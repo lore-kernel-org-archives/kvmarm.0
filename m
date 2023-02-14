@@ -1,27 +1,29 @@
-Received: from out-77.mta1.migadu.com (out-77.mta1.migadu.com [95.215.58.77])
+Received: from out-69.mta0.migadu.com (out-69.mta0.migadu.com [91.218.175.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3842CA5
-	for <kvmarm@lists.linux.dev>; Tue, 14 Feb 2023 20:56:06 +0000 (UTC)
-Date: Tue, 14 Feb 2023 21:18:56 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C312CA5
+	for <kvmarm@lists.linux.dev>; Tue, 14 Feb 2023 21:18:29 +0000 (UTC)
+Date: Tue, 14 Feb 2023 19:43:12 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1676405942;
+	t=1676400194;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=GNW8SrgMQvUyACn7rFRBFRQ3ENe28gCY7MBVq5s37kc=;
-	b=DASD/suchG96au0LYsv6dTjdALItPT7wWU9eun7rJ2QSWlObNf5bMbqNOTN9eT9JB7GFqv
-	phZj31ai7ctY1JjBs96+vYmpRr02dsiEm9w3hkSlAMYPsvxVDCmdrBj7jovKHUWk55dFxO
-	GwM7WkhBD15O8o0im1eWmacWI+0Wk0c=
+	bh=+ARZ8c4fJOUkVauk6nDGCLPkdV1BbJIECX4fbiHsPeY=;
+	b=pAAVwz3CClbUr3faOJyK+PpC8pa/wsjiGJu9Xp41mm5fpYlmHsrLrRzZ9jNZ654Ob81LKT
+	p4Y5XjiuqPmMbwUBUIVuPeQkw9OexgkiGYgqlxe5g9EfGdYrOT2Xb+sYRBIJCH8IBNB15C
+	ep9FHtX2Nff9LMoAjGOVrfLU4RbSCvE=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
-To: Ricardo Koller <ricarkol@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
-	alexandru.elisei@arm.com, eric.auger@redhat.com,
-	oliver.upton@linux.dev, reijiw@google.com
-Subject: Re: [kvm-unit-tests PATCH v4 0/6] arm: pmu: Add support for PMUv3p5
-Message-ID: <20230214201856.wvfg2wxgeg5z6out@orel>
-References: <20230126165351.2561582-1-ricarkol@google.com>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: thuth@redhat.com, pbonzini@redhat.com, nrb@linux.ibm.com,
+	imbrenda@linux.ibm.com, marcorr@google.com,
+	alexandru.elisei@arm.com, oliver.upton@linux.dev,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [kvm-unit-tests PATCH v5] arm: Replace MAX_SMP probe loop in
+ favor of reading directly
+Message-ID: <20230214184312.tuonymejepqg3dyq@orel>
+References: <20230207233256.3791424-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -30,65 +32,80 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230126165351.2561582-1-ricarkol@google.com>
+In-Reply-To: <20230207233256.3791424-1-coltonlewis@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Thu, Jan 26, 2023 at 04:53:45PM +0000, Ricardo Koller wrote:
-> The first commit fixes the tests when running on PMUv3p5. The issue is that
-> PMUv3p5 uses 64-bit counters irrespective of whether the PMU is configured
-> for overflowing at 32 or 64-bits. Tests are currently failing [0] on
-> PMUv3p5 because of this. They wrongly assume that values will be wrapped
-> around 32-bits, but they overflow into the other half of the 64-bit
-> counters.
+On Tue, Feb 07, 2023 at 11:32:56PM +0000, Colton Lewis wrote:
+> Replace the MAX_SMP probe loop in favor of reading a number directly
+> from the QEMU error message. This is equally safe as the existing code
+> because the error message has had the same format as long as it has
+> existed, since QEMU v2.10. The final number before the end of the
+> error message line indicates the max QEMU supports.
 > 
-> The second and third commits add new tests for 64-bit overflows, a feature
-> added with PMUv3p5 (PMCR_EL0.LP == 1). This is done by running all
-> overflow-related tests in two modes: with 32-bit and 64-bit overflows.
-> The fourt commit changes the value reporting to use %lx instead of %ld.
+> This loop logic is broken for machines with a number of CPUs that
+> isn't a power of two. This problem was noticed for gicv2 tests on
+> machines with a non-power-of-two number of CPUs greater than 8 because
+> tests were running with MAX_SMP less than 8. As a hypothetical example,
+> a machine with 12 CPUs will test with MAX_SMP=6 because 12 >> 1 ==
+> 6. This can, in rare circumstances, lead to different test results
+> depending only on the number of CPUs the machine has.
 > 
-> This series was tested on PMUv3p5 and PMUv3p4 using the ARM Fast Model and
-> kvmtool.  All tests pass on both PMUv3p5 and PMUv3p4 when using Marc's
-> PMUv3p5 series [0], plus the suggestion made at [1]. Didn't test AArch32.
+> A previous comment explains the loop should only apply to kernels
+> <=v4.3 on arm and suggests deletion when it becomes tiresome to
+> maintain. However, it is always theoretically possible to test on a
+> machine that has more CPUs than QEMU supports, so it makes sense to
+> leave some check in place.
 > 
-> Changes from v3:
-> - Added commit to fix test_overflow_interrupt(). (Reiji and Eric)
-> - Separated s/ALL_SET/ALL_SET_32/ and s/PRE_OVERFLOW/PRE_OVERFLOW_32
->   into its own commit. (Reiji and Eric)
-> - Fix s/200/20. (Eric)
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+>  scripts/runtime.bash | 17 ++++++++---------
+>  1 file changed, 8 insertions(+), 9 deletions(-)
 > 
-> Changes from v2:
-> - used Oliver's suggestion of using pmevcntr_mask() for masking counters to
->   32 or 64 bits, instead of casting to uint32_t or uint64_t.
-> - removed ALL_SET_AT() in favor of pmevcntr_mask(). (Oliver)
-> - moved the change to have odd counter overflows at 64-bits from first to
->   third commit.
-> - renamed PRE_OVERFLOW macro to PRE_OVERFLOW_32, and PRE_OVERFLOW_AT() to
->   PRE_OVERFLOW().
+> v5: Remove the last awk reference and guard the probing code with a
+> check that ARCH = arm or arm64.
 > 
-> Changes from v1 (all suggested by Alexandru):
-> - report counter values in hexadecimal
-> - s/overflow_at_64bits/unused for all chained tests
-> - check that odd counters do not increment when using overflow_at_64bits
->   (pmcr.LP=1)
-> - test 64-bit odd counters overflows
-> - switch confusing var names in test_chained_sw_incr(): cntr0 <-> cntr1
+> v4: https://lore.kernel.org/kvm/20230201172110.1970980-1-coltonlewis@google.com/
 > 
-> [0] https://lore.kernel.org/kvmarm/20221113163832.3154370-1-maz@kernel.org/
-> [1] https://lore.kernel.org/kvmarm/Y4jasyxvFRNvvmox@google.com/
+> v3: https://lore.kernel.org/kvm/20230130195700.729498-1-coltonlewis@google.com/
 > 
-> Ricardo Koller (6):
->   arm: pmu: Fix overflow checks for PMUv3p5 long counters
->   arm: pmu: Prepare for testing 64-bit overflows
->   arm: pmu: Rename ALL_SET and PRE_OVERFLOW
->   arm: pmu: Add tests for 64-bit overflows
->   arm: pmu: Print counter values as hexadecimals
->   arm: pmu: Fix test_overflow_interrupt()
+> v2: https://lore.kernel.org/kvm/20230111215422.2153645-1-coltonlewis@google.com/
 > 
->  arm/pmu.c | 298 ++++++++++++++++++++++++++++++++++--------------------
->  1 file changed, 188 insertions(+), 110 deletions(-)
+> v1: https://lore.kernel.org/kvm/20221219185250.631503-1-coltonlewis@google.com/
 > 
-> -- 
-> 2.39.1.456.gfc5497dd1b-goog
->
+> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> index f8794e9a..fb64e855 100644
+> --- a/scripts/runtime.bash
+> +++ b/scripts/runtime.bash
+> @@ -188,12 +188,11 @@ function run()
+>  # Probe for MAX_SMP, in case it's less than the number of host cpus.
+>  #
+>  # This probing currently only works for ARM, as x86 bails on another
+> -# error first. Also, this probing isn't necessary for any ARM hosts
+> -# running kernels later than v4.3, i.e. those including ef748917b52
+> -# "arm/arm64: KVM: Remove 'config KVM_ARM_MAX_VCPUS'". So, at some
+> -# point when maintaining the while loop gets too tiresome, we can
+> -# just remove it...
+> -while $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
+> -		|& grep -qi 'exceeds max CPUs'; do
+> -	MAX_SMP=$((MAX_SMP >> 1))
+> -done
+> +# error first, so this check is only run for ARM and ARM64. The
+> +# parameter expansion takes the last number from the QEMU error
+> +# message, which gives the allowable MAX_SMP.
+> +if [ "${ARCH%64}" = arm ] && smp=$($RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
 
-Applied, thanks
+I'd rather be more explicit. I'll change this to
+
+if [[ $ARCH == 'arm' || $ARCH == 'arm64' ]] && smp=...
+
+and merge it.
+
+Thanks,
+drew
+
+> +      |& grep 'exceeds max CPUs'); then
+> +	smp=${smp##*(}
+> +	MAX_SMP=${smp:0:-1}
+> +fi
+> --
+> 2.39.1.519.gcb327c4b5f-goog
