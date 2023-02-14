@@ -1,103 +1,115 @@
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-240.mta1.migadu.com (out-240.mta1.migadu.com [95.215.58.240])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF63C0A3
-	for <kvmarm@lists.linux.dev>; Tue, 14 Feb 2023 21:59:46 +0000 (UTC)
-Received: by mail-qt1-f172.google.com with SMTP id b21so355683qtr.13
-        for <kvmarm@lists.linux.dev>; Tue, 14 Feb 2023 13:59:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=G9CGSOp3cnMbqbIfyoqOt2E4VaTIulHyrGeP2LlvMsY=;
-        b=ERbDpCpt2Tk4VGox/mEQVipV7nprtmIHi/II9V7O+StTtFAxdKi65RNqDJcFbNVb1X
-         9CQJYjwsoLZrgFVz+cKyqcItgaS2yg/xt94wT430K6f4WoEDlHPS6qoY6ybpy6x00JBh
-         SdYrx5Rf/RQLfo47T+A2IxYeoz2D6yKkjNahTRQQOqJyGCn4qrG1WOxPEio99ROGwJZK
-         H6jCUN7og67rkf4ykYgx7cSGFeMzQa3kIfaAWSdZI4iLICf18nt6ZWr9zwO1zEQDd/1O
-         CjRHt4nwDjXPZ1TmIJNvu/1FjNBKa9jkUWpJal1G/dJCSC1KFc0lzY0xCEtcs3HhHJNv
-         +R/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=G9CGSOp3cnMbqbIfyoqOt2E4VaTIulHyrGeP2LlvMsY=;
-        b=quOwKHuue0mNl81PA0e2V7PrA7Haw4jiDGZo1OLJ2krz/M4/i+RqSgZFwK5xeT9/WN
-         ATtldB/IvA6OSZ/x+LrGvq5ngz6MQOcua/p758vZ4VfvhwNnN9bNNmfg5tTBiInhG1v0
-         zueuHYkOKeT3j6amjGWbB/LoGx1y4ZFj031ot3AmMfykeUFx+tr/1DnyELcXGLLOlPyi
-         wsKYneg56AzZG+jLrZqlfI6ADxNrqTsUq89Qtn8+zT66WQPIQ3TFA0o6DlMi5cd1hPNV
-         +LUabp4dKMZR347W6YRr0UfbMr9/BOm9Sa9hMshjDDvtR7SFTZxuxQotjGsJptOggV3V
-         /85Q==
-X-Gm-Message-State: AO0yUKVDGR/EY6+lZQu0I3xYtQuOZ8+Dzg/bqKGPym+1YDRHoOz3BLTg
-	9Ihm1zsSuZc+LnelLDkYZdpJAgMy4IBg6D8y8k3PXQ==
-X-Google-Smtp-Source: AK7set+Gv3LXwX2MMsG93isRy47g9jzZQtswzEk9WEDLngAXTM0ZyBRQotqzN6+CLBFyCY5T0/n3zT94zcb6C5sRpEU=
-X-Received: by 2002:a05:622a:148c:b0:3ba:240b:99ad with SMTP id
- t12-20020a05622a148c00b003ba240b99admr543512qtx.65.1676411985281; Tue, 14 Feb
- 2023 13:59:45 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22538CB80
+	for <kvmarm@lists.linux.dev>; Tue, 14 Feb 2023 22:06:12 +0000 (UTC)
+Date: Tue, 14 Feb 2023 21:18:32 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1676405913;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FZWvHAE3AfHijPUYYwDdENkgr8zhxS3Wmlnay/ly7FA=;
+	b=FHqbdBDiHu8GtKvzSunGVJdy78W1/MQgTwzhqVhTr+WEVzmnGC7u3/8AuASP1wNx3zER8w
+	H4sKnLDbBxDJ36Z0Qa0xiqI0r3pr+7ImNd+YEmbNACVr+zHxfCCJZNPaB5upsbSNMbzV4J
+	D2A/JzEUzf1vDf3UV6yZZifOe9hTTwM=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [kvm-unit-tests PATCH v6 0/2] arm: Add PSCI CPU_OFF test
+Message-ID: <20230214201832.qtzatjfomh3cxtgd@orel>
+References: <20230203162353.34876-1-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230206165851.3106338-1-ricarkol@google.com> <1a3afa6d-3478-31dd-6f34-52075875c2fa@redhat.com>
- <Y+s5PwV1l60jXal1@linux.dev>
-In-Reply-To: <Y+s5PwV1l60jXal1@linux.dev>
-From: Ricardo Koller <ricarkol@google.com>
-Date: Tue, 14 Feb 2023 13:59:34 -0800
-Message-ID: <CAOHnOrzXjwJ+WZJhvBQFT3y6iLHMAD54BveVCdhy0zksmUcZhQ@mail.gmail.com>
-Subject: Re: [PATCH v2 00/12] Implement Eager Page Splitting for ARM.
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Gavin Shan <gshan@redhat.com>, pbonzini@redhat.com, maz@kernel.org, 
-	oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com, 
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com, 
-	catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com, 
-	alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com, 
-	reijiw@google.com, rananta@google.com, bgardon@google.com, ricarkol@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230203162353.34876-1-alexandru.elisei@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Feb 13, 2023 at 11:33 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+On Fri, Feb 03, 2023 at 04:23:51PM +0000, Alexandru Elisei wrote:
+> The series adds a test for the PSCI function CPU_OFF. The test is
+> implemented in patch #2, "arm/psci: Add PSCI CPU_OFF test case".  Patch #1,
+> "arm/psci: Test that CPU 1 has been successfully brought online" is a
+> preparatory patch to allow the CPU_OFF test to run after the CPU_ON test.
+> Executing the CPU_OFF test after the CPU_ON test makes the most sense,
+> since CPU_OFF requires all the CPUs to be brought online before the test
+> can execute, and this is exactly what the CPU_ON test does.
+> 
+> I believe that proving that a CPU has been successfully offlined is an
+> undecidable problem - it might just be that the CPU is stuck at a higher
+> exception level doing something else entirely, and if the test were to wait
+> long enough, the CPU would return from the CPU_OFF call and start executing
+> code, thus failing to be offlined. Right now, the test waits for 100ms
+> after checking that all the other CPUs are offline. I thought this was a
+> good balance between making the test fast and being reasonably sure that
+> the offline succeeded. I'm open to suggestions here if anyone thinks
+> otherwise.
+> 
+> Tested for both the arm and arm64 architectures: on an x86 machine (qemu
+> with TCG), and a rockpro64 (qemu and kvmtool).
+> 
+> And Nikita is not longer at Arm, and I don't have a new email address where
+> she can be reached, so I didn't CC her.
+> 
+> Changelog:
+> 
+> v5 -> v6:
+> - Added Reviewed-by tag to #1 (Drew).
+> - Fixed the unintended change that added the argc/argv arguments to main()
+>   in #2 (Drew).
+> - Fixed bailing early when all secondaries are offline in #2 (Drew).
+> - Run the cpu-off test only if some of the secondaries are not idling
+>   instead if cpu-on has failed (cpu-on can fail for other reasons too)
+>   (Drew).
+> 
+> v4 -> v5:
+> - Open code smp_prepare_secondary in psci.c instead of exposing it as a
+>   library function in the cpu_on test (Drew).
+> - Don't return early if a CPU failed to online CPU1 in the cpu_on test, and
+>   check the return values for the CPUs that succeeded to online CPU 1
+>   (Drew).
+> - Drop cpu_off_success in the cpu_off test in favour of checking
+>   AFFINITY_INFO and the cpu idle mask (Drew).
+> - Hopefully made the cpu_off test faster (Drew).
+> 
+> v3 -> v4:
+> - Moved ownership of the series to Alexandru Elisei. All bugs are mine.
+> - Moved the timeout for the CPU_ON test to patch #1.
+> - Changed the include order for arm/psic.c in patch #1 to order the headers
+>   alphabetically.
+> - Run the CPU_OFF test only if CPU_ON succeeds, because CPU_OFF expects all
+>   CPUs to be online, the test would otherwise hang forever.
+> - Minor style changes here and there.
+> 
+> v2 -> v3:
+> - Add timeout so that test does not hang if CPU1 fails to come online
+> - Remove unnecessary call of on_cpus() in the condition where target CPU is not online.
+> 
+> v1 -> v2:
+> - Modify PSCI CPU_ON test to ensure CPU 1 remains online after the execution of the test.
+> - Addition of PSCI CPU_OFF test and calling it after PSCI CPU_ON test has been executed.
+> 
+> Alexandru Elisei (1):
+>   arm/psci: Test that CPU 1 has been successfully brought online
+> 
+> Nikita Venkatesh (1):
+>   arm/psci: Add PSCI CPU_OFF test case
+> 
+>  arm/psci.c        | 138 +++++++++++++++++++++++++++++++++++++++++-----
+>  lib/arm/asm/smp.h |   9 ++-
+>  lib/arm/smp.c     |   4 --
+>  lib/errata.h      |   2 +
+>  4 files changed, 134 insertions(+), 19 deletions(-)
+> 
+> 
+> base-commit: 2480430a36102f8ea276b3bfb1d64d5dacc23b8f
+> -- 
+> 2.39.1
 >
-> Hi Gavin,
->
-> On Tue, Feb 14, 2023 at 04:57:59PM +1100, Gavin Shan wrote:
-> > On 2/7/23 3:58 AM, Ricardo Koller wrote:
->
-> <snip>
->
-> > > Eager Page Splitting fixes the above two issues by eagerly splitting
-> > > huge-pages when enabling dirty logging. The goal is to avoid doing it
-> > > while faulting on write-protected pages.
->
-> </snip>
->
-> > I'm not sure why we can't eagerly split the PMD mapping into 512 PTE
-> > mapping in the page fault handler?
->
-> The entire goal of the series is to avoid page splitting at all on the
-> stage-2 abort path. Ideally we want to minimize the time taken to handle
-> a fault so we can get back to running the guest. The requirement to
-> perform a break-before-make operation to change the mapping granularity
-> can, as Ricardo points out, be a bottleneck on contemporary implementations.
->
-> There is a clear uplift with the proposed implementation already, and I
-> would expect that margin to widen if/when we add support for lockless
-> (i.e. RCU-protected) permission relaxation.
 
-There's also the issue of allocating 513 pages on fault when splitting PUDs.
-
->
-> > In the implementation, the newly introduced API
-> > kvm_pgtable_stage2_split() calls to kvm_pgtable_stage2_create_unlinked()
-> > and then stage2_map_walker(), which is part of kvm_pgtable_stage2_map(),
-> > to create the unlinked page tables.
->
-> This is deliberate code reuse. Page table construction in the fault path
-> is largely similar to that of eager split besides the fact that one is
-> working on 'live' page tables whereas the other is not. As such I gave
-> the suggestion to Ricardo to reuse what we have today for the sake of
-> eager splitting.
->
-> --
-> Thanks,
-> Oliver
+Applied, thanks
