@@ -1,98 +1,87 @@
-Received: from out-108.mta1.migadu.com (out-108.mta1.migadu.com [95.215.58.108])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8574815A8
-	for <kvmarm@lists.linux.dev>; Tue, 14 Feb 2023 00:15:25 +0000 (UTC)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1676327211;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4973D23D5
+	for <kvmarm@lists.linux.dev>; Tue, 14 Feb 2023 03:45:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1676346315;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HSzklRkVsXJz/hVV1Smo9TgADWE1visfUN0vsS5QYPM=;
-	b=Mj0TXFbTrVvFINMINi0IRxEZx6zuQM9dP26AUhQAHYasfoGVdKMDrHWEU2ch4vyel5cdqk
-	PiKPSAgmF7BXi2eEKZu3o5QPP8No1fVMH+Sejuh9jFazy+Sr2Hh4qWvlOFjxluxGy/tDY2
-	0gIyjgjB1jyMzvawFuPH+eAysVcRI1A=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>,
-	kvm@vger.kernel.org
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 00/18] KVM: arm64: Prefix patches for NV support
-Date: Mon, 13 Feb 2023 22:26:26 +0000
-Message-Id: <167632713104.280051.11716946551616361075.b4-ty@linux.dev>
-In-Reply-To: <20230209175820.1939006-1-maz@kernel.org>
-References: <20230209175820.1939006-1-maz@kernel.org>
+	bh=3AIpnqpvUD6jq2TBiR4c/9rNmsRY6g7mIfXM/n0+slQ=;
+	b=SC2ipuiKHVVlIS5/9ev1x1y+wHj+L3MG9T7cvKj7IF/MMNFx4CfxkWu60lGqKTOfVuB2b1
+	5c/SjGGBdnWDZf0J0ucZ01X773E3lbaEFlcn65WBqKHXtGcRQuvupfF9Pj/GgZi94uo+7d
+	fY5kgogvGp9TdVwwFm0ROL8CDwkpQTw=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-567-W6oFm3vQNy2SJHawQnV8CQ-1; Mon, 13 Feb 2023 22:45:11 -0500
+X-MC-Unique: W6oFm3vQNy2SJHawQnV8CQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 675303810789;
+	Tue, 14 Feb 2023 03:45:11 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 5A1EEC16022;
+	Tue, 14 Feb 2023 03:45:11 +0000 (UTC)
+From: shahuang@redhat.com
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Shaoqin Huang <shahuang@redhat.com>,
+	Andrew Jones <andrew.jones@linux.dev>,
+	Eric Auger <eric.auger@redhat.com>
+Subject: [kvm-unit-tests 1/3] arm: gic: Write one bit per time in gic_irq_set_clr_enable()
+Date: Mon, 13 Feb 2023 22:44:51 -0500
+Message-Id: <20230214034453.148494-2-shahuang@redhat.com>
+In-Reply-To: <20230214034453.148494-1-shahuang@redhat.com>
+References: <20230214034453.148494-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 
-On Thu, 9 Feb 2023 17:58:02 +0000, Marc Zyngier wrote:
-> As a bunch of the NV patches have had a decent amount of review, and
-> given that they do very little on their own, I've put together a
-> prefix series that gets the most mundane stuff out of the way.
-> 
-> Of course, nothing is functional, but nothing gets used either. In a
-> way, this is pretty similar to the current state of pKVM! ;-)
-> 
-> [...]
+From: Shaoqin Huang <shahuang@redhat.com>
 
-Applied to kvmarm/next, thanks!
+When use gic_irq_set_clr_enable() to disable an interrupt, it will
+disable all interrupt since it first read from Interrupt Clear-Enable
+Registers and then write this value with a mask back.
 
-[01/18] arm64: Add ARM64_HAS_NESTED_VIRT cpufeature
-        https://git.kernel.org/kvmarm/kvmarm/c/675cabc89900
-[02/18] KVM: arm64: Use the S2 MMU context to iterate over S2 table
-        https://git.kernel.org/kvmarm/kvmarm/c/8531bd63a8dc
-[03/18] KVM: arm64: nv: Introduce nested virtualization VCPU feature
-        https://git.kernel.org/kvmarm/kvmarm/c/89b0e7de3451
-[04/18] KVM: arm64: nv: Reset VCPU to EL2 registers if VCPU nested virt is set
-        https://git.kernel.org/kvmarm/kvmarm/c/2fb32357ae67
-[05/18] KVM: arm64: nv: Allow userspace to set PSR_MODE_EL2x
-        https://git.kernel.org/kvmarm/kvmarm/c/1d05d51bac78
-[06/18] KVM: arm64: nv: Add EL2 system registers to vcpu context
-        https://git.kernel.org/kvmarm/kvmarm/c/5305cc2c3400
-[07/18] KVM: arm64: nv: Add nested virt VCPU primitives for vEL2 VCPU state
-        https://git.kernel.org/kvmarm/kvmarm/c/0043b29038e2
-[08/18] KVM: arm64: nv: Handle HCR_EL2.NV system register traps
-        https://git.kernel.org/kvmarm/kvmarm/c/6ff9dc238a53
-[09/18] KVM: arm64: nv: Support virtual EL2 exceptions
-        https://git.kernel.org/kvmarm/kvmarm/c/47f3a2fc765a
-[10/18] KVM: arm64: nv: Inject HVC exceptions to the virtual EL2
-        https://git.kernel.org/kvmarm/kvmarm/c/93c33702cd2b
-[11/18] KVM: arm64: nv: Handle trapped ERET from virtual EL2
-        https://git.kernel.org/kvmarm/kvmarm/c/6898a55ce38c
-[12/18] KVM: arm64: nv: Handle PSCI call via smc from the guest
-        https://git.kernel.org/kvmarm/kvmarm/c/bd36b1a9eb5a
-[13/18] KVM: arm64: nv: Add accessors for SPSR_EL1, ELR_EL1 and VBAR_EL1 from virtual EL2
-        https://git.kernel.org/kvmarm/kvmarm/c/9da117eec924
-[14/18] KVM: arm64: nv: Emulate PSTATE.M for a guest hypervisor
-        https://git.kernel.org/kvmarm/kvmarm/c/d9552fe133f9
-[15/18] KVM: arm64: nv: Allow a sysreg to be hidden from userspace only
-        https://git.kernel.org/kvmarm/kvmarm/c/e6b367db0f91
-[16/18] KVM: arm64: nv: Emulate EL12 register accesses from the virtual EL2
-        https://git.kernel.org/kvmarm/kvmarm/c/280b748e871e
-[17/18] KVM: arm64: nv: Filter out unsupported features from ID regs
-        https://git.kernel.org/kvmarm/kvmarm/c/9f75b6d447d7
-[18/18] KVM: arm64: nv: Only toggle cache for virtual EL2 when SCTLR_EL2 changes
-        https://git.kernel.org/kvmarm/kvmarm/c/191e0e155521
+So diretly write one bit per time to enable or disable interrupt.
 
---
-Best,
-Oliver
+Fixes: cb573c2 ("arm: gic: Introduce gic_irq_set_clr_enable() helper")
+Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+---
+ lib/arm/gic.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+index 1bfcfcf..89a15fe 100644
+--- a/lib/arm/gic.c
++++ b/lib/arm/gic.c
+@@ -176,7 +176,6 @@ void gic_ipi_send_mask(int irq, const cpumask_t *dest)
+ void gic_irq_set_clr_enable(int irq, bool enable)
+ {
+ 	u32 offset, split = 32, shift = (irq % 32);
+-	u32 reg, mask = BIT(shift);
+ 	void *base;
+ 
+ 	assert(irq < 1020);
+@@ -199,8 +198,7 @@ void gic_irq_set_clr_enable(int irq, bool enable)
+ 		assert(0);
+ 	}
+ 	base += offset + (irq / split) * 4;
+-	reg = readl(base);
+-	writel(reg | mask, base);
++	writel(BIT(shift), base);
+ }
+ 
+ enum gic_irq_state gic_irq_state(int irq)
+-- 
+2.39.1
+
