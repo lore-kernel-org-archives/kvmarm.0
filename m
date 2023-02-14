@@ -1,89 +1,132 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96B7D23D5
-	for <kvmarm@lists.linux.dev>; Tue, 14 Feb 2023 03:45:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC3EC256A
+	for <kvmarm@lists.linux.dev>; Tue, 14 Feb 2023 05:58:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1676346329;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	s=mimecast20190719; t=1676354299;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=rXXqhL3i2rw+CD2SWSpGnLLy2TCQWbs5XnC6wXJkit0=;
-	b=H+04QcFP/CmeYZtX+i9Y+lhuE65wjAlyfWZBc45D0CDUwx4+pS8yX8Tye23ufqWUSbjZ6s
-	rpP6uTktvqSh9J4eVFLoVncdVw5BB9UrrwKQu7xLqiCPJf9jQhQ/PRKi2J/Z9PzaADsoxt
-	t2nXhZBFKQtz3whmqvPABqCWCepybIw=
+	bh=QroTo7XZf3wgJm7/KonBsO/MCtU86JyA/gXwdq8Y+4o=;
+	b=agTpdc8eRSdR4g43K780A3Vejd9lYJyiejkUy9udLljNTtYk7ueDO1JOIVU/aRewBYeuQa
+	XgQzLlaEmtXnuCvRIKAJYgClhRCdz9g7xi84PvPzkcwh4UfX4LCQ+wRfX5BeNcOY5Fe3SU
+	pYLMwTv3E+EuX+687FuGeO+bjI/xmxw=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-396-ahTsTAxNNyiILwCNL55fQA-1; Mon, 13 Feb 2023 22:45:11 -0500
-X-MC-Unique: ahTsTAxNNyiILwCNL55fQA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+ us-mta-541-fhLi7w2lPhSIOujo1IV_iQ-1; Tue, 14 Feb 2023 00:58:12 -0500
+X-MC-Unique: fhLi7w2lPhSIOujo1IV_iQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 94889101A55E;
-	Tue, 14 Feb 2023 03:45:11 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 8E1FAC16022;
-	Tue, 14 Feb 2023 03:45:11 +0000 (UTC)
-From: shahuang@redhat.com
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: Shaoqin Huang <shahuang@redhat.com>,
-	Andrew Jones <andrew.jones@linux.dev>
-Subject: [kvm-unit-tests 3/3] arm64: microbench: Use gic_enable_irq() macro in microbench test
-Date: Mon, 13 Feb 2023 22:44:53 -0500
-Message-Id: <20230214034453.148494-4-shahuang@redhat.com>
-In-Reply-To: <20230214034453.148494-1-shahuang@redhat.com>
-References: <20230214034453.148494-1-shahuang@redhat.com>
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BD016101AA5F;
+	Tue, 14 Feb 2023 05:58:10 +0000 (UTC)
+Received: from [10.64.54.114] (vpn2-54-114.bne.redhat.com [10.64.54.114])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 80A6551E5;
+	Tue, 14 Feb 2023 05:58:02 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v2 00/12] Implement Eager Page Splitting for ARM.
+To: Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
+ maz@kernel.org, oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
+ catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com,
+ reijiw@google.com, rananta@google.com, bgardon@google.com, ricarkol@gmail.com
+References: <20230206165851.3106338-1-ricarkol@google.com>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <1a3afa6d-3478-31dd-6f34-52075875c2fa@redhat.com>
+Date: Tue, 14 Feb 2023 16:57:59 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+In-Reply-To: <20230206165851.3106338-1-ricarkol@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 
-From: Shaoqin Huang <shahuang@redhat.com>
+Hi Ricardo,
 
-Use gic_enable_irq() to clean up code.
+On 2/7/23 3:58 AM, Ricardo Koller wrote:
+> Eager Page Splitting improves the performance of dirty-logging (used
+> in live migrations) when guest memory is backed by huge-pages.  It's
+> an optimization used in Google Cloud since 2016 on x86, and for the
+> last couple of months on ARM.
+> 
+> Background and motivation
+> =========================
+> Dirty logging is typically used for live-migration iterative copying.
+> KVM implements dirty-logging at the PAGE_SIZE granularity (will refer
+> to 4K pages from now on).  It does it by faulting on write-protected
+> 4K pages.  Therefore, enabling dirty-logging on a huge-page requires
+> breaking it into 4K pages in the first place.  KVM does this breaking
+> on fault, and because it's in the critical path it only maps the 4K
+> page that faulted; every other 4K page is left unmapped.  This is not
+> great for performance on ARM for a couple of reasons:
+> 
+> - Splitting on fault can halt vcpus for milliseconds in some
+>    implementations. Splitting a block PTE requires using a broadcasted
+>    TLB invalidation (TLBI) for every huge-page (due to the
+>    break-before-make requirement). Note that x86 doesn't need this. We
+>    observed some implementations that take millliseconds to complete
+>    broadcasted TLBIs when done in parallel from multiple vcpus.  And
+>    that's exactly what happens when doing it on fault: multiple vcpus
+>    fault at the same time triggering TLBIs in parallel.
+> 
+> - Read intensive guest workloads end up paying for dirty-logging.
+>    Only mapping the faulting 4K page means that all the other pages
+>    that were part of the huge-page will now be unmapped. The effect is
+>    that any access, including reads, now has to fault.
+> 
+> Eager Page Splitting (on ARM)
+> =============================
+> Eager Page Splitting fixes the above two issues by eagerly splitting
+> huge-pages when enabling dirty logging. The goal is to avoid doing it
+> while faulting on write-protected pages. This is what the TDP MMU does
+> for x86 [0], except that x86 does it for different reasons: to avoid
+> grabbing the MMU lock on fault. Note that taking care of
+> write-protection faults still requires grabbing the MMU lock on ARM,
+> but not on x86 (with the fast_page_fault path).
+> 
+> An additional benefit of eagerly splitting huge-pages is that it can
+> be done in a controlled way (e.g., via an IOCTL). This series provides
+> two knobs for doing it, just like its x86 counterpart: when enabling
+> dirty logging, and when using the KVM_CLEAR_DIRTY_LOG ioctl. The
+> benefit of doing it on KVM_CLEAR_DIRTY_LOG is that this ioctl takes
+> ranges, and not complete memslots like when enabling dirty logging.
+> This means that the cost of splitting (mainly broadcasted TLBIs) can
+> be throttled: split a range, wait for a bit, split another range, etc.
+> The benefits of this approach were presented by Oliver Upton at KVM
+> Forum 2022 [1].
+> 
 
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
----
- arm/micro-bench.c | 15 +--------------
- 1 file changed, 1 insertion(+), 14 deletions(-)
+[...]
 
-diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-index 8436612..090fda6 100644
---- a/arm/micro-bench.c
-+++ b/arm/micro-bench.c
-@@ -212,24 +212,11 @@ static void lpi_exec(void)
- 
- static bool timer_prep(void)
- {
--	void *gic_isenabler;
--
- 	gic_enable_defaults();
- 	install_irq_handler(EL1H_IRQ, gic_irq_handler);
- 	local_irq_enable();
- 
--	switch (gic_version()) {
--	case 2:
--		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
--		break;
--	case 3:
--		gic_isenabler = gicv3_sgi_base() + GICR_ISENABLER0;
--		break;
--	default:
--		assert_msg(0, "Unreachable");
--	}
--
--	writel(1 << PPI(TIMER_VTIMER_IRQ), gic_isenabler);
-+	gic_enable_irq(PPI(TIMER_VTIMER_IRQ));
- 	write_sysreg(ARCH_TIMER_CTL_IMASK | ARCH_TIMER_CTL_ENABLE, cntv_ctl_el0);
- 	isb();
- 
--- 
-2.39.1
+Sorry for raising questions about the design lately. There are two operations
+regarding the existing huge page mapping. Here, lets take PMD and PTE mapping
+as an example for discussion: (a) The existing PMD mapping is split to contiguous
+512 PTE mappings when all sub-pages are written in sequence and dirty logging has
+been enabled (b) The contiguous 512 PTE mappings are combined to one PMD mapping
+when dirty logging is disabled.
+
+Before this series is applied, both (a) and (b) are handled by the page fault handler.
+After this series is applied, (a) is handled in the ioctl handler while (b) is still
+handled in the page fault handler. I'm not sure why we can't eagerly split the PMD
+mapping into 512 PTE mapping in the page fault handler? In this way, the implementation
+may be simplified by extending kvm_pgtable_stage2_map(). In the implementation, the
+newly introduced API kvm_pgtable_stage2_split() calls to kvm_pgtable_stage2_create_unlinked()
+and then stage2_map_walker(), which is part of kvm_pgtable_stage2_map(), to create the
+unlinked page tables. It's why I have the question.
+
+Thanks,
+Gavin
+
 
