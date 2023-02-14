@@ -1,27 +1,27 @@
-Received: from out-13.mta1.migadu.com (out-13.mta1.migadu.com [95.215.58.13])
+Received: from out-77.mta1.migadu.com (out-77.mta1.migadu.com [95.215.58.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26417C5E2
-	for <kvmarm@lists.linux.dev>; Tue, 14 Feb 2023 20:40:48 +0000 (UTC)
-Date: Tue, 14 Feb 2023 21:23:34 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3842CA5
+	for <kvmarm@lists.linux.dev>; Tue, 14 Feb 2023 20:56:06 +0000 (UTC)
+Date: Tue, 14 Feb 2023 21:18:56 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1676406220;
+	t=1676405942;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+uBN9Bn2ZufBVKlwHRxv10F6vgU620kjCUdcZKd8LN0=;
-	b=J1dnPyP40TZIIf3EXmMWR8Sy0k3Cl7OfJaR61pboItEB7m++uBeq1RykPIfCz5HgClTF+C
-	KATPEZUpRNjyCXN1qeQO1FFiMSlm6/kT/Bz7q13GwzuK8ijqzI5ifoo5BosxWrMlZwTvgN
-	999CDfJbQO41Lxf49rihbwlytGl+Gbw=
+	bh=GNW8SrgMQvUyACn7rFRBFRQ3ENe28gCY7MBVq5s37kc=;
+	b=DASD/suchG96au0LYsv6dTjdALItPT7wWU9eun7rJ2QSWlObNf5bMbqNOTN9eT9JB7GFqv
+	phZj31ai7ctY1JjBs96+vYmpRr02dsiEm9w3hkSlAMYPsvxVDCmdrBj7jovKHUWk55dFxO
+	GwM7WkhBD15O8o0im1eWmacWI+0Wk0c=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu
-Subject: Re: [kvm-unit-tests PATCH v2 0/2] arm/arm64: teach
- virt_to_pte_phys() about block descriptors
-Message-ID: <20230214202334.dk22gk4fzy2rkdty@orel>
-References: <20221124152816.22305-1-alexandru.elisei@arm.com>
+To: Ricardo Koller <ricarkol@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+	alexandru.elisei@arm.com, eric.auger@redhat.com,
+	oliver.upton@linux.dev, reijiw@google.com
+Subject: Re: [kvm-unit-tests PATCH v4 0/6] arm: pmu: Add support for PMUv3p5
+Message-ID: <20230214201856.wvfg2wxgeg5z6out@orel>
+References: <20230126165351.2561582-1-ricarkol@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -30,36 +30,65 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221124152816.22305-1-alexandru.elisei@arm.com>
+In-Reply-To: <20230126165351.2561582-1-ricarkol@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Thu, Nov 24, 2022 at 03:28:14PM +0000, Alexandru Elisei wrote:
-> I was writing a quick test when I noticed that arm's implementation of
-> __virt_to_phys(), which ends up calling virt_to_pte_phys(), doesn't handle
-> block mappings and returns a bogus value. When fixing it I got confused
-> about mmu_get_pte() and get_pte(), so I (hopefully) improved things by
-> renaming mmu_get_pte() to follow_pte().
+On Thu, Jan 26, 2023 at 04:53:45PM +0000, Ricardo Koller wrote:
+> The first commit fixes the tests when running on PMUv3p5. The issue is that
+> PMUv3p5 uses 64-bit counters irrespective of whether the PMU is configured
+> for overflowing at 32 or 64-bits. Tests are currently failing [0] on
+> PMUv3p5 because of this. They wrongly assume that values will be wrapped
+> around 32-bits, but they overflow into the other half of the 64-bit
+> counters.
 > 
-> Changes since v1:
+> The second and third commits add new tests for 64-bit overflows, a feature
+> added with PMUv3p5 (PMCR_EL0.LP == 1). This is done by running all
+> overflow-related tests in two modes: with 32-bit and 64-bit overflows.
+> The fourt commit changes the value reporting to use %lx instead of %ld.
 > 
-> - Dropped patch #1 ("lib/vmalloc: Treat virt_to_pte_phys() as returning a
->   physical address") because it was incorrect.
-> - Dropped the check for pte_valid() for the return value of mmu_get_pte() in
->   patch #1 because mmu_get_pte() returns NULL for an invalid descriptor.
+> This series was tested on PMUv3p5 and PMUv3p4 using the ARM Fast Model and
+> kvmtool.  All tests pass on both PMUv3p5 and PMUv3p4 when using Marc's
+> PMUv3p5 series [0], plus the suggestion made at [1]. Didn't test AArch32.
 > 
-> Lightly tested on a rockpro64 (4k and 64k pages, arm64 and arm, qemu only)
-> because the changes from the previous version are trivial.
+> Changes from v3:
+> - Added commit to fix test_overflow_interrupt(). (Reiji and Eric)
+> - Separated s/ALL_SET/ALL_SET_32/ and s/PRE_OVERFLOW/PRE_OVERFLOW_32
+>   into its own commit. (Reiji and Eric)
+> - Fix s/200/20. (Eric)
 > 
-> Alexandru Elisei (2):
->   arm/arm64: mmu: Teach virt_to_pte_phys() about block descriptors
->   arm/arm64: mmu: Rename mmu_get_pte() -> follow_pte()
+> Changes from v2:
+> - used Oliver's suggestion of using pmevcntr_mask() for masking counters to
+>   32 or 64 bits, instead of casting to uint32_t or uint64_t.
+> - removed ALL_SET_AT() in favor of pmevcntr_mask(). (Oliver)
+> - moved the change to have odd counter overflows at 64-bits from first to
+>   third commit.
+> - renamed PRE_OVERFLOW macro to PRE_OVERFLOW_32, and PRE_OVERFLOW_AT() to
+>   PRE_OVERFLOW().
 > 
->  lib/arm/asm/mmu-api.h |  2 +-
->  lib/arm/mmu.c         | 88 +++++++++++++++++++++++++------------------
->  2 files changed, 53 insertions(+), 37 deletions(-)
+> Changes from v1 (all suggested by Alexandru):
+> - report counter values in hexadecimal
+> - s/overflow_at_64bits/unused for all chained tests
+> - check that odd counters do not increment when using overflow_at_64bits
+>   (pmcr.LP=1)
+> - test 64-bit odd counters overflows
+> - switch confusing var names in test_chained_sw_incr(): cntr0 <-> cntr1
+> 
+> [0] https://lore.kernel.org/kvmarm/20221113163832.3154370-1-maz@kernel.org/
+> [1] https://lore.kernel.org/kvmarm/Y4jasyxvFRNvvmox@google.com/
+> 
+> Ricardo Koller (6):
+>   arm: pmu: Fix overflow checks for PMUv3p5 long counters
+>   arm: pmu: Prepare for testing 64-bit overflows
+>   arm: pmu: Rename ALL_SET and PRE_OVERFLOW
+>   arm: pmu: Add tests for 64-bit overflows
+>   arm: pmu: Print counter values as hexadecimals
+>   arm: pmu: Fix test_overflow_interrupt()
+> 
+>  arm/pmu.c | 298 ++++++++++++++++++++++++++++++++++--------------------
+>  1 file changed, 188 insertions(+), 110 deletions(-)
 > 
 > -- 
-> 2.37.0
+> 2.39.1.456.gfc5497dd1b-goog
 >
 
 Applied, thanks
