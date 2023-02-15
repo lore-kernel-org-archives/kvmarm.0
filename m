@@ -1,103 +1,146 @@
-Received: from out-237.mta0.migadu.com (out-237.mta0.migadu.com [91.218.175.237])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F26CB80
-	for <kvmarm@lists.linux.dev>; Tue, 14 Feb 2023 22:21:15 +0000 (UTC)
-Date: Tue, 14 Feb 2023 21:18:16 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1676405897;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yuaj1zHJFoMRoJdDoO0Dzp8Y3jToLAkJ82554SZ8ZIU=;
-	b=k+3PkFmNUb/WlOGQkV+evZKnMssx18jo7IkQO+fxrPjU+xDmFDPA7JWw1WQ+po7wXixkQt
-	hBEy63+/7sbhUDkzm1uEaLoAtDizanAU425UCRaSQkqDzHQWbK9p3quzoLcegDzNtWYSDm
-	SEOMHzIMfB0GtfYBLrxjABItmm+F7TY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: thuth@redhat.com, pbonzini@redhat.com, nrb@linux.ibm.com,
-	imbrenda@linux.ibm.com, marcorr@google.com,
-	alexandru.elisei@arm.com, oliver.upton@linux.dev,
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [kvm-unit-tests PATCH v5] arm: Replace MAX_SMP probe loop in
- favor of reading directly
-Message-ID: <20230214201816.rhky4rn7kmvfuh75@orel>
-References: <20230207233256.3791424-1-coltonlewis@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A60F15AD
+	for <kvmarm@lists.linux.dev>; Wed, 15 Feb 2023 01:07:21 +0000 (UTC)
+Received: by mail-io1-f74.google.com with SMTP id l15-20020a05660227cf00b0074065ea437aso2327143ios.12
+        for <kvmarm@lists.linux.dev>; Tue, 14 Feb 2023 17:07:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=IyNPeLOdyUSRCloXmM+8l8tMrO7/92CcJQeGkdKd/vw=;
+        b=a3RFuz2JUP+kYHqqv6Gl99pOIwgDCa05eLIbj2NAByamb9c87BYsdvwxSsltqlpuTj
+         G5bChEn3dvtuU/Zn/BWCKyZk07px3NCmu8Z7Eyewl9O+etu7BOXo/pGAhhwDWb+RofUf
+         UY6O8BrPc0LpoYEbfvBh3vYBSpVnCO+zJ/76Ecmegs8MzRSqk+w1yE103NepU7HN1/6e
+         VwSD+ZVgh1SJWgb7GFmq2TZjZaYbfX9ne88fw/xhK+Lh0frKX3CYWN6CjCp7QgJ66mhA
+         8ld3bdlRiq0Mh27BOLutcQQ4BHuJ1jQWhO3HqmaP7p3TrxwMal8Rk0LRiM2xuK3+aI3A
+         fsrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IyNPeLOdyUSRCloXmM+8l8tMrO7/92CcJQeGkdKd/vw=;
+        b=QCCLshdw9Px4xdrLEuRy8swo/Vqd2d+CAwgadPN/NaNIegIZf+gvt/DW6weObR+M4Y
+         AGYoFuD6X75QrHw2sY+BvgOjxzQt6dmJWESed6s+CTsjX5kblMCO1l01Re+3AsnMDnEL
+         olQ36HCvuL6Z5+xLgVYgjt8RCn4jEghUqAlZTCBaWSfgjpkCVwQfyYRju0c14y+PVpLJ
+         fEULN6DwrRWc4K+TRjdcICZK2BzBacM/owhIrMLEhA9UYjtwk3uIPgTYFgUhVNiPOlw6
+         tCMw8kPJgqstmujTDDP55m947JiMHoe8Uo7pwEZIg4r3CI+c+jbVhVnkQGEd9gN6sb7L
+         2qRw==
+X-Gm-Message-State: AO0yUKU4sb+FmgJbNvvmF+RZfosTw94bULCbJtvKLq8y34IbaJ2YixI/
+	2duhMp71RHb+4mRNEHplcOJ3u69mY7iV
+X-Google-Smtp-Source: AK7set/hhwzs3tBETMRfIHWDYFlERciNM8DL4xWOpJy9YppTznI6bpJLKBiVPnqbNBCyVEoxYd0Fj8xSX5cn
+X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
+ (user=rananta job=sendgmr) by 2002:a6b:4015:0:b0:6df:2c9f:f8fc with SMTP id
+ k21-20020a6b4015000000b006df2c9ff8fcmr306048ioa.4.1676423240257; Tue, 14 Feb
+ 2023 17:07:20 -0800 (PST)
+Date: Wed, 15 Feb 2023 01:07:01 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230207233256.3791424-1-coltonlewis@google.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
+Message-ID: <20230215010717.3612794-1-rananta@google.com>
+Subject: [REPOST PATCH 00/16] Add support for vPMU selftests
+From: Raghavendra Rao Ananta <rananta@google.com>
+To: Oliver Upton <oupton@google.com>, Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Ricardo Koller <ricarkol@google.com>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jing Zhang <jingzhangos@google.com>, 
+	Colton Lewis <coltonlewis@google.com>, Raghavendra Rao Anata <rananta@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Feb 07, 2023 at 11:32:56PM +0000, Colton Lewis wrote:
-> Replace the MAX_SMP probe loop in favor of reading a number directly
-> from the QEMU error message. This is equally safe as the existing code
-> because the error message has had the same format as long as it has
-> existed, since QEMU v2.10. The final number before the end of the
-> error message line indicates the max QEMU supports.
-> 
-> This loop logic is broken for machines with a number of CPUs that
-> isn't a power of two. This problem was noticed for gicv2 tests on
-> machines with a non-power-of-two number of CPUs greater than 8 because
-> tests were running with MAX_SMP less than 8. As a hypothetical example,
-> a machine with 12 CPUs will test with MAX_SMP=6 because 12 >> 1 ==
-> 6. This can, in rare circumstances, lead to different test results
-> depending only on the number of CPUs the machine has.
-> 
-> A previous comment explains the loop should only apply to kernels
-> <=v4.3 on arm and suggests deletion when it becomes tiresome to
-> maintain. However, it is always theoretically possible to test on a
-> machine that has more CPUs than QEMU supports, so it makes sense to
-> leave some check in place.
-> 
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> ---
->  scripts/runtime.bash | 17 ++++++++---------
->  1 file changed, 8 insertions(+), 9 deletions(-)
-> 
-> v5: Remove the last awk reference and guard the probing code with a
-> check that ARCH = arm or arm64.
-> 
-> v4: https://lore.kernel.org/kvm/20230201172110.1970980-1-coltonlewis@google.com/
-> 
-> v3: https://lore.kernel.org/kvm/20230130195700.729498-1-coltonlewis@google.com/
-> 
-> v2: https://lore.kernel.org/kvm/20230111215422.2153645-1-coltonlewis@google.com/
-> 
-> v1: https://lore.kernel.org/kvm/20221219185250.631503-1-coltonlewis@google.com/
-> 
-> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index f8794e9a..fb64e855 100644
-> --- a/scripts/runtime.bash
-> +++ b/scripts/runtime.bash
-> @@ -188,12 +188,11 @@ function run()
->  # Probe for MAX_SMP, in case it's less than the number of host cpus.
->  #
->  # This probing currently only works for ARM, as x86 bails on another
-> -# error first. Also, this probing isn't necessary for any ARM hosts
-> -# running kernels later than v4.3, i.e. those including ef748917b52
-> -# "arm/arm64: KVM: Remove 'config KVM_ARM_MAX_VCPUS'". So, at some
-> -# point when maintaining the while loop gets too tiresome, we can
-> -# just remove it...
-> -while $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
-> -		|& grep -qi 'exceeds max CPUs'; do
-> -	MAX_SMP=$((MAX_SMP >> 1))
-> -done
-> +# error first, so this check is only run for ARM and ARM64. The
-> +# parameter expansion takes the last number from the QEMU error
-> +# message, which gives the allowable MAX_SMP.
-> +if [ "${ARCH%64}" = arm ] && smp=$($RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
-> +      |& grep 'exceeds max CPUs'); then
-> +	smp=${smp##*(}
-> +	MAX_SMP=${smp:0:-1}
-> +fi
-> --
-> 2.39.1.519.gcb327c4b5f-goog
+Hello,
 
-Applied, thanks
+The series aims to add vPMU selftests to improve the test coverage
+for KVM's PMU emulation. It includes the tests that validates actions
+from userspace, such as verifying the guest read/write accesses to the
+PMu registers while limiting the number for PMCs, and allowing or denying
+certain events via KVM_ARM_VCPU_PMU_V3_FILTER attribute. It also includes
+tests for KVM's guarding of the PMU attributes to count EL2/EL3 events,
+and formal KVM behavior that enables PMU emulation. The last part validates
+the guest expectations of the vPMU by setting up a stress test that
+force-migrates multiple vCPUs frequently across random pCPUs in the system,
+thus ensuring KVM's management of vCPU PMU contexts correctly.
+
+As suggested by Oliver in my original post of the series [1] (and with
+Reiji's permission), I'm re-posting the series to include the
+selftest patches from Reiji's series that aims to limit the number
+of PMCs for the guest [2].
+
+Patches 1-4 are unmodified patches 11-14 from Reiji's series [2],
+which introduces the vPMU selftests that adds a test to validate
+the read/write functionalities for the guest accesses to the
+implemented and unimplemented counters.
+
+Patch-5 refactors the existing tests for plugging-in the upcoming tests
+easily and rename the test file to a more generic name.
+
+Patch-6 and 7 add helper macros and functions respectively to interact
+with the cycle counter.
+
+Patch-8 extends create_vpmu_vm() to accept an array of event filters
+as an argument that are to be applied to the VM.
+
+Patch-9 tests the KVM_ARM_VCPU_PMU_V3_FILTER attribute by scripting
+various combinations of events that are to be allowed or denied to
+the guest and verifying guest's behavior.
+
+Patch-10 adds test to validate KVM's handling of guest requests to count
+events in EL2/EL3.
+
+Patch-11 introduces the vCPU migration stress testing by validating cycle
+counter and general purpose counter's behavior across vCPU migrations.
+
+Patch-12, 13, and 14 expands the tests in patch-8 to validate
+overflow/IRQ functionality, chained events, and occupancy of all the PMU
+counters, respectively.
+
+Patch-15 extends create_vpmu_vm() to create multiple vCPUs for the VM.
+
+Patch-16 expands the stress tests for multiple vCPUs.
+
+The series has been tested on hardwares with PMUv3p1 and PMUv3p5 on
+top of v6.2-rc7 plus Reiji's series [2].
+
+Thank you.
+Raghavendra
+
+[1]: https://lore.kernel.org/all/20230213180234.2885032-1-rananta@google.com/
+[2]: https://lore.kernel.org/all/20230211031506.4159098-1-reijiw@google.com/
+
+Raghavendra Rao Ananta (12):
+  selftests: KVM: aarch64: Refactor the vPMU counter access tests
+  tools: arm64: perf_event: Define Cycle counter enable/overflow bits
+  selftests: KVM: aarch64: Add PMU cycle counter helpers
+  selftests: KVM: aarch64: Consider PMU event filters for VM creation
+  selftests: KVM: aarch64: Add KVM PMU event filter test
+  selftests: KVM: aarch64: Add KVM EVTYPE filter PMU test
+  selftests: KVM: aarch64: Add vCPU migration test for PMU
+  selftests: KVM: aarch64: Test PMU overflow/IRQ functionality
+  selftests: KVM: aarch64: Test chained events for PMU
+  selftests: KVM: aarch64: Add PMU test to chain all the counters
+  selftests: KVM: aarch64: Add multi-vCPU support for vPMU VM creation
+  selftests: KVM: aarch64: Extend the vCPU migration test to multi-vCPUs
+
+Reiji Watanabe (4):
+  tools: arm64: Import perf_event.h
+  KVM: selftests: aarch64: Introduce vpmu_counter_access test
+  KVM: selftests: aarch64: vPMU register test for implemented counters
+  KVM: selftests: aarch64: vPMU register test for unimplemented counters
+
+ tools/arch/arm64/include/asm/perf_event.h     |  265 +++
+ tools/testing/selftests/kvm/Makefile          |    1 +
+ .../testing/selftests/kvm/aarch64/vpmu_test.c | 1710 +++++++++++++++++
+ .../selftests/kvm/include/aarch64/processor.h |    1 +
+ 4 files changed, 1977 insertions(+)
+ create mode 100644 tools/arch/arm64/include/asm/perf_event.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/vpmu_test.c
+
+-- 
+2.39.1.581.gbfd45094c4-goog
+
