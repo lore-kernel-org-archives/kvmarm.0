@@ -1,140 +1,79 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B9927B
-	for <kvmarm@lists.linux.dev>; Wed, 15 Feb 2023 17:03:04 +0000 (UTC)
-Received: by mail-pg1-f202.google.com with SMTP id m11-20020a65564b000000b004fbec68e875so1400937pgs.1
-        for <kvmarm@lists.linux.dev>; Wed, 15 Feb 2023 09:03:04 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01EA17B
+	for <kvmarm@lists.linux.dev>; Wed, 15 Feb 2023 17:07:46 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-50e79ffba49so221594957b3.9
+        for <kvmarm@lists.linux.dev>; Wed, 15 Feb 2023 09:07:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rXpHrm412Se84icLxlhp0c6gn6FcOiMTmYzMu9XFzE0=;
-        b=aLJK/RN+Unz5AmXXe1jY38G4rjdZYbR+ulpZxlfYoinsVuT0AVhwUWxXtbsDj+cxdi
-         o/xO1bFJomGKwqEdz2sz5QYTN8lW3dhyO/q0maVszkrPBtu9rJ2rfyW4uv1VIkOD7umC
-         CR3YEAR8APgGj00V5yp/WQbwIpTihgXmTNa6SOOPf6hlfOikYJu/R38zHTK/27VSgPaf
-         FfblQYJBNauILeThbiUEl6MpF57hSexikv3tHqsVOC3XjHRTwp+rphmcFQ6hh/GFzqIJ
-         847rlbVckcQrssaXB7GwVsA8r2Ud6PaIUWUPJLPxXVfxrK9vAup92Yn4Rg1nkwG16Jof
-         Bgyg==
+        bh=I40PJrFRqn61VwCmmZvurXKna/KGPzaaS+rQHZXZvn0=;
+        b=l8u1qpGgi11tT4E8pv9pTuFXHM/7WY2MCiv2bszlJ1zxeExjqm25IM6hph3zf0n+GH
+         ysvNzeo91bE0dHqERdOSLN9nkAhwpdM8rvp4LDTHjt0IYdwmbCUNot0/sh9QF2e0g+4Z
+         iXxjc61Os8fGMeChQfy7xU38ALBiYCz8AYDCwTG4waTH3d1iDkVZc0yYh5UNBmH9BNIC
+         4s4k2LCWdlix0TbeFAYqhetPtDE28k4vgwnqcFslAgOyUWGhqcYIEmTs3P2wcstRRrmQ
+         ULTCsPbzrtYJpit4Rb6KoytvdVRvTJo64CyT87HR+oXbZKIrYwa+Kqzs6Ne5vw5YvgZQ
+         r+vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rXpHrm412Se84icLxlhp0c6gn6FcOiMTmYzMu9XFzE0=;
-        b=tA91RTyTKvabQoJ/Wymnaqloggkdv2NMZiDbu/XjDFxrF75hd/a8clTO6XRaVWQjG2
-         RxH7PZHNJEgP059IWRvdP/VTBJa6eUS6r9lRDPlglyI/HdJqfdh3XQX3Xe7pskG3fple
-         VcILj5H8RmolN948kGXnj9VlYeVpHe3OB4/AnnhRK1Pc8KVKYknL4WrXJUjPga8pjz7T
-         c8DXyhOx3Q3H8wEyV+qEtZcC0OREsgmqjwlPlf1U3ZU3tyQbpVVvWEQTTkvY5CFqR+UI
-         WgwrH96KCq7zgQtf/bHo6kGhzQpACpulxmFt0PRcV/Zmf5r9Y37ioflULLP12ArCyr3G
-         XTdw==
-X-Gm-Message-State: AO0yUKVUhTrbzcUCOCNWlfxkP2HBDbN/Ur95St5EZ1VtFzHZ8DALkh/+
-	bTojog1LkC5Kih4aPBj5z6mXLWqF7Cc=
-X-Google-Smtp-Source: AK7set/RArgkpEYAvlgEF0UvF1fVSH+rZwKn4nEsJtUurS58zRCLANNB+sRdpIYCCh6+5smbam+TI/Xym8o=
+        bh=I40PJrFRqn61VwCmmZvurXKna/KGPzaaS+rQHZXZvn0=;
+        b=XA+EqMVVH6omC95XRmbZBxzR0qCRyalKT64VE1gL6JQ39wCMm3qJsthyyHwhu5zS1R
+         U3frxTBSkx4w5DRThWpe1pRmXq32vbxF5k++JOcVnA00LdDUk7Eb3qVv0ckiY1ws2qrV
+         6mpSd9EHzdx8gALGvaXoFK2ks7rwM5489Wym0+P1Mg9+oL+NVG/IZHFV/ELnYkB0pUWQ
+         4ZT9JXp+zQaO/7MhRH3nLn4fyHxeJsiUeJu2JqdYmfOWC+XzMjYFRW4ecWhk0LJGDVQT
+         rM3MlQ3V3ORgGZ/1Srlt85qbuJ3rbTlseY7PEQVPxuOwjKNx8XhDEBt/G8XVQzmlnW4h
+         V+WQ==
+X-Gm-Message-State: AO0yUKUiliQiHe452pNFnMRXfjRRIvSn7+94jMw9MbMZ1ljj49SzfQX7
+	c7ShAk5qEJUBxtjcmxGtPJx1c/ory1E=
+X-Google-Smtp-Source: AK7set/bKyGjjQSPDfHloXqvYliTaSoAw87YpPgzxpVLEYaD/uIjcgxZV0daIcoU5fiuPAjFav357tj93Iw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:af59:0:b0:4fb:ee04:732a with SMTP id
- s25-20020a63af59000000b004fbee04732amr466823pgo.2.1676480583747; Wed, 15 Feb
- 2023 09:03:03 -0800 (PST)
-Date: Wed, 15 Feb 2023 09:03:02 -0800
-In-Reply-To: <Y+yfhELf/TbsosO9@linux.dev>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2c2:b0:920:2b79:84b4 with SMTP id
+ w2-20020a05690202c200b009202b7984b4mr349239ybh.386.1676480865897; Wed, 15 Feb
+ 2023 09:07:45 -0800 (PST)
+Date: Wed, 15 Feb 2023 09:07:44 -0800
+In-Reply-To: <87mt5fz5g6.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230215011614.725983-1-amoorthy@google.com> <20230215011614.725983-5-amoorthy@google.com>
- <Y+yfhELf/TbsosO9@linux.dev>
-Message-ID: <Y+0QRsZ4yWyUdpnc@google.com>
-Subject: Re: [PATCH 4/8] kvm: Allow hva_pfn_fast to resolve read-only faults.
+References: <20230215011614.725983-1-amoorthy@google.com> <20230215011614.725983-6-amoorthy@google.com>
+ <87mt5fz5g6.wl-maz@kernel.org>
+Message-ID: <Y+0RYMfw6pHrSLX4@google.com>
+Subject: Re: [PATCH 5/8] kvm: Add cap/kvm_run field for memory fault exits
 From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
 Cc: Anish Moorthy <amoorthy@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Marc Zyngier <maz@kernel.org>, James Houghton <jthoughton@google.com>, Ben Gardon <bgardon@google.com>, 
-	David Matlack <dmatlack@google.com>, Ricardo Koller <ricarkol@google.com>, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Axel Rasmussen <axelrasmussen@google.com>, 
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev
+	Oliver Upton <oliver.upton@linux.dev>, James Houghton <jthoughton@google.com>, 
+	Ben Gardon <bgardon@google.com>, David Matlack <dmatlack@google.com>, 
+	Ricardo Koller <ricarkol@google.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Feb 15, 2023, Oliver Upton wrote:
-> On Wed, Feb 15, 2023 at 01:16:10AM +0000, Anish Moorthy wrote:
-> > The upcoming mem_fault_nowait commits will make it so that, when the
-> > relevant cap is enabled, hva_to_pfn will return after calling
-> > hva_to_pfn_fast without ever attempting to pin memory via
-> > hva_to_pfn_slow.
-> > 
-> > hva_to_pfn_fast currently just fails for read-only faults. However,
-> > there doesn't seem to be a reason that we can't just try pinning the
-> > page without FOLL_WRITE instead of immediately falling back to slow-GUP.
-> > This commit implements that behavior.
-
-State what the patch does, avoid pronouns, and especially don't have "This commmit"
-or "This patch" anywhere.  From Documentation/process/submitting-patches.rst:
-
-  Describe your changes in imperative mood, e.g. "make xyzzy do frotz"
-  instead of "[This patch] makes xyzzy do frotz" or "[I] changed xyzzy
-  to do frotz", as if you are giving orders to the codebase to change
-  its behaviour.
-
-> > Suggested-by: James Houghton <jthoughton@google.com>
-> > Signed-off-by: Anish Moorthy <amoorthy@google.com>
-> > ---
-> >  virt/kvm/kvm_main.c | 22 ++++++++++++----------
-> >  1 file changed, 12 insertions(+), 10 deletions(-)
-> > 
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index d255964ec331e..dae5f48151032 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -2479,7 +2479,7 @@ static inline int check_user_page_hwpoison(unsigned long addr)
-> >  }
+On Wed, Feb 15, 2023, Marc Zyngier wrote:
+> On Wed, 15 Feb 2023 01:16:11 +0000, Anish Moorthy <amoorthy@google.com> wrote:
+> >  8. Other capabilities.
+> >  ======================
 > >  
-> >  /*
-> > - * The fast path to get the writable pfn which will be stored in @pfn,
-> > + * The fast path to get the pfn which will be stored in @pfn,
-> >   * true indicates success, otherwise false is returned.  It's also the
-> >   * only part that runs if we can in atomic context.
-> >   */
-> > @@ -2487,16 +2487,18 @@ static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
-> >  			    bool *writable, kvm_pfn_t *pfn)
-> >  {
-> >  	struct page *page[1];
-> > +	bool found_by_fast_gup =
-> > +		get_user_page_fast_only(
-> > +			addr,
-> > +			/*
-> > +			 * Fast pin a writable pfn only if it is a write fault request
-> > +			 * or the caller allows to map a writable pfn for a read fault
-> > +			 * request.
-> > +			 */
-> > +			(write_fault || writable) ? FOLL_WRITE : 0,
-> > +			page);
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 109b18e2789c4..9352e7f8480fb 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -801,6 +801,9 @@ struct kvm {
+> >  	bool vm_bugged;
+> >  	bool vm_dead;
 > >  
-> > -	/*
-> > -	 * Fast pin a writable pfn only if it is a write fault request
-> > -	 * or the caller allows to map a writable pfn for a read fault
-> > -	 * request.
-> > -	 */
-> > -	if (!(write_fault || writable))
-> > -		return false;
-> > -
-> > -	if (get_user_page_fast_only(addr, FOLL_WRITE, page)) {
-> > +	if (found_by_fast_gup) {
+> > +	rwlock_t mem_fault_nowait_lock;
+> > +	bool mem_fault_nowait;
 > 
-> You could have a smaller diff (and arrive at something more readable)
+> A full-fat rwlock to protect a single bool? What benefits do you
+> expect from a rwlock? Why is it preferable to an atomic access, or a
+> simple bitop?
 
-Heh, this whole series just screams "google3". :-)
-
-Anish, please read through 
-
-  Documentation/process/coding-style.rst
-
-and 
-
-  Documentation/process/submitting-patches.rst
-
-particularaly the "Describe your changes" and "Style-check your changes" your
-changes sections.  Bonus points if you work through the mostly redundant process/
-documentation, e.g. these have supplementary info.
-
-  Documentation/process/4.Coding.rst
-  Documentation/process/5.Posting.rst
+There's no need to have any kind off dedicated atomicity.  The only readers are
+in vCPU context, just disallow KVM_CAP_MEM_FAULT_NOWAIT after vCPUs are created.
