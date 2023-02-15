@@ -1,417 +1,134 @@
-Received: from mail-il1-f201.google.com (mail-il1-f201.google.com [209.85.166.201])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C1AB15AE
-	for <kvmarm@lists.linux.dev>; Wed, 15 Feb 2023 01:07:41 +0000 (UTC)
-Received: by mail-il1-f201.google.com with SMTP id t6-20020a056e02010600b0031417634f4bso9911815ilm.18
-        for <kvmarm@lists.linux.dev>; Tue, 14 Feb 2023 17:07:41 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B3EE15AD
+	for <kvmarm@lists.linux.dev>; Wed, 15 Feb 2023 01:16:30 +0000 (UTC)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-52f2445e802so78329587b3.10
+        for <kvmarm@lists.linux.dev>; Tue, 14 Feb 2023 17:16:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YKcCEtcasEy96yYR95uUDcecBsDQdV3knxsKnUz3/Gk=;
-        b=rIfYoIsp11nNcN2vFQFjrLmBGnkW3VKkYELEsBzzdFFKc1eONWEWEhfn7jUzJlAoMt
-         cu+Ez8zm4icxn2Z2lh80OLwAA7AZ9w+CI8Ne5gadJqKHfe1Q7bGiltcBiADfflGELbs6
-         OD0FlA7wv9AIURH3u6ovnn3pYVRsnG1ebwxoQooTVuO7okm7vXbEzbZwJHmW/pShuk65
-         xdpN56Wij3QdIA7unnNsS67RhL4mUIgKWdwinB8n+P5sFOpntJ3UWdcJgjIqLdIzO2U2
-         edssb8KFyLxO3/Pdh8xS1SPuuN+VDNJCWB1LSqHoH6tkJw8hiqvAyRZyO759S9TywzFw
-         kRQA==
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=wrq62AzkctYtWs8cF7vErW/C4PklOl8HkpwRKHnxMak=;
+        b=BdgtTh4wvUuTb8JeaMBxrKlOym4Z2lbO6UkdORicuqaxW2ytXMz2XcnqvpbumjhCxw
+         kNGDepdGdtEoKLdw092AFODNvzCMlyiwvhlPXCwaEKYSDGskA7i+iQJxFRJI2f3L4D2Q
+         0fBbbK7SiQDlThYAgELeEisHdzK20Et9ma72dMjy9U7/v/A48sbk8Qp2jQiab+E93DAj
+         xN1xfDJPvE2BwbthpaJi/PHt0UI5lu9eZT+3KcMPAA4TQ+k+RvHZsaD/rhKgodiqb7Ru
+         4U9xdyJ8pjL1IqQoUeUTBY0RNJouN0cCVbL8GjN2mmBFtLyIl4uj63EaeUwuYfNgOi47
+         wQqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YKcCEtcasEy96yYR95uUDcecBsDQdV3knxsKnUz3/Gk=;
-        b=HrkbReGVqznEyFJdHUGdbBPk7DZM20/L3ST6dZznTpAMH06pEkT6cYe9wnjPsh/Ubx
-         5Y+MyZDfWIBYkPp0f6ECqZsnPP3/p0NVZDwb7thjKwWeOJLRKLitYIqBvCn9jrPVUz11
-         phLyRYSIaZtI/WsthH5dCqes4gthdYhWeG7Irr1TxxY6W/Og+R5xdJxE3HYxPaUwjznB
-         wW9mCSjT9YqBjrmBsuDsBCaqpobsPv6EMt6D8jZPIbqfQm4IJeL8Ko37XeMpu+MyGEO1
-         ycV5bMZKxigwO79q3aatAVdcqgedmdNXt39L9gGZUbdTMlOtPn45ndL15vTywsSmxTz/
-         bKAw==
-X-Gm-Message-State: AO0yUKXm3nxKF4p7AMlyDvHcUJ7xHAuLWS6vdyr7tGMTEb4Y1LaNjdcI
-	fclRBkqePDHsTHp3H8ZIyG1ndJZ7f/n3
-X-Google-Smtp-Source: AK7set8eypuzPxapcfOamnWx0i/1N4TWhXPPHogRkxrXl/P/lAHb3z5rdSK4UAh3DxdOcRqbbCw0c3QWJhrI
-X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
- (user=rananta job=sendgmr) by 2002:a92:7606:0:b0:30f:4ee:3d93 with SMTP id
- r6-20020a927606000000b0030f04ee3d93mr296233ilc.1.1676423260760; Tue, 14 Feb
- 2023 17:07:40 -0800 (PST)
-Date: Wed, 15 Feb 2023 01:07:17 +0000
-In-Reply-To: <20230215010717.3612794-1-rananta@google.com>
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wrq62AzkctYtWs8cF7vErW/C4PklOl8HkpwRKHnxMak=;
+        b=4pnS0QvivVOGJ2ul4+qghiQuZTZNuunCfmlsl2FgovNhB5H6eGrDSYMA5/1GSU516k
+         2tTtSYSg0FbegS19AW8bsbI/KEyP0AOLZLmQrVV5r3V4R6BM98CU2mCX/O4IpzZQ+zhd
+         ZYbl96wYMe9RTijezCi0EexKYxCDBL9R4esx6v9idi2EAp1gqy0BUadvLUA0SGQjCZc7
+         4RORadgFS2IH2oY/srwdnQIhGN8SlrklkvFbmqqSFS2gPK6OfKWNiS4WXwOqJ5mPs7vu
+         CZ5ZgQiM0zBWdFwzNsO4xYMQaogrBCxBGnu4X5/reEYx8y97RFhuQ3z9OQRQNi71tRrn
+         ku/g==
+X-Gm-Message-State: AO0yUKWwsaPtqUo9xkgeXUG3+qRzmCQdN5QamhnsgIw8Cjo49bdBYUGM
+	BbNY2DS3rft+hKrFmBopKsgpBLIQ7Zx3Aw==
+X-Google-Smtp-Source: AK7set/R/GsUX/jau7ramnhMxdFq70R7jXaandJ76F1bsa5NTsCH8j78V1e7saDdWz2v2aIDjSthZkizR2msGA==
+X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
+ (user=amoorthy job=sendgmr) by 2002:a81:80c4:0:b0:52e:cda8:1195 with SMTP id
+ q187-20020a8180c4000000b0052ecda81195mr68928ywf.329.1676423789447; Tue, 14
+ Feb 2023 17:16:29 -0800 (PST)
+Date: Wed, 15 Feb 2023 01:16:06 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230215010717.3612794-1-rananta@google.com>
 X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
-Message-ID: <20230215010717.3612794-17-rananta@google.com>
-Subject: [REPOST PATCH 16/16] selftests: KVM: aarch64: Extend the vCPU
- migration test to multi-vCPUs
-From: Raghavendra Rao Ananta <rananta@google.com>
-To: Oliver Upton <oupton@google.com>, Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Ricardo Koller <ricarkol@google.com>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jing Zhang <jingzhangos@google.com>, 
-	Colton Lewis <coltonlewis@google.com>, Raghavendra Rao Anata <rananta@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Message-ID: <20230215011614.725983-1-amoorthy@google.com>
+Subject: [PATCH 0/8] Add memory fault exits to avoid slow GUP
+From: Anish Moorthy <amoorthy@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Sean Christopherson <seanjc@google.com>, 
+	James Houghton <jthoughton@google.com>, Anish Moorthy <amoorthy@google.com>, 
+	Ben Gardon <bgardon@google.com>, David Matlack <dmatlack@google.com>, 
+	Ricardo Koller <ricarkol@google.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
-To test KVM's handling of multiple vCPU contexts together, that are
-frequently migrating across random pCPUs in the system, extend the test
-to create a VM with multiple vCPUs and validate the behavior.
+This series improves scalabiity with userfaultfd-based postcopy live
+migration. It implements the no-slow-gup approach which James Houghton
+described in his earlier RFC ([1]). The new cap
+KVM_CAP_MEM_FAULT_NOWAIT, is introduced, which causes KVM to exit to
+userspace if fast get_user_pages (GUP) fails while resolving a page
+fault. The motivation is to allow (most) EPT violations to be resolved
+without going through userfaultfd, which involves serializing faults on
+internal locks: see [1] for more details.
 
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
----
- .../testing/selftests/kvm/aarch64/vpmu_test.c | 166 ++++++++++++------
- 1 file changed, 114 insertions(+), 52 deletions(-)
+After receiving the new exit, userspace can check if it has previously
+UFFDIO_COPY/CONTINUEd the faulting address- if not, then it knows that
+fast GUP could not possibly have succeeded, and so the fault has to be
+resolved via UFFDIO_COPY/CONTINUE. In these cases a UFFDIO_WAKE is
+unnecessary, as the vCPU thread hasn't been put to sleep waiting on the
+uffd.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_test.c b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-index 239fc7e06b3b9..c9d8e5f9a22ab 100644
---- a/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-@@ -19,11 +19,12 @@
-  * higher exception levels (EL2, EL3). Verify this functionality by
-  * configuring and trying to count the events for EL2 in the guest.
-  *
-- * 4. Since the PMU registers are per-cpu, stress KVM by frequently
-- * migrating the guest vCPU to random pCPUs in the system, and check
-- * if the vPMU is still behaving as expected. The sub-tests include
-- * testing basic functionalities such as basic counters behavior,
-- * overflow, overflow interrupts, and chained events.
-+ * 4. Since the PMU registers are per-cpu, stress KVM by creating a
-+ * multi-vCPU VM, then frequently migrate the guest vCPUs to random
-+ * pCPUs in the system, and check if the vPMU is still behaving as
-+ * expected. The sub-tests include testing basic functionalities such
-+ * as basic counters behavior, overflow, overflow interrupts, and
-+ * chained events.
-  *
-  * Copyright (c) 2022 Google LLC.
-  *
-@@ -348,19 +349,22 @@ struct guest_irq_data {
- 	struct spinlock lock;
- };
- 
--static struct guest_irq_data guest_irq_data;
-+static struct guest_irq_data guest_irq_data[KVM_MAX_VCPUS];
- 
- #define VCPU_MIGRATIONS_TEST_ITERS_DEF		1000
- #define VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS	2
-+#define VCPU_MIGRATIONS_TEST_NR_VPUS_DEF	2
- 
- struct test_args {
- 	int vcpu_migration_test_iter;
- 	int vcpu_migration_test_migrate_freq_ms;
-+	int vcpu_migration_test_nr_vcpus;
- };
- 
- static struct test_args test_args = {
- 	.vcpu_migration_test_iter = VCPU_MIGRATIONS_TEST_ITERS_DEF,
- 	.vcpu_migration_test_migrate_freq_ms = VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS,
-+	.vcpu_migration_test_nr_vcpus = VCPU_MIGRATIONS_TEST_NR_VPUS_DEF,
- };
- 
- static void guest_sync_handler(struct ex_regs *regs)
-@@ -396,26 +400,34 @@ static void guest_validate_irq(int pmc_idx, uint32_t pmovsclr, uint32_t pmc_idx_
- 	}
- }
- 
-+static struct guest_irq_data *get_irq_data(void)
-+{
-+	uint32_t cpu = guest_get_vcpuid();
-+
-+	return &guest_irq_data[cpu];
-+}
-+
- static void guest_irq_handler(struct ex_regs *regs)
- {
- 	uint32_t pmc_idx_bmap;
- 	uint64_t i, pmcr_n = get_pmcr_n();
- 	uint32_t pmovsclr = read_pmovsclr();
- 	unsigned int intid = gic_get_and_ack_irq();
-+	struct guest_irq_data *irq_data = get_irq_data();
- 
- 	/* No other IRQ apart from the PMU IRQ is expected */
- 	GUEST_ASSERT_1(intid == PMU_IRQ, intid);
- 
--	spin_lock(&guest_irq_data.lock);
--	pmc_idx_bmap = READ_ONCE(guest_irq_data.pmc_idx_bmap);
-+	spin_lock(&irq_data->lock);
-+	pmc_idx_bmap = READ_ONCE(irq_data->pmc_idx_bmap);
- 
- 	for (i = 0; i < pmcr_n; i++)
- 		guest_validate_irq(i, pmovsclr, pmc_idx_bmap);
- 	guest_validate_irq(ARMV8_PMU_CYCLE_COUNTER_IDX, pmovsclr, pmc_idx_bmap);
- 
- 	/* Mark IRQ as recived for the corresponding PMCs */
--	WRITE_ONCE(guest_irq_data.irq_received_bmap, pmovsclr);
--	spin_unlock(&guest_irq_data.lock);
-+	WRITE_ONCE(irq_data->irq_received_bmap, pmovsclr);
-+	spin_unlock(&irq_data->lock);
- 
- 	gic_set_eoi(intid);
- }
-@@ -423,35 +435,40 @@ static void guest_irq_handler(struct ex_regs *regs)
- static int pmu_irq_received(int pmc_idx)
- {
- 	bool irq_received;
-+	struct guest_irq_data *irq_data = get_irq_data();
- 
--	spin_lock(&guest_irq_data.lock);
--	irq_received = READ_ONCE(guest_irq_data.irq_received_bmap) & BIT(pmc_idx);
--	WRITE_ONCE(guest_irq_data.irq_received_bmap, guest_irq_data.pmc_idx_bmap & ~BIT(pmc_idx));
--	spin_unlock(&guest_irq_data.lock);
-+	spin_lock(&irq_data->lock);
-+	irq_received = READ_ONCE(irq_data->irq_received_bmap) & BIT(pmc_idx);
-+	WRITE_ONCE(irq_data->irq_received_bmap, irq_data->pmc_idx_bmap & ~BIT(pmc_idx));
-+	spin_unlock(&irq_data->lock);
- 
- 	return irq_received;
- }
- 
- static void pmu_irq_init(int pmc_idx)
- {
-+	struct guest_irq_data *irq_data = get_irq_data();
-+
- 	write_pmovsclr(BIT(pmc_idx));
- 
--	spin_lock(&guest_irq_data.lock);
--	WRITE_ONCE(guest_irq_data.irq_received_bmap, guest_irq_data.pmc_idx_bmap & ~BIT(pmc_idx));
--	WRITE_ONCE(guest_irq_data.pmc_idx_bmap, guest_irq_data.pmc_idx_bmap | BIT(pmc_idx));
--	spin_unlock(&guest_irq_data.lock);
-+	spin_lock(&irq_data->lock);
-+	WRITE_ONCE(irq_data->irq_received_bmap, irq_data->pmc_idx_bmap & ~BIT(pmc_idx));
-+	WRITE_ONCE(irq_data->pmc_idx_bmap, irq_data->pmc_idx_bmap | BIT(pmc_idx));
-+	spin_unlock(&irq_data->lock);
- 
- 	enable_irq(pmc_idx);
- }
- 
- static void pmu_irq_exit(int pmc_idx)
- {
-+	struct guest_irq_data *irq_data = get_irq_data();
-+
- 	write_pmovsclr(BIT(pmc_idx));
- 
--	spin_lock(&guest_irq_data.lock);
--	WRITE_ONCE(guest_irq_data.irq_received_bmap, guest_irq_data.pmc_idx_bmap & ~BIT(pmc_idx));
--	WRITE_ONCE(guest_irq_data.pmc_idx_bmap, guest_irq_data.pmc_idx_bmap & ~BIT(pmc_idx));
--	spin_unlock(&guest_irq_data.lock);
-+	spin_lock(&irq_data->lock);
-+	WRITE_ONCE(irq_data->irq_received_bmap, irq_data->pmc_idx_bmap & ~BIT(pmc_idx));
-+	WRITE_ONCE(irq_data->pmc_idx_bmap, irq_data->pmc_idx_bmap & ~BIT(pmc_idx));
-+	spin_unlock(&irq_data->lock);
- 
- 	disable_irq(pmc_idx);
- }
-@@ -783,7 +800,8 @@ static void test_event_count(uint64_t event, int pmc_idx, bool expect_count)
- static void test_basic_pmu_functionality(void)
- {
- 	local_irq_disable();
--	gic_init(GIC_V3, 1, (void *)GICD_BASE_GPA, (void *)GICR_BASE_GPA);
-+	gic_init(GIC_V3, test_args.vcpu_migration_test_nr_vcpus,
-+			(void *)GICD_BASE_GPA, (void *)GICR_BASE_GPA);
- 	gic_irq_enable(PMU_IRQ);
- 	local_irq_enable();
- 
-@@ -1093,11 +1111,13 @@ static void guest_evtype_filter_test(void)
- 
- static void guest_vcpu_migration_test(void)
- {
-+	int iter = test_args.vcpu_migration_test_iter;
-+
- 	/*
- 	 * While the userspace continuously migrates this vCPU to random pCPUs,
- 	 * run basic PMU functionalities and verify the results.
- 	 */
--	while (test_args.vcpu_migration_test_iter--)
-+	while (iter--)
- 		test_basic_pmu_functionality();
- }
- 
-@@ -1472,17 +1492,23 @@ static void run_kvm_evtype_filter_test(void)
- 
- struct vcpu_migrate_data {
- 	struct vpmu_vm *vpmu_vm;
--	pthread_t *pt_vcpu;
--	bool vcpu_done;
-+	pthread_t *pt_vcpus;
-+	unsigned long *vcpu_done_map;
-+	pthread_mutex_t vcpu_done_map_lock;
- };
- 
-+struct vcpu_migrate_data migrate_data;
-+
- static void *run_vcpus_migrate_test_func(void *arg)
- {
--	struct vcpu_migrate_data *migrate_data = arg;
--	struct vpmu_vm *vpmu_vm = migrate_data->vpmu_vm;
-+	struct vpmu_vm *vpmu_vm = migrate_data.vpmu_vm;
-+	unsigned int vcpu_idx = (unsigned long)arg;
- 
--	run_vcpu(vpmu_vm->vcpus[0]);
--	migrate_data->vcpu_done = true;
-+	run_vcpu(vpmu_vm->vcpus[vcpu_idx]);
-+
-+	pthread_mutex_lock(&migrate_data.vcpu_done_map_lock);
-+	__set_bit(vcpu_idx, migrate_data.vcpu_done_map);
-+	pthread_mutex_unlock(&migrate_data.vcpu_done_map_lock);
- 
- 	return NULL;
- }
-@@ -1504,7 +1530,7 @@ static uint32_t get_pcpu(void)
- 	return pcpu;
- }
- 
--static int migrate_vcpu(struct vcpu_migrate_data *migrate_data)
-+static int migrate_vcpu(int vcpu_idx)
- {
- 	int ret;
- 	cpu_set_t cpuset;
-@@ -1513,9 +1539,9 @@ static int migrate_vcpu(struct vcpu_migrate_data *migrate_data)
- 	CPU_ZERO(&cpuset);
- 	CPU_SET(new_pcpu, &cpuset);
- 
--	pr_debug("Migrating vCPU to pCPU: %u\n", new_pcpu);
-+	pr_debug("Migrating vCPU %d to pCPU: %u\n", vcpu_idx, new_pcpu);
- 
--	ret = pthread_setaffinity_np(*migrate_data->pt_vcpu, sizeof(cpuset), &cpuset);
-+	ret = pthread_setaffinity_np(migrate_data.pt_vcpus[vcpu_idx], sizeof(cpuset), &cpuset);
- 
- 	/* Allow the error where the vCPU thread is already finished */
- 	TEST_ASSERT(ret == 0 || ret == ESRCH,
-@@ -1526,48 +1552,74 @@ static int migrate_vcpu(struct vcpu_migrate_data *migrate_data)
- 
- static void *vcpus_migrate_func(void *arg)
- {
--	struct vcpu_migrate_data *migrate_data = arg;
-+	struct vpmu_vm *vpmu_vm = migrate_data.vpmu_vm;
-+	int i, n_done, nr_vcpus = vpmu_vm->nr_vcpus;
-+	bool vcpu_done;
- 
--	while (!migrate_data->vcpu_done) {
-+	do {
- 		usleep(msecs_to_usecs(test_args.vcpu_migration_test_migrate_freq_ms));
--		migrate_vcpu(migrate_data);
--	}
-+		for (n_done = 0, i = 0; i < nr_vcpus; i++) {
-+			pthread_mutex_lock(&migrate_data.vcpu_done_map_lock);
-+			vcpu_done = test_bit(i, migrate_data.vcpu_done_map);
-+			pthread_mutex_unlock(&migrate_data.vcpu_done_map_lock);
-+
-+			if (vcpu_done) {
-+				n_done++;
-+				continue;
-+			}
-+
-+			migrate_vcpu(i);
-+		}
-+
-+	} while (nr_vcpus != n_done);
- 
- 	return NULL;
- }
- 
- static void run_vcpu_migration_test(uint64_t pmcr_n)
- {
--	int ret;
-+	int i, nr_vcpus, ret;
- 	struct vpmu_vm *vpmu_vm;
--	pthread_t pt_vcpu, pt_sched;
--	struct vcpu_migrate_data migrate_data = {
--		.pt_vcpu = &pt_vcpu,
--		.vcpu_done = false,
--	};
-+	pthread_t pt_sched, *pt_vcpus;
- 
- 	__TEST_REQUIRE(get_nprocs() >= 2, "At least two pCPUs needed for vCPU migration test");
- 
- 	guest_data.test_stage = TEST_STAGE_VCPU_MIGRATION;
- 	guest_data.expected_pmcr_n = pmcr_n;
- 
--	migrate_data.vpmu_vm = vpmu_vm = create_vpmu_vm(1, guest_code, NULL);
-+	nr_vcpus = test_args.vcpu_migration_test_nr_vcpus;
-+
-+	migrate_data.vcpu_done_map = bitmap_zalloc(nr_vcpus);
-+	TEST_ASSERT(migrate_data.vcpu_done_map, "Failed to create vCPU done bitmap");
-+	pthread_mutex_init(&migrate_data.vcpu_done_map_lock, NULL);
-+
-+	migrate_data.pt_vcpus = pt_vcpus = calloc(nr_vcpus, sizeof(*pt_vcpus));
-+	TEST_ASSERT(pt_vcpus, "Failed to create vCPU thread pointers");
-+
-+	migrate_data.vpmu_vm = vpmu_vm = create_vpmu_vm(nr_vcpus, guest_code, NULL);
- 
- 	/* Initialize random number generation for migrating vCPUs to random pCPUs */
- 	srand(time(NULL));
- 
--	/* Spawn a vCPU thread */
--	ret = pthread_create(&pt_vcpu, NULL, run_vcpus_migrate_test_func, &migrate_data);
--	TEST_ASSERT(!ret, "Failed to create the vCPU thread");
-+	/* Spawn vCPU threads */
-+	for (i = 0; i < nr_vcpus; i++) {
-+		ret = pthread_create(&pt_vcpus[i], NULL,
-+					run_vcpus_migrate_test_func,  (void *)(unsigned long)i);
-+		TEST_ASSERT(!ret, "Failed to create the vCPU thread: %d", i);
-+	}
- 
- 	/* Spawn a scheduler thread to force-migrate vCPUs to various pCPUs */
--	ret = pthread_create(&pt_sched, NULL, vcpus_migrate_func, &migrate_data);
-+	ret = pthread_create(&pt_sched, NULL, vcpus_migrate_func, NULL);
- 	TEST_ASSERT(!ret, "Failed to create the scheduler thread for migrating the vCPUs");
- 
- 	pthread_join(pt_sched, NULL);
--	pthread_join(pt_vcpu, NULL);
-+
-+	for (i = 0; i < nr_vcpus; i++)
-+		pthread_join(pt_vcpus[i], NULL);
- 
- 	destroy_vpmu_vm(vpmu_vm);
-+	free(pt_vcpus);
-+	bitmap_free(migrate_data.vcpu_done_map);
- }
- 
- static void run_tests(uint64_t pmcr_n)
-@@ -1596,12 +1648,14 @@ static uint64_t get_pmcr_n_limit(void)
- 
- static void print_help(char *name)
- {
--	pr_info("Usage: %s [-h] [-i vcpu_migration_test_iterations] [-m vcpu_migration_freq_ms]\n",
--		name);
-+	pr_info("Usage: %s [-h] [-i vcpu_migration_test_iterations] [-m vcpu_migration_freq_ms]"
-+		"[-n vcpu_migration_nr_vcpus]\n", name);
- 	pr_info("\t-i: Number of iterations of vCPU migrations test (default: %u)\n",
- 		VCPU_MIGRATIONS_TEST_ITERS_DEF);
- 	pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different pCPU. (default: %u)\n",
- 		VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS);
-+	pr_info("\t-n: Number of vCPUs for vCPU migrations test. (default: %u)\n",
-+		VCPU_MIGRATIONS_TEST_NR_VPUS_DEF);
- 	pr_info("\t-h: print this help screen\n");
- }
- 
-@@ -1609,7 +1663,7 @@ static bool parse_args(int argc, char *argv[])
- {
- 	int opt;
- 
--	while ((opt = getopt(argc, argv, "hi:m:")) != -1) {
-+	while ((opt = getopt(argc, argv, "hi:m:n:")) != -1) {
- 		switch (opt) {
- 		case 'i':
- 			test_args.vcpu_migration_test_iter =
-@@ -1619,6 +1673,14 @@ static bool parse_args(int argc, char *argv[])
- 			test_args.vcpu_migration_test_migrate_freq_ms =
- 				atoi_positive("vCPU migration frequency", optarg);
- 			break;
-+		case 'n':
-+			test_args.vcpu_migration_test_nr_vcpus =
-+				atoi_positive("Nr vCPUs for vCPU migrations", optarg);
-+			if (test_args.vcpu_migration_test_nr_vcpus > KVM_MAX_VCPUS) {
-+				pr_info("Max allowed vCPUs: %u\n", KVM_MAX_VCPUS);
-+				goto err;
-+			}
-+			break;
- 		case 'h':
- 		default:
- 			goto err;
+If userspace *has* already COPY/CONTINUEd the address, then it must take
+some other action to make fast GUP succeed: such as swapping in the
+page (for instance, via MADV_POPULATE_WRITE for writable mappings).
+
+This feature should only be enabled during userfaultfd postcopy, as it
+prevents the generation of async page faults.
+
+The actual kernel changes to implement the change on arm64/x86 are
+small: most of this series is actually just adding support for the new
+feature in the demand paging self test. Performance samples (rates
+reported in thousands of pages/s, average of five runs each) generated
+using [2] on an x86 machine with 256 cores, are shown below.
+
+vCPUs, Paging Rate (w/o new cap), Paging Rate (w/ new cap)
+1       150     340
+2       191     477
+4       210     809
+8       155     1239
+16      130     1595
+32      108     2299
+64      86      3482
+128     62      4134
+256     36      4012
+
+[1] https://lore.kernel.org/linux-mm/CADrL8HVDB3u2EOhXHCrAgJNLwHkj2Lka1B_kkNb0dNwiWiAN_Q@mail.gmail.com/
+[2] ./demand_paging_test -b 64M -u MINOR -s shmem -a -v <n> -r <n> [-w]
+    A quick rundown of the new flags (also detailed in later commits)
+        -a registers all of guest memory to a single uffd.
+        -r species the number of reader threads for polling the uffd.
+        -w is what actually enables memory fault exits.
+    All data was collected after applying the entire series.
+
+This series is based on the latest kvm/next (7cb79f433e75).
+
+Anish Moorthy (8):
+  selftests/kvm: Fix bug in how demand_paging_test calculates paging
+    rate
+  selftests/kvm: Allow many vcpus per UFFD in demand paging test
+  selftests/kvm: Switch demand paging uffd readers to epoll
+  kvm: Allow hva_pfn_fast to resolve read-only faults.
+  kvm: Add cap/kvm_run field for memory fault exits
+  kvm/x86: Add mem fault exit on EPT violations
+  kvm/arm64: Implement KVM_CAP_MEM_FAULT_NOWAIT for arm64
+  selftests/kvm: Handle mem fault exits in demand paging test
+
+ Documentation/virt/kvm/api.rst                |  42 ++++
+ arch/arm64/kvm/arm.c                          |   1 +
+ arch/arm64/kvm/mmu.c                          |  14 +-
+ arch/x86/kvm/mmu/mmu.c                        |  23 +-
+ arch/x86/kvm/x86.c                            |   1 +
+ include/linux/kvm_host.h                      |  13 +
+ include/uapi/linux/kvm.h                      |  13 +-
+ tools/include/uapi/linux/kvm.h                |   7 +
+ .../selftests/kvm/aarch64/page_fault_test.c   |   4 +-
+ .../selftests/kvm/demand_paging_test.c        | 237 ++++++++++++++----
+ .../selftests/kvm/include/userfaultfd_util.h  |  18 +-
+ .../selftests/kvm/lib/userfaultfd_util.c      | 160 +++++++-----
+ virt/kvm/kvm_main.c                           |  48 +++-
+ 13 files changed, 442 insertions(+), 139 deletions(-)
+
 -- 
 2.39.1.581.gbfd45094c4-goog
 
