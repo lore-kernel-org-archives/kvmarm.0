@@ -1,53 +1,52 @@
-Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
+Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D64257B
-	for <kvmarm@lists.linux.dev>; Wed, 15 Feb 2023 18:06:07 +0000 (UTC)
-Received: by mail-vs1-f51.google.com with SMTP id u20so4810681vsp.5
-        for <kvmarm@lists.linux.dev>; Wed, 15 Feb 2023 10:06:07 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69C947B
+	for <kvmarm@lists.linux.dev>; Wed, 15 Feb 2023 18:19:52 +0000 (UTC)
+Received: by mail-vs1-f41.google.com with SMTP id g8so20786087vso.3
+        for <kvmarm@lists.linux.dev>; Wed, 15 Feb 2023 10:19:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=14Wsnq1C5/e/lr4OHIbzbe/RW8U5P8QTch1ADuqyPNc=;
-        b=hqydrB0uk3xrYuEWrr9bC2c28vBvdOrWuT4o2GQyjyKHHMRGVquMplEKn0VEa7IG3z
-         zDPbKd6PNbA8+cMSjjZJ+XY/jm106WMeZVNzEP1rVcs4pGglU3JTT/NTzterzjXgwbZu
-         e7pvbkYFHd0k6CT2PbycxRlNPY7/TcAODYosIg6cF3OaA/8PLnDtJDpAcnhD5aQTIzsg
-         Qg3fsJ45d4GMQ1hKwksNnZ0KFwhmWHRQRRTuQn8W+RBtH6mHF9lgMKRiXGn2KEx/GMlQ
-         QmiDcJyYqdxCQ4+RbsIxNsGKLpnkix1GXBZkVFemnFQD1RDwOo8POfG5Uq1MtnEB3X4K
-         WNSg==
+        bh=QexbYYGKRhTPyK9qoiEanQk7KDl1Is1wY2YZxvsIfXU=;
+        b=mFyJ6OIO7yB2VWEaz6UL+z3Wa25WYnVJXGNQsTHc25aO4V3+I0c4AQL8EKqyjDJaT7
+         tRsOG1YLaPBo9FbRNLA2ZIW4yRCfpflBCwkTUkgH6FRhAbatENYkWsNfteYLgjavbnae
+         ypZnRQOlbfRgDVf6UQwZg2/CC2POTWtowXhAG2YICyXavov5RCdNwlIQiAx2WwFwpWpv
+         JbkV5MnJgbEOCrVagRukB3iIf/OWuiJZjmWjDemoKUwQ7mcmwarwHJDC+vVDq+52s6pP
+         pj3o598LibgN/JG5sh+s8Ry+zUPN/LEA7AJGKwC8pAFw8F67pXql5s5uF9EdHT3HEXK/
+         2r9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=14Wsnq1C5/e/lr4OHIbzbe/RW8U5P8QTch1ADuqyPNc=;
-        b=SvkCs6itRLXRW3rqmLbjziDgKiy5LdEiWVD9URJuqMfLuxZ6khnHztdSQ4L3F9+QBE
-         Gen9tjTcmajip/kheNU09WCQkK2WpKifu/O91IK8p0OvLls6lHJL2fOCxa34CXiaqEri
-         B3XhrxUy1kLm7JHQXFWZksqHDdf5DtttU2JokCByqI2oelnUxvd9yCV5g3KhLuy7nRyV
-         WI6NoDzo7kvz9fDoQ7W/5aXIZQHYTpPP0iuqLgSw1Y7Y39YbJNiCAv5IEGJ7kbgdeOms
-         5YLEjRQMBAGhGtYNfpfEMnS4AGL8y7Zk37oXzBSKEsKoYIw794sfq4DjRrncwzfTyZjS
-         0gmw==
-X-Gm-Message-State: AO0yUKW4SN5ZnFUa10HbeMJGbFktlY8mnsFEWmgq0u/STH1suhdywABt
-	PjPOvESoSsyAfg2tY0oddd5lcsKSnFMZIkNAIjb8MA==
-X-Google-Smtp-Source: AK7set/KlyJWZTFcc9c+ciNsp30/44ed0OYWwISa16TuXvviGl/4f1NDwiurFeZZA96nyqwnVTbAz2TX63KihceiHCU=
+        bh=QexbYYGKRhTPyK9qoiEanQk7KDl1Is1wY2YZxvsIfXU=;
+        b=eAhaTEkH5UfyTi/xrsOgDJg6zlp7VUb2pG+F4rVEAi49Nxi7DlnQdz7GhQfdR7BSKj
+         kMIQsbF8rI42FruhTmBvU9X/IUuosNiI/QJJnBJMZwzMiRnT/gYOn+mD7b+HH6e9ewZn
+         K24uObABZhhMqwytqG5ZLfcDLow01oLwUEOssvTUu5TZLWRi7tHj4J1fUCfbrPGyUSz2
+         k17p6hZei+47esYKV2Vk36frVmuAaEHXdsxsBpkiJKFpQLptZNJp3oGeeaodWSMAfiTJ
+         ZkdGYfJVewsfl0CfUexw6RbbY6plw6beEmkOTuY8qbsrkYDUPROiLrHRuw7OPZjAds59
+         w82Q==
+X-Gm-Message-State: AO0yUKW48S9gc3pn8wHXyIGHrhkoxsHJhj/c3D/S3Oo2l5hOKhdTofCs
+	b6ZBGGwbFOsTmX4DMVkhxiKzrRvW3cRZ7FbRqdrY5g==
+X-Google-Smtp-Source: AK7set8ObJP7iGMvIUA6ruyvO8dY6AGJgXSEHO2ybg33E1OElXwnHQnJ+uNh4aYLeegXyK4SEQSkBTFZmZzJxetes74=
 X-Received: by 2002:a05:6102:3b01:b0:412:6a3:2267 with SMTP id
- x1-20020a0561023b0100b0041206a32267mr719527vsu.5.1676484366683; Wed, 15 Feb
- 2023 10:06:06 -0800 (PST)
+ x1-20020a0561023b0100b0041206a32267mr730394vsu.5.1676485191228; Wed, 15 Feb
+ 2023 10:19:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230215011614.725983-1-amoorthy@google.com> <20230215011614.725983-2-amoorthy@google.com>
- <Y+yJU2pE4IyuIwOQ@linux.dev> <Y+0L/x2YgiEgm9bt@google.com>
-In-Reply-To: <Y+0L/x2YgiEgm9bt@google.com>
+References: <20230215011614.725983-1-amoorthy@google.com> <20230215011614.725983-5-amoorthy@google.com>
+ <Y+yfhELf/TbsosO9@linux.dev> <Y+0QRsZ4yWyUdpnc@google.com>
+In-Reply-To: <Y+0QRsZ4yWyUdpnc@google.com>
 From: Anish Moorthy <amoorthy@google.com>
-Date: Wed, 15 Feb 2023 10:05:55 -0800
-Message-ID: <CAF7b7mpSOqzrxqXgpSjD17SufaV-2ZnLL5+eR29jJL_j=1aFvA@mail.gmail.com>
-Subject: Re: [PATCH 1/8] selftests/kvm: Fix bug in how demand_paging_test
- calculates paging rate
+Date: Wed, 15 Feb 2023 10:19:40 -0800
+Message-ID: <CAF7b7mprKmdoQ=aedfDkN85vi01fskAL_s_ROgkysWuTmSt9FQ@mail.gmail.com>
+Subject: Re: [PATCH 4/8] kvm: Allow hva_pfn_fast to resolve read-only faults.
 To: Sean Christopherson <seanjc@google.com>
 Cc: Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Marc Zyngier <maz@kernel.org>, James Houghton <jthoughton@google.com>, Ben Gardon <bgardon@google.com>, 
@@ -56,35 +55,65 @@ Cc: Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Feb 15, 2023 at 8:44 AM Sean Christopherson <seanjc@google.com> wrote:
+On Wed, Feb 15, 2023 at 1:02 AM Oliver Upton <oliver.upton@linux.dev> wrote:
 >
-> On Wed, Feb 15, 2023, Oliver Upton wrote:
-> > Hi Anish,
-> >
-> > On Wed, Feb 15, 2023 at 01:16:07AM +0000, Anish Moorthy wrote:
-> > > Currently we're dividing tv_nsec by 1E8, not 1E9.
-> > >
-> > > Reported-by: James Houghton <jthoughton@google.com>
-> > > Signed-off-by: Anish Moorthy <amoorthy@google.com>
-> > > ---
-> > >  tools/testing/selftests/kvm/demand_paging_test.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >
-> > > diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-> > > index b0e1fc4de9e29..6809184ce2390 100644
-> > > --- a/tools/testing/selftests/kvm/demand_paging_test.c
-> > > +++ b/tools/testing/selftests/kvm/demand_paging_test.c
-> > > @@ -194,7 +194,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
-> > >             ts_diff.tv_sec, ts_diff.tv_nsec);
-> > >     pr_info("Overall demand paging rate: %f pgs/sec\n",
-> > >             memstress_args.vcpu_args[0].pages * nr_vcpus /
-> > > -           ((double)ts_diff.tv_sec + (double)ts_diff.tv_nsec / 100000000.0));
-> > > +           ((double)ts_diff.tv_sec + (double)ts_diff.tv_nsec / 1E9));
-> >
-> > Use NSEC_PER_SEC instead so the conversion taking place is immediately
-> > obvious.
+> You could have a smaller diff (and arrive at something more readable)
+> using a local for the gup flags:
 >
-> And please post this separately, it's a fix that's independent of the rest of the
-> series and can/should be applied sooner than later.
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 9c60384b5ae0..57f92ff3728a 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2494,6 +2494,7 @@ static inline int check_user_page_hwpoison(unsigned long addr)
+>  static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
+>                             bool *writable, kvm_pfn_t *pfn)
+>  {
+> +       unsigned int gup_flags;
+>         struct page *page[1];
+>
+>         /*
+> @@ -2501,10 +2502,9 @@ static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
+>          * or the caller allows to map a writable pfn for a read fault
+>          * request.
+>          */
+> -       if (!(write_fault || writable))
+> -               return false;
+> +       gup_flags = (write_fault || writable) ? FOLL_WRITE : 0;
+>
+> -       if (get_user_page_fast_only(addr, FOLL_WRITE, page)) {
+> +       if (get_user_page_fast_only(addr, gup_flags, page)) {
+>                 *pfn = page_to_pfn(page[0]);
+>
+>                 if (writable)
 
-Will do, and thanks for the pointer to NSEC_PER_SEC Oliver.
+Good idea, will do.
+
+On Wed, Feb 15, 2023 at 9:03 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> State what the patch does, avoid pronouns, and especially don't have "This commmit"
+> or "This patch" anywhere.  From Documentation/process/submitting-patches.rst:
+>
+>   Describe your changes in imperative mood, e.g. "make xyzzy do frotz"
+>   instead of "[This patch] makes xyzzy do frotz" or "[I] changed xyzzy
+>   to do frotz", as if you are giving orders to the codebase to change
+>   its behaviour.
+>
+> Heh, this whole series just screams "google3". :-)
+>
+> Anish, please read through
+>
+>   Documentation/process/coding-style.rst
+>
+> and
+>
+>   Documentation/process/submitting-patches.rst
+>
+> particularaly the "Describe your changes" and "Style-check your changes" your
+> changes sections.  Bonus points if you work through the mostly redundant process/
+> documentation, e.g. these have supplementary info.
+>
+>   Documentation/process/4.Coding.rst
+>   Documentation/process/5.Posting.rst
+
+Thanks for the resources Sean- I'll go through the series and rework the commit
+messages/documentation appropriately.
