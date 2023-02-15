@@ -1,40 +1,40 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-il1-f202.google.com (mail-il1-f202.google.com [209.85.166.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 753D715AD
-	for <kvmarm@lists.linux.dev>; Wed, 15 Feb 2023 01:07:36 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-4c11ae6ab25so178716107b3.8
-        for <kvmarm@lists.linux.dev>; Tue, 14 Feb 2023 17:07:36 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7D715AD
+	for <kvmarm@lists.linux.dev>; Wed, 15 Feb 2023 01:07:38 +0000 (UTC)
+Received: by mail-il1-f202.google.com with SMTP id z8-20020a92d6c8000000b0031570404cf1so100469ilp.1
+        for <kvmarm@lists.linux.dev>; Tue, 14 Feb 2023 17:07:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NBYdz/0TDvO7IvfPjxUDSlCbo4CB4F+r8/XPr+qUWDQ=;
-        b=aU7pmUYv2yFznya4HKfX1wyvhQAM3XhVN5tZHo14V3xLjl6LM+msYiUQUI/dDntR9P
-         CbvnwgZh3cRfQx79R9WIbI+LKjbcZAai7Y+RaW92yDgl4FStzDKPO10HY8CUoR2PJt1T
-         834vABtVSpIIOinRgAahgffjX3r/2UIjphb+uUNNKpECqpq9C2PGKzX6/bW+UoQ49VOr
-         PrO+lotusnp1yDayMDsB4Jxg86PSOnjUDHZIHcsitjU74lBcPCkdIei3IyOzbGfdYxle
-         PZkwnkMzeN5Wg3Et/kktfJNg9pmdWwD6MLBpyDRVQ1mUrdmKRIyfonpQpa9tL16jPgJW
-         kXsQ==
+        bh=cRn8pqb+ZATFzovvOq02T9w/U2XDHj1IusmF+T0soEI=;
+        b=tFso5WtZ/6jKsl3SoKrW0h0/JXk2Zohgx7CBo+sqFGlc8SPkBH/FLv21x0mRbrYb+6
+         sHNDbjL+I8AVibLJG9YCCq/FH43TX89MSdJQvBQxdPx7PO/c5pNdiGSrIWeqrHGDLdlz
+         Zv/w3Iw9Uzcla+S95SpuJ0tStuyq0zeHfrWKGe++vjtcNCJsnHFw7d260HFUnrcF8izf
+         HuMWFwpgS5mPeLVRVJil+Te4MvNc1y4M36S0N+JBcw3J05wTyvJpuDe3JqI4mt2OCIPc
+         YlwNGCQ54uial65J7N48Y7mtnmKttG3H3x5/8KThx7MnkyrFMUNmqhk2X4nMobBl+8/M
+         DH9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NBYdz/0TDvO7IvfPjxUDSlCbo4CB4F+r8/XPr+qUWDQ=;
-        b=JwomZfr/iAc23qp3TRApBqcCxqHoC3tIvgIPz0MY6iikBsGFbWR7V2FXv5D8zZEcw2
-         w3SpBIBHGgBvdUR/3Rr3oD3HemCsOTsBtEpms7oz2ocbdyUB3IuNs9ltF3JlP3RXOv0F
-         J+8hxLhnwGzEtOGEFB41v0c2iooCufSdtpvEJD7abkFp9KNXiPNqPng55T3RN1kcaOUD
-         r0Oj/uP4xLDYoqXJXDo3xY/pqTACgh/Nnjna5BNJpqWDsositYotXfu+zjL+suHizaII
-         4kh5PUNgGl2xThhATCznIe8BsuIqcAgQlnCxBDQWYEkdzFjCXVCPX1CrMgDwjFsBEaiC
-         FFcA==
-X-Gm-Message-State: AO0yUKVdtnf4SCeb+YAa0igbVlxvC8zr9N9OtbTrJmdkfWajDG0wGjSd
-	NDJaaN37Vh2tMvVJ+TdYn1Kt43BXVid9
-X-Google-Smtp-Source: AK7set+QJGvEyaQlgDqCrNd1yxkrORT3h4o9kypjzu0frfeLgSsVp3Gp+lfw/eT5m69TfV+mIApL4A1Yp/op
+        bh=cRn8pqb+ZATFzovvOq02T9w/U2XDHj1IusmF+T0soEI=;
+        b=TlLmX8BwnTjZ6a3wysqHubu80jouo5gScWcIwXtD8ftEDiiAtwfx/ghDrrKepmLxD3
+         gLzvBDx4O0RWN9lm49pglaoJScA7hg0t+sWtGAfqAzAjuhV/nqvNg4gAdNWzmkjhxAWi
+         T9TYk14ZnUy6EzZvOnciFQBhxP9zE6H1X4+QFSW5zhmShJZ9D5tbPW5K98kVxf7/8PWr
+         0iOya97G0C+IAk5e9vi65J2syyQVfi4tsdm/ZGaf31WpFHcAdqFBMNgJZlwqfMp3izka
+         9fJQD4+YbIffLpG0WgEGA/FJz4jF8hjaaj7z8vOzl4k8DgIILhElrlPXAVRVi5FD76+j
+         QYiA==
+X-Gm-Message-State: AO0yUKWftvRi9MflHq5+HRDS4mBMPNKO+XwBxdqa0hzwsU3zhxEv/BAT
+	ahJATcKGzUyuVKebhcrvusb9Q7MmPVTP
+X-Google-Smtp-Source: AK7set879hJleeEG485JEjMlVmvoEKEYhPpaft0WTFabkmYcY62Nyc9GtszHET3D2Wz3m5gr37YJ/w5AUtRq
 X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
- (user=rananta job=sendgmr) by 2002:a81:4309:0:b0:52e:c2c5:b75e with SMTP id
- q9-20020a814309000000b0052ec2c5b75emr2ywa.2.1676423255128; Tue, 14 Feb 2023
- 17:07:35 -0800 (PST)
-Date: Wed, 15 Feb 2023 01:07:12 +0000
+ (user=rananta job=sendgmr) by 2002:a6b:6b06:0:b0:740:694b:54b2 with SMTP id
+ g6-20020a6b6b06000000b00740694b54b2mr318908ioc.21.1676423257661; Tue, 14 Feb
+ 2023 17:07:37 -0800 (PST)
+Date: Wed, 15 Feb 2023 01:07:14 +0000
 In-Reply-To: <20230215010717.3612794-1-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,9 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230215010717.3612794-1-rananta@google.com>
 X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
-Message-ID: <20230215010717.3612794-12-rananta@google.com>
-Subject: [REPOST PATCH 11/16] selftests: KVM: aarch64: Add vCPU migration test
- for PMU
+Message-ID: <20230215010717.3612794-14-rananta@google.com>
+Subject: [REPOST PATCH 13/16] selftests: KVM: aarch64: Test chained events for PMU
 From: Raghavendra Rao Ananta <rananta@google.com>
 To: Oliver Upton <oupton@google.com>, Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>, 
 	Ricardo Koller <ricarkol@google.com>, James Morse <james.morse@arm.com>, 
@@ -57,319 +56,122 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Jing Zhang <jingzhangos@google.com>,
 	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Implement a stress test for KVM by frequently force-migrating the
-vCPU to random pCPUs in the system. This would validate the
-save/restore functionality of KVM and starting/stopping of
-PMU counters as necessary.
+Extend the vPMU's vCPU migration test to validate
+chained events, and their overflow conditions.
 
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
- .../testing/selftests/kvm/aarch64/vpmu_test.c | 195 +++++++++++++++++-
- 1 file changed, 193 insertions(+), 2 deletions(-)
+ .../testing/selftests/kvm/aarch64/vpmu_test.c | 76 ++++++++++++++++++-
+ 1 file changed, 75 insertions(+), 1 deletion(-)
 
 diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_test.c b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-index 5c166df245589..0c9d801f4e602 100644
+index 066dc17fa3906..de725f4339ad5 100644
 --- a/tools/testing/selftests/kvm/aarch64/vpmu_test.c
 +++ b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-@@ -19,9 +19,15 @@
-  * higher exception levels (EL2, EL3). Verify this functionality by
-  * configuring and trying to count the events for EL2 in the guest.
+@@ -23,7 +23,7 @@
+  * migrating the guest vCPU to random pCPUs in the system, and check
+  * if the vPMU is still behaving as expected. The sub-tests include
+  * testing basic functionalities such as basic counters behavior,
+- * overflow, and overflow interrupts.
++ * overflow, overflow interrupts, and chained events.
   *
-+ * 4. Since the PMU registers are per-cpu, stress KVM by frequently
-+ * migrating the guest vCPU to random pCPUs in the system, and check
-+ * if the vPMU is still behaving as expected.
-+ *
   * Copyright (c) 2022 Google LLC.
   *
-  */
-+#define _GNU_SOURCE
-+
- #include <kvm_util.h>
- #include <processor.h>
- #include <test_util.h>
-@@ -30,6 +36,11 @@
- #include <linux/arm-smccc.h>
- #include <linux/bitfield.h>
- #include <linux/bitmap.h>
-+#include <stdlib.h>
-+#include <pthread.h>
-+#include <sys/sysinfo.h>
-+
-+#include "delay.h"
+@@ -61,6 +61,8 @@
+ #define PRE_OVERFLOW_32		(GENMASK(31, 0) - COUNT_TO_OVERFLOW + 1)
+ #define PRE_OVERFLOW_64		(GENMASK(63, 0) - COUNT_TO_OVERFLOW + 1)
  
- /* The max number of the PMU event counters (excluding the cycle counter) */
- #define ARMV8_PMU_MAX_GENERAL_COUNTERS	(ARMV8_PMU_MAX_COUNTERS - 1)
-@@ -37,6 +48,8 @@
- /* The max number of event numbers that's supported */
- #define ARMV8_PMU_MAX_EVENTS		64
- 
-+#define msecs_to_usecs(msec)		((msec) * 1000LL)
++#define ALL_SET_64		GENMASK(63, 0)
 +
- /*
-  * The macros and functions below for reading/writing PMEV{CNTR,TYPER}<n>_EL0
-  * were basically copied from arch/arm64/kernel/perf_event.c.
-@@ -265,6 +278,7 @@ enum test_stage {
- 	TEST_STAGE_COUNTER_ACCESS = 1,
- 	TEST_STAGE_KVM_EVENT_FILTER,
- 	TEST_STAGE_KVM_EVTYPE_FILTER,
-+	TEST_STAGE_VCPU_MIGRATION,
- };
+ #define GICD_BASE_GPA	0x8000000ULL
+ #define GICR_BASE_GPA	0x80A0000ULL
  
- struct guest_data {
-@@ -275,6 +289,19 @@ struct guest_data {
- 
- static struct guest_data guest_data;
- 
-+#define VCPU_MIGRATIONS_TEST_ITERS_DEF		1000
-+#define VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS	2
-+
-+struct test_args {
-+	int vcpu_migration_test_iter;
-+	int vcpu_migration_test_migrate_freq_ms;
-+};
-+
-+static struct test_args test_args = {
-+	.vcpu_migration_test_iter = VCPU_MIGRATIONS_TEST_ITERS_DEF,
-+	.vcpu_migration_test_migrate_freq_ms = VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS,
-+};
-+
- static void guest_sync_handler(struct ex_regs *regs)
- {
- 	uint64_t esr, ec;
-@@ -352,7 +379,6 @@ static bool pmu_event_is_supported(uint64_t event)
- 		GUEST_ASSERT_3(!(_tval & mask), _tval, mask, set_expected);\
+@@ -639,6 +641,75 @@ static void test_cycles_count(bool expect_count, bool test_overflow)
+ 	pmu_disable_reset();
  }
  
--
- /*
-  * Extra instructions inserted by the compiler would be difficult to compensate
-  * for, so hand assemble everything between, and including, the PMCR accesses
-@@ -459,6 +485,13 @@ static void test_event_count(uint64_t event, int pmc_idx, bool expect_count)
- 	}
- }
- 
-+static void test_basic_pmu_functionality(void)
++static void test_chained_count(int pmc_idx)
 +{
-+	/* Test events on generic and cycle counters */
-+	test_instructions_count(0, true);
-+	test_cycles_count(true);
-+}
++	int i, chained_pmc_idx;
++	struct pmc_accessor *acc;
++	uint64_t pmcr_n, cnt, cntr_val;
 +
- /*
-  * Check if @mask bits in {PMCNTEN,PMINTEN,PMOVS}{SET,CLR} registers
-  * are set or cleared as specified in @set_expected.
-@@ -748,6 +781,16 @@ static void guest_evtype_filter_test(void)
- 	GUEST_ASSERT_2(cnt == 0, cnt, typer);
- }
- 
-+static void guest_vcpu_migration_test(void)
-+{
++	/* The test needs at least two PMCs */
++	pmcr_n = get_pmcr_n();
++	GUEST_ASSERT_1(pmcr_n >= 2, pmcr_n);
++
 +	/*
-+	 * While the userspace continuously migrates this vCPU to random pCPUs,
-+	 * run basic PMU functionalities and verify the results.
++	 * The chained counter's idx is always chained with (pmc_idx + 1).
++	 * pmc_idx should be even as the chained event doesn't count on
++	 * odd numbered counters.
 +	 */
-+	while (test_args.vcpu_migration_test_iter--)
-+		test_basic_pmu_functionality();
-+}
++	GUEST_ASSERT_1(pmc_idx % 2 == 0, pmc_idx);
 +
- static void guest_code(void)
- {
- 	switch (guest_data.test_stage) {
-@@ -760,6 +803,9 @@ static void guest_code(void)
- 	case TEST_STAGE_KVM_EVTYPE_FILTER:
- 		guest_evtype_filter_test();
- 		break;
-+	case TEST_STAGE_VCPU_MIGRATION:
-+		guest_vcpu_migration_test();
-+		break;
- 	default:
- 		GUEST_ASSERT_1(0, guest_data.test_stage);
- 	}
-@@ -837,6 +883,7 @@ create_vpmu_vm(void *guest_code, struct kvm_pmu_event_filter *pmu_event_filters)
- 
- 	vpmu_vm->vm = vm = vm_create(1);
- 	vm_init_descriptor_tables(vm);
++	/*
++	 * The max counter idx that the chained counter can occupy is
++	 * (pmcr_n - 1), while the actual event sits on (pmcr_n - 2).
++	 */
++	chained_pmc_idx = pmc_idx + 1;
++	GUEST_ASSERT(chained_pmc_idx < pmcr_n);
 +
- 	/* Catch exceptions for easier debugging */
- 	for (ec = 0; ec < ESR_EC_NUM; ec++) {
- 		vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT, ec,
-@@ -881,6 +928,8 @@ static void run_vcpu(struct kvm_vcpu *vcpu)
- 	struct ucall uc;
- 
- 	sync_global_to_guest(vcpu->vm, guest_data);
-+	sync_global_to_guest(vcpu->vm, test_args);
++	enable_counter(chained_pmc_idx);
++	pmu_irq_init(chained_pmc_idx);
 +
- 	vcpu_run(vcpu);
- 	switch (get_ucall(vcpu, &uc)) {
- 	case UCALL_ABORT:
-@@ -1098,11 +1147,112 @@ static void run_kvm_evtype_filter_test(void)
- 	destroy_vpmu_vm(vpmu_vm);
- }
- 
-+struct vcpu_migrate_data {
-+	struct vpmu_vm *vpmu_vm;
-+	pthread_t *pt_vcpu;
-+	bool vcpu_done;
-+};
++	/* Configure the chained event using all the possible ways*/
++	for (i = 0; i < ARRAY_SIZE(pmc_accessors); i++) {
++		acc = &pmc_accessors[i];
 +
-+static void *run_vcpus_migrate_test_func(void *arg)
-+{
-+	struct vcpu_migrate_data *migrate_data = arg;
-+	struct vpmu_vm *vpmu_vm = migrate_data->vpmu_vm;
++		/* Test if the chained counter increments when the base event overflows */
 +
-+	run_vcpu(vpmu_vm->vcpu);
-+	migrate_data->vcpu_done = true;
++		cntr_val = 1;
++		acc->write_cntr(chained_pmc_idx, cntr_val);
++		acc->write_typer(chained_pmc_idx, ARMV8_PMUV3_PERFCTR_CHAIN);
 +
-+	return NULL;
-+}
++		/* Chain the counter with pmc_idx that's configured for an overflow */
++		test_instructions_count(pmc_idx, true, true);
 +
-+static uint32_t get_pcpu(void)
-+{
-+	uint32_t pcpu;
-+	unsigned int nproc_conf;
-+	cpu_set_t online_cpuset;
++		/*
++		 * pmc_idx is also configured to run for all the ARRAY_SIZE(pmc_accessors)
++		 * combinations. Hence, the chained chained_pmc_idx is expected to be
++		 * cntr_val + ARRAY_SIZE(pmc_accessors).
++		 */
++		cnt = acc->read_cntr(chained_pmc_idx);
++		GUEST_ASSERT_4(cnt == cntr_val + ARRAY_SIZE(pmc_accessors),
++				pmc_idx, i, cnt, cntr_val + ARRAY_SIZE(pmc_accessors));
 +
-+	nproc_conf = get_nprocs_conf();
-+	sched_getaffinity(0, sizeof(cpu_set_t), &online_cpuset);
++		/* Test for the overflow of the chained counter itself */
 +
-+	/* Randomly find an available pCPU to place the vCPU on */
-+	do {
-+		pcpu = rand() % nproc_conf;
-+	} while (!CPU_ISSET(pcpu, &online_cpuset));
++		cntr_val = ALL_SET_64;
++		acc->write_cntr(chained_pmc_idx, cntr_val);
 +
-+	return pcpu;
-+}
++		test_instructions_count(pmc_idx, true, true);
 +
-+static int migrate_vcpu(struct vcpu_migrate_data *migrate_data)
-+{
-+	int ret;
-+	cpu_set_t cpuset;
-+	uint32_t new_pcpu = get_pcpu();
-+
-+	CPU_ZERO(&cpuset);
-+	CPU_SET(new_pcpu, &cpuset);
-+
-+	pr_debug("Migrating vCPU to pCPU: %u\n", new_pcpu);
-+
-+	ret = pthread_setaffinity_np(*migrate_data->pt_vcpu, sizeof(cpuset), &cpuset);
-+
-+	/* Allow the error where the vCPU thread is already finished */
-+	TEST_ASSERT(ret == 0 || ret == ESRCH,
-+		    "Failed to migrate the vCPU to pCPU: %u; ret: %d\n", new_pcpu, ret);
-+
-+	return ret;
-+}
-+
-+static void *vcpus_migrate_func(void *arg)
-+{
-+	struct vcpu_migrate_data *migrate_data = arg;
-+
-+	while (!migrate_data->vcpu_done) {
-+		usleep(msecs_to_usecs(test_args.vcpu_migration_test_migrate_freq_ms));
-+		migrate_vcpu(migrate_data);
++		/*
++		 * At this point, an interrupt should've been fired for the chained
++		 * counter (which validates the overflow bit), and the counter should've
++		 * wrapped around to ARRAY_SIZE(pmc_accessors) - 1.
++		 */
++		cnt = acc->read_cntr(chained_pmc_idx);
++		GUEST_ASSERT_4(cnt == ARRAY_SIZE(pmc_accessors) - 1,
++				pmc_idx, i, cnt, ARRAY_SIZE(pmc_accessors));
 +	}
 +
-+	return NULL;
++	pmu_irq_exit(chained_pmc_idx);
 +}
 +
-+static void run_vcpu_migration_test(uint64_t pmcr_n)
-+{
-+	int ret;
-+	struct vpmu_vm *vpmu_vm;
-+	pthread_t pt_vcpu, pt_sched;
-+	struct vcpu_migrate_data migrate_data = {
-+		.pt_vcpu = &pt_vcpu,
-+		.vcpu_done = false,
-+	};
-+
-+	__TEST_REQUIRE(get_nprocs() >= 2, "At least two pCPUs needed for vCPU migration test");
-+
-+	guest_data.test_stage = TEST_STAGE_VCPU_MIGRATION;
-+	guest_data.expected_pmcr_n = pmcr_n;
-+
-+	migrate_data.vpmu_vm = vpmu_vm = create_vpmu_vm(guest_code, NULL);
-+
-+	/* Initialize random number generation for migrating vCPUs to random pCPUs */
-+	srand(time(NULL));
-+
-+	/* Spawn a vCPU thread */
-+	ret = pthread_create(&pt_vcpu, NULL, run_vcpus_migrate_test_func, &migrate_data);
-+	TEST_ASSERT(!ret, "Failed to create the vCPU thread");
-+
-+	/* Spawn a scheduler thread to force-migrate vCPUs to various pCPUs */
-+	ret = pthread_create(&pt_sched, NULL, vcpus_migrate_func, &migrate_data);
-+	TEST_ASSERT(!ret, "Failed to create the scheduler thread for migrating the vCPUs");
-+
-+	pthread_join(pt_sched, NULL);
-+	pthread_join(pt_vcpu, NULL);
-+
-+	destroy_vpmu_vm(vpmu_vm);
-+}
-+
- static void run_tests(uint64_t pmcr_n)
+ static void test_event_count(uint64_t event, int pmc_idx, bool expect_count)
  {
- 	run_counter_access_tests(pmcr_n);
- 	run_kvm_event_filter_test();
- 	run_kvm_evtype_filter_test();
-+	run_vcpu_migration_test(pmcr_n);
+ 	switch (event) {
+@@ -665,6 +736,9 @@ static void test_basic_pmu_functionality(void)
+ 	/* Test overflow with interrupts on generic and cycle counters */
+ 	test_instructions_count(0, true, true);
+ 	test_cycles_count(true, true);
++
++	/* Test chained events */
++	test_chained_count(0);
  }
  
  /*
-@@ -1121,12 +1271,53 @@ static uint64_t get_pmcr_n_limit(void)
- 	return FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
- }
- 
--int main(void)
-+static void print_help(char *name)
-+{
-+	pr_info("Usage: %s [-h] [-i vcpu_migration_test_iterations] [-m vcpu_migration_freq_ms]\n",
-+		name);
-+	pr_info("\t-i: Number of iterations of vCPU migrations test (default: %u)\n",
-+		VCPU_MIGRATIONS_TEST_ITERS_DEF);
-+	pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different pCPU. (default: %u)\n",
-+		VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS);
-+	pr_info("\t-h: print this help screen\n");
-+}
-+
-+static bool parse_args(int argc, char *argv[])
-+{
-+	int opt;
-+
-+	while ((opt = getopt(argc, argv, "hi:m:")) != -1) {
-+		switch (opt) {
-+		case 'i':
-+			test_args.vcpu_migration_test_iter =
-+				atoi_positive("Nr vCPU migration iterations", optarg);
-+			break;
-+		case 'm':
-+			test_args.vcpu_migration_test_migrate_freq_ms =
-+				atoi_positive("vCPU migration frequency", optarg);
-+			break;
-+		case 'h':
-+		default:
-+			goto err;
-+		}
-+	}
-+
-+	return true;
-+
-+err:
-+	print_help(argv[0]);
-+	return false;
-+}
-+
-+int main(int argc, char *argv[])
- {
- 	uint64_t pmcr_n;
- 
- 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
- 
-+	if (!parse_args(argc, argv))
-+		exit(KSFT_SKIP);
-+
- 	pmcr_n = get_pmcr_n_limit();
- 	run_tests(pmcr_n);
- 
 -- 
 2.39.1.581.gbfd45094c4-goog
 
