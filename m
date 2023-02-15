@@ -1,96 +1,88 @@
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 876516FC2
-	for <kvmarm@lists.linux.dev>; Wed, 15 Feb 2023 16:25:14 +0000 (UTC)
-Received: by mail-qt1-f181.google.com with SMTP id z5so22339198qtn.8
-        for <kvmarm@lists.linux.dev>; Wed, 15 Feb 2023 08:25:14 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A28157B
+	for <kvmarm@lists.linux.dev>; Wed, 15 Feb 2023 16:44:49 +0000 (UTC)
+Received: by mail-pl1-f201.google.com with SMTP id h5-20020a170902748500b0019aacd1fb04so4010757pll.2
+        for <kvmarm@lists.linux.dev>; Wed, 15 Feb 2023 08:44:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=AFepK2rkB6ezD70sOO4MhlZcyxN8oS1icDWJsj/PPKQ=;
-        b=Qhoq6nyimphHqRE5WzVN8RgkyLd4oDJPLhqmOaXFoUid4CPWPTXVbx5yfIcS/DOpDi
-         Q66ZjIRewef/dTRmmUZgomkm9Zy1xH+8qmHVBQ8bgeRyLulUUHGdB6RbVOZ7mtVrdILk
-         4N7yn9eJ/7b0IwZHWlL0nh9QjVDOJuijesSDZ/8rzE+ihdxXQwVLvCiFCgFTclMcaG5x
-         RbqeniZ0qbfppXUI3yQWv6m5/JOGgE9m0961DBmvFhyq59PuPQ63p9Olt1BIvoED6GOo
-         aaRL6rERcJQWqI+1IFfJ5Asu6m84awWlRbc3hzZ7WSly5iAsVvZGHX4C5K5mP8sGf5ZL
-         GamQ==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=t8DMcJvXOt1uVMYd5lzHsJnF9jrZA0JOd1Wq9dyU57Y=;
+        b=WoRu9NpYfvK6J7R6Hjg/lqXmtWSjFmIjHU2Co8CI2GzDjhbDr+vBMUWmeO1JI0psis
+         L86WT9EvkHym4MiCd+N49yB7UaWK4XEkKss6gjM2GjoxmzxLW6DofNQ0BScuDnGDWTkL
+         m203gZvFo7D0YemQZg96lVgyrB2rwF3q9QkcSVLcbUGCR7yexx/c0+bAQDYQFYroDKUU
+         MZWQByGYoptU9v021DZtiGN1+sbig7mL/ZWIvMCkJMUKZDFvyBBLtyUvouKFwwym4Ib+
+         5iJqFRO9/VLw8UKxjgH46tUGdUKGWgry3LhdlTKTaIHzy71rmAqj20l0dfvkyECUsZby
+         hvKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AFepK2rkB6ezD70sOO4MhlZcyxN8oS1icDWJsj/PPKQ=;
-        b=pNPcDtkmlliWwiO2Y3z039w3WKOTX4tuGjpErXrzmGbLuP2M/gJYzg2ojWP/1wACwB
-         UxNqBoWnxKNSL6Xn7sAkjjeA5RynFXajFuezd6RcyFB6MZpW1MxfDhy44k7v40h5YB2B
-         F2cQhsKKl9Ciy2DvaV6qdeW2uoGoGtHOdOrATFFvK/9KEgZWmxTHP3sSwjHz98FXS1oc
-         ckDEonoNz1MBjVcqkscA2nRVjOWboDk6ipx/5nwrSHF8LpyRAGcYFF0ftFc3oVSA1QYj
-         TKCLnPEju/5fauB5t0bivTGSNWdq2tgS3dqrfbl+pEgr2nw3keXG+YK/rNVhN6pzw77O
-         oa7w==
-X-Gm-Message-State: AO0yUKWFMSoG5rEl+NuSnQVBrYDBRm2KGrqQlH52gDfs0Po3QOpOkLhh
-	nISjH/1z6yZdC/yskJTGFf3TLO4HAyPG4eZCJXWJCw==
-X-Google-Smtp-Source: AK7set9ikM4pL943zsnOf8yKyyR11BmkOt0tLqoP8fuVV3p3LRQ9jdICX6UpZLZ8msIH4DpPAMZoNgO+hZsONxK16LM=
-X-Received: by 2002:ac8:58cb:0:b0:3ba:240b:99ad with SMTP id
- u11-20020ac858cb000000b003ba240b99admr355236qta.65.1676478313326; Wed, 15 Feb
- 2023 08:25:13 -0800 (PST)
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=t8DMcJvXOt1uVMYd5lzHsJnF9jrZA0JOd1Wq9dyU57Y=;
+        b=wJtrziNo2t+eZ5dHdodTR4AQ1VGi+jDYAmOkOjSI9uPfJtft2nQag47UhWPwTLcJLO
+         9B803BYPEn2AdsTcQN/Ssf/tDpNp7LaaO1TvlR8MUiiGPAJoESmvbTWoB3b09DN7iQiZ
+         JO2m+gnF8CHeuPgZFdJHIFpvevYifI+PvQrQn8kfxqda5qmghAkG+t/xiKOccpdHgyxf
+         dCyQGb+PiIh6NQgktKD6gOMewshOqZ9VnbtX8zkCYAHt9rLlx9cSiTzUrgcbvOIXnI0f
+         dZ8HU/nYl/hAjsnQmb+EHNNjrCOvKAOs9yrzbK8sKm4fZOzFQYpr+3EbZAronTZP9lB1
+         vtzg==
+X-Gm-Message-State: AO0yUKX33ouRPkuvFhk3ZsQgptsWAkqYLjIEmQklp/ajD041ek9lJyBo
+	C3TGcWhKNebxFttNo0RMnZNWkP+4O2E=
+X-Google-Smtp-Source: AK7set9mz6oE4Te7rt9n1BbiU/9ZQWLHMawumtBwjGTY9V0SWl+h2f3S7YMuaoevJRHcJm0SIwnMhfdvhvA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:bf0b:0:b0:4ce:ca8b:432b with SMTP id
+ v11-20020a63bf0b000000b004ceca8b432bmr244899pgf.10.1676479488932; Wed, 15 Feb
+ 2023 08:44:48 -0800 (PST)
+Date: Wed, 15 Feb 2023 08:44:47 -0800
+In-Reply-To: <Y+yJU2pE4IyuIwOQ@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230206165851.3106338-1-ricarkol@google.com> <20230206165851.3106338-10-ricarkol@google.com>
- <9201764f-baa1-250a-39ac-0305bce789a3@redhat.com> <CAOHnOrzGXU29JK+8aRq0SnMe6Ske04YWffJhPU6iUXjGyyoQtA@mail.gmail.com>
-In-Reply-To: <CAOHnOrzGXU29JK+8aRq0SnMe6Ske04YWffJhPU6iUXjGyyoQtA@mail.gmail.com>
-From: Ricardo Koller <ricarkol@google.com>
-Date: Wed, 15 Feb 2023 08:25:02 -0800
-Message-ID: <CAOHnOrwZGyzARsOqfgNGk9cH4rUoi-FyKXbbKa-fu=MzA+yO1g@mail.gmail.com>
-Subject: Re: [PATCH v2 09/12] KVM: arm64: Split huge pages when dirty logging
- is enabled
-To: Gavin Shan <gshan@redhat.com>
-Cc: pbonzini@redhat.com, maz@kernel.org, oupton@google.com, 
-	yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com, 
-	andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com, 
-	suzuki.poulose@arm.com, eric.auger@redhat.com, reijiw@google.com, 
-	rananta@google.com, bgardon@google.com, ricarkol@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20230215011614.725983-1-amoorthy@google.com> <20230215011614.725983-2-amoorthy@google.com>
+ <Y+yJU2pE4IyuIwOQ@linux.dev>
+Message-ID: <Y+0L/x2YgiEgm9bt@google.com>
+Subject: Re: [PATCH 1/8] selftests/kvm: Fix bug in how demand_paging_test
+ calculates paging rate
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Anish Moorthy <amoorthy@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Marc Zyngier <maz@kernel.org>, James Houghton <jthoughton@google.com>, Ben Gardon <bgardon@google.com>, 
+	David Matlack <dmatlack@google.com>, Ricardo Koller <ricarkol@google.com>, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Axel Rasmussen <axelrasmussen@google.com>, 
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
 
-> > > +
-> > > +             next = __stage2_range_addr_end(addr, end, chunk_size);
-> > > +             ret = kvm_pgtable_stage2_split(pgt, addr, next - addr,
-> > > +                                            cache, cache_capacity);
-> > > +             if (ret)
-> > > +                     break;
-> > > +     } while (addr = next, addr != end);
-> > > +
-> > > +     return ret;
-> > > +}
-> > > +
-> > >   #define stage2_apply_range_resched(kvm, addr, end, fn)                      \
-> > >       stage2_apply_range(kvm, addr, end, fn, true)
-> > >
-> >
-> > I'm wandering if stage2_apply_range() can be reused to avoid invent another similar
-> > function. the gap are the granularity and conditions to reschedule.
->
-> Will try and see what it looks like and report back.
->
+On Wed, Feb 15, 2023, Oliver Upton wrote:
+> Hi Anish,
+> 
+> On Wed, Feb 15, 2023 at 01:16:07AM +0000, Anish Moorthy wrote:
+> > Currently we're dividing tv_nsec by 1E8, not 1E9.
+> > 
+> > Reported-by: James Houghton <jthoughton@google.com>
+> > Signed-off-by: Anish Moorthy <amoorthy@google.com>
+> > ---
+> >  tools/testing/selftests/kvm/demand_paging_test.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+> > index b0e1fc4de9e29..6809184ce2390 100644
+> > --- a/tools/testing/selftests/kvm/demand_paging_test.c
+> > +++ b/tools/testing/selftests/kvm/demand_paging_test.c
+> > @@ -194,7 +194,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+> >  		ts_diff.tv_sec, ts_diff.tv_nsec);
+> >  	pr_info("Overall demand paging rate: %f pgs/sec\n",
+> >  		memstress_args.vcpu_args[0].pages * nr_vcpus /
+> > -		((double)ts_diff.tv_sec + (double)ts_diff.tv_nsec / 100000000.0));
+> > +		((double)ts_diff.tv_sec + (double)ts_diff.tv_nsec / 1E9));
+> 
+> Use NSEC_PER_SEC instead so the conversion taking place is immediately
+> obvious.
 
-Tried and don't like the result very much:
+And please post this separately, it's a fix that's independent of the rest of the
+series and can/should be applied sooner than later.
 
-static int _stage2_apply_range(struct kvm *kvm, phys_addr_t addr,
-phys_addr_t end,
-                               int (*fn)(struct kvm_pgtable *, u64,
-u64),
-                               bool fn_ignore_failures, bool
-fn_drop_mmu_lock,
-                               struct kvm_mmu_memory_cache *cache, int
-cache_capacity,
-                               bool resched)
-
-The generic function would require too many arguments to work for all cases.
-
-Thanks,
-Ricardo
+Thanks!
