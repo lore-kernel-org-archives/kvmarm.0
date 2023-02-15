@@ -1,49 +1,52 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 887A77B
-	for <kvmarm@lists.linux.dev>; Wed, 15 Feb 2023 17:40:50 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-52a8f97c8ccso224484517b3.6
-        for <kvmarm@lists.linux.dev>; Wed, 15 Feb 2023 09:40:50 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D1E8C0A3
+	for <kvmarm@lists.linux.dev>; Wed, 15 Feb 2023 17:40:52 +0000 (UTC)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-527501b56ffso225326457b3.15
+        for <kvmarm@lists.linux.dev>; Wed, 15 Feb 2023 09:40:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=JnGTU2/9t/zkkgh7A/4Y+4WIThR4IupzRv0EQ615LuM=;
-        b=fVvSF7Tv5YLk1Pe1vvAm2g42jBZDdrcVZVrSLsWVmAOdxGjVdOpaLJvO7bLFng452k
-         XZJrrW7zwI81rP73fYeci9Xg+8PArzyWiWZKIByF/lyn5srxfhGNtUBN30N+i5HaJYCE
-         3D5HraLbTaiWXeSAhgE/5wBg9rQjcgfBgD2D61eDmPFYuAmb/K41Y8qdUHaLciGQ5uej
-         ISUk8FcOcszoePXsxjlsFNBlvJELfkOhLIfTNGoq4SgCWqlcycPofrgRTmM0ugfyFe0B
-         iqOpkOvf1kCzUC++FHiBXVdSRrVlGGkkYibuXuDzDUwKdgQ1XkReFC4TiOqCpl+zzYOt
-         xYug==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=B/KCp/Z4FTyIB9CQJtKq6N3+noLJ91OFnIUVo6bQFck=;
+        b=nJs7cQBabi7g3RZOx2pbm3SvNKnvqUsfzyVdTA/gUP0ZKRQO7TTYexYE9aEjQiruQ6
+         fbK6oNOS7G1xVsOV2Udht6P9vsiLi9hmBO7UGd1jogqmp740hqo9DbzZuNsOjzLpU5R7
+         ajMrZW2+v2vvslix7TIbGhq1c6tMqMpxVDrCQwNNDgL+9pY4n1Asw/9KzibLhUW6t9A0
+         ztGJMSYazbqkw54nwFGe6qsvoT1SCnRoNLXM3pXHnoiL+8WaUWQHak0R7vk2N+fv2pV4
+         Q5NXs+4D7bFPF17ohkvBbrwXKjeRLqsISRJtI1wXP/C1b1RUWVzUMe15Z36k591t8Kjg
+         TWFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JnGTU2/9t/zkkgh7A/4Y+4WIThR4IupzRv0EQ615LuM=;
-        b=kiTo8tUry5cPND5B15VffFKNnOIyXXw8l5TmJx+d61rOcBIwChFrwBrdbM+Na88e5W
-         577KQYxRUuvfLNydBOVahinsZphMCgwSVEL+wxPLKfLyFaVrvYXA1zXH8D62ArB4uSGZ
-         L9tB6f+MX3JAJxnCj953nIxHSP7vj0Uci4XJ+zSx44OtMGzscp/xEwN/9rTtFaEwvAjJ
-         aRmBqblb9D8uhoQ2MQ4KNeK85jHqsEKdNXjjJkkQyVPFdQRwqKYn99pzOWgWJwITpbf8
-         5jIJaawZ+TUoZdwS1sDxT5GLxlRsa+ElUwbCstwICpFq6x441hZ6qf8IR4DgDyKrzVtT
-         EqTw==
-X-Gm-Message-State: AO0yUKUSz5IsSB+Zc7ExOIvnm0jzI1AGZDi3E2Z4SNOuP60A3FF0mOFR
-	x0TI5yiAuMh19h+AY3IB048k0m5PzYd3Ww==
-X-Google-Smtp-Source: AK7set9v1Tsu2RbvecayG0pwh5E5wClByYDYiL70Pzy58BFi4OUwYkvuL1V0JRtDpSobgqldWdKujz0Xcdl7CA==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=B/KCp/Z4FTyIB9CQJtKq6N3+noLJ91OFnIUVo6bQFck=;
+        b=8L6oU73wI3v0Nzmqch2sYtpkqh9mRuaoE0sEvhzh7rRIUVxUSMXqvZM/LNdzPkqlZh
+         9QZ+xjonHueRsSxUJ24AWzWKX7GLd1SlNQMd3aKMat1AkjZjNufCR1woe5ycO6MFdBtp
+         /E0LDbeevTIU+PxVDl2JJNQYBQK1A/YfFoQLiJgmxeMlDaD+V+rFQr4/dj+mhmI7xIAH
+         IPc5kZH4pQyPgXyGcAFpzD6POGP52mGOhvydRZGVXCTbU2l8YvuF3G4QIvZYrRaomcf6
+         lCNj9tEE0F9fBAIXsSawLQ6AXUmimLyy+G19B19+IVxKKPMtdkdRmeJ+YKYtQXtd8rIj
+         LbtQ==
+X-Gm-Message-State: AO0yUKXU7I3wjVKptOu7+ZpEwSNpDpTf50lSGcPQzfNzJ0JwoSsv2Qjs
+	uyJbL12Ms0EBlRWkVmEMUqQD1uX6rsIGWQ==
+X-Google-Smtp-Source: AK7set+bgWijZpJZs3bDh4hkYfkbATLgzpivaSg/+p9yVA9hd4Von3l4zJ2X/6ZQ6ZzNq/xoAlM7jJ2xlXZ/lQ==
 X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a81:4502:0:b0:52e:b7ea:3d58 with SMTP id
- s2-20020a814502000000b0052eb7ea3d58mr7ywa.7.1676482848942; Wed, 15 Feb 2023
- 09:40:48 -0800 (PST)
-Date: Wed, 15 Feb 2023 17:40:34 +0000
+ (user=ricarkol job=sendgmr) by 2002:a25:828f:0:b0:86f:8ba9:9474 with SMTP id
+ r15-20020a25828f000000b0086f8ba99474mr378251ybk.302.1676482851162; Wed, 15
+ Feb 2023 09:40:51 -0800 (PST)
+Date: Wed, 15 Feb 2023 17:40:35 +0000
+In-Reply-To: <20230215174046.2201432-1-ricarkol@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20230215174046.2201432-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.39.1.637.g21b0678d19-goog
-Message-ID: <20230215174046.2201432-1-ricarkol@google.com>
-Subject: [PATCH v3 00/12] Implement Eager Page Splitting for ARM
+Message-ID: <20230215174046.2201432-2-ricarkol@google.com>
+Subject: [PATCH v3 01/12] KVM: arm64: Add KVM_PGTABLE_WALK ctx->flags for
+ skipping BBM and CMO
 From: Ricardo Koller <ricarkol@google.com>
 To: pbonzini@redhat.com, maz@kernel.org, oupton@google.com, 
 	yuzenghui@huawei.com, dmatlack@google.com
@@ -54,191 +57,108 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
 	ricarkol@gmail.com, Ricardo Koller <ricarkol@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Eager Page Splitting improves the performance of dirty-logging (used
-in live migrations) when guest memory is backed by huge-pages.  It's
-an optimization used in Google Cloud since 2016 on x86, and for the
-last couple of months on ARM.
+Add two flags to kvm_pgtable_visit_ctx, KVM_PGTABLE_WALK_SKIP_BBM and
+KVM_PGTABLE_WALK_SKIP_CMO, to indicate that the walk should not
+perform break-before-make (BBM) nor cache maintenance operations
+(CMO). This will by a future commit to create unlinked tables not
+accessible to the HW page-table walker.  This is safe as these removed
+tables are not visible to the HW page-table walker.
 
-Background and motivation
-=========================
-Dirty logging is typically used for live-migration iterative copying.
-KVM implements dirty-logging at the PAGE_SIZE granularity (will refer
-to 4K pages from now on).  It does it by faulting on write-protected
-4K pages.  Therefore, enabling dirty-logging on a huge-page requires
-breaking it into 4K pages in the first place.  KVM does this breaking
-on fault, and because it's in the critical path it only maps the 4K
-page that faulted; every other 4K page is left unmapped.  This is not
-great for performance on ARM for a couple of reasons:
+Signed-off-by: Ricardo Koller <ricarkol@google.com>
+---
+ arch/arm64/include/asm/kvm_pgtable.h | 18 ++++++++++++++++++
+ arch/arm64/kvm/hyp/pgtable.c         | 27 ++++++++++++++++-----------
+ 2 files changed, 34 insertions(+), 11 deletions(-)
 
-- Splitting on fault can halt vcpus for milliseconds in some
-  implementations. Splitting a block PTE requires using a broadcasted
-  TLB invalidation (TLBI) for every huge-page (due to the
-  break-before-make requirement). Note that x86 doesn't need this. We
-  observed some implementations that take millliseconds to complete
-  broadcasted TLBIs when done in parallel from multiple vcpus.  And
-  that's exactly what happens when doing it on fault: multiple vcpus
-  fault at the same time triggering TLBIs in parallel.
-
-- Read intensive guest workloads end up paying for dirty-logging.
-  Only mapping the faulting 4K page means that all the other pages
-  that were part of the huge-page will now be unmapped. The effect is
-  that any access, including reads, now has to fault.
-
-Eager Page Splitting (on ARM)
-=============================
-Eager Page Splitting fixes the above two issues by eagerly splitting
-huge-pages when enabling dirty logging. The goal is to avoid doing it
-while faulting on write-protected pages. This is what the TDP MMU does
-for x86 [0], except that x86 does it for different reasons: to avoid
-grabbing the MMU lock on fault. Note that taking care of
-write-protection faults still requires grabbing the MMU lock on ARM,
-but not on x86 (with the fast_page_fault path).
-
-An additional benefit of eagerly splitting huge-pages is that it can
-be done in a controlled way (e.g., via an IOCTL). This series provides
-two knobs for doing it, just like its x86 counterpart: when enabling
-dirty logging, and when using the KVM_CLEAR_DIRTY_LOG ioctl. The
-benefit of doing it on KVM_CLEAR_DIRTY_LOG is that this ioctl takes
-ranges, and not complete memslots like when enabling dirty logging.
-This means that the cost of splitting (mainly broadcasted TLBIs) can
-be throttled: split a range, wait for a bit, split another range, etc.
-The benefits of this approach were presented by Oliver Upton at KVM
-Forum 2022 [1].
-
-Implementation
-==============
-Patches 3-4 add a pgtable utility function for splitting huge block
-PTEs: kvm_pgtable_stage2_split(). Patches 5-9 add support for eagerly
-splitting huge-pages when enabling dirty-logging and when using the
-KVM_CLEAR_DIRTY_LOG ioctl. Note that this is just like what x86 does,
-and the code is actually based on it.  And finally, patch 9:
-
-	KVM: arm64: Use local TLBI on permission relaxation
-
-adds support for using local TLBIs instead of broadcasts when doing
-permission relaxation. This last patch is key to achieving good
-performance during dirty-logging, as eagerly breaking huge-pages
-replaces mapping new pages with permission relaxation. Got this patch
-(indirectly) from Marc Z.  and took the liberty of adding a commit
-message.
-
-Note: this applies on top of 6.2-rc6.
-
-Performance evaluation
-======================
-The performance benefits were tested using the dirty_log_perf_test
-selftest with 2M huge-pages.
-
-The first test uses a write-only sequential workload where the stride
-is 2M instead of 4K [2]. The idea with this experiment is to emulate a
-random access pattern writing a different huge-page at every access.
-Observe that the benefit increases with the number of vcpus: up to
-5.76x for 152 vcpus. This table shows the guest dirtying time when
-using the CLEAR ioctl (and KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2):
-
-/dirty_log_perf_test_sparse -s anonymous_hugetlb_2mb -b 1G -v $i -i 3 -m 2
-
-	+-------+----------+------------------+
-	| vCPUs | 6.2-rc3  | 6.2-rc3 + series |
-	|       |    (ms)  |             (ms) |
-	+-------+----------+------------------+
-	|    1  |    2.63  |          1.66    |
-	|    2  |    2.95  |          1.70    |
-	|    4  |    3.21  |          1.71    |
-	|    8  |    4.97  |          1.78    |
-	|   16  |    9.51  |          1.82    |
-	|   32  |   20.15  |          3.03    |
-	|   64  |   40.09  |          5.80    |
-	|  128  |   80.08  |         12.24    |
-	|  152  |  109.81  |         15.14    |
-	+-------+----------+------------------+
-
-This secondv test measures the benefit of eager page splitting on read
-intensive workloads (1 write for every 10 reads). As in the other
-test, the benefit increases with the number of vcpus, up to 8.82x for
-152 vcpus. This table shows the guest dirtying time when using the
-CLEAR ioctl (and KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2):
-
-./dirty_log_perf_test -s anonymous_hugetlb_2mb -b 1G -v $i -i 3 -m 2 -w 10
-
-	+-------+----------+------------------+
-	| vCPUs | 6.2-rc3  | 6.2-rc3 + series |
-	|       |   (sec)  |            (sec) |
-	+-------+----------+------------------+
-	|    1  |    0.65  |          0.07    |
-	|    2  |    0.70  |          0.08    |
-	|    4  |    0.71  |          0.08    |
-	|    8  |    0.72  |          0.08    |
-	|   16  |    0.76  |          0.08    |
-	|   32  |    1.61  |          0.14    |
-	|   64  |    3.46  |          0.30    |
-	|  128  |    5.49  |          0.64    |
-	|  152  |    6.44  |          0.63    |
-	+-------+----------+------------------+
-
-Changes from v2:
-https://lore.kernel.org/kvmarm/20230206165851.3106338-1-ricarkol@google.com/
-- removed redundant kvm_pte_table() check from split walker function. (Gavin)
-- fix compilation of patch 8 by moving some definitions from path 9. (Gavin)
-- add comment for kvm_mmu_split_nr_page_tables(). (Gavin)
-
-Changes from v1:
-https://lore.kernel.org/kvmarm/20230113035000.480021-1-ricarkol@google.com/
-- added a capability to set the eager splitting chunk size. This
-  indirectly sets the number of pages in the cache. It also allows for
-  opting out of this feature. (Oliver, Marc)
-- changed kvm_pgtable_stage2_split() to split 1g huge-pages
-  using either 513 or 1 at a time (with a cache of 1). (Oliver, Marc)
-- added force_pte arg to kvm_pgtable_stage2_create_removed().
-- renamed free_removed to free_unlinked. (Ben and Oliver)
-- added KVM_PGTABLE_WALK ctx->flags for skipping BBM and CMO, instead
-  of KVM_PGTABLE_WALK_REMOVED. (Oliver)
-
-Changes from the RFC:
-https://lore.kernel.org/kvmarm/20221112081714.2169495-1-ricarkol@google.com/
-- dropped the changes to split on POST visits. No visible perf
-  benefit.
-- changed the kvm_pgtable_stage2_free_removed() implementation to
-  reuse the stage2 mapper.
-- dropped the FEAT_BBM changes and optimization. Will send this on a
-  different series.
-
-Thanks,
-Ricardo
-
-Marc Zyngier (1):
-  KVM: arm64: Use local TLBI on permission relaxation
-
-Ricardo Koller (11):
-  KVM: arm64: Add KVM_PGTABLE_WALK ctx->flags for skipping BBM and CMO
-  KVM: arm64: Rename free_unlinked to free_removed
-  KVM: arm64: Add helper for creating unlinked stage2 subtrees
-  KVM: arm64: Add kvm_pgtable_stage2_split()
-  KVM: arm64: Refactor kvm_arch_commit_memory_region()
-  KVM: arm64: Add kvm_uninit_stage2_mmu()
-  KVM: arm64: Export kvm_are_all_memslots_empty()
-  KVM: arm64: Add KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-  KVM: arm64: Split huge pages when dirty logging is enabled
-  KVM: arm64: Open-code kvm_mmu_write_protect_pt_masked()
-  KVM: arm64: Split huge pages during KVM_CLEAR_DIRTY_LOG
-
- Documentation/virt/kvm/api.rst        |  26 ++++
- arch/arm64/include/asm/kvm_asm.h      |   4 +
- arch/arm64/include/asm/kvm_host.h     |  19 +++
- arch/arm64/include/asm/kvm_mmu.h      |   1 +
- arch/arm64/include/asm/kvm_pgtable.h  |  85 +++++++++++-
- arch/arm64/kvm/arm.c                  |  22 +++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c    |  10 ++
- arch/arm64/kvm/hyp/nvhe/mem_protect.c |   6 +-
- arch/arm64/kvm/hyp/nvhe/tlb.c         |  54 ++++++++
- arch/arm64/kvm/hyp/pgtable.c          | 187 +++++++++++++++++++++++--
- arch/arm64/kvm/hyp/vhe/tlb.c          |  32 +++++
- arch/arm64/kvm/mmu.c                  | 188 +++++++++++++++++++++-----
- include/linux/kvm_host.h              |   2 +
- include/uapi/linux/kvm.h              |   1 +
- virt/kvm/kvm_main.c                   |   2 +-
- 15 files changed, 585 insertions(+), 54 deletions(-)
-
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index 63f81b27a4e3..3339192a97a9 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -188,12 +188,20 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
+  *					children.
+  * @KVM_PGTABLE_WALK_SHARED:		Indicates the page-tables may be shared
+  *					with other software walkers.
++ * @KVM_PGTABLE_WALK_SKIP_BBM:		Visit and update table entries
++ *					without Break-before-make
++ *					requirements.
++ * @KVM_PGTABLE_WALK_SKIP_CMO:		Visit and update table entries
++ *					without Cache maintenance
++ *					operations required.
+  */
+ enum kvm_pgtable_walk_flags {
+ 	KVM_PGTABLE_WALK_LEAF			= BIT(0),
+ 	KVM_PGTABLE_WALK_TABLE_PRE		= BIT(1),
+ 	KVM_PGTABLE_WALK_TABLE_POST		= BIT(2),
+ 	KVM_PGTABLE_WALK_SHARED			= BIT(3),
++	KVM_PGTABLE_WALK_SKIP_BBM		= BIT(4),
++	KVM_PGTABLE_WALK_SKIP_CMO		= BIT(4),
+ };
+ 
+ struct kvm_pgtable_visit_ctx {
+@@ -215,6 +223,16 @@ static inline bool kvm_pgtable_walk_shared(const struct kvm_pgtable_visit_ctx *c
+ 	return ctx->flags & KVM_PGTABLE_WALK_SHARED;
+ }
+ 
++static inline bool kvm_pgtable_walk_skip_bbm(const struct kvm_pgtable_visit_ctx *ctx)
++{
++	return ctx->flags & KVM_PGTABLE_WALK_SKIP_BBM;
++}
++
++static inline bool kvm_pgtable_walk_skip_cmo(const struct kvm_pgtable_visit_ctx *ctx)
++{
++	return ctx->flags & KVM_PGTABLE_WALK_SKIP_CMO;
++}
++
+ /**
+  * struct kvm_pgtable_walker - Hook into a page-table walk.
+  * @cb:		Callback function to invoke during the walk.
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index b11cf2c618a6..e093e222daf3 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -717,14 +717,17 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
+ 	if (!stage2_try_set_pte(ctx, KVM_INVALID_PTE_LOCKED))
+ 		return false;
+ 
+-	/*
+-	 * Perform the appropriate TLB invalidation based on the evicted pte
+-	 * value (if any).
+-	 */
+-	if (kvm_pte_table(ctx->old, ctx->level))
+-		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
+-	else if (kvm_pte_valid(ctx->old))
+-		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
++	if (!kvm_pgtable_walk_skip_bbm(ctx)) {
++		/*
++		 * Perform the appropriate TLB invalidation based on the
++		 * evicted pte value (if any).
++		 */
++		if (kvm_pte_table(ctx->old, ctx->level))
++			kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
++		else if (kvm_pte_valid(ctx->old))
++			kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu,
++				     ctx->addr, ctx->level);
++	}
+ 
+ 	if (stage2_pte_is_counted(ctx->old))
+ 		mm_ops->put_page(ctx->ptep);
+@@ -808,11 +811,13 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+ 		return -EAGAIN;
+ 
+ 	/* Perform CMOs before installation of the guest stage-2 PTE */
+-	if (mm_ops->dcache_clean_inval_poc && stage2_pte_cacheable(pgt, new))
++	if (!kvm_pgtable_walk_skip_cmo(ctx) && mm_ops->dcache_clean_inval_poc &&
++	    stage2_pte_cacheable(pgt, new))
+ 		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(new, mm_ops),
+-						granule);
++					       granule);
+ 
+-	if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
++	if (!kvm_pgtable_walk_skip_cmo(ctx) && mm_ops->icache_inval_pou &&
++	    stage2_pte_executable(new))
+ 		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
+ 
+ 	stage2_make_pte(ctx, new);
 -- 
 2.39.1.637.g21b0678d19-goog
 
