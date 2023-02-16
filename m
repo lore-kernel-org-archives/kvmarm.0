@@ -1,116 +1,228 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-121.mta1.migadu.com (out-121.mta1.migadu.com [95.215.58.121])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3529BD308
-	for <kvmarm@lists.linux.dev>; Thu, 16 Feb 2023 22:55:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1676588152;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D92D308
+	for <kvmarm@lists.linux.dev>; Thu, 16 Feb 2023 23:07:29 +0000 (UTC)
+Date: Thu, 16 Feb 2023 22:09:47 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1676585391;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=WsJAQPdgfmyRCdBIfmljb6PSA+KVi0kNYA3whbtDzGE=;
-	b=DHRiAYSjcsDDcxs8PoOioXboGPqApCxe10kW+xOpIZvMy4uR5zwDVDlSYD8DRskieVrfCL
-	cbswfVfdgP2WHEobYyQtbo6CpuGPVq6p3ima6AM9RgroyIz9lArqCE1LpD9P2OExe28e2f
-	EycCJ0HKFBZogPJeSPkh1ASWzbTtBxg=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-222-7Eg2ESzDPdy-BEMe6xnzAw-1; Thu, 16 Feb 2023 17:55:50 -0500
-X-MC-Unique: 7Eg2ESzDPdy-BEMe6xnzAw-1
-Received: by mail-qt1-f199.google.com with SMTP id cd3-20020a05622a418300b003b9bd2a2284so2090472qtb.4
-        for <kvmarm@lists.linux.dev>; Thu, 16 Feb 2023 14:55:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WsJAQPdgfmyRCdBIfmljb6PSA+KVi0kNYA3whbtDzGE=;
-        b=moaDPKSWaC1kqQ7t4zDMyy/+yMYMLKmm4cC7HyDkq4JcYVtKTKRuRe4UwFa8OIkf3B
-         DRw7y+QholJVNNL3yMpxpFqV6WI/MgGVrSiihGcjwjJHlI/udhUDxMowyfEU3GD165V2
-         tdIrt63IlTM6ONAgPHKc+Rhy8Kxnk3uPd5AtZTeGmaeNciZldxuHhSjkYqMhk9c1YbrG
-         AEr5F4+LQ4Nh9iadq0a2Ymt6f4w3wa7HYrNdGLz9mssH0VbtpXfJkF0TCMAWdB7I6/3Q
-         3/fLYP5wRuDPTvk7lxHWQmYsqMlI7KLmtkjCZmooOl/5xaMHp2UabVG3Dsq4cuS3s3JU
-         P15A==
-X-Gm-Message-State: AO0yUKXobnQOZKlG4vOVCKt/XLLVA1MScQUSgEarEjPfLuINUpObHWTM
-	CNV8u+6ZlpE9vXxziTJa1RRJFV0qiPLi4NkS/pqa6zkQnEFF3rsVRYwMOLbv+hvv1xyXxgEe5+g
-	Phy6//aRJFBooE3aw
-X-Received: by 2002:a05:622a:1052:b0:3b5:87db:f979 with SMTP id f18-20020a05622a105200b003b587dbf979mr14520330qte.5.1676588150334;
-        Thu, 16 Feb 2023 14:55:50 -0800 (PST)
-X-Google-Smtp-Source: AK7set+WU3Uxar4FQEfigjScvOSNMorobMDegsajbzAUL2/ymdc3m3y2cKgUDCySPQH/BrPQuXkBAg==
-X-Received: by 2002:a05:622a:1052:b0:3b5:87db:f979 with SMTP id f18-20020a05622a105200b003b587dbf979mr14520310qte.5.1676588150092;
-        Thu, 16 Feb 2023 14:55:50 -0800 (PST)
-Received: from x1n (bras-base-aurron9127w-grc-56-70-30-145-63.dsl.bell.ca. [70.30.145.63])
-        by smtp.gmail.com with ESMTPSA id 2-20020ac82082000000b003b2d890752dsm1301870qtd.88.2023.02.16.14.55.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Feb 2023 14:55:49 -0800 (PST)
-Date: Thu, 16 Feb 2023 17:55:48 -0500
-From: Peter Xu <peterx@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Anish Moorthy <amoorthy@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Houghton <jthoughton@google.com>,
-	Ben Gardon <bgardon@google.com>,
-	David Matlack <dmatlack@google.com>,
+	bh=gusSgHuRHriX2I9klAI50JRbZs+tVNNAeSSjo6yWKTI=;
+	b=LNM6OwO6sNPPCQV4z+PFFWnANCMMXAgF3YFDR+IAudGiHrUmkpWhg4clYh9IVHLII1hlsV
+	oYlhWsEGE+xYZ+doFjaFE3FIh6S5FVBebSSINyxzt9e3My7TTbM2qV0ti9Sj3ZJuwQODcj
+	zTxXwGQtIwyK5Ir47AzVUYCgA4BRAMc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	Ricardo Koller <ricarkol@google.com>,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 6/8] kvm/x86: Add mem fault exit on EPT violations
-Message-ID: <Y+60dIGWIXEuHpwW@x1n>
-References: <20230215011614.725983-1-amoorthy@google.com>
- <20230215011614.725983-7-amoorthy@google.com>
- <Y+0VK6vZpMqAQ2Dc@google.com>
+	Simon Veith <sveith@amazon.de>, dwmw2@infradead.org
+Subject: Re: [PATCH 08/16] KVM: arm64: timers: Allow userspace to set the
+ counter offsets
+Message-ID: <Y+6pqz3pCwu7izZL@linux.dev>
+References: <20230216142123.2638675-1-maz@kernel.org>
+ <20230216142123.2638675-9-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <Y+0VK6vZpMqAQ2Dc@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20230216142123.2638675-9-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-Hi, Sean,
+Hi Marc,
 
-On Wed, Feb 15, 2023 at 09:23:55AM -0800, Sean Christopherson wrote:
-> > @@ -4230,9 +4231,25 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
-> >  	}
-> >  
-> >  	async = false;
-> > -	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, false, &async,
-> > -					  fault->write, &fault->map_writable,
-> > -					  &fault->hva);
-> > +	mem_fault_nowait = memory_faults_enabled(vcpu->kvm);
-> > +
-> > +	fault->pfn = __gfn_to_pfn_memslot(
-> > +		slot, fault->gfn,
-> > +		mem_fault_nowait,
+On Thu, Feb 16, 2023 at 02:21:15PM +0000, Marc Zyngier wrote:
+> And this is the moment you have all been waiting for: setting the
+> counter offsets from userspace.
 > 
-> Hrm, as prep work for this series, I think we should first clean up the pile o'
-> bools.  This came up before when the "interruptible" flag was added[*].  We punted
-> then, but I think it's time to bite the bullet, especially since "nowait" and
-> "async" need to be mutually exclusive.
+> We expose a brand new capability that reports the ability to set
+> the offsets for both the virtual and physical sides, independently.
 > 
-> [*] https://lore.kernel.org/all/YrR9i3yHzh5ftOxB@google.com
+> In keeping with the architecture, the offsets are expressed as
+> a delta that is substracted from the physical counter value.
+> 
+> Once this new API is used, there is no going back, and the counters
+> cannot be written to to set the offsets implicitly (the writes
+> are instead ignored).
 
-IIUC at that time we didn't reach a consensus on how to rework it, and the
-suggestion was using a bool and separate the cleanup (while the flag
-cleanup got NACKed..), which makes sense to me.
+Is there any particular reason to use an explicit ioctl as opposed to
+the KVM_{GET,SET}_DEVICE_ATTR ioctls? Dunno where you stand on it, but I
+quite like that interface for simple state management. We also avoid
+eating up more UAPI bits in the global namespace.
 
-Personally I like your other patch a lot:
+You could also split up the two offsets as individual attributes, but I
+really couldn't care less. Its userspace's problem after all!
 
-https://lore.kernel.org/all/YrTNGVpT8Cw2yrnr@google.com/
+And on that note, any VMM patches to match this implementation? kvmtool
+would suffice, just want something that runs a real VM and pokes these
+ioctls.
 
-The question is, after we merge the bools into a flag, do we still need a
-struct* anyway?  If we can reach a consensus, I'll be happy to continue
-working on the cleanup (by picking up your patch first).  Or if Anish would
-like to take it over in any form that'll be also perfect.
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  4 +++
+>  arch/arm64/include/uapi/asm/kvm.h | 15 ++++++++++
+>  arch/arm64/kvm/arch_timer.c       | 46 +++++++++++++++++++++++++++----
+>  arch/arm64/kvm/arm.c              |  8 ++++++
+>  include/uapi/linux/kvm.h          |  3 ++
+>  5 files changed, 71 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 3adac0c5e175..8514a37cf8d5 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -221,6 +221,8 @@ struct kvm_arch {
+>  #define KVM_ARCH_FLAG_EL1_32BIT				4
+>  	/* PSCI SYSTEM_SUSPEND enabled for the guest */
+>  #define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		5
+> +	/* VM counter offsets */
+> +#define KVM_ARCH_FLAG_COUNTER_OFFSETS			6
 
-Thanks,
+nit: I'm not too bothered by the test_bit(...) mouthful when its used
+sparingly but it may be nice to have a helper if it is repeated enough
+times.
+
+>  	unsigned long flags;
+>  
+> @@ -1010,6 +1012,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+>  
+>  long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+>  				struct kvm_arm_copy_mte_tags *copy_tags);
+> +int kvm_vm_ioctl_set_counter_offsets(struct kvm *kvm,
+> +				     struct kvm_arm_counter_offsets *offsets);
+>  
+>  /* Guest/host FPSIMD coordination helpers */
+>  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index f8129c624b07..2d7557a160bd 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -198,6 +198,21 @@ struct kvm_arm_copy_mte_tags {
+>  	__u64 reserved[2];
+>  };
+>  
+> +/*
+> + * Counter/Timer offset structure. Describe the virtual/physical offsets.
+> + * To be used with KVM_ARM_SET_CNT_OFFSETS.
+> + */
+> +struct kvm_arm_counter_offsets {
+> +	__u64 virtual_offset;
+> +	__u64 physical_offset;
+> +
+> +#define KVM_COUNTER_SET_VOFFSET_FLAG	(1UL << 0)
+> +#define KVM_COUNTER_SET_POFFSET_FLAG	(1UL << 1)
+> +
+> +	__u64 flags;
+> +	__u64 reserved;
+> +};
+> +
+>  #define KVM_ARM_TAGS_TO_GUEST		0
+>  #define KVM_ARM_TAGS_FROM_GUEST		1
+>  
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 444ea6dca218..b04544b702f9 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -852,9 +852,11 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+>  	ptimer->vcpu = vcpu;
+>  	ptimer->offset.vm_offset = &vcpu->kvm->arch.offsets.poffset;
+>  
+> -	/* Synchronize cntvoff across all vtimers of a VM. */
+> -	timer_set_offset(vtimer, kvm_phys_timer_read());
+> -	timer_set_offset(ptimer, 0);
+> +	/* Synchronize offsets across timers of a VM if not already provided */
+> +	if (!test_bit(KVM_ARCH_FLAG_COUNTER_OFFSETS, &vcpu->kvm->arch.flags)) {
+> +		timer_set_offset(vtimer, kvm_phys_timer_read());
+> +		timer_set_offset(ptimer, 0);
+> +	}
+>  
+>  	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
+>  	timer->bg_timer.function = kvm_bg_timer_expire;
+> @@ -898,8 +900,11 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
+>  		kvm_arm_timer_write(vcpu, timer, TIMER_REG_CTL, value);
+>  		break;
+>  	case KVM_REG_ARM_TIMER_CNT:
+> -		timer = vcpu_vtimer(vcpu);
+> -		timer_set_offset(timer, kvm_phys_timer_read() - value);
+> +		if (!test_bit(KVM_ARCH_FLAG_COUNTER_OFFSETS,
+> +			      &vcpu->kvm->arch.flags)) {
+> +			timer = vcpu_vtimer(vcpu);
+> +			timer_set_offset(timer, kvm_phys_timer_read() - value);
+> +		}
+
+If we've already got userspace to buy in to the new UAPI, should we
+return an error instead of silently failing? Might be good to catch
+misbehavior in the act, even if it is benign as this patch is written.
+
+>  		break;
+>  	case KVM_REG_ARM_TIMER_CVAL:
+>  		timer = vcpu_vtimer(vcpu);
+> @@ -909,6 +914,13 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
+>  		timer = vcpu_ptimer(vcpu);
+>  		kvm_arm_timer_write(vcpu, timer, TIMER_REG_CTL, value);
+>  		break;
+> +	case KVM_REG_ARM_PTIMER_CNT:
+> +		if (!test_bit(KVM_ARCH_FLAG_COUNTER_OFFSETS,
+> +			      &vcpu->kvm->arch.flags)) {
+> +			timer = vcpu_ptimer(vcpu);
+> +			timer_set_offset(timer, kvm_phys_timer_read() - value);
+> +		}
+> +		break;
+>  	case KVM_REG_ARM_PTIMER_CVAL:
+>  		timer = vcpu_ptimer(vcpu);
+>  		kvm_arm_timer_write(vcpu, timer, TIMER_REG_CVAL, value);
+> @@ -1446,3 +1458,27 @@ int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  
+>  	return -ENXIO;
+>  }
+> +
+> +int kvm_vm_ioctl_set_counter_offsets(struct kvm *kvm,
+> +				     struct kvm_arm_counter_offsets *offsets)
+> +{
+> +	if (offsets->reserved ||
+> +	    (offsets->flags & ~(KVM_COUNTER_SET_VOFFSET_FLAG |
+> +				KVM_COUNTER_SET_POFFSET_FLAG)))
+> +		return -EINVAL;
+> +
+> +	if (!lock_all_vcpus(kvm))
+> +		return -EBUSY;
+
+Is there any reason why we can't just order this ioctl before vCPU
+creation altogether, or is there a need to do this at runtime? We're
+about to tolerate multiple writers to the offset value, and I think the
+only thing we need to guarantee is that the below flag is set before
+vCPU ioctls have a chance to run.
+
+Actually, the one benefit of enforcing a strict ordering is that you can
+hide the old register indices completely from KVM_GET_REG_LIST to
+provide further discouragement to userspace.
+
+Otherwise, if you choose to keep it this way then the requirement to
+have no vCPU ioctls in flight needs to be explicitly documented as that
+is a bit of a tricky interface.
+
+> +	set_bit(KVM_ARCH_FLAG_COUNTER_OFFSETS, &kvm->arch.flags);
+> +
+> +	if (offsets->flags & KVM_COUNTER_SET_VOFFSET_FLAG)
+> +		kvm->arch.offsets.voffset = offsets->virtual_offset;
+> +
+> +	if (offsets->flags & KVM_COUNTER_SET_POFFSET_FLAG)
+> +		kvm->arch.offsets.poffset = offsets->physical_offset;
+> +
+> +	unlock_all_vcpus(kvm);
+> +
+> +	return 0;
+> +}
 
 -- 
-Peter Xu
-
+Thanks,
+Oliver
