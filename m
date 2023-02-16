@@ -1,25 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD99A746F
-	for <kvmarm@lists.linux.dev>; Thu, 16 Feb 2023 14:31:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 816DBC433EF;
-	Thu, 16 Feb 2023 14:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E83746C
+	for <kvmarm@lists.linux.dev>; Thu, 16 Feb 2023 14:31:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7094DC433A4;
+	Thu, 16 Feb 2023 14:31:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1676557884;
-	bh=b2cqCZetPzP86Bj0UI7SfqqUnTqFfWWQASExM82mRyI=;
+	s=k20201202; t=1676557886;
+	bh=nIEyPcKSfGn/aSgYLXrCxCTer43Vb54hmCW7FGQkIaQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=A4NGkaDV/9pZ1MMtC4HU6k03a1JDjApKussUBnCFrOeq7QnBeRWjNMeH8l0sidUn+
-	 aEy0t6uzXH8Z0+9QAPrAoF2jhru3XNniJriAP2Xl1RdF0swTSthY20t/b+Sa4VRhqg
-	 t445GSwsOSOQkfd9MyC45P7nU1VOnoLmWxvQhcOIxCsXN30vmE/oYqaOWn4jaaqGz5
-	 r7dudhqx3UiLSXsaUnNTr28x+VvFbpQ1bs6lrMjSJfQXMKh2cLEHbo9Ie5shtEOazl
-	 8wajJaTNt6EyxUeBbI9S8gSLljD2yGLatpsY5sGdvp32p/wDUkNKIwYUT3kDMWrMvy
-	 sqDv9wTG1TfLg==
+	b=jEpPqpYpXevvEFZAEcFOWQNHhfZGycRUi27WB3IhTLYEL8HDupxTALjOklRrHi5lB
+	 MuRZkHfSpXHT5YsZXUMk2oYjvuTPGFYH/6/lk12pvxLmGO6fCc0EOhvNgkCsnkZUvd
+	 a65QGRQcIoBknR5ws1QYhVXG8LChHSbvtdOJ+bvcuBq3xwzydGHwu+7sSCkBbXZMiP
+	 o7Xzb6q4YPO3gLb02SEE/MQ99joTwgWDsrzh9goMPQXH5v0nzxcK9GdakAJq4f0tt8
+	 Oa0PRBUW201IHf7YeytBF4COqp/iC7QOdF3gYSnBlNeQWeye+jGDXBvTpV6ftd8f5J
+	 qVdJj7Zo5DkTg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pSf8w-00AuwB-Lh;
+	id 1pSf8w-00AuwB-0A;
 	Thu, 16 Feb 2023 14:21:50 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -32,9 +32,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Ricardo Koller <ricarkol@google.com>,
 	Simon Veith <sveith@amazon.de>,
 	dwmw2@infradead.org
-Subject: [PATCH 15/16] KVM: arm64: selftests: Augment existing timer test to handle variable offsets
-Date: Thu, 16 Feb 2023 14:21:22 +0000
-Message-Id: <20230216142123.2638675-16-maz@kernel.org>
+Subject: [PATCH 12/16] KVM: arm64: nv: timers: Add a per-timer, per-vcpu offset
+Date: Thu, 16 Feb 2023 14:21:19 +0000
+Message-Id: <20230216142123.2638675-13-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230216142123.2638675-1-maz@kernel.org>
 References: <20230216142123.2638675-1-maz@kernel.org>
@@ -50,83 +50,61 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Allow a user to specify the physical and virtual offsets on the
-command-line.
+Being able to set a global offset isn't enough.
+
+With NV, we also need to a per-vcpu, per-timer offset (for example,
+CNTVCT_EL0 being offset by CNTVOFF_EL2).
+
+Use a similar method as the VM-wide offset to have a timer point
+to the shadow register that contains the offset value.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- .../selftests/kvm/aarch64/arch_timer.c        | 23 ++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/arch_timer.c  | 13 ++++++++++---
+ include/kvm/arm_arch_timer.h |  5 +++++
+ 2 files changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-index 26556a266021..62af0e7d10b4 100644
---- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
-+++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-@@ -47,6 +47,7 @@ struct test_args {
- 	int nr_iter;
- 	int timer_period_ms;
- 	int migration_freq_ms;
-+	struct kvm_arm_counter_offsets offsets;
- };
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index f968d6d3479b..1f442ac0c499 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -84,10 +84,17 @@ u64 timer_get_cval(struct arch_timer_context *ctxt)
  
- static struct test_args test_args = {
-@@ -54,6 +55,7 @@ static struct test_args test_args = {
- 	.nr_iter = NR_TEST_ITERS_DEF,
- 	.timer_period_ms = TIMER_TEST_PERIOD_MS_DEF,
- 	.migration_freq_ms = TIMER_TEST_MIGRATION_FREQ_MS,
-+	.offsets = { .flags = 0 },
- };
+ static u64 timer_get_offset(struct arch_timer_context *ctxt)
+ {
+-	if (ctxt && ctxt->offset.vm_offset)
+-		return *ctxt->offset.vm_offset;
++	u64 offset = 0;
  
- #define msecs_to_usecs(msec)		((msec) * 1000LL)
-@@ -372,6 +374,13 @@ static struct kvm_vm *test_vm_create(void)
- 	vm_init_descriptor_tables(vm);
- 	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT, guest_irq_handler);
- 
-+	if (test_args.offsets.flags) {
-+		if (kvm_has_cap(KVM_CAP_COUNTER_OFFSETS))
-+			vm_ioctl(vm, KVM_ARM_SET_CNT_OFFSETS, &test_args.offsets);
-+		else
-+			__TEST_REQUIRE(test_args.offsets.flags, "no support for global offsets");
-+	}
+-	return 0;
++	if (!ctxt)
++		return 0;
 +
- 	for (i = 0; i < nr_vcpus; i++)
- 		vcpu_init_descriptor_tables(vcpus[i]);
- 
-@@ -403,6 +412,10 @@ static void test_print_help(char *name)
- 		TIMER_TEST_PERIOD_MS_DEF);
- 	pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different pCPU. 0 to turn off (default: %u)\n",
- 		TIMER_TEST_MIGRATION_FREQ_MS);
-+	pr_info("\t-o: Virtual counter offset (in counter cycles, default: %llu)\n",
-+		test_args.offsets.virtual_offset);
-+	pr_info("\t-O: Physical counter offset (in counter cycles, default: %llu)\n",
-+		test_args.offsets.physical_offset);
- 	pr_info("\t-h: print this help screen\n");
++	if (ctxt->offset.vm_offset)
++		offset += *ctxt->offset.vm_offset;
++	if (ctxt->offset.vcpu_offset)
++		offset += *ctxt->offset.vcpu_offset;
++
++	return offset;
  }
  
-@@ -410,7 +423,7 @@ static bool parse_args(int argc, char *argv[])
- {
- 	int opt;
+ static void timer_set_ctl(struct arch_timer_context *ctxt, u32 ctl)
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index 62ef4883e644..e76e513b90c5 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -29,6 +29,11 @@ struct arch_timer_offset {
+ 	 * structure. If NULL, assume a zero offset.
+ 	 */
+ 	u64	*vm_offset;
++	/*
++	 * If set, pointer to one of the offsets in the vcpu's sysreg
++	 * array. If NULL, assume a zero offset.
++	 */
++	u64	*vcpu_offset;
+ };
  
--	while ((opt = getopt(argc, argv, "hn:i:p:m:")) != -1) {
-+	while ((opt = getopt(argc, argv, "hn:i:p:m:o:O:")) != -1) {
- 		switch (opt) {
- 		case 'n':
- 			test_args.nr_vcpus = atoi_positive("Number of vCPUs", optarg);
-@@ -429,6 +442,14 @@ static bool parse_args(int argc, char *argv[])
- 		case 'm':
- 			test_args.migration_freq_ms = atoi_non_negative("Frequency", optarg);
- 			break;
-+		case 'o':
-+			test_args.offsets.virtual_offset = strtol(optarg, NULL, 0);
-+			test_args.offsets.flags |= KVM_COUNTER_SET_VOFFSET_FLAG;
-+			break;
-+		case 'O':
-+			test_args.offsets.physical_offset = strtol(optarg, NULL, 0);
-+			test_args.offsets.flags |= KVM_COUNTER_SET_POFFSET_FLAG;
-+			break;
- 		case 'h':
- 		default:
- 			goto err;
+ struct arch_timer_vm_offsets {
 -- 
 2.34.1
 
