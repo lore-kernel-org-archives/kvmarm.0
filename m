@@ -1,12 +1,12 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD8EC79C8
-	for <kvmarm@lists.linux.dev>; Thu, 16 Feb 2023 16:01:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED94879C8
+	for <kvmarm@lists.linux.dev>; Thu, 16 Feb 2023 16:01:46 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 432C5113E;
-	Thu, 16 Feb 2023 08:02:25 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 41809168F;
+	Thu, 16 Feb 2023 08:02:29 -0800 (PST)
 Received: from e126864.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5D02B3F881;
-	Thu, 16 Feb 2023 08:01:39 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7424F3F881;
+	Thu, 16 Feb 2023 08:01:43 -0800 (PST)
 From: Kristina Martsenko <kristina.martsenko@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
@@ -22,9 +22,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Luis Machado <luis.machado@arm.com>,
 	Vladimir Murzin <vladimir.murzin@arm.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 04/10] arm64: mops: document boot requirements for MOPS
-Date: Thu, 16 Feb 2023 16:00:06 +0000
-Message-Id: <20230216160012.272345-5-kristina.martsenko@arm.com>
+Subject: [PATCH 05/10] arm64: mops: don't disable host MOPS instructions from EL2
+Date: Thu, 16 Feb 2023 16:00:07 +0000
+Message-Id: <20230216160012.272345-6-kristina.martsenko@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230216160012.272345-1-kristina.martsenko@arm.com>
 References: <20230216160012.272345-1-kristina.martsenko@arm.com>
@@ -36,36 +36,28 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-FEAT_MOPS introduces new instructions, we require that these
-instructions not execute as UNDEFINED when we identify that the feature
-is supported. Additionally, the instructions may generate a Memory Copy
-or Memory Set exception, we require that the exception be taken to EL1
-in case EL2 is not able to correctly handle it.
+To allow nVHE host EL0 and EL1 to use FEAT_MOPS instructions, configure
+EL2 to not cause these instructions to be treated as UNDEFINED. A VHE
+host is unaffected by this control.
 
 Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
 ---
- Documentation/arm64/booting.rst | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arch/arm64/include/asm/kvm_arm.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/arm64/booting.rst b/Documentation/arm64/booting.rst
-index ffeccdd6bdac..f3913ee94c42 100644
---- a/Documentation/arm64/booting.rst
-+++ b/Documentation/arm64/booting.rst
-@@ -379,6 +379,14 @@ Before jumping into the kernel, the following conditions must be met:
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index cd8dd307aaba..f37d37957322 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -94,7 +94,7 @@
+ #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
  
-     - SMCR_EL2.EZT0 (bit 30) must be initialised to 0b1.
+ #define HCRX_GUEST_FLAGS 0
+-#define HCRX_HOST_FLAGS (HCRX_EL2_SMPME)
++#define HCRX_HOST_FLAGS (HCRX_EL2_SMPME | HCRX_EL2_MSCEn)
  
-+  For CPUs with Memory Copy and Memory Set instructions (FEAT_MOPS):
-+
-+  - If the kernel is entered at EL1 and EL2 is present:
-+
-+    - HCRX_EL2.MSCEn (bit 11) must be initialised to 0b1.
-+
-+    - HCRX_EL2.MCE2 (bit 10) must be initialised to 0b0.
-+
- The requirements described above for CPU mode, caches, MMUs, architected
- timers, coherency and system registers apply to all CPUs.  All CPUs must
- enter the kernel in the same exception level.  Where the values documented
+ /* TCR_EL2 Registers bits */
+ #define TCR_EL2_RES1		((1U << 31) | (1 << 23))
 -- 
 2.25.1
 
