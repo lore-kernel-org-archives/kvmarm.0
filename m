@@ -1,85 +1,82 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A832079C8
-	for <kvmarm@lists.linux.dev>; Thu, 16 Feb 2023 16:02:07 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0D93F113E;
-	Thu, 16 Feb 2023 08:02:50 -0800 (PST)
-Received: from e126864.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8AF763F881;
-	Thu, 16 Feb 2023 08:02:04 -0800 (PST)
-From: Kristina Martsenko <kristina.martsenko@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20C1879C8
+	for <kvmarm@lists.linux.dev>; Thu, 16 Feb 2023 16:20:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AA28C433EF;
+	Thu, 16 Feb 2023 16:20:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1676564430;
+	bh=4/Mra1uduX8keyCHbdM9fzHuDKiiGoVReok56faIhNE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ebZC7z7iwhtoZcYsHbsUDXUfX1aJ9BBwrTQeBbZ3ktFOx5dPrOyoOgSOsnk7t+yTk
+	 SbEzns9u8/snEs3ghpg8eQQ4HWXYQwrO5f3ZR+7xuhs6ODm4P3qTA7+q1YCeSHBxNk
+	 8X0gfjex4vPzEoXbTXNR8H0lwrjUDaPApbPPslJMM3NbvHsZB7ob0074Pkn2vrxgii
+	 k/mVsM17Ppr2LyNtgpNNCg8CcRTCWEHAjmONsIr9y+9Xi0lYInAV8AyL/k3ekpciIa
+	 V5tFtGFYz27PrbYnt5ZXujGcV6cJoWUOo1KR7LchH77Qt7OiAaj55CUZgxlmqnWnc7
+	 4zCgaBMjnHvVg==
+Date: Thu, 16 Feb 2023 16:20:27 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Kristina Martsenko <kristina.martsenko@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Mark Rutland <mark.rutland@arm.com>,
-	Mark Brown <broonie@kernel.org>,
 	Luis Machado <luis.machado@arm.com>,
 	Vladimir Murzin <vladimir.murzin@arm.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 10/10] arm64: mops: allow disabling MOPS from the kernel command line
-Date: Thu, 16 Feb 2023 16:00:12 +0000
-Message-Id: <20230216160012.272345-11-kristina.martsenko@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230216160012.272345-1-kristina.martsenko@arm.com>
+Subject: Re: [PATCH 03/10] KVM: arm64: switch HCRX_EL2 between host and guest
+Message-ID: <Y+5Xy/Hqu4FKLTUE@sirena.org.uk>
 References: <20230216160012.272345-1-kristina.martsenko@arm.com>
+ <20230216160012.272345-4-kristina.martsenko@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Q7jxvfpgnyMhcdqv"
+Content-Disposition: inline
+In-Reply-To: <20230216160012.272345-4-kristina.martsenko@arm.com>
+X-Cookie: Serving suggestion.
 
-Make it possible to disable the MOPS extension at runtime using the
-kernel command line. This can be useful for testing or working around
-hardware issues.
 
-Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
----
- Documentation/admin-guide/kernel-parameters.txt | 3 +++
- arch/arm64/kernel/idreg-override.c              | 2 ++
- 2 files changed, 5 insertions(+)
+--Q7jxvfpgnyMhcdqv
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 6cfa6e3996cf..ee86fe17352d 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -408,6 +408,9 @@
- 	arm64.nosme	[ARM64] Unconditionally disable Scalable Matrix
- 			Extension support
- 
-+	arm64.nomops	[ARM64] Unconditionally disable Memory Copy and Memory
-+			Set instructions support
-+
- 	ataflop=	[HW,M68k]
- 
- 	atarimouse=	[HW,MOUSE] Atari Mouse
-diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
-index d833d78a7f31..d13ae90042cb 100644
---- a/arch/arm64/kernel/idreg-override.c
-+++ b/arch/arm64/kernel/idreg-override.c
-@@ -123,6 +123,7 @@ static const struct ftr_set_desc isar2 __initconst = {
- 	.fields		= {
- 		FIELD("gpa3", ID_AA64ISAR2_EL1_GPA3_SHIFT, NULL),
- 		FIELD("apa3", ID_AA64ISAR2_EL1_APA3_SHIFT, NULL),
-+		FIELD("mops", ID_AA64ISAR2_EL1_MOPS_SHIFT, NULL),
- 		{}
- 	},
- };
-@@ -174,6 +175,7 @@ static const struct {
- 	  "id_aa64isar1.gpi=0 id_aa64isar1.gpa=0 "
- 	  "id_aa64isar1.api=0 id_aa64isar1.apa=0 "
- 	  "id_aa64isar2.gpa3=0 id_aa64isar2.apa3=0"	   },
-+	{ "arm64.nomops",		"id_aa64isar2.mops=0" },
- 	{ "arm64.nomte",		"id_aa64pfr1.mte=0" },
- 	{ "nokaslr",			"kaslr.disabled=1" },
- };
--- 
-2.25.1
+On Thu, Feb 16, 2023 at 04:00:05PM +0000, Kristina Martsenko wrote:
 
+> After this change, SMPME is no longer set for guests, which should have
+> no effect as SME is currently disabled for guests.
+
+SMPME is mainly set for the benefit of any future guests, it is
+used to turn off SME priorities for guests.  While it's true that
+we don't have any guests support yet it's there as safety to
+ensure we don't forget to enable it later on or something
+otherwise goes wrong.  We don't need priority mapping on the host
+since we don't have any priority mapping support at all, and it's
+difficult to see a reason why we would want to remap our own
+priorities in the host.
+
+--Q7jxvfpgnyMhcdqv
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmPuV8oACgkQJNaLcl1U
+h9AbuQf/dYenzWHcmALSd/TVql2lkH47+tYsmsFjjo0LoUnrjf1CCIHC59/DRgNO
+99qTOxbxoqnLktQLteXIyI2hqTJm27jExVnklJY8ffYJT8W19P3j7xMB+ho44f+D
+V0+CXwSYW6SFELOHcplmJpiZ83EFGXxBI05QHIuxHYI68n0w+ZgJfh9gvDNNK8nf
+oV/vEGxOWBmz1mcZ7mrlttthS7BLuHkrB/sBgcLSOfSe73y0nLbJpS+ulkn/tDQK
+goLRiRebsyRHKX27f/V0zKQWDeWSuT3fFqX4kMSBE0HD5nU0CH4yhba1VscZtbNs
+oYhzKsw6QjdmvCeNwZ/TpUFyDufYuQ==
+=leqC
+-----END PGP SIGNATURE-----
+
+--Q7jxvfpgnyMhcdqv--
