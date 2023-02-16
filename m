@@ -1,316 +1,112 @@
-Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 172177B
-	for <kvmarm@lists.linux.dev>; Thu, 16 Feb 2023 18:54:00 +0000 (UTC)
-Received: by mail-vs1-f52.google.com with SMTP id j40so933143vsv.2
-        for <kvmarm@lists.linux.dev>; Thu, 16 Feb 2023 10:54:00 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00F933E6
+	for <kvmarm@lists.linux.dev>; Thu, 16 Feb 2023 21:38:41 +0000 (UTC)
+Received: by mail-pj1-f74.google.com with SMTP id bg13-20020a17090b0d8d00b00233ee678ea6so1555374pjb.2
+        for <kvmarm@lists.linux.dev>; Thu, 16 Feb 2023 13:38:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=JyRRKEGZ8zSR9Nqcb3MNGJNAmA81Hl5SP7GHLNm+Cm0=;
-        b=bNCnbI+VXeIdOVQVm0sp1rmobHHtRTc9+2ERfzZi+u+Y/2FGqLRckgeiuLg8Ex3nLm
-         0cUpC0qdwJjBHVo2Vi5ljBKsPHbc0Jn2ODIe1C1s8JYQvuF8kCa8m9CIolH5KGRZZYKP
-         mOsC6CqHniQu+2TX0Bc5ZM+88NEakTpoG52aE3DbF0o8TWeNAeKOEXEFawDmNF+UDbsD
-         Zv7+kC30Ig39liFHBwG9JNTIrekrPThxd0HrTxB6mzZE8VFVCpt/bbR/UZcgXRo2ZZOH
-         a9j/pYumOiZMehj5gcnSH87ePomE82U/r+swRnENXuA5ixacoPmMm6fgHWUrsiZcbxop
-         50XA==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qISKjtUmN2cEwBwW4xMI8exQ5WKRK627PpvklIdcOFI=;
+        b=sfgAZ70dHjZIDt2LlS8uAAFtM3WGXWas6Swe1KZGm/7LwDUPrvMw5IjA6K+Yl5nXbx
+         l/JB29YObSepeKdZS8KpaqLUbqar3WIXxLvjBNSO96gvv7lCvdc/UTNctCXfluTUiMYz
+         Ze4SCZJXt0odf2R2vwiDjLSl0J/bAg1QM5eY7RDp4vkIDfBHXziFmXKfYb5dK3phQa2S
+         mM/putTXr102FYkQcAnBu0KotBNtkF0xWASreyKGWqf+uTodfTKsBUiLeINHWNXWl6Nb
+         BqvMUPpXzNV4b4HthNEdF7E94IrsUXUBoDepSs5mnkZgW50d/oK8LHUoYtZfL3CUK9pm
+         M21w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JyRRKEGZ8zSR9Nqcb3MNGJNAmA81Hl5SP7GHLNm+Cm0=;
-        b=EEipdbjtt1GKV/iJ3/jxdDhReXQNJD6h5k0c/TGIKuIn0LXjWvgRNCF8zen58wLhwa
-         7zhSRPJSMSN3/g/Ln6zMbcZ0TeeTRjHvp5cY7vlkwrLN08wT3iiKIsH+t8Ecf9PV6cwQ
-         eeOeoegnO810yWY5+Q3O+XI3nIbYAMi731ql9EeNhYyFMhsyvP26VkOw6Of5MXoA8Cdd
-         ScXkFYRZlNgRo+d53KvKDTx6uYl3V02E/51368QGYoEn3Lk0HQ87x9TAOKucC5/du8DW
-         Ju+8oUPTBtG5RhoX6UrhUGWZigid+Aq+UQCDC95GE74mPGJcnBBXkKLdABqneAQpVJOz
-         60Dg==
-X-Gm-Message-State: AO0yUKVqwRPykdlHRRNA2Xey6YIYDvGE/EH1/zAwMt3Q5WnucZjroLci
-	c8UmH6sTSWZslQjRH6oU/TRgOucQR0PFX3YN6hCzgQ==
-X-Google-Smtp-Source: AK7set9dE37K0pvg3/0VA9YLcO6pH4noIv9bFNiaq7QbeTkkjSQXEmjErAL00CLE7/xnjYN1EglE9y72davbrfU8Qj8=
-X-Received: by 2002:a05:6102:3b01:b0:412:6a3:2267 with SMTP id
- x1-20020a0561023b0100b0041206a32267mr1548682vsu.5.1676573639812; Thu, 16 Feb
- 2023 10:53:59 -0800 (PST)
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qISKjtUmN2cEwBwW4xMI8exQ5WKRK627PpvklIdcOFI=;
+        b=gzfi0+fs3xFqTNIbLgUxB+ELtily/4XpZxL3hkMQIbXCi71K2N3iixXuSMVbh9vjiP
+         +UevuWK99bhgCkjNOIWms+ahIMbpvO/cLNevvRzwVGM6XeFF8DbfbRjtSI9ZY4ZjfCyM
+         gTnb4aJ4JMb62yyCfwHxK9JVNAlZldMAebWvHSoxK2TkOf+5bkwJOMBf2SS8vf9H9Dn+
+         /aLWwZgXo8q25sS0nQQ71NEDdIp876y5HHgOSs1L/rtqx3Ybzeht4kpbm1qF2Mi+XU2V
+         8CHNLtbQleqCF3yHPSC4W5LXJuaqmt/kIcqFiryQBLDs+F0LlM3t/tmTv6zpr9umtkWA
+         RHqQ==
+X-Gm-Message-State: AO0yUKUdocJ2bdIGgVGzU60axfbBTeTt9rdoIxowwE5hoGhNuJxnge+P
+	SNDpqG0ICy4Icx9DIYUK6qcpZFXypfk=
+X-Google-Smtp-Source: AK7set8GdCvk4jCPWiRNB0CEkjUTMbp8EH1MVnNVK571C5L6Vx7G9LuGyMCqRh3cyi5QWEywqdmID/9uzYs=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:f508:0:b0:4fb:a28e:fa50 with SMTP id
+ w8-20020a63f508000000b004fba28efa50mr1086612pgh.8.1676583520915; Thu, 16 Feb
+ 2023 13:38:40 -0800 (PST)
+Date: Thu, 16 Feb 2023 13:38:39 -0800
+In-Reply-To: <CAF7b7mr3iDBYWvX+ZPA1JeZgezX-BDo8VArwnjuzHUeWJmO32Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
+Mime-Version: 1.0
 References: <20230215011614.725983-1-amoorthy@google.com> <20230215011614.725983-6-amoorthy@google.com>
- <87mt5fz5g6.wl-maz@kernel.org>
-In-Reply-To: <87mt5fz5g6.wl-maz@kernel.org>
-From: Anish Moorthy <amoorthy@google.com>
-Date: Thu, 16 Feb 2023 10:53:47 -0800
-Message-ID: <CAF7b7mr3iDBYWvX+ZPA1JeZgezX-BDo8VArwnjuzHUeWJmO32Q@mail.gmail.com>
+ <87mt5fz5g6.wl-maz@kernel.org> <CAF7b7mr3iDBYWvX+ZPA1JeZgezX-BDo8VArwnjuzHUeWJmO32Q@mail.gmail.com>
+Message-ID: <Y+6iX6a22+GEuH1b@google.com>
 Subject: Re: [PATCH 5/8] kvm: Add cap/kvm_run field for memory fault exits
-To: Marc Zyngier <maz@kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Sean Christopherson <seanjc@google.com>, James Houghton <jthoughton@google.com>, 
+From: Sean Christopherson <seanjc@google.com>
+To: Anish Moorthy <amoorthy@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Houghton <jthoughton@google.com>, 
 	Ben Gardon <bgardon@google.com>, David Matlack <dmatlack@google.com>, 
 	Ricardo Koller <ricarkol@google.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
 	Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
 	peterx@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Feb 15, 2023 at 12:59 AM Oliver Upton <oliver.upton@linux.dev> wrote:
->
-> Why not use KVM_ENABLE_CAP instead for this? Its a preexisting UAPI for
-> toggling KVM behaviors.
-
-Oh I wrote it this way because, even with the "args" field in "struct
-kvm_enable_cap" to express the enable/disable intent, it felt weird to allow
-disabling the feature through KVM_ENABLE_CAP. But it seems like that's the
-convention, so I'll make the change.
-
-> >  5. The kvm_run structure
-> >  ========================
-> >
-> > @@ -6544,6 +6556,21 @@ array field represents return values. The userspace should update the return
-> >  values of SBI call before resuming the VCPU. For more details on RISC-V SBI
-> >  spec refer, https://github.com/riscv/riscv-sbi-doc.
-> > +
-> > +             /* KVM_EXIT_MEMORY_FAULT */
-> > +             struct {
-> > +                     __u64 gpa;
-> > +                     __u64 size;
-> > +             } memory_fault;
-> > +
->
-> How is userspace expected to differentiate the gup_fast() failed exit
-> from the guest-private memory exit? I don't think flags are a good idea
-> for this, as it comes with the illusion that both events can happen on a
-> single exit. In reality, these are mutually exclusive.
->
-> A fault type/code would be better here, with the option to add flags at
-> a later date that could be used to further describe the exit (if
-> needed).
-
-Agreed. Something like this, then?
-
-+    struct {
-+        __u32 fault_code;
-+        __u64 reserved;
-+        __u64 gpa;
-+        __u64 size;
-+    } memory_fault;
-
-The "reserved" field is meant to be the placeholder for a future "flags" field.
-Let me know if there's a better/more conventional way to achieve this.
-
-On Wed, Feb 15, 2023 at 9:07 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, Feb 15, 2023, Marc Zyngier wrote:
-> > On Wed, 15 Feb 2023 01:16:11 +0000, Anish Moorthy <amoorthy@google.com> wrote:
-> > >  8. Other capabilities.
-> > >  ======================
+On Thu, Feb 16, 2023, Anish Moorthy wrote:
+> On Wed, Feb 15, 2023 at 12:59 AM Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > > > index 109b18e2789c4..9352e7f8480fb 100644
+> > > > --- a/include/linux/kvm_host.h
+> > > > +++ b/include/linux/kvm_host.h
+> > > > @@ -801,6 +801,9 @@ struct kvm {
+> > > >     bool vm_bugged;
+> > > >     bool vm_dead;
+> > > >
+> > > > +   rwlock_t mem_fault_nowait_lock;
+> > > > +   bool mem_fault_nowait;
 > > >
-> > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > > index 109b18e2789c4..9352e7f8480fb 100644
-> > > --- a/include/linux/kvm_host.h
-> > > +++ b/include/linux/kvm_host.h
-> > > @@ -801,6 +801,9 @@ struct kvm {
-> > >     bool vm_bugged;
-> > >     bool vm_dead;
-> > >
-> > > +   rwlock_t mem_fault_nowait_lock;
-> > > +   bool mem_fault_nowait;
+> > > A full-fat rwlock to protect a single bool? What benefits do you
+> > > expect from a rwlock? Why is it preferable to an atomic access, or a
+> > > simple bitop?
 > >
-> > A full-fat rwlock to protect a single bool? What benefits do you
-> > expect from a rwlock? Why is it preferable to an atomic access, or a
-> > simple bitop?
->
-> There's no need to have any kind off dedicated atomicity.  The only readers are
-> in vCPU context, just disallow KVM_CAP_MEM_FAULT_NOWAIT after vCPUs are created.
+> > There's no need to have any kind off dedicated atomicity.  The only readers are
+> > in vCPU context, just disallow KVM_CAP_MEM_FAULT_NOWAIT after vCPUs are created.
+> 
+> I think we do need atomicity here.
 
-I think we do need atomicity here. When KVM_CAP_MEM_FAULT_NOWAIT is enabled
-async page faults are essentially disabled: so userspace will likely want to
-disable the cap at some point (such as the end of live migration post-copy).
-Since we want to support this without having to pause vCPUs, there's an
-atomicity requirement.
+Atomicity, yes.  Mutually exclusivity, no.  AFAICT, nothing will break if userspace
+has multiple in-flight calls to toggled the flag.  And if we do want to guarantee
+there's only one writer, then kvm->lock or kvm->slots_lock will suffice.
 
-Marc, I used an rwlock simply because it seemed like the easiest correct thing
-to do. I had a hunch that I'd be asked to change this to an atomic, so I can go
-ahead and do that barring any other suggestions.
+> When KVM_CAP_MEM_FAULT_NOWAIT is enabled async page faults are essentially
+> disabled: so userspace will likely want to disable the cap at some point
+> (such as the end of live migration post-copy).
 
-On Wed, Feb 15, 2023 at 12:41 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> > +:Returns: 0 on success, or -1 if KVM_CAP_MEM_FAULT_NOWAIT is not present.
->
-> Please pick a meaningful error code instead of -1. And if you intended
-> this as -EPERM, please explain the rationale (-EINVAL would seem more
-> appropriate).
+Ah, this is a dynamic thing and not a set-and-forget thing.
 
-As I mention earlier, I'll be switching to toggling the capability via
-KVM_ENABLE_CAP so this KVM_SET_MEM_FAULT_NOWAIT ioctl is going to go away. I
-will make sure to set an appropriate error code if the user passes nonsensical
-"args" to KVM_ENABLE_CAP though, whatever that ends up meaning.
+> Since we want to support this without having to pause vCPUs, there's an
+> atomicity requirement.
 
-> > +
-> > +Enables (state=true) or disables (state=false) waitless memory faults. For more
-> > +information, see the documentation of KVM_CAP_MEM_FAULT_NOWAIT.
-> > +
-> >  5. The kvm_run structure
-> >  ========================
-> >
-> > @@ -6544,6 +6556,21 @@ array field represents return values. The userspace should update the return
-> >  values of SBI call before resuming the VCPU. For more details on RISC-V SBI
-> >  spec refer, https://github.com/riscv/riscv-sbi-doc.
-> >
-> > +::
-> > +
-> > +             /* KVM_EXIT_MEMORY_FAULT */
-> > +             struct {
-> > +                     __u64 gpa;
-> > +                     __u64 size;
-> > +             } memory_fault;
-> > +
-> > +If exit reason is KVM_EXIT_MEMORY_FAULT then it indicates that the VCPU has
-> > +encountered a memory error which is not handled by KVM kernel module and
-> > +which userspace may choose to handle.
->
-> No, the vcpu hasn't "encountered a memory error". The hypervisor has
-> taken a page fault, which is very different. And it isn't that KVM
-> couldn't handle it (or we wouldn't have a hypervisor at all). From
-> what I understand of this series (possibly very little), userspace has
-> to *ask* for these, and they are delivered in specific circumstances.
-> Which are?
+Ensuring that vCPUs "see" the new value and not corrupting memory are two very
+different things.  Making the flag an atomic, wrapping with a rwlock, etc... do
+nothing to ensure vCPUs observe the new value.  And for non-crazy usage of bools,
+they're not even necessary to avoid memory corruption, e.g. the result of concurrent
+writes to a bool is non-deterministic, but so is the order of two tasks contending
+for a lock, so it's a moot point.
 
-Thanks for the correction: "encountered a memory error" was incorrect phrasing.
-What is your opinion on the following, hopefully more accurate, documentation?
+I think what you really want to achieve is that vCPUs observe the NOWAIT flag
+before KVM returns to userspace.  There are a variety of ways to make that happen,
+but since this all about accessing guest memory, the simplest is likely to
+"protect" the flag with kvm->srcu, i.e. require SRCU be held by readers and then
+do a synchronize_srcu() to ensure all vCPUs have picked up the new value.
 
-"An exit reason of KVM_EXIT_MEMORY_FAULT indicates that the vCPU encountered a
-memory fault for which the userspace page tables did not contain a present
-mapping. This exit is only generated when KVM_CAP_MEM_FAULT_NOWAIT is enabled:
-otherwise KVM will attempt to resolve the fault without exiting to userspace,
-returning -1 with errno=EFAULT when it cannot."
+Speaking of SRCU (which protect memslots), why not make this a memslot flag?  If
+the goal is to be able to turn the behavior on/off dynamically, wouldn't it be
+beneficial to turn off the NOWAIT behavior when a memslot is fully transfered?
 
-It might also help to note that the vCPUs exit in exactly the same cases where
-userspace would get a page fault when trying to access the memory through the
-VMA/mapping provided to the memslot. Please let me know if you feel that this
-information should be included in the documentation, or if you see anything else
-I've gotten wrong.
-
-As for handling these faults: userspace should consider its own knowledge of the
-guest and determine how best to resolve each fault. For instance if userspace
-hasn't UFFDIO_COPY/CONTINUEd a faulting page yet, then it must do so to
-establish the mapping. If it already did, then the next step would be to fault
-in the page via MADV_POPULATE_READ|WRITE.
-
-A naive userspace could just always MADV_POPULATE_READ|WRITE in response to
-these faults: that would basically yield KVM's behavior *without* the capability
-enabled, just with extra steps, worse performance, and no chance for async page
-faults.
-
-A final note: this is just how the fault applies in the context of
-userfaultfd-based post-copy live migration. Other uses might come up in the
-future, in which case userspace would want to take some other sort of action.
-
-> > +'gpa' and 'size' indicate the memory range the error occurs at. Userspace
-> > +may handle the error and return to KVM to retry the previous memory access.
->
-> What are these *exactly*? In what unit?
-
-Sorry, I'll add some descriptive comments here. "gpa" is the guest physical
-address of the faulting page (rounded down to be aligned with "size"), and
-"size" is just the size in bytes of the faulting page.
-
-> ... What guarantees that the
-> process eventually converges? How is userspace supposed to handle the
-> fault (which is *not* an error)? Don't you need to communicate other
-> information, such as the type of fault (read, write, permission or
-> translation fault...)?
-
-Ok, two parts to the response here.
-
-1. As Oliver touches on earlier, we'll probably want to use this same field for
-   different classes of memory fault in the future (such as the ones which Chao
-   is introducing in [1]): so it does make sense to add "code" and "flags"
-   fields which can be used to communicate more information to the user (and
-   which can just be set to MEM_FAULT_NOWAIT/0 in this series).
-
-2. As to why a code/flags of MEM_FAULT_NOWAIT/0 should be enough information to
-   convey to the user here: the assumption behind this series is that
-   MADV_POPULATE_READ|WRITE will always be enough to ensure that the vCPU can
-   run again. This goes back to the earlier claim about vCPUs exiting in the
-   exact same cases as when userspace would get a page fault trying to access
-   the same memory. MADV_POPULATE_READ|WRITE is intended to resolve exactly
-   these cases, so userspace shouldn't need anything more.
-
-Again, a VMM enabling the new exit to make post-copy faster must determine what
-action to take depending on whether it has UFFDIO_COPY|CONTINUEd the faulting
-page (at least for now, perhaps there will be more uses in the future): we can
-keep discussing if this seems fragile. Just keeping things limited to
-userfaultfd, having KVM communicate to userspace which action is required could
-get difficult. For UFFDIO_CONTINUE we'd have to check if the VMA had
-VM_UFFD_MINOR, and for UFFDIO_COPY we'd have to at least check the page cache.
-
-> >
-> > +7.34 KVM_CAP_MEM_FAULT_NOWAIT
-> > +-----------------------------
-> > +
-> > +:Architectures: x86, arm64
-> > +:Target: VM
-> > +:Parameters: None
-> > +:Returns: 0 on success, or -EINVAL if capability is not supported.
-> > +
-> > +The presence of this capability indicates that userspace can enable/disable
-> > +waitless memory faults through the KVM_SET_MEM_FAULT_NOWAIT ioctl.
-> > +
-> > +When waitless memory faults are enabled, fast get_user_pages failures when
-> > +handling EPT/Shadow Page Table violations will cause a vCPU exit
-> > +(KVM_EXIT_MEMORY_FAULT) instead of a fallback to slow get_user_pages.
->
-> Do you really expect a random VMM hacker to understand what GUP is?
-> Also, the x86 verbiage makes zero sense to me. Please write this in a
-> way that is useful for userspace people, because they are the ones
-> consuming this documentation. I really can't imagine anyone being able
-> to write something useful based on this.
-
-My bad: obviously I shouldn't be exposing the kernel's implementation details
-here. As for what the documentation should actually say, I'm thinking I can
-adapt the revised description of the KVM exit from earlier ("An exit reason of
-KVM_EXIT_MEMORY_FAULT indicates..."). Again, please let me know if you see
-anything which should be changed there.
-
-> > +             /* KVM_EXIT_MEMORY_FAULT */
-> > +             struct {
-> > +                     __u64 flags;
-> > +                     __u64 gpa;
-> > +                     __u64 size;
-> > +             } memory_fault;
->
-> Sigh... This doesn't even match the documentation.
-
-Ack! Ack.
-
-> > -/* Available with  KVM_CAP_S390_VCPU_RESETS */
-> > +/* Available with KVM_CAP_S390_VCPU_RESETS */
->
-> Unrelated change?
-
-Yes, I'll drop it from the next revision.
-
-> > +             r = -EFAULT;
-> > +             if (copy_from_user(&state, argp, sizeof(state)))
->
-> A copy_from_user for... a bool? Why don't you directly treat argp as
-> the boolean itself? Of even better, make it a more interesting
-> quantity so that the API can evolve in the future. As it stands, it is
-> not extensible, which means it is already dead, if Linux APIs are
-> anything to go by.
-
-I'll keep that in mind for the future, but this is now moot since I'll be
-removing KVM_SET_MEM_FAULT_NOWAIT.
-
-> On a related subject: is there a set of patches for any of the main
-> VMMs making any use of this?
-
-No. For what it's worth, the demand_paging_selftest demonstrates the basics of
-what userspace can do with the new exit. Would it be helpful to see how QEMU
-could use it as well?
-
-[1] https://lore.kernel.org/all/CA+EHjTyzZ2n8kQxH_Qx72aRq1k+dETJXTsoOM3tggPZAZkYbCA@mail.gmail.com/
+A memslot flag would likely be simpler to implement as it would piggyback all of
+the existing infrastructure to handle memslot updates.
