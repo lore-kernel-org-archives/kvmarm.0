@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E83746C
-	for <kvmarm@lists.linux.dev>; Thu, 16 Feb 2023 14:31:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7094DC433A4;
-	Thu, 16 Feb 2023 14:31:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8185E746C
+	for <kvmarm@lists.linux.dev>; Thu, 16 Feb 2023 14:31:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4270DC433EF;
+	Thu, 16 Feb 2023 14:31:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1676557886;
-	bh=nIEyPcKSfGn/aSgYLXrCxCTer43Vb54hmCW7FGQkIaQ=;
+	s=k20201202; t=1676557889;
+	bh=QqKWnxVCmWjaRHHpFhF9lvt+Kt1/5o5W5NIuE4VWNwY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jEpPqpYpXevvEFZAEcFOWQNHhfZGycRUi27WB3IhTLYEL8HDupxTALjOklRrHi5lB
-	 MuRZkHfSpXHT5YsZXUMk2oYjvuTPGFYH/6/lk12pvxLmGO6fCc0EOhvNgkCsnkZUvd
-	 a65QGRQcIoBknR5ws1QYhVXG8LChHSbvtdOJ+bvcuBq3xwzydGHwu+7sSCkBbXZMiP
-	 o7Xzb6q4YPO3gLb02SEE/MQ99joTwgWDsrzh9goMPQXH5v0nzxcK9GdakAJq4f0tt8
-	 Oa0PRBUW201IHf7YeytBF4COqp/iC7QOdF3gYSnBlNeQWeye+jGDXBvTpV6ftd8f5J
-	 qVdJj7Zo5DkTg==
+	b=BBVBIVKxfN+otxuDh6tjITGWlD2qZDMmlePf2P+zsLwLtBZNJml2UZXr9wo/KzhfD
+	 +DLAftqcKO6kMhOlxQELU7as2b7dfitiOvkVwlY10gpOBFJFZPHS6sIuU6AE+V5RYt
+	 pVv+G9Sk34MHxhtlqfNthRXYV6d+lnZRLOkQyZVzprLW7rYrfV2Rd4E4UezXAA04FW
+	 W1uo3lEp0Hh/Qbo3JiraAVfgDlNBoRfdUwUUjgHwIjgpYxS+DJDtlE7RIVJZDW/Gz0
+	 5j+AQZjL6T7Ch/3llwQjP97zZBhI8X3ThnLoq5JGtoCH9cyU9OoK1yt9IcWC5DUA7y
+	 vqMnS8MLWR9Iw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pSf8w-00AuwB-0A;
-	Thu, 16 Feb 2023 14:21:50 +0000
+	id 1pSf8v-00AuwB-OE;
+	Thu, 16 Feb 2023 14:21:49 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -32,9 +32,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Ricardo Koller <ricarkol@google.com>,
 	Simon Veith <sveith@amazon.de>,
 	dwmw2@infradead.org
-Subject: [PATCH 12/16] KVM: arm64: nv: timers: Add a per-timer, per-vcpu offset
-Date: Thu, 16 Feb 2023 14:21:19 +0000
-Message-Id: <20230216142123.2638675-13-maz@kernel.org>
+Subject: [PATCH 11/16] KVM: arm64: Document KVM_ARM_SET_CNT_OFFSETS and co
+Date: Thu, 16 Feb 2023 14:21:18 +0000
+Message-Id: <20230216142123.2638675-12-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230216142123.2638675-1-maz@kernel.org>
 References: <20230216142123.2638675-1-maz@kernel.org>
@@ -50,61 +50,71 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Being able to set a global offset isn't enough.
-
-With NV, we also need to a per-vcpu, per-timer offset (for example,
-CNTVCT_EL0 being offset by CNTVOFF_EL2).
-
-Use a similar method as the VM-wide offset to have a timer point
-to the shadow register that contains the offset value.
+Add some basic documentation on the effects of KVM_ARM_SET_CNT_OFFSETS.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arch_timer.c  | 13 ++++++++++---
- include/kvm/arm_arch_timer.h |  5 +++++
- 2 files changed, 15 insertions(+), 3 deletions(-)
+ Documentation/virt/kvm/api.rst | 47 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index f968d6d3479b..1f442ac0c499 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -84,10 +84,17 @@ u64 timer_get_cval(struct arch_timer_context *ctxt)
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 0a67cb738013..bdd361fd90f4 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -5937,6 +5937,53 @@ delivery must be provided via the "reg_aen" struct.
+ The "pad" and "reserved" fields may be used for future extensions and should be
+ set to 0s by userspace.
  
- static u64 timer_get_offset(struct arch_timer_context *ctxt)
- {
--	if (ctxt && ctxt->offset.vm_offset)
--		return *ctxt->offset.vm_offset;
-+	u64 offset = 0;
- 
--	return 0;
-+	if (!ctxt)
-+		return 0;
++4.138 KVM_ARM_SET_CNT_OFFSETS
++-----------------------------
 +
-+	if (ctxt->offset.vm_offset)
-+		offset += *ctxt->offset.vm_offset;
-+	if (ctxt->offset.vcpu_offset)
-+		offset += *ctxt->offset.vcpu_offset;
++:Capability: KVM_CAP_COUNTER_OFFSETS
++:Architectures: arm64
++:Type: vm ioctl
++:Parameters: struct kvm_arm_counter_offsets (in)
++:Returns: 0 on success, <0 on error
 +
-+	return offset;
- }
++This capability indicates that userspace is able to apply a set of
++VM-wide offsets to the virtual and physical counters as viewed by the
++guest using the KVM_ARM_SET_CNT_OFFSETS ioctl and the following data
++structure:
++
++	struct kvm_arm_counter_offsets {
++		__u64 virtual_offset;
++		__u64 physical_offset;
++
++	#define KVM_COUNTER_SET_VOFFSET_FLAG   (1UL << 0)
++	#define KVM_COUNTER_SET_POFFSET_FLAG   (1UL << 1)
++
++		__u64 flags;
++		__u64 reserved;
++	};
++
++Each of the two offsets describe a number of counter cycles that are
++subtracted from the corresponding counter (similar to the effects of
++the CNTVOFF_EL2 and CNTPOFF_EL2 system registers). For each offset
++that userspace wishes to change, it must set the corresponding flag in
++the "flag" field. These values always apply to all vcpus (already
++created or created after this ioctl) in this VM.
++
++It is userspace's responsibility to compute the offsets based, for
++example, on previous values of the guest counters.
++
++With nested virtualisation, the virtual offset as no effect on the
++execution of the guest, and the nested hypervisor is responsible for
++the offset that is presented to its own guests.
++
++Any flag value that isn't described here, or any value other than 0
++for the "reserved" field may result in an error being returned.
++
++Note that using this ioctl results in KVM ignoring subsequent
++userspace writes to the CNTVCT_EL0 and CNTPCT_EL0 registers using the
++SET_ONE_REG interface. No error will be returned, but the resulting
++offset will not be applied.
++
+ 5. The kvm_run structure
+ ========================
  
- static void timer_set_ctl(struct arch_timer_context *ctxt, u32 ctl)
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index 62ef4883e644..e76e513b90c5 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -29,6 +29,11 @@ struct arch_timer_offset {
- 	 * structure. If NULL, assume a zero offset.
- 	 */
- 	u64	*vm_offset;
-+	/*
-+	 * If set, pointer to one of the offsets in the vcpu's sysreg
-+	 * array. If NULL, assume a zero offset.
-+	 */
-+	u64	*vcpu_offset;
- };
- 
- struct arch_timer_vm_offsets {
 -- 
 2.34.1
 
