@@ -1,228 +1,272 @@
-Received: from out-121.mta1.migadu.com (out-121.mta1.migadu.com [95.215.58.121])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D92D308
-	for <kvmarm@lists.linux.dev>; Thu, 16 Feb 2023 23:07:29 +0000 (UTC)
-Date: Thu, 16 Feb 2023 22:09:47 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1676585391;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A74C376
+	for <kvmarm@lists.linux.dev>; Fri, 17 Feb 2023 04:07:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1676606843;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=gusSgHuRHriX2I9klAI50JRbZs+tVNNAeSSjo6yWKTI=;
-	b=LNM6OwO6sNPPCQV4z+PFFWnANCMMXAgF3YFDR+IAudGiHrUmkpWhg4clYh9IVHLII1hlsV
-	oYlhWsEGE+xYZ+doFjaFE3FIh6S5FVBebSSINyxzt9e3My7TTbM2qV0ti9Sj3ZJuwQODcj
-	zTxXwGQtIwyK5Ir47AzVUYCgA4BRAMc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	Simon Veith <sveith@amazon.de>, dwmw2@infradead.org
-Subject: Re: [PATCH 08/16] KVM: arm64: timers: Allow userspace to set the
- counter offsets
-Message-ID: <Y+6pqz3pCwu7izZL@linux.dev>
-References: <20230216142123.2638675-1-maz@kernel.org>
- <20230216142123.2638675-9-maz@kernel.org>
+	bh=TWQfzUcCwlzm6sKehp4ZpwCoGpqZRGcu2EZK4t1AGuM=;
+	b=ANojH85Kr/GYsTm0WFc0nwcXyQyqf86SEGpH71KPtrCDpXDHiWHggyxO+pvblHZ3Bu7UCr
+	WtWbRDpHgOnxcMCNc08+1yCXLIEJ6VSvRiSTYAsFj+8fG2Gdau50C8oOUKE2I+FoViE4Ew
+	LjUKngal7AJeramGIhhTeXVm9aji1k4=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-204-h9wPs1alOo-Oi3zAj6uO7A-1; Thu, 16 Feb 2023 23:07:21 -0500
+X-MC-Unique: h9wPs1alOo-Oi3zAj6uO7A-1
+Received: by mail-pj1-f69.google.com with SMTP id pv3-20020a17090b3c8300b002342e23955cso1992236pjb.7
+        for <kvmarm@lists.linux.dev>; Thu, 16 Feb 2023 20:07:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TWQfzUcCwlzm6sKehp4ZpwCoGpqZRGcu2EZK4t1AGuM=;
+        b=Xr/+DY5mZe3cRlMI8hTxDMQUVNbSj/Q80PjDYKMc3XQzZu3QHuJRe/A9sUrJa9tUy1
+         c3H6ORJRfCP0Qem7VVn5ZI8EHUBlPv0Da6eIvP3rmPhQH9fdPt35vJr8AK36Ri60j1Qk
+         ffrKBG9t3LE8lO7r5eq8rbLph5+5VbFW871LzB//pghQl24rdFFK+H/dDkuOstwDXrd5
+         fq9u4PFF+ZZkklf0JKXxsEtdkds8TYNW33mQPM5IfN96IvkEpdHw8x3mEKk+w1RzAKnc
+         fjzlglfcnhpy2K8sqs+v+rxx6yvDoYAN54u6wYsSApwABGFoiYDTc6AfKtnXuu6xhKUJ
+         9j2A==
+X-Gm-Message-State: AO0yUKU2mXbifcZx/Hs/nwz99P/HDQ+PLwfu74m7WtmMrWEd7YDruPPJ
+	xulCsUG/T/+K+yG07VivuD6xU9RMZhES641c8Gbl4EA5LNLc3DfyjP8HS/1RJ71Du+33AHFxMvT
+	ITLr7WJCAxKMdN0Xo
+X-Received: by 2002:a05:6a00:cce:b0:5a9:b4c6:c07c with SMTP id b14-20020a056a000cce00b005a9b4c6c07cmr3136857pfv.0.1676606840715;
+        Thu, 16 Feb 2023 20:07:20 -0800 (PST)
+X-Google-Smtp-Source: AK7set/HhmzhIvwODyOOUf9AdQnW43QbUPXFNc3K5/CqbRQRmJyVplWpkivs2LFTRWh1IEFIVBO3+Q==
+X-Received: by 2002:a05:6a00:cce:b0:5a9:b4c6:c07c with SMTP id b14-20020a056a000cce00b005a9b4c6c07cmr3136817pfv.0.1676606840275;
+        Thu, 16 Feb 2023 20:07:20 -0800 (PST)
+Received: from [10.66.61.39] ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id b14-20020a65668e000000b004fb997a0bd8sm1905130pgw.30.2023.02.16.20.07.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Feb 2023 20:07:19 -0800 (PST)
+Message-ID: <073043b0-522d-0c5c-7a85-35ef5112e6d9@redhat.com>
+Date: Fri, 17 Feb 2023 12:07:12 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230216142123.2638675-9-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH v3 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
+To: Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
+ maz@kernel.org, oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
+ catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com,
+ gshan@redhat.com, reijiw@google.com, rananta@google.com, bgardon@google.com,
+ ricarkol@gmail.com
+References: <20230215174046.2201432-1-ricarkol@google.com>
+ <20230215174046.2201432-5-ricarkol@google.com>
+From: Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <20230215174046.2201432-5-ricarkol@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Marc,
+Hi Ricardo,
 
-On Thu, Feb 16, 2023 at 02:21:15PM +0000, Marc Zyngier wrote:
-> And this is the moment you have all been waiting for: setting the
-> counter offsets from userspace.
-> 
-> We expose a brand new capability that reports the ability to set
-> the offsets for both the virtual and physical sides, independently.
-> 
-> In keeping with the architecture, the offsets are expressed as
-> a delta that is substracted from the physical counter value.
-> 
-> Once this new API is used, there is no going back, and the counters
-> cannot be written to to set the offsets implicitly (the writes
-> are instead ignored).
-
-Is there any particular reason to use an explicit ioctl as opposed to
-the KVM_{GET,SET}_DEVICE_ATTR ioctls? Dunno where you stand on it, but I
-quite like that interface for simple state management. We also avoid
-eating up more UAPI bits in the global namespace.
-
-You could also split up the two offsets as individual attributes, but I
-really couldn't care less. Its userspace's problem after all!
-
-And on that note, any VMM patches to match this implementation? kvmtool
-would suffice, just want something that runs a real VM and pokes these
-ioctls.
-
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+On 2/16/23 01:40, Ricardo Koller wrote:
+> Add a new stage2 function, kvm_pgtable_stage2_split(), for splitting a
+> range of huge pages. This will be used for eager-splitting huge pages
+> into PAGE_SIZE pages. The goal is to avoid having to split huge pages
+> on write-protection faults, and instead use this function to do it
+> ahead of time for large ranges (e.g., all guest memory in 1G chunks at
+> a time).
+>
+> No functional change intended. This new function will be used in a
+> subsequent commit.
+>
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > ---
->  arch/arm64/include/asm/kvm_host.h |  4 +++
->  arch/arm64/include/uapi/asm/kvm.h | 15 ++++++++++
->  arch/arm64/kvm/arch_timer.c       | 46 +++++++++++++++++++++++++++----
->  arch/arm64/kvm/arm.c              |  8 ++++++
->  include/uapi/linux/kvm.h          |  3 ++
->  5 files changed, 71 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 3adac0c5e175..8514a37cf8d5 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -221,6 +221,8 @@ struct kvm_arch {
->  #define KVM_ARCH_FLAG_EL1_32BIT				4
->  	/* PSCI SYSTEM_SUSPEND enabled for the guest */
->  #define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		5
-> +	/* VM counter offsets */
-> +#define KVM_ARCH_FLAG_COUNTER_OFFSETS			6
-
-nit: I'm not too bothered by the test_bit(...) mouthful when its used
-sparingly but it may be nice to have a helper if it is repeated enough
-times.
-
->  	unsigned long flags;
->  
-> @@ -1010,6 +1012,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->  
->  long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->  				struct kvm_arm_copy_mte_tags *copy_tags);
-> +int kvm_vm_ioctl_set_counter_offsets(struct kvm *kvm,
-> +				     struct kvm_arm_counter_offsets *offsets);
->  
->  /* Guest/host FPSIMD coordination helpers */
->  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index f8129c624b07..2d7557a160bd 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -198,6 +198,21 @@ struct kvm_arm_copy_mte_tags {
->  	__u64 reserved[2];
->  };
->  
-> +/*
-> + * Counter/Timer offset structure. Describe the virtual/physical offsets.
-> + * To be used with KVM_ARM_SET_CNT_OFFSETS.
+>   arch/arm64/include/asm/kvm_pgtable.h |  30 ++++++++
+>   arch/arm64/kvm/hyp/pgtable.c         | 105 +++++++++++++++++++++++++++
+>   2 files changed, 135 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 2ea397ad3e63..b28489aa0994 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -658,6 +658,36 @@ bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr);
+>    */
+>   int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
+>   
+> +/**
+> + * kvm_pgtable_stage2_split() - Split a range of huge pages into leaf PTEs pointing
+> + *				to PAGE_SIZE guest pages.
+> + * @pgt:	 Page-table structure initialised by kvm_pgtable_stage2_init().
+> + * @addr:	 Intermediate physical address from which to split.
+> + * @size:	 Size of the range.
+> + * @mc:		 Cache of pre-allocated and zeroed memory from which to allocate
+> + *		 page-table pages.
+> + * @mc_capacity: Number of pages in @mc.
+> + *
+> + * @addr and the end (@addr + @size) are effectively aligned down and up to
+> + * the top level huge-page block size. This is an example using 1GB
+> + * huge-pages and 4KB granules.
+> + *
+> + *                          [---input range---]
+> + *                          :                 :
+> + * [--1G block pte--][--1G block pte--][--1G block pte--][--1G block pte--]
+> + *                          :                 :
+> + *                   [--2MB--][--2MB--][--2MB--][--2MB--]
+> + *                          :                 :
+> + *                   [ ][ ][:][ ][ ][ ][ ][ ][:][ ][ ][ ]
+> + *                          :                 :
+> + *
+> + * Return: 0 on success, negative error code on failure. Note that
+> + * kvm_pgtable_stage2_split() is best effort: it tries to break as many
+> + * blocks in the input range as allowed by @mc_capacity.
 > + */
-> +struct kvm_arm_counter_offsets {
-> +	__u64 virtual_offset;
-> +	__u64 physical_offset;
+> +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> +			     void *mc, u64 mc_capacity);
 > +
-> +#define KVM_COUNTER_SET_VOFFSET_FLAG	(1UL << 0)
-> +#define KVM_COUNTER_SET_POFFSET_FLAG	(1UL << 1)
-> +
-> +	__u64 flags;
-> +	__u64 reserved;
+>   /**
+>    * kvm_pgtable_walk() - Walk a page-table.
+>    * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index fed314f2b320..e2fb78398b3d 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -1229,6 +1229,111 @@ int kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+>   	return 0;
+>   }
+>   
+> +struct stage2_split_data {
+> +	struct kvm_s2_mmu		*mmu;
+> +	void				*memcache;
+> +	u64				mc_capacity;
 > +};
 > +
->  #define KVM_ARM_TAGS_TO_GUEST		0
->  #define KVM_ARM_TAGS_FROM_GUEST		1
->  
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 444ea6dca218..b04544b702f9 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -852,9 +852,11 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
->  	ptimer->vcpu = vcpu;
->  	ptimer->offset.vm_offset = &vcpu->kvm->arch.offsets.poffset;
->  
-> -	/* Synchronize cntvoff across all vtimers of a VM. */
-> -	timer_set_offset(vtimer, kvm_phys_timer_read());
-> -	timer_set_offset(ptimer, 0);
-> +	/* Synchronize offsets across timers of a VM if not already provided */
-> +	if (!test_bit(KVM_ARCH_FLAG_COUNTER_OFFSETS, &vcpu->kvm->arch.flags)) {
-> +		timer_set_offset(vtimer, kvm_phys_timer_read());
-> +		timer_set_offset(ptimer, 0);
-> +	}
->  
->  	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
->  	timer->bg_timer.function = kvm_bg_timer_expire;
-> @@ -898,8 +900,11 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
->  		kvm_arm_timer_write(vcpu, timer, TIMER_REG_CTL, value);
->  		break;
->  	case KVM_REG_ARM_TIMER_CNT:
-> -		timer = vcpu_vtimer(vcpu);
-> -		timer_set_offset(timer, kvm_phys_timer_read() - value);
-> +		if (!test_bit(KVM_ARCH_FLAG_COUNTER_OFFSETS,
-> +			      &vcpu->kvm->arch.flags)) {
-> +			timer = vcpu_vtimer(vcpu);
-> +			timer_set_offset(timer, kvm_phys_timer_read() - value);
-> +		}
-
-If we've already got userspace to buy in to the new UAPI, should we
-return an error instead of silently failing? Might be good to catch
-misbehavior in the act, even if it is benign as this patch is written.
-
->  		break;
->  	case KVM_REG_ARM_TIMER_CVAL:
->  		timer = vcpu_vtimer(vcpu);
-> @@ -909,6 +914,13 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
->  		timer = vcpu_ptimer(vcpu);
->  		kvm_arm_timer_write(vcpu, timer, TIMER_REG_CTL, value);
->  		break;
-> +	case KVM_REG_ARM_PTIMER_CNT:
-> +		if (!test_bit(KVM_ARCH_FLAG_COUNTER_OFFSETS,
-> +			      &vcpu->kvm->arch.flags)) {
-> +			timer = vcpu_ptimer(vcpu);
-> +			timer_set_offset(timer, kvm_phys_timer_read() - value);
-> +		}
-> +		break;
->  	case KVM_REG_ARM_PTIMER_CVAL:
->  		timer = vcpu_ptimer(vcpu);
->  		kvm_arm_timer_write(vcpu, timer, TIMER_REG_CVAL, value);
-> @@ -1446,3 +1458,27 @@ int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->  
->  	return -ENXIO;
->  }
-> +
-> +int kvm_vm_ioctl_set_counter_offsets(struct kvm *kvm,
-> +				     struct kvm_arm_counter_offsets *offsets)
+> +/*
+> + * Get the number of page-tables needed to replace a bock with a fully
+> + * populated tree, up to the PTE level, at particular level.
+> + */
+> +static inline u32 stage2_block_get_nr_page_tables(u32 level)
 > +{
-> +	if (offsets->reserved ||
-> +	    (offsets->flags & ~(KVM_COUNTER_SET_VOFFSET_FLAG |
-> +				KVM_COUNTER_SET_POFFSET_FLAG)))
-> +		return -EINVAL;
-> +
-> +	if (!lock_all_vcpus(kvm))
-> +		return -EBUSY;
+> +	switch (level) {
+> +	/* There are no blocks at level 0 */
+> +	case 1: return 1 + PTRS_PER_PTE;
+> +	case 2: return 1;
+> +	case 3: return 0;
 
-Is there any reason why we can't just order this ioctl before vCPU
-creation altogether, or is there a need to do this at runtime? We're
-about to tolerate multiple writers to the offset value, and I think the
-only thing we need to guarantee is that the below flag is set before
-vCPU ioctls have a chance to run.
+Is the level 3 check really needed?
+Because level 3 will be first detected by:
 
-Actually, the one benefit of enforcing a strict ordering is that you can
-hide the old register indices completely from KVM_GET_REG_LIST to
-provide further discouragement to userspace.
++ if (level == KVM_PGTABLE_MAX_LEVELS - 1)
++ return 0;
 
-Otherwise, if you choose to keep it this way then the requirement to
-have no vCPU ioctls in flight needs to be explicitly documented as that
-is a bit of a tricky interface.
+in the stage2_split_walker().
 
-> +	set_bit(KVM_ARCH_FLAG_COUNTER_OFFSETS, &kvm->arch.flags);
+Even if the case 3 return 0 and continue execute, it will still trigger:
+kvm_pgtable_stage2_create_unlinked(..level..)
+   -> __kvm_pgtable_walk(..level+1..)
+     -> WARN_ON_ONCE(level >= KVM_PGTABLE_MAX_LEVELS)
+
+Thanks,
+Shaoqin
+
+> +	default:
+> +		WARN_ON_ONCE(1);
+> +		return ~0;
+> +	}
+> +}
 > +
-> +	if (offsets->flags & KVM_COUNTER_SET_VOFFSET_FLAG)
-> +		kvm->arch.offsets.voffset = offsets->virtual_offset;
+> +static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> +			       enum kvm_pgtable_walk_flags visit)
+> +{
+> +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+> +	struct stage2_split_data *data = ctx->arg;
+> +	kvm_pte_t pte = ctx->old, new, *childp;
+> +	enum kvm_pgtable_prot prot;
+> +	void *mc = data->memcache;
+> +	u32 level = ctx->level;
+> +	u64 phys, nr_pages;
+> +	bool force_pte;
+> +	int ret;
 > +
-> +	if (offsets->flags & KVM_COUNTER_SET_POFFSET_FLAG)
-> +		kvm->arch.offsets.poffset = offsets->physical_offset;
+> +	/* No huge-pages exist at the last level */
+> +	if (level == KVM_PGTABLE_MAX_LEVELS - 1)
+> +		return 0;
 > +
-> +	unlock_all_vcpus(kvm);
+> +	/* We only split valid block mappings */
+> +	if (!kvm_pte_valid(pte))
+> +		return 0;
 > +
+> +	nr_pages = stage2_block_get_nr_page_tables(level);
+> +	if (data->mc_capacity >= nr_pages) {
+> +		/* Build a tree mapped down to the PTE granularity. */
+> +		force_pte = true;
+> +	} else {
+> +		/*
+> +		 * Don't force PTEs. This requires a single page of PMDs at the
+> +		 * PUD level, or a single page of PTEs at the PMD level. If we
+> +		 * are at the PUD level, the PTEs will be created recursively.
+> +		 */
+> +		force_pte = false;
+> +		nr_pages = 1;
+> +	}
+> +
+> +	if (data->mc_capacity < nr_pages)
+> +		return -ENOMEM;
+> +
+> +	phys = kvm_pte_to_phys(pte);
+> +	prot = kvm_pgtable_stage2_pte_prot(pte);
+> +
+> +	ret = kvm_pgtable_stage2_create_unlinked(data->mmu->pgt, &new, phys,
+> +						 level, prot, mc, force_pte);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (!stage2_try_break_pte(ctx, data->mmu)) {
+> +		childp = kvm_pte_follow(new, mm_ops);
+> +		kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
+> +		mm_ops->put_page(childp);
+> +		return -EAGAIN;
+> +	}
+> +
+> +	/*
+> +	 * Note, the contents of the page table are guaranteed to be made
+> +	 * visible before the new PTE is assigned because stage2_make_pte()
+> +	 * writes the PTE using smp_store_release().
+> +	 */
+> +	stage2_make_pte(ctx, new);
+> +	dsb(ishst);
+> +	data->mc_capacity -= nr_pages;
 > +	return 0;
 > +}
+> +
+> +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> +			     void *mc, u64 mc_capacity)
+> +{
+> +	struct stage2_split_data split_data = {
+> +		.mmu		= pgt->mmu,
+> +		.memcache	= mc,
+> +		.mc_capacity	= mc_capacity,
+> +	};
+> +
+> +	struct kvm_pgtable_walker walker = {
+> +		.cb	= stage2_split_walker,
+> +		.flags	= KVM_PGTABLE_WALK_LEAF,
+> +		.arg	= &split_data,
+> +	};
+> +
+> +	return kvm_pgtable_walk(pgt, addr, size, &walker);
+> +}
+> +
+>   int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+>   			      struct kvm_pgtable_mm_ops *mm_ops,
+>   			      enum kvm_pgtable_stage2_flags flags,
 
 -- 
-Thanks,
-Oliver
+Regards,
+Shaoqin
+
