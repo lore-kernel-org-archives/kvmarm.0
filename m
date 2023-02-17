@@ -1,89 +1,186 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C655F5692
-	for <kvmarm@lists.linux.dev>; Fri, 17 Feb 2023 20:47:35 +0000 (UTC)
-Received: by mail-pl1-f201.google.com with SMTP id p6-20020a170902a40600b0019c3296ecafso292668plq.4
-        for <kvmarm@lists.linux.dev>; Fri, 17 Feb 2023 12:47:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jglgM7rGS6BZeewgUjhjVdRgQ10E1ZkiBvAtcJmwM0A=;
-        b=Fk69sJTezn6jkRmpd1DOlrDi/iIq2WXleRsAJDJTt7OkCksspb8tAY4dpElPLjf14g
-         UoKLZ0QOmMWCJfm6BikS/IJ88Vg4VqOMTMmV32uVmzMww2ByXxzElWT78pCh6cUcgPat
-         QU4eRWO4pp2JAr+eH5yWeJbT3WCxjenoN81nCBjvS57Y0o2w0mNOBKJ4TUdbx1ZO9htN
-         58LBXXOCJRQrfJ6D2Y6HU8hUzXfkcX5Gu6q6JmojEiMCvn12bUrYIJk93iibcjqMseWJ
-         QVa1D7Z2dhdXlzPZ3pzQQIg0AGsdFGJ/kGsdCOF5CWodQJJHb4Evwae+Md76WDEQODN4
-         W9lQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=jglgM7rGS6BZeewgUjhjVdRgQ10E1ZkiBvAtcJmwM0A=;
-        b=oZAGxHtZu8s084B0e69E9fpSzoe6THIX7sCBdvS8MkIp/yeeszoVDRDvoluVZkAWXb
-         e6CxzPz+AHhb4Be9EoHXZ5D/sevHDYUy1El9UcJpjjXKrYggjdYPSNcYFqd4dFe9je/N
-         P5EqHAt/0fY4Vmo3ZPTezIIwpSOi5UZpMRKvvFjVmSg8qqtd2WsRcZbFwoGagKmMnE99
-         CXJwA1SLJhbQ3BYywIjK+GQmwyRXpW/oTijG3W1RSPXyd7fcUeQ1t4v9axVDp47uQx4r
-         RHJtyv+3YYVxrze0BqQK1UvjufJwTzHcG7OWjQB4dkcsmp17xq9ct1qwOY+YWpdp45yK
-         QaAw==
-X-Gm-Message-State: AO0yUKVc2bcnp1rE7w4EPWei4bQS1duiJUl8pAb2j2IB1SCYkT02aOVF
-	DW8b7l04AQVTMjGG3pYMnHzCZC7ySLg=
-X-Google-Smtp-Source: AK7set9UYCeqsW7R4kSLIqKVhLLvDClhaJZ1vJl7CZ3hUzRmm9/jrECrLYVaf6bJ9FxAYGOjU16oyF5BFjo=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:914c:0:b0:4fb:933a:91d with SMTP id
- l73-20020a63914c000000b004fb933a091dmr267319pge.11.1676666855081; Fri, 17 Feb
- 2023 12:47:35 -0800 (PST)
-Date: Fri, 17 Feb 2023 12:47:33 -0800
-In-Reply-To: <CAF7b7mqeXcHdFHewX3enn-vxf6y7CUWjXjB3TXithZ_PnzVLQQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6CB0946A
+	for <kvmarm@lists.linux.dev>; Fri, 17 Feb 2023 22:11:42 +0000 (UTC)
+Date: Fri, 17 Feb 2023 22:11:36 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1676671900;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YOtwXAHUOiyF0cWE///JxNQMG7Pj09nvjoeNGQ1jJPI=;
+	b=otuTkuRMVAI2H3ABHL2WvG01UFkH0pdnCMmcEM0csD2A//96XvHVPcG6adIKPd9e67dnox
+	T2/6IgERYYTD+z5A3pHXEwUeK6McncmtiL4H9wujj6eiZIjkefAOonwdVpFB3E9RbtbsMT
+	jZ+nxuC1DNLS3dMFeWYIXksrB6ohnN4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Simon Veith <sveith@amazon.de>, dwmw2@infradead.org
+Subject: Re: [PATCH 08/16] KVM: arm64: timers: Allow userspace to set the
+ counter offsets
+Message-ID: <Y+/7mO1sxH4jThmu@linux.dev>
+References: <20230216142123.2638675-1-maz@kernel.org>
+ <20230216142123.2638675-9-maz@kernel.org>
+ <Y+6pqz3pCwu7izZL@linux.dev>
+ <86k00gy4so.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230215011614.725983-1-amoorthy@google.com> <20230215011614.725983-6-amoorthy@google.com>
- <87mt5fz5g6.wl-maz@kernel.org> <CAF7b7mr3iDBYWvX+ZPA1JeZgezX-BDo8VArwnjuzHUeWJmO32Q@mail.gmail.com>
- <Y+6iX6a22+GEuH1b@google.com> <CAF7b7mqeXcHdFHewX3enn-vxf6y7CUWjXjB3TXithZ_PnzVLQQ@mail.gmail.com>
-Message-ID: <Y+/n5X8+fGitI8FE@google.com>
-Subject: Re: [PATCH 5/8] kvm: Add cap/kvm_run field for memory fault exits
-From: Sean Christopherson <seanjc@google.com>
-To: Anish Moorthy <amoorthy@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, James Houghton <jthoughton@google.com>, 
-	Ben Gardon <bgardon@google.com>, David Matlack <dmatlack@google.com>, 
-	Ricardo Koller <ricarkol@google.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	peterx@redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86k00gy4so.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Feb 17, 2023, Anish Moorthy wrote:
-> On Thu, Feb 16, 2023 at 1:38=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> > Ensuring that vCPUs "see" the new value and not corrupting memory are t=
-wo very
-> > different things.  Making the flag an atomic, wrapping with a rwlock, e=
-tc... do
-> > nothing to ensure vCPUs observe the new value.  And for non-crazy usage=
- of bools,
-> > they're not even necessary to avoid memory corruption...
->=20
-> Oh, that's news to me- I've learned to treat any unprotected concurrent a=
-ccesses
-> to memory as undefined behavior: guess there's always more to learn.
+On Fri, Feb 17, 2023 at 10:17:27AM +0000, Marc Zyngier wrote:
+> Hi Oliver,
+> 
+> On Thu, 16 Feb 2023 22:09:47 +0000,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+> > 
+> > Hi Marc,
+> > 
+> > On Thu, Feb 16, 2023 at 02:21:15PM +0000, Marc Zyngier wrote:
+> > > And this is the moment you have all been waiting for: setting the
+> > > counter offsets from userspace.
+> > > 
+> > > We expose a brand new capability that reports the ability to set
+> > > the offsets for both the virtual and physical sides, independently.
+> > > 
+> > > In keeping with the architecture, the offsets are expressed as
+> > > a delta that is substracted from the physical counter value.
+> > > 
+> > > Once this new API is used, there is no going back, and the counters
+> > > cannot be written to to set the offsets implicitly (the writes
+> > > are instead ignored).
+> > 
+> > Is there any particular reason to use an explicit ioctl as opposed to
+> > the KVM_{GET,SET}_DEVICE_ATTR ioctls? Dunno where you stand on it, but I
+> > quite like that interface for simple state management. We also avoid
+> > eating up more UAPI bits in the global namespace.
+> 
+> The problem with that is that it requires yet another KVM device for
+> this, and I'm lazy. It also makes it a bit harder for the VMM to buy
+> into this (need to track another FD, for example).
 
-To expand a bit, undefined and non-deterministic are two different things. =
- In
-this case, the behavior is not deterministic, but it _is_ defined.  Readers=
- will
-either see %true or %false, but they will not see %beagle.=20
+You can also accept the device ioctls on the actual VM FD, quite like
+we do for the vCPU right now. And hey, I've got a patch that gets you
+most of the way there!
 
-And more importantly _KVM_ doesn't care whether or not the behavior is dete=
-rministic,
-that's userspace's responsibility.  E.g. if KVM were endangered by the flag=
- changing
-then some form of locking absolutely would be needed, but that's not the ca=
-se here.
+https://lore.kernel.org/kvmarm/20230211013759.3556016-3-oliver.upton@linux.dev/
+
+> > Is there any reason why we can't just order this ioctl before vCPU
+> > creation altogether, or is there a need to do this at runtime? We're
+> > about to tolerate multiple writers to the offset value, and I think the
+> > only thing we need to guarantee is that the below flag is set before
+> > vCPU ioctls have a chance to run.
+> 
+> Again, we don't know for sure whether the final offset is available
+> before vcpu creation time. My idea for QEMU would be to perform the
+> offset adjustment as late as possible, right before executing the VM,
+> after having restored the vcpus with whatever value they had.
+
+So how does userspace work out an offset based on available information?
+The part that hasn't clicked for me yet is where userspace gets the
+current value of the true physical counter to calculate an offset.
+
+We could make it ABI that the guest's physical counter matches that of
+the host by default. Of course, that has been the case since the
+beginning of time but it is now directly user-visible.
+
+The only part I don't like about that is that we aren't fully creating
+an abstraction around host and guest system time. So here's my current
+mental model of how we represent the generic timer to userspace:
+
+				+-----------------------+
+				|	   		|
+				| Host System Counter	|
+				|	   (1) 		|
+				+-----------------------+
+				    	   |
+			       +-----------+-----------+
+			       |		       |
+       +-----------------+  +-----+		    +-----+  +--------------------+
+       | (2) CNTPOFF_EL2 |--| sub |		    | sub |--| (3) CNTVOFF_EL2    |
+       +-----------------+  +-----+	     	    +-----+  +--------------------+
+			       |           	       |
+			       |		       |
+		     +-----------------+	 +----------------+
+		     | (5) CNTPCT_EL0  |         | (4) CNTVCT_EL0 |
+		     +-----------------+	 +----------------+
+
+AFAICT, this UAPI exposes abstractions for (2) and (3) to userspace, but
+userspace cannot directly get at (1).
+
+Chewing on this a bit more, I don't think userspace has any business
+messing with virtual and physical time independently, especially when
+nested virtualization comes into play.
+
+I think the illusion to userspace needs to be built around the notion of
+a system counter:
+
+                                +-----------------------+
+                                |                       |
+                                | Host System Counter   |
+                                |          (1)          |
+                                +-----------------------+
+					   |
+					   |
+					+-----+   +-------------------+
+					| sub |---| (6) system_offset |
+					+-----+   +-------------------+
+					   |
+					   |
+                                +-----------------------+
+                                |                       |
+                                | Guest System Counter  |
+                                |          (7)          |
+                                +-----------------------+
+                                           |
+                               +-----------+-----------+
+                               |                       |
+       +-----------------+  +-----+                 +-----+  +--------------------+
+       | (2) CNTPOFF_EL2 |--| sub |                 | sub |--| (3) CNTVOFF_EL2    |
+       +-----------------+  +-----+                 +-----+  +--------------------+
+                               |                       |
+                               |                       |
+                     +-----------------+         +----------------+
+                     | (5) CNTPCT_EL0  |         | (4) CNTVCT_EL0 |
+                     +-----------------+         +----------------+
+
+And from a UAPI perspective, we would either expose (1) and (6) to let
+userspace calculate an offset or simply allow (7) to be directly
+read/written.
+
+That frees up the meaning of the counter offsets as being purely a
+virtual EL2 thing. These registers would reset to 0, and non-NV guests
+could never change their value.
+
+Under the hood KVM would program the true offset registers as:
+
+	CNT{P,V}OFF_EL2 = 'virtual CNT{P,V}OFF_EL2' + system_offset
+
+With this we would effectively configure CNTPCT = CNTVCT = 0 at the
+point of VM creation. Only crappy thing is it requires full physical
+counter/timer emulation for non-ECV systems, but the guest shouldn't be
+using the physical counter in the first place.
+
+Yes, this sucks for guests running on hosts w/ NV but not ECV. If anyone
+can tell me how an L0 hypervisor is supposed to do NV without ECV, I'm
+all ears.
+
+Does any of what I've written make remote sense or have I gone entirely
+off the rails with my ASCII art? :)
+
+-- 
+Thanks,
+Oliver
