@@ -1,69 +1,189 @@
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BEA3323E
-	for <kvmarm@lists.linux.dev>; Fri, 17 Feb 2023 18:35:59 +0000 (UTC)
-Date: Fri, 17 Feb 2023 18:35:53 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1676658957;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6qPUIlrAqdWw119xSuvPcIRUnxHbEoSXWSdwW7asdJY=;
-	b=Rc03kNSpdg1lE63r+qqNHFhINxu6bF2u6pnsnCnfhniG2DDkj2jE5ryJK6w08ent3I+nY0
-	S+lTE0VzuE1pkutIFKidfTQi6zrLVysP76lpSphN/qsn05H3ZChaFqoF4IAU/B4fs4EGmd
-	+x4X0RLUxWnnKKSfrfSEInVpibhM7lw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.linux.dev,
-	Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Salil Mehta <salil.mehta@huawei.com>
-Subject: Re: [RFC PATCH v2 6/6] KVM: arm64: Indroduce support for userspace
- SMCCC filtering
-Message-ID: <Y+/JCS30AD0sr0Q0@linux.dev>
-References: <20230211013759.3556016-1-oliver.upton@linux.dev>
- <20230211013759.3556016-7-oliver.upton@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61C72323E
+	for <kvmarm@lists.linux.dev>; Fri, 17 Feb 2023 19:14:50 +0000 (UTC)
+Received: by mail-vk1-f182.google.com with SMTP id bw2so989300vkb.2
+        for <kvmarm@lists.linux.dev>; Fri, 17 Feb 2023 11:14:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1676661289;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qVTO4xFWAbGUXR7DKM9UY+o8NK6Xjb5cc7LUCkAe5ek=;
+        b=TU7EaOIss2LMxfhHnSjxTI6eATQnooPOFypZFBxEiVOBoLDGsyOw/HtoRQqxytLRxR
+         ZHqZ4VqQazMQ+Rw6mZUCmhedaI3yNc+Nx7Y9bLqzxx4XnrUWrK9GvwbFQyiZwvqfBaG3
+         zGQKYSe5GCXV1EDgsYMazGLXL42HwtcfScBDROnVkBNzoEiEpfTrbUUsatsnhtO5236Y
+         1G+K/N88GmD2yk4eU3sDhwxdA3/UeAR4NXVUg1RcGp7TDPJmOUiE4FAMhulbQsV0nWlX
+         fJREDwCi1v32zQFx/qt+PWn6SPVnSrbrdsTBFjd+7SXh+NsjMI/wH+o/lNQP+VyhvFQq
+         oT1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1676661289;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qVTO4xFWAbGUXR7DKM9UY+o8NK6Xjb5cc7LUCkAe5ek=;
+        b=fQ+fAesyxuXKlpyI9+2TcS1c3n+V/V4V1o19/BYKuu1nqYxT96pQJMKC5B4UjnJobs
+         noXLjaq6ax6IbUUoxC81XUk27tRkczyOzfRpCKfRG7gi42vuVaza7Jv/KaQL05vbbWbr
+         WxXcTJKvziGxNEYCKAd5Sz3tSoL8DVr4d7GEIrNA+nfGP363Cq4MIxBWWTe2Jy57Sqmt
+         zK2WAMRAth1JD+/jkjQphd4yjS2oTTt6F009FdnyP1Zrw2Wsd7PChwj4S6uS5hb/B5U+
+         bAihsCGMi0a9XYvS7HsX+qqL1JgH45345qLmXeQ1f/+f4ZuQ3qJUWdhNsVVn+3/VCRJz
+         CHyQ==
+X-Gm-Message-State: AO0yUKVRg1kJ0USKIPP2ocuHlsy7mC5dGXDD9leUN0zzaOdWc1aq0cZ+
+	MQ8L0WTfsCJFO0oFQoF7BHsXYJST/GCK11uAGRV6vg==
+X-Google-Smtp-Source: AK7set/nHg4O75YDiKYZI5ub4C/e2MbSF/pXe3H9JppCXn0NtJ+NxhDAJ16lg+WneuYDne2Gfma8eR4+a1Hn7LtP/bY=
+X-Received: by 2002:a1f:2fd1:0:b0:407:fb48:8105 with SMTP id
+ v200-20020a1f2fd1000000b00407fb488105mr183223vkv.38.1676661289103; Fri, 17
+ Feb 2023 11:14:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230211013759.3556016-7-oliver.upton@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+References: <20230215011614.725983-1-amoorthy@google.com> <20230215011614.725983-6-amoorthy@google.com>
+ <87mt5fz5g6.wl-maz@kernel.org> <CAF7b7mr3iDBYWvX+ZPA1JeZgezX-BDo8VArwnjuzHUeWJmO32Q@mail.gmail.com>
+ <Y+6iX6a22+GEuH1b@google.com>
+In-Reply-To: <Y+6iX6a22+GEuH1b@google.com>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Fri, 17 Feb 2023 11:14:37 -0800
+Message-ID: <CAF7b7mqeXcHdFHewX3enn-vxf6y7CUWjXjB3TXithZ_PnzVLQQ@mail.gmail.com>
+Subject: Re: [PATCH 5/8] kvm: Add cap/kvm_run field for memory fault exits
+To: Sean Christopherson <seanjc@google.com>, Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	James Houghton <jthoughton@google.com>, Ben Gardon <bgardon@google.com>, 
+	David Matlack <dmatlack@google.com>, Ricardo Koller <ricarkol@google.com>, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Axel Rasmussen <axelrasmussen@google.com>, 
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev, peterx@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Feb 11, 2023 at 01:37:59AM +0000, Oliver Upton wrote:
+On Thu, Feb 16, 2023 at 10:53=E2=80=AFAM Anish Moorthy <amoorthy@google.com=
+> wrote:
+>
+> On Wed, Feb 15, 2023 at 12:59 AM Oliver Upton <oliver.upton@linux.dev> wr=
+ote:
+> >
+> > How is userspace expected to differentiate the gup_fast() failed exit
+> > from the guest-private memory exit? I don't think flags are a good idea
+> > for this, as it comes with the illusion that both events can happen on =
+a
+> > single exit. In reality, these are mutually exclusive.
+> >
+> > A fault type/code would be better here, with the option to add flags at
+> > a later date that could be used to further describe the exit (if
+> > needed).
+>
+> Agreed. Something like this, then?
+>
+> +    struct {
+> +        __u32 fault_code;
+> +        __u64 reserved;
+> +        __u64 gpa;
+> +        __u64 size;
+> +    } memory_fault;
+>
+> The "reserved" field is meant to be the placeholder for a future "flags" =
+field.
+> Let me know if there's a better/more conventional way to achieve this.
 
-[...]
+On Thu, Feb 16, 2023 at 10:53=E2=80=AFAM Anish Moorthy <amoorthy@google.com=
+> wrote:
+>
+> 1. As Oliver touches on earlier, we'll probably want to use this same fie=
+ld for
+>    different classes of memory fault in the future (such as the ones whic=
+h Chao
+>    is introducing in [1]): so it does make sense to add "code" and "flags=
+"
+>    fields which can be used to communicate more information to the user (=
+and
+>    which can just be set to MEM_FAULT_NOWAIT/0 in this series).
 
-> +    struct kvm_smccc_filter_range {
-> +            __u32 base;
-> +            __u32 nr_functions;
-> +            __u8 action;
-> +            __u8 pad[7];
-> +    };
-> +
-> +    struct kvm_smccc_filter {
-> +            __u32 nr_entries;
-> +            __u32 pad;
-> +
-> +            struct kvm_smccc_filter_range entries[];
-> +    };
+Let me walk back my responses here: I took a closer look at Chao's series, =
+and
+it doesn't seem that I should be trying to share KVM_EXIT_MEMORY_FAULT with=
+ it
+in the first place. As far as I can understand (not that much, to be clear =
+:)
+we're signaling unrelated things, so it makes more sense to use different e=
+xits
+(ie, rename mine to KVM_EXIT_MEMORY_FAULT_NOWAIT). That would prevent any
+potential confusion about mutual exclusivity.
 
-After dealing with this when writing the selftest, I feel like this is a
-bit over complicated for both userspace and kernel.
+That also removes the need for a "fault_code" field in "memory_fault", whic=
+h I
+could rename to something more general like "guest_memory_range". As for th=
+e
+"reserved" field, we could keep it around if we care about reusing
+"guest_memory_range" between exits, or discard it if we don't.
 
-Next revision will take a similar approach to the PMU event filter,
-allowing userspace to insert new ranges into the filter with successive
-calls to the interface.
+On Thu, Feb 16, 2023 at 1:38=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Thu, Feb 16, 2023, Anish Moorthy wrote:
+> > On Wed, Feb 15, 2023 at 12:59 AM Oliver Upton <oliver.upton@linux.dev> =
+wrote:
+> > > > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > > > > index 109b18e2789c4..9352e7f8480fb 100644
+> > > > > --- a/include/linux/kvm_host.h
+> > > > > +++ b/include/linux/kvm_host.h
+> > > > > @@ -801,6 +801,9 @@ struct kvm {
+> > > > >     bool vm_bugged;
+> > > > >     bool vm_dead;
+> > > > >
+> > > > > +   rwlock_t mem_fault_nowait_lock;
+> > > > > +   bool mem_fault_nowait;
+> > > >
+> > > > A full-fat rwlock to protect a single bool? What benefits do you
+> > > > expect from a rwlock? Why is it preferable to an atomic access, or =
+a
+> > > > simple bitop?
+> > >
+> > > There's no need to have any kind off dedicated atomicity.  The only r=
+eaders are
+> > > in vCPU context, just disallow KVM_CAP_MEM_FAULT_NOWAIT after vCPUs a=
+re created.
+> >
+> > I think we do need atomicity here.
+>
+> Atomicity, yes.  Mutually exclusivity, no.  AFAICT, nothing will break if=
+ userspace
+> has multiple in-flight calls to toggled the flag.  And if we do want to g=
+uarantee
+> there's only one writer, then kvm->lock or kvm->slots_lock will suffice.
+>
+> > Since we want to support this without having to pause vCPUs, there's an
+> > atomicity requirement.
+>
+> Ensuring that vCPUs "see" the new value and not corrupting memory are two=
+ very
+> different things.  Making the flag an atomic, wrapping with a rwlock, etc=
+... do
+> nothing to ensure vCPUs observe the new value.  And for non-crazy usage o=
+f bools,
+> they're not even necessary to avoid memory corruption...
 
--- 
-Thanks,
-Oliver
+Oh, that's news to me- I've learned to treat any unprotected concurrent acc=
+esses
+to memory as undefined behavior: guess there's always more to learn.
+
+> I think what you really want to achieve is that vCPUs observe the NOWAIT =
+flag
+> before KVM returns to userspace.  There are a variety of ways to make tha=
+t happen,
+> but since this all about accessing guest memory, the simplest is likely t=
+o
+> "protect" the flag with kvm->srcu, i.e. require SRCU be held by readers a=
+nd then
+> do a synchronize_srcu() to ensure all vCPUs have picked up the new value.
+>
+> Speaking of SRCU (which protect memslots), why not make this a memslot fl=
+ag?  If
+> the goal is to be able to turn the behavior on/off dynamically, wouldn't =
+it be
+> beneficial to turn off the NOWAIT behavior when a memslot is fully transf=
+ered?
+
+Thanks for the suggestions, I never considered making this a memslot flag
+actually. so I'll go look into that.
