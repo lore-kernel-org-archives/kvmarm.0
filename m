@@ -1,40 +1,40 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7874633
-	for <kvmarm@lists.linux.dev>; Sat, 18 Feb 2023 03:23:28 +0000 (UTC)
-Received: by mail-pf1-f201.google.com with SMTP id cv11-20020a056a0044cb00b005a8534314aeso1520307pfb.17
-        for <kvmarm@lists.linux.dev>; Fri, 17 Feb 2023 19:23:28 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCD78633
+	for <kvmarm@lists.linux.dev>; Sat, 18 Feb 2023 03:23:30 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-536629d5255so20398937b3.2
+        for <kvmarm@lists.linux.dev>; Fri, 17 Feb 2023 19:23:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1676690608;
+        d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=V+h39w+M5y7yM65vTe8AIma457bKn0boXmudJkmUO64=;
-        b=OOGQDAozfJPxU4cPh+eNsnFORVxhBseQ4po+PMVYCaaHrMa27a9eZwz2HjcuIdNgVh
-         slYOm4TsOONQCaqTOCU64Vyqjc6wA23716ZiGacc/GuZx9D+Ze+sZX3iXZOiGOJPfzWw
-         DEoYq/LLYfSROStk+2ZwCOK08p6EUsCQQomIY0RjEmXUx1ogiu0aDnkPstrbqkFIAsIO
-         MmTUzMho1a89tjVA6XSHJPzknQsAy9d3/oybmTkcrgybl1jryNlrmOncv1u6qAqxxR1C
-         WAcxMZX5PvwwVrEDyVwVNABO4a3hoCllU8GjbsW9Wy5fF9tXx1SQaV4ccNARUsNP0pKc
-         brWQ==
+        bh=gbSTlN/R7sFLt7NEbeV1LfkNJ13li3QgpciXxHucdPA=;
+        b=E0v+pTVBD+PSap3EzWQTe4YgZHdD3KpfYSMjGDEHoHtzSZA1YJl3ulfRCks+5Owyt5
+         K6bRvtd7t4remMKuC1QA4CbInOm8Az9V70RCAmA4TTxkqVnGM3kryG4h/xiYALh/WZn+
+         w+A0HqPccdEyRgRY0A5xCezTI1SSIYjvDzBSVfaRn+YCUIOK2xRRIlz88uDHe+G0p7n4
+         lkeU7LLh50RJJ1qAuNVL5TfJuMwNIJNl501QI1ZVV13ldXugMj40GTYVUYC4IUMSBUjB
+         fqGcKmqbuvYciJjKCMa/1ST96oCjo+imza9ssRGIstb5qvD397xkVtqaceDQKchyWNkn
+         82qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1676690608;
+        d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V+h39w+M5y7yM65vTe8AIma457bKn0boXmudJkmUO64=;
-        b=HFbowx8Maa09sqVV5s4pjAIKXDi8Jpin5azoLjLpjd76OBDBLEPJbPEjQYR1KFYC/7
-         QTorENq5q/WOqO6+68ycZ45Vr5VO7IBc8l31D630ClOmUP2O5ySVr+lkZORz3UTiVjXa
-         LZQWM0CudwpUGwNmCR6V3eA3CWNwbRYDKCWgT8/qU5AjnsC1j0lRXWTBBOi/WtkxoLhk
-         lhzVWvw64t5U/Nq7B6k4lepVvkfT1VHIN/kcatprQOjcbSmmHamw2Wb8xUdVs2ArmOdK
-         5X/TrhCtaXcJws0srmAeqZHnFe7/M14nipN4No/UCey45u3mViv09SK0CGJAg5h5kY5X
-         7MxA==
-X-Gm-Message-State: AO0yUKXQNBIx30aeQReTjpQl+ylGOyz74i6ImJuouzcxuKxDzgCnf74G
-	Ucell2RoFehDOZO//OzPm2CBt1mJ9PewZA==
-X-Google-Smtp-Source: AK7set+NggMflM6BNmRBHhGqrUcGVQByOp77BaqX2/+UoO+KkK/O0C3um/TDX+sbYIPuNVsMZ/613iCYuJMYfA==
+        bh=gbSTlN/R7sFLt7NEbeV1LfkNJ13li3QgpciXxHucdPA=;
+        b=Waq+fDj/aydkHWe6Qju0RjnrsrV4WPBU3BCstZXStcVb6pj+citQVoeJg8Ze6UlYnU
+         FeehuS5HDXPB0/KESxzms0eJtoTCC46iIvrjAzS/m0kKiPpY/nxn+niuHtnoVW35EFyq
+         wwqMr1vG0lk3+giL3U2PEWk20mhRo6tD1GdEp323kgAhgKt1xsHGvHJ3u6MPDfMkFrmm
+         ya07/IQgv7qv4qjKIJLh6ZUWikrUkLOrZtA4j2kE3jFodxqA0XdzYPjYVdE/xM5MFMUH
+         t/3chIY+ei0hKC8S6qt7nrUj/rbZ6Ldkbz2bixvBo1NZuNNyQwR72L+kGeg99gNixrUn
+         m2EA==
+X-Gm-Message-State: AO0yUKVAB5u9cHuT7qXpfy4Iq/oG+9mqvLHu3D3CbTMwAubmU365URqO
+	ue9NZ7WUhkUo01y5meJNaCffYr6+ckRzFQ==
+X-Google-Smtp-Source: AK7set+v9+2nJ8bLXXnFa4tQDFP6zCdWRXjm1KjqbKbtydcgLmUPwO9K33R4Fjrw+bmLxEo8QVvkvA80BWj83w==
 X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a17:902:7207:b0:19c:2b30:f22e with SMTP
- id ba7-20020a170902720700b0019c2b30f22emr354082plb.11.1676690608082; Fri, 17
- Feb 2023 19:23:28 -0800 (PST)
-Date: Sat, 18 Feb 2023 03:23:09 +0000
+ (user=ricarkol job=sendgmr) by 2002:a81:4703:0:b0:527:3e8:5a94 with SMTP id
+ u3-20020a814703000000b0052703e85a94mr1004218ywa.68.1676690609825; Fri, 17 Feb
+ 2023 19:23:29 -0800 (PST)
+Date: Sat, 18 Feb 2023 03:23:10 +0000
 In-Reply-To: <20230218032314.635829-1-ricarkol@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230218032314.635829-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.39.2.637.g21b0678d19-goog
-Message-ID: <20230218032314.635829-8-ricarkol@google.com>
-Subject: [PATCH v4 07/12] KVM: arm64: Export kvm_are_all_memslots_empty()
+Message-ID: <20230218032314.635829-9-ricarkol@google.com>
+Subject: [PATCH v4 08/12] KVM: arm64: Add KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
 From: Ricardo Koller <ricarkol@google.com>
 To: pbonzini@redhat.com, maz@kernel.org, oupton@google.com, 
 	yuzenghui@huawei.com, dmatlack@google.com
@@ -53,45 +53,157 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
 	catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com, 
 	alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com, 
 	gshan@redhat.com, reijiw@google.com, rananta@google.com, bgardon@google.com, 
-	ricarkol@gmail.com, Ricardo Koller <ricarkol@google.com>
+	ricarkol@gmail.com, Ricardo Koller <ricarkol@google.com>, 
+	Oliver Upton <oliver.upton@linux.dev>
 Content-Type: text/plain; charset="UTF-8"
 
-Export kvm_are_all_memslots_empty(). This will be used by a future
-commit when checking before setting a capability.
+Add a capability for userspace to specify the eager split chunk size.
+The chunk size specifies how many pages to break at a time, using a
+single allocation. Bigger the chunk size, more pages need to be
+allocated ahead of time.
 
-No functional change intended.
-
+Suggested-by: Oliver Upton <oliver.upton@linux.dev>
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- include/linux/kvm_host.h | 2 ++
- virt/kvm/kvm_main.c      | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ Documentation/virt/kvm/api.rst    | 26 ++++++++++++++++++++++++++
+ arch/arm64/include/asm/kvm_host.h | 19 +++++++++++++++++++
+ arch/arm64/kvm/arm.c              | 22 ++++++++++++++++++++++
+ arch/arm64/kvm/mmu.c              |  3 +++
+ include/uapi/linux/kvm.h          |  1 +
+ 5 files changed, 71 insertions(+)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 4f26b244f6d0..8c5530e03a78 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -991,6 +991,8 @@ static inline bool kvm_memslots_empty(struct kvm_memslots *slots)
- 	return RB_EMPTY_ROOT(&slots->gfn_tree);
- }
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 9807b05a1b57..a9332e331cce 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -8284,6 +8284,32 @@ structure.
+ When getting the Modified Change Topology Report value, the attr->addr
+ must point to a byte where the value will be stored or retrieved from.
  
-+bool kvm_are_all_memslots_empty(struct kvm *kvm);
++8.40 KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
++---------------------------------------
 +
- #define kvm_for_each_memslot(memslot, bkt, slots)			      \
- 	hash_for_each(slots->id_hash, bkt, memslot, id_node[slots->node_idx]) \
- 		if (WARN_ON_ONCE(!memslot->npages)) {			      \
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 9c60384b5ae0..3940d2467e1b 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4604,7 +4604,7 @@ int __attribute__((weak)) kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 	return -EINVAL;
- }
++:Capability: KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
++:Architectures: arm64
++:Type: vm
++:Parameters: arg[0] is the new chunk size.
++:Returns: 0 on success, -EINVAL if any memslot has been created.
++
++This capability sets the chunk size used in Eager Page Splitting.
++
++Eager Page Splitting improves the performance of dirty-logging (used
++in live migrations) when guest memory is backed by huge-pages.  This
++optimization is enabled by default on arm64. It avoids splitting
++huge-pages (into PAGE_SIZE pages) on fault, by doing it eagerly when
++enabling dirty logging (with the KVM_MEM_LOG_DIRTY_PAGES flag for a
++memory region), or when using KVM_CLEAR_DIRTY_LOG.
++
++The chunk size specifies how many pages to break at a time, using a
++single allocation for each chunk. Bigger the chunk size, more pages
++need to be allocated ahead of time. A good heuristic is to pick the
++size of the huge-pages as the chunk size.
++
++If the chunk size (arg[0]) is zero, then no eager page splitting is
++performed. The default value PMD size (e.g., 2M when PAGE_SIZE is 4K).
++
+ 9. Known KVM API problems
+ =========================
  
--static bool kvm_are_all_memslots_empty(struct kvm *kvm)
-+bool kvm_are_all_memslots_empty(struct kvm *kvm)
- {
- 	int i;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 35a159d131b5..1445cbf6295e 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -153,6 +153,25 @@ struct kvm_s2_mmu {
+ 	/* The last vcpu id that ran on each physical CPU */
+ 	int __percpu *last_vcpu_ran;
+ 
++#define KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT	PMD_SIZE
++	/*
++	 * Memory cache used to split
++	 * KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE worth of huge pages. It
++	 * is used to allocate stage2 page tables while splitting huge
++	 * pages. Note that the choice of EAGER_PAGE_SPLIT_CHUNK_SIZE
++	 * influences both the capacity of the split page cache, and
++	 * how often KVM reschedules. Be wary of raising CHUNK_SIZE
++	 * too high.
++	 *
++	 * A good heuristic to pick CHUNK_SIZE is that it should be
++	 * the size of the huge-pages backing guest memory. If not
++	 * known, the PMD size (usually 2M) is a good guess.
++	 *
++	 * Protected by kvm->slots_lock.
++	 */
++	struct kvm_mmu_memory_cache split_page_cache;
++	uint64_t split_page_chunk_size;
++
+ 	struct kvm_arch *arch;
+ };
+ 
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 9c5573bc4614..c80617ced599 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -101,6 +101,22 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		r = 0;
+ 		set_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags);
+ 		break;
++	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
++		mutex_lock(&kvm->lock);
++		mutex_lock(&kvm->slots_lock);
++		/*
++		 * To keep things simple, allow changing the chunk
++		 * size only if there are no memslots created.
++		 */
++		if (!kvm_are_all_memslots_empty(kvm)) {
++			r = -EINVAL;
++		} else {
++			r = 0;
++			kvm->arch.mmu.split_page_chunk_size = cap->args[0];
++		}
++		mutex_unlock(&kvm->slots_lock);
++		mutex_unlock(&kvm->lock);
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		break;
+@@ -298,6 +314,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ARM_PTRAUTH_GENERIC:
+ 		r = system_has_full_ptr_auth();
+ 		break;
++	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
++		if (kvm)
++			r = kvm->arch.mmu.split_page_chunk_size;
++		else
++			r = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
++		break;
+ 	default:
+ 		r = 0;
+ 	}
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 812633a75e74..e2ada6588017 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -755,6 +755,9 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+ 	for_each_possible_cpu(cpu)
+ 		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
+ 
++	mmu->split_page_cache.gfp_zero = __GFP_ZERO;
++	mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
++
+ 	mmu->pgt = pgt;
+ 	mmu->pgd_phys = __pa(pgt->pgd);
+ 	return 0;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 55155e262646..02e05f7918e2 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1175,6 +1175,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
+ #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
+ #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
++#define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 226
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
  
 -- 
 2.39.2.637.g21b0678d19-goog
