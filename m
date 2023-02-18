@@ -1,40 +1,40 @@
 Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F01633
-	for <kvmarm@lists.linux.dev>; Sat, 18 Feb 2023 03:23:19 +0000 (UTC)
-Received: by mail-yb1-f202.google.com with SMTP id e83-20020a25e756000000b0086349255277so2754983ybh.8
-        for <kvmarm@lists.linux.dev>; Fri, 17 Feb 2023 19:23:19 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E4D862F
+	for <kvmarm@lists.linux.dev>; Sat, 18 Feb 2023 03:23:21 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id v74-20020a252f4d000000b0087f69905709so2950112ybv.10
+        for <kvmarm@lists.linux.dev>; Fri, 17 Feb 2023 19:23:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=G8W7vR0PRQmPGFMPIXJ++IapBHBRtIMd4Chx9W9B5Ps=;
-        b=jfshQ85qJucHKlc9NtInF4jRlhylfSuyLpB0sjsaublJRAg8aCadTARhFFiJRw1CtZ
-         brVcjj52MiE0ZT3l4SduCr0zSuPGVfnqTPiukrZlRVA4eALEupuFrrYCnq5vUQYl2Yow
-         NrtMlFuEZThW3dk+ytyBqPvXroS0hxtB/1aIyqry1xz/e+/dV2bvZ4HQ6JABHdUssUcS
-         4XaS2Ua584WH8LqzqavcXtevKQVKiyK9i980P+IzC4FY6iRe10ITilbboKKulq8MZAZg
-         7PbRpdikVvWIM8uwUTJwvIRa98Awv4Y+ZuGx7+w25P1x/BTHXwQaaOk8Kz2u4GMQwOS7
-         ZP5Q==
+        bh=PtIyUzFZ+POnJVZohdUvw1RC8Y306B94OJRPN02aY5c=;
+        b=QsgbrZlEi/GSuCuA7VqSJwr0EbqZk15xghg0MEeMJz3ukp2oWwmJioHUunXOyKO6Vy
+         lpC8ZwHBaRHAlzyrAxuiQGsrk5liGTE6g45MndH31A4qfkLWojBd1aCZQuD6DMXlA806
+         h3mA8K9YeW4vLINy6ISLvQ1st9ABmnhZv0Dgvc9fJ8+6x5/wKK5WNeVhUSipjFsnjxoo
+         f/8NDCIqgjDNL8JoWf4XXHHj+AHFZRiwlMgbnA48sS3pYzzPzBw6ak4ptnXmhvwnaYP/
+         hln4dEo8MUye8l5HtH99LKsDpapy4hYhivyckGcwKWA4vxESOa8JrvfBOcbiE775x75Y
+         Gn6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=G8W7vR0PRQmPGFMPIXJ++IapBHBRtIMd4Chx9W9B5Ps=;
-        b=feExt/30WLyOb7D84BO+6OGY8ZWFzX0l1Nu4Z6GjxG07lhVzHOWmgy7crTgmuBKKvI
-         /Cx0fBlmMeH3qCsf2F6F1fX16Py8wQWLHBW4nBjaL83Jf23IsZCVf4Y/uDH4U6S6S/FI
-         dcvmnAmPXnTAe+pqTHo0OpnaZ8Kli4M6UDHy/j3u12D83DDrzViQZfx0jHrFQAq03yI8
-         ikezokbSnXLRHkp8sISvvHwjXaRWju8I2cGxRO2X4Zzcf7XRB2ZFSsL8ZSW7N513xUdS
-         m9fgGM733CY3gwEkgrsBBCi3jQCML4QTIZAR8nPCWwBRwomFivSlncPrHb/w+OLPCprZ
-         psAQ==
-X-Gm-Message-State: AO0yUKWMNHkUW0k0J7yPC/2Tw1d3/3q+5t2Cj4ESvQ6kLSJzpmbxwVB5
-	kyKqqrQ7kCZd/rd5EzpgKr691I6aaRj2XQ==
-X-Google-Smtp-Source: AK7set8xVKfNyBAGZlVz+zxNxGP3IALOxKRKuRoHBiLyPDSeaWu4wCUI5EWWUpiE3JolGW6iyDb4YSaev4n/Mg==
+        bh=PtIyUzFZ+POnJVZohdUvw1RC8Y306B94OJRPN02aY5c=;
+        b=nYEB2KoTSiOsK5r6bcbaX1N9Z6q3/qocnJt5NBA78NpSqGDmEV3kvAzCLMTMoO3FYT
+         CLxszkTB2CoRfjKzu3f1V16OPNjE6eQwd7gJDRPb58D0WdLDTXxv2WCCdi+gOi7gzTzm
+         t8qRSG1bI4VzJ0fhrjfoNPYOlcBFD+jczZbHYHIzZeD4BFeFtKuiaPNC3YinR+k3OMV1
+         8rTEXAAwXhrihvm/vtR7cui3quDUiklfX6GPmiUmaL2DaAkXJjPHB64p782DX5r0G1mi
+         4Z54zM4kw8DUhNQUKV3YkxMqe4IlZ0cZ7Lm9l9DWRLEFr6VoOs2V5hrjbUguBUCC1kE6
+         2IDQ==
+X-Gm-Message-State: AO0yUKVCgjoCeBhDsXFR6HrV4JKOY/BSYuIFq2LI5JirBba/NPCOskD9
+	1LRYtkOK/uCyiSEKg8nTY5/wqGvxxrnMlA==
+X-Google-Smtp-Source: AK7set+V3zRtYJ8+vOkQY169szCDURd19+1oKMsz/bWzZPDgcECJmnpTwzBdBirzbaOdf3cXwjZcIhLZ1Qbe6Q==
 X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a81:6a03:0:b0:533:9485:c828 with SMTP id
- f3-20020a816a03000000b005339485c828mr831393ywc.512.1676690598494; Fri, 17 Feb
- 2023 19:23:18 -0800 (PST)
-Date: Sat, 18 Feb 2023 03:23:03 +0000
+ (user=ricarkol job=sendgmr) by 2002:a05:6902:10c:b0:997:c919:4484 with SMTP
+ id o12-20020a056902010c00b00997c9194484mr49779ybh.6.1676690600280; Fri, 17
+ Feb 2023 19:23:20 -0800 (PST)
+Date: Sat, 18 Feb 2023 03:23:04 +0000
 In-Reply-To: <20230218032314.635829-1-ricarkol@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,9 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230218032314.635829-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.39.2.637.g21b0678d19-goog
-Message-ID: <20230218032314.635829-2-ricarkol@google.com>
-Subject: [PATCH v4 01/12] KVM: arm64: Add KVM_PGTABLE_WALK ctx->flags for
- skipping BBM and CMO
+Message-ID: <20230218032314.635829-3-ricarkol@google.com>
+Subject: [PATCH v4 02/12] KVM: arm64: Rename free_unlinked to free_removed
 From: Ricardo Koller <ricarkol@google.com>
 To: pbonzini@redhat.com, maz@kernel.org, oupton@google.com, 
 	yuzenghui@huawei.com, dmatlack@google.com
@@ -54,111 +53,164 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
 	catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com, 
 	alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com, 
 	gshan@redhat.com, reijiw@google.com, rananta@google.com, bgardon@google.com, 
-	ricarkol@gmail.com, Ricardo Koller <ricarkol@google.com>
+	ricarkol@gmail.com, Ricardo Koller <ricarkol@google.com>, 
+	Oliver Upton <oliver.upton@linux.dev>
 Content-Type: text/plain; charset="UTF-8"
 
-Add two flags to kvm_pgtable_visit_ctx, KVM_PGTABLE_WALK_SKIP_BBM and
-KVM_PGTABLE_WALK_SKIP_CMO, to indicate that the walk should not
-perform break-before-make (BBM) nor cache maintenance operations
-(CMO). This will by a future commit to create unlinked tables not
-accessible to the HW page-table walker.  This is safe as these removed
-tables are not visible to the HW page-table walker.
+Normalize on referring to tables outside of an active paging structure
+as 'unlinked'.
+
+A subsequent change to KVM will add support for building page tables
+that are not part of an active paging structure. The existing
+'removed_table' terminology is quite clunky when applied in this
+context.
+
+No functional change intended.
 
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 18 ++++++++++++++++++
- arch/arm64/kvm/hyp/pgtable.c         | 27 ++++++++++++++++-----------
- 2 files changed, 34 insertions(+), 11 deletions(-)
+ arch/arm64/include/asm/kvm_pgtable.h  |  8 ++++----
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c |  6 +++---
+ arch/arm64/kvm/hyp/pgtable.c          |  6 +++---
+ arch/arm64/kvm/mmu.c                  | 10 +++++-----
+ 4 files changed, 15 insertions(+), 15 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 63f81b27a4e3..252b651f743d 100644
+index 252b651f743d..dcd3aafd3e6c 100644
 --- a/arch/arm64/include/asm/kvm_pgtable.h
 +++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -188,12 +188,20 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
-  *					children.
-  * @KVM_PGTABLE_WALK_SHARED:		Indicates the page-tables may be shared
-  *					with other software walkers.
-+ * @KVM_PGTABLE_WALK_SKIP_BBM:		Visit and update table entries
-+ *					without Break-before-make
-+ *					requirements.
-+ * @KVM_PGTABLE_WALK_SKIP_CMO:		Visit and update table entries
-+ *					without Cache maintenance
-+ *					operations required.
-  */
- enum kvm_pgtable_walk_flags {
- 	KVM_PGTABLE_WALK_LEAF			= BIT(0),
- 	KVM_PGTABLE_WALK_TABLE_PRE		= BIT(1),
- 	KVM_PGTABLE_WALK_TABLE_POST		= BIT(2),
- 	KVM_PGTABLE_WALK_SHARED			= BIT(3),
-+	KVM_PGTABLE_WALK_SKIP_BBM		= BIT(4),
-+	KVM_PGTABLE_WALK_SKIP_CMO		= BIT(5),
- };
+@@ -99,7 +99,7 @@ static inline bool kvm_level_supports_block_mapping(u32 level)
+  *				allocation is physically contiguous.
+  * @free_pages_exact:		Free an exact number of memory pages previously
+  *				allocated by zalloc_pages_exact.
+- * @free_removed_table:		Free a removed paging structure by unlinking and
++ * @free_unlinked_table:	Free an unlinked paging structure by unlinking and
+  *				dropping references.
+  * @get_page:			Increment the refcount on a page.
+  * @put_page:			Decrement the refcount on a page. When the
+@@ -119,7 +119,7 @@ struct kvm_pgtable_mm_ops {
+ 	void*		(*zalloc_page)(void *arg);
+ 	void*		(*zalloc_pages_exact)(size_t size);
+ 	void		(*free_pages_exact)(void *addr, size_t size);
+-	void		(*free_removed_table)(void *addr, u32 level);
++	void		(*free_unlinked_table)(void *addr, u32 level);
+ 	void		(*get_page)(void *addr);
+ 	void		(*put_page)(void *addr);
+ 	int		(*page_count)(void *addr);
+@@ -450,7 +450,7 @@ int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
  
- struct kvm_pgtable_visit_ctx {
-@@ -215,6 +223,16 @@ static inline bool kvm_pgtable_walk_shared(const struct kvm_pgtable_visit_ctx *c
- 	return ctx->flags & KVM_PGTABLE_WALK_SHARED;
+ /**
+- * kvm_pgtable_stage2_free_removed() - Free a removed stage-2 paging structure.
++ * kvm_pgtable_stage2_free_unlinked() - Free an unlinked stage-2 paging structure.
+  * @mm_ops:	Memory management callbacks.
+  * @pgtable:	Unlinked stage-2 paging structure to be freed.
+  * @level:	Level of the stage-2 paging structure to be freed.
+@@ -458,7 +458,7 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
+  * The page-table is assumed to be unreachable by any hardware walkers prior to
+  * freeing and therefore no TLB invalidation is performed.
+  */
+-void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
++void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
+ 
+ /**
+  * kvm_pgtable_stage2_map() - Install a mapping in a guest stage-2 page-table.
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index 552653fa18be..b030170d803b 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -91,9 +91,9 @@ static void host_s2_put_page(void *addr)
+ 	hyp_put_page(&host_s2_pool, addr);
  }
  
-+static inline bool kvm_pgtable_walk_skip_bbm(const struct kvm_pgtable_visit_ctx *ctx)
-+{
-+	return ctx->flags & KVM_PGTABLE_WALK_SKIP_BBM;
-+}
-+
-+static inline bool kvm_pgtable_walk_skip_cmo(const struct kvm_pgtable_visit_ctx *ctx)
-+{
-+	return ctx->flags & KVM_PGTABLE_WALK_SKIP_CMO;
-+}
-+
- /**
-  * struct kvm_pgtable_walker - Hook into a page-table walk.
-  * @cb:		Callback function to invoke during the walk.
+-static void host_s2_free_removed_table(void *addr, u32 level)
++static void host_s2_free_unlinked_table(void *addr, u32 level)
+ {
+-	kvm_pgtable_stage2_free_removed(&host_mmu.mm_ops, addr, level);
++	kvm_pgtable_stage2_free_unlinked(&host_mmu.mm_ops, addr, level);
+ }
+ 
+ static int prepare_s2_pool(void *pgt_pool_base)
+@@ -110,7 +110,7 @@ static int prepare_s2_pool(void *pgt_pool_base)
+ 	host_mmu.mm_ops = (struct kvm_pgtable_mm_ops) {
+ 		.zalloc_pages_exact = host_s2_zalloc_pages_exact,
+ 		.zalloc_page = host_s2_zalloc_page,
+-		.free_removed_table = host_s2_free_removed_table,
++		.free_unlinked_table = host_s2_free_unlinked_table,
+ 		.phys_to_virt = hyp_phys_to_virt,
+ 		.virt_to_phys = hyp_virt_to_phys,
+ 		.page_count = hyp_page_count,
 diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index b11cf2c618a6..e093e222daf3 100644
+index e093e222daf3..0a5ef9288371 100644
 --- a/arch/arm64/kvm/hyp/pgtable.c
 +++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -717,14 +717,17 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
- 	if (!stage2_try_set_pte(ctx, KVM_INVALID_PTE_LOCKED))
- 		return false;
+@@ -841,7 +841,7 @@ static int stage2_map_walk_table_pre(const struct kvm_pgtable_visit_ctx *ctx,
+ 	if (ret)
+ 		return ret;
  
--	/*
--	 * Perform the appropriate TLB invalidation based on the evicted pte
--	 * value (if any).
--	 */
--	if (kvm_pte_table(ctx->old, ctx->level))
--		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
--	else if (kvm_pte_valid(ctx->old))
--		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
-+	if (!kvm_pgtable_walk_skip_bbm(ctx)) {
-+		/*
-+		 * Perform the appropriate TLB invalidation based on the
-+		 * evicted pte value (if any).
-+		 */
-+		if (kvm_pte_table(ctx->old, ctx->level))
-+			kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-+		else if (kvm_pte_valid(ctx->old))
-+			kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu,
-+				     ctx->addr, ctx->level);
-+	}
+-	mm_ops->free_removed_table(childp, ctx->level);
++	mm_ops->free_unlinked_table(childp, ctx->level);
+ 	return 0;
+ }
  
- 	if (stage2_pte_is_counted(ctx->old))
- 		mm_ops->put_page(ctx->ptep);
-@@ -808,11 +811,13 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
- 		return -EAGAIN;
+@@ -886,7 +886,7 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+  * The TABLE_PRE callback runs for table entries on the way down, looking
+  * for table entries which we could conceivably replace with a block entry
+  * for this mapping. If it finds one it replaces the entry and calls
+- * kvm_pgtable_mm_ops::free_removed_table() to tear down the detached table.
++ * kvm_pgtable_mm_ops::free_unlinked_table() to tear down the detached table.
+  *
+  * Otherwise, the LEAF callback performs the mapping at the existing leaves
+  * instead.
+@@ -1250,7 +1250,7 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
+ 	pgt->pgd = NULL;
+ }
  
- 	/* Perform CMOs before installation of the guest stage-2 PTE */
--	if (mm_ops->dcache_clean_inval_poc && stage2_pte_cacheable(pgt, new))
-+	if (!kvm_pgtable_walk_skip_cmo(ctx) && mm_ops->dcache_clean_inval_poc &&
-+	    stage2_pte_cacheable(pgt, new))
- 		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(new, mm_ops),
--						granule);
-+					       granule);
+-void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level)
++void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level)
+ {
+ 	kvm_pteref_t ptep = (kvm_pteref_t)pgtable;
+ 	struct kvm_pgtable_walker walker = {
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index a3ee3b605c9b..9bd3c2cfb476 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -130,21 +130,21 @@ static void kvm_s2_free_pages_exact(void *virt, size_t size)
  
--	if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
-+	if (!kvm_pgtable_walk_skip_cmo(ctx) && mm_ops->icache_inval_pou &&
-+	    stage2_pte_executable(new))
- 		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
+ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops;
  
- 	stage2_make_pte(ctx, new);
+-static void stage2_free_removed_table_rcu_cb(struct rcu_head *head)
++static void stage2_free_unlinked_table_rcu_cb(struct rcu_head *head)
+ {
+ 	struct page *page = container_of(head, struct page, rcu_head);
+ 	void *pgtable = page_to_virt(page);
+ 	u32 level = page_private(page);
+ 
+-	kvm_pgtable_stage2_free_removed(&kvm_s2_mm_ops, pgtable, level);
++	kvm_pgtable_stage2_free_unlinked(&kvm_s2_mm_ops, pgtable, level);
+ }
+ 
+-static void stage2_free_removed_table(void *addr, u32 level)
++static void stage2_free_unlinked_table(void *addr, u32 level)
+ {
+ 	struct page *page = virt_to_page(addr);
+ 
+ 	set_page_private(page, (unsigned long)level);
+-	call_rcu(&page->rcu_head, stage2_free_removed_table_rcu_cb);
++	call_rcu(&page->rcu_head, stage2_free_unlinked_table_rcu_cb);
+ }
+ 
+ static void kvm_host_get_page(void *addr)
+@@ -681,7 +681,7 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
+ 	.zalloc_page		= stage2_memcache_zalloc_page,
+ 	.zalloc_pages_exact	= kvm_s2_zalloc_pages_exact,
+ 	.free_pages_exact	= kvm_s2_free_pages_exact,
+-	.free_removed_table	= stage2_free_removed_table,
++	.free_unlinked_table	= stage2_free_unlinked_table,
+ 	.get_page		= kvm_host_get_page,
+ 	.put_page		= kvm_s2_put_page,
+ 	.page_count		= kvm_host_page_count,
 -- 
 2.39.2.637.g21b0678d19-goog
 
