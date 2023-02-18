@@ -1,186 +1,254 @@
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6CB0946A
-	for <kvmarm@lists.linux.dev>; Fri, 17 Feb 2023 22:11:42 +0000 (UTC)
-Date: Fri, 17 Feb 2023 22:11:36 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1676671900;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YOtwXAHUOiyF0cWE///JxNQMG7Pj09nvjoeNGQ1jJPI=;
-	b=otuTkuRMVAI2H3ABHL2WvG01UFkH0pdnCMmcEM0csD2A//96XvHVPcG6adIKPd9e67dnox
-	T2/6IgERYYTD+z5A3pHXEwUeK6McncmtiL4H9wujj6eiZIjkefAOonwdVpFB3E9RbtbsMT
-	jZ+nxuC1DNLS3dMFeWYIXksrB6ohnN4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	Simon Veith <sveith@amazon.de>, dwmw2@infradead.org
-Subject: Re: [PATCH 08/16] KVM: arm64: timers: Allow userspace to set the
- counter offsets
-Message-ID: <Y+/7mO1sxH4jThmu@linux.dev>
-References: <20230216142123.2638675-1-maz@kernel.org>
- <20230216142123.2638675-9-maz@kernel.org>
- <Y+6pqz3pCwu7izZL@linux.dev>
- <86k00gy4so.wl-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD93162F
+	for <kvmarm@lists.linux.dev>; Sat, 18 Feb 2023 03:23:17 +0000 (UTC)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5365663d982so29957777b3.3
+        for <kvmarm@lists.linux.dev>; Fri, 17 Feb 2023 19:23:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=6ZCewEQd5vkrfkBY2DqxPlegfMd8h8RpUWFewGb6TNE=;
+        b=OBOyWFM3UWZshRFcdEI8eXdPQ7ySSC7HX1+ng0wa520fiO2Ck958GcKHv2qlHnShDg
+         8rUfqT4WxStsnN9ZMYno1keUPh5imI8ccZXm0LPPEPetdeFsjcVm78GsG4PoUIdn4po3
+         /PWnVfUt3Qpou+PePKrTnRbDZxkYyMLnAPpuZno7ApJmEtxt9URTowjmLF0PfMUah/B+
+         EsZTJhjSQnnaAdXCMFtuMgE4vlgGM1veSPaoaAOVOk+WJGDmxzx6sLlZ+7sJ9qocjRgi
+         7lT0D1+UPM4x4C37+KuUKfWGtJlMilnvjJeRv9KsPwUAfg+45z26HqKIjln42V6NLE9z
+         6tWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6ZCewEQd5vkrfkBY2DqxPlegfMd8h8RpUWFewGb6TNE=;
+        b=4rABKR//TrzzcCGcDkdYCKCD7g66QWxhhWQut1oZVmkvvnOd9Plg+u5fR2SN1tv9CQ
+         ZGjSdPgD6mCtn94UpXoT96/ZjIxLo4vW0D5a+qMgbrADb+ZrZmvIpwt0YPJW2pMmo7sr
+         aU+f/JkySA6cPJED/Q55C5gXURm/P74mFqmIpJi0CtVhbCM657U32mxobkLU0f4xtugK
+         tNkLNCmtDLvFp6khAiGOoBlIeW/HJTp+Z7uboPsSWe8eecbXQpCPyf8mYClybQpj2haM
+         VWweg4T+EW/3HnLb8rKf5qfaoXTOxJRdnCtGzp5cZWG6KCshztWIny9lOA3Zy33SAGVo
+         IOoA==
+X-Gm-Message-State: AO0yUKXf0ElS9+JRs1rvvuDJhRq2mJKxkcYMBNA0r0vmFqq7w0zYxiga
+	N5IIPpkr8nWcVX+yQ+8DT11Oe6hw0dLGZw==
+X-Google-Smtp-Source: AK7set8Tzb4cDOmF3DwYg8AHLy80Sr/Fr7dsKCFTsx7gFJABRL91kzR0pbdmZRBHPfoWgK5vzeDY5jc+UKBvTA==
+X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
+ (user=ricarkol job=sendgmr) by 2002:a81:8606:0:b0:52e:e6ed:308e with SMTP id
+ w6-20020a818606000000b0052ee6ed308emr1258183ywf.526.1676690596794; Fri, 17
+ Feb 2023 19:23:16 -0800 (PST)
+Date: Sat, 18 Feb 2023 03:23:02 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86k00gy4so.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.2.637.g21b0678d19-goog
+Message-ID: <20230218032314.635829-1-ricarkol@google.com>
+Subject: [PATCH v4 00/12] Implement Eager Page Splitting for ARM
+From: Ricardo Koller <ricarkol@google.com>
+To: pbonzini@redhat.com, maz@kernel.org, oupton@google.com, 
+	yuzenghui@huawei.com, dmatlack@google.com
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com, 
+	catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com, 
+	alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com, 
+	gshan@redhat.com, reijiw@google.com, rananta@google.com, bgardon@google.com, 
+	ricarkol@gmail.com, Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Feb 17, 2023 at 10:17:27AM +0000, Marc Zyngier wrote:
-> Hi Oliver,
-> 
-> On Thu, 16 Feb 2023 22:09:47 +0000,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-> > 
-> > Hi Marc,
-> > 
-> > On Thu, Feb 16, 2023 at 02:21:15PM +0000, Marc Zyngier wrote:
-> > > And this is the moment you have all been waiting for: setting the
-> > > counter offsets from userspace.
-> > > 
-> > > We expose a brand new capability that reports the ability to set
-> > > the offsets for both the virtual and physical sides, independently.
-> > > 
-> > > In keeping with the architecture, the offsets are expressed as
-> > > a delta that is substracted from the physical counter value.
-> > > 
-> > > Once this new API is used, there is no going back, and the counters
-> > > cannot be written to to set the offsets implicitly (the writes
-> > > are instead ignored).
-> > 
-> > Is there any particular reason to use an explicit ioctl as opposed to
-> > the KVM_{GET,SET}_DEVICE_ATTR ioctls? Dunno where you stand on it, but I
-> > quite like that interface for simple state management. We also avoid
-> > eating up more UAPI bits in the global namespace.
-> 
-> The problem with that is that it requires yet another KVM device for
-> this, and I'm lazy. It also makes it a bit harder for the VMM to buy
-> into this (need to track another FD, for example).
+Eager Page Splitting improves the performance of dirty-logging (used
+in live migrations) when guest memory is backed by huge-pages.  It's
+an optimization used in Google Cloud since 2016 on x86, and for the
+last couple of months on ARM.
 
-You can also accept the device ioctls on the actual VM FD, quite like
-we do for the vCPU right now. And hey, I've got a patch that gets you
-most of the way there!
+Background and motivation
+=========================
+Dirty logging is typically used for live-migration iterative copying.
+KVM implements dirty-logging at the PAGE_SIZE granularity (will refer
+to 4K pages from now on).  It does it by faulting on write-protected
+4K pages.  Therefore, enabling dirty-logging on a huge-page requires
+breaking it into 4K pages in the first place.  KVM does this breaking
+on fault, and because it's in the critical path it only maps the 4K
+page that faulted; every other 4K page is left unmapped.  This is not
+great for performance on ARM for a couple of reasons:
 
-https://lore.kernel.org/kvmarm/20230211013759.3556016-3-oliver.upton@linux.dev/
+- Splitting on fault can halt vcpus for milliseconds in some
+  implementations. Splitting a block PTE requires using a broadcasted
+  TLB invalidation (TLBI) for every huge-page (due to the
+  break-before-make requirement). Note that x86 doesn't need this. We
+  observed some implementations that take millliseconds to complete
+  broadcasted TLBIs when done in parallel from multiple vcpus.  And
+  that's exactly what happens when doing it on fault: multiple vcpus
+  fault at the same time triggering TLBIs in parallel.
 
-> > Is there any reason why we can't just order this ioctl before vCPU
-> > creation altogether, or is there a need to do this at runtime? We're
-> > about to tolerate multiple writers to the offset value, and I think the
-> > only thing we need to guarantee is that the below flag is set before
-> > vCPU ioctls have a chance to run.
-> 
-> Again, we don't know for sure whether the final offset is available
-> before vcpu creation time. My idea for QEMU would be to perform the
-> offset adjustment as late as possible, right before executing the VM,
-> after having restored the vcpus with whatever value they had.
+- Read intensive guest workloads end up paying for dirty-logging.
+  Only mapping the faulting 4K page means that all the other pages
+  that were part of the huge-page will now be unmapped. The effect is
+  that any access, including reads, now has to fault.
 
-So how does userspace work out an offset based on available information?
-The part that hasn't clicked for me yet is where userspace gets the
-current value of the true physical counter to calculate an offset.
+Eager Page Splitting (on ARM)
+=============================
+Eager Page Splitting fixes the above two issues by eagerly splitting
+huge-pages when enabling dirty logging. The goal is to avoid doing it
+while faulting on write-protected pages. This is what the TDP MMU does
+for x86 [0], except that x86 does it for different reasons: to avoid
+grabbing the MMU lock on fault. Note that taking care of
+write-protection faults still requires grabbing the MMU lock on ARM,
+but not on x86 (with the fast_page_fault path).
 
-We could make it ABI that the guest's physical counter matches that of
-the host by default. Of course, that has been the case since the
-beginning of time but it is now directly user-visible.
+An additional benefit of eagerly splitting huge-pages is that it can
+be done in a controlled way (e.g., via an IOCTL). This series provides
+two knobs for doing it, just like its x86 counterpart: when enabling
+dirty logging, and when using the KVM_CLEAR_DIRTY_LOG ioctl. The
+benefit of doing it on KVM_CLEAR_DIRTY_LOG is that this ioctl takes
+ranges, and not complete memslots like when enabling dirty logging.
+This means that the cost of splitting (mainly broadcasted TLBIs) can
+be throttled: split a range, wait for a bit, split another range, etc.
+The benefits of this approach were presented by Oliver Upton at KVM
+Forum 2022 [1].
 
-The only part I don't like about that is that we aren't fully creating
-an abstraction around host and guest system time. So here's my current
-mental model of how we represent the generic timer to userspace:
+Implementation
+==============
+Patches 3-4 add a pgtable utility function for splitting huge block
+PTEs: kvm_pgtable_stage2_split(). Patches 5-9 add support for eagerly
+splitting huge-pages when enabling dirty-logging and when using the
+KVM_CLEAR_DIRTY_LOG ioctl. Note that this is just like what x86 does,
+and the code is actually based on it.  And finally, patch 9:
 
-				+-----------------------+
-				|	   		|
-				| Host System Counter	|
-				|	   (1) 		|
-				+-----------------------+
-				    	   |
-			       +-----------+-----------+
-			       |		       |
-       +-----------------+  +-----+		    +-----+  +--------------------+
-       | (2) CNTPOFF_EL2 |--| sub |		    | sub |--| (3) CNTVOFF_EL2    |
-       +-----------------+  +-----+	     	    +-----+  +--------------------+
-			       |           	       |
-			       |		       |
-		     +-----------------+	 +----------------+
-		     | (5) CNTPCT_EL0  |         | (4) CNTVCT_EL0 |
-		     +-----------------+	 +----------------+
+	KVM: arm64: Use local TLBI on permission relaxation
 
-AFAICT, this UAPI exposes abstractions for (2) and (3) to userspace, but
-userspace cannot directly get at (1).
+adds support for using local TLBIs instead of broadcasts when doing
+permission relaxation. This last patch is key to achieving good
+performance during dirty-logging, as eagerly breaking huge-pages
+replaces mapping new pages with permission relaxation. Got this patch
+(indirectly) from Marc Z.  and took the liberty of adding a commit
+message.
 
-Chewing on this a bit more, I don't think userspace has any business
-messing with virtual and physical time independently, especially when
-nested virtualization comes into play.
+Note: this applies on top of 6.2-rc6.
 
-I think the illusion to userspace needs to be built around the notion of
-a system counter:
+Performance evaluation
+======================
+The performance benefits were tested using the dirty_log_perf_test
+selftest with 2M huge-pages.
 
-                                +-----------------------+
-                                |                       |
-                                | Host System Counter   |
-                                |          (1)          |
-                                +-----------------------+
-					   |
-					   |
-					+-----+   +-------------------+
-					| sub |---| (6) system_offset |
-					+-----+   +-------------------+
-					   |
-					   |
-                                +-----------------------+
-                                |                       |
-                                | Guest System Counter  |
-                                |          (7)          |
-                                +-----------------------+
-                                           |
-                               +-----------+-----------+
-                               |                       |
-       +-----------------+  +-----+                 +-----+  +--------------------+
-       | (2) CNTPOFF_EL2 |--| sub |                 | sub |--| (3) CNTVOFF_EL2    |
-       +-----------------+  +-----+                 +-----+  +--------------------+
-                               |                       |
-                               |                       |
-                     +-----------------+         +----------------+
-                     | (5) CNTPCT_EL0  |         | (4) CNTVCT_EL0 |
-                     +-----------------+         +----------------+
+The first test uses a write-only sequential workload where the stride
+is 2M instead of 4K [2]. The idea with this experiment is to emulate a
+random access pattern writing a different huge-page at every access.
+Observe that the benefit increases with the number of vcpus: up to
+5.76x for 152 vcpus. This table shows the guest dirtying time when
+using the CLEAR ioctl (and KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2):
 
-And from a UAPI perspective, we would either expose (1) and (6) to let
-userspace calculate an offset or simply allow (7) to be directly
-read/written.
+/dirty_log_perf_test_sparse -s anonymous_hugetlb_2mb -b 1G -v $i -i 3 -m 2
 
-That frees up the meaning of the counter offsets as being purely a
-virtual EL2 thing. These registers would reset to 0, and non-NV guests
-could never change their value.
+	+-------+----------+------------------+
+	| vCPUs | 6.2-rc3  | 6.2-rc3 + series |
+	|       |    (ms)  |             (ms) |
+	+-------+----------+------------------+
+	|    1  |    2.63  |          1.66    |
+	|    2  |    2.95  |          1.70    |
+	|    4  |    3.21  |          1.71    |
+	|    8  |    4.97  |          1.78    |
+	|   16  |    9.51  |          1.82    |
+	|   32  |   20.15  |          3.03    |
+	|   64  |   40.09  |          5.80    |
+	|  128  |   80.08  |         12.24    |
+	|  152  |  109.81  |         15.14    |
+	+-------+----------+------------------+
 
-Under the hood KVM would program the true offset registers as:
+This secondv test measures the benefit of eager page splitting on read
+intensive workloads (1 write for every 10 reads). As in the other
+test, the benefit increases with the number of vcpus, up to 8.82x for
+152 vcpus. This table shows the guest dirtying time when using the
+CLEAR ioctl (and KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2):
 
-	CNT{P,V}OFF_EL2 = 'virtual CNT{P,V}OFF_EL2' + system_offset
+./dirty_log_perf_test -s anonymous_hugetlb_2mb -b 1G -v $i -i 3 -m 2 -w 10
 
-With this we would effectively configure CNTPCT = CNTVCT = 0 at the
-point of VM creation. Only crappy thing is it requires full physical
-counter/timer emulation for non-ECV systems, but the guest shouldn't be
-using the physical counter in the first place.
+	+-------+----------+------------------+
+	| vCPUs | 6.2-rc3  | 6.2-rc3 + series |
+	|       |   (sec)  |            (sec) |
+	+-------+----------+------------------+
+	|    1  |    0.65  |          0.07    |
+	|    2  |    0.70  |          0.08    |
+	|    4  |    0.71  |          0.08    |
+	|    8  |    0.72  |          0.08    |
+	|   16  |    0.76  |          0.08    |
+	|   32  |    1.61  |          0.14    |
+	|   64  |    3.46  |          0.30    |
+	|  128  |    5.49  |          0.64    |
+	|  152  |    6.44  |          0.63    |
+	+-------+----------+------------------+
 
-Yes, this sucks for guests running on hosts w/ NV but not ECV. If anyone
-can tell me how an L0 hypervisor is supposed to do NV without ECV, I'm
-all ears.
+Changes from v3:
+https://lore.kernel.org/kvmarm/20230215174046.2201432-1-ricarkol@google.com/
+- KVM_PGTABLE_WALK_SKIP_CMO to use BIT(5). (Shaoqin)
+- Rewritten commit message for "Rename free_unlinked to free_removed"
+  using Oliver's suggestion. (Oliver)
+- "un" -> "an" typo. (Shaoqin)
+- kvm_pgtable_stage2_create_unlinked() to return a "kvm_pte_t *". (Oliver)
+- refactored stage2_block_get_nr_page_tables(). (Oliver)
+- /s/bock/block. (Shaoqin)
 
-Does any of what I've written make remote sense or have I gone entirely
-off the rails with my ASCII art? :)
+Changes from v2:
+https://lore.kernel.org/kvmarm/20230206165851.3106338-1-ricarkol@google.com/
+- removed redundant kvm_pte_table() check from split walker function. (Gavin)
+- fix compilation of patch 8 by moving some definitions from path 9. (Gavin)
+- add comment for kvm_mmu_split_nr_page_tables(). (Gavin)
+
+Changes from v1:
+https://lore.kernel.org/kvmarm/20230113035000.480021-1-ricarkol@google.com/
+- added a capability to set the eager splitting chunk size. This
+  indirectly sets the number of pages in the cache. It also allows for
+  opting out of this feature. (Oliver, Marc)
+- changed kvm_pgtable_stage2_split() to split 1g huge-pages
+  using either 513 or 1 at a time (with a cache of 1). (Oliver, Marc)
+- added force_pte arg to kvm_pgtable_stage2_create_removed().
+- renamed free_removed to free_unlinked. (Ben and Oliver)
+- added KVM_PGTABLE_WALK ctx->flags for skipping BBM and CMO, instead
+  of KVM_PGTABLE_WALK_REMOVED. (Oliver)
+
+Changes from the RFC:
+https://lore.kernel.org/kvmarm/20221112081714.2169495-1-ricarkol@google.com/
+- dropped the changes to split on POST visits. No visible perf
+  benefit.
+- changed the kvm_pgtable_stage2_free_removed() implementation to
+  reuse the stage2 mapper.
+- dropped the FEAT_BBM changes and optimization. Will send this on a
+  different series.
+
+Thanks,
+Ricardo
+
+Marc Zyngier (1):
+  KVM: arm64: Use local TLBI on permission relaxation
+
+Ricardo Koller (11):
+  KVM: arm64: Add KVM_PGTABLE_WALK ctx->flags for skipping BBM and CMO
+  KVM: arm64: Rename free_unlinked to free_removed
+  KVM: arm64: Add helper for creating unlinked stage2 subtrees
+  KVM: arm64: Add kvm_pgtable_stage2_split()
+  KVM: arm64: Refactor kvm_arch_commit_memory_region()
+  KVM: arm64: Add kvm_uninit_stage2_mmu()
+  KVM: arm64: Export kvm_are_all_memslots_empty()
+  KVM: arm64: Add KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+  KVM: arm64: Split huge pages when dirty logging is enabled
+  KVM: arm64: Open-code kvm_mmu_write_protect_pt_masked()
+  KVM: arm64: Split huge pages during KVM_CLEAR_DIRTY_LOG
+
+ Documentation/virt/kvm/api.rst        |  26 ++++
+ arch/arm64/include/asm/kvm_asm.h      |   4 +
+ arch/arm64/include/asm/kvm_host.h     |  19 +++
+ arch/arm64/include/asm/kvm_mmu.h      |   1 +
+ arch/arm64/include/asm/kvm_pgtable.h  |  84 ++++++++++-
+ arch/arm64/kvm/arm.c                  |  22 +++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c    |  10 ++
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c |   6 +-
+ arch/arm64/kvm/hyp/nvhe/tlb.c         |  54 +++++++
+ arch/arm64/kvm/hyp/pgtable.c          | 194 ++++++++++++++++++++++++--
+ arch/arm64/kvm/hyp/vhe/tlb.c          |  32 +++++
+ arch/arm64/kvm/mmu.c                  | 188 +++++++++++++++++++++----
+ include/linux/kvm_host.h              |   2 +
+ include/uapi/linux/kvm.h              |   1 +
+ virt/kvm/kvm_main.c                   |   2 +-
+ 15 files changed, 591 insertions(+), 54 deletions(-)
 
 -- 
-Thanks,
-Oliver
+2.39.2.637.g21b0678d19-goog
+
