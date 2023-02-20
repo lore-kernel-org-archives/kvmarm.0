@@ -1,116 +1,128 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E2893201
-	for <kvmarm@lists.linux.dev>; Mon, 20 Feb 2023 11:54:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1676894079;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZTjFVNYxtagb4cg319xliz4UCkGMGRvRsYmTyNu28k4=;
-	b=VFKvk5uiQf5BTiLW+XTk/DTP0tyfZDo9ynNvSrGxE8nH/6dMXqimZvCs0pedri3uCxGnAZ
-	BCXgcQtiKqLDt/UMTXBMwivvEZFozamrIxeOw428ty70s9Mdl4adXhzF+PKKdFIE3iAcCb
-	0nvQKE6w69/UxWHCGd3O+tqVMil6QfY=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-300-Cq4R3DRCN-mn2C7CaePShQ-1; Mon, 20 Feb 2023 06:54:37 -0500
-X-MC-Unique: Cq4R3DRCN-mn2C7CaePShQ-1
-Received: by mail-ed1-f69.google.com with SMTP id h13-20020a0564020e8d00b004a26ef05c34so1005883eda.16
-        for <kvmarm@lists.linux.dev>; Mon, 20 Feb 2023 03:54:37 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZTjFVNYxtagb4cg319xliz4UCkGMGRvRsYmTyNu28k4=;
-        b=40JYj0J8MSSfwtv2xcjSNhmi/z/qYbHy6AxGVDydmAsdF3GVRDzC9ZCVoHkAL7bvNN
-         ZMc2/n6prSruMJc8qIlyugTtAEDILt3gBeajk9XX5ruYmnnSpitf/wOI20UEtqN0LQfu
-         qqGiLkg4Tfte94CKtG4dOnqEbKovA/7qfP2iR4sCN6PSXAWhANo0JMmfyHFfhBuLw+GG
-         cuirVv7+tWu5g3NoA1FUVsE4cGj4vXF3KGRFH66Dw/EOfZiOBalzkiXMHa6ZapeCOKgm
-         NvjYap4pRuH6z1OW4n/92T3itRDWVWZzddkgk6xhvNr+L0S/wIzTDXUCkj3BnimUvDuj
-         u3AA==
-X-Gm-Message-State: AO0yUKW4/y7xUWXQR8vCEwTtxw4x8DjPYBiI7VOJKt3TAepa/cX1dBVc
-	zBMGS0J+SonX4tlfgLIa1nJ5dEbXlVAiTyk4zlI6/Gag7obZ50qgI9vYJHwhjVEa6/i5HvLE7B3
-	50uucNYBDyo9Y3H1x
-X-Received: by 2002:a17:906:f1c9:b0:877:7113:71f3 with SMTP id gx9-20020a170906f1c900b00877711371f3mr6850711ejb.25.1676894076773;
-        Mon, 20 Feb 2023 03:54:36 -0800 (PST)
-X-Google-Smtp-Source: AK7set+aARynCMmmEZ3mh9yR3vdePFzx+Wkn8K5DsG1GLplA256FG3LrePk1F0vxywmGZv6zPNhVlQ==
-X-Received: by 2002:a17:906:f1c9:b0:877:7113:71f3 with SMTP id gx9-20020a170906f1c900b00877711371f3mr6850656ejb.25.1676894076481;
-        Mon, 20 Feb 2023 03:54:36 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
-        by smtp.googlemail.com with ESMTPSA id a26-20020a170906685a00b008b1b86bf668sm4533865ejs.4.2023.02.20.03.54.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Feb 2023 03:54:35 -0800 (PST)
-Message-ID: <f932e133-b5f3-6ce5-e68d-512339cc30a4@redhat.com>
-Date: Mon, 20 Feb 2023 12:54:33 +0100
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1576663BB
+	for <kvmarm@lists.linux.dev>; Mon, 20 Feb 2023 14:17:34 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DF41FFEC;
+	Mon, 20 Feb 2023 06:18:15 -0800 (PST)
+Received: from [10.57.75.211] (unknown [10.57.75.211])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D89583F881;
+	Mon, 20 Feb 2023 06:17:31 -0800 (PST)
+Message-ID: <e16ec8cd-3b00-0b64-8a44-7cf8f34c771a@arm.com>
+Date: Mon, 20 Feb 2023 14:17:30 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [GIT PULL] KVM/arm64 updates for 6.3
-To: Marc Zyngier <maz@kernel.org>
-Cc: Akihiko Odaki <akihiko.odaki@daynix.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Andre Przywara <andre.przywara@arm.com>,
- Andrew Jones <andrew.jones@linux.dev>, Anup Patel <anup@brainfault.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Chao Gao <chao.gao@intel.com>,
- Christoffer Dall <christoffer.dall@arm.com>,
- Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
- Cornelia Huck <cohuck@redhat.com>, David Matlack <dmatlack@google.com>,
- D Scott Phillips <scott@os.amperecomputing.com>,
- Eric Farman <farman@linux.ibm.com>, Fabiano Rosas <farosas@linux.ibm.com>,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Hector Martin <marcan@marcan.st>,
- Isaku Yamahata <isaku.yamahata@intel.com>, James Morse
- <james.morse@arm.com>, Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
- Kai Huang <kai.huang@intel.com>, Lai Jiangshan <jiangshan.ljs@antgroup.com>,
- Mark Brown <broonie@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
- Michael Kelley <mikelley@microsoft.com>,
- Nianyao Tang <tangnianyao@huawei.com>, Oliver Upton
- <oliver.upton@linux.dev>, Paul Durrant <paul@xen.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
- Quentin Perret <qperret@google.com>, Reiji Watanabe <reijiw@google.com>,
- Russell King <rmk+kernel@armlinux.org.uk>,
- Sean Christopherson <seanjc@google.com>, Shaoqin Huang
- <shahuang@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Thomas Gleixner <tglx@linutronix.de>, Thomas Huth <thuth@redhat.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, Will Deacon <will@kernel.org>,
- Yuan Yao <yuan.yao@intel.com>, Yu Zhang <yu.c.zhang@linux.intel.com>,
- Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-References: <20230218142218.3816630-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20230218142218.3816630-1-maz@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.7.2
+Subject: Re: [PATCH v1 00/12] KVM: arm64: Support FEAT_LPA2 at hyp s1 and vm
+ s2
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>,
+ Anshuman Khandual <anshuman.khandual@arm.com>, kvmarm@lists.cs.columbia.edu,
+ Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.linux.dev,
+ Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org
+References: <20221206135930.3277585-1-ryan.roberts@arm.com>
+ <Y5pvzKYdZK79nyZw@google.com> <c19594a6-358b-c0de-b1f5-84de38015379@arm.com>
+ <Y5tjfmJRFY2pFlr4@google.com> <Y6H+uXrIrQjdntA4@google.com>
+From: Ryan Roberts <ryan.roberts@arm.com>
+In-Reply-To: <Y6H+uXrIrQjdntA4@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 2/18/23 15:22, Marc Zyngier wrote:
-> Paolo,
-> 
-> Here's the bulk of the KVM/arm64 updates for 6.3, see the tag for the
-> laundry list. A couple of things to note:
-> 
-> - We drag two branches to avoid ugly conflicts:
-> 
->    * the common KVM 'kvm-hw-enable-refactor' that you already have in
->      your tree
-> 
->    * the arm64 'for-next/sme2' branch
-> 
-> - The whole thing has been pulled together by Oliver who has, I think,
->    done a tremendous job
+Hi Oliver,
 
-Pulled, thanks Marc and Oliver!
+Apologies for having gone quiet on this. I came back to this work today only to
+notice that you sent the below response on the 20th Dec but it did not get
+picked up by my mail client somehow (although I'm sure it was operator error). I
+just spotted it on lore.kernel.org.
 
-Paolo
+I'm planning to post a second version soon-ish, with all your comments
+addressed. I think everything except the below is pretty clear and straight forward.
+
+
+On 20/12/2022 18:28, Oliver Upton wrote:
+> On Thu, Dec 15, 2022 at 06:12:14PM +0000, Oliver Upton wrote:
+>> On Thu, Dec 15, 2022 at 09:33:17AM +0000, Ryan Roberts wrote:
+>>> On 15/12/2022 00:52, Oliver Upton wrote:
+>>>> On Tue, Dec 06, 2022 at 01:59:18PM +0000, Ryan Roberts wrote:
+>>>>> (appologies, I'm resending this series as I managed to send the cover letter to
+>>>>> all but the following patches only to myself on first attempt).
+>>>>>
+>>>>> This is my first upstream feature submission so please go easy ;-)
+>>>>
+>>>> Welcome :)
+>>>>
+>>>>> Support 52-bit Output Addresses: FEAT_LPA2 changes the format of the PTEs. The
+>>>>> HW advertises support for LPA2 independently for stage 1 and stage 2, and
+>>>>> therefore its possible to have it for one and not the other. I've assumed that
+>>>>> there is a valid case for this if stage 1 is not supported but stage 2 is, KVM
+>>>>> could still then use LPA2 at stage 2 to create a 52 bit IPA space (which could
+>>>>> then be consumed by a 64KB page guest kernel with the help of FEAT_LPA). Because
+>>>>> of this independence and the fact that the kvm pgtable library is used for both
+>>>>> stage 1 and stage 2 tables, this means the library now has to remember the
+>>>>> in-use format on a per-page-table basis. To do this, I had to rework some
+>>>>> functions to take a `struct kvm_pgtable *` parameter, and as a result, there is
+>>>>> a noisy patch to add this parameter.
+>>>>
+>>>> Mismatch between the translation stages is an interesting problem...
+>>>>
+>>>> Given that userspace is responsible for setting up the IPA space, I
+>>>> can't really think of a strong use case for 52 bit IPAs with a 48 bit
+>>>> VA. Sure, the VMM could construct a sparse IPA space or remap the same
+>>>> HVA at multiple IPAs to artificially saturate the address space, but
+>>>> neither seems terribly compelling.
+>>>>
+>>>> Nonetheless, AFAICT we already allow this sort of mismatch on LPA &&
+>>>> !LVA systems. A 48 bit userspace could construct a 52 bit IPA space for
+>>>> its guest.
+>>>
+>>> I guess a simpler approach would be to only use LPA2 if its supported by both
+>>> stage1 and stage2. Then the code could just use a static key in the few required
+>>> places.
+>>
+>> Ah, you caught on quick to what I was thinking :-)
+> 
+> Just wanted to revisit this...
+> 
+> Ryan, you say that it is possible for hardware to support LPA2 for a
+> single stage of translation. Are you basing that statement on something
+> in the Arm ARM or the fact that there are two different enumerations
+> for stage-1 and stage-2?
+
+Its based on there being 2 separate enumerations. I've dug into this with our
+architecture folks; while it is clearly possible that the HW (or L0 hyp) to
+present an ID register that says one stage supports LPA2 and the other doesn't,
+the real intention behind having the 2 fields separated out is for an L0 hyp to
+be able to limit the stage2 granule sizes that it advertises to guest
+hypervisors. There are no anticipated use cases where HW or L0 hypervisor might
+want to advertise support for LPA2 in one stage and not the other.
+
+So on that basis, it sounds to me like we should just test for LPA2 support in
+both stages and require both to be supported. That simplifies things
+significantly - I can just use a static key to globally flip between pte
+formats, and a bunch of the noisy refactoring disappears.
+
+> 
+> In my cursory search I wasn't able to find anything that would suggest
+> it is possible for only a single stage to implement the feature. The one
+> possibility I can think of is the NV case, where the L0 hypervisor for
+> some reason does not support LPA2 in its emulated stage-2 but still
+> advertises support for LPA2 at stage-1. I'd say that's quite a stupid
+> L0, but I should really hold my tongue until KVM actually does NV ;-)
+> 
+> I want to make sure there is a strong sense of what LPA2 means in terms
+> of the architecture to inform how we use it in KVM.
+> 
+> --
+> Thanks,
+> Oliver
+> 
+
+Thanks,
+Ryan
+
 
