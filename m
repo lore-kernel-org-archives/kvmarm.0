@@ -1,166 +1,116 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C196F2F2B;
-	Mon, 20 Feb 2023 10:52:04 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C879915BF;
-	Mon, 20 Feb 2023 02:52:40 -0800 (PST)
-Received: from [10.57.75.211] (unknown [10.57.75.211])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4EDEA3F703;
-	Mon, 20 Feb 2023 02:51:53 -0800 (PST)
-Message-ID: <09cc1a81-d4a2-7db2-2add-d56121bbd7d7@arm.com>
-Date: Mon, 20 Feb 2023 10:51:51 +0000
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E2893201
+	for <kvmarm@lists.linux.dev>; Mon, 20 Feb 2023 11:54:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1676894079;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZTjFVNYxtagb4cg319xliz4UCkGMGRvRsYmTyNu28k4=;
+	b=VFKvk5uiQf5BTiLW+XTk/DTP0tyfZDo9ynNvSrGxE8nH/6dMXqimZvCs0pedri3uCxGnAZ
+	BCXgcQtiKqLDt/UMTXBMwivvEZFozamrIxeOw428ty70s9Mdl4adXhzF+PKKdFIE3iAcCb
+	0nvQKE6w69/UxWHCGd3O+tqVMil6QfY=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-300-Cq4R3DRCN-mn2C7CaePShQ-1; Mon, 20 Feb 2023 06:54:37 -0500
+X-MC-Unique: Cq4R3DRCN-mn2C7CaePShQ-1
+Received: by mail-ed1-f69.google.com with SMTP id h13-20020a0564020e8d00b004a26ef05c34so1005883eda.16
+        for <kvmarm@lists.linux.dev>; Mon, 20 Feb 2023 03:54:37 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZTjFVNYxtagb4cg319xliz4UCkGMGRvRsYmTyNu28k4=;
+        b=40JYj0J8MSSfwtv2xcjSNhmi/z/qYbHy6AxGVDydmAsdF3GVRDzC9ZCVoHkAL7bvNN
+         ZMc2/n6prSruMJc8qIlyugTtAEDILt3gBeajk9XX5ruYmnnSpitf/wOI20UEtqN0LQfu
+         qqGiLkg4Tfte94CKtG4dOnqEbKovA/7qfP2iR4sCN6PSXAWhANo0JMmfyHFfhBuLw+GG
+         cuirVv7+tWu5g3NoA1FUVsE4cGj4vXF3KGRFH66Dw/EOfZiOBalzkiXMHa6ZapeCOKgm
+         NvjYap4pRuH6z1OW4n/92T3itRDWVWZzddkgk6xhvNr+L0S/wIzTDXUCkj3BnimUvDuj
+         u3AA==
+X-Gm-Message-State: AO0yUKW4/y7xUWXQR8vCEwTtxw4x8DjPYBiI7VOJKt3TAepa/cX1dBVc
+	zBMGS0J+SonX4tlfgLIa1nJ5dEbXlVAiTyk4zlI6/Gag7obZ50qgI9vYJHwhjVEa6/i5HvLE7B3
+	50uucNYBDyo9Y3H1x
+X-Received: by 2002:a17:906:f1c9:b0:877:7113:71f3 with SMTP id gx9-20020a170906f1c900b00877711371f3mr6850711ejb.25.1676894076773;
+        Mon, 20 Feb 2023 03:54:36 -0800 (PST)
+X-Google-Smtp-Source: AK7set+aARynCMmmEZ3mh9yR3vdePFzx+Wkn8K5DsG1GLplA256FG3LrePk1F0vxywmGZv6zPNhVlQ==
+X-Received: by 2002:a17:906:f1c9:b0:877:7113:71f3 with SMTP id gx9-20020a170906f1c900b00877711371f3mr6850656ejb.25.1676894076481;
+        Mon, 20 Feb 2023 03:54:36 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
+        by smtp.googlemail.com with ESMTPSA id a26-20020a170906685a00b008b1b86bf668sm4533865ejs.4.2023.02.20.03.54.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Feb 2023 03:54:35 -0800 (PST)
+Message-ID: <f932e133-b5f3-6ce5-e68d-512339cc30a4@redhat.com>
+Date: Mon, 20 Feb 2023 12:54:33 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.7.2
-Subject: Re: [RFC] Support for Arm CCA VMs on Linux
-Content-Language: en-US
-To: Itaru Kitayama <itaru.kitayama@gmail.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-coco@lists.linux.dev,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [GIT PULL] KVM/arm64 updates for 6.3
+To: Marc Zyngier <maz@kernel.org>
+Cc: Akihiko Odaki <akihiko.odaki@daynix.com>,
  Alexandru Elisei <alexandru.elisei@arm.com>,
- Andrew Jones <andrew.jones@linux.dev>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Chao Peng <chao.p.peng@linux.intel.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- James Morse <james.morse@arm.com>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>,
- Joey Gouly <Joey.Gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Paolo Bonzini <pbonzini@redhat.com>, Quentin Perret <qperret@google.com>,
- Sean Christopherson <seanjc@google.com>, Steven Price
- <steven.price@arm.com>, Thomas Huth <thuth@redhat.com>,
- Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
- kvmarm@lists.cs.columbia.edu
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
- <cfb0292c-e84d-0a7c-be74-ae5508779502@arm.com>
- <CANW9uyvXofhGGuhGzk_0Et-w8CHT2y35WSu5+hno6Qm8K4R4ug@mail.gmail.com>
- <CANW9uyuY2Ca9dxYQTtFLFupd-A088NTtmhdE=ST6o6Qn1_XM_A@mail.gmail.com>
-From: Ryan Roberts <ryan.roberts@arm.com>
-In-Reply-To: <CANW9uyuY2Ca9dxYQTtFLFupd-A088NTtmhdE=ST6o6Qn1_XM_A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+ Andre Przywara <andre.przywara@arm.com>,
+ Andrew Jones <andrew.jones@linux.dev>, Anup Patel <anup@brainfault.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Chao Gao <chao.gao@intel.com>,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+ Cornelia Huck <cohuck@redhat.com>, David Matlack <dmatlack@google.com>,
+ D Scott Phillips <scott@os.amperecomputing.com>,
+ Eric Farman <farman@linux.ibm.com>, Fabiano Rosas <farosas@linux.ibm.com>,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Hector Martin <marcan@marcan.st>,
+ Isaku Yamahata <isaku.yamahata@intel.com>, James Morse
+ <james.morse@arm.com>, Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
+ Kai Huang <kai.huang@intel.com>, Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+ Mark Brown <broonie@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
+ Michael Kelley <mikelley@microsoft.com>,
+ Nianyao Tang <tangnianyao@huawei.com>, Oliver Upton
+ <oliver.upton@linux.dev>, Paul Durrant <paul@xen.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+ Quentin Perret <qperret@google.com>, Reiji Watanabe <reijiw@google.com>,
+ Russell King <rmk+kernel@armlinux.org.uk>,
+ Sean Christopherson <seanjc@google.com>, Shaoqin Huang
+ <shahuang@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Thomas Huth <thuth@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, Will Deacon <will@kernel.org>,
+ Yuan Yao <yuan.yao@intel.com>, Yu Zhang <yu.c.zhang@linux.intel.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+References: <20230218142218.3816630-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20230218142218.3816630-1-maz@kernel.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 17/02/2023 08:02, Itaru Kitayama wrote:
-> On Sat, Feb 11, 2023 at 7:53 AM Itaru Kitayama <itaru.kitayama@gmail.com> wrote:
->>
->> On Sat, Feb 11, 2023 at 1:56 AM Ryan Roberts <ryan.roberts@arm.com> wrote:
->>>
->>> On 27/01/2023 11:22, Suzuki K Poulose wrote:
->>>> [...]
->>>
->>>> Running the stack
->>>> ====================
->>>>
->>>> To run/test the stack, you would need the following components :
->>>>
->>>> 1) FVP Base AEM RevC model with FEAT_RME support [4]
->>>> 2) TF-A firmware for EL3 [5]
->>>> 3) TF-A RMM for R-EL2 [3]
->>>> 4) Linux Kernel [6]
->>>> 5) kvmtool [7]
->>>> 6) kvm-unit-tests [8]
->>>>
->>>> Instructions for building the firmware components and running the model are
->>>> available here [9]. Once, the host kernel is booted, a Realm can be launched by
->>>> invoking the `lkvm` commad as follows:
->>>>
->>>>  $ lkvm run --realm                            \
->>>>        --measurement-algo=["sha256", "sha512"] \
->>>>        --disable-sve                           \
->>>>        <normal-vm-options>
->>>>
->>>> Where:
->>>>  * --measurement-algo (Optional) specifies the algorithm selected for creating the
->>>>    initial measurements by the RMM for this Realm (defaults to sha256).
->>>>  * GICv3 is mandatory for the Realms.
->>>>  * SVE is not yet supported in the TF-RMM, and thus must be disabled using
->>>>    --disable-sve
->>>>
->>>> You may also run the kvm-unit-tests inside the Realm world, using the similar
->>>> options as above.
->>>
->>> Building all of these components and configuring the FVP correctly can be quite
->>> tricky, so I thought I would plug a tool we have called Shrinkwrap, which can
->>> simplify all of this.
->>>
->>> The tool accepts a yaml input configuration that describes how a set of
->>> components should be built and packaged, and how the FVP should be configured
->>> and booted. And by default, it uses a Docker container on its backend, which
->>> contains all the required tools, including the FVP. You can optionally use
->>> Podman or have it run on your native system if you prefer. It supports both
->>> x86_64 and aarch64. And you can even run it in --dry-run mode to see the set of
->>> shell commands that would have been executed.
->>>
->>> It comes with two CCA configs out-of-the-box; cca-3world.yaml builds TF-A, RMM,
->>> Linux (for both host and guest), kvmtool and kvm-unit-tests. cca-4world.yaml
->>> adds Hafnium and some demo SPs for the secure world (although since Hafnium
->>> requires x86_64 to build, cca-4world.yaml doesn't currently work on an aarch64
->>> build host).
->>>
->>> See the documentation [1] and repository [2] for more info.
->>>
->>> Brief instructions to get you up and running:
->>>
->>>   # Install shrinkwrap. (I assume you have Docker installed):
->>>   sudo pip3 install pyyaml termcolor tuxmake
->>>   git clone https://git.gitlab.arm.com/tooling/shrinkwrap.git
->>>   export PATH=$PWD/shrinkwrap/shrinkwrap:$PATH
->>>
->>>   # If running Python < 3.9:
->>>   sudo pip3 install graphlib-backport
->>>
->>>   # Build all the CCA components:
->>>   shrinkwrap build cca-3world.yaml [--dry-run]
->>
->> This has been working on my Multipass instance on M1, thanks for the tool.
->>
->> Thanks,
->> Itaru.
+On 2/18/23 15:22, Marc Zyngier wrote:
+> Paolo,
 > 
-> It took a while though I've just booted an Ubuntu 22.10 disk image
-> with the cca-3world.yaml config on M1.
+> Here's the bulk of the KVM/arm64 updates for 6.3, see the tag for the
+> laundry list. A couple of things to note:
+> 
+> - We drag two branches to avoid ugly conflicts:
+> 
+>    * the common KVM 'kvm-hw-enable-refactor' that you already have in
+>      your tree
+> 
+>    * the arm64 'for-next/sme2' branch
+> 
+> - The whole thing has been pulled together by Oliver who has, I think,
+>    done a tremendous job
 
-That's good to hear - If you have any feedback (or patches ;-)) for Shrinkwrap
-that would improve the experience, do let me know!
+Pulled, thanks Marc and Oliver!
 
-> 
-> Thanks,
-> Itaru.
-> 
->>
->>>
->>>   # Run the stack in the FVP:
->>>   shrinkwrap run cca-3world.yaml -r ROOTFS=<my_rootfs.ext4> [--dry-run]
->>>
->>> By default, building is done at ~/.shrinkwrap/build/cca-3world and the package
->>> is created at ~/.shrinkwrap/package/cca-3world (this can be changed with
->>> envvars).
->>>
->>> The 'run' command will boot TF-A, RMM and host Linux kernel in the FVP, and
->>> mount the provided rootfs. You will likely want to have copied the userspace
->>> pieces into the rootfs before running, so you can create realms:
->>>
->>> - ~/.shrinkwrap/package/cca-3world/Image (kernel with RMI and RSI support)
->>> - ~/.shrinkwrap/package/cca-3world/lkvm (kvmtool able to launch realms)
->>> - ~/.shrinkwrap/package/cca-3world/kvm-unit-tests.tgz (built kvm-unit-tests)
->>>
->>> Once the FVP is booted to a shell, you can do something like this to launch a
->>> Linux guest in a realm:
->>>
->>>   lkvm run --realm --disable-sve -c 1 -m 256 -k Image
->>>
->>> [1] https://shrinkwrap.docs.arm.com
->>> [2] https://gitlab.arm.com/tooling/shrinkwrap
->>>
->>>
->>> _______________________________________________
->>> linux-arm-kernel mailing list
->>> linux-arm-kernel@lists.infradead.org
->>> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+Paolo
 
