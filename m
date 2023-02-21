@@ -1,83 +1,109 @@
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 093766D24
-	for <kvmarm@lists.linux.dev>; Tue, 21 Feb 2023 16:28:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1676996925; x=1708532925;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-id:mime-version:content-transfer-encoding:subject;
-  bh=An3ZyYPjzm/F1tOVGPO3OL+S+08Pygd7okUCpWph0KM=;
-  b=N1eXMCznFHOTMkogHfWtrMsvg/YkjNDmnVw/lHef3QtxS4UQlxyGbSxh
-   hGTJOtjpyB1rnj7BIglpEWUTTwo1Vi+8pFiO6wZYSBgd/UFZznOJT9aqY
-   TwNrGaBWxic3Y9+Ibgwx951QDId1uLbdyewhsXmEFma3Uu9OvZTMs4ZEG
-   s=;
-X-IronPort-AV: E=Sophos;i="5.97,315,1669075200"; 
-   d="scan'208";a="299455621"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A450E8F78
+	for <kvmarm@lists.linux.dev>; Tue, 21 Feb 2023 22:17:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5370FC433D2;
+	Tue, 21 Feb 2023 22:17:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1677017877;
+	bh=7NgmTSoX6xFkJQjEiuCD2VFCagZVsbvuwdkjicAmDTg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cpxz3ikQozuEH9OqfOioetwbh5VQrJZXzjR2jjYEUgyQiINbhXX7OFi7l0W0Qv18T
+	 tCA9PAjHmCS7eDvPBhR/Uc3OKiVEtLOOwIwkUAIlmpFD3hsEUZkZVNVy+RnhRlZHjC
+	 UXk5PZmL2XQwCs5awMjufUke4p6cb/NiiAnsLegV1aLjhqJdcQlqcrU/f4hT616XIY
+	 a0y/VIRpg4Fx/AmqmRspyls1+A6dCiNwTcP5hc2EdL1SWXutuPoN1o+kSB+pWbdUuF
+	 IHA1+fQk8VtojpoVRmdTLWPN3CFIJvCqjU94UXH1G2+cMklGCIM2D1mvSH0B907K/H
+	 1qpVJW/y4dS2A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pUaxP-00CByA-1D;
+	Tue, 21 Feb 2023 22:17:55 +0000
+Date: Tue, 21 Feb 2023 22:17:54 +0000
+Message-ID: <87lekqzmr1.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: "Veith, Simon" <sveith@amazon.de>
+Cc: "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"dwmw2@infradead.org" <dwmw2@infradead.org>,
+	"yuzenghui@huawei.com"
+	<yuzenghui@huawei.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"james.morse@arm.com" <james.morse@arm.com>,
+	"oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>,
+	"ricarkol@google.com" <ricarkol@google.com>
 Subject: Re: [PATCH 00/16] KVM: arm64: Rework timer offsetting for fun and profit
-Thread-Topic: [PATCH 00/16] KVM: arm64: Rework timer offsetting for fun and profit
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-44b6fc51.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2023 16:28:40 +0000
-Received: from EX19D018EUC004.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-	by email-inbound-relay-pdx-2a-m6i4x-44b6fc51.us-west-2.amazon.com (Postfix) with ESMTPS id 914E4A293A;
-	Tue, 21 Feb 2023 16:28:37 +0000 (UTC)
-Received: from EX19D018EUC003.ant.amazon.com (10.252.51.231) by
- EX19D018EUC004.ant.amazon.com (10.252.51.172) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.24; Tue, 21 Feb 2023 16:28:36 +0000
-Received: from EX19D018EUC003.ant.amazon.com ([fe80::8a6b:2af5:3f32:8cfe]) by
- EX19D018EUC003.ant.amazon.com ([fe80::8a6b:2af5:3f32:8cfe%3]) with mapi id
- 15.02.1118.024; Tue, 21 Feb 2023 16:28:36 +0000
-From: "Veith, Simon" <sveith@amazon.de>
-To: "maz@kernel.org" <maz@kernel.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-CC: "dwmw2@infradead.org" <dwmw2@infradead.org>, "yuzenghui@huawei.com"
-	<yuzenghui@huawei.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"james.morse@arm.com" <james.morse@arm.com>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, "ricarkol@google.com" <ricarkol@google.com>
-Thread-Index: AQHZQhIhiotZ8QeTIUeBSHOWoG2ULa7ZnmqA
-Date: Tue, 21 Feb 2023 16:28:36 +0000
-Message-ID: <5404a3554c3a1efd1e8e098072a4cf03d1b01152.camel@amazon.de>
+In-Reply-To: <5404a3554c3a1efd1e8e098072a4cf03d1b01152.camel@amazon.de>
 References: <20230216142123.2638675-1-maz@kernel.org>
-In-Reply-To: <20230216142123.2638675-1-maz@kernel.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.1.212.17]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B285DF88BE57D8478127CC5E2935E5BB@amazon.com>
+	<5404a3554c3a1efd1e8e098072a4cf03d1b01152.camel@amazon.de>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sveith@amazon.de, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, dwmw2@infradead.org, yuzenghui@huawei.com, suzuki.poulose@arm.com, james.morse@arm.com, oliver.upton@linux.dev, ricarkol@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-SGVsbG8gTWFyYywNCg0KT24gVGh1LCAyMDIzLTAyLTE2IGF0IDE0OjIxICswMDAwLCBNYXJjIFp5
-bmdpZXIgd3JvdGU6DQo+IFRoaXMgc2VyaWVzIGFpbXMgYXQgc2F0aXNmeWluZyBtdWx0aXBsZSBn
-b2FsczoNCj4gDQo+IC0gYWxsb3cgYSBWTU0gdG8gYXRvbWljYWxseSByZXN0b3JlIGEgdGltZXIg
-b2Zmc2V0IGZvciBhIHdob2xlIFZNDQo+IMKgIGluc3RlYWQgb2YgdXBkYXRpbmcgdGhlIG9mZnNl
-dCBlYWNoIHRpbWUgYSB2Y3B1IGdldCBpdHMgY291bnRlcg0KPiDCoCB3cml0dGVuDQo+IA0KPiAt
-IGFsbG93IGEgVk1NIHRvIHNhdmUvcmVzdG9yZSB0aGUgcGh5c2ljYWwgdGltZXIgY29udGV4dCwg
-c29tZXRoaW5nDQo+IMKgIHRoYXQgd2UgY2Fubm90IGRvIGF0IHRoZSBtb21lbnQgZHVlIHRvIHRo
-ZSBsYWNrIG9mIG9mZnNldHRpbmcNCj4gDQo+IC0gcHJvdmlkZSBhIGZyYW1ld29yayB0aGF0IGlz
-IHN1aXRhYmxlIGZvciBOViBzdXBwb3J0LCB3aGVyZSB3ZSBnZXQNCj4gwqAgYm90aCBnbG9iYWwg
-YW5kIHBlciB0aW1lciwgcGVyIHZjcHUgb2Zmc2V0dGluZw0KDQpUaGFuayB5b3Ugc28gbXVjaCBm
-b3IgZm9sbG93aW5nIHVwIG9uIG15IChhZG1pdHRlZGx5IHZlcnkgYmFzaWMpIHBhdGNoDQp3aXRo
-IHlvdXIgb3duIHByb3Bvc2FsIQ0KDQo+IFRoaXMgaGFzIGJlZW4gbW9kZXJhdGVseSB0ZXN0ZWQg
-d2l0aCBuVkhFLCBWSEUgYW5kIE5WLiBJIGRvIG5vdCBoYXZlDQo+IGFjY2VzcyB0byBDTlRQT0ZG
-LWF3YXJlIEhXLCBzbyB0aGUganVyeSBpcyBzdGlsbCBvdXQgb24gdGhhdCBvbmUNCg0KU2FtZSBo
-ZXJlIGFib3V0IENOVFBPRkYgLS0gSSBnYXZlIGl0IGEgcXVpY2sgc3BpbiBvbiBHcmF2aXRvbjIg
-YW5kDQpHcmF2aXRvbjMsIGFuZCBuZWl0aGVyIGNoaXAgY2xhaW1zIHRoZSBBUk02NF9IQVNfRUNW
-X0NOVFBPRkYgY2FwYWJpbGl0eQ0KZnJvbSB5b3VyIHBhdGNoLg0KDQpJIGFtIHdvcmtpbmcgb24g
-dGVzdGluZyB5b3VyIHNlcmllcyB3aXRoIG91ciB1c2Vyc3BhY2UgYW5kIHdpbGwgcmVwb3J0DQpi
-YWNrLg0KDQpUaGFua3MNClNpbW9uDQoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1h
-bnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBD
-aHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2Vy
-aWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1J
-RDogREUgMjg5IDIzNyA4NzkKCgo=
+Hi Simon,
 
+On Tue, 21 Feb 2023 16:28:36 +0000,
+"Veith, Simon" <sveith@amazon.de> wrote:
+>=20
+> Hello Marc,
+>=20
+> On Thu, 2023-02-16 at 14:21 +0000, Marc Zyngier wrote:
+> > This series aims at satisfying multiple goals:
+> >=20
+> > - allow a VMM to atomically restore a timer offset for a whole VM
+> > =C2=A0 instead of updating the offset each time a vcpu get its counter
+> > =C2=A0 written
+> >=20
+> > - allow a VMM to save/restore the physical timer context, something
+> > =C2=A0 that we cannot do at the moment due to the lack of offsetting
+> >=20
+> > - provide a framework that is suitable for NV support, where we get
+> > =C2=A0 both global and per timer, per vcpu offsetting
+>=20
+> Thank you so much for following up on my (admittedly very basic) patch
+> with your own proposal!
+
+No worries. There is nothing like "nerd sniping"... ;-)
+
+> > This has been moderately tested with nVHE, VHE and NV. I do not have
+> > access to CNTPOFF-aware HW, so the jury is still out on that one
+>=20
+> Same here about CNTPOFF -- I gave it a quick spin on Graviton2 and
+> Graviton3, and neither chip claims the ARM64_HAS_ECV_CNTPOFF capability
+> from your patch.
+
+Nah, G2/G3 are old stuff (v8.2 and v8.3+ respectively). You need at
+least a v8.6 system, something that is made of the best Unobtainium
+money can buy. M2 has ECV, but without CNTPOFF, which is just silly.
+
+> I am working on testing your series with our userspace and will report
+> back.
+
+Thanks a lot, that'd be super helpful. Please don't get too attached
+to the userspace interface though, as it is likely to change (Oliver
+has an interesting suggestion to simplify it, but I need to convince
+myself that it doesn't break migration of the physical timer).
+
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
