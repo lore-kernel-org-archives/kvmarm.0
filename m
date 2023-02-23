@@ -1,172 +1,281 @@
-Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
+Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E146D184F
-	for <kvmarm@lists.linux.dev>; Thu, 23 Feb 2023 05:26:18 +0000 (UTC)
-Received: by mail-vs1-f54.google.com with SMTP id o6so13562894vsq.10
-        for <kvmarm@lists.linux.dev>; Wed, 22 Feb 2023 21:26:18 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997AD1C27
+	for <kvmarm@lists.linux.dev>; Thu, 23 Feb 2023 05:59:33 +0000 (UTC)
+Received: by mail-vs1-f53.google.com with SMTP id d20so5777264vsf.11
+        for <kvmarm@lists.linux.dev>; Wed, 22 Feb 2023 21:59:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AXEnUJIuw3DsBBpeEas97UQaCI4+fKGVwu8RQPcIlxs=;
-        b=ebfMrTiO8jVZApxkACFGkW19OKcseaGjzh5HjIfu8MAU62l8YkK9wYnBFkU6I+6zuE
-         AUDCEHsZSZ9mbCKKWNPTplXuqS87aYdUMgEd5/HJTFPzZF9uHLGfh+f//SGkFgG2WUUC
-         VMrPZXwgvdZQ0a9Rdfoin9rPnC9lwtXHaGCdiIAVtUZ+zDzePE60bEA2n80H6qz2mPub
-         YZRSOEb//hMVhNQrFI5fjyJOTZ5EPIveLNi+6mlZv8sUqb9Y6C+ziwSJjuW7/BuocHT5
-         ypJ99wrjoFqAACPuG1lbl4B3N9wqDvRcpL/jBCfwY1kMxbLPNuarGmvnmO4vjdaXxv4a
-         SkyA==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=voGsAay0JFyPNio8rcBV6wtwoqCyfm2R0MRGDG4+I/0=;
+        b=Sqaq5lh2eaXDCN8btRTVSZgyL0HObVfsyAHIbkAC5IPrJvBu4OePPr88QW2SoSa6ep
+         +tV8JGytOa9EN6vAFMfVVakotTH8kruySr8d6LyQ8aZtJw8MVvFq6UGr2ihfJ+Sby12E
+         yEFq9ofnl/HzbGa+f/vvzGLPlVYlKR107c7BHjlb0/2AqFdXnlqia73cVnsPaJpneaVf
+         cyJwZr8Y/LPWFkwkR90uY+zyu0yC9uDSP6cqPUQJM0gtK7m7L3t0TTfaDvT9XjR0Jp96
+         z1+FsrLGy1fwgJo3UL8ogH6ZltcuoqAKUqeCwDDafL4G1L0fWx8W/MqKIuAnhoTcyQrf
+         7kxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AXEnUJIuw3DsBBpeEas97UQaCI4+fKGVwu8RQPcIlxs=;
-        b=L3n6inKoUuRWvPw0akcOTIee3arpTT/PRUu9Nr5fLi55CuBNBkXD6gO667F/XiGnlJ
-         CZs2J/BY/CYkdhuikrXs2BPvU1Dr5muVezggnA8DFT89Fe0wHos2wnOTuEX3Yb49fQE5
-         JMuZLMWDqqNXbhceT014i28Kok5XYXq267Vq1XMMKriSDjz8aUvvIi4SAvMqpXPWSOVK
-         sY512+tyfhP5dvApHc/+YBYN5z2u8g09bq64yKUG7lVONKpct8JNzpXXShAKbbCbZd+0
-         cLwEfNMSylPEqNCdU2WpO/4JuuiRbEO80hw9oV9/2fH88OTvNZKz1UqbAELyWlAyXisx
-         IsJg==
-X-Gm-Message-State: AO0yUKWgEkon0tVyFdcN6Tui1qTl6LX5elWODlVIJyqd9uTP8+WdAFUo
-	senWpic3UlRH9GzqDlhBz7aaLvcSMxyte7Zkyts6/Q==
-X-Google-Smtp-Source: AK7set/r/f8pGhkIjYGiLVLtcsnWRFxpAmGZdfZxTguMU1aVP5zVqu1WLV5ZRnN+vLq9szVFT6NHenS4YuDGWsM46AY=
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=voGsAay0JFyPNio8rcBV6wtwoqCyfm2R0MRGDG4+I/0=;
+        b=YATLiD6YB/jatYW4GIDpWlEhRi/xvwhET64HVhb5PnI4/AAQSfRADR+hNaPtr/d87G
+         yFZ+txqhvRykbKwxTBDbVS1jkkBfDe1gmy7dOwEXOXzV4oytFb7hiAS50BfOlY2Z6cLa
+         V5N8fljZ7j7MdqfOCHvLIIvxv/qGgGgdUC6x3ourVfpMAZ42umuDRgJ3Hh3dV44TBRj9
+         Ju/BEKK7JuX4suen3xJlBdXkBNpWhr/+ee2Tult3sYYQBsOeDO/hhDDpwZqShBxjJRft
+         YLj07Kyjp/tXnaSEhziRvFfkr9Au3lo/2C3xI2ImF2OKhMYqTdspWCSLQQLdamCRxF68
+         bydg==
+X-Gm-Message-State: AO0yUKWDZHBj8qHr/N78wuYYg5cMcUsFlhYANXgOHS6VtqlKzKgSAvAe
+	5dTtwfsgEg2IAWCva6bvp0umEPT3pOaahwi/M/i6gg==
+X-Google-Smtp-Source: AK7set8VuRuV4VxywpIU3KkVLV5dhdtwJXtEFnsgQIUvofFMrP6yngToGpMhoAq4t4jKNWH2TZiaOGQVBfK1rFiYhoY=
 X-Received: by 2002:a05:6102:108f:b0:41e:d8b5:ee40 with SMTP id
- s15-20020a056102108f00b0041ed8b5ee40mr553492vsr.26.1677129977589; Wed, 22 Feb
- 2023 21:26:17 -0800 (PST)
+ s15-20020a056102108f00b0041ed8b5ee40mr558056vsr.26.1677131972255; Wed, 22 Feb
+ 2023 21:59:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-4-yuzhao@google.com>
- <Y+9EUeUIS/ZUe2vw@linux.dev> <Y++kiJwUIh55jkvl@google.com>
-In-Reply-To: <Y++kiJwUIh55jkvl@google.com>
+References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-3-yuzhao@google.com>
+ <Y++q/lglE6FJBdjt@google.com>
+In-Reply-To: <Y++q/lglE6FJBdjt@google.com>
 From: Yu Zhao <yuzhao@google.com>
-Date: Wed, 22 Feb 2023 22:25:41 -0700
-Message-ID: <CAOUHufYVWvEG=EMBEffnurQhJSb5WN75NVVXPhWghWFR9Aa94A@mail.gmail.com>
-Subject: Re: [PATCH mm-unstable v1 3/5] kvm/arm64: add kvm_arch_test_clear_young()
+Date: Wed, 22 Feb 2023 22:58:56 -0700
+Message-ID: <CAOUHufaK-BHdajDZJKjn_LU-gMkUTKa_9foMB8g-u9DyrVhPwg@mail.gmail.com>
+Subject: Re: [PATCH mm-unstable v1 2/5] kvm/x86: add kvm_arch_test_clear_young()
 To: Sean Christopherson <seanjc@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Andrew Morton <akpm@linux-foundation.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Michael Larabel <michael@michaellarabel.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, x86@kernel.org, 
-	linux-mm@google.com
+Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Michael Larabel <michael@michaellarabel.com>, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	linuxppc-dev@lists.ozlabs.org, x86@kernel.org, linux-mm@google.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 17, 2023 at 9:00=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
+On Fri, Feb 17, 2023 at 9:27 AM Sean Christopherson <seanjc@google.com> wrote:
 >
-> On Fri, Feb 17, 2023, Oliver Upton wrote:
-> > Hi Yu,
+> On Thu, Feb 16, 2023, Yu Zhao wrote:
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 6aaae18f1854..d2995c9e8f07 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1367,6 +1367,12 @@ struct kvm_arch {
+> >        *      the MMU lock in read mode + the tdp_mmu_pages_lock or
+> >        *      the MMU lock in write mode
+> >        *
+> > +      * kvm_arch_test_clear_young() is a special case. It relies on two
+>
+> No, it's not.  The TDP MMU already employs on RCU and CMPXCHG.
+
+It is -- you read it out of context :)
+
+         * For reads, this list is protected by:
+         *      the MMU lock in read mode + RCU or
+         *      the MMU lock in write mode
+         *
+         * For writes, this list is protected by:
+         *      the MMU lock in read mode + the tdp_mmu_pages_lock or
+         *      the MMU lock in write mode
+         *
+         * kvm_arch_test_clear_young() is a special case.
+         ...
+
+        struct list_head tdp_mmu_roots;
+
+> Just drop the
+> entire comment.
+
+Let me move it into kvm_arch_test_clear_young().
+
+Also I want to be clear:
+1. We can't just focus on here and now; we need to consider the distant future.
+2. From my POV, "see the comments on ..." is like the index of a book.
+
+> > +      * techniques, RCU and cmpxchg, to safely test and clear the accessed
+> > +      * bit without taking the MMU lock. The former protects KVM page tables
+> > +      * from being freed while the latter clears the accessed bit atomically
+> > +      * against both the hardware and other software page table walkers.
+> > +      *
+> >        * Roots will remain in the list until their tdp_mmu_root_count
+> >        * drops to zero, at which point the thread that decremented the
+> >        * count to zero should removed the root from the list and clean
+> > @@ -2171,4 +2177,25 @@ int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages);
+> >        KVM_X86_QUIRK_FIX_HYPERCALL_INSN |     \
+> >        KVM_X86_QUIRK_MWAIT_NEVER_UD_FAULTS)
 > >
-> > scripts/get_maintainers.pl is your friend for getting the right set of
-> > emails for a series :) Don't know about others, but generally I would
-> > prefer to be Cc'ed on an entire series (to gather context) than just an
-> > individual patch.
+> > +extern u64 __read_mostly shadow_accessed_mask;
+> > +
+> > +/*
+> > + * Returns true if A/D bits are supported in hardware and are enabled by KVM.
+> > + * When enabled, KVM uses A/D bits for all non-nested MMUs.  Because L1 can
+> > + * disable A/D bits in EPTP12, SP and SPTE variants are needed to handle the
+> > + * scenario where KVM is using A/D bits for L1, but not L2.
+> > + */
+> > +static inline bool kvm_ad_enabled(void)
+> > +{
+> > +     return shadow_accessed_mask;
+> > +}
 >
-> +1
+> Absolutely not.  This information is not getting directly exposed outside of KVM.
+
+Will do.
+
+> > +
+> > +/* see the comments on the generic kvm_arch_has_test_clear_young() */
+> > +#define kvm_arch_has_test_clear_young kvm_arch_has_test_clear_young
+> > +static inline bool kvm_arch_has_test_clear_young(void)
+> > +{
+> > +     return IS_ENABLED(CONFIG_KVM) && IS_ENABLED(CONFIG_X86_64) &&
+> > +            (!IS_REACHABLE(CONFIG_KVM) || (kvm_ad_enabled() && tdp_enabled));
+> > +}
 >
+> Pending the justification for why this is KVM-only
+
+Nothing else has *_young()... IOW, KVM is the only user of *_young().
+
+> I would strongly prefer we
+> find a way to have the mmu_notifier framework track whether or not any listeners
+> have a test_clear_young().  E.g. have KVM nullify its hook during module load.
+
+It's already done that way. This function is just for the caller to
+avoid unnecessary trips into the MMU notifier on archs that don't
+support this capability. (The caller would find it unsupported.)
+
+> > +
+> >  #endif /* _ASM_X86_KVM_HOST_H */
+> > diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+> > index 6f54dc9409c9..0dc7fed1f3fd 100644
+> > --- a/arch/x86/kvm/mmu/spte.h
+> > +++ b/arch/x86/kvm/mmu/spte.h
+> > @@ -153,7 +153,6 @@ extern u64 __read_mostly shadow_mmu_writable_mask;
+> >  extern u64 __read_mostly shadow_nx_mask;
+> >  extern u64 __read_mostly shadow_x_mask; /* mutual exclusive with nx_mask */
+> >  extern u64 __read_mostly shadow_user_mask;
+> > -extern u64 __read_mostly shadow_accessed_mask;
+> >  extern u64 __read_mostly shadow_dirty_mask;
+> >  extern u64 __read_mostly shadow_mmio_value;
+> >  extern u64 __read_mostly shadow_mmio_mask;
+> > @@ -247,17 +246,6 @@ static inline bool is_shadow_present_pte(u64 pte)
+> >       return !!(pte & SPTE_MMU_PRESENT_MASK);
+> >  }
 > >
-> > On Thu, Feb 16, 2023 at 09:12:28PM -0700, Yu Zhao wrote:
-> > > This patch adds kvm_arch_test_clear_young() for the vast majority of
-> > > VMs that are not pKVM and run on hardware that sets the accessed bit
-> > > in KVM page tables.
+> > -/*
+> > - * Returns true if A/D bits are supported in hardware and are enabled by KVM.
+> > - * When enabled, KVM uses A/D bits for all non-nested MMUs.  Because L1 can
+> > - * disable A/D bits in EPTP12, SP and SPTE variants are needed to handle the
+> > - * scenario where KVM is using A/D bits for L1, but not L2.
+> > - */
+> > -static inline bool kvm_ad_enabled(void)
+> > -{
+> > -     return !!shadow_accessed_mask;
+> > -}
 >
-> At least for the x86 changes, please read Documentation/process/maintaine=
-r-tip.rst
-> and rewrite the changelogs.
+> As Oliver said in the ARM patch, _if_ this is justified, please do code movement
+> in a separate patch.
 
-I see -- will remove "this patch".
+I'll just drop this.
 
-> > > It relies on two techniques, RCU and cmpxchg, to safely test and clea=
-r
-> > > the accessed bit without taking the MMU lock. The former protects KVM
-> > > page tables from being freed while the latter clears the accessed bit
-> > > atomically against both the hardware and other software page table
-> > > walkers.
-> > >
-> > > Signed-off-by: Yu Zhao <yuzhao@google.com>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_host.h       |  7 +++
-> > >  arch/arm64/include/asm/kvm_pgtable.h    |  8 +++
-> > >  arch/arm64/include/asm/stage2_pgtable.h | 43 ++++++++++++++
-> > >  arch/arm64/kvm/arm.c                    |  1 +
-> > >  arch/arm64/kvm/hyp/pgtable.c            | 51 ++--------------
-> > >  arch/arm64/kvm/mmu.c                    | 77 +++++++++++++++++++++++=
-+-
-> > >  6 files changed, 141 insertions(+), 46 deletions(-)
-> > >
-> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/a=
-sm/kvm_host.h
-> > > index 35a159d131b5..572bcd321586 100644
-> > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > @@ -1031,4 +1031,11 @@ static inline void kvm_hyp_reserve(void) { }
-> > >  void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
-> > >  bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu);
-> > >
-> > > +/* see the comments on the generic kvm_arch_has_test_clear_young() *=
-/
+> >  static inline bool sp_ad_disabled(struct kvm_mmu_page *sp)
+> >  {
+> >       return sp->role.ad_disabled;
+> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> > index d6df38d371a0..9028e09f1aab 100644
+> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> > @@ -1309,6 +1309,47 @@ bool kvm_tdp_mmu_age_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+> >       return kvm_tdp_mmu_handle_gfn(kvm, range, age_gfn_range);
+> >  }
+> >
+> > +bool kvm_arch_test_clear_young(struct kvm *kvm, struct kvm_gfn_range *range,
+> > +                            gfn_t lsb_gfn, unsigned long *bitmap)
+> > +{
+> > +     struct kvm_mmu_page *root;
+> > +
+> > +     if (WARN_ON_ONCE(!kvm_arch_has_test_clear_young()))
+> > +             return false;
+> > +
+> > +     if (kvm_memslots_have_rmaps(kvm))
 >
-> Please eliminate all of these "see the comments on blah", in every case t=
-hey do
-> nothing more than redirect the reader to something they're likely already=
- aware of.
->
-> > > +#define kvm_arch_has_test_clear_young kvm_arch_has_test_clear_young
-> > > +static inline bool kvm_arch_has_test_clear_young(void)
-> > > +{
-> > > +   return IS_ENABLED(CONFIG_KVM) && cpu_has_hw_af() && !is_protected=
-_kvm_enabled();
-> > > +}
->
-> ...
->
-> > Also, I'm at a loss for why we'd need to test if CONFIG_KVM is enabled.
-> > My expectation is that we should provide an implementation that returns
-> > false if !CONFIG_KVM, avoiding the need to repeat that bit in every
-> > single implementation of the function.
->
-> mm/vmscan.c uses kvm_arch_has_test_clear_young().  I have opinions on tha=
-t, but
-> I'll hold off on expressing them until there's actual justification prese=
-nted
-> somewhere.
->
-> Yu, this series and each patch needs a big pile of "why".  I get that the=
- goal
-> is to optimize memory oversubscribe, but there needs to be justification =
-for
-> why this is KVM only, why nested VMs and !A/D hardware are out of scope, =
-why yet
-> another mmu_notifier hook is being added, etc.
+> This completely disables the API on VMs that have _ever_ run a nested VM.
 
-I totally agree.
+Ok, we definitely don't want this.
 
-This is an optimization, not a bug fix. It can't be justified without
-performance numbers from some common use cases. That burden of proof
-clearly rests on me -- I will follow up on that.
+> I doubt
+> that's the intended behavior.
 
-For now, I want to make sure the methodical part is clear:
-1. We only have limited resources and we need to prioritize major use cases=
-.
-2. We can only improve one thing at a time and we can't cover
-everything at the same time.
-3. We need to focus on the return on investment and the future.
+Good catch, thanks.
 
-I hope everyone by now agrees with my "the vast majority of VMs ..."
-assertion. If not, I'm happy to revisit that [1]. If so, the next step
-would be whether we want to focus on the vast majority first. I think
-this naturally answers why the nested VMs and !AD h/w are out of
-scope, at the moment (I didn't spell this out; probably I should in
-v2). After we have taken the first step, we probably can decide
-whether there is enough resource and demand to cover the low return on
-investment part (but complexity but less common use cases).
+> > +             return false;
+> > +
+> > +     /* see the comments on kvm_arch->tdp_mmu_roots */
+> > +     rcu_read_lock();
+> > +
+> > +     list_for_each_entry_rcu(root, &kvm->arch.tdp_mmu_roots, link) {
+> > +             struct tdp_iter iter;
+> > +
+> > +             if (kvm_mmu_page_as_id(root) != range->slot->as_id)
+> > +                     continue;
+>
+> for_each_tdp_mmu_root() does this for you.
+>
+> > +
+> > +             tdp_root_for_each_leaf_pte(iter, root, range->start, range->end) {
+> > +                     u64 *sptep = rcu_dereference(iter.sptep);
+>
+> kvm_tdp_mmu_read_spte(), thought it's not clear to me why this doesn't test+clear
+> the SPTE's accessed bit and then toggle the bitmap.
+>
+> > +                     u64 new_spte = iter.old_spte & ~shadow_accessed_mask;
+> > +
+> > +                     VM_WARN_ON_ONCE(!page_count(virt_to_page(sptep)));
+>
+> This doesn't do what I assume it's intended to do.
 
-[1] https://lore.kernel.org/linux-mm/20230217041230.2417228-1-yuzhao@google=
-.com/
+This asserts the page table page is not freed, i.e., the memory we are
+modifying still belongs to someone.
+
+ If we forget to do RCU free, i.e., we free immediately, this can
+catch it, assuming no reuse.
+
+> The sptep points at a KVM,
+> a.k.a. kernel, allocated page, not at guest memory.  Assuming the intent is to
+> assert that the memory being aged has an elevated refcount, this would need to
+> extract the pfn out of the SPTE and get the struct page for that.  But that's
+> completely unsafe because KVM supports mapping VM_PFNMAP and VM_IO memory into
+> the guest.  Maybe the proposed caller only operates on struct page memory, but
+> I am not willing to make that assumption in KVM.
+>
+> TL;DR: drop this.
+>
+> > +                     VM_WARN_ON_ONCE(iter.gfn < range->start || iter.gfn >= range->end);
+>
+> This adds no value KVM is completely hosed if tdp_root_for_each_leaf_pte() botches
+> the ranges.
+
+Ok.
+
+> > +
+> > +                     if (new_spte == iter.old_spte)
+> > +                             continue;
+> > +
+> > +                     /* see the comments on the generic kvm_arch_has_test_clear_young() */
+>
+> No, "see xyz" for unintuitive logic is not acceptable.  Add a helper and document
+> the logic there, don't splatter "see XYZ" comments everywhere.
+>
+> > +                     if (__test_and_change_bit(lsb_gfn - iter.gfn, bitmap))
+> > +                             cmpxchg64(sptep, iter.old_spte, new_spte);
+>
+> Clearing a single bit doesn't need a CMPXCHG.  Please weigh in on a relevant series
+> that is modifying the aging flows[*], I want to have exactly one helper for aging
+> TDP MMU SPTEs.
+>
+> [*] https://lore.kernel.org/all/20230211014626.3659152-5-vipinsh@google.com
+
+I'll take a look at that series. clear_bit() probably won't cause any
+practical damage but is technically wrong because, for example, it can
+end up clearing the A-bit in a non-leaf PMD. (cmpxchg will just fail
+in this case, obviously.)
