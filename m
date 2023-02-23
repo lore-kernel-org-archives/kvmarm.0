@@ -1,116 +1,136 @@
-Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com [209.85.217.45])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AEE86FB7
-	for <kvmarm@lists.linux.dev>; Thu, 23 Feb 2023 20:10:13 +0000 (UTC)
-Received: by mail-vs1-f45.google.com with SMTP id s1so1184070vsk.5
-        for <kvmarm@lists.linux.dev>; Thu, 23 Feb 2023 12:10:13 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D98A06FB7
+	for <kvmarm@lists.linux.dev>; Thu, 23 Feb 2023 20:29:00 +0000 (UTC)
+Received: by mail-pj1-f74.google.com with SMTP id fy8-20020a17090b020800b002374c592205so154407pjb.5
+        for <kvmarm@lists.linux.dev>; Thu, 23 Feb 2023 12:29:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tb4E/KDAfmO+OWY5M3vwQnCShVGqXeIPzhu+t6ji2TI=;
-        b=Buy8GsfJbaC7xe6w4gIMVDaR17FRMpXubc52+8pPyuvFEIOFipuVV1KBEuKEAKh0El
-         7DlCtGhjvPy6R3F83LlbXWVkFsviditFGOnyOFNuaCOFkrNwI/obEofFnE7fHFIFAjz5
-         TS0RlbZVFOqi87gU5+jO/2VyNSZYlD1MRdH/KauUtlrOFE91xF4O4zPf42C2bpL/k3d4
-         f10eOthZsxd161U/wfkLecBG0lA6RlgWgp1Y7V0lS1+X71MKNI7c2knUOng4oSETF3N3
-         4wA3dsBYF7sv1XPjiAiCOtvvfYyIrBnGgsjlWHce/SoH5Z12GmZZtRDih8OTERcpCo1Z
-         77Kw==
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iMpgRmyVDog12gGF5u00S3GFVvfa3RjsGhYYuIghQuw=;
+        b=Oj0JNHRfBF0003MFOrybvJRxKWvg4a//DfyLNclUK+7N5/s7VjeN2Ybz0ne96gQ+y/
+         Kce+Q0ZXdzbS+HItx2LVYs6XbJeGYav5T0kxtg6oSGyyAnYLkgfUmKMvnWrz/RJr2iGt
+         BiNuY4XQIP71ObixRoPGWBrf5q6zjI9OvmSI5XqGwGSoaN4Qo8PjJcVdjNQWqFmCbaNT
+         fDylmTkY2OnILfYvuCp/0wvlS/vK3WqeY+Vs8jpgS0bDY+Fzi+bVe+j3RecifYahcIhh
+         j4oJs7UNz2z7WtDg2Ub7n9qah3g+mR+nVEw9Z6a8GUszbe4QIdPOG3iK1M22brh9bkyW
+         z3qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tb4E/KDAfmO+OWY5M3vwQnCShVGqXeIPzhu+t6ji2TI=;
-        b=Jy93EJLCHBy8EpmmHS3Mhktd0qnKNwo4Cn0Z7fDMyH/tIJrGvdGctA0A0J6XGLpB3y
-         x4wKN2yqefAHhECK6PkAaC9TnDfg9QZGxDHNj9rIL1T1/fs5ssAl0jycZh4uUX6dOr8j
-         /sxdqLyeln+IDseKjNm6/vJY+fp5ratDt6xfYTFEU0VvgF9D+tx7/FvrJ2BQHy4vAx+v
-         13HvbVloAnHsz+BgqDbpQxXniBMBC11wdsuDlw9DxNpxHQ9w2ZAM67p334mSoJYfwDa3
-         a+YOKQrdefqG9bNVZieUt0nG+4GGv7R3zxz9Shd/sng8/3beP6czT+O3xBGONK7S1MRj
-         C/wg==
-X-Gm-Message-State: AO0yUKWHnxwg8odlzk30xa3zm1Z4x3x2DNPalx4onPbLC375Zo3nDk5k
-	XFrdFYa0M5fJJUkzWxGVtNEvK3cEnMSN12MjkG9tew==
-X-Google-Smtp-Source: AK7set/BdoUj1YfuS8JpwJQ04kHrKoqkmuSB4hZ/qUc3HI+kpJOsmACSu4zfNA2VRxx+6n1Ke4C2BNibi2yxxoTp1zE=
-X-Received: by 2002:a05:6102:3181:b0:414:34d3:89a with SMTP id
- c1-20020a056102318100b0041434d3089amr752650vsh.6.1677183012138; Thu, 23 Feb
- 2023 12:10:12 -0800 (PST)
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=iMpgRmyVDog12gGF5u00S3GFVvfa3RjsGhYYuIghQuw=;
+        b=6TcIbuZZTc3DLMVXNGSE86rb0IX4PCe8JigDPQJlL5LfWVPg0YviXAiZ3arhuphExs
+         Vy+w85XIeocsWx4DX6g6OZgNuvGXYxI2wVBZta7feKtf5G6lqe9HLIa3XsyGv8AD6Voo
+         k5Cn8mUBHI8whT7lacUZajV4UWcGOJaIJWmWxxrEnSmkUesJNNhnAlcNWa/LkZ+lxWhM
+         3G/QrXVHJ29OBMB7c7ABW1nCG+X/oIPvdwM4ljvap8nq19uXE0m0jJGZevQ1Q19ug/eg
+         VTrQJfwkNWN99efXqP8CAttJNY0MEF0dTSmpBlwanEQqrxvbzJkOyDNswpbLK2cy7KYO
+         iscw==
+X-Gm-Message-State: AO0yUKXeCDH1iv2BGB4SeTJDOM0AZjVqoVa4HPYahbJMelWZcO4s1wRa
+	akZ3ztRfMRWAtBi2KSa04fk/siMlA90=
+X-Google-Smtp-Source: AK7set/XyWT2OAnpm11r3FBKVIDwL0kXrUZRkKccpnOexZiyXc1HvjHh6IvJEeYAirA5lDcDXm4Ck4IuD34=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:1955:b0:593:f5e4:8d87 with SMTP id
+ s21-20020a056a00195500b00593f5e48d87mr2471665pfk.6.1677184140109; Thu, 23 Feb
+ 2023 12:29:00 -0800 (PST)
+Date: Thu, 23 Feb 2023 12:28:58 -0800
+In-Reply-To: <CAOUHufYWktz4SNjL_o_2oZNcJLXserwCot-Prv4UEG9uzn57rg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
+Mime-Version: 1.0
 References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-6-yuzhao@google.com>
  <Y/elw7CTvVWt0Js6@google.com> <CAOUHufbAKpv95k6rVedstjD_7JzP0RrbOD652gyZh2vbAjGPOg@mail.gmail.com>
  <Y/e6Z+KIl6sYJoRg@google.com> <CAOUHufbwcqx21T=zmvYpnX_Mnd2A0KkPORbtxnJEwKuUKVSPzA@mail.gmail.com>
- <Y/fFWyYPu5Jf0de1@google.com>
-In-Reply-To: <Y/fFWyYPu5Jf0de1@google.com>
-From: Yu Zhao <yuzhao@google.com>
-Date: Thu, 23 Feb 2023 13:09:33 -0700
-Message-ID: <CAOUHufYWktz4SNjL_o_2oZNcJLXserwCot-Prv4UEG9uzn57rg@mail.gmail.com>
+ <Y/fFWyYPu5Jf0de1@google.com> <CAOUHufYWktz4SNjL_o_2oZNcJLXserwCot-Prv4UEG9uzn57rg@mail.gmail.com>
+Message-ID: <Y/fMimvChfhhbCid@google.com>
 Subject: Re: [PATCH mm-unstable v1 5/5] mm: multi-gen LRU: use mmu_notifier_test_clear_young()
-To: Sean Christopherson <seanjc@google.com>
+From: Sean Christopherson <seanjc@google.com>
+To: Yu Zhao <yuzhao@google.com>
 Cc: Johannes Weiner <hannes@cmpxchg.org>, Andrew Morton <akpm@linux-foundation.org>, 
 	Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
 	Michael Larabel <michael@michaellarabel.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
 	linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, x86@kernel.org, 
 	linux-mm@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 23, 2023 at 12:58=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> On Thu, Feb 23, 2023, Yu Zhao wrote:
-> > On Thu, Feb 23, 2023 at 12:11=E2=80=AFPM Sean Christopherson <seanjc@go=
-ogle.com> wrote:
-> > >
-> > > On Thu, Feb 23, 2023, Yu Zhao wrote:
-> > > > > As alluded to in patch 1, unless batching the walks even if KVM d=
-oes _not_ support
-> > > > > a lockless walk is somehow _worse_ than using the existing mmu_no=
-tifier_clear_flush_young(),
-> > > > > I think batching the calls should be conditional only on LRU_GEN_=
-SPTE_WALK.  Or
-> > > > > if we want to avoid batching when there are no mmu_notifier liste=
-ners, probe
-> > > > > mmu_notifiers.  But don't call into KVM directly.
-> > > >
-> > > > I'm not sure I fully understand. Let's present the problem on the M=
-M
-> > > > side: assuming KVM supports lockless walks, batching can still be
-> > > > worse (very unlikely), because GFNs can exhibit no memory locality =
-at
-> > > > all. So this option allows userspace to disable batching.
-> > >
-> > > I'm asking the opposite.  Is there a scenario where batching+lock is =
-worse than
-> > > !batching+lock?  If not, then don't make batching depend on lockless =
-walks.
+On Thu, Feb 23, 2023, Yu Zhao wrote:
+> On Thu, Feb 23, 2023 at 12:58=E2=80=AFPM Sean Christopherson <seanjc@goog=
+le.com> wrote:
 > >
-> > Yes, absolutely. batching+lock means we take/release mmu_lock for
-> > every single PTE in the entire VA space -- each small batch contains
-> > 64 PTEs but the entire batch is the whole KVM.
->
-> Who is "we"?
+> > On Thu, Feb 23, 2023, Yu Zhao wrote:
+> > > On Thu, Feb 23, 2023 at 12:11=E2=80=AFPM Sean Christopherson <seanjc@=
+google.com> wrote:
+> > > >
+> > > > On Thu, Feb 23, 2023, Yu Zhao wrote:
+> > > > > > As alluded to in patch 1, unless batching the walks even if KVM=
+ does _not_ support
+> > > > > > a lockless walk is somehow _worse_ than using the existing mmu_=
+notifier_clear_flush_young(),
+> > > > > > I think batching the calls should be conditional only on LRU_GE=
+N_SPTE_WALK.  Or
+> > > > > > if we want to avoid batching when there are no mmu_notifier lis=
+teners, probe
+> > > > > > mmu_notifiers.  But don't call into KVM directly.
+> > > > >
+> > > > > I'm not sure I fully understand. Let's present the problem on the=
+ MM
+> > > > > side: assuming KVM supports lockless walks, batching can still be
+> > > > > worse (very unlikely), because GFNs can exhibit no memory localit=
+y at
+> > > > > all. So this option allows userspace to disable batching.
+> > > >
+> > > > I'm asking the opposite.  Is there a scenario where batching+lock i=
+s worse than
+> > > > !batching+lock?  If not, then don't make batching depend on lockles=
+s walks.
+> > >
+> > > Yes, absolutely. batching+lock means we take/release mmu_lock for
+> > > every single PTE in the entire VA space -- each small batch contains
+> > > 64 PTEs but the entire batch is the whole KVM.
+> >
+> > Who is "we"?
+>=20
+> Oops -- shouldn't have used "we".
+>=20
+> > I don't see anything in the kernel that triggers walking the whole
+> > VMA, e.g. lru_gen_look_around() limits the walk to a single PMD.  I fee=
+l like I'm
+> > missing something...
+>=20
+> walk_mm() -> walk_pud_range() -> walk_pmd_range() -> walk_pte_range()
+> -> test_spte_young() -> mmu_notifier_test_clear_young().
+>=20
+> MGLRU takes two passes: during the first pass, it sweeps entire VA
+> space on each MM (per MM/KVM); during the second pass, it uses the rmap o=
+n each
+> folio (per folio).
 
-Oops -- shouldn't have used "we".
+Ah.  IIUC, userspace can use LRU_GEN_SPTE_WALK to control whether or not to=
+ walk
+secondary MMUs, and the kernel further restricts LRU_GEN_SPTE_WALK to secon=
+dary
+MMUs that implement a lockless walk.  And if the answer is "no", secondary =
+MMUs
+are simply not consulted.
 
-> I don't see anything in the kernel that triggers walking the whole
-> VMA, e.g. lru_gen_look_around() limits the walk to a single PMD.  I feel =
-like I'm
-> missing something...
+If that's correct, then the proper way to handle this is by extending mmu_n=
+otifier_ops
+to query (a) if there's at least one register listeners that implements
+test_clear_young() and (b) if all registered listeners that implement test_=
+clear_young()
+support lockless walks.  That avoids direct dependencies on KVM, and avoids=
+ making
+assumptions that may not always hold true, e.g. that KVM is the only mmu_no=
+tifier
+user that supports the young APIs.
 
-walk_mm() -> walk_pud_range() -> walk_pmd_range() -> walk_pte_range()
--> test_spte_young() -> mmu_notifier_test_clear_young().
-
-MGLRU takes two passes: during the first pass, it sweeps entire VA
-space on each MM (per MM/KVM); during the second pass, it uses the rmap on =
-each
-folio (per folio). The look around exploits the (spatial) locality in
-the second pass, to get the best out of the expensive per folio rmap
-walk.
-
-(The first pass can't handle shared mappings; the second pass can.)
+P.S. all of this info absolutely belongs in documentation and/or changelogs=
+.
