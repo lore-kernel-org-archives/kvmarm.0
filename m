@@ -1,173 +1,113 @@
-Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85AC62F2A
-	for <kvmarm@lists.linux.dev>; Thu, 23 Feb 2023 17:40:56 +0000 (UTC)
-Received: by mail-vs1-f51.google.com with SMTP id m10so14806666vso.4
-        for <kvmarm@lists.linux.dev>; Thu, 23 Feb 2023 09:40:56 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9740E2F2A
+	for <kvmarm@lists.linux.dev>; Thu, 23 Feb 2023 17:43:33 +0000 (UTC)
+Received: by mail-pl1-f201.google.com with SMTP id k3-20020a170902ce0300b0019ca6e66303so2943786plg.18
+        for <kvmarm@lists.linux.dev>; Thu, 23 Feb 2023 09:43:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fo7AgQ2bct21yLgbxRinWk51c7Sq7xFh6y+K3L6/tTM=;
-        b=GBvZr3FRKM3NOesy8gVSZUY02Sq7aNLAUfDffqGDvKf740Ehqv8nBE7Oi8FsVIN6J1
-         JkZFMoh+qCPEAzymwVHG0z1bBMx/KYg6SymF2QTZuOLraOywk3TLiLhpYUErfPSbomdU
-         FdELqyo5w45/teVQSzUk24vH1+jYHCr88FiP2s8cZmTnhZ/p9c9I1VeiW+nF0kurnbWN
-         zU2trwEFNYfVM5n6sxlFHrJwWriTlH1Yux1MJGSccWSU+BwuGOcqC/WBw7sP08hDnexG
-         HURlUENH3H2vj5o3TSRbImMuccAeHy0C5gzNj/u3KE2SP/RtkjYxI2vBWBhCxO8K3UcO
-         df/g==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uEW2x7lvcZVgNquM9X5miuc098m/bUXcKiqyROdfsvA=;
+        b=GnEFv8ZYEKJq2FLsbqFXmOIsxOoE4EVShbkz1ukBp++CxWl81cjyx0bklp6nXH3I70
+         1Dn7JrVCVuKLElNcGdQ1U6YXznFPEHlKh91jnsTXumsHU8puSiTvyoKnzjCVZbQPKnWS
+         QXdxzapoB+4T797LXxDe2I0aHK2NBTy6Rw4ivHdiib/6jaI04ABl+Dtf1ReAAkKNrGSl
+         8NHnqSqy6ru6z4leh6bzy1EQMm6tgE5IBBFzAYn+bp+FpfKImc6YedR1CZMkmMlPEp36
+         c2HXP4yjSNThuM60YRVKyVgt+SlF71LlRuX35DyTXLuiC4Od9uaQKbklKgKjNGtAO3hZ
+         O4sA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fo7AgQ2bct21yLgbxRinWk51c7Sq7xFh6y+K3L6/tTM=;
-        b=ktYi0KXjrAWT6R5GcTqggdrmjxH0Ht8fh8ky24w+QWJ8+xQ0+d+FjgtrmSpP6VFnkg
-         TuiHA7gjtME/35oiZul0r7CVb6+Mh3tNZskbuyP1dy9F50qp1IleNnApw5Y+N/aJW+gf
-         7NG4vtABdILC1H1dpfcypS7DdwKjbF6kA+r17g8Du9zy7m1FJGh42LqSTzGOui/DKzR7
-         BhcI9OERBzblynsjZmBmcnDvTdf0kNz4G3DaNpyoCWPeMSZbs0R/dAMfUDUBQtcd3TF1
-         Hh+z8R4iOgMJz3y9dus30rBmr6PPuC7eakbGNAmGX9R7bNxtpd+divZXMxcmB3ZblbbI
-         WttA==
-X-Gm-Message-State: AO0yUKUkwbkabqaVogWSGmu1wqE450IYdu3+CDe3JECGv8Y5Jd4Ugs9W
-	fCvp6piACxZQtH7OP9yDf85Y3l276mzb7VgdznOYDYRxRYcjYVHpLPE=
-X-Google-Smtp-Source: AK7set9wJbC1t128b6r/YElZqMz+AmeZGkkjsbu1lRieG6NYjdy/fQfX1OM7M72E6+9T9qCprQHwdxazlikgHRzNMDs=
-X-Received: by 2002:a05:6102:108f:b0:41e:d8b5:ee40 with SMTP id
- s15-20020a056102108f00b0041ed8b5ee40mr899877vsr.26.1677174055279; Thu, 23 Feb
- 2023 09:40:55 -0800 (PST)
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uEW2x7lvcZVgNquM9X5miuc098m/bUXcKiqyROdfsvA=;
+        b=K2qMtXmQiSeR/DzI8iybCaNqIbF89pTV7gqbhPFQbTCswrFAUsuxMzMZV3g0KahLW9
+         UMISEahkztDHxBPU5OKHt31zk5w1IHrPKNcDPq0SDTALgz8jcTCtrYR8+ZyPdn93ByNn
+         RqOcHedOQhmM240V+1o7053dukBJcAUTkPFGzocaO0gr304DmyDsEMtLzre3B5jbIyc1
+         C/WBDC4QUAbwHwxY8iSY9vEiGx7mrXYGnxAoeTI+3Vb5sCmVP3hZj0cC6BO6X84tfC+I
+         ExNZOAXj5Px44JF3dIqgl5eGYwfMug3pgbD7TLNMzliHsIozu3X7DEnOnJFWNwingOs/
+         Hwqw==
+X-Gm-Message-State: AO0yUKXcALprDEcFkizlGWJHqM051e43Y92QmX+VYZGcBn9nsnSauJqf
+	uDx3CTA6NCo9Mi7sAbzzKp7y1mqdHqY=
+X-Google-Smtp-Source: AK7set83+Pnlpt5peCqIhQBtdMvaXZZfXzsbtxsBRoLRt6jnUdFR+O/gyNEyxZMgKJ7oNYHyvpri8MhadHU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a65:6944:0:b0:4fd:2170:b2da with SMTP id
+ w4-20020a656944000000b004fd2170b2damr1506614pgq.0.1677174212817; Thu, 23 Feb
+ 2023 09:43:32 -0800 (PST)
+Date: Thu, 23 Feb 2023 09:43:31 -0800
+In-Reply-To: <20230217041230.2417228-6-yuzhao@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-2-yuzhao@google.com>
- <Y/ee1s3XPGa62SFV@google.com>
-In-Reply-To: <Y/ee1s3XPGa62SFV@google.com>
-From: Yu Zhao <yuzhao@google.com>
-Date: Thu, 23 Feb 2023 10:40:19 -0700
-Message-ID: <CAOUHufZ0Ep4_Edo4OoeUVpVK4uFJF6_yVL=xSrQM8an_Vw4VKw@mail.gmail.com>
-Subject: Re: [PATCH mm-unstable v1 1/5] mm/kvm: add mmu_notifier_test_clear_young()
-To: Sean Christopherson <seanjc@google.com>
+Mime-Version: 1.0
+References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-6-yuzhao@google.com>
+Message-ID: <Y/elw7CTvVWt0Js6@google.com>
+Subject: Re: [PATCH mm-unstable v1 5/5] mm: multi-gen LRU: use mmu_notifier_test_clear_young()
+From: Sean Christopherson <seanjc@google.com>
+To: Yu Zhao <yuzhao@google.com>
 Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Jonathan Corbet <corbet@lwn.net>, Michael Larabel <michael@michaellarabel.com>, kvmarm@lists.linux.dev, 
 	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
 	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
 	linuxppc-dev@lists.ozlabs.org, x86@kernel.org, linux-mm@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Feb 23, 2023 at 10:14=E2=80=AFAM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> On Thu, Feb 16, 2023, Yu Zhao wrote:
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 9c60384b5ae0..1b465df4a93d 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -875,6 +875,63 @@ static int kvm_mmu_notifier_clear_young(struct mmu=
-_notifier *mn,
-> >       return kvm_handle_hva_range_no_flush(mn, start, end, kvm_age_gfn)=
-;
-> >  }
-> >
-> > +static bool kvm_test_clear_young(struct kvm *kvm, unsigned long start,
-> > +                              unsigned long end, unsigned long *bitmap=
-)
-> > +{
-> > +     int i;
-> > +     int key;
-> > +     bool success =3D true;
-> > +
-> > +     trace_kvm_age_hva(start, end);
-> > +
-> > +     key =3D srcu_read_lock(&kvm->srcu);
-> > +
-> > +     for (i =3D 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
-> > +             struct interval_tree_node *node;
-> > +             struct kvm_memslots *slots =3D __kvm_memslots(kvm, i);
-> > +
-> > +             kvm_for_each_memslot_in_hva_range(node, slots, start, end=
- - 1) {
-> > +                     gfn_t lsb_gfn;
-> > +                     unsigned long hva_start, hva_end;
-> > +                     struct kvm_gfn_range range =3D {
-> > +                             .slot =3D container_of(node, struct kvm_m=
-emory_slot,
-> > +                                                  hva_node[slots->node=
-_idx]),
-> > +                     };
-> > +
-> > +                     hva_start =3D max(start, range.slot->userspace_ad=
-dr);
-> > +                     hva_end =3D min(end - 1, range.slot->userspace_ad=
-dr +
-> > +                                            range.slot->npages * PAGE_=
-SIZE - 1);
-> > +
-> > +                     range.start =3D hva_to_gfn_memslot(hva_start, ran=
-ge.slot);
-> > +                     range.end =3D hva_to_gfn_memslot(hva_end, range.s=
-lot) + 1;
-> > +
-> > +                     if (WARN_ON_ONCE(range.end <=3D range.start))
-> > +                             continue;
->
-> Extend __kvm_handle_hva_range() instead of copy-pasting.  At a very quick=
- glance,
-> I believe all that is needed is (minus sanity checks):
+On Thu, Feb 16, 2023, Yu Zhao wrote:
+> An existing selftest can quickly demonstrate the effectiveness of this
+> patch. On a generic workstation equipped with 128 CPUs and 256GB DRAM:
 
-Yes, will do.
+Not my area of maintenance, but a non-existent changelog (for all intents and
+purposes) for a change of this size and complexity is not acceptable.
 
-I do need to add one more parameter to kvm_gfn_range, because that's
-what the current kvm_arch_test_clear_young() needs, assuming that
-function is acceptable.
+>   $ sudo max_guest_memory_test -c 64 -m 250 -s 250
+> 
+>   MGLRU      run2
+>   ---------------
+>   Before    ~600s
+>   After      ~50s
+>   Off       ~250s
+> 
+>   kswapd (MGLRU before)
+>     100.00%  balance_pgdat
+>       100.00%  shrink_node
+>         100.00%  shrink_one
+>           99.97%  try_to_shrink_lruvec
+>             99.06%  evict_folios
+>               97.41%  shrink_folio_list
+>                 31.33%  folio_referenced
+>                   31.06%  rmap_walk_file
+>                     30.89%  folio_referenced_one
+>                       20.83%  __mmu_notifier_clear_flush_young
+>                         20.54%  kvm_mmu_notifier_clear_flush_young
+>   =>                      19.34%  _raw_write_lock
+> 
+>   kswapd (MGLRU after)
+>     100.00%  balance_pgdat
+>       100.00%  shrink_node
+>         100.00%  shrink_one
+>           99.97%  try_to_shrink_lruvec
+>             99.51%  evict_folios
+>               71.70%  shrink_folio_list
+>                 7.08%  folio_referenced
+>                   6.78%  rmap_walk_file
+>                     6.72%  folio_referenced_one
+>                       5.60%  lru_gen_look_around
+>   =>                    1.53%  __mmu_notifier_test_clear_young
 
-Also, just a side note, from MM's POV, the following in
-__kvm_handle_hva_range() seems to forget to handle end =3D=3D 0, if that's
-possible?
+Do you happen to know how much of the improvement is due to batching, and how
+much is due to using a walkless walk?
 
-  hva_end =3D min(range->end, slot->userspace_addr + (slot->npages <<
-PAGE_SHIFT));
+> @@ -5699,6 +5797,9 @@ static ssize_t show_enabled(struct kobject *kobj, struct kobj_attribute *attr, c
+>  	if (arch_has_hw_nonleaf_pmd_young() && get_cap(LRU_GEN_NONLEAF_YOUNG))
+>  		caps |= BIT(LRU_GEN_NONLEAF_YOUNG);
+>  
+> +	if (kvm_arch_has_test_clear_young() && get_cap(LRU_GEN_SPTE_WALK))
+> +		caps |= BIT(LRU_GEN_SPTE_WALK);
 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index d255964ec331..3296ae2cf6fa 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -544,6 +544,7 @@ struct kvm_hva_range {
->         hva_handler_t handler;
->         on_lock_fn_t on_lock;
->         on_unlock_fn_t on_unlock;
-> +       bool lockless;
->         bool flush_on_ret;
->         bool may_block;
->  };
-> @@ -616,7 +617,7 @@ static __always_inline int __kvm_handle_hva_range(str=
-uct kvm *kvm,
->                         gfn_range.end =3D hva_to_gfn_memslot(hva_end + PA=
-GE_SIZE - 1, slot);
->                         gfn_range.slot =3D slot;
->
-> -                       if (!locked) {
-> +                       if (!range->lockless && !locked) {
->                                 locked =3D true;
->                                 KVM_MMU_LOCK(kvm);
->                                 if (!IS_KVM_NULL_FN(range->on_lock))
->
-> > +
-> > +                     /* see the comments on the generic kvm_arch_has_t=
-est_clear_young() */
-> > +                     lsb_gfn =3D hva_to_gfn_memslot(end - 1, range.slo=
-t);
-> > +
-> > +                     success =3D kvm_arch_test_clear_young(kvm, &range=
-, lsb_gfn, bitmap);
-> > +                     if (!success)
-> > +                             break;
-> > +             }
-> > +     }
-> > +
-> > +     srcu_read_unlock(&kvm->srcu, key);
-> > +
-> > +     return success;
-> > +}
+As alluded to in patch 1, unless batching the walks even if KVM does _not_ support
+a lockless walk is somehow _worse_ than using the existing mmu_notifier_clear_flush_young(),
+I think batching the calls should be conditional only on LRU_GEN_SPTE_WALK.  Or
+if we want to avoid batching when there are no mmu_notifier listeners, probe
+mmu_notifiers.  But don't call into KVM directly.
