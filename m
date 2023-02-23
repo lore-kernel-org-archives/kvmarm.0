@@ -1,51 +1,50 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4236C2C9E
-	for <kvmarm@lists.linux.dev>; Thu, 23 Feb 2023 17:09:40 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-536c02ed619so133301817b3.8
-        for <kvmarm@lists.linux.dev>; Thu, 23 Feb 2023 09:09:40 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7BB82F2A
+	for <kvmarm@lists.linux.dev>; Thu, 23 Feb 2023 17:14:00 +0000 (UTC)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-536bbaeceeaso137925457b3.11
+        for <kvmarm@lists.linux.dev>; Thu, 23 Feb 2023 09:14:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ESEYfucHSnOWaZatj5hNQPiLl3UqdNvq9+VGnD33XD0=;
-        b=eacT4PM6bk+JAGYX8AtEreTJLTfD+mSJsjox9puZbiJhIzz/wIxHhoNqBFIAXYayu7
-         ix2AdCa9GlyQPz6wKG3LR8o4NT+280wasX8/AykGzPPWlG6F17mnxqyPEg7H8lCLwAiX
-         eXH6zqI0g24xM5ZEDyA5U2YNv7s9H603+yWuiAeHry6HpCAAUQ5/Ypm3z9qWSoASZAJv
-         GIl+kmJbNVHeS7mmPwXAdOExvjZqQ9ItW1uw3DrabrHDmj3KBFLmoGmyQYc+K7/u+5MN
-         XBySfkomcCwXORKGamuW5yTLWSpURcpZFsI0uJbe36YJ/e/6tvZI8z6lN62S38fr6TXv
-         yALQ==
+        bh=m9a3DVsbLLCiizvc2aec2wajhEpcLeonWEm+iefIJpg=;
+        b=j3+/xNXOW39AcGdiBKIT1ULTMkq8kVSikEDQybzdeJTRA37B2kpy80N5M1Dei878R4
+         GaXaFfuMncInfPEX5RJTGpdyozZsflbRf0Gbtl9jxACTZgei3XQt5U/WYSeMd7/i64ow
+         U135uPNxlmsPv4ItCwhl7oyYE5w1QhCJKJqaOclKSAWU/aWhnoTHIOiSvrruZaqQt8na
+         Uh+YugdR1H4UVdnaJ09b/cgGqLEYVq8/f44xVjwZH2YLIIBd4i/f1Jr7SEfqqKiHZfK4
+         er44ZBZpMwi5PZXjKu21H2yJPHQNutcaEZjY0olLohqu9AmYfM91IghN2CDVI97loorS
+         tx3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ESEYfucHSnOWaZatj5hNQPiLl3UqdNvq9+VGnD33XD0=;
-        b=qIwjjohr0Wv0EiQMk7yO1Geaoo6Wj5JXYSoalFaxzvrMtG3chbpUhfIULPq0J/dwWH
-         NWfntqv7BxHgMQj9Y8wdFOoW8G+NUUNl2CqZCacAZpPMUfVkuonDP26ZmW8zMKPC6i2/
-         2PKpgsmUeeVerL/QrZTixjEmi6Ya675BlXod3YUNoN6yjQ9jzGib1wVaNtLvlYc6slKr
-         7cvsL3Ynsa/bVChPy5p3ZCTsPvmoVZ3fF8PBvs9BWpgq9yQtRqlmc/t06Y3xxGdWIojU
-         HX5DrPWVsiO9d1sHzwc3eCF0WV9kt2Pt02ooCMOeWAYkXPz2WKmzlDg41+4gY8x9JB2j
-         dtWg==
-X-Gm-Message-State: AO0yUKW/qZFlAWnkZpiz9gIN+LaZ7+djHqG/7vTN/204r7mJv/tKBEd7
-	2jwhwyicAr692lfX3VyI1FWHxg+F0Ns=
-X-Google-Smtp-Source: AK7set+o4nZnorUIfwBQUKqlnrrJeoYQJz7sG9NME5jj+i7H5Ea4MTUvMN+YCmQEaMe31ZnG3Fe5siKK8IQ=
+        bh=m9a3DVsbLLCiizvc2aec2wajhEpcLeonWEm+iefIJpg=;
+        b=BVe8QG1z2zkO0IEo//yU0nbvY/dnqIZN5qZ5K7+y6dp5+LT9ZHnzUmcz4UQ7295Y27
+         TdGt+PS1Pc12aAvpOUijDiBMEfcCDEWeE7xIi0gIZTreMmGmJK8r88iCyPKOV1+/cuzq
+         5Isjbzd/XqMgefSHpQHx6JitYyB6ZHQeUX6jneE21J10y3DVDkLs/JhUxQWEM9EyUvLz
+         Uwz2pGIycilD23mYT+VWALXHcTqoqcyyt9DevOtrr6SLuW2KDgCFM8e9edrGAhgI9dP/
+         gN8qIJFqnwJKTncaLxqKIh73k7oJ0ueED2DoYRM+jUf8gtiPj80XGoXa+aZTdhx9xnb7
+         lCXA==
+X-Gm-Message-State: AO0yUKXu8dJqy1oAdDGXmC9WadQpY1DivwcuAToZwPvpdlE54JFvU+OO
+	nkB/X2dHZXtH5LjxFkW2m7yfqzgAkCI=
+X-Google-Smtp-Source: AK7set/sBYiVXprfoygydPUN0hrU35/k2bW+OOgTOU9cAUD3HKKiCHjKS7O05xDs1Rmfdd/bjv5qKqc6wMY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:b60b:0:b0:52f:45a:5b00 with SMTP id
- u11-20020a81b60b000000b0052f045a5b00mr2611344ywh.2.1677172179211; Thu, 23 Feb
- 2023 09:09:39 -0800 (PST)
-Date: Thu, 23 Feb 2023 09:09:37 -0800
-In-Reply-To: <CAOUHufaK-BHdajDZJKjn_LU-gMkUTKa_9foMB8g-u9DyrVhPwg@mail.gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:10c9:b0:855:fdcb:4467 with SMTP id
+ w9-20020a05690210c900b00855fdcb4467mr3661788ybu.0.1677172439635; Thu, 23 Feb
+ 2023 09:13:59 -0800 (PST)
+Date: Thu, 23 Feb 2023 09:13:58 -0800
+In-Reply-To: <20230217041230.2417228-2-yuzhao@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-3-yuzhao@google.com>
- <Y++q/lglE6FJBdjt@google.com> <CAOUHufaK-BHdajDZJKjn_LU-gMkUTKa_9foMB8g-u9DyrVhPwg@mail.gmail.com>
-Message-ID: <Y/ed0XYAPx+7pukA@google.com>
-Subject: Re: [PATCH mm-unstable v1 2/5] kvm/x86: add kvm_arch_test_clear_young()
+References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-2-yuzhao@google.com>
+Message-ID: <Y/ee1s3XPGa62SFV@google.com>
+Subject: Re: [PATCH mm-unstable v1 1/5] mm/kvm: add mmu_notifier_test_clear_young()
 From: Sean Christopherson <seanjc@google.com>
 To: Yu Zhao <yuzhao@google.com>
 Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
@@ -55,87 +54,84 @@ Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.co
 	linuxppc-dev@lists.ozlabs.org, x86@kernel.org, linux-mm@google.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Feb 22, 2023, Yu Zhao wrote:
-> On Fri, Feb 17, 2023 at 9:27 AM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Thu, Feb 16, 2023, Yu Zhao wrote:
-> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > > index 6aaae18f1854..d2995c9e8f07 100644
-> > > --- a/arch/x86/include/asm/kvm_host.h
-> > > +++ b/arch/x86/include/asm/kvm_host.h
-> > > @@ -1367,6 +1367,12 @@ struct kvm_arch {
-> > >        *      the MMU lock in read mode + the tdp_mmu_pages_lock or
-> > >        *      the MMU lock in write mode
-> > >        *
-> > > +      * kvm_arch_test_clear_young() is a special case. It relies on two
-> >
-> > No, it's not.  The TDP MMU already employs on RCU and CMPXCHG.
-> 
-> It is -- you read it out of context :)
+On Thu, Feb 16, 2023, Yu Zhao wrote:
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 9c60384b5ae0..1b465df4a93d 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -875,6 +875,63 @@ static int kvm_mmu_notifier_clear_young(struct mmu_notifier *mn,
+>  	return kvm_handle_hva_range_no_flush(mn, start, end, kvm_age_gfn);
+>  }
+>  
+> +static bool kvm_test_clear_young(struct kvm *kvm, unsigned long start,
+> +				 unsigned long end, unsigned long *bitmap)
+> +{
+> +	int i;
+> +	int key;
+> +	bool success = true;
+> +
+> +	trace_kvm_age_hva(start, end);
+> +
+> +	key = srcu_read_lock(&kvm->srcu);
+> +
+> +	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
+> +		struct interval_tree_node *node;
+> +		struct kvm_memslots *slots = __kvm_memslots(kvm, i);
+> +
+> +		kvm_for_each_memslot_in_hva_range(node, slots, start, end - 1) {
+> +			gfn_t lsb_gfn;
+> +			unsigned long hva_start, hva_end;
+> +			struct kvm_gfn_range range = {
+> +				.slot = container_of(node, struct kvm_memory_slot,
+> +						     hva_node[slots->node_idx]),
+> +			};
+> +
+> +			hva_start = max(start, range.slot->userspace_addr);
+> +			hva_end = min(end - 1, range.slot->userspace_addr +
+> +					       range.slot->npages * PAGE_SIZE - 1);
+> +
+> +			range.start = hva_to_gfn_memslot(hva_start, range.slot);
+> +			range.end = hva_to_gfn_memslot(hva_end, range.slot) + 1;
+> +
+> +			if (WARN_ON_ONCE(range.end <= range.start))
+> +				continue;
 
-Ah, the special case is that it's fully lockless.  That's still not all that
-special, e.g. see kvm_tdp_mmu_walk_lockless_{begin,end}().
+Extend __kvm_handle_hva_range() instead of copy-pasting.  At a very quick glance,
+I believe all that is needed is (minus sanity checks):
 
->          * For reads, this list is protected by:
->          *      the MMU lock in read mode + RCU or
->          *      the MMU lock in write mode
->          *
->          * For writes, this list is protected by:
->          *      the MMU lock in read mode + the tdp_mmu_pages_lock or
->          *      the MMU lock in write mode
->          *
->          * kvm_arch_test_clear_young() is a special case.
->          ...
-> 
->         struct list_head tdp_mmu_roots;
-> 
-> > Just drop the
-> > entire comment.
-> 
-> Let me move it into kvm_arch_test_clear_young().
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index d255964ec331..3296ae2cf6fa 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -544,6 +544,7 @@ struct kvm_hva_range {
+        hva_handler_t handler;
+        on_lock_fn_t on_lock;
+        on_unlock_fn_t on_unlock;
++       bool lockless;
+        bool flush_on_ret;
+        bool may_block;
+ };
+@@ -616,7 +617,7 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+                        gfn_range.end = hva_to_gfn_memslot(hva_end + PAGE_SIZE - 1, slot);
+                        gfn_range.slot = slot;
+ 
+-                       if (!locked) {
++                       if (!range->lockless && !locked) {
+                                locked = true;
+                                KVM_MMU_LOCK(kvm);
+                                if (!IS_KVM_NULL_FN(range->on_lock))
 
-No, I do not want kvm_arch_test_clear_young(), or any other one-off function, to
-be "special".  I love the idea of a lockless walk, but I want it to be a formal,
-documented way to walk TDP MMU roots.  I.e. add macro to go with for_each_tdp_mmu_root()
-and the yield-safe variants.
-
-/* blah blah blah */
-#define for_each_tdp_mmu_root_lockless(_kvm, _root, _as_id)		\
-	list_for_each_entry_rcu(_root, &kvm->arch.tdp_mmu_roots, link)	\
-		if (refcount_read(&root->tdp_mmu_root_count) &&		\
-		    kvm_mmu_page_as_id(_root) != _as_id) {		\
-		} else
-
-> Also I want to be clear:
-> 1. We can't just focus on here and now; we need to consider the distant future.
-
-I 100% agree, but those words need to be backed up by actions.  This series is
-littered with code that is not maintainable long term, e.g. open coding stuff
-that belongs in helpers and/or for which KVM already provides helpers, copy-pasting
-__kvm_handle_hva_range() instead of extending it to have a lockless option, poking
-directly into KVM from mm/ code, etc.
-
-I apologize for being so blunt.  My intent isn't to be rude/snarky, it's to set
-very clear expectations for getting any of these changes merges.  I asbolutely do
-want to land improvments to KVM's test+clear young flows, but it needs to be done
-in a way that is maintainable and doesn't saddle KVM with more tech debt.
-
-> 2. From my POV, "see the comments on ..." is like the index of a book.
-
-And my _very_ strong preference is to provide the "index" via code, not comments.
-
-> > Clearing a single bit doesn't need a CMPXCHG.  Please weigh in on a relevant series
-> > that is modifying the aging flows[*], I want to have exactly one helper for aging
-> > TDP MMU SPTEs.
-> >
-> > [*] https://lore.kernel.org/all/20230211014626.3659152-5-vipinsh@google.com
-> 
-> I'll take a look at that series. clear_bit() probably won't cause any
-> practical damage but is technically wrong because, for example, it can
-> end up clearing the A-bit in a non-leaf PMD. (cmpxchg will just fail
-> in this case, obviously.)
-
-Eh, not really.  By that argument, clearing an A-bit in a huge PTE is also technically
-wrong because the target gfn may or may not have been accessed.  The only way for
-KVM to clear a A-bit in a non-leaf entry is if the entry _was_ a huge PTE, but was
-replaced between the "is leaf" and the clear_bit().
+> +
+> +			/* see the comments on the generic kvm_arch_has_test_clear_young() */
+> +			lsb_gfn = hva_to_gfn_memslot(end - 1, range.slot);
+> +
+> +			success = kvm_arch_test_clear_young(kvm, &range, lsb_gfn, bitmap);
+> +			if (!success)
+> +				break;
+> +		}
+> +	}
+> +
+> +	srcu_read_unlock(&kvm->srcu, key);
+> +
+> +	return success;
+> +}
