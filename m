@@ -1,160 +1,145 @@
-Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A7E033D6
-	for <kvmarm@lists.linux.dev>; Thu, 23 Feb 2023 20:49:38 +0000 (UTC)
-Received: by mail-vs1-f46.google.com with SMTP id o2so4263479vss.8
-        for <kvmarm@lists.linux.dev>; Thu, 23 Feb 2023 12:49:38 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63CCB33D6
+	for <kvmarm@lists.linux.dev>; Thu, 23 Feb 2023 21:12:26 +0000 (UTC)
+Received: by mail-pf1-f202.google.com with SMTP id 202-20020a6218d3000000b005a89856900eso1378119pfy.14
+        for <kvmarm@lists.linux.dev>; Thu, 23 Feb 2023 13:12:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3SF3XhVP3fAY++OBxv67A9DpjZx+ZDC9K9+v7wrHIg4=;
-        b=EpX9CHX76iRG0Fs24LnxWWmUrr6GORT9E0/M4Xni5oa8PVB+NyUf9xnluacNRHiJLi
-         oTPsaXyvlxhYWm1ndp1ryFZ2TYjXOvmoy1HRUGzS0OcGc0zMZqTcHgAXNM4rvtYhkBVg
-         qf1J0mPiiAUp/S0+3TAXNUeuKCd0ORgY+E6d2A7I7obvZdxZj53WV4QC5FeppMbcQG4J
-         w3LEbf37wFLbDqttTYWl7EPewRkSSHAJUCRfzZv8DTS9QEc8hXTrQprXo+iEqU+77E4a
-         oj0f9UT2zBFwspHpPsFBXYoak9R9do+2VFEDllmPwgJrEESjvU63PTjiVmuQ4E+SRpNl
-         YYCA==
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jZqpqHNnDrkVf5YnH4C4p2Du+MWFI+rsSboHjRikfo0=;
+        b=cstTUl3cDjETi7Uy5k8lUK4jDXVH5n84ULJ8Qdzf8KUig6GFtpHB7w0eoI8Plhg2NM
+         6FWa3l7sXNc+M6YDtvaFjXzlpRtWBMe5SojZXE91tPmgJMlFF/CW1ZZv81jiCr0fXexK
+         lScdHryZlveE1J+z0J2TIi81MbXXQWHYdNInuM44+8VugSDN/fGG/tYGrW4Jcvq/Dl9n
+         Ek7HnOVQiTB+e4FM6RTzQyIV1EEstxc2pOWecp5NaX9GOemJJxxrazzswOceIxFVcfln
+         /s7eha+SalTSQycIbbCTH+sAFv5dgkYSrn8AD1goiYFHWVwKHCsyUeb7nev3pGjb/y5j
+         CUrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3SF3XhVP3fAY++OBxv67A9DpjZx+ZDC9K9+v7wrHIg4=;
-        b=8E/dLu5MfD0S1naLhPw4894XeFcuRupdXCYoAawj/EuUGMRM3LL2RiclBkPl91vPeT
-         e3UWp5ZpYj0wGMGI81vjkB197q7Z0q8w6Jq6ThOw/moYbdhfPK6wx9qt8l2Uw/aFcq0l
-         EyimT/XwgQND7fjTpeTPIxsKf5Wnz6opdLAUGGgZ8uCbhhiad5r6rGhvspurnH6kt437
-         fXWxJdTcaunbH4+JOdEer9ES9Hv7CTvYvNnbpP/q8dD5gBjVPm5Y95fX64zBRNKkP1bP
-         QrWDm+8e0S2khpG2OR48eMAz3MEDIo6Q2BHKQbCTDTp2r+u5SWpJelPxld75Pn3iPLG2
-         02Ng==
-X-Gm-Message-State: AO0yUKXvJm2T7xjF/vKJKyGX5+jN6UW0hCptNFG9qJhHQVJ0GhmEnlYS
-	5/aGCOhzWEGIzsdQ4McZ7rC/fptXy2YqTX4cPQDoJA==
-X-Google-Smtp-Source: AK7set+PFnbYU2JD49LX096IfpIl1qWCv3pt6jtJWvZdeEDsrHSa6XgcIEspmONr+RBUjp9C7QlPEAawwJ6rNQ/sErI=
-X-Received: by 2002:a67:fb96:0:b0:411:bf89:685c with SMTP id
- n22-20020a67fb96000000b00411bf89685cmr800789vsr.6.1677185377290; Thu, 23 Feb
- 2023 12:49:37 -0800 (PST)
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=jZqpqHNnDrkVf5YnH4C4p2Du+MWFI+rsSboHjRikfo0=;
+        b=NdBwLZPkyY7k+mifZV7tjw8Jh8fEMG8TDkFTj6YPRLpzEdRr0kWhjbEhltHubBdKLM
+         6+jN9Nvfxb0jtjM45AW9nfYejPcRim4soCm9GJD908QUkPtQXs7JahP5sziOjR6Uh4s1
+         yYzsivcKTc6+ebl4X27XdUiUj+Jam+uwUV1KputC6sWHIlRsCmCPfXYA/drVTAy7Y7y8
+         oWqe8XN389pN8mIqQwbtHSpfySsC1UzZOLJ3Ow5YPiKkW351F0u6ZJq9mZV7j1rxj8Re
+         lJyz8KTSbeIdsYrpEzW4r2fNPuc9YUWNwg4G6we0sZ1SCoBLiPIIG3lMbKRNgatLy4EV
+         Ibgw==
+X-Gm-Message-State: AO0yUKVUFKBAcTeiaXFd7tb77ZpYxF3hkTYPZmxZGJPxIScaoAZHAAnh
+	+Qd3OrRh3w+v0jxi8+RhBN6y8R99JlQ=
+X-Google-Smtp-Source: AK7set8UOj7NygywK+cGr/Rmvj7I4XEunDNhPQJfW5dsIVprbIkkXYFIqYFcViXFQ9A3GP588Pa1F52horE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:fa4b:b0:237:2106:a861 with SMTP id
+ dt11-20020a17090afa4b00b002372106a861mr826705pjb.0.1677186745595; Thu, 23 Feb
+ 2023 13:12:25 -0800 (PST)
+Date: Thu, 23 Feb 2023 13:12:24 -0800
+In-Reply-To: <CAOUHufZ0Ep4_Edo4OoeUVpVK4uFJF6_yVL=xSrQM8an_Vw4VKw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-6-yuzhao@google.com>
- <Y/elw7CTvVWt0Js6@google.com> <CAOUHufbAKpv95k6rVedstjD_7JzP0RrbOD652gyZh2vbAjGPOg@mail.gmail.com>
- <Y/e6Z+KIl6sYJoRg@google.com> <CAOUHufbwcqx21T=zmvYpnX_Mnd2A0KkPORbtxnJEwKuUKVSPzA@mail.gmail.com>
- <Y/fFWyYPu5Jf0de1@google.com> <CAOUHufYWktz4SNjL_o_2oZNcJLXserwCot-Prv4UEG9uzn57rg@mail.gmail.com>
- <Y/fMimvChfhhbCid@google.com>
-In-Reply-To: <Y/fMimvChfhhbCid@google.com>
-From: Yu Zhao <yuzhao@google.com>
-Date: Thu, 23 Feb 2023 13:48:59 -0700
-Message-ID: <CAOUHufb4yFPJ8bLt-YRC7eMAyT2PMA_JF82Z412+O=79edsuwQ@mail.gmail.com>
-Subject: Re: [PATCH mm-unstable v1 5/5] mm: multi-gen LRU: use mmu_notifier_test_clear_young()
-To: Sean Christopherson <seanjc@google.com>
-Cc: Johannes Weiner <hannes@cmpxchg.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Michael Larabel <michael@michaellarabel.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, x86@kernel.org, 
-	linux-mm@google.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-2-yuzhao@google.com>
+ <Y/ee1s3XPGa62SFV@google.com> <CAOUHufZ0Ep4_Edo4OoeUVpVK4uFJF6_yVL=xSrQM8an_Vw4VKw@mail.gmail.com>
+Message-ID: <Y/fWuGL5RN8fUIr5@google.com>
+Subject: Re: [PATCH mm-unstable v1 1/5] mm/kvm: add mmu_notifier_test_clear_young()
+From: Sean Christopherson <seanjc@google.com>
+To: Yu Zhao <yuzhao@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Michael Larabel <michael@michaellarabel.com>, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	linuxppc-dev@lists.ozlabs.org, x86@kernel.org, linux-mm@google.com
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 23, 2023 at 1:29=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Thu, Feb 23, 2023, Yu Zhao wrote:
-> > On Thu, Feb 23, 2023 at 12:58=E2=80=AFPM Sean Christopherson <seanjc@go=
-ogle.com> wrote:
+On Thu, Feb 23, 2023, Yu Zhao wrote:
+> On Thu, Feb 23, 2023 at 10:14=E2=80=AFAM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> >
+> > On Thu, Feb 16, 2023, Yu Zhao wrote:
+> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > > index 9c60384b5ae0..1b465df4a93d 100644
+> > > --- a/virt/kvm/kvm_main.c
+> > > +++ b/virt/kvm/kvm_main.c
+> > > @@ -875,6 +875,63 @@ static int kvm_mmu_notifier_clear_young(struct m=
+mu_notifier *mn,
+> > >       return kvm_handle_hva_range_no_flush(mn, start, end, kvm_age_gf=
+n);
+> > >  }
 > > >
-> > > On Thu, Feb 23, 2023, Yu Zhao wrote:
-> > > > On Thu, Feb 23, 2023 at 12:11=E2=80=AFPM Sean Christopherson <seanj=
-c@google.com> wrote:
-> > > > >
-> > > > > On Thu, Feb 23, 2023, Yu Zhao wrote:
-> > > > > > > As alluded to in patch 1, unless batching the walks even if K=
-VM does _not_ support
-> > > > > > > a lockless walk is somehow _worse_ than using the existing mm=
-u_notifier_clear_flush_young(),
-> > > > > > > I think batching the calls should be conditional only on LRU_=
-GEN_SPTE_WALK.  Or
-> > > > > > > if we want to avoid batching when there are no mmu_notifier l=
-isteners, probe
-> > > > > > > mmu_notifiers.  But don't call into KVM directly.
-> > > > > >
-> > > > > > I'm not sure I fully understand. Let's present the problem on t=
-he MM
-> > > > > > side: assuming KVM supports lockless walks, batching can still =
-be
-> > > > > > worse (very unlikely), because GFNs can exhibit no memory local=
-ity at
-> > > > > > all. So this option allows userspace to disable batching.
-> > > > >
-> > > > > I'm asking the opposite.  Is there a scenario where batching+lock=
- is worse than
-> > > > > !batching+lock?  If not, then don't make batching depend on lockl=
-ess walks.
-> > > >
-> > > > Yes, absolutely. batching+lock means we take/release mmu_lock for
-> > > > every single PTE in the entire VA space -- each small batch contain=
+> > > +static bool kvm_test_clear_young(struct kvm *kvm, unsigned long star=
+t,
+> > > +                              unsigned long end, unsigned long *bitm=
+ap)
+> > > +{
+> > > +     int i;
+> > > +     int key;
+> > > +     bool success =3D true;
+> > > +
+> > > +     trace_kvm_age_hva(start, end);
+> > > +
+> > > +     key =3D srcu_read_lock(&kvm->srcu);
+> > > +
+> > > +     for (i =3D 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
+> > > +             struct interval_tree_node *node;
+> > > +             struct kvm_memslots *slots =3D __kvm_memslots(kvm, i);
+> > > +
+> > > +             kvm_for_each_memslot_in_hva_range(node, slots, start, e=
+nd - 1) {
+> > > +                     gfn_t lsb_gfn;
+> > > +                     unsigned long hva_start, hva_end;
+> > > +                     struct kvm_gfn_range range =3D {
+> > > +                             .slot =3D container_of(node, struct kvm=
+_memory_slot,
+> > > +                                                  hva_node[slots->no=
+de_idx]),
+> > > +                     };
+> > > +
+> > > +                     hva_start =3D max(start, range.slot->userspace_=
+addr);
+> > > +                     hva_end =3D min(end - 1, range.slot->userspace_=
+addr +
+> > > +                                            range.slot->npages * PAG=
+E_SIZE - 1);
+> > > +
+> > > +                     range.start =3D hva_to_gfn_memslot(hva_start, r=
+ange.slot);
+> > > +                     range.end =3D hva_to_gfn_memslot(hva_end, range=
+.slot) + 1;
+> > > +
+> > > +                     if (WARN_ON_ONCE(range.end <=3D range.start))
+> > > +                             continue;
+> >
+> > Extend __kvm_handle_hva_range() instead of copy-pasting.  At a very qui=
+ck glance,
+> > I believe all that is needed is (minus sanity checks):
+>=20
+> Yes, will do.
+>=20
+> I do need to add one more parameter to kvm_gfn_range, because that's
+> what the current kvm_arch_test_clear_young() needs, assuming that
+> function is acceptable.
+>=20
+> Also, just a side note, from MM's POV, the following in
+> __kvm_handle_hva_range() seems to forget to handle end =3D=3D 0, if that'=
 s
-> > > > 64 PTEs but the entire batch is the whole KVM.
-> > >
-> > > Who is "we"?
-> >
-> > Oops -- shouldn't have used "we".
-> >
-> > > I don't see anything in the kernel that triggers walking the whole
-> > > VMA, e.g. lru_gen_look_around() limits the walk to a single PMD.  I f=
-eel like I'm
-> > > missing something...
-> >
-> > walk_mm() -> walk_pud_range() -> walk_pmd_range() -> walk_pte_range()
-> > -> test_spte_young() -> mmu_notifier_test_clear_young().
-> >
-> > MGLRU takes two passes: during the first pass, it sweeps entire VA
-> > space on each MM (per MM/KVM); during the second pass, it uses the rmap=
- on each
-> > folio (per folio).
->
-> Ah.  IIUC, userspace can use LRU_GEN_SPTE_WALK to control whether or not =
-to walk
-> secondary MMUs, and the kernel further restricts LRU_GEN_SPTE_WALK to sec=
-ondary
-> MMUs that implement a lockless walk.  And if the answer is "no", secondar=
-y MMUs
-> are simply not consulted.
+> possible?
 
-Sorry for the bad naming -- probably LRU_GEN_SPTE_BATCH_WALK would be
-less confusing.
+It's handled by the WARN_ON_ONCE() at the very top:
 
-MGLRU always consults the secondary MMU for each page it's going to
-reclaim (during the second pass), i.e., it checks the A-bit in the
-SPTE mapping a page (by the rmap) it plans to reclaim so that it won't
-take a hot page away from KVM.
+static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+						  const struct kvm_hva_range *range)
+{
+	if (WARN_ON_ONCE(range->end <=3D range->start))
+		return 0;
 
-If the lockless walk is supported, MGLRU doesn't need to work at page
-granularity: (physical) pages on the LRU list may have nothing in
-common (e.g., from different processes), checking their PTEs/SPTEs one
-by one is expensive. Instead, it sweeps the entire KVM spaces in the
-first pass and checks the *adjacent SPTEs* of a page it plans to
-reclaim in the second pass. Both rely on the *assumption* there would
-be some spatial locality to exploit. This assumption can be wrong, and
-LRU_GEN_SPTE_WALK disables it.
 
-> If that's correct, then the proper way to handle this is by extending mmu=
-_notifier_ops
-> to query (a) if there's at least one register listeners that implements
-> test_clear_young() and (b) if all registered listeners that implement tes=
-t_clear_young()
-> support lockless walks.  That avoids direct dependencies on KVM, and avoi=
-ds making
-> assumptions that may not always hold true, e.g. that KVM is the only mmu_=
-notifier
-> user that supports the young APIs.
->
-> P.S. all of this info absolutely belongs in documentation and/or changelo=
-gs.
-
-Will do.
+>=20
+>   hva_end =3D min(range->end, slot->userspace_addr + (slot->npages <<
+> PAGE_SHIFT));
