@@ -1,113 +1,1213 @@
-Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B286EAD42
-	for <kvmarm@lists.linux.dev>; Thu, 23 Feb 2023 22:41:15 +0000 (UTC)
-Received: by mail-io1-f73.google.com with SMTP id p188-20020a6b8dc5000000b0074c96ca271bso3565195iod.0
-        for <kvmarm@lists.linux.dev>; Thu, 23 Feb 2023 14:41:15 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6895F15A5
+	for <kvmarm@lists.linux.dev>; Fri, 24 Feb 2023 01:02:02 +0000 (UTC)
+Received: by mail-pj1-f41.google.com with SMTP id y2so10603117pjg.3
+        for <kvmarm@lists.linux.dev>; Thu, 23 Feb 2023 17:02:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=njxIFRU6oa+bMFJp4SuHumf2vOky2GO0uHGNatkMWic=;
-        b=gzX0he6fpyBfnaDeQpfldthAsDjjo1Wpv2jFwTY5MDXv4xgye4uUhlrSIBepktdx4z
-         74tPQc4yxz5NuE2Ud9YV8oyeylL419uuvjNcGkGrVLbpylqDGLHZyzQ7BJeOMKjiV5Vy
-         /OFyB0bXj9vS6toOvy0wtcK13pbSEdiNVc5ezmHcR/fBIY+YMOostsfdNwdZNZ3DmZFD
-         jILkuoUVClxm15bcf4WZw1WYUjuvpIzfA23W3W5TnWmt8QubAU39fsD3zpSI9kC21z0P
-         KdrirIsUjek+COyg7fQ0cYHrnQIci9TRK6eEaPr0Yo6hGmu3sVx50XDg+5DBS8v6ue2H
-         jTtw==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=LMz10ToQggpvFr696M5S6ZJwXm9p4N2ZVa8H8u0sMVg=;
+        b=laq34AQsNNmsehdqjHjQh0iCNXABwCgzLuR6uAxpVeh1z7JmXV5IFNlH5a7A4SO3cE
+         jajTY/dide4aw6RUPixYsYbRB4UZZPuDHtuf0WdUWQn+jCvb1w28ROYTvCPaxkmXuSui
+         pml55KHc1cbnHeTYiB0jUwj8rQroc6StRO+qSRgGpJ+ulR8sS3K1uTttBSk6y659vHBk
+         2i1vrCvvRaUKDK9SzTE9eksZpvpPsWdxqtxqUP/lhBALtK1KBiVpP7CyNkHykt+KIvDa
+         i3wbHRRLmyB1uAaC65bdREt+XguJnZoCWQ2NC9Xot6e4UIemyAX+PTMDE5Kn9zvXqCuS
+         Nd8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=njxIFRU6oa+bMFJp4SuHumf2vOky2GO0uHGNatkMWic=;
-        b=B4cRcqfAUMTw1owbQqeLkzXo4a+YOSIATq83aK9gz6maNFuFUWDD8a1nHnu4Lb3e6B
-         dWZ2eBQ4AkBwdH3lh89F2qxl3auD2ArTrh55iG2UH8FRvQIBJBbAPigOwsRQ6e9MGeNN
-         TlLsEtatOr1R54Qxc1qb63YPr2qp9KNhWFAdC1HBqwRGzZ48fmiJ5PCWhEvbwslSMdpk
-         06J3i/6P+mSM02le1US6u971n24YIZOm33aRlrUib3Uz8mCO3XQ/f+suc8tT2/I7m26a
-         vxUxrRpKCFiVkEzmmzE07FRo82k33vXDFX4fYm6ObLUlfLkLBM2B0xSld4leE9vkazfQ
-         i4vw==
-X-Gm-Message-State: AO0yUKU7kZAY+2+RIp+UmCyd3SZqW20i6ZK8rQWmoCM+Il626rvSNmEu
-	MFBDWD9B/86/yPGAQ9GzQEDxcyGsKLM0KGC/bA==
-X-Google-Smtp-Source: AK7set8eU6LXXGNsXhypWuPasNfU+Jy+y/Y6+I7CCNgTvs1mrAWB6o6YN6KK+svTCaLeqtyLcQ/Gja8X8X4Clja/KQ==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a02:84e7:0:b0:3c5:d3e:9c82 with SMTP
- id f94-20020a0284e7000000b003c50d3e9c82mr4336134jai.5.1677192074809; Thu, 23
- Feb 2023 14:41:14 -0800 (PST)
-Date: Thu, 23 Feb 2023 22:41:13 +0000
-In-Reply-To: <20230216142123.2638675-9-maz@kernel.org> (message from Marc
- Zyngier on Thu, 16 Feb 2023 14:21:15 +0000)
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LMz10ToQggpvFr696M5S6ZJwXm9p4N2ZVa8H8u0sMVg=;
+        b=mg8n6xIrCQ1z+tQNvnjVkIgRMAdX1IhzrlBsZCkFn+mQpPSQ2zx8jotVDFB9JllE2p
+         6976oLU8BwT53VEftn1DLd7x1fZwkzJogt92SkTARgdQzeklq+8HUurkucqx1zH84Fpm
+         A8Ja/Ku3cvJ/Y97fbSGuiB0NDw+iRoBhmuXUGAP9vldMQBP6jeHV7k/aVODpPOpY8pbU
+         c9yKmP44Pk73IqRO5jw7XaEVw8WVGA66Llb8SvonOwSiZpBlLlOtkQiBvm3kUR1w9Rap
+         B73yV/syBrmSvFm1xO9ZcozwViEy8Ktfs7HtWKNg/bKOuevuflEfbwCFIaSh5Lrcr3GJ
+         cSlw==
+X-Gm-Message-State: AO0yUKUX7f+/YcnRLwjeWJVfrycV8E1qDhMoaxHpM5Mt8y+MKJZm6fIB
+	4thhB1KowZYikSlym6ZGMacQCa5BRqkftTZkM+lbOA==
+X-Google-Smtp-Source: AK7set/HmRRAMHvZJNcBkUbaQ0ANn8DAL3jlHteSMX4+PraglHfKje+gUDa8uf+3DjAN+8QW0S1/8Cf0Kaii5LZnugk=
+X-Received: by 2002:a17:902:a3cd:b0:19a:82a2:fcf9 with SMTP id
+ q13-20020a170902a3cd00b0019a82a2fcf9mr2315698plb.2.1677200521241; Thu, 23 Feb
+ 2023 17:02:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <gsntwn4880om.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH 08/16] KVM: arm64: timers: Allow userspace to set the
- counter offsets
-From: Colton Lewis <coltonlewis@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, james.morse@arm.com, 
-	suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, 
-	ricarkol@google.com, sveith@amazon.de, dwmw2@infradead.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+References: <20230212215830.2975485-1-jingzhangos@google.com> <20230212215830.2975485-2-jingzhangos@google.com>
+In-Reply-To: <20230212215830.2975485-2-jingzhangos@google.com>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Thu, 23 Feb 2023 17:01:44 -0800
+Message-ID: <CAAeT=FwdjrPm9i6rxrGQKEuu+x5VU+mKEJER5C7RYtid6nmZWQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/6] KVM: arm64: Move CPU ID feature registers
+ emulation into a separate file
+To: Jing Zhang <jingzhangos@google.com>
+Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@google.com>, Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, 
+	Ricardo Koller <ricarkol@google.com>, Raghavendra Rao Ananta <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Marc Zyngier <maz@kernel.org> writes:
+Hi Jing,
 
-> Once this new API is used, there is no going back, and the counters
-> cannot be written to to set the offsets implicitly (the writes
-> are instead ignored).
-
-Why do this? I can't see a reason for disabling the other API the first
-time this one is used.
-
-> In keeping with the architecture, the offsets are expressed as
-> a delta that is substracted from the physical counter value.
-                   ^
-nit: subtracted
-
+On Sun, Feb 12, 2023 at 1:58 PM Jing Zhang <jingzhangos@google.com> wrote:
+>
+> Create a new file id_regs.c for CPU ID feature registers emulation code,
+> which are moved from sys_regs.c and tweak sys_regs code accordingly.
+>
+> No functional change intended.
+>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/kvm/Makefile   |   2 +-
+>  arch/arm64/kvm/id_regs.c  | 486 ++++++++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/sys_regs.c | 463 ++----------------------------------
+>  arch/arm64/kvm/sys_regs.h |  28 +++
+>  4 files changed, 541 insertions(+), 438 deletions(-)
+>  create mode 100644 arch/arm64/kvm/id_regs.c
+>
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index c0c050e53157..a6a315fcd81e 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -13,7 +13,7 @@ obj-$(CONFIG_KVM) += hyp/
+>  kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+>          inject_fault.o va_layout.o handle_exit.o \
+>          guest.o debug.o reset.o sys_regs.o stacktrace.o \
+> -        vgic-sys-reg-v3.o fpsimd.o pkvm.o \
+> +        vgic-sys-reg-v3.o fpsimd.o pkvm.o id_regs.o \
+>          arch_timer.o trng.o vmid.o emulate-nested.o nested.o \
+>          vgic/vgic.o vgic/vgic-init.o \
+>          vgic/vgic-irqfd.o vgic/vgic-v2.o \
+> diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
+> new file mode 100644
+> index 000000000000..7f30d683de21
+> --- /dev/null
+> +++ b/arch/arm64/kvm/id_regs.c
+> @@ -0,0 +1,486 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
 > +/*
-> + * Counter/Timer offset structure. Describe the virtual/physical offsets.
-> + * To be used with KVM_ARM_SET_CNT_OFFSETS.
+> + * Copyright (C) 2023 - Google LLC
+> + * Author: Jing Zhang <jingzhangos@google.com>
+> + *
+> + * Moved from arch/arm64/kvm/sys_regs.c
+> + * Copyright (C) 2012,2013 - ARM Ltd
+> + * Author: Marc Zyngier <marc.zyngier@arm.com>
 > + */
-> +struct kvm_arm_counter_offsets {
-> +	__u64 virtual_offset;
-> +	__u64 physical_offset;
 > +
-> +#define KVM_COUNTER_SET_VOFFSET_FLAG	(1UL << 0)
-> +#define KVM_COUNTER_SET_POFFSET_FLAG	(1UL << 1)
+> +#include <linux/bitfield.h>
+> +#include <linux/bsearch.h>
+> +#include <linux/kvm_host.h>
+> +#include <asm/kvm_emulate.h>
+> +#include <asm/sysreg.h>
+> +#include <asm/cpufeature.h>
+> +#include <asm/kvm_nested.h>
 > +
-> +	__u64 flags;
-> +	__u64 reserved;
+> +#include "sys_regs.h"
+> +
+> +static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
+> +{
+> +       if (kvm_vcpu_has_pmu(vcpu))
+> +               return vcpu->kvm->arch.dfr0_pmuver.imp;
+> +
+> +       return vcpu->kvm->arch.dfr0_pmuver.unimp;
+> +}
+> +
+> +static u8 perfmon_to_pmuver(u8 perfmon)
+> +{
+> +       switch (perfmon) {
+> +       case ID_DFR0_EL1_PerfMon_PMUv3:
+> +               return ID_AA64DFR0_EL1_PMUVer_IMP;
+> +       case ID_DFR0_EL1_PerfMon_IMPDEF:
+> +               return ID_AA64DFR0_EL1_PMUVer_IMP_DEF;
+> +       default:
+> +               /* Anything ARMv8.1+ and NI have the same value. For now. */
+> +               return perfmon;
+> +       }
+> +}
+> +
+> +static u8 pmuver_to_perfmon(u8 pmuver)
+> +{
+> +       switch (pmuver) {
+> +       case ID_AA64DFR0_EL1_PMUVer_IMP:
+> +               return ID_DFR0_EL1_PerfMon_PMUv3;
+> +       case ID_AA64DFR0_EL1_PMUVer_IMP_DEF:
+> +               return ID_DFR0_EL1_PerfMon_IMPDEF;
+> +       default:
+> +               /* Anything ARMv8.1+ and NI have the same value. For now. */
+> +               return pmuver;
+> +       }
+> +}
+> +
+> +/* Read a sanitised cpufeature ID register by sys_reg_desc */
+> +static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r)
+> +{
+> +       u32 id = reg_to_encoding(r);
+> +       u64 val;
+> +
+> +       if (sysreg_visible_as_raz(vcpu, r))
+> +               return 0;
+> +
+> +       val = read_sanitised_ftr_reg(id);
+> +
+> +       switch (id) {
+> +       case SYS_ID_AA64PFR0_EL1:
+> +               if (!vcpu_has_sve(vcpu))
+> +                       val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE);
+> +               val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU);
+> +               val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
+> +               val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2),
+> +                                 (u64)vcpu->kvm->arch.pfr0_csv2);
+> +               val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
+> +               val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3),
+> +                                 (u64)vcpu->kvm->arch.pfr0_csv3);
+> +               if (kvm_vgic_global_state.type == VGIC_V3) {
+> +                       val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC);
+> +                       val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC), 1);
+> +               }
+> +               break;
+> +       case SYS_ID_AA64PFR1_EL1:
+> +               if (!kvm_has_mte(vcpu->kvm))
+> +                       val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE);
+> +
+> +               val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);
+> +               break;
+> +       case SYS_ID_AA64ISAR1_EL1:
+> +               if (!vcpu_has_ptrauth(vcpu))
+> +                       val &= ~(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_APA) |
+> +                                ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_API) |
+> +                                ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_GPA) |
+> +                                ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_GPI));
+> +               break;
+> +       case SYS_ID_AA64ISAR2_EL1:
+> +               if (!vcpu_has_ptrauth(vcpu))
+> +                       val &= ~(ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_APA3) |
+> +                                ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_GPA3));
+> +               if (!cpus_have_final_cap(ARM64_HAS_WFXT))
+> +                       val &= ~ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_WFxT);
+> +               break;
+> +       case SYS_ID_AA64DFR0_EL1:
+> +               /* Limit debug to ARMv8.0 */
+> +               val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer);
+> +               val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer), 6);
+> +               /* Set PMUver to the required version */
+> +               val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
+> +               val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
+> +                                 vcpu_pmuver(vcpu));
+> +               /* Hide SPE from guests */
+> +               val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMSVer);
+> +               break;
+> +       case SYS_ID_DFR0_EL1:
+> +               val &= ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
+> +               val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon),
+> +                                 pmuver_to_perfmon(vcpu_pmuver(vcpu)));
+> +               break;
+> +       case SYS_ID_AA64MMFR2_EL1:
+> +               val &= ~ID_AA64MMFR2_EL1_CCIDX_MASK;
+> +               break;
+> +       case SYS_ID_MMFR4_EL1:
+> +               val &= ~ARM64_FEATURE_MASK(ID_MMFR4_EL1_CCIDX);
+> +               break;
+> +       }
+> +
+> +       return val;
+> +}
+> +
+> +/* cpufeature ID register access trap handlers */
+> +
+> +static bool access_id_reg(struct kvm_vcpu *vcpu,
+> +                         struct sys_reg_params *p,
+> +                         const struct sys_reg_desc *r)
+> +{
+> +       if (p->is_write)
+> +               return write_to_read_only(vcpu, p, r);
+> +
+> +       p->regval = read_id_reg(vcpu, r);
+> +       if (vcpu_has_nv(vcpu))
+> +               access_nested_id_reg(vcpu, p, r);
+> +
+> +       return true;
+> +}
+> +
+> +/*
+> + * cpufeature ID register user accessors
+> + *
+> + * For now, these registers are immutable for userspace, so no values
+> + * are stored, and for set_id_reg() we don't allow the effective value
+> + * to be changed.
+> + */
+> +static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> +                     u64 *val)
+> +{
+> +       *val = read_id_reg(vcpu, rd);
+> +       return 0;
+> +}
+> +
+> +static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> +                     u64 val)
+> +{
+> +       /* This is what we mean by invariant: you can't change it. */
+> +       if (val != read_id_reg(vcpu, rd))
+> +               return -EINVAL;
+> +
+> +       return 0;
+> +}
+> +
+> +static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
+> +                                 const struct sys_reg_desc *r)
+> +{
+> +       u32 id = reg_to_encoding(r);
+> +
+> +       switch (id) {
+> +       case SYS_ID_AA64ZFR0_EL1:
+> +               if (!vcpu_has_sve(vcpu))
+> +                       return REG_RAZ;
+> +               break;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static unsigned int aa32_id_visibility(const struct kvm_vcpu *vcpu,
+> +                                      const struct sys_reg_desc *r)
+> +{
+> +       /*
+> +        * AArch32 ID registers are UNKNOWN if AArch32 isn't implemented at any
+> +        * EL. Promote to RAZ/WI in order to guarantee consistency between
+> +        * systems.
+> +        */
+> +       if (!kvm_supports_32bit_el0())
+> +               return REG_RAZ | REG_USER_WI;
+> +
+> +       return id_visibility(vcpu, r);
+> +}
+> +
+> +static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+> +                              const struct sys_reg_desc *rd,
+> +                              u64 val)
+> +{
+> +       u8 csv2, csv3;
+> +
+> +       /*
+> +        * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long as
+> +        * it doesn't promise more than what is actually provided (the
+> +        * guest could otherwise be covered in ectoplasmic residue).
+> +        */
+> +       csv2 = cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_EL1_CSV2_SHIFT);
+> +       if (csv2 > 1 ||
+> +           (csv2 && arm64_get_spectre_v2_state() != SPECTRE_UNAFFECTED))
+> +               return -EINVAL;
+> +
+> +       /* Same thing for CSV3 */
+> +       csv3 = cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_EL1_CSV3_SHIFT);
+> +       if (csv3 > 1 ||
+> +           (csv3 && arm64_get_meltdown_state() != SPECTRE_UNAFFECTED))
+> +               return -EINVAL;
+> +
+> +       /* We can only differ with CSV[23], and anything else is an error */
+> +       val ^= read_id_reg(vcpu, rd);
+> +       val &= ~(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2) |
+> +                ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3));
+> +       if (val)
+> +               return -EINVAL;
+> +
+> +       vcpu->kvm->arch.pfr0_csv2 = csv2;
+> +       vcpu->kvm->arch.pfr0_csv3 = csv3;
+> +
+> +       return 0;
+> +}
+> +
+> +static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+> +                              const struct sys_reg_desc *rd,
+> +                              u64 val)
+> +{
+> +       u8 pmuver, host_pmuver;
+> +       bool valid_pmu;
+> +
+> +       host_pmuver = kvm_arm_pmu_get_pmuver_limit();
+> +
+> +       /*
+> +        * Allow AA64DFR0_EL1.PMUver to be set from userspace as long
+> +        * as it doesn't promise more than what the HW gives us. We
+> +        * allow an IMPDEF PMU though, only if no PMU is supported
+> +        * (KVM backward compatibility handling).
+> +        */
+> +       pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), val);
+> +       if ((pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF && pmuver > host_pmuver))
+> +               return -EINVAL;
+> +
+> +       valid_pmu = (pmuver != 0 && pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
+> +
+> +       /* Make sure view register and PMU support do match */
+> +       if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
+> +               return -EINVAL;
+> +
+> +       /* We can only differ with PMUver, and anything else is an error */
+> +       val ^= read_id_reg(vcpu, rd);
+> +       val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
+> +       if (val)
+> +               return -EINVAL;
+> +
+> +       if (valid_pmu)
+> +               vcpu->kvm->arch.dfr0_pmuver.imp = pmuver;
+> +       else
+> +               vcpu->kvm->arch.dfr0_pmuver.unimp = pmuver;
+> +
+> +       return 0;
+> +}
+> +
+> +static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+> +                          const struct sys_reg_desc *rd,
+> +                          u64 val)
+> +{
+> +       u8 perfmon, host_perfmon;
+> +       bool valid_pmu;
+> +
+> +       host_perfmon = pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit());
+> +
+> +       /*
+> +        * Allow DFR0_EL1.PerfMon to be set from userspace as long as
+> +        * it doesn't promise more than what the HW gives us on the
+> +        * AArch64 side (as everything is emulated with that), and
+> +        * that this is a PMUv3.
+> +        */
+> +       perfmon = FIELD_GET(ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon), val);
+> +       if ((perfmon != ID_DFR0_EL1_PerfMon_IMPDEF && perfmon > host_perfmon) ||
+> +           (perfmon != 0 && perfmon < ID_DFR0_EL1_PerfMon_PMUv3))
+> +               return -EINVAL;
+> +
+> +       valid_pmu = (perfmon != 0 && perfmon != ID_DFR0_EL1_PerfMon_IMPDEF);
+> +
+> +       /* Make sure view register and PMU support do match */
+> +       if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
+> +               return -EINVAL;
+> +
+> +       /* We can only differ with PerfMon, and anything else is an error */
+> +       val ^= read_id_reg(vcpu, rd);
+> +       val &= ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
+> +       if (val)
+> +               return -EINVAL;
+> +
+> +       if (valid_pmu)
+> +               vcpu->kvm->arch.dfr0_pmuver.imp = perfmon_to_pmuver(perfmon);
+> +       else
+> +               vcpu->kvm->arch.dfr0_pmuver.unimp = perfmon_to_pmuver(perfmon);
+> +
+> +       return 0;
+> +}
+> +
+> +/* sys_reg_desc initialiser for known cpufeature ID registers */
+> +#define ID_SANITISED(name) {                   \
+> +       SYS_DESC(SYS_##name),                   \
+> +       .access = access_id_reg,                \
+> +       .get_user = get_id_reg,                 \
+> +       .set_user = set_id_reg,                 \
+> +       .visibility = id_visibility,            \
+> +}
+> +
+> +/* sys_reg_desc initialiser for known cpufeature ID registers */
+> +#define AA32_ID_SANITISED(name) {              \
+> +       SYS_DESC(SYS_##name),                   \
+> +       .access = access_id_reg,                \
+> +       .get_user = get_id_reg,                 \
+> +       .set_user = set_id_reg,                 \
+> +       .visibility = aa32_id_visibility,       \
+> +}
+> +
+> +/*
+> + * sys_reg_desc initialiser for architecturally unallocated cpufeature ID
+> + * register with encoding Op0=3, Op1=0, CRn=0, CRm=crm, Op2=op2
+> + * (1 <= crm < 8, 0 <= Op2 < 8).
+> + */
+> +#define ID_UNALLOCATED(crm, op2) {                     \
+> +       Op0(3), Op1(0), CRn(0), CRm(crm), Op2(op2),     \
+> +       .access = access_id_reg,                        \
+> +       .get_user = get_id_reg,                         \
+> +       .set_user = set_id_reg,                         \
+> +       .visibility = raz_visibility                    \
+> +}
+> +
+> +/*
+> + * sys_reg_desc initialiser for known ID registers that we hide from guests.
+> + * For now, these are exposed just like unallocated ID regs: they appear
+> + * RAZ for the guest.
+> + */
+> +#define ID_HIDDEN(name) {                      \
+> +       SYS_DESC(SYS_##name),                   \
+> +       .access = access_id_reg,                \
+> +       .get_user = get_id_reg,                 \
+> +       .set_user = set_id_reg,                 \
+> +       .visibility = raz_visibility,           \
+> +}
+> +
+> +static const struct sys_reg_desc id_reg_descs[] = {
+> +       /*
+> +        * ID regs: all ID_SANITISED() entries here must have corresponding
+> +        * entries in arm64_ftr_regs[].
+> +        */
+> +
+> +       /* AArch64 mappings of the AArch32 ID registers */
+> +       /* CRm=1 */
+> +       AA32_ID_SANITISED(ID_PFR0_EL1),
+> +       AA32_ID_SANITISED(ID_PFR1_EL1),
+> +       { SYS_DESC(SYS_ID_DFR0_EL1), .access = access_id_reg,
+> +         .get_user = get_id_reg, .set_user = set_id_dfr0_el1,
+> +         .visibility = aa32_id_visibility, },
+> +       ID_HIDDEN(ID_AFR0_EL1),
+> +       AA32_ID_SANITISED(ID_MMFR0_EL1),
+> +       AA32_ID_SANITISED(ID_MMFR1_EL1),
+> +       AA32_ID_SANITISED(ID_MMFR2_EL1),
+> +       AA32_ID_SANITISED(ID_MMFR3_EL1),
+> +
+> +       /* CRm=2 */
+> +       AA32_ID_SANITISED(ID_ISAR0_EL1),
+> +       AA32_ID_SANITISED(ID_ISAR1_EL1),
+> +       AA32_ID_SANITISED(ID_ISAR2_EL1),
+> +       AA32_ID_SANITISED(ID_ISAR3_EL1),
+> +       AA32_ID_SANITISED(ID_ISAR4_EL1),
+> +       AA32_ID_SANITISED(ID_ISAR5_EL1),
+> +       AA32_ID_SANITISED(ID_MMFR4_EL1),
+> +       AA32_ID_SANITISED(ID_ISAR6_EL1),
+> +
+> +       /* CRm=3 */
+> +       AA32_ID_SANITISED(MVFR0_EL1),
+> +       AA32_ID_SANITISED(MVFR1_EL1),
+> +       AA32_ID_SANITISED(MVFR2_EL1),
+> +       ID_UNALLOCATED(3, 3),
+> +       AA32_ID_SANITISED(ID_PFR2_EL1),
+> +       ID_HIDDEN(ID_DFR1_EL1),
+> +       AA32_ID_SANITISED(ID_MMFR5_EL1),
+> +       ID_UNALLOCATED(3, 7),
+> +
+> +       /* AArch64 ID registers */
+> +       /* CRm=4 */
+> +       { SYS_DESC(SYS_ID_AA64PFR0_EL1), .access = access_id_reg,
+> +         .get_user = get_id_reg, .set_user = set_id_aa64pfr0_el1, },
+> +       ID_SANITISED(ID_AA64PFR1_EL1),
+> +       ID_UNALLOCATED(4, 2),
+> +       ID_UNALLOCATED(4, 3),
+> +       ID_SANITISED(ID_AA64ZFR0_EL1),
+> +       ID_HIDDEN(ID_AA64SMFR0_EL1),
+> +       ID_UNALLOCATED(4, 6),
+> +       ID_UNALLOCATED(4, 7),
+> +
+> +       /* CRm=5 */
+> +       { SYS_DESC(SYS_ID_AA64DFR0_EL1), .access = access_id_reg,
+> +         .get_user = get_id_reg, .set_user = set_id_aa64dfr0_el1, },
+> +       ID_SANITISED(ID_AA64DFR1_EL1),
+> +       ID_UNALLOCATED(5, 2),
+> +       ID_UNALLOCATED(5, 3),
+> +       ID_HIDDEN(ID_AA64AFR0_EL1),
+> +       ID_HIDDEN(ID_AA64AFR1_EL1),
+> +       ID_UNALLOCATED(5, 6),
+> +       ID_UNALLOCATED(5, 7),
+> +
+> +       /* CRm=6 */
+> +       ID_SANITISED(ID_AA64ISAR0_EL1),
+> +       ID_SANITISED(ID_AA64ISAR1_EL1),
+> +       ID_SANITISED(ID_AA64ISAR2_EL1),
+> +       ID_UNALLOCATED(6, 3),
+> +       ID_UNALLOCATED(6, 4),
+> +       ID_UNALLOCATED(6, 5),
+> +       ID_UNALLOCATED(6, 6),
+> +       ID_UNALLOCATED(6, 7),
+> +
+> +       /* CRm=7 */
+> +       ID_SANITISED(ID_AA64MMFR0_EL1),
+> +       ID_SANITISED(ID_AA64MMFR1_EL1),
+> +       ID_SANITISED(ID_AA64MMFR2_EL1),
+> +       ID_UNALLOCATED(7, 3),
+> +       ID_UNALLOCATED(7, 4),
+> +       ID_UNALLOCATED(7, 5),
+> +       ID_UNALLOCATED(7, 6),
+> +       ID_UNALLOCATED(7, 7),
 > +};
 > +
+> +const struct sys_reg_desc *kvm_arm_find_id_reg(const struct sys_reg_params *params)
+> +{
 
-It looks weird to have the #defines in the middle of the struct like
-that. I think it would be easier to read with the #defines before the
-struct.
+You might want to check if the param indicates the ID register,
+before running the binary search for the ID register table.
+(I have the same comment to kvm_arm_get_id_reg() and
+kvm_arm_set_id_reg()).
 
-> @@ -852,9 +852,11 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
->   	ptimer->vcpu = vcpu;
->   	ptimer->offset.vm_offset = &vcpu->kvm->arch.offsets.poffset;
+> +       return find_reg(params, id_reg_descs, ARRAY_SIZE(id_reg_descs));
+> +}
+> +
+> +void kvm_arm_reset_id_regs(struct kvm_vcpu *vcpu)
+> +{
+> +       unsigned long i;
+> +
+> +       for (i = 0; i < ARRAY_SIZE(id_reg_descs); i++)
+> +               if (id_reg_descs[i].reset)
+> +                       id_reg_descs[i].reset(vcpu, &id_reg_descs[i]);
+> +}
+> +
+> +int kvm_arm_get_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> +{
+> +       return kvm_sys_reg_get_user(vcpu, reg,
+> +                                   id_reg_descs, ARRAY_SIZE(id_reg_descs));
+> +}
+> +
+> +int kvm_arm_set_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> +{
+> +       return kvm_sys_reg_set_user(vcpu, reg,
+> +                                   id_reg_descs, ARRAY_SIZE(id_reg_descs));
+> +}
+> +
+> +bool kvm_arm_check_idreg_table(void)
+> +{
+> +       return check_sysreg_table(id_reg_descs, ARRAY_SIZE(id_reg_descs), false);
+> +}
+> +
+> +/* Assumed ordered tables, see kvm_sys_reg_table_init. */
 
-> -	/* Synchronize cntvoff across all vtimers of a VM. */
-> -	timer_set_offset(vtimer, kvm_phys_timer_read());
-> -	timer_set_offset(ptimer, 0);
-> +	/* Synchronize offsets across timers of a VM if not already provided */
-> +	if (!test_bit(KVM_ARCH_FLAG_COUNTER_OFFSETS, &vcpu->kvm->arch.flags)) {
-> +		timer_set_offset(vtimer, kvm_phys_timer_read());
-> +		timer_set_offset(ptimer, 0);
-> +	}
+I don't think we need this comment, as the code doesn't seem to assume that.
 
->   	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
->   	timer->bg_timer.function = kvm_bg_timer_expire;
+> +int kvm_arm_walk_id_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
+> +{
+> +       const struct sys_reg_desc *i2, *end2;
+> +       unsigned int total = 0;
+> +       int err;
+> +
+> +       i2 = id_reg_descs;
+> +       end2 = id_reg_descs + ARRAY_SIZE(id_reg_descs);
+> +
+> +       while (i2 != end2) {
+> +               err = walk_one_sys_reg(vcpu, i2++, &uind, &total);
+> +               if (err)
+> +                       return err;
+> +       }
+> +       return total;
+> +}
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 53749d3a0996..3b23b7a67eb5 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -53,16 +53,6 @@ static bool read_from_write_only(struct kvm_vcpu *vcpu,
+>         return false;
+>  }
+>
+> -static bool write_to_read_only(struct kvm_vcpu *vcpu,
+> -                              struct sys_reg_params *params,
+> -                              const struct sys_reg_desc *r)
+> -{
+> -       WARN_ONCE(1, "Unexpected sys_reg write to read-only register\n");
+> -       print_sys_reg_instr(params);
+> -       kvm_inject_undefined(vcpu);
+> -       return false;
+> -}
+> -
+>  u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+>  {
+>         u64 val = 0x8badf00d8badf00d;
+> @@ -1153,163 +1143,6 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+>         return true;
+>  }
+>
+> -static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
+> -{
+> -       if (kvm_vcpu_has_pmu(vcpu))
+> -               return vcpu->kvm->arch.dfr0_pmuver.imp;
+> -
+> -       return vcpu->kvm->arch.dfr0_pmuver.unimp;
+> -}
+> -
+> -static u8 perfmon_to_pmuver(u8 perfmon)
+> -{
+> -       switch (perfmon) {
+> -       case ID_DFR0_EL1_PerfMon_PMUv3:
+> -               return ID_AA64DFR0_EL1_PMUVer_IMP;
+> -       case ID_DFR0_EL1_PerfMon_IMPDEF:
+> -               return ID_AA64DFR0_EL1_PMUVer_IMP_DEF;
+> -       default:
+> -               /* Anything ARMv8.1+ and NI have the same value. For now. */
+> -               return perfmon;
+> -       }
+> -}
+> -
+> -static u8 pmuver_to_perfmon(u8 pmuver)
+> -{
+> -       switch (pmuver) {
+> -       case ID_AA64DFR0_EL1_PMUVer_IMP:
+> -               return ID_DFR0_EL1_PerfMon_PMUv3;
+> -       case ID_AA64DFR0_EL1_PMUVer_IMP_DEF:
+> -               return ID_DFR0_EL1_PerfMon_IMPDEF;
+> -       default:
+> -               /* Anything ARMv8.1+ and NI have the same value. For now. */
+> -               return pmuver;
+> -       }
+> -}
+> -
+> -/* Read a sanitised cpufeature ID register by sys_reg_desc */
+> -static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r)
+> -{
+> -       u32 id = reg_to_encoding(r);
+> -       u64 val;
+> -
+> -       if (sysreg_visible_as_raz(vcpu, r))
+> -               return 0;
+> -
+> -       val = read_sanitised_ftr_reg(id);
+> -
+> -       switch (id) {
+> -       case SYS_ID_AA64PFR0_EL1:
+> -               if (!vcpu_has_sve(vcpu))
+> -                       val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE);
+> -               val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU);
+> -               val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
+> -               val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2), (u64)vcpu->kvm->arch.pfr0_csv2);
+> -               val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
+> -               val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3), (u64)vcpu->kvm->arch.pfr0_csv3);
+> -               if (kvm_vgic_global_state.type == VGIC_V3) {
+> -                       val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC);
+> -                       val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC), 1);
+> -               }
+> -               break;
+> -       case SYS_ID_AA64PFR1_EL1:
+> -               if (!kvm_has_mte(vcpu->kvm))
+> -                       val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE);
+> -
+> -               val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);
+> -               break;
+> -       case SYS_ID_AA64ISAR1_EL1:
+> -               if (!vcpu_has_ptrauth(vcpu))
+> -                       val &= ~(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_APA) |
+> -                                ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_API) |
+> -                                ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_GPA) |
+> -                                ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_GPI));
+> -               break;
+> -       case SYS_ID_AA64ISAR2_EL1:
+> -               if (!vcpu_has_ptrauth(vcpu))
+> -                       val &= ~(ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_APA3) |
+> -                                ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_GPA3));
+> -               if (!cpus_have_final_cap(ARM64_HAS_WFXT))
+> -                       val &= ~ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_WFxT);
+> -               break;
+> -       case SYS_ID_AA64DFR0_EL1:
+> -               /* Limit debug to ARMv8.0 */
+> -               val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer);
+> -               val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer), 6);
+> -               /* Set PMUver to the required version */
+> -               val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
+> -               val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
+> -                                 vcpu_pmuver(vcpu));
+> -               /* Hide SPE from guests */
+> -               val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMSVer);
+> -               break;
+> -       case SYS_ID_DFR0_EL1:
+> -               val &= ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
+> -               val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon),
+> -                                 pmuver_to_perfmon(vcpu_pmuver(vcpu)));
+> -               break;
+> -       case SYS_ID_AA64MMFR2_EL1:
+> -               val &= ~ID_AA64MMFR2_EL1_CCIDX_MASK;
+> -               break;
+> -       case SYS_ID_MMFR4_EL1:
+> -               val &= ~ARM64_FEATURE_MASK(ID_MMFR4_EL1_CCIDX);
+> -               break;
+> -       }
+> -
+> -       return val;
+> -}
+> -
+> -static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
+> -                                 const struct sys_reg_desc *r)
+> -{
+> -       u32 id = reg_to_encoding(r);
+> -
+> -       switch (id) {
+> -       case SYS_ID_AA64ZFR0_EL1:
+> -               if (!vcpu_has_sve(vcpu))
+> -                       return REG_RAZ;
+> -               break;
+> -       }
+> -
+> -       return 0;
+> -}
+> -
+> -static unsigned int aa32_id_visibility(const struct kvm_vcpu *vcpu,
+> -                                      const struct sys_reg_desc *r)
+> -{
+> -       /*
+> -        * AArch32 ID registers are UNKNOWN if AArch32 isn't implemented at any
+> -        * EL. Promote to RAZ/WI in order to guarantee consistency between
+> -        * systems.
+> -        */
+> -       if (!kvm_supports_32bit_el0())
+> -               return REG_RAZ | REG_USER_WI;
+> -
+> -       return id_visibility(vcpu, r);
+> -}
+> -
+> -static unsigned int raz_visibility(const struct kvm_vcpu *vcpu,
+> -                                  const struct sys_reg_desc *r)
+> -{
+> -       return REG_RAZ;
+> -}
+> -
+> -/* cpufeature ID register access trap handlers */
+> -
+> -static bool access_id_reg(struct kvm_vcpu *vcpu,
+> -                         struct sys_reg_params *p,
+> -                         const struct sys_reg_desc *r)
+> -{
+> -       if (p->is_write)
+> -               return write_to_read_only(vcpu, p, r);
+> -
+> -       p->regval = read_id_reg(vcpu, r);
+> -       if (vcpu_has_nv(vcpu))
+> -               access_nested_id_reg(vcpu, p, r);
+> -
+> -       return true;
+> -}
+> -
+>  /* Visibility overrides for SVE-specific control registers */
+>  static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
+>                                    const struct sys_reg_desc *rd)
+> @@ -1320,144 +1153,6 @@ static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
+>         return REG_HIDDEN;
+>  }
+>
+> -static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+> -                              const struct sys_reg_desc *rd,
+> -                              u64 val)
+> -{
+> -       u8 csv2, csv3;
+> -
+> -       /*
+> -        * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long as
+> -        * it doesn't promise more than what is actually provided (the
+> -        * guest could otherwise be covered in ectoplasmic residue).
+> -        */
+> -       csv2 = cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_EL1_CSV2_SHIFT);
+> -       if (csv2 > 1 ||
+> -           (csv2 && arm64_get_spectre_v2_state() != SPECTRE_UNAFFECTED))
+> -               return -EINVAL;
+> -
+> -       /* Same thing for CSV3 */
+> -       csv3 = cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_EL1_CSV3_SHIFT);
+> -       if (csv3 > 1 ||
+> -           (csv3 && arm64_get_meltdown_state() != SPECTRE_UNAFFECTED))
+> -               return -EINVAL;
+> -
+> -       /* We can only differ with CSV[23], and anything else is an error */
+> -       val ^= read_id_reg(vcpu, rd);
+> -       val &= ~(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2) |
+> -                ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3));
+> -       if (val)
+> -               return -EINVAL;
+> -
+> -       vcpu->kvm->arch.pfr0_csv2 = csv2;
+> -       vcpu->kvm->arch.pfr0_csv3 = csv3;
+> -
+> -       return 0;
+> -}
+> -
+> -static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+> -                              const struct sys_reg_desc *rd,
+> -                              u64 val)
+> -{
+> -       u8 pmuver, host_pmuver;
+> -       bool valid_pmu;
+> -
+> -       host_pmuver = kvm_arm_pmu_get_pmuver_limit();
+> -
+> -       /*
+> -        * Allow AA64DFR0_EL1.PMUver to be set from userspace as long
+> -        * as it doesn't promise more than what the HW gives us. We
+> -        * allow an IMPDEF PMU though, only if no PMU is supported
+> -        * (KVM backward compatibility handling).
+> -        */
+> -       pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), val);
+> -       if ((pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF && pmuver > host_pmuver))
+> -               return -EINVAL;
+> -
+> -       valid_pmu = (pmuver != 0 && pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
+> -
+> -       /* Make sure view register and PMU support do match */
+> -       if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
+> -               return -EINVAL;
+> -
+> -       /* We can only differ with PMUver, and anything else is an error */
+> -       val ^= read_id_reg(vcpu, rd);
+> -       val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
+> -       if (val)
+> -               return -EINVAL;
+> -
+> -       if (valid_pmu)
+> -               vcpu->kvm->arch.dfr0_pmuver.imp = pmuver;
+> -       else
+> -               vcpu->kvm->arch.dfr0_pmuver.unimp = pmuver;
+> -
+> -       return 0;
+> -}
+> -
+> -static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+> -                          const struct sys_reg_desc *rd,
+> -                          u64 val)
+> -{
+> -       u8 perfmon, host_perfmon;
+> -       bool valid_pmu;
+> -
+> -       host_perfmon = pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit());
+> -
+> -       /*
+> -        * Allow DFR0_EL1.PerfMon to be set from userspace as long as
+> -        * it doesn't promise more than what the HW gives us on the
+> -        * AArch64 side (as everything is emulated with that), and
+> -        * that this is a PMUv3.
+> -        */
+> -       perfmon = FIELD_GET(ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon), val);
+> -       if ((perfmon != ID_DFR0_EL1_PerfMon_IMPDEF && perfmon > host_perfmon) ||
+> -           (perfmon != 0 && perfmon < ID_DFR0_EL1_PerfMon_PMUv3))
+> -               return -EINVAL;
+> -
+> -       valid_pmu = (perfmon != 0 && perfmon != ID_DFR0_EL1_PerfMon_IMPDEF);
+> -
+> -       /* Make sure view register and PMU support do match */
+> -       if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
+> -               return -EINVAL;
+> -
+> -       /* We can only differ with PerfMon, and anything else is an error */
+> -       val ^= read_id_reg(vcpu, rd);
+> -       val &= ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
+> -       if (val)
+> -               return -EINVAL;
+> -
+> -       if (valid_pmu)
+> -               vcpu->kvm->arch.dfr0_pmuver.imp = perfmon_to_pmuver(perfmon);
+> -       else
+> -               vcpu->kvm->arch.dfr0_pmuver.unimp = perfmon_to_pmuver(perfmon);
+> -
+> -       return 0;
+> -}
+> -
+> -/*
+> - * cpufeature ID register user accessors
+> - *
+> - * For now, these registers are immutable for userspace, so no values
+> - * are stored, and for set_id_reg() we don't allow the effective value
+> - * to be changed.
+> - */
+> -static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> -                     u64 *val)
+> -{
+> -       *val = read_id_reg(vcpu, rd);
+> -       return 0;
+> -}
+> -
+> -static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> -                     u64 val)
+> -{
+> -       /* This is what we mean by invariant: you can't change it. */
+> -       if (val != read_id_reg(vcpu, rd))
+> -               return -EINVAL;
+> -
+> -       return 0;
+> -}
+> -
+>  static int get_raz_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>                        u64 *val)
+>  {
+> @@ -1642,50 +1337,6 @@ static unsigned int elx2_visibility(const struct kvm_vcpu *vcpu,
+>         .visibility = elx2_visibility,          \
+>  }
+>
+> -/* sys_reg_desc initialiser for known cpufeature ID registers */
+> -#define ID_SANITISED(name) {                   \
+> -       SYS_DESC(SYS_##name),                   \
+> -       .access = access_id_reg,                \
+> -       .get_user = get_id_reg,                 \
+> -       .set_user = set_id_reg,                 \
+> -       .visibility = id_visibility,            \
+> -}
+> -
+> -/* sys_reg_desc initialiser for known cpufeature ID registers */
+> -#define AA32_ID_SANITISED(name) {              \
+> -       SYS_DESC(SYS_##name),                   \
+> -       .access = access_id_reg,                \
+> -       .get_user = get_id_reg,                 \
+> -       .set_user = set_id_reg,                 \
+> -       .visibility = aa32_id_visibility,       \
+> -}
+> -
+> -/*
+> - * sys_reg_desc initialiser for architecturally unallocated cpufeature ID
+> - * register with encoding Op0=3, Op1=0, CRn=0, CRm=crm, Op2=op2
+> - * (1 <= crm < 8, 0 <= Op2 < 8).
+> - */
+> -#define ID_UNALLOCATED(crm, op2) {                     \
+> -       Op0(3), Op1(0), CRn(0), CRm(crm), Op2(op2),     \
+> -       .access = access_id_reg,                        \
+> -       .get_user = get_id_reg,                         \
+> -       .set_user = set_id_reg,                         \
+> -       .visibility = raz_visibility                    \
+> -}
+> -
+> -/*
+> - * sys_reg_desc initialiser for known ID registers that we hide from guests.
+> - * For now, these are exposed just like unallocated ID regs: they appear
+> - * RAZ for the guest.
+> - */
+> -#define ID_HIDDEN(name) {                      \
+> -       SYS_DESC(SYS_##name),                   \
+> -       .access = access_id_reg,                \
+> -       .get_user = get_id_reg,                 \
+> -       .set_user = set_id_reg,                 \
+> -       .visibility = raz_visibility,           \
+> -}
+> -
+>  static bool access_sp_el1(struct kvm_vcpu *vcpu,
+>                           struct sys_reg_params *p,
+>                           const struct sys_reg_desc *r)
+> @@ -1776,87 +1427,6 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>
+>         { SYS_DESC(SYS_MPIDR_EL1), NULL, reset_mpidr, MPIDR_EL1 },
+>
+> -       /*
+> -        * ID regs: all ID_SANITISED() entries here must have corresponding
+> -        * entries in arm64_ftr_regs[].
+> -        */
+> -
+> -       /* AArch64 mappings of the AArch32 ID registers */
+> -       /* CRm=1 */
+> -       AA32_ID_SANITISED(ID_PFR0_EL1),
+> -       AA32_ID_SANITISED(ID_PFR1_EL1),
+> -       { SYS_DESC(SYS_ID_DFR0_EL1), .access = access_id_reg,
+> -         .get_user = get_id_reg, .set_user = set_id_dfr0_el1,
+> -         .visibility = aa32_id_visibility, },
+> -       ID_HIDDEN(ID_AFR0_EL1),
+> -       AA32_ID_SANITISED(ID_MMFR0_EL1),
+> -       AA32_ID_SANITISED(ID_MMFR1_EL1),
+> -       AA32_ID_SANITISED(ID_MMFR2_EL1),
+> -       AA32_ID_SANITISED(ID_MMFR3_EL1),
+> -
+> -       /* CRm=2 */
+> -       AA32_ID_SANITISED(ID_ISAR0_EL1),
+> -       AA32_ID_SANITISED(ID_ISAR1_EL1),
+> -       AA32_ID_SANITISED(ID_ISAR2_EL1),
+> -       AA32_ID_SANITISED(ID_ISAR3_EL1),
+> -       AA32_ID_SANITISED(ID_ISAR4_EL1),
+> -       AA32_ID_SANITISED(ID_ISAR5_EL1),
+> -       AA32_ID_SANITISED(ID_MMFR4_EL1),
+> -       AA32_ID_SANITISED(ID_ISAR6_EL1),
+> -
+> -       /* CRm=3 */
+> -       AA32_ID_SANITISED(MVFR0_EL1),
+> -       AA32_ID_SANITISED(MVFR1_EL1),
+> -       AA32_ID_SANITISED(MVFR2_EL1),
+> -       ID_UNALLOCATED(3,3),
+> -       AA32_ID_SANITISED(ID_PFR2_EL1),
+> -       ID_HIDDEN(ID_DFR1_EL1),
+> -       AA32_ID_SANITISED(ID_MMFR5_EL1),
+> -       ID_UNALLOCATED(3,7),
+> -
+> -       /* AArch64 ID registers */
+> -       /* CRm=4 */
+> -       { SYS_DESC(SYS_ID_AA64PFR0_EL1), .access = access_id_reg,
+> -         .get_user = get_id_reg, .set_user = set_id_aa64pfr0_el1, },
+> -       ID_SANITISED(ID_AA64PFR1_EL1),
+> -       ID_UNALLOCATED(4,2),
+> -       ID_UNALLOCATED(4,3),
+> -       ID_SANITISED(ID_AA64ZFR0_EL1),
+> -       ID_HIDDEN(ID_AA64SMFR0_EL1),
+> -       ID_UNALLOCATED(4,6),
+> -       ID_UNALLOCATED(4,7),
+> -
+> -       /* CRm=5 */
+> -       { SYS_DESC(SYS_ID_AA64DFR0_EL1), .access = access_id_reg,
+> -         .get_user = get_id_reg, .set_user = set_id_aa64dfr0_el1, },
+> -       ID_SANITISED(ID_AA64DFR1_EL1),
+> -       ID_UNALLOCATED(5,2),
+> -       ID_UNALLOCATED(5,3),
+> -       ID_HIDDEN(ID_AA64AFR0_EL1),
+> -       ID_HIDDEN(ID_AA64AFR1_EL1),
+> -       ID_UNALLOCATED(5,6),
+> -       ID_UNALLOCATED(5,7),
+> -
+> -       /* CRm=6 */
+> -       ID_SANITISED(ID_AA64ISAR0_EL1),
+> -       ID_SANITISED(ID_AA64ISAR1_EL1),
+> -       ID_SANITISED(ID_AA64ISAR2_EL1),
+> -       ID_UNALLOCATED(6,3),
+> -       ID_UNALLOCATED(6,4),
+> -       ID_UNALLOCATED(6,5),
+> -       ID_UNALLOCATED(6,6),
+> -       ID_UNALLOCATED(6,7),
+> -
+> -       /* CRm=7 */
+> -       ID_SANITISED(ID_AA64MMFR0_EL1),
+> -       ID_SANITISED(ID_AA64MMFR1_EL1),
+> -       ID_SANITISED(ID_AA64MMFR2_EL1),
+> -       ID_UNALLOCATED(7,3),
+> -       ID_UNALLOCATED(7,4),
+> -       ID_UNALLOCATED(7,5),
+> -       ID_UNALLOCATED(7,6),
+> -       ID_UNALLOCATED(7,7),
+> -
+>         { SYS_DESC(SYS_SCTLR_EL1), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
+>         { SYS_DESC(SYS_ACTLR_EL1), access_actlr, reset_actlr, ACTLR_EL1 },
+>         { SYS_DESC(SYS_CPACR_EL1), NULL, reset_val, CPACR_EL1, 0 },
+> @@ -2531,8 +2101,8 @@ static const struct sys_reg_desc cp15_64_regs[] = {
+>         { SYS_DESC(SYS_AARCH32_CNTP_CVAL),    access_arch_timer },
+>  };
+>
+> -static bool check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
+> -                              bool is_32)
+> +bool check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
+> +                       bool is_32)
+>  {
+>         unsigned int i;
+>
+> @@ -2883,7 +2453,9 @@ static bool emulate_sys_reg(struct kvm_vcpu *vcpu,
+>  {
+>         const struct sys_reg_desc *r;
+>
+> -       r = find_reg(params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
+> +       r = kvm_arm_find_id_reg(params);
 
-The code says "assign the offsets if the KVM_ARCH_FLAG_COUNTER_OFFSETS
-flag is not on". The flag name is confusing and made it hard for me to
-understand the intent. I think the intent is to only assign the offsets
-if the user has not called the API to provide some offsets (that would
-have been assigned in the API call along with flipping the flag
-on). With that in mind, I would prefer the flag name reference the
-user. KVM_ARCH_FLAG_USER_OFFSETS
+It appears that this is the only one code that enforces id_regs.c
+to expose sys_reg_desc of ID registers. Although I'm not sure your
+intention, you might want to create emulate_id_reg(), instead of
+exposing that unnecessarily ?
+
+Thank you,
+Reiji
+
+> +       if (!r)
+> +               r = find_reg(params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
+>
+>         if (likely(r)) {
+>                 perform_access(vcpu, params, r);
+> @@ -2912,6 +2484,8 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
+>  {
+>         unsigned long i;
+>
+> +       kvm_arm_reset_id_regs(vcpu);
+> +
+>         for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++)
+>                 if (sys_reg_descs[i].reset)
+>                         sys_reg_descs[i].reset(vcpu, &sys_reg_descs[i]);
+> @@ -3160,6 +2734,10 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
+>         if (err != -ENOENT)
+>                 return err;
+>
+> +       err = kvm_arm_get_id_reg(vcpu, reg);
+> +       if (err != -ENOENT)
+> +               return err;
+> +
+>         return kvm_sys_reg_get_user(vcpu, reg,
+>                                     sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
+>  }
+> @@ -3204,6 +2782,10 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
+>         if (err != -ENOENT)
+>                 return err;
+>
+> +       err = kvm_arm_set_id_reg(vcpu, reg);
+> +       if (err != -ENOENT)
+> +               return err;
+> +
+>         return kvm_sys_reg_set_user(vcpu, reg,
+>                                     sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
+>  }
+> @@ -3250,10 +2832,10 @@ static bool copy_reg_to_user(const struct sys_reg_desc *reg, u64 __user **uind)
+>         return true;
+>  }
+>
+> -static int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
+> -                           const struct sys_reg_desc *rd,
+> -                           u64 __user **uind,
+> -                           unsigned int *total)
+> +int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
+> +                    const struct sys_reg_desc *rd,
+> +                    u64 __user **uind,
+> +                    unsigned int *total)
+>  {
+>         /*
+>          * Ignore registers we trap but don't save,
+> @@ -3294,6 +2876,7 @@ unsigned long kvm_arm_num_sys_reg_descs(struct kvm_vcpu *vcpu)
+>  {
+>         return ARRAY_SIZE(invariant_sys_regs)
+>                 + num_demux_regs()
+> +               + kvm_arm_walk_id_regs(vcpu, (u64 __user *)NULL)
+>                 + walk_sys_regs(vcpu, (u64 __user *)NULL);
+>  }
+>
+> @@ -3309,6 +2892,11 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+>                 uindices++;
+>         }
+>
+> +       err = kvm_arm_walk_id_regs(vcpu, uindices);
+> +       if (err < 0)
+> +               return err;
+> +       uindices += err;
+> +
+>         err = walk_sys_regs(vcpu, uindices);
+>         if (err < 0)
+>                 return err;
+> @@ -3323,6 +2911,7 @@ int __init kvm_sys_reg_table_init(void)
+>         unsigned int i;
+>
+>         /* Make sure tables are unique and in order. */
+> +       valid &= kvm_arm_check_idreg_table();
+>         valid &= check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), false);
+>         valid &= check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs), true);
+>         valid &= check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs), true);
+> diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+> index 6b11f2cc7146..96a52936d130 100644
+> --- a/arch/arm64/kvm/sys_regs.h
+> +++ b/arch/arm64/kvm/sys_regs.h
+> @@ -210,6 +210,22 @@ find_reg(const struct sys_reg_params *params, const struct sys_reg_desc table[],
+>         return __inline_bsearch((void *)pval, table, num, sizeof(table[0]), match_sys_reg);
+>  }
+>
+> +static inline unsigned int raz_visibility(const struct kvm_vcpu *vcpu,
+> +                                         const struct sys_reg_desc *r)
+> +{
+> +       return REG_RAZ;
+> +}
+> +
+> +static inline bool write_to_read_only(struct kvm_vcpu *vcpu,
+> +                                     struct sys_reg_params *params,
+> +                                     const struct sys_reg_desc *r)
+> +{
+> +       WARN_ONCE(1, "Unexpected sys_reg write to read-only register\n");
+> +       print_sys_reg_instr(params);
+> +       kvm_inject_undefined(vcpu);
+> +       return false;
+> +}
+> +
+>  const struct sys_reg_desc *get_reg_by_id(u64 id,
+>                                          const struct sys_reg_desc table[],
+>                                          unsigned int num);
+> @@ -220,6 +236,18 @@ int kvm_sys_reg_get_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
+>                          const struct sys_reg_desc table[], unsigned int num);
+>  int kvm_sys_reg_set_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
+>                          const struct sys_reg_desc table[], unsigned int num);
+> +bool check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
+> +                       bool is_32);
+> +int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
+> +                    const struct sys_reg_desc *rd,
+> +                    u64 __user **uind,
+> +                    unsigned int *total);
+> +const struct sys_reg_desc *kvm_arm_find_id_reg(const struct sys_reg_params *params);
+> +void kvm_arm_reset_id_regs(struct kvm_vcpu *vcpu);
+> +int kvm_arm_get_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
+> +int kvm_arm_set_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
+> +bool kvm_arm_check_idreg_table(void);
+> +int kvm_arm_walk_id_regs(struct kvm_vcpu *vcpu, u64 __user *uind);
+>
+>  #define AA32(_x)       .aarch32_map = AA32_##_x
+>  #define Op0(_x)        .Op0 = _x
+> --
+> 2.39.1.581.gbfd45094c4-goog
+>
