@@ -1,67 +1,149 @@
-Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-37.mta0.migadu.com (out-37.mta0.migadu.com [91.218.175.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33FCAD58
-	for <kvmarm@lists.linux.dev>; Fri, 24 Feb 2023 20:08:17 +0000 (UTC)
-Received: by mail-io1-f73.google.com with SMTP id a21-20020a5d9595000000b0074c9dc19e16so49546ioo.15
-        for <kvmarm@lists.linux.dev>; Fri, 24 Feb 2023 12:08:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=lq/fW+1gQO4fLzyopuslQ/5nt8lJLNNZbLNdvJWyg60=;
-        b=ZRD06LxPDQh9ndgSUCZKyVPO+p4ZA36dw5+dprfLdTO1Ui40tseTDQjix2pt2YBxxE
-         tbqXrbhQTasOXR40M+gIvXG6PO98fL+MTLjngEqkPe942ohJx1kTbRgLMJR6n7SuHVWZ
-         sBVUuDZEAzsSY5FCBVtD9c1hXQwn+NRkzhy0uinLsxMyLDGF9DWgg8reJ97cOliMic3M
-         Cvbq71846TzqLx9xDWyDRMaLZxaky03us3gIr7RSoHMOCh6Yo5Kteg8K7NUbeW+C+xfs
-         cPAYuQNlPMngtJDDZf01j805hKirkQWR2EJyKyvFyTFpSgJTPo3t3ERtHGPPSW3IYmIx
-         WCTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lq/fW+1gQO4fLzyopuslQ/5nt8lJLNNZbLNdvJWyg60=;
-        b=058LRrGGCxka+cPR66kq4ER16+GuvdnC04ByINofUzVv+i3FQCT+QvPdG6q+hfF1kW
-         o2WITFGDO87a6Cq+DXzB8sfRAnJvBstlEpyZXuF6DYab3rxLC2NhxOWTOJVmBqp+DCwC
-         NMhAerMUcfucZjwHlYHnbQvmkdUz2MQEHnBtDcBMAV4oYQfhyTXdSMg45kCIUTy/PauD
-         Eo4RO8kHDUWMpZ2sS89I74FLfJuxgDUInNMVP4mGTDqAcx7mhlCitV1wJQBsmY4hisIg
-         woYbrR5MWYpe6uhZwLhRA0g3P21iNvrIqRGMXDimdD30oLqIS0aPx56Eboo0UKeypzIe
-         s8LQ==
-X-Gm-Message-State: AO0yUKVmJX/96ALrFFHN8XyOKxS9Z36J90T/9X1oGsA3+pXBf1jePjUp
-	AmcMynnFzEbOUM28rGWt3fOTWSw4NwxnsDrwsw==
-X-Google-Smtp-Source: AK7set+6She2NcmRmPNnegMaKKLqU4exl69q8s3WqgCHl+QehD+6uDHs/Ir9zbRNO8GYwqkkC/9xJcwgXnvvvkKQEQ==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a02:a1c5:0:b0:3c4:d4b2:f72 with SMTP
- id o5-20020a02a1c5000000b003c4d4b20f72mr5755289jah.3.1677269296880; Fri, 24
- Feb 2023 12:08:16 -0800 (PST)
-Date: Fri, 24 Feb 2023 20:08:15 +0000
-In-Reply-To: <20230216142123.2638675-14-maz@kernel.org> (message from Marc
- Zyngier on Thu, 16 Feb 2023 14:21:20 +0000)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31246BA32
+	for <kvmarm@lists.linux.dev>; Fri, 24 Feb 2023 21:32:28 +0000 (UTC)
+Date: Fri, 24 Feb 2023 21:32:21 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1677274345;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qtA5fvSpmvmVArdiqF76mcur7Cp3Jx1bdHIXYhALi6s=;
+	b=QWl8VolSZxRV8XANnvTyKZyD1suP+mzPEsHkCcYrFcbzsWaCAogdKYITIprHAdZlYAqzCD
+	95o77d7F6NszDqEtq1HHdIX0ZQQNLUVw0oMgmu6XbF24vsdFJRKcSyfQoi7MV5dO0IM9Pq
+	U0BymGep2Leg8O7CzX8tiV590zm+Igs=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: James Morse <james.morse@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.linux.dev,
+	Akihiko Odaki <akihiko.odaki@daynix.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Salil Mehta <salil.mehta@huawei.com>
+Subject: Re: [RFC PATCH v2 0/6] KVM: arm64: Userspace SMCCC call filtering
+Message-ID: <Y/ks5VkvypSntpQ1@linux.dev>
+References: <20230211013759.3556016-1-oliver.upton@linux.dev>
+ <854b55d9-a384-d383-0715-4aebb236d8fb@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <gsntilfq968g.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH 13/16] KVM: arm64: nv: timers: Support hyp timer emulation
-From: Colton Lewis <coltonlewis@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, james.morse@arm.com, 
-	suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, 
-	ricarkol@google.com, sveith@amazon.de, dwmw2@infradead.org, 
-	christoffer.dall@arm.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <854b55d9-a384-d383-0715-4aebb236d8fb@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-I hope someone else looks at this one because I don't understand NV.
+Hi James,
 
-Marc Zyngier <maz@kernel.org> writes:
+On Fri, Feb 24, 2023 at 03:12:08PM +0000, James Morse wrote:
+> Hi Oliver,
+> 
+> On 11/02/2023 01:37, Oliver Upton wrote:
+> > The Arm SMCCC is rather prescriptive in regards to the allocation of
+> > SMCCC function ID ranges. Many of the hypercall ranges have an
+> > associated specification from Arm (FF-A, PSCI, SDEI, etc.) with some
+> > room for vendor-specific implementations.
+> > 
+> > The ever-expanding SMCCC surface leaves a lot of work within KVM for
+> > providing new features. Furthermore, KVM implements its own
+> > vendor-specific ABI, with little room for other implementations (like
+> > Hyper-V, for example).
+> > 
+> > Not only that, it would appear that vCPU hotplug [1] has a legitimate
+> > use case for something like this, sending PSCI calls to userspace (where
+> > they should have gone in the first place).
+> > 
+> > => We have these new hypercall bitmap registers, why not use that?
+> > 
+> > The hypercall bitmap registers aren't necessarily aimed at the same
+> > problem. The bitmap registers allow a VMM to preserve the ABI the guest
+> > gets from KVM by default when migrating between hosts. By default KVM
+> > exposes the entire feature set to the guest, whereas user SMCCC calls
+> > need explicit opt-in from userspace.
+> > 
+> > Applies to 6.2-rc3.
+> 
+> 
+> > TODO:
+> >  - Reject the ranges of hypercalls we don't want userspace to handle.
+> >    Spectre crud mainly, any others?
+> 
+> We can predict what future 'ARCH_WORKAROUND_foo' values will be in the future, as they
+> have to be generated by a single instruction. I think its worth preventing user-space from
+> using any of those.
 
-> +	struct arch_timer_context *ctx;
-> +
-> +	ctx = (vcpu_has_nv(vcpu) && is_hyp_ctxt(vcpu)) ? vcpu_hvtimer(vcpu)
-> +						       : vcpu_vtimer(vcpu);
+Agreed.
 
-I don't think that ternary is the easiest to read and would prefer an if
-statement.
+> I don't see how user-space could possibly implement stolen time correctly ... but I don'
+> think we should prevent it trying.
+
+Yeah, unless there's a real hazard to getting userspace involved (like
+above) then I see no issue in letting the VMM have at it.
+
+> The 'features' calls are going to be a headache, especially when the features call in one
+> range gives results about calls in a different range. (e.g. you query PSCI_FEATURES to
+> find if SMCCC_VERSION is supported). I'm working on a reference implementation for kvmtool
+> to show we don't regress any of the existing SMC-CC supoprt.
+
+Goodness, thanks for taking a stab at the userspace angle of this.
+
+I've been mulling on this issue for a while. I originally wanted the
+UAPI to consume the whole set of subranges described in the filter at
+once to impose some degree of validation, but I worry that'll become
+unnecessarily complex (so I will definitely get it wrong).
+
+Short of a better solution for the problem I'm fine saying it is
+entirely a userspace problem to present a sensible feature set. No
+matter what we do the problem of incorrectly advertising to the guest
+will exist with user hypercalls, possibly in a range KVM doesn't
+know/care about.
+
+> 
+> >    I plan on using the invariant of the maple tree to reject filters
+> >    that intersect with a reserved range.
+> > 
+> >  - Should exits for SMC calls have the PC pre-incremented to align with
+> >    HVC? Go read the comment in handle_smc() if you aren't following.
+> > 
+> >    I think the answer is 'yes', but opinions welcome as always :)
+> 
+> I don't think there is a compelling argument either way. But please document whether
+> user-space must increment the PC, or must not!
+
+I'm going forward with pre-increment, both for consistency with HVCs and
+avoiding additional ioctls to manually increment PC from userspace.
+Documentation to boot!
+
+> >  - This series unifies the SMCCC space for HVCs and SMCs but this
+> >    requires a lot more thought. Otherwise, we can add support for two
+> >    separate namespaces.
+> 
+> I checked with ATG, they think the function IDs are one space, and have no intention of
+> having different APIs for the same function-id behind HVC/SMC.
+> 
+> They pointed to 'SMCCC issue E, appendix D' which says hypervisors are expected to trap
+> SMC, both conduits go to the same 'managing EL'.
+
+Excellent, thank you for getting clarification on that. What I'm also
+reading here is that KVM is indeed wrong in its unwillingness to handle
+SMCCC calls from EL1 :)
+
+> 
+> >  - Testing! I only got as far as compiling this on my machine. At
+> >    minimum a decent selftest is requried considering the UAPI here is
+> >    rather involved.
+> 
+> I've got PSCI support in kvmtool, (including cpu-suspend), I intend to try and test as
+> much of SMC-CC as I can.
+
+Thanks, that is tremendously helpful. Bonus points if userspace PSCI
+handling is enabled unconditionally and not just for hotplug :)
+
+-- 
+Thanks,
+Oliver
