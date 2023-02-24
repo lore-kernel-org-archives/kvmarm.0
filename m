@@ -1,14 +1,14 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBCC55CBD
-	for <kvmarm@lists.linux.dev>; Fri, 24 Feb 2023 15:12:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BAE25CBD
+	for <kvmarm@lists.linux.dev>; Fri, 24 Feb 2023 15:12:41 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 52C3E1042;
-	Fri, 24 Feb 2023 07:13:00 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B8AB11042;
+	Fri, 24 Feb 2023 07:13:23 -0800 (PST)
 Received: from [10.1.196.177] (eglon.cambridge.arm.com [10.1.196.177])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 971D03FB75;
-	Fri, 24 Feb 2023 07:12:15 -0800 (PST)
-Message-ID: <854b55d9-a384-d383-0715-4aebb236d8fb@arm.com>
-Date: Fri, 24 Feb 2023 15:12:08 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7E1623FB75;
+	Fri, 24 Feb 2023 07:12:38 -0800 (PST)
+Message-ID: <b10d117a-3d3d-c273-9885-3bfecfa8304d@arm.com>
+Date: Fri, 24 Feb 2023 15:12:33 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -17,7 +17,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
  Thunderbird/91.13.0
-Subject: Re: [RFC PATCH v2 0/6] KVM: arm64: Userspace SMCCC call filtering
+Subject: Re: [RFC PATCH v2 5/6] KVM: arm64: Add support for KVM_EXIT_HYPERCALL
 Content-Language: en-GB
 To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
 Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.linux.dev,
@@ -25,88 +25,61 @@ Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.linux.dev,
  Raghavendra Rao Ananta <rananta@google.com>,
  linux-arm-kernel@lists.infradead.org, Salil Mehta <salil.mehta@huawei.com>
 References: <20230211013759.3556016-1-oliver.upton@linux.dev>
+ <20230211013759.3556016-6-oliver.upton@linux.dev>
 From: James Morse <james.morse@arm.com>
-In-Reply-To: <20230211013759.3556016-1-oliver.upton@linux.dev>
+In-Reply-To: <20230211013759.3556016-6-oliver.upton@linux.dev>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 Hi Oliver,
 
 On 11/02/2023 01:37, Oliver Upton wrote:
-> The Arm SMCCC is rather prescriptive in regards to the allocation of
-> SMCCC function ID ranges. Many of the hypercall ranges have an
-> associated specification from Arm (FF-A, PSCI, SDEI, etc.) with some
-> room for vendor-specific implementations.
+> In anticipation of user hypercall filters, add the necessary plumbing to
+> get SMCCC calls out to userspace. Even though the exit structure has
+> space for KVM to pass register arguments, let's just avoid it altogether
+> and let userspace poke at the registers via KVM_GET_ONE_REG.
 > 
-> The ever-expanding SMCCC surface leaves a lot of work within KVM for
-> providing new features. Furthermore, KVM implements its own
-> vendor-specific ABI, with little room for other implementations (like
-> Hyper-V, for example).
+> This deliberately stretches the definition of a 'hypercall' to cover
+> SMCs from EL1 in addition to the HVCs we know and love. KVM doesn't
+> support EL1 calls into secure services, but now we can paint that as a
+> userspace problem and be done with it.
 > 
-> Not only that, it would appear that vCPU hotplug [1] has a legitimate
-> use case for something like this, sending PSCI calls to userspace (where
-> they should have gone in the first place).
-> 
-> => We have these new hypercall bitmap registers, why not use that?
-> 
-> The hypercall bitmap registers aren't necessarily aimed at the same
-> problem. The bitmap registers allow a VMM to preserve the ABI the guest
-> gets from KVM by default when migrating between hosts. By default KVM
-> exposes the entire feature set to the guest, whereas user SMCCC calls
-> need explicit opt-in from userspace.
-> 
-> Applies to 6.2-rc3.
+> Finally, we need a flag to let userspace know what conduit instruction
+> was used (i.e. SMC vs. HVC). Redefine the remaining padding in
+> kvm_run::hypercall to accomplish this. Let's all take a moment
+> to admire the flowers and see how 'longmode' tied up a full u32 in the
+> UAPI. Weep.
+
+> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+> index 45b8371816fd..f095c048730a 100644
+> --- a/arch/arm64/kvm/hypercalls.c
+> +++ b/arch/arm64/kvm/hypercalls.c
+> @@ -161,6 +161,17 @@ static u8 kvm_hvc_get_action(struct kvm_vcpu *vcpu, u32 func_id)
+>  	return KVM_SMCCC_FILTER_DENY;
+>  }
+>  
+> +static void kvm_prepare_hypercall_exit(struct kvm_vcpu *vcpu, u32 func_id, bool smc)
+> +{
+> +	struct kvm_run *run = vcpu->run;
+> +
+> +	run->exit_reason = KVM_EXIT_HYPERCALL;
+
+> +	run->hypercall.nr = func_id;
+
+This is a bit weird. The func_id is the x0 value, so it would more naturally live in
+run->hypercall.args[0].
+
+User-space also needs the SMC/HVC immediate value, as that is only available in the ESR.
+It makes more sense to put the immediate value here.
 
 
-> TODO:
->  - Reject the ranges of hypercalls we don't want userspace to handle.
->    Spectre crud mainly, any others?
-
-We can predict what future 'ARCH_WORKAROUND_foo' values will be in the future, as they
-have to be generated by a single instruction. I think its worth preventing user-space from
-using any of those.
-
-I don't see how user-space could possibly implement stolen time correctly ... but I don'
-think we should prevent it trying.
-
-The 'features' calls are going to be a headache, especially when the features call in one
-range gives results about calls in a different range. (e.g. you query PSCI_FEATURES to
-find if SMCCC_VERSION is supported). I'm working on a reference implementation for kvmtool
-to show we don't regress any of the existing SMC-CC supoprt.
-
-
->    I plan on using the invariant of the maple tree to reject filters
->    that intersect with a reserved range.
-> 
->  - Should exits for SMC calls have the PC pre-incremented to align with
->    HVC? Go read the comment in handle_smc() if you aren't following.
-> 
->    I think the answer is 'yes', but opinions welcome as always :)
-
-I don't think there is a compelling argument either way. But please document whether
-user-space must increment the PC, or must not!
-
-
->  - This series unifies the SMCCC space for HVCs and SMCs but this
->    requires a lot more thought. Otherwise, we can add support for two
->    separate namespaces.
-
-I checked with ATG, they think the function IDs are one space, and have no intention of
-having different APIs for the same function-id behind HVC/SMC.
-
-They pointed to 'SMCCC issue E, appendix D' which says hypervisors are expected to trap
-SMC, both conduits go to the same 'managing EL'.
-
-
->  - Testing! I only got as far as compiling this on my machine. At
->    minimum a decent selftest is requried considering the UAPI here is
->    rather involved.
-
-I've got PSCI support in kvmtool, (including cpu-suspend), I intend to try and test as
-much of SMC-CC as I can.
-
-I'll rebase the virtual-cpu hotplug stuff onto this, Salil should be able to give some
-feedback from the Qemu side.
+> +	if (smc)
+> +		run->hypercall.flags = KVM_HYPERCALL_EXIT_SMC;
+> +}
+> +
+>  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
 
 
 Thanks,
