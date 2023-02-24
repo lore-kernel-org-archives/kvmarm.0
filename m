@@ -1,229 +1,99 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4C7CAD58
-	for <kvmarm@lists.linux.dev>; Fri, 24 Feb 2023 19:16:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CEDAC433D2;
-	Fri, 24 Feb 2023 19:16:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1677266208;
-	bh=4bJ3J6pFQm4HD8LaHyxFJDa0kckSx5QJN4hO2pYexLQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=rnQ4Rv4SgtImAuA7/zzhU/pMGn830ByVIh4dVWWVctBxH1N1xNziP2AdmDLxGZsiZ
-	 BIV6g6XMvb/RRTRK1Nv5Q7lalwEvq0nBAhv6VrRZowqzXBaJo9oQOmAgykLK7Kmsjt
-	 cdFVlfGqxLcz9Cwm7eeJvJgxGdZaDmj0Dccg79YwhMZuGEnKFgi3hdxedg02OOeGYZ
-	 sRjYJcKsFFb+7/RbLuwZn9HcTlwaqCiM4wxYwMI27QKaoOxY1vBooCoi3+Rzl8jI7c
-	 JOip7HmW9knsoMZ/4p6TJPmD3RoXrh2UHzTEDmiH0SraFIObK7vf+5LSDRgzIG92tG
-	 Mkv5CWqLgPfrg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pVdYj-00Czq8-Un;
-	Fri, 24 Feb 2023 19:16:46 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Reiji Watanabe <reijiw@google.com>
-Subject: [PATCH v2] KVM: arm64: timers: Convert per-vcpu virtual offset to a global value
-Date: Fri, 24 Feb 2023 19:16:40 +0000
-Message-Id: <20230224191640.3396734-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF1DAD58
+	for <kvmarm@lists.linux.dev>; Fri, 24 Feb 2023 20:07:32 +0000 (UTC)
+Received: by mail-io1-f74.google.com with SMTP id s1-20020a6bd301000000b0073e7646594aso67209iob.8
+        for <kvmarm@lists.linux.dev>; Fri, 24 Feb 2023 12:07:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=b9eEgAqxwwT4oBExX9UxWqccj7ZXr1sZAWCiBgAFhOg=;
+        b=iqgI5WzFSxMSY27jQbX6h/A7/1NbpKWYqj67NeQey9WRvdfy8LcaF9g7Ztkco4ORBR
+         f5DJCdkG2NVVQPUeBftttAXkjkT/5h39/fppVpX5BovT39UKAJi54mPw6sa9s8RCxfu3
+         i4m6G3HBZh/9Fg8VrElnnk/q668v6koXeArvYu3PDRdW2FHIBjynX4W4bz7K7TVKvj1R
+         RRIx9ccSLl5TknS4xxZrxMamMKcGI3wGDD9cOOANW8x7ExtWLgHirQVWHsX2if5S68pu
+         V8qaBkcmfs3+pI/+RAQtAQ5a7tErrFuOfhodyg7L8E3Qs6UPQIgvV2euXEhkCEqBnAhh
+         bBsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=b9eEgAqxwwT4oBExX9UxWqccj7ZXr1sZAWCiBgAFhOg=;
+        b=LYu3+VW8nf8a3xSkhlsuK9sa5oOmYlMMa+Ff7RxSHutaE/yMg2hfgg6goJSJZPkMLM
+         qsEyDQOwU+d+KnFdYLzR7+gwgdqwdUXxahzebOBikllLtzCZBGnwW2RlQjMTLJNwYduX
+         M7yNT02KB3FZ+FGc/IYfFO9GI+0XorkZBpvJ1uA/ZB2xcHb0g/YBoOn9GifVjWxIz5xP
+         i9emVCpA6oxPEob/0ExE5z3giz6O9NLMP135FOTyCM+2BZQ/8ZDHpqLucRDqJBndivRr
+         FiyunXsqI/f/ENNuXqaA0tboLglpSIENddgZoWmpp4u83Dy58mDZaQ5Lr+Ecl3/hRecd
+         5dTA==
+X-Gm-Message-State: AO0yUKVXcVQ1kgzQ4k4TAkxGhlMdIvBAWsi4Q5iGkZaCYpqan8ip3JXH
+	9CcKh5zmq2oiS23LSxwl41Kjp3BOSGels3aj4A==
+X-Google-Smtp-Source: AK7set/EAaM8y0wwRhjkt0dNHV7aQnp40+jiSD+YRka4vFYDirCN0RN1NCz2qoO9U8PIUH0WXao1xULkaWnv7uKVkA==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a02:a186:0:b0:3a7:e46f:7d30 with SMTP
+ id n6-20020a02a186000000b003a7e46f7d30mr6586704jah.3.1677269251262; Fri, 24
+ Feb 2023 12:07:31 -0800 (PST)
+Date: Fri, 24 Feb 2023 20:07:30 +0000
+In-Reply-To: <20230216142123.2638675-1-maz@kernel.org> (message from Marc
+ Zyngier on Thu, 16 Feb 2023 14:21:07 +0000)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, reijiw@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+Message-ID: <gsntlekm969p.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH 00/16] KVM: arm64: Rework timer offsetting for fun and profit
+From: Colton Lewis <coltonlewis@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, james.morse@arm.com, 
+	suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, 
+	ricarkol@google.com, sveith@amazon.de, dwmw2@infradead.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-Having a per-vcpu virtual offset is a pain. It needs to be synchronized
-on each update, and expands badly to a setup where different timers can
-have different offsets, or have composite offsets (as with NV).
+Hello Marc,
 
-So let's start by replacing the use of the CNTVOFF_EL2 shadow register
-(which we want to reclaim for NV anyway), and make the virtual timer
-carry a pointer to a VM-wide offset.
+This patch is of special interest to me as I was working on my own
+ECV/CNTPOFF implementation, although mine was more narrow and doesn't
+address any of your other goals. As far as I can tell at the moment,
+your patch can cover the uses of mine, so I will dedicate
+myself to reviewing and testing yours. Please include me on any future
+rerolls of this patch.
 
-This simplifies the code significantly. It also addresses two terrible bugs:
+Marc Zyngier <maz@kernel.org> writes:
 
-- The use of CNTVOFF_EL2 leads to some nice offset corruption
-  when the sysreg gets reset, as reported by Joey.
+> This series aims at satisfying multiple goals:
 
-- The kvm mutex is taken from a vcpu ioctl, which goes against
-  the locking rules...
+> - allow a VMM to atomically restore a timer offset for a whole VM
+>    instead of updating the offset each time a vcpu get its counter
+>    written
 
-Reported-by: Joey Gouly <joey.gouly@arm.com>
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20230224173915.GA17407@e124191.cambridge.arm.com
----
- arch/arm64/include/asm/kvm_host.h |  3 +++
- arch/arm64/kvm/arch_timer.c       | 45 +++++++------------------------
- arch/arm64/kvm/hypercalls.c       |  2 +-
- include/kvm/arm_arch_timer.h      | 15 +++++++++++
- 4 files changed, 29 insertions(+), 36 deletions(-)
+> - allow a VMM to save/restore the physical timer context, something
+>    that we cannot do at the moment due to the lack of offsetting
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index a1892a8f6032..bcd774d74f34 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -193,6 +193,9 @@ struct kvm_arch {
- 	/* Interrupt controller */
- 	struct vgic_dist	vgic;
- 
-+	/* Timers */
-+	struct arch_timer_vm_data timer_data;
-+
- 	/* Mandated version of PSCI */
- 	u32 psci_version;
- 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 00610477ec7b..e1af4301b913 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -84,14 +84,10 @@ u64 timer_get_cval(struct arch_timer_context *ctxt)
- 
- static u64 timer_get_offset(struct arch_timer_context *ctxt)
- {
--	struct kvm_vcpu *vcpu = ctxt->vcpu;
-+	if (ctxt->offset.vm_offset)
-+		return *ctxt->offset.vm_offset;
- 
--	switch(arch_timer_ctx_index(ctxt)) {
--	case TIMER_VTIMER:
--		return __vcpu_sys_reg(vcpu, CNTVOFF_EL2);
--	default:
--		return 0;
--	}
-+	return 0;
- }
- 
- static void timer_set_ctl(struct arch_timer_context *ctxt, u32 ctl)
-@@ -128,15 +124,12 @@ static void timer_set_cval(struct arch_timer_context *ctxt, u64 cval)
- 
- static void timer_set_offset(struct arch_timer_context *ctxt, u64 offset)
- {
--	struct kvm_vcpu *vcpu = ctxt->vcpu;
--
--	switch(arch_timer_ctx_index(ctxt)) {
--	case TIMER_VTIMER:
--		__vcpu_sys_reg(vcpu, CNTVOFF_EL2) = offset;
--		break;
--	default:
-+	if (!ctxt->offset.vm_offset) {
- 		WARN(offset, "timer %ld\n", arch_timer_ctx_index(ctxt));
-+		return;
- 	}
-+
-+	WRITE_ONCE(*ctxt->offset.vm_offset, offset);
- }
- 
- u64 kvm_phys_timer_read(void)
-@@ -765,25 +758,6 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
--/* Make the updates of cntvoff for all vtimer contexts atomic */
--static void update_vtimer_cntvoff(struct kvm_vcpu *vcpu, u64 cntvoff)
--{
--	unsigned long i;
--	struct kvm *kvm = vcpu->kvm;
--	struct kvm_vcpu *tmp;
--
--	mutex_lock(&kvm->lock);
--	kvm_for_each_vcpu(i, tmp, kvm)
--		timer_set_offset(vcpu_vtimer(tmp), cntvoff);
--
--	/*
--	 * When called from the vcpu create path, the CPU being created is not
--	 * included in the loop above, so we just set it here as well.
--	 */
--	timer_set_offset(vcpu_vtimer(vcpu), cntvoff);
--	mutex_unlock(&kvm->lock);
--}
--
- void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
-@@ -791,10 +765,11 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
- 	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
- 
- 	vtimer->vcpu = vcpu;
-+	vtimer->offset.vm_offset = &vcpu->kvm->arch.timer_data.voffset;
- 	ptimer->vcpu = vcpu;
- 
- 	/* Synchronize cntvoff across all vtimers of a VM. */
--	update_vtimer_cntvoff(vcpu, kvm_phys_timer_read());
-+	timer_set_offset(vtimer, kvm_phys_timer_read());
- 	timer_set_offset(ptimer, 0);
- 
- 	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
-@@ -840,7 +815,7 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
- 		break;
- 	case KVM_REG_ARM_TIMER_CNT:
- 		timer = vcpu_vtimer(vcpu);
--		update_vtimer_cntvoff(vcpu, kvm_phys_timer_read() - value);
-+		timer_set_offset(timer, kvm_phys_timer_read() - value);
- 		break;
- 	case KVM_REG_ARM_TIMER_CVAL:
- 		timer = vcpu_vtimer(vcpu);
-diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index 64c086c02c60..5da884e11337 100644
---- a/arch/arm64/kvm/hypercalls.c
-+++ b/arch/arm64/kvm/hypercalls.c
-@@ -44,7 +44,7 @@ static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
- 	feature = smccc_get_arg1(vcpu);
- 	switch (feature) {
- 	case KVM_PTP_VIRT_COUNTER:
--		cycles = systime_snapshot.cycles - vcpu_read_sys_reg(vcpu, CNTVOFF_EL2);
-+		cycles = systime_snapshot.cycles - vcpu->kvm->arch.timer_data.voffset;
- 		break;
- 	case KVM_PTP_PHYS_COUNTER:
- 		cycles = systime_snapshot.cycles;
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index 71916de7c6c4..c52a6e6839da 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -23,6 +23,19 @@ enum kvm_arch_timer_regs {
- 	TIMER_REG_CTL,
- };
- 
-+struct arch_timer_offset {
-+	/*
-+	 * If set, pointer to one of the offsets in the kvm's offset
-+	 * structure. If NULL, assume a zero offset.
-+	 */
-+	u64	*vm_offset;
-+};
-+
-+struct arch_timer_vm_data {
-+	/* Offset applied to the virtual timer/counter */
-+	u64	voffset;
-+};
-+
- struct arch_timer_context {
- 	struct kvm_vcpu			*vcpu;
- 
-@@ -32,6 +45,8 @@ struct arch_timer_context {
- 	/* Emulated Timer (may be unused) */
- 	struct hrtimer			hrtimer;
- 
-+	/* Offset for this counter/timer */
-+	struct arch_timer_offset	offset;
- 	/*
- 	 * We have multiple paths which can save/restore the timer state onto
- 	 * the hardware, so we need some way of keeping track of where the
--- 
-2.34.1
+> - provide a framework that is suitable for NV support, where we get
+>    both global and per timer, per vcpu offsetting
 
+
+If I am understanding your changes correctly, you introduce some VM-wide
+timers with no hardware backing and a new API to access them from
+userspace. This is useful both because it makes the code simpler (no
+need to manually keep registers in sync), and so CNT{V,P}OFF can be
+appropriately virtualized with NV. Is that a fair summary of the
+important bits?
+
+> This has been moderately tested with nVHE, VHE and NV. I do not have
+> access to CNTPOFF-aware HW, so the jury is still out on that one. Note
+> that the NV patches in this series are here to give a perspective on
+> how this gets used.
+
+> I've updated the arch_timer selftest to allow offsets to be provided
+> from the command line, but the arch_test is pretty flimsy and tends to
+> fail with an error==EINTR, even without this series. Something to
+> investigate.
+
+I can help you with testing because I have access to CNTPOFF-aware
+hardware and emulators. Is there anything you are especially interested
+to try out?
