@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 836282570
-	for <kvmarm@lists.linux.dev>; Fri, 24 Feb 2023 08:59:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32054C433D2;
-	Fri, 24 Feb 2023 08:59:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82EA2320C
+	for <kvmarm@lists.linux.dev>; Fri, 24 Feb 2023 10:54:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 429C2C433EF;
+	Fri, 24 Feb 2023 10:54:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1677229162;
-	bh=11vK/L/5PpDDe6mKxD8lC9D0OP25ipWMak2rzttxd+o=;
+	s=k20201202; t=1677236095;
+	bh=Cl2GUFWLQFIfBTovBT5tWYqPK+1em50HlxfgOszatnc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=P4l5HBgMl5WZWBki5KRuxAPlbEqY1Dkb7A9uHsHYEDaKdaMfA+VRYdFf6C2nRis90
-	 T9a7R4tdfpytm+RBUQ8SlbHBWS6Co+hlRQJf3cc+67Vp3i8lzVoLxZMwRlOlfxZl0u
-	 E0J5Ou83q6F+3QcrVa6RlTZi6FdSDXZLLr640Gn/BCv7BznLSrWNxxW2lawFSzkaev
-	 f8vOhcST9PyHl7X4lXCf1Uoo8fIAkkWV2v86iz66ueXcxz04Hqv+XFVehkqM7uE2FL
-	 uUr49itTlg52Zkkt/YclXf6ylsMeBfANnqn8dgnaUO4R6y/MEpHaCO0eRda2tPifZc
-	 da3zANEfReImg==
+	b=hQMfN1d0IiKT7fplbjM/f530emlY9ua9C2XRB5pjHAccKXRczmK5RkgA5eJEEACsb
+	 1cSwp0WJ8JA+vKwlRRE/rIExUfhjZYUUXYyoeB3ZWl/K3VkP9zTqCzTlzEMWR5TWkg
+	 dmiEr7QV/6kbKXGyBv+D1TC/zQKXtfHPVYgEGkYtQfXMq+lbFokuGAQEyQmXEnxe5C
+	 QaP20xqkbvS8wjG3w4MVrf+Pf4YZJ4q4BIyp20PLGA/EQvE3+rDdl5pwNsnD9+/M/X
+	 NHCCxmItyfsfL6268nCx5zmAAvTqEFRBDY++Xt6yha+wbpSVDKNYlfVgHgirXI9nKl
+	 UxarXecTk0pkQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pVTvD-00CqTD-NT;
-	Fri, 24 Feb 2023 08:59:19 +0000
-Date: Fri, 24 Feb 2023 08:59:19 +0000
-Message-ID: <864jrbxwuw.wl-maz@kernel.org>
+	id 1pVVj2-00Cry5-Rm;
+	Fri, 24 Feb 2023 10:54:52 +0000
+Date: Fri, 24 Feb 2023 10:54:52 +0000
+Message-ID: <86356vxrib.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Colton Lewis <coltonlewis@google.com>
 Cc: kvmarm@lists.linux.dev,
@@ -35,10 +35,10 @@ Cc: kvmarm@lists.linux.dev,
 	ricarkol@google.com,
 	sveith@amazon.de,
 	dwmw2@infradead.org
-Subject: Re: [PATCH 06/16] KVM: arm64: timers: Use CNTPOFF_EL2 to offset the physical timer
-In-Reply-To: <gsntzg948104.fsf@coltonlewis-kvm.c.googlers.com>
-References: <20230216142123.2638675-7-maz@kernel.org>
-	<gsntzg948104.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH 07/16] KVM: arm64: timers: Allow physical offset without CNTPOFF_EL2
+In-Reply-To: <gsnty1oo80py.fsf@coltonlewis-kvm.c.googlers.com>
+References: <20230216142123.2638675-8-maz@kernel.org>
+	<gsnty1oo80py.fsf@coltonlewis-kvm.c.googlers.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -54,74 +54,126 @@ X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvmarm@lists.linux.dev, kvm@vger.kern
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 23 Feb 2023 22:34:19 +0000,
+On Thu, 23 Feb 2023 22:40:25 +0000,
 Colton Lewis <coltonlewis@google.com> wrote:
 > 
 > 
-> CNTPOFF_EL2 should probably be added to the vcpu_sysreg enum in
-> kvm_host.h for this patch. This seemed like the most relevant commit.
-> 
 > Marc Zyngier <maz@kernel.org> writes:
 > 
-> > +static bool has_cntpoff(void)
-> > +{
-> > +	return (has_vhe() && cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF));
-> > +}
+> > +/* If _pred is true, set bit in _set, otherwise set it in _clr */
+> > +#define assign_clear_set_bit(_pred, _bit, _clr, _set)			\
+> > +	do {								\
+> > +		if (_pred)						\
+> > +			(_set) |= (_bit);				\
+> > +		else							\
+> > +			(_clr) |= (_bit);				\
+> > +	} while (0)
 > > +
 > 
-> This being used to guard the register in set_cntpoff seems to say that
-> we can only write CNTPOFF in VHE mode. Since it's possible the
-> underlying hardware could still support CNTPOFF even if KVM is running
-> in nVHE mode, should there be a way to set CNTPOFF in nVHE mode? Is that
-> possible?
+> I don't think the do-while wrapper is necessary. Is there any reason
+> besides style guide conformance?
 
-It would have to happen at EL2 (the register is called CNTPOFF_EL2,
-which should give you a clue). This code execute at EL1 when running
-nVHE, so any CNTPOFF_EL2 access would UNDEF.
+It is if you want to avoid a stray ';'.
+
+> > +	/*
+> > +	 * We have two possibility to deal with a physical offset:
+> > +	 *
+> > +	 * - Either we have CNTPOFF (yay!) or the offset is 0:
+> > +	 *   we let the guest freely access the HW
+> > +	 *
+> > +	 * - or neither of these condition apply:
+> > +	 *   we trap accesses to the HW, but still use it
+> > +	 *   after correcting the physical offset
+> > +	 */
+> > +	if (!has_cntpoff() && timer_get_offset(map->direct_ptimer))
+> > +		tpt = tpc = true;
+> 
+> If there are only two possibilites, then two different booleans makes
+> things more complicated than it has to be.
+
+Each boolean denotes a different architectural state. They are
+separate so that someone can:
+
+- easily understand what is going on
+
+- affect one without affecting the other when extending this code
+
+The "common state" is what we had before, and it was a real pig to
+reverse engineer *my own code*. Yes, this is job security, but I don't
+think that's a good enough reason! ;-)
+
+So I contend that two bools make things far simpler to reason about
+these things.
 
 > 
-> This caused some confusion for me on my implementation as some teammates
-> thought so but I could not get an implementation working for nVHE mode.
-
-Using CNTPOFF for nVHE is utterly pointless unless you start
-offloading the host's physical timer to the EL2 physical timer on
-entry. Otherwise, you completely screw the host timer and everybody
-dies.
-
-> > @@ -84,7 +89,7 @@ u64 timer_get_cval(struct arch_timer_context *ctxt)
+> > +	assign_clear_set_bit(tpt, CNTHCTL_EL1PCEN << 10, set, clr);
+> > +	assign_clear_set_bit(tpc, CNTHCTL_EL1PCTEN << 10, set, clr);
 > 
-> >   static u64 timer_get_offset(struct arch_timer_context *ctxt)
+> Might be good to name the 10 something like VHE_SHIFT so people know why
+> it is applied.
+
+VHE_SHIFT really doesn't mean more that '10' because it doesn't tell
+you *why* you have to do this.
+
+The real way of solving that one is it move everything to the sysreg
+generation *and* have a way to contextualise the sysreg generation
+based on features and other controls (see the discussion about
+FEAT_CCIDX as an example).
+
+>
+> > +
+> > +
+> > +	timer_set_traps(vcpu, &map);
+> >   }
+> 
+> >   bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu)
+> > @@ -1293,27 +1363,12 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+> >   }
+> 
+> >   /*
+> > - * On VHE system, we only need to configure the EL2 timer trap
+> > register once,
+> > - * not for every world switch.
+> > - * The host kernel runs at EL2 with HCR_EL2.TGE == 1,
+> > - * and this makes those bits have no effect for the host kernel
+> > execution.
+> > + * If we have CNTPOFF, permanently set ECV to enable it.
+> >    */
+> >   void kvm_timer_init_vhe(void)
 > >   {
-> > -	if (ctxt->offset.vm_offset)
-> > +	if (ctxt && ctxt->offset.vm_offset)
-> >   		return *ctxt->offset.vm_offset;
+> > -	/* When HCR_EL2.E2H ==1, EL1PCEN and EL1PCTEN are shifted by 10 */
+> > -	u32 cnthctl_shift = 10;
+> > -	u64 val;
+> > -
+> > -	/*
+> > -	 * VHE systems allow the guest direct access to the EL1 physical
+> > -	 * timer/counter.
+> > -	 */
+> > -	val = read_sysreg(cnthctl_el2);
+> > -	val |= (CNTHCTL_EL1PCEN << cnthctl_shift);
+> > -	val |= (CNTHCTL_EL1PCTEN << cnthctl_shift);
+> >   	if (cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF))
+> > -		val |= CNTHCTL_ECV;
+> > -	write_sysreg(val, cnthctl_el2);
+> > +		sysreg_clear_set(cntkctl_el1, 0, CNTHCTL_ECV);
+> >   }
 > 
-> >   	return 0;
-> 
-> nit: this change should be in the previous commit
+> What is the reason for moving these register writes from initialization
+> to vcpu load time? This contradicts the comment that says this is only
+> needed once and not at every world switch. Seems like doing more work
+> for no reason.
 
-No. I don't even think this is required anymore, due to the way the
-offset is now handled on the VHE-only path.
+You did notice that the comment got *removed*, so that there is no
+contradiction?
 
-> 
-> > @@ -480,6 +491,7 @@ static void timer_save_state(struct
-> > arch_timer_context *ctx)
-> >   		write_sysreg_el0(0, SYS_CNTP_CTL);
-> >   		isb();
-> 
-> > +		set_cntpoff(0);
-> >   		break;
-> >   	case NR_KVM_TIMERS:
-> >   		BUG();
-> 
-> This seems to say CNTPOFF will be reset to 0 every time a vcpu
-> switches out. What if the host originally had some value other than 0?
-> Is KVM responsible for that context?
+You also understand that with a physical offset, and in the absence of
+CNTPOFF, we cannot grant access to the physical counter/timer to the
+guest?
 
-The host never has any value other than zero, just like it doesn't
-have a value other than 0 for CNTVOFF_EL2. See the comment a few lines
-above that explain the rationale for CNTVOFF, which mostly applies to
-CNTPOFF as well.
+Finally, given that we always have to write various bits of
+CNTKCTL_EL1 for other reasons, moving this settings shouldn't result
+in any extra work (specially considering that they don't require any
+extra synchronisation).
 
 Thanks,
 
