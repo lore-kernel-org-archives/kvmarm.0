@@ -1,84 +1,104 @@
-Received: from out-16.mta0.migadu.com (out-16.mta0.migadu.com [91.218.175.16])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 655DD3224
-	for <kvmarm@lists.linux.dev>; Tue, 28 Feb 2023 19:22:11 +0000 (UTC)
-Date: Tue, 28 Feb 2023 19:22:04 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1677612128;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B4F9475
+	for <kvmarm@lists.linux.dev>; Tue, 28 Feb 2023 21:05:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1677618330;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=LbYuqfCuY3T1CvXJk+av0g4V2EXiiWFsKxVBORVL9FY=;
-	b=W7Ugjs4PVgdnEmIQg8Hu9a+sy1r8G/aQDSGCJyZXds0p9QGUPsQ+IeRSQxkZl12yaK1rgv
-	VMquNdhCIBv7TWGYoGA9LbdVhhUz9LbKOfgJadT/dUOV6kvMzegUjIGsUVL6FBGdyIVjKO
-	HUVhx/1ae9JBSrM8t7WbdShqBYoJH2E=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Reiji Watanabe <reijiw@google.com>, nd@arm.com
-Subject: Re: [PATCH v2] KVM: arm64: timers: Convert per-vcpu virtual offset
- to a global value
-Message-ID: <Y/5UXKoK38fENlkb@linux.dev>
-References: <20230224191640.3396734-1-maz@kernel.org>
- <20230228112607.GA18683@e124191.cambridge.arm.com>
- <87sfepha41.wl-maz@kernel.org>
+	bh=0/5hmQVwpzcKmo7ZySLNvsyz1qAPMMBkqrZKd0ciXbk=;
+	b=AsK4gTBvUHwFRY727XMjHCBXsbQENr9ReSTbV4DGEL7l1o6RbG30rKiOqu30dqW+d38r34
+	yfwUWNXw/NB2EwwjonbHjG08WRyED1PZWIu60RGG0FQe0s9+rS2eQGuRTjmgioxWHfnoCH
+	JMi7FBtE/Y/U21q0daQKlZVjRRhi+/U=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-647-k4Ri9KZqOACYPdVwVhvd1w-1; Tue, 28 Feb 2023 16:05:29 -0500
+X-MC-Unique: k4Ri9KZqOACYPdVwVhvd1w-1
+Received: by mail-wr1-f72.google.com with SMTP id r3-20020a5d6c63000000b002bff57fc7fcso1859249wrz.19
+        for <kvmarm@lists.linux.dev>; Tue, 28 Feb 2023 13:05:29 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0/5hmQVwpzcKmo7ZySLNvsyz1qAPMMBkqrZKd0ciXbk=;
+        b=lMAJJibKqCUjWAGO8vn/7oxMBr9TmZ/swIgZHYMLGUhuD8C4/95tDYJHrQEzmD5eoI
+         QsPPtQWn2QR9NR5DIMdL5T1anZ0gPBHuWUWykk0z0uWLDnfVq+0EYJf14yLWkl24ocug
+         SilUHi8ba1G2vgxH6ZCv55ciRJoRJKS45zFChEE92FIHMVKL40qemXMBxQQpsHoySIFg
+         i/vB/ag7HH01u9Q1jOcXu2U4VE/JVTopG7WXzvhES+pwntS7usipIb+WzYZuxGX8eEHs
+         hJrEDMyWlqs+hgN5RIseEVDaNXoB1cwplN7EQpPd95I9c/U2LUL0T4J4zN52q1oBVBVm
+         X8bg==
+X-Gm-Message-State: AO0yUKXpw0GBUDHc8Ve657qmG5s9aXFy/E115NPXRr+kKYd56Dxa2JpM
+	0LaDXfQHAIpsu0b8sCVLlb/sE3zZUMRWDibU08LKTU7mborVzrtvDYL5ZNfownrbSRUBbAksPmn
+	bBA6gBe30MozMsqHb
+X-Received: by 2002:a05:600c:1d28:b0:3e2:147f:ac1a with SMTP id l40-20020a05600c1d2800b003e2147fac1amr3385144wms.21.1677618328376;
+        Tue, 28 Feb 2023 13:05:28 -0800 (PST)
+X-Google-Smtp-Source: AK7set9zrY1Ob9BThSVmM8VM9t39M7li3rs0M0P+LAVMOqBxDLKVC6qz7tgEwMKRPuRCd+1G8HlP3w==
+X-Received: by 2002:a05:600c:1d28:b0:3e2:147f:ac1a with SMTP id l40-20020a05600c1d2800b003e2147fac1amr3385132wms.21.1677618328092;
+        Tue, 28 Feb 2023 13:05:28 -0800 (PST)
+Received: from [192.168.8.100] (tmo-112-221.customers.d1-online.com. [80.187.112.221])
+        by smtp.gmail.com with ESMTPSA id bh22-20020a05600c3d1600b003e01493b136sm17087499wmb.43.2023.02.28.13.05.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Feb 2023 13:05:27 -0800 (PST)
+Message-ID: <04213fad-909f-e86d-caaa-c559917b2e4d@redhat.com>
+Date: Tue, 28 Feb 2023 22:05:25 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87sfepha41.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [PATCH v2 6/6] KVM: Change return type of kvm_arch_vm_ioctl() to
+ "int"
+From: Thomas Huth <thuth@redhat.com>
+To: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Sean Christopherson <seanjc@google.com>
+Cc: kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+ James Morse <james.morse@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
+ Gavin Shan <gshan@redhat.com>, Steven Price <steven.price@arm.com>,
+ Cornelia Huck <cohuck@redhat.com>
+References: <20230208140105.655814-1-thuth@redhat.com>
+ <20230208140105.655814-7-thuth@redhat.com>
+In-Reply-To: <20230208140105.655814-7-thuth@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Feb 28, 2023 at 07:18:38PM +0000, Marc Zyngier wrote:
-> On Tue, 28 Feb 2023 11:26:07 +0000,
-> Joey Gouly <joey.gouly@arm.com> wrote:
-> > 
-> > Hi Marc,
-> > 
-> > On Fri, Feb 24, 2023 at 07:16:40PM +0000, Marc Zyngier wrote:
-> > > Having a per-vcpu virtual offset is a pain. It needs to be synchronized
-> > > on each update, and expands badly to a setup where different timers can
-> > > have different offsets, or have composite offsets (as with NV).
-> > > 
-> > > So let's start by replacing the use of the CNTVOFF_EL2 shadow register
-> > > (which we want to reclaim for NV anyway), and make the virtual timer
-> > > carry a pointer to a VM-wide offset.
-> > > 
-> > > This simplifies the code significantly. It also addresses two terrible bugs:
-> > > 
-> > > - The use of CNTVOFF_EL2 leads to some nice offset corruption
-> > >   when the sysreg gets reset, as reported by Joey.
-> > > 
-> > > - The kvm mutex is taken from a vcpu ioctl, which goes against
-> > >   the locking rules...
-> > > 
-> > > Reported-by: Joey Gouly <joey.gouly@arm.com>
-> > > Reviewed-by: Reiji Watanabe <reijiw@google.com>
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > Link: https://lore.kernel.org/r/20230224173915.GA17407@e124191.cambridge.arm.com
-> > 
-> > Fixes my mismatched timer offset issues.
-> > 
-> > Tested-by: Joey Gouly <joey.gouly@arm.com>
+On 08/02/2023 15.01, Thomas Huth wrote:
+> All kvm_arch_vm_ioctl() implementations now only deal with "int"
+> types as return values, so we can change the return type of these
+> functions to use "int" instead of "long".
 > 
-> Thanks for having given it a go. Hopefully Oliver will be able to send
-> this to as a fix shortly.
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>   arch/arm64/kvm/arm.c       | 3 +--
+>   arch/mips/kvm/mips.c       | 4 ++--
+>   arch/powerpc/kvm/powerpc.c | 5 ++---
+>   arch/riscv/kvm/vm.c        | 3 +--
+>   arch/s390/kvm/kvm-s390.c   | 3 +--
+>   arch/x86/kvm/x86.c         | 3 +--
+>   include/linux/kvm_host.h   | 3 +--
+>   7 files changed, 9 insertions(+), 15 deletions(-)
 
-Absolutely, I have this queued up. Thanks for testing the patch Joey.
+Ping!
 
-Want to see if I can get push access to the kvmarm repository in time,
-otherwise I'll send a pull to you Marc.
+Unless I missed something, I think this series had enough review ... Paolo, 
+could you maybe queue the whole series, since it's mostly an 
+architecture-wide clean up?
 
--- 
-Thanks,
-Oliver
+  Thanks,
+   Thomas
+
