@@ -1,165 +1,259 @@
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 111ACA4C;
-	Wed,  1 Mar 2023 20:50:30 +0000 (UTC)
-Received: by mail-lf1-f50.google.com with SMTP id m7so19373395lfj.8;
-        Wed, 01 Mar 2023 12:50:30 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF0EA4C
+	for <kvmarm@lists.linux.dev>; Wed,  1 Mar 2023 21:09:32 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 23-20020a250b17000000b00a1f7de39bf5so1692832ybl.19
+        for <kvmarm@lists.linux.dev>; Wed, 01 Mar 2023 13:09:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1677703829;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:date:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EVVIi1qOZQqID+FdPDDHY7NMwGofBluJX4NX+g9TI3E=;
-        b=VasxnDSTws6qNz+8E1phAyl+YOciqDut6QJdLrJixPO4nxQ9JOWgTpVJEsCX0GKXVm
-         xTVE8oxNEAbZ0THzYdxBe5wfusqulkheAPmXvWK63CBtUwDFUlwIfv/CPOlQm01FGsMY
-         /9DkiMjLxXjdf7ozxoOKQ737w6PET4LaWsVyR6j37gLupPpJcBz/Ol2iVat0+AFKwcnU
-         Bxq0DRkc3zK2EJyRpE1y69iN9iDL8lJjpIdiSJ6ItYzOR5t5lM6cMomt61wXyWXWQHgu
-         s6Z2ZATDIbsy3+mY1t3L1IyOdRS6pbN9xm4M6h3qMyXM/wP9H1s86xgB6aFwvc3RwmjF
-         g8oQ==
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=wki+koK7r6w+SgEjoa4UmFEH60qFloywPNvWMkgzFuY=;
+        b=p3DVRXEAdxi4wMpcCTvVRbSDRy0FbtDXyeOnl2tjhV+hh94s7qFYwxxPU2zTlrquET
+         Fl3k9B3m+Xsh4n8E4HtuUaeVwKkgIdKveNK54JPIds1OIrGEx91mbVcKRDku8wEMUh3+
+         nrXNoxYrwemZiUgKmP7pk+41evVG8uSqN6cj8jnA5Y3S2n/sPyEPBBgT40bP/uYXfylR
+         scdwsfYTgbT4myORH2CmT/YlvCWaRLG340M7/KyQQsaKgoslwuUzOkYxEnrVAiCF4SPo
+         8ZcRUHTfsIwaTQHs4PwtMj18Wgx1M4W5Id87iRAnrNEeKkkqbwFFsnEip1GAE9Ejg4RZ
+         Et2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677703829;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EVVIi1qOZQqID+FdPDDHY7NMwGofBluJX4NX+g9TI3E=;
-        b=aeIzsFxR2EtlZcaz17vLWQESZ/q/JbC0z0ELrW149iK0vnDObhbSFtaRpAqPOzbG2E
-         ruP+/wrckIwp31vwzkE9ffRjsLIJhxbI4k3g9ChmHw7yuSVsj/u3+TPdZEm6496mWRp5
-         uk5h6jzQBNaneyKrVXhdM91XRGt72MHZsIdKgDwwlIUuobLc6tcCdt+MaTSGRHnCtHe8
-         zrRI4mS2HaktMBqJG4+I6ARnU5uf6AwntL2EAqIXQwE5ys7Qz53afaD0tkeWs4+0CbJR
-         1jPklsPecpwU4P/AyxuyYU6FF1rytHbhabBKK1M/zqXiAPjqO6TRf4PLPli/Bu18x5iI
-         Ap5Q==
-X-Gm-Message-State: AO0yUKV1LelQdRP2cgKSWGjIOz2I9i6+N+r3ki7a9B7XDv6ExY10Esrl
-	VtzWCG52S3B4JHpVz/7mJSw=
-X-Google-Smtp-Source: AK7set9s6L68MNMvJaMIm5hnekdlwc+Dfq4svvZSmGQlo9t3K6s+hDmaQhwTMbeCBOc77HvnQYc3dw==
-X-Received: by 2002:ac2:4c21:0:b0:4b5:a7c7:9dc4 with SMTP id u1-20020ac24c21000000b004b5a7c79dc4mr1736422lfq.3.1677703828933;
-        Wed, 01 Mar 2023 12:50:28 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id r10-20020ac252aa000000b004cc5f44747dsm1869566lfm.220.2023.03.01.12.50.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Mar 2023 12:50:28 -0800 (PST)
-From: Zhi Wang <zhi.wang.linux@gmail.com>
-X-Google-Original-From: Zhi Wang <zhi.wang.linux@intel.com>
-Date: Wed, 1 Mar 2023 22:50:26 +0200
-To: Steven Price <steven.price@arm.com>
-Cc: Zhi Wang <zhi.wang.linux@gmail.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>, Marc
- Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, James Morse
- <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>, Suzuki K
- Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Joey
- Gouly <joey.gouly@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev
-Subject: Re: [RFC PATCH 08/28] arm64: RME: Keep a spare page delegated to
- the RMM
-Message-ID: <20230301225026.000054ec@intel.com>
-In-Reply-To: <5750eead-44f9-260f-283d-4902b5363faf@arm.com>
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
-	<20230127112932.38045-1-steven.price@arm.com>
-	<20230127112932.38045-9-steven.price@arm.com>
-	<20230213184701.00005d3b@gmail.com>
-	<5750eead-44f9-260f-283d-4902b5363faf@arm.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wki+koK7r6w+SgEjoa4UmFEH60qFloywPNvWMkgzFuY=;
+        b=vH7VFnAc1lAP1YPpNgpWGgnLV50lReTl0rEiwWFTTW8fV0Zj1JMuCVhRXZkQUad5+k
+         QOT+6HcgU8wVqEM9fwIpLf+1awIM9EUQwkAezGZHGj/0q5k9kKarURgoTFqZxizhkHPk
+         oDYNSkawPaOp8ZcMwJjgqNEBu9vyjMT4YdTXn+OpDt6+CLZWLsJgZnL2YmR4sOW6QzdQ
+         pzJhhO5B0m8DhGRtDnKRcS50hHY6BOsxx48RBOBiqcTUlY1CI7NqNHM4YSvBRq3F7RQo
+         B/NEUc4+cxoPf4JwoTrqQCX8uNvQ1Tu5tScwwUUCeXLv09jjBtBYKnkLok195ZbKK+h4
+         bnDQ==
+X-Gm-Message-State: AO0yUKUXMGVILCa1qAbKmTcvFoF8m+87of3H/bV05WSicZAU/h1qsfXJ
+	YFV/G620NNfOHmwndtD3KE/1IxQbwS+Y1w==
+X-Google-Smtp-Source: AK7set/aMlaUpwuADSCT1u+W1xBEdPUIMTY4iq1FbK9m9WGM1GUxayQNVJU7Y0c6SstEhf9j9+r2ChhrUvT11Q==
+X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
+ (user=ricarkol job=sendgmr) by 2002:a5b:211:0:b0:a94:b0b6:50cb with SMTP id
+ z17-20020a5b0211000000b00a94b0b650cbmr4222004ybl.11.1677704971104; Wed, 01
+ Mar 2023 13:09:31 -0800 (PST)
+Date: Wed,  1 Mar 2023 21:09:16 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.2.722.g9855ee24e9-goog
+Message-ID: <20230301210928.565562-1-ricarkol@google.com>
+Subject: [PATCH v5 00/12] Implement Eager Page Splitting for ARM
+From: Ricardo Koller <ricarkol@google.com>
+To: pbonzini@redhat.com, maz@kernel.org, oupton@google.com, 
+	yuzenghui@huawei.com, dmatlack@google.com
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com, 
+	catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com, 
+	alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com, 
+	gshan@redhat.com, reijiw@google.com, rananta@google.com, bgardon@google.com, 
+	ricarkol@gmail.com, Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 1 Mar 2023 11:55:37 +0000
-Steven Price <steven.price@arm.com> wrote:
+Eager Page Splitting improves the performance of dirty-logging (used
+in live migrations) when guest memory is backed by huge-pages.  It's
+an optimization used in Google Cloud since 2016 on x86, and for the
+last couple of months on ARM.
 
-> On 13/02/2023 16:47, Zhi Wang wrote:
-> > On Fri, 27 Jan 2023 11:29:12 +0000
-> > Steven Price <steven.price@arm.com> wrote:
-> > 
-> >> Pages can only be populated/destroyed on the RMM at the 4KB granule,
-> >> this requires creating the full depth of RTTs. However if the pages are
-> >> going to be combined into a 4MB huge page the last RTT is only
-> >> temporarily needed. Similarly when freeing memory the huge page must be
-> >> temporarily split requiring temporary usage of the full depth oF RTTs.
-> >>
-> >> To avoid needing to perform a temporary allocation and delegation of a
-> >> page for this purpose we keep a spare delegated page around. In
-> >> particular this avoids the need for memory allocation while destroying
-> >> the realm guest.
-> >>
-> >> Signed-off-by: Steven Price <steven.price@arm.com>
-> >> ---
-> >>  arch/arm64/include/asm/kvm_rme.h | 3 +++
-> >>  arch/arm64/kvm/rme.c             | 6 ++++++
-> >>  2 files changed, 9 insertions(+)
-> >>
-> >> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
-> >> index 055a22accc08..a6318af3ed11 100644
-> >> --- a/arch/arm64/include/asm/kvm_rme.h
-> >> +++ b/arch/arm64/include/asm/kvm_rme.h
-> >> @@ -21,6 +21,9 @@ struct realm {
-> >>  	void *rd;
-> >>  	struct realm_params *params;
-> >>  
-> >> +	/* A spare already delegated page */
-> >> +	phys_addr_t spare_page;
-> >> +
-> >>  	unsigned long num_aux;
-> >>  	unsigned int vmid;
-> >>  	unsigned int ia_bits;
-> >> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> >> index 9f8c5a91b8fc..0c9d70e4d9e6 100644
-> >> --- a/arch/arm64/kvm/rme.c
-> >> +++ b/arch/arm64/kvm/rme.c
-> >> @@ -148,6 +148,7 @@ static int realm_create_rd(struct kvm *kvm)
-> >>  	}
-> >>  
-> >>  	realm->rd = rd;
-> >> +	realm->spare_page = PHYS_ADDR_MAX;
-> >>  	realm->ia_bits = VTCR_EL2_IPA(kvm->arch.vtcr);
-> >>  
-> >>  	if (WARN_ON(rmi_rec_aux_count(rd_phys, &realm->num_aux))) {
-> >> @@ -357,6 +358,11 @@ void kvm_destroy_realm(struct kvm *kvm)
-> >>  		free_page((unsigned long)realm->rd);
-> >>  		realm->rd = NULL;
-> >>  	}
-> >> +	if (realm->spare_page != PHYS_ADDR_MAX) {
-> >> +		if (!WARN_ON(rmi_granule_undelegate(realm->spare_page)))
-> >> +			free_page((unsigned long)phys_to_virt(realm->spare_page));
-> > 
-> > Will the page be leaked (not usable for host and realms) if the undelegate
-> > failed? If yes, better at least put a comment.
-> 
-> Yes - I'll add a comment.
-> 
-> In general being unable to undelegate a page points to a programming
-> error in the host. The only reason the RMM should refuse the request is
-> it the page is in use by a Realm which the host has configured. So the
-> WARN() is correct (there's a kernel bug) and the only sensible course of
-> action is to leak the page and limp on.
->
+Background and motivation
+=========================
+Dirty logging is typically used for live-migration iterative copying.
+KVM implements dirty-logging at the PAGE_SIZE granularity (will refer
+to 4K pages from now on).  It does it by faulting on write-protected
+4K pages.  Therefore, enabling dirty-logging on a huge-page requires
+breaking it into 4K pages in the first place.  KVM does this breaking
+on fault, and because it's in the critical path it only maps the 4K
+page that faulted; every other 4K page is left unmapped.  This is not
+great for performance on ARM for a couple of reasons:
 
-It would be nice to add a summary of above into the patch comments.
+- Splitting on fault can halt vcpus for milliseconds in some
+  implementations. Splitting a block PTE requires using a broadcasted
+  TLB invalidation (TLBI) for every huge-page (due to the
+  break-before-make requirement). Note that x86 doesn't need this. We
+  observed some implementations that take millliseconds to complete
+  broadcasted TLBIs when done in parallel from multiple vcpus.  And
+  that's exactly what happens when doing it on fault: multiple vcpus
+  fault at the same time triggering TLBIs in parallel.
 
-Having a comment when leaking a page (which mostly means the page cannot be
-reclaimed by VMM and used on a REALM any more) is nice. TDX/SNP also have
-the problem of leaking pages due to mystic reasons.
+- Read intensive guest workloads end up paying for dirty-logging.
+  Only mapping the faulting 4K page means that all the other pages
+  that were part of the huge-page will now be unmapped. The effect is
+  that any access, including reads, now has to fault.
 
-Imagine the leaking can turn worse bit by bit in a long running server and
-KVM will definitely have a generic accounting interface for reporting the
-numbers to the userspace later. Having a explicit comment at this time
-really makes it easier later.
- 
-> Thanks,
-> 
-> Steve
-> 
-> >> +		realm->spare_page = PHYS_ADDR_MAX;
-> >> +	}
-> >>  
-> >>  	pgd_sz = kvm_pgd_pages(pgt->ia_bits, pgt->start_level);
-> >>  	for (i = 0; i < pgd_sz; i++) {
-> > 
-> 
+Eager Page Splitting (on ARM)
+=============================
+Eager Page Splitting fixes the above two issues by eagerly splitting
+huge-pages when enabling dirty logging. The goal is to avoid doing it
+while faulting on write-protected pages. This is what the TDP MMU does
+for x86 [0], except that x86 does it for different reasons: to avoid
+grabbing the MMU lock on fault. Note that taking care of
+write-protection faults still requires grabbing the MMU lock on ARM,
+but not on x86 (with the fast_page_fault path).
+
+An additional benefit of eagerly splitting huge-pages is that it can
+be done in a controlled way (e.g., via an IOCTL). This series provides
+two knobs for doing it, just like its x86 counterpart: when enabling
+dirty logging, and when using the KVM_CLEAR_DIRTY_LOG ioctl. The
+benefit of doing it on KVM_CLEAR_DIRTY_LOG is that this ioctl takes
+ranges, and not complete memslots like when enabling dirty logging.
+This means that the cost of splitting (mainly broadcasted TLBIs) can
+be throttled: split a range, wait for a bit, split another range, etc.
+The benefits of this approach were presented by Oliver Upton at KVM
+Forum 2022 [1].
+
+Implementation
+==============
+Patches 3-4 add a pgtable utility function for splitting huge block
+PTEs: kvm_pgtable_stage2_split(). Patches 5-9 add support for eagerly
+splitting huge-pages when enabling dirty-logging and when using the
+KVM_CLEAR_DIRTY_LOG ioctl. Note that this is just like what x86 does,
+and the code is actually based on it.  And finally, patch 9:
+
+	KVM: arm64: Use local TLBI on permission relaxation
+
+adds support for using local TLBIs instead of broadcasts when doing
+permission relaxation. This last patch is key to achieving good
+performance during dirty-logging, as eagerly breaking huge-pages
+replaces mapping new pages with permission relaxation. Got this patch
+(indirectly) from Marc Z.  and took the liberty of adding a commit
+message.
+
+Note: this applies on top of 6.2-rc6.
+
+Performance evaluation
+======================
+The performance benefits were tested using the dirty_log_perf_test
+selftest with 2M huge-pages.
+
+The first test uses a write-only sequential workload where the stride
+is 2M instead of 4K [2]. The idea with this experiment is to emulate a
+random access pattern writing a different huge-page at every access.
+Observe that the benefit increases with the number of vcpus: up to
+5.76x for 152 vcpus. This table shows the guest dirtying time when
+using the CLEAR ioctl (and KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2):
+
+/dirty_log_perf_test_sparse -s anonymous_hugetlb_2mb -b 1G -v $i -i 3 -m 2
+
+	+-------+----------+------------------+
+	| vCPUs | 6.2-rc3  | 6.2-rc3 + series |
+	|       |    (ms)  |             (ms) |
+	+-------+----------+------------------+
+	|    1  |    2.63  |          1.66    |
+	|    2  |    2.95  |          1.70    |
+	|    4  |    3.21  |          1.71    |
+	|    8  |    4.97  |          1.78    |
+	|   16  |    9.51  |          1.82    |
+	|   32  |   20.15  |          3.03    |
+	|   64  |   40.09  |          5.80    |
+	|  128  |   80.08  |         12.24    |
+	|  152  |  109.81  |         15.14    |
+	+-------+----------+------------------+
+
+This secondv test measures the benefit of eager page splitting on read
+intensive workloads (1 write for every 10 reads). As in the other
+test, the benefit increases with the number of vcpus, up to 8.82x for
+152 vcpus. This table shows the guest dirtying time when using the
+CLEAR ioctl (and KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2):
+
+./dirty_log_perf_test -s anonymous_hugetlb_2mb -b 1G -v $i -i 3 -m 2 -w 10
+
+	+-------+----------+------------------+
+	| vCPUs | 6.2-rc3  | 6.2-rc3 + series |
+	|       |   (sec)  |            (sec) |
+	+-------+----------+------------------+
+	|    1  |    0.65  |          0.07    |
+	|    2  |    0.70  |          0.08    |
+	|    4  |    0.71  |          0.08    |
+	|    8  |    0.72  |          0.08    |
+	|   16  |    0.76  |          0.08    |
+	|   32  |    1.61  |          0.14    |
+	|   64  |    3.46  |          0.30    |
+	|  128  |    5.49  |          0.64    |
+	|  152  |    6.44  |          0.63    |
+	+-------+----------+------------------+
+
+Changes from v4:
+https://lore.kernel.org/kvmarm/20230218032314.635829-1-ricarkol@google.com/
+- nits on some comments (s/removed/unlinked and remove @new).
+  (Shaoqin)
+
+Changes from v3:
+https://lore.kernel.org/kvmarm/20230215174046.2201432-1-ricarkol@google.com/
+- KVM_PGTABLE_WALK_SKIP_CMO to use BIT(5). (Shaoqin)
+- Rewritten commit message for "Rename free_unlinked to free_removed"
+  using Oliver's suggestion. (Oliver)
+- "un" -> "an" typo. (Shaoqin)
+- kvm_pgtable_stage2_create_unlinked() to return a "kvm_pte_t *". (Oliver)
+- refactored stage2_block_get_nr_page_tables(). (Oliver)
+- /s/bock/block. (Shaoqin)
+
+Changes from v2:
+https://lore.kernel.org/kvmarm/20230206165851.3106338-1-ricarkol@google.com/
+- removed redundant kvm_pte_table() check from split walker function. (Gavin)
+- fix compilation of patch 8 by moving some definitions from path 9. (Gavin)
+- add comment for kvm_mmu_split_nr_page_tables(). (Gavin)
+
+Changes from v1:
+https://lore.kernel.org/kvmarm/20230113035000.480021-1-ricarkol@google.com/
+- added a capability to set the eager splitting chunk size. This
+  indirectly sets the number of pages in the cache. It also allows for
+  opting out of this feature. (Oliver, Marc)
+- changed kvm_pgtable_stage2_split() to split 1g huge-pages
+  using either 513 or 1 at a time (with a cache of 1). (Oliver, Marc)
+- added force_pte arg to kvm_pgtable_stage2_create_removed().
+- renamed free_removed to free_unlinked. (Ben and Oliver)
+- added KVM_PGTABLE_WALK ctx->flags for skipping BBM and CMO, instead
+  of KVM_PGTABLE_WALK_REMOVED. (Oliver)
+
+Changes from the RFC:
+https://lore.kernel.org/kvmarm/20221112081714.2169495-1-ricarkol@google.com/
+- dropped the changes to split on POST visits. No visible perf
+  benefit.
+- changed the kvm_pgtable_stage2_free_removed() implementation to
+  reuse the stage2 mapper.
+- dropped the FEAT_BBM changes and optimization. Will send this on a
+  different series.
+
+Thanks,
+Ricardo
+
+Marc Zyngier (1):
+  KVM: arm64: Use local TLBI on permission relaxation
+
+Ricardo Koller (11):
+  KVM: arm64: Add KVM_PGTABLE_WALK ctx->flags for skipping BBM and CMO
+  KVM: arm64: Rename free_unlinked to free_removed
+  KVM: arm64: Add helper for creating unlinked stage2 subtrees
+  KVM: arm64: Add kvm_pgtable_stage2_split()
+  KVM: arm64: Refactor kvm_arch_commit_memory_region()
+  KVM: arm64: Add kvm_uninit_stage2_mmu()
+  KVM: arm64: Export kvm_are_all_memslots_empty()
+  KVM: arm64: Add KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+  KVM: arm64: Split huge pages when dirty logging is enabled
+  KVM: arm64: Open-code kvm_mmu_write_protect_pt_masked()
+  KVM: arm64: Split huge pages during KVM_CLEAR_DIRTY_LOG
+
+ Documentation/virt/kvm/api.rst        |  26 ++++
+ arch/arm64/include/asm/kvm_asm.h      |   4 +
+ arch/arm64/include/asm/kvm_host.h     |  19 +++
+ arch/arm64/include/asm/kvm_mmu.h      |   1 +
+ arch/arm64/include/asm/kvm_pgtable.h  |  84 ++++++++++-
+ arch/arm64/kvm/arm.c                  |  22 +++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c    |  10 ++
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c |   6 +-
+ arch/arm64/kvm/hyp/nvhe/tlb.c         |  54 +++++++
+ arch/arm64/kvm/hyp/pgtable.c          | 194 ++++++++++++++++++++++++--
+ arch/arm64/kvm/hyp/vhe/tlb.c          |  32 +++++
+ arch/arm64/kvm/mmu.c                  | 188 +++++++++++++++++++++----
+ include/linux/kvm_host.h              |   2 +
+ include/uapi/linux/kvm.h              |   1 +
+ virt/kvm/kvm_main.c                   |   2 +-
+ 15 files changed, 591 insertions(+), 54 deletions(-)
+
+-- 
+2.39.2.722.g9855ee24e9-goog
 
