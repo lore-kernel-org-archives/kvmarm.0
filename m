@@ -1,46 +1,46 @@
 Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55665883D;
-	Wed,  1 Mar 2023 20:21:16 +0000 (UTC)
-Received: by mail-lj1-f169.google.com with SMTP id j17so15289453ljq.11;
-        Wed, 01 Mar 2023 12:21:16 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B8648BE5;
+	Wed,  1 Mar 2023 20:33:51 +0000 (UTC)
+Received: by mail-lj1-f169.google.com with SMTP id g18so13231308ljl.3;
+        Wed, 01 Mar 2023 12:33:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1677702074;
+        d=gmail.com; s=20210112; t=1677702829;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:date:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LPRzczm2wGlm6Acu/l6huV/wn3LazkeUdQZ6PCCLChQ=;
-        b=cOhEeH1WbB9GB02Xj94/oBs4LLalpGpRsZt4noDlX08wznB4ETeULIsi5VI7ldE1PA
-         GG11jx4yRs8j2QJov16ykTRBTrMcizWt+c6X39zcmxE/ZPBO2WNede+2uqUsx5Nz2ivc
-         MZQ1hCq9xXrgB7aDiTxUq6sJ2uq+GTZYIOl5Kv+4CUUn0wMr99rA7aV7YCG9rDbyys5w
-         GzyiCTs1Eu6KgJXHdLbmRSqUpCSUkTWcd3P57qUMyjjii1AF9qsT245+4YaBYuiT91Ox
-         A4Sb8mcKmQGRSfo349KbqM4W9gQx3shQuqBpLDONuVBFmZxgAMbHgGW/99pBOEIH27in
-         bweg==
+        bh=F14Yg6j8CjnO2GgnFPI0eLv2PPbZQX2WxbIgOsUbQuo=;
+        b=d/f0/EcO3a+BoqqV/QHn2B6aSbAep0kw8I8AETm0wLyNvrF4YmecfXc7J56vBuxrwx
+         ZCXUHGY42VEndv3JWxsl9VGPNTajqte3UN713AtRbd41+D0FbQpZuUA3bqiCBviVBz1A
+         199y3YUZdYCgQo8k3BlGxj2Hnl8EynfX/AfY5Gb942olXEvU4rcFBtWcV63ERC2jONlm
+         esNej17bIqSUrDZrNKuvmAoajchvEfNMvuEXRZVhF3vWrHZzVXqPSrOq2f6wrGVgvOmH
+         0cFFo77qhjLtIvAREeKVU86FyUE3URnLf36KhhxMoLWX6v5EjzeKXuw3sycEBuvQ/Yz+
+         VfUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677702074;
+        d=1e100.net; s=20210112; t=1677702829;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LPRzczm2wGlm6Acu/l6huV/wn3LazkeUdQZ6PCCLChQ=;
-        b=Zl46zixthuxaCgQ46b6XoXFykeV1IPg1gxu+RHORJnAWBiNfpXE0XDIcxQPzgk8sXU
-         r5ihxsS6AIPdBG+8b+/bs339H3CDEmJpm4hK9RmUdY3wYYjC6nE9gOUR82aT/DRXY0J/
-         Ds3bDp3nvDDUAXN3RMYWHGf1AIEKk0PT/32GdHRTzZvVzqY5a8fG1IN+tyNGGrkJluU6
-         Hzqnd34SfVZAjbIA6rYBHkG9iKB3OS+dzkdQiFWXcsZjmmio71kXPzjpvyAMvZHKA/EM
-         RpTYIRwXYWGKUGHdGst+ntww/2Dz3ge9aJzS1E9qdCTCJ8D0IqiKwD8+Dw89s8KyVy0O
-         ntCw==
-X-Gm-Message-State: AO0yUKXGvoBGw9zKX7oIvoCuAq7SfElWGXtcKjh9iwte6tFXZxWhRICl
-	4ehoIj3AKDtcNBmjUsdMsrA=
-X-Google-Smtp-Source: AK7set//lT5xo12hxlQxelQR8VrVKBkgBABiLB+SLWfCUjQ1QO8JK2l/Nl96Wcz0sxWliWJDTdMrfw==
-X-Received: by 2002:a2e:95d4:0:b0:293:1696:a042 with SMTP id y20-20020a2e95d4000000b002931696a042mr2137065ljh.4.1677702074195;
-        Wed, 01 Mar 2023 12:21:14 -0800 (PST)
+        bh=F14Yg6j8CjnO2GgnFPI0eLv2PPbZQX2WxbIgOsUbQuo=;
+        b=nZcsXr78nkvJMBNzdIh0OWgNKG9OwtSdDcGMXvauI50VlT5mTlybqlKpMe8dcxh9Kc
+         G93EXFrHE/GFWeqRTqR0NhcurrkHMoXjSqo40la2FXpjLaPYZcnpwyUFBWbhsci3c4Bx
+         qYaX57haIZLrvmUYyOhWUqC88+/nexQ9pLvC1nDLMZyzBIUN82PniNnm1wbQVv7hGPWT
+         OuNvVYFSy2z0CDzZTYaYTyjWq7wtfZGwUFGR6a4iOCT1vkaY+fffFBiK2DAM/oGnXbEs
+         xFcU4wPO+k8wUWVPTJ4/rg71X+iW5I2L/6ZdXDAfSElWFtAbcToDS59EaVdtodi1siRK
+         1Ajg==
+X-Gm-Message-State: AO0yUKXkGIy7k+VseGcgPfP2AyiHzjZ449aDwFxppWii82mzJDXeBBx6
+	JsuDD4vnpHuMu+IxBQdLnjI=
+X-Google-Smtp-Source: AK7set/hcHtp3GjmUdRWo+Y2B7PECElEq3V23NbAxPdL1hzXgz5I4Dtwh53wl90A1VfKfnDeI5KNiw==
+X-Received: by 2002:a2e:9bd6:0:b0:295:c3fc:8a49 with SMTP id w22-20020a2e9bd6000000b00295c3fc8a49mr2389921ljj.2.1677702829201;
+        Wed, 01 Mar 2023 12:33:49 -0800 (PST)
 Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id p17-20020a2eb991000000b00295b1ad177csm1595531ljp.68.2023.03.01.12.21.13
+        by smtp.gmail.com with ESMTPSA id v11-20020a2ea44b000000b002935632b3f8sm1822091ljn.14.2023.03.01.12.33.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Mar 2023 12:21:14 -0800 (PST)
+        Wed, 01 Mar 2023 12:33:48 -0800 (PST)
 From: Zhi Wang <zhi.wang.linux@gmail.com>
 X-Google-Original-From: Zhi Wang <zhi.wang.linux@intel.com>
-Date: Wed, 1 Mar 2023 22:21:12 +0200
+Date: Wed, 1 Mar 2023 22:33:46 +0200
 To: Steven Price <steven.price@arm.com>
 Cc: Zhi Wang <zhi.wang.linux@gmail.com>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>, Marc
@@ -51,14 +51,15 @@ Cc: Zhi Wang <zhi.wang.linux@gmail.com>, kvm@vger.kernel.org,
  Gouly <joey.gouly@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
  Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
  linux-coco@lists.linux.dev
-Subject: Re: [RFC PATCH 05/28] arm64: RME: Define the user ABI
-Message-ID: <20230301222112.00003bc7@intel.com>
-In-Reply-To: <8e803abd-8856-3c44-6262-40c026216c9a@arm.com>
+Subject: Re: [RFC PATCH 06/28] arm64: RME: ioctls to create and configure
+ realms
+Message-ID: <20230301223346.00000a0b@intel.com>
+In-Reply-To: <04adb31d-06c5-b274-62c6-4f19dc681513@arm.com>
 References: <20230127112248.136810-1-suzuki.poulose@arm.com>
 	<20230127112932.38045-1-steven.price@arm.com>
-	<20230127112932.38045-6-steven.price@arm.com>
-	<20230213180413.00000392@gmail.com>
-	<8e803abd-8856-3c44-6262-40c026216c9a@arm.com>
+	<20230127112932.38045-7-steven.price@arm.com>
+	<20230213181044.00004994@gmail.com>
+	<04adb31d-06c5-b274-62c6-4f19dc681513@arm.com>
 X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -69,186 +70,318 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 1 Mar 2023 11:54:34 +0000
+On Wed, 1 Mar 2023 11:55:17 +0000
 Steven Price <steven.price@arm.com> wrote:
 
-> On 13/02/2023 16:04, Zhi Wang wrote:
-> > On Fri, 27 Jan 2023 11:29:09 +0000
+> On 13/02/2023 16:10, Zhi Wang wrote:
+> > On Fri, 27 Jan 2023 11:29:10 +0000
 > > Steven Price <steven.price@arm.com> wrote:
 > > 
-> >> There is one (multiplexed) CAP which can be used to create, populate and
-> >> then activate the realm.
+> >> Add the KVM_CAP_ARM_RME_CREATE_FD ioctl to create a realm. This involves
+> >> delegating pages to the RMM to hold the Realm Descriptor (RD) and for
+> >> the base level of the Realm Translation Tables (RTT). A VMID also need
+> >> to be picked, since the RMM has a separate VMID address space a
+> >> dedicated allocator is added for this purpose.
+> >>
+> >> KVM_CAP_ARM_RME_CONFIG_REALM is provided to allow configuring the realm
+> >> before it is created.
 > >>
 > >> Signed-off-by: Steven Price <steven.price@arm.com>
 > >> ---
-> >>  Documentation/virt/kvm/api.rst    |  1 +
-> >>  arch/arm64/include/uapi/asm/kvm.h | 63 +++++++++++++++++++++++++++++++
-> >>  include/uapi/linux/kvm.h          |  2 +
-> >>  3 files changed, 66 insertions(+)
+> >>  arch/arm64/include/asm/kvm_rme.h |  14 ++
+> >>  arch/arm64/kvm/arm.c             |  19 ++
+> >>  arch/arm64/kvm/mmu.c             |   6 +
+> >>  arch/arm64/kvm/reset.c           |  33 +++
+> >>  arch/arm64/kvm/rme.c             | 357 +++++++++++++++++++++++++++++++
+> >>  5 files changed, 429 insertions(+)
 > >>
-> >> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> >> index 0dd5d8733dd5..f1a59d6fb7fc 100644
-> >> --- a/Documentation/virt/kvm/api.rst
-> >> +++ b/Documentation/virt/kvm/api.rst
-> >> @@ -4965,6 +4965,7 @@ Recognised values for feature:
+> >> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
+> >> index c26bc2c6770d..055a22accc08 100644
+> >> --- a/arch/arm64/include/asm/kvm_rme.h
+> >> +++ b/arch/arm64/include/asm/kvm_rme.h
+> >> @@ -6,6 +6,8 @@
+> >>  #ifndef __ASM_KVM_RME_H
+> >>  #define __ASM_KVM_RME_H
 > >>  
-> >>    =====      ===========================================
-> >>    arm64      KVM_ARM_VCPU_SVE (requires KVM_CAP_ARM_SVE)
-> >> +  arm64      KVM_ARM_VCPU_REC (requires KVM_CAP_ARM_RME)
-> >>    =====      ===========================================
-> >>  
-> >>  Finalizes the configuration of the specified vcpu feature.
-> >> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> >> index a7a857f1784d..fcc0b8dce29b 100644
-> >> --- a/arch/arm64/include/uapi/asm/kvm.h
-> >> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> >> @@ -109,6 +109,7 @@ struct kvm_regs {
-> >>  #define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
-> >>  #define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
-> >>  #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
-> >> +#define KVM_ARM_VCPU_REC		7 /* VCPU REC state as part of Realm */
-> >>  
-> >>  struct kvm_vcpu_init {
-> >>  	__u32 target;
-> >> @@ -401,6 +402,68 @@ enum {
-> >>  #define   KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES	3
-> >>  #define   KVM_DEV_ARM_ITS_CTRL_RESET		4
-> >>  
-> >> +/* KVM_CAP_ARM_RME on VM fd */
-> >> +#define KVM_CAP_ARM_RME_CONFIG_REALM		0
-> >> +#define KVM_CAP_ARM_RME_CREATE_RD		1
-> >> +#define KVM_CAP_ARM_RME_INIT_IPA_REALM		2
-> >> +#define KVM_CAP_ARM_RME_POPULATE_REALM		3
-> >> +#define KVM_CAP_ARM_RME_ACTIVATE_REALM		4
+> >> +#include <uapi/linux/kvm.h>
 > >> +
+> >>  enum realm_state {
+> >>  	REALM_STATE_NONE,
+> >>  	REALM_STATE_NEW,
+> >> @@ -15,8 +17,20 @@ enum realm_state {
+> >>  
+> >>  struct realm {
+> >>  	enum realm_state state;
+> >> +
+> >> +	void *rd;
+> >> +	struct realm_params *params;
+> >> +
+> >> +	unsigned long num_aux;
+> >> +	unsigned int vmid;
+> >> +	unsigned int ia_bits;
+> >>  };
+> >>  
 > > 
-> > It is a little bit confusing here. These seems more like 'commands' not caps.
-> > Will leave more comments after reviewing the later patches.
+> > Maybe more comments for this structure?
 > 
-> Sorry for the slow response. Thank you for your review - I hope to post
-> a new version of this series (rebased on 6.3-rc1) in the coming weeks
-> with your comments addressed.
+> Agreed, this series is a bit light on comments. I'll try to improve for v2.
 > 
+> <snip>
+> 
+> > 
+> > Just curious. Wouldn't it be better to use IDR as this is ID allocation? There
+> > were some efforts to change the use of bitmap allocation to IDR before.
+> 
+> I'm not sure it makes much difference really. This matches KVM's
+> vmid_map, but here things are much more simple as there's no support for
+> the likes of VMID rollover (the number of Realm VMs is just capped at
+> the number of VMIDs).
+> 
+> IDR provides a lot of functionality we don't need, but equally I don't
+> think performance or memory usage are really a concern here.
 
-Hi:
+Agree. I am not opposed to the current approach. I gave this comment because
+I vaguely remember there were some patch bundles to covert bitmap to IDR in
+the kernel before. So I think it would be better to raise it up and get a
+conclusion. It would save some efforts for the people who might jump in the
+review later.
 
-No worries. I spent most of my time on closing the review of TDX/SNP
-series recently while stopped at patch 16 of this series. I will try to
-finish the rest of this series this week.
-
-I am glad if my efforts help and more reviewers can smoothly jump in
-later.
- 
-> They are indeed commands - and using caps is a bit of a hack. The
-> benefit here is that all the Realm commands are behind the one
-> KVM_CAP_ARM_RME.
-> 
-> The options I can see are:
-> 
-> a) What I've got here - (ab)using KVM_ENABLE_CAP to perform commands.
-> 
-> b) Add new ioctls for each of the above stages (so 5 new ioctls on top
-> of the CAP for discovery). With any future extensions requiring new ioctls.
-> 
-> c) Add a single new multiplexing ioctl (along with the CAP for discovery).
-> 
-> I'm not massively keen on defining a new multiplexing scheme (c), but
-> equally (b) seems like it's burning through ioctl numbers. Which led me
-> to stick with (a) which at least keeps the rebasing simple (there's only
-> the one CAP number which could conflict) and there's already a
-> multiplexing scheme.
-> 
-> But I'm happy to change if there's consensus a different approach would
-> be preferable.
-> 
-
-Let's see if others have different opinions.
-
-My coin goes to b as it is better to respect "what it is, make it explicit
-and clear" when coming to define the UABI. Ioctl number is for UABI. If
-it is going to burn out, IMHO, we need to find another way, perhaps another
-fd to group those ioctls, like KVM.
-
-1. a) seems abusing the usage of the cap. for sure, the benefit is obvious.
-2. c) seems hiding the details, which saves the ioctl numbers, but it didn't
-actually help a lot on the complexity and might end up with another bunch
-of "command code".
-
-> Thanks,
 > 
 > Steve
 > 
-> >> +#define KVM_CAP_ARM_RME_MEASUREMENT_ALGO_SHA256		0
-> >> +#define KVM_CAP_ARM_RME_MEASUREMENT_ALGO_SHA512		1
+> >> +/* Protects access to rme_vmid_bitmap */
+> >> +static DEFINE_SPINLOCK(rme_vmid_lock);
+> >> +static unsigned long *rme_vmid_bitmap;
 > >> +
-> >> +#define KVM_CAP_ARM_RME_RPV_SIZE 64
+> >> +static int rme_vmid_init(void)
+> >> +{
+> >> +	unsigned int vmid_count = 1 << kvm_get_vmid_bits();
 > >> +
-> >> +/* List of configuration items accepted for KVM_CAP_ARM_RME_CONFIG_REALM */
-> >> +#define KVM_CAP_ARM_RME_CFG_RPV			0
-> >> +#define KVM_CAP_ARM_RME_CFG_HASH_ALGO		1
-> >> +#define KVM_CAP_ARM_RME_CFG_SVE			2
-> >> +#define KVM_CAP_ARM_RME_CFG_DBG			3
-> >> +#define KVM_CAP_ARM_RME_CFG_PMU			4
+> >> +	rme_vmid_bitmap = bitmap_zalloc(vmid_count, GFP_KERNEL);
+> >> +	if (!rme_vmid_bitmap) {
+> >> +		kvm_err("%s: Couldn't allocate rme vmid bitmap\n", __func__);
+> >> +		return -ENOMEM;
+> >> +	}
 > >> +
-> >> +struct kvm_cap_arm_rme_config_item {
-> >> +	__u32 cfg;
-> >> +	union {
-> >> +		/* cfg == KVM_CAP_ARM_RME_CFG_RPV */
-> >> +		struct {
-> >> +			__u8	rpv[KVM_CAP_ARM_RME_RPV_SIZE];
-> >> +		};
+> >> +	return 0;
+> >> +}
 > >> +
-> >> +		/* cfg == KVM_CAP_ARM_RME_CFG_HASH_ALGO */
-> >> +		struct {
-> >> +			__u32	hash_algo;
-> >> +		};
+> >> +static int rme_vmid_reserve(void)
+> >> +{
+> >> +	int ret;
+> >> +	unsigned int vmid_count = 1 << kvm_get_vmid_bits();
 > >> +
-> >> +		/* cfg == KVM_CAP_ARM_RME_CFG_SVE */
-> >> +		struct {
-> >> +			__u32	sve_vq;
-> >> +		};
+> >> +	spin_lock(&rme_vmid_lock);
+> >> +	ret = bitmap_find_free_region(rme_vmid_bitmap, vmid_count, 0);
+> >> +	spin_unlock(&rme_vmid_lock);
 > >> +
-> >> +		/* cfg == KVM_CAP_ARM_RME_CFG_DBG */
-> >> +		struct {
-> >> +			__u32	num_brps;
-> >> +			__u32	num_wrps;
-> >> +		};
+> >> +	return ret;
+> >> +}
 > >> +
-> >> +		/* cfg == KVM_CAP_ARM_RME_CFG_PMU */
-> >> +		struct {
-> >> +			__u32	num_pmu_cntrs;
-> >> +		};
-> >> +		/* Fix the size of the union */
-> >> +		__u8	reserved[256];
-> >> +	};
-> >> +};
+> >> +static void rme_vmid_release(unsigned int vmid)
+> >> +{
+> >> +	spin_lock(&rme_vmid_lock);
+> >> +	bitmap_release_region(rme_vmid_bitmap, vmid, 0);
+> >> +	spin_unlock(&rme_vmid_lock);
+> >> +}
 > >> +
-> >> +struct kvm_cap_arm_rme_populate_realm_args {
-> >> +	__u64 populate_ipa_base;
-> >> +	__u64 populate_ipa_size;
-> >> +};
+> >> +static int kvm_create_realm(struct kvm *kvm)
+> >> +{
+> >> +	struct realm *realm = &kvm->arch.realm;
+> >> +	int ret;
 > >> +
-> >> +struct kvm_cap_arm_rme_init_ipa_args {
-> >> +	__u64 init_ipa_base;
-> >> +	__u64 init_ipa_size;
-> >> +};
+> >> +	if (!kvm_is_realm(kvm) || kvm_realm_state(kvm) != REALM_STATE_NONE)
+> >> +		return -EEXIST;
 > >> +
-> >>  /* Device Control API on vcpu fd */
-> >>  #define KVM_ARM_VCPU_PMU_V3_CTRL	0
-> >>  #define   KVM_ARM_VCPU_PMU_V3_IRQ	0
-> >> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> >> index 20522d4ba1e0..fec1909e8b73 100644
-> >> --- a/include/uapi/linux/kvm.h
-> >> +++ b/include/uapi/linux/kvm.h
-> >> @@ -1176,6 +1176,8 @@ struct kvm_ppc_resize_hpt {
-> >>  #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
-> >>  #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
+> >> +	ret = rme_vmid_reserve();
+> >> +	if (ret < 0)
+> >> +		return ret;
+> >> +	realm->vmid = ret;
+> >> +
+> >> +	ret = realm_create_rd(kvm);
+> >> +	if (ret) {
+> >> +		rme_vmid_release(realm->vmid);
+> >> +		return ret;
+> >> +	}
+> >> +
+> >> +	WRITE_ONCE(realm->state, REALM_STATE_NEW);
+> >> +
+> >> +	/* The realm is up, free the parameters.  */
+> >> +	free_page((unsigned long)realm->params);
+> >> +	realm->params = NULL;
+> >> +
+> >> +	return 0;
+> >> +}
+> >> +
+> >> +static int config_realm_hash_algo(struct realm *realm,
+> >> +				  struct kvm_cap_arm_rme_config_item *cfg)
+> >> +{
+> >> +	switch (cfg->hash_algo) {
+> >> +	case KVM_CAP_ARM_RME_MEASUREMENT_ALGO_SHA256:
+> >> +		if (!rme_supports(RMI_FEATURE_REGISTER_0_HASH_SHA_256))
+> >> +			return -EINVAL;
+> >> +		break;
+> >> +	case KVM_CAP_ARM_RME_MEASUREMENT_ALGO_SHA512:
+> >> +		if (!rme_supports(RMI_FEATURE_REGISTER_0_HASH_SHA_512))
+> >> +			return -EINVAL;
+> >> +		break;
+> >> +	default:
+> >> +		return -EINVAL;
+> >> +	}
+> >> +	realm->params->measurement_algo = cfg->hash_algo;
+> >> +	return 0;
+> >> +}
+> >> +
+> >> +static int config_realm_sve(struct realm *realm,
+> >> +			    struct kvm_cap_arm_rme_config_item *cfg)
+> >> +{
+> >> +	u64 features_0 = realm->params->features_0;
+> >> +	int max_sve_vq = u64_get_bits(rmm_feat_reg0,
+> >> +				      RMI_FEATURE_REGISTER_0_SVE_VL);
+> >> +
+> >> +	if (!rme_supports(RMI_FEATURE_REGISTER_0_SVE_EN))
+> >> +		return -EINVAL;
+> >> +
+> >> +	if (cfg->sve_vq > max_sve_vq)
+> >> +		return -EINVAL;
+> >> +
+> >> +	features_0 &= ~(RMI_FEATURE_REGISTER_0_SVE_EN |
+> >> +			RMI_FEATURE_REGISTER_0_SVE_VL);
+> >> +	features_0 |= u64_encode_bits(1, RMI_FEATURE_REGISTER_0_SVE_EN);
+> >> +	features_0 |= u64_encode_bits(cfg->sve_vq,
+> >> +				      RMI_FEATURE_REGISTER_0_SVE_VL);
+> >> +
+> >> +	realm->params->features_0 = features_0;
+> >> +	return 0;
+> >> +}
+> >> +
+> >> +static int kvm_rme_config_realm(struct kvm *kvm, struct kvm_enable_cap *cap)
+> >> +{
+> >> +	struct kvm_cap_arm_rme_config_item cfg;
+> >> +	struct realm *realm = &kvm->arch.realm;
+> >> +	int r = 0;
+> >> +
+> >> +	if (kvm_realm_state(kvm) != REALM_STATE_NONE)
+> >> +		return -EBUSY;
+> >> +
+> >> +	if (copy_from_user(&cfg, (void __user *)cap->args[1], sizeof(cfg)))
+> >> +		return -EFAULT;
+> >> +
+> >> +	switch (cfg.cfg) {
+> >> +	case KVM_CAP_ARM_RME_CFG_RPV:
+> >> +		memcpy(&realm->params->rpv, &cfg.rpv, sizeof(cfg.rpv));
+> >> +		break;
+> >> +	case KVM_CAP_ARM_RME_CFG_HASH_ALGO:
+> >> +		r = config_realm_hash_algo(realm, &cfg);
+> >> +		break;
+> >> +	case KVM_CAP_ARM_RME_CFG_SVE:
+> >> +		r = config_realm_sve(realm, &cfg);
+> >> +		break;
+> >> +	default:
+> >> +		r = -EINVAL;
+> >> +	}
+> >> +
+> >> +	return r;
+> >> +}
+> >> +
+> >> +int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
+> >> +{
+> >> +	int r = 0;
+> >> +
+> >> +	switch (cap->args[0]) {
+> >> +	case KVM_CAP_ARM_RME_CONFIG_REALM:
+> >> +		r = kvm_rme_config_realm(kvm, cap);
+> >> +		break;
+> >> +	case KVM_CAP_ARM_RME_CREATE_RD:
+> >> +		if (kvm->created_vcpus) {
+> >> +			r = -EBUSY;
+> >> +			break;
+> >> +		}
+> >> +
+> >> +		r = kvm_create_realm(kvm);
+> >> +		break;
+> >> +	default:
+> >> +		r = -EINVAL;
+> >> +		break;
+> >> +	}
+> >> +
+> >> +	return r;
+> >> +}
+> >> +
+> >> +void kvm_destroy_realm(struct kvm *kvm)
+> >> +{
+> >> +	struct realm *realm = &kvm->arch.realm;
+> >> +	struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
+> >> +	unsigned int pgd_sz;
+> >> +	int i;
+> >> +
+> >> +	if (realm->params) {
+> >> +		free_page((unsigned long)realm->params);
+> >> +		realm->params = NULL;
+> >> +	}
+> >> +
+> >> +	if (kvm_realm_state(kvm) == REALM_STATE_NONE)
+> >> +		return;
+> >> +
+> >> +	WRITE_ONCE(realm->state, REALM_STATE_DYING);
+> >> +
+> >> +	rme_vmid_release(realm->vmid);
+> >> +
+> >> +	if (realm->rd) {
+> >> +		phys_addr_t rd_phys = virt_to_phys(realm->rd);
+> >> +
+> >> +		if (WARN_ON(rmi_realm_destroy(rd_phys)))
+> >> +			return;
+> >> +		if (WARN_ON(rmi_granule_undelegate(rd_phys)))
+> >> +			return;
+> >> +		free_page((unsigned long)realm->rd);
+> >> +		realm->rd = NULL;
+> >> +	}
+> >> +
+> >> +	pgd_sz = kvm_pgd_pages(pgt->ia_bits, pgt->start_level);
+> >> +	for (i = 0; i < pgd_sz; i++) {
+> >> +		phys_addr_t pgd_phys = kvm->arch.mmu.pgd_phys + i * PAGE_SIZE;
+> >> +
+> >> +		if (WARN_ON(rmi_granule_undelegate(pgd_phys)))
+> >> +			return;
+> >> +	}
+> >> +
+> >> +	kvm_free_stage2_pgd(&kvm->arch.mmu);
+> >> +}
+> >> +
+> >> +int kvm_init_realm_vm(struct kvm *kvm)
+> >> +{
+> >> +	struct realm_params *params;
+> >> +
+> >> +	params = (struct realm_params *)get_zeroed_page(GFP_KERNEL);
+> >> +	if (!params)
+> >> +		return -ENOMEM;
+> >> +
+> >> +	params->features_0 = create_realm_feat_reg0(kvm);
+> >> +	kvm->arch.realm.params = params;
+> >> +	return 0;
+> >> +}
+> >> +
+> >>  int kvm_init_rme(void)
+> >>  {
+> >> +	int ret;
+> >> +
+> >>  	if (PAGE_SIZE != SZ_4K)
+> >>  		/* Only 4k page size on the host is supported */
+> >>  		return 0;
+> >> @@ -43,6 +394,12 @@ int kvm_init_rme(void)
+> >>  		/* Continue without realm support */
+> >>  		return 0;
 > >>  
-> >> +#define KVM_CAP_ARM_RME 300 // FIXME: Large number to prevent conflicts
+> >> +	ret = rme_vmid_init();
+> >> +	if (ret)
+> >> +		return ret;
 > >> +
-> >>  #ifdef KVM_CAP_IRQ_ROUTING
+> >> +	WARN_ON(rmi_features(0, &rmm_feat_reg0));
+> >> +
+> >>  	/* Future patch will enable static branch kvm_rme_is_available */
 > >>  
-> >>  struct kvm_irq_routing_irqchip {
+> >>  	return 0;
 > > 
 > 
 
