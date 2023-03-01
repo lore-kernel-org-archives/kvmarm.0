@@ -1,40 +1,40 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C9088BEE
-	for <kvmarm@lists.linux.dev>; Wed,  1 Mar 2023 21:09:42 +0000 (UTC)
-Received: by mail-pj1-f74.google.com with SMTP id q9-20020a17090a9f4900b00237d026fc55so257777pjv.3
-        for <kvmarm@lists.linux.dev>; Wed, 01 Mar 2023 13:09:42 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E0868BEE
+	for <kvmarm@lists.linux.dev>; Wed,  1 Mar 2023 21:09:44 +0000 (UTC)
+Received: by mail-pj1-f73.google.com with SMTP id o8-20020a17090a5b0800b0023740160d09so5031965pji.6
+        for <kvmarm@lists.linux.dev>; Wed, 01 Mar 2023 13:09:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FD7uNwpEYF9RsVYatisVMtB7W3/05QCRhc5pQD1utdg=;
-        b=GKbeHEhd81x4RT0NRiaNegia/D4yGXeprV1zo45q3lUMhN8Jd0I5JPlSf0CNvA0/+e
-         XBbcwBZiGpFyfRO88xezpgSDQzv1xFoV6nXnPYjkBOHhGox/VP2VPJkn1S9XYhf6d52P
-         nz3VuQCoHgfWyD+YD8NffwGbJRhosrREg0eRLtc6DgoR3C+EWBi6LGrEsTgA11q0L/CG
-         xRHJHbXfg67Sc9Sp0OFyUoKPaeqtXDtK8zQE2OVXSldXJnGaPNPXIzDm7BMv+9TKgg1d
-         mcprn81G4KfeaX08Uthza5kJIwnmIUGcuozOci+gMx9fix/o98HhRJux7SLwShphnMSt
-         hLMQ==
+        bh=DqA9XPbdG72ij8bnt7P1FG5k/aZwFU14SdlEVjUmaeQ=;
+        b=Di8RI9KA4HPs+lwFiOVEWU1f+4M8cDSY9XVJ/MlMifv+lFD1Kx+kz15kGAQ26n33Rw
+         mLMjSPzYRJ/nA8sEBvn7Ge1ky3/HXLI5lzHK4ddEk0XvH3x3kphbhtm2NM7a3PFMtPmw
+         dQu24XlzT/OTKwnEC/dX6oZ2++xnNEzNw/S7IoZ/bPVBy0rcJX8g0cGQuCqBcc1oczET
+         V/5F98DdOOcXw+2cKe9nhAEnUrJiEpuL9jW+tdG8YqbPnTlKBoXpgbkwU9UMxbh05YRH
+         sWwwgixDq//SOtNAEZI7n+RQGa2bY6wjv3xzSj98H8ReMzzb+wnY20jIzezLmA09eWVj
+         IbKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FD7uNwpEYF9RsVYatisVMtB7W3/05QCRhc5pQD1utdg=;
-        b=PPEdEKmkW8F+DL9JDkuA1UgBFwRYwC8agaObCYIjGmpOJnuBvJ4oMs5wdGWB2/3fK3
-         0dYyYtV3DZ718gT4zToadQDG17Y3+OPf4OMbP1+37wJviImpDDYTBKG4BPxNN6uR883j
-         SqAtxo5hyYxIOP4RWYK3w5Nigur5Z4HeZK88v5zey1geVKimW4fl23Sw74ynn2CmHFon
-         xxCoaJXYwu+i+kpdrRGG3QKYGyxDukV8pRS4IunfgGnrPGOgPWFIbS/4iJ509bWx3m+Z
-         ZVMVXoYzHOK73o1u+FhBlepQDwnentUtnNOmde7OWaSh9vh5uhEFxYvb4HPWmbiTmiUU
-         j+Wg==
-X-Gm-Message-State: AO0yUKVAymXQAyXv6VEJqOixUF5QYUccmsvRslhu+cPvvDICm4K/fmgG
-	qLXoq++wv2vzoJP+mQmgvRgCQfLAq7LTqw==
-X-Google-Smtp-Source: AK7set8BFQJrdcP7LxWyeTBzLMdsUZBctkkgkT8+/5jkqM87wF7FFCh3sVs/KW+w4RyY6le5Sdo6CkLY3bMq2A==
+        bh=DqA9XPbdG72ij8bnt7P1FG5k/aZwFU14SdlEVjUmaeQ=;
+        b=FnHZr7xh6IV9S8QX35uE3ugN0q6TVey/8teIYy4QFyUZFcZyjwbkBgA231qfzZT6ra
+         /n0ata+C71i07Rzu7rjm08gsOpLgmgYYuYdJd3NioodstLqw31eG7vsH6ELsxqbEUAqO
+         6JSNmPGDYkqhGENfi2syXZ7aGI44nyidqobWSkGEYU+Y6qYTFi9piSnGiU1HP7B7fZIx
+         hNdofLyc/HH9Gzn5fmjKp2qJQtHtvcOSN70d7tntAEPYbsf0fmdgKI9PjTKnCj9/D8Zi
+         5q1eJ2Xuu+lhICDp9/Kw4872eXC8R5bnWYBLclZ5NO6zp86CeXlz5tZTGF+a8i5p9Coo
+         m8lg==
+X-Gm-Message-State: AO0yUKV7A2AgAwrWtEh3G1G0cOurbqDWyuvdjdyh6x6utJB78YHCiqhU
+	mdYFNuF4x3L1leufTaUKBZgEbZWvNr15aQ==
+X-Google-Smtp-Source: AK7set9aWhP2GLViX6xifcLL83bOgHSFy+VYxOzjjIe65tdTxY8xZL1AY5Jg738RWC0IZjRmQr5q+r1hn95JbQ==
 X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a63:381d:0:b0:503:7c81:4599 with SMTP id
- f29-20020a63381d000000b005037c814599mr2229087pga.11.1677704981897; Wed, 01
- Mar 2023 13:09:41 -0800 (PST)
-Date: Wed,  1 Mar 2023 21:09:22 +0000
+ (user=ricarkol job=sendgmr) by 2002:a17:903:187:b0:19b:36:30e0 with SMTP id
+ z7-20020a170903018700b0019b003630e0mr3105569plg.5.1677704983960; Wed, 01 Mar
+ 2023 13:09:43 -0800 (PST)
+Date: Wed,  1 Mar 2023 21:09:23 +0000
 In-Reply-To: <20230301210928.565562-1-ricarkol@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230301210928.565562-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.39.2.722.g9855ee24e9-goog
-Message-ID: <20230301210928.565562-7-ricarkol@google.com>
-Subject: [PATCH v5 06/12] KVM: arm64: Add kvm_uninit_stage2_mmu()
+Message-ID: <20230301210928.565562-8-ricarkol@google.com>
+Subject: [PATCH v5 07/12] KVM: arm64: Export kvm_are_all_memslots_empty()
 From: Ricardo Koller <ricarkol@google.com>
 To: pbonzini@redhat.com, maz@kernel.org, oupton@google.com, 
 	yuzenghui@huawei.com, dmatlack@google.com
@@ -56,55 +56,43 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
 	ricarkol@gmail.com, Ricardo Koller <ricarkol@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add kvm_uninit_stage2_mmu() and move kvm_free_stage2_pgd() into it. A
-future commit will add some more things to do inside of
-kvm_uninit_stage2_mmu().
+Export kvm_are_all_memslots_empty(). This will be used by a future
+commit when checking before setting a capability.
 
 No functional change intended.
 
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- arch/arm64/include/asm/kvm_mmu.h | 1 +
- arch/arm64/kvm/mmu.c             | 7 ++++++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ include/linux/kvm_host.h | 2 ++
+ virt/kvm/kvm_main.c      | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index e4a7e6369499..058f3ae5bc26 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -167,6 +167,7 @@ void free_hyp_pgds(void);
- 
- void stage2_unmap_vm(struct kvm *kvm);
- int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long type);
-+void kvm_uninit_stage2_mmu(struct kvm *kvm);
- void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
- int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 			  phys_addr_t pa, unsigned long size, bool writable);
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index d2c5e6992459..812633a75e74 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -766,6 +766,11 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
- 	return err;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 4f26b244f6d0..8c5530e03a78 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -991,6 +991,8 @@ static inline bool kvm_memslots_empty(struct kvm_memslots *slots)
+ 	return RB_EMPTY_ROOT(&slots->gfn_tree);
  }
  
-+void kvm_uninit_stage2_mmu(struct kvm *kvm)
-+{
-+	kvm_free_stage2_pgd(&kvm->arch.mmu);
-+}
++bool kvm_are_all_memslots_empty(struct kvm *kvm);
 +
- static void stage2_unmap_memslot(struct kvm *kvm,
- 				 struct kvm_memory_slot *memslot)
- {
-@@ -1855,7 +1860,7 @@ void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
- 
- void kvm_arch_flush_shadow_all(struct kvm *kvm)
- {
--	kvm_free_stage2_pgd(&kvm->arch.mmu);
-+	kvm_uninit_stage2_mmu(kvm);
+ #define kvm_for_each_memslot(memslot, bkt, slots)			      \
+ 	hash_for_each(slots->id_hash, bkt, memslot, id_node[slots->node_idx]) \
+ 		if (WARN_ON_ONCE(!memslot->npages)) {			      \
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 9c60384b5ae0..3940d2467e1b 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4604,7 +4604,7 @@ int __attribute__((weak)) kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 	return -EINVAL;
  }
  
- void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+-static bool kvm_are_all_memslots_empty(struct kvm *kvm)
++bool kvm_are_all_memslots_empty(struct kvm *kvm)
+ {
+ 	int i;
+ 
 -- 
 2.39.2.722.g9855ee24e9-goog
 
