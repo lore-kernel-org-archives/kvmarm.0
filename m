@@ -1,69 +1,94 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D0AEC8
-	for <kvmarm@lists.linux.dev>; Wed,  1 Mar 2023 07:19:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1677655165;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=9gte+UdZRbB1selX9b8PwG5UPjX8H5856UTwKQRAiBQ=;
-	b=RbO74yP4iVREFtoOXZVKrnm896e/TDUJvCVUbwxDAbkpQXW87lBccIU2Pye8JdMKxPwxeZ
-	OmKx5AxAMQkM/EoFNyen24RfJtcvjCcKxs9V7tcOkex7qQyYIqeFjwb5jjC5wCQ5wPdzBW
-	3rDTnLm1s2PY6OIcWrn4EOFf5aYhWOg=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-170-rAl27tkgMeicRGncRPK1pw-1; Wed, 01 Mar 2023 02:19:24 -0500
-X-MC-Unique: rAl27tkgMeicRGncRPK1pw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 097653C0DDB8;
-	Wed,  1 Mar 2023 07:19:23 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 00A0018EC6;
-	Wed,  1 Mar 2023 07:19:23 +0000 (UTC)
-From: Shaoqin Huang <shahuang@redhat.com>
-To: kvmarm@lists.linux.dev
-Cc: Shaoqin Huang <shahuang@redhat.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B55B10F0
+	for <kvmarm@lists.linux.dev>; Wed,  1 Mar 2023 09:20:30 +0000 (UTC)
+Received: by mail-wm1-f48.google.com with SMTP id ay29-20020a05600c1e1d00b003e9f4c2b623so11317064wmb.3
+        for <kvmarm@lists.linux.dev>; Wed, 01 Mar 2023 01:20:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1677662429;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ksdV4yO+/ccC87yK6osO5dTNtiRfrlYmNqnr+scBfFo=;
+        b=R4M5oYOcaqThwAC3+Mi3wP1Z5kZ5o+33EOc8N+bdvkNjAjTjnuZfS9F3eLsUisC1Hm
+         hC0r5T4FZaQ+H3XBnz+SX24rnbELRy8DFVpt7cdQzKzTqmPM5Azz5yO3OdF7jxeYPuyK
+         Ycszux1MDO7EiNUxaLiES0djq0YU/7XugDADt+Fo6WOpJ44a8ugyFLWilbUHDD34C21n
+         rilDqiCPmzSXUYEXP3N63l6k9+eqMPQPaXEIgj7J/hTQkewr91AEHeB4hmj6cTyb8XZT
+         53be0KEbxw9PrPU+Flik8vQJhYEDs8Od5R7d4po8qokM4CtgV8HOHI3/7CtYXTL1x/z5
+         qYVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1677662429;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ksdV4yO+/ccC87yK6osO5dTNtiRfrlYmNqnr+scBfFo=;
+        b=3Jzvu7mGW9zek+zZjRk30MvT48a1WT80tGdmvUMFqQd/SEg6D8g3oCvGGAq5sL6KlM
+         MqJBU2KlueGcxcMjK+mDJJtUORJZ6WS/cfY2Q6LEw4mrt7PSphshCXZsxEROAVlXSVat
+         I/aGCbaA4gMLb+ARA6wZTp1oTZl597NbxL8mQVfkTs4G3D43Lv6KCwyppG+T0+dbri0U
+         aK7ywcPUZcgcPV77WGyiKmC7YCZk7L0Rg6nRLS5UMRiDTHKsmpC5C/Bk841/v7ZhpV8G
+         6alUyLmcvNwTsWlpoB11jrq8NhOHe82OKI6Wez7lSSGbMwwNC3cIg9V6zOX2Wx2FVvJK
+         u3iw==
+X-Gm-Message-State: AO0yUKX5OdrzXfsz27gShAz1y3G375JUHg6A7MXS0epd4+MinHQB0O8t
+	md+1nCWZuMuame2whZ8kJKQ0pw==
+X-Google-Smtp-Source: AK7set90Ie+ijBFqKBrmMowRejIpuYczAUvaNPGHR/JgrcHLFFLzdHVU7dNTDOpzYjquvTEFuwnCFg==
+X-Received: by 2002:a05:600c:714:b0:3eb:29fe:70df with SMTP id i20-20020a05600c071400b003eb29fe70dfmr4155693wmn.35.1677662429259;
+        Wed, 01 Mar 2023 01:20:29 -0800 (PST)
+Received: from myrica (054592b0.skybroadband.com. [5.69.146.176])
+        by smtp.gmail.com with ESMTPSA id y2-20020a1c4b02000000b003e203681b26sm14703927wma.29.2023.03.01.01.20.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Mar 2023 01:20:28 -0800 (PST)
+Date: Wed, 1 Mar 2023 09:20:29 +0000
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: Itaru Kitayama <itaru.kitayama@gmail.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-coco@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Andrew Jones <andrew.jones@linux.dev>,
-	kvm@vger.kernel.org (open list:ARM)
-Subject: [kvm-unit-tests] arm: Replace the obsolete qemu script
-Date: Wed,  1 Mar 2023 02:17:37 -0500
-Message-Id: <20230301071737.43760-1-shahuang@redhat.com>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Chao Peng <chao.p.peng@linux.intel.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, James Morse <james.morse@arm.com>,
+	Joey Gouly <Joey.Gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Quentin Perret <qperret@google.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Steven Price <steven.price@arm.com>, Thomas Huth <thuth@redhat.com>,
+	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+	kvmarm@lists.cs.columbia.edu
+Subject: Re: [RFC] Support for Arm CCA VMs on Linux
+Message-ID: <Y/8Y3WLmiw6+Z5AS@myrica>
+References: <20230127112248.136810-1-suzuki.poulose@arm.com>
+ <Y9PtKJ3Wicc19JF1@myrica>
+ <CANW9uyud8RTkqgiL=64wV712QMxtAyubqeyCJ0vpcADJ42VqJA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANW9uyud8RTkqgiL=64wV712QMxtAyubqeyCJ0vpcADJ42VqJA@mail.gmail.com>
 
-The qemu script used to detect the testdev is obsoleted, replace it
-with the modern way to detect if testdev exists.
+Hi Itaru,
 
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
----
- arm/run | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+On Wed, Mar 01, 2023 at 08:35:05AM +0900, Itaru Kitayama wrote:
+> Hi Jean,
+> I've tried your series in Real on CCA Host, but the KVM arch init
+> emits an Invalid argument error and terminates.
 
-diff --git a/arm/run b/arm/run
-index 1284891..9800cfb 100755
---- a/arm/run
-+++ b/arm/run
-@@ -59,8 +59,7 @@ if ! $qemu $M -device '?' 2>&1 | grep virtconsole > /dev/null; then
- 	exit 2
- fi
- 
--if $qemu $M -chardev testdev,id=id -initrd . 2>&1 \
--		| grep backend > /dev/null; then
-+if ! $qemu $M -chardev '?' 2>&1 | grep testdev > /dev/null; then
- 	echo "$qemu doesn't support chr-testdev. Exiting."
- 	exit 2
- fi
--- 
-2.39.1
+Do you know which call returns this error?  Normally the RMEGuest support
+should print more detailed errors. Are you able to launch normal guests
+(without the rme-guest object and confidential-guest-support machine
+parameter)?  Could you give the complete QEMU command-line?
 
+> I configure it with the aarch64-softmmu target only and built, any
+> other steps I should worry?
+
+No, that should be enough
+
+Thanks,
+Jean
