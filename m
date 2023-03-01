@@ -1,93 +1,216 @@
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88DB2D506;
-	Tue, 28 Feb 2023 23:35:17 +0000 (UTC)
-Received: by mail-pj1-f43.google.com with SMTP id m3-20020a17090ade0300b00229eec90a7fso2531pjv.0;
-        Tue, 28 Feb 2023 15:35:17 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81496A3F
+	for <kvmarm@lists.linux.dev>; Wed,  1 Mar 2023 03:36:58 +0000 (UTC)
+Received: by mail-ed1-f48.google.com with SMTP id h16so48511393edz.10
+        for <kvmarm@lists.linux.dev>; Tue, 28 Feb 2023 19:36:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=e4zYd/om/0vBkL4x55q7/7LukdZ/UT4v5ORbkIxAbcQ=;
-        b=nNJQX9hYnw3FX8YKTaDXEAIS+z4fPv8Bw+B8qr6ckPjb8pFiYXJ7RiGVqtKr/keDNd
-         GHwOhj9tlgJjLU/U20MXO8fQKHuOdeKGrg2eToL9nDAbiCvFdqud9l6fOuVKo0baxp7t
-         5FVPg/CUTGadEIP2mUpz3gWuG6560mb6D/o5pIVzm6rRVozf7pBSd3DFDEuXckZBA1OR
-         wnNpxgtjEvF/TswNsBSQ8hBWnHeKrYoekuzxHeICMr4siBBpNcT8MrJWADmUM92DmGVN
-         zsKkZkGc1Ez+ceo4mMkEpvaZAfJIiM7PDPrPH2zOGLVkBHL4KoIYnCweaSc3laUK7hCX
-         oIKQ==
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112; t=1677641816;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1ZAYTgdH3g2eA8KTBBY4GQlm36jelREL/yz68bJEPuM=;
+        b=Tj2mVbFT7fnS3TZ77xTENZyKAVr8LSBmBF5SW1DpFM8/r0A1EjopgCRIf7Cs4yFDMu
+         /oUx5ClByWGaFWMVCJmHR+5IUpDXWzbIwFTN4zJTbLS/Um7JEPVDub5JO3eaaSd0CN+1
+         TPLZyga2D0laYByTfldbfjj2vTzSf+yIPj93pgDFPO+FqD63aWnUkqk/hVzMOydGhAi7
+         ALYvhP7hlHseJk1gk+Pt035iESstyopmIDeTrnGmh2R2GANtp5VxFJ5oHEy0pBIVCdzZ
+         +N/wZi42fsScEEYF99++lT1dCnGNd4DBkZCVgjpzFsR32LoyfocsmGBNyd1j7eC75yd1
+         kfYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=e4zYd/om/0vBkL4x55q7/7LukdZ/UT4v5ORbkIxAbcQ=;
-        b=GiCJcVLOkiOjNMODPscEGSXCBvJacBiB5ifl7K1R9juvSAREVgaLIzPGYoEp36jQR0
-         lIHTgC1m+biYMXk4zmr4+o8vu3BhCfAgvGFG9uXhdE8tG8g2y0/2CMlatzBrBw4JiXBM
-         6RZ4JOAYIB0fRxnUQzVGhet6OVXuzp1YWjIw7fNgsk++70EuqbecprUrC1V6a1dm2hCA
-         zyItb7DkdBJoN7Q9ebBsMAFXZ0Wq6vXWKT3ebIb849TI1i85gp11vNqkZlFMZHtPcrv7
-         ltOnlLUPgHNX6P1hha1RExu90djipxBc9uQDur7HDB4djK9UvDKdwBBdZOYc+GP2b10+
-         BeqQ==
-X-Gm-Message-State: AO0yUKWOv1zB9+kgUiVMp+sILvNbPl2rS/M9qKqBHw9emaiYwZGcY7Wa
-	cTIlaXbEvwvWrWQvpzyAY4ho8h50jElEow19amQ=
-X-Google-Smtp-Source: AK7set/h/6S+CfhMlSvBaTTgOBE4PVtAkXHS+ngdIcxOP2Zb8jQT9r+uwE43NbtTp5RsatSeptHrwizOBS6NcjndHi0=
-X-Received: by 2002:a17:90a:ad8a:b0:234:1fac:f291 with SMTP id
- s10-20020a17090aad8a00b002341facf291mr1861292pjq.8.1677627316752; Tue, 28 Feb
- 2023 15:35:16 -0800 (PST)
+        d=1e100.net; s=20210112; t=1677641816;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1ZAYTgdH3g2eA8KTBBY4GQlm36jelREL/yz68bJEPuM=;
+        b=wsA6FkE1AaKpBtZGUFT9cHht5GkQeV+gJfijOM9LLIO6oUGBblkT461xx/HXbz46SN
+         PdbzuloxX8PAW9+5StSh1S7SStNuAR5DlUkZYNcfktAMSM/E6oof6ymMuhzkUNKaQEzJ
+         8DBn/QGz24XYsh9cMqVEKkvCcVYrchDWRUkV5dbpaD2sKEObtpBFoNOxZ1V/dglcJBAh
+         M9Glx+I0suzPk0NeD03hxUXSYrnFEfYQKoNuweyK0lsXuGEBcZphG5dkCAl1A1IyqXOu
+         nmDwMgoPiNx2RNB53BYCAW8N46uRhTYWmBGruLR4JiRxBkjdWXW2o1CWb4d1xblpZT4b
+         QYzw==
+X-Gm-Message-State: AO0yUKVP5zmLkZQMAcC/ZOnd2K9kiRPXVjhPbqs4oyNb2D1BIl0+BYpv
+	4sCbxwTIumvIq/FTcmkMIsaMicZ9dxFTF8LbWl6R/Q==
+X-Google-Smtp-Source: AK7set+dLONCBXH4RidKQNVKyCSGG1a2E+iXTX58/fAlnCKopTiu8AO/bZzUT4U40KUp1mzv2LoYMpt5uHuzD9MiSX8=
+X-Received: by 2002:a17:906:3586:b0:8ab:b606:9728 with SMTP id
+ o6-20020a170906358600b008abb6069728mr2502509ejb.5.1677641816479; Tue, 28 Feb
+ 2023 19:36:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230127112248.136810-1-suzuki.poulose@arm.com> <Y9PtKJ3Wicc19JF1@myrica>
-In-Reply-To: <Y9PtKJ3Wicc19JF1@myrica>
-From: Itaru Kitayama <itaru.kitayama@gmail.com>
-Date: Wed, 1 Mar 2023 08:35:05 +0900
-Message-ID: <CANW9uyud8RTkqgiL=64wV712QMxtAyubqeyCJ0vpcADJ42VqJA@mail.gmail.com>
-Subject: Re: [RFC] Support for Arm CCA VMs on Linux
-To: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-coco@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Andrew Jones <andrew.jones@linux.dev>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>, 
-	James Morse <james.morse@arm.com>, Joey Gouly <Joey.Gouly@arm.com>, Marc Zyngier <maz@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Sean Christopherson <seanjc@google.com>, Steven Price <steven.price@arm.com>, Thomas Huth <thuth@redhat.com>, 
-	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu
+References: <20230208140105.655814-1-thuth@redhat.com> <20230208140105.655814-7-thuth@redhat.com>
+In-Reply-To: <20230208140105.655814-7-thuth@redhat.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Wed, 1 Mar 2023 09:06:44 +0530
+Message-ID: <CAAhSdy2=_6wP9LYXbxajtkaes013oWF6O-fOizcz_QC2ivZfvw@mail.gmail.com>
+Subject: Re: [PATCH v2 6/6] KVM: Change return type of kvm_arch_vm_ioctl() to "int"
+To: Thomas Huth <thuth@redhat.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Sean Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	David Hildenbrand <david@redhat.com>, Gavin Shan <gshan@redhat.com>, Steven Price <steven.price@arm.com>, 
+	Cornelia Huck <cohuck@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jan 28, 2023 at 12:30 AM Jean-Philippe Brucker
-<jean-philippe@linaro.org> wrote:
+On Wed, Feb 8, 2023 at 7:31=E2=80=AFPM Thomas Huth <thuth@redhat.com> wrote=
+:
 >
-> On Fri, Jan 27, 2023 at 11:22:48AM +0000, Suzuki K Poulose wrote:
-> > We are happy to announce the early RFC version of the Arm
-> > Confidential Compute Architecture (CCA) support for the Linux
-> > stack. The intention is to seek early feedback in the following areas:
-> >  * KVM integration of the Arm CCA
-> >  * KVM UABI for managing the Realms, seeking to generalise the operations
-> >    wherever possible with other Confidential Compute solutions.
+> All kvm_arch_vm_ioctl() implementations now only deal with "int"
+> types as return values, so we can change the return type of these
+> functions to use "int" instead of "long".
 >
-> A prototype for launching Realm VMs with QEMU is available at:
-> https://lore.kernel.org/qemu-devel/20230127150727.612594-1-jean-philippe@linaro.org/
->
-> Thanks,
-> Jean
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Hi Jean,
-I've tried your series in Real on CCA Host, but the KVM arch init
-emits an Invalid argument error and terminates.
-I configure it with the aarch64-softmmu target only and built, any
-other steps I should worry?
+Looks good to me.
 
-Itaru.
+For KVM RISC-V:
+Acked-by: Anup Patel <anup@brainfault.org>
 
+Regards,
+Anup
+
+> ---
+>  arch/arm64/kvm/arm.c       | 3 +--
+>  arch/mips/kvm/mips.c       | 4 ++--
+>  arch/powerpc/kvm/powerpc.c | 5 ++---
+>  arch/riscv/kvm/vm.c        | 3 +--
+>  arch/s390/kvm/kvm-s390.c   | 3 +--
+>  arch/x86/kvm/x86.c         | 3 +--
+>  include/linux/kvm_host.h   | 3 +--
+>  7 files changed, 9 insertions(+), 15 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 9c5573bc4614..e791ad6137b8 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1449,8 +1449,7 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm =
+*kvm,
+>         }
+>  }
+>
+> -long kvm_arch_vm_ioctl(struct file *filp,
+> -                      unsigned int ioctl, unsigned long arg)
+> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lo=
+ng arg)
+>  {
+>         struct kvm *kvm =3D filp->private_data;
+>         void __user *argp =3D (void __user *)arg;
+> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+> index a25e0b73ee70..84cadaa2c2d3 100644
+> --- a/arch/mips/kvm/mips.c
+> +++ b/arch/mips/kvm/mips.c
+> @@ -1003,9 +1003,9 @@ void kvm_arch_flush_remote_tlbs_memslot(struct kvm =
+*kvm,
+>         kvm_flush_remote_tlbs(kvm);
+>  }
+>
+> -long kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned l=
+ong arg)
+> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lo=
+ng arg)
+>  {
+> -       long r;
+> +       int r;
+>
+>         switch (ioctl) {
+>         default:
+> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+> index 04494a4fb37a..6f6ba55c224f 100644
+> --- a/arch/powerpc/kvm/powerpc.c
+> +++ b/arch/powerpc/kvm/powerpc.c
+> @@ -2386,12 +2386,11 @@ static int kvmppc_get_cpu_char(struct kvm_ppc_cpu=
+_char *cp)
+>  }
+>  #endif
+>
+> -long kvm_arch_vm_ioctl(struct file *filp,
+> -                       unsigned int ioctl, unsigned long arg)
+> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lo=
+ng arg)
+>  {
+>         struct kvm *kvm __maybe_unused =3D filp->private_data;
+>         void __user *argp =3D (void __user *)arg;
+> -       long r;
+> +       int r;
+>
+>         switch (ioctl) {
+>         case KVM_PPC_GET_PVINFO: {
+> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
+> index 65a964d7e70d..c13130ab459a 100644
+> --- a/arch/riscv/kvm/vm.c
+> +++ b/arch/riscv/kvm/vm.c
+> @@ -87,8 +87,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long =
+ext)
+>         return r;
+>  }
+>
+> -long kvm_arch_vm_ioctl(struct file *filp,
+> -                      unsigned int ioctl, unsigned long arg)
+> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lo=
+ng arg)
+>  {
+>         return -EINVAL;
+>  }
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 8ad1972b8a73..86ca49814983 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2850,8 +2850,7 @@ static int kvm_s390_vm_mem_op(struct kvm *kvm, stru=
+ct kvm_s390_mem_op *mop)
+>         return r;
+>  }
+>
+> -long kvm_arch_vm_ioctl(struct file *filp,
+> -                      unsigned int ioctl, unsigned long arg)
+> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lo=
+ng arg)
+>  {
+>         struct kvm *kvm =3D filp->private_data;
+>         void __user *argp =3D (void __user *)arg;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 2d210ab47e21..52a8c993cd55 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -6645,8 +6645,7 @@ static int kvm_vm_ioctl_set_clock(struct kvm *kvm, =
+void __user *argp)
+>         return 0;
+>  }
+>
+> -long kvm_arch_vm_ioctl(struct file *filp,
+> -                      unsigned int ioctl, unsigned long arg)
+> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lo=
+ng arg)
+>  {
+>         struct kvm *kvm =3D filp->private_data;
+>         void __user *argp =3D (void __user *)arg;
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 4f26b244f6d0..ed2f1f02976b 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1398,8 +1398,7 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct k=
+vm_irq_level *irq_level,
+>                         bool line_status);
+>  int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>                             struct kvm_enable_cap *cap);
+> -long kvm_arch_vm_ioctl(struct file *filp,
+> -                      unsigned int ioctl, unsigned long arg);
+> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lo=
+ng arg);
+>  long kvm_arch_vm_compat_ioctl(struct file *filp, unsigned int ioctl,
+>                               unsigned long arg);
+>
+> --
+> 2.31.1
 >
 >
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> --
+> kvm-riscv mailing list
+> kvm-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/kvm-riscv
