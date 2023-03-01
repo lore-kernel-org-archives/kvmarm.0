@@ -1,119 +1,73 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97ECD23A1;
-	Wed,  1 Mar 2023 11:55:42 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 28F652F4;
-	Wed,  1 Mar 2023 03:56:25 -0800 (PST)
-Received: from [10.57.16.41] (unknown [10.57.16.41])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4A8A43F587;
-	Wed,  1 Mar 2023 03:55:39 -0800 (PST)
-Message-ID: <5750eead-44f9-260f-283d-4902b5363faf@arm.com>
-Date: Wed, 1 Mar 2023 11:55:37 +0000
+Received: from out-25.mta0.migadu.com (out-25.mta0.migadu.com [91.218.175.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 335A52588
+	for <kvmarm@lists.linux.dev>; Wed,  1 Mar 2023 12:50:15 +0000 (UTC)
+Date: Wed, 1 Mar 2023 13:50:04 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1677675013;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fCApX7iz5dgT/qmgIa01Py+r2kxVH4oqCWLORW4PNTQ=;
+	b=DDTl2Zl4yoMvYU4F+/6WIVQjfpWjwBjKCFTSZE7IS2oqJFttijOwKb+uwI9FoZd1GPu40y
+	dd3u4QOUYe8PY/obz7nNM2+3GrxYunS+jt/WyYZnQyfAkX8B87wGfSRWVJg0Na9ctsS/eA
+	nGiXsCw4OLPMziZq86+HNLSKAfv4r70=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Shaoqin Huang <shahuang@redhat.com>
+Cc: kvmarm@lists.linux.dev, "open list:ARM" <kvm@vger.kernel.org>
+Subject: Re: [kvm-unit-tests] arm: Replace the obsolete qemu script
+Message-ID: <20230301125004.d5giadtz4yaqdjam@orel>
+References: <20230301071737.43760-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH 08/28] arm64: RME: Keep a spare page delegated to the
- RMM
-Content-Language: en-GB
-To: Zhi Wang <zhi.wang.linux@gmail.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
- <20230127112932.38045-1-steven.price@arm.com>
- <20230127112932.38045-9-steven.price@arm.com>
- <20230213184701.00005d3b@gmail.com>
-From: Steven Price <steven.price@arm.com>
-In-Reply-To: <20230213184701.00005d3b@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230301071737.43760-1-shahuang@redhat.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 13/02/2023 16:47, Zhi Wang wrote:
-> On Fri, 27 Jan 2023 11:29:12 +0000
-> Steven Price <steven.price@arm.com> wrote:
+On Wed, Mar 01, 2023 at 02:17:37AM -0500, Shaoqin Huang wrote:
+> The qemu script used to detect the testdev is obsoleted, replace it
+> with the modern way to detect if testdev exists.
+
+Hi Shaoqin,
+
+Can you please point out the oldest QEMU version for which the modern
+way works?
+
 > 
->> Pages can only be populated/destroyed on the RMM at the 4KB granule,
->> this requires creating the full depth of RTTs. However if the pages are
->> going to be combined into a 4MB huge page the last RTT is only
->> temporarily needed. Similarly when freeing memory the huge page must be
->> temporarily split requiring temporary usage of the full depth oF RTTs.
->>
->> To avoid needing to perform a temporary allocation and delegation of a
->> page for this purpose we keep a spare delegated page around. In
->> particular this avoids the need for memory allocation while destroying
->> the realm guest.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>  arch/arm64/include/asm/kvm_rme.h | 3 +++
->>  arch/arm64/kvm/rme.c             | 6 ++++++
->>  2 files changed, 9 insertions(+)
->>
->> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
->> index 055a22accc08..a6318af3ed11 100644
->> --- a/arch/arm64/include/asm/kvm_rme.h
->> +++ b/arch/arm64/include/asm/kvm_rme.h
->> @@ -21,6 +21,9 @@ struct realm {
->>  	void *rd;
->>  	struct realm_params *params;
->>  
->> +	/* A spare already delegated page */
->> +	phys_addr_t spare_page;
->> +
->>  	unsigned long num_aux;
->>  	unsigned int vmid;
->>  	unsigned int ia_bits;
->> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
->> index 9f8c5a91b8fc..0c9d70e4d9e6 100644
->> --- a/arch/arm64/kvm/rme.c
->> +++ b/arch/arm64/kvm/rme.c
->> @@ -148,6 +148,7 @@ static int realm_create_rd(struct kvm *kvm)
->>  	}
->>  
->>  	realm->rd = rd;
->> +	realm->spare_page = PHYS_ADDR_MAX;
->>  	realm->ia_bits = VTCR_EL2_IPA(kvm->arch.vtcr);
->>  
->>  	if (WARN_ON(rmi_rec_aux_count(rd_phys, &realm->num_aux))) {
->> @@ -357,6 +358,11 @@ void kvm_destroy_realm(struct kvm *kvm)
->>  		free_page((unsigned long)realm->rd);
->>  		realm->rd = NULL;
->>  	}
->> +	if (realm->spare_page != PHYS_ADDR_MAX) {
->> +		if (!WARN_ON(rmi_granule_undelegate(realm->spare_page)))
->> +			free_page((unsigned long)phys_to_virt(realm->spare_page));
+> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+> ---
+>  arm/run | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 > 
-> Will the page be leaked (not usable for host and realms) if the undelegate
-> failed? If yes, better at least put a comment.
+> diff --git a/arm/run b/arm/run
+> index 1284891..9800cfb 100755
+> --- a/arm/run
+> +++ b/arm/run
+> @@ -59,8 +59,7 @@ if ! $qemu $M -device '?' 2>&1 | grep virtconsole > /dev/null; then
+>  	exit 2
+>  fi
+>  
+> -if $qemu $M -chardev testdev,id=id -initrd . 2>&1 \
+> -		| grep backend > /dev/null; then
+> +if ! $qemu $M -chardev '?' 2>&1 | grep testdev > /dev/null; then
+                              ^ This shouldn't be necessary. afaict,
+			        only stdio is used
 
-Yes - I'll add a comment.
+We can change the 'grep testdev >/dev/null' to 'grep -q testdev'
 
-In general being unable to undelegate a page points to a programming
-error in the host. The only reason the RMM should refuse the request is
-it the page is in use by a Realm which the host has configured. So the
-WARN() is correct (there's a kernel bug) and the only sensible course of
-action is to leak the page and limp on.
+>  	echo "$qemu doesn't support chr-testdev. Exiting."
+>  	exit 2
+>  fi
+> -- 
+> 2.39.1
+> 
 
 Thanks,
-
-Steve
-
->> +		realm->spare_page = PHYS_ADDR_MAX;
->> +	}
->>  
->>  	pgd_sz = kvm_pgd_pages(pgt->ia_bits, pgt->start_level);
->>  	for (i = 0; i < pgd_sz; i++) {
-> 
-
+drew
