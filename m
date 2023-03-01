@@ -1,108 +1,98 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F13FA4C
-	for <kvmarm@lists.linux.dev>; Wed,  1 Mar 2023 21:17:02 +0000 (UTC)
-Received: by mail-pf1-f202.google.com with SMTP id i15-20020aa78d8f000000b005edc307b103so6721902pfr.17
-        for <kvmarm@lists.linux.dev>; Wed, 01 Mar 2023 13:17:01 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86979A4C;
+	Wed,  1 Mar 2023 22:12:36 +0000 (UTC)
+Received: by mail-pg1-f177.google.com with SMTP id d6so8673126pgu.2;
+        Wed, 01 Mar 2023 14:12:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AyQwFFR+sM3AjGhPSeNMTQXkHflwmeDdXwXEbmr5h+E=;
-        b=pYMa2OtEY+vmyWWa9yw3R2ExSa6IY1i6E6t+6wzheNsXmU5EPR01Vot7JIJHT/qwak
-         SkoNr2mRknbC84EJc5DKGfsdFapxqQpcB5SOG+6efwyftIotDOGzPLW1LXWiBwKHTcjg
-         kovTTzH7nZIumcI/elhor2wVw/k0ndk1z55wrbw+WtxH5Lf9iTJ7Y07jAX/4Gb8WLclD
-         MTWins+bfPXhOi0PfQUNOMXM1brjemy27YbFup/ZcKSlbrRpQUnQZXKyaTQlYGb8dA/v
-         ue8HOohm7e0c8whS0Ge4nM62Sl8VIQ2egCyJdvQOWhZZYIO0DQb6ApOU5Wq3UTTCEXVF
-         y5TQ==
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=pfazAaB1krD03qoiIwUHuiCesj2DfTyBcU1GYneJYWY=;
+        b=eg3rRwZ9NRqc4NZ7mn+d958skdQTsR4DJymp6pXMjdMC+F8Cv5+HJ4h1h31TbHYrsf
+         xkQidejdXlTtUsLE4NorgMScT8UMYVTDEOrbXNiHh//bvLbt1DdI9scp0WftBOUfaOL9
+         X3GOlkZy4ukLdzwwqP9uaskWDAJ+K6nyala8LjPvtDQbDW0vF6DJYfBp5vnWdk5UTjtB
+         SYy9aeG2Xa1fiux0memPdeXSo97rZ3zxByZxeAp3fQHQzLEPsxndaS1s3qjMYWKZQVyw
+         cc0fjA/1jbDMsCuxijqVJMRK0tdroOTJmXWbGddzEM5Icc0EoyaRUq6iu+JtTAAY76bv
+         E+IQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AyQwFFR+sM3AjGhPSeNMTQXkHflwmeDdXwXEbmr5h+E=;
-        b=q6K7zUfa1KPZQcE08XnC4odD6UZRzZrdTqaMHrx3QJ+U7yv2CyIwsx9PhjJFnp2qt5
-         RREh7v1O89CfGAcPMkbifr9EgTxP9K8s5JVNYZkt3CDgHOcM8bMAPvRSW98gHtMRyNfs
-         iy9A9vvujWgx60SbRH8Mi+p0EPbmKZliuj2gdbp6Als/3UD+xgaMnZVZF3mfeEWQDe3b
-         6B7cpZCLjrarbV+6fRThpkaecbqCTlqIfR0Y1uGUNhaA2reOqVNpFfKZxt5o3ir03SrF
-         NfIUSLkzgojUy3lncBqNUrgELzUQeCqC/TBeYED0xZPLjVHvuOGnN6vD00OPPrS11cPU
-         3yuw==
-X-Gm-Message-State: AO0yUKWTMv2D+pOUK+lJlQO6b5TcjZtk4JatTSQd+QnuRM8JbtK4rLkS
-	HV7ndhkeAVhO4jUoqvPGEAROygPj94SluQ==
-X-Google-Smtp-Source: AK7set9TXehDrschYbjcA/9KfvI0u1IPieBacO26x8ZbIZC1/zC1kpDzsxUGBOvvlhI5NDOtZwBae8PR/0EA+A==
-X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a05:6a00:2d8:b0:5a8:9872:2b9b with SMTP
- id b24-20020a056a0002d800b005a898722b9bmr3125821pft.1.1677704980039; Wed, 01
- Mar 2023 13:09:40 -0800 (PST)
-Date: Wed,  1 Mar 2023 21:09:21 +0000
-In-Reply-To: <20230301210928.565562-1-ricarkol@google.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pfazAaB1krD03qoiIwUHuiCesj2DfTyBcU1GYneJYWY=;
+        b=Oe0/F4yw/YlCue7tdCumn3rjM6VDQYcBUe0MqMFhZYxB3eRMuQVTZ+rvM8MiqMn+SN
+         bblcExDVMnx/PI/k5CSszbgB97RBPOX09r8p5vBMHCXAAoUrTj7Dr6XvVK4rk07sKQJ9
+         oh4nu21QxO+AedKhCgI4l2pVE0J4EbFO/+1MBGbkecEULsYIhoqP1sWNlnFJGM2ouMmK
+         2f2MTw+Rnsle+RFcZ53MZnEIBqVfjtv+Gj1Lqw4Sh2Da7Z8KWpUfH9+g+/uKpYCBKZj+
+         5kRoFSuMB2wmaUDwNO9tSzUblJIXEt+HQSZeibaGLKwBdVezL+OCHBsTen2oUxBOLUle
+         TF7Q==
+X-Gm-Message-State: AO0yUKWsB9VaXXD7QrAwB+l6amrTI+cjdOa9QQf6becMkwgiVx8H28u7
+	3bPU9mgljrLcUtkF4xufOgRENVxkIyaJbuxklUz+LmgVQ/zN/IZM
+X-Google-Smtp-Source: AK7set/xZsX7wuPd5hcssb22bozalTDdT87153QVXXZsO8821SKx1dgPeG8UYV84t8ORVw6spES6bxVcdlLRGQt0+8c=
+X-Received: by 2002:a63:7d57:0:b0:4fc:2369:811 with SMTP id
+ m23-20020a637d57000000b004fc23690811mr2685207pgn.6.1677708755473; Wed, 01 Mar
+ 2023 14:12:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230301210928.565562-1-ricarkol@google.com>
-X-Mailer: git-send-email 2.39.2.722.g9855ee24e9-goog
-Message-ID: <20230301210928.565562-6-ricarkol@google.com>
-Subject: [PATCH v5 05/12] KVM: arm64: Refactor kvm_arch_commit_memory_region()
-From: Ricardo Koller <ricarkol@google.com>
-To: pbonzini@redhat.com, maz@kernel.org, oupton@google.com, 
-	yuzenghui@huawei.com, dmatlack@google.com
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com, 
-	catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com, 
-	alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com, 
-	gshan@redhat.com, reijiw@google.com, rananta@google.com, bgardon@google.com, 
-	ricarkol@gmail.com, Ricardo Koller <ricarkol@google.com>
+MIME-Version: 1.0
+References: <20230127112248.136810-1-suzuki.poulose@arm.com>
+ <Y9PtKJ3Wicc19JF1@myrica> <CANW9uyud8RTkqgiL=64wV712QMxtAyubqeyCJ0vpcADJ42VqJA@mail.gmail.com>
+ <Y/8Y3WLmiw6+Z5AS@myrica>
+In-Reply-To: <Y/8Y3WLmiw6+Z5AS@myrica>
+From: Itaru Kitayama <itaru.kitayama@gmail.com>
+Date: Thu, 2 Mar 2023 07:12:24 +0900
+Message-ID: <CANW9uysnvGCwANu+_6dp9+3rvHGOkThT9d0K2qpQV4exdmYWoA@mail.gmail.com>
+Subject: Re: [RFC] Support for Arm CCA VMs on Linux
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-coco@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Andrew Jones <andrew.jones@linux.dev>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>, 
+	James Morse <james.morse@arm.com>, Joey Gouly <Joey.Gouly@arm.com>, Marc Zyngier <maz@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Sean Christopherson <seanjc@google.com>, Steven Price <steven.price@arm.com>, Thomas Huth <thuth@redhat.com>, 
+	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu
 Content-Type: text/plain; charset="UTF-8"
 
-Refactor kvm_arch_commit_memory_region() as a preparation for a future
-commit to look cleaner and more understandable. Also, it looks more
-like its x86 counterpart (in kvm_mmu_slot_apply_flags()).
+On Wed, Mar 1, 2023 at 6:20 PM Jean-Philippe Brucker
+<jean-philippe@linaro.org> wrote:
+>
+> Hi Itaru,
+>
+> On Wed, Mar 01, 2023 at 08:35:05AM +0900, Itaru Kitayama wrote:
+> > Hi Jean,
+> > I've tried your series in Real on CCA Host, but the KVM arch init
+> > emits an Invalid argument error and terminates.
+>
+> Do you know which call returns this error?  Normally the RMEGuest support
+> should print more detailed errors. Are you able to launch normal guests
+> (without the rme-guest object and confidential-guest-support machine
+> parameter)?  Could you give the complete QEMU command-line?
 
-No functional change intended.
+No, I cant say which. Yes, the CCA-capable QEMU boots if I don't set
+RME-related options.
 
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
----
- arch/arm64/kvm/mmu.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+Here's mine (based upon your command-line):
+qemu-system-aarch64 -cpu host -accel kvm -machine
+virt,gic-version=3,confidential-guest-support=rme0 -smp 2 -m 256M
+-nographic -object rme-guest,id=rme0,measurement-algo=sha512 -kernel
+Image -initrd rootfs.ext2 -append 'console=ttyAMA0 earlycon'
+-overcommit mem-lock=on
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 9bd3c2cfb476..d2c5e6992459 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1761,20 +1761,27 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
- 				   const struct kvm_memory_slot *new,
- 				   enum kvm_mr_change change)
- {
-+	bool log_dirty_pages = new && new->flags & KVM_MEM_LOG_DIRTY_PAGES;
-+
- 	/*
- 	 * At this point memslot has been committed and there is an
- 	 * allocated dirty_bitmap[], dirty pages will be tracked while the
- 	 * memory slot is write protected.
- 	 */
--	if (change != KVM_MR_DELETE && new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
-+	if (log_dirty_pages) {
-+
-+		if (change == KVM_MR_DELETE)
-+			return;
-+
- 		/*
- 		 * If we're with initial-all-set, we don't need to write
- 		 * protect any pages because they're all reported as dirty.
- 		 * Huge pages and normal pages will be write protect gradually.
- 		 */
--		if (!kvm_dirty_log_manual_protect_and_init_set(kvm)) {
--			kvm_mmu_wp_memory_region(kvm, new->id);
--		}
-+		if (kvm_dirty_log_manual_protect_and_init_set(kvm))
-+			return;
-+
-+		kvm_mmu_wp_memory_region(kvm, new->id);
- 	}
- }
- 
--- 
-2.39.2.722.g9855ee24e9-goog
-
+Itaru.
+>
+> > I configure it with the aarch64-softmmu target only and built, any
+> > other steps I should worry?
+>
+> No, that should be enough
+>
+> Thanks,
+> Jean
