@@ -1,216 +1,69 @@
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81496A3F
-	for <kvmarm@lists.linux.dev>; Wed,  1 Mar 2023 03:36:58 +0000 (UTC)
-Received: by mail-ed1-f48.google.com with SMTP id h16so48511393edz.10
-        for <kvmarm@lists.linux.dev>; Tue, 28 Feb 2023 19:36:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112; t=1677641816;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1ZAYTgdH3g2eA8KTBBY4GQlm36jelREL/yz68bJEPuM=;
-        b=Tj2mVbFT7fnS3TZ77xTENZyKAVr8LSBmBF5SW1DpFM8/r0A1EjopgCRIf7Cs4yFDMu
-         /oUx5ClByWGaFWMVCJmHR+5IUpDXWzbIwFTN4zJTbLS/Um7JEPVDub5JO3eaaSd0CN+1
-         TPLZyga2D0laYByTfldbfjj2vTzSf+yIPj93pgDFPO+FqD63aWnUkqk/hVzMOydGhAi7
-         ALYvhP7hlHseJk1gk+Pt035iESstyopmIDeTrnGmh2R2GANtp5VxFJ5oHEy0pBIVCdzZ
-         +N/wZi42fsScEEYF99++lT1dCnGNd4DBkZCVgjpzFsR32LoyfocsmGBNyd1j7eC75yd1
-         kfYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677641816;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1ZAYTgdH3g2eA8KTBBY4GQlm36jelREL/yz68bJEPuM=;
-        b=wsA6FkE1AaKpBtZGUFT9cHht5GkQeV+gJfijOM9LLIO6oUGBblkT461xx/HXbz46SN
-         PdbzuloxX8PAW9+5StSh1S7SStNuAR5DlUkZYNcfktAMSM/E6oof6ymMuhzkUNKaQEzJ
-         8DBn/QGz24XYsh9cMqVEKkvCcVYrchDWRUkV5dbpaD2sKEObtpBFoNOxZ1V/dglcJBAh
-         M9Glx+I0suzPk0NeD03hxUXSYrnFEfYQKoNuweyK0lsXuGEBcZphG5dkCAl1A1IyqXOu
-         nmDwMgoPiNx2RNB53BYCAW8N46uRhTYWmBGruLR4JiRxBkjdWXW2o1CWb4d1xblpZT4b
-         QYzw==
-X-Gm-Message-State: AO0yUKVP5zmLkZQMAcC/ZOnd2K9kiRPXVjhPbqs4oyNb2D1BIl0+BYpv
-	4sCbxwTIumvIq/FTcmkMIsaMicZ9dxFTF8LbWl6R/Q==
-X-Google-Smtp-Source: AK7set+dLONCBXH4RidKQNVKyCSGG1a2E+iXTX58/fAlnCKopTiu8AO/bZzUT4U40KUp1mzv2LoYMpt5uHuzD9MiSX8=
-X-Received: by 2002:a17:906:3586:b0:8ab:b606:9728 with SMTP id
- o6-20020a170906358600b008abb6069728mr2502509ejb.5.1677641816479; Tue, 28 Feb
- 2023 19:36:56 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D0AEC8
+	for <kvmarm@lists.linux.dev>; Wed,  1 Mar 2023 07:19:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1677655165;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=9gte+UdZRbB1selX9b8PwG5UPjX8H5856UTwKQRAiBQ=;
+	b=RbO74yP4iVREFtoOXZVKrnm896e/TDUJvCVUbwxDAbkpQXW87lBccIU2Pye8JdMKxPwxeZ
+	OmKx5AxAMQkM/EoFNyen24RfJtcvjCcKxs9V7tcOkex7qQyYIqeFjwb5jjC5wCQ5wPdzBW
+	3rDTnLm1s2PY6OIcWrn4EOFf5aYhWOg=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-170-rAl27tkgMeicRGncRPK1pw-1; Wed, 01 Mar 2023 02:19:24 -0500
+X-MC-Unique: rAl27tkgMeicRGncRPK1pw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 097653C0DDB8;
+	Wed,  1 Mar 2023 07:19:23 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 00A0018EC6;
+	Wed,  1 Mar 2023 07:19:23 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: kvmarm@lists.linux.dev
+Cc: Shaoqin Huang <shahuang@redhat.com>,
+	Andrew Jones <andrew.jones@linux.dev>,
+	kvm@vger.kernel.org (open list:ARM)
+Subject: [kvm-unit-tests] arm: Replace the obsolete qemu script
+Date: Wed,  1 Mar 2023 02:17:37 -0500
+Message-Id: <20230301071737.43760-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230208140105.655814-1-thuth@redhat.com> <20230208140105.655814-7-thuth@redhat.com>
-In-Reply-To: <20230208140105.655814-7-thuth@redhat.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Wed, 1 Mar 2023 09:06:44 +0530
-Message-ID: <CAAhSdy2=_6wP9LYXbxajtkaes013oWF6O-fOizcz_QC2ivZfvw@mail.gmail.com>
-Subject: Re: [PATCH v2 6/6] KVM: Change return type of kvm_arch_vm_ioctl() to "int"
-To: Thomas Huth <thuth@redhat.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Sean Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	David Hildenbrand <david@redhat.com>, Gavin Shan <gshan@redhat.com>, Steven Price <steven.price@arm.com>, 
-	Cornelia Huck <cohuck@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 
-On Wed, Feb 8, 2023 at 7:31=E2=80=AFPM Thomas Huth <thuth@redhat.com> wrote=
-:
->
-> All kvm_arch_vm_ioctl() implementations now only deal with "int"
-> types as return values, so we can change the return type of these
-> functions to use "int" instead of "long".
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+The qemu script used to detect the testdev is obsoleted, replace it
+with the modern way to detect if testdev exists.
 
-Looks good to me.
+Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+---
+ arm/run | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-For KVM RISC-V:
-Acked-by: Anup Patel <anup@brainfault.org>
+diff --git a/arm/run b/arm/run
+index 1284891..9800cfb 100755
+--- a/arm/run
++++ b/arm/run
+@@ -59,8 +59,7 @@ if ! $qemu $M -device '?' 2>&1 | grep virtconsole > /dev/null; then
+ 	exit 2
+ fi
+ 
+-if $qemu $M -chardev testdev,id=id -initrd . 2>&1 \
+-		| grep backend > /dev/null; then
++if ! $qemu $M -chardev '?' 2>&1 | grep testdev > /dev/null; then
+ 	echo "$qemu doesn't support chr-testdev. Exiting."
+ 	exit 2
+ fi
+-- 
+2.39.1
 
-Regards,
-Anup
-
-> ---
->  arch/arm64/kvm/arm.c       | 3 +--
->  arch/mips/kvm/mips.c       | 4 ++--
->  arch/powerpc/kvm/powerpc.c | 5 ++---
->  arch/riscv/kvm/vm.c        | 3 +--
->  arch/s390/kvm/kvm-s390.c   | 3 +--
->  arch/x86/kvm/x86.c         | 3 +--
->  include/linux/kvm_host.h   | 3 +--
->  7 files changed, 9 insertions(+), 15 deletions(-)
->
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 9c5573bc4614..e791ad6137b8 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1449,8 +1449,7 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm =
-*kvm,
->         }
->  }
->
-> -long kvm_arch_vm_ioctl(struct file *filp,
-> -                      unsigned int ioctl, unsigned long arg)
-> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lo=
-ng arg)
->  {
->         struct kvm *kvm =3D filp->private_data;
->         void __user *argp =3D (void __user *)arg;
-> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-> index a25e0b73ee70..84cadaa2c2d3 100644
-> --- a/arch/mips/kvm/mips.c
-> +++ b/arch/mips/kvm/mips.c
-> @@ -1003,9 +1003,9 @@ void kvm_arch_flush_remote_tlbs_memslot(struct kvm =
-*kvm,
->         kvm_flush_remote_tlbs(kvm);
->  }
->
-> -long kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned l=
-ong arg)
-> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lo=
-ng arg)
->  {
-> -       long r;
-> +       int r;
->
->         switch (ioctl) {
->         default:
-> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-> index 04494a4fb37a..6f6ba55c224f 100644
-> --- a/arch/powerpc/kvm/powerpc.c
-> +++ b/arch/powerpc/kvm/powerpc.c
-> @@ -2386,12 +2386,11 @@ static int kvmppc_get_cpu_char(struct kvm_ppc_cpu=
-_char *cp)
->  }
->  #endif
->
-> -long kvm_arch_vm_ioctl(struct file *filp,
-> -                       unsigned int ioctl, unsigned long arg)
-> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lo=
-ng arg)
->  {
->         struct kvm *kvm __maybe_unused =3D filp->private_data;
->         void __user *argp =3D (void __user *)arg;
-> -       long r;
-> +       int r;
->
->         switch (ioctl) {
->         case KVM_PPC_GET_PVINFO: {
-> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
-> index 65a964d7e70d..c13130ab459a 100644
-> --- a/arch/riscv/kvm/vm.c
-> +++ b/arch/riscv/kvm/vm.c
-> @@ -87,8 +87,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long =
-ext)
->         return r;
->  }
->
-> -long kvm_arch_vm_ioctl(struct file *filp,
-> -                      unsigned int ioctl, unsigned long arg)
-> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lo=
-ng arg)
->  {
->         return -EINVAL;
->  }
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 8ad1972b8a73..86ca49814983 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -2850,8 +2850,7 @@ static int kvm_s390_vm_mem_op(struct kvm *kvm, stru=
-ct kvm_s390_mem_op *mop)
->         return r;
->  }
->
-> -long kvm_arch_vm_ioctl(struct file *filp,
-> -                      unsigned int ioctl, unsigned long arg)
-> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lo=
-ng arg)
->  {
->         struct kvm *kvm =3D filp->private_data;
->         void __user *argp =3D (void __user *)arg;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 2d210ab47e21..52a8c993cd55 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -6645,8 +6645,7 @@ static int kvm_vm_ioctl_set_clock(struct kvm *kvm, =
-void __user *argp)
->         return 0;
->  }
->
-> -long kvm_arch_vm_ioctl(struct file *filp,
-> -                      unsigned int ioctl, unsigned long arg)
-> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lo=
-ng arg)
->  {
->         struct kvm *kvm =3D filp->private_data;
->         void __user *argp =3D (void __user *)arg;
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 4f26b244f6d0..ed2f1f02976b 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1398,8 +1398,7 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct k=
-vm_irq_level *irq_level,
->                         bool line_status);
->  int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->                             struct kvm_enable_cap *cap);
-> -long kvm_arch_vm_ioctl(struct file *filp,
-> -                      unsigned int ioctl, unsigned long arg);
-> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lo=
-ng arg);
->  long kvm_arch_vm_compat_ioctl(struct file *filp, unsigned int ioctl,
->                               unsigned long arg);
->
-> --
-> 2.31.1
->
->
-> --
-> kvm-riscv mailing list
-> kvm-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kvm-riscv
