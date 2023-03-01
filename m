@@ -1,94 +1,303 @@
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B55B10F0
-	for <kvmarm@lists.linux.dev>; Wed,  1 Mar 2023 09:20:30 +0000 (UTC)
-Received: by mail-wm1-f48.google.com with SMTP id ay29-20020a05600c1e1d00b003e9f4c2b623so11317064wmb.3
-        for <kvmarm@lists.linux.dev>; Wed, 01 Mar 2023 01:20:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1677662429;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ksdV4yO+/ccC87yK6osO5dTNtiRfrlYmNqnr+scBfFo=;
-        b=R4M5oYOcaqThwAC3+Mi3wP1Z5kZ5o+33EOc8N+bdvkNjAjTjnuZfS9F3eLsUisC1Hm
-         hC0r5T4FZaQ+H3XBnz+SX24rnbELRy8DFVpt7cdQzKzTqmPM5Azz5yO3OdF7jxeYPuyK
-         Ycszux1MDO7EiNUxaLiES0djq0YU/7XugDADt+Fo6WOpJ44a8ugyFLWilbUHDD34C21n
-         rilDqiCPmzSXUYEXP3N63l6k9+eqMPQPaXEIgj7J/hTQkewr91AEHeB4hmj6cTyb8XZT
-         53be0KEbxw9PrPU+Flik8vQJhYEDs8Od5R7d4po8qokM4CtgV8HOHI3/7CtYXTL1x/z5
-         qYVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677662429;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ksdV4yO+/ccC87yK6osO5dTNtiRfrlYmNqnr+scBfFo=;
-        b=3Jzvu7mGW9zek+zZjRk30MvT48a1WT80tGdmvUMFqQd/SEg6D8g3oCvGGAq5sL6KlM
-         MqJBU2KlueGcxcMjK+mDJJtUORJZ6WS/cfY2Q6LEw4mrt7PSphshCXZsxEROAVlXSVat
-         I/aGCbaA4gMLb+ARA6wZTp1oTZl597NbxL8mQVfkTs4G3D43Lv6KCwyppG+T0+dbri0U
-         aK7ywcPUZcgcPV77WGyiKmC7YCZk7L0Rg6nRLS5UMRiDTHKsmpC5C/Bk841/v7ZhpV8G
-         6alUyLmcvNwTsWlpoB11jrq8NhOHe82OKI6Wez7lSSGbMwwNC3cIg9V6zOX2Wx2FVvJK
-         u3iw==
-X-Gm-Message-State: AO0yUKX5OdrzXfsz27gShAz1y3G375JUHg6A7MXS0epd4+MinHQB0O8t
-	md+1nCWZuMuame2whZ8kJKQ0pw==
-X-Google-Smtp-Source: AK7set90Ie+ijBFqKBrmMowRejIpuYczAUvaNPGHR/JgrcHLFFLzdHVU7dNTDOpzYjquvTEFuwnCFg==
-X-Received: by 2002:a05:600c:714:b0:3eb:29fe:70df with SMTP id i20-20020a05600c071400b003eb29fe70dfmr4155693wmn.35.1677662429259;
-        Wed, 01 Mar 2023 01:20:29 -0800 (PST)
-Received: from myrica (054592b0.skybroadband.com. [5.69.146.176])
-        by smtp.gmail.com with ESMTPSA id y2-20020a1c4b02000000b003e203681b26sm14703927wma.29.2023.03.01.01.20.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Mar 2023 01:20:28 -0800 (PST)
-Date: Wed, 1 Mar 2023 09:20:29 +0000
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: Itaru Kitayama <itaru.kitayama@gmail.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-coco@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, James Morse <james.morse@arm.com>,
-	Joey Gouly <Joey.Gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Quentin Perret <qperret@google.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Steven Price <steven.price@arm.com>, Thomas Huth <thuth@redhat.com>,
-	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
-	kvmarm@lists.cs.columbia.edu
-Subject: Re: [RFC] Support for Arm CCA VMs on Linux
-Message-ID: <Y/8Y3WLmiw6+Z5AS@myrica>
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
- <Y9PtKJ3Wicc19JF1@myrica>
- <CANW9uyud8RTkqgiL=64wV712QMxtAyubqeyCJ0vpcADJ42VqJA@mail.gmail.com>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5183610EE;
+	Wed,  1 Mar 2023 09:58:34 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D41EA2F4;
+	Wed,  1 Mar 2023 01:59:16 -0800 (PST)
+Received: from [10.57.91.114] (unknown [10.57.91.114])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9D3243F881;
+	Wed,  1 Mar 2023 01:58:29 -0800 (PST)
+Message-ID: <fa49dcf2-00a0-660d-cdcd-bbb6db02bcd0@arm.com>
+Date: Wed, 1 Mar 2023 09:58:28 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANW9uyud8RTkqgiL=64wV712QMxtAyubqeyCJ0vpcADJ42VqJA@mail.gmail.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.7.2
+Subject: Re: [RFC] Support for Arm CCA VMs on Linux
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Andrew Jones <andrew.jones@linux.dev>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ James Morse <james.morse@arm.com>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ Joey Gouly <Joey.Gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Paolo Bonzini <pbonzini@redhat.com>, Quentin Perret <qperret@google.com>,
+ Sean Christopherson <seanjc@google.com>, Steven Price
+ <steven.price@arm.com>, Thomas Huth <thuth@redhat.com>,
+ Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+ kvmarm@lists.cs.columbia.edu
+References: <20230127112248.136810-1-suzuki.poulose@arm.com>
+ <Y+vBHXbxPBgHxzGY@work-vm>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <Y+vBHXbxPBgHxzGY@work-vm>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Itaru,
+Hi Dave
 
-On Wed, Mar 01, 2023 at 08:35:05AM +0900, Itaru Kitayama wrote:
-> Hi Jean,
-> I've tried your series in Real on CCA Host, but the KVM arch init
-> emits an Invalid argument error and terminates.
+Thanks for your response, and apologies for the delay. Response, in line.
 
-Do you know which call returns this error?  Normally the RMEGuest support
-should print more detailed errors. Are you able to launch normal guests
-(without the rme-guest object and confidential-guest-support machine
-parameter)?  Could you give the complete QEMU command-line?
+On 14/02/2023 17:13, Dr. David Alan Gilbert wrote:
+> * Suzuki K Poulose (suzuki.poulose@arm.com) wrote:
+>> We are happy to announce the early RFC version of the Arm
+>> Confidential Compute Architecture (CCA) support for the Linux
+>> stack. The intention is to seek early feedback in the following areas:
+>>   * KVM integration of the Arm CCA
+>>   * KVM UABI for managing the Realms, seeking to generalise the operations
+>>     wherever possible with other Confidential Compute solutions.
+>>     Note: This version doesn't support Guest Private memory, which will be added
+>>     later (see below).
+>>   * Linux Guest support for Realms
+>>
+>> Arm CCA Introduction
+>> =====================
+>>
+>> The Arm CCA is a reference software architecture and implementation that builds
+>> on the Realm Management Extension (RME), enabling the execution of Virtual
+>> machines, while preventing access by more privileged software, such as hypervisor.
+>> The Arm CCA allows the hypervisor to control the VM, but removes the right for
+>> access to the code, register state or data that is used by VM.
+>> More information on the architecture is available here[0].
+>>
+>>      Arm CCA Reference Software Architecture
+>>
+>>          Realm World    ||    Normal World   ||  Secure World  ||
+>>                         ||        |          ||                ||
+>>   EL0 x-------x         || x----x | x------x ||                ||
+>>       | Realm |         || |    | | |      | ||                ||
+>>       |       |         || | VM | | |      | ||                ||
+>>   ----|  VM*  |---------||-|    |---|      |-||----------------||
+>>       |       |         || |    | | |  H   | ||                ||
+>>   EL1 x-------x         || x----x | |      | ||                ||
+>>           ^             ||        | |  o   | ||                ||
+>>           |             ||        | |      | ||                ||
+>>   ------- R*------------------------|  s  -|---------------------
+>>           S             ||          |      | ||                ||
+>>           I             ||          |  t   | ||                ||
+>>           |             ||          |      | ||                ||
+>>           v             ||          x------x ||                ||
+>>   EL2    RMM*           ||              ^    ||                ||
+>>           ^             ||              |    ||                ||
+>>   ========|=============================|========================
+>>           |                             | SMC
+>>           x--------- *RMI* -------------x
+>>
+>>   EL3                   Root World
+>>                         EL3 Firmware
+>>   ===============================================================
+>> Where :
+>>   RMM - Realm Management Monitor
+>>   RMI - Realm Management Interface
+>>   RSI - Realm Service Interface
+>>   SMC - Secure Monitor Call
+> 
+> Hi,
+>    It's nice to see this full stack posted - thanks!
+> 
+> Are there any pointers to information on attestation and similar
+> measurement things?  In particular, are there any plans for a vTPM
 
-> I configure it with the aarch64-softmmu target only and built, any
-> other steps I should worry?
+The RMM v1.0 provides attestation and measurement services to the Realm,
+via Realm Service Interface (RSI) calls. However, there is no support
+for partitioning the Realm VM with v1.0. This is currently under
+development and should be available in the near future.
 
-No, that should be enough
+With that in place, a vTPM could reside in a partition of the Realm VM 
+along side the OS in another. Does that answer your question ?
 
-Thanks,
-Jean
+Kind regards
+Suzuki
+
+
+> for Realms - if there were, it would make life easy for us, since we
+> can share some user space stuff with other CoCo systems.
+> 
+> Dave
+> 
+>> RME introduces a new security state "Realm world", in addition to the
+>> traditional Secure and Non-Secure states. The Arm CCA defines a new component,
+>> Realm Management Monitor (RMM) that runs at R-EL2. This is a standard piece of
+>> firmware, verified, installed and loaded by the EL3 firmware (e.g, TF-A), at
+>> system boot.
+>>
+>> The RMM provides standard interfaces - Realm Management Interface (RMI) - to the
+>> Normal world hypervisor to manage the VMs running in the Realm world (also called
+>> Realms in short). These are exposed via SMC and are routed through the EL3
+>> firmwre.
+>> The RMI interface includes:
+>>    - Move a physical page from the Normal world to the Realm world
+>>    - Creating a Realm with requested parameters, tracked via Realm Descriptor (RD)
+>>    - Creating VCPUs aka Realm Execution Context (REC), with initial register state.
+>>    - Create stage2 translation table at any level.
+>>    - Load initial images into Realm Memory from normal world memory
+>>    - Schedule RECs (vCPUs) and handle exits
+>>    - Inject virtual interrupts into the Realm
+>>    - Service stage2 runtime faults with pages (provided by host, scrubbed by RMM).
+>>    - Create "shared" mappings that can be accessed by VMM/Hyp.
+>>    - Reclaim the memory allocated for the RAM and RTTs (Realm Translation Tables)
+>>
+>> However v1.0 of RMM specifications doesn't support:
+>>   - Paging protected memory of a Realm VM. Thus the pages backing the protected
+>>     memory region must be pinned.
+>>   - Live migration of Realms.
+>>   - Trusted Device assignment.
+>>   - Physical interrupt backed Virtual interrupts for Realms
+>>
+>> RMM also provides certain services to the Realms via SMC, called Realm Service
+>> Interface (RSI). These include:
+>>   - Realm Guest Configuration.
+>>   - Attestation & Measurement services
+>>   - Managing the state of an Intermediate Physical Address (IPA aka GPA) page.
+>>   - Host Call service (Communication with the Normal world Hypervisor)
+>>
+>> The specifications for the RMM software is currently at *v1.0-Beta2* and the
+>> latest version is available here [1].
+>>
+>> The Trusted Firmware foundation has an implementation of the RMM - TF-RMM -
+>> available here [3].
+>>
+>> Implementation
+>> =================
+>>
+>> This version of the stack is based on the RMM specification v1.0-Beta0[2], with
+>> following exceptions :
+>>    - TF-RMM/KVM currently doesn't support the optional features of PMU,
+>>       SVE and Self-hosted debug (coming soon).
+>>    - The RSI_HOST_CALL structure alignment requirement is reduced to match
+>>       RMM v1.0 Beta1
+>>    - RMI/RSI version numbers do not match the RMM spec. This will be
+>>      resolved once the spec/implementation is complete, across TF-RMM+Linux stack.
+>>
+>> We plan to update the stack to support the latest version of the RMMv1.0 spec
+>> in the coming revisions.
+>>
+>> This release includes the following components :
+>>
+>>   a) Linux Kernel
+>>       i) Host / KVM support - Support for driving the Realms via RMI. This is
+>>       dependent on running in the Kernel at EL2 (aka VHE mode). Also provides
+>>       UABI for VMMs to manage the Realm VMs. The support is restricted to 4K page
+>>       size, matching the Stage2 granule supported by RMM. The VMM is responsible
+>>       for making sure the guest memory is locked.
+>>
+>>         TODO: Guest Private memory[10] integration - We have been following the
+>>         series and support will be added once it is merged upstream.
+>>       
+>>       ii) Guest support - Support for a Linux Kernel to run in the Realm VM at
+>>       Realm-EL1, using RSI services. This includes virtio support (virtio-v1.0
+>>       only). All I/O are treated as non-secure/shared.
+>>   
+>>   c) kvmtool - VMM changes required to manage Realm VMs. No guest private memory
+>>      as mentioned above.
+>>   d) kvm-unit-tests - Support for running in Realms along with additional tests
+>>      for RSI ABI.
+>>
+>> Running the stack
+>> ====================
+>>
+>> To run/test the stack, you would need the following components :
+>>
+>> 1) FVP Base AEM RevC model with FEAT_RME support [4]
+>> 2) TF-A firmware for EL3 [5]
+>> 3) TF-A RMM for R-EL2 [3]
+>> 4) Linux Kernel [6]
+>> 5) kvmtool [7]
+>> 6) kvm-unit-tests [8]
+>>
+>> Instructions for building the firmware components and running the model are
+>> available here [9]. Once, the host kernel is booted, a Realm can be launched by
+>> invoking the `lkvm` commad as follows:
+>>
+>>   $ lkvm run --realm 				 \
+>> 	 --measurement-algo=["sha256", "sha512"] \
+>> 	 --disable-sve				 \
+>> 	 <normal-vm-options>
+>>
+>> Where:
+>>   * --measurement-algo (Optional) specifies the algorithm selected for creating the
+>>     initial measurements by the RMM for this Realm (defaults to sha256).
+>>   * GICv3 is mandatory for the Realms.
+>>   * SVE is not yet supported in the TF-RMM, and thus must be disabled using
+>>     --disable-sve
+>>
+>> You may also run the kvm-unit-tests inside the Realm world, using the similar
+>> options as above.
+>>
+>>
+>> Links
+>> ============
+>>
+>> [0] Arm CCA Landing page (See Key Resources section for various documentations)
+>>      https://www.arm.com/architecture/security-features/arm-confidential-compute-architecture
+>>
+>> [1] RMM Specification Latest
+>>      https://developer.arm.com/documentation/den0137/latest
+>>
+>> [2] RMM v1.0-Beta0 specification
+>>      https://developer.arm.com/documentation/den0137/1-0bet0/
+>>
+>> [3] Trusted Firmware RMM - TF-RMM
+>>      https://www.trustedfirmware.org/projects/tf-rmm/
+>>      GIT: https://git.trustedfirmware.org/TF-RMM/tf-rmm.git
+>>
+>> [4] FVP Base RevC AEM Model (available on x86_64 / Arm64 Linux)
+>>      https://developer.arm.com/Tools%20and%20Software/Fixed%20Virtual%20Platforms
+>>
+>> [5] Trusted Firmware for A class
+>>      https://www.trustedfirmware.org/projects/tf-a/
+>>
+>> [6] Linux kernel support for Arm-CCA
+>>      https://gitlab.arm.com/linux-arm/linux-cca
+>>      Host Support branch:	cca-host/rfc-v1
+>>      Guest Support branch:	cca-guest/rfc-v1
+>>
+>> [7] kvmtool support for Arm CCA
+>>      https://gitlab.arm.com/linux-arm/kvmtool-cca cca/rfc-v1
+>>
+>> [8] kvm-unit-tests support for Arm CCA
+>>      https://gitlab.arm.com/linux-arm/kvm-unit-tests-cca  cca/rfc-v1
+>>
+>> [9] Instructions for Building Firmware components and running the model, see
+>>      section 4.19.2 "Building and running TF-A with RME"
+>>      https://trustedfirmware-a.readthedocs.io/en/latest/components/realm-management-extension.html#building-and-running-tf-a-with-rme
+>>
+>> [10] fd based Guest Private memory for KVM
+>>     https://lkml.kernel.org/r/20221202061347.1070246-1-chao.p.peng@linux.intel.com
+>>
+>> Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+>> Cc: Andrew Jones <andrew.jones@linux.dev>
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> Cc: Chao Peng <chao.p.peng@linux.intel.com>
+>> Cc: Christoffer Dall <christoffer.dall@arm.com>
+>> Cc: Fuad Tabba <tabba@google.com>
+>> Cc: James Morse <james.morse@arm.com>
+>> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+>> Cc: Joey Gouly <Joey.Gouly@arm.com>
+>> Cc: Marc Zyngier <maz@kernel.org>
+>> Cc: Mark Rutland <mark.rutland@arm.com>
+>> Cc: Oliver Upton <oliver.upton@linux.dev>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Quentin Perret <qperret@google.com>
+>> Cc: Sean Christopherson <seanjc@google.com>
+>> Cc: Steven Price <steven.price@arm.com>
+>> Cc: Thomas Huth <thuth@redhat.com>
+>> Cc: Will Deacon <will@kernel.org>
+>> Cc: Zenghui Yu <yuzenghui@huawei.com>
+>> To: linux-coco@lists.linux.dev
+>> To: kvmarm@lists.linux.dev
+>> Cc: kvmarm@lists.cs.columbia.edu
+>> Cc: linux-arm-kernel@lists.infradead.org
+>> To: linux-kernel@vger.kernel.org
+>> To: kvm@vger.kernel.org
+>>
+
