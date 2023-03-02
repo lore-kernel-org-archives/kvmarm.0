@@ -1,66 +1,85 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94366ED3
-	for <kvmarm@lists.linux.dev>; Thu,  2 Mar 2023 03:02:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1677726169;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=6kZFiug5mIRB7tAkTIUwsKmYbfqvTxNd2xDpOYGIXL0=;
-	b=ZRw7TYmiHgczm+dnG1hWtkECihscjCXqbzr348+b/ufwgGw+vxfnKKTm2MSo/Zxz9FTZGt
-	MSN62gGmIGhxRadIiX93UHLKDEBhLXTIbVZQ+GJstXTIA6667joB3T4brYi+HR7Er7vCzD
-	/5pm1i0rzIMawauP30kqT3c7RfOEd+M=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-590-ovs6SDUBP0usNKu_LA2C6A-1; Wed, 01 Mar 2023 22:02:46 -0500
-X-MC-Unique: ovs6SDUBP0usNKu_LA2C6A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E843B802D38;
-	Thu,  2 Mar 2023 03:02:45 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C8B922026D4B;
-	Thu,  2 Mar 2023 03:02:45 +0000 (UTC)
-From: Shaoqin Huang <shahuang@redhat.com>
-To: kvmarm@lists.linux.dev
-Cc: Shaoqin Huang <shahuang@redhat.com>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Eric Auger <eric.auger@redhat.com>,
-	kvm@vger.kernel.org (open list:ARM)
-Subject: [RESEND kvm-unit-tests 0/3] arm: Use gic_enable/disable_irq() macro to clean up code
-Date: Wed,  1 Mar 2023 22:02:34 -0500
-Message-Id: <20230302030238.158796-1-shahuang@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841C9110B
+	for <kvmarm@lists.linux.dev>; Thu,  2 Mar 2023 05:50:43 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id a137-20020a25ca8f000000b0091b90b20cd9so2977322ybg.6
+        for <kvmarm@lists.linux.dev>; Wed, 01 Mar 2023 21:50:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=K3JIxiC0M77Pk7ywc3uQ/jzPAxcPYJAhKiYM9zf/wCk=;
+        b=jtb5+/An/yu3T9m7m/98dfEoSfuJeWhdUaRVOkoGjRKDvvstUFT30gKnyCyPqji8bu
+         r1SKTDK+uCcJwQdfJWLgq+f1XJfKKzkkCEw5xIUD2aYGbcdXPNRPscejOngrX+2zjXw2
+         EOyUIU2i36AqfQpsykEPTMZUOTBER32Skq7/LQ027yvSPNTax/FK6RBq4yZI/F5NAgJH
+         Or3F/CKKOQQxblmFknMTwfV/8DUie08mPTvPu/whwZxDHKj9urdpJcesJhwgiqxarYD7
+         G1CmC6TabyRzkso/6vItQ6+qDNwWmLUYoEV8MwmOXzIjKSMTqbBH7FgtiwresKIPm9Xy
+         Oq4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=K3JIxiC0M77Pk7ywc3uQ/jzPAxcPYJAhKiYM9zf/wCk=;
+        b=h4XodrT29LCDp2r2V8bnhYtTGWPW3540nEfziOBlbKrP5EsIlvfLIitoX3fQvz+Z8L
+         S89LKAxsd2gphukuPorZvIkq9VuhPj4IlEmSiKlv3z3ldLtc2K53JtNDPgsLTqgYlmpK
+         9GDsA3XLKno8oiH75qZz3axYU7/6hqAYYKH0hy0QwdKB+0wYRqZajxKFyTRrom6KzGSy
+         dbqC+ZrvSPHhVp5WHgfrkURE9h7h7vg3+jxEadPkHHkRGrU8+RXICPyIsSl6QiGJDCq0
+         dh3w7dE7eP6DXBRXSto1wuFgCRXUNLC2phy8cDbvtbrQRTCleZzYemhr3V9mtV3GSZEC
+         tuaA==
+X-Gm-Message-State: AO0yUKXV9dIrmJiCqC7HNU3de0W8A5iZfW6Xl2mJdtyiO1ilq1lgY9eG
+	oGOzqyws0EmPUP701PmlMX3JFV7buP4=
+X-Google-Smtp-Source: AK7set9c8XVwEZFWDGh+9kXnrdAHO4gC875qJEsTWGDCD3+FYSzJT6DG3+/6LXrhQag+NTWGMPw4lFdcm8Y=
+X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
+ (user=reijiw job=sendgmr) by 2002:a5b:211:0:b0:91d:98cd:bfe4 with SMTP id
+ z17-20020a5b0211000000b0091d98cdbfe4mr4832176ybl.10.1677736242502; Wed, 01
+ Mar 2023 21:50:42 -0800 (PST)
+Date: Wed,  1 Mar 2023 21:50:31 -0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.2.722.g9855ee24e9-goog
+Message-ID: <20230302055033.3081456-1-reijiw@google.com>
+Subject: [PATCH 0/2] KVM: arm64: PMU: Preserve vPMC registers properly on migration
+From: Reiji Watanabe <reijiw@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Ricardo Koller <ricarkol@google.com>, 
+	Jing Zhang <jingzhangos@google.com>, Raghavendra Rao Anata <rananta@google.com>, 
+	Will Deacon <will@kernel.org>, Reiji Watanabe <reijiw@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Some tests still use their own code to enable/disable irq, use
-gic_enable/disable_irq() to clean up them.
+The series fixes two problems in preserving vPMU counter (vPMC)
+registers (PMCCNTR_EL0/PMEVCNTR<n>_EL0) during migration.
 
-The first patch fixes a problem which will disable all irq when use
-gic_disable_irq().
+One of the problems is that KVM may not return the current values
+of the vPMC registers for KVM_GET_ONE_REG.
 
-The patch 2-3 clean up the code by using the macro.
+The other one might cause KVM to reset the vPMC registers on the
+first KVM_RUN on the destination. This is because userspace might
+save PMCR_EL0 with PMCR_EL0.{C,P} bits set on the source, and
+restore it on the destination.
 
-Shaoqin Huang (3):
-  arm: gic: Write one bit per time in gic_irq_set_clr_enable()
-  arm64: timer: Use gic_enable/disable_irq() macro in timer test
-  arm64: microbench: Use gic_enable_irq() macro in microbench test
+See patch-1 and patch-2 for details on these issues respectively.
 
- arm/micro-bench.c | 15 +--------------
- arm/timer.c       | 20 +++-----------------
- lib/arm/gic.c     |  4 +---
- 3 files changed, 5 insertions(+), 34 deletions(-)
+The series is based on v6.2.
 
+Reiji Watanabe (2):
+  KVM: arm64: PMU: Fix GET_ONE_REG for vPMC regs to return the current
+    value
+  KVM: arm64: PMU: Don't save PMCR_EL0.{C,P} for the vCPU
+
+ arch/arm64/kvm/pmu-emul.c |  4 +++-
+ arch/arm64/kvm/sys_regs.c | 21 +++++++++++++++++++--
+ 2 files changed, 22 insertions(+), 3 deletions(-)
+
+
+base-commit: c9c3395d5e3dcc6daee66c6908354d47bf98cb0c
 -- 
-2.39.1
+2.39.2.722.g9855ee24e9-goog
 
