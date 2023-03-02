@@ -1,51 +1,51 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E76651C10
-	for <kvmarm@lists.linux.dev>; Thu,  2 Mar 2023 08:19:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2F51C10
+	for <kvmarm@lists.linux.dev>; Thu,  2 Mar 2023 08:20:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1677745191;
+	s=mimecast20190719; t=1677745199;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=zIjaXDXp4WiF/PZhzlcAElDicG/m9VQA0incK69mGeo=;
-	b=DlKKPiFvHmXpMEA1i04yqeUuVQFV+cBs+oyF4djGp6GbKsIZxOkcumfi0epNA3S3nL3oHB
-	oTTXBBjjfM+uOHy2vupu8+8cLnAsU54eEl12SoEYQoqKUdYDYabEOHVheAP1IuWcLCYTBZ
-	9qLePY5iXS0CCOQK8NvyAXnuGRkF7qs=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=XoJEO/rrhsWrElsDeh33FRv7UGKPrM+4RlG9La9lfTc=;
+	b=BKjth3dLh1BS288iPIR9SKu7NpJ3vjw3QJW5M4gORM5jU3YSYoTH56YjQ6oQg4YFNgcvTa
+	JE9Lh/awKYdESEtdA2RBWuHXqn4+ZDOzEi5a9Ki/ZQTBvAlPTJdmOkcmgmOd1atxK5Omph
+	FL4uq+orCxoUb36O/up+SEQaJ2as0Z4=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-510-Rjj_4fkVOwaIZiiVXqE7oA-1; Thu, 02 Mar 2023 03:19:49 -0500
-X-MC-Unique: Rjj_4fkVOwaIZiiVXqE7oA-1
-Received: by mail-qk1-f198.google.com with SMTP id u28-20020a05620a085c00b0073b88cae2f5so9593686qku.8
-        for <kvmarm@lists.linux.dev>; Thu, 02 Mar 2023 00:19:49 -0800 (PST)
+ us-mta-540-vCyzscRZMKuIUOF65oP2sw-1; Thu, 02 Mar 2023 03:19:57 -0500
+X-MC-Unique: vCyzscRZMKuIUOF65oP2sw-1
+Received: by mail-qk1-f199.google.com with SMTP id y1-20020a05620a09c100b0070630ecfd9bso9629239qky.20
+        for <kvmarm@lists.linux.dev>; Thu, 02 Mar 2023 00:19:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zIjaXDXp4WiF/PZhzlcAElDicG/m9VQA0incK69mGeo=;
-        b=5kJATC/Cvx9eaQuJYLxKyGRJpJ16HnEqjMKs35TJUB3SaifBSuERxFGbXDFKrzg4Id
-         926NJ1+YnFyV/Ohah4liFF/WHEpDm12spGuBSNgJLY94fF6IMtP6aYd3LMOomcbe8x1N
-         8DaS8RkFzZSb93v5cE3pimI/HBn7FOOz2a2l5OBshUTW417JMZNBY5O79dld/npp+tl1
-         wTGQ/DgGkuP+lagIqQGmqTTzgasPjzQkIJwp4ZBX7vNvN5VjIvxxo5r5kdfVT9S3hfOg
-         JiE1qPHMxP/RLxoemscBTPf1t0x7jxgohk/ShilWxGcCb+jm/I79o/lGggzbE1kFKS3u
-         Xz1Q==
-X-Gm-Message-State: AO0yUKUevdaOrnB4zc4ZwUPZVZoPxVbGe8SWfEi59I89i0T/3IEte/1w
-	YNgjrA6UpHXy+JMQUp35kuTDNrlF36JOk9yTYQwLQKnE6SUCrcH8G5WbuxtbUPiiyNXzaPlg1gy
-	cI0+APc0DE7CwvdQH
-X-Received: by 2002:a05:6214:29e9:b0:56b:fa99:7866 with SMTP id jv9-20020a05621429e900b0056bfa997866mr15509752qvb.7.1677745189315;
-        Thu, 02 Mar 2023 00:19:49 -0800 (PST)
-X-Google-Smtp-Source: AK7set9DC0uf3w5/KZdo3iDCN05BT27ad4JPBOOjlaA8gZ1f4js38pJNLws5TY6JsybSloz9MoJvIQ==
-X-Received: by 2002:a05:6214:29e9:b0:56b:fa99:7866 with SMTP id jv9-20020a05621429e900b0056bfa997866mr15509741qvb.7.1677745189084;
-        Thu, 02 Mar 2023 00:19:49 -0800 (PST)
+        bh=XoJEO/rrhsWrElsDeh33FRv7UGKPrM+4RlG9La9lfTc=;
+        b=oSN0idfhoyuu4zHnv/PR3zk1mt1xvNdG1fGCiaYIK13rGDgMEY0AexLahuSUTiw9tL
+         YjrbY/FzDiOPmJHyhutUmtlLE7bcGcnW3GzPiUi5CIkVulFgGery9lCyzNnEQc0hFDI1
+         1Nmeq8lm4Z3Rq3zaBNDlJj1xWJKDzvh0IlmLmNDUA2yJC+QVRuZsYilcDbIWJQZ2Wv4F
+         2FleEaZFZ+0R9rFGPme25+WeF0V3AmdOCVqgtl7H71ZjVG4tDj6MIZ4Yu0VnCX2fCfqV
+         BKykPxDQ5yiogbleooSIm+80KxZLAhJh7JxK0VHLF2mvu7QKWc4XqmjGsUCWl1cPi+bI
+         KvtQ==
+X-Gm-Message-State: AO0yUKV6d6eMCEjZrUQBjKDcprNnqZ6BhLbzU5017yUGVax0Ij557zOQ
+	56IheVTYyY2d6R/9KY90n1ZpQ/nqGxQ/M0IRw9yrBTT5YOWHdh0T6w5E7pHzOOOGTOulseYvqHz
+	W8QpoJsoBXfzvXamp
+X-Received: by 2002:a05:622a:1a84:b0:3bf:b6ba:1c1f with SMTP id s4-20020a05622a1a8400b003bfb6ba1c1fmr17689094qtc.10.1677745197469;
+        Thu, 02 Mar 2023 00:19:57 -0800 (PST)
+X-Google-Smtp-Source: AK7set/f8FUy6jS5OC2id5Rsy6kJpPekovC1uYs9hy0AcMyf273M0RdPVTwqpf0GUC63NUgSX9UIcQ==
+X-Received: by 2002:a05:622a:1a84:b0:3bf:b6ba:1c1f with SMTP id s4-20020a05622a1a8400b003bfb6ba1c1fmr17689082qtc.10.1677745197262;
+        Thu, 02 Mar 2023 00:19:57 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id g1-20020a37b601000000b00743049c2b15sm1221359qkf.66.2023.03.02.00.19.47
+        by smtp.gmail.com with ESMTPSA id d5-20020ac86685000000b003bfaf01af24sm9894512qtp.46.2023.03.02.00.19.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Mar 2023 00:19:48 -0800 (PST)
-Message-ID: <830e41b7-2e78-caff-7115-81be321bdad9@redhat.com>
-Date: Thu, 2 Mar 2023 09:19:46 +0100
+        Thu, 02 Mar 2023 00:19:56 -0800 (PST)
+Message-ID: <58de2175-62f1-a873-872b-dff79c53fec9@redhat.com>
+Date: Thu, 2 Mar 2023 09:19:54 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,84 +54,62 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
-Subject: Re: [RESEND kvm-unit-tests 2/3] arm64: timer: Use
- gic_enable/disable_irq() macro in timer test
+Subject: Re: [RESEND kvm-unit-tests 3/3] arm64: microbench: Use
+ gic_enable_irq() macro in microbench test
 To: Shaoqin Huang <shahuang@redhat.com>, kvmarm@lists.linux.dev
 Cc: Andrew Jones <andrew.jones@linux.dev>, "open list:ARM"
  <kvm@vger.kernel.org>
 References: <20230302030238.158796-1-shahuang@redhat.com>
- <20230302030238.158796-3-shahuang@redhat.com>
+ <20230302030238.158796-4-shahuang@redhat.com>
 From: Eric Auger <eauger@redhat.com>
-In-Reply-To: <20230302030238.158796-3-shahuang@redhat.com>
+In-Reply-To: <20230302030238.158796-4-shahuang@redhat.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-
+Hi Shaoqin,
 
 On 3/2/23 04:02, Shaoqin Huang wrote:
-> Use gic_enable/disable_irq() to clean up the code.
+> Use gic_enable_irq() to clean up code.
 > 
 > Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-
-Thanks
-
 Eric
-
 > ---
->  arm/timer.c | 20 +++-----------------
->  1 file changed, 3 insertions(+), 17 deletions(-)
+>  arm/micro-bench.c | 15 +--------------
+>  1 file changed, 1 insertion(+), 14 deletions(-)
 > 
-> diff --git a/arm/timer.c b/arm/timer.c
-> index c4e7b10..c0a8388 100644
-> --- a/arm/timer.c
-> +++ b/arm/timer.c
-> @@ -14,9 +14,6 @@
->  #include <asm/gic.h>
->  #include <asm/io.h>
+> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
+> index 8436612..090fda6 100644
+> --- a/arm/micro-bench.c
+> +++ b/arm/micro-bench.c
+> @@ -212,24 +212,11 @@ static void lpi_exec(void)
 >  
-> -static void *gic_isenabler;
-> -static void *gic_icenabler;
-> -
->  static bool ptimer_unsupported;
->  
->  static void ptimer_unsupported_handler(struct pt_regs *regs, unsigned int esr)
-> @@ -139,12 +136,12 @@ static struct timer_info ptimer_info = {
->  
->  static void set_timer_irq_enabled(struct timer_info *info, bool enabled)
+>  static bool timer_prep(void)
 >  {
-> -	u32 val = 1 << PPI(info->irq);
-> +	u32 irq = PPI(info->irq);
->  
->  	if (enabled)
-> -		writel(val, gic_isenabler);
-> +		gic_enable_irq(irq);
->  	else
-> -		writel(val, gic_icenabler);
-> +		gic_disable_irq(irq);
->  }
->  
->  static void irq_handler(struct pt_regs *regs)
-> @@ -366,17 +363,6 @@ static void test_init(void)
->  
+> -	void *gic_isenabler;
+> -
 >  	gic_enable_defaults();
+>  	install_irq_handler(EL1H_IRQ, gic_irq_handler);
+>  	local_irq_enable();
 >  
 > -	switch (gic_version()) {
 > -	case 2:
 > -		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
-> -		gic_icenabler = gicv2_dist_base() + GICD_ICENABLER;
 > -		break;
 > -	case 3:
 > -		gic_isenabler = gicv3_sgi_base() + GICR_ISENABLER0;
-> -		gic_icenabler = gicv3_sgi_base() + GICR_ICENABLER0;
 > -		break;
+> -	default:
+> -		assert_msg(0, "Unreachable");
 > -	}
 > -
->  	install_irq_handler(EL1H_IRQ, irq_handler);
->  	set_timer_irq_enabled(&ptimer_info, true);
->  	set_timer_irq_enabled(&vtimer_info, true);
+> -	writel(1 << PPI(TIMER_VTIMER_IRQ), gic_isenabler);
+> +	gic_enable_irq(PPI(TIMER_VTIMER_IRQ));
+>  	write_sysreg(ARCH_TIMER_CTL_IMASK | ARCH_TIMER_CTL_ENABLE, cntv_ctl_el0);
+>  	isb();
+>  
 
