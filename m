@@ -1,115 +1,113 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2F51C10
-	for <kvmarm@lists.linux.dev>; Thu,  2 Mar 2023 08:20:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1677745199;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XoJEO/rrhsWrElsDeh33FRv7UGKPrM+4RlG9La9lfTc=;
-	b=BKjth3dLh1BS288iPIR9SKu7NpJ3vjw3QJW5M4gORM5jU3YSYoTH56YjQ6oQg4YFNgcvTa
-	JE9Lh/awKYdESEtdA2RBWuHXqn4+ZDOzEi5a9Ki/ZQTBvAlPTJdmOkcmgmOd1atxK5Omph
-	FL4uq+orCxoUb36O/up+SEQaJ2as0Z4=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-540-vCyzscRZMKuIUOF65oP2sw-1; Thu, 02 Mar 2023 03:19:57 -0500
-X-MC-Unique: vCyzscRZMKuIUOF65oP2sw-1
-Received: by mail-qk1-f199.google.com with SMTP id y1-20020a05620a09c100b0070630ecfd9bso9629239qky.20
-        for <kvmarm@lists.linux.dev>; Thu, 02 Mar 2023 00:19:57 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84FB01FD7
+	for <kvmarm@lists.linux.dev>; Thu,  2 Mar 2023 09:18:24 +0000 (UTC)
+Received: by mail-wm1-f47.google.com with SMTP id fm20-20020a05600c0c1400b003ead37e6588so1191267wmb.5
+        for <kvmarm@lists.linux.dev>; Thu, 02 Mar 2023 01:18:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1677748702;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+v85GLUDrQ2zVLBvlWtS8ia1HQWcVPpr7GzHsjdX2Jw=;
+        b=MswMY0eyIVOvB1BGlIsjT7T7ZB+Coenk8J9ktojT2m4Q1VRDdt++rgRUovNUXlnJ8+
+         0n9yemw+T01QZcvWjHA+IRLf1JeQT4kgvMDTRAYyxhxbxVWsHDg9iQgAYLNOQNwzA9OF
+         sDZz74KhVDusvK5O1ZzeFkSdIarEHU0F40BXnkkl9lMTBvYQ5MhVKpY3D2OmLJcBkAEy
+         KcO16Kf5TQjdh+qmv8d3ljlMfUjsN/SwOUJhPHytWIHGEv2W78sjXEO3RFhRyQIfEBHP
+         PMv71bBDjxuLO7cV0gbppJac2jsSFYaYorLS8teQTqi/lzN5ml/LLJzfs4CWnvoIVFYD
+         TWyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XoJEO/rrhsWrElsDeh33FRv7UGKPrM+4RlG9La9lfTc=;
-        b=oSN0idfhoyuu4zHnv/PR3zk1mt1xvNdG1fGCiaYIK13rGDgMEY0AexLahuSUTiw9tL
-         YjrbY/FzDiOPmJHyhutUmtlLE7bcGcnW3GzPiUi5CIkVulFgGery9lCyzNnEQc0hFDI1
-         1Nmeq8lm4Z3Rq3zaBNDlJj1xWJKDzvh0IlmLmNDUA2yJC+QVRuZsYilcDbIWJQZ2Wv4F
-         2FleEaZFZ+0R9rFGPme25+WeF0V3AmdOCVqgtl7H71ZjVG4tDj6MIZ4Yu0VnCX2fCfqV
-         BKykPxDQ5yiogbleooSIm+80KxZLAhJh7JxK0VHLF2mvu7QKWc4XqmjGsUCWl1cPi+bI
-         KvtQ==
-X-Gm-Message-State: AO0yUKV6d6eMCEjZrUQBjKDcprNnqZ6BhLbzU5017yUGVax0Ij557zOQ
-	56IheVTYyY2d6R/9KY90n1ZpQ/nqGxQ/M0IRw9yrBTT5YOWHdh0T6w5E7pHzOOOGTOulseYvqHz
-	W8QpoJsoBXfzvXamp
-X-Received: by 2002:a05:622a:1a84:b0:3bf:b6ba:1c1f with SMTP id s4-20020a05622a1a8400b003bfb6ba1c1fmr17689094qtc.10.1677745197469;
-        Thu, 02 Mar 2023 00:19:57 -0800 (PST)
-X-Google-Smtp-Source: AK7set/f8FUy6jS5OC2id5Rsy6kJpPekovC1uYs9hy0AcMyf273M0RdPVTwqpf0GUC63NUgSX9UIcQ==
-X-Received: by 2002:a05:622a:1a84:b0:3bf:b6ba:1c1f with SMTP id s4-20020a05622a1a8400b003bfb6ba1c1fmr17689082qtc.10.1677745197262;
-        Thu, 02 Mar 2023 00:19:57 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id d5-20020ac86685000000b003bfaf01af24sm9894512qtp.46.2023.03.02.00.19.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Mar 2023 00:19:56 -0800 (PST)
-Message-ID: <58de2175-62f1-a873-872b-dff79c53fec9@redhat.com>
-Date: Thu, 2 Mar 2023 09:19:54 +0100
+        d=1e100.net; s=20210112; t=1677748703;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+v85GLUDrQ2zVLBvlWtS8ia1HQWcVPpr7GzHsjdX2Jw=;
+        b=mwEEf/+j1WFNoA3PGr5RwiegVxizSoDjFYtMvXcndfN/lRl2JxKrFyt8w3g33xzVEw
+         VObtIUdG2RLmn3iBc2JHPXSMc45qBa/fn6qjtIHgj7qf0/08VIWYGEc8eh4kge5TFv12
+         br4xusYsEJSvL35s6yflzRR+OvdupvtrK2HQ3sjMUG/3xO2Whjt01cGvznzMIEkd5Zyx
+         sSoBH7YmCH6/soFLBZD/23WUd+Hb073PKV8Kg9L3eNAQKZSk5vAMkMz7mbfdO1w4PKEq
+         yPbyqjAlZEJ8nv+NSsg5Goi7QHbIN/91BQzh19J5L7YFzj6ojax1Vfgz8vR/6TVO80U8
+         fQJw==
+X-Gm-Message-State: AO0yUKUz3ox1wVP5CMyRk4Ztz9UGXldjLDtBW7pQY8ydiS4FDzzG9BB7
+	VA4/4I+77iZT1Tj1Tel1het+tQ==
+X-Google-Smtp-Source: AK7set+YPw1lyaEwaI48fxgT8GolHPnYxo9XVJyK/m4+bNoNPlN8Bml3v5HR6wybgri48X3tq2AU1w==
+X-Received: by 2002:a05:600c:3d8e:b0:3ea:bc08:b55e with SMTP id bi14-20020a05600c3d8e00b003eabc08b55emr6973744wmb.25.1677748702713;
+        Thu, 02 Mar 2023 01:18:22 -0800 (PST)
+Received: from myrica (054592b0.skybroadband.com. [5.69.146.176])
+        by smtp.gmail.com with ESMTPSA id x14-20020adfec0e000000b002c54536c662sm14745006wrn.34.2023.03.02.01.18.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Mar 2023 01:18:22 -0800 (PST)
+Date: Thu, 2 Mar 2023 09:18:24 +0000
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: Itaru Kitayama <itaru.kitayama@gmail.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-coco@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Andrew Jones <andrew.jones@linux.dev>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Chao Peng <chao.p.peng@linux.intel.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, James Morse <james.morse@arm.com>,
+	Joey Gouly <Joey.Gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Quentin Perret <qperret@google.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Steven Price <steven.price@arm.com>, Thomas Huth <thuth@redhat.com>,
+	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+	kvmarm@lists.cs.columbia.edu
+Subject: Re: [RFC] Support for Arm CCA VMs on Linux
+Message-ID: <ZABp4KhrhsHcKmh2@myrica>
+References: <20230127112248.136810-1-suzuki.poulose@arm.com>
+ <Y9PtKJ3Wicc19JF1@myrica>
+ <CANW9uyud8RTkqgiL=64wV712QMxtAyubqeyCJ0vpcADJ42VqJA@mail.gmail.com>
+ <Y/8Y3WLmiw6+Z5AS@myrica>
+ <CANW9uysnvGCwANu+_6dp9+3rvHGOkThT9d0K2qpQV4exdmYWoA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [RESEND kvm-unit-tests 3/3] arm64: microbench: Use
- gic_enable_irq() macro in microbench test
-To: Shaoqin Huang <shahuang@redhat.com>, kvmarm@lists.linux.dev
-Cc: Andrew Jones <andrew.jones@linux.dev>, "open list:ARM"
- <kvm@vger.kernel.org>
-References: <20230302030238.158796-1-shahuang@redhat.com>
- <20230302030238.158796-4-shahuang@redhat.com>
-From: Eric Auger <eauger@redhat.com>
-In-Reply-To: <20230302030238.158796-4-shahuang@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANW9uysnvGCwANu+_6dp9+3rvHGOkThT9d0K2qpQV4exdmYWoA@mail.gmail.com>
 
-Hi Shaoqin,
-
-On 3/2/23 04:02, Shaoqin Huang wrote:
-> Use gic_enable_irq() to clean up code.
+On Thu, Mar 02, 2023 at 07:12:24AM +0900, Itaru Kitayama wrote:
+> On Wed, Mar 1, 2023 at 6:20 PM Jean-Philippe Brucker
+> <jean-philippe@linaro.org> wrote:
+> >
+> > Hi Itaru,
+> >
+> > On Wed, Mar 01, 2023 at 08:35:05AM +0900, Itaru Kitayama wrote:
+> > > Hi Jean,
+> > > I've tried your series in Real on CCA Host, but the KVM arch init
+> > > emits an Invalid argument error and terminates.
+> >
+> > Do you know which call returns this error?  Normally the RMEGuest support
+> > should print more detailed errors. Are you able to launch normal guests
+> > (without the rme-guest object and confidential-guest-support machine
+> > parameter)?  Could you give the complete QEMU command-line?
 > 
-> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Eric
-> ---
->  arm/micro-bench.c | 15 +--------------
->  1 file changed, 1 insertion(+), 14 deletions(-)
+> No, I cant say which. Yes, the CCA-capable QEMU boots if I don't set
+> RME-related options.
 > 
-> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-> index 8436612..090fda6 100644
-> --- a/arm/micro-bench.c
-> +++ b/arm/micro-bench.c
-> @@ -212,24 +212,11 @@ static void lpi_exec(void)
->  
->  static bool timer_prep(void)
->  {
-> -	void *gic_isenabler;
-> -
->  	gic_enable_defaults();
->  	install_irq_handler(EL1H_IRQ, gic_irq_handler);
->  	local_irq_enable();
->  
-> -	switch (gic_version()) {
-> -	case 2:
-> -		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
-> -		break;
-> -	case 3:
-> -		gic_isenabler = gicv3_sgi_base() + GICR_ISENABLER0;
-> -		break;
-> -	default:
-> -		assert_msg(0, "Unreachable");
-> -	}
-> -
-> -	writel(1 << PPI(TIMER_VTIMER_IRQ), gic_isenabler);
-> +	gic_enable_irq(PPI(TIMER_VTIMER_IRQ));
->  	write_sysreg(ARCH_TIMER_CTL_IMASK | ARCH_TIMER_CTL_ENABLE, cntv_ctl_el0);
->  	isb();
->  
+> Here's mine (based upon your command-line):
+> qemu-system-aarch64 -cpu host -accel kvm -machine
+> virt,gic-version=3,confidential-guest-support=rme0 -smp 2 -m 256M
+> -nographic -object rme-guest,id=rme0,measurement-algo=sha512 -kernel
+> Image -initrd rootfs.ext2 -append 'console=ttyAMA0 earlycon'
+> -overcommit mem-lock=on
 
+Thank you, this works on my setup so I'm not sure what's wrong. Check that
+KVM initialized successfully, with this in the host kernel log:
+"[    0.267019] kvm [1]: Using prototype RMM support (version 56.0)"
+
+Next step would be to find out where the EINVAL comes from, with printfs
+or GDB. This seems rather specific so I'll email you directly to avoid
+filling up everyone's inbox.
+
+Thanks,
+Jean
