@@ -1,61 +1,108 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377D6A2C
-	for <kvmarm@lists.linux.dev>; Thu,  2 Mar 2023 10:45:40 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7C1211FB;
-	Thu,  2 Mar 2023 02:46:22 -0800 (PST)
-Received: from [10.1.29.164] (e121487-lin.cambridge.arm.com [10.1.29.164])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 267113F67D;
-	Thu,  2 Mar 2023 02:45:34 -0800 (PST)
-Message-ID: <6d407882-c34e-16f1-1662-2af588e982f7@arm.com>
-Date: Thu, 2 Mar 2023 10:45:25 +0000
+Received: from out-41.mta1.migadu.com (out-41.mta1.migadu.com [95.215.58.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4A0B5381
+	for <kvmarm@lists.linux.dev>; Thu,  2 Mar 2023 11:52:33 +0000 (UTC)
+Date: Thu, 2 Mar 2023 12:52:29 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1677757951;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1Exd3f/Ghc1iGR4gajWUjcAYxFgYFkLRTz32ntOPrBc=;
+	b=ngTUwxqRWtF85TTvnRkd0MydvBUtsS00IrzUQh/x+9XqODC2Pm5kN8Zf6oOdJiaH0MWwMC
+	snpff2/IJ/BdRoq6HxJmZSORV9hwP2gMhdigljAazxwz/Y4MxaC9gLKNijX8UtUtrR7Zrd
+	P/xUqbfJVttupvdb4gThADWZRAd4LL4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Shaoqin Huang <shahuang@redhat.com>
+Cc: kvmarm@lists.linux.dev, "open list:ARM" <kvm@vger.kernel.org>
+Subject: Re: [kvm-unit-tests] arm: Replace the obsolete qemu script
+Message-ID: <20230302115229.cphrnp5qaxmdg6wz@orel>
+References: <20230301071737.43760-1-shahuang@redhat.com>
+ <20230301125004.d5giadtz4yaqdjam@orel>
+ <5b019bd3-cc57-017a-e0f6-bf9ebc97ad11@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH v5 12/12] KVM: arm64: Use local TLBI on permission
- relaxation
-Content-Language: en-US
-To: Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
- maz@kernel.org, oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
- catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
- alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com,
- gshan@redhat.com, reijiw@google.com, rananta@google.com, bgardon@google.com,
- ricarkol@gmail.com
-References: <20230301210928.565562-1-ricarkol@google.com>
- <20230301210928.565562-13-ricarkol@google.com>
-From: Vladimir Murzin <vladimir.murzin@arm.com>
-In-Reply-To: <20230301210928.565562-13-ricarkol@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5b019bd3-cc57-017a-e0f6-bf9ebc97ad11@redhat.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 3/1/23 21:09, Ricardo Koller wrote:
-> Second, KVM does not set the VTTBR_EL2.CnP bit, so each
-> PE has its own TLB entry for the same page. KVM could tolerate that when
-> doing permission relaxation (i.e., not having changes broadcasted to all
-> PEs).
+On Thu, Mar 02, 2023 at 06:09:36PM +0800, Shaoqin Huang wrote:
+> Hi drew,
+> 
+> On 3/1/23 20:50, Andrew Jones wrote:
+> > On Wed, Mar 01, 2023 at 02:17:37AM -0500, Shaoqin Huang wrote:
+> > > The qemu script used to detect the testdev is obsoleted, replace it
+> > > with the modern way to detect if testdev exists.
+> > 
+> > Hi Shaoqin,
+> > 
+> > Can you please point out the oldest QEMU version for which the modern
+> > way works?
+> > 
+> > > 
+> > > Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+> > > ---
+> > >   arm/run | 3 +--
+> > >   1 file changed, 1 insertion(+), 2 deletions(-)
+> > > 
+> > > diff --git a/arm/run b/arm/run
+> > > index 1284891..9800cfb 100755
+> > > --- a/arm/run
+> > > +++ b/arm/run
+> > > @@ -59,8 +59,7 @@ if ! $qemu $M -device '?' 2>&1 | grep virtconsole > /dev/null; then
+> > >   	exit 2
+> > >   fi
+> > > -if $qemu $M -chardev testdev,id=id -initrd . 2>&1 \
+> > > -		| grep backend > /dev/null; then
+> > > +if ! $qemu $M -chardev '?' 2>&1 | grep testdev > /dev/null; then
+> >                                ^ This shouldn't be necessary. afaict,
+> > 			        only stdio is used
+> > 
+> > We can change the 'grep testdev >/dev/null' to 'grep -q testdev'
+> > 
+> 
+> This just remind me if we could also change
+> 
+> if ! $qemu $M -device '?' 2>&1 | grep virtconsole > /dev/null; then
+> 
+> to
+> 
+> if ! $qemu $M -device '?' | grep -q virtconsole; then
+> 
+> And all other place like that.
 
-I'm might be missing something, but it seems that we do set CnP bit, at
-least in v6.2 we have
+Yup.
 
-arch/arm64/include/asm/kvm_mmu.h
+Also, unrelated, but can you change your patch prefix to
 
-static __always_inline u64 kvm_get_vttbr(struct kvm_s2_mmu *mmu)
-{
-        struct kvm_vmid *vmid = &mmu->vmid;
-        u64 vmid_field, baddr;
-        u64 cnp = system_supports_cnp() ? VTTBR_CNP_BIT : 0;
+  kvm-unit-tests PATCH
 
-        baddr = mmu->pgd_phys;
-        vmid_field = atomic64_read(&vmid->id) << VTTBR_VMID_SHIFT;
-        vmid_field &= VTTBR_VMID_MASK(kvm_arm_vmid_bits);
-        return kvm_phys_to_vttbr(baddr) | vmid_field | cnp;
-}
+as suggested in the README? My filters are looking for 'PATCH'.
 
-Cheers
-Vladimir
+Thanks,
+drew
+
+> 
+> Thanks,
+> 
+> > >   	echo "$qemu doesn't support chr-testdev. Exiting."
+> > >   	exit 2
+> > >   fi
+> > > -- 
+> > > 2.39.1
+> > > 
+> > 
+> > Thanks,
+> > drew
+> > 
+> 
+> -- 
+> Shaoqin
+> 
