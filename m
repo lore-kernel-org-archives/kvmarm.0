@@ -1,108 +1,72 @@
-Received: from out-41.mta1.migadu.com (out-41.mta1.migadu.com [95.215.58.41])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4A0B5381
-	for <kvmarm@lists.linux.dev>; Thu,  2 Mar 2023 11:52:33 +0000 (UTC)
-Date: Thu, 2 Mar 2023 12:52:29 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1677757951;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1205381
+	for <kvmarm@lists.linux.dev>; Thu,  2 Mar 2023 12:11:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1677759059;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1Exd3f/Ghc1iGR4gajWUjcAYxFgYFkLRTz32ntOPrBc=;
-	b=ngTUwxqRWtF85TTvnRkd0MydvBUtsS00IrzUQh/x+9XqODC2Pm5kN8Zf6oOdJiaH0MWwMC
-	snpff2/IJ/BdRoq6HxJmZSORV9hwP2gMhdigljAazxwz/Y4MxaC9gLKNijX8UtUtrR7Zrd
-	P/xUqbfJVttupvdb4gThADWZRAd4LL4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Shaoqin Huang <shahuang@redhat.com>
-Cc: kvmarm@lists.linux.dev, "open list:ARM" <kvm@vger.kernel.org>
-Subject: Re: [kvm-unit-tests] arm: Replace the obsolete qemu script
-Message-ID: <20230302115229.cphrnp5qaxmdg6wz@orel>
-References: <20230301071737.43760-1-shahuang@redhat.com>
- <20230301125004.d5giadtz4yaqdjam@orel>
- <5b019bd3-cc57-017a-e0f6-bf9ebc97ad11@redhat.com>
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=CMgUDFG9sXPdMEH9xgulkf4eeUNkbssVC3IJ2/A7V+Y=;
+	b=ZO+x3l7bB7imm2TFockDYxlJ7RrawdPH3UbU/2FwXdr8NVIObo82xWaAii/ZXfyW+EsAHy
+	pcLNFgDFTSVu92IgLE0iJ5++UhkLRkApoDM5Tw5Z5BEvc31AW+wCjjvW0H9COiulsLo2Km
+	kpAOYEkCAVP5KW/Rc91avP3SsSvjQAU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-359-CQZlb6vzO-WO7sMOVpkPmg-1; Thu, 02 Mar 2023 07:10:58 -0500
+X-MC-Unique: CQZlb6vzO-WO7sMOVpkPmg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C777485A5B1
+	for <kvmarm@lists.linux.dev>; Thu,  2 Mar 2023 12:10:57 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C28D82026D4B;
+	Thu,  2 Mar 2023 12:10:57 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: kvmarm@lists.linux.dev
+Cc: Shaoqin Huang <shahuang@redhat.com>
+Subject: [kvm-unit-tests PATCH v2 0/3] arm: Use gic_enable/disable_irq() macro to clean up code
+Date: Thu,  2 Mar 2023 07:10:46 -0500
+Message-Id: <20230302121049.160466-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5b019bd3-cc57-017a-e0f6-bf9ebc97ad11@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"; x-default=true
 
-On Thu, Mar 02, 2023 at 06:09:36PM +0800, Shaoqin Huang wrote:
-> Hi drew,
-> 
-> On 3/1/23 20:50, Andrew Jones wrote:
-> > On Wed, Mar 01, 2023 at 02:17:37AM -0500, Shaoqin Huang wrote:
-> > > The qemu script used to detect the testdev is obsoleted, replace it
-> > > with the modern way to detect if testdev exists.
-> > 
-> > Hi Shaoqin,
-> > 
-> > Can you please point out the oldest QEMU version for which the modern
-> > way works?
-> > 
-> > > 
-> > > Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
-> > > ---
-> > >   arm/run | 3 +--
-> > >   1 file changed, 1 insertion(+), 2 deletions(-)
-> > > 
-> > > diff --git a/arm/run b/arm/run
-> > > index 1284891..9800cfb 100755
-> > > --- a/arm/run
-> > > +++ b/arm/run
-> > > @@ -59,8 +59,7 @@ if ! $qemu $M -device '?' 2>&1 | grep virtconsole > /dev/null; then
-> > >   	exit 2
-> > >   fi
-> > > -if $qemu $M -chardev testdev,id=id -initrd . 2>&1 \
-> > > -		| grep backend > /dev/null; then
-> > > +if ! $qemu $M -chardev '?' 2>&1 | grep testdev > /dev/null; then
-> >                                ^ This shouldn't be necessary. afaict,
-> > 			        only stdio is used
-> > 
-> > We can change the 'grep testdev >/dev/null' to 'grep -q testdev'
-> > 
-> 
-> This just remind me if we could also change
-> 
-> if ! $qemu $M -device '?' 2>&1 | grep virtconsole > /dev/null; then
-> 
-> to
-> 
-> if ! $qemu $M -device '?' | grep -q virtconsole; then
-> 
-> And all other place like that.
+Some tests still use their own code to enable/disable irq, use
+gic_enable/disable_irq() to clean up them.
 
-Yup.
+The first patch fixes a problem which will disable all irq when use
+gic_disable_irq().
 
-Also, unrelated, but can you change your patch prefix to
+The patch 2-3 clean up the code by using the macro.
 
-  kvm-unit-tests PATCH
+Changelog:
+----------
+v2:
+  - tweak the comments in patch 1. (Eric)
+  - Reviewed by Eric.
 
-as suggested in the README? My filters are looking for 'PATCH'.
+Shaoqin Huang (3):
+  arm: gic: Write one bit per time in gic_irq_set_clr_enable()
+  arm64: timer: Use gic_enable/disable_irq() macro in timer test
+  arm64: microbench: Use gic_enable_irq() macro in microbench test
 
-Thanks,
-drew
+ arm/micro-bench.c | 15 +--------------
+ arm/timer.c       | 20 +++-----------------
+ lib/arm/gic.c     |  4 +---
+ 3 files changed, 5 insertions(+), 34 deletions(-)
 
-> 
-> Thanks,
-> 
-> > >   	echo "$qemu doesn't support chr-testdev. Exiting."
-> > >   	exit 2
-> > >   fi
-> > > -- 
-> > > 2.39.1
-> > > 
-> > 
-> > Thanks,
-> > drew
-> > 
-> 
-> -- 
-> Shaoqin
-> 
+-- 
+2.39.1
+
