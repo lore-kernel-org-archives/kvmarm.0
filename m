@@ -1,71 +1,93 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3568D1FB3;
-	Fri,  3 Mar 2023 09:54:53 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9F9C62F4;
-	Fri,  3 Mar 2023 01:55:35 -0800 (PST)
-Received: from [10.57.90.45] (unknown [10.57.90.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9ED7B3F587;
-	Fri,  3 Mar 2023 01:54:48 -0800 (PST)
-Message-ID: <1c91b777-982e-e71a-4829-51744e9555c5@arm.com>
-Date: Fri, 3 Mar 2023 09:54:47 +0000
-Precedence: bulk
-X-Mailing-List: kvmarm@lists.linux.dev
-List-Id: <kvmarm.lists.linux.dev>
-List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
-List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.7.2
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 228AD538C;
+	Fri,  3 Mar 2023 11:39:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B587C433D2;
+	Fri,  3 Mar 2023 11:39:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1677843550;
+	bh=kU/Ch3/h5WcXNFnEIJI+X3pPxVuYNKbYP9iG0kOs07M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MHkKMOpSsP/RYBqZ9Fn4cYK/Fwxrm1sEttxqN+9L35DKC0l44kt49MFCy92c+JGNI
+	 YbtDqlsq+YY4UyglC7hPlYfBMnPTfBQOTbAKSO+Vq7KgvUM4ZkrGDiFAi7OLEnyT8H
+	 Tutc+D7uCjbiDzpzrKEm2ZcVuzTRzXLUa/WYAma+jJ23YdgTPbFi56C5VnyEt5PT7d
+	 ZPgcD/IfThxtcNMEwAUM/NKjy4Vxh0cxoPtya0TGeCp+dtl/S3J6RNzTonW4VYhm3A
+	 UdSuakGNZ8RfETRkwiWzz2s7+VQQ8gNU/T2Od7TSwkOlvWYbl8QUNd7bcm/K9mAK//
+	 2HotVVtQW0q1g==
+Date: Fri, 3 Mar 2023 11:39:05 +0000
+From: Jean-Philippe Brucker <jpb@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Itaru Kitayama <itaru.kitayama@gmail.com>,
+	linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Andrew Jones <andrew.jones@linux.dev>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Chao Peng <chao.p.peng@linux.intel.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, James Morse <james.morse@arm.com>,
+	Joey Gouly <Joey.Gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Quentin Perret <qperret@google.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Steven Price <steven.price@arm.com>, Thomas Huth <thuth@redhat.com>,
+	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+	kvmarm@lists.cs.columbia.edu
 Subject: Re: [RFC] Support for Arm CCA VMs on Linux
-To: Jean-Philippe Brucker <jean-philippe@linaro.org>,
- Itaru Kitayama <itaru.kitayama@gmail.com>
-Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Andrew Jones <andrew.jones@linux.dev>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Chao Peng <chao.p.peng@linux.intel.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- James Morse <james.morse@arm.com>, Joey Gouly <Joey.Gouly@arm.com>,
- Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>,
- Quentin Perret <qperret@google.com>, Sean Christopherson
- <seanjc@google.com>, Steven Price <steven.price@arm.com>,
- Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>,
- Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu
+Message-ID: <20230303113905.GD361458@myrica>
 References: <20230127112248.136810-1-suzuki.poulose@arm.com>
  <Y9PtKJ3Wicc19JF1@myrica>
  <CANW9uyud8RTkqgiL=64wV712QMxtAyubqeyCJ0vpcADJ42VqJA@mail.gmail.com>
  <Y/8Y3WLmiw6+Z5AS@myrica>
  <CANW9uysnvGCwANu+_6dp9+3rvHGOkThT9d0K2qpQV4exdmYWoA@mail.gmail.com>
  <20230303094618.GC361458@myrica>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20230303094618.GC361458@myrica>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+ <1c91b777-982e-e71a-4829-51744e9555c5@arm.com>
+Precedence: bulk
+X-Mailing-List: kvmarm@lists.linux.dev
+List-Id: <kvmarm.lists.linux.dev>
+List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
+List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1c91b777-982e-e71a-4829-51744e9555c5@arm.com>
 
-On 03/03/2023 09:46, Jean-Philippe Brucker wrote:
-> On Thu, Mar 02, 2023 at 07:12:24AM +0900, Itaru Kitayama wrote:
->>>> I've tried your series in Real on CCA Host, but the KVM arch init
->>>> emits an Invalid argument error and terminates.
+On Fri, Mar 03, 2023 at 09:54:47AM +0000, Suzuki K Poulose wrote:
+> On 03/03/2023 09:46, Jean-Philippe Brucker wrote:
+> > On Thu, Mar 02, 2023 at 07:12:24AM +0900, Itaru Kitayama wrote:
+> > > > > I've tried your series in Real on CCA Host, but the KVM arch init
+> > > > > emits an Invalid argument error and terminates.
+> > 
+> > This was the KVM_SET_ONE_REG for the SVE vector size. During my tests I
+> > didn't enable SVE in the host but shrinkwrap enables more options.
 > 
-> This was the KVM_SET_ONE_REG for the SVE vector size. During my tests I
-> didn't enable SVE in the host but shrinkwrap enables more options.
+> Does the Qemu check for SVE capability on /dev/kvm ? For kvmtool, we
+> changed to using the VM instance and that would prevent using SVE,
+> until the RMM supports it.
 
-Does the Qemu check for SVE capability on /dev/kvm ? For kvmtool, we
-changed to using the VM instance and that would prevent using SVE,
-until the RMM supports it.
+Yes, QEMU does check the SVE cap on /dev/kvm. I can propose changing it or
+complementing it with a VM check in my next version, it seems to work
+(though I need to double-check the VM fd lifetime). Same goes for
+KVM_CAP_STEAL_TIME, which I need to disable explicitly at the moment.
 
-Suzuki
+Thanks,
+Jean
 
 > 
-> Until we figure out support for SVE, disable it on the QEMU command-line
-> (similarly to '--disable-sve' needed for kvmtool boot):
+> Suzuki
 > 
-> 	-cpu host,sve=off
+> > 
+> > Until we figure out support for SVE, disable it on the QEMU command-line
+> > (similarly to '--disable-sve' needed for kvmtool boot):
+> > 
+> > 	-cpu host,sve=off
+> > 
+> > Thanks,
+> > Jean
 > 
-> Thanks,
-> Jean
-
+> 
