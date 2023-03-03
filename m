@@ -1,99 +1,118 @@
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758AE10FA
-	for <kvmarm@lists.linux.dev>; Thu,  2 Mar 2023 19:06:42 +0000 (UTC)
-Received: by mail-pj1-f47.google.com with SMTP id m20-20020a17090ab79400b00239d8e182efso3775413pjr.5
-        for <kvmarm@lists.linux.dev>; Thu, 02 Mar 2023 11:06:42 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E21FCEC3
+	for <kvmarm@lists.linux.dev>; Fri,  3 Mar 2023 00:47:08 +0000 (UTC)
+Received: by mail-pl1-f174.google.com with SMTP id v11so1073244plz.8
+        for <kvmarm@lists.linux.dev>; Thu, 02 Mar 2023 16:47:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1677784002;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=i950zL3EMtEtsFlpDuMJZ9iaTlDb9zorW5KZE1wh+50=;
-        b=FHY7SRoDoR5AcqGgEUJe/jwrFQL4dY5auk//rpn0O18POlf5dfI79qcNZvluQvj8Te
-         kqI0JOoZuAnwcMX9mFAqZPltTza30mtoYGkh4k5vIW4PbhtPSeUb5JtjSgaMX11lsKxD
-         b0od4H6OnKerSCIJ3qRqbOEEZrLHrOS0nrcQXP+fUScewuqA56nvhv7gf6ijY8oxXYG6
-         C/fuGBzLMrb4eeO7ch6pYqrPI2sW2lYyN1jFVyA/fQgcoHPA9iBBdxtyrl0SCMWDHCTB
-         M4DMNd8CKwjvYikBE7g1UJfLTT5n9XQNBD1570DR8iGFJNL56hhwV6jpnM+tvb+TYzcD
-         XnLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677784002;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20210112; t=1677804428;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=i950zL3EMtEtsFlpDuMJZ9iaTlDb9zorW5KZE1wh+50=;
-        b=Q5sYMwIj1Ccql3WUYkWmh/orzfD8WTv5BfzbAqR4vsf8OkADdvOqbNYpLRgrq9KzdR
-         mCuca86zfhszE7QEG4vG7l4JImdVADdBEynJb0AFvhvufJFChLv3VYpFOZm7yWpyUyhS
-         TLhSnD0Fw6pANDp41ey2fwZbNTPKzksKymJBJnEBdCgJGp3dGsgjVHYArsXqFO61Prq1
-         Jskno8G/VET1Fa7dOvlaKxAGmLDVg7/JPlF6NYoqIzSvMlHaLVjV1KCJi9MeSp1qxZ+g
-         zLk9deOzfy0NKp4hczJS+JjgXwhCedhkkwfzJ8SvGqGgE8nDIawGTX4DcSwRMfeWkQp3
-         4KcQ==
-X-Gm-Message-State: AO0yUKU0oldbFU79UrAW+2+rvIl8X1XfWMUKIXQU2SgyTtAdS9rEuR2l
-	CzRy1SZ0HslFKgY2ArvMf/lrJw==
-X-Google-Smtp-Source: AK7set/lwHcJWPhRwDJHfG9z85lSAImCzpQ6QcQdgHZJVVnEfRiwrAew4INWC6nv3Raom5EcrizSNg==
-X-Received: by 2002:a17:902:fb8d:b0:19a:f556:e37f with SMTP id lg13-20020a170902fb8d00b0019af556e37fmr17986plb.4.1677784001555;
-        Thu, 02 Mar 2023 11:06:41 -0800 (PST)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id y20-20020a17090aca9400b0023317104415sm1965197pjt.17.2023.03.02.11.06.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Mar 2023 11:06:41 -0800 (PST)
-Date: Thu, 2 Mar 2023 11:06:37 -0800
-From: Ricardo Koller <ricarkol@google.com>
-To: Vladimir Murzin <vladimir.murzin@arm.com>
-Cc: pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
-	yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com,
-	andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com,
-	suzuki.poulose@arm.com, eric.auger@redhat.com, gshan@redhat.com,
-	reijiw@google.com, rananta@google.com, bgardon@google.com,
-	ricarkol@gmail.com
-Subject: Re: [PATCH v5 12/12] KVM: arm64: Use local TLBI on permission
- relaxation
-Message-ID: <ZADzvSK77CHBwcNN@google.com>
-References: <20230301210928.565562-1-ricarkol@google.com>
- <20230301210928.565562-13-ricarkol@google.com>
- <6d407882-c34e-16f1-1662-2af588e982f7@arm.com>
+        bh=NU0rjrjUgK9UPMJSdQ+7dnHdl8K0SghnjzsbTsmj3Ag=;
+        b=TYHVnKkDpwjH8a1fiWkJJLS9ndCnG4I1g1BYddtN2ar35mGnN82+tbX39xKwI/8BeN
+         pWtnDWV66OhFYew1W1q/3kd2qI1+LtJP4x/AGPYYEpVxSmeognokqWfMBNklHWLD2hZ1
+         CGZ5WUBRFIRQPGZPGhZVLHAHsvgtfRytOC6uRcIGBQ0ZIvQOqvogS9uHjoP3pIda/iLF
+         7+jq/ot2GajAKp9C2SoVb1SCXKcoau+giMPlZSv4fJ759gStAl4UMKZnHbtj7nlYv+Xm
+         YDXb52RmdERNx7ntXJa5wxxuWZiunxYYlvwPxrPSlGxPbSp9EY78yguj+1zh28akhwk+
+         ddNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1677804428;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NU0rjrjUgK9UPMJSdQ+7dnHdl8K0SghnjzsbTsmj3Ag=;
+        b=KCp7wMAcDLRFqxVrE/8ekqDzSD0pQ2ne/BZUxnoLLCWwBjbnFR5SvuDaDVELVZmEw3
+         9c1at6gt8HMwT2/X6P+l+9UMfECtD6SLG+JAZGfWDTPJ9wBvy1Gf8irvojqs0TAEm2ox
+         Fc0teYc4XdGLGeODz1cbn+8fvidO2wMhTzfQk4sjk2XXeEwLHGR3CB01mUqMEjDllyX3
+         2zldOjImLUQOn04ApwpM/VBHix/jrKGUW1gb9q4JgCFUTMSrEmGHj3B3kRc7xog58umX
+         n5PVTnEHW75W4/uKv6EbQSYBefFEsqedFv8QGVNBt/EonFygRLsR/bKEkujgyNqrxMkw
+         ngWw==
+X-Gm-Message-State: AO0yUKVJJsUVsDQBA0P9bG+fZA/nfHmPVBwhlQhCP95XC7kj7Ja8ZJQM
+	VbP+03E8gXnQNb50fpfkKiQkxIwZwdTAJ19QYw+xLg==
+X-Google-Smtp-Source: AK7set8ZZrRi0qeKqTr30s8g0fTBn8gg+Ebb9eSsgyj8YAUkp51xb+A200hC7FaZ6ERHui06IV+QymO/X0I7sksnzUs=
+X-Received: by 2002:a17:902:f783:b0:19c:140d:aada with SMTP id
+ q3-20020a170902f78300b0019c140daadamr70591pln.2.1677804428140; Thu, 02 Mar
+ 2023 16:47:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6d407882-c34e-16f1-1662-2af588e982f7@arm.com>
+References: <20230215010717.3612794-1-rananta@google.com> <20230215010717.3612794-7-rananta@google.com>
+In-Reply-To: <20230215010717.3612794-7-rananta@google.com>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Thu, 2 Mar 2023 16:46:51 -0800
+Message-ID: <CAAeT=FyrgUjQWhL75n7z43msubHHghhy3Tj2JjsYop14f3kFhg@mail.gmail.com>
+Subject: Re: [REPOST PATCH 06/16] tools: arm64: perf_event: Define Cycle
+ counter enable/overflow bits
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Ricardo Koller <ricarkol@google.com>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jing Zhang <jingzhangos@google.com>, Colton Lewis <coltonlewis@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Vladimir,
+Hi Raghu,
 
-On Thu, Mar 02, 2023 at 10:45:25AM +0000, Vladimir Murzin wrote:
-> On 3/1/23 21:09, Ricardo Koller wrote:
-> > Second, KVM does not set the VTTBR_EL2.CnP bit, so each
-> > PE has its own TLB entry for the same page. KVM could tolerate that when
-> > doing permission relaxation (i.e., not having changes broadcasted to all
-> > PEs).
-> 
-> I'm might be missing something, but it seems that we do set CnP bit, at
-> least in v6.2 we have
-> 
-> arch/arm64/include/asm/kvm_mmu.h
-> 
-> static __always_inline u64 kvm_get_vttbr(struct kvm_s2_mmu *mmu)
-> {
->         struct kvm_vmid *vmid = &mmu->vmid;
->         u64 vmid_field, baddr;
->         u64 cnp = system_supports_cnp() ? VTTBR_CNP_BIT : 0;
-> 
->         baddr = mmu->pgd_phys;
->         vmid_field = atomic64_read(&vmid->id) << VTTBR_VMID_SHIFT;
->         vmid_field &= VTTBR_VMID_MASK(kvm_arm_vmid_bits);
->         return kvm_phys_to_vttbr(baddr) | vmid_field | cnp;
-> }
-> 
-> Cheers
-> Vladimir
+On Tue, Feb 14, 2023 at 5:07=E2=80=AFPM Raghavendra Rao Ananta
+<rananta@google.com> wrote:
+>
+> Add the definitions of ARMV8_PMU_CNTOVS_C (Cycle counter overflow
+> bit) for overflow status registers and ARMV8_PMU_CNTENSET_C (Cycle
+> counter enable bit) for PMCNTENSET_EL0 register.
+>
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  tools/arch/arm64/include/asm/perf_event.h | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>
+> diff --git a/tools/arch/arm64/include/asm/perf_event.h b/tools/arch/arm64=
+/include/asm/perf_event.h
+> index 97e49a4d4969f..8ce23aabf6fe6 100644
+> --- a/tools/arch/arm64/include/asm/perf_event.h
+> +++ b/tools/arch/arm64/include/asm/perf_event.h
+> @@ -222,9 +222,11 @@
+>  /*
+>   * PMOVSR: counters overflow flag status reg
+>   */
+> +#define ARMV8_PMU_CNTOVS_C      (1 << 31) /* Cycle counter overflow bit =
+*/
 
-I need to fix the commit message. What I meant to say is that
-this optimization is correct in the case where CnP is not set.
+Nit: This macro doesn't seem to be used in any of the patches.
+Do we need this ?
 
-Thanks,
-Ricardo
+Thank you,
+Reiji
+
+
+>  #define        ARMV8_PMU_OVSR_MASK             0xffffffff      /* Mask f=
+or writable bits */
+>  #define        ARMV8_PMU_OVERFLOWED_MASK       ARMV8_PMU_OVSR_MASK
+>
+> +
+>  /*
+>   * PMXEVTYPER: Event selection reg
+>   */
+> @@ -247,6 +249,11 @@
+>  #define ARMV8_PMU_USERENR_CR   (1 << 2) /* Cycle counter can be read at =
+EL0 */
+>  #define ARMV8_PMU_USERENR_ER   (1 << 3) /* Event counter can be read at =
+EL0 */
+>
+> +/*
+> + * PMCNTENSET: Count Enable set reg
+> + */
+> +#define ARMV8_PMU_CNTENSET_C    (1 << 31) /* Cycle counter enable bit */
+> +
+>  /* PMMIR_EL1.SLOTS mask */
+>  #define ARMV8_PMU_SLOTS_MASK   0xff
+>
+> --
+> 2.39.1.581.gbfd45094c4-goog
+>
