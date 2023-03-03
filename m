@@ -1,51 +1,51 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC26F1C3C
-	for <kvmarm@lists.linux.dev>; Fri,  3 Mar 2023 08:31:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28F541FB3
+	for <kvmarm@lists.linux.dev>; Fri,  3 Mar 2023 09:02:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1677832308;
+	s=mimecast20190719; t=1677834157;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=2SrZLWyV+NYc4YhMPRe6Q+B4hTIUE14K9ia6BF1JotM=;
-	b=PFmBXCj+BbAwZcvl9rCcGlIDIHf49n7wKkQvzSsgL+llVouZloGxpPZdzoSNNzcwg+BdX7
-	f0c9cz3J0ihbwwIlrL3i3Kn/URZUgnMP8tSJtLTzudH7PqdgTjfQTtn22DTLry/y1W5H1Q
-	MUdJ73CwLAEPGZghJ+tF52Qgw+E6kec=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=zVx7liUtAHi9MlgajvxM1lPoJHO/9CA0IPkpax0IClE=;
+	b=cY1EGyeV6QpEZmC/IZ+0aqmH7V/3NByXbz97juOBfbi36ebMOQ+qFRIFsvUzfHjr6j9pd5
+	ykc9Mi6oI8XbXHnHdPTK9h/wkwK3F7X8s38w2jTISaxYRItChAMv8trufMy0DwOUiNbbUO
+	a3tTE+u0Uq8c/lx5wZiBn6tTPBOz2gE=
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
+ [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-443-sNIJ1uJCOZeKYNZfQExIDA-1; Fri, 03 Mar 2023 03:31:45 -0500
-X-MC-Unique: sNIJ1uJCOZeKYNZfQExIDA-1
-Received: by mail-pj1-f71.google.com with SMTP id o17-20020a17090ab89100b0023752c22f38so900825pjr.4
-        for <kvmarm@lists.linux.dev>; Fri, 03 Mar 2023 00:31:45 -0800 (PST)
+ us-mta-608-AYlI8IMzOP-ltqJ87pTTpA-1; Fri, 03 Mar 2023 04:02:34 -0500
+X-MC-Unique: AYlI8IMzOP-ltqJ87pTTpA-1
+Received: by mail-pl1-f198.google.com with SMTP id s15-20020a170902ea0f00b0019d0c7a83dfso1097944plg.14
+        for <kvmarm@lists.linux.dev>; Fri, 03 Mar 2023 01:02:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677832304;
+        d=1e100.net; s=20210112; t=1677834153;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2SrZLWyV+NYc4YhMPRe6Q+B4hTIUE14K9ia6BF1JotM=;
-        b=j+60mmX6MceX0o1wnruCDQKywRESq4JeRvbMDaNSJnd92waTe0d2lJ2QR06cb4m982
-         4ihlkbOzP7egNN80feeqRSC+5eae6AnUutr1EdCRKkwjiFr+L3rZKiuzoHo9URpH4dzp
-         v7mG7m5cxIR9nv6UcbJrz7cp3cYYMvvVmH2U1uWpqQCWScv/oCmGMsLSP3E5Yy2PHons
-         fi5Q5T4ueoPxMtSHEk1WWasA60qxqnoNbTIyLmi/ELfIx52IFo6NhGnevHlyzDBh64W8
-         Y2NPRfJotAoV80paA/7Qak4+99XbSDkBTgJAKsjUapAFcKoGb2DOy9NAitLDnezLAKmv
-         ouxg==
-X-Gm-Message-State: AO0yUKX0snNRQg1pIg/VBBcEEZTlhkbxwONcEwQZOtmgjYY0kKm0DRSL
-	pNFbUYCwC7iXZJCk8ilt0rsUholMonQXL4tLdHF86e/qk17jI4sj/7S8SHp02N8MmUMf50uwepW
-	IrBBWvZlLwmcwNUIW
-X-Received: by 2002:a17:902:7e88:b0:199:3f82:ef62 with SMTP id z8-20020a1709027e8800b001993f82ef62mr1448534pla.5.1677832304565;
-        Fri, 03 Mar 2023 00:31:44 -0800 (PST)
-X-Google-Smtp-Source: AK7set+noydgc9x8s/21QA/vZv2xFCtbXxkuyBc46PbxyI9Cty9lK5XgchBr474ufrFDJ+AxnrA8Pg==
-X-Received: by 2002:a17:902:7e88:b0:199:3f82:ef62 with SMTP id z8-20020a1709027e8800b001993f82ef62mr1448509pla.5.1677832304185;
-        Fri, 03 Mar 2023 00:31:44 -0800 (PST)
+        bh=zVx7liUtAHi9MlgajvxM1lPoJHO/9CA0IPkpax0IClE=;
+        b=8J7xs+/y0jhSpO6cJy3U+8RApzrVrKXOsqZtv7VFNPTYJi7aTxJvskRxgRNZ2Vh7v+
+         jgp4LEq3z8yMSooeNxBEJlBuhdBjGCZVk2/06FafHWbeQOmppS/fp9xclJDID3KRzv3F
+         jIxAoxPI0WJ1fD8TOKiik2rpKnYZbprsKxQk55ULjbHPBlGWFeMzR+HmuYhPvDnOdbji
+         /VMSiD6wcxnFlb4N49/aN8KRN/qe5OCu0V3rQ80GlHa3qMeGNQLJwekk0M87Ton3oNOU
+         hqR/kw3COHGa+qXCtmLp0YvheX1EBRRUhQBYFq2RjEhFBb2SfoTPwx8QmVto852ij/gN
+         AsAg==
+X-Gm-Message-State: AO0yUKX1Po2ZXLZNKPLYrL/PNY4FmNOIbWP6i2li2jSgv1grKchAAoi5
+	69eENXiqrYqXom2QlUnfAsmhKNV/qL37NffQwPCMuJDdPt8RRnobeO4Mswmw9KAyh4CgoaFwZAy
+	99waQm4t1j9+4nExK
+X-Received: by 2002:a05:6a20:4423:b0:cb:92d1:12fa with SMTP id ce35-20020a056a20442300b000cb92d112famr1914501pzb.5.1677834153652;
+        Fri, 03 Mar 2023 01:02:33 -0800 (PST)
+X-Google-Smtp-Source: AK7set+5f8FlHxnZmYaBGFOuhT0DGa9DRRHob6U6wIAnDZR5WSytvfvwZtYXLu8siMeoQ0u9unftjQ==
+X-Received: by 2002:a05:6a20:4423:b0:cb:92d1:12fa with SMTP id ce35-20020a056a20442300b000cb92d112famr1914477pzb.5.1677834153361;
+        Fri, 03 Mar 2023 01:02:33 -0800 (PST)
 Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id y15-20020a17090322cf00b0019a95baaaa6sm936351plg.222.2023.03.03.00.31.38
+        by smtp.gmail.com with ESMTPSA id e18-20020a62aa12000000b00593cd0f37dcsm1058769pff.169.2023.03.03.01.02.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Mar 2023 00:31:43 -0800 (PST)
-Message-ID: <268bae0d-4398-7137-b106-a779fb0904ca@redhat.com>
-Date: Fri, 3 Mar 2023 16:31:36 +0800
+        Fri, 03 Mar 2023 01:02:32 -0800 (PST)
+Message-ID: <55728b43-0d03-50e3-f76d-85fc9caacc59@redhat.com>
+Date: Fri, 3 Mar 2023 17:02:25 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,197 +54,143 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.8.0
-Subject: Re: [PATCH v5 02/12] KVM: arm64: Rename free_unlinked to free_removed
+Subject: Re: [PATCH v5 03/12] KVM: arm64: Add helper for creating unlinked
+ stage2 subtrees
 To: Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
  maz@kernel.org, oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
  catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
  alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com,
  gshan@redhat.com, reijiw@google.com, rananta@google.com, bgardon@google.com,
- ricarkol@gmail.com, Oliver Upton <oliver.upton@linux.dev>
+ ricarkol@gmail.com
 References: <20230301210928.565562-1-ricarkol@google.com>
- <20230301210928.565562-3-ricarkol@google.com>
+ <20230301210928.565562-4-ricarkol@google.com>
 From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230301210928.565562-3-ricarkol@google.com>
+In-Reply-To: <20230301210928.565562-4-ricarkol@google.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Ricardo,
 
-May be replace the patch name from:
-KVM: arm64: Rename free_unlinked to free_removed
-to
-KVM: arm64: Rename free_removed to free_unlinked
-
-is the right description for this patch?
-
-But in fact, it has no affect to me.
 
 On 3/2/23 05:09, Ricardo Koller wrote:
-> Normalize on referring to tables outside of an active paging structure
-> as 'unlinked'.
+> Add a stage2 helper, kvm_pgtable_stage2_create_unlinked(), for
+> creating unlinked tables (which is the opposite of
+> kvm_pgtable_stage2_free_unlinked()).  Creating an unlinked table is
+> useful for splitting PMD and PUD blocks into subtrees of PAGE_SIZE
+> PTEs.  For example, a PUD can be split into PAGE_SIZE PTEs by first
+> creating a fully populated tree, and then use it to replace the PUD in
+> a single step.  This will be used in a subsequent commit for eager
+> huge-page splitting (a dirty-logging optimization).
 > 
-> A subsequent change to KVM will add support for building page tables
-> that are not part of an active paging structure. The existing
-> 'removed_table' terminology is quite clunky when applied in this
-> context.
-> 
-> No functional change intended.
+> No functional change intended. This new function will be used in a
+> subsequent commit.
 > 
 > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-
-The patch itself LGTM.
-
 Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-
-Thanks,
-
 > ---
->   arch/arm64/include/asm/kvm_pgtable.h  |  8 ++++----
->   arch/arm64/kvm/hyp/nvhe/mem_protect.c |  6 +++---
->   arch/arm64/kvm/hyp/pgtable.c          |  6 +++---
->   arch/arm64/kvm/mmu.c                  | 10 +++++-----
->   4 files changed, 15 insertions(+), 15 deletions(-)
+>   arch/arm64/include/asm/kvm_pgtable.h | 28 +++++++++++++++++
+>   arch/arm64/kvm/hyp/pgtable.c         | 46 ++++++++++++++++++++++++++++
+>   2 files changed, 74 insertions(+)
 > 
 > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 252b651f743d..dcd3aafd3e6c 100644
+> index dcd3aafd3e6c..2b98357a5497 100644
 > --- a/arch/arm64/include/asm/kvm_pgtable.h
 > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -99,7 +99,7 @@ static inline bool kvm_level_supports_block_mapping(u32 level)
->    *				allocation is physically contiguous.
->    * @free_pages_exact:		Free an exact number of memory pages previously
->    *				allocated by zalloc_pages_exact.
-> - * @free_removed_table:		Free a removed paging structure by unlinking and
-> + * @free_unlinked_table:	Free an unlinked paging structure by unlinking and
->    *				dropping references.
->    * @get_page:			Increment the refcount on a page.
->    * @put_page:			Decrement the refcount on a page. When the
-> @@ -119,7 +119,7 @@ struct kvm_pgtable_mm_ops {
->   	void*		(*zalloc_page)(void *arg);
->   	void*		(*zalloc_pages_exact)(size_t size);
->   	void		(*free_pages_exact)(void *addr, size_t size);
-> -	void		(*free_removed_table)(void *addr, u32 level);
-> +	void		(*free_unlinked_table)(void *addr, u32 level);
->   	void		(*get_page)(void *addr);
->   	void		(*put_page)(void *addr);
->   	int		(*page_count)(void *addr);
-> @@ -450,7 +450,7 @@ int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
->   void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
->   
->   /**
-> - * kvm_pgtable_stage2_free_removed() - Free a removed stage-2 paging structure.
-> + * kvm_pgtable_stage2_free_unlinked() - Free an unlinked stage-2 paging structure.
->    * @mm_ops:	Memory management callbacks.
->    * @pgtable:	Unlinked stage-2 paging structure to be freed.
->    * @level:	Level of the stage-2 paging structure to be freed.
-> @@ -458,7 +458,7 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
->    * The page-table is assumed to be unreachable by any hardware walkers prior to
->    * freeing and therefore no TLB invalidation is performed.
+> @@ -460,6 +460,34 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
 >    */
-> -void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
-> +void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
+>   void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
 >   
+> +/**
+> + * kvm_pgtable_stage2_create_unlinked() - Create an unlinked stage-2 paging structure.
+> + * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
+> + * @phys:	Physical address of the memory to map.
+> + * @level:	Starting level of the stage-2 paging structure to be created.
+> + * @prot:	Permissions and attributes for the mapping.
+> + * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
+> + *		page-table pages.
+> + * @force_pte:  Force mappings to PAGE_SIZE granularity.
+> + *
+> + * Returns an unlinked page-table tree. If @force_pte is true or
+> + * @level is 2 (the PMD level), then the tree is mapped up to the
+> + * PAGE_SIZE leaf PTE; the tree is mapped up one level otherwise.
+> + * This new page-table tree is not reachable (i.e., it is unlinked)
+> + * from the root pgd and it's therefore unreachableby the hardware
+> + * page-table walker. No TLB invalidation or CMOs are performed.
+> + *
+> + * If device attributes are not explicitly requested in @prot, then the
+> + * mapping will be normal, cacheable.
+> + *
+> + * Return: The fully populated (unlinked) stage-2 paging structure, or
+> + * an ERR_PTR(error) on failure.
+> + */
+> +kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+> +					      u64 phys, u32 level,
+> +					      enum kvm_pgtable_prot prot,
+> +					      void *mc, bool force_pte);
+> +
 >   /**
 >    * kvm_pgtable_stage2_map() - Install a mapping in a guest stage-2 page-table.
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index 552653fa18be..b030170d803b 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -91,9 +91,9 @@ static void host_s2_put_page(void *addr)
->   	hyp_put_page(&host_s2_pool, addr);
->   }
->   
-> -static void host_s2_free_removed_table(void *addr, u32 level)
-> +static void host_s2_free_unlinked_table(void *addr, u32 level)
->   {
-> -	kvm_pgtable_stage2_free_removed(&host_mmu.mm_ops, addr, level);
-> +	kvm_pgtable_stage2_free_unlinked(&host_mmu.mm_ops, addr, level);
->   }
->   
->   static int prepare_s2_pool(void *pgt_pool_base)
-> @@ -110,7 +110,7 @@ static int prepare_s2_pool(void *pgt_pool_base)
->   	host_mmu.mm_ops = (struct kvm_pgtable_mm_ops) {
->   		.zalloc_pages_exact = host_s2_zalloc_pages_exact,
->   		.zalloc_page = host_s2_zalloc_page,
-> -		.free_removed_table = host_s2_free_removed_table,
-> +		.free_unlinked_table = host_s2_free_unlinked_table,
->   		.phys_to_virt = hyp_phys_to_virt,
->   		.virt_to_phys = hyp_virt_to_phys,
->   		.page_count = hyp_page_count,
+>    * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
 > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index e093e222daf3..0a5ef9288371 100644
+> index 0a5ef9288371..3554b74e13c6 100644
 > --- a/arch/arm64/kvm/hyp/pgtable.c
 > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -841,7 +841,7 @@ static int stage2_map_walk_table_pre(const struct kvm_pgtable_visit_ctx *ctx,
->   	if (ret)
->   		return ret;
->   
-> -	mm_ops->free_removed_table(childp, ctx->level);
-> +	mm_ops->free_unlinked_table(childp, ctx->level);
->   	return 0;
+> @@ -1181,6 +1181,52 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
+>   	return kvm_pgtable_walk(pgt, addr, size, &walker);
 >   }
 >   
-> @@ -886,7 +886,7 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
->    * The TABLE_PRE callback runs for table entries on the way down, looking
->    * for table entries which we could conceivably replace with a block entry
->    * for this mapping. If it finds one it replaces the entry and calls
-> - * kvm_pgtable_mm_ops::free_removed_table() to tear down the detached table.
-> + * kvm_pgtable_mm_ops::free_unlinked_table() to tear down the detached table.
->    *
->    * Otherwise, the LEAF callback performs the mapping at the existing leaves
->    * instead.
-> @@ -1250,7 +1250,7 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
->   	pgt->pgd = NULL;
->   }
+> +kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+> +					      u64 phys, u32 level,
+> +					      enum kvm_pgtable_prot prot,
+> +					      void *mc, bool force_pte)
+> +{
+> +	struct stage2_map_data map_data = {
+> +		.phys		= phys,
+> +		.mmu		= pgt->mmu,
+> +		.memcache	= mc,
+> +		.force_pte	= force_pte,
+> +	};
+> +	struct kvm_pgtable_walker walker = {
+> +		.cb		= stage2_map_walker,
+> +		.flags		= KVM_PGTABLE_WALK_LEAF |
+> +				  KVM_PGTABLE_WALK_SKIP_BBM |
+> +				  KVM_PGTABLE_WALK_SKIP_CMO,
+> +		.arg		= &map_data,
+> +	};
+> +	/* .addr (the IPA) is irrelevant for an unlinked table */
+> +	struct kvm_pgtable_walk_data data = {
+> +		.walker	= &walker,
+> +		.addr	= 0,
+> +		.end	= kvm_granule_size(level),
+> +	};
+> +	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
+> +	kvm_pte_t *pgtable;
+> +	int ret;
+> +
+> +	ret = stage2_set_prot_attr(pgt, prot, &map_data.attr);
+> +	if (ret)
+> +		return ERR_PTR(ret);
+> +
+> +	pgtable = mm_ops->zalloc_page(mc);
+> +	if (!pgtable)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	ret = __kvm_pgtable_walk(&data, mm_ops, (kvm_pteref_t)pgtable,
+> +				 level + 1);
+> +	if (ret) {
+> +		kvm_pgtable_stage2_free_unlinked(mm_ops, pgtable, level);
+> +		mm_ops->put_page(pgtable);
+> +		return ERR_PTR(ret);
+> +	}
+> +
+> +	return pgtable;
+> +}
 >   
-> -void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level)
-> +void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level)
->   {
->   	kvm_pteref_t ptep = (kvm_pteref_t)pgtable;
->   	struct kvm_pgtable_walker walker = {
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index a3ee3b605c9b..9bd3c2cfb476 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -130,21 +130,21 @@ static void kvm_s2_free_pages_exact(void *virt, size_t size)
->   
->   static struct kvm_pgtable_mm_ops kvm_s2_mm_ops;
->   
-> -static void stage2_free_removed_table_rcu_cb(struct rcu_head *head)
-> +static void stage2_free_unlinked_table_rcu_cb(struct rcu_head *head)
->   {
->   	struct page *page = container_of(head, struct page, rcu_head);
->   	void *pgtable = page_to_virt(page);
->   	u32 level = page_private(page);
->   
-> -	kvm_pgtable_stage2_free_removed(&kvm_s2_mm_ops, pgtable, level);
-> +	kvm_pgtable_stage2_free_unlinked(&kvm_s2_mm_ops, pgtable, level);
->   }
->   
-> -static void stage2_free_removed_table(void *addr, u32 level)
-> +static void stage2_free_unlinked_table(void *addr, u32 level)
->   {
->   	struct page *page = virt_to_page(addr);
->   
->   	set_page_private(page, (unsigned long)level);
-> -	call_rcu(&page->rcu_head, stage2_free_removed_table_rcu_cb);
-> +	call_rcu(&page->rcu_head, stage2_free_unlinked_table_rcu_cb);
->   }
->   
->   static void kvm_host_get_page(void *addr)
-> @@ -681,7 +681,7 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
->   	.zalloc_page		= stage2_memcache_zalloc_page,
->   	.zalloc_pages_exact	= kvm_s2_zalloc_pages_exact,
->   	.free_pages_exact	= kvm_s2_free_pages_exact,
-> -	.free_removed_table	= stage2_free_removed_table,
-> +	.free_unlinked_table	= stage2_free_unlinked_table,
->   	.get_page		= kvm_host_get_page,
->   	.put_page		= kvm_s2_put_page,
->   	.page_count		= kvm_host_page_count,
+>   int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+>   			      struct kvm_pgtable_mm_ops *mm_ops,
 
 -- 
 Shaoqin
