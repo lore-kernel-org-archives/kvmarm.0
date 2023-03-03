@@ -1,136 +1,291 @@
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4504D46AA
-	for <kvmarm@lists.linux.dev>; Fri,  3 Mar 2023 13:57:29 +0000 (UTC)
-Received: by mail-wr1-f47.google.com with SMTP id v16so2406661wrn.0
-        for <kvmarm@lists.linux.dev>; Fri, 03 Mar 2023 05:57:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1677851847;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hrHDSk+aKQWG+5fv3AwNWB+cSl2suAJ8jLnBdEelixg=;
-        b=wA0JLwiXTgP78aOg9Fy3S212QN3lFzf2xs0OkU4uR31gq+5+VXY70j7NEr2MI0kFNV
-         aw799C8JRza89IaPD0o+Fs2abJDPkOBqyXasvRBRxd0f6rMlI8Ny5gNw1NpOpezNqLzA
-         B0l375Z2imh4lIC0h9fvMZ8LoX3n6XaSES2/wj2PeCobmWfQDNYS7Y4kUyvxPWNYMgjW
-         eWayThJDFs4mFcKfGpAJIXj/g+NjvilR1orOgShnTKWoprXtrzv95Jnv9y+vBN5qqvq8
-         Hx4zUOADzcq/Z9tx/fvFnlSCgniS4bsZmRdSEGN3H+bIIgSPkYfifD4O5vUULy29Mjzm
-         gtQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677851847;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hrHDSk+aKQWG+5fv3AwNWB+cSl2suAJ8jLnBdEelixg=;
-        b=3ARM8wM2eRmAajQ+ly21txxdT8MwfyaV3kKiaacFVyFfmdiYi3o7c+X1mslKT68Fe8
-         In34JsrOYg5Dfb1iZIizQjFHbFJo5LznqqPDcfe2vbWuibMQQEtgz10C8isVDtTjEBE9
-         LqSkVU0n031DY7NCO5NrpMRF4GeFMyIx2th/Qk5ILrn4hfCvgn9+DXEJkr8nIHbB526E
-         YW4JuRSM2NHb/29XoUY9rXl+uYFrAwfxxeiQcxF/DLYQPolwSOy83DLUTCWc9X2NjHEx
-         3rq6QJ78+JN3L6bDWLQ5OBWtsq0qY1Lkmf9+vq22yZBJWw1Zc+1ynA7Q5YAPDivXPf3C
-         jV+g==
-X-Gm-Message-State: AO0yUKVOWXlajXRTXi1+jHALFxtccbNeeNN2xARABtuXHimX0zcBIIZ8
-	euvf+3SXOxJir5I0BrU3rYKOqA==
-X-Google-Smtp-Source: AK7set8CZLbAGLTlPG82iW3Ddrry4HX/pR8GcNB6glVvipnsuFTiB+l0Sif0R9izgtavLnk1COykyA==
-X-Received: by 2002:a5d:6545:0:b0:2c7:cc8:782c with SMTP id z5-20020a5d6545000000b002c70cc8782cmr4300861wrv.1.1677851847356;
-        Fri, 03 Mar 2023 05:57:27 -0800 (PST)
-Received: from myrica (054592b0.skybroadband.com. [5.69.146.176])
-        by smtp.gmail.com with ESMTPSA id j6-20020a05600c42c600b003eb192787bfsm2445486wme.25.2023.03.03.05.57.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Mar 2023 05:57:26 -0800 (PST)
-Date: Fri, 3 Mar 2023 13:57:27 +0000
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Jean-Philippe Brucker <jpb@kernel.org>,
-	Itaru Kitayama <itaru.kitayama@gmail.com>,
-	linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, James Morse <james.morse@arm.com>,
-	Joey Gouly <Joey.Gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Quentin Perret <qperret@google.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Steven Price <steven.price@arm.com>, Thomas Huth <thuth@redhat.com>,
-	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
-	kvmarm@lists.cs.columbia.edu
-Subject: Re: [RFC] Support for Arm CCA VMs on Linux
-Message-ID: <20230303135727.GA473581@myrica>
-References: <Y9PtKJ3Wicc19JF1@myrica>
- <CANW9uyud8RTkqgiL=64wV712QMxtAyubqeyCJ0vpcADJ42VqJA@mail.gmail.com>
- <Y/8Y3WLmiw6+Z5AS@myrica>
- <CANW9uysnvGCwANu+_6dp9+3rvHGOkThT9d0K2qpQV4exdmYWoA@mail.gmail.com>
- <20230303094618.GC361458@myrica>
- <1c91b777-982e-e71a-4829-51744e9555c5@arm.com>
- <20230303113905.GD361458@myrica>
- <20230303120800.ahtyc6et77ig4s27@orel>
- <2418536c-2658-18d6-f70c-c1af5adaa816@arm.com>
- <875ybi0ytc.fsf@redhat.com>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A0EF46AA;
+	Fri,  3 Mar 2023 14:05:01 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9033C143D;
+	Fri,  3 Mar 2023 06:05:43 -0800 (PST)
+Received: from [10.1.39.22] (e122027.cambridge.arm.com [10.1.39.22])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CC74E3F93E;
+	Fri,  3 Mar 2023 06:04:57 -0800 (PST)
+Message-ID: <10be86c3-96ac-399f-850d-2ceaace22e24@arm.com>
+Date: Fri, 3 Mar 2023 14:04:56 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <875ybi0ytc.fsf@redhat.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [RFC PATCH 09/28] arm64: RME: RTT handling
+To: Zhi Wang <zhi.wang.linux@gmail.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev
+References: <20230127112248.136810-1-suzuki.poulose@arm.com>
+ <20230127112932.38045-1-steven.price@arm.com>
+ <20230127112932.38045-10-steven.price@arm.com>
+ <20230213194421.00005f7b@gmail.com>
+Content-Language: en-GB
+From: Steven Price <steven.price@arm.com>
+In-Reply-To: <20230213194421.00005f7b@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 03, 2023 at 02:06:07PM +0100, Cornelia Huck wrote:
-> On Fri, Mar 03 2023, Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+On 13/02/2023 17:44, Zhi Wang wrote:
+> On Fri, 27 Jan 2023 11:29:13 +0000
+> Steven Price <steven.price@arm.com> wrote:
 > 
-> > On 03/03/2023 12:08, Andrew Jones wrote:
-> >> On Fri, Mar 03, 2023 at 11:39:05AM +0000, Jean-Philippe Brucker wrote:
-> >>> On Fri, Mar 03, 2023 at 09:54:47AM +0000, Suzuki K Poulose wrote:
-> >>>> On 03/03/2023 09:46, Jean-Philippe Brucker wrote:
-> >>>>> On Thu, Mar 02, 2023 at 07:12:24AM +0900, Itaru Kitayama wrote:
-> >>>>>>>> I've tried your series in Real on CCA Host, but the KVM arch init
-> >>>>>>>> emits an Invalid argument error and terminates.
-> >>>>>
-> >>>>> This was the KVM_SET_ONE_REG for the SVE vector size. During my tests I
-> >>>>> didn't enable SVE in the host but shrinkwrap enables more options.
-> >>>>
-> >>>> Does the Qemu check for SVE capability on /dev/kvm ? For kvmtool, we
-> >>>> changed to using the VM instance and that would prevent using SVE,
-> >>>> until the RMM supports it.
-> >>>
-> >>> Yes, QEMU does check the SVE cap on /dev/kvm. I can propose changing it or
-> >>> complementing it with a VM check in my next version, it seems to work
-> >>> (though I need to double-check the VM fd lifetime). Same goes for
-> >>> KVM_CAP_STEAL_TIME, which I need to disable explicitly at the moment.
-> >> 
-> >> I'm probably missing something since I haven't looked at this, but I'm
-> >> wondering what the "VM instance" check is and why it should be necessary.
-> >
-> > Userspace can check for a KVM_CAP_ on KVM fd (/dev/kvm) or a VM fd
-> > (returned via KVM_CREATE_VM).
-> >
-> >> Shouldn't KVM only expose capabilities which it can provide? I.e. the
-> >
-> > Correct, given now that we have different "types" of VMs possible on
-> > Arm64, (Normal vs Realm vs pVM), the capabilities of each of these
-> > could be different and thus we should use the KVM_CAP_ on the VM fd (
-> > referred to VM instance above) and not the generic KVM fd.
+>> The RMM owns the stage 2 page tables for a realm, and KVM must request
+>> that the RMM creates/destroys entries as necessary. The physical pages
+>> to store the page tables are delegated to the realm as required, and can
+>> be undelegated when no longer used.
+>>
 > 
-> Using the vm ioctl is even encouraged in the doc for
-> KVM_CHECK_EXTENSION:
-> 
-> "Based on their initialization different VMs may have different capabilities.
-> It is thus encouraged to use the vm ioctl to query for capabilities"
-> 
-> It would probably make sense to convert QEMU to use the vm ioctl
-> everywhere (the wrapper falls back to the global version on failure
-> anyway.)
+> This is only an introduction to RTT handling. While this patch is mostly like
+> RTT teardown, better add more introduction to this patch. Also maybe refine
+> the tittle to reflect what this patch is actually doing.
 
-Indeed, I'll see if I can come up with something generic, thanks for the
-pointer
+You've a definite point that this patch is mostly about RTT teardown.
+Technically it also adds the RTT creation path (realm_rtt_create) -
+hence the generic patch title.
+
+But I'll definitely expand the commit message to mention the complexity
+of tear down which is the bulk of the patch.
+
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>>  arch/arm64/include/asm/kvm_rme.h |  19 +++++
+>>  arch/arm64/kvm/mmu.c             |   7 +-
+>>  arch/arm64/kvm/rme.c             | 139 +++++++++++++++++++++++++++++++
+>>  3 files changed, 162 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
+>> index a6318af3ed11..eea5118dfa8a 100644
+>> --- a/arch/arm64/include/asm/kvm_rme.h
+>> +++ b/arch/arm64/include/asm/kvm_rme.h
+>> @@ -35,5 +35,24 @@ u32 kvm_realm_ipa_limit(void);
+>>  int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
+>>  int kvm_init_realm_vm(struct kvm *kvm);
+>>  void kvm_destroy_realm(struct kvm *kvm);
+>> +void kvm_realm_destroy_rtts(struct realm *realm, u32 ia_bits, u32 start_level);
+>> +
+>> +#define RME_RTT_BLOCK_LEVEL	2
+>> +#define RME_RTT_MAX_LEVEL	3
+>> +
+>> +#define RME_PAGE_SHIFT		12
+>> +#define RME_PAGE_SIZE		BIT(RME_PAGE_SHIFT)
+>> +/* See ARM64_HW_PGTABLE_LEVEL_SHIFT() */
+>> +#define RME_RTT_LEVEL_SHIFT(l)	\
+>> +	((RME_PAGE_SHIFT - 3) * (4 - (l)) + 3)
+>> +#define RME_L2_BLOCK_SIZE	BIT(RME_RTT_LEVEL_SHIFT(2))
+>> +
+>> +static inline unsigned long rme_rtt_level_mapsize(int level)
+>> +{
+>> +	if (WARN_ON(level > RME_RTT_MAX_LEVEL))
+>> +		return RME_PAGE_SIZE;
+>> +
+>> +	return (1UL << RME_RTT_LEVEL_SHIFT(level));
+>> +}
+>>  
+>>  #endif
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index 22c00274884a..f29558c5dcbc 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -834,16 +834,17 @@ void stage2_unmap_vm(struct kvm *kvm)
+>>  void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+>>  {
+>>  	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+>> -	struct kvm_pgtable *pgt = NULL;
+>> +	struct kvm_pgtable *pgt;
+>>  
+>>  	write_lock(&kvm->mmu_lock);
+>> +	pgt = mmu->pgt;
+>>  	if (kvm_is_realm(kvm) &&
+>>  	    kvm_realm_state(kvm) != REALM_STATE_DYING) {
+>> -		/* TODO: teardown rtts */
+>>  		write_unlock(&kvm->mmu_lock);
+>> +		kvm_realm_destroy_rtts(&kvm->arch.realm, pgt->ia_bits,
+>> +				       pgt->start_level);
+>>  		return;
+>>  	}
+>> -	pgt = mmu->pgt;
+>>  	if (pgt) {
+>>  		mmu->pgd_phys = 0;
+>>  		mmu->pgt = NULL;
+>> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+>> index 0c9d70e4d9e6..f7b0e5a779f8 100644
+>> --- a/arch/arm64/kvm/rme.c
+>> +++ b/arch/arm64/kvm/rme.c
+>> @@ -73,6 +73,28 @@ static int rmi_check_version(void)
+>>  	return 0;
+>>  }
+>>  
+>> +static void realm_destroy_undelegate_range(struct realm *realm,
+>> +					   unsigned long ipa,
+>> +					   unsigned long addr,
+>> +					   ssize_t size)
+>> +{
+>> +	unsigned long rd = virt_to_phys(realm->rd);
+>> +	int ret;
+>> +
+>> +	while (size > 0) {
+>> +		ret = rmi_data_destroy(rd, ipa);
+>> +		WARN_ON(ret);
+>> +		ret = rmi_granule_undelegate(addr);
+>> +
+> As the return value is not documented, what will happen if a page undelegate
+> failed? Leaked? Some explanation is required here.
+
+Yes - it's leaked. I'll add a comment to explain the get_page() call.
 
 Thanks,
-Jean
+
+Steve
+
+>> +		if (ret)
+>> +			get_page(phys_to_page(addr));
+>> +
+>> +		addr += PAGE_SIZE;
+>> +		ipa += PAGE_SIZE;
+>> +		size -= PAGE_SIZE;
+>> +	}
+>> +}
+>> +
+>>  static unsigned long create_realm_feat_reg0(struct kvm *kvm)
+>>  {
+>>  	unsigned long ia_bits = VTCR_EL2_IPA(kvm->arch.vtcr);
+>> @@ -170,6 +192,123 @@ static int realm_create_rd(struct kvm *kvm)
+>>  	return r;
+>>  }
+>>  
+>> +static int realm_rtt_destroy(struct realm *realm, unsigned long addr,
+>> +			     int level, phys_addr_t rtt_granule)
+>> +{
+>> +	addr = ALIGN_DOWN(addr, rme_rtt_level_mapsize(level - 1));
+>> +	return rmi_rtt_destroy(rtt_granule, virt_to_phys(realm->rd), addr,
+>> +			level);
+>> +}
+>> +
+>> +static int realm_destroy_free_rtt(struct realm *realm, unsigned long addr,
+>> +				  int level, phys_addr_t rtt_granule)
+>> +{
+>> +	if (realm_rtt_destroy(realm, addr, level, rtt_granule))
+>> +		return -ENXIO;
+>> +	if (!WARN_ON(rmi_granule_undelegate(rtt_granule)))
+>> +		put_page(phys_to_page(rtt_granule));
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int realm_rtt_create(struct realm *realm,
+>> +			    unsigned long addr,
+>> +			    int level,
+>> +			    phys_addr_t phys)
+>> +{
+>> +	addr = ALIGN_DOWN(addr, rme_rtt_level_mapsize(level - 1));
+>> +	return rmi_rtt_create(phys, virt_to_phys(realm->rd), addr, level);
+>> +}
+>> +
+>> +static int realm_tear_down_rtt_range(struct realm *realm, int level,
+>> +				     unsigned long start, unsigned long end)
+>> +{
+>> +	phys_addr_t rd = virt_to_phys(realm->rd);
+>> +	ssize_t map_size = rme_rtt_level_mapsize(level);
+>> +	unsigned long addr, next_addr;
+>> +	bool failed = false;
+>> +
+>> +	for (addr = start; addr < end; addr = next_addr) {
+>> +		phys_addr_t rtt_addr, tmp_rtt;
+>> +		struct rtt_entry rtt;
+>> +		unsigned long end_addr;
+>> +
+>> +		next_addr = ALIGN(addr + 1, map_size);
+>> +
+>> +		end_addr = min(next_addr, end);
+>> +
+>> +		if (rmi_rtt_read_entry(rd, ALIGN_DOWN(addr, map_size),
+>> +				       level, &rtt)) {
+>> +			failed = true;
+>> +			continue;
+>> +		}
+>> +
+>> +		rtt_addr = rmi_rtt_get_phys(&rtt);
+>> +		WARN_ON(level != rtt.walk_level);
+>> +
+>> +		switch (rtt.state) {
+>> +		case RMI_UNASSIGNED:
+>> +		case RMI_DESTROYED:
+>> +			break;
+>> +		case RMI_TABLE:
+>> +			if (realm_tear_down_rtt_range(realm, level + 1,
+>> +						      addr, end_addr)) {
+>> +				failed = true;
+>> +				break;
+>> +			}
+>> +			if (IS_ALIGNED(addr, map_size) &&
+>> +			    next_addr <= end &&
+>> +			    realm_destroy_free_rtt(realm, addr, level + 1,
+>> +						   rtt_addr))
+>> +				failed = true;
+>> +			break;
+>> +		case RMI_ASSIGNED:
+>> +			WARN_ON(!rtt_addr);
+>> +			/*
+>> +			 * If there is a block mapping, break it now, using the
+>> +			 * spare_page. We are sure to have a valid delegated
+>> +			 * page at spare_page before we enter here, otherwise
+>> +			 * WARN once, which will be followed by further
+>> +			 * warnings.
+>> +			 */
+>> +			tmp_rtt = realm->spare_page;
+>> +			if (level == 2 &&
+>> +			    !WARN_ON_ONCE(tmp_rtt == PHYS_ADDR_MAX) &&
+>> +			    realm_rtt_create(realm, addr,
+>> +					     RME_RTT_MAX_LEVEL, tmp_rtt)) {
+>> +				WARN_ON(1);
+>> +				failed = true;
+>> +				break;
+>> +			}
+>> +			realm_destroy_undelegate_range(realm, addr,
+>> +						       rtt_addr, map_size);
+>> +			/*
+>> +			 * Collapse the last level table and make the spare page
+>> +			 * reusable again.
+>> +			 */
+>> +			if (level == 2 &&
+>> +			    realm_rtt_destroy(realm, addr, RME_RTT_MAX_LEVEL,
+>> +					      tmp_rtt))
+>> +				failed = true;
+>> +			break;
+>> +		case RMI_VALID_NS:
+>> +			WARN_ON(rmi_rtt_unmap_unprotected(rd, addr, level));
+>> +			break;
+>> +		default:
+>> +			WARN_ON(1);
+>> +			failed = true;
+>> +			break;
+>> +		}
+>> +	}
+>> +
+>> +	return failed ? -EINVAL : 0;
+>> +}
+>> +
+>> +void kvm_realm_destroy_rtts(struct realm *realm, u32 ia_bits, u32 start_level)
+>> +{
+>> +	realm_tear_down_rtt_range(realm, start_level, 0, (1UL << ia_bits));
+>> +}
+>> +
+>>  /* Protects access to rme_vmid_bitmap */
+>>  static DEFINE_SPINLOCK(rme_vmid_lock);
+>>  static unsigned long *rme_vmid_bitmap;
+> 
+
