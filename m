@@ -1,448 +1,486 @@
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6F323AD;
-	Sat,  4 Mar 2023 12:47:03 +0000 (UTC)
-Received: by mail-lf1-f45.google.com with SMTP id t11so6968167lfr.1;
-        Sat, 04 Mar 2023 04:47:03 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58E6C28F7
+	for <kvmarm@lists.linux.dev>; Sat,  4 Mar 2023 20:28:47 +0000 (UTC)
+Received: by mail-pf1-f174.google.com with SMTP id c4so3563714pfl.0
+        for <kvmarm@lists.linux.dev>; Sat, 04 Mar 2023 12:28:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1677934021;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=google.com; s=20210112; t=1677961727;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CGQomQGP8gUIFgdugwowmOox1MmHnesjQBkCqLWksRM=;
-        b=dHzm9O4VkASpiuDbOvlSccF8yHnbOCjrDOjyvsYo1anVtDYPjaJOKRKZsxGf9a1fFa
-         8MYWKyxotKvrMEBFX5zS8YBZ0tTjwEWakxJdz52vVS+NxV7WbN7fu6xEzNQFNmhz96rm
-         n4W+cSV4FqQGCjl6GlxFVh2yjK9lmcqWXw931PQ0OdY3I1EvnkGie4GqlLmIf2q+TKSK
-         wGa1SISNympr02Ca9CUt25RAx1PlGCrp3LP6zH1Dm8YVEP3SPHa1FR5K0y39VmFUv5lD
-         JhRA8nnZElhrCtZQAHTowrTYyBuM7gMt+M/sZuTZc9uFG/yJFN6u5H/HyzX/Qy/K+6L9
-         tJBQ==
+        bh=n6XnGfZ3Kb9963SPPqrDJB0yg+2sAvV1RW90nBYUsNQ=;
+        b=XGPE7+iCfQw+GkoAkRLTGnfWoTqSO3hK16UKEw6JMRHBR/7P7f/N5Rz63ByGVE1EIY
+         TEVO+h787UE2sQoUnwk+ceTawM09N+C+bKLNOZEuVZqaYni1ltd+1MgHPTe6UheGDEhT
+         7wDARDUpX5Wd+ulVw23bhOgUpgsO0CsatCWphaDLCBKjCqCFgGneNT6YSHr2ZxJabv17
+         aYUVSBAAesjfVQNsvYk1Gtu/MGTwWdY2iatK4Lu5eetZyyG8ga/zpYDWdevjiheoDwYM
+         pdgh2rNf/kpDlHcb+yj3UxS+LpbVbHwXxCLr2kGbvAKOavmel3N2fvVEYAGxZRGOn+ui
+         pUuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677934021;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20210112; t=1677961727;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CGQomQGP8gUIFgdugwowmOox1MmHnesjQBkCqLWksRM=;
-        b=EQZuo6A+KKMCM14dGumHu6M97IFwIJ04bHLpmQlBYYqE84HlngRztJMlG3BeZUXbsW
-         cYAmI1LVTHjPaxqbmPLDE/cEAC2/UDIRX/4z0NYZo5qQj9AnN6gYEKcq2aRI6jU4voRA
-         zliETqDXbGuPnXrWm53AQesn2oYr4MFES3zTlZiYMkcEzn/s3iYDYB/IaKZcVjKaqUEj
-         kfgmvL78hxUW1PLIXUoSZphPDfToOnwpYuw0GmbjVr/DsDxqs1IGKjsSld8nQ81mu9N8
-         bNJm4zt/lhd0bQ/x2YVic5S+/4qRtySqWv/j25JANgydDAv2pNrERsvzNmGiU+nqeikX
-         RxUw==
-X-Gm-Message-State: AO0yUKWE8oBc1GNHgym7/xOvYL22Cf3wDm6DN1V7+UgGqvI55KRA4IqH
-	aF5KYErrF3XT0b1gL2I5A3U=
-X-Google-Smtp-Source: AK7set+hS/8v9f/jNHJ8kVJSVqI3kGGejHK2Qe1wVAfe8VrTKYWpMoYhtUdQ6R3KaDoaFnB/D7jNig==
-X-Received: by 2002:a05:6512:102b:b0:4b5:a7c7:9dc4 with SMTP id r11-20020a056512102b00b004b5a7c79dc4mr1410071lfr.3.1677934021324;
-        Sat, 04 Mar 2023 04:47:01 -0800 (PST)
-Received: from localhost (88-113-32-99.elisa-laajakaista.fi. [88.113.32.99])
-        by smtp.gmail.com with ESMTPSA id i22-20020a056512007600b004cb08ec4c30sm816000lfo.99.2023.03.04.04.46.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 Mar 2023 04:47:01 -0800 (PST)
-Date: Sat, 4 Mar 2023 14:46:57 +0200
-From: Zhi Wang <zhi.wang.linux@gmail.com>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Catalin Marinas
- <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon
- <will@kernel.org>, James Morse <james.morse@arm.com>, Oliver Upton
- <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, Alexandru
- Elisei <alexandru.elisei@arm.com>, Christoffer Dall
- <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev
-Subject: Re: [RFC PATCH 10/28] arm64: RME: Allocate/free RECs to match vCPUs
-Message-ID: <20230304144657.0000528a@gmail.com>
-In-Reply-To: <e4306163-e972-f8b0-d7ce-87f1777d4958@arm.com>
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
-	<20230127112932.38045-1-steven.price@arm.com>
-	<20230127112932.38045-11-steven.price@arm.com>
-	<20230213200857.00007575@gmail.com>
-	<e4306163-e972-f8b0-d7ce-87f1777d4958@arm.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        bh=n6XnGfZ3Kb9963SPPqrDJB0yg+2sAvV1RW90nBYUsNQ=;
+        b=Kll1Q4vrJVVHSgB1u9oqM4/lYE9VDvomsRAUAePob26ojOc7GP/jLpItzqEkWsw+zc
+         rjwVpb7KcRecWb7jgWluBDqzwThOKOF5DpotRmYl3cjTnCbM2FJCvFIVsa22G3sVzOyR
+         y1G4lrS9rOIbc9gWYUKcXNtmQmt8MrtDZGZx/FvuGK06klgcP9Gtdkt2n08htpaOFQBs
+         yc0UOgj49hYOf9G6Pt2qAQn+R1KjnIBYIIJXr7mpyU/o7Jceflcdpti9UoD+0DNAUOb0
+         RhNlRN7ZpoFp7KqZ284r7dw5dbau1W/VwYIo7mV0p0hj2nu9pFNqDD2KtwLx20TXpgvh
+         yPHg==
+X-Gm-Message-State: AO0yUKVlfcxjCqdDiSzmxd1dpA2DKTp7z2OqTpazLLJomlkee+4o4mk2
+	T1JbKl+qzcvwYXzKggHrEdzYlN/01KwHXlqxV5uwvg==
+X-Google-Smtp-Source: AK7set/01iy81PQUrASN7xzWQxpHDXBsU0RwzyMYtPI3/3MAoORVAKLFtqdY9QJDgfSYJGpdy5vbsRWDZVZ0ZsyJbSM=
+X-Received: by 2002:a63:7d03:0:b0:503:a268:b81e with SMTP id
+ y3-20020a637d03000000b00503a268b81emr1913781pgc.5.1677961726488; Sat, 04 Mar
+ 2023 12:28:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20230215010717.3612794-1-rananta@google.com> <20230215010717.3612794-10-rananta@google.com>
+In-Reply-To: <20230215010717.3612794-10-rananta@google.com>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Sat, 4 Mar 2023 12:28:30 -0800
+Message-ID: <CAAeT=FwEPrJq7o4mRa-tMP2NgwkOR+5WjvjzwToG9-2PTBUZjg@mail.gmail.com>
+Subject: Re: [REPOST PATCH 09/16] selftests: KVM: aarch64: Add KVM PMU event
+ filter test
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Ricardo Koller <ricarkol@google.com>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jing Zhang <jingzhangos@google.com>, Colton Lewis <coltonlewis@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 3 Mar 2023 14:05:02 +0000
-Steven Price <steven.price@arm.com> wrote:
+Hi Raghu,
 
-> On 13/02/2023 18:08, Zhi Wang wrote:
-> > On Fri, 27 Jan 2023 11:29:14 +0000
-> > Steven Price <steven.price@arm.com> wrote:
-> > 
-> >> The RMM maintains a data structure known as the Realm Execution Context
-> >> (or REC). It is similar to struct kvm_vcpu and tracks the state of the
-> >> virtual CPUs. KVM must delegate memory and request the structures are
-> >> created when vCPUs are created, and suitably tear down on destruction.
-> >>
-> > 
-> > It would be better to leave some pointers to the spec here. It really saves
-> > time for reviewers. /
-> 
-> Fair enough. I wasn't sure how often to repeat the link to the spec, but
-> a few more times wouldn't hurt ;)
+On Tue, Feb 14, 2023 at 5:07=E2=80=AFPM Raghavendra Rao Ananta
+<rananta@google.com> wrote:
+>
+> Add tests to validate KVM's KVM_ARM_VCPU_PMU_V3_FILTER
+> attribute by applying a series of filters to allow or
+> deny events from the userspace. Validation is done by
+> the guest in a way that it should be able to count
+> only the events that are allowed.
+>
+> The workload to execute a precise number of instructions
+> (execute_precise_instrs() and precise_instrs_loop()) is taken
+> from the kvm-unit-tests' arm/pmu.c.
+>
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  .../testing/selftests/kvm/aarch64/vpmu_test.c | 261 +++++++++++++++++-
+>  1 file changed, 258 insertions(+), 3 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_test.c b/tools/test=
+ing/selftests/kvm/aarch64/vpmu_test.c
+> index 2b3a4fa3afa9c..3dfb770b538e9 100644
+> --- a/tools/testing/selftests/kvm/aarch64/vpmu_test.c
+> +++ b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
+> @@ -2,12 +2,21 @@
+>  /*
+>   * vpmu_test - Test the vPMU
+>   *
+> - * Copyright (c) 2022 Google LLC.
+> + * The test suit contains a series of checks to validate the vPMU
+> + * functionality. This test runs only when KVM_CAP_ARM_PMU_V3 is
+> + * supported on the host. The tests include:
+>   *
+> - * This test checks if the guest can see the same number of the PMU even=
+t
+> + * 1. Check if the guest can see the same number of the PMU event
+>   * counters (PMCR_EL0.N) that userspace sets, if the guest can access
+>   * those counters, and if the guest cannot access any other counters.
+> - * This test runs only when KVM_CAP_ARM_PMU_V3 is supported on the host.
+> + *
+> + * 2. Test the functionality of KVM's KVM_ARM_VCPU_PMU_V3_FILTER
+> + * attribute by applying a series of filters in various combinations
+> + * of allowing or denying the events. The guest validates it by
+> + * checking if it's able to count only the events that are allowed.
+> + *
+> + * Copyright (c) 2022 Google LLC.
+> + *
+>   */
+>  #include <kvm_util.h>
+>  #include <processor.h>
+> @@ -230,6 +239,12 @@ struct pmc_accessor pmc_accessors[] =3D {
+>
+>  #define MAX_EVENT_FILTERS_PER_VM 10
+>
+> +#define EVENT_ALLOW(ev) \
+> +       {.base_event =3D ev, .nevents =3D 1, .action =3D KVM_PMU_EVENT_AL=
+LOW}
+> +
+> +#define EVENT_DENY(ev) \
+> +       {.base_event =3D ev, .nevents =3D 1, .action =3D KVM_PMU_EVENT_DE=
+NY}
+> +
+>  #define INVALID_EC     (-1ul)
+>  uint64_t expected_ec =3D INVALID_EC;
+>  uint64_t op_end_addr;
+> @@ -243,11 +258,13 @@ struct vpmu_vm {
+>
+>  enum test_stage {
+>         TEST_STAGE_COUNTER_ACCESS =3D 1,
+> +       TEST_STAGE_KVM_EVENT_FILTER,
+>  };
+>
+>  struct guest_data {
+>         enum test_stage test_stage;
+>         uint64_t expected_pmcr_n;
+> +       unsigned long *pmu_filter;
+>  };
+>
+>  static struct guest_data guest_data;
+> @@ -329,6 +346,113 @@ static bool pmu_event_is_supported(uint64_t event)
+>                 GUEST_ASSERT_3(!(_tval & mask), _tval, mask, set_expected=
+);\
+>  }
+>
+> +
+> +/*
+> + * Extra instructions inserted by the compiler would be difficult to com=
+pensate
+> + * for, so hand assemble everything between, and including, the PMCR acc=
+esses
+> + * to start and stop counting. isb instructions are inserted to make sur=
+e
+> + * pmccntr read after this function returns the exact instructions execu=
+ted
+> + * in the controlled block. Total instrs =3D isb + nop + 2*loop =3D 2 + =
+2*loop.
+> + */
+> +static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+> +{
+> +       uint64_t pmcr64 =3D pmcr;
+> +
+> +       asm volatile(
+> +       "       msr     pmcr_el0, %[pmcr]\n"
+> +       "       isb\n"
+> +       "1:     subs    %w[loop], %w[loop], #1\n"
+> +       "       b.gt    1b\n"
+> +       "       nop\n"
+> +       "       msr     pmcr_el0, xzr\n"
+> +       "       isb\n"
+> +       : [loop] "+r" (loop)
+> +       : [pmcr] "r" (pmcr64)
+> +       : "cc");
+> +}
+> +
+> +/*
+> + * Execute a known number of guest instructions. Only even instruction c=
+ounts
+> + * greater than or equal to 4 are supported by the in-line assembly code=
+. The
+> + * control register (PMCR_EL0) is initialized with the provided value (a=
+llowing
+> + * for example for the cycle counter or event counters to be reset). At =
+the end
+> + * of the exact instruction loop, zero is written to PMCR_EL0 to disable
+> + * counting, allowing the cycle counter or event counters to be read at =
+the
+> + * leisure of the calling code.
+> + */
+> +static void execute_precise_instrs(int num, uint32_t pmcr)
+> +{
+> +       int loop =3D (num - 2) / 2;
+> +
+> +       GUEST_ASSERT_2(num >=3D 4 && ((num - 2) % 2 =3D=3D 0), num, loop)=
+;
+> +       precise_instrs_loop(loop, pmcr);
+> +}
+> +
+> +static void test_instructions_count(int pmc_idx, bool expect_count)
+> +{
+> +       int i;
+> +       struct pmc_accessor *acc;
+> +       uint64_t cnt;
+> +       int instrs_count =3D 100;
+> +
+> +       enable_counter(pmc_idx);
+> +
+> +       /* Test the event using all the possible way to configure the eve=
+nt */
+> +       for (i =3D 0; i < ARRAY_SIZE(pmc_accessors); i++) {
+> +               acc =3D &pmc_accessors[i];
+> +
+> +               pmu_disable_reset();
+> +
+> +               acc->write_typer(pmc_idx, ARMV8_PMUV3_PERFCTR_INST_RETIRE=
+D);
+> +
+> +               /* Enable the PMU and execute precisely number of instruc=
+tions as a workload */
+> +               execute_precise_instrs(instrs_count, read_sysreg(pmcr_el0=
+) | ARMV8_PMU_PMCR_E);
+> +
+> +               /* If a count is expected, the counter should be increase=
+d by 'instrs_count' */
+> +               cnt =3D acc->read_cntr(pmc_idx);
+> +               GUEST_ASSERT_4(expect_count =3D=3D (cnt =3D=3D instrs_cou=
+nt),
+> +                               i, expect_count, cnt, instrs_count);
+> +       }
+> +
+> +       disable_counter(pmc_idx);
+> +}
+> +
+> +static void test_cycles_count(bool expect_count)
+> +{
+> +       uint64_t cnt;
+> +
+> +       pmu_enable();
+> +       reset_cycle_counter();
+> +
+> +       /* Count cycles in EL0 and EL1 */
+> +       write_pmccfiltr(0);
+> +       enable_cycle_counter();
+> +
+> +       cnt =3D read_cycle_counter();
+> +
+> +       /*
+> +        * If a count is expected by the test, the cycle counter should b=
+e increased by
+> +        * at least 1, as there is at least one instruction between enabl=
+ing the
+> +        * counter and reading the counter.
+> +        */
+> +       GUEST_ASSERT_2(expect_count =3D=3D (cnt > 0), cnt, expect_count);
+> +
+> +       disable_cycle_counter();
 
-Based on my review experience, the right time would be when a new concept is
-first on the table.
+It would be nicer to also test using a generic PMC with
+ARMV8_PMUV3_PERFCTR_CPU_CYCLES (not just with a cycle counter),
+as the filter should be applied to both.
 
-For example, the concept REC appears in this patch series for the first time, it
-would be nice to have following things in the comments:
+> +       pmu_disable_reset();
+> +}
+> +
+> +static void test_event_count(uint64_t event, int pmc_idx, bool expect_co=
+unt)
+> +{
+> +       switch (event) {
+> +       case ARMV8_PMUV3_PERFCTR_INST_RETIRED:
+> +               test_instructions_count(pmc_idx, expect_count);
+> +               break;
+> +       case ARMV8_PMUV3_PERFCTR_CPU_CYCLES:
+> +               test_cycles_count(expect_count);
+> +               break;
+> +       }
+> +}
+> +
+>  /*
+>   * Check if @mask bits in {PMCNTEN,PMINTEN,PMOVS}{SET,CLR} registers
+>   * are set or cleared as specified in @set_expected.
+> @@ -532,12 +656,37 @@ static void guest_counter_access_test(uint64_t expe=
+cted_pmcr_n)
+>         }
+>  }
+>
+> +static void guest_event_filter_test(unsigned long *pmu_filter)
+> +{
+> +       uint64_t event;
+> +
+> +       /*
+> +        * Check if PMCEIDx_EL0 is advertized as configured by the usersp=
+ace.
+> +        * It's possible that even though the userspace allowed it, it ma=
+y not be supported
+> +        * by the hardware and could be advertized as 'disabled'. Hence, =
+only validate against
+> +        * the events that are advertized.
 
-1) Basic summary of the concept. Several sentences help people to understand
-what it is, what it is used for, what/when it is required (mostly this would be
-helpful on denoting the interaction with existing flows), and then eventually how
-it will interact with the existing flows. It would be good enough for people who
-don't have time to dig the concept itself but want to review the interaction flow
-with the component they are familiar with or the area they are working on. 
+How about checking events that are supported by the hardware
+initially (without setting the event filter) ?
+Then, we can test if events that userspace tried to hide are
+not exposed to guests correctly.
 
-2) A simple sentence to show the spec name and chapter name would be good
-enough for people who would like to dig it. It is also a nice timing to educate
-people who are interested in the detail of the tech concept.
+Can we also add a case for events that we can test both upper
+32bits and lower 32 bits of both of PMCEID{0,1}_EL0 registers ?
+(pmu_event_is_supported() needs to be fixed as well)
 
-> 
-> >> Signed-off-by: Steven Price <steven.price@arm.com>
-> >> ---
-> >>  arch/arm64/include/asm/kvm_emulate.h |   2 +
-> >>  arch/arm64/include/asm/kvm_host.h    |   3 +
-> >>  arch/arm64/include/asm/kvm_rme.h     |  10 ++
-> >>  arch/arm64/kvm/arm.c                 |   1 +
-> >>  arch/arm64/kvm/reset.c               |  11 ++
-> >>  arch/arm64/kvm/rme.c                 | 144 +++++++++++++++++++++++++++
-> >>  6 files changed, 171 insertions(+)
-> >>
-> >> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> >> index 5a2b7229e83f..285e62914ca4 100644
-> >> --- a/arch/arm64/include/asm/kvm_emulate.h
-> >> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> >> @@ -504,6 +504,8 @@ static inline enum realm_state kvm_realm_state(struct kvm *kvm)
-> >>  
-> >>  static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
-> >>  {
-> >> +	if (static_branch_unlikely(&kvm_rme_is_available))
-> >> +		return vcpu->arch.rec.mpidr != INVALID_HWID;
-> >>  	return false;
-> >>  }
-> >>  
-> >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> >> index 04347c3a8c6b..ef497b718cdb 100644
-> >> --- a/arch/arm64/include/asm/kvm_host.h
-> >> +++ b/arch/arm64/include/asm/kvm_host.h
-> >> @@ -505,6 +505,9 @@ struct kvm_vcpu_arch {
-> >>  		u64 last_steal;
-> >>  		gpa_t base;
-> >>  	} steal;
-> >> +
-> >> +	/* Realm meta data */
-> >> +	struct rec rec;
-> > 
-> > I think the name of the data structure "rec" needs a prefix, it is too common
-> > and might conflict with the private data structures in the other modules. Maybe
-> > rme_rec or realm_rec?
-> 
-> struct realm_rec seems like a good choice. I agree 'rec' without context
-> is somewhat ambiguous.
-> 
-> >>  };
-> >>  
-> >>  /*
-> >> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
-> >> index eea5118dfa8a..4b219ebe1400 100644
-> >> --- a/arch/arm64/include/asm/kvm_rme.h
-> >> +++ b/arch/arm64/include/asm/kvm_rme.h
-> >> @@ -6,6 +6,7 @@
-> >>  #ifndef __ASM_KVM_RME_H
-> >>  #define __ASM_KVM_RME_H
-> >>  
-> >> +#include <asm/rmi_smc.h>
-> >>  #include <uapi/linux/kvm.h>
-> >>  
-> >>  enum realm_state {
-> >> @@ -29,6 +30,13 @@ struct realm {
-> >>  	unsigned int ia_bits;
-> >>  };
-> >>  
-> >> +struct rec {
-> >> +	unsigned long mpidr;
-> >> +	void *rec_page;
-> >> +	struct page *aux_pages[REC_PARAMS_AUX_GRANULES];
-> >> +	struct rec_run *run;
-> >> +};
-> >> +
-> > 
-> > It is better to leave some comments for above members or pointers to the spec,
-> > that saves a lot of time for review.
-> 
-> Will add comments.
-> 
-> >>  int kvm_init_rme(void);
-> >>  u32 kvm_realm_ipa_limit(void);
-> >>  
-> >> @@ -36,6 +44,8 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
-> >>  int kvm_init_realm_vm(struct kvm *kvm);
-> >>  void kvm_destroy_realm(struct kvm *kvm);
-> >>  void kvm_realm_destroy_rtts(struct realm *realm, u32 ia_bits, u32 start_level);
-> >> +int kvm_create_rec(struct kvm_vcpu *vcpu);
-> >> +void kvm_destroy_rec(struct kvm_vcpu *vcpu);
-> >>  
-> >>  #define RME_RTT_BLOCK_LEVEL	2
-> >>  #define RME_RTT_MAX_LEVEL	3
-> >> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> >> index badd775547b8..52affed2f3cf 100644
-> >> --- a/arch/arm64/kvm/arm.c
-> >> +++ b/arch/arm64/kvm/arm.c
-> >> @@ -373,6 +373,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-> >>  	/* Force users to call KVM_ARM_VCPU_INIT */
-> >>  	vcpu->arch.target = -1;
-> >>  	bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
-> >> +	vcpu->arch.rec.mpidr = INVALID_HWID;
-> >>  
-> >>  	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
-> >>  
-> >> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> >> index 9e71d69e051f..0c84392a4bf2 100644
-> >> --- a/arch/arm64/kvm/reset.c
-> >> +++ b/arch/arm64/kvm/reset.c
-> >> @@ -135,6 +135,11 @@ int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature)
-> >>  			return -EPERM;
-> >>  
-> >>  		return kvm_vcpu_finalize_sve(vcpu);
-> >> +	case KVM_ARM_VCPU_REC:
-> >> +		if (!kvm_is_realm(vcpu->kvm))
-> >> +			return -EINVAL;
-> >> +
-> >> +		return kvm_create_rec(vcpu);
-> >>  	}
-> >>  
-> >>  	return -EINVAL;
-> >> @@ -145,6 +150,11 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu)
-> >>  	if (vcpu_has_sve(vcpu) && !kvm_arm_vcpu_sve_finalized(vcpu))
-> >>  		return false;
-> >>  
-> >> +	if (kvm_is_realm(vcpu->kvm) &&
-> >> +	    !(vcpu_is_rec(vcpu) &&
-> >> +	      READ_ONCE(vcpu->kvm->arch.realm.state) == REALM_STATE_ACTIVE))
-> >> +		return false;
-> > 
-> > That's why it is better to introduce the realm state in the previous patches so
-> > that people can really get the idea of the states at this stage.
-> > 
-> >> +
-> >>  	return true;
-> >>  }
-> >>  
-> >> @@ -157,6 +167,7 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
-> >>  	if (sve_state)
-> >>  		kvm_unshare_hyp(sve_state, sve_state + vcpu_sve_state_size(vcpu));
-> >>  	kfree(sve_state);
-> >> +	kvm_destroy_rec(vcpu);
-> >>  }
-> >>  
-> >>  static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
-> >> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> >> index f7b0e5a779f8..d79ed889ca4d 100644
-> >> --- a/arch/arm64/kvm/rme.c
-> >> +++ b/arch/arm64/kvm/rme.c
-> >> @@ -514,6 +514,150 @@ void kvm_destroy_realm(struct kvm *kvm)
-> >>  	kvm_free_stage2_pgd(&kvm->arch.mmu);
-> >>  }
-> >>  
-> >> +static void free_rec_aux(struct page **aux_pages,
-> >> +			 unsigned int num_aux)
-> >> +{
-> >> +	unsigned int i;
-> >> +
-> >> +	for (i = 0; i < num_aux; i++) {
-> >> +		phys_addr_t aux_page_phys = page_to_phys(aux_pages[i]);
-> >> +
-> >> +		if (WARN_ON(rmi_granule_undelegate(aux_page_phys)))
-> >> +			continue;
-> >> +
-> >> +		__free_page(aux_pages[i]);
-> >> +	}
-> >> +}
-> >> +
-> >> +static int alloc_rec_aux(struct page **aux_pages,
-> >> +			 u64 *aux_phys_pages,
-> >> +			 unsigned int num_aux)
-> >> +{
-> >> +	int ret;
-> >> +	unsigned int i;
-> >> +
-> >> +	for (i = 0; i < num_aux; i++) {
-> >> +		struct page *aux_page;
-> >> +		phys_addr_t aux_page_phys;
-> >> +
-> >> +		aux_page = alloc_page(GFP_KERNEL);
-> >> +		if (!aux_page) {
-> >> +			ret = -ENOMEM;
-> >> +			goto out_err;
-> >> +		}
-> >> +		aux_page_phys = page_to_phys(aux_page);
-> >> +		if (rmi_granule_delegate(aux_page_phys)) {
-> >> +			__free_page(aux_page);
-> >> +			ret = -ENXIO;
-> >> +			goto out_err;
-> >> +		}
-> >> +		aux_pages[i] = aux_page;
-> >> +		aux_phys_pages[i] = aux_page_phys;
-> >> +	}
-> >> +
-> >> +	return 0;
-> >> +out_err:
-> >> +	free_rec_aux(aux_pages, i);
-> >> +	return ret;
-> >> +}
-> >> +
-> >> +int kvm_create_rec(struct kvm_vcpu *vcpu)
-> >> +{
-> >> +	struct user_pt_regs *vcpu_regs = vcpu_gp_regs(vcpu);
-> >> +	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
-> >> +	struct realm *realm = &vcpu->kvm->arch.realm;
-> >> +	struct rec *rec = &vcpu->arch.rec;
-> >> +	unsigned long rec_page_phys;
-> >> +	struct rec_params *params;
-> >> +	int r, i;
-> >> +
-> >> +	if (kvm_realm_state(vcpu->kvm) != REALM_STATE_NEW)
-> >> +		return -ENOENT;
-> >> +
-> >> +	/*
-> >> +	 * The RMM will report PSCI v1.0 to Realms and the KVM_ARM_VCPU_PSCI_0_2
-> >> +	 * flag covers v0.2 and onwards.
-> >> +	 */
-> >> +	if (!test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features))
-> >> +		return -EINVAL;
-> >> +
-> >> +	BUILD_BUG_ON(sizeof(*params) > PAGE_SIZE);
-> >> +	BUILD_BUG_ON(sizeof(*rec->run) > PAGE_SIZE);
-> >> +
-> >> +	params = (struct rec_params *)get_zeroed_page(GFP_KERNEL);
-> >> +	rec->rec_page = (void *)__get_free_page(GFP_KERNEL);
-> >> +	rec->run = (void *)get_zeroed_page(GFP_KERNEL);
-> >> +	if (!params || !rec->rec_page || !rec->run) {
-> >> +		r = -ENOMEM;
-> >> +		goto out_free_pages;
-> >> +	}
-> >> +
-> >> +	for (i = 0; i < ARRAY_SIZE(params->gprs); i++)
-> >> +		params->gprs[i] = vcpu_regs->regs[i];
-> >> +
-> >> +	params->pc = vcpu_regs->pc;
-> >> +
-> >> +	if (vcpu->vcpu_id == 0)
-> >> +		params->flags |= REC_PARAMS_FLAG_RUNNABLE;
-> >> +
-> >> +	rec_page_phys = virt_to_phys(rec->rec_page);
-> >> +
-> >> +	if (rmi_granule_delegate(rec_page_phys)) {
-> >> +		r = -ENXIO;
-> >> +		goto out_free_pages;
-> >> +	}
-> >> +
-> > 
-> > Wouldn't it be better to extend the alloc_rec_aux() to allocate and delegate
-> > pages above? so that you can same some gfps and rmi_granuale_delegates().
-> 
-> I don't think it's really an improvement. There's only the one
-> rmi_granule_delegate() call (for the REC page itself). The RecParams and
-> RecRun pages are not delegated because they are shared with the host. It
-> would also hide the structure setup within the new
-> alloc_rec_aux_and_rec() function.
-> 
 
-It should make it clearer.
 
-I was thinking if it would be nice to abstract alloc + delegated as a common
-function, then alloc_rec_aux() and kvm_realm_rec() can be its common user.
+> +        *
+> +        * Furthermore, check if the event is in fact counting if enabled=
+, or vice-versa.
+> +        */
+> +       for (event =3D 0; event < ARMV8_PMU_MAX_EVENTS - 1; event++) {
+> +               if (pmu_event_is_supported(event)) {
+> +                       GUEST_ASSERT_1(test_bit(event, pmu_filter), event=
+);
+> +                       test_event_count(event, 0, true);
+> +               } else {
+> +                       test_event_count(event, 0, false);
+> +               }
+> +       }
+> +}
+> +
+>  static void guest_code(void)
+>  {
+>         switch (guest_data.test_stage) {
+>         case TEST_STAGE_COUNTER_ACCESS:
+>                 guest_counter_access_test(guest_data.expected_pmcr_n);
+>                 break;
+> +       case TEST_STAGE_KVM_EVENT_FILTER:
+> +               guest_event_filter_test(guest_data.pmu_filter);
+> +               break;
+>         default:
+>                 GUEST_ASSERT_1(0, guest_data.test_stage);
+>         }
 
-> >> +	r = alloc_rec_aux(rec->aux_pages, params->aux, realm->num_aux);
-> >> +	if (r)
-> >> +		goto out_undelegate_rmm_rec;
-> >> +
-> >> +	params->num_rec_aux = realm->num_aux;
-> >> +	params->mpidr = mpidr;
-> >> +
-> >> +	if (rmi_rec_create(rec_page_phys,
-> >> +			   virt_to_phys(realm->rd),
-> >> +			   virt_to_phys(params))) {
-> >> +		r = -ENXIO;
-> >> +		goto out_free_rec_aux;
-> >> +	}
-> >> +
-> >> +	rec->mpidr = mpidr;
-> >> +
-> >> +	free_page((unsigned long)params);
-> >> +	return 0;
-> >> +
-> >> +out_free_rec_aux:
-> >> +	free_rec_aux(rec->aux_pages, realm->num_aux);
-> >> +out_undelegate_rmm_rec:
-> >> +	if (WARN_ON(rmi_granule_undelegate(rec_page_phys)))
-> >> +		rec->rec_page = NULL;
-> >> +out_free_pages:
-> >> +	free_page((unsigned long)rec->run);
-> >> +	free_page((unsigned long)rec->rec_page);
-> >> +	free_page((unsigned long)params);
-> >> +	return r;
-> >> +}
-> >> +
-> >> +void kvm_destroy_rec(struct kvm_vcpu *vcpu)
-> >> +{
-> >> +	struct realm *realm = &vcpu->kvm->arch.realm;
-> >> +	struct rec *rec = &vcpu->arch.rec;
-> >> +	unsigned long rec_page_phys;
-> >> +
-> >> +	if (!vcpu_is_rec(vcpu))
-> >> +		return;
-> >> +
-> >> +	rec_page_phys = virt_to_phys(rec->rec_page);
-> >> +
-> >> +	if (WARN_ON(rmi_rec_destroy(rec_page_phys)))
-> >> +		return;
-> >> +	if (WARN_ON(rmi_granule_undelegate(rec_page_phys)))
-> >> +		return;
-> >> +
-> > 
-> > The two returns above feels off. What is the reason to skip the below page
-> > undelegates?
-> 
-> The reason is the usual: if we fail to undelegate then the pages have to
-> be leaked. I'll add some comments. However it does look like I've got
-> the order wrong here, if the undelegate fails for rec_page_phys it's
-> possible that we might still be able to free the rec_aux pages (although
-> something has gone terribly wrong for that to be the case).
-> 
-> I'll change the order to:
-> 
->   /* If the REC destroy fails, leak all pages relating to the REC */
->   if (WARN_ON(rmi_rec_destroy(rec_page_phys)))
-> 	return;
-> 
->   free_rec_aux(rec->aux_pages, realm->num_aux);
-> 
->   /* If the undelegate fails then leak the REC page */
->   if (WARN_ON(rmi_granule_undelegate(rec_page_phys)))
-> 	return;
-> 
->   free_page((unsigned long)rec->rec_page);
-> 
-> If the rmi_rec_destroy() call has failed then the RMM should prevent the
-> undelegate so there's little point trying.
-> 
-> Steve
-> 
-> >> +	free_rec_aux(rec->aux_pages, realm->num_aux);
-> >> +	free_page((unsigned long)rec->rec_page);
-> >> +}
-> >> +
-> >>  int kvm_init_realm_vm(struct kvm *kvm)
-> >>  {
-> >>  	struct realm_params *params;
-> > 
-> 
+IMHO running a guest from a different guest_code_xxx might be more
+straightforward rather than controlling through the test_stage,
+as it appears each test 'stage' is a different test case rather than
+a test stage, and the test creates a new guest for each test 'stage'.
+I don't find any reason to share the guest_code for those test
+cases (Unless we are going to run some common guest codes for test
+cases in the following patches)
 
+
+> @@ -760,9 +909,115 @@ static void run_counter_access_tests(uint64_t pmcr_=
+n)
+>                 run_counter_access_error_test(i);
+>  }
+>
+> +static struct kvm_pmu_event_filter pmu_event_filters[][MAX_EVENT_FILTERS=
+_PER_VM] =3D {
+
+It looks like KVM_ARM_VCPU_PMU_V3_FILTER is always used with
+one entry in the filter (.nevents =3D=3D 1).
+Could we also test with .nevents > 1 ?
+
+> +       /*
+> +        * Each set of events denotes a filter configuration for that VM.
+> +        * During VM creation, the filters will be applied in the sequenc=
+e mentioned here.
+> +        */
+> +       {
+> +               EVENT_ALLOW(ARMV8_PMUV3_PERFCTR_INST_RETIRED),
+> +       },
+> +       {
+> +               EVENT_ALLOW(ARMV8_PMUV3_PERFCTR_INST_RETIRED),
+> +               EVENT_ALLOW(ARMV8_PMUV3_PERFCTR_CPU_CYCLES),
+> +       },
+> +       {
+> +               EVENT_ALLOW(ARMV8_PMUV3_PERFCTR_INST_RETIRED),
+> +               EVENT_ALLOW(ARMV8_PMUV3_PERFCTR_CPU_CYCLES),
+> +               EVENT_DENY(ARMV8_PMUV3_PERFCTR_INST_RETIRED),
+> +       },
+> +       {
+> +               EVENT_ALLOW(ARMV8_PMUV3_PERFCTR_INST_RETIRED),
+> +               EVENT_ALLOW(ARMV8_PMUV3_PERFCTR_CPU_CYCLES),
+> +               EVENT_DENY(ARMV8_PMUV3_PERFCTR_INST_RETIRED),
+> +               EVENT_DENY(ARMV8_PMUV3_PERFCTR_CPU_CYCLES),
+> +       },
+> +       {
+> +               EVENT_DENY(ARMV8_PMUV3_PERFCTR_INST_RETIRED),
+> +               EVENT_DENY(ARMV8_PMUV3_PERFCTR_CPU_CYCLES),
+> +               EVENT_ALLOW(ARMV8_PMUV3_PERFCTR_CPU_CYCLES),
+> +               EVENT_ALLOW(ARMV8_PMUV3_PERFCTR_INST_RETIRED),
+> +       },
+> +       {
+> +               EVENT_DENY(ARMV8_PMUV3_PERFCTR_INST_RETIRED),
+> +               EVENT_ALLOW(ARMV8_PMUV3_PERFCTR_CPU_CYCLES),
+> +               EVENT_ALLOW(ARMV8_PMUV3_PERFCTR_INST_RETIRED),
+> +       },
+> +       {
+> +               EVENT_DENY(ARMV8_PMUV3_PERFCTR_INST_RETIRED),
+> +               EVENT_DENY(ARMV8_PMUV3_PERFCTR_CPU_CYCLES),
+> +       },
+> +       {
+> +               EVENT_DENY(ARMV8_PMUV3_PERFCTR_INST_RETIRED),
+> +       },
+> +};
+> +
+> +static void run_kvm_event_filter_error_tests(void)
+> +{
+> +       int ret;
+> +       struct kvm_vm *vm;
+> +       struct kvm_vcpu *vcpu;
+> +       struct vpmu_vm *vpmu_vm;
+> +       struct kvm_vcpu_init init;
+> +       struct kvm_pmu_event_filter pmu_event_filter =3D EVENT_ALLOW(ARMV=
+8_PMUV3_PERFCTR_CPU_CYCLES);
+> +       struct kvm_device_attr filter_attr =3D {
+> +               .group =3D KVM_ARM_VCPU_PMU_V3_CTRL,
+> +               .attr =3D KVM_ARM_VCPU_PMU_V3_FILTER,
+> +               .addr =3D (uint64_t) &pmu_event_filter,
+> +       };
+> +
+> +       /* KVM should not allow configuring filters after the PMU is init=
+ialized */
+> +       vpmu_vm =3D create_vpmu_vm(guest_code, NULL);
+> +       ret =3D __vcpu_ioctl(vpmu_vm->vcpu, KVM_SET_DEVICE_ATTR, &filter_=
+attr);
+> +       TEST_ASSERT(ret =3D=3D -1 && errno =3D=3D EBUSY,
+> +                       "Failed to disallow setting an event filter after=
+ PMU init");
+> +       destroy_vpmu_vm(vpmu_vm);
+> +
+> +       /* Check for invalid event filter setting */
+> +       vm =3D vm_create(1);
+> +       vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
+> +       init.features[0] |=3D (1 << KVM_ARM_VCPU_PMU_V3);
+> +       vcpu =3D aarch64_vcpu_add(vm, 0, &init, guest_code);
+> +
+> +       pmu_event_filter.base_event =3D UINT16_MAX;
+> +       pmu_event_filter.nevents =3D 5;
+> +       ret =3D __vcpu_ioctl(vcpu, KVM_SET_DEVICE_ATTR, &filter_attr);
+> +       TEST_ASSERT(ret =3D=3D -1 && errno =3D=3D EINVAL, "Failed check f=
+or invalid filter configuration");
+> +       kvm_vm_free(vm);
+> +}
+> +
+> +static void run_kvm_event_filter_test(void)
+> +{
+> +       int i;
+> +       struct vpmu_vm *vpmu_vm;
+> +       struct kvm_vm *vm;
+> +       vm_vaddr_t pmu_filter_gva;
+> +       size_t pmu_filter_bmap_sz =3D BITS_TO_LONGS(ARMV8_PMU_MAX_EVENTS)=
+ * sizeof(unsigned long);
+> +
+> +       guest_data.test_stage =3D TEST_STAGE_KVM_EVENT_FILTER;
+> +
+> +       /* Test for valid filter configurations */
+> +       for (i =3D 0; i < ARRAY_SIZE(pmu_event_filters); i++) {
+> +               vpmu_vm =3D create_vpmu_vm(guest_code, pmu_event_filters[=
+i]);
+> +               vm =3D vpmu_vm->vm;
+> +
+> +               pmu_filter_gva =3D vm_vaddr_alloc(vm, pmu_filter_bmap_sz,=
+ KVM_UTIL_MIN_VADDR);
+> +               memcpy(addr_gva2hva(vm, pmu_filter_gva), vpmu_vm->pmu_fil=
+ter, pmu_filter_bmap_sz);
+> +               guest_data.pmu_filter =3D (unsigned long *) pmu_filter_gv=
+a;
+> +
+> +               run_vcpu(vpmu_vm->vcpu);
+> +
+> +               destroy_vpmu_vm(vpmu_vm);
+> +       }
+> +
+> +       /* Check if KVM is handling the errors correctly */
+> +       run_kvm_event_filter_error_tests();
+> +}
+> +
+>  static void run_tests(uint64_t pmcr_n)
+>  {
+>         run_counter_access_tests(pmcr_n);
+> +       run_kvm_event_filter_test();
+>  }
+>
+>  /*
+> --
+> 2.39.1.581.gbfd45094c4-goog
+>
+
+Thank you,
+Reiji
