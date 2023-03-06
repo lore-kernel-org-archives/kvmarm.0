@@ -1,143 +1,89 @@
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A63BC53B8;
-	Mon,  6 Mar 2023 15:37:54 +0000 (UTC)
-Received: by mail-lf1-f43.google.com with SMTP id s20so13263768lfb.11;
-        Mon, 06 Mar 2023 07:37:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678117072;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5hDMsqcdGIfiCOVeyjU4Ba4iMqQn+GOWjCwhWYk6SdI=;
-        b=cg1/O1TWCoAT+12txvkiPpk8WOQTLsVbbyntUVywAm++PWVMzFM4JjQRWDOUOYRScg
-         pvFU352A9exDJyfmr6d8LqJgbi0luBH+enT3u31nc54Hmh05vWYHCkSSe7oGk7lmhxyE
-         gQSPcdZk5nGsoTod4x/9xM1gvrso7kjeMYYHWi2P08jqU+eAbw3oqFZsorHQ0S/CRtHA
-         d+foYcEAUnenuImuL8oP9UXM5FRNCKBTKRUghgv+c1d+jCyNJQcf5Z8sqJZPTHfcasad
-         gO4Za/039IiZBBKhDDxAJK9l/nUdtBwyQUaEdwEM3X27LHjxursB5jxdMGtDxQkwzSHu
-         Mqpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678117072;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5hDMsqcdGIfiCOVeyjU4Ba4iMqQn+GOWjCwhWYk6SdI=;
-        b=SmtJg5YyMJbMxQdWRowXnMsZMbp3hUJciy14qz7kC3UyQPBN03QyIwHJ+7ruxVXw3P
-         a3fDtUSPnkGinuDYt/GkShGNlo4tFFiJYDeYUqtcSv4kZttVMcJq/v8hKBOx2SbLNcGG
-         TPN82dFvx+7+LL1wyxMBVTZG4GKnA2I/wAzG36yGud+iX/g6buKQiJ9E9ZKNx5kbATtP
-         Zy7+aZiKzq5GgEFOHYfRPqFHC72lx2+QPqG8eQYHP9FC3wLZHhMo1FrwDsdAH+gNsDtO
-         pnFbHxijgOWojTzAOeSt37GAamaUkP6V3hejOMsrTzT4DpOEkxsY+g+c+qZ1xrcnckqQ
-         RSOA==
-X-Gm-Message-State: AO0yUKXFLwfHtQwu3daGD7r2kWSSaOjphW6C/XSb7RVw3iWPDMEpKE0M
-	fyWbPYhdsh/t+YfBsxNt80xU9B6G9VY=
-X-Google-Smtp-Source: AK7set/mMWXfBFsiLU1XkaTiImOSmqnWmfXifYoeEmJfJYsfZbSf6DihYHx9KRJq7C6ZcNvQWlxpEQ==
-X-Received: by 2002:a19:f011:0:b0:4cb:3a60:65c9 with SMTP id p17-20020a19f011000000b004cb3a6065c9mr2589865lfc.2.1678117072501;
-        Mon, 06 Mar 2023 07:37:52 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id g22-20020ac25396000000b004cb14fa604csm1680397lfh.262.2023.03.06.07.37.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Mar 2023 07:37:52 -0800 (PST)
-Date: Mon, 6 Mar 2023 17:37:51 +0200
-From: Zhi Wang <zhi.wang.linux@gmail.com>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Catalin Marinas
- <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon
- <will@kernel.org>, James Morse <james.morse@arm.com>, Oliver Upton
- <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, Alexandru
- Elisei <alexandru.elisei@arm.com>, Christoffer Dall
- <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev
-Subject: Re: [RFC PATCH 15/28] KVM: arm64: Handle realm MMIO emulation
-Message-ID: <20230306173751.000026d4@gmail.com>
-In-Reply-To: <20230127112932.38045-16-steven.price@arm.com>
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
-	<20230127112932.38045-1-steven.price@arm.com>
-	<20230127112932.38045-16-steven.price@arm.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E7553B8
+	for <kvmarm@lists.linux.dev>; Mon,  6 Mar 2023 16:14:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AE7BC433EF;
+	Mon,  6 Mar 2023 16:14:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1678119253;
+	bh=zl80OGxRqJtAQ1gF5I9FrcC87gG/BtqC9Nkj4+q+wig=;
+	h=From:Subject:Date:To:Cc:From;
+	b=V67xf/GzS4FQ7RzWrYj7MomZomg4mmn/qvwxFcKVXIeYQCTvFOnVOtzmDQL1nAoIq
+	 D3wC6dxFic8H7p4r/cg9a2ab9SKRChj4n7raGceUn00fohdDi81B1JVHcqCMHhlvyu
+	 IV43ZKsqEE8LUw288MooG8Hlmy69H+vJwTA0IF7Ve1ylRAXTSxwKm4U6qUC0hs5thU
+	 usKA4rz/MTiz1B67dlKkA5CD/ee1bOChWCMhusHm3Qmbomuxr+3pf53qza3JOBpC1E
+	 Y+KaBCFubZWKTgaD5wAsAW8pF4Rl6s8SCLiJ3We8yI1PrJIJ2sGdlEvyqA5xt890Tm
+	 sdlEcKEmXeZlg==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH 0/2] KVM: arm64: Support for per-guest fine grained traps
+ configuration
+Date: Mon, 06 Mar 2023 16:08:50 +0000
+Message-Id: <20230301-kvm-arm64-fgt-v1-0-cfdf71ac67dc@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABMQBmQC/x2NQQqEMAwAvyI5b6CtWsGvyB6qTTVIq6QiC+Lft
+ 3qcgWEuyCRMGfrqAqGTM2+pgP5UMC0uzYTsC4NRpla10rieEZ1E22CYD6TWe226xgbbQWlGlwl
+ HcWlanuqI+2N3ocC/9zJ87/sPGY/UMXUAAAA=
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ James Morse <james.morse@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org, 
+ kvmarm@lists.linux.dev, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.13-dev-bd1bf
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1608; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=zl80OGxRqJtAQ1gF5I9FrcC87gG/BtqC9Nkj4+q+wig=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBkBhFQcM68fPi2mI7+5AEZM8Pl5mjSNjSub/Vryzbc
+ Rw7UGuKJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZAYRUAAKCRAk1otyXVSH0NIYB/
+ 9/7LphRXXBYsdg8n33kkqmbzb2N8OiTkrIsxip2/wPcywL98ABfv+ynRLNoLK63TtST2iAaxusE5Ff
+ UVPHG5lcYzmHAyVCHmUma7JS8c/MR3No53DTmzHEKbQmzEOQucC/rEH50Z+nThYNICCr1XMrYIaNXY
+ LteFTD0szQU9UlyCzQPCgZbRsPYXpbiQ8CdVS+uzfeC2E5NyGdpmnYVkZcW7xSzLSb7I4HvlJyDmh2
+ HgjRnlV/5CDoCbWDlndA2a8XDD8C/d4MmEFV9xjlKEhNmcwpyzPmuWf2pZ8oAPDECz19aubU0ftilT
+ LcQe9lbHEgBRm6uA/8Ybmd3WNhGA3d
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-On Fri, 27 Jan 2023 11:29:19 +0000
-Steven Price <steven.price@arm.com> wrote:
+A number of upcoming features will require per guest configuration of
+the fine grained traps enabled in the guest.  At present the only
+management we do is for SME where we don't yet have guest support so we
+unconditionally enable the traps while guests are running but this will
+change going forward and at present the code isn't particularly
+scalable.  This series aims to make it easier to configure which traps
+are enabled for the guest by making the value set for the guest into
+configuration in the vCPU data which we can set up based on the chosen
+features rather than requiring conditional code in the trap enable and
+disable paths.
 
-> MMIO emulation for a realm cannot be done directly with the VM's
-> registers as they are protected from the host. However the RMM interface
-> provides a structure member for providing the read/written value and
+This will have no benefit until one of the features that requires
+configuration of these traps is merged but since there's a number of
+such features it seems useful to decide on an approach to handling traps
+for them which can be shared.
 
-More details would be better for helping the review. I can only see the
-emulated mmio value from the device model (kvmtool or kvm_io_bus) is put into
-the GPRS[0] of the RecEntry object. But the rest of the flow is missing.
+---
+Mark Brown (2):
+      arm64: Add feature detection for fine grained traps
+      KVM: arm64: Move FGT value configuration to vCPU state
 
-I guess RMM copies the value in the RecEntry.GPRS[0] to the target GPR in the
-guest context in RMI_REC_ENTER when seeing RMI_EMULATED_MMIO. This is for
-the guest MMIO read path.
+ arch/arm64/include/asm/kvm_emulate.h    | 12 ++++++++++++
+ arch/arm64/include/asm/kvm_host.h       |  6 ++++++
+ arch/arm64/kernel/cpufeature.c          | 11 +++++++++++
+ arch/arm64/kvm/arm.c                    |  1 +
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 31 +++++++++++++++----------------
+ arch/arm64/tools/cpucaps                |  1 +
+ 6 files changed, 46 insertions(+), 16 deletions(-)
+---
+base-commit: fe15c26ee26efa11741a7b632e9f23b01aca4cc6
+change-id: 20230301-kvm-arm64-fgt-e5dd12746f67
 
-How about the MMIO write path? I don't see where the RecExit.GPRS[0] is loaded
-to a varible and returned to the userspace.
-
-> we can transfer this to the appropriate VCPU's register entry and then
-> depend on the generic MMIO handling code in KVM.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->  arch/arm64/kvm/mmio.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
-> index 3dd38a151d2a..c4879fa3a8d3 100644
-> --- a/arch/arm64/kvm/mmio.c
-> +++ b/arch/arm64/kvm/mmio.c
-> @@ -6,6 +6,7 @@
->  
->  #include <linux/kvm_host.h>
->  #include <asm/kvm_emulate.h>
-> +#include <asm/rmi_smc.h>
->  #include <trace/events/kvm.h>
->  
->  #include "trace.h"
-> @@ -109,6 +110,9 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
->  			       &data);
->  		data = vcpu_data_host_to_guest(vcpu, data, len);
->  		vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
-> +
-> +		if (vcpu_is_rec(vcpu))
-> +			vcpu->arch.rec.run->entry.gprs[0] = data;
-
-I think the guest context is maintained by RMM (while KVM can only touch
-Rec{Entry, Exit} object) so that guest context in the legacy VHE mode is
-unused.
-
-If yes, I guess here is should be:
-
-if (unlikely(vcpu_is_rec(vcpu)))
-	vcpu->arch.rec.run->entry.gprs[0] = data;
-else
-	vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
-
->  	}
->  
->  	/*
-> @@ -179,6 +183,9 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
->  	run->mmio.len		= len;
->  	vcpu->mmio_needed	= 1;
->  
-> +	if (vcpu_is_rec(vcpu))
-> +		vcpu->arch.rec.run->entry.flags |= RMI_EMULATED_MMIO;
-> +
-
-Wouldn't it be better to set this in the kvm_handle_mmio_return where the MMIO
-read emulation has been surely successful?
-
->  	if (!ret) {
->  		/* We handled the access successfully in the kernel. */
->  		if (!is_write)
+Best regards,
+-- 
+Mark Brown <broonie@kernel.org>
 
