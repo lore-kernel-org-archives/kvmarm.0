@@ -1,25 +1,23 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E7553B8
-	for <kvmarm@lists.linux.dev>; Mon,  6 Mar 2023 16:14:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AE7BC433EF;
-	Mon,  6 Mar 2023 16:14:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 677A953B8
+	for <kvmarm@lists.linux.dev>; Mon,  6 Mar 2023 16:14:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBA02C433D2;
+	Mon,  6 Mar 2023 16:14:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1678119253;
-	bh=zl80OGxRqJtAQ1gF5I9FrcC87gG/BtqC9Nkj4+q+wig=;
-	h=From:Subject:Date:To:Cc:From;
-	b=V67xf/GzS4FQ7RzWrYj7MomZomg4mmn/qvwxFcKVXIeYQCTvFOnVOtzmDQL1nAoIq
-	 D3wC6dxFic8H7p4r/cg9a2ab9SKRChj4n7raGceUn00fohdDi81B1JVHcqCMHhlvyu
-	 IV43ZKsqEE8LUw288MooG8Hlmy69H+vJwTA0IF7Ve1ylRAXTSxwKm4U6qUC0hs5thU
-	 usKA4rz/MTiz1B67dlKkA5CD/ee1bOChWCMhusHm3Qmbomuxr+3pf53qza3JOBpC1E
-	 Y+KaBCFubZWKTgaD5wAsAW8pF4Rl6s8SCLiJ3We8yI1PrJIJ2sGdlEvyqA5xt890Tm
-	 sdlEcKEmXeZlg==
+	s=k20201202; t=1678119256;
+	bh=vceDguBh4JZwOSilIbFFRC7rbnkH49TmeEOBoUMa2Os=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=XOPbzYisxsZD3Yah010t2RDkzdldGp565OgaDJ7hJEIuncBPByJ0bk6aqYeDg20xC
+	 Oj40qEclmLArHa4FDR5xAsIHzEilNpCd9ausXVfk5Vwf+juSp8WI/arubq2jST3Oos
+	 YDTPHiDjgXXtZpgyWMrXpHCIzZkoEYmimKu4fUx690vDCccGrjzn17++kSyR0Uk+MI
+	 1gqPr/MowoMUiGfOruvVbjHnqiR+hUhM8cWNYRdcNKaAnC3CHsqVBJ8wVWWUdivATz
+	 GrAOR4WAHfLMjF5sPBRt+x50cQy35GcOkM82IvH1Ra+q1m2jTX8P0cIQWlWSHieKwR
+	 p5XlTQyqxid3w==
 From: Mark Brown <broonie@kernel.org>
-Subject: [PATCH 0/2] KVM: arm64: Support for per-guest fine grained traps
- configuration
-Date: Mon, 06 Mar 2023 16:08:50 +0000
-Message-Id: <20230301-kvm-arm64-fgt-v1-0-cfdf71ac67dc@kernel.org>
+Date: Mon, 06 Mar 2023 16:08:51 +0000
+Subject: [PATCH 1/2] arm64: Add feature detection for fine grained traps
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -28,9 +26,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIABMQBmQC/x2NQQqEMAwAvyI5b6CtWsGvyB6qTTVIq6QiC+Lft
- 3qcgWEuyCRMGfrqAqGTM2+pgP5UMC0uzYTsC4NRpla10rieEZ1E22CYD6TWe226xgbbQWlGlwl
- HcWlanuqI+2N3ocC/9zJ87/sPGY/UMXUAAAA=
+Message-Id: <20230301-kvm-arm64-fgt-v1-1-cfdf71ac67dc@kernel.org>
+References: <20230301-kvm-arm64-fgt-v1-0-cfdf71ac67dc@kernel.org>
+In-Reply-To: <20230301-kvm-arm64-fgt-v1-0-cfdf71ac67dc@kernel.org>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
  James Morse <james.morse@arm.com>, 
  Suzuki K Poulose <suzuki.poulose@arm.com>, 
@@ -39,51 +37,63 @@ To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 Cc: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org, 
  kvmarm@lists.linux.dev, Mark Brown <broonie@kernel.org>
 X-Mailer: b4 0.13-dev-bd1bf
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1608; i=broonie@kernel.org;
- h=from:subject:message-id; bh=zl80OGxRqJtAQ1gF5I9FrcC87gG/BtqC9Nkj4+q+wig=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBkBhFQcM68fPi2mI7+5AEZM8Pl5mjSNjSub/Vryzbc
- Rw7UGuKJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZAYRUAAKCRAk1otyXVSH0NIYB/
- 9/7LphRXXBYsdg8n33kkqmbzb2N8OiTkrIsxip2/wPcywL98ABfv+ynRLNoLK63TtST2iAaxusE5Ff
- UVPHG5lcYzmHAyVCHmUma7JS8c/MR3No53DTmzHEKbQmzEOQucC/rEH50Z+nThYNICCr1XMrYIaNXY
- LteFTD0szQU9UlyCzQPCgZbRsPYXpbiQ8CdVS+uzfeC2E5NyGdpmnYVkZcW7xSzLSb7I4HvlJyDmh2
- HgjRnlV/5CDoCbWDlndA2a8XDD8C/d4MmEFV9xjlKEhNmcwpyzPmuWf2pZ8oAPDECz19aubU0ftilT
- LcQe9lbHEgBRm6uA/8Ybmd3WNhGA3d
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1433; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=vceDguBh4JZwOSilIbFFRC7rbnkH49TmeEOBoUMa2Os=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBkBhFRKKJwboOyASu4sTY6ztRuLGhBHbkXSFwzI1la
+ l8wg8JqJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZAYRUQAKCRAk1otyXVSH0CURB/
+ 9H+0wmgpfXvmHW9PsE7T58kmE54EpyIp7Prpl/OjTYGc6hS4GqYnkrMilLEezpXUEHpx8bav0OQx52
+ LuhH+sSSwsk2GbkfLE3xzIukIWFckOdWGnD7lFhbaei/8J5Gedc6p5yksscH0jgX2Pwwc2rw87SA5k
+ 8jf29qCL2/DaAYiewjHg82zZAO0c3ym9I49SgwG/L9BEIIuUoobghgAMG1GS0VCyQEJgcFnHHj3XZ5
+ XJKQ2JgThWye9FWlfRSaUiQ1Vi45E4bLP/1WErmQccYBhvDbdBjlExbAf7/U6jCU+HSKroDrM482Ui
+ dtx7zzd4EmmssbnkdGUVcb80gRZkkU
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-A number of upcoming features will require per guest configuration of
-the fine grained traps enabled in the guest.  At present the only
-management we do is for SME where we don't yet have guest support so we
-unconditionally enable the traps while guests are running but this will
-change going forward and at present the code isn't particularly
-scalable.  This series aims to make it easier to configure which traps
-are enabled for the guest by making the value set for the guest into
-configuration in the vCPU data which we can set up based on the chosen
-features rather than requiring conditional code in the trap enable and
-disable paths.
+In order to allow us to have shared code for managing fine grained traps
+for KVM guests add it as a detected feature rather than relying on it
+being a dependency of other features.
 
-This will have no benefit until one of the features that requires
-configuration of these traps is merged but since there's a number of
-such features it seems useful to decide on an approach to handling traps
-for them which can be shared.
-
+Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
-Mark Brown (2):
-      arm64: Add feature detection for fine grained traps
-      KVM: arm64: Move FGT value configuration to vCPU state
+ arch/arm64/kernel/cpufeature.c | 11 +++++++++++
+ arch/arm64/tools/cpucaps       |  1 +
+ 2 files changed, 12 insertions(+)
 
- arch/arm64/include/asm/kvm_emulate.h    | 12 ++++++++++++
- arch/arm64/include/asm/kvm_host.h       |  6 ++++++
- arch/arm64/kernel/cpufeature.c          | 11 +++++++++++
- arch/arm64/kvm/arm.c                    |  1 +
- arch/arm64/kvm/hyp/include/hyp/switch.h | 31 +++++++++++++++----------------
- arch/arm64/tools/cpucaps                |  1 +
- 6 files changed, 46 insertions(+), 16 deletions(-)
----
-base-commit: fe15c26ee26efa11741a7b632e9f23b01aca4cc6
-change-id: 20230301-kvm-arm64-fgt-e5dd12746f67
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 2e3e55139777..6d1cda522f69 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -2698,6 +2698,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.matches = has_cpuid_feature,
+ 		.min_field_value = 1,
+ 	},
++	{
++		.desc = "Fine Grained Traps",
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.capability = ARM64_HAS_FGT,
++		.sys_reg = SYS_ID_AA64MMFR0_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64MMFR0_EL1_FGT_SHIFT,
++		.field_width = 4,
++		.min_field_value = 1,
++		.matches = has_cpuid_feature,
++	},
+ #ifdef CONFIG_ARM64_SME
+ 	{
+ 		.desc = "Scalable Matrix Extension",
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index 37b1340e9646..b63cd342add2 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -24,6 +24,7 @@ HAS_DIT
+ HAS_E0PD
+ HAS_ECV
+ HAS_EPAN
++HAS_FGT
+ HAS_GENERIC_AUTH
+ HAS_GENERIC_AUTH_ARCH_QARMA3
+ HAS_GENERIC_AUTH_ARCH_QARMA5
 
-Best regards,
 -- 
-Mark Brown <broonie@kernel.org>
+2.30.2
 
