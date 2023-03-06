@@ -1,12 +1,12 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0BB46FD5
-	for <kvmarm@lists.linux.dev>; Mon,  6 Mar 2023 19:55:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2E26FDA
+	for <kvmarm@lists.linux.dev>; Mon,  6 Mar 2023 19:55:08 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0F8531C14;
-	Mon,  6 Mar 2023 11:55:50 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7178E152B;
+	Mon,  6 Mar 2023 11:55:45 -0800 (PST)
 Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com [10.1.196.26])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 56A963F71A;
-	Mon,  6 Mar 2023 11:55:05 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B8B5D3F71A;
+	Mon,  6 Mar 2023 11:55:00 -0800 (PST)
 From: Ryan Roberts <ryan.roberts@arm.com>
 To: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
@@ -18,9 +18,9 @@ To: Catalin Marinas <catalin.marinas@arm.com>,
 Cc: Ryan Roberts <ryan.roberts@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: [PATCH v2 05/12] KVM: arm64: Use LPA2 page-tables for stage2 if HW supports it
-Date: Mon,  6 Mar 2023 19:54:31 +0000
-Message-Id: <20230306195438.1557851-6-ryan.roberts@arm.com>
+Subject: [PATCH v2 02/12] arm64/mm: Add FEAT_LPA2 specific ID_AA64MMFR0.TGRAN[2]
+Date: Mon,  6 Mar 2023 19:54:28 +0000
+Message-Id: <20230306195438.1557851-3-ryan.roberts@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230306195438.1557851-1-ryan.roberts@arm.com>
 References: <20230306195438.1557851-1-ryan.roberts@arm.com>
@@ -32,148 +32,60 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implement a simple policy whereby if the HW supports FEAT_LPA2 for the
-page size we are using, always use LPA2-style page-tables for stage 2,
-regardless of the VMM-requested IPA size or HW-implemented PA size. When
-in use we can now support up to 52-bit IPA and PA sizes.
+From: Anshuman Khandual <anshuman.khandual@arm.com>
 
-We use the previously created cpu feature to track whether LPA2 is
-supported for deciding whether to use the LPA2 or classic pte format.
+PAGE_SIZE support is tested against possible minimum and maximum values for
+its respective ID_AA64MMFR0.TGRAN field, depending on whether it is signed
+or unsigned. But then FEAT_LPA2 implementation needs to be validated for 4K
+and 16K page sizes via feature specific ID_AA64MMFR0.TGRAN values. Hence it
+adds FEAT_LPA2 specific ID_AA64MMFR0.TGRAN[2] values per ARM ARM (0487G.A).
 
-Note that FEAT_LPA2 brings support for bigger block mappings (512GB with
-4KB, 64GB with 16KB). We explicitly don't enable these in the library
-because stage2_apply_range() works on batch sizes of the largest used
-block mapping, and increasing the size of the batch would lead to soft
-lockups. See commit 5994bc9e05c2 ("KVM: arm64: Limit
-stage2_apply_range() batch size to largest block").
-
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
-
-TMP
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 47 +++++++++++++++++++++-------
- arch/arm64/kvm/hyp/pgtable.c         | 12 +++++--
- 2 files changed, 46 insertions(+), 13 deletions(-)
+ arch/arm64/include/asm/sysreg.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 4cd6762bda80..4164b336c1e7 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -25,12 +25,22 @@
- #define KVM_PGTABLE_MIN_BLOCK_LEVEL	2U
- #endif
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 9e3ecba3c4e6..7f708eecc3ad 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -609,10 +609,12 @@
  
-+static inline u64 kvm_get_parange_max(void)
-+{
-+	if (system_supports_lpa2() ||
-+	   (IS_ENABLED(CONFIG_ARM64_PA_BITS_52) && PAGE_SIZE == SZ_64K))
-+		return ID_AA64MMFR0_EL1_PARANGE_52;
-+	else
-+		return ID_AA64MMFR0_EL1_PARANGE_48;
-+}
-+
- static inline u64 kvm_get_parange(u64 mmfr0)
- {
-+	u64 parange_max = kvm_get_parange_max();
- 	u64 parange = cpuid_feature_extract_unsigned_field(mmfr0,
- 				ID_AA64MMFR0_EL1_PARANGE_SHIFT);
--	if (parange > ID_AA64MMFR0_EL1_PARANGE_MAX)
--		parange = ID_AA64MMFR0_EL1_PARANGE_MAX;
-+	if (parange > parange_max)
-+		parange = parange_max;
+ /* id_aa64mmfr0 */
+ #define ID_AA64MMFR0_EL1_TGRAN4_SUPPORTED_MIN	0x0
++#define ID_AA64MMFR0_EL1_TGRAN4_LPA2		ID_AA64MMFR0_EL1_TGRAN4_52_BIT
+ #define ID_AA64MMFR0_EL1_TGRAN4_SUPPORTED_MAX	0x7
+ #define ID_AA64MMFR0_EL1_TGRAN64_SUPPORTED_MIN	0x0
+ #define ID_AA64MMFR0_EL1_TGRAN64_SUPPORTED_MAX	0x7
+ #define ID_AA64MMFR0_EL1_TGRAN16_SUPPORTED_MIN	0x1
++#define ID_AA64MMFR0_EL1_TGRAN16_LPA2		ID_AA64MMFR0_EL1_TGRAN16_52_BIT
+ #define ID_AA64MMFR0_EL1_TGRAN16_SUPPORTED_MAX	0xf
  
- 	return parange;
- }
-@@ -41,6 +51,8 @@ typedef u64 kvm_pte_t;
+ #define ARM64_MIN_PARANGE_BITS		32
+@@ -620,6 +622,7 @@
+ #define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_DEFAULT	0x0
+ #define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_NONE		0x1
+ #define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_MIN		0x2
++#define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_LPA2		0x3
+ #define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_MAX		0x7
  
- #define KVM_PTE_ADDR_MASK		GENMASK(47, PAGE_SHIFT)
- #define KVM_PTE_ADDR_51_48		GENMASK(15, 12)
-+#define KVM_PTE_ADDR_MASK_LPA2		GENMASK(49, PAGE_SHIFT)
-+#define KVM_PTE_ADDR_51_50_LPA2		GENMASK(9, 8)
+ #ifdef CONFIG_ARM64_PA_BITS_52
+@@ -630,11 +633,13 @@
  
- #define KVM_PHYS_INVALID		(-1ULL)
- 
-@@ -51,21 +63,34 @@ static inline bool kvm_pte_valid(kvm_pte_t pte)
- 
- static inline u64 kvm_pte_to_phys(kvm_pte_t pte)
- {
--	u64 pa = pte & KVM_PTE_ADDR_MASK;
--
--	if (PAGE_SHIFT == 16)
--		pa |= FIELD_GET(KVM_PTE_ADDR_51_48, pte) << 48;
-+	u64 pa;
-+
-+	if (system_supports_lpa2()) {
-+		pa = pte & KVM_PTE_ADDR_MASK_LPA2;
-+		pa |= FIELD_GET(KVM_PTE_ADDR_51_50_LPA2, pte) << 50;
-+	} else {
-+		pa = pte & KVM_PTE_ADDR_MASK;
-+		if (PAGE_SHIFT == 16)
-+			pa |= FIELD_GET(KVM_PTE_ADDR_51_48, pte) << 48;
-+	}
- 
- 	return pa;
- }
- 
- static inline kvm_pte_t kvm_phys_to_pte(u64 pa)
- {
--	kvm_pte_t pte = pa & KVM_PTE_ADDR_MASK;
--
--	if (PAGE_SHIFT == 16) {
--		pa &= GENMASK(51, 48);
--		pte |= FIELD_PREP(KVM_PTE_ADDR_51_48, pa >> 48);
-+	kvm_pte_t pte;
-+
-+	if (system_supports_lpa2()) {
-+		pte = pa & KVM_PTE_ADDR_MASK_LPA2;
-+		pa &= GENMASK(51, 50);
-+		pte |= FIELD_PREP(KVM_PTE_ADDR_51_50_LPA2, pa >> 50);
-+	} else {
-+		pte = pa & KVM_PTE_ADDR_MASK;
-+		if (PAGE_SHIFT == 16) {
-+			pa &= GENMASK(51, 48);
-+			pte |= FIELD_PREP(KVM_PTE_ADDR_51_48, pa >> 48);
-+		}
- 	}
- 
- 	return pte;
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 3d61bd3e591d..414a5dbf233d 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -64,7 +64,10 @@ struct kvm_pgtable_walk_data {
- 
- static bool kvm_phys_is_valid(u64 phys)
- {
--	return phys < BIT(id_aa64mmfr0_parange_to_phys_shift(ID_AA64MMFR0_EL1_PARANGE_MAX));
-+	u64 parange_max = kvm_get_parange_max();
-+	u8 shift = id_aa64mmfr0_parange_to_phys_shift(parange_max);
-+
-+	return phys < BIT(shift);
- }
- 
- static bool kvm_block_mapping_supported(const struct kvm_pgtable_visit_ctx *ctx, u64 phys)
-@@ -615,6 +618,9 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
- 	vtcr |= VTCR_EL2_HA;
- #endif /* CONFIG_ARM64_HW_AFDBM */
- 
-+	if (system_supports_lpa2())
-+		vtcr |= VTCR_EL2_DS;
-+
- 	/* Set the vmid bits */
- 	vtcr |= (get_vmid_bits(mmfr1) == 16) ?
- 		VTCR_EL2_VS_16BIT :
-@@ -652,7 +658,9 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
- 	if (prot & KVM_PGTABLE_PROT_W)
- 		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
- 
--	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
-+	if (!system_supports_lpa2())
-+		attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
-+
- 	attr |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
- 	attr |= prot & KVM_PTE_LEAF_ATTR_HI_SW;
- 	*ptep = attr;
+ #if defined(CONFIG_ARM64_4K_PAGES)
+ #define ID_AA64MMFR0_EL1_TGRAN_SHIFT		ID_AA64MMFR0_EL1_TGRAN4_SHIFT
++#define ID_AA64MMFR0_EL1_TGRAN_LPA2		ID_AA64MMFR0_EL1_TGRAN4_52_BIT
+ #define ID_AA64MMFR0_EL1_TGRAN_SUPPORTED_MIN	ID_AA64MMFR0_EL1_TGRAN4_SUPPORTED_MIN
+ #define ID_AA64MMFR0_EL1_TGRAN_SUPPORTED_MAX	ID_AA64MMFR0_EL1_TGRAN4_SUPPORTED_MAX
+ #define ID_AA64MMFR0_EL1_TGRAN_2_SHIFT		ID_AA64MMFR0_EL1_TGRAN4_2_SHIFT
+ #elif defined(CONFIG_ARM64_16K_PAGES)
+ #define ID_AA64MMFR0_EL1_TGRAN_SHIFT		ID_AA64MMFR0_EL1_TGRAN16_SHIFT
++#define ID_AA64MMFR0_EL1_TGRAN_LPA2		ID_AA64MMFR0_EL1_TGRAN16_52_BIT
+ #define ID_AA64MMFR0_EL1_TGRAN_SUPPORTED_MIN	ID_AA64MMFR0_EL1_TGRAN16_SUPPORTED_MIN
+ #define ID_AA64MMFR0_EL1_TGRAN_SUPPORTED_MAX	ID_AA64MMFR0_EL1_TGRAN16_SUPPORTED_MAX
+ #define ID_AA64MMFR0_EL1_TGRAN_2_SHIFT		ID_AA64MMFR0_EL1_TGRAN16_2_SHIFT
 -- 
 2.25.1
 
