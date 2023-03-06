@@ -1,203 +1,136 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D2186FD8
-	for <kvmarm@lists.linux.dev>; Mon,  6 Mar 2023 19:55:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A702C6FC5
+	for <kvmarm@lists.linux.dev>; Mon,  6 Mar 2023 20:02:20 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DBF781570;
-	Mon,  6 Mar 2023 11:56:00 -0800 (PST)
-Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com [10.1.196.26])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2F4243F71A;
-	Mon,  6 Mar 2023 11:55:16 -0800 (PST)
-From: Ryan Roberts <ryan.roberts@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: Ryan Roberts <ryan.roberts@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: [PATCH v2 12/12] KVM: selftests: arm64: Support P52V48 4K and 16K guest_modes
-Date: Mon,  6 Mar 2023 19:54:38 +0000
-Message-Id: <20230306195438.1557851-13-ryan.roberts@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230306195438.1557851-1-ryan.roberts@arm.com>
-References: <20230306195438.1557851-1-ryan.roberts@arm.com>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7954311FB;
+	Mon,  6 Mar 2023 12:03:03 -0800 (PST)
+Received: from [10.57.79.176] (unknown [10.57.79.176])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D42463F71A;
+	Mon,  6 Mar 2023 12:02:18 -0800 (PST)
+Message-ID: <dab08559-da62-2c09-5bfb-d2a1afa4aad6@arm.com>
+Date: Mon, 6 Mar 2023 20:02:17 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.8.0
+Subject: Re: [PATCH v2 09/12] KVM: arm64: Support up to 5 levels of
+ translation in kvm_pgtable
+To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Ard Biesheuvel <ardb@kernel.org>,
+ Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+References: <20230306195438.1557851-1-ryan.roberts@arm.com>
+ <20230306195438.1557851-10-ryan.roberts@arm.com>
+Content-Language: en-US
+From: Ryan Roberts <ryan.roberts@arm.com>
+In-Reply-To: <20230306195438.1557851-10-ryan.roberts@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Add support for VM_MODE_P52V48_4K and VM_MODE_P52V48_16K guest modes by
-using the FEAT_LPA2 pte format for stage1, when FEAT_LPA2 is available.
+On 06/03/2023 19:54, Ryan Roberts wrote:
+> FEAT_LPA2 increases the maximum levels of translation from 4 to 5 for
+> the 4KB page case, when IA is >48 bits. While we can still use 4 levels
+> for stage2 translation in this case (due to stage2 allowing concatenated
+> page tables for first level lookup), the same kvm_pgtable library is
+> used for the hyp stage1 page tables and stage1 does not support
+> concatenation.
+> 
+> Therefore, modify the library to support up to 5 levels. Previous
+> patches already laid the groundwork for this by refactoring code to work
+> in terms of KVM_PGTABLE_FIRST_LEVEL and KVM_PGTABLE_LAST_LEVEL. So we
+> just need to change these macros.
+> 
+> The hardware sometimes encodes the new level differently from the
+> others: One such place is when reading the level from the FSC field in
+> the ESR_EL2 register. We never expect to see the lowest level (-1) here
+> since the stage 2 page tables always use concatenated tables for first
+> level lookup and therefore only use 4 levels of lookup. So we get away
+> with just adding a comment to explain why we are not being careful about
+> decoding level -1.
+> 
+> For stage2 VTCR_EL2.SL2 is introduced to encode the new start level.
+> However, since we always use concatenated page tables for first level
+> look up at stage2 (and therefore we will never need the new extra level)
+> we never touch this new field.
+> 
+> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h | 10 ++++++++++
+>  arch/arm64/include/asm/kvm_pgtable.h |  2 +-
+>  arch/arm64/kvm/hyp/pgtable.c         | 10 ++++++++++
+>  3 files changed, 21 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 26666a623fa8..542575aad159 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -405,6 +405,16 @@ static __always_inline u8 kvm_vcpu_trap_get_fault_type(const struct kvm_vcpu *vc
+>  
+>  static __always_inline s8 kvm_vcpu_trap_get_fault_level(const struct kvm_vcpu *vcpu)
+>  {
+> +	/*
+> +	 * Note: With the introduction of FEAT_LPA2 an extra level of
+> +	 * translation (level -1) is added. This level (obviously) doesn't
+> +	 * follow the previous convention of encoding the 4 levels in the 2 LSBs
+> +	 * of the FSC so this function breaks if the fault is for level -1.
+> +	 *
+> +	 * However, stage2 tables always use concatenated tables for first level
+> +	 * lookup and therefore it is guaranteed that the level will be between
+> +	 * 0 and 3, and this function continues to work.
+> +	 */
+>  	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_FSC_LEVEL;
+>  }
+>  
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 8c7e65147777..a5d96592c658 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -11,7 +11,7 @@
+>  #include <linux/kvm_host.h>
+>  #include <linux/types.h>
+>  
+> -#define KVM_PGTABLE_FIRST_LEVEL		0
+> +#define KVM_PGTABLE_FIRST_LEVEL		-1
+>  #define KVM_PGTABLE_LAST_LEVEL		3
+>  
+>  /*
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 939eab245205..a09c17242da7 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -612,6 +612,15 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
+>  	lvls = stage2_pgtable_levels(phys_shift);
+>  	if (lvls < 2)
+>  		lvls = 2;
+> +
+> +	/*
+> +	 * When LPA2 is enabled, the HW supports an extra level of translation
+> +	 * (for 5 in total) when using 4K pages. It also introduces VTCR_EL2.SL2
+> +	 * to as an addition to SL0 to enable encoding this extra start level.
+> +	 * However, since we always use concatenated pages for the first level
+> +	 * lookup, we will never need this extra level and therefore do not need
+> +	 * to touch SL2.
+> +	 */
+>  	vtcr |= VTCR_EL2_LVLS_TO_SL0(lvls);
+>  
+>  #ifdef CONFIG_ARM64_HW_AFDBM
+> @@ -1053,6 +1062,7 @@ struct stage2_attr_data {
+>  	kvm_pte_t			attr_clr;
+>  	kvm_pte_t			pte;
+>  	s8				level;
+> +	struct kvm_pgtable_mm_ops	*mm_ops;
 
-Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
----
- .../selftests/kvm/include/kvm_util_base.h     |  1 +
- .../selftests/kvm/lib/aarch64/processor.c     | 39 ++++++++++++++-----
- tools/testing/selftests/kvm/lib/guest_modes.c |  2 +
- tools/testing/selftests/kvm/lib/kvm_util.c    |  3 ++
- 4 files changed, 36 insertions(+), 9 deletions(-)
+Naturally, as soon as I sent this out, I noticed this, which clearly should not
+be here. I suspect it's an artifact from rebasing. Sorry about that, please
+ignore and I'll fix it in the next version.
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index fbc2a79369b8..b8678bf4a980 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -150,6 +150,7 @@ static inline struct userspace_mem_region *vm_get_mem_region(struct kvm_vm *vm,
- 
- enum vm_guest_mode {
- 	VM_MODE_P52V48_4K,
-+	VM_MODE_P52V48_16K,
- 	VM_MODE_P52V48_64K,
- 	VM_MODE_P48V48_4K,
- 	VM_MODE_P48V48_16K,
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index b2d80396b8f8..934f8baa7d0e 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -12,6 +12,7 @@
- #include "kvm_util.h"
- #include "processor.h"
- #include <linux/bitfield.h>
-+#include <linux/sizes.h>
- 
- #define DEFAULT_ARM64_GUEST_STACK_VADDR_MIN	0xac0000
- 
-@@ -58,13 +59,25 @@ static uint64_t pte_index(struct kvm_vm *vm, vm_vaddr_t gva)
- 	return (gva >> vm->page_shift) & mask;
- }
- 
-+static inline bool use_lpa2_pte_format(struct kvm_vm *vm)
-+{
-+	return (vm->page_size == SZ_4K || vm->page_size == SZ_16K) &&
-+	    (vm->pa_bits > 48 || vm->va_bits > 48);
-+}
-+
- static uint64_t addr_pte(struct kvm_vm *vm, uint64_t pa, uint64_t attrs)
- {
- 	uint64_t pte;
- 
--	pte = pa & GENMASK(47, vm->page_shift);
--	if (vm->page_shift == 16)
--		pte |= (pa & GENMASK(51, 48)) >> (48 - 12);
-+	if (use_lpa2_pte_format(vm)) {
-+		pte = pa & GENMASK(49, vm->page_shift);
-+		pte |= (pa & GENMASK(51, 50)) >> (50 - 8);
-+		attrs &= ~GENMASK(9, 8);
-+	} else {
-+		pte = pa & GENMASK(47, vm->page_shift);
-+		if (vm->page_shift == 16)
-+			pte |= (pa & GENMASK(51, 48)) >> (48 - 12);
-+	}
- 	pte |= attrs;
- 
- 	return pte;
-@@ -74,9 +87,14 @@ static uint64_t pte_addr(struct kvm_vm *vm, uint64_t pte)
- {
- 	uint64_t pa;
- 
--	pa = pte & GENMASK(47, vm->page_shift);
--	if (vm->page_shift == 16)
--		pa |= (pte & GENMASK(15, 12)) << (48 - 12);
-+	if (use_lpa2_pte_format(vm)) {
-+		pa = pte & GENMASK(49, vm->page_shift);
-+		pa |= (pte & GENMASK(9, 8)) << (50 - 8);
-+	} else {
-+		pa = pte & GENMASK(47, vm->page_shift);
-+		if (vm->page_shift == 16)
-+			pa |= (pte & GENMASK(15, 12)) << (48 - 12);
-+	}
- 
- 	return pa;
- }
-@@ -266,9 +284,6 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
- 
- 	/* Configure base granule size */
- 	switch (vm->mode) {
--	case VM_MODE_P52V48_4K:
--		TEST_FAIL("AArch64 does not support 4K sized pages "
--			  "with 52-bit physical address ranges");
- 	case VM_MODE_PXXV48_4K:
- 		TEST_FAIL("AArch64 does not support 4K sized pages "
- 			  "with ANY-bit physical address ranges");
-@@ -278,12 +293,14 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
- 	case VM_MODE_P36V48_64K:
- 		tcr_el1 |= 1ul << 14; /* TG0 = 64KB */
- 		break;
-+	case VM_MODE_P52V48_16K:
- 	case VM_MODE_P48V48_16K:
- 	case VM_MODE_P40V48_16K:
- 	case VM_MODE_P36V48_16K:
- 	case VM_MODE_P36V47_16K:
- 		tcr_el1 |= 2ul << 14; /* TG0 = 16KB */
- 		break;
-+	case VM_MODE_P52V48_4K:
- 	case VM_MODE_P48V48_4K:
- 	case VM_MODE_P40V48_4K:
- 	case VM_MODE_P36V48_4K:
-@@ -297,6 +314,8 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
- 
- 	/* Configure output size */
- 	switch (vm->mode) {
-+	case VM_MODE_P52V48_4K:
-+	case VM_MODE_P52V48_16K:
- 	case VM_MODE_P52V48_64K:
- 		tcr_el1 |= 6ul << 32; /* IPS = 52 bits */
- 		ttbr0_el1 |= (vm->pgd & GENMASK(51, 48)) >> (48 - 2);
-@@ -325,6 +344,8 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
- 	/* TCR_EL1 |= IRGN0:WBWA | ORGN0:WBWA | SH0:Inner-Shareable */;
- 	tcr_el1 |= (1 << 8) | (1 << 10) | (3 << 12);
- 	tcr_el1 |= (64 - vm->va_bits) /* T0SZ */;
-+	if (use_lpa2_pte_format(vm))
-+		tcr_el1 |= (1ul << 59) /* DS */;
- 
- 	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SCTLR_EL1), sctlr_el1);
- 	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TCR_EL1), tcr_el1);
-diff --git a/tools/testing/selftests/kvm/lib/guest_modes.c b/tools/testing/selftests/kvm/lib/guest_modes.c
-index c64c5cf49942..6634afc22137 100644
---- a/tools/testing/selftests/kvm/lib/guest_modes.c
-+++ b/tools/testing/selftests/kvm/lib/guest_modes.c
-@@ -23,6 +23,8 @@ void guest_modes_append_default(void)
- 
- 		aarch64_get_supported_page_sizes(limit, &ipa4k, &ipa16k, &ipa64k);
- 
-+		guest_mode_append(VM_MODE_P52V48_4K, ipa4k >= 52, ipa4k >= 52);
-+		guest_mode_append(VM_MODE_P52V48_16K, ipa16k >= 52, ipa16k >= 52);
- 		guest_mode_append(VM_MODE_P52V48_64K, ipa64k >= 52, ipa64k >= 52);
- 
- 		guest_mode_append(VM_MODE_P48V48_4K, ipa4k >= 48, ipa4k >= 48);
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 3ea24a5f4c43..0e4905b75825 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -143,6 +143,7 @@ const char *vm_guest_mode_string(uint32_t i)
- {
- 	static const char * const strings[] = {
- 		[VM_MODE_P52V48_4K]	= "PA-bits:52,  VA-bits:48,  4K pages",
-+		[VM_MODE_P52V48_16K]	= "PA-bits:52,  VA-bits:48, 16K pages",
- 		[VM_MODE_P52V48_64K]	= "PA-bits:52,  VA-bits:48, 64K pages",
- 		[VM_MODE_P48V48_4K]	= "PA-bits:48,  VA-bits:48,  4K pages",
- 		[VM_MODE_P48V48_16K]	= "PA-bits:48,  VA-bits:48, 16K pages",
-@@ -168,6 +169,7 @@ const char *vm_guest_mode_string(uint32_t i)
- 
- const struct vm_guest_mode_params vm_guest_mode_params[] = {
- 	[VM_MODE_P52V48_4K]	= { 52, 48,  0x1000, 12 },
-+	[VM_MODE_P52V48_16K]	= { 52, 48,  0x4000, 14 },
- 	[VM_MODE_P52V48_64K]	= { 52, 48, 0x10000, 16 },
- 	[VM_MODE_P48V48_4K]	= { 48, 48,  0x1000, 12 },
- 	[VM_MODE_P48V48_16K]	= { 48, 48,  0x4000, 14 },
-@@ -246,6 +248,7 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mode)
- 	case VM_MODE_P36V48_64K:
- 		vm->pgtable_levels = 3;
- 		break;
-+	case VM_MODE_P52V48_16K:
- 	case VM_MODE_P48V48_16K:
- 	case VM_MODE_P40V48_16K:
- 	case VM_MODE_P36V48_16K:
--- 
-2.25.1
+
+>  };
+>  
+>  static int stage2_attr_walker(const struct kvm_pgtable_visit_ctx *ctx,
 
