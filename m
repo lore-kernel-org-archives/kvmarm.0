@@ -1,257 +1,514 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAA84391
-	for <kvmarm@lists.linux.dev>; Tue,  7 Mar 2023 03:46:18 +0000 (UTC)
-Received: by mail-yb1-f201.google.com with SMTP id l24-20020a25b318000000b007eba3f8e3baso12571669ybj.4
-        for <kvmarm@lists.linux.dev>; Mon, 06 Mar 2023 19:46:18 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5340063E
+	for <kvmarm@lists.linux.dev>; Tue,  7 Mar 2023 06:10:07 +0000 (UTC)
+Received: by mail-pj1-f52.google.com with SMTP id oj5so12183377pjb.5
+        for <kvmarm@lists.linux.dev>; Mon, 06 Mar 2023 22:10:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678160778;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VGjqrjpuw0L+8X6Iy5HBMW42liiteNEc7MWTHjJh4Xc=;
-        b=ZpQKgXe/WHKw2SpCF1799ueHt09uyGUMIRhtd39yp6IyRqDw5BHgs5JsewmN/3fviw
-         A3tR9lH6NieRvEoom6/4J7TvxDyl0154kMjJLQMf6F86hRUJUvn2L0Vg5SsXmhflxbLZ
-         z/SmxVqCOkVJ2MhgexhOUkTXeBimk7WLC3NjJytVPU6HIatgt+NQiU2NhhCKNRLvEQ+F
-         D0aDJgws+OK3g/tNAvG81LJiXYRS1/3mb1lYT7syHpW5LUKXedgf1RNcXjpCSHwE9/E/
-         jZ/fFD/4B6zHM3NTNAQ3Q4kM1WbRQQbJUVvWo4VyWmDjNatlScZBpAGCBoc48Kab02Pa
-         7UDA==
+        d=google.com; s=20210112; t=1678169407;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dgLjsFmwNjBPnsrBKiPb+yNJklce3/QTLLfNgQRf7fg=;
+        b=UNAExAWxQ7psWq0fdCPD8BToMH1tvnmzAv7KZ0MfxJW8CkkLxiwLds6GkkTxRjaJry
+         r09F38DAr5dqFro9IwPQ/pc88KstWMdYHwiqZ6hFqjZFMzZLJZshGfqxW8fLCXgwePIk
+         oS0pngwg1kykmc0QLg2ZTdFfqBPzgdzhbTq3MHcdBS5a81ze33P+6SnXptNN3oVqHJuc
+         k/P/H93opr+XAqFw/Gkaoh4oAwJKj8+75Wk3g2s4u+B9vsGA4RFDEVW5ETRNLVAJTA8W
+         sCtvMCrAERy5d6q78qhGgedHV3Mek0Wh7m8CUE+NNwse7tGuDXbt7MKgiE/C/7uCOkzR
+         FPSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678160778;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VGjqrjpuw0L+8X6Iy5HBMW42liiteNEc7MWTHjJh4Xc=;
-        b=TsY3lz8ZBVD8EpjY69wFOVVDGDV+TMNk8dFE/MWXJMY4WCmoMZGl5yk48WDLASPZvc
-         bxGuy9cotSJ4Q0P5Hv+iVvZiBPrNIMv/olODBHL1Vz4BNsgqiHxy6OEQwG/XXZR8v555
-         JOm99tHS7QJVhqhk9fPhTL9r9wV3peIEqeVcsu4Qhuo+ddX73/+uNhT1afuKKa2fi4fe
-         xX/o6LZQUwewCIxu6noaHzV+d0RV/4gr9RifArgiVQGvTK8L7Be0vNZPAog1VtXZ8AL/
-         8maQDGSu5RCWH765ZgSw3sYZgsbEqEbZHaQ2FtHqyX7Q2uHeWA/rJNpdhA51Ln4J5RgJ
-         rdFQ==
-X-Gm-Message-State: AO0yUKWJHcdIdUsp0nSPiO3r0cTW2uSOTBhYqJW+fv/cUQc0KRwpv//J
-	2gunXOUS3mArqpyhk2xCXa3CMo4PwHEJsg==
-X-Google-Smtp-Source: AK7set9YBnrrwalPv7KgetgsTgM9LIHdjWC6Zuez5YX5KaiKx9tfgePWQo2w7LWoc1G9aSBtyhweELPz143+pQ==
-X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a81:af4e:0:b0:521:db3f:9e27 with SMTP id
- x14-20020a81af4e000000b00521db3f9e27mr8363695ywj.2.1678160777865; Mon, 06 Mar
- 2023 19:46:17 -0800 (PST)
-Date: Tue,  7 Mar 2023 03:45:55 +0000
-In-Reply-To: <20230307034555.39733-1-ricarkol@google.com>
+        d=1e100.net; s=20210112; t=1678169407;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dgLjsFmwNjBPnsrBKiPb+yNJklce3/QTLLfNgQRf7fg=;
+        b=PIv0SmpaRB/Fz0pc6i2oMVsMb2HpcvOHJaIaXqxVUAKBl8521mnCOVYbEJ464CEok7
+         muMWGSt5KtQHVTmiODo1IWGEWxHtkvAKtW8LspIt3+9ycCxkwlcGO9jTlZ4r6WGWunRG
+         hV5GaAAFuWVjEKXzQequSw6SEha3b20HVE6S/4ZZ8ksCR0iBUvbUoOvUYKYwbD0Oce44
+         ZHtZoWx5YgGkO9DZx/0Jk2J5uBczhd5lcQ7ZG1lBO5NepyPsNQKvptCUwOfGzgVtrwj9
+         k9G6GxG5wtXgsqkr6caiwcOFhbzHp1M7MxQVR75irz5c4nHRyMe5X/pRGg23QCqIW6qO
+         dAyg==
+X-Gm-Message-State: AO0yUKUtqMYjEzsDRxMlvmxbppM9YlZaB9BZOBwffrneu+UD/w0mznBd
+	nRniZdul3Kaiq91r0ZkLSDAU79YZkUNQP2psuC7Ufg==
+X-Google-Smtp-Source: AK7set9gY21dT6ZE8NpllykoZMh//mFXUtZEvVb7PvD3SUPOBUhN6WyrR02EsMl8HtF9ZB23EGl3yZxbjPGiaWw9rc4=
+X-Received: by 2002:a17:90a:1c02:b0:234:bed1:1012 with SMTP id
+ s2-20020a17090a1c0200b00234bed11012mr4740344pjs.6.1678169406050; Mon, 06 Mar
+ 2023 22:10:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230307034555.39733-1-ricarkol@google.com>
-X-Mailer: git-send-email 2.40.0.rc0.216.gc4246ad0f0-goog
-Message-ID: <20230307034555.39733-13-ricarkol@google.com>
-Subject: [PATCH v6 12/12] KVM: arm64: Use local TLBI on permission relaxation
-From: Ricardo Koller <ricarkol@google.com>
-To: pbonzini@redhat.com, maz@kernel.org, oupton@google.com, 
-	yuzenghui@huawei.com, dmatlack@google.com
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com, 
-	catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com, 
-	alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com, 
-	gshan@redhat.com, reijiw@google.com, rananta@google.com, bgardon@google.com, 
-	ricarkol@gmail.com, Ricardo Koller <ricarkol@google.com>
+MIME-Version: 1.0
+References: <20230215010717.3612794-1-rananta@google.com> <20230215010717.3612794-13-rananta@google.com>
+In-Reply-To: <20230215010717.3612794-13-rananta@google.com>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Mon, 6 Mar 2023 22:09:49 -0800
+Message-ID: <CAAeT=Fyy-3fsN3aWRtX9AoBoHVXyWmY+TJAOuty3Tz=kH5HmJA@mail.gmail.com>
+Subject: Re: [REPOST PATCH 12/16] selftests: KVM: aarch64: Test PMU
+ overflow/IRQ functionality
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Ricardo Koller <ricarkol@google.com>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jing Zhang <jingzhangos@google.com>, Colton Lewis <coltonlewis@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Marc Zyngier <maz@kernel.org>
+Hi Raghu,
 
-Broadcasted TLB invalidations (TLBI) are usually less performant than
-their local variant. In particular, we observed some implementations
-that take millliseconds to complete parallel broadcasted TLBIs.
+On Tue, Feb 14, 2023 at 5:07=E2=80=AFPM Raghavendra Rao Ananta
+<rananta@google.com> wrote:
+>
+> Extend the vCPU migration test to also validate the vPMU's
+> functionality when set up for overflow conditions.
+>
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  .../testing/selftests/kvm/aarch64/vpmu_test.c | 223 ++++++++++++++++--
+>  1 file changed, 198 insertions(+), 25 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_test.c b/tools/test=
+ing/selftests/kvm/aarch64/vpmu_test.c
+> index 0c9d801f4e602..066dc17fa3906 100644
+> --- a/tools/testing/selftests/kvm/aarch64/vpmu_test.c
+> +++ b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
+> @@ -21,7 +21,9 @@
+>   *
+>   * 4. Since the PMU registers are per-cpu, stress KVM by frequently
+>   * migrating the guest vCPU to random pCPUs in the system, and check
+> - * if the vPMU is still behaving as expected.
+> + * if the vPMU is still behaving as expected. The sub-tests include
+> + * testing basic functionalities such as basic counters behavior,
+> + * overflow, and overflow interrupts.
+>   *
+>   * Copyright (c) 2022 Google LLC.
+>   *
+> @@ -41,13 +43,27 @@
+>  #include <sys/sysinfo.h>
+>
+>  #include "delay.h"
+> +#include "gic.h"
+> +#include "spinlock.h"
+>
+>  /* The max number of the PMU event counters (excluding the cycle counter=
+) */
+>  #define ARMV8_PMU_MAX_GENERAL_COUNTERS (ARMV8_PMU_MAX_COUNTERS - 1)
+>
+> +/* The cycle counter bit position that's common among the PMU registers =
+*/
+> +#define ARMV8_PMU_CYCLE_COUNTER_IDX    31
+> +
+>  /* The max number of event numbers that's supported */
+>  #define ARMV8_PMU_MAX_EVENTS           64
+>
+> +#define PMU_IRQ                                23
+> +
+> +#define COUNT_TO_OVERFLOW      0xFULL
+> +#define PRE_OVERFLOW_32                (GENMASK(31, 0) - COUNT_TO_OVERFL=
+OW + 1)
+> +#define PRE_OVERFLOW_64                (GENMASK(63, 0) - COUNT_TO_OVERFL=
+OW + 1)
+> +
+> +#define GICD_BASE_GPA  0x8000000ULL
+> +#define GICR_BASE_GPA  0x80A0000ULL
+> +
+>  #define msecs_to_usecs(msec)           ((msec) * 1000LL)
+>
+>  /*
+> @@ -162,6 +178,17 @@ static inline void write_sel_evtyper(int sel, unsign=
+ed long val)
+>         isb();
+>  }
+>
+> +static inline void write_pmovsclr(unsigned long val)
+> +{
+> +       write_sysreg(val, pmovsclr_el0);
+> +       isb();
+> +}
+> +
+> +static unsigned long read_pmovsclr(void)
+> +{
+> +       return read_sysreg(pmovsclr_el0);
+> +}
+> +
+>  static inline void enable_counter(int idx)
+>  {
+>         uint64_t v =3D read_sysreg(pmcntenset_el0);
+> @@ -178,11 +205,33 @@ static inline void disable_counter(int idx)
+>         isb();
+>  }
+>
+> +static inline void enable_irq(int idx)
+> +{
+> +       uint64_t v =3D read_sysreg(pmcntenset_el0);
+> +
+> +       write_sysreg(BIT(idx) | v, pmintenset_el1);
+> +       isb();
+> +}
+> +
+> +static inline void disable_irq(int idx)
+> +{
+> +       uint64_t v =3D read_sysreg(pmcntenset_el0);
+> +
+> +       write_sysreg(BIT(idx) | v, pmintenclr_el1);
+> +       isb();
+> +}
+> +
+>  static inline uint64_t read_cycle_counter(void)
+>  {
+>         return read_sysreg(pmccntr_el0);
+>  }
+>
+> +static inline void write_cycle_counter(uint64_t v)
+> +{
+> +       write_sysreg(v, pmccntr_el0);
+> +       isb();
+> +}
+> +
+>  static inline void reset_cycle_counter(void)
+>  {
+>         uint64_t v =3D read_sysreg(pmcr_el0);
+> @@ -289,6 +338,15 @@ struct guest_data {
+>
+>  static struct guest_data guest_data;
+>
+> +/* Data to communicate among guest threads */
+> +struct guest_irq_data {
+> +       uint32_t pmc_idx_bmap;
+> +       uint32_t irq_received_bmap;
+> +       struct spinlock lock;
+> +};
+> +
+> +static struct guest_irq_data guest_irq_data;
+> +
+>  #define VCPU_MIGRATIONS_TEST_ITERS_DEF         1000
+>  #define VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS 2
+>
+> @@ -322,6 +380,79 @@ static void guest_sync_handler(struct ex_regs *regs)
+>         expected_ec =3D INVALID_EC;
+>  }
+>
+> +static void guest_validate_irq(int pmc_idx, uint32_t pmovsclr, uint32_t =
+pmc_idx_bmap)
 
-It's safe to use local, non-shareable, TLBIs when relaxing permissions
-on a PTE in the KVM case for a couple of reasons. First, according to
-the ARM Arm (DDI 0487H.a D5-4913), permission relaxation does not need
-break-before-make.  Second, the VTTBR_EL2.CnP==0 case, where each PE
-has its own TLB entry for the same page, is tolerated correctly by KVM
-when doing permission relaxation. Not having changes broadcasted to
-all PEs is correct for this case, as it's safe to have other PEs fault
-on permission on the same page.
+Can you please add a comment about what is pmc_idx_bmap ?
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
----
- arch/arm64/include/asm/kvm_asm.h   |  4 +++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 10 ++++++
- arch/arm64/kvm/hyp/nvhe/tlb.c      | 54 ++++++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/pgtable.c       |  2 +-
- arch/arm64/kvm/hyp/vhe/tlb.c       | 32 ++++++++++++++++++
- 5 files changed, 101 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 43c3bc0f9544..bb17b2ead4c7 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -68,6 +68,7 @@ enum __kvm_host_smccc_func {
- 	__KVM_HOST_SMCCC_FUNC___kvm_vcpu_run,
- 	__KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context,
- 	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa,
-+	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa_nsh,
- 	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid,
- 	__KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context,
- 	__KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff,
-@@ -225,6 +226,9 @@ extern void __kvm_flush_vm_context(void);
- extern void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu);
- extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
- 				     int level);
-+extern void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
-+					 phys_addr_t ipa,
-+					 int level);
- extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
- 
- extern void __kvm_timer_set_cntvoff(u64 cntvoff);
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 728e01d4536b..c6bf1e49ca93 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -125,6 +125,15 @@ static void handle___kvm_tlb_flush_vmid_ipa(struct kvm_cpu_context *host_ctxt)
- 	__kvm_tlb_flush_vmid_ipa(kern_hyp_va(mmu), ipa, level);
- }
- 
-+static void handle___kvm_tlb_flush_vmid_ipa_nsh(struct kvm_cpu_context *host_ctxt)
-+{
-+	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
-+	DECLARE_REG(phys_addr_t, ipa, host_ctxt, 2);
-+	DECLARE_REG(int, level, host_ctxt, 3);
-+
-+	__kvm_tlb_flush_vmid_ipa_nsh(kern_hyp_va(mmu), ipa, level);
-+}
-+
- static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
- {
- 	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
-@@ -315,6 +324,7 @@ static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__kvm_vcpu_run),
- 	HANDLE_FUNC(__kvm_flush_vm_context),
- 	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
-+	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa_nsh),
- 	HANDLE_FUNC(__kvm_tlb_flush_vmid),
- 	HANDLE_FUNC(__kvm_flush_cpu_context),
- 	HANDLE_FUNC(__kvm_timer_set_cntvoff),
-diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-index d296d617f589..ef2b70587f93 100644
---- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-@@ -109,6 +109,60 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
- 	__tlb_switch_to_host(&cxt);
- }
- 
-+void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
-+				  phys_addr_t ipa, int level)
-+{
-+	struct tlb_inv_context cxt;
-+
-+	dsb(nshst);
-+
-+	/* Switch to requested VMID */
-+	__tlb_switch_to_guest(mmu, &cxt);
-+
-+	/*
-+	 * We could do so much better if we had the VA as well.
-+	 * Instead, we invalidate Stage-2 for this IPA, and the
-+	 * whole of Stage-1. Weep...
-+	 */
-+	ipa >>= 12;
-+	__tlbi_level(ipas2e1, ipa, level);
-+
-+	/*
-+	 * We have to ensure completion of the invalidation at Stage-2,
-+	 * since a table walk on another CPU could refill a TLB with a
-+	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
-+	 * the Stage-1 invalidation happened first.
-+	 */
-+	dsb(nsh);
-+	__tlbi(vmalle1);
-+	dsb(nsh);
-+	isb();
-+
-+	/*
-+	 * If the host is running at EL1 and we have a VPIPT I-cache,
-+	 * then we must perform I-cache maintenance at EL2 in order for
-+	 * it to have an effect on the guest. Since the guest cannot hit
-+	 * I-cache lines allocated with a different VMID, we don't need
-+	 * to worry about junk out of guest reset (we nuke the I-cache on
-+	 * VMID rollover), but we do need to be careful when remapping
-+	 * executable pages for the same guest. This can happen when KSM
-+	 * takes a CoW fault on an executable page, copies the page into
-+	 * a page that was previously mapped in the guest and then needs
-+	 * to invalidate the guest view of the I-cache for that page
-+	 * from EL1. To solve this, we invalidate the entire I-cache when
-+	 * unmapping a page from a guest if we have a VPIPT I-cache but
-+	 * the host is running at EL1. As above, we could do better if
-+	 * we had the VA.
-+	 *
-+	 * The moral of this story is: if you have a VPIPT I-cache, then
-+	 * you should be running with VHE enabled.
-+	 */
-+	if (icache_is_vpipt())
-+		icache_inval_all_pou();
-+
-+	__tlb_switch_to_host(&cxt);
-+}
-+
- void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
- {
- 	struct tlb_inv_context cxt;
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 3149b98d1701..dcf7ec1810c7 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -1179,7 +1179,7 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
- 				       KVM_PGTABLE_WALK_HANDLE_FAULT |
- 				       KVM_PGTABLE_WALK_SHARED);
- 	if (!ret)
--		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, pgt->mmu, addr, level);
-+		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa_nsh, pgt->mmu, addr, level);
- 	return ret;
- }
- 
-diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-index 24cef9b87f9e..e69da550cdc5 100644
---- a/arch/arm64/kvm/hyp/vhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -111,6 +111,38 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
- 	__tlb_switch_to_host(&cxt);
- }
- 
-+void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
-+				  phys_addr_t ipa, int level)
-+{
-+	struct tlb_inv_context cxt;
-+
-+	dsb(nshst);
-+
-+	/* Switch to requested VMID */
-+	__tlb_switch_to_guest(mmu, &cxt);
-+
-+	/*
-+	 * We could do so much better if we had the VA as well.
-+	 * Instead, we invalidate Stage-2 for this IPA, and the
-+	 * whole of Stage-1. Weep...
-+	 */
-+	ipa >>= 12;
-+	__tlbi_level(ipas2e1, ipa, level);
-+
-+	/*
-+	 * We have to ensure completion of the invalidation at Stage-2,
-+	 * since a table walk on another CPU could refill a TLB with a
-+	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
-+	 * the Stage-1 invalidation happened first.
-+	 */
-+	dsb(nsh);
-+	__tlbi(vmalle1);
-+	dsb(nsh);
-+	isb();
-+
-+	__tlb_switch_to_host(&cxt);
-+}
-+
- void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
- {
- 	struct tlb_inv_context cxt;
--- 
-2.40.0.rc0.216.gc4246ad0f0-goog
+> +{
+> +       /*
+> +        * Fail if there's an interrupt from unexpected PMCs.
+> +        * All the expected events' IRQs may not arrive at the same time.
+> +        * Hence, check if the interrupt is valid only if it's expected.
+> +        */
+> +       if (pmovsclr & BIT(pmc_idx)) {
+> +               GUEST_ASSERT_3(pmc_idx_bmap & BIT(pmc_idx), pmc_idx, pmov=
+sclr, pmc_idx_bmap);
+> +               write_pmovsclr(BIT(pmc_idx));
+> +       }
+> +}
+> +
+> +static void guest_irq_handler(struct ex_regs *regs)
+> +{
+> +       uint32_t pmc_idx_bmap;
+> +       uint64_t i, pmcr_n =3D get_pmcr_n();
+> +       uint32_t pmovsclr =3D read_pmovsclr();
+> +       unsigned int intid =3D gic_get_and_ack_irq();
+> +
+> +       /* No other IRQ apart from the PMU IRQ is expected */
+> +       GUEST_ASSERT_1(intid =3D=3D PMU_IRQ, intid);
+> +
+> +       spin_lock(&guest_irq_data.lock);
 
+Could you explain why this lock is required in this patch ??
+If this is used to serialize the interrupt context code and
+the normal (non-interrupt) context code, you might want to
+disable the IRQ ?  Using the spin lock won't work well for
+that if the interrupt handler is invoked while the normal
+context code grabs the lock.
+Having said that, since execute_precise_instrs() disables the PMU
+ via PMCR, and does isb after that, I don't think the overflow
+interrupt is delivered while the normal context code is in
+pmu_irq_*() anyway.
+
+> +       pmc_idx_bmap =3D READ_ONCE(guest_irq_data.pmc_idx_bmap);
+> +
+> +       for (i =3D 0; i < pmcr_n; i++)
+> +               guest_validate_irq(i, pmovsclr, pmc_idx_bmap);
+> +       guest_validate_irq(ARMV8_PMU_CYCLE_COUNTER_IDX, pmovsclr, pmc_idx=
+_bmap);
+> +
+> +       /* Mark IRQ as recived for the corresponding PMCs */
+> +       WRITE_ONCE(guest_irq_data.irq_received_bmap, pmovsclr);
+> +       spin_unlock(&guest_irq_data.lock);
+> +
+> +       gic_set_eoi(intid);
+> +}
+> +
+> +static int pmu_irq_received(int pmc_idx)
+> +{
+> +       bool irq_received;
+> +
+> +       spin_lock(&guest_irq_data.lock);
+> +       irq_received =3D READ_ONCE(guest_irq_data.irq_received_bmap) & BI=
+T(pmc_idx);
+> +       WRITE_ONCE(guest_irq_data.irq_received_bmap, guest_irq_data.pmc_i=
+dx_bmap & ~BIT(pmc_idx));
+> +       spin_unlock(&guest_irq_data.lock);
+> +
+> +       return irq_received;
+> +}
+> +
+> +static void pmu_irq_init(int pmc_idx)
+> +{
+> +       write_pmovsclr(BIT(pmc_idx));
+> +
+> +       spin_lock(&guest_irq_data.lock);
+> +       WRITE_ONCE(guest_irq_data.irq_received_bmap, guest_irq_data.pmc_i=
+dx_bmap & ~BIT(pmc_idx));
+> +       WRITE_ONCE(guest_irq_data.pmc_idx_bmap, guest_irq_data.pmc_idx_bm=
+ap | BIT(pmc_idx));
+> +       spin_unlock(&guest_irq_data.lock);
+> +
+> +       enable_irq(pmc_idx);
+> +}
+> +
+> +static void pmu_irq_exit(int pmc_idx)
+> +{
+> +       write_pmovsclr(BIT(pmc_idx));
+> +
+> +       spin_lock(&guest_irq_data.lock);
+> +       WRITE_ONCE(guest_irq_data.irq_received_bmap, guest_irq_data.pmc_i=
+dx_bmap & ~BIT(pmc_idx));
+> +       WRITE_ONCE(guest_irq_data.pmc_idx_bmap, guest_irq_data.pmc_idx_bm=
+ap & ~BIT(pmc_idx));
+> +       spin_unlock(&guest_irq_data.lock);
+> +
+> +       disable_irq(pmc_idx);
+> +}
+> +
+>  /*
+>   * Run the given operation that should trigger an exception with the
+>   * given exception class. The exception handler (guest_sync_handler)
+> @@ -420,12 +551,20 @@ static void execute_precise_instrs(int num, uint32_=
+t pmcr)
+>         precise_instrs_loop(loop, pmcr);
+>  }
+>
+> -static void test_instructions_count(int pmc_idx, bool expect_count)
+> +static void test_instructions_count(int pmc_idx, bool expect_count, bool=
+ test_overflow)
+>  {
+>         int i;
+>         struct pmc_accessor *acc;
+> -       uint64_t cnt;
+> -       int instrs_count =3D 100;
+> +       uint64_t cntr_val =3D 0;
+> +       int instrs_count =3D 500;
+
+Can we set instrs_count based on the value we set for cntr_val?
+(so that instrs_count can be adjusted automatically when we change the
+value of cntr_val ?)
+
+> +
+> +       if (test_overflow) {
+> +               /* Overflow scenarios can only be tested when a count is =
+expected */
+> +               GUEST_ASSERT_1(expect_count, pmc_idx);
+> +
+> +               cntr_val =3D PRE_OVERFLOW_32;
+> +               pmu_irq_init(pmc_idx);
+> +       }
+>
+>         enable_counter(pmc_idx);
+>
+> @@ -433,41 +572,68 @@ static void test_instructions_count(int pmc_idx, bo=
+ol expect_count)
+>         for (i =3D 0; i < ARRAY_SIZE(pmc_accessors); i++) {
+>                 acc =3D &pmc_accessors[i];
+>
+> -               pmu_disable_reset();
+> -
+> +               acc->write_cntr(pmc_idx, cntr_val);
+>                 acc->write_typer(pmc_idx, ARMV8_PMUV3_PERFCTR_INST_RETIRE=
+D);
+>
+> -               /* Enable the PMU and execute precisely number of instruc=
+tions as a workload */
+> -               execute_precise_instrs(instrs_count, read_sysreg(pmcr_el0=
+) | ARMV8_PMU_PMCR_E);
+> +               /*
+> +                * Enable the PMU and execute a precise number of instruc=
+tions as a workload.
+> +                * Since execute_precise_instrs() disables the PMU at the=
+ end, 'instrs_count'
+> +                * should have enough instructions to raise an IRQ.
+> +                */
+> +               execute_precise_instrs(instrs_count, ARMV8_PMU_PMCR_E);
+>
+> -               /* If a count is expected, the counter should be increase=
+d by 'instrs_count' */
+> -               cnt =3D acc->read_cntr(pmc_idx);
+> -               GUEST_ASSERT_4(expect_count =3D=3D (cnt =3D=3D instrs_cou=
+nt),
+> -                               i, expect_count, cnt, instrs_count);
+> +               /*
+> +                * If an overflow is expected, only check for the overfla=
+g flag.
+> +                * As overflow interrupt is enabled, the interrupt would =
+add additional
+> +                * instructions and mess up the precise instruction count=
+. Hence, measure
+> +                * the instructions count only when the test is not set u=
+p for an overflow.
+> +                */
+> +               if (test_overflow) {
+> +                       GUEST_ASSERT_2(pmu_irq_received(pmc_idx), pmc_idx=
+, i);
+> +               } else {
+> +                       uint64_t cnt =3D acc->read_cntr(pmc_idx);
+> +
+> +                       GUEST_ASSERT_4(expect_count =3D=3D (cnt =3D=3D in=
+strs_count),
+> +                                       pmc_idx, i, cnt, expect_count);
+> +               }
+>         }
+>
+> -       disable_counter(pmc_idx);
+> +       if (test_overflow)
+> +               pmu_irq_exit(pmc_idx);
+>  }
+>
+> -static void test_cycles_count(bool expect_count)
+> +static void test_cycles_count(bool expect_count, bool test_overflow)
+>  {
+>         uint64_t cnt;
+>
+> -       pmu_enable();
+> -       reset_cycle_counter();
+> +       if (test_overflow) {
+> +               /* Overflow scenarios can only be tested when a count is =
+expected */
+> +               GUEST_ASSERT(expect_count);
+> +
+> +               write_cycle_counter(PRE_OVERFLOW_64);
+> +               pmu_irq_init(ARMV8_PMU_CYCLE_COUNTER_IDX);
+> +       } else {
+> +               reset_cycle_counter();
+> +       }
+>
+>         /* Count cycles in EL0 and EL1 */
+>         write_pmccfiltr(0);
+>         enable_cycle_counter();
+>
+> +       /* Enable the PMU and execute precisely number of instructions as=
+ a workload */
+
+Can you please add a comment why we do this (500 times) iterations ?
+Can we set the iteration number based on the initial value of the
+cycle counter ?
+
+> +       execute_precise_instrs(500, read_sysreg(pmcr_el0) | ARMV8_PMU_PMC=
+R_E);
+>         cnt =3D read_cycle_counter();
+  >
+>         /*
+>          * If a count is expected by the test, the cycle counter should b=
+e increased by
+> -        * at least 1, as there is at least one instruction between enabl=
+ing the
+> +        * at least 1, as there are a number of instructions between enab=
+ling the
+>          * counter and reading the counter.
+>          */
+
+"at least 1" doesn't seem to be consistent with the GUEST_ASSERT_2 below
+when test_overflow is true, considering the initial value of the cycle coun=
+ter.
+Shouldn't this GUEST_ASSERT_2 be executed only if test_overflow is false ?
+(Or do you want to adjust the comment ?)
+
+>         GUEST_ASSERT_2(expect_count =3D=3D (cnt > 0), cnt, expect_count);
+> +       if (test_overflow) {
+> +               GUEST_ASSERT_2(pmu_irq_received(ARMV8_PMU_CYCLE_COUNTER_I=
+DX), cnt, expect_count);
+> +               pmu_irq_exit(ARMV8_PMU_CYCLE_COUNTER_IDX);
+> +       }
+>
+>         disable_cycle_counter();
+>         pmu_disable_reset();
+> @@ -477,19 +643,28 @@ static void test_event_count(uint64_t event, int pm=
+c_idx, bool expect_count)
+>  {
+>         switch (event) {
+>         case ARMV8_PMUV3_PERFCTR_INST_RETIRED:
+> -               test_instructions_count(pmc_idx, expect_count);
+> +               test_instructions_count(pmc_idx, expect_count, false);
+>                 break;
+>         case ARMV8_PMUV3_PERFCTR_CPU_CYCLES:
+> -               test_cycles_count(expect_count);
+> +               test_cycles_count(expect_count, false);
+>                 break;
+>         }
+>  }
+>
+>  static void test_basic_pmu_functionality(void)
+>  {
+> +       local_irq_disable();
+> +       gic_init(GIC_V3, 1, (void *)GICD_BASE_GPA, (void *)GICR_BASE_GPA)=
+;
+> +       gic_irq_enable(PMU_IRQ);
+> +       local_irq_enable();
+> +
+>         /* Test events on generic and cycle counters */
+> -       test_instructions_count(0, true);
+> -       test_cycles_count(true);
+> +       test_instructions_count(0, true, false);
+> +       test_cycles_count(true, false);
+> +
+> +       /* Test overflow with interrupts on generic and cycle counters */
+> +       test_instructions_count(0, true, true);
+> +       test_cycles_count(true, true);
+>  }
+>
+>  /*
+> @@ -813,9 +988,6 @@ static void guest_code(void)
+>         GUEST_DONE();
+>  }
+>
+> -#define GICD_BASE_GPA  0x8000000ULL
+> -#define GICR_BASE_GPA  0x80A0000ULL
+> -
+>  static unsigned long *
+>  set_event_filters(struct kvm_vcpu *vcpu, struct kvm_pmu_event_filter *pm=
+u_event_filters)
+>  {
+> @@ -866,7 +1038,7 @@ create_vpmu_vm(void *guest_code, struct kvm_pmu_even=
+t_filter *pmu_event_filters)
+>         struct kvm_vcpu *vcpu;
+>         struct kvm_vcpu_init init;
+>         uint8_t pmuver, ec;
+> -       uint64_t dfr0, irq =3D 23;
+> +       uint64_t dfr0, irq =3D PMU_IRQ;
+>         struct vpmu_vm *vpmu_vm;
+>         struct kvm_device_attr irq_attr =3D {
+>                 .group =3D KVM_ARM_VCPU_PMU_V3_CTRL,
+> @@ -883,6 +1055,7 @@ create_vpmu_vm(void *guest_code, struct kvm_pmu_even=
+t_filter *pmu_event_filters)
+>
+>         vpmu_vm->vm =3D vm =3D vm_create(1);
+>         vm_init_descriptor_tables(vm);
+> +       vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT, guest_irq_ha=
+ndler);
+>
+>         /* Catch exceptions for easier debugging */
+>         for (ec =3D 0; ec < ESR_EC_NUM; ec++) {
+> --
+> 2.39.1.581.gbfd45094c4-goog
+>
+
+Thanks,
+Reiji
