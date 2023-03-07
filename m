@@ -1,40 +1,40 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69BA536E
-	for <kvmarm@lists.linux.dev>; Tue,  7 Mar 2023 03:46:15 +0000 (UTC)
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-536c8bcae3bso123265827b3.2
-        for <kvmarm@lists.linux.dev>; Mon, 06 Mar 2023 19:46:15 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2E15391
+	for <kvmarm@lists.linux.dev>; Tue,  7 Mar 2023 03:46:16 +0000 (UTC)
+Received: by mail-pf1-f201.google.com with SMTP id bw25-20020a056a00409900b005a9d0e66a7aso6472353pfb.5
+        for <kvmarm@lists.linux.dev>; Mon, 06 Mar 2023 19:46:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678160774;
+        d=google.com; s=20210112; t=1678160776;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pxHXXFOzzPtwBytDTC3DJkgO49OCnlzta01APx3XRoY=;
-        b=nj/c+LEQmDR3kTSgRRFj/Gf2yKA5uMA9WHuiQKtfyl0Cgt1idBG16QiUDxM3VOKJLW
-         2QgLWoN42UOUUF/XJAIxdB0g5996QWHSl1b2EYqzH/Uc39menAy95Ls6YVr5Q4d9+FiQ
-         nlJ6wGmYGtNEMWyfgGB8fYaEHGBL+j0ftq+rnrsIUcUT0c3ltL1Nx9FURFUMBMUZt6q6
-         DbrCE5qRjl70S4SigIUvM6wNYgCEnXDYpdnnQrT5GdO84Xkr/ycK17e/96iP13EE5JQC
-         n3IwZWYckEoV9HQII0A29MCIOXPjx6WfFgdrGTZcUZ86MDkWrCvGYtGZKnVnYrwdu4sF
-         4TYw==
+        bh=ygqX7cYaXDWkUbcA+/8gfKKiXYuqG9E9j8+54ijaRhI=;
+        b=UdTnjJR7diqCGdoPrwymK8BVf2lIJswPqqOkE9ieVHPG32C3/AxTqH18MvIqTpgNfs
+         f9cSw/RpRxTpxdGUJssaGIH7B1x2fTjtL0fWX8KrXbvpU0jwDsN7LEZkcR3zsh5bnHzp
+         9FrzMZQEAKIBx90HXg0Iab/s2eZNRua6hCxF7I4XhPJjanaONXxQVF3QXN6J/FtMRJp4
+         LMnTqKC1bKyZzIFqRa4+ObK2Pvqo3Mq2D+DfuaxhJtreC3fCXFUwUYkEXXJtpKlgxcoZ
+         k7B+HRC0oaPlarVnjzJweOW9wAn7eADmgauRTxut0/dZ9W+pGmUmSo8zOkmSiLxtgFsx
+         WJeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678160774;
+        d=1e100.net; s=20210112; t=1678160776;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pxHXXFOzzPtwBytDTC3DJkgO49OCnlzta01APx3XRoY=;
-        b=Mobb2+Q+CgKLwkjBjvYUUXhZZj4dh8+z8yizBvWzKej/OCr0/E4Ax82ARqHSNrjP9H
-         2iXTgoOVR72dIpObAsW/gz1OnZtCFyrzuMd46GwZt6p2+GJxdZqUjJkrBkzUG8UwTxz9
-         tT6mK8AmVmfkTiIorJ9sygOP9o767zXZq+hlMdS1f4RZVlO0JZuK1bQO7G5sqwBjC1AK
-         DvSAs55XfzC0OEwrg5EbOp+It5pI0mF1typvAiIiBVMEgPAFuC2cBawg0+3KRK7RUgbt
-         RZnhF+LGi0mfMthttZuJDJCUfVb89INaNRCV4bW0MfR4zRBcRIvkYWcQ+U8MB8GAasXd
-         Vy0w==
-X-Gm-Message-State: AO0yUKVi0z45zWkXkO3ROMw/2E1/AQUKwOQnGqYYVw9Y9Gx+cFxA1u/4
-	eJ9LZRaUF4iLS5VmozvOrBm74MrYaTsRWw==
-X-Google-Smtp-Source: AK7set/QPG5XWbwT+rXjxMWSbAg7uofBayxdEsaP1/+8DML9BhxrSFvP0atmTt2hqDzmmsQ06l4NdFlLgMdgug==
+        bh=ygqX7cYaXDWkUbcA+/8gfKKiXYuqG9E9j8+54ijaRhI=;
+        b=bScQ+/4waS9sGUkAs4fGwLyLpd57ItTXdvqIZNTz2SICbiZ46F8n+Rvs1K99zHDBFd
+         PYEvd0DITvv2ATHpttwxeeVmjeVeLjEQMWQfkdGvr3TbH6xBefAJFZa5RWQVMWifBJOd
+         +H/5cWszaGFjSHTiyK0wr+vhHDgwTMGVc2YAs0kz+9jqOzZ+aQeXesvF3lXrQoe/PZBC
+         kj2+aYjpTmvm8OeYy2m2pBoLU7uveLdO9zCQ4LTQy+eGhk0Tl1+m2Z7kre5OYnpfDp5J
+         cuIZweDAwl+lR5+ViKsXZ805hLTafqp7w34f1TMyQzU7ELQ5Ktrg2zPce2h3uYAmuTyw
+         oNnw==
+X-Gm-Message-State: AO0yUKXNGr0JZOjcCJw1R9LACFLZwti8yvkbqZBpQ+rpRuaovnkkpfuW
+	+jEArYURfSRAFeK9Cl1LO/g1+wrFoBebtA==
+X-Google-Smtp-Source: AK7set9RrPF1bWr9sfzbU55TuzyilEy7iLjQ4Qc3mOoUfD5BSrWI3TYPI784ZQIhAOP0QbH+0RUdUxhh2/lIeA==
 X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a05:6902:151:b0:afa:d8b5:8e82 with SMTP
- id p17-20020a056902015100b00afad8b58e82mr5595371ybh.6.1678160774501; Mon, 06
- Mar 2023 19:46:14 -0800 (PST)
-Date: Tue,  7 Mar 2023 03:45:53 +0000
+ (user=ricarkol job=sendgmr) by 2002:a62:860d:0:b0:5f4:fe6d:fafa with SMTP id
+ x13-20020a62860d000000b005f4fe6dfafamr5651514pfd.0.1678160776437; Mon, 06 Mar
+ 2023 19:46:16 -0800 (PST)
+Date: Tue,  7 Mar 2023 03:45:54 +0000
 In-Reply-To: <20230307034555.39733-1-ricarkol@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230307034555.39733-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.40.0.rc0.216.gc4246ad0f0-goog
-Message-ID: <20230307034555.39733-11-ricarkol@google.com>
-Subject: [PATCH v6 10/12] KVM: arm64: Open-code kvm_mmu_write_protect_pt_masked()
+Message-ID: <20230307034555.39733-12-ricarkol@google.com>
+Subject: [PATCH v6 11/12] KVM: arm64: Split huge pages during KVM_CLEAR_DIRTY_LOG
 From: Ricardo Koller <ricarkol@google.com>
 To: pbonzini@redhat.com, maz@kernel.org, oupton@google.com, 
 	yuzenghui@huawei.com, dmatlack@google.com
@@ -56,84 +56,60 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
 	ricarkol@gmail.com, Ricardo Koller <ricarkol@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Move the functionality of kvm_mmu_write_protect_pt_masked() into its
-caller, kvm_arch_mmu_enable_log_dirty_pt_masked().  This will be used
-in a subsequent commit in order to share some of the code in
-kvm_arch_mmu_enable_log_dirty_pt_masked().
+This is the arm64 counterpart of commit cb00a70bd4b7 ("KVM: x86/mmu:
+Split huge pages mapped by the TDP MMU during KVM_CLEAR_DIRTY_LOG"),
+which has the benefit of splitting the cost of splitting a memslot
+across multiple ioctls.
 
-No functional change intended.
+Split huge pages on the range specified using KVM_CLEAR_DIRTY_LOG.
+And do not split when enabling dirty logging if
+KVM_DIRTY_LOG_INITIALLY_SET is set.
 
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- arch/arm64/kvm/mmu.c | 42 +++++++++++++++---------------------------
- 1 file changed, 15 insertions(+), 27 deletions(-)
+ arch/arm64/kvm/mmu.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index b1b8da5f8b6c..910aea6bbd1e 100644
+index 910aea6bbd1e..d54223b5db97 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1056,28 +1056,6 @@ static void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot)
- 	kvm_flush_remote_tlbs(kvm);
- }
- 
--/**
-- * kvm_mmu_write_protect_pt_masked() - write protect dirty pages
-- * @kvm:	The KVM pointer
-- * @slot:	The memory slot associated with mask
-- * @gfn_offset:	The gfn offset in memory slot
-- * @mask:	The mask of dirty pages at offset 'gfn_offset' in this memory
-- *		slot to be write protected
-- *
-- * Walks bits set in mask write protects the associated pte's. Caller must
-- * acquire kvm_mmu_lock.
-- */
--static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
--		struct kvm_memory_slot *slot,
--		gfn_t gfn_offset, unsigned long mask)
--{
--	phys_addr_t base_gfn = slot->base_gfn + gfn_offset;
--	phys_addr_t start = (base_gfn +  __ffs(mask)) << PAGE_SHIFT;
--	phys_addr_t end = (base_gfn + __fls(mask) + 1) << PAGE_SHIFT;
--
--	stage2_wp_range(&kvm->arch.mmu, start, end);
--}
--
- /**
-  * kvm_mmu_split_memory_region() - split the stage 2 blocks into PAGE_SIZE
-  *				   pages for memory slot
-@@ -1104,17 +1082,27 @@ static void kvm_mmu_split_memory_region(struct kvm *kvm, int slot)
- }
- 
- /*
-- * kvm_arch_mmu_enable_log_dirty_pt_masked - enable dirty logging for selected
-- * dirty pages.
-+ * kvm_arch_mmu_enable_log_dirty_pt_masked() - enable dirty logging for selected pages.
-+ * @kvm:	The KVM pointer
-+ * @slot:	The memory slot associated with mask
-+ * @gfn_offset:	The gfn offset in memory slot
-+ * @mask:	The mask of pages at offset 'gfn_offset' in this memory
-+ *		slot to enable dirty logging on
+@@ -1089,8 +1089,8 @@ static void kvm_mmu_split_memory_region(struct kvm *kvm, int slot)
+  * @mask:	The mask of pages at offset 'gfn_offset' in this memory
+  *		slot to enable dirty logging on
   *
-- * It calls kvm_mmu_write_protect_pt_masked to write protect selected pages to
-- * enable dirty logging for them.
-+ * Writes protect selected pages to enable dirty logging for them. Caller must
-+ * acquire kvm->mmu_lock.
+- * Writes protect selected pages to enable dirty logging for them. Caller must
+- * acquire kvm->mmu_lock.
++ * Splits selected pages to PAGE_SIZE and then writes protect them to enable
++ * dirty logging for them. Caller must acquire kvm->mmu_lock.
   */
  void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
  		struct kvm_memory_slot *slot,
- 		gfn_t gfn_offset, unsigned long mask)
- {
--	kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
-+	phys_addr_t base_gfn = slot->base_gfn + gfn_offset;
-+	phys_addr_t start = (base_gfn +  __ffs(mask)) << PAGE_SHIFT;
-+	phys_addr_t end = (base_gfn + __fls(mask) + 1) << PAGE_SHIFT;
+@@ -1103,6 +1103,13 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+ 	lockdep_assert_held_write(&kvm->mmu_lock);
+ 
+ 	stage2_wp_range(&kvm->arch.mmu, start, end);
 +
-+	lockdep_assert_held_write(&kvm->mmu_lock);
-+
-+	stage2_wp_range(&kvm->arch.mmu, start, end);
++	/*
++	 * If initially-all-set mode is not set, then huge-pages were already
++	 * split when enabling dirty logging: no need to do it again.
++	 */
++	if (kvm_dirty_log_manual_protect_and_init_set(kvm))
++		kvm_mmu_split_huge_pages(kvm, start, end);
  }
  
  static void kvm_send_hwpoison_signal(unsigned long address, short lsb)
+@@ -1889,7 +1896,9 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+ 		 * this when deleting, moving, disabling dirty logging, or
+ 		 * creating the memslot (a nop). Doing it for deletes makes
+ 		 * sure we don't leak memory, and there's no need to keep the
+-		 * cache around for any of the other cases.
++		 * cache around for any of the other cases. Keeping the cache
++		 * is useful for successive KVM_CLEAR_DIRTY_LOG calls, which is
++		 * not handled in this function.
+ 		 */
+ 		kvm_mmu_free_memory_cache(&kvm->arch.mmu.split_page_cache);
+ 	}
 -- 
 2.40.0.rc0.216.gc4246ad0f0-goog
 
