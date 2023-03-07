@@ -1,934 +1,252 @@
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E3523D72
-	for <kvmarm@lists.linux.dev>; Tue,  7 Mar 2023 11:28:50 +0000 (UTC)
-Received: by mail-wr1-f42.google.com with SMTP id l1so11718406wry.12
-        for <kvmarm@lists.linux.dev>; Tue, 07 Mar 2023 03:28:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1678188528;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=09uqZm0w18GChoUZWmG8uQ1lR/P11PH+uuK+IHEB5NE=;
-        b=OSOYkBjI7TC+Rm2aaHOSqHqWHa7HylcG523CaFhQiH6wt0GvgOMdduYPHz24MPbFBY
-         A2aK7Gca5+7GRKyJHRNA60/7+B+d25TQodCJ6iAbkYFR/tnJp8B8RX5o83XpMldgr9BP
-         dlTKCeUCDDJoG91LoM/U9eaPig118njBDp97Iovex+0y0HM9mRFIWg0CHXKxZlHdJ4Xa
-         F0eT2QFaElaAzUnIqDK0T8iqrXqWc8qWAn3JwfdbU4H1RGBiUdzv47yjrraX114+9wA7
-         kWnNAAJlBdJu/g77+SZRE5Ze6fMjgCWOex6RwaKwdJ5iX1ePW9MFFQNG9zCYhrolCPgh
-         740Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678188528;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=09uqZm0w18GChoUZWmG8uQ1lR/P11PH+uuK+IHEB5NE=;
-        b=C00eK2fwegOG1uP+KCmowlolKqZ4+wo2x2Kk1pQVYjUPEE9/+kcENoPXE8eHaPRE5S
-         hCS1QdfHVSuMf1ZdJrQeOZdZbTCBKg7YapcYarvPEQaF+1jTVku9MENb97pr0bp5Lx7H
-         v2Mqm+iuzr1UmrkqUY+8VMKAc9JdJMwe+VTuGsr5dSGPQWcWW5ELZ6E9dFbGAbwqP3sz
-         5JI9hmzwnkFETXghtRyjQ3AmcGN37W8V05KoDd1a4U+WFf1BiKYwuLpuxQlGArXKb0ww
-         QFPudDLGcGbosZV+yIdBFXKTvTMOfDC8RlxPCQPMH9vYqP3+0rkyoMBy0DNy97bCqiXU
-         PVgw==
-X-Gm-Message-State: AO0yUKU4TPkBXLYjqw0NLgZ6yPE0/aCLbAsawpSRl+zURT2TdXBgqPzz
-	AwkPEndptj6Nfsht12cE+SJ+Vg==
-X-Google-Smtp-Source: AK7set9L84RdvQtYkRSddaSiBNWOguNL89sydAgmRWoaQipbeDgRPoBcVF8Y7n/6aZITuqcxpwCZ/g==
-X-Received: by 2002:adf:eece:0:b0:2c6:2ac4:66ee with SMTP id a14-20020adfeece000000b002c62ac466eemr9425099wrp.39.1678188528453;
-        Tue, 07 Mar 2023 03:28:48 -0800 (PST)
-Received: from zen.linaroharston ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id f2-20020adfdb42000000b002c54fb024b2sm12192159wrj.61.2023.03.07.03.28.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Mar 2023 03:28:47 -0800 (PST)
-Received: from zen.lan (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 2EF1B1FFBF;
-	Tue,  7 Mar 2023 11:28:46 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org,
-	qemu-devel@nongnu.org,
-	Thomas Huth <thuth@redhat.com>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	kvmarm@lists.linux.dev,
-	qemu-arm@nongnu.org,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [kvm-unit-tests PATCH v10 7/7] arm/tcg-test: some basic TCG exercising tests
-Date: Tue,  7 Mar 2023 11:28:45 +0000
-Message-Id: <20230307112845.452053-8-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230307112845.452053-1-alex.bennee@linaro.org>
-References: <20230307112845.452053-1-alex.bennee@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28183C00;
+	Tue,  7 Mar 2023 12:01:00 +0000 (UTC)
+Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.206])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4PWDXl435Nz6J7Pg;
+	Tue,  7 Mar 2023 20:00:23 +0800 (CST)
+Received: from localhost (10.126.173.40) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Tue, 7 Mar
+ 2023 12:00:51 +0000
+Date: Tue, 7 Mar 2023 12:00:50 +0000
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: James Morse <james.morse@arm.com>
+CC: <linux-pm@vger.kernel.org>, <loongarch@lists.linux.dev>,
+	<kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
+	<linux-acpi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
+	<linux-ia64@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <x86@kernel.org>, Marc Zyngier
+	<maz@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Lorenzo Pieralisi
+	<lpieralisi@kernel.org>, "Mark Rutland" <mark.rutland@arm.com>, Sudeep Holla
+	<sudeep.holla@arm.com>, Borislav Petkov <bp@alien8.de>, H Peter Anvin
+	<hpa@zytor.com>, Dave Hansen <dave.hansen@linux.intel.com>, Ingo Molnar
+	<mingo@redhat.com>, Will Deacon <will@kernel.org>, Catalin Marinas
+	<catalin.marinas@arm.com>, Huacai Chen <chenhuacai@kernel.org>, Suzuki K
+ Poulose <suzuki.poulose@arm.com>, "Oliver Upton" <oliver.upton@linux.dev>,
+	Len Brown <lenb@kernel.org>, Rafael Wysocki <rafael@kernel.org>, WANG Xuerui
+	<kernel@xen0n.name>, Salil Mehta <salil.mehta@huawei.com>, Russell King
+	<linux@armlinux.org.uk>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	<kangkang.shen@futurewei.com>
+Subject: Re: [RFC PATCH 00/32] ACPI/arm64: add support for virtual
+ cpuhotplug
+Message-ID: <20230307120050.000032f1@Huawei.com>
+In-Reply-To: <20230203135043.409192-1-james.morse@arm.com>
+References: <20230203135043.409192-1-james.morse@arm.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.126.173.40]
+X-ClientProxiedBy: lhrpeml500005.china.huawei.com (7.191.163.240) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
+X-CFilter-Loop: Reflected
 
-These tests are not really aimed at KVM at all but exist to stretch
-QEMU's TCG code generator. In particular these exercise the ability of
-the TCG to:
+On Fri,  3 Feb 2023 13:50:11 +0000
+James Morse <james.morse@arm.com> wrote:
 
-  * Chain TranslationBlocks together (tight)
-  * Handle heavy usage of the tb_jump_cache (paged)
-  * Pathological case of computed local jumps (computed)
 
-In addition the tests can be varied by adding IPI IRQs or SMC sequences
-into the mix to stress the tcg_exit and invalidation mechanisms.
+...
 
-To explicitly stress the tb_flush() mechanism you can use the mod/rounds
-parameters to force more frequent tb invalidation. Combined with setting
--tb-size 1 in QEMU to limit the code generation buffer size.
+> On a system that supports cpuhotplug the MADT has to describe every possible
+> CPU at boot. Under KVM, the vGIC needs to know about every possible vCPU before
+> the guest is started.
+> With these constraints, virtual-cpuhotplug is really just a hypervisor/firmware
+> policy about which CPUs can be brought online.
+> 
+> This series adds support for virtual-cpuhotplug as exactly that: firmware
+> policy. This may even work on a physical machine too; for a guest the part of
+> firmware is played by the VMM. (typically Qemu).
+> 
+> PSCI support is modified to return 'DENIED' if the CPU can't be brought
+> online/enabled yet. The CPU object's _STA method's enabled bit is used to
+> indicate firmware's current disposition. If the CPU has its enabled bit clear,
+> it will not be registered with sysfs, and attempts to bring it online will
+> fail. The notifications that _STA has changed its value then work in the same
+> way as physical hotplug, and firmware can cause the CPU to be registered some
+> time later, allowing it to be brought online.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20211118184650.661575-11-alex.bennee@linaro.org>
+Hi James,
 
----
-v9
-  - moved back to unittests.cfg
-  - fixed some missing accel tags
-  - s/printf/report_info/
-  - clean up some comment blocks
----
- arm/Makefile.arm     |   2 +
- arm/Makefile.arm64   |   2 +
- arm/Makefile.common  |   1 +
- arm/tcg-test-asm.S   | 171 ++++++++++++++++++++++
- arm/tcg-test-asm64.S | 170 ++++++++++++++++++++++
- arm/tcg-test.c       | 340 +++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg    |  84 +++++++++++
- 7 files changed, 770 insertions(+)
- create mode 100644 arm/tcg-test-asm.S
- create mode 100644 arm/tcg-test-asm64.S
- create mode 100644 arm/tcg-test.c
+As we discussed on an LOD call a while back, I think that we need some path to
+find out if the guest supports vCPU HP or not so that info can be queried by
+an orchestrator / libvirt etc.  In general the entity responsible for allocating
+extra vCPUs may not know what support the VM has for this feature.
 
-diff --git a/arm/Makefile.arm b/arm/Makefile.arm
-index 01fd4c7b..6af61033 100644
---- a/arm/Makefile.arm
-+++ b/arm/Makefile.arm
-@@ -37,4 +37,6 @@ tests =
- 
- include $(SRCDIR)/$(TEST_DIR)/Makefile.common
- 
-+$(TEST_DIR)/tcg-test.elf: $(cstart.o) $(TEST_DIR)/tcg-test.o $(TEST_DIR)/tcg-test-asm.o
-+
- arch_clean: arm_clean
-diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-index 42e18e77..72da5033 100644
---- a/arm/Makefile.arm64
-+++ b/arm/Makefile.arm64
-@@ -35,5 +35,7 @@ tests += $(TEST_DIR)/debug.flat
- 
- include $(SRCDIR)/$(TEST_DIR)/Makefile.common
- 
-+$(TEST_DIR)/tcg-test.elf: $(cstart.o) $(TEST_DIR)/tcg-test.o $(TEST_DIR)/tcg-test-asm64.o
-+
- arch_clean: arm_clean
- 	$(RM) lib/arm64/.*.d
-diff --git a/arm/Makefile.common b/arm/Makefile.common
-index 0a2bdcfc..0b81fa72 100644
---- a/arm/Makefile.common
-+++ b/arm/Makefile.common
-@@ -14,6 +14,7 @@ tests-common += $(TEST_DIR)/pl031.flat
- tests-common += $(TEST_DIR)/tlbflush-code.flat
- tests-common += $(TEST_DIR)/locking-test.flat
- tests-common += $(TEST_DIR)/barrier-litmus-test.flat
-+tests-common += $(TEST_DIR)/tcg-test.flat
- 
- tests-all = $(tests-common) $(tests)
- all: directories $(tests-all)
-diff --git a/arm/tcg-test-asm.S b/arm/tcg-test-asm.S
-new file mode 100644
-index 00000000..f58fac08
---- /dev/null
-+++ b/arm/tcg-test-asm.S
-@@ -0,0 +1,171 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * TCG Test assembler functions for armv7 tests.
-+ *
-+ * Copyright (C) 2016, Linaro Ltd, Alex Bennée <alex.bennee@linaro.org>
-+ *
-+ * These helper functions are written in pure asm to control the size
-+ * of the basic blocks and ensure they fit neatly into page
-+ * aligned chunks. The pattern of branches they follow is determined by
-+ * the 32 bit seed they are passed. It should be the same for each set.
-+ *
-+ * Calling convention
-+ *  - r0, iterations
-+ *  - r1, jump pattern
-+ *  - r2-r3, scratch
-+ *
-+ * Returns r0
-+ */
-+
-+.arm
-+
-+.section .text
-+
-+/*
-+ * Tight - all blocks should quickly be patched and should run
-+ * very fast unless irqs or smc gets in the way
-+ */
-+
-+.global tight_start
-+tight_start:
-+        subs    r0, r0, #1
-+        beq     tight_end
-+
-+        ror     r1, r1, #1
-+        tst     r1, #1
-+        beq     tightA
-+        b       tight_start
-+
-+tightA:
-+        subs    r0, r0, #1
-+        beq     tight_end
-+
-+        ror     r1, r1, #1
-+        tst     r1, #1
-+        beq     tightB
-+        b       tight_start
-+
-+tightB:
-+        subs    r0, r0, #1
-+        beq     tight_end
-+
-+        ror     r1, r1, #1
-+        tst     r1, #1
-+        beq     tight_start
-+        b       tightA
-+
-+.global tight_end
-+tight_end:
-+        mov     pc, lr
-+
-+/*
-+ * Computed jumps cannot be hardwired into the basic blocks so each one
-+ * will either cause an exit for the main execution loop or trigger an
-+ * inline look up for the next block.
-+ *
-+ * There is some caching which should ameliorate the cost a little.
-+ */
-+
-+        /* Align << 13 == 4096 byte alignment */
-+        .align 13
-+        .global computed_start
-+computed_start:
-+        subs    r0, r0, #1
-+        beq     computed_end
-+
-+        /* Jump table */
-+        ror     r1, r1, #1
-+        and     r2, r1, #1
-+        adr     r3, computed_jump_table
-+        ldr     r2, [r3, r2, lsl #2]
-+        mov     pc, r2
-+
-+        b       computed_err
-+
-+computed_jump_table:
-+        .word   computed_start
-+        .word   computedA
-+
-+computedA:
-+        subs    r0, r0, #1
-+        beq     computed_end
-+
-+        /* Jump into code */
-+        ror     r1, r1, #1
-+        and     r2, r1, #1
-+        adr     r3, 1f
-+        add	r3, r2, lsl #2
-+        mov     pc, r3
-+1:      b       computed_start
-+        b       computedB
-+
-+        b       computed_err
-+
-+
-+computedB:
-+        subs    r0, r0, #1
-+        beq     computed_end
-+        ror     r1, r1, #1
-+
-+        /* Conditional register load */
-+        adr     r3, computedA
-+        tst     r1, #1
-+        adreq   r3, computed_start
-+        mov     pc, r3
-+
-+        b       computed_err
-+
-+computed_err:
-+        mov     r0, #1
-+        .global computed_end
-+computed_end:
-+        mov     pc, lr
-+
-+
-+/*
-+ * Page hoping
-+ *
-+ * Each block is in a different page, hence the blocks never get joined
-+ */
-+        /* Align << 13 == 4096 byte alignment */
-+        .align 13
-+        .global paged_start
-+paged_start:
-+        subs    r0, r0, #1
-+        beq     paged_end
-+
-+        ror     r1, r1, #1
-+        tst     r1, #1
-+        beq     pagedA
-+        b       paged_start
-+
-+        /* Align << 13 == 4096 byte alignment */
-+        .align 13
-+pagedA:
-+        subs    r0, r0, #1
-+        beq     paged_end
-+
-+        ror     r1, r1, #1
-+        tst     r1, #1
-+        beq     pagedB
-+        b       paged_start
-+
-+        /* Align << 13 == 4096 byte alignment */
-+        .align 13
-+pagedB:
-+        subs    r0, r0, #1
-+        beq     paged_end
-+
-+        ror     r1, r1, #1
-+        tst     r1, #1
-+        beq     paged_start
-+        b       pagedA
-+
-+        /* Align << 13 == 4096 byte alignment */
-+        .align 13
-+.global paged_end
-+paged_end:
-+        mov     pc, lr
-+
-+.global test_code_end
-+test_code_end:
-diff --git a/arm/tcg-test-asm64.S b/arm/tcg-test-asm64.S
-new file mode 100644
-index 00000000..e69a8c72
---- /dev/null
-+++ b/arm/tcg-test-asm64.S
-@@ -0,0 +1,170 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * TCG Test assembler functions for armv8 tests.
-+ *
-+ * Copyright (C) 2016, Linaro Ltd, Alex Bennée <alex.bennee@linaro.org>
-+ *
-+ * These helper functions are written in pure asm to control the size
-+ * of the basic blocks and ensure they fit neatly into page
-+ * aligned chunks. The pattern of branches they follow is determined by
-+ * the 32 bit seed they are passed. It should be the same for each set.
-+ *
-+ * Calling convention
-+ *  - x0, iterations
-+ *  - x1, jump pattern
-+ *  - x2-x3, scratch
-+ *
-+ * Returns x0
-+ */
-+
-+.section .text
-+
-+/*
-+ * Tight - all blocks should quickly be patched and should run
-+ * very fast unless irqs or smc gets in the way
-+ */
-+
-+.global tight_start
-+tight_start:
-+        subs    x0, x0, #1
-+        beq     tight_end
-+
-+        ror     x1, x1, #1
-+        tst     x1, #1
-+        beq     tightA
-+        b       tight_start
-+
-+tightA:
-+        subs    x0, x0, #1
-+        beq     tight_end
-+
-+        ror     x1, x1, #1
-+        tst     x1, #1
-+        beq     tightB
-+        b       tight_start
-+
-+tightB:
-+        subs    x0, x0, #1
-+        beq     tight_end
-+
-+        ror     x1, x1, #1
-+        tst     x1, #1
-+        beq     tight_start
-+        b       tightA
-+
-+.global tight_end
-+tight_end:
-+        ret
-+
-+/*
-+ * Computed jumps cannot be hardwired into the basic blocks so each one
-+ * will either cause an exit for the main execution loop or trigger an
-+ * inline look up for the next block.
-+ *
-+ * There is some caching which should ameliorate the cost a little.
-+ */
-+
-+        /* Align << 13 == 4096 byte alignment */
-+        .align 13
-+        .global computed_start
-+computed_start:
-+        subs    x0, x0, #1
-+        beq     computed_end
-+
-+        /* Jump table */
-+        ror     x1, x1, #1
-+        and     x2, x1, #1
-+        adr     x3, computed_jump_table
-+        ldr     x2, [x3, x2, lsl #3]
-+        br      x2
-+
-+        b       computed_err
-+
-+computed_jump_table:
-+        .quad   computed_start
-+        .quad   computedA
-+
-+computedA:
-+        subs    x0, x0, #1
-+        beq     computed_end
-+
-+        /* Jump into code */
-+        ror     x1, x1, #1
-+        and     x2, x1, #1
-+        adr     x3, 1f
-+        add	x3, x3, x2, lsl #2
-+        br      x3
-+1:      b       computed_start
-+        b       computedB
-+
-+        b       computed_err
-+
-+
-+computedB:
-+        subs    x0, x0, #1
-+        beq     computed_end
-+        ror     x1, x1, #1
-+
-+        /* Conditional register load */
-+        adr     x2, computedA
-+        adr     x3, computed_start
-+        tst     x1, #1
-+        csel    x2, x3, x2, eq
-+        br      x2
-+
-+        b       computed_err
-+
-+computed_err:
-+        mov     x0, #1
-+        .global computed_end
-+computed_end:
-+        ret
-+
-+
-+/*
-+ * Page hoping
-+ *
-+ * Each block is in a different page, hence the blocks never get joined
-+ */
-+        /* Align << 13 == 4096 byte alignment */
-+        .align 13
-+        .global paged_start
-+paged_start:
-+        subs    x0, x0, #1
-+        beq     paged_end
-+
-+        ror     x1, x1, #1
-+        tst     x1, #1
-+        beq     pagedA
-+        b       paged_start
-+
-+        /* Align << 13 == 4096 byte alignment */
-+        .align 13
-+pagedA:
-+        subs    x0, x0, #1
-+        beq     paged_end
-+
-+        ror     x1, x1, #1
-+        tst     x1, #1
-+        beq     pagedB
-+        b       paged_start
-+
-+        /* Align << 13 == 4096 byte alignment */
-+        .align 13
-+pagedB:
-+        subs    x0, x0, #1
-+        beq     paged_end
-+
-+        ror     x1, x1, #1
-+        tst     x1, #1
-+        beq     paged_start
-+        b       pagedA
-+
-+        /* Align << 13 == 4096 byte alignment */
-+        .align 13
-+.global paged_end
-+paged_end:
-+        ret
-+
-+.global test_code_end
-+test_code_end:
-diff --git a/arm/tcg-test.c b/arm/tcg-test.c
-new file mode 100644
-index 00000000..d04d56e4
---- /dev/null
-+++ b/arm/tcg-test.c
-@@ -0,0 +1,340 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * ARM TCG Tests
-+ *
-+ * These tests are explicitly aimed at stretching the QEMU TCG engine.
-+ */
-+
-+#include <libcflat.h>
-+#include <asm/processor.h>
-+#include <asm/smp.h>
-+#include <asm/cpumask.h>
-+#include <asm/barrier.h>
-+#include <asm/mmu.h>
-+#include <asm/gic.h>
-+
-+#include <prng.h>
-+
-+#define MAX_CPUS 8
-+
-+/* These entry points are in the assembly code */
-+extern int tight_start(uint32_t count, uint32_t pattern);
-+extern int computed_start(uint32_t count, uint32_t pattern);
-+extern int paged_start(uint32_t count, uint32_t pattern);
-+extern uint32_t tight_end;
-+extern uint32_t computed_end;
-+extern uint32_t paged_end;
-+extern unsigned long test_code_end;
-+
-+typedef int (*test_fn)(uint32_t count, uint32_t pattern);
-+
-+typedef struct {
-+	const char *test_name;
-+	bool       should_pass;
-+	test_fn    start_fn;
-+	uint32_t   *code_end;
-+} test_descr_t;
-+
-+/* Test array */
-+static test_descr_t tests[] = {
-+       /*
-+	* Tight chain.
-+	*
-+	* These are a bunch of basic blocks that have fixed branches in
-+	* a page aligned space. The branches taken are decided by a
-+	* psuedo-random bitmap for each CPU.
-+	*
-+	* Once the basic blocks have been chained together by the TCG they
-+	* should run until they reach their block count. This will be the
-+	* most efficient mode in which generated code is run. The only other
-+	* exits will be caused by interrupts or TB invalidation.
-+	*/
-+	{ "tight", true, tight_start, &tight_end },
-+	/*
-+	 * Computed jumps.
-+	 *
-+	 * A bunch of basic blocks which just do computed jumps so the basic
-+	 * block is never chained but they are all within a page (maybe not
-+	 * required). This will exercise the cache lookup but not the new
-+	 * generation.
-+	 */
-+	{ "computed", true, computed_start, &computed_end },
-+	/*
-+	 * Page ping pong.
-+	 *
-+	 * Have the blocks are separated by PAGE_SIZE so they can never
-+	 * be chained together.
-+	 *
-+	 */
-+	{ "paged", true, paged_start, &paged_end}
-+};
-+
-+static test_descr_t *test;
-+
-+static int iterations = 1000000;
-+static int rounds = 1000;
-+static int mod_freq = 5;
-+static uint32_t pattern[MAX_CPUS];
-+
-+/* control flags */
-+static int smc;
-+static int irq;
-+static int check_irq;
-+
-+/* IRQ accounting */
-+#define MAX_IRQ_IDS 16
-+static int irqv;
-+static unsigned long irq_sent_ts[MAX_CPUS][MAX_CPUS][MAX_IRQ_IDS];
-+
-+static int irq_recv[MAX_CPUS];
-+static int irq_sent[MAX_CPUS];
-+static int irq_overlap[MAX_CPUS];  /* if ts > now, i.e a race */
-+static int irq_slow[MAX_CPUS];  /* if delay > threshold */
-+static unsigned long irq_latency[MAX_CPUS]; /* cumulative time */
-+
-+static int errors[MAX_CPUS];
-+
-+static cpumask_t smp_test_complete;
-+
-+static cpumask_t ready;
-+
-+static void wait_on_ready(void)
-+{
-+	cpumask_set_cpu(smp_processor_id(), &ready);
-+	while (!cpumask_full(&ready))
-+		cpu_relax();
-+}
-+
-+/*
-+ * This triggers TCGs SMC detection by writing values to the executing
-+ * code pages. We are not actually modifying the instructions and the
-+ * underlying code will remain unchanged. However this should trigger
-+ * invalidation of the Translation Blocks
-+ */
-+
-+static void trigger_smc_detection(uint32_t *start, uint32_t *end)
-+{
-+	volatile uint32_t *ptr = start;
-+
-+	while (ptr < end) {
-+		uint32_t inst = *ptr;
-+		*ptr++ = inst;
-+	}
-+}
-+
-+/* Handler for receiving IRQs */
-+
-+static void irq_handler(struct pt_regs *regs __unused)
-+{
-+	unsigned long then, now = get_cntvct();
-+	int cpu = smp_processor_id();
-+	u32 irqstat = gic_read_iar();
-+	u32 irqnr = gic_iar_irqnr(irqstat);
-+
-+	if (irqnr != GICC_INT_SPURIOUS) {
-+		unsigned int src_cpu = (irqstat >> 10) & 0x7;
-+
-+		gic_write_eoir(irqstat);
-+		irq_recv[cpu]++;
-+
-+		then = irq_sent_ts[src_cpu][cpu][irqnr];
-+
-+		if (then > now) {
-+			irq_overlap[cpu]++;
-+		} else {
-+			unsigned long latency = (now - then);
-+
-+			if (latency > 30000)
-+				irq_slow[cpu]++;
-+			else
-+				irq_latency[cpu] += latency;
-+		}
-+	}
-+}
-+
-+/*
-+ * This triggers cross-CPU IRQs. Each IRQ should cause the basic block
-+ * execution to finish the main run-loop get entered again.
-+ */
-+static int send_cross_cpu_irqs(int this_cpu, int irq)
-+{
-+	int cpu, sent = 0;
-+	cpumask_t mask;
-+
-+	cpumask_copy(&mask, &cpu_present_mask);
-+
-+	for_each_present_cpu(cpu) {
-+		if (cpu != this_cpu) {
-+			irq_sent_ts[this_cpu][cpu][irq] = get_cntvct();
-+			cpumask_clear_cpu(cpu, &mask);
-+			sent++;
-+		}
-+	}
-+
-+	gic_ipi_send_mask(irq, &mask);
-+
-+	return sent;
-+}
-+
-+static void do_test(void)
-+{
-+	int cpu = smp_processor_id();
-+	int i, irq_id = 0;
-+
-+	report_info("CPU%d: online and setting up with pattern 0x%"PRIx32,
-+		    cpu, pattern[cpu]);
-+
-+	if (irq) {
-+		gic_enable_defaults();
-+#ifdef __arm__
-+		install_exception_handler(EXCPTN_IRQ, irq_handler);
-+#else
-+		install_irq_handler(EL1H_IRQ, irq_handler);
-+#endif
-+		local_irq_enable();
-+
-+		wait_on_ready();
-+	}
-+
-+	for (i = 0; i < rounds; i++) {
-+		/* Enter the blocks */
-+		errors[cpu] += test->start_fn(iterations, pattern[cpu]);
-+
-+		if ((i + cpu) % mod_freq == 0) {
-+			if (smc)
-+				trigger_smc_detection((uint32_t *) test->start_fn,
-+						      test->code_end);
-+
-+			if (irq) {
-+				irq_sent[cpu] += send_cross_cpu_irqs(cpu, irq_id);
-+				irq_id++;
-+				irq_id = irq_id % 15;
-+			}
-+		}
-+	}
-+
-+	/* ensure everything complete before we finish */
-+	smp_wmb();
-+
-+	cpumask_set_cpu(cpu, &smp_test_complete);
-+	if (cpu != 0)
-+		halt();
-+}
-+
-+static void report_irq_stats(int cpu)
-+{
-+	int recv = irq_recv[cpu];
-+	int race = irq_overlap[cpu];
-+	int slow = irq_slow[cpu];
-+
-+	unsigned long avg_latency = irq_latency[cpu] / (recv - (race + slow));
-+
-+	report_info("CPU%d: %d irqs (%d races, %d slow,  %ld ticks avg latency)",
-+		    cpu, recv, race, slow, avg_latency);
-+}
-+
-+
-+static void setup_and_run_tcg_test(void)
-+{
-+	static const unsigned char seed[] = "tcg-test";
-+	struct isaac_ctx prng_context;
-+	int cpu;
-+	int total_err = 0, total_sent = 0, total_recv = 0;
-+
-+	isaac_init(&prng_context, &seed[0], sizeof(seed));
-+
-+	/* boot other CPUs */
-+	for_each_present_cpu(cpu) {
-+		pattern[cpu] = isaac_next_uint32(&prng_context);
-+
-+		if (cpu == 0)
-+			continue;
-+
-+		smp_boot_secondary(cpu, do_test);
-+	}
-+
-+	do_test();
-+
-+	while (!cpumask_full(&smp_test_complete))
-+		cpu_relax();
-+
-+	/* Ensure everything completes before we check the data */
-+	smp_mb();
-+
-+	/* Now total up errors and irqs */
-+	for_each_present_cpu(cpu) {
-+		total_err += errors[cpu];
-+		total_sent += irq_sent[cpu];
-+		total_recv += irq_recv[cpu];
-+
-+		if (check_irq)
-+			report_irq_stats(cpu);
-+	}
-+
-+	if (check_irq)
-+		report(total_sent == total_recv && total_err == 0,
-+		       "%d IRQs sent, %d received, %d errors\n",
-+		       total_sent, total_recv, total_err == 0);
-+	else
-+		report(total_err == 0, "%d errors, IRQs not checked", total_err);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	int i;
-+	unsigned int j;
-+
-+	for (i = 0; i < argc; i++) {
-+		char *arg = argv[i];
-+
-+		for (j = 0; j < ARRAY_SIZE(tests); j++) {
-+			if (strcmp(arg, tests[j].test_name) == 0)
-+				test = &tests[j];
-+		}
-+
-+		/* Test modifiers */
-+		if (strstr(arg, "mod=") != NULL) {
-+			char *p = strstr(arg, "=");
-+
-+			mod_freq = atol(p+1);
-+		}
-+
-+		if (strstr(arg, "rounds=") != NULL) {
-+			char *p = strstr(arg, "=");
-+
-+			rounds = atol(p+1);
-+		}
-+
-+		if (strcmp(arg, "smc") == 0) {
-+			unsigned long test_start = (unsigned long) &tight_start;
-+			unsigned long test_end = (unsigned long) &test_code_end;
-+
-+			smc = 1;
-+			mmu_set_range_ptes(mmu_idmap, test_start, test_start,
-+					   test_end, __pgprot(PTE_WBWA));
-+
-+			report_prefix_push("smc");
-+		}
-+
-+		if (strcmp(arg, "irq") == 0) {
-+			irq = 1;
-+			if (!gic_init())
-+				report_abort("No supported gic present!");
-+			irqv = gic_version();
-+			report_prefix_push("irq");
-+		}
-+
-+		if (strcmp(arg, "check_irq") == 0)
-+			check_irq = 1;
-+	}
-+
-+	if (test) {
-+		/* ensure args visible to all cores */
-+		smp_mb();
-+		setup_and_run_tcg_test();
-+	} else {
-+		report(false, "Unknown test");
-+	}
-+
-+	return report_summary();
-+}
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 3d73e308..5b46ff5b 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -361,3 +361,87 @@ smp = 2
- extra_params = -append 'sal_barrier'
- groups = nodefault mttcg barrier
- 
-+# TCG Tests
-+[tcg::tight]
-+file = tcg-test.flat
-+smp = $(($MAX_SMP>4?4:$MAX_SMP))
-+extra_params = -append 'tight'
-+groups = nodefault mttcg
-+accel = tcg
-+
-+[tcg::tight-smc]
-+file = tcg-test.flat
-+smp = $(($MAX_SMP>4?4:$MAX_SMP))
-+extra_params = -append 'tight smc' -accel tcg,tb-size=1
-+groups = nodefault mttcg
-+accel = tcg
-+
-+[tcg::tight-irq]
-+file = tcg-test.flat
-+smp = $(($MAX_SMP>4?4:$MAX_SMP))
-+extra_params = -append 'tight irq'
-+groups = nodefault mttcg
-+accel = tcg
-+
-+[tcg::tight-smc-irq]
-+file = tcg-test.flat
-+smp = $(($MAX_SMP>4?4:$MAX_SMP))
-+extra_params = -append 'tight smc irq'
-+groups = nodefault mttcg
-+accel = tcg
-+
-+[tcg::computed]
-+file = tcg-test.flat
-+smp = $(($MAX_SMP>4?4:$MAX_SMP))
-+extra_params = -append 'computed'
-+groups = nodefault mttcg
-+accel = tcg
-+
-+[tcg::computed-smc]
-+file = tcg-test.flat
-+smp = $(($MAX_SMP>4?4:$MAX_SMP))
-+extra_params = -append 'computed smc'
-+groups = nodefault mttcg
-+accel = tcg
-+
-+[tcg::computed-irq]
-+file = tcg-test.flat
-+smp = $(($MAX_SMP>4?4:$MAX_SMP))
-+extra_params = -append 'computed irq'
-+groups = nodefault mttcg
-+accel = tcg
-+
-+[tcg::computed-smc-irq]
-+file = tcg-test.flat
-+smp = $(($MAX_SMP>4?4:$MAX_SMP))
-+extra_params = -append 'computed smc irq'
-+groups = nodefault mttcg
-+accel = tcg
-+
-+[tcg::paged]
-+file = tcg-test.flat
-+smp = $(($MAX_SMP>4?4:$MAX_SMP))
-+extra_params = -append 'paged'
-+groups = nodefault mttcg
-+accel = tcg
-+
-+[tcg::paged-smc]
-+file = tcg-test.flat
-+smp = $(($MAX_SMP>4?4:$MAX_SMP))
-+extra_params = -append 'paged smc'
-+groups = nodefault mttcg
-+accel = tcg
-+
-+[tcg::paged-irq]
-+file = tcg-test.flat
-+smp = $(($MAX_SMP>4?4:$MAX_SMP))
-+extra_params = -append 'paged irq'
-+groups = nodefault mttcg
-+accel = tcg
-+
-+[tcg::paged-smc-irq]
-+file = tcg-test.flat
-+smp = $(($MAX_SMP>4?4:$MAX_SMP))
-+extra_params = -append 'paged smc irq'
-+groups = nodefault mttcg
-+accel = tcg
--- 
-2.39.2
+There are various ways we could get this information into the VMM.
+My immediate thought is to use one of the ACPI interfaces that lets us write
+AML that can set an emulated register. A query to the VMM can check if this
+register is set.
+
+So options.
+
+_OSI() - Deprecated on ARM64 so lets not use that ;)
+_OSC() - Could add a bit to Table 6.13 Platform-Wide Capabilites in ACPI 6.5 spec.
+         Given x86 has a similar online capable bit perhaps this is the best option
+         though it is the one that requires a formal code first proposal to ASWG.
+_OSC() - Could add a new UUID and put it under a suitable device - maybe all CPUs?
+         You could definitely argue this feature is an operating system property.
+_DSM() - Similar to OSC but always under a device.
+         Whilst can be used for this I'm not sure it really matches intended usecase.
+
+Assuming everyone agrees this bit of introspection is useful,
+Rafael / other ACPI specialists: Any suggestions on how best to do this?
+
+Jonathan
+
+
+
+
+
+> 
+> This creates something that looks like cpuhotplug to user-space, as the sysfs
+> files appear and disappear, and the udev notifications look the same.
+> 
+> One notable difference is the CPU present mask, which is exposed via sysfs.
+> Because the CPUs remain present throughout, they can still be seen in that mask.
+> This value does get used by webbrowsers to estimate the number of CPUs
+> as the CPU online mask is constantly changed on mobile phones.
+> 
+> Linux is tolerant of PSCI returning errors, as its always been allowed to do
+> that. To avoid confusing OS that can't tolerate this, we needed an additional
+> bit in the MADT GICC flags. This series copies ACPI_MADT_ONLINE_CAPABLE, which
+> appears to be for this purpose, but calls it ACPI_MADT_GICC_CPU_CAPABLE as it
+> has a different bit position in the GICC.
+> 
+> This code is unconditionally enabled for all ACPI architectures.
+> If there are problems with firmware tables on some devices, the CPUs will
+> already be online by the time the acpi_processor_make_enabled() is called.
+> A mismatch here causes a firmware-bug message and kernel taint. This should
+> only affect people with broken firmware who also boot with maxcpus=1, and
+> bring CPUs online later.
+> 
+> I had a go at switching the remaining architectures over to GENERIC_CPU_DEVICES,
+> so that the Kconfig symbol can be removed, but I got stuck with powerpc
+> and s390.
+> 
+> 
+> The first patch has already been posted as a fix here:
+> https://www.spinics.net/lists/linux-ia64/msg21920.html
+> I've only build tested Loongarch and ia64.
+> 
+> 
+> If folk want to play along at home, you'll need a copy of Qemu that supports this.
+> https://github.com/salil-mehta/qemu.git salil/virt-cpuhp-armv8/rfc-v1-port29092022.psci.present
+> 
+> You'll need to fix the numbers of KVM_CAP_ARM_HVC_TO_USER and KVM_CAP_ARM_PSCI_TO_USER
+> to match your host kernel. Replace your '-smp' argument with something like:
+> | -smp cpus=1,maxcpus=3,cores=3,threads=1,sockets=1
+> 
+> then feed the following to the Qemu montior;
+> | (qemu) device_add driver=host-arm-cpu,core-id=1,id=cpu1
+> | (qemu) device_del cpu1
+> 
+> 
+> This series is based on v6.2-rc3, and can be retrieved from:
+> https://git.kernel.org/pub/scm/linux/kernel/git/morse/linux.git/ virtual_cpu_hotplug/rfc/v1
+> 
+> 
+> Thanks,
+> 
+> James Morse (29):
+>   ia64: Fix build error due to switch case label appearing next to
+>     declaration
+>   ACPI: Move ACPI_HOTPLUG_CPU to be enabled per architecture
+>   drivers: base: Use present CPUs in GENERIC_CPU_DEVICES
+>   drivers: base: Allow parts of GENERIC_CPU_DEVICES to be overridden
+>   drivers: base: Move cpu_dev_init() after node_dev_init()
+>   arm64: setup: Switch over to GENERIC_CPU_DEVICES using
+>     arch_register_cpu()
+>   ia64/topology: Switch over to GENERIC_CPU_DEVICES
+>   x86/topology: Switch over to GENERIC_CPU_DEVICES
+>   LoongArch: Switch over to GENERIC_CPU_DEVICES
+>   arch_topology: Make register_cpu_capacity_sysctl() tolerant to late
+>     CPUs
+>   ACPI: processor: Add support for processors described as container
+>     packages
+>   ACPI: processor: Register CPUs that are online, but not described in
+>     the DSDT
+>   ACPI: processor: Register all CPUs from acpi_processor_get_info()
+>   ACPI: Rename ACPI_HOTPLUG_CPU to include 'present'
+>   ACPI: Move acpi_bus_trim_one() before acpi_scan_hot_remove()
+>   ACPI: Rename acpi_processor_hotadd_init and remove pre-processor
+>     guards
+>   ACPI: Add post_eject to struct acpi_scan_handler for cpu hotplug
+>   ACPI: Check _STA present bit before making CPUs not present
+>   ACPI: Warn when the present bit changes but the feature is not enabled
+>   drivers: base: Implement weak arch_unregister_cpu()
+>   LoongArch: Use the __weak version of arch_unregister_cpu()
+>   arm64: acpi: Move get_cpu_for_acpi_id() to a header
+>   ACPICA: Add new MADT GICC flags fields [code first?]
+>   arm64, irqchip/gic-v3, ACPI: Move MADT GICC enabled check into a
+>     helper
+>   irqchip/gic-v3: Don't return errors from gic_acpi_match_gicc()
+>   irqchip/gic-v3: Add support for ACPI's disabled but 'online capable'
+>     CPUs
+>   ACPI: add support to register CPUs based on the _STA enabled bit
+>   arm64: document virtual CPU hotplug's expectations
+>   cpumask: Add enabled cpumask for present CPUs that can be brought
+>     online
+> 
+> Jean-Philippe Brucker (3):
+>   arm64: psci: Ignore DENIED CPUs
+>   KVM: arm64: Pass hypercalls to userspace
+>   KVM: arm64: Pass PSCI calls to userspace
+> 
+>  Documentation/arm64/cpu-hotplug.rst       |  79 ++++++++++++
+>  Documentation/arm64/index.rst             |   1 +
+>  Documentation/virt/kvm/api.rst            |  31 ++++-
+>  Documentation/virt/kvm/arm/hypercalls.rst |   1 +
+>  arch/arm64/Kconfig                        |   1 +
+>  arch/arm64/include/asm/acpi.h             |  11 ++
+>  arch/arm64/include/asm/cpu.h              |   1 -
+>  arch/arm64/include/asm/kvm_host.h         |   2 +
+>  arch/arm64/kernel/acpi_numa.c             |  11 --
+>  arch/arm64/kernel/psci.c                  |   2 +-
+>  arch/arm64/kernel/setup.c                 |  13 +-
+>  arch/arm64/kernel/smp.c                   |   5 +-
+>  arch/arm64/kvm/arm.c                      |  15 ++-
+>  arch/arm64/kvm/hypercalls.c               |  28 ++++-
+>  arch/arm64/kvm/psci.c                     |  13 ++
+>  arch/ia64/Kconfig                         |   2 +
+>  arch/ia64/include/asm/acpi.h              |   2 +-
+>  arch/ia64/include/asm/cpu.h               |  11 --
+>  arch/ia64/kernel/acpi.c                   |   6 +-
+>  arch/ia64/kernel/setup.c                  |   2 +-
+>  arch/ia64/kernel/sys_ia64.c               |   7 +-
+>  arch/ia64/kernel/topology.c               |  35 +-----
+>  arch/loongarch/Kconfig                    |   2 +
+>  arch/loongarch/kernel/topology.c          |  31 +----
+>  arch/x86/Kconfig                          |   2 +
+>  arch/x86/include/asm/cpu.h                |   6 -
+>  arch/x86/kernel/acpi/boot.c               |   4 +-
+>  arch/x86/kernel/topology.c                |  19 +--
+>  drivers/acpi/Kconfig                      |   5 +-
+>  drivers/acpi/acpi_processor.c             | 146 +++++++++++++++++-----
+>  drivers/acpi/processor_core.c             |   2 +-
+>  drivers/acpi/scan.c                       | 116 +++++++++++------
+>  drivers/base/arch_topology.c              |  38 ++++--
+>  drivers/base/cpu.c                        |  31 ++++-
+>  drivers/base/init.c                       |   2 +-
+>  drivers/firmware/psci/psci.c              |   2 +
+>  drivers/irqchip/irq-gic-v3.c              |  38 +++---
+>  include/acpi/acpi_bus.h                   |   1 +
+>  include/acpi/actbl2.h                     |   1 +
+>  include/kvm/arm_hypercalls.h              |   1 +
+>  include/kvm/arm_psci.h                    |   4 +
+>  include/linux/acpi.h                      |  10 +-
+>  include/linux/cpu.h                       |   6 +
+>  include/linux/cpumask.h                   |  25 ++++
+>  include/uapi/linux/kvm.h                  |   2 +
+>  kernel/cpu.c                              |   3 +
+>  46 files changed, 532 insertions(+), 244 deletions(-)
+>  create mode 100644 Documentation/arm64/cpu-hotplug.rst
+> 
 
