@@ -1,54 +1,53 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92297C
-	for <kvmarm@lists.linux.dev>; Wed,  8 Mar 2023 01:19:54 +0000 (UTC)
-Received: by mail-pf1-f175.google.com with SMTP id fa28so9277016pfb.12
-        for <kvmarm@lists.linux.dev>; Tue, 07 Mar 2023 17:19:54 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C21362B
+	for <kvmarm@lists.linux.dev>; Wed,  8 Mar 2023 03:15:40 +0000 (UTC)
+Received: by mail-pl1-f173.google.com with SMTP id x11so11902260pln.12
+        for <kvmarm@lists.linux.dev>; Tue, 07 Mar 2023 19:15:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678238394;
+        d=google.com; s=20210112; t=1678245339;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wJ8ZqDbH0Op/flSBVdELJAzRNYjqtKdnPeZUxAolvRg=;
-        b=fVOwIdqOQ+QRmw6NIOt2yPi3VNEgk7qFu2yEjck9cfdvTkOZ57+bsuOODgwuaPol+w
-         05TJhcwLJR/WfN02XdBWIrU8pC9fZxQ9tB6dc4od4H0Xx5jPFnZf3CKvPM3nIUNQTfdx
-         rowwPWL9VkYQwrVs+fYDpBZfaEtwHwNjROUsCmWesZtA3QbP1Z4AhOdT6hGGU4NyCBd7
-         0FkzWGCBVrgs9Y+L06g8CNKDpr5AIU+2O8OG6I7GrCUYNYQemzVq3OZlJdL30RvAiiCy
-         ef4x99KZU6vi1eMpK1nPjwwYJ6XiVvfwUAtrekx3yiJIA0soe0RDoJpByL7ufIiJirnV
-         O/Qw==
+        bh=8KLtOtqIOku6+uBljLyZ+IqwdfXOpvVBsa3QjdNH7SI=;
+        b=tgihNc5yOKSPh0ZzINtG7H0j9M/j1GVyE7wa3RYbV/FwmMo7YWI2XQx2lveRIo0G0+
+         G8wF1DwEkZvHjGc6fz8GuQ33mwbC95BoOE9HlXkYBQp7aOCCu39q6qKJjrSIR1G/gZT9
+         7jDY6ZZPKeeO/54gBJrfHZWVu0xlTUe8vPJwlngrWxZgYS8ubElrpjX/1/hAte42k9Ei
+         O1Gr5J4GTa7qcLZYxA9t+gtbGyEpkOQg9lnWQqD5gIOFieJgREtU+m8pEPnN5CLU1GmL
+         8j8zFgzXAJ7pbGsyxgsEOp3zciTFw2SoUXV2iEEljKJfkArhOiPveZEUqGqPTXyxOMko
+         HUPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678238394;
+        d=1e100.net; s=20210112; t=1678245339;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wJ8ZqDbH0Op/flSBVdELJAzRNYjqtKdnPeZUxAolvRg=;
-        b=nCg7u0ZJ7zGjHLs8q8iYFWl276RGxxX6jdAsvVGy47xgsZ85hfm2AyssV6dPlH2UzH
-         H8pzr5Xn6AYgRBHHada0hk3yXk729+Ck/dwGqGrTjsm3nNMf9lghHI53nKG9A29ofwYb
-         z02H8bHBzLvYCx/TWBDH11cJK2PeFsq0zHutr975wP3hr2qG50Y9WRMVRG8kdCOOHByf
-         2hux+evdp+azv5PEmZDbQCQKIcf//GMgK/LJWZtzZa8z0I5KOuZWKp8M7EX2RNoq9/ZH
-         9GiOKzUeoFTBkpfo3FaggYXN1jnCY7k7Q5GXn1Wr/seksVAkT+jVvR5TjspsgzYxI2cu
-         G5Uw==
-X-Gm-Message-State: AO0yUKW6hwyu9BRdOMexS9k9g/PWH0pVjub7+u/tLyaSy2PBzDfstJIi
-	F0DUr8gwKyqJ7FOjQlpg5U9uQKipdtaqbuk24BzMHqsDRarFLB4IPRc=
-X-Google-Smtp-Source: AK7set9XMQQmLMIWDxO7HSZrKs5RirfZsaG9jsCXS3sVgcyJBjNRjC+GdhjDsVYlMhYP162W0VxxwxBSgr+WG4P7C6o=
-X-Received: by 2002:a62:d154:0:b0:5a9:9713:1dc with SMTP id
- t20-20020a62d154000000b005a9971301dcmr7257282pfl.6.1678238393858; Tue, 07 Mar
- 2023 17:19:53 -0800 (PST)
+        bh=8KLtOtqIOku6+uBljLyZ+IqwdfXOpvVBsa3QjdNH7SI=;
+        b=VW5T7dEstA38p7WqyZTH+qtXk7md2vCf8mRwo6p2kR1LwTVutL8+tdyat19YO1iUjN
+         osLslvq8f5jJ7vpgApIhpsd+eEsXNoiDgxiGn2j0WU9wJ6ium4Szl+NpekronCQpTeyR
+         ynvkppLEdUlcT+xah/8xG2XMPsyd96JQKllxMMRsuj+IvGLR2J9JKRJwzTE3zRKy8G2O
+         n/1neQ96c9xDE7nCvuB7nNrzr9/Zh7pqpfvRaJEqySp7qzdVgab+s4XUyOIDo1GR1192
+         OwvEM2BIfEnNQEO8gFwxAh4BN9Gbevuowja7zLH7Zfs5a8dFNMbsPQ+CgulgDT+d2MEq
+         BaDA==
+X-Gm-Message-State: AO0yUKUy2jjS2hTMlARXd3LgudP36OBOKmGHBEu/duoKr94AvYfoOgDq
+	33lqGJ2cW9bVvj+fKru0f1JzHiMRyKBfb3czuxx2ig==
+X-Google-Smtp-Source: AK7set87QoRQVLy6vDriYzYfoiOmWlVTVUGUN2kXf1H2zM/7/OLmxw44WQa80T6nXG0RwsaZBlmfoqVDPLlBJedT33g=
+X-Received: by 2002:a17:902:6846:b0:19c:9999:e922 with SMTP id
+ f6-20020a170902684600b0019c9999e922mr6471879pln.5.1678245339412; Tue, 07 Mar
+ 2023 19:15:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230215010717.3612794-1-rananta@google.com> <20230215010717.3612794-13-rananta@google.com>
- <CAAeT=Fyy-3fsN3aWRtX9AoBoHVXyWmY+TJAOuty3Tz=kH5HmJA@mail.gmail.com>
-In-Reply-To: <CAAeT=Fyy-3fsN3aWRtX9AoBoHVXyWmY+TJAOuty3Tz=kH5HmJA@mail.gmail.com>
+References: <20230215010717.3612794-1-rananta@google.com> <20230215010717.3612794-14-rananta@google.com>
+In-Reply-To: <20230215010717.3612794-14-rananta@google.com>
 From: Reiji Watanabe <reijiw@google.com>
-Date: Tue, 7 Mar 2023 17:19:37 -0800
-Message-ID: <CAAeT=Fzw0n8F=dA951GpCvTtnieZWDNm+qOs-2USX+MNqGJ62w@mail.gmail.com>
-Subject: Re: [REPOST PATCH 12/16] selftests: KVM: aarch64: Test PMU
- overflow/IRQ functionality
+Date: Tue, 7 Mar 2023 19:15:23 -0800
+Message-ID: <CAAeT=Fw5Y3yqh4gfYH+1G0a11Uced-HV15fcWq=q7n0x-j9FQQ@mail.gmail.com>
+Subject: Re: [REPOST PATCH 13/16] selftests: KVM: aarch64: Test chained events
+ for PMU
 To: Raghavendra Rao Ananta <rananta@google.com>
 Cc: Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>, 
 	Ricardo Koller <ricarkol@google.com>, James Morse <james.morse@arm.com>, 
@@ -59,479 +58,153 @@ Cc: Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 6, 2023 at 10:09=E2=80=AFPM Reiji Watanabe <reijiw@google.com> =
-wrote:
->
-> Hi Raghu,
->
-> On Tue, Feb 14, 2023 at 5:07=E2=80=AFPM Raghavendra Rao Ananta
-> <rananta@google.com> wrote:
-> >
-> > Extend the vCPU migration test to also validate the vPMU's
-> > functionality when set up for overflow conditions.
-> >
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >  .../testing/selftests/kvm/aarch64/vpmu_test.c | 223 ++++++++++++++++--
-> >  1 file changed, 198 insertions(+), 25 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_test.c b/tools/te=
-sting/selftests/kvm/aarch64/vpmu_test.c
-> > index 0c9d801f4e602..066dc17fa3906 100644
-> > --- a/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-> > +++ b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-> > @@ -21,7 +21,9 @@
-> >   *
-> >   * 4. Since the PMU registers are per-cpu, stress KVM by frequently
-> >   * migrating the guest vCPU to random pCPUs in the system, and check
-> > - * if the vPMU is still behaving as expected.
-> > + * if the vPMU is still behaving as expected. The sub-tests include
-> > + * testing basic functionalities such as basic counters behavior,
-> > + * overflow, and overflow interrupts.
-> >   *
-> >   * Copyright (c) 2022 Google LLC.
-> >   *
-> > @@ -41,13 +43,27 @@
-> >  #include <sys/sysinfo.h>
-> >
-> >  #include "delay.h"
-> > +#include "gic.h"
-> > +#include "spinlock.h"
-> >
-> >  /* The max number of the PMU event counters (excluding the cycle count=
-er) */
-> >  #define ARMV8_PMU_MAX_GENERAL_COUNTERS (ARMV8_PMU_MAX_COUNTERS - 1)
-> >
-> > +/* The cycle counter bit position that's common among the PMU register=
-s */
-> > +#define ARMV8_PMU_CYCLE_COUNTER_IDX    31
-> > +
-> >  /* The max number of event numbers that's supported */
-> >  #define ARMV8_PMU_MAX_EVENTS           64
-> >
-> > +#define PMU_IRQ                                23
-> > +
-> > +#define COUNT_TO_OVERFLOW      0xFULL
-> > +#define PRE_OVERFLOW_32                (GENMASK(31, 0) - COUNT_TO_OVER=
-FLOW + 1)
-> > +#define PRE_OVERFLOW_64                (GENMASK(63, 0) - COUNT_TO_OVER=
-FLOW + 1)
+HI Raghu,
 
-Reset values of PMCR_EL0.LP and PMCR_EL0.LC are UNKNOWN.
-As the test seems to expect a 64-bit overflow on the cycle counter
-and a 32-bit overflow on the other counters, the guest code should
-explicitly clear PMCR_EL0.LP and set PMCR_EL0.LC, before the test.
+
+On Tue, Feb 14, 2023 at 5:07=E2=80=AFPM Raghavendra Rao Ananta
+<rananta@google.com> wrote:
+>
+> Extend the vPMU's vCPU migration test to validate
+> chained events, and their overflow conditions.
+>
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  .../testing/selftests/kvm/aarch64/vpmu_test.c | 76 ++++++++++++++++++-
+>  1 file changed, 75 insertions(+), 1 deletion(-)
+>
+> diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_test.c b/tools/test=
+ing/selftests/kvm/aarch64/vpmu_test.c
+> index 066dc17fa3906..de725f4339ad5 100644
+> --- a/tools/testing/selftests/kvm/aarch64/vpmu_test.c
+> +++ b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
+> @@ -23,7 +23,7 @@
+>   * migrating the guest vCPU to random pCPUs in the system, and check
+>   * if the vPMU is still behaving as expected. The sub-tests include
+>   * testing basic functionalities such as basic counters behavior,
+> - * overflow, and overflow interrupts.
+> + * overflow, overflow interrupts, and chained events.
+>   *
+>   * Copyright (c) 2022 Google LLC.
+>   *
+> @@ -61,6 +61,8 @@
+>  #define PRE_OVERFLOW_32                (GENMASK(31, 0) - COUNT_TO_OVERFL=
+OW + 1)
+>  #define PRE_OVERFLOW_64                (GENMASK(63, 0) - COUNT_TO_OVERFL=
+OW + 1)
+>
+> +#define ALL_SET_64             GENMASK(63, 0)
+> +
+>  #define GICD_BASE_GPA  0x8000000ULL
+>  #define GICR_BASE_GPA  0x80A0000ULL
+>
+> @@ -639,6 +641,75 @@ static void test_cycles_count(bool expect_count, boo=
+l test_overflow)
+>         pmu_disable_reset();
+>  }
+>
+> +static void test_chained_count(int pmc_idx)
+> +{
+> +       int i, chained_pmc_idx;
+> +       struct pmc_accessor *acc;
+> +       uint64_t pmcr_n, cnt, cntr_val;
+> +
+> +       /* The test needs at least two PMCs */
+> +       pmcr_n =3D get_pmcr_n();
+> +       GUEST_ASSERT_1(pmcr_n >=3D 2, pmcr_n);
+
+Nit: As the architecture doesn't require this, rather than causing the
+test failure, I would suggest gracefully skipping this test case or
+make this the requirement of the test.
 
 Thanks,
 Reiji
 
 
-> > +
-> > +#define GICD_BASE_GPA  0x8000000ULL
-> > +#define GICR_BASE_GPA  0x80A0000ULL
-> > +
-> >  #define msecs_to_usecs(msec)           ((msec) * 1000LL)
-> >
-> >  /*
-> > @@ -162,6 +178,17 @@ static inline void write_sel_evtyper(int sel, unsi=
-gned long val)
-> >         isb();
-> >  }
-> >
-> > +static inline void write_pmovsclr(unsigned long val)
-> > +{
-> > +       write_sysreg(val, pmovsclr_el0);
-> > +       isb();
-> > +}
-> > +
-> > +static unsigned long read_pmovsclr(void)
-> > +{
-> > +       return read_sysreg(pmovsclr_el0);
-> > +}
-> > +
-> >  static inline void enable_counter(int idx)
-> >  {
-> >         uint64_t v =3D read_sysreg(pmcntenset_el0);
-> > @@ -178,11 +205,33 @@ static inline void disable_counter(int idx)
-> >         isb();
-> >  }
-> >
-> > +static inline void enable_irq(int idx)
-> > +{
-> > +       uint64_t v =3D read_sysreg(pmcntenset_el0);
-> > +
-> > +       write_sysreg(BIT(idx) | v, pmintenset_el1);
-> > +       isb();
-> > +}
-> > +
-> > +static inline void disable_irq(int idx)
-> > +{
-> > +       uint64_t v =3D read_sysreg(pmcntenset_el0);
-> > +
-> > +       write_sysreg(BIT(idx) | v, pmintenclr_el1);
-> > +       isb();
-> > +}
-> > +
-> >  static inline uint64_t read_cycle_counter(void)
-> >  {
-> >         return read_sysreg(pmccntr_el0);
-> >  }
-> >
-> > +static inline void write_cycle_counter(uint64_t v)
-> > +{
-> > +       write_sysreg(v, pmccntr_el0);
-> > +       isb();
-> > +}
-> > +
-> >  static inline void reset_cycle_counter(void)
-> >  {
-> >         uint64_t v =3D read_sysreg(pmcr_el0);
-> > @@ -289,6 +338,15 @@ struct guest_data {
-> >
-> >  static struct guest_data guest_data;
-> >
-> > +/* Data to communicate among guest threads */
-> > +struct guest_irq_data {
-> > +       uint32_t pmc_idx_bmap;
-> > +       uint32_t irq_received_bmap;
-> > +       struct spinlock lock;
-> > +};
-> > +
-> > +static struct guest_irq_data guest_irq_data;
-> > +
-> >  #define VCPU_MIGRATIONS_TEST_ITERS_DEF         1000
-> >  #define VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS 2
-> >
-> > @@ -322,6 +380,79 @@ static void guest_sync_handler(struct ex_regs *reg=
-s)
-> >         expected_ec =3D INVALID_EC;
-> >  }
-> >
-> > +static void guest_validate_irq(int pmc_idx, uint32_t pmovsclr, uint32_=
-t pmc_idx_bmap)
->
-> Can you please add a comment about what is pmc_idx_bmap ?
->
->
-> > +{
-> > +       /*
-> > +        * Fail if there's an interrupt from unexpected PMCs.
-> > +        * All the expected events' IRQs may not arrive at the same tim=
-e.
-> > +        * Hence, check if the interrupt is valid only if it's expected=
+> +
+> +       /*
+> +        * The chained counter's idx is always chained with (pmc_idx + 1)=
 .
-> > +        */
-> > +       if (pmovsclr & BIT(pmc_idx)) {
-> > +               GUEST_ASSERT_3(pmc_idx_bmap & BIT(pmc_idx), pmc_idx, pm=
-ovsclr, pmc_idx_bmap);
-> > +               write_pmovsclr(BIT(pmc_idx));
-> > +       }
-> > +}
-> > +
-> > +static void guest_irq_handler(struct ex_regs *regs)
-> > +{
-> > +       uint32_t pmc_idx_bmap;
-> > +       uint64_t i, pmcr_n =3D get_pmcr_n();
-> > +       uint32_t pmovsclr =3D read_pmovsclr();
-> > +       unsigned int intid =3D gic_get_and_ack_irq();
-> > +
-> > +       /* No other IRQ apart from the PMU IRQ is expected */
-> > +       GUEST_ASSERT_1(intid =3D=3D PMU_IRQ, intid);
-> > +
-> > +       spin_lock(&guest_irq_data.lock);
+> +        * pmc_idx should be even as the chained event doesn't count on
+> +        * odd numbered counters.
+> +        */
+> +       GUEST_ASSERT_1(pmc_idx % 2 =3D=3D 0, pmc_idx);
+> +
+> +       /*
+> +        * The max counter idx that the chained counter can occupy is
+> +        * (pmcr_n - 1), while the actual event sits on (pmcr_n - 2).
+> +        */
+> +       chained_pmc_idx =3D pmc_idx + 1;
+> +       GUEST_ASSERT(chained_pmc_idx < pmcr_n);
+> +
+> +       enable_counter(chained_pmc_idx);
+> +       pmu_irq_init(chained_pmc_idx);
+> +
+> +       /* Configure the chained event using all the possible ways*/
+> +       for (i =3D 0; i < ARRAY_SIZE(pmc_accessors); i++) {
+> +               acc =3D &pmc_accessors[i];
+> +
+> +               /* Test if the chained counter increments when the base e=
+vent overflows */
+> +
+> +               cntr_val =3D 1;
+> +               acc->write_cntr(chained_pmc_idx, cntr_val);
+> +               acc->write_typer(chained_pmc_idx, ARMV8_PMUV3_PERFCTR_CHA=
+IN);
+> +
+> +               /* Chain the counter with pmc_idx that's configured for a=
+n overflow */
+> +               test_instructions_count(pmc_idx, true, true);
+> +
+> +               /*
+> +                * pmc_idx is also configured to run for all the ARRAY_SI=
+ZE(pmc_accessors)
+> +                * combinations. Hence, the chained chained_pmc_idx is ex=
+pected to be
+> +                * cntr_val + ARRAY_SIZE(pmc_accessors).
+> +                */
+> +               cnt =3D acc->read_cntr(chained_pmc_idx);
+> +               GUEST_ASSERT_4(cnt =3D=3D cntr_val + ARRAY_SIZE(pmc_acces=
+sors),
+> +                               pmc_idx, i, cnt, cntr_val + ARRAY_SIZE(pm=
+c_accessors));
+> +
+> +               /* Test for the overflow of the chained counter itself */
+> +
+> +               cntr_val =3D ALL_SET_64;
+> +               acc->write_cntr(chained_pmc_idx, cntr_val);
+> +
+> +               test_instructions_count(pmc_idx, true, true);
+> +
+> +               /*
+> +                * At this point, an interrupt should've been fired for t=
+he chained
+> +                * counter (which validates the overflow bit), and the co=
+unter should've
+> +                * wrapped around to ARRAY_SIZE(pmc_accessors) - 1.
+> +                */
+> +               cnt =3D acc->read_cntr(chained_pmc_idx);
+> +               GUEST_ASSERT_4(cnt =3D=3D ARRAY_SIZE(pmc_accessors) - 1,
+> +                               pmc_idx, i, cnt, ARRAY_SIZE(pmc_accessors=
+));
+> +       }
+> +
+> +       pmu_irq_exit(chained_pmc_idx);
+> +}
+> +
+>  static void test_event_count(uint64_t event, int pmc_idx, bool expect_co=
+unt)
+>  {
+>         switch (event) {
+> @@ -665,6 +736,9 @@ static void test_basic_pmu_functionality(void)
+>         /* Test overflow with interrupts on generic and cycle counters */
+>         test_instructions_count(0, true, true);
+>         test_cycles_count(true, true);
+> +
+> +       /* Test chained events */
+> +       test_chained_count(0);
+>  }
 >
-> Could you explain why this lock is required in this patch ??
-> If this is used to serialize the interrupt context code and
-> the normal (non-interrupt) context code, you might want to
-> disable the IRQ ?  Using the spin lock won't work well for
-> that if the interrupt handler is invoked while the normal
-> context code grabs the lock.
-> Having said that, since execute_precise_instrs() disables the PMU
->  via PMCR, and does isb after that, I don't think the overflow
-> interrupt is delivered while the normal context code is in
-> pmu_irq_*() anyway.
+>  /*
+> --
+> 2.39.1.581.gbfd45094c4-goog
 >
-> > +       pmc_idx_bmap =3D READ_ONCE(guest_irq_data.pmc_idx_bmap);
-> > +
-> > +       for (i =3D 0; i < pmcr_n; i++)
-> > +               guest_validate_irq(i, pmovsclr, pmc_idx_bmap);
-> > +       guest_validate_irq(ARMV8_PMU_CYCLE_COUNTER_IDX, pmovsclr, pmc_i=
-dx_bmap);
-> > +
-> > +       /* Mark IRQ as recived for the corresponding PMCs */
-> > +       WRITE_ONCE(guest_irq_data.irq_received_bmap, pmovsclr);
-> > +       spin_unlock(&guest_irq_data.lock);
-> > +
-> > +       gic_set_eoi(intid);
-> > +}
-> > +
-> > +static int pmu_irq_received(int pmc_idx)
-> > +{
-> > +       bool irq_received;
-> > +
-> > +       spin_lock(&guest_irq_data.lock);
-> > +       irq_received =3D READ_ONCE(guest_irq_data.irq_received_bmap) & =
-BIT(pmc_idx);
-> > +       WRITE_ONCE(guest_irq_data.irq_received_bmap, guest_irq_data.pmc=
-_idx_bmap & ~BIT(pmc_idx));
-> > +       spin_unlock(&guest_irq_data.lock);
-> > +
-> > +       return irq_received;
-> > +}
-> > +
-> > +static void pmu_irq_init(int pmc_idx)
-> > +{
-> > +       write_pmovsclr(BIT(pmc_idx));
-> > +
-> > +       spin_lock(&guest_irq_data.lock);
-> > +       WRITE_ONCE(guest_irq_data.irq_received_bmap, guest_irq_data.pmc=
-_idx_bmap & ~BIT(pmc_idx));
-> > +       WRITE_ONCE(guest_irq_data.pmc_idx_bmap, guest_irq_data.pmc_idx_=
-bmap | BIT(pmc_idx));
-> > +       spin_unlock(&guest_irq_data.lock);
-> > +
-> > +       enable_irq(pmc_idx);
-> > +}
-> > +
-> > +static void pmu_irq_exit(int pmc_idx)
-> > +{
-> > +       write_pmovsclr(BIT(pmc_idx));
-> > +
-> > +       spin_lock(&guest_irq_data.lock);
-> > +       WRITE_ONCE(guest_irq_data.irq_received_bmap, guest_irq_data.pmc=
-_idx_bmap & ~BIT(pmc_idx));
-> > +       WRITE_ONCE(guest_irq_data.pmc_idx_bmap, guest_irq_data.pmc_idx_=
-bmap & ~BIT(pmc_idx));
-> > +       spin_unlock(&guest_irq_data.lock);
-> > +
-> > +       disable_irq(pmc_idx);
-> > +}
-> > +
-> >  /*
-> >   * Run the given operation that should trigger an exception with the
-> >   * given exception class. The exception handler (guest_sync_handler)
-> > @@ -420,12 +551,20 @@ static void execute_precise_instrs(int num, uint3=
-2_t pmcr)
-> >         precise_instrs_loop(loop, pmcr);
-> >  }
-> >
-> > -static void test_instructions_count(int pmc_idx, bool expect_count)
-> > +static void test_instructions_count(int pmc_idx, bool expect_count, bo=
-ol test_overflow)
-> >  {
-> >         int i;
-> >         struct pmc_accessor *acc;
-> > -       uint64_t cnt;
-> > -       int instrs_count =3D 100;
-> > +       uint64_t cntr_val =3D 0;
-> > +       int instrs_count =3D 500;
->
-> Can we set instrs_count based on the value we set for cntr_val?
-> (so that instrs_count can be adjusted automatically when we change the
-> value of cntr_val ?)
->
-> > +
-> > +       if (test_overflow) {
-
-
-
-> > +               /* Overflow scenarios can only be tested when a count i=
-s expected */
-> > +               GUEST_ASSERT_1(expect_count, pmc_idx);
-> > +
-> > +               cntr_val =3D PRE_OVERFLOW_32;
-> > +               pmu_irq_init(pmc_idx);
-> > +       }
-> >
-> >         enable_counter(pmc_idx);
-> >
-> > @@ -433,41 +572,68 @@ static void test_instructions_count(int pmc_idx, =
-bool expect_count)
-> >         for (i =3D 0; i < ARRAY_SIZE(pmc_accessors); i++) {
-> >                 acc =3D &pmc_accessors[i];
-> >
-> > -               pmu_disable_reset();
-> > -
-> > +               acc->write_cntr(pmc_idx, cntr_val);
-> >                 acc->write_typer(pmc_idx, ARMV8_PMUV3_PERFCTR_INST_RETI=
-RED);
-> >
-> > -               /* Enable the PMU and execute precisely number of instr=
-uctions as a workload */
-> > -               execute_precise_instrs(instrs_count, read_sysreg(pmcr_e=
-l0) | ARMV8_PMU_PMCR_E);
-> > +               /*
-> > +                * Enable the PMU and execute a precise number of instr=
-uctions as a workload.
-> > +                * Since execute_precise_instrs() disables the PMU at t=
-he end, 'instrs_count'
-> > +                * should have enough instructions to raise an IRQ.
-> > +                */
-> > +               execute_precise_instrs(instrs_count, ARMV8_PMU_PMCR_E);
-> >
-> > -               /* If a count is expected, the counter should be increa=
-sed by 'instrs_count' */
-> > -               cnt =3D acc->read_cntr(pmc_idx);
-> > -               GUEST_ASSERT_4(expect_count =3D=3D (cnt =3D=3D instrs_c=
-ount),
-> > -                               i, expect_count, cnt, instrs_count);
-> > +               /*
-> > +                * If an overflow is expected, only check for the overf=
-lag flag.
-> > +                * As overflow interrupt is enabled, the interrupt woul=
-d add additional
-> > +                * instructions and mess up the precise instruction cou=
-nt. Hence, measure
-> > +                * the instructions count only when the test is not set=
- up for an overflow.
-> > +                */
-> > +               if (test_overflow) {
-> > +                       GUEST_ASSERT_2(pmu_irq_received(pmc_idx), pmc_i=
-dx, i);
-> > +               } else {
-> > +                       uint64_t cnt =3D acc->read_cntr(pmc_idx);
-> > +
-> > +                       GUEST_ASSERT_4(expect_count =3D=3D (cnt =3D=3D =
-instrs_count),
-> > +                                       pmc_idx, i, cnt, expect_count);
-> > +               }
-> >         }
-> >
-> > -       disable_counter(pmc_idx);
-> > +       if (test_overflow)
-> > +               pmu_irq_exit(pmc_idx);
-> >  }
-> >
-> > -static void test_cycles_count(bool expect_count)
-> > +static void test_cycles_count(bool expect_count, bool test_overflow)
-> >  {
-> >         uint64_t cnt;
-> >
-> > -       pmu_enable();
-> > -       reset_cycle_counter();
-> > +       if (test_overflow) {
-> > +               /* Overflow scenarios can only be tested when a count i=
-s expected */
-> > +               GUEST_ASSERT(expect_count);
-> > +
-> > +               write_cycle_counter(PRE_OVERFLOW_64);
-> > +               pmu_irq_init(ARMV8_PMU_CYCLE_COUNTER_IDX);
-> > +       } else {
-> > +               reset_cycle_counter();
-> > +       }
-> >
-> >         /* Count cycles in EL0 and EL1 */
-> >         write_pmccfiltr(0);
-> >         enable_cycle_counter();
-> >
-> > +       /* Enable the PMU and execute precisely number of instructions =
-as a workload */
->
-> Can you please add a comment why we do this (500 times) iterations ?
-> Can we set the iteration number based on the initial value of the
-> cycle counter ?
->
-> > +       execute_precise_instrs(500, read_sysreg(pmcr_el0) | ARMV8_PMU_P=
-MCR_E);
-> >         cnt =3D read_cycle_counter();
->   >
-> >         /*
-> >          * If a count is expected by the test, the cycle counter should=
- be increased by
-> > -        * at least 1, as there is at least one instruction between ena=
-bling the
-> > +        * at least 1, as there are a number of instructions between en=
-abling the
-> >          * counter and reading the counter.
-> >          */
->
-> "at least 1" doesn't seem to be consistent with the GUEST_ASSERT_2 below
-> when test_overflow is true, considering the initial value of the cycle co=
-unter.
-> Shouldn't this GUEST_ASSERT_2 be executed only if test_overflow is false =
-?
-> (Or do you want to adjust the comment ?)
->
-> >         GUEST_ASSERT_2(expect_count =3D=3D (cnt > 0), cnt, expect_count=
-);
-> > +       if (test_overflow) {
-> > +               GUEST_ASSERT_2(pmu_irq_received(ARMV8_PMU_CYCLE_COUNTER=
-_IDX), cnt, expect_count);
-> > +               pmu_irq_exit(ARMV8_PMU_CYCLE_COUNTER_IDX);
-> > +       }
-> >
-> >         disable_cycle_counter();
-> >         pmu_disable_reset();
-> > @@ -477,19 +643,28 @@ static void test_event_count(uint64_t event, int =
-pmc_idx, bool expect_count)
-> >  {
-> >         switch (event) {
-> >         case ARMV8_PMUV3_PERFCTR_INST_RETIRED:
-> > -               test_instructions_count(pmc_idx, expect_count);
-> > +               test_instructions_count(pmc_idx, expect_count, false);
-> >                 break;
-> >         case ARMV8_PMUV3_PERFCTR_CPU_CYCLES:
-> > -               test_cycles_count(expect_count);
-> > +               test_cycles_count(expect_count, false);
-> >                 break;
-> >         }
-> >  }
-> >
-> >  static void test_basic_pmu_functionality(void)
-> >  {
-> > +       local_irq_disable();
-> > +       gic_init(GIC_V3, 1, (void *)GICD_BASE_GPA, (void *)GICR_BASE_GP=
-A);
-> > +       gic_irq_enable(PMU_IRQ);
-> > +       local_irq_enable();
-> > +
-> >         /* Test events on generic and cycle counters */
-> > -       test_instructions_count(0, true);
-> > -       test_cycles_count(true);
-> > +       test_instructions_count(0, true, false);
-> > +       test_cycles_count(true, false);
-> > +
-> > +       /* Test overflow with interrupts on generic and cycle counters =
-*/
-> > +       test_instructions_count(0, true, true);
-> > +       test_cycles_count(true, true);
-> >  }
-> >
-> >  /*
-> > @@ -813,9 +988,6 @@ static void guest_code(void)
-> >         GUEST_DONE();
-> >  }
-> >
-> > -#define GICD_BASE_GPA  0x8000000ULL
-> > -#define GICR_BASE_GPA  0x80A0000ULL
-> > -
-> >  static unsigned long *
-> >  set_event_filters(struct kvm_vcpu *vcpu, struct kvm_pmu_event_filter *=
-pmu_event_filters)
-> >  {
-> > @@ -866,7 +1038,7 @@ create_vpmu_vm(void *guest_code, struct kvm_pmu_ev=
-ent_filter *pmu_event_filters)
-> >         struct kvm_vcpu *vcpu;
-> >         struct kvm_vcpu_init init;
-> >         uint8_t pmuver, ec;
-> > -       uint64_t dfr0, irq =3D 23;
-> > +       uint64_t dfr0, irq =3D PMU_IRQ;
-> >         struct vpmu_vm *vpmu_vm;
-> >         struct kvm_device_attr irq_attr =3D {
-> >                 .group =3D KVM_ARM_VCPU_PMU_V3_CTRL,
-> > @@ -883,6 +1055,7 @@ create_vpmu_vm(void *guest_code, struct kvm_pmu_ev=
-ent_filter *pmu_event_filters)
-> >
-> >         vpmu_vm->vm =3D vm =3D vm_create(1);
-> >         vm_init_descriptor_tables(vm);
-> > +       vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT, guest_irq_=
-handler);
-> >
-> >         /* Catch exceptions for easier debugging */
-> >         for (ec =3D 0; ec < ESR_EC_NUM; ec++) {
-> > --
-> > 2.39.1.581.gbfd45094c4-goog
-> >
->
-> Thanks,
-> Reiji
