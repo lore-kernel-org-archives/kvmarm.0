@@ -1,481 +1,120 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-38.mta0.migadu.com (out-38.mta0.migadu.com [91.218.175.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883FE641
-	for <kvmarm@lists.linux.dev>; Wed,  8 Mar 2023 04:44:18 +0000 (UTC)
-Received: by mail-pj1-f54.google.com with SMTP id x34so15520522pjj.0
-        for <kvmarm@lists.linux.dev>; Tue, 07 Mar 2023 20:44:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678250658;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8mLQfF6ZGKw2BR9aAplYP+Gj0qOysuIIakxQ46pVCDg=;
-        b=tJgJoFS8sd0T9sKiG+DinK2idR8zn7Gq5TjsRiYFb1fnb0NiMRFO1OEzv0hxgCyb01
-         SLYcRI8lamPxfvKw4MdwZ0S7hldTjbHf1onkWys7P6wug46YYch0dstfL2GhQAFKuOxt
-         zNZOJB2k3oofOPMWlSaqU5Lzmb63FUFaYOub6FhQfISouG/MxjngXwbgnT1S+4YgbG4I
-         CzVCxOXX5CCSyy5fwTZmu9g/Nydb+k1PAvhenVaBG7KLfpm30IzZs1a4ezxbxEc3T0ct
-         g0pPArb2roXWSXAvITXl5hR1Jf4T6h279VLcPCVehH2StIy7/zJiqfeiaLKv6fNRQTbW
-         pl8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678250658;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8mLQfF6ZGKw2BR9aAplYP+Gj0qOysuIIakxQ46pVCDg=;
-        b=TBozSVSyk2o5tISbqsNNleAtTR0J8a6SaHCZr26qXRhwROmvD5oavMsQz9mu0hhhgI
-         bRj3jlO/o9nL7LrSA334IuXpdXardi1vvQ894nJM2NK1E8RZx2ca/rSH5eZhq/76edvu
-         KteMuadrnMH4dR0PHRREwUkq12SRsnuctwDFYuEw8efBBWs2WMWZixVOaTS+HfCdL1EJ
-         2zoUNud4zmbvSgb+cv4p06PoM0nMENE3j2d4Dbte/0GcVwtCwzOkElGYsYTCj2amtTOY
-         v8x1rWDKa7Vkwh5emOChhQtl4mGThMZ4erEJ50dJ9Vj31YceWrPXs2v7ZJ1mAPHf6mz8
-         axaw==
-X-Gm-Message-State: AO0yUKV8o6J7D7WpET3ke0DwuxoSmd/wWtMUxX90bGSzdeYOJ7mAMS77
-	sEG8x3yroIresHgKdUvkNQMVFpfu2ORv+3kuUzIKEA==
-X-Google-Smtp-Source: AK7set8HG8ZsHU4Smobm3ok043bymkLE+2W6bR9JWvH1imsZ6MtoIw5FiKewVbHltbRx9O+UAuw//MaKYJVUehGjlqo=
-X-Received: by 2002:a17:902:7e8b:b0:19e:8781:81b2 with SMTP id
- z11-20020a1709027e8b00b0019e878181b2mr6644153pla.5.1678250657701; Tue, 07 Mar
- 2023 20:44:17 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 576B37B
+	for <kvmarm@lists.linux.dev>; Wed,  8 Mar 2023 07:46:07 +0000 (UTC)
+Date: Wed, 8 Mar 2023 07:46:00 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1678261565;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WKzyZZ5TvHHv+nFcORL1XTaFGVCC5mIp3QEkslOGjpM=;
+	b=pecnibry7D0AwevOwIcO8UrAJTSKX40E+DlEkvW+GKrHUO3XhEWYK89YgKhyyDma0I3nlW
+	+8aMPyy+tAec1ZV/rmxDkbLBB36GwHf2BGoHVGo2SjoNI/TWgors07Tv1PU/Zit5+xS3ux
+	rQpO1uuv/KwLWBboGjF3wDl7r2NSC5U=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Simon Veith <sveith@amazon.de>, dwmw2@infradead.org
+Subject: Re: [PATCH 08/16] KVM: arm64: timers: Allow userspace to set the
+ counter offsets
+Message-ID: <ZAg9ONoYhUoa0mH9@linux.dev>
+References: <20230216142123.2638675-1-maz@kernel.org>
+ <20230216142123.2638675-9-maz@kernel.org>
+ <Y+6pqz3pCwu7izZL@linux.dev>
+ <86k00gy4so.wl-maz@kernel.org>
+ <Y+/7mO1sxH4jThmu@linux.dev>
+ <86bkllyku2.wl-maz@kernel.org>
+ <Y/ZEGHkw5Jft19RP@linux.dev>
+ <867cw8xmq2.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230215010717.3612794-1-rananta@google.com> <20230215010717.3612794-17-rananta@google.com>
-In-Reply-To: <20230215010717.3612794-17-rananta@google.com>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Tue, 7 Mar 2023 20:44:01 -0800
-Message-ID: <CAAeT=FxJsY5NF8Bq5cAfm-Jc=Ln3CnDJYey49_TTLqQKvS+UNw@mail.gmail.com>
-Subject: Re: [REPOST PATCH 16/16] selftests: KVM: aarch64: Extend the vCPU
- migration test to multi-vCPUs
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Ricardo Koller <ricarkol@google.com>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jing Zhang <jingzhangos@google.com>, Colton Lewis <coltonlewis@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <867cw8xmq2.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Raghu,
+Hey Marc,
 
-On Tue, Feb 14, 2023 at 5:07=E2=80=AFPM Raghavendra Rao Ananta
-<rananta@google.com> wrote:
->
-> To test KVM's handling of multiple vCPU contexts together, that are
-> frequently migrating across random pCPUs in the system, extend the test
-> to create a VM with multiple vCPUs and validate the behavior.
->
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> ---
->  .../testing/selftests/kvm/aarch64/vpmu_test.c | 166 ++++++++++++------
->  1 file changed, 114 insertions(+), 52 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_test.c b/tools/test=
-ing/selftests/kvm/aarch64/vpmu_test.c
-> index 239fc7e06b3b9..c9d8e5f9a22ab 100644
-> --- a/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-> +++ b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-> @@ -19,11 +19,12 @@
->   * higher exception levels (EL2, EL3). Verify this functionality by
->   * configuring and trying to count the events for EL2 in the guest.
->   *
-> - * 4. Since the PMU registers are per-cpu, stress KVM by frequently
-> - * migrating the guest vCPU to random pCPUs in the system, and check
-> - * if the vPMU is still behaving as expected. The sub-tests include
-> - * testing basic functionalities such as basic counters behavior,
-> - * overflow, overflow interrupts, and chained events.
-> + * 4. Since the PMU registers are per-cpu, stress KVM by creating a
-> + * multi-vCPU VM, then frequently migrate the guest vCPUs to random
-> + * pCPUs in the system, and check if the vPMU is still behaving as
-> + * expected. The sub-tests include testing basic functionalities such
-> + * as basic counters behavior, overflow, overflow interrupts, and
-> + * chained events.
->   *
->   * Copyright (c) 2022 Google LLC.
->   *
-> @@ -348,19 +349,22 @@ struct guest_irq_data {
->         struct spinlock lock;
->  };
->
-> -static struct guest_irq_data guest_irq_data;
-> +static struct guest_irq_data guest_irq_data[KVM_MAX_VCPUS];
->
->  #define VCPU_MIGRATIONS_TEST_ITERS_DEF         1000
->  #define VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS 2
-> +#define VCPU_MIGRATIONS_TEST_NR_VPUS_DEF       2
->
->  struct test_args {
->         int vcpu_migration_test_iter;
->         int vcpu_migration_test_migrate_freq_ms;
-> +       int vcpu_migration_test_nr_vcpus;
->  };
->
->  static struct test_args test_args =3D {
->         .vcpu_migration_test_iter =3D VCPU_MIGRATIONS_TEST_ITERS_DEF,
->         .vcpu_migration_test_migrate_freq_ms =3D VCPU_MIGRATIONS_TEST_MIG=
-RATION_FREQ_MS,
-> +       .vcpu_migration_test_nr_vcpus =3D VCPU_MIGRATIONS_TEST_NR_VPUS_DE=
-F,
->  };
->
->  static void guest_sync_handler(struct ex_regs *regs)
-> @@ -396,26 +400,34 @@ static void guest_validate_irq(int pmc_idx, uint32_=
-t pmovsclr, uint32_t pmc_idx_
->         }
->  }
->
-> +static struct guest_irq_data *get_irq_data(void)
-> +{
-> +       uint32_t cpu =3D guest_get_vcpuid();
-> +
-> +       return &guest_irq_data[cpu];
-> +}
-> +
->  static void guest_irq_handler(struct ex_regs *regs)
->  {
->         uint32_t pmc_idx_bmap;
->         uint64_t i, pmcr_n =3D get_pmcr_n();
->         uint32_t pmovsclr =3D read_pmovsclr();
->         unsigned int intid =3D gic_get_and_ack_irq();
-> +       struct guest_irq_data *irq_data =3D get_irq_data();
->
->         /* No other IRQ apart from the PMU IRQ is expected */
->         GUEST_ASSERT_1(intid =3D=3D PMU_IRQ, intid);
->
-> -       spin_lock(&guest_irq_data.lock);
-> -       pmc_idx_bmap =3D READ_ONCE(guest_irq_data.pmc_idx_bmap);
-> +       spin_lock(&irq_data->lock);
-> +       pmc_idx_bmap =3D READ_ONCE(irq_data->pmc_idx_bmap);
->
->         for (i =3D 0; i < pmcr_n; i++)
->                 guest_validate_irq(i, pmovsclr, pmc_idx_bmap);
->         guest_validate_irq(ARMV8_PMU_CYCLE_COUNTER_IDX, pmovsclr, pmc_idx=
-_bmap);
->
->         /* Mark IRQ as recived for the corresponding PMCs */
-> -       WRITE_ONCE(guest_irq_data.irq_received_bmap, pmovsclr);
-> -       spin_unlock(&guest_irq_data.lock);
-> +       WRITE_ONCE(irq_data->irq_received_bmap, pmovsclr);
-> +       spin_unlock(&irq_data->lock);
->
->         gic_set_eoi(intid);
->  }
-> @@ -423,35 +435,40 @@ static void guest_irq_handler(struct ex_regs *regs)
->  static int pmu_irq_received(int pmc_idx)
->  {
->         bool irq_received;
-> +       struct guest_irq_data *irq_data =3D get_irq_data();
->
-> -       spin_lock(&guest_irq_data.lock);
-> -       irq_received =3D READ_ONCE(guest_irq_data.irq_received_bmap) & BI=
-T(pmc_idx);
-> -       WRITE_ONCE(guest_irq_data.irq_received_bmap, guest_irq_data.pmc_i=
-dx_bmap & ~BIT(pmc_idx));
-> -       spin_unlock(&guest_irq_data.lock);
-> +       spin_lock(&irq_data->lock);
-> +       irq_received =3D READ_ONCE(irq_data->irq_received_bmap) & BIT(pmc=
-_idx);
-> +       WRITE_ONCE(irq_data->irq_received_bmap, irq_data->pmc_idx_bmap & =
-~BIT(pmc_idx));
-> +       spin_unlock(&irq_data->lock);
->
->         return irq_received;
->  }
->
->  static void pmu_irq_init(int pmc_idx)
->  {
-> +       struct guest_irq_data *irq_data =3D get_irq_data();
-> +
->         write_pmovsclr(BIT(pmc_idx));
->
-> -       spin_lock(&guest_irq_data.lock);
-> -       WRITE_ONCE(guest_irq_data.irq_received_bmap, guest_irq_data.pmc_i=
-dx_bmap & ~BIT(pmc_idx));
-> -       WRITE_ONCE(guest_irq_data.pmc_idx_bmap, guest_irq_data.pmc_idx_bm=
-ap | BIT(pmc_idx));
-> -       spin_unlock(&guest_irq_data.lock);
-> +       spin_lock(&irq_data->lock);
-> +       WRITE_ONCE(irq_data->irq_received_bmap, irq_data->pmc_idx_bmap & =
-~BIT(pmc_idx));
-> +       WRITE_ONCE(irq_data->pmc_idx_bmap, irq_data->pmc_idx_bmap | BIT(p=
-mc_idx));
-> +       spin_unlock(&irq_data->lock);
->
->         enable_irq(pmc_idx);
->  }
->
->  static void pmu_irq_exit(int pmc_idx)
->  {
-> +       struct guest_irq_data *irq_data =3D get_irq_data();
-> +
->         write_pmovsclr(BIT(pmc_idx));
->
-> -       spin_lock(&guest_irq_data.lock);
-> -       WRITE_ONCE(guest_irq_data.irq_received_bmap, guest_irq_data.pmc_i=
-dx_bmap & ~BIT(pmc_idx));
-> -       WRITE_ONCE(guest_irq_data.pmc_idx_bmap, guest_irq_data.pmc_idx_bm=
-ap & ~BIT(pmc_idx));
-> -       spin_unlock(&guest_irq_data.lock);
-> +       spin_lock(&irq_data->lock);
-> +       WRITE_ONCE(irq_data->irq_received_bmap, irq_data->pmc_idx_bmap & =
-~BIT(pmc_idx));
-> +       WRITE_ONCE(irq_data->pmc_idx_bmap, irq_data->pmc_idx_bmap & ~BIT(=
-pmc_idx));
-> +       spin_unlock(&irq_data->lock);
->
->         disable_irq(pmc_idx);
->  }
-> @@ -783,7 +800,8 @@ static void test_event_count(uint64_t event, int pmc_=
-idx, bool expect_count)
->  static void test_basic_pmu_functionality(void)
->  {
->         local_irq_disable();
-> -       gic_init(GIC_V3, 1, (void *)GICD_BASE_GPA, (void *)GICR_BASE_GPA)=
-;
-> +       gic_init(GIC_V3, test_args.vcpu_migration_test_nr_vcpus,
-> +                       (void *)GICD_BASE_GPA, (void *)GICR_BASE_GPA);
->         gic_irq_enable(PMU_IRQ);
->         local_irq_enable();
->
-> @@ -1093,11 +1111,13 @@ static void guest_evtype_filter_test(void)
->
->  static void guest_vcpu_migration_test(void)
->  {
-> +       int iter =3D test_args.vcpu_migration_test_iter;
-> +
->         /*
->          * While the userspace continuously migrates this vCPU to random =
-pCPUs,
->          * run basic PMU functionalities and verify the results.
->          */
-> -       while (test_args.vcpu_migration_test_iter--)
-> +       while (iter--)
->                 test_basic_pmu_functionality();
->  }
->
-> @@ -1472,17 +1492,23 @@ static void run_kvm_evtype_filter_test(void)
->
->  struct vcpu_migrate_data {
->         struct vpmu_vm *vpmu_vm;
-> -       pthread_t *pt_vcpu;
-> -       bool vcpu_done;
-> +       pthread_t *pt_vcpus;
-> +       unsigned long *vcpu_done_map;
-> +       pthread_mutex_t vcpu_done_map_lock;
->  };
->
-> +struct vcpu_migrate_data migrate_data;
-> +
->  static void *run_vcpus_migrate_test_func(void *arg)
->  {
-> -       struct vcpu_migrate_data *migrate_data =3D arg;
-> -       struct vpmu_vm *vpmu_vm =3D migrate_data->vpmu_vm;
-> +       struct vpmu_vm *vpmu_vm =3D migrate_data.vpmu_vm;
-> +       unsigned int vcpu_idx =3D (unsigned long)arg;
->
-> -       run_vcpu(vpmu_vm->vcpus[0]);
-> -       migrate_data->vcpu_done =3D true;
-> +       run_vcpu(vpmu_vm->vcpus[vcpu_idx]);
-> +
-> +       pthread_mutex_lock(&migrate_data.vcpu_done_map_lock);
-> +       __set_bit(vcpu_idx, migrate_data.vcpu_done_map);
-> +       pthread_mutex_unlock(&migrate_data.vcpu_done_map_lock);
->
->         return NULL;
->  }
-> @@ -1504,7 +1530,7 @@ static uint32_t get_pcpu(void)
->         return pcpu;
->  }
->
-> -static int migrate_vcpu(struct vcpu_migrate_data *migrate_data)
-> +static int migrate_vcpu(int vcpu_idx)
->  {
->         int ret;
->         cpu_set_t cpuset;
-> @@ -1513,9 +1539,9 @@ static int migrate_vcpu(struct vcpu_migrate_data *m=
-igrate_data)
->         CPU_ZERO(&cpuset);
->         CPU_SET(new_pcpu, &cpuset);
->
-> -       pr_debug("Migrating vCPU to pCPU: %u\n", new_pcpu);
-> +       pr_debug("Migrating vCPU %d to pCPU: %u\n", vcpu_idx, new_pcpu);
->
-> -       ret =3D pthread_setaffinity_np(*migrate_data->pt_vcpu, sizeof(cpu=
-set), &cpuset);
-> +       ret =3D pthread_setaffinity_np(migrate_data.pt_vcpus[vcpu_idx], s=
-izeof(cpuset), &cpuset);
->
->         /* Allow the error where the vCPU thread is already finished */
->         TEST_ASSERT(ret =3D=3D 0 || ret =3D=3D ESRCH,
-> @@ -1526,48 +1552,74 @@ static int migrate_vcpu(struct vcpu_migrate_data =
-*migrate_data)
->
->  static void *vcpus_migrate_func(void *arg)
->  {
-> -       struct vcpu_migrate_data *migrate_data =3D arg;
-> +       struct vpmu_vm *vpmu_vm =3D migrate_data.vpmu_vm;
-> +       int i, n_done, nr_vcpus =3D vpmu_vm->nr_vcpus;
-> +       bool vcpu_done;
->
-> -       while (!migrate_data->vcpu_done) {
-> +       do {
->                 usleep(msecs_to_usecs(test_args.vcpu_migration_test_migra=
-te_freq_ms));
-> -               migrate_vcpu(migrate_data);
-> -       }
-> +               for (n_done =3D 0, i =3D 0; i < nr_vcpus; i++) {
-> +                       pthread_mutex_lock(&migrate_data.vcpu_done_map_lo=
-ck);
-> +                       vcpu_done =3D test_bit(i, migrate_data.vcpu_done_=
-map);
-> +                       pthread_mutex_unlock(&migrate_data.vcpu_done_map_=
-lock);
+On Thu, Feb 23, 2023 at 06:25:57PM +0000, Marc Zyngier wrote:
 
-Do we need to hold the lock here ?
+[...]
 
+> > Do we need to bend over backwards for a theoretical use case with
+> > the new UAPI? If anyone depends on the existing behavior then they can
+> > continue to use the old UAPI to partially migrate the guest counters.
+> 
+> I don't buy the old/new thing. My take is that these things should be
+> cumulative if there isn't a hard reason to break the existing API.
 
-> +
-> +                       if (vcpu_done) {
-> +                               n_done++;
-> +                               continue;
-> +                       }
-> +
-> +                       migrate_vcpu(i);
-> +               }
-> +
-> +       } while (nr_vcpus !=3D n_done);
->
->         return NULL;
->  }
->
->  static void run_vcpu_migration_test(uint64_t pmcr_n)
->  {
-> -       int ret;
-> +       int i, nr_vcpus, ret;
->         struct vpmu_vm *vpmu_vm;
-> -       pthread_t pt_vcpu, pt_sched;
-> -       struct vcpu_migrate_data migrate_data =3D {
-> -               .pt_vcpu =3D &pt_vcpu,
-> -               .vcpu_done =3D false,
-> -       };
-> +       pthread_t pt_sched, *pt_vcpus;
->
->         __TEST_REQUIRE(get_nprocs() >=3D 2, "At least two pCPUs needed fo=
-r vCPU migration test");
->
->         guest_data.test_stage =3D TEST_STAGE_VCPU_MIGRATION;
->         guest_data.expected_pmcr_n =3D pmcr_n;
->
-> -       migrate_data.vpmu_vm =3D vpmu_vm =3D create_vpmu_vm(1, guest_code=
-, NULL);
-> +       nr_vcpus =3D test_args.vcpu_migration_test_nr_vcpus;
-> +
-> +       migrate_data.vcpu_done_map =3D bitmap_zalloc(nr_vcpus);
-> +       TEST_ASSERT(migrate_data.vcpu_done_map, "Failed to create vCPU do=
-ne bitmap");
-> +       pthread_mutex_init(&migrate_data.vcpu_done_map_lock, NULL);
-> +
-> +       migrate_data.pt_vcpus =3D pt_vcpus =3D calloc(nr_vcpus, sizeof(*p=
-t_vcpus));
-> +       TEST_ASSERT(pt_vcpus, "Failed to create vCPU thread pointers");
-> +
-> +       migrate_data.vpmu_vm =3D vpmu_vm =3D create_vpmu_vm(nr_vcpus, gue=
-st_code, NULL);
->
->         /* Initialize random number generation for migrating vCPUs to ran=
-dom pCPUs */
->         srand(time(NULL));
->
-> -       /* Spawn a vCPU thread */
-> -       ret =3D pthread_create(&pt_vcpu, NULL, run_vcpus_migrate_test_fun=
-c, &migrate_data);
-> -       TEST_ASSERT(!ret, "Failed to create the vCPU thread");
-> +       /* Spawn vCPU threads */
-> +       for (i =3D 0; i < nr_vcpus; i++) {
-> +               ret =3D pthread_create(&pt_vcpus[i], NULL,
-> +                                       run_vcpus_migrate_test_func,  (vo=
-id *)(unsigned long)i);
-> +               TEST_ASSERT(!ret, "Failed to create the vCPU thread: %d",=
- i);
-> +       }
->
->         /* Spawn a scheduler thread to force-migrate vCPUs to various pCP=
-Us */
-> -       ret =3D pthread_create(&pt_sched, NULL, vcpus_migrate_func, &migr=
-ate_data);
-> +       ret =3D pthread_create(&pt_sched, NULL, vcpus_migrate_func, NULL)=
-;
->         TEST_ASSERT(!ret, "Failed to create the scheduler thread for migr=
-ating the vCPUs");
->
->         pthread_join(pt_sched, NULL);
-> -       pthread_join(pt_vcpu, NULL);
-> +
-> +       for (i =3D 0; i < nr_vcpus; i++)
-> +               pthread_join(pt_vcpus[i], NULL);
->
->         destroy_vpmu_vm(vpmu_vm);
-> +       free(pt_vcpus);
-> +       bitmap_free(migrate_data.vcpu_done_map);
->  }
->
->  static void run_tests(uint64_t pmcr_n)
-> @@ -1596,12 +1648,14 @@ static uint64_t get_pmcr_n_limit(void)
->
->  static void print_help(char *name)
->  {
-> -       pr_info("Usage: %s [-h] [-i vcpu_migration_test_iterations] [-m v=
-cpu_migration_freq_ms]\n",
-> -               name);
-> +       pr_info("Usage: %s [-h] [-i vcpu_migration_test_iterations] [-m v=
-cpu_migration_freq_ms]"
-> +               "[-n vcpu_migration_nr_vcpus]\n", name);
->         pr_info("\t-i: Number of iterations of vCPU migrations test (defa=
-ult: %u)\n",
->                 VCPU_MIGRATIONS_TEST_ITERS_DEF);
->         pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different=
- pCPU. (default: %u)\n",
->                 VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS);
-> +       pr_info("\t-n: Number of vCPUs for vCPU migrations test. (default=
-: %u)\n",
-> +               VCPU_MIGRATIONS_TEST_NR_VPUS_DEF);
->         pr_info("\t-h: print this help screen\n");
->  }
->
-> @@ -1609,7 +1663,7 @@ static bool parse_args(int argc, char *argv[])
->  {
->         int opt;
->
-> -       while ((opt =3D getopt(argc, argv, "hi:m:")) !=3D -1) {
-> +       while ((opt =3D getopt(argc, argv, "hi:m:n:")) !=3D -1) {
->                 switch (opt) {
->                 case 'i':
->                         test_args.vcpu_migration_test_iter =3D
-> @@ -1619,6 +1673,14 @@ static bool parse_args(int argc, char *argv[])
->                         test_args.vcpu_migration_test_migrate_freq_ms =3D
->                                 atoi_positive("vCPU migration frequency",=
- optarg);
->                         break;
-> +               case 'n':
-> +                       test_args.vcpu_migration_test_nr_vcpus =3D
-> +                               atoi_positive("Nr vCPUs for vCPU migratio=
-ns", optarg);
-> +                       if (test_args.vcpu_migration_test_nr_vcpus > KVM_=
-MAX_VCPUS) {
-> +                               pr_info("Max allowed vCPUs: %u\n", KVM_MA=
-X_VCPUS);
-> +                               goto err;
-> +                       }
-> +                       break;
->                 case 'h':
->                 default:
->                         goto err;
-> --
-> 2.39.1.581.gbfd45094c4-goog
->
->
+Unsurprisingly, I may have been a bit confusing in my replies to you.
 
+I have zero interest in breaking the existing API. Any suggestion of
+'changing the rules' was more along the lines of providing an alternate
+scheme for the counters and letting the quirks of the old interface
+continue.
+
+> > My previous suggestion of tying the physical and virtual counters
+> > together at VM creation would definitely break such a use case, though,
+> > so we'd be at the point of requiring explicit opt-in from userspace.
+> 
+> I'm trying to find a middle ground, so bear with me. Here's the
+> situation as I see it:
+> 
+> (1) a VM that is migrating today can only set the virtual offset and
+>     doesn't affect the physical counter. This behaviour must be
+>     preserved in we cannot prove that nobody relies on it.
+> 
+> (2) setting the physical offset could be done by two means:
+> 
+>     (a) writing the counter register (like we do for CNTVCT)
+>     (b) providing an offset via a side channel
+> 
+> I think (1) must stay forever, just like we still support the old
+> GICv2 implicit initialisation.
+
+No argument here. Unless userspace pokes some new bit of UAPI, the old
+behavior of CNTVCT must live on.
+
+> (2a) is also desirable as it requires no extra work on the VMM side.
+> Just restore the damn thing, and nothing changes (we're finally able
+> to migrate the physical timer). (2b) really is icing on the cake.
+> 
+> The question is whether we can come up with an API offering (2b) that
+> still allows (1) and (2a). I'd be happy with a new API that, when
+> used, resets both offsets to the same value, matching your pretty
+> picture. But the dual offsetting still has to exist internally.
+> 
+> When it comes to NV, it uses either the physical offset that has been
+> provided by writing CNTPCT, or the one that has been written via the
+> new API. Under the hood, this is the same piece of data, of course.
+> 
+> The only meaningful difference with my initial proposal is that there
+> is no new virtual offset API. It is either register writes that obey
+> the same rules as before, or a single offset setting.
+
+I certainly agree that (2a) is highly desirable to get existing VMMs to
+'do the right thing' for free. Playing devil's advocate, would this not
+also break the tracing example you've given of correlating timestamps
+between the host and guest? I wouldn't expect a userspace + VM tracing
+contraption to live migrate but restoring from a snapshot seems
+plausible.
+
+Regardless, I like the general direction you've proposed. IIUC, you'll
+want to go ahead with ignoring writes to CNT{P,V}CT if the offset was
+written by userspace, right?
+
+-- 
 Thanks,
-Reiji
+Oliver
