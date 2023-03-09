@@ -1,33 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01FD32F36
-	for <kvmarm@lists.linux.dev>; Thu,  9 Mar 2023 08:25:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F99DC433D2;
-	Thu,  9 Mar 2023 08:25:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5AC22F36
+	for <kvmarm@lists.linux.dev>; Thu,  9 Mar 2023 08:29:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8788DC433EF;
+	Thu,  9 Mar 2023 08:29:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1678350322;
-	bh=NF9uArR2Xw5L2IGuaa/g8Rp3bnNLsfYmX4k/kLHf5dU=;
+	s=k20201202; t=1678350569;
+	bh=2k4s+7q61F9IqFit/joyuBMQsl0m6FGsMAJf9S5C2g4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HIZkDW+ZobbMS8sY2RQce3TyaEsk0+/Pa6CZynJWokaSN631tYMqs0ugi+d4YL4Ik
-	 cQ1R6giTTL6Y2y/wOd5rP4wV9UpnHxjSfDFdD98u4slejiz70gBCA75KYR50owz3Zd
-	 6ih+k8lhyqwqI1t5Yx/ZnBJMB9NIxgAfQWkSrdqLazPoTOPKMZAwMZqHL2ne5cA92U
-	 pw1nO3rzR6m2DzYl+bDZ+8wjaFxMfUBtK7WswNIKoWShgEgaBpVmImwZv0asqn3qSL
-	 GmzL9FhvRh68kiclt5uZzRdP1NAJl77WqOkTyexORSxZmrcK83iF3lBLRK4IDMIK/h
-	 QpHQ4aAXcbm0Q==
+	b=uLVYAaIlDqCLGBls+WcHrQXa38GbCLAP2NAYgDd+ecIFrm6PEjfQmKGkbmjWj3de2
+	 oq8nclAy1QzsEzfTx9EKIhppYyJUHw7o6mGItng40474B4ZDJ4/+hxsD3eF28se2/Z
+	 q4PV8U/Jryyv/5csR+cblrWy5zaq6UUafojgdM3c27zTi79IO9BtNHV1OcK2T5zkMn
+	 sQGtYbJ5+Rk4e0jN/Lod+nHcomc2x5E6yTusyiJ0aRK0bcEaHKdQLQut/h0/kG/0KN
+	 /x9hPdjAc2f6w+u0vPyS+CqT7xp5ZHTAXdzPB/OgEb2/6K4F/BR70Lm3x/60MTgf9U
+	 WUovdJzXbCYnw==
 Received: from 82-132-236-50.dab.02.net ([82.132.236.50] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1paBaM-00GFDI-SY;
-	Thu, 09 Mar 2023 08:25:15 +0000
-Date: Thu, 09 Mar 2023 08:25:09 +0000
-Message-ID: <87edpy9vru.wl-maz@kernel.org>
+	id 1paBeQ-00GFIV-T6;
+	Thu, 09 Mar 2023 08:29:27 +0000
+Date: Thu, 09 Mar 2023 08:29:24 +0000
+Message-ID: <87cz5i9vkr.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,	kvm@vger.kernel.org,	linux-arm-kernel@lists.infradead.org,	James Morse <james.morse@arm.com>,	Suzuki K Poulose <suzuki.poulose@arm.com>,	Zenghui Yu <yuzenghui@huawei.com>,	Ricardo Koller <ricarkol@google.com>,	Simon Veith <sveith@amazon.de>,	dwmw2@infradead.org
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Simon Veith <sveith@amazon.de>,
+	dwmw2@infradead.org
 Subject: Re: [PATCH 08/16] KVM: arm64: timers: Allow userspace to set the counter offsets
-In-Reply-To: <ZAg9ONoYhUoa0mH9@linux.dev>
+In-Reply-To: <ZAg/Cj1PzZu6ma3j@linux.dev>
 References: <20230216142123.2638675-1-maz@kernel.org>
 	<20230216142123.2638675-9-maz@kernel.org>
 	<Y+6pqz3pCwu7izZL@linux.dev>
@@ -37,6 +45,7 @@ References: <20230216142123.2638675-1-maz@kernel.org>
 	<Y/ZEGHkw5Jft19RP@linux.dev>
 	<867cw8xmq2.wl-maz@kernel.org>
 	<ZAg9ONoYhUoa0mH9@linux.dev>
+	<ZAg/Cj1PzZu6ma3j@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -52,40 +61,27 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kern
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Oliver,
-
-On Wed, 08 Mar 2023 07:46:00 +0000,
+On Wed, 08 Mar 2023 07:53:46 +0000,
 Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> > I certainly agree that (2a) is highly desirable to get existing VMMs to
+> > 'do the right thing' for free. Playing devil's advocate, would this not
+> > also break the tracing example you've given of correlating timestamps
+> > between the host and guest? I wouldn't expect a userspace + VM tracing
+> > contraption to live migrate but restoring from a snapshot seems
+> > plausible.
+> 
+> The problem I'm alluding to here is that the VMM will save/restore
+> the physical counter value and cause KVM to offset the physical counter.
+> Live migration is a pretty obvious example, but resuming from a snapshot
+> after resetting a system be similarly affected.
 
-[...]
+My take on this is that if you have produced the snapshot on a
+pre-CNTPCT host, there will be no change in behaviour. If you've
+produced the snapshot on a new host, you get the new behaviour.
 
-> I certainly agree that (2a) is highly desirable to get existing VMMs to
-> 'do the right thing' for free. Playing devil's advocate, would this not
-> also break the tracing example you've given of correlating timestamps
-> between the host and guest? I wouldn't expect a userspace + VM tracing
-> contraption to live migrate but restoring from a snapshot seems
-> plausible.
-
-It really depends when this VM was saved.
-
-If you saved it on an old host that doesn't expose CNTPCT and restore
-it on a new host, the physical offset is still zero (this is already
-special-cased), and there is no difference in behaviour.
-
-If you saved it from a host that does expose CNTPCT, then the
-behaviour changes. But should we really care?
-
-> Regardless, I like the general direction you've proposed. IIUC, you'll
-> want to go ahead with ignoring writes to CNT{P,V}CT if the offset was
-> written by userspace, right?
-
-That'd be my preference in order not to break the "blind restore"
-behaviour that QEMU already uses for about everything.
-
-I'll repost the series shortly, as it has grown some extra goodies
-such as moving the PPI settings out of the way...
-
-Thanks,
+I am willing to be accommodating to the use case, but only to a
+certain extent! ;-)
 
 	M.
 
