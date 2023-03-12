@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE6B5468A
-	for <kvmarm@lists.linux.dev>; Sun, 12 Mar 2023 15:01:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A467AC433EF;
-	Sun, 12 Mar 2023 15:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43736468A
+	for <kvmarm@lists.linux.dev>; Sun, 12 Mar 2023 15:04:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDE5BC433EF;
+	Sun, 12 Mar 2023 15:04:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1678633269;
-	bh=5Hjd4auKS5618HP+eewfU+0AdaZU72zDi2NyYqVHDlY=;
+	s=k20201202; t=1678633481;
+	bh=SIbdBH9Uorm6WV2JXyDFkVvV/YHzzNhbijI2zG9qjMI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QFzVcnNmQkHAy2qzRJIKWqBfLnfJTtyeEVtooOosL5LfAa6xNh/kUzVbNX/XD2z+0
-	 FBtHXs6+EQz89fR7qNK/zb6C+PzHWL7JhP3IN6xwF851W9BjAlTpVI5BSiwm9aXKic
-	 XWH4PT/a6ZXoTewvRYNYT9CQDnSw6Ec0YtXMbOxms+D/O1oC87IWF6rGIMMlP8XrHv
-	 yDMaoNDeae2d34edWYDWf8Pt1bnYvDzZtDzT7f4HCswyVxWdKduBH23OuNWXtOPtTD
-	 T061VqeydftzCxE9/sCCh/e8uJBlp/J1J4nE8hI2R2lsOuZGBG4i1eX2mPB5C4FfVB
-	 QCYxOyopJr8pQ==
+	b=kBoRg8lSwnTkyb6jB9jdUDkUmhUY/nCNWiP8ZDjDYbW+i1tvA1z4TYUtfmErSzGU+
+	 fz1074/YtaeKKV78T887jNR14pXnUrfFioy3VCLGYs3C13YiqrqabVDkXgeLG07+VV
+	 5kaM5RhRt5AdBLCSF9gOiDJAY04vjdA2qlZVNnMHBhqABc3IYslNdBQBthazJzpT5h
+	 WAy1PAWFO/ystsPptbzsff+Ab4fTh5ef0yGQe0vUcWyGEFEIap6yCdIY6bBWdVrbUL
+	 x0F854DpNdSSPp/0G3khbo/GltVy9HtaW1pQ0kWi+frFgQjtHQxkbKKdwAbTZHcSTJ
+	 F4XCpRWlezQQQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pbNC7-00H0wB-4Z;
-	Sun, 12 Mar 2023 15:01:07 +0000
-Date: Sun, 12 Mar 2023 15:01:06 +0000
-Message-ID: <87y1o23tfx.wl-maz@kernel.org>
+	id 1pbNFX-00H0y3-Ma;
+	Sun, 12 Mar 2023 15:04:39 +0000
+Date: Sun, 12 Mar 2023 15:04:39 +0000
+Message-ID: <87wn3m3ta0.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Reiji Watanabe <reijiw@google.com>
 Cc: Oliver Upton <oliver.upton@linux.dev>,
@@ -38,10 +38,9 @@ Cc: Oliver Upton <oliver.upton@linux.dev>,
 	Jing Zhang <jingzhangos@google.com>,
 	Raghavendra Rao Anata <rananta@google.com>,
 	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 2/2] KVM: arm64: PMU: Don't save PMCR_EL0.{C,P} for the vCPU
-In-Reply-To: <20230302055033.3081456-3-reijiw@google.com>
+Subject: Re: [PATCH 0/2] KVM: arm64: PMU: Preserve vPMC registers properly on migration
+In-Reply-To: <20230302055033.3081456-1-reijiw@google.com>
 References: <20230302055033.3081456-1-reijiw@google.com>
-	<20230302055033.3081456-3-reijiw@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -57,43 +56,22 @@ X-SA-Exim-Rcpt-To: reijiw@google.com, oliver.upton@linux.dev, kvmarm@lists.linux
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 02 Mar 2023 05:50:33 +0000,
+On Thu, 02 Mar 2023 05:50:31 +0000,
 Reiji Watanabe <reijiw@google.com> wrote:
 > 
-> Presently, when a guest writes 1 to PMCR_EL0.{C,P}, which is WO/RAZ,
-> KVM saves the register value, including these bits.
-> When userspace reads the register using KVM_GET_ONE_REG, KVM returns
-> the saved register value as it is (the saved value might have these
-> bits set).  This could result in userspace setting these bits on the
-> destination during migration.  Consequently, KVM may end up resetting
-> the vPMU counter registers (PMCCNTR_EL0 and/or PMEVCNTR<n>_EL0) to
-> zero on the first KVM_RUN after migration.
+> The series fixes two problems in preserving vPMU counter (vPMC)
+> registers (PMCCNTR_EL0/PMEVCNTR<n>_EL0) during migration.
 > 
-> Fix this by not saving those bits when a guest writes 1 to those bits.
+> One of the problems is that KVM may not return the current values
+> of the vPMC registers for KVM_GET_ONE_REG.
 > 
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> ---
->  arch/arm64/kvm/pmu-emul.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index 24908400e190..a5a0a9811ddb 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -538,7 +538,9 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
->  	if (!kvm_pmu_is_3p5(vcpu))
->  		val &= ~ARMV8_PMU_PMCR_LP;
->  
-> -	__vcpu_sys_reg(vcpu, PMCR_EL0) = val;
-> +	/* The reset bits don't indicate any state, and shouldn't be saved. */
-> +	__vcpu_sys_reg(vcpu, PMCR_EL0) =
-> +				val & ~(ARMV8_PMU_PMCR_C | ARMV8_PMU_PMCR_P);
+> The other one might cause KVM to reset the vPMC registers on the
+> first KVM_RUN on the destination. This is because userspace might
+> save PMCR_EL0 with PMCR_EL0.{C,P} bits set on the source, and
+> restore it on the destination.
 
-nit: assignment on a single line, please.
-
-With that,
-
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+This looks good to me. Can you please add the relevant Fixes: tags and
+a Cc: to stable? With that, that'd be a candidate for -rc3, I think.
 
 Thanks,
 
