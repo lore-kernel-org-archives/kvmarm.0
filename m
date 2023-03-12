@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09BE1FA3
-	for <kvmarm@lists.linux.dev>; Sun, 12 Mar 2023 10:49:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83DE4C433D2;
-	Sun, 12 Mar 2023 10:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625CE1FA3
+	for <kvmarm@lists.linux.dev>; Sun, 12 Mar 2023 11:06:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C9A6C433EF;
+	Sun, 12 Mar 2023 11:06:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1678618171;
-	bh=B3urysGaJdXsGL+TyngVKPW62/euDarj+hSfjXZ6EuU=;
+	s=k20201202; t=1678619194;
+	bh=STfmhEfqkyJ2vMrZ657uq8KqwzA4lQYY107NFbI1jPY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oJTtiEk2XUqPC2IcXstrn6D10XhXJepYTsiAVwpmuAm7Vfj90YxsCo8YjEO7Fqo/W
-	 qpJ2k1SSDdtUf/iqbkq9JntdvWQKgNl8I18/AqQyB0ZXnPm6nfLd5QxLeXEbNYccVt
-	 wBHEk6fMFGnTskIq4O5MyZSBB3iGaeYuwdubITlTp8lZz1pnrovlxdLu24qgwXqQ0/
-	 elt2q75bjcFAldIXw0g5ww4Crs+5xhC8BzdAnDPDduLYlGKivn03ngiDr90/P5pK2u
-	 s7D6tzu6UwmeGSUn5HKhnB8B08LwQ30x8XFNvmNsnYh6TTJ0HoEHkNXMT1HJsQ91tJ
-	 7642WZ6QRht9g==
+	b=FA8Fw89t/f7RnMbAhIOdqvrhQrHi29BK8sqPpPzbgmnAUetRpnDA1lPUuuSK/D/l2
+	 OUzkzIqw19WbLUCNtkE5/ZX9X9WmmCbr95rPnSCVWHGx34/jrUB7voaOkKQCBm/YoZ
+	 C6JCOCyuaL4Z4SUcQDR9DfGntCRL3Mtv5KoJsZFXh6TTTkYFnHCi2YJUoUkzHfdoSX
+	 /ZhmGbjt8/Sq43nBBiv4Q3JCnhlConh4nkmdn7ayh1v8Lp3pmp/aGbcv+37eC7LXT+
+	 quz0v2MFgHVjVCMEf0y9lSvBTp7o6G2HJSqrHV3awrTEpRaJ3QVibYKdMjdOIi4FWE
+	 v96FRJ9MWbT8w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pbJGb-00GyYv-9V;
-	Sun, 12 Mar 2023 10:49:29 +0000
-Date: Sun, 12 Mar 2023 10:49:28 +0000
-Message-ID: <87cz5e5jnr.wl-maz@kernel.org>
+	id 1pbJX5-00GyfN-P6;
+	Sun, 12 Mar 2023 11:06:31 +0000
+Date: Sun, 12 Mar 2023 11:06:31 +0000
+Message-ID: <87bkky5ivc.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Ricardo Koller <ricarkol@google.com>
 Cc: pbonzini@redhat.com,
@@ -44,10 +44,10 @@ Cc: pbonzini@redhat.com,
 	bgardon@google.com,
 	ricarkol@gmail.com,
 	Shaoqin Huang <shahuang@redhat.com>
-Subject: Re: [PATCH v6 02/12] KVM: arm64: Add KVM_PGTABLE_WALK ctx->flags for skipping BBM and CMO
-In-Reply-To: <20230307034555.39733-3-ricarkol@google.com>
+Subject: Re: [PATCH v6 03/12] KVM: arm64: Add helper for creating unlinked stage2 subtrees
+In-Reply-To: <20230307034555.39733-4-ricarkol@google.com>
 References: <20230307034555.39733-1-ricarkol@google.com>
-	<20230307034555.39733-3-ricarkol@google.com>
+	<20230307034555.39733-4-ricarkol@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -63,153 +63,148 @@ X-SA-Exim-Rcpt-To: ricarkol@google.com, pbonzini@redhat.com, oupton@google.com, 
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 07 Mar 2023 03:45:45 +0000,
+On Tue, 07 Mar 2023 03:45:46 +0000,
 Ricardo Koller <ricarkol@google.com> wrote:
 > 
-> Add two flags to kvm_pgtable_visit_ctx, KVM_PGTABLE_WALK_SKIP_BBM and
-> KVM_PGTABLE_WALK_SKIP_CMO, to indicate that the walk should not
-> perform break-before-make (BBM) nor cache maintenance operations
-> (CMO). This will by a future commit to create unlinked tables not
+> Add a stage2 helper, kvm_pgtable_stage2_create_unlinked(), for
+> creating unlinked tables (which is the opposite of
+> kvm_pgtable_stage2_free_unlinked()).  Creating an unlinked table is
+> useful for splitting PMD and PUD blocks into subtrees of PAGE_SIZE
 
-This will *be used*?
+Please drop the PMD/PUD verbiage. That's specially confusing when
+everything is described in terms of 'level'
 
-> accessible to the HW page-table walker.  This is safe as these
-> unlinked tables are not visible to the HW page-table walker.
+> PTEs.  For example, a PUD can be split into PAGE_SIZE PTEs by first
 
-I don't think this last sentence makes much sense. The PTW is always
-coherent with the CPU caches and doesn't require cache maintenance
-(CMOs are solely for the pages the PTs point to).
+for example: s/a PUD/a level 1 mapping/
 
-But this makes me question this patch further.
+> creating a fully populated tree, and then use it to replace the PUD in
+> a single step.  This will be used in a subsequent commit for eager
+> huge-page splitting (a dirty-logging optimization).
+> 
+> No functional change intended. This new function will be used in a
+> subsequent commit.
 
-The key observation here is that if you are creating new PTs that
-shadow an existing structure and still points to the same data pages,
-the cache state is independent of the intermediate PT walk, and thus
-CMOs are pointless anyway. So skipping CMOs makes sense.
-
-I agree with the assertion that there is little point in doing BBM
-when *creating* page tables, as all PTs start in an invalid state. But
-then, why do you need to skip it? The invalidation calls are already
-gated on the previous pointer being valid, which I presume won't be
-the case for what you describe here.
+Drop this last sentence, it doesn't say anything that you haven't
+already said.
 
 > 
 > Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
 > ---
->  arch/arm64/include/asm/kvm_pgtable.h | 18 ++++++++++++++++++
->  arch/arm64/kvm/hyp/pgtable.c         | 27 ++++++++++++++++-----------
->  2 files changed, 34 insertions(+), 11 deletions(-)
+>  arch/arm64/include/asm/kvm_pgtable.h | 28 +++++++++++++++++
+>  arch/arm64/kvm/hyp/pgtable.c         | 46 ++++++++++++++++++++++++++++
+>  2 files changed, 74 insertions(+)
 > 
 > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 26a4293726c1..c7a269cad053 100644
+> index c7a269cad053..b7b3fc0fa7a5 100644
 > --- a/arch/arm64/include/asm/kvm_pgtable.h
 > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -195,6 +195,12 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
->   *					with other software walkers.
->   * @KVM_PGTABLE_WALK_HANDLE_FAULT:	Indicates the page-table walk was
->   *					invoked from a fault handler.
-> + * @KVM_PGTABLE_WALK_SKIP_BBM:		Visit and update table entries
-> + *					without Break-before-make
-> + *					requirements.
-> + * @KVM_PGTABLE_WALK_SKIP_CMO:		Visit and update table entries
-> + *					without Cache maintenance
-> + *					operations required.
-
-We have both I and D side CMOs. Is it reasonable to always treat them
-identically?
-
+> @@ -468,6 +468,34 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
 >   */
->  enum kvm_pgtable_walk_flags {
->  	KVM_PGTABLE_WALK_LEAF			= BIT(0),
-> @@ -202,6 +208,8 @@ enum kvm_pgtable_walk_flags {
->  	KVM_PGTABLE_WALK_TABLE_POST		= BIT(2),
->  	KVM_PGTABLE_WALK_SHARED			= BIT(3),
->  	KVM_PGTABLE_WALK_HANDLE_FAULT		= BIT(4),
-> +	KVM_PGTABLE_WALK_SKIP_BBM		= BIT(5),
-> +	KVM_PGTABLE_WALK_SKIP_CMO		= BIT(6),
->  };
+>  void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
 >  
->  struct kvm_pgtable_visit_ctx {
-> @@ -223,6 +231,16 @@ static inline bool kvm_pgtable_walk_shared(const struct kvm_pgtable_visit_ctx *c
->  	return ctx->flags & KVM_PGTABLE_WALK_SHARED;
->  }
->  
-> +static inline bool kvm_pgtable_walk_skip_bbm(const struct kvm_pgtable_visit_ctx *ctx)
-> +{
-> +	return ctx->flags & KVM_PGTABLE_WALK_SKIP_BBM;
+> +/**
+> + * kvm_pgtable_stage2_create_unlinked() - Create an unlinked stage-2 paging structure.
+> + * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
+> + * @phys:	Physical address of the memory to map.
+> + * @level:	Starting level of the stage-2 paging structure to be created.
+> + * @prot:	Permissions and attributes for the mapping.
+> + * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
+> + *		page-table pages.
+> + * @force_pte:  Force mappings to PAGE_SIZE granularity.
+> + *
+> + * Returns an unlinked page-table tree. If @force_pte is true or
+> + * @level is 2 (the PMD level), then the tree is mapped up to the
+> + * PAGE_SIZE leaf PTE; the tree is mapped up one level otherwise.
 
-Probably worth wrapping this with an 'unlikely'.
+I wouldn't make this "one level" assumption, as this really depends on
+the size of what gets mapped (and future evolution of this code).
 
-> +}
-> +
-> +static inline bool kvm_pgtable_walk_skip_cmo(const struct kvm_pgtable_visit_ctx *ctx)
-> +{
-> +	return ctx->flags & KVM_PGTABLE_WALK_SKIP_CMO;
+> + * This new page-table tree is not reachable (i.e., it is unlinked)
+> + * from the root pgd and it's therefore unreachableby the hardware
+> + * page-table walker. No TLB invalidation or CMOs are performed.
+> + *
+> + * If device attributes are not explicitly requested in @prot, then the
+> + * mapping will be normal, cacheable.
+> + *
+> + * Return: The fully populated (unlinked) stage-2 paging structure, or
+> + * an ERR_PTR(error) on failure.
 
-Same here.
+What guarantees that this new unlinked structure is kept in sync with
+the original one? AFAICT, nothing does.
 
-Also, why are these in kvm_pgtable.h? Can't they be moved inside
-pgtable.c and thus have the "inline" attribute dropped?
-
-> +}
+> + */
+> +kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+> +					      u64 phys, u32 level,
+> +					      enum kvm_pgtable_prot prot,
+> +					      void *mc, bool force_pte);
 > +
 >  /**
->   * struct kvm_pgtable_walker - Hook into a page-table walk.
->   * @cb:		Callback function to invoke during the walk.
+>   * kvm_pgtable_stage2_map() - Install a mapping in a guest stage-2 page-table.
+>   * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
 > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index a3246d6cddec..4f703cc4cb03 100644
+> index 4f703cc4cb03..6bdfcb671b32 100644
 > --- a/arch/arm64/kvm/hyp/pgtable.c
 > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -741,14 +741,17 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
->  	if (!stage2_try_set_pte(ctx, KVM_INVALID_PTE_LOCKED))
->  		return false;
+> @@ -1212,6 +1212,52 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
+>  	return kvm_pgtable_walk(pgt, addr, size, &walker);
+>  }
 >  
-> -	/*
-> -	 * Perform the appropriate TLB invalidation based on the evicted pte
-> -	 * value (if any).
-> -	 */
-> -	if (kvm_pte_table(ctx->old, ctx->level))
-> -		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> -	else if (kvm_pte_valid(ctx->old))
-> -		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
-> +	if (!kvm_pgtable_walk_skip_bbm(ctx)) {
-> +		/*
-> +		 * Perform the appropriate TLB invalidation based on the
-> +		 * evicted pte value (if any).
-> +		 */
-> +		if (kvm_pte_table(ctx->old, ctx->level))
+> +kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+> +					      u64 phys, u32 level,
+> +					      enum kvm_pgtable_prot prot,
+> +					      void *mc, bool force_pte)
+> +{
+> +	struct stage2_map_data map_data = {
+> +		.phys		= phys,
+> +		.mmu		= pgt->mmu,
+> +		.memcache	= mc,
+> +		.force_pte	= force_pte,
+> +	};
+> +	struct kvm_pgtable_walker walker = {
+> +		.cb		= stage2_map_walker,
+> +		.flags		= KVM_PGTABLE_WALK_LEAF |
+> +				  KVM_PGTABLE_WALK_SKIP_BBM |
+> +				  KVM_PGTABLE_WALK_SKIP_CMO,
+> +		.arg		= &map_data,
+> +	};
+> +	/* .addr (the IPA) is irrelevant for an unlinked table */
+> +	struct kvm_pgtable_walk_data data = {
+> +		.walker	= &walker,
+> +		.addr	= 0,
 
-You're not skipping BBM here. You're skipping the TLB invalidation.
-Not quite the same thing.
+Is that always true? What if the caller expect a non-block-aligned
+mapping? You should at least check that phys is aligned to the granule
+size of 'level', or bad stuff may happen.
 
-> +			kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> +		else if (kvm_pte_valid(ctx->old))
-> +			kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu,
-> +				     ctx->addr, ctx->level);
+> +		.end	= kvm_granule_size(level),
+> +	};
+> +	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
+> +	kvm_pte_t *pgtable;
+> +	int ret;
+> +
+> +	ret = stage2_set_prot_attr(pgt, prot, &map_data.attr);
+> +	if (ret)
+> +		return ERR_PTR(ret);
+> +
+> +	pgtable = mm_ops->zalloc_page(mc);
+> +	if (!pgtable)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	ret = __kvm_pgtable_walk(&data, mm_ops, (kvm_pteref_t)pgtable,
+> +				 level + 1);
+> +	if (ret) {
+> +		kvm_pgtable_stage2_free_unlinked(mm_ops, pgtable, level);
+> +		mm_ops->put_page(pgtable);
+> +		return ERR_PTR(ret);
 > +	}
+> +
+> +	return pgtable;
+> +}
 >  
->  	if (stage2_pte_is_counted(ctx->old))
->  		mm_ops->put_page(ctx->ptep);
-> @@ -832,11 +835,13 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
->  		return -EAGAIN;
->  
->  	/* Perform CMOs before installation of the guest stage-2 PTE */
-> -	if (mm_ops->dcache_clean_inval_poc && stage2_pte_cacheable(pgt, new))
-> +	if (!kvm_pgtable_walk_skip_cmo(ctx) && mm_ops->dcache_clean_inval_poc &&
-> +	    stage2_pte_cacheable(pgt, new))
->  		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(new, mm_ops),
-> -						granule);
-> +					       granule);
->  
-> -	if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
-> +	if (!kvm_pgtable_walk_skip_cmo(ctx) && mm_ops->icache_inval_pou &&
-> +	    stage2_pte_executable(new))
->  		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
->  
->  	stage2_make_pte(ctx, new);
-
-Thanks,
+>  int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+>  			      struct kvm_pgtable_mm_ops *mm_ops,
 
 	M.
 
