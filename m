@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2782E2569
-	for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 13:10:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D831AC433D2;
-	Mon, 13 Mar 2023 13:10:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37CA82569
+	for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 13:10:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C8ABC433D2;
+	Mon, 13 Mar 2023 13:10:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1678713048;
-	bh=n/qfX7ce3Z08XT0Z7ir/kaLjZOmQuILg6jnYgrTIGxQ=;
+	s=k20201202; t=1678713051;
+	bh=T5TzBinFvNtJrCG3LVLJH0W0QQB95zTzrahKqxBr9YM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EU08uvI0/A7tI9SVNeR/qRgpGu3rLxG/+hw4Et9NDBgIbZp6fA719q9U/usnXYsF0
-	 94OnF3xpbc3vVbpmHTBNU9CPq18xvxUuVBW5kQQIDi42Z/99ZkQ97VVxxTGWAcvqgK
-	 9J2F9zuyDVyf4iPnWGfu/fxqIbW7jV2Q9RQSWumjMVaa7HbE0xBnh5md180dCw6BwY
-	 UrIyA7/qqXyGJrhg3pUw7eliIdUOpk9TsIMo59zV14PZgVPQH6jwUVafvVWRMZmROL
-	 6gSQ87r8p/OK4grw/Z+DCseXYqBT+HLKic8Xw66IsYFWphOK1P+KFcd3DQ82vnapX7
-	 tkzgz4wKTqolw==
+	b=uPaSbgobaaib9NWqxMj/CH6QVapsOOY3C7ApBOOQew5TEk+MQnM3gsx0PtMbsTSsd
+	 Z2ZK/AWKwc4mfKvdY7+7t+kXi8183wxLlq3pZ6x6i1fxiTNJ9NUrKmiaYZdIR7bj1H
+	 MdZACPIdDxVLxgppYB9XhlY7GZ6L0lje1eZnK1f9lI1k5/qjIBJOvoP4tf2iikyxaO
+	 uW7Y8vyJHZLh2jwGzrxUZTUR76ukVVlzVnDGH/JXXpS5lWCk4C9AebYhpNigSIUbe3
+	 rkqvc/eRVkz6/mrYvKWLOBYKvQ+02Itq7f+u059PNaH6Iui2Za5fJSeOvwsJsgS7jb
+	 oJgnvpCXMMpHA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pbhbh-00HEdE-Tm;
-	Mon, 13 Mar 2023 12:48:53 +0000
+	id 1pbhbk-00HEdE-5T;
+	Mon, 13 Mar 2023 12:48:56 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -35,9 +35,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Colton Lewis <coltonlewis@google.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	dwmw2@infradead.org
-Subject: [PATCH v2 10/19] KVM: arm64: timers: Rationalise per-vcpu timer init
-Date: Mon, 13 Mar 2023 12:48:28 +0000
-Message-Id: <20230313124837.2264882-11-maz@kernel.org>
+Subject: [PATCH v2 19/19] KVM: arm64: selftests: Deal with spurious timer interrupts
+Date: Mon, 13 Mar 2023 12:48:37 +0000
+Message-Id: <20230313124837.2264882-20-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230313124837.2264882-1-maz@kernel.org>
 References: <20230313124837.2264882-1-maz@kernel.org>
@@ -53,141 +53,95 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The way we initialise our timer contexts may be satisfactory
-for two timers, but will be getting pretty annoying with four.
+Make sure the timer test can properly handle a spurious timer
+interrupt, something that is far from being unlikely.
 
-Cleanup the whole thing by removing the code duplication and
-getting rid of unused IRQ configuration elements.
+This involves checking for the GIC IAR return value (don't bother
+handling the interrupt if it was spurious) as well as the timer
+control register (don't do anything if the interrupt is masked
+or the timer disabled). Take this opportunity to rewrite the
+timer handler in a more readable way.
+
+This solves a bunch of failures that creep up on systems that
+are slow to retire the interrupt, something that the GIC architecture
+makes no guarantee about.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arch_timer.c  | 73 +++++++++++++++++++-----------------
- include/kvm/arm_arch_timer.h |  1 -
- 2 files changed, 39 insertions(+), 35 deletions(-)
+ .../selftests/kvm/aarch64/arch_timer.c        | 40 ++++++++++++-------
+ 1 file changed, 25 insertions(+), 15 deletions(-)
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 25625e1d6d89..edd851e3b169 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -30,14 +30,9 @@ static u32 host_ptimer_irq_flags;
+diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+index 6d2e811fbf85..ed88580c0a99 100644
+--- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
++++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+@@ -123,25 +123,35 @@ static void guest_validate_irq(unsigned int intid,
+ 	uint64_t xcnt = 0, xcnt_diff_us, cval = 0;
+ 	unsigned long xctl = 0;
+ 	unsigned int timer_irq = 0;
++	unsigned int accessor;
  
- static DEFINE_STATIC_KEY_FALSE(has_gic_active_state);
- 
--static const struct kvm_irq_level default_ptimer_irq = {
--	.irq	= 30,
--	.level	= 1,
--};
--
--static const struct kvm_irq_level default_vtimer_irq = {
--	.irq	= 27,
--	.level	= 1,
-+static const u8 default_ppi[] = {
-+	[TIMER_PTIMER]  = 30,
-+	[TIMER_VTIMER]  = 27,
- };
- 
- static bool kvm_timer_irq_can_fire(struct arch_timer_context *timer_ctx);
-@@ -820,12 +815,14 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
- 	 * resets the timer to be disabled and unmasked and is compliant with
- 	 * the ARMv7 architecture.
- 	 */
--	timer_set_ctl(vcpu_vtimer(vcpu), 0);
--	timer_set_ctl(vcpu_ptimer(vcpu), 0);
-+	for (int i = 0; i < NR_KVM_TIMERS; i++)
-+		timer_set_ctl(vcpu_get_timer(vcpu, i), 0);
+-	if (stage == GUEST_STAGE_VTIMER_CVAL ||
+-		stage == GUEST_STAGE_VTIMER_TVAL) {
+-		xctl = timer_get_ctl(VIRTUAL);
+-		timer_set_ctl(VIRTUAL, CTL_IMASK);
+-		xcnt = timer_get_cntct(VIRTUAL);
+-		cval = timer_get_cval(VIRTUAL);
++	if (intid == IAR_SPURIOUS)
++		return;
 +
- 
- 	if (timer->enabled) {
--		kvm_timer_update_irq(vcpu, false, vcpu_vtimer(vcpu));
--		kvm_timer_update_irq(vcpu, false, vcpu_ptimer(vcpu));
-+		for (int i = 0; i < NR_KVM_TIMERS; i++)
-+			kvm_timer_update_irq(vcpu, false,
-+					     vcpu_get_timer(vcpu, i));
- 
- 		if (irqchip_in_kernel(vcpu->kvm)) {
- 			kvm_vgic_reset_mapped_irq(vcpu, map.direct_vtimer->irq.irq);
-@@ -840,39 +837,47 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
-+static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
-+{
-+	struct arch_timer_context *ctxt = vcpu_get_timer(vcpu, timerid);
-+	struct kvm *kvm = vcpu->kvm;
-+
-+	ctxt->vcpu = vcpu;
-+
-+	if (timerid == TIMER_VTIMER)
-+		ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
-+	else
-+		ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
-+
-+	hrtimer_init(&ctxt->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
-+	ctxt->hrtimer.function = kvm_hrtimer_expire;
-+	ctxt->irq.irq = default_ppi[timerid];
-+
-+	switch (timerid) {
-+	case TIMER_PTIMER:
-+		ctxt->host_timer_irq = host_ptimer_irq;
++	switch (stage) {
++	case GUEST_STAGE_VTIMER_CVAL:
++	case GUEST_STAGE_VTIMER_TVAL:
++		accessor = VIRTUAL;
+ 		timer_irq = vtimer_irq;
+-	} else if (stage == GUEST_STAGE_PTIMER_CVAL ||
+-		stage == GUEST_STAGE_PTIMER_TVAL) {
+-		xctl = timer_get_ctl(PHYSICAL);
+-		timer_set_ctl(PHYSICAL, CTL_IMASK);
+-		xcnt = timer_get_cntct(PHYSICAL);
+-		cval = timer_get_cval(PHYSICAL);
 +		break;
-+	case TIMER_VTIMER:
-+		ctxt->host_timer_irq = host_vtimer_irq;
++	case GUEST_STAGE_PTIMER_CVAL:
++	case GUEST_STAGE_PTIMER_TVAL:
++		accessor = PHYSICAL;
+ 		timer_irq = ptimer_irq;
+-	} else {
 +		break;
-+	}
-+}
-+
- void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
--	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
--	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
- 
--	vtimer->vcpu = vcpu;
--	vtimer->offset.vm_offset = &vcpu->kvm->arch.timer_data.voffset;
--	ptimer->vcpu = vcpu;
--	ptimer->offset.vm_offset = &vcpu->kvm->arch.timer_data.poffset;
-+	for (int i = 0; i < NR_KVM_TIMERS; i++)
-+		timer_context_init(vcpu, i);
- 
- 	/* Synchronize offsets across timers of a VM if not already provided */
- 	if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
--		timer_set_offset(vtimer, kvm_phys_timer_read());
--		timer_set_offset(ptimer, 0);
-+		timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
-+		timer_set_offset(vcpu_ptimer(vcpu), 0);
++	default:
+ 		GUEST_ASSERT(0);
++		return;
  	}
  
- 	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
- 	timer->bg_timer.function = kvm_bg_timer_expire;
--
--	hrtimer_init(&vtimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
--	hrtimer_init(&ptimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
--	vtimer->hrtimer.function = kvm_hrtimer_expire;
--	ptimer->hrtimer.function = kvm_hrtimer_expire;
--
--	vtimer->irq.irq = default_vtimer_irq.irq;
--	ptimer->irq.irq = default_ptimer_irq.irq;
--
--	vtimer->host_timer_irq = host_vtimer_irq;
--	ptimer->host_timer_irq = host_ptimer_irq;
--
--	vtimer->host_timer_irq_flags = host_vtimer_irq_flags;
--	ptimer->host_timer_irq_flags = host_ptimer_irq_flags;
++	xctl = timer_get_ctl(accessor);
++	if ((xctl & CTL_IMASK) || !(xctl & CTL_ENABLE))
++		return;
++
++	timer_set_ctl(accessor, CTL_IMASK);
++	xcnt = timer_get_cntct(accessor);
++	cval = timer_get_cval(accessor);
++
+ 	xcnt_diff_us = cycles_to_usec(xcnt - shared_data->xcnt);
+ 
+ 	/* Make sure we are dealing with the correct timer IRQ */
+@@ -150,6 +160,8 @@ static void guest_validate_irq(unsigned int intid,
+ 	/* Basic 'timer condition met' check */
+ 	GUEST_ASSERT_3(xcnt >= cval, xcnt, cval, xcnt_diff_us);
+ 	GUEST_ASSERT_1(xctl & CTL_ISTATUS, xctl);
++
++	WRITE_ONCE(shared_data->nr_iter, shared_data->nr_iter + 1);
  }
  
- void kvm_timer_cpu_up(void)
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index 2dd0fd2406fb..c746ef64220b 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -59,7 +59,6 @@ struct arch_timer_context {
+ static void guest_irq_handler(struct ex_regs *regs)
+@@ -160,8 +172,6 @@ static void guest_irq_handler(struct ex_regs *regs)
  
- 	/* Duplicated state from arch_timer.c for convenience */
- 	u32				host_timer_irq;
--	u32				host_timer_irq_flags;
- };
+ 	guest_validate_irq(intid, shared_data);
  
- struct timer_map {
+-	WRITE_ONCE(shared_data->nr_iter, shared_data->nr_iter + 1);
+-
+ 	gic_set_eoi(intid);
+ }
+ 
 -- 
 2.34.1
 
