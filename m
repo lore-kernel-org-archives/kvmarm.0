@@ -1,102 +1,85 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47EC223B7
-	for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 09:14:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5395C433A4;
-	Mon, 13 Mar 2023 09:14:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1678698891;
-	bh=Wye0Vl6QFmyMU9FOa/kaj5qWj9XcQLGu7BWa7lw7V9E=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ewkzT/nuk5WO/zD80cVndUZQKir9qXYDKY1GCbp7xOHH+0x3xDBv4/hWKhbkcwJBt
-	 7L1CmGNRpMRIlGgd0VrEg1oc70SJFCBNYgDSu+m2mz4RFALpMirVskbfdrO0g0EGcQ
-	 CWCOfzirYmAhzpMIXWKCb3v4kO4+cPo1/NZRq3Lg/kQghJZDsZJQE5eEQu5EXZKJkx
-	 NwT5c0fLPoUKV+0uLbeJ6Uci+i5f35sD2fj+LacYJCJy/EGj7tQhel6Y1FR/dR7QBB
-	 pX7Hs44NYUSM7aHpoZX875G/2aKgZVXs2O3X613+p4qiZ0YLjoYLg8bp5GZZWlzted
-	 cdMOyEVWTVFJQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pbeGW-00HAzq-LW;
-	Mon, 13 Mar 2023 09:14:48 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	Quentin Perret <qperret@google.com>,
-	stable@vger.kernel.org
-Subject: [PATCH 2/2] KVM: arm64: Check for kvm_vma_mte_allowed in the critical section
-Date: Mon, 13 Mar 2023 09:14:25 +0000
-Message-Id: <20230313091425.1962708-3-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230313091425.1962708-1-maz@kernel.org>
-References: <20230313091425.1962708-1-maz@kernel.org>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAF4C23A7
+	for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 10:10:09 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E200C2F4;
+	Mon, 13 Mar 2023 03:10:46 -0700 (PDT)
+Received: from e120937-lin (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 228E03F71A;
+	Mon, 13 Mar 2023 03:10:02 -0700 (PDT)
+Date: Mon, 13 Mar 2023 10:09:55 +0000
+From: Cristian Marussi <cristian.marussi@arm.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Jeremy Linton <jeremy.linton@arm.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: Circular lockdep in kvm_reset_vcpu() ?
+Message-ID: <ZA72c+TT9epTcvX4@e120937-lin>
+References: <f6452cdd-65ff-34b8-bab0-5c06416da5f6@arm.com>
+ <Y+bnybGEkMpZzm/y@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, ardb@kernel.org, will@kernel.org, qperret@google.com, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y+bnybGEkMpZzm/y@linux.dev>
 
-On page fault, we find about the VMA that backs the page fault
-early on, and quickly release the mmap_read_lock. However, using
-the VMA pointer after the critical section is pretty dangerous,
-as a teardown may happen in the meantime and the VMA be long gone.
+On Sat, Feb 11, 2023 at 12:56:41AM +0000, Oliver Upton wrote:
+> Hi Jeremy,
+> 
 
-Move the sampling of the MTE permission early, and NULL-ify the
-VMA pointer after that, just to be on the safe side.
+Hi,
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Cc: stable@vger.kernel.org
----
- arch/arm64/kvm/mmu.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+> On Fri, Feb 10, 2023 at 11:46:36AM -0600, Jeremy Linton wrote:
+> > Hi,
+> > 
+> > I saw this pop yesterday:
+> 
+> You and me both actually! Shame on me, I spoke off-list about this with
+> Marc in passing. Thanks for sending along the report.
+> 
+> > [   78.333360] ======================================================
+> > [   78.339541] WARNING: possible circular locking dependency detected
+> > [   78.345721] 6.2.0-rc7+ #19 Not tainted
+> > [   78.349470] ------------------------------------------------------
+> > [   78.355647] qemu-system-aar/859 is trying to acquire lock:
+> > [   78.361130] ffff5aa69269eba0 (&host_kvm->lock){+.+.}-{3:3}, at:
+> > kvm_reset_vcpu+0x34/0x274
+> > [   78.369344]
+> > [   78.369344] but task is already holding lock:
+> > [   78.375182] ffff5aa68768c0b8 (&vcpu->mutex){+.+.}-{3:3}, at:
+> > kvm_vcpu_ioctl+0x8c/0xba0
+> 
+> [...]
+> 
+> > It appears to be triggered by the new commit 42a90008f890a ('KVM: Ensure
+> > lockdep knows about kvm->lock vs. vcpu->mutex ordering rule') which is
+> > detecting the vcpu lock grabbed by kvm_vcpu_ioctl() and then the kvm mutext
+> > grabbed by kvm_reset_vcpu().
+> 
+> Right, this commit gave lockdep what it needed to smack us on the head
+> for getting the locking wrong in the arm64 side.
+> 
+> As gross as it might be, the right direction is likely to have our own
+> lock in kvm_arch that we can acquire while holding the vcpu mutex. I'll
+> throw a patch at the list once I get done testing it.
+> 
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index d7b8b25942df..2424be11eb52 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1208,7 +1208,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- {
- 	int ret = 0;
- 	bool write_fault, writable, force_pte = false;
--	bool exec_fault;
-+	bool exec_fault, mte_allowed;
- 	bool device = false;
- 	unsigned long mmu_seq;
- 	struct kvm *kvm = vcpu->kvm;
-@@ -1285,6 +1285,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		fault_ipa &= ~(vma_pagesize - 1);
- 
- 	gfn = fault_ipa >> PAGE_SHIFT;
-+	mte_allowed = kvm_vma_mte_allowed(vma);
-+	/* Don't use the VMA after that -- it may have vanished */
-+	vma = NULL;
- 	mmap_read_unlock(current->mm);
- 
- 	/*
-@@ -1375,7 +1378,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 
- 	if (fault_status != ESR_ELx_FSC_PERM && !device && kvm_has_mte(kvm)) {
- 		/* Check the VMM hasn't introduced a new disallowed VMA */
--		if (kvm_vma_mte_allowed(vma)) {
-+		if (mte_allowed) {
- 			sanitise_mte_tags(kvm, pfn, vma_pagesize);
- 		} else {
- 			ret = -EFAULT;
--- 
-2.34.1
+I just hit this using a v6.3-rc2 and a mainline kvmtool.
+
+In my case, though, the guest does not even boot if I use more than 1 vcpu, which
+I suppose triggers effectively the reported possible deadlock, i.e.:
+
+root/lkvm_master run -c 4 -m 4096 -k /root/Image_guest -d /root/disk_debian_buster_guest.img -p "loglevel=8"
+  # lkvm run -k /root/Image_guest -m 4096 -c 4 --name guest-288
+....<HANGS FOREVER>
+
+Thanks,
+Cristian
 
