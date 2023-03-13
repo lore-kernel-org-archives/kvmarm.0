@@ -1,156 +1,322 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8899A8F4E
-	for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 23:55:06 +0000 (UTC)
-Received: by mail-yb1-f202.google.com with SMTP id t25-20020a252d19000000b00b341ad1b626so9322575ybt.19
-        for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 16:55:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAB718F4E
+	for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 23:58:34 +0000 (UTC)
+Received: by mail-pj1-f54.google.com with SMTP id y2so13656627pjg.3
+        for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 16:58:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678751705;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=VkWifiOZWCx17ERcyP19NDXhRCR0dMhnRj+TI/ZHeGo=;
-        b=TvtrIUPpjdjaDwJjo0RLO8idek0XTrVD7IZA/D948AdJ3jGlgi/aukHv2H5ZQrvcNi
-         sqwDPOSZz6YAq81yFy3t2f1qqT7jy2AwT9Hu/5KS8d16kRwuw23dVG8oWDJxI0KBTaCJ
-         vyLw1eOB98JSEDZShI1PAomu+7Elob5kgvuxrPE7zcYhTU5XHw84sD/yvD5qtDc4+RMV
-         UObr0/d6yqwZHdIqlDWZE/LL+MS594vZv4Bdv01Rz0gFLKcYgQc+RjTU9JGeqsmPMoiO
-         dDiFcxX2s1RzOdnthCa8owr3U0eA7usc4jf0wuVCVfmRLo3ME6ACxG++CZeSH56tt1da
-         6UbQ==
+        d=google.com; s=20210112; t=1678751914;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=PDGcCbApk5SWwy8kMHL+dkdFkrI2nhTDi1PUuQqqAaQ=;
+        b=DryNVkrkPQR7Y8Frs7sEVAlw83RREkA6IF0+9mmWSUQyTMzlEkUFDpbr4pJGIp/QMY
+         rGpI3UYjyL0TbLhkw3wbcC1UXJELK8y+jymeZZDfrTwh4q3VCs1yDk4R0L5FIxoIZ0dZ
+         d8emcyC0X112nr53vG/poiTBbeVJA7H07fI1oNMDakalatUD0omup49Y2VZqf3SxJp6J
+         lbDAIQ+y7olJqs4BKdlNF1ic7r5SlC5+kjwu3yDQPCH1XGzZQAfV0RbsYiAfVoYZ7yAs
+         b9aj/oLomDwuIi/Q5KZ6mDgSsEPA2s2k+IABYOxjgiwWuO6eUAy1BRPLheQQH2xq6Fzs
+         wiOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678751705;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VkWifiOZWCx17ERcyP19NDXhRCR0dMhnRj+TI/ZHeGo=;
-        b=fPA6jF5APUN/4lYIpxYVHOBxRo6bZEJ88QonFmyjKX2V7yJpg3lAAia3rHq43HEFpq
-         m/b4KuRUK1f+aDHExHUa0cEQswUc9iNjcrco+fO57EIK7Ji21NgThLDYoS+EB/9l6i4C
-         8H7oPGI/t8dSe2OhgGFUb1LIKjP1X8mGXu9IQQI5V4+l8Jlv1B0rYCPvXCwE0J7ck1Db
-         2l19XO++t8glwcfZZc4ElrBsok5+1XRBuZJT5wVpDgKxqSQf2sdpJRA92EHBbiXX5eVM
-         OueVZL5vk6Qmxd9Muik/PPkJ8dYhbdZWQp1V3UJTlhS22nLcWovmoc1x8C86DZiY45Az
-         y15A==
-X-Gm-Message-State: AO0yUKV3o8xR/8utNIB4/LX/ZSuQ8xY2Z1KNGnQ9OSInGPcKbJm6sdtR
-	vfM+qfS/p+H7ZTkggEkkdWEKOJ0t5MZfBg==
-X-Google-Smtp-Source: AK7set8Xx7Y7NTWYub347kzpK+eiVQUCaW6+mGeLKEFajo2Yu1VarpuWrgufy6NQGbwmwy3O5aaGj1ZoCFy5+A==
-X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a5b:f03:0:b0:a74:87b0:4090 with SMTP id
- x3-20020a5b0f03000000b00a7487b04090mr15188970ybr.3.1678751705474; Mon, 13 Mar
- 2023 16:55:05 -0700 (PDT)
-Date: Mon, 13 Mar 2023 16:54:54 -0700
+        d=1e100.net; s=20210112; t=1678751914;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PDGcCbApk5SWwy8kMHL+dkdFkrI2nhTDi1PUuQqqAaQ=;
+        b=CICvXwrbnZAQs1IA72N72ExuiAH2B0Jrt6458sdpVaI7bSZL0bynixiVh52JaLYpJA
+         N71taX43HH4Oe0iJK4NVzTWT7k4qLjei7YHOYTfVWHiVYz9k1v8W6IAD2ASK6OenfPTy
+         PliAA4Q15fVpO4P3rmSlWaC/1a1CXuUY/MzrZwlaH+1tOV3rqLPOBAal4S+aHlsd+Wm1
+         zW+IXuWQmRRECrXuN6f/X/HlH0FAi6vJGX+RxtLEpqZCde4K4ZgtQeOxfH1jhsJiZi1J
+         /SYeTaF8Iiro/NerCb47enNYAD2T9bwAGV+MyjhzNK5hPCGRvd2q7r6mPDQhKtCIoIwW
+         bsAQ==
+X-Gm-Message-State: AO0yUKVH9XpIglX4NsLm4qSE4FlRjr/Ots2qhrwJGb/zDePcIhwMNjWB
+	ej1R33wmCYZvGVOog2v3ff6Cbw==
+X-Google-Smtp-Source: AK7set/Hu7vqd1wnczHiPPHnEjFdjll2EklIz6df1Wi2Pzcr8jT04QXk+2sps3I4+iud/g2olGWDWg==
+X-Received: by 2002:a17:903:430e:b0:19c:c5d4:afd2 with SMTP id jz14-20020a170903430e00b0019cc5d4afd2mr7340plb.11.1678751914078;
+        Mon, 13 Mar 2023 16:58:34 -0700 (PDT)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
+        by smtp.gmail.com with ESMTPSA id bu11-20020a17090aee4b00b002342ccc8280sm414596pjb.6.2023.03.13.16.58.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Mar 2023 16:58:33 -0700 (PDT)
+Date: Mon, 13 Mar 2023 16:58:30 -0700
+From: Ricardo Koller <ricarkol@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com,
+	dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	qperret@google.com, catalin.marinas@arm.com, andrew.jones@linux.dev,
+	seanjc@google.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+	eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
+	rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
+	Shaoqin Huang <shahuang@redhat.com>
+Subject: Re: [PATCH v6 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
+Message-ID: <ZA+4pv6UIDpAp5aY@google.com>
+References: <20230307034555.39733-1-ricarkol@google.com>
+ <20230307034555.39733-5-ricarkol@google.com>
+ <87a60i5hju.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
-Message-ID: <20230313235454.2964067-1-dmatlack@google.com>
-Subject: [PATCH] KVM: arm64: Retry fault if vma_lookup() results become invalid
-From: David Matlack <dmatlack@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Will Deacon <will@kernel.org>, Marcelo Tosatti <mtosatti@redhat.com>, 
-	Christoffer Dall <c.dall@virtualopensystems.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, David Matlack <dmatlack@google.com>, stable@vger.kernel.org, 
-	Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87a60i5hju.wl-maz@kernel.org>
 
-Read mmu_invalidate_seq before dropping the mmap_lock so that KVM can
-detect if the results of vma_lookup() (e.g. vma_shift) become stale
-before it acquires kvm->mmu_lock. This fixes a theoretical bug where a
-VMA could be changed by userspace after vma_lookup() and before KVM
-reads the mmu_invalidate_seq, causing KVM to install page table entries
-based on a (possibly) no-longer-valid vma_shift.
+On Sun, Mar 12, 2023 at 11:35:01AM +0000, Marc Zyngier wrote:
+> On Tue, 07 Mar 2023 03:45:47 +0000,
+> Ricardo Koller <ricarkol@google.com> wrote:
+> > 
+> > Add a new stage2 function, kvm_pgtable_stage2_split(), for splitting a
+> > range of huge pages. This will be used for eager-splitting huge pages
+> > into PAGE_SIZE pages. The goal is to avoid having to split huge pages
+> > on write-protection faults, and instead use this function to do it
+> > ahead of time for large ranges (e.g., all guest memory in 1G chunks at
+> > a time).
+> > 
+> > No functional change intended. This new function will be used in a
+> > subsequent commit.
+> 
+> Same comment as before about the usefulness of this last sentence.
+> 
+> > 
+> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> > Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_pgtable.h |  30 +++++++
+> >  arch/arm64/kvm/hyp/pgtable.c         | 113 +++++++++++++++++++++++++++
+> >  2 files changed, 143 insertions(+)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > index b7b3fc0fa7a5..40e323a718fc 100644
+> > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > @@ -665,6 +665,36 @@ bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr);
+> >   */
+> >  int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
+> >  
+> > +/**
+> > + * kvm_pgtable_stage2_split() - Split a range of huge pages into leaf PTEs pointing
+> > + *				to PAGE_SIZE guest pages.
+> > + * @pgt:	 Page-table structure initialised by kvm_pgtable_stage2_init().
+> > + * @addr:	 Intermediate physical address from which to split.
+> > + * @size:	 Size of the range.
+> > + * @mc:		 Cache of pre-allocated and zeroed memory from which to allocate
+> > + *		 page-table pages.
+> > + * @mc_capacity: Number of pages in @mc.
+> > + *
+> > + * @addr and the end (@addr + @size) are effectively aligned down and up to
+> > + * the top level huge-page block size. This is an example using 1GB
+> > + * huge-pages and 4KB granules.
+> > + *
+> > + *                          [---input range---]
+> > + *                          :                 :
+> > + * [--1G block pte--][--1G block pte--][--1G block pte--][--1G block pte--]
+> > + *                          :                 :
+> > + *                   [--2MB--][--2MB--][--2MB--][--2MB--]
+> > + *                          :                 :
+> > + *                   [ ][ ][:][ ][ ][ ][ ][ ][:][ ][ ][ ]
+> > + *                          :                 :
+> 
+> So here, what alignment do we effectively get?
+>
 
-Re-order the MMU cache top-up to earlier in user_mem_abort() so that it
-is not done after KVM has read mmu_invalidate_seq (i.e. so as to avoid
-inducing spurious fault retries).
+The function tries to split any block that overlaps with the input
+range. Here's another example that might be more helpful:
 
-This bug has existed since KVM/ARM's inception. It's unlikely that any
-sane userspace currently modifies VMAs in such a way as to trigger this
-race. And even with directed testing I was unable to reproduce it. But a
-sufficiently motivated host userspace might be able to exploit this
-race.
+ *                                [---input range---]
+ *                                :                 :
+ * [--1G block pte--][--2MB--][--2MB--][--1G block pte--][--1G block pte--]
 
-Fixes: 94f8e6418d39 ("KVM: ARM: Handle guest faults in KVM")
-Cc: stable@vger.kernel.org
-Reported-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: David Matlack <dmatlack@google.com>
----
- arch/arm64/kvm/mmu.c | 48 +++++++++++++++++++-------------------------
- 1 file changed, 21 insertions(+), 27 deletions(-)
+is split like this:
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 7113587222ff..f54408355d1d 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1217,6 +1217,20 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		return -EFAULT;
- 	}
- 
-+	/*
-+	 * Permission faults just need to update the existing leaf entry,
-+	 * and so normally don't require allocations from the memcache. The
-+	 * only exception to this is when dirty logging is enabled at runtime
-+	 * and a write fault needs to collapse a block entry into a table.
-+	 */
-+	if (fault_status != ESR_ELx_FSC_PERM ||
-+	    (logging_active && write_fault)) {
-+		ret = kvm_mmu_topup_memory_cache(memcache,
-+						 kvm_mmu_cache_min_pages(kvm));
-+		if (ret)
-+			return ret;
-+	}
-+
- 	/*
- 	 * Let's check if we will get back a huge page backed by hugetlbfs, or
- 	 * get block mapping for device MMIO region.
-@@ -1269,37 +1283,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		fault_ipa &= ~(vma_pagesize - 1);
- 
- 	gfn = fault_ipa >> PAGE_SHIFT;
--	mmap_read_unlock(current->mm);
--
--	/*
--	 * Permission faults just need to update the existing leaf entry,
--	 * and so normally don't require allocations from the memcache. The
--	 * only exception to this is when dirty logging is enabled at runtime
--	 * and a write fault needs to collapse a block entry into a table.
--	 */
--	if (fault_status != ESR_ELx_FSC_PERM ||
--	    (logging_active && write_fault)) {
--		ret = kvm_mmu_topup_memory_cache(memcache,
--						 kvm_mmu_cache_min_pages(kvm));
--		if (ret)
--			return ret;
--	}
- 
--	mmu_seq = vcpu->kvm->mmu_invalidate_seq;
- 	/*
--	 * Ensure the read of mmu_invalidate_seq happens before we call
--	 * gfn_to_pfn_prot (which calls get_user_pages), so that we don't risk
--	 * the page we just got a reference to gets unmapped before we have a
--	 * chance to grab the mmu_lock, which ensure that if the page gets
--	 * unmapped afterwards, the call to kvm_unmap_gfn will take it away
--	 * from us again properly. This smp_rmb() interacts with the smp_wmb()
--	 * in kvm_mmu_notifier_invalidate_<page|range_end>.
-+	 * Read mmu_invalidate_seq so that KVM can detect if the results of
-+	 * vma_lookup() or __gfn_to_pfn_memslot() become stale prior to
-+	 * acquiring kvm->mmu_lock.
- 	 *
--	 * Besides, __gfn_to_pfn_memslot() instead of gfn_to_pfn_prot() is
--	 * used to avoid unnecessary overhead introduced to locate the memory
--	 * slot because it's always fixed even @gfn is adjusted for huge pages.
-+	 * Rely on mmap_read_unlock() for an implicit smp_rmb(), which pairs
-+	 * with the smp_wmb() in kvm_mmu_invalidate_end().
- 	 */
--	smp_rmb();
-+	mmu_seq = vcpu->kvm->mmu_invalidate_seq;
-+	mmap_read_unlock(current->mm);
- 
- 	pfn = __gfn_to_pfn_memslot(memslot, gfn, false, false, NULL,
- 				   write_fault, &writable, NULL);
+ * [--1G block pte--][--2MB--][ ][ ][ ][ ][ ][ ][ ][ ][ ][--1G block pte--]
+                              <-------split range------->
 
-base-commit: 96a4627dbbd48144a65af936b321701c70876026
--- 
-2.40.0.rc1.284.g88254d51c5-goog
+I think I will just use this new description instead.
 
+> > + * Return: 0 on success, negative error code on failure. Note that
+> > + * kvm_pgtable_stage2_split() is best effort: it tries to break as many
+> > + * blocks in the input range as allowed by @mc_capacity.
+> > + */
+> > +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> > +			     void *mc, u64 mc_capacity);
+> > +
+> >  /**
+> >   * kvm_pgtable_walk() - Walk a page-table.
+> >   * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > index 6bdfcb671b32..3149b98d1701 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -1259,6 +1259,119 @@ kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+> >  	return pgtable;
+> >  }
+> >  
+> > +struct stage2_split_data {
+> > +	struct kvm_s2_mmu		*mmu;
+> > +	void				*memcache;
+> > +	u64				mc_capacity;
+> 
+> Why isn't this a pointer to a *real* memcache structure?
+> 
+
+Mainly because I wanted this function to be like the other pgtable.c
+funtions that use opaque pointers to handle the vhe and nvhe cases. vhe
+uses "struct kvm_mmu_memory_cache" while nvhe uses "struct hyp_pool".
+This series only implements the vhe case but I didn't want to restrict
+kvm_pgtable_stage2_split() to vhe just because of this. Just in case, I
+have not tried it in nvhe.
+
+> > +};
+> > +
+> > +/*
+> > + * Get the number of page-tables needed to replace a block with a
+> > + * fully populated tree, up to the PTE level, at particular level.
+> > + */
+> > +static inline int stage2_block_get_nr_page_tables(u32 level)
+> 
+> Please drop the inline. The compiler will figure it out.
+> 
+> > +{
+> > +	if (WARN_ON_ONCE(level < KVM_PGTABLE_MIN_BLOCK_LEVEL ||
+> > +			 level >= KVM_PGTABLE_MAX_LEVELS))
+> > +		return -EINVAL;
+> 
+> Move this check to the 'default' case below.
+> 
+> > +
+> > +	switch (level) {
+> > +	case 1:
+> > +		return PTRS_PER_PTE + 1;
+> > +	case 2:
+> > +		return 1;
+> 
+> This is odd. Replacing a block by a table always requires
+> 'PTRS_PER_PTE + 1' pages. Why 1? If this is some special treatment for
+> level-2 mappings, please spell it out.
+
+I'm not sure I understand. I'm interpreting "level=X" as in "level X
+entry".  More specifically, using PAGE_SIZE=4096 as an example:
+
+a level 3 entry (a PTE): a 4096 block needs 0 page-table pages
+a level 2 entry: a 2M block needs 1 page-table pages
+a level 1 entry: a 1G block needs 512+1 page-table pages
+
+> 
+> > +	case 3:
+> > +		return 0;
+> > +	default:
+> > +		return -EINVAL;
+> > +	};
+> > +}
+> > +
+> > +static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> > +			       enum kvm_pgtable_walk_flags visit)
+> > +{
+> > +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+> > +	struct stage2_split_data *data = ctx->arg;
+> > +	kvm_pte_t pte = ctx->old, new, *childp;
+> > +	enum kvm_pgtable_prot prot;
+> > +	void *mc = data->memcache;
+> > +	u32 level = ctx->level;
+> > +	bool force_pte;
+> > +	int nr_pages;
+> > +	u64 phys;
+> > +
+> > +	/* No huge-pages exist at the last level */
+> > +	if (level == KVM_PGTABLE_MAX_LEVELS - 1)
+> > +		return 0;
+> 
+> Why the check for level 3 in the previous function if never get there?
+> 
+
+Was trying to make stage2_block_get_nr_page_tables() useful for other
+cases. It's still correct for other cases to ask how many page-table
+pages are needed for a PTE (stage2_block_get_nr_page_tables(3) -> 0).
+
+> > +
+> > +	/* We only split valid block mappings */
+> > +	if (!kvm_pte_valid(pte))
+> > +		return 0;
+> > +
+> > +	nr_pages = stage2_block_get_nr_page_tables(level);
+> > +	if (nr_pages < 0)
+> > +		return nr_pages;
+> > +
+> > +	if (data->mc_capacity >= nr_pages) {
+> > +		/* Build a tree mapped down to the PTE granularity. */
+> > +		force_pte = true;
+> > +	} else {
+> > +		/*
+> > +		 * Don't force PTEs. This requires a single page of PMDs at the
+> > +		 * PUD level, or a single page of PTEs at the PMD level. If we
+> > +		 * are at the PUD level, the PTEs will be created recursively.
+> > +		 */
+> 
+> I don't understand how you reach this 'single page' conclusion. You
+> need to explain why you get there.
+
+Ack, will expand it.
+
+> 
+> > +		force_pte = false;
+> > +		nr_pages = 1;
+> > +	}
+> > +
+> > +	if (data->mc_capacity < nr_pages)
+> > +		return -ENOMEM;
+> > +
+> > +	phys = kvm_pte_to_phys(pte);
+> > +	prot = kvm_pgtable_stage2_pte_prot(pte);
+> > +
+> > +	childp = kvm_pgtable_stage2_create_unlinked(data->mmu->pgt, phys,
+> > +						    level, prot, mc, force_pte);
+> > +	if (IS_ERR(childp))
+> > +		return PTR_ERR(childp);
+> > +
+> > +	if (!stage2_try_break_pte(ctx, data->mmu)) {
+> > +		kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
+> > +		mm_ops->put_page(childp);
+> > +		return -EAGAIN;
+> > +	}
+> > +
+> > +	/*
+> > +	 * Note, the contents of the page table are guaranteed to be made
+> > +	 * visible before the new PTE is assigned because stage2_make_pte()
+> > +	 * writes the PTE using smp_store_release().
+> > +	 */
+> > +	new = kvm_init_table_pte(childp, mm_ops);
+> > +	stage2_make_pte(ctx, new);
+> > +	dsb(ishst);
+> > +	data->mc_capacity -= nr_pages;
+> > +	return 0;
+> > +}
+> > +
+> > +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> > +			     void *mc, u64 mc_capacity)
+> > +{
+> > +	struct stage2_split_data split_data = {
+> > +		.mmu		= pgt->mmu,
+> > +		.memcache	= mc,
+> > +		.mc_capacity	= mc_capacity,
+> > +	};
+> > +
+> > +	struct kvm_pgtable_walker walker = {
+> > +		.cb	= stage2_split_walker,
+> > +		.flags	= KVM_PGTABLE_WALK_LEAF,
+> > +		.arg	= &split_data,
+> > +	};
+> > +
+> > +	return kvm_pgtable_walk(pgt, addr, size, &walker);
+> > +}
+> > +
+> >  int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+> >  			      struct kvm_pgtable_mm_ops *mm_ops,
+> >  			      enum kvm_pgtable_stage2_flags flags,
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
