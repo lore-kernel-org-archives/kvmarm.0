@@ -1,92 +1,160 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7003815CA
-	for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 03:32:37 +0000 (UTC)
-Received: by mail-pl1-f201.google.com with SMTP id az7-20020a170902a58700b001a0534b4ddbso252491plb.15
-        for <kvmarm@lists.linux.dev>; Sun, 12 Mar 2023 20:32:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D02F515CA
+	for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 03:34:26 +0000 (UTC)
+Received: by mail-pj1-f43.google.com with SMTP id u3-20020a17090a450300b00239db6d7d47so10285673pjg.4
+        for <kvmarm@lists.linux.dev>; Sun, 12 Mar 2023 20:34:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678678357;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Cy0M1iGheyvntKi3y+GjSM1iOxY11G04EpNocjkoq+U=;
-        b=cTlJ+7udPzmM6zDFIF8ee2sFIvZBsuiRIzV3hNdqlXEPHqtV/3ijyFigaPGG7iWIbO
-         1guLZBZQIfl0luMifYX5GK0gqJ3c0xz/QgTJgsbv1j6AMWobq0tNK8nGok9LbuyK+0el
-         rvRQs5ZG/duTgxuDLv0bQtipFopuFsxP8G+HiucL2KRVM8o6xEf8/+vriszjqqrNtsZ7
-         XGfP9seoWjth9Ksb9BeuGopHHfUcP5zGR+xoYhy5m2yI5Z2vllNEqNzt9XTFb7I3pGTK
-         woOmBWlowBmXlGZWhKub2Au27Z0uepqBaSnUTTCfkeNGOi3xq8FbhneFxCaqOUneCp+R
-         DB5A==
+        d=google.com; s=20210112; t=1678678466;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K7c5jAY08UAv//Ae/goiaQTw3VyvwlH6KcT5ugpnHns=;
+        b=alKqa5hG+Rl5pqhVqbVPZ2qCNwXgWRVNgfR6IQHI5jD8yc8JC4E00lm9RFYVKXeZXE
+         /UIJ6sN8YDzaDPSyqg0UNWza231nCtJK50e08rQOcepn9aQ50y97bwi8FhS9Ci4hPk78
+         A/NrUSvElIQGtYLULfTFmDVE+a2mrqofQffPfMKWj3j324MIXlk3ue7wDXejBhuCMPbK
+         WZ+YuXYy8/3DAzWHp7RogryFui61FDON9SYQXK9dtWiAPQTB2VrXvh1WFBqHzNvfXFhj
+         QLSs6PLIpj4DC3SDzO2fQcYbPIjdKgBMPFRpapEDocJ6dTBROrfoYdBFMupMygUMgimf
+         2HBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678678357;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Cy0M1iGheyvntKi3y+GjSM1iOxY11G04EpNocjkoq+U=;
-        b=uypXVF5pTRwbDxgYLJ7fh0LvxhLTi37JHJvSJfkc5wxfu325sVzuqpqnP40NEbeF8D
-         I55YdRJjvaNt2I/jMU9JIec+TW0xJ/kkDSEbhJEBpcdEa61Qz37IDdqZewsjAMVGQBKh
-         oQyx8aqthDeQRNSeNHs+lEo8f5bOSyh9ePPk5lw0xgQkiEG9Im8ceP7zkudM80r/6XMv
-         JyJaXRTyl8OkJGt6e0xbxxIRwTOeo5Dj1S7B4UR7anD+rdzYimWKLkldE71QvNBaAs+X
-         pE51/ukOFvicwNjsrXrUuUmKgv9JUBiMySRIzmGl/8TnCbw0fuGMyOLA5JvF1Gx9Soem
-         6PlQ==
-X-Gm-Message-State: AO0yUKWXlnu1SDeBtRlJMx7B2wHOY7t3JJj8qEq+YDFAS8da5w3Va+MC
-	vWCnmsUwW3ct5LZSZz/w66YKDZGHZD8=
-X-Google-Smtp-Source: AK7set/Qj4lGvY7S0/dBT1dO/b9crIdCITPApjcUxw1m+F6Uzkdmxx1UuVnqUaK/Yt3t/zLkSaQwoK0FjNU=
-X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a63:b55e:0:b0:502:e1c4:d37b with SMTP id
- u30-20020a63b55e000000b00502e1c4d37bmr11190335pgo.12.1678678357011; Sun, 12
- Mar 2023 20:32:37 -0700 (PDT)
-Date: Sun, 12 Mar 2023 20:32:34 -0700
+        d=1e100.net; s=20210112; t=1678678466;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=K7c5jAY08UAv//Ae/goiaQTw3VyvwlH6KcT5ugpnHns=;
+        b=HZho43ujI6deP5OQ26IpQjD1CgmcDhDlmF8q+EkNJgli1TNWt+Wxw92d4shyOI7sbk
+         5goiDr+UcbdoWtKcCMZBfjmqdw9hwr6UPBDdqtu9jy1/dUhnscNjH143HwYmvEUE1I4z
+         hBkw/zsWer8yez6iqvmBbIqdn+u8J1ePV2w9aPBjb3YKvnf/+SHuowQc+p84WWM559C1
+         ELoVvVtkiPPe5cpE6m9SMPT5Mx/Iej8EetdXzwj2YHSGTlF2v7Spd+DFhsKQgIRx2i0x
+         XNI/OV5aX8ioTbQX9gWEKfdycdB4jhuJshDv6gaaZ5rAg2GU3/R1Ue/mA1jNBXitgs3P
+         f9Ww==
+X-Gm-Message-State: AO0yUKUMV3Isl/tXZkTxKI0BCWL+s0fXfyKG1lqni0Epew8/H6Lc1bJ5
+	C4nUyGs6ZtAViFCSErC1nJY2OhfglyvHLzfth0AZOA==
+X-Google-Smtp-Source: AK7set/QkYQ5x8DlXWqqggEpeZ2zMX+v5gg+we1kDw+npqM2bImlqd6vIr3LxHCbPLkw1LqAJkAHOxerUOFPbbI36XA=
+X-Received: by 2002:a17:903:2c1:b0:19a:7e41:5a2c with SMTP id
+ s1-20020a17090302c100b0019a7e415a2cmr12074640plk.2.1678678466118; Sun, 12 Mar
+ 2023 20:34:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
-Message-ID: <20230313033234.1475987-1-reijiw@google.com>
-Subject: [PATCH v2 2/2] KVM: arm64: PMU: Don't save PMCR_EL0.{C,P} for the vCPU
+MIME-Version: 1.0
+References: <20230302055033.3081456-1-reijiw@google.com> <20230302055033.3081456-2-reijiw@google.com>
+ <87zg8i3tma.wl-maz@kernel.org>
+In-Reply-To: <87zg8i3tma.wl-maz@kernel.org>
 From: Reiji Watanabe <reijiw@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Ricardo Koller <ricarkol@google.com>, 
-	Jing Zhang <jingzhangos@google.com>, Raghavendra Rao Anata <rananta@google.com>, 
-	Will Deacon <will@kernel.org>, Reiji Watanabe <reijiw@google.com>, stable@vger.kernel.org
+Date: Sun, 12 Mar 2023 20:34:09 -0700
+Message-ID: <CAAeT=FwbDViWhtPJFFv4CTE9rTJvu7vNvarNQOmsGsctFiwTNw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: PMU: Fix GET_ONE_REG for vPMC regs to
+ return the current value
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, James Morse <james.morse@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Ricardo Koller <ricarkol@google.com>, Jing Zhang <jingzhangos@google.com>, 
+	Raghavendra Rao Anata <rananta@google.com>, Will Deacon <will@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Presently, when a guest writes 1 to PMCR_EL0.{C,P}, which is WO/RAZ,
-KVM saves the register value, including these bits.
-When userspace reads the register using KVM_GET_ONE_REG, KVM returns
-the saved register value as it is (the saved value might have these
-bits set).  This could result in userspace setting these bits on the
-destination during migration.  Consequently, KVM may end up resetting
-the vPMU counter registers (PMCCNTR_EL0 and/or PMEVCNTR<n>_EL0) to
-zero on the first KVM_RUN after migration.
+Hi Marc,
 
-Fix this by not saving those bits when a guest writes 1 to those bits.
+On Sun, Mar 12, 2023 at 7:57=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> On Thu, 02 Mar 2023 05:50:32 +0000,
+> Reiji Watanabe <reijiw@google.com> wrote:
+> >
+> > Have KVM_GET_ONE_REG for vPMU counter (vPMC) registers (PMCCNTR_EL0
+> > and PMEVCNTR<n>_EL0) return the sum of the register value in the sysreg
+> > file and the current perf event counter value.
+> >
+> > Values of vPMC registers are saved in sysreg files on certain occasions=
+.
+> > These saved values don't represent the current values of the vPMC
+> > registers if the perf events for the vPMCs count events after the save.
+> > The current values of those registers are the sum of the sysreg file
+> > value and the current perf event counter value.  But, when userspace
+> > reads those registers (using KVM_GET_ONE_REG), KVM returns the sysreg
+> > file value to userspace (not the sum value).
+> >
+> > Fix this to return the sum value for KVM_GET_ONE_REG.
+> >
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 21 +++++++++++++++++++--
+> >  1 file changed, 19 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index c6cbfe6b854b..c48c053d6146 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -765,6 +765,22 @@ static bool pmu_counter_idx_valid(struct kvm_vcpu =
+*vcpu, u64 idx)
+> >       return true;
+> >  }
+> >
+> > +static int get_pmu_evcntr(struct kvm_vcpu *vcpu, const struct sys_reg_=
+desc *r,
+> > +                       u64 *val)
+> > +{
+> > +     u64 idx;
+> > +
+> > +     if (r->CRn =3D=3D 9 && r->CRm =3D=3D 13 && r->Op2 =3D=3D 0)
+> > +             /* PMCCNTR_EL0 */
+> > +             idx =3D ARMV8_PMU_CYCLE_IDX;
+> > +     else
+> > +             /* PMEVCNTRn_EL0 */
+> > +             idx =3D ((r->CRm & 3) << 3) | (r->Op2 & 7);
+> > +
+> > +     *val =3D kvm_pmu_get_counter_value(vcpu, idx);
+> > +     return 0;
+>
+> It is a bit odd not to return an error when no PMU present, but this
+> is already filtered out by the top-level accessors.
 
-Fixes: ab9468340d2b ("arm64: KVM: Add access handler for PMCR register")
-Cc: stable@vger.kernel.org
-Reviewed-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Reiji Watanabe <reijiw@google.com>
----
- arch/arm64/kvm/pmu-emul.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Yes, exactly.
 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 24908400e190..c243b10f3e15 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -538,7 +538,8 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
- 	if (!kvm_pmu_is_3p5(vcpu))
- 		val &= ~ARMV8_PMU_PMCR_LP;
- 
--	__vcpu_sys_reg(vcpu, PMCR_EL0) = val;
-+	/* The reset bits don't indicate any state, and shouldn't be saved. */
-+	__vcpu_sys_reg(vcpu, PMCR_EL0) = val & ~(ARMV8_PMU_PMCR_C | ARMV8_PMU_PMCR_P);
- 
- 	if (val & ARMV8_PMU_PMCR_E) {
- 		kvm_pmu_enable_counter_mask(vcpu,
--- 
-2.40.0.rc1.284.g88254d51c5-goog
+>
+> > +}
+> > +
+> >  static bool access_pmu_evcntr(struct kvm_vcpu *vcpu,
+> >                             struct sys_reg_params *p,
+> >                             const struct sys_reg_desc *r)
+> > @@ -981,7 +997,7 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu,=
+ struct sys_reg_params *p,
+> >  /* Macro to expand the PMEVCNTRn_EL0 register */
+> >  #define PMU_PMEVCNTR_EL0(n)                                          \
+> >       { PMU_SYS_REG(SYS_PMEVCNTRn_EL0(n)),                            \
+> > -       .reset =3D reset_pmevcntr,                                     =
+ \
+> > +       .reset =3D reset_pmevcntr, .get_user =3D get_pmu_evcntr,       =
+   \
+> >         .access =3D access_pmu_evcntr, .reg =3D (PMEVCNTR0_EL0 + n), }
+> >
+> >  /* Macro to expand the PMEVTYPERn_EL0 register */
+> > @@ -1745,7 +1761,8 @@ static const struct sys_reg_desc sys_reg_descs[] =
+=3D {
+> >       { PMU_SYS_REG(SYS_PMCEID1_EL0),
+> >         .access =3D access_pmceid, .reset =3D NULL },
+> >       { PMU_SYS_REG(SYS_PMCCNTR_EL0),
+> > -       .access =3D access_pmu_evcntr, .reset =3D reset_unknown, .reg =
+=3D PMCCNTR_EL0 },
+> > +       .access =3D access_pmu_evcntr, .reset =3D reset_unknown,
+> > +       .reg =3D PMCCNTR_EL0, .get_user =3D get_pmu_evcntr},
+> >       { PMU_SYS_REG(SYS_PMXEVTYPER_EL0),
+> >         .access =3D access_pmu_evtyper, .reset =3D NULL },
+> >       { PMU_SYS_REG(SYS_PMXEVCNTR_EL0),
+>
+> Reviewed-by: Marc Zyngier <maz@kernel.org>
 
+Thank you!
+Reiji
+
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
