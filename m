@@ -1,433 +1,83 @@
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0640515CA
-	for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 04:15:35 +0000 (UTC)
-Received: by mail-pg1-f172.google.com with SMTP id d10so6135359pgt.12
-        for <kvmarm@lists.linux.dev>; Sun, 12 Mar 2023 21:15:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678680935;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ICiyccuIxNKubJVNPm3vfDjG/ydP+GvUZ2kKe9U3fg8=;
-        b=biyQkkRwcXPN0y6l0ypQo6y8R/fz/4fHdXJeJmXz0wBSq7leYuI9OHAP/2rrRzukzU
-         TvnoBtGQwwo+XB9hibbSBZSXaluSH+SKhmpukm+vXlDMUq/bh5OuZBiQ7cQuHEvHGqry
-         lfG1K3/E35kTlkV9lzN0Yr82Tgny/ha3VQlMMQnf0fnidYADVNv/IkuE0ohdmLWmw8e/
-         0SIogYC0tuGlmPGwl4QVIJSm4ad+3kkl4phCuTnIrI6lz2IxiMthoTndh1jjM84YTc+3
-         TfWAj3ppORXShpAL/syrJnKe1w15K6N4N3BnBys054RHbdK3/Fy2i5XSEyjrfGlkNSoZ
-         cKqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678680935;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ICiyccuIxNKubJVNPm3vfDjG/ydP+GvUZ2kKe9U3fg8=;
-        b=7NYveaMDwb9VBBLF2ou8M+DaL1Mqc+c6DHIkvlgwtIMpnhNLKAzj+/TU08bFO1GS1u
-         Xjyy8a81wIAZh184Vm3eYtyiOxBgD3OsXPkJmXCoxH7SLfZnZc4uKhf82KJyDZaA84MM
-         kErJ4oqwwJ3TAfGyPc3pgK5bHRe1pRsZlGQIavf1MJFO6zRLgop4riqU2n1T7hpBhcSj
-         hTy+n7it5IoWWorsW+XLEB9H+CTogEV5WWkhv1WA5PhPJ8N5CocmwQgwOZnf39oP1wlo
-         XjB47qFCAddi2eC3nfYR+VF2IkypzjwCGrFKdbwTOU2ReQMn7LNaTQfjdpjgoeSsYeol
-         kgKw==
-X-Gm-Message-State: AO0yUKVqMoVeUe1aN6+y3WQgcvUFiOH2aBo/zgWo72MreFJEkTUMTwWm
-	pmLnf4KfWiCfZkKIsqFMYQARCAgZwchV5DsdLwRHLQ==
-X-Google-Smtp-Source: AK7set/Biz5ZXyDhWISoW5+C/6opbLb9ahW9+ZsfV9OE9R/ZUhCiuayIe/CdrNcuA6XGjyvosdpfrcnEumV4+IUH/W0=
-X-Received: by 2002:a65:4001:0:b0:503:2d3f:a187 with SMTP id
- f1-20020a654001000000b005032d3fa187mr10847064pgp.5.1678680935167; Sun, 12 Mar
- 2023 21:15:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD22123B4
+	for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 09:14:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 700F8C433EF;
+	Mon, 13 Mar 2023 09:14:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1678698890;
+	bh=Y0XLnrqcdiNHMLsFp+Z7PoEjpZ9/TLl3jHTZFQx/TeQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=dImEaMhdnkFCElHYxdgTRzpHGc5sv3oktR3lcRF7Gd+lnzAR0/05//STbIteu2YnW
+	 jnaRUopN+/NImNrVI9K9X0PDCsQuZ4xVnLtrv8o7GMaM5vV8cBS2dwwt6jNGnMEqa5
+	 In1D4GgVR2UATTQqSM0dTuM4NfqsuCnJ2SLSoXC+CHq7i3JfT/pgsD7YLXuxZNCkhY
+	 84cdqft7RNP2J3nPK95eDdYjkp5W36wCX93rALJ5U+uEN1j9rSHhpIQVm1uOrSDUv1
+	 c7ca2xoVyv+nj9ABchE98hlNsGwWoy8AkfT+YQSkJNBG91FF4BSf3kqVinre96VBDP
+	 N+D5VFIgE/YEQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pbeGW-00HAzq-2m;
+	Mon, 13 Mar 2023 09:14:48 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	Quentin Perret <qperret@google.com>
+Subject: [PATCH 0/2] KVM: arm64: Plug a couple of MM races
+Date: Mon, 13 Mar 2023 09:14:23 +0000
+Message-Id: <20230313091425.1962708-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230228062246.1222387-1-jingzhangos@google.com> <20230228062246.1222387-6-jingzhangos@google.com>
-In-Reply-To: <20230228062246.1222387-6-jingzhangos@google.com>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Sun, 12 Mar 2023 21:15:18 -0700
-Message-ID: <CAAeT=FyKDe9Fn1o_WUK+EUfZxkxWnYHmnVOD4Eno9aqbWWeOqQ@mail.gmail.com>
-Subject: Re: [PATCH v3 5/6] KVM: arm64: Introduce ID register specific descriptor
-To: Jing Zhang <jingzhangos@google.com>
-Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@google.com>, Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, 
-	Ricardo Koller <ricarkol@google.com>, Raghavendra Rao Ananta <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, ardb@kernel.org, will@kernel.org, qperret@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Jing,
+Ard recently reported a really odd warning generated with KASAN, where
+the page table walker we use to inspect the userspace page tables was
+going into the weeds and accessing something that was looking totally
+unrelated (and previously freed).
 
-On Mon, Feb 27, 2023 at 10:23=E2=80=AFPM Jing Zhang <jingzhangos@google.com=
-> wrote:
->
-> Introduce an ID feature register specific descriptor to include ID
-> register specific fields and callbacks besides its corresponding
-> general system register descriptor.
-> New fields for ID register descriptor would be added later when it
-> is necessary to support a writable ID register.
->
-> No functional change intended.
->
-> Co-developed-by: Reiji Watanabe <reijiw@google.com>
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> ---
->  arch/arm64/kvm/id_regs.c  | 184 ++++++++++++++++++++++++++++----------
->  arch/arm64/kvm/sys_regs.c |   2 +-
->  arch/arm64/kvm/sys_regs.h |   1 +
->  3 files changed, 138 insertions(+), 49 deletions(-)
->
-> diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
-> index 21ec8fc10d79..fc0dcd557cbb 100644
-> --- a/arch/arm64/kvm/id_regs.c
-> +++ b/arch/arm64/kvm/id_regs.c
-> @@ -18,6 +18,10 @@
->
->  #include "sys_regs.h"
->
-> +struct id_reg_desc {
-> +       const struct sys_reg_desc       reg_desc;
-> +};
-> +
->  static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
->  {
->         if (kvm_vcpu_has_pmu(vcpu))
-> @@ -326,21 +330,25 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
->  }
->
->  /* sys_reg_desc initialiser for known cpufeature ID registers */
-> -#define ID_SANITISED(name) {                   \
-> -       SYS_DESC(SYS_##name),                   \
-> -       .access =3D access_id_reg,                \
-> -       .get_user =3D get_id_reg,                 \
-> -       .set_user =3D set_id_reg,                 \
-> -       .visibility =3D id_visibility,            \
-> +#define ID_SANITISED(name) {                           \
-> +       .reg_desc =3D {                                   \
-> +               SYS_DESC(SYS_##name),                   \
-> +               .access =3D access_id_reg,                \
-> +               .get_user =3D get_id_reg,                 \
-> +               .set_user =3D set_id_reg,                 \
-> +               .visibility =3D id_visibility,            \
-> +       },                                              \
->  }
->
->  /* sys_reg_desc initialiser for known cpufeature ID registers */
-> -#define AA32_ID_SANITISED(name) {              \
-> -       SYS_DESC(SYS_##name),                   \
-> -       .access =3D access_id_reg,                \
-> -       .get_user =3D get_id_reg,                 \
-> -       .set_user =3D set_id_reg,                 \
-> -       .visibility =3D aa32_id_visibility,       \
-> +#define AA32_ID_SANITISED(name) {                      \
-> +       .reg_desc =3D {                                   \
-> +               SYS_DESC(SYS_##name),                   \
-> +               .access =3D access_id_reg,                \
-> +               .get_user =3D get_id_reg,                 \
-> +               .set_user =3D set_id_reg,                 \
-> +               .visibility =3D aa32_id_visibility,       \
-> +       },                                              \
->  }
->
->  /*
-> @@ -348,12 +356,14 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
->   * register with encoding Op0=3D3, Op1=3D0, CRn=3D0, CRm=3Dcrm, Op2=3Dop=
-2
->   * (1 <=3D crm < 8, 0 <=3D Op2 < 8).
->   */
-> -#define ID_UNALLOCATED(crm, op2) {                     \
-> -       Op0(3), Op1(0), CRn(0), CRm(crm), Op2(op2),     \
-> -       .access =3D access_id_reg,                        \
-> -       .get_user =3D get_id_reg,                         \
-> -       .set_user =3D set_id_reg,                         \
-> -       .visibility =3D raz_visibility                    \
-> +#define ID_UNALLOCATED(crm, op2) {                             \
-> +       .reg_desc =3D {                                           \
-> +               Op0(3), Op1(0), CRn(0), CRm(crm), Op2(op2),     \
-> +               .access =3D access_id_reg,                        \
-> +               .get_user =3D get_id_reg,                         \
-> +               .set_user =3D set_id_reg,                         \
-> +               .visibility =3D raz_visibility                    \
-> +       },                                                      \
->  }
->
->  /*
-> @@ -361,15 +371,17 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
->   * For now, these are exposed just like unallocated ID regs: they appear
->   * RAZ for the guest.
->   */
-> -#define ID_HIDDEN(name) {                      \
-> -       SYS_DESC(SYS_##name),                   \
-> -       .access =3D access_id_reg,                \
-> -       .get_user =3D get_id_reg,                 \
-> -       .set_user =3D set_id_reg,                 \
-> -       .visibility =3D raz_visibility,           \
-> +#define ID_HIDDEN(name) {                              \
-> +       .reg_desc =3D {                                   \
-> +               SYS_DESC(SYS_##name),                   \
-> +               .access =3D access_id_reg,                \
-> +               .get_user =3D get_id_reg,                 \
-> +               .set_user =3D set_id_reg,                 \
-> +               .visibility =3D raz_visibility,           \
-> +       },                                              \
->  }
->
-> -static const struct sys_reg_desc id_reg_descs[] =3D {
-> +static const struct id_reg_desc id_reg_descs[KVM_ARM_ID_REG_NUM] =3D {
->         /*
->          * ID regs: all ID_SANITISED() entries here must have correspondi=
-ng
->          * entries in arm64_ftr_regs[].
-> @@ -379,9 +391,13 @@ static const struct sys_reg_desc id_reg_descs[] =3D =
-{
->         /* CRm=3D1 */
->         AA32_ID_SANITISED(ID_PFR0_EL1),
->         AA32_ID_SANITISED(ID_PFR1_EL1),
-> -       { SYS_DESC(SYS_ID_DFR0_EL1), .access =3D access_id_reg,
-> -         .get_user =3D get_id_reg, .set_user =3D set_id_dfr0_el1,
-> -         .visibility =3D aa32_id_visibility, },
-> +       { .reg_desc =3D {
-> +               SYS_DESC(SYS_ID_DFR0_EL1),
-> +               .access =3D access_id_reg,
-> +               .get_user =3D get_id_reg,
-> +               .set_user =3D set_id_dfr0_el1,
-> +               .visibility =3D aa32_id_visibility, },
-> +       },
->         ID_HIDDEN(ID_AFR0_EL1),
->         AA32_ID_SANITISED(ID_MMFR0_EL1),
->         AA32_ID_SANITISED(ID_MMFR1_EL1),
-> @@ -410,8 +426,12 @@ static const struct sys_reg_desc id_reg_descs[] =3D =
-{
->
->         /* AArch64 ID registers */
->         /* CRm=3D4 */
-> -       { SYS_DESC(SYS_ID_AA64PFR0_EL1), .access =3D access_id_reg,
-> -         .get_user =3D get_id_reg, .set_user =3D set_id_aa64pfr0_el1, },
-> +       { .reg_desc =3D {
-> +               SYS_DESC(SYS_ID_AA64PFR0_EL1),
-> +               .access =3D access_id_reg,
-> +               .get_user =3D get_id_reg,
-> +               .set_user =3D set_id_aa64pfr0_el1, },
-> +       },
->         ID_SANITISED(ID_AA64PFR1_EL1),
->         ID_UNALLOCATED(4, 2),
->         ID_UNALLOCATED(4, 3),
-> @@ -421,8 +441,12 @@ static const struct sys_reg_desc id_reg_descs[] =3D =
-{
->         ID_UNALLOCATED(4, 7),
->
->         /* CRm=3D5 */
-> -       { SYS_DESC(SYS_ID_AA64DFR0_EL1), .access =3D access_id_reg,
-> -         .get_user =3D get_id_reg, .set_user =3D set_id_aa64dfr0_el1, },
-> +       { .reg_desc =3D {
-> +               SYS_DESC(SYS_ID_AA64DFR0_EL1),
-> +               .access =3D access_id_reg,
-> +               .get_user =3D get_id_reg,
-> +               .set_user =3D set_id_aa64dfr0_el1, },
-> +       },
->         ID_SANITISED(ID_AA64DFR1_EL1),
->         ID_UNALLOCATED(5, 2),
->         ID_UNALLOCATED(5, 3),
-> @@ -461,12 +485,12 @@ static const struct sys_reg_desc id_reg_descs[] =3D=
- {
->   */
->  int emulate_id_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *params)
->  {
-> -       const struct sys_reg_desc *r;
-> +       u32 id;
->
-> -       r =3D find_reg(params, id_reg_descs, ARRAY_SIZE(id_reg_descs));
-> +       id =3D reg_to_encoding(params);
->
-> -       if (likely(r)) {
-> -               perform_access(vcpu, params, r);
-> +       if (likely(is_id_reg(id))) {
-> +               perform_access(vcpu, params, &id_reg_descs[IDREG_IDX(id)]=
-.reg_desc);
->         } else {
->                 print_sys_reg_msg(params,
->                                   "Unsupported guest id_reg access at: %l=
-x [%08lx]\n",
-> @@ -483,38 +507,102 @@ void kvm_arm_reset_id_regs(struct kvm_vcpu *vcpu)
->         unsigned long i;
->
->         for (i =3D 0; i < ARRAY_SIZE(id_reg_descs); i++)
-> -               if (id_reg_descs[i].reset)
-> -                       id_reg_descs[i].reset(vcpu, &id_reg_descs[i]);
-> +               if (id_reg_descs[i].reg_desc.reset)
-> +                       id_reg_descs[i].reg_desc.reset(vcpu, &id_reg_desc=
-s[i].reg_desc);
->  }
->
->  int kvm_arm_get_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *=
-reg)
->  {
-> -       return kvm_sys_reg_get_user(vcpu, reg,
-> -                                   id_reg_descs, ARRAY_SIZE(id_reg_descs=
-));
-> +       u64 __user *uaddr =3D (u64 __user *)(unsigned long)reg->addr;
-> +       const struct sys_reg_desc *r;
-> +       struct sys_reg_params params;
-> +       u64 val;
-> +       int ret;
-> +       u32 id;
-> +
-> +       if (!index_to_params(reg->id, &params))
-> +               return -ENOENT;
-> +       id =3D reg_to_encoding(&params);
-> +
-> +       if (!is_id_reg(id))
-> +               return -ENOENT;
-> +
-> +       r =3D &id_reg_descs[IDREG_IDX(id)].reg_desc;
-> +       if (r->get_user) {
-> +               ret =3D (r->get_user)(vcpu, r, &val);
-> +       } else {
-> +               ret =3D 0;
-> +               val =3D IDREG(vcpu->kvm, id);
-> +       }
-> +
-> +       if (!ret)
-> +               ret =3D put_user(val, uaddr);
-> +
-> +       return ret;
->  }
->
->  int kvm_arm_set_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *=
-reg)
->  {
-> -       return kvm_sys_reg_set_user(vcpu, reg,
-> -                                   id_reg_descs, ARRAY_SIZE(id_reg_descs=
-));
-> +       u64 __user *uaddr =3D (u64 __user *)(unsigned long)reg->addr;
-> +       const struct sys_reg_desc *r;
-> +       struct sys_reg_params params;
-> +       u64 val;
-> +       int ret;
-> +       u32 id;
-> +
-> +       if (!index_to_params(reg->id, &params))
-> +               return -ENOENT;
-> +       id =3D reg_to_encoding(&params);
-> +
-> +       if (!is_id_reg(id))
-> +               return -ENOENT;
-> +
-> +       if (get_user(val, uaddr))
-> +               return -EFAULT;
-> +
-> +       r =3D &id_reg_descs[IDREG_IDX(id)].reg_desc;
-> +
-> +       if (sysreg_user_write_ignore(vcpu, r))
-> +               return 0;
-> +
-> +       if (r->set_user) {
-> +               ret =3D (r->set_user)(vcpu, r, val);
-> +       } else {
-> +               WARN_ONCE(1, "ID register set_user callback is NULL\n");
-> +               ret =3D 0;
-> +       }
-> +
-> +       return ret;
->  }
->
->  bool kvm_arm_check_idreg_table(void)
->  {
-> -       return check_sysreg_table(id_reg_descs, ARRAY_SIZE(id_reg_descs),=
- false);
-> +       unsigned int i;
-> +
-> +       for (i =3D 0; i < ARRAY_SIZE(id_reg_descs); i++) {
-> +               const struct sys_reg_desc *r =3D &id_reg_descs[i].reg_des=
-c;
-> +
-> +               if (IDREG_IDX(reg_to_encoding(r)) !=3D i) {
+Will and I spent quite some time looking into it, and while we were
+not able to reproduce the issue, we were able to spot at least a
+couple of issues that could partially explain the issue.
 
-As I mentioned for the previous version of the patch,
-can we also check if this is an ID register ?
+The first course of action is to disable interrupts while walking the
+userspace PTs. This prevents exit_mmap() from tearing down these PTs
+by blocking the IPI. We also fail gracefully if the IPI won the race
+and killed the page tables before we started the walk.
 
-> +                       kvm_err("id_reg table %pS entry %d not set correc=
-tly\n",
-> +                               &id_reg_descs[i].reg_desc, i);
-> +                       return false;
-> +               }
-> +       }
-> +
-> +       return true;
->  }
->
->  int kvm_arm_walk_id_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
->  {
-> -       const struct sys_reg_desc *i2, *end2;
-> +       const struct id_reg_desc *i2, *end2;
->         unsigned int total =3D 0;
->         int err;
->
->         i2 =3D id_reg_descs;
->         end2 =3D id_reg_descs + ARRAY_SIZE(id_reg_descs);
->
-> -       while (i2 !=3D end2) {
-> -               err =3D walk_one_sys_reg(vcpu, i2++, &uind, &total);
-> +       for (; i2 !=3D end2; i2++) {
-> +               err =3D walk_one_sys_reg(vcpu, &(i2->reg_desc), &uind, &t=
-otal);
->                 if (err)
->                         return err;
->         }
-> @@ -532,12 +620,12 @@ void kvm_arm_set_default_id_regs(struct kvm *kvm)
->         u64 val;
->
->         for (i =3D 0; i < ARRAY_SIZE(id_reg_descs); i++) {
-> -               id =3D reg_to_encoding(&id_reg_descs[i]);
-> +               id =3D reg_to_encoding(&id_reg_descs[i].reg_desc);
->                 if (WARN_ON_ONCE(!is_id_reg(id)))
+The second issue is to not use a VMA pointer that was obtained with
+the mmap_read_lock held after that lock has been released. There is no
+guarantee that it is still valid.
 
-If kvm_arm_check_idreg_table() checks all entries in the table
-are an ID register, we can remove this checking from here.
+I've earmarked both for stable, though I expect backporting this to
+older revisions of the kernel could be... interesting.
 
-Thank you,
-Reiji
+	M.
 
+Marc Zyngier (2):
+  KVM: arm64: Disable interrupts while walking userspace PTs
+  KVM: arm64: Check for kvm_vma_mte_allowed in the critical section
 
->                         /* Shouldn't happen */
->                         continue;
->
-> -               if (id_reg_descs[i].visibility =3D=3D raz_visibility)
-> +               if (id_reg_descs[i].reg_desc.visibility =3D=3D raz_visibi=
-lity)
->                         /* Hidden or reserved ID register */
->                         continue;
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 568ebc0fb15c..7b63d9038639 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -2519,7 +2519,7 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
->   * Userspace API
->   ***********************************************************************=
-******/
->
-> -static bool index_to_params(u64 id, struct sys_reg_params *params)
-> +bool index_to_params(u64 id, struct sys_reg_params *params)
->  {
->         switch (id & KVM_REG_SIZE_MASK) {
->         case KVM_REG_SIZE_U64:
-> diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-> index 9231d89889c7..094a7f19d93f 100644
-> --- a/arch/arm64/kvm/sys_regs.h
-> +++ b/arch/arm64/kvm/sys_regs.h
-> @@ -239,6 +239,7 @@ static inline bool is_id_reg(u32 id)
->
->  void perform_access(struct kvm_vcpu *vcpu, struct sys_reg_params *params=
-,
->                     const struct sys_reg_desc *r);
-> +bool index_to_params(u64 id, struct sys_reg_params *params);
->  const struct sys_reg_desc *get_reg_by_id(u64 id,
->                                          const struct sys_reg_desc table[=
-],
->                                          unsigned int num);
-> --
-> 2.39.2.722.g9855ee24e9-goog
->
+ arch/arm64/kvm/mmu.c | 42 +++++++++++++++++++++++++++++++++---------
+ 1 file changed, 33 insertions(+), 9 deletions(-)
+
+-- 
+2.34.1
+
