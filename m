@@ -1,36 +1,27 @@
-Received: from out-12.mta1.migadu.com (out-12.mta1.migadu.com [95.215.58.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E129879C0
-	for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 18:04:14 +0000 (UTC)
-Date: Mon, 13 Mar 2023 18:04:07 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1678730652;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vQYUbvnE136yUkG/cwkOWkXNIYV1jlaCbhEZUeHbp7E=;
-	b=Ik/1GQ51Np77wdQJzc9ewDSJ17t7iO+Af6WIzQFIwZdtQlCVEeJvsoGYtSqXqBs4y6pVmT
-	A5w9KSDLQOeU0XytCO9Dt+dN4wDXLx8HMFOfoSIT3G/L3n/dtPvL14nrESxcR9xeCxd5uo
-	jvFneSLxcu72ZtmJarrzOB049rn6dQw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Reiji Watanabe <reijiw@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Raghavendra Rao Anata <rananta@google.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v2 0/2] KVM: arm64: PMU: Preserve vPMC registers properly
- on migration
-Message-ID: <ZA9llyTSgLcV2a1s@linux.dev>
-References: <20230313032905.1474705-1-reijiw@google.com>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A0FD3C35
+	for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 18:20:21 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E56444B3;
+	Mon, 13 Mar 2023 11:21:04 -0700 (PDT)
+Received: from e120937-lin (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 080EF3F67D;
+	Mon, 13 Mar 2023 11:20:19 -0700 (PDT)
+Date: Mon, 13 Mar 2023 18:20:13 +0000
+From: Cristian Marussi <cristian.marussi@arm.com>
+To: Marc Zyngier <maz@misterjones.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Jeremy Linton <jeremy.linton@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: Circular lockdep in kvm_reset_vcpu() ?
+Message-ID: <ZA9pUNZPyFtLDfxC@e120937-lin>
+References: <f6452cdd-65ff-34b8-bab0-5c06416da5f6@arm.com>
+ <Y+bnybGEkMpZzm/y@linux.dev>
+ <ZA72c+TT9epTcvX4@e120937-lin>
+ <3496a6a10b2d8693825e733b871938f5@misterjones.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -39,44 +30,70 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230313032905.1474705-1-reijiw@google.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <3496a6a10b2d8693825e733b871938f5@misterjones.org>
 
-Hi Reiji,
+On Mon, Mar 13, 2023 at 02:09:55PM +0000, Marc Zyngier wrote:
+> On 2023-03-13 10:09, Cristian Marussi wrote:
+> > On Sat, Feb 11, 2023 at 12:56:41AM +0000, Oliver Upton wrote:
+> > > Hi Jeremy,
+> > > 
+> > 
+> > Hi,
+> > 
+> > > On Fri, Feb 10, 2023 at 11:46:36AM -0600, Jeremy Linton wrote:
+> > > > Hi,
+> > > >
+> > > > I saw this pop yesterday:
+> > > 
+> > > You and me both actually! Shame on me, I spoke off-list about this
+> > > with
+> > > Marc in passing. Thanks for sending along the report.
+> > > 
+> > > > [   78.333360] ======================================================
+> > > > [   78.339541] WARNING: possible circular locking dependency detected
+> > > > [   78.345721] 6.2.0-rc7+ #19 Not tainted
+> > > > [   78.349470] ------------------------------------------------------
+> > > > [   78.355647] qemu-system-aar/859 is trying to acquire lock:
+> > > > [   78.361130] ffff5aa69269eba0 (&host_kvm->lock){+.+.}-{3:3}, at:
+> > > > kvm_reset_vcpu+0x34/0x274
+> > > > [   78.369344]
+> > > > [   78.369344] but task is already holding lock:
+> > > > [   78.375182] ffff5aa68768c0b8 (&vcpu->mutex){+.+.}-{3:3}, at:
+> > > > kvm_vcpu_ioctl+0x8c/0xba0
+> > > 
+> > > [...]
+> > > 
+> > > > It appears to be triggered by the new commit 42a90008f890a ('KVM: Ensure
+> > > > lockdep knows about kvm->lock vs. vcpu->mutex ordering rule') which is
+> > > > detecting the vcpu lock grabbed by kvm_vcpu_ioctl() and then the kvm mutext
+> > > > grabbed by kvm_reset_vcpu().
+> > > 
+> > > Right, this commit gave lockdep what it needed to smack us on the head
+> > > for getting the locking wrong in the arm64 side.
+> > > 
+> > > As gross as it might be, the right direction is likely to have our own
+> > > lock in kvm_arch that we can acquire while holding the vcpu mutex.
+> > > I'll
+> > > throw a patch at the list once I get done testing it.
+> > > 
+> > 
+> > I just hit this using a v6.3-rc2 and a mainline kvmtool.
+> > 
+> > In my case, though, the guest does not even boot if I use more than 1
+> > vcpu, which
+> > I suppose triggers effectively the reported possible deadlock, i.e.:
+> > 
+> > root/lkvm_master run -c 4 -m 4096 -k /root/Image_guest -d
+> > /root/disk_debian_buster_guest.img -p "loglevel=8"
+> >   # lkvm run -k /root/Image_guest -m 4096 -c 4 --name guest-288
+> > ....<HANGS FOREVER>
+> 
+> Pass earlycon to the guest for a start.
+> 
+> I seriously doubt someone has actually seen a deadlock, because
+> the issue has been there for at least the past 7 years...
+> 
+> And -rc2 works just fine here.
 
-On Sun, Mar 12, 2023 at 08:29:03PM -0700, Reiji Watanabe wrote:
-> The series fixes two problems in preserving vPMU counter (vPMC)
-> registers (PMCCNTR_EL0/PMEVCNTR<n>_EL0) during migration.
-> 
-> One of the problems is that KVM may not return the current values
-> of the vPMC registers for KVM_GET_ONE_REG.
-> 
-> The other one might cause KVM to reset the vPMC registers on the
-> first KVM_RUN on the destination. This is because userspace might
-> save PMCR_EL0 with PMCR_EL0.{C,P} bits set on the source, and
-> restore it on the destination.
-> 
-> See patch-1 and patch-2 for details on these issues respectively.
-> 
-> The series is based on v6.3-rc2.
-> 
-> v2:
->  - Collect Marc's r-b tags (Thank you!)
->  - Added "Fixes:" tags
->  - Added Cc: to stable
->  - Cosmetics change (remove one line break in kvm_pmu_handle_pmcr())
-> 
-> v1: https://lore.kernel.org/all/20230302055033.3081456-1-reijiw@google.com/
-> 
-> Reiji Watanabe (2):
->   KVM: arm64: PMU: Fix GET_ONE_REG for vPMC regs to return the current
->     value
->   KVM: arm64: PMU: Don't save PMCR_EL0.{C,P} for the vCPU
-
-I received both of these patches as indepentent emails instead of replies to
-the cover letter (i.e. In-Reply-To header is missing). I was able to find
-both patches but just wanted to let you know so you can debug your tooling.
-
--- 
-Thanks,
-Oliver
+Thanks, I'll dig deeper what's going on un my setup.
+Cristian
