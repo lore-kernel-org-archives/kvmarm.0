@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC2C7256D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B55C32575
 	for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 12:48:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 616CFC433A7;
-	Mon, 13 Mar 2023 12:48:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D243C433A0;
+	Mon, 13 Mar 2023 12:48:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1678711735;
-	bh=EwxhR0jlhg4TmjwhkeNEDmh/WyqaKbEWp3FbuHlAzO0=;
+	s=k20201202; t=1678711734;
+	bh=wKhGfUDELYNx+7C/I9F4TOHnWGL7guOYqyin2aDBWxI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=quzY6rRWEjuBoeAcg2upbnvksFZSilc8I/1qOUa6U/LU3N+XNtPIZK2Y8yLKrUh9a
-	 qYwOp8d//6hz+r2J7f+Y2Y7gSYr/Y/Ou2QxooHsmC6Jpem15ulQNtidFPMeVQQs65l
-	 0F4Of3L05fTtEe6hLLzY+Jmtal7Uy+GgZ6g+7Csbt6iMvJTii9lWpT5LhgP1oroF5n
-	 5SDuzaBPqhhvfdb+t4qkznwt2DfSQXWYj/R+IGwEpDydfiyj7S8POTCQNvH6TpM2J6
-	 /RBV/Ns9W00yyi19x8iY00uwTg/cloVvckrKjIwtk4gzXb6UvjCA37bCpsDbVhWRx9
-	 apqCNRI2Aoduw==
+	b=XJgsA7tzwl4YD4dx2Cy3aV0/pyoGBnTsZsqv3oGDwIPn8gukQF/mK4sj1amn2Xs8E
+	 lDe8x+n677hY4TOiAsS1MnmXh1BwQdmM6PyAlzl49C5fe6txgjny/irNEVnxe2+rZo
+	 IEJb7mbS1VrmVrqCGAB+HsOA1hXy2MBOt5bgBdA+lvJIlnRQw/PaiFs/9FQDI9lTA9
+	 7VvMa8Uc48uz0heeR166hjpdgUVGSZnz0spn1/iFGBcIwFiyQADC8pxDFF2pHinrEX
+	 ZVvrRVfjd0zUtBXeTw0ZB/hgEYKT/VU+T7ALwck0WHfHF4fzaReSd8rVrRQokB/IE3
+	 HkQuECAgSxBRg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pbhbh-00HEdE-FO;
-	Mon, 13 Mar 2023 12:48:53 +0000
+	id 1pbhbg-00HEdE-N2;
+	Mon, 13 Mar 2023 12:48:52 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -35,9 +35,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Colton Lewis <coltonlewis@google.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	dwmw2@infradead.org
-Subject: [PATCH v2 08/19] KVM: arm64: timers: Allow userspace to set the global counter offset
-Date: Mon, 13 Mar 2023 12:48:26 +0000
-Message-Id: <20230313124837.2264882-9-maz@kernel.org>
+Subject: [PATCH v2 05/19] KVM: arm64: timers: Use CNTPOFF_EL2 to offset the physical timer
+Date: Mon, 13 Mar 2023 12:48:23 +0000
+Message-Id: <20230313124837.2264882-6-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230313124837.2264882-1-maz@kernel.org>
 References: <20230313124837.2264882-1-maz@kernel.org>
@@ -53,192 +53,129 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-And this is the moment you have all been waiting for: setting the
-counter offset from userspace.
+With ECV and CNTPOFF_EL2, it is very easy to offer an offset for
+the physical timer. So let's do just that.
 
-We expose a brand new capability that reports the ability to set
-the offset for both the virtual and physical sides.
-
-In keeping with the architecture, the offset is expressed as
-a delta that is substracted from the physical counter value.
-
-Once this new API is used, there is no going back, and the counters
-cannot be written to to set the offsets implicitly (the writes
-are instead ignored).
+Nothing can set the offset yet, so this should have no effect
+whatsoever (famous last words...).
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h |  4 +++
- arch/arm64/include/uapi/asm/kvm.h |  9 ++++++
- arch/arm64/kvm/arch_timer.c       | 46 +++++++++++++++++++++++++++----
- arch/arm64/kvm/arm.c              |  8 ++++++
- include/uapi/linux/kvm.h          |  3 ++
- 5 files changed, 65 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/arch_timer.c          | 18 +++++++++++++++++-
+ arch/arm64/kvm/hypercalls.c          |  2 +-
+ include/clocksource/arm_arch_timer.h |  1 +
+ include/kvm/arm_arch_timer.h         |  2 ++
+ 4 files changed, 21 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 002a10cbade2..116233a390e9 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -221,6 +221,8 @@ struct kvm_arch {
- #define KVM_ARCH_FLAG_EL1_32BIT				4
- 	/* PSCI SYSTEM_SUSPEND enabled for the guest */
- #define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		5
-+	/* VM counter offset */
-+#define KVM_ARCH_FLAG_VM_COUNTER_OFFSET			6
- 
- 	unsigned long flags;
- 
-@@ -1010,6 +1012,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
- 
- long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
- 				struct kvm_arm_copy_mte_tags *copy_tags);
-+int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
-+				    struct kvm_arm_counter_offset *offset);
- 
- /* Guest/host FPSIMD coordination helpers */
- int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index f8129c624b07..12fb0d8a760a 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -198,6 +198,15 @@ struct kvm_arm_copy_mte_tags {
- 	__u64 reserved[2];
- };
- 
-+/*
-+ * Counter/Timer offset structure. Describe the virtual/physical offset.
-+ * To be used with KVM_ARM_SET_COUNTER_OFFSET.
-+ */
-+struct kvm_arm_counter_offset {
-+	__u64 counter_offset;
-+	__u64 reserved;
-+};
-+
- #define KVM_ARM_TAGS_TO_GUEST		0
- #define KVM_ARM_TAGS_FROM_GUEST		1
- 
 diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index bb64a71ae193..25625e1d6d89 100644
+index 9515c645f03d..3118ea0a1b41 100644
 --- a/arch/arm64/kvm/arch_timer.c
 +++ b/arch/arm64/kvm/arch_timer.c
-@@ -851,9 +851,11 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
- 	ptimer->vcpu = vcpu;
- 	ptimer->offset.vm_offset = &vcpu->kvm->arch.timer_data.poffset;
+@@ -52,6 +52,11 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
+ 			      struct arch_timer_context *timer,
+ 			      enum kvm_arch_timer_regs treg);
  
--	/* Synchronize cntvoff across all vtimers of a VM. */
--	timer_set_offset(vtimer, kvm_phys_timer_read());
--	timer_set_offset(ptimer, 0);
-+	/* Synchronize offsets across timers of a VM if not already provided */
-+	if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
-+		timer_set_offset(vtimer, kvm_phys_timer_read());
-+		timer_set_offset(ptimer, 0);
-+	}
- 
- 	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
- 	timer->bg_timer.function = kvm_bg_timer_expire;
-@@ -897,8 +899,11 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
- 		kvm_arm_timer_write(vcpu, timer, TIMER_REG_CTL, value);
- 		break;
- 	case KVM_REG_ARM_TIMER_CNT:
--		timer = vcpu_vtimer(vcpu);
--		timer_set_offset(timer, kvm_phys_timer_read() - value);
-+		if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET,
-+			      &vcpu->kvm->arch.flags)) {
-+			timer = vcpu_vtimer(vcpu);
-+			timer_set_offset(timer, kvm_phys_timer_read() - value);
-+		}
- 		break;
- 	case KVM_REG_ARM_TIMER_CVAL:
- 		timer = vcpu_vtimer(vcpu);
-@@ -908,6 +913,13 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
- 		timer = vcpu_ptimer(vcpu);
- 		kvm_arm_timer_write(vcpu, timer, TIMER_REG_CTL, value);
- 		break;
-+	case KVM_REG_ARM_PTIMER_CNT:
-+		if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET,
-+			      &vcpu->kvm->arch.flags)) {
-+			timer = vcpu_ptimer(vcpu);
-+			timer_set_offset(timer, kvm_phys_timer_read() - value);
-+		}
-+		break;
- 	case KVM_REG_ARM_PTIMER_CVAL:
- 		timer = vcpu_ptimer(vcpu);
- 		kvm_arm_timer_write(vcpu, timer, TIMER_REG_CVAL, value);
-@@ -1443,3 +1455,27 @@ int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 
- 	return -ENXIO;
- }
-+
-+int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
-+				    struct kvm_arm_counter_offset *offset)
++static bool has_cntpoff(void)
 +{
-+	if (offset->reserved)
-+		return -EINVAL;
-+
-+	if (!lock_all_vcpus(kvm))
-+		return -EBUSY;
-+
-+	set_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &kvm->arch.flags);
-+
-+	/*
-+	 * If userspace decides to set the offset using this API rather
-+	 * than merely restoring the counter values, the offset applies
-+	 * to both the virtual and physical views.
-+	 */
-+	kvm->arch.timer_data.voffset = offset->counter_offset;
-+	kvm->arch.timer_data.poffset = offset->counter_offset;
-+
-+	unlock_all_vcpus(kvm);
-+
-+	return 0;
++	return (has_vhe() && cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF));
 +}
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 097750a01497..1d1c54d1ec15 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -220,6 +220,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_VCPU_ATTRIBUTES:
- 	case KVM_CAP_PTP_KVM:
- 	case KVM_CAP_ARM_SYSTEM_SUSPEND:
-+	case KVM_CAP_COUNTER_OFFSET:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
-@@ -1479,6 +1480,13 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 			return -EFAULT;
- 		return kvm_vm_ioctl_mte_copy_tags(kvm, &copy_tags);
- 	}
-+	case KVM_ARM_SET_COUNTER_OFFSET: {
-+		struct kvm_arm_counter_offset offset;
 +
-+		if (copy_from_user(&offset, argp, sizeof(offset)))
-+			return -EFAULT;
-+		return kvm_vm_ioctl_set_counter_offset(kvm, &offset);
-+	}
+ u32 timer_get_ctl(struct arch_timer_context *ctxt)
+ {
+ 	struct kvm_vcpu *vcpu = ctxt->vcpu;
+@@ -84,7 +89,7 @@ u64 timer_get_cval(struct arch_timer_context *ctxt)
+ 
+ static u64 timer_get_offset(struct arch_timer_context *ctxt)
+ {
+-	if (ctxt->offset.vm_offset)
++	if (ctxt && ctxt->offset.vm_offset)
+ 		return *ctxt->offset.vm_offset;
+ 
+ 	return 0;
+@@ -432,6 +437,12 @@ static void set_cntvoff(u64 cntvoff)
+ 	kvm_call_hyp(__kvm_timer_set_cntvoff, cntvoff);
+ }
+ 
++static void set_cntpoff(u64 cntpoff)
++{
++	if (has_cntpoff())
++		write_sysreg_s(cntpoff, SYS_CNTPOFF_EL2);
++}
++
+ static void timer_save_state(struct arch_timer_context *ctx)
+ {
+ 	struct arch_timer_cpu *timer = vcpu_timer(ctx->vcpu);
+@@ -480,6 +491,7 @@ static void timer_save_state(struct arch_timer_context *ctx)
+ 		write_sysreg_el0(0, SYS_CNTP_CTL);
+ 		isb();
+ 
++		set_cntpoff(0);
+ 		break;
+ 	case NR_KVM_TIMERS:
+ 		BUG();
+@@ -550,6 +562,7 @@ static void timer_restore_state(struct arch_timer_context *ctx)
+ 		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTV_CTL);
+ 		break;
+ 	case TIMER_PTIMER:
++		set_cntpoff(timer_get_offset(ctx));
+ 		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTP_CVAL);
+ 		isb();
+ 		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTP_CTL);
+@@ -767,6 +780,7 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+ 	vtimer->vcpu = vcpu;
+ 	vtimer->offset.vm_offset = &vcpu->kvm->arch.timer_data.voffset;
+ 	ptimer->vcpu = vcpu;
++	ptimer->offset.vm_offset = &vcpu->kvm->arch.timer_data.poffset;
+ 
+ 	/* Synchronize cntvoff across all vtimers of a VM. */
+ 	timer_set_offset(vtimer, kvm_phys_timer_read());
+@@ -1297,6 +1311,8 @@ void kvm_timer_init_vhe(void)
+ 	val = read_sysreg(cnthctl_el2);
+ 	val |= (CNTHCTL_EL1PCEN << cnthctl_shift);
+ 	val |= (CNTHCTL_EL1PCTEN << cnthctl_shift);
++	if (cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF))
++		val |= CNTHCTL_ECV;
+ 	write_sysreg(val, cnthctl_el2);
+ }
+ 
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index 5da884e11337..39a4707e081d 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -47,7 +47,7 @@ static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
+ 		cycles = systime_snapshot.cycles - vcpu->kvm->arch.timer_data.voffset;
+ 		break;
+ 	case KVM_PTP_PHYS_COUNTER:
+-		cycles = systime_snapshot.cycles;
++		cycles = systime_snapshot.cycles - vcpu->kvm->arch.timer_data.poffset;
+ 		break;
  	default:
- 		return -EINVAL;
- 	}
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index d77aef872a0a..6a7e1a0ecf04 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1184,6 +1184,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
- #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
- #define KVM_CAP_PMU_EVENT_MASKED_EVENTS 226
-+#define KVM_CAP_COUNTER_OFFSET 227
+ 		return;
+diff --git a/include/clocksource/arm_arch_timer.h b/include/clocksource/arm_arch_timer.h
+index 057c8964aefb..cbbc9a6dc571 100644
+--- a/include/clocksource/arm_arch_timer.h
++++ b/include/clocksource/arm_arch_timer.h
+@@ -21,6 +21,7 @@
+ #define CNTHCTL_EVNTEN			(1 << 2)
+ #define CNTHCTL_EVNTDIR			(1 << 3)
+ #define CNTHCTL_EVNTI			(0xF << 4)
++#define CNTHCTL_ECV			(1 << 12)
  
- #ifdef KVM_CAP_IRQ_ROUTING
+ enum arch_timer_reg {
+ 	ARCH_TIMER_REG_CTRL,
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index 70d47c4adc6a..2dd0fd2406fb 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -34,6 +34,8 @@ struct arch_timer_offset {
+ struct arch_timer_vm_data {
+ 	/* Offset applied to the virtual timer/counter */
+ 	u64	voffset;
++	/* Offset applied to the physical timer/counter */
++	u64	poffset;
+ };
  
-@@ -1543,6 +1544,8 @@ struct kvm_s390_ucas_mapping {
- #define KVM_SET_PMU_EVENT_FILTER  _IOW(KVMIO,  0xb2, struct kvm_pmu_event_filter)
- #define KVM_PPC_SVM_OFF		  _IO(KVMIO,  0xb3)
- #define KVM_ARM_MTE_COPY_TAGS	  _IOR(KVMIO,  0xb4, struct kvm_arm_copy_mte_tags)
-+/* Available with KVM_CAP_COUNTER_OFFSET */
-+#define KVM_ARM_SET_COUNTER_OFFSET _IOW(KVMIO,  0xb5, struct kvm_arm_counter_offset)
- 
- /* ioctl for vm fd */
- #define KVM_CREATE_DEVICE	  _IOWR(KVMIO,  0xe0, struct kvm_create_device)
+ struct arch_timer_context {
 -- 
 2.34.1
 
