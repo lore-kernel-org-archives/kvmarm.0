@@ -1,127 +1,117 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2822569
-	for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 13:11:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D043C433EF;
-	Mon, 13 Mar 2023 13:11:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1678713067;
-	bh=sTaX04P3HhSQ8MuwwEAOYdHMdPFB29YmwEAkpBTRmYs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eMEqedXqgTlE7kCdRlTXknxt8YFGGPyG3l3ZDDdTR/8CjakyBBSYqwjrIU/5UXa8P
-	 kbWmVqzaRWTWZD7V6wNe2BMysxpYvSQCPq6+bgruSYjUNa/7a4B9CNspI1/r4HcDYa
-	 nsbn1bsr8cM1+mlt2C72adW7KiC4Um6LTeVP2w/KhwsQrc6PqOqQoh+A5phbQbBC5z
-	 iSOFzYlck4yLkAkAiSil8BocGWmyH1cR1/rhyIgsi4aQL+KovdWOvaNtjvzEzd6D0K
-	 e1YMzTV8M61ZfYzMdhlrRZ3W7ka7C8ZJ/3BfVk94gOgLkDbjJ18q41RSusr+NZ7EJB
-	 Be2WZbImJXhYw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3755A10F6
+	for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 14:40:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=misterjones.org; s=dkim20211231; h=Content-Transfer-Encoding:Content-Type:
+	Message-ID:References:In-Reply-To:Subject:Cc:To:From:Date:MIME-Version:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Qr9EmARbpnWVBZVDOnt8Yn6YBbvuxLqxnG9mDigVdc4=; b=DTLP+2GXw5z/4G76KmEtd1Gja3
+	D5qgsxG3QaFv3ll2zrN/8ibitIq82Ue+1nuq1WNt3GD11m2/MW7qW1kiXf/JyWy43RRoIxHKz0xOA
+	WsHxrOaM3ubxLJz5npfX6Z/GvyW+qIE4yYKlyaBdbM+P7PMjBUNuc9c9714gUgZnGy4BQpqLn3vhL
+	Fcve9tCh3qL7SAAOB5vD/Prka0F/aDQH9WRR3+Q+O6TAJRpU0NPc7AYhzDOddQkFf7cGUJyZ5bTRK
+	IDMwgKy/Jbsw5clKXTLuIorr7bDppYDquAJ+uCn7RG0e/tgPbMsLoeYzdtVwZLFcVpFMqeNS3ZmkV
+	wMCP5x/w==;
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pbhbj-00HEdE-TJ;
-	Mon, 13 Mar 2023 12:48:55 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	Simon Veith <sveith@amazon.de>,
-	Reiji Watanabe <reijiw@google.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	dwmw2@infradead.org
-Subject: [PATCH v2 18/19] KVM: arm64: selftests: Augment existing timer test to handle variable offset
-Date: Mon, 13 Mar 2023 12:48:36 +0000
-Message-Id: <20230313124837.2264882-19-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230313124837.2264882-1-maz@kernel.org>
-References: <20230313124837.2264882-1-maz@kernel.org>
+	(envelope-from <maz@misterjones.org>)
+	id 1pbis8-00HGIo-9F;
+	Mon, 13 Mar 2023 14:09:56 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de, reijiw@google.com, coltonlewis@google.com, joey.gouly@arm.com, dwmw2@infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
+Date: Mon, 13 Mar 2023 14:09:55 +0000
+From: Marc Zyngier <maz@misterjones.org>
+To: Cristian Marussi <cristian.marussi@arm.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Jeremy Linton
+ <jeremy.linton@arm.com>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org, David Woodhouse <dwmw@amazon.co.uk>, Marc
+ Zyngier <marc.zyngier@arm.com>
+Subject: Re: Circular lockdep in kvm_reset_vcpu() ?
+In-Reply-To: <ZA72c+TT9epTcvX4@e120937-lin>
+References: <f6452cdd-65ff-34b8-bab0-5c06416da5f6@arm.com>
+ <Y+bnybGEkMpZzm/y@linux.dev> <ZA72c+TT9epTcvX4@e120937-lin>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <3496a6a10b2d8693825e733b871938f5@misterjones.org>
+X-Sender: maz@misterjones.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: cristian.marussi@arm.com, oliver.upton@linux.dev, jeremy.linton@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, dwmw@amazon.co.uk, marc.zyngier@arm.com
+X-SA-Exim-Mail-From: maz@misterjones.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Allow a user to specify the global offset on the command-line.
+On 2023-03-13 10:09, Cristian Marussi wrote:
+> On Sat, Feb 11, 2023 at 12:56:41AM +0000, Oliver Upton wrote:
+>> Hi Jeremy,
+>> 
+> 
+> Hi,
+> 
+>> On Fri, Feb 10, 2023 at 11:46:36AM -0600, Jeremy Linton wrote:
+>> > Hi,
+>> >
+>> > I saw this pop yesterday:
+>> 
+>> You and me both actually! Shame on me, I spoke off-list about this 
+>> with
+>> Marc in passing. Thanks for sending along the report.
+>> 
+>> > [   78.333360] ======================================================
+>> > [   78.339541] WARNING: possible circular locking dependency detected
+>> > [   78.345721] 6.2.0-rc7+ #19 Not tainted
+>> > [   78.349470] ------------------------------------------------------
+>> > [   78.355647] qemu-system-aar/859 is trying to acquire lock:
+>> > [   78.361130] ffff5aa69269eba0 (&host_kvm->lock){+.+.}-{3:3}, at:
+>> > kvm_reset_vcpu+0x34/0x274
+>> > [   78.369344]
+>> > [   78.369344] but task is already holding lock:
+>> > [   78.375182] ffff5aa68768c0b8 (&vcpu->mutex){+.+.}-{3:3}, at:
+>> > kvm_vcpu_ioctl+0x8c/0xba0
+>> 
+>> [...]
+>> 
+>> > It appears to be triggered by the new commit 42a90008f890a ('KVM: Ensure
+>> > lockdep knows about kvm->lock vs. vcpu->mutex ordering rule') which is
+>> > detecting the vcpu lock grabbed by kvm_vcpu_ioctl() and then the kvm mutext
+>> > grabbed by kvm_reset_vcpu().
+>> 
+>> Right, this commit gave lockdep what it needed to smack us on the head
+>> for getting the locking wrong in the arm64 side.
+>> 
+>> As gross as it might be, the right direction is likely to have our own
+>> lock in kvm_arch that we can acquire while holding the vcpu mutex. 
+>> I'll
+>> throw a patch at the list once I get done testing it.
+>> 
+> 
+> I just hit this using a v6.3-rc2 and a mainline kvmtool.
+> 
+> In my case, though, the guest does not even boot if I use more than 1
+> vcpu, which
+> I suppose triggers effectively the reported possible deadlock, i.e.:
+> 
+> root/lkvm_master run -c 4 -m 4096 -k /root/Image_guest -d
+> /root/disk_debian_buster_guest.img -p "loglevel=8"
+>   # lkvm run -k /root/Image_guest -m 4096 -c 4 --name guest-288
+> ....<HANGS FOREVER>
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- tools/testing/selftests/kvm/aarch64/arch_timer.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+Pass earlycon to the guest for a start.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-index 26556a266021..6d2e811fbf85 100644
---- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
-+++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-@@ -47,6 +47,7 @@ struct test_args {
- 	int nr_iter;
- 	int timer_period_ms;
- 	int migration_freq_ms;
-+	struct kvm_arm_counter_offset offset;
- };
- 
- static struct test_args test_args = {
-@@ -54,6 +55,7 @@ static struct test_args test_args = {
- 	.nr_iter = NR_TEST_ITERS_DEF,
- 	.timer_period_ms = TIMER_TEST_PERIOD_MS_DEF,
- 	.migration_freq_ms = TIMER_TEST_MIGRATION_FREQ_MS,
-+	.offset = { .reserved = 1 },
- };
- 
- #define msecs_to_usecs(msec)		((msec) * 1000LL)
-@@ -372,6 +374,13 @@ static struct kvm_vm *test_vm_create(void)
- 	vm_init_descriptor_tables(vm);
- 	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT, guest_irq_handler);
- 
-+	if (!test_args.offset.reserved) {
-+		if (kvm_has_cap(KVM_CAP_COUNTER_OFFSET))
-+			vm_ioctl(vm, KVM_ARM_SET_COUNTER_OFFSET, &test_args.offset);
-+		else
-+			TEST_FAIL("no support for global offset\n");
-+	}
-+
- 	for (i = 0; i < nr_vcpus; i++)
- 		vcpu_init_descriptor_tables(vcpus[i]);
- 
-@@ -403,6 +412,7 @@ static void test_print_help(char *name)
- 		TIMER_TEST_PERIOD_MS_DEF);
- 	pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different pCPU. 0 to turn off (default: %u)\n",
- 		TIMER_TEST_MIGRATION_FREQ_MS);
-+	pr_info("\t-o: Counter offset (in counter cycles, default: 0)\n");
- 	pr_info("\t-h: print this help screen\n");
- }
- 
-@@ -410,7 +420,7 @@ static bool parse_args(int argc, char *argv[])
- {
- 	int opt;
- 
--	while ((opt = getopt(argc, argv, "hn:i:p:m:")) != -1) {
-+	while ((opt = getopt(argc, argv, "hn:i:p:m:o:O:")) != -1) {
- 		switch (opt) {
- 		case 'n':
- 			test_args.nr_vcpus = atoi_positive("Number of vCPUs", optarg);
-@@ -429,6 +439,10 @@ static bool parse_args(int argc, char *argv[])
- 		case 'm':
- 			test_args.migration_freq_ms = atoi_non_negative("Frequency", optarg);
- 			break;
-+		case 'o':
-+			test_args.offset.counter_offset = strtol(optarg, NULL, 0);
-+			test_args.offset.reserved = 0;
-+			break;
- 		case 'h':
- 		default:
- 			goto err;
+I seriously doubt someone has actually seen a deadlock, because
+the issue has been there for at least the past 7 years...
+
+And -rc2 works just fine here.
+
+         M.
 -- 
-2.34.1
-
+Who you jivin' with that Cosmik Debris?
