@@ -1,128 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D222F2B
-	for <kvmarm@lists.linux.dev>; Sun, 12 Mar 2023 19:35:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0355C433EF;
-	Sun, 12 Mar 2023 19:35:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1678649756;
-	bh=Vu0VeFs97BU4JOALMNRa8KqBt7uKbnwhF5S6J/1/OWE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Uqv0EmQCw4I3C/NFaXEfT/hc2siUGMJ1+LD/xcOUd+yXZFZ+m82sfLtjyyFQmPlm5
-	 oW3+4Ud+od6haim1YSvtXAmwY6GvjzhtXH+AwYnL7nNfSbrwbUGjKBH4QC1sG6tSKp
-	 6VRsfoi6oLlx3ngPHC8kh0TpFY2AOWiv/MoQHnEzXRG+Nd1MOgBZ7n051q4wfjhBFi
-	 NfoZ2EqC5Vu4Mi3mP5+6PjHpMUVAzMwi8T5RrpZQ8OjetoFXVq/m3n7/EubU9OuGUa
-	 Obas5GcM6iPq0bmHYopSHF5vCC2Cqn7K17+9xn+p319OTx5Jfok/gs2fwIeul/4rPD
-	 69qWaoUkrbKdQ==
-Date: Sun, 12 Mar 2023 19:35:53 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: selftests: Add coverage of MTE system registers
-Message-ID: <ZA4pmVALRVr0NuIU@sirena.org.uk>
-References: <20230308-kvm-arm64-test-mte-regs-v1-1-f92a377e486f@kernel.org>
- <87edpu5klk.wl-maz@kernel.org>
- <ZA3jISc0DH+7swbI@sirena.org.uk>
- <87v8j63rr0.wl-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BDAA15CA
+	for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 03:30:24 +0000 (UTC)
+Received: by mail-pf1-f202.google.com with SMTP id x15-20020a056a000bcf00b0062436f133c1so988814pfu.1
+        for <kvmarm@lists.linux.dev>; Sun, 12 Mar 2023 20:30:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1678678224;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=SdlPWktROsh+JmiviRgnNdVxeIIiPFplxaQO79O6Ksw=;
+        b=qScfWVRHtaNZ7LeoilFi7KVFQvfj43FymK5EnBRDSXjBmUm8JlatP9MRZ64qcejuLs
+         XjA/8aKDew9t3Y4rRzL1Y3CsHlQC044bLOfeJpafYcgptPgqGAl0dCIWR5Na2kzN4jjw
+         mUGTFwbyUpbno31gPjx4teUokKWQmaHTEHkjPGY6/kN5/KU1jIDLN1tSLLcedvR7biMn
+         NDpB3sQh+hWtvRr81AyGceLKKshSMcNhlbUCvNmcXgXyknyICmNYe+sakKSgs2zYUPUa
+         Hc4Zh4O5Q/VExhRDjA1KE7/bxKWxfjIQ3pKMVWwBBwSQW299zecsEtI3z8VmE9ZIKmYJ
+         U+Xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678678224;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SdlPWktROsh+JmiviRgnNdVxeIIiPFplxaQO79O6Ksw=;
+        b=uk0hxDk+4nplXNkTlDK8kXgNnv8f7idVBstxfeOHzYMhBWv9STfGMCr9Dxfqx6AUvy
+         7R2tMThaWnz52InLNf+6LRd4DflTwO9qdl01vHOpOANbfR9HrbhcET/IGCl0ES1OnHg+
+         7FqgmfDc+9LUjYxEzvdsZIB5U2hIZQTN7ix3g9jftJ9ZI8qByPGtKOCeYytso0Dm1KgS
+         TZWmcnfjd5p+t3BjzsCwMUIRpWKkfVlNiTYvebXvb/ZGcgZCYkhorPicex00r0Q0/msG
+         jgXY7HSnhQ+v51fEXu1IsIpkrRyNYaF6+81o75/9aw54T40oWOQ3vi+rO8UmGNtHvFQw
+         Jv2g==
+X-Gm-Message-State: AO0yUKVROF0Tvwx9LFY/SdUIrAQnUyoq10nqUU6Q4ruSFDC0NbX10Bqw
+	30QDu9ik2/LnxJds6bHw0Jv/BGPMKL0=
+X-Google-Smtp-Source: AK7set+gdEoQhj3SJOTWehpvE/gjAq+U6uimdq+vWRo8HEF76CvzRWY0PsNw6/QMUrCk/0uJgQ7FfVNmZ6I=
+X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
+ (user=reijiw job=sendgmr) by 2002:a17:90a:420b:b0:237:29b1:188f with SMTP id
+ o11-20020a17090a420b00b0023729b1188fmr11930655pjg.8.1678678224493; Sun, 12
+ Mar 2023 20:30:24 -0700 (PDT)
+Date: Sun, 12 Mar 2023 20:29:03 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="WJHcUvzHOCQ+71Jf"
-Content-Disposition: inline
-In-Reply-To: <87v8j63rr0.wl-maz@kernel.org>
-X-Cookie: Single tasking: Just Say No.
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
+Message-ID: <20230313032905.1474705-1-reijiw@google.com>
+Subject: [PATCH v2 0/2] KVM: arm64: PMU: Preserve vPMC registers properly on migration
+From: Reiji Watanabe <reijiw@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Ricardo Koller <ricarkol@google.com>, 
+	Jing Zhang <jingzhangos@google.com>, Raghavendra Rao Anata <rananta@google.com>, 
+	Will Deacon <will@kernel.org>, Reiji Watanabe <reijiw@google.com>
+Content-Type: text/plain; charset="UTF-8"
+
+The series fixes two problems in preserving vPMU counter (vPMC)
+registers (PMCCNTR_EL0/PMEVCNTR<n>_EL0) during migration.
+
+One of the problems is that KVM may not return the current values
+of the vPMC registers for KVM_GET_ONE_REG.
+
+The other one might cause KVM to reset the vPMC registers on the
+first KVM_RUN on the destination. This is because userspace might
+save PMCR_EL0 with PMCR_EL0.{C,P} bits set on the source, and
+restore it on the destination.
+
+See patch-1 and patch-2 for details on these issues respectively.
+
+The series is based on v6.3-rc2.
+
+v2:
+ - Collect Marc's r-b tags (Thank you!)
+ - Added "Fixes:" tags
+ - Added Cc: to stable
+ - Cosmetics change (remove one line break in kvm_pmu_handle_pmcr())
+
+v1: https://lore.kernel.org/all/20230302055033.3081456-1-reijiw@google.com/
+
+Reiji Watanabe (2):
+  KVM: arm64: PMU: Fix GET_ONE_REG for vPMC regs to return the current
+    value
+  KVM: arm64: PMU: Don't save PMCR_EL0.{C,P} for the vCPU
+
+ arch/arm64/kvm/pmu-emul.c |  3 ++-
+ arch/arm64/kvm/sys_regs.c | 21 +++++++++++++++++++--
+ 2 files changed, 21 insertions(+), 3 deletions(-)
 
 
---WJHcUvzHOCQ+71Jf
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+base-commit: eeac8ede17557680855031c6f305ece2378af326
+-- 
+2.40.0.rc1.284.g88254d51c5-goog
 
-On Sun, Mar 12, 2023 at 03:37:39PM +0000, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
-> > On Sun, Mar 12, 2023 at 10:29:11AM +0000, Marc Zyngier wrote:
-> > > Mark Brown <broonie@kernel.org> wrote:
-
-> > combination just for the sake of it.  It's one of those areas
-> > where it's hard to determine if there's an intent behind the
-> > implementation choices made or if they're just whatever someone
-> > happened to write and not particularly important or desired.
-
-> It *is* desired. We've had cases of flags being reset at the wrong
-> time and leading to issues that would be detected by this test. The
-> PMU stuff is indeed one example, but similar things could happen
-> between SVE+MTE, for example.
-
-I take it you mean that the current situation where it's only
-covering X and X+PMU cases is not desired and wasn't intentional?
-
-> > > A good first step would be to be able to build these combinations
-> > > dynamically, and only then add new sublists to the mix.
-
-> > That would certainly be a good idea, if we were heading in that
-> > direction I'd also expect negative tests checking that for
-> > example pointer authentication registers don't appear when that's
-> > not enabled.  I'm not sure that it's worth blocking all new
-> > coverage for that though, there is still value in having a bit of
-> > basic coverage even if not all the combinations are covered yet.
-
-> Then where is the incentive to get it fixed? People will just keep
-> piling stuff, and the coverage will increasingly become worse.
-
-It's always possible someone will be interested and keep plugging
-away at improving things over the longer term even without having
-other work blocked.  Sometimes someone will come along explicitly
-trying to improve whatever the thing is, or someone other than
-the person submitting a given patch might see the idea being
-mentioned and be inspired to implement it (that process is how we
-ended up with the ALSA pcm-test program).
-
-The flip side of this approach is that it's encouraging people to
-do the minimum possible in order to reduce the chances that out
-of scope cleanup work gets added on to whatever they were
-originally trying to do, and to avoid doing smaller cleanups if
-they notice anything else that could be improved (especially if
-those things might resuling in something that'd tie up something
-more urgent).  It's not a big deal if it's a small bit of extra
-work, but the more work it is than the original thing the more of
-an impact it can have.
-
-It's a balancing thing - sometimes things do need some push to
-get things done, but on the other hand if it's the only approach
-taken then it can become a bit of a self fulfilling prophecy.
-
-> We have to do it as some point, and now is as good a time as any.
-
-Well, I was just doing a drive by patch here because I noticed
-that MTE wasn't covered, it's not like I'm even looking at MTE.
-Realistically I'm not sure how long it'll be before I have the
-bandwidth for reworking this.  There is some other work where I'd
-get blocked on it, but it's not going to be this release cycle.
-
---WJHcUvzHOCQ+71Jf
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmQOKZYACgkQJNaLcl1U
-h9Bx0Af+MhNB5JQvjPLOVR3tG0fmoNBj4n8e6CcKQBWTemQQkp4z2DGozdSNTHvi
-xw1L/yMB5t+FAsAliuqLbgzjekR+SIo96YtTa0KO8l55TZwjQyYud5+G9lFZPhK1
-eSmfyVY2uTTNdDNWlh7fdL1XTQepdhMpl0k11VJLzi4XoNJ3CEdTWLuoWrfu1mNE
-Jd/qJgkmfmPX2NU2+kRy7vNyhtegDtboo/2Gw61tJGnfHmo1xc5F/Gdgq9e9Dnq3
-sT7mqsORU2J4Mi5pye94xwVuHR7cNqmrxM23LomwbQJBwnnNilcD/rYN1Frp+hHk
-Q9mSQpAOQ8QMOl9F+7WFak13mID1yw==
-=AhwS
------END PGP SIGNATURE-----
-
---WJHcUvzHOCQ+71Jf--
