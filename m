@@ -1,74 +1,113 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBA4428F2
-	for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 15:18:57 +0000 (UTC)
-Received: by mail-pg1-f201.google.com with SMTP id d22-20020a63d716000000b00502e3fb8ff3so2725897pgg.10
-        for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 08:18:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678720737;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=J9Xq5escaSYWRdwEHLAH6oMvH+8AblM7LMhxhLK/+R0=;
-        b=ECU2onOte2LWgRcZ6hdpQJUQ545e8QYM/XcY7GVAWLhiWCLmjylBB4Lrbg9gPXs1Ly
-         nyymNz8VgQwaIYdloRIqQFkY18RufYl0mPrAqfYFQTkZ1/lhJmPjcOUXTNTwEn56gupM
-         AP/aLRyohdEkarN7z8U0kKmAMbtXatRxWA3ZViONpAZqXBqOJHXxHqQFK+l048IthItP
-         ClzEB5dty74kqOXSVv7HoBUAnVozh8IkxDnN/1sOZSiAEgeg7hRiwB2MsepNbU/GdTxp
-         FQwlKOIbv6RHdQXdmiC934rGjmvInxzxTVlwbQyDRnc0kxiIceRbwpY+0ZKXrD0WblOt
-         nMag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678720737;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J9Xq5escaSYWRdwEHLAH6oMvH+8AblM7LMhxhLK/+R0=;
-        b=ojegz06WeSx6JzXs+FZdLu8qd3fddwY05eYk383Kkt9+p0s7979ZBKoacnM/R3qpJY
-         bwTmG7WoIzpY+a9JE4TQnRoWyX3aWniJCkBeXiH12y+tza4TpYtJ0uQwybKXd14vscC/
-         V/3XehOX3VMKfETSiNtJDmnuFLLKnsUuRrvhW/lx6PxXrdWjluj/demZJq7ANSL7wxCL
-         DpTApG8+xo1Cjj4F8DDD5bFtk4NRq+eeA9R58KEAMUrJ8FY96Xa/VUA3+zGE2MtkBkY0
-         7Nzn3zUFV1Q0yJQaHzIDOlLfpJT//kso6NzI0s+bELnLZftlY3/RXmMEx/OU1Lv7JQan
-         wt8A==
-X-Gm-Message-State: AO0yUKVzeR1sKSVTcF5lP05m9wwnyfRvqSdWpl0KEM+zHtKVA+waBPiE
-	qH1gzDcBjIab2QufJ0U3QHlehUEKKHg=
-X-Google-Smtp-Source: AK7set9BlNoLJIo5wX3TzGHjv6KddFr8nWGutCu67vJ9adzJb5qHZFLAwIMAXzJ2iWxeuSokv6/ju1J+ybs=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a62:1b50:0:b0:593:e110:9582 with SMTP id
- b77-20020a621b50000000b00593e1109582mr3599041pfb.2.1678720736984; Mon, 13 Mar
- 2023 08:18:56 -0700 (PDT)
-Date: Mon, 13 Mar 2023 08:18:55 -0700
-In-Reply-To: <878rg25hbq.wl-maz@kernel.org>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 336B328F2;
+	Mon, 13 Mar 2023 15:51:04 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C9C932F4;
+	Mon, 13 Mar 2023 08:51:46 -0700 (PDT)
+Received: from [10.1.196.177] (eglon.cambridge.arm.com [10.1.196.177])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 74FC33F71A;
+	Mon, 13 Mar 2023 08:50:56 -0700 (PDT)
+Message-ID: <1f21673e-e5e6-a158-94a4-6ae6724c1f93@arm.com>
+Date: Mon, 13 Mar 2023 15:50:52 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230307034555.39733-1-ricarkol@google.com> <20230307034555.39733-8-ricarkol@google.com>
- <878rg25hbq.wl-maz@kernel.org>
-Message-ID: <ZA8+31vQA6vcQuK2@google.com>
-Subject: Re: [PATCH v6 07/12] KVM: arm64: Export kvm_are_all_memslots_empty()
-From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com, oupton@google.com, 
-	yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com, 
-	andrew.jones@linux.dev, alexandru.elisei@arm.com, suzuki.poulose@arm.com, 
-	eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com, 
-	rananta@google.com, bgardon@google.com, ricarkol@gmail.com, 
-	Shaoqin Huang <shahuang@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [RFC PATCH 00/32] ACPI/arm64: add support for virtual cpuhotplug
+Content-Language: en-GB
+To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-ia64@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ x86@kernel.org, Marc Zyngier <maz@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>, Sudeep Holla <sudeep.holla@arm.com>,
+ Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>, Ingo Molnar <mingo@redhat.com>,
+ Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ Huacai Chen <chenhuacai@kernel.org>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Len Brown <lenb@kernel.org>,
+ Rafael Wysocki <rafael@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
+ Salil Mehta <salil.mehta@huawei.com>, Russell King <linux@armlinux.org.uk>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>, kangkang.shen@futurewei.com
+References: <20230203135043.409192-1-james.morse@arm.com>
+ <20230307120050.000032f1@Huawei.com>
+From: James Morse <james.morse@arm.com>
+In-Reply-To: <20230307120050.000032f1@Huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Mar 12, 2023, Marc Zyngier wrote:
-> On Tue, 07 Mar 2023 03:45:50 +0000,
-> Ricardo Koller <ricarkol@google.com> wrote:
-> > No functional change intended.
+Hi Jonathan,
+
+On 07/03/2023 12:00, Jonathan Cameron wrote:
+> On Fri,  3 Feb 2023 13:50:11 +0000
+> James Morse <james.morse@arm.com> wrote:
+
+>> On a system that supports cpuhotplug the MADT has to describe every possible
+>> CPU at boot. Under KVM, the vGIC needs to know about every possible vCPU before
+>> the guest is started.
+>> With these constraints, virtual-cpuhotplug is really just a hypervisor/firmware
+>> policy about which CPUs can be brought online.
+>>
+>> This series adds support for virtual-cpuhotplug as exactly that: firmware
+>> policy. This may even work on a physical machine too; for a guest the part of
+>> firmware is played by the VMM. (typically Qemu).
+>>
+>> PSCI support is modified to return 'DENIED' if the CPU can't be brought
+>> online/enabled yet. The CPU object's _STA method's enabled bit is used to
+>> indicate firmware's current disposition. If the CPU has its enabled bit clear,
+>> it will not be registered with sysfs, and attempts to bring it online will
+>> fail. The notifications that _STA has changed its value then work in the same
+>> way as physical hotplug, and firmware can cause the CPU to be registered some
+>> time later, allowing it to be brought online.
+
+> As we discussed on an LOD call a while back, I think that we need some path to
+> find out if the guest supports vCPU HP or not so that info can be queried by
+> an orchestrator / libvirt etc.  In general the entity responsible for allocating
+> extra vCPUs may not know what support the VM has for this feature.
+
+I agree. For arm64 this is going to be important if/when there are machines that do
+physical hotplug of CPUs too.
+
+
+> There are various ways we could get this information into the VMM.
+> My immediate thought is to use one of the ACPI interfaces that lets us write
+> AML that can set an emulated register. A query to the VMM can check if this
+> register is set.
 > 
-> I wish people stopped adding this pointless sentence to commit
-> messages. All changes have a functional change one way or another,
-> unless you are only changing a comment.
+> So options.
+> 
+> _OSI() - Deprecated on ARM64 so lets not use that ;)
 
-The implied context is that there is no change in runtime functionality, which
-does hold true for many changes.  I personally find the annotation helpful, both
-for code review and when doing git archaeology.  If a changelog states that the
-author doesn't/didn't intend a functional change, then _any_ change in (runtime)
-functionality becomes a red flag, and for me, prompts a closer look regardless of
-whether or not I have other concerns with the patch/commit.
+News to me, I've only just discovered it!
+
+
+> _OSC() - Could add a bit to Table 6.13 Platform-Wide Capabilites in ACPI 6.5 spec.
+>          Given x86 has a similar online capable bit perhaps this is the best option
+>          though it is the one that requires a formal code first proposal to ASWG.
+
+I've had a go at writing this one:
+https://gitlab.arm.com/linux-arm/linux-jm/-/commit/220b0d8b0261d7467c8705e6f614d57325798859
+
+It'll appear in the v1 of the series once the kernel and qemu bits are all lined up again.
+
+
+Thanks,
+
+James
+
+
+> _OSC() - Could add a new UUID and put it under a suitable device - maybe all CPUs?
+>          You could definitely argue this feature is an operating system property.
+> _DSM() - Similar to OSC but always under a device.
+>          Whilst can be used for this I'm not sure it really matches intended usecase.
+> 
+> Assuming everyone agrees this bit of introspection is useful,
+> Rafael / other ACPI specialists: Any suggestions on how best to do this?
