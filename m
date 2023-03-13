@@ -1,53 +1,52 @@
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE70315CA
-	for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 03:35:03 +0000 (UTC)
-Received: by mail-pj1-f47.google.com with SMTP id kb15so10636315pjb.1
-        for <kvmarm@lists.linux.dev>; Sun, 12 Mar 2023 20:35:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5A2415CA
+	for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 03:35:56 +0000 (UTC)
+Received: by mail-pj1-f41.google.com with SMTP id e15-20020a17090ac20f00b0023d1b009f52so277417pjt.2
+        for <kvmarm@lists.linux.dev>; Sun, 12 Mar 2023 20:35:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678678503;
+        d=google.com; s=20210112; t=1678678556;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=c8b0WhK8vmfgLUxQMk/eTDiK5Km4ElMB+CW7ekOSktw=;
-        b=UI2j7kOxEIcMON0OFYjBjv4HbsUo6ky4Jc7WVZANhbpNuUX/vx8IX2OSLAor1cfimy
-         9z4jZajcCcdDq0PhoccbU8mXIkOXcHx2LNykaZK9F1q48ZpvebWLzp2JHFmohyDpFJpG
-         f0+rePacUSHA6HUY+9dLcrmEgia4fCX65Uj5oXIlUr2ShIVoktgXEEDTzt4sb9bCYi1a
-         THfBpsHmldHZbcf8UImoHCagJaIc2c6ScakEro2NvGYYt8AmpNGkLWvzsCjYx9SW436S
-         B3GHcDC8xhXuaDDvOYWph/LuFDkChMgFHgrDxvR2jtpmNSBzlNK7exlVPwpigJoOwbkR
-         mRwQ==
+        bh=XIVDKNgNNnu7iJidCAmkeAHFjqwKfwXTuL13VCoOInQ=;
+        b=OHPdAgmcGU4QMibOut+sWb1Mt3yexKZ+FGNJSMuSuf/Z8Jt1h6UtKkMXBxGdTHctL9
+         oVIWxgsPVk524AJEpmL1bOqTWCbKlNet6yr5mqfEkSaxAXZoV3Ps4A46yvo0jz7Rdyem
+         x6eXadJTQLU8zjhJ53dciyxBu5LaG0xyzxeooK4zRv0pgYgzDCkYGdcv06QBYzD9e0f5
+         cw7WocKdrsfrBCslixZvrJBQ4Arbn6zpYsP/FFs6i6QCuQ1TY/0p/MoD0X5LNbYXI8j7
+         UK0NO1+vC6kiU7BC3pdxWzjpGfxsEyH6vK35nGbNtG4pr0xFq1cFRPrNoJAo5q8mM683
+         YOKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678678503;
+        d=1e100.net; s=20210112; t=1678678556;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=c8b0WhK8vmfgLUxQMk/eTDiK5Km4ElMB+CW7ekOSktw=;
-        b=dPOrr9OAWNzQQ2PGlVdmP+iyRg7E85ucZomyUGl6ERhq/V8/l0qxCsa6tqRDotECtE
-         jbU50qWj7G29iJwuhCBxQdMW5LmzikpvkNfwpTDHbPEOzLDnH7MtUCA1VrhPfUOXrN8/
-         cF469NLFk2a6noG8pCqrPCv0HBQLhoiRRSINqqnRUbp+AO7z+NCcaGcUWcPDkQeZClTn
-         72m0jPZPEuRjxznz/aU162Ux4mCEd5Wx0PYzTsIeIbIw6V+OW3Y4ENmhaAEWvd+ekMet
-         R0jasgIYG/1c/FdGM0ubFV+8m363Jntn3QvHxw7e5kaa5bl63oSEqKk1Re3A1+CgULri
-         qWmg==
-X-Gm-Message-State: AO0yUKWj7ktawQ1bhIXupJGI+ymtFAg2MTRNi7YkAFmriPzTTuZZHBRN
-	UXcBPK8Q0EWQFgRdC7xr7pg9QatI1I5rwigk+d1koA==
-X-Google-Smtp-Source: AK7set+ZYwGulAFTlGElUo5y1U5AO9QzS5d1rkxFf+xh7M7NuFyE3ozmdH71T9UqFQSC06M2dN0/bogbUzkgVc+Hyjs=
+        bh=XIVDKNgNNnu7iJidCAmkeAHFjqwKfwXTuL13VCoOInQ=;
+        b=jnJB7HOiherSbnoTW5UxJuW3bvOB+A2BVl1/SYrr4ese1tsulB9i8o+kerXlFKfaJF
+         zseF/nQjjC7buPA8UIPE2ckgMy+3lDDon9pGv0v+yU9cGxmWRavR08J2hnQ7WZmJu36e
+         jE1qVwPeF0SbUazG+qoEDdFu3/maOsbB6TR4ICTGnhWISkNnOU7+fDNlbAMtenN+HvAC
+         I9jnfAA13DlyV2XUmSVhEO15WgWLVx0rY2zAS1p80TFY387R+s0oaIMR6c5CNdunQytn
+         HvhkYq1uI1EBfDndvDn7TbhUwQJrgGjHWD9hCqHRqiK3fxj95pkHJbbkcVov6iNTwh2F
+         Spdw==
+X-Gm-Message-State: AO0yUKXP2caftyJAucBC0mhDgFvGPhR3CL3dP9wlsWVxWfcaZqhwuPSb
+	9GZ+StuljWJDH4Ot4lrQVPN+7KEunRxEhT4QbhXrtA==
+X-Google-Smtp-Source: AK7set9ytJ+OvrhbrLetsnIDo/dfpOg8EONiPahVU2UwpRmMYqsdRD/mpKfb4P9rmj1BRrcC6/ounfQ9rh5k4KZbWJo=
 X-Received: by 2002:a17:90a:ba03:b0:230:b842:143e with SMTP id
- s3-20020a17090aba0300b00230b842143emr11836291pjr.6.1678678503167; Sun, 12 Mar
- 2023 20:35:03 -0700 (PDT)
+ s3-20020a17090aba0300b00230b842143emr11836800pjr.6.1678678556258; Sun, 12 Mar
+ 2023 20:35:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230302055033.3081456-1-reijiw@google.com> <20230302055033.3081456-3-reijiw@google.com>
- <87y1o23tfx.wl-maz@kernel.org>
-In-Reply-To: <87y1o23tfx.wl-maz@kernel.org>
+References: <20230302055033.3081456-1-reijiw@google.com> <87wn3m3ta0.wl-maz@kernel.org>
+In-Reply-To: <87wn3m3ta0.wl-maz@kernel.org>
 From: Reiji Watanabe <reijiw@google.com>
-Date: Sun, 12 Mar 2023 20:34:46 -0700
-Message-ID: <CAAeT=FxiYjPyFcvDKWVHhkksDd8FQtq8Nwz3bgWygNwitFsGHQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: arm64: PMU: Don't save PMCR_EL0.{C,P} for the vCPU
+Date: Sun, 12 Mar 2023 20:35:39 -0700
+Message-ID: <CAAeT=FzTSboSVB=VJ_mkmkOmMtftjzOaQQfAOwmnUuomOwfiYw@mail.gmail.com>
+Subject: Re: [PATCH 0/2] KVM: arm64: PMU: Preserve vPMC registers properly on migration
 To: Marc Zyngier <maz@kernel.org>
 Cc: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
 	linux-arm-kernel@lists.infradead.org, James Morse <james.morse@arm.com>, 
@@ -60,52 +59,40 @@ Content-Transfer-Encoding: quoted-printable
 
 Hi Marc,
 
-On Sun, Mar 12, 2023 at 8:01=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+On Sun, Mar 12, 2023 at 8:04=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
 :
 >
-> On Thu, 02 Mar 2023 05:50:33 +0000,
+> On Thu, 02 Mar 2023 05:50:31 +0000,
 > Reiji Watanabe <reijiw@google.com> wrote:
 > >
-> > Presently, when a guest writes 1 to PMCR_EL0.{C,P}, which is WO/RAZ,
-> > KVM saves the register value, including these bits.
-> > When userspace reads the register using KVM_GET_ONE_REG, KVM returns
-> > the saved register value as it is (the saved value might have these
-> > bits set).  This could result in userspace setting these bits on the
-> > destination during migration.  Consequently, KVM may end up resetting
-> > the vPMU counter registers (PMCCNTR_EL0 and/or PMEVCNTR<n>_EL0) to
-> > zero on the first KVM_RUN after migration.
+> > The series fixes two problems in preserving vPMU counter (vPMC)
+> > registers (PMCCNTR_EL0/PMEVCNTR<n>_EL0) during migration.
 > >
-> > Fix this by not saving those bits when a guest writes 1 to those bits.
+> > One of the problems is that KVM may not return the current values
+> > of the vPMC registers for KVM_GET_ONE_REG.
 > >
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > ---
-> >  arch/arm64/kvm/pmu-emul.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> > index 24908400e190..a5a0a9811ddb 100644
-> > --- a/arch/arm64/kvm/pmu-emul.c
-> > +++ b/arch/arm64/kvm/pmu-emul.c
-> > @@ -538,7 +538,9 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64=
- val)
-> >       if (!kvm_pmu_is_3p5(vcpu))
-> >               val &=3D ~ARMV8_PMU_PMCR_LP;
-> >
-> > -     __vcpu_sys_reg(vcpu, PMCR_EL0) =3D val;
-> > +     /* The reset bits don't indicate any state, and shouldn't be save=
-d. */
-> > +     __vcpu_sys_reg(vcpu, PMCR_EL0) =3D
-> > +                             val & ~(ARMV8_PMU_PMCR_C | ARMV8_PMU_PMCR=
-_P);
+> > The other one might cause KVM to reset the vPMC registers on the
+> > first KVM_RUN on the destination. This is because userspace might
+> > save PMCR_EL0 with PMCR_EL0.{C,P} bits set on the source, and
+> > restore it on the destination.
 >
-> nit: assignment on a single line, please.
+> This looks good to me. Can you please add the relevant Fixes: tags and
+> a Cc: to stable? With that, that'd be a candidate for -rc3, I think.
 
-Yes, I fixed it in v2!
+Thank you for the review!
 
->
-> With that,
->
-> Reviewed-by: Marc Zyngier <maz@kernel.org>
+I posted v2, which addressed the comments above, and the comment
+for the patch-2 (remove the line break).
 
-Thank you!
+Thank you,
 Reiji
+
+
+
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
