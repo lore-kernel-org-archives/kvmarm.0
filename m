@@ -1,40 +1,40 @@
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F0D723A0
-	for <kvmarm@lists.linux.dev>; Tue, 14 Mar 2023 05:36:07 +0000 (UTC)
-Received: by mail-pj1-f42.google.com with SMTP id j3-20020a17090adc8300b0023d09aea4a6so4885273pjv.5
-        for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 22:36:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5189523A0
+	for <kvmarm@lists.linux.dev>; Tue, 14 Mar 2023 06:09:35 +0000 (UTC)
+Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-177ca271cb8so3642268fac.2
+        for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 23:09:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678772166;
+        d=google.com; s=20210112; t=1678774174;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hno9M7jfqssc84ksJPwSVrXsqIzHHbC2LfkPjyFPBcI=;
-        b=Qku2AwPzNNvs7nKJCRFOPLDRjqjCA0GNT1WD6u3nuvymuoR5kGqecVyW0dpdrsP3f/
-         NEwViXvwM9dqX5BFDtF2vpdHq4fhUyQBh3h9YpOZkrZDLfJxJ0xRgC/ZJ7+lCPGbvHQI
-         3zGOahcFq6uEfBxVu4KH8QJfKLGd4t0q4YgDLpZ0dI96Or3R33iOEnwwhu5uJrkX/fmk
-         bAC09GIlFDea36HXG+wTj5+0aSsboXhsORTN4F+CJtto/xQXiH4PDAMlsGiHV+3VMZA1
-         3BPeMgxNUNup9FMRyiLLui+WGLmCZyGBTNLGRzLHhGywu3lcZDz+6ia8UVe/gicj24P+
-         n1ZQ==
+        bh=Oa/b1JmJ+JRpVd0DcgNo1vC8GPNb+zSNtZxPqUlZQ0s=;
+        b=rZ7hxfOJ9+83Laoko1Jr0AzUIPeGjHXESHYWt5VRKfLweIbJ7t8RNxZmkGg4xIi/em
+         qM9PazwYLKjh2CC5BtM76tOmm2ufhvdRUv+UsV3F/uVyjJN9o6y6ZFjIo65WOaJg/n8U
+         hbn2K4ctq8wgmqzRKwaTnkpbdkR57bKEUiqYMWGTixFt2LRlgZTGM5I/Z8aCQtnFHLN+
+         zyOmDoOcStqtQlXV/gXE+6bJw1cAQLCugmwHA692xq+Ez64wLBqLVPRRZ44FgBf6PCTb
+         Q1/4fDiNGo6zr8AxeefwEQlHRPet4A77nr37Ta0PRFrPSy8+4yyEWB110zYTxH6qpCZe
+         PiEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678772166;
+        d=1e100.net; s=20210112; t=1678774174;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hno9M7jfqssc84ksJPwSVrXsqIzHHbC2LfkPjyFPBcI=;
-        b=P1qBEAP4gi6SRt2sJQMIzK0jm5ftICgSwES9aMdsP2yQBRKBujK4wcCt+o2rgKbraG
-         mrQsqk/h7V7jdmCauDdE2V1YqqeqxyLPiJMcmm1FIIvKMSD0QoN+fE1oKORpKGB4jSSn
-         MU3I7wRfHhu5CTCAAG8Zi2gQJIWi2iV0TVLJ24RqpvyjLootp+sv5CqxU5GU3J37dMUs
-         dCV5xpZaLBIPR0tQiPNyO2+EFbFrvBSY3u2g5k9epq+tm+nuHO/9YwYGAeSzGUvr1BXz
-         VZaQ5mCNfP2YyWXcUILiDVdp4KuNcR56EpAAOnSwsjBy8eoAQCvXomS884NmXZty6BQA
-         tGNQ==
-X-Gm-Message-State: AO0yUKWoQIJ/tfsgh6P8eaY8gilcu+Rf9AlW+iPCDbLMyY6hsRlqMeSN
-	US8gixMePD/mZxTE+vvLxNdEPXAeU/nRXEh/KYNYhg==
-X-Google-Smtp-Source: AK7set+Z0Qs9Q8Ca4kDiYVK5slSY7OdHGQx2hDUd+HbuF9DZKe78QDtyd3RJXkr9/R4rnpJcEr0QF+laFZzBKPySWj0=
-X-Received: by 2002:a17:90a:5d0b:b0:23b:3611:e42c with SMTP id
- s11-20020a17090a5d0b00b0023b3611e42cmr3210659pji.5.1678772166377; Mon, 13 Mar
- 2023 22:36:06 -0700 (PDT)
+        bh=Oa/b1JmJ+JRpVd0DcgNo1vC8GPNb+zSNtZxPqUlZQ0s=;
+        b=1770e+ZDY/M+gl7XDD6GFbRQLT6CPOQmf1NRycbhs/oSRbTnThXjlSQBkG9pOwufze
+         YHLiMJpex9eB8EdIb2tGQEzm4POcmySdyVuB8z1a/iHIdjgOrX9ALVLNu1Kn/JBC4Vm8
+         op1ULTtQKcdC4vBWMAzwHjZiV5iOYtxNDh7m7hTilip7bUpvN64gXVoF3Q1dkFDzWm7H
+         fZu0FtwrhysZHXF8iUJF8fL1uDwwZAZT7hzUjM7essIxoF/uHI3Br7eeYtxG0DOLnFpN
+         xu/H195P0UYozqXjlUY+a3cIOhz2m32dPyHK8hSF4gL1313ar+5IcZzzG3NwsC6cSeOl
+         EaNQ==
+X-Gm-Message-State: AO0yUKV7jiYTUG9Uk1NdQkl8NMuJoPU4x8L7BgcDa7lXgvVBp6v5Z3YB
+	KuFG9DNQP4Ibv064TtgZvixHzA7k0WCIB/atfqoSyw==
+X-Google-Smtp-Source: AK7set/Bk6uDTyz4XrKEWOhz6PY9GlE2aWSo8Fs7XMFkyiMIHEj216SdnY8+TwU404T2REnC+HZ6ELR4NuBAtt0PoOs=
+X-Received: by 2002:a05:6870:bf8b:b0:177:ac40:8f6d with SMTP id
+ av11-20020a056870bf8b00b00177ac408f6dmr2219059oac.8.1678774174080; Mon, 13
+ Mar 2023 23:09:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,11 +47,11 @@ References: <20230228062246.1222387-1-jingzhangos@google.com>
  <CAAeT=FzokuakbRG5U75zCbGzgB-DN17pq+MTLCH1+4iXL7vLHQ@mail.gmail.com>
  <CAAdAUth+aVv+njiCQkvWZYC=5J+iKiLuJLO4FrJT20amkVwxrQ@mail.gmail.com> <CAAeT=FyYs1uFPZ3wBZ_Y=Q+1hJ5WCXf6NeWkO5s8-D7whJ1LDw@mail.gmail.com>
 In-Reply-To: <CAAeT=FyYs1uFPZ3wBZ_Y=Q+1hJ5WCXf6NeWkO5s8-D7whJ1LDw@mail.gmail.com>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Mon, 13 Mar 2023 22:35:50 -0700
-Message-ID: <CAAeT=Fx9OKixnVL6Oeo7q7YETvCP+zBg27gaH=E1JcWVU2-+sw@mail.gmail.com>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Mon, 13 Mar 2023 23:09:21 -0700
+Message-ID: <CAAdAUthL6ETHRNqouYY0kM2ACN4p9CMzTEOHKVrk0nDTEK6EOA@mail.gmail.com>
 Subject: Re: [PATCH v3 4/6] KVM: arm64: Use per guest ID register for ID_AA64DFR0_EL1.PMUVer
-To: Jing Zhang <jingzhangos@google.com>
+To: Reiji Watanabe <reijiw@google.com>
 Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
 	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oupton@google.com>, Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
@@ -61,8 +61,31 @@ Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jing,
+Hi Reiji,
 
+On Mon, Mar 13, 2023 at 10:14=E2=80=AFPM Reiji Watanabe <reijiw@google.com>=
+ wrote:
+>
+> On Mon, Mar 13, 2023 at 9:37=E2=80=AFPM Jing Zhang <jingzhangos@google.co=
+m> wrote:
+> >
+> > Hi Reiji,
+> >
+> > On Sun, Mar 12, 2023 at 9:13=E2=80=AFPM Reiji Watanabe <reijiw@google.c=
+om> wrote:
+> > >
+> > > Hi Jing,
+> > >
+> > > On Thu, Mar 9, 2023 at 6:38=E2=80=AFPM Jing Zhang <jingzhangos@google=
+.com> wrote:
+> > > >
+> > > > Hi Reiji,
+> > > >
+> > > > On Wed, Mar 8, 2023 at 8:42 AM Reiji Watanabe <reijiw@google.com> w=
+rote:
+> > > > >
+> > > > > Hi Jing,
+> > > > >
 > > > > > On Mon, Feb 27, 2023 at 10:23=E2=80=AFPM Jing Zhang <jingzhangos@=
 google.com> wrote:
 > > > > > >
@@ -202,16 +225,6 @@ th
 > Difference threads will set (restore) those registers for
 > different vCPUs in parallel, although those data are shared per VM.
 > (e.g. kvm_arm_set_fw_reg_bmap() addresses the similar case)
-
-I'm sorry, this example is misleading (my memory was corrupted)...
-This is just an example of the code that gets a per VM lock in
-KVM_SET_ONE_REG (It gets the lock to prevent from modifying the
-registers after the first KVM_RUN for the guest).
-
-Thank you,
-Reiji
-
-
 >
 > > Anyway, let's see if there are
 > > any ideas from others before adding the lockings.
@@ -329,6 +342,10 @@ MUVer_V3P5)
 > with no PMU configured, it might return true (it depends on the value
 > of dfr0_pmuver.imp).
 > Or am I missing something ??
+After double checking the code, I think you are right. The
+kvm_vcpu_has_pmu() is not necessary.
 >
 > Thank you,
 > Reiji
+Thanks,
+Jing
