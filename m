@@ -1,322 +1,449 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAB718F4E
-	for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 23:58:34 +0000 (UTC)
-Received: by mail-pj1-f54.google.com with SMTP id y2so13656627pjg.3
-        for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 16:58:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3E2E1FA8
+	for <kvmarm@lists.linux.dev>; Tue, 14 Mar 2023 04:26:33 +0000 (UTC)
+Received: by mail-oi1-f181.google.com with SMTP id bj30so10988697oib.6
+        for <kvmarm@lists.linux.dev>; Mon, 13 Mar 2023 21:26:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678751914;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PDGcCbApk5SWwy8kMHL+dkdFkrI2nhTDi1PUuQqqAaQ=;
-        b=DryNVkrkPQR7Y8Frs7sEVAlw83RREkA6IF0+9mmWSUQyTMzlEkUFDpbr4pJGIp/QMY
-         rGpI3UYjyL0TbLhkw3wbcC1UXJELK8y+jymeZZDfrTwh4q3VCs1yDk4R0L5FIxoIZ0dZ
-         d8emcyC0X112nr53vG/poiTBbeVJA7H07fI1oNMDakalatUD0omup49Y2VZqf3SxJp6J
-         lbDAIQ+y7olJqs4BKdlNF1ic7r5SlC5+kjwu3yDQPCH1XGzZQAfV0RbsYiAfVoYZ7yAs
-         b9aj/oLomDwuIi/Q5KZ6mDgSsEPA2s2k+IABYOxjgiwWuO6eUAy1BRPLheQQH2xq6Fzs
-         wiOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678751914;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20210112; t=1678767993;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PDGcCbApk5SWwy8kMHL+dkdFkrI2nhTDi1PUuQqqAaQ=;
-        b=CICvXwrbnZAQs1IA72N72ExuiAH2B0Jrt6458sdpVaI7bSZL0bynixiVh52JaLYpJA
-         N71taX43HH4Oe0iJK4NVzTWT7k4qLjei7YHOYTfVWHiVYz9k1v8W6IAD2ASK6OenfPTy
-         PliAA4Q15fVpO4P3rmSlWaC/1a1CXuUY/MzrZwlaH+1tOV3rqLPOBAal4S+aHlsd+Wm1
-         zW+IXuWQmRRECrXuN6f/X/HlH0FAi6vJGX+RxtLEpqZCde4K4ZgtQeOxfH1jhsJiZi1J
-         /SYeTaF8Iiro/NerCb47enNYAD2T9bwAGV+MyjhzNK5hPCGRvd2q7r6mPDQhKtCIoIwW
-         bsAQ==
-X-Gm-Message-State: AO0yUKVH9XpIglX4NsLm4qSE4FlRjr/Ots2qhrwJGb/zDePcIhwMNjWB
-	ej1R33wmCYZvGVOog2v3ff6Cbw==
-X-Google-Smtp-Source: AK7set/Hu7vqd1wnczHiPPHnEjFdjll2EklIz6df1Wi2Pzcr8jT04QXk+2sps3I4+iud/g2olGWDWg==
-X-Received: by 2002:a17:903:430e:b0:19c:c5d4:afd2 with SMTP id jz14-20020a170903430e00b0019cc5d4afd2mr7340plb.11.1678751914078;
-        Mon, 13 Mar 2023 16:58:34 -0700 (PDT)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id bu11-20020a17090aee4b00b002342ccc8280sm414596pjb.6.2023.03.13.16.58.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Mar 2023 16:58:33 -0700 (PDT)
-Date: Mon, 13 Mar 2023 16:58:30 -0700
-From: Ricardo Koller <ricarkol@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com,
-	dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	qperret@google.com, catalin.marinas@arm.com, andrew.jones@linux.dev,
-	seanjc@google.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-	eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-	rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
-	Shaoqin Huang <shahuang@redhat.com>
-Subject: Re: [PATCH v6 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
-Message-ID: <ZA+4pv6UIDpAp5aY@google.com>
-References: <20230307034555.39733-1-ricarkol@google.com>
- <20230307034555.39733-5-ricarkol@google.com>
- <87a60i5hju.wl-maz@kernel.org>
+        bh=RizlOsdd/aYe5/sxPksJfTgdJ2usMbmPaZfKYJlzqP8=;
+        b=OGHfqlbL2X0JhHik2cotDldIch+4IHnKeK+c6hVFSXEvkvxxgTA9kdGK1fCPIYTER6
+         Z/NR8KjLCg5sp63OocsaPEPXjoAA4r2/CdPadE0Nmd60Vb+DBFVDztsBjcidgZ3pRr+u
+         HZWUuT//d4zeiESveYYDFmXdTlzlSooaRGjw8sFTphkLaMtbxs7RHAL5JTHfOAcRjo5V
+         NMXPGulfG3H6jCm5qXVOvPCw26htSGtejkkTIUyJk/Pu+T/jxaQJcKLTePEjYv7JZWLe
+         epiAFvCgAalYQMZ7BAytxVkOarl53++86tT4LN/Ip5n77y8FDxKzT52BpRNnyz2eAePr
+         ew9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678767993;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RizlOsdd/aYe5/sxPksJfTgdJ2usMbmPaZfKYJlzqP8=;
+        b=u9elN2/CckH5keTbb6//rr+FvvapLATS6jivCnsq/Hy06/+ET+9QzIr2EWaCrCoBFa
+         dSpHYUvSvQ1yQ14sxaWA7KUW6KZ3/vYuvvqBRRLJl0CjK9MrXZWwwo21xTdgEUt7Ms5o
+         FruL72xkQTk9o4QS2TUyZhF8Sd/QE7lvMayS5R4iRxBCTXEYVpvClW6PDoy0PtS0lZc6
+         t2lPQO8GELE/b3lOCYm8WIJ9Rd0d7bluAdTaK9jcHvAy2aes5xpQBUBlwKR4NUwG+SG6
+         T+8IfFAmr8FLqGsjnmHLk+wb8uTzBWUf4o8lBl8QkA9v6LkWHSFvpea4b4Oq478SpIiX
+         fesw==
+X-Gm-Message-State: AO0yUKW4IN7PmKF/DwH0Kg0HjHT+Bk6ZiKHGQubgDekxg2fNi8vqbFvQ
+	M/lijKkOLGBmoLs/bF8a/HsfhPMZU6wHf/1CEuDWVQ==
+X-Google-Smtp-Source: AK7set/HMwU7DnqhKbspTbSjCWXBtYFmt2i9qoNywruBplqUuXHf6q3b05t1kVZMozlZ3NtoOHs3Dw6Iumu0WxV5ioM=
+X-Received: by 2002:aca:1c09:0:b0:384:2019:c201 with SMTP id
+ c9-20020aca1c09000000b003842019c201mr12035089oic.8.1678767992500; Mon, 13 Mar
+ 2023 21:26:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87a60i5hju.wl-maz@kernel.org>
+References: <20230228062246.1222387-1-jingzhangos@google.com>
+ <20230228062246.1222387-6-jingzhangos@google.com> <CAAeT=FyKDe9Fn1o_WUK+EUfZxkxWnYHmnVOD4Eno9aqbWWeOqQ@mail.gmail.com>
+In-Reply-To: <CAAeT=FyKDe9Fn1o_WUK+EUfZxkxWnYHmnVOD4Eno9aqbWWeOqQ@mail.gmail.com>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Mon, 13 Mar 2023 21:26:19 -0700
+Message-ID: <CAAdAUtiJ25gY6LyFueZgRV+riRSKWXza0HF3noXe_o3Sqg58NA@mail.gmail.com>
+Subject: Re: [PATCH v3 5/6] KVM: arm64: Introduce ID register specific descriptor
+To: Reiji Watanabe <reijiw@google.com>
+Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@google.com>, Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, 
+	Ricardo Koller <ricarkol@google.com>, Raghavendra Rao Ananta <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Mar 12, 2023 at 11:35:01AM +0000, Marc Zyngier wrote:
-> On Tue, 07 Mar 2023 03:45:47 +0000,
-> Ricardo Koller <ricarkol@google.com> wrote:
-> > 
-> > Add a new stage2 function, kvm_pgtable_stage2_split(), for splitting a
-> > range of huge pages. This will be used for eager-splitting huge pages
-> > into PAGE_SIZE pages. The goal is to avoid having to split huge pages
-> > on write-protection faults, and instead use this function to do it
-> > ahead of time for large ranges (e.g., all guest memory in 1G chunks at
-> > a time).
-> > 
-> > No functional change intended. This new function will be used in a
-> > subsequent commit.
-> 
-> Same comment as before about the usefulness of this last sentence.
-> 
-> > 
-> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_pgtable.h |  30 +++++++
-> >  arch/arm64/kvm/hyp/pgtable.c         | 113 +++++++++++++++++++++++++++
-> >  2 files changed, 143 insertions(+)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> > index b7b3fc0fa7a5..40e323a718fc 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -665,6 +665,36 @@ bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr);
-> >   */
-> >  int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
-> >  
-> > +/**
-> > + * kvm_pgtable_stage2_split() - Split a range of huge pages into leaf PTEs pointing
-> > + *				to PAGE_SIZE guest pages.
-> > + * @pgt:	 Page-table structure initialised by kvm_pgtable_stage2_init().
-> > + * @addr:	 Intermediate physical address from which to split.
-> > + * @size:	 Size of the range.
-> > + * @mc:		 Cache of pre-allocated and zeroed memory from which to allocate
-> > + *		 page-table pages.
-> > + * @mc_capacity: Number of pages in @mc.
-> > + *
-> > + * @addr and the end (@addr + @size) are effectively aligned down and up to
-> > + * the top level huge-page block size. This is an example using 1GB
-> > + * huge-pages and 4KB granules.
-> > + *
-> > + *                          [---input range---]
-> > + *                          :                 :
-> > + * [--1G block pte--][--1G block pte--][--1G block pte--][--1G block pte--]
-> > + *                          :                 :
-> > + *                   [--2MB--][--2MB--][--2MB--][--2MB--]
-> > + *                          :                 :
-> > + *                   [ ][ ][:][ ][ ][ ][ ][ ][:][ ][ ][ ]
-> > + *                          :                 :
-> 
-> So here, what alignment do we effectively get?
+Hi Reiji,
+
+On Sun, Mar 12, 2023 at 9:15=E2=80=AFPM Reiji Watanabe <reijiw@google.com> =
+wrote:
 >
-
-The function tries to split any block that overlaps with the input
-range. Here's another example that might be more helpful:
-
- *                                [---input range---]
- *                                :                 :
- * [--1G block pte--][--2MB--][--2MB--][--1G block pte--][--1G block pte--]
-
-is split like this:
-
- * [--1G block pte--][--2MB--][ ][ ][ ][ ][ ][ ][ ][ ][ ][--1G block pte--]
-                              <-------split range------->
-
-I think I will just use this new description instead.
-
-> > + * Return: 0 on success, negative error code on failure. Note that
-> > + * kvm_pgtable_stage2_split() is best effort: it tries to break as many
-> > + * blocks in the input range as allowed by @mc_capacity.
-> > + */
-> > +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> > +			     void *mc, u64 mc_capacity);
-> > +
-> >  /**
-> >   * kvm_pgtable_walk() - Walk a page-table.
-> >   * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index 6bdfcb671b32..3149b98d1701 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -1259,6 +1259,119 @@ kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
-> >  	return pgtable;
-> >  }
-> >  
-> > +struct stage2_split_data {
-> > +	struct kvm_s2_mmu		*mmu;
-> > +	void				*memcache;
-> > +	u64				mc_capacity;
-> 
-> Why isn't this a pointer to a *real* memcache structure?
-> 
-
-Mainly because I wanted this function to be like the other pgtable.c
-funtions that use opaque pointers to handle the vhe and nvhe cases. vhe
-uses "struct kvm_mmu_memory_cache" while nvhe uses "struct hyp_pool".
-This series only implements the vhe case but I didn't want to restrict
-kvm_pgtable_stage2_split() to vhe just because of this. Just in case, I
-have not tried it in nvhe.
-
+> Hi Jing,
+>
+> On Mon, Feb 27, 2023 at 10:23=E2=80=AFPM Jing Zhang <jingzhangos@google.c=
+om> wrote:
+> >
+> > Introduce an ID feature register specific descriptor to include ID
+> > register specific fields and callbacks besides its corresponding
+> > general system register descriptor.
+> > New fields for ID register descriptor would be added later when it
+> > is necessary to support a writable ID register.
+> >
+> > No functional change intended.
+> >
+> > Co-developed-by: Reiji Watanabe <reijiw@google.com>
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  arch/arm64/kvm/id_regs.c  | 184 ++++++++++++++++++++++++++++----------
+> >  arch/arm64/kvm/sys_regs.c |   2 +-
+> >  arch/arm64/kvm/sys_regs.h |   1 +
+> >  3 files changed, 138 insertions(+), 49 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
+> > index 21ec8fc10d79..fc0dcd557cbb 100644
+> > --- a/arch/arm64/kvm/id_regs.c
+> > +++ b/arch/arm64/kvm/id_regs.c
+> > @@ -18,6 +18,10 @@
+> >
+> >  #include "sys_regs.h"
+> >
+> > +struct id_reg_desc {
+> > +       const struct sys_reg_desc       reg_desc;
 > > +};
 > > +
-> > +/*
-> > + * Get the number of page-tables needed to replace a block with a
-> > + * fully populated tree, up to the PTE level, at particular level.
-> > + */
-> > +static inline int stage2_block_get_nr_page_tables(u32 level)
-> 
-> Please drop the inline. The compiler will figure it out.
-> 
-> > +{
-> > +	if (WARN_ON_ONCE(level < KVM_PGTABLE_MIN_BLOCK_LEVEL ||
-> > +			 level >= KVM_PGTABLE_MAX_LEVELS))
-> > +		return -EINVAL;
-> 
-> Move this check to the 'default' case below.
-> 
+> >  static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
+> >  {
+> >         if (kvm_vcpu_has_pmu(vcpu))
+> > @@ -326,21 +330,25 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+> >  }
+> >
+> >  /* sys_reg_desc initialiser for known cpufeature ID registers */
+> > -#define ID_SANITISED(name) {                   \
+> > -       SYS_DESC(SYS_##name),                   \
+> > -       .access =3D access_id_reg,                \
+> > -       .get_user =3D get_id_reg,                 \
+> > -       .set_user =3D set_id_reg,                 \
+> > -       .visibility =3D id_visibility,            \
+> > +#define ID_SANITISED(name) {                           \
+> > +       .reg_desc =3D {                                   \
+> > +               SYS_DESC(SYS_##name),                   \
+> > +               .access =3D access_id_reg,                \
+> > +               .get_user =3D get_id_reg,                 \
+> > +               .set_user =3D set_id_reg,                 \
+> > +               .visibility =3D id_visibility,            \
+> > +       },                                              \
+> >  }
+> >
+> >  /* sys_reg_desc initialiser for known cpufeature ID registers */
+> > -#define AA32_ID_SANITISED(name) {              \
+> > -       SYS_DESC(SYS_##name),                   \
+> > -       .access =3D access_id_reg,                \
+> > -       .get_user =3D get_id_reg,                 \
+> > -       .set_user =3D set_id_reg,                 \
+> > -       .visibility =3D aa32_id_visibility,       \
+> > +#define AA32_ID_SANITISED(name) {                      \
+> > +       .reg_desc =3D {                                   \
+> > +               SYS_DESC(SYS_##name),                   \
+> > +               .access =3D access_id_reg,                \
+> > +               .get_user =3D get_id_reg,                 \
+> > +               .set_user =3D set_id_reg,                 \
+> > +               .visibility =3D aa32_id_visibility,       \
+> > +       },                                              \
+> >  }
+> >
+> >  /*
+> > @@ -348,12 +356,14 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+> >   * register with encoding Op0=3D3, Op1=3D0, CRn=3D0, CRm=3Dcrm, Op2=3D=
+op2
+> >   * (1 <=3D crm < 8, 0 <=3D Op2 < 8).
+> >   */
+> > -#define ID_UNALLOCATED(crm, op2) {                     \
+> > -       Op0(3), Op1(0), CRn(0), CRm(crm), Op2(op2),     \
+> > -       .access =3D access_id_reg,                        \
+> > -       .get_user =3D get_id_reg,                         \
+> > -       .set_user =3D set_id_reg,                         \
+> > -       .visibility =3D raz_visibility                    \
+> > +#define ID_UNALLOCATED(crm, op2) {                             \
+> > +       .reg_desc =3D {                                           \
+> > +               Op0(3), Op1(0), CRn(0), CRm(crm), Op2(op2),     \
+> > +               .access =3D access_id_reg,                        \
+> > +               .get_user =3D get_id_reg,                         \
+> > +               .set_user =3D set_id_reg,                         \
+> > +               .visibility =3D raz_visibility                    \
+> > +       },                                                      \
+> >  }
+> >
+> >  /*
+> > @@ -361,15 +371,17 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+> >   * For now, these are exposed just like unallocated ID regs: they appe=
+ar
+> >   * RAZ for the guest.
+> >   */
+> > -#define ID_HIDDEN(name) {                      \
+> > -       SYS_DESC(SYS_##name),                   \
+> > -       .access =3D access_id_reg,                \
+> > -       .get_user =3D get_id_reg,                 \
+> > -       .set_user =3D set_id_reg,                 \
+> > -       .visibility =3D raz_visibility,           \
+> > +#define ID_HIDDEN(name) {                              \
+> > +       .reg_desc =3D {                                   \
+> > +               SYS_DESC(SYS_##name),                   \
+> > +               .access =3D access_id_reg,                \
+> > +               .get_user =3D get_id_reg,                 \
+> > +               .set_user =3D set_id_reg,                 \
+> > +               .visibility =3D raz_visibility,           \
+> > +       },                                              \
+> >  }
+> >
+> > -static const struct sys_reg_desc id_reg_descs[] =3D {
+> > +static const struct id_reg_desc id_reg_descs[KVM_ARM_ID_REG_NUM] =3D {
+> >         /*
+> >          * ID regs: all ID_SANITISED() entries here must have correspon=
+ding
+> >          * entries in arm64_ftr_regs[].
+> > @@ -379,9 +391,13 @@ static const struct sys_reg_desc id_reg_descs[] =
+=3D {
+> >         /* CRm=3D1 */
+> >         AA32_ID_SANITISED(ID_PFR0_EL1),
+> >         AA32_ID_SANITISED(ID_PFR1_EL1),
+> > -       { SYS_DESC(SYS_ID_DFR0_EL1), .access =3D access_id_reg,
+> > -         .get_user =3D get_id_reg, .set_user =3D set_id_dfr0_el1,
+> > -         .visibility =3D aa32_id_visibility, },
+> > +       { .reg_desc =3D {
+> > +               SYS_DESC(SYS_ID_DFR0_EL1),
+> > +               .access =3D access_id_reg,
+> > +               .get_user =3D get_id_reg,
+> > +               .set_user =3D set_id_dfr0_el1,
+> > +               .visibility =3D aa32_id_visibility, },
+> > +       },
+> >         ID_HIDDEN(ID_AFR0_EL1),
+> >         AA32_ID_SANITISED(ID_MMFR0_EL1),
+> >         AA32_ID_SANITISED(ID_MMFR1_EL1),
+> > @@ -410,8 +426,12 @@ static const struct sys_reg_desc id_reg_descs[] =
+=3D {
+> >
+> >         /* AArch64 ID registers */
+> >         /* CRm=3D4 */
+> > -       { SYS_DESC(SYS_ID_AA64PFR0_EL1), .access =3D access_id_reg,
+> > -         .get_user =3D get_id_reg, .set_user =3D set_id_aa64pfr0_el1, =
+},
+> > +       { .reg_desc =3D {
+> > +               SYS_DESC(SYS_ID_AA64PFR0_EL1),
+> > +               .access =3D access_id_reg,
+> > +               .get_user =3D get_id_reg,
+> > +               .set_user =3D set_id_aa64pfr0_el1, },
+> > +       },
+> >         ID_SANITISED(ID_AA64PFR1_EL1),
+> >         ID_UNALLOCATED(4, 2),
+> >         ID_UNALLOCATED(4, 3),
+> > @@ -421,8 +441,12 @@ static const struct sys_reg_desc id_reg_descs[] =
+=3D {
+> >         ID_UNALLOCATED(4, 7),
+> >
+> >         /* CRm=3D5 */
+> > -       { SYS_DESC(SYS_ID_AA64DFR0_EL1), .access =3D access_id_reg,
+> > -         .get_user =3D get_id_reg, .set_user =3D set_id_aa64dfr0_el1, =
+},
+> > +       { .reg_desc =3D {
+> > +               SYS_DESC(SYS_ID_AA64DFR0_EL1),
+> > +               .access =3D access_id_reg,
+> > +               .get_user =3D get_id_reg,
+> > +               .set_user =3D set_id_aa64dfr0_el1, },
+> > +       },
+> >         ID_SANITISED(ID_AA64DFR1_EL1),
+> >         ID_UNALLOCATED(5, 2),
+> >         ID_UNALLOCATED(5, 3),
+> > @@ -461,12 +485,12 @@ static const struct sys_reg_desc id_reg_descs[] =
+=3D {
+> >   */
+> >  int emulate_id_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *param=
+s)
+> >  {
+> > -       const struct sys_reg_desc *r;
+> > +       u32 id;
+> >
+> > -       r =3D find_reg(params, id_reg_descs, ARRAY_SIZE(id_reg_descs));
+> > +       id =3D reg_to_encoding(params);
+> >
+> > -       if (likely(r)) {
+> > -               perform_access(vcpu, params, r);
+> > +       if (likely(is_id_reg(id))) {
+> > +               perform_access(vcpu, params, &id_reg_descs[IDREG_IDX(id=
+)].reg_desc);
+> >         } else {
+> >                 print_sys_reg_msg(params,
+> >                                   "Unsupported guest id_reg access at: =
+%lx [%08lx]\n",
+> > @@ -483,38 +507,102 @@ void kvm_arm_reset_id_regs(struct kvm_vcpu *vcpu=
+)
+> >         unsigned long i;
+> >
+> >         for (i =3D 0; i < ARRAY_SIZE(id_reg_descs); i++)
+> > -               if (id_reg_descs[i].reset)
+> > -                       id_reg_descs[i].reset(vcpu, &id_reg_descs[i]);
+> > +               if (id_reg_descs[i].reg_desc.reset)
+> > +                       id_reg_descs[i].reg_desc.reset(vcpu, &id_reg_de=
+scs[i].reg_desc);
+> >  }
+> >
+> >  int kvm_arm_get_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg=
+ *reg)
+> >  {
+> > -       return kvm_sys_reg_get_user(vcpu, reg,
+> > -                                   id_reg_descs, ARRAY_SIZE(id_reg_des=
+cs));
+> > +       u64 __user *uaddr =3D (u64 __user *)(unsigned long)reg->addr;
+> > +       const struct sys_reg_desc *r;
+> > +       struct sys_reg_params params;
+> > +       u64 val;
+> > +       int ret;
+> > +       u32 id;
 > > +
-> > +	switch (level) {
-> > +	case 1:
-> > +		return PTRS_PER_PTE + 1;
-> > +	case 2:
-> > +		return 1;
-> 
-> This is odd. Replacing a block by a table always requires
-> 'PTRS_PER_PTE + 1' pages. Why 1? If this is some special treatment for
-> level-2 mappings, please spell it out.
-
-I'm not sure I understand. I'm interpreting "level=X" as in "level X
-entry".  More specifically, using PAGE_SIZE=4096 as an example:
-
-a level 3 entry (a PTE): a 4096 block needs 0 page-table pages
-a level 2 entry: a 2M block needs 1 page-table pages
-a level 1 entry: a 1G block needs 512+1 page-table pages
-
-> 
-> > +	case 3:
-> > +		return 0;
-> > +	default:
-> > +		return -EINVAL;
-> > +	};
-> > +}
+> > +       if (!index_to_params(reg->id, &params))
+> > +               return -ENOENT;
+> > +       id =3D reg_to_encoding(&params);
 > > +
-> > +static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
-> > +			       enum kvm_pgtable_walk_flags visit)
-> > +{
-> > +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
-> > +	struct stage2_split_data *data = ctx->arg;
-> > +	kvm_pte_t pte = ctx->old, new, *childp;
-> > +	enum kvm_pgtable_prot prot;
-> > +	void *mc = data->memcache;
-> > +	u32 level = ctx->level;
-> > +	bool force_pte;
-> > +	int nr_pages;
-> > +	u64 phys;
+> > +       if (!is_id_reg(id))
+> > +               return -ENOENT;
 > > +
-> > +	/* No huge-pages exist at the last level */
-> > +	if (level == KVM_PGTABLE_MAX_LEVELS - 1)
-> > +		return 0;
-> 
-> Why the check for level 3 in the previous function if never get there?
-> 
-
-Was trying to make stage2_block_get_nr_page_tables() useful for other
-cases. It's still correct for other cases to ask how many page-table
-pages are needed for a PTE (stage2_block_get_nr_page_tables(3) -> 0).
-
+> > +       r =3D &id_reg_descs[IDREG_IDX(id)].reg_desc;
+> > +       if (r->get_user) {
+> > +               ret =3D (r->get_user)(vcpu, r, &val);
+> > +       } else {
+> > +               ret =3D 0;
+> > +               val =3D IDREG(vcpu->kvm, id);
+> > +       }
 > > +
-> > +	/* We only split valid block mappings */
-> > +	if (!kvm_pte_valid(pte))
-> > +		return 0;
+> > +       if (!ret)
+> > +               ret =3D put_user(val, uaddr);
 > > +
-> > +	nr_pages = stage2_block_get_nr_page_tables(level);
-> > +	if (nr_pages < 0)
-> > +		return nr_pages;
+> > +       return ret;
+> >  }
+> >
+> >  int kvm_arm_set_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg=
+ *reg)
+> >  {
+> > -       return kvm_sys_reg_set_user(vcpu, reg,
+> > -                                   id_reg_descs, ARRAY_SIZE(id_reg_des=
+cs));
+> > +       u64 __user *uaddr =3D (u64 __user *)(unsigned long)reg->addr;
+> > +       const struct sys_reg_desc *r;
+> > +       struct sys_reg_params params;
+> > +       u64 val;
+> > +       int ret;
+> > +       u32 id;
 > > +
-> > +	if (data->mc_capacity >= nr_pages) {
-> > +		/* Build a tree mapped down to the PTE granularity. */
-> > +		force_pte = true;
-> > +	} else {
-> > +		/*
-> > +		 * Don't force PTEs. This requires a single page of PMDs at the
-> > +		 * PUD level, or a single page of PTEs at the PMD level. If we
-> > +		 * are at the PUD level, the PTEs will be created recursively.
-> > +		 */
-> 
-> I don't understand how you reach this 'single page' conclusion. You
-> need to explain why you get there.
-
-Ack, will expand it.
-
-> 
-> > +		force_pte = false;
-> > +		nr_pages = 1;
-> > +	}
+> > +       if (!index_to_params(reg->id, &params))
+> > +               return -ENOENT;
+> > +       id =3D reg_to_encoding(&params);
 > > +
-> > +	if (data->mc_capacity < nr_pages)
-> > +		return -ENOMEM;
+> > +       if (!is_id_reg(id))
+> > +               return -ENOENT;
 > > +
-> > +	phys = kvm_pte_to_phys(pte);
-> > +	prot = kvm_pgtable_stage2_pte_prot(pte);
+> > +       if (get_user(val, uaddr))
+> > +               return -EFAULT;
 > > +
-> > +	childp = kvm_pgtable_stage2_create_unlinked(data->mmu->pgt, phys,
-> > +						    level, prot, mc, force_pte);
-> > +	if (IS_ERR(childp))
-> > +		return PTR_ERR(childp);
+> > +       r =3D &id_reg_descs[IDREG_IDX(id)].reg_desc;
 > > +
-> > +	if (!stage2_try_break_pte(ctx, data->mmu)) {
-> > +		kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
-> > +		mm_ops->put_page(childp);
-> > +		return -EAGAIN;
-> > +	}
+> > +       if (sysreg_user_write_ignore(vcpu, r))
+> > +               return 0;
 > > +
-> > +	/*
-> > +	 * Note, the contents of the page table are guaranteed to be made
-> > +	 * visible before the new PTE is assigned because stage2_make_pte()
-> > +	 * writes the PTE using smp_store_release().
-> > +	 */
-> > +	new = kvm_init_table_pte(childp, mm_ops);
-> > +	stage2_make_pte(ctx, new);
-> > +	dsb(ishst);
-> > +	data->mc_capacity -= nr_pages;
-> > +	return 0;
-> > +}
+> > +       if (r->set_user) {
+> > +               ret =3D (r->set_user)(vcpu, r, val);
+> > +       } else {
+> > +               WARN_ONCE(1, "ID register set_user callback is NULL\n")=
+;
+> > +               ret =3D 0;
+> > +       }
 > > +
-> > +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> > +			     void *mc, u64 mc_capacity)
-> > +{
-> > +	struct stage2_split_data split_data = {
-> > +		.mmu		= pgt->mmu,
-> > +		.memcache	= mc,
-> > +		.mc_capacity	= mc_capacity,
-> > +	};
+> > +       return ret;
+> >  }
+> >
+> >  bool kvm_arm_check_idreg_table(void)
+> >  {
+> > -       return check_sysreg_table(id_reg_descs, ARRAY_SIZE(id_reg_descs=
+), false);
+> > +       unsigned int i;
 > > +
-> > +	struct kvm_pgtable_walker walker = {
-> > +		.cb	= stage2_split_walker,
-> > +		.flags	= KVM_PGTABLE_WALK_LEAF,
-> > +		.arg	= &split_data,
-> > +	};
+> > +       for (i =3D 0; i < ARRAY_SIZE(id_reg_descs); i++) {
+> > +               const struct sys_reg_desc *r =3D &id_reg_descs[i].reg_d=
+esc;
 > > +
-> > +	return kvm_pgtable_walk(pgt, addr, size, &walker);
-> > +}
+> > +               if (IDREG_IDX(reg_to_encoding(r)) !=3D i) {
+>
+> As I mentioned for the previous version of the patch,
+> can we also check if this is an ID register ?
+Sure, will use is_id_reg() to do the checking.
+>
+> > +                       kvm_err("id_reg table %pS entry %d not set corr=
+ectly\n",
+> > +                               &id_reg_descs[i].reg_desc, i);
+> > +                       return false;
+> > +               }
+> > +       }
 > > +
-> >  int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
-> >  			      struct kvm_pgtable_mm_ops *mm_ops,
-> >  			      enum kvm_pgtable_stage2_flags flags,
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+> > +       return true;
+> >  }
+> >
+> >  int kvm_arm_walk_id_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
+> >  {
+> > -       const struct sys_reg_desc *i2, *end2;
+> > +       const struct id_reg_desc *i2, *end2;
+> >         unsigned int total =3D 0;
+> >         int err;
+> >
+> >         i2 =3D id_reg_descs;
+> >         end2 =3D id_reg_descs + ARRAY_SIZE(id_reg_descs);
+> >
+> > -       while (i2 !=3D end2) {
+> > -               err =3D walk_one_sys_reg(vcpu, i2++, &uind, &total);
+> > +       for (; i2 !=3D end2; i2++) {
+> > +               err =3D walk_one_sys_reg(vcpu, &(i2->reg_desc), &uind, =
+&total);
+> >                 if (err)
+> >                         return err;
+> >         }
+> > @@ -532,12 +620,12 @@ void kvm_arm_set_default_id_regs(struct kvm *kvm)
+> >         u64 val;
+> >
+> >         for (i =3D 0; i < ARRAY_SIZE(id_reg_descs); i++) {
+> > -               id =3D reg_to_encoding(&id_reg_descs[i]);
+> > +               id =3D reg_to_encoding(&id_reg_descs[i].reg_desc);
+> >                 if (WARN_ON_ONCE(!is_id_reg(id)))
+>
+> If kvm_arm_check_idreg_table() checks all entries in the table
+> are an ID register, we can remove this checking from here.
+Agreed.
+>
+> Thank you,
+> Reiji
+>
+>
+> >                         /* Shouldn't happen */
+> >                         continue;
+> >
+> > -               if (id_reg_descs[i].visibility =3D=3D raz_visibility)
+> > +               if (id_reg_descs[i].reg_desc.visibility =3D=3D raz_visi=
+bility)
+> >                         /* Hidden or reserved ID register */
+> >                         continue;
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 568ebc0fb15c..7b63d9038639 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -2519,7 +2519,7 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
+> >   * Userspace API
+> >   *********************************************************************=
+********/
+> >
+> > -static bool index_to_params(u64 id, struct sys_reg_params *params)
+> > +bool index_to_params(u64 id, struct sys_reg_params *params)
+> >  {
+> >         switch (id & KVM_REG_SIZE_MASK) {
+> >         case KVM_REG_SIZE_U64:
+> > diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+> > index 9231d89889c7..094a7f19d93f 100644
+> > --- a/arch/arm64/kvm/sys_regs.h
+> > +++ b/arch/arm64/kvm/sys_regs.h
+> > @@ -239,6 +239,7 @@ static inline bool is_id_reg(u32 id)
+> >
+> >  void perform_access(struct kvm_vcpu *vcpu, struct sys_reg_params *para=
+ms,
+> >                     const struct sys_reg_desc *r);
+> > +bool index_to_params(u64 id, struct sys_reg_params *params);
+> >  const struct sys_reg_desc *get_reg_by_id(u64 id,
+> >                                          const struct sys_reg_desc tabl=
+e[],
+> >                                          unsigned int num);
+> > --
+> > 2.39.2.722.g9855ee24e9-goog
+> >
+Thanks,
+Jing
