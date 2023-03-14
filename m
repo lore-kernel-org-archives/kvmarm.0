@@ -1,102 +1,164 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DC963236
-	for <kvmarm@lists.linux.dev>; Tue, 14 Mar 2023 10:18:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4197BC433EF;
-	Tue, 14 Mar 2023 10:18:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1678789091;
-	bh=bCtRPQv7hL+bF58dkg997VbbVXYl579kzeqhbRSP2b4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ODszmiBoQxpTOi9EMHIVmHNf2jTeV+UKLilm9lMIVNRKE1l00mgy7uRvjjYa/MaR/
-	 wQhF365xrZLf9ag6Q3pa+8FYzQkkJ6U0B9ka0Lfm3ZbTFh5p+2WFH7g6p/xuznF3bZ
-	 epZQAXvr36fjPFZcEZC1BYdX3lVKmtA7aSBImHJEHOpzBgRPkRg/wCN8JTdpdl4Ze8
-	 oMPPj2qcFkqiur1VIxcecybUAh9wKljZ6TObzCBslv0W47gXsL0AwK83czBqKzRPRU
-	 zsr8Ii+jm8hZWKmKxz4PB/L79EK3BcrgDYuIU6RBi1u4uPxPc/ooihn/JSTkq4QPvS
-	 6NqLaVW864a0w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pc1jM-00HW40-Rg;
-	Tue, 14 Mar 2023 10:18:09 +0000
-Date: Tue, 14 Mar 2023 10:18:08 +0000
-Message-ID: <86ilf3y6u7.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Ricardo Koller <ricarkol@google.com>,
-	pbonzini@redhat.com,
-	oupton@google.com,
-	yuzenghui@huawei.com,
-	dmatlack@google.com,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	qperret@google.com,
-	catalin.marinas@arm.com,
-	andrew.jones@linux.dev,
-	alexandru.elisei@arm.com,
-	suzuki.poulose@arm.com,
-	eric.auger@redhat.com,
-	gshan@redhat.com,
-	reijiw@google.com,
-	rananta@google.com,
-	bgardon@google.com,
-	ricarkol@gmail.com,
-	Shaoqin Huang <shahuang@redhat.com>
-Subject: Re: [PATCH v6 07/12] KVM: arm64: Export kvm_are_all_memslots_empty()
-In-Reply-To: <ZA8+31vQA6vcQuK2@google.com>
-References: <20230307034555.39733-1-ricarkol@google.com>
-	<20230307034555.39733-8-ricarkol@google.com>
-	<878rg25hbq.wl-maz@kernel.org>
-	<ZA8+31vQA6vcQuK2@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBBFF320A;
+	Tue, 14 Mar 2023 11:03:00 +0000 (UTC)
+Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.201])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4PbVw92GJMz6J7Km;
+	Tue, 14 Mar 2023 19:02:01 +0800 (CST)
+Received: from localhost (10.48.148.120) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Tue, 14 Mar
+ 2023 11:02:51 +0000
+Date: Tue, 14 Mar 2023 11:02:50 +0000
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: James Morse <james.morse@arm.com>
+CC: <linux-pm@vger.kernel.org>, <loongarch@lists.linux.dev>,
+	<kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
+	<linux-acpi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
+	<linux-ia64@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <x86@kernel.org>, Marc Zyngier
+	<maz@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Lorenzo Pieralisi
+	<lpieralisi@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Sudeep Holla
+	<sudeep.holla@arm.com>, Borislav Petkov <bp@alien8.de>, H Peter Anvin
+	<hpa@zytor.com>, Dave Hansen <dave.hansen@linux.intel.com>, Ingo Molnar
+	<mingo@redhat.com>, Will Deacon <will@kernel.org>, Catalin Marinas
+	<catalin.marinas@arm.com>, Huacai Chen <chenhuacai@kernel.org>, "Suzuki K
+ Poulose" <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, Len
+ Brown <lenb@kernel.org>, Rafael Wysocki <rafael@kernel.org>, "WANG Xuerui"
+	<kernel@xen0n.name>, Salil Mehta <salil.mehta@huawei.com>, "Russell King"
+	<linux@armlinux.org.uk>, <kangkang.shen@futurewei.com>
+Subject: Re: [RFC PATCH 00/32] ACPI/arm64: add support for virtual
+ cpuhotplug
+Message-ID: <20230314110250.00005685@Huawei.com>
+In-Reply-To: <1f21673e-e5e6-a158-94a4-6ae6724c1f93@arm.com>
+References: <20230203135043.409192-1-james.morse@arm.com>
+	<20230307120050.000032f1@Huawei.com>
+	<1f21673e-e5e6-a158-94a4-6ae6724c1f93@arm.com>
+Followup-To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seanjc@google.com, ricarkol@google.com, pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com, andrew.jones@linux.dev, alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com, rananta@google.com, bgardon@google.com, ricarkol@gmail.com, shahuang@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: quoted-printable
+X-Originating-IP: [10.48.148.120]
+X-ClientProxiedBy: lhrpeml500003.china.huawei.com (7.191.162.67) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
+X-CFilter-Loop: Reflected
 
-On Mon, 13 Mar 2023 15:18:55 +0000,
-Sean Christopherson <seanjc@google.com> wrote:
-> 
-> On Sun, Mar 12, 2023, Marc Zyngier wrote:
-> > On Tue, 07 Mar 2023 03:45:50 +0000,
-> > Ricardo Koller <ricarkol@google.com> wrote:
-> > > No functional change intended.
-> > 
-> > I wish people stopped adding this pointless sentence to commit
-> > messages. All changes have a functional change one way or another,
-> > unless you are only changing a comment.
-> 
-> The implied context is that there is no change in runtime functionality, which
-> does hold true for many changes.  I personally find the annotation helpful, both
-> for code review and when doing git archaeology.  If a changelog states that the
-> author doesn't/didn't intend a functional change, then _any_ change in (runtime)
-> functionality becomes a red flag, and for me, prompts a closer look regardless of
-> whether or not I have other concerns with the patch/commit.
+On Mon, 13 Mar 2023 15:50:52 +0000
+James Morse <james.morse@arm.com> wrote:
 
-And I think it lures the reviewer into a false sense of security. No
-intended change, must be fine. Except when it is not. More often than
-not, we end-up with seemingly innocent changes that break things.
+> Hi Jonathan,
+>=20
+> On 07/03/2023 12:00, Jonathan Cameron wrote:
+> > On Fri,  3 Feb 2023 13:50:11 +0000
+> > James Morse <james.morse@arm.com> wrote: =20
+>=20
+> >> On a system that supports cpuhotplug the MADT has to describe every po=
+ssible
+> >> CPU at boot. Under KVM, the vGIC needs to know about every possible vC=
+PU before
+> >> the guest is started.
+> >> With these constraints, virtual-cpuhotplug is really just a hypervisor=
+/firmware
+> >> policy about which CPUs can be brought online.
+> >>
+> >> This series adds support for virtual-cpuhotplug as exactly that: firmw=
+are
+> >> policy. This may even work on a physical machine too; for a guest the =
+part of
+> >> firmware is played by the VMM. (typically Qemu).
+> >>
+> >> PSCI support is modified to return 'DENIED' if the CPU can't be brought
+> >> online/enabled yet. The CPU object's _STA method's enabled bit is used=
+ to
+> >> indicate firmware's current disposition. If the CPU has its enabled bi=
+t clear,
+> >> it will not be registered with sysfs, and attempts to bring it online =
+will
+> >> fail. The notifications that _STA has changed its value then work in t=
+he same
+> >> way as physical hotplug, and firmware can cause the CPU to be register=
+ed some
+> >> time later, allowing it to be brought online. =20
+>=20
+> > As we discussed on an LOD call a while back, I think that we need some =
+path to
+> > find out if the guest supports vCPU HP or not so that info can be queri=
+ed by
+> > an orchestrator / libvirt etc.  In general the entity responsible for a=
+llocating
+> > extra vCPUs may not know what support the VM has for this feature. =20
+>=20
+> I agree. For arm64 this is going to be important if/when there are machin=
+es that do
+> physical hotplug of CPUs too.
+>=20
+>=20
+> > There are various ways we could get this information into the VMM.
+> > My immediate thought is to use one of the ACPI interfaces that lets us =
+write
+> > AML that can set an emulated register. A query to the VMM can check if =
+this
+> > register is set.
+> >=20
+> > So options.
+> >=20
+> > _OSI() - Deprecated on ARM64 so lets not use that ;) =20
+>=20
+> News to me, I've only just discovered it!
+>=20
+>=20
+> > _OSC() - Could add a bit to Table 6.13 Platform-Wide Capabilites in ACP=
+I 6.5 spec.
+> >          Given x86 has a similar online capable bit perhaps this is the=
+ best option
+> >          though it is the one that requires a formal code first proposa=
+l to ASWG. =20
+>=20
+> I've had a go at writing this one:
+> https://gitlab.arm.com/linux-arm/linux-jm/-/commit/220b0d8b0261d7467c8705=
+e6f614d57325798859
 
-It is even worse when things get (for good or bad reasons) backported
-to -stable or an internal tree of some description. "No functional
-change" can become something very different in another context. How do
-you communicate this?
+=46rom a quick glance that looks good to me.
 
-Maybe I'll add a standard disclaimer to my own patches ("Here be
-dragons!").
+>=20
+> It'll appear in the v1 of the series once the kernel and qemu bits are al=
+l lined up again.
 
-	M.
+We'll also need to kick off the spec change with a code-first proposal.
+I think current standard way to do that is a bugzilla entry in EDK2 repo=20
+https://bugzilla.tianocore.org/buglist.cgi?component=3DSpecification%20Upda=
+te&product=3DEDK2%20Code%20First&resolution=3D---
+and the get someone in ASWG to create equivalent tracking issue in mantis.
 
--- 
-Without deviation from the norm, progress is not possible.
+Great if you already have that in hand via relevant ARM folks.
+
+Jonathan
+
+>=20
+>=20
+> Thanks,
+>=20
+> James
+>=20
+>=20
+> > _OSC() - Could add a new UUID and put it under a suitable device - mayb=
+e all CPUs?
+> >          You could definitely argue this feature is an operating system=
+ property.
+> > _DSM() - Similar to OSC but always under a device.
+> >          Whilst can be used for this I'm not sure it really matches int=
+ended usecase.
+> >=20
+> > Assuming everyone agrees this bit of introspection is useful,
+> > Rafael / other ACPI specialists: Any suggestions on how best to do this=
+? =20
+>=20
+
