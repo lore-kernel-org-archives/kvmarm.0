@@ -1,179 +1,101 @@
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CD038F69;
-	Tue, 14 Mar 2023 15:44:40 +0000 (UTC)
-Received: by mail-lf1-f50.google.com with SMTP id t11so20597129lfr.1;
-        Tue, 14 Mar 2023 08:44:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678808678; x=1681400678;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cgTpDdjkEtDwUyqMsKfKimgkpTko/+U4mjHsdeCCyAw=;
-        b=jn+4fsbltc9iHB3Pg5GN3DIZTz8zMRzUeKeAIzOiTyYvXPUn/3asS8Ueyq6cSIzv7b
-         KfOshWG4YecYkTM5ULwjC66WFhoMkDdpEsW4UewwGMGhucUoNikdZIvciTL/i9szXTHL
-         FaSQuKBvVTEdjgSN5O6bAMSKQAoFg5wFR7nLwLZaGgpQ03j2Xwo8SL9alAhePo7gOL2n
-         gpbcyWjJKAS45cJ/PMATN1DElGUDwNAQsfI9nSwIb+Z5CNVqPov6+NDgMeku5Ypt6UEC
-         AGzG6Fg35jFPB1Wjjd8Bq8F4T8S93tyGqnVoDw03OQJy9gifmcrNyqbXz9WIeArpE2BA
-         /p/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678808678; x=1681400678;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cgTpDdjkEtDwUyqMsKfKimgkpTko/+U4mjHsdeCCyAw=;
-        b=LXh7LN5gQLqIgiZGpCwP8lv1E9d4WVc+n2n9QD4GEEnd1s71ybYjgcyWYAvuYFIgNm
-         q4QQ7ChLO8u3sjGACbDo4wxFoNf+yziRIAPRNQbQp0Baq+GS84ZAyxGveTOf0AjIj8/T
-         e7y+x7L4ene6m5sU9/3pQFuI9F7NdmWDrAIH6u6P/jSpm4t+GhnBVyXhF7fC+FnQ1PO8
-         Tk3Z6KDSwajbrtsHVyPlS4uAfWX41DFwZ+BTUeE9Flkeg23wDCZFIbOupWanZ6ao4Txy
-         SPXT02craT/sOIGDpFhVRqSl3pYH8fUUOuk4gCIIVB0OCS8AozJQFxTZJyZjZC9yDp0U
-         RrLg==
-X-Gm-Message-State: AO0yUKW5invht39G+EMsF0O81ewSRbmxJrg2MLhxlExquAchgk2dTsvR
-	Gm1i2kRUJBFDgssqaeBQLEo=
-X-Google-Smtp-Source: AK7set9Y1zV5rLAEEvjenaYbvtewXbHCXiE3dOYMiaGQa6T/jHn8v6l35bVSLf5V1f4SsCB9xAyJDg==
-X-Received: by 2002:ac2:5239:0:b0:4db:3467:f2ff with SMTP id i25-20020ac25239000000b004db3467f2ffmr62296lfl.5.1678808678111;
-        Tue, 14 Mar 2023 08:44:38 -0700 (PDT)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id w16-20020ac25990000000b004cb1de3f487sm443117lfn.104.2023.03.14.08.44.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Mar 2023 08:44:38 -0700 (PDT)
-Date: Tue, 14 Mar 2023 17:44:36 +0200
-From: Zhi Wang <zhi.wang.linux@gmail.com>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Catalin Marinas
- <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon
- <will@kernel.org>, James Morse <james.morse@arm.com>, Oliver Upton
- <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, Alexandru
- Elisei <alexandru.elisei@arm.com>, Christoffer Dall
- <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev
-Subject: Re: [RFC PATCH 15/28] KVM: arm64: Handle realm MMIO emulation
-Message-ID: <20230314174436.0000584d@gmail.com>
-In-Reply-To: <e0354676-e8cf-6ea0-3229-a55d90259f8e@arm.com>
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
-	<20230127112932.38045-1-steven.price@arm.com>
-	<20230127112932.38045-16-steven.price@arm.com>
-	<20230306173751.000026d4@gmail.com>
-	<e0354676-e8cf-6ea0-3229-a55d90259f8e@arm.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425B73C30
+	for <kvmarm@lists.linux.dev>; Tue, 14 Mar 2023 16:31:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D989CC433EF;
+	Tue, 14 Mar 2023 16:31:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1678811500;
+	bh=ARC9WBAhBVNF4Tztw+npvVi7tSsxTYJsQSXYXedfHHg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qj2EMqg+tWF6I0RiRIFJxaGmxwCo4aQ9Pwt/roF+/gI36ZhlwL2tqAM1P+PmBCf5Z
+	 c2FXor5ppSLyGiHzoTNmItOaOC/NGcfdw+uVUHuZxlHyudsqjWT5y/0kUYxlms86PX
+	 yqOj1HvKbbWmEofHGXiGeU75lV7OEtZkVum4Fe+LiYBzShRoVvnEn2CwmLuN5F3BSQ
+	 szjnOa1MG9n4VrEAljHEYnqeIF3erX2GMQAPCNYsZyQk7G688+wm4qomx9milYSwxE
+	 1jW6l8zvArDZRUt/5CU/DcbXAE2+/tXW1/sKrwHoYggaKzVS0YE7AuVZTOYfAi4+r3
+	 0XeVxW+WjIHOA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pc7Yo-0001sY-Fs;
+	Tue, 14 Mar 2023 16:31:38 +0000
+Date: Tue, 14 Mar 2023 16:31:38 +0000
+Message-ID: <86fsa7xpjp.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: David Matlack <dmatlack@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	stable@vger.kernel.org,
+	Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH] KVM: arm64: Retry fault if vma_lookup() results become invalid
+In-Reply-To: <20230313235454.2964067-1-dmatlack@google.com>
+References: <20230313235454.2964067-1-dmatlack@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dmatlack@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, mtosatti@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, stable@vger.kernel.org, seanjc@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 10 Mar 2023 15:47:14 +0000
-Steven Price <steven.price@arm.com> wrote:
+[Dropping Christoffer's 11 year obsolete address...]
 
-> On 06/03/2023 15:37, Zhi Wang wrote:
-> > On Fri, 27 Jan 2023 11:29:19 +0000
-> > Steven Price <steven.price@arm.com> wrote:
-> >   
-> >> MMIO emulation for a realm cannot be done directly with the VM's
-> >> registers as they are protected from the host. However the RMM interface
-> >> provides a structure member for providing the read/written value and  
-> > 
-> > More details would be better for helping the review. I can only see the
-> > emulated mmio value from the device model (kvmtool or kvm_io_bus) is put into
-> > the GPRS[0] of the RecEntry object. But the rest of the flow is missing.  
+On Mon, 13 Mar 2023 23:54:54 +0000,
+David Matlack <dmatlack@google.com> wrote:
 > 
-> The commit message is out of date (sorry about that). A previous version
-> of the spec had a dedicated member for the read/write value, but this
-> was changed to just use GPRS[0] as you've spotted. I'll update the text.
+> Read mmu_invalidate_seq before dropping the mmap_lock so that KVM can
+> detect if the results of vma_lookup() (e.g. vma_shift) become stale
+> before it acquires kvm->mmu_lock. This fixes a theoretical bug where a
+> VMA could be changed by userspace after vma_lookup() and before KVM
+> reads the mmu_invalidate_seq, causing KVM to install page table entries
+> based on a (possibly) no-longer-valid vma_shift.
 > 
-> > I guess RMM copies the value in the RecEntry.GPRS[0] to the target GPR in the
-> > guest context in RMI_REC_ENTER when seeing RMI_EMULATED_MMIO. This is for
-> > the guest MMIO read path.  
+> Re-order the MMU cache top-up to earlier in user_mem_abort() so that it
+> is not done after KVM has read mmu_invalidate_seq (i.e. so as to avoid
+> inducing spurious fault retries).
 > 
-> Yes, when entering the guest after an (emulatable) read data abort the
-> value in GPRS[0] is loaded from the RecEntry structure into the
-> appropriate register for the guest.
+> This bug has existed since KVM/ARM's inception. It's unlikely that any
+> sane userspace currently modifies VMAs in such a way as to trigger this
+> race. And even with directed testing I was unable to reproduce it. But a
+> sufficiently motivated host userspace might be able to exploit this
+> race.
 > 
-> > How about the MMIO write path? I don't see where the RecExit.GPRS[0] is loaded
-> > to a varible and returned to the userspace.  
-> 
+> Fixes: 94f8e6418d39 ("KVM: ARM: Handle guest faults in KVM")
 
------
-> The RMM will populate GPRS[0] with the written value in this case (even
-> if another register was actually used in the instruction). We then
-> transfer that to the usual VCPU structure so that the normal fault
-> handling logic works.
-> 
------
+Ah, good luck with that one! :D user_mem_abort() used to be so nice
+and simple at the time! And yet...
 
-Are these in this patch or another patch?
+> Cc: stable@vger.kernel.org
+> Reported-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: David Matlack <dmatlack@google.com>
 
-> >> we can transfer this to the appropriate VCPU's register entry and then
-> >> depend on the generic MMIO handling code in KVM.
-> >>
-> >> Signed-off-by: Steven Price <steven.price@arm.com>
-> >> ---
-> >>  arch/arm64/kvm/mmio.c | 7 +++++++
-> >>  1 file changed, 7 insertions(+)
-> >>
-> >> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
-> >> index 3dd38a151d2a..c4879fa3a8d3 100644
-> >> --- a/arch/arm64/kvm/mmio.c
-> >> +++ b/arch/arm64/kvm/mmio.c
-> >> @@ -6,6 +6,7 @@
-> >>  
-> >>  #include <linux/kvm_host.h>
-> >>  #include <asm/kvm_emulate.h>
-> >> +#include <asm/rmi_smc.h>
-> >>  #include <trace/events/kvm.h>
-> >>  
-> >>  #include "trace.h"
-> >> @@ -109,6 +110,9 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
-> >>  			       &data);
-> >>  		data = vcpu_data_host_to_guest(vcpu, data, len);
-> >>  		vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
-> >> +
-> >> +		if (vcpu_is_rec(vcpu))
-> >> +			vcpu->arch.rec.run->entry.gprs[0] = data;  
-> > 
-> > I think the guest context is maintained by RMM (while KVM can only touch
-> > Rec{Entry, Exit} object) so that guest context in the legacy VHE mode is
-> > unused.
-> > 
-> > If yes, I guess here is should be:
-> > 
-> > if (unlikely(vcpu_is_rec(vcpu)))
-> > 	vcpu->arch.rec.run->entry.gprs[0] = data;
-> > else
-> > 	vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);  
-> 
-> Correct. Although there's no harm in updating with vcpu_set_reg(). But
-> I'll make the change because it's clearer.
-> 
-> >>  	}
-> >>  
-> >>  	/*
-> >> @@ -179,6 +183,9 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
-> >>  	run->mmio.len		= len;
-> >>  	vcpu->mmio_needed	= 1;
-> >>  
-> >> +	if (vcpu_is_rec(vcpu))
-> >> +		vcpu->arch.rec.run->entry.flags |= RMI_EMULATED_MMIO;
-> >> +  
-> > 
-> > Wouldn't it be better to set this in the kvm_handle_mmio_return where the MMIO
-> > read emulation has been surely successful?  
-> 
-> Yes, that makes sense - I'll move this.
-> 
-> Thanks,
-> 
-> Steve
-> 
-> >>  	if (!ret) {
-> >>  		/* We handled the access successfully in the kernel. */
-> >>  		if (!is_write)  
-> >   
-> 
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
+Oliver, how do you want to deal with this one? queue it right now? Or
+wait until the dust settles on my two other patches?
+
+I don't mind either way, I can either take it as part of the same
+series, or rebase my stuff on it.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
