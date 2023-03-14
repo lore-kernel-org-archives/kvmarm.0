@@ -1,164 +1,76 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBBFF320A;
-	Tue, 14 Mar 2023 11:03:00 +0000 (UTC)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.201])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4PbVw92GJMz6J7Km;
-	Tue, 14 Mar 2023 19:02:01 +0800 (CST)
-Received: from localhost (10.48.148.120) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Tue, 14 Mar
- 2023 11:02:51 +0000
-Date: Tue, 14 Mar 2023 11:02:50 +0000
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: James Morse <james.morse@arm.com>
-CC: <linux-pm@vger.kernel.org>, <loongarch@lists.linux.dev>,
-	<kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
-	<linux-acpi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-	<linux-ia64@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <x86@kernel.org>, Marc Zyngier
-	<maz@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Lorenzo Pieralisi
-	<lpieralisi@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Sudeep Holla
-	<sudeep.holla@arm.com>, Borislav Petkov <bp@alien8.de>, H Peter Anvin
-	<hpa@zytor.com>, Dave Hansen <dave.hansen@linux.intel.com>, Ingo Molnar
-	<mingo@redhat.com>, Will Deacon <will@kernel.org>, Catalin Marinas
-	<catalin.marinas@arm.com>, Huacai Chen <chenhuacai@kernel.org>, "Suzuki K
- Poulose" <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, Len
- Brown <lenb@kernel.org>, Rafael Wysocki <rafael@kernel.org>, "WANG Xuerui"
-	<kernel@xen0n.name>, Salil Mehta <salil.mehta@huawei.com>, "Russell King"
-	<linux@armlinux.org.uk>, <kangkang.shen@futurewei.com>
-Subject: Re: [RFC PATCH 00/32] ACPI/arm64: add support for virtual
- cpuhotplug
-Message-ID: <20230314110250.00005685@Huawei.com>
-In-Reply-To: <1f21673e-e5e6-a158-94a4-6ae6724c1f93@arm.com>
-References: <20230203135043.409192-1-james.morse@arm.com>
-	<20230307120050.000032f1@Huawei.com>
-	<1f21673e-e5e6-a158-94a4-6ae6724c1f93@arm.com>
-Followup-To: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D45B8320A
+	for <kvmarm@lists.linux.dev>; Tue, 14 Mar 2023 11:04:17 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3DBFC4B3;
+	Tue, 14 Mar 2023 04:04:55 -0700 (PDT)
+Received: from e120937-lin (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 84F6E3F67D;
+	Tue, 14 Mar 2023 04:04:10 -0700 (PDT)
+Date: Tue, 14 Mar 2023 11:04:00 +0000
+From: Cristian Marussi <cristian.marussi@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Jeremy Linton <jeremy.linton@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, David Woodhouse <dwmw@amazon.co.uk>
+Subject: Re: Circular lockdep in kvm_reset_vcpu() ?
+Message-ID: <ZBBUoBsfGokxiBzC@e120937-lin>
+References: <f6452cdd-65ff-34b8-bab0-5c06416da5f6@arm.com>
+ <Y+bnybGEkMpZzm/y@linux.dev>
+ <ZA72c+TT9epTcvX4@e120937-lin>
+ <3496a6a10b2d8693825e733b871938f5@misterjones.org>
+ <ZA9pUNZPyFtLDfxC@e120937-lin>
+ <82978ec75c0b34203dd1df693e7adf83@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [10.48.148.120]
-X-ClientProxiedBy: lhrpeml500003.china.huawei.com (7.191.162.67) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <82978ec75c0b34203dd1df693e7adf83@kernel.org>
 
-On Mon, 13 Mar 2023 15:50:52 +0000
-James Morse <james.morse@arm.com> wrote:
+On Tue, Mar 14, 2023 at 09:28:25AM +0000, Marc Zyngier wrote:
+> On 2023-03-13 18:20, Cristian Marussi wrote:
+> > On Mon, Mar 13, 2023 at 02:09:55PM +0000, Marc Zyngier wrote:
+> 
+> > > And -rc2 works just fine here.
+> > 
+> > Thanks, I'll dig deeper what's going on un my setup.
+> 
+> Actually, you really want this patch[1] which is on its
+> way to Linus.
+> 
+> It could explain the issue you're seeing with SMP.
 
-> Hi Jonathan,
->=20
-> On 07/03/2023 12:00, Jonathan Cameron wrote:
-> > On Fri,  3 Feb 2023 13:50:11 +0000
-> > James Morse <james.morse@arm.com> wrote: =20
->=20
-> >> On a system that supports cpuhotplug the MADT has to describe every po=
-ssible
-> >> CPU at boot. Under KVM, the vGIC needs to know about every possible vC=
-PU before
-> >> the guest is started.
-> >> With these constraints, virtual-cpuhotplug is really just a hypervisor=
-/firmware
-> >> policy about which CPUs can be brought online.
-> >>
-> >> This series adds support for virtual-cpuhotplug as exactly that: firmw=
-are
-> >> policy. This may even work on a physical machine too; for a guest the =
-part of
-> >> firmware is played by the VMM. (typically Qemu).
-> >>
-> >> PSCI support is modified to return 'DENIED' if the CPU can't be brought
-> >> online/enabled yet. The CPU object's _STA method's enabled bit is used=
- to
-> >> indicate firmware's current disposition. If the CPU has its enabled bi=
-t clear,
-> >> it will not be registered with sysfs, and attempts to bring it online =
-will
-> >> fail. The notifications that _STA has changed its value then work in t=
-he same
-> >> way as physical hotplug, and firmware can cause the CPU to be register=
-ed some
-> >> time later, allowing it to be brought online. =20
->=20
-> > As we discussed on an LOD call a while back, I think that we need some =
-path to
-> > find out if the guest supports vCPU HP or not so that info can be queri=
-ed by
-> > an orchestrator / libvirt etc.  In general the entity responsible for a=
-llocating
-> > extra vCPUs may not know what support the VM has for this feature. =20
->=20
-> I agree. For arm64 this is going to be important if/when there are machin=
-es that do
-> physical hotplug of CPUs too.
->=20
->=20
-> > There are various ways we could get this information into the VMM.
-> > My immediate thought is to use one of the ACPI interfaces that lets us =
-write
-> > AML that can set an emulated register. A query to the VMM can check if =
-this
-> > register is set.
-> >=20
-> > So options.
-> >=20
-> > _OSI() - Deprecated on ARM64 so lets not use that ;) =20
->=20
-> News to me, I've only just discovered it!
->=20
->=20
-> > _OSC() - Could add a bit to Table 6.13 Platform-Wide Capabilites in ACP=
-I 6.5 spec.
-> >          Given x86 has a similar online capable bit perhaps this is the=
- best option
-> >          though it is the one that requires a formal code first proposa=
-l to ASWG. =20
->=20
-> I've had a go at writing this one:
-> https://gitlab.arm.com/linux-arm/linux-jm/-/commit/220b0d8b0261d7467c8705=
-e6f614d57325798859
+Hi Marc,
 
-=46rom a quick glance that looks good to me.
+thanks this just solves for me on JUNO with guest SMP.
 
->=20
-> It'll appear in the v1 of the series once the kernel and qemu bits are al=
-l lined up again.
+Indeed with earlycon on JUNO with SMP I was seeing, beside a lot of
+workqueue lockup that finally hanged the guest, some puzzling
+'time-traveling' stamps that seemed to align more with the host time
+than the guest.
 
-We'll also need to kick off the spec change with a code-first proposal.
-I think current standard way to do that is a bugzilla entry in EDK2 repo=20
-https://bugzilla.tianocore.org/buglist.cgi?component=3DSpecification%20Upda=
-te&product=3DEDK2%20Code%20First&resolution=3D---
-and the get someone in ASWG to create equivalent tracking issue in mantis.
+    [    0.509305] thermal_sys: Registered thermal governor 'step_wise'
+    [    0.509327] thermal_sys: Registered thermal governor 'power_allocator'
+    [  282.404523] audit: type=2000 audit(0.372:1): state=initialized audit_enabled=0 res=1
+    [    0.526380] cpuidle: using governor menu
+    [    0.530378] hw-breakpoint: found 6 breakpoint and 4 watchpoint registers.
+    [    0.536241] ASID allocator initialised with 65536 entries
+    [    0.547455] Serial: AMBA PL011 UART driver
+    [    0.563267] Callback from call_rcu_tasks() invoked.
+    [  282.463816] KASLR disabled due to lack of seed
+    [  282.470356] HugeTLB: registered 1.00 GiB page size, pre-allocated 0 pages
+    [  282.476182] HugeTLB: 0 KiB vmemmap can be freed for a 1.00 GiB page
+    ....
+    .....
+    [  345.799753] io scheduler bfq registered
+    [  126.753573] watchdog: BUG: soft lockup - CPU#0 stuck for 118s! [kworker/u4:0:9]
+    [  126.759801] Modules linked in:
+    [  126.762397] irq event stamp: 713
 
-Great if you already have that in hand via relevant ARM folks.
-
-Jonathan
-
->=20
->=20
-> Thanks,
->=20
-> James
->=20
->=20
-> > _OSC() - Could add a new UUID and put it under a suitable device - mayb=
-e all CPUs?
-> >          You could definitely argue this feature is an operating system=
- property.
-> > _DSM() - Similar to OSC but always under a device.
-> >          Whilst can be used for this I'm not sure it really matches int=
-ended usecase.
-> >=20
-> > Assuming everyone agrees this bit of introspection is useful,
-> > Rafael / other ACPI specialists: Any suggestions on how best to do this=
-? =20
->=20
-
+Thanks a lot for the help.
+Cristian
