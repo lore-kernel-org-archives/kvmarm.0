@@ -1,114 +1,64 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-5.mta1.migadu.com (out-5.mta1.migadu.com [95.215.58.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28D6C3C30
-	for <kvmarm@lists.linux.dev>; Tue, 14 Mar 2023 17:47:03 +0000 (UTC)
-Received: by mail-yb1-f201.google.com with SMTP id z31-20020a25a122000000b00b38d2b9a2e9so9455253ybh.3
-        for <kvmarm@lists.linux.dev>; Tue, 14 Mar 2023 10:47:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678816022;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=qRi9DieC6fI0xIFZnV2isMARrArMZFITNyhRbutkUcc=;
-        b=J4PHjCO9DVOG2IIZLlEtu8iAXYlOcLbV7OLgpPQBQgsz1pAJ2C2wzdjLLf/1g9eqNo
-         op+2aOnupfVtCdIDSr8M8ID795JGx5VRMC7EFRt19RrKe/E5mck5SseJLTH/G6ZJwztt
-         c8b9gW0D17nzVNM/cEje5+rJUj3q2X+E+w5iM/CQn+goAzvYyxcGEetdW/aRREYr+5lD
-         CHeSbkEjzLGMr3yQafJzkKBHQBE3JZcwTVfuHXPyc1EcyRSpvbuyjIyFFOV4gATWih2L
-         /j2hP/hqEZOy8lSuGeUyoEMF1vH8a2bW1oUcw/c3Fxs2NkCvXGjtlQ9vgiwLtOhJXPxn
-         g0Uw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678816022;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qRi9DieC6fI0xIFZnV2isMARrArMZFITNyhRbutkUcc=;
-        b=rRH6XlSJGsN/sGDqOPNCxHH+CgGfQF6NAJpnIkCWSOdd/eZ0/AFaS1qCkHOCp3B1pZ
-         6yDDaR8iPU5OCc48mWOLfr06GJrHSdoDyc87Q8cN6TFu2zUqWj3XIisAGgHTl/c2DEqu
-         WO96CG1+J7wPrVjdbOB844YTsvSWxgzayjRDc8dKPMwXESZsJC/Vrw5j1O/ILZREhY9t
-         C+aIlXHGZSqUxU67liyO6h87MkhDda+NoApK04wR26sMPY3nQWjlBbd7dAFDmWQiEDcJ
-         4Vu6sG5ze6MArcPTutktri0hhnlWErqWhkG1MwAgZ6DrAi5ud8wAXVicGHAW+MRorqNk
-         ZtfA==
-X-Gm-Message-State: AO0yUKUd7/W5VQxhmYi5Rojs4K7eVxl/Cd6yi59EkWPIdh6j0sUfwlvv
-	eIRmNtzdzcFOVFsp/1yGRir3l4LHtqbIyalQCA==
-X-Google-Smtp-Source: AK7set9HH+M89jKTZ9W9fEUUdg0sgyPEHK/9CryOqrq/dO1DXpdnhKzTTfYNX8+F3GqgglMaiuTDCdAXCZa0pbdFvw==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a5b:38a:0:b0:ac9:cb97:bd0e with SMTP
- id k10-20020a5b038a000000b00ac9cb97bd0emr19014460ybp.5.1678816022162; Tue, 14
- Mar 2023 10:47:02 -0700 (PDT)
-Date: Tue, 14 Mar 2023 17:47:01 +0000
-In-Reply-To: <86o7owyj0a.wl-maz@kernel.org> (message from Marc Zyngier on Mon,
- 13 Mar 2023 11:43:01 +0000)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6561FA930
+	for <kvmarm@lists.linux.dev>; Tue, 14 Mar 2023 18:10:34 +0000 (UTC)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1678817432;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=z/e8hGKQr30b5ZvdSDvuiuWs97jzQhjwuRhF+vuhvk8=;
+	b=To69XkfxqTbOxl5n49kjumMJ7t3j0izNLm88VXspv8c8B1+4S6tHPjESl9RFvOvz5Jh7DF
+	lkTAuaGZs3L9wVaF4ymnTYNduKWZbOGf4ywCvG2CXyclM04KVH2tsFAlgx56LqPoYUMb4+
+	OJMdIAmSGztCai6SQVzNcJxb7j0U+ik=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	David Matlack <dmatlack@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Sean Christopherson <seanjc@google.com>,
+	stable@vger.kernel.org,
+	Christoffer Dall <c.dall@virtualopensystems.com>,
+	kvmarm@lists.linux.dev,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Retry fault if vma_lookup() results become invalid
+Date: Tue, 14 Mar 2023 18:10:18 +0000
+Message-Id: <167881740956.623301.15796552782250010868.b4-ty@linux.dev>
+In-Reply-To: <20230313235454.2964067-1-dmatlack@google.com>
+References: <20230313235454.2964067-1-dmatlack@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <gsnta60fcjje.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH 15/16] KVM: arm64: selftests: Augment existing timer test
- to handle variable offsets
-From: Colton Lewis <coltonlewis@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, james.morse@arm.com, 
-	suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, 
-	ricarkol@google.com, sveith@amazon.de, dwmw2@infradead.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Marc Zyngier <maz@kernel.org> writes:
+On Mon, 13 Mar 2023 16:54:54 -0700, David Matlack wrote:
+> Read mmu_invalidate_seq before dropping the mmap_lock so that KVM can
+> detect if the results of vma_lookup() (e.g. vma_shift) become stale
+> before it acquires kvm->mmu_lock. This fixes a theoretical bug where a
+> VMA could be changed by userspace after vma_lookup() and before KVM
+> reads the mmu_invalidate_seq, causing KVM to install page table entries
+> based on a (possibly) no-longer-valid vma_shift.
+> 
+> [...]
 
-> On Fri, 10 Mar 2023 19:26:47 +0000,
-> Colton Lewis <coltonlewis@google.com> wrote:
+Applied to kvmarm/fixes, thanks!
 
->> Marc Zyngier <maz@kernel.org> writes:
+[1/1] KVM: arm64: Retry fault if vma_lookup() results become invalid
+      https://git.kernel.org/kvmarm/kvmarm/c/13ec9308a857
 
->> >> mvbbq9:/data/coltonlewis/ecv/arm64-obj/kselftest/kvm#
->> >> ./aarch64/arch_timer -O 0xffff
->> >> ==== Test Assertion Failure ====
->> >>    aarch64/arch_timer.c:239: false
->> >>    pid=48094 tid=48095 errno=4 - Interrupted system call
->> >>       1  0x4010fb: test_vcpu_run at arch_timer.c:239
->> >>       2  0x42a5bf: start_thread at pthread_create.o:0
->> >>       3  0x46845b: thread_start at clone.o:0
->> >>    Failed guest assert: xcnt >= cval at aarch64/arch_timer.c:151
->> >> values: 2500645901305, 2500645961845; 9939, vcpu 0; stage; 3; iter: 2
-
->> > The fun part is that you can see similar things without the series:
-
->> > ==== Test Assertion Failure ====
->> >    aarch64/arch_timer.c:239: false
->> >    pid=647 tid=651 errno=4 - Interrupted system call
->> >       1  0x00000000004026db: test_vcpu_run at arch_timer.c:239
->> >       2  0x00007fffb13cedd7: ?? ??:0
->> >       3  0x00007fffb1437e9b: ?? ??:0
->> >    Failed guest assert: config_iter + 1 == irq_iter at
->> > aarch64/arch_timer.c:188
->> > values: 2, 3; 0, vcpu 3; stage; 4; iter: 3
-
->> > That's on a vanilla kernel (6.2-rc4) on an M1 with the test run
->> > without any argument in a loop. After a few iterations, it blows.
-
-> I finally got to the bottom of that one. This is yet another case of
-> the test making the assumption that spurious interrupts don't exist...
-
-That's great!
-
-> Here, the timer interrupt has been masked at the source, but the GIC
-> (or its emulation) can be slow to retire it. So we take it again,
-> spuriously, and account it as a true interrupt. None of the asserts in
-> the timer handler fire because they only check the *previous* state.
-
-> Eventually, the interrupt retires and we progress to the next
-> iteration. But in the meantime, we have incremented the irq counter by
-> the number of spurious events, and the test fails.
-
-> The obvious fix is to check for the timer state in the handler and
-> exit early if the timer interrupt is masked or the timer disabled.
-> With that, I don't see these failures anymore.
-
-> I've folded that into the patch that already deals with some spurious
-> events.
-
-I'll be looking at it and will keep in mind your questions about my
-hardware should I find any issues. Yes it has ECV and CNTPOFF but no I
-didn't try turning it off for this because my issue occured only when
-setting a physical offset and that can't be done without ECV.
+--
+Best,
+Oliver
