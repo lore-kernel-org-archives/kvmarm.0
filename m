@@ -1,19 +1,19 @@
-Received: from out-24.mta1.migadu.com (out-24.mta1.migadu.com [95.215.58.24])
+Received: from out-38.mta1.migadu.com (out-38.mta1.migadu.com [95.215.58.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF8A4AD32
-	for <kvmarm@lists.linux.dev>; Thu, 16 Mar 2023 21:14:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6BEAD3B
+	for <kvmarm@lists.linux.dev>; Thu, 16 Mar 2023 21:14:33 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1679001269;
+	t=1679001271;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=LkAwqg0i7yTvKn2mOxOOrm7GaHmSdBwLu5pMrSRUytM=;
-	b=FSd/qQ6pOisIrAv3tCgau7khw7/9tF+lpLR00aeUh1bc6YTa8H4BwCILOztc1x6+TuC5bK
-	pF0jJ1dwqdzVe38DpemCRT2KHlY61fnJkOd6WTNJeD7doFnCgbY1h7vlhhKMG1ptX9HWX/
-	DOAk5IQo+sywJWacpAmkw1WbxDRAOoM=
+	bh=Y6WCwXdxPGayUTYQiiz7A33G3vWOFTm+XoV1N+ILT4Q=;
+	b=miXT+rN+fON3qy9ndCBESpWT9CR5jSy6fgAhn7qzBc58A3kg+5M7VibaJ3xnFZ7bnwPfxZ
+	KdTeLtc1nBNquu5deByLZuId5wfG7hY6icDyWFZpE4xrANGEE0D77gcm2+RoCw1LmcYGp4
+	Hoss4+3DeUqlrcSqQB5TwSE5FEAD5DE=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>
 Cc: James Morse <james.morse@arm.com>,
@@ -22,11 +22,10 @@ Cc: James Morse <james.morse@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-arm-kernel@lists.infradead.org,
 	Sean Christopherson <seanjc@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Jeremy Linton <jeremy.linton@arm.com>
-Subject: [PATCH v2 2/4] KVM: arm64: Avoid lock inversion when setting the VM register width
-Date: Thu, 16 Mar 2023 21:14:10 +0000
-Message-Id: <20230316211412.2651555-3-oliver.upton@linux.dev>
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH v2 3/4] KVM: arm64: Use config_lock to protect data ordered against KVM_RUN
+Date: Thu, 16 Mar 2023 21:14:11 +0000
+Message-Id: <20230316211412.2651555-4-oliver.upton@linux.dev>
 In-Reply-To: <20230316211412.2651555-1-oliver.upton@linux.dev>
 References: <20230316211412.2651555-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -38,116 +37,162 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-kvm->lock must be taken outside of the vcpu->mutex. Of course, the
-locking documentation for KVM makes this abundantly clear. Nonetheless,
-the locking order in KVM/arm64 has been wrong for quite a while; we
-acquire the kvm->lock while holding the vcpu->mutex all over the shop.
+There are various bits of VM-scoped data that can only be configured
+before the first call to KVM_RUN, such as the hypercall bitmaps and
+the PMU. As these fields are protected by the kvm->lock and accessed
+while holding vcpu->mutex, this is yet another example of lock
+inversion.
 
-All was seemingly fine until commit 42a90008f890 ("KVM: Ensure lockdep
-knows about kvm->lock vs. vcpu->mutex ordering rule") caught us with our
-pants down, leading to lockdep barfing:
+Change out the kvm->lock for kvm->arch.config_lock in all of these
+instances. Opportunistically simplify the locking mechanics of the
+PMU configuration by holding the config_lock for the entirety of
+kvm_arm_pmu_v3_set_attr().
 
- ======================================================
- WARNING: possible circular locking dependency detected
- 6.2.0-rc7+ #19 Not tainted
- ------------------------------------------------------
- qemu-system-aar/859 is trying to acquire lock:
- ffff5aa69269eba0 (&host_kvm->lock){+.+.}-{3:3}, at: kvm_reset_vcpu+0x34/0x274
+Note that this also addresses a couple of bugs. There is an unguarded
+read of the PMU version in KVM_ARM_VCPU_PMU_V3_FILTER which could race
+with KVM_ARM_VCPU_PMU_V3_SET_PMU. Additionally, until now writes to the
+per-vCPU vPMU irq were not serialized VM-wide, meaning concurrent calls
+to KVM_ARM_VCPU_PMU_V3_IRQ could lead to a false positive in
+pmu_irq_is_valid().
 
- but task is already holding lock:
- ffff5aa68768c0b8 (&vcpu->mutex){+.+.}-{3:3}, at: kvm_vcpu_ioctl+0x8c/0xba0
-
- which lock already depends on the new lock.
-
-Add a dedicated lock to serialize writes to VM-scoped configuration from
-the context of a vCPU. Protect the register width flags with the new
-lock, thus avoiding the need to grab the kvm->lock while holding
-vcpu->mutex in kvm_reset_vcpu().
-
-Reported-by: Jeremy Linton <jeremy.linton@arm.com>
-Link: https://lore.kernel.org/kvmarm/f6452cdd-65ff-34b8-bab0-5c06416da5f6@arm.com/
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_host.h |  3 +++
- arch/arm64/kvm/arm.c              | 18 ++++++++++++++++++
- arch/arm64/kvm/reset.c            |  6 +++---
- 3 files changed, 24 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/arm.c        |  4 ++--
+ arch/arm64/kvm/guest.c      |  2 ++
+ arch/arm64/kvm/hypercalls.c |  4 ++--
+ arch/arm64/kvm/pmu-emul.c   | 23 ++++++-----------------
+ 4 files changed, 12 insertions(+), 21 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 917586237a4d..1f4b9708a775 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -185,6 +185,9 @@ struct kvm_protected_vm {
- };
- 
- struct kvm_arch {
-+	/* Protects VM-scoped configuration data */
-+	struct mutex config_lock;
-+
- 	struct kvm_s2_mmu mmu;
- 
- 	/* VTCR_EL2 value for this VM */
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 731a78f85915..1478bec52767 100644
+index 1478bec52767..a4793961b73d 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -128,6 +128,16 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- {
- 	int ret;
+@@ -624,9 +624,9 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+ 	if (kvm_vm_is_protected(kvm))
+ 		kvm_call_hyp_nvhe(__pkvm_vcpu_init_traps, vcpu);
  
-+	mutex_init(&kvm->arch.config_lock);
-+
-+#ifdef CONFIG_LOCKDEP
-+	/* Clue in lockdep that the config_lock must be taken inside kvm->lock */
-+	mutex_lock(&kvm->lock);
+-	mutex_lock(&kvm->lock);
 +	mutex_lock(&kvm->arch.config_lock);
+ 	set_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags);
+-	mutex_unlock(&kvm->lock);
 +	mutex_unlock(&kvm->arch.config_lock);
-+	mutex_unlock(&kvm->lock);
-+#endif
-+
- 	ret = kvm_share_hyp(kvm, kvm + 1);
- 	if (ret)
- 		return ret;
-@@ -328,6 +338,14 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
  
- 	spin_lock_init(&vcpu->arch.mp_state_lock);
+ 	return ret;
+ }
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 07444fa22888..481c79cf22cd 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -957,7 +957,9 @@ int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
  
-+#ifdef CONFIG_LOCKDEP
-+	/* Inform lockdep that the config_lock is acquired after vcpu->mutex */
-+	mutex_lock(&vcpu->mutex);
-+	mutex_lock(&vcpu->kvm->arch.config_lock);
-+	mutex_unlock(&vcpu->kvm->arch.config_lock);
-+	mutex_unlock(&vcpu->mutex);
-+#endif
-+
- 	/* Force users to call KVM_ARM_VCPU_INIT */
- 	vcpu->arch.target = -1;
- 	bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index b874ec6a37c1..ee445a7a1ef8 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -205,7 +205,7 @@ static int kvm_set_vm_width(struct kvm_vcpu *vcpu)
+ 	switch (attr->group) {
+ 	case KVM_ARM_VCPU_PMU_V3_CTRL:
++		mutex_lock(&vcpu->kvm->arch.config_lock);
+ 		ret = kvm_arm_pmu_v3_set_attr(vcpu, attr);
++		mutex_unlock(&vcpu->kvm->arch.config_lock);
+ 		break;
+ 	case KVM_ARM_VCPU_TIMER_CTRL:
+ 		ret = kvm_arm_timer_set_attr(vcpu, attr);
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index 5da884e11337..fbdbf4257f76 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -377,7 +377,7 @@ static int kvm_arm_set_fw_reg_bmap(struct kvm_vcpu *vcpu, u64 reg_id, u64 val)
+ 	if (val & ~fw_reg_features)
+ 		return -EINVAL;
  
- 	is32bit = vcpu_has_feature(vcpu, KVM_ARM_VCPU_EL1_32BIT);
+-	mutex_lock(&kvm->lock);
++	mutex_lock(&kvm->arch.config_lock);
  
--	lockdep_assert_held(&kvm->lock);
+ 	if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags) &&
+ 	    val != *fw_reg_bmap) {
+@@ -387,7 +387,7 @@ static int kvm_arm_set_fw_reg_bmap(struct kvm_vcpu *vcpu, u64 reg_id, u64 val)
+ 
+ 	WRITE_ONCE(*fw_reg_bmap, val);
+ out:
+-	mutex_unlock(&kvm->lock);
++	mutex_unlock(&kvm->arch.config_lock);
+ 	return ret;
+ }
+ 
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index c243b10f3e15..82991d89c2ea 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -875,7 +875,7 @@ static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
+ 	struct arm_pmu *arm_pmu;
+ 	int ret = -ENXIO;
+ 
+-	mutex_lock(&kvm->lock);
 +	lockdep_assert_held(&kvm->arch.config_lock);
+ 	mutex_lock(&arm_pmus_lock);
  
- 	if (test_bit(KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED, &kvm->arch.flags)) {
- 		/*
-@@ -262,9 +262,9 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	bool loaded;
- 	u32 pstate;
+ 	list_for_each_entry(entry, &arm_pmus, entry) {
+@@ -895,7 +895,6 @@ static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
+ 	}
  
--	mutex_lock(&vcpu->kvm->lock);
-+	mutex_lock(&vcpu->kvm->arch.config_lock);
- 	ret = kvm_set_vm_width(vcpu);
--	mutex_unlock(&vcpu->kvm->lock);
-+	mutex_unlock(&vcpu->kvm->arch.config_lock);
+ 	mutex_unlock(&arm_pmus_lock);
+-	mutex_unlock(&kvm->lock);
+ 	return ret;
+ }
  
- 	if (ret)
- 		return ret;
+@@ -903,22 +902,20 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
+ 
++	lockdep_assert_held(&kvm->arch.config_lock);
++
+ 	if (!kvm_vcpu_has_pmu(vcpu))
+ 		return -ENODEV;
+ 
+ 	if (vcpu->arch.pmu.created)
+ 		return -EBUSY;
+ 
+-	mutex_lock(&kvm->lock);
+ 	if (!kvm->arch.arm_pmu) {
+ 		/* No PMU set, get the default one */
+ 		kvm->arch.arm_pmu = kvm_pmu_probe_armpmu();
+-		if (!kvm->arch.arm_pmu) {
+-			mutex_unlock(&kvm->lock);
++		if (!kvm->arch.arm_pmu)
+ 			return -ENODEV;
+-		}
+ 	}
+-	mutex_unlock(&kvm->lock);
+ 
+ 	switch (attr->attr) {
+ 	case KVM_ARM_VCPU_PMU_V3_IRQ: {
+@@ -962,19 +959,13 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 		     filter.action != KVM_PMU_EVENT_DENY))
+ 			return -EINVAL;
+ 
+-		mutex_lock(&kvm->lock);
+-
+-		if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags)) {
+-			mutex_unlock(&kvm->lock);
++		if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags))
+ 			return -EBUSY;
+-		}
+ 
+ 		if (!kvm->arch.pmu_filter) {
+ 			kvm->arch.pmu_filter = bitmap_alloc(nr_events, GFP_KERNEL_ACCOUNT);
+-			if (!kvm->arch.pmu_filter) {
+-				mutex_unlock(&kvm->lock);
++			if (!kvm->arch.pmu_filter)
+ 				return -ENOMEM;
+-			}
+ 
+ 			/*
+ 			 * The default depends on the first applied filter.
+@@ -993,8 +984,6 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 		else
+ 			bitmap_clear(kvm->arch.pmu_filter, filter.base_event, filter.nevents);
+ 
+-		mutex_unlock(&kvm->lock);
+-
+ 		return 0;
+ 	}
+ 	case KVM_ARM_VCPU_PMU_V3_SET_PMU: {
 -- 
 2.40.0.rc1.284.g88254d51c5-goog
 
