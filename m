@@ -1,110 +1,96 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ACFD6FC3
-	for <kvmarm@lists.linux.dev>; Wed, 15 Mar 2023 21:01:00 +0000 (UTC)
-Received: by mail-pl1-f201.google.com with SMTP id k3-20020a170902ce0300b0019ca6e66303so11041604plg.18
-        for <kvmarm@lists.linux.dev>; Wed, 15 Mar 2023 14:01:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678914060;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UoDvobVQiPMq5acwjCe9688yztYKCiKKo2a8h2clq3Y=;
-        b=ABsYD8ivxczrfhW46NqRAYHlkYUpTpC/r4227tqpcgEUGcqmOIJjmJkUXsyslLEZp3
-         h6A5RbNktFzEqVzHBEIkMJCft6k2dqY8WR6mjI6m0voJrU/B3sWSQ+PlVuOXTLPytZ+m
-         02xaQdGzHShm7xD1s3vveeUjSypDW+kpfzfx2tyf8OGH8SA+A2Wo+otnTl3myqa0/Hgg
-         gcnUHxdx1vv/Ldm8vzJ7o+lOMOKa3WDhSFkx1Pq5cm9TieHZO7rIyzZYnAnsAhLKCIKq
-         HByZO7+N7kUN+s1qfw5LCtY8jUR5kpsWzVT21LE24/wuBV5ZHgSnFHLUJBSZbhZ4bXkf
-         ICDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678914060;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UoDvobVQiPMq5acwjCe9688yztYKCiKKo2a8h2clq3Y=;
-        b=G7vwIpCprzHAprDNlrYAw6GwKc5HSZ6NTJoH5Lg1ooYRSC2+MpSMB4iuHd3vKj55F8
-         D/h2UTeGKGBJT2WS3+zjIF3pKyHnOa90DilYdfcQbw9H6vApXtv5ZKEfKElVKT/HKbt/
-         01vmSVgJSXs1mmPjQk1SCDNNykmCBdbxviQe3HUIBvGcmVKQbNVS8DGhP3nbQD+a9sq9
-         iU5HbWuR+SlD5XBN3vAEuOpRQ0a7g10m9Nhf7dTwTCZD0Lz2vVWpgQN/PsLAVf99Peho
-         U3TmLi3qTZxNC/Sug2oR3acAcjEFCIofxO0bcWmJYK/6pBq9mLOScFHyCa+Ex32jrKBW
-         RC6g==
-X-Gm-Message-State: AO0yUKVNwjeMeZ56XpjQPQo7/isf8msVMyv30/keEAXndiDngLnCjRkj
-	Vu4/LKE0QJNlFa4QUczk7rSgEKX5vjs=
-X-Google-Smtp-Source: AK7set9I2d7zMrmbQqwepgi6EVy423MROFM770G/8niG8EsRE4Q4WDIEw2I/e22xzRSKFbKIa6cM2vJUBss=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:d48f:b0:1a0:144b:6489 with SMTP id
- c15-20020a170902d48f00b001a0144b6489mr398143plg.10.1678914059460; Wed, 15 Mar
- 2023 14:00:59 -0700 (PDT)
-Date: Wed, 15 Mar 2023 14:00:57 -0700
-In-Reply-To: <86ilf3y6u7.wl-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FFFD612F
+	for <kvmarm@lists.linux.dev>; Thu, 16 Mar 2023 17:45:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A556BC433EF;
+	Thu, 16 Mar 2023 17:45:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1678988752;
+	bh=N1P01DTJd4uVjYfwCW0Upba7xUoZtVgRhAG/ukULUy4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=dL9Fb4tR+LyaksLVWeq3nNK5szOJaEghNyl5aontm0qutNQk3UavbeNDCgco3tih2
+	 nqCmWVjP1lyWFHsZsCnq4CsuiqQGqnGL2v17HFiQuosE827tjH/Dh+BNrI0nIrlDUM
+	 b7Rd5Aquz23nUpC6Wv8GAZZqTNP+cWMAcOukIuDuj/wrTBzUL+6PgD5EJFyS/nimZF
+	 qgvULMGVIM/jj2Ah7pbKZiP51RFFRkpIHnSM3ua2SP8e9rJCNXPsSkgPI20k6wSsG6
+	 iE0XAWVJf8yjxEdxFFEp7GWNY28Mk+CgKiRIsgQvAMdh0xFvZEIN74m4378GEeTqKP
+	 t08LcnqGoMNdA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pcrfi-000eUs-DM;
+	Thu, 16 Mar 2023 17:45:50 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	Quentin Perret <qperret@google.com>,
+	Sean Christopherson <seanjc@google.com>,
+	David Matlack <dmatlack@google.com>
+Subject: [PATCH v2 0/2] KVM: arm64: Plug a couple of MM races
+Date: Thu, 16 Mar 2023 17:45:44 +0000
+Message-Id: <20230316174546.3777507-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230307034555.39733-1-ricarkol@google.com> <20230307034555.39733-8-ricarkol@google.com>
- <878rg25hbq.wl-maz@kernel.org> <ZA8+31vQA6vcQuK2@google.com> <86ilf3y6u7.wl-maz@kernel.org>
-Message-ID: <ZBIyCQXPVEAkJZES@google.com>
-Subject: Re: [PATCH v6 07/12] KVM: arm64: Export kvm_are_all_memslots_empty()
-From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com, oupton@google.com, 
-	yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com, 
-	andrew.jones@linux.dev, alexandru.elisei@arm.com, suzuki.poulose@arm.com, 
-	eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com, 
-	rananta@google.com, bgardon@google.com, ricarkol@gmail.com, 
-	Shaoqin Huang <shahuang@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, ardb@kernel.org, will@kernel.org, qperret@google.com, seanjc@google.com, dmatlack@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Mar 14, 2023, Marc Zyngier wrote:
-> On Mon, 13 Mar 2023 15:18:55 +0000,
-> Sean Christopherson <seanjc@google.com> wrote:
-> > 
-> > On Sun, Mar 12, 2023, Marc Zyngier wrote:
-> > > On Tue, 07 Mar 2023 03:45:50 +0000,
-> > > Ricardo Koller <ricarkol@google.com> wrote:
-> > > > No functional change intended.
-> > > 
-> > > I wish people stopped adding this pointless sentence to commit
-> > > messages. All changes have a functional change one way or another,
-> > > unless you are only changing a comment.
-> > 
-> > The implied context is that there is no change in runtime functionality, which
-> > does hold true for many changes.  I personally find the annotation helpful, both
-> > for code review and when doing git archaeology.  If a changelog states that the
-> > author doesn't/didn't intend a functional change, then _any_ change in (runtime)
-> > functionality becomes a red flag, and for me, prompts a closer look regardless of
-> > whether or not I have other concerns with the patch/commit.
-> 
-> And I think it lures the reviewer into a false sense of security. No
-> intended change, must be fine. Except when it is not. More often than
-> not, we end-up with seemingly innocent changes that break things.
-> 
-> It is even worse when things get (for good or bad reasons) backported
-> to -stable or an internal tree of some description. "No functional
-> change" can become something very different in another context. How do
-> you communicate this?
+Ard recently reported a really odd warning generated with KASAN, where
+the page table walker we use to inspect the userspace page tables was
+going into the weeds and accessing something that was looking totally
+unrelated (and previously freed).
 
-For KVM x86, we opt out of AUTOSEL, so barring errors elsewhere in the process,
-a maintainer needs to review such patches at some point.  And again, for me,
-sending a patch to stable that was intended to be a nop is a flag that the backport
-warrants a closer look, e.g. extra justification for why a patch that's (allegedly)
-a nop needs to be backported to stable kernels.
+Will and I spent quite some time looking into it, and while we were
+not able to reproduce the issue, we were able to spot at least a
+couple of issues that could partially explain the issue.
 
-I agree it's imperfect, e.g could lead downstream maintainers astray if they view
-the disclaimer as a statement of truth as opposed to be a statement of intent.
-But IMO the good things that come from being able to know the author's intent far
-outweigh the probability of bad things happening because a reviewer and/or downstream
-consumer put too much weight on the statement.
+The first course of action is to disable interrupts while walking the
+userspace PTs. This prevents exit_mmap() from tearing down these PTs
+by blocking the IPI. We also fail gracefully if the IPI won the race
+and killed the page tables before we started the walk.
 
-My opinion is certainly influenced by having spent far too much time digging through
-historical KVM x86 commits, where it's all too often unclear if a buggy/flawed
-commit was simply a coding goof, versus the commit doing exactly what the author
-intended and being broken because of bad assumptions, incorrect interpretation of
-a spec, etc.  But even with that bias in mind, I still think explicitly declaring
-an author's intent for these types of changes is overall a net positive.
+The second issue is to not use a VMA pointer that was obtained with
+the mmap_read_lock held after that lock has been released. There is no
+guarantee that it is still valid.
 
-Anywho, I don't mean to step on toes and force my preferences down everyone's
-throats, just wanted to provide my reasoning for including the disclaimer and
-encouraging other KVM x86 contributors to do the same.
+I've earmarked both for stable, though I expect backporting this to
+older revisions of the kernel could be... interesting.
+
+* From v1[1]:
+
+  - Return -EAGAIN from get_user_mapping_size() when the mapping is
+    gone instead of -EFAULT which would be fatal (which is still
+    returned in cases that are not expected to be seen). Other error
+    codes can also be returned from kvm_pgtable_get_leaf(), but always
+    in conditions that are rather bad.
+
+  - Rebased on top of kvmarm/fixes which already contains David's own
+    MMU fix.
+
+[1] https://lore.kernel.org/r/20230313091425.1962708-1-maz@kernel.org
+
+Marc Zyngier (2):
+  KVM: arm64: Disable interrupts while walking userspace PTs
+  KVM: arm64: Check for kvm_vma_mte_allowed in the critical section
+
+ arch/arm64/kvm/mmu.c | 53 ++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 44 insertions(+), 9 deletions(-)
+
+-- 
+2.34.1
+
