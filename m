@@ -1,82 +1,67 @@
-Received: from out-18.mta1.migadu.com (out-18.mta1.migadu.com [95.215.58.18])
+Received: from out-30.mta1.migadu.com (out-30.mta1.migadu.com [95.215.58.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E109AD4E
-	for <kvmarm@lists.linux.dev>; Thu, 16 Mar 2023 23:42:19 +0000 (UTC)
-Date: Thu, 16 Mar 2023 23:42:12 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 783F9377
+	for <kvmarm@lists.linux.dev>; Fri, 17 Mar 2023 01:20:31 +0000 (UTC)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1679010137;
+	t=1679016029;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Z9wFXHFTqY0qDRcH43pszZPbHt+9ze46oN5dD5scERM=;
-	b=LtNgIIiFchLoDQZMYIjfVErlc53+gEFMCv31zVbKG+w/WX/9cNgUJtNhJsaE+oGs4zhs9Y
-	Xmejd3PTagnQcaBzhRVlOhhT9fNC5mNMCSe6dDDiK5yOIT3LggZ4EJY7B3QDQzi5qpwu0c
-	oTpCCSGaN7OezLzUDYGEL35c1tuTeAs=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	bh=Nc7w7qAQ6zyR0/2M81jaXDe/qAYliYKNQvNHrFqPVgY=;
+	b=Jw6gTg18DP+4XKnTmYJ5Le6tFsjj+OGlSTWIlMNIMDuRTF1ls9M+LX7VGTerh9cp+Ew7jS
+	GdAv5vE1Eik0jzRlHRMnSSq2vXUHcU9MNYjjFjP2V4PzdEnlnvNvF0DrGM3vqIdXEUol0c
+	dRGpuPA8LzBJ5cYSwhDnFYvn7hsw9bo=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Will Deacon <will@kernel.org>, Quentin Perret <qperret@google.com>,
+To: Marc Zyngier <maz@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Will Deacon <will@kernel.org>,
+	Quentin Perret <qperret@google.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Morse <james.morse@arm.com>,
 	Sean Christopherson <seanjc@google.com>,
-	David Matlack <dmatlack@google.com>, stable@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] KVM: arm64: Disable interrupts while walking
- userspace PTs
-Message-ID: <ZBOpVLEPEJazjyGD@linux.dev>
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v2 0/2] KVM: arm64: Plug a couple of MM races
+Date: Fri, 17 Mar 2023 01:20:03 +0000
+Message-Id: <167901338534.2794852.13463993728106907466.b4-ty@linux.dev>
+In-Reply-To: <20230316174546.3777507-1-maz@kernel.org>
 References: <20230316174546.3777507-1-maz@kernel.org>
- <20230316174546.3777507-2-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230316174546.3777507-2-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Marc,
-
-On Thu, Mar 16, 2023 at 05:45:45PM +0000, Marc Zyngier wrote:
-> We walk the userspace PTs to discover what mapping size was
-> used there. However, this can race against the userspace tables
-> being freed, and we end-up in the weeds.
+On Thu, 16 Mar 2023 17:45:44 +0000, Marc Zyngier wrote:
+> Ard recently reported a really odd warning generated with KASAN, where
+> the page table walker we use to inspect the userspace page tables was
+> going into the weeds and accessing something that was looking totally
+> unrelated (and previously freed).
 > 
-> Thankfully, the mm code is being generous and will IPI us when
-> doing so. So let's implement our part of the bargain and disable
-> interrupts around the walk. This ensures that nothing terrible
-> happens during that time.
+> Will and I spent quite some time looking into it, and while we were
+> not able to reproduce the issue, we were able to spot at least a
+> couple of issues that could partially explain the issue.
 > 
-> We still need to handle the removal of the page tables before
-> the walk. For that, allow get_user_mapping_size() to return an
-> error, and make sure this error can be propagated all the way
-> to the the exit handler.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Cc: stable@vger.kernel.org
+> [...]
 
-Looks good. I've squashed in this meaningless diff to make use of an existing
-helper.
+Applied to kvmarm/fixes, thanks!
 
+[1/2] KVM: arm64: Disable interrupts while walking userspace PTs
+      https://git.kernel.org/kvmarm/kvmarm/c/e86fc1a3a3e9
+[2/2] KVM: arm64: Check for kvm_vma_mte_allowed in the critical section
+      https://git.kernel.org/kvmarm/kvmarm/c/8c2e8ac8ad4b
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index e95593736ae3..3b9d4d24c361 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -691,7 +691,7 @@ static int get_user_mapping_size(struct kvm *kvm, u64 addr)
- 		return -EFAULT;
- 
- 	/* Oops, the userspace PTs are gone... Replay the fault */
--	if (!(pte & PTE_VALID))
-+	if (!kvm_pte_valid(pte))
- 		return -EAGAIN;
- 
- 	return BIT(ARM64_HW_PGTABLE_LEVEL_SHIFT(level));
-
--- 
-Thanks,
+--
+Best,
 Oliver
