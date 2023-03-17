@@ -1,100 +1,100 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC5BF810
-	for <kvmarm@lists.linux.dev>; Fri, 17 Mar 2023 09:03:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61E38C433D2;
-	Fri, 17 Mar 2023 09:03:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B708B6AAD
+	for <kvmarm@lists.linux.dev>; Fri, 17 Mar 2023 13:49:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47910C4339B;
+	Fri, 17 Mar 2023 13:49:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1679043832;
-	bh=RrbCxRQbeYh+QHF+SQ74FvWDUfJeosjdXICD/8hIBR0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LkYEb5vLxw9Pnphh2sN+xstLaO1E8fOa8cuAwYfKL+3NIAbTObJvfmjcAmjQxqsLv
-	 CpvtLKj8vbYdaViupwyXxgujt12LuBAPg5UqqBCDENNXHSy39O1FUnYM+OLdAzckNm
-	 dL1a/HcC1vCJMyVbsfN3z++Kq23lYYBA/pR2M3DYLYD7O7Sl9T7YF0tkODYBkzj3N1
-	 1Opcm/BJ6MIvr7POaOJkskIrG3uo7r0W9kCN9PQ/o7kvOYvORZh/ow5aiFWGhvh5UW
-	 /14GSRz/beCTNJqYdPSe5m6GCrz7lERRSVF8HdtSpfEIdD/w5azEMBJfQC/7XW4nOh
-	 szugRJkAY8v3A==
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pd606-000tA9-51;
-	Fri, 17 Mar 2023 09:03:50 +0000
+	s=k20201202; t=1679060990;
+	bh=hYx2SB0J8tAxqp2JtYSAKc2OLyHhlB7K1qDpf1HJaSc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EMRrxtPkZkvgfPnPSJBRw4tC7F/4vKjxF0mtYftwif7l6/2TBRq4RxKY2W+q+11+i
+	 gyv0wo9xz9Gf/mDomDMOsgUjoYN6CYCSaqidhZkUjmx+U/JUbKnvLDp3XqkY9ppRw5
+	 3NCw2i3u6s4w3aUx8y11XedZkeBwRo8aCfKJLryoW0g8NRY8Vz2ZjkwtfTQMSTG2w2
+	 3x4+8cxnvbdw/b3glqzwYP3ZLSfFxxa3PyiOrKDwrxXoibriofLFHb4sAkNt/G6bJG
+	 epvncBObylRAQho64abn4HZmmXi3HhKsM0o9RG4o9yF369Fw/t+/NgZzu/AlAG/zzm
+	 hCaiiGcVvFDww==
+Date: Fri, 17 Mar 2023 13:49:44 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH 2/2] KVM: arm64: Move FGT value configuration to vCPU
+ state
+Message-ID: <855e60de-56c0-4500-a8ce-d79ffb0ed19d@sirena.org.uk>
+References: <20230301-kvm-arm64-fgt-v1-0-cfdf71ac67dc@kernel.org>
+ <20230301-kvm-arm64-fgt-v1-2-cfdf71ac67dc@kernel.org>
+ <867cvfyclz.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Date: Fri, 17 Mar 2023 09:03:50 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org, James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Ard Biesheuvel
- <ardb@kernel.org>, Will Deacon <will@kernel.org>, Quentin Perret
- <qperret@google.com>, Sean Christopherson <seanjc@google.com>, David Matlack
- <dmatlack@google.com>, stable@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] KVM: arm64: Disable interrupts while walking
- userspace PTs
-In-Reply-To: <ZBOpVLEPEJazjyGD@linux.dev>
-References: <20230316174546.3777507-1-maz@kernel.org>
- <20230316174546.3777507-2-maz@kernel.org> <ZBOpVLEPEJazjyGD@linux.dev>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <760caa64691576b728c224bbbfdd18a4@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, ardb@kernel.org, will@kernel.org, qperret@google.com, seanjc@google.com, dmatlack@google.com, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="BeswKVhtvigxCD8A"
+Content-Disposition: inline
+In-Reply-To: <867cvfyclz.wl-maz@kernel.org>
+X-Cookie: Life is like an analogy.
 
-On 2023-03-16 23:42, Oliver Upton wrote:
-> Marc,
-> 
-> On Thu, Mar 16, 2023 at 05:45:45PM +0000, Marc Zyngier wrote:
->> We walk the userspace PTs to discover what mapping size was
->> used there. However, this can race against the userspace tables
->> being freed, and we end-up in the weeds.
->> 
->> Thankfully, the mm code is being generous and will IPI us when
->> doing so. So let's implement our part of the bargain and disable
->> interrupts around the walk. This ensures that nothing terrible
->> happens during that time.
->> 
->> We still need to handle the removal of the page tables before
->> the walk. For that, allow get_user_mapping_size() to return an
->> error, and make sure this error can be propagated all the way
->> to the the exit handler.
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> Cc: stable@vger.kernel.org
-> 
-> Looks good. I've squashed in this meaningless diff to make use of an 
-> existing
-> helper.
-> 
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index e95593736ae3..3b9d4d24c361 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -691,7 +691,7 @@ static int get_user_mapping_size(struct kvm *kvm, 
-> u64 addr)
->  		return -EFAULT;
-> 
->  	/* Oops, the userspace PTs are gone... Replay the fault */
-> -	if (!(pte & PTE_VALID))
-> +	if (!kvm_pte_valid(pte))
->  		return -EAGAIN;
 
-Sure, LGTM.
+--BeswKVhtvigxCD8A
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Thanks,
+On Fri, Mar 17, 2023 at 09:02:32AM +0000, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+> > +	vcpu->arch.hfgrtr_el2 = 0;
+> > +	vcpu->arch.hfgwtr_el2 = 0;
+
+> Although this looks completely innocent, this actually have the effect
+> of trapping the SMPRI_EL1 and TPIDR2_EL0 registers, something that is
+> self documented in the current code, and that completely disappears
+> with this patch.
+
+> This needs documenting by enumerating the sysregs that get trapped.
+
+That's an awful lot of registers with the fine grained traps, and when
+extended to cover HFHxTR2 there's a bunch of RES0 bits intended for
+future traps.  It feels a bit unmanagable.  I'd have expected something
+more along the lines of "enable all traps other than...".  The pattern
+seemed to be more to have an explicit initialiser for the bits that are
+set (eg, with CPACR_EL1) which was why I didn't put anything explicit.
+
+> > +	/* Fine grained traps values for the guest and host */
+> > +	u64 hfgrtr_el2;
+> > +	u64 hfgwtr_el2;
+> > +	u64 hfgrtr_el2_host;
+> > +	u64 hfgwtr_el2_host;
+
+> Why do we have both host and guest? This is the vcpu structure, and
+> the host state doesn't belong here. If you want to save some host
+> state, place the hfgxtr_el2 fields in kvm_cpu_context, and use the
+> per-CPU instance of this structure to save the host state.
+
+Ah, I'd not run into the percpu structure - that does look like a better
+fit.
+
+--BeswKVhtvigxCD8A
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmQUb/gACgkQJNaLcl1U
+h9BpiQf9FhJzoGdTexo3BcCa/elsUnLfLOOAYrDAHWiYDUpiWSZCDEZZtzjztFmZ
+SP9iBfzdPUi/mheUcZ3zVwqDLas8rdGABquJNmKX0eHeXPOZLaKj4TB1/EbVAUWE
+R1FKPFUIlfdw4OXdcX3Q02b4jUbs0SkemHIEQuABxfEDSJ+OOBONu5O92fg8ThRT
+USH0z6q1cRz7S74C+8O90csb0WLFEsAB8D/hb2ijaQojU7XO9mVRYScRmPPJcDPe
+jt1Z3NzCdG2rG0dd2BTCOHERwAvtz1rwr9DDx2+ss2FagAmcSQaebw6n4F0yIeit
+DeMZY4fE/xgxpF3/6Jj6KlpmfUV+6g==
+=EeY1
+-----END PGP SIGNATURE-----
+
+--BeswKVhtvigxCD8A--
