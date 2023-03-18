@@ -1,90 +1,100 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B1E279D1
-	for <kvmarm@lists.linux.dev>; Fri, 17 Mar 2023 19:50:49 +0000 (UTC)
-Received: by mail-yb1-f201.google.com with SMTP id e80-20020a255053000000b00b641ae96a5cso2808486ybb.18
-        for <kvmarm@lists.linux.dev>; Fri, 17 Mar 2023 12:50:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679082648;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SWp43EKSObLScNJyve8NVm0+M7i+tQFxyt9k8TiRe9g=;
-        b=e0o+1QipaOeuxF3SQj+/1I0NUJYANsvskj+jz+/JVVr1JI/Gi8EhYKPNYf6VCam0BD
-         BAsjPkgg5/ctjSm5fbatVkc37cbroqyTAJ5lMHDQqqUyK1lU4+hREwmj8Q8fnx7emkyA
-         FqesCCLDpG94eJAu7iyFgDIMb2uvcOYUTcrQgwHxZ/qSMHGAbwYNX1NfDIvwCrf3/yLh
-         Qlzcif76NWl2d5Dec/ik4T5zqD5Ogl0pkotQHRqs3F6j3Db5VjWme4evtJbL06vcVC8k
-         5G2KHySl3FJNxq+4Y1E8Q2s1mqtvNv/IskSm5DyA1K7kEWGH1hY/bYV0pIPrlheqehC+
-         Vjsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679082648;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SWp43EKSObLScNJyve8NVm0+M7i+tQFxyt9k8TiRe9g=;
-        b=b7ogJuYHMDzCfaQT2jK2IvJ7WJcDklJnlLEvKV8EUKsaugghWdmHSghWrojy9uWK4s
-         B4QVGxsmoQsjYv1w/vm6yl4nQzx2THakD92wH0qLSH8OID2aJXtGpmhieE+Z3lSogOvq
-         bG9hBU/rqmZhiSsif1JPpt04+dxrjDrNAsHRrmoMdLPCyJW3el0WmMmjMcd1QWB8vc5U
-         vEC1JBrwpGNGRF4k+m8mqHNQLoWhIkh/lcKjZRW9qW4exsgoFqkJMuV/rfk6H9XBttVh
-         uispIdmjZaFyu2CtMM5/xcBmB4JL0jF67lvURqIIIH5eFy56xGSJjuylzMKQv5BAoKwc
-         4WHA==
-X-Gm-Message-State: AO0yUKWzitdJikyDi/RVx8h2zZOGsDmD/xGqUNDZeTL7YXv0W1YpkSYD
-	etpRN3z0MFXEAN4D1CXRY246vg2/cH6GE20=
-X-Google-Smtp-Source: AK7set+1dZfI1V93G2NNZOWgyqiVDUpszfGni5yoPVSFDzoxKaFlWRR3P5jO5zsNV2xWLmuL0WJ9RjPmhL3qVro=
-X-Received: from zaidcloud.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5325])
- (user=zalbassam job=sendgmr) by 2002:a25:2d1a:0:b0:8ed:3426:8a69 with SMTP id
- t26-20020a252d1a000000b008ed34268a69mr511377ybt.1.1679082648198; Fri, 17 Mar
- 2023 12:50:48 -0700 (PDT)
-Date: Fri, 17 Mar 2023 15:50:27 -0400
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83252EC0
+	for <kvmarm@lists.linux.dev>; Sat, 18 Mar 2023 10:02:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5181EC433EF;
+	Sat, 18 Mar 2023 10:02:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1679133757;
+	bh=SdAwA+yHmCjXzJB/aenMpFVAdyQsRtXN1tQ01msm5Cs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RqY6KopL7ppyQlvW6i3ZwxS+hbTy+fvymdMHSNtaF+v3LemFtoyinunkzxynSnDVR
+	 tBjblgW/mYpTyycNu0X36cBD7+EUgc2fisTzcDj8wXIi4mOOipZIjIGphqHoxKiZGZ
+	 ABI80Aeg0LzIYPPM+3WrUAxi2RlNpn6kuht5rcIfMCnUTJGWZ16vFesqiGGI2aqqlO
+	 K9LbFETxjc9LHXK93QRT7k/liOfpqJNdMu4NVkRR6TuU3Hj8Pcpnz/lVG0EbN/tDOw
+	 YZTEm1OuKFyDmu1nt/Zdwyi4fugx0fKBph9xJdCP/MtJp2SxPxrNzksgcNOxfH5hGy
+	 WR2tNkEkWMHdQ==
+Received: from [89.213.33.168] (helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pdTOU-001Anm-NT;
+	Sat, 18 Mar 2023 10:02:34 +0000
+Date: Sat, 18 Mar 2023 10:02:33 +0000
+Message-ID: <87v8iygyx2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Zaid Al-Bassam <zalbassam@google.com>, Mark Rutland <mark.rutland@arm.com>,	Will Deacon <will@kernel.org>
+Cc: Jesus Sanchez-Palencia <jesussanp@google.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu,
+	f.fainelli@gmail.com
+Subject: Re: [PATCH v4 0/8] perf: arm: Make PMUv3 driver available for aarch32
 In-Reply-To: <20230317195027.3746949-1-zalbassam@google.com>
+References: <20230317195027.3746949-1-zalbassam@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230317195027.3746949-1-zalbassam@google.com>
-X-Mailer: git-send-email 2.40.0.rc2.332.ga46443480c-goog
-Message-ID: <20230317195027.3746949-9-zalbassam@google.com>
-Subject: [PATCH v4 8/8] ARM: mach-virt: Select PMUv3 driver by default
-From: Zaid Al-Bassam <zalbassam@google.com>
-To: Jesus Sanchez-Palencia <jesussanp@google.com>, Russell King <linux@armlinux.org.uk>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Namhyung Kim <namhyung@kernel.org>, Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, f.fainelli@gmail.com
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Zaid Al-Bassam <zalbassam@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 89.213.33.168
+X-SA-Exim-Rcpt-To: zalbassam@google.com, mark.rutland@arm.com, will@kernel.org, jesussanp@google.com, linux@armlinux.org.uk, catalin.marinas@arm.com, peterz@infradead.org, mingo@redhat.com, acme@kernel.org, alexander.shishkin@linux.intel.com, jolsa@kernel.org, namhyung@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, f.fainelli@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Marc Zyngier <marc.zyngier@arm.com>
+On Fri, 17 Mar 2023 19:50:19 +0000,
+Zaid Al-Bassam <zalbassam@google.com> wrote:
+> 
+> Currently, PMUv3 driver is only available for ARMv8 aarch64 platforms,
+> ARMv8 platorms running in aarch32 mode dont have access to the driver.
+> This is, especially, a problem for ARMv8 platforms that only have
+> aarch32 support, like the Cortex-A32.
+> 
+> Make the PMUv3 driver available to arm arch (ARMv8 aarch32) by moving
+> the PMUv3 driver from arm64 to drivers, that makes the driver common
+> to both arm and arm64 architectures, then add PMUv3 arm Support.
+> 
+> The main work in this patchset was made a while back by Marc Zyngier
+> in [1]. Patchset version 1 [v1] rebases Marc's patches to the latest
+> kernel revision and adds additional patches to accommodate the changes
+> in the kernel since Marc wrote the patches.
+> 
+> version 2 [v2] of the patchset was created by Marc Zyngier and I
+> picked it up from [2].
 
-Since 32bit guests are not unlikely to run on an ARMv8 host,
-let's select the PMUv3 driver, which allows the PMU to be used
-on such systems.
+The SoB chain is now a bit off as you picked it from my tree. Nothing
+that we can't fix, but please be careful in the future. You also
+failed to pick Florian's Tested-by: tags, which is worse. Please make
+sure to pick these things as people reply to your series.
 
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Zaid Al-Bassam <zalbassam@google.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+Will, Mark: any objection to the general shape of this series? I've
+been using it again to test the 32bit PMU support in KVM, and would
+rather see something merged while the architecture still has some
+relevance.
 
-diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index bc12857e81f9..6f0a2576d17f 100644
---- a/arch/arm/Kconfig
-+++ b/arch/arm/Kconfig
-@@ -401,6 +401,7 @@ config ARCH_VIRT
- 	select ARM_GIC_V3
- 	select ARM_GIC_V3_ITS if PCI
- 	select ARM_PSCI
-+	select ARM_PMUV3 if PERF_EVENTS
- 	select HAVE_ARM_ARCH_TIMER
- 
- config ARCH_AIROHA
+Thanks,
+
+	M.
+
 -- 
-2.40.0.rc2.332.ga46443480c-goog
-
+Without deviation from the norm, progress is not possible.
