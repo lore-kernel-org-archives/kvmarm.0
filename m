@@ -1,91 +1,88 @@
-Received: from out-8.mta0.migadu.com (out-8.mta0.migadu.com [91.218.175.8])
+Received: from out-27.mta0.migadu.com (out-27.mta0.migadu.com [91.218.175.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B49039440
-	for <kvmarm@lists.linux.dev>; Tue, 21 Mar 2023 12:13:28 +0000 (UTC)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5032C952
+	for <kvmarm@lists.linux.dev>; Tue, 21 Mar 2023 14:49:26 +0000 (UTC)
+Date: Tue, 21 Mar 2023 15:49:22 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1679400806;
+	t=1679410164;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=W8avJLFib3sdsj9e8Eeoams20ysVm7oUzXRXZTHIjjw=;
-	b=XxJrLfW4fGCijJKOoIjCsd8QA36c4I/nw177R02xL1V9RMxwiMcCT1HI92YCp15a5Eg3co
-	oTHHA9QHZ/IUbejd3hMwWeOFoSM7obmxFzLxutAMwxm4mvisbKAulzk/mofSxUuvLqHWHV
-	iFIW2dWX4lBO48Ml358T1scG1Yl6eas=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qbQfRBfczUJav6FHt3ZKMjH+csQpxkzMB8JxUvxdhEg=;
+	b=hfMGnzoG6xzWlox+ufsQX1egceC/3JbHyhVSilkiaV+C05kj5/k/2jyb75UTOgfVe9SVO8
+	Dv0iKHcJVeJyPZTUhDUpu/N3qpFLSn6BX4v4acfZSWDNG2UvylXHh1RokgUtIlbvvCkTkz
+	NlbjZ3Xw03ajFpUmCbPcF375angm+zo=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Shaoqin Huang <shahuang@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [kvm-unit-tests PATCH] arm/pl031: Apply gic_enable_irq
-Date: Tue, 21 Mar 2023 13:13:25 +0100
-Message-Id: <20230321121325.755595-1-andrew.jones@linux.dev>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+	qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.linux.dev,
+	qemu-arm@nongnu.org
+Subject: Re: [kvm-unit-tests PATCH v10 1/7] Makefile: add GNU global tags
+ support
+Message-ID: <20230321144922.kiptey3aiwnz7j65@orel>
+References: <20230307112845.452053-1-alex.bennee@linaro.org>
+ <20230307112845.452053-2-alex.bennee@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-type: text/plain
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230307112845.452053-2-alex.bennee@linaro.org>
 X-Migadu-Flow: FLOW_OUT
 
-Use gic_enable_irq() to clean up code.
+On Tue, Mar 07, 2023 at 11:28:39AM +0000, Alex Bennée wrote:
+> If you have ctags you might as well offer gtags as a target.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Message-Id: <20211118184650.661575-4-alex.bennee@linaro.org>
+> 
+> ---
+> v10
+>   - update .gitignore
+> ---
+>  Makefile   | 5 ++++-
+>  .gitignore | 3 +++
+>  2 files changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 6ed5deac..f22179de 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -145,6 +145,9 @@ cscope:
+>  		-name '*.[chsS]' -exec realpath --relative-base=$(CURDIR) {} \; | sort -u > ./cscope.files
+>  	cscope -bk
+>  
+> -.PHONY: tags
+> +.PHONY: tags gtags
+>  tags:
+>  	ctags -R
+> +
+> +gtags:
+> +	gtags
+> diff --git a/.gitignore b/.gitignore
+> index 33529b65..4d5f460f 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -12,6 +12,9 @@ tags
+>  patches
+>  .stgit-*
+>  cscope.*
+> +GPATH
+> +GRTAGS
+> +GTAGS
+>  *.swp
+>  /lib/asm
+>  /lib/config.h
+> -- 
+> 2.39.2
+>
 
-Suggested-by: Zenghui Yu <yuzenghui@huawei.com>
-Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
----
- arm/pl031.c | 12 +-----------
- 1 file changed, 1 insertion(+), 11 deletions(-)
-
-diff --git a/arm/pl031.c b/arm/pl031.c
-index 452fe0f3e36c..c56805e402a0 100644
---- a/arm/pl031.c
-+++ b/arm/pl031.c
-@@ -47,7 +47,6 @@ static u32 cntfrq;
- static struct pl031_regs *pl031;
- static int pl031_irq;
- static void *gic_ispendr;
--static void *gic_isenabler;
- static volatile bool irq_triggered;
- 
- static int check_id(void)
-@@ -125,13 +124,6 @@ static bool gic_irq_pending(void)
- 	return readl(gic_ispendr + offset) & (1 << (pl031_irq & 31));
- }
- 
--static void gic_irq_unmask(void)
--{
--	uint32_t offset = (pl031_irq / 32) * 4;
--
--	writel(1 << (pl031_irq & 31), gic_isenabler + offset);
--}
--
- static void irq_handler(struct pt_regs *regs)
- {
- 	u32 irqstat = gic_read_iar();
-@@ -185,7 +177,7 @@ static int check_rtc_irq(void)
- 	report(gic_irq_pending(), "  RTC IRQ pending now");
- 
- 	/* Enable retrieval of IRQ */
--	gic_irq_unmask();
-+	gic_enable_irq(pl031_irq);
- 	local_irq_enable();
- 
- 	report(irq_triggered, "  IRQ triggered");
-@@ -208,11 +200,9 @@ static void rtc_irq_init(void)
- 	switch (gic_version()) {
- 	case 2:
- 		gic_ispendr = gicv2_dist_base() + GICD_ISPENDR;
--		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
- 		break;
- 	case 3:
- 		gic_ispendr = gicv3_dist_base() + GICD_ISPENDR;
--		gic_isenabler = gicv3_dist_base() + GICD_ISENABLER;
- 		break;
- 	}
- }
--- 
-2.39.2
-
+Acked-by: Andrew Jones <andrew.jones@linux.dev>
