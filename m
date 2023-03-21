@@ -1,269 +1,53 @@
-Received: from out-27.mta1.migadu.com (out-27.mta1.migadu.com [95.215.58.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97A518477
-	for <kvmarm@lists.linux.dev>; Mon, 20 Mar 2023 22:10:51 +0000 (UTC)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1679350249;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5QiGPiGNM91vJrdHaHtuBdnuzIhv0JJsQir3ZJY6jgQ=;
-	b=IwtyWbIYf1dEuS2Epo2bjFrk2NTblWUaE/9xxCv0KiJ6id5bAAbfP4oiQh2JmOZTrlH74k
-	FTal34mt3eN2vkNFeQVrDP/szdfjD5nRNQDKXLJ0Mcwd975+3O9FovqgLQrYEnPlbruqKM
-	Jy20y7HSF/VFDz1YpQ2Mz5HT6nHqHh0=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 11/11] KVM: selftests: Add test for SMCCC filter
-Date: Mon, 20 Mar 2023 22:10:02 +0000
-Message-Id: <20230320221002.4191007-12-oliver.upton@linux.dev>
-In-Reply-To: <20230320221002.4191007-1-oliver.upton@linux.dev>
-References: <20230320221002.4191007-1-oliver.upton@linux.dev>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A23579C7
+	for <kvmarm@lists.linux.dev>; Tue, 21 Mar 2023 09:42:36 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A1BA3AD7;
+	Tue, 21 Mar 2023 02:43:14 -0700 (PDT)
+Received: from [10.57.53.10] (unknown [10.57.53.10])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3E4F53F766;
+	Tue, 21 Mar 2023 02:42:29 -0700 (PDT)
+Message-ID: <60fbd578-0391-98b1-d8d1-200a716e1500@arm.com>
+Date: Tue, 21 Mar 2023 09:42:25 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.9.0
+Subject: Re: [PATCH 02/11] KVM: arm64: Add a helper to check if a VM has ran
+ once
+To: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, Sean Christopherson <seanjc@google.com>,
+ Salil Mehta <salil.mehta@huawei.com>
+References: <20230320221002.4191007-1-oliver.upton@linux.dev>
+ <20230320221002.4191007-3-oliver.upton@linux.dev>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20230320221002.4191007-3-oliver.upton@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Add a selftest for the SMCCC filter, ensuring basic UAPI constraints
-(e.g. reserved ranges, non-overlapping ranges) are upheld. Additionally,
-test that the DENIED and FWD_TO_USER work as intended.
+Hi Oliver,
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/aarch64/smccc_filter.c      | 196 ++++++++++++++++++
- 2 files changed, 197 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/aarch64/smccc_filter.c
+On 20/03/2023 22:09, Oliver Upton wrote:
+> The test_bit(...) pattern is quite a lot of keystrokes. Replace
+> existing callsites with a helper.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>   arch/arm64/include/asm/kvm_host.h | 3 +++
+>   arch/arm64/kvm/pmu-emul.c         | 4 ++--
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 84a627c43795..d66a0642cffd 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -141,6 +141,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
- TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
- TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
- TEST_GEN_PROGS_aarch64 += aarch64/psci_test
-+TEST_GEN_PROGS_aarch64 += aarch64/smccc_filter
- TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_irq
-diff --git a/tools/testing/selftests/kvm/aarch64/smccc_filter.c b/tools/testing/selftests/kvm/aarch64/smccc_filter.c
-new file mode 100644
-index 000000000000..7f4950d18b42
---- /dev/null
-+++ b/tools/testing/selftests/kvm/aarch64/smccc_filter.c
-@@ -0,0 +1,196 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * smccc_filter - Tests for the SMCCC filter UAPI.
-+ *
-+ * Copyright (c) 2023 Google LLC
-+ *
-+ * This test includes:
-+ *  - Tests that the UAPI constraints are upheld by KVM. For example, userspace
-+ *    is prevented from filtering the architecture range of SMCCC calls.
-+ *  - Test that the filter actions (DENIED, FWD_TO_USER) work as intended.
-+ */
-+
-+#include <linux/arm-smccc.h>
-+#include <linux/psci.h>
-+#include <stdint.h>
-+
-+#include "processor.h"
-+#include "test_util.h"
-+
-+enum smccc_conduit {
-+	HVC_INSN,
-+	SMC_INSN,
-+};
-+
-+#define for_each_conduit(conduit)					\
-+	for (conduit = HVC_INSN; conduit <= SMC_INSN; conduit++)
-+
-+static void guest_main(uint32_t func_id, enum smccc_conduit conduit)
-+{
-+	struct arm_smccc_res res;
-+
-+	if (conduit == SMC_INSN)
-+		smccc_smc(func_id, 0, 0, 0, 0, 0, 0, 0, &res);
-+	else
-+		smccc_hvc(func_id, 0, 0, 0, 0, 0, 0, 0, &res);
-+
-+	GUEST_SYNC(res.a0);
-+}
-+
-+static int __set_smccc_filter(struct kvm_vm *vm, uint32_t start, uint32_t nr_functions,
-+			      enum kvm_smccc_filter_action action)
-+{
-+	struct kvm_smccc_filter filter = {
-+		.base		= start,
-+		.nr_functions	= nr_functions,
-+		.action		= action,
-+	};
-+
-+	return __kvm_device_attr_set(vm->fd, KVM_ARM_VM_SMCCC_CTRL,
-+				     KVM_ARM_VM_SMCCC_FILTER, &filter);
-+}
-+
-+static void set_smccc_filter(struct kvm_vm *vm, uint32_t start, uint32_t nr_functions,
-+			     enum kvm_smccc_filter_action action)
-+{
-+	int ret = __set_smccc_filter(vm, start, nr_functions, action);
-+
-+	TEST_ASSERT(!ret, "failed to configure SMCCC filter: %d", ret);
-+}
-+
-+static struct kvm_vm *setup_vm(struct kvm_vcpu **vcpu)
-+{
-+	struct kvm_vcpu_init init;
-+	struct kvm_vm *vm;
-+
-+	vm = vm_create(1);
-+	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
-+
-+	/*
-+	 * Enable in-kernel emulation of PSCI to ensure that calls are denied
-+	 * due to the SMCCC filter, not because of KVM.
-+	 */
-+	init.features[0] |= (1 << KVM_ARM_VCPU_PSCI_0_2);
-+
-+	*vcpu = aarch64_vcpu_add(vm, 0, &init, guest_main);
-+	return vm;
-+}
-+
-+/* Ensure that userspace cannot filter the Arm Architecture SMCCC range */
-+static void test_filter_reserved_range(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm = setup_vm(&vcpu);
-+	int r;
-+
-+	r = __set_smccc_filter(vm, ARM_SMCCC_ARCH_WORKAROUND_1,
-+			       1, KVM_SMCCC_FILTER_DENY);
-+	TEST_ASSERT(r, "Attempt to filter reserved range unexpectedly succeeded");
-+
-+	kvm_vm_free(vm);
-+}
-+
-+/* Test that overlapping configurations of the SMCCC filter are rejected */
-+static void test_filter_overlap(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm = setup_vm(&vcpu);
-+	int r;
-+
-+	set_smccc_filter(vm, PSCI_0_2_FN64_CPU_ON, 1, KVM_SMCCC_FILTER_DENY);
-+
-+	r = __set_smccc_filter(vm, PSCI_0_2_FN64_CPU_ON, 1, KVM_SMCCC_FILTER_DENY);
-+	TEST_ASSERT(r, "Attempt to filter already configured range unexpectedly succeeded");
-+
-+	kvm_vm_free(vm);
-+}
-+
-+static void expect_call_denied(struct kvm_vcpu *vcpu)
-+{
-+	struct ucall uc;
-+
-+	if (get_ucall(vcpu, &uc) != UCALL_SYNC)
-+		TEST_FAIL("Unexpected ucall: %lu\n", uc.cmd);
-+
-+	TEST_ASSERT(uc.args[1] == SMCCC_RET_NOT_SUPPORTED,
-+		    "Unexpected SMCCC return code: %lu", uc.args[1]);
-+}
-+
-+/* Denied SMCCC calls have a return code of SMCCC_RET_NOT_SUPPORTED */
-+static void test_filter_denied(void)
-+{
-+	enum smccc_conduit conduit;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	for_each_conduit(conduit) {
-+		vm = setup_vm(&vcpu);
-+
-+		set_smccc_filter(vm, PSCI_0_2_FN_PSCI_VERSION, 1, KVM_SMCCC_FILTER_DENY);
-+		vcpu_args_set(vcpu, 2, PSCI_0_2_FN_PSCI_VERSION, conduit);
-+
-+		vcpu_run(vcpu);
-+		expect_call_denied(vcpu);
-+
-+		kvm_vm_free(vm);
-+	}
-+}
-+
-+static void expect_call_fwd_to_user(struct kvm_vcpu *vcpu, uint32_t func_id,
-+				    enum smccc_conduit conduit)
-+{
-+	struct kvm_run *run = vcpu->run;
-+
-+	TEST_ASSERT(run->exit_reason == KVM_EXIT_HYPERCALL,
-+		    "Unexpected exit reason: %u", run->exit_reason);
-+	TEST_ASSERT(run->hypercall.nr == func_id,
-+		    "Unexpected SMCCC function: %llu", run->hypercall.nr);
-+
-+	if (conduit == SMC_INSN)
-+		TEST_ASSERT(run->hypercall.flags & KVM_HYPERCALL_EXIT_SMC,
-+			    "KVM_HYPERCALL_EXIT_SMC is not set");
-+	else
-+		TEST_ASSERT(!(run->hypercall.flags & KVM_HYPERCALL_EXIT_SMC),
-+			    "KVM_HYPERCAL_EXIT_SMC is set");
-+}
-+
-+/* SMCCC calls forwarded to userspace cause KVM_EXIT_HYPERCALL exits */
-+static void test_filter_fwd_to_user(void)
-+{
-+	enum smccc_conduit conduit;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	for_each_conduit(conduit) {
-+		vm = setup_vm(&vcpu);
-+
-+		set_smccc_filter(vm, PSCI_0_2_FN_PSCI_VERSION, 1, KVM_SMCCC_FILTER_FWD_TO_USER);
-+		vcpu_args_set(vcpu, 2, PSCI_0_2_FN_PSCI_VERSION, conduit);
-+
-+		vcpu_run(vcpu);
-+		expect_call_fwd_to_user(vcpu, PSCI_0_2_FN_PSCI_VERSION, conduit);
-+
-+		kvm_vm_free(vm);
-+	}
-+}
-+
-+static bool kvm_supports_smccc_filter(void)
-+{
-+	struct kvm_vm *vm = vm_create_barebones();
-+	int r;
-+
-+	r = __kvm_has_device_attr(vm->fd, KVM_ARM_VM_SMCCC_CTRL, KVM_ARM_VM_SMCCC_FILTER);
-+
-+	kvm_vm_free(vm);
-+	return !r;
-+}
-+
-+int main(void)
-+{
-+	TEST_REQUIRE(kvm_supports_smccc_filter());
-+
-+	test_filter_reserved_range();
-+	test_filter_overlap();
-+	test_filter_denied();
-+	test_filter_fwd_to_user();
-+}
--- 
-2.40.0.rc1.284.g88254d51c5-goog
+There is one more instance in arch/arm64/kvm/hypercalls.c at
+kvm_arm_set_fw_reg_bmap(). Is there a reason why that can't be replaced ?
+
+Otherwise, looks good to me.
+
+Suzuki
 
