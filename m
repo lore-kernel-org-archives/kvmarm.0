@@ -1,96 +1,91 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41D938BE1
-	for <kvmarm@lists.linux.dev>; Tue, 21 Mar 2023 09:53:12 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B960AAD7;
-	Tue, 21 Mar 2023 02:53:55 -0700 (PDT)
-Received: from [10.57.53.10] (unknown [10.57.53.10])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 650633F766;
-	Tue, 21 Mar 2023 02:53:10 -0700 (PDT)
-Message-ID: <5f7dcec1-eeeb-811b-d9bc-85ecb7c73aa9@arm.com>
-Date: Tue, 21 Mar 2023 09:53:06 +0000
+Received: from out-8.mta0.migadu.com (out-8.mta0.migadu.com [91.218.175.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B49039440
+	for <kvmarm@lists.linux.dev>; Tue, 21 Mar 2023 12:13:28 +0000 (UTC)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1679400806;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=W8avJLFib3sdsj9e8Eeoams20ysVm7oUzXRXZTHIjjw=;
+	b=XxJrLfW4fGCijJKOoIjCsd8QA36c4I/nw177R02xL1V9RMxwiMcCT1HI92YCp15a5Eg3co
+	oTHHA9QHZ/IUbejd3hMwWeOFoSM7obmxFzLxutAMwxm4mvisbKAulzk/mofSxUuvLqHWHV
+	iFIW2dWX4lBO48Ml358T1scG1Yl6eas=
+From: Andrew Jones <andrew.jones@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: Shaoqin Huang <shahuang@redhat.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [kvm-unit-tests PATCH] arm/pl031: Apply gic_enable_irq
+Date: Tue, 21 Mar 2023 13:13:25 +0100
+Message-Id: <20230321121325.755595-1-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.9.0
-Subject: Re: [PATCH 03/11] KVM: arm64: Add vm fd device attribute accessors
-To: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Sean Christopherson <seanjc@google.com>,
- Salil Mehta <salil.mehta@huawei.com>
-References: <20230320221002.4191007-1-oliver.upton@linux.dev>
- <20230320221002.4191007-4-oliver.upton@linux.dev>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20230320221002.4191007-4-oliver.upton@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 20/03/2023 22:09, Oliver Upton wrote:
-> A subsequent change will allow userspace to convey a filter for
-> hypercalls through a vm device attribute. Add the requisite boilerplate
-> for vm attribute accessors.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->   arch/arm64/kvm/arm.c | 29 +++++++++++++++++++++++++++++
->   1 file changed, 29 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 3bd732eaf087..b6e26c0e65e5 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1439,11 +1439,28 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
->   	}
->   }
->   
-> +static int kvm_vm_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
-> +{
-> +	switch (attr->group) {
-> +	default:
-> +		return -ENXIO;
-> +	}
-> +}
-> +
-> +static int kvm_vm_set_attr(struct kvm *kvm, struct kvm_device_attr *attr)
-> +{
-> +	switch (attr->group) {
-> +	default:
-> +		return -ENXIO;
-> +	}
-> +}
-> +
->   long kvm_arch_vm_ioctl(struct file *filp,
->   		       unsigned int ioctl, unsigned long arg)
->   {
->   	struct kvm *kvm = filp->private_data;
->   	void __user *argp = (void __user *)arg;
-> +	struct kvm_device_attr attr;
->   
->   	switch (ioctl) {
->   	case KVM_CREATE_IRQCHIP: {
-> @@ -1479,6 +1496,18 @@ long kvm_arch_vm_ioctl(struct file *filp,
->   			return -EFAULT;
->   		return kvm_vm_ioctl_mte_copy_tags(kvm, &copy_tags);
->   	}
-> +	case KVM_HAS_DEVICE_ATTR: {
-> +		if (copy_from_user(&attr, argp, sizeof(attr)))
-> +			return -EFAULT;
-> +
-> +		return kvm_vm_has_attr(kvm, &attr);
-> +	}
-> +	case KVM_SET_DEVICE_ATTR: {
-> +		if (copy_from_user(&attr, argp, sizeof(attr)))
-> +			return -EFAULT;
-> +
-> +		return kvm_vm_set_attr(kvm, &attr);
-> +	}
+Use gic_enable_irq() to clean up code.
 
-Is there a reason to exclude KVM_GET_DEVICE_ATTR handling ?
+Suggested-by: Zenghui Yu <yuzenghui@huawei.com>
+Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+---
+ arm/pl031.c | 12 +-----------
+ 1 file changed, 1 insertion(+), 11 deletions(-)
 
-Suzuki
+diff --git a/arm/pl031.c b/arm/pl031.c
+index 452fe0f3e36c..c56805e402a0 100644
+--- a/arm/pl031.c
++++ b/arm/pl031.c
+@@ -47,7 +47,6 @@ static u32 cntfrq;
+ static struct pl031_regs *pl031;
+ static int pl031_irq;
+ static void *gic_ispendr;
+-static void *gic_isenabler;
+ static volatile bool irq_triggered;
+ 
+ static int check_id(void)
+@@ -125,13 +124,6 @@ static bool gic_irq_pending(void)
+ 	return readl(gic_ispendr + offset) & (1 << (pl031_irq & 31));
+ }
+ 
+-static void gic_irq_unmask(void)
+-{
+-	uint32_t offset = (pl031_irq / 32) * 4;
+-
+-	writel(1 << (pl031_irq & 31), gic_isenabler + offset);
+-}
+-
+ static void irq_handler(struct pt_regs *regs)
+ {
+ 	u32 irqstat = gic_read_iar();
+@@ -185,7 +177,7 @@ static int check_rtc_irq(void)
+ 	report(gic_irq_pending(), "  RTC IRQ pending now");
+ 
+ 	/* Enable retrieval of IRQ */
+-	gic_irq_unmask();
++	gic_enable_irq(pl031_irq);
+ 	local_irq_enable();
+ 
+ 	report(irq_triggered, "  IRQ triggered");
+@@ -208,11 +200,9 @@ static void rtc_irq_init(void)
+ 	switch (gic_version()) {
+ 	case 2:
+ 		gic_ispendr = gicv2_dist_base() + GICD_ISPENDR;
+-		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
+ 		break;
+ 	case 3:
+ 		gic_ispendr = gicv3_dist_base() + GICD_ISPENDR;
+-		gic_isenabler = gicv3_dist_base() + GICD_ISENABLER;
+ 		break;
+ 	}
+ }
+-- 
+2.39.2
 
