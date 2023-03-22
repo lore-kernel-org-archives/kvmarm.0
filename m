@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A42482566
-	for <kvmarm@lists.linux.dev>; Wed, 22 Mar 2023 12:02:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3481AC433D2;
-	Wed, 22 Mar 2023 12:02:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82B4B2566
+	for <kvmarm@lists.linux.dev>; Wed, 22 Mar 2023 12:02:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37B67C433D2;
+	Wed, 22 Mar 2023 12:02:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1679486539;
-	bh=rgf80NZ6Lf8YlvQh7lNwvfe1vjJ9RqRyEotFA1blxkE=;
+	s=k20201202; t=1679486550;
+	bh=CRCJIH2uLdyNfVV6sSx01twRnixoyJd2xVLxCDPs1IE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pUCA1wNnedBOtiY9kskI+rWDvAkH8KIeoi87P7azHYr4TuGcP/QCXPNhRBOd5iqZx
-	 60pgD4fJjOU4AYBv0BoergYs8BlSooUMK48nL0CZKFWsgrZscEOOc+Tk5D/BbSrzYL
-	 9ZPoi1/FkiVZOVrbNSymvu9pB4KsDb75fqZ36IQhVQHrBxgG4GONpXC88MCO8Y8qMp
-	 EZKBc7HP/RS7NHftYhlHjqcndFUuR8soJX4vZJsH/NfIGXa4Q3UX+ZskbHUAk+VJXZ
-	 d8EbNE7uQf2OebJ4kjyRb8vV+tZAah2Qp54YpbCja1/aProfVr1DjW3TspBJF0D2LL
-	 J4iBqBTHIU70g==
+	b=ZUudX7rP9Nh03eQITRX66t39X6AI8DhYlJPk24XZdQtMXtbsXhp32i8F+LfUDq8QV
+	 nsEi9Xz3ou8SBQDvntvCoDUeWgUBZ1MvMaflR06+mjhLTzMvbTLSfLoTAsxYQeObuc
+	 gWMGfidnL9nb8xLRpXYINB8Wu3EIMTRshhbVNtygp5I2lgjlf9PjBSMK7qcZDiOh8B
+	 pzB8XdLWTT6UaBZ2+Bshc17d15XmQXSIUb9AYBuxE9voEIIkI+RlBWMyh83m7m/G5A
+	 HnNM0KF6XPbthiUDVNDLFH/d1UlbdTZ7c9YLIEwGfz0fzKQIJSQtNt+rul/zJzDQaN
+	 4Z3Y7nyRJgfwQ==
 Received: from [206.0.71.16] (helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pexAW-002CJ1-D1;
-	Wed, 22 Mar 2023 12:02:16 +0000
-Date: Wed, 22 Mar 2023 12:02:15 +0000
-Message-ID: <87o7olgfjs.wl-maz@kernel.org>
+	id 1pexAf-002CJ7-Sk;
+	Wed, 22 Mar 2023 12:02:27 +0000
+Date: Wed, 22 Mar 2023 12:02:24 +0000
+Message-ID: <87mt45gfjj.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: James Morse <james.morse@arm.com>,
@@ -31,10 +31,10 @@ Cc: James Morse <james.morse@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-arm-kernel@lists.infradead.org,
 	Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH v2 4/4] KVM: arm64: Use config_lock to protect vgic state
-In-Reply-To: <20230316211412.2651555-5-oliver.upton@linux.dev>
+Subject: Re: [PATCH v2 1/4] KVM: arm64: Avoid vcpu->mutex v. kvm->lock inversion in CPU_ON
+In-Reply-To: <20230316211412.2651555-2-oliver.upton@linux.dev>
 References: <20230316211412.2651555-1-oliver.upton@linux.dev>
-	<20230316211412.2651555-5-oliver.upton@linux.dev>
+	<20230316211412.2651555-2-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -50,210 +50,235 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@a
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 16 Mar 2023 21:14:12 +0000,
+On Thu, 16 Mar 2023 21:14:09 +0000,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Almost all of the vgic state is VM-scoped but accessed from the context
-> of a vCPU. These accesses were serialized on the kvm->lock which cannot
-> be nested within a vcpu->mutex critical section.
+> KVM/arm64 had the lock ordering backwards on vcpu->mutex and kvm->lock
+> from the very beginning. One such example is the way vCPU resets are
+> handled: the kvm->lock is acquired while handling a guest CPU_ON PSCI
+> call.
 > 
-> Move over the vgic state to using the config_lock. Tweak the lock
-> ordering where necessary to ensure that the config_lock is acquired
-> after the vcpu->mutex. Acquire the config_lock in kvm_vgic_create() to
-> avoid a race between the converted flows and GIC creation.
+> Add a dedicated lock to serialize writes to kvm_vcpu_arch::mp_state.
+> Hold the lock in kvm_psci_vcpu_on() to protect against changes while
+> the reset state is being configured. Ensure that readers read mp_state
+> exactly once. While at it, plug yet another race by taking the
+> mp_state_lock in the KVM_SET_MP_STATE ioctl handler.
+> 
+> As changes to MP state are now guarded with a dedicated lock, drop the
+> kvm->lock acquisition from the PSCI CPU_ON path. Similarly, move the
+> reader of reset_state outside of the kvm->lock and insert a barrier to
+> ensure reset_state is read before dropping the pending reset state.
+> 
+> While the kvm->lock inversion still exists in kvm_reset_vcpu(), at least
+> now PSCI CPU_ON no longer depends on it for serializing vCPU reset.
 > 
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/kvm/vgic/vgic-debug.c      |  8 ++--
->  arch/arm64/kvm/vgic/vgic-init.c       | 33 ++++++++++-------
->  arch/arm64/kvm/vgic/vgic-its.c        | 29 ++++++---------
->  arch/arm64/kvm/vgic/vgic-kvm-device.c | 53 ++++++++++++---------------
->  arch/arm64/kvm/vgic/vgic-mmio-v3.c    |  4 +-
->  arch/arm64/kvm/vgic/vgic-mmio.c       | 12 +++---
->  arch/arm64/kvm/vgic/vgic-v4.c         | 11 +++---
->  arch/arm64/kvm/vgic/vgic.c            |  2 +-
->  8 files changed, 75 insertions(+), 77 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h |  1 +
+>  arch/arm64/kvm/arm.c              | 23 ++++++++++++++++++-----
+>  arch/arm64/kvm/psci.c             | 19 ++++++++++---------
+>  arch/arm64/kvm/reset.c            | 10 ++++++----
+>  4 files changed, 35 insertions(+), 18 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/vgic/vgic-debug.c b/arch/arm64/kvm/vgic/vgic-debug.c
-> index 78cde687383c..07aa0437125a 100644
-> --- a/arch/arm64/kvm/vgic/vgic-debug.c
-> +++ b/arch/arm64/kvm/vgic/vgic-debug.c
-> @@ -85,7 +85,7 @@ static void *vgic_debug_start(struct seq_file *s, loff_t *pos)
->  	struct kvm *kvm = s->private;
->  	struct vgic_state_iter *iter;
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index bcd774d74f34..917586237a4d 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -522,6 +522,7 @@ struct kvm_vcpu_arch {
 >  
-> -	mutex_lock(&kvm->lock);
-> +	mutex_lock(&kvm->arch.config_lock);
->  	iter = kvm->arch.vgic.iter;
->  	if (iter) {
->  		iter = ERR_PTR(-EBUSY);
-> @@ -104,7 +104,7 @@ static void *vgic_debug_start(struct seq_file *s, loff_t *pos)
->  	if (end_of_vgic(iter))
->  		iter = NULL;
->  out:
-> -	mutex_unlock(&kvm->lock);
-> +	mutex_unlock(&kvm->arch.config_lock);
->  	return iter;
+>  	/* vcpu power state */
+>  	struct kvm_mp_state mp_state;
+> +	spinlock_t mp_state_lock;
+>  
+>  	/* Cache some mmu pages needed inside spinlock regions */
+>  	struct kvm_mmu_memory_cache mmu_page_cache;
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 3bd732eaf087..731a78f85915 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -326,6 +326,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>  {
+>  	int err;
+>  
+> +	spin_lock_init(&vcpu->arch.mp_state_lock);
+> +
+>  	/* Force users to call KVM_ARM_VCPU_INIT */
+>  	vcpu->arch.target = -1;
+>  	bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
+> @@ -443,16 +445,23 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>  	vcpu->cpu = -1;
 >  }
 >  
-> @@ -132,12 +132,12 @@ static void vgic_debug_stop(struct seq_file *s, void *v)
->  	if (IS_ERR(v))
->  		return;
->  
-> -	mutex_lock(&kvm->lock);
-> +	mutex_lock(&kvm->arch.config_lock);
->  	iter = kvm->arch.vgic.iter;
->  	kfree(iter->lpi_array);
->  	kfree(iter);
->  	kvm->arch.vgic.iter = NULL;
-> -	mutex_unlock(&kvm->lock);
-> +	mutex_unlock(&kvm->arch.config_lock);
+> -void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
+> +static void __kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
+>  {
+>  	vcpu->arch.mp_state.mp_state = KVM_MP_STATE_STOPPED;
+>  	kvm_make_request(KVM_REQ_SLEEP, vcpu);
+>  	kvm_vcpu_kick(vcpu);
 >  }
 >  
->  static void print_dist_state(struct seq_file *s, struct vgic_dist *dist)
-> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> index cd134db41a57..b1690063e17d 100644
-> --- a/arch/arm64/kvm/vgic/vgic-init.c
-> +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> @@ -74,9 +74,6 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
->  	unsigned long i;
->  	int ret;
+> +void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
+> +{
+> +	spin_lock(&vcpu->arch.mp_state_lock);
+> +	__kvm_arm_vcpu_power_off(vcpu);
+> +	spin_unlock(&vcpu->arch.mp_state_lock);
+> +}
+> +
+>  bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu)
+>  {
+> -	return vcpu->arch.mp_state.mp_state == KVM_MP_STATE_STOPPED;
+> +	return READ_ONCE(vcpu->arch.mp_state.mp_state) == KVM_MP_STATE_STOPPED;
+>  }
 >  
-> -	if (irqchip_in_kernel(kvm))
-> -		return -EEXIST;
-> -
->  	/*
->  	 * This function is also called by the KVM_CREATE_IRQCHIP handler,
->  	 * which had no chance yet to check the availability of the GICv2
-> @@ -91,6 +88,13 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
->  	if (!lock_all_vcpus(kvm))
+>  static void kvm_arm_vcpu_suspend(struct kvm_vcpu *vcpu)
+> @@ -464,13 +473,13 @@ static void kvm_arm_vcpu_suspend(struct kvm_vcpu *vcpu)
+>  
+>  static bool kvm_arm_vcpu_suspended(struct kvm_vcpu *vcpu)
+>  {
+> -	return vcpu->arch.mp_state.mp_state == KVM_MP_STATE_SUSPENDED;
+> +	return READ_ONCE(vcpu->arch.mp_state.mp_state) == KVM_MP_STATE_SUSPENDED;
+>  }
+>  
+>  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+>  				    struct kvm_mp_state *mp_state)
+>  {
+> -	*mp_state = vcpu->arch.mp_state;
+> +	*mp_state = READ_ONCE(vcpu->arch.mp_state);
+>  
+>  	return 0;
+>  }
+> @@ -480,12 +489,14 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+>  {
+>  	int ret = 0;
+>  
+> +	spin_lock(&vcpu->arch.mp_state_lock);
+> +
+>  	switch (mp_state->mp_state) {
+>  	case KVM_MP_STATE_RUNNABLE:
+>  		vcpu->arch.mp_state = *mp_state;
+
+Given that the above helpers snapshot mp_state without holding the
+lock, it'd be better to at least turn this into a WRITE_ONCE().
+
+>  		break;
+>  	case KVM_MP_STATE_STOPPED:
+> -		kvm_arm_vcpu_power_off(vcpu);
+> +		__kvm_arm_vcpu_power_off(vcpu);
+>  		break;
+>  	case KVM_MP_STATE_SUSPENDED:
+>  		kvm_arm_vcpu_suspend(vcpu);
+> @@ -494,6 +505,8 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+>  		ret = -EINVAL;
+>  	}
+>  
+> +	spin_unlock(&vcpu->arch.mp_state_lock);
+> +
+>  	return ret;
+>  }
+>  
+> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> index 7fbc4c1b9df0..7f1bff1cd670 100644
+> --- a/arch/arm64/kvm/psci.c
+> +++ b/arch/arm64/kvm/psci.c
+> @@ -62,6 +62,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  	struct vcpu_reset_state *reset_state;
+>  	struct kvm *kvm = source_vcpu->kvm;
+>  	struct kvm_vcpu *vcpu = NULL;
+> +	int ret = PSCI_RET_SUCCESS;
+>  	unsigned long cpu_id;
+>  
+>  	cpu_id = smccc_get_arg1(source_vcpu);
+> @@ -76,11 +77,15 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  	 */
+>  	if (!vcpu)
+>  		return PSCI_RET_INVALID_PARAMS;
+> +
+> +	spin_lock(&vcpu->arch.mp_state_lock);
+>  	if (!kvm_arm_vcpu_stopped(vcpu)) {
+>  		if (kvm_psci_version(source_vcpu) != KVM_ARM_PSCI_0_1)
+> -			return PSCI_RET_ALREADY_ON;
+> +			ret = PSCI_RET_ALREADY_ON;
+>  		else
+> -			return PSCI_RET_INVALID_PARAMS;
+> +			ret = PSCI_RET_INVALID_PARAMS;
+> +
+> +		goto out_unlock;
+>  	}
+>  
+>  	reset_state = &vcpu->arch.reset_state;
+> @@ -108,7 +113,9 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  	vcpu->arch.mp_state.mp_state = KVM_MP_STATE_RUNNABLE;
+>  	kvm_vcpu_wake_up(vcpu);
+>  
+> -	return PSCI_RET_SUCCESS;
+> +out_unlock:
+> +	spin_unlock(&vcpu->arch.mp_state_lock);
+> +	return ret;
+>  }
+>  
+>  static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
+> @@ -229,7 +236,6 @@ static unsigned long kvm_psci_check_allowed_function(struct kvm_vcpu *vcpu, u32
+>  
+>  static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
+>  {
+> -	struct kvm *kvm = vcpu->kvm;
+>  	u32 psci_fn = smccc_get_function(vcpu);
+>  	unsigned long val;
+>  	int ret = 1;
+> @@ -254,9 +260,7 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
+>  		kvm_psci_narrow_to_32bit(vcpu);
+>  		fallthrough;
+>  	case PSCI_0_2_FN64_CPU_ON:
+> -		mutex_lock(&kvm->lock);
+>  		val = kvm_psci_vcpu_on(vcpu);
+> -		mutex_unlock(&kvm->lock);
+>  		break;
+>  	case PSCI_0_2_FN_AFFINITY_INFO:
+>  		kvm_psci_narrow_to_32bit(vcpu);
+> @@ -395,7 +399,6 @@ static int kvm_psci_1_x_call(struct kvm_vcpu *vcpu, u32 minor)
+>  
+>  static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
+>  {
+> -	struct kvm *kvm = vcpu->kvm;
+>  	u32 psci_fn = smccc_get_function(vcpu);
+>  	unsigned long val;
+>  
+> @@ -405,9 +408,7 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
+>  		val = PSCI_RET_SUCCESS;
+>  		break;
+>  	case KVM_PSCI_FN_CPU_ON:
+> -		mutex_lock(&kvm->lock);
+>  		val = kvm_psci_vcpu_on(vcpu);
+> -		mutex_unlock(&kvm->lock);
+>  		break;
+>  	default:
+>  		val = PSCI_RET_NOT_SUPPORTED;
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 49a3257dec46..b874ec6a37c1 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -264,15 +264,17 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>  
+>  	mutex_lock(&vcpu->kvm->lock);
+>  	ret = kvm_set_vm_width(vcpu);
+> -	if (!ret) {
+> -		reset_state = vcpu->arch.reset_state;
+> -		WRITE_ONCE(vcpu->arch.reset_state.reset, false);
+> -	}
+>  	mutex_unlock(&vcpu->kvm->lock);
+>  
+>  	if (ret)
 >  		return ret;
 >  
-> +	mutex_lock(&kvm->arch.config_lock);
+> +	reset_state = vcpu->arch.reset_state;
 > +
-> +	if (irqchip_in_kernel(kvm)) {
-> +		ret = -EEXIST;
-> +		goto out_unlock;
-> +	}
-> +
->  	kvm_for_each_vcpu(i, vcpu, kvm) {
->  		if (vcpu_has_run_once(vcpu))
->  			goto out_unlock;
-> @@ -118,6 +122,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
->  		INIT_LIST_HEAD(&kvm->arch.vgic.rd_regions);
->  
->  out_unlock:
-> +	mutex_unlock(&kvm->arch.config_lock);
->  	unlock_all_vcpus(kvm);
->  	return ret;
->  }
-> @@ -227,9 +232,9 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
->  	 * KVM io device for the redistributor that belongs to this VCPU.
->  	 */
->  	if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
-> -		mutex_lock(&vcpu->kvm->lock);
-> +		mutex_lock(&vcpu->kvm->arch.config_lock);
->  		ret = vgic_register_redist_iodev(vcpu);
-> -		mutex_unlock(&vcpu->kvm->lock);
-> +		mutex_unlock(&vcpu->kvm->arch.config_lock);
->  	}
->  	return ret;
->  }
-> @@ -250,7 +255,6 @@ static void kvm_vgic_vcpu_enable(struct kvm_vcpu *vcpu)
->   * The function is generally called when nr_spis has been explicitly set
->   * by the guest through the KVM DEVICE API. If not nr_spis is set to 256.
->   * vgic_initialized() returns true when this function has succeeded.
-> - * Must be called with kvm->lock held!
->   */
->  int vgic_init(struct kvm *kvm)
->  {
-> @@ -259,6 +263,8 @@ int vgic_init(struct kvm *kvm)
->  	int ret = 0, i;
->  	unsigned long idx;
->  
-> +	lockdep_assert_held(&kvm->arch.config_lock);
-> +
->  	if (vgic_initialized(kvm))
->  		return 0;
->  
-> @@ -373,12 +379,13 @@ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
->  	vgic_cpu->rd_iodev.base_addr = VGIC_ADDR_UNDEF;
->  }
->  
-> -/* To be called with kvm->lock held */
->  static void __kvm_vgic_destroy(struct kvm *kvm)
->  {
->  	struct kvm_vcpu *vcpu;
->  	unsigned long i;
->  
-> +	lockdep_assert_held(&kvm->arch.config_lock);
-> +
->  	vgic_debug_destroy(kvm);
->  
->  	kvm_for_each_vcpu(i, vcpu, kvm)
-> @@ -389,9 +396,9 @@ static void __kvm_vgic_destroy(struct kvm *kvm)
->  
->  void kvm_vgic_destroy(struct kvm *kvm)
->  {
-> -	mutex_lock(&kvm->lock);
-> +	mutex_lock(&kvm->arch.config_lock);
->  	__kvm_vgic_destroy(kvm);
-> -	mutex_unlock(&kvm->lock);
-> +	mutex_unlock(&kvm->arch.config_lock);
->  }
->  
->  /**
-> @@ -414,9 +421,9 @@ int vgic_lazy_init(struct kvm *kvm)
->  		if (kvm->arch.vgic.vgic_model != KVM_DEV_TYPE_ARM_VGIC_V2)
->  			return -EBUSY;
->  
-> -		mutex_lock(&kvm->lock);
-> +		mutex_lock(&kvm->arch.config_lock);
->  		ret = vgic_init(kvm);
-> -		mutex_unlock(&kvm->lock);
-> +		mutex_unlock(&kvm->arch.config_lock);
->  	}
->  
->  	return ret;
-> @@ -441,7 +448,7 @@ int kvm_vgic_map_resources(struct kvm *kvm)
->  	if (likely(vgic_ready(kvm)))
->  		return 0;
->  
-> -	mutex_lock(&kvm->lock);
-> +	mutex_lock(&kvm->arch.config_lock);
->  	if (vgic_ready(kvm))
->  		goto out;
->  
-> @@ -459,7 +466,7 @@ int kvm_vgic_map_resources(struct kvm *kvm)
->  		dist->ready = true;
->  
->  out:
-> -	mutex_unlock(&kvm->lock);
-> +	mutex_unlock(&kvm->arch.config_lock);
->  	return ret;
->  }
->  
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> index 2642e9ce2819..ca55065102e7 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -2043,7 +2043,10 @@ static int vgic_its_attr_regs_access(struct kvm_device *dev,
->  	if (offset & align)
->  		return -EINVAL;
->  
-> -	mutex_lock(&dev->kvm->lock);
-> +	if (!lock_all_vcpus(dev->kvm))
-> +		return -EBUSY;
-> +
-> +	mutex_lock(&dev->kvm->arch.config_lock);
+> +	/* Ensure reset_state is read before clearing the pending state */
+> +	smp_rmb();
+> +	WRITE_ONCE(vcpu->arch.reset_state.reset, false);
 
-Huh, that's fishy. The whole "lock the VM and the lock the individual
-vcpus" is there to prevent a concurrent creation of a vcpu while we're
-doing stuff that affects them all. Allowing a new vcpu to come online
-while this sequence is happening is ... unexpected.
-
-Why do we need to drop this initial lock? I'd expect them to be
-completely cumulative.
+What prevents a concurrent PSCI call from messing with this state? I'd
+have expected this to be done while holding the mp_state lock... There
+must be something, somewhere, but I fail to spot it right now.
 
 Thanks,
 
