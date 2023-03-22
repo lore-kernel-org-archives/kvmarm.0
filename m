@@ -1,60 +1,145 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F313023AD
-	for <kvmarm@lists.linux.dev>; Wed, 22 Mar 2023 10:05:38 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 625A6AD7;
-	Wed, 22 Mar 2023 03:06:22 -0700 (PDT)
-Received: from [10.57.53.198] (unknown [10.57.53.198])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6D95C3F67D;
-	Wed, 22 Mar 2023 03:05:37 -0700 (PDT)
-Message-ID: <4ef9cf26-bc5d-2b67-9a9c-249e12b749a3@arm.com>
-Date: Wed, 22 Mar 2023 10:05:35 +0000
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF04723AD
+	for <kvmarm@lists.linux.dev>; Wed, 22 Mar 2023 10:23:56 +0000 (UTC)
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-3ec1e8c4cacso10275e9.1
+        for <kvmarm@lists.linux.dev>; Wed, 22 Mar 2023 03:23:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1679480635;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mcDRlGqb6Azx/x9zIxUH1xj8S/fV5DxJOLYKrwe15TU=;
+        b=b9wczk/RvzcvFUi12dsmCX/dOp168FNB/SofHTHB0xagYDW5bzYNCsxLv8oNlbpPrK
+         ZjD9DO5iSb2Vm2D/61rXC644sDbVjg56fHs/fY+0K8FEb2LHGQGJZH71ZLYSdF4K05a9
+         4cJVG7d4bcGG8TWLurN45B+JegyERpBhQP5uoNdcwXGJoAaE1ipCg+CE2HstLhaBcLoU
+         98rMKepuI+GZLDwDZSHRISsqO2IbuMWWiWyRhbSHS0+b1fQGgVC8Q4+FjaLviFbbA+uA
+         46S8lM2iCvIAQhazV4ySTlQcjLZ2x4XLbLG7zp9qFH3OUFyN9pd8Xq9taLn40wgOvBJh
+         ACNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679480635;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mcDRlGqb6Azx/x9zIxUH1xj8S/fV5DxJOLYKrwe15TU=;
+        b=Hc9tDLFUNKcjfxLK3GKCaAXNzflhum09HbLyzEh66Lb931bb0vz3ejpAJw9pL1aFic
+         3sJuGpgLyrYEkleA5I3RryI5MRUoHmpDoeacdgezIwD7pBeTIKaxFGQEEz/J4yN58B0h
+         26VdG9In9c/Sigtwdz7gytWGRTFGqT8HCP+b3zNdgDtgKmFQBgA0PYLHgeGJz8ufXLxa
+         CGmFiGtpg+iYdIdIeb1omZCqyDOy16QSJUIqjULum2OC0il8FT5VHRAw6+BgdjOdSuye
+         nH/4+PkF1HPm3cI6KtgVB4F+uYHo+J8CNxYrrwQ0UeujueA6pZx16xtrg1B/ApxvEsRe
+         H3ZA==
+X-Gm-Message-State: AO0yUKXtQpWl3IiOqexcRjPZvXL8Vidbhpp+qdowixQclJjpQmSFz9cW
+	8oIZR7/vBOv8+NC19TXqCDAfsA==
+X-Google-Smtp-Source: AK7set/RxnGBHvENZoN3y84D3iy9ZfTLiNg7s6OFbvMVV5PfOCNdV5jQnhbS+sVxArHm8nYHBg02hg==
+X-Received: by 2002:a05:600c:3d0c:b0:3df:f3cb:e8ce with SMTP id bh12-20020a05600c3d0c00b003dff3cbe8cemr108656wmb.7.1679480635095;
+        Wed, 22 Mar 2023 03:23:55 -0700 (PDT)
+Received: from google.com (44.232.78.34.bc.googleusercontent.com. [34.78.232.44])
+        by smtp.gmail.com with ESMTPSA id y16-20020a056000109000b002c56013c07fsm13394867wrw.109.2023.03.22.03.23.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Mar 2023 03:23:54 -0700 (PDT)
+Date: Wed, 22 Mar 2023 10:23:50 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org,
+	joro@8bytes.org, robin.murphy@arm.com, james.morse@arm.com,
+	suzuki.poulose@arm.com, oliver.upton@linux.dev,
+	yuzenghui@huawei.com, dbrazdil@google.com, ryan.roberts@arm.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	iommu@lists.linux.dev
+Subject: Re: [RFC PATCH 39/45] iommu/arm-smmu-v3-kvm: Initialize page table
+ configuration
+Message-ID: <ZBrXNjOiqHJAxLzw@google.com>
+References: <20230201125328.2186498-1-jean-philippe@linaro.org>
+ <20230201125328.2186498-40-jean-philippe@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.8.0
-Subject: Re: [PATCH v4 04/30] lib: Apply Lindent to acpi.{c,h}
-Content-Language: en-GB
-To: Andrew Jones <andrew.jones@linux.dev>, Shaoqin Huang <shahuang@redhat.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
- alexandru.elisei@arm.com, ricarkol@google.com
-References: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
- <20230213101759.2577077-5-nikos.nikoleris@arm.com>
- <5a8887b2-a276-b087-964e-fa3f98826185@redhat.com>
- <20230321173210.kojqm6owufly7upk@orel>
-From: Nikos Nikoleris <nikos.nikoleris@arm.com>
-In-Reply-To: <20230321173210.kojqm6owufly7upk@orel>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230201125328.2186498-40-jean-philippe@linaro.org>
 
-On 21/03/2023 17:32, Andrew Jones wrote:
-> On Thu, Mar 09, 2023 at 03:11:56PM +0800, Shaoqin Huang wrote:
-> ...
->>> +#define ACPI_TABLE_HEADER_DEF		/* ACPI common table header */			\
->>> +	u32 signature;			/* ACPI signature (4 ASCII characters) */	\
->>> +	u32 length;			/* Length of table, in bytes, including header */ \
->>> +	u8  revision;			/* ACPI Specification minor version # */	\
->>> +	u8  checksum;			/* To make sum of entire table == 0 */		\
->>> +	u8  oem_id [6];			/* OEM identification */			\
->>                    ^
->>> +	u8  oem_table_id [8];		/* OEM table identification */			\
->>                          ^
->>> +	u32 oem_revision;		/* OEM revision number */			\
->>> +	u8  asl_compiler_id [4];	/* ASL compiler vendor ID */			\
->>                             ^
->> nit: These space should also be deleted.
->>
+Hi Jean,
+
+On Wed, Feb 01, 2023 at 12:53:23PM +0000, Jean-Philippe Brucker wrote:
+> Prepare the stage-2 I/O page table configuration that will be used by
+> the hypervisor driver.
 > 
-> Yes, but the fixup belongs in the next patch that does manual style
-> changes.
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> ---
+>  .../iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c   | 29 +++++++++++++++++++
+>  1 file changed, 29 insertions(+)
 > 
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c
+> index 755c77bc0417..55489d56fb5b 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c
+> @@ -16,6 +16,7 @@ struct host_arm_smmu_device {
+>  	struct arm_smmu_device		smmu;
+>  	pkvm_handle_t			id;
+>  	u32				boot_gbpa;
+> +	unsigned int			pgd_order;
+>  };
+>  
+>  #define smmu_to_host(_smmu) \
+> @@ -192,6 +193,7 @@ static int kvm_arm_smmu_probe(struct platform_device *pdev)
+>  	size_t size;
+>  	phys_addr_t ioaddr;
+>  	struct resource *res;
+> +	struct io_pgtable_cfg cfg;
+>  	struct arm_smmu_device *smmu;
+>  	struct device *dev = &pdev->dev;
+>  	struct host_arm_smmu_device *host_smmu;
+> @@ -233,6 +235,31 @@ static int kvm_arm_smmu_probe(struct platform_device *pdev)
+>  	if (!kvm_arm_smmu_validate_features(smmu))
+>  		return -ENODEV;
+>  
+> +	/*
+> +	 * Stage-1 should be easy to support, though we do need to allocate a
+> +	 * context descriptor table.
+> +	 */
+> +	cfg = (struct io_pgtable_cfg) {
+> +		.fmt = ARM_64_LPAE_S2,
+> +		.pgsize_bitmap = smmu->pgsize_bitmap,
+> +		.ias = smmu->ias,
+> +		.oas = smmu->oas,
+> +		.coherent_walk = smmu->features & ARM_SMMU_FEAT_COHERENCY,
+> +	};
+> +
+> +	/*
+> +	 * Choose the page and address size. Compute the PGD size and number of
+> +	 * levels as well, so we know how much memory to pre-allocate.
+> +	 */
+> +	ret = io_pgtable_configure(&cfg, &size);
+size variable is overwritten here with pgd size, while used later on
+the assumption it still contains the SMMU MMIO size.
+This looks like it is not intended?
 
-Thank you both, I will address this in the next patch.
 
+> +	if (ret)
+> +		return ret;
+> +
+> +	host_smmu->pgd_order = get_order(size);
+> +	smmu->pgsize_bitmap = cfg.pgsize_bitmap;
+> +	smmu->ias = cfg.ias;
+> +	smmu->oas = cfg.oas;
+> +
+>  	ret = arm_smmu_init_one_queue(smmu, &smmu->cmdq.q, smmu->base,
+>  				      ARM_SMMU_CMDQ_PROD, ARM_SMMU_CMDQ_CONS,
+>  				      CMDQ_ENT_DWORDS, "cmdq");
+> @@ -253,6 +280,8 @@ static int kvm_arm_smmu_probe(struct platform_device *pdev)
+>  	hyp_smmu->mmio_addr = ioaddr;
+>  	hyp_smmu->mmio_size = size;
+>  	hyp_smmu->features = smmu->features;
+> +	hyp_smmu->iommu.pgtable_cfg = cfg;
+> +
+>  	kvm_arm_smmu_cur++;
+>  
+>  	return 0;
+> -- 
+> 2.39.0
+> 
 Thanks,
-
-Nikos
+Mostafa
