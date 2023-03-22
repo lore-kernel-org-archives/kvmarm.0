@@ -1,70 +1,92 @@
-Received: from out-34.mta1.migadu.com (out-34.mta1.migadu.com [95.215.58.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3457533F0
-	for <kvmarm@lists.linux.dev>; Tue, 21 Mar 2023 18:42:01 +0000 (UTC)
-Date: Tue, 21 Mar 2023 19:41:58 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1679424120;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DIC31lOJGI6TEZYluCgHNpwEWB1FmTnLvCT8xC83L7k=;
-	b=YiZbiHD3gZey054BxlRxLWzl7L1YfgP7LQxnneIwom/y671cu1hf4BC0PoFDxAhxYZ0D01
-	kh6Ya7govaVCJE/I8T/tt3ZwU21DxCRzpjNlQbXRS5EoB3sVDg4Tlx1s9xOBUaUc0QHXu0
-	p8BcRbAmk/iUxvdCieu/NRaXo9GyTgA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Nikos Nikoleris <nikos.nikoleris@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
-	alexandru.elisei@arm.com, ricarkol@google.com
-Subject: Re: [PATCH v4 30/30] arm64: Add an efi/run script
-Message-ID: <20230321184158.phwwbsk5mv7qwhpa@orel>
-References: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
- <20230213101759.2577077-31-nikos.nikoleris@arm.com>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F069A23AD
+	for <kvmarm@lists.linux.dev>; Wed, 22 Mar 2023 10:03:13 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 436CD4B3;
+	Wed, 22 Mar 2023 03:03:51 -0700 (PDT)
+Received: from [10.57.53.198] (unknown [10.57.53.198])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 67C243F67D;
+	Wed, 22 Mar 2023 03:03:06 -0700 (PDT)
+Message-ID: <07119162-55c9-cf86-ce55-651496dabb00@arm.com>
+Date: Wed, 22 Mar 2023 10:02:35 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230213101759.2577077-31-nikos.nikoleris@arm.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.8.0
+Subject: Re: [PATCH v4 30/30] arm64: Add an efi/run script
+Content-Language: en-GB
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+ alexandru.elisei@arm.com, ricarkol@google.com
+References: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
+ <20230213101759.2577077-31-nikos.nikoleris@arm.com>
+ <20230321184158.phwwbsk5mv7qwhpa@orel>
+From: Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <20230321184158.phwwbsk5mv7qwhpa@orel>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Feb 13, 2023 at 10:17:59AM +0000, Nikos Nikoleris wrote:
-> This change adds a efi/run script inspired by the one in x86. This
-> script will setup a folder with the test compiled as an EFI app and a
-> startup.nsh script. The script launches QEMU providing an image with
-> EDKII and the path to the folder with the test which is executed
-> automatically.
+Hi Drew,
+
+On 21/03/2023 18:41, Andrew Jones wrote:
+> On Mon, Feb 13, 2023 at 10:17:59AM +0000, Nikos Nikoleris wrote:
+>> This change adds a efi/run script inspired by the one in x86. This
+>> script will setup a folder with the test compiled as an EFI app and a
+>> startup.nsh script. The script launches QEMU providing an image with
+>> EDKII and the path to the folder with the test which is executed
+>> automatically.
+>>
+>> For example:
+>>
+>> $> ./arm/efi/run ./arm/selftest.efi setup smp=2 mem=256
 > 
-> For example:
+> This should be
 > 
-> $> ./arm/efi/run ./arm/selftest.efi setup smp=2 mem=256
+> ./arm/efi/run ./arm/selftest.efi -append "setup smp=2 mem=256" -smp 2 -m 256
+>
 
-This should be
+Indeed, I will update the commit message.
 
-./arm/efi/run ./arm/selftest.efi -append "setup smp=2 mem=256" -smp 2 -m 256
+> but I can't get any tests to run through ./arm/efi/run. All of them
+> immediately die with a DABT_EL1. I can get the tests to run (and pass) by
+> manually booting into UEFI with the FAT partition pointing at the parent
+> directory
+> 
 
-but I can't get any tests to run through ./arm/efi/run. All of them
-immediately die with a DABT_EL1. I can get the tests to run (and pass) by
-manually booting into UEFI with the FAT partition pointing at the parent
-directory
+I suppose the DABT_EL1 is happening after the test has started and not 
+while the UEFI interactive shell starts?
 
- $QEMU -nodefaults -machine virt -accel tcg -cpu cortex-a57 \
-       -device pci-testdev -display none -serial stdio \
-       -bios /usr/share/edk2/aarch64/QEMU_EFI.silent.fd \
-       -drive file.dir=efi-tests/,file.driver=vvfat,file.rw=on,format=raw,if=virtio
+>   $QEMU -nodefaults -machine virt -accel tcg -cpu cortex-a57 \
+>         -device pci-testdev -display none -serial stdio \
+>         -bios /usr/share/edk2/aarch64/QEMU_EFI.silent.fd \
+>         -drive file.dir=efi-tests/,file.driver=vvfat,file.rw=on,format=raw,if=virtio
+> 
 
-and then, for example for the timer test, doing
+Do you hit the DABT_EL1 if you let it automatically start using the 
+startup.nsh prepared by the ./arm/efi/run script? Meaning change the 
+above command if you provided -drive file.dir=efi-tests/timer instead:
 
- fs0:
- cd timer
- timer.efi
+  $QEMU -nodefaults -machine virt -accel tcg -cpu cortex-a57 \
+        -device pci-testdev -display none -serial stdio \
+        -bios /usr/share/edk2/aarch64/QEMU_EFI.silent.fd \
+        -drive file.dir=efi 
+tests/timer,file.driver=vvfat,file.rw=on,format=raw,if=virtio
 
-but the script never works.
+Thanks for reviewing this!
 
-Thanks,
-drew
+Nikos
+
+> and then, for example for the timer test, doing
+> 
+>   fs0:
+>   cd timer
+>   timer.efi
+> 
+> but the script never works.
+>
+> Thanks,
+> drew
