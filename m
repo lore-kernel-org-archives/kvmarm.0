@@ -1,180 +1,137 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2EFB2566;
-	Wed, 22 Mar 2023 11:51:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C072B2566
+	for <kvmarm@lists.linux.dev>; Wed, 22 Mar 2023 11:57:20 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D06524B3;
-	Wed, 22 Mar 2023 04:52:07 -0700 (PDT)
-Received: from [10.57.53.137] (unknown [10.57.53.137])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B2E553F67D;
-	Wed, 22 Mar 2023 04:51:20 -0700 (PDT)
-Message-ID: <2a944bb7-23d0-7b49-90c2-5bcf8da694b0@arm.com>
-Date: Wed, 22 Mar 2023 11:51:18 +0000
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 253CC4B3;
+	Wed, 22 Mar 2023 04:58:04 -0700 (PDT)
+Received: from [10.57.53.198] (unknown [10.57.53.198])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 49F503F67D;
+	Wed, 22 Mar 2023 04:57:19 -0700 (PDT)
+Message-ID: <31ac48f6-c8d9-edb1-d013-551489a34740@arm.com>
+Date: Wed, 22 Mar 2023 11:57:17 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [RFC PATCH 15/28] KVM: arm64: Handle realm MMIO emulation
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.8.0
+Subject: Re: [PATCH v4 30/30] arm64: Add an efi/run script
 Content-Language: en-GB
-To: Zhi Wang <zhi.wang.linux@gmail.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
- <20230127112932.38045-1-steven.price@arm.com>
- <20230127112932.38045-16-steven.price@arm.com>
- <20230306173751.000026d4@gmail.com>
- <e0354676-e8cf-6ea0-3229-a55d90259f8e@arm.com>
- <20230314174436.0000584d@gmail.com>
-From: Steven Price <steven.price@arm.com>
-In-Reply-To: <20230314174436.0000584d@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+ alexandru.elisei@arm.com, ricarkol@google.com
+References: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
+ <20230213101759.2577077-31-nikos.nikoleris@arm.com>
+ <20230321184158.phwwbsk5mv7qwhpa@orel>
+ <07119162-55c9-cf86-ce55-651496dabb00@arm.com>
+ <20230322112455.got7oypemataep2c@orel>
+From: Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <20230322112455.got7oypemataep2c@orel>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 14/03/2023 15:44, Zhi Wang wrote:
-> On Fri, 10 Mar 2023 15:47:14 +0000
-> Steven Price <steven.price@arm.com> wrote:
-> 
->> On 06/03/2023 15:37, Zhi Wang wrote:
->>> On Fri, 27 Jan 2023 11:29:19 +0000
->>> Steven Price <steven.price@arm.com> wrote:
->>>   
->>>> MMIO emulation for a realm cannot be done directly with the VM's
->>>> registers as they are protected from the host. However the RMM interface
->>>> provides a structure member for providing the read/written value and  
->>>
->>> More details would be better for helping the review. I can only see the
->>> emulated mmio value from the device model (kvmtool or kvm_io_bus) is put into
->>> the GPRS[0] of the RecEntry object. But the rest of the flow is missing.  
+On 22/03/2023 11:24, Andrew Jones wrote:
+> On Wed, Mar 22, 2023 at 10:02:35AM +0000, Nikos Nikoleris wrote:
+>> Hi Drew,
 >>
->> The commit message is out of date (sorry about that). A previous version
->> of the spec had a dedicated member for the read/write value, but this
->> was changed to just use GPRS[0] as you've spotted. I'll update the text.
->>
->>> I guess RMM copies the value in the RecEntry.GPRS[0] to the target GPR in the
->>> guest context in RMI_REC_ENTER when seeing RMI_EMULATED_MMIO. This is for
->>> the guest MMIO read path.  
->>
->> Yes, when entering the guest after an (emulatable) read data abort the
->> value in GPRS[0] is loaded from the RecEntry structure into the
->> appropriate register for the guest.
->>
->>> How about the MMIO write path? I don't see where the RecExit.GPRS[0] is loaded
->>> to a varible and returned to the userspace.  
->>
-> 
-> -----
->> The RMM will populate GPRS[0] with the written value in this case (even
->> if another register was actually used in the instruction). We then
->> transfer that to the usual VCPU structure so that the normal fault
->> handling logic works.
->>
-> -----
-> 
-> Are these in this patch or another patch?
-
-The RMM (not included in this particular series[1]) sets the first
-element of the 'GPRS' array which is in memory shared with the host.
-
-The Linux half to populate the vcpu structure is in the previous patch:
-
-+static int rec_exit_sync_dabt(struct kvm_vcpu *vcpu)
-+{
-+	struct rec *rec = &vcpu->arch.rec;
-+
-+	if (kvm_vcpu_dabt_iswrite(vcpu) && kvm_vcpu_dabt_isvalid(vcpu))
-+		vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu),
-+			     rec->run->exit.gprs[0]);
-+
-+	return kvm_handle_guest_abort(vcpu);
-+}
-
-I guess it might make sense to pull the 'if' statement out of the
-previous patch and into this one to keep all the MMIO code together.
-
-Steve
-
-[1] This Linux code is written against the RMM specification and in
-theory could work with any RMM implementation. But the TF RMM is open
-source, so I can point you at the assignment in the latest commit here:
-https://git.trustedfirmware.org/TF-RMM/tf-rmm.git/tree/runtime/core/exit.c?id=d294b1b05e8d234d32684a982552aa2a17fb9157#n264
-
->>>> we can transfer this to the appropriate VCPU's register entry and then
->>>> depend on the generic MMIO handling code in KVM.
+>> On 21/03/2023 18:41, Andrew Jones wrote:
+>>> On Mon, Feb 13, 2023 at 10:17:59AM +0000, Nikos Nikoleris wrote:
+>>>> This change adds a efi/run script inspired by the one in x86. This
+>>>> script will setup a folder with the test compiled as an EFI app and a
+>>>> startup.nsh script. The script launches QEMU providing an image with
+>>>> EDKII and the path to the folder with the test which is executed
+>>>> automatically.
 >>>>
->>>> Signed-off-by: Steven Price <steven.price@arm.com>
->>>> ---
->>>>  arch/arm64/kvm/mmio.c | 7 +++++++
->>>>  1 file changed, 7 insertions(+)
+>>>> For example:
 >>>>
->>>> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
->>>> index 3dd38a151d2a..c4879fa3a8d3 100644
->>>> --- a/arch/arm64/kvm/mmio.c
->>>> +++ b/arch/arm64/kvm/mmio.c
->>>> @@ -6,6 +6,7 @@
->>>>  
->>>>  #include <linux/kvm_host.h>
->>>>  #include <asm/kvm_emulate.h>
->>>> +#include <asm/rmi_smc.h>
->>>>  #include <trace/events/kvm.h>
->>>>  
->>>>  #include "trace.h"
->>>> @@ -109,6 +110,9 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
->>>>  			       &data);
->>>>  		data = vcpu_data_host_to_guest(vcpu, data, len);
->>>>  		vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
->>>> +
->>>> +		if (vcpu_is_rec(vcpu))
->>>> +			vcpu->arch.rec.run->entry.gprs[0] = data;  
+>>>> $> ./arm/efi/run ./arm/selftest.efi setup smp=2 mem=256
 >>>
->>> I think the guest context is maintained by RMM (while KVM can only touch
->>> Rec{Entry, Exit} object) so that guest context in the legacy VHE mode is
->>> unused.
+>>> This should be
 >>>
->>> If yes, I guess here is should be:
+>>> ./arm/efi/run ./arm/selftest.efi -append "setup smp=2 mem=256" -smp 2 -m 256
 >>>
->>> if (unlikely(vcpu_is_rec(vcpu)))
->>> 	vcpu->arch.rec.run->entry.gprs[0] = data;
->>> else
->>> 	vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);  
 >>
->> Correct. Although there's no harm in updating with vcpu_set_reg(). But
->> I'll make the change because it's clearer.
+>> Indeed, I will update the commit message.
 >>
->>>>  	}
->>>>  
->>>>  	/*
->>>> @@ -179,6 +183,9 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
->>>>  	run->mmio.len		= len;
->>>>  	vcpu->mmio_needed	= 1;
->>>>  
->>>> +	if (vcpu_is_rec(vcpu))
->>>> +		vcpu->arch.rec.run->entry.flags |= RMI_EMULATED_MMIO;
->>>> +  
+>>> but I can't get any tests to run through ./arm/efi/run. All of them
+>>> immediately die with a DABT_EL1. I can get the tests to run (and pass) by
+>>> manually booting into UEFI with the FAT partition pointing at the parent
+>>> directory
 >>>
->>> Wouldn't it be better to set this in the kvm_handle_mmio_return where the MMIO
->>> read emulation has been surely successful?  
 >>
->> Yes, that makes sense - I'll move this.
+>> I suppose the DABT_EL1 is happening after the test has started and not while
+>> the UEFI interactive shell starts?
+> 
+> The countdown completes and the startup script runs (I can add an echo to
+> check it). So it must be the test that fails.
+> 
 >>
->> Thanks,
+>>>    $QEMU -nodefaults -machine virt -accel tcg -cpu cortex-a57 \
+>>>          -device pci-testdev -display none -serial stdio \
+>>>          -bios /usr/share/edk2/aarch64/QEMU_EFI.silent.fd \
+>>>          -drive file.dir=efi-tests/,file.driver=vvfat,file.rw=on,format=raw,if=virtio
+>>>
 >>
->> Steve
+>> Do you hit the DABT_EL1 if you let it automatically start using the
+>> startup.nsh prepared by the ./arm/efi/run script? Meaning change the above
+>> command if you provided -drive file.dir=efi-tests/timer instead:
 >>
->>>>  	if (!ret) {
->>>>  		/* We handled the access successfully in the kernel. */
->>>>  		if (!is_write)  
->>>   
+>>   $QEMU -nodefaults -machine virt -accel tcg -cpu cortex-a57 \
+>>         -device pci-testdev -display none -serial stdio \
+>>         -bios /usr/share/edk2/aarch64/QEMU_EFI.silent.fd \
+>>         -drive file.dir=efi
+>> tests/timer,file.driver=vvfat,file.rw=on,format=raw,if=virtio
+> 
+> Yes, this is what ./arm/efi/run does, and it doesn't help to use the
+> command line directly.
+> 
 >>
+>> Thanks for reviewing this!
+>>
+>> Nikos
+>>
+>>> and then, for example for the timer test, doing
+>>>
+>>>    fs0:
+>>>    cd timer
+>>>    timer.efi
+> 
+> This actually doesn't work. I was actually doing
+> 
+>   fs0:
+>   cd timer
+>   ls
+>   timer.efi
+> 
+> and, believe it or not, without the 'ls' I get the dabt, with the 'ls' the
+> test runs and passes. Adding an 'ls' to the startup script doesn't help
+> the automatic execution though.
+> 
+> Which versions of QEMU and edk2 are you using? And what file system do you
+> have the efi-tests directory on?
 > 
 
+I am using the QEMU_EFI.fd image that comes with Ubuntu 20.04.6 
+(0~20191122.bd85bf54-2ubuntu3.4) 
+https://packages.ubuntu.com/focal-updates/qemu-efi-aarch64
+
+and I've tried two different versions of QEMU
+
+$> qemu-system-aarch64 --version 
+
+QEMU emulator version 4.2.1 (Debian 1:4.2-3ubuntu6.24)
+Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+
+$> ../qemu/build/qemu-system-aarch64 --version
+QEMU emulator version 7.0.0 (v7.0.0-dirty)
+Copyright (c) 2003-2022 Fabrice Bellard and the QEMU Project developers
+
+efi-tests is on ext4
+
+I am happy to have a closer look if you help me reproduce your environment.
+
+Thanks,
+
+Nikos
