@@ -1,124 +1,146 @@
-Received: from out-49.mta1.migadu.com (out-49.mta1.migadu.com [95.215.58.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86DC223D4
-	for <kvmarm@lists.linux.dev>; Wed, 22 Mar 2023 11:24:59 +0000 (UTC)
-Date: Wed, 22 Mar 2023 12:24:55 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1679484297;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aITG1t60yJcLOWRraYur4nSTqT9NFr2rwaG9aiUNdl0=;
-	b=FVNveFkEQhM7cS2x/d3kOLwVC/Yub5VlcR+2J0duNOWeK9e+e8TIRk2d06B8y025T2mNUW
-	ta0qJlbbudAhv8+5TglW51qIKWYypI2XRBxUCrWthalnHmsTDJPNIGcGWRGzFPHJJhi7yl
-	my6mrSJjTglMLSFN+kJ2bAK83veWpS8=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Nikos Nikoleris <nikos.nikoleris@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
-	alexandru.elisei@arm.com, ricarkol@google.com
-Subject: Re: [PATCH v4 30/30] arm64: Add an efi/run script
-Message-ID: <20230322112455.got7oypemataep2c@orel>
-References: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
- <20230213101759.2577077-31-nikos.nikoleris@arm.com>
- <20230321184158.phwwbsk5mv7qwhpa@orel>
- <07119162-55c9-cf86-ce55-651496dabb00@arm.com>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D9F2571;
+	Wed, 22 Mar 2023 11:51:25 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D05F9AD7;
+	Wed, 22 Mar 2023 04:52:08 -0700 (PDT)
+Received: from [10.57.53.137] (unknown [10.57.53.137])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EDC243F93E;
+	Wed, 22 Mar 2023 04:51:21 -0700 (PDT)
+Message-ID: <3f4dcc1e-7679-0f7c-44ef-6b0824400259@arm.com>
+Date: Wed, 22 Mar 2023 11:51:20 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <07119162-55c9-cf86-ce55-651496dabb00@arm.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [RFC PATCH 16/28] arm64: RME: Allow populating initial contents
+Content-Language: en-GB
+To: Zhi Wang <zhi.wang.linux@gmail.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev
+References: <20230127112248.136810-1-suzuki.poulose@arm.com>
+ <20230127112932.38045-1-steven.price@arm.com>
+ <20230127112932.38045-17-steven.price@arm.com>
+ <20230306193439.000048f2@gmail.com>
+ <6c6ff608-2314-a49a-84ee-fac883c4e227@arm.com>
+ <20230314173121.00006cfb@gmail.com>
+From: Steven Price <steven.price@arm.com>
+In-Reply-To: <20230314173121.00006cfb@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 22, 2023 at 10:02:35AM +0000, Nikos Nikoleris wrote:
-> Hi Drew,
+On 14/03/2023 15:31, Zhi Wang wrote:
+> On Fri, 10 Mar 2023 15:47:16 +0000
+> Steven Price <steven.price@arm.com> wrote:
 > 
-> On 21/03/2023 18:41, Andrew Jones wrote:
-> > On Mon, Feb 13, 2023 at 10:17:59AM +0000, Nikos Nikoleris wrote:
-> > > This change adds a efi/run script inspired by the one in x86. This
-> > > script will setup a folder with the test compiled as an EFI app and a
-> > > startup.nsh script. The script launches QEMU providing an image with
-> > > EDKII and the path to the folder with the test which is executed
-> > > automatically.
-> > > 
-> > > For example:
-> > > 
-> > > $> ./arm/efi/run ./arm/selftest.efi setup smp=2 mem=256
-> > 
-> > This should be
-> > 
-> > ./arm/efi/run ./arm/selftest.efi -append "setup smp=2 mem=256" -smp 2 -m 256
-> > 
+>> On 06/03/2023 17:34, Zhi Wang wrote:
+>>> On Fri, 27 Jan 2023 11:29:20 +0000
+>>> Steven Price <steven.price@arm.com> wrote:
+
+<snip>
+
+>>>> +	if (kvm_realm_state(kvm) != REALM_STATE_NEW)
+>>>> +		return -EBUSY;  
+>>>
+>>> Maybe -EINVAL? The realm hasn't been created (RMI_REALM_CREATE is not called
+>>> yet). The userspace shouldn't reach this path.  
+>>
+>> Well user space can attempt to populate in the ACTIVE state - which is
+>> where the idea of 'busy' comes from. Admittedly it's a little confusing
+>> when RMI_REALM_CREATE hasn't been called.
+>>
+>> I'm not particularly bothered about the return code, but it's useful to
+>> have a different code to -EINVAL as it's not an invalid argument, but
+>> calling at the wrong time. I can't immediately see a better error code
+>> though.
+>>
+> The reason why I feel -EBUSY is little bit off is EBUSY usually indicates
+> something is already initialized and currently running, then another
+> calling path wanna to operate it. 
 > 
-> Indeed, I will update the commit message.
+> I took a look on the ioctls in arch/arm64/kvm/arm.c. It seems people have
+> different opinions for calling execution path at a wrong time:
 > 
-> > but I can't get any tests to run through ./arm/efi/run. All of them
-> > immediately die with a DABT_EL1. I can get the tests to run (and pass) by
-> > manually booting into UEFI with the FAT partition pointing at the parent
-> > directory
-> > 
+> For example:
 > 
-> I suppose the DABT_EL1 is happening after the test has started and not while
-> the UEFI interactive shell starts?
-
-The countdown completes and the startup script runs (I can add an echo to
-check it). So it must be the test that fails.
-
+> long kvm_arch_vcpu_ioctl()
+> ...
+>         case KVM_GET_REG_LIST: {
+>                 struct kvm_reg_list __user *user_list = argp;
+>                 struct kvm_reg_list reg_list;
+>                 unsigned n;
 > 
-> >   $QEMU -nodefaults -machine virt -accel tcg -cpu cortex-a57 \
-> >         -device pci-testdev -display none -serial stdio \
-> >         -bios /usr/share/edk2/aarch64/QEMU_EFI.silent.fd \
-> >         -drive file.dir=efi-tests/,file.driver=vvfat,file.rw=on,format=raw,if=virtio
-> > 
+>                 r = -ENOEXEC;
+>                 if (unlikely(!kvm_vcpu_initialized(vcpu)))
+>                         break;
 > 
-> Do you hit the DABT_EL1 if you let it automatically start using the
-> startup.nsh prepared by the ./arm/efi/run script? Meaning change the above
-> command if you provided -drive file.dir=efi-tests/timer instead:
+>                 r = -EPERM;
+>                 if (!kvm_arm_vcpu_is_finalized(vcpu))
+>                         break;
 > 
->  $QEMU -nodefaults -machine virt -accel tcg -cpu cortex-a57 \
->        -device pci-testdev -display none -serial stdio \
->        -bios /usr/share/edk2/aarch64/QEMU_EFI.silent.fd \
->        -drive file.dir=efi
-> tests/timer,file.driver=vvfat,file.rw=on,format=raw,if=virtio
+> If we have to choose one, I prefer -ENOEXEC as -EPERM is stranger. But
+> personally my vote goes to -EINVAL.
 
-Yes, this is what ./arm/efi/run does, and it doesn't help to use the
-command line directly.
+Ok, I think you've convinced me - I'll change to -EINVAL. It is invalid
+use of the API and none of the other error codes seem a great fit.
 
+Although I do wish Linux had more descriptive error codes - I often end
+up peppering the kernel with a few printks when using a new API to find
+out what I'm doing wrong.
+
+Steve
+
+>> Steve
+>>
+>>>> +
+>>>> +	if (!IS_ALIGNED(args->populate_ipa_base, PAGE_SIZE) ||
+>>>> +	    !IS_ALIGNED(args->populate_ipa_size, PAGE_SIZE))
+>>>> +		return -EINVAL;
+>>>> +
+>>>> +	ipa_base = args->populate_ipa_base;
+>>>> +	ipa_end = ipa_base + args->populate_ipa_size;
+>>>> +
+>>>> +	if (ipa_end < ipa_base)
+>>>> +		return -EINVAL;
+>>>> +
+>>>> +	return populate_par_region(kvm, ipa_base, ipa_end);
+>>>> +}
+>>>> +
+>>>>  static int set_ipa_state(struct kvm_vcpu *vcpu,
+>>>>  			 unsigned long ipa,
+>>>>  			 unsigned long end,
+>>>> @@ -748,6 +1102,18 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
+>>>>  		r = kvm_init_ipa_range_realm(kvm, &args);
+>>>>  		break;
+>>>>  	}
+>>>> +	case KVM_CAP_ARM_RME_POPULATE_REALM: {
+>>>> +		struct kvm_cap_arm_rme_populate_realm_args args;
+>>>> +		void __user *argp = u64_to_user_ptr(cap->args[1]);
+>>>> +
+>>>> +		if (copy_from_user(&args, argp, sizeof(args))) {
+>>>> +			r = -EFAULT;
+>>>> +			break;
+>>>> +		}
+>>>> +
+>>>> +		r = kvm_populate_realm(kvm, &args);
+>>>> +		break;
+>>>> +	}
+>>>>  	default:
+>>>>  		r = -EINVAL;
+>>>>  		break;  
+>>>   
+>>
 > 
-> Thanks for reviewing this!
-> 
-> Nikos
-> 
-> > and then, for example for the timer test, doing
-> > 
-> >   fs0:
-> >   cd timer
-> >   timer.efi
 
-This actually doesn't work. I was actually doing
-
- fs0:
- cd timer
- ls
- timer.efi
-
-and, believe it or not, without the 'ls' I get the dabt, with the 'ls' the
-test runs and passes. Adding an 'ls' to the startup script doesn't help
-the automatic execution though.
-
-Which versions of QEMU and edk2 are you using? And what file system do you
-have the efi-tests directory on?
-
-Thanks,
-drew
-
-> > 
-> > but the script never works.
-> > 
-> > Thanks,
-> > drew
