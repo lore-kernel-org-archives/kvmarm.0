@@ -1,56 +1,29 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-49.mta1.migadu.com (out-49.mta1.migadu.com [95.215.58.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF04723AD
-	for <kvmarm@lists.linux.dev>; Wed, 22 Mar 2023 10:23:56 +0000 (UTC)
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-3ec1e8c4cacso10275e9.1
-        for <kvmarm@lists.linux.dev>; Wed, 22 Mar 2023 03:23:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679480635;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mcDRlGqb6Azx/x9zIxUH1xj8S/fV5DxJOLYKrwe15TU=;
-        b=b9wczk/RvzcvFUi12dsmCX/dOp168FNB/SofHTHB0xagYDW5bzYNCsxLv8oNlbpPrK
-         ZjD9DO5iSb2Vm2D/61rXC644sDbVjg56fHs/fY+0K8FEb2LHGQGJZH71ZLYSdF4K05a9
-         4cJVG7d4bcGG8TWLurN45B+JegyERpBhQP5uoNdcwXGJoAaE1ipCg+CE2HstLhaBcLoU
-         98rMKepuI+GZLDwDZSHRISsqO2IbuMWWiWyRhbSHS0+b1fQGgVC8Q4+FjaLviFbbA+uA
-         46S8lM2iCvIAQhazV4ySTlQcjLZ2x4XLbLG7zp9qFH3OUFyN9pd8Xq9taLn40wgOvBJh
-         ACNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679480635;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mcDRlGqb6Azx/x9zIxUH1xj8S/fV5DxJOLYKrwe15TU=;
-        b=Hc9tDLFUNKcjfxLK3GKCaAXNzflhum09HbLyzEh66Lb931bb0vz3ejpAJw9pL1aFic
-         3sJuGpgLyrYEkleA5I3RryI5MRUoHmpDoeacdgezIwD7pBeTIKaxFGQEEz/J4yN58B0h
-         26VdG9In9c/Sigtwdz7gytWGRTFGqT8HCP+b3zNdgDtgKmFQBgA0PYLHgeGJz8ufXLxa
-         CGmFiGtpg+iYdIdIeb1omZCqyDOy16QSJUIqjULum2OC0il8FT5VHRAw6+BgdjOdSuye
-         nH/4+PkF1HPm3cI6KtgVB4F+uYHo+J8CNxYrrwQ0UeujueA6pZx16xtrg1B/ApxvEsRe
-         H3ZA==
-X-Gm-Message-State: AO0yUKXtQpWl3IiOqexcRjPZvXL8Vidbhpp+qdowixQclJjpQmSFz9cW
-	8oIZR7/vBOv8+NC19TXqCDAfsA==
-X-Google-Smtp-Source: AK7set/RxnGBHvENZoN3y84D3iy9ZfTLiNg7s6OFbvMVV5PfOCNdV5jQnhbS+sVxArHm8nYHBg02hg==
-X-Received: by 2002:a05:600c:3d0c:b0:3df:f3cb:e8ce with SMTP id bh12-20020a05600c3d0c00b003dff3cbe8cemr108656wmb.7.1679480635095;
-        Wed, 22 Mar 2023 03:23:55 -0700 (PDT)
-Received: from google.com (44.232.78.34.bc.googleusercontent.com. [34.78.232.44])
-        by smtp.gmail.com with ESMTPSA id y16-20020a056000109000b002c56013c07fsm13394867wrw.109.2023.03.22.03.23.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Mar 2023 03:23:54 -0700 (PDT)
-Date: Wed, 22 Mar 2023 10:23:50 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org,
-	joro@8bytes.org, robin.murphy@arm.com, james.morse@arm.com,
-	suzuki.poulose@arm.com, oliver.upton@linux.dev,
-	yuzenghui@huawei.com, dbrazdil@google.com, ryan.roberts@arm.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	iommu@lists.linux.dev
-Subject: Re: [RFC PATCH 39/45] iommu/arm-smmu-v3-kvm: Initialize page table
- configuration
-Message-ID: <ZBrXNjOiqHJAxLzw@google.com>
-References: <20230201125328.2186498-1-jean-philippe@linaro.org>
- <20230201125328.2186498-40-jean-philippe@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86DC223D4
+	for <kvmarm@lists.linux.dev>; Wed, 22 Mar 2023 11:24:59 +0000 (UTC)
+Date: Wed, 22 Mar 2023 12:24:55 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1679484297;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aITG1t60yJcLOWRraYur4nSTqT9NFr2rwaG9aiUNdl0=;
+	b=FVNveFkEQhM7cS2x/d3kOLwVC/Yub5VlcR+2J0duNOWeK9e+e8TIRk2d06B8y025T2mNUW
+	ta0qJlbbudAhv8+5TglW51qIKWYypI2XRBxUCrWthalnHmsTDJPNIGcGWRGzFPHJJhi7yl
+	my6mrSJjTglMLSFN+kJ2bAK83veWpS8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+	alexandru.elisei@arm.com, ricarkol@google.com
+Subject: Re: [PATCH v4 30/30] arm64: Add an efi/run script
+Message-ID: <20230322112455.got7oypemataep2c@orel>
+References: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
+ <20230213101759.2577077-31-nikos.nikoleris@arm.com>
+ <20230321184158.phwwbsk5mv7qwhpa@orel>
+ <07119162-55c9-cf86-ce55-651496dabb00@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -59,87 +32,93 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230201125328.2186498-40-jean-philippe@linaro.org>
+In-Reply-To: <07119162-55c9-cf86-ce55-651496dabb00@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Jean,
-
-On Wed, Feb 01, 2023 at 12:53:23PM +0000, Jean-Philippe Brucker wrote:
-> Prepare the stage-2 I/O page table configuration that will be used by
-> the hypervisor driver.
+On Wed, Mar 22, 2023 at 10:02:35AM +0000, Nikos Nikoleris wrote:
+> Hi Drew,
 > 
-> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> ---
->  .../iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c   | 29 +++++++++++++++++++
->  1 file changed, 29 insertions(+)
+> On 21/03/2023 18:41, Andrew Jones wrote:
+> > On Mon, Feb 13, 2023 at 10:17:59AM +0000, Nikos Nikoleris wrote:
+> > > This change adds a efi/run script inspired by the one in x86. This
+> > > script will setup a folder with the test compiled as an EFI app and a
+> > > startup.nsh script. The script launches QEMU providing an image with
+> > > EDKII and the path to the folder with the test which is executed
+> > > automatically.
+> > > 
+> > > For example:
+> > > 
+> > > $> ./arm/efi/run ./arm/selftest.efi setup smp=2 mem=256
+> > 
+> > This should be
+> > 
+> > ./arm/efi/run ./arm/selftest.efi -append "setup smp=2 mem=256" -smp 2 -m 256
+> > 
 > 
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c
-> index 755c77bc0417..55489d56fb5b 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c
-> @@ -16,6 +16,7 @@ struct host_arm_smmu_device {
->  	struct arm_smmu_device		smmu;
->  	pkvm_handle_t			id;
->  	u32				boot_gbpa;
-> +	unsigned int			pgd_order;
->  };
->  
->  #define smmu_to_host(_smmu) \
-> @@ -192,6 +193,7 @@ static int kvm_arm_smmu_probe(struct platform_device *pdev)
->  	size_t size;
->  	phys_addr_t ioaddr;
->  	struct resource *res;
-> +	struct io_pgtable_cfg cfg;
->  	struct arm_smmu_device *smmu;
->  	struct device *dev = &pdev->dev;
->  	struct host_arm_smmu_device *host_smmu;
-> @@ -233,6 +235,31 @@ static int kvm_arm_smmu_probe(struct platform_device *pdev)
->  	if (!kvm_arm_smmu_validate_features(smmu))
->  		return -ENODEV;
->  
-> +	/*
-> +	 * Stage-1 should be easy to support, though we do need to allocate a
-> +	 * context descriptor table.
-> +	 */
-> +	cfg = (struct io_pgtable_cfg) {
-> +		.fmt = ARM_64_LPAE_S2,
-> +		.pgsize_bitmap = smmu->pgsize_bitmap,
-> +		.ias = smmu->ias,
-> +		.oas = smmu->oas,
-> +		.coherent_walk = smmu->features & ARM_SMMU_FEAT_COHERENCY,
-> +	};
-> +
-> +	/*
-> +	 * Choose the page and address size. Compute the PGD size and number of
-> +	 * levels as well, so we know how much memory to pre-allocate.
-> +	 */
-> +	ret = io_pgtable_configure(&cfg, &size);
-size variable is overwritten here with pgd size, while used later on
-the assumption it still contains the SMMU MMIO size.
-This looks like it is not intended?
-
-
-> +	if (ret)
-> +		return ret;
-> +
-> +	host_smmu->pgd_order = get_order(size);
-> +	smmu->pgsize_bitmap = cfg.pgsize_bitmap;
-> +	smmu->ias = cfg.ias;
-> +	smmu->oas = cfg.oas;
-> +
->  	ret = arm_smmu_init_one_queue(smmu, &smmu->cmdq.q, smmu->base,
->  				      ARM_SMMU_CMDQ_PROD, ARM_SMMU_CMDQ_CONS,
->  				      CMDQ_ENT_DWORDS, "cmdq");
-> @@ -253,6 +280,8 @@ static int kvm_arm_smmu_probe(struct platform_device *pdev)
->  	hyp_smmu->mmio_addr = ioaddr;
->  	hyp_smmu->mmio_size = size;
->  	hyp_smmu->features = smmu->features;
-> +	hyp_smmu->iommu.pgtable_cfg = cfg;
-> +
->  	kvm_arm_smmu_cur++;
->  
->  	return 0;
-> -- 
-> 2.39.0
+> Indeed, I will update the commit message.
 > 
+> > but I can't get any tests to run through ./arm/efi/run. All of them
+> > immediately die with a DABT_EL1. I can get the tests to run (and pass) by
+> > manually booting into UEFI with the FAT partition pointing at the parent
+> > directory
+> > 
+> 
+> I suppose the DABT_EL1 is happening after the test has started and not while
+> the UEFI interactive shell starts?
+
+The countdown completes and the startup script runs (I can add an echo to
+check it). So it must be the test that fails.
+
+> 
+> >   $QEMU -nodefaults -machine virt -accel tcg -cpu cortex-a57 \
+> >         -device pci-testdev -display none -serial stdio \
+> >         -bios /usr/share/edk2/aarch64/QEMU_EFI.silent.fd \
+> >         -drive file.dir=efi-tests/,file.driver=vvfat,file.rw=on,format=raw,if=virtio
+> > 
+> 
+> Do you hit the DABT_EL1 if you let it automatically start using the
+> startup.nsh prepared by the ./arm/efi/run script? Meaning change the above
+> command if you provided -drive file.dir=efi-tests/timer instead:
+> 
+>  $QEMU -nodefaults -machine virt -accel tcg -cpu cortex-a57 \
+>        -device pci-testdev -display none -serial stdio \
+>        -bios /usr/share/edk2/aarch64/QEMU_EFI.silent.fd \
+>        -drive file.dir=efi
+> tests/timer,file.driver=vvfat,file.rw=on,format=raw,if=virtio
+
+Yes, this is what ./arm/efi/run does, and it doesn't help to use the
+command line directly.
+
+> 
+> Thanks for reviewing this!
+> 
+> Nikos
+> 
+> > and then, for example for the timer test, doing
+> > 
+> >   fs0:
+> >   cd timer
+> >   timer.efi
+
+This actually doesn't work. I was actually doing
+
+ fs0:
+ cd timer
+ ls
+ timer.efi
+
+and, believe it or not, without the 'ls' I get the dabt, with the 'ls' the
+test runs and passes. Adding an 'ls' to the startup script doesn't help
+the automatic execution though.
+
+Which versions of QEMU and edk2 are you using? And what file system do you
+have the efi-tests directory on?
+
 Thanks,
-Mostafa
+drew
+
+> > 
+> > but the script never works.
+> > 
+> > Thanks,
+> > drew
