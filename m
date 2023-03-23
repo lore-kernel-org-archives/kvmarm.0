@@ -1,91 +1,72 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-8.mta0.migadu.com (out-8.mta0.migadu.com [91.218.175.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B2D93C04
-	for <kvmarm@lists.linux.dev>; Thu, 23 Mar 2023 18:56:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 023FCC433EF;
-	Thu, 23 Mar 2023 18:56:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1679597818;
-	bh=TTOT8BXKpDeG0idarmpx7k8xv/rMwqoTTTQf32UWpSg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RXU0q9pTHsscMAVR9AF72Gv5Shw4fPRcGeNliGWbcTKn8b83OSwOfKJcRk132OWfO
-	 l6CG1bRSU5nSLhnxcjxxbGX+n03XnAxi3qNv11BlZpWWw2UsrltFW7ZjDQ2UAqgkRz
-	 r79cz9aQ3GBWuszc2XpJSW1kySDniQjbfdUfYF91YAVDXKB0urOgBqfzBjhx9B71yr
-	 VWRQCoxZpbkDI2T2Mmh1GvlmGqzIyIn5LplMlvsBq4T5vn+cSbn0P2tiYsKDMWzksx
-	 mqPL3u+kuNlP4BSJadVZbWZPhKsnYH/Ir07HVl6x7blB9BHUmmCn5dyRiWUIdmsf1V
-	 48LnO2WPiMChw==
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pfQ7L-002cXH-GX;
-	Thu, 23 Mar 2023 18:56:55 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28DE3C04
+	for <kvmarm@lists.linux.dev>; Thu, 23 Mar 2023 19:18:10 +0000 (UTC)
+Date: Thu, 23 Mar 2023 19:18:05 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1679599088;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Gq2VTw21n2omjdhvRhnFDBiQfxeSYLTO49OoqEo41EY=;
+	b=DZJNKHS+yUGO40Mjt1t7faQDYJUOEMoi2a1+sFNNNPjV7lad0fxqOy63uTqrmCStZzGBIV
+	HKfEf6PunGdNMVs20YxidESSVr39qJb7ZMn4fwRO2/85K1IC2Zr/Yce1n8W+Q371cI05QI
+	CA7eZXpxvl2Ulr3XnqNtZcOocF100gQ=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.linux.dev,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH v2 4/4] KVM: arm64: Use config_lock to protect vgic state
+Message-ID: <ZByl7ZB835jySq/x@linux.dev>
+References: <20230316211412.2651555-1-oliver.upton@linux.dev>
+ <20230316211412.2651555-5-oliver.upton@linux.dev>
+ <87o7olgfjs.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Date: Thu, 23 Mar 2023 18:56:55 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>, Ryan Roberts
- <ryan.roberts@arm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
- linux-kselftest@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 0/3] KVM: selftests: Fixes for broken tests
-In-Reply-To: <ZByOn79zokUpLGSs@linux.dev>
-References: <20230308110948.1820163-1-ryan.roberts@arm.com>
- <4eca298b-411f-e6db-04d2-e8963a0e5d98@arm.com> <ZByOn79zokUpLGSs@linux.dev>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <2d3bc930bd3fdc20a7257b6f343313ed@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, ryan.roberts@arm.com, pbonzini@redhat.com, shuah@kernel.org, linux-kselftest@vger.kernel.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87o7olgfjs.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On 2023-03-23 17:38, Oliver Upton wrote:
-> Hey Ryan,
+On Wed, Mar 22, 2023 at 12:02:15PM +0000, Marc Zyngier wrote:
+> On Thu, 16 Mar 2023 21:14:12 +0000,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+
+[...]
+
+> > --- a/arch/arm64/kvm/vgic/vgic-its.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> > @@ -2043,7 +2043,10 @@ static int vgic_its_attr_regs_access(struct kvm_device *dev,
+> >  	if (offset & align)
+> >  		return -EINVAL;
+> >  
+> > -	mutex_lock(&dev->kvm->lock);
+> > +	if (!lock_all_vcpus(dev->kvm))
+> > +		return -EBUSY;
+> > +
+> > +	mutex_lock(&dev->kvm->arch.config_lock);
 > 
-> On Thu, Mar 23, 2023 at 12:56:18PM +0000, Ryan Roberts wrote:
->> Hi Oliver,
->> 
->> Just a polite nudge on this: I was originally hoping to get these into 
->> 6.3 since
->> I thought they were fairly uncontroversial and clearly fixing bugs. 
->> What are my
->> chances?
+> Huh, that's fishy. The whole "lock the VM and the lock the individual
+> vcpus" is there to prevent a concurrent creation of a vcpu while we're
+> doing stuff that affects them all. Allowing a new vcpu to come online
+> while this sequence is happening is ... unexpected.
 > 
-> Yes, your changes are indeed uncontroversial :) At least for me, fixes 
-> to
-> selftests take a strictly lower priority than fixes to the kernel 
-> outside of
-> a merge window. AFAICT, only LPA systems are affected by the changes 
-> here and
-> I'm not aware of any of those out in the wild.
+> Why do we need to drop this initial lock? I'd expect them to be
+> completely cumulative.
 
-Agreed. My usual take on fixing tests is that unless the test has been
-broken in the current cycle, we can safely delay merging the fix until
-the following cycle.
+Urgh.. Yes, you're right. I'll go with kvm->lock -> lock_all_vcpus() ->
+kvm->config_lock in the next spin to guard against the vCPU creation
+race.
 
-And yes, LPA-capable HW is essentially vapourware at this stage.
-
-> 
-> So, unless there is a burning issue, I'd like to defer these patches to 
-> the
-> 6.4 merge window. Nonetheless, it all looks good to me:
-> 
-> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-
-Thanks for that. I'll start queuing 6.4 material once I'm back to my
-usual time zone, beginning of next week.
-
-Cheers,
-
-         M.
 -- 
-Jazz is not dead. It just smells funny...
+Thanks,
+Oliver
