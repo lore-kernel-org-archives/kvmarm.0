@@ -1,23 +1,24 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC2FDA93A
-	for <kvmarm@lists.linux.dev>; Thu, 23 Mar 2023 15:49:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C2BCC433A0;
-	Thu, 23 Mar 2023 15:49:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480C6A93A
+	for <kvmarm@lists.linux.dev>; Thu, 23 Mar 2023 15:49:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8988C4339E;
+	Thu, 23 Mar 2023 15:49:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1679586557;
-	bh=/uGx45HMfQP5sjD2snoqgNI1enn4/7Is9C9kcXV6zXE=;
+	s=k20201202; t=1679586560;
+	bh=bc/jDRoML8/rVwNAUXAs3Cta3BhHmQEWHxqYcAOab38=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=LPDha8QjcAnciWhAL5JRLE3LZ+gTwHPTcuBwiRnKiL1bv/eItD1pyU5SHK9AZxktd
-	 1zs6vNpM2n5SnRPsNEA9eUV0zb3uB5jPMyrDCg2dOwuKxaTJc3iKb5j28HZl9TBQ8f
-	 rNyHGQq4nuVUaKrr0/4W5I77cAfV97/sKj+5H+m8DaAKfizNzgL2VbTqC7ZoP1gjmJ
-	 I8YxEOQmYI0Eg0MGr01zB1ZA3c/NdlzPfigOnGAMUD+rb7TzC0nIyaG+5g1OCBf97F
-	 4O1bpaEyiA2ahIIJZrerj+GGSpPaTFIpkm1jxWbxc0hu8RIKB+WnrKSLM99AQINseI
-	 ruyJbjXast/aQ==
+	b=Y8RnLkTBmRrhjiCyW130L+BNQBzbxNSG7I70XsoqngTJs4UHphHUZFAGhTmgR+Zn8
+	 Tj3fjLbm9J1ESkhD9P8T3J5zRXQGdak+Xt32MJ9NuX1ksxf6Q99bYldMTACZ8jAV2r
+	 JRCZdol00BS3X0vhCAupOAEba+h9t6wi463EqIitVRrdSDFuftdI3KaYnQzBVbJ4iJ
+	 gNSk2iJQikA+sihToRxTke9Ju+IUTuEnKDFZRxr7MrPW2LzOhWEH3eK49SQFZJ9jbS
+	 rnGTe74w3i/26ZWKDKQgJJHAKoIABhC5RFDmQVsQO4zL+LB/6W7z01l0Qj1aRd/95H
+	 my6COBJHKQZug==
 From: Mark Brown <broonie@kernel.org>
-Date: Thu, 23 Mar 2023 15:48:35 +0000
-Subject: [PATCH v2 1/2] arm64: Add feature detection for fine grained traps
+Date: Thu, 23 Mar 2023 15:48:36 +0000
+Subject: [PATCH v2 2/2] KVM: arm64: Move FGT value configuration to vCPU
+ state
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -26,7 +27,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230301-kvm-arm64-fgt-v2-1-c11c0dcf810a@kernel.org>
+Message-Id: <20230301-kvm-arm64-fgt-v2-2-c11c0dcf810a@kernel.org>
 References: <20230301-kvm-arm64-fgt-v2-0-c11c0dcf810a@kernel.org>
 In-Reply-To: <20230301-kvm-arm64-fgt-v2-0-c11c0dcf810a@kernel.org>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
@@ -37,63 +38,174 @@ To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 Cc: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org, 
  kvmarm@lists.linux.dev, Mark Brown <broonie@kernel.org>
 X-Mailer: b4 0.13-dev-bd1bf
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1486; i=broonie@kernel.org;
- h=from:subject:message-id; bh=/uGx45HMfQP5sjD2snoqgNI1enn4/7Is9C9kcXV6zXE=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBkHHT2PqGya4Sl7tNN4HF4r8Ro9DsEi+1tZ82Lgjlk
- z8Y77uWJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZBx09gAKCRAk1otyXVSH0PQsB/
- 94GcRFdZKNfASYdsAPdBqiQFT40EJlBPVqv7Ue0gA9h8z2Hb74Wt4ZuyxPe/oEece5Gzb2oY2kp+4t
- KsWS/JSNZc93Zq1nD9p6PSEDHRv2xh260FdIqL4OgLQ1wPb4+f3gZu8BGMzRIgqi7eFkwQbrwNPAQ2
- 8DRrF+oZHBWz1Thsl3VtVPI/B9KbIccOrfnveSoOp89EpK9STS1ZxxezLGkWZoUABJX8Z+e4uy8Z1B
- eqQy6/L/DFdHoB/6RBnTqXsNrYQNNQiA/BXiwLaBVR74wjp6NhQVrNyP+g/3G+33eoV+eBIDBP1CJz
- vFtWXjzWp68xmU0WZXGFFQ+0ki3yIV
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5886; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=bc/jDRoML8/rVwNAUXAs3Cta3BhHmQEWHxqYcAOab38=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBkHHT39sie3zytPuOBFnmH9uhGc9ss/mq0VfLRht01
+ hCRuD4mJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZBx09wAKCRAk1otyXVSH0FlkB/
+ 0RxLEG+X40SNnVIz0hYn4/XdONL1t4B3+Quz5D3RTDwfxYaCICBkGhvFlIvNs3I0ONe0ouxCy7GkCb
+ o2vphAprPpa6ZfN/26Cx8QP+M2R/gSlANi8csCp6T0PrbRQFDk1XBPbmxi8o7vR6dVhC9aosyr+y3c
+ KiG1fPbj4wzHLuO7Xglt/jO50TunIz13nzHriecgeQFsigqZqjSTlmIbkU+8l66r8uTHx0K91+MCTL
+ J48+OqH/XB563y97UOme6HOTAUUmMwRtCYOqf0jbCmtpZnxrPbtrsd70Ev+4jPonshyDETmIj3WHQc
+ Fdzv9U8ri0ccO2FT/VlGsjOw4lOmS0
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-In order to allow us to have shared code for managing fine grained traps
-for KVM guests add it as a detected feature rather than relying on it
-being a dependency of other features.
+Currently the only fine grained traps we use are the SME ones and we decide
+if we want to manage fine grained traps for the guest and which to
+enable based on the presence of that feature. In order to support SME,
+PIE and other features where we need fine grained traps we will need to
+select per guest which traps are enabled. Move to storing the traps to
+enable in the vCPU data, updating the registers if fine grained traps
+are supported and any are enabled. In order to ensure that the fine
+grained traps are restored along with other traps there is a bit of
+asymmetry with where the registers are restored on guest exit.
 
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Currently we always set this register to 0 when running the guest so
+unconditionally use that value for guests, future patches will configure
+this.
+
+No functional change, though we will do additional saves of the guest
+FGT register configurations and will save and restore even if the host
+and guest states are identical.
+
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/kernel/cpufeature.c | 11 +++++++++++
- arch/arm64/tools/cpucaps       |  1 +
- 2 files changed, 12 insertions(+)
+ arch/arm64/include/asm/kvm_emulate.h       | 16 ++++++++++++++
+ arch/arm64/include/asm/kvm_host.h          |  2 ++
+ arch/arm64/kvm/arm.c                       |  1 +
+ arch/arm64/kvm/hyp/include/hyp/switch.h    | 35 ++++++++++++++++--------------
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |  9 ++++++++
+ 5 files changed, 47 insertions(+), 16 deletions(-)
 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 2e3e55139777..6d1cda522f69 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -2698,6 +2698,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.matches = has_cpuid_feature,
- 		.min_field_value = 1,
- 	},
-+	{
-+		.desc = "Fine Grained Traps",
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.capability = ARM64_HAS_FGT,
-+		.sys_reg = SYS_ID_AA64MMFR0_EL1,
-+		.sign = FTR_UNSIGNED,
-+		.field_pos = ID_AA64MMFR0_EL1_FGT_SHIFT,
-+		.field_width = 4,
-+		.min_field_value = 1,
-+		.matches = has_cpuid_feature,
-+	},
- #ifdef CONFIG_ARM64_SME
- 	{
- 		.desc = "Scalable Matrix Extension",
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index 37b1340e9646..b63cd342add2 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -24,6 +24,7 @@ HAS_DIT
- HAS_E0PD
- HAS_ECV
- HAS_EPAN
-+HAS_FGT
- HAS_GENERIC_AUTH
- HAS_GENERIC_AUTH_ARCH_QARMA3
- HAS_GENERIC_AUTH_ARCH_QARMA5
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index b31b32ecbe2d..9f88bcfdff70 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -107,6 +107,22 @@ static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
+ 	return (unsigned long *)&vcpu->arch.hcr_el2;
+ }
+ 
++static inline void vcpu_reset_fgt(struct kvm_vcpu *vcpu)
++{
++	if (!cpus_have_const_cap(ARM64_HAS_FGT))
++		return;
++
++	/*
++	 * Enable traps for the guest by default:
++	 *
++	 * ACCDATA_EL1, GCSPR_EL0, GCSCRE0_EL1, GCSPR_EL1, GCSCR_EL1,
++	 * SMPRI_EL1, TPIDR2_EL0, RCWMASK_EL1, PIRE0_EL1, PIR_EL1,
++	 * POR_EL0, POR_EL1, S2POR_EL1, MAIR2_EL1, and AMAIR_EL1,
++	 */
++	__vcpu_sys_reg(vcpu, HFGRTR_EL2) = 0;
++	__vcpu_sys_reg(vcpu, HFGWTR_EL2) = 0;
++}
++
+ static inline void vcpu_clear_wfx_traps(struct kvm_vcpu *vcpu)
+ {
+ 	vcpu->arch.hcr_el2 &= ~HCR_TWE;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index bcd774d74f34..d81831e36443 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -365,6 +365,8 @@ enum vcpu_sysreg {
+ 	TPIDR_EL2,	/* EL2 Software Thread ID Register */
+ 	CNTHCTL_EL2,	/* Counter-timer Hypervisor Control register */
+ 	SP_EL2,		/* EL2 Stack Pointer */
++	HFGRTR_EL2,	/* Fine Grained Read Traps */
++	HFGWTR_EL2,	/* Fine Grained Write Traps */
+ 
+ 	NR_SYS_REGS	/* Nothing after this line! */
+ };
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 3bd732eaf087..baa8d1a089bd 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1205,6 +1205,7 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+ 	}
+ 
+ 	vcpu_reset_hcr(vcpu);
++	vcpu_reset_fgt(vcpu);
+ 	vcpu->arch.cptr_el2 = CPTR_EL2_DEFAULT;
+ 
+ 	/*
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 07d37ff88a3f..bf0183a3a82d 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -88,33 +88,36 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
+ 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+ 
+-	if (cpus_have_final_cap(ARM64_SME)) {
+-		sysreg_clear_set_s(SYS_HFGRTR_EL2,
+-				   HFGxTR_EL2_nSMPRI_EL1_MASK |
+-				   HFGxTR_EL2_nTPIDR2_EL0_MASK,
+-				   0);
+-		sysreg_clear_set_s(SYS_HFGWTR_EL2,
+-				   HFGxTR_EL2_nSMPRI_EL1_MASK |
+-				   HFGxTR_EL2_nTPIDR2_EL0_MASK,
+-				   0);
++	if (cpus_have_final_cap(ARM64_HAS_FGT)) {
++		write_sysreg_s(__vcpu_sys_reg(vcpu, HFGRTR_EL2),
++			       SYS_HFGRTR_EL2);
++
++		write_sysreg_s(__vcpu_sys_reg(vcpu, HFGWTR_EL2),
++			       SYS_HFGWTR_EL2);
+ 	}
+ }
+ 
+ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+ {
++	struct kvm_cpu_context *host_ctxt;
++
+ 	write_sysreg(vcpu->arch.mdcr_el2_host, mdcr_el2);
+ 
+ 	write_sysreg(0, hstr_el2);
+ 	if (kvm_arm_support_pmu_v3())
+ 		write_sysreg(0, pmuserenr_el0);
+ 
+-	if (cpus_have_final_cap(ARM64_SME)) {
+-		sysreg_clear_set_s(SYS_HFGRTR_EL2, 0,
+-				   HFGxTR_EL2_nSMPRI_EL1_MASK |
+-				   HFGxTR_EL2_nTPIDR2_EL0_MASK);
+-		sysreg_clear_set_s(SYS_HFGWTR_EL2, 0,
+-				   HFGxTR_EL2_nSMPRI_EL1_MASK |
+-				   HFGxTR_EL2_nTPIDR2_EL0_MASK);
++	/*
++	 * Restore the host FGT configuration here since it's managing
++	 * traps.
++	 */
++	if (cpus_have_final_cap(ARM64_HAS_FGT)) {
++		host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
++
++		write_sysreg_s(__vcpu_sys_reg(vcpu, HFGRTR_EL2),
++			       SYS_HFGRTR_EL2);
++		write_sysreg_s(__vcpu_sys_reg(vcpu, HFGWTR_EL2),
++			       SYS_HFGWTR_EL2);
+ 	}
+ }
+ 
+diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+index 699ea1f8d409..7e67a3e27749 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
++++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+@@ -19,6 +19,15 @@
+ static inline void __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+ {
+ 	ctxt_sys_reg(ctxt, MDSCR_EL1)	= read_sysreg(mdscr_el1);
++
++	/*
++	 * These are restored as part of trap disablement rather than
++	 * in __sysreg_restore_common_state().
++	 */
++	if (cpus_have_final_cap(ARM64_HAS_FGT)) {
++		ctxt_sys_reg(ctxt, HFGRTR_EL2) = read_sysreg_s(SYS_HFGRTR_EL2);
++		ctxt_sys_reg(ctxt, HFGWTR_EL2) = read_sysreg_s(SYS_HFGWTR_EL2);
++	}
+ }
+ 
+ static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
 
 -- 
 2.30.2
