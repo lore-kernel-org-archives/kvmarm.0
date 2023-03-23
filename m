@@ -1,89 +1,89 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E525AD2FB
-	for <kvmarm@lists.linux.dev>; Thu, 23 Mar 2023 22:48:39 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 632CD4B3;
-	Thu, 23 Mar 2023 15:49:23 -0700 (PDT)
-Received: from [192.168.122.164] (U203867.austin.arm.com [10.118.30.28])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 27FE63F766;
-	Thu, 23 Mar 2023 15:48:32 -0700 (PDT)
-Message-ID: <b5afbc8d-e2cd-ce13-4089-e18339c14562@arm.com>
-Date: Thu, 23 Mar 2023 17:48:29 -0500
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2DC3D2FB
+	for <kvmarm@lists.linux.dev>; Thu, 23 Mar 2023 22:50:52 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id f66-20020a255145000000b00b714602d43fso163154ybb.10
+        for <kvmarm@lists.linux.dev>; Thu, 23 Mar 2023 15:50:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1679611851;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=74Bca3+J0Cb4vQ6fen5CaUBDEj5b5vV7i4MEot6v9Ds=;
+        b=YH7MTbm9mvyot6ZU2+XkcDSlj10Nsc7kiE+CaqrEGoRHP+5Wp1aXsacMGgUuC+9V/C
+         WVpEYg6CLbPyr+dvSfXfFo9SzojYnPgv2zPNeoMiLzTDGGi4AOX40qM/0GVJy3TDdzri
+         /A1NFKBZszV6ih13Bp4d8BSvUXewKzg6VmXODUInfnB0TEN6hYV85WwJX+9wI/qq4era
+         0a3SNXpZRFkv2GXJSpRTaAfqAeuXeGfauq4Kc6Df39oJSG3g/+pwfT0MoMzqhhdMMan2
+         GnM5KMzJNUIZtfs56MGTlzzcI0yeX13rZ0t+OMLFxMcw4SONq0Zz6RyW2BIHRmVknLv5
+         Kafg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679611851;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=74Bca3+J0Cb4vQ6fen5CaUBDEj5b5vV7i4MEot6v9Ds=;
+        b=LLC6yAIZYz5H1lMND8euQZJcCYLskds1qW/1dsqMB6bt+om6o/6E0sdSnGaTRG282f
+         k4W3wTWZEvPDucSmMxZ8EaYMyDT3AefYx9slATmN2fkcZmb7p3Q196ydTTvWg+KZ/6WV
+         UL4VLKoJxp35VP1lTUXJiRfq9QEBnqom9rxaKuxtLAYqrB8r80KTWkHacRF3UtQeLiY7
+         ofWQdClRKqbhX5gMm9aRVTI4AEy2qvUI9hp5XIrjaFOESm8uoOySJ1t/CdN1FzgjXUQl
+         KPcInfsSiX7BNys8fpP/PZo6FR7s/9gPFql0dYrO4Bvv3+yU9v8+GbgG/AK17lkl9qk5
+         Mdsw==
+X-Gm-Message-State: AAQBX9cR7WS/HNciMbb+CJ6bePXCkE7gWIDU7yWp33FVUTb65zODKke7
+	dwk3cg/G8+hVZgpszaH0R5p//6nAfbw=
+X-Google-Smtp-Source: AKy350ZsIJuSNQoMPlJ5+eoOr2kgPIQRx9B3zNmq76T9BVO+0ZLsWEOoUS4XgvR/h7pV3ogslqbmAO1mcEk=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:4426:0:b0:544:5aa0:e212 with SMTP id
+ r38-20020a814426000000b005445aa0e212mr87638ywa.6.1679611851706; Thu, 23 Mar
+ 2023 15:50:51 -0700 (PDT)
+Date: Thu, 23 Mar 2023 15:50:28 -0700
+In-Reply-To: <20230126184025.2294823-1-dmatlack@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH v2 0/4] KVM: arm64: Fix vcpu->mutex v. kvm->lock inversion
-Content-Language: en-US
-To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
-Cc: James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.linux.dev,
- Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- Sean Christopherson <seanjc@google.com>
-References: <20230316211412.2651555-1-oliver.upton@linux.dev>
-From: Jeremy Linton <jeremy.linton@arm.com>
-In-Reply-To: <20230316211412.2651555-1-oliver.upton@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20230126184025.2294823-1-dmatlack@google.com>
+X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
+Message-ID: <167934082066.1939558.14724526021018063522.b4-ty@google.com>
+Subject: Re: [PATCH v2 0/7] KVM: Add a common API for range-based TLB invalidation
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	David Matlack <dmatlack@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Huacai Chen <chenhuacai@kernel.org>, 
+	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	Raghavendra Rao Ananta <rananta@google.com>
+Content-Type: text/plain; charset="utf-8"
 
-Hi,
-
-On 3/16/23 16:14, Oliver Upton wrote:
-> As it so happens, lock ordering in KVM/arm64 is completely backwards.
-> There's a significant amount of VM-wide state that needs to be accessed
-> from the context of a vCPU. Until now, this was accomplished by
-> acquiring the kvm->lock, but that cannot be nested within vcpu->mutex.
+On Thu, 26 Jan 2023 10:40:18 -0800, David Matlack wrote:
+> This series introduces a common API for performing range-based TLB
+> invalidation. This is then used to supplant
+> kvm_arch_flush_remote_tlbs_memslot() and pave the way for two other
+> patch series:
 > 
-> This series fixes the issue with some fine-grained locking for MP state
-> and a new, dedicated mutex that can nest with both kvm->lock and
-> vcpu->mutex.
+> 1. https://lore.kernel.org/kvm/20230109215347.3119271-1-rananta@google.com/
 > 
-> Tested with kvmtool and QEMU scaled up to 64 vCPUs on a kernel w/
-> lockdep enabled. Applies to kvmarm/next.
+> [...]
 
-This set makes the reported lockdep error go away for me, it also 
-appears to complete some basic kernel/kvm testing without error as well. So,
+Applied the x86 specific cleanups to kvm-x86 mmu.  They're good changes on their
+own, I'm quite confident that this series a whole won't be going into 6.4, and I
+suspect/hope that getting these into 6.4 will make David's life easier (there are
+more cleanups in the related x86 code that I want to get into 6.4).  David, if
+I'm wrong, you'll have plenty of time to think of an appropriate punishment ;-)
 
-Tested-by: Jeremy Linton <jeremy.linton@arm.com>
+[3/7] KVM: x86/mmu: Collapse kvm_flush_remote_tlbs_with_{range,address}() together
+      https://github.com/kvm-x86/linux/commit/28e4b4597d65
+[4/7] KVM: x86/mmu: Rename kvm_flush_remote_tlbs_with_address()
+      https://github.com/kvm-x86/linux/commit/8c63e8c21765
+[5/7] KVM: x86/MMU: Use gfn_t in kvm_flush_remote_tlbs_range()
+      https://github.com/kvm-x86/linux/commit/9d4655da1a4c
 
-
-Thanks,
-
-> 
-> v1: http://lore.kernel.org/kvmarm/20230308083947.3760066-1-oliver.upton@linux.dev
-> 
-> v1 -> v2:
->   - Add a dedicated lock for serializing writes to MP state
->   - Inform lockdep of acquisition order at time of VM/vCPU creation
->   - Plug a race with GIC creation (Sean)
->   - Use the config_lock in GIC ITS flows as well. There is now a single
->     (valid) use of kvm->lock when enabling MTE.
-> 
-> Oliver Upton (4):
->    KVM: arm64: Avoid vcpu->mutex v. kvm->lock inversion in CPU_ON
->    KVM: arm64: Avoid lock inversion when setting the VM register width
->    KVM: arm64: Use config_lock to protect data ordered against KVM_RUN
->    KVM: arm64: Use config_lock to protect vgic state
-> 
->   arch/arm64/include/asm/kvm_host.h     |  4 ++
->   arch/arm64/kvm/arm.c                  | 45 +++++++++++++++++++----
->   arch/arm64/kvm/guest.c                |  2 +
->   arch/arm64/kvm/hypercalls.c           |  4 +-
->   arch/arm64/kvm/pmu-emul.c             | 23 +++---------
->   arch/arm64/kvm/psci.c                 | 19 +++++-----
->   arch/arm64/kvm/reset.c                | 16 ++++----
->   arch/arm64/kvm/vgic/vgic-debug.c      |  8 ++--
->   arch/arm64/kvm/vgic/vgic-init.c       | 33 ++++++++++-------
->   arch/arm64/kvm/vgic/vgic-its.c        | 29 ++++++---------
->   arch/arm64/kvm/vgic/vgic-kvm-device.c | 53 ++++++++++++---------------
->   arch/arm64/kvm/vgic/vgic-mmio-v3.c    |  4 +-
->   arch/arm64/kvm/vgic/vgic-mmio.c       | 12 +++---
->   arch/arm64/kvm/vgic/vgic-v4.c         | 11 +++---
->   arch/arm64/kvm/vgic/vgic.c            |  2 +-
->   15 files changed, 146 insertions(+), 119 deletions(-)
-> 
-
+--
+https://github.com/kvm-x86/linux/tree/next
+https://github.com/kvm-x86/linux/tree/fixes
