@@ -1,84 +1,93 @@
-Received: from out-21.mta0.migadu.com (out-21.mta0.migadu.com [91.218.175.21])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D7168F4A
-	for <kvmarm@lists.linux.dev>; Thu, 23 Mar 2023 20:45:58 +0000 (UTC)
-Date: Thu, 23 Mar 2023 20:45:51 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1679604355;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eTQwABadeBKFNTm3EY/dRBPaZ0090mrkCE25izbSHEU=;
-	b=VcU0bSkyWGTiQb7KhH5J5lh1GvLpmUATCcj/R5fbst10j92GpuP6M0uWq3j9KzsiHSrWCh
-	GtkTeR/A2LFHPCXaDtOb00o1KsKxHV1aMGj9gSTH/8n5BbMKYITRTd1iKpC5y9UQQo8MzF
-	4JDvhTSd1tzlPwS1B2NvrW89fQVrHW0=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Jeremy Linton <jeremy.linton@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.linux.dev,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B29D2F1
+	for <kvmarm@lists.linux.dev>; Thu, 23 Mar 2023 22:08:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2358C433D2;
+	Thu, 23 Mar 2023 22:08:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1679609330;
+	bh=x1ANynbg7sxcbxW58uUMx+EhenQNWNHyr/Dpqip+Md4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FT71rjVXwhGQetsHuGsafPVXht8w6EblT2NtL5wBAWizZGUddzmNRMHviHJw852PR
+	 KHCftd2lewcckgTSeRb0oe51nOgVxx6zwwAfkAX1TBAgyTGV+DvhMLWw15/Axeu7AJ
+	 14F03gghPBGZkohATUmytzrLbgg7MhV5goBx0+fK0Q36CBnWv9qdQciVh1XAoKwVp4
+	 Vv2R3/YlKtK/vumwLiJMDHcu0IG5Uejcq3YeIPMU0Hz5vXIYIzkyUcZTDTWsjZzEfI
+	 xOzCoSUodR6Wtc6FgTL0lsF+UvEfv+68tBEp6CWLX/5izRv2fmT4Ack7PwzLSYZ8P3
+	 PhfYPSvSyMmlw==
+Date: Thu, 23 Mar 2023 22:08:44 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH v2 2/4] KVM: arm64: Avoid lock inversion when setting the
- VM register width
-Message-ID: <ZBy6f1XoO1b4zts1@linux.dev>
-References: <20230316211412.2651555-1-oliver.upton@linux.dev>
- <20230316211412.2651555-3-oliver.upton@linux.dev>
- <5b355d9f-0191-2631-9745-5ed2d10af0e1@arm.com>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 2/2] KVM: arm64: Move FGT value configuration to vCPU
+ state
+Message-ID: <4f6a5565-af40-4bde-8aaf-5470e9562b0e@sirena.org.uk>
+References: <20230301-kvm-arm64-fgt-v2-0-c11c0dcf810a@kernel.org>
+ <20230301-kvm-arm64-fgt-v2-2-c11c0dcf810a@kernel.org>
+ <865yarxnwv.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="yG042uWorPt/O9Uo"
+Content-Disposition: inline
+In-Reply-To: <865yarxnwv.wl-maz@kernel.org>
+X-Cookie: A lie in time saves nine.
+
+
+--yG042uWorPt/O9Uo
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5b355d9f-0191-2631-9745-5ed2d10af0e1@arm.com>
-X-Migadu-Flow: FLOW_OUT
 
-Jeremy,
+On Thu, Mar 23, 2023 at 07:34:08PM +0000, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
-On Thu, Mar 23, 2023 at 03:09:54PM -0500, Jeremy Linton wrote:
-> Hi,
-> 
-> On 3/16/23 16:14, Oliver Upton wrote:
-> > kvm->lock must be taken outside of the vcpu->mutex. Of course, the
-> > locking documentation for KVM makes this abundantly clear. Nonetheless,
-> > the locking order in KVM/arm64 has been wrong for quite a while; we
-> > acquire the kvm->lock while holding the vcpu->mutex all over the shop.
-> > 
-> > All was seemingly fine until commit 42a90008f890 ("KVM: Ensure lockdep
-> > knows about kvm->lock vs. vcpu->mutex ordering rule") caught us with our
-> > pants down, leading to lockdep barfing:
-> 
-> Thanks for looking at this! It had a bit of fuzz applying to -rc3, did I
-> miss a required patch?
-> 
-> This patch makes the lockdep warnings I was seeing go away but I'm seeing
-> similar lockdep problem while running the kvm kselftests. In particular I
-> think it was "selftests: kvm: debug-exceptions" which threw the warning.
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -365,6 +365,8 @@ enum vcpu_sysreg {
+> >  	TPIDR_EL2,	/* EL2 Software Thread ID Register */
+> >  	CNTHCTL_EL2,	/* Counter-timer Hypervisor Control register */
+> >  	SP_EL2,		/* EL2 Stack Pointer */
+> > +	HFGRTR_EL2,	/* Fine Grained Read Traps */
+> > +	HFGWTR_EL2,	/* Fine Grained Write Traps */
 
-Hmm, that's odd. IIRC the only test that exploded for me w/o the commit
-below was arch_timer.
+> No, this is the wrong spot. These registers describe the *guest*
+> state. Not the state that KVM sets for its own use. These registers
+> would be used by a guest hypervisor to manage traps it uses for its
+> own guests.
 
-> So, i'm not sure its completely fixed. I ran the previous one a couple weeks
-> back before you respun it, and IIRC didn't see any errors.
+Ah, sorry, I misinterpreted what you meant when you said to put them in
+kvm_vcpu_context - the sys_regs array in there seemed to be the place
+where data for sysregs is stored.  The large set of EL2 registers in
+there already stopped alarm bells going off, as did the fact that with
+the patch above we were loading a copy from there for the guest.
 
-Thanks for taking this for a spin! This series depends on commit 47053904e182
-("KVM: arm64: timers: Convert per-vcpu virtual offset to a global value")
-which is only present in kvmarm/fixes at the moment. I had sent out a PR for
-this last week but Paolo has yet to pull.
+To clarify, place just regular member variables in kvm_vcpu_context then
+save host state to the percpu host context (I guess while activating
+traps) and load the guest state from vcpu->arch.ctxt.hfgxtr_el2?  I've
+got that testing locally just now.
 
-With both Marc's patch and this series I'm unable to reproduce lockdep
-warnings w/ selftests or kvmtool. If it isn't too much trouble can you
-give kvmarm/fixes plus this series a whirl and see if everything is
-addressed?
+--yG042uWorPt/O9Uo
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Otherwise you may have stumbled into some more crud we'll need to
-address :)
+-----BEGIN PGP SIGNATURE-----
 
--- 
-Thanks,
-Oliver
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmQczesACgkQJNaLcl1U
+h9CgrQf+Iyu8i074tUZexlZ56xsN6baTS1Cxk8NkCdIQ6UdYc8WJg9XmxPEeBI6q
+k0d6P1ahYHu80p2oa0EDT3UXugP2WTS5sPv2WcwirkKIB05cH7rhJaShCOr5vm1S
+QAsRpYOEM3ndxxBApFr1kpanjpqPq+f7hJvO0nfr08CLJw9UQ+49yc8s+eNkAj5V
+UMiPzvLV+2yjW9f9vj4dmrSy3lUNrD7WrmNllE5om/+4KZtuBb/j1IuMFsa+NPUV
+mllbKenGuyVrDR0u51y0OU8+3/Q4n3LW0+L5yDWLHxXMqc6vaPoE2mMnJmu5JM/o
+jV+GwYgtg7txxMFLE3bHV8x4d/YiNA==
+=x/lI
+-----END PGP SIGNATURE-----
+
+--yG042uWorPt/O9Uo--
