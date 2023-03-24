@@ -1,63 +1,97 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A2DA6FDF
-	for <kvmarm@lists.linux.dev>; Fri, 24 Mar 2023 15:32:15 +0000 (UTC)
-Received: by mail-yb1-f201.google.com with SMTP id f66-20020a255145000000b00b714602d43fso2139471ybb.10
-        for <kvmarm@lists.linux.dev>; Fri, 24 Mar 2023 08:32:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679671934;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8wWj5gOBKK79F+U411pw+oLnnu4up+3JeOo4QflJRMs=;
-        b=rfTPuN5gA17NBcmwJPvRfjQtsAwpqfGwbNMJ4apghPHh9Sg2/PNhVnwzTOSMs7XI+O
-         yZNpqreHm1myeEi5LfJCi3HL+K5brljFzOQATNAvfU7E0TSRQPWDz66fULQF9Vy3rH0O
-         RdhVDUVlUrg09IESx+uEy4FRMG/maagZASLl0Bs8lFbID+pnzhWbe4lb0AQbljzkwVW+
-         gv6jrsdylvoXgQBjgDOSSmJtsMUlXxDoRX4E8bg2ffOru6PG25wSPjROowJVzI8io1cy
-         onmoIVjHPQZeAOqzl2c92i/fMWO9QsajGd8vLJCHMRNDLyEYlnLjRXajBiC7n4hp4/VY
-         dAmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679671934;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8wWj5gOBKK79F+U411pw+oLnnu4up+3JeOo4QflJRMs=;
-        b=zx3KB/sR//FwIqkBmsxWo9QrMqnwfstHK9G3vfXgoi3XXyY/12PuOeQN0A46NVz14r
-         eoL39Wwak1qp+wXvuMrGqhrFN+p0x7lKgCxbI6nVTJtyomcW+jxhNDF73EB9fln2+Gj/
-         /3tn3hVBQZCGyuUAwicPWEHZr92g13i2muoGCIJabayd8CwMXo6G7JiTSQWnIYCE9EDY
-         uuA6i2xsIWYF7nyNJQ/k3cOrO3l+JFU/bNcvNVGO0A4wJtT4zL9fjRPcMO1GMosz1Wmr
-         nAsY31zBnalwktRH9Nyd1UgjE1MuzZDuHPNhs6z9pPBuHN5xjw/6WW7xXwnw5FeefsCP
-         zv5w==
-X-Gm-Message-State: AAQBX9cTQPF2B9htqzcNPAGSRIJoA7jOogPOiNn6ztmr0pJ66obWITKy
-	bxsYSfaRff+hmbHgXhwh9Y0Ch7TfRNE=
-X-Google-Smtp-Source: AKy350aR6TmyV8XNI1+jYOI4HteoseM0nrN8Xp9QMAlCHGUU2J5wvQmLvSBl9ObmAQouPC4xvepv2PnYDa4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:12d4:0:b0:b6e:d788:eba4 with SMTP id
- 203-20020a2512d4000000b00b6ed788eba4mr1213205ybs.6.1679671934425; Fri, 24 Mar
- 2023 08:32:14 -0700 (PDT)
-Date: Fri, 24 Mar 2023 08:32:12 -0700
-In-Reply-To: <20230308110948.1820163-2-ryan.roberts@arm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C461DD2F7
+	for <kvmarm@lists.linux.dev>; Fri, 24 Mar 2023 18:03:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1AF2C433D2;
+	Fri, 24 Mar 2023 18:03:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1679681017;
+	bh=tKZ9/oaRhxbLg4cyo+nZSht23wve8VKRZIBqjwFQmvc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KOtfXKpy4ZeaeGs0OgT28VpaQz9ExkzXUFR39d3k5EVNfIV4R15SVr6LcEcc619J3
+	 VEM0RY2TJMcdgCh7vqb2W3yZ441ciQ8AT0qs7h5LLrvvpdvBzUV0icGcDrBnmwiZUW
+	 SLVL0AV52MA3tYv9QoTTaroasr7H2MNKveoYRVC6tHfAbWuIHGoVkYyXVLx9cRP1Ob
+	 aNuXWxyDJcPslQbYa65Z274NEReYF9fLBX+kDlFjfEa/kpIUgTzDPk7BV7thPDSIcf
+	 BSRnisG3kGFix5vDpypcxmtavGu1SMqi/37KCEdLeVOms/oLdbgcCGesRo2tjx5fNV
+	 +z4/WFzqHLL1A==
+Date: Fri, 24 Mar 2023 18:03:30 +0000
+From: Will Deacon <will@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, Zaid Al-Bassam <zalbassam@google.com>,
+	Jesus Sanchez-Palencia <jesussanp@google.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Namhyung Kim <namhyung@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu,
+	"f.fainelli@gmail.comm Anshuman Khandual" <anshuman.khandual@arm.com>
+Subject: Re: [PATCH v4 0/8] perf: arm: Make PMUv3 driver available for aarch32
+Message-ID: <20230324180329.GB27948@willie-the-truck>
+References: <20230317195027.3746949-1-zalbassam@google.com>
+ <87v8iygyx2.wl-maz@kernel.org>
+ <ZB2sGrsbr58ttoWI@FVFF77S0Q05N>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230308110948.1820163-1-ryan.roberts@arm.com> <20230308110948.1820163-2-ryan.roberts@arm.com>
-Message-ID: <ZB3CfO3d8ULSFUwk@google.com>
-Subject: Re: [PATCH v2 1/3] KVM: selftests: Fixup config fragment for access_tracking_perf_test
-From: Sean Christopherson <seanjc@google.com>
-To: Ryan Roberts <ryan.roberts@arm.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org, 
-	kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZB2sGrsbr58ttoWI@FVFF77S0Q05N>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Wed, Mar 08, 2023, Ryan Roberts wrote:
-> access_tracking_perf_test requires CONFIG_IDLE_PAGE_TRACKING. However
-> this is missing from the config fragment, so add it in so that this test
-> is no longer skipped.
+On Fri, Mar 24, 2023 at 01:56:42PM +0000, Mark Rutland wrote:
+> On Sat, Mar 18, 2023 at 10:02:33AM +0000, Marc Zyngier wrote:
+> > On Fri, 17 Mar 2023 19:50:19 +0000,
+> > Zaid Al-Bassam <zalbassam@google.com> wrote:
+> > > 
+> > > Currently, PMUv3 driver is only available for ARMv8 aarch64 platforms,
+> > > ARMv8 platorms running in aarch32 mode dont have access to the driver.
+> > > This is, especially, a problem for ARMv8 platforms that only have
+> > > aarch32 support, like the Cortex-A32.
+> > > 
+> > > Make the PMUv3 driver available to arm arch (ARMv8 aarch32) by moving
+> > > the PMUv3 driver from arm64 to drivers, that makes the driver common
+> > > to both arm and arm64 architectures, then add PMUv3 arm Support.
+> > > 
+> > > The main work in this patchset was made a while back by Marc Zyngier
+> > > in [1]. Patchset version 1 [v1] rebases Marc's patches to the latest
+> > > kernel revision and adds additional patches to accommodate the changes
+> > > in the kernel since Marc wrote the patches.
+> > > 
+> > > version 2 [v2] of the patchset was created by Marc Zyngier and I
+> > > picked it up from [2].
+> > 
+> > The SoB chain is now a bit off as you picked it from my tree. Nothing
+> > that we can't fix, but please be careful in the future. You also
+> > failed to pick Florian's Tested-by: tags, which is worse. Please make
+> > sure to pick these things as people reply to your series.
+> > 
+> > Will, Mark: any objection to the general shape of this series? I've
+> > been using it again to test the 32bit PMU support in KVM, and would
+> > rather see something merged while the architecture still has some
+> > relevance.
 > 
-> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
-> ---
+> I think the general shape looks fine, but this is going to conflict with
+> Anshuman's BRBE series, so we'll need to figure out how to stage these w.r.t.
+> one another.
+> 
+> Will, any preference between handling the merge manually or rebasing one atop
+> the other? We'll presumably want to place the BRBE files under drivers/perf/ if
+> we've moved the PMUv3 code there.
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+Probably easiest to queue this and have Anshuman rebase BRBE on top once
+I've done that. I'll look at it next week.
+
+Will
