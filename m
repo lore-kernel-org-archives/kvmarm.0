@@ -1,84 +1,81 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 510815688
-	for <kvmarm@lists.linux.dev>; Fri, 24 Mar 2023 13:56:52 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C7C7711FB;
-	Fri, 24 Mar 2023 06:57:35 -0700 (PDT)
-Received: from FVFF77S0Q05N (unknown [10.57.55.116])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 344073F71E;
-	Fri, 24 Mar 2023 06:56:48 -0700 (PDT)
-Date: Fri, 24 Mar 2023 13:56:42 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Zaid Al-Bassam <zalbassam@google.com>, Will Deacon <will@kernel.org>,
-	Jesus Sanchez-Palencia <jesussanp@google.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>, Namhyung Kim <namhyung@kernel.org>,
-	James Morse <james.morse@arm.com>,
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B43806FA1
+	for <kvmarm@lists.linux.dev>; Fri, 24 Mar 2023 14:47:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48B9DC433D2;
+	Fri, 24 Mar 2023 14:47:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1679669239;
+	bh=94UwISeh0wgAFIbnn19iAAV6arHkbjP0f+mWzBW5sWU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=R5VYAw8KYgr6l/NxzCN295enwnMIs6Angdiuly3I8J2d3Mkw6+G+NITu/cglQyXgV
+	 F2gHpCXuJ/XQfN6LdTlsljixe5LPuZEsK1FcDTVNAwpAbbf9TmRRG4oNhktAxpSpuO
+	 TEfu/Fbrkb2rgcC+tla/hA5bZE6WruUE8TrsQ6wPqTxQgfMxqCgsMS5JqS+Te+DzbT
+	 c3hdPlrxH12sseDzcXytF1hz9qO5nZsTI9YpJO/JdGq0V36/UWzJW2yQZz+9Ar3hO1
+	 W95BFFtusDL3XIEYI7PyUkxl+nypSpmGJRn7I0eCBY8tthWAfIusZYup0z3YXfdgIO
+	 TOG13k3YnNW+g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pfihJ-002qBP-FY;
+	Fri, 24 Mar 2023 14:47:17 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu,
-	"f.fainelli@gmail.comm Anshuman Khandual" <anshuman.khandual@arm.com>
-Subject: Re: [PATCH v4 0/8] perf: arm: Make PMUv3 driver available for aarch32
-Message-ID: <ZB2sGrsbr58ttoWI@FVFF77S0Q05N>
-References: <20230317195027.3746949-1-zalbassam@google.com>
- <87v8iygyx2.wl-maz@kernel.org>
+	Ricardo Koller <ricarkol@google.com>,
+	Simon Veith <sveith@amazon.de>,
+	Reiji Watanabe <reijiw@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	dwmw2@infradead.org
+Subject: [PATCH v3 02/18] arm64: Add CNTPOFF_EL2 register definition
+Date: Fri, 24 Mar 2023 14:46:48 +0000
+Message-Id: <20230324144704.4193635-3-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230324144704.4193635-1-maz@kernel.org>
+References: <20230324144704.4193635-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87v8iygyx2.wl-maz@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de, reijiw@google.com, coltonlewis@google.com, joey.gouly@arm.com, dwmw2@infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, Mar 18, 2023 at 10:02:33AM +0000, Marc Zyngier wrote:
-> On Fri, 17 Mar 2023 19:50:19 +0000,
-> Zaid Al-Bassam <zalbassam@google.com> wrote:
-> > 
-> > Currently, PMUv3 driver is only available for ARMv8 aarch64 platforms,
-> > ARMv8 platorms running in aarch32 mode dont have access to the driver.
-> > This is, especially, a problem for ARMv8 platforms that only have
-> > aarch32 support, like the Cortex-A32.
-> > 
-> > Make the PMUv3 driver available to arm arch (ARMv8 aarch32) by moving
-> > the PMUv3 driver from arm64 to drivers, that makes the driver common
-> > to both arm and arm64 architectures, then add PMUv3 arm Support.
-> > 
-> > The main work in this patchset was made a while back by Marc Zyngier
-> > in [1]. Patchset version 1 [v1] rebases Marc's patches to the latest
-> > kernel revision and adds additional patches to accommodate the changes
-> > in the kernel since Marc wrote the patches.
-> > 
-> > version 2 [v2] of the patchset was created by Marc Zyngier and I
-> > picked it up from [2].
-> 
-> The SoB chain is now a bit off as you picked it from my tree. Nothing
-> that we can't fix, but please be careful in the future. You also
-> failed to pick Florian's Tested-by: tags, which is worse. Please make
-> sure to pick these things as people reply to your series.
-> 
-> Will, Mark: any objection to the general shape of this series? I've
-> been using it again to test the 32bit PMU support in KVM, and would
-> rather see something merged while the architecture still has some
-> relevance.
+Add the definition for CNTPOFF_EL2 in the description file.
 
-I think the general shape looks fine, but this is going to conflict with
-Anshuman's BRBE series, so we'll need to figure out how to stage these w.r.t.
-one another.
+Reviewed-by: Colton Lewis <coltonlewis@google.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/tools/sysreg | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Will, any preference between handling the merge manually or rebasing one atop
-the other? We'll presumably want to place the BRBE files under drivers/perf/ if
-we've moved the PMUv3 code there.
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index dd5a9c7e310f..7063f1aacc54 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -1952,6 +1952,10 @@ Sysreg	CONTEXTIDR_EL2	3	4	13	0	1
+ Fields	CONTEXTIDR_ELx
+ EndSysreg
+ 
++Sysreg	CNTPOFF_EL2	3	4	14	0	6
++Field	63:0	PhysicalOffset
++EndSysreg
++
+ Sysreg	CPACR_EL12	3	5	1	0	2
+ Fields	CPACR_ELx
+ EndSysreg
+-- 
+2.34.1
 
-Thanks,
-Mark.
