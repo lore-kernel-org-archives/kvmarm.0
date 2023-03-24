@@ -1,25 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295C26FA1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF12D6FCE
 	for <kvmarm@lists.linux.dev>; Fri, 24 Mar 2023 14:47:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BFF2C433A0;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A34EFC433A4;
 	Fri, 24 Mar 2023 14:47:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1679669240;
-	bh=a3ZQgHz/7BkKgt59XtQTeSv16AbvV2lod48w2amU/bc=;
+	bh=F41qBULujmWLiGNaRxVAWAXUjdWyWI4MtIGX+yVW8OY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XdUMcuutxfRzzVLdQNM8m7fn2Wz5iif2Rt6rI8uUgCLTdu0NzjjoBj+ONnBCBrfVt
-	 u3YwiJlMNT4SKJ2W2CC+vLmwihCCSkJWljueEBwQCqFvV4CMk+SfFMpDXLuzHdbTY+
-	 ukV8cnJTt4joi7/ib+F1CEEZ0GEXOQncZz/+H+4p5njafEPYG2I7Mddm/E/O4TAw+C
-	 Nh3+WPMmwNPP9d3UqJgeuZ/YwQQ6MXkb/2bmDh5dC6wv97hBCzxwP4ejilUvT863RS
-	 yLUOJUjfXFxSsDkNRMFqQKd6tLdsl6E2Igwx6MgWN76NA5ryAqBupDuSuD3WMY9lN/
-	 5SJdTiU90pRwg==
+	b=QPds/sjpRzoyJpceMfCWUj5A39EomXeq/JGmGRR2wzjnseol9ahzFkNs2PY/FXtyh
+	 pI+4w7rHwcC8U3VVhogqnxf9Ddz/uNwLVcrhY7zxCnnzcv++b+hR5cMfHb4NBIn44M
+	 Qn6djTiZHimyGmahpmasIFs2/KkTg77+dUs1fxj7E51u4K/iybJEb3oE5WU0BYwHaG
+	 Zwr/FEaydcUfjd3OuxQsUQ1PLWIopzMaDjETFVW3qAkcsYBYme39Cr5ryFdCoMIvby
+	 G8IkUfW/TzjiFfIVLmat9vIvSVWvC2232UOZsc/45L34IRK1CVxgCv5KG9YPU4h/t3
+	 /UeSopC29t7gQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pfihK-002qBP-D5;
+	id 1pfihK-002qBP-T8;
 	Fri, 24 Mar 2023 14:47:18 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -35,9 +35,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Colton Lewis <coltonlewis@google.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	dwmw2@infradead.org
-Subject: [PATCH v3 06/18] KVM: arm64: Expose {un,}lock_all_vcpus() to the rest of KVM
-Date: Fri, 24 Mar 2023 14:46:52 +0000
-Message-Id: <20230324144704.4193635-7-maz@kernel.org>
+Subject: [PATCH v3 08/18] KVM: arm64: timers: Allow save/restoring of the physical timer
+Date: Fri, 24 Mar 2023 14:46:54 +0000
+Message-Id: <20230324144704.4193635-9-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230324144704.4193635-1-maz@kernel.org>
 References: <20230324144704.4193635-1-maz@kernel.org>
@@ -53,150 +53,74 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Being able to lock/unlock all vcpus in one go is a feature that
-only the vgic has enjoyed so far. Let's be brave and expose it
-to the world.
+Nothing like being 10 year late to a party!
+
+Now that userspace can set counter offsets, we can save/restore
+the physical timer as well!
+
+Nobody really cared so far, but you're welcome anyway.
 
 Reviewed-by: Colton Lewis <coltonlewis@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h     |  3 ++
- arch/arm64/kvm/arm.c                  | 43 +++++++++++++++++++++++++++
- arch/arm64/kvm/vgic/vgic-kvm-device.c | 38 -----------------------
- arch/arm64/kvm/vgic/vgic.h            |  3 --
- 4 files changed, 46 insertions(+), 41 deletions(-)
+ arch/arm64/kvm/guest.c | 29 +++++++++++++++++------------
+ 1 file changed, 17 insertions(+), 12 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index bcd774d74f34..002a10cbade2 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -922,6 +922,9 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
- 
- int __init kvm_sys_reg_table_init(void);
- 
-+bool lock_all_vcpus(struct kvm *kvm);
-+void unlock_all_vcpus(struct kvm *kvm);
-+
- /* MMIO helpers */
- void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
- unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 3bd732eaf087..ae5110cc3bad 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1484,6 +1484,49 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 	}
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 07444fa22888..46e910819de6 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -590,11 +590,16 @@ static unsigned long num_core_regs(const struct kvm_vcpu *vcpu)
+ 	return copy_core_reg_indices(vcpu, NULL);
  }
  
-+/* unlocks vcpus from @vcpu_lock_idx and smaller */
-+static void unlock_vcpus(struct kvm *kvm, int vcpu_lock_idx)
-+{
-+	struct kvm_vcpu *tmp_vcpu;
-+
-+	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
-+		tmp_vcpu = kvm_get_vcpu(kvm, vcpu_lock_idx);
-+		mutex_unlock(&tmp_vcpu->mutex);
-+	}
-+}
-+
-+void unlock_all_vcpus(struct kvm *kvm)
-+{
-+	lockdep_assert_held(&kvm->lock);
-+
-+	unlock_vcpus(kvm, atomic_read(&kvm->online_vcpus) - 1);
-+}
-+
-+/* Returns true if all vcpus were locked, false otherwise */
-+bool lock_all_vcpus(struct kvm *kvm)
-+{
-+	struct kvm_vcpu *tmp_vcpu;
-+	unsigned long c;
-+
-+	lockdep_assert_held(&kvm->lock);
-+
-+	/*
-+	 * Any time a vcpu is in an ioctl (including running), the
-+	 * core KVM code tries to grab the vcpu->mutex.
-+	 *
-+	 * By grabbing the vcpu->mutex of all VCPUs we ensure that no
-+	 * other VCPUs can fiddle with the state while we access it.
-+	 */
-+	kvm_for_each_vcpu(c, tmp_vcpu, kvm) {
-+		if (!mutex_trylock(&tmp_vcpu->mutex)) {
-+			unlock_vcpus(kvm, c - 1);
-+			return false;
-+		}
-+	}
-+
-+	return true;
-+}
-+
- static unsigned long nvhe_percpu_size(void)
+-/**
+- * ARM64 versions of the TIMER registers, always available on arm64
+- */
++static const u64 timer_reg_list[] = {
++	KVM_REG_ARM_TIMER_CTL,
++	KVM_REG_ARM_TIMER_CNT,
++	KVM_REG_ARM_TIMER_CVAL,
++	KVM_REG_ARM_PTIMER_CTL,
++	KVM_REG_ARM_PTIMER_CNT,
++	KVM_REG_ARM_PTIMER_CVAL,
++};
+ 
+-#define NUM_TIMER_REGS 3
++#define NUM_TIMER_REGS ARRAY_SIZE(timer_reg_list)
+ 
+ static bool is_timer_reg(u64 index)
  {
- 	return (unsigned long)CHOOSE_NVHE_SYM(__per_cpu_end) -
-diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-index edeac2380591..04dd68835b3f 100644
---- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-+++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-@@ -342,44 +342,6 @@ int vgic_v2_parse_attr(struct kvm_device *dev, struct kvm_device_attr *attr,
+@@ -602,6 +607,9 @@ static bool is_timer_reg(u64 index)
+ 	case KVM_REG_ARM_TIMER_CTL:
+ 	case KVM_REG_ARM_TIMER_CNT:
+ 	case KVM_REG_ARM_TIMER_CVAL:
++	case KVM_REG_ARM_PTIMER_CTL:
++	case KVM_REG_ARM_PTIMER_CNT:
++	case KVM_REG_ARM_PTIMER_CVAL:
+ 		return true;
+ 	}
+ 	return false;
+@@ -609,14 +617,11 @@ static bool is_timer_reg(u64 index)
+ 
+ static int copy_timer_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+ {
+-	if (put_user(KVM_REG_ARM_TIMER_CTL, uindices))
+-		return -EFAULT;
+-	uindices++;
+-	if (put_user(KVM_REG_ARM_TIMER_CNT, uindices))
+-		return -EFAULT;
+-	uindices++;
+-	if (put_user(KVM_REG_ARM_TIMER_CVAL, uindices))
+-		return -EFAULT;
++	for (int i = 0; i < NUM_TIMER_REGS; i++) {
++		if (put_user(timer_reg_list[i], uindices))
++			return -EFAULT;
++		uindices++;
++	}
+ 
  	return 0;
  }
- 
--/* unlocks vcpus from @vcpu_lock_idx and smaller */
--static void unlock_vcpus(struct kvm *kvm, int vcpu_lock_idx)
--{
--	struct kvm_vcpu *tmp_vcpu;
--
--	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
--		tmp_vcpu = kvm_get_vcpu(kvm, vcpu_lock_idx);
--		mutex_unlock(&tmp_vcpu->mutex);
--	}
--}
--
--void unlock_all_vcpus(struct kvm *kvm)
--{
--	unlock_vcpus(kvm, atomic_read(&kvm->online_vcpus) - 1);
--}
--
--/* Returns true if all vcpus were locked, false otherwise */
--bool lock_all_vcpus(struct kvm *kvm)
--{
--	struct kvm_vcpu *tmp_vcpu;
--	unsigned long c;
--
--	/*
--	 * Any time a vcpu is run, vcpu_load is called which tries to grab the
--	 * vcpu->mutex.  By grabbing the vcpu->mutex of all VCPUs we ensure
--	 * that no other VCPUs are run and fiddle with the vgic state while we
--	 * access it.
--	 */
--	kvm_for_each_vcpu(c, tmp_vcpu, kvm) {
--		if (!mutex_trylock(&tmp_vcpu->mutex)) {
--			unlock_vcpus(kvm, c - 1);
--			return false;
--		}
--	}
--
--	return true;
--}
--
- /**
-  * vgic_v2_attr_regs_access - allows user space to access VGIC v2 state
-  *
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index 7f7f3c5ed85a..f9923beedd27 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -273,9 +273,6 @@ int vgic_init(struct kvm *kvm);
- void vgic_debug_init(struct kvm *kvm);
- void vgic_debug_destroy(struct kvm *kvm);
- 
--bool lock_all_vcpus(struct kvm *kvm);
--void unlock_all_vcpus(struct kvm *kvm);
--
- static inline int vgic_v3_max_apr_idx(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *cpu_if = &vcpu->arch.vgic_cpu;
 -- 
 2.34.1
 
