@@ -1,45 +1,27 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-26.mta1.migadu.com (out-26.mta1.migadu.com [95.215.58.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C461DD2F7
-	for <kvmarm@lists.linux.dev>; Fri, 24 Mar 2023 18:03:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1AF2C433D2;
-	Fri, 24 Mar 2023 18:03:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1679681017;
-	bh=tKZ9/oaRhxbLg4cyo+nZSht23wve8VKRZIBqjwFQmvc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KOtfXKpy4ZeaeGs0OgT28VpaQz9ExkzXUFR39d3k5EVNfIV4R15SVr6LcEcc619J3
-	 VEM0RY2TJMcdgCh7vqb2W3yZ441ciQ8AT0qs7h5LLrvvpdvBzUV0icGcDrBnmwiZUW
-	 SLVL0AV52MA3tYv9QoTTaroasr7H2MNKveoYRVC6tHfAbWuIHGoVkYyXVLx9cRP1Ob
-	 aNuXWxyDJcPslQbYa65Z274NEReYF9fLBX+kDlFjfEa/kpIUgTzDPk7BV7thPDSIcf
-	 BSRnisG3kGFix5vDpypcxmtavGu1SMqi/37KCEdLeVOms/oLdbgcCGesRo2tjx5fNV
-	 +z4/WFzqHLL1A==
-Date: Fri, 24 Mar 2023 18:03:30 +0000
-From: Will Deacon <will@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Zaid Al-Bassam <zalbassam@google.com>,
-	Jesus Sanchez-Palencia <jesussanp@google.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>, Namhyung Kim <namhyung@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu,
-	"f.fainelli@gmail.comm Anshuman Khandual" <anshuman.khandual@arm.com>
-Subject: Re: [PATCH v4 0/8] perf: arm: Make PMUv3 driver available for aarch32
-Message-ID: <20230324180329.GB27948@willie-the-truck>
-References: <20230317195027.3746949-1-zalbassam@google.com>
- <87v8iygyx2.wl-maz@kernel.org>
- <ZB2sGrsbr58ttoWI@FVFF77S0Q05N>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5AECD2F7
+	for <kvmarm@lists.linux.dev>; Fri, 24 Mar 2023 18:16:36 +0000 (UTC)
+Date: Fri, 24 Mar 2023 18:16:30 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1679681794;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FjtAZRcYQB+WxYXahyZSw4SActJDxTb2jNLzvVaf6N4=;
+	b=KiFGURPqsiOxa4c3ajiqE9o83acFTRdlPjfFzHhShyE+lz5IwbTg2HNfCFofuSCRAAGH2q
+	DmEZKMj2LNkCqw0pd/pfXwXDAEO2taZ0dQ2uZTTuz1VCNTqGtuzr3y05xFcuu1/oyBLSBJ
+	GAnYiV1cFwCEGDp4PBSorReYSkP/ook=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: maz@kernel.org, reijiw@google.com, dmatlack@google.com,
+	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.3, part #2
+Message-ID: <ZB3o/jsQIwS+4g4E@linux.dev>
+References: <ZBPZ4D9MIsaCNDh6@thinky-boi>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,50 +30,87 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZB2sGrsbr58ttoWI@FVFF77S0Q05N>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <ZBPZ4D9MIsaCNDh6@thinky-boi>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Mar 24, 2023 at 01:56:42PM +0000, Mark Rutland wrote:
-> On Sat, Mar 18, 2023 at 10:02:33AM +0000, Marc Zyngier wrote:
-> > On Fri, 17 Mar 2023 19:50:19 +0000,
-> > Zaid Al-Bassam <zalbassam@google.com> wrote:
-> > > 
-> > > Currently, PMUv3 driver is only available for ARMv8 aarch64 platforms,
-> > > ARMv8 platorms running in aarch32 mode dont have access to the driver.
-> > > This is, especially, a problem for ARMv8 platforms that only have
-> > > aarch32 support, like the Cortex-A32.
-> > > 
-> > > Make the PMUv3 driver available to arm arch (ARMv8 aarch32) by moving
-> > > the PMUv3 driver from arm64 to drivers, that makes the driver common
-> > > to both arm and arm64 architectures, then add PMUv3 arm Support.
-> > > 
-> > > The main work in this patchset was made a while back by Marc Zyngier
-> > > in [1]. Patchset version 1 [v1] rebases Marc's patches to the latest
-> > > kernel revision and adds additional patches to accommodate the changes
-> > > in the kernel since Marc wrote the patches.
-> > > 
-> > > version 2 [v2] of the patchset was created by Marc Zyngier and I
-> > > picked it up from [2].
-> > 
-> > The SoB chain is now a bit off as you picked it from my tree. Nothing
-> > that we can't fix, but please be careful in the future. You also
-> > failed to pick Florian's Tested-by: tags, which is worse. Please make
-> > sure to pick these things as people reply to your series.
-> > 
-> > Will, Mark: any objection to the general shape of this series? I've
-> > been using it again to test the 32bit PMU support in KVM, and would
-> > rather see something merged while the architecture still has some
-> > relevance.
+Paolo,
+
+Pinging this PR in case you missed it, the issues around host page table walks
+are particularly urgent as the race on host page table teardown has been
+reproduced on some setups.
+
+--
+Thanks,
+Oliver
+
+On Thu, Mar 16, 2023 at 08:09:20PM -0700, Oliver Upton wrote:
+> Hi Paolo,
 > 
-> I think the general shape looks fine, but this is going to conflict with
-> Anshuman's BRBE series, so we'll need to figure out how to stage these w.r.t.
-> one another.
+> Another week, another set of fixes for KVM/arm64.
 > 
-> Will, any preference between handling the merge manually or rebasing one atop
-> the other? We'll presumably want to place the BRBE files under drivers/perf/ if
-> we've moved the PMUv3 code there.
+> Description can be found in the tag, but the teardown race when walking
+> host page tables is particularly nasty and currently causing problems
+> for folks. The fix is quite simple by disabling interrupts when walking
+> host page tables, as the thread must be IPI'ed before the table memory
+> can actually be freed.
+> 
+> Please pull,
+> 
+> Oliver
+> 
+> The following changes since commit 47053904e18282af4525a02e3e0f519f014fc7f9:
+> 
+>   KVM: arm64: timers: Convert per-vcpu virtual offset to a global value (2023-03-11 02:00:40 -0800)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.3-2
+> 
+> for you to fetch changes up to 8c2e8ac8ad4be68409e806ce1cc78fc7a04539f3:
+> 
+>   KVM: arm64: Check for kvm_vma_mte_allowed in the critical section (2023-03-16 23:42:56 +0000)
+> 
+> ----------------------------------------------------------------
+> KVM/arm64 fixes for 6.3, part #2
+> 
+> Fixes for a rather interesting set of bugs relating to the MMU:
+> 
+>  - Read the MMU notifier seq before dropping the mmap lock to guard
+>    against reading a potentially stale VMA
+> 
+>  - Disable interrupts when walking user page tables to protect against
+>    the page table being freed
+> 
+>  - Read the MTE permissions for the VMA within the mmap lock critical
+>    section, avoiding the use of a potentally stale VMA pointer
+> 
+> Additionally, some fixes targeting the vPMU:
+> 
+>  - Return the sum of the current perf event value and PMC snapshot for
+>    reads from userspace
+> 
+>  - Don't save the value of guest writes to PMCR_EL0.{C,P}, which could
+>    otherwise lead to userspace erroneously resetting the vPMU during VM
+>    save/restore
+> 
+> ----------------------------------------------------------------
+> David Matlack (1):
+>       KVM: arm64: Retry fault if vma_lookup() results become invalid
+> 
+> Marc Zyngier (2):
+>       KVM: arm64: Disable interrupts while walking userspace PTs
+>       KVM: arm64: Check for kvm_vma_mte_allowed in the critical section
+> 
+> Reiji Watanabe (2):
+>       KVM: arm64: PMU: Fix GET_ONE_REG for vPMC regs to return the current value
+>       KVM: arm64: PMU: Don't save PMCR_EL0.{C,P} for the vCPU
+> 
+>  arch/arm64/kvm/mmu.c      | 99 ++++++++++++++++++++++++++++++-----------------
+>  arch/arm64/kvm/pmu-emul.c |  3 +-
+>  arch/arm64/kvm/sys_regs.c | 21 +++++++++-
+>  3 files changed, 85 insertions(+), 38 deletions(-)
+> 
 
-Probably easiest to queue this and have Anshuman rebase BRBE on top once
-I've done that. I'll look at it next week.
-
-Will
+-- 
+Thanks,
+Oliver
