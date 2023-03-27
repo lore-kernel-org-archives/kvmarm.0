@@ -1,97 +1,309 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986E5393
-	for <kvmarm@lists.linux.dev>; Sun, 26 Mar 2023 01:19:59 +0000 (UTC)
-Received: by mail-pl1-f201.google.com with SMTP id z16-20020a170902d55000b001a06f9b5e31so3574924plf.21
-        for <kvmarm@lists.linux.dev>; Sat, 25 Mar 2023 18:19:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679793599;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QI/EqVJSbrviuXTqoZjivbQTyKLSha3AimdnquYMXWc=;
-        b=XRKc51T8cnu7JDEWX9tAI7inG2D1iaT67CaXMzQVUYoEs0bP1hCXvbePNvag0nUWJ3
-         lUWSQDZTMvn71SCpNmYwWg6NSqpDi6KmDCloaMDl3sCsrKxH7Kb/Yr7KCiO2OTTGgHCL
-         hJM9NipRmFgbn7WqBKNlrYDUpJV+t/fZLnZK7OfjelP2XyHlVo9O151TgkT03iSxczm0
-         iBAUnxoNbNJ70ax08svmq0VN5wjd8CvISdK6AQX64L5SGCx+fnI3891TxaPy1vFjD8E8
-         RK5FkBLxP33q2OEPScBa5fadHqDlCyMjdyRQ8S+BTWLhhSYG/QChcSrYCoUVhvLQAoc8
-         XgwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679793599;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QI/EqVJSbrviuXTqoZjivbQTyKLSha3AimdnquYMXWc=;
-        b=Hue5gOgIBAs8168k+WRi8tf4ZbKnBzzYHdNFm8LeFZCaA0P3I0bdNejhnLP1qx/Op1
-         /VsOzuYa18twRWZnkw0Y/zFj/Ub87jiMmWQXMgTMC+ct+dmtOxTylEMXBc2C5CsuQWKC
-         VJUEv7fCKc5Icibdbcl/2Tty5eBWqZEXY4yR3jVMk7l5IBQtmPGgStsXDoRicIj4w/3J
-         GWtlBk3EsKSgzSCV7UGQnUbAIKfyQh6pTT1DTclJ4umB6rwz+2i/xa2mI4HDDDeBp1X0
-         Rv6g6YFTMVvNMq95aXWhcEtOuQ3DKV/G0pMt2Kcmy564Xi+XhBVKaRGcNwhSUgG5yZO9
-         PhQA==
-X-Gm-Message-State: AAQBX9fu4B+qWuk4vvnQMOkiP/o5yitSJdd0+NCQQ9zANjna0dniJ+en
-	ac/UkBqDVJxh30GN/uetyfTDHQScVIxQcgX9cA==
-X-Google-Smtp-Source: AKy350YzdI6W2peL0PoLdiDUrbLBCuUczb8fA3S0s0TXKpTODOv4vqupPU3pSdRyK18yqYxPFmFAFTVFcG9zIn0KWA==
-X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a17:902:b94b:b0:19f:6f30:a3f6 with
- SMTP id h11-20020a170902b94b00b0019f6f30a3f6mr2661620pls.1.1679793599120;
- Sat, 25 Mar 2023 18:19:59 -0700 (PDT)
-Date: Sun, 26 Mar 2023 01:19:50 +0000
-In-Reply-To: <20230326011950.405749-1-jingzhangos@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B73A29
+	for <kvmarm@lists.linux.dev>; Mon, 27 Mar 2023 10:14:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7946C433D2;
+	Mon, 27 Mar 2023 10:14:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1679912046;
+	bh=q8knNZbvz1AkxOZAS3ojAskQnyVm4evgO72JVaz/vrQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=eMPjCg5R0ofYFwzzoeh1VK5BPEvnZ+i4D6BKxYlpTcFYGnVv6c3+HnLw5gCivS8Ll
+	 AwQ4qRUpRJDXvzUS4Lq0rm1rZIplObe79NNFvhxXYqL7VkFYEBxzrrC/wHlp26Lt0h
+	 u6mCTCDKwHJUawYiEVgPSJcnthXvu+DOXZ8Kguq1fIAKdb3dz8qOL2BUr//1rBZIEV
+	 /WWYmT85TX/wph5Bkhy5NM6pnaILuZPFeuRs5Ec5z0lbEI4Gx5I6OSrF1O8fnRAXZr
+	 OvLBy0ckQTGUY1FUvFcWZqRMiR9/lSRoJ4NzISCIz3VM3Yoje7m/VR4CnUnVEXhfld
+	 +/pd4uivrrr/Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pgjrX-003PeQ-FW;
+	Mon, 27 Mar 2023 11:14:03 +0100
+Date: Mon, 27 Mar 2023 11:14:03 +0100
+Message-ID: <86355qy00k.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jing Zhang <jingzhangos@google.com>
+Cc: KVM <kvm@vger.kernel.org>,
+	KVMARM <kvmarm@lists.linux.dev>,
+	ARMLinux <linux-arm-kernel@lists.infradead.org>,
+	Oliver Upton <oupton@google.com>,
+	Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Reiji Watanabe <reijiw@google.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v4 1/6] KVM: arm64: Move CPU ID feature registers emulation into a separate file
+In-Reply-To: <20230317050637.766317-2-jingzhangos@google.com>
+References: <20230317050637.766317-1-jingzhangos@google.com>
+	<20230317050637.766317-2-jingzhangos@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230326011950.405749-1-jingzhangos@google.com>
-X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <20230326011950.405749-4-jingzhangos@google.com>
-Subject: [PATCH v1 3/3] KVM: arm64: Enable writable for all fields in ID_DFR0_EL1
-From: Jing Zhang <jingzhangos@google.com>
-To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@google.com>
-Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, 
-	Reiji Watanabe <reijiw@google.com>, Ricardo Koller <ricarkol@google.com>, 
-	Raghavendra Rao Ananta <rananta@google.com>, Jing Zhang <jingzhangos@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, reijiw@google.com, ricarkol@google.com, rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-All valid fields in ID_DFR0_EL1 are writable from usrespace with this
-change.
+On Fri, 17 Mar 2023 05:06:32 +0000,
+Jing Zhang <jingzhangos@google.com> wrote:
+> 
+> Create a new file id_regs.c for CPU ID feature registers emulation code,
+> which are moved from sys_regs.c and tweak sys_regs code accordingly.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/kvm/Makefile   |   2 +-
+>  arch/arm64/kvm/id_regs.c  | 506 ++++++++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/sys_regs.c | 464 ++--------------------------------
+>  arch/arm64/kvm/sys_regs.h |  41 +++
+>  4 files changed, 575 insertions(+), 438 deletions(-)
+>  create mode 100644 arch/arm64/kvm/id_regs.c
+> 
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index c0c050e53157..a6a315fcd81e 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -13,7 +13,7 @@ obj-$(CONFIG_KVM) += hyp/
+>  kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+>  	 inject_fault.o va_layout.o handle_exit.o \
+>  	 guest.o debug.o reset.o sys_regs.o stacktrace.o \
+> -	 vgic-sys-reg-v3.o fpsimd.o pkvm.o \
+> +	 vgic-sys-reg-v3.o fpsimd.o pkvm.o id_regs.o \
+>  	 arch_timer.o trng.o vmid.o emulate-nested.o nested.o \
+>  	 vgic/vgic.o vgic/vgic-init.o \
+>  	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
+> diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
+> new file mode 100644
+> index 000000000000..08b738852955
+> --- /dev/null
+> +++ b/arch/arm64/kvm/id_regs.c
 
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
----
- arch/arm64/kvm/id_regs.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+[...]
 
-diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
-index e64152aa448b..7dc2fb8121f3 100644
---- a/arch/arm64/kvm/id_regs.c
-+++ b/arch/arm64/kvm/id_regs.c
-@@ -565,8 +565,22 @@ static struct id_reg_desc id_reg_descs[KVM_ARM_ID_REG_NUM] = {
- 		.set_user = set_id_dfr0_el1,
- 		.visibility = aa32_id_visibility, },
- 	  .ftr_bits = {
-+		ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE,
-+			ID_DFR0_EL1_CopDbg_SHIFT, ID_DFR0_EL1_CopDbg_WIDTH, 0),
-+		ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE,
-+			ID_DFR0_EL1_CopSDbg_SHIFT, ID_DFR0_EL1_CopSDbg_WIDTH, 0),
-+		ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE,
-+			ID_DFR0_EL1_MMapDbg_SHIFT, ID_DFR0_EL1_MMapDbg_WIDTH, 0),
-+		ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE,
-+			ID_DFR0_EL1_CopTrc_SHIFT, ID_DFR0_EL1_CopTrc_WIDTH, 0),
-+		ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE,
-+			ID_DFR0_EL1_MMapTrc_SHIFT, ID_DFR0_EL1_MMapTrc_WIDTH, 0),
-+		ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE,
-+			ID_DFR0_EL1_MProfDbg_SHIFT, ID_DFR0_EL1_MProfDbg_WIDTH, 0),
- 		ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE,
- 			ID_DFR0_EL1_PerfMon_SHIFT, ID_DFR0_EL1_PerfMon_WIDTH, 0),
-+		ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE,
-+			ID_DFR0_EL1_TraceFilt_SHIFT, ID_DFR0_EL1_TraceFilt_WIDTH, 0),
- 		ARM64_FTR_END, },
- 	  .init = init_id_dfr0_el1,
- 	},
+> +/**
+> + * emulate_id_reg - Emulate a guest access to an AArch64 CPU ID feature register
+> + * @vcpu: The VCPU pointer
+> + * @params: Decoded system register parameters
+> + *
+> + * Return: true if the ID register access was successful, false otherwise.
+> + */
+> +int emulate_id_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *params)
+> +{
+> +	const struct sys_reg_desc *r;
+> +
+> +	r = find_reg(params, id_reg_descs, ARRAY_SIZE(id_reg_descs));
+> +
+> +	if (likely(r)) {
+> +		perform_access(vcpu, params, r);
+> +	} else {
+> +		print_sys_reg_msg(params,
+> +				  "Unsupported guest id_reg access at: %lx [%08lx]\n",
+> +				  *vcpu_pc(vcpu), *vcpu_cpsr(vcpu));
+> +		kvm_inject_undefined(vcpu);
+> +	}
+> +
+> +	return 1;
+> +}
+> +
+> +
+> +void kvm_arm_reset_id_regs(struct kvm_vcpu *vcpu)
+> +{
+> +	unsigned long i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(id_reg_descs); i++)
+> +		if (id_reg_descs[i].reset)
+> +			id_reg_descs[i].reset(vcpu, &id_reg_descs[i]);
+> +}
+
+What does this mean? None of the idregs have a reset function, given
+that they are global. Maybe this will make sense in the following
+patches, but definitely not here.
+
+> +
+> +int kvm_arm_get_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> +{
+> +	return kvm_sys_reg_get_user(vcpu, reg,
+> +				    id_reg_descs, ARRAY_SIZE(id_reg_descs));
+> +}
+> +
+> +int kvm_arm_set_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> +{
+> +	return kvm_sys_reg_set_user(vcpu, reg,
+> +				    id_reg_descs, ARRAY_SIZE(id_reg_descs));
+> +}
+> +
+> +bool kvm_arm_check_idreg_table(void)
+> +{
+> +	return check_sysreg_table(id_reg_descs, ARRAY_SIZE(id_reg_descs), false);
+> +}
+
+All these helpers are called from sys_regs.c and directly call back
+into it. Why not simply have a helper that gets the base and size of
+the array, and stick to pure common code?
+
+> +
+> +int kvm_arm_walk_id_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
+> +{
+> +	const struct sys_reg_desc *i2, *end2;
+> +	unsigned int total = 0;
+> +	int err;
+> +
+> +	i2 = id_reg_descs;
+> +	end2 = id_reg_descs + ARRAY_SIZE(id_reg_descs);
+> +
+> +	while (i2 != end2) {
+> +		err = walk_one_sys_reg(vcpu, i2++, &uind, &total);
+> +		if (err)
+> +			return err;
+> +	}
+> +	return total;
+> +}
+
+This is an exact copy of walk_sys_regs. Surely this can be made common
+code.
+
+[...]
+
+> @@ -2912,6 +2482,8 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
+>  {
+>  	unsigned long i;
+>  
+> +	kvm_arm_reset_id_regs(vcpu);
+> +
+>  	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++)
+>  		if (sys_reg_descs[i].reset)
+>  			sys_reg_descs[i].reset(vcpu, &sys_reg_descs[i]);
+> @@ -2932,6 +2504,9 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
+>  	params = esr_sys64_to_params(esr);
+>  	params.regval = vcpu_get_reg(vcpu, Rt);
+>  
+> +	if (is_id_reg(reg_to_encoding(&params)))
+> +		return emulate_id_reg(vcpu, &params);
+> +
+>  	if (!emulate_sys_reg(vcpu, &params))
+>  		return 1;
+>  
+> @@ -3160,6 +2735,10 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
+>  	if (err != -ENOENT)
+>  		return err;
+>  
+> +	err = kvm_arm_get_id_reg(vcpu, reg);
+
+Why not check for the encoding here? or in the helpers? It feels that
+this is an overhead that would be easy to reduce, given that we have
+fewer idregs than normal sysregs.
+
+> +	if (err != -ENOENT)
+> +		return err;
+> +
+>  	return kvm_sys_reg_get_user(vcpu, reg,
+>  				    sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
+>  }
+> @@ -3204,6 +2783,10 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
+>  	if (err != -ENOENT)
+>  		return err;
+>  
+> +	err = kvm_arm_set_id_reg(vcpu, reg);
+
+Same here.
+
+> +	if (err != -ENOENT)
+> +		return err;
+> +
+>  	return kvm_sys_reg_set_user(vcpu, reg,
+>  				    sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
+>  }
+> @@ -3250,10 +2833,10 @@ static bool copy_reg_to_user(const struct sys_reg_desc *reg, u64 __user **uind)
+>  	return true;
+>  }
+>  
+> -static int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
+> -			    const struct sys_reg_desc *rd,
+> -			    u64 __user **uind,
+> -			    unsigned int *total)
+> +int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
+> +		     const struct sys_reg_desc *rd,
+> +		     u64 __user **uind,
+> +		     unsigned int *total)
+>  {
+>  	/*
+>  	 * Ignore registers we trap but don't save,
+> @@ -3294,6 +2877,7 @@ unsigned long kvm_arm_num_sys_reg_descs(struct kvm_vcpu *vcpu)
+>  {
+>  	return ARRAY_SIZE(invariant_sys_regs)
+>  		+ num_demux_regs()
+> +		+ kvm_arm_walk_id_regs(vcpu, (u64 __user *)NULL)
+>  		+ walk_sys_regs(vcpu, (u64 __user *)NULL);
+>  }
+>  
+> @@ -3309,6 +2893,11 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+>  		uindices++;
+>  	}
+>  
+> +	err = kvm_arm_walk_id_regs(vcpu, uindices);
+> +	if (err < 0)
+> +		return err;
+> +	uindices += err;
+> +
+>  	err = walk_sys_regs(vcpu, uindices);
+>  	if (err < 0)
+>  		return err;
+> @@ -3323,6 +2912,7 @@ int __init kvm_sys_reg_table_init(void)
+>  	unsigned int i;
+>  
+>  	/* Make sure tables are unique and in order. */
+> +	valid &= kvm_arm_check_idreg_table();
+>  	valid &= check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), false);
+>  	valid &= check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs), true);
+>  	valid &= check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs), true);
+> diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+> index 6b11f2cc7146..ad41305348f7 100644
+> --- a/arch/arm64/kvm/sys_regs.h
+> +++ b/arch/arm64/kvm/sys_regs.h
+> @@ -210,6 +210,35 @@ find_reg(const struct sys_reg_params *params, const struct sys_reg_desc table[],
+>  	return __inline_bsearch((void *)pval, table, num, sizeof(table[0]), match_sys_reg);
+>  }
+>  
+> +static inline unsigned int raz_visibility(const struct kvm_vcpu *vcpu,
+> +					  const struct sys_reg_desc *r)
+> +{
+> +	return REG_RAZ;
+> +}
+
+No, please. This is used as a function pointer. You now potentially
+force the compiler to emit as many copy of this as there are pointers.
+
+> +
+> +static inline bool write_to_read_only(struct kvm_vcpu *vcpu,
+> +				      struct sys_reg_params *params,
+> +				      const struct sys_reg_desc *r)
+> +{
+> +	WARN_ONCE(1, "Unexpected sys_reg write to read-only register\n");
+> +	print_sys_reg_instr(params);
+> +	kvm_inject_undefined(vcpu);
+> +	return false;
+> +}
+
+Please make this common code, and not an inline function.
+
+Thanks,
+
+	M.
+
 -- 
-2.40.0.348.gf938b09366-goog
-
+Without deviation from the norm, progress is not possible.
