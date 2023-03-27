@@ -1,95 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-43.mta1.migadu.com (out-43.mta1.migadu.com [95.215.58.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0834533C0
-	for <kvmarm@lists.linux.dev>; Mon, 27 Mar 2023 15:01:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3465C433A0;
-	Mon, 27 Mar 2023 15:01:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1679929306;
-	bh=r+dQg0PSqxF3VlUF2mJkLYbGDx+UxqX2Bes1Pj330fg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tRhqHa2RVftPiBnJK+wRC2nuNifGfnZOkN2+asNj5Q4o/ncjN39GMqkSk+7DAR9FR
-	 hVyNMa7yh/l6/aREh5YbTK1/x+NEVGMibGi7NP8soas+vOzTwTsTnIIZzeTT9A+Ji3
-	 c8DntpvW4ncJoqa7mZ9y6JthdOAy+pzLf3nr6R+jmS5o6M15YL5vmORj9ocyap4vjp
-	 4Tb8XKxX1qH5dn2F6VjCaJCicZFO23DgP72p6BjbxBsQeqGPOMigiNkyiPM4WZuPne
-	 Q5v8VjYi0d7SWFkKD+eyaga1OJ7rqre6LPfszesjnD5+lp0e1PRvmH5oRNWWkC57Ng
-	 bH4BYAIp1yhJQ==
-From: Will Deacon <will@kernel.org>
-To: Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Zaid Al-Bassam <zalbassam@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Marc Zyngier <maz@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A04333E7
+	for <kvmarm@lists.linux.dev>; Mon, 27 Mar 2023 16:48:14 +0000 (UTC)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1679935692;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=LqKTO4E6HX4QiDyoWT5sl9XwAA/YwIMfS1uwE5bBi/M=;
+	b=YJsgiKrG8o0W3905kwgXWw0NpXm8CQhGKW3hOnljJwhb/y9/5VO7TTApM2BoNfERI9ax1/
+	EYzwPJ29Wi516AK16lsrOidUO2yS9tg7Bs46B2psRwh/CEnw5/rxHqzUCS/0NnfA60Vc6b
+	DLC2ZdF7qC7dhqTh/VUbgqWkDQ4pskE=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Jesus Sanchez-Palencia <jesussanp@google.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-kernel@vger.kernel.org,
-	f.fainelli@gmail.com,
-	Russell King <linux@armlinux.org.uk>,
-	linux-perf-users@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	kvmarm@lists.cs.columbia.edu,
 	kvmarm@lists.linux.dev,
-	Peter Zijlstra <peterz@infradead.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>
-Cc: kernel-team@android.com,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v4 0/8] perf: arm: Make PMUv3 driver available for aarch32
-Date: Mon, 27 Mar 2023 16:01:19 +0100
-Message-Id: <167992208038.2117465.2416051281544086020.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20230317195027.3746949-1-zalbassam@google.com>
-References: <20230317195027.3746949-1-zalbassam@google.com>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Sean Christopherson <seanjc@google.com>,
+	Jeremy Linton <jeremy.linton@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH v3 0/4] KVM: arm64: Fix vcpu->mutex v. kvm->lock inversion
+Date: Mon, 27 Mar 2023 16:47:43 +0000
+Message-Id: <20230327164747.2466958-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, 17 Mar 2023 15:50:19 -0400, Zaid Al-Bassam wrote:
-> Currently, PMUv3 driver is only available for ARMv8 aarch64 platforms,
-> ARMv8 platorms running in aarch32 mode dont have access to the driver.
-> This is, especially, a problem for ARMv8 platforms that only have
-> aarch32 support, like the Cortex-A32.
-> 
-> Make the PMUv3 driver available to arm arch (ARMv8 aarch32) by moving
-> the PMUv3 driver from arm64 to drivers, that makes the driver common
-> to both arm and arm64 architectures, then add PMUv3 arm Support.
-> 
-> [...]
+As it so happens, lock ordering in KVM/arm64 is completely backwards.
+There's a significant amount of VM-wide state that needs to be accessed
+from the context of a vCPU. Until now, this was accomplished by
+acquiring the kvm->lock, but that cannot be nested within vcpu->mutex.
 
-Applied to will (for-next/perf), thanks!
+This series fixes the issue with some fine-grained locking for MP state
+and a new, dedicated mutex that can nest with both kvm->lock and
+vcpu->mutex.
 
-[1/8] arm64: perf: Move PMUv3 driver to drivers/perf
-      https://git.kernel.org/will/c/7755cec63ade
-[2/8] arm64: perf: Abstract system register accesses away
-      https://git.kernel.org/will/c/df29ddf4f04b
-[3/8] perf: pmuv3: Abstract PMU version checks
-      https://git.kernel.org/will/c/711432770f78
-[4/8] perf: pmuv3: Move inclusion of kvm_host.h to the arch-specific helper
-      https://git.kernel.org/will/c/11fba29a8a1f
-[5/8] perf: pmuv3: Change GENMASK to GENMASK_ULL
-      https://git.kernel.org/will/c/b3a070869f39
-[6/8] ARM: Make CONFIG_CPU_V7 valid for 32bit ARMv8 implementations
-      https://git.kernel.org/will/c/252309adc81f
-[7/8] ARM: perf: Allow the use of the PMUv3 driver on 32bit ARM
-      https://git.kernel.org/will/c/009d6dc87a56
-[8/8] ARM: mach-virt: Select PMUv3 driver by default
-      https://git.kernel.org/will/c/3b16f6268e66
+Tested with kvmtool and QEMU scaled up to 64 vCPUs on a kernel w/
+lockdep enabled. Applies to kvmarm-fixes-6.3-2.
 
-Cheers,
+Please note that these changes will most likely be taken in the 6.4
+merge window and not as a fixup during 6.3. After discussing with Marc
+we agreed that letting these patches marinade in -next for a while is
+probably best as it is quite an overhaul to our locking. Additionally,
+there is no evidence of actual deadlocks occurring in the wild, likely
+because we _always_ ordered the locks backwards, hence the only breakage
+at the moment is lockdep.
+
+Also, Jeremy, I chose to omit your Tested-by tag on the last patch as it
+was rather significantly changed from when you last took it for a spin.
+
+v1: http://lore.kernel.org/kvmarm/20230308083947.3760066-1-oliver.upton@linux.dev
+v2: https://lore.kernel.org/kvmarm/20230316211412.2651555-1-oliver.upton@linux.dev/
+
+v2 -> v3:
+ - Continue to acquire the kvm->lock where we must protect against a
+   concurrent vCPU creation (Marc)
+ - Plug a few missing WRITE_ONCE() promotions for mp_state (Marc)
+ - Hold the mp_state_lock when reading reset_state (Marc)
+ - Fix the unguarded write to mp_state in kvm_prepare_system_event()
+ - Collect Jeremy's Tested-by tags (thanks!)
+
+v1 -> v2:
+ - Add a dedicated lock for serializing writes to MP state
+ - Inform lockdep of acquisition order at time of VM/vCPU creation
+ - Plug a race with GIC creation (Sean)
+ - Use the config_lock in GIC ITS flows as well
+
+Oliver Upton (4):
+  KVM: arm64: Avoid vcpu->mutex v. kvm->lock inversion in CPU_ON
+  KVM: arm64: Avoid lock inversion when setting the VM register width
+  KVM: arm64: Use config_lock to protect data ordered against KVM_RUN
+  KVM: arm64: Use config_lock to protect vgic state
+
+ arch/arm64/include/asm/kvm_host.h     |  4 ++
+ arch/arm64/kvm/arm.c                  | 53 +++++++++++++++++++++------
+ arch/arm64/kvm/guest.c                |  2 +
+ arch/arm64/kvm/hypercalls.c           |  4 +-
+ arch/arm64/kvm/pmu-emul.c             | 23 +++---------
+ arch/arm64/kvm/psci.c                 | 28 ++++++++------
+ arch/arm64/kvm/reset.c                | 15 ++++----
+ arch/arm64/kvm/vgic/vgic-debug.c      |  8 ++--
+ arch/arm64/kvm/vgic/vgic-init.c       | 36 +++++++++++-------
+ arch/arm64/kvm/vgic/vgic-its.c        | 18 ++++++---
+ arch/arm64/kvm/vgic/vgic-kvm-device.c | 47 ++++++++++++++----------
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c    |  4 +-
+ arch/arm64/kvm/vgic/vgic-mmio.c       | 12 +++---
+ arch/arm64/kvm/vgic/vgic-v4.c         | 11 +++---
+ arch/arm64/kvm/vgic/vgic.c            | 12 +++---
+ 15 files changed, 168 insertions(+), 109 deletions(-)
+
+
+base-commit: 8c2e8ac8ad4be68409e806ce1cc78fc7a04539f3
 -- 
-Will
+2.40.0.348.gf938b09366-goog
 
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
