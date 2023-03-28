@@ -1,98 +1,116 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379ACA21
-	for <kvmarm@lists.linux.dev>; Tue, 28 Mar 2023 03:47:54 +0000 (UTC)
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-545e529206eso48966427b3.9
-        for <kvmarm@lists.linux.dev>; Mon, 27 Mar 2023 20:47:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679975273;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=1fqM/5aXH/kUnbZst5pUEbiSYW0bWjK1pNRwkxjpC7o=;
-        b=nfCnu/maO6m2fyb3UGY0EV4VvPIVgxyIDQ/Stccb7oTK9UzBRlILkW1RfXa23+PKcN
-         qYph1cHZhVwtJQVjyjX5AiHiZG2LNrP/kgjF+q72dnTLENdLoFLRnPM+/828+yOlspDu
-         D7bBvHGgr5xJdj62d1FEz86SaPUbgQuCRyYVGXRq9Hv6o0mYwKddsYwz5tXL8JvGC0GJ
-         9NIfZuaKeHLTxx0ECdd9xmpQlLeQCgeOod9bO1QtPJcreidiA02sWmrTeDhlSAEuYRUr
-         mw51jWIWU5lOU5qbfEDSvHmTbwMbakc607pjjpKmIQRkErApsqAH/WXdOyAR4h0huxpl
-         fl3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679975273;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1fqM/5aXH/kUnbZst5pUEbiSYW0bWjK1pNRwkxjpC7o=;
-        b=Bg1aXxAbqoTrgyyyi9KThh7FVgrq9w3jPFNSOoM0ZnuPrhByHro+Dw0Imcr6h3MtoF
-         /CwwxR5ljnxFSoGYAEVD1D96xNnnG8/ql+jnkSQo9oWXqReuUYKUpqa052pVEpeH6FGr
-         LtxQVuUQfJBstqfOE0n0yOL4Pmx3Dvo/L3lPFj9w10bqLDz9vkuuaQReWX+hK8wewhxs
-         TQ+wnnvfH1NNZAoft7y+GZsoHAsgi2isv56qSQbLtOe/XtLNOc2ZFc4FvvUGb7J3Sdqt
-         3Y30eSMno95CZ+B3CztHl1Q6bB30lYnfl7fNxByAnY8LbKtt8nPkFXV0uh34H4C1KuFP
-         UQ/g==
-X-Gm-Message-State: AAQBX9fRH1fhFaYelZfm9jM2u1FrK7KnqpiUoy1LAYRHqVdIjnaTPLaP
-	/exGohiTtbX5GLn8Csz2JqGy/gwjgN4=
-X-Google-Smtp-Source: AKy350YDNIIl35Z1hSKIAvRkO/mVLdZdmZFktwv0iTKmYyy8goNSt9y0gXZFbDnhlOzfQwDo+Wp3YEuawvY=
-X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a05:6902:1181:b0:b6c:2224:8a77 with SMTP id
- m1-20020a056902118100b00b6c22248a77mr9016560ybu.1.1679975273052; Mon, 27 Mar
- 2023 20:47:53 -0700 (PDT)
-Date: Mon, 27 Mar 2023 20:47:25 -0700
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A766A40
+	for <kvmarm@lists.linux.dev>; Tue, 28 Mar 2023 08:39:12 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 066EFC14;
+	Tue, 28 Mar 2023 01:39:50 -0700 (PDT)
+Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A75563F73F;
+	Tue, 28 Mar 2023 01:39:04 -0700 (PDT)
+Message-ID: <a3b900b3-661b-f0ac-807d-d4f4f2ca1e85@arm.com>
+Date: Tue, 28 Mar 2023 09:39:03 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <20230328034725.2051499-1-reijiw@google.com>
-Subject: [PATCH v1] KVM: arm64: PMU: Restore the guest's EL0 event counting
- after migration
-From: Reiji Watanabe <reijiw@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Ricardo Koller <ricarkol@google.com>, 
-	Jing Zhang <jingzhangos@google.com>, Raghavendra Rao Anata <rananta@google.com>, 
-	Will Deacon <will@kernel.org>, Reiji Watanabe <reijiw@google.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH 03/11] KVM: arm64: Add vm fd device attribute accessors
+Content-Language: en-US
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ James Morse <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Sean Christopherson <seanjc@google.com>, Salil Mehta <salil.mehta@huawei.com>
+References: <20230320221002.4191007-1-oliver.upton@linux.dev>
+ <20230320221002.4191007-4-oliver.upton@linux.dev>
+ <5f7dcec1-eeeb-811b-d9bc-85ecb7c73aa9@arm.com> <ZBngKAqIIyIWTEsB@linux.dev>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <ZBngKAqIIyIWTEsB@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Currently, with VHE, KVM enables the EL0 event counting for the
-guest on vcpu_load() or KVM enables it as a part of the PMU
-register emulation process, when needed.  However, in the migration
-case (with VHE), the same handling is lacking.  So, enable it on the
-first KVM_RUN with VHE (after the migration) when needed.
+On 21/03/2023 16:49, Oliver Upton wrote:
+> Hi Suzuki,
+> 
+> On Tue, Mar 21, 2023 at 09:53:06AM +0000, Suzuki K Poulose wrote:
+>> On 20/03/2023 22:09, Oliver Upton wrote:
+>>> A subsequent change will allow userspace to convey a filter for
+>>> hypercalls through a vm device attribute. Add the requisite boilerplate
+>>> for vm attribute accessors.
+>>>
+>>> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+>>> ---
+>>>    arch/arm64/kvm/arm.c | 29 +++++++++++++++++++++++++++++
+>>>    1 file changed, 29 insertions(+)
+>>>
+>>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>>> index 3bd732eaf087..b6e26c0e65e5 100644
+>>> --- a/arch/arm64/kvm/arm.c
+>>> +++ b/arch/arm64/kvm/arm.c
+>>> @@ -1439,11 +1439,28 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+>>>    	}
+>>>    }
+>>> +static int kvm_vm_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
+>>> +{
+>>> +	switch (attr->group) {
+>>> +	default:
+>>> +		return -ENXIO;
+>>> +	}
+>>> +}
+>>> +
+>>> +static int kvm_vm_set_attr(struct kvm *kvm, struct kvm_device_attr *attr)
+>>> +{
+>>> +	switch (attr->group) {
+>>> +	default:
+>>> +		return -ENXIO;
+>>> +	}
+>>> +}
+>>> +
+>>>    long kvm_arch_vm_ioctl(struct file *filp,
+>>>    		       unsigned int ioctl, unsigned long arg)
+>>>    {
+>>>    	struct kvm *kvm = filp->private_data;
+>>>    	void __user *argp = (void __user *)arg;
+>>> +	struct kvm_device_attr attr;
+>>>    	switch (ioctl) {
+>>>    	case KVM_CREATE_IRQCHIP: {
+>>> @@ -1479,6 +1496,18 @@ long kvm_arch_vm_ioctl(struct file *filp,
+>>>    			return -EFAULT;
+>>>    		return kvm_vm_ioctl_mte_copy_tags(kvm, &copy_tags);
+>>>    	}
+>>> +	case KVM_HAS_DEVICE_ATTR: {
+>>> +		if (copy_from_user(&attr, argp, sizeof(attr)))
+>>> +			return -EFAULT;
+>>> +
+>>> +		return kvm_vm_has_attr(kvm, &attr);
+>>> +	}
+>>> +	case KVM_SET_DEVICE_ATTR: {
+>>> +		if (copy_from_user(&attr, argp, sizeof(attr)))
+>>> +			return -EFAULT;
+>>> +
+>>> +		return kvm_vm_set_attr(kvm, &attr);
+>>> +	}
+>>
+>> Is there a reason to exclude KVM_GET_DEVICE_ATTR handling ?
+> 
+> The GET_DEVICE_ATTR would effectively be dead code, as the hypercall filter is
+> a write-only attribute. The filter is constructed through iterative calls to
+> the attribute, so conveying the end result to userspace w/ the same UAPI
+> is non-trivial.
+> 
+> Hopefully userspace remembers what it wrote to the field ;-)
 
-Fixes: d0c94c49792c ("KVM: arm64: Restore PMU configuration on first run")
-Cc: stable@vger.kernel.org
-Signed-off-by: Reiji Watanabe <reijiw@google.com>
----
- arch/arm64/kvm/pmu-emul.c | 1 +
- arch/arm64/kvm/sys_regs.c | 1 -
- 2 files changed, 1 insertion(+), 1 deletion(-)
+Fair enough. I am thinking of using VM DEVICE_ATTR for some of the Arm
+CCA Realm Configuration, which are now overloaded with ENABLE_CAP.
 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index c243b10f3e15..5eca0cdd961d 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -558,6 +558,7 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
- 		for_each_set_bit(i, &mask, 32)
- 			kvm_pmu_set_pmc_value(kvm_vcpu_idx_to_pmc(vcpu, i), 0, true);
- 	}
-+	kvm_vcpu_pmu_restore_guest(vcpu);
- }
- 
- static bool kvm_pmu_counter_is_enabled(struct kvm_pmc *pmc)
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 1b2c161120be..34688918c811 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -794,7 +794,6 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 		if (!kvm_supports_32bit_el0())
- 			val |= ARMV8_PMU_PMCR_LC;
- 		kvm_pmu_handle_pmcr(vcpu, val);
--		kvm_vcpu_pmu_restore_guest(vcpu);
- 	} else {
- 		/* PMCR.P & PMCR.C are RAZ */
- 		val = __vcpu_sys_reg(vcpu, PMCR_EL0)
--- 
-2.40.0.348.gf938b09366-goog
+We could add GET_DEVICE_ATTR if and when we need it.
+
+Thanks
+Suzuki
+
+
+> 
 
