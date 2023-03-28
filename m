@@ -1,123 +1,131 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FEE18465
-	for <kvmarm@lists.linux.dev>; Tue, 28 Mar 2023 14:15:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C29ABC43443;
-	Tue, 28 Mar 2023 14:15:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85E058BE0
+	for <kvmarm@lists.linux.dev>; Tue, 28 Mar 2023 15:27:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CEADC433EF;
+	Tue, 28 Mar 2023 15:27:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1680012925;
-	bh=49m7YtzLSlQ7IsIak5a6PdN9lSIxklya7T1YSDvOg8U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bBQh0oyXYzfRuT69hkDXpPq9oaxAT+alyCX3MSUJeFS44/ksMq9EJGneDyQALmSRw
-	 yCR1KjfbfpVvEtL2+Tucd9GWFheKv8zHpTcxYToyfA1QTtZB6qH2RjhkknXZcd7qSg
-	 OKAc0q/Ddm3Ve+wyUB/PZgXu6RAsn3LWhPJ9dfMFYBj1nkXMz3rkMnAgdbGWwEgRUt
-	 t5AbkVyseS9zniSPRd6r5kdmhwMCE4PgF7lj/96ZSWTbwb7/KyR0CE4dFti1a9DTrR
-	 DlBWiJs4kDG+qekukJ1UbfmZTGYAWZHddBBpw/dQe2OThlSKYPYyV1YW1lvydPLSkY
-	 FjqL7a3SEs4vg==
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1phA6d-003nH5-Gr;
-	Tue, 28 Mar 2023 15:15:23 +0100
+	s=k20201202; t=1680017271;
+	bh=+sUblLnhTmkAAsgpAOod8vL7GHeeAQRVuYluSyOviD0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gi82WVE4vrCgOQWUh+F/nNZvj++qkRD5UlvmUIG6r9+mGrTeSXwkYiMN6FwjzxMVs
+	 ekWN3GS9xRN5oJGvBvoai1Zz6ccvLgBrferRDk0xUgn/PuwpEIV1gurWnnofmZVNSl
+	 ndcsY5v2wfGqJsIm5ydzItH5p+C3594hqIPDMiJzUS4p9t4jxlFG7vZt68MAKRSm0b
+	 +6l7l/eLTYoPKlW8TkKI1Q11W61LRYEpDHKqdnUkBNALfTS760CDLMVj7utiwDXKAl
+	 mAQPyKPw8NPWluwm7O91Ve1gquSMEGjtBStQklgT4yh2JyQXfm1bSp8ryUL9H8Ci/x
+	 TSYGhwXwkC76A==
+Date: Tue, 28 Mar 2023 16:27:45 +0100
+From: Will Deacon <will@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 2/2] KVM: arm64: Move FGT value configuration to vCPU
+ state
+Message-ID: <20230328152744.GB1844@willie-the-truck>
+References: <20230301-kvm-arm64-fgt-v2-0-c11c0dcf810a@kernel.org>
+ <20230301-kvm-arm64-fgt-v2-2-c11c0dcf810a@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Date: Tue, 28 Mar 2023 15:15:23 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, James Morse
- <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Sean
- Christopherson <seanjc@google.com>, Salil Mehta <salil.mehta@huawei.com>
-Subject: Re: [PATCH 05/11] KVM: arm64: Start handling SMCs from EL1
-In-Reply-To: <23758eb0-a5b9-afa6-a85e-faa2690323c7@arm.com>
-References: <20230320221002.4191007-1-oliver.upton@linux.dev>
- <20230320221002.4191007-6-oliver.upton@linux.dev>
- <23758eb0-a5b9-afa6-a85e-faa2690323c7@arm.com>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <3712e4370dafe95ab828d642dbf064f8@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, pbonzini@redhat.com, james.morse@arm.com, yuzenghui@huawei.com, seanjc@google.com, salil.mehta@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230301-kvm-arm64-fgt-v2-2-c11c0dcf810a@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On 2023-03-28 09:52, Suzuki K Poulose wrote:
-> On 20/03/2023 22:09, Oliver Upton wrote:
->> Whelp, the architecture gods have spoken and confirmed that the 
->> function
->> ID space is common between SMCs and HVCs. Not only that, the 
->> expectation
->> is that hypervisors handle calls to both SMC and HVC conduits. KVM
->> recently picked up support for SMCCCs in commit bd36b1a9eb5a ("KVM:
->> arm64: nv: Handle SMCs taken from virtual EL2") but scoped it only to 
->> a
->> nested hypervisor.
->> 
->> Let's just open the floodgates and let EL1 access our SMCCC
->> implementation with the SMC instruction as well.
->> 
->> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+On Thu, Mar 23, 2023 at 03:48:36PM +0000, Mark Brown wrote:
+> Currently the only fine grained traps we use are the SME ones and we decide
+> if we want to manage fine grained traps for the guest and which to
+> enable based on the presence of that feature. In order to support SME,
+> PIE and other features where we need fine grained traps we will need to
+> select per guest which traps are enabled. Move to storing the traps to
+> enable in the vCPU data, updating the registers if fine grained traps
+> are supported and any are enabled. In order to ensure that the fine
+> grained traps are restored along with other traps there is a bit of
+> asymmetry with where the registers are restored on guest exit.
 > 
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Currently we always set this register to 0 when running the guest so
+> unconditionally use that value for guests, future patches will configure
+> this.
 > 
-> One minor observation below.
+> No functional change, though we will do additional saves of the guest
+> FGT register configurations and will save and restore even if the host
+> and guest states are identical.
 > 
->> ---
->>   arch/arm64/kvm/handle_exit.c | 14 +++++++-------
->>   1 file changed, 7 insertions(+), 7 deletions(-)
->> 
->> diff --git a/arch/arm64/kvm/handle_exit.c 
->> b/arch/arm64/kvm/handle_exit.c
->> index 5e4f9737cbd5..68f95dcd41a1 100644
->> --- a/arch/arm64/kvm/handle_exit.c
->> +++ b/arch/arm64/kvm/handle_exit.c
->> @@ -72,13 +72,15 @@ static int handle_smc(struct kvm_vcpu *vcpu)
->>   	 *
->>   	 * We need to advance the PC after the trap, as it would
->>   	 * otherwise return to the same address...
->> -	 *
->> -	 * Only handle SMCs from the virtual EL2 with an immediate of zero 
->> and
->> -	 * skip it otherwise.
->>   	 */
->> -	if (!vcpu_is_el2(vcpu) || kvm_vcpu_hvc_get_imm(vcpu)) {
->> +	kvm_incr_pc(vcpu);
->> +
->> +	/*
->> +	 * SMCs with a nonzero immediate are reserved according to DEN0028E 
->> 2.9
->> +	 * "SMC and HVC immediate value".
->> +	 */
->> +	if (kvm_vcpu_hvc_get_imm(vcpu)) {
->>   		vcpu_set_reg(vcpu, 0, ~0UL);
->> -		kvm_incr_pc(vcpu);
->>   		return 1;
->>   	}
->>   @@ -93,8 +95,6 @@ static int handle_smc(struct kvm_vcpu *vcpu)
->>   	if (ret < 0)
->>   		vcpu_set_reg(vcpu, 0, ~0UL);
-> 
-> Nothing to do with this patch. But that check above is different
-> from how we handle HVC. i.e., we return back to guest for HVCs.
-> But for SMCs, we tend to return "ret" indicating an error (ret < 0).
-> 
-> Do we need to fix that ?
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h       | 16 ++++++++++++++
+>  arch/arm64/include/asm/kvm_host.h          |  2 ++
+>  arch/arm64/kvm/arm.c                       |  1 +
+>  arch/arm64/kvm/hyp/include/hyp/switch.h    | 35 ++++++++++++++++--------------
+>  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |  9 ++++++++
+>  5 files changed, 47 insertions(+), 16 deletions(-)
 
-I guess so. It is just that it is practically impossible to get
-a negative value at the moment, but it isn't something we should
-rely on.
+[...]
 
-Thanks,
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 07d37ff88a3f..bf0183a3a82d 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -88,33 +88,36 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
+>  	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+>  
+> -	if (cpus_have_final_cap(ARM64_SME)) {
+> -		sysreg_clear_set_s(SYS_HFGRTR_EL2,
+> -				   HFGxTR_EL2_nSMPRI_EL1_MASK |
+> -				   HFGxTR_EL2_nTPIDR2_EL0_MASK,
+> -				   0);
+> -		sysreg_clear_set_s(SYS_HFGWTR_EL2,
+> -				   HFGxTR_EL2_nSMPRI_EL1_MASK |
+> -				   HFGxTR_EL2_nTPIDR2_EL0_MASK,
+> -				   0);
+> +	if (cpus_have_final_cap(ARM64_HAS_FGT)) {
+> +		write_sysreg_s(__vcpu_sys_reg(vcpu, HFGRTR_EL2),
+> +			       SYS_HFGRTR_EL2);
+> +
+> +		write_sysreg_s(__vcpu_sys_reg(vcpu, HFGWTR_EL2),
+> +			       SYS_HFGWTR_EL2);
+>  	}
+>  }
+>  
+>  static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+>  {
+> +	struct kvm_cpu_context *host_ctxt;
+> +
+>  	write_sysreg(vcpu->arch.mdcr_el2_host, mdcr_el2);
+>  
+>  	write_sysreg(0, hstr_el2);
+>  	if (kvm_arm_support_pmu_v3())
+>  		write_sysreg(0, pmuserenr_el0);
+>  
+> -	if (cpus_have_final_cap(ARM64_SME)) {
+> -		sysreg_clear_set_s(SYS_HFGRTR_EL2, 0,
+> -				   HFGxTR_EL2_nSMPRI_EL1_MASK |
+> -				   HFGxTR_EL2_nTPIDR2_EL0_MASK);
+> -		sysreg_clear_set_s(SYS_HFGWTR_EL2, 0,
+> -				   HFGxTR_EL2_nSMPRI_EL1_MASK |
+> -				   HFGxTR_EL2_nTPIDR2_EL0_MASK);
+> +	/*
+> +	 * Restore the host FGT configuration here since it's managing
+> +	 * traps.
+> +	 */
+> +	if (cpus_have_final_cap(ARM64_HAS_FGT)) {
+> +		host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +
+> +		write_sysreg_s(__vcpu_sys_reg(vcpu, HFGRTR_EL2),
+> +			       SYS_HFGRTR_EL2);
+> +		write_sysreg_s(__vcpu_sys_reg(vcpu, HFGWTR_EL2),
+> +			       SYS_HFGWTR_EL2);
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+I don't understand this hunk. Where is `host_ctxt` being used?
+
+Will
