@@ -1,140 +1,153 @@
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1340BAFDF
-	for <kvmarm@lists.linux.dev>; Wed, 29 Mar 2023 12:15:29 +0000 (UTC)
-Received: by mail-wr1-f73.google.com with SMTP id e15-20020adfa44f000000b002d7ea9d6ef0so1515688wra.8
-        for <kvmarm@lists.linux.dev>; Wed, 29 Mar 2023 05:15:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680092128; x=1682684128;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=3LDovRClEiEee92bH6YgUcmES4firbrLEQRncmwPJsY=;
-        b=aE6a1iSlrF07iDsx3s27aH3qFGuqnJ39YNvFoWalfzgbbc5syaOxqbYaSMBLqQ3XRa
-         Ds3EeAfyOoUZAdikTRKm6kmKYR213dgBalRpH7Da+vX1KnqhkxQyRtVGGIoninmWXAXI
-         o64sIAzpSypg2xzqsTsOsGT5UDHxdRxQR0tTue9KmkCX33DR65GOtnIRUNvaEHtX9dIh
-         P7FY9sKOnaMnvgyIxswHv/aB2oRXDXeNN2A5NkogyedusqDDIBdUaUdzgoYDsJf//ifW
-         kAhrT3dfpGl+jIefDKdp/Gj3sj+JgvTfvv5rxM30gmQSIXhWBPhSurNs4xLuq/pwzQhL
-         1jQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680092128; x=1682684128;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3LDovRClEiEee92bH6YgUcmES4firbrLEQRncmwPJsY=;
-        b=0Uy9v2hQ62+4edNzIrvWoenq2pzduqiLmMNFiW63ayAYMZQXPh/1OQSMsMOASeumEm
-         v+ekbhDA1LXUmIrHYRX5XNdh3S74AJiSyB2fpj0yStAYq/FE9zAfEa6tYnqv8+RLy4AC
-         0cHAa0ruEteVRhiwFOu9KeB6/UeDPaW55JEuxiPJTeGvgnyfJBeQkdR1TO5NXnm7G9+R
-         z+OSJXvGjTipw7qA+4C80S/VKE3Hr4Ys+ctLJ5eaKrE2mK1DsKlBu1cDNLqx1Job0vOd
-         h5w1uD0pOsiO9D/x+XV+eFm1KJPCq8Pt3FcfjSVbgDjDXiOMZ/LdbAxUZjdyPE9xVUZ7
-         +daA==
-X-Gm-Message-State: AAQBX9cA37OG2mhdSoJppe2686J2YmENZbDWWK2OSXMWWspHfX/DET+S
-	RSAUK+yPC0bN6Xi8fYlI3BTvQmEjws/Ud7gIvN0pHfQa2BTjGDIfURTvYa1Q+O7Xs3iNCEor/gg
-	Ap6+HpteWM3kCG5fDrXjX4plimFHTgyT8EdVQWbF/rcPkSugBI+0prsAQRaE=
-X-Google-Smtp-Source: AKy350a2TXbsc4wgoDmK0xosSNujzwRIPiHbkU0ilqrgPU26WFZYU6IQL0eiinCffMwXzip/xFl4nM0mmg==
-X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:adf:e5c7:0:b0:2ce:a8a1:f2a9 with SMTP id
- a7-20020adfe5c7000000b002cea8a1f2a9mr4010465wrn.12.1680092128220; Wed, 29 Mar
- 2023 05:15:28 -0700 (PDT)
-Date: Wed, 29 Mar 2023 13:15:26 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73B621C2B
+	for <kvmarm@lists.linux.dev>; Wed, 29 Mar 2023 13:24:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42A61C433EF;
+	Wed, 29 Mar 2023 13:24:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1680096246;
+	bh=6W3QduN/k7cEYVjrCpqP0JWTIrPEYxw7C0NN/q9lMsA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ii5JzxZWeLps+5SdKNWHb/vqKDeuEHlWwLSLqtLOb12sK86SR+qlgrHSuZSeZZtCP
+	 duExSeQyI8x4d2FXAauMXmNT6cCbSlS5jQrQ+hrufsos5Wmu/5zjqFAf0wi1fC/9Hd
+	 RM1ebL1LaODWo7/YcgGt/ESA/zPRUbh/2/bKMvuKzXgXMqZcDfq3bhmXCzLh2V/Mvd
+	 jHrhtSuIbBVS0TYw3Zj97oFlKfz3DSIHbd3F3XTNLbvjeCdJ0TH03n0NNGwaf1yuJu
+	 saFclfxoDCwXR7eExP41Bb/sy7yhfwLPuxmj+9lgDhK9btXp/YHISEV6oUVJMfJl2H
+	 EXrWuI8mQFTHQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1phVmW-0043wr-3C;
+	Wed, 29 Mar 2023 14:24:04 +0100
+Date: Wed, 29 Mar 2023 14:24:03 +0100
+Message-ID: <86ilejwv0s.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	oupton@google.com,
+	will@kernel.org,
+	pbonzini@redhat.com,
+	james.morse@arm.com,
+	alexandru.elisei@arm.com,
+	suzuki.poulose@arm.com,
+	reijiw@google.com,
+	ricarkol@google.com,
+	rananta@google.com,
+	jingzhangos@google.com
+Subject: Re: [PATCH] KVM: arm64: Advertise ID_AA64PFR0_EL1.CSV2/3 to protected VMs
+In-Reply-To: <20230329121526.1168242-1-tabba@google.com>
+References: <20230329121526.1168242-1-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <20230329121526.1168242-1-tabba@google.com>
-Subject: [PATCH] KVM: arm64: Advertise ID_AA64PFR0_EL1.CSV2/3 to protected VMs
-From: Fuad Tabba <tabba@google.com>
-To: kvmarm@lists.linux.dev
-Cc: maz@kernel.org, oupton@google.com, will@kernel.org, pbonzini@redhat.com, 
-	james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, 
-	reijiw@google.com, ricarkol@google.com, rananta@google.com, 
-	jingzhangos@google.com, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, oupton@google.com, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, reijiw@google.com, ricarkol@google.com, rananta@google.com, jingzhangos@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The existing pKVM code attempts to do that using a value that's
-initialized to 0 but never set. To advertise csv2/3 to a
-protected guest, store them at the hypervisor and use them for
-setting csv2/3.
+On Wed, 29 Mar 2023 13:15:26 +0100,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> The existing pKVM code attempts to do that using a value that's
+> initialized to 0 but never set. To advertise csv2/3 to a
+> protected guest, store them at the hypervisor and use them for
+> setting csv2/3.
+> 
+> Similar to non-protected KVM, these are tracked as a system-wide
+> variable, rather than per cpu, for simplicity.
+> 
+> Fixes: 6c30bfb18d0b ("KVM: arm64: Add handlers for protected VM System Registers")
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_hyp.h   |  3 +++
+>  arch/arm64/kvm/arm.c               |  2 ++
+>  arch/arm64/kvm/hyp/nvhe/sys_regs.c | 15 ++++++++++++---
+>  3 files changed, 17 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index bdd9cf546d95..723a645af191 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -127,4 +127,7 @@ extern u64 kvm_nvhe_sym(id_aa64smfr0_el1_sys_val);
+>  extern unsigned long kvm_nvhe_sym(__icache_flags);
+>  extern unsigned int kvm_nvhe_sym(kvm_arm_vmid_bits);
+>  
+> +extern bool kvm_nvhe_sym(spectre_unaffected);
+> +extern bool kvm_nvhe_sym(meltdown_unaffected);
+> +
+>  #endif /* __ARM64_KVM_HYP_H__ */
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 3bd732eaf087..364a4440ae54 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1902,6 +1902,8 @@ static void kvm_hyp_init_symbols(void)
+>  	kvm_nvhe_sym(id_aa64smfr0_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64SMFR0_EL1);
+>  	kvm_nvhe_sym(__icache_flags) = __icache_flags;
+>  	kvm_nvhe_sym(kvm_arm_vmid_bits) = kvm_arm_vmid_bits;
+> +	kvm_nvhe_sym(spectre_unaffected) = (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED);
+> +	kvm_nvhe_sym(meltdown_unaffected) = (arm64_get_meltdown_state() == SPECTRE_UNAFFECTED);
+>  }
+>  
+>  static int __init kvm_hyp_init_protection(u32 hyp_va_bits)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> index 08d2b004f4b7..3f647a2f4c96 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> @@ -28,6 +28,16 @@ u64 id_aa64mmfr1_el1_sys_val;
+>  u64 id_aa64mmfr2_el1_sys_val;
+>  u64 id_aa64smfr0_el1_sys_val;
+>  
+> +/*
+> + * Track whether the system isn't affected by spectre/meltown.
+> + * Although this is per-CPU, we make it global for simplicity, e.g., not to have
+> + * to worry about migration.
+> + *
+> + * Unlike for non-protected VMs, userspace cannot override this.
+> + */
+> +bool spectre_unaffected;
+> +bool meltdown_unaffected;
+> +
+>  /*
+>   * Inject an unknown/undefined exception to an AArch64 guest while most of its
+>   * sysregs are live.
+> @@ -85,7 +95,6 @@ static u64 get_restricted_features_unsigned(u64 sys_reg_val,
+>  
+>  static u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu)
+>  {
+> -	const struct kvm *kvm = (const struct kvm *)kern_hyp_va(vcpu->kvm);
+>  	u64 set_mask = 0;
+>  	u64 allow_mask = PVM_ID_AA64PFR0_ALLOW;
+>  
+> @@ -94,9 +103,9 @@ static u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu)
+>  
+>  	/* Spectre and Meltdown mitigation in KVM */
+>  	set_mask |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2),
+> -			       (u64)kvm->arch.pfr0_csv2);
+> +			       spectre_unaffected);
+>  	set_mask |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3),
+> -			       (u64)kvm->arch.pfr0_csv3);
+> +			       meltdown_unaffected);
 
-Similar to non-protected KVM, these are tracked as a system-wide
-variable, rather than per cpu, for simplicity.
+Since you already have a sanitised version of ID_AA64PFR0_EL1, it
+would seem more straightforward to directly perform this adjustment at
+the point where you export the value, rather than doing it at runtime.
 
-Fixes: 6c30bfb18d0b ("KVM: arm64: Add handlers for protected VM System Registers")
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/include/asm/kvm_hyp.h   |  3 +++
- arch/arm64/kvm/arm.c               |  2 ++
- arch/arm64/kvm/hyp/nvhe/sys_regs.c | 15 ++++++++++++---
- 3 files changed, 17 insertions(+), 3 deletions(-)
+Ideally, the proton-pack code would perform the update and set the
+sanitised values directly in the cpufeature repository, but this would
+involve me looking at it again, and I really don't want to do that.
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index bdd9cf546d95..723a645af191 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -127,4 +127,7 @@ extern u64 kvm_nvhe_sym(id_aa64smfr0_el1_sys_val);
- extern unsigned long kvm_nvhe_sym(__icache_flags);
- extern unsigned int kvm_nvhe_sym(kvm_arm_vmid_bits);
- 
-+extern bool kvm_nvhe_sym(spectre_unaffected);
-+extern bool kvm_nvhe_sym(meltdown_unaffected);
-+
- #endif /* __ARM64_KVM_HYP_H__ */
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 3bd732eaf087..364a4440ae54 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1902,6 +1902,8 @@ static void kvm_hyp_init_symbols(void)
- 	kvm_nvhe_sym(id_aa64smfr0_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64SMFR0_EL1);
- 	kvm_nvhe_sym(__icache_flags) = __icache_flags;
- 	kvm_nvhe_sym(kvm_arm_vmid_bits) = kvm_arm_vmid_bits;
-+	kvm_nvhe_sym(spectre_unaffected) = (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED);
-+	kvm_nvhe_sym(meltdown_unaffected) = (arm64_get_meltdown_state() == SPECTRE_UNAFFECTED);
- }
- 
- static int __init kvm_hyp_init_protection(u32 hyp_va_bits)
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index 08d2b004f4b7..3f647a2f4c96 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -28,6 +28,16 @@ u64 id_aa64mmfr1_el1_sys_val;
- u64 id_aa64mmfr2_el1_sys_val;
- u64 id_aa64smfr0_el1_sys_val;
- 
-+/*
-+ * Track whether the system isn't affected by spectre/meltown.
-+ * Although this is per-CPU, we make it global for simplicity, e.g., not to have
-+ * to worry about migration.
-+ *
-+ * Unlike for non-protected VMs, userspace cannot override this.
-+ */
-+bool spectre_unaffected;
-+bool meltdown_unaffected;
-+
- /*
-  * Inject an unknown/undefined exception to an AArch64 guest while most of its
-  * sysregs are live.
-@@ -85,7 +95,6 @@ static u64 get_restricted_features_unsigned(u64 sys_reg_val,
- 
- static u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu)
- {
--	const struct kvm *kvm = (const struct kvm *)kern_hyp_va(vcpu->kvm);
- 	u64 set_mask = 0;
- 	u64 allow_mask = PVM_ID_AA64PFR0_ALLOW;
- 
-@@ -94,9 +103,9 @@ static u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu)
- 
- 	/* Spectre and Meltdown mitigation in KVM */
- 	set_mask |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2),
--			       (u64)kvm->arch.pfr0_csv2);
-+			       spectre_unaffected);
- 	set_mask |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3),
--			       (u64)kvm->arch.pfr0_csv3);
-+			       meltdown_unaffected);
- 
- 	return (id_aa64pfr0_el1_sys_val & allow_mask) | set_mask;
- }
+Thanks,
+
+	M.
+
 -- 
-2.40.0.348.gf938b09366-goog
-
+Without deviation from the norm, progress is not possible.
