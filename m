@@ -1,231 +1,180 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5023710E3
-	for <kvmarm@lists.linux.dev>; Wed, 29 Mar 2023 04:50:52 +0000 (UTC)
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1a273b3b466so9855ad.1
-        for <kvmarm@lists.linux.dev>; Tue, 28 Mar 2023 21:50:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E572210E3
+	for <kvmarm@lists.linux.dev>; Wed, 29 Mar 2023 05:41:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680065451;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GMKbYfJvfPn8OhLKIq7+3kjU4mVXW1gjBFDJdfKxGPY=;
-        b=BJwoAvT/1xWo/Ivydhw+aCRfco2DfLYLCBlMntoiV7cIlJEViFX9vJBR7pkaZnZO//
-         azKx16TqI81pGr7Nk9+ticGYcNUlFsL/7kD+i25ZvPhz3VbPFT3Gf+prB9UiBL3+vBKZ
-         XZsLrZ2omTLP/3nhCAiyErL0XOA77aLXcn3Fz20hUH347TJGoX13fMJH9FRQUBsJldsV
-         f6slcjfk2qqwwDQeuYpKHajbBDP5jma0BFZ0IO9E9V6Ba51M5m9jp+2SNaPovwH4CuR9
-         ViWkAzSS4xuZwSt7DDlZXQk+iwstTBZZVz3RihZbNozwTDSOizOwLt4LKLF97wMbH+9t
-         +bvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680065451;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GMKbYfJvfPn8OhLKIq7+3kjU4mVXW1gjBFDJdfKxGPY=;
-        b=7dehBj9i1OjkgjxY+cAiDMT2ua4898JIubjP9pJeieN6MNEGu0pcMGakMfAV0aGtNr
-         fJm4C+exliSaVe9CPang+nboqXmYojXqA7dcBqU+tB42H1XNxc2dNwHigqvuYOmmnGa/
-         zlBFapwyeg1ES2kntu8TxngfhWDsJ6PMR6wwukxF+gJjssp46KJCdDBiZk0xUI2Na4Dk
-         dFp0kf/k/H5GWUVuAivQKyNcjDNGOstjwo9g4cZO1pl8hfGUWwBbUzo+lfSTd4+AGNeJ
-         2zFnBdNkXtFM+bZ98W06eZcxV7nOLA+rVTmi34TlD6jmFJKUFXdoktD8djMiLDnamHB4
-         i2tw==
-X-Gm-Message-State: AAQBX9c36gMm0J3K5u5We2i/fi9Sxfxq1vdvaUAZUidh8dd0UYvWbB1b
-	CP8lPMXO5wXKYF5eWoqxeHjMGKPxOdgIGuXE8EczSA==
-X-Google-Smtp-Source: AKy350bXnCpONpk2prcoJtHoGxgZkKoBYk6y65s/zCoegLKB/gbO6zyCy6h31/BuhmsG7NwgQK16HQ==
-X-Received: by 2002:a17:902:eb13:b0:19c:c5d4:afd2 with SMTP id l19-20020a170902eb1300b0019cc5d4afd2mr117077plb.11.1680065451458;
-        Tue, 28 Mar 2023 21:50:51 -0700 (PDT)
-Received: from google.com (132.111.125.34.bc.googleusercontent.com. [34.125.111.132])
-        by smtp.gmail.com with ESMTPSA id qb2-20020a17090b280200b00240015b837fsm4116349pjb.2.2023.03.28.21.50.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Mar 2023 21:50:50 -0700 (PDT)
-Date: Tue, 28 Mar 2023 21:50:46 -0700
-From: Reiji Watanabe <reijiw@google.com>
-To: Ricardo Koller <ricarkol@google.com>
-Cc: pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
-	yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com,
-	andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com,
-	suzuki.poulose@arm.com, eric.auger@redhat.com, gshan@redhat.com,
-	rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH v6 08/12] KVM: arm64: Add
- KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-Message-ID: <20230329045046.anwujgkede7h2hi5@google.com>
-References: <20230307034555.39733-1-ricarkol@google.com>
- <20230307034555.39733-9-ricarkol@google.com>
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1680068480; x=1711604480;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-id:mime-version:content-transfer-encoding:subject;
+  bh=8fpUuRrVFd9qaWhA24P4dhijoqs5wUMF1+uq9uNSt2Y=;
+  b=tSeKAyX81SFhAWprD5H843HIiLA0CTm9X0Wf5frfg5jF13OEjGSD+5rX
+   pfPkdelOMf5z94S74cJzSyTDdfqBOjrdn9D5lqIyzZCq+j+1ZKDK0Zm9i
+   mGQdzWu5nKseJykWWz61PbA+QYeYFyIwNsp0RhWXKyUZB+7BcJUetWKDb
+   0=;
+X-IronPort-AV: E=Sophos;i="5.98,299,1673913600"; 
+   d="scan'208";a="323713307"
+Subject: Re: [PATCH v3 00/18] KVM: arm64: Rework timer offsetting for fun and profit
+Thread-Topic: [PATCH v3 00/18] KVM: arm64: Rework timer offsetting for fun and profit
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-93c3b254.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2023 05:41:13 +0000
+Received: from EX19D018EUC004.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+	by email-inbound-relay-iad-1a-m6i4x-93c3b254.us-east-1.amazon.com (Postfix) with ESMTPS id 1CD84E280F;
+	Wed, 29 Mar 2023 05:41:08 +0000 (UTC)
+Received: from EX19D018EUC003.ant.amazon.com (10.252.51.231) by
+ EX19D018EUC004.ant.amazon.com (10.252.51.172) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Wed, 29 Mar 2023 05:41:07 +0000
+Received: from EX19D018EUC003.ant.amazon.com ([fe80::8a6b:2af5:3f32:8cfe]) by
+ EX19D018EUC003.ant.amazon.com ([fe80::8a6b:2af5:3f32:8cfe%3]) with mapi id
+ 15.02.1118.026; Wed, 29 Mar 2023 05:41:07 +0000
+From: "Veith, Simon" <sveith@amazon.de>
+To: "maz@kernel.org" <maz@kernel.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+CC: "yuzenghui@huawei.com" <yuzenghui@huawei.com>, "dwmw2@infradead.org"
+	<dwmw2@infradead.org>, "coltonlewis@google.com" <coltonlewis@google.com>,
+	"james.morse@arm.com" <james.morse@arm.com>, "suzuki.poulose@arm.com"
+	<suzuki.poulose@arm.com>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"joey.gouly@arm.com" <joey.gouly@arm.com>, "reijiw@google.com"
+	<reijiw@google.com>, "ricarkol@google.com" <ricarkol@google.com>
+Thread-Index: AQHZXl+i0CYMixrEhEK0ar4uuaICha8RRVyA
+Date: Wed, 29 Mar 2023 05:41:07 +0000
+Message-ID: <67fd090a26beb831a3ae754853c9419e1cbcfcd8.camel@amazon.de>
+References: <20230324144704.4193635-1-maz@kernel.org>
+In-Reply-To: <20230324144704.4193635-1-maz@kernel.org>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.1.212.14]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <0CD458A8C93A324F8113C32DC3A1087E@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230307034555.39733-9-ricarkol@google.com>
+Content-Transfer-Encoding: base64
 
-Hi Ricardo,
+SGVsbG8gTWFyYywNCg0KdGhhbmtzIGFnYWluIGZvciB5b3VyIHByb3Bvc2FsLg0KDQpPbiBGcmks
+IDIwMjMtMDMtMjQgYXQgMTQ6NDYgKzAwMDAsIE1hcmMgWnluZ2llciB3cm90ZToNCj4gVGhpcyBz
+ZXJpZXMgYWltcyBhdCBzYXRpc2Z5aW5nIG11bHRpcGxlIGdvYWxzOg0KPiANCj4gLSBhbGxvdyBh
+IFZNTSB0byBhdG9taWNhbGx5IHJlc3RvcmUgYSB0aW1lciBvZmZzZXQgZm9yIGEgd2hvbGUgVk0N
+Cj4gwqAgaW5zdGVhZCBvZiB1cGRhdGluZyB0aGUgb2Zmc2V0IGVhY2ggdGltZSBhIHZjcHUgZ2V0
+IGl0cyBjb3VudGVyDQo+IMKgIHdyaXR0ZW4NCj4gDQo+IC0gYWxsb3cgYSBWTU0gdG8gc2F2ZS9y
+ZXN0b3JlIHRoZSBwaHlzaWNhbCB0aW1lciBjb250ZXh0LCBzb21ldGhpbmcNCj4gwqAgdGhhdCB3
+ZSBjYW5ub3QgZG8gYXQgdGhlIG1vbWVudCBkdWUgdG8gdGhlIGxhY2sgb2Ygb2Zmc2V0dGluZw0K
+PiANCj4gLSBwcm92aWRlIGEgZnJhbWV3b3JrIHRoYXQgaXMgc3VpdGFibGUgZm9yIE5WIHN1cHBv
+cnQsIHdoZXJlIHdlIGdldA0KPiDCoCBib3RoIGdsb2JhbCBhbmQgcGVyIHRpbWVyLCBwZXIgdmNw
+dSBvZmZzZXR0aW5nLCBhbmQgbWFuYWdlDQo+IMKgIGludGVycnVwdHMgaW4gYSBsZXNzIGJyYWlu
+ZGVhZCB3YXkuDQo+IA0KPiBXZSBmaXggYSBjb3VwbGUgb2YgaXNzdWVzIGFsb25nIHRoZSB3YXks
+IGJvdGggZnJvbSBhIHN0eWxpc3RpYyBhbmQNCj4gY29ycmVjdG5lc3MgcGVyc3BlY3RpdmUuIFRo
+aXMgcmVzdWx0cyBpbiBhIG5ldyBwZXIgVk0gS1ZNIEFQSSB0aGF0DQo+IGFsbG93cyBhIGdsb2Jh
+bCBvZmZzZXQgdG8gYmUgc2V0IGF0IGFueSBwb2ludCBpbiB0aW1lLCBvdmVycmlkaW5nDQo+IGJv
+dGgNCj4gb2YgdGhlIHRpbWVyIGNvdW50ZXIgd3JpdGViYWNrcy4NCj4gDQo+IFdlIGFsc28gdGFr
+ZSB0aGlzIG9wcG9ydHVuaXR5IHRvIHJld29yayB0aGUgd2F5IElSUXMgYXJlIGFzc29jaWF0ZWQN
+Cj4gd2l0aCB0aW1lcnMsIHNvbWV0aGluZyB0aGF0IHdhcyBhbHdheXMgYSBiaXQgZG9kZ3kuIFRo
+aXMgcmVsaWVzIG9uIGENCj4gbmV3IGxvY2ssIHdoaWNoIHNob3VsZCBkaXNhcHBlYXIgb25jZSBP
+bGl2ZXIncyBsb2NrIG9yZGVyaW5nIHNlcmllcw0KPiBpcw0KPiBtZXJnZWQgKHdlIGNhbiByZXVz
+ZSB0aGUgY29uZmlnX2xvY2sgZm9yIHRoaXMpLg0KPiANCj4gVGhpcyBoYXMgYmVlbiB0ZXN0ZWQg
+d2l0aCBuVkhFLCBWSEUgYW5kIE5WLiBJIGRvIG5vdCBoYXZlIGFjY2VzcyB0bw0KPiBDTlRQT0ZG
+LWF3YXJlIEhXLCBidXQgQ29sdG9uIG1hbmFnZWQgdG8gZ2l2ZSBpdCBhIGdvLiBOb3RlIHRoYXQg
+dGhlDQo+IE5WIHBhdGNoZXMgaW4gdGhpcyBzZXJpZXMgYXJlIGhlcmUgdG8gZ2l2ZSBhIHBlcnNw
+ZWN0aXZlIG9uIGhvdyB0aGlzDQo+IGdldHMgdXNlZC4NCj4gDQo+IEkndmUgdXBkYXRlZCB0aGUg
+YXJjaF90aW1lciBzZWxmdGVzdCB0byBhbGxvdyBhbiBvZmZzZXQgdG8gYmUNCj4gcHJvdmlkZWQN
+Cj4gZnJvbSB0aGUgY29tbWFuZCBsaW5lLCBhbmQgZml4ZWQgYSBjb3VwbGUgb2YgZ2xhcmluZyBp
+c3N1ZXMgYWxvbmcgdGhlDQo+IHdheS4NCj4gDQo+IE5vdGUgdGhhdCB0aGlzIGlzIGF0IGJlc3Qg
+Ni40IG1hdGVyaWFsLiBJIGhhdmUgYSBicmFuY2ggc3Rhc2hlZCBhdA0KPiBbMF0NCj4gYW5kIGJh
+c2VkIG9uIDYuMy1yYzMsIGFzIHdlbGwgYXMgYSBtaW5pbWFsIGV4YW1wbGUgb2YgdGhlIHVzZSBv
+ZiB0aGUNCj4gQVBJIGF0IFszXSBiYXNlZCBvbiBrdm10b29sLg0KPiANCj4gU2ltb246IEknZCBh
+cHByZWNpYXRlIHNvbWUgZmVlZGJhY2sgYXMgd2hldGhlciB0aGlzIGNoYW5nZSBmaXRzIHlvdXIN
+Cj4gcmVxdWlyZW1lbnRzLCBnaXZlbiB0aGF0IHlvdSBicm91Z2h0IHRoaXMgdXAgdGhlIGZpcnN0
+IHBsYWNlLg0KDQpUaGUgaW50ZXJmYWNlIGxvb2tzIGdvb2QgdG8gbWUuIEkgaGF2ZSB5ZXQgdG8g
+ZGVsaXZlciBvbiBteSBwcm9taXNlIHRvDQp0ZXN0IHlvdXIgcGF0Y2ggc2VyaWVzIHdpdGggb3Vy
+IHVzZXJzcGFjZTsgSSBhbSBvbiBsZWF2ZSB0aGlzIHdlZWssIGJ1dA0KSSdsbCBnaXZlIHlvdXIg
+bGF0ZXN0IGl0ZXJhdGlvbiBhIGdvIG5leHQgd2Vlay4NCg0KVGhhbmtzDQpTaW1vbg0KDQo+IFRo
+YW5rcywNCj4gDQo+IMKgwqDCoMKgwqDCoMKgIE0uDQo+IA0KPiAqIEZyb20gdjIgWzJdOg0KPiAN
+Cj4gwqAgLSBGaXhlZCAzMmJpdCBoYW5kbGluZyBvZiB0aGUgcGh5c2ljYWwgY291bnRlciB3aGVu
+IHRoZSBvZmZzZXQgaXMNCj4gwqDCoMKgIG5vbi16ZXJvDQo+IA0KPiDCoCAtIERyb3BwZWQgdW51
+c2VkIC1PIG9wdGlvbiBmcm9tIHRoZSBzZWxmdGVzdA0KPiANCj4gwqAgLSBBZGRlZCBsb2NrZGVw
+X2Fzc2VydF9oZWxkKCkgdG8gKHVuKWxvY2tfYWxsX3ZjcHVzKCkNCj4gDQo+IMKgIC0gUmVvcmRl
+cmVkIHRoZSBsYXN0IHR3byBwYXRjaGVzDQo+IA0KPiDCoCAtIEFkZGVkIENvbHRvbidzIFJCcywg
+d2l0aCB0aGFua3MNCj4gDQo+IMKgIC0gRHJvcHBlZCB0aGUgaW5pdGlhbCBwYXRjaCB3aGljaCBo
+YXMgYmVlbiBtZXJnZWQNCj4gDQo+IMKgIC0gUmViYXNlZCBvbiA2LjMtcmMzDQo+IA0KPiAqIEZy
+b20gdjEgWzFdOg0KPiANCj4gwqAgLSBTd2l0Y2hlZCBmcm9tIGEgZHVhbCBvZmZzZXQgdG8gYSBz
+aW5nbGUgb25lIHdoaWNoIGdldHMgYXBwbGllZCB0bw0KPiDCoMKgwqAgYm90aCB2aXJ0dWFsIGFu
+ZCBwaHlzaWNhbCBjb3VudGVycy4gV2hpY2ggbWVhbnMgdGhhdCBOViBkb2Vzbid0DQo+IMKgwqDC
+oCBiZWhhdmUgb2RkbHkgYW55bW9yZSBieSBpZ25vcmluZyB0aGUgdmlydHVhbCBvZmZzZXQuDQo+
+IA0KPiDCoCAtIFNvbWUgY29zbWV0aWMgcmVwYWludGluZyBvZiB0aGUgVUFQSSBzeW1ib2xzDQo+
+IA0KPiDCoCAtIEFkZGVkIHBhdGNoZXMgdG8gcmV3b3JrIHRoZSBJUlEgbWFwcGluZyB0byB0aW1l
+cnMNCj4gDQo+IMKgIC0gUGF0Y2ggIzEgb24gaXRzIHdheSB0byBQYW9sbw0KPiANCj4gwqAgLSBS
+ZWJhc2VkIG9uIDYuMy1yYzENCj4gDQo+IFswXQ0KPiBodHRwczovL2dpdC5rZXJuZWwub3JnL3B1
+Yi9zY20vbGludXgva2VybmVsL2dpdC9tYXovYXJtLXBsYXRmb3Jtcy5naXQvbG9nLz9oPWt2bS1h
+cm02NC90aW1lci12bS1vZmZzZXRzDQo+IFsxXSBodHRwczovL2xvcmUua2VybmVsLm9yZy9yLzIw
+MjMwMjE2MTQyMTIzLjI2Mzg2NzUtMS1tYXpAa2VybmVsLm9yZw0KPiBbMl0gaHR0cHM6Ly9sb3Jl
+Lmtlcm5lbC5vcmcvci8yMDIzMDMxMzEyNDgzNy4yMjY0ODgyLTUtbWF6QGtlcm5lbC5vcmcNCj4g
+WzNdDQo+IGh0dHBzOi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L21h
+ei9rdm10b29sLmdpdC9jb21taXQvP2g9emVyby1vZmZzZXQmaWQ9M2IxMjUzMDczZWU1N2MwZDky
+YmFmN2IyMTQzNjI4MjliNDg3YjhkNQ0KPiANCj4gTWFyYyBaeW5naWVyICgxOCk6DQo+IMKgIEtW
+TTogYXJtNjQ6IHRpbWVyczogVXNlIGEgcGVyLXZjcHUsIHBlci10aW1lciBhY2N1bXVsYXRvciBm
+b3INCj4gwqDCoMKgIGZyYWN0aW9uYWwgbnMNCj4gwqAgYXJtNjQ6IEFkZCBDTlRQT0ZGX0VMMiBy
+ZWdpc3RlciBkZWZpbml0aW9uDQo+IMKgIGFybTY0OiBBZGQgSEFTX0VDVl9DTlRQT0ZGIGNhcGFi
+aWxpdHkNCj4gwqAgS1ZNOiBhcm02NDogdGltZXJzOiBVc2UgQ05UUE9GRl9FTDIgdG8gb2Zmc2V0
+IHRoZSBwaHlzaWNhbCB0aW1lcg0KPiDCoCBLVk06IGFybTY0OiB0aW1lcnM6IEFsbG93IHBoeXNp
+Y2FsIG9mZnNldCB3aXRob3V0IENOVFBPRkZfRUwyDQo+IMKgIEtWTTogYXJtNjQ6IEV4cG9zZSB7
+dW4sfWxvY2tfYWxsX3ZjcHVzKCkgdG8gdGhlIHJlc3Qgb2YgS1ZNDQo+IMKgIEtWTTogYXJtNjQ6
+IHRpbWVyczogQWxsb3cgdXNlcnNwYWNlIHRvIHNldCB0aGUgZ2xvYmFsIGNvdW50ZXINCj4gb2Zm
+c2V0DQo+IMKgIEtWTTogYXJtNjQ6IHRpbWVyczogQWxsb3cgc2F2ZS9yZXN0b3Jpbmcgb2YgdGhl
+IHBoeXNpY2FsIHRpbWVyDQo+IMKgIEtWTTogYXJtNjQ6IHRpbWVyczogUmF0aW9uYWxpc2UgcGVy
+LXZjcHUgdGltZXIgaW5pdA0KPiDCoCBLVk06IGFybTY0OiB0aW1lcnM6IEFic3RyYWN0IHBlci10
+aW1lciBJUlEgYWNjZXNzDQo+IMKgIEtWTTogYXJtNjQ6IHRpbWVyczogTW92ZSB0aGUgdGltZXIg
+SVJRcyBpbnRvIGFyY2hfdGltZXJfdm1fZGF0YQ0KPiDCoCBLVk06IGFybTY0OiBBYnN0cmFjdCB0
+aGUgbnVtYmVyIG9mIHZhbGlkIHRpbWVycyBwZXIgdmNwdQ0KPiDCoCBLVk06IGFybTY0OiBEb2N1
+bWVudCBLVk1fQVJNX1NFVF9DTlRfT0ZGU0VUUyBhbmQgY28NCj4gwqAgS1ZNOiBhcm02NDogbnY6
+IHRpbWVyczogQWRkIGEgcGVyLXRpbWVyLCBwZXItdmNwdSBvZmZzZXQNCj4gwqAgS1ZNOiBhcm02
+NDogbnY6IHRpbWVyczogU3VwcG9ydCBoeXAgdGltZXIgZW11bGF0aW9uDQo+IMKgIEtWTTogYXJt
+NjQ6IHNlbGZ0ZXN0czogQWRkIHBoeXNpY2FsIHRpbWVyIHJlZ2lzdGVycyB0byB0aGUgc3lzcmVn
+DQo+IGxpc3QNCj4gwqAgS1ZNOiBhcm02NDogc2VsZnRlc3RzOiBEZWFsIHdpdGggc3B1cmlvdXMg
+dGltZXIgaW50ZXJydXB0cw0KPiDCoCBLVk06IGFybTY0OiBzZWxmdGVzdHM6IEF1Z21lbnQgZXhp
+c3RpbmcgdGltZXIgdGVzdCB0byBoYW5kbGUNCj4gdmFyaWFibGUNCj4gwqDCoMKgIG9mZnNldA0K
+PiANCj4gwqBEb2N1bWVudGF0aW9uL3ZpcnQva3ZtL2FwaS5yc3TCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqAgfMKgIDM4ICsrDQo+IMKgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9z
+dC5owqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCAxMyArDQo+IMKgYXJjaC9hcm02NC9pbmNs
+dWRlL2FzbS9zeXNyZWcuaMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgwqAgMiArDQo+
+IMKgYXJjaC9hcm02NC9pbmNsdWRlL3VhcGkvYXNtL2t2bS5owqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgIHzCoCAxMSArDQo+IMKgYXJjaC9hcm02NC9rZXJuZWwvY3B1ZmVhdHVyZS5jwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCAxMSArDQo+IMKgYXJjaC9hcm02NC9rdm0vYXJjaF90
+aW1lci5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwgNTM5ICsrKysrKysr
+KysrKysrLS0NCj4gLS0NCj4gwqBhcmNoL2FybTY0L2t2bS9hcm0uY8KgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCA1MyArKw0KPiDCoGFyY2gvYXJt
+NjQva3ZtL2d1ZXN0LmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgIHzCoCAyOSArLQ0KPiDCoGFyY2gvYXJtNjQva3ZtL2h5cC9udmhlL3RpbWVyLXNyLmPCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIHzCoCAxOCArLQ0KPiDCoGFyY2gvYXJtNjQva3ZtL2h5cGVyY2Fs
+bHMuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqDCoCAyICstDQo+IMKg
+YXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgfMKgwqAgOSArDQo+IMKgYXJjaC9hcm02NC9rdm0vdHJhY2VfYXJtLmjCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqDCoCA2ICstDQo+IMKgYXJjaC9hcm02
+NC9rdm0vdmdpYy92Z2ljLWt2bS1kZXZpY2UuY8KgwqDCoMKgwqDCoMKgwqAgfMKgIDM4IC0tDQo+
+IMKgYXJjaC9hcm02NC9rdm0vdmdpYy92Z2ljLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoCB8wqAgMTUgKw0KPiDCoGFyY2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy5owqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgwqAgMyAtDQo+IMKgYXJjaC9hcm02
+NC90b29scy9jcHVjYXBzwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+IHzCoMKgIDEgKw0KPiDCoGFyY2gvYXJtNjQvdG9vbHMvc3lzcmVnwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgwqAgNCArDQo+IMKgaW5jbHVkZS9jbG9ja3Nv
+dXJjZS9hcm1fYXJjaF90aW1lci5owqDCoMKgwqDCoMKgwqDCoMKgIHzCoMKgIDEgKw0KPiDCoGlu
+Y2x1ZGUva3ZtL2FybV9hcmNoX3RpbWVyLmjCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgIHzCoCAzNiArLQ0KPiDCoGluY2x1ZGUva3ZtL2FybV92Z2ljLmjCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHzCoMKgIDEgKw0KPiDCoGluY2x1ZGUvdWFw
+aS9saW51eC9rdm0uaMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8
+wqDCoCAzICsNCj4gwqAuLi4vc2VsZnRlc3RzL2t2bS9hYXJjaDY0L2FyY2hfdGltZXIuY8KgwqDC
+oMKgwqDCoMKgIHzCoCA1NiArLQ0KPiDCoC4uLi9zZWxmdGVzdHMva3ZtL2FhcmNoNjQvZ2V0LXJl
+Zy1saXN0LmPCoMKgwqDCoMKgIHzCoMKgIDUgKy0NCj4gwqAyMyBmaWxlcyBjaGFuZ2VkLCA2OTAg
+aW5zZXJ0aW9ucygrKSwgMjA0IGRlbGV0aW9ucygtKQ0KPiANCj4gLS0NCj4gMi4zNC4xDQo+IA0K
+DQoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApLcmF1c2Vuc3RyLiAz
+OAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBK
+b25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1
+bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
 
-On Tue, Mar 07, 2023 at 03:45:51AM +0000, Ricardo Koller wrote:
-> Add a capability for userspace to specify the eager split chunk size.
-> The chunk size specifies how many pages to break at a time, using a
-> single allocation. Bigger the chunk size, more pages need to be
-> allocated ahead of time.
-> 
-> Suggested-by: Oliver Upton <oliver.upton@linux.dev>
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->  Documentation/virt/kvm/api.rst    | 26 ++++++++++++++++++++++++++
->  arch/arm64/include/asm/kvm_host.h | 19 +++++++++++++++++++
->  arch/arm64/kvm/arm.c              | 22 ++++++++++++++++++++++
->  arch/arm64/kvm/mmu.c              |  3 +++
->  include/uapi/linux/kvm.h          |  1 +
->  5 files changed, 71 insertions(+)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 62de0768d6aa..872dae7cfbe0 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -8380,6 +8380,32 @@ structure.
->  When getting the Modified Change Topology Report value, the attr->addr
->  must point to a byte where the value will be stored or retrieved from.
->  
-> +8.40 KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-> +---------------------------------------
-> +
-> +:Capability: KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-> +:Architectures: arm64
-> +:Type: vm
-> +:Parameters: arg[0] is the new chunk size.
-> +:Returns: 0 on success, -EINVAL if any memslot has been created.
-> +
-> +This capability sets the chunk size used in Eager Page Splitting.
-> +
-> +Eager Page Splitting improves the performance of dirty-logging (used
-> +in live migrations) when guest memory is backed by huge-pages.  This
-> +optimization is enabled by default on arm64. It avoids splitting
-> +huge-pages (into PAGE_SIZE pages) on fault, by doing it eagerly when
-> +enabling dirty logging (with the KVM_MEM_LOG_DIRTY_PAGES flag for a
-> +memory region), or when using KVM_CLEAR_DIRTY_LOG.
-> +
-> +The chunk size specifies how many pages to break at a time, using a
-> +single allocation for each chunk. Bigger the chunk size, more pages
-> +need to be allocated ahead of time. A good heuristic is to pick the
-> +size of the huge-pages as the chunk size.
-> +
-> +If the chunk size (arg[0]) is zero, then no eager page splitting is
-> +performed. The default value PMD size (e.g., 2M when PAGE_SIZE is 4K).
-> +
->  9. Known KVM API problems
->  =========================
->  
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index a1892a8f6032..b7755d0cbd4d 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -158,6 +158,25 @@ struct kvm_s2_mmu {
->  	/* The last vcpu id that ran on each physical CPU */
->  	int __percpu *last_vcpu_ran;
->  
-> +#define KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT	PMD_SIZE
-> +	/*
-> +	 * Memory cache used to split
-> +	 * KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE worth of huge pages. It
-> +	 * is used to allocate stage2 page tables while splitting huge
-> +	 * pages. Note that the choice of EAGER_PAGE_SPLIT_CHUNK_SIZE
-
-Nit: s/EAGER_PAGE_SPLIT_CHUNK_SIZE/EAGER_SPLIT_CHUNK_SIZE/ ?
-(or 'split_page_chunk_size' to make the comment consistent
-with the field name?)
-
-
-> +	 * influences both the capacity of the split page cache, and
-> +	 * how often KVM reschedules. Be wary of raising CHUNK_SIZE
-> +	 * too high.
-> +	 *
-> +	 * A good heuristic to pick CHUNK_SIZE is that it should be
-> +	 * the size of the huge-pages backing guest memory. If not
-> +	 * known, the PMD size (usually 2M) is a good guess.
-> +	 *
-> +	 * Protected by kvm->slots_lock.
-> +	 */
-> +	struct kvm_mmu_memory_cache split_page_cache;
-> +	uint64_t split_page_chunk_size;
-> +
->  	struct kvm_arch *arch;
->  };
->  
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 3bd732eaf087..3468fee223ae 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -91,6 +91,22 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->  		r = 0;
->  		set_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags);
->  		break;
-> +	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
-> +		mutex_lock(&kvm->lock);
-
-Do we need to hold kvm->lock here ?
-
-Thanks,
-Reiji
-
-
-> +		mutex_lock(&kvm->slots_lock);
-> +		/*
-> +		 * To keep things simple, allow changing the chunk
-> +		 * size only if there are no memslots created.
-> +		 */
-> +		if (!kvm_are_all_memslots_empty(kvm)) {
-> +			r = -EINVAL;
-> +		} else {
-> +			r = 0;
-> +			kvm->arch.mmu.split_page_chunk_size = cap->args[0];
-> +		}
-> +		mutex_unlock(&kvm->slots_lock);
-> +		mutex_unlock(&kvm->lock);
-> +		break;
->  	default:
->  		r = -EINVAL;
->  		break;
-> @@ -288,6 +304,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_ARM_PTRAUTH_GENERIC:
->  		r = system_has_full_ptr_auth();
->  		break;
-> +	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
-> +		if (kvm)
-> +			r = kvm->arch.mmu.split_page_chunk_size;
-> +		else
-> +			r = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
-> +		break;
->  	default:
->  		r = 0;
->  	}
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index a2800e5c4271..898985b09321 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -756,6 +756,9 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
->  	for_each_possible_cpu(cpu)
->  		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
->  
-> +	mmu->split_page_cache.gfp_zero = __GFP_ZERO;
-> +	mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
-> +
->  	mmu->pgt = pgt;
->  	mmu->pgd_phys = __pa(pgt->pgd);
->  	return 0;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index d77aef872a0a..af43acdc7901 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1184,6 +1184,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
->  #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
->  #define KVM_CAP_PMU_EVENT_MASKED_EVENTS 226
-> +#define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 227
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
-> -- 
-> 2.40.0.rc0.216.gc4246ad0f0-goog
-> 
