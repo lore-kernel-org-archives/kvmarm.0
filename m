@@ -1,143 +1,138 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E95157B
-	for <kvmarm@lists.linux.dev>; Wed, 29 Mar 2023 00:21:55 +0000 (UTC)
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-536a5a0b6e3so139595837b3.10
-        for <kvmarm@lists.linux.dev>; Tue, 28 Mar 2023 17:21:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680049315;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iXBtTxJA82bcXFQXnQ4d5hea80kX0towjerItzNuSjc=;
-        b=f3LE3sXwy/Ypo0P2WoNo8NflUs56Y6hwFUXr6NyFwI05caseJKeOArDA3LgE6Zvesh
-         n8XB+vhcrio7HWaQOwAgaN3DIiP9fCowNOXVr4nI+hNQtTbatppnEfPFQKmmykKrDCdm
-         BYn5i/V1hkx3deB/XcrBXFj3kTR5h1S7Xcr1lR4QtEztD3l97yuAqQGTW/v5IqFDFIB3
-         /BX/s9XQQjmYW6t6MQl5kqVyqT1vco7mSDQcsmO2kRkM429zib6uYwf6k+CXWGQpYA9r
-         q9xWmPJLZW8gDNFLVzvXNcN/lF/2sLxlfxPgRdF37A1YYkqf+/7neUK/EMVqdLyEtdw7
-         QJUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680049315;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iXBtTxJA82bcXFQXnQ4d5hea80kX0towjerItzNuSjc=;
-        b=GFhQAsmPEIBTgp2rFQ2KREKVIhCMYfz+Fv2sEQzEc5Lbbs4roAqD6q3TYsdgJrA8FU
-         pRFfSln/VImL6+hZjGdhIgn1XHeGBturx0PJ2g01DWcIoJiPI05ZlE7ujq+vOE5Kd3MM
-         KZDIDO7OOE7kRSsJudLBrmQYCbAAN/X8K59qoFjuuIaOKckNmTPtLlKofd4d5aIac81u
-         PXQfEVNkT8RZbvyZUWM8QC+CeF+95N1R1WE8dhiiNz34ohxkyOwLyL15t1HsWLBjvFQP
-         xgNfDK0aDl/Cm2i3FE5Hpy4FqL/wI60y043e2XgpycL0TCI3LfFjReLwNEhmAmaDG+HR
-         QQDw==
-X-Gm-Message-State: AAQBX9cJgiFTveJ2iavQHnCrgcncYsHIZrMfKATcdehm+0+C8XK6Ju3D
-	+r4gulqG4CoN5Ft1sWkqjjUE3ptmoB0=
-X-Google-Smtp-Source: AKy350a64aWirwKtZfp2hNwUr2/sbk2BHCGDPtQLxA7yvFuGhqlS4CfVlAm0dtCZEFXYfpoboZnvH7OctM8=
-X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a05:6902:a8c:b0:b7b:fb15:8685 with SMTP id
- cd12-20020a0569020a8c00b00b7bfb158685mr5290936ybb.9.1680049315012; Tue, 28
- Mar 2023 17:21:55 -0700 (PDT)
-Date: Tue, 28 Mar 2023 17:21:36 -0700
-In-Reply-To: <20230329002136.2463442-1-reijiw@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6827CEBB
+	for <kvmarm@lists.linux.dev>; Wed, 29 Mar 2023 02:35:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1680057346;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uk4XWZ2laUwaUBSfpuB6h6JbrXDzKovTQURHIz2YxOo=;
+	b=LBzyg+p090FT/29biEzBj7flauJn4PwUbVN9W//paVILIRI7Nxr1ad4mVL/+NOtdgQ2wN5
+	6UoKQ+BIFqlDK0oL/AGZRnniXSd2ZuDUzNrIzCcd9CbL4pC7zzVQPzzHpuD5HrXfXDrdx4
+	9L3dSITcAj9b7WLxUbSfSl/UEH0w0rs=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-228-KlnEoq3DMH2x9S4ZkzV4HA-1; Tue, 28 Mar 2023 22:35:40 -0400
+X-MC-Unique: KlnEoq3DMH2x9S4ZkzV4HA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C45E8801210;
+	Wed, 29 Mar 2023 02:35:38 +0000 (UTC)
+Received: from [10.72.13.230] (ovpn-13-230.pek2.redhat.com [10.72.13.230])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 66F4A140E96A;
+	Wed, 29 Mar 2023 02:35:21 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [RFC PATCH 00/32] ACPI/arm64: add support for virtual cpuhotplug
+To: James Morse <james.morse@arm.com>, linux-pm@vger.kernel.org,
+ loongarch@lists.linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, x86@kernel.org
+Cc: Marc Zyngier <maz@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>, Sudeep Holla <sudeep.holla@arm.com>,
+ Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>, Ingo Molnar <mingo@redhat.com>,
+ Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ Huacai Chen <chenhuacai@kernel.org>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Len Brown <lenb@kernel.org>,
+ Rafael Wysocki <rafael@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
+ Salil Mehta <salil.mehta@huawei.com>, Russell King <linux@armlinux.org.uk>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>
+References: <20230203135043.409192-1-james.morse@arm.com>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <41dd71ab-a6a7-fd93-73ec-64a6b0ca468e@redhat.com>
+Date: Wed, 29 Mar 2023 10:35:17 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230329002136.2463442-1-reijiw@google.com>
-X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <20230329002136.2463442-3-reijiw@google.com>
-Subject: [PATCH v1 2/2] KVM: arm64: PMU: Ensure to trap PMU access from EL0 to EL2
-From: Reiji Watanabe <reijiw@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Ricardo Koller <ricarkol@google.com>, 
-	Jing Zhang <jingzhangos@google.com>, Raghavendra Rao Anata <rananta@google.com>, 
-	Will Deacon <will@kernel.org>, Reiji Watanabe <reijiw@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+In-Reply-To: <20230203135043.409192-1-james.morse@arm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 
-Currently, with VHE, KVM sets ER, CR, SW and EN bits of
-PMUSERENR_EL0 to 1 on vcpu_load().  So, if the value of those bits
-are cleared after vcpu_load() (the perf subsystem would do when PMU
-counters are programmed for the guest), PMU access from the guest EL0
-might be trapped to the guest EL1 directly regardless of the current
-PMUSERENR_EL0 value of the vCPU.
+Hi James,
 
-With VHE, fix this by setting those bits of the register on every
-guest entry (as with nVHE).  Also, opportunistically make the similar
-change for PMSELR_EL0, which is cleared by vcpu_load(), to ensure it
-is always set to zero on guest entry (PMXEVCNTR_EL0 access might cause
-UNDEF at EL1 instead of being trapped to EL2, depending on the value
-of PMSELR_EL0).  I think that would be more robust, although I don't
-find any kernel code that writes PMSELR_EL0.
+On 2/3/23 9:50 PM, James Morse wrote:
 
-Fixes: 83a7a4d643d3 ("arm64: perf: Enable PMU counter userspace access for perf event")
-Signed-off-by: Reiji Watanabe <reijiw@google.com>
----
- arch/arm64/kvm/hyp/include/hyp/switch.h | 29 +++++++++++++------------
- 1 file changed, 15 insertions(+), 14 deletions(-)
+[...]
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 44b84fbdde0d..7d39882d8a73 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -74,18 +74,6 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
- 	/* Trap on AArch32 cp15 c15 (impdef sysregs) accesses (EL1 or EL0) */
- 	write_sysreg(1 << 15, hstr_el2);
- 
--	/*
--	 * Make sure we trap PMU access from EL0 to EL2. Also sanitize
--	 * PMSELR_EL0 to make sure it never contains the cycle
--	 * counter, which could make a PMXEVCNTR_EL0 access UNDEF at
--	 * EL1 instead of being trapped to EL2.
--	 */
--	if (kvm_arm_support_pmu_v3()) {
--		write_sysreg(0, pmselr_el0);
--		vcpu->arch.host_pmuserenr_el0 = read_sysreg(pmuserenr_el0);
--		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
--	}
--
- 	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
- 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
- 
-@@ -106,8 +94,6 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
- 	write_sysreg(vcpu->arch.mdcr_el2_host, mdcr_el2);
- 
- 	write_sysreg(0, hstr_el2);
--	if (kvm_arm_support_pmu_v3())
--		write_sysreg(vcpu->arch.host_pmuserenr_el0, pmuserenr_el0);
- 
- 	if (cpus_have_final_cap(ARM64_SME)) {
- 		sysreg_clear_set_s(SYS_HFGRTR_EL2, 0,
-@@ -130,6 +116,18 @@ static inline void ___activate_traps(struct kvm_vcpu *vcpu)
- 
- 	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_VSE))
- 		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
-+
-+	/*
-+	 * Make sure we trap PMU access from EL0 to EL2. Also sanitize
-+	 * PMSELR_EL0 to make sure it never contains the cycle
-+	 * counter, which could make a PMXEVCNTR_EL0 access UNDEF at
-+	 * EL1 instead of being trapped to EL2.
-+	 */
-+	if (kvm_arm_support_pmu_v3()) {
-+		write_sysreg(0, pmselr_el0);
-+		vcpu->arch.host_pmuserenr_el0 = read_sysreg(pmuserenr_el0);
-+		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
-+	}
- }
- 
- static inline void ___deactivate_traps(struct kvm_vcpu *vcpu)
-@@ -144,6 +142,9 @@ static inline void ___deactivate_traps(struct kvm_vcpu *vcpu)
- 		vcpu->arch.hcr_el2 &= ~HCR_VSE;
- 		vcpu->arch.hcr_el2 |= read_sysreg(hcr_el2) & HCR_VSE;
- 	}
-+
-+	if (kvm_arm_support_pmu_v3())
-+		write_sysreg(vcpu->arch.host_pmuserenr_el0, pmuserenr_el0);
- }
- 
- static inline bool __populate_fault_info(struct kvm_vcpu *vcpu)
--- 
-2.40.0.348.gf938b09366-goog
+> 
+> 
+> The first patch has already been posted as a fix here:
+> https://www.spinics.net/lists/linux-ia64/msg21920.html
+> I've only build tested Loongarch and ia64.
+> 
+
+It has been merged to upstream.
+
+> 
+> If folk want to play along at home, you'll need a copy of Qemu that supports this.
+> https://github.com/salil-mehta/qemu.git salil/virt-cpuhp-armv8/rfc-v1-port29092022.psci.present
+> 
+> You'll need to fix the numbers of KVM_CAP_ARM_HVC_TO_USER and KVM_CAP_ARM_PSCI_TO_USER
+> to match your host kernel. Replace your '-smp' argument with something like:
+> | -smp cpus=1,maxcpus=3,cores=3,threads=1,sockets=1
+> 
+> then feed the following to the Qemu montior;
+> | (qemu) device_add driver=host-arm-cpu,core-id=1,id=cpu1
+> | (qemu) device_del cpu1
+> 
+> 
+> This series is based on v6.2-rc3, and can be retrieved from:
+> https://git.kernel.org/pub/scm/linux/kernel/git/morse/linux.git/ virtual_cpu_hotplug/rfc/v1
+> 
+
+I give it a try, but the hot-added CPU needs to be put into online
+state manually. I'm not sure if it's expected or not.
+
+     /home/gavin/sandbox/qemu.main/build/qemu-system-aarch64                \
+     -accel kvm,dirty-ring-size=65536                                       \
+     -machine virt,gic-version=host,nvdimm=on                               \
+     -cpu host -smp maxcpus=8,cpus=1,sockets=1,clusters=1,cores=8,threads=1 \
+     -m 1024M,slots=16,maxmem=64G                                           \
+     -object memory-backend-ram,id=mem0,size=1024M                          \
+     -numa node,nodeid=0,memdev=mem0                                        \
+     -L /home/gavin/sandbox/qemu.main/build/pc-bios                         \
+     -monitor none -serial mon:stdio -nographic -gdb tcp::1234              \
+     -bios /home/gavin/sandbox/qemu.main/build/pc-bios/edk2-aarch64-code.fd \
+     -kernel /home/gavin/sandbox/linux.guest/arch/arm64/boot/Image          \
+     -initrd /home/gavin/sandbox/images/rootfs.cpio.xz                      \
+     -append memhp_default_state=online_movable                             \
+        :
+        :
+     guest# cat /proc/cpuinfo | grep "CPU implementer" | wc -l
+     1
+     (qemu) device_add driver=host-arm-cpu,core-id=1,id=cpu1
+     guest# cat /proc/cpuinfo | grep "CPU implementer" | wc -l
+     1
+     guest# echo 1 > /sys/devices/system/cpu/cpu1/online
+     guest# cat /proc/cpuinfo | grep "CPU implementer" | wc -l
+     2
+     (qemu) device_del cpu1
+     guest# cat /proc/cpuinfo | grep "CPU implementer" | wc -l
+     1
+
+Note that the QEMU binary is directly built from Salil's repository and
+the kernel image is built from v6.3-rc4, plus this patchset excluding the
+first patch since it has been merged.
+
+Thanks,
+Gavin
+
+
+
 
