@@ -1,139 +1,143 @@
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-22.mta1.migadu.com (out-22.mta1.migadu.com [95.215.58.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABD012F30
-	for <kvmarm@lists.linux.dev>; Wed, 29 Mar 2023 16:29:13 +0000 (UTC)
-Received: by mail-pj1-f53.google.com with SMTP id l7so14548897pjg.5
-        for <kvmarm@lists.linux.dev>; Wed, 29 Mar 2023 09:29:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680107353;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=9wWrsLlXKWvQA38obw+xbkZDiZxNr9CZXUvW32hk7Zs=;
-        b=Zz6aCUUmIOsuN6jjhxWlSNkUocUVLBH86e4Cgs8AuqoEgzVZgAoXrLrwHoI1qV+7SG
-         eYGVOZwQlZ1yerLWiCTfWbSZ9ba7dYB4fbXiPKH96l6XVRCkJLtilAHjAsgDMiiS7iq/
-         hHg5b2DyjekHyoQua10b/Fdi5z0Pdt0QhHMwyGm7oE6c7lnMLOv2pYwycyOlKQ2YCBYu
-         twGVqko3CVySmDqYsadOtEGgy5Ye5WTkNDFpsMFGsvLa7viQ09FBSLoybrs12Jls+H3G
-         9z9MyicL3PlJP1NQZQZHEOqzopBFoMpSJHqB8d1r/DA85oJJFhSal70+02jrzlwNbo1z
-         82Gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680107353;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9wWrsLlXKWvQA38obw+xbkZDiZxNr9CZXUvW32hk7Zs=;
-        b=iG7lvZ6eaMteNACTQdTifLt/0jtLwEAl3VVYCKhE4VDUHJU8Z/oJSFewnLi4EpUGbC
-         aTiGA1ZKS05pH/QdbOyI5CkzUgzNyRkgJVfozKuI8KEjc6Fw+PD1nbnN8kCTG3A7MXDz
-         3iBBa2GRmNXw88NcOoVEX8Gg7j8gK9B2Eu6i3QC8v9LRRbqs5VCMkFoburDd7SBtmSqm
-         6t/mEGwrVrmCoIs9IZVEF/W+jKmWYJJnvq7dakX+U7hKGGozcvwJ0coSjPkD0RAQZZlo
-         CZOnIV0lHBazCFinpUA1JDxJUc5MuN/gH8x8rT2bqIbfYVJBBc1ZqOubH2TlvfKQ6KkH
-         EA4Q==
-X-Gm-Message-State: AAQBX9esZGZDbZmj6pt02DtnEYtfJB6NDWB8WvUPNT7ZR9GX4gP0udY7
-	QMiFgHFp3iVyrYyp5VOtaggL9zuZLfgq7h5x+B36YQ==
-X-Google-Smtp-Source: AKy350ZORUTybtTmxknrU6U6sDbDJmKms88a0NXHL8s0bQ+Pm9uOWRyP22uljRbj0cRwTCy7wM0LnHGSFCGNhYzF50w=
-X-Received: by 2002:a17:902:848d:b0:1a2:1fd0:226b with SMTP id
- c13-20020a170902848d00b001a21fd0226bmr6464831plo.5.1680107352908; Wed, 29 Mar
- 2023 09:29:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C837EA1
+	for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 00:17:40 +0000 (UTC)
+Date: Thu, 30 Mar 2023 00:17:25 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1680135457;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dZ7CgR7LTAUcUKEiGOSUlgNQXWvEplmklKUnppCogvc=;
+	b=hRX9HcY4lHKvklyIm9h5vMkVivWZXvGwyJDd5XCTzM29yNzKcO7TXlGwIu+7wmffVDeVof
+	XgLEjtUm074mMAdnfFC0AGMUVl2/hrS6DpBuI9GVy6scElft++20vrOGXsNmvbt2Zh3bAr
+	8VYBc2aq4fHO3hc8+86ULT8PRGPctfE=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
+	Ricardo Koller <ricarkol@google.com>,
+	Reiji Watanabe <reijiw@google.com>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 6/7] KVM: arm64: Break the table entries using TLBI
+ range instructions
+Message-ID: <ZCTVFYd2oJnGR6O+@linux.dev>
+References: <20230206172340.2639971-1-rananta@google.com>
+ <20230206172340.2639971-7-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230329002136.2463442-1-reijiw@google.com> <20230329002136.2463442-2-reijiw@google.com>
- <87v8ikqaib.wl-maz@kernel.org>
-In-Reply-To: <87v8ikqaib.wl-maz@kernel.org>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Wed, 29 Mar 2023 09:28:56 -0700
-Message-ID: <CAAeT=Fx3ZHXwOBoCTAV-Hp4ZG4V_MJfzbmC6zDUk-0M5mP=PnA@mail.gmail.com>
-Subject: Re: [PATCH v1 1/2] KVM: arm64: PMU: Restore the host's PMUSERENR_EL0
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, James Morse <james.morse@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Ricardo Koller <ricarkol@google.com>, Jing Zhang <jingzhangos@google.com>, 
-	Raghavendra Rao Anata <rananta@google.com>, Will Deacon <will@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230206172340.2639971-7-rananta@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Marc,
+nit: s/break/invalidate/g
 
-On Wed, Mar 29, 2023 at 08:31:24AM +0100, Marc Zyngier wrote:
-> On Wed, 29 Mar 2023 01:21:35 +0100,
-> Reiji Watanabe <reijiw@google.com> wrote:
-> >
-> > Restore the host's PMUSERENR_EL0 value instead of clearing it,
-> > before returning back to userspace, as the host's EL0 might have
-> > a direct access to PMU registers (some bits of PMUSERENR_EL0
-> > might not be zero).
-> >
-> > Fixes: 83a7a4d643d3 ("arm64: perf: Enable PMU counter userspace access for perf event")
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h       | 3 +++
-> >  arch/arm64/kvm/hyp/include/hyp/switch.h | 3 ++-
-> >  2 files changed, 5 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index bcd774d74f34..82220ecec10e 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -544,6 +544,9 @@ struct kvm_vcpu_arch {
-> >
-> >     /* Per-vcpu CCSIDR override or NULL */
-> >     u32 *ccsidr;
-> > +
-> > +   /* the value of host's pmuserenr_el0 before guest entry */
-> > +   u64     host_pmuserenr_el0;
->
-> I don't think we need this in each and every vcpu. Why can't this be
-> placed in struct kvm_host_data and accessed via the per-cpu pointer?
-> Maybe even use the PMUSERNR_EL0 field in the sysreg array?
+There is a rather important degree of nuance there. 'Break' as it
+relates to break-before-make implies that the PTE is made invalid and
+visible to hardware _before_ a subsequent invalidation. There will be
+systems that relax this requirement and also support TLBIRANGE.
 
-Thank you for the nice suggestion.
-Indeed, that would be better.  I will fix it in v2.
+On Mon, Feb 06, 2023 at 05:23:39PM +0000, Raghavendra Rao Ananta wrote:
 
->
-> There is probably a number of things that we could move there, but
-> let's start by not adding more unnecessary stuff to the vcpu
-> structure.
+Some nitpicking on the changelog:
 
-Yeah, I agree.
+> Currently, when breaking up the stage-2 table entries, KVM
 
-Thank you,
-Reiji
+'breaking up stage-2 table entries' is rather ambiguous. Instead
+describe the operation taking place on the page tables (i.e. hugepage
+collapse).
 
+> would flush the entire VM's context using 'vmalls12e1is'
+> TLBI operation. One of the problematic situation is collapsing
+> table entries into a hugepage, specifically if the VM is
+> faulting on many hugepages (say after dirty-logging). This
+> creates a performance penality for the guest whose pages have
 
+typo: penalty
 
->
-> >  };
-> >
-> >  /*
-> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > index 07d37ff88a3f..44b84fbdde0d 100644
-> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > @@ -82,6 +82,7 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
-> >      */
-> >     if (kvm_arm_support_pmu_v3()) {
-> >             write_sysreg(0, pmselr_el0);
-> > +           vcpu->arch.host_pmuserenr_el0 = read_sysreg(pmuserenr_el0);
-> >             write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
-> >     }
-> >
-> > @@ -106,7 +107,7 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
-> >
-> >     write_sysreg(0, hstr_el2);
-> >     if (kvm_arm_support_pmu_v3())
-> > -           write_sysreg(0, pmuserenr_el0);
-> > +           write_sysreg(vcpu->arch.host_pmuserenr_el0, pmuserenr_el0);
-> >
-> >     if (cpus_have_final_cap(ARM64_SME)) {
-> >             sysreg_clear_set_s(SYS_HFGRTR_EL2, 0,
->
-> Thanks,
->
->       M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+> already been faulted earlier as they would have to refill their
+> TLBs again.
+> 
+> Hence, if the system supports it, use __kvm_tlb_flush_range_vmid_ipa()
+
+> to flush only the range of pages governed by the table entry,
+> while leaving other TLB entries alone. An upcoming patch also
+> takes advantage of this when breaking up table entries during
+> the unmap operation.
+
+Language regarding an upcoming patch isn't necessary, as this one stands
+on its own (implements and uses a range-based invalidation helper).
+
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  arch/arm64/kvm/hyp/pgtable.c | 23 ++++++++++++++++++++---
+>  1 file changed, 20 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index b11cf2c618a6c..0858d1fa85d6b 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -686,6 +686,20 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
+>  	return cmpxchg(ctx->ptep, ctx->old, new) == ctx->old;
+>  }
+>  
+> +static void kvm_pgtable_stage2_flush_range(struct kvm_s2_mmu *mmu, u64 start, u64 end,
+> +						u32 level, u32 tlb_level)
+> +{
+> +	if (system_supports_tlb_range())
+
+You also check this in __kvm_tlb_flush_range(), ideally this should be
+done exactly once per call.
+
+> +		kvm_call_hyp(__kvm_tlb_flush_range_vmid_ipa, mmu, start, end, level, tlb_level);
+> +	else
+> +		/*
+> +		 * Invalidate the whole stage-2, as we may have numerous leaf
+> +		 * entries below us which would otherwise need invalidating
+> +		 * individually.
+> +		 */
+> +		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
+> +}
+> +
+>  /**
+>   * stage2_try_break_pte() - Invalidates a pte according to the
+>   *			    'break-before-make' requirements of the
+> @@ -721,10 +735,13 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
+>  	 * Perform the appropriate TLB invalidation based on the evicted pte
+>  	 * value (if any).
+>  	 */
+> -	if (kvm_pte_table(ctx->old, ctx->level))
+> -		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
+> -	else if (kvm_pte_valid(ctx->old))
+> +	if (kvm_pte_table(ctx->old, ctx->level)) {
+> +		u64 end = ctx->addr + kvm_granule_size(ctx->level);
+> +
+> +		kvm_pgtable_stage2_flush_range(mmu, ctx->addr, end, ctx->level, 0);
+> +	} else if (kvm_pte_valid(ctx->old)) {
+>  		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
+> +	}
+>  
+>  	if (stage2_pte_is_counted(ctx->old))
+>  		mm_ops->put_page(ctx->ptep);
+> -- 
+> 2.39.1.519.gcb327c4b5f-goog
+> 
+> 
+
+-- 
+Thanks,
+Oliver
