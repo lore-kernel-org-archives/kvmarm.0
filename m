@@ -1,76 +1,358 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C98202F24
-	for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 18:37:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9880AC433EF;
-	Thu, 30 Mar 2023 18:37:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1680201452;
-	bh=KgOv3E/krfjtQY57qqjjtIIwp1aANMzPi+769qf8brY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ryzESI5xatZjiSzT2r8zRFQk66CLGSB5Y6PS4iHYCyvK5ncbdqaUvW9vn8sAiCFi1
-	 8xyHUpe5j4YBHHBqgWIV0dVkIh1aRVE2+yInLNOJ9Cc7ivuw3gzynI7mw9tkn2kdx1
-	 PmtQkWQXml3oIVYncpbrNyCtDt+K/E7FeR+4+QmaDbiHlTbdoCh5KufGrQViko0g5n
-	 MSYz1F9Ep+3apFRTJJgbH+xvCOCaw3CJN2Xb3gjbQwpI3ETBUqIigrjZ7vzZ0EtD4I
-	 R9XPPECjF1QM7J6HWAaBtPLaQTdidus4WJWlOIXIhAQdaEUPYxYfPdTgWSDLa5Ryon
-	 mBBfdLLJsBd0A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1phx9O-004T1T-SP;
-	Thu, 30 Mar 2023 19:37:30 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Ryan Roberts <ryan.roberts@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Cc: Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 0/3] KVM: selftests: Fixes for broken tests
-Date: Thu, 30 Mar 2023 19:37:28 +0100
-Message-Id: <168020143222.2928926.5454772168751993745.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230308110948.1820163-1-ryan.roberts@arm.com>
-References: <20230308110948.1820163-1-ryan.roberts@arm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32CEA944A
+	for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 22:44:08 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5458dde029bso204197117b3.13
+        for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 15:44:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1680216247;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/uMEyvfRZ1sO1MO8fuPK2yVSFwIoti/weSCrfIahBz0=;
+        b=HkADuuWTDFb2CmUHzQygUqsd7n30DrfpZgY4wV0G+aV4No9xrlSOjbPfT1ey4pE9Cb
+         DxnIikT4DiB923Bsc4+sE37ne7OCdWy7ebRVdvvRktAgoq1RhoRr6O4WggKzX6ccQL1h
+         /EtTlA6E+dGWkBD7XDOb4k4njMZKcQr6eo9vZBs6wXscx1w58a0mSesUoQhFXj+ePjQj
+         h+ebWebBqMoo9y/g7E76Sh2E33fjPZli0KGhvrlq6jVa/ju6miqkMl/PLI2RyMBo7GtC
+         z3Zprjd20UWM+Aqg77lCdVEVVRZlD2w1h5UuNtDOO2p2G/1S0ya38+9WX0fsiGltK1Zp
+         LsVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680216247;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/uMEyvfRZ1sO1MO8fuPK2yVSFwIoti/weSCrfIahBz0=;
+        b=dC9o0CEMBKOnm1vDOPTqkpOr97O6vRCeWkZO3i+gp3vbIImtEx56PrihU9NuSZI4NC
+         i4b+vecJcQYZh0UmsL4JK2LG7Z5p70VbWJrBRXhMNIrtHSIFkV8KcMSRdxXJV7qKLzXV
+         vbPRn9IAuIsyg/l0XYKseg9aXlFx8tvk2wkTcAW6jVJEmpw80qs7aCZRHsRpoJTbWYW0
+         53ZR6x700kZ5grtF5g6RgPAP7d9jQphvmc9+HEgAbK1B6x5qbbWgazzUOB0j5SmyuGe0
+         BFwHTq/UXS01s3LZlw0bTwmAft4+wD86JFtBGvuqrsaVbUJWochGapdiRrMkWuXVr1P/
+         eKaA==
+X-Gm-Message-State: AAQBX9du3fydybsynq8UhbFh+HMkkI3AZ5KySyHr6jZDVyWHL4/UGX7k
+	qyRdb5vdoao/UYEsIc5yDOeHzoESp3AA
+X-Google-Smtp-Source: AKy350YJl7uVdoztbmhl+H5CjDDEGKtjny/a65KRC1+dFOZf9oOHrLjqq1QMw6vRcQ5hrX6JwNewWx5zSjOt
+X-Received: from davidai2.mtv.corp.google.com ([2620:15c:211:201:c162:24e8:ec5e:d520])
+ (user=davidai job=sendgmr) by 2002:a81:a805:0:b0:546:6ef:8baf with SMTP id
+ f5-20020a81a805000000b0054606ef8bafmr6938530ywh.2.1680216247110; Thu, 30 Mar
+ 2023 15:44:07 -0700 (PDT)
+Date: Thu, 30 Mar 2023 15:43:35 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ryan.roberts@arm.com, oliver.upton@linux.dev, shuah@kernel.org, linux-kselftest@vger.kernel.org, pbonzini@redhat.com, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
+Message-ID: <20230330224348.1006691-1-davidai@google.com>
+Subject: [RFC PATCH 0/6] Improve VM DVFS and task placement behavior
+From: David Dai <davidai@google.com>
+To: "Rafael J. Wysocki" <rafael@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Lorenzo Pieralisi <lpieralisi@kernel.org>, Sudeep Holla <sudeep.holla@arm.com>, 
+	Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
+	Dietmar Eggemann <dietmar.eggemann@arm.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
+	Daniel Bristot de Oliveira <bristot@redhat.com>, Valentin Schneider <vschneid@redhat.com>, David Dai <davidai@google.com>
+Cc: kernel-team@android.com, linux-pm@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 8 Mar 2023 11:09:45 +0000, Ryan Roberts wrote:
-> Here is a respin of the KVM selftests fixes, with your nits addressed; I've
-> fixed the footer whitespace issue and I'm now using FIELD_GET() in the place
-> where you suggested and a couple of other places too. I've also included the 3rd
-> patch in this series (the ttbr0_el1 fix), which I originally sent separately -
-> this is now using FIELD_GET() too.
-> 
-> So this series superceeds [1] and [2].
-> 
-> [...]
+Hi,
 
-Applied to next, thanks!
+This patch series is a continuation of the talk Saravana gave at LPC 2022
+titled "CPUfreq/sched and VM guest workload problems" [1][2][3]. The gist
+of the talk is that workloads running in a guest VM get terrible task
+placement and DVFS behavior when compared to running the same workload in
+the host. Effectively, no EAS for threads inside VMs. This would make power
+and performance terrible just by running the workload in a VM even if we
+assume there is zero virtualization overhead.
 
-[1/3] KVM: selftests: Fixup config fragment for access_tracking_perf_test
-      commit: a2bed39057b434c4fd816005d1b950fefc61569d
-[2/3] KVM: selftests: arm64: Fix pte encode/decode for PA bits > 48
-      commit: e659babfc5a693553cf9473470840464f0ed5d77
-[3/3] KVM: selftests: arm64: Fix ttbr0_el1 encoding for PA bits > 48
-      commit: e17071754cf50e5f6ff8ebee077e0e4114d3bea5
+We have been iterating over different options for communicating between
+guest and host, ways of applying the information coming from the
+guest/host, etc to figure out the best performance and power improvements
+we could get.
 
-Cheers,
+The patch series in its current state is NOT meant for landing in the
+upstream kernel. We are sending this patch series to share the current
+progress and data we have so far. The patch series is meant to be easy to
+cherry-pick and test on various devices to see what performance and power
+benefits this might give for others.
 
-	M.
+With this series, a workload running in a VM gets the same task placement
+and DVFS treatment as it would when running in the host.
+
+As expected, we see significant performance improvement and better
+performance/power ratio. If anyone else wants to try this out for your VM
+workloads and report findings, that'd be very much appreciated.
+
+The idea is to improve VM CPUfreq/sched behavior by:
+- Having guest kernel to do accurate load tracking by taking host CPU
+  arch/type and frequency into account.
+- Sharing vCPU run queue utilization information with the host so that the
+  host can do proper frequency scaling and task placement on the host side.
+
+Results:
+========
+
+As of right now, the best results have been with using hypercalls (see more
+below first) to communicate between host and guest and treating the vCPU
+run queue util similar to util_est on the host side vCPU thread. So that's
+what this patch series does.
+
+Let's look at the results for this series first and then look at the other
+options we are trying/tried out:
+
+Use cases running Android inside a VM on a Chromebook:
+======================================================
+
+PCMark (Emulates real world usecases)
+Higher is better
++-------------------+----------+------------+--------+
+| Test Case (score) | Baseline | Util_guest | %delta |
++-------------------+----------+------------+--------+
+| Weighted Total    |     6136 |       7274 |   +19% |
++-------------------+----------+------------+--------+
+| Web Browsing      |     5558 |       6273 |   +13% |
++-------------------+----------+------------+--------+
+| Video Editing     |     4921 |       5221 |    +6% |
++-------------------+----------+------------+--------+
+| Writing           |     6864 |       8825 |   +29% |
++-------------------+----------+------------+--------+
+| Photo Editing     |     7983 |      11593 |   +45% |
++-------------------+----------+------------+--------+
+| Data Manipulation |     5814 |       6081 |    +5% |
++-------------------+----------+------------+--------+
+
+PCMark Performance/mAh
+Higher is better
++-----------+----------+------------+--------+
+|           | Baseline | Util_guest | %delta |
++-----------+----------+------------+--------+
+| Score/mAh |       79 |         88 |   +11% |
++-----------+----------+------------+--------+
+
+Roblox
+Higher is better
++-----+----------+------------+--------+
+|     | Baseline | Util_guest | %delta |
++-----+----------+------------+--------+
+| FPS |    18.25 |      28.66 |   +57% |
++-----+----------+------------+--------+
+
+Roblox FPS/mAh
+Higher is better
++-----+----------+------------+--------+
+|     | Baseline | Util_guest | %delta |
++-----+----------+------------+--------+
+| FPS |     0.15 |       0.19 |   +26% |
++-----+----------+------------+--------+
+
+Use cases running a minimal system inside a VM on a Pixel 6:
+============================================================
+
+FIO
+Higher is better
++----------------------+----------+------------+--------+
+| Test Case (avg MB/s) | Baseline | Util_guest | %delta |
++----------------------+----------+------------+--------+
+| Seq Write            |     9.27 |       12.6 |   +36% |
++----------------------+----------+------------+--------+
+| Rand Write           |     9.34 |       11.9 |   +27% |
++----------------------+----------+------------+--------+
+| Seq Read             |      106 |        124 |   +17% |
++----------------------+----------+------------+--------+
+| Rand Read            |     33.6 |         35 |    +4% |
++----------------------+----------+------------+--------+
+
+CPU-based ML Inference Benchmark
+Lower is better
++-------------------------+----------+------------+--------+
+| Test Case (ms)          | Baseline | Util_guest | %delta |
++-------------------------+----------+------------+--------+
+| Cached Sample Inference |     2.57 |       1.75 |   -32% |
++-------------------------+----------+------------+--------+
+| Small Sample Inference  |      6.8 |       5.57 |   -18% |
++-------------------------+----------+------------+--------+
+| Large Sample Inference  |     31.2 |      26.58 |   -15% |
++-------------------------+----------+------------+--------+
+
+These patches expect the host to:
+- Affine vCPUs to specific clusters.
+- Set vCPU capacity to match the host CPU they are running on.
+
+To make this easy to do/try out, we have put up patches[4][5] to do this on
+CrosVM. Once you pick up those patches, you can use options
+"--host-cpu-topology" and "--virt-cpufreq" to achieve the above.
+
+The patch series can be broken into:
+
+Patch 1: Add util_guest as an additional PELT signal for host vCPU threads
+Patch 2: Hypercall for guest to get current pCPU's frequency
+Patch 3: Send vCPU run queue util to host and apply as util_guest
+Patch 4: Query pCPU freq table from guest (we'll move this to DT in the
+	 future)
+Patch 5: Virtual cpufreq driver that uses the hypercalls to send util to
+	 host and implement frequency invariance in the guest.
+
+Alternative we have implemented and profiled:
+=============================================
+
+util_guest vs uclamp_min
+========================
+
+One suggestion at LPC was to use uclamp_min to apply the util info coming
+from the guest. As we suspected, it doesn't perform as well because
+uclamp_min is not additive, whereas the actual workload on the host CPU due
+to the vCPU is additive to the existing workloads on the host. Uclamp_min
+also has the undesirable side-effect of threads forked from the vCPU thread
+inheriting whatever uclamp_min value the vCPU thread had and then getting
+stuck with that uclamp_min value.
+
+Below are some additional benchmark results comparing the uclamp_min
+prototype (listed as Uclamp) using the same test environment as before
+(including hypercalls).
+
+As before, %delta is always comparing to baseline.
+
+PCMark
+Higher is better
++-------------------+----------+------------+--------+--------+--------+
+| Test Case (score) | Baseline | Util_guest | %delta | Uclamp | %delta |
++-------------------+----------+------------+--------+--------+--------+
+| Weighted Total    |     6136 |       7274 |   +19% |   6848 |   +12% |
++-------------------+----------+------------+--------+--------+--------+
+| Web Browsing      |     5558 |       6273 |   +13% |   6050 |    +9% |
++-------------------+----------+------------+--------+--------+--------+
+| Video Editing     |     4921 |       5221 |    +6% |   5091 |    +3% |
++-------------------+----------+------------+--------+--------+--------+
+| Writing           |     6864 |       8825 |   +29% |   8523 |   +24% |
++-------------------+----------+------------+--------+--------+--------+
+| Photo Editing     |     7983 |      11593 |   +45% |   9865 |   +24% |
++-------------------+----------+------------+--------+--------+--------+
+| Data Manipulation |     5814 |       6081 |    +5% |   5836 |     0% |
++-------------------+----------+------------+--------+--------+--------+
+
+PCMark Performance/mAh
+Higher is better
++-----------+----------+------------+--------+--------+--------+
+|           | Baseline | Util_guest | %delta | Uclamp | %delta |
++-----------+----------+------------+--------+--------+--------+
+| Score/mAh |       79 |         88 |   +11% |     83 |    +7% |
++-----------+----------+------------+--------+--------+--------+
+
+Hypercalls vs MMIO:
+===================
+We realize that hypercalls are not the recommended choice for this and we
+have no attachment to any communication method as long as it gives good
+results.
+
+We started off with hypercalls to see what is the best we could achieve if
+we didn't have to context switch into host side userspace.
+
+To see the impact of switching from hypercalls to MMIO, we kept util_guest
+and only switched from hypercall to MMIO. So in the results below:
+- Hypercall = hypercall + util_guest
+- MMIO = MMIO + util_guest
+
+As before, %delta is always comparing to baseline.
+
+PCMark
+Higher is better
++-------------------+----------+------------+--------+-------+--------+
+| Test Case (score) | Baseline |  Hypercall | %delta |  MMIO | %delta |
++-------------------+----------+------------+--------+-------+--------+
+| Weighted Total    |     6136 |       7274 |   +19% |  6867 |   +12% |
++-------------------+----------+------------+--------+-------+--------+
+| Web Browsing      |     5558 |       6273 |   +13% |  6035 |    +9% |
++-------------------+----------+------------+--------+-------+--------+
+| Video Editing     |     4921 |       5221 |    +6% |  5167 |    +5% |
++-------------------+----------+------------+--------+-------+--------+
+| Writing           |     6864 |       8825 |   +29% |  8529 |   +24% |
++-------------------+----------+------------+--------+-------+--------+
+| Photo Editing     |     7983 |      11593 |   +45% | 10812 |   +35% |
++-------------------+----------+------------+--------+-------+--------+
+| Data Manipulation |     5814 |       6081 |    +5% |  5327 |    -8% |
++-------------------+----------+------------+--------+-------+--------+
+
+PCMark Performance/mAh
+Higher is better
++-----------+----------+-----------+--------+------+--------+
+|           | Baseline | Hypercall | %delta | MMIO | %delta |
++-----------+----------+-----------+--------+------+--------+
+| Score/mAh |       79 |        88 |   +11% |   83 |    +7% |
++-----------+----------+-----------+--------+------+--------+
+
+Roblox
+Higher is better
++-----+----------+------------+--------+-------+--------+
+|     | Baseline |  Hypercall | %delta |  MMIO | %delta |
++-----+----------+------------+--------+-------+--------+
+| FPS |    18.25 |      28.66 |   +57% | 24.06 |   +32% |
++-----+----------+------------+--------+-------+--------+
+
+Roblox Frames/mAh
+Higher is better
++------------+----------+------------+--------+--------+--------+
+|            | Baseline |  Hypercall | %delta |   MMIO | %delta |
++------------+----------+------------+--------+--------+--------+
+| Frames/mAh |    91.25 |     114.64 |   +26% | 103.11 |   +13% |
++------------+----------+------------+--------+--------+--------+
+
+Next steps:
+===========
+We are continuing to look into communication mechanisms other than
+hypercalls that are just as/more efficient and avoid switching into the VMM
+userspace. Any inputs in this regard are greatly appreciated.
+
+Thanks,
+David & Saravana
+
+[1] - https://lpc.events/event/16/contributions/1195/
+[2] - https://lpc.events/event/16/contributions/1195/attachments/970/1893/LPC%202022%20-%20VM%20DVFS.pdf
+[3] - https://www.youtube.com/watch?v=hIg_5bg6opU
+[4] - https://chromium-review.googlesource.com/c/crosvm/crosvm/+/4208668
+[5] - https://chromium-review.googlesource.com/c/crosvm/crosvm/+/4288027
+
+David Dai (6):
+  sched/fair: Add util_guest for tasks
+  kvm: arm64: Add support for get_cur_cpufreq service
+  kvm: arm64: Add support for util_hint service
+  kvm: arm64: Add support for get_freqtbl service
+  dt-bindings: cpufreq: add bindings for virtual kvm cpufreq
+  cpufreq: add kvm-cpufreq driver
+
+ .../bindings/cpufreq/cpufreq-virtual-kvm.yaml |  39 +++
+ Documentation/virt/kvm/api.rst                |  28 ++
+ .../virt/kvm/arm/get_cur_cpufreq.rst          |  21 ++
+ Documentation/virt/kvm/arm/get_freqtbl.rst    |  23 ++
+ Documentation/virt/kvm/arm/index.rst          |   3 +
+ Documentation/virt/kvm/arm/util_hint.rst      |  22 ++
+ arch/arm64/include/uapi/asm/kvm.h             |   3 +
+ arch/arm64/kvm/arm.c                          |   3 +
+ arch/arm64/kvm/hypercalls.c                   |  60 +++++
+ drivers/cpufreq/Kconfig                       |  13 +
+ drivers/cpufreq/Makefile                      |   1 +
+ drivers/cpufreq/kvm-cpufreq.c                 | 245 ++++++++++++++++++
+ include/linux/arm-smccc.h                     |  21 ++
+ include/linux/sched.h                         |  12 +
+ include/uapi/linux/kvm.h                      |   3 +
+ kernel/sched/core.c                           |  24 +-
+ kernel/sched/fair.c                           |  15 +-
+ tools/arch/arm64/include/uapi/asm/kvm.h       |   3 +
+ 18 files changed, 536 insertions(+), 3 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/cpufreq/cpufreq-virtual-kvm.yaml
+ create mode 100644 Documentation/virt/kvm/arm/get_cur_cpufreq.rst
+ create mode 100644 Documentation/virt/kvm/arm/get_freqtbl.rst
+ create mode 100644 Documentation/virt/kvm/arm/util_hint.rst
+ create mode 100644 drivers/cpufreq/kvm-cpufreq.c
+
 -- 
-Without deviation from the norm, progress is not possible.
-
+2.40.0.348.gf938b09366-goog
 
