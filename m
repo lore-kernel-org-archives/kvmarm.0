@@ -1,269 +1,95 @@
-Received: from out-52.mta1.migadu.com (out-52.mta1.migadu.com [95.215.58.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908588835
-	for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 15:49:57 +0000 (UTC)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1680191395;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mwDu1qBRRHvDlIernCQqE1jdaZTWQF5u3kZ8eMVFNiA=;
-	b=HPD+n/DoNKpobmMVDWhMZqqeN3pLE/mpvIxl/tmv3L+idVcQZ+hTu5P5ov6F4OZoII8QvZ
-	vz0lGKObpxDSSYGmZ8FxtqeQG8e6sBCgLZgrPGrOWs4JwmisplRwb9yjbK8RJG5E2cLTdy
-	3Qb70kv6i2vfS1Mr0cdNYK+cjqnoQSU=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 13/13] KVM: selftests: Add test for SMCCC filter
-Date: Thu, 30 Mar 2023 15:49:18 +0000
-Message-Id: <20230330154918.4014761-14-oliver.upton@linux.dev>
-In-Reply-To: <20230330154918.4014761-1-oliver.upton@linux.dev>
-References: <20230330154918.4014761-1-oliver.upton@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2F08C02
+	for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 17:32:14 +0000 (UTC)
+Received: by mail-pg1-f201.google.com with SMTP id q1-20020a656841000000b0050be5e5bb24so5612730pgt.3
+        for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 10:32:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1680197534;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nnTxsagUavl4R5aNPiZp2P+s0f7o2Hc1Pg/eKFJp8lA=;
+        b=Tbftoqox//lZxbaYckaOW2jLVCOWAr7GWaUOL82qbvrJCy/mMJPuj/3f2H7ZFuS5yB
+         hBsKdEhNaqwUHaG/myxU4nSEcTVmPZd22Ai/s2inSUgRjPVi19MqgveLSoH3MXl/zBuK
+         2OGO27X0nuriV2ZEcAPrBWGREVHFoUpSBXWZg6PY8pOlLEsU/vTFddtIWnD9UzHN8cLb
+         MmaLjPpJF1yTTlI0gwiwKKSVbn+wFGFeAcimW7Bwe03gl2gYgrFS24rBYtHCoAi1/4dI
+         IbNBf+BcaCMBhBTF0fa6zR3dswkAI5EeB6i4FNe1DNt5XwrwigVS/lgHxB+U5r6aiuu8
+         X3MA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680197534;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nnTxsagUavl4R5aNPiZp2P+s0f7o2Hc1Pg/eKFJp8lA=;
+        b=5yKu4x5bPAUfTLgZCFABTIrh4m2NNuqi2MCy3wfKCie5a78wneRJOWQYe6XmitcgwD
+         ui2plM+cdXpOr2hV0votsnZMjbTnFdu6Y2JMMne5dtvoBUMxR/u3bTXSX+887CZgCRMB
+         tCGz18uPTv9BXAf97YGkuA74hVqDI/a70qEA7+QmP/8PHyoM2P2QuPNzPYJO1O82MYrt
+         X3ny++jdROsgTsud+sbXR6xP7NC6skew2boDcvY3u4axfuo+ovrnhUsl+Y5eRlI9M4hL
+         UJYJVnXxnY3ZADLcBkhh5BaTxxeLoWoNOt9tuaTamDr4HN4t6zYnyYqGLR99Wj+AHhGv
+         0Jkg==
+X-Gm-Message-State: AAQBX9c1nCAny+O8W0BQSmmkOl01d9TyY7ve6wVmqfpcRR2lOi4ZTBZo
+	kr0JmTqqjp0OnbV5kGkHdE26FD5maBQ=
+X-Google-Smtp-Source: AKy350azwWwpDFQd4w8zJIPRbA66xXSs/muh2nz2rtjySYQAHjCaHNE9llrmnCWe8Mcu6uxntD2BlSaMQdY=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:e88e:b0:1a0:7630:8ef9 with SMTP id
+ w14-20020a170902e88e00b001a076308ef9mr9302444plg.12.1680197534051; Thu, 30
+ Mar 2023 10:32:14 -0700 (PDT)
+Date: Thu, 30 Mar 2023 10:32:12 -0700
+In-Reply-To: <20230330154918.4014761-2-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20230330154918.4014761-1-oliver.upton@linux.dev> <20230330154918.4014761-2-oliver.upton@linux.dev>
+Message-ID: <ZCXHnFz7gB8QJzvD@google.com>
+Subject: Re: [PATCH v2 01/13] KVM: x86: Redefine 'longmode' as a flag for KVM_EXIT_HYPERCALL
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Salil Mehta <salil.mehta@huawei.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Add a selftest for the SMCCC filter, ensuring basic UAPI constraints
-(e.g. reserved ranges, non-overlapping ranges) are upheld. Additionally,
-test that the DENIED and FWD_TO_USER work as intended.
+On Thu, Mar 30, 2023, Oliver Upton wrote:
+> The 'longmode' field is a bit annoying as it blows an entire __u32 to
+> represent a boolean value. Since other architectures are looking to add
+> support for KVM_EXIT_HYPERCALL, now is probably a good time to clean it
+> up.
+> 
+> Redefine the field (and the remaining padding) as a set of flags.
+> Preserve the existing ABI by using bit 0 to indicate if the guest was in
+> long mode and requiring that the remaining 31 bits must be zero.
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/aarch64/smccc_filter.c      | 196 ++++++++++++++++++
- 2 files changed, 197 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/aarch64/smccc_filter.c
+Acked-by: Sean Christopherson <seanjc@google.com>
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 84a627c43795..d66a0642cffd 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -141,6 +141,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
- TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
- TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
- TEST_GEN_PROGS_aarch64 += aarch64/psci_test
-+TEST_GEN_PROGS_aarch64 += aarch64/smccc_filter
- TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_irq
-diff --git a/tools/testing/selftests/kvm/aarch64/smccc_filter.c b/tools/testing/selftests/kvm/aarch64/smccc_filter.c
-new file mode 100644
-index 000000000000..7f4950d18b42
---- /dev/null
-+++ b/tools/testing/selftests/kvm/aarch64/smccc_filter.c
-@@ -0,0 +1,196 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * smccc_filter - Tests for the SMCCC filter UAPI.
-+ *
-+ * Copyright (c) 2023 Google LLC
-+ *
-+ * This test includes:
-+ *  - Tests that the UAPI constraints are upheld by KVM. For example, userspace
-+ *    is prevented from filtering the architecture range of SMCCC calls.
-+ *  - Test that the filter actions (DENIED, FWD_TO_USER) work as intended.
-+ */
-+
-+#include <linux/arm-smccc.h>
-+#include <linux/psci.h>
-+#include <stdint.h>
-+
-+#include "processor.h"
-+#include "test_util.h"
-+
-+enum smccc_conduit {
-+	HVC_INSN,
-+	SMC_INSN,
-+};
-+
-+#define for_each_conduit(conduit)					\
-+	for (conduit = HVC_INSN; conduit <= SMC_INSN; conduit++)
-+
-+static void guest_main(uint32_t func_id, enum smccc_conduit conduit)
-+{
-+	struct arm_smccc_res res;
-+
-+	if (conduit == SMC_INSN)
-+		smccc_smc(func_id, 0, 0, 0, 0, 0, 0, 0, &res);
-+	else
-+		smccc_hvc(func_id, 0, 0, 0, 0, 0, 0, 0, &res);
-+
-+	GUEST_SYNC(res.a0);
-+}
-+
-+static int __set_smccc_filter(struct kvm_vm *vm, uint32_t start, uint32_t nr_functions,
-+			      enum kvm_smccc_filter_action action)
-+{
-+	struct kvm_smccc_filter filter = {
-+		.base		= start,
-+		.nr_functions	= nr_functions,
-+		.action		= action,
-+	};
-+
-+	return __kvm_device_attr_set(vm->fd, KVM_ARM_VM_SMCCC_CTRL,
-+				     KVM_ARM_VM_SMCCC_FILTER, &filter);
-+}
-+
-+static void set_smccc_filter(struct kvm_vm *vm, uint32_t start, uint32_t nr_functions,
-+			     enum kvm_smccc_filter_action action)
-+{
-+	int ret = __set_smccc_filter(vm, start, nr_functions, action);
-+
-+	TEST_ASSERT(!ret, "failed to configure SMCCC filter: %d", ret);
-+}
-+
-+static struct kvm_vm *setup_vm(struct kvm_vcpu **vcpu)
-+{
-+	struct kvm_vcpu_init init;
-+	struct kvm_vm *vm;
-+
-+	vm = vm_create(1);
-+	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
-+
-+	/*
-+	 * Enable in-kernel emulation of PSCI to ensure that calls are denied
-+	 * due to the SMCCC filter, not because of KVM.
-+	 */
-+	init.features[0] |= (1 << KVM_ARM_VCPU_PSCI_0_2);
-+
-+	*vcpu = aarch64_vcpu_add(vm, 0, &init, guest_main);
-+	return vm;
-+}
-+
-+/* Ensure that userspace cannot filter the Arm Architecture SMCCC range */
-+static void test_filter_reserved_range(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm = setup_vm(&vcpu);
-+	int r;
-+
-+	r = __set_smccc_filter(vm, ARM_SMCCC_ARCH_WORKAROUND_1,
-+			       1, KVM_SMCCC_FILTER_DENY);
-+	TEST_ASSERT(r, "Attempt to filter reserved range unexpectedly succeeded");
-+
-+	kvm_vm_free(vm);
-+}
-+
-+/* Test that overlapping configurations of the SMCCC filter are rejected */
-+static void test_filter_overlap(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm = setup_vm(&vcpu);
-+	int r;
-+
-+	set_smccc_filter(vm, PSCI_0_2_FN64_CPU_ON, 1, KVM_SMCCC_FILTER_DENY);
-+
-+	r = __set_smccc_filter(vm, PSCI_0_2_FN64_CPU_ON, 1, KVM_SMCCC_FILTER_DENY);
-+	TEST_ASSERT(r, "Attempt to filter already configured range unexpectedly succeeded");
-+
-+	kvm_vm_free(vm);
-+}
-+
-+static void expect_call_denied(struct kvm_vcpu *vcpu)
-+{
-+	struct ucall uc;
-+
-+	if (get_ucall(vcpu, &uc) != UCALL_SYNC)
-+		TEST_FAIL("Unexpected ucall: %lu\n", uc.cmd);
-+
-+	TEST_ASSERT(uc.args[1] == SMCCC_RET_NOT_SUPPORTED,
-+		    "Unexpected SMCCC return code: %lu", uc.args[1]);
-+}
-+
-+/* Denied SMCCC calls have a return code of SMCCC_RET_NOT_SUPPORTED */
-+static void test_filter_denied(void)
-+{
-+	enum smccc_conduit conduit;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	for_each_conduit(conduit) {
-+		vm = setup_vm(&vcpu);
-+
-+		set_smccc_filter(vm, PSCI_0_2_FN_PSCI_VERSION, 1, KVM_SMCCC_FILTER_DENY);
-+		vcpu_args_set(vcpu, 2, PSCI_0_2_FN_PSCI_VERSION, conduit);
-+
-+		vcpu_run(vcpu);
-+		expect_call_denied(vcpu);
-+
-+		kvm_vm_free(vm);
-+	}
-+}
-+
-+static void expect_call_fwd_to_user(struct kvm_vcpu *vcpu, uint32_t func_id,
-+				    enum smccc_conduit conduit)
-+{
-+	struct kvm_run *run = vcpu->run;
-+
-+	TEST_ASSERT(run->exit_reason == KVM_EXIT_HYPERCALL,
-+		    "Unexpected exit reason: %u", run->exit_reason);
-+	TEST_ASSERT(run->hypercall.nr == func_id,
-+		    "Unexpected SMCCC function: %llu", run->hypercall.nr);
-+
-+	if (conduit == SMC_INSN)
-+		TEST_ASSERT(run->hypercall.flags & KVM_HYPERCALL_EXIT_SMC,
-+			    "KVM_HYPERCALL_EXIT_SMC is not set");
-+	else
-+		TEST_ASSERT(!(run->hypercall.flags & KVM_HYPERCALL_EXIT_SMC),
-+			    "KVM_HYPERCAL_EXIT_SMC is set");
-+}
-+
-+/* SMCCC calls forwarded to userspace cause KVM_EXIT_HYPERCALL exits */
-+static void test_filter_fwd_to_user(void)
-+{
-+	enum smccc_conduit conduit;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	for_each_conduit(conduit) {
-+		vm = setup_vm(&vcpu);
-+
-+		set_smccc_filter(vm, PSCI_0_2_FN_PSCI_VERSION, 1, KVM_SMCCC_FILTER_FWD_TO_USER);
-+		vcpu_args_set(vcpu, 2, PSCI_0_2_FN_PSCI_VERSION, conduit);
-+
-+		vcpu_run(vcpu);
-+		expect_call_fwd_to_user(vcpu, PSCI_0_2_FN_PSCI_VERSION, conduit);
-+
-+		kvm_vm_free(vm);
-+	}
-+}
-+
-+static bool kvm_supports_smccc_filter(void)
-+{
-+	struct kvm_vm *vm = vm_create_barebones();
-+	int r;
-+
-+	r = __kvm_has_device_attr(vm->fd, KVM_ARM_VM_SMCCC_CTRL, KVM_ARM_VM_SMCCC_FILTER);
-+
-+	kvm_vm_free(vm);
-+	return !r;
-+}
-+
-+int main(void)
-+{
-+	TEST_REQUIRE(kvm_supports_smccc_filter());
-+
-+	test_filter_reserved_range();
-+	test_filter_overlap();
-+	test_filter_denied();
-+	test_filter_fwd_to_user();
-+}
--- 
-2.40.0.348.gf938b09366-goog
+>  Documentation/virt/kvm/api.rst  | 3 +--
+>  arch/x86/include/asm/kvm_host.h | 7 +++++++
+>  arch/x86/include/uapi/asm/kvm.h | 3 +++
+>  arch/x86/kvm/x86.c              | 6 +++++-
+>  include/uapi/linux/kvm.h        | 9 +++++++--
+>  5 files changed, 23 insertions(+), 5 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 62de0768d6aa..9b01e3d0e757 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6218,8 +6218,7 @@ to the byte array.
+>  			__u64 nr;
+>  			__u64 args[6];
+>  			__u64 ret;
+> -			__u32 longmode;
+> -			__u32 pad;
+> +			__u64 flags;
+>  		} hypercall;
+>  
+>  Unused.  This was once used for 'hypercall to userspace'.  To implement
 
+Note to self, this needs to be updated as "hypercall" is longer unused.
