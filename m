@@ -1,25 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 795898C02
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8961A8C08
 	for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 17:48:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29876C433D2;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40834C4339C;
 	Thu, 30 Mar 2023 17:48:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1680198486;
-	bh=94UwISeh0wgAFIbnn19iAAV6arHkbjP0f+mWzBW5sWU=;
+	bh=VzmiC9FX+ZfNMXCHEN+Bh2kvmeKVWDoUDgNLI+FCBiQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ls1UAqbVpuDhQcMtM59FtuLX35rtCIN8rmLEy+/oa5leUKcgPULJBPZ2mMZcy0lu6
-	 3fwTugXa5WjoTSsGwG8wgh/ZFdhAAIsl4JE3KSbthCmcc4fHBsGq+ANW5AwS3so1B3
-	 G0FUeIxskKAP4J9fZJaNoTYa1FmcuBqF+4SatVJKT9M/9lBOErzUMLQFLVLwArsV+I
-	 vVqFtCLUd93B+aFOleA42a8Qth88Fj7x8yCd3Te4LMsJlfCT50i0c76MwOIvsN6f1C
-	 Jr9AfnHHhf4FFczg8QO3xA1RZAMNMUQTVw2gE+KJBTvvdlkhrvvIB5gMaCAKba88Bk
-	 QAacLDeXQb29Q==
+	b=icIkP1HNRK+A8OIZ8JyJYI6xg9so6qy0O5gusT92P63IU7J+EhrxSPG7Z5MCYlTbM
+	 dhNxqzZVs1zbDJ1kGLe1ERN9GNnnp7lMPDFUjgTkU1m43AcOLkbtit+IYesW/bACwL
+	 SMkLLxeqYseVS07YkjnqC67IjRAzxxe6q24Eu5mwKYMjwgh9pueONGIMQhHROPNwsZ
+	 wDOjFJqCa+aTWZczjKaAm3s/A1IrJSQIEtCt9gAWs+8oqQvBW/HpzPPtZrwhghQZIM
+	 mHH95pQhrwkPvIr/zGnVTTPJ8g5a0eMPt7EHYTSPRUFUsi1anye6YQHRPDprOGPkq4
+	 um+tvqsg/dRkQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1phwNY-004Rpa-5E;
+	id 1phwNY-004Rpa-E7;
 	Thu, 30 Mar 2023 18:48:04 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -35,9 +35,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Colton Lewis <coltonlewis@google.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	dwmw2@infradead.org
-Subject: [PATCH v4 02/20] arm64: Add CNTPOFF_EL2 register definition
-Date: Thu, 30 Mar 2023 18:47:42 +0100
-Message-Id: <20230330174800.2677007-3-maz@kernel.org>
+Subject: [PATCH v4 03/20] arm64: Add HAS_ECV_CNTPOFF capability
+Date: Thu, 30 Mar 2023 18:47:43 +0100
+Message-Id: <20230330174800.2677007-4-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230330174800.2677007-1-maz@kernel.org>
 References: <20230330174800.2677007-1-maz@kernel.org>
@@ -53,29 +53,51 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the definition for CNTPOFF_EL2 in the description file.
+Add the probing code for the FEAT_ECV variant that implements CNTPOFF_EL2.
+Why it is optional is a mystery, but let's try and detect it.
 
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
 Reviewed-by: Colton Lewis <coltonlewis@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/tools/sysreg | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/arm64/kernel/cpufeature.c | 11 +++++++++++
+ arch/arm64/tools/cpucaps       |  1 +
+ 2 files changed, 12 insertions(+)
 
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index dd5a9c7e310f..7063f1aacc54 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -1952,6 +1952,10 @@ Sysreg	CONTEXTIDR_EL2	3	4	13	0	1
- Fields	CONTEXTIDR_ELx
- EndSysreg
- 
-+Sysreg	CNTPOFF_EL2	3	4	14	0	6
-+Field	63:0	PhysicalOffset
-+EndSysreg
-+
- Sysreg	CPACR_EL12	3	5	1	0	2
- Fields	CPACR_ELx
- EndSysreg
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 2e3e55139777..c331c49a7d19 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -2223,6 +2223,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.sign = FTR_UNSIGNED,
+ 		.min_field_value = 1,
+ 	},
++	{
++		.desc = "Enhanced Counter Virtualization (CNTPOFF)",
++		.capability = ARM64_HAS_ECV_CNTPOFF,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.matches = has_cpuid_feature,
++		.sys_reg = SYS_ID_AA64MMFR0_EL1,
++		.field_pos = ID_AA64MMFR0_EL1_ECV_SHIFT,
++		.field_width = 4,
++		.sign = FTR_UNSIGNED,
++		.min_field_value = ID_AA64MMFR0_EL1_ECV_CNTPOFF,
++	},
+ #ifdef CONFIG_ARM64_PAN
+ 	{
+ 		.desc = "Privileged Access Never",
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index 37b1340e9646..40ba95472594 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -23,6 +23,7 @@ HAS_DCPOP
+ HAS_DIT
+ HAS_E0PD
+ HAS_ECV
++HAS_ECV_CNTPOFF
+ HAS_EPAN
+ HAS_GENERIC_AUTH
+ HAS_GENERIC_AUTH_ARCH_QARMA3
 -- 
 2.34.1
 
