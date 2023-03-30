@@ -1,25 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34EBA9440
-	for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 17:56:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09919C433D2;
-	Thu, 30 Mar 2023 17:56:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9209440
+	for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 17:56:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05785C433D2;
+	Thu, 30 Mar 2023 17:56:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1680198983;
-	bh=KcCyQyN0weWoFv98+bG3HUcBKenbrX+8D1/wpqF7/io=;
+	s=k20201202; t=1680198986;
+	bh=KfLu5goCJangGvLq7IT4uJ4Y7D299IzrAIPjai80bEk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=W2zZBZhBS1Z8yLMhsHeVwwM/30gOATKRGu0YXsNL6l4KghYOmIAPUHaELkZxQMjdB
-	 To3HVcy405bsNzZCBUgl37/uMewyAxks0pZPVnuyHVpRE2vZrhJMJvisG3JvhJ8Uje
-	 Y8lE3WusicUXDbonfCOehbsDzT2u62fzz4Cs5rMOrKrcw/9Iw0GpP0ETh5ys1oI76Q
-	 C8dNp5dpR8dJS2xAXRdx32LA+B0DQ3/mX7vkVUjayGiJjwEUAVkRhtXBNaEHh83PgT
-	 Xh0i+ZtbSPoxFZisvn7kxAZNbkqpneiVMFTP8TWcSpmswGK9IXGVrho2fqdhF+z2SH
-	 PTOmKUALlfXUQ==
+	b=L+nMZsshJS3JtocoGra7R7ti4jFW3DFgHqOJC4zJvSzinBmZ81La7HLWFD5J15X0x
+	 TDUERrDIj/GTRWtMe8sUSZLXUiKhkbXfwc+3g7r/u0QFP1u6QGZneNgDc/ZTNqK9kK
+	 FhRDcEK60Hc1xYLhk0NHTc7Y8cKJ/d8MW5SX47+PQxuAAVZzzv8jGZB6BFAnfwcxkM
+	 lenzIRds6msm+wRPz4MwEAig4cD79el9GNWYOYMwENZqsFTFYUFWaxM9HpcEbwTUFD
+	 4zhwXPc6vmf/giXZ7CRwUMTZsDRkjHECDsgQSvOgiooMcCB6dSXKkfubV9h7HryZcY
+	 Zb9O1rs76mDiA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1phwNb-004Rpa-3d;
+	id 1phwNb-004Rpa-Mr;
 	Thu, 30 Mar 2023 18:48:07 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -35,9 +35,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Colton Lewis <coltonlewis@google.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	dwmw2@infradead.org
-Subject: [PATCH v4 13/20] KVM: arm64: timers: Fast-track CNTPCT_EL0 trap handling
-Date: Thu, 30 Mar 2023 18:47:53 +0100
-Message-Id: <20230330174800.2677007-14-maz@kernel.org>
+Subject: [PATCH v4 15/20] KVM: arm64: Document KVM_ARM_SET_CNT_OFFSETS and co
+Date: Thu, 30 Mar 2023 18:47:55 +0100
+Message-Id: <20230330174800.2677007-16-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230330174800.2677007-1-maz@kernel.org>
 References: <20230330174800.2677007-1-maz@kernel.org>
@@ -53,78 +53,62 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Now that it is likely that CNTPCT_EL0 accesses will trap,
-fast-track the emulation of the counter read which doesn't
-need more that a simple offsetting.
+Add some basic documentation on the effects of KVM_ARM_SET_CNT_OFFSETS.
 
-One day, we'll have CNTPOFF everywhere. One day.
-
-Suggested-by: Oliver Upton <oliver.upton@linux.dev>
+Reviewed-by: Colton Lewis <coltonlewis@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/hyp/switch.h | 36 +++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ Documentation/virt/kvm/api.rst | 38 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 07d37ff88a3f..9954368f639d 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -26,6 +26,7 @@
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/kvm_nested.h>
- #include <asm/fpsimd.h>
- #include <asm/debug-monitors.h>
- #include <asm/processor.h>
-@@ -326,6 +327,38 @@ static bool kvm_hyp_handle_ptrauth(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	return true;
- }
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 62de0768d6aa..192adcb61add 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6029,6 +6029,44 @@ delivery must be provided via the "reg_aen" struct.
+ The "pad" and "reserved" fields may be used for future extensions and should be
+ set to 0s by userspace.
  
-+static bool kvm_hyp_handle_cntpct(struct kvm_vcpu *vcpu)
-+{
-+	struct arch_timer_context *ctxt;
-+	u32 sysreg;
-+	u64 val;
++4.138 KVM_ARM_SET_COUNTER_OFFSET
++--------------------------------
 +
-+	/*
-+	 * We only get here for 64bit guests, 32bit guests will hit
-+	 * the long and winding road all the way to the standard
-+	 * handling. Yes, it sucks to be irrelevant.
-+	 */
-+	sysreg = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
++:Capability: KVM_CAP_COUNTER_OFFSET
++:Architectures: arm64
++:Type: vm ioctl
++:Parameters: struct kvm_arm_counter_offset (in)
++:Returns: 0 on success, < 0 on error
 +
-+	switch (sysreg) {
-+	case SYS_CNTPCT_EL0:
-+	case SYS_CNTPCTSS_EL0:
-+		ctxt = vcpu_ptimer(vcpu);
-+		break;
-+	default:
-+		return false;
-+	}
++This capability indicates that userspace is able to apply a single VM-wide
++offset to both the virtual and physical counters as viewed by the guest
++using the KVM_ARM_SET_CNT_OFFSET ioctl and the following data structure:
 +
-+	val = arch_timer_read_cntpct_el0();
++::
 +
-+	if (ctxt->offset.vm_offset)
-+		val -= *kern_hyp_va(ctxt->offset.vm_offset);
++	struct kvm_arm_counter_offset {
++		__u64 counter_offset;
++		__u64 reserved;
++	};
 +
-+	vcpu_set_reg(vcpu, kvm_vcpu_sys_get_rt(vcpu), val);
-+	__kvm_skip_instr(vcpu);
-+	return true;
-+}
++The offset describes a number of counter cycles that are subtracted from
++both virtual and physical counter views (similar to the effects of the
++CNTVOFF_EL2 and CNTPOFF_EL2 system registers, but only global). The offset
++always applies to all vcpus (already created or created after this ioctl)
++for this VM.
 +
- static bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM) &&
-@@ -339,6 +372,9 @@ static bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	if (esr_is_ptrauth_trap(kvm_vcpu_get_esr(vcpu)))
- 		return kvm_hyp_handle_ptrauth(vcpu, exit_code);
- 
-+	if (kvm_hyp_handle_cntpct(vcpu))
-+		return true;
++It is userspace's responsibility to compute the offset based, for example,
++on previous values of the guest counters.
 +
- 	return false;
- }
++Any value other than 0 for the "reserved" field may result in an error
++(-EINVAL) being returned. This ioctl can also return -EBUSY if any vcpu
++ioctl is issued concurrently.
++
++Note that using this ioctl results in KVM ignoring subsequent userspace
++writes to the CNTVCT_EL0 and CNTPCT_EL0 registers using the SET_ONE_REG
++interface. No error will be returned, but the resulting offset will not be
++applied.
++
+ 5. The kvm_run structure
+ ========================
  
 -- 
 2.34.1
