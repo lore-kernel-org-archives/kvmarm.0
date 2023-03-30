@@ -1,95 +1,127 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2F08C02
-	for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 17:32:14 +0000 (UTC)
-Received: by mail-pg1-f201.google.com with SMTP id q1-20020a656841000000b0050be5e5bb24so5612730pgt.3
-        for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 10:32:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680197534;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nnTxsagUavl4R5aNPiZp2P+s0f7o2Hc1Pg/eKFJp8lA=;
-        b=Tbftoqox//lZxbaYckaOW2jLVCOWAr7GWaUOL82qbvrJCy/mMJPuj/3f2H7ZFuS5yB
-         hBsKdEhNaqwUHaG/myxU4nSEcTVmPZd22Ai/s2inSUgRjPVi19MqgveLSoH3MXl/zBuK
-         2OGO27X0nuriV2ZEcAPrBWGREVHFoUpSBXWZg6PY8pOlLEsU/vTFddtIWnD9UzHN8cLb
-         MmaLjPpJF1yTTlI0gwiwKKSVbn+wFGFeAcimW7Bwe03gl2gYgrFS24rBYtHCoAi1/4dI
-         IbNBf+BcaCMBhBTF0fa6zR3dswkAI5EeB6i4FNe1DNt5XwrwigVS/lgHxB+U5r6aiuu8
-         X3MA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680197534;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nnTxsagUavl4R5aNPiZp2P+s0f7o2Hc1Pg/eKFJp8lA=;
-        b=5yKu4x5bPAUfTLgZCFABTIrh4m2NNuqi2MCy3wfKCie5a78wneRJOWQYe6XmitcgwD
-         ui2plM+cdXpOr2hV0votsnZMjbTnFdu6Y2JMMne5dtvoBUMxR/u3bTXSX+887CZgCRMB
-         tCGz18uPTv9BXAf97YGkuA74hVqDI/a70qEA7+QmP/8PHyoM2P2QuPNzPYJO1O82MYrt
-         X3ny++jdROsgTsud+sbXR6xP7NC6skew2boDcvY3u4axfuo+ovrnhUsl+Y5eRlI9M4hL
-         UJYJVnXxnY3ZADLcBkhh5BaTxxeLoWoNOt9tuaTamDr4HN4t6zYnyYqGLR99Wj+AHhGv
-         0Jkg==
-X-Gm-Message-State: AAQBX9c1nCAny+O8W0BQSmmkOl01d9TyY7ve6wVmqfpcRR2lOi4ZTBZo
-	kr0JmTqqjp0OnbV5kGkHdE26FD5maBQ=
-X-Google-Smtp-Source: AKy350azwWwpDFQd4w8zJIPRbA66xXSs/muh2nz2rtjySYQAHjCaHNE9llrmnCWe8Mcu6uxntD2BlSaMQdY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:e88e:b0:1a0:7630:8ef9 with SMTP id
- w14-20020a170902e88e00b001a076308ef9mr9302444plg.12.1680197534051; Thu, 30
- Mar 2023 10:32:14 -0700 (PDT)
-Date: Thu, 30 Mar 2023 10:32:12 -0700
-In-Reply-To: <20230330154918.4014761-2-oliver.upton@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75BA78C02
+	for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 17:46:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16B34C433D2;
+	Thu, 30 Mar 2023 17:46:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1680198380;
+	bh=uwg4vVca0PK6f6towdemg7iiJoZTcPoR6/nkSk4gd1A=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EAh4y9c213YGTVz9G11YqMVR2UAROYfcLcrIn6nZzakCWpZkGFOFtgeoOyf+LO82O
+	 7DWVpz0o2vB4nr5mqRHVPKy++qAxjV41zCKUemYFPR1iC4sIeKvlZ7CzgSGUUuPFn2
+	 hzsG1z1c4FlJpIkxaEDfQNs8NCeC+ILTudOR+7NepHVVB2b2g5PvThlxcVVdx7PDc4
+	 8KKkh8SlNlPpkz9LIYmVpPEa2baKinR5iuSZnFvuj/yseCuKJQziRGNreg3VFQhaub
+	 PQNlVUZ0vugF6iZxjnzoLRiYbc558GA2mOKpu4Lf6fWIaDFgX+Z81/jOfHMacctji5
+	 LvWq1EVr/OHCw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1phwLp-004RnV-LD;
+	Thu, 30 Mar 2023 18:46:17 +0100
+Date: Thu, 30 Mar 2023 18:46:17 +0100
+Message-ID: <86cz4qw2s6.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: "Veith, Simon" <sveith@amazon.de>
+Cc: "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"dwmw2@infradead.org"
+	<dwmw2@infradead.org>,
+	"coltonlewis@google.com" <coltonlewis@google.com>,
+	"james.morse@arm.com" <james.morse@arm.com>,
+	"suzuki.poulose@arm.com"
+	<suzuki.poulose@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"joey.gouly@arm.com" <joey.gouly@arm.com>,
+	"reijiw@google.com"
+	<reijiw@google.com>,
+	"ricarkol@google.com" <ricarkol@google.com>
+Subject: Re: [PATCH v3 00/18] KVM: arm64: Rework timer offsetting for fun and profit
+In-Reply-To: <67fd090a26beb831a3ae754853c9419e1cbcfcd8.camel@amazon.de>
+References: <20230324144704.4193635-1-maz@kernel.org>
+	<67fd090a26beb831a3ae754853c9419e1cbcfcd8.camel@amazon.de>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230330154918.4014761-1-oliver.upton@linux.dev> <20230330154918.4014761-2-oliver.upton@linux.dev>
-Message-ID: <ZCXHnFz7gB8QJzvD@google.com>
-Subject: Re: [PATCH v2 01/13] KVM: x86: Redefine 'longmode' as a flag for KVM_EXIT_HYPERCALL
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Salil Mehta <salil.mehta@huawei.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sveith@amazon.de, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, yuzenghui@huawei.com, dwmw2@infradead.org, coltonlewis@google.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, joey.gouly@arm.com, reijiw@google.com, ricarkol@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Mar 30, 2023, Oliver Upton wrote:
-> The 'longmode' field is a bit annoying as it blows an entire __u32 to
-> represent a boolean value. Since other architectures are looking to add
-> support for KVM_EXIT_HYPERCALL, now is probably a good time to clean it
-> up.
-> 
-> Redefine the field (and the remaining padding) as a set of flags.
-> Preserve the existing ABI by using bit 0 to indicate if the guest was in
-> long mode and requiring that the remaining 31 bits must be zero.
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
+On Wed, 29 Mar 2023 06:41:07 +0100,
+"Veith, Simon" <sveith@amazon.de> wrote:
+>=20
+> Hello Marc,
+>=20
+> thanks again for your proposal.
+>=20
+> On Fri, 2023-03-24 at 14:46 +0000, Marc Zyngier wrote:
+> > This series aims at satisfying multiple goals:
+> >=20
+> > - allow a VMM to atomically restore a timer offset for a whole VM
+> > =C2=A0 instead of updating the offset each time a vcpu get its counter
+> > =C2=A0 written
+> >=20
+> > - allow a VMM to save/restore the physical timer context, something
+> > =C2=A0 that we cannot do at the moment due to the lack of offsetting
+> >=20
+> > - provide a framework that is suitable for NV support, where we get
+> > =C2=A0 both global and per timer, per vcpu offsetting, and manage
+> > =C2=A0 interrupts in a less braindead way.
+> >=20
+> > We fix a couple of issues along the way, both from a stylistic and
+> > correctness perspective. This results in a new per VM KVM API that
+> > allows a global offset to be set at any point in time, overriding
+> > both
+> > of the timer counter writebacks.
+> >=20
+> > We also take this opportunity to rework the way IRQs are associated
+> > with timers, something that was always a bit dodgy. This relies on a
+> > new lock, which should disappear once Oliver's lock ordering series
+> > is
+> > merged (we can reuse the config_lock for this).
+> >=20
+> > This has been tested with nVHE, VHE and NV. I do not have access to
+> > CNTPOFF-aware HW, but Colton managed to give it a go. Note that the
+> > NV patches in this series are here to give a perspective on how this
+> > gets used.
+> >=20
+> > I've updated the arch_timer selftest to allow an offset to be
+> > provided
+> > from the command line, and fixed a couple of glaring issues along the
+> > way.
+> >=20
+> > Note that this is at best 6.4 material. I have a branch stashed at
+> > [0]
+> > and based on 6.3-rc3, as well as a minimal example of the use of the
+> > API at [3] based on kvmtool.
+> >=20
+> > Simon: I'd appreciate some feedback as whether this change fits your
+> > requirements, given that you brought this up the first place.
+>=20
+> The interface looks good to me. I have yet to deliver on my promise to
+> test your patch series with our userspace; I am on leave this week, but
+> I'll give your latest iteration a go next week.
 
-Acked-by: Sean Christopherson <seanjc@google.com>
+No worries. I'm about to post v4, which I think is pretty ripe at this
+stage. Do let me know when you get a chance to try it.
 
->  Documentation/virt/kvm/api.rst  | 3 +--
->  arch/x86/include/asm/kvm_host.h | 7 +++++++
->  arch/x86/include/uapi/asm/kvm.h | 3 +++
->  arch/x86/kvm/x86.c              | 6 +++++-
->  include/uapi/linux/kvm.h        | 9 +++++++--
->  5 files changed, 23 insertions(+), 5 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 62de0768d6aa..9b01e3d0e757 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6218,8 +6218,7 @@ to the byte array.
->  			__u64 nr;
->  			__u64 args[6];
->  			__u64 ret;
-> -			__u32 longmode;
-> -			__u32 pad;
-> +			__u64 flags;
->  		} hypercall;
->  
->  Unused.  This was once used for 'hypercall to userspace'.  To implement
+Thanks,
 
-Note to self, this needs to be updated as "hypercall" is longer unused.
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
