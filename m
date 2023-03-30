@@ -1,18 +1,18 @@
-Received: from out-4.mta0.migadu.com (out-4.mta0.migadu.com [91.218.175.4])
+Received: from out-2.mta1.migadu.com (out-2.mta1.migadu.com [95.215.58.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 330CF1105
-	for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 00:59:26 +0000 (UTC)
-Date: Thu, 30 Mar 2023 00:59:18 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E29F1105
+	for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 01:19:14 +0000 (UTC)
+Date: Thu, 30 Mar 2023 01:19:06 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1680137963;
+	t=1680139152;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uD+IOimJMh4cbgBXvoWINW8nXWmtJftvBab7aOw95tI=;
-	b=ez9OovHtElrk9mpTqRlKDSUBByry79ZcLt2ztwAqwvMnSaA0r1G7D8uK3tAJubXhbtFmca
-	DF1+JuqSKmSIMa0ZLnT2zvarL5YVKf05DY1ZptP2AdRohW3XQF9qMRa6pVvNcKxjUiqapn
-	vwTSr3LAu91vqLeboljZg4JoT2bxpCw=
+	bh=ieJMdM29DRBiOqszQV7TS65QczUNcFjEDp7KMm1vo3M=;
+	b=K99/mO6ZmX+9Z0SOnOzW1yNj0BHgL3UOGUt5LDv4XF9H4nY2Cg0HyI0qsjQUQNx7YLeIe0
+	uom4b/i4ad0aQ5i458f25KJCmhDQSZwecGkcQn5VkL+En/wHNQ+m4NVLwnEMwFh8yvPosG
+	I4QEkthBz0FE0FQ9g1HCfE7t7CgQvbk=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Raghavendra Rao Ananta <rananta@google.com>
@@ -28,11 +28,10 @@ Cc: Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
 	Colton Lewis <coltonlewis@google.com>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v2 3/7] KVM: arm64: Implement
-  __kvm_tlb_flush_range_vmid_ipa()
-Message-ID: <ZCTe5koj8fOgbrYO@linux.dev>
+Subject: Re: [PATCH v2 2/7] KVM: arm64: Add FEAT_TLBIRANGE support
+Message-ID: <ZCTjirkCgBkT65eP@linux.dev>
 References: <20230206172340.2639971-1-rananta@google.com>
- <20230206172340.2639971-4-rananta@google.com>
+ <20230206172340.2639971-3-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,119 +40,72 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230206172340.2639971-4-rananta@google.com>
+In-Reply-To: <20230206172340.2639971-3-rananta@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Mon, Feb 06, 2023 at 05:23:36PM +0000, Raghavendra Rao Ananta wrote:
-> Define  __kvm_tlb_flush_range_vmid_ipa() (for VHE and nVHE)
-
-bikeshed: Personally, I find that range implies it takes an address as an
-argument already. Maybe just call it __kvm_tlb_flush_vmid_range()
-
-> to flush a range of stage-2 page-tables using IPA in one go.
-> If the system supports FEAT_TLBIRANGE, the following patches
-> would conviniently replace global TLBI such as vmalls12e1is
-> in the map, unmap, and dirty-logging paths with ripas2e1is
-> instead.
+On Mon, Feb 06, 2023 at 05:23:35PM +0000, Raghavendra Rao Ananta wrote:
+> Define a generic function __kvm_tlb_flush_range() to
+> invalidate the TLBs over a range of addresses. The
+> implementation accepts 'op' as a generic TLBI operation.
+> Upcoming patches will use this to implement IPA based
+> TLB invalidations (ipas2e1is).
+> 
+> If the system doesn't support FEAT_TLBIRANGE, the
+> implementation falls back to flushing the pages one by one
+> for the range supplied.
 > 
 > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 > ---
->  arch/arm64/include/asm/kvm_asm.h   |  3 +++
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 12 ++++++++++++
->  arch/arm64/kvm/hyp/nvhe/tlb.c      | 28 ++++++++++++++++++++++++++++
->  arch/arm64/kvm/hyp/vhe/tlb.c       | 24 ++++++++++++++++++++++++
->  4 files changed, 67 insertions(+)
+>  arch/arm64/include/asm/kvm_asm.h | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
 > 
 > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 995ff048e8851..80a8ea85e84f8 100644
+> index 43c3bc0f9544d..995ff048e8851 100644
 > --- a/arch/arm64/include/asm/kvm_asm.h
 > +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -79,6 +79,7 @@ enum __kvm_host_smccc_func {
->  	__KVM_HOST_SMCCC_FUNC___pkvm_init_vm,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_init_vcpu,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_teardown_vm,
-> +	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_range_vmid_ipa,
->  };
+> @@ -221,6 +221,24 @@ DECLARE_KVM_NVHE_SYM(__per_cpu_end);
+>  DECLARE_KVM_HYP_SYM(__bp_harden_hyp_vecs);
+>  #define __bp_harden_hyp_vecs	CHOOSE_HYP_SYM(__bp_harden_hyp_vecs)
 >  
->  #define DECLARE_KVM_VHE_SYM(sym)	extern char sym[]
-> @@ -243,6 +244,8 @@ extern void __kvm_flush_vm_context(void);
+> +#define __kvm_tlb_flush_range(op, mmu, start, end, level, tlb_level) do {	\
+> +	unsigned long pages, stride;						\
+> +										\
+> +	stride = kvm_granule_size(level);					\
+
+Hmm... There's a rather subtle and annoying complication here that I
+don't believe is handled.
+
+Similar to what I said in the last spin of the series, there is no
+guarantee that a range of IPAs is mapped at the exact same level
+throughout. Dirty logging and memslots that aren't hugepage aligned
+could lead to a mix of mapping levels being used within a range of the
+IPA space.
+
+> +	start = round_down(start, stride);					\
+> +	end = round_up(end, stride);						\
+> +	pages = (end - start) >> PAGE_SHIFT;					\
+> +										\
+> +	if ((!system_supports_tlb_range() &&					\
+> +	     (end - start) >= (MAX_TLBI_OPS * stride)) ||			\
+
+Doesn't checking for TLBIRANGE above eliminate the need to test against
+MAX_TLBI_OPS?
+
+> +	    pages >= MAX_TLBI_RANGE_PAGES) {					\
+> +		__kvm_tlb_flush_vmid(mmu);					\
+> +		break;								\
+> +	}									\
+> +										\
+> +	__flush_tlb_range_op(op, start, pages, stride, 0, tlb_level, false);	\
+> +} while (0)
+> +
+>  extern void __kvm_flush_vm_context(void);
 >  extern void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu);
 >  extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
->  				     int level);
-> +extern void __kvm_tlb_flush_range_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t start,
-> +						phys_addr_t end, int level, int tlb_level);
->  extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
->  
->  extern void __kvm_timer_set_cntvoff(u64 cntvoff);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 728e01d4536b0..5787eee4c9fe4 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -125,6 +125,17 @@ static void handle___kvm_tlb_flush_vmid_ipa(struct kvm_cpu_context *host_ctxt)
->  	__kvm_tlb_flush_vmid_ipa(kern_hyp_va(mmu), ipa, level);
->  }
->  
-> +static void handle___kvm_tlb_flush_range_vmid_ipa(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
-> +	DECLARE_REG(phys_addr_t, start, host_ctxt, 2);
-> +	DECLARE_REG(phys_addr_t, end, host_ctxt, 3);
-> +	DECLARE_REG(int, level, host_ctxt, 4);
-> +	DECLARE_REG(int, tlb_level, host_ctxt, 5);
-> +
-> +	__kvm_tlb_flush_range_vmid_ipa(kern_hyp_va(mmu), start, end, level, tlb_level);
-> +}
-> +
->  static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
->  {
->  	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
-> @@ -315,6 +326,7 @@ static const hcall_t host_hcall[] = {
->  	HANDLE_FUNC(__kvm_vcpu_run),
->  	HANDLE_FUNC(__kvm_flush_vm_context),
->  	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
-> +	HANDLE_FUNC(__kvm_tlb_flush_range_vmid_ipa),
->  	HANDLE_FUNC(__kvm_tlb_flush_vmid),
->  	HANDLE_FUNC(__kvm_flush_cpu_context),
->  	HANDLE_FUNC(__kvm_timer_set_cntvoff),
-> diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-> index d296d617f5896..7398dd00445e7 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-> @@ -109,6 +109,34 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
->  	__tlb_switch_to_host(&cxt);
->  }
->  
-> +void __kvm_tlb_flush_range_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t start,
-> +					phys_addr_t end, int level, int tlb_level)
-> +{
-> +	struct tlb_inv_context cxt;
-> +
-> +	dsb(ishst);
-> +
-> +	/* Switch to requested VMID */
-> +	__tlb_switch_to_guest(mmu, &cxt);
-> +
-> +	__kvm_tlb_flush_range(ipas2e1is, mmu, start, end, level, tlb_level);
-> +
-> +	/*
-> +	 * Range-based ipas2e1is flushes only Stage-2 entries, and since the
-> +	 * VA isn't available for Stage-1 entries, flush the entire stage-1.
-> +	 */
-
-nit: if we are going to preserve some of the commentary over in
-__kvm_tlb_flush_vmid_ipa(), I would prefer just an exact copy/paste.
-But, FWIW, I think you can just elide the clarifying comments altogether
-since the relationship between stage-1 and stage-2 invalidations is
-already documented.
-
-> +	dsb(ish);
-> +	__tlbi(vmalle1is);
-> +	dsb(ish);
-> +	isb();
-> +
-> +	/* See the comment below in __kvm_tlb_flush_vmid_ipa() */
-
-Same comment as above.
+> -- 
+> 2.39.1.519.gcb327c4b5f-goog
+> 
+> 
 
 -- 
 Thanks,
