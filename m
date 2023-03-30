@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8961A8C08
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BBD88C09
 	for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 17:48:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40834C4339C;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33399C433EF;
 	Thu, 30 Mar 2023 17:48:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1680198486;
-	bh=VzmiC9FX+ZfNMXCHEN+Bh2kvmeKVWDoUDgNLI+FCBiQ=;
+	bh=kxaApTO2zBKod/mkcWkqVMNDuQmCza2E3OtcpQhj7Yk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=icIkP1HNRK+A8OIZ8JyJYI6xg9so6qy0O5gusT92P63IU7J+EhrxSPG7Z5MCYlTbM
-	 dhNxqzZVs1zbDJ1kGLe1ERN9GNnnp7lMPDFUjgTkU1m43AcOLkbtit+IYesW/bACwL
-	 SMkLLxeqYseVS07YkjnqC67IjRAzxxe6q24Eu5mwKYMjwgh9pueONGIMQhHROPNwsZ
-	 wDOjFJqCa+aTWZczjKaAm3s/A1IrJSQIEtCt9gAWs+8oqQvBW/HpzPPtZrwhghQZIM
-	 mHH95pQhrwkPvIr/zGnVTTPJ8g5a0eMPt7EHYTSPRUFUsi1anye6YQHRPDprOGPkq4
-	 um+tvqsg/dRkQ==
+	b=bw8GXFVmnmBH6IbP1mwcQvPN/jCm8E3CtLEo28h4AOxTin2YRhqrKTNO9XSvoGqK5
+	 vGhrd0WEuEUwYAp2QqwML6DmP6iw0nQFDBXA2x+Qs697PZJh19J1VyJmnivtF90z6p
+	 RwrXyMC7shnwIUlnbv9ROiGzKqcqQ2qXk4cHzqyukUwi8/iWdyIFtw35r5dykFS/V5
+	 Rd0O7I+zAP4ghIM99JBVdsOtKLpfdjQt2IiulvTjN0JYCP2m3WBv+6YvrghmuGyEiz
+	 FKD1581h5ASSxcPxJoCzrR/sk7Kx+CXYPV14u/t/u2Sx0/Nm9beRXisxtVrlZd/3t0
+	 56vI/YoA5oZ0g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1phwNY-004Rpa-E7;
-	Thu, 30 Mar 2023 18:48:04 +0100
+	id 1phwNX-004Rpa-T2;
+	Thu, 30 Mar 2023 18:48:03 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -35,9 +35,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Colton Lewis <coltonlewis@google.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	dwmw2@infradead.org
-Subject: [PATCH v4 03/20] arm64: Add HAS_ECV_CNTPOFF capability
-Date: Thu, 30 Mar 2023 18:47:43 +0100
-Message-Id: <20230330174800.2677007-4-maz@kernel.org>
+Subject: [PATCH v4 01/20] KVM: arm64: timers: Use a per-vcpu, per-timer accumulator for fractional ns
+Date: Thu, 30 Mar 2023 18:47:41 +0100
+Message-Id: <20230330174800.2677007-2-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230330174800.2677007-1-maz@kernel.org>
 References: <20230330174800.2677007-1-maz@kernel.org>
@@ -53,51 +53,43 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the probing code for the FEAT_ECV variant that implements CNTPOFF_EL2.
-Why it is optional is a mystery, but let's try and detect it.
+Instead of accumulating the fractional ns value generated every time
+we compute a ns delta in a global variable, use a per-vcpu, per-timer
+variable. This keeps the fractional ns local to the timer instead of
+contributing to any odd, unrelated timer.
 
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
 Reviewed-by: Colton Lewis <coltonlewis@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kernel/cpufeature.c | 11 +++++++++++
- arch/arm64/tools/cpucaps       |  1 +
- 2 files changed, 12 insertions(+)
+ arch/arm64/kvm/arch_timer.c  | 2 +-
+ include/kvm/arm_arch_timer.h | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 2e3e55139777..c331c49a7d19 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -2223,6 +2223,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.sign = FTR_UNSIGNED,
- 		.min_field_value = 1,
- 	},
-+	{
-+		.desc = "Enhanced Counter Virtualization (CNTPOFF)",
-+		.capability = ARM64_HAS_ECV_CNTPOFF,
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.matches = has_cpuid_feature,
-+		.sys_reg = SYS_ID_AA64MMFR0_EL1,
-+		.field_pos = ID_AA64MMFR0_EL1_ECV_SHIFT,
-+		.field_width = 4,
-+		.sign = FTR_UNSIGNED,
-+		.min_field_value = ID_AA64MMFR0_EL1_ECV_CNTPOFF,
-+	},
- #ifdef CONFIG_ARM64_PAN
- 	{
- 		.desc = "Privileged Access Never",
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index 37b1340e9646..40ba95472594 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -23,6 +23,7 @@ HAS_DCPOP
- HAS_DIT
- HAS_E0PD
- HAS_ECV
-+HAS_ECV_CNTPOFF
- HAS_EPAN
- HAS_GENERIC_AUTH
- HAS_GENERIC_AUTH_ARCH_QARMA3
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index e1af4301b913..9515c645f03d 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -212,7 +212,7 @@ static u64 kvm_counter_compute_delta(struct arch_timer_context *timer_ctx,
+ 		ns = cyclecounter_cyc2ns(timecounter->cc,
+ 					 val - now,
+ 					 timecounter->mask,
+-					 &timecounter->frac);
++					 &timer_ctx->ns_frac);
+ 		return ns;
+ 	}
+ 
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index c52a6e6839da..70d47c4adc6a 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -44,6 +44,7 @@ struct arch_timer_context {
+ 
+ 	/* Emulated Timer (may be unused) */
+ 	struct hrtimer			hrtimer;
++	u64				ns_frac;
+ 
+ 	/* Offset for this counter/timer */
+ 	struct arch_timer_offset	offset;
 -- 
 2.34.1
 
