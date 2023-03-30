@@ -1,19 +1,19 @@
-Received: from out-56.mta1.migadu.com (out-56.mta1.migadu.com [95.215.58.56])
+Received: from out-20.mta1.migadu.com (out-20.mta1.migadu.com [95.215.58.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C088836
-	for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 15:49:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E76A8836
+	for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 15:49:38 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1680191374;
+	t=1680191376;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=YzSfwFGm8NO+I2M2r6JMUYH/IVd8zU67wvMoeXElqlg=;
-	b=avCzg4DW4jF5VMBlIAbWrHjD3BdU364fV8Y5Ur9xbmo+/jbd7LTbx9wX/veIxGuVHXHlQ1
-	gehuV09wKDjAXM1aXM7hyaK6xWQil00P+5YjDnJgtOzrk/wKysnXn86DjkO/w+AmZ+ARva
-	eD2bVv4a28jFKwH1vswFqevAiLEuYsg=
+	bh=Eh9wd48ohN+FzWNYjVMpazX+yjNyuvvGeo+Fsv9LqwU=;
+	b=Kvsxkcfq0zuM5YVDpfFIezOLcR2kb5qZ3kReSY04NhAFyDzaeQ2MDC2AnqlwxOmOq7i50e
+	z0TNPfPtThggXtDU5c1YuvsuKaoUUn/2V6FycLWZvN25Gln/9DR0lDeumNLgRkMSa8TjLP
+	p3OLFUcaxbxMqKQGWAlhGVp//K/QpgQ=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -25,9 +25,9 @@ Cc: kvm@vger.kernel.org,
 	Sean Christopherson <seanjc@google.com>,
 	Salil Mehta <salil.mehta@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 03/13] KVM: arm64: Add vm fd device attribute accessors
-Date: Thu, 30 Mar 2023 15:49:08 +0000
-Message-Id: <20230330154918.4014761-4-oliver.upton@linux.dev>
+Subject: [PATCH v2 04/13] KVM: arm64: Rename SMC/HVC call handler to reflect reality
+Date: Thu, 30 Mar 2023 15:49:09 +0000
+Message-Id: <20230330154918.4014761-5-oliver.upton@linux.dev>
 In-Reply-To: <20230330154918.4014761-1-oliver.upton@linux.dev>
 References: <20230330154918.4014761-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -39,68 +39,70 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-A subsequent change will allow userspace to convey a filter for
-hypercalls through a vm device attribute. Add the requisite boilerplate
-for vm attribute accessors.
+KVM handles SMCCC calls from virtual EL2 that use the SMC instruction
+since commit bd36b1a9eb5a ("KVM: arm64: nv: Handle SMCs taken from
+virtual EL2"). Thus, the function name of the handler no longer reflects
+reality.
+
+Normalize the name on SMCCC, since that's the only hypercall interface
+KVM supports in the first place. No fuctional change intended.
 
 Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/arm.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ arch/arm64/kvm/handle_exit.c | 4 ++--
+ arch/arm64/kvm/hypercalls.c  | 2 +-
+ include/kvm/arm_hypercalls.h | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 3bd732eaf087..b6e26c0e65e5 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1439,11 +1439,28 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index a798c0b4d717..5e4f9737cbd5 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -52,7 +52,7 @@ static int handle_hvc(struct kvm_vcpu *vcpu)
+ 		return 1;
+ 	}
+ 
+-	ret = kvm_hvc_call_handler(vcpu);
++	ret = kvm_smccc_call_handler(vcpu);
+ 	if (ret < 0) {
+ 		vcpu_set_reg(vcpu, 0, ~0UL);
+ 		return 1;
+@@ -89,7 +89,7 @@ static int handle_smc(struct kvm_vcpu *vcpu)
+ 	 * at Non-secure EL1 is trapped to EL2 if HCR_EL2.TSC==1, rather than
+ 	 * being treated as UNDEFINED.
+ 	 */
+-	ret = kvm_hvc_call_handler(vcpu);
++	ret = kvm_smccc_call_handler(vcpu);
+ 	if (ret < 0)
+ 		vcpu_set_reg(vcpu, 0, ~0UL);
+ 
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index a09a526a7d7c..5ead6c6afff0 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -121,7 +121,7 @@ static bool kvm_hvc_call_allowed(struct kvm_vcpu *vcpu, u32 func_id)
  	}
  }
  
-+static int kvm_vm_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
-+{
-+	switch (attr->group) {
-+	default:
-+		return -ENXIO;
-+	}
-+}
-+
-+static int kvm_vm_set_attr(struct kvm *kvm, struct kvm_device_attr *attr)
-+{
-+	switch (attr->group) {
-+	default:
-+		return -ENXIO;
-+	}
-+}
-+
- long kvm_arch_vm_ioctl(struct file *filp,
- 		       unsigned int ioctl, unsigned long arg)
+-int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
++int kvm_smccc_call_handler(struct kvm_vcpu *vcpu)
  {
- 	struct kvm *kvm = filp->private_data;
- 	void __user *argp = (void __user *)arg;
-+	struct kvm_device_attr attr;
+ 	struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
+ 	u32 func_id = smccc_get_function(vcpu);
+diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
+index 1188f116cf4e..8f4e33bc43e8 100644
+--- a/include/kvm/arm_hypercalls.h
++++ b/include/kvm/arm_hypercalls.h
+@@ -6,7 +6,7 @@
  
- 	switch (ioctl) {
- 	case KVM_CREATE_IRQCHIP: {
-@@ -1479,6 +1496,18 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 			return -EFAULT;
- 		return kvm_vm_ioctl_mte_copy_tags(kvm, &copy_tags);
- 	}
-+	case KVM_HAS_DEVICE_ATTR: {
-+		if (copy_from_user(&attr, argp, sizeof(attr)))
-+			return -EFAULT;
-+
-+		return kvm_vm_has_attr(kvm, &attr);
-+	}
-+	case KVM_SET_DEVICE_ATTR: {
-+		if (copy_from_user(&attr, argp, sizeof(attr)))
-+			return -EFAULT;
-+
-+		return kvm_vm_set_attr(kvm, &attr);
-+	}
- 	default:
- 		return -EINVAL;
- 	}
+ #include <asm/kvm_emulate.h>
+ 
+-int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
++int kvm_smccc_call_handler(struct kvm_vcpu *vcpu);
+ 
+ static inline u32 smccc_get_function(struct kvm_vcpu *vcpu)
+ {
 -- 
 2.40.0.348.gf938b09366-goog
 
