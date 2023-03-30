@@ -1,25 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE3A99443
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDFBB9444
 	for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 17:48:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80DFEC433A4;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 102E3C433A1;
 	Thu, 30 Mar 2023 17:48:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1680198487;
-	bh=FV+hPqbWT1HhbKd0Z1axGuXAM5g9JEiwubbU7pPnmFw=;
+	bh=a3ZQgHz/7BkKgt59XtQTeSv16AbvV2lod48w2amU/bc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TgJCd9KnxapZ7v2NllTpYUNHkoVQ1TrHSc6lH8BlZFo/+sWiBlEl0FaZBL/yip9uS
-	 ZLuSYVrXMbcpSnLBJBxrUVkVHhqAmkI4bRjflegq9WJt7DmQfC0HUcVpQvMBICzRD4
-	 eMmtlK5xoxbkOpnww0KCirSH70S57xPrzfCdTg79m4Y66Giipo+IQUPVGuYkYzlNOU
-	 GFiFkEIuUeL8jeTcQMoOp11syb3Kx1zSmAmhfn5Mcm95JTItjJ6cfX0VLLp7gty7iW
-	 j4+2x8AIcvgklPP3wC8POHzUB7r+SfGkThxonHkOSsQEu6GX3IgRifOPuUPHTXWS6g
-	 +oEBYgqhLP1xQ==
+	b=DvNmbLDqpGKDWLt08Aw8yA1si4u+chp0yheOSmPVDEwxRa6fKyoFSUUeRykzwitA1
+	 TltZqQNSUe+ni7crk4EAkFiLpRH7OEKshq+vTkMXJyvaMtTmLyjbOE9N4NQVCrdFHT
+	 ZFYnrLOSKMvebGpu3plSkh57YjF2ztWmIdwxfFhtWf/Gy+NpL31JnIxKJ0qsXFCuia
+	 ykxyTOcoDjKTW+IMj5Tofqk3qry5Xq8dJ0FBFBS3jICjr3O92Uhy1Mvb32jeET6nYZ
+	 GqyYMisA1SeK/fyOGr8xg3Y9+z6iRNFbL9SsL2PPl+a0HeQ6qh2dh00sBFSwld6YXx
+	 P0JS1xETQvQkQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1phwNZ-004Rpa-GL;
+	id 1phwNZ-004Rpa-83;
 	Thu, 30 Mar 2023 18:48:05 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -35,9 +35,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Colton Lewis <coltonlewis@google.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	dwmw2@infradead.org
-Subject: [PATCH v4 07/20] KVM: arm64: timers: Allow userspace to set the global counter offset
-Date: Thu, 30 Mar 2023 18:47:47 +0100
-Message-Id: <20230330174800.2677007-8-maz@kernel.org>
+Subject: [PATCH v4 06/20] KVM: arm64: Expose {un,}lock_all_vcpus() to the rest of KVM
+Date: Thu, 30 Mar 2023 18:47:46 +0100
+Message-Id: <20230330174800.2677007-7-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230330174800.2677007-1-maz@kernel.org>
 References: <20230330174800.2677007-1-maz@kernel.org>
@@ -53,201 +53,150 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-And this is the moment you have all been waiting for: setting the
-counter offset from userspace.
-
-We expose a brand new capability that reports the ability to set
-the offset for both the virtual and physical sides.
-
-In keeping with the architecture, the offset is expressed as
-a delta that is substracted from the physical counter value.
-
-Once this new API is used, there is no going back, and the counters
-cannot be written to to set the offsets implicitly (the writes
-are instead ignored).
+Being able to lock/unlock all vcpus in one go is a feature that
+only the vgic has enjoyed so far. Let's be brave and expose it
+to the world.
 
 Reviewed-by: Colton Lewis <coltonlewis@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h |  4 +++
- arch/arm64/include/uapi/asm/kvm.h |  9 ++++++
- arch/arm64/kvm/arch_timer.c       | 54 ++++++++++++++++++++++++++++---
- arch/arm64/kvm/arm.c              |  8 +++++
- include/uapi/linux/kvm.h          |  3 ++
- 5 files changed, 73 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/kvm_host.h     |  3 ++
+ arch/arm64/kvm/arm.c                  | 43 +++++++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic-kvm-device.c | 38 -----------------------
+ arch/arm64/kvm/vgic/vgic.h            |  3 --
+ 4 files changed, 46 insertions(+), 41 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 002a10cbade2..116233a390e9 100644
+index bcd774d74f34..002a10cbade2 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -221,6 +221,8 @@ struct kvm_arch {
- #define KVM_ARCH_FLAG_EL1_32BIT				4
- 	/* PSCI SYSTEM_SUSPEND enabled for the guest */
- #define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		5
-+	/* VM counter offset */
-+#define KVM_ARCH_FLAG_VM_COUNTER_OFFSET			6
+@@ -922,6 +922,9 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
  
- 	unsigned long flags;
+ int __init kvm_sys_reg_table_init(void);
  
-@@ -1010,6 +1012,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
- 
- long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
- 				struct kvm_arm_copy_mte_tags *copy_tags);
-+int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
-+				    struct kvm_arm_counter_offset *offset);
- 
- /* Guest/host FPSIMD coordination helpers */
- int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index f8129c624b07..12fb0d8a760a 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -198,6 +198,15 @@ struct kvm_arm_copy_mte_tags {
- 	__u64 reserved[2];
- };
- 
-+/*
-+ * Counter/Timer offset structure. Describe the virtual/physical offset.
-+ * To be used with KVM_ARM_SET_COUNTER_OFFSET.
-+ */
-+struct kvm_arm_counter_offset {
-+	__u64 counter_offset;
-+	__u64 reserved;
-+};
++bool lock_all_vcpus(struct kvm *kvm);
++void unlock_all_vcpus(struct kvm *kvm);
 +
- #define KVM_ARM_TAGS_TO_GUEST		0
- #define KVM_ARM_TAGS_FROM_GUEST		1
- 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index bb64a71ae193..771504c79711 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -851,9 +851,11 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
- 	ptimer->vcpu = vcpu;
- 	ptimer->offset.vm_offset = &vcpu->kvm->arch.timer_data.poffset;
- 
--	/* Synchronize cntvoff across all vtimers of a VM. */
--	timer_set_offset(vtimer, kvm_phys_timer_read());
--	timer_set_offset(ptimer, 0);
-+	/* Synchronize offsets across timers of a VM if not already provided */
-+	if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
-+		timer_set_offset(vtimer, kvm_phys_timer_read());
-+		timer_set_offset(ptimer, 0);
-+	}
- 
- 	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
- 	timer->bg_timer.function = kvm_bg_timer_expire;
-@@ -897,8 +899,11 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
- 		kvm_arm_timer_write(vcpu, timer, TIMER_REG_CTL, value);
- 		break;
- 	case KVM_REG_ARM_TIMER_CNT:
--		timer = vcpu_vtimer(vcpu);
--		timer_set_offset(timer, kvm_phys_timer_read() - value);
-+		if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET,
-+			      &vcpu->kvm->arch.flags)) {
-+			timer = vcpu_vtimer(vcpu);
-+			timer_set_offset(timer, kvm_phys_timer_read() - value);
-+		}
- 		break;
- 	case KVM_REG_ARM_TIMER_CVAL:
- 		timer = vcpu_vtimer(vcpu);
-@@ -908,6 +913,13 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
- 		timer = vcpu_ptimer(vcpu);
- 		kvm_arm_timer_write(vcpu, timer, TIMER_REG_CTL, value);
- 		break;
-+	case KVM_REG_ARM_PTIMER_CNT:
-+		if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET,
-+			      &vcpu->kvm->arch.flags)) {
-+			timer = vcpu_ptimer(vcpu);
-+			timer_set_offset(timer, kvm_phys_timer_read() - value);
-+		}
-+		break;
- 	case KVM_REG_ARM_PTIMER_CVAL:
- 		timer = vcpu_ptimer(vcpu);
- 		kvm_arm_timer_write(vcpu, timer, TIMER_REG_CVAL, value);
-@@ -1443,3 +1455,35 @@ int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 
- 	return -ENXIO;
- }
-+
-+int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
-+				    struct kvm_arm_counter_offset *offset)
-+{
-+	int ret = 0;
-+
-+	if (offset->reserved)
-+		return -EINVAL;
-+
-+	mutex_lock(&kvm->lock);
-+
-+	if (lock_all_vcpus(kvm)) {
-+		set_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &kvm->arch.flags);
-+
-+		/*
-+		 * If userspace decides to set the offset using this
-+		 * API rather than merely restoring the counter
-+		 * values, the offset applies to both the virtual and
-+		 * physical views.
-+		 */
-+		kvm->arch.timer_data.voffset = offset->counter_offset;
-+		kvm->arch.timer_data.poffset = offset->counter_offset;
-+
-+		unlock_all_vcpus(kvm);
-+	} else {
-+		ret = -EBUSY;
-+	}
-+
-+	mutex_unlock(&kvm->lock);
-+
-+	return ret;
-+}
+ /* MMIO helpers */
+ void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
+ unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len);
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index ae5110cc3bad..1c8a4bbae684 100644
+index 3bd732eaf087..ae5110cc3bad 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -220,6 +220,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_VCPU_ATTRIBUTES:
- 	case KVM_CAP_PTP_KVM:
- 	case KVM_CAP_ARM_SYSTEM_SUSPEND:
-+	case KVM_CAP_COUNTER_OFFSET:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
-@@ -1479,6 +1480,13 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 			return -EFAULT;
- 		return kvm_vm_ioctl_mte_copy_tags(kvm, &copy_tags);
+@@ -1484,6 +1484,49 @@ long kvm_arch_vm_ioctl(struct file *filp,
  	}
-+	case KVM_ARM_SET_COUNTER_OFFSET: {
-+		struct kvm_arm_counter_offset offset;
+ }
+ 
++/* unlocks vcpus from @vcpu_lock_idx and smaller */
++static void unlock_vcpus(struct kvm *kvm, int vcpu_lock_idx)
++{
++	struct kvm_vcpu *tmp_vcpu;
 +
-+		if (copy_from_user(&offset, argp, sizeof(offset)))
-+			return -EFAULT;
-+		return kvm_vm_ioctl_set_counter_offset(kvm, &offset);
++	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
++		tmp_vcpu = kvm_get_vcpu(kvm, vcpu_lock_idx);
++		mutex_unlock(&tmp_vcpu->mutex);
 +	}
- 	default:
- 		return -EINVAL;
- 	}
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index d77aef872a0a..6a7e1a0ecf04 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1184,6 +1184,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
- #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
- #define KVM_CAP_PMU_EVENT_MASKED_EVENTS 226
-+#define KVM_CAP_COUNTER_OFFSET 227
++}
++
++void unlock_all_vcpus(struct kvm *kvm)
++{
++	lockdep_assert_held(&kvm->lock);
++
++	unlock_vcpus(kvm, atomic_read(&kvm->online_vcpus) - 1);
++}
++
++/* Returns true if all vcpus were locked, false otherwise */
++bool lock_all_vcpus(struct kvm *kvm)
++{
++	struct kvm_vcpu *tmp_vcpu;
++	unsigned long c;
++
++	lockdep_assert_held(&kvm->lock);
++
++	/*
++	 * Any time a vcpu is in an ioctl (including running), the
++	 * core KVM code tries to grab the vcpu->mutex.
++	 *
++	 * By grabbing the vcpu->mutex of all VCPUs we ensure that no
++	 * other VCPUs can fiddle with the state while we access it.
++	 */
++	kvm_for_each_vcpu(c, tmp_vcpu, kvm) {
++		if (!mutex_trylock(&tmp_vcpu->mutex)) {
++			unlock_vcpus(kvm, c - 1);
++			return false;
++		}
++	}
++
++	return true;
++}
++
+ static unsigned long nvhe_percpu_size(void)
+ {
+ 	return (unsigned long)CHOOSE_NVHE_SYM(__per_cpu_end) -
+diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+index edeac2380591..04dd68835b3f 100644
+--- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
++++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+@@ -342,44 +342,6 @@ int vgic_v2_parse_attr(struct kvm_device *dev, struct kvm_device_attr *attr,
+ 	return 0;
+ }
  
- #ifdef KVM_CAP_IRQ_ROUTING
+-/* unlocks vcpus from @vcpu_lock_idx and smaller */
+-static void unlock_vcpus(struct kvm *kvm, int vcpu_lock_idx)
+-{
+-	struct kvm_vcpu *tmp_vcpu;
+-
+-	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
+-		tmp_vcpu = kvm_get_vcpu(kvm, vcpu_lock_idx);
+-		mutex_unlock(&tmp_vcpu->mutex);
+-	}
+-}
+-
+-void unlock_all_vcpus(struct kvm *kvm)
+-{
+-	unlock_vcpus(kvm, atomic_read(&kvm->online_vcpus) - 1);
+-}
+-
+-/* Returns true if all vcpus were locked, false otherwise */
+-bool lock_all_vcpus(struct kvm *kvm)
+-{
+-	struct kvm_vcpu *tmp_vcpu;
+-	unsigned long c;
+-
+-	/*
+-	 * Any time a vcpu is run, vcpu_load is called which tries to grab the
+-	 * vcpu->mutex.  By grabbing the vcpu->mutex of all VCPUs we ensure
+-	 * that no other VCPUs are run and fiddle with the vgic state while we
+-	 * access it.
+-	 */
+-	kvm_for_each_vcpu(c, tmp_vcpu, kvm) {
+-		if (!mutex_trylock(&tmp_vcpu->mutex)) {
+-			unlock_vcpus(kvm, c - 1);
+-			return false;
+-		}
+-	}
+-
+-	return true;
+-}
+-
+ /**
+  * vgic_v2_attr_regs_access - allows user space to access VGIC v2 state
+  *
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index 7f7f3c5ed85a..f9923beedd27 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -273,9 +273,6 @@ int vgic_init(struct kvm *kvm);
+ void vgic_debug_init(struct kvm *kvm);
+ void vgic_debug_destroy(struct kvm *kvm);
  
-@@ -1543,6 +1544,8 @@ struct kvm_s390_ucas_mapping {
- #define KVM_SET_PMU_EVENT_FILTER  _IOW(KVMIO,  0xb2, struct kvm_pmu_event_filter)
- #define KVM_PPC_SVM_OFF		  _IO(KVMIO,  0xb3)
- #define KVM_ARM_MTE_COPY_TAGS	  _IOR(KVMIO,  0xb4, struct kvm_arm_copy_mte_tags)
-+/* Available with KVM_CAP_COUNTER_OFFSET */
-+#define KVM_ARM_SET_COUNTER_OFFSET _IOW(KVMIO,  0xb5, struct kvm_arm_counter_offset)
- 
- /* ioctl for vm fd */
- #define KVM_CREATE_DEVICE	  _IOWR(KVMIO,  0xe0, struct kvm_create_device)
+-bool lock_all_vcpus(struct kvm *kvm);
+-void unlock_all_vcpus(struct kvm *kvm);
+-
+ static inline int vgic_v3_max_apr_idx(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_cpu *cpu_if = &vcpu->arch.vgic_cpu;
 -- 
 2.34.1
 
