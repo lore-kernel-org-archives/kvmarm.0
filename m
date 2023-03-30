@@ -1,18 +1,18 @@
-Received: from out-8.mta1.migadu.com (out-8.mta1.migadu.com [95.215.58.8])
+Received: from out-38.mta0.migadu.com (out-38.mta0.migadu.com [91.218.175.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 743BE1C05
-	for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 06:26:57 +0000 (UTC)
-Date: Thu, 30 Mar 2023 06:26:48 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C78EE1C05
+	for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 06:42:54 +0000 (UTC)
+Date: Thu, 30 Mar 2023 06:42:47 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1680157615;
+	t=1680158572;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3ZgdS+jUR77XvVW3n9V6I+tOmSVWjH7Tk5zLOJ1pRgs=;
-	b=F4TZAeqZOKKQ97cdEt/KMQGRxuNgzSeL4b3yDGZy7vSisg6Xg4nM+4GBe+ahw3bOR1pu2t
-	LaJYfau3ifJTik6iAwhLoDSBgXFs7QVgTe4SDV1yQpjCHOB68NW2FDTELlln/cdyTyPpDo
-	Ff3NBwUECR0GGo1bicOGApVCIyeEMEA=
+	bh=UUNTmfY0fOvsY7bCYHRcY0CifEjhLb/ZBB0rxOVTkWw=;
+	b=diSsM9vVRakxTDZtGuQYw6QXrbLjEJp1FY2lxYGXXgZJYd2XODjZapKBAQ05I717+/PMmA
+	Sfmsekn6yMOLJWjfEq/9DUrrHY8rgQv96YwNTJLz+ea7Qrcu5yeXXD8Uzzz7uUXhQfx8Ot
+	KHgrDaLYVm+XPEs9Gtr5EtgdMB4vVR8=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>
@@ -25,11 +25,11 @@ Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
 	Simon Veith <sveith@amazon.de>, Reiji Watanabe <reijiw@google.com>,
 	Colton Lewis <coltonlewis@google.com>,
 	Joey Gouly <joey.gouly@arm.com>, dwmw2@infradead.org
-Subject: Re: [PATCH v3 07/18] KVM: arm64: timers: Allow userspace to set the
- global counter offset
-Message-ID: <ZCUrqIwNNdcAUSv3@linux.dev>
+Subject: Re: [PATCH v3 05/18] KVM: arm64: timers: Allow physical offset
+ without CNTPOFF_EL2
+Message-ID: <ZCUvZ9yhfRSKRb3n@linux.dev>
 References: <20230324144704.4193635-1-maz@kernel.org>
- <20230324144704.4193635-8-maz@kernel.org>
+ <20230324144704.4193635-6-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,144 +38,28 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230324144704.4193635-8-maz@kernel.org>
+In-Reply-To: <20230324144704.4193635-6-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-Hi Marc,
+Hey Marc,
 
-On Fri, Mar 24, 2023 at 02:46:53PM +0000, Marc Zyngier wrote:
-> And this is the moment you have all been waiting for: setting the
-> counter offset from userspace.
+On Fri, Mar 24, 2023 at 02:46:51PM +0000, Marc Zyngier wrote:
+> CNTPOFF_EL2 is awesome, but it is mostly vapourware, and no publicly
+> available implementation has it. So for the common mortals, let's
+> implement the emulated version of this thing.
 > 
-> We expose a brand new capability that reports the ability to set
-> the offset for both the virtual and physical sides.
+> It means trapping accesses to the physical counter and timer, and
+> emulate some of it as necessary.
 > 
-> In keeping with the architecture, the offset is expressed as
-> a delta that is substracted from the physical counter value.
-> 
-> Once this new API is used, there is no going back, and the counters
-> cannot be written to to set the offsets implicitly (the writes
-> are instead ignored).
-> 
-> Reviewed-by: Colton Lewis <coltonlewis@google.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  4 +++
->  arch/arm64/include/uapi/asm/kvm.h |  9 ++++++
->  arch/arm64/kvm/arch_timer.c       | 46 +++++++++++++++++++++++++++----
->  arch/arm64/kvm/arm.c              |  8 ++++++
->  include/uapi/linux/kvm.h          |  3 ++
->  5 files changed, 65 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 002a10cbade2..116233a390e9 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -221,6 +221,8 @@ struct kvm_arch {
->  #define KVM_ARCH_FLAG_EL1_32BIT				4
->  	/* PSCI SYSTEM_SUSPEND enabled for the guest */
->  #define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		5
-> +	/* VM counter offset */
-> +#define KVM_ARCH_FLAG_VM_COUNTER_OFFSET			6
->  
->  	unsigned long flags;
->  
-> @@ -1010,6 +1012,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->  
->  long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->  				struct kvm_arm_copy_mte_tags *copy_tags);
-> +int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
-> +				    struct kvm_arm_counter_offset *offset);
->  
->  /* Guest/host FPSIMD coordination helpers */
->  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index f8129c624b07..12fb0d8a760a 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -198,6 +198,15 @@ struct kvm_arm_copy_mte_tags {
->  	__u64 reserved[2];
->  };
->  
-> +/*
-> + * Counter/Timer offset structure. Describe the virtual/physical offset.
-> + * To be used with KVM_ARM_SET_COUNTER_OFFSET.
-> + */
-> +struct kvm_arm_counter_offset {
-> +	__u64 counter_offset;
-> +	__u64 reserved;
-> +};
-> +
->  #define KVM_ARM_TAGS_TO_GUEST		0
->  #define KVM_ARM_TAGS_FROM_GUEST		1
->  
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index bb64a71ae193..25625e1d6d89 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -851,9 +851,11 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
->  	ptimer->vcpu = vcpu;
->  	ptimer->offset.vm_offset = &vcpu->kvm->arch.timer_data.poffset;
->  
-> -	/* Synchronize cntvoff across all vtimers of a VM. */
-> -	timer_set_offset(vtimer, kvm_phys_timer_read());
-> -	timer_set_offset(ptimer, 0);
-> +	/* Synchronize offsets across timers of a VM if not already provided */
-> +	if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
-> +		timer_set_offset(vtimer, kvm_phys_timer_read());
-> +		timer_set_offset(ptimer, 0);
-> +	}
->  
->  	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
->  	timer->bg_timer.function = kvm_bg_timer_expire;
-> @@ -897,8 +899,11 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
->  		kvm_arm_timer_write(vcpu, timer, TIMER_REG_CTL, value);
->  		break;
->  	case KVM_REG_ARM_TIMER_CNT:
-> -		timer = vcpu_vtimer(vcpu);
-> -		timer_set_offset(timer, kvm_phys_timer_read() - value);
-> +		if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET,
-> +			      &vcpu->kvm->arch.flags)) {
-> +			timer = vcpu_vtimer(vcpu);
-> +			timer_set_offset(timer, kvm_phys_timer_read() - value);
-> +		}
->  		break;
->  	case KVM_REG_ARM_TIMER_CVAL:
->  		timer = vcpu_vtimer(vcpu);
-> @@ -908,6 +913,13 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
->  		timer = vcpu_ptimer(vcpu);
->  		kvm_arm_timer_write(vcpu, timer, TIMER_REG_CTL, value);
->  		break;
-> +	case KVM_REG_ARM_PTIMER_CNT:
-> +		if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET,
-> +			      &vcpu->kvm->arch.flags)) {
-> +			timer = vcpu_ptimer(vcpu);
-> +			timer_set_offset(timer, kvm_phys_timer_read() - value);
-> +		}
-> +		break;
->  	case KVM_REG_ARM_PTIMER_CVAL:
->  		timer = vcpu_ptimer(vcpu);
->  		kvm_arm_timer_write(vcpu, timer, TIMER_REG_CVAL, value);
-> @@ -1443,3 +1455,27 @@ int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->  
->  	return -ENXIO;
->  }
-> +
-> +int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
-> +				    struct kvm_arm_counter_offset *offset)
-> +{
-> +	if (offset->reserved)
-> +		return -EINVAL;
-> +
-> +	if (!lock_all_vcpus(kvm))
-> +		return -EBUSY;
+> As for CNTPOFF_EL2, nobody sets the offset yet.
 
-Similar to what you had mentioned over on the lock (un)inversion series,
-doesn't this risk racing with vCPU creation w/o holding the kvm->lock?
+Did you consider implementing a 'fast' exit handler for counter reads?
+When I took a stab at this a long time ago I had something similar [*].
+Since physical counter emulation is going to effectively be used by all
+systems out there right now it might be worth giving the best emulation
+implementation we can.
 
-Alternatively you could require this ioctl to be issued before any vCPUs
-are created to avoid the need to lock them all here. But, if you see
-value in poking this at runtime then fine by me.
+[*]: https://lore.kernel.org/kvmarm/20210916181510.963449-9-oupton@google.com/
 
 -- 
 Thanks,
