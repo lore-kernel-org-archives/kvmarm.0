@@ -1,40 +1,40 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 701C015A6
-	for <kvmarm@lists.linux.dev>; Fri, 31 Mar 2023 01:44:49 +0000 (UTC)
-Received: by mail-yb1-f201.google.com with SMTP id y144-20020a253296000000b00b69ce0e6f2dso20617886yby.18
-        for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 18:44:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F256515A6
+	for <kvmarm@lists.linux.dev>; Fri, 31 Mar 2023 01:44:57 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-545d027103eso162485317b3.5
+        for <kvmarm@lists.linux.dev>; Thu, 30 Mar 2023 18:44:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680227088;
+        d=google.com; s=20210112; t=1680227097;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sxm82ULq9HWZFwrrpsKKW1Wi+ka2XfyIhyEC8wmryEE=;
-        b=EwCbBy2NmGz1YSwvIaLGptaApqPEAq4wX2wnszbBXw5oQb2Uc0EFP1C20lCXszudSW
-         ygIU6pkqOvK2AK9KQ3c60PIKQ/sfD3NboEMbtXcTSsWk925G3pjV2fMbiBFsUoRknSuK
-         ezx+aC7quvkq5Qp6J2Hw2mSgFZr1Qr0KBroONM5YI6O4ohleQKXY+7eF7wtB6Cg88To2
-         7a50+zIgK7CmPHkJ1agmB5DqT4KvJ5THhi3apcHVq6stFnJbCgwc1za/ktgLOb8S3PJE
-         L4rTFk8Jl8wIm8P/bsAnTRwlFTthcSl9W4i2XZ+2sCglww7Oyy1NNTcNDaY9V5ex4q44
-         ko8Q==
+        bh=mcnJNCHDCGQ7Pzom/y/MQEMC0VEcznZRpNuHkAP16dM=;
+        b=M/Dq0K05dn7RZdEyBco1zZW8o9aWbWD0tOGYp2aROenD9B8zG0YkXNU+ypXcmNaQHy
+         4te0VdM4kG75aRgDJAiNeipUhfEk+8e/2sx5TS12tTIKnwevTbmQxo+lHWm8c4GqVIme
+         9obizM0C3ozNmYHsi7lUhQIGaKT/Br4nuLulq8WoaCHOkuqxJMA1bY+CMXCC0ew5OUZ4
+         1jdQ0A+60hb3BK31NK4oiYIATEqSpKYaYoTbaF3+E58KDNOd+GbOm3KRIRxTxJKRucQs
+         fJJk6ss0ykBavcFxwDBDlUhiJ9dG27uWdOFRP7shyzkO7Uda44T+RDaamnaXQVhGcf2m
+         ufIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680227088;
+        d=1e100.net; s=20210112; t=1680227097;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sxm82ULq9HWZFwrrpsKKW1Wi+ka2XfyIhyEC8wmryEE=;
-        b=tqg+L83CPtpscg43BwtiglK85tsI9koLide8m1Hm8ps/AM08Caa5YbZNM15WlcsCU5
-         50B0PKUmdPO0cT4ogwbHo1HZwo/GucQewptkxlSS/OkYqWSkwcTsJDIsrC+0GhjPkuyF
-         21SWVrIkU0SHGBi3qij1LKDvMYzorFGEiZ58Cf3dLlVhbRSMd7VpWL29dN4jwwf86DTe
-         t/Wzs6gdqwdAJ6vCwjI8IibHXkSH6APXx9c1f6YEej0HC+LOgzijtvC1il4c2J8P3kt8
-         3noU6ecB0GFf4aQMzt5Tn5WEXBKiit10R3rQ+bhz79iba3cTQ3M1DdefVf/1/tZkt7k2
-         al2A==
-X-Gm-Message-State: AAQBX9fZFf9NkG+EEKN1fjEp+0L+8iyk9N6ofcEZSOmGcbsxdn6EDEmy
-	d0lwzlB3KPdHs8SI1ak5Jia+QZAuGMuw
-X-Google-Smtp-Source: AKy350YrvUZvdqqRk49vMMwHj65sbO9FBkTq3BlYniQySKvVZ2DnixnaTt5gk7E6TsmAi1IbV2hLrS2fnA3q
+        bh=mcnJNCHDCGQ7Pzom/y/MQEMC0VEcznZRpNuHkAP16dM=;
+        b=F4RN8CV6+F0CIlxnCQpNEocoXA9/0opw+ZneUasTf/MbR4M1a2FtLBjGyIW5DfamPw
+         7kN47r4WaVZa5uE1k8IxGeMKNw1T9+8aUGVqwOw9DGOa0e4zZXY6HfLkl6nYuCCY9b4J
+         ZlQKmn33wEsWgzX+XcFAmqTD7l5QM/IZ5XARUSb7cqxEd6tAk9nub5kEJ4rRcHO03CsV
+         hHmnmpl4JFGTVOCALVS4IKLN/degSfJ8fo5IXnjirOtFcq4eAGDsliZv48IlCotPCqFw
+         jIkvh2EKvt9zfBbsApId9ONTIynNDHDiM3XzNvgRLBMpmDHOXHmfVTS2rg5XssSK97vj
+         KWGQ==
+X-Gm-Message-State: AAQBX9dVrHPYhePlcozu84guge88svshcK7yPM4mBn6HgLpWYvZ7jxG1
+	yMt+rA9M2pcDCSeYugEcpR0NtPUT/O+o
+X-Google-Smtp-Source: AKy350Yd56UldAkJl7asDkNCi90KnSNtQkBy2kVHq8vFVuOOr9KiBt3/jvgItL1ugb+qYv+7kMO0tDmyjIK9
 X-Received: from davidai2.mtv.corp.google.com ([2620:15c:211:201:c162:24e8:ec5e:d520])
- (user=davidai job=sendgmr) by 2002:a05:6902:120c:b0:b74:77fa:581d with SMTP
- id s12-20020a056902120c00b00b7477fa581dmr13612793ybu.4.1680227088489; Thu, 30
- Mar 2023 18:44:48 -0700 (PDT)
-Date: Thu, 30 Mar 2023 18:43:48 -0700
+ (user=davidai job=sendgmr) by 2002:a25:344:0:b0:b27:4632:f651 with SMTP id
+ 65-20020a250344000000b00b274632f651mr12517637ybd.3.1680227097054; Thu, 30 Mar
+ 2023 18:44:57 -0700 (PDT)
+Date: Thu, 30 Mar 2023 18:43:49 -0700
 In-Reply-To: <20230331014356.1033759-1-davidai@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230331014356.1033759-1-davidai@google.com>
 X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <20230331014356.1033759-5-davidai@google.com>
-Subject: [RFC PATCH v2 4/6] kvm: arm64: Add support for get_freqtbl service
+Message-ID: <20230331014356.1033759-6-davidai@google.com>
+Subject: [RFC PATCH v2 5/6] dt-bindings: cpufreq: add bindings for virtual kvm cpufreq
 From: David Dai <davidai@google.com>
 To: "Rafael J. Wysocki" <rafael@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
 	Rob Herring <robh+dt@kernel.org>, 
@@ -66,202 +66,61 @@ Cc: Saravana Kannan <saravanak@google.com>, kernel-team@android.com, linux-pm@vg
 	kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
-This service allows guests to query the host for the frequency table
-of the CPU that the vCPU is currently running on.
+Add devicetree bindings for a virtual kvm cpufreq driver.
 
 Co-developed-by: Saravana Kannan <saravanak@google.com>
 Signed-off-by: Saravana Kannan <saravanak@google.com>
 Signed-off-by: David Dai <davidai@google.com>
 ---
- Documentation/virt/kvm/api.rst             |  8 ++++++++
- Documentation/virt/kvm/arm/get_freqtbl.rst | 23 ++++++++++++++++++++++
- Documentation/virt/kvm/arm/index.rst       |  1 +
- arch/arm64/include/uapi/asm/kvm.h          |  1 +
- arch/arm64/kvm/arm.c                       |  1 +
- arch/arm64/kvm/hypercalls.c                | 22 +++++++++++++++++++++
- include/linux/arm-smccc.h                  |  7 +++++++
- include/uapi/linux/kvm.h                   |  1 +
- tools/arch/arm64/include/uapi/asm/kvm.h    |  1 +
- 9 files changed, 65 insertions(+)
- create mode 100644 Documentation/virt/kvm/arm/get_freqtbl.rst
+ .../bindings/cpufreq/cpufreq-virtual-kvm.yaml | 39 +++++++++++++++++++
+ 1 file changed, 39 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/cpufreq/cpufreq-virtual-kvm.yaml
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 38ce33564efc..8f905456e2b4 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -8400,6 +8400,14 @@ after normalizing for architecture. This is useful when guests are tracking
- workload on its vCPUs. Util hints allow the host to make more accurate
- frequency selections and task placement for vCPU threads.
- 
-+8.42 KVM_CAP_GET_CPUFREQ_TBL
-+---------------------------
-+
-+:Architectures: arm64
-+
-+This capability indicates that the KVM supports getting the
-+frequency table of the current CPU that the vCPU thread is running on.
-+
- 9. Known KVM API problems
- =========================
- 
-diff --git a/Documentation/virt/kvm/arm/get_freqtbl.rst b/Documentation/virt/kvm/arm/get_freqtbl.rst
+diff --git a/Documentation/devicetree/bindings/cpufreq/cpufreq-virtual-kvm.yaml b/Documentation/devicetree/bindings/cpufreq/cpufreq-virtual-kvm.yaml
 new file mode 100644
-index 000000000000..f6832d7566e7
+index 000000000000..31e64558a7f1
 --- /dev/null
-+++ b/Documentation/virt/kvm/arm/get_freqtbl.rst
-@@ -0,0 +1,23 @@
-+.. SPDX-License-Identifier: GPL-2.0
++++ b/Documentation/devicetree/bindings/cpufreq/cpufreq-virtual-kvm.yaml
+@@ -0,0 +1,39 @@
++# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/cpufreq/cpufreq-virtual-kvm.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
-+get_freqtbl support for arm/arm64
-+=============================
++title: Virtual KVM CPUFreq
 +
-+Allows guest to query the frequency(in KHz) table of the current CPU that
-+the vCPU thread is running on.
++maintainers:
++  - David Dai <davidai@google.com>
 +
-+* ARM_SMCCC_VENDOR_HYP_KVM_GET_CPUFREQ_TBL_FUNC_ID: 0x86000042
++description: |
 +
-+This hypercall uses the SMC32/HVC32 calling convention:
++  KVM CPUFreq is a virtualized driver in guest kernels that sends utilization
++  of its vCPUs as a hint to the host. The host uses hint to schedule vCPU
++  threads and select CPU frequency. It enables accurate Per-Entity Load
++  Tracking for tasks running in the guest by querying host CPU frequency
++  unless a virtualized FIE exists(Like AMUs).
 +
-+ARM_SMCCC_VENDOR_HYP_KVM_GET_CPUFREQ_TBL_FUNC_ID
-+    ==============    ========    =====================================
-+    Function ID:      (uint32)    0x86000042
-+    Arguments:        (uint32)    index of the current CPU's frequency table
-+    Return Values:    (int32)     NOT_SUPPORTED(-1) on error, or
-+                      (uint32)    Frequency table entry of requested index
-+                                  in KHz
-+                                  of current CPU(r1)
-+    Endianness:                   Must be the same endianness
-+                                  as the host.
-+    ==============    ========    =====================================
-diff --git a/Documentation/virt/kvm/arm/index.rst b/Documentation/virt/kvm/arm/index.rst
-index f83877663813..e2e56bb41491 100644
---- a/Documentation/virt/kvm/arm/index.rst
-+++ b/Documentation/virt/kvm/arm/index.rst
-@@ -13,3 +13,4 @@ ARM
-    ptp_kvm
-    get_cur_cpufreq
-    util_hint
-+   get_freqtbl
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 61309ecb7241..ed6f593264bd 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -369,6 +369,7 @@ enum {
- 	KVM_REG_ARM_VENDOR_HYP_BIT_PTP		= 1,
- 	KVM_REG_ARM_VENDOR_HYP_BIT_GET_CUR_CPUFREQ	= 2,
- 	KVM_REG_ARM_VENDOR_HYP_BIT_UTIL_HINT		= 3,
-+	KVM_REG_ARM_VENDOR_HYP_BIT_GET_CPUFREQ_TBL	= 4,
- #ifdef __KERNEL__
- 	KVM_REG_ARM_VENDOR_HYP_BMAP_BIT_COUNT,
- #endif
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index bf3c4d4b9b67..cd76128e4af4 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -222,6 +222,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_SYSTEM_SUSPEND:
- 	case KVM_CAP_GET_CUR_CPUFREQ:
- 	case KVM_CAP_UTIL_HINT:
-+	case KVM_CAP_GET_CPUFREQ_TBL:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
-diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index 01dba07b5183..6f96579dda80 100644
---- a/arch/arm64/kvm/hypercalls.c
-+++ b/arch/arm64/kvm/hypercalls.c
-@@ -42,6 +42,22 @@ static void kvm_sched_set_util(struct kvm_vcpu *vcpu, u64 *val)
- 	val[0] = (u64)ret;
- }
- 
-+static void kvm_sched_get_cpufreq_table(struct kvm_vcpu *vcpu, u64 *val)
-+{
-+	struct cpufreq_policy *policy;
-+	u32 idx = smccc_get_arg1(vcpu);
++properties:
++  compatible:
++    const: virtual,kvm-cpufreq
 +
-+	policy = cpufreq_cpu_get(task_cpu(current));
++required:
++  - compatible
 +
-+	if (!policy)
-+		return;
++additionalProperties: false
 +
-+	val[0] = SMCCC_RET_SUCCESS;
-+	val[1] = policy->freq_table[idx].frequency;
++examples:
++  - |
++    {
++      #address-cells = <2>;
++      #size-cells = <2>;
 +
-+	cpufreq_cpu_put(policy);
-+}
++      cpufreq {
++            compatible = "virtual,kvm-cpufreq";
++      };
 +
- static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
- {
- 	struct system_time_snapshot systime_snapshot;
-@@ -148,6 +164,9 @@ static bool kvm_hvc_call_allowed(struct kvm_vcpu *vcpu, u32 func_id)
- 	case ARM_SMCCC_VENDOR_HYP_KVM_UTIL_HINT_FUNC_ID:
- 		return test_bit(KVM_REG_ARM_VENDOR_HYP_BIT_UTIL_HINT,
- 				&smccc_feat->vendor_hyp_bmap);
-+	case ARM_SMCCC_VENDOR_HYP_KVM_GET_CPUFREQ_TBL_FUNC_ID:
-+		return test_bit(KVM_REG_ARM_VENDOR_HYP_BIT_GET_CPUFREQ_TBL,
-+				&smccc_feat->vendor_hyp_bmap);
- 	default:
- 		return kvm_hvc_call_default_allowed(func_id);
- 	}
-@@ -251,6 +270,9 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
- 	case ARM_SMCCC_VENDOR_HYP_KVM_UTIL_HINT_FUNC_ID:
- 		kvm_sched_set_util(vcpu, val);
- 		break;
-+	case ARM_SMCCC_VENDOR_HYP_KVM_GET_CPUFREQ_TBL_FUNC_ID:
-+		kvm_sched_get_cpufreq_table(vcpu, val);
-+		break;
- 	case ARM_SMCCC_TRNG_VERSION:
- 	case ARM_SMCCC_TRNG_FEATURES:
- 	case ARM_SMCCC_TRNG_GET_UUID:
-diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-index 9f747e5025b6..19fefb73a9bd 100644
---- a/include/linux/arm-smccc.h
-+++ b/include/linux/arm-smccc.h
-@@ -114,6 +114,7 @@
- #define ARM_SMCCC_KVM_FUNC_PTP			1
- #define ARM_SMCCC_KVM_FUNC_GET_CUR_CPUFREQ	64
- #define ARM_SMCCC_KVM_FUNC_UTIL_HINT			65
-+#define ARM_SMCCC_KVM_FUNC_GET_CPUFREQ_TBL	66
- #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
- #define ARM_SMCCC_KVM_NUM_FUNCS			128
- 
-@@ -152,6 +153,12 @@
- 			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
- 			   ARM_SMCCC_KVM_FUNC_UTIL_HINT)
- 
-+#define ARM_SMCCC_VENDOR_HYP_KVM_GET_CPUFREQ_TBL_FUNC_ID		\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
-+			   ARM_SMCCC_KVM_FUNC_GET_CPUFREQ_TBL)
-+
- /* Paravirtualised time calls (defined by ARM DEN0057A) */
- #define ARM_SMCCC_HV_PV_TIME_FEATURES				\
- 	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 7f667ab344ae..90a7f37f046d 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1186,6 +1186,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_PMU_EVENT_MASKED_EVENTS 226
- #define KVM_CAP_GET_CUR_CPUFREQ 512
- #define KVM_CAP_UTIL_HINT 513
-+#define KVM_CAP_GET_CPUFREQ_TBL 514
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-diff --git a/tools/arch/arm64/include/uapi/asm/kvm.h b/tools/arch/arm64/include/uapi/asm/kvm.h
-index 61309ecb7241..ebf9a3395c1b 100644
---- a/tools/arch/arm64/include/uapi/asm/kvm.h
-+++ b/tools/arch/arm64/include/uapi/asm/kvm.h
-@@ -369,6 +369,7 @@ enum {
- 	KVM_REG_ARM_VENDOR_HYP_BIT_PTP		= 1,
- 	KVM_REG_ARM_VENDOR_HYP_BIT_GET_CUR_CPUFREQ	= 2,
- 	KVM_REG_ARM_VENDOR_HYP_BIT_UTIL_HINT		= 3,
-+	KVM_REG_ARM_VENDOR_HYP_BIT_CPUFREQ_TBL		= 4,
- #ifdef __KERNEL__
- 	KVM_REG_ARM_VENDOR_HYP_BMAP_BIT_COUNT,
- #endif
++    };
 -- 
 2.40.0.348.gf938b09366-goog
 
