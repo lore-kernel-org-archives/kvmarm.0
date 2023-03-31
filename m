@@ -1,107 +1,125 @@
-Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 004B8258B
-	for <kvmarm@lists.linux.dev>; Fri, 31 Mar 2023 12:42:16 +0000 (UTC)
-Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-17ab3a48158so23037679fac.1
-        for <kvmarm@lists.linux.dev>; Fri, 31 Mar 2023 05:42:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680266536;
-        h=date:subject:message-id:references:in-reply-to:cc:to:from
-         :mime-version:content-transfer-encoding:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=beHNZoTWpfe1Iychh8E+2Pd1ABXoxogRlM+B8js6fxY=;
-        b=7Uv4FLfEO71RTFT8Hc69+VQLoWdTS6CdGHWuehtdooDNBe1dSC+Ma/LY4Pl7p3xnl3
-         IZsFRbbCSeJl/5dU2P9iUYb7Yej5s0OE8/EQ/dq0i6y+nqkuoc09FdWDAmuQL/xJyGVO
-         EF7pgEr6ttni5IHjivQFkx7jeONXLtzCafW9vI10EtSef+x50JoAYMKAYr4Lqkm23CZP
-         OGu+Srtp/2fDrF+n03AbdNwDCAzrhIYRh//yfoB/c/MNO2wO5/xEQG5wmhwEGTtHVOKT
-         ub585H4jd+D1TxHbTPrPNY6eQx0Tk6lV9YCD516OT1d93MTTntFCDtRs9L2bIaAIiREn
-         gsWQ==
-X-Gm-Message-State: AAQBX9cSc9qGfJHtiE6pRk8PWsw6y0Np08t1E9HjukvOtVVpMowzNTfV
-	O6k39VAyhcq4Tq1fh+jLQg==
-X-Google-Smtp-Source: AKy350aZVWt7V5ZjS97pTxzJSN9yyHjuZdEBpdJxg6kf08veWsSig9HeD3mfdM5vIOgkoKYCiH1xbw==
-X-Received: by 2002:a05:6870:8a0d:b0:17a:ce6b:72c with SMTP id p13-20020a0568708a0d00b0017ace6b072cmr15564322oaq.51.1680266535933;
-        Fri, 31 Mar 2023 05:42:15 -0700 (PDT)
-Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id kw17-20020a056870ac1100b001802d3e181fsm902270oab.14.2023.03.31.05.42.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Mar 2023 05:42:15 -0700 (PDT)
-Received: (nullmailer pid 690279 invoked by uid 1000);
-	Fri, 31 Mar 2023 12:42:14 -0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E42F258B
+	for <kvmarm@lists.linux.dev>; Fri, 31 Mar 2023 12:47:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE7A0C43443
+	for <kvmarm@lists.linux.dev>; Fri, 31 Mar 2023 12:47:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1680266824;
+	bh=JCi9GVM3mtwp6mIWudeUCVrCJNL56Muu1u8evTBy+Wc=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=I/36sq5YnttrK9nAJ+yAGj5x1IpyNsT71dECgjcBoaca9HJKhneSL4z3L6otMFji3
+	 GOq/2hPGw6UR5D3BFyqa8TjCrqlFuvRJ66X/cG8E+mntKhf4ICBjJ1/dlYFYaA8Yc4
+	 3GOJIfyG2idba3EzDGv6X8RZkHCoFGp3To+lOAyj1M/UkxchL4VH7umv2G/l08/VkJ
+	 040/Tlts8qn+VMOCR3m6jTv81npE+cCzoTwDBNLfO737ZBVuuvzk56RjtGwkDwYKjy
+	 zS1THS9S28ejO0jvGJeBP3utl3TzvZ87rxeQgWfiyI1wWdXuonTWyuxIXtSJnqwwdw
+	 sn8dL7+KF2WSw==
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-536af432ee5so413379827b3.0
+        for <kvmarm@lists.linux.dev>; Fri, 31 Mar 2023 05:47:04 -0700 (PDT)
+X-Gm-Message-State: AAQBX9dBhG4HCKeyMaButRQ9YxpPO9NvUI3SBlbOp8bc9S2kXYdVpxLf
+	FFg5U/rNBwh73lyX7aziT/rE5YGLXFFoegN2+w==
+X-Google-Smtp-Source: AKy350aWaizMSmlvku55rVfJmDcUeUGwlpCsDANKH3NMxDTLCeFuL9w+bIkaybQ1c5aF0yC2W2Oz1NrI68bsVGHq5rA=
+X-Received: by 2002:a81:ae4f:0:b0:545:ed8e:f4f6 with SMTP id
+ g15-20020a81ae4f000000b00545ed8ef4f6mr9257438ywk.5.1680266823488; Fri, 31 Mar
+ 2023 05:47:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-From: Rob Herring <robh@kernel.org>
-To: David Dai <davidai@google.com>
-Cc: linux-doc@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, 
-	linux-pm@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>, 
-	Saravana Kannan <saravanak@google.com>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	linux-arm-kernel@lists.infradead.org, 
-	Dietmar Eggemann <dietmar.eggemann@arm.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Steven Rostedt <rostedt@goodmis.org>, Lorenzo Pieralisi <lpieralisi@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Juri Lelli <juri.lelli@redhat.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, kernel-team@android.com, 
-	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
-	Sudeep Holla <sudeep.holla@arm.com>, Viresh Kumar <viresh.kumar@linaro.org>, 
-	Marc Zyngier <maz@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, linux-kernel@vger.kernel.org, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Valentin Schneider <vschneid@redhat.com>, 
-	James Morse <james.morse@arm.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Ingo Molnar <mingo@redhat.com>, kvm@vger.kernel.org, devicetree@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Daniel Bristot de Oliveira <bristot@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Will Deacon <will@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
-	kvmarm@lists.linux.dev
+References: <20230331014356.1033759-1-davidai@google.com> <20230331014356.1033759-6-davidai@google.com>
 In-Reply-To: <20230331014356.1033759-6-davidai@google.com>
-References: <20230331014356.1033759-1-davidai@google.com>
- <20230331014356.1033759-6-davidai@google.com>
-Message-Id: <168026628573.685196.6713450502150551916.robh@kernel.org>
-Subject: Re: [RFC PATCH v2 5/6] dt-bindings: cpufreq: add bindings for
- virtual kvm cpufreq
-Date: Fri, 31 Mar 2023 07:42:14 -0500
+From: Rob Herring <robh+dt@kernel.org>
+Date: Fri, 31 Mar 2023 07:46:52 -0500
+X-Gmail-Original-Message-ID: <CAL_JsqJErVOZZ==i1HpMABfuVEDC+drboLTntMDB0sUC9ZdQ_Q@mail.gmail.com>
+Message-ID: <CAL_JsqJErVOZZ==i1HpMABfuVEDC+drboLTntMDB0sUC9ZdQ_Q@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 5/6] dt-bindings: cpufreq: add bindings for virtual
+ kvm cpufreq
+To: David Dai <davidai@google.com>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Lorenzo Pieralisi <lpieralisi@kernel.org>, Sudeep Holla <sudeep.holla@arm.com>, 
+	Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
+	Dietmar Eggemann <dietmar.eggemann@arm.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
+	Daniel Bristot de Oliveira <bristot@redhat.com>, Valentin Schneider <vschneid@redhat.com>, 
+	Saravana Kannan <saravanak@google.com>, kernel-team@android.com, linux-pm@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-On Thu, 30 Mar 2023 18:43:49 -0700, David Dai wrote:
+On Thu, Mar 30, 2023 at 8:45=E2=80=AFPM David Dai <davidai@google.com> wrot=
+e:
+>
 > Add devicetree bindings for a virtual kvm cpufreq driver.
-> 
+>
 > Co-developed-by: Saravana Kannan <saravanak@google.com>
 > Signed-off-by: Saravana Kannan <saravanak@google.com>
 > Signed-off-by: David Dai <davidai@google.com>
 > ---
 >  .../bindings/cpufreq/cpufreq-virtual-kvm.yaml | 39 +++++++++++++++++++
 >  1 file changed, 39 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/cpufreq/cpufreq-virtual-kvm.yaml
-> 
+>  create mode 100644 Documentation/devicetree/bindings/cpufreq/cpufreq-vir=
+tual-kvm.yaml
+>
+> diff --git a/Documentation/devicetree/bindings/cpufreq/cpufreq-virtual-kv=
+m.yaml b/Documentation/devicetree/bindings/cpufreq/cpufreq-virtual-kvm.yaml
+> new file mode 100644
+> index 000000000000..31e64558a7f1
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/cpufreq/cpufreq-virtual-kvm.yaml
+> @@ -0,0 +1,39 @@
+> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/cpufreq/cpufreq-virtual-kvm.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Virtual KVM CPUFreq
+> +
+> +maintainers:
+> +  - David Dai <davidai@google.com>
+> +
+> +description: |
+> +
+> +  KVM CPUFreq is a virtualized driver in guest kernels that sends utiliz=
+ation
+> +  of its vCPUs as a hint to the host. The host uses hint to schedule vCP=
+U
+> +  threads and select CPU frequency. It enables accurate Per-Entity Load
+> +  Tracking for tasks running in the guest by querying host CPU frequency
+> +  unless a virtualized FIE exists(Like AMUs).
+> +
+> +properties:
+> +  compatible:
+> +    const: virtual,kvm-cpufreq
+> +
+> +required:
+> +  - compatible
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    {
+> +      #address-cells =3D <2>;
+> +      #size-cells =3D <2>;
+> +
+> +      cpufreq {
+> +            compatible =3D "virtual,kvm-cpufreq";
+> +      };
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
+The same thing was tried on non-virtual h/w too. This is not a device
+so it doesn't go in DT. It is just an abuse of DT as a kernel driver
+instantiation mechanism.
 
-yamllint warnings/errors:
-
-dtschema/dtc warnings/errors:
-Error: Documentation/devicetree/bindings/cpufreq/cpufreq-virtual-kvm.example.dts:18.9-10 syntax error
-FATAL ERROR: Unable to parse input tree
-make[1]: *** [scripts/Makefile.lib:419: Documentation/devicetree/bindings/cpufreq/cpufreq-virtual-kvm.example.dtb] Error 1
-make[1]: *** Waiting for unfinished jobs....
-make: *** [Makefile:1512: dt_binding_check] Error 2
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20230331014356.1033759-6-davidai@google.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+Rob
