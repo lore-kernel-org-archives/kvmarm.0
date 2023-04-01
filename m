@@ -1,285 +1,184 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 688EF3D63
-	for <kvmarm@lists.linux.dev>; Fri, 31 Mar 2023 19:13:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E455C433EF;
-	Fri, 31 Mar 2023 19:13:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1680290008;
-	bh=qTLcW2B2aPxiQh4sSHJRGzaYYWFUKxo+JL7LBEZqDqk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iJOJJc0/UAaEIIYeIa2bMU+eB36/aPQeqG7MuBphA4BltwDfRlDk8kQY2n+iDOwXv
-	 am0cOAkd2oZL556EnvW8W1rkopph7dYXN2fKq9dQDM1sN1Drf1/cDFG5zTqyqVE/mG
-	 GQPJMofxioJOdrsC7kbqjZBfoIPcQKQ/z9BtoNlihcsTmEPGhf0IhR1DjqsFcDjDmN
-	 3uVPCpxrqaG5ss1W5BbCK+GDnr/02fOHs0RJgZ6NZ27R/4DsNU7O24XS0WaFqxTuJR
-	 G6I+4/8a+4G8DiyA5yxS2kfJEsh9mOYCM4c6xye63gISaBTY8lPIWGJrIu6Aoqea88
-	 2uqjxksLBA/rA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1piKBh-004nf8-Ox;
-	Fri, 31 Mar 2023 20:13:25 +0100
-Date: Fri, 31 Mar 2023 20:13:24 +0100
-Message-ID: <864jq0wx7v.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB6115A3
+	for <kvmarm@lists.linux.dev>; Sat,  1 Apr 2023 03:12:20 +0000 (UTC)
+Received: by mail-pl1-f178.google.com with SMTP id ix20so23195068plb.3
+        for <kvmarm@lists.linux.dev>; Fri, 31 Mar 2023 20:12:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1680318739;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GMsqA2/S4acnYNFGSszhcxD2t1ID/uK62fRiA76JiBA=;
+        b=izzE5BwTcnLtWXiLFvb1b1GiNKSO8qGbitdSPuU2w3doJeL1SXvD/0YcRCbyPbSHd0
+         LJwJSLBiDslPaI69lmy9Y/1xjuqTF2IXhiJ8wNO0q2bY7aTUTx/B/sgRoZFeuoGkJ6wA
+         rNdMRDFWVWTizj4ktebC7jnALxztJWSYdPqf2/gQSMTizk+5ibKtsgavvHVVIoewpNJT
+         fsfUbERSIZUx5xKiNwnld9prEvcpmyju0cY2+8iMbiB9tuZCpC6ZGmadcu0dWe3w5hyx
+         2hhXx2L3psFIFJb0tN83ePDQsMHg7eNPqt3ZzfYzibSAlBikvflC3XtoU4IgYDVIoPzb
+         1dJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680318739;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GMsqA2/S4acnYNFGSszhcxD2t1ID/uK62fRiA76JiBA=;
+        b=zpOrOFPGFUWUUZnjs9ww+xylJ8/xGvKPHIbfZq8HQ04z46R7vU9Z5vL1ehayJZPGU/
+         LWWDl2HiTmidTuhd08xBRXPlG7SczyPc1G5Foz0+j3LCcKKSv86jMiW7FQhlOnWApXFh
+         IkZ/hOnwkEVbnHgH+5R3Y/xYUcP0GEjD0XsEKV0ZLqAtR1nAjuL2xTjgXuibXidTYyWQ
+         Hdsl0AqEvghNtoXKW6vJuOcrw5qTBAR3AkHTlJ7edL1n/sM0rFnUwEjcGDcTJb1iWFZ3
+         Ll5M/mOOXw3ngfdrVes8THI8Kg+tcSlurOhz0DPYKMMXf55eG3EX/pIIJceAN5SkH5SE
+         sNfw==
+X-Gm-Message-State: AAQBX9c7w+UY65eiucSIitRPvgKgaICf5s3gFXkunXZTNMEcvh3atdED
+	p5b9TN7HWyOXCsw2swZnKRw=
+X-Google-Smtp-Source: AKy350bPTa+6wCaLlfIe0t8Z/dZpxNsv/Fw1CdcxoSM2Sy7O3EUGDsMbmYmRcGqE3Vk4WsBjOQymQA==
+X-Received: by 2002:a17:902:fa43:b0:1a1:a8db:495d with SMTP id lb3-20020a170902fa4300b001a1a8db495dmr22990145plb.4.1680318739546;
+        Fri, 31 Mar 2023 20:12:19 -0700 (PDT)
+Received: from debian.me (subs02-180-214-232-71.three.co.id. [180.214.232.71])
+        by smtp.gmail.com with ESMTPSA id w15-20020a1709027b8f00b0019f789cddccsm2292207pll.19.2023.03.31.20.12.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 31 Mar 2023 20:12:19 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+	id 31AA4101622; Sat,  1 Apr 2023 10:12:15 +0700 (WIB)
+Date: Sat, 1 Apr 2023 10:12:15 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: David Dai <davidai@google.com>, "Rafael J. Wysocki" <rafael@kernel.org>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
 	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Salil Mehta <salil.mehta@huawei.com>
-Subject: Re: [PATCH v2 09/13] KVM: arm64: Indroduce support for userspace SMCCC filtering
-In-Reply-To: <20230330154918.4014761-10-oliver.upton@linux.dev>
-References: <20230330154918.4014761-1-oliver.upton@linux.dev>
-	<20230330154918.4014761-10-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Sudeep Holla <sudeep.holla@arm.com>, Ingo Molnar <mingo@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+	Daniel Bristot de Oliveira <bristot@redhat.com>,
+	Valentin Schneider <vschneid@redhat.com>
+Cc: Saravana Kannan <saravanak@google.com>, kernel-team@android.com,
+	linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [RFC PATCH v2 2/6] kvm: arm64: Add support for get_cur_cpufreq
+ service
+Message-ID: <ZCehD15QJyDapG3u@debian.me>
+References: <20230331014356.1033759-1-davidai@google.com>
+ <20230331014356.1033759-3-davidai@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, pbonzini@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seanjc@google.com, salil.mehta@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230331014356.1033759-3-davidai@google.com>
 
-On Thu, 30 Mar 2023 16:49:14 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-
-nit: typo in the subject. Also, this isn't so much about filtering,
-but forwarding.
-
-> 
-> As the SMCCC (and related specifications) march towards an 'everything
-> and the kitchen sink' interface for interacting with a system it becomes
-> less likely that KVM will support every related feature. We could do
-> better by letting userspace have a crack at it instead.
-> 
-> Allow userspace to define an 'SMCCC filter' that applies to both HVCs
-> and SMCs initiated by the guest. Supporting both conduits with this
-> interface is important for a couple of reasons. Guest SMC usage is table
-> stakes for a nested guest, as HVCs are always taken to the virtual EL2.
-> Additionally, guests may want to interact with a service on the secure
-> side which can now be proxied by userspace.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  Documentation/virt/kvm/devices/vm.rst | 76 +++++++++++++++++++++++++++
->  arch/arm64/include/uapi/asm/kvm.h     | 11 ++++
->  arch/arm64/kvm/arm.c                  |  4 ++
->  arch/arm64/kvm/hypercalls.c           | 58 ++++++++++++++++++++
->  include/kvm/arm_hypercalls.h          |  3 ++
->  5 files changed, 152 insertions(+)
-> 
-> diff --git a/Documentation/virt/kvm/devices/vm.rst b/Documentation/virt/kvm/devices/vm.rst
-> index 147efec626e5..f56c159cac19 100644
-> --- a/Documentation/virt/kvm/devices/vm.rst
-> +++ b/Documentation/virt/kvm/devices/vm.rst
-> @@ -321,3 +321,79 @@ Allows userspace to query the status of migration mode.
->  	     if it is enabled
->  :Returns:   -EFAULT if the given address is not accessible from kernel space;
->  	    0 in case of success.
-> +
-> +6. GROUP: KVM_ARM_VM_SMCCC_CTRL
-> +===============================
+On Thu, Mar 30, 2023 at 06:43:46PM -0700, David Dai wrote:
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 62de0768d6aa..b0ff0ad700bf 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -8380,6 +8380,14 @@ structure.
+>  When getting the Modified Change Topology Report value, the attr->addr
+>  must point to a byte where the value will be stored or retrieved from.
+>  
+> +8.40 KVM_CAP_GET_CUR_CPUFREQ
+> +------------------------
 > +
 > +:Architectures: arm64
 > +
-> +6.1. ATTRIBUTE: KVM_ARM_VM_SMCCC_FILTER (w/o)
-> +---------------------------------------------
+> +This capability indicates that KVM supports getting the
+> +frequency of the current CPU that the vCPU thread is running on.
 > +
-> +:Parameters: Pointer to a ``struct kvm_smccc_filter``
-> +
-> +:Returns:
-> +
-> +        =======  ===========================================
-> +        -EPERM   Range intersects with a reserved range
-> +        -EEXIST  Range intersects with a previously inserted
-> +                 range
-> +        -EBUSY   A vCPU in the VM has already run
-> +        -EINVAL  Invalid filter configuration
-> +        -ENOMEM  Failed to allocate memory for the in-kernel
-> +                 representation of the SMCCC filter
-> +        =======  ===========================================
-> +
-> +Requests the installation of an SMCCC call filter described as follows::
-> +
-> +    enum kvm_smccc_filter_action {
-> +            KVM_SMCCC_FILTER_ALLOW = 0,
-> +            KVM_SMCCC_FILTER_DENY,
-> +            KVM_SMCCC_FILTER_FWD_TO_USER,
-> +    };
-> +
-> +    struct kvm_smccc_filter {
-> +            __u32 base;
-> +            __u32 nr_functions;
-> +            __u8 action;
-> +            __u8 pad[7];
-
-If I could add one word (pun intended) here, I'd add an extra 64bit of
-padding, just in case we end-up needing to pass an address, or
-something else.
-
-> +    };
-> +
-> +The filter is defined as a set of non-overlapping ranges. Each
-> +range defines an action to be applied to SMCCC calls within the range.
-> +Userspace can insert multiple ranges into the filter by using
-> +successive calls to this attribute.
-> +
-> +The default configuration of KVM is such that all implemented SMCCC
-> +calls are allowed. Thus, the SMCCC filter can be defined sparsely
-> +by userspace, only describing ranges that modify the default behavior.
-> +
-> +The range expressed by ``struct kvm_smccc_filter`` is
-> +[``base``, ``base + nr_functions``).
-> +
-> +The SMCCC filter applies to both SMC and HVC calls initiated by the
-> +guest. The SMCCC filter gates the in-kernel emulation of SMCCC calls
-> +and as such takes effect before other interfaces that interact with
-> +SMCCC calls (e.g. hypercall bitmap registers).
-> +
-> +Actions:
-> +
-> + - ``KVM_SMCCC_FILTER_ALLOW``: Allows the guest SMCCC call to be
-> +   handled in-kernel. It is strongly recommended that userspace *not*
-> +   explicitly describe the allowed SMCCC call ranges.
-> +
-> + - ``KVM_SMCCC_FILTER_DENY``: Rejects the guest SMCCC call in-kernel
-> +   and returns to the guest.
-> +
-> + - ``KVM_SMCCC_FILTER_FWD_TO_USER``: The guest SMCCC call is forwarded
-> +   to userspace with an exit reason of ``KVM_EXIT_HYPERCALL``.
-> +
-> +KVM reserves the 'Arm Architecture Calls' range of function IDs and
-> +will reject attempts to define a filter for any portion of these ranges:
-> +
-> +        =========== ===============
-> +        Start       End (inclusive)
-> +        =========== ===============
-> +        0x8000_0000 0x8000_FFFF
-> +        0xC000_0000 0xC000_FFFF
-> +        =========== ===============
-
-You also may want to call out that all padding fields must be set to 0.
-
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index 1dabb7d05514..ba188562b7e0 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -372,6 +372,10 @@ enum {
->  #endif
->  };
+>  9. Known KVM API problems
+>  =========================
 >  
-> +/* Device Control API on vm fd */
-> +#define KVM_ARM_VM_SMCCC_CTRL		0
-> +#define   KVM_ARM_VM_SMCCC_FILTER	0
+> diff --git a/Documentation/virt/kvm/arm/get_cur_cpufreq.rst b/Documentation/virt/kvm/arm/get_cur_cpufreq.rst
+> new file mode 100644
+> index 000000000000..06e0ed5b3868
+> --- /dev/null
+> +++ b/Documentation/virt/kvm/arm/get_cur_cpufreq.rst
+> @@ -0,0 +1,21 @@
+> +.. SPDX-License-Identifier: GPL-2.0
 > +
->  /* Device Control API: ARM VGIC */
->  #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
->  #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS	1
-> @@ -479,6 +483,13 @@ enum kvm_smccc_filter_action {
->  #endif
->  };
->  
-> +struct kvm_smccc_filter {
-> +	__u32 base;
-> +	__u32 nr_functions;
-> +	__u8 action;
-> +	__u8 pad[7];
-> +};
+> +get_cur_cpufreq support for arm/arm64
+> +=============================
 > +
->  /* arm64-specific KVM_EXIT_HYPERCALL flags */
->  #define KVM_HYPERCALL_EXIT_SMC	(1U << 0)
->  
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 1202ac03bee0..efee032c9560 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1444,6 +1444,8 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
->  static int kvm_vm_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
->  {
->  	switch (attr->group) {
-> +	case KVM_ARM_VM_SMCCC_CTRL:
-> +		return kvm_vm_smccc_has_attr(kvm, attr);
->  	default:
->  		return -ENXIO;
->  	}
-> @@ -1452,6 +1454,8 @@ static int kvm_vm_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
->  static int kvm_vm_set_attr(struct kvm *kvm, struct kvm_device_attr *attr)
->  {
->  	switch (attr->group) {
-> +	case KVM_ARM_VM_SMCCC_CTRL:
-> +		return kvm_vm_smccc_set_attr(kvm, attr);
->  	default:
->  		return -ENXIO;
->  	}
-> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-> index 7e8c850847c1..6b371d8fb3c0 100644
-> --- a/arch/arm64/kvm/hypercalls.c
-> +++ b/arch/arm64/kvm/hypercalls.c
-> @@ -145,6 +145,42 @@ static void init_smccc_filter(struct kvm *kvm)
->  	WARN_ON_ONCE(r);
->  }
->  
-> +static int kvm_smccc_set_filter(struct kvm *kvm, struct kvm_smccc_filter __user *uaddr)
-> +{
-> +	struct kvm_smccc_filter filter;
-> +	unsigned long start, end;
-> +	int r;
+> +Get_cur_cpufreq support is used to get current frequency(in KHz) of the
+> +current CPU that the vCPU thread is running on.
 > +
-> +	if (copy_from_user(&filter, uaddr, sizeof(filter)))
-> +		return -EFAULT;
+> +* ARM_SMCCC_VENDOR_HYP_KVM_GET_CUR_CPUFREQ_FUNC_ID: 0x86000040
 > +
-> +	mutex_lock(&kvm->lock);
+> +This hypercall uses the SMC32/HVC32 calling convention:
 > +
-> +	if (kvm_vm_has_ran_once(kvm)) {
-> +		r = -EBUSY;
-> +		goto out_unlock;
-> +	}
-> +
-> +	if (!filter.nr_functions || filter.action >= NR_SMCCC_FILTER_ACTIONS) {
-> +		r = -EINVAL;
-> +		goto out_unlock;
-> +	}
+> +ARM_SMCCC_VENDOR_HYP_KVM_GET_CUR_CPUFREQ_FUNC_ID
+> +    ==============    ========    =====================================
+> +    Function ID:      (uint32)    0x86000040
+> +    Return Values:    (int32)     NOT_SUPPORTED(-1) on error, or
+> +                      (uint32)    Frequency in KHz of current CPU that the
+> +                                  vCPU thread is running on.
+> +    Endianness:                   Must be the same endianness
+> +                                  as the host.
+> +    ==============    ========    =====================================
 
-Also check that the padding fields are set to 0 until we have a better
-use for them.
+Sphinx reports htmldocs warnings:
+/home/bagas/repo/linux-kernel/Documentation/virt/kvm/api.rst:8384: WARNING: Title underline too short.
 
-> +
-> +	start = filter.base;
-> +	end = start + filter.nr_functions - 1;
-> +
-> +	r = mtree_insert_range(&kvm->arch.smccc_filter, start, end,
-> +			       xa_mk_value(filter.action), GFP_KERNEL_ACCOUNT);
-> +	if (r)
-> +		goto out_unlock;
-> +
-> +	set_bit(KVM_ARCH_FLAG_SMCCC_FILTER_CONFIGURED, &kvm->arch.flags);
-> +
-> +out_unlock:
-> +	mutex_unlock(&kvm->lock);
-> +	return r;
-> +}
-> +
+8.40 KVM_CAP_GET_CUR_CPUFREQ
+------------------------
+/home/bagas/repo/linux-kernel/Documentation/virt/kvm/api.rst:8384: WARNING: Title underline too short.
 
-Just a though: it'd be interesting to have a debugfs file dumping the
-content of the maple tree, if only to figure out what it going on when
-doing some userspace hacking. Not something that's needed right now
-though.
+8.40 KVM_CAP_GET_CUR_CPUFREQ
+------------------------
+/home/bagas/repo/linux-kernel/Documentation/virt/kvm/api.rst:8404: WARNING: Title underline too short.
 
-Thanks,
+I have applied the fixup:
 
-	M.
+---- >8 ----
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 8f905456e2b4a1..baf8a4c43b5839 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -8381,7 +8381,7 @@ When getting the Modified Change Topology Report value, the attr->addr
+ must point to a byte where the value will be stored or retrieved from.
+ 
+ 8.40 KVM_CAP_GET_CUR_CPUFREQ
+-------------------------
++----------------------------
+ 
+ :Architectures: arm64
+ 
+diff --git a/Documentation/virt/kvm/arm/get_cur_cpufreq.rst b/Documentation/virt/kvm/arm/get_cur_cpufreq.rst
+index 06e0ed5b3868d7..76f112efb99f92 100644
+--- a/Documentation/virt/kvm/arm/get_cur_cpufreq.rst
++++ b/Documentation/virt/kvm/arm/get_cur_cpufreq.rst
+@@ -11,11 +11,12 @@ current CPU that the vCPU thread is running on.
+ This hypercall uses the SMC32/HVC32 calling convention:
+ 
+ ARM_SMCCC_VENDOR_HYP_KVM_GET_CUR_CPUFREQ_FUNC_ID
+-    ==============    ========    =====================================
++
++    ==============    ========    ========================================
+     Function ID:      (uint32)    0x86000040
+     Return Values:    (int32)     NOT_SUPPORTED(-1) on error, or
+                       (uint32)    Frequency in KHz of current CPU that the
+                                   vCPU thread is running on.
+     Endianness:                   Must be the same endianness
+                                   as the host.
+-    ==============    ========    =====================================
++    ==============    ========    ========================================
+
+Thanks.
 
 -- 
-Without deviation from the norm, progress is not possible.
+An old man doll... just what I always wanted! - Clara
