@@ -1,45 +1,45 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 478BD17C7
-	for <kvmarm@lists.linux.dev>; Sat,  1 Apr 2023 03:16:38 +0000 (UTC)
-Received: by mail-pf1-f169.google.com with SMTP id bt19so16023746pfb.3
-        for <kvmarm@lists.linux.dev>; Fri, 31 Mar 2023 20:16:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C8A817C7
+	for <kvmarm@lists.linux.dev>; Sat,  1 Apr 2023 03:22:07 +0000 (UTC)
+Received: by mail-pj1-f47.google.com with SMTP id f6-20020a17090ac28600b0023b9bf9eb63so25455330pjt.5
+        for <kvmarm@lists.linux.dev>; Fri, 31 Mar 2023 20:22:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680318997;
+        d=gmail.com; s=20210112; t=1680319327;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=79ylBJyUuKCfX3ZxdsB4JMPHnnU1cgFoSf6oewBvv5w=;
-        b=CITX2gGMskHEG30ZV9Yj3YnOYVFONDGOgdxe9zRM4KIrfzfNF///FH4sySwtZLWFbU
-         UF8sDnXSO2eSi8qzI1LfDkfmOr97MpbauQXI4vu3yWNXGzo+kOJKoIvxWA4AOsPZnWsq
-         N5TSgJPcA9RWISqLPTtiPER8GkQwURt3YuJsU5AO8goHQSyb8TFE+ZEh2BZjKT4h3xXK
-         VdYvlB6nYxVORw7M0hIPzK/1tl36LzJw/FI8Ui1DfW25VM8z5zkgHSpI8INy18VCE7qt
-         5Ikd9d/umeoOiIx3egjRpa3ByrcM233DXuidm7sr6SDXsG34rkqXpWVLgW1GX7C4k7Ns
-         q2Tg==
+        bh=cr5tBYy38ZZC28ZSszUi1K8vp86NGKalcc5lCrnyDOk=;
+        b=Aq5zoNHoBZWN6EFETU/CMM0feLdgHGCSqNclgQmWBifRyVilDdbU9ETOmOHRt7jpOp
+         O2cq+76kq8X8T/9qXOMfQYuGTvz0PcqPSBAfI4lcPkqahI8xFYHM5D2xhmwxKgRXcqqW
+         IZZIKKxs3n1mcM49yZojPokiY2bbJ04G+GPc19RVhXQR6GkBseKQjCydZM68LDglrtCG
+         /JxD3mhhllqj++aT+GN5RofKg/qK3crM3hiyCkL7xl3lu+E9fZO8FLMqBxjQNsRMtIMU
+         hurlJWu8Lso4YHDW+Da7UiYrysjuMkNlReuIYd067eyOgtld5iXC9yCPwAr0Ygh0YT0L
+         mYGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680318997;
+        d=1e100.net; s=20210112; t=1680319327;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=79ylBJyUuKCfX3ZxdsB4JMPHnnU1cgFoSf6oewBvv5w=;
-        b=TZwdx6aGqJq25ClTVftwWyCz1RkBUyUqBZN+cayvQn9F+pAhVBI2NK2AvPo/j3uNub
-         zor8sGsrOxS/rSQi4Fu04actvsP59QLdK4Iezdl6NaD8ZoCGppfe6AEURgKUhzbjguQO
-         F1of4BPyBgtsNV6jmT2/erok8aRBssrHt/0/+1LefYYTTKQcGQfGFyI/RzxfokXrwpbB
-         CTyEntF+pfU9NM98WNF9IUHIj5WTn59d/ADeg5/TKFUw+J/0Vbu5TPGj3RXm2UK4YFXk
-         9yThFLsBdNqlMHaNn4wCGju8eDLgLKWigivztx3i6MtMdBSo++yjdiioOQRWj6YPE+t8
-         Xu4A==
-X-Gm-Message-State: AAQBX9fVTCKzNMJL2z7PEabQ5WmucPcAWsaaSEbQLSNWe1v2u617nOw6
-	IFyISUlUfyO55mM+ZBSD0y0=
-X-Google-Smtp-Source: AKy350bGIqAs1SBqSZR0gpCSzc6Nc3BIpAhebt7KaGMdoRUh6/Pz7XXFbO2a23KrtG/+AMuaYGQ0Cw==
-X-Received: by 2002:a62:84c4:0:b0:628:134b:6b1c with SMTP id k187-20020a6284c4000000b00628134b6b1cmr32103216pfd.2.1680318997346;
-        Fri, 31 Mar 2023 20:16:37 -0700 (PDT)
+        bh=cr5tBYy38ZZC28ZSszUi1K8vp86NGKalcc5lCrnyDOk=;
+        b=ifS29zO1wQWbLIAF8jM9L6TuTjx3bqZEmWnx2i3NBnDB6pVA/M1iHfGOJxV9UKdEX/
+         tr+kLjNeIpc/RomFxoCrgLJ0nXcefeLxDtXeOJXG4VllvYNfStjTFJKFIliC/c0Iv1GG
+         kSZCAGyIb3xTWpyEqJpX7hu3lcBBs1/ghZP5GFRI0KbpY46n5PCvkfDqpkoimzYDvhzC
+         g7w9CdKQRNBerRcvYj/rwmrt8GKZvLEy14gpQ4n9isKkkwxU8AVq4qjmxnySMFT8G3J9
+         tTn4vKJpJf3Wdj0yZfQJ5IjKnGs8hUjoT/7Eep+tD67u283F30xufQ2ULDsAkm8klkZ/
+         q+pw==
+X-Gm-Message-State: AAQBX9eq6gz3oxtRRm+VV8hr3n9czOqesry9YoPoFiuX6tjhCjDu5WzS
+	9smaRfCN9XJNH9MhXcUik1I=
+X-Google-Smtp-Source: AKy350YGFMuDhx0aSeePnUv3R6G4bO3noCPXvwRe1lziEoVTbG6Z/ygQOSd4JNEdETFa5URzlDbirg==
+X-Received: by 2002:a17:903:2343:b0:1a1:abcc:e44e with SMTP id c3-20020a170903234300b001a1abcce44emr35392488plh.9.1680319326990;
+        Fri, 31 Mar 2023 20:22:06 -0700 (PDT)
 Received: from debian.me (subs02-180-214-232-71.three.co.id. [180.214.232.71])
-        by smtp.gmail.com with ESMTPSA id s7-20020a62e707000000b0062dad805b76sm2576403pfh.143.2023.03.31.20.16.36
+        by smtp.gmail.com with ESMTPSA id d19-20020a170902b71300b0019ac23cb6edsm2257266pls.181.2023.03.31.20.22.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Mar 2023 20:16:37 -0700 (PDT)
+        Fri, 31 Mar 2023 20:22:06 -0700 (PDT)
 Received: by debian.me (Postfix, from userid 1000)
-	id 260711067F1; Sat,  1 Apr 2023 10:16:34 +0700 (WIB)
-Date: Sat, 1 Apr 2023 10:16:33 +0700
+	id 447A1102ED5; Sat,  1 Apr 2023 10:22:04 +0700 (WIB)
+Date: Sat, 1 Apr 2023 10:22:04 +0700
 From: Bagas Sanjaya <bagasdotme@gmail.com>
 To: David Dai <davidai@google.com>, "Rafael J. Wysocki" <rafael@kernel.org>,
 	Viresh Kumar <viresh.kumar@linaro.org>,
@@ -68,11 +68,10 @@ Cc: Saravana Kannan <saravanak@google.com>, kernel-team@android.com,
 	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [RFC PATCH v2 2/6] kvm: arm64: Add support for get_cur_cpufreq
- service
-Message-ID: <ZCeiEbrZHyYVZYuh@debian.me>
+Subject: Re: [RFC PATCH v2 3/6] kvm: arm64: Add support for util_hint service
+Message-ID: <ZCejXGfh6Hx2NCLi@debian.me>
 References: <20230331014356.1033759-1-davidai@google.com>
- <20230331014356.1033759-3-davidai@google.com>
+ <20230331014356.1033759-4-davidai@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -81,28 +80,57 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230331014356.1033759-3-davidai@google.com>
+In-Reply-To: <20230331014356.1033759-4-davidai@google.com>
 
-On Thu, Mar 30, 2023 at 06:43:46PM -0700, David Dai wrote:
-> +get_cur_cpufreq support for arm/arm64
-> +=============================
+On Thu, Mar 30, 2023 at 06:43:47PM -0700, David Dai wrote:
+> +ARM_SMCCC_HYP_KVM_UTIL_HINT_FUNC_ID
+> +    ==============    =========   ============================
+> +    Function ID:      (uint32)    0x86000041
+> +    Arguments:        (uint32)    util value(0-1024) where 1024 represents
+> +                                  the highest performance point normalized
+> +                                  across all CPUs
+> +    Return values:    (int32)     NOT_SUPPORTED(-1) on error.
+> +    Endianness:                   Must be the same endianness
+> +                                  as the host.
+> +    ==============    ========    ============================
 
-Oops, I have to also fix this heading too:
+Sphinx reports htmldocs warning:
+/home/bagas/repo/linux-kernel/Documentation/virt/kvm/arm/util_hint.rst:21: WARNING: Malformed table.
+Column span alignment problem in table line 8.
+
+==============    =========   ============================
+Function ID:      (uint32)    0x86000041
+Arguments:        (uint32)    util value(0-1024) where 1024 represents
+                              the highest performance point normalized
+                              across all CPUs
+Return values:    (int32)     NOT_SUPPORTED(-1) on error.
+Endianness:                   Must be the same endianness
+                              as the host.
+==============    ========    ============================
+
+I have to fix the table:
 
 ---- >8 ----
-diff --git a/Documentation/virt/kvm/arm/get_cur_cpufreq.rst b/Documentation/virt/kvm/arm/get_cur_cpufreq.rst
-index 76f112efb99f92..21c2b2fe0c8acf 100644
---- a/Documentation/virt/kvm/arm/get_cur_cpufreq.rst
-+++ b/Documentation/virt/kvm/arm/get_cur_cpufreq.rst
-@@ -1,7 +1,7 @@
- .. SPDX-License-Identifier: GPL-2.0
+diff --git a/Documentation/virt/kvm/arm/util_hint.rst b/Documentation/virt/kvm/arm/util_hint.rst
+index 262d142d62d91e..99e5bf99446d90 100644
+--- a/Documentation/virt/kvm/arm/util_hint.rst
++++ b/Documentation/virt/kvm/arm/util_hint.rst
+@@ -11,7 +11,8 @@ to the host.
+ This hypercall using the SMC32/HVC32 calling convention:
  
- get_cur_cpufreq support for arm/arm64
--=============================
-+=====================================
- 
- Get_cur_cpufreq support is used to get current frequency(in KHz) of the
- current CPU that the vCPU thread is running on.
+ ARM_SMCCC_HYP_KVM_UTIL_HINT_FUNC_ID
+-    ==============    =========   ============================
++
++    ==============    =========   ========================================
+     Function ID:      (uint32)    0x86000041
+     Arguments:        (uint32)    util value(0-1024) where 1024 represents
+                                   the highest performance point normalized
+@@ -19,4 +20,4 @@ ARM_SMCCC_HYP_KVM_UTIL_HINT_FUNC_ID
+     Return values:    (int32)     NOT_SUPPORTED(-1) on error.
+     Endianness:                   Must be the same endianness
+                                   as the host.
+-    ==============    ========    ============================
++    ==============    =========   ========================================
 
 Thanks.
 
