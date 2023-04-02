@@ -1,183 +1,148 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E26817C7
-	for <kvmarm@lists.linux.dev>; Sat,  1 Apr 2023 03:28:25 +0000 (UTC)
-Received: by mail-pl1-f177.google.com with SMTP id w4so23180762plg.9
-        for <kvmarm@lists.linux.dev>; Fri, 31 Mar 2023 20:28:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15F473C39
+	for <kvmarm@lists.linux.dev>; Sun,  2 Apr 2023 13:48:07 +0000 (UTC)
+Received: by mail-lf1-f44.google.com with SMTP id h25so34775924lfv.6
+        for <kvmarm@lists.linux.dev>; Sun, 02 Apr 2023 06:48:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680319704;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1aOQ4eYy8N4YCSiaLMCwB/yerXMVOmw3wp9ck3pUmQA=;
-        b=Ok8vzWQ0fTWrdQmBekE/vwQkYJaeU+hCLGvU18l6tpgh+LY+guFyw1PCOkt6cTIDi2
-         Bi2rSAQ4ZWcSGNL5VXFZfhfY9W+UUMxFc836pBNMtI/YKiNa3lkmWiIeZkq/HOE2i6v1
-         CrYVfVRFvUIKsb9OYQYZttYR9+0qI6gi6G2q3B6O6heI5B6NINqaX8Decf4bPIdmgNnw
-         OaJfm9V/8H+3AActZ4CZ6pmApo3U2T1Addxc3QfoMJxKRJcGIg7WF89sAh+ZjT4HrCSn
-         og13ZG7hFc8Nl0yLoQjtBu0DXS/TVzMXnQhNidB4L5HU73Pr3qRkc91hBgz7qlyfdc9C
-         2WzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680319704;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20210112; t=1680443286; x=1683035286;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1aOQ4eYy8N4YCSiaLMCwB/yerXMVOmw3wp9ck3pUmQA=;
-        b=jnDiIcKMlbKaZ5ciLz52VNumgJlkhFQLLvdyj74X8hXtJLgCZKG0igxy2vH9LmTzgz
-         OvDa27fU+DkHY6/JU2vy+yn1cKRvYlVEgq51dDpITrShQ+N3lu+9FMISJPpaFI7oIR4X
-         fjsFJUCdtilRdo3Y6jNuHf9veWt6IUCHPtCKE5lY7mRoasldJ4dFxsB3CFBkVBK0hhEp
-         ps8fWN7XQykljMFGQ4utpdNWFnWPcyFbaxxIWtk55moQYRrY6YBDwULb3lLHX3G8fm88
-         MAcQI6d2w170uheSz5QIHQ/lrGY6rqDqiCHqpbTJGQaQUhhoX2RHUvCUS6mQHdnvgqCU
-         2Vxg==
-X-Gm-Message-State: AAQBX9dvb6FIQxHP7UPwANZR6NkqEynkQPxzO5jWPSsod3BwP0F+sNyL
-	rp2RrbF5yo0WswUmxxG4PN8=
-X-Google-Smtp-Source: AKy350Yoi20kGNomZnY7Fh4bdxg2fFhnur0eeEf88TS9IaTsvuK0id2OfKq0eADwsFcWp5pRxAwcFg==
-X-Received: by 2002:a17:902:f683:b0:1a0:7156:f8d1 with SMTP id l3-20020a170902f68300b001a07156f8d1mr37983907plg.19.1680319704568;
-        Fri, 31 Mar 2023 20:28:24 -0700 (PDT)
-Received: from debian.me (subs02-180-214-232-71.three.co.id. [180.214.232.71])
-        by smtp.gmail.com with ESMTPSA id f6-20020a170902ab8600b001a1f5dc64e5sm2271330plr.177.2023.03.31.20.28.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Mar 2023 20:28:24 -0700 (PDT)
-Received: by debian.me (Postfix, from userid 1000)
-	id CC3F510677D; Sat,  1 Apr 2023 10:28:21 +0700 (WIB)
-Date: Sat, 1 Apr 2023 10:28:21 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: David Dai <davidai@google.com>, "Rafael J. Wysocki" <rafael@kernel.org>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Sudeep Holla <sudeep.holla@arm.com>, Ingo Molnar <mingo@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-	Daniel Bristot de Oliveira <bristot@redhat.com>,
-	Valentin Schneider <vschneid@redhat.com>
-Cc: Saravana Kannan <saravanak@google.com>, kernel-team@android.com,
-	linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [RFC PATCH v2 4/6] kvm: arm64: Add support for get_freqtbl
- service
-Message-ID: <ZCek1YOmg99d6l9A@debian.me>
-References: <20230331014356.1033759-1-davidai@google.com>
- <20230331014356.1033759-5-davidai@google.com>
+        bh=TZIXaofmVFR+Ci0Qtn7ZztnlykUDzyjzm26l4+VTLcI=;
+        b=Llz7KJ0Ft4xJymfR4oMMk9RDdyP+iaAT0YXqzHxQb2jmYU9bxEkmM+0EnOebfhXEf9
+         Vt013bHivQKmbsQo3a6tjj/V6/11Wzsxy2XXrdUo6abl0JLZUxoefj4q65D48fOQS7i3
+         6+f6eV1grmqF5Wfl1Y9W+yuCw8aWY0lFynP9D5k820Qt/lxhZQhDHP2Nhc6HM1CVRvRS
+         EsLUL6ZrqoBkP/qEPEeqQC+hUht8LvhoPQ1t74+wL6JVDHE1+YolJQntSgqmpNs5VkeH
+         WEpO2JvxnWldLT5iUd5qTGWpu5FisTyF7k8hTx+NXibwEAK7fZ0sCraCKIDjE7TQE+Pm
+         BihA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680443286; x=1683035286;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TZIXaofmVFR+Ci0Qtn7ZztnlykUDzyjzm26l4+VTLcI=;
+        b=Mg81yIsaqMUjDu0nwrxjMcU9qcDrRYdQ+TN4D02iakLlUfXxwuTSzYqich+5OD8NeK
+         PPIONSplhB3jJZ1p5KyozNOtNN2KqSwGNjxqtc4NynMSZn7cpOKztEZ74YF+Q39zaenp
+         4BvkPubRP3EcZ7ZzVJW7Coltz2klsIMm851mm/AtTW7oGrMyQN+8SGa+ahWg/n7E+mM3
+         Be/CId7kVDAp36c+D201S4SoklLNgEvwIONBYT+xea7P2MaV+RiLvPb92gXpouicREpJ
+         D0+o/BwRyXfN59JWEkjcIYONrdjQrbyZbIhFh9PJK5HSmMRdEIaNYj7Y0chRqSB1HGO1
+         N1/A==
+X-Gm-Message-State: AAQBX9dnW0Hm0rn1PsYstaL0jUeoye7NIBTzzqUohXtin8gPaZQvepWo
+	rT9+5lUQc3aj65TqFwKLVdV/x1NF2feZeJNzoKDkDg==
+X-Google-Smtp-Source: AKy350a+dRQoGQicHT5dFjHmh3TK5gLTMdPYFS9Sc1I3ti8yDOsOmt4vkO2KK84OHXikpiUuMosDs5z2o5aRAIIUWQY=
+X-Received: by 2002:ac2:5e81:0:b0:4e8:5371:c884 with SMTP id
+ b1-20020ac25e81000000b004e85371c884mr9852027lfq.5.1680443285812; Sun, 02 Apr
+ 2023 06:48:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230331014356.1033759-5-davidai@google.com>
+References: <20230331131218.2063233-1-tabba@google.com> <ZCcGD+El90tBpexd@linux.dev>
+In-Reply-To: <ZCcGD+El90tBpexd@linux.dev>
+From: Fuad Tabba <tabba@google.com>
+Date: Sun, 2 Apr 2023 14:47:29 +0100
+Message-ID: <CA+EHjTy0EhfEUWieqJbdxmrAVE=+cF4GZcYrnDebG=mv9y5Cew@mail.gmail.com>
+Subject: Re: [PATCH v3] KVM: arm64: Advertise ID_AA64PFR0_EL1.CSV2/3 to
+ protected VMs
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, maz@kernel.org, oupton@google.com, will@kernel.org, 
+	pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, 
+	suzuki.poulose@arm.com, reijiw@google.com, ricarkol@google.com, 
+	rananta@google.com, jingzhangos@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 30, 2023 at 06:43:48PM -0700, David Dai wrote:
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 38ce33564efc..8f905456e2b4 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -8400,6 +8400,14 @@ after normalizing for architecture. This is useful when guests are tracking
->  workload on its vCPUs. Util hints allow the host to make more accurate
->  frequency selections and task placement for vCPU threads.
->  
-> +8.42 KVM_CAP_GET_CPUFREQ_TBL
-> +---------------------------
-> +
-> +:Architectures: arm64
-> +
-> +This capability indicates that the KVM supports getting the
-> +frequency table of the current CPU that the vCPU thread is running on.
-> +
->  9. Known KVM API problems
->  =========================
->  
-> diff --git a/Documentation/virt/kvm/arm/get_freqtbl.rst b/Documentation/virt/kvm/arm/get_freqtbl.rst
-> new file mode 100644
-> index 000000000000..f6832d7566e7
-> --- /dev/null
-> +++ b/Documentation/virt/kvm/arm/get_freqtbl.rst
-> @@ -0,0 +1,23 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +get_freqtbl support for arm/arm64
-> +=============================
-> +
-> +Allows guest to query the frequency(in KHz) table of the current CPU that
-> +the vCPU thread is running on.
-> +
-> +* ARM_SMCCC_VENDOR_HYP_KVM_GET_CPUFREQ_TBL_FUNC_ID: 0x86000042
-> +
-> +This hypercall uses the SMC32/HVC32 calling convention:
-> +
-> +ARM_SMCCC_VENDOR_HYP_KVM_GET_CPUFREQ_TBL_FUNC_ID
-> +    ==============    ========    =====================================
-> +    Function ID:      (uint32)    0x86000042
-> +    Arguments:        (uint32)    index of the current CPU's frequency table
-> +    Return Values:    (int32)     NOT_SUPPORTED(-1) on error, or
-> +                      (uint32)    Frequency table entry of requested index
-> +                                  in KHz
-> +                                  of current CPU(r1)
-> +    Endianness:                   Must be the same endianness
-> +                                  as the host.
-> +    ==============    ========    =====================================
+Hi Oliver,
 
-Sphinx reports htmldocs warnings:
-/home/bagas/repo/linux-kernel/Documentation/virt/kvm/api.rst:8404: WARNING: Title underline too short.
+Thanks for your comments.
 
-8.42 KVM_CAP_GET_CPUFREQ_TBL
----------------------------
-/home/bagas/repo/linux-kernel/Documentation/virt/kvm/api.rst:8404: WARNING: Title underline too short.
+On Fri, Mar 31, 2023 at 5:11=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
+>
+> Hi Fuad,
+>
+> Thanks for catching the masking issue in v2. Few comments:
+>
+> On Fri, Mar 31, 2023 at 02:12:18PM +0100, Fuad Tabba wrote:
+> > The existing pKVM code attempts to do that using a value
+>
+> nit: it is more readable if you restate what 'that' is in the changelog,
+> even if it is already in the shortlog.
 
-8.42 KVM_CAP_GET_CPUFREQ_TBL
----------------------------
-/home/bagas/repo/linux-kernel/Documentation/virt/kvm/arm/get_freqtbl.rst:4: WARNING: Title underline too short.
+Will do when I repost this.
 
-get_freqtbl support for arm/arm64
-=============================
+>
+> > initialized to 0, but never set. To advertise csv2/3 to protected
+> > guests, pass the csv values to hyp when initializing hyp's view
+> > of guests' ID_AA64PFR0_EL1.
+> >
+> > Similar to non-protected KVM, these are system-wide, rather than
+> > per cpu, for simplicity.
+> >
+> > Fixes: 6c30bfb18d0b ("KVM: arm64: Add handlers for protected VM System =
+Registers")
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> >
+> > Changes from V2: Fix masking not to affect bits other than CSV2/3.
+>
+> Commentary like this that you don't want to appear in the commit when
+> applied should appear below the '---'
+>
+> > ---
+>
+> I.e. right here.
 
-I have applied the fixup:
+Ack!
+>
+> >  arch/arm64/kvm/arm.c                          | 24 ++++++++++++++++++-
+> >  .../arm64/kvm/hyp/include/nvhe/fixed_config.h |  5 +++-
+> >  arch/arm64/kvm/hyp/nvhe/sys_regs.c            |  7 ------
+> >  3 files changed, 27 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 3bd732eaf087..0ae927c99fa1 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -1889,9 +1889,31 @@ static int __init do_pkvm_init(u32 hyp_va_bits)
+> >       return ret;
+> >  }
+> >
+> > +static u64 get_hyp_id_aa64pfr0_el1(void)
+> > +{
+> > +     u64 mask =3D ~0ULL;
+> > +
+> > +     /*
+> > +      * Track whether the system isn't affected by spectre/meltown in =
+the
+> > +      * hypervisor's view of id_aa64pfr0_el1, used for protected VMs.
+> > +      * Although this is per-CPU, we make it global for simplicity, e.=
+g., not
+> > +      * to have to worry about vcpu migration.
+> > +      *
+> > +      * Unlike for non-protected VMs, userspace cannot override this f=
+or
+> > +      * protected VMs.
+> > +      */
+> > +     if (arm64_get_spectre_v2_state() !=3D SPECTRE_UNAFFECTED)
+> > +             mask &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
+> > +
+> > +     if (arm64_get_meltdown_state() !=3D SPECTRE_UNAFFECTED)
+> > +             mask &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
+>
+> Doesn't this introduce a subtle change to the way that the CSV[23] values
+> are constrained in KVM? At least for 'normal' VMs we constrain both field=
+s
+> to having a max value of 1.
 
----- >8 ----
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index baf8a4c43b5839..3579c470375938 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -8401,7 +8401,7 @@ workload on its vCPUs. Util hints allow the host to make more accurate
- frequency selections and task placement for vCPU threads.
- 
- 8.42 KVM_CAP_GET_CPUFREQ_TBL
-----------------------------
-+----------------------------
- 
- :Architectures: arm64
- 
-diff --git a/Documentation/virt/kvm/arm/get_freqtbl.rst b/Documentation/virt/kvm/arm/get_freqtbl.rst
-index f6832d7566e7e5..215bf0f653e461 100644
---- a/Documentation/virt/kvm/arm/get_freqtbl.rst
-+++ b/Documentation/virt/kvm/arm/get_freqtbl.rst
-@@ -1,7 +1,7 @@
- .. SPDX-License-Identifier: GPL-2.0
- 
- get_freqtbl support for arm/arm64
--=============================
-+=================================
- 
- Allows guest to query the frequency(in KHz) table of the current CPU that
- the vCPU thread is running on.
+You're right. I'll fix this and resend the patch.
 
-Thanks.
+Thanks again,
+/fuad
 
--- 
-An old man doll... just what I always wanted! - Clara
+> --
+> Thanks,
+> Oliver
