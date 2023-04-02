@@ -1,148 +1,133 @@
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15F473C39
-	for <kvmarm@lists.linux.dev>; Sun,  2 Apr 2023 13:48:07 +0000 (UTC)
-Received: by mail-lf1-f44.google.com with SMTP id h25so34775924lfv.6
-        for <kvmarm@lists.linux.dev>; Sun, 02 Apr 2023 06:48:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5891619B
+	for <kvmarm@lists.linux.dev>; Sun,  2 Apr 2023 18:37:51 +0000 (UTC)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-54476ef9caeso268855017b3.6
+        for <kvmarm@lists.linux.dev>; Sun, 02 Apr 2023 11:37:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680443286; x=1683035286;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TZIXaofmVFR+Ci0Qtn7ZztnlykUDzyjzm26l4+VTLcI=;
-        b=Llz7KJ0Ft4xJymfR4oMMk9RDdyP+iaAT0YXqzHxQb2jmYU9bxEkmM+0EnOebfhXEf9
-         Vt013bHivQKmbsQo3a6tjj/V6/11Wzsxy2XXrdUo6abl0JLZUxoefj4q65D48fOQS7i3
-         6+f6eV1grmqF5Wfl1Y9W+yuCw8aWY0lFynP9D5k820Qt/lxhZQhDHP2Nhc6HM1CVRvRS
-         EsLUL6ZrqoBkP/qEPEeqQC+hUht8LvhoPQ1t74+wL6JVDHE1+YolJQntSgqmpNs5VkeH
-         WEpO2JvxnWldLT5iUd5qTGWpu5FisTyF7k8hTx+NXibwEAK7fZ0sCraCKIDjE7TQE+Pm
-         BihA==
+        d=google.com; s=20210112; t=1680460670;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=cERiSljImwXqUKykLWPZ6VGQrBCja3Ipm+emrnE/BlI=;
+        b=FiWF2Fj7xPSBOTeWQcq7DXuuWyfzKfG0bZep6wO70DsbiBn6MKq1oGfFNUJwgE8B6R
+         b1iNIR0qEwnzRaJ1B+v6mgeZQsPkH19qRy42vpfW+bNg89eLduoUC6Q2r8QaSuOrCJdP
+         uvLUg7HvyKrtp5YOM/thBrSrDCtmqYYIV+cDrasWCn5XjCIIdCw3qv59B+MPwr8UsqSV
+         Afqj4jw1+M+5Dw5jzmL4vHodQEgkjaQ9W8DpxVaWND/xcY+pNbx7Rg3wtbJYYd/h6cYa
+         YjnLJRJ7Or1pmFRd03tPhEuWUEh5PblOEbKKzQfBpeiAUIwfG4iQ7zz42ZlfHX+CdR5n
+         N6Kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680443286; x=1683035286;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TZIXaofmVFR+Ci0Qtn7ZztnlykUDzyjzm26l4+VTLcI=;
-        b=Mg81yIsaqMUjDu0nwrxjMcU9qcDrRYdQ+TN4D02iakLlUfXxwuTSzYqich+5OD8NeK
-         PPIONSplhB3jJZ1p5KyozNOtNN2KqSwGNjxqtc4NynMSZn7cpOKztEZ74YF+Q39zaenp
-         4BvkPubRP3EcZ7ZzVJW7Coltz2klsIMm851mm/AtTW7oGrMyQN+8SGa+ahWg/n7E+mM3
-         Be/CId7kVDAp36c+D201S4SoklLNgEvwIONBYT+xea7P2MaV+RiLvPb92gXpouicREpJ
-         D0+o/BwRyXfN59JWEkjcIYONrdjQrbyZbIhFh9PJK5HSmMRdEIaNYj7Y0chRqSB1HGO1
-         N1/A==
-X-Gm-Message-State: AAQBX9dnW0Hm0rn1PsYstaL0jUeoye7NIBTzzqUohXtin8gPaZQvepWo
-	rT9+5lUQc3aj65TqFwKLVdV/x1NF2feZeJNzoKDkDg==
-X-Google-Smtp-Source: AKy350a+dRQoGQicHT5dFjHmh3TK5gLTMdPYFS9Sc1I3ti8yDOsOmt4vkO2KK84OHXikpiUuMosDs5z2o5aRAIIUWQY=
-X-Received: by 2002:ac2:5e81:0:b0:4e8:5371:c884 with SMTP id
- b1-20020ac25e81000000b004e85371c884mr9852027lfq.5.1680443285812; Sun, 02 Apr
- 2023 06:48:05 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1680460670;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cERiSljImwXqUKykLWPZ6VGQrBCja3Ipm+emrnE/BlI=;
+        b=ujxnzc5nnqTgrfaF3VPvj94dructWRhs+nrJ87MQmxI1EvGlfSkR3F1eArwiP2cfHg
+         bgFsNcaVHXPn5b3eieXMtyXdORS4mq90JWmsJ1rNr5JVLOKmKicXl3y4dOYL57U15ZLw
+         TBSeC9Fa3r4enDy4trprYpEQW2Ief1YVJ9XAT4q8xJRHP1q9afoZ3CXN+4iMiWzhzBA5
+         iyhMa2KZLDFnhYYoxcmIfLV3PUIneLAMmyaVHxw/Z5OmB+nZNeAFcfckuQswUPl2XCJb
+         wTv0djb+tF6Bf2RoRy7kljQ2E54/Y4AbJFloTA3ZC9CXLhlCFLLN07ao0ugLR1IENpKD
+         whJA==
+X-Gm-Message-State: AAQBX9c3LS+4576OrH1sxCBowM8XYzYvYpGLxbhepjr2S1vuEs18k+iI
+	vGNiGe6pjVz+4BBOMBA1/tK1xMe5nlDMZZDkIg==
+X-Google-Smtp-Source: AKy350Ylo4IJob0aFKk5xXLNtVoU61BjTIMtGwhBKAkNcnoQXzyYGCNJ3ynvPsaWLP71QbxTmp0MHCYFd1jB981mxQ==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a05:6902:18d5:b0:b75:3fd4:1b31 with
+ SMTP id ck21-20020a05690218d500b00b753fd41b31mr22357355ybb.1.1680460670266;
+ Sun, 02 Apr 2023 11:37:50 -0700 (PDT)
+Date: Sun,  2 Apr 2023 18:37:29 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230331131218.2063233-1-tabba@google.com> <ZCcGD+El90tBpexd@linux.dev>
-In-Reply-To: <ZCcGD+El90tBpexd@linux.dev>
-From: Fuad Tabba <tabba@google.com>
-Date: Sun, 2 Apr 2023 14:47:29 +0100
-Message-ID: <CA+EHjTy0EhfEUWieqJbdxmrAVE=+cF4GZcYrnDebG=mv9y5Cew@mail.gmail.com>
-Subject: Re: [PATCH v3] KVM: arm64: Advertise ID_AA64PFR0_EL1.CSV2/3 to
- protected VMs
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, maz@kernel.org, oupton@google.com, will@kernel.org, 
-	pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, 
-	suzuki.poulose@arm.com, reijiw@google.com, ricarkol@google.com, 
-	rananta@google.com, jingzhangos@google.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
+Message-ID: <20230402183735.3011540-1-jingzhangos@google.com>
+Subject: [PATCH v5 0/6] Support writable CPU ID registers from userspace
+From: Jing Zhang <jingzhangos@google.com>
+To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@google.com>
+Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, 
+	Reiji Watanabe <reijiw@google.com>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Oliver,
+This patchset refactors/adds code to support writable per guest CPU ID feature
+registers. Part of the code/ideas are from
+https://lore.kernel.org/all/20220419065544.3616948-1-reijiw@google.com .
+No functional change is intended in this patchset. With the new CPU ID feature
+registers infrastructure, only writtings of ID_AA64PFR0_EL1.[CSV2|CSV3],
+ID_AA64DFR0_EL1.PMUVer and ID_DFR0_ELF.PerfMon are allowed as KVM does before.
 
-Thanks for your comments.
+Writable (Configurable) per guest CPU ID feature registers are useful for
+creating/migrating guest on ARM CPUs with different kinds of features.
 
-On Fri, Mar 31, 2023 at 5:11=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> Hi Fuad,
->
-> Thanks for catching the masking issue in v2. Few comments:
->
-> On Fri, Mar 31, 2023 at 02:12:18PM +0100, Fuad Tabba wrote:
-> > The existing pKVM code attempts to do that using a value
->
-> nit: it is more readable if you restate what 'that' is in the changelog,
-> even if it is already in the shortlog.
+---
 
-Will do when I repost this.
+* v4 -> v5
+  - Rebased to 2fad20ae05cb (kvmarm/next)
+    Merge branch kvm-arm64/selftest/misc-6,4 into kvmarm-master/next
+  - Use kvm->arch.config_lock to guard update to multiple VM scope idregs
+    to avoid lock inversion
+  - Add back IDREG() macro for idregs access
+  - Refactor struct id_reg_desc by using existing infrastructure.
+  - Addressed many other comments from Marc.
 
->
-> > initialized to 0, but never set. To advertise csv2/3 to protected
-> > guests, pass the csv values to hyp when initializing hyp's view
-> > of guests' ID_AA64PFR0_EL1.
-> >
-> > Similar to non-protected KVM, these are system-wide, rather than
-> > per cpu, for simplicity.
-> >
-> > Fixes: 6c30bfb18d0b ("KVM: arm64: Add handlers for protected VM System =
-Registers")
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> >
-> > Changes from V2: Fix masking not to affect bits other than CSV2/3.
->
-> Commentary like this that you don't want to appear in the commit when
-> applied should appear below the '---'
->
-> > ---
->
-> I.e. right here.
+* v3 -> v4
+  - Remove IDREG() macro for ID reg access, use simple array access instead
+  - Rename kvm_arm_read_id_reg_with_encoding() to kvm_arm_read_id_reg()
+  - Save perfmon value in ID_DFR0_EL1 instead of pmuver
+  - Update perfmon in ID_DFR0_EL1 and pmuver in ID_AA64DFR0_EL1 atomically
+  - Remove kvm_vcpu_has_pmu() in macro kvm_pmu_is_3p5()
+  - Improve ID register sanity checking in kvm_arm_check_idreg_table()
 
-Ack!
->
-> >  arch/arm64/kvm/arm.c                          | 24 ++++++++++++++++++-
-> >  .../arm64/kvm/hyp/include/nvhe/fixed_config.h |  5 +++-
-> >  arch/arm64/kvm/hyp/nvhe/sys_regs.c            |  7 ------
-> >  3 files changed, 27 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 3bd732eaf087..0ae927c99fa1 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -1889,9 +1889,31 @@ static int __init do_pkvm_init(u32 hyp_va_bits)
-> >       return ret;
-> >  }
-> >
-> > +static u64 get_hyp_id_aa64pfr0_el1(void)
-> > +{
-> > +     u64 mask =3D ~0ULL;
-> > +
-> > +     /*
-> > +      * Track whether the system isn't affected by spectre/meltown in =
-the
-> > +      * hypervisor's view of id_aa64pfr0_el1, used for protected VMs.
-> > +      * Although this is per-CPU, we make it global for simplicity, e.=
-g., not
-> > +      * to have to worry about vcpu migration.
-> > +      *
-> > +      * Unlike for non-protected VMs, userspace cannot override this f=
-or
-> > +      * protected VMs.
-> > +      */
-> > +     if (arm64_get_spectre_v2_state() !=3D SPECTRE_UNAFFECTED)
-> > +             mask &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
-> > +
-> > +     if (arm64_get_meltdown_state() !=3D SPECTRE_UNAFFECTED)
-> > +             mask &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
->
-> Doesn't this introduce a subtle change to the way that the CSV[23] values
-> are constrained in KVM? At least for 'normal' VMs we constrain both field=
-s
-> to having a max value of 1.
+* v2 -> v3
+  - Rebased to 96a4627dbbd4 (kvmarm/next)
+    Merge tag ' https://github.com/oupton/linux tags/kvmarm-6.3' from into kvmarm-master/next
+  - Add id registere emulation entry point function emulate_id_reg
+  - Fix consistency for ID_AA64DFR0_EL1.PMUVer and ID_DFR0_EL1.PerfMon
+  - Improve the checking for id register table by ensuring that every entry has
+    the correct id register encoding.
+  - Addressed other comments from Reiji and Marc.
 
-You're right. I'll fix this and resend the patch.
+* v1 -> v2
+  - Rebase to 7121a2e1d107 (kvmarm/next) Merge branch kvm-arm64/nv-prefix into kvmarm/next
+  - Address writing issue for PMUVer
 
-Thanks again,
-/fuad
+[1] https://lore.kernel.org/all/20230201025048.205820-1-jingzhangos@google.com
+[2] https://lore.kernel.org/all/20230212215830.2975485-1-jingzhangos@google.com
+[3] https://lore.kernel.org/all/20230228062246.1222387-1-jingzhangos@google.com
+[4] https://lore.kernel.org/all/20230317050637.766317-1-jingzhangos@google.com
 
-> --
-> Thanks,
-> Oliver
+---
+
+Jing Zhang (6):
+  KVM: arm64: Move CPU ID feature registers emulation into a separate
+    file
+  KVM: arm64: Save ID registers' sanitized value per guest
+  KVM: arm64: Use per guest ID register for ID_AA64PFR0_EL1.[CSV2|CSV3]
+  KVM: arm64: Use per guest ID register for ID_AA64DFR0_EL1.PMUVer
+  KVM: arm64: Introduce ID register specific descriptor
+  KVM: arm64: Refactor writings for PMUVer/CSV2/CSV3
+
+ arch/arm64/include/asm/cpufeature.h |   5 +
+ arch/arm64/include/asm/kvm_host.h   |  34 +-
+ arch/arm64/kernel/cpufeature.c      |   8 +-
+ arch/arm64/kvm/Makefile             |   2 +-
+ arch/arm64/kvm/arm.c                |  24 +-
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c  |   7 -
+ arch/arm64/kvm/id_regs.c            | 790 ++++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c           | 466 ++--------------
+ arch/arm64/kvm/sys_regs.h           |  29 +
+ include/kvm/arm_pmu.h               |   5 +-
+ 10 files changed, 897 insertions(+), 473 deletions(-)
+ create mode 100644 arch/arm64/kvm/id_regs.c
+
+
+base-commit: 2fad20ae05cbcbd1a34272ddd8e27975b4ddcabf
+-- 
+2.40.0.348.gf938b09366-goog
+
