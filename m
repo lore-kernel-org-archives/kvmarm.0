@@ -1,52 +1,53 @@
-Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B437487
-	for <kvmarm@lists.linux.dev>; Mon,  3 Apr 2023 19:43:04 +0000 (UTC)
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-17ab3a48158so32080208fac.1
-        for <kvmarm@lists.linux.dev>; Mon, 03 Apr 2023 12:43:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 085D37487
+	for <kvmarm@lists.linux.dev>; Mon,  3 Apr 2023 19:45:18 +0000 (UTC)
+Received: by mail-ot1-f42.google.com with SMTP id k14-20020a9d700e000000b0069faa923e7eso16231270otj.10
+        for <kvmarm@lists.linux.dev>; Mon, 03 Apr 2023 12:45:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680550984;
+        d=google.com; s=20210112; t=1680551118;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7iJK+OHZ5ZfCg5QFFBGWdn6OvEmXKpIceou758DXRpE=;
-        b=P75M9UuYSreShGG1oskdc2oEHaWakGfm3x1nmTBNbY3MhI1CCHeJEpI9YT0AaX7iuz
-         W8ppTg/AZfxOImDg64xMZaBEh/n8g0ScCZSFfr3f8iAb6E3VgcUnHOZXjo35Ww6qU9OK
-         HYnGda1Rowo0hROsI1n/ZepSutCdSa0xhS13Mr8Q15KtU4gsKDry1UMRVgLjeUEEFAA6
-         bMNFmhhvhX7y205udBzLWZOoJ9iEEypmx7YEi9sgb+hBNSADu8ssYBViDuS2wO+aJxXW
-         UAq3zDT7tf+A6voHMuArWr3SDGPKncFcNt0th4J/hxZQikvyMbjwHhQ+43Ip5P3bOZn5
-         gc+Q==
+        bh=fXSd0dlF+2R3I9OQwTpEhIHnKpahJpStsjSP41bbUjc=;
+        b=XQ4duCSgeYl7dN2WP/jz7f/ZPzS4X6hE5Mw13camiK43W7fCFcrfFTrP6SIZ3R3rqF
+         hDRZLZzIJoHthkfpFYid5n2GZc0KGGXjEM1/DS1w3d5/TXDW90x7qxwhiDxT0DRsjlYD
+         0mC2Ektshgb5wCFkeVBCGT4P/uT10CJZBAiIjQKrEUkUfQb/m6aCXCboQnNqmP89rTZt
+         jEh+Rl89s31ObidvF1GOLP/4WhKo4US7M0NQgTXeFCcp3nUVEK2IIzHf3u1DMkwrwyeb
+         6EjHA2PfMjKmjx+TGYd8p4JlmrzIPc5CJahpF0h+CM+o/vs2p8B6fjhc/noqmZqZSpXV
+         oaNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680550984;
+        d=1e100.net; s=20210112; t=1680551118;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7iJK+OHZ5ZfCg5QFFBGWdn6OvEmXKpIceou758DXRpE=;
-        b=Vve6+tx0pxAx0waRyCnl3oBywyiu/zZTcb/Jd7Wp9OESOWNIFPoBTAyVgiSgoOuxZr
-         0fpbEz9qo0N7IrVB4xp9N5woXpJV2Sb35lobevezCw8Bc9ygKH5h1osJKRRPeeDGlnfJ
-         c/VNNjNne+0BfuXtugvwtRgSDm4Ps007b6w7MVUYtQDMXQUntmu+7HfffUwxbNe1RRXN
-         ZGStK9y6aEaYm5FfSPbXioStqfCrg8I/jJTDgpMFB5dMF54mKIscvlzVuDnILWpFlPtc
-         7cne65knko9t3rNkyh7OwQgUd+qP2d45/ujsFrHBOeNoJY+LWagsRMYXSVKK2/V7OJJg
-         qmZg==
-X-Gm-Message-State: AAQBX9drJLJb+Edt3PxuLkbSMaHwR8k40Gv2pRTe1fQV0l0wg+a2R8BF
-	UV33YnoZL6uUjV/gYWhcXSJIdAN6xDR5PrJVh59kGQ==
-X-Google-Smtp-Source: AKy350YcqR0yqar7uvrPwBXHS+FhvAwEQIc1UW8a63ZVjaeuxY8QeREXpb8TCwCi9M1fb6UX5fncefBZmYL0TAOcxvQ=
-X-Received: by 2002:a05:6871:784:b0:177:bf3e:5d4f with SMTP id
- o4-20020a056871078400b00177bf3e5d4fmr179968oap.8.1680550983629; Mon, 03 Apr
- 2023 12:43:03 -0700 (PDT)
+        bh=fXSd0dlF+2R3I9OQwTpEhIHnKpahJpStsjSP41bbUjc=;
+        b=HYt4JSMyDYxJ8vFNwK+cSRu3OEnG6UxDnxaxgZRq9XHHbkwnRVZen2MXvYb0FRPhs7
+         WCpaOK8hzq0NFTDjXoiiHXE/vY8VQ0X7uDx+fmtg06EgDZ5YJbtLUOb4/B4/72kT7jf3
+         znk46F+uLVKB77FmajC6xZfzp/bSKktpOir0aVMhHCffl5p+1WK0/sJACYrJJTe0eAW8
+         FX+FW0/TLd7Gk/0bFMjcNyX5UNABHSb1OXLLrGamuzLMHXRTpkKl61IvLBsDkA6yqvXr
+         EZTAMnVmwydcXVuMY2RIwrD6AGycuaeA6p8LUFFF5m0lbRxkcMloT7H3Exkfo5vhyp7B
+         SqVw==
+X-Gm-Message-State: AAQBX9dzDtDXVkrt420Vofr4vBQ79lt2F9A9VH7VHM1wHUsc2b6Btvxg
+	5JIaEva9Kgi3l+BepC+kgWMe3MkpSD5nrSXIAlRA+VMkCo7JK/xVZCY=
+X-Google-Smtp-Source: AKy350ZxJ+YsCNZ4p9Ct24YsF2zVuM3+teNZbDHaHjt3h+8I63ARqubdQEG8mXItDUiJaSFmLFZthJNG8ctsSHDnP5o=
+X-Received: by 2002:a9d:60d1:0:b0:694:3b4e:d8d7 with SMTP id
+ b17-20020a9d60d1000000b006943b4ed8d7mr7732358otk.0.1680551117954; Mon, 03 Apr
+ 2023 12:45:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230402183735.3011540-1-jingzhangos@google.com> <861ql1w948.wl-maz@kernel.org>
-In-Reply-To: <861ql1w948.wl-maz@kernel.org>
+References: <20230402183735.3011540-1-jingzhangos@google.com>
+ <20230402183735.3011540-6-jingzhangos@google.com> <86y1n9up5f.wl-maz@kernel.org>
+In-Reply-To: <86y1n9up5f.wl-maz@kernel.org>
 From: Jing Zhang <jingzhangos@google.com>
-Date: Mon, 3 Apr 2023 12:42:52 -0700
-Message-ID: <CAAdAUtj0Yn_s-bOxT9smwWzYO+MhUW=Nv7ZH9zrdkKUJPJLEYA@mail.gmail.com>
-Subject: Re: [PATCH v5 0/6] Support writable CPU ID registers from userspace
+Date: Mon, 3 Apr 2023 12:45:06 -0700
+Message-ID: <CAAdAUthLZpu80rbmQYeGR_Mt5bRUdGhHqbJuRrUwX4MQ6n0O7w@mail.gmail.com>
+Subject: Re: [PATCH v5 5/6] KVM: arm64: Introduce ID register specific descriptor
 To: Marc Zyngier <maz@kernel.org>
 Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
 	ARMLinux <linux-arm-kernel@lists.infradead.org>, Oliver Upton <oupton@google.com>, 
@@ -59,46 +60,69 @@ Content-Transfer-Encoding: quoted-printable
 
 Hi Marc,
 
-On Mon, Apr 3, 2023 at 3:30=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
+On Mon, Apr 3, 2023 at 5:27=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
 >
-> On Sun, 02 Apr 2023 19:37:29 +0100,
+> On Sun, 02 Apr 2023 19:37:34 +0100,
 > Jing Zhang <jingzhangos@google.com> wrote:
 > >
-> > This patchset refactors/adds code to support writable per guest CPU ID =
-feature
-> > registers. Part of the code/ideas are from
-> > https://lore.kernel.org/all/20220419065544.3616948-1-reijiw@google.com =
-.
-> > No functional change is intended in this patchset. With the new CPU ID =
-feature
-> > registers infrastructure, only writtings of ID_AA64PFR0_EL1.[CSV2|CSV3]=
-,
-> > ID_AA64DFR0_EL1.PMUVer and ID_DFR0_ELF.PerfMon are allowed as KVM does =
-before.
+> > Introduce an ID feature register specific descriptor to include ID
+> > register specific fields and callbacks besides its corresponding
+> > general system register descriptor.
 > >
-> > Writable (Configurable) per guest CPU ID feature registers are useful f=
-or
-> > creating/migrating guest on ARM CPUs with different kinds of features.
+> > No functional change intended.
 > >
+> > Co-developed-by: Reiji Watanabe <reijiw@google.com>
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > > ---
+> >  arch/arm64/kvm/id_regs.c  | 233 ++++++++++++++++++++++++++++----------
+> >  arch/arm64/kvm/sys_regs.c |   2 +-
+> >  arch/arm64/kvm/sys_regs.h |   1 +
+> >  3 files changed, 178 insertions(+), 58 deletions(-)
 > >
-> > * v4 -> v5
-> >   - Rebased to 2fad20ae05cb (kvmarm/next)
-> >     Merge branch kvm-arm64/selftest/misc-6,4 into kvmarm-master/next
+> > diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
+> > index e92eacb0ad32..af86001e2686 100644
+> > --- a/arch/arm64/kvm/id_regs.c
+> > +++ b/arch/arm64/kvm/id_regs.c
+> > @@ -18,6 +18,27 @@
+> >
+> >  #include "sys_regs.h"
+> >
+> > +struct id_reg_desc {
+> > +     const struct sys_reg_desc       reg_desc;
+> > +     /*
+> > +      * ftr_bits points to the feature bits array defined in cpufeatur=
+e.c for
+> > +      * writable CPU ID feature register.
+> > +      */
+> > +     const struct arm64_ftr_bits *ftr_bits;
 >
-> Please don't do that. Always use a stable, tagged commit, not some
-> random "commit of the day". If there is a dependency, indicate the
-> *exact* dependency. Yes, x86 is managed differently.
+> Why do we need to keep this around? we already have all the required
+> infrastructure to lookup a full arm64_ftr_reg. So why the added stuff?
+You're right. Will use the lookup function.
 >
-> I'm never going to apply anything on top of an arbitrary commit, so
-> this makes it difficult for both you and I. I understand that you want
-> to avoid conflicts, but I really don't mind resolving those.
+> > +     /*
+> > +      * Only bits with 1 are writable from userspace.
+> > +      * This mask might not be necessary in the future whenever all ID
+> > +      * registers are enabled as writable from userspace.
+> > +      */
+> > +     const u64 writable_mask;
+> > +     /*
+> > +      * This function returns the KVM sanitised register value.
+> > +      * The value would be the same as the host kernel sanitised value=
+ if
+> > +      * there is no KVM sanitisation for this id register.
+> > +      */
+> > +     u64 (*read_kvm_sanitised_reg)(const struct id_reg_desc *idr);
 >
-> So please stick to existing tags as a base, and describe the
-> dependencies you have (in this case, the locking series).
-Sure, will do that.
+> Why can't this function return both the required value and a mask?
+> Why can't it live in the sys_reg_desc structure?
 >
-> Thanks,
+> Frankly, I don't see a good reason to have this wrapper structure
+> which makes things pointlessly complicated and prevent code sharing
+> with the rest of the infrastructure.
+Sure, will reuse the existing fields in sys_reg_desc structure as you
+demonstrated.
 >
 >         M.
 >
