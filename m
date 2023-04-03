@@ -1,136 +1,153 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0209A2FAF
+	for <kvmarm@lists.linux.dev>; Mon,  3 Apr 2023 10:18:58 +0000 (UTC)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+	by smtp-out2.suse.de (Postfix) with ESMTP id 383F41FD68;
+	Mon,  3 Apr 2023 10:18:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1680517137; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=a4MoXhe1RG60yL55LAJJODjxOGik5d8SFY4UggIUu04=;
+	b=f3reNnGyU64PHa5HNUCrDzAbyKc0nC6m7ILE6UJTMTjHxkElPrk4lgSIqv7oS3Q9xgY/Hg
+	/VLrUeBAlu9b5NDr4LMcDfNld4Xb149VSq55RLcflhBtwMCJmuHvrN81AYVDRygS4QQW72
+	FO40CbIW+81IA5MAmWtsjVsYWLwADM8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1680517137;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=a4MoXhe1RG60yL55LAJJODjxOGik5d8SFY4UggIUu04=;
+	b=0j++IB0zvsDolT331j6Xki/sJRKexThn9M0PtBAqAqWQMgBfj6f+XjhvIKrb32XwASwr06
+	xT1cWwJyenOtBJCQ==
+Received: from suse.de (unknown [10.163.43.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270DD1370
-	for <kvmarm@lists.linux.dev>; Mon,  3 Apr 2023 06:25:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1680503159;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=afBNaZ0DMuI7GB+2iDCGbyFFwGSVdQ773bP8QWimT1I=;
-	b=cRW2ueJYRQtARCwTWe/vNt6ZuNcu8S8/mjRC8vpBZAYZ44OkFihgUna53dbC/TF+PjkflY
-	KZjXKdAMYNATKjBdy2r4sOB0p6jHvhsHr/B9AenPIz8iTfAD1GZ+2HZAgEXsYyUMa2/dSH
-	Qts3ytEwmIURTvRyBcrg8dCR6efByVI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-244-28z4qi46NM2VpjD3-hJMRQ-1; Mon, 03 Apr 2023 02:25:57 -0400
-X-MC-Unique: 28z4qi46NM2VpjD3-hJMRQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0C99A801210;
-	Mon,  3 Apr 2023 06:25:56 +0000 (UTC)
-Received: from [10.72.12.158] (ovpn-12-158.pek2.redhat.com [10.72.12.158])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D5BAC15BA0;
-	Mon,  3 Apr 2023 06:25:40 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [RFC PATCH 00/32] ACPI/arm64: add support for virtual cpuhotplug
-To: Shaoqin Huang <shahuang@redhat.com>, James Morse <james.morse@arm.com>,
- linux-pm@vger.kernel.org, loongarch@lists.linux.dev, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, x86@kernel.org
-Cc: Marc Zyngier <maz@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Lorenzo Pieralisi <lpieralisi@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Sudeep Holla <sudeep.holla@arm.com>,
- Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
- Dave Hansen <dave.hansen@linux.intel.com>, Ingo Molnar <mingo@redhat.com>,
- Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Huacai Chen <chenhuacai@kernel.org>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Len Brown <lenb@kernel.org>,
- Rafael Wysocki <rafael@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
- Salil Mehta <salil.mehta@huawei.com>, Russell King <linux@armlinux.org.uk>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>
-References: <20230203135043.409192-1-james.morse@arm.com>
- <e17627fb-283e-dd42-94c1-f89dea167577@redhat.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <972ed7df-78cd-e02a-7376-78c806181b5f@redhat.com>
-Date: Mon, 3 Apr 2023 14:25:36 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+	by relay2.suse.de (Postfix) with ESMTPS id 077E02C161;
+	Mon,  3 Apr 2023 10:18:51 +0000 (UTC)
+Date: Mon, 3 Apr 2023 11:18:49 +0100
+From: Mel Gorman <mgorman@suse.de>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: David Dai <davidai@google.com>, "Rafael J. Wysocki" <rafael@kernel.org>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Sudeep Holla <sudeep.holla@arm.com>, Ingo Molnar <mingo@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Ben Segall <bsegall@google.com>,
+	Daniel Bristot de Oliveira <bristot@redhat.com>,
+	Valentin Schneider <vschneid@redhat.com>, kernel-team@android.com,
+	linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [RFC PATCH 0/6] Improve VM DVFS and task placement behavior
+Message-ID: <20230403101849.z6wengqxkchvpf75@suse.de>
+References: <20230330224348.1006691-1-davidai@google.com>
+ <ZCYuLPlEFUnxPm4A@casper.infradead.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <e17627fb-283e-dd42-94c1-f89dea167577@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+Content-Type: text/plain; charset=iso-8859-15
+Content-Disposition: inline
+In-Reply-To: <ZCYuLPlEFUnxPm4A@casper.infradead.org>
 
-Hi Shaoqin,
-
-On 3/29/23 1:52 PM, Shaoqin Huang wrote:
-> On 2/3/23 21:50, James Morse wrote:
-
-[...]
-
->>
->> The first patch has already been posted as a fix here:
->> https://www.spinics.net/lists/linux-ia64/msg21920.html
->> I've only build tested Loongarch and ia64.
->>
->>
->> If folk want to play along at home, you'll need a copy of Qemu that supports this.
->> https://github.com/salil-mehta/qemu.git salil/virt-cpuhp-armv8/rfc-v1-port29092022.psci.present
->>
->> You'll need to fix the numbers of KVM_CAP_ARM_HVC_TO_USER and KVM_CAP_ARM_PSCI_TO_USER
->> to match your host kernel. Replace your '-smp' argument with something like:
->> | -smp cpus=1,maxcpus=3,cores=3,threads=1,sockets=1
->>
->> then feed the following to the Qemu montior;
->> | (qemu) device_add driver=host-arm-cpu,core-id=1,id=cpu1
->> | (qemu) device_del cpu1
->>
->>
->> This series is based on v6.2-rc3, and can be retrieved from:
->> https://git.kernel.org/pub/scm/linux/kernel/git/morse/linux.git/ virtual_cpu_hotplug/rfc/v1
+On Fri, Mar 31, 2023 at 01:49:48AM +0100, Matthew Wilcox wrote:
+> On Thu, Mar 30, 2023 at 03:43:35PM -0700, David Dai wrote:
+> > Hi,
+> > 
+> > This patch series is a continuation of the talk Saravana gave at LPC 2022
+> > titled "CPUfreq/sched and VM guest workload problems" [1][2][3]. The gist
+> > of the talk is that workloads running in a guest VM get terrible task
+> > placement and DVFS behavior when compared to running the same workload in
 > 
-> I applied this patch series on v6.2-rc3 and using the QEMU cloned from the salil-mehta/qemu.git repo. But when I try to run the QEMU, it shows:
-> 
-> $ qemu-system-aarch64: -accel kvm: Failed to enable KVM_CAP_ARM_PSCI_TO_USER cap.
-> 
-> Here is the command I use:
-> 
-> $ qemu-system-aarch64
-> -machine virt
-> -bios /usr/share/qemu-efi-aarch64/QEMU_EFI.fd
-> -accel kvm
-> -m 4096
-> -smp cpus=1,maxcpus=3,cores=3,threads=1,sockets=1
-> -cpu host
-> -qmp unix:./src.socket,server,nowait
-> -hda ./XXX.qcow2
-> -serial unix:./src.serial,server,nowait
-> -monitor stdio
-> 
-> It seems something related to your notice: You'll need to fix the numbers of KVM_CAP_ARM_HVC_TO_USER and KVM_CAP_ARM_PSCI_TO_USER
-> to match your host kernel.
-> 
-> But I'm not actually understand what should I fix, since I haven't review the patch series. Could you give me some more information? Maybe I'm doing something wrong.
+> DVFS?  Some new filesystem, perhaps?
 > 
 
-When the kernel is rebased to v6.2.rc3, the two capabilities are conflictsing
-between QEMU and host kernel. Please adjust them like below and have a try:
+Dynamic Voltage and Frequency Scaling (DVFS) -- it's a well known term in
+cpufreq/cpuidle/schedutil land.
 
-In qemu/linux-headers/linux/kvm.h
+> > the host. Effectively, no EAS for threads inside VMs. This would make power
+> 
+> EAS?
+> 
 
-#define KVM_CAP_ARM_HVC_TO_USER 250 /* TODO: as per linux 6.1-rc2 */
-#define KVM_CAP_ARM_PSCI_TO_USER 251 /* TODO: as per linux 6.1-rc2 */
+Energy Aware Scheduling (EAS) is mostly a kernel/sched thing that has
+an impact on cpufreq and my recollection is that it was discussed at
+conferences long before kernel/sched had any EAS awareness. I don't have
+the full series in my inbox and didn't dig further but patch 1 at least is
+providing additional information to schedutil which impacts CPU frequency
+selection on systems to varying degrees. The full impact would depend on
+what cpufreq driver is in use and the specific hardware so even if the
+series benefits one set of hardware, it's not necessarily a guaranteed win.
 
-In linux/include/uapi/linux/kvm.h
+> Two unfamiliar and undefined acronyms in your opening paragraph.
+> You're not making me want to read the rest of your opus.
 
-#define KVM_CAP_ARM_HVC_TO_USER 250
-#define KVM_CAP_ARM_PSCI_TO_USER 251
+It depends on the audience and mm/ is not the audience.  VM in the title
+refers to Virtual Machine, not Virtual Memory although I confess I originally
+read it as mm/ and wondered initially how mm/ affects DVFS to the extent it
+triggered a "wtf happened in mm/ recently that I completely missed?". This
+series is mostly of concern to scheduler, cpufreq or KVM depending on your
+perspective. For example, on KVM, I'd immediately wonder if the hypercall
+overhead exceeds any benefit from better task placement although the leader
+suggests the answer is "no".  However, it didn't comment (or I didn't read
+carefully enough) on whether MMIO overhead or alternative communication
+methods have constant cost across different hardware or, much more likely,
+depend on the hardware that could potentially opt-in. Various cpufreq
+hardware has very different costs when measuring or alterating CPU frequency
+stuff, even within different generations of chips from the same vendor.
+While the data also shows performance improvements, it doesn't indicate how
+close to bare metal the improvement is. Even if it's 50% faster within a
+VM, how much slower than bare metal is it? In terms of data presentation,
+it might be better to assign bare metal a score of 1 at the best possible
+score and show the VM performance as a relative ratio (1.00 for bare metal,
+0.5 for VM with a vanilla kernel, 0.75 using improved task placement).
+It would also be preferred to have x86-64 data as the hazards the series
+details with impacts arm64 and x86-64 has the additional challenge that
+cpufreq is often managed by the hardware so it should be demonstrated the
+the series "does no harm" on x86-64 for recent generation Intel and AMD
+chips if possible.  The lack of that data doesn't kill the series as a large
+improvement is still very interesting even if it's not perfect and possible
+specific to arm64. If this *was* my area or I happened to be paying close
+attention to it at the time, I would likely favour using hypercalls only at
+the start because it can be used universally and suggest adding alternative
+communication methods later using the same metric "is an alternative method
+of Guest<->Host communication worse, neutral or better at getting close to
+bare metal performance?" I'd also push for the ratio tables as it's easier
+to see at a glance how close to bare metal performance the series achieves.
+Finally, I would look for x86-64 data just in case it causes harm due to
+hypercall overhead on chips that management frequency in firmware.
 
-Thanks,
-Gavin
+So while I haven't read the series and only patches 2+6 reached by inbox,
+I understand the point in principle. The scheduler on wakeup paths for bare
+metal also tries to favour recently used CPUs and spurious CPU migration
+even though it is only tangentially related to EAS.  For example, a recently
+used CPUs may still be polling (drivers/cpuidle/poll_state.c:poll_idle)
+or at least not entered a deep C-state so the wakeup penalty is lower.
 
+So whatever critism the series deserves, it's not due to using obscure
+terms that no one in kernel/sched/, drivers/cpuidle of drivers/cpufreq
+would recognise.
 
+-- 
+Mel Gorman
+SUSE Labs
