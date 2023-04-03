@@ -1,159 +1,168 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3FDD33CF
-	for <kvmarm@lists.linux.dev>; Mon,  3 Apr 2023 16:41:51 +0000 (UTC)
-Received: by mail-lj1-f177.google.com with SMTP id a11so30998587lji.6
-        for <kvmarm@lists.linux.dev>; Mon, 03 Apr 2023 09:41:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 644DB6FDF
+	for <kvmarm@lists.linux.dev>; Mon,  3 Apr 2023 17:26:14 +0000 (UTC)
+Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-17786581fe1so31559100fac.10
+        for <kvmarm@lists.linux.dev>; Mon, 03 Apr 2023 10:26:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680540110; x=1683132110;
+        d=google.com; s=20210112; t=1680542773;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WCavi4N7lQtSmbtPR96GmRyN9oGbU1CWSEaMmAfYOFk=;
-        b=Bpxsj/EPXJBSk2pJrNpb/ecme2vHTk7FVSwNGGlI3X1rD91BpBZ7aRRHedK+XCxEWN
-         FIBr2oLJlZjw2GKplq1GAOyrA2oH6mnKJxn9080mQqpzV4lRKhnKuBsOnlVLxenIB081
-         +QnW2iM3CDQKGXJal38WhqiSiS+DTJBl0IOTVcfSUu5OA6IxmOx+dJHF0x+6as5lpNyC
-         53Qpxj+Kq5dhPHNLs3bIUrbAZwf6vupR639KsVy2GPOgV+RTU2EDFQQE3/KdbrXHIV01
-         856rm+Hho98ZpmutKOocKU18aTma0norDH/OKKgpOuVwj76uiIzBCg5b6PR+zZ6AeiyT
-         yZaQ==
+        bh=qd9vNo8gmYRz8Z2M2O7ElfQfkdlOYiM1xlJu96lXJAs=;
+        b=oX8NBYb547UrM6ZoqymNw1EdsaXNXl8OfwHwQLHx77p13cWWg7QxpeSNTbBJQzK7zN
+         GORcfbDwlQG/J8YJ/Udb5aZvAsZpBIlCzL5NbfC07p+OldQfiBWgQjJ8edDqp5/JEwGN
+         Vlja5+ZGYN22+5FeGnB3oCd/Aa+fHf5RSjiYxKABYg15BXJODLZ9FdRg3q60s7f5oIII
+         1ZaKJSwt6SqvgmHP3cde1MNJOh0BUK71PwH06e/+YCLXpBZJKUOFuthBS6ylbRdFUA5Q
+         ivFv1wsc705bWl5a4i6xDG64+T17HQ0h/Kz7lLpBDTcuufNYWZl//dh86SgqnSl/k0nU
+         YYGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680540110; x=1683132110;
+        d=1e100.net; s=20210112; t=1680542773;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WCavi4N7lQtSmbtPR96GmRyN9oGbU1CWSEaMmAfYOFk=;
-        b=twvWRfuBVa6/56ctwTzGMhTJI6jEFwkOJxg45vMWKVC/OZopAq9mdppeulmkok+qhW
-         tE8n1LeE3PFYBR4cEwMoUPbaTH942mt6pu1K0hlIPejE/9EfzVQXQjzH3gHexWAKhepZ
-         eumOyVtXxS51eDFZ+1WvawGrDo+mzxGZMz5poBjF7hmxHQsqOGw85X7WoptuUO8nTZit
-         z9v1Wyn4I83d5odivzVM5HqdoAJUlM1hLCZ4fDKZI3DqhbmFOZolWGPsXZLHW/un/vuY
-         vlqamLOP90YYljCutDVJBgraVtd4GumRq0Qsu542cbR4uB8UhMFzBZJy/dMeiNxCiaOB
-         fVQw==
-X-Gm-Message-State: AAQBX9fqauK4B4g/4kQ3/FGP7PqyXcIWvyXV9EYiYATuB+Nfn/enJSyY
-	0ig2Vjg9jp3PfF9ZO1neND6rM+vTeYgQCPJCtNPz8Q==
-X-Google-Smtp-Source: AKy350aqaEfeMAyYsRokqUl0n0ZD1kFQJWJ+xAmyXbSZ5tqzcBrwqcjaPvQMcsmEpEWht0IpGdkJKw8RgguAzVjM2mA=
-X-Received: by 2002:a2e:7312:0:b0:29a:a76a:194b with SMTP id
- o18-20020a2e7312000000b0029aa76a194bmr52187ljc.3.1680540109749; Mon, 03 Apr
- 2023 09:41:49 -0700 (PDT)
+        bh=qd9vNo8gmYRz8Z2M2O7ElfQfkdlOYiM1xlJu96lXJAs=;
+        b=PHvJ2l+fNrll5GEyKCGoiSGevH04Pc4e958ehDyQOaiupsOhmaFL4OytTatnNiiAli
+         uEJEsZ8GdQDncWSx88vLnfVngBioogkJKAKZUrR4/cDxuZr1fxioSTp95PFu3CalLo+O
+         WN9yoiJ2hs4w79uGjFghygsKHG0UKF0ZfMFhPpcjNRfdMp2ZB8kfTNgw2g01EZGkQB1J
+         NLui6O5Crm/zXFADwnsWIaNU/xshZe4fpQ8WfqWro3MRM7QjwSUg5vphtd+vMfyfFGvK
+         q8jadoTL91FjcDduCV5MoSPMrWytjqOQo+evWSkydVQh2urYvOcyjvXhBKSfjT2/T9UO
+         64Xw==
+X-Gm-Message-State: AAQBX9eTp16pJAF/c1vzKg7qT/30Rs+m0CZ8c/xE3KTa2hEqXtusDgOO
+	CqXPC+DWfDoKkHASVvZ3IZMgcR2DV5Q11+uX3M8uTg==
+X-Google-Smtp-Source: AKy350ZvpCTIPloJRcOFoCrQ+HT6tXfd4a3GZ/Vtv3sZwoG6TcgOwSNV226vkhToXbFZYP2WlIqpnoj9PF1pwnBRTZc=
+X-Received: by 2002:a05:6870:96a2:b0:17e:d94f:90d9 with SMTP id
+ o34-20020a05687096a200b0017ed94f90d9mr7605490oaq.3.1680542773212; Mon, 03 Apr
+ 2023 10:26:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230403132953.2069621-1-tabba@google.com> <86wn2tulav.wl-maz@kernel.org>
-In-Reply-To: <86wn2tulav.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 3 Apr 2023 17:41:13 +0100
-Message-ID: <CA+EHjTw_saZf_nMfaRHG+Bonc3KiFLEXNwJdaY=b-fWwe1V2dg@mail.gmail.com>
-Subject: Re: [PATCH v4] KVM: arm64: Advertise ID_AA64PFR0_EL1.CSV2/3 to
- protected VMs
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, oliver.upton@linux.dev, oupton@google.com, 
-	will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, 
-	alexandru.elisei@arm.com, suzuki.poulose@arm.com, reijiw@google.com, 
-	ricarkol@google.com, rananta@google.com, jingzhangos@google.com
+References: <20230206172340.2639971-1-rananta@google.com> <20230206172340.2639971-3-rananta@google.com>
+ <ZCTjirkCgBkT65eP@linux.dev>
+In-Reply-To: <ZCTjirkCgBkT65eP@linux.dev>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Mon, 3 Apr 2023 10:26:01 -0700
+Message-ID: <CAJHc60y1BLQC4c0qXCuqF7JfewBC_fG2xuH0Wj0AHJh9x3CK5g@mail.gmail.com>
+Subject: Re: [PATCH v2 2/7] KVM: arm64: Add FEAT_TLBIRANGE support
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Ricardo Koller <ricarkol@google.com>, Reiji Watanabe <reijiw@google.com>, 
+	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Jing Zhang <jingzhangos@google.com>, Colton Lewis <coltonlewis@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Marc,
+Hi Oliver,
 
-On Mon, Apr 3, 2023 at 2:50=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote:
+On Wed, Mar 29, 2023 at 6:19=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
 >
-> On Mon, 03 Apr 2023 14:29:53 +0100,
-> Fuad Tabba <tabba@google.com> wrote:
+> On Mon, Feb 06, 2023 at 05:23:35PM +0000, Raghavendra Rao Ananta wrote:
+> > Define a generic function __kvm_tlb_flush_range() to
+> > invalidate the TLBs over a range of addresses. The
+> > implementation accepts 'op' as a generic TLBI operation.
+> > Upcoming patches will use this to implement IPA based
+> > TLB invalidations (ipas2e1is).
 > >
-> > The existing pKVM code attempts to advertise CSV2/3 using values
-> > initialized to 0, but never set. To advertise CSV2/3 to protected
-> > guests, pass the CSV2/3 values to hyp when initializing hyp's
-> > view of guests' ID_AA64PFR0_EL1.
+> > If the system doesn't support FEAT_TLBIRANGE, the
+> > implementation falls back to flushing the pages one by one
+> > for the range supplied.
 > >
-> > Similar to non-protected KVM, these are system-wide, rather than
-> > per cpu, for simplicity.
-> >
-> > Fixes: 6c30bfb18d0b ("KVM: arm64: Add handlers for protected VM System =
-Registers")
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> >
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 > > ---
+> >  arch/arm64/include/asm/kvm_asm.h | 18 ++++++++++++++++++
+> >  1 file changed, 18 insertions(+)
 > >
-> > Based on: 197b6b60ae7b (6.3-rc4)
-> > Changes from V3: Fix masking to constrain CSV2/3 to 1 (Oliver).
+> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/=
+kvm_asm.h
+> > index 43c3bc0f9544d..995ff048e8851 100644
+> > --- a/arch/arm64/include/asm/kvm_asm.h
+> > +++ b/arch/arm64/include/asm/kvm_asm.h
+> > @@ -221,6 +221,24 @@ DECLARE_KVM_NVHE_SYM(__per_cpu_end);
+> >  DECLARE_KVM_HYP_SYM(__bp_harden_hyp_vecs);
+> >  #define __bp_harden_hyp_vecs CHOOSE_HYP_SYM(__bp_harden_hyp_vecs)
 > >
-> >  arch/arm64/kvm/arm.c                          | 25 ++++++++++++++++++-
-> >  .../arm64/kvm/hyp/include/nvhe/fixed_config.h |  5 +++-
-> >  arch/arm64/kvm/hyp/nvhe/sys_regs.c            |  7 ------
-> >  3 files changed, 28 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 3bd732eaf087..04401c2851f8 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -1889,9 +1889,32 @@ static int __init do_pkvm_init(u32 hyp_va_bits)
-> >       return ret;
-> >  }
-> >
-> > +static u64 get_hyp_id_aa64pfr0_el1(void)
-> > +{
-> > +     u64 mask =3D ~(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2) |
-> > +                  ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3));
+> > +#define __kvm_tlb_flush_range(op, mmu, start, end, level, tlb_level) d=
+o {    \
+> > +     unsigned long pages, stride;                                     =
+       \
+> > +                                                                      =
+       \
+> > +     stride =3D kvm_granule_size(level);                              =
+         \
+>
+> Hmm... There's a rather subtle and annoying complication here that I
+> don't believe is handled.
+>
+> Similar to what I said in the last spin of the series, there is no
+> guarantee that a range of IPAs is mapped at the exact same level
+> throughout. Dirty logging and memslots that aren't hugepage aligned
+> could lead to a mix of mapping levels being used within a range of the
+> IPA space.
+>
+Unlike the comment on v1, the level/stride here is used to jump the
+addresses in case the system doesn't support TLBIRANGE. The TTL hint
+is 0.
+That being said, do you think we can always assume the least possible
+stride (say, 4k) and hardcode it?
+With respect to alignment, since the function is only called while
+breaking the table PTE,  do you think it'll still be a problem even if
+we go with the least granularity stride?
+
+> > +     start =3D round_down(start, stride);                             =
+         \
+> > +     end =3D round_up(end, stride);                                   =
+         \
+> > +     pages =3D (end - start) >> PAGE_SHIFT;                           =
+         \
+> > +                                                                      =
+       \
+> > +     if ((!system_supports_tlb_range() &&                             =
+       \
+> > +          (end - start) >=3D (MAX_TLBI_OPS * stride)) ||              =
+         \
+>
+> Doesn't checking for TLBIRANGE above eliminate the need to test against
+> MAX_TLBI_OPS?
+>
+Derived from __flush_tlb_range(), I think the condition is used to
+just flush everything if the range is too large to iterate and flush
+when the system doesn't support TLBIRANGE. Probably to prevent
+soft-lockups?
+
+Thank you.
+Raghavendra
+> > +         pages >=3D MAX_TLBI_RANGE_PAGES) {                           =
+         \
+> > +             __kvm_tlb_flush_vmid(mmu);                               =
+       \
+> > +             break;                                                   =
+       \
+> > +     }                                                                =
+       \
+> > +                                                                      =
+       \
+> > +     __flush_tlb_range_op(op, start, pages, stride, 0, tlb_level, fals=
+e);    \
+> > +} while (0)
 > > +
-> > +     /*
-> > +      * Track whether the system isn't affected by spectre/meltown in =
-the
-> > +      * hypervisor's view of id_aa64pfr0_el1, used for protected VMs.
-> > +      * Although this is per-CPU, we make it global for simplicity, e.=
-g., not
-> > +      * to have to worry about vcpu migration.
-> > +      *
-> > +      * Unlike for non-protected VMs, userspace cannot override this f=
-or
-> > +      * protected VMs.
-> > +      */
-> > +     mask |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2),
-> > +                        arm64_get_spectre_v2_state() =3D=3D SPECTRE_UN=
-AFFECTED);
-> > +
-> > +     mask |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3),
-> > +                        arm64_get_meltdown_state() =3D=3D SPECTRE_UNAF=
-FECTED);
-> > +
-> > +     return read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1) & mask;
->
-> I'm confused. PFR0.CSV2 is only set if the HW advertises it. But KVM
-> should advertises it to guests if arm64_get_spectre_v2_state() reports
-> "UNAFFECTED".
->
-> In that later case, "read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1) &
-> mask" will always leave CSV2 to 0. Same thing for CSV3.
->
-> I'd expect something like:
->
->         u64 val =3D read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
->
->         val &=3D ~(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2) |
->                  ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3));
->         val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2),
->                           arm64_get_spectre_v2_state() =3D=3D SPECTRE_UNA=
-FFECTED);
->         val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3),
->                           arm64_get_meltdown_state() =3D=3D SPECTRE_UNAFF=
-ECTED);
->
->         return val;
->
-> Or did I read that completely wrong?
-
-No, I missed the case where the hardware isn't unaffected and doesn't
-advertise these bits. Your suggestion covers that and ensures that
-pKVM behaves the same as non-protected KVM. I'll fix this and resend.
-
-Thanks again!
-
-/fuad
-
->
->         M.
+> >  extern void __kvm_flush_vm_context(void);
+> >  extern void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu);
+> >  extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr=
+_t ipa,
+> > --
+> > 2.39.1.519.gcb327c4b5f-goog
+> >
+> >
 >
 > --
-> Without deviation from the norm, progress is not possible.
+> Thanks,
+> Oliver
