@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A718A198
-	for <kvmarm@lists.linux.dev>; Mon,  3 Apr 2023 10:30:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57A94C433EF;
-	Mon,  3 Apr 2023 10:30:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5AEE5678
+	for <kvmarm@lists.linux.dev>; Mon,  3 Apr 2023 12:27:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CA4CC433D2;
+	Mon,  3 Apr 2023 12:27:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1680517850;
-	bh=LtfHFuZaXdP+NTrO+xUjJcWmPwQQUeWSwY+GLhi5mHk=;
+	s=k20201202; t=1680524847;
+	bh=BrG5Nj5Nwj6W50uY9aYrwQurvhRX585TrN75jn0tEdU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NpBvSLUAFrfp754Gtpm45J8SE6vwqiBXXLwlNBdR65rbS86SLJTuxvM98OASDDeGg
-	 CnrEz34OKiObnHW8yExGWwP68+DmOHW0XeMGJB0j9I94T571YLG78/Oc6eTXHNA7Vb
-	 sQKcfTVSkvWBwY/f2ABgJhtlT5rFsZKNeZEyGls3wkzhzdwEeQLdUUOUhK28uDrukx
-	 lZAlf7UFat3v/Jl4DI0FPyOE09z7OX/obJW47mIuhi1dBC1O74PM47mzPwP8MKVCQP
-	 HuW0z1PXl4TOnrDBT5g/7tv/7g88nJBRsjMbJ25c5dlwZxdJEF4HpJRWT09tWNNpa9
-	 yFJDyDziZ4zPQ==
+	b=jwPvIaqxhFQOPl7+Gk3b7rNT9smU1e04Z01CAPHyuhXckQnuTjxusx6Rv+szxbtz7
+	 E9y3j1swJHWschZmYqtPDBkd+08wLjzZyTB1jJr9zIjmVxL4nLhCdDhJbjYC9XOqkf
+	 UJkZiRUsHcSMgZSeG9f/EZklD9A4JkU7Af4GFPKZ5zDlwOi+TszoPHLSvbNaD/J5NB
+	 cgKlJ4vjRYGGddHWxXTbHSmNxMPMBd8KwAG6XnSGTRUDZaIpFkexhVbrkovzh8aLhh
+	 yyq/1WJjK1jFQg/VE1RI2G9i/tAVrPxAc1fXGnw/e50bQhtSlAN3qSasWqKFuECIRa
+	 5M2my++uR3S3w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pjHSZ-005H2b-Um;
-	Mon, 03 Apr 2023 11:30:48 +0100
-Date: Mon, 03 Apr 2023 11:30:47 +0100
-Message-ID: <861ql1w948.wl-maz@kernel.org>
+	id 1pjJHR-005Ika-3A;
+	Mon, 03 Apr 2023 13:27:25 +0100
+Date: Mon, 03 Apr 2023 13:27:24 +0100
+Message-ID: <86y1n9up5f.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Jing Zhang <jingzhangos@google.com>
 Cc: KVM <kvm@vger.kernel.org>,
@@ -37,9 +37,10 @@ Cc: KVM <kvm@vger.kernel.org>,
 	Fuad Tabba <tabba@google.com>,
 	Reiji Watanabe <reijiw@google.com>,
 	Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v5 0/6] Support writable CPU ID registers from userspace
-In-Reply-To: <20230402183735.3011540-1-jingzhangos@google.com>
+Subject: Re: [PATCH v5 5/6] KVM: arm64: Introduce ID register specific descriptor
+In-Reply-To: <20230402183735.3011540-6-jingzhangos@google.com>
 References: <20230402183735.3011540-1-jingzhangos@google.com>
+	<20230402183735.3011540-6-jingzhangos@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,37 +56,62 @@ X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.lin
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sun, 02 Apr 2023 19:37:29 +0100,
+On Sun, 02 Apr 2023 19:37:34 +0100,
 Jing Zhang <jingzhangos@google.com> wrote:
 > 
-> This patchset refactors/adds code to support writable per guest CPU ID feature
-> registers. Part of the code/ideas are from
-> https://lore.kernel.org/all/20220419065544.3616948-1-reijiw@google.com .
-> No functional change is intended in this patchset. With the new CPU ID feature
-> registers infrastructure, only writtings of ID_AA64PFR0_EL1.[CSV2|CSV3],
-> ID_AA64DFR0_EL1.PMUVer and ID_DFR0_ELF.PerfMon are allowed as KVM does before.
+> Introduce an ID feature register specific descriptor to include ID
+> register specific fields and callbacks besides its corresponding
+> general system register descriptor.
 > 
-> Writable (Configurable) per guest CPU ID feature registers are useful for
-> creating/migrating guest on ARM CPUs with different kinds of features.
+> No functional change intended.
 > 
+> Co-developed-by: Reiji Watanabe <reijiw@google.com>
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > ---
+>  arch/arm64/kvm/id_regs.c  | 233 ++++++++++++++++++++++++++++----------
+>  arch/arm64/kvm/sys_regs.c |   2 +-
+>  arch/arm64/kvm/sys_regs.h |   1 +
+>  3 files changed, 178 insertions(+), 58 deletions(-)
 > 
-> * v4 -> v5
->   - Rebased to 2fad20ae05cb (kvmarm/next)
->     Merge branch kvm-arm64/selftest/misc-6,4 into kvmarm-master/next
+> diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
+> index e92eacb0ad32..af86001e2686 100644
+> --- a/arch/arm64/kvm/id_regs.c
+> +++ b/arch/arm64/kvm/id_regs.c
+> @@ -18,6 +18,27 @@
+>  
+>  #include "sys_regs.h"
+>  
+> +struct id_reg_desc {
+> +	const struct sys_reg_desc	reg_desc;
+> +	/*
+> +	 * ftr_bits points to the feature bits array defined in cpufeature.c for
+> +	 * writable CPU ID feature register.
+> +	 */
+> +	const struct arm64_ftr_bits *ftr_bits;
 
-Please don't do that. Always use a stable, tagged commit, not some
-random "commit of the day". If there is a dependency, indicate the
-*exact* dependency. Yes, x86 is managed differently.
+Why do we need to keep this around? we already have all the required
+infrastructure to lookup a full arm64_ftr_reg. So why the added stuff?
 
-I'm never going to apply anything on top of an arbitrary commit, so
-this makes it difficult for both you and I. I understand that you want
-to avoid conflicts, but I really don't mind resolving those.
+> +	/*
+> +	 * Only bits with 1 are writable from userspace.
+> +	 * This mask might not be necessary in the future whenever all ID
+> +	 * registers are enabled as writable from userspace.
+> +	 */
+> +	const u64 writable_mask;
+> +	/*
+> +	 * This function returns the KVM sanitised register value.
+> +	 * The value would be the same as the host kernel sanitised value if
+> +	 * there is no KVM sanitisation for this id register.
+> +	 */
+> +	u64 (*read_kvm_sanitised_reg)(const struct id_reg_desc *idr);
 
-So please stick to existing tags as a base, and describe the
-dependencies you have (in this case, the locking series).
+Why can't this function return both the required value and a mask?
+Why can't it live in the sys_reg_desc structure?
 
-Thanks,
+Frankly, I don't see a good reason to have this wrapper structure
+which makes things pointlessly complicated and prevent code sharing
+with the rest of the infrastructure.
 
 	M.
 
