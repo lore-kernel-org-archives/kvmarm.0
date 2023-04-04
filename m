@@ -1,30 +1,29 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-29.mta1.migadu.com (out-29.mta1.migadu.com [95.215.58.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03BD7C
-	for <kvmarm@lists.linux.dev>; Tue,  4 Apr 2023 10:50:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED4CDC4339B;
-	Tue,  4 Apr 2023 10:50:37 +0000 (UTC)
-Date: Tue, 4 Apr 2023 11:50:34 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Kristina Martsenko <kristina.martsenko@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Luis Machado <luis.machado@arm.com>,
-	Vladimir Murzin <vladimir.murzin@arm.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 04/10] arm64: mops: document boot requirements for MOPS
-Message-ID: <ZCwA+rbmFT2HaZ7G@arm.com>
-References: <20230216160012.272345-1-kristina.martsenko@arm.com>
- <20230216160012.272345-5-kristina.martsenko@arm.com>
- <ZBSCObGmIXjyeMA6@arm.com>
- <61b0e30a-568c-d7f6-7b67-e9fc8b68de25@arm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050E56AB8
+	for <kvmarm@lists.linux.dev>; Tue,  4 Apr 2023 12:47:50 +0000 (UTC)
+Date: Tue, 4 Apr 2023 14:47:47 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1680612468;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6oSkwVtAFz/64zpfFDW2DBrJENzw8H7IvhaMYTJCvpI=;
+	b=CczpIPdHmGEqeMZsQ5AcnIOuWUYeUoVhwi+Tg96ZC62y/UmPOXs8Ivf4vUaY+XH4XjUkpG
+	2ips9Xbspa7uU06niAqAIzMDZ5Hoc7lsOILCNcnSpvDkWw+zhG783oJZM9E9/utsaGn2PN
+	It5WDHF+ciP8uyMUFmQPVMYYGWsOa0I=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	maz@kernel.org, will@kernel.org, oliver.upton@linux.dev, ricarkol@google.com, 
+	reijiw@google.com, alexandru.elisei@arm.com
+Subject: Re: [kvm-unit-tests PATCH 0/6] arm: pmu: Fix random failures of
+ pmu-chain-promotion
+Message-ID: <xcd3kt23ffdq5qfziuyp2vgwv7ndkmh3acepbpqqhhrokv755e@wuiltddj2hj2>
+References: <20230315110725.1215523-1-eric.auger@redhat.com>
+ <968a026e-066e-deea-d02f-f64133295ff1@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -33,70 +32,47 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <61b0e30a-568c-d7f6-7b67-e9fc8b68de25@arm.com>
+In-Reply-To: <968a026e-066e-deea-d02f-f64133295ff1@redhat.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Mar 24, 2023 at 01:00:43AM +0000, Kristina Martsenko wrote:
-> On 17/03/2023 15:07, Catalin Marinas wrote:
-> > On Thu, Feb 16, 2023 at 04:00:06PM +0000, Kristina Martsenko wrote:
-> >> +  For CPUs with Memory Copy and Memory Set instructions (FEAT_MOPS):
-> >> +
-> >> +  - If the kernel is entered at EL1 and EL2 is present:
-> >> +
-> >> +    - HCRX_EL2.MSCEn (bit 11) must be initialised to 0b1.
-> >> +
-> >> +    - HCRX_EL2.MCE2 (bit 10) must be initialised to 0b0.
-> > 
-> > Regarding MCE2, does EL1 actually care if EL2 wants to handle all the
-> > memcpy/memset exceptions? 
+On Tue, Apr 04, 2023 at 08:23:15AM +0200, Eric Auger wrote:
+> Hi,
 > 
-> No, EL1 does not need to handle the exceptions itself, but I don't see any
-> current use case for allowing EL2 to handle it.
+> On 3/15/23 12:07, Eric Auger wrote:
+> > On some HW (ThunderXv2), some random failures of
+> > pmu-chain-promotion test can be observed.
+> >
+> > pmu-chain-promotion is composed of several subtests
+> > which run 2 mem_access loops. The initial value of
+> > the counter is set so that no overflow is expected on
+> > the first loop run and overflow is expected on the second.
+> > However it is observed that sometimes we get an overflow
+> > on the first run. It looks related to some variability of
+> > the mem_acess count. This variability is observed on all
+> > HW I have access to, with different span though. On
+> > ThunderX2 HW it looks the margin that is currently taken
+> > is too small and we regularly hit failure.
+> >
+> > although the first goal of this series is to increase
+> > the count/margin used in those tests, it also attempts
+> > to improve the pmu-chain-promotion logs, add some barriers
+> > in the mem-access loop, clarify the chain counter
+> > enable/disable sequence.
+> >
+> > A new 'pmu-memaccess-reliability' is also introduced to
+> > detect issues with MEM_ACCESS event variability and make
+> > the debug easier.
+> >
+> > Obviously one can wonder if this variability is something normal
+> > and does not hide any other bug. I hope this series will raise
+> > additional discussions about this.
+> >
+> > https://github.com/eauger/kut/tree/pmu-chain-promotion-fixes-v1
 > 
-> If it was allowed, I think booting.txt would need to specify exactly what Linux
-> expects EL2 to do if MCE2 is set (eg, that EL2 handles the exception by
-> reformatting registers, modifying single step state, etc).
+> Gentle ping.
 
-What I meant is that an EL1 kernel shouldn't care if MCE2 is 0 or 1. We
-could clarify that if set to 1, it is expected that the hypervisor
-handles the memory copy/set exceptions accordingly.
+I'd be happy to take this, but I was hoping to see some r-b's and/or t-b's
+from some of the others.
 
-> > There may even be a valid case to do this at
-> > EL2 if you run a guest that uses these instructions but has no clue on
-> > how to deal with the specific exception like WrongOption.
-> 
-> Not sure I follow - this series adds the exception handling, so how can a Linux
-> guest not know how to handle the exception?
-
-The guest may not always be Linux (e.g. some microkernel) and may not
-expect the hardware implementation to change underneath.
-
-> Or do you mean that there may be times when EL1 can't take the exception but
-> EL2 may move it to another CPU, and so EL2 would need to handle the exception?
-
-I haven't thought of this but it's actually a good point. Are there any
-cases where Linux can't handle a memcpy exception? I guess we need to be
-careful with taking such exception in an atomic context (e.g. no
-rescheduling on the return path).
-
-> I'm not sure if Linux ever uses mops instructions at times like that.
-
-The compiler may generate a memcpy() call by simply assigning a
-structure to another. So we can't control where those instructions are
-used.
-
-> Note that this series does not add support for mops in guests yet. 
-
-You mean there's no KVM support. But Linux may be run under a different
-hypervisor (e.g. Hyper-V) as a guest.
-
-> I think booting.txt can be updated when that support is added.
-
-In booting.txt, when you say the kernel entered at EL1, it implies that
-it may be run as a guest under a random hypervisor.
-
-So maybe we should detail the MCE2 requirement a bit, saying that it can
-be either 0 or 1 but, for the latter, the hypervisor must handle the
-corresponding exceptions.
-
--- 
-Catalin
+Thanks,
+drew
