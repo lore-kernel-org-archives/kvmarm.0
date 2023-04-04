@@ -1,177 +1,144 @@
-Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7355A935
-	for <kvmarm@lists.linux.dev>; Mon,  3 Apr 2023 21:26:01 +0000 (UTC)
-Received: by mail-oo1-f49.google.com with SMTP id m6-20020a4ae846000000b0053b9059edd5so4856002oom.3
-        for <kvmarm@lists.linux.dev>; Mon, 03 Apr 2023 14:26:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 753EC7C
+	for <kvmarm@lists.linux.dev>; Tue,  4 Apr 2023 03:53:47 +0000 (UTC)
+Received: by mail-pl1-f201.google.com with SMTP id n13-20020a170902d2cd00b001a22d27406bso16936315plc.13
+        for <kvmarm@lists.linux.dev>; Mon, 03 Apr 2023 20:53:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680557161;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kj5a1Gjv5u3ed9nScVQuCJw/TrKNl0CS2e9DPpgpMXA=;
-        b=mgVL+rENIqJd9I9v7V0Guir9ljCZePQyRnCXisG5f1mOrzACjXVqszlL/X48Vanzo1
-         CjSAKSQ0mdQ3p/mVUVSOmzOOqszaQHXxfclviPRo7GCBAmHcdoGZhoxlEQaU8vjkjidC
-         JWA048aq1fb0aq47KQ58KMM30zZ5KBhy6EsFxZzk0M2LfmX4jpgE6Ql0UflKmsqGB0qR
-         Z9m3xzs0lYj8z/0uAiioNURmyO3StSqsmubWQ0qfIG9mfMR9plqhEZixLkCYodxZuzUN
-         GB0dBemlcOud2MslvusZ4ZQYOnAkm0OQ8dplUsrUoKquub/JZFFSyNLdq6+HzrSlFfeF
-         DNrg==
+        d=google.com; s=20210112; t=1680580427;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Kl6XH7tsAvbCeHiUIQpcSJ8z/9T0GbF7s7ZTe/CJjI8=;
+        b=ZJtZ3QkBwaqzM6X3963/YPwxJHfGZQbe02Ext9gV1LQX8kN7cpb3f3zrXaSw/nGdRO
+         0FJIiFqqCOrwxsteNiUfP2UBtaawRHVyUh/muSx7MapgJdDDsMkqhNpYUPL3UJzanT3s
+         UHZizYqmgw4v4g3XZkYxpXsvPLmUcsf9U7r36RkYAimpCB0RuYvI3hNnkhLn+N9ZSIct
+         fTj297YMQMlT/49BSdPQ+ozIrdV+hTobtvsKnHQPOZprhaE16mfVyRYksW6s2GIQe6l6
+         dnuOJbTfDOLfEBcFvn2Q7amY9LvCnPiLb23yWj3oDJxgB+o+B6W1U/r3iEBkxEkwzWtN
+         nJuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680557161;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kj5a1Gjv5u3ed9nScVQuCJw/TrKNl0CS2e9DPpgpMXA=;
-        b=6R+zoKglZG4Bkk5/PD5Ebg5xJVknBXQgMTjCMIoqxb2BIRXPygVxgMGEs6Rs3AkHxl
-         k3BHUYq2GlFZVYkoObFP/RupjiwVt6wxm+8bV6BJruFCjFvojZdn6MmGYvDYwdiHJGZb
-         DsZJd6QRNiBr7yD0Fk2vNfZRn5yULJ8D/lyUUQ9Rpbgeh2IX451og9EUZmvOwgi+mPKw
-         U8RAKjDR8G6qYPjofwOAnxf4xbTXVi4CR+C1j0GWBYFKiSexnNArYCICeja5baKXidZD
-         cDYe/c7lhFm9sWpBmrIiq7yvbR01scPw1XNkyTxGeZayGY+U1XErq/QG/a9SGUP+SJok
-         R08Q==
-X-Gm-Message-State: AAQBX9fB5kNFpX+f+5RGd4+yyMkc5n/YaA1PY74YI9gj7Itd+XacHDI5
-	GRSlFobrSHG/JbuIP9KFLyD+leQBG5oQ/QMFiPFILg==
-X-Google-Smtp-Source: AKy350Zqul6mVyvawVN/gE10vGUZ571dKlqpaiOYYFKigQGJiSFxqug/tZdueykq19XibUWA6mbqM9ZFY60UoL6xlFM=
-X-Received: by 2002:a4a:a406:0:b0:53e:944:8896 with SMTP id
- v6-20020a4aa406000000b0053e09448896mr354553ool.0.1680557160674; Mon, 03 Apr
- 2023 14:26:00 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1680580427;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Kl6XH7tsAvbCeHiUIQpcSJ8z/9T0GbF7s7ZTe/CJjI8=;
+        b=CLAtMdbD3utCujJJkotHh4JO/MbCS7g4s4mlj4OxtmxJIrMEAEraIhym3fLWiIh74z
+         kEq+r1zmhyQkmrqXEVNQklYeLBnhiH5qyCxcwRLxbpCCHWUBzVNhclK9qHHWTKhp9BPZ
+         OZoS92IilzSMYiyxjCGBbWGoFiLUbrspjXLLx+nOkkLmzJSLaQRuXv0nNIxZP/cTPT8g
+         G1bFBNUHjs6BkIKpNEMeBGEOCksJL5uCt/Mgi8v/m8/UxYMeRhZKB1OV3njIYqfZpFJ7
+         KB+N1ko+NPof/2DFhR3Ww2avZsZc+Yey37qFNs1ICDkEgwKZ2iQMQVxFfBT1GRisxydQ
+         wIog==
+X-Gm-Message-State: AAQBX9f0LWKXSCr2Cuo4pghS/5QpNMd0mOeH6Oqx6/4x6c8m8zhEIG2P
+	nidK0dyLTwPcomFU8V5SRIOrcBUBMLfZag/6CA==
+X-Google-Smtp-Source: AKy350ZJfffhvWGlxC1EcPyUK94RX+9STEn5IxpVxmbl99uTVRhb6XFmqy/CVVWHJ1om8sN4O/I1Mmxxdu4SRKLB1g==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a17:903:494:b0:19a:e3d4:216e with SMTP
+ id jj20-20020a170903049400b0019ae3d4216emr481174plb.7.1680580426875; Mon, 03
+ Apr 2023 20:53:46 -0700 (PDT)
+Date: Tue,  4 Apr 2023 03:53:38 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230206172340.2639971-1-rananta@google.com> <20230206172340.2639971-7-rananta@google.com>
- <ZCTVFYd2oJnGR6O+@linux.dev>
-In-Reply-To: <ZCTVFYd2oJnGR6O+@linux.dev>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Mon, 3 Apr 2023 14:25:49 -0700
-Message-ID: <CAJHc60wfkYiO95c-oY1jSNyRBLtjBvr6bDDbBw26DxqiY4MSmA@mail.gmail.com>
-Subject: Re: [PATCH v2 6/7] KVM: arm64: Break the table entries using TLBI
- range instructions
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Ricardo Koller <ricarkol@google.com>, Reiji Watanabe <reijiw@google.com>, 
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
+Message-ID: <20230404035344.4043856-1-jingzhangos@google.com>
+Subject: [PATCH v6 0/6] Support writable CPU ID registers from userspace
+From: Jing Zhang <jingzhangos@google.com>
+To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@google.com>
+Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
 	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Jing Zhang <jingzhangos@google.com>, Colton Lewis <coltonlewis@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, 
+	Reiji Watanabe <reijiw@google.com>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 29, 2023 at 5:17=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> nit: s/break/invalidate/g
->
-> There is a rather important degree of nuance there. 'Break' as it
-> relates to break-before-make implies that the PTE is made invalid and
-> visible to hardware _before_ a subsequent invalidation. There will be
-> systems that relax this requirement and also support TLBIRANGE.
->
-> On Mon, Feb 06, 2023 at 05:23:39PM +0000, Raghavendra Rao Ananta wrote:
->
-> Some nitpicking on the changelog:
->
-> > Currently, when breaking up the stage-2 table entries, KVM
->
-> 'breaking up stage-2 table entries' is rather ambiguous. Instead
-> describe the operation taking place on the page tables (i.e. hugepage
-> collapse).
->
-> > would flush the entire VM's context using 'vmalls12e1is'
-> > TLBI operation. One of the problematic situation is collapsing
-> > table entries into a hugepage, specifically if the VM is
-> > faulting on many hugepages (say after dirty-logging). This
-> > creates a performance penality for the guest whose pages have
->
-> typo: penalty
->
-> > already been faulted earlier as they would have to refill their
-> > TLBs again.
-> >
-> > Hence, if the system supports it, use __kvm_tlb_flush_range_vmid_ipa()
->
-> > to flush only the range of pages governed by the table entry,
-> > while leaving other TLB entries alone. An upcoming patch also
-> > takes advantage of this when breaking up table entries during
-> > the unmap operation.
->
-> Language regarding an upcoming patch isn't necessary, as this one stands
-> on its own (implements and uses a range-based invalidation helper).
->
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/pgtable.c | 23 ++++++++++++++++++++---
-> >  1 file changed, 20 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.=
-c
-> > index b11cf2c618a6c..0858d1fa85d6b 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -686,6 +686,20 @@ static bool stage2_try_set_pte(const struct kvm_pg=
-table_visit_ctx *ctx, kvm_pte_
-> >       return cmpxchg(ctx->ptep, ctx->old, new) =3D=3D ctx->old;
-> >  }
-> >
-> > +static void kvm_pgtable_stage2_flush_range(struct kvm_s2_mmu *mmu, u64=
- start, u64 end,
-> > +                                             u32 level, u32 tlb_level)
-> > +{
-> > +     if (system_supports_tlb_range())
->
-> You also check this in __kvm_tlb_flush_range(), ideally this should be
-> done exactly once per call.
->
-> > +             kvm_call_hyp(__kvm_tlb_flush_range_vmid_ipa, mmu, start, =
-end, level, tlb_level);
-> > +     else
-> > +             /*
-> > +              * Invalidate the whole stage-2, as we may have numerous =
-leaf
-> > +              * entries below us which would otherwise need invalidati=
-ng
-> > +              * individually.
-> > +              */
-> > +             kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> > +}
-> > +
-> >  /**
-> >   * stage2_try_break_pte() - Invalidates a pte according to the
-> >   *                       'break-before-make' requirements of the
-> > @@ -721,10 +735,13 @@ static bool stage2_try_break_pte(const struct kvm=
-_pgtable_visit_ctx *ctx,
-> >        * Perform the appropriate TLB invalidation based on the evicted =
-pte
-> >        * value (if any).
-> >        */
-> > -     if (kvm_pte_table(ctx->old, ctx->level))
-> > -             kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> > -     else if (kvm_pte_valid(ctx->old))
-> > +     if (kvm_pte_table(ctx->old, ctx->level)) {
-> > +             u64 end =3D ctx->addr + kvm_granule_size(ctx->level);
-> > +
-> > +             kvm_pgtable_stage2_flush_range(mmu, ctx->addr, end, ctx->=
-level, 0);
-> > +     } else if (kvm_pte_valid(ctx->old)) {
-> >               kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ct=
-x->level);
-> > +     }
-> >
-> >       if (stage2_pte_is_counted(ctx->old))
-> >               mm_ops->put_page(ctx->ptep);
-> > --
-> > 2.39.1.519.gcb327c4b5f-goog
-> >
-> >
-ACK on all of the comments. I'll address them in next revision.
+This patchset refactors/adds code to support writable per guest CPU ID feature
+registers. Part of the code/ideas are from
+https://lore.kernel.org/all/20220419065544.3616948-1-reijiw@google.com .
+No functional change is intended in this patchset. With the new CPU ID feature
+registers infrastructure, only writtings of ID_AA64PFR0_EL1.[CSV2|CSV3],
+ID_AA64DFR0_EL1.PMUVer and ID_DFR0_ELF.PerfMon are allowed as KVM does before.
 
-Thank you.
-Raghavendra
->
-> --
-> Thanks,
-> Oliver
+Writable (Configurable) per guest CPU ID feature registers are useful for
+creating/migrating guest on ARM CPUs with different kinds of features.
+
+This patchset uses kvm->arch.config_lock from Oliver's lock inversion fixes at
+https://lore.kernel.org/linux-arm-kernel/20230327164747.2466958-1-oliver.upton@linux.dev/
+
+---
+
+* v5 -> v6
+  - Rebased to v6.3-rc5.
+  - Reuse struct sys_reg_desc's reset() callback and field val for KVM.
+    sanitisation function and writable mask instead of creating a new data
+    structure for idregs.
+  - Use get_arm64_ftr_reg() instead of exposing idregs ftr_bits array.
+
+* v4 -> v5
+  - Rebased to 2fad20ae05cb (kvmarm/next)
+    Merge branch kvm-arm64/selftest/misc-6,4 into kvmarm-master/next
+  - Use kvm->arch.config_lock to guard update to multiple VM scope idregs
+    to avoid lock inversion
+  - Add back IDREG() macro for idregs access
+  - Refactor struct id_reg_desc by using existing infrastructure.
+  - Addressed many other comments from Marc.
+
+* v3 -> v4
+  - Remove IDREG() macro for ID reg access, use simple array access instead
+  - Rename kvm_arm_read_id_reg_with_encoding() to kvm_arm_read_id_reg()
+  - Save perfmon value in ID_DFR0_EL1 instead of pmuver
+  - Update perfmon in ID_DFR0_EL1 and pmuver in ID_AA64DFR0_EL1 atomically
+  - Remove kvm_vcpu_has_pmu() in macro kvm_pmu_is_3p5()
+  - Improve ID register sanity checking in kvm_arm_check_idreg_table()
+
+* v2 -> v3
+  - Rebased to 96a4627dbbd4 (kvmarm/next)
+    Merge tag ' https://github.com/oupton/linux tags/kvmarm-6.3' from into kvmarm-master/next
+  - Add id registere emulation entry point function emulate_id_reg
+  - Fix consistency for ID_AA64DFR0_EL1.PMUVer and ID_DFR0_EL1.PerfMon
+  - Improve the checking for id register table by ensuring that every entry has
+    the correct id register encoding.
+  - Addressed other comments from Reiji and Marc.
+
+* v1 -> v2
+  - Rebase to 7121a2e1d107 (kvmarm/next) Merge branch kvm-arm64/nv-prefix into kvmarm/next
+  - Address writing issue for PMUVer
+
+[1] https://lore.kernel.org/all/20230201025048.205820-1-jingzhangos@google.com
+[2] https://lore.kernel.org/all/20230212215830.2975485-1-jingzhangos@google.com
+[3] https://lore.kernel.org/all/20230228062246.1222387-1-jingzhangos@google.com
+[4] https://lore.kernel.org/all/20230317050637.766317-1-jingzhangos@google.com
+[5] https://lore.kernel.org/all/20230402183735.3011540-1-jingzhangos@google.com
+
+---
+
+Jing Zhang (6):
+  KVM: arm64: Move CPU ID feature registers emulation into a separate
+    file
+  KVM: arm64: Save ID registers' sanitized value per guest
+  KVM: arm64: Use per guest ID register for ID_AA64PFR0_EL1.[CSV2|CSV3]
+  KVM: arm64: Use per guest ID register for ID_AA64DFR0_EL1.PMUVer
+  KVM: arm64: Reuse fields of sys_reg_desc for idreg
+  KVM: arm64: Refactor writings for PMUVer/CSV2/CSV3
+
+ arch/arm64/include/asm/cpufeature.h |   1 +
+ arch/arm64/include/asm/kvm_host.h   |  34 +-
+ arch/arm64/kernel/cpufeature.c      |   2 +-
+ arch/arm64/kvm/Makefile             |   2 +-
+ arch/arm64/kvm/arm.c                |  24 +-
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c  |   7 -
+ arch/arm64/kvm/id_regs.c            | 670 ++++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c           | 525 ++++------------------
+ arch/arm64/kvm/sys_regs.h           |  28 +-
+ include/kvm/arm_pmu.h               |   5 +-
+ 10 files changed, 809 insertions(+), 489 deletions(-)
+ create mode 100644 arch/arm64/kvm/id_regs.c
+
+
+base-commit: 7e364e56293bb98cae1b55fd835f5991c4e96e7d
+-- 
+2.40.0.348.gf938b09366-goog
+
