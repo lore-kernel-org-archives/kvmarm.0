@@ -1,127 +1,105 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C9E648
-	for <kvmarm@lists.linux.dev>; Tue,  4 Apr 2023 06:23:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1680589402;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=APNrYYwPBAuPO+GWb7+dbYKyxbTjRyfGmu8CPqknU3k=;
-	b=DOGUrwFhCMSwi0eYWo8dNecfyfNHOOyMoTdW7S/hJHXTZrsSiGm3CqLufCepGvh/GzZ5qI
-	ylC/SA2KkUy59zyabnLMEr9a2ZYzogAQdz6YUrdLq2ZTEd8PyGkZdaZKH2qGXIkueKUNI8
-	epzysZ8CYiutoWb7RtyHyOUcYTtb/gI=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-209-pB65kaY5NIW7kQMQ9MbQsw-1; Tue, 04 Apr 2023 02:23:21 -0400
-X-MC-Unique: pB65kaY5NIW7kQMQ9MbQsw-1
-Received: by mail-qt1-f197.google.com with SMTP id u22-20020a05622a011600b003dfd61e8594so21416074qtw.15
-        for <kvmarm@lists.linux.dev>; Mon, 03 Apr 2023 23:23:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680589399;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=APNrYYwPBAuPO+GWb7+dbYKyxbTjRyfGmu8CPqknU3k=;
-        b=yPmOQ151nhnMOM0o1/Z4CaqeSoqrWSWmPUds3+f49GND7wSnY+/SAn9HyIoh0smHRq
-         dJT98snctlSJu0Y0CSEeCJ7AqhBfEeO8/4TZFcHokWzLl9pDuelL/vTHXR0Edht+8YS3
-         w8M27AD5IG1WBoCwm2/i9BoLQw3BtMTzXi/k0QDJrVn/9ROHGo7rPUl1I3f66m5fhi3u
-         NfxsC3jgG8GMvMSn+qMo+37lYgJpZzl6Mhf+5upKXXdsUbsHmiiyUvYTON2bfwLEJD2F
-         Rrx8xbE4VQtJjRpfwWuOJpM93O1wu+FUhzP1gIDLaKnfNH9U0/zg3wdD8WFFXrWYH4zP
-         5Icw==
-X-Gm-Message-State: AAQBX9cuI8yZzw8uqVQEMO37gjhxhIsF9oAyuSk8kwgpQca1C5htRXfg
-	FmAXJKeYhZthgOHP6d4pdKIT/HA9Dc5a/bST+9XaAl3xUfDXR33XQN1WZQYOPYFuXqByIKFoOv0
-	fWmvqLgbbO03CKHgEgx7B9a1F
-X-Received: by 2002:a05:6214:21a4:b0:56f:d8:dbb4 with SMTP id t4-20020a05621421a400b0056f00d8dbb4mr1943715qvc.2.1680589399746;
-        Mon, 03 Apr 2023 23:23:19 -0700 (PDT)
-X-Google-Smtp-Source: AKy350azFYLEwDlMSgwwh8I9rqVxvJqaLdUyzLHmRZw0ztFX9U2/HybsX+OTx3X6c8SwpCBJw9wTYg==
-X-Received: by 2002:a05:6214:21a4:b0:56f:d8:dbb4 with SMTP id t4-20020a05621421a400b0056f00d8dbb4mr1943700qvc.2.1680589399506;
-        Mon, 03 Apr 2023 23:23:19 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ny4-20020a056214398400b005e37909a7fcsm2022912qvb.13.2023.04.03.23.23.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Apr 2023 23:23:18 -0700 (PDT)
-Message-ID: <968a026e-066e-deea-d02f-f64133295ff1@redhat.com>
-Date: Tue, 4 Apr 2023 08:23:15 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30ED533DA
+	for <kvmarm@lists.linux.dev>; Tue,  4 Apr 2023 10:05:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3321C4339B;
+	Tue,  4 Apr 2023 10:05:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1680602714;
+	bh=vk4tGNl8zx+FJkjVlaxsYjBg7s0TpSl6JR8Z0Yd06kc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=d3jtdP4xbuVnCqgYuEEzVeoezrc/0yMmeXe7vRzRdXaX3fWdsWErCoVMm3eZFM3w+
+	 VfZ7z35ei08ZqJFcZwn21W+D5w5Q7FBhZQ2Zha2xYA0C25mMXGCP1hZdQiY9mHSS1l
+	 b6iNy2iNJNy4+RYn2s4vdIHzEKWWi9+GHf5HoLxmFU/X6aOlC5zjbeuzSLlUQuowxr
+	 plP38shNHVzjkRC8KbSYKzcE7MQCx7daqNGlwiMb0XRsOBprCLiUGoI7jWiuR6aSfG
+	 0M4lFucyVxhy+HvpM+oUHARLQxtI2LdAoZ49JM1XaLu3qv8u72v5uPPva/lTZfZARm
+	 0WJ4L66QKF92Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pjdXM-005ZtD-7f;
+	Tue, 04 Apr 2023 11:05:12 +0100
+Date: Tue, 04 Apr 2023 11:05:11 +0100
+Message-ID: <86ttxwufmw.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Reiji Watanabe <reijiw@google.com>, Oliver Upton <oliver.upton@linux.dev>,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Raghavendra Rao Anata <rananta@google.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v1 0/2] KVM: arm64: PMU: Correct the handling of PMUSERENR_EL0
+In-Reply-To: <20230329002136.2463442-1-reijiw@google.com>
+References: <20230329002136.2463442-1-reijiw@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH 0/6] arm: pmu: Fix random failures of
- pmu-chain-promotion
-To: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- andrew.jones@linux.dev, maz@kernel.org, will@kernel.org,
- oliver.upton@linux.dev, ricarkol@google.com, reijiw@google.com,
- alexandru.elisei@arm.com
-References: <20230315110725.1215523-1-eric.auger@redhat.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230315110725.1215523-1-eric.auger@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: mark.rutland@arm.com, reijiw@google.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, alexandru.elisei@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, pbonzini@redhat.com, ricarkol@google.com, jingzhangos@google.com, rananta@google.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi,
++ Mark, as we just discussed this.
 
-On 3/15/23 12:07, Eric Auger wrote:
-> On some HW (ThunderXv2), some random failures of
-> pmu-chain-promotion test can be observed.
->
-> pmu-chain-promotion is composed of several subtests
-> which run 2 mem_access loops. The initial value of
-> the counter is set so that no overflow is expected on
-> the first loop run and overflow is expected on the second.
-> However it is observed that sometimes we get an overflow
-> on the first run. It looks related to some variability of
-> the mem_acess count. This variability is observed on all
-> HW I have access to, with different span though. On
-> ThunderX2 HW it looks the margin that is currently taken
-> is too small and we regularly hit failure.
->
-> although the first goal of this series is to increase
-> the count/margin used in those tests, it also attempts
-> to improve the pmu-chain-promotion logs, add some barriers
-> in the mem-access loop, clarify the chain counter
-> enable/disable sequence.
->
-> A new 'pmu-memaccess-reliability' is also introduced to
-> detect issues with MEM_ACCESS event variability and make
-> the debug easier.
->
-> Obviously one can wonder if this variability is something normal
-> and does not hide any other bug. I hope this series will raise
-> additional discussions about this.
->
-> https://github.com/eauger/kut/tree/pmu-chain-promotion-fixes-v1
+On Wed, 29 Mar 2023 01:21:34 +0100,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> This series will fix bugs in KVM's handling of PMUSERENR_EL0.
+> 
+> With PMU access support from EL0 [1], the perf subsystem would
+> set CR and ER bits of PMUSERENR_EL0 as needed to allow EL0 to have
+> a direct access to PMU counters.  However, KVM appears to assume
+> that the register value is always zero for the host EL0, and has
+> the following two problems in handling the register.
+> 
+> [A] The host EL0 might lose the direct access to PMU counters, as
+>     KVM always clears PMUSERENR_EL0 before returning to userspace.
+> 
+> [B] With VHE, the guest EL0 access to PMU counters might be trapped
+>     to EL1 instead of to EL2 (even when PMUSERENR_EL0 for the guest
+>     indicates that the guest EL0 has an access to the counters).
+>     This is because, with VHE, KVM sets ER, CR, SW and EN bits of
+>     PMUSERENR_EL0 to 1 on vcpu_load() to ensure to trap PMU access
+>     from the guset EL0 to EL2, but those bits might be cleared by
+>     the perf subsystem after vcpu_load() (when PMU counters are
+>     programmed for the vPMU emulation).
+> 
+> Patch-1 will fix [A], and Patch-2 will fix [B] respectively.
+> The series is based on v6.3-rc4.
+> 
+> [1] https://github.com/torvalds/linux/commit/83a7a4d643d33a8b74a42229346b7ed7139fcef9
+> 
+> Reiji Watanabe (2):
+>   KVM: arm64: PMU: Restore the host's PMUSERENR_EL0
+>   KVM: arm64: PMU: Ensure to trap PMU access from EL0 to EL2
+> 
+>  arch/arm64/include/asm/kvm_host.h       |  3 +++
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 28 +++++++++++++------------
+>  2 files changed, 18 insertions(+), 13 deletions(-)
+> 
+> 
+> base-commit: 197b6b60ae7bc51dd0814953c562833143b292aa
+> -- 
+> 2.40.0.348.gf938b09366-goog
+> 
+> 
 
-Gentle ping.
-
-Thanks
-
-Eric
->
-> Eric Auger (6):
->   arm: pmu: pmu-chain-promotion: Improve debug messages
->   arm: pmu: pmu-chain-promotion: Introduce defines for count and margin
->     values
->   arm: pmu: Add extra DSB barriers in the mem_access loop
->   arm: pmu: Fix chain counter enable/disable sequences
->   arm: pmu: Add pmu-memaccess-reliability test
->   arm: pmu-chain-promotion: Increase the count and margin values
->
->  arm/pmu.c         | 189 +++++++++++++++++++++++++++++++++-------------
->  arm/unittests.cfg |   6 ++
->  2 files changed, 141 insertions(+), 54 deletions(-)
->
-
+-- 
+Without deviation from the norm, progress is not possible.
