@@ -1,57 +1,54 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02714BA52
-	for <kvmarm@lists.linux.dev>; Tue,  4 Apr 2023 16:00:47 +0000 (UTC)
-Received: by mail-wr1-f52.google.com with SMTP id r11so33333630wrr.12
-        for <kvmarm@lists.linux.dev>; Tue, 04 Apr 2023 09:00:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680624046;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8K2SCp3N7WmXl5Hlded+U+tmuHCBjMjb7rjTKVn+ghk=;
-        b=owhdeMQ665T618BPk+i/t5+b22DfkXcK5JP+rpAZdWk3KRCpsDtTpmaa4HT2RDnqld
-         PYlRYjyf9wkXrjdfIHzBk2Act08sGj8PBm7Wg3vHTx63pYbuU/xX7cD93j3TEYQj7ACc
-         PZ3+p6b+w5kELe6CyS0//j7RztJLt1C++sv2wDPybtRZx3tZSypUE0ELXrb9KqVq+jC6
-         2MNYVUifpj6TYfpnAK7lQuBAIIKUvur44LiyBtIYM3Tw7+1rTkMWb1AEZNgg/McpK/MV
-         Sq91mzgjuwiCSvVO3pzdmrNE8j5CQ8zT4lLXpt5FP8nSeYw7i1lgExkxbw75QZ3ggIAP
-         eN1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680624046;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8K2SCp3N7WmXl5Hlded+U+tmuHCBjMjb7rjTKVn+ghk=;
-        b=3UOGFzrvDdsEFBGRmPfMP3Y7f11BDrMuRTg6VRwZdK2cl5saOujdVAduow/9VOMTV4
-         GEhveoI0xVxVVDhzphjM8lkg/y/BsEkixFjX6n4lvwtTzHFDHbE+LkX1uxSOtjse6Nk1
-         2VIXKZNsGMcVQ/wHaVqvRKEO+EVns8jIkqb7dnst7hR2yajEPVu4J5eILCZo0N5TOBhO
-         QfH9Xaf1dOWcb5tC30bD49oLvH5BFvx6kuzNGgaEpN5Y4k5KzgnrH2En/RSBP/TFMItd
-         swFkbRN5qV91oFRLO9MDdyrFyTE/pDGu5t3qWn3cYuXJuPXGzvRY+NxKRXZChQN9VcBF
-         JuXg==
-X-Gm-Message-State: AAQBX9dEHek6vYjg2yLwEk2dhfYhsJv56OAIpnIABM5Y+wWDRDfmXu2u
-	YR8Xw1c4wgZL1BwBMmXoCB1IEg==
-X-Google-Smtp-Source: AKy350Yhk5Yty0BVntaEj2IuKQU6pcpCE8rOGmBm4/2Og/8fIk8LVzOTYonEUbAff04/787UgUetIQ==
-X-Received: by 2002:a5d:4b91:0:b0:2e5:31a3:38d4 with SMTP id b17-20020a5d4b91000000b002e531a338d4mr1916594wrt.55.1680624046051;
-        Tue, 04 Apr 2023 09:00:46 -0700 (PDT)
-Received: from myrica (054592b0.skybroadband.com. [5.69.146.176])
-        by smtp.gmail.com with ESMTPSA id n9-20020a5d4009000000b002d431f61b18sm12480440wrp.103.2023.04.04.09.00.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Apr 2023 09:00:45 -0700 (PDT)
-Date: Tue, 4 Apr 2023 17:00:46 +0100
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org,
-	joro@8bytes.org, robin.murphy@arm.com, james.morse@arm.com,
-	suzuki.poulose@arm.com, oliver.upton@linux.dev,
-	yuzenghui@huawei.com, dbrazdil@google.com, ryan.roberts@arm.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	iommu@lists.linux.dev
-Subject: Re: [RFC PATCH 20/45] KVM: arm64: iommu: Add map() and unmap()
- operations
-Message-ID: <20230404160046.GA305012@myrica>
-References: <20230201125328.2186498-1-jean-philippe@linaro.org>
- <20230201125328.2186498-21-jean-philippe@linaro.org>
- <ZCXRbF0dP7oHT+hl@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8231E28F3;
+	Tue,  4 Apr 2023 17:00:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1680627641; x=1712163641;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=5xKt3Mh+Sl3zFYCi02o8CwPXbzSSg3wM1CcnJxfZW4s=;
+  b=lSHEXpl7Xh9k/fKXaeoXgAz7g1hYYiV5Ff3YDACnvDc1zcY47tHlDMG5
+   k2dhCm6hjDG0iWXvJKelubu2IexPkWLLF2RgEXAv8olprzX3c1chAfR0L
+   rQ8NiBN7QV+HhdNUcxIjDvrGZLVnpKBTN+/WicHo4+bRUD1ey3W4TMjBe
+   kMgwVycttS4gkqvCwgt7HnOF+hPxPA3ZV7Rwxpidm5FhuIwYUy2+VjRRE
+   wrs30N2sdQj5ulnfBlt1yuA8fSQSPw+YELkOWPviqc4FWzCsxgDNrwHZ2
+   STdUxiB06KLT84aWVD3fRRrOp4knqn7wXJFerSamUoMDYRIDJMsf43VAF
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10670"; a="343951131"
+X-IronPort-AV: E=Sophos;i="5.98,318,1673942400"; 
+   d="scan'208";a="343951131"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2023 10:00:41 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10670"; a="750993725"
+X-IronPort-AV: E=Sophos;i="5.98,318,1673942400"; 
+   d="scan'208";a="750993725"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by fmsmga008.fm.intel.com with ESMTP; 04 Apr 2023 10:00:37 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1pjk1M-000Pve-1d;
+	Tue, 04 Apr 2023 17:00:36 +0000
+Date: Wed, 5 Apr 2023 00:59:46 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+	KVMARM <kvmarm@lists.linux.dev>,
+	ARMLinux <linux-arm-kernel@lists.infradead.org>,
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@google.com>
+Cc: oe-kbuild-all@lists.linux.dev, Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v6 4/6] KVM: arm64: Use per guest ID register for
+ ID_AA64DFR0_EL1.PMUVer
+Message-ID: <202304050006.49TmDWF6-lkp@intel.com>
+References: <20230404035344.4043856-5-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -60,28 +57,121 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZCXRbF0dP7oHT+hl@google.com>
+In-Reply-To: <20230404035344.4043856-5-jingzhangos@google.com>
 
-Hi Mostafa,
+Hi Jing,
 
-On Thu, Mar 30, 2023 at 06:14:04PM +0000, Mostafa Saleh wrote:
-> > +err_unmap:
-> > +	__kvm_iommu_unmap_pages(&iopt, iova_orig, pgsize, pgcount_orig - pgcount);
-> On error here, this unmaps (and unshares) only pages that has been
-> mapped.
-> But all pages where shared with IOMMU before (via
-> __pkvm_host_share_dma) and this corrupts the other pages state as
-> they are marked as shared while they are not.
+kernel test robot noticed the following build errors:
 
-Right, I'll fix this
+[auto build test ERROR on 7e364e56293bb98cae1b55fd835f5991c4e96e7d]
 
-> I see we can add a "bool unshare" arg to __kvm_iommu_unmap_pages which
-> will be called with false on error from here after calling
-> __pkvm_host_unshare_dma for the whole range.
+url:    https://github.com/intel-lab-lkp/linux/commits/Jing-Zhang/KVM-arm64-Move-CPU-ID-feature-registers-emulation-into-a-separate-file/20230404-115612
+base:   7e364e56293bb98cae1b55fd835f5991c4e96e7d
+patch link:    https://lore.kernel.org/r/20230404035344.4043856-5-jingzhangos%40google.com
+patch subject: [PATCH v6 4/6] KVM: arm64: Use per guest ID register for ID_AA64DFR0_EL1.PMUVer
+config: arm64-allyesconfig (https://download.01.org/0day-ci/archive/20230405/202304050006.49TmDWF6-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 12.1.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/66ece3020c02ab1206bb9478e8cb0172e125bbfc
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Jing-Zhang/KVM-arm64-Move-CPU-ID-feature-registers-emulation-into-a-separate-file/20230404-115612
+        git checkout 66ece3020c02ab1206bb9478e8cb0172e125bbfc
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=arm64 olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash arch/arm64/
 
-I think it's simpler to call iopt_unmap_pages() directly here, followed by
-__pkvm_host_unshare_dma(). It even saves us a few lines
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202304050006.49TmDWF6-lkp@intel.com/
 
-Thanks,
-Jean
+All errors (new ones prefixed by >>):
 
+   In file included from include/linux/rhashtable-types.h:14,
+                    from include/linux/ipc.h:7,
+                    from include/uapi/linux/sem.h:5,
+                    from include/linux/sem.h:5,
+                    from include/linux/sched.h:15,
+                    from include/linux/hardirq.h:9,
+                    from include/linux/kvm_host.h:7,
+                    from arch/arm64/kvm/id_regs.c:13:
+   arch/arm64/kvm/id_regs.c: In function 'set_id_aa64dfr0_el1':
+>> arch/arm64/kvm/id_regs.c:261:44: error: 'struct kvm_arch' has no member named 'config_lock'
+     261 |                 mutex_lock(&vcpu->kvm->arch.config_lock);
+         |                                            ^
+   include/linux/mutex.h:187:44: note: in definition of macro 'mutex_lock'
+     187 | #define mutex_lock(lock) mutex_lock_nested(lock, 0)
+         |                                            ^~~~
+   arch/arm64/kvm/id_regs.c:269:46: error: 'struct kvm_arch' has no member named 'config_lock'
+     269 |                 mutex_unlock(&vcpu->kvm->arch.config_lock);
+         |                                              ^
+   arch/arm64/kvm/id_regs.c: In function 'set_id_dfr0_el1':
+   arch/arm64/kvm/id_regs.c:311:44: error: 'struct kvm_arch' has no member named 'config_lock'
+     311 |                 mutex_lock(&vcpu->kvm->arch.config_lock);
+         |                                            ^
+   include/linux/mutex.h:187:44: note: in definition of macro 'mutex_lock'
+     187 | #define mutex_lock(lock) mutex_lock_nested(lock, 0)
+         |                                            ^~~~
+   arch/arm64/kvm/id_regs.c:318:46: error: 'struct kvm_arch' has no member named 'config_lock'
+     318 |                 mutex_unlock(&vcpu->kvm->arch.config_lock);
+         |                                              ^
+
+
+vim +261 arch/arm64/kvm/id_regs.c
+
+   228	
+   229	static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+   230				       const struct sys_reg_desc *rd,
+   231				       u64 val)
+   232	{
+   233		u8 pmuver, host_pmuver;
+   234		bool valid_pmu;
+   235	
+   236		host_pmuver = kvm_arm_pmu_get_pmuver_limit();
+   237	
+   238		/*
+   239		 * Allow AA64DFR0_EL1.PMUver to be set from userspace as long
+   240		 * as it doesn't promise more than what the HW gives us. We
+   241		 * allow an IMPDEF PMU though, only if no PMU is supported
+   242		 * (KVM backward compatibility handling).
+   243		 */
+   244		pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), val);
+   245		if ((pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF && pmuver > host_pmuver))
+   246			return -EINVAL;
+   247	
+   248		valid_pmu = (pmuver != 0 && pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
+   249	
+   250		/* Make sure view register and PMU support do match */
+   251		if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
+   252			return -EINVAL;
+   253	
+   254		/* We can only differ with PMUver, and anything else is an error */
+   255		val ^= read_id_reg(vcpu, rd);
+   256		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
+   257		if (val)
+   258			return -EINVAL;
+   259	
+   260		if (valid_pmu) {
+ > 261			mutex_lock(&vcpu->kvm->arch.config_lock);
+   262			IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &= ~ID_AA64DFR0_EL1_PMUVer_MASK;
+   263			IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |= FIELD_PREP(ID_AA64DFR0_EL1_PMUVer_MASK,
+   264									    pmuver);
+   265	
+   266			IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) &= ~ID_DFR0_EL1_PerfMon_MASK;
+   267			IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) |= FIELD_PREP(ID_DFR0_EL1_PerfMon_MASK,
+   268									pmuver_to_perfmon(pmuver));
+   269			mutex_unlock(&vcpu->kvm->arch.config_lock);
+   270		} else {
+   271			assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags,
+   272				   pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
+   273		}
+   274	
+   275		return 0;
+   276	}
+   277	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
