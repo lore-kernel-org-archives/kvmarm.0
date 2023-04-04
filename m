@@ -1,167 +1,143 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-38.mta0.migadu.com (out-38.mta0.migadu.com [91.218.175.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFEE7BA3E
-	for <kvmarm@lists.linux.dev>; Tue,  4 Apr 2023 15:23:24 +0000 (UTC)
-Received: by mail-wr1-f74.google.com with SMTP id i25-20020adfaad9000000b002cff37de14fso3797034wrc.16
-        for <kvmarm@lists.linux.dev>; Tue, 04 Apr 2023 08:23:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680621803; x=1683213803;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=LI+3FHqwQL9jrPeYgxrwtlUWlDIOVCL+e+ckJalmVYI=;
-        b=a2QzmNYqwAO1/XerI4Crl0/j3VJeJVAINUWnufEkBZIn6spTGdE2zSYVS//M4e7rCo
-         6XTie4biXjaH3B8VHdUJUsCP2DmPf0XDiQ33DRup/Dk4ZKnt+pFNxdXVFNsLSxb5FYHz
-         IiMlCK8uAs+IlqwKSTW/BSU/hQOesbLedXflw/V79R4nJyIxFuTLaou/x8MEDYgdk9Hn
-         AXAZRoTFJvW2Ddq98bwOwapEs2rQvZnARYxIfk2T2PhjQyyhWnc1t4WhGlAiqLm+gNTh
-         v6KItf3xMkfPo+IVreJ6ZRA5eSKIC9QyI98mnnYYxe+2nra7IOzHvov3pRP+0xWYjB11
-         ovbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680621803; x=1683213803;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LI+3FHqwQL9jrPeYgxrwtlUWlDIOVCL+e+ckJalmVYI=;
-        b=osue783p/sUgRh8aw3zagGDBsQNs9oqrpsgC/w1ZEU2vNJES7qJDkfV7J2gEHqrRTe
-         HpN+IzEmoXhoQZ2DydMcO2iM+7RaaoaZNkhDyPoAD0c/w9RILaPBafmx0seNKayYOl6c
-         YsQq1CMNvVDskBBH7qiYXBZ2faCs0zFw3A60c6TJ3wImgFJb+7Pc+acwwq9FYnFC+9Ow
-         KvOdyZo3idJ7vDANPhgutE92vPWEf2i7kF5vBJgn7p3A2GnffbbdGamfWPJPUuxscsYT
-         iDdJjZ3mwk7/oTgdhTrlDb6V1inq7wcpPECAQ15mko5IPUGH6nI4558rnx2kz1rr5/hA
-         imhQ==
-X-Gm-Message-State: AAQBX9e3MosUl1FO143eXI6PfnzrEhkoTLl56JqMI2kPxMna/4pHCSGS
-	GGH/jyeEmUbGP5pjw9EgsjFmp0K68FlZpOP4sEpgEoVVT6mU6I27y8fREjaiUFHD/Qk8dJEC7Cx
-	I0s5SDf8h59XrzQxUeufXKkcBZJIp50lDRkz4wLDORRXi4fZEqK2cPgAB/U8=
-X-Google-Smtp-Source: AKy350afIk6/58nZZUY/BpWPhrT7hckFjBXpOMOmxniqDvzY1/3FJoSWy5N/PoNcFc23uP8UvzFFwujNig==
-X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a5d:4388:0:b0:2d0:3584:27e with SMTP id
- i8-20020a5d4388000000b002d03584027emr598559wrq.10.1680621803110; Tue, 04 Apr
- 2023 08:23:23 -0700 (PDT)
-Date: Tue,  4 Apr 2023 16:23:21 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADDA6BA4C
+	for <kvmarm@lists.linux.dev>; Tue,  4 Apr 2023 15:41:10 +0000 (UTC)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1680622868;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CU/XU3F3GwIZz9kYjA7aV6ecuWqFFb5qIKgAatQSo18=;
+	b=rws8/1OyjBlklvudxvKMgcj6p5hq3uYFYG3b92ZaZdUcJ2qefBxHX4ACvF2zyZei5oZI1G
+	Pk5tuBwUIpqW6j2DHfh+w0RRfb7rdWQi9Lj+77mHPy+GWdqBWqfAZYyVRVnTFQF1V45snz
+	SRoKFzFKp8tsO0WojnemV73xiIBRCFE=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH v3 01/13] KVM: x86: Redefine 'longmode' as a flag for KVM_EXIT_HYPERCALL
+Date: Tue,  4 Apr 2023 15:40:38 +0000
+Message-Id: <20230404154050.2270077-2-oliver.upton@linux.dev>
+In-Reply-To: <20230404154050.2270077-1-oliver.upton@linux.dev>
+References: <20230404154050.2270077-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <20230404152321.413064-1-tabba@google.com>
-Subject: [PATCH v5] KVM: arm64: Advertise ID_AA64PFR0_EL1.CSV2/3 to protected VMs
-From: Fuad Tabba <tabba@google.com>
-To: kvmarm@lists.linux.dev
-Cc: maz@kernel.org, oliver.upton@linux.dev, oupton@google.com, will@kernel.org, 
-	pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, 
-	suzuki.poulose@arm.com, reijiw@google.com, ricarkol@google.com, 
-	rananta@google.com, jingzhangos@google.com, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-The existing pKVM code attempts to advertise CSV2/3 using values
-initialized to 0, but never set. To advertise CSV2/3 to protected
-guests, pass the CSV2/3 values to hyp when initializing hyp's
-view of guests' ID_AA64PFR0_EL1.
+The 'longmode' field is a bit annoying as it blows an entire __u32 to
+represent a boolean value. Since other architectures are looking to add
+support for KVM_EXIT_HYPERCALL, now is probably a good time to clean it
+up.
 
-Similar to non-protected KVM, these are system-wide, rather than
-per cpu, for simplicity.
+Redefine the field (and the remaining padding) as a set of flags.
+Preserve the existing ABI by using bit 0 to indicate if the guest was in
+long mode and requiring that the remaining 31 bits must be zero.
 
-Fixes: 6c30bfb18d0b ("KVM: arm64: Add handlers for protected VM System Registers")
-Signed-off-by: Fuad Tabba <tabba@google.com>
-
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Acked-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
+ Documentation/virt/kvm/api.rst  | 3 +--
+ arch/x86/include/asm/kvm_host.h | 7 +++++++
+ arch/x86/include/uapi/asm/kvm.h | 3 +++
+ arch/x86/kvm/x86.c              | 6 +++++-
+ include/uapi/linux/kvm.h        | 9 +++++++--
+ 5 files changed, 23 insertions(+), 5 deletions(-)
 
-Based on: 197b6b60ae7b (6.3-rc4)
-
-Changes from V4: Advertisement of CSV2/3 should be based on what
-KVM advertises to all VMs, and not only on the underlying
-hardware's ID_AA64PFR0_EL1 (Marc).
-
- arch/arm64/kvm/arm.c                          | 26 ++++++++++++++++++-
- .../arm64/kvm/hyp/include/nvhe/fixed_config.h |  5 +++-
- arch/arm64/kvm/hyp/nvhe/sys_regs.c            |  7 -----
- 3 files changed, 29 insertions(+), 9 deletions(-)
-
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 3bd732eaf087..e850aeccebb9 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1889,9 +1889,33 @@ static int __init do_pkvm_init(u32 hyp_va_bits)
- 	return ret;
- }
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 62de0768d6aa..9b01e3d0e757 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6218,8 +6218,7 @@ to the byte array.
+ 			__u64 nr;
+ 			__u64 args[6];
+ 			__u64 ret;
+-			__u32 longmode;
+-			__u32 pad;
++			__u64 flags;
+ 		} hypercall;
  
-+static u64 get_hyp_id_aa64pfr0_el1(void)
-+{
-+	/*
-+	 * Track whether the system isn't affected by spectre/meltdown in the
-+	 * hypervisor's view of id_aa64pfr0_el1, used for protected VMs.
-+	 * Although this is per-CPU, we make it global for simplicity, e.g., not
-+	 * to have to worry about vcpu migration.
-+	 *
-+	 * Unlike for non-protected VMs, userspace cannot override this for
-+	 * protected VMs.
-+	 */
-+	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+ Unused.  This was once used for 'hypercall to userspace'.  To implement
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 808c292ad3f4..15bda40517ff 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -2204,4 +2204,11 @@ int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages);
+ 	 KVM_X86_QUIRK_FIX_HYPERCALL_INSN |	\
+ 	 KVM_X86_QUIRK_MWAIT_NEVER_UD_FAULTS)
+ 
++/*
++ * KVM previously used a u32 field in kvm_run to indicate the hypercall was
++ * initiated from long mode. KVM now sets bit 0 to indicate long mode, but the
++ * remaining 31 lower bits must be 0 to preserve ABI.
++ */
++#define KVM_EXIT_HYPERCALL_MBZ		GENMASK_ULL(31, 1)
 +
-+	val &= ~(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2) |
-+		 ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3));
+ #endif /* _ASM_X86_KVM_HOST_H */
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 7f467fe05d42..1a6a1f987949 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -559,4 +559,7 @@ struct kvm_pmu_event_filter {
+ #define KVM_VCPU_TSC_CTRL 0 /* control group for the timestamp counter (TSC) */
+ #define   KVM_VCPU_TSC_OFFSET 0 /* attribute for the TSC offset */
+ 
++/* x86-specific KVM_EXIT_HYPERCALL flags. */
++#define KVM_EXIT_HYPERCALL_LONG_MODE	BIT(0)
 +
-+	val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2),
-+			  arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED);
-+	val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3),
-+			  arm64_get_meltdown_state() == SPECTRE_UNAFFECTED);
+ #endif /* _ASM_X86_KVM_H */
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 7713420abab0..27a1d5c1a018 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9803,7 +9803,11 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+ 		vcpu->run->hypercall.args[0]  = gpa;
+ 		vcpu->run->hypercall.args[1]  = npages;
+ 		vcpu->run->hypercall.args[2]  = attrs;
+-		vcpu->run->hypercall.longmode = op_64_bit;
++		vcpu->run->hypercall.flags    = 0;
++		if (op_64_bit)
++			vcpu->run->hypercall.flags |= KVM_EXIT_HYPERCALL_LONG_MODE;
 +
-+	return val;
-+}
++		WARN_ON_ONCE(vcpu->run->hypercall.flags & KVM_EXIT_HYPERCALL_MBZ);
+ 		vcpu->arch.complete_userspace_io = complete_hypercall_exit;
+ 		return 0;
+ 	}
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index d77aef872a0a..dd42d7dfb86c 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -341,8 +341,13 @@ struct kvm_run {
+ 			__u64 nr;
+ 			__u64 args[6];
+ 			__u64 ret;
+-			__u32 longmode;
+-			__u32 pad;
 +
- static void kvm_hyp_init_symbols(void)
- {
--	kvm_nvhe_sym(id_aa64pfr0_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
-+	kvm_nvhe_sym(id_aa64pfr0_el1_sys_val) = get_hyp_id_aa64pfr0_el1();
- 	kvm_nvhe_sym(id_aa64pfr1_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64PFR1_EL1);
- 	kvm_nvhe_sym(id_aa64isar0_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64ISAR0_EL1);
- 	kvm_nvhe_sym(id_aa64isar1_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64ISAR1_EL1);
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h b/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
-index 07edfc7524c9..37440e1dda93 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
-@@ -33,11 +33,14 @@
-  * Allow for protected VMs:
-  * - Floating-point and Advanced SIMD
-  * - Data Independent Timing
-+ * - Spectre/Meltdown Mitigation
-  */
- #define PVM_ID_AA64PFR0_ALLOW (\
- 	ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_FP) | \
- 	ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AdvSIMD) | \
--	ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_DIT) \
-+	ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_DIT) | \
-+	ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2) | \
-+	ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3) \
- 	)
- 
- /*
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index 08d2b004f4b7..edd969a1f36b 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -85,19 +85,12 @@ static u64 get_restricted_features_unsigned(u64 sys_reg_val,
- 
- static u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu)
- {
--	const struct kvm *kvm = (const struct kvm *)kern_hyp_va(vcpu->kvm);
- 	u64 set_mask = 0;
- 	u64 allow_mask = PVM_ID_AA64PFR0_ALLOW;
- 
- 	set_mask |= get_restricted_features_unsigned(id_aa64pfr0_el1_sys_val,
- 		PVM_ID_AA64PFR0_RESTRICT_UNSIGNED);
- 
--	/* Spectre and Meltdown mitigation in KVM */
--	set_mask |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2),
--			       (u64)kvm->arch.pfr0_csv2);
--	set_mask |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3),
--			       (u64)kvm->arch.pfr0_csv3);
--
- 	return (id_aa64pfr0_el1_sys_val & allow_mask) | set_mask;
- }
- 
-
-base-commit: 197b6b60ae7bc51dd0814953c562833143b292aa
++			union {
++#ifndef __KERNEL__
++				__u32 longmode;
++#endif
++				__u64 flags;
++			};
+ 		} hypercall;
+ 		/* KVM_EXIT_TPR_ACCESS */
+ 		struct {
 -- 
 2.40.0.348.gf938b09366-goog
 
