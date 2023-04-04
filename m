@@ -1,19 +1,19 @@
-Received: from out-42.mta1.migadu.com (out-42.mta1.migadu.com [95.215.58.42])
+Received: from out-9.mta0.migadu.com (out-9.mta0.migadu.com [91.218.175.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125D4A34
-	for <kvmarm@lists.linux.dev>; Tue,  4 Apr 2023 18:41:41 +0000 (UTC)
-Date: Tue, 4 Apr 2023 18:41:34 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8376DA34
+	for <kvmarm@lists.linux.dev>; Tue,  4 Apr 2023 18:46:44 +0000 (UTC)
+Date: Tue, 4 Apr 2023 18:46:37 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1680633699;
+	t=1680634002;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CD1jFme43qexXcrz2XKuPM7oAmE3rbgRSVHroXDqbrw=;
-	b=XxMWM4k6DzmlzlUYCTPsBpVShgELiUyXykVncoQOI9O0ryTtAg39juJqr096OjqQhF24JI
-	uEvzoH7ILn2I9mZGvoxalTYWjyS69x8X3o/W6iSilKD5dhH0vV8RaOw4on8UiGaV1aQyrs
-	OqJuRLoiUX/kY7qk/unXspbmaHW8FqA=
+	bh=6CCFZGbCbuQhOOVHvrtx2gWbSjOe3K33umxalnr28II=;
+	b=iF+v2Q68XT8lGFaQ4gn2l9SacXhFLr07nAJDyI5xvBIPSL79kEpsGE78SUdsCLk2SYEpOH
+	gNbkgNenyyOrqioed/7OY2lIcm+le6m6u0QuxKJDhvHEj9Xw6GN6Ra+PNeP5zXqchAsBTF
+	60qSwNES7H8nO1iMtQr+iEogRX+FYxU=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Raghavendra Rao Ananta <rananta@google.com>
@@ -29,12 +29,13 @@ Cc: Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
 	Colton Lewis <coltonlewis@google.com>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v2 2/7] KVM: arm64: Add FEAT_TLBIRANGE support
-Message-ID: <ZCxvXq0dftq/Szra@linux.dev>
+Subject: Re: [PATCH v2 3/7] KVM: arm64: Implement
+ __kvm_tlb_flush_range_vmid_ipa()
+Message-ID: <ZCxwjYf+EjuB64iH@linux.dev>
 References: <20230206172340.2639971-1-rananta@google.com>
- <20230206172340.2639971-3-rananta@google.com>
- <ZCTjirkCgBkT65eP@linux.dev>
- <CAJHc60y1BLQC4c0qXCuqF7JfewBC_fG2xuH0Wj0AHJh9x3CK5g@mail.gmail.com>
+ <20230206172340.2639971-4-rananta@google.com>
+ <ZCTe5koj8fOgbrYO@linux.dev>
+ <CAJHc60x-ZHN=ZQemZp0wkj5jp-Ys8024YDQmWhmKn3NgZ0HHCQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,97 +45,27 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJHc60y1BLQC4c0qXCuqF7JfewBC_fG2xuH0Wj0AHJh9x3CK5g@mail.gmail.com>
+In-Reply-To: <CAJHc60x-ZHN=ZQemZp0wkj5jp-Ys8024YDQmWhmKn3NgZ0HHCQ@mail.gmail.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Mon, Apr 03, 2023 at 10:26:01AM -0700, Raghavendra Rao Ananta wrote:
-> Hi Oliver,
-> 
-> On Wed, Mar 29, 2023 at 6:19 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+On Mon, Apr 03, 2023 at 02:08:29PM -0700, Raghavendra Rao Ananta wrote:
+> On Wed, Mar 29, 2023 at 5:59 PM Oliver Upton <oliver.upton@linux.dev> wrote:
 > >
-> > On Mon, Feb 06, 2023 at 05:23:35PM +0000, Raghavendra Rao Ananta wrote:
-> > > Define a generic function __kvm_tlb_flush_range() to
-> > > invalidate the TLBs over a range of addresses. The
-> > > implementation accepts 'op' as a generic TLBI operation.
-> > > Upcoming patches will use this to implement IPA based
-> > > TLB invalidations (ipas2e1is).
-> > >
-> > > If the system doesn't support FEAT_TLBIRANGE, the
-> > > implementation falls back to flushing the pages one by one
-> > > for the range supplied.
-> > >
-> > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_asm.h | 18 ++++++++++++++++++
-> > >  1 file changed, 18 insertions(+)
-> > >
-> > > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> > > index 43c3bc0f9544d..995ff048e8851 100644
-> > > --- a/arch/arm64/include/asm/kvm_asm.h
-> > > +++ b/arch/arm64/include/asm/kvm_asm.h
-> > > @@ -221,6 +221,24 @@ DECLARE_KVM_NVHE_SYM(__per_cpu_end);
-> > >  DECLARE_KVM_HYP_SYM(__bp_harden_hyp_vecs);
-> > >  #define __bp_harden_hyp_vecs CHOOSE_HYP_SYM(__bp_harden_hyp_vecs)
-> > >
-> > > +#define __kvm_tlb_flush_range(op, mmu, start, end, level, tlb_level) do {    \
-> > > +     unsigned long pages, stride;                                            \
-> > > +                                                                             \
-> > > +     stride = kvm_granule_size(level);                                       \
+> > On Mon, Feb 06, 2023 at 05:23:36PM +0000, Raghavendra Rao Ananta wrote:
+> > > Define  __kvm_tlb_flush_range_vmid_ipa() (for VHE and nVHE)
 > >
-> > Hmm... There's a rather subtle and annoying complication here that I
-> > don't believe is handled.
+> > bikeshed: Personally, I find that range implies it takes an address as an
+> > argument already. Maybe just call it __kvm_tlb_flush_vmid_range()
 > >
-> > Similar to what I said in the last spin of the series, there is no
-> > guarantee that a range of IPAs is mapped at the exact same level
-> > throughout. Dirty logging and memslots that aren't hugepage aligned
-> > could lead to a mix of mapping levels being used within a range of the
-> > IPA space.
-> >
-> Unlike the comment on v1, the level/stride here is used to jump the
-> addresses in case the system doesn't support TLBIRANGE. The TTL hint
-> is 0.
+> Hmm, since TLBI instructions takes-in a variety of ranges, VA or IPA,
+> I just thought of extending the '_ipa' to make things clear. Moreover
+> it aligns with the existing __kvm_tlb_flush_vmid_ipa(). WDYT?
 
-Right. So we agree that the level is not uniform throughout the provided
-range. The invalidation by IPA is also used if 'pages' is odd, even on
-systems with TLBIRANGE. We must assume the worst case here, in that the
-TLBI by IPA invalidated a single PTE-level entry. You could wind up
-over-invalidating in that case, but you'd still be correct.
-
-> That being said, do you think we can always assume the least possible
-> stride (say, 4k) and hardcode it?
-> With respect to alignment, since the function is only called while
-> breaking the table PTE,  do you think it'll still be a problem even if
-> we go with the least granularity stride?
-
-I believe so. If we want to apply the range-based invalidations generally
-in KVM then we will not always be dealing with a block-aligned chunk of
-address.
-
-> > > +     start = round_down(start, stride);                                      \
-> > > +     end = round_up(end, stride);                                            \
-> > > +     pages = (end - start) >> PAGE_SHIFT;                                    \
-> > > +                                                                             \
-> > > +     if ((!system_supports_tlb_range() &&                                    \
-> > > +          (end - start) >= (MAX_TLBI_OPS * stride)) ||                       \
-> >
-> > Doesn't checking for TLBIRANGE above eliminate the need to test against
-> > MAX_TLBI_OPS?
-> >
-> Derived from __flush_tlb_range(), I think the condition is used to
-> just flush everything if the range is too large to iterate and flush
-> when the system doesn't support TLBIRANGE. Probably to prevent
-> soft-lockups?
-
-Right, but you test above for system_supports_tlb_range(), meaning that
-you'd unconditionally call __kvm_tlb_flush_vmid() below.
-
-> > > +         pages >= MAX_TLBI_RANGE_PAGES) {                                    \
-> > > +             __kvm_tlb_flush_vmid(mmu);                                      \
-> > > +             break;                                                          \
-> > > +     }                                                                       \
-> > > +                                                                             \
-> > > +     __flush_tlb_range_op(op, start, pages, stride, 0, tlb_level, false);    \
-> > > +} while (0)
+Like I said, just a bikeshed and it seemed trivial to eliminate a token
+in the function name. FWIW, you're dealing in terms of the IPA space by
+definition, as a VMID identifies an IPA address space. Range-based
+invalidations by VA would instead take an ASID as the address space
+identifier.
 
 -- 
 Thanks,
