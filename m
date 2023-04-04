@@ -1,168 +1,141 @@
-Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-42.mta1.migadu.com (out-42.mta1.migadu.com [95.215.58.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61CC9C951
-	for <kvmarm@lists.linux.dev>; Tue,  4 Apr 2023 17:52:14 +0000 (UTC)
-Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-17ac5ee3f9cso35490460fac.12
-        for <kvmarm@lists.linux.dev>; Tue, 04 Apr 2023 10:52:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680630733;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yNm7ut5xw3YZveb3bi0ZcN2eShh+vdiK3vTRJbWEvZA=;
-        b=h2tJpzO+g3ZA7Mm7KbV9GPDwwOmXm1vnpvbntR367mW0dQav+pdZcj+f50RJIi6beM
-         tVxQJoFUESXI9XyuMrhwrLaOBoK0n+pJvu+rtplmt2eErJQNf032DN6A4hI9pGU7nOqV
-         rA4QUKDX2VY4sFlKjFptHf+4iiEDFyv7prc6Q5h2TOLHRM3Q7b77VNFimBQ+9XvOveN1
-         DzO6yQYD9660QaKaDSCGQc7rJrxfjCPklNv041UJdiHriaz9/nvtuSsG5es7QrCwbPOP
-         cHsKzjlv8Og+hpT6y5ROIw53CeSSVBe8AverjDtAy1Hc7sxC/vZQE8D2m+d8fvdnbtuF
-         cmVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680630733;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yNm7ut5xw3YZveb3bi0ZcN2eShh+vdiK3vTRJbWEvZA=;
-        b=dU6tptnNV2KhxYw3IZ7m5FUoQep7C7TZ9B/R2DVwe4rx1Li9LiIfKmNzud0jaQ/bgu
-         uyFGcWu3pacv+RCHlvZ5rZ0BxjdGJE+IXd7HKX02gKUuvjHoy48j3lXbPndJhYWMC015
-         Mn3ufjLBnbdma70K3RQ/GdAwDaglx1YG0XDy+AsB/YFYBycLKiFX0XKxtn1xe8ddf7+k
-         NFsbgudQudQ1D4FvB1RdIB2Gd7zlTuyhqOOd9fXouUEBp57WVM49K12CIjkoBHu8ThKs
-         YQ3HtxdwZzodW/0WtqyMZF4idsX0Ea1VJMxTi6pcIjhiZCmnjCRp10nbXtbHR7dXkDfB
-         RLXA==
-X-Gm-Message-State: AAQBX9cy/ECQ7a0BBsVDVlJxwPgubwmnf89Dnu3FeTE6I7UIrsHp4YAq
-	DVI7/Xc1PxcIrTJXcxmnLcZnQ8mR869wmEQeyjtXkw==
-X-Google-Smtp-Source: AKy350aclrbPOzMya2Gmn5/BEKwLirIrj5w/kNKlHrChJIP3iEcRqHMaSM3SVKUi/0+yDBbwgDgjPwtuU+n5OtrvPAs=
-X-Received: by 2002:a05:6870:57:b0:17e:e396:cce0 with SMTP id
- 23-20020a056870005700b0017ee396cce0mr1672458oaz.9.1680630733248; Tue, 04 Apr
- 2023 10:52:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125D4A34
+	for <kvmarm@lists.linux.dev>; Tue,  4 Apr 2023 18:41:41 +0000 (UTC)
+Date: Tue, 4 Apr 2023 18:41:34 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1680633699;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CD1jFme43qexXcrz2XKuPM7oAmE3rbgRSVHroXDqbrw=;
+	b=XxMWM4k6DzmlzlUYCTPsBpVShgELiUyXykVncoQOI9O0ryTtAg39juJqr096OjqQhF24JI
+	uEvzoH7ILn2I9mZGvoxalTYWjyS69x8X3o/W6iSilKD5dhH0vV8RaOw4on8UiGaV1aQyrs
+	OqJuRLoiUX/kY7qk/unXspbmaHW8FqA=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
+	Ricardo Koller <ricarkol@google.com>,
+	Reiji Watanabe <reijiw@google.com>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 2/7] KVM: arm64: Add FEAT_TLBIRANGE support
+Message-ID: <ZCxvXq0dftq/Szra@linux.dev>
+References: <20230206172340.2639971-1-rananta@google.com>
+ <20230206172340.2639971-3-rananta@google.com>
+ <ZCTjirkCgBkT65eP@linux.dev>
+ <CAJHc60y1BLQC4c0qXCuqF7JfewBC_fG2xuH0Wj0AHJh9x3CK5g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230206172340.2639971-1-rananta@google.com> <20230206172340.2639971-8-rananta@google.com>
- <ZCTa5wfVtGScLQEa@linux.dev>
-In-Reply-To: <ZCTa5wfVtGScLQEa@linux.dev>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Tue, 4 Apr 2023 10:52:01 -0700
-Message-ID: <CAJHc60xvSFpUs+o84fR14Rghd6rruBJkCMBtroeCeLDtjJg=gw@mail.gmail.com>
-Subject: Re: [PATCH v2 7/7] KVM: arm64: Create a fast stage-2 unmap path
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Ricardo Koller <ricarkol@google.com>, Reiji Watanabe <reijiw@google.com>, 
-	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Jing Zhang <jingzhangos@google.com>, Colton Lewis <coltonlewis@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJHc60y1BLQC4c0qXCuqF7JfewBC_fG2xuH0Wj0AHJh9x3CK5g@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Mar 29, 2023 at 5:42=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> On Mon, Feb 06, 2023 at 05:23:40PM +0000, Raghavendra Rao Ananta wrote:
-> > The current implementation of the stage-2 unmap walker
-> > traverses the entire page-table to clear and flush the TLBs
-> > for each entry. This could be very expensive, especially if
-> > the VM is not backed by hugepages. The unmap operation could be
-> > made efficient by disconnecting the table at the very
-> > top (level at which the largest block mapping can be hosted)
-> > and do the rest of the unmapping using free_removed_table().
-> > If the system supports FEAT_TLBIRANGE, flush the entire range
-> > that has been disconnected from the rest of the page-table.
+On Mon, Apr 03, 2023 at 10:26:01AM -0700, Raghavendra Rao Ananta wrote:
+> Hi Oliver,
+> 
+> On Wed, Mar 29, 2023 at 6:19 PM Oliver Upton <oliver.upton@linux.dev> wrote:
 > >
-> > Suggested-by: Ricardo Koller <ricarkol@google.com>
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/pgtable.c | 44 ++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 44 insertions(+)
+> > On Mon, Feb 06, 2023 at 05:23:35PM +0000, Raghavendra Rao Ananta wrote:
+> > > Define a generic function __kvm_tlb_flush_range() to
+> > > invalidate the TLBs over a range of addresses. The
+> > > implementation accepts 'op' as a generic TLBI operation.
+> > > Upcoming patches will use this to implement IPA based
+> > > TLB invalidations (ipas2e1is).
+> > >
+> > > If the system doesn't support FEAT_TLBIRANGE, the
+> > > implementation falls back to flushing the pages one by one
+> > > for the range supplied.
+> > >
+> > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_asm.h | 18 ++++++++++++++++++
+> > >  1 file changed, 18 insertions(+)
+> > >
+> > > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> > > index 43c3bc0f9544d..995ff048e8851 100644
+> > > --- a/arch/arm64/include/asm/kvm_asm.h
+> > > +++ b/arch/arm64/include/asm/kvm_asm.h
+> > > @@ -221,6 +221,24 @@ DECLARE_KVM_NVHE_SYM(__per_cpu_end);
+> > >  DECLARE_KVM_HYP_SYM(__bp_harden_hyp_vecs);
+> > >  #define __bp_harden_hyp_vecs CHOOSE_HYP_SYM(__bp_harden_hyp_vecs)
+> > >
+> > > +#define __kvm_tlb_flush_range(op, mmu, start, end, level, tlb_level) do {    \
+> > > +     unsigned long pages, stride;                                            \
+> > > +                                                                             \
+> > > +     stride = kvm_granule_size(level);                                       \
 > >
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.=
-c
-> > index 0858d1fa85d6b..af3729d0971f2 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -1017,6 +1017,49 @@ static int stage2_unmap_walker(const struct kvm_=
-pgtable_visit_ctx *ctx,
-> >       return 0;
-> >  }
+> > Hmm... There's a rather subtle and annoying complication here that I
+> > don't believe is handled.
 > >
-> > +/*
-> > + * The fast walker executes only if the unmap size is exactly equal to=
- the
-> > + * largest block mapping supported (i.e. at KVM_PGTABLE_MIN_BLOCK_LEVE=
-L),
-> > + * such that the underneath hierarchy at KVM_PGTABLE_MIN_BLOCK_LEVEL c=
-an
-> > + * be disconnected from the rest of the page-table without the need to
-> > + * traverse all the PTEs, at all the levels, and unmap each and every =
-one
-> > + * of them. The disconnected table is freed using free_removed_table()=
-.
-> > + */
-> > +static int fast_stage2_unmap_walker(const struct kvm_pgtable_visit_ctx=
- *ctx,
-> > +                            enum kvm_pgtable_walk_flags visit)
-> > +{
-> > +     struct kvm_pgtable_mm_ops *mm_ops =3D ctx->mm_ops;
-> > +     kvm_pte_t *childp =3D kvm_pte_follow(ctx->old, mm_ops);
-> > +     struct kvm_s2_mmu *mmu =3D ctx->arg;
-> > +
-> > +     if (!kvm_pte_valid(ctx->old) || ctx->level !=3D KVM_PGTABLE_MIN_B=
-LOCK_LEVEL)
-> > +             return 0;
-> > +
-> > +     if (!stage2_try_break_pte(ctx, mmu))
-> > +             return -EAGAIN;
-> > +
-> > +     /*
-> > +      * Gain back a reference for stage2_unmap_walker() to free
-> > +      * this table entry from KVM_PGTABLE_MIN_BLOCK_LEVEL - 1.
-> > +      */
-> > +     mm_ops->get_page(ctx->ptep);
->
-> Doesn't this run the risk of a potential UAF if the refcount was 1 before
-> calling stage2_try_break_pte()? IOW, stage2_try_break_pte() will drop
-> the refcount to 0 on the page before this ever gets called.
->
-> Also, AFAICT this misses the CMOs that are required on systems w/o
-> FEAT_FWB. Without them it is possible that the host will read something
-> other than what was most recently written by the guest if it is using
-> noncacheable memory attributes at stage-1.
->
-> I imagine the actual bottleneck is the DSB required after every
-> CMO/TLBI. Theoretically, the unmap path could be updated to:
->
->  - Perform the appropriate CMOs for every valid leaf entry *without*
->    issuing a DSB.
->
->  - Elide TLBIs entirely that take place in the middle of the walk
->
->  - After the walk completes, dsb(ish) to guarantee that the CMOs have
->    completed and the invalid PTEs are made visible to the hardware
->    walkers. This should be done implicitly by the TLBI implementation
->
->  - Invalidate the [addr, addr + size) range of IPAs
->
-> This would also avoid over-invalidating stage-1 since we blast the
-> entire stage-1 context for every stage-2 invalidation. Thoughts?
->
-Correct me if I'm wrong, but if we invalidate the TLB after the walk
-is complete, don't you think there's a risk of race if the guest can
-hit in the TLB even though the page was unmapped?
+> > Similar to what I said in the last spin of the series, there is no
+> > guarantee that a range of IPAs is mapped at the exact same level
+> > throughout. Dirty logging and memslots that aren't hugepage aligned
+> > could lead to a mix of mapping levels being used within a range of the
+> > IPA space.
+> >
+> Unlike the comment on v1, the level/stride here is used to jump the
+> addresses in case the system doesn't support TLBIRANGE. The TTL hint
+> is 0.
 
+Right. So we agree that the level is not uniform throughout the provided
+range. The invalidation by IPA is also used if 'pages' is odd, even on
+systems with TLBIRANGE. We must assume the worst case here, in that the
+TLBI by IPA invalidated a single PTE-level entry. You could wind up
+over-invalidating in that case, but you'd still be correct.
+
+> That being said, do you think we can always assume the least possible
+> stride (say, 4k) and hardcode it?
+> With respect to alignment, since the function is only called while
+> breaking the table PTE,  do you think it'll still be a problem even if
+> we go with the least granularity stride?
+
+I believe so. If we want to apply the range-based invalidations generally
+in KVM then we will not always be dealing with a block-aligned chunk of
+address.
+
+> > > +     start = round_down(start, stride);                                      \
+> > > +     end = round_up(end, stride);                                            \
+> > > +     pages = (end - start) >> PAGE_SHIFT;                                    \
+> > > +                                                                             \
+> > > +     if ((!system_supports_tlb_range() &&                                    \
+> > > +          (end - start) >= (MAX_TLBI_OPS * stride)) ||                       \
+> >
+> > Doesn't checking for TLBIRANGE above eliminate the need to test against
+> > MAX_TLBI_OPS?
+> >
+> Derived from __flush_tlb_range(), I think the condition is used to
+> just flush everything if the range is too large to iterate and flush
+> when the system doesn't support TLBIRANGE. Probably to prevent
+> soft-lockups?
+
+Right, but you test above for system_supports_tlb_range(), meaning that
+you'd unconditionally call __kvm_tlb_flush_vmid() below.
+
+> > > +         pages >= MAX_TLBI_RANGE_PAGES) {                                    \
+> > > +             __kvm_tlb_flush_vmid(mmu);                                      \
+> > > +             break;                                                          \
+> > > +     }                                                                       \
+> > > +                                                                             \
+> > > +     __flush_tlb_range_op(op, start, pages, stride, 0, tlb_level, false);    \
+> > > +} while (0)
+
+-- 
 Thanks,
-Raghavendra
-
-Raghavendra
-> > +     mm_ops->free_removed_table(childp, ctx->level);
-> > +     return 0;
-> > +}
-> > +
->
-> --
-> Thanks,
-> Oliver
+Oliver
