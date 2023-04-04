@@ -1,40 +1,40 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCFF4635
-	for <kvmarm@lists.linux.dev>; Tue,  4 Apr 2023 03:53:52 +0000 (UTC)
-Received: by mail-pj1-f73.google.com with SMTP id nu18-20020a17090b1b1200b0023fbe01dc06so15158735pjb.8
-        for <kvmarm@lists.linux.dev>; Mon, 03 Apr 2023 20:53:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77371635
+	for <kvmarm@lists.linux.dev>; Tue,  4 Apr 2023 03:53:54 +0000 (UTC)
+Received: by mail-pj1-f74.google.com with SMTP id nm11-20020a17090b19cb00b0023d0c90d851so9658713pjb.1
+        for <kvmarm@lists.linux.dev>; Mon, 03 Apr 2023 20:53:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680580432;
+        d=google.com; s=20210112; t=1680580434;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ch2U6ty5T88f6V+9FBCOXhicmZ9im9bNn2G5dyREKis=;
-        b=RjhcCYGcjCoxFOs5DfLqev0wiGdzTo8vNHS9AzyWFfMTH6Tk1W/8LvP08ZpPWjeYQ+
-         0XZKHjvv0gbYPyfDOeaJ+TCM/mciFWkDxaMbCDPazjTX4NhF/rFbbrJ+IA130sjS9kFl
-         fuhJhZ+j5zI1aaOnsstRPZiuevTVlXAkP25mnSe3UuC2Cxptl0F5SGW2HCOi2RxddrqD
-         1n1KyNBdcx9Pjdt55OcKnO+OtqEvcmrGfYtgPmHBglSpxPPunN7o3bFugPiWtNOVTO3p
-         e0So8X7Ddxmga7tSuwEh6NmHgVTMLHVYzlGwsZ9Fj5Nj4ejAMHszuwGvwwLQOqFlRC6z
-         gEXA==
+        bh=UPaRDrnezSi3/msZhxMLLcFkaO1ENnHVHYvRu1cKR0E=;
+        b=ctKwbFgnE63agOAOwGkVQVgxB/0XPe+4jBzzK6GGjXvzsokFATZFjRxV0bY6CmVFi4
+         Yaq96UDN5hnBrlqXajLOUvwDkMn6ZV89ATys4qI0F6cyCWhHodjC1JAuPF6pc8uk3n0o
+         Nzrly8wq3WdqzsbqdXnChJ0QEri3IQy/f5mr10b+RbahX/Pw0wsntknDrEecrmNKKbmo
+         /kus23Q0lnMF2fPqXvWrRndXVsFwLFGhlwCNgCh9cyQaXl3azEaSlSppfLMdojC1IVBr
+         kMTicbhX7d+JC5G4bwfenajzF1h/2kWMvyvoMVYG8J7Erj+cCjeS62VO9Kd0w+afPiC+
+         8WkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680580432;
+        d=1e100.net; s=20210112; t=1680580434;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ch2U6ty5T88f6V+9FBCOXhicmZ9im9bNn2G5dyREKis=;
-        b=TFiFRFNy2OPeJdQNVf2yyjaXP0E0JNmaj79t+A2NfaOGpZ563vy0OFhO6TS67Bfx0l
-         LIHOmY6iiwtBPCs++mNg9qc2PgsscpJL6bAXbFo+aAbA/Cwkik5QNe95tD9qViwdTTan
-         fbObtfF0ClNt4IZIGkZnNukm0itYhvay6qJD/b8vBczFR8r/MwS7f1xoeS+mU23sWmN3
-         7rU78AiUHd/NYhgtYHZ1fWR7IKR0+vT24cqIs4IgnQYHktISORmYFp0ll4oUqj/EvivQ
-         pKYkZe4qQIQHBHFZnEVT4JYYrieyU4xhVCbtvq2W0Z8/9GQkUVcZwARD5x9H3RGZ6FZ6
-         VyKA==
-X-Gm-Message-State: AAQBX9ckHTUYZa0ldUezo3BhSKXwIj/CgqV+sh40fBspN7iwUXsMKVnb
-	TAshqN3IZ5IElgyNtqEqLZcJC44SVGYUn7XAjQ==
-X-Google-Smtp-Source: AKy350bC9EBmTtP3WYLQhME9KL1kMRqt87S77bP1xkusAE+BQVKa+ZJbiI3D1jBcTT4yXwcaE5kvVJgjryd7sC+8Dw==
+        bh=UPaRDrnezSi3/msZhxMLLcFkaO1ENnHVHYvRu1cKR0E=;
+        b=a7VWG2xdgEPLvY4Q4f3gL0/SHDeywmQkaGBWKmgfyp0OwEnq8N8q2xy/FfAMN3shHm
+         izBXvQ1Jyv/XuvnlSSLeWiWlHaHdi+gl2FL6n+nYeMEwjTOiCHKZQkpK1M1Sl2jUvDsM
+         0xHmwn6pK0Ru2C+tqkVC7sdTrjSGM9DhwydLCXh/1HVuSZlGEKAxIhILlplxEkKGA25G
+         VfSS4CoDyjhBrOa482vRHn1QjzUbKFoq8W+gnVhw/bXJijeVXe3S4AD8aCFfzqOT6Bl7
+         KvdHJ8nIqXhpmxgBhMh4BXvpz2ILRxux7VZQI1uqQfykvgTTFF1WaGdx8XshvbjSZ8GB
+         Liaw==
+X-Gm-Message-State: AAQBX9dRPPWZIyzbY5f8vTnlrUKYMB/G69hCjmWbumv5qAb8zu4P6guG
+	ivQRhZ9UurIXWOeGuOe8BZHvuPQTOKonLePOGA==
+X-Google-Smtp-Source: AKy350bu/wdRHgiw5cjAVFxUC7KPVk1p2Li/D4upy7yFfd7BF+P2LPYVKvyTuVZsogdqH0Ef5BYttAHkWSA14wQUPQ==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a17:90b:e09:b0:240:228:95bd with SMTP
- id ge9-20020a17090b0e0900b00240022895bdmr402042pjb.5.1680580432236; Mon, 03
- Apr 2023 20:53:52 -0700 (PDT)
-Date: Tue,  4 Apr 2023 03:53:41 +0000
+ (user=jingzhangos job=sendgmr) by 2002:a17:90b:b09:b0:240:f09c:fae8 with SMTP
+ id bf9-20020a17090b0b0900b00240f09cfae8mr414619pjb.2.1680580434077; Mon, 03
+ Apr 2023 20:53:54 -0700 (PDT)
+Date: Tue,  4 Apr 2023 03:53:42 +0000
 In-Reply-To: <20230404035344.4043856-1-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230404035344.4043856-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <20230404035344.4043856-4-jingzhangos@google.com>
-Subject: [PATCH v6 3/6] KVM: arm64: Use per guest ID register for ID_AA64PFR0_EL1.[CSV2|CSV3]
+Message-ID: <20230404035344.4043856-5-jingzhangos@google.com>
+Subject: [PATCH v6 4/6] KVM: arm64: Use per guest ID register for ID_AA64DFR0_EL1.PMUVer
 From: Jing Zhang <jingzhangos@google.com>
 To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
 	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
@@ -57,157 +57,162 @@ Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
 	Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-With per guest ID registers, ID_AA64PFR0_EL1.[CSV2|CSV3] settings from
-userspace can be stored in its corresponding ID register.
+With per guest ID registers, PMUver settings from userspace
+can be stored in its corresponding ID register.
 
-The setting of CSV bits for protected VMs are removed according to the
-discussion from Fuad below:
-https://lore.kernel.org/all/CA+EHjTwXA9TprX4jeG+-D+c8v9XG+oFdU1o6TSkvVye145_OvA@mail.gmail.com
-
-Besides the removal of CSV bits setting for protected VMs, No other
-functional change intended.
+No functional change intended.
 
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h  |  2 --
- arch/arm64/kvm/arm.c               | 17 ----------------
- arch/arm64/kvm/hyp/nvhe/sys_regs.c |  7 -------
- arch/arm64/kvm/id_regs.c           | 31 ++++++++++++++++++++++--------
- 4 files changed, 23 insertions(+), 34 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 11 +++----
+ arch/arm64/kvm/arm.c              |  6 ----
+ arch/arm64/kvm/id_regs.c          | 50 ++++++++++++++++++++++++-------
+ include/kvm/arm_pmu.h             |  5 ++--
+ 4 files changed, 49 insertions(+), 23 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index f0588bdce0ef..67a55177fd83 100644
+index 67a55177fd83..da46a2729581 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -249,8 +249,6 @@ struct kvm_arch {
+@@ -237,6 +237,12 @@ struct kvm_arch {
+ #define KVM_ARCH_FLAG_EL1_32BIT				4
+ 	/* PSCI SYSTEM_SUSPEND enabled for the guest */
+ #define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		5
++	/*
++	 * AA64DFR0_EL1.PMUver was set as ID_AA64DFR0_EL1_PMUVer_IMP_DEF
++	 * or DFR0_EL1.PerfMon was set as ID_DFR0_EL1_PerfMon_IMPDEF from
++	 * userspace for VCPUs without PMU.
++	 */
++#define KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU		6
+ 
+ 	unsigned long flags;
+ 
+@@ -249,11 +255,6 @@ struct kvm_arch {
  
  	cpumask_var_t supported_cpus;
  
--	u8 pfr0_csv2;
--	u8 pfr0_csv3;
- 	struct {
- 		u8 imp:4;
- 		u8 unimp:4;
+-	struct {
+-		u8 imp:4;
+-		u8 unimp:4;
+-	} dfr0_pmuver;
+-
+ 	/* Hypercall features firmware registers' descriptor */
+ 	struct kvm_smccc_features smccc_feat;
+ 
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 1bf6030c8946..64e1c19e5a9b 100644
+index 64e1c19e5a9b..3fe28d545b54 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -104,22 +104,6 @@ static int kvm_arm_default_max_vcpus(void)
- 	return vgic_present ? kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
- }
- 
--static void set_default_spectre(struct kvm *kvm)
--{
--	/*
--	 * The default is to expose CSV2 == 1 if the HW isn't affected.
--	 * Although this is a per-CPU feature, we make it global because
--	 * asymmetric systems are just a nuisance.
--	 *
--	 * Userspace can override this as long as it doesn't promise
--	 * the impossible.
--	 */
--	if (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED)
--		kvm->arch.pfr0_csv2 = 1;
--	if (arm64_get_meltdown_state() == SPECTRE_UNAFFECTED)
--		kvm->arch.pfr0_csv3 = 1;
--}
--
- /**
-  * kvm_arch_init_vm - initializes a VM data structure
-  * @kvm:	pointer to the KVM struct
-@@ -151,7 +135,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	/* The maximum number of VCPUs is limited by the host's GIC model */
- 	kvm->max_vcpus = kvm_arm_default_max_vcpus();
- 
--	set_default_spectre(kvm);
+@@ -138,12 +138,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
  	kvm_arm_init_hypercalls(kvm);
  	kvm_arm_init_id_regs(kvm);
  
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index 08d2b004f4b7..edd969a1f36b 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -85,19 +85,12 @@ static u64 get_restricted_features_unsigned(u64 sys_reg_val,
- 
- static u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu)
- {
--	const struct kvm *kvm = (const struct kvm *)kern_hyp_va(vcpu->kvm);
- 	u64 set_mask = 0;
- 	u64 allow_mask = PVM_ID_AA64PFR0_ALLOW;
- 
- 	set_mask |= get_restricted_features_unsigned(id_aa64pfr0_el1_sys_val,
- 		PVM_ID_AA64PFR0_RESTRICT_UNSIGNED);
- 
--	/* Spectre and Meltdown mitigation in KVM */
--	set_mask |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2),
--			       (u64)kvm->arch.pfr0_csv2);
--	set_mask |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3),
--			       (u64)kvm->arch.pfr0_csv3);
+-	/*
+-	 * Initialise the default PMUver before there is a chance to
+-	 * create an actual PMU.
+-	 */
+-	kvm->arch.dfr0_pmuver.imp = kvm_arm_pmu_get_pmuver_limit();
 -
- 	return (id_aa64pfr0_el1_sys_val & allow_mask) | set_mask;
- }
+ 	return 0;
  
+ err_free_cpumask:
 diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
-index 7e78957085fc..291311b1ecca 100644
+index 291311b1ecca..6f65d30693fe 100644
 --- a/arch/arm64/kvm/id_regs.c
 +++ b/arch/arm64/kvm/id_regs.c
-@@ -61,12 +61,6 @@ u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
- 		if (!vcpu_has_sve(vcpu))
- 			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE);
- 		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU);
--		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
--		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2),
--				  (u64)vcpu->kvm->arch.pfr0_csv2);
--		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
--		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3),
--				  (u64)vcpu->kvm->arch.pfr0_csv3);
- 		if (kvm_vgic_global_state.type == VGIC_V3) {
- 			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC);
- 			val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC), 1);
-@@ -201,6 +195,7 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
- 			       u64 val)
+@@ -21,9 +21,12 @@
+ static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
  {
- 	u8 csv2, csv3;
-+	u64 sval = val;
+ 	if (kvm_vcpu_has_pmu(vcpu))
+-		return vcpu->kvm->arch.dfr0_pmuver.imp;
++		return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
++				 IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1));
++	else if (test_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags))
++		return ID_AA64DFR0_EL1_PMUVer_IMP_DEF;
  
- 	/*
- 	 * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long as
-@@ -223,8 +218,7 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+-	return vcpu->kvm->arch.dfr0_pmuver.unimp;
++	return 0;
+ }
+ 
+ static u8 perfmon_to_pmuver(u8 perfmon)
+@@ -254,10 +257,20 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
  	if (val)
  		return -EINVAL;
  
--	vcpu->kvm->arch.pfr0_csv2 = csv2;
--	vcpu->kvm->arch.pfr0_csv3 = csv3;
-+	IDREG(vcpu->kvm, reg_to_encoding(rd)) = sval;
+-	if (valid_pmu)
+-		vcpu->kvm->arch.dfr0_pmuver.imp = pmuver;
+-	else
+-		vcpu->kvm->arch.dfr0_pmuver.unimp = pmuver;
++	if (valid_pmu) {
++		mutex_lock(&vcpu->kvm->arch.config_lock);
++		IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &= ~ID_AA64DFR0_EL1_PMUVer_MASK;
++		IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |= FIELD_PREP(ID_AA64DFR0_EL1_PMUVer_MASK,
++								    pmuver);
++
++		IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) &= ~ID_DFR0_EL1_PerfMon_MASK;
++		IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) |= FIELD_PREP(ID_DFR0_EL1_PerfMon_MASK,
++								pmuver_to_perfmon(pmuver));
++		mutex_unlock(&vcpu->kvm->arch.config_lock);
++	} else {
++		assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags,
++			   pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
++	}
  
  	return 0;
  }
-@@ -488,4 +482,25 @@ void kvm_arm_init_id_regs(struct kvm *kvm)
- 		val = read_sanitised_ftr_reg(id);
- 		IDREG(kvm, id) = val;
+@@ -294,10 +307,19 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+ 	if (val)
+ 		return -EINVAL;
+ 
+-	if (valid_pmu)
+-		vcpu->kvm->arch.dfr0_pmuver.imp = perfmon_to_pmuver(perfmon);
+-	else
+-		vcpu->kvm->arch.dfr0_pmuver.unimp = perfmon_to_pmuver(perfmon);
++	if (valid_pmu) {
++		mutex_lock(&vcpu->kvm->arch.config_lock);
++		IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) &= ~ID_DFR0_EL1_PerfMon_MASK;
++		IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) |= FIELD_PREP(ID_DFR0_EL1_PerfMon_MASK, perfmon);
++
++		IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &= ~ID_AA64DFR0_EL1_PMUVer_MASK;
++		IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |= FIELD_PREP(ID_AA64DFR0_EL1_PMUVer_MASK,
++								    perfmon_to_pmuver(perfmon));
++		mutex_unlock(&vcpu->kvm->arch.config_lock);
++	} else {
++		assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags,
++			   perfmon == ID_DFR0_EL1_PerfMon_IMPDEF);
++	}
+ 
+ 	return 0;
+ }
+@@ -503,4 +525,12 @@ void kvm_arm_init_id_regs(struct kvm *kvm)
  	}
+ 
+ 	IDREG(kvm, SYS_ID_AA64PFR0_EL1) = val;
 +
 +	/*
-+	 * The default is to expose CSV2 == 1 if the HW isn't affected.
-+	 * Although this is a per-CPU feature, we make it global because
-+	 * asymmetric systems are just a nuisance.
-+	 *
-+	 * Userspace can override this as long as it doesn't promise
-+	 * the impossible.
++	 * Initialise the default PMUver before there is a chance to
++	 * create an actual PMU.
 +	 */
-+	val = IDREG(kvm, SYS_ID_AA64PFR0_EL1);
-+
-+	if (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED) {
-+		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
-+		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2), 1);
-+	}
-+	if (arm64_get_meltdown_state() == SPECTRE_UNAFFECTED) {
-+		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
-+		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3), 1);
-+	}
-+
-+	IDREG(kvm, SYS_ID_AA64PFR0_EL1) = val;
++	IDREG(kvm, SYS_ID_AA64DFR0_EL1) &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
++	IDREG(kvm, SYS_ID_AA64DFR0_EL1) |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
++						      kvm_arm_pmu_get_pmuver_limit());
  }
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 628775334d5e..856ac59b6821 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -92,8 +92,9 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
+ /*
+  * Evaluates as true when emulating PMUv3p5, and false otherwise.
+  */
+-#define kvm_pmu_is_3p5(vcpu)						\
+-	(vcpu->kvm->arch.dfr0_pmuver.imp >= ID_AA64DFR0_EL1_PMUVer_V3P5)
++#define kvm_pmu_is_3p5(vcpu)									\
++	 (FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),					\
++		 IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1)) >= ID_AA64DFR0_EL1_PMUVer_V3P5)
+ 
+ u8 kvm_arm_pmu_get_pmuver_limit(void);
+ 
 -- 
 2.40.0.348.gf938b09366-goog
 
