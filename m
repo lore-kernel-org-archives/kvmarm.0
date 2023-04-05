@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED4C26ABC
-	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:41:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C73F3C433D2;
-	Wed,  5 Apr 2023 15:41:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F32676ABC
+	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:41:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1718C4339B;
+	Wed,  5 Apr 2023 15:41:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1680709274;
-	bh=9g8STqPXgzD9Bbvt489TT/ehnNJeuV9gTn/DLP9G+xA=;
+	s=k20201202; t=1680709276;
+	bh=mbfRSCVS0+LD0xUmsRpeGuUS2JXLEcE0dUkMqujNWEA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hePkJJlk5YajhTZKr/QJVXlr7camHFaYl03u4jag1YT+bDB1S917xnet7sPA54+yf
-	 Cgv8ewYMNzOeKQ/Zg70TM159xzXIlqhrWznEu3oPmv8CnCXmlz2Bo6Ro66tMxcQR8r
-	 QKMLMSxNHilDwNkq3eec/UxdOegUzvgBYFSYWo0q442upgGPwMYOSg3MR7DWkT+xUx
-	 dKoJEgVdpVsVWoBdP0FX7DEoRQheW49z83+J8YVzsLBtNYQ+GotiQQSsayMLra96mo
-	 xze7eZqH/y1anCpXfhxRU5lDaRK8GwyWvcmtj2DJVCCRj0T5pPtZFzXlb56RNy2KDN
-	 zOzpVx+IW04/Q==
+	b=hmo4XSYvv7wVxbwsPK4wrVk9jsAgSxBHyi43axSPMlQ6cd3wg90HfR+LWxQB1yCN4
+	 4/Eu84LDHSgg8NwPYlf1xurV4HF5+DpLxiFl4XyBHsxswJ4PH3FMyt3irMUWh5vVNa
+	 /0Cg8rbotqFt7vcNEMNV5nWyzd/bl7tpBuwuLCKecBEZbkYr8by8eXqnxa1MVwoHzW
+	 ySUCuHuKyNIXtuu3h9mpqaTwx3nS/RUrTFTayEDIYmd0jsXj//Lh1eVrQ5EdL0ShoO
+	 AvbE+ZxT8JOSdk0ow/qHGnmPG4g6sT8aVlIY88c6wM+rQ2TzTJrHzmPqYyW9+9X2T4
+	 hrj3Qequ5o6GQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pk5FO-0062PV-Fq;
-	Wed, 05 Apr 2023 16:40:30 +0100
+	id 1pk5FQ-0062PV-GE;
+	Wed, 05 Apr 2023 16:40:32 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v9 13/50] KVM: arm64: nv: Forward debug traps to the nested guest
-Date: Wed,  5 Apr 2023 16:39:31 +0100
-Message-Id: <20230405154008.3552854-14-maz@kernel.org>
+Subject: [PATCH v9 20/50] KVM: arm64: nv: Set a handler for the system instruction traps
+Date: Wed,  5 Apr 2023 16:39:38 +0100
+Message-Id: <20230405154008.3552854-21-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230405154008.3552854-1-maz@kernel.org>
 References: <20230405154008.3552854-1-maz@kernel.org>
@@ -56,78 +56,120 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On handling a debug trap, check whether we need to forward it to the
-guest before handling it.
+When HCR.NV bit is set, execution of the EL2 translation regime address
+aranslation instructions and TLB maintenance instructions are trapped to
+EL2. In addition, execution of the EL1 translation regime address
+aranslation instructions and TLB maintenance instructions that are only
+accessible from EL2 and above are trapped to EL2. In these cases,
+ESR_EL2.EC will be set to 0x18.
 
+Rework the system instruction emulation framework to handle potentially
+all system instruction traps other than MSR/MRS instructions. Those
+system instructions would be AT and TLBI instructions controlled by
+HCR_EL2.NV, AT, and TTLB bits.
+
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+[maz: squashed two patches together, redispatched various bits around]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h | 2 ++
- arch/arm64/kvm/emulate-nested.c     | 9 +++++++--
- arch/arm64/kvm/sys_regs.c           | 5 +++++
- 3 files changed, 14 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 47 +++++++++++++++++++++++++++++++--------
+ 1 file changed, 38 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 4b7f9f35ece9..f2820c82e956 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -59,6 +59,8 @@ static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
- 	return ttbr0 & ~GENMASK_ULL(63, 48);
- }
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 548f637e57ac..900b96970452 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1993,10 +1993,6 @@ static bool access_spsr_el2(struct kvm_vcpu *vcpu,
+  * guest...
+  */
+ static const struct sys_reg_desc sys_reg_descs[] = {
+-	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
+-	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
+-	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
+-
+ 	DBG_BCR_BVR_WCR_WVR_EL1(0),
+ 	DBG_BCR_BVR_WCR_WVR_EL1(1),
+ 	{ SYS_DESC(SYS_MDCCINT_EL1), trap_debug_regs, reset_val, MDCCINT_EL1, 0 },
+@@ -2475,6 +2471,12 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
+ };
  
-+extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
-+			    u64 control_bit);
- extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
- extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
- extern bool forward_nv1_traps(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 7c06844a5113..555771e1260d 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -14,14 +14,14 @@
- 
- #include "trace.h"
- 
--bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit)
-+bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg, u64 control_bit)
- {
- 	bool control_bit_set;
- 
- 	if (!vcpu_has_nv(vcpu))
- 		return false;
- 
--	control_bit_set = __vcpu_sys_reg(vcpu, HCR_EL2) & control_bit;
-+	control_bit_set = __vcpu_sys_reg(vcpu, reg) & control_bit;
- 	if (!vcpu_is_el2(vcpu) && control_bit_set) {
- 		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
- 		return true;
-@@ -29,6 +29,11 @@ bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit)
++static struct sys_reg_desc sys_insn_descs[] = {
++	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
++	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
++	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
++};
++
+ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
+ 			struct sys_reg_params *p,
+ 			const struct sys_reg_desc *r)
+@@ -3164,6 +3166,24 @@ static bool emulate_sys_reg(struct kvm_vcpu *vcpu,
  	return false;
  }
  
-+bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit)
++static int emulate_sys_instr(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
 +{
-+	return __forward_traps(vcpu, HCR_EL2, control_bit);
++	const struct sys_reg_desc *r;
++
++	/* Search from the system instruction table. */
++	r = find_reg(p, sys_insn_descs, ARRAY_SIZE(sys_insn_descs));
++
++	if (likely(r)) {
++		perform_access(vcpu, p, r);
++	} else {
++		kvm_err("Unsupported guest sys instruction at: %lx\n",
++			*vcpu_pc(vcpu));
++		print_sys_reg_instr(p);
++		kvm_inject_undefined(vcpu);
++	}
++	return 1;
 +}
 +
- bool forward_nv_traps(struct kvm_vcpu *vcpu)
- {
- 	return forward_traps(vcpu, HCR_NV);
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index d40e5181bf74..548f637e57ac 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -666,6 +666,11 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu,
- 			    struct sys_reg_params *p,
- 			    const struct sys_reg_desc *r)
- {
-+	if (forward_traps(vcpu, HCR_TGE) ||
-+	    __forward_traps(vcpu, MDCR_EL2, MDCR_EL2_TDE) ||
-+	    __forward_traps(vcpu, MDCR_EL2, MDCR_EL2_TDA))
-+		return false;
+ /**
+  * kvm_reset_sys_regs - sets system registers to reset value
+  * @vcpu: The VCPU pointer
+@@ -3181,7 +3201,8 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
+ }
+ 
+ /**
+- * kvm_handle_sys_reg -- handles a mrs/msr trap on a guest sys_reg access
++ * kvm_handle_sys_reg -- handles a system instruction or mrs/msr instruction
++ *			 trap on a guest execution
+  * @vcpu: The VCPU pointer
+  */
+ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
+@@ -3195,12 +3216,19 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
+ 	params = esr_sys64_to_params(esr);
+ 	params.regval = vcpu_get_reg(vcpu, Rt);
+ 
+-	if (!emulate_sys_reg(vcpu, &params))
++	/* System register? */
++	if (params.Op0 == 2 || params.Op0 == 3) {
++		if (!emulate_sys_reg(vcpu, &params))
++			return 1;
 +
- 	access_rw(vcpu, p, r);
- 	if (p->is_write)
- 		vcpu_set_flag(vcpu, DEBUG_DIRTY);
++		if (!params.is_write)
++			vcpu_set_reg(vcpu, Rt, params.regval);
++
+ 		return 1;
++	}
+ 
+-	if (!params.is_write)
+-		vcpu_set_reg(vcpu, Rt, params.regval);
+-	return 1;
++	/* Hints, PSTATE (Op0 == 0) and System instructions (Op0 == 1) */
++	return emulate_sys_instr(vcpu, &params);
+ }
+ 
+ /******************************************************************************
+@@ -3592,6 +3620,7 @@ int __init kvm_sys_reg_table_init(void)
+ 	valid &= check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), true);
+ 	valid &= check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs), true);
+ 	valid &= check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs), false);
++	valid &= check_sysreg_table(sys_insn_descs, ARRAY_SIZE(sys_insn_descs), false);
+ 
+ 	if (!valid)
+ 		return -EINVAL;
 -- 
 2.34.1
 
