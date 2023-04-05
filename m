@@ -1,186 +1,142 @@
-Received: from out-57.mta0.migadu.com (out-57.mta0.migadu.com [91.218.175.57])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AE563AE
-	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:30:49 +0000 (UTC)
-Date: Wed, 5 Apr 2023 15:30:41 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1680708646;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9E5OY1K4w45DWf573FPZ+2UbjmJk7huX/eo3Pr5CduI=;
-	b=HR7E0IwqAIlq+8vjV2SEXl2q5CluHxEy6WnHMznnXgGCA3nwCgw019fxvP0+BKVXLLfjSR
-	6G67Ag5YWsVkVTYdh/3j4ci0TDtDjjXqZRhc3+1p/+UH9Enu0iAGIlnO7Xrf8J6ImWV7jb
-	qE1xQDKG7VW21FcQTq7l1QOq888XQmg=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DBFB63AE
+	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:40:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5893EC4339B;
+	Wed,  5 Apr 2023 15:40:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1680709229;
+	bh=cgECd0Xl7cqJInXMK8BolOW16mKjxex4k5xxxCQT6bM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=j9A6SiIRY8OGZ2FmPWNOwOHGG2vTJ9Bc3IXZUAw5D1eZT/7wQAzO3LSLdeYfPrqeb
+	 VZPZJMkeqbwf6eyxQuT5+5LvwdqEp3d8SyZRkxPkab1VrDGRKRZBcvztBxa5szM8UV
+	 jiCHVBDZ3onOra2k/PSLWnTPoeIReRaQL6yZAJcNvd5v64K2V1SXGQp/GoECPzY6Hc
+	 qMEiQKYLhMuSv+ofP8pgMJhUVFS3M7BzKZujImclXZ9rQGOwMYcocCBVwMBRXgzb2/
+	 4T5cSpvu0bnX5NPaIhqxMsvCq1JFY/G1UDkAp2WXMZCLBUc+TVggk00pjkVsAtExAE
+	 hukAcLktw2PnQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pk5FL-0062PV-3w;
+	Wed, 05 Apr 2023 16:40:27 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Chase Conklin <chase.conklin@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Darren Hart <darren@os.amperecomputing.com>,
+	Jintack Lim <jintack@cs.columbia.edu>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Miguel Luis <miguel.luis@oracle.com>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Salil Mehta <salil.mehta@huawei.com>
-Subject: Re: [PATCH v3 08/13] KVM: arm64: Add support for KVM_EXIT_HYPERCALL
-Message-ID: <ZC2UIWa4huuiE0ZD@linux.dev>
-References: <20230404154050.2270077-1-oliver.upton@linux.dev>
- <20230404154050.2270077-9-oliver.upton@linux.dev>
- <87o7o26aty.wl-maz@kernel.org>
- <86pm8iv8tj.wl-maz@kernel.org>
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v9 01/50] KVM: arm64: nv: Add non-VHE-EL2->EL1 translation helpers
+Date: Wed,  5 Apr 2023 16:39:19 +0100
+Message-Id: <20230405154008.3552854-2-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230405154008.3552854-1-maz@kernel.org>
+References: <20230405154008.3552854-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86pm8iv8tj.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hey Marc,
+Some EL2 system registers immediately affect the current execution
+of the system, so we need to use their respective EL1 counterparts.
+For this we need to define a mapping between the two. In general,
+this only affects non-VHE guest hypervisors, as VHE system registers
+are compatible with the EL1 counterparts.
 
-On Wed, Apr 05, 2023 at 12:59:20PM +0100, Marc Zyngier wrote:
+These helpers will get used in subsequent patches.
 
-[...]
+Co-developed-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_nested.h | 48 +++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
-> > > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> > > index 68f95dcd41a1..3f43e20c48b6 100644
-> > > --- a/arch/arm64/kvm/handle_exit.c
-> > > +++ b/arch/arm64/kvm/handle_exit.c
-> > > @@ -71,7 +71,9 @@ static int handle_smc(struct kvm_vcpu *vcpu)
-> > >  	 * Trap exception, not a Secure Monitor Call exception [...]"
-> > >  	 *
-> > >  	 * We need to advance the PC after the trap, as it would
-> > > -	 * otherwise return to the same address...
-> > > +	 * otherwise return to the same address. Furthermore, pre-incrementing
-> > > +	 * the PC before potentially exiting to userspace maintains the same
-> > > +	 * abstraction for both SMCs and HVCs.
-> > 
-> > nit: this comment really needs to find its way in the documentation so
-> > that a VMM author can determine the PC of the SMC/HVC. This is
-> > specially important for 32bit, which has a 16bit encodings for
-> > SMC/HVC.
-> > 
-> > And thinking of it, this outlines a small flaw in this API. If
-> > luserspace needs to find out about the address of the HVC/SMC, it
-> > needs to know the *size* of the instruction. But we don't propagate
-> > the ESR value. I think this still works by construction (userspace can
-> > check PSTATE and work out whether we're in ARM or Thumb mode), but
-> > this feels fragile.
-> > 
-> > Should we expose the ESR, or at least ESR_EL2.IL as an additional
-> > flag?
-> 
-> Just to make this a quicker round trip, I hacked the following
-> together. If you agree with it, I'll stick it on top and get the ball
-> rolling.
-
-Less work for me? How could I say no :)
-
-> From 9b830e7a3819c2771074bebe66c1d5f20394e3cc Mon Sep 17 00:00:00 2001
-> From: Marc Zyngier <maz@kernel.org>
-> Date: Wed, 5 Apr 2023 12:48:58 +0100
-> Subject: [PATCH] KVM: arm64: Expose SMC/HVC width to userspace
-> 
-> When returning to userspace to handle a SMCCC call, we consistently
-> set PC to point to the instruction immediately after the HVC/SMC.
-> 
-> However, should userspace need to know the exact address of the
-> trapping instruction, it needs to know about the *size* of that
-> instruction. For AArch64, this is pretty easy. For AArch32, this
-> is a bit more funky, as Thumb has 16bit encodings for both HVC
-> and SMC.
-> 
-> Expose this to userspace with a new flag that directly derives
-> from ESR_EL2.IL. Also update the documentation to reflect the PC
-> state at the point of exit.
-> 
-> Finally, this fixes a small buglet where the hypercall.{args,ret}
-> fields would not be cleared on exit, and could contain some
-> random junk.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-
-> ---
->  Documentation/virt/kvm/api.rst    |  8 ++++++++
->  arch/arm64/include/uapi/asm/kvm.h |  3 ++-
->  arch/arm64/kvm/hypercalls.c       | 16 +++++++++++-----
->  3 files changed, 21 insertions(+), 6 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index c8ab2f730945..103f945959ed 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6244,6 +6244,14 @@ Definition of ``flags``:
->     conduit to initiate the SMCCC call. If this bit is 0 then the guest
->     used the HVC conduit for the SMCCC call.
->  
-> + - ``KVM_HYPERCALL_EXIT_16BIT``: Indicates that the guest used a 16bit
-> +   instruction to initiate the SMCCC call. If this bit is 0 then the
-> +   guest used a 32bit instruction. An AArch64 guest always has this
-> +   bit set to 0.
-> +
-> +At the point of exit, PC points to the instruction immediately following
-> +the trapping instruction.
-> +
->  ::
->  
->  		/* KVM_EXIT_TPR_ACCESS */
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index 3dcfa4bfdf83..b1c1edf85480 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -491,7 +491,8 @@ struct kvm_smccc_filter {
->  };
->  
->  /* arm64-specific KVM_EXIT_HYPERCALL flags */
-> -#define KVM_HYPERCALL_EXIT_SMC	(1U << 0)
-> +#define KVM_HYPERCALL_EXIT_SMC		(1U << 0)
-> +#define KVM_HYPERCALL_EXIT_16BIT	(1U << 1)
->  
->  #endif
->  
-> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-> index 9a35d6d18193..3b6523f25afc 100644
-> --- a/arch/arm64/kvm/hypercalls.c
-> +++ b/arch/arm64/kvm/hypercalls.c
-> @@ -222,13 +222,19 @@ static void kvm_prepare_hypercall_exit(struct kvm_vcpu *vcpu, u32 func_id)
->  {
->  	u8 ec = ESR_ELx_EC(kvm_vcpu_get_esr(vcpu));
->  	struct kvm_run *run = vcpu->run;
-> -
-> -	run->exit_reason = KVM_EXIT_HYPERCALL;
-> -	run->hypercall.nr = func_id;
-> -	run->hypercall.flags = 0;
-> +	u64 flags = 0;
->  
->  	if (ec == ESR_ELx_EC_SMC32 || ec == ESR_ELx_EC_SMC64)
-> -		run->hypercall.flags |= KVM_HYPERCALL_EXIT_SMC;
-> +		flags |= KVM_HYPERCALL_EXIT_SMC;
-> +
-> +	if (!kvm_vcpu_trap_il_is32bit(vcpu))
-> +		flags |= KVM_HYPERCALL_EXIT_16BIT;
-> +
-> +	run->exit_reason = KVM_EXIT_HYPERCALL;
-> +	run->hypercall = (typeof(run->hypercall)) {
-> +		.nr	= func_id,
-> +		.flags	= flags,
-> +	};
->  }
->  
->  int kvm_smccc_call_handler(struct kvm_vcpu *vcpu)
-> -- 
-> 2.34.1
-> 
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
-
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 8fb67f032fd1..f8c4db870520 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -2,6 +2,7 @@
+ #ifndef __ARM64_KVM_NESTED_H
+ #define __ARM64_KVM_NESTED_H
+ 
++#include <linux/bitfield.h>
+ #include <linux/kvm_host.h>
+ 
+ static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
+@@ -11,6 +12,53 @@ static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
+ 		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
+ }
+ 
++/* Translation helpers from non-VHE EL2 to EL1 */
++static inline u64 tcr_el2_ps_to_tcr_el1_ips(u64 tcr_el2)
++{
++	return (u64)FIELD_GET(TCR_EL2_PS_MASK, tcr_el2) << TCR_IPS_SHIFT;
++}
++
++static inline u64 translate_tcr_el2_to_tcr_el1(u64 tcr)
++{
++	return TCR_EPD1_MASK |				/* disable TTBR1_EL1 */
++	       ((tcr & TCR_EL2_TBI) ? TCR_TBI0 : 0) |
++	       tcr_el2_ps_to_tcr_el1_ips(tcr) |
++	       (tcr & TCR_EL2_TG0_MASK) |
++	       (tcr & TCR_EL2_ORGN0_MASK) |
++	       (tcr & TCR_EL2_IRGN0_MASK) |
++	       (tcr & TCR_EL2_T0SZ_MASK);
++}
++
++static inline u64 translate_cptr_el2_to_cpacr_el1(u64 cptr_el2)
++{
++	u64 cpacr_el1 = 0;
++
++	if (cptr_el2 & CPTR_EL2_TTA)
++		cpacr_el1 |= CPACR_ELx_TTA;
++	if (!(cptr_el2 & CPTR_EL2_TFP))
++		cpacr_el1 |= CPACR_ELx_FPEN;
++	if (!(cptr_el2 & CPTR_EL2_TZ))
++		cpacr_el1 |= CPACR_ELx_ZEN;
++
++	return cpacr_el1;
++}
++
++static inline u64 translate_sctlr_el2_to_sctlr_el1(u64 val)
++{
++	/* Only preserve the minimal set of bits we support */
++	val &= (SCTLR_ELx_M | SCTLR_ELx_A | SCTLR_ELx_C | SCTLR_ELx_SA |
++		SCTLR_ELx_I | SCTLR_ELx_IESB | SCTLR_ELx_WXN | SCTLR_ELx_EE);
++	val |= SCTLR_EL1_RES1;
++
++	return val;
++}
++
++static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
++{
++	/* Clear the ASID field */
++	return ttbr0 & ~GENMASK_ULL(63, 48);
++}
++
+ struct sys_reg_params;
+ struct sys_reg_desc;
+ 
 -- 
-Thanks,
-Oliver
+2.34.1
+
