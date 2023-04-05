@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 161CE6AD9
-	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:46:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDBBCC433D2;
-	Wed,  5 Apr 2023 15:46:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D03D26AD9
+	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:46:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A537CC433D2;
+	Wed,  5 Apr 2023 15:46:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1680709564;
-	bh=mIGEzqeJ4OWwVwkeI3yoSLFdEg4/R9rCF1HJ3dE3CcU=;
+	s=k20201202; t=1680709567;
+	bh=7BO0Ssdij/dFPVApY+QX/fubB90BB/xC9flfiMh1bIA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PXH2v50/FTDjMyqolfO0L1hk5dlmFSbdQ4VVZF9WffokwoLhpcMl3JpCIG9QQ9bRr
-	 dUNkTu7rCoQfLOvnrz/AwKr2CdC+2y1p/3G7FKjG8BIMOtKRdswUlOClRx5YIUIwnR
-	 V9he/Uvb50TaFfE7bG7GULAIgG/vdf95toDNOIZxYlxslbIK6Q3DiJh91BO99TdBfq
-	 X8wbcE0eH6uUlUFzG+2M/J0NPj1xuimP1QNyxynBBH6MBpdShCFVuf9wSylV8+Cb4g
-	 9i1v0L9DnePTxK/+Drz//6kqgQzlFA6VCNrOKvAbQ59CfS1WHLx9ahK5YIxwVMsLqO
-	 AnECQOM4uBxgw==
+	b=vBVuY+KM7T0xq0bWBcHSWVUMSJ5I2Vx5K8zBiDExhc4OXDRYhczoqojSW1VS9AZy6
+	 I7rCaL62RfN8yLfTZ7GcE8TOKcjW9UgOSGpF//UbC5GmsUF3xxeBUDNC9+dEpw0uAj
+	 uNBhUATOdNyvNY32FXqQBklTYGrHLVQFfeq96TT13FWnHhRhmhI0vckJfqFrKQkdQW
+	 cQ13wSDeXUauS+em2/nK+Y/IjVAWfBQY3ukFS/s434a57d8aY/QvugGzdKmeicWzwy
+	 +5Jt53MD515QVeA5YgxCOFVRYntSUDAmiX5I5C12jDM+unmjn0VaesM0BFiykpL4+1
+	 5MYXZbihNXQ6g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pk5Fr-0062PV-Du;
-	Wed, 05 Apr 2023 16:41:00 +0100
+	id 1pk5Fe-0062PV-EJ;
+	Wed, 05 Apr 2023 16:40:47 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v9 42/50] KVM: arm64: nv: Sync nested timer state with FEAT_NV2
-Date: Wed,  5 Apr 2023 16:40:00 +0100
-Message-Id: <20230405154008.3552854-43-maz@kernel.org>
+Subject: [PATCH v9 37/50] KVM: arm64: nv: Tag shadow S2 entries with nested level
+Date: Wed,  5 Apr 2023 16:39:55 +0100
+Message-Id: <20230405154008.3552854-38-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230405154008.3552854-1-maz@kernel.org>
 References: <20230405154008.3552854-1-maz@kernel.org>
@@ -56,103 +56,83 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+Populate bits [56:55] of the leaf entry with the level provided
+by the guest's S2 translation.
 
-Emulating the timers with FEAT_NV2 is a bit odd, as the timers
-can be reconfigured behind our back without the hypervisor even
-noticing. In the VHE case, that's an actual regression in the
-architecture...
-
-Co-developed-by: Christoffer Dall <christoffer.dall@arm.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arch_timer.c  | 44 ++++++++++++++++++++++++++++++++++++
- arch/arm64/kvm/arm.c         |  3 +++
- include/kvm/arm_arch_timer.h |  1 +
- 3 files changed, 48 insertions(+)
+ arch/arm64/include/asm/kvm_nested.h |  7 +++++++
+ arch/arm64/kvm/mmu.c                | 16 ++++++++++++++--
+ 2 files changed, 21 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index c5c8cc3c25ae..2a1d88efada4 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -914,6 +914,50 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
- 		kvm_timer_blocking(vcpu);
- }
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 52d0a6c0fecc..784168dcb0fe 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -5,6 +5,8 @@
+ #include <linux/bitfield.h>
+ #include <linux/kvm_host.h>
  
-+void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
++#include <asm/kvm_pgtable.h>
++
+ static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
+ {
+ 	return (!__is_defined(__KVM_NVHE_HYPERVISOR__) &&
+@@ -139,4 +141,9 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+ 
+ #define KVM_NV_GUEST_MAP_SZ	(KVM_PGTABLE_PROT_SW1 | KVM_PGTABLE_PROT_SW0)
+ 
++static inline u64 kvm_encode_nested_level(struct kvm_s2_trans *trans)
 +{
-+	/*
-+	 * When NV2 is on, guest hypervisors have their EL0 timer register
-+	 * accesses redirected to the VNCR page. Any guest action taken on
-+	 * the timer is postponed until the next exit, leading to a very
-+	 * poor quality of emulation.
-+	 */
-+	if (!is_hyp_ctxt(vcpu))
-+		return;
-+
-+	if (!vcpu_el2_e2h_is_set(vcpu)) {
-+		/*
-+		 * A non-VHE guest hypervisor doesn't have any direct access
-+		 * to its timers: the EL2 registers trap (and the HW is
-+		 * fully emulated), while the EL0 registers access memory
-+		 * despite the access being notionally direct. Boo.
-+		 *
-+		 * We update the hardware timer registers with the
-+		 * latest value written by the guest to the VNCR page
-+		 * and let the hardware take care of the rest.
-+		 */
-+		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CTL_EL0),  SYS_CNTV_CTL);
-+		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0), SYS_CNTV_CVAL);
-+		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CTL_EL0),  SYS_CNTP_CTL);
-+		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0), SYS_CNTP_CVAL);
-+	} else {
-+		/*
-+		 * For a VHE guest hypervisor, the EL2 state is directly
-+		 * stored in the host EL0 timers, while the emulated EL0
-+		 * state is stored in the VNCR page. The latter could have
-+		 * been updated behind our back, and we must reset the
-+		 * emulation of the timers.
-+		 */
-+		struct timer_map map;
-+		get_timer_map(vcpu, &map);
-+
-+		soft_timer_cancel(&map.emul_vtimer->hrtimer);
-+		soft_timer_cancel(&map.emul_ptimer->hrtimer);
-+		timer_emulate(map.emul_vtimer);
-+		timer_emulate(map.emul_ptimer);
-+	}
++	return FIELD_PREP(KVM_NV_GUEST_MAP_SZ, trans->level);
 +}
 +
- /*
-  * With a userspace irqchip we have to check if the guest de-asserted the
-  * timer and if so, unmask the timer irq signal on the host interrupt
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 6af9fdf9b44d..c7089e558252 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -985,6 +985,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		if (static_branch_unlikely(&userspace_irqchip_in_use))
- 			kvm_timer_sync_user(vcpu);
- 
-+		if (vcpu_has_nv2(vcpu))
-+			kvm_timer_sync_nested(vcpu);
+ #endif /* __ARM64_KVM_NESTED_H */
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 7fd122d687f7..42bce05261c5 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1456,11 +1456,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	 * Potentially reduce shadow S2 permissions to match the guest's own
+ 	 * S2. For exec faults, we'd only reach this point if the guest
+ 	 * actually allowed it (see kvm_s2_handle_perm_fault).
++	 *
++	 * Also encode the level of the nested translation in the SW bits of
++	 * the PTE/PMD/PUD. This will be retrived on TLB invalidation from
++	 * the guest.
+ 	 */
+ 	if (nested) {
+ 		writable &= kvm_s2_trans_writable(nested);
+ 		if (!kvm_s2_trans_readable(nested))
+ 			prot &= ~KVM_PGTABLE_PROT_R;
 +
- 		kvm_arch_vcpu_ctxsync_fp(vcpu);
++		prot |= kvm_encode_nested_level(nested);
+ 	}
  
- 		/*
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index 52008f5cff06..a8382dda1c2e 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -98,6 +98,7 @@ int __init kvm_timer_hyp_init(bool has_gic);
- int kvm_timer_enable(struct kvm_vcpu *vcpu);
- int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu);
- void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
-+void kvm_timer_sync_nested(struct kvm_vcpu *vcpu);
- void kvm_timer_sync_user(struct kvm_vcpu *vcpu);
- bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu);
- void kvm_timer_update_run(struct kvm_vcpu *vcpu);
+ 	read_lock(&kvm->mmu_lock);
+@@ -1514,14 +1520,20 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	 * permissions only if vma_pagesize equals fault_granule. Otherwise,
+ 	 * kvm_pgtable_stage2_map() should be called to change block size.
+ 	 */
+-	if (fault_status == ESR_ELx_FSC_PERM && vma_pagesize == fault_granule)
++	if (fault_status == ESR_ELx_FSC_PERM && vma_pagesize == fault_granule) {
++		/*
++		 * Drop the SW bits in favour of those stored in the
++		 * PTE, which will be preserved.
++		 */
++		prot &= ~KVM_NV_GUEST_MAP_SZ;
+ 		ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
+-	else
++	} else {
+ 		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
+ 					     __pfn_to_phys(pfn), prot,
+ 					     memcache,
+ 					     KVM_PGTABLE_WALK_HANDLE_FAULT |
+ 					     KVM_PGTABLE_WALK_SHARED);
++	}
+ 
+ 	/* Mark the page dirty only if the fault is handled successfully */
+ 	if (writable && !ret) {
 -- 
 2.34.1
 
