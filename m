@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC4346ABC
-	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:46:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91AF5C433D2;
-	Wed,  5 Apr 2023 15:46:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08516ABC
+	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:46:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D7AEC4339B;
+	Wed,  5 Apr 2023 15:46:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1680709586;
-	bh=C+eYkxFuOlWI1J0Ai+7uKAkwuQz44DowGsncqCBujTA=;
+	s=k20201202; t=1680709588;
+	bh=PHs4gaxAaWQmUmtjbLODLMqbuuO3t58QTS/ww8BSn6A=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QLwyPTCVUNwX1ra03YiaNfDc3ORLFLTEcXljf4JoPppIdHgp51m5yr5k/J/snkYPs
-	 Q9sg49L4y1IX06258+nn1DhGHU9h8P4TDKQtXvRWIsfjgbLUadfQaU3/jK/AE20pqM
-	 CfxXSqErplFDkmhWuyBP3YdhURLDIcpO9IuxO7FdDCVBzKxqVz1ER/E3Bm9R2ejd7x
-	 yQiG0zQ2GSQ86CxcMDX7GVoCufAqhdiLZqrVKgbIXUJGTqBvNLU5AUc20oJZwerTP9
-	 bzenpExdBzgY8olp6GhsqpX0T8lxiBQGF71fXF4qDwg/J7zqgp/58hxzLF5yGl5LdP
-	 oZrztHeZqQZKg==
+	b=LWGJOkd2zACE5X491upAsmJRjku26+xZwkENQLcsZYHokf8hNgDzj5eaOPhZ2MDA2
+	 aYNvlot05wLHFAICO9I3R0UERf5D4C/DBBQN/HezhGGSfEzPiwCJTTKernKraYpxs6
+	 f8xS+6ehSIuZQ0UbdvbV+JAe2H4/micyk7sbX1TYB85ITnLBURnsmXFnMWSJROUgJX
+	 CP41DdK2PgVpR+uCqiqGStSGSqG3MVR7+yV+Mx3MdcxHhJGW4c9UsVf61fYU4PH9qe
+	 1/WryL3+H5ckujoXvBgrp0b29HpPnWEZZZXvy/wJYAcmnfPUY807EUqKO3u92Pxd2B
+	 hJyZ6PmCIG/Xw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pk5Fw-0062PV-71;
-	Wed, 05 Apr 2023 16:41:04 +0100
+	id 1pk5Fh-0062PV-A1;
+	Wed, 05 Apr 2023 16:40:51 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v9 48/50] KVM: arm64: nv: Fast-track EL1 TLBIs for VHE guests
-Date: Wed,  5 Apr 2023 16:40:06 +0100
-Message-Id: <20230405154008.3552854-49-maz@kernel.org>
+Subject: [PATCH v9 38/50] KVM: arm64: nv: Add include containing the VNCR_EL2 offsets
+Date: Wed,  5 Apr 2023 16:39:56 +0100
+Message-Id: <20230405154008.3552854-39-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230405154008.3552854-1-maz@kernel.org>
 References: <20230405154008.3552854-1-maz@kernel.org>
@@ -56,134 +56,98 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Due to the way ARMv8.4-NV suppresses traps when accessing EL2
-system registers, we can't track when the guest changes its
-HCR_EL2.TGE setting. This means we always trap EL1 TLBIs,
-even if they don't affect any guest.
+VNCR_EL2 points to a page containing a number of system registers
+accessed by a guest hypervisor when ARMv8.4-NV is enabled.
 
-This obviously has a huge impact on performance, as we handle
-TLBI traps as a normal exit, and a normal VHE host issues
-thousands of TLBIs when booting (and quite a few when running
-userspace).
-
-A cheap way to reduce the overhead is to handle the limited
-case of {E2H,TGE}=={1,1} as a guest fixup, as we already have
-the right mmu configuration in place. Just execute the decoded
-instruction right away and return to the guest.
+Let's document the offsets in that page, as we are going to use
+this layout.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/vhe/switch.c | 43 ++++++++++++++++++++++++++++++++-
- arch/arm64/kvm/hyp/vhe/tlb.c    |  6 +++--
- arch/arm64/kvm/sys_regs.c       | 12 ---------
- 3 files changed, 46 insertions(+), 15 deletions(-)
+ arch/arm64/include/asm/vncr_mapping.h | 74 +++++++++++++++++++++++++++
+ 1 file changed, 74 insertions(+)
+ create mode 100644 arch/arm64/include/asm/vncr_mapping.h
 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 238c6613cf47..a3555b90d9e1 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -168,6 +168,47 @@ void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
- 	__deactivate_traps_common(vcpu);
- }
- 
-+static bool kvm_hyp_handle_tlbi_el1(struct kvm_vcpu *vcpu, u64 *exit_code)
-+{
-+	u32 instr;
-+	u64 val;
+diff --git a/arch/arm64/include/asm/vncr_mapping.h b/arch/arm64/include/asm/vncr_mapping.h
+new file mode 100644
+index 000000000000..c0a2acd5045c
+--- /dev/null
++++ b/arch/arm64/include/asm/vncr_mapping.h
+@@ -0,0 +1,74 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * System register offsets in the VNCR page
++ * All offsets are *byte* displacements!
++ */
 +
-+	/*
-+	 * Ideally, we would never trap on EL1 TLB invalidations when the
-+	 * guest's HCR_EL2.{E2H,TGE} == {1,1}. But "thanks" to ARMv8.4, we
-+	 * don't trap writes to HCR_EL2, meaning that we can't track
-+	 * changes to the virtual TGE bit. So we leave HCR_EL2.TTLB set on
-+	 * the host. Oopsie...
-+	 *
-+	 * In order to speed-up EL1 TLBIs from the vEL2 guest when TGE is
-+	 * set, try and handle these invalidation as quickly as possible,
-+	 * without fully exiting (unless this needs forwarding).
-+	 */
-+	if (!vcpu_has_nv2(vcpu) ||
-+	    !vcpu_is_el2(vcpu) ||
-+	    (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE))
-+		return false;
++#ifndef __ARM64_VNCR_MAPPING_H__
++#define __ARM64_VNCR_MAPPING_H__
 +
-+	instr = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
-+	if (sys_reg_Op0(instr) != TLBI_Op0 ||
-+	    sys_reg_Op1(instr) != TLBI_Op1_EL1)
-+		return false;
++#define VNCR_VTTBR_EL2          0x020
++#define VNCR_VTCR_EL2           0x040
++#define VNCR_VMPIDR_EL2         0x050
++#define VNCR_CNTVOFF_EL2        0x060
++#define VNCR_HCR_EL2            0x078
++#define VNCR_HSTR_EL2           0x080
++#define VNCR_VPIDR_EL2          0x088
++#define VNCR_TPIDR_EL2          0x090
++#define VNCR_VNCR_EL2           0x0B0
++#define VNCR_CPACR_EL1          0x100
++#define VNCR_CONTEXTIDR_EL1     0x108
++#define VNCR_SCTLR_EL1          0x110
++#define VNCR_ACTLR_EL1          0x118
++#define VNCR_TCR_EL1            0x120
++#define VNCR_AFSR0_EL1          0x128
++#define VNCR_AFSR1_EL1          0x130
++#define VNCR_ESR_EL1            0x138
++#define VNCR_MAIR_EL1           0x140
++#define VNCR_AMAIR_EL1          0x148
++#define VNCR_MDSCR_EL1          0x158
++#define VNCR_SPSR_EL1           0x160
++#define VNCR_CNTV_CVAL_EL0      0x168
++#define VNCR_CNTV_CTL_EL0       0x170
++#define VNCR_CNTP_CVAL_EL0      0x178
++#define VNCR_CNTP_CTL_EL0       0x180
++#define VNCR_SCXTNUM_EL1        0x188
++#define VNCR_TFSR_EL1		0x190
++#define VNCR_ZCR_EL1            0x1E0
++#define VNCR_TTBR0_EL1          0x200
++#define VNCR_TTBR1_EL1          0x210
++#define VNCR_FAR_EL1            0x220
++#define VNCR_ELR_EL1            0x230
++#define VNCR_SP_EL1             0x240
++#define VNCR_VBAR_EL1           0x250
++#define VNCR_ICH_LR0_EL2        0x400
++//      VNCR_ICH_LRN_EL2(n)     VNCR_ICH_LR0_EL2+8*((n) & 7)
++#define VNCR_ICH_AP0R0_EL2      0x480
++//      VNCR_ICH_AP0RN_EL2(n)   VNCR_ICH_AP0R0_EL2+8*((n) & 3)
++#define VNCR_ICH_AP1R0_EL2      0x4A0
++//      VNCR_ICH_AP1RN_EL2(n)   VNCR_ICH_AP1R0_EL2+8*((n) & 3)
++#define VNCR_ICH_HCR_EL2        0x4C0
++#define VNCR_ICH_VMCR_EL2       0x4C8
++#define VNCR_VDISR_EL2          0x500
++#define VNCR_PMBLIMITR_EL1      0x800
++#define VNCR_PMBPTR_EL1         0x810
++#define VNCR_PMBSR_EL1          0x820
++#define VNCR_PMSCR_EL1          0x828
++#define VNCR_PMSEVFR_EL1        0x830
++#define VNCR_PMSICR_EL1         0x838
++#define VNCR_PMSIRR_EL1         0x840
++#define VNCR_PMSLATFR_EL1       0x848
++#define VNCR_TRFCR_EL1          0x880
++#define VNCR_MPAM1_EL1          0x900
++#define VNCR_MPAMHCR_EL2        0x930
++#define VNCR_MPAMVPMV_EL2       0x938
++#define VNCR_MPAMVPM0_EL2       0x940
++#define VNCR_MPAMVPM1_EL2       0x948
++#define VNCR_MPAMVPM2_EL2       0x950
++#define VNCR_MPAMVPM3_EL2       0x958
++#define VNCR_MPAMVPM4_EL2       0x960
++#define VNCR_MPAMVPM5_EL2       0x968
++#define VNCR_MPAMVPM6_EL2       0x970
++#define VNCR_MPAMVPM7_EL2       0x978
 +
-+	val = vcpu_get_reg(vcpu, kvm_vcpu_sys_get_rt(vcpu));
-+	__kvm_tlb_el1_instr(NULL, val, instr);
-+	__kvm_skip_instr(vcpu);
-+
-+	return true;
-+}
-+
-+static bool kvm_hyp_handle_sysreg_vhe(struct kvm_vcpu *vcpu, u64 *exit_code)
-+{
-+	if (kvm_hyp_handle_tlbi_el1(vcpu, exit_code))
-+		return true;
-+
-+	return kvm_hyp_handle_sysreg(vcpu, exit_code);
-+}
-+
- static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
- 	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
-@@ -216,7 +257,7 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
- static const exit_handler_fn hyp_exit_handlers[] = {
- 	[0 ... ESR_ELx_EC_MAX]		= NULL,
- 	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
--	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg,
-+	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg_vhe,
- 	[ESR_ELx_EC_SVE]		= kvm_hyp_handle_fpsimd,
- 	[ESR_ELx_EC_FP_ASIMD]		= kvm_hyp_handle_fpsimd,
- 	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
-diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-index c4389db4cc22..beb162468c0b 100644
---- a/arch/arm64/kvm/hyp/vhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -201,7 +201,8 @@ void __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_encoding)
- 	dsb(ishst);
- 
- 	/* Switch to requested VMID */
--	__tlb_switch_to_guest(mmu, &cxt);
-+	if (mmu)
-+		__tlb_switch_to_guest(mmu, &cxt);
- 
- 	/*
- 	 * Execute the same instruction as the guest hypervisor did,
-@@ -240,5 +241,6 @@ void __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_encoding)
- 	dsb(ish);
- 	isb();
- 
--	__tlb_switch_to_host(&cxt);
-+	if (mmu)
-+		__tlb_switch_to_host(&cxt);
- }
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 4a1c4a97f702..a671629fb366 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -3113,18 +3113,6 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 
- 	WARN_ON(!vcpu_is_el2(vcpu));
- 
--	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_E2H | HCR_TGE)) == (HCR_E2H | HCR_TGE)) {
--		mutex_lock(&vcpu->kvm->lock);
--		/*
--		 * ARMv8.4-NV allows the guest to change TGE behind
--		 * our back, so we always trap EL1 TLBIs from vEL2...
--		 */
--		__kvm_tlb_el1_instr(&vcpu->kvm->arch.mmu, p->regval, sys_encoding);
--		mutex_unlock(&vcpu->kvm->lock);
--
--		return true;
--	}
--
- 	kvm_s2_mmu_iterate_by_vmid(vcpu->kvm, get_vmid(vttbr),
- 				   &(union tlbi_info) {
- 					   .va = {
++#endif /* __ARM64_VNCR_MAPPING_H__ */
 -- 
 2.34.1
 
