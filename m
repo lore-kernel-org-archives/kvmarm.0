@@ -1,47 +1,39 @@
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80EAD7FC
-	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 08:04:26 +0000 (UTC)
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-947cd8b2de3so31871266b.0
-        for <kvmarm@lists.linux.dev>; Wed, 05 Apr 2023 01:04:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680681864; x=1683273864;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1qeWL9csSccLs6fLdE0uQkmoTpVTl/CNeE7DAxN2MXc=;
-        b=Xhq2FpN6Mn9U+EjSMWm81/rOkL0bCFC+/2wjeKRsitvqUzxRSPfp9fuoLeyBFssxEy
-         uDCSbz1YbvYjEPswqb3S2GTeD5WrMfOxja6ExrIKkGQLeADhlgbB7YOPra4MuzjHMrmj
-         ZXdFh+JVuRGjSQyYZanQX5QlEVziDHiVidIiylGL7f0MyJUhqMsMEyHDcOQ7gNiV1wC+
-         ahUaXralaKBaRSz4fOK+iGVNv27U4eaNu+zC6QxXTv6Jps/OaYMBUjv3ab9gY0hKw4g7
-         NAydS21zEz4TOSL9DVk3uvDj3K8Lk9ct3FFtJCd1yGfrC7kCaSATBwW4q2DaUE7YXwsp
-         DLwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680681864; x=1683273864;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1qeWL9csSccLs6fLdE0uQkmoTpVTl/CNeE7DAxN2MXc=;
-        b=zYzyrtOfRCwZgcKFgIeccCJCHWLBSW9d8NoMCXhHl9KmtJRDncjVrC40D8y0CE0rmB
-         6Tt/K1GsmXfhY5VUJpPww0zhKYIVUTz4RIjdWldwUlzqfw4qmH+CsKNJy/+iYtflSvqz
-         UnxyzqVhYWh+x8pR3WBDGdIAgak6cuo9cmSSiEltSpjgRjApPslLr+F3NxOd6mpr2qFB
-         uVuddgLOh58kA++DfTlsnRV+DyxXP4I0D4I/E4p2K9BCjqdLXyos1faZdky1e/I8eGWh
-         Y3FnA3t4fN9HJ8ZeweAJvJttahMsXbAUkA3lRgXU0f7SwD2iutyNg6skihB9tndiqBOz
-         SGtQ==
-X-Gm-Message-State: AAQBX9ezZSZX5oSaIuZChiffIZap2TnTHQ39CCxNuyYM6TAdIB6zYn5b
-	AMjCV3jID7LmOrqSh82snsjXYA==
-X-Google-Smtp-Source: AKy350bF5rLJogTrsY1f6blQnOqzcwkAlbB5v+pmHg+Ta3p4lfp6J5hb3yzzRk5ijVMDrTT8n0Y6cA==
-X-Received: by 2002:a05:6402:2026:b0:4fd:2533:f56 with SMTP id ay6-20020a056402202600b004fd25330f56mr1005988edb.39.1680681864506;
-        Wed, 05 Apr 2023 01:04:24 -0700 (PDT)
-Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
-        by smtp.gmail.com with ESMTPSA id a65-20020a509ec7000000b004fbf6b35a56sm6955177edf.76.2023.04.05.01.04.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Apr 2023 01:04:23 -0700 (PDT)
-Date: Wed, 5 Apr 2023 08:04:20 +0000
-From: Quentin Perret <qperret@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55FEA7FC
+	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 08:06:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=X4PVQdadl6ZTLGeoTeEp0Dd4gWHDvdr8s3g3jGogpgM=; b=DKg+iwJwTae61N3oz8ZS/lSVqH
+	kXviuaxC6aMQnQA5NKnoAYS+qajbWl5RIS05vx4JjXnA/1uY+a6/soU4CazZazeHQav2ueMfPrrCw
+	EQUtTTogq4y06UUHDaVZhomah8Ld7DY4BLc4PlF02mk+6H6VMn5G2AarBSTEbEfXR7zxMLhc8ipKq
+	fl5YJeELcKAFBG/bLUYgII+mWcmdo/VpMksm9FsNLpasKzi1IS7cA+k2ezf09uaGVGwNlxhm01sFE
+	KDYfuKdYv5cDPGcxNWj9Txx2BEhobQP6E+J5LNv2LY9KNdhtAkeSaFEL95RFldfCXBGTcR+AwDIHi
+	WB1uHuRg==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1pjy9S-009pS6-2w;
+	Wed, 05 Apr 2023 08:05:55 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 9A0B2300274;
+	Wed,  5 Apr 2023 10:05:48 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 6D9C5262312B5; Wed,  5 Apr 2023 10:05:48 +0200 (CEST)
+Date: Wed, 5 Apr 2023 10:05:48 +0200
+From: Peter Zijlstra <peterz@infradead.org>
 To: David Dai <davidai@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>,
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
@@ -49,16 +41,21 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
 	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	Saravana Kannan <saravanak@google.com>, kernel-team@android.com,
-	kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	Sudeep Holla <sudeep.holla@arm.com>, Ingo Molnar <mingo@redhat.com>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+	Daniel Bristot de Oliveira <bristot@redhat.com>,
+	Valentin Schneider <vschneid@redhat.com>, kernel-team@android.com,
+	linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [RFC PATCH 2/6] kvm: arm64: Add support for get_cur_cpufreq
- service
-Message-ID: <ZC0rhEHTlz6dHKC0@google.com>
+Subject: Re: [RFC PATCH 0/6] Improve VM DVFS and task placement behavior
+Message-ID: <20230405080548.GW4253@hirez.programming.kicks-ass.net>
 References: <20230330224348.1006691-1-davidai@google.com>
- <20230330224348.1006691-3-davidai@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -67,25 +64,48 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230330224348.1006691-3-davidai@google.com>
+In-Reply-To: <20230330224348.1006691-1-davidai@google.com>
 
-On Thursday 30 Mar 2023 at 15:43:37 (-0700), David Dai wrote:
-> This service allows guests to query the host for frequency of the CPU
-> that the vCPU is currently running on.
+On Thu, Mar 30, 2023 at 03:43:35PM -0700, David Dai wrote:
+> Hi,
+> 
+> This patch series is a continuation of the talk Saravana gave at LPC 2022
+> titled "CPUfreq/sched and VM guest workload problems" [1][2][3]. The gist
+> of the talk is that workloads running in a guest VM get terrible task
+> placement and DVFS behavior when compared to running the same workload in
+> the host. Effectively, no EAS for threads inside VMs. This would make power
+> and performance terrible just by running the workload in a VM even if we
+> assume there is zero virtualization overhead.
+> 
+> We have been iterating over different options for communicating between
+> guest and host, ways of applying the information coming from the
+> guest/host, etc to figure out the best performance and power improvements
+> we could get.
+> 
+> The patch series in its current state is NOT meant for landing in the
+> upstream kernel. We are sending this patch series to share the current
+> progress and data we have so far. The patch series is meant to be easy to
+> cherry-pick and test on various devices to see what performance and power
+> benefits this might give for others.
+> 
+> With this series, a workload running in a VM gets the same task placement
+> and DVFS treatment as it would when running in the host.
+> 
+> As expected, we see significant performance improvement and better
+> performance/power ratio. If anyone else wants to try this out for your VM
+> workloads and report findings, that'd be very much appreciated.
+> 
+> The idea is to improve VM CPUfreq/sched behavior by:
+> - Having guest kernel to do accurate load tracking by taking host CPU
+>   arch/type and frequency into account.
+> - Sharing vCPU run queue utilization information with the host so that the
+>   host can do proper frequency scaling and task placement on the host side.
 
-I assume the intention here is to achieve scale invariance in the guest
-to ensure its PELT signals represent how much work is actually being
-done. If so, it's likely the usage of activity monitors will be superior
-for this type of thing as that may allow us to drop the baked-in
-assumption about vCPU pinning. IIRC, AMUs v2 (arm64-specific obv) have
-extended support for virtualization, so I'd suggest looking into
-supporting that first.
+So, not having actually been send many of the patches I've no idea what
+you've done... Please, eradicate this ridiculous idea of sending random
+people a random subset of a patch series. Either send all of it or none,
+this is a bloody nuisance.
 
-And assuming we also want to support this on hardware that don't have
-AMUs, or don't have the right virt extensions, then the only thing I can
-think of is to have the VMM expose non-architectural AMUs to the guest,
-maybe emulated using PMUs. If the guest uses Linux, it'll need to grow
-support for non-architectural AMUs which is its own can of worms though.
-
-Thanks,
-Quentin
+Having said that; my biggest worry is that you're making scheduler
+internals into an ABI. I would hate for this paravirt interface to tie
+us down.
