@@ -1,64 +1,67 @@
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 326F779E2
-	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 21:09:21 +0000 (UTC)
-Received: by mail-pg1-f177.google.com with SMTP id d22so22578772pgw.2
-        for <kvmarm@lists.linux.dev>; Wed, 05 Apr 2023 14:09:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2C7C950
+	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 22:07:59 +0000 (UTC)
+Received: by mail-pg1-f175.google.com with SMTP id h31so22669377pgl.6
+        for <kvmarm@lists.linux.dev>; Wed, 05 Apr 2023 15:07:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680728960;
+        d=google.com; s=20210112; t=1680732479;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6MLGKvl/FzbLKzi4k20FGuOr9OHamYGW4v4bUuCe4Pw=;
-        b=n28dxYvaxPfq5JUzsQqU6kb+bImfDaBPK4ACVIjk36q9wbwO2Ix5OhdxzRqVx+gjh7
-         vPGDsy2Z/CkVDlg0sacBgvwyhP7Cr0CdN6fmm+V+cxa8+RtEgXZfvRyRNCKyvdMkH3IG
-         AZIFu3+14yJXDRgL1cAXUeLDtssdqJhhsK3uUP9LNJOKnlmtgEbiGDaecgZ2kxcyuk+W
-         ieFXO/j1UfguA8IRQyx5S+9eNafvz99yFQpPT34J9xYi+XPsnNySq6lG7R9Y+uCWDb48
-         YGdH1N2wSkTT52iPU+n1BLdHUrV7R+KBKxYE48TbebgWoPnGhsUXfQZtwsoUmHH5p6Uh
-         UXGQ==
+        bh=6G4NsFlCDV5fs2a2Hk+HPn6BW+TSo8l8fhvL/n7IKto=;
+        b=Co/XH8kheGMcW5639kFQflWIBdRbseeE5Rgi33B4NHAwkIuhJ8cRjGblOk3jTnpe3M
+         r8NDGd4BbIPvGUCTtlIr1C3Zi3M3kVBDoSPBmqFnbVUgJEH+rMm0xic9kbB5F1PS469K
+         v1mqbc0XbrOyTEZFxU0ygPvmf+3dHmAY6CsJ9O7wnH7swCU/AVkriErypZpzAdgN2JX5
+         g7RiLqySQwykhvK9Yp436hJ6RVIMG7NxCvKb3YHlnhCMdin4lAC9yBtRjNUKm8bUitaS
+         sSu9j6TkAiYHkxQxzNBHO0Xb9op6XALV5XasEjMG0VTfxTM7nkVUzYMSqHE97uOdWJz9
+         t2rQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680728960;
+        d=1e100.net; s=20210112; t=1680732479;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6MLGKvl/FzbLKzi4k20FGuOr9OHamYGW4v4bUuCe4Pw=;
-        b=IDeqy/KOMdx5dhE7U0BSl5P+NDnX6lkoAWvNzRq/08BR85PYxiMaMpH4taDfgq0WgF
-         hBCRqO7Kd+1bx6XhabzN8+exqzrlpa6GZHhMn63cIYxHj1/TqX0JrXWdjP2prM8umd1t
-         7TJ8IF1EELBy16/RJHr/A9lgC1ScD4hZn6NO6U+sPJ3w45JHDvSHQef4obQP0mdgZWwC
-         bUeQi+DEy3d0atWjT9hHu7o31U4u72wh6YqoIbBpTwN6D5bUg3PDPgl0EZDd+dWUEEFq
-         UwTeIxBRPwE9XNDyBA3XEUX1D/TwAcpYVSiMjI/vD2lVCIOSZZx6Rge3ThK7nVmV0Oqr
-         WKQA==
-X-Gm-Message-State: AAQBX9c5MQw8GCzWFN9GCm5yIFMBEOyrpuLo8N9pxg5D2pYg6aYI3zCP
-	jVHj10CkTeMwZfKPV8YoeGpu8O9CLWtq5vbYWbR0lw==
-X-Google-Smtp-Source: AKy350b0IUXlBzjwLLr6SEpK1cx38ABlr+yVbGlA9Wc0dSXUg0uG5eQHWSVFl7t3uBAdQCZoYdM8DgcCcOXiLa8I580=
-X-Received: by 2002:a65:430c:0:b0:514:3d3d:da5a with SMTP id
- j12-20020a65430c000000b005143d3dda5amr427665pgq.3.1680728960348; Wed, 05 Apr
- 2023 14:09:20 -0700 (PDT)
+        bh=6G4NsFlCDV5fs2a2Hk+HPn6BW+TSo8l8fhvL/n7IKto=;
+        b=5xXs43U2wY/y3VAeTz8/c4QgOp2vUk224lSZv5YnF6DRYLedO4mN9xXqEtdy6l/1XP
+         fuY4i445g3CrLz1nHxvU74JSoSoubejE5fB0CdRrIrQdJcobQansjXlG6zEJF1KMSnWo
+         FnYz3ie4QChx7G0OdxHHlkEfxUrEV2QIcx6f7XN0JcXF5D9QsgPDTO9GZiw1XFxowsRC
+         v+sMT9srsPqYcfy0OHhBVihowMGXyHmquEzABuz2KWcLG9s9lO5uKeqIDgBqosPSyY4j
+         MmgxoWG3mNCBy3nH/BFIAyw44+RP7InDgxtnwxcHFs9TO2oloqeCQL8dU0DB+8yJk9cb
+         85EA==
+X-Gm-Message-State: AAQBX9dAFKMojumg6kOdf5b8rT0C5U0TjXC+bXHqFhYy9+U9aDSNvdK3
+	RMfASZASU9n64pyjGFdwzaowsRKWZw8G1PkcUSP2mQ==
+X-Google-Smtp-Source: AKy350YWe0LQY4a1WtMtO9UBAtN8fCXxF/yrfEr5xXDYzw+Sj0JKwU0Q2JALgP82rgc6URVJ5DF6xJk/YwaCPJm10os=
+X-Received: by 2002:a05:6a00:999:b0:625:cda5:c28c with SMTP id
+ u25-20020a056a00099900b00625cda5c28cmr4345578pfg.6.1680732478867; Wed, 05 Apr
+ 2023 15:07:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230330224348.1006691-1-davidai@google.com> <20230405080548.GW4253@hirez.programming.kicks-ass.net>
-In-Reply-To: <20230405080548.GW4253@hirez.programming.kicks-ass.net>
+References: <20230331014356.1033759-1-davidai@google.com> <20230331014356.1033759-6-davidai@google.com>
+ <CAL_JsqJErVOZZ==i1HpMABfuVEDC+drboLTntMDB0sUC9ZdQ_Q@mail.gmail.com>
+In-Reply-To: <CAL_JsqJErVOZZ==i1HpMABfuVEDC+drboLTntMDB0sUC9ZdQ_Q@mail.gmail.com>
 From: Saravana Kannan <saravanak@google.com>
-Date: Wed, 5 Apr 2023 14:08:43 -0700
-Message-ID: <CAGETcx-qgKeUQ60VhvW+hYUY-sMh-wX1G8zSwJUFpJ-u7aU6aA@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/6] Improve VM DVFS and task placement behavior
-To: Peter Zijlstra <peterz@infradead.org>
+Date: Wed, 5 Apr 2023 15:07:22 -0700
+Message-ID: <CAGETcx_YhXqgyuWwH7BrMV4-z2LVEq5-X-FtPvmi-9tCrjVXVw@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 5/6] dt-bindings: cpufreq: add bindings for virtual
+ kvm cpufreq
+To: Rob Herring <robh+dt@kernel.org>
 Cc: David Dai <davidai@google.com>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Viresh Kumar <viresh.kumar@linaro.org>, Rob Herring <robh+dt@kernel.org>, 
+	Viresh Kumar <viresh.kumar@linaro.org>, 
 	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
 	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
 	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
 	Lorenzo Pieralisi <lpieralisi@kernel.org>, Sudeep Holla <sudeep.holla@arm.com>, 
-	Ingo Molnar <mingo@redhat.com>, Juri Lelli <juri.lelli@redhat.com>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Dietmar Eggemann <dietmar.eggemann@arm.com>, 
-	Steven Rostedt <rostedt@goodmis.org>, Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
+	Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
+	Dietmar Eggemann <dietmar.eggemann@arm.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
 	Daniel Bristot de Oliveira <bristot@redhat.com>, Valentin Schneider <vschneid@redhat.com>, kernel-team@android.com, 
 	linux-pm@vger.kernel.org, devicetree@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
@@ -66,96 +69,84 @@ Cc: David Dai <davidai@google.com>, "Rafael J. Wysocki" <rafael@kernel.org>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 5, 2023 at 1:06=E2=80=AFAM Peter Zijlstra <peterz@infradead.org=
-> wrote:
+On Fri, Mar 31, 2023 at 5:47=E2=80=AFAM Rob Herring <robh+dt@kernel.org> wr=
+ote:
 >
-> On Thu, Mar 30, 2023 at 03:43:35PM -0700, David Dai wrote:
-> > Hi,
+> On Thu, Mar 30, 2023 at 8:45=E2=80=AFPM David Dai <davidai@google.com> wr=
+ote:
 > >
-> > This patch series is a continuation of the talk Saravana gave at LPC 20=
-22
-> > titled "CPUfreq/sched and VM guest workload problems" [1][2][3]. The gi=
-st
-> > of the talk is that workloads running in a guest VM get terrible task
-> > placement and DVFS behavior when compared to running the same workload =
-in
-> > the host. Effectively, no EAS for threads inside VMs. This would make p=
-ower
-> > and performance terrible just by running the workload in a VM even if w=
-e
-> > assume there is zero virtualization overhead.
+> > Add devicetree bindings for a virtual kvm cpufreq driver.
 > >
-> > We have been iterating over different options for communicating between
-> > guest and host, ways of applying the information coming from the
-> > guest/host, etc to figure out the best performance and power improvemen=
-ts
-> > we could get.
+> > Co-developed-by: Saravana Kannan <saravanak@google.com>
+> > Signed-off-by: Saravana Kannan <saravanak@google.com>
+> > Signed-off-by: David Dai <davidai@google.com>
+> > ---
+> >  .../bindings/cpufreq/cpufreq-virtual-kvm.yaml | 39 +++++++++++++++++++
+> >  1 file changed, 39 insertions(+)
+> >  create mode 100644 Documentation/devicetree/bindings/cpufreq/cpufreq-v=
+irtual-kvm.yaml
 > >
-> > The patch series in its current state is NOT meant for landing in the
-> > upstream kernel. We are sending this patch series to share the current
-> > progress and data we have so far. The patch series is meant to be easy =
-to
-> > cherry-pick and test on various devices to see what performance and pow=
-er
-> > benefits this might give for others.
-> >
-> > With this series, a workload running in a VM gets the same task placeme=
-nt
-> > and DVFS treatment as it would when running in the host.
-> >
-> > As expected, we see significant performance improvement and better
-> > performance/power ratio. If anyone else wants to try this out for your =
-VM
-> > workloads and report findings, that'd be very much appreciated.
-> >
-> > The idea is to improve VM CPUfreq/sched behavior by:
-> > - Having guest kernel to do accurate load tracking by taking host CPU
-> >   arch/type and frequency into account.
-> > - Sharing vCPU run queue utilization information with the host so that =
-the
-> >   host can do proper frequency scaling and task placement on the host s=
-ide.
+> > diff --git a/Documentation/devicetree/bindings/cpufreq/cpufreq-virtual-=
+kvm.yaml b/Documentation/devicetree/bindings/cpufreq/cpufreq-virtual-kvm.ya=
+ml
+> > new file mode 100644
+> > index 000000000000..31e64558a7f1
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/cpufreq/cpufreq-virtual-kvm.yam=
+l
+> > @@ -0,0 +1,39 @@
+> > +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/cpufreq/cpufreq-virtual-kvm.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: Virtual KVM CPUFreq
+> > +
+> > +maintainers:
+> > +  - David Dai <davidai@google.com>
+> > +
+> > +description: |
+> > +
+> > +  KVM CPUFreq is a virtualized driver in guest kernels that sends util=
+ization
+> > +  of its vCPUs as a hint to the host. The host uses hint to schedule v=
+CPU
+> > +  threads and select CPU frequency. It enables accurate Per-Entity Loa=
+d
+> > +  Tracking for tasks running in the guest by querying host CPU frequen=
+cy
+> > +  unless a virtualized FIE exists(Like AMUs).
+> > +
+> > +properties:
+> > +  compatible:
+> > +    const: virtual,kvm-cpufreq
+> > +
+> > +required:
+> > +  - compatible
+> > +
+> > +additionalProperties: false
+> > +
+> > +examples:
+> > +  - |
+> > +    {
+> > +      #address-cells =3D <2>;
+> > +      #size-cells =3D <2>;
+> > +
+> > +      cpufreq {
+> > +            compatible =3D "virtual,kvm-cpufreq";
+> > +      };
 >
-> So, not having actually been send many of the patches I've no idea what
-> you've done... Please, eradicate this ridiculous idea of sending random
-> people a random subset of a patch series. Either send all of it or none,
-> this is a bloody nuisance.
+> The same thing was tried on non-virtual h/w too. This is not a device
+> so it doesn't go in DT. It is just an abuse of DT as a kernel driver
+> instantiation mechanism.
 
-Sorry, that was our intention, but had a scripting error. It's been fixed.
+Because it has no registers it's reading and writing, right? Yeah,
+just went with this for now to make it easy for people to cherry pick
+and test it. Maybe we shouldn't have added documentation and made this
+look too official.
 
-I have a script to use with git send-email's --to-cmd and --cc-cmd
-option. It uses get_maintainers.pl to figure out who to email, but it
-gets trickier for a patch series that spans maintainer trees.
-
-v2 and later will have everyone get all the patches.
-
-> Having said that; my biggest worry is that you're making scheduler
-> internals into an ABI. I would hate for this paravirt interface to tie
-> us down.
-
-The only 2 pieces of information shared between host/guest are:
-
-1. Host CPU frequency -- this isn't really scheduler internals and
-will map nicely to a virtual cpufreq driver.
-
-2. A vCPU util value between 0 - 1024 where 1024 corresponds to the
-highest performance point across all CPUs (taking freq, arch, etc into
-consideration). Yes, this currently matches how the run queue util is
-tracked, but we can document the interface as "percentage of max
-performance capability", but representing it as 0 - 1024 instead of
-0-100. That way, even if the scheduler changes how it tracks util in
-the future, we can still keep this interface between guest/host and
-map it appropriately on the host end.
-
-In either case, we could even have a Windows guest where they might
-track vCPU utilization differently and still have this work with the
-Linux host with this interface.
-
-Does that sound reasonable to you?
-
-Another option is to convert (2) into a "CPU frequency" request (but
-without latching it to values in the CPUfreq table) but it'll add some
-unnecessary math (with division) on the guest and host end. But I'd
-rather keep it as 0-1024 unless you really want this 2nd option.
+In the end, I'm expecting this will be a real MMIO device. Until we
+move from RFC to PATCH, feel free to ignore this patch.
 
 -Saravana
