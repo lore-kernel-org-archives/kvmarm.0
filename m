@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBB776ABC
-	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:41:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C83FC4339C;
-	Wed,  5 Apr 2023 15:41:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6496D6ABC
+	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:41:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B581C4339C;
+	Wed,  5 Apr 2023 15:41:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1680709304;
-	bh=PtqEYkawU6HTlhZU1Y8UJwggJinVQ5xhTLJHUn3rVyE=;
+	s=k20201202; t=1680709308;
+	bh=HzXSsUwByW2jAR2hO6nb9l7RS/h2EPWpRifFw83LriQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rEWNPY/QYBo2fbKmjJ1tgT4SaRv4XhMjgFQSCcah3iWG6tZXYrMSv8RYksZ/IPur1
-	 4LxKEKmzuB3YyNlbliaNXegcP9xAGsb8JvuMrfWloSfoNZUBCdZdjMV9wfSrPFFfOZ
-	 Sno/zcGR90IwhlXZBBgtuI1ytrg1oJgR8C04FuJss+AL9FQSfoaxOq+P1J+A7ixksO
-	 jpPZgPK2zb5kVQqYaHN5DqcpTp/I98GBmXrhViWGeEIx6P+60IUVBsx3bww1AgT5SZ
-	 cUaVn65EsqyRTsJtkBvX854lEeLPSKi8cwzf3CQMOxCh2slKnucGDwt5JiUZTBqngi
-	 fDS1wyaz+Zmug==
+	b=eQiN3pdYzvEKc1AGbn74E6rhwGWa5dgKhWjHUOQLqbbMuNqtgs5usa4vOmW72g+qN
+	 EOYM4I07ryt9xcCcFkKcwW1Y2LTOn0gtVY5Fab4P0grfH2gDHIGUmfMby1h9DDlSTQ
+	 gTa2+hSEEKMiPTadqnSRbQM0Cux6QvJ0XF1Fl5uO6VJGgId7gpCWoVZl/BiSGsTOH4
+	 zPhmXXfoaj9XgyXi4vF+5GCzgTr2gxYpZMm7T7rSA/NV76f6lJT4U/QEHRIDekSGLq
+	 prl1a1PNdDwlFX2LVGcOxRTGNQWmJgnaqW60LTf6NOXAwFX6VBuVZv0Fgk1RuywJ3M
+	 /WKCr3TnSiFcw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pk5FO-0062PV-6e;
-	Wed, 05 Apr 2023 16:40:30 +0100
+	id 1pk5FV-0062PV-CY;
+	Wed, 05 Apr 2023 16:40:39 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v9 12/50] KVM: arm64: nv: Respect the virtual HCR_EL2.NV1 bit setting
-Date: Wed,  5 Apr 2023 16:39:30 +0100
-Message-Id: <20230405154008.3552854-13-maz@kernel.org>
+Subject: [PATCH v9 33/50] KVM: arm64: nv: Deal with broken VGIC on maintenance interrupt delivery
+Date: Wed,  5 Apr 2023 16:39:51 +0100
+Message-Id: <20230405154008.3552854-34-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230405154008.3552854-1-maz@kernel.org>
 References: <20230405154008.3552854-1-maz@kernel.org>
@@ -56,122 +56,42 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Jintack Lim <jintack@cs.columbia.edu>
+Normal, non-nesting KVM deals with maintenance interrupt in a very
+simple way: we don't even try to handle it and just turn it off
+as soon as we exit, long before the kernel can handle it.
 
-Forward ELR_EL1, SPSR_EL1 and VBAR_EL1 traps to the virtual EL2 if the
-virtual HCR_EL2.{NV,NV1}={1,1}.
+However, with NV, we rely on the actual handling of the interrupt
+to leave it active and pass it down to the L1 guest hypervisor
+(we effectively treat it as an assigned interrupt, just like the
+timer).
 
-This is for recursive nested virtualization.
+This doesn't work with something like the Apple M2, which doesn't
+have an active state that allows the interrupt to be masked.
 
-Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+Instead, just disable the vgic after having taken the interrupt and
+injected a virtual interrupt. This is enough for the guest to make
+forward progress, but will limit its ability to handle further
+interrupts until it next exits (IAR will always report "spurious").
+
+Oh well.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_arm.h    |  1 +
- arch/arm64/include/asm/kvm_nested.h |  1 +
- arch/arm64/kvm/emulate-nested.c     |  5 +++++
- arch/arm64/kvm/sys_regs.c           | 21 ++++++++++++++++++++-
- 4 files changed, 27 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/vgic/vgic-v3-nested.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index e47faadbfde1..8e2b0bf1f484 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -20,6 +20,7 @@
- #define HCR_AMVOFFEN	(UL(1) << 51)
- #define HCR_FIEN	(UL(1) << 47)
- #define HCR_FWB		(UL(1) << 46)
-+#define HCR_NV1		(UL(1) << 43)
- #define HCR_NV		(UL(1) << 42)
- #define HCR_API		(UL(1) << 41)
- #define HCR_APK		(UL(1) << 40)
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 04096113cdf0..4b7f9f35ece9 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -61,6 +61,7 @@ static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
- 
- extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
- extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
-+extern bool forward_nv1_traps(struct kvm_vcpu *vcpu);
- 
- struct sys_reg_params;
- struct sys_reg_desc;
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 75cf6f15accc..7c06844a5113 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -34,6 +34,11 @@ bool forward_nv_traps(struct kvm_vcpu *vcpu)
- 	return forward_traps(vcpu, HCR_NV);
+diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+index 755e4819603a..919275b94625 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
++++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+@@ -225,4 +225,7 @@ void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu)
+ 		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
+ 				    vcpu->kvm->arch.vgic.maint_irq, state, vcpu);
+ 	}
++
++	if (unlikely(kvm_vgic_global_state.no_hw_deactivation))
++		sysreg_clear_set_s(SYS_ICH_HCR_EL2, ICH_HCR_EN, 0);
  }
- 
-+bool forward_nv1_traps(struct kvm_vcpu *vcpu)
-+{
-+	return forward_traps(vcpu, HCR_NV1);
-+}
-+
- static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
- {
- 	u64 mode = spsr & PSR_MODE_MASK;
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 56cc60eede59..d40e5181bf74 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -357,6 +357,16 @@ static bool access_rw(struct kvm_vcpu *vcpu,
- 	return true;
- }
- 
-+static bool access_vbar_el1(struct kvm_vcpu *vcpu,
-+			    struct sys_reg_params *p,
-+			    const struct sys_reg_desc *r)
-+{
-+	if (forward_nv1_traps(vcpu))
-+		return false;
-+
-+	return access_rw(vcpu, p, r);
-+}
-+
- /*
-  * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
-  */
-@@ -1919,6 +1929,9 @@ static bool access_elr(struct kvm_vcpu *vcpu,
- 	if (el12_reg(p) && forward_nv_traps(vcpu))
- 		return false;
- 
-+	if (!el12_reg(p) && forward_nv1_traps(vcpu))
-+		return false;
-+
- 	if (p->is_write)
- 		vcpu_write_sys_reg(vcpu, p->regval, ELR_EL1);
- 	else
-@@ -1934,6 +1947,9 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
- 	if (el12_reg(p) && forward_nv_traps(vcpu))
- 		return false;
- 
-+	if (!el12_reg(p) && forward_nv1_traps(vcpu))
-+		return false;
-+
- 	if (p->is_write)
- 		__vcpu_sys_reg(vcpu, SPSR_EL1) = p->regval;
- 	else
-@@ -1949,6 +1965,9 @@ static bool access_spsr_el2(struct kvm_vcpu *vcpu,
- 	if (el12_reg(p) && forward_nv_traps(vcpu))
- 		return false;
- 
-+	if (!el12_reg(p) && forward_nv1_traps(vcpu))
-+		return false;
-+
- 	if (p->is_write)
- 		vcpu_write_sys_reg(vcpu, p->regval, SPSR_EL2);
- 	else
-@@ -2163,7 +2182,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_LORC_EL1), trap_loregion },
- 	{ SYS_DESC(SYS_LORID_EL1), trap_loregion },
- 
--	{ SYS_DESC(SYS_VBAR_EL1), access_rw, reset_val, VBAR_EL1, 0 },
-+	{ SYS_DESC(SYS_VBAR_EL1), access_vbar_el1, reset_val, VBAR_EL1, 0 },
- 	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
- 
- 	{ SYS_DESC(SYS_ICC_IAR0_EL1), write_to_read_only },
 -- 
 2.34.1
 
