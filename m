@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08516ABC
-	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:46:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D7AEC4339B;
-	Wed,  5 Apr 2023 15:46:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F2676ABC
+	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:46:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8A51C433D2;
+	Wed,  5 Apr 2023 15:46:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1680709588;
-	bh=PHs4gaxAaWQmUmtjbLODLMqbuuO3t58QTS/ww8BSn6A=;
+	s=k20201202; t=1680709590;
+	bh=R76HaO8qoXwTusW877BsCKlHkjCFGvuoQfdtYgi9v/k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LWGJOkd2zACE5X491upAsmJRjku26+xZwkENQLcsZYHokf8hNgDzj5eaOPhZ2MDA2
-	 aYNvlot05wLHFAICO9I3R0UERf5D4C/DBBQN/HezhGGSfEzPiwCJTTKernKraYpxs6
-	 f8xS+6ehSIuZQ0UbdvbV+JAe2H4/micyk7sbX1TYB85ITnLBURnsmXFnMWSJROUgJX
-	 CP41DdK2PgVpR+uCqiqGStSGSqG3MVR7+yV+Mx3MdcxHhJGW4c9UsVf61fYU4PH9qe
-	 1/WryL3+H5ckujoXvBgrp0b29HpPnWEZZZXvy/wJYAcmnfPUY807EUqKO3u92Pxd2B
-	 hJyZ6PmCIG/Xw==
+	b=DvrmfVHqB8oL64YI4j2xaSeYxR+Goun2pP9Q7DIuwrXw79k54u/Do3R65JHRCB22J
+	 t6G6iyI3uEgpHsFi3jq1+EF0gUpxxLMpHZ7ucwzINPLexJ5iHS+9LoGNdZNi26f/be
+	 EI3vGp5WH9fSQxAU8iQYSQO8i+g6ZTVL7/2UXUNLDku7QNE2ZxDkCcchyE2rPsm6da
+	 C//r7QNgK/GZ3OjGghEv0QHvIZYLbYhOxYYEZ7qHNFo3HR2JYpcWNBIfZQxMuZMKSC
+	 ulRP91iRoU5Z8PGyCYLI5UcoKkZBFUrd4mGlCG74Bcq27FCedFnxaFiVMZFoTsaAAL
+	 KbA3l6ocM56XA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pk5Fh-0062PV-A1;
-	Wed, 05 Apr 2023 16:40:51 +0100
+	id 1pk5Fw-0062PV-Ow;
+	Wed, 05 Apr 2023 16:41:04 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v9 38/50] KVM: arm64: nv: Add include containing the VNCR_EL2 offsets
-Date: Wed,  5 Apr 2023 16:39:56 +0100
-Message-Id: <20230405154008.3552854-39-maz@kernel.org>
+Subject: [PATCH v9 50/50] KVM: arm64: nv: Accelerate EL0 timer read accesses when FEAT_ECV is on
+Date: Wed,  5 Apr 2023 16:40:08 +0100
+Message-Id: <20230405154008.3552854-51-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230405154008.3552854-1-maz@kernel.org>
 References: <20230405154008.3552854-1-maz@kernel.org>
@@ -56,98 +56,84 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-VNCR_EL2 points to a page containing a number of system registers
-accessed by a guest hypervisor when ARMv8.4-NV is enabled.
+Although FEAT_ECV allows us to correctly enable the timers, it also
+reduces performances pretty badly (a L2 guest doing a lot of virtio
+emulated in L1 userspace results in a 30% degradation).
 
-Let's document the offsets in that page, as we are going to use
-this layout.
+Mitigate this by emulating the CTL/CVAL register reads in the
+inner run loop, without returning to the general kernel. This halves
+the overhead described above.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/vncr_mapping.h | 74 +++++++++++++++++++++++++++
- 1 file changed, 74 insertions(+)
- create mode 100644 arch/arm64/include/asm/vncr_mapping.h
+ arch/arm64/kvm/hyp/vhe/switch.c | 49 +++++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
 
-diff --git a/arch/arm64/include/asm/vncr_mapping.h b/arch/arm64/include/asm/vncr_mapping.h
-new file mode 100644
-index 000000000000..c0a2acd5045c
---- /dev/null
-+++ b/arch/arm64/include/asm/vncr_mapping.h
-@@ -0,0 +1,74 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * System register offsets in the VNCR page
-+ * All offsets are *byte* displacements!
-+ */
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index a3555b90d9e1..a9ac61505a86 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -201,11 +201,60 @@ static bool kvm_hyp_handle_tlbi_el1(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	return true;
+ }
+ 
++static bool kvm_hyp_handle_ecv(struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++	u64 esr, val;
 +
-+#ifndef __ARM64_VNCR_MAPPING_H__
-+#define __ARM64_VNCR_MAPPING_H__
++	/*
++	 * Having FEAT_ECV allows for a better quality of timer emulation.
++	 * However, this comes at a huge cost in terms of traps. Try and
++	 * satisfy the reads without returning to the kernel if we can.
++	 */
++	if (!cpus_have_final_cap(ARM64_HAS_ECV))
++		return false;
 +
-+#define VNCR_VTTBR_EL2          0x020
-+#define VNCR_VTCR_EL2           0x040
-+#define VNCR_VMPIDR_EL2         0x050
-+#define VNCR_CNTVOFF_EL2        0x060
-+#define VNCR_HCR_EL2            0x078
-+#define VNCR_HSTR_EL2           0x080
-+#define VNCR_VPIDR_EL2          0x088
-+#define VNCR_TPIDR_EL2          0x090
-+#define VNCR_VNCR_EL2           0x0B0
-+#define VNCR_CPACR_EL1          0x100
-+#define VNCR_CONTEXTIDR_EL1     0x108
-+#define VNCR_SCTLR_EL1          0x110
-+#define VNCR_ACTLR_EL1          0x118
-+#define VNCR_TCR_EL1            0x120
-+#define VNCR_AFSR0_EL1          0x128
-+#define VNCR_AFSR1_EL1          0x130
-+#define VNCR_ESR_EL1            0x138
-+#define VNCR_MAIR_EL1           0x140
-+#define VNCR_AMAIR_EL1          0x148
-+#define VNCR_MDSCR_EL1          0x158
-+#define VNCR_SPSR_EL1           0x160
-+#define VNCR_CNTV_CVAL_EL0      0x168
-+#define VNCR_CNTV_CTL_EL0       0x170
-+#define VNCR_CNTP_CVAL_EL0      0x178
-+#define VNCR_CNTP_CTL_EL0       0x180
-+#define VNCR_SCXTNUM_EL1        0x188
-+#define VNCR_TFSR_EL1		0x190
-+#define VNCR_ZCR_EL1            0x1E0
-+#define VNCR_TTBR0_EL1          0x200
-+#define VNCR_TTBR1_EL1          0x210
-+#define VNCR_FAR_EL1            0x220
-+#define VNCR_ELR_EL1            0x230
-+#define VNCR_SP_EL1             0x240
-+#define VNCR_VBAR_EL1           0x250
-+#define VNCR_ICH_LR0_EL2        0x400
-+//      VNCR_ICH_LRN_EL2(n)     VNCR_ICH_LR0_EL2+8*((n) & 7)
-+#define VNCR_ICH_AP0R0_EL2      0x480
-+//      VNCR_ICH_AP0RN_EL2(n)   VNCR_ICH_AP0R0_EL2+8*((n) & 3)
-+#define VNCR_ICH_AP1R0_EL2      0x4A0
-+//      VNCR_ICH_AP1RN_EL2(n)   VNCR_ICH_AP1R0_EL2+8*((n) & 3)
-+#define VNCR_ICH_HCR_EL2        0x4C0
-+#define VNCR_ICH_VMCR_EL2       0x4C8
-+#define VNCR_VDISR_EL2          0x500
-+#define VNCR_PMBLIMITR_EL1      0x800
-+#define VNCR_PMBPTR_EL1         0x810
-+#define VNCR_PMBSR_EL1          0x820
-+#define VNCR_PMSCR_EL1          0x828
-+#define VNCR_PMSEVFR_EL1        0x830
-+#define VNCR_PMSICR_EL1         0x838
-+#define VNCR_PMSIRR_EL1         0x840
-+#define VNCR_PMSLATFR_EL1       0x848
-+#define VNCR_TRFCR_EL1          0x880
-+#define VNCR_MPAM1_EL1          0x900
-+#define VNCR_MPAMHCR_EL2        0x930
-+#define VNCR_MPAMVPMV_EL2       0x938
-+#define VNCR_MPAMVPM0_EL2       0x940
-+#define VNCR_MPAMVPM1_EL2       0x948
-+#define VNCR_MPAMVPM2_EL2       0x950
-+#define VNCR_MPAMVPM3_EL2       0x958
-+#define VNCR_MPAMVPM4_EL2       0x960
-+#define VNCR_MPAMVPM5_EL2       0x968
-+#define VNCR_MPAMVPM6_EL2       0x970
-+#define VNCR_MPAMVPM7_EL2       0x978
++	if (!vcpu_has_nv2(vcpu))
++		return false;
 +
-+#endif /* __ARM64_VNCR_MAPPING_H__ */
++	esr = kvm_vcpu_get_esr(vcpu);
++	if ((esr & ESR_ELx_SYS64_ISS_DIR_MASK) != ESR_ELx_SYS64_ISS_DIR_READ)
++		return false;
++
++	switch (esr_sys64_to_sysreg(esr)) {
++	case SYS_CNTP_CTL_EL02:
++	case SYS_CNTP_CTL_EL0:
++		val = __vcpu_sys_reg(vcpu, CNTP_CTL_EL0);
++		break;
++	case SYS_CNTP_CVAL_EL02:
++	case SYS_CNTP_CVAL_EL0:
++		val = __vcpu_sys_reg(vcpu, CNTP_CVAL_EL0);
++		break;
++	case SYS_CNTV_CTL_EL02:
++	case SYS_CNTV_CTL_EL0:
++		val = __vcpu_sys_reg(vcpu, CNTV_CTL_EL0);
++		break;
++	case SYS_CNTV_CVAL_EL02:
++	case SYS_CNTV_CVAL_EL0:
++		val = __vcpu_sys_reg(vcpu, CNTV_CVAL_EL0);
++		break;
++	default:
++		return false;
++	}
++
++	vcpu_set_reg(vcpu, kvm_vcpu_sys_get_rt(vcpu), val);
++	__kvm_skip_instr(vcpu);
++
++	return true;
++}
++
+ static bool kvm_hyp_handle_sysreg_vhe(struct kvm_vcpu *vcpu, u64 *exit_code)
+ {
+ 	if (kvm_hyp_handle_tlbi_el1(vcpu, exit_code))
+ 		return true;
+ 
++	if (kvm_hyp_handle_ecv(vcpu, exit_code))
++		return true;
++
+ 	return kvm_hyp_handle_sysreg(vcpu, exit_code);
+ }
+ 
 -- 
 2.34.1
 
