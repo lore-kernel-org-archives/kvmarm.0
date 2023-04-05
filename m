@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E36036ABC
-	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:46:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7727C4339B;
-	Wed,  5 Apr 2023 15:46:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E5D6ABC
+	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:46:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14225C433D2;
+	Wed,  5 Apr 2023 15:46:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1680709571;
-	bh=5FKZeF4bcHwk1v+ELgygebiurlG0HlkfqX7UD+u6FrE=;
+	s=k20201202; t=1680709576;
+	bh=q9r1hOTNh/oLCfkMuKIIcbe+H8ghVFyameXVN/4crsY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HBW7dABKyloKObDla8SIZglPwDt2of9gvt0WxHKYZdVcnLzLMp3Xj+wMR/fxDbjrn
-	 icg6cABJEWfJ6PY19wWhPOrHDrscWeTlXe8IRsquAaEGCNvAUzjt7Zfjpw0NsHaskk
-	 QraW35EHoU1YfhuOzlU570TLdPizUAHjEJcWci4trgUPfDFZAVkXk86B1HbHgw9jth
-	 ckut0WJErX9DuwGPNYnKOqn8qdF23OW/XZgQ9LuaLrtclYT6BvsgOO05S7om8jqrmq
-	 vmLuqs4jObOo1ihlFTwPJ9iAHD2YqfwOuMfLPVpDtt2lZbGtGmgmeP98sCj6ctenrC
-	 yKSfLc98y7UWQ==
+	b=CIbUyv8yMPeDkGi3BJLYFGLnn8Z/wG6rJWWQcBu5hpGwZdFS9bLA5r9Dl/CdDdmpM
+	 GKzt/DDKMoHlSWz4R9HBqgm4mhFwYbeY+LrazOYiLHoMy0LbwqA26+AjTgKZwhfj+l
+	 EeSEfmiz+TDgCUcnv1k3gKfvkZ7BY33Dc/EeRwe6aJaS1Aeh8chOY733qDcRGoZXXD
+	 6L1DzS756sgl466Yw81/lO+HPUg6y1uatVfiQhZwvviICSJifWeKq/1yHN8/y8ZYkv
+	 2lE3L4hOId0hS8/EZQhjmVqmz6WvkktylZNbtJO6jBsuUl+Q0cc7D4rEBZN2Qh7Yzn
+	 9tQvLyau1pAGw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pk5Fd-0062PV-I7;
-	Wed, 05 Apr 2023 16:40:46 +0100
+	id 1pk5Fw-0062PV-G8;
+	Wed, 05 Apr 2023 16:41:04 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v9 36/50] KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like information
-Date: Wed,  5 Apr 2023 16:39:54 +0100
-Message-Id: <20230405154008.3552854-37-maz@kernel.org>
+Subject: [PATCH v9 49/50] KVM: arm64: nv: Use FEAT_ECV to trap access to EL0 timers
+Date: Wed,  5 Apr 2023 16:40:07 +0100
+Message-Id: <20230405154008.3552854-50-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230405154008.3552854-1-maz@kernel.org>
 References: <20230405154008.3552854-1-maz@kernel.org>
@@ -56,135 +56,107 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-In order to be able to make S2 TLB invalidations more performant on NV,
-let's use a scheme derived from the ARMv8.4 TTL extension.
+Although FEAT_NV2 makes most things fast, it also makes it impossible
+to correctly emulate the timers, as the sysreg accesses are redirected
+to memory.
 
-If bits [56:55] in the descriptor are non-zero, they indicate a level
-which can be used as an invalidation range.
+FEAT_ECV addresses this by giving a hypervisor the ability to trap
+the EL02 sysregs as well as the virtual timer.
+
+Add the required trap setting to make use of the feature, allowing
+us to elide the ugly resync in the middle of the run loop.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h |  2 +
- arch/arm64/kvm/nested.c             | 81 +++++++++++++++++++++++++++++
- 2 files changed, 83 insertions(+)
+ arch/arm64/kvm/arch_timer.c          | 37 +++++++++++++++++++++++++---
+ include/clocksource/arm_arch_timer.h |  4 +++
+ 2 files changed, 38 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 9e5ffb68a5cd..52d0a6c0fecc 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -137,4 +137,6 @@ struct sys_reg_desc;
- void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
- 			  const struct sys_reg_desc *r);
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 98fddb4a846d..e3b5bd7cf15c 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -790,7 +790,7 @@ static void kvm_timer_vcpu_load_nested_switch(struct kvm_vcpu *vcpu,
  
-+#define KVM_NV_GUEST_MAP_SZ	(KVM_PGTABLE_PROT_SW1 | KVM_PGTABLE_PROT_SW0)
-+
- #endif /* __ARM64_KVM_NESTED_H */
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index b46d58d4542c..0f535a5ff941 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -4,6 +4,7 @@
-  * Author: Jintack Lim <jintack.lim@linaro.org>
-  */
+ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
+ {
+-	bool tpt, tpc;
++	bool tvt, tpt, tvc, tpc, tvt02, tpt02;
+ 	u64 clr, set;
  
-+#include <linux/bitfield.h>
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- 
-@@ -413,6 +414,81 @@ static unsigned int ttl_to_size(u8 ttl)
- 	return max_size;
- }
- 
-+/*
-+ * Compute the equivalent of the TTL field by parsing the shadow PT.  The
-+ * granule size is extracted from the cached VTCR_EL2.TG0 while the level is
-+ * retrieved from first entry carrying the level as a tag.
-+ */
-+static u8 get_guest_mapping_ttl(struct kvm_s2_mmu *mmu, u64 addr)
-+{
-+	u64 tmp, sz = 0, vtcr = mmu->vtcr;
-+	kvm_pte_t pte;
-+	u8 ttl, level;
-+
-+	switch (vtcr & VTCR_EL2_TG0_MASK) {
-+	case VTCR_EL2_TG0_4K:
-+		ttl = (1 << 2);
-+		break;
-+	case VTCR_EL2_TG0_16K:
-+		ttl = (2 << 2);
-+		break;
-+	case VTCR_EL2_TG0_64K:
-+		ttl = (3 << 2);
-+		break;
-+	default:
-+		BUG();
-+	}
-+
-+	tmp = addr;
-+
-+again:
-+	/* Iteratively compute the block sizes for a particular granule size */
-+	switch (vtcr & VTCR_EL2_TG0_MASK) {
-+	case VTCR_EL2_TG0_4K:
-+		if	(sz < SZ_4K)	sz = SZ_4K;
-+		else if (sz < SZ_2M)	sz = SZ_2M;
-+		else if (sz < SZ_1G)	sz = SZ_1G;
-+		else			sz = 0;
-+		break;
-+	case VTCR_EL2_TG0_16K:
-+		if	(sz < SZ_16K)	sz = SZ_16K;
-+		else if (sz < SZ_32M)	sz = SZ_32M;
-+		else			sz = 0;
-+		break;
-+	case VTCR_EL2_TG0_64K:
-+		if	(sz < SZ_64K)	sz = SZ_64K;
-+		else if (sz < SZ_512M)	sz = SZ_512M;
-+		else			sz = 0;
-+		break;
-+	default:
-+		BUG();
-+	}
-+
-+	if (sz == 0)
-+		return 0;
-+
-+	tmp &= ~(sz - 1);
-+	if (kvm_pgtable_get_leaf(mmu->pgt, tmp, &pte, NULL))
-+		goto again;
-+	if (!(pte & PTE_VALID))
-+		goto again;
-+	level = FIELD_GET(KVM_NV_GUEST_MAP_SZ, pte);
-+	if (!level)
-+		goto again;
-+
-+	ttl |= level;
+ 	/*
+@@ -805,7 +805,30 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
+ 	 * within this function, reality kicks in and we start adding
+ 	 * traps based on emulation requirements.
+ 	 */
+-	tpt = tpc = false;
++	tvt = tpt = tvc = tpc = false;
++	tvt02 = tpt02 = false;
 +
 +	/*
-+	 * We now have found some level information in the shadow S2. Check
-+	 * that the resulting range is actually including the original IPA.
++	 * NV2 badly breaks the timer semantics by redirecting accesses to
++	 * the EL0 timer state to memory, so let's call ECV to the rescue if
++	 * available: we trap all CNT{P,V}_{CTL,CVAL,TVAL}_EL0 accesses.
++	 *
++	 * The treatment slightly varies depending whether we run a nVHE or
++	 * VHE guest: nVHE will use the _EL0 registers directly, while VHE
++	 * will use the _EL02 accessors. This translates in different trap
++	 * bits.
++	 *
++	 * None of the trapping is required when running in non-HYP context,
++	 * unless required by the L1 hypervisor settings once we advertise
++	 * ECV+NV in the guest, or that we need trapping for other reasons.
 +	 */
-+	sz = ttl_to_size(ttl);
-+	if (addr < (tmp + sz))
-+		return ttl;
-+
-+	return 0;
-+}
-+
- unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val)
- {
- 	unsigned long max_size;
-@@ -420,6 +496,11 @@ unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val)
- 
- 	ttl = FIELD_GET(GENMASK_ULL(47, 44), val);
- 
-+	if (!(cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL) && ttl)) {
-+		u64 addr = (val & GENMASK_ULL(35, 0)) << 12;
-+		ttl = get_guest_mapping_ttl(mmu, addr);
++	if (cpus_have_final_cap(ARM64_HAS_ECV) &&
++	    vcpu_has_nv2(vcpu) && is_hyp_ctxt(vcpu)) {
++		if (vcpu_el2_e2h_is_set(vcpu))
++			tvt02 = tpt02 = true;
++		else
++			tvt = tpt = true;
 +	}
-+
- 	max_size = ttl_to_size(ttl);
  
- 	if (!max_size) {
+ 	/*
+ 	 * We have two possibility to deal with a physical offset:
+@@ -845,6 +868,10 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
+ 
+ 	assign_clear_set_bit(tpt, CNTHCTL_EL1PCEN << 10, set, clr);
+ 	assign_clear_set_bit(tpc, CNTHCTL_EL1PCTEN << 10, set, clr);
++	assign_clear_set_bit(tvt, CNTHCTL_EL1TVT, clr, set);
++	assign_clear_set_bit(tvc, CNTHCTL_EL1TVCT, clr, set);
++	assign_clear_set_bit(tvt02, CNTHCTL_EL1NVVCT, clr, set);
++	assign_clear_set_bit(tpt02, CNTHCTL_EL1NVPCT, clr, set);
+ 
+ 	/* This only happens on VHE, so use the CNTKCTL_EL1 accessor */
+ 	sysreg_clear_set(cntkctl_el1, clr, set);
+@@ -940,8 +967,12 @@ void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
+ 	 * accesses redirected to the VNCR page. Any guest action taken on
+ 	 * the timer is postponed until the next exit, leading to a very
+ 	 * poor quality of emulation.
++	 *
++	 * This is an unmitigated disaster, only papered over by FEAT_ECV,
++	 * which allows trapping of the timer registers even with NV2.
++	 * Still, this is still worse than FEAT_NV on its own. Meh.
+ 	 */
+-	if (!is_hyp_ctxt(vcpu))
++	if (cpus_have_const_cap(ARM64_HAS_ECV) || !is_hyp_ctxt(vcpu))
+ 		return;
+ 
+ 	if (!vcpu_el2_e2h_is_set(vcpu)) {
+diff --git a/include/clocksource/arm_arch_timer.h b/include/clocksource/arm_arch_timer.h
+index cbbc9a6dc571..c62811fb4130 100644
+--- a/include/clocksource/arm_arch_timer.h
++++ b/include/clocksource/arm_arch_timer.h
+@@ -22,6 +22,10 @@
+ #define CNTHCTL_EVNTDIR			(1 << 3)
+ #define CNTHCTL_EVNTI			(0xF << 4)
+ #define CNTHCTL_ECV			(1 << 12)
++#define CNTHCTL_EL1TVT			(1 << 13)
++#define CNTHCTL_EL1TVCT			(1 << 14)
++#define CNTHCTL_EL1NVPCT		(1 << 15)
++#define CNTHCTL_EL1NVVCT		(1 << 16)
+ 
+ enum arch_timer_reg {
+ 	ARCH_TIMER_REG_CTRL,
 -- 
 2.34.1
 
