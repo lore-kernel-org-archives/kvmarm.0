@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D40D6ABD
-	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:40:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0504CC433EF;
-	Wed,  5 Apr 2023 15:40:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91EB6ABD
+	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:40:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0205C433EF;
+	Wed,  5 Apr 2023 15:40:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1680709248;
-	bh=Qp6MCbgjyeYLqXhzPsD/TLmpoZonoNw49Oh0VFywzgE=;
+	s=k20201202; t=1680709250;
+	bh=zz1skk9grcs9frfh2cvcY/iWNHaGcTFPg5uckcycoBI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Og1BlC6r7OnttGkUFyEf3L+9qSEDXVHlH2SUhGdme0H/H24l8TAvHPMVolnLH8PN3
-	 CdhW9C4TDAYFAPeBYBoH43CBu6y0baneJFPHYBAcNJSFOQS1hy1GXCi3diwcDHkSDW
-	 7V6FT6oOk5jwCdNoLQj/0aCaGU6OvjDS6Je/J5GHNH/ylZJig9xkcLHjJaJKlU5c+R
-	 4DNfgPNMSFrogxMJeZoGUFNgmQTemFiQLVxe6KrMTauJ2Dpag8oiRfiTxTQyUi8S72
-	 HHCBDt2PezWKVCgY85Pn1wIpStV4afikdJzFN2O5BPALspmRrsp7STJqB5jdUVujcp
-	 yuWkWeuy4zFWQ==
+	b=ewkj4KZaQpYZ88FIunFBg38vHaHSOs3Y4YpHswj3QRc1maySFh8l/GaYbqjY9fr/i
+	 +3KxM8hWy2X3SiyTKvX8qGwSk5fRt18zXtORQ26bttNg6UUjrNj45ErZJEXvG1Ocu4
+	 Gx7J5l1cDt6+EiHlTxpiUo8CHZ+/pCzv4bqCd555HDaKJkCCS+U4nCrcA1Q9VIy9Uq
+	 5ENCDdM4ndfiC8Rh7fZhWQi+RVJ6+NKFuqYbeRYiELgYAQL7+3F6drltjm9+gvIrim
+	 qoGkp4mwhUoJxXC/HrKXRyRU2uCpuGeEIuPe1TP3b+6WEM5DpXe5T++0gZd3+2GAIu
+	 1AyEMl7z0SvNQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pk5FX-0062PV-UG;
-	Wed, 05 Apr 2023 16:40:41 +0100
+	id 1pk5FS-0062PV-0N;
+	Wed, 05 Apr 2023 16:40:34 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v9 34/50] KVM: arm64: nv: Allow userspace to request KVM_ARM_VCPU_NESTED_VIRT
-Date: Wed,  5 Apr 2023 16:39:52 +0100
-Message-Id: <20230405154008.3552854-35-maz@kernel.org>
+Subject: [PATCH v9 25/50] KVM: arm64: nv: Add handling of EL2-specific timer registers
+Date: Wed,  5 Apr 2023 16:39:43 +0100
+Message-Id: <20230405154008.3552854-26-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230405154008.3552854-1-maz@kernel.org>
 References: <20230405154008.3552854-1-maz@kernel.org>
@@ -56,57 +56,187 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Since we're (almost) feature complete, let's allow userspace to
-request KVM_ARM_VCPU_NESTED_VIRT by bumping the KVM_VCPU_MAX_FEATURES
-up. We also now advertise the feature to userspace with a new capability.
-
-It's going to be great...
+Add the required handling for EL2 and EL02 registers, as
+well as EL1 registers used in the E2H context.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 2 +-
- arch/arm64/kvm/arm.c              | 3 +++
- include/uapi/linux/kvm.h          | 1 +
- 3 files changed, 5 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/sysreg.h |   7 +++
+ arch/arm64/kvm/sys_regs.c       | 102 +++++++++++++++++++++++++++++++-
+ 2 files changed, 108 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 1b3902d2470f..03268d444801 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -37,7 +37,7 @@
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index c4a173b136b1..355480766b4a 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -389,6 +389,7 @@
+ #define SYS_CNTFRQ_EL0			sys_reg(3, 3, 14, 0, 0)
  
- #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
+ #define SYS_CNTPCT_EL0			sys_reg(3, 3, 14, 0, 1)
++#define SYS_CNTVCT_EL0			sys_reg(3, 3, 14, 0, 2)
+ #define SYS_CNTPCTSS_EL0		sys_reg(3, 3, 14, 0, 5)
+ #define SYS_CNTVCTSS_EL0		sys_reg(3, 3, 14, 0, 6)
  
--#define KVM_VCPU_MAX_FEATURES 7
-+#define KVM_VCPU_MAX_FEATURES 8
+@@ -503,6 +504,12 @@
  
- #define KVM_REQ_SLEEP \
- 	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index e4a77fe1cfa4..6af9fdf9b44d 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -272,6 +272,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_EL1_32BIT:
- 		r = cpus_have_const_cap(ARM64_HAS_32BIT_EL1);
- 		break;
-+	case KVM_CAP_ARM_EL2:
-+		r = cpus_have_const_cap(ARM64_HAS_NESTED_VIRT);
+ #define SYS_CNTVOFF_EL2			sys_reg(3, 4, 14, 0, 3)
+ #define SYS_CNTHCTL_EL2			sys_reg(3, 4, 14, 1, 0)
++#define SYS_CNTHP_TVAL_EL2		sys_reg(3, 4, 14, 2, 0)
++#define SYS_CNTHP_CTL_EL2		sys_reg(3, 4, 14, 2, 1)
++#define SYS_CNTHP_CVAL_EL2		sys_reg(3, 4, 14, 2, 2)
++#define SYS_CNTHV_TVAL_EL2		sys_reg(3, 4, 14, 3, 0)
++#define SYS_CNTHV_CTL_EL2		sys_reg(3, 4, 14, 3, 1)
++#define SYS_CNTHV_CVAL_EL2		sys_reg(3, 4, 14, 3, 2)
+ 
+ /* VHE encodings for architectural EL0/1 system registers */
+ #define SYS_SCTLR_EL12			sys_reg(3, 5, 1, 0, 0)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 42d67f74b54a..96fee2a39859 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1348,26 +1348,111 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+ 
+ 	switch (reg) {
+ 	case SYS_CNTP_TVAL_EL0:
++		if (is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu))
++			tmr = TIMER_HPTIMER;
++		else
++			tmr = TIMER_PTIMER;
++		treg = TIMER_REG_TVAL;
 +		break;
- 	case KVM_CAP_GUEST_DEBUG_HW_BPS:
- 		r = get_num_brps();
++
+ 	case SYS_AARCH32_CNTP_TVAL:
++	case SYS_CNTP_TVAL_EL02:
+ 		tmr = TIMER_PTIMER;
+ 		treg = TIMER_REG_TVAL;
  		break;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 6a7e1a0ecf04..70ac878cf99f 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1185,6 +1185,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
- #define KVM_CAP_PMU_EVENT_MASKED_EVENTS 226
- #define KVM_CAP_COUNTER_OFFSET 227
-+#define KVM_CAP_ARM_EL2 228
++
++	case SYS_CNTV_TVAL_EL02:
++		tmr = TIMER_VTIMER;
++		treg = TIMER_REG_TVAL;
++		break;
++
++	case SYS_CNTHP_TVAL_EL2:
++		tmr = TIMER_HPTIMER;
++		treg = TIMER_REG_TVAL;
++		break;
++
++	case SYS_CNTHV_TVAL_EL2:
++		tmr = TIMER_HVTIMER;
++		treg = TIMER_REG_TVAL;
++		break;
++
+ 	case SYS_CNTP_CTL_EL0:
++		if (is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu))
++			tmr = TIMER_HPTIMER;
++		else
++			tmr = TIMER_PTIMER;
++		treg = TIMER_REG_CTL;
++		break;
++
+ 	case SYS_AARCH32_CNTP_CTL:
++	case SYS_CNTP_CTL_EL02:
+ 		tmr = TIMER_PTIMER;
+ 		treg = TIMER_REG_CTL;
+ 		break;
++
++	case SYS_CNTV_CTL_EL02:
++		tmr = TIMER_VTIMER;
++		treg = TIMER_REG_CTL;
++		break;
++
++	case SYS_CNTHP_CTL_EL2:
++		tmr = TIMER_HPTIMER;
++		treg = TIMER_REG_CTL;
++		break;
++
++	case SYS_CNTHV_CTL_EL2:
++		tmr = TIMER_HVTIMER;
++		treg = TIMER_REG_CTL;
++		break;
++
+ 	case SYS_CNTP_CVAL_EL0:
++		if (is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu))
++			tmr = TIMER_HPTIMER;
++		else
++			tmr = TIMER_PTIMER;
++		treg = TIMER_REG_CVAL;
++		break;
++
+ 	case SYS_AARCH32_CNTP_CVAL:
++	case SYS_CNTP_CVAL_EL02:
+ 		tmr = TIMER_PTIMER;
+ 		treg = TIMER_REG_CVAL;
+ 		break;
++
++	case SYS_CNTV_CVAL_EL02:
++		tmr = TIMER_VTIMER;
++		treg = TIMER_REG_CVAL;
++		break;
++
++	case SYS_CNTHP_CVAL_EL2:
++		tmr = TIMER_HPTIMER;
++		treg = TIMER_REG_CVAL;
++		break;
++
++	case SYS_CNTHV_CVAL_EL2:
++		tmr = TIMER_HVTIMER;
++		treg = TIMER_REG_CVAL;
++		break;
++
++	case SYS_CNTVOFF_EL2:
++		tmr = TIMER_VTIMER;
++		treg = TIMER_REG_VOFF;
++		break;
++
+ 	case SYS_CNTPCT_EL0:
+ 	case SYS_CNTPCTSS_EL0:
++		if (is_hyp_ctxt(vcpu))
++			tmr = TIMER_HPTIMER;
++		else
++			tmr = TIMER_PTIMER;
++		treg = TIMER_REG_CNT;
++		break;
++
+ 	case SYS_AARCH32_CNTPCT:
+ 		tmr = TIMER_PTIMER;
+ 		treg = TIMER_REG_CNT;
+ 		break;
++
+ 	default:
+ 		print_sys_reg_msg(p, "%s", "Unhandled trapped timer register");
+ 		kvm_inject_undefined(vcpu);
+@@ -2449,8 +2534,15 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	EL2_REG(CONTEXTIDR_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(TPIDR_EL2, access_rw, reset_val, 0),
  
- #ifdef KVM_CAP_IRQ_ROUTING
+-	EL2_REG(CNTVOFF_EL2, access_rw, reset_val, 0),
++	EL2_REG(CNTVOFF_EL2, access_arch_timer, reset_val, 0),
+ 	EL2_REG(CNTHCTL_EL2, access_rw, reset_val, 0),
++	{ SYS_DESC(SYS_CNTHP_TVAL_EL2), access_arch_timer },
++	EL2_REG(CNTHP_CTL_EL2, access_arch_timer, reset_val, 0),
++	EL2_REG(CNTHP_CVAL_EL2, access_arch_timer, reset_val, 0),
++
++	{ SYS_DESC(SYS_CNTHV_TVAL_EL2), access_arch_timer },
++	EL2_REG(CNTHV_CTL_EL2, access_arch_timer, reset_val, 0),
++	EL2_REG(CNTHV_CVAL_EL2, access_arch_timer, reset_val, 0),
+ 
+ 	EL12_REG(SCTLR, access_vm_reg, reset_val, 0x00C50078),
+ 	EL12_REG(CPACR, access_rw, reset_val, 0),
+@@ -2469,6 +2561,14 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	EL12_REG(CONTEXTIDR, access_vm_reg, reset_val, 0),
+ 	EL12_REG(CNTKCTL, access_rw, reset_val, 0),
+ 
++	{ SYS_DESC(SYS_CNTP_TVAL_EL02), access_arch_timer },
++	{ SYS_DESC(SYS_CNTP_CTL_EL02), access_arch_timer },
++	{ SYS_DESC(SYS_CNTP_CVAL_EL02), access_arch_timer },
++
++	{ SYS_DESC(SYS_CNTV_TVAL_EL02), access_arch_timer },
++	{ SYS_DESC(SYS_CNTV_CTL_EL02), access_arch_timer },
++	{ SYS_DESC(SYS_CNTV_CVAL_EL02), access_arch_timer },
++
+ 	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
+ };
  
 -- 
 2.34.1
