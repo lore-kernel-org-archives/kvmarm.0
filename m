@@ -1,221 +1,165 @@
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D634D2F2
-	for <kvmarm@lists.linux.dev>; Tue,  4 Apr 2023 21:46:05 +0000 (UTC)
-Received: by mail-ot1-f49.google.com with SMTP id d22-20020a9d5e16000000b0069b5252ced7so18102691oti.13
-        for <kvmarm@lists.linux.dev>; Tue, 04 Apr 2023 14:46:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680644764;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sep2IsHHPi6VwoK6jVRyP5qZG2pWFbR4+s4uvdE1Pj8=;
-        b=TVNVkJ7Wgr3eBNyrguuJr4KbyC36pm49mYs5WIGWBdhvxbh36y5KZn55NFo2bZYEMS
-         XJEYOZlehkfGVtYXb8z/Rh3KbYZCORYlfv1Yo16FL8npwtDgrJP42nOUqVBlup3W/OAg
-         NbEweNaP+ZYnp0HJ6Oxg5pgrGU6th66YTULpbiUgOa3DRxZcmEXebsACoZTgNrJITZhX
-         DnIt5IYnST38UbSJ4oKygwuHgqiS1+8zAlYV1RKtZnu7IixetGzLgEPnEgi9ipaB/00R
-         E67fSn8ENKTlMswf/ShwbSXGWxe+2VxSp6GLh+5gEDDmA1837VObl0oKWs7chi17hnsw
-         jUZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680644764;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sep2IsHHPi6VwoK6jVRyP5qZG2pWFbR4+s4uvdE1Pj8=;
-        b=mRf7upnjf2Fx+X57jGbymTbncMa8J0T9IXjHVi3v0HOco87eibcjk5rcEKQqzTbSXD
-         NhOIbWmOxlCFUTT6KtZExU/1XnthIF1aiRYG7t+appffrb8QitU7UQ/vfY9kNVSeuFId
-         nI+3yDW/lyfk1WuGXsypZid+WpZjqe/Qi+YpEVowZq2giPA9NSpncwjtktGX63y5TcOy
-         v7F8q8JotOjlzYBvU8qHaGPC4t2Kl+EeShp0q35bmnq5ej/qOsk8g4M9SmmJFh4jnAbr
-         M5QOt5k1F3sPng/MWUctUCZ6NMWF9oKjMKf51VMkdINCUTN5IjEv8hLPvTruiSoQbK+D
-         A41g==
-X-Gm-Message-State: AAQBX9fljpzBkQuDt2zE0Y9CLLYuYKW+dMFx88XowJv8bKxMljlmX3us
-	xJRj+flw5Demi+f0dSfhKxILK40lOxvhH90fcoNp5A==
-X-Google-Smtp-Source: AKy350bcPlJB7oPstsY310EnzkBFuuMkGNuuxOTrisQk1MNOgJbl7QRAmzq9lGup3ADNCpG68LK4svZ9J/yeKc1spZE=
-X-Received: by 2002:a05:6830:1be4:b0:6a1:1b5c:c6db with SMTP id
- k4-20020a0568301be400b006a11b5cc6dbmr1292746otb.7.1680644764217; Tue, 04 Apr
- 2023 14:46:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A9F27FC
+	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 07:35:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 293D1C433D2;
+	Wed,  5 Apr 2023 07:35:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1680680125;
+	bh=r9fPk2ZLwV8C4ivtlt4hbSQ0Xx3nNbvxEH7kLfN7kTY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YTwzs24ZFYpYps1DURxOFyoQzr8k+w0vnAuZiRYv4FZKzA4bzXglzoMkOgB7CFB92
+	 Wz/0RKqQYjhdWTmcyT4RSY6eW+yRAS+E+tB7dJ9TRhi6TmNs6xIZajIcHsgzMNNJ+M
+	 D6vHJb2VlQr+jtfIyckq44KaojgrZ++nLtPg66Dp4zaTX7/r+quT/IH27pTMp5ucNr
+	 doD1yX4K5ZtsBAZ9G0ddnUczPMoHDPYcnPquN5gdgJ8yHfedFF7u1qDJgMCZ6ZPSs3
+	 LyJZVjsTAvGY9euZeHVCJ3GvDmYmz2ejDtwk9PKxuRyZzf4bdSNgL3aE7Wc3UzuRBN
+	 uV326ypH7W8PA==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pjxfu-005tS6-PZ;
+	Wed, 05 Apr 2023 08:35:22 +0100
+Date: Wed, 05 Apr 2023 08:35:05 +0100
+Message-ID: <87o7o26aty.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Salil Mehta <salil.mehta@huawei.com>
+Subject: Re: [PATCH v3 08/13] KVM: arm64: Add support for KVM_EXIT_HYPERCALL
+In-Reply-To: <20230404154050.2270077-9-oliver.upton@linux.dev>
+References: <20230404154050.2270077-1-oliver.upton@linux.dev>
+	<20230404154050.2270077-9-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230206172340.2639971-1-rananta@google.com> <20230206172340.2639971-8-rananta@google.com>
- <ZCTa5wfVtGScLQEa@linux.dev> <CAJHc60xvSFpUs+o84fR14Rghd6rruBJkCMBtroeCeLDtjJg=gw@mail.gmail.com>
- <ZCx4QCs+cjr4nYev@linux.dev> <CAJHc60xQ36vah9+eEOLqKdjamfoxijPTwXLrrhOy=NVvMW=VOw@mail.gmail.com>
- <ZCyXEsm0RkvMQuns@linux.dev>
-In-Reply-To: <ZCyXEsm0RkvMQuns@linux.dev>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Tue, 4 Apr 2023 14:45:52 -0700
-Message-ID: <CAJHc60y84QDxYsBUNX4EmhyQSM=SJkmYus82GW9k+BmZV96Vjg@mail.gmail.com>
-Subject: Re: [PATCH v2 7/7] KVM: arm64: Create a fast stage-2 unmap path
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: h@linux.dev, Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Ricardo Koller <ricarkol@google.com>, Reiji Watanabe <reijiw@google.com>, 
-	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Jing Zhang <jingzhangos@google.com>, Colton Lewis <coltonlewis@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, pbonzini@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seanjc@google.com, salil.mehta@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Apr 4, 2023 at 2:31=E2=80=AFPM Oliver Upton <oliver.upton@linux.dev=
-> wrote:
->
-> On Tue, Apr 04, 2023 at 02:07:06PM -0700, Raghavendra Rao Ananta wrote:
-> > On Tue, Apr 4, 2023 at 12:19=E2=80=AFPM Oliver Upton <oliver.upton@linu=
-x.dev> wrote:
-> > >
-> > > On Tue, Apr 04, 2023 at 10:52:01AM -0700, Raghavendra Rao Ananta wrot=
-e:
-> > > > On Wed, Mar 29, 2023 at 5:42=E2=80=AFPM Oliver Upton <oliver.upton@=
-linux.dev> wrote:
-> > > > >
-> > > > > On Mon, Feb 06, 2023 at 05:23:40PM +0000, Raghavendra Rao Ananta =
-wrote:
-> > > > > > The current implementation of the stage-2 unmap walker
-> > > > > > traverses the entire page-table to clear and flush the TLBs
-> > > > > > for each entry. This could be very expensive, especially if
-> > > > > > the VM is not backed by hugepages. The unmap operation could be
-> > > > > > made efficient by disconnecting the table at the very
-> > > > > > top (level at which the largest block mapping can be hosted)
-> > > > > > and do the rest of the unmapping using free_removed_table().
-> > > > > > If the system supports FEAT_TLBIRANGE, flush the entire range
-> > > > > > that has been disconnected from the rest of the page-table.
-> > > > > >
-> > > > > > Suggested-by: Ricardo Koller <ricarkol@google.com>
-> > > > > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > > > > > ---
-> > > > > >  arch/arm64/kvm/hyp/pgtable.c | 44 ++++++++++++++++++++++++++++=
-++++++++
-> > > > > >  1 file changed, 44 insertions(+)
-> > > > > >
-> > > > > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/=
-pgtable.c
-> > > > > > index 0858d1fa85d6b..af3729d0971f2 100644
-> > > > > > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > > > > > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > > > > > @@ -1017,6 +1017,49 @@ static int stage2_unmap_walker(const str=
-uct kvm_pgtable_visit_ctx *ctx,
-> > > > > >       return 0;
-> > > > > >  }
-> > > > > >
-> > > > > > +/*
-> > > > > > + * The fast walker executes only if the unmap size is exactly =
-equal to the
-> > > > > > + * largest block mapping supported (i.e. at KVM_PGTABLE_MIN_BL=
-OCK_LEVEL),
-> > > > > > + * such that the underneath hierarchy at KVM_PGTABLE_MIN_BLOCK=
-_LEVEL can
-> > > > > > + * be disconnected from the rest of the page-table without the=
- need to
-> > > > > > + * traverse all the PTEs, at all the levels, and unmap each an=
-d every one
-> > > > > > + * of them. The disconnected table is freed using free_removed=
-_table().
-> > > > > > + */
-> > > > > > +static int fast_stage2_unmap_walker(const struct kvm_pgtable_v=
-isit_ctx *ctx,
-> > > > > > +                            enum kvm_pgtable_walk_flags visit)
-> > > > > > +{
-> > > > > > +     struct kvm_pgtable_mm_ops *mm_ops =3D ctx->mm_ops;
-> > > > > > +     kvm_pte_t *childp =3D kvm_pte_follow(ctx->old, mm_ops);
-> > > > > > +     struct kvm_s2_mmu *mmu =3D ctx->arg;
-> > > > > > +
-> > > > > > +     if (!kvm_pte_valid(ctx->old) || ctx->level !=3D KVM_PGTAB=
-LE_MIN_BLOCK_LEVEL)
-> > > > > > +             return 0;
-> > > > > > +
-> > > > > > +     if (!stage2_try_break_pte(ctx, mmu))
-> > > > > > +             return -EAGAIN;
-> > > > > > +
-> > > > > > +     /*
-> > > > > > +      * Gain back a reference for stage2_unmap_walker() to fre=
-e
-> > > > > > +      * this table entry from KVM_PGTABLE_MIN_BLOCK_LEVEL - 1.
-> > > > > > +      */
-> > > > > > +     mm_ops->get_page(ctx->ptep);
-> > > > >
-> > > > > Doesn't this run the risk of a potential UAF if the refcount was =
-1 before
-> > > > > calling stage2_try_break_pte()? IOW, stage2_try_break_pte() will =
-drop
-> > > > > the refcount to 0 on the page before this ever gets called.
-> > > > >
-> > > > > Also, AFAICT this misses the CMOs that are required on systems w/=
-o
-> > > > > FEAT_FWB. Without them it is possible that the host will read som=
-ething
-> > > > > other than what was most recently written by the guest if it is u=
-sing
-> > > > > noncacheable memory attributes at stage-1.
-> > > > >
-> > > > > I imagine the actual bottleneck is the DSB required after every
-> > > > > CMO/TLBI. Theoretically, the unmap path could be updated to:
-> > > > >
-> > > > >  - Perform the appropriate CMOs for every valid leaf entry *witho=
-ut*
-> > > > >    issuing a DSB.
-> > > > >
-> > > > >  - Elide TLBIs entirely that take place in the middle of the walk
-> > > > >
-> > > > >  - After the walk completes, dsb(ish) to guarantee that the CMOs =
-have
-> > > > >    completed and the invalid PTEs are made visible to the hardwar=
-e
-> > > > >    walkers. This should be done implicitly by the TLBI implementa=
-tion
-> > > > >
-> > > > >  - Invalidate the [addr, addr + size) range of IPAs
-> > > > >
-> > > > > This would also avoid over-invalidating stage-1 since we blast th=
-e
-> > > > > entire stage-1 context for every stage-2 invalidation. Thoughts?
-> > > > >
-> > > > Correct me if I'm wrong, but if we invalidate the TLB after the wal=
-k
-> > > > is complete, don't you think there's a risk of race if the guest ca=
-n
-> > > > hit in the TLB even though the page was unmapped?
-> > >
-> > > Yeah, we'd need to do the CMOs _after_ making the translation invalid=
- in
-> > > the page tables and completing the TLB invalidation. Apologies.
-> > >
-> > > Otherwise, the only requirement we need to uphold w/ either the MMU
-> > > notifiers or userspace is that the translation has been invalidated a=
-t
-> > > the time of return.
-> > >
-> > Actually, my concern about the race was against the hardware. If we
-> > follow the above approach, let's say we invalidated a certain set of
-> > PTEs, but the TLBs aren't yet invalidated. During this point if
-> > another vCPU accesses the range governed by the invalidated PTEs,
-> > wouldn't it still hit in the TLB? Have I misunderstood you or am I
-> > missing something?
->
-> Yep, that's exactly what would happen. There is no way to eliminate the
-> race you mention, there will always be a window of time where the page
-> tables no longer contain a particular translation but the TLBs may still
-> be holding a valid entry.
->
-This is new to me :)
+On Tue, 04 Apr 2023 16:40:45 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> In anticipation of user hypercall filters, add the necessary plumbing to
+> get SMCCC calls out to userspace. Even though the exit structure has
+> space for KVM to pass register arguments, let's just avoid it altogether
+> and let userspace poke at the registers via KVM_GET_ONE_REG.
+> 
+> This deliberately stretches the definition of a 'hypercall' to cover
+> SMCs from EL1 in addition to the HVCs we know and love. KVM doesn't
+> support EL1 calls into secure services, but now we can paint that as a
+> userspace problem and be done with it.
+> 
+> Finally, we need a flag to let userspace know what conduit instruction
+> was used (i.e. SMC vs. HVC).
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  Documentation/virt/kvm/api.rst    | 18 ++++++++++++++++--
+>  arch/arm64/include/uapi/asm/kvm.h |  4 ++++
+>  arch/arm64/kvm/handle_exit.c      |  4 +++-
+>  arch/arm64/kvm/hypercalls.c       | 16 ++++++++++++++++
+>  4 files changed, 39 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 9b01e3d0e757..9497792c4ee5 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6221,11 +6221,25 @@ to the byte array.
+>  			__u64 flags;
+>  		} hypercall;
+>  
+> -Unused.  This was once used for 'hypercall to userspace'.  To implement
+> -such functionality, use KVM_EXIT_IO (x86) or KVM_EXIT_MMIO (all except s390).
+> +
+> +It is strongly recommended that userspace use ``KVM_EXIT_IO`` (x86) or
+> +``KVM_EXIT_MMIO`` (all except s390) to implement functionality that
+> +requires a guest to interact with host userpace.
+>  
+>  .. note:: KVM_EXIT_IO is significantly faster than KVM_EXIT_MMIO.
+>  
+> +For arm64:
+> +----------
+> +
+> +``nr`` contains the function ID of the guest's SMCCC call. Userspace is
+> +expected to use the ``KVM_GET_ONE_REG`` ioctl to retrieve the call
+> +parameters from the vCPU's GPRs.
+> +
+> +Definition of ``flags``:
+> + - ``KVM_HYPERCALL_EXIT_SMC``: Indicates that the guest used the SMC
+> +   conduit to initiate the SMCCC call. If this bit is 0 then the guest
+> +   used the HVC conduit for the SMCCC call.
+> +
+>  ::
+>  
+>  		/* KVM_EXIT_TPR_ACCESS */
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index f9672ef1159a..f86446c5a7e3 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -472,12 +472,16 @@ enum {
+>  enum kvm_smccc_filter_action {
+>  	KVM_SMCCC_FILTER_HANDLE = 0,
+>  	KVM_SMCCC_FILTER_DENY,
+> +	KVM_SMCCC_FILTER_FWD_TO_USER,
+>  
+>  #ifdef __KERNEL__
+>  	NR_SMCCC_FILTER_ACTIONS
+>  #endif
+>  };
+>  
+> +/* arm64-specific KVM_EXIT_HYPERCALL flags */
+> +#define KVM_HYPERCALL_EXIT_SMC	(1U << 0)
+> +
+>  #endif
+>  
+>  #endif /* __ARM_KVM_H__ */
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 68f95dcd41a1..3f43e20c48b6 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -71,7 +71,9 @@ static int handle_smc(struct kvm_vcpu *vcpu)
+>  	 * Trap exception, not a Secure Monitor Call exception [...]"
+>  	 *
+>  	 * We need to advance the PC after the trap, as it would
+> -	 * otherwise return to the same address...
+> +	 * otherwise return to the same address. Furthermore, pre-incrementing
+> +	 * the PC before potentially exiting to userspace maintains the same
+> +	 * abstraction for both SMCs and HVCs.
 
-> This race is benign so long as we guarantee that all translations for
-> the affected address (i.e. in the page tables, cached in a TLB) have
-> been invalidated before returning to the caller. For example, MM cannot
-> start swapping out guest memory until it is guaranteed that the guest is
-> no longer writing to it.
->
-Well, if you feel that the risk is acceptable, we can probably defer
-the invalidations until the unmap walk is finished.
+nit: this comment really needs to find its way in the documentation so
+that a VMM author can determine the PC of the SMC/HVC. This is
+specially important for 32bit, which has a 16bit encodings for
+SMC/HVC.
 
-Thank you.
-Raghavendra
+And thinking of it, this outlines a small flaw in this API. If
+luserspace needs to find out about the address of the HVC/SMC, it
+needs to know the *size* of the instruction. But we don't propagate
+the ESR value. I think this still works by construction (userspace can
+check PSTATE and work out whether we're in ARM or Thumb mode), but
+this feels fragile.
 
-> --
-> Thanks,
-> Oliver
+Should we expose the ESR, or at least ESR_EL2.IL as an additional
+flag?
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
