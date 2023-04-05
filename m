@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C6EB6ABD
-	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:40:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72E32C433A0;
-	Wed,  5 Apr 2023 15:40:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D40D6ABD
+	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:40:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0504CC433EF;
+	Wed,  5 Apr 2023 15:40:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1680709245;
-	bh=BqWGGG6P0Q1EZNUaobu4OneFEfRFSI4gFWADamGwyEI=;
+	s=k20201202; t=1680709248;
+	bh=Qp6MCbgjyeYLqXhzPsD/TLmpoZonoNw49Oh0VFywzgE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OsId5NIhMgEELAQTVXaett/UwYU0WZDM+4Bc6KforaGi2jmIm8UpjkKfuzGkczQoo
-	 szsoDH6dFPh9tefbnv4fs0+17eiT7E+azoG0diQunCWU1T4SAYluqlYNKSGP4U1Vd+
-	 aMgcfOH8zNpAC1TY6JSZM72D2XNqfGPylPV7T5ObH8lehSH4US6FpUaUPfZp1nkEX/
-	 ML1gd5DTEe3i4UcdGjCHq4538Lb5B/9+TzWkmmfGLMw3Cam/+Z8duKccTkuTV0tBN9
-	 k1Ppw0SUOUg5VLwezV9y8RFiXZP9te44ID9sy6uj+4RzatGXLE3gpPKJESiVBpfPIE
-	 13kltom17ImSw==
+	b=Og1BlC6r7OnttGkUFyEf3L+9qSEDXVHlH2SUhGdme0H/H24l8TAvHPMVolnLH8PN3
+	 CdhW9C4TDAYFAPeBYBoH43CBu6y0baneJFPHYBAcNJSFOQS1hy1GXCi3diwcDHkSDW
+	 7V6FT6oOk5jwCdNoLQj/0aCaGU6OvjDS6Je/J5GHNH/ylZJig9xkcLHjJaJKlU5c+R
+	 4DNfgPNMSFrogxMJeZoGUFNgmQTemFiQLVxe6KrMTauJ2Dpag8oiRfiTxTQyUi8S72
+	 HHCBDt2PezWKVCgY85Pn1wIpStV4afikdJzFN2O5BPALspmRrsp7STJqB5jdUVujcp
+	 yuWkWeuy4zFWQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pk5FR-0062PV-FK;
-	Wed, 05 Apr 2023 16:40:33 +0100
+	id 1pk5FX-0062PV-UG;
+	Wed, 05 Apr 2023 16:40:41 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v9 23/50] KVM: arm64: nv: Fold guest's HCR_EL2 configuration into the host's
-Date: Wed,  5 Apr 2023 16:39:41 +0100
-Message-Id: <20230405154008.3552854-24-maz@kernel.org>
+Subject: [PATCH v9 34/50] KVM: arm64: nv: Allow userspace to request KVM_ARM_VCPU_NESTED_VIRT
+Date: Wed,  5 Apr 2023 16:39:52 +0100
+Message-Id: <20230405154008.3552854-35-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230405154008.3552854-1-maz@kernel.org>
 References: <20230405154008.3552854-1-maz@kernel.org>
@@ -56,33 +56,58 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-When entering a L2 guest (nested virt enabled, but not in hypervisor
-context), we need to honor the traps the L1 guest has asked enabled.
+Since we're (almost) feature complete, let's allow userspace to
+request KVM_ARM_VCPU_NESTED_VIRT by bumping the KVM_VCPU_MAX_FEATURES
+up. We also now advertise the feature to userspace with a new capability.
 
-For now, just OR the guest's HCR_EL2 into the host's. We may have to do
-some filtering in the future though.
+It's going to be great...
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/vhe/switch.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/arm64/include/asm/kvm_host.h | 2 +-
+ arch/arm64/kvm/arm.c              | 3 +++
+ include/uapi/linux/kvm.h          | 1 +
+ 3 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index a17bf261d501..ff77b37b6f45 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -81,6 +81,11 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 			if (!vcpu_el2_tge_is_set(vcpu))
- 				hcr |= HCR_AT | HCR_TTLB;
- 		}
-+	} else if (vcpu_has_nv(vcpu)) {
-+		u64 vhcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
-+
-+		vhcr_el2 &= ~HCR_GUEST_NV_FILTER_FLAGS;
-+		hcr |= vhcr_el2;
- 	}
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 1b3902d2470f..03268d444801 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -37,7 +37,7 @@
  
- 	___activate_traps(vcpu, hcr);
+ #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
+ 
+-#define KVM_VCPU_MAX_FEATURES 7
++#define KVM_VCPU_MAX_FEATURES 8
+ 
+ #define KVM_REQ_SLEEP \
+ 	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index e4a77fe1cfa4..6af9fdf9b44d 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -272,6 +272,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ARM_EL1_32BIT:
+ 		r = cpus_have_const_cap(ARM64_HAS_32BIT_EL1);
+ 		break;
++	case KVM_CAP_ARM_EL2:
++		r = cpus_have_const_cap(ARM64_HAS_NESTED_VIRT);
++		break;
+ 	case KVM_CAP_GUEST_DEBUG_HW_BPS:
+ 		r = get_num_brps();
+ 		break;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 6a7e1a0ecf04..70ac878cf99f 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1185,6 +1185,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
+ #define KVM_CAP_PMU_EVENT_MASKED_EVENTS 226
+ #define KVM_CAP_COUNTER_OFFSET 227
++#define KVM_CAP_ARM_EL2 228
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
 -- 
 2.34.1
 
