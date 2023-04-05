@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A18876ABC
-	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:41:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71F7AC4339B;
-	Wed,  5 Apr 2023 15:41:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69AC6ABC
+	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:41:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71C95C4339E;
+	Wed,  5 Apr 2023 15:41:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1680709285;
-	bh=+Dgp2ZystkCF2LXfDawgMy9ijTfY3yI7W5pOElk7QNY=;
+	s=k20201202; t=1680709287;
+	bh=A8APb/ShbfEk/49VtpSdFlMSQpzv8xpXTIJI/KZaCbQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gpLtZ49aq6xshvE9Avjwx1vUS2du8qAoMfANObn1e0tIAFqqgrflklTTR8V1mEqZD
-	 QNQ60Hx6SogXnZTWYGolIsJhqQ11kecOhqiHt1OAVmFRmQdQb/r+bgVDZ3YcbhysoP
-	 imk8+4q6r4cEj4/xAAhdb8ViTipZ5PkBpy/2nL4ugwE070jqACH8z/RW8ZHRfHYejH
-	 q2s/W3N9plS/fM50NIgGikCECfsSybfD72GpFzOX/dMcu+CxSoxE81IUi30l+E5hs5
-	 DYCbiOj7jVtDu8yPz0gOl3geOZW8ER4VlYBXDmGHftW/paRBTDnQTc5JUiZzosocJH
-	 okfnYO8n06qFw==
+	b=us8bJebJKF5lor/94j4lpx/LipLQ6FGpgB907UJL/iQAmGl9gZM5lz69dezjKOVxz
+	 sWWANH3W+xYXkUdQOIPI+FJ2SqM06iBS9ftRFgE/MPqRu2jrWBN1hLyCroTSXuDbO3
+	 IJJBkBivOxyAmSPLkJUsDSA1UYfq+MYq8GkLngCXLyV8ta6tix8uolk88QuyT7PBpA
+	 xO1wL1ThANsEhs0R8smN5DqjSYWhfwajCGgImJ1CDB47lnV9tQNJ3NrAS2HfSWqKX/
+	 EikzggOeVvr0nvtcxOf58ZQxYtAkxFTLWZq9rGLUZdBzktstMwVPcRhk0+bBmaM87U
+	 i4bP16T+k1zDA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pk5FN-0062PV-U3;
-	Wed, 05 Apr 2023 16:40:29 +0100
+	id 1pk5FU-0062PV-1N;
+	Wed, 05 Apr 2023 16:40:37 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v9 11/50] KVM: arm64: nv: Respect virtual HCR_EL2.TVM and TRVM settings
-Date: Wed,  5 Apr 2023 16:39:29 +0100
-Message-Id: <20230405154008.3552854-12-maz@kernel.org>
+Subject: [PATCH v9 32/50] KVM: arm64: nv: Implement maintenance interrupt forwarding
+Date: Wed,  5 Apr 2023 16:39:50 +0100
+Message-Id: <20230405154008.3552854-33-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230405154008.3552854-1-maz@kernel.org>
 References: <20230405154008.3552854-1-maz@kernel.org>
@@ -56,39 +56,149 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Jintack Lim <jintack.lim@linaro.org>
+When we take a maintenance interrupt, we need to decide whether
+it is generated on an action from the guest, or if it is something
+that needs to be forwarded to the guest hypervisor.
 
-Forward the EL1 virtual memory register traps to the virtual EL2 if they
-are not coming from the virtual EL2 and the virtual HCR_EL2.TVM or TRVM
-bit is set.
-
-This is for recursive nested virtualization.
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ arch/arm64/kvm/vgic/vgic-init.c      | 33 ++++++++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic-v3-nested.c | 28 ++++++++++++++++++-----
+ 2 files changed, 55 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 6628b66d02fb..56cc60eede59 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -420,6 +420,13 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
- 	if (el12_reg(p) && forward_nv_traps(vcpu))
- 		return false;
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+index cd134db41a57..a97279f82bbd 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -6,10 +6,12 @@
+ #include <linux/uaccess.h>
+ #include <linux/interrupt.h>
+ #include <linux/cpu.h>
++#include <linux/irq.h>
+ #include <linux/kvm_host.h>
+ #include <kvm/arm_vgic.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_mmu.h>
++#include <asm/kvm_nested.h>
+ #include "vgic.h"
  
-+	if (!el12_reg(p)) {
-+		u64 bit = p->is_write ? HCR_TVM : HCR_TRVM;
-+
-+		if (forward_traps(vcpu, bit))
-+			return false;
+ /*
+@@ -222,6 +224,16 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+ 	if (!irqchip_in_kernel(vcpu->kvm))
+ 		return 0;
+ 
++	if (vcpu_has_nv(vcpu)) {
++		/* Cope with vintage userspace. Maybe we should fail instead */
++		if (vcpu->kvm->arch.vgic.maint_irq == 0)
++			vcpu->kvm->arch.vgic.maint_irq = kvm_vgic_global_state.maint_irq;
++		ret = kvm_vgic_set_owner(vcpu, vcpu->kvm->arch.vgic.maint_irq,
++					 vcpu);
++		if (ret)
++			return ret;
 +	}
 +
- 	/* We don't expect TRVM on the host */
- 	BUG_ON(!vcpu_is_el2(vcpu) && !p->is_write);
+ 	/*
+ 	 * If we are creating a VCPU with a GICv3 we must also register the
+ 	 * KVM io device for the redistributor that belongs to this VCPU.
+@@ -478,12 +490,23 @@ void kvm_vgic_cpu_down(void)
  
+ static irqreturn_t vgic_maintenance_handler(int irq, void *data)
+ {
++	struct kvm_vcpu *vcpu = *(struct kvm_vcpu **)data;
++
+ 	/*
+ 	 * We cannot rely on the vgic maintenance interrupt to be
+ 	 * delivered synchronously. This means we can only use it to
+ 	 * exit the VM, and we perform the handling of EOIed
+ 	 * interrupts on the exit path (see vgic_fold_lr_state).
+ 	 */
++
++	/* If not nested, deactivate */
++	if (!vcpu || !vgic_state_is_nested(vcpu)) {
++		irq_set_irqchip_state(irq, IRQCHIP_STATE_ACTIVE, false);
++		return IRQ_HANDLED;
++	}
++
++	/* Assume nested from now */
++	vgic_v3_handle_nested_maint_irq(vcpu);
+ 	return IRQ_HANDLED;
+ }
+ 
+@@ -582,6 +605,16 @@ int kvm_vgic_hyp_init(void)
+ 		return ret;
+ 	}
+ 
++	if (has_mask) {
++		ret = irq_set_vcpu_affinity(kvm_vgic_global_state.maint_irq,
++					    kvm_get_running_vcpus());
++		if (ret) {
++			kvm_err("Error setting vcpu affinity\n");
++			free_percpu_irq(kvm_vgic_global_state.maint_irq, kvm_get_running_vcpus());
++			return ret;
++		}
++	}
++
+ 	kvm_info("vgic interrupt IRQ%d\n", kvm_vgic_global_state.maint_irq);
+ 	return 0;
+ }
+diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+index e88c75e79010..755e4819603a 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
++++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+@@ -175,10 +175,20 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
+ void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++	struct vgic_irq *irq;
++	unsigned long flags;
+ 
+ 	vgic_cpu->shadow_vgic_v3 = vgic_cpu->nested_vgic_v3;
+ 	vgic_v3_create_shadow_lr(vcpu);
+ 	__vgic_v3_restore_state(vcpu_shadow_if(vcpu));
++
++	irq = vgic_get_irq(vcpu->kvm, vcpu, vcpu->kvm->arch.vgic.maint_irq);
++	raw_spin_lock_irqsave(&irq->irq_lock, flags);
++	if (irq->line_level || irq->active)
++		irq_set_irqchip_state(kvm_vgic_global_state.maint_irq,
++				      IRQCHIP_STATE_ACTIVE, true);
++	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
++	vgic_put_irq(vcpu->kvm, irq);
+ }
+ 
+ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+@@ -193,20 +203,26 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+ 	 */
+ 	vgic_v3_fixup_shadow_lr_state(vcpu);
+ 	vgic_cpu->nested_vgic_v3 = vgic_cpu->shadow_vgic_v3;
++	irq_set_irqchip_state(kvm_vgic_global_state.maint_irq,
++			      IRQCHIP_STATE_ACTIVE, false);
+ }
+ 
+ void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu)
+ {
+-	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
+-
+ 	/*
+ 	 * If we exit a nested VM with a pending maintenance interrupt from the
+ 	 * GIC, then we need to forward this to the guest hypervisor so that it
+ 	 * can re-sync the appropriate LRs and sample level triggered interrupts
+ 	 * again.
+ 	 */
+-	if (vgic_state_is_nested(vcpu) &&
+-	    (cpu_if->vgic_hcr & ICH_HCR_EN) &&
+-	    vgic_v3_get_misr(vcpu))
+-		kvm_inject_nested_irq(vcpu);
++	if (vgic_state_is_nested(vcpu)) {
++		struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
++		bool state;
++
++		state  = cpu_if->vgic_hcr & ICH_HCR_EN;
++		state &= vgic_v3_get_misr(vcpu);
++
++		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
++				    vcpu->kvm->arch.vgic.maint_irq, state, vcpu);
++	}
+ }
 -- 
 2.34.1
 
