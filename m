@@ -1,199 +1,86 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-36.mta0.migadu.com (out-36.mta0.migadu.com [91.218.175.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5471E6ABC
-	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:46:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A48EC433D2;
-	Wed,  5 Apr 2023 15:46:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1680709610;
-	bh=C193qCDjqiF5HkfsJlWly9Jsvkj9TvtpD7IYpBzHGpI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LZhoGiNOz1zaYAHslZ7h8cxSWTX0VfnaxUr3yFPWPMcMo8gTO6iGqwGPdbx61fSb4
-	 HnxtJ7xUxnRn5fuEnaisKTd/gLcBfnxaay8TWrIa3g5K8r9eTiJSyUWy00q+Truz+C
-	 KvSCbt2s3YACaxWuru0JozSu4s6cATY4GaEqGTTGcq15lyHsKSJ9lJnmmmq38lLS/F
-	 uGhIG1epigcI9mz9klLeje8ZXADc6dn6Xb/749CzBVZIkKW1pCShddFRatJEGJbdcl
-	 2LLbUTekm4WpAzfzS80X9fJth7r888gaOsUr0cuXiU0+yUsssCG3v1notbwoPCJhNH
-	 BBDhHG0dthOPw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pk5Fv-0062PV-UY;
-	Wed, 05 Apr 2023 16:41:04 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Darren Hart <darren@os.amperecomputing.com>,
-	Jintack Lim <jintack@cs.columbia.edu>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Miguel Luis <miguel.luis@oracle.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 428246FD0
+	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 16:12:56 +0000 (UTC)
+Date: Wed, 5 Apr 2023 09:12:49 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1680711173;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=7CkgZMZOVF7MbpZue7UsvX7LmMmfoQVPHzEDVenfrgw=;
+	b=lcojLCqkONgW2SfBtg4a6NrQ3YjDDqXdKyYv4UAzFV1xRAgdzhwC4aiXEhAP13/vysW5ER
+	FbKVqUI4qhrDjvr1Uew6BeHLbRkn0ibu2xSSfKveUeor4VjT3eiJl6nsLf2CRmNk/C7yCN
+	G7A4GCArBLUM57KPGVdhPC75oYACwog=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Fuad Tabba <tabba@google.com>,
+	Reiji Watanabe <reijiw@google.com>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v9 47/50] KVM: arm64: nv: Fast-track 'InHost' exception returns
-Date: Wed,  5 Apr 2023 16:40:05 +0100
-Message-Id: <20230405154008.3552854-48-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230405154008.3552854-1-maz@kernel.org>
-References: <20230405154008.3552854-1-maz@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org
+Subject: [GIT PULL] KVM/arm64 fixes for 6.3, part #3
+Message-ID: <ZC2eAXc9UE7Vesmn@thinky-boi>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Migadu-Flow: FLOW_OUT
 
-A significant part of the ARMv8.3-NV extension is to trap ERET
-instructions so that the hypervisor gets a chance to switch
-from a vEL2 L1 guest to an EL1 L2 guest.
+Hi Paolo,
 
-But this also has the unfortunate consequence of trapping ERET
-in unsuspecting circumstances, such as staying at vEL2 (interrupt
-handling while being in the guest hypervisor), or returning to host
-userspace in the case of a VHE guest.
+Sending out what is likely the last batch of fixes for 6.3. Most
+noteworthy is the PMU fix, as Reiji found that events counting in guest
+userspace stopped working after live migration on VHE systems.
+Additionally, Fuad found that pKVM was underselling the Spectre/Meltdown
+mitigation state to protected VMs, so we have a fix for that too.
 
-Although we already make some effort to handle these ERET quicker
-by not doing the put/load dance, it is still way too far down the
-line for it to be efficient enough.
+Also, FYI, Marc will reprise his role for the 6.4 kernel. Nothing is
+set in stone but the working model is that we'll alternate the
+maintainer duties each kernel release.
 
-For these cases, it would ideal to ERET directly, no question asked.
-Of course, we can't do that. But the next best thing is to do it as
-early as possible, in fixup_guest_exit(), much as we would handle
-FPSIMD exceptions.
+Please pull,
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/emulate-nested.c | 29 +++------------------
- arch/arm64/kvm/hyp/vhe/switch.c | 46 +++++++++++++++++++++++++++++++++
- 2 files changed, 49 insertions(+), 26 deletions(-)
+Oliver
 
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 555771e1260d..e2d23f624115 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -79,8 +79,7 @@ static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
- 
- void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
- {
--	u64 spsr, elr, mode;
--	bool direct_eret;
-+	u64 spsr, elr;
- 
- 	/*
- 	 * Forward this trap to the virtual EL2 if the virtual
-@@ -89,33 +88,11 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
- 	if (forward_nv_traps(vcpu))
- 		return;
- 
--	/*
--	 * Going through the whole put/load motions is a waste of time
--	 * if this is a VHE guest hypervisor returning to its own
--	 * userspace, or the hypervisor performing a local exception
--	 * return. No need to save/restore registers, no need to
--	 * switch S2 MMU. Just do the canonical ERET.
--	 */
--	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
--	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
--
--	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
--
--	direct_eret  = (mode == PSR_MODE_EL0t &&
--			vcpu_el2_e2h_is_set(vcpu) &&
--			vcpu_el2_tge_is_set(vcpu));
--	direct_eret |= (mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t);
--
--	if (direct_eret) {
--		*vcpu_pc(vcpu) = vcpu_read_sys_reg(vcpu, ELR_EL2);
--		*vcpu_cpsr(vcpu) = spsr;
--		trace_kvm_nested_eret(vcpu, *vcpu_pc(vcpu), spsr);
--		return;
--	}
--
- 	preempt_disable();
- 	kvm_arch_vcpu_put(vcpu);
- 
-+	spsr = __vcpu_sys_reg(vcpu, SPSR_EL2);
-+	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
- 	elr = __vcpu_sys_reg(vcpu, ELR_EL2);
- 
- 	trace_kvm_nested_eret(vcpu, elr, spsr);
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 7682d2f13eaa..238c6613cf47 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -168,6 +168,51 @@ void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
- 	__deactivate_traps_common(vcpu);
- }
- 
-+static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
-+{
-+	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
-+	u64 spsr, mode;
-+
-+	/*
-+	 * Going through the whole put/load motions is a waste of time
-+	 * if this is a VHE guest hypervisor returning to its own
-+	 * userspace, or the hypervisor performing a local exception
-+	 * return. No need to save/restore registers, no need to
-+	 * switch S2 MMU. Just do the canonical ERET.
-+	 *
-+	 * Unless the trap has to be forwarded further down the line,
-+	 * of course...
-+	 */
-+	if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV)
-+		return false;
-+
-+	spsr = read_sysreg_el1(SYS_SPSR);
-+	spsr = __fixup_spsr_el2_read(ctxt, spsr);
-+	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
-+
-+	switch (mode) {
-+	case PSR_MODE_EL0t:
-+		if (!(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)))
-+			return false;
-+		break;
-+	case PSR_MODE_EL2t:
-+		mode = PSR_MODE_EL1t;
-+		break;
-+	case PSR_MODE_EL2h:
-+		mode = PSR_MODE_EL1h;
-+		break;
-+	default:
-+		return false;
-+	}
-+
-+	spsr = (spsr & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
-+
-+	write_sysreg_el2(spsr, SYS_SPSR);
-+	write_sysreg_el2(read_sysreg_el1(SYS_ELR), SYS_ELR);
-+
-+	return true;
-+}
-+
- static const exit_handler_fn hyp_exit_handlers[] = {
- 	[0 ... ESR_ELx_EC_MAX]		= NULL,
- 	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
-@@ -177,6 +222,7 @@ static const exit_handler_fn hyp_exit_handlers[] = {
- 	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
- 	[ESR_ELx_EC_DABT_LOW]		= kvm_hyp_handle_dabt_low,
- 	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
-+	[ESR_ELx_EC_ERET]		= kvm_hyp_handle_eret,
- };
- 
- static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu)
--- 
-2.34.1
+The following changes since commit 8c2e8ac8ad4be68409e806ce1cc78fc7a04539f3:
 
+  KVM: arm64: Check for kvm_vma_mte_allowed in the critical section (2023-03-16 23:42:56 +0000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.3-3
+
+for you to fetch changes up to e81625218bf7986ba1351a98c43d346b15601d26:
+
+  KVM: arm64: Advertise ID_AA64PFR0_EL1.CSV2/3 to protected VMs (2023-04-04 15:52:06 +0000)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 6.3, part #3
+
+ - Ensure the guest PMU context is restored before the first KVM_RUN,
+   fixing an issue where EL0 event counting is broken after vCPU
+   save/restore
+
+ - Actually initialize ID_AA64PFR0_EL1.{CSV2,CSV3} based on the
+   sanitized, system-wide values for protected VMs
+
+----------------------------------------------------------------
+Fuad Tabba (1):
+      KVM: arm64: Advertise ID_AA64PFR0_EL1.CSV2/3 to protected VMs
+
+Reiji Watanabe (1):
+      KVM: arm64: PMU: Restore the guest's EL0 event counting after migration
+
+ arch/arm64/kvm/arm.c                           | 26 +++++++++++++++++++++++++-
+ arch/arm64/kvm/hyp/include/nvhe/fixed_config.h |  5 ++++-
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c             |  7 -------
+ arch/arm64/kvm/pmu-emul.c                      |  1 +
+ arch/arm64/kvm/sys_regs.c                      |  1 -
+ 5 files changed, 30 insertions(+), 10 deletions(-)
