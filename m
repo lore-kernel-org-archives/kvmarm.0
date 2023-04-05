@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 199BB6ABC
-	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:41:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E28F1C4339B;
-	Wed,  5 Apr 2023 15:41:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED4C26ABC
+	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:41:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C73F3C433D2;
+	Wed,  5 Apr 2023 15:41:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1680709272;
-	bh=pXYSgv35cxB9qoUl6iVDTqGhokT94uL8UdFnTttHfiU=;
+	s=k20201202; t=1680709274;
+	bh=9g8STqPXgzD9Bbvt489TT/ehnNJeuV9gTn/DLP9G+xA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=G7qc76s9sXNH0Bgm9+uy/srCWvw8pExD6Kg/81tfD+KdFHsbIjGCwjvEQKxpOdM6U
-	 niHoBZliRaD+WS67tmliYNgO/qZ/Dv2iJbyOALbk/u4mmVREjHWkGNr+DPO/88rkwJ
-	 tbQUUC+ljm49M3i8kLbOLx4o+ozO+F0lKqWxAqoZpset3kPhF/8Bg1yPaebpUjwddG
-	 jiaZO/hF0e5ubPK84dOWo+LHTjBr51WHO6PXhJth7IKfy7bhjYm2b3ItgxqBsMK7HC
-	 2PWXqoBXmCWaq1vF/anghQ3mREg8NDOZLr1IMQqFmNItq8O02UG5N1/gbbrrVI4Rw1
-	 d2KDZVOyNVnDw==
+	b=hePkJJlk5YajhTZKr/QJVXlr7camHFaYl03u4jag1YT+bDB1S917xnet7sPA54+yf
+	 Cgv8ewYMNzOeKQ/Zg70TM159xzXIlqhrWznEu3oPmv8CnCXmlz2Bo6Ro66tMxcQR8r
+	 QKMLMSxNHilDwNkq3eec/UxdOegUzvgBYFSYWo0q442upgGPwMYOSg3MR7DWkT+xUx
+	 dKoJEgVdpVsVWoBdP0FX7DEoRQheW49z83+J8YVzsLBtNYQ+GotiQQSsayMLra96mo
+	 xze7eZqH/y1anCpXfhxRU5lDaRK8GwyWvcmtj2DJVCCRj0T5pPtZFzXlb56RNy2KDN
+	 zOzpVx+IW04/Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pk5FS-0062PV-JM;
-	Wed, 05 Apr 2023 16:40:34 +0100
+	id 1pk5FO-0062PV-Fq;
+	Wed, 05 Apr 2023 16:40:30 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v9 27/50] KVM: arm64: nv: Load timer before the GIC
-Date: Wed,  5 Apr 2023 16:39:45 +0100
-Message-Id: <20230405154008.3552854-28-maz@kernel.org>
+Subject: [PATCH v9 13/50] KVM: arm64: nv: Forward debug traps to the nested guest
+Date: Wed,  5 Apr 2023 16:39:31 +0100
+Message-Id: <20230405154008.3552854-14-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230405154008.3552854-1-maz@kernel.org>
 References: <20230405154008.3552854-1-maz@kernel.org>
@@ -56,36 +56,78 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-In order for vgic_v3_load_nested to be able to observe which timer
-interrupts have the HW bit set for the current context, the timers
-must have been loaded in the new mode and the right timer mapped
-to their corresponding HW IRQs.
-
-At the moment, we load the GIC first, meaning that timer interrupts
-injected to an L2 guest will never have the HW bit set (we see the
-old configuration).
-
-Swapping the two loads solves this particular problem.
+On handling a debug trap, check whether we need to forward it to the
+guest before handling it.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_nested.h | 2 ++
+ arch/arm64/kvm/emulate-nested.c     | 9 +++++++--
+ arch/arm64/kvm/sys_regs.c           | 5 +++++
+ 3 files changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 2fc529519ae7..8d8084a4473e 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -415,8 +415,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 4b7f9f35ece9..f2820c82e956 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -59,6 +59,8 @@ static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
+ 	return ttbr0 & ~GENMASK_ULL(63, 48);
+ }
  
- 	vcpu->cpu = cpu;
++extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
++			    u64 control_bit);
+ extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
+ extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
+ extern bool forward_nv1_traps(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 7c06844a5113..555771e1260d 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -14,14 +14,14 @@
  
--	kvm_vgic_load(vcpu);
- 	kvm_timer_vcpu_load(vcpu);
-+	kvm_vgic_load(vcpu);
- 	if (has_vhe())
- 		kvm_vcpu_load_sysregs_vhe(vcpu);
- 	kvm_arch_vcpu_load_fp(vcpu);
+ #include "trace.h"
+ 
+-bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit)
++bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg, u64 control_bit)
+ {
+ 	bool control_bit_set;
+ 
+ 	if (!vcpu_has_nv(vcpu))
+ 		return false;
+ 
+-	control_bit_set = __vcpu_sys_reg(vcpu, HCR_EL2) & control_bit;
++	control_bit_set = __vcpu_sys_reg(vcpu, reg) & control_bit;
+ 	if (!vcpu_is_el2(vcpu) && control_bit_set) {
+ 		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
+ 		return true;
+@@ -29,6 +29,11 @@ bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit)
+ 	return false;
+ }
+ 
++bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit)
++{
++	return __forward_traps(vcpu, HCR_EL2, control_bit);
++}
++
+ bool forward_nv_traps(struct kvm_vcpu *vcpu)
+ {
+ 	return forward_traps(vcpu, HCR_NV);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index d40e5181bf74..548f637e57ac 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -666,6 +666,11 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu,
+ 			    struct sys_reg_params *p,
+ 			    const struct sys_reg_desc *r)
+ {
++	if (forward_traps(vcpu, HCR_TGE) ||
++	    __forward_traps(vcpu, MDCR_EL2, MDCR_EL2_TDE) ||
++	    __forward_traps(vcpu, MDCR_EL2, MDCR_EL2_TDA))
++		return false;
++
+ 	access_rw(vcpu, p, r);
+ 	if (p->is_write)
+ 		vcpu_set_flag(vcpu, DEBUG_DIRTY);
 -- 
 2.34.1
 
