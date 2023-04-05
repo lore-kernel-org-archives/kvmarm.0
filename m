@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F3FE6ABC
-	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:46:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03735C4339C;
-	Wed,  5 Apr 2023 15:46:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23EB56ABC
+	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:46:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBDC8C433EF;
+	Wed,  5 Apr 2023 15:46:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1680709603;
-	bh=+2JPLukEFDEX0fzy6afrLZR6rneETyuBJB+KMvFzgh4=;
+	s=k20201202; t=1680709605;
+	bh=BRXV6rAWpc0/CXcNW2cHbdZA6l0F6lbjVb8xQjdp5Es=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WpExVkEELG5OkSDW97GOsdLYhfXOjszCbAjneEGtUIVptFkbz94wE07eqg2d6V7hp
-	 09VplT7MWmdPJaA1bAVUNsrjGkg+8d9UZMtd+Tr9tJbIV7/brHkABfh//efDhHEa8H
-	 f9tPRPB4iI7QfMXVRrPUCuLpmxynPAfatOD32e91z85Moum0UEG/yzSLjWJXL1IH8v
-	 bg1aXn7UqMIR8Dw2t7iWdJtCZBdj0W5Po0KDeazw0QgXqJkMOF1nqePvex2zZfoBQy
-	 o1jDFkBsCbkZk5eIzRysoo+g2CRcI0YUZ1GICxP8ggKvENC6kP+mDR5bhpov+2YIMu
-	 kMRX3y9jvEUfA==
+	b=RFBRoFAN7xUa3vqYMf/KeC7NMmCy+G35xe1KKuGNOY0n5Y9A75spHh1l2SZPlnsUf
+	 oP4IZkm8MRvMEjDK0bDqr9qaWxV2kcX0onmobR3rBbMEx2aJTU9vx9YAtkkx6woVCx
+	 u1hvpruBwTgC9GJx44qv5BNUcY9GuWHmTRsSjSCxumhaR63uR2Zovh1DWJTCbbFzXS
+	 1Uw1evoQJ1ufqzF3p+7g40Nu7d6FYssUxEAwLVHqGWp0IwzgSn3/xFY5Nz2O7Ddm91
+	 Cja07pfEs5O8RUn9GvF4SnIdusj6h3I/PKb41C7iExreMNTgN8+5vBiDx/2vgmlGk6
+	 juj07dxMpwv7w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pk5Fv-0062PV-Bw;
-	Wed, 05 Apr 2023 16:41:03 +0100
+	id 1pk5Ft-0062PV-Qs;
+	Wed, 05 Apr 2023 16:41:02 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v9 45/50] KVM: arm64: nv: Allocate VNCR page when required
-Date: Wed,  5 Apr 2023 16:40:03 +0100
-Message-Id: <20230405154008.3552854-46-maz@kernel.org>
+Subject: [PATCH v9 43/50] KVM: arm64: nv: Fold GICv3 host trapping requirements into guest setup
+Date: Wed,  5 Apr 2023 16:40:01 +0100
+Message-Id: <20230405154008.3552854-44-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230405154008.3552854-1-maz@kernel.org>
 References: <20230405154008.3552854-1-maz@kernel.org>
@@ -56,56 +56,100 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-If running a NV guest on an ARMv8.4-NV capable system, let's
-allocate an additional page that will be used by the hypervisor
-to fulfill system register accesses.
+Popular HW that is able to use NV also has a broken vgic implementation
+that requires trapping.
+
+On such HW, propagate the host trap bits into the guest's shadow
+ICH_HCR_EL2 register, making sure we don't allow an L2 guest to bring
+the system down.
+
+This involves a bit of tweaking so that the emulation code correctly
+poicks up the shadow state as needed, and to only partially sync
+ICH_HCR_EL2 back with the guest state to capture EOIcount.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/nested.c | 10 ++++++++++
- arch/arm64/kvm/reset.c  |  1 +
- 2 files changed, 11 insertions(+)
+ arch/arm64/kvm/hyp/vgic-v3-sr.c      |  4 ++--
+ arch/arm64/kvm/vgic/vgic-v3-nested.c | 21 ++++++++++++++++++---
+ 2 files changed, 20 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 0f535a5ff941..15264ab84ab4 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -38,6 +38,14 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
- 	if (!cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
- 		return -EINVAL;
+diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+index 75152c1ce646..aaaea35099e5 100644
+--- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -484,7 +484,7 @@ static int __vgic_v3_get_group(struct kvm_vcpu *vcpu)
+ static int __vgic_v3_highest_priority_lr(struct kvm_vcpu *vcpu, u32 vmcr,
+ 					 u64 *lr_val)
+ {
+-	unsigned int used_lrs = vcpu->arch.vgic_cpu.vgic_v3.used_lrs;
++	unsigned int used_lrs = kern_hyp_va(vcpu->arch.vgic_cpu.current_cpu_if)->used_lrs;
+ 	u8 priority = GICv3_IDLE_PRIORITY;
+ 	int i, lr = -1;
  
-+	if (cpus_have_final_cap(ARM64_HAS_ENHANCED_NESTED_VIRT)) {
-+		if (!vcpu->arch.ctxt.vncr_array)
-+			vcpu->arch.ctxt.vncr_array = (u64 *)__get_free_page(GFP_KERNEL | __GFP_ZERO);
-+
-+		if (!vcpu->arch.ctxt.vncr_array)
-+			return -ENOMEM;
-+	}
-+
- 	mutex_lock(&kvm->lock);
+@@ -523,7 +523,7 @@ static int __vgic_v3_highest_priority_lr(struct kvm_vcpu *vcpu, u32 vmcr,
+ static int __vgic_v3_find_active_lr(struct kvm_vcpu *vcpu, int intid,
+ 				    u64 *lr_val)
+ {
+-	unsigned int used_lrs = vcpu->arch.vgic_cpu.vgic_v3.used_lrs;
++	unsigned int used_lrs = kern_hyp_va(vcpu->arch.vgic_cpu.current_cpu_if)->used_lrs;
+ 	int i;
  
- 	/*
-@@ -67,6 +75,8 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
- 		    kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 2], 0)) {
- 			kvm_free_stage2_pgd(&tmp[num_mmus - 1]);
- 			kvm_free_stage2_pgd(&tmp[num_mmus - 2]);
-+			free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
-+			vcpu->arch.ctxt.vncr_array = NULL;
- 		} else {
- 			kvm->arch.nested_mmus_size = num_mmus;
- 			ret = 0;
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 49a3257dec46..8417d2fa0ebd 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -161,6 +161,7 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	if (sve_state)
- 		kvm_unshare_hyp(sve_state, sve_state + vcpu_sve_state_size(vcpu));
- 	kfree(sve_state);
-+	free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
- 	kfree(vcpu->arch.ccsidr);
- }
+ 	for (i = 0; i < used_lrs; i++) {
+diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+index 12937bc86e1c..51f97bd4489d 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
++++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+@@ -149,9 +149,20 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
+ void vgic_v3_create_shadow_state(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.shadow_vgic_v3;
++	struct vgic_v3_cpu_if *host_if = &vcpu->arch.vgic_cpu.vgic_v3;
++	u64 val = 0;
+ 	int i;
  
+-	cpu_if->vgic_hcr = __vcpu_sys_reg(vcpu, ICH_HCR_EL2);
++	/*
++	 * If we're on a system with a broken vgic that requires
++	 * trapping, propagate the trapping requirements.
++	 *
++	 * Ah, the smell of rotten fruits...
++	 */
++	if (static_branch_unlikely(&vgic_v3_cpuif_trap))
++		val = host_if->vgic_hcr & (ICH_HCR_TALL0 | ICH_HCR_TALL1 |
++					   ICH_HCR_TC | ICH_HCR_TDIR);
++	cpu_if->vgic_hcr = __vcpu_sys_reg(vcpu, ICH_HCR_EL2) | val;
+ 	cpu_if->vgic_vmcr = __vcpu_sys_reg(vcpu, ICH_VMCR_EL2);
+ 
+ 	for (i = 0; i < 4; i++) {
+@@ -181,6 +192,7 @@ void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
+ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v3_cpu_if *s_cpu_if = vcpu_shadow_if(vcpu);
++	u64 val;
+ 	int i;
+ 
+ 	__vgic_v3_save_state(s_cpu_if);
+@@ -189,7 +201,10 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+ 	 * Translate the shadow state HW fields back to the virtual ones
+ 	 * before copying the shadow struct back to the nested one.
+ 	 */
+-	__vcpu_sys_reg(vcpu, ICH_HCR_EL2) = s_cpu_if->vgic_hcr;
++	val = __vcpu_sys_reg(vcpu, ICH_HCR_EL2);
++	val &= ~ICH_HCR_EOIcount_MASK;
++	val |= (s_cpu_if->vgic_hcr & ICH_HCR_EOIcount_MASK);
++	__vcpu_sys_reg(vcpu, ICH_HCR_EL2) = val;
+ 	__vcpu_sys_reg(vcpu, ICH_VMCR_EL2) = s_cpu_if->vgic_vmcr;
+ 
+ 	for (i = 0; i < 4; i++) {
+@@ -198,7 +213,7 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	for (i = 0; i < kvm_vgic_global_state.nr_lr; i++) {
+-		u64 val = __vcpu_sys_reg(vcpu, ICH_LRN(i));
++		val = __vcpu_sys_reg(vcpu, ICH_LRN(i));
+ 
+ 		val &= ~ICH_LR_STATE;
+ 		val |= s_cpu_if->vgic_lr[i] & ICH_LR_STATE;
 -- 
 2.34.1
 
