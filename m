@@ -1,105 +1,246 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37CF71FBB
-	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 18:45:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE859C433D2;
-	Wed,  5 Apr 2023 18:45:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1680720324;
-	bh=J4UXmvYvYK4qcl8j2VAxL3b5OKdzwzoxr4JqIjRd1yc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OC9h/SL18UE5n/uOg4q4G/GN7qko2Gk5oICyENCvzkROtev2tYyDsRHI/ynEzzZHA
-	 GK4xicRbSI9LnBJyeb1DTvtMZ5ehTYz8jDrdt6VFJrdtUSiyxIbtDzBWub79w7WGVX
-	 6M4KJajC1dPsiWx3/bPeCetPV8K301erbcvRkexa+R8Y/d3PVdG9cGGiBxhlfOmx0r
-	 E1w8/9irS30pz+LvRJTP5tpNkAutbN4hVfIoUYpFy9HQbdbqdyKspJyfDYbU5c7F1t
-	 DC8MeXE/hlMNyDKJNGn84J2ENapalf+LtYeLPTrrdR8XawY1HHR7mPD4gpSJ9HENTB
-	 6kU5WwjAEACUQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pk88I-0065Zq-Eb;
-	Wed, 05 Apr 2023 19:45:22 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	Oliver Upton <oliver.upton@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v3 00/13] KVM: arm64: Userspace SMCCC call filtering
-Date: Wed,  5 Apr 2023 19:45:18 +0100
-Message-Id: <168072017406.3602423.3927825887664687371.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230404154050.2270077-1-oliver.upton@linux.dev>
-References: <20230404154050.2270077-1-oliver.upton@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AA3879CC
+	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 21:01:36 +0000 (UTC)
+Received: by mail-pj1-f48.google.com with SMTP id x15so35285199pjk.2
+        for <kvmarm@lists.linux.dev>; Wed, 05 Apr 2023 14:01:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1680728496;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fHFlMisxaJ0plZrJeiWQsYMJJxbUcOQBZpoj9lXl62o=;
+        b=o68UQJlSeR/2dP30d3/3CG29eQi7NJUexGjKnFCJlBRne7MBh/pnOLR6z5hr0IcBKF
+         rGtNS+VfkApuHBT4LOZszkfDA5ur0hx2XsTYBVaUo9Mpo8zstckblRhZIrIFyUAyNKeC
+         bImEOJVQiHH/0xwOgCdHD3FzLTUkJUOUg8YxvZjMvIvVZvTfDl/MO8+nVHCZ6Hjl/s9/
+         nBOkPddImEOqiBfKtLNmE4rQkxJtcAAr2zemszvWQQ2l4d4CdHEk5hq0cYT/tIfQAHNQ
+         PalbkNTzzkjmk+8KnlFVIxi2D0sXhuYRAxUUR3QGgi5uBzGsU5s1ufo++LrWQ+Aq5Ks9
+         PXBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680728496;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fHFlMisxaJ0plZrJeiWQsYMJJxbUcOQBZpoj9lXl62o=;
+        b=JK+pDV37xWQQXF01G9lp5ASBQtnVVgtDfDygqa6btdyxmLfL6ceLYQFyrpITwKnaHr
+         en9gf6LVjj1u5BHneQEJKHE8hEPiIrzNUDB9c2Fx+G2G1Sdp3BjfkfUB/leL47gCZabA
+         Y2JoiV8HPZ0oX2dbNg0Apu1xPupsNPkhFZv9gxAWR3Wb2qyRevGO3iv1J4fy8f8R3moI
+         Z7jp4YWk+9cNQhea7PZjFEM5YIjcpK6iuSjQECmNH6w/ymQrBXix0a4Jcp3ELlXOEKys
+         7eh/fGYTkeRl5dahRdZvg5K2i/OvQNLbS39Mm2ZslaMjMa5H15+q6/KVk8ib/HCW7Xct
+         G2cw==
+X-Gm-Message-State: AAQBX9d50wWa2AffONHc+uSDj59qI56HONdLxGEeXJafgs3yw34AhEnU
+	0mNkgoXqncNhKa5Pkn6ox6tlASEFdnCZ4vNEVAJXDw==
+X-Google-Smtp-Source: AKy350aHiztqd9S0M+CMjOQXju2vYq2NssFDb70LAGMoQGKeCoDHJhiRNivzaqFcE6TN33nMAdUuT1+/TPOGcn3A86M=
+X-Received: by 2002:a17:902:a40a:b0:1a0:535b:22d9 with SMTP id
+ p10-20020a170902a40a00b001a0535b22d9mr3252431plq.10.1680728495555; Wed, 05
+ Apr 2023 14:01:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, oliver.upton@linux.dev, pbonzini@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, salil.mehta@huawei.com, seanjc@google.com, yuzenghui@huawei.com, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+References: <20230330224348.1006691-1-davidai@google.com> <ZCx97IKjsBibjdGc@linux.dev>
+ <86sfdfv0e1.wl-maz@kernel.org>
+In-Reply-To: <86sfdfv0e1.wl-maz@kernel.org>
+From: Saravana Kannan <saravanak@google.com>
+Date: Wed, 5 Apr 2023 14:00:59 -0700
+Message-ID: <CAGETcx90SiaztPO21GsHSr18XUTHoLWt3Jv+y=EW5yfjJgzJHw@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/6] Improve VM DVFS and task placement behavior
+To: Marc Zyngier <maz@kernel.org>
+Cc: David Dai <davidai@google.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>, 
+	Sudeep Holla <sudeep.holla@arm.com>, Ingo Molnar <mingo@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Dietmar Eggemann <dietmar.eggemann@arm.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
+	Daniel Bristot de Oliveira <bristot@redhat.com>, Valentin Schneider <vschneid@redhat.com>, kernel-team@android.com, 
+	linux-pm@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 4 Apr 2023 15:40:37 +0000, Oliver Upton wrote:
-> The Arm SMCCC is rather prescriptive in regards to the allocation of
-> SMCCC function ID ranges. Many of the hypercall ranges have an
-> associated specification from Arm (FF-A, PSCI, SDEI, etc.) with some
-> room for vendor-specific implementations.
-> 
-> The ever-expanding SMCCC surface leaves a lot of work within KVM for
-> providing new features. Furthermore, KVM implements its own
-> vendor-specific ABI, with little room for other implementations (like
-> Hyper-V, for example). Rather than cramming it all into the kernel we
-> should provide a way for userspace to handle hypercalls.
-> 
-> [...]
+On Tue, Apr 4, 2023 at 1:49=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Tue, 04 Apr 2023 20:43:40 +0100,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+> >
+> > Folks,
+> >
+> > On Thu, Mar 30, 2023 at 03:43:35PM -0700, David Dai wrote:
+> >
+> > <snip>
+> >
+> > > PCMark
+> > > Higher is better
+> > > +-------------------+----------+------------+--------+-------+-------=
+-+
+> > > | Test Case (score) | Baseline |  Hypercall | %delta |  MMIO | %delta=
+ |
+> > > +-------------------+----------+------------+--------+-------+-------=
+-+
+> > > | Weighted Total    |     6136 |       7274 |   +19% |  6867 |   +12%=
+ |
+> > > +-------------------+----------+------------+--------+-------+-------=
+-+
+> > > | Web Browsing      |     5558 |       6273 |   +13% |  6035 |    +9%=
+ |
+> > > +-------------------+----------+------------+--------+-------+-------=
+-+
+> > > | Video Editing     |     4921 |       5221 |    +6% |  5167 |    +5%=
+ |
+> > > +-------------------+----------+------------+--------+-------+-------=
+-+
+> > > | Writing           |     6864 |       8825 |   +29% |  8529 |   +24%=
+ |
+> > > +-------------------+----------+------------+--------+-------+-------=
+-+
+> > > | Photo Editing     |     7983 |      11593 |   +45% | 10812 |   +35%=
+ |
+> > > +-------------------+----------+------------+--------+-------+-------=
+-+
+> > > | Data Manipulation |     5814 |       6081 |    +5% |  5327 |    -8%=
+ |
+> > > +-------------------+----------+------------+--------+-------+-------=
+-+
+> > >
+> > > PCMark Performance/mAh
+> > > Higher is better
+> > > +-----------+----------+-----------+--------+------+--------+
+> > > |           | Baseline | Hypercall | %delta | MMIO | %delta |
+> > > +-----------+----------+-----------+--------+------+--------+
+> > > | Score/mAh |       79 |        88 |   +11% |   83 |    +7% |
+> > > +-----------+----------+-----------+--------+------+--------+
+> > >
+> > > Roblox
+> > > Higher is better
+> > > +-----+----------+------------+--------+-------+--------+
+> > > |     | Baseline |  Hypercall | %delta |  MMIO | %delta |
+> > > +-----+----------+------------+--------+-------+--------+
+> > > | FPS |    18.25 |      28.66 |   +57% | 24.06 |   +32% |
+> > > +-----+----------+------------+--------+-------+--------+
+> > >
+> > > Roblox Frames/mAh
+> > > Higher is better
+> > > +------------+----------+------------+--------+--------+--------+
+> > > |            | Baseline |  Hypercall | %delta |   MMIO | %delta |
+> > > +------------+----------+------------+--------+--------+--------+
+> > > | Frames/mAh |    91.25 |     114.64 |   +26% | 103.11 |   +13% |
+> > > +------------+----------+------------+--------+--------+--------+
+> >
+> > </snip>
+> >
+> > > Next steps:
+> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > We are continuing to look into communication mechanisms other than
+> > > hypercalls that are just as/more efficient and avoid switching into t=
+he VMM
+> > > userspace. Any inputs in this regard are greatly appreciated.
 
-Applied to next, thanks!
+Hi Oliver and Marc,
 
-[01/13] KVM: x86: Redefine 'longmode' as a flag for KVM_EXIT_HYPERCALL
-        commit: e65733b5c59a1ea20324a03494364958bef3fc68
-[02/13] KVM: arm64: Add a helper to check if a VM has ran once
-        commit: de40bb8abb764f6866d82c4e2a43acdb22892cf4
-[03/13] KVM: arm64: Add vm fd device attribute accessors
-        commit: e0fc6b21616dd917899ee4a2d4126b4a963c0871
-[04/13] KVM: arm64: Rename SMC/HVC call handler to reflect reality
-        commit: aac94968126beb9846c12a940f1302ece7849b4f
-[05/13] KVM: arm64: Start handling SMCs from EL1
-        commit: c2d2e9b3d8ce9db825a5630d9d52d542f5138ae0
-[06/13] KVM: arm64: Refactor hvc filtering to support different actions
-        commit: a8308b3fc9494953c453480fb277e24f82f7d2b9
-[07/13] KVM: arm64: Use a maple tree to represent the SMCCC filter
-        commit: fb88707dd39bd1d5ec4a058776de9ee99bcc7b72
-[08/13] KVM: arm64: Add support for KVM_EXIT_HYPERCALL
-        commit: d824dff1919bbd523d4d5c860437d043c0ad121d
-[09/13] KVM: arm64: Introduce support for userspace SMCCC filtering
-        commit: 821d935c87bc95253f82deec3cbb457ccf3de003
-[10/13] KVM: arm64: Return NOT_SUPPORTED to guest for unknown PSCI version
-        commit: 7e484d2785e2a2e526a6b2679d3e4c1402ffe0ec
-[11/13] KVM: arm64: Let errors from SMCCC emulation to reach userspace
-        commit: 37c8e494794786aa8e4acba1f0f5b45f37b11699
-[12/13] KVM: selftests: Add a helper for SMCCC calls with SMC instruction
-        commit: fab19915f498b0e76fabd4d78841c99b7b6d7851
-[13/13] KVM: selftests: Add test for SMCCC filter
-        commit: 60e7dade498eb881bcdf0d9a420c97625f73acc1
+Replying to both of you in this one email.
 
-I've also added the extra patch to deal with with AArch32 T1
-encodings of HVC/SMC. Please check the conflict resolution!
+> >
+> > We're highly unlikely to entertain such an interface in KVM.
+> >
+> > The entire feature is dependent on pinning vCPUs to physical cores, for=
+ which
+> > userspace is in the driver's seat. That is a well established and docum=
+ented
+> > policy which can be seen in the way we handle heterogeneous systems and
+> > vPMU.
+> >
+> > Additionally, this bloats the KVM PV ABI with highly VMM-dependent inte=
+rfaces
+> > that I would not expect to benefit the typical user of KVM.
+> >
+> > Based on the data above, it would appear that the userspace implementat=
+ion is
+> > in the same neighborhood as a KVM-based implementation, which only furt=
+her
+> > weakens the case for moving this into the kernel.
 
-Cheers,
+Oliver,
 
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+Sorry if the tables/data aren't presented in an intuitive way, but
+MMIO vs hypercall is definitely not in the same neighborhood. The
+hypercall method often gives close to 2x the improvement that the MMIO
+method gives. For example:
 
+- Roblox FPS: MMIO improves it by 32% vs hypercall improves it by 57%.
+- Frames/mAh: MMIO improves it by 13% vs hypercall improves it by 26%.
+- PC Mark Data manipulation: MMIO makes it worse by 8% vs hypercall
+improves it by 5%
 
+Hypercall does better for other cases too, just not as good. For example,
+- PC Mark Photo editing: Going from MMIO to hypercall gives a 10% improveme=
+nt.
+
+These are all pretty non-trivial, at least in the mobile world. Heck,
+whole teams would spend months for 2% improvement in battery :)
+
+> >
+> > I certainly can appreciate the motivation for the series, but this feat=
+ure
+> > should be in userspace as some form of a virtual device.
+>
+> +1 on all of the above.
+
+Marc and Oliver,
+
+We are not tied to hypercalls. We want to do the right thing here, but
+MMIO going all the way to userspace definitely doesn't cut it as is.
+This is where we need some guidance. See more below.
+
+> The one thing I'd like to understand that the comment seems to imply
+> that there is a significant difference in overhead between a hypercall
+> and an MMIO. In my experience, both are pretty similar in cost for a
+> handling location (both in userspace or both in the kernel).
+
+I think the main difference really is that in our hypercall vs MMIO
+comparison the hypercall is handled in the kernel vs MMIO goes all the
+way to userspace. I agree with you that the difference probably won't
+be significant if both of them go to the same "depth" in the privilege
+levels.
+
+> MMIO
+> handling is a tiny bit more expensive due to a guaranteed TLB miss
+> followed by a walk of the in-kernel device ranges, but that's all. It
+> should hardly register.
+>
+> And if you really want some super-low latency, low overhead
+> signalling, maybe an exception is the wrong tool for the job. Shared
+> memory communication could be more appropriate.
+
+Yeah, that's one of our next steps. Ideally, we want to use shared
+memory for the host to guest information flow. It's a 32-bit value
+representing the current frequency that the host can update whenever
+the host CPU frequency changes and the guest can read whenever it
+needs it.
+
+For guest to host information flow, we'll need a kick from guest to
+host because we need to take action on the host side when threads
+migrate between vCPUs and cause a significant change in vCPU util.
+Again it can be just a shared memory and some kick. This is what we
+are currently trying to figure out how to do.
+
+If there are APIs to do this, can you point us to those please? We'd
+also want the shared memory to be accessible by the VMM (so, shared
+between guest kernel, host kernel and VMM).
+
+Are the above next steps sane? Or is that a no-go? The main thing we
+want to cut out is the need for having to switch to userspace for
+every single interaction because, as is, it leaves a lot on the table.
+
+Also, thanks for all the feedback. Glad to receive it.
+
+-Saravana
