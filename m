@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E5D6ABC
-	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:46:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14225C433D2;
-	Wed,  5 Apr 2023 15:46:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 862406ABC
+	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:46:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A3C3C433D2;
+	Wed,  5 Apr 2023 15:46:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1680709576;
-	bh=q9r1hOTNh/oLCfkMuKIIcbe+H8ghVFyameXVN/4crsY=;
+	s=k20201202; t=1680709583;
+	bh=jexwEcEYoC0w5lw9cBv3BUVfKVxaWNo5BXzlFRvTiKE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CIbUyv8yMPeDkGi3BJLYFGLnn8Z/wG6rJWWQcBu5hpGwZdFS9bLA5r9Dl/CdDdmpM
-	 GKzt/DDKMoHlSWz4R9HBqgm4mhFwYbeY+LrazOYiLHoMy0LbwqA26+AjTgKZwhfj+l
-	 EeSEfmiz+TDgCUcnv1k3gKfvkZ7BY33Dc/EeRwe6aJaS1Aeh8chOY733qDcRGoZXXD
-	 6L1DzS756sgl466Yw81/lO+HPUg6y1uatVfiQhZwvviICSJifWeKq/1yHN8/y8ZYkv
-	 2lE3L4hOId0hS8/EZQhjmVqmz6WvkktylZNbtJO6jBsuUl+Q0cc7D4rEBZN2Qh7Yzn
-	 9tQvLyau1pAGw==
+	b=gRE37ppRuH/Tkwl23J0CS1yiyT0L6bnufzl5owffXuf0Q/UzPPjLGyYsWhl8gws8C
+	 RsjjQ3oNHlzV44SoWH0qWfnuJUz5sH56XViiPHubJKry0pMMzWbkCaqWz2/8MiyDTx
+	 uTxiTQ8Awr950Ogb5gY9zKiovV3ll0PNpQU64isi+ECiADMwGS9WIxKn+MCwvz8RtX
+	 7KVyK9NQy3h0MJeOfrAkSAWU750C5M4364NDe81jkV/+EzDTAqqWPYhckwAzJ9rwqq
+	 nkeCBF358TJBkPMqY8sgD1OJwlzy2tns9kpxluGOSI8qaI6eEhQh0cdHoyniMQImu4
+	 6bEPK9cx/uB3Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pk5Fw-0062PV-G8;
-	Wed, 05 Apr 2023 16:41:04 +0100
+	id 1pk5Fq-0062PV-AB;
+	Wed, 05 Apr 2023 16:40:59 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v9 49/50] KVM: arm64: nv: Use FEAT_ECV to trap access to EL0 timers
-Date: Wed,  5 Apr 2023 16:40:07 +0100
-Message-Id: <20230405154008.3552854-50-maz@kernel.org>
+Subject: [PATCH v9 41/50] KVM: arm64: Add FEAT_NV2 cpu feature
+Date: Wed,  5 Apr 2023 16:39:59 +0100
+Message-Id: <20230405154008.3552854-42-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230405154008.3552854-1-maz@kernel.org>
 References: <20230405154008.3552854-1-maz@kernel.org>
@@ -56,107 +56,53 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Although FEAT_NV2 makes most things fast, it also makes it impossible
-to correctly emulate the timers, as the sysreg accesses are redirected
-to memory.
-
-FEAT_ECV addresses this by giving a hypervisor the ability to trap
-the EL02 sysregs as well as the virtual timer.
-
-Add the required trap setting to make use of the feature, allowing
-us to elide the ugly resync in the middle of the run loop.
+Add the detection code for the FEAT_NV2 feature.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arch_timer.c          | 37 +++++++++++++++++++++++++---
- include/clocksource/arm_arch_timer.h |  4 +++
- 2 files changed, 38 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_nested.h |  6 ++++++
+ arch/arm64/kernel/cpufeature.c      | 11 +++++++++++
+ 2 files changed, 17 insertions(+)
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 98fddb4a846d..e3b5bd7cf15c 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -790,7 +790,7 @@ static void kvm_timer_vcpu_load_nested_switch(struct kvm_vcpu *vcpu,
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 784168dcb0fe..a58c3df12379 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -14,6 +14,12 @@ static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
+ 		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
+ }
  
- static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
- {
--	bool tpt, tpc;
-+	bool tvt, tpt, tvc, tpc, tvt02, tpt02;
- 	u64 clr, set;
- 
- 	/*
-@@ -805,7 +805,30 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
- 	 * within this function, reality kicks in and we start adding
- 	 * traps based on emulation requirements.
- 	 */
--	tpt = tpc = false;
-+	tvt = tpt = tvc = tpc = false;
-+	tvt02 = tpt02 = false;
++static inline bool vcpu_has_nv2(const struct kvm_vcpu *vcpu)
++{
++	return cpus_have_final_cap(ARM64_HAS_ENHANCED_NESTED_VIRT) &&
++		vcpu_has_nv(vcpu);
++}
 +
-+	/*
-+	 * NV2 badly breaks the timer semantics by redirecting accesses to
-+	 * the EL0 timer state to memory, so let's call ECV to the rescue if
-+	 * available: we trap all CNT{P,V}_{CTL,CVAL,TVAL}_EL0 accesses.
-+	 *
-+	 * The treatment slightly varies depending whether we run a nVHE or
-+	 * VHE guest: nVHE will use the _EL0 registers directly, while VHE
-+	 * will use the _EL02 accessors. This translates in different trap
-+	 * bits.
-+	 *
-+	 * None of the trapping is required when running in non-HYP context,
-+	 * unless required by the L1 hypervisor settings once we advertise
-+	 * ECV+NV in the guest, or that we need trapping for other reasons.
-+	 */
-+	if (cpus_have_final_cap(ARM64_HAS_ECV) &&
-+	    vcpu_has_nv2(vcpu) && is_hyp_ctxt(vcpu)) {
-+		if (vcpu_el2_e2h_is_set(vcpu))
-+			tvt02 = tpt02 = true;
-+		else
-+			tvt = tpt = true;
-+	}
- 
- 	/*
- 	 * We have two possibility to deal with a physical offset:
-@@ -845,6 +868,10 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
- 
- 	assign_clear_set_bit(tpt, CNTHCTL_EL1PCEN << 10, set, clr);
- 	assign_clear_set_bit(tpc, CNTHCTL_EL1PCTEN << 10, set, clr);
-+	assign_clear_set_bit(tvt, CNTHCTL_EL1TVT, clr, set);
-+	assign_clear_set_bit(tvc, CNTHCTL_EL1TVCT, clr, set);
-+	assign_clear_set_bit(tvt02, CNTHCTL_EL1NVVCT, clr, set);
-+	assign_clear_set_bit(tpt02, CNTHCTL_EL1NVPCT, clr, set);
- 
- 	/* This only happens on VHE, so use the CNTKCTL_EL1 accessor */
- 	sysreg_clear_set(cntkctl_el1, clr, set);
-@@ -940,8 +967,12 @@ void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
- 	 * accesses redirected to the VNCR page. Any guest action taken on
- 	 * the timer is postponed until the next exit, leading to a very
- 	 * poor quality of emulation.
-+	 *
-+	 * This is an unmitigated disaster, only papered over by FEAT_ECV,
-+	 * which allows trapping of the timer registers even with NV2.
-+	 * Still, this is still worse than FEAT_NV on its own. Meh.
- 	 */
--	if (!is_hyp_ctxt(vcpu))
-+	if (cpus_have_const_cap(ARM64_HAS_ECV) || !is_hyp_ctxt(vcpu))
- 		return;
- 
- 	if (!vcpu_el2_e2h_is_set(vcpu)) {
-diff --git a/include/clocksource/arm_arch_timer.h b/include/clocksource/arm_arch_timer.h
-index cbbc9a6dc571..c62811fb4130 100644
---- a/include/clocksource/arm_arch_timer.h
-+++ b/include/clocksource/arm_arch_timer.h
-@@ -22,6 +22,10 @@
- #define CNTHCTL_EVNTDIR			(1 << 3)
- #define CNTHCTL_EVNTI			(0xF << 4)
- #define CNTHCTL_ECV			(1 << 12)
-+#define CNTHCTL_EL1TVT			(1 << 13)
-+#define CNTHCTL_EL1TVCT			(1 << 14)
-+#define CNTHCTL_EL1NVPCT		(1 << 15)
-+#define CNTHCTL_EL1NVVCT		(1 << 16)
- 
- enum arch_timer_reg {
- 	ARCH_TIMER_REG_CTRL,
+ /* Translation helpers from non-VHE EL2 to EL1 */
+ static inline u64 tcr_el2_ps_to_tcr_el1_ips(u64 tcr_el2)
+ {
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index c331c49a7d19..db877f1d3a7b 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -2298,6 +2298,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.field_width = 4,
+ 		.min_field_value = ID_AA64MMFR2_EL1_NV_IMP,
+ 	},
++	{
++		.desc = "Enhanced Nested Virtualization Support",
++		.capability = ARM64_HAS_ENHANCED_NESTED_VIRT,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.matches = has_nested_virt_support,
++		.sys_reg = SYS_ID_AA64MMFR2_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64MMFR2_EL1_NV_SHIFT,
++		.field_width = 4,
++		.min_field_value = ID_AA64MMFR2_EL1_NV_NV2,
++	},
+ 	{
+ 		.capability = ARM64_HAS_32BIT_EL0_DO_NOT_USE,
+ 		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
 -- 
 2.34.1
 
