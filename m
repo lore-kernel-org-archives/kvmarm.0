@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D03D26AD9
-	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:46:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A537CC433D2;
-	Wed,  5 Apr 2023 15:46:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E36036ABC
+	for <kvmarm@lists.linux.dev>; Wed,  5 Apr 2023 15:46:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7727C4339B;
+	Wed,  5 Apr 2023 15:46:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1680709567;
-	bh=7BO0Ssdij/dFPVApY+QX/fubB90BB/xC9flfiMh1bIA=;
+	s=k20201202; t=1680709571;
+	bh=5FKZeF4bcHwk1v+ELgygebiurlG0HlkfqX7UD+u6FrE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=vBVuY+KM7T0xq0bWBcHSWVUMSJ5I2Vx5K8zBiDExhc4OXDRYhczoqojSW1VS9AZy6
-	 I7rCaL62RfN8yLfTZ7GcE8TOKcjW9UgOSGpF//UbC5GmsUF3xxeBUDNC9+dEpw0uAj
-	 uNBhUATOdNyvNY32FXqQBklTYGrHLVQFfeq96TT13FWnHhRhmhI0vckJfqFrKQkdQW
-	 cQ13wSDeXUauS+em2/nK+Y/IjVAWfBQY3ukFS/s434a57d8aY/QvugGzdKmeicWzwy
-	 +5Jt53MD515QVeA5YgxCOFVRYntSUDAmiX5I5C12jDM+unmjn0VaesM0BFiykpL4+1
-	 5MYXZbihNXQ6g==
+	b=HBW7dABKyloKObDla8SIZglPwDt2of9gvt0WxHKYZdVcnLzLMp3Xj+wMR/fxDbjrn
+	 icg6cABJEWfJ6PY19wWhPOrHDrscWeTlXe8IRsquAaEGCNvAUzjt7Zfjpw0NsHaskk
+	 QraW35EHoU1YfhuOzlU570TLdPizUAHjEJcWci4trgUPfDFZAVkXk86B1HbHgw9jth
+	 ckut0WJErX9DuwGPNYnKOqn8qdF23OW/XZgQ9LuaLrtclYT6BvsgOO05S7om8jqrmq
+	 vmLuqs4jObOo1ihlFTwPJ9iAHD2YqfwOuMfLPVpDtt2lZbGtGmgmeP98sCj6ctenrC
+	 yKSfLc98y7UWQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pk5Fe-0062PV-EJ;
-	Wed, 05 Apr 2023 16:40:47 +0100
+	id 1pk5Fd-0062PV-I7;
+	Wed, 05 Apr 2023 16:40:46 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v9 37/50] KVM: arm64: nv: Tag shadow S2 entries with nested level
-Date: Wed,  5 Apr 2023 16:39:55 +0100
-Message-Id: <20230405154008.3552854-38-maz@kernel.org>
+Subject: [PATCH v9 36/50] KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like information
+Date: Wed,  5 Apr 2023 16:39:54 +0100
+Message-Id: <20230405154008.3552854-37-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230405154008.3552854-1-maz@kernel.org>
 References: <20230405154008.3552854-1-maz@kernel.org>
@@ -56,83 +56,135 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Populate bits [56:55] of the leaf entry with the level provided
-by the guest's S2 translation.
+In order to be able to make S2 TLB invalidations more performant on NV,
+let's use a scheme derived from the ARMv8.4 TTL extension.
+
+If bits [56:55] in the descriptor are non-zero, they indicate a level
+which can be used as an invalidation range.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h |  7 +++++++
- arch/arm64/kvm/mmu.c                | 16 ++++++++++++++--
- 2 files changed, 21 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_nested.h |  2 +
+ arch/arm64/kvm/nested.c             | 81 +++++++++++++++++++++++++++++
+ 2 files changed, 83 insertions(+)
 
 diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 52d0a6c0fecc..784168dcb0fe 100644
+index 9e5ffb68a5cd..52d0a6c0fecc 100644
 --- a/arch/arm64/include/asm/kvm_nested.h
 +++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -5,6 +5,8 @@
- #include <linux/bitfield.h>
- #include <linux/kvm_host.h>
+@@ -137,4 +137,6 @@ struct sys_reg_desc;
+ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+ 			  const struct sys_reg_desc *r);
  
-+#include <asm/kvm_pgtable.h>
-+
- static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
- {
- 	return (!__is_defined(__KVM_NVHE_HYPERVISOR__) &&
-@@ -139,4 +141,9 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
- 
- #define KVM_NV_GUEST_MAP_SZ	(KVM_PGTABLE_PROT_SW1 | KVM_PGTABLE_PROT_SW0)
- 
-+static inline u64 kvm_encode_nested_level(struct kvm_s2_trans *trans)
-+{
-+	return FIELD_PREP(KVM_NV_GUEST_MAP_SZ, trans->level);
-+}
++#define KVM_NV_GUEST_MAP_SZ	(KVM_PGTABLE_PROT_SW1 | KVM_PGTABLE_PROT_SW0)
 +
  #endif /* __ARM64_KVM_NESTED_H */
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 7fd122d687f7..42bce05261c5 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1456,11 +1456,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * Potentially reduce shadow S2 permissions to match the guest's own
- 	 * S2. For exec faults, we'd only reach this point if the guest
- 	 * actually allowed it (see kvm_s2_handle_perm_fault).
-+	 *
-+	 * Also encode the level of the nested translation in the SW bits of
-+	 * the PTE/PMD/PUD. This will be retrived on TLB invalidation from
-+	 * the guest.
- 	 */
- 	if (nested) {
- 		writable &= kvm_s2_trans_writable(nested);
- 		if (!kvm_s2_trans_readable(nested))
- 			prot &= ~KVM_PGTABLE_PROT_R;
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index b46d58d4542c..0f535a5ff941 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -4,6 +4,7 @@
+  * Author: Jintack Lim <jintack.lim@linaro.org>
+  */
+ 
++#include <linux/bitfield.h>
+ #include <linux/kvm.h>
+ #include <linux/kvm_host.h>
+ 
+@@ -413,6 +414,81 @@ static unsigned int ttl_to_size(u8 ttl)
+ 	return max_size;
+ }
+ 
++/*
++ * Compute the equivalent of the TTL field by parsing the shadow PT.  The
++ * granule size is extracted from the cached VTCR_EL2.TG0 while the level is
++ * retrieved from first entry carrying the level as a tag.
++ */
++static u8 get_guest_mapping_ttl(struct kvm_s2_mmu *mmu, u64 addr)
++{
++	u64 tmp, sz = 0, vtcr = mmu->vtcr;
++	kvm_pte_t pte;
++	u8 ttl, level;
 +
-+		prot |= kvm_encode_nested_level(nested);
- 	}
- 
- 	read_lock(&kvm->mmu_lock);
-@@ -1514,14 +1520,20 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * permissions only if vma_pagesize equals fault_granule. Otherwise,
- 	 * kvm_pgtable_stage2_map() should be called to change block size.
- 	 */
--	if (fault_status == ESR_ELx_FSC_PERM && vma_pagesize == fault_granule)
-+	if (fault_status == ESR_ELx_FSC_PERM && vma_pagesize == fault_granule) {
-+		/*
-+		 * Drop the SW bits in favour of those stored in the
-+		 * PTE, which will be preserved.
-+		 */
-+		prot &= ~KVM_NV_GUEST_MAP_SZ;
- 		ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
--	else
-+	} else {
- 		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
- 					     __pfn_to_phys(pfn), prot,
- 					     memcache,
- 					     KVM_PGTABLE_WALK_HANDLE_FAULT |
- 					     KVM_PGTABLE_WALK_SHARED);
++	switch (vtcr & VTCR_EL2_TG0_MASK) {
++	case VTCR_EL2_TG0_4K:
++		ttl = (1 << 2);
++		break;
++	case VTCR_EL2_TG0_16K:
++		ttl = (2 << 2);
++		break;
++	case VTCR_EL2_TG0_64K:
++		ttl = (3 << 2);
++		break;
++	default:
++		BUG();
 +	}
++
++	tmp = addr;
++
++again:
++	/* Iteratively compute the block sizes for a particular granule size */
++	switch (vtcr & VTCR_EL2_TG0_MASK) {
++	case VTCR_EL2_TG0_4K:
++		if	(sz < SZ_4K)	sz = SZ_4K;
++		else if (sz < SZ_2M)	sz = SZ_2M;
++		else if (sz < SZ_1G)	sz = SZ_1G;
++		else			sz = 0;
++		break;
++	case VTCR_EL2_TG0_16K:
++		if	(sz < SZ_16K)	sz = SZ_16K;
++		else if (sz < SZ_32M)	sz = SZ_32M;
++		else			sz = 0;
++		break;
++	case VTCR_EL2_TG0_64K:
++		if	(sz < SZ_64K)	sz = SZ_64K;
++		else if (sz < SZ_512M)	sz = SZ_512M;
++		else			sz = 0;
++		break;
++	default:
++		BUG();
++	}
++
++	if (sz == 0)
++		return 0;
++
++	tmp &= ~(sz - 1);
++	if (kvm_pgtable_get_leaf(mmu->pgt, tmp, &pte, NULL))
++		goto again;
++	if (!(pte & PTE_VALID))
++		goto again;
++	level = FIELD_GET(KVM_NV_GUEST_MAP_SZ, pte);
++	if (!level)
++		goto again;
++
++	ttl |= level;
++
++	/*
++	 * We now have found some level information in the shadow S2. Check
++	 * that the resulting range is actually including the original IPA.
++	 */
++	sz = ttl_to_size(ttl);
++	if (addr < (tmp + sz))
++		return ttl;
++
++	return 0;
++}
++
+ unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val)
+ {
+ 	unsigned long max_size;
+@@ -420,6 +496,11 @@ unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val)
  
- 	/* Mark the page dirty only if the fault is handled successfully */
- 	if (writable && !ret) {
+ 	ttl = FIELD_GET(GENMASK_ULL(47, 44), val);
+ 
++	if (!(cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL) && ttl)) {
++		u64 addr = (val & GENMASK_ULL(35, 0)) << 12;
++		ttl = get_guest_mapping_ttl(mmu, addr);
++	}
++
+ 	max_size = ttl_to_size(ttl);
+ 
+ 	if (!max_size) {
 -- 
 2.34.1
 
