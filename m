@@ -1,82 +1,69 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 097E58BE0
-	for <kvmarm@lists.linux.dev>; Thu,  6 Apr 2023 15:48:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD5F7C433D2;
-	Thu,  6 Apr 2023 15:48:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2EA88BE0
+	for <kvmarm@lists.linux.dev>; Thu,  6 Apr 2023 15:52:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E85E1C4339B;
+	Thu,  6 Apr 2023 15:52:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1680796138;
-	bh=34/Zlt4htBGJgLYgA2mf1PBt32s5lUf3YI5evv+PwzE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=D7zxynq8HRn4kJeQhHBvFnLHjZ8ju+Eb7dFz232hmOrhF/MqeZ5wmrKIBfeSQiOnt
-	 CUSXgqKQcQXJ9sOmgzzvu3n1/kuJwDE7WkZxA4LwlnWK1+msnF8UsaEXHUwBPDEZ8d
-	 XsaOo5wLs8EYeXr1xxdaSMh0bwwvQnpRDWOE118o9UvsZ09MygGW4CjVwg0OPknKif
-	 m62k+njaTviZs7niYwjZk4JRrQvH4kO39brIrVd9scMiiqkz0D2lim2+Zg/SNIEPLU
-	 Ikn+5w1eXq6RdVfdxfWk0HnNt3I77T//IqX+xrEUKyOxHYUSA/GFGdBaOh9vlnerTi
-	 ZtLvTmxy9Hbiw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pkRr6-006MBX-Jj;
-	Thu, 06 Apr 2023 16:48:56 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH] KVM: arm64: vhe: Drop extra isb() on guest exit
-Date: Thu,  6 Apr 2023 16:48:53 +0100
-Message-Id: <20230406154853.3860511-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+	s=k20201202; t=1680796325;
+	bh=K3nKlwtLW4ov+c1tQtsAtihdZk18gxkUszK5KsfK0nY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=BuQpaykZID2uYzqXxVEB8vKhzVAIsIIYdZDCOKztxJqWWR8DoLqGXDp+heC4FTQ6I
+	 w+eBIQk2ijM7AKvhNKzW4SjRwOP1c4zi8Bl4/i1WGgIIXmqo8QJcNQxj1sdZvRYgAa
+	 KjfiN6dJbF3/2fef2spdBWCmre/0VhVdzPZCdmyUYCqBeRpb76lWe6HK57jtT/2fCn
+	 fGHiK+kODIHCgdldh1JgHOsEFOP173Y0Bv6UMWA9MQVP+/6li2ie2OTdPGjbH1iME1
+	 LUFyxd0QTd129ku8H4eEPuW3aSTaSVEv018rTBSLj/hoLo/AAqCusx3B4zl24cLJ4i
+	 Wwlr8Aq7r1YMg==
+From: Will Deacon <will@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: catalin.marinas@arm.com,
+	kernel-team@android.com,
+	Will Deacon <will@kernel.org>,
+	maz@kernel.org,
+	alexandru.elisei@arm.com,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH] arm: Do not add padding alignment for hugetlbfs backed memory
+Date: Thu,  6 Apr 2023 16:51:51 +0100
+Message-Id: <168079121966.329537.16952736151329909027.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20230405110905.669217-1-suzuki.poulose@arm.com>
+References: <20230405110905.669217-1-suzuki.poulose@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-__kvm_vcpu_run_vhe() end on VHE with an isb(). However, this
-function is only reachable via kvm_call_hyp_ret(), which already
-contains an isb() in order to mimick the behaviour of nVHE and
-provide a context synchronisation event.
+On Wed, 5 Apr 2023 12:09:05 +0100, Suzuki K Poulose wrote:
+> The arm code tries to align the memory allocation size to 2M to potentially
+> make use of the transparent hugepages. But this would be problematic if we
+> try to allocate from the hugetlbfs, where the allocation size could be more than
+> 2M. Given we support upto 1G, let use leave it to the user to align the
+> requested memory when hugetlbfs is used.
+> 
+> Without the patch:
+>  $ echo 1 > /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages
+>  $ mount -t hugetlbfs -o pagesize=1G none /root/hugemem/
+>  $  lkvm run -m 1024 --hugetlbfs /root/hugemem/  ...
+>    # lkvm run -k ...  -m 1024 -c 6
+>    Fatal: Can't ftruncate for mem mapping size 1075838976
+> 
+> [...]
 
-We thus have two isb()s back to back, which is one too many.
-Drop the first one and solely rely on the one in the helper.
+Applied to kvmtool (master), thanks!
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/hyp/vhe/switch.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+[1/1] arm: Do not add padding alignment for hugetlbfs backed memory
+      https://git.kernel.org/will/kvmtool/c/77b108c6a6f1
 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index cd3f3117bf16..3d868e84c7a0 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -227,11 +227,10 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 
- 	/*
- 	 * When we exit from the guest we change a number of CPU configuration
--	 * parameters, such as traps.  Make sure these changes take effect
--	 * before running the host or additional guests.
-+	 * parameters, such as traps.  We rely on the isb() in kvm_call_hyp*()
-+	 * to make sure these changes take effect before running the host or
-+	 * additional guests.
- 	 */
--	isb();
--
- 	return ret;
- }
- 
+Cheers,
 -- 
-2.34.1
+Will
 
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
