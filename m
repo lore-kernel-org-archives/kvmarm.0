@@ -1,300 +1,206 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C1A5EA3
-	for <kvmarm@lists.linux.dev>; Thu,  6 Apr 2023 08:42:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80BF2C433EF;
-	Thu,  6 Apr 2023 08:42:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1680770547;
-	bh=i3Ygol4vLeOR82TBK9DpW4bTLHkspuPPD6gKyABYHMI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=i5+gAyOI7VCazBa5+/A5mCmEIM4o3q3BpZtKQaaY0H6gzleKFszck/GDN5kMVk1gL
-	 AjPmGg8DTt/RJ1pd031YBTz+AlshMAPFf5cCiSJVfNw41eLFseMutPsVF0EhbHGVWk
-	 UegmFQ+3591c38spZk/PVV8j1uI9viGaUDyU5YuQr459vXSKZWdPMT708dEkzjsd77
-	 psxxNtfE4TM+UpKND0WlNovrI7SIalxPc3xj6oxd6miAVba2ecpFOM2i5GBnnTUXSN
-	 8mLNKmInlBgwidENNWhlJENR/FmmBBbAdA5qZ9gCWPEXoP/CxpWwzebvQzDtLnv1R2
-	 dTSMkkXDHf6xg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pkLCL-006FGs-2X;
-	Thu, 06 Apr 2023 09:42:25 +0100
-Date: Thu, 06 Apr 2023 09:42:24 +0100
-Message-ID: <86o7o1v1u7.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3632F29A1
+	for <kvmarm@lists.linux.dev>; Thu,  6 Apr 2023 12:52:57 +0000 (UTC)
+Received: by mail-ej1-f46.google.com with SMTP id 18so1124334ejo.13
+        for <kvmarm@lists.linux.dev>; Thu, 06 Apr 2023 05:52:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1680785575; x=1683377575;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=IJscOEPUxerIocq5ivhaFnZ1SHI0paGFj+4RY7CI49c=;
+        b=mmi2ytKq+NaQhoDUPRHBUEjRhCCPgZiy7rLgIJXfMFck1daXezUDFfW+f8Ya9qW8Nu
+         77o8Nv8mCPZJVOJ/Mw5IkzQ/lVA8K8pLYcnCheg3aUT4rIjJIAXX7Utgjw5MQqmXLhtW
+         435VTHVUt6RP3++nMGoeLtublMXBqOmF5FEHQb6o99n31lb7S6WZxLIvcTevt83tl6fV
+         cKM/LYDc4weOyCwuDkg3btNjWsl6SyXFBeMGeyFU1GWXKNRtgmCulev2zmpW5HSdx9TQ
+         WDUIoKFjlt3z2DEYShN6woFM3WBqXviuTCQLf58p6eWApFbTnPJA8N2vEAKJbmcOE3wx
+         8r5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680785575; x=1683377575;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IJscOEPUxerIocq5ivhaFnZ1SHI0paGFj+4RY7CI49c=;
+        b=nV8X8AZtVUUUPSflWUCj1eLJS4/Qnp8/xe/hTuNsVd+i7THsSoh+7h+RpD2gJiQenb
+         duznG/U7xiK73lNSZ3bWuGGXOLo2vav2T+AdxwMBgQTwYZhEB6ryQivRoH8TLRd/euzY
+         viLdkIAn8xqNz2pRvc/wk6wW7DnI1VcB7VdkrdEvioztlm4ryUW6l70+MFBkAVoU4uBK
+         A6Xys+b6IH3yI5oc5mKI3/ixC5sJS0lPdExcq4ZS+nFvIwNj8KQfKXQxXd6g0BN/jfiq
+         rarIzxTOgJ60b/um02AM1jlgjD4cQFO951ZDdd412316WVA9ummdJ5tIKFzz6TGYh9zj
+         qp5Q==
+X-Gm-Message-State: AAQBX9c8hWP+2UNDnOFXENyD+VAlqHWurMmpSRNnYyIKrkZuAn3A7qoo
+	1aBZ3xi9ka8oDvKbjMzvRNoeEA==
+X-Google-Smtp-Source: AKy350ZjSeUi5W/FMFj8cFd3FZ8IBUmJZCdwJjwrxRaSX9z1B2tETRyepfqtj3cs2LAQGBpYvDx5aA==
+X-Received: by 2002:a17:906:9be2:b0:931:624b:680c with SMTP id de34-20020a1709069be200b00931624b680cmr6404112ejc.29.1680785575139;
+        Thu, 06 Apr 2023 05:52:55 -0700 (PDT)
+Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
+        by smtp.gmail.com with ESMTPSA id rj13-20020a1709076c8d00b00947ccb6150bsm657067ejc.102.2023.04.06.05.52.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Apr 2023 05:52:54 -0700 (PDT)
+Date: Thu, 6 Apr 2023 12:52:51 +0000
+From: Quentin Perret <qperret@google.com>
 To: Saravana Kannan <saravanak@google.com>
-Cc: David Dai <davidai@google.com>,
+Cc: Marc Zyngier <maz@kernel.org>, David Dai <davidai@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	"Rafael J. Wysocki" <rafael@kernel.org>,
 	Viresh Kumar <viresh.kumar@linaro.org>,
 	Rob Herring <robh+dt@kernel.org>,
 	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
 	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	James Morse <james.morse@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
 	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	Ingo Molnar <mingo@redhat.com>,
+	Sudeep Holla <sudeep.holla@arm.com>, Ingo Molnar <mingo@redhat.com>,
 	Peter Zijlstra <peterz@infradead.org>,
 	Juri Lelli <juri.lelli@redhat.com>,
 	Vincent Guittot <vincent.guittot@linaro.org>,
 	Dietmar Eggemann <dietmar.eggemann@arm.com>,
 	Steven Rostedt <rostedt@goodmis.org>,
-	Ben Segall <bsegall@google.com>,
-	Mel Gorman <mgorman@suse.de>,
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
 	Daniel Bristot de Oliveira <bristot@redhat.com>,
-	Valentin Schneider <vschneid@redhat.com>,
-	kernel-team@android.com,
-	linux-pm@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
+	Valentin Schneider <vschneid@redhat.com>, kernel-team@android.com,
+	linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
 Subject: Re: [RFC PATCH 0/6] Improve VM DVFS and task placement behavior
-In-Reply-To: <CAGETcx90SiaztPO21GsHSr18XUTHoLWt3Jv+y=EW5yfjJgzJHw@mail.gmail.com>
+Message-ID: <ZC7Ao1qoNGYXQ9h4@google.com>
 References: <20230330224348.1006691-1-davidai@google.com>
-	<ZCx97IKjsBibjdGc@linux.dev>
-	<86sfdfv0e1.wl-maz@kernel.org>
-	<CAGETcx90SiaztPO21GsHSr18XUTHoLWt3Jv+y=EW5yfjJgzJHw@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <ZCx97IKjsBibjdGc@linux.dev>
+ <86sfdfv0e1.wl-maz@kernel.org>
+ <ZC0n0HRsmNJeJZps@google.com>
+ <CAGETcx_9SdyCQ5UHhjsnV5+X8arhXoZS2NN-mewtPM3oHuZrkw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: saravanak@google.com, davidai@google.com, oliver.upton@linux.dev, rafael@kernel.org, viresh.kumar@linaro.org, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, pbonzini@redhat.com, corbet@lwn.net, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, lpieralisi@kernel.org, sudeep.holla@arm.com, mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com, kernel-team@android.com, linux-pm@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAGETcx_9SdyCQ5UHhjsnV5+X8arhXoZS2NN-mewtPM3oHuZrkw@mail.gmail.com>
 
-On Wed, 05 Apr 2023 22:00:59 +0100,
-Saravana Kannan <saravanak@google.com> wrote:
->=20
-> On Tue, Apr 4, 2023 at 1:49=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrot=
-e:
+On Wednesday 05 Apr 2023 at 14:07:18 (-0700), Saravana Kannan wrote:
+> On Wed, Apr 5, 2023 at 12:48 AM 'Quentin Perret' via kernel-team
+> > And I concur with all the above as well. Putting this in the kernel is
+> > not an obvious fit at all as that requires a number of assumptions about
+> > the VMM.
 > >
-> > On Tue, 04 Apr 2023 20:43:40 +0100,
-> > Oliver Upton <oliver.upton@linux.dev> wrote:
-> > >
-> > > Folks,
-> > >
-> > > On Thu, Mar 30, 2023 at 03:43:35PM -0700, David Dai wrote:
-> > >
-> > > <snip>
-> > >
-> > > > PCMark
-> > > > Higher is better
-> > > > +-------------------+----------+------------+--------+-------+-----=
----+
-> > > > | Test Case (score) | Baseline |  Hypercall | %delta |  MMIO | %del=
-ta |
-> > > > +-------------------+----------+------------+--------+-------+-----=
----+
-> > > > | Weighted Total    |     6136 |       7274 |   +19% |  6867 |   +1=
-2% |
-> > > > +-------------------+----------+------------+--------+-------+-----=
----+
-> > > > | Web Browsing      |     5558 |       6273 |   +13% |  6035 |    +=
-9% |
-> > > > +-------------------+----------+------------+--------+-------+-----=
----+
-> > > > | Video Editing     |     4921 |       5221 |    +6% |  5167 |    +=
-5% |
-> > > > +-------------------+----------+------------+--------+-------+-----=
----+
-> > > > | Writing           |     6864 |       8825 |   +29% |  8529 |   +2=
-4% |
-> > > > +-------------------+----------+------------+--------+-------+-----=
----+
-> > > > | Photo Editing     |     7983 |      11593 |   +45% | 10812 |   +3=
-5% |
-> > > > +-------------------+----------+------------+--------+-------+-----=
----+
-> > > > | Data Manipulation |     5814 |       6081 |    +5% |  5327 |    -=
-8% |
-> > > > +-------------------+----------+------------+--------+-------+-----=
----+
-> > > >
-> > > > PCMark Performance/mAh
-> > > > Higher is better
-> > > > +-----------+----------+-----------+--------+------+--------+
-> > > > |           | Baseline | Hypercall | %delta | MMIO | %delta |
-> > > > +-----------+----------+-----------+--------+------+--------+
-> > > > | Score/mAh |       79 |        88 |   +11% |   83 |    +7% |
-> > > > +-----------+----------+-----------+--------+------+--------+
-> > > >
-> > > > Roblox
-> > > > Higher is better
-> > > > +-----+----------+------------+--------+-------+--------+
-> > > > |     | Baseline |  Hypercall | %delta |  MMIO | %delta |
-> > > > +-----+----------+------------+--------+-------+--------+
-> > > > | FPS |    18.25 |      28.66 |   +57% | 24.06 |   +32% |
-> > > > +-----+----------+------------+--------+-------+--------+
-> > > >
-> > > > Roblox Frames/mAh
-> > > > Higher is better
-> > > > +------------+----------+------------+--------+--------+--------+
-> > > > |            | Baseline |  Hypercall | %delta |   MMIO | %delta |
-> > > > +------------+----------+------------+--------+--------+--------+
-> > > > | Frames/mAh |    91.25 |     114.64 |   +26% | 103.11 |   +13% |
-> > > > +------------+----------+------------+--------+--------+--------+
-> > >
-> > > </snip>
-> > >
-> > > > Next steps:
-> > > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > > We are continuing to look into communication mechanisms other than
-> > > > hypercalls that are just as/more efficient and avoid switching into=
- the VMM
-> > > > userspace. Any inputs in this regard are greatly appreciated.
->=20
-> Hi Oliver and Marc,
->=20
-> Replying to both of you in this one email.
->=20
-> > >
-> > > We're highly unlikely to entertain such an interface in KVM.
-> > >
-> > > The entire feature is dependent on pinning vCPUs to physical cores, f=
-or which
-> > > userspace is in the driver's seat. That is a well established and doc=
-umented
-> > > policy which can be seen in the way we handle heterogeneous systems a=
-nd
-> > > vPMU.
-> > >
-> > > Additionally, this bloats the KVM PV ABI with highly VMM-dependent in=
-terfaces
-> > > that I would not expect to benefit the typical user of KVM.
-> > >
-> > > Based on the data above, it would appear that the userspace implement=
-ation is
-> > > in the same neighborhood as a KVM-based implementation, which only fu=
-rther
-> > > weakens the case for moving this into the kernel.
->=20
-> Oliver,
->=20
-> Sorry if the tables/data aren't presented in an intuitive way, but
-> MMIO vs hypercall is definitely not in the same neighborhood. The
-> hypercall method often gives close to 2x the improvement that the MMIO
-> method gives. For example:
->=20
-> - Roblox FPS: MMIO improves it by 32% vs hypercall improves it by 57%.
-> - Frames/mAh: MMIO improves it by 13% vs hypercall improves it by 26%.
-> - PC Mark Data manipulation: MMIO makes it worse by 8% vs hypercall
-> improves it by 5%
->=20
-> Hypercall does better for other cases too, just not as good. For example,
-> - PC Mark Photo editing: Going from MMIO to hypercall gives a 10% improve=
-ment.
->=20
-> These are all pretty non-trivial, at least in the mobile world. Heck,
-> whole teams would spend months for 2% improvement in battery :)
+> > As Oliver pointed out, the guest topology, and how it maps to the host
+> > topology (vcpu pinning etc) is very much a VMM policy decision and will
+> > be particularly important to handle guest frequency requests correctly.
+> >
+> > In addition to that, the VMM's software architecture may have an impact.
+> > Crosvm for example does device emulation in separate processes for
+> > security reasons, so it is likely that adjusting the scheduling
+> > parameters ('util_guest', uclamp, or else) only for the vCPU thread that
+> > issues frequency requests will be sub-optimal for performance, we may
+> > want to adjust those parameters for all the tasks that are on the
+> > critical path.
+> >
+> > And at an even higher level, assuming in the kernel a certain mapping of
+> > vCPU threads to host threads feels kinda wrong, this too is a host
+> > userspace policy decision I believe. Not that anybody in their right
+> > mind would want to do this, but I _think_ it would technically be
+> > feasible to serialize the execution of multiple vCPUs on the same host
+> > thread, at which point the util_guest thingy becomes entirely bogus. (I
+> > obviously don't want to conflate this use-case, it's just an example
+> > that shows the proposed abstraction in the series is not a perfect fit
+> > for the KVM userspace delegation model.)
+> 
+> See my reply to Oliver and Marc. To me it looks like we are converging
+> towards having shared memory between guest, host kernel and VMM and
+> that should address all our concerns.
+
+Hmm, that is not at all my understanding of what has been the most
+important part of the feedback so far: this whole thing belongs to
+userspace.
+
+> The guest will see a MMIO device, writing to it will trigger the host
+> kernel to do the basic "set util_guest/uclamp for the vCPU thread that
+> corresponds to the vCPU" and then the VMM can do more on top as/if
+> needed (because it has access to the shared memory too). Does that
+> make sense?
+
+Not really no. I've given examples of why this doesn't make sense for
+the kernel to do this, which still seems to be the case with what you're
+suggesting here.
+
+> Even in the extreme example, the stuff the kernel would do would still
+> be helpful, but not sufficient. You can aggregate the
+> util_guest/uclamp and do whatever from the VMM.
+> Technically in the extreme example, you don't need any of this. The
+> normal util tracking of the vCPU thread on the host side would be
+> sufficient.
 >
+> Actually any time we have only 1 vCPU host thread per VM, we shouldn't
+> be using anything in this patch series and not instantiate the guest
+> device at all.
+
+> > So +1 from me to move this as a virtual device of some kind. And if the
+> > extra cost of exiting all the way back to userspace is prohibitive (is
+> > it btw?),
+> 
+> I think the "13% increase in battery consumption for games" makes it
+> pretty clear that going to userspace is prohibitive. And that's just
+> one example.
+
+I beg to differ. We need to understand where these 13% come from in more
+details. Is it really the actual cost of the userspace exit? Or is it
+just that from userspace the only knob you can play with is uclamp and
+that didn't reach the expected level of performance?
+
+If that is the userspace exit, then we can work to optimize that -- it's
+a fairly common problem in the virt world, nothing special here.
+
+And if the issue is the lack of expressiveness in uclamp, then that too
+is something we should work on, but clearly giving vCPU threads more
+'power' than normal host threads is a bit of a red flag IMO. vCPU
+threads must be constrained in the same way that userspace threads are,
+because they _are_ userspace threads.
+
+> > then we can try to work on that. Maybe something a la vhost
+> > can be done to optimize, I'll have a think.
+> >
+> > > The one thing I'd like to understand that the comment seems to imply
+> > > that there is a significant difference in overhead between a hypercall
+> > > and an MMIO. In my experience, both are pretty similar in cost for a
+> > > handling location (both in userspace or both in the kernel). MMIO
+> > > handling is a tiny bit more expensive due to a guaranteed TLB miss
+> > > followed by a walk of the in-kernel device ranges, but that's all. It
+> > > should hardly register.
 > > >
-> > > I certainly can appreciate the motivation for the series, but this fe=
-ature
-> > > should be in userspace as some form of a virtual device.
+> > > And if you really want some super-low latency, low overhead
+> > > signalling, maybe an exception is the wrong tool for the job. Shared
+> > > memory communication could be more appropriate.
 > >
-> > +1 on all of the above.
->=20
-> Marc and Oliver,
->=20
-> We are not tied to hypercalls. We want to do the right thing here, but
-> MMIO going all the way to userspace definitely doesn't cut it as is.
-> This is where we need some guidance. See more below.
+> > I presume some kind of signalling mechanism will be necessary to
+> > synchronously update host scheduling parameters in response to guest
+> > frequency requests, but if the volume of data requires it then a shared
+> > buffer + doorbell type of approach should do.
+> 
+> Part of the communication doesn't need synchronous handling by the
+> host. So, what I said above.
 
-I don't buy this assertion at all. An MMIO in userspace is already
-much better than nothing. One of my many objection to the whole series
-is that it is built as a massively invasive thing that has too many
-fingers in too many pies, with unsustainable assumptions such as 1:1
-mapping between CPU and vCPUs.
+I've also replied to another message about the scale invariance issue,
+and I'm not convinced the frequency based interface proposed here really
+makes sense. An AMU-like interface is very likely to be superior.
 
-I'd rather you build something simple first (pure userspace using
-MMIOs), work out where the bottlenecks are, and work with us to add
-what is needed to get to something sensible, and only that. I'm not
-willing to sacrifice maintainability for maximum performance (the
-whole thing reminds me of the in-kernel http server...).
+> > Thinking about it, using SCMI over virtio would implement exactly that.
+> > Linux-as-a-guest already supports it IIRC, so possibly the problem
+> > being addressed in this series could be 'simply' solved using an SCMI
+> > backend in the VMM...
+> 
+> This will be worse than all the options we've tried so far because it
+> has the userspace overhead AND uclamp overhead.
 
->=20
-> > The one thing I'd like to understand that the comment seems to imply
-> > that there is a significant difference in overhead between a hypercall
-> > and an MMIO. In my experience, both are pretty similar in cost for a
-> > handling location (both in userspace or both in the kernel).
->=20
-> I think the main difference really is that in our hypercall vs MMIO
-> comparison the hypercall is handled in the kernel vs MMIO goes all the
-> way to userspace. I agree with you that the difference probably won't
-> be significant if both of them go to the same "depth" in the privilege
-> levels.
->=20
-> > MMIO
-> > handling is a tiny bit more expensive due to a guaranteed TLB miss
-> > followed by a walk of the in-kernel device ranges, but that's all. It
-> > should hardly register.
-> >
-> > And if you really want some super-low latency, low overhead
-> > signalling, maybe an exception is the wrong tool for the job. Shared
-> > memory communication could be more appropriate.
->=20
-> Yeah, that's one of our next steps. Ideally, we want to use shared
-> memory for the host to guest information flow. It's a 32-bit value
-> representing the current frequency that the host can update whenever
-> the host CPU frequency changes and the guest can read whenever it
-> needs it.
-
-Why should the guest care? Why can't the guest ask for an arbitrary
-capacity, and get what it gets? You give no information as to *why*
-you are doing what you are doing...
-
->=20
-> For guest to host information flow, we'll need a kick from guest to
-> host because we need to take action on the host side when threads
-> migrate between vCPUs and cause a significant change in vCPU util.
-> Again it can be just a shared memory and some kick. This is what we
-> are currently trying to figure out how to do.
-
-That kick would have to go to userspace. There is no way I'm willing
-to introduce scheduling primitives inside KVM (the ones we have are
-ridiculously bad anyway), and I very much want to avoid extra PV gunk.
-
-> If there are APIs to do this, can you point us to those please? We'd
-> also want the shared memory to be accessible by the VMM (so, shared
-> between guest kernel, host kernel and VMM).
-
-By default, *ALL* the memory is shared. Isn't that wonderful?
-
->=20
-> Are the above next steps sane? Or is that a no-go? The main thing we
-> want to cut out is the need for having to switch to userspace for
-> every single interaction because, as is, it leaves a lot on the table.
-
-Well, for a start, you could disclose how often you hit this DVFS
-"device", and when are the critical state changes that must happen
-immediately vs those that can simply be posted without having to take
-immediate effect.
-
-This sort of information would be much more interesting than a bunch
-of benchmarks I know nothing about.
+But it doesn't violate the whole KVM userspace delegation model, so we
+should start from there and then optimize further if need be.
 
 Thanks,
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
+Quentin
