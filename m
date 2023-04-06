@@ -1,96 +1,89 @@
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0232ECA
-	for <kvmarm@lists.linux.dev>; Thu,  6 Apr 2023 07:39:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=PSTnZvKPii8CuqOLasDZa85RvXeN5qcfEeMj/qPN4AI=; b=NS+Rj5XNebo6MF4JhS2WqHg+pY
-	ILIdptlQ1bk40yfARr2w/c3p1krt6L0pMWX612ksBo1yCxk9YxCWaqf2t7UWlPP1tCrwpnQzKCNd3
-	cBi2ZFmaJ7k+LwPVX3gYnTYJSIF3tMDHiTVxOXbMEKAhDpOq3v6ZOpOU9kD7sFxxavM5TdWx5S3fd
-	gOJSgcgQM086pSBofRNXZVbJkznDSLzclz5TcbU0TrQy0hMUae0+OQhMcsOIPqKSLyv67cepA8V7m
-	9Tiogm4Fuxu1w4JrHqEV6JFitpcmTral7U/bnGHxrFZX4jTpKUycTLFmHBUJJZD1SM7/dBCTXlEOZ
-	0K21+nJQ==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1pkKCn-00ASbW-0T;
-	Thu, 06 Apr 2023 07:38:49 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(Client did not present a certificate)
-	by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 74E9D3000DC;
-	Thu,  6 Apr 2023 09:38:48 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 5BAFA24C025F1; Thu,  6 Apr 2023 09:38:48 +0200 (CEST)
-Date: Thu, 6 Apr 2023 09:38:48 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Saravana Kannan <saravanak@google.com>
-Cc: David Dai <davidai@google.com>, "Rafael J. Wysocki" <rafael@kernel.org>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2E0AECA
+	for <kvmarm@lists.linux.dev>; Thu,  6 Apr 2023 08:02:30 +0000 (UTC)
+Received: by mail-wr1-f47.google.com with SMTP id l27so38622479wrb.2
+        for <kvmarm@lists.linux.dev>; Thu, 06 Apr 2023 01:02:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1680768149;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aV1ZnUUJLqxOvx3H0XRFtDasoGMKHSB5Y7fc9UvZtzk=;
+        b=YgAI2RKmmfNtFPE/EL3tY0mL4x4CM1XeV17+kFv+MwARKdbfDenoKaze/zdW1ShSez
+         4n9nQmcyv9Wm8Om/THcxFYGjdNVr8TQ63gFwBT3zhS1V+YvR7C4TWRsSv5hDmiesos1r
+         vHJ6Yk6rr+3LhneR3H2GCBqoRiJlvGn32SrrRhsWei72mN48CrOH766Ty2ApW+7FRSQg
+         X3VGA7dS47sideSdlPoLAXNoN5lEDQ9KKc+06Iky+TgJPQyBSdjNC8TJsxT4y+r2jIQT
+         RhN1SqAZlfj4CSG+T/XMW0CDZG/vL96vm09vw0FNrS5+kiGdvRWeOfDONaQgB6meiOWM
+         Jy0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680768149;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aV1ZnUUJLqxOvx3H0XRFtDasoGMKHSB5Y7fc9UvZtzk=;
+        b=AhRqAA1OuzisitUNRuw7Q2ioxV1H5R5NacGjr64PBtBAwwKYEKrqsEObNiu9xOG4WS
+         ErpGYFcmv6xqmJO8XQ/phEfO8al2mLLcILBP/yFWM7pS2dVbOlVSeBuq1tZaXM5iNFhT
+         dfFyM8uT1f2lf3emJaLZ7sPthhXw6sKMUmoo9cL7tdH8Ja3/fJRjAHuKQbOgYlwZ1QV0
+         7WtLyoVKcbct40NKaGMISRO/obtjKKq22h753S9CjiBbxiSsuHDIZUrRRUCQ/YGaSzkP
+         zaip0H3lE8/2coFpQ6qSNIpNJZWDTpgPNiXnvEB1kvJ2V3pqmBM+rNRmhErhlZK/ixw7
+         xYhQ==
+X-Gm-Message-State: AAQBX9cRkdjrnEL3Zl43vuPW8X4X51v3cWLx7fKzXhmEMRpAxiWRSxu+
+	m/XEyVu/k/HkfLSE0KBuOU0=
+X-Google-Smtp-Source: AKy350b9h7ZEL2DRsB2Pm+8XOYlemA64X3N8kveF+ecbq572GltkKa28E4U1bJN1sMSfw1pXKqN7ug==
+X-Received: by 2002:a5d:4950:0:b0:2ce:fd37:9392 with SMTP id r16-20020a5d4950000000b002cefd379392mr5485266wrs.45.1680768148950;
+        Thu, 06 Apr 2023 01:02:28 -0700 (PDT)
+Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
+        by smtp.gmail.com with ESMTPSA id b14-20020adfde0e000000b002d1bfe3269esm1008601wrm.59.2023.04.06.01.02.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Apr 2023 01:02:28 -0700 (PDT)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Sudeep Holla <sudeep.holla@arm.com>, Ingo Molnar <mingo@redhat.com>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-	Daniel Bristot de Oliveira <bristot@redhat.com>,
-	Valentin Schneider <vschneid@redhat.com>, kernel-team@android.com,
-	linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [RFC PATCH 0/6] Improve VM DVFS and task placement behavior
-Message-ID: <20230406073848.GC386572@hirez.programming.kicks-ass.net>
-References: <20230330224348.1006691-1-davidai@google.com>
- <20230405080548.GW4253@hirez.programming.kicks-ass.net>
- <CAGETcx-qgKeUQ60VhvW+hYUY-sMh-wX1G8zSwJUFpJ-u7aU6aA@mail.gmail.com>
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH][next] KVM: selftests: Fix spelling mistake "KVM_HYPERCAL_EXIT_SMC" -> "KVM_HYPERCALL_EXIT_SMC"
+Date: Thu,  6 Apr 2023 09:02:26 +0100
+Message-Id: <20230406080226.122955-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAGETcx-qgKeUQ60VhvW+hYUY-sMh-wX1G8zSwJUFpJ-u7aU6aA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 05, 2023 at 02:08:43PM -0700, Saravana Kannan wrote:
+There is a spelling mistake in a test assert message. Fix it.
 
-> The only 2 pieces of information shared between host/guest are:
-> 
-> 1. Host CPU frequency -- this isn't really scheduler internals and
-> will map nicely to a virtual cpufreq driver.
-> 
-> 2. A vCPU util value between 0 - 1024 where 1024 corresponds to the
-> highest performance point across all CPUs (taking freq, arch, etc into
-> consideration). Yes, this currently matches how the run queue util is
-> tracked, but we can document the interface as "percentage of max
-> performance capability", but representing it as 0 - 1024 instead of
-> 0-100. That way, even if the scheduler changes how it tracks util in
-> the future, we can still keep this interface between guest/host and
-> map it appropriately on the host end.
-> 
-> In either case, we could even have a Windows guest where they might
-> track vCPU utilization differently and still have this work with the
-> Linux host with this interface.
-> 
-> Does that sound reasonable to you?
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ tools/testing/selftests/kvm/aarch64/smccc_filter.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Yeah, I suppose that's managable.
+diff --git a/tools/testing/selftests/kvm/aarch64/smccc_filter.c b/tools/testing/selftests/kvm/aarch64/smccc_filter.c
+index 0f9db0641847..82650313451a 100644
+--- a/tools/testing/selftests/kvm/aarch64/smccc_filter.c
++++ b/tools/testing/selftests/kvm/aarch64/smccc_filter.c
+@@ -211,7 +211,7 @@ static void expect_call_fwd_to_user(struct kvm_vcpu *vcpu, uint32_t func_id,
+ 			    "KVM_HYPERCALL_EXIT_SMC is not set");
+ 	else
+ 		TEST_ASSERT(!(run->hypercall.flags & KVM_HYPERCALL_EXIT_SMC),
+-			    "KVM_HYPERCAL_EXIT_SMC is set");
++			    "KVM_HYPERCALL_EXIT_SMC is set");
+ }
+ 
+ /* SMCCC calls forwarded to userspace cause KVM_EXIT_HYPERCALL exits */
+-- 
+2.30.2
 
-Something that wasn't initially clear to me; all this hard assumes a 1:1
-vCPU:CPU relation, right? Which isn't typical in virt land.
