@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B581FB6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94371FB9
 	for <kvmarm@lists.linux.dev>; Sat,  8 Apr 2023 16:04:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C61EC433D2;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49675C433A7;
 	Sat,  8 Apr 2023 16:04:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1680969891;
-	bh=ccwv9tH1t6Cn5/tuDW4QfW8z+r1vALUHZQx9EhTTIF4=;
+	bh=o/DlzcCv84E0d74WXt/xXFCBSqi2CyUM8zi9WxCI7Us=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oqs///SlMfArkEyC7hr6aTV8TJuqjLcFggwo97O8Ze51BhcFzmrhJCZXui0e/SPj9
-	 A/vdBI1C4QhwdATZG09RcfGnQ3q2OfY4wiPofj5fOX65u14vhZ9TsXmYKJNbFvMOy9
-	 YSfVPD0fk8ovzbPISxbEu8A4fczBJO8UfShQYxKGwSwHzVy8jEt+aoUbhlGzI1R0rD
-	 rlLHgHH7yNOUvFPBCHSkJLnNGjF3cDV56iOeQRjsR8TdPznHk/ck5H4UYm4MuSY0xL
-	 4jY+15aPavHH0jbtdzyf2yEk/GOv7lVw2ftv3UAjXO+tfniuJf7kFIpca/wvdHhgl6
-	 Pofce64LZwJNQ==
+	b=klPdRbLe352Fge1Qc59RuURYq2dt6qvaWC+FY7ocmmamZ0T3D+SCYF0E+cHnPMWXL
+	 NQW76nhH62ihWXnx2y7M4Zm+Ek6bByRzQLj758zWzs2Ed7qtTbXXBEQGBT8S11yI+j
+	 8Wd9fC++KB4wfMa6Hm+nhjjJDEue+1i7r5Yf549F5EQhxRHRp6TFcrIM8M2uxUO1tO
+	 fc6RCgUxCM8JE3X5wqcDMpmfN5Zd+oCigqe0KL1++Wd8RouWFSvFpJkRcI4ILL+06k
+	 OaI+rV/8P8D0O2o7dTY64FFOZZyV8sQbulf+Sad2t/ilMoxrYmLmBVDAFvjaWlw1Mu
+	 U3zdoe+5QnJXw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1plB3Y-006wc5-UL;
-	Sat, 08 Apr 2023 17:04:48 +0100
+	id 1plB3Z-006wc5-FR;
+	Sat, 08 Apr 2023 17:04:49 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -30,9 +30,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Will Deacon <will@kernel.org>
-Subject: [PATCH v2 1/5] KVM: arm64: nvhe: Synchronise with page table walker on vcpu run
-Date: Sat,  8 Apr 2023 17:04:23 +0100
-Message-Id: <20230408160427.10672-2-maz@kernel.org>
+Subject: [PATCH v2 4/5] KVM: arm64: vhe: Synchronise with page table walker on MMU update
+Date: Sat,  8 Apr 2023 17:04:26 +0100
+Message-Id: <20230408160427.10672-5-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230408160427.10672-1-maz@kernel.org>
 References: <20230408160427.10672-1-maz@kernel.org>
@@ -48,81 +48,50 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-When taking an exception between the EL1&0 translation regime and
-the EL2 translation regime, the page table walker is allowed to
-complete the walks started from EL0 or EL1 while running at EL2.
+Contrary to nVHE, VHE is a lot easier when it comes to dealing
+with speculative page table walks started at EL1. As we only change
+EL1&0 translation regime when context-switching, we already benefit
+from the effect of the DSB that sits in the context switch code.
 
-It means that altering the system registers that define the EL1&0
-translation regime is fraught with danger *unless* we wait for
-the completion of such walk with a DSB (R_LFHQG and subsequent
-statements in the ARM ARM). We already did the right thing for
-other external agents (SPE, TRBE), but not the PTW.
-
-Rework the existing SPE/TRBE synchronisation to include the PTW,
-and add the missing DSB on guest exit.
+We only need to take care of it in the NV case, where we can
+flip between between two EL1 contexts (one of them being the virtual
+EL2) without a context switch.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/nvhe/debug-sr.c |  2 --
- arch/arm64/kvm/hyp/nvhe/switch.c   | 18 ++++++++++++++++++
- 2 files changed, 18 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-index 2673bde62fad..d756b939f296 100644
---- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-@@ -37,7 +37,6 @@ static void __debug_save_spe(u64 *pmscr_el1)
+diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+index 7b44f6b3b547..b35a178e7e0d 100644
+--- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+@@ -13,6 +13,7 @@
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_hyp.h>
++#include <asm/kvm_nested.h>
  
- 	/* Now drain all buffered data to memory */
- 	psb_csync();
--	dsb(nsh);
- }
- 
- static void __debug_restore_spe(u64 pmscr_el1)
-@@ -69,7 +68,6 @@ static void __debug_save_trace(u64 *trfcr_el1)
- 	isb();
- 	/* Drain the trace buffer to memory */
- 	tsb_csync();
--	dsb(nsh);
- }
- 
- static void __debug_restore_trace(u64 trfcr_el1)
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index c2cb46ca4fb6..71fa16a0dc77 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -272,6 +272,17 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	 */
- 	__debug_save_host_buffers_nvhe(vcpu);
+ /*
+  * VHE: Host and guest must save mdscr_el1 and sp_el0 (and the PC and
+@@ -69,6 +70,17 @@ void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu)
+ 	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+ 	__sysreg_save_user_state(host_ctxt);
  
 +	/*
-+	 * We're about to restore some new MMU state. Make sure
-+	 * ongoing page-table walks that have started before we
-+	 * trapped to EL2 have completed. This also synchronises the
-+	 * above disabling of SPE and TRBE.
-+	 *
-+	 * See DDI0487I.a D8.1.5 "Out-of-context translation regimes",
-+	 * rule R_LFHQG and subsequent information statements.
++	 * When running a normal EL1 guest, we only load a new vcpu
++	 * after a context switch, which imvolves a DSB, so all
++	 * speculative EL1&0 walks will have already completed.
++	 * If running NV, the vcpu may transition between vEL1 and
++	 * vEL2 without a context switch, so make sure we complete
++	 * those walks before loading a new context.
 +	 */
-+	dsb(nsh);
++	if (vcpu_has_nv(vcpu))
++		dsb(nsh);
 +
- 	__kvm_adjust_pc(vcpu);
- 
  	/*
-@@ -306,6 +317,13 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	__timer_disable_traps(vcpu);
- 	__hyp_vgic_save_state(vcpu);
- 
-+	/*
-+	 * Same thing as before the guest run: we're about to switch
-+	 * the MMU context, so let's make sure we don't have any
-+	 * ongoing EL1&0 translations.
-+	 */
-+	dsb(nsh);
-+
- 	__deactivate_traps(vcpu);
- 	__load_host_stage2();
- 
+ 	 * Load guest EL1 and user state
+ 	 *
 -- 
 2.34.1
 
