@@ -1,88 +1,108 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A576AFFB
-	for <kvmarm@lists.linux.dev>; Fri,  7 Apr 2023 23:30:46 +0000 (UTC)
-Received: by mail-pl1-f202.google.com with SMTP id n15-20020a170902f60f00b001a273a4a685so16425487plg.15
-        for <kvmarm@lists.linux.dev>; Fri, 07 Apr 2023 16:30:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1153917C0
+	for <kvmarm@lists.linux.dev>; Sat,  8 Apr 2023 03:49:29 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id e199-20020a2550d0000000b00b8db8a4530dso2709774ybb.5
+        for <kvmarm@lists.linux.dev>; Fri, 07 Apr 2023 20:49:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680910246;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lFUj6O6CB3iiBV1uvi/t8sklxmHPNBdsFm6z4ma14Yo=;
-        b=g5wwO/E/km9HV/J4Uo40AnPSisucwkmavL4S1Pf4Fx0jHCk1WbKxYKFrTEZxFx6XHp
-         2exvb76Kc6SS9Ds8LXjXF0I1WFqClQxCNCC6sf4daSWTnp+YpnSO2121ov5N7kOpcqib
-         YCLGPirwnvPcpp/S3fo5s+vT7QnEVjcGGwmgFHFlmScqbAaLkGHrQ6ia2vS3XVAARuDd
-         sMCqZDZFuZewtQIjpJWpW7S/bUTL7IiTKNWpDkyOWB4W2AE70oenj4IH+Pui3ZI77/9t
-         egivxNBn8aOes50PuEtPh0HjwIwXrfmgH5cXyJJ/cO29tWSweCMf9GcheLm+s0IsbY3F
-         CJyg==
+        d=google.com; s=20210112; t=1680925769; x=1683517769;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=mG6DQun3X6e8Ycs1sxk5r+7eU2NYVjbJa0bqr1sphFc=;
+        b=a7N4k+eWIN2ClbGZHuEu4ZylavHenpxLMS7+ncTPOK+Dgz/TJT+rakguvQnf4r8UMr
+         +sAwlaXxOS5HDwmahTMQ9qvsjBsDdMIn1ezJaSwYH2YaSKDe72mbZxO6kt9EdA1odxKj
+         cxm+2byY8NLxVOwoJMDosZ4Or2SqtYgYAClM6j1UfaP9VGVERyXZjoQo43L5CFGhzO9E
+         1hIfWsbdAehKuulLfbpHWccJMAhnl6uZY8ZMP6BQiNr78nw/v1jkKLOD+s5F0a/EjOjn
+         w3/YQNPt6PbXh7fcCxohoua1sMi3KpK5DORyHYDnl4ZvW3gQl2z99XMfCyI75+y40WMX
+         SNjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680910246;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lFUj6O6CB3iiBV1uvi/t8sklxmHPNBdsFm6z4ma14Yo=;
-        b=4ZOXZjWVYXHTjULewpHwGj4vrZa0wJ/a7hDsS6KLsv6C6loB53jY5LNEoD/ITmsmPP
-         1bJ+Au9RBbPJzorAegKL1fmhp6iFPwSRpBCpZXcwLwSYZNu2dLioii8Vmf1gQAtOlMQW
-         DVJqMsnucuQctJusTG4AMIpnUCQGIx3ANSdIlq7S79ekjF84edwazbQkVygVrbzMaF7b
-         mqgUEqgLM9+eK+AbQdCLyBvG3Rb9g/kbBhA8vJy9WJNsicz+EQlhU1Afg/ML+zfFYFoL
-         IBRMt4k7Jp8LUhsmspeLcNqzli0lR0ygieW55MJGaSjIY+j6vIaNXyV7uPdc4dZQkpEh
-         wshA==
-X-Gm-Message-State: AAQBX9dXWAcXtvSX4Pyy/V83zdPdcYP+MZr0zmaKCuAwXdrLDrFcv9Xy
-	Nl6BeR9fbRfSm17hFG1jEG1Z8eDHY9A=
-X-Google-Smtp-Source: AKy350YxihhHFMNV20FoO+AQH03z9Y8GXCy5PhVvBVZ1Rdqa7VXUgXNseSxSRo6RlhR0sxbeKagnCEmAUJY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:cc01:b0:244:9909:6e60 with SMTP id
- b1-20020a17090acc0100b0024499096e60mr959943pju.3.1680910245959; Fri, 07 Apr
- 2023 16:30:45 -0700 (PDT)
-Date: Fri, 7 Apr 2023 16:30:44 -0700
-In-Reply-To: <20230306190156.434452-1-dmatlack@google.com>
+        d=1e100.net; s=20210112; t=1680925769; x=1683517769;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mG6DQun3X6e8Ycs1sxk5r+7eU2NYVjbJa0bqr1sphFc=;
+        b=MPY5n+4lWm0gLRBQnBhEqhgI628LnEvrjRZSueyAYAxb7dh7UG4pYOHJxPVXTS1zHM
+         rgETAPtfxQbDhBU7smaWZKLLTwIhYi7DDV+z2ewXdpFbJADWZ2KRPBc3gbiTafr1aQiD
+         Acw6WjTaxlmt4MHAZRx57rrFXqAWg30byQDtRRl1/GcSwitknFxuAgHBGxgOIMFNvgrK
+         XoJKXUvysj1p6bfsaohQNAerIIs9rtBQTZVITDblPXPpbMkDupZzP2SE+Wtk1OaDWpP9
+         9quY1pwPdRt3cIDj1eZVCvvNLWjJZo19pDglc3QCqcQeCgVglrmvmjCo8OdWcKRGYON5
+         QMdw==
+X-Gm-Message-State: AAQBX9djngy9CQzDB2d6Jpy7Gdca+Xmyc2xMbaJxFc/88GVMRQ/8HwS8
+	xJJNKfwiX/i4Lby9yQf5uhts3bk7GhU=
+X-Google-Smtp-Source: AKy350b2b+kyoeKDHcQVC1s0YQ5cKbQc+CXh/czLHlf4GwnSo/hMjwzF33oizSPx/1fq1ueUiauYfHjnrYw=
+X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
+ (user=reijiw job=sendgmr) by 2002:a25:c845:0:b0:b4c:9333:2a2 with SMTP id
+ y66-20020a25c845000000b00b4c933302a2mr2288924ybf.9.1680925769001; Fri, 07 Apr
+ 2023 20:49:29 -0700 (PDT)
+Date: Fri,  7 Apr 2023 20:47:57 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230306190156.434452-1-dmatlack@google.com>
-Message-ID: <ZDCnpAd0fh2cKcpS@google.com>
-Subject: Re: [PATCH v2 0/4] KVM: Refactor KVM stats macros and enable custom
- stat names
-From: Sean Christopherson <seanjc@google.com>
-To: David Matlack <dmatlack@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Huacai Chen <chenhuacai@kernel.org>, 
-	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Eric Farman <farman@linux.ibm.com>, 
-	"Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?=" <philmd@linaro.org>, Sathvika Vasireddy <sv@linux.ibm.com>, 
-	Nicholas Piggin <npiggin@gmail.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org
-Content-Type: text/plain; charset="us-ascii"
+X-Mailer: git-send-email 2.40.0.577.gac1e443424-goog
+Message-ID: <20230408034759.2369068-1-reijiw@google.com>
+Subject: [PATCH v2 0/2] KVM: arm64: PMU: Correct the handling of PMUSERENR_EL0
+From: Reiji Watanabe <reijiw@google.com>
+To: Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Will Deacon <will@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Ricardo Koller <ricarkol@google.com>, 
+	Jing Zhang <jingzhangos@google.com>, Raghavendra Rao Anata <rananta@google.com>, 
+	Shaoqin Huang <shahuang@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Reiji Watanabe <reijiw@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Mar 06, 2023, David Matlack wrote:
-> David Matlack (4):
->   KVM: Refactor stats descriptor generation macros
->   KVM: Refactor designated initializer macros for struct _kvm_stats_desc
->   KVM: Allow custom names for KVM_STAT()
->   KVM: x86: Drop union for pages_{4k,2m,1g} stats
-> 
->  arch/arm64/kvm/guest.c          |  14 +--
->  arch/mips/kvm/mips.c            |  54 ++++-----
->  arch/powerpc/kvm/book3s.c       |  62 +++++-----
->  arch/powerpc/kvm/booke.c        |  48 ++++----
->  arch/riscv/kvm/vcpu.c           |  16 +--
->  arch/s390/kvm/kvm-s390.c        | 198 ++++++++++++++++----------------
->  arch/x86/include/asm/kvm_host.h |   9 +-
->  arch/x86/kvm/x86.c              |  94 +++++++--------
->  include/linux/kvm_host.h        | 179 +++++++++++------------------
->  9 files changed, 314 insertions(+), 360 deletions(-)
+This series will fix bugs in KVM's handling of PMUSERENR_EL0.
 
-For the series,
+With PMU access support from EL0 [1], the perf subsystem would
+set CR and ER bits of PMUSERENR_EL0 as needed to allow EL0 to have
+a direct access to PMU counters.  However, KVM appears to assume
+that the register value is always zero for the host EL0, and has
+the following two problems in handling the register.
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+[A] The host EL0 might lose the direct access to PMU counters, as
+    KVM always clears PMUSERENR_EL0 before returning to userspace.
+
+[B] With VHE, the guest EL0 access to PMU counters might be trapped
+    to EL1 instead of to EL2 (even when PMUSERENR_EL0 for the guest
+    indicates that the guest EL0 has an access to the counters).
+    This is because, with VHE, KVM sets ER, CR, SW and EN bits of
+    PMUSERENR_EL0 to 1 on vcpu_load() to ensure to trap PMU access
+    from the guset EL0 to EL2, but those bits might be cleared by
+    the perf subsystem after vcpu_load() (when PMU counters are
+    programmed for the vPMU emulation).
+
+Patch-1 will fix [A], and Patch-2 will fix [B] respectively.
+The series is based on v6.3-rc5.
+
+v2:
+ - Save the PMUSERENR_EL0 for the host in the sysreg array of
+   kvm_host_data. [Marc]
+ - Don't let armv8pmu_start() overwrite PMUSERENR if the vCPU
+   is loaded, instead have KVM update the saved shadow register
+   value for the host. [Marc, Mark]
+
+v1: https://lore.kernel.org/all/20230329002136.2463442-1-reijiw@google.com/
+
+[1] https://github.com/torvalds/linux/commit/83a7a4d643d33a8b74a42229346b7ed7139fcef9
+
+Reiji Watanabe (2):
+  KVM: arm64: PMU: Restore the host's PMUSERENR_EL0
+  KVM: arm64: PMU: Don't overwrite PMUSERENR with vcpu loaded
+
+ arch/arm64/include/asm/kvm_host.h       |  5 +++++
+ arch/arm64/kernel/perf_event.c          | 21 ++++++++++++++++++---
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 13 +++++++++++--
+ arch/arm64/kvm/pmu.c                    | 20 ++++++++++++++++++++
+ 4 files changed, 54 insertions(+), 5 deletions(-)
+
+
+base-commit: 7e364e56293bb98cae1b55fd835f5991c4e96e7d
+-- 
+2.40.0.577.gac1e443424-goog
+
