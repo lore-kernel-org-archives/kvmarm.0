@@ -1,40 +1,40 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C81D184F
-	for <kvmarm@lists.linux.dev>; Sun,  9 Apr 2023 06:30:07 +0000 (UTC)
-Received: by mail-pj1-f73.google.com with SMTP id o2-20020a17090ac08200b00244b34f5e3aso935960pjs.2
-        for <kvmarm@lists.linux.dev>; Sat, 08 Apr 2023 23:30:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8FBF184F
+	for <kvmarm@lists.linux.dev>; Sun,  9 Apr 2023 06:30:09 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id 8-20020a250508000000b00b7c653a0a4aso38673328ybf.23
+        for <kvmarm@lists.linux.dev>; Sat, 08 Apr 2023 23:30:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1681021807; x=1683613807;
+        d=google.com; s=20210112; t=1681021808; x=1683613808;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W/9TrLiFh0g6i4CFqkD+8PkRd+TfJMu2Z2yB0plZBwo=;
-        b=OKme6zdcLHlLnQV+0WVds+nJndYTKtQG6clVmxCrMGqN+i9aiXDmV/i+QYrKZPYVNo
-         UHDSeXvov0SHBxbbiVkXLosyLPavrs0Z1WVMrBEs1yDd8d+/d57hFHkKeCMYaRSU7TVZ
-         woNAauRkvBMkeCUSQtaQkBNqNItxgm67ifIwgm+h9dlp6N+JtErbUG84vS4o9mXBc4+8
-         ev5VPudAMXCxz2h6Akctc3nmTqN0AE+8GQUhwyUHQ4z+l266a//kvLxl/0k8OaNQ+w7J
-         pnVWdEIJ6ojApjdCyeQ/2NOV4e5fKRQ36asYyOyDOkm4j74ATF+xTTuA8KRh7sf0Rwcw
-         BYBA==
+        bh=if+YkGXz3GoOKFXpY68wLACnSj9D5ohyIKRDRrK/Hs4=;
+        b=HygojbwsLM+kCoupRBYy10Ibop+q1/MYjUIVR7DbPvFnuNWijIn/UhfWGHmVnfNzSx
+         O/zMOGi5LhdHBN4rtUz+yk29d71nuWhbU0SaqMi7Tl+4eHezKkIjeI5cK69qyXeFi3Ft
+         Bmcg3+qMWQxApRrzosruX3kbbsZfuOVuj4IKjJ2tipYltcCFcS3CXzWuaZhj81ZIcFU0
+         octi8sr/FpV3xpC7dwTVcj1/ceXgVMwaVOLLhRTJdMAayTLOF4J2OQ1+5E4NtVE+gRua
+         kJEjUmc8x4jjanZoUpJkJ37vGzoZwxZMd8sG5quOoa4pKCZ1RvoiK2Cwvq83jfGeHlqi
+         qZQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681021807; x=1683613807;
+        d=1e100.net; s=20210112; t=1681021808; x=1683613808;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W/9TrLiFh0g6i4CFqkD+8PkRd+TfJMu2Z2yB0plZBwo=;
-        b=DPH3kBT/aN9Md5Nu3K9ZZSdeLJhebDa91DSzPoULat31RtA0PFSdmNfeOiMXB5e9Us
-         ICUgU+09DhjG1O1TVjFTpfWifcj9XlJTnd+i0Tbo28x/EwRY7MxI2J2Lz2Tp5N9jA6CP
-         +S6N9qU/fREit+DciX4XREAt/z4j9aURNg+0JzcgHMvcJDneuB7fYCXrWvSGppB6+pNR
-         UInTzQqfQJxpb/UFMem4/0tKr+MGevnCMOu/JQydSm/5YqDK58VlpqlTP5K4MOceNpfE
-         tuPPW0c+PDcoUxen2zmXYSknLA76XyczTjkXI4hWdteRJUztBpFiOpGLB3VmjcUL5//w
-         xBTA==
-X-Gm-Message-State: AAQBX9eQMQxhiUdSapfdaChW+9wAOrnGnqwbRncVeH9UhfL33nQFzNch
-	Zk4jhnvnjAl5+T75PZErwn0ib2tPjjH8tg==
-X-Google-Smtp-Source: AKy350Z2WQwB5EMyLbrcj2e9/j7PUbO/8LTAEI6k3DdYFkDybadjKLoY/rTeCg4eYVz+ZWnt2lWiichG8LM6iQ==
+        bh=if+YkGXz3GoOKFXpY68wLACnSj9D5ohyIKRDRrK/Hs4=;
+        b=h0crorNE0qVDX3XX9YhLAR942YDBp8wS1R1hKDTH50u6BxFq7FjRUc5aXvDCJ1SPNC
+         AIyk3MDU+wRMtO+u3kp0HSwEmcKlTRV/L19yHPfbuaniZd/YFu3RH2NNoJKVpIyWMVT0
+         EvlKmscIrZaBn0NOr1BCSXmtIy6EBQRyS2zb+tA5njEYqry5Lzdsd04/h/LKl8nt6VlM
+         0RK+n9ModClofRbUZ0PEc7oBMzXt05h6jbELj/jKAd7cwpfQ1/+6Ul22xIyidBbTq4eA
+         Sy+XKS/w81VF1LbnXiBsQAhS6ycsDI+yr+bQ0YOWvE+qnpTeW0esKJ7StjSMn2OZmuB8
+         lp4g==
+X-Gm-Message-State: AAQBX9dee8+FuuH/TTOfl3BEOxD1TNG12ZhAjcHkNv/htXlPHfMsRtdQ
+	B39vDd8Ljf0HxKDNfKvVzebUFxu3PhKD5Q==
+X-Google-Smtp-Source: AKy350bux1gSy/tqUCk8dzR6pnh+RgxO/Ld8BwP+yAuSbfTZdOY365S2qdqqoy50RgsAHilx4ojrq8jmVNUhMQ==
 X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a17:902:cecb:b0:19a:82a2:fcf9 with SMTP
- id d11-20020a170902cecb00b0019a82a2fcf9mr1088678plg.2.1681021806971; Sat, 08
- Apr 2023 23:30:06 -0700 (PDT)
-Date: Sun,  9 Apr 2023 06:29:49 +0000
+ (user=ricarkol job=sendgmr) by 2002:a25:d98e:0:b0:b6e:b924:b96f with SMTP id
+ q136-20020a25d98e000000b00b6eb924b96fmr4248784ybg.3.1681021808809; Sat, 08
+ Apr 2023 23:30:08 -0700 (PDT)
+Date: Sun,  9 Apr 2023 06:29:50 +0000
 In-Reply-To: <20230409063000.3559991-1-ricarkol@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,9 +44,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230409063000.3559991-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.40.0.577.gac1e443424-goog
-Message-ID: <20230409063000.3559991-3-ricarkol@google.com>
-Subject: [PATCH v7 02/12] KVM: arm64: Add KVM_PGTABLE_WALK ctx->flags for
- skipping BBM and CMO
+Message-ID: <20230409063000.3559991-4-ricarkol@google.com>
+Subject: [PATCH v7 02/12] KVM: arm64: Add KVM_PGTABLE_WALK flags for skipping
+ CMOs and BBM TLBIs
 From: Ricardo Koller <ricarkol@google.com>
 To: pbonzini@redhat.com, maz@kernel.org, oupton@google.com, 
 	yuzenghui@huawei.com, dmatlack@google.com
@@ -58,11 +58,11 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
 	Shaoqin Huang <shahuang@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add two flags to kvm_pgtable_visit_ctx, KVM_PGTABLE_WALK_SKIP_BBM and
-KVM_PGTABLE_WALK_SKIP_CMO, to indicate that the walk should not
-perform break-before-make (BBM) nor cache maintenance operations
-(CMO). This will be used by a future commit to create unlinked tables
-not accessible to the HW page-table walker.
+Add two flags to kvm_pgtable_visit_ctx, KVM_PGTABLE_WALK_SKIP_BBM_TLBI
+and KVM_PGTABLE_WALK_SKIP_CMO, to indicate that the walk should not
+perform TLB invalidations (TLBIs) in break-before-make (BBM) nor cache
+maintenance operations (CMO). This will be used by a future commit to
+create unlinked tables not accessible to the HW page-table walker.
 
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
