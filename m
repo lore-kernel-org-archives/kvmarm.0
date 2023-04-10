@@ -1,51 +1,60 @@
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C19A1FAE;
-	Sun,  9 Apr 2023 09:36:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1681032993; x=1712568993;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=KR3OB1bN1xOPenjENINMC1U5px4J2IzqB6I4Fi/cpek=;
-  b=CRpovn4IEhsQ5HP5dexfAz49rLYk12izAaz5EDXBgmwzsR9rUBvtEIVE
-   XtNz2ukb8Ij+PSR4Ws5iZfO/IsW0nCHxkKmKxT7GZtdSErfl931XnJP2q
-   qq5GY/JoVPqkt6Dw05OVBSnqSxOiPxtuWSn6opj2LeQjY/QhLFnYqWHKX
-   TBaPa8F/D1wLbzCH+bG/buVJOelo9xC+jcbNLnkusIdO1TKqtie2tkNtX
-   tIYu6R9B2QUErkyFv1m4F+FS3RM3LHJH5Ypwq9RIs7hXibyLZT2GphH/0
-   bAjAn31t48jbAwh5mKQPXAPzqS5LSddQ7wfwcv/AR7gWQygLQ/EWlRfC0
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10674"; a="408345048"
-X-IronPort-AV: E=Sophos;i="5.98,331,1673942400"; 
-   d="scan'208";a="408345048"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2023 02:36:32 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10674"; a="1017701223"
-X-IronPort-AV: E=Sophos;i="5.98,331,1673942400"; 
-   d="scan'208";a="1017701223"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by fmsmga005.fm.intel.com with ESMTP; 09 Apr 2023 02:36:28 -0700
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1plRTH-000UST-1Q;
-	Sun, 09 Apr 2023 09:36:27 +0000
-Date: Sun, 9 Apr 2023 17:36:02 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
-	maz@kernel.org, oupton@google.com, yuzenghui@huawei.com,
-	dmatlack@google.com
-Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com,
-	andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com,
-	suzuki.poulose@arm.com, eric.auger@redhat.com, gshan@redhat.com,
-	reijiw@google.com, rananta@google.com, bgardon@google.com,
-	ricarkol@gmail.com, Ricardo Koller <ricarkol@google.com>,
-	Shaoqin Huang <shahuang@redhat.com>
-Subject: Re: [PATCH v7 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
-Message-ID: <202304091707.ALABRVCG-lkp@intel.com>
-References: <20230409063000.3559991-6-ricarkol@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09EFE3C04
+	for <kvmarm@lists.linux.dev>; Mon, 10 Apr 2023 15:34:46 +0000 (UTC)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1a652700c36so3665ad.0
+        for <kvmarm@lists.linux.dev>; Mon, 10 Apr 2023 08:34:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1681140886; x=1683732886;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=a5B8WOLUO5bkG5KJUoHhJ2LLIwuNgHJHj1AC8T37BCc=;
+        b=STUo2BLfBRIOLevbIcQ9agTqxEEXS6G+kHcy0khrvExBZf7aSAxCXzxMk6w4oa3pnJ
+         /FGxPlO0HChcypcBW7aQ52fl14+PdyzyixFtrZNyRcilearwW4KpleQOTVXxEA5TSjXE
+         ydaxWMH1YcjyNRUq/p52o6eF+CquTCMZWhJU5y83JC97pw7Oy55XigHqWrl2ISnIM+3J
+         ZH9ZMVchHTQg7CiD1eGNBbWTr06fDMq8pViro+A9Ysx/Zl3DvucNw+WAqALGc/V/98Js
+         BPuAaJt3COPKNJnfTsiwon78kfN/UXtkvjDGu/p9QTu+l1Xe4bULJSy69LITtbT4JzwF
+         w0Gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1681140886; x=1683732886;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=a5B8WOLUO5bkG5KJUoHhJ2LLIwuNgHJHj1AC8T37BCc=;
+        b=cCCQLXpRiKlmREogmiip6FS6MyRZMslsSocwIzknir4WNoTTZJQPXWF9igsbGMLy1Q
+         jkwcexk0FjGS0kxAa84y2bckXtetXAGKXf9bDvNWudKA75hJlN8304FuLOjShJ1jAVGa
+         bV5arhadkK42KaM3b4g6udRRU+B4RV4Sp2sZ5Uju3IrRdAjjMJU6roXbT2CVBtsrOyXz
+         Kx7Fo3gQUExCiaOaRTGG9aPBshACG+mW0VuFYb/M9Pe/b3ySn8zVTc/Dlnv0hfU0oqep
+         S/c70nQFwUsYjDUq4IKlG0Rs1Dz3CqIgPve9TBnfY3NRrBpUMPL7G6lBay0UO6GlC9Mv
+         Pzcw==
+X-Gm-Message-State: AAQBX9dmCjLWPvA1iVf4u8X+xU/5MrtQgRZXJ8nTptyLEeIoQk+moS/X
+	Oy933w/Elxflq5k10qIMidq+MUzq42U+IxAe/KEW9Q==
+X-Google-Smtp-Source: AKy350bDpAiRoM3P1ElDc+eukU/YFhcf7QH9EkUzPIfrdGKe6BHvUg1bBw2scNVOR8srw2Dmip2v3A==
+X-Received: by 2002:a17:903:1358:b0:198:af4f:de0b with SMTP id jl24-20020a170903135800b00198af4fde0bmr452964plb.11.1681140886054;
+        Mon, 10 Apr 2023 08:34:46 -0700 (PDT)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id jh3-20020a170903328300b001963a178dfcsm6039218plb.244.2023.04.10.08.34.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Apr 2023 08:34:45 -0700 (PDT)
+Date: Mon, 10 Apr 2023 08:34:41 -0700
+From: Reiji Watanabe <reijiw@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Simon Veith <sveith@amazon.de>,
+	Colton Lewis <coltonlewis@google.com>,
+	Joey Gouly <joey.gouly@arm.com>, dwmw2@infradead.org
+Subject: Re: [PATCH v4 05/20] KVM: arm64: timers: Allow physical offset
+ without CNTPOFF_EL2
+Message-ID: <20230410153441.vddskgxu2zzsi7bq@google.com>
+References: <20230330174800.2677007-1-maz@kernel.org>
+ <20230330174800.2677007-6-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,165 +63,316 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230409063000.3559991-6-ricarkol@google.com>
+In-Reply-To: <20230330174800.2677007-6-maz@kernel.org>
 
-Hi Ricardo,
+Hi Marc,
 
-kernel test robot noticed the following build errors:
+On Thu, Mar 30, 2023 at 06:47:45PM +0100, Marc Zyngier wrote:
+> CNTPOFF_EL2 is awesome, but it is mostly vapourware, and no publicly
+> available implementation has it. So for the common mortals, let's
+> implement the emulated version of this thing.
+> 
+> It means trapping accesses to the physical counter and timer, and
+> emulate some of it as necessary.
+> 
+> As for CNTPOFF_EL2, nobody sets the offset yet.
+> 
+> Reviewed-by: Colton Lewis <coltonlewis@google.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/sysreg.h    |  2 +
+>  arch/arm64/kvm/arch_timer.c        | 98 +++++++++++++++++++++++-------
+>  arch/arm64/kvm/hyp/nvhe/timer-sr.c | 18 ++++--
+>  arch/arm64/kvm/sys_regs.c          |  9 +++
+>  4 files changed, 98 insertions(+), 29 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 9e3ecba3c4e6..f8da9e1b0c11 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -388,6 +388,7 @@
+>  
+>  #define SYS_CNTFRQ_EL0			sys_reg(3, 3, 14, 0, 0)
+>  
+> +#define SYS_CNTPCT_EL0			sys_reg(3, 3, 14, 0, 1)
+>  #define SYS_CNTPCTSS_EL0		sys_reg(3, 3, 14, 0, 5)
+>  #define SYS_CNTVCTSS_EL0		sys_reg(3, 3, 14, 0, 6)
+>  
+> @@ -400,6 +401,7 @@
+>  
+>  #define SYS_AARCH32_CNTP_TVAL		sys_reg(0, 0, 14, 2, 0)
+>  #define SYS_AARCH32_CNTP_CTL		sys_reg(0, 0, 14, 2, 1)
+> +#define SYS_AARCH32_CNTPCT		sys_reg(0, 0, 0, 14, 0)
+>  #define SYS_AARCH32_CNTP_CVAL		sys_reg(0, 2, 0, 14, 0)
+>  
+>  #define __PMEV_op2(n)			((n) & 0x7)
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 3118ea0a1b41..bb64a71ae193 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -458,6 +458,8 @@ static void timer_save_state(struct arch_timer_context *ctx)
+>  		goto out;
+>  
+>  	switch (index) {
+> +		u64 cval;
+> +
+>  	case TIMER_VTIMER:
+>  		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTV_CTL));
+>  		timer_set_cval(ctx, read_sysreg_el0(SYS_CNTV_CVAL));
+> @@ -485,7 +487,12 @@ static void timer_save_state(struct arch_timer_context *ctx)
+>  		break;
+>  	case TIMER_PTIMER:
+>  		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTP_CTL));
+> -		timer_set_cval(ctx, read_sysreg_el0(SYS_CNTP_CVAL));
+> +		cval = read_sysreg_el0(SYS_CNTP_CVAL);
+> +
+> +		if (!has_cntpoff())
+> +			cval -= timer_get_offset(ctx);
+> +
+> +		timer_set_cval(ctx, cval);
+>  
+>  		/* Disable the timer */
+>  		write_sysreg_el0(0, SYS_CNTP_CTL);
+> @@ -555,6 +562,8 @@ static void timer_restore_state(struct arch_timer_context *ctx)
+>  		goto out;
+>  
+>  	switch (index) {
+> +		u64 cval, offset;
+> +
+>  	case TIMER_VTIMER:
+>  		set_cntvoff(timer_get_offset(ctx));
+>  		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTV_CVAL);
+> @@ -562,8 +571,12 @@ static void timer_restore_state(struct arch_timer_context *ctx)
+>  		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTV_CTL);
+>  		break;
+>  	case TIMER_PTIMER:
+> -		set_cntpoff(timer_get_offset(ctx));
+> -		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTP_CVAL);
+> +		cval = timer_get_cval(ctx);
+> +		offset = timer_get_offset(ctx);
+> +		set_cntpoff(offset);
+> +		if (!has_cntpoff())
+> +			cval += offset;
+> +		write_sysreg_el0(cval, SYS_CNTP_CVAL);
+>  		isb();
+>  		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTP_CTL);
+>  		break;
+> @@ -634,6 +647,61 @@ static void kvm_timer_vcpu_load_nogic(struct kvm_vcpu *vcpu)
+>  		enable_percpu_irq(host_vtimer_irq, host_vtimer_irq_flags);
+>  }
+>  
+> +/* If _pred is true, set bit in _set, otherwise set it in _clr */
+> +#define assign_clear_set_bit(_pred, _bit, _clr, _set)			\
+> +	do {								\
+> +		if (_pred)						\
+> +			(_set) |= (_bit);				\
+> +		else							\
+> +			(_clr) |= (_bit);				\
+> +	} while (0)
+> +
+> +static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
+> +{
+> +	bool tpt, tpc;
+> +	u64 clr, set;
+> +
+> +	/*
+> +	 * No trapping gets configured here with nVHE. See
+> +	 * __timer_enable_traps(), which is where the stuff happens.
+> +	 */
+> +	if (!has_vhe())
+> +		return;
+> +
+> +	/*
+> +	 * Our default policy is not to trap anything. As we progress
+> +	 * within this function, reality kicks in and we start adding
+> +	 * traps based on emulation requirements.
+> +	 */
+> +	tpt = tpc = false;
+> +
+> +	/*
+> +	 * We have two possibility to deal with a physical offset:
+> +	 *
+> +	 * - Either we have CNTPOFF (yay!) or the offset is 0:
+> +	 *   we let the guest freely access the HW
+> +	 *
+> +	 * - or neither of these condition apply:
+> +	 *   we trap accesses to the HW, but still use it
+> +	 *   after correcting the physical offset
+> +	 */
+> +	if (!has_cntpoff() && timer_get_offset(map->direct_ptimer))
+> +		tpt = tpc = true;
+> +
+> +	/*
+> +	 * Now that we have collected our requirements, compute the
+> +	 * trap and enable bits.
+> +	 */
+> +	set = 0;
+> +	clr = 0;
+> +
+> +	assign_clear_set_bit(tpt, CNTHCTL_EL1PCEN << 10, set, clr);
+> +	assign_clear_set_bit(tpc, CNTHCTL_EL1PCTEN << 10, set, clr);
 
-[auto build test ERROR on kvm/queue]
-[also build test ERROR on mst-vhost/linux-next linus/master v6.3-rc5 next-20230406]
-[cannot apply to kvmarm/next kvm/linux-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Nit: IMHO the way the code specifies the 'set' and 'clr' arguments for
+the macro might be a bit confusing ('set' is for '_clr', and 'clr' is
+for '_set')?
+Perhaps changing the parameter names of assign_clear_set_bit() like
+below or flipping the condition (i.e. Specify !tpt or no_tpt instead
+of tpt) might be less confusing?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ricardo-Koller/KVM-arm64-Rename-free_removed-to-free_unlinked/20230409-143229
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-patch link:    https://lore.kernel.org/r/20230409063000.3559991-6-ricarkol%40google.com
-patch subject: [PATCH v7 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
-config: arm64-defconfig (https://download.01.org/0day-ci/archive/20230409/202304091707.ALABRVCG-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/c94328e3e8b2d2d873503360ea730c87f4a03301
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Ricardo-Koller/KVM-arm64-Rename-free_removed-to-free_unlinked/20230409-143229
-        git checkout c94328e3e8b2d2d873503360ea730c87f4a03301
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=arm64 olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash arch/arm64/
-
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202304091707.ALABRVCG-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from include/linux/bitfield.h:10,
-                    from arch/arm64/kvm/hyp/pgtable.c:10:
-   arch/arm64/kvm/hyp/pgtable.c: In function 'stage2_split_walker':
->> include/linux/container_of.h:20:54: error: 'struct kvm_s2_mmu' has no member named 'split_page_cache'
-      20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
-         |                                                      ^~
-   include/linux/build_bug.h:78:56: note: in definition of macro '__static_assert'
-      78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
-         |                                                        ^~~~
-   include/linux/container_of.h:20:9: note: in expansion of macro 'static_assert'
-      20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
-         |         ^~~~~~~~~~~~~
-   include/linux/container_of.h:20:23: note: in expansion of macro '__same_type'
-      20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
-         |                       ^~~~~~~~~~~
-   arch/arm64/kvm/hyp/pgtable.c:1340:15: note: in expansion of macro 'container_of'
-    1340 |         mmu = container_of(mc, struct kvm_s2_mmu, split_page_cache);
-         |               ^~~~~~~~~~~~
-   include/linux/compiler_types.h:338:27: error: expression in static assertion is not an integer
-     338 | #define __same_type(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
-         |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:78:56: note: in definition of macro '__static_assert'
-      78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
-         |                                                        ^~~~
-   include/linux/container_of.h:20:9: note: in expansion of macro 'static_assert'
-      20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
-         |         ^~~~~~~~~~~~~
-   include/linux/container_of.h:20:23: note: in expansion of macro '__same_type'
-      20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
-         |                       ^~~~~~~~~~~
-   arch/arm64/kvm/hyp/pgtable.c:1340:15: note: in expansion of macro 'container_of'
-    1340 |         mmu = container_of(mc, struct kvm_s2_mmu, split_page_cache);
-         |               ^~~~~~~~~~~~
-   In file included from include/uapi/linux/posix_types.h:5,
-                    from include/uapi/linux/types.h:14,
-                    from include/linux/types.h:6,
-                    from include/linux/kasan-checks.h:5,
-                    from include/asm-generic/rwonce.h:26,
-                    from arch/arm64/include/asm/rwonce.h:71,
-                    from include/linux/compiler.h:247,
-                    from include/linux/build_bug.h:5:
->> include/linux/stddef.h:16:33: error: 'struct kvm_s2_mmu' has no member named 'split_page_cache'
-      16 | #define offsetof(TYPE, MEMBER)  __builtin_offsetof(TYPE, MEMBER)
-         |                                 ^~~~~~~~~~~~~~~~~~
-   include/linux/container_of.h:23:28: note: in expansion of macro 'offsetof'
-      23 |         ((type *)(__mptr - offsetof(type, member))); })
-         |                            ^~~~~~~~
-   arch/arm64/kvm/hyp/pgtable.c:1340:15: note: in expansion of macro 'container_of'
-    1340 |         mmu = container_of(mc, struct kvm_s2_mmu, split_page_cache);
-         |               ^~~~~~~~~~~~
---
-   In file included from include/linux/bitfield.h:10,
-                    from arch/arm64/kvm/hyp/nvhe/../pgtable.c:10:
-   arch/arm64/kvm/hyp/nvhe/../pgtable.c: In function 'stage2_split_walker':
->> include/linux/container_of.h:20:54: error: 'struct kvm_s2_mmu' has no member named 'split_page_cache'
-      20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
-         |                                                      ^~
-   include/linux/build_bug.h:78:56: note: in definition of macro '__static_assert'
-      78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
-         |                                                        ^~~~
-   include/linux/container_of.h:20:9: note: in expansion of macro 'static_assert'
-      20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
-         |         ^~~~~~~~~~~~~
-   include/linux/container_of.h:20:23: note: in expansion of macro '__same_type'
-      20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
-         |                       ^~~~~~~~~~~
-   arch/arm64/kvm/hyp/nvhe/../pgtable.c:1340:15: note: in expansion of macro 'container_of'
-    1340 |         mmu = container_of(mc, struct kvm_s2_mmu, split_page_cache);
-         |               ^~~~~~~~~~~~
-   include/linux/compiler_types.h:338:27: error: expression in static assertion is not an integer
-     338 | #define __same_type(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
-         |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:78:56: note: in definition of macro '__static_assert'
-      78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
-         |                                                        ^~~~
-   include/linux/container_of.h:20:9: note: in expansion of macro 'static_assert'
-      20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
-         |         ^~~~~~~~~~~~~
-   include/linux/container_of.h:20:23: note: in expansion of macro '__same_type'
-      20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
-         |                       ^~~~~~~~~~~
-   arch/arm64/kvm/hyp/nvhe/../pgtable.c:1340:15: note: in expansion of macro 'container_of'
-    1340 |         mmu = container_of(mc, struct kvm_s2_mmu, split_page_cache);
-         |               ^~~~~~~~~~~~
-   In file included from include/uapi/linux/posix_types.h:5,
-                    from include/uapi/linux/types.h:14,
-                    from include/linux/types.h:6,
-                    from include/linux/kasan-checks.h:5,
-                    from include/asm-generic/rwonce.h:26,
-                    from arch/arm64/include/asm/rwonce.h:71,
-                    from include/linux/compiler.h:247,
-                    from include/linux/build_bug.h:5:
->> include/linux/stddef.h:16:33: error: 'struct kvm_s2_mmu' has no member named 'split_page_cache'
-      16 | #define offsetof(TYPE, MEMBER)  __builtin_offsetof(TYPE, MEMBER)
-         |                                 ^~~~~~~~~~~~~~~~~~
-   include/linux/container_of.h:23:28: note: in expansion of macro 'offsetof'
-      23 |         ((type *)(__mptr - offsetof(type, member))); })
-         |                            ^~~~~~~~
-   arch/arm64/kvm/hyp/nvhe/../pgtable.c:1340:15: note: in expansion of macro 'container_of'
-    1340 |         mmu = container_of(mc, struct kvm_s2_mmu, split_page_cache);
-         |               ^~~~~~~~~~~~
+#define assign_clear_set_bit(_pred, _bit, _t_val, _f_val)	\
+do {								\
+	if (_pred)						\
+		(_t_val) |= (_bit);				\
+	else							\
+		(_f_val) |= (_bit);				\
+} while (0)
 
 
-vim +20 include/linux/container_of.h
+> +
+> +	/* This only happens on VHE, so use the CNTKCTL_EL1 accessor */
+> +	sysreg_clear_set(cntkctl_el1, clr, set);
+> +}
+> +
+>  void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+>  {
+>  	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+> @@ -657,9 +725,10 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+>  	timer_restore_state(map.direct_vtimer);
+>  	if (map.direct_ptimer)
+>  		timer_restore_state(map.direct_ptimer);
+> -
+>  	if (map.emul_ptimer)
+>  		timer_emulate(map.emul_ptimer);
+> +
+> +	timer_set_traps(vcpu, &map);
+>  }
+>  
+>  bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu)
+> @@ -1292,28 +1361,11 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+>  	return 0;
+>  }
+>  
+> -/*
+> - * On VHE system, we only need to configure the EL2 timer trap register once,
+> - * not for every world switch.
+> - * The host kernel runs at EL2 with HCR_EL2.TGE == 1,
+> - * and this makes those bits have no effect for the host kernel execution.
+> - */
+> +/* If we have CNTPOFF, permanently set ECV to enable it */
+>  void kvm_timer_init_vhe(void)
+>  {
+> -	/* When HCR_EL2.E2H ==1, EL1PCEN and EL1PCTEN are shifted by 10 */
+> -	u32 cnthctl_shift = 10;
+> -	u64 val;
+> -
+> -	/*
+> -	 * VHE systems allow the guest direct access to the EL1 physical
+> -	 * timer/counter.
+> -	 */
+> -	val = read_sysreg(cnthctl_el2);
+> -	val |= (CNTHCTL_EL1PCEN << cnthctl_shift);
+> -	val |= (CNTHCTL_EL1PCTEN << cnthctl_shift);
+>  	if (cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF))
+> -		val |= CNTHCTL_ECV;
+> -	write_sysreg(val, cnthctl_el2);
+> +		sysreg_clear_set(cntkctl_el1, 0, CNTHCTL_ECV);
+>  }
+>  
+>  static void set_timer_irqs(struct kvm *kvm, int vtimer_irq, int ptimer_irq)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/timer-sr.c b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
+> index 9072e71693ba..b185ac0dbd47 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/timer-sr.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
+> @@ -9,6 +9,7 @@
+>  #include <linux/kvm_host.h>
+>  
+>  #include <asm/kvm_hyp.h>
+> +#include <asm/kvm_mmu.h>
+>  
+>  void __kvm_timer_set_cntvoff(u64 cntvoff)
+>  {
+> @@ -35,14 +36,19 @@ void __timer_disable_traps(struct kvm_vcpu *vcpu)
+>   */
+>  void __timer_enable_traps(struct kvm_vcpu *vcpu)
+>  {
+> -	u64 val;
+> +	u64 clr = 0, set = 0;
+>  
+>  	/*
+>  	 * Disallow physical timer access for the guest
+> -	 * Physical counter access is allowed
+> +	 * Physical counter access is allowed if no offset is enforced
+> +	 * or running protected (we don't offset anything in this case).
+>  	 */
+> -	val = read_sysreg(cnthctl_el2);
+> -	val &= ~CNTHCTL_EL1PCEN;
+> -	val |= CNTHCTL_EL1PCTEN;
+> -	write_sysreg(val, cnthctl_el2);
+> +	clr = CNTHCTL_EL1PCEN;
 
-d2a8ebbf8192b8 Andy Shevchenko  2021-11-08   9  
-d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  10  /**
-d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  11   * container_of - cast a member of a structure out to the containing structure
-d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  12   * @ptr:	the pointer to the member.
-d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  13   * @type:	the type of the container struct this is embedded in.
-d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  14   * @member:	the name of the member within the struct.
-d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  15   *
-7376e561fd2e01 Sakari Ailus     2022-10-24  16   * WARNING: any const qualifier of @ptr is lost.
-d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  17   */
-d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  18  #define container_of(ptr, type, member) ({				\
-d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  19  	void *__mptr = (void *)(ptr);					\
-e1edc277e6f6df Rasmus Villemoes 2021-11-08 @20  	static_assert(__same_type(*(ptr), ((type *)0)->member) ||	\
-e1edc277e6f6df Rasmus Villemoes 2021-11-08  21  		      __same_type(*(ptr), void),			\
-d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  22  		      "pointer type mismatch in container_of()");	\
-d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  23  	((type *)(__mptr - offsetof(type, member))); })
-d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  24  
+Nit: Perhaps "clr |= CNTHCTL_EL1PCEN;" would be more
+straightforward (or initialize 'clr' to CNTHCTL_EL1PCEN ?).
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+> +	if (is_protected_kvm_enabled() ||
+> +	    !kern_hyp_va(vcpu->kvm)->arch.timer_data.poffset)
+> +		set |= CNTHCTL_EL1PCTEN;
+> +	else
+> +		clr |= CNTHCTL_EL1PCTEN;
+> +
+> +	sysreg_clear_set(cnthctl_el2, clr, set);
+>  }
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 53749d3a0996..be7c2598e563 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1139,6 +1139,12 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+>  		tmr = TIMER_PTIMER;
+>  		treg = TIMER_REG_CVAL;
+>  		break;
+> +	case SYS_CNTPCT_EL0:
+> +	case SYS_CNTPCTSS_EL0:
+> +	case SYS_AARCH32_CNTPCT:
+> +		tmr = TIMER_PTIMER;
+> +		treg = TIMER_REG_CNT;
+> +		break;
+>  	default:
+>  		print_sys_reg_msg(p, "%s", "Unhandled trapped timer register");
+>  		kvm_inject_undefined(vcpu);
+> @@ -2075,6 +2081,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	AMU_AMEVTYPER1_EL0(14),
+>  	AMU_AMEVTYPER1_EL0(15),
+>  
+> +	{ SYS_DESC(SYS_CNTPCT_EL0), access_arch_timer },
+> +	{ SYS_DESC(SYS_CNTPCTSS_EL0), access_arch_timer },
+>  	{ SYS_DESC(SYS_CNTP_TVAL_EL0), access_arch_timer },
+>  	{ SYS_DESC(SYS_CNTP_CTL_EL0), access_arch_timer },
+>  	{ SYS_DESC(SYS_CNTP_CVAL_EL0), access_arch_timer },
+> @@ -2525,6 +2533,7 @@ static const struct sys_reg_desc cp15_64_regs[] = {
+>  	{ Op1( 0), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, TTBR0_EL1 },
+>  	{ CP15_PMU_SYS_REG(DIRECT, 0, 0, 9, 0), .access = access_pmu_evcntr },
+>  	{ Op1( 0), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_SGI1R */
+> +	{ SYS_DESC(SYS_AARCH32_CNTPCT),	      access_arch_timer },
+
+Shouldn't KVM also emulate CNTPCTSS (Aarch32) when its trapping is
+enabled on the host with ECV_CNTPOFF ?
+
+
+>  	{ Op1( 1), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, TTBR1_EL1 },
+>  	{ Op1( 1), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_ASGI1R */
+>  	{ Op1( 2), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_SGI0R */
+> -- 
+> 2.34.1
+> 
+> 
+
+Nit: In emulating reading physical counter/timer for direct_ptimer
+(poffset != 0 on VHE without ECV_CNTPOFF), it appears that
+kvm_arm_timer_read_sysreg() unnecessarily calls
+timer_{save,restore}_state(), and kvm_arm_timer_write_sysreg()
+unnecessarily calls timer_save_state().  Couldn't we skip those
+unnecessary calls ? (I didn't check all the following patches, but
+the current code would be more convenient in the following patches ?)
+
+Thank you,
+Reiji
+
