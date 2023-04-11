@@ -1,58 +1,54 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5C2C5250
-	for <kvmarm@lists.linux.dev>; Mon, 10 Apr 2023 20:04:42 +0000 (UTC)
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1a1b23f49e2so350885ad.0
-        for <kvmarm@lists.linux.dev>; Mon, 10 Apr 2023 13:04:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1681157082; x=1683749082;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ioh7H8l7yHk6qWPycTIzyodgQk+veGhOYnAh0iMY1+w=;
-        b=lWtyZKzYcc1MyYe7qNHQjECK/dg2CML09VVHQcrM2Wq0FpFlSWEjPrdhXxb4iGnSM8
-         WW1oDeNJKmcbJ2YGduDza3p2OwzwBVBlL9NaiUIxPVC2Vb7esdENbAHKAcIvZLjQs+fU
-         r5ZVGpDtF3oITFKpWRAVGErbpGlPjQqpI7ekDq6uhTZEMZdxRR1Ij0QuiZoKezquRNji
-         rE/470RHWL+3eJvJ1OK0b2vUexzcygYo5fKuesngRR+efH6Wwfi3fXQza5IheHRA+6Kb
-         o/gHOzOqAwEg4HzW6lUFWgujuxn6iN+avE1mOgb2jQNoRaIYuwCB5iTWf/1Qe8fRvslx
-         Y8gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681157082; x=1683749082;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ioh7H8l7yHk6qWPycTIzyodgQk+veGhOYnAh0iMY1+w=;
-        b=HR9oWZP/P9rPujJkCOd11QL6/ahVZ7enee1Z2UZek6q+3R0CnTpSZoCxNoNfHnX89r
-         JZk7ZAUA+4FUFXy+eWAy4XG9Ejsli1vIRlc30Ys8tLi1kAoWTYljloUFWMhzCv0P9uC3
-         tSKzDpEqWws9JlKqXzqkbES+2iiRqMNV0oVyuVWnUcAZAuHlYTPp1cpBYK8IBnwau9r5
-         obo6V3YUalnq9DIESu7KFz7mWFmBB4wrg/Y+aATsDdksyWm1miIWThbn8POGaYEW0f+o
-         Ilf3/A8et47IpBPF1hLGTRz+8U9CORG3pjK83IILE2KZ3PHNSirddsU7S/PuXH4TL8rl
-         KJZw==
-X-Gm-Message-State: AAQBX9ctidfLy1hZEKvPtTi/HZTegLh9KklZllZhjJRsxemTfGL0IbCv
-	wDes3FiqUX8d7BnmVO3HPUL8vw==
-X-Google-Smtp-Source: AKy350ZW9oej8RUl8/eOvpVf8OCKfDFJNBTL3TZd9an4aitV0vDTNyioWDQmQgd7+UPDNhApEI0Z+Q==
-X-Received: by 2002:a17:903:1351:b0:1a5:2e85:94a1 with SMTP id jl17-20020a170903135100b001a52e8594a1mr54087plb.14.1681157082052;
-        Mon, 10 Apr 2023 13:04:42 -0700 (PDT)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id mh5-20020a17090b4ac500b0023fbb21214bsm3185888pjb.17.2023.04.10.13.04.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Apr 2023 13:04:41 -0700 (PDT)
-Date: Mon, 10 Apr 2023 13:04:38 -0700
-From: Ricardo Koller <ricarkol@google.com>
-To: Reiji Watanabe <reijiw@google.com>
-Cc: pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
-	yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com,
-	andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com,
-	suzuki.poulose@arm.com, eric.auger@redhat.com, gshan@redhat.com,
-	rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH v6 08/12] KVM: arm64: Add
- KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-Message-ID: <ZDRr1ozBOoW2PtPQ@google.com>
-References: <20230307034555.39733-1-ricarkol@google.com>
- <20230307034555.39733-9-ricarkol@google.com>
- <20230329045046.anwujgkede7h2hi5@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82B3C23A3;
+	Tue, 11 Apr 2023 06:48:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1681195684; x=1712731684;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=P4YMBXScVBBglfEFkiGOeQasVcTNDpoblfuqLiEFJNE=;
+  b=ISTridHaKGmCP/skxCTS7NxATQQ74/Uvu2+eHsiQjv/4xUOMFNtFEzmY
+   +/g7oN+z/vxsfU2/KoHrosH/Tvl88DHAhJSdzHt2n0Uwf+xw278uQ18fB
+   XJkOP0JDJ6ZHY0QIyJLdxBUnROBZ+ow+y1R8Xze1vcmO84i0s8aSF+I7I
+   +4bxxVpI6zgbEJocpLCBjNpfKqpg93pZ6sfXINPvpvjyMr1TnG84ga1wM
+   wKd+Kg97nmQvpwt3WEOQ4MPlQvTgo7mNLIYZsUFUPasEIbQikTnN/Yar0
+   tUAPhAtv+I1hUwV1qA0fECLON8dEpM5YQAgUigIsZJu4TwoTtpqQlJ34l
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10676"; a="429828721"
+X-IronPort-AV: E=Sophos;i="5.98,336,1673942400"; 
+   d="scan'208";a="429828721"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2023 23:48:03 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10676"; a="721082322"
+X-IronPort-AV: E=Sophos;i="5.98,336,1673942400"; 
+   d="scan'208";a="721082322"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by orsmga001.jf.intel.com with ESMTP; 10 Apr 2023 23:47:58 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1pm7nJ-000W3G-10;
+	Tue, 11 Apr 2023 06:47:57 +0000
+Date: Tue, 11 Apr 2023 14:47:02 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+	KVMARM <kvmarm@lists.linux.dev>,
+	ARMLinux <linux-arm-kernel@lists.infradead.org>,
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@google.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v6 4/6] KVM: arm64: Use per guest ID register for
+ ID_AA64DFR0_EL1.PMUVer
+Message-ID: <202304111418.tQGXPpze-lkp@intel.com>
+References: <20230404035344.4043856-5-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -61,193 +57,114 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230329045046.anwujgkede7h2hi5@google.com>
+In-Reply-To: <20230404035344.4043856-5-jingzhangos@google.com>
 
-On Tue, Mar 28, 2023 at 09:50:46PM -0700, Reiji Watanabe wrote:
-> Hi Ricardo,
-> 
-> On Tue, Mar 07, 2023 at 03:45:51AM +0000, Ricardo Koller wrote:
-> > Add a capability for userspace to specify the eager split chunk size.
-> > The chunk size specifies how many pages to break at a time, using a
-> > single allocation. Bigger the chunk size, more pages need to be
-> > allocated ahead of time.
-> > 
-> > Suggested-by: Oliver Upton <oliver.upton@linux.dev>
-> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > ---
-> >  Documentation/virt/kvm/api.rst    | 26 ++++++++++++++++++++++++++
-> >  arch/arm64/include/asm/kvm_host.h | 19 +++++++++++++++++++
-> >  arch/arm64/kvm/arm.c              | 22 ++++++++++++++++++++++
-> >  arch/arm64/kvm/mmu.c              |  3 +++
-> >  include/uapi/linux/kvm.h          |  1 +
-> >  5 files changed, 71 insertions(+)
-> > 
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index 62de0768d6aa..872dae7cfbe0 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -8380,6 +8380,32 @@ structure.
-> >  When getting the Modified Change Topology Report value, the attr->addr
-> >  must point to a byte where the value will be stored or retrieved from.
-> >  
-> > +8.40 KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-> > +---------------------------------------
-> > +
-> > +:Capability: KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-> > +:Architectures: arm64
-> > +:Type: vm
-> > +:Parameters: arg[0] is the new chunk size.
-> > +:Returns: 0 on success, -EINVAL if any memslot has been created.
-> > +
-> > +This capability sets the chunk size used in Eager Page Splitting.
-> > +
-> > +Eager Page Splitting improves the performance of dirty-logging (used
-> > +in live migrations) when guest memory is backed by huge-pages.  This
-> > +optimization is enabled by default on arm64. It avoids splitting
-> > +huge-pages (into PAGE_SIZE pages) on fault, by doing it eagerly when
-> > +enabling dirty logging (with the KVM_MEM_LOG_DIRTY_PAGES flag for a
-> > +memory region), or when using KVM_CLEAR_DIRTY_LOG.
-> > +
-> > +The chunk size specifies how many pages to break at a time, using a
-> > +single allocation for each chunk. Bigger the chunk size, more pages
-> > +need to be allocated ahead of time. A good heuristic is to pick the
-> > +size of the huge-pages as the chunk size.
-> > +
-> > +If the chunk size (arg[0]) is zero, then no eager page splitting is
-> > +performed. The default value PMD size (e.g., 2M when PAGE_SIZE is 4K).
-> > +
-> >  9. Known KVM API problems
-> >  =========================
-> >  
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index a1892a8f6032..b7755d0cbd4d 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -158,6 +158,25 @@ struct kvm_s2_mmu {
-> >  	/* The last vcpu id that ran on each physical CPU */
-> >  	int __percpu *last_vcpu_ran;
-> >  
-> > +#define KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT	PMD_SIZE
-> > +	/*
-> > +	 * Memory cache used to split
-> > +	 * KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE worth of huge pages. It
-> > +	 * is used to allocate stage2 page tables while splitting huge
-> > +	 * pages. Note that the choice of EAGER_PAGE_SPLIT_CHUNK_SIZE
-> 
-> Nit: s/EAGER_PAGE_SPLIT_CHUNK_SIZE/EAGER_SPLIT_CHUNK_SIZE/ ?
-> (or 'split_page_chunk_size' to make the comment consistent
-> with the field name?)
-> 
->
+Hi Jing,
 
-I missed this on v7! sorry Reiji. Will fix this on the next version.
+kernel test robot noticed the following build errors:
 
-> > +	 * influences both the capacity of the split page cache, and
-> > +	 * how often KVM reschedules. Be wary of raising CHUNK_SIZE
-> > +	 * too high.
-> > +	 *
-> > +	 * A good heuristic to pick CHUNK_SIZE is that it should be
-> > +	 * the size of the huge-pages backing guest memory. If not
-> > +	 * known, the PMD size (usually 2M) is a good guess.
-> > +	 *
-> > +	 * Protected by kvm->slots_lock.
-> > +	 */
-> > +	struct kvm_mmu_memory_cache split_page_cache;
-> > +	uint64_t split_page_chunk_size;
-> > +
-> >  	struct kvm_arch *arch;
-> >  };
-> >  
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 3bd732eaf087..3468fee223ae 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -91,6 +91,22 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-> >  		r = 0;
-> >  		set_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags);
-> >  		break;
-> > +	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
-> > +		mutex_lock(&kvm->lock);
-> 
-> Do we need to hold kvm->lock here ?
+[auto build test ERROR on 7e364e56293bb98cae1b55fd835f5991c4e96e7d]
 
-We don't need it. It's safe to have it here, but it's not required.
+url:    https://github.com/intel-lab-lkp/linux/commits/Jing-Zhang/KVM-arm64-Move-CPU-ID-feature-registers-emulation-into-a-separate-file/20230404-115612
+base:   7e364e56293bb98cae1b55fd835f5991c4e96e7d
+patch link:    https://lore.kernel.org/r/20230404035344.4043856-5-jingzhangos%40google.com
+patch subject: [PATCH v6 4/6] KVM: arm64: Use per guest ID register for ID_AA64DFR0_EL1.PMUVer
+config: arm64-randconfig-r031-20230410 (https://download.01.org/0day-ci/archive/20230411/202304111418.tQGXPpze-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project 2c57868e2e877f73c339796c3374ae660bb77f0d)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # install arm64 cross compiling tool for clang build
+        # apt-get install binutils-aarch64-linux-gnu
+        # https://github.com/intel-lab-lkp/linux/commit/66ece3020c02ab1206bb9478e8cb0172e125bbfc
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Jing-Zhang/KVM-arm64-Move-CPU-ID-feature-registers-emulation-into-a-separate-file/20230404-115612
+        git checkout 66ece3020c02ab1206bb9478e8cb0172e125bbfc
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm64 olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash arch/arm64/kvm/
 
-The ordering of locks is:
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202304111418.tQGXPpze-lkp@intel.com/
 
-	kvm->lock --> kvm->slots_lock
+All errors (new ones prefixed by >>):
 
-and kvm->lock is not held at this point, so it's safe to grab it.  I
-found instances where kvm->lock is held before grabbing kvm->slots_lock,
-and others where it's not. So it's not required.
+>> arch/arm64/kvm/id_regs.c:261:31: error: no member named 'config_lock' in 'struct kvm_arch'
+                   mutex_lock(&vcpu->kvm->arch.config_lock);
+                               ~~~~~~~~~~~~~~~ ^
+   include/linux/mutex.h:187:44: note: expanded from macro 'mutex_lock'
+   #define mutex_lock(lock) mutex_lock_nested(lock, 0)
+                                              ^~~~
+   arch/arm64/kvm/id_regs.c:269:33: error: no member named 'config_lock' in 'struct kvm_arch'
+                   mutex_unlock(&vcpu->kvm->arch.config_lock);
+                                 ~~~~~~~~~~~~~~~ ^
+   arch/arm64/kvm/id_regs.c:311:31: error: no member named 'config_lock' in 'struct kvm_arch'
+                   mutex_lock(&vcpu->kvm->arch.config_lock);
+                               ~~~~~~~~~~~~~~~ ^
+   include/linux/mutex.h:187:44: note: expanded from macro 'mutex_lock'
+   #define mutex_lock(lock) mutex_lock_nested(lock, 0)
+                                              ^~~~
+   arch/arm64/kvm/id_regs.c:318:33: error: no member named 'config_lock' in 'struct kvm_arch'
+                   mutex_unlock(&vcpu->kvm->arch.config_lock);
+                                 ~~~~~~~~~~~~~~~ ^
+   4 errors generated.
 
-I will remove it for the next version.
 
-Thanks,
-Ricardo
+vim +261 arch/arm64/kvm/id_regs.c
 
-> 
-> Thanks,
-> Reiji
-> 
-> 
-> > +		mutex_lock(&kvm->slots_lock);
-> > +		/*
-> > +		 * To keep things simple, allow changing the chunk
-> > +		 * size only if there are no memslots created.
-> > +		 */
-> > +		if (!kvm_are_all_memslots_empty(kvm)) {
-> > +			r = -EINVAL;
+   228	
+   229	static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+   230				       const struct sys_reg_desc *rd,
+   231				       u64 val)
+   232	{
+   233		u8 pmuver, host_pmuver;
+   234		bool valid_pmu;
+   235	
+   236		host_pmuver = kvm_arm_pmu_get_pmuver_limit();
+   237	
+   238		/*
+   239		 * Allow AA64DFR0_EL1.PMUver to be set from userspace as long
+   240		 * as it doesn't promise more than what the HW gives us. We
+   241		 * allow an IMPDEF PMU though, only if no PMU is supported
+   242		 * (KVM backward compatibility handling).
+   243		 */
+   244		pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), val);
+   245		if ((pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF && pmuver > host_pmuver))
+   246			return -EINVAL;
+   247	
+   248		valid_pmu = (pmuver != 0 && pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
+   249	
+   250		/* Make sure view register and PMU support do match */
+   251		if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
+   252			return -EINVAL;
+   253	
+   254		/* We can only differ with PMUver, and anything else is an error */
+   255		val ^= read_id_reg(vcpu, rd);
+   256		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
+   257		if (val)
+   258			return -EINVAL;
+   259	
+   260		if (valid_pmu) {
+ > 261			mutex_lock(&vcpu->kvm->arch.config_lock);
+   262			IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &= ~ID_AA64DFR0_EL1_PMUVer_MASK;
+   263			IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |= FIELD_PREP(ID_AA64DFR0_EL1_PMUVer_MASK,
+   264									    pmuver);
+   265	
+   266			IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) &= ~ID_DFR0_EL1_PerfMon_MASK;
+   267			IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) |= FIELD_PREP(ID_DFR0_EL1_PerfMon_MASK,
+   268									pmuver_to_perfmon(pmuver));
+   269			mutex_unlock(&vcpu->kvm->arch.config_lock);
+   270		} else {
+   271			assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags,
+   272				   pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
+   273		}
+   274	
+   275		return 0;
+   276	}
+   277	
 
-> > +		} else {
-> > +			r = 0;
-> > +			kvm->arch.mmu.split_page_chunk_size = cap->args[0];
-> > +		}
-> > +		mutex_unlock(&kvm->slots_lock);
-> > +		mutex_unlock(&kvm->lock);
-> > +		break;
-> >  	default:
-> >  		r = -EINVAL;
-> >  		break;
-> > @@ -288,6 +304,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> >  	case KVM_CAP_ARM_PTRAUTH_GENERIC:
-> >  		r = system_has_full_ptr_auth();
-> >  		break;
-> > +	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
-> > +		if (kvm)
-> > +			r = kvm->arch.mmu.split_page_chunk_size;
-> > +		else
-> > +			r = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
-> > +		break;
-> >  	default:
-> >  		r = 0;
-> >  	}
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index a2800e5c4271..898985b09321 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -756,6 +756,9 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
-> >  	for_each_possible_cpu(cpu)
-> >  		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
-> >  
-> > +	mmu->split_page_cache.gfp_zero = __GFP_ZERO;
-> > +	mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
-> > +
-> >  	mmu->pgt = pgt;
-> >  	mmu->pgd_phys = __pa(pgt->pgd);
-> >  	return 0;
-> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > index d77aef872a0a..af43acdc7901 100644
-> > --- a/include/uapi/linux/kvm.h
-> > +++ b/include/uapi/linux/kvm.h
-> > @@ -1184,6 +1184,7 @@ struct kvm_ppc_resize_hpt {
-> >  #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
-> >  #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
-> >  #define KVM_CAP_PMU_EVENT_MASKED_EVENTS 226
-> > +#define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 227
-> >  
-> >  #ifdef KVM_CAP_IRQ_ROUTING
-> >  
-> > -- 
-> > 2.40.0.rc0.216.gc4246ad0f0-goog
-> > 
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
