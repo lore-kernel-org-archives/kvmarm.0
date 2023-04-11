@@ -1,170 +1,162 @@
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82B3C23A3;
-	Tue, 11 Apr 2023 06:48:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1681195684; x=1712731684;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=P4YMBXScVBBglfEFkiGOeQasVcTNDpoblfuqLiEFJNE=;
-  b=ISTridHaKGmCP/skxCTS7NxATQQ74/Uvu2+eHsiQjv/4xUOMFNtFEzmY
-   +/g7oN+z/vxsfU2/KoHrosH/Tvl88DHAhJSdzHt2n0Uwf+xw278uQ18fB
-   XJkOP0JDJ6ZHY0QIyJLdxBUnROBZ+ow+y1R8Xze1vcmO84i0s8aSF+I7I
-   +4bxxVpI6zgbEJocpLCBjNpfKqpg93pZ6sfXINPvpvjyMr1TnG84ga1wM
-   wKd+Kg97nmQvpwt3WEOQ4MPlQvTgo7mNLIYZsUFUPasEIbQikTnN/Yar0
-   tUAPhAtv+I1hUwV1qA0fECLON8dEpM5YQAgUigIsZJu4TwoTtpqQlJ34l
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10676"; a="429828721"
-X-IronPort-AV: E=Sophos;i="5.98,336,1673942400"; 
-   d="scan'208";a="429828721"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2023 23:48:03 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10676"; a="721082322"
-X-IronPort-AV: E=Sophos;i="5.98,336,1673942400"; 
-   d="scan'208";a="721082322"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by orsmga001.jf.intel.com with ESMTP; 10 Apr 2023 23:47:58 -0700
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1pm7nJ-000W3G-10;
-	Tue, 11 Apr 2023 06:47:57 +0000
-Date: Tue, 11 Apr 2023 14:47:02 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-	KVMARM <kvmarm@lists.linux.dev>,
-	ARMLinux <linux-arm-kernel@lists.infradead.org>,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@google.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v6 4/6] KVM: arm64: Use per guest ID register for
- ID_AA64DFR0_EL1.PMUVer
-Message-ID: <202304111418.tQGXPpze-lkp@intel.com>
-References: <20230404035344.4043856-5-jingzhangos@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF8928EF
+	for <kvmarm@lists.linux.dev>; Tue, 11 Apr 2023 07:45:59 +0000 (UTC)
+Received: by mail-wr1-f48.google.com with SMTP id e2so6484469wrc.10
+        for <kvmarm@lists.linux.dev>; Tue, 11 Apr 2023 00:45:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1681199158; x=1683791158;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8GJkBu/6O7bpoxJpSxzQAmtDd9z9BrBcTp2/jbWSqLg=;
+        b=ONrys1MQcuUa+gyjSddYDw/0ef8cr2MbRXSeoXGLMVtibaBja5whE6sSVgGWAVK/EM
+         zJmY7FbvlT2+6CyulhXthb8c1nZ2Mbs6moQIVcQtfbUanq0yi/SLuWKSUIO8NiRxCj4O
+         H/j/UYM/KtAogIIcG1nAT6+cmekS7jliJO0wKDgOYCfQZvzDyWlNEw02aDu7WsndtaBU
+         Vuo6MVynWArAs8BXHY9gKF+j+0/fiWUvro80kG0bGyrZ3JIBPX7NuSRwfk7FBbKvg5yU
+         9iaox21FvCX8P0MKd215a+nZhjhRXqCu5lXASGBW4Q/pMvWCcU9YiJccAliKgvNG2NgY
+         LdAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1681199158; x=1683791158;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=8GJkBu/6O7bpoxJpSxzQAmtDd9z9BrBcTp2/jbWSqLg=;
+        b=Vs1CPUw/wo8+zUzYy17bb4PxfONslNSbs1k1yCQatFycmFc9RNmhEflRLZLIOpzHMj
+         Ep2F/7735aV8r6hIUJ9szZCah2c90TIEt/SiBKZB7uQc93GLH4FrVkmZsW1SdkONqQL2
+         6gw1ItsUMYmxQr6j0PPAuNuUoBY/WctmxNcccgl8PeGLXo6DBe6rcllMOge2tC+Yw4YT
+         l6vqMDv5Xm4tXq27BzFZStZV2eu8FHy7w4UfgOI2kbZ+76bYZzb3+gxIcdnC9kQdbOHk
+         6e9CRatnbOyTCeXwaIqi2wZi/m04kEvRYRCNaFjMZg0poOlDBLok/CUPNiktTlpg24/i
+         4ujQ==
+X-Gm-Message-State: AAQBX9emKvHbRe0ItHPRPClLamSgD0I/07uflDfuwFom9Nx1K/ttMcFV
+	Qt4LCzgRakEzBdqV7SDvsJf1Sg==
+X-Google-Smtp-Source: AKy350bBvr6G4NN9rfEYbGer6u6n82uyRoaKQDPSezwGnZVwZF/ZEYw9oCSuzQJ5e7sKq7TMi088/w==
+X-Received: by 2002:a05:6000:1081:b0:2f2:d852:c3e6 with SMTP id y1-20020a056000108100b002f2d852c3e6mr1336809wrw.3.1681199157880;
+        Tue, 11 Apr 2023 00:45:57 -0700 (PDT)
+Received: from zen.linaroharston ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id s10-20020a5d6a8a000000b002efdf3e5be0sm7736513wru.44.2023.04.11.00.45.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Apr 2023 00:45:57 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 0218F1FFB7;
+	Tue, 11 Apr 2023 08:45:57 +0100 (BST)
+References: <20230307112845.452053-1-alex.bennee@linaro.org>
+ <20230321152649.zae7edlfub76fyqq@orel>
+User-agent: mu4e 1.10.0; emacs 29.0.90
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, kvmarm@lists.linux.dev, qemu-arm@nongnu.org
+Subject: Re: [kvm-unit-tests PATCH v10 0/7] MTTCG sanity tests for ARM
+Date: Tue, 11 Apr 2023 08:43:49 +0100
+In-reply-to: <20230321152649.zae7edlfub76fyqq@orel>
+Message-ID: <87mt3erhe3.fsf@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230404035344.4043856-5-jingzhangos@google.com>
-
-Hi Jing,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on 7e364e56293bb98cae1b55fd835f5991c4e96e7d]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Jing-Zhang/KVM-arm64-Move-CPU-ID-feature-registers-emulation-into-a-separate-file/20230404-115612
-base:   7e364e56293bb98cae1b55fd835f5991c4e96e7d
-patch link:    https://lore.kernel.org/r/20230404035344.4043856-5-jingzhangos%40google.com
-patch subject: [PATCH v6 4/6] KVM: arm64: Use per guest ID register for ID_AA64DFR0_EL1.PMUVer
-config: arm64-randconfig-r031-20230410 (https://download.01.org/0day-ci/archive/20230411/202304111418.tQGXPpze-lkp@intel.com/config)
-compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project 2c57868e2e877f73c339796c3374ae660bb77f0d)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # install arm64 cross compiling tool for clang build
-        # apt-get install binutils-aarch64-linux-gnu
-        # https://github.com/intel-lab-lkp/linux/commit/66ece3020c02ab1206bb9478e8cb0172e125bbfc
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Jing-Zhang/KVM-arm64-Move-CPU-ID-feature-registers-emulation-into-a-separate-file/20230404-115612
-        git checkout 66ece3020c02ab1206bb9478e8cb0172e125bbfc
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm64 olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash arch/arm64/kvm/
-
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202304111418.tQGXPpze-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> arch/arm64/kvm/id_regs.c:261:31: error: no member named 'config_lock' in 'struct kvm_arch'
-                   mutex_lock(&vcpu->kvm->arch.config_lock);
-                               ~~~~~~~~~~~~~~~ ^
-   include/linux/mutex.h:187:44: note: expanded from macro 'mutex_lock'
-   #define mutex_lock(lock) mutex_lock_nested(lock, 0)
-                                              ^~~~
-   arch/arm64/kvm/id_regs.c:269:33: error: no member named 'config_lock' in 'struct kvm_arch'
-                   mutex_unlock(&vcpu->kvm->arch.config_lock);
-                                 ~~~~~~~~~~~~~~~ ^
-   arch/arm64/kvm/id_regs.c:311:31: error: no member named 'config_lock' in 'struct kvm_arch'
-                   mutex_lock(&vcpu->kvm->arch.config_lock);
-                               ~~~~~~~~~~~~~~~ ^
-   include/linux/mutex.h:187:44: note: expanded from macro 'mutex_lock'
-   #define mutex_lock(lock) mutex_lock_nested(lock, 0)
-                                              ^~~~
-   arch/arm64/kvm/id_regs.c:318:33: error: no member named 'config_lock' in 'struct kvm_arch'
-                   mutex_unlock(&vcpu->kvm->arch.config_lock);
-                                 ~~~~~~~~~~~~~~~ ^
-   4 errors generated.
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
 
-vim +261 arch/arm64/kvm/id_regs.c
+Andrew Jones <andrew.jones@linux.dev> writes:
 
-   228	
-   229	static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-   230				       const struct sys_reg_desc *rd,
-   231				       u64 val)
-   232	{
-   233		u8 pmuver, host_pmuver;
-   234		bool valid_pmu;
-   235	
-   236		host_pmuver = kvm_arm_pmu_get_pmuver_limit();
-   237	
-   238		/*
-   239		 * Allow AA64DFR0_EL1.PMUver to be set from userspace as long
-   240		 * as it doesn't promise more than what the HW gives us. We
-   241		 * allow an IMPDEF PMU though, only if no PMU is supported
-   242		 * (KVM backward compatibility handling).
-   243		 */
-   244		pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), val);
-   245		if ((pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF && pmuver > host_pmuver))
-   246			return -EINVAL;
-   247	
-   248		valid_pmu = (pmuver != 0 && pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
-   249	
-   250		/* Make sure view register and PMU support do match */
-   251		if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
-   252			return -EINVAL;
-   253	
-   254		/* We can only differ with PMUver, and anything else is an error */
-   255		val ^= read_id_reg(vcpu, rd);
-   256		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-   257		if (val)
-   258			return -EINVAL;
-   259	
-   260		if (valid_pmu) {
- > 261			mutex_lock(&vcpu->kvm->arch.config_lock);
-   262			IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &= ~ID_AA64DFR0_EL1_PMUVer_MASK;
-   263			IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |= FIELD_PREP(ID_AA64DFR0_EL1_PMUVer_MASK,
-   264									    pmuver);
-   265	
-   266			IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) &= ~ID_DFR0_EL1_PerfMon_MASK;
-   267			IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) |= FIELD_PREP(ID_DFR0_EL1_PerfMon_MASK,
-   268									pmuver_to_perfmon(pmuver));
-   269			mutex_unlock(&vcpu->kvm->arch.config_lock);
-   270		} else {
-   271			assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags,
-   272				   pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
-   273		}
-   274	
-   275		return 0;
-   276	}
-   277	
+> On Tue, Mar 07, 2023 at 11:28:38AM +0000, Alex Benn=C3=A9e wrote:
+>> I last had a go at getting these up-streamed at the end of 2021 so
+>> its probably worth having another go. From the last iteration a
+>> number of the groundwork patches did get merged:
+>>=20
+>>   Subject: [kvm-unit-tests PATCH v9 0/9] MTTCG sanity tests for ARM
+>>   Date: Thu,  2 Dec 2021 11:53:43 +0000
+>>   Message-Id: <20211202115352.951548-1-alex.bennee@linaro.org>
+>>=20
+>> So this leaves a minor gtags patch, adding the isaac RNG library which
+>> would also be useful for other users, see:
+>>=20
+>>   Subject: [kvm-unit-tests PATCH v3 11/27] lib: Add random number genera=
+tor
+>>   Date: Tue, 22 Nov 2022 18:11:36 +0200
+>>   Message-Id: <20221122161152.293072-12-mlevitsk@redhat.com>
+>>=20
+>> Otherwise there are a few minor checkpatch tweaks.
+>>=20
+>> I would still like to enable KVM unit tests inside QEMU as things like
+>> the x86 APIC tests are probably a better fit for unit testing TCG
+>> emulation than booting a whole OS with various APICs enabled.
+>>=20
+>> Alex Benn=C3=A9e (7):
+>>   Makefile: add GNU global tags support
+>>   add .gitpublish metadata
+>>   lib: add isaac prng library from CCAN
+>>   arm/tlbflush-code: TLB flush during code execution
+>>   arm/locking-tests: add comprehensive locking test
+>>   arm/barrier-litmus-tests: add simple mp and sal litmus tests
+>>   arm/tcg-test: some basic TCG exercising tests
+>>=20
+>>  Makefile                  |   5 +-
+>>  arm/Makefile.arm          |   2 +
+>>  arm/Makefile.arm64        |   2 +
+>>  arm/Makefile.common       |   6 +-
+>>  lib/arm/asm/barrier.h     |  19 ++
+>>  lib/arm64/asm/barrier.h   |  50 +++++
+>>  lib/prng.h                |  83 +++++++
+>>  lib/prng.c                | 163 ++++++++++++++
+>>  arm/tcg-test-asm.S        | 171 +++++++++++++++
+>>  arm/tcg-test-asm64.S      | 170 ++++++++++++++
+>>  arm/barrier-litmus-test.c | 450 ++++++++++++++++++++++++++++++++++++++
+>>  arm/locking-test.c        | 321 +++++++++++++++++++++++++++
+>>  arm/spinlock-test.c       |  87 --------
+>>  arm/tcg-test.c            | 340 ++++++++++++++++++++++++++++
+>>  arm/tlbflush-code.c       | 209 ++++++++++++++++++
+>>  arm/unittests.cfg         | 170 ++++++++++++++
+>>  .gitignore                |   3 +
+>>  .gitpublish               |  18 ++
+>>  18 files changed, 2180 insertions(+), 89 deletions(-)
+>>  create mode 100644 lib/prng.h
+>>  create mode 100644 lib/prng.c
+>>  create mode 100644 arm/tcg-test-asm.S
+>>  create mode 100644 arm/tcg-test-asm64.S
+>>  create mode 100644 arm/barrier-litmus-test.c
+>>  create mode 100644 arm/locking-test.c
+>>  delete mode 100644 arm/spinlock-test.c
+>>  create mode 100644 arm/tcg-test.c
+>>  create mode 100644 arm/tlbflush-code.c
+>>  create mode 100644 .gitpublish
+>>=20
+>> --=20
+>> 2.39.2
+>>
+>
+> I don't see any problem with the series, but I didn't review it closely.
+> I think it's unlikely we'll get reviewers, but, as the tests are
+> nodefault, then that's probably OK. Can you make sure all tests have a
+> "tcg" type prefix when they are TCG-only, like the last patch does for
+> its tests? That will help filter them out when building all tests as
+> standalone tests.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+tcg-tests is the only test that explicitly targets TCG behaviour (in the
+choice of loops and SMC). The other tests are architecture validation
+tests which should just be easy passes on real silicon.
+
+> Someday mkstandalone could maybe learn how to build
+> a directory hierarchy using the group names, e.g.
+>
+>  tests/mttcg/tlb/all_other
+
+So nodefault isn't enough for this?
+
+>
+> but I don't expect to have time for that myself anytime soon, so prefixes
+> will likely have to do for now (or forever).
+>
+> Thanks,
+> drew
+
+
+--=20
+Alex Benn=C3=A9e
+Virtualisation Tech Lead @ Linaro
