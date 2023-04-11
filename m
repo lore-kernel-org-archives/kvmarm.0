@@ -1,97 +1,76 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FA8C2F29
-	for <kvmarm@lists.linux.dev>; Tue, 11 Apr 2023 11:25:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CB2BC433EF;
-	Tue, 11 Apr 2023 11:25:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1681212306;
-	bh=B1ZaBaMT7tK1LgbIC9hi0qnUcpYo7fHssf6FQgCYUSc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=b+6K2xiSZW9LeODlX6QGkuBhaatbr6qJ04rVPuUT9yhUF9ts+pT4CHfnTiJ3DfGFb
-	 eTlekH9JjtnX8/ZH8bYitLFueHoRKQJomQHbalxo1LpxMQEZlR3DiBIoi4nVPLFnf9
-	 hbwl+YJHksmSTQKbYBkWj7OY1g5marypXanq7RQe1t9PEjg43vhMNm8Xao9pq1ZVHw
-	 qhq/oz5ckYg3iGq4p+W1mBvqy20+olh6dtQFvvMgrrVoTkAVpCgrTol0L2tqL3CQ0U
-	 iLB8lYWxk9uWObv+f8uFxAL+ZXJyUklNvfpYKjxeBzvWmcfIkKyb2rfn3Dg6+V8OYo
-	 1OMuU0QwnFKHA==
-Date: Tue, 11 Apr 2023 12:24:59 +0100
-From: Will Deacon <will@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Reiji Watanabe <reijiw@google.com>, Mark Rutland <mark.rutland@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Raghavendra Rao Anata <rananta@google.com>,
-	Shaoqin Huang <shahuang@redhat.com>, Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v2 0/2] KVM: arm64: PMU: Correct the handling of
- PMUSERENR_EL0
-Message-ID: <20230411112458.GA22090@willie-the-truck>
-References: <20230408034759.2369068-1-reijiw@google.com>
- <86r0subv8s.wl-maz@kernel.org>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DB858F6C
+	for <kvmarm@lists.linux.dev>; Tue, 11 Apr 2023 16:58:05 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4BED4D75;
+	Tue, 11 Apr 2023 09:58:49 -0700 (PDT)
+Received: from [10.1.38.164] (e126864.cambridge.arm.com [10.1.38.164])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 04A943F73F;
+	Tue, 11 Apr 2023 09:58:01 -0700 (PDT)
+Message-ID: <ed690c50-5188-e5f5-962a-b2b87d7ecf60@arm.com>
+Date: Tue, 11 Apr 2023 17:57:34 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86r0subv8s.wl-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH 04/10] arm64: mops: document boot requirements for MOPS
+Content-Language: en-US
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Mark Rutland <mark.rutland@arm.com>,
+ Mark Brown <broonie@kernel.org>, Luis Machado <luis.machado@arm.com>,
+ Vladimir Murzin <vladimir.murzin@arm.com>, linux-kernel@vger.kernel.org
+References: <20230216160012.272345-1-kristina.martsenko@arm.com>
+ <20230216160012.272345-5-kristina.martsenko@arm.com>
+ <ZBSCObGmIXjyeMA6@arm.com> <61b0e30a-568c-d7f6-7b67-e9fc8b68de25@arm.com>
+ <ZCwA+rbmFT2HaZ7G@arm.com>
+From: Kristina Martsenko <kristina.martsenko@arm.com>
+In-Reply-To: <ZCwA+rbmFT2HaZ7G@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sat, Apr 08, 2023 at 10:04:19AM +0100, Marc Zyngier wrote:
-> On Sat, 08 Apr 2023 04:47:57 +0100,
-> Reiji Watanabe <reijiw@google.com> wrote:
-> > 
-> > This series will fix bugs in KVM's handling of PMUSERENR_EL0.
-> > 
-> > With PMU access support from EL0 [1], the perf subsystem would
-> > set CR and ER bits of PMUSERENR_EL0 as needed to allow EL0 to have
-> > a direct access to PMU counters.  However, KVM appears to assume
-> > that the register value is always zero for the host EL0, and has
-> > the following two problems in handling the register.
-> > 
-> > [A] The host EL0 might lose the direct access to PMU counters, as
-> >     KVM always clears PMUSERENR_EL0 before returning to userspace.
-> > 
-> > [B] With VHE, the guest EL0 access to PMU counters might be trapped
-> >     to EL1 instead of to EL2 (even when PMUSERENR_EL0 for the guest
-> >     indicates that the guest EL0 has an access to the counters).
-> >     This is because, with VHE, KVM sets ER, CR, SW and EN bits of
-> >     PMUSERENR_EL0 to 1 on vcpu_load() to ensure to trap PMU access
-> >     from the guset EL0 to EL2, but those bits might be cleared by
-> >     the perf subsystem after vcpu_load() (when PMU counters are
-> >     programmed for the vPMU emulation).
-> > 
-> > Patch-1 will fix [A], and Patch-2 will fix [B] respectively.
-> > The series is based on v6.3-rc5.
-> > 
-> > v2:
-> >  - Save the PMUSERENR_EL0 for the host in the sysreg array of
-> >    kvm_host_data. [Marc]
-> >  - Don't let armv8pmu_start() overwrite PMUSERENR if the vCPU
-> >    is loaded, instead have KVM update the saved shadow register
-> >    value for the host. [Marc, Mark]
+On 04/04/2023 11:50, Catalin Marinas wrote:
+> On Fri, Mar 24, 2023 at 01:00:43AM +0000, Kristina Martsenko wrote:
+>> On 17/03/2023 15:07, Catalin Marinas wrote:
+>>> On Thu, Feb 16, 2023 at 04:00:06PM +0000, Kristina Martsenko wrote:
+>>>> +  For CPUs with Memory Copy and Memory Set instructions (FEAT_MOPS):
+>>>> +
+>>>> +  - If the kernel is entered at EL1 and EL2 is present:
+>>>> +
+>>>> +    - HCRX_EL2.MSCEn (bit 11) must be initialised to 0b1.
+>>>> +
+>>>> +    - HCRX_EL2.MCE2 (bit 10) must be initialised to 0b0.
+>>>
+>>> Regarding MCE2, does EL1 actually care if EL2 wants to handle all the
+>>> memcpy/memset exceptions? 
+>>
+>> Note that this series does not add support for mops in guests yet. 
 > 
-> This looks much better to me. If Mark is OK with it, I'm happy to take
-> it in 6.4.
+> You mean there's no KVM support. But Linux may be run under a different
+> hypervisor (e.g. Hyper-V) as a guest.
 > 
-> Speaking of which, this will clash with the queued move of the PMUv3
-> code into drivers/perf, and probably break on 32bit. I can either take
-> a branch shared with arm64 (009d6dc87a56 ("ARM: perf: Allow the use of
-> the PMUv3 driver on 32bit ARM")), or wait until -rc1.
+>> I think booting.txt can be updated when that support is added.
 > 
-> Will, what do you prefer?
+> In booting.txt, when you say the kernel entered at EL1, it implies that
+> it may be run as a guest under a random hypervisor.
+> 
+> So maybe we should detail the MCE2 requirement a bit, saying that it can
+> be either 0 or 1 but, for the latter, the hypervisor must handle the
+> corresponding exceptions.
 
-I'd be inclined to wait until -rc1, but for-next/perf is stable if you
-decide to take it anyway.
+That makes sense. I was going to add this, but then realized that MCE2 only
+traps memcpy exceptions from EL1, not EL0, so it does not have any effect with
+this series. So I think we can just drop the MCE2 requirement entirely for now
+and specify the requirement later when we add memcpy instructions into the
+kernel itself.
 
-Will
+Thanks,
+Kristina
+
