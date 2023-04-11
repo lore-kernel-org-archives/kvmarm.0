@@ -1,69 +1,204 @@
-Received: from out-5.mta0.migadu.com (out-5.mta0.migadu.com [91.218.175.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70CC35388
-	for <kvmarm@lists.linux.dev>; Tue, 11 Apr 2023 09:08:47 +0000 (UTC)
-Date: Tue, 11 Apr 2023 11:08:43 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1681204125;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=I2iC8buvK2tS8ozL9BHGlo/Sy4UT6qIVUL5c6wk4p6g=;
-	b=jDlTpk0mHI9HGFG/mMYsZ8feUXZFsTYrXMBV5wrpq5gBMwvb/D9qBQrkCPFRqNvyAJEb4W
-	P4y8LBz10RyPFh4MBpBmxUQknrrQybLiS/mbE8byvPCvvIGCxYHg6xrzoKogdNXTySydbl
-	/Ezp9qgwjnJyILNj90gjOzfVQUX4280=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 
-	qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.linux.dev, qemu-arm@nongnu.org
-Subject: Re: [kvm-unit-tests PATCH v10 0/7] MTTCG sanity tests for ARM
-Message-ID: <hlno75xnob6jwbpfzwbwsjje2ujgfzw5kwvwmu2627obkmpqk2@dtcvgno2dkge>
-References: <20230307112845.452053-1-alex.bennee@linaro.org>
- <20230321152649.zae7edlfub76fyqq@orel>
- <87mt3erhe3.fsf@linaro.org>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 549CB5388
+	for <kvmarm@lists.linux.dev>; Tue, 11 Apr 2023 09:34:08 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 42691D75;
+	Tue, 11 Apr 2023 02:34:46 -0700 (PDT)
+Received: from FVFF77S0Q05N (unknown [10.57.20.166])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1EE7B3F73F;
+	Tue, 11 Apr 2023 02:33:55 -0700 (PDT)
+Date: Tue, 11 Apr 2023 10:33:50 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Reiji Watanabe <reijiw@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Raghavendra Rao Anata <rananta@google.com>,
+	Shaoqin Huang <shahuang@redhat.com>, Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v2 2/2] KVM: arm64: PMU: Don't overwrite PMUSERENR with
+ vcpu loaded
+Message-ID: <ZDUpfnXi/GwFwFV9@FVFF77S0Q05N>
+References: <20230408034759.2369068-1-reijiw@google.com>
+ <20230408034759.2369068-3-reijiw@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87mt3erhe3.fsf@linaro.org>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20230408034759.2369068-3-reijiw@google.com>
 
-On Tue, Apr 11, 2023 at 08:43:49AM +0100, Alex Bennée wrote:
+On Fri, Apr 07, 2023 at 08:47:59PM -0700, Reiji Watanabe wrote:
+> Currently, with VHE, KVM sets ER, CR, SW and EN bits of
+> PMUSERENR_EL0 to 1 on vcpu_load(), and saves and restores
+> the register value for the host on vcpu_load() and vcpu_put().
+> If the value of those bits are cleared on a pCPU with a vCPU
+> loaded (armv8pmu_start() would do that when PMU counters are
+> programmed for the guest), PMU access from the guest EL0 might
+> be trapped to the guest EL1 directly regardless of the current
+> PMUSERENR_EL0 value of the vCPU.
 > 
-> Andrew Jones <andrew.jones@linux.dev> writes:
-...
-> > Someday mkstandalone could maybe learn how to build
-> > a directory hierarchy using the group names, e.g.
-> >
-> >  tests/mttcg/tlb/all_other
-> 
-> So nodefault isn't enough for this?
->
+> Fix this by not letting armv8pmu_start() overwrite PMUSERENR on
+> the pCPU on which a vCPU is loaded, and instead updating the
+> saved shadow register value for the host, so that the value can
+> be restored on vcpu_put() later.
 
-nodefault is enough to avoid running a test with run_tests.sh,
-when its group hasn't been explicitly selected, i.e.
+I'm happy with the hook in the PMU code, but I think there's still a race
+between an IPI and vcpu_{load,put}() where we can lose an update to
+PMUSERERNR_EL0. I tried to point that out in my final question in:
 
- ./run_tests.sh
+  https://lore.kernel.org/all/ZCwzV7ACl21VbLru@FVFF77S0Q05N.cambridge.arm.com/
 
-doesn't run the test
+... but I looks like that wasn't all that clear.
 
- ./run_tests.sh -g test-group-name
+Consider vcpu_load():
 
-does run the test.
+void vcpu_load(struct kvm_vcpu *vcpu)
+{
+	int cpu = get_cpu();
 
-standalone test filtering is only done by filename (but
-potentially pathname), which is why I suggested we someday use
-the group names as directory names. Anyway, that's future work.
-This series just needs to ensure it gets its group names right.
+	__this_cpu_write(kvm_running_vcpu, vcpu);
+	preempt_notifier_register(&vcpu->preempt_notifier);
+	kvm_arch_vcpu_load(vcpu, cpu);
+	put_cpu();
+}
+
+AFAICT that's called with IRQs enabled, and the {get,put}_cpu() calls will only
+disable migration/preemption. After the write to kvm_running_vcpu, the code in
+kvm_set_pmuserenr() will see that there is a running vcpu, and write to the
+host context without updating the real PMUSERENR_EL0 register.
+
+If we take an IPI and call kvm_set_pmuserenr() after the write to
+kvm_running_vcpu but before kvm_running_vcpu() completes, the call to
+kvm_set_pmuserenr() could update the host context (without updating the real
+PMUSERENR_EL0 value) before __activate_traps_common() saves the host value
+with:
+
+	 ctxt_sys_reg(hctxt, PMUSERENR_EL0) = read_sysreg(pmuserenr_el0);
+
+... which would discard the write made by kvm_set_pmuserenr().
+
+Similar can happen in vcpu_put() where an IPI after __deactivate_traps_common()
+but before kvm_running_vcpu is cleared would result in kvm_set_pmuserenr()
+writing to the host context, but this value would never be written into HW.
+
+Unless I'm missing something (e.g. if interrupts are actually masked during
+those windows), I don't think this is a complete fix as-is.
+
+I'm not sure if there is a smart fix for that.
 
 Thanks,
-drew
+Mark.
+
+> Suggested-by: Mark Rutland <mark.rutland@arm.com>
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Fixes: 83a7a4d643d3 ("arm64: perf: Enable PMU counter userspace access for perf event")
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  5 +++++
+>  arch/arm64/kernel/perf_event.c    | 21 ++++++++++++++++++---
+>  arch/arm64/kvm/pmu.c              | 20 ++++++++++++++++++++
+>  3 files changed, 43 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index bcd774d74f34..22db2f885c17 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1028,9 +1028,14 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu);
+>  #ifdef CONFIG_KVM
+>  void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
+>  void kvm_clr_pmu_events(u32 clr);
+> +bool kvm_set_pmuserenr(u64 val);
+>  #else
+>  static inline void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr) {}
+>  static inline void kvm_clr_pmu_events(u32 clr) {}
+> +static inline bool kvm_set_pmuserenr(u64 val)
+> +{
+> +	return false;
+> +}
+>  #endif
+>  
+>  void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+> index dde06c0f97f3..0fffe4c56c28 100644
+> --- a/arch/arm64/kernel/perf_event.c
+> +++ b/arch/arm64/kernel/perf_event.c
+> @@ -741,9 +741,25 @@ static inline u32 armv8pmu_getreset_flags(void)
+>  	return value;
+>  }
+>  
+> +static void update_pmuserenr(u64 val)
+> +{
+> +	lockdep_assert_irqs_disabled();
+> +
+> +	/*
+> +	 * The current pmuserenr value might be the value for the guest.
+> +	 * If that's the case, have KVM keep tracking of the register value
+> +	 * for the host EL0 so that KVM can restore it before returning to
+> +	 * the host EL0. Otherwise, update the register now.
+> +	 */
+> +	if (kvm_set_pmuserenr(val))
+> +		return;
+> +
+> +	write_sysreg(val, pmuserenr_el0);
+> +}
+> +
+>  static void armv8pmu_disable_user_access(void)
+>  {
+> -	write_sysreg(0, pmuserenr_el0);
+> +	update_pmuserenr(0);
+>  }
+>  
+>  static void armv8pmu_enable_user_access(struct arm_pmu *cpu_pmu)
+> @@ -759,8 +775,7 @@ static void armv8pmu_enable_user_access(struct arm_pmu *cpu_pmu)
+>  			armv8pmu_write_evcntr(i, 0);
+>  	}
+>  
+> -	write_sysreg(0, pmuserenr_el0);
+> -	write_sysreg(ARMV8_PMU_USERENR_ER | ARMV8_PMU_USERENR_CR, pmuserenr_el0);
+> +	update_pmuserenr(ARMV8_PMU_USERENR_ER | ARMV8_PMU_USERENR_CR);
+>  }
+>  
+>  static void armv8pmu_enable_event(struct perf_event *event)
+> diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
+> index 7887133d15f0..40bb2cb13317 100644
+> --- a/arch/arm64/kvm/pmu.c
+> +++ b/arch/arm64/kvm/pmu.c
+> @@ -209,3 +209,23 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu)
+>  	kvm_vcpu_pmu_enable_el0(events_host);
+>  	kvm_vcpu_pmu_disable_el0(events_guest);
+>  }
+> +
+> +/*
+> + * With VHE, keep track of the PMUSERENR_EL0 value for the host EL0 on
+> + * the pCPU where vCPU is loaded, since PMUSERENR_EL0 is switched to
+> + * the value for the guest on vcpu_load().  The value for the host EL0
+> + * will be restored on vcpu_put(), before returning to the EL0.
+> + *
+> + * Return true if KVM takes care of the register. Otherwise return false.
+> + */
+> +bool kvm_set_pmuserenr(u64 val)
+> +{
+> +	struct kvm_cpu_context *hctxt;
+> +
+> +	if (!kvm_arm_support_pmu_v3() || !has_vhe() || !kvm_get_running_vcpu())
+> +		return false;
+> +
+> +	hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +	ctxt_sys_reg(hctxt, PMUSERENR_EL0) = val;
+> +	return true;
+> +}
+> -- 
+> 2.40.0.577.gac1e443424-goog
+> 
+> 
