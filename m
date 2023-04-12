@@ -1,40 +1,40 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D177A936
-	for <kvmarm@lists.linux.dev>; Wed, 12 Apr 2023 21:35:23 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-54f69fb5cafso71986507b3.12
-        for <kvmarm@lists.linux.dev>; Wed, 12 Apr 2023 14:35:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63141A93A
+	for <kvmarm@lists.linux.dev>; Wed, 12 Apr 2023 21:35:24 +0000 (UTC)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-54f8b46f399so40043257b3.10
+        for <kvmarm@lists.linux.dev>; Wed, 12 Apr 2023 14:35:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681335322; x=1683927322;
+        d=google.com; s=20221208; t=1681335323; x=1683927323;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2HEZpjwJAllfV0I5F7ADUYQU3lomGIeMIJyobWdtpuc=;
-        b=lAmykGgc7/jSWWpiEUSSuOFZq53ucIIAMaKUFqmueRpj2EzlhWgnqQLfis3Ztcd4wi
-         h5Zgje/Jxjcj2CcRv9fSMfzcrGEpsPUQ+X4OYlwUzTG9hZZgzZxEg4iERSVRsazSR4dQ
-         mbJBRRiQGBkQ1VaXe8CftZCD+8LyveM0bff5wLsLok2+QNnHiJm2xDU1peod1tRA9Gme
-         8K+wJXLIyDSfDU2Liq5+LTeILHdZRIhAdBtJ4tBTagjbxyHGme3Bdyd46qOb/TRcpdXT
-         elyMkDBA5mdJuuZYGfiFiCeYQ/U5/qRgk3o+DrSjOQIWmibO2PFVdAWi+0KxVip7dHLw
-         hBDA==
+        bh=uHo5QQHeSuM2EtVp0WZkAVQAlrFLxra0Ir0r+Emw+q4=;
+        b=sa+XBYOkX2d/Tu87yvD3UhP5nhC7As51Olcx+W/RSEY/FGJuNDurfGxnX//1FqsoM2
+         PJTt3/hUG7FrXNKJiVjFgxDx7oahgt4JlSXSeXB7SuChwWitdUEUlqC13KbMvt9pAe5b
+         zArqJRTUKp7mKE6YJmU9VTtlAuOdBuED2zJNjYiJQGU4IdX1hTel0j5u28jgfcUoLPuM
+         UcSNN40jmwOi2rQ3p+pwHCL+Lzc4bweXDCbWWTR7hgoE/VkKJ3GoZ07ZMgQq8SUMudLk
+         dwcDtmojhM9j6Jpn97L/vupf06dWUHVzfFDZhSr5ygLVJGg8y2SUDVOmW1Ps1ad3Wrad
+         9zGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681335322; x=1683927322;
+        d=1e100.net; s=20221208; t=1681335323; x=1683927323;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2HEZpjwJAllfV0I5F7ADUYQU3lomGIeMIJyobWdtpuc=;
-        b=LiVnVoPy6MsPJoJ0V4BVcVdkA9X3qUOF/9oiyNdbWlrGfUCO5yKd2lLge6XkgYDL0R
-         ZHIIY0gGD6/6f8Wj/zewRkhUwV2SZ5f85OX262/S1RvcHa5LDuPhEShA6xLw+17JDGIr
-         aRuSpnvv/nzMyEywWAUmLtyM6PVK6Z+9KEnbPyjPRCA53/D2ceMhaPSpGjoF+SsCvmxf
-         QUokucDFloD58Trz4I4tdBhMm95DtjOasZWJn2D5+0a2JSRPyXWPW15RGu0oTpq9mMvy
-         Z4E14KHUhAxu6PjZ48fn71SblmBPwmrpT0ReFucC9exgsUmsaZ6fiR/o2kKcwH2XkLiH
-         S8lQ==
-X-Gm-Message-State: AAQBX9cSTiyOKZjDoYy7ytklmvc+RyKTS54I5yNz6grxJCP/yhBttcdu
-	W2tlJjpwGapAyamwJsTtoKVnJLUEJinIxA==
-X-Google-Smtp-Source: AKy350ZEcbjFijoKkL3xtGAA1xKzYaEJ45MS8KT6dNFR0HK9SeJ8kLYqa/GC16fyN32eT7P0BxcvFD5YNNEzLA==
+        bh=uHo5QQHeSuM2EtVp0WZkAVQAlrFLxra0Ir0r+Emw+q4=;
+        b=YSjNbX1kj0AB2xf+S6zdPdEnsRj/BW8Y+UzkKCh+ui/jD+RxvRLpMgc/CW9rK10kG8
+         AbvbURHeDM3+sl8jOeln67usH/H3neWcq8QrspVe+UIwGRXcwvhqTtlthtaNaBc99Nhg
+         lwjXuPxOF4oerxoJxC5L7Bd7kwBc0QEbaPFW3jxm67/nHZTkwmX4d8MIGcGIHs/trj8G
+         rVt1ismmoBZWjb/yU91yu2hLnfJd5f90ok18tzr95MCp5vIuc3dsWDb9nFuhOxAcfJQU
+         WVWLACT0Zw5grSvbCBAC6LRJJJAnXyj5qj8MLkTeJ9cElClpPuwWh1/0S8cm0P8GeV18
+         Zevg==
+X-Gm-Message-State: AAQBX9ezYxh8Ooqve6naQLcaM7ByuE9rfXv8ZQvaDN9/4c93IIyl9DGL
+	aO68Zg6lCGfMk0cMGsGU+ye08geYqzOgzQ==
+X-Google-Smtp-Source: AKy350Z2PC9zVB+t1rGgWRL74ikHOAYhj1EdKpabNbisfi4nEhLfjYbZhgRy3U2heOy2zhj+WgIR06d2qDQXMQ==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a25:d78b:0:b0:b67:d295:d614 with SMTP id
- o133-20020a25d78b000000b00b67d295d614mr9968308ybg.12.1681335322385; Wed, 12
- Apr 2023 14:35:22 -0700 (PDT)
-Date: Wed, 12 Apr 2023 21:34:56 +0000
+ (user=amoorthy job=sendgmr) by 2002:a25:6c07:0:b0:b8b:eea7:525a with SMTP id
+ h7-20020a256c07000000b00b8beea7525amr9848148ybc.7.1681335323435; Wed, 12 Apr
+ 2023 14:35:23 -0700 (PDT)
+Date: Wed, 12 Apr 2023 21:34:57 +0000
 In-Reply-To: <20230412213510.1220557-1-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230412213510.1220557-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.40.0.577.gac1e443424-goog
-Message-ID: <20230412213510.1220557-9-amoorthy@google.com>
-Subject: [PATCH v3 08/22] KVM: Annotate -EFAULTs from kvm_vcpu_read_guest_page()
+Message-ID: <20230412213510.1220557-10-amoorthy@google.com>
+Subject: [PATCH v3 09/22] KVM: Annotate -EFAULTs from kvm_vcpu_map()
 From: Anish Moorthy <amoorthy@google.com>
 To: pbonzini@redhat.com, maz@kernel.org
 Cc: oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com, 
@@ -55,30 +55,29 @@ Cc: oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com,
 Content-Type: text/plain; charset="UTF-8"
 
 Implement KVM_CAP_MEMORY_FAULT_INFO for efaults generated by
-kvm_vcpu_read_guest_page().
+kvm_vcpu_map().
 
 Signed-off-by: Anish Moorthy <amoorthy@google.com>
 ---
- virt/kvm/kvm_main.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ virt/kvm/kvm_main.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index b29a38af543f0..572adba9ad8ed 100644
+index 572adba9ad8ed..f3be5aa49829a 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -3014,7 +3014,11 @@ int kvm_vcpu_read_guest_page(struct kvm_vcpu *vcpu, gfn_t gfn, void *data,
- {
- 	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+@@ -2843,8 +2843,10 @@ int kvm_vcpu_map(struct kvm_vcpu *vcpu, gfn_t gfn, struct kvm_host_map *map)
+ #endif
+ 	}
  
--	return __kvm_read_guest_page(slot, gfn, data, offset, len);
-+	int ret = __kvm_read_guest_page(slot, gfn, data, offset, len);
-+
-+	if (ret == -EFAULT)
-+		kvm_populate_efault_info(vcpu, gfn * PAGE_SIZE + offset, len);
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest_page);
+-	if (!hva)
++	if (!hva) {
++		kvm_populate_efault_info(vcpu, gfn * PAGE_SIZE, PAGE_SIZE);
+ 		return -EFAULT;
++	}
  
+ 	map->page = page;
+ 	map->hva = hva;
 -- 
 2.40.0.577.gac1e443424-goog
 
