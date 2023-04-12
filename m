@@ -1,40 +1,40 @@
 Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C911A93A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53AB8A93C
 	for <kvmarm@lists.linux.dev>; Wed, 12 Apr 2023 21:35:34 +0000 (UTC)
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-54f97aac3d0so30076787b3.15
-        for <kvmarm@lists.linux.dev>; Wed, 12 Apr 2023 14:35:33 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-54f8b46f399so40047387b3.10
+        for <kvmarm@lists.linux.dev>; Wed, 12 Apr 2023 14:35:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681335333; x=1683927333;
+        d=google.com; s=20221208; t=1681335334; x=1683927334;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=g4meCJ11bu24h/cx6LqrB3qAGYM0pv712osrkf0fzPk=;
-        b=ksc3Uo2kb7fia25zCArzbWloYH/nh04oxzOH/JXw50ehdelb83OV7185J0dcX5CTUl
-         SGpdnP8yVtEWCbN+YKQ1yw8N8CQUKFw5GeaZzxeaIm8mtKU8dAgwpAVgKJavw0O/BKRr
-         aANPAgurlfqKrwO6NGZX4gGPSuyn7eKZfTRk38L/4yupoynBZqCFaqDAjRlkDb1iUMh5
-         pC0nfYaS0kiBXS6IZr2a1LpJBUYMVii2A3gBADS7dpYAr1eW2Ktxxidq4/+TMOHkiSL7
-         o8XlEyDWSf+taexDIlKlaYBbFOU+RE/VhORCsyo31dF0tN3prUOBff0E7D5keRnnyYrE
-         Mj+Q==
+        bh=/Enih2OM3xwbE5JxqMI9mr7glLAzseUE52pRXsIPwpY=;
+        b=LJSLx2GmrRRLif5bbLyYGFln1e+mukhuEhQ8NMHWImtHxszerqlY/NKn+zz1MUyL4g
+         Rlbv9IpPwkTyJx8bnss02J6GJZz2JTwlgyaXgxqHU3tn4LkPOw11BCHr/ArqNWqOxIB2
+         hHqqC6FrtyMb61n7b+Ls90p9ALsXIFcnVJa/q40H84E0KOXzBt6kpUTjEjtE+ocWlBdY
+         RNd/SE0HnxV79jWKOBVBGLq8MMReIJ4+vmT4abRVkyAkKHk+1t/UXey6drvtWNdrlN4i
+         um/lqceHm0LhijaKXqX57GaVUClwr+zMEqAwGOYFMXAvgIRufjrICOxdPvn8Hhik5V3Q
+         3yeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681335333; x=1683927333;
+        d=1e100.net; s=20221208; t=1681335334; x=1683927334;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=g4meCJ11bu24h/cx6LqrB3qAGYM0pv712osrkf0fzPk=;
-        b=ZiQvRnVYtmsUifPYAAjkvHVtFRFKs+3U/3VSkufAgl199ctrnGJll5bNGvJpa+AJmC
-         INhG+xvvT87TFOcXwg7ReVAl5GLlNkUCb5oB7o3ZCXbc4Fq3y9vVKqGxv2Os0uSs0AyK
-         VcBfND072RQ6bip6f0Ux4QxeSiRZKbO7HplZHa43Rt3U6CwwYqK90IISIjGX1CTqhT76
-         JQ7uOOAcoI05u6gPBNRKV+DW8QoGLD6ngBXw8LcNHpc3eiJY59Lh4lrZSGk3JgoahCNU
-         lHeK/DimyL5fFVlN6OIRLxQxXmTtxskmXDfv62JdydmEB04hENQre4sh3tsPVz/Zst2+
-         PXfQ==
-X-Gm-Message-State: AAQBX9dEVBm25sOXU58cHHqg+HT4FEyx/w/FaJPnPculS5Eu+/hEXpYB
-	DoHoqetpEAQmFDtuylTNAfTvbJE7zDx0dw==
-X-Google-Smtp-Source: AKy350ZG6iLC4X3Y7S8xfkDc/hZ3/74579TfJlfN5A+jNG8WvNeg+IGrAA5URu61LfHolsG/pk2OemadO/dyGw==
+        bh=/Enih2OM3xwbE5JxqMI9mr7glLAzseUE52pRXsIPwpY=;
+        b=SRKuAkQo7n7+3GxolSZbsyiUOEiG19RdgkUpL0RbJfxDUFGGmbcZj/18rcBjEcFkSn
+         RtegGyTimAbWCRGZhGCxMvZRCjMWa4BXFb4KA7GXqVzhscrxyoohhsrlVFzuMcEzh2di
+         BJtuaUSBIv9RAQiCPBAnzvb8OcN2As7zMQ2gZKg+qdmBkpaGKhfCvr+qHXwF8ns4qQ+F
+         nzq7+TaO+8omsA80n0XlE/ZToq3t/crP6618RbJ4gpqWyc/ctj9UcAvc4HaD4v6B9NjI
+         O3bLMrEpc3Xb7OrolZSa6wsifub02UMr9QBypP4zELoTy4U1hztSgcAx4A23lDag5pHP
+         1AYA==
+X-Gm-Message-State: AAQBX9c0mBrvJVh79WDehZMr/+dcuNonMUSgEf+BvwetFTOEw+Dk3DCU
+	42Ejuu4COmAuRzYIeVG7fBBqSnqxJnSSBw==
+X-Google-Smtp-Source: AKy350ZFX3aP1qiu5losJdiyWVTYHetybhx9O9AbXDP6rP4+1JK6fQgdp+4BmbBKGbw0H30C9IftH48afs2buA==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a81:c94d:0:b0:54b:fd28:c5ff with SMTP id
- c13-20020a81c94d000000b0054bfd28c5ffmr2814728ywl.3.1681335333086; Wed, 12 Apr
- 2023 14:35:33 -0700 (PDT)
-Date: Wed, 12 Apr 2023 21:35:08 +0000
+ (user=amoorthy job=sendgmr) by 2002:a25:3354:0:b0:b8e:f726:d198 with SMTP id
+ z81-20020a253354000000b00b8ef726d198mr5949388ybz.8.1681335334026; Wed, 12 Apr
+ 2023 14:35:34 -0700 (PDT)
+Date: Wed, 12 Apr 2023 21:35:09 +0000
 In-Reply-To: <20230412213510.1220557-1-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230412213510.1220557-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.40.0.577.gac1e443424-goog
-Message-ID: <20230412213510.1220557-21-amoorthy@google.com>
-Subject: [PATCH v3 20/22] KVM: arm64: Implement KVM_CAP_ABSENT_MAPPING_FAULT
+Message-ID: <20230412213510.1220557-22-amoorthy@google.com>
+Subject: [PATCH v3 21/22] KVM: selftests: Add memslot_flags parameter to memstress_create_vm()
 From: Anish Moorthy <amoorthy@google.com>
 To: pbonzini@redhat.com, maz@kernel.org
 Cc: oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com, 
@@ -54,70 +54,108 @@ Cc: oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com,
 	kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
-Return -EFAULT from user_mem_abort when the memslot flag is enabled and
-fast GUP fails to find a present mapping for the page.
+Memslot flags aren't currently exposed to the tests, and are just always
+set to 0. Add a parameter to allow tests to manually set those flags.
 
 Signed-off-by: Anish Moorthy <amoorthy@google.com>
 ---
- Documentation/virt/kvm/api.rst |  2 +-
- arch/arm64/kvm/arm.c           |  1 +
- arch/arm64/kvm/mmu.c           | 11 +++++++++--
- 3 files changed, 11 insertions(+), 3 deletions(-)
+ tools/testing/selftests/kvm/access_tracking_perf_test.c       | 2 +-
+ tools/testing/selftests/kvm/demand_paging_test.c              | 4 ++--
+ tools/testing/selftests/kvm/dirty_log_perf_test.c             | 2 +-
+ tools/testing/selftests/kvm/include/memstress.h               | 2 +-
+ tools/testing/selftests/kvm/lib/memstress.c                   | 4 ++--
+ .../testing/selftests/kvm/memslot_modification_stress_test.c  | 2 +-
+ 6 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 452bbca800b15..47f728701aca4 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -7712,7 +7712,7 @@ reported to the maintainers.
- 7.35 KVM_CAP_ABSENT_MAPPING_FAULT
- ---------------------------------
+diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+index 3c7defd34f567..b51656b408b83 100644
+--- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
++++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+@@ -306,7 +306,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	struct kvm_vm *vm;
+ 	int nr_vcpus = params->nr_vcpus;
  
--:Architectures: x86
-+:Architectures: x86, arm64
- :Returns: -EINVAL.
+-	vm = memstress_create_vm(mode, nr_vcpus, params->vcpu_memory_bytes, 1,
++	vm = memstress_create_vm(mode, nr_vcpus, params->vcpu_memory_bytes, 1, 0,
+ 				 params->backing_src, !overlap_memory_access);
  
- The presence of this capability indicates that userspace may pass the
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index a932346b59f61..c9666d7c6c4ff 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -221,6 +221,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_PTP_KVM:
- 	case KVM_CAP_ARM_SYSTEM_SUSPEND:
- 	case KVM_CAP_MEMORY_FAULT_INFO:
-+	case KVM_CAP_ABSENT_MAPPING_FAULT:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index d5ae636c26d62..26b9485557056 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1206,6 +1206,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	unsigned long vma_pagesize, fault_granule;
- 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
- 	struct kvm_pgtable *pgt;
-+	bool exit_on_memory_fault = kvm_slot_fault_on_absent_mapping(memslot);
+ 	memstress_start_vcpu_threads(nr_vcpus, vcpu_thread_main);
+diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+index c729cee4c2055..e84dde345edbc 100644
+--- a/tools/testing/selftests/kvm/demand_paging_test.c
++++ b/tools/testing/selftests/kvm/demand_paging_test.c
+@@ -144,8 +144,8 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	int i, num_uffds = 0;
+ 	uint64_t uffd_region_size;
  
- 	fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
- 	write_fault = kvm_is_write_fault(vcpu);
-@@ -1301,8 +1302,14 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 */
- 	smp_rmb();
+-	vm = memstress_create_vm(mode, nr_vcpus, guest_percpu_mem_size, 1,
+-				 p->src_type, p->partition_vcpu_memory_access);
++	vm = memstress_create_vm(mode, nr_vcpus, guest_percpu_mem_size,
++				1, 0, p->src_type, p->partition_vcpu_memory_access);
  
--	pfn = __gfn_to_pfn_memslot(memslot, gfn, false, false, NULL,
--				   write_fault, &writable, NULL);
-+	pfn = __gfn_to_pfn_memslot(memslot, gfn, exit_on_memory_fault, false, NULL,
-+					write_fault, &writable, NULL);
-+
-+	if (exit_on_memory_fault && pfn == KVM_PFN_ERR_FAULT) {
-+		kvm_populate_efault_info(vcpu,
-+				round_down(gfn * PAGE_SIZE, vma_pagesize), vma_pagesize);
-+		return -EFAULT;
-+	}
- 	if (pfn == KVM_PFN_ERR_HWPOISON) {
- 		kvm_send_hwpoison_signal(hva, vma_shift);
- 		return 0;
+ 	demand_paging_size = get_backing_src_pagesz(p->src_type);
+ 
+diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+index e9d6d1aecf89c..6c8749193cfa4 100644
+--- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+@@ -224,7 +224,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	int i;
+ 
+ 	vm = memstress_create_vm(mode, nr_vcpus, guest_percpu_mem_size,
+-				 p->slots, p->backing_src,
++				 p->slots, 0, p->backing_src,
+ 				 p->partition_vcpu_memory_access);
+ 
+ 	pr_info("Random seed: %u\n", p->random_seed);
+diff --git a/tools/testing/selftests/kvm/include/memstress.h b/tools/testing/selftests/kvm/include/memstress.h
+index 72e3e358ef7bd..1cba965d2d331 100644
+--- a/tools/testing/selftests/kvm/include/memstress.h
++++ b/tools/testing/selftests/kvm/include/memstress.h
+@@ -56,7 +56,7 @@ struct memstress_args {
+ extern struct memstress_args memstress_args;
+ 
+ struct kvm_vm *memstress_create_vm(enum vm_guest_mode mode, int nr_vcpus,
+-				   uint64_t vcpu_memory_bytes, int slots,
++				   uint64_t vcpu_memory_bytes, int slots, uint32_t slot_flags,
+ 				   enum vm_mem_backing_src_type backing_src,
+ 				   bool partition_vcpu_memory_access);
+ void memstress_destroy_vm(struct kvm_vm *vm);
+diff --git a/tools/testing/selftests/kvm/lib/memstress.c b/tools/testing/selftests/kvm/lib/memstress.c
+index 5f1d3173c238c..7589b8cef6911 100644
+--- a/tools/testing/selftests/kvm/lib/memstress.c
++++ b/tools/testing/selftests/kvm/lib/memstress.c
+@@ -119,7 +119,7 @@ void memstress_setup_vcpus(struct kvm_vm *vm, int nr_vcpus,
+ }
+ 
+ struct kvm_vm *memstress_create_vm(enum vm_guest_mode mode, int nr_vcpus,
+-				   uint64_t vcpu_memory_bytes, int slots,
++				   uint64_t vcpu_memory_bytes, int slots, uint32_t slot_flags,
+ 				   enum vm_mem_backing_src_type backing_src,
+ 				   bool partition_vcpu_memory_access)
+ {
+@@ -207,7 +207,7 @@ struct kvm_vm *memstress_create_vm(enum vm_guest_mode mode, int nr_vcpus,
+ 
+ 		vm_userspace_mem_region_add(vm, backing_src, region_start,
+ 					    MEMSTRESS_MEM_SLOT_INDEX + i,
+-					    region_pages, 0);
++					    region_pages, slot_flags);
+ 	}
+ 
+ 	/* Do mapping for the demand paging memory slot */
+diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+index 9855c41ca811f..0b19ec3ecc9cc 100644
+--- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
++++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+@@ -95,7 +95,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	struct test_params *p = arg;
+ 	struct kvm_vm *vm;
+ 
+-	vm = memstress_create_vm(mode, nr_vcpus, guest_percpu_mem_size, 1,
++	vm = memstress_create_vm(mode, nr_vcpus, guest_percpu_mem_size, 1, 0,
+ 				 VM_MEM_SRC_ANONYMOUS,
+ 				 p->partition_vcpu_memory_access);
+ 
 -- 
 2.40.0.577.gac1e443424-goog
 
