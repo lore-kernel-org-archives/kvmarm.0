@@ -1,40 +1,40 @@
 Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0B1A936
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D55CA93C
 	for <kvmarm@lists.linux.dev>; Wed, 12 Apr 2023 21:35:25 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-54efad677cbso123307667b3.6
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-54ee397553eso133912057b3.19
         for <kvmarm@lists.linux.dev>; Wed, 12 Apr 2023 14:35:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681335324; x=1683927324;
+        d=google.com; s=20221208; t=1681335325; x=1683927325;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fXIZH8fY83vgfwH8POrr//89XoSgOMitG1Dp++mIiPs=;
-        b=YisQpRnBOeAwg9ZX219UZQMhQxuyDfMdNDGwIM7kYemLzsSfZ/SGeZjelJTvKZTX01
-         h+3Mva+AsoeDLPkEZfXti0QYJCd0Gnxtx2iPS46KcZYJMbtNIpccXd1nkV7JjclKAgOT
-         ZZgzQxYVQewWug5Hu/GM9rA5g0xIWgk9PTD6gv8RLkgLSKnFdVu0S2i0SZwpYwJwRWHr
-         M4RMrS3cKuQowbs4mv/G49o/rXgk/U+bWQ1jnOSm37UF5tkUkoqwpaqgy25/jiVwm4S5
-         dK6aGhjypYDdse2/jDhX7vXjaJhm5k+2X10ISVVE0X24dQw/ZwqzdXc93uctIAQ/wiBy
-         t+PA==
+        bh=+2CX14Kj8/FFXl+IH0W/8FGtmxWGznSGRKdbhRDJLUc=;
+        b=p8bqpn4Dk9Gz6MN4ywNEmQtagtzpLIxrNnIs/78XOR/BZCZsaubThr5jZlBe3A9/Bo
+         xUGwI26ti8RR6P8GdBzrDgrFhOrTjkeh9AtMCg/Q9PFIi3EAVKhB8I8p0MNXBEhdx058
+         qHIdK5MhwqEdX2g5KKNjLJnb/mhhyuldqk8s0eAqYV4nAchHoT628Fnj3jVtkCgj0KSZ
+         NQjg5DjX1iidMjq4DxkyjK7XFXry1UsIBkfsDw0DlcBJI06XomtB15gsVc+JjM+Pceog
+         lgxYPlOh7M/77mtkNft0npiYroONt+2TYP1Jm1lm0UlYFodlTIf10FXcOnCumbISliIr
+         sCqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681335324; x=1683927324;
+        d=1e100.net; s=20221208; t=1681335325; x=1683927325;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fXIZH8fY83vgfwH8POrr//89XoSgOMitG1Dp++mIiPs=;
-        b=MDFg9msJvplQf5Q+SYOnTWG8lBJgtfH6iY0wludKWCxOTZMH/zWdkXpdY30GieZpAj
-         IcHzOEjd887Ti/Yw/Qrr/hwLlcHSrzrAVFcqrtWH1rszKGfqyIUrRUj1ztmPYN6VPwck
-         ayeDljVyOjMuPLIZXvfjvKQQfIM37g5Ra9/fzA7wAXg6oMhsq2KHhQU4Y/ErChqIPyNP
-         B9IQESTT+MU1juP3P2Me8ImBF3pI1qaULzJ8ZMObmMILPbspQKzFMZMTEDloNWhejkHj
-         k9lK6/LoJPB07SiTO7hbKIHh3BSSb9QW+btkT2agR+zgyyZVA+Lk8RVDdtJaELCqHg9m
-         ZKwg==
-X-Gm-Message-State: AAQBX9ckqJDp4t47V/xe2s7PtpqgKOEGNzCh99N5jfl4/DSiyunbjCwB
-	YDYrQz/zJC0ca+Tlt2yTfEnVPwd7ovOGzw==
-X-Google-Smtp-Source: AKy350bhXrkwYHL2oiwHoVZPq1a1kZqsww17x6UiZcbBFdt3mgWFNOOcT1fYEgc+pglz1McVDcJD24DYEi1ceQ==
+        bh=+2CX14Kj8/FFXl+IH0W/8FGtmxWGznSGRKdbhRDJLUc=;
+        b=KjnNxNmrTuy4mrU417Ys1y3YE+Uk+9z1pRKfDZzg5/d10BqywTY3fUyK6O1Tkl6O9S
+         1yP5gNQrGjD3rDO1kLq69lyoro3Mwpj4v/1jPUYYMxER2r+2Nnt4Y4T7wotfcfj7NBbS
+         Fo5G2gaQnsV9zYTPsFB4gzcODVMRT6x1CGcsEHkTnDIdg9++CQRxs9VkicJmkZ2Cu40C
+         JpzOE3up3uj4SjvpRNk1FiVyTqHyhK7pztsZBvoSaAGpdasV6NcB8VkczIc7eH86DPvB
+         BnxIpnXbmk2Ksju3H3L6wyOZcub7XaRgcCQzbJQsvhYV9LoDahCZerBKm6PTFBRhkyjA
+         7Jiw==
+X-Gm-Message-State: AAQBX9f7DH5SwO/VK5Zq8veZl8rbYiWUaS4RfKRxz99032tQ2t8Xcs93
+	5oUI3/GF0PrxaybhXsX60LGa/fsbdTzhBA==
+X-Google-Smtp-Source: AKy350ZoVAtaYWZqyK/PKLeLB7f5y1zErH4zuwClH5USqCfQLe7jp2ooTV3DJsYLDFSWaoh1ky/XqCmcJ18/XA==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
  (user=amoorthy job=sendgmr) by 2002:a0d:ec02:0:b0:54c:2723:560d with SMTP id
- q2-20020a0dec02000000b0054c2723560dmr8663ywn.3.1681335324351; Wed, 12 Apr
- 2023 14:35:24 -0700 (PDT)
-Date: Wed, 12 Apr 2023 21:34:58 +0000
+ q2-20020a0dec02000000b0054c2723560dmr8679ywn.3.1681335325180; Wed, 12 Apr
+ 2023 14:35:25 -0700 (PDT)
+Date: Wed, 12 Apr 2023 21:34:59 +0000
 In-Reply-To: <20230412213510.1220557-1-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230412213510.1220557-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.40.0.577.gac1e443424-goog
-Message-ID: <20230412213510.1220557-11-amoorthy@google.com>
-Subject: [PATCH v3 10/22] KVM: x86: Annotate -EFAULTs from kvm_mmu_page_fault()
+Message-ID: <20230412213510.1220557-12-amoorthy@google.com>
+Subject: [PATCH v3 11/22] KVM: x86: Annotate -EFAULTs from setup_vmgexit_scratch()
 From: Anish Moorthy <amoorthy@google.com>
 To: pbonzini@redhat.com, maz@kernel.org
 Cc: oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com, 
@@ -55,27 +55,25 @@ Cc: oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com,
 Content-Type: text/plain; charset="UTF-8"
 
 Implement KVM_CAP_MEMORY_FAULT_INFO for efaults generated by
-kvm_mmu_page_fault().
+setup_vmgexit_scratch().
 
 Signed-off-by: Anish Moorthy <amoorthy@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/x86/kvm/svm/sev.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 144c5a01cd778..7391d1f75149d 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5670,6 +5670,9 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
- 			return -EIO;
- 	}
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index c25aeb550cd97..9ef121f71dc26 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2683,6 +2683,7 @@ static int setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
+ 			pr_err("vmgexit: kvm_read_guest for scratch area failed\n");
  
-+	if (r == -EFAULT)
-+		kvm_populate_efault_info(vcpu, round_down(cr2_or_gpa, PAGE_SIZE),
-+								 PAGE_SIZE);
- 	if (r < 0)
- 		return r;
- 	if (r != RET_PF_EMULATE)
+ 			kvfree(scratch_va);
++			kvm_populate_efault_info(&svm->vcpu, scratch_gpa_beg, len);
+ 			return -EFAULT;
+ 		}
+ 
 -- 
 2.40.0.577.gac1e443424-goog
 
