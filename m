@@ -1,111 +1,82 @@
-Received: from out-23.mta0.migadu.com (out-23.mta0.migadu.com [91.218.175.23])
+Received: from out-34.mta1.migadu.com (out-34.mta1.migadu.com [95.215.58.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3965017C3
-	for <kvmarm@lists.linux.dev>; Wed, 12 Apr 2023 06:27:44 +0000 (UTC)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE351843
+	for <kvmarm@lists.linux.dev>; Wed, 12 Apr 2023 07:34:39 +0000 (UTC)
+Date: Wed, 12 Apr 2023 09:34:36 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1681280862;
+	t=1681284877;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=+OS5wx79G82DqRgrCfJzTs9nXM1PD3+eiU8Aqdq5JR8=;
-	b=pzeEMJhFRaxiTe3UdxgGr93c+R+rc9zl26TE8Wk7gbvdjwp9lr6AVcTHGIv8ZqRGTmmDXS
-	JrmS1DqhAF/LgwDwW+FI1c9kuLNybAj1wuIQRz+BvCufVpWIn3JoOrZaGU5E4969XinsCB
-	eP24Fu5rCYTMEZbhHfw/cVZrGyEpRCs=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	stable@vger.kernel.org
-Subject: [PATCH] KVM: arm64: vgic: Don't acquire its_lock before config_lock
-Date: Wed, 12 Apr 2023 06:27:33 +0000
-Message-Id: <20230412062733.988229-1-oliver.upton@linux.dev>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JgmLJY1FS9sXM2DAjMrDwoSdOBu3r7uKWwOajGOkWww=;
+	b=wKqv3yzVGOJ93ZQPxRlSXBmFphdt6DVgPhxlbQ13+VitUjgZ39pACBlzoOo1fSB/QdWGk0
+	K7qbraLP84pAg/p5CUdNe5aFppHvFcUmKUuNqeEuVNFYMNeGWCDzCD/+V7EEVwFuHM0nBl
+	btXXrSWcQqQ6xhWKIAE6jVQzNxModjI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	maz@kernel.org, will@kernel.org, oliver.upton@linux.dev, ricarkol@google.com, 
+	reijiw@google.com, alexandru.elisei@arm.com
+Subject: Re: [kvm-unit-tests PATCH 0/6] arm: pmu: Fix random failures of
+ pmu-chain-promotion
+Message-ID: <7l36wddzolsq7psm5gvra7w6emzlojj5utn7pnrsmwyx6v6jh7@zzrrwbty5zfq>
+References: <20230315110725.1215523-1-eric.auger@redhat.com>
+ <968a026e-066e-deea-d02f-f64133295ff1@redhat.com>
+ <xcd3kt23ffdq5qfziuyp2vgwv7ndkmh3acepbpqqhhrokv755e@wuiltddj2hj2>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <xcd3kt23ffdq5qfziuyp2vgwv7ndkmh3acepbpqqhhrokv755e@wuiltddj2hj2>
 X-Migadu-Flow: FLOW_OUT
 
-commit f00327731131 ("KVM: arm64: Use config_lock to protect vgic
-state") was meant to rectify a longstanding lock ordering issue in KVM
-where the kvm->lock is taken while holding vcpu->mutex. As it so
-happens, the aforementioned commit introduced yet another locking issue
-by acquiring the its_lock before acquiring the config lock.
+On Tue, Apr 04, 2023 at 02:47:49PM +0200, Andrew Jones wrote:
+> On Tue, Apr 04, 2023 at 08:23:15AM +0200, Eric Auger wrote:
+> > Hi,
+> > 
+> > On 3/15/23 12:07, Eric Auger wrote:
+> > > On some HW (ThunderXv2), some random failures of
+> > > pmu-chain-promotion test can be observed.
+> > >
+> > > pmu-chain-promotion is composed of several subtests
+> > > which run 2 mem_access loops. The initial value of
+> > > the counter is set so that no overflow is expected on
+> > > the first loop run and overflow is expected on the second.
+> > > However it is observed that sometimes we get an overflow
+> > > on the first run. It looks related to some variability of
+> > > the mem_acess count. This variability is observed on all
+> > > HW I have access to, with different span though. On
+> > > ThunderX2 HW it looks the margin that is currently taken
+> > > is too small and we regularly hit failure.
+> > >
+> > > although the first goal of this series is to increase
+> > > the count/margin used in those tests, it also attempts
+> > > to improve the pmu-chain-promotion logs, add some barriers
+> > > in the mem-access loop, clarify the chain counter
+> > > enable/disable sequence.
+> > >
+> > > A new 'pmu-memaccess-reliability' is also introduced to
+> > > detect issues with MEM_ACCESS event variability and make
+> > > the debug easier.
+> > >
+> > > Obviously one can wonder if this variability is something normal
+> > > and does not hide any other bug. I hope this series will raise
+> > > additional discussions about this.
+> > >
+> > > https://github.com/eauger/kut/tree/pmu-chain-promotion-fixes-v1
+> > 
+> > Gentle ping.
+> 
+> I'd be happy to take this, but I was hoping to see some r-b's and/or t-b's
+> from some of the others.
 
-This is obviously wrong, especially considering that the lock ordering
-is well documented in vgic.c. Reshuffle the locks once more to take the
-config_lock before the its_lock. While at it, sprinkle in the lockdep
-hinting that has become popular as of late to keep lockdep apprised of
-our ordering.
+Any takers? Ricardo? Alexandru?
 
-Cc: stable@vger.kernel.org
-Fixes: f00327731131 ("KVM: arm64: Use config_lock to protect vgic state")
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
-
-Applies to kvmarm/next. Tested with QEMU with lockdep enabled.
-
- arch/arm64/kvm/vgic/vgic-its.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
-
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 7713cd06104e..750e51e3779a 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -1958,6 +1958,16 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
- 	mutex_init(&its->its_lock);
- 	mutex_init(&its->cmd_lock);
- 
-+	/* Yep, even more trickery for lock ordering... */
-+#ifdef CONFIG_LOCKDEP
-+	mutex_lock(&dev->kvm->arch.config_lock);
-+	mutex_lock(&its->cmd_lock);
-+	mutex_lock(&its->its_lock);
-+	mutex_unlock(&its->its_lock);
-+	mutex_unlock(&its->cmd_lock);
-+	mutex_unlock(&dev->kvm->arch.config_lock);
-+#endif
-+
- 	its->vgic_its_base = VGIC_ADDR_UNDEF;
- 
- 	INIT_LIST_HEAD(&its->device_list);
-@@ -2752,15 +2762,14 @@ static int vgic_its_ctrl(struct kvm *kvm, struct vgic_its *its, u64 attr)
- 		return 0;
- 
- 	mutex_lock(&kvm->lock);
--	mutex_lock(&its->its_lock);
- 
- 	if (!lock_all_vcpus(kvm)) {
--		mutex_unlock(&its->its_lock);
- 		mutex_unlock(&kvm->lock);
- 		return -EBUSY;
- 	}
- 
- 	mutex_lock(&kvm->arch.config_lock);
-+	mutex_lock(&its->its_lock);
- 
- 	switch (attr) {
- 	case KVM_DEV_ARM_ITS_CTRL_RESET:
-@@ -2774,9 +2783,9 @@ static int vgic_its_ctrl(struct kvm *kvm, struct vgic_its *its, u64 attr)
- 		break;
- 	}
- 
-+	mutex_unlock(&its->its_lock);
- 	mutex_unlock(&kvm->arch.config_lock);
- 	unlock_all_vcpus(kvm);
--	mutex_unlock(&its->its_lock);
- 	mutex_unlock(&kvm->lock);
- 	return ret;
- }
-
-base-commit: df706d5176fdd92cdfe27ee6ec4389e4cff18bed
--- 
-2.40.0.577.gac1e443424-goog
-
+Thanks,
+drew
