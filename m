@@ -1,40 +1,40 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE60A939
-	for <kvmarm@lists.linux.dev>; Wed, 12 Apr 2023 21:35:29 +0000 (UTC)
-Received: by mail-yb1-f202.google.com with SMTP id h206-20020a2521d7000000b00b8f3681db1eso3993637ybh.11
-        for <kvmarm@lists.linux.dev>; Wed, 12 Apr 2023 14:35:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FFE0A936
+	for <kvmarm@lists.linux.dev>; Wed, 12 Apr 2023 21:35:30 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-54f89e7de94so43459357b3.17
+        for <kvmarm@lists.linux.dev>; Wed, 12 Apr 2023 14:35:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681335328; x=1683927328;
+        d=google.com; s=20221208; t=1681335329; x=1683927329;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TLJM370BGXbRsW/E5uGIyc+ccmSwnIlQ6m8okICmE78=;
-        b=wejiGHqZGIyNR3UMUoT0jh07Z2bqhz0x6OsEUUNrr/QJTEbD4p/twiQXgY7TdOeW84
-         8uYvht+OkX6pUYnlSv0QTlb+0rBH6xO0DMty619puVSkmD9LfcU7/ZJuGj5erof3tjgc
-         tR4JbovReXeRwmjus6dOnaSqXAgkTQ2aiu1XDf9Iog5WoqmLBa3dEinf347k61B37MrW
-         s0bisQNQP7raE75xNPpWge3XlaaSBqJazbGtqjePh5xq79nyekhI/XMw6rGKBWsnaTyN
-         +9Nba0FpzQij+M4tnFOzOt0qWcslF0JfO/3Cbz43eB6yXUbXmmsoo8wxVnChKVOUPWgF
-         Bieg==
+        bh=TMoObdMgGKK1Dm08+sln58kp5QBYq24ihR/AEV1awlI=;
+        b=rh+/+zw3Za1gxuRrVQJEEjhupmhmknQ/4pC4YKJQPjw/IBRrbOGZRl6uPFNdSfQIAg
+         rLRvo/QL7yxEQnzBbcuQBBulo8e4IqcIDuwrrNv3C0inbPr8YZJ3V2T0PMO7P/s2222w
+         d01Y596uxKiYiIi8HMOCx+Gc6YGpSjv6bd5ixrhHyr4X9rQi/uIHGmOmrslt7LEJz9fo
+         qX+bWNOFqUeXEe/rqEzR3O3uzwVf204tZ0Js1kWQJ/+NXNbBWyLxdRPaW1+XPkDRtZCw
+         yW7FfsafpaPKaeAu5nHfz4+R6ula5hXzkCq8pZtMZha3Oq8Hmn5CgaruZT0WhQSxPx1A
+         7FJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681335328; x=1683927328;
+        d=1e100.net; s=20221208; t=1681335329; x=1683927329;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TLJM370BGXbRsW/E5uGIyc+ccmSwnIlQ6m8okICmE78=;
-        b=lmrxz1CT4KthUHx96FR0y/C/jr/saAlNnwjW6Onz9Zc7q815Vcpc0WvEmXZY+YqEer
-         h5VYdvKjG4/9CCGMbZXu7hZPtDxTgxByecUPCfRVvlOy2N3SEN7yTa5yujrFRXmOAcOG
-         2QTi1f7NIX/pKHaYFaObl85oQU8ubcxSmT+mMV3pB382oVHZ8KKUURvlpSHfryUagdFV
-         8njyQ2V/eY22vQsc27bFnxF/kvF9dI15jIiN+Uv6h36Pn5Dt0H0tZAwkYqXPCKUgOzLh
-         UFq9R2VIsHcvCzD+K05Pa305gyN9d0CrbLHQVonvf1o4By8fEL4RLeNBkhQ10Y/BO7dH
-         GRhA==
-X-Gm-Message-State: AAQBX9cBvc2ip3XrqzEiHqh4fE1gTP7c4q3OkOJfmCnJHfQgYED47mKd
-	Iq/oGWcU9PT87p/lB06ltxKXOP2nIt1OcA==
-X-Google-Smtp-Source: AKy350Zz+xHx97O82en66JkvO0/xWQmHy3qKXiGdMYTUAU8j1OkF3SFZDNZl0zwMBp52T3C8+gmB+jaY/ERp4A==
+        bh=TMoObdMgGKK1Dm08+sln58kp5QBYq24ihR/AEV1awlI=;
+        b=l5KFW70uNJaqEZQjPxCqxx0LlvLcO0ZSn10v4utRvN9v/5E0CdEYETQmkibJlAsW/6
+         XJiJTGUb7DNpsEwX3rP03M+JMFO/nbrYRt073dqDwb1F/ZMPq3xIrkDc/EPTEvVPWiF0
+         a01JG9kgksMWneHWk9j4uvaZfGeYtCF+wCCLE93IWV1gbFk5H63xrPqIRa1ahuaOQiLq
+         w5Au3KlvAlYqPHdAQZDuSxI0Ye8z0cqc3ENjIpaetzrcmd1w8+0XmZ42x2w2uInyRv1k
+         iPkyWATR7lLnuYnPO90Epy8y7QIf9s/Doiv6vHLCKhgYkxuKAuJbfnt/URMXp8EQ+Zat
+         w9UA==
+X-Gm-Message-State: AAQBX9ddp+g67GUMiNQpT8pKUefKHcEde74zo0mNqs58pEj21kBeNlJH
+	sDZi17dOQutEYgbcJa9PDX+lodce//i2LQ==
+X-Google-Smtp-Source: AKy350awPEdXfzeyIZrkWycnGmb1wsYa+P7TPbbAsrvpvFBbHnKQbFgfxIvBnw6PFjQaDHuHgaXdgnJo4I8u5w==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a81:a809:0:b0:544:bce8:980f with SMTP id
- f9-20020a81a809000000b00544bce8980fmr4950839ywh.6.1681335328669; Wed, 12 Apr
- 2023 14:35:28 -0700 (PDT)
-Date: Wed, 12 Apr 2023 21:35:03 +0000
+ (user=amoorthy job=sendgmr) by 2002:a0d:ec50:0:b0:54d:913b:c9e8 with SMTP id
+ r16-20020a0dec50000000b0054d913bc9e8mr8999819ywn.5.1681335329588; Wed, 12 Apr
+ 2023 14:35:29 -0700 (PDT)
+Date: Wed, 12 Apr 2023 21:35:04 +0000
 In-Reply-To: <20230412213510.1220557-1-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230412213510.1220557-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.40.0.577.gac1e443424-goog
-Message-ID: <20230412213510.1220557-16-amoorthy@google.com>
-Subject: [PATCH v3 15/22] KVM: x86: Annotate -EFAULTs from direct_map()
+Message-ID: <20230412213510.1220557-17-amoorthy@google.com>
+Subject: [PATCH v3 16/22] KVM: x86: Annotate -EFAULTs from kvm_handle_error_pfn()
 From: Anish Moorthy <amoorthy@google.com>
 To: pbonzini@redhat.com, maz@kernel.org
 Cc: oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com, 
@@ -55,48 +55,38 @@ Cc: oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com,
 Content-Type: text/plain; charset="UTF-8"
 
 Implement KVM_CAP_MEMORY_FAULT_INFO for efaults generated by
-direct_map().
-
-Since direct_map() traverses multiple levels of the shadow page table, it
-seems like there are actually two correct guest physical address ranges
-which could be provided.
-
-1. A smaller range, more specific range, which potentially only
-   corresponds to a part of what could not be mapped.
-   start = gfn_round_for_level(fault->gfn, fault->goal_level)
-   length = KVM_PAGES_PER_HPAGE(fault->goal_level)
-
-2. The entire range which could not be mapped
-   start = gfn_round_for_level(fault->gfn, fault->goal_level)
-   length = KVM_PAGES_PER_HPAGE(fault->goal_level)
-
-Take the first approach, although it's possible the second is actually
-preferable.
+kvm_handle_error_pfn().
 
 Signed-off-by: Anish Moorthy <amoorthy@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ arch/x86/kvm/mmu/mmu.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 937329bee654e..a965c048edde8 100644
+index a965c048edde8..d83a3e1e3eff9 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3192,8 +3192,13 @@ static int direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 					     fault->req_level >= it.level);
+@@ -3218,6 +3218,9 @@ static void kvm_send_hwpoison_signal(struct kvm_memory_slot *slot, gfn_t gfn)
+ 
+ static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ {
++	uint64_t rounded_gfn;
++	uint64_t fault_size;
++
+ 	if (is_sigpending_pfn(fault->pfn)) {
+ 		kvm_handle_signal_exit(vcpu);
+ 		return -EINTR;
+@@ -3236,6 +3239,10 @@ static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fa
+ 		return RET_PF_RETRY;
  	}
  
--	if (WARN_ON_ONCE(it.level != fault->goal_level))
-+	if (WARN_ON_ONCE(it.level != fault->goal_level)) {
-+		gfn_t rounded_gfn = gfn_round_for_level(fault->gfn, fault->goal_level);
-+		uint64_t len = KVM_PAGES_PER_HPAGE(fault->goal_level);
++	fault_size = KVM_HPAGE_SIZE(fault->goal_level);
++	rounded_gfn = round_down(fault->gfn * PAGE_SIZE, fault_size);
 +
-+		kvm_populate_efault_info(vcpu, rounded_gfn, len);
- 		return -EFAULT;
-+	}
++	kvm_populate_efault_info(vcpu, rounded_gfn, fault_size);
+ 	return -EFAULT;
+ }
  
- 	ret = mmu_set_spte(vcpu, fault->slot, it.sptep, ACC_ALL,
- 			   base_gfn, fault->pfn, fault);
 -- 
 2.40.0.577.gac1e443424-goog
 
