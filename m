@@ -1,74 +1,104 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E050E3D78
-	for <kvmarm@lists.linux.dev>; Wed, 12 Apr 2023 12:55:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87350C4339B;
-	Wed, 12 Apr 2023 12:55:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1681304140;
-	bh=iqZBaeODnGbLrHrbvxwREeRqtMd+mKJxt4Zldqs66qY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=t/fnsVbMy/BsAzyk+/kxyyMLhPADjsOGWk7cmDo0nQbn7rOL0fP6BjUXIZ71JtM8L
-	 2vOKPRYCP3cm1gEdI1UoUUHAyaxWcZ60eKHOuFz/mlX0/gmSoD2BedwfKdQu0CgIdJ
-	 uD7qs8iDDlmrw8taGXBAD8ptGNgSWTcOeI/+ZKvqIgemrKJPElgGpD+Lh5WIvBVWak
-	 vOt/OhJ0SKu7YUFS1Rt+Acd2h17XdUuGJnizV+JeZALSfAMWIXGt1GifMs+PNsK3IT
-	 2/13VC2FR6vJs2kRbItet3d9vT4oM4tXm5CUJn5ipVWbh72x9KO6TtQNRP/i6h8fPc
-	 sZPRO2cj+kQkA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pma0g-007q0n-G8;
-	Wed, 12 Apr 2023 13:55:38 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	Oliver Upton <oliver.upton@linux.dev>
-Cc: James Morse <james.morse@arm.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BF236121
+	for <kvmarm@lists.linux.dev>; Wed, 12 Apr 2023 15:47:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9461BC433AC;
+	Wed, 12 Apr 2023 15:47:38 +0000 (UTC)
+Date: Wed, 12 Apr 2023 16:47:35 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Ryan Roberts <ryan.roberts@arm.com>
+Cc: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	stable@vger.kernel.org,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: vgic: Don't acquire its_lock before config_lock
-Date: Wed, 12 Apr 2023 13:55:35 +0100
-Message-Id: <168130412864.78725.7707238818559974772.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230412062733.988229-1-oliver.upton@linux.dev>
-References: <20230412062733.988229-1-oliver.upton@linux.dev>
+	Ard Biesheuvel <ardb@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 01/12] arm64/mm: Update non-range tlb invalidation
+ routines for FEAT_LPA2
+Message-ID: <ZDbSl8vccLiMCrDz@arm.com>
+References: <20230306195438.1557851-1-ryan.roberts@arm.com>
+ <20230306195438.1557851-2-ryan.roberts@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, stable@vger.kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230306195438.1557851-2-ryan.roberts@arm.com>
 
-On Wed, 12 Apr 2023 06:27:33 +0000, Oliver Upton wrote:
-> commit f00327731131 ("KVM: arm64: Use config_lock to protect vgic
-> state") was meant to rectify a longstanding lock ordering issue in KVM
-> where the kvm->lock is taken while holding vcpu->mutex. As it so
-> happens, the aforementioned commit introduced yet another locking issue
-> by acquiring the its_lock before acquiring the config lock.
+On Mon, Mar 06, 2023 at 07:54:27PM +0000, Ryan Roberts wrote:
+> FEAT_LPA2 impacts tlb invalidation in 2 ways; Firstly, the TTL field in
+> the non-range tlbi instructions can now validly take a 0 value for the
+> 4KB granule (this is due to the extra level of translation). Secondly,
+> the BADDR field in the range tlbi instructions must be aligned to 64KB
+> when LPA2 is in use (TCR.DS=1). Changes are required for tlbi to
+> continue to operate correctly when LPA2 is in use.
 > 
-> This is obviously wrong, especially considering that the lock ordering
-> is well documented in vgic.c. Reshuffle the locks once more to take the
-> config_lock before the its_lock. While at it, sprinkle in the lockdep
-> hinting that has become popular as of late to keep lockdep apprised of
-> our ordering.
+> KVM only uses the non-range (__tlbi_level()) routines. Therefore we only
+> solve the first problem with this patch.
 
-Applied to next, thanks!
+There are some patches on the list to add support for range invalidation
+in KVM:
 
-[1/1] KVM: arm64: vgic: Don't acquire its_lock before config_lock
-      commit: 49e5d16b6fc003407a33a9961b4bcbb970bd1c76
+https://lore.kernel.org/r/20230206172340.2639971-1-rananta@google.com
 
-Cheers,
+> diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
+> index 412a3b9a3c25..67dd47df42d5 100644
+> --- a/arch/arm64/include/asm/tlbflush.h
+> +++ b/arch/arm64/include/asm/tlbflush.h
+> @@ -93,19 +93,22 @@ static inline unsigned long get_trans_granule(void)
+>   * When ARMv8.4-TTL exists, TLBI operations take an additional hint for
+>   * the level at which the invalidation must take place. If the level is
+>   * wrong, no invalidation may take place. In the case where the level
+> - * cannot be easily determined, a 0 value for the level parameter will
+> - * perform a non-hinted invalidation.
+> + * cannot be easily determined, the value TLBI_TTL_UNKNOWN will perform
+> + * a non-hinted invalidation. Any provided level outside the hint range
+> + * will also cause fall-back to non-hinted invalidation.
+>   *
+>   * For Stage-2 invalidation, use the level values provided to that effect
+>   * in asm/stage2_pgtable.h.
+>   */
+>  #define TLBI_TTL_MASK		GENMASK_ULL(47, 44)
+>  
+> +#define TLBI_TTL_UNKNOWN	(-1)
+> +
+>  #define __tlbi_level(op, addr, level) do {				\
+>  	u64 arg = addr;							\
+>  									\
+>  	if (cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL) &&		\
+> -	    level) {							\
+> +	    level >= 0 && level <= 3) {					\
 
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+I'd just use level != TLBI_TTL_UNKNOWN here.
 
+>  		u64 ttl = level & 3;					\
+>  		ttl |= get_trans_granule() << 2;			\
+>  		arg &= ~TLBI_TTL_MASK;					\
+> @@ -133,16 +136,17 @@ static inline unsigned long get_trans_granule(void)
+>   * [BADDR, BADDR + (NUM + 1) * 2^(5*SCALE + 1) * PAGESIZE)
+>   *
+>   */
+> -#define __TLBI_VADDR_RANGE(addr, asid, scale, num, ttl)		\
+> -	({							\
+> -		unsigned long __ta = (addr) >> PAGE_SHIFT;	\
+> -		__ta &= GENMASK_ULL(36, 0);			\
+> -		__ta |= (unsigned long)(ttl) << 37;		\
+> -		__ta |= (unsigned long)(num) << 39;		\
+> -		__ta |= (unsigned long)(scale) << 44;		\
+> -		__ta |= get_trans_granule() << 46;		\
+> -		__ta |= (unsigned long)(asid) << 48;		\
+> -		__ta;						\
+> +#define __TLBI_VADDR_RANGE(addr, asid, scale, num, ttl)				\
+> +	({									\
+> +		unsigned long __ta = (addr) >> PAGE_SHIFT;			\
+> +		unsigned long __ttl = (ttl >= 1 && ttl <= 3) ? ttl : 0;		\
 
+And here, set __ttl to 0 if TLBI_TTL_UNKNOWN.
+
+Otherwise it looks fine:
+
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
