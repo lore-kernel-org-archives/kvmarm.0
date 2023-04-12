@@ -1,40 +1,40 @@
 Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B240A935
-	for <kvmarm@lists.linux.dev>; Wed, 12 Apr 2023 21:35:18 +0000 (UTC)
-Received: by mail-yb1-f202.google.com with SMTP id 186-20020a2510c3000000b00b880000325bso30110929ybq.3
-        for <kvmarm@lists.linux.dev>; Wed, 12 Apr 2023 14:35:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D155A936
+	for <kvmarm@lists.linux.dev>; Wed, 12 Apr 2023 21:35:19 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id t66-20020a254645000000b00b74680a7904so13784677yba.15
+        for <kvmarm@lists.linux.dev>; Wed, 12 Apr 2023 14:35:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681335317; x=1683927317;
+        d=google.com; s=20221208; t=1681335318; x=1683927318;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tZP5BD9r0skQIBcVsEuwbsf0/jfPby4JFW+0o25mrlY=;
-        b=DAuQvN09j6rlTcQ+SQvMQ+Srqk6zFEIzLM+R85LsZhahtQ9CqOj17Bl9EwDey3+OVk
-         P61HT30gkple2nno/lQ6MMs2NiUU9yRsMw67CiJ06U4l7n5Y6XMTqmmU4enb4W3pHBmq
-         nBmCLgs5DM0SwjG0Z4HWqplWgT+BrSEOhLpoMD5vE9qPZc9sZNjFbjyUlwuSOybbkUau
-         /NL1HdHJ7Qj+Wnp9YdpsWuGUi7Qwd9lEr+7CEbZOMeleYsWX4yUNsC/N65vWzHpxrdJV
-         Kg9I13GwIJsn6srNEau4xyl+XnBWmGtXj4V9QSu4M9kEdgzLrmgUSFyd/ElRA6N/5V6+
-         oT/g==
+        bh=9qcXR+cj62Nmz/QQQB2g9N2pbdYpcmmyV5nmt0T5Wjo=;
+        b=jKd+t0UtWM9xdOiqGRYNFX92os/otTxaJl4Aq9bIi0v9GANiTqkZBL/I45CujgAQS6
+         MzK4MDvKOetboWsJ3AHeOfQd/NePDJlf65y7kIDGm3MVGQnsV8BAB2K34AdrUiC0Dhn3
+         ETjJ1PEuxflgPxc8u+TwmpiZ1VExPHDqjNtsatLtld6xdOsm/BMr4fHWr2dAljkvCJ9j
+         t4SUTI6Jq4R2QOZv+CxYoQeTRoneT7k0B1dC9jqxfcJA9b5ur1FurjeI473lS5euST9Z
+         FDKBAA7J0WRtJLH7ZUmGAUuavMkA+9wKoI/V/FPWkmO6R2om6cXKIV2IivywVuTD+ZpM
+         j57A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681335317; x=1683927317;
+        d=1e100.net; s=20221208; t=1681335318; x=1683927318;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tZP5BD9r0skQIBcVsEuwbsf0/jfPby4JFW+0o25mrlY=;
-        b=Yd/W2wx1If0js4meU1PjfzJ9NSwv2biII8BgkUOtHLdg1XpXSz0o9R60ST+pH5J2v1
-         SxqY8sSF7HcEPmCy/uxvRNttLSyKJLnNdIEUzm3k0rrE6LMliuUXb1D9wBwSHZSSu/bK
-         8FNSHkfBoJkC0wAgi1R1Olh9GAHUJK86wa8LM/wLCqpBabCp2WoRVyCRXWm7/YgUe9Si
-         1zr+B726x+gdiDNsJDS2hfWnPuEt7cNS+2Gn0macg+ALX5QshnlmlrdChtTd0pdcO8is
-         D60x5MVxWhPQ7cN5iyq3Ki+/WGaqODGGx8EDpNbdoCizKH7GT4Svd2NVm49ISGY932SB
-         /LXQ==
-X-Gm-Message-State: AAQBX9co0lO2lyBtkBHOCrycKafK1p5CQyelPDRER3cSyx42om2FLGXD
-	+yBfVijl4BmyEUDFKUER1blXW5OiK5g3WQ==
-X-Google-Smtp-Source: AKy350ad5sOlGC49a3Zq+AqLstAbTPejBd4itxZk6c/jHU4q2Zhim4pjqaakFyBZUvWX5WivnmgBjuGC8os9Ig==
+        bh=9qcXR+cj62Nmz/QQQB2g9N2pbdYpcmmyV5nmt0T5Wjo=;
+        b=h3VDpjohGewZffcs2vcJGrcl5oX+wXD4kcdWxPbUnW1d3pHZhz3k/pampdLpn1sWkg
+         B3CeIS/ft2ZkamQ9gnFDfZEbX91lRkMb4oLSsrCEaoMZJMbVnCk4kSgwYIu08LLKBALt
+         lHSmy5E7rl0Als2GaBQ9/IYai501n80c9Zl5OhhLXjhcZOe6iGM7forGhZOiedOJht3S
+         wN+mNqOdiAixgx5+dZPEEa6NTe5TJOMPKIxiF6JbGRjjJ6FcOYxXKyiZHWhJG5Ut+cNo
+         z6b33WP/8Cw1d0fgQftyQ4EDRidSItiSD8pBvQuo+prynApX3d5fQ2NgXnY7+1xo1XsX
+         YyVQ==
+X-Gm-Message-State: AAQBX9cMBNY8lPOM4SXVBfxjO5EHWrQstTP27g84qoFUz8KtLR71VFuG
+	maq0B6mJVkvu78pXN4bqLjwRAesGHx4DKA==
+X-Google-Smtp-Source: AKy350Zu8+mZvFG+GBSeyU7SYAPl8PpXVNqqRPXN8kTxiuOldRi6f9+m5WF52N2/PJJYK1MSzUO1lNI0nmUPUw==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a25:d20c:0:b0:b6b:6a39:949c with SMTP id
- j12-20020a25d20c000000b00b6b6a39949cmr326ybg.6.1681335317547; Wed, 12 Apr
- 2023 14:35:17 -0700 (PDT)
-Date: Wed, 12 Apr 2023 21:34:51 +0000
+ (user=amoorthy job=sendgmr) by 2002:a25:cb97:0:b0:b8f:52e6:69a8 with SMTP id
+ b145-20020a25cb97000000b00b8f52e669a8mr753519ybg.13.1681335318559; Wed, 12
+ Apr 2023 14:35:18 -0700 (PDT)
+Date: Wed, 12 Apr 2023 21:34:52 +0000
 In-Reply-To: <20230412213510.1220557-1-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230412213510.1220557-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.40.0.577.gac1e443424-goog
-Message-ID: <20230412213510.1220557-4-amoorthy@google.com>
-Subject: [PATCH v3 03/22] KVM: Allow hva_pfn_fast() to resolve read-only faults.
+Message-ID: <20230412213510.1220557-5-amoorthy@google.com>
+Subject: [PATCH v3 04/22] KVM: x86: Set vCPU exit reason to KVM_EXIT_UNKNOWN
+  at the start of KVM_RUN
 From: Anish Moorthy <amoorthy@google.com>
 To: pbonzini@redhat.com, maz@kernel.org
 Cc: oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com, 
@@ -54,43 +55,43 @@ Cc: oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com,
 	kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
-hva_to_pfn_fast() currently just fails for read-only faults, which is
-unnecessary. Instead, try pinning the page without passing FOLL_WRITE.
-This allows read-only faults to (potentially) be resolved without
-falling back to slow GUP.
+Give kvm_run.exit_reason a defined initial value on entry into KVM_RUN:
+other architectures (riscv, arm64) already use KVM_EXIT_UNKNOWN for this
+purpose, so copy that convention.
 
-Suggested-by: James Houghton <jthoughton@google.com>
+This gives vCPUs trying to fill the run struct a mechanism to avoid
+overwriting already-populated data, albeit an imperfect one. Being able
+to detect an already-populated KVM run struct will prevent at least some
+bugs in the upcoming implementation of KVM_CAP_MEMORY_FAULT_INFO, which
+will attempt to fill the run struct whenever a vCPU fails a guest memory
+access.
+
+Without the already-populated check, KVM_CAP_MEMORY_FAULT_INFO could
+change kvm_run in any code paths which
+
+1. Populate kvm_run for some exit and prepare to return to userspace
+2. Access guest memory for some reason (but without returning -EFAULTs
+    to userspace)
+3. Finish the return to userspace set up in (1), now with the contents
+    of kvm_run changed to contain efault info.
+
 Signed-off-by: Anish Moorthy <amoorthy@google.com>
 ---
- virt/kvm/kvm_main.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ arch/x86/kvm/x86.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index f40b72eb0e7bf..cf7d3de6f3689 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2479,7 +2479,7 @@ static inline int check_user_page_hwpoison(unsigned long addr)
- }
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 237c483b12301..ca73eb066af81 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10965,6 +10965,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 	kvm_run->flags = 0;
+ 	kvm_load_guest_fpu(vcpu);
  
- /*
-- * The fast path to get the writable pfn which will be stored in @pfn,
-+ * The fast path to get the pfn which will be stored in @pfn,
-  * true indicates success, otherwise false is returned.  It's also the
-  * only part that runs if we can in atomic context.
-  */
-@@ -2493,10 +2493,9 @@ static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
- 	 * or the caller allows to map a writable pfn for a read fault
- 	 * request.
- 	 */
--	if (!(write_fault || writable))
--		return false;
-+	unsigned int gup_flags = (write_fault || writable) ? FOLL_WRITE : 0;
- 
--	if (get_user_page_fast_only(addr, FOLL_WRITE, page)) {
-+	if (get_user_page_fast_only(addr, gup_flags, page)) {
- 		*pfn = page_to_pfn(page[0]);
- 
- 		if (writable)
++	kvm_run->exit_reason = KVM_EXIT_UNKNOWN;
+ 	kvm_vcpu_srcu_read_lock(vcpu);
+ 	if (unlikely(vcpu->arch.mp_state == KVM_MP_STATE_UNINITIALIZED)) {
+ 		if (kvm_run->immediate_exit) {
 -- 
 2.40.0.577.gac1e443424-goog
 
