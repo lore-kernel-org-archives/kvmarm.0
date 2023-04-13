@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A51AC2113
-	for <kvmarm@lists.linux.dev>; Thu, 13 Apr 2023 08:14:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58B32C433D2;
-	Thu, 13 Apr 2023 08:14:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F71B7E
+	for <kvmarm@lists.linux.dev>; Thu, 13 Apr 2023 08:14:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23712C4339E;
+	Thu, 13 Apr 2023 08:14:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1681373690;
-	bh=hoKygbPOL58I+YlWlRe195xdYNCWVBya3lVdmeUY5ok=;
-	h=From:To:Cc:Subject:Date:From;
-	b=HhNMsD7r0RmlyqIM3GARmEas2zRJLln65AaS8Tm0urK2jYOnLhPSv9ugPdS8fj5Ln
-	 fFl811ythOvewVTkyKKB2WXHFaMy12xBI6jOyEA6AZhqhLuYB6vYiWgbOp/aT5goTE
-	 iRWLVFP7JeznsZGfX7FmXnnLRHhb5J87LHLenyPsycJDka++QWWEWHdMRZDQ0GMr+Y
-	 xhpua5HPDQmz6cPCuPIAT8TgpqXQ0+j0g93UKzpWPN77cIWBPC7zFkSq3peCjW0K+g
-	 1lSjUYJ89TCx7wEAVq+NRzSKzPJCVaczjou9EgOM1HmsOIgXX7rl6fgZmx2lqn4Agm
-	 3dpG3fC2zraxg==
+	s=k20201202; t=1681373691;
+	bh=1TLRUE6hxNsNLutNh1cOZu+lay+ak1KILzdQaIgRJ1I=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=RfVRViDKJ5NarJdzVtwi99l9ZN86tJDpsnCU0pjCH/caGVjn+U7JeABmdgkE5/Kkk
+	 /dpnwc3H0d0Fs5hsphLtVrRW75TTx3V5QtpJbOTHk8bYxQDfjqLntETGvISJxtI25N
+	 R4wFX4zfEEUOo12xA1Z4L+p9Wt8BqZj9xyYdYW+HnFNrZ2+eSxjsfmpNyMquIJ6XYC
+	 DZILX+jNtXYXxV65i+UqQoelYRm3z2ydvIVYpsXprg6tOyd2AdSs3EYiDebZVwcfJH
+	 /zEBM33yiqxSX2VHwKuvSkjeVU1hQ50BYJ3vlbCL/SAclQ3po5aK4nyfrml0uthwR3
+	 0azvvC5LNwx5Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pms6S-0082qd-4H;
-	Thu, 13 Apr 2023 09:14:48 +0100
+	id 1pms6T-0082qd-Af;
+	Thu, 13 Apr 2023 09:14:49 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -31,10 +31,12 @@ Cc: James Morse <james.morse@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Will Deacon <will@kernel.org>,
 	Ricardo Koller <ricarkol@google.com>
-Subject: [PATCH v3 0/5] KVM: arm64: Synchronise speculative page table walks on translation regime change
-Date: Thu, 13 Apr 2023 09:14:36 +0100
-Message-Id: <20230413081441.165134-1-maz@kernel.org>
+Subject: [PATCH v3 5/5] KVM: arm64: vhe: Drop extra isb() on guest exit
+Date: Thu, 13 Apr 2023 09:14:41 +0100
+Message-Id: <20230413081441.165134-6-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230413081441.165134-1-maz@kernel.org>
+References: <20230413081441.165134-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,64 +49,39 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-It recently became apparent that the way we switch our EL1&0
-translation regime is not entirely fool proof.
+__kvm_vcpu_run_vhe() end on VHE with an isb(). However, this
+function is only reachable via kvm_call_hyp_ret(), which already
+contains an isb() in order to mimick the behaviour of nVHE and
+provide a context synchronisation event.
 
-On taking an exception from EL1&0 to EL2(&0), the page table walker is
-allowed to carry on with speculative walks started from EL1&0 while
-running at EL2 (see R_LFHQG). Given that the PTW may be actively using
-the EL1&0 system registers, the only safe way to deal with it is to
-issue a DSB before changing any of it.
+We thus have two isb()s back to back, which is one too many.
+Drop the first one and solely rely on the one in the helper.
 
-We already did the right thing for SPE and TRBE, but ignored the PTW
-for unknown reasons (probably because the architecture wasn't crystal
-clear at the time).
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/kvm/hyp/vhe/switch.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-This requires a bit of surgery in the nvhe code, though most of these
-patches are comments so that my future self can understand the purpose
-of these barriers. The VHE code is largely unaffected, thanks to the
-DSB in the context switch.
-
-The last patch isn't directly related, but a superfluous ISB was
-spotted while working on this series.
-
-- From v2 [2]
-
-  - Give an option to the nVHE TLBI code to still issue non-shareable
-    DSBs, as there are pending patches making use of it.
-
-  - Collected Oliver's RBs, with thanks.
-
-- From v1 [1]
-
-  - Upgraded TLBIs' dsb(ishst) to dsb(ish) to cover the PTW's required
-    barrier (thanks to Oliver for spotting the issue)
-
-  - Split the nVHE patch into 3 distinct patches for ease of
-    reviewing.
-
-  - Brought the extra ISB patch into this series despite having been
-    previously posted separately.
-
-[1] https://lore.kernel.org/r/20230330100419.1436629-1-maz@kernel.org
-[2] https://lore.kernel.org/r/20230408160427.10672-1-maz@kernel.org
-
-Marc Zyngier (5):
-  KVM: arm64: nvhe: Synchronise with page table walker on vcpu run
-  KVM: arm64: nvhe: Synchronise with page table walker on TLBI
-  KVM: arm64: pkvm: Document the side effects of
-    kvm_flush_dcache_to_poc()
-  KVM: arm64: vhe: Synchronise with page table walker on MMU update
-  KVM: arm64: vhe: Drop extra isb() on guest exit
-
- arch/arm64/kvm/hyp/nvhe/debug-sr.c    |  2 --
- arch/arm64/kvm/hyp/nvhe/mem_protect.c |  7 +++++
- arch/arm64/kvm/hyp/nvhe/switch.c      | 18 +++++++++++++
- arch/arm64/kvm/hyp/nvhe/tlb.c         | 38 ++++++++++++++++++++-------
- arch/arm64/kvm/hyp/vhe/switch.c       |  7 +++--
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c    | 12 +++++++++
- 6 files changed, 69 insertions(+), 15 deletions(-)
-
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index cd3f3117bf16..3d868e84c7a0 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -227,11 +227,10 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 	/*
+ 	 * When we exit from the guest we change a number of CPU configuration
+-	 * parameters, such as traps.  Make sure these changes take effect
+-	 * before running the host or additional guests.
++	 * parameters, such as traps.  We rely on the isb() in kvm_call_hyp*()
++	 * to make sure these changes take effect before running the host or
++	 * additional guests.
+ 	 */
+-	isb();
+-
+ 	return ret;
+ }
+ 
 -- 
 2.34.1
 
