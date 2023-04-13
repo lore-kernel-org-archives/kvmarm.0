@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F71B7E
-	for <kvmarm@lists.linux.dev>; Thu, 13 Apr 2023 08:14:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23712C4339E;
-	Thu, 13 Apr 2023 08:14:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 005312117
+	for <kvmarm@lists.linux.dev>; Thu, 13 Apr 2023 08:14:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A03F1C433A0;
+	Thu, 13 Apr 2023 08:14:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1681373691;
-	bh=1TLRUE6hxNsNLutNh1cOZu+lay+ak1KILzdQaIgRJ1I=;
+	s=k20201202; t=1681373690;
+	bh=ssGIGapEX7W9wNVAFXirqDVqgvwzBthGP08DUYy3w04=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RfVRViDKJ5NarJdzVtwi99l9ZN86tJDpsnCU0pjCH/caGVjn+U7JeABmdgkE5/Kkk
-	 /dpnwc3H0d0Fs5hsphLtVrRW75TTx3V5QtpJbOTHk8bYxQDfjqLntETGvISJxtI25N
-	 R4wFX4zfEEUOo12xA1Z4L+p9Wt8BqZj9xyYdYW+HnFNrZ2+eSxjsfmpNyMquIJ6XYC
-	 DZILX+jNtXYXxV65i+UqQoelYRm3z2ydvIVYpsXprg6tOyd2AdSs3EYiDebZVwcfJH
-	 /zEBM33yiqxSX2VHwKuvSkjeVU1hQ50BYJ3vlbCL/SAclQ3po5aK4nyfrml0uthwR3
-	 0azvvC5LNwx5Q==
+	b=fSSlUmww/bhflKQrsaGCMT9KSau9hd7ktOCvVx1z6D6W0+bVlEKZGQQ77NAIlZXht
+	 IVV+YXbk1/6lG+hdjMPuiLqZ8qVo7uwm8eEBWri6qjmgzbSsQoVmS9GQ+oi2tuVGt1
+	 Jr5MvyqLKt8esOSLOuRLTf013vlhktwRFFPb84bCEgU/etIGBcNtvFkFizE1mA40tL
+	 PkmTTBRZ3+++dERjINrWSKGIyOA0SxDnF9Vb2T5XuTa/85CePy/7I5NxeuTekkEvJ9
+	 /O0jnawnAvGtyEPCDHHdDaoGz9FY9qp24Eh8iQQb+qVnM3eTwVwAmVg2KO07on3Tbc
+	 d1i+Rmw0FyVFA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pms6T-0082qd-Af;
-	Thu, 13 Apr 2023 09:14:49 +0100
+	id 1pms6S-0082qd-Mf;
+	Thu, 13 Apr 2023 09:14:48 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -31,9 +31,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Will Deacon <will@kernel.org>,
 	Ricardo Koller <ricarkol@google.com>
-Subject: [PATCH v3 5/5] KVM: arm64: vhe: Drop extra isb() on guest exit
-Date: Thu, 13 Apr 2023 09:14:41 +0100
-Message-Id: <20230413081441.165134-6-maz@kernel.org>
+Subject: [PATCH v3 2/5] KVM: arm64: nvhe: Synchronise with page table walker on TLBI
+Date: Thu, 13 Apr 2023 09:14:38 +0100
+Message-Id: <20230413081441.165134-3-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230413081441.165134-1-maz@kernel.org>
 References: <20230413081441.165134-1-maz@kernel.org>
@@ -49,39 +49,99 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-__kvm_vcpu_run_vhe() end on VHE with an isb(). However, this
-function is only reachable via kvm_call_hyp_ret(), which already
-contains an isb() in order to mimick the behaviour of nVHE and
-provide a context synchronisation event.
+A TLBI from EL2 impacting EL1 involves messing with the EL1&0
+translation regime, and the page table walker may still be
+performing speculative walks.
 
-We thus have two isb()s back to back, which is one too many.
-Drop the first one and solely rely on the one in the helper.
+Piggyback on the existing DSBs to always have a DSB ISH that
+will synchronise all load/store operations that the PTW may
+still have.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/hyp/vhe/switch.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/tlb.c | 38 ++++++++++++++++++++++++++---------
+ 1 file changed, 29 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index cd3f3117bf16..3d868e84c7a0 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -227,11 +227,10 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+index d296d617f589..1da2fc35f94e 100644
+--- a/arch/arm64/kvm/hyp/nvhe/tlb.c
++++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+@@ -15,8 +15,31 @@ struct tlb_inv_context {
+ };
+ 
+ static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
+-				  struct tlb_inv_context *cxt)
++				  struct tlb_inv_context *cxt,
++				  bool nsh)
+ {
++	/*
++	 * We have two requirements:
++	 *
++	 * - ensure that the page table updates are visible to all
++         *   CPUs, for which a dsb(DOMAIN-st) is what we need, DOMAIN
++         *   being either ish or nsh, depending on the invalidation
++         *   type.
++	 *
++	 * - complete any speculative page table walk started before
++         *   we trapped to EL2 so that we can mess with the MM
++         *   registers out of context, for which dsb(nsh) is enough
++	 *
++	 * The composition of these two barriers is a dsb(DOMAIN), and
++	 * the 'nsh' parameter tracks the distinction between
++	 * Inner-Shareable and Non-Shareable, as specified by the
++	 * callers.
++	 */
++	if (nsh)
++		dsb(nsh);
++	else
++		dsb(ish);
++
+ 	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+ 		u64 val;
+ 
+@@ -60,10 +83,8 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
+ {
+ 	struct tlb_inv_context cxt;
+ 
+-	dsb(ishst);
+-
+ 	/* Switch to requested VMID */
+-	__tlb_switch_to_guest(mmu, &cxt);
++	__tlb_switch_to_guest(mmu, &cxt, false);
  
  	/*
- 	 * When we exit from the guest we change a number of CPU configuration
--	 * parameters, such as traps.  Make sure these changes take effect
--	 * before running the host or additional guests.
-+	 * parameters, such as traps.  We rely on the isb() in kvm_call_hyp*()
-+	 * to make sure these changes take effect before running the host or
-+	 * additional guests.
- 	 */
--	isb();
--
- 	return ret;
- }
+ 	 * We could do so much better if we had the VA as well.
+@@ -113,10 +134,8 @@ void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
+ {
+ 	struct tlb_inv_context cxt;
  
+-	dsb(ishst);
+-
+ 	/* Switch to requested VMID */
+-	__tlb_switch_to_guest(mmu, &cxt);
++	__tlb_switch_to_guest(mmu, &cxt, false);
+ 
+ 	__tlbi(vmalls12e1is);
+ 	dsb(ish);
+@@ -130,7 +149,7 @@ void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu)
+ 	struct tlb_inv_context cxt;
+ 
+ 	/* Switch to requested VMID */
+-	__tlb_switch_to_guest(mmu, &cxt);
++	__tlb_switch_to_guest(mmu, &cxt, false);
+ 
+ 	__tlbi(vmalle1);
+ 	asm volatile("ic iallu");
+@@ -142,7 +161,8 @@ void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu)
+ 
+ void __kvm_flush_vm_context(void)
+ {
+-	dsb(ishst);
++	/* Same remark as in __tlb_switch_to_guest() */
++	dsb(ish);
+ 	__tlbi(alle1is);
+ 
+ 	/*
 -- 
 2.34.1
 
