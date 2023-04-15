@@ -1,40 +1,40 @@
 Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F1B82F58
-	for <kvmarm@lists.linux.dev>; Sat, 15 Apr 2023 16:41:00 +0000 (UTC)
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-517a6547b0aso1093219a12.1
-        for <kvmarm@lists.linux.dev>; Sat, 15 Apr 2023 09:41:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EFFC2F58
+	for <kvmarm@lists.linux.dev>; Sat, 15 Apr 2023 16:41:02 +0000 (UTC)
+Received: by mail-pg1-f202.google.com with SMTP id x71-20020a63864a000000b0051b7f8530f5so1504958pgd.4
+        for <kvmarm@lists.linux.dev>; Sat, 15 Apr 2023 09:41:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681576860; x=1684168860;
+        d=google.com; s=20221208; t=1681576861; x=1684168861;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=z2M63eTttyiy9/bDAykyJM/0pATtpC5A2Oom8LHCZ9k=;
-        b=TUQUCtCJib3y4up2QnqFd/naObQKhfNVY7afy7u9JkA8pMqyu4rdiZKWgXORmpq/fC
-         X5ETMMDTvclo+ScvAxMF9E/5ES7fjYYlbnpHGVn1KIa247m/sTbKp1LiKYm6cFlrVB+9
-         XJj2oiTUGiZTx6tK+D078A/8/ov0MU+lI1lPjGAmeyBl4wMC1K+hALb+JCsaHRRWmJ5e
-         93bbVzLDiknxQxkPfOURflcbszH6G2+bbVV2z8VBou27F05tmm53aUSC0YIqpjh6cTos
-         XXaytsJlLmhKUoGamjBghxs9fpVneoIo45c+V5bb8+/zyfK9yOB08NqssaJWxbQfZV03
-         zXbA==
+        bh=yN5fMEct/m/a/Rb4C1ETfFy+OcX2pQ2OuWIAZln2Ig8=;
+        b=6c1VPjZivedueEUiAXDku3YRYAEyynhvNcZcTtx7sXg+dj/b/7pQqNUZRlxi0VnNgM
+         HU/HnTXb7oi1jxUxUzhOCww6He/6XaINnEk/LN/G6PSRVl7tyiAUtGbEnX1HivrqirbL
+         v6LzlW2qO3g0yxerfUS2t38Km9jK8S38Ne8Rq/pqdUkJb3SNLDWXYR5lDksAD/XIHN+E
+         0g41hwtlPBdkD9yu8UEDDafeOJkIGhrrjAVEK0AI6wYL9EWWk4cTu5VqpIkRKWBbU8R1
+         AfRHB73ZFjkx6iAOw5bKYc2tfoQ8XScC3a9NSKtlIm0V/WQpk59HxKztVgfuJ21g8IGz
+         JQvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681576860; x=1684168860;
+        d=1e100.net; s=20221208; t=1681576861; x=1684168861;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z2M63eTttyiy9/bDAykyJM/0pATtpC5A2Oom8LHCZ9k=;
-        b=a+cW53/JwDwFXsYkfuENuP6Y8DgwmxMcnxMuOYV3pROA4Pr2fogKt6xe+DUQhW3wve
-         xy9kH+bxYL1m34z/lAOLjPMQih6N41jYvjaW+AW/9Er5JDRIqh2oedODGN4RWyXbASwf
-         Hv81aNMxTMkA093JVJtUUOVUFDghLmFCo9qphpnWKPTsZ/ACBcbf3xT31VciENENIOXA
-         Wb3b1XNHz4/9yszmnPYWb6fowvDAWQlPlO0B7dXySlPzKm9RctCCcIKDz6tHUTFIQjUM
-         SaG8vwOIGk3UKA4aAL16ylKtbXDYod1zDoXUmS9qcYXW4J6zsXSaGRTKCjNlexITCchZ
-         X7zg==
-X-Gm-Message-State: AAQBX9fPefljQgs6B0tOA1gdXHmwSeG96hlFCWcyTtNwOIRNSzm+8zX5
-	9kHKPTWzd6JI2qCIpypxDIZFyqNhKtQ=
-X-Google-Smtp-Source: AKy350brZ9cJoLoaZNJmMW+tpDxq5a3i0icYIzxJIjiLPR3atdE1a+olD8DSeBPpLqiSycbYFskGMVlrt64=
+        bh=yN5fMEct/m/a/Rb4C1ETfFy+OcX2pQ2OuWIAZln2Ig8=;
+        b=jlV2XoIORkqw8pmJ6KBdVDRDhcpEkNfvtP93UjOhib3Mgs3xBml6VJBxS+/ecWTLNB
+         20345dN7tLwRbta2FgL0db3XhdMI4Bj43iYxGEFDVlXMqZW4VVUZQQ7kVsK690WAEV+j
+         4JAJHd2aOIXyHkHbl1tuKjNr39TpJYi3hcSHuHEzwNWEPbdcvlnLbB40tAUNXwmP3jlC
+         S19rhFGRnzv4EtpzdpDtHlu2moHLBJDLvKApSuVvK53y5/mjG94WzRWO4dxNFCg0p/L1
+         MLdkuI7Dj29igt0GaZV2+xkO6DBEKczK00ZWJOsYGhoca4Z/vJL8pZw9CmkUGAVuJtE+
+         uYQA==
+X-Gm-Message-State: AAQBX9c8Q0HTQVDBbebj3ygj1dbJAPA9Y3KC0bmJ5q9PbQh9CTmS4Hnb
+	BC0Qq+e8xrtSFIeiwyMMnKZh/ETydgk=
+X-Google-Smtp-Source: AKy350ZpoeWbPfw+vdWfFf3rs9d/YBFxFx2kf3wEQCOjKxS78GCg9vah2bgdu44L7BNMcnOeoXu9+9aJhSM=
 X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a05:6a00:a1d:b0:63b:6e47:8646 with SMTP id
- p29-20020a056a000a1d00b0063b6e478646mr2576065pfh.3.1681576859816; Sat, 15 Apr
- 2023 09:40:59 -0700 (PDT)
-Date: Sat, 15 Apr 2023 09:40:28 -0700
+ (user=reijiw job=sendgmr) by 2002:a63:382:0:b0:51b:7928:6d07 with SMTP id
+ 124-20020a630382000000b0051b79286d07mr1300345pgd.0.1681576861604; Sat, 15 Apr
+ 2023 09:41:01 -0700 (PDT)
+Date: Sat, 15 Apr 2023 09:40:29 -0700
 In-Reply-To: <20230415164029.526895-1-reijiw@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230415164029.526895-1-reijiw@google.com>
 X-Mailer: git-send-email 2.40.0.634.g4ca3ef3211-goog
-Message-ID: <20230415164029.526895-2-reijiw@google.com>
-Subject: [PATCH v3 1/2] KVM: arm64: PMU: Restore the host's PMUSERENR_EL0
+Message-ID: <20230415164029.526895-3-reijiw@google.com>
+Subject: [PATCH v3 2/2] KVM: arm64: PMU: Don't overwrite PMUSERENR with vcpu loaded
 From: Reiji Watanabe <reijiw@google.com>
 To: Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
 	Oliver Upton <oliver.upton@linux.dev>, Will Deacon <will@kernel.org>, 
@@ -59,49 +59,223 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	Reiji Watanabe <reijiw@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Restore the host's PMUSERENR_EL0 value instead of clearing it,
-before returning back to userspace, as the host's EL0 might have
-a direct access to PMU registers (some bits of PMUSERENR_EL0 for
-might not be zero for the host EL0).
+Currently, with VHE, KVM sets ER, CR, SW and EN bits of
+PMUSERENR_EL0 to 1 on vcpu_load(), and saves and restores
+the register value for the host on vcpu_load() and vcpu_put().
+If the value of those bits are cleared on a pCPU with a vCPU
+loaded (armv8pmu_start() would do that when PMU counters are
+programmed for the guest), PMU access from the guest EL0 might
+be trapped to the guest EL1 directly regardless of the current
+PMUSERENR_EL0 value of the vCPU.
 
+Fix this by not letting armv8pmu_start() overwrite PMUSERENR_EL0
+on the pCPU where PMUSERENR_EL0 for the guest is loaded, and
+instead updating the saved shadow register value for the host,
+so that the value can be restored on vcpu_put() later.
+While vcpu_{put,load}() are manipulating PMUSERENR_EL0, disable
+IRQs to prevent a race condition between these processes and IPIs
+that attempt to update PMUSERENR_EL0 for the host EL0.
+As this change (disabling IRQs) is applied to the nVHE hyp code,
+unwanted code (i.e. trace_hardirqs_off) will be included in the
+hyp code when CONFIG_TRACE_IRQFLAGS is enabled.  Introduce
+NO_TRACE_IRQFLAGS macro to locally disable CONFIG_TRACE_IRQFLAGS
+in the nVHE hyp code.
+
+Suggested-by: Mark Rutland <mark.rutland@arm.com>
+Suggested-by: Marc Zyngier <maz@kernel.org>
 Fixes: 83a7a4d643d3 ("arm64: perf: Enable PMU counter userspace access for perf event")
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/hyp/include/hyp/switch.h | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_host.h       |  7 +++++++
+ arch/arm64/kernel/perf_event.c          | 21 ++++++++++++++++++---
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 24 ++++++++++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/Makefile        |  2 +-
+ arch/arm64/kvm/pmu.c                    | 25 +++++++++++++++++++++++++
+ include/linux/irqflags.h                |  4 ++--
+ 6 files changed, 77 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 07d37ff88a3f..6718731729fd 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -81,7 +81,12 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
- 	 * EL1 instead of being trapped to EL2.
- 	 */
- 	if (kvm_arm_support_pmu_v3()) {
-+		struct kvm_cpu_context *hctxt;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index bcd774d74f34..c49cfda2740a 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -668,6 +668,8 @@ struct kvm_vcpu_arch {
+ /* Software step state is Active-pending */
+ #define DBG_SS_ACTIVE_PENDING	__vcpu_single_flag(sflags, BIT(5))
+ 
++/* PMUSERENR for the guest EL0 is on physical CPU */
++#define PMUSERENR_ON_CPU	__vcpu_single_flag(sflags, BIT(6))
+ 
+ /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+ #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
+@@ -1028,9 +1030,14 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu);
+ #ifdef CONFIG_KVM
+ void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
+ void kvm_clr_pmu_events(u32 clr);
++bool kvm_set_pmuserenr(u64 val);
+ #else
+ static inline void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr) {}
+ static inline void kvm_clr_pmu_events(u32 clr) {}
++static inline bool kvm_set_pmuserenr(u64 val)
++{
++	return false;
++}
+ #endif
+ 
+ void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+index dde06c0f97f3..33bb5f548f8a 100644
+--- a/arch/arm64/kernel/perf_event.c
++++ b/arch/arm64/kernel/perf_event.c
+@@ -741,9 +741,25 @@ static inline u32 armv8pmu_getreset_flags(void)
+ 	return value;
+ }
+ 
++static void update_pmuserenr(u64 val)
++{
++	lockdep_assert_irqs_disabled();
 +
- 		write_sysreg(0, pmselr_el0);
++	/*
++	 * The current PMUSERENR_EL0 value might be the value for the guest.
++	 * If that's the case, have KVM keep tracking of the register value
++	 * for the host EL0 so that KVM can restore it before returning to
++	 * the host EL0. Otherwise, update the register now.
++	 */
++	if (kvm_set_pmuserenr(val))
++		return;
 +
-+		hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-+		ctxt_sys_reg(hctxt, PMUSERENR_EL0) = read_sysreg(pmuserenr_el0);
- 		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
++	write_sysreg(val, pmuserenr_el0);
++}
++
+ static void armv8pmu_disable_user_access(void)
+ {
+-	write_sysreg(0, pmuserenr_el0);
++	update_pmuserenr(0);
+ }
+ 
+ static void armv8pmu_enable_user_access(struct arm_pmu *cpu_pmu)
+@@ -759,8 +775,7 @@ static void armv8pmu_enable_user_access(struct arm_pmu *cpu_pmu)
+ 			armv8pmu_write_evcntr(i, 0);
  	}
  
-@@ -105,8 +110,12 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
- 	write_sysreg(vcpu->arch.mdcr_el2_host, mdcr_el2);
+-	write_sysreg(0, pmuserenr_el0);
+-	write_sysreg(ARMV8_PMU_USERENR_ER | ARMV8_PMU_USERENR_CR, pmuserenr_el0);
++	update_pmuserenr(ARMV8_PMU_USERENR_ER | ARMV8_PMU_USERENR_CR);
+ }
  
- 	write_sysreg(0, hstr_el2);
--	if (kvm_arm_support_pmu_v3())
--		write_sysreg(0, pmuserenr_el0);
-+	if (kvm_arm_support_pmu_v3()) {
-+		struct kvm_cpu_context *hctxt;
+ static void armv8pmu_enable_event(struct perf_event *event)
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 6718731729fd..7e73be12cfaf 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -82,12 +82,24 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+ 	 */
+ 	if (kvm_arm_support_pmu_v3()) {
+ 		struct kvm_cpu_context *hctxt;
++		unsigned long flags;
+ 
+ 		write_sysreg(0, pmselr_el0);
+ 
+ 		hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
 +
-+		hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-+		write_sysreg(ctxt_sys_reg(hctxt, PMUSERENR_EL0), pmuserenr_el0);
-+	}
++		/*
++		 * Disable IRQs to prevent a race condition between the
++		 * following code and IPIs that attempts to update
++		 * PMUSERENR_EL0. See also kvm_set_pmuserenr().
++		 */
++		local_irq_save(flags);
++
+ 		ctxt_sys_reg(hctxt, PMUSERENR_EL0) = read_sysreg(pmuserenr_el0);
+ 		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
++		vcpu_set_flag(vcpu, PMUSERENR_ON_CPU);
++
++		local_irq_restore(flags);
+ 	}
+ 
+ 	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
+@@ -112,9 +124,21 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+ 	write_sysreg(0, hstr_el2);
+ 	if (kvm_arm_support_pmu_v3()) {
+ 		struct kvm_cpu_context *hctxt;
++		unsigned long flags;
+ 
+ 		hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
++
++		/*
++		 * Disable IRQs to prevent a race condition between the
++		 * following code and IPIs that attempts to update
++		 * PMUSERENR_EL0. See also kvm_set_pmuserenr().
++		 */
++		local_irq_save(flags);
++
+ 		write_sysreg(ctxt_sys_reg(hctxt, PMUSERENR_EL0), pmuserenr_el0);
++		vcpu_clear_flag(vcpu, PMUSERENR_ON_CPU);
++
++		local_irq_restore(flags);
+ 	}
  
  	if (cpus_have_final_cap(ARM64_SME)) {
- 		sysreg_clear_set_s(SYS_HFGRTR_EL2, 0,
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index 530347cdebe3..2c08a54ca7d9 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -10,7 +10,7 @@ asflags-y := -D__KVM_NVHE_HYPERVISOR__ -D__DISABLE_EXPORTS
+ # will explode instantly (Words of Marc Zyngier). So introduce a generic flag
+ # __DISABLE_TRACE_MMIO__ to disable MMIO tracing for nVHE KVM.
+ ccflags-y := -D__KVM_NVHE_HYPERVISOR__ -D__DISABLE_EXPORTS -D__DISABLE_TRACE_MMIO__
+-ccflags-y += -fno-stack-protector	\
++ccflags-y += -fno-stack-protector -DNO_TRACE_IRQFLAGS \
+ 	     -DDISABLE_BRANCH_PROFILING	\
+ 	     $(DISABLE_STACKLEAK_PLUGIN)
+ 
+diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
+index 7887133d15f0..d6a863853bfe 100644
+--- a/arch/arm64/kvm/pmu.c
++++ b/arch/arm64/kvm/pmu.c
+@@ -209,3 +209,28 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu)
+ 	kvm_vcpu_pmu_enable_el0(events_host);
+ 	kvm_vcpu_pmu_disable_el0(events_guest);
+ }
++
++/*
++ * With VHE, keep track of the PMUSERENR_EL0 value for the host EL0 on the pCPU
++ * where PMUSERENR_EL0 for the guest is loaded, since PMUSERENR_EL0 is switched
++ * to the value for the guest on vcpu_load().  The value for the host EL0
++ * will be restored on vcpu_put(), before returning to the EL0.
++ *
++ * Return true if KVM takes care of the register. Otherwise return false.
++ */
++bool kvm_set_pmuserenr(u64 val)
++{
++	struct kvm_cpu_context *hctxt;
++	struct kvm_vcpu *vcpu;
++
++	if (!kvm_arm_support_pmu_v3() || !has_vhe())
++		return false;
++
++	vcpu = kvm_get_running_vcpu();
++	if (!vcpu || !vcpu_get_flag(vcpu, PMUSERENR_ON_CPU))
++		return false;
++
++	hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
++	ctxt_sys_reg(hctxt, PMUSERENR_EL0) = val;
++	return true;
++}
+diff --git a/include/linux/irqflags.h b/include/linux/irqflags.h
+index 5ec0fa71399e..f7fd5d645b52 100644
+--- a/include/linux/irqflags.h
++++ b/include/linux/irqflags.h
+@@ -198,9 +198,9 @@ extern void warn_bogus_irq_restore(void);
+ 
+ /*
+  * The local_irq_*() APIs are equal to the raw_local_irq*()
+- * if !TRACE_IRQFLAGS.
++ * if !TRACE_IRQFLAGS or if NO_TRACE_IRQFLAGS is locally set.
+  */
+-#ifdef CONFIG_TRACE_IRQFLAGS
++#if defined CONFIG_TRACE_IRQFLAGS && !defined(NO_TRACE_IRQFLAGS)
+ 
+ #define local_irq_enable()				\
+ 	do {						\
 -- 
 2.40.0.634.g4ca3ef3211-goog
 
