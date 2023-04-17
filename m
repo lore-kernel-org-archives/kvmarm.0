@@ -1,291 +1,192 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2BC57B
-	for <kvmarm@lists.linux.dev>; Sun, 16 Apr 2023 04:53:54 +0000 (UTC)
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-63b41df6c5aso746788b3a.1
-        for <kvmarm@lists.linux.dev>; Sat, 15 Apr 2023 21:53:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CBD215A0
+	for <kvmarm@lists.linux.dev>; Mon, 17 Apr 2023 03:34:55 +0000 (UTC)
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1a6e5be6224so16905ad.1
+        for <kvmarm@lists.linux.dev>; Sun, 16 Apr 2023 20:34:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681620834; x=1684212834;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VMTDeZwh9/grD0gErG9YU5jhGrRVgshTp/o9TkkizoE=;
-        b=6mjBhXEnOVj0mJPIE+HvGuFO0mlKW314KgvPQGrpUgHQRjQAeuRVyFEpoAeHsldQg5
-         WOmp4/nLJcTMLVROM2QGULQY1FHtUU4/VP6xgTGicDK+WJA31QBPaTwrulRYnJws8OOu
-         0MfnFtpsn7zTVcgc6CHI0aNdhiqVGPmRf2t380xktetwqAgGILbi6IG74cX0dd1aTklL
-         aRh74dYgYCTqGZ5kaPTHLavCv8ctsoISgxGf61T6ihn48pEUHtMhUCrQGupRETRs3mRc
-         FSeVS1dcUhySXaCDKC/ACq+gTDROu/zmasXiFoVdneA3JT4y4+fHN5tSy/AXLh3lhlrP
-         +ecg==
+        d=google.com; s=20221208; t=1681702494; x=1684294494;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=NlW2TVVx2ak294Y+VUa1rl/r58qCiE5sh+v8a4TOPOo=;
+        b=tEkMX2pLHGrbo019aJCQi+10L/qFWKi2RdR9ix640cDeuAnVgB0I5VZ1oArJKNLsCF
+         pWQZkLtyn8ZavtmHkVgYf7DMcxlXr38qdv0YGv/6MDZA95Ovs0JDHaO8kzjOfndIVFWw
+         l+FbineuX/d3Cq+6ixhP9Fyu84qGvP0U3T+Gds7pDbB/7gYiud6w2cWeM/UiKXlm97ko
+         5NODe5Ims2uMcg5t1xkSy3AtZOcycNfQ+di3hWv1lN7BmIV5O/okne+yeR+QBbe1BtX9
+         442bn35GDCwsd1RExs+oAoNp+GM1+6Rkber7Ftz7qLq79QHXvsgfTZGRsrmD9NyJFpwZ
+         rhgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681620834; x=1684212834;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VMTDeZwh9/grD0gErG9YU5jhGrRVgshTp/o9TkkizoE=;
-        b=VO1k6NUSi5XLe51qKFmikIHiiUxgBoK72ryGecdUaCi9BTQKzSUeq4lsDrQxunUxvW
-         GyKGdNRLRnQ9I7LgjzyKqT5+lu5AODZS+6i8lBc7xOV96497FYTKoCCP6FowebMwkJpj
-         0r8rcXYMkQlVWJzBEo8v3hQSzFgjD+ZoqW10a3PW3eXQZ9rchonTZZ4qaShiFNww0XB3
-         lFm4wei9ZAeyyK4/naBgi90HLvKbJA1DOTBb274dp8amiSKsei7w4HaR0cnJcxN3IhHi
-         X6fGj4jq/I1/0RItqYpAThDueV3sP2Z7khWZLN3HnA9kCPVdC2HmwYaOIBpev9d+yMfk
-         dLlg==
-X-Gm-Message-State: AAQBX9cn5FPgFZ136mKVnqeeSvlTHNIE4ezhgn/jLop/0dNUWeLgL0zM
-	y3xxdGjlPpUHpVdTeh7nmuta4p+uc+Y=
-X-Google-Smtp-Source: AKy350adYnpwquKs5u8XpxsLbgnVKuP8weSf0ElM94XiI/RcQMBOdqACbZtcVbYpYyKSLA2MSnJakpqPwiA=
-X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a05:6a00:181f:b0:62d:afc6:c152 with SMTP id
- y31-20020a056a00181f00b0062dafc6c152mr5669836pfa.5.1681620834123; Sat, 15 Apr
- 2023 21:53:54 -0700 (PDT)
-Date: Sat, 15 Apr 2023 21:53:16 -0700
-In-Reply-To: <20230416045316.1367849-1-reijiw@google.com>
+        d=1e100.net; s=20221208; t=1681702494; x=1684294494;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NlW2TVVx2ak294Y+VUa1rl/r58qCiE5sh+v8a4TOPOo=;
+        b=UlsUoCbkYs+9u0Dy+5+7/64x9tWI2d3WYsw9r2MwtP0E8CERxNVmDVZzfkxfIEJWsF
+         t4sioy0uaxjMdOxihobTtJ/An37GD4Hkqsj+P+g4NXPzjC7A9dTsug14jApM9sd1cAmn
+         J+2STATaiIOLq/cPx40XtnZx8enNg2T5p5KqI6el7y8A9SyTFSC0bd04m7lQ6dyCTKoN
+         c1fM/AQwNSvqEs1FfRKO3IYaxPhlUY4ZhQI4Wpi62eA9gd1nhRcKWjPebZjeJiFqD2pM
+         rKSOqGT/Nywp6RuGnAwS6xB8npFxgfKzWdf/dZsAQxMOgMzf58Vc+oxrBCpwMGROZsQo
+         hWyQ==
+X-Gm-Message-State: AAQBX9daEnrzKQTKhEXw5AyuERedQxh3ZBGZHNWCnau9SNmymBtgYW3l
+	fQ5djjZaJJGKzCdRjw4ke+mC6bKWfDbx4B/a0u7HNA==
+X-Google-Smtp-Source: AKy350ZuBUQNLPxBSAuymBWh4oP4g4a3g2zWJtFKy9jLFZ4M1TP0qTcejsl9m7wrjq4FbzrkEVzf2g==
+X-Received: by 2002:a17:903:4103:b0:1a6:760c:af3d with SMTP id r3-20020a170903410300b001a6760caf3dmr604530pld.16.1681702494429;
+        Sun, 16 Apr 2023 20:34:54 -0700 (PDT)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id ij8-20020a170902ab4800b001a514d75d16sm6516955plb.13.2023.04.16.20.34.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Apr 2023 20:34:53 -0700 (PDT)
+Date: Sun, 16 Apr 2023 20:34:49 -0700
+From: Reiji Watanabe <reijiw@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Simon Veith <sveith@amazon.de>,
+	Colton Lewis <coltonlewis@google.com>,
+	Joey Gouly <joey.gouly@arm.com>, dwmw2@infradead.org
+Subject: Re: [PATCH v4 05/20] KVM: arm64: timers: Allow physical offset
+ without CNTPOFF_EL2
+Message-ID: <20230417033449.2obz4ywzdtkl2z42@google.com>
+References: <20230330174800.2677007-1-maz@kernel.org>
+ <20230330174800.2677007-6-maz@kernel.org>
+ <20230410153441.vddskgxu2zzsi7bq@google.com>
+ <86h6tkkky4.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230416045316.1367849-1-reijiw@google.com>
-X-Mailer: git-send-email 2.40.0.634.g4ca3ef3211-goog
-Message-ID: <20230416045316.1367849-3-reijiw@google.com>
-Subject: [PATCH v4 2/2] KVM: arm64: PMU: Don't overwrite PMUSERENR with vcpu loaded
-From: Reiji Watanabe <reijiw@google.com>
-To: Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Will Deacon <will@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Ricardo Koller <ricarkol@google.com>, 
-	Jing Zhang <jingzhangos@google.com>, Raghavendra Rao Anata <rananta@google.com>, 
-	Shaoqin Huang <shahuang@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Reiji Watanabe <reijiw@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86h6tkkky4.wl-maz@kernel.org>
 
-Currently, with VHE, KVM sets ER, CR, SW and EN bits of
-PMUSERENR_EL0 to 1 on vcpu_load(), and saves and restores
-the register value for the host on vcpu_load() and vcpu_put().
-If the value of those bits are cleared on a pCPU with a vCPU
-loaded (armv8pmu_start() would do that when PMU counters are
-programmed for the guest), PMU access from the guest EL0 might
-be trapped to the guest EL1 directly regardless of the current
-PMUSERENR_EL0 value of the vCPU.
+> > > +	assign_clear_set_bit(tpt, CNTHCTL_EL1PCEN << 10, set, clr);
+> > > +	assign_clear_set_bit(tpc, CNTHCTL_EL1PCTEN << 10, set, clr);
+> > 
+> > Nit: IMHO the way the code specifies the 'set' and 'clr' arguments for
+> > the macro might be a bit confusing ('set' is for '_clr', and 'clr' is
+> > for '_set')?
+> 
+> I don't disagree, but we end-up with bits of different polarity once
+> NV is fully in, see:
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/tree/arch/arm64/kvm/arch_timer.c?h=kvm-arm64/nv-6.4-WIP#n861
+> 
+> > Perhaps changing the parameter names of assign_clear_set_bit() like
+> > below or flipping the condition (i.e. Specify !tpt or no_tpt instead
+> > of tpt) might be less confusing?
+> > 
+> > #define assign_clear_set_bit(_pred, _bit, _t_val, _f_val)	\
+> > do {								\
+> > 	if (_pred)						\
+> > 		(_t_val) |= (_bit);				\
+> > 	else							\
+> > 		(_f_val) |= (_bit);				\
+> > } while (0)
+> 
+> See the pointer above. We need a good way to specify bits that have
+> one polarity or another, and compute the result given the high-level
+> constraints that are provided by the emulation code.
+> 
+> So far, I haven't been able to work out something "nice".
 
-Fix this by not letting armv8pmu_start() overwrite PMUSERENR_EL0
-on the pCPU where PMUSERENR_EL0 for the guest is loaded, and
-instead updating the saved shadow register value for the host,
-so that the value can be restored on vcpu_put() later.
-While vcpu_{put,load}() are manipulating PMUSERENR_EL0, disable
-IRQs to prevent a race condition between these processes and IPIs
-that attempt to update PMUSERENR_EL0 for the host EL0.
-As this change (disabling IRQs) is applied to the nVHE hyp code,
-unwanted code (e.g. trace_hardirqs_off, etc) will be included in the
-hyp code when CONFIG_TRACE_IRQFLAGS and/or CONFIG_DEBUG_IRQFLAGS
-are enabled.  Introduce NO_TRACE_IRQFLAGS and NO_DEBUG_IRQFLAGS
-macros to locally disable CONFIG_TRACE_IRQFLAGS or
-CONFIG_DEBUG_IRQFLAGS in the nVHE hyp code.
+Thank you for the pointer.  Understood.
+I don't have a batter idea though :)
 
-Suggested-by: Mark Rutland <mark.rutland@arm.com>
-Suggested-by: Marc Zyngier <maz@kernel.org>
-Fixes: 83a7a4d643d3 ("arm64: perf: Enable PMU counter userspace access for perf event")
-Signed-off-by: Reiji Watanabe <reijiw@google.com>
----
- arch/arm64/include/asm/kvm_host.h       |  7 +++++++
- arch/arm64/kernel/perf_event.c          | 21 ++++++++++++++++++---
- arch/arm64/kvm/hyp/include/hyp/switch.h | 24 ++++++++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/Makefile        |  2 +-
- arch/arm64/kvm/pmu.c                    | 25 +++++++++++++++++++++++++
- include/linux/irqflags.h                |  6 +++---
- 6 files changed, 78 insertions(+), 7 deletions(-)
+> 
+> [...]
+> 
+> > > +	{ SYS_DESC(SYS_CNTPCT_EL0), access_arch_timer },
+> > > +	{ SYS_DESC(SYS_CNTPCTSS_EL0), access_arch_timer },
+> > >  	{ SYS_DESC(SYS_CNTP_TVAL_EL0), access_arch_timer },
+> > >  	{ SYS_DESC(SYS_CNTP_CTL_EL0), access_arch_timer },
+> > >  	{ SYS_DESC(SYS_CNTP_CVAL_EL0), access_arch_timer },
+> > > @@ -2525,6 +2533,7 @@ static const struct sys_reg_desc cp15_64_regs[] = {
+> > >  	{ Op1( 0), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, TTBR0_EL1 },
+> > >  	{ CP15_PMU_SYS_REG(DIRECT, 0, 0, 9, 0), .access = access_pmu_evcntr },
+> > >  	{ Op1( 0), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_SGI1R */
+> > > +	{ SYS_DESC(SYS_AARCH32_CNTPCT),	      access_arch_timer },
+> > 
+> > Shouldn't KVM also emulate CNTPCTSS (Aarch32) when its trapping is
+> > enabled on the host with ECV_CNTPOFF ?
+> 
+> Oh, well spotted. I'll queue something on top of the series to that
+> effect (I'd rather not respin it as it has been in -next for some
+> time, and the merge window is approaching).
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index bcd774d74f34..c49cfda2740a 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -668,6 +668,8 @@ struct kvm_vcpu_arch {
- /* Software step state is Active-pending */
- #define DBG_SS_ACTIVE_PENDING	__vcpu_single_flag(sflags, BIT(5))
- 
-+/* PMUSERENR for the guest EL0 is on physical CPU */
-+#define PMUSERENR_ON_CPU	__vcpu_single_flag(sflags, BIT(6))
- 
- /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
- #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
-@@ -1028,9 +1030,14 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu);
- #ifdef CONFIG_KVM
- void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
- void kvm_clr_pmu_events(u32 clr);
-+bool kvm_set_pmuserenr(u64 val);
- #else
- static inline void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr) {}
- static inline void kvm_clr_pmu_events(u32 clr) {}
-+static inline bool kvm_set_pmuserenr(u64 val)
-+{
-+	return false;
-+}
- #endif
- 
- void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
-index dde06c0f97f3..33bb5f548f8a 100644
---- a/arch/arm64/kernel/perf_event.c
-+++ b/arch/arm64/kernel/perf_event.c
-@@ -741,9 +741,25 @@ static inline u32 armv8pmu_getreset_flags(void)
- 	return value;
- }
- 
-+static void update_pmuserenr(u64 val)
-+{
-+	lockdep_assert_irqs_disabled();
-+
-+	/*
-+	 * The current PMUSERENR_EL0 value might be the value for the guest.
-+	 * If that's the case, have KVM keep tracking of the register value
-+	 * for the host EL0 so that KVM can restore it before returning to
-+	 * the host EL0. Otherwise, update the register now.
-+	 */
-+	if (kvm_set_pmuserenr(val))
-+		return;
-+
-+	write_sysreg(val, pmuserenr_el0);
-+}
-+
- static void armv8pmu_disable_user_access(void)
- {
--	write_sysreg(0, pmuserenr_el0);
-+	update_pmuserenr(0);
- }
- 
- static void armv8pmu_enable_user_access(struct arm_pmu *cpu_pmu)
-@@ -759,8 +775,7 @@ static void armv8pmu_enable_user_access(struct arm_pmu *cpu_pmu)
- 			armv8pmu_write_evcntr(i, 0);
- 	}
- 
--	write_sysreg(0, pmuserenr_el0);
--	write_sysreg(ARMV8_PMU_USERENR_ER | ARMV8_PMU_USERENR_CR, pmuserenr_el0);
-+	update_pmuserenr(ARMV8_PMU_USERENR_ER | ARMV8_PMU_USERENR_CR);
- }
- 
- static void armv8pmu_enable_event(struct perf_event *event)
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 6718731729fd..7e73be12cfaf 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -82,12 +82,24 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
- 	 */
- 	if (kvm_arm_support_pmu_v3()) {
- 		struct kvm_cpu_context *hctxt;
-+		unsigned long flags;
- 
- 		write_sysreg(0, pmselr_el0);
- 
- 		hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-+
-+		/*
-+		 * Disable IRQs to prevent a race condition between the
-+		 * following code and IPIs that attempts to update
-+		 * PMUSERENR_EL0. See also kvm_set_pmuserenr().
-+		 */
-+		local_irq_save(flags);
-+
- 		ctxt_sys_reg(hctxt, PMUSERENR_EL0) = read_sysreg(pmuserenr_el0);
- 		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
-+		vcpu_set_flag(vcpu, PMUSERENR_ON_CPU);
-+
-+		local_irq_restore(flags);
- 	}
- 
- 	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
-@@ -112,9 +124,21 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
- 	write_sysreg(0, hstr_el2);
- 	if (kvm_arm_support_pmu_v3()) {
- 		struct kvm_cpu_context *hctxt;
-+		unsigned long flags;
- 
- 		hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-+
-+		/*
-+		 * Disable IRQs to prevent a race condition between the
-+		 * following code and IPIs that attempts to update
-+		 * PMUSERENR_EL0. See also kvm_set_pmuserenr().
-+		 */
-+		local_irq_save(flags);
-+
- 		write_sysreg(ctxt_sys_reg(hctxt, PMUSERENR_EL0), pmuserenr_el0);
-+		vcpu_clear_flag(vcpu, PMUSERENR_ON_CPU);
-+
-+		local_irq_restore(flags);
- 	}
- 
- 	if (cpus_have_final_cap(ARM64_SME)) {
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index 530347cdebe3..2e31d37512c7 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -10,7 +10,7 @@ asflags-y := -D__KVM_NVHE_HYPERVISOR__ -D__DISABLE_EXPORTS
- # will explode instantly (Words of Marc Zyngier). So introduce a generic flag
- # __DISABLE_TRACE_MMIO__ to disable MMIO tracing for nVHE KVM.
- ccflags-y := -D__KVM_NVHE_HYPERVISOR__ -D__DISABLE_EXPORTS -D__DISABLE_TRACE_MMIO__
--ccflags-y += -fno-stack-protector	\
-+ccflags-y += -fno-stack-protector -DNO_TRACE_IRQFLAGS -DNO_DEBUG_IRQFLAGS \
- 	     -DDISABLE_BRANCH_PROFILING	\
- 	     $(DISABLE_STACKLEAK_PLUGIN)
- 
-diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-index 7887133d15f0..d6a863853bfe 100644
---- a/arch/arm64/kvm/pmu.c
-+++ b/arch/arm64/kvm/pmu.c
-@@ -209,3 +209,28 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu)
- 	kvm_vcpu_pmu_enable_el0(events_host);
- 	kvm_vcpu_pmu_disable_el0(events_guest);
- }
-+
-+/*
-+ * With VHE, keep track of the PMUSERENR_EL0 value for the host EL0 on the pCPU
-+ * where PMUSERENR_EL0 for the guest is loaded, since PMUSERENR_EL0 is switched
-+ * to the value for the guest on vcpu_load().  The value for the host EL0
-+ * will be restored on vcpu_put(), before returning to the EL0.
-+ *
-+ * Return true if KVM takes care of the register. Otherwise return false.
-+ */
-+bool kvm_set_pmuserenr(u64 val)
-+{
-+	struct kvm_cpu_context *hctxt;
-+	struct kvm_vcpu *vcpu;
-+
-+	if (!kvm_arm_support_pmu_v3() || !has_vhe())
-+		return false;
-+
-+	vcpu = kvm_get_running_vcpu();
-+	if (!vcpu || !vcpu_get_flag(vcpu, PMUSERENR_ON_CPU))
-+		return false;
-+
-+	hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-+	ctxt_sys_reg(hctxt, PMUSERENR_EL0) = val;
-+	return true;
-+}
-diff --git a/include/linux/irqflags.h b/include/linux/irqflags.h
-index 5ec0fa71399e..bcf3b969d459 100644
---- a/include/linux/irqflags.h
-+++ b/include/linux/irqflags.h
-@@ -156,7 +156,7 @@ do {						\
- # define start_critical_timings() do { } while (0)
- #endif
- 
--#ifdef CONFIG_DEBUG_IRQFLAGS
-+#if defined CONFIG_DEBUG_IRQFLAGS && !defined(NO_DEBUG_IRQFLAGS)
- extern void warn_bogus_irq_restore(void);
- #define raw_check_bogus_irq_restore()			\
- 	do {						\
-@@ -198,9 +198,9 @@ extern void warn_bogus_irq_restore(void);
- 
- /*
-  * The local_irq_*() APIs are equal to the raw_local_irq*()
-- * if !TRACE_IRQFLAGS.
-+ * if !TRACE_IRQFLAGS or if NO_TRACE_IRQFLAGS is locally set.
-  */
--#ifdef CONFIG_TRACE_IRQFLAGS
-+#if defined CONFIG_TRACE_IRQFLAGS && !defined(NO_TRACE_IRQFLAGS)
- 
- #define local_irq_enable()				\
- 	do {						\
--- 
-2.40.0.634.g4ca3ef3211-goog
+Understood.
 
+
+> 
+> > 
+> > 
+> > >  	{ Op1( 1), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, TTBR1_EL1 },
+> > >  	{ Op1( 1), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_ASGI1R */
+> > >  	{ Op1( 2), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_SGI0R */
+> > > -- 
+> > > 2.34.1
+> > > 
+> > > 
+> > 
+> > Nit: In emulating reading physical counter/timer for direct_ptimer
+> > (poffset != 0 on VHE without ECV_CNTPOFF), it appears that
+> > kvm_arm_timer_read_sysreg() unnecessarily calls
+> > timer_{save,restore}_state(), and kvm_arm_timer_write_sysreg()
+> > unnecessarily calls timer_save_state().  Couldn't we skip those
+> > unnecessary calls ? (I didn't check all the following patches, but
+> > the current code would be more convenient in the following patches ?)
+> 
+> Well, it depends how you look at it. We still perform "some" level of
+> emulation (such as offsetting CVAL), and it allows us to share some
+> code with the full emulation.
+
+Even if we skip calling timer_save_state() and/or timer_restore_state(),
+I would think we could still share some code with the full emulation.
+What I meant was something like below (a diff from the patch-5).
+Or Am I misunderstanding something?
+
+
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -1003,7 +1003,7 @@ u64 kvm_arm_timer_read_sysreg(struct kvm_vcpu *vcpu,
+        get_timer_map(vcpu, &map);
+        timer = vcpu_get_timer(vcpu, tmr);
+ 
+-       if (timer == map.emul_ptimer)
++       if (timer == map.emul_ptimer || timer == map.direct_ptimer)
+                return kvm_arm_timer_read(vcpu, timer, treg);
+ 
+        preempt_disable();
+@@ -1056,7 +1056,9 @@ void kvm_arm_timer_write_sysreg(struct kvm_vcpu *vcpu,
+                timer_emulate(timer);
+        } else {
+                preempt_disable();
+-               timer_save_state(timer);
++               if (timer != map.direct_ptimer)
++                       timer_save_state(timer);
++
+                kvm_arm_timer_write(vcpu, timer, treg, val);
+                timer_restore_state(timer);
+                preempt_enable();
+
+
+> On top of that, we already fast-track CNTPCT_EL0, which is the main
+> user, and has a visible benefit with NV. If anything, I'd rather add a
+> similar fast-tracking for the read side of CNTP_CVAL_EL0 and
+> CNTP_CTL_EL0. We could then leave that code for 32bit only, which
+> nobody gives a toss about.
+> 
+> What do you think?
+
+Ah, I didn't check that fast-track CNTPCT_EL0.
+Yes, that would be nicer.
+
+Thank you!
+Reiji
