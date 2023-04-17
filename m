@@ -1,192 +1,217 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CBD215A0
-	for <kvmarm@lists.linux.dev>; Mon, 17 Apr 2023 03:34:55 +0000 (UTC)
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1a6e5be6224so16905ad.1
-        for <kvmarm@lists.linux.dev>; Sun, 16 Apr 2023 20:34:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681702494; x=1684294494;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NlW2TVVx2ak294Y+VUa1rl/r58qCiE5sh+v8a4TOPOo=;
-        b=tEkMX2pLHGrbo019aJCQi+10L/qFWKi2RdR9ix640cDeuAnVgB0I5VZ1oArJKNLsCF
-         pWQZkLtyn8ZavtmHkVgYf7DMcxlXr38qdv0YGv/6MDZA95Ovs0JDHaO8kzjOfndIVFWw
-         l+FbineuX/d3Cq+6ixhP9Fyu84qGvP0U3T+Gds7pDbB/7gYiud6w2cWeM/UiKXlm97ko
-         5NODe5Ims2uMcg5t1xkSy3AtZOcycNfQ+di3hWv1lN7BmIV5O/okne+yeR+QBbe1BtX9
-         442bn35GDCwsd1RExs+oAoNp+GM1+6Rkber7Ftz7qLq79QHXvsgfTZGRsrmD9NyJFpwZ
-         rhgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681702494; x=1684294494;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NlW2TVVx2ak294Y+VUa1rl/r58qCiE5sh+v8a4TOPOo=;
-        b=UlsUoCbkYs+9u0Dy+5+7/64x9tWI2d3WYsw9r2MwtP0E8CERxNVmDVZzfkxfIEJWsF
-         t4sioy0uaxjMdOxihobTtJ/An37GD4Hkqsj+P+g4NXPzjC7A9dTsug14jApM9sd1cAmn
-         J+2STATaiIOLq/cPx40XtnZx8enNg2T5p5KqI6el7y8A9SyTFSC0bd04m7lQ6dyCTKoN
-         c1fM/AQwNSvqEs1FfRKO3IYaxPhlUY4ZhQI4Wpi62eA9gd1nhRcKWjPebZjeJiFqD2pM
-         rKSOqGT/Nywp6RuGnAwS6xB8npFxgfKzWdf/dZsAQxMOgMzf58Vc+oxrBCpwMGROZsQo
-         hWyQ==
-X-Gm-Message-State: AAQBX9daEnrzKQTKhEXw5AyuERedQxh3ZBGZHNWCnau9SNmymBtgYW3l
-	fQ5djjZaJJGKzCdRjw4ke+mC6bKWfDbx4B/a0u7HNA==
-X-Google-Smtp-Source: AKy350ZuBUQNLPxBSAuymBWh4oP4g4a3g2zWJtFKy9jLFZ4M1TP0qTcejsl9m7wrjq4FbzrkEVzf2g==
-X-Received: by 2002:a17:903:4103:b0:1a6:760c:af3d with SMTP id r3-20020a170903410300b001a6760caf3dmr604530pld.16.1681702494429;
-        Sun, 16 Apr 2023 20:34:54 -0700 (PDT)
-Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id ij8-20020a170902ab4800b001a514d75d16sm6516955plb.13.2023.04.16.20.34.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Apr 2023 20:34:53 -0700 (PDT)
-Date: Sun, 16 Apr 2023 20:34:49 -0700
-From: Reiji Watanabe <reijiw@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	Simon Veith <sveith@amazon.de>,
-	Colton Lewis <coltonlewis@google.com>,
-	Joey Gouly <joey.gouly@arm.com>, dwmw2@infradead.org
-Subject: Re: [PATCH v4 05/20] KVM: arm64: timers: Allow physical offset
- without CNTPOFF_EL2
-Message-ID: <20230417033449.2obz4ywzdtkl2z42@google.com>
-References: <20230330174800.2677007-1-maz@kernel.org>
- <20230330174800.2677007-6-maz@kernel.org>
- <20230410153441.vddskgxu2zzsi7bq@google.com>
- <86h6tkkky4.wl-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A508FC2D8
+	for <kvmarm@lists.linux.dev>; Mon, 17 Apr 2023 06:08:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1681711732;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7/GX76h4Kb0kaWGv3m6HKSx7P+gkzG44sMPzyc+rFsM=;
+	b=VdKYbUVjfv1RoFy/N+4nl33DE3cNZBLTsqA4hbk9VFn1132vdKDKaHgb3Ovufwe+joEd96
+	I/nRzIJZe30AGPDDXKO7KKr8C9hD6bh6uAIT2xe0A0FirMOhSWJ4R+QaL/u4PyWomYuCYS
+	DVoX+7usXzF/wAQ6smQfX+36jWBu90o=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-93-Ly9QmHwqOVaCcW9eUcRuvA-1; Mon, 17 Apr 2023 02:08:48 -0400
+X-MC-Unique: Ly9QmHwqOVaCcW9eUcRuvA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 41078855300;
+	Mon, 17 Apr 2023 06:08:47 +0000 (UTC)
+Received: from [10.72.13.187] (ovpn-13-187.pek2.redhat.com [10.72.13.187])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id A4D8240CE2D4;
+	Mon, 17 Apr 2023 06:08:35 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v7 01/12] KVM: arm64: Rename free_removed to free_unlinked
+To: Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
+ maz@kernel.org, oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
+ catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com,
+ reijiw@google.com, rananta@google.com, bgardon@google.com,
+ ricarkol@gmail.com, Oliver Upton <oliver.upton@linux.dev>,
+ Shaoqin Huang <shahuang@redhat.com>
+References: <20230409063000.3559991-1-ricarkol@google.com>
+ <20230409063000.3559991-2-ricarkol@google.com>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <47421b51-82f7-2832-6e28-8d855e2813f3@redhat.com>
+Date: Mon, 17 Apr 2023 14:08:31 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86h6tkkky4.wl-maz@kernel.org>
+In-Reply-To: <20230409063000.3559991-2-ricarkol@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 
-> > > +	assign_clear_set_bit(tpt, CNTHCTL_EL1PCEN << 10, set, clr);
-> > > +	assign_clear_set_bit(tpc, CNTHCTL_EL1PCTEN << 10, set, clr);
-> > 
-> > Nit: IMHO the way the code specifies the 'set' and 'clr' arguments for
-> > the macro might be a bit confusing ('set' is for '_clr', and 'clr' is
-> > for '_set')?
+On 4/9/23 2:29 PM, Ricardo Koller wrote:
+> Normalize on referring to tables outside of an active paging structure
+> as 'unlinked'.
 > 
-> I don't disagree, but we end-up with bits of different polarity once
-> NV is fully in, see:
+> A subsequent change to KVM will add support for building page tables
+> that are not part of an active paging structure. The existing
+> 'removed_table' terminology is quite clunky when applied in this
+> context.
 > 
-> https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/tree/arch/arm64/kvm/arch_timer.c?h=kvm-arm64/nv-6.4-WIP#n861
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> ---
+>   arch/arm64/include/asm/kvm_pgtable.h  |  8 ++++----
+>   arch/arm64/kvm/hyp/nvhe/mem_protect.c |  6 +++---
+>   arch/arm64/kvm/hyp/pgtable.c          |  6 +++---
+>   arch/arm64/kvm/mmu.c                  | 10 +++++-----
+>   4 files changed, 15 insertions(+), 15 deletions(-)
 > 
-> > Perhaps changing the parameter names of assign_clear_set_bit() like
-> > below or flipping the condition (i.e. Specify !tpt or no_tpt instead
-> > of tpt) might be less confusing?
-> > 
-> > #define assign_clear_set_bit(_pred, _bit, _t_val, _f_val)	\
-> > do {								\
-> > 	if (_pred)						\
-> > 		(_t_val) |= (_bit);				\
-> > 	else							\
-> > 		(_f_val) |= (_bit);				\
-> > } while (0)
+
+Reviewed-by: Gavin Shan <gshan@redhat.com>
+
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 4cd6762bda805..26a4293726c14 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -104,7 +104,7 @@ static inline bool kvm_level_supports_block_mapping(u32 level)
+>    *				allocation is physically contiguous.
+>    * @free_pages_exact:		Free an exact number of memory pages previously
+>    *				allocated by zalloc_pages_exact.
+> - * @free_removed_table:		Free a removed paging structure by unlinking and
+> + * @free_unlinked_table:	Free an unlinked paging structure by unlinking and
+>    *				dropping references.
+>    * @get_page:			Increment the refcount on a page.
+>    * @put_page:			Decrement the refcount on a page. When the
+> @@ -124,7 +124,7 @@ struct kvm_pgtable_mm_ops {
+>   	void*		(*zalloc_page)(void *arg);
+>   	void*		(*zalloc_pages_exact)(size_t size);
+>   	void		(*free_pages_exact)(void *addr, size_t size);
+> -	void		(*free_removed_table)(void *addr, u32 level);
+> +	void		(*free_unlinked_table)(void *addr, u32 level);
+>   	void		(*get_page)(void *addr);
+>   	void		(*put_page)(void *addr);
+>   	int		(*page_count)(void *addr);
+> @@ -440,7 +440,7 @@ int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+>   void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
+>   
+>   /**
+> - * kvm_pgtable_stage2_free_removed() - Free a removed stage-2 paging structure.
+> + * kvm_pgtable_stage2_free_unlinked() - Free an unlinked stage-2 paging structure.
+>    * @mm_ops:	Memory management callbacks.
+>    * @pgtable:	Unlinked stage-2 paging structure to be freed.
+>    * @level:	Level of the stage-2 paging structure to be freed.
+> @@ -448,7 +448,7 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
+>    * The page-table is assumed to be unreachable by any hardware walkers prior to
+>    * freeing and therefore no TLB invalidation is performed.
+>    */
+> -void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
+> +void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
+>   
+>   /**
+>    * kvm_pgtable_stage2_map() - Install a mapping in a guest stage-2 page-table.
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 552653fa18be3..b030170d803b6 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -91,9 +91,9 @@ static void host_s2_put_page(void *addr)
+>   	hyp_put_page(&host_s2_pool, addr);
+>   }
+>   
+> -static void host_s2_free_removed_table(void *addr, u32 level)
+> +static void host_s2_free_unlinked_table(void *addr, u32 level)
+>   {
+> -	kvm_pgtable_stage2_free_removed(&host_mmu.mm_ops, addr, level);
+> +	kvm_pgtable_stage2_free_unlinked(&host_mmu.mm_ops, addr, level);
+>   }
+>   
+>   static int prepare_s2_pool(void *pgt_pool_base)
+> @@ -110,7 +110,7 @@ static int prepare_s2_pool(void *pgt_pool_base)
+>   	host_mmu.mm_ops = (struct kvm_pgtable_mm_ops) {
+>   		.zalloc_pages_exact = host_s2_zalloc_pages_exact,
+>   		.zalloc_page = host_s2_zalloc_page,
+> -		.free_removed_table = host_s2_free_removed_table,
+> +		.free_unlinked_table = host_s2_free_unlinked_table,
+>   		.phys_to_virt = hyp_phys_to_virt,
+>   		.virt_to_phys = hyp_virt_to_phys,
+>   		.page_count = hyp_page_count,
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 3d61bd3e591d2..a3246d6cddec7 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -860,7 +860,7 @@ static int stage2_map_walk_table_pre(const struct kvm_pgtable_visit_ctx *ctx,
+>   	if (ret)
+>   		return ret;
+>   
+> -	mm_ops->free_removed_table(childp, ctx->level);
+> +	mm_ops->free_unlinked_table(childp, ctx->level);
+>   	return 0;
+>   }
+>   
+> @@ -905,7 +905,7 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+>    * The TABLE_PRE callback runs for table entries on the way down, looking
+>    * for table entries which we could conceivably replace with a block entry
+>    * for this mapping. If it finds one it replaces the entry and calls
+> - * kvm_pgtable_mm_ops::free_removed_table() to tear down the detached table.
+> + * kvm_pgtable_mm_ops::free_unlinked_table() to tear down the detached table.
+>    *
+>    * Otherwise, the LEAF callback performs the mapping at the existing leaves
+>    * instead.
+> @@ -1276,7 +1276,7 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
+>   	pgt->pgd = NULL;
+>   }
+>   
+> -void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level)
+> +void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level)
+>   {
+>   	kvm_pteref_t ptep = (kvm_pteref_t)pgtable;
+>   	struct kvm_pgtable_walker walker = {
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 7113587222ffe..efdaab3f154de 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -131,21 +131,21 @@ static void kvm_s2_free_pages_exact(void *virt, size_t size)
+>   
+>   static struct kvm_pgtable_mm_ops kvm_s2_mm_ops;
+>   
+> -static void stage2_free_removed_table_rcu_cb(struct rcu_head *head)
+> +static void stage2_free_unlinked_table_rcu_cb(struct rcu_head *head)
+>   {
+>   	struct page *page = container_of(head, struct page, rcu_head);
+>   	void *pgtable = page_to_virt(page);
+>   	u32 level = page_private(page);
+>   
+> -	kvm_pgtable_stage2_free_removed(&kvm_s2_mm_ops, pgtable, level);
+> +	kvm_pgtable_stage2_free_unlinked(&kvm_s2_mm_ops, pgtable, level);
+>   }
+>   
+> -static void stage2_free_removed_table(void *addr, u32 level)
+> +static void stage2_free_unlinked_table(void *addr, u32 level)
+>   {
+>   	struct page *page = virt_to_page(addr);
+>   
+>   	set_page_private(page, (unsigned long)level);
+> -	call_rcu(&page->rcu_head, stage2_free_removed_table_rcu_cb);
+> +	call_rcu(&page->rcu_head, stage2_free_unlinked_table_rcu_cb);
+>   }
+>   
+>   static void kvm_host_get_page(void *addr)
+> @@ -682,7 +682,7 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
+>   	.zalloc_page		= stage2_memcache_zalloc_page,
+>   	.zalloc_pages_exact	= kvm_s2_zalloc_pages_exact,
+>   	.free_pages_exact	= kvm_s2_free_pages_exact,
+> -	.free_removed_table	= stage2_free_removed_table,
+> +	.free_unlinked_table	= stage2_free_unlinked_table,
+>   	.get_page		= kvm_host_get_page,
+>   	.put_page		= kvm_s2_put_page,
+>   	.page_count		= kvm_host_page_count,
 > 
-> See the pointer above. We need a good way to specify bits that have
-> one polarity or another, and compute the result given the high-level
-> constraints that are provided by the emulation code.
-> 
-> So far, I haven't been able to work out something "nice".
 
-Thank you for the pointer.  Understood.
-I don't have a batter idea though :)
-
-> 
-> [...]
-> 
-> > > +	{ SYS_DESC(SYS_CNTPCT_EL0), access_arch_timer },
-> > > +	{ SYS_DESC(SYS_CNTPCTSS_EL0), access_arch_timer },
-> > >  	{ SYS_DESC(SYS_CNTP_TVAL_EL0), access_arch_timer },
-> > >  	{ SYS_DESC(SYS_CNTP_CTL_EL0), access_arch_timer },
-> > >  	{ SYS_DESC(SYS_CNTP_CVAL_EL0), access_arch_timer },
-> > > @@ -2525,6 +2533,7 @@ static const struct sys_reg_desc cp15_64_regs[] = {
-> > >  	{ Op1( 0), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, TTBR0_EL1 },
-> > >  	{ CP15_PMU_SYS_REG(DIRECT, 0, 0, 9, 0), .access = access_pmu_evcntr },
-> > >  	{ Op1( 0), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_SGI1R */
-> > > +	{ SYS_DESC(SYS_AARCH32_CNTPCT),	      access_arch_timer },
-> > 
-> > Shouldn't KVM also emulate CNTPCTSS (Aarch32) when its trapping is
-> > enabled on the host with ECV_CNTPOFF ?
-> 
-> Oh, well spotted. I'll queue something on top of the series to that
-> effect (I'd rather not respin it as it has been in -next for some
-> time, and the merge window is approaching).
-
-Understood.
-
-
-> 
-> > 
-> > 
-> > >  	{ Op1( 1), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, TTBR1_EL1 },
-> > >  	{ Op1( 1), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_ASGI1R */
-> > >  	{ Op1( 2), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_SGI0R */
-> > > -- 
-> > > 2.34.1
-> > > 
-> > > 
-> > 
-> > Nit: In emulating reading physical counter/timer for direct_ptimer
-> > (poffset != 0 on VHE without ECV_CNTPOFF), it appears that
-> > kvm_arm_timer_read_sysreg() unnecessarily calls
-> > timer_{save,restore}_state(), and kvm_arm_timer_write_sysreg()
-> > unnecessarily calls timer_save_state().  Couldn't we skip those
-> > unnecessary calls ? (I didn't check all the following patches, but
-> > the current code would be more convenient in the following patches ?)
-> 
-> Well, it depends how you look at it. We still perform "some" level of
-> emulation (such as offsetting CVAL), and it allows us to share some
-> code with the full emulation.
-
-Even if we skip calling timer_save_state() and/or timer_restore_state(),
-I would think we could still share some code with the full emulation.
-What I meant was something like below (a diff from the patch-5).
-Or Am I misunderstanding something?
-
-
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -1003,7 +1003,7 @@ u64 kvm_arm_timer_read_sysreg(struct kvm_vcpu *vcpu,
-        get_timer_map(vcpu, &map);
-        timer = vcpu_get_timer(vcpu, tmr);
- 
--       if (timer == map.emul_ptimer)
-+       if (timer == map.emul_ptimer || timer == map.direct_ptimer)
-                return kvm_arm_timer_read(vcpu, timer, treg);
- 
-        preempt_disable();
-@@ -1056,7 +1056,9 @@ void kvm_arm_timer_write_sysreg(struct kvm_vcpu *vcpu,
-                timer_emulate(timer);
-        } else {
-                preempt_disable();
--               timer_save_state(timer);
-+               if (timer != map.direct_ptimer)
-+                       timer_save_state(timer);
-+
-                kvm_arm_timer_write(vcpu, timer, treg, val);
-                timer_restore_state(timer);
-                preempt_enable();
-
-
-> On top of that, we already fast-track CNTPCT_EL0, which is the main
-> user, and has a visible benefit with NV. If anything, I'd rather add a
-> similar fast-tracking for the read side of CNTP_CVAL_EL0 and
-> CNTP_CTL_EL0. We could then leave that code for 32bit only, which
-> nobody gives a toss about.
-> 
-> What do you think?
-
-Ah, I didn't check that fast-track CNTPCT_EL0.
-Yes, that would be nicer.
-
-Thank you!
-Reiji
