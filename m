@@ -1,260 +1,127 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E6FF1848
-	for <kvmarm@lists.linux.dev>; Mon, 17 Apr 2023 07:20:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1681716035;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=urktqoQPNL62ta63+uWPbsfKfnDqeorMUw+E44Iw5GM=;
-	b=V8cdTanFkYz49A95Tqq7oN4Gh4JN6AAs28urlZb/9mVwy+pPpSE+3/vSRPjU7g0AixRoJQ
-	425NCyGdh9ALj4FWZc++mA9bKfTu3W7VV7cI8Ak81YkshS9JHZ02w6xYFCDhbb6CT73BFw
-	bG1y3wyXuTtpHxBCZe2zDEceOgzncEc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-438-Krc4P42bMGC_kMG9d_PLRA-1; Mon, 17 Apr 2023 03:20:32 -0400
-X-MC-Unique: Krc4P42bMGC_kMG9d_PLRA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2829F85A588;
-	Mon, 17 Apr 2023 07:20:31 +0000 (UTC)
-Received: from [10.72.13.187] (ovpn-13-187.pek2.redhat.com [10.72.13.187])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 91142C15BA0;
-	Mon, 17 Apr 2023 07:20:20 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v7 12/12] KVM: arm64: Use local TLBI on permission
- relaxation
-To: Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
- maz@kernel.org, oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
- catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
- alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com,
- reijiw@google.com, rananta@google.com, bgardon@google.com, ricarkol@gmail.com
-References: <20230409063000.3559991-1-ricarkol@google.com>
- <20230409063000.3559991-14-ricarkol@google.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <b163513f-b858-307f-e271-3d0cd17194f3@redhat.com>
-Date: Mon, 17 Apr 2023 15:20:16 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD3931C30
+	for <kvmarm@lists.linux.dev>; Mon, 17 Apr 2023 09:36:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BAB1C433EF;
+	Mon, 17 Apr 2023 09:36:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1681724205;
+	bh=KeQTm2yBf7lmV1SmG8Zc9mtIZJvTYh+5UwPe5wHnMAE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=o41Hevtxb/HlIeFnl7UijhGGQXziFR82gJYtj3SIxze3nzhEpoMCZLEpOoeefhmY5
+	 Ap6tjlfIC1eCYQuLrJVDDY7T4+NZLqP58u/ofE5TNqO1GnQYRuQQJu1hyP/EVNWd1y
+	 wrF4p+CLw2WdIp/7F7f7Sn/BMoqvM6EPvgRIkp2eIhZckWfTRbpzo1Mk0dKrCDfpo4
+	 QmPfDsZqG/M7OPpCSJoSZVH+2pWSNq8SWWUO23V4jZu7EqhSZNo5As0h9bxZfK/5ey
+	 BWM98lSkjDTreKeJaf8i4YYXBzCe79oAin1+tH9Ua1pB/rgDafLR50q62/FhDoX/Qy
+	 7KVdML/l98frA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1poLHu-008t1H-Vb;
+	Mon, 17 Apr 2023 10:36:43 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Quentin Perret <qperret@google.com>,
+	Mostafa Saleh <smostafa@google.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] KVM: arm64: Make vcpu flag updates non-preemptible
+Date: Mon, 17 Apr 2023 10:36:29 +0100
+Message-Id: <20230417093629.1440039-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <20230409063000.3559991-14-ricarkol@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com, qperret@google.com, smostafa@google.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 4/9/23 2:30 PM, Ricardo Koller wrote:
-> From: Marc Zyngier <maz@kernel.org>
-> 
-> Broadcast TLB invalidations (TLBIs) targeting the Inner Shareable
-> Domain are usually less performant than their non-shareable variant.
-> In particular, we observed some implementations that take
-> millliseconds to complete parallel broadcasted TLBIs.
-> 
-> It's safe to use non-shareable TLBIs when relaxing permissions on a
-> PTE in the KVM case.  According to the ARM ARM (0487I.a) section
-> D8.13.1 "Using break-before-make when updating translation table
-> entries", permission relaxation does not need break-before-make.
-> Specifically, R_WHZWS states that these are the only changes that
-> require a break-before-make sequence: changes of memory type
-> (Shareability or Cacheability), address changes, or changing the block
-> size.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->   arch/arm64/include/asm/kvm_asm.h   |  4 +++
->   arch/arm64/kvm/hyp/nvhe/hyp-main.c | 10 ++++++
->   arch/arm64/kvm/hyp/nvhe/tlb.c      | 54 ++++++++++++++++++++++++++++++
->   arch/arm64/kvm/hyp/pgtable.c       |  2 +-
->   arch/arm64/kvm/hyp/vhe/tlb.c       | 32 ++++++++++++++++++
->   5 files changed, 101 insertions(+), 1 deletion(-)
-> 
+Per-vcpu flags are updated using a non-atomic RMW operation.
+Which means it is possible to get preempted between the read and
+write operations.
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
+Another interesting thing to note is that preemption also updates
+flags, as we have some flag manipulation in both the load and put
+operations.
 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 43c3bc0f9544d..bb17b2ead4c71 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -68,6 +68,7 @@ enum __kvm_host_smccc_func {
->   	__KVM_HOST_SMCCC_FUNC___kvm_vcpu_run,
->   	__KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context,
->   	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa,
-> +	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa_nsh,
->   	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid,
->   	__KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context,
->   	__KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff,
-> @@ -225,6 +226,9 @@ extern void __kvm_flush_vm_context(void);
->   extern void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu);
->   extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
->   				     int level);
-> +extern void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
-> +					 phys_addr_t ipa,
-> +					 int level);
->   extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
->   
->   extern void __kvm_timer_set_cntvoff(u64 cntvoff);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 728e01d4536b0..c6bf1e49ca934 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -125,6 +125,15 @@ static void handle___kvm_tlb_flush_vmid_ipa(struct kvm_cpu_context *host_ctxt)
->   	__kvm_tlb_flush_vmid_ipa(kern_hyp_va(mmu), ipa, level);
->   }
->   
-> +static void handle___kvm_tlb_flush_vmid_ipa_nsh(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
-> +	DECLARE_REG(phys_addr_t, ipa, host_ctxt, 2);
-> +	DECLARE_REG(int, level, host_ctxt, 3);
-> +
-> +	__kvm_tlb_flush_vmid_ipa_nsh(kern_hyp_va(mmu), ipa, level);
-> +}
-> +
->   static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
->   {
->   	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
-> @@ -315,6 +324,7 @@ static const hcall_t host_hcall[] = {
->   	HANDLE_FUNC(__kvm_vcpu_run),
->   	HANDLE_FUNC(__kvm_flush_vm_context),
->   	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
-> +	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa_nsh),
->   	HANDLE_FUNC(__kvm_tlb_flush_vmid),
->   	HANDLE_FUNC(__kvm_flush_cpu_context),
->   	HANDLE_FUNC(__kvm_timer_set_cntvoff),
-> diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-> index d296d617f5896..ef2b70587f933 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-> @@ -109,6 +109,60 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
->   	__tlb_switch_to_host(&cxt);
->   }
->   
-> +void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
-> +				  phys_addr_t ipa, int level)
-> +{
-> +	struct tlb_inv_context cxt;
-> +
-> +	dsb(nshst);
-> +
-> +	/* Switch to requested VMID */
-> +	__tlb_switch_to_guest(mmu, &cxt);
-> +
-> +	/*
-> +	 * We could do so much better if we had the VA as well.
-> +	 * Instead, we invalidate Stage-2 for this IPA, and the
-> +	 * whole of Stage-1. Weep...
-> +	 */
-> +	ipa >>= 12;
-> +	__tlbi_level(ipas2e1, ipa, level);
-> +
-> +	/*
-> +	 * We have to ensure completion of the invalidation at Stage-2,
-> +	 * since a table walk on another CPU could refill a TLB with a
-> +	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
-> +	 * the Stage-1 invalidation happened first.
-> +	 */
-> +	dsb(nsh);
-> +	__tlbi(vmalle1);
-> +	dsb(nsh);
-> +	isb();
-> +
-> +	/*
-> +	 * If the host is running at EL1 and we have a VPIPT I-cache,
-> +	 * then we must perform I-cache maintenance at EL2 in order for
-> +	 * it to have an effect on the guest. Since the guest cannot hit
-> +	 * I-cache lines allocated with a different VMID, we don't need
-> +	 * to worry about junk out of guest reset (we nuke the I-cache on
-> +	 * VMID rollover), but we do need to be careful when remapping
-> +	 * executable pages for the same guest. This can happen when KSM
-> +	 * takes a CoW fault on an executable page, copies the page into
-> +	 * a page that was previously mapped in the guest and then needs
-> +	 * to invalidate the guest view of the I-cache for that page
-> +	 * from EL1. To solve this, we invalidate the entire I-cache when
-> +	 * unmapping a page from a guest if we have a VPIPT I-cache but
-> +	 * the host is running at EL1. As above, we could do better if
-> +	 * we had the VA.
-> +	 *
-> +	 * The moral of this story is: if you have a VPIPT I-cache, then
-> +	 * you should be running with VHE enabled.
-> +	 */
-> +	if (icache_is_vpipt())
-> +		icache_inval_all_pou();
-> +
-> +	__tlb_switch_to_host(&cxt);
-> +}
-> +
->   void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
->   {
->   	struct tlb_inv_context cxt;
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 48c5a95c6e8cd..023269dd84f76 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -1189,7 +1189,7 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
->   				       KVM_PGTABLE_WALK_HANDLE_FAULT |
->   				       KVM_PGTABLE_WALK_SHARED);
->   	if (!ret)
-> -		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, pgt->mmu, addr, level);
-> +		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa_nsh, pgt->mmu, addr, level);
->   	return ret;
->   }
->   
-> diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-> index 24cef9b87f9e9..e69da550cdc5b 100644
-> --- a/arch/arm64/kvm/hyp/vhe/tlb.c
-> +++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-> @@ -111,6 +111,38 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
->   	__tlb_switch_to_host(&cxt);
->   }
->   
-> +void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
-> +				  phys_addr_t ipa, int level)
-> +{
-> +	struct tlb_inv_context cxt;
-> +
-> +	dsb(nshst);
-> +
-> +	/* Switch to requested VMID */
-> +	__tlb_switch_to_guest(mmu, &cxt);
-> +
-> +	/*
-> +	 * We could do so much better if we had the VA as well.
-> +	 * Instead, we invalidate Stage-2 for this IPA, and the
-> +	 * whole of Stage-1. Weep...
-> +	 */
-> +	ipa >>= 12;
-> +	__tlbi_level(ipas2e1, ipa, level);
-> +
-> +	/*
-> +	 * We have to ensure completion of the invalidation at Stage-2,
-> +	 * since a table walk on another CPU could refill a TLB with a
-> +	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
-> +	 * the Stage-1 invalidation happened first.
-> +	 */
-> +	dsb(nsh);
-> +	__tlbi(vmalle1);
-> +	dsb(nsh);
-> +	isb();
-> +
-> +	__tlb_switch_to_host(&cxt);
-> +}
-> +
->   void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
->   {
->   	struct tlb_inv_context cxt;
-> 
+It is thus possible to lose information communicated by either
+load or put, as the preempted flag update will overwrite the flags
+when the thread is resumed. This is specially critical if either
+load or put has stored information which depends on the physical
+CPU the vcpu runs on.
+
+This results in really elusive bugs, and kudos must be given to
+Mostafa for the long hours of debugging, and finally spotting
+the problem.
+
+Fixes: e87abb73e594 ("KVM: arm64: Add helpers to manipulate vcpu flags among a set")
+Reported-by: Mostafa Saleh <smostafa@google.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Cc: stable@vger.kernel.org
+---
+ arch/arm64/include/asm/kvm_host.h | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index bcd774d74f34..d716cfd806e8 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -579,6 +579,19 @@ struct kvm_vcpu_arch {
+ 		v->arch.flagset & (m);				\
+ 	})
+ 
++/*
++ * Note that the set/clear accessors must be preempt-safe in order to
++ * avoid nesting them with load/put which also manipulate flags...
++ */
++#ifdef __KVM_NVHE_HYPERVISOR__
++/* the nVHE hypervisor is always non-preemptible */
++#define __vcpu_flags_preempt_disable()
++#define __vcpu_flags_preempt_enable()
++#else
++#define __vcpu_flags_preempt_disable()	preempt_disable()
++#define __vcpu_flags_preempt_enable()	preempt_enable()
++#endif
++
+ #define __vcpu_set_flag(v, flagset, f, m)			\
+ 	do {							\
+ 		typeof(v->arch.flagset) *fset;			\
+@@ -586,9 +599,11 @@ struct kvm_vcpu_arch {
+ 		__build_check_flag(v, flagset, f, m);		\
+ 								\
+ 		fset = &v->arch.flagset;			\
++		__vcpu_flags_preempt_disable();			\
+ 		if (HWEIGHT(m) > 1)				\
+ 			*fset &= ~(m);				\
+ 		*fset |= (f);					\
++		__vcpu_flags_preempt_enable();			\
+ 	} while (0)
+ 
+ #define __vcpu_clear_flag(v, flagset, f, m)			\
+@@ -598,7 +613,9 @@ struct kvm_vcpu_arch {
+ 		__build_check_flag(v, flagset, f, m);		\
+ 								\
+ 		fset = &v->arch.flagset;			\
++		__vcpu_flags_preempt_disable();			\
+ 		*fset &= ~(m);					\
++		__vcpu_flags_preempt_enable();			\
+ 	} while (0)
+ 
+ #define vcpu_get_flag(v, ...)	__vcpu_get_flag((v), __VA_ARGS__)
+-- 
+2.34.1
 
