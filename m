@@ -1,141 +1,126 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFDA73201
-	for <kvmarm@lists.linux.dev>; Mon, 17 Apr 2023 10:43:58 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B20211063;
-	Mon, 17 Apr 2023 03:44:36 -0700 (PDT)
-Received: from [10.57.68.227] (unknown [10.57.68.227])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 136253F5A1;
-	Mon, 17 Apr 2023 03:43:50 -0700 (PDT)
-Message-ID: <33ef82c4-2fa4-8816-8dc4-9c3a94f00bc2@arm.com>
-Date: Mon, 17 Apr 2023 11:43:49 +0100
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A28263DD
+	for <kvmarm@lists.linux.dev>; Mon, 17 Apr 2023 11:40:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07054C433D2;
+	Mon, 17 Apr 2023 11:40:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1681731632;
+	bh=mIQHO7+k2jNUk1GJ9SsvgtdCa75k5x9GzXYwLhevS84=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SaZPU+wcSR498p/rcRkowFB0g4mwA8v9D9xL7q4zMnb2eGdVDE1SXaXHR7NLSWc7k
+	 es2Xi0xQBS9VfbZmh7YF0UEAMriaoIrFHncxdPVwiloEfd7sWTAO8jw3G3B73zTaNy
+	 UexbJKlbedrSAAplAaHzQW93NHeTQXtIEjNzBFpWOBcUfR+8Nnz06q6+FKDRFmTiJ8
+	 mduRdP1wrdcJ5BG0FTxxeysNaSssmKt/BrAYMS/SNsRxY8OIu2SFlfNcFsMHxQD9of
+	 A5Jld4lvFvdXqaBhI6l2j+1SNiqRZ5iWuqELnnQRcGaCO9H5KYymhMKFUzRXEix494
+	 fAbF0eXye95Zg==
+Date: Mon, 17 Apr 2023 12:40:26 +0100
+From: Will Deacon <will@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Quentin Perret <qperret@google.com>,
+	Mostafa Saleh <smostafa@google.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Make vcpu flag updates non-preemptible
+Message-ID: <20230417114025.GA30826@willie-the-truck>
+References: <20230417093629.1440039-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.9.1
-Subject: Re: [PATCH v2 00/12] KVM: arm64: Support FEAT_LPA2 at hyp s1 and vm
- s2
-Content-Language: en-US
-To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Ard Biesheuvel <ardb@kernel.org>,
- Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-References: <20230306195438.1557851-1-ryan.roberts@arm.com>
-From: Ryan Roberts <ryan.roberts@arm.com>
-In-Reply-To: <20230306195438.1557851-1-ryan.roberts@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230417093629.1440039-1-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Just a polite nudge: If anyone has any feedback on this series, it would be
-great to hear it!
+On Mon, Apr 17, 2023 at 10:36:29AM +0100, Marc Zyngier wrote:
+> Per-vcpu flags are updated using a non-atomic RMW operation.
+> Which means it is possible to get preempted between the read and
+> write operations.
+> 
+> Another interesting thing to note is that preemption also updates
+> flags, as we have some flag manipulation in both the load and put
+> operations.
+> 
+> It is thus possible to lose information communicated by either
+> load or put, as the preempted flag update will overwrite the flags
+> when the thread is resumed. This is specially critical if either
+> load or put has stored information which depends on the physical
+> CPU the vcpu runs on.
+> 
+> This results in really elusive bugs, and kudos must be given to
+> Mostafa for the long hours of debugging, and finally spotting
+> the problem.
+> 
+> Fixes: e87abb73e594 ("KVM: arm64: Add helpers to manipulate vcpu flags among a set")
+> Reported-by: Mostafa Saleh <smostafa@google.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: stable@vger.kernel.org
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index bcd774d74f34..d716cfd806e8 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -579,6 +579,19 @@ struct kvm_vcpu_arch {
+>  		v->arch.flagset & (m);				\
+>  	})
+>  
+> +/*
+> + * Note that the set/clear accessors must be preempt-safe in order to
+> + * avoid nesting them with load/put which also manipulate flags...
+> + */
+> +#ifdef __KVM_NVHE_HYPERVISOR__
+> +/* the nVHE hypervisor is always non-preemptible */
+> +#define __vcpu_flags_preempt_disable()
+> +#define __vcpu_flags_preempt_enable()
+> +#else
+> +#define __vcpu_flags_preempt_disable()	preempt_disable()
+> +#define __vcpu_flags_preempt_enable()	preempt_enable()
+> +#endif
 
-On 06/03/2023 19:54, Ryan Roberts wrote:
-> Add support for FEAT_LPA2 to KVM for both hypervisor stage 1 (for the
-> nvhe/protected modes) and the vm stage 2 translation tables (for all modes).
-> FEAT_LPA2 enables 52 bit PAs and VAs for 4KB and 16KB granules (note this is
-> already supported for 64KB granules via the FEAT_LPA and FEAT_LVA extensions).
-> The series does not include support for FEAT_LPA2 in the kernel stage 1. This
-> support is provided separately by Ard Biesheuvel's series at [1]. The two series
-> are independent.
-> 
-> These patches are based on top of v6.3-rc1, plus 3 kvm selftests bug-fix
-> patches, which I have posted separately at [2] and [3]. You can find a tree at
-> [4]. Those bug-fix patches relate to incorrect test code for 52-bit PA (64K)
-> guests, and are needed in order to test the new 52-bit 4K and 16K guest modes
-> that this series enables.
-> 
-> 
-> Testing:
-> Testing has been done exclusively on the FVP and covers the boot matrix tests
-> and kvm selftests.
-> 
-> The host/guest config boot matrix gives the same (expected) results as
-> for the v1 submission; of 180 conifgs, 12 fail, and these are all due to
-> attempting to load the host kernel into high memory which isn't expected to work
-> until the kernel has FEAT_LPA2 support for its stage 1. (refer to v1 posting for
-> details on the exact configs).
-> 
-> KVM selftests have been enhanced to support P52V48 4K and 16K guest modes, and
-> all tests have been run against a P48V48_4K host and a P52V52_4K host (a run
-> takes about 10 hours on FVP, sigh, but I can test a few more host configs if
-> useful). All tests pass except "memslot_perf_test", which fails due to a timeout
-> while syncing. This test fails in the same way for plain v6.3-rc1, so I'm
-> confident this is not a regression caused by this series. (the issue is that
-> alarm(2) is issued and the signal is received before alarm(0) is issued. I
-> expect this is an FVP-time related problem, although I'm not sure how to fix
-> robustly for the FVP without potentially hanging real systems for long periods
-> of time).
-> 
-> 
-> Changes since v1:
-> https://lore.kernel.org/kvmarm/20221206135930.3277585-1-ryan.roberts@arm.com/
->  - Create CPU feature for LPA2 (enabled if both S1 and S2 report LPA2 support).
->  - Use the CPU feature (and therefore code patching) to globally decide whether
->    or not to use LPA2 PTE format; no more per-pgtable flag to pass around.
->  - Removed the range-based TLBI changes, which are not required by KVM; leaves
->    only minor changes to the non-range-based invalidation code.
->  - Removed patch to encode/decode VTCR_EL2.SL2, and replaced with a comment
->    describing why we never need to touch SL2 (stage 2 always uses concatenated
->    first level lookup).
->  - Added support for LPA2 guests in KVM selftests (VM_MODE_P52V48_4K enabled and
->    new VM_MODE_P52V48_16K added).
->  - Rebased onto 6.3-rc1.
-> 
-> 
-> [1] https://lore.kernel.org/linux-arm-kernel/20221124123932.2648991-1-ardb@kernel.org
-> [2] https://lore.kernel.org/kvmarm/20230228170756.769461-1-ryan.roberts@arm.com/
-> [3] https://lore.kernel.org/kvmarm/20230302152033.242073-1-ryan.roberts@arm.com/
-> [4] https://gitlab.arm.com/linux-arm/linux-rr/-/tree/features/lpa2/kvm_lkml-v2
-> 
-> 
-> Anshuman Khandual (1):
->   arm64/mm: Add FEAT_LPA2 specific ID_AA64MMFR0.TGRAN[2]
-> 
-> Ryan Roberts (11):
->   arm64/mm: Update non-range tlb invalidation routines for FEAT_LPA2
->   KVM: arm64: Add ARM64_HAS_LPA2 CPU capability
->   KVM: arm64: Add new (V)TCR_EL2 field definitions for FEAT_LPA2
->   KVM: arm64: Use LPA2 page-tables for stage2 if HW supports it
->   KVM: arm64: Use LPA2 page-tables for hyp stage1 if HW supports it
->   KVM: arm64: Insert PS field at TCR_EL2 assembly time
->   KVM: arm64: Convert translation level parameter to s8
->   KVM: arm64: Support up to 5 levels of translation in kvm_pgtable
->   KVM: arm64: Allow guests with >48-bit IPA size on FEAT_LPA2 systems
->   KVM: selftests: arm64: Determine max ipa size per-page size
->   KVM: selftests: arm64: Support P52V48 4K and 16K guest_modes
-> 
->  arch/arm64/include/asm/cpufeature.h           |  5 ++
->  arch/arm64/include/asm/kvm_arm.h              |  2 +
->  arch/arm64/include/asm/kvm_emulate.h          | 12 ++-
->  arch/arm64/include/asm/kvm_pgtable.h          | 72 +++++++++++------
->  arch/arm64/include/asm/kvm_pkvm.h             |  5 +-
->  arch/arm64/include/asm/sysreg.h               |  5 ++
->  arch/arm64/include/asm/tlb.h                  |  9 ++-
->  arch/arm64/include/asm/tlbflush.h             | 43 ++++++----
->  arch/arm64/kernel/cpufeature.c                | 40 ++++++++++
->  arch/arm64/kvm/arm.c                          |  4 +
->  arch/arm64/kvm/hyp/nvhe/hyp-init.S            |  4 -
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  6 +-
->  arch/arm64/kvm/hyp/nvhe/mm.c                  |  4 +-
->  arch/arm64/kvm/hyp/nvhe/setup.c               |  2 +-
->  arch/arm64/kvm/hyp/pgtable.c                  | 79 ++++++++++++-------
->  arch/arm64/kvm/mmu.c                          | 15 ++--
->  arch/arm64/kvm/reset.c                        |  9 +--
->  arch/arm64/tools/cpucaps                      |  1 +
->  .../selftests/kvm/include/aarch64/processor.h |  4 +-
->  .../selftests/kvm/include/kvm_util_base.h     |  1 +
->  .../selftests/kvm/lib/aarch64/processor.c     | 66 ++++++++++++----
->  tools/testing/selftests/kvm/lib/guest_modes.c | 42 +++++-----
->  tools/testing/selftests/kvm/lib/kvm_util.c    |  3 +
->  23 files changed, 297 insertions(+), 136 deletions(-)
-> 
-> --
-> 2.25.1
-> 
-> 
+If it makes things cleaner, we could define local (empty) copies of these
+preempt_*() macros at EL2 to save you having to wrap them here. Up to you.
 
+>  #define __vcpu_set_flag(v, flagset, f, m)			\
+>  	do {							\
+>  		typeof(v->arch.flagset) *fset;			\
+> @@ -586,9 +599,11 @@ struct kvm_vcpu_arch {
+>  		__build_check_flag(v, flagset, f, m);		\
+>  								\
+>  		fset = &v->arch.flagset;			\
+> +		__vcpu_flags_preempt_disable();			\
+>  		if (HWEIGHT(m) > 1)				\
+>  			*fset &= ~(m);				\
+>  		*fset |= (f);					\
+> +		__vcpu_flags_preempt_enable();			\
+>  	} while (0)
+>  
+>  #define __vcpu_clear_flag(v, flagset, f, m)			\
+> @@ -598,7 +613,9 @@ struct kvm_vcpu_arch {
+>  		__build_check_flag(v, flagset, f, m);		\
+>  								\
+>  		fset = &v->arch.flagset;			\
+> +		__vcpu_flags_preempt_disable();			\
+>  		*fset &= ~(m);					\
+> +		__vcpu_flags_preempt_enable();			\
+>  	} while (0)
+>  
+>  #define vcpu_get_flag(v, ...)	__vcpu_get_flag((v), __VA_ARGS__)
+
+Given that __vcpu_get_flag() is still preemptible, we should probably
+add a READ_ONCE() in there when we access the relevant flags field. In
+practice, they're all single-byte fields so it should be ok, but I think
+the READ_ONCE() is still worthwhile.
+
+Will
