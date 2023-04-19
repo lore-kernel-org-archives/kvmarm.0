@@ -1,45 +1,45 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E0C63D67
-	for <kvmarm@lists.linux.dev>; Wed, 19 Apr 2023 13:51:20 +0000 (UTC)
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-63b620188aeso3529465b3a.0
-        for <kvmarm@lists.linux.dev>; Wed, 19 Apr 2023 06:51:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 257C83D67
+	for <kvmarm@lists.linux.dev>; Wed, 19 Apr 2023 13:57:17 +0000 (UTC)
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-63b4960b015so2742427b3a.3
+        for <kvmarm@lists.linux.dev>; Wed, 19 Apr 2023 06:57:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1681912280; x=1684504280;
+        d=gmail.com; s=20221208; t=1681912636; x=1684504636;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=on3F8pM3p3B9OClirjfPRYd2TCLDzgp9dJKToJBsoLE=;
-        b=dC0uL4Ug8165ZqCya+YsdJvUDjZauqRrZmyIPt7IiTUA/do6GbK4Q4PBwwD6bnNTu2
-         HjNWDUyOx/2y+/oHqwMiDjZCOLMpDvPXGZk9RYHvnEUn23GpVxV3LS6d+pZRS7ydwEYl
-         n2vUCFUxLfdqmvU/RBFZ5oheDGmk/v2fiRLI22MZCU2h68Dj82vCsk6DGj3cLie2JYMJ
-         zop8FdIDWDo58mDf5D/NJomanHIqQfwh1gTDQGooXhM81EzKWjcvrPQGOyjf6eIpT2pj
-         DztWnVgBpYPYBvCIf3lphHjD4n9wI4L5b+NBlIS8MaK79zQB+Xzv1fZP+QSskQeJmGRv
-         Q0jg==
+        bh=u7oEQgq/N7m5uMfXKoD8pt9QoV4B/N16ESs+v3DEmZM=;
+        b=W+cnHA13BWowN0PpxsgVhIwq+MMW1zvcCcBUoMAeS+sZ1H77rpJ/TM2DCd5bhOTNwp
+         ynhaMGA0aRyv8Y0Li1+MF87fPvNKsEwkMY/Lzqb2t6CaaTYVdYYK7ArYZmzBK3Blxvzd
+         dQBoyInLWtIgQRHaqnXAcFItxBWH4H/XwLrSgwtou95phMVunOu4pHEHCcVqDVtrmAhS
+         INcCA1HhY7SqFIweW8sBWYlLLuA+1eMS49k/g78QYEhoZONY64bi1VJRlQlt8EbKTZK+
+         mcrqoKxZxYX5CJeCwaamGb7h0FJzAsTgeCTO8VhIfSdJEceG73s5RCFw+0xicPMHOzbf
+         HQQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681912280; x=1684504280;
+        d=1e100.net; s=20221208; t=1681912636; x=1684504636;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=on3F8pM3p3B9OClirjfPRYd2TCLDzgp9dJKToJBsoLE=;
-        b=YXf0rXXf/YKry2sHbd7CqsaQMP4Mh3nttzfv30nV7U/T6MTzfTE1niGZffm42btkFx
-         5FgHWkpRLNhxy8hdohGvRcgE6HGdDZBfiKB1tJVby1czcMbNz58+fsFbXoYeNG7IBFcQ
-         dYpnAYTaAeqbuEHjk0RT5bRUYFT8d10GbdO3TzwlnEK4nbjGLPGEUbDsDfUuL9UIsKCQ
-         o3SNrx8adgr0EvGUNnKZZsxHM8tOZ87rt35xWAv5U8cjngD6QJWZCXW+SLe75L6PRf4S
-         msHOF6doh/c8MKyjcyYOuEPU5FU5/dY2abBD1MYc8lNCJefUZ12vCKFEqk3B4KRYUEuT
-         XMZA==
-X-Gm-Message-State: AAQBX9c5HC76oA0Glh61USJkk+1lwu5Vxwz4fgROgiL9Ium8a5a9c+r0
-	C7k1UfGKqngb04mqa2Doq8DB8wNuHd99Sw==
-X-Google-Smtp-Source: AKy350aednu5oBp7h8YO3r+lKDMkIRtI+RAxeonBIF+ewZH3h1mRowihayQ3GZqOTl5W+jZZZHUuQA==
-X-Received: by 2002:a17:902:db01:b0:1a6:d46b:dfb5 with SMTP id m1-20020a170902db0100b001a6d46bdfb5mr6253884plx.26.1681912279619;
-        Wed, 19 Apr 2023 06:51:19 -0700 (PDT)
+        bh=u7oEQgq/N7m5uMfXKoD8pt9QoV4B/N16ESs+v3DEmZM=;
+        b=H7x8B/vQV3z1+V5y9brbhQ3SSEtNKhn9Jb/PPIdY6kWd9FEbXsgODT/PoEj+oxBlpA
+         NXKWpeTUbGHO8QDIHoShB0jNK78XxTHkzRyb4Qcsj6B+tNhJad+s9IMsi9HncwrCgYfx
+         MbXGAngr65UHTBMtUuGsRXwA9BdvnHvpDPrcQj5PtTv5Fo57wj7ldFDDOKlAJhL2m1au
+         3geAPOAOV3SZQ1V+gf5Os+M6vxnhn2y0CkpYQSrZPX3IOHPe/S0XEqaqzlM30l+HE4OA
+         DSAh4Ri2vEv5TxmX68NFKl7QO1bUo6PJrJGZBqEW4xqJFxMwPevJW7sB4eBQjt6AoYjt
+         zxug==
+X-Gm-Message-State: AAQBX9dtvOwa5ve7i4XHoo8AikWYcTSyxwBndxBzdZwTMAigCAEz/Yqv
+	yzssNUU1ff2EVdIQKt3q9qU=
+X-Google-Smtp-Source: AKy350aPNtDY+P1RjfZPKNSooNYyjTs9DHxBOkVD4MYIWvKGPM8tkOablbaPzsUYz6GH2aCKQRqegg==
+X-Received: by 2002:a05:6a00:2d1e:b0:63b:23b0:a72e with SMTP id fa30-20020a056a002d1e00b0063b23b0a72emr4357016pfb.15.1681912636339;
+        Wed, 19 Apr 2023 06:57:16 -0700 (PDT)
 Received: from [172.27.232.10] (ec2-16-163-40-128.ap-east-1.compute.amazonaws.com. [16.163.40.128])
-        by smtp.gmail.com with ESMTPSA id w8-20020a170902904800b001a239325f1csm11398221plz.100.2023.04.19.06.51.15
+        by smtp.gmail.com with ESMTPSA id n17-20020aa78a51000000b0062dcf5c01f9sm11134940pfa.36.2023.04.19.06.57.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Apr 2023 06:51:19 -0700 (PDT)
-Message-ID: <e73e9a97-3c76-fa71-b481-c0673e8562de@gmail.com>
-Date: Wed, 19 Apr 2023 21:51:12 +0800
+        Wed, 19 Apr 2023 06:57:15 -0700 (PDT)
+Message-ID: <a518e669-c758-57c8-3ba9-b4844e2cb79d@gmail.com>
+Date: Wed, 19 Apr 2023 21:57:09 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,8 +48,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.10.0
-Subject: Re: [PATCH v3 01/22] KVM: selftests: Allow many vCPUs and reader
- threads per UFFD in demand paging test
+Subject: Re: [PATCH v3 05/22] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
 Content-Language: en-US
 To: Anish Moorthy <amoorthy@google.com>, pbonzini@redhat.com, maz@kernel.org
 Cc: oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com,
@@ -57,445 +56,315 @@ Cc: oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com,
  axelrasmussen@google.com, peterx@redhat.com, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
 References: <20230412213510.1220557-1-amoorthy@google.com>
- <20230412213510.1220557-2-amoorthy@google.com>
+ <20230412213510.1220557-6-amoorthy@google.com>
 From: Hoo Robert <robert.hoo.linux@gmail.com>
-In-Reply-To: <20230412213510.1220557-2-amoorthy@google.com>
+In-Reply-To: <20230412213510.1220557-6-amoorthy@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 4/13/2023 5:34 AM, Anish Moorthy wrote:
-> At the moment, demand_paging_test does not support profiling/testing
-> multiple vCPU threads concurrently faulting on a single uffd because
+> KVM_CAP_MEMORY_FAULT_INFO allows kvm_run to return useful information
+> besides a return value of -1 and errno of EFAULT when a vCPU fails an
+> access to guest memory.
 > 
->      (a) "-u" (run test in userfaultfd mode) creates a uffd for each vCPU's
->          region, so that each uffd services a single vCPU thread.
->      (b) "-u -o" (userfaultfd mode + overlapped vCPU memory accesses)
->          simply doesn't work: the test tries to register the same memory
->          to multiple uffds, causing an error.
-> 
-> Add support for many vcpus per uffd by
->      (1) Keeping "-u" behavior unchanged.
->      (2) Making "-u -a" create a single uffd for all of guest memory.
->      (3) Making "-u -o" implicitly pass "-a", solving the problem in (b).
-> In cases (2) and (3) all vCPU threads fault on a single uffd.
-> 
-> With multiple potentially multiple vCPU per UFFD, it makes sense to
-        ^^^^^^^^
-redundant "multiple"?
+> Add documentation, updates to the KVM headers, and a helper function
+> (kvm_populate_efault_info) for implementing the capability.
 
-> allow configuring the number reader threads per UFFD as well: add the
-> "-r" flag to do so.
+kvm_populate_efault_info(), function name.
 > 
+> Besides simply filling the run struct, kvm_populate_efault_info takes
+
+Ditto
+
+> two safety measures
+> 
+>    a. It tries to prevent concurrent fills on a single vCPU run struct
+>       by checking that the run struct being modified corresponds to the
+>       currently loaded vCPU.
+>    b. It tries to avoid filling an already-populated run struct by
+>       checking whether the exit reason has been modified since entry
+>       into KVM_RUN.
+> 
+> Finally, mark KVM_CAP_MEMORY_FAULT_INFO as available on arm64 and x86,
+> even though EFAULT annotation are currently totally absent. Picking a
+> point to declare the implementation "done" is difficult because
+> 
+>    1. Annotations will be performed incrementally in subsequent commits
+>       across both core and arch-specific KVM.
+>    2. The initial series will very likely miss some cases which need
+>       annotation. Although these omissions are to be fixed in the future,
+>       userspace thus still needs to expect and be able to handle
+>       unannotated EFAULTs.
+> 
+> Given these qualifications, just marking it available here seems the
+> least arbitrary thing to do.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
 > Signed-off-by: Anish Moorthy <amoorthy@google.com>
-> Acked-by: James Houghton <jthoughton@google.com>
 > ---
->   .../selftests/kvm/aarch64/page_fault_test.c   |  4 +-
->   .../selftests/kvm/demand_paging_test.c        | 62 +++++++++----
->   .../selftests/kvm/include/userfaultfd_util.h  | 18 +++-
->   .../selftests/kvm/lib/userfaultfd_util.c      | 86 +++++++++++++------
->   4 files changed, 124 insertions(+), 46 deletions(-)
+>   Documentation/virt/kvm/api.rst | 35 +++++++++++++++++++++++++++
+>   arch/arm64/kvm/arm.c           |  1 +
+>   arch/x86/kvm/x86.c             |  1 +
+>   include/linux/kvm_host.h       | 12 ++++++++++
+>   include/uapi/linux/kvm.h       | 16 +++++++++++++
+>   tools/include/uapi/linux/kvm.h | 11 +++++++++
+>   virt/kvm/kvm_main.c            | 44 ++++++++++++++++++++++++++++++++++
+>   7 files changed, 120 insertions(+)
 > 
-> diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> index df10f1ffa20d9..3b6d228a9340d 100644
-> --- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> +++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> @@ -376,14 +376,14 @@ static void setup_uffd(struct kvm_vm *vm, struct test_params *p,
->   		*pt_uffd = uffd_setup_demand_paging(uffd_mode, 0,
->   						    pt_args.hva,
->   						    pt_args.paging_size,
-> -						    test->uffd_pt_handler);
-> +						    1, test->uffd_pt_handler);
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 48fad65568227..f174f43c38d45 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6637,6 +6637,18 @@ array field represents return values. The userspace should update the return
+>   values of SBI call before resuming the VCPU. For more details on RISC-V SBI
+>   spec refer, https://github.com/riscv/riscv-sbi-doc.
 >   
->   	*data_uffd = NULL;
->   	if (test->uffd_data_handler)
->   		*data_uffd = uffd_setup_demand_paging(uffd_mode, 0,
->   						      data_args.hva,
->   						      data_args.paging_size,
-> -						      test->uffd_data_handler);
-> +						      1, test->uffd_data_handler);
->   }
->   
->   static void free_uffd(struct test_desc *test, struct uffd_desc *pt_uffd,
-> diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-> index b0e1fc4de9e29..6c2253f4a64ef 100644
-> --- a/tools/testing/selftests/kvm/demand_paging_test.c
-> +++ b/tools/testing/selftests/kvm/demand_paging_test.c
-> @@ -77,9 +77,15 @@ static int handle_uffd_page_request(int uffd_mode, int uffd,
->   		copy.mode = 0;
->   
->   		r = ioctl(uffd, UFFDIO_COPY, &copy);
-> -		if (r == -1) {
-> -			pr_info("Failed UFFDIO_COPY in 0x%lx from thread %d with errno: %d\n",
-> -				addr, tid, errno);
-> +		/*
-> +		 * With multiple vCPU threads fault on a single page and there are
-> +		 * multiple readers for the UFFD, at least one of the UFFDIO_COPYs
-> +		 * will fail with EEXIST: handle that case without signaling an
-> +		 * error.
-> +		 */
-
-But this code path is also gone through in other cases, isn't it? In
-those cases, is it still safe to ignore EEXIST?
-
-> +		if (r == -1 && errno != EEXIST) {
-> +			pr_info("Failed UFFDIO_COPY in 0x%lx from thread %d, errno = %d\n",
-> +					addr, tid, errno);
-
-unintended indent changes I think.
-
->   			return r;
->   		}
->   	} else if (uffd_mode == UFFDIO_REGISTER_MODE_MINOR) {
-> @@ -89,9 +95,10 @@ static int handle_uffd_page_request(int uffd_mode, int uffd,
->   		cont.range.len = demand_paging_size;
->   
->   		r = ioctl(uffd, UFFDIO_CONTINUE, &cont);
-> -		if (r == -1) {
-> -			pr_info("Failed UFFDIO_CONTINUE in 0x%lx from thread %d with errno: %d\n",
-> -				addr, tid, errno);
-> +		/* See the note about EEXISTs in the UFFDIO_COPY branch. */
-
-Personally I would suggest copy the comments here. what if some day above
-code/comment was changed/deleted?
-
-> +		if (r == -1 && errno != EEXIST) {
-> +			pr_info("Failed UFFDIO_CONTINUE in 0x%lx, thread %d, errno = %d\n",
-> +					addr, tid, errno);
-
-Ditto
-
->   			return r;
->   		}
->   	} else {
-> @@ -110,7 +117,9 @@ static int handle_uffd_page_request(int uffd_mode, int uffd,
->   
->   struct test_params {
->   	int uffd_mode;
-> +	bool single_uffd;
->   	useconds_t uffd_delay;
-> +	int readers_per_uffd;
->   	enum vm_mem_backing_src_type src_type;
->   	bool partition_vcpu_memory_access;
->   };
-> @@ -133,7 +142,8 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->   	struct timespec start;
->   	struct timespec ts_diff;
->   	struct kvm_vm *vm;
-> -	int i;
-> +	int i, num_uffds = 0;
-> +	uint64_t uffd_region_size;
->   
->   	vm = memstress_create_vm(mode, nr_vcpus, guest_percpu_mem_size, 1,
->   				 p->src_type, p->partition_vcpu_memory_access);
-> @@ -146,10 +156,13 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->   	memset(guest_data_prototype, 0xAB, demand_paging_size);
->   
->   	if (p->uffd_mode) {
-> -		uffd_descs = malloc(nr_vcpus * sizeof(struct uffd_desc *));
-> +		num_uffds = p->single_uffd ? 1 : nr_vcpus;
-> +		uffd_region_size = nr_vcpus * guest_percpu_mem_size / num_uffds;
+> +::
 > +
-> +		uffd_descs = malloc(num_uffds * sizeof(struct uffd_desc *));
->   		TEST_ASSERT(uffd_descs, "Memory allocation failed");
+> +		/* KVM_EXIT_MEMORY_FAULT */
+> +		struct {
+> +			__u64 flags;
+> +			__u64 gpa;
+> +			__u64 len; /* in bytes */
+> +		} memory_fault;
+> +
+> +Indicates a vCPU memory fault on the guest physical address range
+> +[gpa, gpa + len). See KVM_CAP_MEMORY_FAULT_INFO for more details.
+> +
+>   ::
 >   
-> -		for (i = 0; i < nr_vcpus; i++) {
-> +		for (i = 0; i < num_uffds; i++) {
->   			struct memstress_vcpu_args *vcpu_args;
->   			void *vcpu_hva;
->   			void *vcpu_alias;
-> @@ -160,8 +173,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->   			vcpu_hva = addr_gpa2hva(vm, vcpu_args->gpa);
->   			vcpu_alias = addr_gpa2alias(vm, vcpu_args->gpa);
+>       /* KVM_EXIT_NOTIFY */
+> @@ -7670,6 +7682,29 @@ This capability is aimed to mitigate the threat that malicious VMs can
+>   cause CPU stuck (due to event windows don't open up) and make the CPU
+>   unavailable to host or other VMs.
 >   
-> -			prefault_mem(vcpu_alias,
-> -				vcpu_args->pages * memstress_args.guest_page_size);
-> +			prefault_mem(vcpu_alias, uffd_region_size);
+> +7.34 KVM_CAP_MEMORY_FAULT_INFO
+> +------------------------------
+> +
+> +:Architectures: x86, arm64
+> +:Parameters: args[0] - KVM_MEMORY_FAULT_INFO_ENABLE|DISABLE to enable/disable
+> +             the capability.
+> +:Returns: 0 on success, or -EINVAL if unsupported or invalid args[0].
+> +
+> +When enabled, EFAULTs "returned" by KVM_RUN in response to failed vCPU guest
+> +memory accesses may be annotated with additional information. When KVM_RUN
+> +returns an error with errno=EFAULT, userspace may check the exit reason: if it
+> +is KVM_EXIT_MEMORY_FAULT, userspace is then permitted to read the 'memory_fault'
+> +member of the run struct.
+> +
+> +The 'gpa' and 'len' (in bytes) fields describe the range of guest
+> +physical memory to which access failed, i.e. [gpa, gpa + len). 'flags' is
+> +currently always zero.
+> +
+> +NOTE: The implementation of this capability is incomplete. Even with it enabled,
+> +userspace may receive "bare" EFAULTs (i.e. exit reason !=
+> +KVM_EXIT_MEMORY_FAULT) from KVM_RUN. These should be considered bugs and
+> +reported to the maintainers.
+> +
+>   8. Other capabilities.
+>   ======================
 >   
->   			/*
->   			 * Set up user fault fd to handle demand paging
-> @@ -169,7 +181,8 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->   			 */
->   			uffd_descs[i] = uffd_setup_demand_paging(
->   				p->uffd_mode, p->uffd_delay, vcpu_hva,
-> -				vcpu_args->pages * memstress_args.guest_page_size,
-> +				uffd_region_size,
-> +				p->readers_per_uffd,
->   				&handle_uffd_page_request);
->   		}
->   	}
-> @@ -186,7 +199,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index a43e1cb3b7e97..a932346b59f61 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -220,6 +220,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   	case KVM_CAP_VCPU_ATTRIBUTES:
+>   	case KVM_CAP_PTP_KVM:
+>   	case KVM_CAP_ARM_SYSTEM_SUSPEND:
+> +	case KVM_CAP_MEMORY_FAULT_INFO:
+>   		r = 1;
+>   		break;
+>   	case KVM_CAP_SET_GUEST_DEBUG2:
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index ca73eb066af81..0925678e741de 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4432,6 +4432,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   	case KVM_CAP_VAPIC:
+>   	case KVM_CAP_ENABLE_CAP:
+>   	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
+> +	case KVM_CAP_MEMORY_FAULT_INFO:
+>   		r = 1;
+>   		break;
+>   	case KVM_CAP_EXIT_HYPERCALL:
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 90edc16d37e59..776f9713f3921 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -805,6 +805,8 @@ struct kvm {
+>   	struct notifier_block pm_notifier;
+>   #endif
+>   	char stats_id[KVM_STATS_NAME_SIZE];
+> +
+> +	bool fill_efault_info;
+>   };
 >   
->   	if (p->uffd_mode) {
->   		/* Tell the user fault fd handler threads to quit */
-> -		for (i = 0; i < nr_vcpus; i++)
-> +		for (i = 0; i < num_uffds; i++)
->   			uffd_stop_demand_paging(uffd_descs[i]);
->   	}
+>   #define kvm_err(fmt, ...) \
+> @@ -2277,4 +2279,14 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
+>   /* Max number of entries allowed for each kvm dirty ring */
+>   #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
 >   
-> @@ -206,14 +219,19 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->   static void help(char *name)
->   {
->   	puts("");
-> -	printf("usage: %s [-h] [-m vm_mode] [-u uffd_mode] [-d uffd_delay_usec]\n"
-> -	       "          [-b memory] [-s type] [-v vcpus] [-o]\n", name);
-> +	printf("usage: %s [-h] [-m vm_mode] [-u uffd_mode] [-a]\n"
-> +		   "          [-d uffd_delay_usec] [-r readers_per_uffd] [-b memory]\n"
-> +		   "          [-s type] [-v vcpus] [-o]\n", name);
+> +/*
+> + * Attempts to set the run struct's exit reason to KVM_EXIT_MEMORY_FAULT and
+> + * populate the memory_fault field with the given information.
+> + *
+> + * Does nothing if KVM_CAP_MEMORY_FAULT_INFO is not enabled. WARNs and does
+> + * nothing if the exit reason is not KVM_EXIT_UNKNOWN, or if 'vcpu' is not
+> + * the current running vcpu.
+> + */
+> +inline void kvm_populate_efault_info(struct kvm_vcpu *vcpu,
+> +					uint64_t gpa, uint64_t len);
+>   #endif
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 4003a166328cc..bc73e8381a2bb 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -264,6 +264,7 @@ struct kvm_xen_exit {
+>   #define KVM_EXIT_RISCV_SBI        35
+>   #define KVM_EXIT_RISCV_CSR        36
+>   #define KVM_EXIT_NOTIFY           37
+> +#define KVM_EXIT_MEMORY_FAULT     38
 
-Ditto
-
->   	guest_modes_help();
->   	printf(" -u: use userfaultfd to handle vCPU page faults. Mode is a\n"
->   	       "     UFFD registration mode: 'MISSING' or 'MINOR'.\n");
-> +	printf(" -a: Use a single userfaultfd for all of guest memory, instead of\n"
-> +		   "     creating one for each region paged by a unique vCPU\n"
-> +		   "     Set implicitly with -o, and no effect without -u.\n");
-
-Ditto
-
->   	printf(" -d: add a delay in usec to the User Fault\n"
->   	       "     FD handler to simulate demand paging\n"
->   	       "     overheads. Ignored without -u.\n");
-> +	printf(" -r: Set the number of reader threads per uffd.\n");
->   	printf(" -b: specify the size of the memory region which should be\n"
->   	       "     demand paged by each vCPU. e.g. 10M or 3G.\n"
->   	       "     Default: 1G\n");
-> @@ -231,12 +249,14 @@ int main(int argc, char *argv[])
->   	struct test_params p = {
->   		.src_type = DEFAULT_VM_MEM_SRC,
->   		.partition_vcpu_memory_access = true,
-> +		.readers_per_uffd = 1,
-> +		.single_uffd = false,
+struct exit_reason[] string for KVM_EXIT_MEMORY_FAULT can be added as
+well.
+>   
+>   /* For KVM_EXIT_INTERNAL_ERROR */
+>   /* Emulate instruction failed. */
+> @@ -505,6 +506,16 @@ struct kvm_run {
+>   #define KVM_NOTIFY_CONTEXT_INVALID	(1 << 0)
+>   			__u32 flags;
+>   		} notify;
+> +		/* KVM_EXIT_MEMORY_FAULT */
+> +		struct {
+> +			/*
+> +			 * Indicates a memory fault on the guest physical address range
+> +			 * [gpa, gpa + len). flags is always zero for now.
+> +			 */
+> +			__u64 flags;
+> +			__u64 gpa;
+> +			__u64 len; /* in bytes */
+> +		} memory_fault;
+>   		/* Fix the size of the union. */
+>   		char padding[256];
 >   	};
->   	int opt;
+> @@ -1184,6 +1195,7 @@ struct kvm_ppc_resize_hpt {
+>   #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
+>   #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
+>   #define KVM_CAP_PMU_EVENT_MASKED_EVENTS 226
+> +#define KVM_CAP_MEMORY_FAULT_INFO 227
 >   
->   	guest_modes_append_default();
+>   #ifdef KVM_CAP_IRQ_ROUTING
 >   
-> -	while ((opt = getopt(argc, argv, "hm:u:d:b:s:v:o")) != -1) {
-> +	while ((opt = getopt(argc, argv, "ahom:u:d:b:s:v:r:")) != -1) {
->   		switch (opt) {
->   		case 'm':
->   			guest_modes_cmdline(optarg);
-> @@ -248,6 +268,9 @@ int main(int argc, char *argv[])
->   				p.uffd_mode = UFFDIO_REGISTER_MODE_MINOR;
->   			TEST_ASSERT(p.uffd_mode, "UFFD mode must be 'MISSING' or 'MINOR'.");
->   			break;
-> +		case 'a':
-> +			p.single_uffd = true;
-> +			break;
->   		case 'd':
->   			p.uffd_delay = strtoul(optarg, NULL, 0);
->   			TEST_ASSERT(p.uffd_delay >= 0, "A negative UFFD delay is not supported.");
-> @@ -265,6 +288,13 @@ int main(int argc, char *argv[])
->   			break;
->   		case 'o':
->   			p.partition_vcpu_memory_access = false;
-> +			p.single_uffd = true;
-> +			break;
-> +		case 'r':
-> +			p.readers_per_uffd = atoi(optarg);
-> +			TEST_ASSERT(p.readers_per_uffd >= 1,
-> +						"Invalid number of readers per uffd %d: must be >=1",
-> +						p.readers_per_uffd);
->   			break;
->   		case 'h':
->   		default:
-> diff --git a/tools/testing/selftests/kvm/include/userfaultfd_util.h b/tools/testing/selftests/kvm/include/userfaultfd_util.h
-> index 877449c345928..92cc1f9ec0686 100644
-> --- a/tools/testing/selftests/kvm/include/userfaultfd_util.h
-> +++ b/tools/testing/selftests/kvm/include/userfaultfd_util.h
-> @@ -17,18 +17,30 @@
+> @@ -2237,4 +2249,8 @@ struct kvm_s390_zpci_op {
+>   /* flags for kvm_s390_zpci_op->u.reg_aen.flags */
+>   #define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
 >   
->   typedef int (*uffd_handler_t)(int uffd_mode, int uffd, struct uffd_msg *msg);
->   
-> +struct uffd_reader_args {
-> +	int uffd_mode;
-> +	int uffd;
-> +	useconds_t delay;
-> +	uffd_handler_t handler;
-> +	/* Holds the read end of the pipe for killing the reader. */
-> +	int pipe;
-> +};
+> +/* flags for KVM_CAP_MEMORY_FAULT_INFO */
+> +#define KVM_MEMORY_FAULT_INFO_DISABLE  0
+> +#define KVM_MEMORY_FAULT_INFO_ENABLE   1
 > +
->   struct uffd_desc {
->   	int uffd_mode;
->   	int uffd;
-> -	int pipefds[2];
->   	useconds_t delay;
->   	uffd_handler_t handler;
-> -	pthread_t thread;
-> +	uint64_t num_readers;
-> +	/* Holds the write ends of the pipes for killing the readers. */
-> +	int *pipefds;
-> +	pthread_t *readers;
-> +	struct uffd_reader_args *reader_args;
->   };
+>   #endif /* __LINUX_KVM_H */
+> diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
+> index 4003a166328cc..5c57796364d65 100644
+> --- a/tools/include/uapi/linux/kvm.h
+> +++ b/tools/include/uapi/linux/kvm.h
+> @@ -264,6 +264,7 @@ struct kvm_xen_exit {
+>   #define KVM_EXIT_RISCV_SBI        35
+>   #define KVM_EXIT_RISCV_CSR        36
+>   #define KVM_EXIT_NOTIFY           37
+> +#define KVM_EXIT_MEMORY_FAULT     38
 >   
->   struct uffd_desc *uffd_setup_demand_paging(int uffd_mode, useconds_t delay,
->   					   void *hva, uint64_t len,
-> -					   uffd_handler_t handler);
-> +					   uint64_t num_readers, uffd_handler_t handler);
+>   /* For KVM_EXIT_INTERNAL_ERROR */
+>   /* Emulate instruction failed. */
+> @@ -505,6 +506,16 @@ struct kvm_run {
+>   #define KVM_NOTIFY_CONTEXT_INVALID	(1 << 0)
+>   			__u32 flags;
+>   		} notify;
+> +		/* KVM_EXIT_MEMORY_FAULT */
+> +		struct {
+> +			/*
+> +			 * Indicates a memory fault on the guest physical address range
+> +			 * [gpa, gpa + len). flags is always zero for now.
+> +			 */
+> +			__u64 flags;
+> +			__u64 gpa;
+> +			__u64 len; /* in bytes */
+> +		} memory_fault;
+>   		/* Fix the size of the union. */
+>   		char padding[256];
+>   	};
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index cf7d3de6f3689..f3effc93cbef3 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1142,6 +1142,7 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
+>   	spin_lock_init(&kvm->mn_invalidate_lock);
+>   	rcuwait_init(&kvm->mn_memslots_update_rcuwait);
+>   	xa_init(&kvm->vcpu_array);
+> +	kvm->fill_efault_info = false;
 >   
->   void uffd_stop_demand_paging(struct uffd_desc *uffd);
+>   	INIT_LIST_HEAD(&kvm->gpc_list);
+>   	spin_lock_init(&kvm->gpc_lock);
+> @@ -4096,6 +4097,8 @@ static long kvm_vcpu_ioctl(struct file *filp,
+>   			put_pid(oldpid);
+>   		}
+>   		r = kvm_arch_vcpu_ioctl_run(vcpu);
+> +		WARN_ON_ONCE(r == -EFAULT &&
+> +					 vcpu->run->exit_reason != KVM_EXIT_MEMORY_FAULT);
+>   		trace_kvm_userspace_exit(vcpu->run->exit_reason, r);
+>   		break;
+>   	}
+> @@ -4672,6 +4675,15 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
 >   
-> diff --git a/tools/testing/selftests/kvm/lib/userfaultfd_util.c b/tools/testing/selftests/kvm/lib/userfaultfd_util.c
-> index 92cef20902f1f..2723ee1e3e1b2 100644
-> --- a/tools/testing/selftests/kvm/lib/userfaultfd_util.c
-> +++ b/tools/testing/selftests/kvm/lib/userfaultfd_util.c
-> @@ -27,10 +27,8 @@
->   
->   static void *uffd_handler_thread_fn(void *arg)
->   {
-> -	struct uffd_desc *uffd_desc = (struct uffd_desc *)arg;
-> -	int uffd = uffd_desc->uffd;
-> -	int pipefd = uffd_desc->pipefds[0];
-> -	useconds_t delay = uffd_desc->delay;
-> +	struct uffd_reader_args *reader_args = (struct uffd_reader_args *)arg;
-> +	int uffd = reader_args->uffd;
->   	int64_t pages = 0;
->   	struct timespec start;
->   	struct timespec ts_diff;
-> @@ -44,7 +42,7 @@ static void *uffd_handler_thread_fn(void *arg)
->   
->   		pollfd[0].fd = uffd;
->   		pollfd[0].events = POLLIN;
-> -		pollfd[1].fd = pipefd;
-> +		pollfd[1].fd = reader_args->pipe;
->   		pollfd[1].events = POLLIN;
->   
->   		r = poll(pollfd, 2, -1);
-> @@ -92,9 +90,9 @@ static void *uffd_handler_thread_fn(void *arg)
->   		if (!(msg.event & UFFD_EVENT_PAGEFAULT))
->   			continue;
->   
-> -		if (delay)
-> -			usleep(delay);
-> -		r = uffd_desc->handler(uffd_desc->uffd_mode, uffd, &msg);
-> +		if (reader_args->delay)
-> +			usleep(reader_args->delay);
-> +		r = reader_args->handler(reader_args->uffd_mode, uffd, &msg);
->   		if (r < 0)
->   			return NULL;
->   		pages++;
-> @@ -110,7 +108,7 @@ static void *uffd_handler_thread_fn(void *arg)
->   
->   struct uffd_desc *uffd_setup_demand_paging(int uffd_mode, useconds_t delay,
->   					   void *hva, uint64_t len,
-> -					   uffd_handler_t handler)
-> +					   uint64_t num_readers, uffd_handler_t handler)
->   {
->   	struct uffd_desc *uffd_desc;
->   	bool is_minor = (uffd_mode == UFFDIO_REGISTER_MODE_MINOR);
-> @@ -118,14 +116,26 @@ struct uffd_desc *uffd_setup_demand_paging(int uffd_mode, useconds_t delay,
->   	struct uffdio_api uffdio_api;
->   	struct uffdio_register uffdio_register;
->   	uint64_t expected_ioctls = ((uint64_t) 1) << _UFFDIO_COPY;
-> -	int ret;
-> +	int ret, i;
->   
->   	PER_PAGE_DEBUG("Userfaultfd %s mode, faults resolved with %s\n",
->   		       is_minor ? "MINOR" : "MISSING",
->   		       is_minor ? "UFFDIO_CONINUE" : "UFFDIO_COPY");
->   
->   	uffd_desc = malloc(sizeof(struct uffd_desc));
-> -	TEST_ASSERT(uffd_desc, "malloc failed");
-> +	TEST_ASSERT(uffd_desc, "Failed to malloc uffd descriptor");
-> +
-> +	uffd_desc->pipefds = malloc(sizeof(int) * num_readers);
-> +	TEST_ASSERT(uffd_desc->pipefds, "Failed to malloc pipes");
-> +
-> +	uffd_desc->readers = malloc(sizeof(pthread_t) * num_readers);
-> +	TEST_ASSERT(uffd_desc->readers, "Failed to malloc reader threads");
-> +
-> +	uffd_desc->reader_args = malloc(
-> +		sizeof(struct uffd_reader_args) * num_readers);
-> +	TEST_ASSERT(uffd_desc->reader_args, "Failed to malloc reader_args");
-> +
-> +	uffd_desc->num_readers = num_readers;
->   
->   	/* In order to get minor faults, prefault via the alias. */
->   	if (is_minor)
-> @@ -148,18 +158,32 @@ struct uffd_desc *uffd_setup_demand_paging(int uffd_mode, useconds_t delay,
->   	TEST_ASSERT((uffdio_register.ioctls & expected_ioctls) ==
->   		    expected_ioctls, "missing userfaultfd ioctls");
->   
-> -	ret = pipe2(uffd_desc->pipefds, O_CLOEXEC | O_NONBLOCK);
-> -	TEST_ASSERT(!ret, "Failed to set up pipefd");
-> -
->   	uffd_desc->uffd_mode = uffd_mode;
->   	uffd_desc->uffd = uffd;
->   	uffd_desc->delay = delay;
->   	uffd_desc->handler = handler;
-
-Now that these info are encapsulated into reader args below, looks
-unnecessary to have them in uffd_desc here.
-
-> -	pthread_create(&uffd_desc->thread, NULL, uffd_handler_thread_fn,
-> -		       uffd_desc);
->   
-> -	PER_VCPU_DEBUG("Created uffd thread for HVA range [%p, %p)\n",
-> -		       hva, hva + len);
-> +	for (i = 0; i < uffd_desc->num_readers; ++i) {
-> +		int pipes[2];
-> +
-> +		ret = pipe2((int *) &pipes, O_CLOEXEC | O_NONBLOCK);
-> +		TEST_ASSERT(!ret, "Failed to set up pipefd %i for uffd_desc %p",
-> +					i, uffd_desc);
-> +
-> +		uffd_desc->pipefds[i] = pipes[1];
-> +
-> +		uffd_desc->reader_args[i].uffd_mode = uffd_mode;
-> +		uffd_desc->reader_args[i].uffd = uffd;
-> +		uffd_desc->reader_args[i].delay = delay;
-> +		uffd_desc->reader_args[i].handler = handler;
-> +		uffd_desc->reader_args[i].pipe = pipes[0];
-> +
-> +		pthread_create(&uffd_desc->readers[i], NULL, uffd_handler_thread_fn,
-> +					   &uffd_desc->reader_args[i]);
-> +
-> +		PER_VCPU_DEBUG("Created uffd thread %i for HVA range [%p, %p)\n",
-> +					   i, hva, hva + len);
+>   		return r;
+>   	}
+> +	case KVM_CAP_MEMORY_FAULT_INFO: {
+> +		if (!kvm_vm_ioctl_check_extension_generic(kvm, cap->cap)
+> +			|| (cap->args[0] != KVM_MEMORY_FAULT_INFO_ENABLE
+> +				&& cap->args[0] != KVM_MEMORY_FAULT_INFO_DISABLE)) {
+> +			return -EINVAL;
+> +		}
+> +		kvm->fill_efault_info = cap->args[0] == KVM_MEMORY_FAULT_INFO_ENABLE;
+> +		return 0;
 > +	}
+>   	default:
+>   		return kvm_vm_ioctl_enable_cap(kvm, cap);
+>   	}
+> @@ -6173,3 +6185,35 @@ int kvm_vm_create_worker_thread(struct kvm *kvm, kvm_vm_thread_fn_t thread_fn,
 >   
->   	return uffd_desc;
+>   	return init_context.err;
 >   }
-> @@ -167,19 +191,31 @@ struct uffd_desc *uffd_setup_demand_paging(int uffd_mode, useconds_t delay,
->   void uffd_stop_demand_paging(struct uffd_desc *uffd)
->   {
->   	char c = 0;
-> -	int ret;
-> +	int i, ret;
->   
-> -	ret = write(uffd->pipefds[1], &c, 1);
-> -	TEST_ASSERT(ret == 1, "Unable to write to pipefd");
-> +	for (i = 0; i < uffd->num_readers; ++i) {
-> +		ret = write(uffd->pipefds[i], &c, 1);
-> +		TEST_ASSERT(
-> +			ret == 1, "Unable to write to pipefd %i for uffd_desc %p", i, uffd);
-> +	}
->   
-> -	ret = pthread_join(uffd->thread, NULL);
-> -	TEST_ASSERT(ret == 0, "Pthread_join failed.");
-> +	for (i = 0; i < uffd->num_readers; ++i) {
-> +		ret = pthread_join(uffd->readers[i], NULL);
-> +		TEST_ASSERT(
-> +			ret == 0,
-> +			"Pthread_join failed on reader thread %i for uffd_desc %p", i, uffd);
-> +	}
->   
->   	close(uffd->uffd);
->   
-> -	close(uffd->pipefds[1]);
-> -	close(uffd->pipefds[0]);
-> +	for (i = 0; i < uffd->num_readers; ++i) {
-> +		close(uffd->pipefds[i]);
-> +		close(uffd->reader_args[i].pipe);
-> +	}
->   
-> +	free(uffd->pipefds);
-> +	free(uffd->readers);
-> +	free(uffd->reader_args);
->   	free(uffd);
->   }
->   
+> +
+> +inline void kvm_populate_efault_info(struct kvm_vcpu *vcpu,
+> +					uint64_t gpa, uint64_t len)
+> +{
+> +	if (!vcpu->kvm->fill_efault_info)
+> +		return;
+> +
+> +	preempt_disable();
+> +	/*
+> +	 * Ensure the this vCPU isn't modifying another vCPU's run struct, which
+> +	 * would open the door for races between concurrent calls to this
+> +	 * function.
+> +	 */
+> +	if (WARN_ON_ONCE(vcpu != __this_cpu_read(kvm_running_vcpu)))
+> +		goto out;
+> +	/*
+> +	 * Try not to overwrite an already-populated run struct.
+> +	 * This isn't a perfect solution, as there's no guarantee that the exit
+> +	 * reason is set before the run struct is populated, but it should prevent
+> +	 * at least some bugs.
+> +	 */
+> +	else if (WARN_ON_ONCE(vcpu->run->exit_reason != KVM_EXIT_UNKNOWN))
+> +		goto out;
+> +
+> +	vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
+> +	vcpu->run->memory_fault.gpa = gpa;
+> +	vcpu->run->memory_fault.len = len;
+> +	vcpu->run->memory_fault.flags = 0;
+> +
+> +out:
+> +	preempt_enable();
+> +}
 
