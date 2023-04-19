@@ -1,28 +1,58 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E25F728F2
-	for <kvmarm@lists.linux.dev>; Wed, 19 Apr 2023 09:39:30 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DCCF91042;
-	Wed, 19 Apr 2023 02:40:13 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 74C633F5A1;
-	Wed, 19 Apr 2023 02:39:28 -0700 (PDT)
-Date: Wed, 19 Apr 2023 10:39:25 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: Mark Rutland <mark.rutland@arm.com>,
-	Andrew Jones <andrew.jones@linux.dev>, eric.auger.pro@gmail.com,
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
-	will@kernel.org, oliver.upton@linux.dev, ricarkol@google.com,
-	reijiw@google.com
-Subject: Re: [kvm-unit-tests PATCH 0/6] arm: pmu: Fix random failures of
- pmu-chain-promotion
-Message-ID: <ZD-2zYGyAhM6q_9Q@monolith.localdoman>
-References: <20230315110725.1215523-1-eric.auger@redhat.com>
- <968a026e-066e-deea-d02f-f64133295ff1@redhat.com>
- <xcd3kt23ffdq5qfziuyp2vgwv7ndkmh3acepbpqqhhrokv755e@wuiltddj2hj2>
- <ZDZwIFtH8V59fE4o@FVFF77S0Q05N>
- <6d6126af-4974-0655-e817-5c5c472d5a2f@redhat.com>
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D56A228F2
+	for <kvmarm@lists.linux.dev>; Wed, 19 Apr 2023 09:48:18 +0000 (UTC)
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-2f917585b26so2541703f8f.0
+        for <kvmarm@lists.linux.dev>; Wed, 19 Apr 2023 02:48:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1681897697; x=1684489697;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VUmNU9fmEDH4AWgVCWAPUoxIWc9FWYtply5fLTTOakk=;
+        b=aFgzvnN2KDaOnk1PzgUfVwZs8/lyWRaVWasJExSE49m7XS88YM3b8tzP5OjITgwzTl
+         ED5aLnGFxu8LwU5hDMrZKQs9m8ZAyGJPD7CBw1fL9KH5FaIasCtEkjiZj30Cwk1jMV2d
+         7AK6ycFPsr9Rc+HnQ7e4MatP5xOlMDmApi07UZGvPlPN00B3n+zeGaX+Sgn5Ml37M1DU
+         YNruLPHdax11p7FRSwuiloiC2g7kDu/nYwGbkElL3CqJ+d91hihnamyVqB1tVmduQwyi
+         I0LIrU2Nh64wAL1V/XPH8HQOfSWZRjvqQ6xsvnsHC77iHuhIKQNRNtRX7Pqpedz8g3zN
+         Fo5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681897697; x=1684489697;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VUmNU9fmEDH4AWgVCWAPUoxIWc9FWYtply5fLTTOakk=;
+        b=alEC8tzWgPXtX6LU8YK6Depjt1vXosKyq7ZmgSttbIA8CpErQ6MsxAPxkChU5g0Yih
+         v8ZMM0R9SpCL9xTghbNlXrYEu5Wq246jzkHyepCTIwV0qe/4O1/dMAPoIWEHR7D5TAiY
+         nVYwCO6q2iXs88HhqImNOO9iSXInQvZGJ2JXGrAfUOuxpGydIqZLNt0ZgtDp2na2LW/d
+         q/hE1fAJbhvP9yEqteon92koZLflxzeh/81yauCmubeJ68V6q5AbiX0iYYRu/kCa/1Ta
+         Josqn7t+ukiSlMa6Bxk19yPnRWX+xo3Xh0Olw3yArmw6DD44/T691yh/GzJSHH3Tnfk1
+         E1Aw==
+X-Gm-Message-State: AAQBX9dllhy5gRsWnXcl1mMk6E3D5mvG35uYv9Q0G2s9EhR1dl+EBwHG
+	5sePSr4zqMz6aj8XlXN0TKyNig==
+X-Google-Smtp-Source: AKy350aRgpPx6s5bC7jE3+Xs1NiiOrq+N2HezetkWhWoRtt+8BQNsgxqVCUURhojJYFWSZlAOKqD3A==
+X-Received: by 2002:a5d:4b49:0:b0:2fd:98a8:e800 with SMTP id w9-20020a5d4b49000000b002fd98a8e800mr3620146wrs.7.1681897696941;
+        Wed, 19 Apr 2023 02:48:16 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id q9-20020a1ce909000000b003f177c3672dsm1599087wmc.29.2023.04.19.02.48.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Apr 2023 02:48:16 -0700 (PDT)
+Date: Wed, 19 Apr 2023 12:48:13 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Steven Price <steven.price@arm.com>
+Cc: Andre Przywara <andre.przywara@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Eric Auger <eric.auger@redhat.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Fix buffer overflow in kvm_arm_set_fw_reg()
+Message-ID: <46ace8c7-c3b1-4e2d-8af0-3f0ab1bd55f5@kili.mountain>
+References: <ab7b9caf-5c90-4616-8517-b38637293639@kili.mountain>
+ <d6e45332-0b91-2400-0549-068ea72a4482@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -31,161 +61,32 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6d6126af-4974-0655-e817-5c5c472d5a2f@redhat.com>
+In-Reply-To: <d6e45332-0b91-2400-0549-068ea72a4482@arm.com>
 
-Hi,
-
-On Wed, Apr 19, 2023 at 09:32:10AM +0200, Eric Auger wrote:
-> Hi,
+On Wed, Apr 19, 2023 at 09:48:41AM +0100, Steven Price wrote:
+> On 19/04/2023 09:06, Dan Carpenter wrote:
+> > The KVM_REG_SIZE() comes from the ioctl and it can be a power of two
+> > between 0-32768 but if it is more than sizeof(long) this will corrupt
+> > memory.
+> > 
+> > Fixes: 99adb567632b ("KVM: arm/arm64: Add save/restore support for firmware workaround state")
+> > Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 > 
-> On 4/12/23 10:47, Mark Rutland wrote:
-> > On Tue, Apr 04, 2023 at 02:47:47PM +0200, Andrew Jones wrote:
-> >> On Tue, Apr 04, 2023 at 08:23:15AM +0200, Eric Auger wrote:
-> >>> Hi,
-> >>>
-> >>> On 3/15/23 12:07, Eric Auger wrote:
-> >>>> On some HW (ThunderXv2), some random failures of
-> >>>> pmu-chain-promotion test can be observed.
-> >>>>
-> >>>> pmu-chain-promotion is composed of several subtests
-> >>>> which run 2 mem_access loops. The initial value of
-> >>>> the counter is set so that no overflow is expected on
-> >>>> the first loop run and overflow is expected on the second.
-> >>>> However it is observed that sometimes we get an overflow
-> >>>> on the first run. It looks related to some variability of
-> >>>> the mem_acess count. This variability is observed on all
-> >>>> HW I have access to, with different span though. On
-> >>>> ThunderX2 HW it looks the margin that is currently taken
-> >>>> is too small and we regularly hit failure.
-> >>>>
-> >>>> although the first goal of this series is to increase
-> >>>> the count/margin used in those tests, it also attempts
-> >>>> to improve the pmu-chain-promotion logs, add some barriers
-> >>>> in the mem-access loop, clarify the chain counter
-> >>>> enable/disable sequence.
-> >>>>
-> >>>> A new 'pmu-memaccess-reliability' is also introduced to
-> >>>> detect issues with MEM_ACCESS event variability and make
-> >>>> the debug easier.
-> > As a minor nit, 'pmu-mem-access-reliability' would be more consistent with
-> > 'pmu-mem-access'. The lack of a dash in 'memaccess' tripped me up while I was
-> > trying to run those two tests.
+> Reviewed-by: Steven Price <steven.price@arm.com>
 > 
-> I can easily respin with that renaming. thanks for the feedback. Waiting
-> a little bit more if somebody has any other comment.
-
-Started reviewing the series last week, something came up and I had to stop
-after the first patch (very nice improvement, by the way). I will finish
-the review by the end of this week.
-
-Thanks,
-Alex
-
+> Although there might be something to be said for rejecting anything
+> where KVM_REG_SIZE(reg->id) != sizeof(u64), as for smaller sizes the top
+> bits of val would be undefined which would require the code to mask the
+> top bits out to be safe. Given that all registers are currently u64 (and
+> I don't expect that to change), perhaps the below would be clearer?
 > 
-> Eric
-> >
-> >>>> Obviously one can wonder if this variability is something normal
-> >>>> and does not hide any other bug. I hope this series will raise
-> >>>> additional discussions about this.
-> >>>>
-> >>>> https://github.com/eauger/kut/tree/pmu-chain-promotion-fixes-v1
-> >>> Gentle ping.
-> >> I'd be happy to take this, but I was hoping to see some r-b's and/or t-b's
-> >> from some of the others.
-> > I gave this a spin on my ThunderX2, and it seems to fix the intermittent
-> > failures I was seeing.
-> >
-> > FWIW:
-> >
-> > Tested-by: Mark Rutland <mark.rutland@arm.com>
-> >
-> > Before (on commit 4ba7058c61e8922f9c8397cfa1095fac325f809b):
-> >
-> > Test results below.
-> >
-> > | [mark@gravadlaks:~/src/kvm-unit-tests]% TESTNAME=pmu-chain-promotion TIMEOUT=90s ACCEL= useapp qemu ./arm/run arm/pmu.flat -smp 1 -append 'pmu-chain-promotion'
-> > | timeout -k 1s --foreground 90s /home/mark/.opt/apps/qemu/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host -accel kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/pmu.flat -smp 1 -append pmu-chain-promotion # -initrd /tmp/tmp.nl1i6S0EIY
-> > | INFO: PMU version: 0x4
-> > | INFO: PMU implementer/ID code: 0(" ")/0
-> > | INFO: Implements 6 event counters
-> > | PASS: pmu: pmu-chain-promotion: 32-bit overflows: chain counter not counting if even counter is disabled
-> > | PASS: pmu: pmu-chain-promotion: 32-bit overflows: odd counter did not increment on overflow if disabled
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x7
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: CHAIN counter #1 has value 0x0
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: overflow counter 0x1
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x4
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x1b
-> > | PASS: pmu: pmu-chain-promotion: 32-bit overflows: should have triggered an overflow on #0
-> > | FAIL: pmu: pmu-chain-promotion: 32-bit overflows: CHAIN counter #1 shouldn't have incremented
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: counter #0 = 0xffffffdc, counter #1 = 0x0 overflow=0x0
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x4
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x1b
-> > | FAIL: pmu: pmu-chain-promotion: 32-bit overflows: CHAIN counter enabled: CHAIN counter was incremented and overflow
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: CHAIN counter #1 = 0x0, overflow=0x1
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x4
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x1b
-> > | FAIL: pmu: pmu-chain-promotion: 32-bit overflows: 32b->64b: CHAIN counter incremented and overflow
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: CHAIN counter #1 = 0x0, overflow=0x1
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: counter #0=0xfffffff3, counter #1=0x0
-> > | PASS: pmu: pmu-chain-promotion: 32-bit overflows: overflow is expected on counter 0
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: counter #0=0xa, counter #1=0xf9 overflow=0x1
-> > | SUMMARY: 7 tests, 3 unexpected failures
-> >
-> > After:
-> >
-> > | [mark@gravadlaks:~/src/kvm-unit-tests]% TESTNAME=pmu-chain-promotion TIMEOUT=90s ACCEL=kvm useapp qemu ./arm/run arm/pmu.flat -smp 1 -append 'pmu-chain-promotion'
-> > | timeout -k 1s --foreground 90s /home/mark/.opt/apps/qemu/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host -accel kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/pmu.flat -smp 1 -append pmu-chain-promotion # -initrd /tmp/tmp.pahLyg1F3s
-> > | INFO: PMU version: 0x4
-> > | INFO: PMU implementer/ID code: 0(" ")/0
-> > | INFO: Implements 6 event counters
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest1: post #1=0x0 #0=0x0 overflow=0x0
-> > | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest1: chain counter not counting if even counter is disabled
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest2: post #1=0x0 #0=0xf3 overflow=0x1
-> > | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest2: odd counter did not increment on overflow if disabled
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest3: init #1=0x0 #0=0xfffffea1 overflow=0x0
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest3: After 1st loop #1=0x0 #0=0xffffffa0 overflow=0x0
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest3: After 2d loop #1=0x0 #0=0xc0 overflow=0x1
-> > | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest3: should have triggered an overflow on #0
-> > | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest3: CHAIN counter #1 shouldn't have incremented
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest4: init #1=0x0 #0=0xfffffea1 overflow=0x0
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest4: After 1st loop #1=0x0 #0=0xffffffb7 overflow=0x0
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest4: After 2d loop #1=0x1 #0=0xbc overflow=0x1
-> > | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest4: CHAIN counter enabled: CHAIN counter was incremented and overflow
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest5: init #1=0x0 #0=0xfffffea1 overflow=0x0
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest5: After 1st loop #1=0x22c #0=0xffffff9f overflow=0x0
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest5: After 2d loop #1=0x1 #0=0x9d overflow=0x1
-> > | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest5: 32b->64b: CHAIN counter incremented and overflow
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest6: init #1=0x0 #0=0xfffffea1 overflow=0x0
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest6: After 1st loop #1=0x0 #0=0xffffff9f overflow=0x0
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest6: After 2d loop #1=0x1f9 #0=0x9c overflow=0x1
-> > | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest6: overflow is expected on counter 0
-> > | SUMMARY: 7 tests
-> >
-> > As a bonus, the mem-access and memaccess-reliability results:
-> >
-> > | [mark@gravadlaks:~/src/kvm-unit-tests]% TESTNAME=pmu-chain-promotion TIMEOUT=90s ACCEL=kvm useapp qemu ./arm/run arm/pmu.flat -smp 1 -append 'pmu-mem-access'     
-> > | timeout -k 1s --foreground 90s /home/mark/.opt/apps/qemu/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host -accel kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/pmu.flat -smp 1 -append pmu-mem-access # -initrd /tmp/tmp.84AeEp8Tiw
-> > | INFO: PMU version: 0x4
-> > | INFO: PMU implementer/ID code: 0(" ")/0
-> > | INFO: Implements 6 event counters
-> > | INFO: pmu: pmu-mem-access: 32-bit overflows: counter #0 is 0x15 (MEM_ACCESS)
-> > | INFO: pmu: pmu-mem-access: 32-bit overflows: counter #1 is 0x15 (MEM_ACCESS)
-> > | PASS: pmu: pmu-mem-access: 32-bit overflows: Ran 20 mem accesses
-> > | PASS: pmu: pmu-mem-access: 32-bit overflows: Ran 20 mem accesses with expected overflows on both counters
-> > | INFO: pmu: pmu-mem-access: 32-bit overflows: cnt#0=0x8 cnt#1=0x8 overflow=0x3
-> > | SKIP: pmu: pmu-mem-access: 64-bit overflows: Skip test as 64 overflows need FEAT_PMUv3p5
-> > | SUMMARY: 3 tests, 1 skipped
-> > | [mark@gravadlaks:~/src/kvm-unit-tests]% TESTNAME=pmu-chain-promotion TIMEOUT=90s ACCEL=kvm useapp qemu ./arm/run arm/pmu.flat -smp 1 -append 'pmu-memaccess-reliability'
-> > | timeout -k 1s --foreground 90s /home/mark/.opt/apps/qemu/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host -accel kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/pmu.flat -smp 1 -append pmu-memaccess-reliability # -initrd /tmp/tmp.ZToqwencZR
-> > | INFO: PMU version: 0x4
-> > | INFO: PMU implementer/ID code: 0(" ")/0
-> > | INFO: Implements 6 event counters
-> > | INFO: pmu: pmu-memaccess-reliability: 32-bit overflows: overflow=0 min=251 max=283 COUNT=250 MARGIN=100
-> > | PASS: pmu: pmu-memaccess-reliability: 32-bit overflows: memaccess is reliable
-> > | SKIP: pmu: pmu-memaccess-reliability: 64-bit overflows: Skip test as 64 overflows need FEAT_PMUv3p5
-> > | SUMMARY: 2 tests, 1 skipped
-> >
-> > Thanks,
-> > Mark.
-> >
-> 
+> 	if (KVM_REG_SIZE(reg->id) != sizeof(val))
+> 		return -EINVAL;
+> 	if (copy_from_user(&val, uaddr, sizeof(val)))
+> 		return -EFAULT;
+
+I was thinking that zero might be a valid size?
+
+regards,
+dan carpenter
+
