@@ -1,45 +1,45 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF063D67
-	for <kvmarm@lists.linux.dev>; Wed, 19 Apr 2023 13:36:53 +0000 (UTC)
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1a526aa3dd5so37778315ad.3
-        for <kvmarm@lists.linux.dev>; Wed, 19 Apr 2023 06:36:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E0C63D67
+	for <kvmarm@lists.linux.dev>; Wed, 19 Apr 2023 13:51:20 +0000 (UTC)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-63b620188aeso3529465b3a.0
+        for <kvmarm@lists.linux.dev>; Wed, 19 Apr 2023 06:51:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1681911413; x=1684503413;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=iOX9IhenPqCIJQOLNcwKs+Lj53e3MnWmvQSEeYt/aVM=;
-        b=eIw28Fwx3KFF/gqyxVXtFtBhs73dZDKFEY6zJ/fJvgwxgSZ+wJFbp0WwEI2ZHbkP3a
-         ElDs0AVTJC3iAT7Y5pUuhIE1ezLSnOOS6baKV+mY+LoQysdawl7t2hkD/KVoO7xzEaCf
-         kTiwlI+yuBs8jUwFyQf5gDb+TCy5I9CF2EDFD/EpC7a0w+pkQtt3DYDfdA9mPVNCcoIq
-         FpWKSwGXej0XtISCC5vBgq0tWMz9zOYP6sjtka//t+ETIZUxLSr3zcVnqFuOv8VmvtiE
-         LrsOWBVIbSmQIMJIFrVy6AlH39FvkBAV7twf6YsrNtyMAfyMHvkT7F4Ap0vhWeA5xsAr
-         NktQ==
+        d=gmail.com; s=20221208; t=1681912280; x=1684504280;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=on3F8pM3p3B9OClirjfPRYd2TCLDzgp9dJKToJBsoLE=;
+        b=dC0uL4Ug8165ZqCya+YsdJvUDjZauqRrZmyIPt7IiTUA/do6GbK4Q4PBwwD6bnNTu2
+         HjNWDUyOx/2y+/oHqwMiDjZCOLMpDvPXGZk9RYHvnEUn23GpVxV3LS6d+pZRS7ydwEYl
+         n2vUCFUxLfdqmvU/RBFZ5oheDGmk/v2fiRLI22MZCU2h68Dj82vCsk6DGj3cLie2JYMJ
+         zop8FdIDWDo58mDf5D/NJomanHIqQfwh1gTDQGooXhM81EzKWjcvrPQGOyjf6eIpT2pj
+         DztWnVgBpYPYBvCIf3lphHjD4n9wI4L5b+NBlIS8MaK79zQB+Xzv1fZP+QSskQeJmGRv
+         Q0jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681911413; x=1684503413;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20221208; t=1681912280; x=1684504280;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iOX9IhenPqCIJQOLNcwKs+Lj53e3MnWmvQSEeYt/aVM=;
-        b=js9uzmrtfJYwD2jxDd28AgSpezbpH+UhqoUXlEVFlmGFrBacumDMHuXlaj5+Eiv3+V
-         MKwO4cHNRc5hQnG64at/0E2IuLQiSc7LoDV8Ch9VaY1O+KPCNjQ/JoR1Dekim7duK7fp
-         DvhECZ1s0tD/zIeayfFkrK0pwUX/MOr9NRai4LPqKg56Entx6/cfbdOIBO9sXtzgL58R
-         a005t308VQp3wha+en8GOsn8XrN07XEapESwi0nr9YSyaXBTyJetgzLyxTfosxhsJeWH
-         Sw+NMu1XzNJMdITS1+ThfmsXb0aaLyiROTTqFR7XkQGepwH/c2THP68mCeI+B618qONs
-         vbVA==
-X-Gm-Message-State: AAQBX9dCYjFiMg1nR33zgnk5XRmE/9etz3EEPN+Y2G6lLlqH3FohuO3z
-	yqXmnu2DdrU8uilGGceKvCTinWIzjIwt4Q==
-X-Google-Smtp-Source: AKy350alXc1ONRhUA7XIa28nLbvt2XJ7sqqCYuAOmq3t7gBkrrJYXz7/rkS9YfIcmDF6ZbQaMcb/Aw==
-X-Received: by 2002:a17:903:22cc:b0:1a6:7570:5370 with SMTP id y12-20020a17090322cc00b001a675705370mr6297746plg.10.1681911412748;
-        Wed, 19 Apr 2023 06:36:52 -0700 (PDT)
+        bh=on3F8pM3p3B9OClirjfPRYd2TCLDzgp9dJKToJBsoLE=;
+        b=YXf0rXXf/YKry2sHbd7CqsaQMP4Mh3nttzfv30nV7U/T6MTzfTE1niGZffm42btkFx
+         5FgHWkpRLNhxy8hdohGvRcgE6HGdDZBfiKB1tJVby1czcMbNz58+fsFbXoYeNG7IBFcQ
+         dYpnAYTaAeqbuEHjk0RT5bRUYFT8d10GbdO3TzwlnEK4nbjGLPGEUbDsDfUuL9UIsKCQ
+         o3SNrx8adgr0EvGUNnKZZsxHM8tOZ87rt35xWAv5U8cjngD6QJWZCXW+SLe75L6PRf4S
+         msHOF6doh/c8MKyjcyYOuEPU5FU5/dY2abBD1MYc8lNCJefUZ12vCKFEqk3B4KRYUEuT
+         XMZA==
+X-Gm-Message-State: AAQBX9c5HC76oA0Glh61USJkk+1lwu5Vxwz4fgROgiL9Ium8a5a9c+r0
+	C7k1UfGKqngb04mqa2Doq8DB8wNuHd99Sw==
+X-Google-Smtp-Source: AKy350aednu5oBp7h8YO3r+lKDMkIRtI+RAxeonBIF+ewZH3h1mRowihayQ3GZqOTl5W+jZZZHUuQA==
+X-Received: by 2002:a17:902:db01:b0:1a6:d46b:dfb5 with SMTP id m1-20020a170902db0100b001a6d46bdfb5mr6253884plx.26.1681912279619;
+        Wed, 19 Apr 2023 06:51:19 -0700 (PDT)
 Received: from [172.27.232.10] (ec2-16-163-40-128.ap-east-1.compute.amazonaws.com. [16.163.40.128])
-        by smtp.gmail.com with ESMTPSA id b5-20020a170902bd4500b0019a8530c063sm11407873plx.102.2023.04.19.06.36.48
+        by smtp.gmail.com with ESMTPSA id w8-20020a170902904800b001a239325f1csm11398221plz.100.2023.04.19.06.51.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Apr 2023 06:36:52 -0700 (PDT)
-Message-ID: <a43e5deb-211a-c4c0-6b1d-7715c3665017@gmail.com>
-Date: Wed, 19 Apr 2023 21:36:46 +0800
+        Wed, 19 Apr 2023 06:51:19 -0700 (PDT)
+Message-ID: <e73e9a97-3c76-fa71-b481-c0673e8562de@gmail.com>
+Date: Wed, 19 Apr 2023 21:51:12 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,185 +48,454 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.10.0
-From: Hoo Robert <robert.hoo.linux@gmail.com>
-Subject: Re: [PATCH v3 02/22] KVM: selftests: Use EPOLL in userfaultfd_util
- reader threads and signal errors via TEST_ASSERT
+Subject: Re: [PATCH v3 01/22] KVM: selftests: Allow many vCPUs and reader
+ threads per UFFD in demand paging test
+Content-Language: en-US
 To: Anish Moorthy <amoorthy@google.com>, pbonzini@redhat.com, maz@kernel.org
 Cc: oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com,
  bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
  axelrasmussen@google.com, peterx@redhat.com, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
 References: <20230412213510.1220557-1-amoorthy@google.com>
- <20230412213510.1220557-3-amoorthy@google.com>
-Content-Language: en-US
-In-Reply-To: <20230412213510.1220557-3-amoorthy@google.com>
+ <20230412213510.1220557-2-amoorthy@google.com>
+From: Hoo Robert <robert.hoo.linux@gmail.com>
+In-Reply-To: <20230412213510.1220557-2-amoorthy@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 4/13/2023 5:34 AM, Anish Moorthy wrote:
-> With multiple reader threads POLLing a single UFFD, the test suffers
-> from the thundering herd problem: performance degrades as the number of
-> reader threads is increased. Solve this issue [1] by switching the
-> the polling mechanism to EPOLL + EPOLLEXCLUSIVE.
+> At the moment, demand_paging_test does not support profiling/testing
+> multiple vCPU threads concurrently faulting on a single uffd because
 > 
-> Also, change the error-handling convention of uffd_handler_thread_fn.
-> Instead of just printing errors and returning early from the polling
-> loop, check for them via TEST_ASSERT. "return NULL" is reserved for a
-> successful exit from uffd_handler_thread_fn, ie one triggered by a
-> write to the exit pipe.
+>      (a) "-u" (run test in userfaultfd mode) creates a uffd for each vCPU's
+>          region, so that each uffd services a single vCPU thread.
+>      (b) "-u -o" (userfaultfd mode + overlapped vCPU memory accesses)
+>          simply doesn't work: the test tries to register the same memory
+>          to multiple uffds, causing an error.
 > 
-> Performance samples generated by the command in [2] are given below.
+> Add support for many vcpus per uffd by
+>      (1) Keeping "-u" behavior unchanged.
+>      (2) Making "-u -a" create a single uffd for all of guest memory.
+>      (3) Making "-u -o" implicitly pass "-a", solving the problem in (b).
+> In cases (2) and (3) all vCPU threads fault on a single uffd.
 > 
-> Num Reader Threads, Paging Rate (POLL), Paging Rate (EPOLL)
-> 1      249k      185k
-> 2      201k      235k
-> 4      186k      155k
-> 16     150k      217k
-> 32     89k       198k
-> 
-> [1] Single-vCPU performance does suffer somewhat.
-> [2] ./demand_paging_test -u MINOR -s shmem -v 4 -o -r <num readers>
+> With multiple potentially multiple vCPU per UFFD, it makes sense to
+        ^^^^^^^^
+redundant "multiple"?
+
+> allow configuring the number reader threads per UFFD as well: add the
+> "-r" flag to do so.
 > 
 > Signed-off-by: Anish Moorthy <amoorthy@google.com>
 > Acked-by: James Houghton <jthoughton@google.com>
 > ---
->   .../selftests/kvm/demand_paging_test.c        |  1 -
->   .../selftests/kvm/lib/userfaultfd_util.c      | 74 +++++++++----------
->   2 files changed, 35 insertions(+), 40 deletions(-)
+>   .../selftests/kvm/aarch64/page_fault_test.c   |  4 +-
+>   .../selftests/kvm/demand_paging_test.c        | 62 +++++++++----
+>   .../selftests/kvm/include/userfaultfd_util.h  | 18 +++-
+>   .../selftests/kvm/lib/userfaultfd_util.c      | 86 +++++++++++++------
+>   4 files changed, 124 insertions(+), 46 deletions(-)
 > 
+> diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+> index df10f1ffa20d9..3b6d228a9340d 100644
+> --- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+> +++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+> @@ -376,14 +376,14 @@ static void setup_uffd(struct kvm_vm *vm, struct test_params *p,
+>   		*pt_uffd = uffd_setup_demand_paging(uffd_mode, 0,
+>   						    pt_args.hva,
+>   						    pt_args.paging_size,
+> -						    test->uffd_pt_handler);
+> +						    1, test->uffd_pt_handler);
+>   
+>   	*data_uffd = NULL;
+>   	if (test->uffd_data_handler)
+>   		*data_uffd = uffd_setup_demand_paging(uffd_mode, 0,
+>   						      data_args.hva,
+>   						      data_args.paging_size,
+> -						      test->uffd_data_handler);
+> +						      1, test->uffd_data_handler);
+>   }
+>   
+>   static void free_uffd(struct test_desc *test, struct uffd_desc *pt_uffd,
 > diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-> index 6c2253f4a64ef..c729cee4c2055 100644
+> index b0e1fc4de9e29..6c2253f4a64ef 100644
 > --- a/tools/testing/selftests/kvm/demand_paging_test.c
 > +++ b/tools/testing/selftests/kvm/demand_paging_test.c
-> @@ -13,7 +13,6 @@
->   #include <stdio.h>
->   #include <stdlib.h>
->   #include <time.h>
-> -#include <poll.h>
->   #include <pthread.h>
->   #include <linux/userfaultfd.h>
->   #include <sys/syscall.h>
+> @@ -77,9 +77,15 @@ static int handle_uffd_page_request(int uffd_mode, int uffd,
+>   		copy.mode = 0;
+>   
+>   		r = ioctl(uffd, UFFDIO_COPY, &copy);
+> -		if (r == -1) {
+> -			pr_info("Failed UFFDIO_COPY in 0x%lx from thread %d with errno: %d\n",
+> -				addr, tid, errno);
+> +		/*
+> +		 * With multiple vCPU threads fault on a single page and there are
+> +		 * multiple readers for the UFFD, at least one of the UFFDIO_COPYs
+> +		 * will fail with EEXIST: handle that case without signaling an
+> +		 * error.
+> +		 */
+
+But this code path is also gone through in other cases, isn't it? In
+those cases, is it still safe to ignore EEXIST?
+
+> +		if (r == -1 && errno != EEXIST) {
+> +			pr_info("Failed UFFDIO_COPY in 0x%lx from thread %d, errno = %d\n",
+> +					addr, tid, errno);
+
+unintended indent changes I think.
+
+>   			return r;
+>   		}
+>   	} else if (uffd_mode == UFFDIO_REGISTER_MODE_MINOR) {
+> @@ -89,9 +95,10 @@ static int handle_uffd_page_request(int uffd_mode, int uffd,
+>   		cont.range.len = demand_paging_size;
+>   
+>   		r = ioctl(uffd, UFFDIO_CONTINUE, &cont);
+> -		if (r == -1) {
+> -			pr_info("Failed UFFDIO_CONTINUE in 0x%lx from thread %d with errno: %d\n",
+> -				addr, tid, errno);
+> +		/* See the note about EEXISTs in the UFFDIO_COPY branch. */
+
+Personally I would suggest copy the comments here. what if some day above
+code/comment was changed/deleted?
+
+> +		if (r == -1 && errno != EEXIST) {
+> +			pr_info("Failed UFFDIO_CONTINUE in 0x%lx, thread %d, errno = %d\n",
+> +					addr, tid, errno);
+
+Ditto
+
+>   			return r;
+>   		}
+>   	} else {
+> @@ -110,7 +117,9 @@ static int handle_uffd_page_request(int uffd_mode, int uffd,
+>   
+>   struct test_params {
+>   	int uffd_mode;
+> +	bool single_uffd;
+>   	useconds_t uffd_delay;
+> +	int readers_per_uffd;
+>   	enum vm_mem_backing_src_type src_type;
+>   	bool partition_vcpu_memory_access;
+>   };
+> @@ -133,7 +142,8 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>   	struct timespec start;
+>   	struct timespec ts_diff;
+>   	struct kvm_vm *vm;
+> -	int i;
+> +	int i, num_uffds = 0;
+> +	uint64_t uffd_region_size;
+>   
+>   	vm = memstress_create_vm(mode, nr_vcpus, guest_percpu_mem_size, 1,
+>   				 p->src_type, p->partition_vcpu_memory_access);
+> @@ -146,10 +156,13 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>   	memset(guest_data_prototype, 0xAB, demand_paging_size);
+>   
+>   	if (p->uffd_mode) {
+> -		uffd_descs = malloc(nr_vcpus * sizeof(struct uffd_desc *));
+> +		num_uffds = p->single_uffd ? 1 : nr_vcpus;
+> +		uffd_region_size = nr_vcpus * guest_percpu_mem_size / num_uffds;
+> +
+> +		uffd_descs = malloc(num_uffds * sizeof(struct uffd_desc *));
+>   		TEST_ASSERT(uffd_descs, "Memory allocation failed");
+>   
+> -		for (i = 0; i < nr_vcpus; i++) {
+> +		for (i = 0; i < num_uffds; i++) {
+>   			struct memstress_vcpu_args *vcpu_args;
+>   			void *vcpu_hva;
+>   			void *vcpu_alias;
+> @@ -160,8 +173,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>   			vcpu_hva = addr_gpa2hva(vm, vcpu_args->gpa);
+>   			vcpu_alias = addr_gpa2alias(vm, vcpu_args->gpa);
+>   
+> -			prefault_mem(vcpu_alias,
+> -				vcpu_args->pages * memstress_args.guest_page_size);
+> +			prefault_mem(vcpu_alias, uffd_region_size);
+>   
+>   			/*
+>   			 * Set up user fault fd to handle demand paging
+> @@ -169,7 +181,8 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>   			 */
+>   			uffd_descs[i] = uffd_setup_demand_paging(
+>   				p->uffd_mode, p->uffd_delay, vcpu_hva,
+> -				vcpu_args->pages * memstress_args.guest_page_size,
+> +				uffd_region_size,
+> +				p->readers_per_uffd,
+>   				&handle_uffd_page_request);
+>   		}
+>   	}
+> @@ -186,7 +199,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>   
+>   	if (p->uffd_mode) {
+>   		/* Tell the user fault fd handler threads to quit */
+> -		for (i = 0; i < nr_vcpus; i++)
+> +		for (i = 0; i < num_uffds; i++)
+>   			uffd_stop_demand_paging(uffd_descs[i]);
+>   	}
+>   
+> @@ -206,14 +219,19 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>   static void help(char *name)
+>   {
+>   	puts("");
+> -	printf("usage: %s [-h] [-m vm_mode] [-u uffd_mode] [-d uffd_delay_usec]\n"
+> -	       "          [-b memory] [-s type] [-v vcpus] [-o]\n", name);
+> +	printf("usage: %s [-h] [-m vm_mode] [-u uffd_mode] [-a]\n"
+> +		   "          [-d uffd_delay_usec] [-r readers_per_uffd] [-b memory]\n"
+> +		   "          [-s type] [-v vcpus] [-o]\n", name);
+
+Ditto
+
+>   	guest_modes_help();
+>   	printf(" -u: use userfaultfd to handle vCPU page faults. Mode is a\n"
+>   	       "     UFFD registration mode: 'MISSING' or 'MINOR'.\n");
+> +	printf(" -a: Use a single userfaultfd for all of guest memory, instead of\n"
+> +		   "     creating one for each region paged by a unique vCPU\n"
+> +		   "     Set implicitly with -o, and no effect without -u.\n");
+
+Ditto
+
+>   	printf(" -d: add a delay in usec to the User Fault\n"
+>   	       "     FD handler to simulate demand paging\n"
+>   	       "     overheads. Ignored without -u.\n");
+> +	printf(" -r: Set the number of reader threads per uffd.\n");
+>   	printf(" -b: specify the size of the memory region which should be\n"
+>   	       "     demand paged by each vCPU. e.g. 10M or 3G.\n"
+>   	       "     Default: 1G\n");
+> @@ -231,12 +249,14 @@ int main(int argc, char *argv[])
+>   	struct test_params p = {
+>   		.src_type = DEFAULT_VM_MEM_SRC,
+>   		.partition_vcpu_memory_access = true,
+> +		.readers_per_uffd = 1,
+> +		.single_uffd = false,
+>   	};
+>   	int opt;
+>   
+>   	guest_modes_append_default();
+>   
+> -	while ((opt = getopt(argc, argv, "hm:u:d:b:s:v:o")) != -1) {
+> +	while ((opt = getopt(argc, argv, "ahom:u:d:b:s:v:r:")) != -1) {
+>   		switch (opt) {
+>   		case 'm':
+>   			guest_modes_cmdline(optarg);
+> @@ -248,6 +268,9 @@ int main(int argc, char *argv[])
+>   				p.uffd_mode = UFFDIO_REGISTER_MODE_MINOR;
+>   			TEST_ASSERT(p.uffd_mode, "UFFD mode must be 'MISSING' or 'MINOR'.");
+>   			break;
+> +		case 'a':
+> +			p.single_uffd = true;
+> +			break;
+>   		case 'd':
+>   			p.uffd_delay = strtoul(optarg, NULL, 0);
+>   			TEST_ASSERT(p.uffd_delay >= 0, "A negative UFFD delay is not supported.");
+> @@ -265,6 +288,13 @@ int main(int argc, char *argv[])
+>   			break;
+>   		case 'o':
+>   			p.partition_vcpu_memory_access = false;
+> +			p.single_uffd = true;
+> +			break;
+> +		case 'r':
+> +			p.readers_per_uffd = atoi(optarg);
+> +			TEST_ASSERT(p.readers_per_uffd >= 1,
+> +						"Invalid number of readers per uffd %d: must be >=1",
+> +						p.readers_per_uffd);
+>   			break;
+>   		case 'h':
+>   		default:
+> diff --git a/tools/testing/selftests/kvm/include/userfaultfd_util.h b/tools/testing/selftests/kvm/include/userfaultfd_util.h
+> index 877449c345928..92cc1f9ec0686 100644
+> --- a/tools/testing/selftests/kvm/include/userfaultfd_util.h
+> +++ b/tools/testing/selftests/kvm/include/userfaultfd_util.h
+> @@ -17,18 +17,30 @@
+>   
+>   typedef int (*uffd_handler_t)(int uffd_mode, int uffd, struct uffd_msg *msg);
+>   
+> +struct uffd_reader_args {
+> +	int uffd_mode;
+> +	int uffd;
+> +	useconds_t delay;
+> +	uffd_handler_t handler;
+> +	/* Holds the read end of the pipe for killing the reader. */
+> +	int pipe;
+> +};
+> +
+>   struct uffd_desc {
+>   	int uffd_mode;
+>   	int uffd;
+> -	int pipefds[2];
+>   	useconds_t delay;
+>   	uffd_handler_t handler;
+> -	pthread_t thread;
+> +	uint64_t num_readers;
+> +	/* Holds the write ends of the pipes for killing the readers. */
+> +	int *pipefds;
+> +	pthread_t *readers;
+> +	struct uffd_reader_args *reader_args;
+>   };
+>   
+>   struct uffd_desc *uffd_setup_demand_paging(int uffd_mode, useconds_t delay,
+>   					   void *hva, uint64_t len,
+> -					   uffd_handler_t handler);
+> +					   uint64_t num_readers, uffd_handler_t handler);
+>   
+>   void uffd_stop_demand_paging(struct uffd_desc *uffd);
+>   
 > diff --git a/tools/testing/selftests/kvm/lib/userfaultfd_util.c b/tools/testing/selftests/kvm/lib/userfaultfd_util.c
-> index 2723ee1e3e1b2..909ad69c1cb04 100644
+> index 92cef20902f1f..2723ee1e3e1b2 100644
 > --- a/tools/testing/selftests/kvm/lib/userfaultfd_util.c
 > +++ b/tools/testing/selftests/kvm/lib/userfaultfd_util.c
-> @@ -16,6 +16,7 @@
->   #include <poll.h>
->   #include <pthread.h>
->   #include <linux/userfaultfd.h>
-> +#include <sys/epoll.h>
->   #include <sys/syscall.h>
+> @@ -27,10 +27,8 @@
 >   
->   #include "kvm_util.h"
-> @@ -32,60 +33,55 @@ static void *uffd_handler_thread_fn(void *arg)
+>   static void *uffd_handler_thread_fn(void *arg)
+>   {
+> -	struct uffd_desc *uffd_desc = (struct uffd_desc *)arg;
+> -	int uffd = uffd_desc->uffd;
+> -	int pipefd = uffd_desc->pipefds[0];
+> -	useconds_t delay = uffd_desc->delay;
+> +	struct uffd_reader_args *reader_args = (struct uffd_reader_args *)arg;
+> +	int uffd = reader_args->uffd;
 >   	int64_t pages = 0;
 >   	struct timespec start;
 >   	struct timespec ts_diff;
-> +	int epollfd;
-> +	struct epoll_event evt;
-> +
-> +	epollfd = epoll_create(1);
-> +	TEST_ASSERT(epollfd >= 0, "Failed to create epollfd.");
-> +
-> +	evt.events = EPOLLIN | EPOLLEXCLUSIVE;
-> +	evt.data.u32 = 0;
-> +	TEST_ASSERT(epoll_ctl(epollfd, EPOLL_CTL_ADD, uffd, &evt) == 0,
-> +				"Failed to add uffd to epollfd");
-> +
-> +	evt.events = EPOLLIN;
-> +	evt.data.u32 = 1;
-> +	TEST_ASSERT(epoll_ctl(epollfd, EPOLL_CTL_ADD, reader_args->pipe, &evt) == 0,
-> +				"Failed to add pipe to epollfd");
+> @@ -44,7 +42,7 @@ static void *uffd_handler_thread_fn(void *arg)
 >   
->   	clock_gettime(CLOCK_MONOTONIC, &start);
->   	while (1) {
->   		struct uffd_msg msg;
-> -		struct pollfd pollfd[2];
-> -		char tmp_chr;
->   		int r;
+>   		pollfd[0].fd = uffd;
+>   		pollfd[0].events = POLLIN;
+> -		pollfd[1].fd = pipefd;
+> +		pollfd[1].fd = reader_args->pipe;
+>   		pollfd[1].events = POLLIN;
 >   
-> -		pollfd[0].fd = uffd;
-> -		pollfd[0].events = POLLIN;
-> -		pollfd[1].fd = reader_args->pipe;
-> -		pollfd[1].events = POLLIN;
-> -
-> -		r = poll(pollfd, 2, -1);
-> -		switch (r) {
-> -		case -1:
-> -			pr_info("poll err");
-> -			continue;
-> -		case 0:
-> -			continue;
-> -		case 1:
-> -			break;
-> -		default:
-> -			pr_info("Polling uffd returned %d", r);
-> -			return NULL;
-> -		}
-> +		r = epoll_wait(epollfd, &evt, 1, -1);
-> +		TEST_ASSERT(r == 1,
-> +					"Unexpected number of events (%d) from epoll, errno = %d",
-> +					r, errno);
->   
-too much indentation, also seen elsewhere.
-
-> -		if (pollfd[0].revents & POLLERR) {
-> -			pr_info("uffd revents has POLLERR");
-> -			return NULL;
-> -		}
-> +		if (evt.data.u32 == 1) {
-> +			char tmp_chr;
->   
-> -		if (pollfd[1].revents & POLLIN) {
-> -			r = read(pollfd[1].fd, &tmp_chr, 1);
-> +			TEST_ASSERT(!(evt.events & (EPOLLERR | EPOLLHUP)),
-> +						"Reader thread received EPOLLERR or EPOLLHUP on pipe.");
-> +			r = read(reader_args->pipe, &tmp_chr, 1);
->   			TEST_ASSERT(r == 1,
-> -				    "Error reading pipefd in UFFD thread\n");
-> +						"Error reading pipefd in uffd reader thread");
->   			return NULL;
-
-How about goto
-	ts_diff = timespec_elapsed(start);
-Otherwise last stats won't get chances to be calc'ed.
-
->   		}
->   
-> -		if (!(pollfd[0].revents & POLLIN))
-> -			continue;
-> +		TEST_ASSERT(!(evt.events & (EPOLLERR | EPOLLHUP)),
-> +					"Reader thread received EPOLLERR or EPOLLHUP on uffd.");
->   
->   		r = read(uffd, &msg, sizeof(msg));
->   		if (r == -1) {
-> -			if (errno == EAGAIN)
-> -				continue;
-> -			pr_info("Read of uffd got errno %d\n", errno);
-> -			return NULL;
-> +			TEST_ASSERT(errno == EAGAIN,
-> +						"Error reading from UFFD: errno = %d", errno);
-> +			continue;
->   		}
->   
-> -		if (r != sizeof(msg)) {
-> -			pr_info("Read on uffd returned unexpected size: %d bytes", r);
-> -			return NULL;
-> -		}
-> +		TEST_ASSERT(r == sizeof(msg),
-> +					"Read on uffd returned unexpected number of bytes (%d)", r);
->   
+>   		r = poll(pollfd, 2, -1);
+> @@ -92,9 +90,9 @@ static void *uffd_handler_thread_fn(void *arg)
 >   		if (!(msg.event & UFFD_EVENT_PAGEFAULT))
 >   			continue;
-> @@ -93,8 +89,8 @@ static void *uffd_handler_thread_fn(void *arg)
->   		if (reader_args->delay)
->   			usleep(reader_args->delay);
->   		r = reader_args->handler(reader_args->uffd_mode, uffd, &msg);
-> -		if (r < 0)
-> -			return NULL;
-> +		TEST_ASSERT(r >= 0,
-> +					"Reader thread handler fn returned negative value %d", r);
+>   
+> -		if (delay)
+> -			usleep(delay);
+> -		r = uffd_desc->handler(uffd_desc->uffd_mode, uffd, &msg);
+> +		if (reader_args->delay)
+> +			usleep(reader_args->delay);
+> +		r = reader_args->handler(reader_args->uffd_mode, uffd, &msg);
+>   		if (r < 0)
+>   			return NULL;
 >   		pages++;
->   	}
+> @@ -110,7 +108,7 @@ static void *uffd_handler_thread_fn(void *arg)
+>   
+>   struct uffd_desc *uffd_setup_demand_paging(int uffd_mode, useconds_t delay,
+>   					   void *hva, uint64_t len,
+> -					   uffd_handler_t handler)
+> +					   uint64_t num_readers, uffd_handler_t handler)
+>   {
+>   	struct uffd_desc *uffd_desc;
+>   	bool is_minor = (uffd_mode == UFFDIO_REGISTER_MODE_MINOR);
+> @@ -118,14 +116,26 @@ struct uffd_desc *uffd_setup_demand_paging(int uffd_mode, useconds_t delay,
+>   	struct uffdio_api uffdio_api;
+>   	struct uffdio_register uffdio_register;
+>   	uint64_t expected_ioctls = ((uint64_t) 1) << _UFFDIO_COPY;
+> -	int ret;
+> +	int ret, i;
+>   
+>   	PER_PAGE_DEBUG("Userfaultfd %s mode, faults resolved with %s\n",
+>   		       is_minor ? "MINOR" : "MISSING",
+>   		       is_minor ? "UFFDIO_CONINUE" : "UFFDIO_COPY");
+>   
+>   	uffd_desc = malloc(sizeof(struct uffd_desc));
+> -	TEST_ASSERT(uffd_desc, "malloc failed");
+> +	TEST_ASSERT(uffd_desc, "Failed to malloc uffd descriptor");
+> +
+> +	uffd_desc->pipefds = malloc(sizeof(int) * num_readers);
+> +	TEST_ASSERT(uffd_desc->pipefds, "Failed to malloc pipes");
+> +
+> +	uffd_desc->readers = malloc(sizeof(pthread_t) * num_readers);
+> +	TEST_ASSERT(uffd_desc->readers, "Failed to malloc reader threads");
+> +
+> +	uffd_desc->reader_args = malloc(
+> +		sizeof(struct uffd_reader_args) * num_readers);
+> +	TEST_ASSERT(uffd_desc->reader_args, "Failed to malloc reader_args");
+> +
+> +	uffd_desc->num_readers = num_readers;
+>   
+>   	/* In order to get minor faults, prefault via the alias. */
+>   	if (is_minor)
+> @@ -148,18 +158,32 @@ struct uffd_desc *uffd_setup_demand_paging(int uffd_mode, useconds_t delay,
+>   	TEST_ASSERT((uffdio_register.ioctls & expected_ioctls) ==
+>   		    expected_ioctls, "missing userfaultfd ioctls");
+>   
+> -	ret = pipe2(uffd_desc->pipefds, O_CLOEXEC | O_NONBLOCK);
+> -	TEST_ASSERT(!ret, "Failed to set up pipefd");
+> -
+>   	uffd_desc->uffd_mode = uffd_mode;
+>   	uffd_desc->uffd = uffd;
+>   	uffd_desc->delay = delay;
+>   	uffd_desc->handler = handler;
+
+Now that these info are encapsulated into reader args below, looks
+unnecessary to have them in uffd_desc here.
+
+> -	pthread_create(&uffd_desc->thread, NULL, uffd_handler_thread_fn,
+> -		       uffd_desc);
+>   
+> -	PER_VCPU_DEBUG("Created uffd thread for HVA range [%p, %p)\n",
+> -		       hva, hva + len);
+> +	for (i = 0; i < uffd_desc->num_readers; ++i) {
+> +		int pipes[2];
+> +
+> +		ret = pipe2((int *) &pipes, O_CLOEXEC | O_NONBLOCK);
+> +		TEST_ASSERT(!ret, "Failed to set up pipefd %i for uffd_desc %p",
+> +					i, uffd_desc);
+> +
+> +		uffd_desc->pipefds[i] = pipes[1];
+> +
+> +		uffd_desc->reader_args[i].uffd_mode = uffd_mode;
+> +		uffd_desc->reader_args[i].uffd = uffd;
+> +		uffd_desc->reader_args[i].delay = delay;
+> +		uffd_desc->reader_args[i].handler = handler;
+> +		uffd_desc->reader_args[i].pipe = pipes[0];
+> +
+> +		pthread_create(&uffd_desc->readers[i], NULL, uffd_handler_thread_fn,
+> +					   &uffd_desc->reader_args[i]);
+> +
+> +		PER_VCPU_DEBUG("Created uffd thread %i for HVA range [%p, %p)\n",
+> +					   i, hva, hva + len);
+> +	}
+>   
+>   	return uffd_desc;
+>   }
+> @@ -167,19 +191,31 @@ struct uffd_desc *uffd_setup_demand_paging(int uffd_mode, useconds_t delay,
+>   void uffd_stop_demand_paging(struct uffd_desc *uffd)
+>   {
+>   	char c = 0;
+> -	int ret;
+> +	int i, ret;
+>   
+> -	ret = write(uffd->pipefds[1], &c, 1);
+> -	TEST_ASSERT(ret == 1, "Unable to write to pipefd");
+> +	for (i = 0; i < uffd->num_readers; ++i) {
+> +		ret = write(uffd->pipefds[i], &c, 1);
+> +		TEST_ASSERT(
+> +			ret == 1, "Unable to write to pipefd %i for uffd_desc %p", i, uffd);
+> +	}
+>   
+> -	ret = pthread_join(uffd->thread, NULL);
+> -	TEST_ASSERT(ret == 0, "Pthread_join failed.");
+> +	for (i = 0; i < uffd->num_readers; ++i) {
+> +		ret = pthread_join(uffd->readers[i], NULL);
+> +		TEST_ASSERT(
+> +			ret == 0,
+> +			"Pthread_join failed on reader thread %i for uffd_desc %p", i, uffd);
+> +	}
+>   
+>   	close(uffd->uffd);
+>   
+> -	close(uffd->pipefds[1]);
+> -	close(uffd->pipefds[0]);
+> +	for (i = 0; i < uffd->num_readers; ++i) {
+> +		close(uffd->pipefds[i]);
+> +		close(uffd->reader_args[i].pipe);
+> +	}
+>   
+> +	free(uffd->pipefds);
+> +	free(uffd->readers);
+> +	free(uffd->reader_args);
+>   	free(uffd);
+>   }
 >   
 
