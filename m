@@ -1,40 +1,40 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6175D15A8
-	for <kvmarm@lists.linux.dev>; Wed, 19 Apr 2023 02:19:07 +0000 (UTC)
-Received: by mail-yb1-f202.google.com with SMTP id f66-20020a255145000000b00b7f75c3cafdso12592451ybb.16
-        for <kvmarm@lists.linux.dev>; Tue, 18 Apr 2023 19:19:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC21F15A8
+	for <kvmarm@lists.linux.dev>; Wed, 19 Apr 2023 02:19:09 +0000 (UTC)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-552f169d85eso51570627b3.13
+        for <kvmarm@lists.linux.dev>; Tue, 18 Apr 2023 19:19:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681870746; x=1684462746;
+        d=google.com; s=20221208; t=1681870748; x=1684462748;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=z7zzcGDZPbSte4f8fT9vbCw5LuF4xstdxjEG9JI5LdU=;
-        b=1BpmpgNYdsRKvRk6qrTEJbdcclnYFCXUZ1sKONbsw5Ac+UIEhNn+Cnjg4xjnCGB5JQ
-         Shim51D/sV8i+svuoxMw06bFf0Ucel+aJs/jZJJQ1BNVWu7V4xKCnMR7ZBqzsal8nEcV
-         kZiYnCBxW/ZfmJF0FbIPl2er+nfPek/CxhnGqU0yeGxTQkO0OY60TJ9f3whZk7pwzDPA
-         rVKqlgZTUyLiVhks/K6jyM9QOfSJkfori6PQ0DzF2ye/sOHYLOlYUmsp0B2Nv5eywmkS
-         EwDe+BL0VSwDvG3ugu5GwSLOR0/NsBzFakFVtuLsKy/yuAWsB+PVHPnR285JBPVa1X9+
-         hNhw==
+        bh=xOVoOXEuKgQg2tBCLrjO+Ie6Feguqmtzji3r08inyQ8=;
+        b=GBpDxzuZ8iJftmRFbQ4u416CLpAaocgcZ258FLuBJdT5LXUXVoFni09Eq8Jyypgsdi
+         i3e3mWkR61bQcOBiE2Na5nyLZ9Vodg+T18Ab03ypVpChrLseDg7l+pl9A/nIiyCxU2oa
+         rXUs/G8SdfeIcRJ9MrRo96XWQfkkPzlaaoYvG8YVrySHFFhSYSJlQNXpboOcNU7QnRi2
+         N23NYdPybyffUM3dTo4131YLhg/3VGFXDfAx0oFFH9pojA5Pwdv2A7+FS+yWFrvLJImB
+         EZfnFhoF34L7GoYAEWgrIRv2pu3Dzo4nE9mWrei7GCzVdLnkXrcmMY5eeBzO40mvwy/g
+         rw+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681870746; x=1684462746;
+        d=1e100.net; s=20221208; t=1681870748; x=1684462748;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z7zzcGDZPbSte4f8fT9vbCw5LuF4xstdxjEG9JI5LdU=;
-        b=dm3Tt/FhaLJvLlA2b7PKO+RPijp2SPeVArT7kTbkDH62H/VZzwPYrKnQhGwlVhuYFL
-         GRhdLYaNSBgZBFi21HhqW7KqKgiIyQETDTcAEFCN1qK78HG+iZGTeKi2cxGOGrSUQyC0
-         9ukZgTIPrbBoJj+vLG3brCq1CJSsfOCkK14xvRdP6epaEzhQoyKMcfWRgGNm9/QBVXkh
-         Lv+oW/fSEE7w4W6QpvULObXVPiDnPOpXg46eJ0E9+68DshWTIC5a7YLZYVDXntKt6IV0
-         xk7zRHETW795lLX/027Mzo35/KFEg4HTG13z9+B7T7hCNeVPXuUlYpFGOF+EyWaCcCWN
-         pMlA==
-X-Gm-Message-State: AAQBX9fOjT/QjJx8dDKLcPnR0iJVUq5SMg4CG3DSdpyLJk8HJ1U21f2L
-	44r958i13sv/H98wLFHGAZ0fxfbFR0U=
-X-Google-Smtp-Source: AKy350Z/I1GCXlm8WzCDIqkLOeoag4XllnSKJRp0ZAYYdDCimf2ANR08QBaZ+Z2bMGMmbTBDeu0l1oEfJ0E=
+        bh=xOVoOXEuKgQg2tBCLrjO+Ie6Feguqmtzji3r08inyQ8=;
+        b=l2JvtU3eFqSCahWpggt5EDTkiz9ld2du0BoZQI+RJVQ/hdrkDNgiKIJKz7BYLsfGrl
+         7b6xnRW0PAe3nQdwrBmwGiXt4XfLkFoY3b1jR5cef/KMKH+JN6STq7Wfzgw9pxDOBc2f
+         cUwXvNnepIgfu25cT3nY8y0g3F8LNUvkzrvRzJP1d204Yo76JxEX65a6BaTKRk5M3jM+
+         hLRszaqd+VN889aLYZcpMZhcUZde9x0DIBWpj56SRxrdJT+YbIcs8EsiG73/4Rnm9v+x
+         BpXXD+P6sGvuG2qA6Joe/JNU8WfIZSjR9svA7Gz5h5G9HOhAzUXbcaXQcgGDdNANv2RG
+         QNyA==
+X-Gm-Message-State: AAQBX9dyGDzO4OWiCkwnvLADFHno6KDqaQzh1Ld5RRkhixm+OzHREIzZ
+	SuSOrD2o288tL3A+fddhS7GbZ9fmx8U=
+X-Google-Smtp-Source: AKy350ZAJNC+m10rAkRY8MhHkLcGAFWbMx7c2WWQF2YMC1seAPFdQ+q3ICVHOmnhHJFjhA4DMarFTvB+Emo=
 X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a25:d814:0:b0:b96:7676:db47 with SMTP id
- p20-20020a25d814000000b00b967676db47mr433801ybg.13.1681870746505; Tue, 18 Apr
- 2023 19:19:06 -0700 (PDT)
-Date: Tue, 18 Apr 2023 19:18:51 -0700
+ (user=reijiw job=sendgmr) by 2002:a25:d68c:0:b0:b92:25bf:a6ba with SMTP id
+ n134-20020a25d68c000000b00b9225bfa6bamr7234069ybg.6.1681870748829; Tue, 18
+ Apr 2023 19:19:08 -0700 (PDT)
+Date: Tue, 18 Apr 2023 19:18:52 -0700
 In-Reply-To: <20230419021852.2981107-1-reijiw@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230419021852.2981107-1-reijiw@google.com>
 X-Mailer: git-send-email 2.40.0.396.gfff15efe05-goog
-Message-ID: <20230419021852.2981107-2-reijiw@google.com>
-Subject: [PATCH v1 1/2] KVM: arm64: Acquire mp_state_lock in kvm_arch_vcpu_ioctl_vcpu_init()
+Message-ID: <20230419021852.2981107-3-reijiw@google.com>
+Subject: [PATCH v1 2/2] KVM: arm64: Have kvm_psci_vcpu_on() use WRITE_ONCE()
+ to update mp_state
 From: Reiji Watanabe <reijiw@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
@@ -56,32 +57,29 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	Will Deacon <will@kernel.org>, Reiji Watanabe <reijiw@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-kvm_arch_vcpu_ioctl_vcpu_init() doesn't acquire mp_state_lock
-when setting the mp_state to KVM_MP_STATE_RUNNABLE. Fix the
-code to acquire the lock.
+All accessors of kvm_vcpu_arch::mp_state should be {READ,WRITE}_ONCE(),
+since readers of the mp_state don't acquire the mp_state_lock.
+Nonetheless, kvm_psci_vcpu_on() updates the mp_state without using
+WRITE_ONCE(). So, fix the code to update the mp_state using WRITE_ONCE.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/arm.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/psci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index fbafcbbcc463..388aa4f18f21 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1244,8 +1244,11 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+index 5767e6baa61a..d046e82e3723 100644
+--- a/arch/arm64/kvm/psci.c
++++ b/arch/arm64/kvm/psci.c
+@@ -110,7 +110,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
  	 */
- 	if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
- 		kvm_arm_vcpu_power_off(vcpu);
--	else
-+	else {
-+		spin_lock(&vcpu->arch.mp_state_lock);
- 		WRITE_ONCE(vcpu->arch.mp_state.mp_state, KVM_MP_STATE_RUNNABLE);
-+		spin_unlock(&vcpu->arch.mp_state_lock);
-+	}
+ 	smp_wmb();
  
- 	return 0;
- }
+-	vcpu->arch.mp_state.mp_state = KVM_MP_STATE_RUNNABLE;
++	WRITE_ONCE(vcpu->arch.mp_state.mp_state, KVM_MP_STATE_RUNNABLE);
+ 	kvm_vcpu_wake_up(vcpu);
+ 
+ out_unlock:
 -- 
 2.40.0.396.gfff15efe05-goog
 
