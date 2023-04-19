@@ -1,390 +1,232 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88CB23C17
-	for <kvmarm@lists.linux.dev>; Wed, 19 Apr 2023 12:21:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A90F7C4339B;
-	Wed, 19 Apr 2023 12:21:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1681906887;
-	bh=SmUqVjCAaBqnXVoiv057Ynztj5828L9ALAY2C+PHOuQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nmAvWu5Cw9C0UkkjnoLaf6FZ1/OAaQeDNq7aG36sCIA5OwluK4nrp4Xl7RpuWKQc+
-	 jHBcNmNFHyKt6ZkR698tquEU9B3/GaFz2OnwIkHKnAezrs+HQOeoqzzlW4m4E8OSS2
-	 hDp6SPKZJ3IiV+GhivF+izlSCkls+RLSjywGXm+6Z/lF7UmoceHKvbjpQ1q/EvneY5
-	 ehovWZVJexUVeaXmLmq9H/+clvnZc4+5mekqk7fpiaS0wCBARhLyqPDzm43RRvDeEV
-	 L1AD/+Xp09zZsmQYhTekx8CAaK6Zhu4sOmx1KanCrdTzSz4NKtBcC4KiiaHVx8z67n
-	 CnQyAKv7xsFmA==
-From: Will Deacon <will@kernel.org>
-To: linux-arm-kernel@lists.infradead.org
-Cc: Will Deacon <will@kernel.org>,
-	Quentin Perret <qperret@google.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	Sebastian Ene <sebastianene@google.com>,
-	Fuad Tabba <tabba@google.com>,
-	kvmarm@lists.linux.dev,
-	kernel-team@android.com,
-	Andrew Walbran <qwandor@google.com>
-Subject: [PATCH v2 10/10] KVM: arm64: pkvm: Add support for fragmented FF-A descriptors
-Date: Wed, 19 Apr 2023 13:20:51 +0100
-Message-Id: <20230419122051.1341-11-will@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20230419122051.1341-1-will@kernel.org>
-References: <20230419122051.1341-1-will@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF063D67
+	for <kvmarm@lists.linux.dev>; Wed, 19 Apr 2023 13:36:53 +0000 (UTC)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1a526aa3dd5so37778315ad.3
+        for <kvmarm@lists.linux.dev>; Wed, 19 Apr 2023 06:36:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1681911413; x=1684503413;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=iOX9IhenPqCIJQOLNcwKs+Lj53e3MnWmvQSEeYt/aVM=;
+        b=eIw28Fwx3KFF/gqyxVXtFtBhs73dZDKFEY6zJ/fJvgwxgSZ+wJFbp0WwEI2ZHbkP3a
+         ElDs0AVTJC3iAT7Y5pUuhIE1ezLSnOOS6baKV+mY+LoQysdawl7t2hkD/KVoO7xzEaCf
+         kTiwlI+yuBs8jUwFyQf5gDb+TCy5I9CF2EDFD/EpC7a0w+pkQtt3DYDfdA9mPVNCcoIq
+         FpWKSwGXej0XtISCC5vBgq0tWMz9zOYP6sjtka//t+ETIZUxLSr3zcVnqFuOv8VmvtiE
+         LrsOWBVIbSmQIMJIFrVy6AlH39FvkBAV7twf6YsrNtyMAfyMHvkT7F4Ap0vhWeA5xsAr
+         NktQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681911413; x=1684503413;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iOX9IhenPqCIJQOLNcwKs+Lj53e3MnWmvQSEeYt/aVM=;
+        b=js9uzmrtfJYwD2jxDd28AgSpezbpH+UhqoUXlEVFlmGFrBacumDMHuXlaj5+Eiv3+V
+         MKwO4cHNRc5hQnG64at/0E2IuLQiSc7LoDV8Ch9VaY1O+KPCNjQ/JoR1Dekim7duK7fp
+         DvhECZ1s0tD/zIeayfFkrK0pwUX/MOr9NRai4LPqKg56Entx6/cfbdOIBO9sXtzgL58R
+         a005t308VQp3wha+en8GOsn8XrN07XEapESwi0nr9YSyaXBTyJetgzLyxTfosxhsJeWH
+         Sw+NMu1XzNJMdITS1+ThfmsXb0aaLyiROTTqFR7XkQGepwH/c2THP68mCeI+B618qONs
+         vbVA==
+X-Gm-Message-State: AAQBX9dCYjFiMg1nR33zgnk5XRmE/9etz3EEPN+Y2G6lLlqH3FohuO3z
+	yqXmnu2DdrU8uilGGceKvCTinWIzjIwt4Q==
+X-Google-Smtp-Source: AKy350alXc1ONRhUA7XIa28nLbvt2XJ7sqqCYuAOmq3t7gBkrrJYXz7/rkS9YfIcmDF6ZbQaMcb/Aw==
+X-Received: by 2002:a17:903:22cc:b0:1a6:7570:5370 with SMTP id y12-20020a17090322cc00b001a675705370mr6297746plg.10.1681911412748;
+        Wed, 19 Apr 2023 06:36:52 -0700 (PDT)
+Received: from [172.27.232.10] (ec2-16-163-40-128.ap-east-1.compute.amazonaws.com. [16.163.40.128])
+        by smtp.gmail.com with ESMTPSA id b5-20020a170902bd4500b0019a8530c063sm11407873plx.102.2023.04.19.06.36.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Apr 2023 06:36:52 -0700 (PDT)
+Message-ID: <a43e5deb-211a-c4c0-6b1d-7715c3665017@gmail.com>
+Date: Wed, 19 Apr 2023 21:36:46 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+From: Hoo Robert <robert.hoo.linux@gmail.com>
+Subject: Re: [PATCH v3 02/22] KVM: selftests: Use EPOLL in userfaultfd_util
+ reader threads and signal errors via TEST_ASSERT
+To: Anish Moorthy <amoorthy@google.com>, pbonzini@redhat.com, maz@kernel.org
+Cc: oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com,
+ bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
+ axelrasmussen@google.com, peterx@redhat.com, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+References: <20230412213510.1220557-1-amoorthy@google.com>
+ <20230412213510.1220557-3-amoorthy@google.com>
+Content-Language: en-US
+In-Reply-To: <20230412213510.1220557-3-amoorthy@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Quentin Perret <qperret@google.com>
+On 4/13/2023 5:34 AM, Anish Moorthy wrote:
+> With multiple reader threads POLLing a single UFFD, the test suffers
+> from the thundering herd problem: performance degrades as the number of
+> reader threads is increased. Solve this issue [1] by switching the
+> the polling mechanism to EPOLL + EPOLLEXCLUSIVE.
+> 
+> Also, change the error-handling convention of uffd_handler_thread_fn.
+> Instead of just printing errors and returning early from the polling
+> loop, check for them via TEST_ASSERT. "return NULL" is reserved for a
+> successful exit from uffd_handler_thread_fn, ie one triggered by a
+> write to the exit pipe.
+> 
+> Performance samples generated by the command in [2] are given below.
+> 
+> Num Reader Threads, Paging Rate (POLL), Paging Rate (EPOLL)
+> 1      249k      185k
+> 2      201k      235k
+> 4      186k      155k
+> 16     150k      217k
+> 32     89k       198k
+> 
+> [1] Single-vCPU performance does suffer somewhat.
+> [2] ./demand_paging_test -u MINOR -s shmem -v 4 -o -r <num readers>
+> 
+> Signed-off-by: Anish Moorthy <amoorthy@google.com>
+> Acked-by: James Houghton <jthoughton@google.com>
+> ---
+>   .../selftests/kvm/demand_paging_test.c        |  1 -
+>   .../selftests/kvm/lib/userfaultfd_util.c      | 74 +++++++++----------
+>   2 files changed, 35 insertions(+), 40 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+> index 6c2253f4a64ef..c729cee4c2055 100644
+> --- a/tools/testing/selftests/kvm/demand_paging_test.c
+> +++ b/tools/testing/selftests/kvm/demand_paging_test.c
+> @@ -13,7 +13,6 @@
+>   #include <stdio.h>
+>   #include <stdlib.h>
+>   #include <time.h>
+> -#include <poll.h>
+>   #include <pthread.h>
+>   #include <linux/userfaultfd.h>
+>   #include <sys/syscall.h>
+> diff --git a/tools/testing/selftests/kvm/lib/userfaultfd_util.c b/tools/testing/selftests/kvm/lib/userfaultfd_util.c
+> index 2723ee1e3e1b2..909ad69c1cb04 100644
+> --- a/tools/testing/selftests/kvm/lib/userfaultfd_util.c
+> +++ b/tools/testing/selftests/kvm/lib/userfaultfd_util.c
+> @@ -16,6 +16,7 @@
+>   #include <poll.h>
+>   #include <pthread.h>
+>   #include <linux/userfaultfd.h>
+> +#include <sys/epoll.h>
+>   #include <sys/syscall.h>
+>   
+>   #include "kvm_util.h"
+> @@ -32,60 +33,55 @@ static void *uffd_handler_thread_fn(void *arg)
+>   	int64_t pages = 0;
+>   	struct timespec start;
+>   	struct timespec ts_diff;
+> +	int epollfd;
+> +	struct epoll_event evt;
+> +
+> +	epollfd = epoll_create(1);
+> +	TEST_ASSERT(epollfd >= 0, "Failed to create epollfd.");
+> +
+> +	evt.events = EPOLLIN | EPOLLEXCLUSIVE;
+> +	evt.data.u32 = 0;
+> +	TEST_ASSERT(epoll_ctl(epollfd, EPOLL_CTL_ADD, uffd, &evt) == 0,
+> +				"Failed to add uffd to epollfd");
+> +
+> +	evt.events = EPOLLIN;
+> +	evt.data.u32 = 1;
+> +	TEST_ASSERT(epoll_ctl(epollfd, EPOLL_CTL_ADD, reader_args->pipe, &evt) == 0,
+> +				"Failed to add pipe to epollfd");
+>   
+>   	clock_gettime(CLOCK_MONOTONIC, &start);
+>   	while (1) {
+>   		struct uffd_msg msg;
+> -		struct pollfd pollfd[2];
+> -		char tmp_chr;
+>   		int r;
+>   
+> -		pollfd[0].fd = uffd;
+> -		pollfd[0].events = POLLIN;
+> -		pollfd[1].fd = reader_args->pipe;
+> -		pollfd[1].events = POLLIN;
+> -
+> -		r = poll(pollfd, 2, -1);
+> -		switch (r) {
+> -		case -1:
+> -			pr_info("poll err");
+> -			continue;
+> -		case 0:
+> -			continue;
+> -		case 1:
+> -			break;
+> -		default:
+> -			pr_info("Polling uffd returned %d", r);
+> -			return NULL;
+> -		}
+> +		r = epoll_wait(epollfd, &evt, 1, -1);
+> +		TEST_ASSERT(r == 1,
+> +					"Unexpected number of events (%d) from epoll, errno = %d",
+> +					r, errno);
+>   
+too much indentation, also seen elsewhere.
 
-FF-A memory descriptors may need to be sent in fragments when they don't
-fit in the mailboxes. Doing so involves using the FRAG_TX and FRAG_RX
-primitives defined in the FF-A protocol.
+> -		if (pollfd[0].revents & POLLERR) {
+> -			pr_info("uffd revents has POLLERR");
+> -			return NULL;
+> -		}
+> +		if (evt.data.u32 == 1) {
+> +			char tmp_chr;
+>   
+> -		if (pollfd[1].revents & POLLIN) {
+> -			r = read(pollfd[1].fd, &tmp_chr, 1);
+> +			TEST_ASSERT(!(evt.events & (EPOLLERR | EPOLLHUP)),
+> +						"Reader thread received EPOLLERR or EPOLLHUP on pipe.");
+> +			r = read(reader_args->pipe, &tmp_chr, 1);
+>   			TEST_ASSERT(r == 1,
+> -				    "Error reading pipefd in UFFD thread\n");
+> +						"Error reading pipefd in uffd reader thread");
+>   			return NULL;
 
-Add support in the pKVM FF-A relayer for fragmented descriptors by
-monitoring outgoing FRAG_TX transactions and by buffering large
-descriptors on the reclaim path.
+How about goto
+	ts_diff = timespec_elapsed(start);
+Otherwise last stats won't get chances to be calc'ed.
 
-Co-developed-by: Andrew Walbran <qwandor@google.com>
-Signed-off-by: Andrew Walbran <qwandor@google.com>
-Signed-off-by: Quentin Perret <qperret@google.com>
-Signed-off-by: Will Deacon <will@kernel.org>
----
- arch/arm64/include/asm/kvm_pkvm.h |  17 ++-
- arch/arm64/kvm/hyp/nvhe/ffa.c     | 170 ++++++++++++++++++++++++++----
- 2 files changed, 162 insertions(+), 25 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index 2b495ec59deb..e46250a02017 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -6,7 +6,9 @@
- #ifndef __ARM64_KVM_PKVM_H__
- #define __ARM64_KVM_PKVM_H__
- 
-+#include <linux/arm_ffa.h>
- #include <linux/memblock.h>
-+#include <linux/scatterlist.h>
- #include <asm/kvm_pgtable.h>
- 
- /* Maximum number of VMs that can co-exist under pKVM. */
-@@ -110,8 +112,19 @@ static inline unsigned long host_s2_pgtable_pages(void)
- 
- static inline unsigned long hyp_ffa_proxy_pages(void)
- {
--	/* A page each for the hypervisor's RX and TX mailboxes. */
--	return 2 * KVM_FFA_MBOX_NR_PAGES;
-+	size_t desc_max;
-+
-+	/*
-+	 * The hypervisor FFA proxy needs enough memory to buffer a fragmented
-+	 * descriptor returned from EL3 in response to a RETRIEVE_REQ call.
-+	 */
-+	desc_max = sizeof(struct ffa_mem_region) +
-+		   sizeof(struct ffa_mem_region_attributes) +
-+		   sizeof(struct ffa_composite_mem_region) +
-+		   SG_MAX_SEGMENTS * sizeof(struct ffa_mem_region_addr_range);
-+
-+	/* Plus a page each for the hypervisor's RX and TX mailboxes. */
-+	return (2 * KVM_FFA_MBOX_NR_PAGES) + DIV_ROUND_UP(desc_max, PAGE_SIZE);
- }
- 
- #endif	/* __ARM64_KVM_PKVM_H__ */
-diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index aa8bfc97a164..a787f9134c39 100644
---- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-+++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -42,6 +42,18 @@
-  */
- #define HOST_FFA_ID	0
- 
-+/*
-+ * A buffer to hold the maximum descriptor size we can see from the host,
-+ * which is required when the SPMD returns a fragmented FFA_MEM_RETRIEVE_RESP
-+ * when resolving the handle on the reclaim path.
-+ */
-+struct kvm_ffa_descriptor_buffer {
-+	void	*buf;
-+	size_t	len;
-+};
-+
-+static struct kvm_ffa_descriptor_buffer ffa_desc_buf;
-+
- struct kvm_ffa_buffers {
- 	hyp_spinlock_t lock;
- 	void *tx;
-@@ -122,6 +134,24 @@ static int spmd_unmap_ffa_buffers(void)
- 	return res.a0 == FFA_SUCCESS ? FFA_RET_SUCCESS : res.a2;
- }
- 
-+static void spmd_mem_frag_tx(struct arm_smccc_res *res, u32 handle_lo,
-+			     u32 handle_hi, u32 fraglen, u32 endpoint_id)
-+{
-+	arm_smccc_1_1_smc(FFA_MEM_FRAG_TX,
-+			  handle_lo, handle_hi, fraglen, endpoint_id,
-+			  0, 0, 0,
-+			  res);
-+}
-+
-+static void spmd_mem_frag_rx(struct arm_smccc_res *res, u32 handle_lo,
-+			     u32 handle_hi, u32 fragoff)
-+{
-+	arm_smccc_1_1_smc(FFA_MEM_FRAG_RX,
-+			  handle_lo, handle_hi, fragoff, HOST_FFA_ID,
-+			  0, 0, 0,
-+			  res);
-+}
-+
- static void spmd_mem_xfer(struct arm_smccc_res *res, u64 func_id, u32 len,
- 			  u32 fraglen)
- {
-@@ -323,6 +353,64 @@ static int ffa_host_unshare_ranges(struct ffa_mem_region_addr_range *ranges,
- 	return ret;
- }
- 
-+static void do_ffa_mem_frag_tx(struct arm_smccc_res *res,
-+			       struct kvm_cpu_context *ctxt)
-+{
-+	DECLARE_REG(u32, handle_lo, ctxt, 1);
-+	DECLARE_REG(u32, handle_hi, ctxt, 2);
-+	DECLARE_REG(u32, fraglen, ctxt, 3);
-+	DECLARE_REG(u32, endpoint_id, ctxt, 4);
-+	struct ffa_mem_region_addr_range *buf;
-+	int ret = FFA_RET_INVALID_PARAMETERS;
-+	u32 nr_ranges;
-+
-+	if (fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE)
-+		goto out;
-+
-+	if (fraglen % sizeof(*buf))
-+		goto out;
-+
-+	hyp_spin_lock(&host_buffers.lock);
-+	if (!host_buffers.tx)
-+		goto out_unlock;
-+
-+	buf = hyp_buffers.tx;
-+	memcpy(buf, host_buffers.tx, fraglen);
-+	nr_ranges = fraglen / sizeof(*buf);
-+
-+	ret = ffa_host_share_ranges(buf, nr_ranges);
-+	if (ret) {
-+		/*
-+		 * We're effectively aborting the transaction, so we need
-+		 * to restore the global state back to what it was prior to
-+		 * transmission of the first fragment.
-+		 */
-+		spmd_mem_reclaim(res, handle_lo, handle_hi, 0);
-+		WARN_ON(res->a0 != FFA_SUCCESS);
-+		goto out_unlock;
-+	}
-+
-+	spmd_mem_frag_tx(res, handle_lo, handle_hi, fraglen, endpoint_id);
-+	if (res->a0 != FFA_SUCCESS && res->a0 != FFA_MEM_FRAG_RX)
-+		WARN_ON(ffa_host_unshare_ranges(buf, nr_ranges));
-+
-+out_unlock:
-+	hyp_spin_unlock(&host_buffers.lock);
-+out:
-+	if (ret)
-+		ffa_to_smccc_res(res, ret);
-+
-+	/*
-+	 * If for any reason this did not succeed, we're in trouble as we have
-+	 * now lost the content of the previous fragments and we can't rollback
-+	 * the host stage-2 changes. The pages previously marked as shared will
-+	 * remain stuck in that state forever, hence preventing the host from
-+	 * sharing/donating them again and may possibly lead to subsequent
-+	 * failures, but this will not compromise confidentiality.
-+	 */
-+	return;
-+}
-+
- static __always_inline void do_ffa_mem_xfer(const u64 func_id,
- 					    struct arm_smccc_res *res,
- 					    struct kvm_cpu_context *ctxt)
-@@ -333,8 +421,8 @@ static __always_inline void do_ffa_mem_xfer(const u64 func_id,
- 	DECLARE_REG(u32, npages_mbz, ctxt, 4);
- 	struct ffa_composite_mem_region *reg;
- 	struct ffa_mem_region *buf;
-+	u32 offset, nr_ranges;
- 	int ret = 0;
--	u32 offset;
- 
- 	BUILD_BUG_ON(func_id != FFA_FN64_MEM_SHARE &&
- 		     func_id != FFA_FN64_MEM_LEND);
-@@ -345,11 +433,6 @@ static __always_inline void do_ffa_mem_xfer(const u64 func_id,
- 		goto out;
- 	}
- 
--	if (fraglen < len) {
--		ret = FFA_RET_ABORTED;
--		goto out;
--	}
--
- 	if (fraglen < sizeof(struct ffa_mem_region) +
- 		      sizeof(struct ffa_mem_region_attributes)) {
- 		ret = FFA_RET_INVALID_PARAMETERS;
-@@ -377,21 +460,26 @@ static __always_inline void do_ffa_mem_xfer(const u64 func_id,
- 	}
- 
- 	reg = (void *)buf + offset;
--	if (fraglen < offset + sizeof(struct ffa_composite_mem_region) +
--		      reg->addr_range_cnt *
--		      sizeof(struct ffa_mem_region_addr_range)) {
-+	nr_ranges = ((void *)buf + fraglen) - (void *)reg->constituents;
-+	if (nr_ranges % sizeof(reg->constituents[0])) {
- 		ret = FFA_RET_INVALID_PARAMETERS;
- 		goto out_unlock;
- 	}
- 
--	ret = ffa_host_share_ranges(reg->constituents, reg->addr_range_cnt);
-+	nr_ranges /= sizeof(reg->constituents[0]);
-+	ret = ffa_host_share_ranges(reg->constituents, nr_ranges);
- 	if (ret)
- 		goto out_unlock;
- 
- 	spmd_mem_xfer(res, func_id, len, fraglen);
--	if (res->a0 != FFA_SUCCESS) {
--		WARN_ON(ffa_host_unshare_ranges(reg->constituents,
--						reg->addr_range_cnt));
-+	if (fraglen != len) {
-+		if (res->a0 != FFA_MEM_FRAG_RX)
-+			goto err_unshare;
-+
-+		if (res->a3 != fraglen)
-+			goto err_unshare;
-+	} else if (res->a0 != FFA_SUCCESS) {
-+		goto err_unshare;
- 	}
- 
- out_unlock:
-@@ -400,6 +488,10 @@ static __always_inline void do_ffa_mem_xfer(const u64 func_id,
- 	if (ret)
- 		ffa_to_smccc_res(res, ret);
- 	return;
-+
-+err_unshare:
-+	WARN_ON(ffa_host_unshare_ranges(reg->constituents, nr_ranges));
-+	goto out_unlock;
- }
- 
- static void do_ffa_mem_reclaim(struct arm_smccc_res *res,
-@@ -409,9 +501,9 @@ static void do_ffa_mem_reclaim(struct arm_smccc_res *res,
- 	DECLARE_REG(u32, handle_hi, ctxt, 2);
- 	DECLARE_REG(u32, flags, ctxt, 3);
- 	struct ffa_composite_mem_region *reg;
-+	u32 offset, len, fraglen, fragoff;
- 	struct ffa_mem_region *buf;
- 	int ret = 0;
--	u32 offset;
- 	u64 handle;
- 
- 	handle = PACK_HANDLE(handle_lo, handle_hi);
-@@ -429,11 +521,8 @@ static void do_ffa_mem_reclaim(struct arm_smccc_res *res,
- 	if (res->a0 != FFA_MEM_RETRIEVE_RESP)
- 		goto out_unlock;
- 
--	/* Check for fragmentation */
--	if (res->a1 != res->a2) {
--		ret = FFA_RET_ABORTED;
--		goto out_unlock;
--	}
-+	len = res->a1;
-+	fraglen = res->a2;
- 
- 	offset = buf->ep_mem_access[0].composite_off;
- 	/*
-@@ -441,16 +530,36 @@ static void do_ffa_mem_reclaim(struct arm_smccc_res *res,
- 	 * check that we end up with something that doesn't look _completely_
- 	 * bogus.
- 	 */
--	if (WARN_ON(offset > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE)) {
-+	if (WARN_ON(offset > len ||
-+		    fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE)) {
- 		ret = FFA_RET_ABORTED;
- 		goto out_unlock;
- 	}
- 
--	reg = (void *)buf + offset;
-+	if (len > ffa_desc_buf.len) {
-+		ret = FFA_RET_NO_MEMORY;
-+		goto out_unlock;
-+	}
-+
-+	buf = ffa_desc_buf.buf;
-+	memcpy(buf, hyp_buffers.rx, fraglen);
-+
-+	for (fragoff = fraglen; fragoff < len; fragoff += fraglen) {
-+		spmd_mem_frag_rx(res, handle_lo, handle_hi, fragoff);
-+		if (res->a0 != FFA_MEM_FRAG_TX) {
-+			ret = FFA_RET_INVALID_PARAMETERS;
-+			goto out_unlock;
-+		}
-+
-+		fraglen = res->a3;
-+		memcpy((void *)buf + fragoff, hyp_buffers.rx, fraglen);
-+	}
-+
- 	spmd_mem_reclaim(res, handle_lo, handle_hi, flags);
- 	if (res->a0 != FFA_SUCCESS)
- 		goto out_unlock;
- 
-+	reg = (void *)buf + offset;
- 	/* If the SPMD was happy, then we should be too. */
- 	WARN_ON(ffa_host_unshare_ranges(reg->constituents,
- 					reg->addr_range_cnt));
-@@ -552,6 +661,9 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt)
- 	case FFA_FN64_MEM_LEND:
- 		do_ffa_mem_xfer(FFA_FN64_MEM_LEND, &res, host_ctxt);
- 		goto out_handled;
-+	case FFA_MEM_FRAG_TX:
-+		do_ffa_mem_frag_tx(&res, host_ctxt);
-+		goto out_handled;
- 	}
- 
- 	if (ffa_call_supported(func_id))
-@@ -567,6 +679,7 @@ int hyp_ffa_init(void *pages)
- {
- 	struct arm_smccc_res res;
- 	size_t min_rxtx_sz;
-+	void *tx, *rx;
- 
- 	if (kvm_host_psci_config.smccc_version < ARM_SMCCC_VERSION_1_2)
- 		return 0;
-@@ -607,10 +720,21 @@ int hyp_ffa_init(void *pages)
- 	if (min_rxtx_sz > PAGE_SIZE)
- 		return -EOPNOTSUPP;
- 
-+	tx = pages;
-+	pages += KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE;
-+	rx = pages;
-+	pages += KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE;
-+
-+	ffa_desc_buf = (struct kvm_ffa_descriptor_buffer) {
-+		.buf	= pages,
-+		.len	= PAGE_SIZE *
-+			  (hyp_ffa_proxy_pages() - (2 * KVM_FFA_MBOX_NR_PAGES)),
-+	};
-+
- 	hyp_buffers = (struct kvm_ffa_buffers) {
- 		.lock	= __HYP_SPIN_LOCK_UNLOCKED,
--		.tx	= pages,
--		.rx	= pages + (KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE),
-+		.tx	= tx,
-+		.rx	= rx,
- 	};
- 
- 	host_buffers = (struct kvm_ffa_buffers) {
--- 
-2.40.0.634.g4ca3ef3211-goog
+>   		}
+>   
+> -		if (!(pollfd[0].revents & POLLIN))
+> -			continue;
+> +		TEST_ASSERT(!(evt.events & (EPOLLERR | EPOLLHUP)),
+> +					"Reader thread received EPOLLERR or EPOLLHUP on uffd.");
+>   
+>   		r = read(uffd, &msg, sizeof(msg));
+>   		if (r == -1) {
+> -			if (errno == EAGAIN)
+> -				continue;
+> -			pr_info("Read of uffd got errno %d\n", errno);
+> -			return NULL;
+> +			TEST_ASSERT(errno == EAGAIN,
+> +						"Error reading from UFFD: errno = %d", errno);
+> +			continue;
+>   		}
+>   
+> -		if (r != sizeof(msg)) {
+> -			pr_info("Read on uffd returned unexpected size: %d bytes", r);
+> -			return NULL;
+> -		}
+> +		TEST_ASSERT(r == sizeof(msg),
+> +					"Read on uffd returned unexpected number of bytes (%d)", r);
+>   
+>   		if (!(msg.event & UFFD_EVENT_PAGEFAULT))
+>   			continue;
+> @@ -93,8 +89,8 @@ static void *uffd_handler_thread_fn(void *arg)
+>   		if (reader_args->delay)
+>   			usleep(reader_args->delay);
+>   		r = reader_args->handler(reader_args->uffd_mode, uffd, &msg);
+> -		if (r < 0)
+> -			return NULL;
+> +		TEST_ASSERT(r >= 0,
+> +					"Reader thread handler fn returned negative value %d", r);
+>   		pages++;
+>   	}
+>   
 
