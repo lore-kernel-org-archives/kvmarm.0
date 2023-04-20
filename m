@@ -1,69 +1,115 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0557946F
-	for <kvmarm@lists.linux.dev>; Thu, 20 Apr 2023 22:47:41 +0000 (UTC)
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-3f17fdb520dso10915575e9.3
-        for <kvmarm@lists.linux.dev>; Thu, 20 Apr 2023 15:47:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED131946F
+	for <kvmarm@lists.linux.dev>; Thu, 20 Apr 2023 23:30:16 +0000 (UTC)
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-3f09b4a1527so11951735e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 20 Apr 2023 16:30:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682030860; x=1684622860;
+        d=google.com; s=20221208; t=1682033415; x=1684625415;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=I500wf29ShVTt/8kNXae6cb36NI8eexo7GrOocU/WMU=;
-        b=IzlePHjF/qbChziTFLQN+LJ+aTmnw52wmdpyTv2kL0Q6NG/AyPO1+HnzacS7BWyViR
-         pDE5N0vbgaHydiw7YYYTH4t4x15EHkEgR/eGyjZ3EJHkGn9rep5mViODsGV1QHBsDrSR
-         ic+7OUcSUTfa1LkYLGX+EKMTxg51Gl0A3tltVxWIen3yafNjK6h6XR/D5kYMB66oGc+H
-         e+rSrr0Tg9RP9DpJGFC3d+JukTOjaqFisiLC/x4+EXi9vIUiZ8aCq1KShJ79r/3Khsik
-         5fW3/+LypYYbUUuJ1pqKWUd/CEug0j8xLPdFS+dXaTJLMjZLIMk/OwYy8/TSOEeFyZUN
-         4cDw==
+        bh=nRsiw33DYXKBM8rTcW+xozbunBMlWYP+e9GkMRlf85o=;
+        b=A4at8XXuyv3notVzg4656tjZMmTA3z/aSsYPxm37+S52hqmLCI3ztJ6UvW6QjPvjFZ
+         RP0EI0xZ7G0NaIZnpLnz8uNuHfE+iGmvotVqN9+UPhWRc5kJHQaUwPfdjSPZgbTHSndA
+         umuIQTTyz1rBOs8z9BB0pcSF1QfaDJZ6eYKeCf9ptZcuHqkYxPHpCUbHXBjsLH7E9iR7
+         03/zF79IZIL9cO43GZ2pS+kb8+dBL5xVMHka5+5bI1WW5hTiyO93ptI0XteyW6V85LmL
+         iYnaU0pGqNsw+SHf+GnRpj5V4L1kz1EFjEFAThbrHWUr375ATrtg7KzVeeomHJ+izHvo
+         ealA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682030860; x=1684622860;
+        d=1e100.net; s=20221208; t=1682033415; x=1684625415;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=I500wf29ShVTt/8kNXae6cb36NI8eexo7GrOocU/WMU=;
-        b=Ft+09IUZAcy2DTmjaRsmT/h2hEERNHDt78OHVUXAOy7lgEsgWhfsQtkEij6g1RMXs8
-         Nqdop/EJ+3u5O3FpfRL6ghenCv8DZRxHA0ZVEYb5XrK6GLtY9mRR5e5I/uR+rU+VTB4S
-         91Vew4Pj9Nlq4zmkXpy60lT1atgyYGB1/sqI/qaESfz+3X0mG2+OwOY41krpBEcQgNqt
-         jbuD5kkYbz9CydhzglhYHTlzEPc9IyVRpIb4AEtmLra2u4p3W2fqURio31N6XnXBrJNf
-         78pX8qe1PQJ1UqtYO62DGDFqe7JU6xUVPkbxAnPdCUsQf/4aSrC4RmL3BuKx+t/2QZHv
-         r9TQ==
-X-Gm-Message-State: AAQBX9eyCM2mkHiat4b0kHku/VufhVGu+rEZArZ96t5nNm+CcP87JKim
-	CTQgixjJ2K3i8eHJKVkok+PSrga7+UXTCiCjcyKl6A==
-X-Google-Smtp-Source: AKy350Z/7sBVzla3WvehW8q8Z1Pvmrks0DHxOdhv+P7CBhhNPJPBZ4RwV7tyeJqUXZTkzE3xfbV9xvVD5eqjL5iRCwY=
-X-Received: by 2002:a1c:ed15:0:b0:3f1:6fb3:ffcc with SMTP id
- l21-20020a1ced15000000b003f16fb3ffccmr338953wmh.22.1682030860171; Thu, 20 Apr
- 2023 15:47:40 -0700 (PDT)
+        bh=nRsiw33DYXKBM8rTcW+xozbunBMlWYP+e9GkMRlf85o=;
+        b=L6DjAZFmfwVd2WULXSQVLc1suiT+xGmTk5dvSNzuUTuoFvBgxNx3vtkfJxDBebNhMw
+         1acY2joFmSGMqNZSlgHeGd786/BS1YAE5X2XMbZyLX8B7xn6xAfpG0JO/RjJ+bbpeJDi
+         V8Q/p6fyMGq9ikI3wHEqHsFBtMUC11jjOlLeAIRVvWBI65jHdyIVs2S59vtDkAo0RITH
+         LqSc3tZ0Jl+mdttJ0FzsUlU61ybE8BnVM6FtWmQA/kDukF601NjB9zdo/R/mcYvftw90
+         of7UQ1fE68YDjcu8BzmrkzYtHFeeFjiz3sI0dIndW0LI86LuE3N/cuUr6fqkVcQOX7ex
+         i6vg==
+X-Gm-Message-State: AAQBX9e19ybUSOaEnwbVMS+zAUenmgsK6KeL4+bdhDbCx/Bm9zVpdAqq
+	2hOJq4EC+MZxWzuGsZZ+gdRvQcGhWxuSjXpctX878w==
+X-Google-Smtp-Source: AKy350ZpVTpgjnmn9ovaeU5yBTjC9QP6WDTaH2r2jbAMcPM84z3sHsNZQ5pJLq8Py8ZbybqTJhTQMmmyWv0OUJ0feEk=
+X-Received: by 2002:a05:600c:2113:b0:3ee:289a:43a7 with SMTP id
+ u19-20020a05600c211300b003ee289a43a7mr394651wml.22.1682033415059; Thu, 20 Apr
+ 2023 16:30:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230412213510.1220557-1-amoorthy@google.com> <20230412213510.1220557-23-amoorthy@google.com>
- <7db5a448-f3b2-2c43-1cf1-d7e75e8d06e1@gmail.com>
-In-Reply-To: <7db5a448-f3b2-2c43-1cf1-d7e75e8d06e1@gmail.com>
+References: <20230412213510.1220557-1-amoorthy@google.com> <20230412213510.1220557-8-amoorthy@google.com>
+ <ZEGmAnnv5Dq8BgrW@x1n>
+In-Reply-To: <ZEGmAnnv5Dq8BgrW@x1n>
 From: Anish Moorthy <amoorthy@google.com>
-Date: Thu, 20 Apr 2023 15:47:03 -0700
-Message-ID: <CAF7b7moF4p+f1sFVa+nYa+LqzpjpRqj7HV2eo3grE6mW0ppAug@mail.gmail.com>
-Subject: Re: [PATCH v3 22/22] KVM: selftests: Handle memory fault exits in demand_paging_test
-To: Hoo Robert <robert.hoo.linux@gmail.com>
+Date: Thu, 20 Apr 2023 16:29:38 -0700
+Message-ID: <CAF7b7mqR97H=z05XN-qv97Tp=Qqr4y6kBgckkVRu5XLDpwJTUg@mail.gmail.com>
+Subject: Re: [PATCH v3 07/22] KVM: Annotate -EFAULTs from kvm_vcpu_write_guest_page()
+To: Peter Xu <peterx@redhat.com>
 Cc: pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev, 
 	seanjc@google.com, jthoughton@google.com, bgardon@google.com, 
 	dmatlack@google.com, ricarkol@google.com, axelrasmussen@google.com, 
-	peterx@redhat.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 19, 2023 at 7:10=E2=80=AFAM Hoo Robert <robert.hoo.linux@gmail.=
-com> wrote:
+On Thu, Apr 20, 2023 at 1:52=E2=80=AFPM Peter Xu <peterx@redhat.com> wrote:
 >
-> I think this vcpu exec time calc should be outside while() {} block.
+> On Wed, Apr 12, 2023 at 09:34:55PM +0000, Anish Moorthy wrote:
+> > Implement KVM_CAP_MEMORY_FAULT_INFO for efaults from
+> > kvm_vcpu_write_guest_page()
+> >
+> > Signed-off-by: Anish Moorthy <amoorthy@google.com>
+> > ---
+> >  virt/kvm/kvm_main.c | 5 ++++-
+> >  1 file changed, 4 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 63b4285d858d1..b29a38af543f0 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -3119,8 +3119,11 @@ int kvm_vcpu_write_guest_page(struct kvm_vcpu *v=
+cpu, gfn_t gfn,
+> >                             const void *data, int offset, int len)
+> >  {
+> >       struct kvm_memory_slot *slot =3D kvm_vcpu_gfn_to_memslot(vcpu, gf=
+n);
+> > +     int ret =3D __kvm_write_guest_page(vcpu->kvm, slot, gfn, data, of=
+fset, len);
+> >
+> > -     return __kvm_write_guest_page(vcpu->kvm, slot, gfn, data, offset,=
+ len);
+> > +     if (ret =3D=3D -EFAULT)
+> > +             kvm_populate_efault_info(vcpu, gfn * PAGE_SIZE + offset, =
+len);
+> > +     return ret;
+> >  }
+> >  EXPORT_SYMBOL_GPL(kvm_vcpu_write_guest_page);
+>
+> Why need to trap this?  Is this -EFAULT part of the "scalable userfault"
+> plan or not?
+>
+> My previous memory was one can still leave things like copy_to_user() to =
+go
+> via the userfaults channels which should work in parallel with the new vc=
+pu
+> MEMORY_FAULT exit.  But maybe the plan changed?
 
-Ah, you're right: fixed.
+This commit isn't really part of the "scalable uffd" changes, which
+basically correspond to KVM_CAP_ABSENT_MAPPING_FAULT. There should be
+more details in the cover letter, but basically my v1 just included
+KVM_CAP_ABSENT_MAPPING_FAULT: Sean argued that the API there ("return
+to userspace whenever KVM fails a guest memory access to a page
+fault") was problematic, and so I reworked the series to include a
+general capability for reporting extra information for failed guest
+memory accesses (KVM_CAP_MEMORY_FAULT_INFO) and
+KVM_CAP_ABSENT_MAPPING_FAULT (which is meant to be used in combination
+with the other cap) for the "scalable userfaultfd" changes.
 
-> can this gettid() be substituted by tid above? or #include header file
-> for its prototype, otherwise build warning/error.
-
-Huh, not sure how I missed the warning. Thanks, and done.
+As such most of the commits in this series are unrelated to
+KVM_CAP_ABSENT_MAPPING_FAULT, and this is one of those commits. It
+doesn't affect page faults generated by copy_to_user (which should
+still be delivered via uffd).
