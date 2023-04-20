@@ -1,104 +1,102 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 514E6320A
-	for <kvmarm@lists.linux.dev>; Thu, 20 Apr 2023 20:52:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27C4C320A
+	for <kvmarm@lists.linux.dev>; Thu, 20 Apr 2023 20:53:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1682023944;
+	s=mimecast20190719; t=1682024030;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=R5Co2BkbmQDmd1M15a18Ma3/6BF2fWXYzajJ3Tdrdrw=;
-	b=UIPIhTd857jXBEs8TziWbSEjrIqDw/vg7nlWQTDZD/yC8VnscgJ/3WNPK7J4ujzVO3b1Ip
-	L8d7CdMTl8fB+4hGDs2b3h5mMz7tkxceTZVsAJv+mqTnZuwMs3zpcQk2daaCDTCt/6kaf2
-	50ZLRa0izmsdpFGodLJOkAuFUbNrnf4=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=8InUreRUNhx4YcihT8dj307g5hljV9sg88uJ8MQywSg=;
+	b=Is9xMm0751QTMPrsl2yqHXzBKPXinPbD1M/XOArFW2TQIIldymJq1qhnnKUUkWjAhhr4YO
+	vxvHtm51tpm+vXV9UgjH2IZxOD8c5Oeh5CF9BBcmCcNeFtSNwv9f9M/bMEkiIY+Onh7C+c
+	hz8Fgp4K8lqY0zf8hSV44zxJ0MyDQns=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-604--kKipYKvOyKvAaGzlLd15w-1; Thu, 20 Apr 2023 16:52:21 -0400
-X-MC-Unique: -kKipYKvOyKvAaGzlLd15w-1
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-3ef2cb3bfbfso3681211cf.0
-        for <kvmarm@lists.linux.dev>; Thu, 20 Apr 2023 13:52:21 -0700 (PDT)
+ us-mta-265-T-xtXvIqM7uNKtg8W-Bmrg-1; Thu, 20 Apr 2023 16:53:48 -0400
+X-MC-Unique: T-xtXvIqM7uNKtg8W-Bmrg-1
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-3ef3116d1dcso3211611cf.1
+        for <kvmarm@lists.linux.dev>; Thu, 20 Apr 2023 13:53:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682023940; x=1684615940;
+        d=1e100.net; s=20221208; t=1682024028; x=1684616028;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=R5Co2BkbmQDmd1M15a18Ma3/6BF2fWXYzajJ3Tdrdrw=;
-        b=UhjyfY1d6FAnTZUS45TV4g5JMCEaf8UHtwX9y6HRjKh3iEWe23oZLBQheR2cXzJP/Q
-         xXurB/mxBDa4MgxZgdUIPlPpt+GxWlAAbXy5yDb6uOEGIJr03w9Iyb7AM7vWmrskPbfq
-         N3z3958mkTWfyj7F3ZZfrUVhUiluKp++yOLsu17cEw5R0MTSIPRtbIshkJE1ugVSDshm
-         LzHVmjyiw0HDyt/iwxdOp+Jn9DS7vpintoknpllQ0Yt/Fna5uVUHyurjEhtQM8lpV3jw
-         YaVLWA5/d/p+AOvtQQE/gITmSDd0oqx4GKnjoVcM0x7tnOE9FwCFwKTbaf2KWz3QNcTv
-         Z1TA==
-X-Gm-Message-State: AAQBX9eUOjrN0kI7VQUtYwOiTVuyyymJ29/s0w0A+uDS5ULyYvgb03L6
-	iqIfDSIEmwrqPaiRhnuG4KssXXA5AgBZ6zCEcVLsqTx+1CGw+ioiUYGLBso9rAZ5VH74GnF79GM
-	hOdlRAf23AwrQZa7p
-X-Received: by 2002:a05:622a:1a1a:b0:3b8:36f8:830e with SMTP id f26-20020a05622a1a1a00b003b836f8830emr4713288qtb.6.1682023940690;
-        Thu, 20 Apr 2023 13:52:20 -0700 (PDT)
-X-Google-Smtp-Source: AKy350ZXCY19Yj/E+BEr/ubLXULAq+ANh15aYSC2LqGjLgngRSReEqE/xKadWhwBb6lg0GvqOg+jfw==
-X-Received: by 2002:a05:622a:1a1a:b0:3b8:36f8:830e with SMTP id f26-20020a05622a1a1a00b003b836f8830emr4713261qtb.6.1682023940401;
-        Thu, 20 Apr 2023 13:52:20 -0700 (PDT)
+        bh=8InUreRUNhx4YcihT8dj307g5hljV9sg88uJ8MQywSg=;
+        b=Yw1P0cHZ1N3gWtcqOvbE91ptkzFaEjVltkUHXH822gGwKeKT4Lw9jKHpeuBzJkFU8N
+         ni6xhr2CQ6pGtiWIKHQmVFU8zlwdPOISFmJfFx5D9MAsVuM3Jjs4cY1g4Ws6qeYNnzQc
+         bqk+U/yxFpwVwAxQhOnIVWNLcIrsLXgeRALBOsfmyMMBkBXR+h4Cex6LSG+OTxBmmOsf
+         5vQPn4S91BoFficHqZJADWO6HXp76N5OIBkRJ2retAnmHVWzE5yPAFUGfcaey5kV9HgC
+         YThuLYE9gy9NG4XOcsnbMeQpQh70u4N7OwziJu+qidgzq9ZSLOUH6ARJIyTfX6yCBN5D
+         Sxzg==
+X-Gm-Message-State: AAQBX9dZ9Rn0HSiBpd+5uix29N1R8/S0KlIUo3elAVzZGPEVlNcJbkvd
+	StKfjd/doYKAb9nYqLwiDiS6sjJ7cnjNA2u9F9akfoXSumsnYXN2Ys8QdrPaGS9KQq4bjyvKIuq
+	0bzfjL1fpTNl2IbLm
+X-Received: by 2002:a05:6214:5195:b0:5de:5da:b873 with SMTP id kl21-20020a056214519500b005de05dab873mr4390815qvb.3.1682024028184;
+        Thu, 20 Apr 2023 13:53:48 -0700 (PDT)
+X-Google-Smtp-Source: AKy350a6N61cy4ViOMnJA6wPwFePU1JTwO4kJEKCYCQbAdeBQMKAcdu1S9n5lWu/p0VA+/q1z2i4pg==
+X-Received: by 2002:a05:6214:5195:b0:5de:5da:b873 with SMTP id kl21-20020a056214519500b005de05dab873mr4390802qvb.3.1682024027951;
+        Thu, 20 Apr 2023 13:53:47 -0700 (PDT)
 Received: from x1n (bras-base-aurron9127w-grc-40-70-52-229-124.dsl.bell.ca. [70.52.229.124])
-        by smtp.gmail.com with ESMTPSA id b10-20020a05622a020a00b003e65228ef54sm753879qtx.86.2023.04.20.13.52.18
+        by smtp.gmail.com with ESMTPSA id dp1-20020a05620a2b4100b0074ded6ad058sm694198qkb.129.2023.04.20.13.53.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Apr 2023 13:52:19 -0700 (PDT)
-Date: Thu, 20 Apr 2023 16:52:18 -0400
+        Thu, 20 Apr 2023 13:53:47 -0700 (PDT)
+Date: Thu, 20 Apr 2023 16:53:46 -0400
 From: Peter Xu <peterx@redhat.com>
 To: Anish Moorthy <amoorthy@google.com>
 Cc: pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev,
 	seanjc@google.com, jthoughton@google.com, bgardon@google.com,
 	dmatlack@google.com, ricarkol@google.com, axelrasmussen@google.com,
 	kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 07/22] KVM: Annotate -EFAULTs from
- kvm_vcpu_write_guest_page()
-Message-ID: <ZEGmAnnv5Dq8BgrW@x1n>
+Subject: Re: [PATCH v3 09/22] KVM: Annotate -EFAULTs from kvm_vcpu_map()
+Message-ID: <ZEGmWrnqI3SBUW7A@x1n>
 References: <20230412213510.1220557-1-amoorthy@google.com>
- <20230412213510.1220557-8-amoorthy@google.com>
+ <20230412213510.1220557-10-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <20230412213510.1220557-8-amoorthy@google.com>
+In-Reply-To: <20230412213510.1220557-10-amoorthy@google.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 
-On Wed, Apr 12, 2023 at 09:34:55PM +0000, Anish Moorthy wrote:
-> Implement KVM_CAP_MEMORY_FAULT_INFO for efaults from
-> kvm_vcpu_write_guest_page()
+On Wed, Apr 12, 2023 at 09:34:57PM +0000, Anish Moorthy wrote:
+> Implement KVM_CAP_MEMORY_FAULT_INFO for efaults generated by
+> kvm_vcpu_map().
 > 
 > Signed-off-by: Anish Moorthy <amoorthy@google.com>
 > ---
->  virt/kvm/kvm_main.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+>  virt/kvm/kvm_main.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
 > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 63b4285d858d1..b29a38af543f0 100644
+> index 572adba9ad8ed..f3be5aa49829a 100644
 > --- a/virt/kvm/kvm_main.c
 > +++ b/virt/kvm/kvm_main.c
-> @@ -3119,8 +3119,11 @@ int kvm_vcpu_write_guest_page(struct kvm_vcpu *vcpu, gfn_t gfn,
->  			      const void *data, int offset, int len)
->  {
->  	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
-> +	int ret = __kvm_write_guest_page(vcpu->kvm, slot, gfn, data, offset, len);
+> @@ -2843,8 +2843,10 @@ int kvm_vcpu_map(struct kvm_vcpu *vcpu, gfn_t gfn, struct kvm_host_map *map)
+>  #endif
+>  	}
 >  
-> -	return __kvm_write_guest_page(vcpu->kvm, slot, gfn, data, offset, len);
-> +	if (ret == -EFAULT)
-> +		kvm_populate_efault_info(vcpu, gfn * PAGE_SIZE + offset, len);
-> +	return ret;
->  }
->  EXPORT_SYMBOL_GPL(kvm_vcpu_write_guest_page);
+> -	if (!hva)
+> +	if (!hva) {
+> +		kvm_populate_efault_info(vcpu, gfn * PAGE_SIZE, PAGE_SIZE);
+>  		return -EFAULT;
+> +	}
+>  
+>  	map->page = page;
+>  	map->hva = hva;
 
-Why need to trap this?  Is this -EFAULT part of the "scalable userfault"
-plan or not?
+Totally not familiar with nested, just a pure question on whether all the
+kvm_vcpu_map() callers will be prepared to receive this -EFAULT yet?
 
-My previous memory was one can still leave things like copy_to_user() to go
-via the userfaults channels which should work in parallel with the new vcpu
-MEMORY_FAULT exit.  But maybe the plan changed?
+I quickly went over the later patches but I didn't find a full solution
+yet, but maybe I missed something.
 
 Thanks,
 
