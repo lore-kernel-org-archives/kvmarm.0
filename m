@@ -1,115 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2093728E2
-	for <kvmarm@lists.linux.dev>; Fri, 21 Apr 2023 11:24:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3CB8C433D2;
-	Fri, 21 Apr 2023 11:24:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1682076293;
-	bh=GmfDHx1HJOprAgc/KFGBtZ/DijDDaT1Bq7BDqD/+p2c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FjxXDPvsC8Lv9yt82lnDeVT5ufVZ6NlSNr9cAoLZu8Z1ZRUw5Y16kkVOahB9kHyTJ
-	 gY4zLXP0DbgowTsxDNn+hOF7xI6W8PSc50G2WplLem4PuNp5/vH0be/EpDrIG9NBA3
-	 0W72al2sHLbqS69rZZElNzGDpvGjsA+KJ2ODtoYktwSWEI19dpYItmQfSc8CE9bWJ8
-	 kv5qXoLRc2qIr1G8SpKFunt8e3/uX8O47KO6z0jrv3aO7FXItFvFYMyatyLhVR8uhe
-	 mmvvIdcchHuSe8QN5bMOfRL7O0ChmXfS+hoi4iLIGjZWcS9ykqg0rVp7VfMp4O1sqA
-	 Hqe4cEdyk07wQ==
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pposl-00A9fI-Du;
-	Fri, 21 Apr 2023 12:24:51 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B262F43
+	for <kvmarm@lists.linux.dev>; Fri, 21 Apr 2023 12:15:36 +0000 (UTC)
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-3ef31b7b868so16668911cf.2
+        for <kvmarm@lists.linux.dev>; Fri, 21 Apr 2023 05:15:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1682079336; x=1684671336;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H9/EvIBO6003bReGPwzhrCqzDZS/9nB8KFyXDCCManY=;
+        b=RyGGvRx21Gvu9bCVR7WXsyfEZERJ4efGvQYat2k7T3Z4tCfzyARLmxI55H1VFK1Gyy
+         6yCTR8NJoqPuIlUmaYl4NhjH6IjqKySDXtvzNoHv4QzIu5dRDdeAiNt1MqjrDkC32nqR
+         i4/1S6FaaiyWP4m53IZcZ7/EVXp3K2r2e6h7yfub8+uXxbRK6DlQXP+a9LPSEwZ0hmwi
+         ZjVweaY+s+t6kPXETa1d9/8Zn7uD3ntTPiZwIyDIj71TdIqLywgWcXqmK1dM2kMBkIl9
+         /PevvgiNtDknioSMj6Z1LsmV9hX9ZcIo0/eI697vUsXlfB1q3GWJu1i+p9/MtFAzj+Wl
+         YwxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682079336; x=1684671336;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=H9/EvIBO6003bReGPwzhrCqzDZS/9nB8KFyXDCCManY=;
+        b=izQFCjsIWhrJEBNYg0g4qf9zYRdMLFlRJA52Hguhk9cSLO9ajR2i3bR/Pe2HagpArX
+         1HomOve9KwqJgNIfcEOQLXKU8ijsKSi/xdfisUpK6ywzlW7kwU1gDtGJaLl685SvlxZ7
+         61NFnqFYXN91hESxpbsGMYJapokJEBMx3lQVXF7G7qPCVAANjr13lb1rxTFxVFuIsgG9
+         kWNROyx2wSyekYJSnf1Hxh1lLp4zQr2vvqPKTeYGzLHyCefYKaIgyjUD6uhIx1B5Mrig
+         9qKeULxsSIO4rG+oXwq7LsFUPNmVRrqrArJRBrip5k49ZkRgJorYA04Lynb/rODfb4O7
+         TrtA==
+X-Gm-Message-State: AAQBX9crXIE7w5LK0vcHEYo63SjS8eOLO5agAgiKGJjT8tm0ikAw8QH3
+	WHQ2Kb0sHMxLiYO7GZMxT9Tm3U/YpZGbzefOxZw=
+X-Google-Smtp-Source: AKy350YLS3W9xq9O8P+qwMVax20PnqooSRm+/+382MwZ/9aQU7mLN3y+tHBuySoAh6eEMcQdzbv7lIzvbSHx3G9/0eI=
+X-Received: by 2002:a05:622a:64a:b0:3ef:4cc1:ce9 with SMTP id
+ a10-20020a05622a064a00b003ef4cc10ce9mr8156539qtb.9.1682079335666; Fri, 21 Apr
+ 2023 05:15:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Date: Fri, 21 Apr 2023 12:24:51 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev,
- will@kernel.org, oliver.upton@linux.dev, ricarkol@google.com,
- reijiw@google.com
-Subject: Re: [kvm-unit-tests PATCH 4/6] arm: pmu: Fix chain counter
- enable/disable sequences
-In-Reply-To: <ZEJq_XNHi8Mx3CBy@monolith.localdoman>
-References: <20230315110725.1215523-1-eric.auger@redhat.com>
- <20230315110725.1215523-5-eric.auger@redhat.com>
- <ZEJq_XNHi8Mx3CBy@monolith.localdoman>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <651289b765b20d6e2dc32f71c5d7b5b5@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, eric.auger@redhat.com, eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev, will@kernel.org, oliver.upton@linux.dev, ricarkol@google.com, reijiw@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+References: <20230412213510.1220557-1-amoorthy@google.com> <20230412213510.1220557-2-amoorthy@google.com>
+ <e73e9a97-3c76-fa71-b481-c0673e8562de@gmail.com> <CAF7b7mqMhQmQzJEhZJvEXGUzFB=jSXXOQUr22=Ef+oT-EDyEkg@mail.gmail.com>
+In-Reply-To: <CAF7b7mqMhQmQzJEhZJvEXGUzFB=jSXXOQUr22=Ef+oT-EDyEkg@mail.gmail.com>
+From: Robert Hoo <robert.hoo.linux@gmail.com>
+Date: Fri, 21 Apr 2023 20:15:24 +0800
+Message-ID: <CA+wubQC0rqteeDdU04vhWahBiwTU5ty5V+pTUXGYu9xd4ppM0g@mail.gmail.com>
+Subject: Re: [PATCH v3 01/22] KVM: selftests: Allow many vCPUs and reader
+ threads per UFFD in demand paging test
+To: Anish Moorthy <amoorthy@google.com>
+Cc: pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev, 
+	seanjc@google.com, jthoughton@google.com, bgardon@google.com, 
+	dmatlack@google.com, ricarkol@google.com, axelrasmussen@google.com, 
+	peterx@redhat.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2023-04-21 11:52, Alexandru Elisei wrote:
-> Hi,
-> 
-> On Wed, Mar 15, 2023 at 12:07:23PM +0100, Eric Auger wrote:
->> In some ARM ARM ddi0487 revisions it is said that
->> disabling/enabling a pair of counters that are paired
->> by a CHAIN event should follow a given sequence:
->> 
->> Disable the low counter first, isb, disable the high counter
->> Enable the high counter first, isb, enable low counter
->> 
->> This was the case in Fc. However this is not written anymore
->> in Ia revision.
->> 
->> Introduce 2 helpers to execute those sequences and replace
->> the existing PMCNTENCLR/ENSET calls.
->> 
->> Also fix 2 write_sysreg_s(0x0, PMCNTENSET_EL0) in subtest 5 & 6
->> and replace them by PMCNTENCLR writes since writing 0 in
->> PMCNTENSET_EL0 has no effect.
->> 
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  arm/pmu.c | 37 ++++++++++++++++++++++++++++---------
->>  1 file changed, 28 insertions(+), 9 deletions(-)
->> 
->> diff --git a/arm/pmu.c b/arm/pmu.c
->> index dde399e2..af679667 100644
->> --- a/arm/pmu.c
->> +++ b/arm/pmu.c
->> @@ -730,6 +730,22 @@ static void test_chained_sw_incr(bool unused)
->>  		    read_regn_el0(pmevcntr, 0), \
->>  		    read_sysreg(pmovsclr_el0))
->> 
->> +static void enable_chain_counter(int even)
->> +{
->> +	write_sysreg_s(BIT(even), PMCNTENSET_EL0); /* Enable the high 
->> counter first */
->> +	isb();
->> +	write_sysreg_s(BIT(even + 1), PMCNTENSET_EL0); /* Enable the low 
->> counter */
->> +	isb();
->> +}
-> 
-> In ARM DDI 0487F.b, at the bottom of page D7-2727:
-> 
-> "When enabling a pair of counters that are paired by a CHAIN event,
-> software must:
-> 
-> 1. Enable the high counter, by setting PMCNTENCLR_EL0[n+1] to 0 and, if
-> necessary, setting PMCR_EL0.E to 1.
-> 2. Execute an ISB instruction, or perform another Context 
-> synchronization
-> event.
-> 3. Enable the low counter by setting PMCNTENCLR_EL0[n] to 0."
+Anish Moorthy <amoorthy@google.com> =E4=BA=8E2023=E5=B9=B44=E6=9C=8821=E6=
+=97=A5=E5=91=A8=E4=BA=94 01:56=E5=86=99=E9=81=93=EF=BC=9A
+>
+> > > +             /*
+> > > +              * With multiple vCPU threads fault on a single page an=
+d there are
+> > > +              * multiple readers for the UFFD, at least one of the U=
+FFDIO_COPYs
+> > > +              * will fail with EEXIST: handle that case without sign=
+aling an
+> > > +              * error.
+> > > +              */
+> >
+> > But this code path is also gone through in other cases, isn't it? In
+> > those cases, is it still safe to ignore EEXIST?
+>
+> Good point: the answer is no, it's not always safe to ignore EEXISTs
+> here. For instance the first UFFDIO_CONTINUE for a page shouldn't be
+> allowed to EEXIST, and that's swept under the rug here. I've added the
+> following to the comment
+>
+> + * Note that this does sweep under the rug any EEXISTs occurring
+> + * from, e.g., the first UFFDIO_COPY/CONTINUEs on a page. A
+> + * realistic VMM would maintain some other state to correctly
+> + * surface EEXISTs to userspace or prevent duplicate
+> + * COPY/CONTINUEs from happening in the first place.
+>
+> I could add that extra state to the self test (via for instance, an
+> atomic bitmap that threads "or" into before issuing any
+> COPY/CONTINUEs) but it's a bit of an extra complication without any
+> real payoff. Let me know if you think the comment's inadequate though.
+>
+IIUC, you could say: in this on demand paging test case, even
+duplicate copy/continue doesn't do harm anyway. Am I right?
 
-This particular text seems to have been removed from the H.a and I.a
-revisions of the ARM ARM, and I cannot spot any equivalent requirement.
+> > > +             /* See the note about EEXISTs in the UFFDIO_COPY branch=
+. */
+> >
+> > Personally I would suggest copy the comments here. what if some day abo=
+ve
+> > code/comment was changed/deleted?
+>
+> You might be right: on the other hand, if the comment ever gets
+> updated then it would have to be done in two places. Anyone to break
+> the tie? :)
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+The one who updates the place is responsible for the comments. make sense?:=
+)
+>
+> > > @@ -148,18 +158,32 @@ struct uffd_desc *uffd_setup_demand_paging(int =
+uffd_mode, useconds_t delay,
+> > >       TEST_ASSERT((uffdio_register.ioctls & expected_ioctls) =3D=3D
+> > >                   expected_ioctls, "missing userfaultfd ioctls");
+> > >
+> > > -     ret =3D pipe2(uffd_desc->pipefds, O_CLOEXEC | O_NONBLOCK);
+> > > -     TEST_ASSERT(!ret, "Failed to set up pipefd");
+> > > -
+> > >       uffd_desc->uffd_mode =3D uffd_mode;
+> > >       uffd_desc->uffd =3D uffd;
+> > >       uffd_desc->delay =3D delay;
+> > >       uffd_desc->handler =3D handler;
+> >
+> > Now that these info are encapsulated into reader args below, looks
+> > unnecessary to have them in uffd_desc here.
+>
+> Good point. I've removed uffd_mode, delay, and handler from uffd_desc.
+> I left the "uffd" field in because that's a shared resource, and
+> close()ing it as "close(desc->uffd)" makes more sense than, say,
+> "close(desc->reader_args[0].uffd)"
+
+Sure, that's also what I originally changed on my side. sorry didn't
+mention it earlier.
