@@ -1,119 +1,123 @@
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47456612D;
-	Fri, 21 Apr 2023 19:43:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1682106210; x=1713642210;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=j/aCznEbmzY6CPJfpDgAnembGflLWzYVe2uqfonw5qE=;
-  b=bBu9kFSG4MUTd41ZNewf4Bunotdt1cJe7TqkiHht4O3SWolQsfKdSn0r
-   V0+4Vcl3rJBWbpeh+vorSkopT2JNMlYgQy399Fo0hlDAJWV3bMf+sDX5j
-   7k/XGVtOXhulcUEYXwutfAVHJqDZcT7t/W4YaK5Waq83Vry9doFzTVlV3
-   zTmZPbxXy/MmfFc9kbrmEJPq1Cqb+oLCRw3rvA+OlvyngRq96UUp5BkuR
-   qDA6SCsdZUXjIaU7BBJua2OdDXfAZzYqxiIX78+kLb+u2zqzDVfQEwz0k
-   wzTsB29Mt7OypmLj1Ikzo3soUC2TszL2nEz5az1T0kC62r+sZi+cMkHrJ
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10687"; a="348861996"
-X-IronPort-AV: E=Sophos;i="5.99,216,1677571200"; 
-   d="scan'208";a="348861996"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2023 12:43:29 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10687"; a="866795075"
-X-IronPort-AV: E=Sophos;i="5.99,216,1677571200"; 
-   d="scan'208";a="866795075"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by orsmga005.jf.intel.com with ESMTP; 21 Apr 2023 12:43:22 -0700
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1ppwfB-000gla-0k;
-	Fri, 21 Apr 2023 19:43:21 +0000
-Date: Sat, 22 Apr 2023 03:43:03 +0800
-From: kernel test robot <lkp@intel.com>
-To: Vipin Sharma <vipinsh@google.com>, maz@kernel.org,
-	oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
-	chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com,
-	tsbogend@alpha.franken.de, anup@brainfault.org,
-	atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
-	aou@eecs.berkeley.edu, seanjc@google.com, pbonzini@redhat.com,
-	dmatlack@google.com, ricarkol@google.com
-Cc: oe-kbuild-all@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
-Subject: Re: [PATCH 7/9] KVM: mmu: Move mmu lock/unlock to arch code for
- clear dirty log
-Message-ID: <202304220315.bpwbgH5n-lkp@intel.com>
-References: <20230421165305.804301-8-vipinsh@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E387C6FD7
+	for <kvmarm@lists.linux.dev>; Fri, 21 Apr 2023 23:19:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1682119172;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gArk5kA5h91jQajZJDrJgiT/ybVjEuAxb1hpzR7LDuo=;
+	b=YLPbFFQbVF96lUFsMGryIUbJXQDF9kIwa/nJbhTay3VJCRiBkFzCfKb78Z6VU/Wv5kNMpk
+	xBlI6pxIFp300cFiwQrcA3VC64zcbDwLfr30EJ4ZENdADk+U6bdkhTgO6OVI/+xYn+GHrO
+	mmxptNjrqvBwJ+ZYj5sl5O5CLsPDNzQ=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-203-7iTSRryLNn6FfPOYE0AptQ-1; Fri, 21 Apr 2023 19:19:31 -0400
+X-MC-Unique: 7iTSRryLNn6FfPOYE0AptQ-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-50470d68f1eso2138696a12.0
+        for <kvmarm@lists.linux.dev>; Fri, 21 Apr 2023 16:19:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682119169; x=1684711169;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gArk5kA5h91jQajZJDrJgiT/ybVjEuAxb1hpzR7LDuo=;
+        b=O1OVDwO6E7t9+w8qo0x6xZ1ZijzKHG9djltscpT1ReDsmirllMIHwYvECqYXWNDYfC
+         BouCa9i5vkOCYYDGIuA07doPcfLrorU9/KEl6sbvvHZ1KWmwkwBgH4sQJwF6mLdK0umh
+         JKO0SXaJHYnzJ8d+46Rky65nhIP3eu3CiMyEAlP/MuKwZru/lEHwyHaDdIcWRL1KVaKX
+         9aOrXVmP1SXxa/Qz9d1zmTMvL+XJ4C9sERWWWlFKlxeH2fDqc8yk5iRAl7mzk23iAnl1
+         FdcvTUSHe5MvFm+xAwvTfmNF6M1cZxvj5lJthVGchZ6DFEfYqXTtuMPqkyCldGXw8Rjy
+         yEHg==
+X-Gm-Message-State: AAQBX9f0+aaKslULuc7XOP2aVpIgjr9dUClAwjx0TGKnRUv9WWsQmiYC
+	SqGhGfJx5ch17IVRH7900CYDjDwCJBNQkY3eFqrs3ZONYDXtbFmFUtqeezTxR8jF/mt4fwkugB6
+	E1C/JRvMhg3Q4vKPb
+X-Received: by 2002:a17:906:6696:b0:94f:296d:75d0 with SMTP id z22-20020a170906669600b0094f296d75d0mr4131497ejo.30.1682119168888;
+        Fri, 21 Apr 2023 16:19:28 -0700 (PDT)
+X-Google-Smtp-Source: AKy350ZZ3xqFfRB+TCuv6iug8ekUlrIuTCxxZuHbavzl6Dc3sGW8mAGG3LfQs+u3PgmIl6xEzLAkvg==
+X-Received: by 2002:a17:906:6696:b0:94f:296d:75d0 with SMTP id z22-20020a170906669600b0094f296d75d0mr4131473ejo.30.1682119168476;
+        Fri, 21 Apr 2023 16:19:28 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id e6-20020a1709062c0600b0094ef2003581sm2612514ejh.153.2023.04.21.16.19.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Apr 2023 16:19:27 -0700 (PDT)
+Message-ID: <1583e743-2448-6bb9-1653-265887f73eb0@redhat.com>
+Date: Sat, 22 Apr 2023 01:19:26 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230421165305.804301-8-vipinsh@google.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [GIT PULL v2] KVM/arm64 fixes for 6.3, part #4
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Marc Zyngier
+ <maz@kernel.org>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
+ Mostafa Saleh <smostafa@google.com>, Dan Carpenter <dan.carpenter@linaro.org>
+References: <ZEAOmK52rgcZeDXg@thinky-boi>
+From: Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <ZEAOmK52rgcZeDXg@thinky-boi>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Vipin,
+On 4/19/23 17:54, Oliver Upton wrote:
+> Hi Paolo,
+> 
+> Here is v2 of the last batch of fixes for 6.3 (for real this time!)
+> 
+> Details in the tag, but the noteworthy addition is Dan's fix for a
+> rather obvious buffer overflow when writing to a firmware register.
+> 
+> Please pull,
+> 
+> Oliver
+> 
+> The following changes since commit e81625218bf7986ba1351a98c43d346b15601d26:
+> 
+>    KVM: arm64: Advertise ID_AA64PFR0_EL1.CSV2/3 to protected VMs (2023-04-04 15:52:06 +0000)
+> 
+> are available in the Git repository at:
+> 
+>    git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.3-4
+> 
+> for you to fetch changes up to a25bc8486f9c01c1af6b6c5657234b2eee2c39d6:
+> 
+>    KVM: arm64: Fix buffer overflow in kvm_arm_set_fw_reg() (2023-04-19 15:22:37 +0000)
 
-kernel test robot noticed the following build warnings:
+Pulled, thanks.
 
-[auto build test WARNING on 95b9779c1758f03cf494e8550d6249a40089ed1c]
+Paolo
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Vipin-Sharma/KVM-selftests-Allow-dirty_log_perf_test-to-clear-dirty-memory-in-chunks/20230422-005708
-base:   95b9779c1758f03cf494e8550d6249a40089ed1c
-patch link:    https://lore.kernel.org/r/20230421165305.804301-8-vipinsh%40google.com
-patch subject: [PATCH 7/9] KVM: mmu: Move mmu lock/unlock to arch code for clear dirty log
-config: riscv-allyesconfig (https://download.01.org/0day-ci/archive/20230422/202304220315.bpwbgH5n-lkp@intel.com/config)
-compiler: riscv64-linux-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/e7505b53d53e3bb5e7f1c43233ef3644673edb75
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Vipin-Sharma/KVM-selftests-Allow-dirty_log_perf_test-to-clear-dirty-memory-in-chunks/20230422-005708
-        git checkout e7505b53d53e3bb5e7f1c43233ef3644673edb75
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=riscv olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=riscv SHELL=/bin/bash arch/riscv/kvm/
+> 
+> ----------------------------------------------------------------
+> KVM/arm64 fixes for 6.3, part #4
+> 
+>   - Plug a buffer overflow due to the use of the user-provided register
+>     width for firmware regs. Outright reject accesses where the
+>     user register width does not match the kernel representation.
+> 
+>   - Protect non-atomic RMW operations on vCPU flags against preemption,
+>     as an update to the flags by an intervening preemption could be lost.
+> 
+> ----------------------------------------------------------------
+> Dan Carpenter (1):
+>        KVM: arm64: Fix buffer overflow in kvm_arm_set_fw_reg()
+> 
+> Marc Zyngier (1):
+>        KVM: arm64: Make vcpu flag updates non-preemptible
+> 
+>   arch/arm64/include/asm/kvm_host.h | 19 ++++++++++++++++++-
+>   arch/arm64/kvm/hypercalls.c       |  2 ++
+>   2 files changed, 20 insertions(+), 1 deletion(-)
+> 
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202304220315.bpwbgH5n-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   arch/riscv/kvm/mmu.c: In function 'kvm_arch_mmu_enable_log_dirty_pt_masked':
->> arch/riscv/kvm/mmu.c:399:9: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
-     399 |         phys_addr_t base_gfn = slot->base_gfn + gfn_offset;
-         |         ^~~~~~~~~~~
-
-
-vim +399 arch/riscv/kvm/mmu.c
-
-c9d57373fc87a3 Anup Patel   2022-07-29  392  
-9d05c1fee83757 Anup Patel   2021-09-27  393  void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
-9d05c1fee83757 Anup Patel   2021-09-27  394  					     struct kvm_memory_slot *slot,
-9d05c1fee83757 Anup Patel   2021-09-27  395  					     gfn_t gfn_offset,
-9d05c1fee83757 Anup Patel   2021-09-27  396  					     unsigned long mask)
-9d05c1fee83757 Anup Patel   2021-09-27  397  {
-e7505b53d53e3b Vipin Sharma 2023-04-21  398  	spin_lock(&kvm->mmu_lock);
-9d05c1fee83757 Anup Patel   2021-09-27 @399  	phys_addr_t base_gfn = slot->base_gfn + gfn_offset;
-9d05c1fee83757 Anup Patel   2021-09-27  400  	phys_addr_t start = (base_gfn +  __ffs(mask)) << PAGE_SHIFT;
-9d05c1fee83757 Anup Patel   2021-09-27  401  	phys_addr_t end = (base_gfn + __fls(mask) + 1) << PAGE_SHIFT;
-9d05c1fee83757 Anup Patel   2021-09-27  402  
-26708234eb12e7 Anup Patel   2022-05-09  403  	gstage_wp_range(kvm, start, end);
-e7505b53d53e3b Vipin Sharma 2023-04-21  404  	spin_unlock(&kvm->mmu_lock);
-9d05c1fee83757 Anup Patel   2021-09-27  405  }
-99cdc6c18c2d81 Anup Patel   2021-09-27  406  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
