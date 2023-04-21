@@ -1,84 +1,129 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE83A5670
-	for <kvmarm@lists.linux.dev>; Fri, 21 Apr 2023 16:22:10 +0000 (UTC)
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-3f178da219bso19708435e9.1
-        for <kvmarm@lists.linux.dev>; Fri, 21 Apr 2023 09:22:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E88B3207
+	for <kvmarm@lists.linux.dev>; Fri, 21 Apr 2023 16:53:09 +0000 (UTC)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-63b41df6c5aso1750847b3a.1
+        for <kvmarm@lists.linux.dev>; Fri, 21 Apr 2023 09:53:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682094129; x=1684686129;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GrYsNtgw74ztN7e3pvnyx/JwXWQAkNxk8bJ7YuN8gRw=;
-        b=19P5qaQDD6Ir4qwcHLjD1JpIvWPpQH6x+LtIKYqRaa+8XtTyn5d1fWxl7foPysgIMt
-         pzxBPWwJHKRLEEdXgOr/LCSqciy/szp5DwfCWCX/c//f8kqBoGYNuH9IfD0ewCxh7YCT
-         owqAxrNvM/wufLhAfp200YLkcUVqmPV6sf5bbe04iIXMUEEjgGscfnVFcMTtiIrsb7As
-         k3/2XcbvHRIpuPbtDxSlVQBkd9R9C9CoFLV6qOUM4USFJCoQ/ZGEMJ9EJ+7jhO9i3jEZ
-         NOl98CeqvMKRZad4MnenhhK38PydTAGe7lQiBDsI0aTkZ3zE4JUiOntaj0eIZ1zaaJ2K
-         3qHQ==
+        d=google.com; s=20221208; t=1682095989; x=1684687989;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Bpz9GCI4OFqr9DlnIkg8fh50O4zOZAPmw/GqyWI1sUY=;
+        b=DGn7gCykqxE1wl2tXEHxtzFbscSQI+JYs1BOyBXnwpOUa0v37O5EWPBn/ZgODYtQlN
+         ucm2bl+oRpYs66hkDH2OsTMMwYnJjHqmfL1Gfoz55eaPsC+KkP0XkEqAwZ6rs8pd6Rpz
+         FUqoTwNDb4fdpZO/bATUsOleiUawwODIJsv2oBaDLHov514nHeOp01TeHl5biXsvmD+B
+         drB6ioShN8gZ615eSTgzwj90uRL3MtckEF9+PdrDWulnCx0CuSxldhcUkAHan3z7jBnk
+         tHJsR2+7JQcAF/jPDdgXfTyng+EIcBFq/MixhtIbZMOElAUZCqnEM9rZEPv1BqgcbQ1G
+         Ek/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682094129; x=1684686129;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GrYsNtgw74ztN7e3pvnyx/JwXWQAkNxk8bJ7YuN8gRw=;
-        b=CuSd7GXRj00dEGnq/xJM/aCa+ceRTfgG0SOJOtqvUIrutar4UIwqyxid691A9Nd07o
-         GwiP5xdffcBTNaPdWe/pKMR6XE4Z6KoeQ0GKsPiBWIoLsbigECc2jO4BNBweKCYcsEAi
-         KRUIIVJWeqmfK+h5fBh+yFeUucPBf4vIGUOU5yOXIvtWeWY04S0cXEkLAe1jJh7+QMzu
-         6zMDKVdfmsSw35KChUf5THtJT0oEiu85tN3CPiAdB6pWzxfgu/9xok767F4v8MJicTNM
-         NaHgzpHyZjMi8NdSpC3JlmzjRhRSlx1zLoQwKjZ5K5Eb+gwRCM0hjwYgc9giAVDg3xzO
-         3CXA==
-X-Gm-Message-State: AAQBX9cm6MD4i6/aW9Nj4viAviDh6aLKE8k+iPR+l3lx/3AyrvPh8rW1
-	KimheDTqQTQqiY9nj1vdhStpxUoovAcdhCImwAqqjw==
-X-Google-Smtp-Source: AKy350YOOW/R09AMwTETRErtw1r2/Wun0ysqRNAv+E7XGPitF9a+Jc7pmelyd9j7FsmyFQSzUDUOVyUJzBF+0pPDXBc=
-X-Received: by 2002:a1c:f30e:0:b0:3f1:6d22:eaa0 with SMTP id
- q14-20020a1cf30e000000b003f16d22eaa0mr2643410wmq.2.1682094128700; Fri, 21 Apr
- 2023 09:22:08 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1682095989; x=1684687989;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Bpz9GCI4OFqr9DlnIkg8fh50O4zOZAPmw/GqyWI1sUY=;
+        b=X2Kb3c8ztWZ3Oy39+pIZ2wwoWWOaMso4NJHbOEa9jL8uf1mhzHt6GkKccgFQbmhZoG
+         YKyIf6PxYX3b1u1ksAMEYfViWIVxfwCiH/EyUQ7iMRc2Pg8sormVgjfEdSRqxCspLTej
+         da4YOdAMVt5wmIrnpaZuNd0QYAezJ+ZYbE82t0MELHB7SiV9DAeveIHOIGFxfKwgt4mg
+         /PozoVWjgdqrmsfkk1Msk7WzMG29UsF7wK6ePikn8CnMOxC2IOuSgrdgt0akoh7DefOp
+         LgHTWUClSzON9uWPxAsAxgjUH6lw6Jt1tkr5NOOffdElJTunhSM6FJerumsrqjjx690Q
+         el9A==
+X-Gm-Message-State: AAQBX9fU+BZzIeXVQWfI2jqYss/at5gLgkOes4ZrBlXOSNea2IO0PZu2
+	CQ1AR6CA91S7eXhBFAV9/CEyvn2bhh5u
+X-Google-Smtp-Source: AKy350ZhH26lR6IB3CnQ8CLF2JwssN6KagmxAVm6T/W0c2gS8Zvsk3hHnJOD9Yv5ucUQ9FKvawPIRN1PXzlu
+X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
+ (user=vipinsh job=sendgmr) by 2002:a05:6a00:b94:b0:63d:397a:8fdd with SMTP id
+ g20-20020a056a000b9400b0063d397a8fddmr2339440pfj.0.1682095989138; Fri, 21 Apr
+ 2023 09:53:09 -0700 (PDT)
+Date: Fri, 21 Apr 2023 09:52:56 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230412213510.1220557-1-amoorthy@google.com> <20230412213510.1220557-2-amoorthy@google.com>
- <e73e9a97-3c76-fa71-b481-c0673e8562de@gmail.com> <CAF7b7mqMhQmQzJEhZJvEXGUzFB=jSXXOQUr22=Ef+oT-EDyEkg@mail.gmail.com>
- <CA+wubQC0rqteeDdU04vhWahBiwTU5ty5V+pTUXGYu9xd4ppM0g@mail.gmail.com>
-In-Reply-To: <CA+wubQC0rqteeDdU04vhWahBiwTU5ty5V+pTUXGYu9xd4ppM0g@mail.gmail.com>
-From: Anish Moorthy <amoorthy@google.com>
-Date: Fri, 21 Apr 2023 09:21:30 -0700
-Message-ID: <CAF7b7mp=f3PEfsC0+1QG9gOXDiZ-P+jX7XeX+49f+KgTmWS1NQ@mail.gmail.com>
-Subject: Re: [PATCH v3 01/22] KVM: selftests: Allow many vCPUs and reader
- threads per UFFD in demand paging test
-To: Robert Hoo <robert.hoo.linux@gmail.com>
-Cc: pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev, 
-	seanjc@google.com, jthoughton@google.com, bgardon@google.com, 
-	dmatlack@google.com, ricarkol@google.com, axelrasmussen@google.com, 
-	peterx@redhat.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.40.0.634.g4ca3ef3211-goog
+Message-ID: <20230421165305.804301-1-vipinsh@google.com>
+Subject: [PATCH 0/9] KVM: arm64: Use MMU read lock for clearing dirty logs
+From: Vipin Sharma <vipinsh@google.com>
+To: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, 
+	tsbogend@alpha.franken.de, anup@brainfault.org, atishp@atishpatra.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	seanjc@google.com, pbonzini@redhat.com, dmatlack@google.com, 
+	ricarkol@google.com
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Vipin Sharma <vipinsh@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 21, 2023 at 5:15=E2=80=AFAM Robert Hoo <robert.hoo.linux@gmail.=
-com> wrote:
->
-> IIUC, you could say: in this on demand paging test case, even
-> duplicate copy/continue doesn't do harm anyway. Am I right?
+This patch series improves guest vCPUs performances on Arm during clearing
+dirty log operations by taking MMU read lock instead of MMU write lock.
 
-It's probably more accurate to say that it never happens in the first
-place. I've added a sentence here,
+vCPUs write protection faults are fixed in Arm using MMU read locks.
+However, when userspace is clearing dirty logs via KVM_CLEAR_DIRTY_LOG
+ioctl, then kernel code takes MMU write lock. This will block vCPUs
+write protection faults and degrade guest performance.  This
+degradation gets worse as guest VM size increases in terms of memory and
+vCPU count.
 
-> > > > +             /* See the note about EEXISTs in the UFFDIO_COPY bran=
-ch. */
-> > >
-> > > Personally I would suggest copy the comments here. what if some day a=
-bove
-> > > code/comment was changed/deleted?
-> >
-> > You might be right: on the other hand, if the comment ever gets
-> > updated then it would have to be done in two places. Anyone to break
-> > the tie? :)
->
-> The one who updates the place is responsible for the comments. make sense=
-?:)
+In this series, MMU read lock adoption is made possible by using
+KVM_PGTABLE_WALK_SHARED flag in page walker.
 
-Fair enough, done.
+Patches 1 to 5:
+These patches are modifying dirty_log_perf_test. Intent is to mimic
+production scenarios where guest keeps on executing while userspace
+threads collect and clear dirty logs independently.
+
+Three new command line options are added:
+1. j: Allows to run guest vCPUs and main thread collecting dirty logs
+      independently of each other after initialization is complete.
+2. k: Allows to clear dirty logs in smaller chunks compared to existing
+      whole memslot clear in one call.
+3. l: Allows to add customizable wait time between consecutive clear
+      dirty log calls to mimic sending dirty memory to destination.
+
+Patch 7-8:
+These patches refactor code to move MMU lock operations to arch specific
+code, refactor Arm's page table walker APIs, and change MMU write lock
+for clearing dirty logs to read lock. Patch 8 has results showing
+improvements based on dirty_log_perf_test.
+
+Vipin Sharma (9):
+  KVM: selftests: Allow dirty_log_perf_test to clear dirty memory in
+    chunks
+  KVM: selftests: Add optional delay between consecutive Clear-Dirty-Log
+    calls
+  KVM: selftests: Pass count of read and write accesses from guest to
+    host
+  KVM: selftests: Print read and write accesses of pages by vCPUs in
+    dirty_log_perf_test
+  KVM: selftests: Allow independent execution of vCPUs in
+    dirty_log_perf_test
+  KVM: arm64: Correct the kvm_pgtable_stage2_flush() documentation
+  KVM: mmu: Move mmu lock/unlock to arch code for clear dirty log
+  KMV: arm64: Allow stage2_apply_range_sched() to pass page table walker
+    flags
+  KVM: arm64: Run clear-dirty-log under MMU read lock
+
+ arch/arm64/include/asm/kvm_pgtable.h          |  17 ++-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         |   4 +-
+ arch/arm64/kvm/hyp/pgtable.c                  |  16 ++-
+ arch/arm64/kvm/mmu.c                          |  36 ++++--
+ arch/mips/kvm/mmu.c                           |   2 +
+ arch/riscv/kvm/mmu.c                          |   2 +
+ arch/x86/kvm/mmu/mmu.c                        |   3 +
+ .../selftests/kvm/dirty_log_perf_test.c       | 108 ++++++++++++++----
+ .../testing/selftests/kvm/include/memstress.h |  13 ++-
+ tools/testing/selftests/kvm/lib/memstress.c   |  43 +++++--
+ virt/kvm/dirty_ring.c                         |   2 -
+ virt/kvm/kvm_main.c                           |   4 -
+ 12 files changed, 185 insertions(+), 65 deletions(-)
+
+
+base-commit: 95b9779c1758f03cf494e8550d6249a40089ed1c
+-- 
+2.40.0.634.g4ca3ef3211-goog
+
