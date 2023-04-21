@@ -1,136 +1,229 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54236568B
-	for <kvmarm@lists.linux.dev>; Fri, 21 Apr 2023 16:53:25 +0000 (UTC)
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2476a31ef4aso1352673a91.3
-        for <kvmarm@lists.linux.dev>; Fri, 21 Apr 2023 09:53:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3EA15689
+	for <kvmarm@lists.linux.dev>; Fri, 21 Apr 2023 16:58:44 +0000 (UTC)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-3f195b164c4so3711855e9.1
+        for <kvmarm@lists.linux.dev>; Fri, 21 Apr 2023 09:58:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682096005; x=1684688005;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EZkpp0Q8jjYvxCvjV0ny/+Rc/wVVpL1bL7ck4xeVhlc=;
-        b=0h1fkH+Qg9TAAOhRy5ByqB0jrA5qVCSK4v4VOevyiT2ApjSQTkdNJB5NveNHYdDJyn
-         UJHQdihO3xA3kzsZEepsUYjUUldoQQHE3IwikHmH626x/P3dqcuE74kUFvi/fYfmL8id
-         EDHpOrTTDrdls8Ay6MgcRCV+nPsBif06WnlTwtqTPlBkRDbsQd0Ihsksz1E+BPVTlwL+
-         Wr1jDKNxfs+qyRuwYH973UQwgCLkK4mXV3n/qkGEbaFtetzvIDazfRsZNp9s0jwVrFs5
-         k56stUv4Ja+Quv0wmKFN8uJmrJL9UvFWW6XEpyc/9yhzn8gHY1vEcRlztKntO6uIDVGX
-         jZXw==
+        d=google.com; s=20221208; t=1682096323; x=1684688323;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z8Rxt8dTLEovw3lEAnM7MgL3OWO4znXGRJ3kPeyNNpw=;
+        b=c2yeDPrvbiceHrf8w+PQc1Uwqt2wh6D7nCKhERo+oeLqgUJTVxF3Q+xtEqAMODaI72
+         2ARnoyoOcN9RWgG5ztthzt2xleV+WThmkuilL6DjSPc1uFF2r4Lb+kAmjDN7bCy8bMJt
+         XTxSS1LAHGwub5nILUVdDv+w+lfYmZHJNnNxbHndvSim6AJRVPA+AWBITxJULAa5KBIZ
+         Sv8hwfIOInAiN/zCUQlNChk8/7e3U8SA8y6pkDjFd3KJ5FfAXAeOcuZJILRGnf/6ZH57
+         q08zX2T7ZHW+cQPUWaTM9d7brBJsbmMt/RSSde6wnqI3D7FXH9G2dB8OT0AyDuISv+7F
+         YO4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682096005; x=1684688005;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EZkpp0Q8jjYvxCvjV0ny/+Rc/wVVpL1bL7ck4xeVhlc=;
-        b=TQRd0N5sjhEUrwEkDwGnTrbF2LC7G+JvOWyj2TO1szVD1ZqkkLS5hyjj3d2CMwD0js
-         3gRG2KFy+XxM5lJef0NeM8rKo5XzAAwtJAdBNFvzyjEeJL9LptXqkH6aviJfvDd2lFd7
-         +U+X6UIWAYIxYpB8WZhXUN1l+Df8LutM8E71kXlBFLZxe2lIHuTcmAV+buxn5cGNY+z9
-         4mEkV+3U6doeX1hJfK21LZEj9hfiIYXvpEBBrg/EYCq/3IpaGChTChbLCdpirYMY8McT
-         ViyIG6lNbNhylQAMsaz0G4+9F2F1XaohqAc1l1KCxe8u5EILQTA39/WJSGQPsF8RcT2n
-         vTfQ==
-X-Gm-Message-State: AAQBX9cDbP1QC1mPCfFT5GAEkqD0eF0KwdtBp7ijwOGNRhA/0RKAa/PX
-	U4x+nwIDqtBQ2PF6MW9vDyrtEht/XFiE
-X-Google-Smtp-Source: AKy350bDKAEiJjC/uv+A89c39cSNVyu8ADQH7b61iTn5O1CeNgQ8Eu2os+9yNYOIL6Af0Fk180jnNb9Y53o2
-X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
- (user=vipinsh job=sendgmr) by 2002:a17:90a:690d:b0:23f:a851:4f04 with SMTP id
- r13-20020a17090a690d00b0023fa8514f04mr1467442pjj.3.1682096004881; Fri, 21 Apr
- 2023 09:53:24 -0700 (PDT)
-Date: Fri, 21 Apr 2023 09:53:05 -0700
-In-Reply-To: <20230421165305.804301-1-vipinsh@google.com>
+        d=1e100.net; s=20221208; t=1682096323; x=1684688323;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=z8Rxt8dTLEovw3lEAnM7MgL3OWO4znXGRJ3kPeyNNpw=;
+        b=YXwhrIPRVGWUcYSC6w33W9AWc6UrGJ9Is07PM7on2cIQfTJAoZOuuK5m4eQGQhccH3
+         neBWeL805/P9bUoMp948dnf+l72KxPaYeypGcDNs6L/lVrgzWznIVl0uOUp3zdC/1Xbs
+         Lta/DgeBiKiBIIT03eSY04EK8E5fymdxP4A/IXktFoWV+vMkiYGnCwX548SQiwymEeDa
+         wjaFCiFRrKkjUo28KcMYzSssTB1SyfjSfGO1LyMaeITr3czvQdMP6+67x+eGeK0+WQiC
+         oR0bH8WXLuGqV6+MOS1xdcILUlUCOvk7wBLHr7/iW0o+Dj86ocpBM8xWsgFoHzVHQGXs
+         fQCw==
+X-Gm-Message-State: AAQBX9ey5esW7x0wUoWNLGb2j9eUMc3poLXImL5pollLq4UnIJgxw8il
+	8/VGzLBhybImRfrhsm4Gewz8Z7rmy51RMIXMvyZomQ==
+X-Google-Smtp-Source: AKy350afBzvM3bUoCKK6F0lcGkrooiM3JAYrImnU/G6GTNeb4vcAlPGHsM/xbA7Ai0f52THZ20jeXhiZqD2U/OjaC5A=
+X-Received: by 2002:adf:cd85:0:b0:2f4:55c3:8452 with SMTP id
+ q5-20020adfcd85000000b002f455c38452mr5064489wrj.22.1682096322772; Fri, 21 Apr
+ 2023 09:58:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230421165305.804301-1-vipinsh@google.com>
-X-Mailer: git-send-email 2.40.0.634.g4ca3ef3211-goog
-Message-ID: <20230421165305.804301-10-vipinsh@google.com>
-Subject: [PATCH 9/9] KVM: arm64: Run clear-dirty-log under MMU read lock
-From: Vipin Sharma <vipinsh@google.com>
-To: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	will@kernel.org, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, 
-	tsbogend@alpha.franken.de, anup@brainfault.org, atishp@atishpatra.org, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	seanjc@google.com, pbonzini@redhat.com, dmatlack@google.com, 
-	ricarkol@google.com
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Vipin Sharma <vipinsh@google.com>
+MIME-Version: 1.0
+References: <20230412213510.1220557-1-amoorthy@google.com> <ZEBHTw3+DcAnPc37@x1n>
+ <CAJHvVchBqQ8iVHgF9cVZDusMKQM2AjtNx2z=i9ZHP2BosN4tBg@mail.gmail.com>
+ <ZEBXi5tZZNxA+jRs@x1n> <CAF7b7mo68VLNp=QynfT7QKgdq=d1YYGv1SEVEDxF9UwHzF6YDw@mail.gmail.com>
+ <ZEGuogfbtxPNUq7t@x1n>
+In-Reply-To: <ZEGuogfbtxPNUq7t@x1n>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Fri, 21 Apr 2023 09:58:06 -0700
+Message-ID: <CAF7b7mrP-ZekkvmXyWbeZOyMjsHQmCKvBEPSogBsw1eAUCs_1A@mail.gmail.com>
+Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
+ migration via annotated memory faults.
+To: Peter Xu <peterx@redhat.com>
+Cc: Axel Rasmussen <axelrasmussen@google.com>, pbonzini@redhat.com, maz@kernel.org, 
+	oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com, 
+	bgardon@google.com, dmatlack@google.com, ricarkol@google.com, 
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Nadav Amit <nadav.amit@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Take MMU read lock for write protecting PTEs and use shared page table
-walker for clearing dirty logs.
+On Thu, Apr 20, 2023 at 2:29=E2=80=AFPM Peter Xu <peterx@redhat.com> wrote:
+>
+> Yes I don't understand why vanilla uffd is so different, neither am I sur=
+e
+> what does the graph mean, though. :)
+>
+> Is the first drop caused by starting migration/precopy?
+>
+> Is the 2nd (huge) drop (mostly to zero) caused by frequently accessing ne=
+w
+> pages during postcopy?
 
-Clearing dirty logs are currently performed under MMU write locks. This
-means vCPUs write protection fault, which also take MMU read lock,  will
-be blocked during this operation. This causes guest degradation and
-especially noticeable on VMs with lot of vCPUs.
+Right on both counts. By the way, for anyone who notices that the
+userfaultfd (red/yellow) lines never recover to the initial level of
+performance, whereas the blue line does: that's a separate issue,
+please ignore :)
 
-Taking MMU read lock will allow vCPUs to execute parallelly and reduces
-the impact on vCPUs performance.
+> Is the workload busy writes single thread, or NCPU threads?
 
-Tested improvement on a ARM Ampere Altra host (64 CPUs, 256 GB
-memory and single NUMA node) via dirty_log_perf_test for 48 vCPU, 96
-GB memory, 8GB clear chunk size, 1 second wait between Clear-Dirty-Log
-calls and configuration:
+One thread per vCPU.
 
-Test command:
-./dirty_log_perf_test -s anonymous_hugetlb_2mb -b 2G -v 48 -l 1 -k 8G -j -m 2
+> Is what you mentioned on the 25%-75% comparison can be shown on the graph=
+?
+> Or maybe that's part of the period where all three are very close to 0?
 
-Before:
-Total pages touched: 50331648 (Reads: 0, Writes: 50331648)
+Yes, unfortunately the absolute size of the improvement is still
+pretty small (we go from ~50 writes/s to ~150), so all looks like zero
+with this scale.
 
-After:
-Total pages touched: 125304832 (Reads: 0, Writes: 125304832)
+> > The second is the redis memtier benchmark [1], a more realistic
+> > workflow where we migrate a VM running the redis server. With scalable
+> > userfaultfd, the client VM observes significantly higher transaction
+> > rates during uffd-based postcopy (see "Memtier.png"). I can pull the
+> > exact numbers if needed, but just from eyeballing the graph you can
+> > see that the improvement is something like 5-10x (at least) for
+> > several seconds. There's still a noticeable gap with KVM demand paging
+> > based-postcopy, but the improvement is definitely significant.
+> >
+> > [1] https://github.com/RedisLabs/memtier_benchmark
+>
+> Does the "5-10x" difference rely in the "15s valley" you pointed out in t=
+he
+> graph?
 
-Signed-off-by: Vipin Sharma <vipinsh@google.com>
----
- arch/arm64/kvm/mmu.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+Not quite sure what you mean: I meant to point out that the ~15s
+valley is where we observe improvements due to scalable userfaultfd.
+For most of that valley, the speedup of scalable uffd is 5-10x (or
+something, I admit to eyeballing those numbers :)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index e0189cdda43d..3f2117d93998 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -67,8 +67,12 @@ static int stage2_apply_range(struct kvm_s2_mmu *mmu, phys_addr_t addr,
- 		if (ret)
- 			break;
- 
--		if (resched && next != end)
--			cond_resched_rwlock_write(&kvm->mmu_lock);
-+		if (resched && next != end) {
-+			if (flags & KVM_PGTABLE_WALK_SHARED)
-+				cond_resched_rwlock_read(&kvm->mmu_lock);
-+			else
-+				cond_resched_rwlock_write(&kvm->mmu_lock);
-+		}
- 	} while (addr = next, addr != end);
- 
- 	return ret;
-@@ -994,7 +998,7 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
- 	phys_addr_t start = (base_gfn +  __ffs(mask)) << PAGE_SHIFT;
- 	phys_addr_t end = (base_gfn + __fls(mask) + 1) << PAGE_SHIFT;
- 
--	stage2_wp_range(&kvm->arch.mmu, start, end, 0);
-+	stage2_wp_range(&kvm->arch.mmu, start, end, KVM_PGTABLE_WALK_SHARED);
- }
- 
- /*
-@@ -1008,9 +1012,9 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
- 		struct kvm_memory_slot *slot,
- 		gfn_t gfn_offset, unsigned long mask)
- {
--	write_lock(&kvm->mmu_lock);
-+	read_lock(&kvm->mmu_lock);
- 	kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
--	write_unlock(&kvm->mmu_lock);
-+	read_unlock(&kvm->mmu_lock);
- }
- 
- static void kvm_send_hwpoison_signal(unsigned long address, short lsb)
--- 
-2.40.0.634.g4ca3ef3211-goog
+> Is it reproduceable that the blue line always has a totally different
+> "valley" comparing to yellow/red?
 
+Yes, but the offset of that valley is just precopy taking longer for
+some reason on that configuration. Honestly it's probably just better
+to ignore the blue line, since that's a google-specific stack.
+
+> Personally I still really want to know what happens if we just split the
+> vma and see how it goes with a standard workloads, but maybe I'm asking t=
+oo
+> much so don't yet worry.  The solution here proposed still makes sense to
+> me and I agree if this can be done well it can resolve the bottleneck ove=
+r
+> 1-userfaultfd.
+>
+> But after I read some of the patches I'm not sure whether it's possible i=
+t
+> can be implemented in a complete way.  You mentioned here and there on th=
+at
+> things can be missing probably due to random places accessing guest pages
+> all over kvm.  Relying sololy on -EFAULT so far doesn't look very reliabl=
+e
+> to me, but it could be because I didn't yet really understand how it work=
+s.
+>
+> Is above a concern to the current solution?
+
+Based on your comment in [1], I think your impression of this series
+is that it tries to (a) catch all of the cases where userfaultfd would
+be triggered and (b) bypass userfaultfd by surfacing the page faults
+via vCPU exit. That's only happening in two places (the
+KVM_ABSENT_MAPPING_FAULT changes) corresponding to the EPT violation
+handler on x86 and the arm64 equivalent. Bypassing the queuing of
+faults onto a uffd in those two cases, and instead delivering those
+faults via vCPU exit, is what provides the performance gains I'm
+demonstrating.
+
+However, all of the other changes (KVM_MEMORY_FAULT_INFO, the bulk of
+this series) are totally unrelated to if/how faults are queued onto
+userfaultfd. Page faults from copy_to_user/copy_from_user, etc will
+continue to be delivered via uffd (if one is registered, obviously),
+and changing that is *not* a goal. All that KVM_MEMORY_FAULT_INFO does
+is deliver some extra information to userspace in cases where KVM_RUN
+currently just returns -EFAULT.
+
+Hopefully this, and my response to [1], clears things up. If not, let
+me know and I'll be glad to discuss further.
+
+[1] https://lore.kernel.org/kvm/ZEGuogfbtxPNUq7t@x1n/T/#m76f940846ecc94ea85=
+efa80ffbe42366c2352636
+
+> Have any of you tried to investigate the other approach to scale
+> userfaultfd?
+
+As Axel mentioned we considered sharding VMAs but didn't pursue it for
+a few different reasons.
+
+> It seems userfaultfd does one thing great which is to have the trapping a=
+t
+> an unified place (when the page fault happens), hence it doesn't need to
+> worry on random codes splat over KVM module read/write a guest page.  The
+> question is whether it'll be easy to do so.
+
+See a couple of notes above.
+
+> Split vma definitely is still a way to scale userfaultfd, but probably no=
+t
+> in a good enough way because it's scaling in memory axis, not cores.  If
+> tens of cores accessing a small region that falls into the same VMA, then
+> it stops working.
+>
+> However maybe it can be scaled in other form?  So far my understanding is
+> "read" upon uffd for messages is still not a problem - the read can be do=
+ne
+> in chunk, and each message will be converted into a request to be send
+> later.
+>
+> If the real problem relies in a bunch of threads queuing, is it possible
+> that we can provide just more queues for the events?  The readers will ju=
+st
+> need to go over all the queues.
+>
+> Way to decide "which thread uses which queue" can be another problem, wha=
+t
+> comes ups quickly to me is a "hash(tid) % n_queues" but maybe it can be
+> better.  Each vcpu thread will have different tids, then they can hopeful=
+ly
+> scale on the queues.
+>
+> There's at least one issue that I know with such an idea, that after we
+> have >1 uffd queues it means the message order will be uncertain.  It may
+> matter for some uffd users (e.g. cooperative userfaultfd, see
+> UFFD_FEATURE_FORK|REMOVE|etc.)  because I believe order of messages matte=
+r
+> for them (mostly CRIU).  But I think that's not a blocker either because =
+we
+> can forbid those features with multi queues.
+>
+> That's a wild idea that I'm just thinking about, which I have totally no
+> idea whether it'll work or not.  It's more or less of a generic question =
+on
+> "whether there's chance to scale on uffd side just in case it might be a
+> cleaner approach", when above concern is a real concern.
+
+You bring up a good point, which is that this series only deals with
+uffd's performance in the context of KVM. I had another idea in this
+vein, which was to allow dedicating queues to certain threads: I even
+threw together a prototype, though there was some bug in it which
+stopped me from ever getting a real signal :(
+
+I think there's still potential to make uffd itself faster but, as you
+point out, that might get messy from an API perspective (I know my
+prototype did :) and is going to require more investigation and
+prototyping. The advantage of this approach is that it's simple, makes
+a lot of conceptual sense IMO (in that the previously-stalled vCPU
+threads can now participate in the work of demand fetching), and
+solves a very important (probably *the* most important) bottleneck
+when it comes to KVM + uffd-based postcopy.
