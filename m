@@ -1,98 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F0B25689
-	for <kvmarm@lists.linux.dev>; Fri, 21 Apr 2023 17:11:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B12ECC433D2;
-	Fri, 21 Apr 2023 17:11:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1682097060;
-	bh=DnRJVkdO+iXXcujqYX0KJiluJwWD+2pWlYT4caOjV0E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EHqT+C8njFjfHsi70rZiFdTrbu/ie2fbzv5GWFi7pafMAdvhkg+xjmdkME5V+TP5H
-	 vcLBHMLLGFbsS6Bh5vypOpKExqOA8wsRzF41qmZ19WzWKshlk3u9i0D0aXorNQzjsL
-	 nQpYWA+mm/4JtT8Uwm4DBOpUtNdlt85q/uiLWvjEUOn2ZnHqCgjzx1pGUZyWRwl9U3
-	 I41Jwu+sshMCbAC8Y0Ew+K9z6kUOnYFRIA8TNf11u2KxRLFc8FeFiRoyQxIli0As/N
-	 m14zF/WcXp/SNioGllvt5vra6edJysaPm4tYR2VfzMlV49j4IaFjTG0hvQMliIapd3
-	 qihad4ZVYUIAA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ppuHi-00AFeg-8D;
-	Fri, 21 Apr 2023 18:10:58 +0100
-Date: Fri, 21 Apr 2023 18:10:57 +0100
-Message-ID: <86pm7xjh3y.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Vipin Sharma <vipinsh@google.com>
-Cc: oliver.upton@linux.dev,
-	james.morse@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	chenhuacai@kernel.org,
-	aleksandar.qemu.devel@gmail.com,
-	tsbogend@alpha.franken.de,
-	anup@brainfault.org,
-	atishp@atishpatra.org,
-	paul.walmsley@sifive.com,
-	palmer@dabbelt.com,
-	aou@eecs.berkeley.edu,
-	seanjc@google.com,
-	pbonzini@redhat.com,
-	dmatlack@google.com,
-	ricarkol@google.com,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-mips@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org,
-	linux-kselftest@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 9/9] KVM: arm64: Run clear-dirty-log under MMU read lock
-In-Reply-To: <20230421165305.804301-10-vipinsh@google.com>
-References: <20230421165305.804301-1-vipinsh@google.com>
-	<20230421165305.804301-10-vipinsh@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2C9C5689
+	for <kvmarm@lists.linux.dev>; Fri, 21 Apr 2023 17:40:04 +0000 (UTC)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1a686260adcso27090725ad.0
+        for <kvmarm@lists.linux.dev>; Fri, 21 Apr 2023 10:40:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1682098804; x=1684690804;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dhmzadUG3fZs7husXeA0WbkxQGo5+WSirow/ZLJYIA8=;
+        b=pJm4mnRWylHJ0Gat/ee7mWuQRrm9PVz1aPFna537nzZRRXGR4K5lTDHOl8n5i2uu48
+         EUMk6MzxI+9wqOFuxraK0ZbUpvCC4tIGAsXhspbFezqRX8BE1BxwJy8OKhTaDOjig6ob
+         Px/LF85jpt9vPJa9dFPxJ+yv7OdYPoEljuimK0lpmB0E+KgSvniPG4vuKuefphuSeJcZ
+         QluANtigCw2t0Hv/9nffvdU0U1OIAQSzStrVHs0TvaHhsrMAaXJtyA1lkV0TkygyEeGT
+         7DoXIwF2Nyu9/i4GFaAA3xw7svYLkVVtdjP39DUN/74Ax/5uxGgKNcnH1gusSFvtPnIO
+         Fd3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682098804; x=1684690804;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dhmzadUG3fZs7husXeA0WbkxQGo5+WSirow/ZLJYIA8=;
+        b=kd1srMujzXuMSWISOgCWNlTmfSHnJfwQlgIwssQ50bKvGxsSec14IML1lKsOQTj4/B
+         oeP4htqFVAIUkOeld/zugy6QIPLAMJna+xBQERBipueEEOug3V6BUdjaxPbhBYMTUniC
+         oq7DSL9MX5X7XqNR2ZqS7CcoEjVl/c3uf2bMbhnDwVnrGZhC8o8Ugoxd1tAEtfVZUr39
+         vZ4H1b/aZysdeoSecvtWtIHCZnWnAaNYBBG9+tbolqLoHEvDQ8TL7F0EOAP0GTTbpVcp
+         cuoxFeytnEuVtQ0DNIuviDFCaGQBTa17wgBmcKPw69CTXvqdangTQQFukY6IyYqNK+/E
+         QnmA==
+X-Gm-Message-State: AAQBX9exirstu6dEP6MDbIyyWE6kx/uMz9GowBX21yeHCy/vfcSsJ8Vu
+	sZxXSZ2hVrazt9lw3GKTM1c=
+X-Google-Smtp-Source: AKy350YGTGp3cJL7b4EnpySmGHmH/RmGOJNpVyZKI5FM1zZ1uha5N7JLEpkc6v8GyUuGJfA+4+aGYA==
+X-Received: by 2002:a17:903:1ce:b0:1a2:a8d0:838e with SMTP id e14-20020a17090301ce00b001a2a8d0838emr5564267plh.61.1682098803815;
+        Fri, 21 Apr 2023 10:40:03 -0700 (PDT)
+Received: from smtpclient.apple ([66.170.99.95])
+        by smtp.gmail.com with ESMTPSA id ju18-20020a170903429200b001a526805b86sm2987436plb.191.2023.04.21.10.40.02
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 21 Apr 2023 10:40:03 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: vipinsh@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, tsbogend@alpha.franken.de, anup@brainfault.org, atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, pbonzini@redhat.com, dmatlack@google.com, ricarkol@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.500.231\))
+Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
+ migration via annotated memory faults.
+From: Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <ZEGuogfbtxPNUq7t@x1n>
+Date: Fri, 21 Apr 2023 10:39:51 -0700
+Cc: Anish Moorthy <amoorthy@google.com>,
+ Axel Rasmussen <axelrasmussen@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ maz@kernel.org,
+ oliver.upton@linux.dev,
+ Sean Christopherson <seanjc@google.com>,
+ James Houghton <jthoughton@google.com>,
+ bgardon@google.com,
+ dmatlack@google.com,
+ ricarkol@google.com,
+ kvm <kvm@vger.kernel.org>,
+ kvmarm@lists.linux.dev
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <46DD705B-3A3F-438E-A5B1-929C1E43D11F@gmail.com>
+References: <20230412213510.1220557-1-amoorthy@google.com>
+ <ZEBHTw3+DcAnPc37@x1n>
+ <CAJHvVchBqQ8iVHgF9cVZDusMKQM2AjtNx2z=i9ZHP2BosN4tBg@mail.gmail.com>
+ <ZEBXi5tZZNxA+jRs@x1n>
+ <CAF7b7mo68VLNp=QynfT7QKgdq=d1YYGv1SEVEDxF9UwHzF6YDw@mail.gmail.com>
+ <ZEGuogfbtxPNUq7t@x1n>
+To: Peter Xu <peterx@redhat.com>
+X-Mailer: Apple Mail (2.3731.500.231)
 
-On Fri, 21 Apr 2023 17:53:05 +0100,
-Vipin Sharma <vipinsh@google.com> wrote:
-> 
-> Take MMU read lock for write protecting PTEs and use shared page table
-> walker for clearing dirty logs.
-> 
-> Clearing dirty logs are currently performed under MMU write locks. This
-> means vCPUs write protection fault, which also take MMU read lock,  will
-> be blocked during this operation. This causes guest degradation and
-> especially noticeable on VMs with lot of vCPUs.
-> 
-> Taking MMU read lock will allow vCPUs to execute parallelly and reduces
-> the impact on vCPUs performance.
 
-Sure. Taking no lock whatsoever would be even better.
+> On Apr 20, 2023, at 2:29 PM, Peter Xu <peterx@redhat.com> wrote:
+>=20
+> Hi, Anish,
+>=20
+> [Copied Nadav Amit for the last few paragraphs on userfaultfd, because
+> Nadav worked on a few userfaultfd performance problems; so maybe he'll
+> also have some ideas around]
 
-What I don't see is the detailed explanation that gives me the warm
-feeling that this is safe and correct. Such an explanation is the
-minimum condition for me to even read the patch.
+Sorry for not following this thread and previous ones.
 
-Thanks,
+I skimmed through and I hope my answers would be helpful and relevant=E2=80=
+=A6
 
-	M.
+Anyhow, I also encountered to some extent the cost of locking (not the
+contention). In my case, I only did a small change to reduce the =
+overhead of
+acquiring the locks by =E2=80=9Ccombining" the locks of =
+faulting_pending_wqh and
+fault_wqh, which are (almost?) always acquired together. I only acquired
+fault_pending_wqh and then introduced =E2=80=9Cfake_spin_lock()=E2=80=9D =
+which only got
+lockdep to understand the fault_wqh is already protected.
 
--- 
-Without deviation from the norm, progress is not possible.
+But as I said, this solution was only intended to reduce the cost of =
+locking,
+and it does not solve the contention.
+
+If I understand the problem correctly, it sounds as if the proper =
+solution
+should be some kind of a range-locks. If it is too heavy or the =
+interface can
+be changed/extended to wake a single address (instead of a range),
+simpler hashed-locks can be used.=
