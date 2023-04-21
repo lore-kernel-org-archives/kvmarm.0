@@ -1,32 +1,23 @@
-Received: from out-9.mta0.migadu.com (out-9.mta0.migadu.com [91.218.175.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 602EE2561
-	for <kvmarm@lists.linux.dev>; Fri, 21 Apr 2023 09:35:43 +0000 (UTC)
-Date: Fri, 21 Apr 2023 09:35:37 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1682069741;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=i5U1AZ+eWrIoVxlayHzG/8S4OiVZIZwprEyJL67qDII=;
-	b=Y8aSjqHdDhVJGlM+pB5Iv7LhI4t9dg+OTrLjTErBsxnctlO+dAJBA3CXb50tPdtSdhcspj
-	kn4FLwIYaw8HkGS1uXWz0TfFoTZUv/sJigaW+RWGMitJWvpiUKMD9OpVBgzSsuz/A0aVt8
-	iMXMRQTtbjtEdhRYNAe/i8tmcV0hZ6U=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	David Matlack <dmatlack@google.com>,
-	Reiji Watanabe <reijiw@google.com>, stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: arm64: Infer the PA offset from IPA in stage-2
- map walker
-Message-ID: <ZEJY6Smz3A2uZ4Ne@linux.dev>
-References: <20230421071606.1603916-1-oliver.upton@linux.dev>
- <20230421071606.1603916-2-oliver.upton@linux.dev>
- <86r0sdk2hx.wl-maz@kernel.org>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6CD2561
+	for <kvmarm@lists.linux.dev>; Fri, 21 Apr 2023 09:55:55 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 84BBE1480;
+	Fri, 21 Apr 2023 02:56:38 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 017CC3F5A1;
+	Fri, 21 Apr 2023 02:55:52 -0700 (PDT)
+Date: Fri, 21 Apr 2023 10:55:50 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	andrew.jones@linux.dev, maz@kernel.org, will@kernel.org,
+	oliver.upton@linux.dev, ricarkol@google.com, reijiw@google.com
+Subject: Re: [kvm-unit-tests PATCH 2/6] arm: pmu: pmu-chain-promotion:
+ Introduce defines for count and margin values
+Message-ID: <ZEJdpmTSyf6sp3Yv@monolith.localdoman>
+References: <20230315110725.1215523-1-eric.auger@redhat.com>
+ <20230315110725.1215523-3-eric.auger@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,95 +26,183 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86r0sdk2hx.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20230315110725.1215523-3-eric.auger@redhat.com>
 
-On Fri, Apr 21, 2023 at 10:28:58AM +0100, Marc Zyngier wrote:
+Hi,
 
-[...]
-
-> So my conclusion is that after these two patches, data->phys should
-> never be updated, right?
-
-Yep, that's the intention.
-
-> Then I'd suggest an additional patch to constify a couple of things
-> and make sure we don't accidentally update them. Something like the
-> patch below (compile-tested only).
-
-I'm always a fan of more idiot proofing, especially when I am said idiot
-:)
-
-> From a2eb08ce793c1cf01c79df13a619815e9d7c1d41 Mon Sep 17 00:00:00 2001
-> From: Marc Zyngier <maz@kernel.org>
-> Date: Fri, 21 Apr 2023 10:18:34 +0100
-> Subject: [PATCH] KVM: arm64: Constify start/end/phys fields of the pgtable
->  walker data
+On Wed, Mar 15, 2023 at 12:07:21PM +0100, Eric Auger wrote:
+> The pmu-chain-promotion test is composed of separate subtests.
 > 
-> As we are revamping the way the pgtable walker evaluates some of the
-> data, make it clear that we rely on somew of the fields to be constant
-> across the lifetime of a walk.
+> Some of them apply some settings on a first MEM_ACCESS loop
+> iterations, change the settings and run another MEM_ACCESS loop.
 > 
-> For this, flag the start, end and pjys fields of the walk data as
-
-typo: phys
-
-> 'const', which will generate an error if we were to accidentally
-> update these fields again.
+> The PRE_OVERFLOW2 MEM_ACCESS counter init value is defined so that
+> the first loop does not overflow and the second loop overflows.
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-
-Looks good.
-
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-
-Let's see if I've confused b4 into thinking I'm reviewing my own patches
-:-P
-
+> At the moment the MEM_ACCESS count number is hardcoded to 20 and
+> PRE_OVERFLOW2 is set to UINT32_MAX - 20 - 15 where 15 acts as a
+> margin.
+> 
+> Introduce defines for the count number and the margin so that it
+> becomes easier to change them.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > ---
->  arch/arm64/kvm/hyp/pgtable.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  arm/pmu.c | 35 +++++++++++++++++++++--------------
+>  1 file changed, 21 insertions(+), 14 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 356a3fd5220c..5282cb9ca4cf 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -58,9 +58,9 @@
->  struct kvm_pgtable_walk_data {
->  	struct kvm_pgtable_walker	*walker;
+> diff --git a/arm/pmu.c b/arm/pmu.c
+> index dad7d4b4..b88366a8 100644
+> --- a/arm/pmu.c
+> +++ b/arm/pmu.c
+> @@ -55,11 +55,18 @@
+>  #define EXT_COMMON_EVENTS_LOW	0x4000
+>  #define EXT_COMMON_EVENTS_HIGH	0x403F
 >  
-> -	u64				start;
-> +	const u64			start;
->  	u64				addr;
-> -	u64				end;
-> +	const u64			end;
->  };
->  
->  static bool kvm_phys_is_valid(u64 phys)
-> @@ -352,7 +352,7 @@ int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
->  }
->  
->  struct hyp_map_data {
-> -	u64				phys;
-> +	const u64			phys;
->  	kvm_pte_t			attr;
->  };
->  
-> @@ -578,7 +578,7 @@ void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt)
->  }
->  
->  struct stage2_map_data {
-> -	u64				phys;
-> +	const u64			phys;
->  	kvm_pte_t			attr;
->  	u8				owner_id;
->  
-> -- 
-> 2.34.1
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+> -#define ALL_SET_32			0x00000000FFFFFFFFULL
+> +#define ALL_SET_32		0x00000000FFFFFFFFULL
+>  #define ALL_CLEAR		0x0000000000000000ULL
+>  #define PRE_OVERFLOW_32		0x00000000FFFFFFF0ULL
+> -#define PRE_OVERFLOW2_32	0x00000000FFFFFFDCULL
+>  #define PRE_OVERFLOW_64		0xFFFFFFFFFFFFFFF0ULL
+> +#define COUNT 20
 
--- 
+test_mem_access (from the test "pmu-mem-access") also uses 20 for
+mem_access_loop, in case you want to change the define there too.
+
+I realize I'm bikeshedding here, but it might also help if the define name
+held some clue to what is being counted (like ACCESS_COUNT, or something
+like that).
+
+> +#define MARGIN 15
+> +/*
+> + * PRE_OVERFLOW2 is set so that 1st COUNT iterations do not
+> + * produce 32b overflow and 2d COUNT iterations do. To accommodate
+
+2**nd** COUNT iterations?
+
+> + * for some observed variability we take into account a given @MARGIN
+
+Some inconsistency here, this variable is referred to with @MARGIN, but
+COUNT isn't (missing "@").
+
+> + */
+> +#define PRE_OVERFLOW2_32		(ALL_SET_32 - COUNT - MARGIN)
+
+This is much better, I would have been hard pressed to figure out where the
+previous value of 0x00000000FFFFFFDCULL came from.
+
+The patch looks good to me (with or without the comments above):
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
 Thanks,
-Oliver
+Alex
+
+>  
+>  #define PRE_OVERFLOW(__overflow_at_64bits)				\
+>  	(__overflow_at_64bits ? PRE_OVERFLOW_64 : PRE_OVERFLOW_32)
+> @@ -737,7 +744,7 @@ static void test_chain_promotion(bool unused)
+>  	write_sysreg_s(0x2, PMCNTENSET_EL0);
+>  	isb();
+>  
+> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>  	PRINT_REGS("post");
+>  	report(!read_regn_el0(pmevcntr, 0),
+>  		"chain counter not counting if even counter is disabled");
+> @@ -750,13 +757,13 @@ static void test_chain_promotion(bool unused)
+>  	write_sysreg_s(0x1, PMCNTENSET_EL0);
+>  	isb();
+>  
+> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>  	PRINT_REGS("post");
+>  	report(!read_regn_el0(pmevcntr, 1) && (read_sysreg(pmovsclr_el0) == 0x1),
+>  		"odd counter did not increment on overflow if disabled");
+>  	report_prefix_pop();
+>  
+> -	/* start at 0xFFFFFFDC, +20 with CHAIN enabled, +20 with CHAIN disabled */
+> +	/* 1st COUNT with CHAIN enabled, next COUNT with CHAIN disabled */
+>  	report_prefix_push("subtest3");
+>  	pmu_reset();
+>  	write_sysreg_s(0x3, PMCNTENSET_EL0);
+> @@ -764,12 +771,12 @@ static void test_chain_promotion(bool unused)
+>  	isb();
+>  	PRINT_REGS("init");
+>  
+> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>  	PRINT_REGS("After 1st loop");
+>  
+>  	/* disable the CHAIN event */
+>  	write_sysreg_s(0x2, PMCNTENCLR_EL0);
+> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>  	PRINT_REGS("After 2d loop");
+>  	report(read_sysreg(pmovsclr_el0) == 0x1,
+>  		"should have triggered an overflow on #0");
+> @@ -777,7 +784,7 @@ static void test_chain_promotion(bool unused)
+>  		"CHAIN counter #1 shouldn't have incremented");
+>  	report_prefix_pop();
+>  
+> -	/* start at 0xFFFFFFDC, +20 with CHAIN disabled, +20 with CHAIN enabled */
+> +	/* 1st COUNT with CHAIN disabled, next COUNT with CHAIN enabled */
+>  
+>  	report_prefix_push("subtest4");
+>  	pmu_reset();
+> @@ -786,13 +793,13 @@ static void test_chain_promotion(bool unused)
+>  	isb();
+>  	PRINT_REGS("init");
+>  
+> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>  	PRINT_REGS("After 1st loop");
+>  
+>  	/* enable the CHAIN event */
+>  	write_sysreg_s(0x3, PMCNTENSET_EL0);
+>  	isb();
+> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>  
+>  	PRINT_REGS("After 2d loop");
+>  
+> @@ -811,7 +818,7 @@ static void test_chain_promotion(bool unused)
+>  	isb();
+>  	PRINT_REGS("init");
+>  
+> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>  	PRINT_REGS("After 1st loop");
+>  
+>  	/* 0 becomes CHAINED */
+> @@ -820,7 +827,7 @@ static void test_chain_promotion(bool unused)
+>  	write_sysreg_s(0x3, PMCNTENSET_EL0);
+>  	write_regn_el0(pmevcntr, 1, 0x0);
+>  
+> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>  	PRINT_REGS("After 2d loop");
+>  
+>  	report((read_regn_el0(pmevcntr, 1) == 1) &&
+> @@ -837,14 +844,14 @@ static void test_chain_promotion(bool unused)
+>  	write_sysreg_s(0x3, PMCNTENSET_EL0);
+>  	PRINT_REGS("init");
+>  
+> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>  	PRINT_REGS("After 1st loop");
+>  
+>  	write_sysreg_s(0x0, PMCNTENSET_EL0);
+>  	write_regn_el0(pmevtyper, 1, CPU_CYCLES | PMEVTYPER_EXCLUDE_EL0);
+>  	write_sysreg_s(0x3, PMCNTENSET_EL0);
+>  
+> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>  	PRINT_REGS("After 2d loop");
+>  	report(read_sysreg(pmovsclr_el0) == 1,
+>  		"overflow is expected on counter 0");
+> -- 
+> 2.38.1
+> 
+> 
