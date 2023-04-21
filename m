@@ -1,40 +1,40 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A59D5689
-	for <kvmarm@lists.linux.dev>; Fri, 21 Apr 2023 16:53:19 +0000 (UTC)
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-b8f6d2ac543so3270854276.2
-        for <kvmarm@lists.linux.dev>; Fri, 21 Apr 2023 09:53:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C23D568B
+	for <kvmarm@lists.linux.dev>; Fri, 21 Apr 2023 16:53:20 +0000 (UTC)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-63b656aacc6so2758013b3a.3
+        for <kvmarm@lists.linux.dev>; Fri, 21 Apr 2023 09:53:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682095998; x=1684687998;
+        d=google.com; s=20221208; t=1682095999; x=1684687999;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aIXwJZ86g2cMsPal848/IoLZKDxpkMIUoWM/xoiNZjQ=;
-        b=OIjqFWC1f6JrRiHtRugX+y84MBGm6ZcE+DgB55EOotUGyniIQQqePlnbirQ3o2dDFU
-         ZnbasVHpI23zQIfcI6Jn3dVfZwuX6HKTuVl0G4OM/jmCEWcu3RScvyE/peQMI6YRxFAi
-         gf0XUXKKZmW/2xI2sZZBymHSazOLXzzNqXiPCfYZYBJgFR1ppXYdTKevwBVLtyFVmsIu
-         +l8sz+E+NsmIMDQ/1tM0lFmpgOnwSQOEUwLEGaRH1NEwhUlguM0BNFYJ1HKGHsauRDG0
-         npWVDOT9XxNmTt4xr+n6quK+ZKfLBdDgq8rhh/Dtt9wDzk6+CyFCPfqqi4sAI0/YzshM
-         AXnw==
+        bh=aDUI7xCr7dWf/FkK1CK1yXAqGXh9n1NZNFj54qb+KHU=;
+        b=xTDct9zxZ9N8ALbPUp/viW7lM9BRRuwGhBUMNIpBcky3DENAIpUsYaKC4hxy6ElANa
+         XJM0ALn9fzQGXWa5TwxvUayRtY+2kF+0hSFrS4Z13rLNDvpjdJ1bTkvnlg/aszqM3kw6
+         JwtYRMMCwqvts/H9WPbPOWtINNCHPcx52iHlR+Mni7gOLO5npE1/M3beOvxeJdJAoVtK
+         oYpcB0E2UWuNNPfDE3N6K7L1PsDilnRRB45iG1BH2Hs9bkLyvvb6zqJnC7OL6glGnKD+
+         tqNazVeTkEV+I2VUzEqOogcJ5o+xCg88TmCeF1jcEtkdTpDT5v8zElAEZqy2mA1rdmJ4
+         ZLUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682095998; x=1684687998;
+        d=1e100.net; s=20221208; t=1682095999; x=1684687999;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aIXwJZ86g2cMsPal848/IoLZKDxpkMIUoWM/xoiNZjQ=;
-        b=Jv0RVTarxIX4RHqY73RP974H2tCQMc/Urwb1Q3k6gooULAN9sTqWU/3ewjSv7M7cb/
-         tLN541d98U0i3LKANT/ZgXvVWKj3lo2KsefKXkxPTZrKydL2OQ/c4yoOwjM5X73qfEMG
-         /fLc2WxUUroeWR0Q/yqgjvYIX326NAvPijiOACacY9gShUdkGPMX0KescCY/uO73s15s
-         Xk3xgT+LeLgCIeHLRp67P/LWhfWZHiFaA5dQQVTOp72y0P+CjUcupCDzU7XFyxwEN1T8
-         pf9SxOPjjwn51UuWSAfFy5m7vZArkABmlGOAV5TF66fGYBgDAq44n6HGi9UYb61lGKOC
-         NcPg==
-X-Gm-Message-State: AAQBX9e5sNlaO/QH0Yyo4Y76rNpAaWsYEOCPZXkXFw8f41aEfSHY6+76
-	rPkl3y38PQ8HgbML1CxmJoZ+ApJd4moA
-X-Google-Smtp-Source: AKy350bXgyJDTEgckFAM/H87961TV8R1B/izBkH2FZgQ+FxNt6ajRDFj7SNSbgxdm0eZ4bQuJyBfwm/9rS7m
+        bh=aDUI7xCr7dWf/FkK1CK1yXAqGXh9n1NZNFj54qb+KHU=;
+        b=Afe88v7gyiW/slLaxqbeOBVRwxk1oVRmZ+zn08pZ09o5B+jv/PWXWBU4T5fH1yIMUW
+         89ss8sgTU++7imS9csvU1bUUoRz9tJrmlyD6BzJIAuqu4MNwmPBlajyMl7V5jA7FxbGJ
+         j80HCbSbcAIt1Bk4b8xY37SLoyK19qr2nwE7VlUtmSFVVb+Pw2wG4MgUzczCTLH+5y2u
+         ywZvX5Ay8ZozM+JZWSjWtQi4KTDxBWONoNzssgRrfITeTfhULUYEgfLYIxPmXzLClnP6
+         SjouLjHBArXY4G+AbhA96ZMFwJgzx3CqQgeucwFrvdh0rjAmxQaidgBQSvo0LVFcYzId
+         9qUA==
+X-Gm-Message-State: AAQBX9dcEcKN2dIsCWBMvNHtZrnFDCVA4wyqWloRFvV3t2nvb0u1DcsK
+	X5ixx1kCLL9LeQhuh/Br+MenNlEx0iPU
+X-Google-Smtp-Source: AKy350Y++Ixj3yZzgu1Tm9pviEO/066Z0jMSz5NI0cEsiZPMFyAUWWqVudz+4dZEwY3ZReh5ODp8Q4bxx5mF
 X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
- (user=vipinsh job=sendgmr) by 2002:a25:d147:0:b0:b8c:ad5:6b4e with SMTP id
- i68-20020a25d147000000b00b8c0ad56b4emr1983907ybg.12.1682095998019; Fri, 21
- Apr 2023 09:53:18 -0700 (PDT)
-Date: Fri, 21 Apr 2023 09:53:01 -0700
+ (user=vipinsh job=sendgmr) by 2002:a05:6a00:134b:b0:63d:5dcd:bc06 with SMTP
+ id k11-20020a056a00134b00b0063d5dcdbc06mr2146455pfu.5.1682095999596; Fri, 21
+ Apr 2023 09:53:19 -0700 (PDT)
+Date: Fri, 21 Apr 2023 09:53:02 -0700
 In-Reply-To: <20230421165305.804301-1-vipinsh@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230421165305.804301-1-vipinsh@google.com>
 X-Mailer: git-send-email 2.40.0.634.g4ca3ef3211-goog
-Message-ID: <20230421165305.804301-6-vipinsh@google.com>
-Subject: [PATCH 5/9]  KVM: selftests: Allow independent execution of vCPUs in dirty_log_perf_test
+Message-ID: <20230421165305.804301-7-vipinsh@google.com>
+Subject: [PATCH 6/9] KVM: arm64: Correct the kvm_pgtable_stage2_flush() documentation
 From: Vipin Sharma <vipinsh@google.com>
 To: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, 
 	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
@@ -61,141 +61,32 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Vipin Sharma <vipinsh@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Allow vCPUs to execute independent of dirty log iterations after
-initialization is complete. Hide this feature behind the new option
-"-j".
+Remove _range suffix from kvm_pgtable_stage2_flush_range which is used
+in documentation of kvm_pgtable_stage2_flush(). There is no function
+named kvm_pgtable_stage2_flush_range().
 
-This change makes dirty_log_perf_test execute like real world workflows
-where guest vCPUs keep on executing while VMM collects dirty logs. Total
-pages touched during execution of test will give good estimate of how
-vCPUs are performing while dirty logging is enabled.
-
+Fixes: 93c66b40d728 ("KVM: arm64: Add support for stage-2 cache flushing in generic page-table")
 Signed-off-by: Vipin Sharma <vipinsh@google.com>
 ---
- .../selftests/kvm/dirty_log_perf_test.c       | 60 ++++++++++++-------
- 1 file changed, 40 insertions(+), 20 deletions(-)
+ arch/arm64/include/asm/kvm_pgtable.h | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-index 0a08a3d21123..ffdad535fdaa 100644
---- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-@@ -69,6 +69,7 @@ static int iteration;
- static int vcpu_last_completed_iteration[KVM_MAX_VCPUS];
- static atomic_ullong total_reads;
- static atomic_ullong total_writes;
-+static bool lockstep_iterations;
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index 4cd6762bda80..4cd62506c198 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -605,9 +605,8 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+ bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr);
  
- static void vcpu_worker(struct memstress_vcpu_args *vcpu_args)
- {
-@@ -83,12 +84,16 @@ static void vcpu_worker(struct memstress_vcpu_args *vcpu_args)
- 	struct timespec total = (struct timespec){0};
- 	struct timespec avg;
- 	struct ucall uc = {};
-+	int current_iteration = -1;
- 	int ret;
- 
- 	run = vcpu->run;
- 
- 	while (!READ_ONCE(host_quit)) {
--		int current_iteration = READ_ONCE(iteration);
-+		if (lockstep_iterations)
-+			current_iteration = READ_ONCE(iteration);
-+		else
-+			current_iteration++;
- 
- 		clock_gettime(CLOCK_MONOTONIC, &start);
- 		ret = _vcpu_run(vcpu);
-@@ -118,13 +123,19 @@ static void vcpu_worker(struct memstress_vcpu_args *vcpu_args)
- 				ts_diff.tv_nsec);
- 		}
- 
--		/*
--		 * Keep running the guest while dirty logging is being disabled
--		 * (iteration is negative) so that vCPUs are accessing memory
--		 * for the entire duration of zapping collapsible SPTEs.
--		 */
--		while (current_iteration == READ_ONCE(iteration) &&
--		       READ_ONCE(iteration) >= 0 && !READ_ONCE(host_quit)) {}
-+		if (lockstep_iterations) {
-+			/*
-+			 * Keep running the guest while dirty logging is being disabled
-+			 * (iteration is negative) so that vCPUs are accessing memory
-+			 * for the entire duration of zapping collapsible SPTEs.
-+			 */
-+			while (current_iteration == READ_ONCE(iteration) &&
-+			       READ_ONCE(iteration) >= 0 && !READ_ONCE(host_quit))
-+				;
-+		} else {
-+			while (!READ_ONCE(iteration))
-+				;
-+		}
- 	}
- 
- 	avg = timespec_div(total, vcpu_last_completed_iteration[vcpu_idx]);
-@@ -238,17 +249,19 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 		clock_gettime(CLOCK_MONOTONIC, &start);
- 		iteration++;
- 
--		pr_debug("Starting iteration %d\n", iteration);
--		for (i = 0; i < nr_vcpus; i++) {
--			while (READ_ONCE(vcpu_last_completed_iteration[i])
--			       != iteration)
--				;
--		}
-+		if (lockstep_iterations) {
-+			pr_debug("Starting iteration %d\n", iteration);
-+			for (i = 0; i < nr_vcpus; i++) {
-+				while (READ_ONCE(vcpu_last_completed_iteration[i])
-+				       != iteration)
-+					;
-+			}
- 
--		ts_diff = timespec_elapsed(start);
--		vcpu_dirty_total = timespec_add(vcpu_dirty_total, ts_diff);
--		pr_info("Iteration %d dirty memory time: %ld.%.9lds\n",
--			iteration, ts_diff.tv_sec, ts_diff.tv_nsec);
-+			ts_diff = timespec_elapsed(start);
-+			vcpu_dirty_total = timespec_add(vcpu_dirty_total, ts_diff);
-+			pr_info("Iteration %d dirty memory time: %ld.%.9lds\n",
-+				iteration, ts_diff.tv_sec, ts_diff.tv_nsec);
-+		}
- 
- 		clock_gettime(CLOCK_MONOTONIC, &start);
- 		memstress_get_dirty_log(vm, bitmaps, p->slots);
-@@ -365,6 +378,10 @@ static void help(char *name)
- 	       "     To leave the application task unpinned, drop the final entry:\n\n"
- 	       "         ./dirty_log_perf_test -v 3 -c 22,23,24\n\n"
- 	       "     (default: no pinning)\n");
-+	printf(" -j: Execute vCPUs independent of dirty log iterations\n"
-+	       "     Independent vCPUs execution will allow them to continuously\n"
-+	       "     dirty memory while main thread is collecting and clearing\n"
-+	       "     dirty logs in the main thread's iterations.\n");
- 	printf(" -k: Specify the chunk size in which dirty memory gets cleared\n"
- 	       "     in memslots in each iteration. If the size is bigger than\n"
- 	       "     the memslot size then whole memslot is cleared in one call.\n"
-@@ -399,10 +416,10 @@ int main(int argc, char *argv[])
- 		kvm_check_cap(KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
- 	dirty_log_manual_caps &= (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE |
- 				  KVM_DIRTY_LOG_INITIALLY_SET);
--
-+	lockstep_iterations = true;
- 	guest_modes_append_default();
- 
--	while ((opt = getopt(argc, argv, "ab:c:eghi:k:l:m:nop:r:s:v:x:w:")) != -1) {
-+	while ((opt = getopt(argc, argv, "ab:c:eghi:jk:l:m:nop:r:s:v:x:w:")) != -1) {
- 		switch (opt) {
- 		case 'a':
- 			p.random_access = true;
-@@ -426,6 +443,9 @@ int main(int argc, char *argv[])
- 		case 'i':
- 			p.iterations = atoi_positive("Number of iterations", optarg);
- 			break;
-+		case 'j':
-+			lockstep_iterations = false;
-+			break;
- 		case 'k':
- 			p.clear_chunk_size = parse_size(optarg);
- 			break;
+ /**
+- * kvm_pgtable_stage2_flush_range() - Clean and invalidate data cache to Point
+- * 				      of Coherency for guest stage-2 address
+- *				      range.
++ * kvm_pgtable_stage2_flush() - Clean and invalidate data cache to Point of
++ *				Coherency for guest stage-2 address range.
+  * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
+  * @addr:	Intermediate physical address from which to flush.
+  * @size:	Size of the range.
 -- 
 2.40.0.634.g4ca3ef3211-goog
 
