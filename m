@@ -1,170 +1,151 @@
-Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4AE146B4
-	for <kvmarm@lists.linux.dev>; Mon, 24 Apr 2023 22:34:08 +0000 (UTC)
-Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-440375334c1so2083319e0c.2
-        for <kvmarm@lists.linux.dev>; Mon, 24 Apr 2023 15:34:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A422B7470
+	for <kvmarm@lists.linux.dev>; Mon, 24 Apr 2023 23:47:08 +0000 (UTC)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-63b79d8043eso26480678b3a.0
+        for <kvmarm@lists.linux.dev>; Mon, 24 Apr 2023 16:47:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682375647; x=1684967647;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+        d=google.com; s=20221208; t=1682380028; x=1684972028;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=hya5HtM8DaHSiWr577YxBeXg4MXiDazfyvrjidrt9Ms=;
-        b=3s9FlF3yuSKzN6fg5VIOdb+lPqzllcSHqaej0oXhXwInCI7yLfVo8dQnxbGevAw0Le
-         mTjgKRlnrP+o4CGW4IFKICZcTEcFQ3NMDlG34jRQaW+NYTX80gcuJheTsTlyWk0aysQc
-         S7eoy3tXujOzC0ZpV2tt7TWZwxbB39zp86638MV1TUX15OAOXuXkezigyhGaD6m+0rNp
-         IMBKXcCCV1siL4C9cBTQt1C6OYT1T6XkUFv6eZ6KYVY5osyFiSnF5tWyQgLQGhM1flA7
-         6fC2Cpy8VmOgvVufpHmqKoVfGXNmhxpFS07g2z+USuXm18wLcoPiZiE1KeykhQyU+wKK
-         RWGQ==
+        bh=6Ot+Rlnm7hn0ij7rFbhHCvuqwiEfbByzG62dXdUvoFM=;
+        b=C7G+CTI+zTaYdXEebMpoh3NA7eElM3eZcBitcG3FWy623s36A3AFCzEkoqO+5X70zG
+         Hn4qOxvU+H8ktV/dvTpDC8F8e4kCT/kkmmvjUFwN43rBcc29BjM3raapLyCM+c47OcQZ
+         ZKxas7fxqwOTLFnkvlKa1SBh2gqw9e4KWfQA9xRq56L8tvTXPELZOdaF/BzpbizVNSwW
+         CiLoltdtJWNpdyrFK3XLwwAZA2hk4q3LFtd8/wrndrSyx9RwcHvmE25PlBCSCQS4Tjlz
+         TRTA2nvnLqel0piqWvuxKJpkrXPz3JtdQegjNrmCuK08YwnFUP96Bv/HlJIr9767SsL9
+         uETw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682375647; x=1684967647;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+        d=1e100.net; s=20221208; t=1682380028; x=1684972028;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=hya5HtM8DaHSiWr577YxBeXg4MXiDazfyvrjidrt9Ms=;
-        b=FoZtZQF4tAmCfiZQm11atv3CQOxaZMCG5Fvn2v/FsypBFf+uJpySRalNAkbdKRu0iR
-         gz7zz7QiBW1hcywvFNLxkiuGvsjnabejVJzAsxenXjugRwjDQCt9oPRZJ5CpOAbci/bz
-         CO4vLbglYsAY1pU2HCmZMMn3tlozDODUzOS9yHpzFqaw7dKfnYrtyOTx/qZbFFt3ofPH
-         BBPbNNzOvsmfdhSglhT6zZ8ymvPpGoGIXtBZN8wVGm9IIyAqWMULq46yGkyQhVXes0SP
-         aMtlWPTUopAlsXeliSc4Nh9TZfNEIjbpNYX7WGHU2asfSQey3TiPGXq0jmfQ8IA6jfcB
-         j+7w==
-X-Gm-Message-State: AC+VfDwrDRQ3GNSjN5GaxmeTxOf7FMA6RmEPUlsPMymSA2GrjzB54ZEk
-	04shbQKDXryvz9EYVfocbQAKuco5YvujL5UMZQNePw==
-X-Google-Smtp-Source: ACHHUZ5CEnfntrlNJqMiiM9SMbCQlJwh8WvqR20BBdrize7I7vqwdZ7MsdtMyrbInwPeX+tOVw8BkvkOhw2BlXggXSY=
-X-Received: by 2002:a1f:5f87:0:b0:44a:e66e:e709 with SMTP id
- t129-20020a1f5f87000000b0044ae66ee709mr172554vkb.0.1682375647327; Mon, 24 Apr
- 2023 15:34:07 -0700 (PDT)
+        bh=6Ot+Rlnm7hn0ij7rFbhHCvuqwiEfbByzG62dXdUvoFM=;
+        b=kZ173zRnU2VWucYRd10zwELsxHD6Y0nXIXlLSN5PT0L9K21UjaGwgxwLYHRQYa63ju
+         6Gyh1CIE8oDdRw3tdt5tq660r+SaPobNrNOPLRbdPzfqnFW1k4xMpRHKLuBswIklao6p
+         /7LhY81txiVpnCpA5jyb0J39kJelLfxmebsTliBkzPo2V4cKkRCoaFesihdTHy7ooMdz
+         HPEW/HNirWkhWV/mr5+u4PHmwOijEff40ngaatgDrZA0HQZedoN1jW1c0SvbBi6ZCnvr
+         ZF6rxjuHaWFOncyx7zWoJmhd4HYRjW7YKgGj8cV86QEudNXy9jdQ6qhkPQVlv2xxWXjY
+         bGHA==
+X-Gm-Message-State: AAQBX9fgfu6trbbqvbVDf2UpNZ1XnJKA9pkzkn+fW9S4r0kaAEJWPWKG
+	1VyY3Sc3kMovF8WizS2aPO1SHb82YRUYxUZ+KA==
+X-Google-Smtp-Source: AKy350YA2bOuxPuU0rjoWOaZFXNoIaerjZaOX9j0+SAeMzgaYiYyYu3xvNxbQC5ZlX/uH0ik+Rf1lqGSKK19ZJ/R6g==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a17:90a:3481:b0:246:ac5c:ba3f with
+ SMTP id p1-20020a17090a348100b00246ac5cba3fmr3352874pjb.0.1682380028103; Mon,
+ 24 Apr 2023 16:47:08 -0700 (PDT)
+Date: Mon, 24 Apr 2023 23:46:58 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-From: David Matlack <dmatlack@google.com>
-Date: Mon, 24 Apr 2023 15:33:40 -0700
-Message-ID: <CALzav=eBXp7CBN1hLVmyH0A4Ukt3MXR7=0__xPSOx1X1tw4iSw@mail.gmail.com>
-Subject: RFC: Common MMU Recommendation
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alexandre Ghiti <alexghiti@rivosinc.com>, Huacai Chen <chenhuacai@kernel.org>, 
-	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
-	kvm list <kvm@vger.kernel.org>, kvmarm@lists.linux.dev, 
-	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.40.0.634.g4ca3ef3211-goog
+Message-ID: <20230424234704.2571444-1-jingzhangos@google.com>
+Subject: [PATCH v7 0/6] Support writable CPU ID registers from userspace
+From: Jing Zhang <jingzhangos@google.com>
+To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@google.com>
+Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, 
+	Reiji Watanabe <reijiw@google.com>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Apologies for the long delay since the last Common MMU update. I've
-been swamped with Google-internal stuff the past few months. But I
-have some updates to share on the strategy I think we should take
-going forward.
+This patchset refactors/adds code to support writable per guest CPU ID feature
+registers. Part of the code/ideas are from
+https://lore.kernel.org/all/20220419065544.3616948-1-reijiw@google.com .
+No functional change is intended in this patchset. With the new CPU ID feature
+registers infrastructure, only writtings of ID_AA64PFR0_EL1.[CSV2|CSV3],
+ID_AA64DFR0_EL1.PMUVer and ID_DFR0_ELF.PerfMon are allowed as KVM does before.
 
-The "Common TDP MMU" Approach
-=============================
+Writable (Configurable) per guest CPU ID feature registers are useful for
+creating/migrating guest on ARM CPUs with different kinds of features.
 
-In December 2022 I sent an RFC[1] to demonstrate that it is possible
-to refactor the KVM/x86 TDP MMU into common code, i.e. introduce a
-Common TDP MMU. The intent behind this was to eventually use this to
-replace the KVM/ARM and KVM/RISC-V MMU code. This may be a viable
-approach for sharing code with RISC-V, but after further
-consideration, this is a dead-end for ARM.
-
-The KVM/x86 TDP MMU does not support all of the ARM use-cases
-(notably, managing Stage-1 page tables or compiling into the hyp). So
-a Common TDP MMU would have to exist alongside the current ARM page
-table code (not replace it) for years. This would increase our
-maintenance costs by having to support both the Common MMU and ARM MMU
-when adding support for new ARM architectural features.
-
-The Common TDP MMU approach is too all-or-nothing, rather than
-providing incremental benefit. ARM and x86 are constantly evolving
-(e.g. ARM support for Nested Virtualization and Confidential Computing
-are under development, both of which require changes to the page table
-code). And we know 128-bit ARM page tables are coming. The Common TDP
-MMU would be constantly trying to "catch-up" to the ARM MMU, and might
-never get there.
-
-Lastly, ARM and x86 have significantly different TLB and cache
-maintenance requirements. Future versions of the ARM architecture make
-it behave more like x86, but KVM still has to support older versions.
-It's highly likely that certain optimizations and patterns we use in
-the TDP MMU won't work for ARM.
-
-For all these reasons, continuing to invest in refactoring the KVM/x86
-TDP MMU common right now is not worth it for ARM. It still could be
-viable for RISC-V, but we (Google) don't have enough resources to
-continue this work. I'd be happy to help provide reviews and guidance
-to anyone that wants to pick it up.
-
-Looking Forward
-===============
-I still believe that sharing KVM MMU code across architectures is a
-worthwhile pursuit. But I think we should look for more incremental
-ways to do it.
-
-For new features, we (Google) plan to upstream both x86 and ARM
-support whenever possible, to limit further divergence and to increase
-the probability of sharing code whenever possible. Note: x86 and ARM
-support won't be upstreamed in a single series due to
-architecture-specific maintainers and trees. But we aim to design them
-considering both architectures from the beginning.
-
-As for de-duplicating existing code, there will be opportunities to
-organically share more code that we should take. The new common
-range-based TLB flushing APIs is one example[2].
-
-I also think there are two areas that would be worth investing in:
-
-Determining Host Huge Page Size
--------------------------------
-When handling a fault, KVM needs to figure out what size mapping it
-can use to map the memory. KVM/x86 figures this out (in part) by
-walking the Linux stage-1 page tables. KVM/ARM and KVM/RISC-V perform
-a vma_lookup() under the mmap_lock and inspect the VMA.
-
-The latter approach has scalability downsides (mmap_lock) and also
-does not work with HugeTLB High Granularity Mapping[3], where Linux
-can map HugeTLB memory with smaller mappings to enable demand fetching
-4KiB at a time (and KVM must do the same).
-
-I'd like to unify the architectures to use a common Linux stage-1 page
-table walk to fix the HGM use-case, and share more code. It may even
-be possible to avoid the vma_lookup() eventually [4].
-
-KVM Page Table Iterators
-------------------------
-To have any hope of sharing MMU code, we have to invest in sharing
-page table code.
-
-A good place to start here would be a common page table walker (x86
-folks: think tdp_iter.c). Page tables are relatively simple data
-structures, and walking through them is just a tree traversal.
-Differences in page table layout can be parameterized in the walker
-and architecture-specific code can handle parsing the PTEs. But the
-actual walking and, more perhaps importantly, the _interface_ for
-walking the page tables can be common.
-
-Consider the x86 and ARM MMU code today. They use very different code
-for walking page tables: x86 uses pre-order traversals with for-loop
-macros. ARM uses pre-order and post-order traversals using callbacks
-and function recursion. The stark difference in how the tables are
-walked makes it very difficult to work across the architectures.
-
-Next Steps
-==========
-I will be on paternity leave from May to September. So there likely
-won't be much progress from me for a while. But I'm going to see if we
-can find someone to work on the common Linux stage-1 walker while I'm
-out.
+This patchset uses kvm->arch.config_lock from Oliver's lock inversion fixes at
+https://lore.kernel.org/linux-arm-kernel/20230327164747.2466958-1-oliver.upton@linux.dev/
 
 ---
 
-Thanks to Oliver Upton, Sean Christopherson, and Marc Zyngier for
-their input on this recommendation.
+* v6 -> v7
+  - Rebased to v6.3-rc7.
+  - Add helpers for idregs read/write.
+  - Guard all idregs reads/writes.
+  - Add code to fix features' safe value type which is different for KVM than
+    for the host.
 
-[1] https://lore.kernel.org/kvm/20221208193857.4090582-1-dmatlack@google.com/
-[2] https://lore.kernel.org/kvm/20230126184025.2294823-1-dmatlack@google.com/
-[3] https://lore.kernel.org/linux-mm/20230218002819.1486479-1-jthoughton@google.com/
-[4] ARM also uses the VMA lookup to map PFNMAP VMAs with huge pages.
-We might need to keep that around until Linux Stage-1 also uses huge
-pages for PFNMAP VMAs (if it doesn't already).
+* v5 -> v6
+  - Rebased to v6.3-rc5.
+  - Reuse struct sys_reg_desc's reset() callback and field val for KVM.
+    sanitisation function and writable mask instead of creating a new data
+    structure for idregs.
+  - Use get_arm64_ftr_reg() instead of exposing idregs ftr_bits array.
+
+* v4 -> v5
+  - Rebased to 2fad20ae05cb (kvmarm/next)
+    Merge branch kvm-arm64/selftest/misc-6,4 into kvmarm-master/next
+  - Use kvm->arch.config_lock to guard update to multiple VM scope idregs
+    to avoid lock inversion
+  - Add back IDREG() macro for idregs access
+  - Refactor struct id_reg_desc by using existing infrastructure.
+  - Addressed many other comments from Marc.
+
+* v3 -> v4
+  - Remove IDREG() macro for ID reg access, use simple array access instead
+  - Rename kvm_arm_read_id_reg_with_encoding() to kvm_arm_read_id_reg()
+  - Save perfmon value in ID_DFR0_EL1 instead of pmuver
+  - Update perfmon in ID_DFR0_EL1 and pmuver in ID_AA64DFR0_EL1 atomically
+  - Remove kvm_vcpu_has_pmu() in macro kvm_pmu_is_3p5()
+  - Improve ID register sanity checking in kvm_arm_check_idreg_table()
+
+* v2 -> v3
+  - Rebased to 96a4627dbbd4 (kvmarm/next)
+    Merge tag ' https://github.com/oupton/linux tags/kvmarm-6.3' from into kvmarm-master/next
+  - Add id registere emulation entry point function emulate_id_reg
+  - Fix consistency for ID_AA64DFR0_EL1.PMUVer and ID_DFR0_EL1.PerfMon
+  - Improve the checking for id register table by ensuring that every entry has
+    the correct id register encoding.
+  - Addressed other comments from Reiji and Marc.
+
+* v1 -> v2
+  - Rebase to 7121a2e1d107 (kvmarm/next) Merge branch kvm-arm64/nv-prefix into kvmarm/next
+  - Address writing issue for PMUVer
+
+[1] https://lore.kernel.org/all/20230201025048.205820-1-jingzhangos@google.com
+[2] https://lore.kernel.org/all/20230212215830.2975485-1-jingzhangos@google.com
+[3] https://lore.kernel.org/all/20230228062246.1222387-1-jingzhangos@google.com
+[4] https://lore.kernel.org/all/20230317050637.766317-1-jingzhangos@google.com
+[5] https://lore.kernel.org/all/20230402183735.3011540-1-jingzhangos@google.com
+[6] https://lore.kernel.org/all/20230404035344.4043856-1-jingzhangos@google.com
+
+---
+
+Jing Zhang (6):
+  KVM: arm64: Move CPU ID feature registers emulation into a separate
+    file
+  KVM: arm64: Save ID registers' sanitized value per guest
+  KVM: arm64: Use per guest ID register for ID_AA64PFR0_EL1.[CSV2|CSV3]
+  KVM: arm64: Use per guest ID register for ID_AA64DFR0_EL1.PMUVer
+  KVM: arm64: Reuse fields of sys_reg_desc for idreg
+  KVM: arm64: Refactor writings for PMUVer/CSV2/CSV3
+
+ arch/arm64/include/asm/cpufeature.h |   1 +
+ arch/arm64/include/asm/kvm_host.h   |  60 ++-
+ arch/arm64/kernel/cpufeature.c      |   2 +-
+ arch/arm64/kvm/Makefile             |   2 +-
+ arch/arm64/kvm/arm.c                |  24 +-
+ arch/arm64/kvm/id_regs.c            | 692 ++++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c           | 525 ++++-----------------
+ arch/arm64/kvm/sys_regs.h           |  28 +-
+ include/kvm/arm_pmu.h               |   5 +-
+ 9 files changed, 857 insertions(+), 482 deletions(-)
+ create mode 100644 arch/arm64/kvm/id_regs.c
+
+
+base-commit: 6a8f57ae2eb07ab39a6f0ccad60c760743051026
+-- 
+2.40.0.634.g4ca3ef3211-goog
+
