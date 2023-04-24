@@ -1,147 +1,288 @@
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 335BD33FA
-	for <kvmarm@lists.linux.dev>; Mon, 24 Apr 2023 19:44:25 +0000 (UTC)
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-63b51fd2972so3996518b3a.3
-        for <kvmarm@lists.linux.dev>; Mon, 24 Apr 2023 12:44:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682365464; x=1684957464;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gttumJmRjcuzz0nO+L7dcVXMjmV9xRO1wfvCT89kRx4=;
-        b=QhGHaaQM7azk+tjDDGNq++SGPWl7Kj3oUwHiSYejHGylznulHSRxwbj78wuowCQTbd
-         lXQRgyAx5jsaDrsldardH4Y3uKDEAIj4dFgor4j4cLrR9UxmhMRhZGg9+kpcvH0G/gV2
-         x6Efy7EVL8kChy1OyD/h3L7WI3tJtCquUgp3VvfFU65cVIrymiThNTGC+0a7Edp9k70c
-         5dvUcFoLWeibOqe2B/W17Skkpf6QCwxmnBRjb6fy33L/6Y76qU6UNtSgEqEJHtJhT56c
-         1KW3jVAd12uXjegicLHD3yWFVkzHe/W10uUYHA5gsFq6x6eL8SJI4EW+ecviKy+Q48Eb
-         TePg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4639C63AD
+	for <kvmarm@lists.linux.dev>; Mon, 24 Apr 2023 20:09:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1682366959;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jaqSE7XG48tGeZTh9A4GycMEA8tOnfnEqPR8Mi0e3+Y=;
+	b=ibYvTHzDyRqIx0zDJ+Np6bGoA5ned3X7NhsHx1r0Y9q91T0c6hEl4ot4NQ/juoWzfr4Z4t
+	lwEhtONwKTWns5gX/kT9LYQGLsyN/toLLawsaoyd52MUtWMdPsisqcWrD4uTdqWoxRA0UX
+	IYbdlmN1TcinEmQsqfrYzyA5uNmkAE4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-121-VS3GlgHUPrWh3znqddREig-1; Mon, 24 Apr 2023 16:09:17 -0400
+X-MC-Unique: VS3GlgHUPrWh3znqddREig-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-2f831f6e175so2598346f8f.2
+        for <kvmarm@lists.linux.dev>; Mon, 24 Apr 2023 13:09:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682365464; x=1684957464;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gttumJmRjcuzz0nO+L7dcVXMjmV9xRO1wfvCT89kRx4=;
-        b=RFBHGVlpRjJQ86ML8jpo6d43ZC+cFgCwP8u2kyN17SebCrp2Lz2BzMSNj7x/aEScoj
-         GeO+0qGide0j3T/6vPWiviY38YYXgISMbG/M9NxuyMtW5ZnfJ18mnP+/KK9Ji3Qd2aR/
-         qcABNJe7Vr5mro2TfrSbtr4+WvjY72FLVmklA/YM+6IOKsCsVi6mkGWcM/HLdGm89Jgm
-         rhZ7bnrCEWMscoS3Tqi+/TnpY49ttcbOMz824ue1KSrhCdm01b/SIlP3Jry7mEtALRPt
-         mwRVLLVRiE1DyW+gBS77Ug3/kmeaRdsNVcfoCQehp6qaem8Lcos89Q0+gCy2pgI+sfhE
-         xjXg==
-X-Gm-Message-State: AAQBX9cHwAFW2ZEwXnwjBG1HVLleRFfyzwZ36x4na6oZ8ggDGIw/btvI
-	Ik7o28tAQBcNkcU78/xC6Cc=
-X-Google-Smtp-Source: AKy350anKgALpmjX1X2m2rSez1PeuzTbvdvdwU9liVevuWPVen/bdTLfTlgAazii7v0HqNVMqA9Ufg==
-X-Received: by 2002:a05:6a00:c85:b0:625:efa4:4c01 with SMTP id a5-20020a056a000c8500b00625efa44c01mr22230394pfv.3.1682365464396;
-        Mon, 24 Apr 2023 12:44:24 -0700 (PDT)
-Received: from smtpclient.apple ([66.170.99.2])
-        by smtp.gmail.com with ESMTPSA id p10-20020a056a000a0a00b0062d8e79ea22sm7694477pfh.40.2023.04.24.12.44.22
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 24 Apr 2023 12:44:23 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
+        d=1e100.net; s=20221208; t=1682366957; x=1684958957;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jaqSE7XG48tGeZTh9A4GycMEA8tOnfnEqPR8Mi0e3+Y=;
+        b=MAIRcxjk9uuAQ5phldug+ufsNtXygkJoUQxz6xj7+4aXP8eEEEG1/KVTTHuJDWz6dD
+         jdAZLBxEVZDA0opYOdYdjCOn4bSXnCj+ftEbA3nkBLa43x/qW36lDY7qge9PhGQWLWgb
+         0M58m8xrZCNaJpYweihGxkJ+p5vJlSzoccvL3q+eFU0LWecTMogY0fyvGS5zYuTKBbHX
+         vDSPEQGUW9XPlIJgTuAiiTeY81ec3nnt1ZDPkuThjthag1G4HJ+RBkQ3EUrQQ7gcifMt
+         ZsAUA07WNiuuy1xfgx+3uRmMed+XKKuat+W5cxK0zdWSptr3+WCpyfL9IHMEHGB7ggO6
+         ii/g==
+X-Gm-Message-State: AAQBX9dPD8QiTsm4wO1EGP5cShtuwczhIOm17O2Chjor1g/iI6SayHr8
+	rDD/VFN3E2nuSHej1G7Nj7Brd5RBbAQFD4pUy6Zc0+LJZ+vRr2eUQ+Heu/f2VH1w3uXuaHmc6cf
+	4bCtDGnvy/wjVxC4b
+X-Received: by 2002:a5d:6e02:0:b0:2fd:98a8:e800 with SMTP id h2-20020a5d6e02000000b002fd98a8e800mr10456629wrz.7.1682366956787;
+        Mon, 24 Apr 2023 13:09:16 -0700 (PDT)
+X-Google-Smtp-Source: AKy350b8PHP69xqyyY1DFRDqw5J7nCTjWgiwzlJv176XIAN5iUfI2BvRjPGgCTBQAnXiP6y1j6cByA==
+X-Received: by 2002:a5d:6e02:0:b0:2fd:98a8:e800 with SMTP id h2-20020a5d6e02000000b002fd98a8e800mr10456615wrz.7.1682366956468;
+        Mon, 24 Apr 2023 13:09:16 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id iz14-20020a05600c554e00b003f175954e71sm16410424wmb.32.2023.04.24.13.09.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Apr 2023 13:09:15 -0700 (PDT)
+Message-ID: <745cd61a-4dbd-4e1b-630c-2f21eec7b005@redhat.com>
+Date: Mon, 24 Apr 2023 22:09:14 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.500.231\))
-Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
- migration via annotated memory faults.
-From: Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <CAF7b7mo78e2YPHU5YrhzuORdpGXCVRxXr6kSyMa+L+guW8jKGw@mail.gmail.com>
-Date: Mon, 24 Apr 2023 12:44:11 -0700
-Cc: Peter Xu <peterx@redhat.com>,
- Axel Rasmussen <axelrasmussen@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- maz@kernel.org,
- oliver.upton@linux.dev,
- Sean Christopherson <seanjc@google.com>,
- James Houghton <jthoughton@google.com>,
- bgardon@google.com,
- dmatlack@google.com,
- ricarkol@google.com,
- kvm <kvm@vger.kernel.org>,
- kvmarm@lists.linux.dev
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <84DD9212-31FB-4AF6-80DD-9BA5AEA0EC1A@gmail.com>
-References: <20230412213510.1220557-1-amoorthy@google.com>
- <ZEBHTw3+DcAnPc37@x1n>
- <CAJHvVchBqQ8iVHgF9cVZDusMKQM2AjtNx2z=i9ZHP2BosN4tBg@mail.gmail.com>
- <ZEBXi5tZZNxA+jRs@x1n>
- <CAF7b7mo68VLNp=QynfT7QKgdq=d1YYGv1SEVEDxF9UwHzF6YDw@mail.gmail.com>
- <ZEGuogfbtxPNUq7t@x1n> <46DD705B-3A3F-438E-A5B1-929C1E43D11F@gmail.com>
- <CAF7b7mo78e2YPHU5YrhzuORdpGXCVRxXr6kSyMa+L+guW8jKGw@mail.gmail.com>
-To: Anish Moorthy <amoorthy@google.com>
-X-Mailer: Apple Mail (2.3731.500.231)
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH 1/6] arm: pmu: pmu-chain-promotion: Improve
+ debug messages
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ andrew.jones@linux.dev, maz@kernel.org, will@kernel.org,
+ oliver.upton@linux.dev, ricarkol@google.com, reijiw@google.com
+References: <20230315110725.1215523-1-eric.auger@redhat.com>
+ <20230315110725.1215523-2-eric.auger@redhat.com>
+ <ZEJWhPtA2xaaqV54@monolith.localdoman>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <ZEJWhPtA2xaaqV54@monolith.localdoman>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+Hi Alexandru,
 
+On 4/21/23 11:25, Alexandru Elisei wrote:
+> Hi,
+>
+> On Wed, Mar 15, 2023 at 12:07:20PM +0100, Eric Auger wrote:
+>> The pmu-chain-promotion test is composed of several subtests.
+>> In case of failures, the current logs are really dificult to
+>> analyze since they look very similar and sometimes duplicated
+>> for each subtest. Add prefixes for each subtest and introduce
+>> a macro that prints the registers we are mostly interested in,
+>> namerly the 2 first counters and the overflow counter.
+> One possible typo below.
+renamed 2d into 2nd as suggested.
+>
+> Ran pmu-chain-promotion with and without this patch applied, the
+> improvement is very noticeable, it makes it very easy to match the debug
+> message with the subtest being run:
+>
+> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
-> On Apr 24, 2023, at 10:54 AM, Anish Moorthy <amoorthy@google.com> =
-wrote:
->=20
-> On Fri, Apr 21, 2023 at 10:40=E2=80=AFAM Nadav Amit =
-<nadav.amit@gmail.com> wrote:
->>=20
->> If I understand the problem correctly, it sounds as if the proper =
-solution
->> should be some kind of a range-locks. If it is too heavy or the =
-interface can
->> be changed/extended to wake a single address (instead of a range),
->> simpler hashed-locks can be used.
->=20
-> Some sort of range-based locking system does seem relevant, although I
-> don't see how that would necessarily speed up the delivery of faults
-> to UFFD readers: I'll have to think about it more.
+Thanks!
 
-Perhaps I misread your issue. Based on the scalability issues you =
-raised,
-I assumed that the problem you encountered is related to lock =
-contention.
-I do not know whether your profiled it, but some information would be
-useful.
-
-Anyhow, if the issue you encounter is mostly about the general overhead
-of delivering userfaultfd, I encountered this one too. The solution I =
-tried
-(and you can find some old patches) is in delivering and resolving =
-userfaultfd
-using IO-uring. The main advantage is that this solution is generic and
-performance is pretty good. The disadvantage is that you do need to =
-allocate
-a polling thread/core to handle the userfaultfd.
-
-If you want, I can send you privately the last iteration of my patches =
-for
-you to give it a spin.
-
->=20
-> On the KVM side though, I think there's value in merging
-> KVM_CAP_ABSENT_MAPPING_FAULT and allowing performance improvements to
-> UFFD itself proceed separately. It's likely that returning faults
-> directly via the vCPU threads will be faster than even an improved
-> UFFD, since the former approach basically removes one level of
-> indirection. That seems important, given the criticality of the
-> EPT-violation path during postcopy. Furthermore, if future performance
-> improvements to UFFD involve changes/restrictions to its API, then
-> KVM_CAP_ABSENT_MAPPING_FAULT could well be useful anyways.
->=20
-> Sean did mention that he wanted KVM_CAP_MEMORY_FAULT_INFO in general,
-> so I'm guessing (some version of) that will (eventually :) be merged
-> in any case.
-
-It certainly not my call. But if you ask me, introducing a solution for
-a concrete use-case that requires API changes/enhancements is not
-guaranteed to be the best solution. It may be better first to fully
-understand the existing overheads and agree that there is no alternative
-cleaner and more general solution with similar performance.
-
-Considering the mess that KVM async-PF introduced, I
-would be very careful before introducing such API changes. I did not =
-look
-too much on the details, but some things anyhow look slightly strange
-(which might be since I am out-of-touch with KVM). For instance, =
-returning
--EFAULT on from KVM_RUN? I would have assumed -EAGAIN would be more
-appropriate since the invocation did succeed.
+Eric
+>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>>  arm/pmu.c | 63 ++++++++++++++++++++++++++++---------------------------
+>>  1 file changed, 32 insertions(+), 31 deletions(-)
+>>
+>> diff --git a/arm/pmu.c b/arm/pmu.c
+>> index f6e95012..dad7d4b4 100644
+>> --- a/arm/pmu.c
+>> +++ b/arm/pmu.c
+>> @@ -715,6 +715,11 @@ static void test_chained_sw_incr(bool unused)
+>>  	report_info("overflow=0x%lx, #0=0x%lx #1=0x%lx", read_sysreg(pmovsclr_el0),
+>>  		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
+>>  }
+>> +#define PRINT_REGS(__s) \
+>> +	report_info("%s #1=0x%lx #0=0x%lx overflow=0x%lx", __s, \
+>> +		    read_regn_el0(pmevcntr, 1), \
+>> +		    read_regn_el0(pmevcntr, 0), \
+>> +		    read_sysreg(pmovsclr_el0))
+>>  
+>>  static void test_chain_promotion(bool unused)
+>>  {
+>> @@ -725,6 +730,7 @@ static void test_chain_promotion(bool unused)
+>>  		return;
+>>  
+>>  	/* Only enable CHAIN counter */
+>> +	report_prefix_push("subtest1");
+>>  	pmu_reset();
+>>  	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
+>>  	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
+>> @@ -732,83 +738,81 @@ static void test_chain_promotion(bool unused)
+>>  	isb();
+>>  
+>>  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+>> +	PRINT_REGS("post");
+>>  	report(!read_regn_el0(pmevcntr, 0),
+>>  		"chain counter not counting if even counter is disabled");
+>> +	report_prefix_pop();
+>>  
+>>  	/* Only enable even counter */
+>> +	report_prefix_push("subtest2");
+>>  	pmu_reset();
+>>  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
+>>  	write_sysreg_s(0x1, PMCNTENSET_EL0);
+>>  	isb();
+>>  
+>>  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+>> +	PRINT_REGS("post");
+>>  	report(!read_regn_el0(pmevcntr, 1) && (read_sysreg(pmovsclr_el0) == 0x1),
+>>  		"odd counter did not increment on overflow if disabled");
+>> -	report_info("MEM_ACCESS counter #0 has value 0x%lx",
+>> -		    read_regn_el0(pmevcntr, 0));
+>> -	report_info("CHAIN counter #1 has value 0x%lx",
+>> -		    read_regn_el0(pmevcntr, 1));
+>> -	report_info("overflow counter 0x%lx", read_sysreg(pmovsclr_el0));
+>> +	report_prefix_pop();
+>>  
+>>  	/* start at 0xFFFFFFDC, +20 with CHAIN enabled, +20 with CHAIN disabled */
+>> +	report_prefix_push("subtest3");
+>>  	pmu_reset();
+>>  	write_sysreg_s(0x3, PMCNTENSET_EL0);
+>>  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2_32);
+>>  	isb();
+>> +	PRINT_REGS("init");
+>>  
+>>  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+>> -	report_info("MEM_ACCESS counter #0 has value 0x%lx",
+>> -		    read_regn_el0(pmevcntr, 0));
+>> +	PRINT_REGS("After 1st loop");
+>>  
+>>  	/* disable the CHAIN event */
+>>  	write_sysreg_s(0x2, PMCNTENCLR_EL0);
+>>  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+>> -	report_info("MEM_ACCESS counter #0 has value 0x%lx",
+>> -		    read_regn_el0(pmevcntr, 0));
+>> +	PRINT_REGS("After 2d loop");
+> Hmm.. was that supposed to be "after 2**n**d loop" (matches the "after 1st
+> loop" message)? A few more instances below.
+>
+> Thanks,
+> Alex
+>
+>>  	report(read_sysreg(pmovsclr_el0) == 0x1,
+>>  		"should have triggered an overflow on #0");
+>>  	report(!read_regn_el0(pmevcntr, 1),
+>>  		"CHAIN counter #1 shouldn't have incremented");
+>> +	report_prefix_pop();
+>>  
+>>  	/* start at 0xFFFFFFDC, +20 with CHAIN disabled, +20 with CHAIN enabled */
+>>  
+>> +	report_prefix_push("subtest4");
+>>  	pmu_reset();
+>>  	write_sysreg_s(0x1, PMCNTENSET_EL0);
+>>  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2_32);
+>>  	isb();
+>> -	report_info("counter #0 = 0x%lx, counter #1 = 0x%lx overflow=0x%lx",
+>> -		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1),
+>> -		    read_sysreg(pmovsclr_el0));
+>> +	PRINT_REGS("init");
+>>  
+>>  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+>> -	report_info("MEM_ACCESS counter #0 has value 0x%lx",
+>> -		    read_regn_el0(pmevcntr, 0));
+>> +	PRINT_REGS("After 1st loop");
+>>  
+>>  	/* enable the CHAIN event */
+>>  	write_sysreg_s(0x3, PMCNTENSET_EL0);
+>>  	isb();
+>>  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+>> -	report_info("MEM_ACCESS counter #0 has value 0x%lx",
+>> -		    read_regn_el0(pmevcntr, 0));
+>> +
+>> +	PRINT_REGS("After 2d loop");
+>>  
+>>  	report((read_regn_el0(pmevcntr, 1) == 1) &&
+>>  		(read_sysreg(pmovsclr_el0) == 0x1),
+>>  		"CHAIN counter enabled: CHAIN counter was incremented and overflow");
+>> -
+>> -	report_info("CHAIN counter #1 = 0x%lx, overflow=0x%lx",
+>> -		read_regn_el0(pmevcntr, 1), read_sysreg(pmovsclr_el0));
+>> +	report_prefix_pop();
+>>  
+>>  	/* start as MEM_ACCESS/CPU_CYCLES and move to CHAIN/MEM_ACCESS */
+>> +	report_prefix_push("subtest5");
+>>  	pmu_reset();
+>>  	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
+>>  	write_regn_el0(pmevtyper, 1, CPU_CYCLES | PMEVTYPER_EXCLUDE_EL0);
+>>  	write_sysreg_s(0x3, PMCNTENSET_EL0);
+>>  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2_32);
+>>  	isb();
+>> +	PRINT_REGS("init");
+>>  
+>>  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+>> -	report_info("MEM_ACCESS counter #0 has value 0x%lx",
+>> -		    read_regn_el0(pmevcntr, 0));
+>> +	PRINT_REGS("After 1st loop");
+>>  
+>>  	/* 0 becomes CHAINED */
+>>  	write_sysreg_s(0x0, PMCNTENSET_EL0);
+>> @@ -817,37 +821,34 @@ static void test_chain_promotion(bool unused)
+>>  	write_regn_el0(pmevcntr, 1, 0x0);
+>>  
+>>  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+>> -	report_info("MEM_ACCESS counter #0 has value 0x%lx",
+>> -		    read_regn_el0(pmevcntr, 0));
+>> +	PRINT_REGS("After 2d loop");
+>>  
+>>  	report((read_regn_el0(pmevcntr, 1) == 1) &&
+>>  		(read_sysreg(pmovsclr_el0) == 0x1),
+>>  		"32b->64b: CHAIN counter incremented and overflow");
+>> -
+>> -	report_info("CHAIN counter #1 = 0x%lx, overflow=0x%lx",
+>> -		read_regn_el0(pmevcntr, 1), read_sysreg(pmovsclr_el0));
+>> +	report_prefix_pop();
+>>  
+>>  	/* start as CHAIN/MEM_ACCESS and move to MEM_ACCESS/CPU_CYCLES */
+>> +	report_prefix_push("subtest6");
+>>  	pmu_reset();
+>>  	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
+>>  	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
+>>  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2_32);
+>>  	write_sysreg_s(0x3, PMCNTENSET_EL0);
+>> +	PRINT_REGS("init");
+>>  
+>>  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+>> -	report_info("counter #0=0x%lx, counter #1=0x%lx",
+>> -			read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
+>> +	PRINT_REGS("After 1st loop");
+>>  
+>>  	write_sysreg_s(0x0, PMCNTENSET_EL0);
+>>  	write_regn_el0(pmevtyper, 1, CPU_CYCLES | PMEVTYPER_EXCLUDE_EL0);
+>>  	write_sysreg_s(0x3, PMCNTENSET_EL0);
+>>  
+>>  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+>> +	PRINT_REGS("After 2d loop");
+>>  	report(read_sysreg(pmovsclr_el0) == 1,
+>>  		"overflow is expected on counter 0");
+>> -	report_info("counter #0=0x%lx, counter #1=0x%lx overflow=0x%lx",
+>> -			read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1),
+>> -			read_sysreg(pmovsclr_el0));
+>> +	report_prefix_pop();
+>>  }
+>>  
+>>  static bool expect_interrupts(uint32_t bitmap)
+>> -- 
+>> 2.38.1
+>>
 
