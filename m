@@ -1,127 +1,82 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E4087C
-	for <kvmarm@lists.linux.dev>; Mon, 24 Apr 2023 11:14:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1682334881;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PWrCJMrvslxtx+4S715HvGi2nPbXA+BOmSMzUbP88XQ=;
-	b=aHWDtR35Y3F7w0j4L0HdNCqTNZwLuNmtqzvVUencrwaLQPgmanxvKKqgYzoBpiUEwt54un
-	ue2u6jRvp5CFsPTS7RMwafwZRQ+nkB+Qw67ywwfYjLHJNUo/oNfN67ZZPZuisE159rPeSL
-	g99efTgeb1sLO2j4kI8BkWF011NHfcI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-501-Jk-P9MJ8Nuy18hkCT35kZw-1; Mon, 24 Apr 2023 07:14:35 -0400
-X-MC-Unique: Jk-P9MJ8Nuy18hkCT35kZw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 064DF185A78F;
-	Mon, 24 Apr 2023 11:14:34 +0000 (UTC)
-Received: from [10.72.12.189] (ovpn-12-189.pek2.redhat.com [10.72.12.189])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B602949AF0;
-	Mon, 24 Apr 2023 11:14:25 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v7 08/12] KVM: arm64: Add
- KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-To: Ricardo Koller <ricarkol@google.com>
-Cc: pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
- yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com,
- andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com,
- suzuki.poulose@arm.com, eric.auger@redhat.com, reijiw@google.com,
- rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
- Oliver Upton <oliver.upton@linux.dev>
-References: <20230409063000.3559991-1-ricarkol@google.com>
- <20230409063000.3559991-10-ricarkol@google.com>
- <58664917-edfa-8c7a-2833-0664d83277d6@redhat.com>
- <ZEWUvTmdfSOwOPOz@google.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <e3b0baba-dc0d-f634-e53f-59cc0fd99973@redhat.com>
-Date: Mon, 24 Apr 2023 19:14:21 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D2203210
+	for <kvmarm@lists.linux.dev>; Mon, 24 Apr 2023 16:45:56 +0000 (UTC)
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-54fb8a8a597so55052977b3.0
+        for <kvmarm@lists.linux.dev>; Mon, 24 Apr 2023 09:45:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1682354755; x=1684946755;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cogHEMsVVgTDAgj3gPVUEVuPljtJmFM5khAyIfbROPI=;
+        b=IBOU6rK79gND4DciwLkfyHJXLICK+nm1hfqmlYcnXaImIV8xf915qrkhfvrtFQ1bD9
+         8Z+ZDwfy6VoKjQweFXwu2Ekk2xB4sANXClY8YQV834aQDs+/FEV0pbYJdQjAAZN9rs34
+         f57BlCx+WuwQCSpj22oE82Xg3qgAyLXwOjmFBUce3BRWppaPMfsXHqc33YIYcz+3VNi4
+         XAZAp7pRNW06LclNSKJAgnoHgP+fH1wRI4+4eovVUts+kprnZi5lybCwL9Zgev3v81H7
+         MVICvn7IiG51PLSmT4j4PcXlaBgIbQc7j8zZ0ZG9H7yZWRSpCFId5KXjqGEfZQLGW0Na
+         Tk1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682354755; x=1684946755;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cogHEMsVVgTDAgj3gPVUEVuPljtJmFM5khAyIfbROPI=;
+        b=NFeSb78xf30dEMIfBjBLnSPyvrrqS+VvBUzkX2QhrSNc0lblAceyNzKflkq3xWili6
+         6R7/J8J6yAqSKnO5Bru+bHUY+FzfIKfo7fW6P/RcxozLrYlLyE2nPb5ryx+LQoDiwTCg
+         D3EJoAjXst22ROuAfk1eFxBZiD7JVd9zGSexZW7lhIAXi3mNjuvLGX4orrC0d2L+/OA0
+         BakQ5SfubqPV04YJfgSi+H54RdPrw0Kq7Fs7kN5ECksE6S4E0tjW2R+oddLjw9BpuCOF
+         MApSpp9+zrmFRMdlye9Zd9jzxm90Fooh770bqJSYOJlxwIzi/l8zvIZglKzFiv3UStWQ
+         83vw==
+X-Gm-Message-State: AAQBX9eRJB6iHuMbNgKyfdTNH2V88z+tq4OE02K6mM8k2WSPzy/bVyOw
+	UsCTFtvGUta6J6ECHepcbwRCdoqfNWPDYM3DpdK73w==
+X-Google-Smtp-Source: AKy350bUMi1vCT3z4Q+q+kn/632Ww3gn+vAsPs+FHaqynFi9cqF64KYbnuQ/xodFFgeBsnoDvd5keBpYNYydhUX/nUI=
+X-Received: by 2002:a0d:ccd0:0:b0:541:8735:171e with SMTP id
+ o199-20020a0dccd0000000b005418735171emr9340453ywd.11.1682354754795; Mon, 24
+ Apr 2023 09:45:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <ZEWUvTmdfSOwOPOz@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+References: <20230421165305.804301-8-vipinsh@google.com> <202304220315.bpwbgH5n-lkp@intel.com>
+In-Reply-To: <202304220315.bpwbgH5n-lkp@intel.com>
+From: Vipin Sharma <vipinsh@google.com>
+Date: Mon, 24 Apr 2023 09:45:18 -0700
+Message-ID: <CAHVum0cp=wfDmuK87jq7+2t5FnK09v1LownwqgS41EisT4Gc1g@mail.gmail.com>
+Subject: Re: [PATCH 7/9] KVM: mmu: Move mmu lock/unlock to arch code for clear
+ dirty log
+To: kernel test robot <lkp@intel.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, 
+	tsbogend@alpha.franken.de, anup@brainfault.org, atishp@atishpatra.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	seanjc@google.com, pbonzini@redhat.com, dmatlack@google.com, 
+	ricarkol@google.com, oe-kbuild-all@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/24/23 4:27 AM, Ricardo Koller wrote:
-> On Mon, Apr 17, 2023 at 03:04:47PM +0800, Gavin Shan wrote:
->> On 4/9/23 2:29 PM, Ricardo Koller wrote:
->>> Add a capability for userspace to specify the eager split chunk size.
->>> The chunk size specifies how many pages to break at a time, using a
->>> single allocation. Bigger the chunk size, more pages need to be
->>> allocated ahead of time.
->>>
->>> Suggested-by: Oliver Upton <oliver.upton@linux.dev>
->>> Signed-off-by: Ricardo Koller <ricarkol@google.com>
->>> ---
->>>    Documentation/virt/kvm/api.rst       | 28 ++++++++++++++++++++++++++
->>>    arch/arm64/include/asm/kvm_host.h    | 15 ++++++++++++++
->>>    arch/arm64/include/asm/kvm_pgtable.h | 18 +++++++++++++++++
->>>    arch/arm64/kvm/arm.c                 | 30 ++++++++++++++++++++++++++++
->>>    arch/arm64/kvm/mmu.c                 |  3 +++
->>>    include/uapi/linux/kvm.h             |  2 ++
->>>    6 files changed, 96 insertions(+)
->>>
->>
->> With the following comments addressed:
->>
->> Reviewed-by: Gavin Shan <gshan@redhat.com>
->>
+On Fri, Apr 21, 2023 at 12:43=E2=80=AFPM kernel test robot <lkp@intel.com> =
+wrote:
+>
+> Hi Vipin,
+>
+> All warnings (new ones prefixed by >>):
+>
+>    arch/riscv/kvm/mmu.c: In function 'kvm_arch_mmu_enable_log_dirty_pt_ma=
+sked':
+> >> arch/riscv/kvm/mmu.c:399:9: warning: ISO C90 forbids mixed declaration=
+s and code [-Wdeclaration-after-statement]
+>      399 |         phys_addr_t base_gfn =3D slot->base_gfn + gfn_offset;
+>          |         ^~~~~~~~~~~
+>
+>
 
-[...]
-
->>
->>> +static inline bool kvm_is_block_size_supported(u64 size)
->>> +{
->>> +	bool is_power_of_two = !((size) & ((size)-1));
->>> +
->>> +	return is_power_of_two && (size & kvm_supported_block_sizes());
->>> +}
->>> +
->>
->> IS_ALIGNED() maybe used here.
-> 
-> I've been trying to reuse some bitmap related function in the kernel,
-> like IS_ALIGNED(), but can't find anything. Or at least it doesn't occur
-> to me how.
-> 
-> kvm_is_block_size_supported() returns true if @size matches only one of
-> the bits set in kvm_supported_block_sizes(). For example, given these
-> supported sizes: 10000100001000.
-> 
-> kvm_is_block_size_supported(100000000) => true
-> kvm_is_block_size_supported(1100) => false
-> 
-
-I was actually thinking of @is_power_of_two is replaced by IS_ALIGNED(),
-For example:
-
-static inline bool kvm_is_block_size_supported(u64 size)
-{
-     return IS_ALIGNED(size, size) && (size & kvm_supported_block_sizes());
-}
-
-IS_ALIGNED() is defined in include/linux/align.h, as below. It's almost
-similar to '((size) & ((size)-1))'
-
-#define IS_ALIGNED(x, a)                (((x) & ((typeof(x))(a) - 1)) == 0)
-
-Thanks,
-Gavin
-
+I will fix it in v2.
