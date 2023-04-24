@@ -1,53 +1,53 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4639C63AD
-	for <kvmarm@lists.linux.dev>; Mon, 24 Apr 2023 20:09:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E877C63AD
+	for <kvmarm@lists.linux.dev>; Mon, 24 Apr 2023 20:09:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1682366959;
+	s=mimecast20190719; t=1682366981;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jaqSE7XG48tGeZTh9A4GycMEA8tOnfnEqPR8Mi0e3+Y=;
-	b=ibYvTHzDyRqIx0zDJ+Np6bGoA5ned3X7NhsHx1r0Y9q91T0c6hEl4ot4NQ/juoWzfr4Z4t
-	lwEhtONwKTWns5gX/kT9LYQGLsyN/toLLawsaoyd52MUtWMdPsisqcWrD4uTdqWoxRA0UX
-	IYbdlmN1TcinEmQsqfrYzyA5uNmkAE4=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=ujYVgz+txm1lGBh6SyDK3CxW+aQKwQ3pZ931TZpn/KY=;
+	b=X8IfDBV3/jTvETpwsYHp/AWaXZkyPYAZ9uqCpEZ4k0NDkiUPI6osth3rQdLovP77/6Fu3S
+	cmWpi2nLfeTN2vKYVH8JgKKw2ls4zSYw93UaiOzmHk1NBcUvw/yIZ8cQaoG6jMhXy2gsko
+	uztaMpXmglgjJjhiIDnEMHE6d0W5zAA=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-121-VS3GlgHUPrWh3znqddREig-1; Mon, 24 Apr 2023 16:09:17 -0400
-X-MC-Unique: VS3GlgHUPrWh3znqddREig-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-2f831f6e175so2598346f8f.2
-        for <kvmarm@lists.linux.dev>; Mon, 24 Apr 2023 13:09:17 -0700 (PDT)
+ us-mta-528-TKjVMN4dN0eC77rjW-JKZQ-1; Mon, 24 Apr 2023 16:09:40 -0400
+X-MC-Unique: TKjVMN4dN0eC77rjW-JKZQ-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-2ffa43cd733so2628218f8f.1
+        for <kvmarm@lists.linux.dev>; Mon, 24 Apr 2023 13:09:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682366957; x=1684958957;
+        d=1e100.net; s=20221208; t=1682366979; x=1684958979;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jaqSE7XG48tGeZTh9A4GycMEA8tOnfnEqPR8Mi0e3+Y=;
-        b=MAIRcxjk9uuAQ5phldug+ufsNtXygkJoUQxz6xj7+4aXP8eEEEG1/KVTTHuJDWz6dD
-         jdAZLBxEVZDA0opYOdYdjCOn4bSXnCj+ftEbA3nkBLa43x/qW36lDY7qge9PhGQWLWgb
-         0M58m8xrZCNaJpYweihGxkJ+p5vJlSzoccvL3q+eFU0LWecTMogY0fyvGS5zYuTKBbHX
-         vDSPEQGUW9XPlIJgTuAiiTeY81ec3nnt1ZDPkuThjthag1G4HJ+RBkQ3EUrQQ7gcifMt
-         ZsAUA07WNiuuy1xfgx+3uRmMed+XKKuat+W5cxK0zdWSptr3+WCpyfL9IHMEHGB7ggO6
-         ii/g==
-X-Gm-Message-State: AAQBX9dPD8QiTsm4wO1EGP5cShtuwczhIOm17O2Chjor1g/iI6SayHr8
-	rDD/VFN3E2nuSHej1G7Nj7Brd5RBbAQFD4pUy6Zc0+LJZ+vRr2eUQ+Heu/f2VH1w3uXuaHmc6cf
-	4bCtDGnvy/wjVxC4b
-X-Received: by 2002:a5d:6e02:0:b0:2fd:98a8:e800 with SMTP id h2-20020a5d6e02000000b002fd98a8e800mr10456629wrz.7.1682366956787;
-        Mon, 24 Apr 2023 13:09:16 -0700 (PDT)
-X-Google-Smtp-Source: AKy350b8PHP69xqyyY1DFRDqw5J7nCTjWgiwzlJv176XIAN5iUfI2BvRjPGgCTBQAnXiP6y1j6cByA==
-X-Received: by 2002:a5d:6e02:0:b0:2fd:98a8:e800 with SMTP id h2-20020a5d6e02000000b002fd98a8e800mr10456615wrz.7.1682366956468;
-        Mon, 24 Apr 2023 13:09:16 -0700 (PDT)
+        bh=ujYVgz+txm1lGBh6SyDK3CxW+aQKwQ3pZ931TZpn/KY=;
+        b=MO7UN+7Hj2iI9kImhsv0cXo0kT4tp8vqbTkgJsZeUAntTpIIiQmPzOm1yrpOEkfeiB
+         kNJ3iJnTgIqWnhoo220j442fpW7iGPEdltkMExnJ7vfE8Xe4idA8kfPIbY76Xw4OqMQt
+         cZ4g1DE4eL7W4ut2It4XOyYn8WA3Q+TZN40wjweqXOp/q0SDRtCOJLvbA1yWCJEVueII
+         K3eRF1ifomKVc12r2VMFV5PNBlFXIt9lDp5Zw1C0OC/hldaeEoEYtuUuz7wkxsSBQEOX
+         Aq4K1iKQxVs6IaKTjkROa5IPZPm8/G5hMJU/R+a/PSg+EqNhhikh8PkzowmgjJHyi8+X
+         uOhA==
+X-Gm-Message-State: AAQBX9cNwJT8plbru+sqjRz5Oe83Kv7x5JK86lhfCFLSKO6867UzqYuJ
+	CBLgaXierItJQlJpj7Rbn5702CX249pyKgJ9Iw8mVHGrXWLhl1bHeZLgZInp8GrjnLwl8MmURsM
+	H2lNcVLksNxmUeCt2
+X-Received: by 2002:a5d:58f5:0:b0:2f9:896a:7554 with SMTP id f21-20020a5d58f5000000b002f9896a7554mr10072788wrd.13.1682366979446;
+        Mon, 24 Apr 2023 13:09:39 -0700 (PDT)
+X-Google-Smtp-Source: AKy350ZvVUmxH8EgEECxq3QfhKsGRstKP2b4ZNGJRtfyXUfJpWyQS+VMo6s53nDoo6D1UjtREQ67KA==
+X-Received: by 2002:a5d:58f5:0:b0:2f9:896a:7554 with SMTP id f21-20020a5d58f5000000b002f9896a7554mr10072769wrd.13.1682366979062;
+        Mon, 24 Apr 2023 13:09:39 -0700 (PDT)
 Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id iz14-20020a05600c554e00b003f175954e71sm16410424wmb.32.2023.04.24.13.09.15
+        by smtp.gmail.com with ESMTPSA id r4-20020adfdc84000000b002f598008d50sm11431897wrj.34.2023.04.24.13.09.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Apr 2023 13:09:15 -0700 (PDT)
-Message-ID: <745cd61a-4dbd-4e1b-630c-2f21eec7b005@redhat.com>
-Date: Mon, 24 Apr 2023 22:09:14 +0200
+        Mon, 24 Apr 2023 13:09:38 -0700 (PDT)
+Message-ID: <e518045c-6138-f9b7-7503-3b3b47c7ee80@redhat.com>
+Date: Mon, 24 Apr 2023 22:09:37 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,17 +57,17 @@ MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
 Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH 1/6] arm: pmu: pmu-chain-promotion: Improve
- debug messages
+Subject: Re: [kvm-unit-tests PATCH 2/6] arm: pmu: pmu-chain-promotion:
+ Introduce defines for count and margin values
 To: Alexandru Elisei <alexandru.elisei@arm.com>
 Cc: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
  andrew.jones@linux.dev, maz@kernel.org, will@kernel.org,
  oliver.upton@linux.dev, ricarkol@google.com, reijiw@google.com
 References: <20230315110725.1215523-1-eric.auger@redhat.com>
- <20230315110725.1215523-2-eric.auger@redhat.com>
- <ZEJWhPtA2xaaqV54@monolith.localdoman>
+ <20230315110725.1215523-3-eric.auger@redhat.com>
+ <ZEJdpmTSyf6sp3Yv@monolith.localdoman>
 From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <ZEJWhPtA2xaaqV54@monolith.localdoman>
+In-Reply-To: <ZEJdpmTSyf6sp3Yv@monolith.localdoman>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -75,214 +75,190 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 Hi Alexandru,
-
-On 4/21/23 11:25, Alexandru Elisei wrote:
+On 4/21/23 11:55, Alexandru Elisei wrote:
 > Hi,
 >
-> On Wed, Mar 15, 2023 at 12:07:20PM +0100, Eric Auger wrote:
->> The pmu-chain-promotion test is composed of several subtests.
->> In case of failures, the current logs are really dificult to
->> analyze since they look very similar and sometimes duplicated
->> for each subtest. Add prefixes for each subtest and introduce
->> a macro that prints the registers we are mostly interested in,
->> namerly the 2 first counters and the overflow counter.
-> One possible typo below.
-renamed 2d into 2nd as suggested.
->
-> Ran pmu-chain-promotion with and without this patch applied, the
-> improvement is very noticeable, it makes it very easy to match the debug
-> message with the subtest being run:
->
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks!
-
-Eric
->
+> On Wed, Mar 15, 2023 at 12:07:21PM +0100, Eric Auger wrote:
+>> The pmu-chain-promotion test is composed of separate subtests.
+>>
+>> Some of them apply some settings on a first MEM_ACCESS loop
+>> iterations, change the settings and run another MEM_ACCESS loop.
+>>
+>> The PRE_OVERFLOW2 MEM_ACCESS counter init value is defined so that
+>> the first loop does not overflow and the second loop overflows.
+>>
+>> At the moment the MEM_ACCESS count number is hardcoded to 20 and
+>> PRE_OVERFLOW2 is set to UINT32_MAX - 20 - 15 where 15 acts as a
+>> margin.
+>>
+>> Introduce defines for the count number and the margin so that it
+>> becomes easier to change them.
+>>
 >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 >> ---
->>  arm/pmu.c | 63 ++++++++++++++++++++++++++++---------------------------
->>  1 file changed, 32 insertions(+), 31 deletions(-)
+>>  arm/pmu.c | 35 +++++++++++++++++++++--------------
+>>  1 file changed, 21 insertions(+), 14 deletions(-)
 >>
 >> diff --git a/arm/pmu.c b/arm/pmu.c
->> index f6e95012..dad7d4b4 100644
+>> index dad7d4b4..b88366a8 100644
 >> --- a/arm/pmu.c
 >> +++ b/arm/pmu.c
->> @@ -715,6 +715,11 @@ static void test_chained_sw_incr(bool unused)
->>  	report_info("overflow=0x%lx, #0=0x%lx #1=0x%lx", read_sysreg(pmovsclr_el0),
->>  		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
->>  }
->> +#define PRINT_REGS(__s) \
->> +	report_info("%s #1=0x%lx #0=0x%lx overflow=0x%lx", __s, \
->> +		    read_regn_el0(pmevcntr, 1), \
->> +		    read_regn_el0(pmevcntr, 0), \
->> +		    read_sysreg(pmovsclr_el0))
+>> @@ -55,11 +55,18 @@
+>>  #define EXT_COMMON_EVENTS_LOW	0x4000
+>>  #define EXT_COMMON_EVENTS_HIGH	0x403F
 >>  
->>  static void test_chain_promotion(bool unused)
->>  {
->> @@ -725,6 +730,7 @@ static void test_chain_promotion(bool unused)
->>  		return;
->>  
->>  	/* Only enable CHAIN counter */
->> +	report_prefix_push("subtest1");
->>  	pmu_reset();
->>  	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
->>  	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
->> @@ -732,83 +738,81 @@ static void test_chain_promotion(bool unused)
->>  	isb();
->>  
->>  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
->> +	PRINT_REGS("post");
->>  	report(!read_regn_el0(pmevcntr, 0),
->>  		"chain counter not counting if even counter is disabled");
->> +	report_prefix_pop();
->>  
->>  	/* Only enable even counter */
->> +	report_prefix_push("subtest2");
->>  	pmu_reset();
->>  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
->>  	write_sysreg_s(0x1, PMCNTENSET_EL0);
->>  	isb();
->>  
->>  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
->> +	PRINT_REGS("post");
->>  	report(!read_regn_el0(pmevcntr, 1) && (read_sysreg(pmovsclr_el0) == 0x1),
->>  		"odd counter did not increment on overflow if disabled");
->> -	report_info("MEM_ACCESS counter #0 has value 0x%lx",
->> -		    read_regn_el0(pmevcntr, 0));
->> -	report_info("CHAIN counter #1 has value 0x%lx",
->> -		    read_regn_el0(pmevcntr, 1));
->> -	report_info("overflow counter 0x%lx", read_sysreg(pmovsclr_el0));
->> +	report_prefix_pop();
->>  
->>  	/* start at 0xFFFFFFDC, +20 with CHAIN enabled, +20 with CHAIN disabled */
->> +	report_prefix_push("subtest3");
->>  	pmu_reset();
->>  	write_sysreg_s(0x3, PMCNTENSET_EL0);
->>  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2_32);
->>  	isb();
->> +	PRINT_REGS("init");
->>  
->>  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
->> -	report_info("MEM_ACCESS counter #0 has value 0x%lx",
->> -		    read_regn_el0(pmevcntr, 0));
->> +	PRINT_REGS("After 1st loop");
->>  
->>  	/* disable the CHAIN event */
->>  	write_sysreg_s(0x2, PMCNTENCLR_EL0);
->>  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
->> -	report_info("MEM_ACCESS counter #0 has value 0x%lx",
->> -		    read_regn_el0(pmevcntr, 0));
->> +	PRINT_REGS("After 2d loop");
-> Hmm.. was that supposed to be "after 2**n**d loop" (matches the "after 1st
-> loop" message)? A few more instances below.
+>> -#define ALL_SET_32			0x00000000FFFFFFFFULL
+>> +#define ALL_SET_32		0x00000000FFFFFFFFULL
+>>  #define ALL_CLEAR		0x0000000000000000ULL
+>>  #define PRE_OVERFLOW_32		0x00000000FFFFFFF0ULL
+>> -#define PRE_OVERFLOW2_32	0x00000000FFFFFFDCULL
+>>  #define PRE_OVERFLOW_64		0xFFFFFFFFFFFFFFF0ULL
+>> +#define COUNT 20
+> test_mem_access (from the test "pmu-mem-access") also uses 20 for
+> mem_access_loop, in case you want to change the define there too.
+I hesitated to change this but in fact the mem-access test does not
+suffer the same flaw and there is no risk we don't overflow when we set
+to PRE_OVERFLOW init value as the measure is always larger than 20. so I
+decided to keep the hardcoded value in that case.
+>
+> I realize I'm bikeshedding here, but it might also help if the define name
+> held some clue to what is being counted (like ACCESS_COUNT, or something
+> like that).
+the event which is tested is MEM_ACCESS, that's whence the current name
+stems from.
+>
+>> +#define MARGIN 15
+>> +/*
+>> + * PRE_OVERFLOW2 is set so that 1st COUNT iterations do not
+>> + * produce 32b overflow and 2d COUNT iterations do. To accommodate
+> 2**nd** COUNT iterations?
+OK
+>
+>> + * for some observed variability we take into account a given @MARGIN
+> Some inconsistency here, this variable is referred to with @MARGIN, but
+> COUNT isn't (missing "@").
+OK
+>
+>> + */
+>> +#define PRE_OVERFLOW2_32		(ALL_SET_32 - COUNT - MARGIN)
+> This is much better, I would have been hard pressed to figure out where the
+> previous value of 0x00000000FFFFFFDCULL came from.
+>
+> The patch looks good to me (with or without the comments above):
+>
+> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+thanks
+
+Eric
 >
 > Thanks,
 > Alex
 >
+>>  
+>>  #define PRE_OVERFLOW(__overflow_at_64bits)				\
+>>  	(__overflow_at_64bits ? PRE_OVERFLOW_64 : PRE_OVERFLOW_32)
+>> @@ -737,7 +744,7 @@ static void test_chain_promotion(bool unused)
+>>  	write_sysreg_s(0x2, PMCNTENSET_EL0);
+>>  	isb();
+>>  
+>> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+>> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>>  	PRINT_REGS("post");
+>>  	report(!read_regn_el0(pmevcntr, 0),
+>>  		"chain counter not counting if even counter is disabled");
+>> @@ -750,13 +757,13 @@ static void test_chain_promotion(bool unused)
+>>  	write_sysreg_s(0x1, PMCNTENSET_EL0);
+>>  	isb();
+>>  
+>> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+>> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>>  	PRINT_REGS("post");
+>>  	report(!read_regn_el0(pmevcntr, 1) && (read_sysreg(pmovsclr_el0) == 0x1),
+>>  		"odd counter did not increment on overflow if disabled");
+>>  	report_prefix_pop();
+>>  
+>> -	/* start at 0xFFFFFFDC, +20 with CHAIN enabled, +20 with CHAIN disabled */
+>> +	/* 1st COUNT with CHAIN enabled, next COUNT with CHAIN disabled */
+>>  	report_prefix_push("subtest3");
+>>  	pmu_reset();
+>>  	write_sysreg_s(0x3, PMCNTENSET_EL0);
+>> @@ -764,12 +771,12 @@ static void test_chain_promotion(bool unused)
+>>  	isb();
+>>  	PRINT_REGS("init");
+>>  
+>> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+>> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>>  	PRINT_REGS("After 1st loop");
+>>  
+>>  	/* disable the CHAIN event */
+>>  	write_sysreg_s(0x2, PMCNTENCLR_EL0);
+>> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+>> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>>  	PRINT_REGS("After 2d loop");
 >>  	report(read_sysreg(pmovsclr_el0) == 0x1,
 >>  		"should have triggered an overflow on #0");
->>  	report(!read_regn_el0(pmevcntr, 1),
+>> @@ -777,7 +784,7 @@ static void test_chain_promotion(bool unused)
 >>  		"CHAIN counter #1 shouldn't have incremented");
->> +	report_prefix_pop();
+>>  	report_prefix_pop();
 >>  
->>  	/* start at 0xFFFFFFDC, +20 with CHAIN disabled, +20 with CHAIN enabled */
+>> -	/* start at 0xFFFFFFDC, +20 with CHAIN disabled, +20 with CHAIN enabled */
+>> +	/* 1st COUNT with CHAIN disabled, next COUNT with CHAIN enabled */
 >>  
->> +	report_prefix_push("subtest4");
+>>  	report_prefix_push("subtest4");
 >>  	pmu_reset();
->>  	write_sysreg_s(0x1, PMCNTENSET_EL0);
->>  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2_32);
+>> @@ -786,13 +793,13 @@ static void test_chain_promotion(bool unused)
 >>  	isb();
->> -	report_info("counter #0 = 0x%lx, counter #1 = 0x%lx overflow=0x%lx",
->> -		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1),
->> -		    read_sysreg(pmovsclr_el0));
->> +	PRINT_REGS("init");
+>>  	PRINT_REGS("init");
 >>  
->>  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
->> -	report_info("MEM_ACCESS counter #0 has value 0x%lx",
->> -		    read_regn_el0(pmevcntr, 0));
->> +	PRINT_REGS("After 1st loop");
+>> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+>> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>>  	PRINT_REGS("After 1st loop");
 >>  
 >>  	/* enable the CHAIN event */
 >>  	write_sysreg_s(0x3, PMCNTENSET_EL0);
 >>  	isb();
->>  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
->> -	report_info("MEM_ACCESS counter #0 has value 0x%lx",
->> -		    read_regn_el0(pmevcntr, 0));
->> +
->> +	PRINT_REGS("After 2d loop");
+>> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+>> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
 >>  
->>  	report((read_regn_el0(pmevcntr, 1) == 1) &&
->>  		(read_sysreg(pmovsclr_el0) == 0x1),
->>  		"CHAIN counter enabled: CHAIN counter was incremented and overflow");
->> -
->> -	report_info("CHAIN counter #1 = 0x%lx, overflow=0x%lx",
->> -		read_regn_el0(pmevcntr, 1), read_sysreg(pmovsclr_el0));
->> +	report_prefix_pop();
+>>  	PRINT_REGS("After 2d loop");
 >>  
->>  	/* start as MEM_ACCESS/CPU_CYCLES and move to CHAIN/MEM_ACCESS */
->> +	report_prefix_push("subtest5");
->>  	pmu_reset();
->>  	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
->>  	write_regn_el0(pmevtyper, 1, CPU_CYCLES | PMEVTYPER_EXCLUDE_EL0);
->>  	write_sysreg_s(0x3, PMCNTENSET_EL0);
->>  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2_32);
+>> @@ -811,7 +818,7 @@ static void test_chain_promotion(bool unused)
 >>  	isb();
->> +	PRINT_REGS("init");
+>>  	PRINT_REGS("init");
 >>  
->>  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
->> -	report_info("MEM_ACCESS counter #0 has value 0x%lx",
->> -		    read_regn_el0(pmevcntr, 0));
->> +	PRINT_REGS("After 1st loop");
+>> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+>> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>>  	PRINT_REGS("After 1st loop");
 >>  
 >>  	/* 0 becomes CHAINED */
->>  	write_sysreg_s(0x0, PMCNTENSET_EL0);
->> @@ -817,37 +821,34 @@ static void test_chain_promotion(bool unused)
+>> @@ -820,7 +827,7 @@ static void test_chain_promotion(bool unused)
+>>  	write_sysreg_s(0x3, PMCNTENSET_EL0);
 >>  	write_regn_el0(pmevcntr, 1, 0x0);
 >>  
->>  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
->> -	report_info("MEM_ACCESS counter #0 has value 0x%lx",
->> -		    read_regn_el0(pmevcntr, 0));
->> +	PRINT_REGS("After 2d loop");
+>> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+>> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>>  	PRINT_REGS("After 2d loop");
 >>  
 >>  	report((read_regn_el0(pmevcntr, 1) == 1) &&
->>  		(read_sysreg(pmovsclr_el0) == 0x1),
->>  		"32b->64b: CHAIN counter incremented and overflow");
->> -
->> -	report_info("CHAIN counter #1 = 0x%lx, overflow=0x%lx",
->> -		read_regn_el0(pmevcntr, 1), read_sysreg(pmovsclr_el0));
->> +	report_prefix_pop();
->>  
->>  	/* start as CHAIN/MEM_ACCESS and move to MEM_ACCESS/CPU_CYCLES */
->> +	report_prefix_push("subtest6");
->>  	pmu_reset();
->>  	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
->>  	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
->>  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2_32);
+>> @@ -837,14 +844,14 @@ static void test_chain_promotion(bool unused)
 >>  	write_sysreg_s(0x3, PMCNTENSET_EL0);
->> +	PRINT_REGS("init");
+>>  	PRINT_REGS("init");
 >>  
->>  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
->> -	report_info("counter #0=0x%lx, counter #1=0x%lx",
->> -			read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
->> +	PRINT_REGS("After 1st loop");
+>> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+>> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>>  	PRINT_REGS("After 1st loop");
 >>  
 >>  	write_sysreg_s(0x0, PMCNTENSET_EL0);
 >>  	write_regn_el0(pmevtyper, 1, CPU_CYCLES | PMEVTYPER_EXCLUDE_EL0);
 >>  	write_sysreg_s(0x3, PMCNTENSET_EL0);
 >>  
->>  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
->> +	PRINT_REGS("After 2d loop");
+>> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+>> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>>  	PRINT_REGS("After 2d loop");
 >>  	report(read_sysreg(pmovsclr_el0) == 1,
 >>  		"overflow is expected on counter 0");
->> -	report_info("counter #0=0x%lx, counter #1=0x%lx overflow=0x%lx",
->> -			read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1),
->> -			read_sysreg(pmovsclr_el0));
->> +	report_prefix_pop();
->>  }
->>  
->>  static bool expect_interrupts(uint32_t bitmap)
 >> -- 
 >> 2.38.1
+>>
 >>
 
