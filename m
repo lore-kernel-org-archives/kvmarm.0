@@ -1,611 +1,147 @@
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 651F633FA
-	for <kvmarm@lists.linux.dev>; Mon, 24 Apr 2023 19:20:02 +0000 (UTC)
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-187c78c6657so3271237fac.2
-        for <kvmarm@lists.linux.dev>; Mon, 24 Apr 2023 12:20:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 335BD33FA
+	for <kvmarm@lists.linux.dev>; Mon, 24 Apr 2023 19:44:25 +0000 (UTC)
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-63b51fd2972so3996518b3a.3
+        for <kvmarm@lists.linux.dev>; Mon, 24 Apr 2023 12:44:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682364001; x=1684956001;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1682365464; x=1684957464;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=f68pLrjpx/4b6RXaSGDmwui8FodEoaBryQOzQaWOhlI=;
-        b=wjexs5fTUvhItBXhJaTGlN+DBUmWbgy3IEqMSQDhL9e1ENp1uFSlpTZSS9T8BG3gns
-         qsxGjpYbuXkDoCt4KKUI+70IcKfYDeTvvjr7evdsU0LODrqqSY47HK3Kt44oYVUPfyeX
-         +t9lExBvSDhvCNs7mvpvL/p3qbf9Lfr9ZA60rzdxv3z4HKYLsgpJPjLdyahLIRjwiQu3
-         1vCFcHT0ereuLLZkHzrmALp/6XZnjUxgbhwlwvig6GGauphFGwIIjQFCI9kkQzpiALYB
-         t2XZdpADw67rcWmpIyLT8zSefNlGc7CX6Ks/s1UKskTJiqnGgHJyKHrAJq6TVEYz/qWX
-         VzWw==
+        bh=gttumJmRjcuzz0nO+L7dcVXMjmV9xRO1wfvCT89kRx4=;
+        b=QhGHaaQM7azk+tjDDGNq++SGPWl7Kj3oUwHiSYejHGylznulHSRxwbj78wuowCQTbd
+         lXQRgyAx5jsaDrsldardH4Y3uKDEAIj4dFgor4j4cLrR9UxmhMRhZGg9+kpcvH0G/gV2
+         x6Efy7EVL8kChy1OyD/h3L7WI3tJtCquUgp3VvfFU65cVIrymiThNTGC+0a7Edp9k70c
+         5dvUcFoLWeibOqe2B/W17Skkpf6QCwxmnBRjb6fy33L/6Y76qU6UNtSgEqEJHtJhT56c
+         1KW3jVAd12uXjegicLHD3yWFVkzHe/W10uUYHA5gsFq6x6eL8SJI4EW+ecviKy+Q48Eb
+         TePg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682364001; x=1684956001;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1682365464; x=1684957464;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=f68pLrjpx/4b6RXaSGDmwui8FodEoaBryQOzQaWOhlI=;
-        b=D8hA9TpQ23Man6bVgEqtibC1+NrDQRmIR3v4ndSYpL9bAoZjpG3H0+e5jTM3g6+Gum
-         XUtxkh1dd33edzKhb4mRLh+4yktX1LwG5jvG1bGEo9gWRYhet9Yr3l2rVJMVn4GK85n0
-         PhjEqBTZyx9UvhkoPTaooaFSJd25OlGdaeDFXb1KTnRgwHQE+gk7hrMRyeL5WL4s14Uw
-         liQgnfBx2iFj0mdkwNQqWCUoPtdd3+mhP2s1/CttBMfG9Wstn0Nxy+3yzh8hft5zSFHB
-         u9Ium0Hqa98Wu0GnsZDTciVkG+HqEkzCsbUoLOuP2p184wEalSiu3vpxPqpBNISjY6+N
-         B3uQ==
-X-Gm-Message-State: AAQBX9enpCG9lfpiXlv0qaeDQTzVe0XRfwfYvJ9z4GbjjMs20gS2yDVg
-	41m7AaPWslugWF84KRYPmC1fG50kUESwjCgHQEZbjQ==
-X-Google-Smtp-Source: AKy350ZsxKaMjIK66eDCPeMOw0nMpGXp4QIp65tY1Vwh/IizqemMVcTchHC1i0QwxCySaHg0fmYUbvZcAZcBfym/xOY=
-X-Received: by 2002:a05:6870:d189:b0:17f:84bb:5a9d with SMTP id
- a9-20020a056870d18900b0017f84bb5a9dmr10117418oac.37.1682364001107; Mon, 24
- Apr 2023 12:20:01 -0700 (PDT)
+        bh=gttumJmRjcuzz0nO+L7dcVXMjmV9xRO1wfvCT89kRx4=;
+        b=RFBHGVlpRjJQ86ML8jpo6d43ZC+cFgCwP8u2kyN17SebCrp2Lz2BzMSNj7x/aEScoj
+         GeO+0qGide0j3T/6vPWiviY38YYXgISMbG/M9NxuyMtW5ZnfJ18mnP+/KK9Ji3Qd2aR/
+         qcABNJe7Vr5mro2TfrSbtr4+WvjY72FLVmklA/YM+6IOKsCsVi6mkGWcM/HLdGm89Jgm
+         rhZ7bnrCEWMscoS3Tqi+/TnpY49ttcbOMz824ue1KSrhCdm01b/SIlP3Jry7mEtALRPt
+         mwRVLLVRiE1DyW+gBS77Ug3/kmeaRdsNVcfoCQehp6qaem8Lcos89Q0+gCy2pgI+sfhE
+         xjXg==
+X-Gm-Message-State: AAQBX9cHwAFW2ZEwXnwjBG1HVLleRFfyzwZ36x4na6oZ8ggDGIw/btvI
+	Ik7o28tAQBcNkcU78/xC6Cc=
+X-Google-Smtp-Source: AKy350anKgALpmjX1X2m2rSez1PeuzTbvdvdwU9liVevuWPVen/bdTLfTlgAazii7v0HqNVMqA9Ufg==
+X-Received: by 2002:a05:6a00:c85:b0:625:efa4:4c01 with SMTP id a5-20020a056a000c8500b00625efa44c01mr22230394pfv.3.1682365464396;
+        Mon, 24 Apr 2023 12:44:24 -0700 (PDT)
+Received: from smtpclient.apple ([66.170.99.2])
+        by smtp.gmail.com with ESMTPSA id p10-20020a056a000a0a00b0062d8e79ea22sm7694477pfh.40.2023.04.24.12.44.22
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 24 Apr 2023 12:44:23 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230404035344.4043856-1-jingzhangos@google.com>
- <20230404035344.4043856-7-jingzhangos@google.com> <20230419045943.bxt2xizlgslaoggi@google.com>
-In-Reply-To: <20230419045943.bxt2xizlgslaoggi@google.com>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Mon, 24 Apr 2023 12:19:50 -0700
-Message-ID: <CAAdAUtgHUV3ms7i2owWWkVMH430QzprmJgn2hDunZ9Shw7j=PQ@mail.gmail.com>
-Subject: Re: [PATCH v6 6/6] KVM: arm64: Refactor writings for PMUVer/CSV2/CSV3
-To: Reiji Watanabe <reijiw@google.com>
-Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@google.com>, Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, 
-	Raghavendra Rao Ananta <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.500.231\))
+Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
+ migration via annotated memory faults.
+From: Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <CAF7b7mo78e2YPHU5YrhzuORdpGXCVRxXr6kSyMa+L+guW8jKGw@mail.gmail.com>
+Date: Mon, 24 Apr 2023 12:44:11 -0700
+Cc: Peter Xu <peterx@redhat.com>,
+ Axel Rasmussen <axelrasmussen@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ maz@kernel.org,
+ oliver.upton@linux.dev,
+ Sean Christopherson <seanjc@google.com>,
+ James Houghton <jthoughton@google.com>,
+ bgardon@google.com,
+ dmatlack@google.com,
+ ricarkol@google.com,
+ kvm <kvm@vger.kernel.org>,
+ kvmarm@lists.linux.dev
 Content-Transfer-Encoding: quoted-printable
+Message-Id: <84DD9212-31FB-4AF6-80DD-9BA5AEA0EC1A@gmail.com>
+References: <20230412213510.1220557-1-amoorthy@google.com>
+ <ZEBHTw3+DcAnPc37@x1n>
+ <CAJHvVchBqQ8iVHgF9cVZDusMKQM2AjtNx2z=i9ZHP2BosN4tBg@mail.gmail.com>
+ <ZEBXi5tZZNxA+jRs@x1n>
+ <CAF7b7mo68VLNp=QynfT7QKgdq=d1YYGv1SEVEDxF9UwHzF6YDw@mail.gmail.com>
+ <ZEGuogfbtxPNUq7t@x1n> <46DD705B-3A3F-438E-A5B1-929C1E43D11F@gmail.com>
+ <CAF7b7mo78e2YPHU5YrhzuORdpGXCVRxXr6kSyMa+L+guW8jKGw@mail.gmail.com>
+To: Anish Moorthy <amoorthy@google.com>
+X-Mailer: Apple Mail (2.3731.500.231)
 
-Hi Reiji,
 
-On Tue, Apr 18, 2023 at 9:59=E2=80=AFPM Reiji Watanabe <reijiw@google.com> =
+
+> On Apr 24, 2023, at 10:54 AM, Anish Moorthy <amoorthy@google.com> =
 wrote:
->
-> Hi Jing,
->
-> On Tue, Apr 04, 2023 at 03:53:44AM +0000, Jing Zhang wrote:
-> > Refactor writings for ID_AA64PFR0_EL1.[CSV2|CSV3],
-> > ID_AA64DFR0_EL1.PMUVer and ID_DFR0_ELF.PerfMon based on utilities
-> > introduced by ID register descriptor array.
-> >
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >  arch/arm64/include/asm/cpufeature.h |   1 +
-> >  arch/arm64/kernel/cpufeature.c      |   2 +-
-> >  arch/arm64/kvm/id_regs.c            | 284 ++++++++++++++++++++--------
-> >  3 files changed, 203 insertions(+), 84 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/a=
-sm/cpufeature.h
-> > index 6bf013fb110d..dc769c2eb7a4 100644
-> > --- a/arch/arm64/include/asm/cpufeature.h
-> > +++ b/arch/arm64/include/asm/cpufeature.h
-> > @@ -915,6 +915,7 @@ static inline unsigned int get_vmid_bits(u64 mmfr1)
-> >       return 8;
-> >  }
-> >
-> > +s64 arm64_ftr_safe_value(const struct arm64_ftr_bits *ftrp, s64 new, s=
-64 cur);
-> >  struct arm64_ftr_reg *get_arm64_ftr_reg(u32 sys_id);
-> >
-> >  extern struct arm64_ftr_override id_aa64mmfr1_override;
-> > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeat=
-ure.c
-> > index 2e3e55139777..677ec4fe9f6b 100644
-> > --- a/arch/arm64/kernel/cpufeature.c
-> > +++ b/arch/arm64/kernel/cpufeature.c
-> > @@ -791,7 +791,7 @@ static u64 arm64_ftr_set_value(const struct arm64_f=
-tr_bits *ftrp, s64 reg,
-> >       return reg;
-> >  }
-> >
-> > -static s64 arm64_ftr_safe_value(const struct arm64_ftr_bits *ftrp, s64=
- new,
-> > +s64 arm64_ftr_safe_value(const struct arm64_ftr_bits *ftrp, s64 new,
-> >                               s64 cur)
-> >  {
-> >       s64 ret =3D 0;
-> > diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
-> > index fe37b6786b4c..33968ada29bb 100644
-> > --- a/arch/arm64/kvm/id_regs.c
-> > +++ b/arch/arm64/kvm/id_regs.c
-> > @@ -18,6 +18,66 @@
-> >
-> >  #include "sys_regs.h"
-> >
-> > +/**
-> > + * arm64_check_features() - Check if a feature register value constitu=
-tes
-> > + * a subset of features indicated by the idreg's KVM sanitised limit.
-> > + *
-> > + * This function will check if each feature field of @val is the "safe=
-" value
-> > + * against idreg's KVM sanitised limit return from reset() callback.
-> > + * If a field value in @val is the same as the one in limit, it is alw=
-ays
-> > + * considered the safe value regardless For register fields that are n=
-ot in
-> > + * writable, only the value in limit is considered the safe value.
-> > + *
-> > + * Return: 0 if all the fields are safe. Otherwise, return negative er=
-rno.
-> > + */
-> > +static int arm64_check_features(struct kvm_vcpu *vcpu,
-> > +                             const struct sys_reg_desc *rd,
-> > +                             u64 val)
-> > +{
-> > +     const struct arm64_ftr_reg *ftr_reg;
-> > +     const struct arm64_ftr_bits *ftrp =3D NULL;
-> > +     u32 id =3D reg_to_encoding(rd);
-> > +     u64 writable_mask =3D rd->val;
-> > +     u64 limit =3D 0;
-> > +     u64 mask =3D 0;
-> > +
-> > +     /* For hidden and unallocated idregs without reset, only val =3D =
-0 is allowed. */
-> > +     if (rd->reset) {
-> > +             limit =3D rd->reset(vcpu, rd);
-> > +             ftr_reg =3D get_arm64_ftr_reg(id);
-> > +             if (!ftr_reg)
-> > +                     return -EINVAL;
-> > +             ftrp =3D ftr_reg->ftr_bits;
-> > +     }
-> > +
-> > +     for (; ftrp && ftrp->width; ftrp++) {
-> > +             s64 f_val, f_lim, safe_val;
-> > +             u64 ftr_mask;
-> > +
-> > +             ftr_mask =3D arm64_ftr_mask(ftrp);
-> > +             if ((ftr_mask & writable_mask) !=3D ftr_mask)
-> > +                     continue;
-> > +
-> > +             f_val =3D arm64_ftr_value(ftrp, val);
-> > +             f_lim =3D arm64_ftr_value(ftrp, limit);
-> > +             mask |=3D ftr_mask;
-> > +
-> > +             if (f_val =3D=3D f_lim)
-> > +                     safe_val =3D f_val;
-> > +             else
-> > +                     safe_val =3D arm64_ftr_safe_value(ftrp, f_val, f_=
-lim);
->
-> Since PMUVer and PerfMon is defined as FTR_EXACT, I believe having lower
-> value in those two fields than the limit always ends up getting -E2BIG.
-> Or am I missing something ??
-> FYI. IIRC, we have some more fields in other ID registers that KVM
-> shouldn't use as is.
-Yes, you are right. I will add code to handle these exceptions.
->
-> > +
-> > +             if (safe_val !=3D f_val)
-> > +                     return -E2BIG;
-> > +     }
-> > +
-> > +     /* For fields that are not writable, values in limit are the safe=
- values. */
-> > +     if ((val & ~mask) !=3D (limit & ~mask))
-> > +             return -E2BIG;
-> > +
-> > +     return 0;
-> > +}
-> > +
-> >  static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
-> >  {
-> >       if (kvm_vcpu_has_pmu(vcpu))
-> > @@ -68,7 +128,6 @@ u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu,=
- u32 id)
-> >       case SYS_ID_AA64PFR0_EL1:
-> >               if (!vcpu_has_sve(vcpu))
-> >                       val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE)=
-;
-> > -             val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU);
-> >               if (kvm_vgic_global_state.type =3D=3D VGIC_V3) {
-> >                       val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC)=
-;
-> >                       val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR=
-0_EL1_GIC), 1);
-> > @@ -95,15 +154,10 @@ u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcp=
-u, u32 id)
-> >                       val &=3D ~ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_WFx=
-T);
-> >               break;
-> >       case SYS_ID_AA64DFR0_EL1:
-> > -             /* Limit debug to ARMv8.0 */
-> > -             val &=3D ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer);
-> > -             val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_De=
-bugVer), 6);
-> >               /* Set PMUver to the required version */
-> >               val &=3D ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-> >               val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PM=
-UVer),
-> >                                 vcpu_pmuver(vcpu));
-> > -             /* Hide SPE from guests */
-> > -             val &=3D ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMSVer);
-> >               break;
-> >       case SYS_ID_DFR0_EL1:
-> >               val &=3D ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
-> > @@ -162,9 +216,14 @@ static int get_id_reg(struct kvm_vcpu *vcpu, const=
- struct sys_reg_desc *rd,
-> >  static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc=
- *rd,
-> >                     u64 val)
-> >  {
-> > -     /* This is what we mean by invariant: you can't change it. */
-> > -     if (val !=3D read_id_reg(vcpu, rd))
-> > -             return -EINVAL;
-> > +     u32 id =3D reg_to_encoding(rd);
-> > +     int ret;
-> > +
-> > +     ret =3D arm64_check_features(vcpu, rd, val);
-> > +     if (ret)
-> > +             return ret;
-> > +
-> > +     IDREG(vcpu->kvm, id) =3D val;
-> >
-> >       return 0;
-> >  }
-> > @@ -198,12 +257,40 @@ static unsigned int aa32_id_visibility(const stru=
-ct kvm_vcpu *vcpu,
-> >       return id_visibility(vcpu, r);
-> >  }
-> >
-> > +static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
-> > +                                       const struct sys_reg_desc *rd)
-> > +{
-> > +     u64 val;
-> > +     u32 id =3D reg_to_encoding(rd);
-> > +
-> > +     val =3D read_sanitised_ftr_reg(id);
-> > +     /*
-> > +      * The default is to expose CSV2 =3D=3D 1 if the HW isn't affecte=
-d.
-> > +      * Although this is a per-CPU feature, we make it global because
-> > +      * asymmetric systems are just a nuisance.
-> > +      *
-> > +      * Userspace can override this as long as it doesn't promise
-> > +      * the impossible.
-> > +      */
-> > +     if (arm64_get_spectre_v2_state() =3D=3D SPECTRE_UNAFFECTED) {
-> > +             val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
-> > +             val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CS=
-V2), 1);
-> > +     }
-> > +     if (arm64_get_meltdown_state() =3D=3D SPECTRE_UNAFFECTED) {
-> > +             val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
-> > +             val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CS=
-V3), 1);
-> > +     }
-> > +
-> > +     val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU);
-> > +
-> > +     return val;
-> > +}
-> > +
-> >  static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
-> >                              const struct sys_reg_desc *rd,
-> >                              u64 val)
-> >  {
-> >       u8 csv2, csv3;
-> > -     u64 sval =3D val;
-> >
-> >       /*
-> >        * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long as
-> > @@ -219,16 +306,30 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *v=
-cpu,
-> >       if (csv3 > 1 || (csv3 && arm64_get_meltdown_state() !=3D SPECTRE_=
-UNAFFECTED))
-> >               return -EINVAL;
-> >
-> > -     /* We can only differ with CSV[23], and anything else is an error=
- */
-> > -     val ^=3D read_id_reg(vcpu, rd);
-> > -     val &=3D ~(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2) |
-> > -              ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3));
-> > -     if (val)
-> > -             return -EINVAL;
-> > +     return set_id_reg(vcpu, rd, val);
-> > +}
-> > +
-> > +static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-> > +                                       const struct sys_reg_desc *rd)
-> > +{
-> > +     u64 val;
-> > +     u32 id =3D reg_to_encoding(rd);
-> >
-> > -     IDREG(vcpu->kvm, reg_to_encoding(rd)) =3D sval;
-> > +     val =3D read_sanitised_ftr_reg(id);
-> > +     /* Limit debug to ARMv8.0 */
-> > +     val &=3D ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer);
-> > +     val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer),=
- 6);
-> > +     /*
-> > +      * Initialise the default PMUver before there is a chance to
-> > +      * create an actual PMU.
-> > +      */
-> > +     val &=3D ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-> > +     val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
-> > +                       kvm_arm_pmu_get_pmuver_limit());
-> > +     /* Hide SPE from guests */
-> > +     val &=3D ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMSVer);
-> >
-> > -     return 0;
-> > +     return val;
-> >  }
-> >
-> >  static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-> > @@ -237,6 +338,7 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcp=
-u,
-> >  {
-> >       u8 pmuver, host_pmuver;
-> >       bool valid_pmu;
-> > +     int ret;
-> >
-> >       host_pmuver =3D kvm_arm_pmu_get_pmuver_limit();
-> >
-> > @@ -256,36 +358,61 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *v=
-cpu,
-> >       if (kvm_vcpu_has_pmu(vcpu) !=3D valid_pmu)
-> >               return -EINVAL;
-> >
-> > -     /* We can only differ with PMUver, and anything else is an error =
-*/
-> > -     val ^=3D read_id_reg(vcpu, rd);
-> > -     val &=3D ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-> > -     if (val)
-> > -             return -EINVAL;
-> > +     if (!valid_pmu) {
-> > +             /*
-> > +              * Ignore the PMUVer filed in @val. The PMUVer would be d=
-etermined
-> > +              * by arch flags bit KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU,
-> > +              */
-> > +             pmuver =3D FIELD_GET(ID_AA64DFR0_EL1_PMUVer_MASK, read_id=
-_reg(vcpu, rd));
->
-> As vPMU is not configured for this vCPU, I believe pmuver will be
-> 0x0 or 0xf.  I think that is not what we want there.
-> Or am I missing something ?
-As stated in the comment, when vPMU is not configured, the PMUVer
-observed by the guest would be determined by arch flags bit
-KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU. The value in the fields of idreg
-doesn't matter. Here is just a trick to ignore the check for the
-PMUVer field.
->
->
-> > +             val &=3D ~ID_AA64DFR0_EL1_PMUVer_MASK;
-> > +             val |=3D FIELD_PREP(ID_AA64DFR0_EL1_PMUVer_MASK, pmuver);
-> > +     }
-> >
-> > -     if (valid_pmu) {
-> > -             mutex_lock(&vcpu->kvm->arch.config_lock);
-> > -             IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &=3D ~ID_AA64DFR0_E=
-L1_PMUVer_MASK;
-> > -             IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |=3D FIELD_PREP(ID_=
-AA64DFR0_EL1_PMUVer_MASK,
-> > -                                                                 pmuve=
-r);
-> > +     mutex_lock(&vcpu->kvm->arch.config_lock);
-> >
-> > -             IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) &=3D ~ID_DFR0_EL1_PerfM=
-on_MASK;
-> > -             IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) |=3D FIELD_PREP(ID_DFR0=
-_EL1_PerfMon_MASK,
-> > -                                                             pmuver_to=
-_perfmon(pmuver));
-> > +     ret =3D set_id_reg(vcpu, rd, val);
-> > +     if (ret) {
-> >               mutex_unlock(&vcpu->kvm->arch.config_lock);
-> > -     } else {
-> > +             return ret;
-> > +     }
-> > +
-> > +     IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) &=3D ~ID_DFR0_EL1_PerfMon_MASK;
-> > +     IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) |=3D FIELD_PREP(ID_DFR0_EL1_Per=
-fMon_MASK,
-> > +                                                     pmuver_to_perfmon=
-(pmuver));
-> > +
-> > +     if (!valid_pmu)
-> >               assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm=
-->arch.flags,
-> >                          pmuver =3D=3D ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
-> > -     }
-> > +
-> > +     mutex_unlock(&vcpu->kvm->arch.config_lock);
-> >
-> >       return 0;
-> >  }
-> >
-> > +static u64 read_sanitised_id_dfr0_el1(struct kvm_vcpu *vcpu,
-> > +                                   const struct sys_reg_desc *rd)
-> > +{
-> > +     u64 val;
-> > +     u32 id =3D reg_to_encoding(rd);
-> > +
-> > +     val =3D read_sanitised_ftr_reg(id);
-> > +     /*
-> > +      * Initialise the default PMUver before there is a chance to
-> > +      * create an actual PMU.
-> > +      */
-> > +     val &=3D ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
-> > +     val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon), kvm_=
-arm_pmu_get_pmuver_limit());
-> > +
-> > +     return val;
-> > +}
-> > +
-> >  static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
-> >                          const struct sys_reg_desc *rd,
-> >                          u64 val)
-> >  {
-> >       u8 perfmon, host_perfmon;
-> >       bool valid_pmu;
-> > +     int ret;
-> >
-> >       host_perfmon =3D pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit()=
-);
-> >
-> > @@ -306,25 +433,33 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
-> >       if (kvm_vcpu_has_pmu(vcpu) !=3D valid_pmu)
-> >               return -EINVAL;
-> >
-> > -     /* We can only differ with PerfMon, and anything else is an error=
- */
-> > -     val ^=3D read_id_reg(vcpu, rd);
-> > -     val &=3D ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
-> > -     if (val)
-> > -             return -EINVAL;
-> > +     if (!valid_pmu) {
-> > +             /*
-> > +              * Ignore the PerfMon filed in @val. The PerfMon would be=
- determined
-> > +              * by arch flags bit KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU,
-> > +              */
->
-> I have the same comment as set_id_aa64dfr0_el1().
->
-> Thank you,
-> Reiji
->
-> > +             perfmon =3D FIELD_GET(ID_DFR0_EL1_PerfMon_MASK, read_id_r=
-eg(vcpu, rd));
-> > +             val &=3D ~ID_DFR0_EL1_PerfMon_MASK;
-> > +             val |=3D FIELD_PREP(ID_DFR0_EL1_PerfMon_MASK, perfmon);
-> > +     }
-> >
-> > -     if (valid_pmu) {
-> > -             mutex_lock(&vcpu->kvm->arch.config_lock);
-> > -             IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) &=3D ~ID_DFR0_EL1_PerfM=
-on_MASK;
-> > -             IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) |=3D FIELD_PREP(ID_DFR0=
-_EL1_PerfMon_MASK, perfmon);
-> > +     mutex_lock(&vcpu->kvm->arch.config_lock);
-> >
-> > -             IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &=3D ~ID_AA64DFR0_E=
-L1_PMUVer_MASK;
-> > -             IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |=3D FIELD_PREP(ID_=
-AA64DFR0_EL1_PMUVer_MASK,
-> > -                                                                 perfm=
-on_to_pmuver(perfmon));
-> > +     ret =3D set_id_reg(vcpu, rd, val);
-> > +     if (ret) {
-> >               mutex_unlock(&vcpu->kvm->arch.config_lock);
-> > -     } else {
-> > +             return ret;
-> > +     }
-> > +
-> > +     IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &=3D ~ID_AA64DFR0_EL1_PMUVe=
-r_MASK;
-> > +     IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |=3D FIELD_PREP(ID_AA64DFR0=
-_EL1_PMUVer_MASK,
-> > +                                                         perfmon_to_pm=
-uver(perfmon));
-> > +
-> > +     if (!valid_pmu)
-> >               assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm=
-->arch.flags,
-> >                          perfmon =3D=3D ID_DFR0_EL1_PerfMon_IMPDEF);
-> > -     }
-> > +
-> > +     mutex_unlock(&vcpu->kvm->arch.config_lock);
-> >
-> >       return 0;
-> >  }
-> > @@ -402,9 +537,13 @@ const struct sys_reg_desc id_reg_descs[KVM_ARM_ID_=
-REG_NUM] =3D {
-> >       /* CRm=3D1 */
-> >       AA32_ID_SANITISED(ID_PFR0_EL1),
-> >       AA32_ID_SANITISED(ID_PFR1_EL1),
-> > -     { SYS_DESC(SYS_ID_DFR0_EL1), .access =3D access_id_reg,
-> > -       .get_user =3D get_id_reg, .set_user =3D set_id_dfr0_el1,
-> > -       .visibility =3D aa32_id_visibility, },
-> > +     { SYS_DESC(SYS_ID_DFR0_EL1),
-> > +       .access =3D access_id_reg,
-> > +       .get_user =3D get_id_reg,
-> > +       .set_user =3D set_id_dfr0_el1,
-> > +       .visibility =3D aa32_id_visibility,
-> > +       .reset =3D read_sanitised_id_dfr0_el1,
-> > +       .val =3D ID_DFR0_EL1_PerfMon_MASK, },
-> >       ID_HIDDEN(ID_AFR0_EL1),
-> >       AA32_ID_SANITISED(ID_MMFR0_EL1),
-> >       AA32_ID_SANITISED(ID_MMFR1_EL1),
-> > @@ -433,8 +572,12 @@ const struct sys_reg_desc id_reg_descs[KVM_ARM_ID_=
-REG_NUM] =3D {
-> >
-> >       /* AArch64 ID registers */
-> >       /* CRm=3D4 */
-> > -     { SYS_DESC(SYS_ID_AA64PFR0_EL1), .access =3D access_id_reg,
-> > -       .get_user =3D get_id_reg, .set_user =3D set_id_aa64pfr0_el1, },
-> > +     { SYS_DESC(SYS_ID_AA64PFR0_EL1),
-> > +       .access =3D access_id_reg,
-> > +       .get_user =3D get_id_reg,
-> > +       .set_user =3D set_id_aa64pfr0_el1,
-> > +       .reset =3D read_sanitised_id_aa64pfr0_el1,
-> > +       .val =3D ID_AA64PFR0_EL1_CSV2_MASK | ID_AA64PFR0_EL1_CSV3_MASK,=
- },
-> >       ID_SANITISED(ID_AA64PFR1_EL1),
-> >       ID_UNALLOCATED(4, 2),
-> >       ID_UNALLOCATED(4, 3),
-> > @@ -444,8 +587,12 @@ const struct sys_reg_desc id_reg_descs[KVM_ARM_ID_=
-REG_NUM] =3D {
-> >       ID_UNALLOCATED(4, 7),
-> >
-> >       /* CRm=3D5 */
-> > -     { SYS_DESC(SYS_ID_AA64DFR0_EL1), .access =3D access_id_reg,
-> > -       .get_user =3D get_id_reg, .set_user =3D set_id_aa64dfr0_el1, },
-> > +     { SYS_DESC(SYS_ID_AA64DFR0_EL1),
-> > +       .access =3D access_id_reg,
-> > +       .get_user =3D get_id_reg,
-> > +       .set_user =3D set_id_aa64dfr0_el1,
-> > +       .reset =3D read_sanitised_id_aa64dfr0_el1,
-> > +       .val =3D ID_AA64DFR0_EL1_PMUVer_MASK, },
-> >       ID_SANITISED(ID_AA64DFR1_EL1),
-> >       ID_UNALLOCATED(5, 2),
-> >       ID_UNALLOCATED(5, 3),
-> > @@ -520,33 +667,4 @@ void kvm_arm_init_id_regs(struct kvm *kvm)
-> >
-> >               IDREG(kvm, id) =3D val;
-> >       }
-> > -
-> > -     /*
-> > -      * The default is to expose CSV2 =3D=3D 1 if the HW isn't affecte=
-d.
-> > -      * Although this is a per-CPU feature, we make it global because
-> > -      * asymmetric systems are just a nuisance.
-> > -      *
-> > -      * Userspace can override this as long as it doesn't promise
-> > -      * the impossible.
-> > -      */
-> > -     val =3D IDREG(kvm, SYS_ID_AA64PFR0_EL1);
-> > -
-> > -     if (arm64_get_spectre_v2_state() =3D=3D SPECTRE_UNAFFECTED) {
-> > -             val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
-> > -             val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CS=
-V2), 1);
-> > -     }
-> > -     if (arm64_get_meltdown_state() =3D=3D SPECTRE_UNAFFECTED) {
-> > -             val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
-> > -             val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CS=
-V3), 1);
-> > -     }
-> > -
-> > -     IDREG(kvm, SYS_ID_AA64PFR0_EL1) =3D val;
-> > -
-> > -     /*
-> > -      * Initialise the default PMUver before there is a chance to
-> > -      * create an actual PMU.
-> > -      */
-> > -     IDREG(kvm, SYS_ID_AA64DFR0_EL1) &=3D ~ARM64_FEATURE_MASK(ID_AA64D=
-FR0_EL1_PMUVer);
-> > -     IDREG(kvm, SYS_ID_AA64DFR0_EL1) |=3D FIELD_PREP(ARM64_FEATURE_MAS=
-K(ID_AA64DFR0_EL1_PMUVer),
-> > -                                                   kvm_arm_pmu_get_pmu=
-ver_limit());
-> >  }
-> > --
-> > 2.40.0.348.gf938b09366-goog
-> >
-Thanks,
-Jing
+>=20
+> On Fri, Apr 21, 2023 at 10:40=E2=80=AFAM Nadav Amit =
+<nadav.amit@gmail.com> wrote:
+>>=20
+>> If I understand the problem correctly, it sounds as if the proper =
+solution
+>> should be some kind of a range-locks. If it is too heavy or the =
+interface can
+>> be changed/extended to wake a single address (instead of a range),
+>> simpler hashed-locks can be used.
+>=20
+> Some sort of range-based locking system does seem relevant, although I
+> don't see how that would necessarily speed up the delivery of faults
+> to UFFD readers: I'll have to think about it more.
+
+Perhaps I misread your issue. Based on the scalability issues you =
+raised,
+I assumed that the problem you encountered is related to lock =
+contention.
+I do not know whether your profiled it, but some information would be
+useful.
+
+Anyhow, if the issue you encounter is mostly about the general overhead
+of delivering userfaultfd, I encountered this one too. The solution I =
+tried
+(and you can find some old patches) is in delivering and resolving =
+userfaultfd
+using IO-uring. The main advantage is that this solution is generic and
+performance is pretty good. The disadvantage is that you do need to =
+allocate
+a polling thread/core to handle the userfaultfd.
+
+If you want, I can send you privately the last iteration of my patches =
+for
+you to give it a spin.
+
+>=20
+> On the KVM side though, I think there's value in merging
+> KVM_CAP_ABSENT_MAPPING_FAULT and allowing performance improvements to
+> UFFD itself proceed separately. It's likely that returning faults
+> directly via the vCPU threads will be faster than even an improved
+> UFFD, since the former approach basically removes one level of
+> indirection. That seems important, given the criticality of the
+> EPT-violation path during postcopy. Furthermore, if future performance
+> improvements to UFFD involve changes/restrictions to its API, then
+> KVM_CAP_ABSENT_MAPPING_FAULT could well be useful anyways.
+>=20
+> Sean did mention that he wanted KVM_CAP_MEMORY_FAULT_INFO in general,
+> so I'm guessing (some version of) that will (eventually :) be merged
+> in any case.
+
+It certainly not my call. But if you ask me, introducing a solution for
+a concrete use-case that requires API changes/enhancements is not
+guaranteed to be the best solution. It may be better first to fully
+understand the existing overheads and agree that there is no alternative
+cleaner and more general solution with similar performance.
+
+Considering the mess that KVM async-PF introduced, I
+would be very careful before introducing such API changes. I did not =
+look
+too much on the details, but some things anyhow look slightly strange
+(which might be since I am out-of-touch with KVM). For instance, =
+returning
+-EFAULT on from KVM_RUN? I would have assumed -EAGAIN would be more
+appropriate since the invocation did succeed.
+
