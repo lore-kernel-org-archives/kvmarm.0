@@ -1,54 +1,35 @@
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+Received: from out-32.mta0.migadu.com (out-32.mta0.migadu.com [91.218.175.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D01310FE;
-	Tue, 25 Apr 2023 07:23:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1682407408; x=1713943408;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Gh+Dq+qpRluNFvtttvSFPUtMvQQemZXLhC07eDECZEQ=;
-  b=Tmkg9MEFSsl5Non8mOSgZ5GRBdA2D2kFDegsiqz8PvqBQY84Zh5JclpZ
-   WmchGo5s3Rrhho7zHUQtFVyuQPf1tF+MWaH7Z8r8752MrQb6AO3wdJ7RK
-   ryw1k2dAnrXKTRCOWuoVjxJ52nW+1xLxpjtvnQIn0YGMPoqWGs8sGGdtl
-   heQZui/p/41/8IrTeW55f3fry8k/iEFdoYYHCNdfRSeYeKjwF/QFVgH9z
-   YBvXCfJmSlLrGF9o6BiZN8KmXk8S+VUVCitB8ZGweP1wNjW3sUoZlUlpN
-   3DEXgYNShS/3eHl0BpLvqAuD4CHwXUG6OeThUW+345e7mn5tyf8fQkasN
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10690"; a="344162712"
-X-IronPort-AV: E=Sophos;i="5.99,224,1677571200"; 
-   d="scan'208";a="344162712"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2023 00:23:27 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10690"; a="837326036"
-X-IronPort-AV: E=Sophos;i="5.99,224,1677571200"; 
-   d="scan'208";a="837326036"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by fmsmga001.fm.intel.com with ESMTP; 25 Apr 2023 00:23:23 -0700
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1prD1H-000j9L-0I;
-	Tue, 25 Apr 2023 07:23:23 +0000
-Date: Tue, 25 Apr 2023 15:22:47 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-	KVMARM <kvmarm@lists.linux.dev>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 764FB7B
+	for <kvmarm@lists.linux.dev>; Tue, 25 Apr 2023 07:52:07 +0000 (UTC)
+Date: Tue, 25 Apr 2023 07:51:59 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1682409124;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=350TgBQILY/jaNRX4gCbyRdsDrtoFKzlurfJ1IuUeII=;
+	b=m3qg++2Tq8TSmJog+me6km0pxuTxJNGC9a5rVIWbEutjgvRF6HGPacMCkrrIVFT1de5V/G
+	Fsi3KI3g5qzBVqxnO5VzJG481eoEqASTwYHRv/WeVpn7yfJakDyjgOTanmQNztiYMmEb7p
+	OIpFuJ0TBhwM9lbNlNB453eboADI6+0=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Jing Zhang <jingzhangos@google.com>
+Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
 	ARMLinux <linux-arm-kernel@lists.infradead.org>,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@google.com>
-Cc: oe-kbuild-all@lists.linux.dev, Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@google.com>,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
 	James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Jing Zhang <jingzhangos@google.com>
+	Raghavendra Rao Ananta <rananta@google.com>
 Subject: Re: [PATCH v7 2/6] KVM: arm64: Save ID registers' sanitized value
  per guest
-Message-ID: <202304251520.GoTtrhba-lkp@intel.com>
-References: <20230424234704.2571444-3-jingzhangos@google.com>
+Message-ID: <ZEeGnwVxytVuZejC@linux.dev>
+References: <20230424234704.2571444-1-jingzhangos@google.com>
+ <20230424234704.2571444-3-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,76 +39,229 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20230424234704.2571444-3-jingzhangos@google.com>
+X-Migadu-Flow: FLOW_OUT
 
 Hi Jing,
 
-kernel test robot noticed the following build errors:
+On Mon, Apr 24, 2023 at 11:47:00PM +0000, Jing Zhang wrote:
+> Introduce id_regs[] in kvm_arch as a storage of guest's ID registers,
+> and save ID registers' sanitized value in the array at KVM_CREATE_VM.
+> Use the saved ones when ID registers are read by the guest or
+> userspace (via KVM_GET_ONE_REG).
+> 
+> No functional change intended.
+> 
+> Co-developed-by: Reiji Watanabe <reijiw@google.com>
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 47 +++++++++++++++++++++++++++++
+>  arch/arm64/kvm/arm.c              |  1 +
+>  arch/arm64/kvm/id_regs.c          | 49 +++++++++++++++++++++++++------
+>  arch/arm64/kvm/sys_regs.c         |  2 +-
+>  arch/arm64/kvm/sys_regs.h         |  3 +-
+>  5 files changed, 90 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index bcd774d74f34..2b1fe90a1790 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -177,6 +177,20 @@ struct kvm_smccc_features {
+>  	unsigned long vendor_hyp_bmap;
+>  };
+>  
+> +/*
+> + * Emualted CPU ID registers per VM
 
-[auto build test ERROR on 6a8f57ae2eb07ab39a6f0ccad60c760743051026]
+typo: emulated
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jing-Zhang/KVM-arm64-Move-CPU-ID-feature-registers-emulation-into-a-separate-file/20230425-074908
-base:   6a8f57ae2eb07ab39a6f0ccad60c760743051026
-patch link:    https://lore.kernel.org/r/20230424234704.2571444-3-jingzhangos%40google.com
-patch subject: [PATCH v7 2/6] KVM: arm64: Save ID registers' sanitized value per guest
-config: arm64-randconfig-r034-20230425 (https://download.01.org/0day-ci/archive/20230425/202304251520.GoTtrhba-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/cca571c516149d39bbaf1b5e916df617940458a6
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Jing-Zhang/KVM-arm64-Move-CPU-ID-feature-registers-emulation-into-a-separate-file/20230425-074908
-        git checkout cca571c516149d39bbaf1b5e916df617940458a6
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=arm64 olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=arm64 prepare
+> + * (Op0, Op1, CRn, CRm, Op2) of the ID registers to be saved in it
+> + * is (3, 0, 0, crm, op2), where 1<=crm<8, 0<=op2<8.
+> + *
+> + * These emulated idregs are VM-wide, but accessed from the context of a vCPU.
+> + * Access to id regs are guarded by kvm_arch.config_lock.
+> + */
+> +#define KVM_ARM_ID_REG_NUM	56
+> +#define IDREG_IDX(id)		(((sys_reg_CRm(id) - 1) << 3) | sys_reg_Op2(id))
+> +struct kvm_idregs {
+> +	u64 regs[KVM_ARM_ID_REG_NUM];
+> +};
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202304251520.GoTtrhba-lkp@intel.com/
+What is the purpose of declaring the register array as a separate
+structure? It has no meaning (nor use) outside of the context of a VM.
 
-All errors (new ones prefixed by >>):
+I'd prefer the 'regs' array be embedded directly in kvm_arch, and just
+name it 'idregs'. You can move your macro definitions there as well to
+immediately precede the field.
 
-   In file included from include/linux/kvm_host.h:45,
-                    from arch/arm64/kernel/asm-offsets.c:16:
-   arch/arm64/include/asm/kvm_host.h: In function 'idreg_read':
->> arch/arm64/include/asm/kvm_host.h:1109:25: error: 'struct kvm_arch' has no member named 'config_lock'
-    1109 |         mutex_lock(&arch->config_lock);
-         |                         ^~
-   arch/arm64/include/asm/kvm_host.h:1111:27: error: 'struct kvm_arch' has no member named 'config_lock'
-    1111 |         mutex_unlock(&arch->config_lock);
-         |                           ^~
-   arch/arm64/include/asm/kvm_host.h: In function 'idreg_write':
-   arch/arm64/include/asm/kvm_host.h:1118:25: error: 'struct kvm_arch' has no member named 'config_lock'
-    1118 |         mutex_lock(&arch->config_lock);
-         |                         ^~
-   arch/arm64/include/asm/kvm_host.h:1120:27: error: 'struct kvm_arch' has no member named 'config_lock'
-    1120 |         mutex_unlock(&arch->config_lock);
-         |                           ^~
-   make[2]: *** [scripts/Makefile.build:114: arch/arm64/kernel/asm-offsets.s] Error 1
-   make[2]: Target 'prepare' not remade because of errors.
-   make[1]: *** [Makefile:1286: prepare0] Error 2
-   make[1]: Target 'prepare' not remade because of errors.
-   make: *** [Makefile:226: __sub-make] Error 2
-   make: Target 'prepare' not remade because of errors.
+>  typedef unsigned int pkvm_handle_t;
+>  
+>  struct kvm_protected_vm {
+> @@ -243,6 +257,9 @@ struct kvm_arch {
+>  	/* Hypercall features firmware registers' descriptor */
+>  	struct kvm_smccc_features smccc_feat;
+>  
+> +	/* Emulated CPU ID registers */
+> +	struct kvm_idregs idregs;
+> +
+>  	/*
+>  	 * For an untrusted host VM, 'pkvm.handle' is used to lookup
+>  	 * the associated pKVM instance in the hypervisor.
+> @@ -1008,6 +1025,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+>  long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+>  				struct kvm_arm_copy_mte_tags *copy_tags);
+>  
+> +void kvm_arm_init_id_regs(struct kvm *kvm);
+> +
+>  /* Guest/host FPSIMD coordination helpers */
+>  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+>  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
+> @@ -1073,4 +1092,32 @@ static inline void kvm_hyp_reserve(void) { }
+>  void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
+>  bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu);
+>  
+> +static inline u64 _idreg_read(struct kvm_arch *arch, u32 id)
 
+<bikeshed>
 
-vim +1109 arch/arm64/include/asm/kvm_host.h
+Personally, I find passing 'kvm_arch' around to be a bit clunky. Almost
+all functions in KVM take 'struct kvm' as an argument, even if it only
+accesses the data in 'kvm_arch'.
 
-  1104	
-  1105	static inline u64 idreg_read(struct kvm_arch *arch, u32 id)
-  1106	{
-  1107		u64 val;
-  1108	
-> 1109		mutex_lock(&arch->config_lock);
-  1110		val = _idreg_read(arch, id);
-  1111		mutex_unlock(&arch->config_lock);
-  1112	
-  1113		return val;
-  1114	}
-  1115	
+So, I'd prefer if all these helpers took 'struct kvm *'.
+
+</bikeshed>
+
+> +{
+> +	return arch->idregs.regs[IDREG_IDX(id)];
+> +}
+> +
+> +static inline void _idreg_write(struct kvm_arch *arch, u32 id, u64 val)
+> +{
+> +	arch->idregs.regs[IDREG_IDX(id)] = val;
+> +}
+> +
+> +static inline u64 idreg_read(struct kvm_arch *arch, u32 id)
+> +{
+> +	u64 val;
+> +
+> +	mutex_lock(&arch->config_lock);
+> +	val = _idreg_read(arch, id);
+> +	mutex_unlock(&arch->config_lock);
+
+What exactly are we protecting against by taking the config_lock here?
+
+While I do believe there is value in serializing writers to the shared
+data, there isn't a need to serialize reads from the guest.
+
+What about implementing the following:
+
+ - Acquire the config_lock for handling writes. Only allow the value to
+   change if !kvm_vm_has_ran_once(). Otherwise, permit identical writes
+   (useful for hotplug, I imagine) or return EBUSY if userspace tried to
+   change something after running the VM.
+
+ - Acquire the config_lock for handling reads *from userspace*
+
+ - Handle reads from the guest with a plain old load, avoiding the need
+   to acquire any locks.
+
+This has the benefit of avoiding lock contention for guest reads w/o
+requiring the use of atomic loads/stores (i.e. {READ,WRITE}_ONCE()) to
+protect said readers.
+
+> +	return val;
+> +}
+> +
+> +static inline void idreg_write(struct kvm_arch *arch, u32 id, u64 val)
+> +{
+> +	mutex_lock(&arch->config_lock);
+> +	_idreg_write(arch, id, val);
+> +	mutex_unlock(&arch->config_lock);
+> +}
+> +
+>  #endif /* __ARM64_KVM_HOST_H__ */
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 4b2e16e696a8..e34744c36406 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -153,6 +153,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  
+>  	set_default_spectre(kvm);
+>  	kvm_arm_init_hypercalls(kvm);
+> +	kvm_arm_init_id_regs(kvm);
+>  
+>  	/*
+>  	 * Initialise the default PMUver before there is a chance to
+> diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
+> index 96b4c43a5100..d2fba2fde01c 100644
+> --- a/arch/arm64/kvm/id_regs.c
+> +++ b/arch/arm64/kvm/id_regs.c
+> @@ -52,16 +52,9 @@ static u8 pmuver_to_perfmon(u8 pmuver)
+>  	}
+>  }
+>  
+> -/* Read a sanitised cpufeature ID register by sys_reg_desc */
+> -static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r)
+> +u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
+>  {
+> -	u32 id = reg_to_encoding(r);
+> -	u64 val;
+> -
+> -	if (sysreg_visible_as_raz(vcpu, r))
+> -		return 0;
+> -
+> -	val = read_sanitised_ftr_reg(id);
+> +	u64 val = idreg_read(&vcpu->kvm->arch, id);
+>  
+>  	switch (id) {
+>  	case SYS_ID_AA64PFR0_EL1:
+> @@ -126,6 +119,14 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r
+>  	return val;
+>  }
+>  
+> +static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r)
+> +{
+> +	if (sysreg_visible_as_raz(vcpu, r))
+> +		return 0;
+> +
+> +	return kvm_arm_read_id_reg(vcpu, reg_to_encoding(r));
+> +}
+> +
+>  /* cpufeature ID register access trap handlers */
+>  
+>  static bool access_id_reg(struct kvm_vcpu *vcpu,
+> @@ -458,3 +459,33 @@ int emulate_id_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *params)
+>  
+>  	return 1;
+>  }
+> +
+> +/*
+> + * Set the guest's ID registers that are defined in id_reg_descs[]
+> + * with ID_SANITISED() to the host's sanitized value.
+> + */
+> +void kvm_arm_init_id_regs(struct kvm *kvm)
+> +{
+> +	int i;
+> +	u32 id;
+> +	u64 val;
+
+nit: use reverse christmas/fir tree ordering for locals.
+
+> +	for (i = 0; i < ARRAY_SIZE(id_reg_descs); i++) {
+> +		id = reg_to_encoding(&id_reg_descs[i]);
+> +		if (WARN_ON_ONCE(!is_id_reg(id)))
+> +			/* Shouldn't happen */
+> +			continue;
+
+I'll make the suggestion once more.
+
+Please do not implement these sort of sanity checks on static data
+structures at the point userspace has gotten involved. Sanity checking
+on id_reg_descs[] should happen at the time KVM is initialized. If
+anything is wrong at that point we should return an error and outright
+refuse to run KVM.
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+Thanks,
+Oliver
