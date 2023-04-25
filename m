@@ -1,145 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F167B
-	for <kvmarm@lists.linux.dev>; Tue, 25 Apr 2023 12:14:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22164C4339C;
-	Tue, 25 Apr 2023 12:14:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1682424860;
-	bh=cHsYInE/5/VtMOx1jRJroZVHEJ5p4Z38kwQmVafczdI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=vQnJT5OfIlwg15X4GF4Lg28xNLib8xCxrp5enROuXv+LYcoU8+DXtnERaiK5LxtjO
-	 RvGpbQXFssaoyTbMB4ZDgmHuSkyqczogW7oCGQj8Qbe41hOsprAdOHrXRWxSVK9kDg
-	 6Eo2ahWBYNv01po+ffGhuvAXgaIoI68pFF0bu6D/Mkzn8gl3U/jvGziSSwwb8cFtFo
-	 I9Ry5tDYFxen4vYEczEmRFEIGfQqVAQa70vSWKrvATnpOMWBLtfKUO63dLL4yaTOae
-	 1oL4B4IAAHA37nM2vGxs3wjW2SHm/x2NU4pDHfKRCSWEktl45X0OkBD1NIZOTNsoMT
-	 hudtP//wd4xKA==
-From: Will Deacon <will@kernel.org>
-To: stable@vger.kernel.org
-Cc: gregkh@linuxfoundation.org,
-	kvmarm@lists.linux.dev,
-	David Matlack <dmatlack@google.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Will Deacon <will@kernel.org>
-Subject: [BACKPORT PATCH 5.15.y] KVM: arm64: Retry fault if vma_lookup() results become invalid
-Date: Tue, 25 Apr 2023 13:14:13 +0100
-Message-Id: <20230425121413.8544-1-will@kernel.org>
-X-Mailer: git-send-email 2.20.1
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7780B7B
+	for <kvmarm@lists.linux.dev>; Tue, 25 Apr 2023 13:00:45 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8D8A34B3;
+	Tue, 25 Apr 2023 06:01:28 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DDB133F64C;
+	Tue, 25 Apr 2023 06:00:42 -0700 (PDT)
+Date: Tue, 25 Apr 2023 14:00:32 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	andrew.jones@linux.dev, maz@kernel.org, will@kernel.org,
+	oliver.upton@linux.dev, ricarkol@google.com, reijiw@google.com
+Subject: Re: [kvm-unit-tests PATCH 3/6] arm: pmu: Add extra DSB barriers in
+ the mem_access loop
+Message-ID: <ZEfO8DwsseerTKfK@monolith.localdoman>
+References: <20230315110725.1215523-1-eric.auger@redhat.com>
+ <20230315110725.1215523-4-eric.auger@redhat.com>
+ <ZEJkozep6M4EqxPW@monolith.localdoman>
+ <48ea7b8f-8bc3-def5-3bfa-e4a1ee41971a@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <48ea7b8f-8bc3-def5-3bfa-e4a1ee41971a@redhat.com>
 
-From: David Matlack <dmatlack@google.com>
+Hi,
 
-[ Upstream commit 13ec9308a85702af7c31f3638a2720863848a7f2 ]
+On Mon, Apr 24, 2023 at 10:11:11PM +0200, Eric Auger wrote:
+> Hi Alexandru,
+> 
+> On 4/21/23 12:25, Alexandru Elisei wrote:
+> > Hi,
+> >
+> > On Wed, Mar 15, 2023 at 12:07:22PM +0100, Eric Auger wrote:
+> >> The mem access loop currently features ISB barriers only. However
+> >> the mem_access loop counts the number of accesses to memory. ISB
+> >> do not garantee the PE cannot reorder memory access. Let's
+> >> add a DSB ISH before the write to PMCR_EL0 that enables the PMU
+> >> and after the last iteration, before disabling the PMU.
+> >>
+> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >> Suggested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> >>
+> >> ---
+> >>
+> >> This was discussed in https://lore.kernel.org/all/YzxmHpV2rpfaUdWi@monolith.localdoman/
+> >> ---
+> >>  arm/pmu.c | 2 ++
+> >>  1 file changed, 2 insertions(+)
+> >>
+> >> diff --git a/arm/pmu.c b/arm/pmu.c
+> >> index b88366a8..dde399e2 100644
+> >> --- a/arm/pmu.c
+> >> +++ b/arm/pmu.c
+> >> @@ -301,6 +301,7 @@ static void mem_access_loop(void *addr, long loop, uint32_t pmcr)
+> >>  {
+> >>  	uint64_t pmcr64 = pmcr;
+> >>  asm volatile(
+> >> +	"       dsb     ish\n"
+> > I think it might still be possible to reorder memory accesses which are
+> > part of the loop after the DSB above and before the PMU is enabled below.
+> > But the DSB above is needed to make sure previous memory accesses, which
+> > shouldn't be counted as part of the loop, are completed.
+> >
+> > I would put another DSB after the ISB which enables the PMU, that way all
+> > memory accesses are neatly sandwitches between two DSBs.
+> >
+> > Having 3 DSBs might look like overdoing it, but I reason it to be correct.
+> > What do you think?
+> I need more time to investigate this. I will come back to you next week
+> as I am OoO this week. Sorry for the inconvenience.
 
-Read mmu_invalidate_seq before dropping the mmap_lock so that KVM can
-detect if the results of vma_lookup() (e.g. vma_shift) become stale
-before it acquires kvm->mmu_lock. This fixes a theoretical bug where a
-VMA could be changed by userspace after vma_lookup() and before KVM
-reads the mmu_invalidate_seq, causing KVM to install page table entries
-based on a (possibly) no-longer-valid vma_shift.
+That's fine, I'm swamped too with other things, so don't expect a quick reply
+:)
 
-Re-order the MMU cache top-up to earlier in user_mem_abort() so that it
-is not done after KVM has read mmu_invalidate_seq (i.e. so as to avoid
-inducing spurious fault retries).
+Thanks,
+Alex
 
-This bug has existed since KVM/ARM's inception. It's unlikely that any
-sane userspace currently modifies VMAs in such a way as to trigger this
-race. And even with directed testing I was unable to reproduce it. But a
-sufficiently motivated host userspace might be able to exploit this
-race.
-
-Fixes: 94f8e6418d39 ("KVM: ARM: Handle guest faults in KVM")
-Cc: stable@vger.kernel.org # 5.15 only
-Reported-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: David Matlack <dmatlack@google.com>
-Reviewed-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20230313235454.2964067-1-dmatlack@google.com
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-[will: Use FSC_PERM instead of ESR_ELx_FSC_PERM. Read 'mmu_notifier_seq'
- instead of 'mmu_invalidate_seq'. Fix up function references in comment.]
-Signed-off-by: Will Deacon <will@kernel.org>
----
- arch/arm64/kvm/mmu.c | 47 ++++++++++++++++++++------------------------
- 1 file changed, 21 insertions(+), 26 deletions(-)
-
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 9b465cd55a8d..38a8095744a0 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -997,6 +997,20 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		return -EFAULT;
- 	}
- 
-+	/*
-+	 * Permission faults just need to update the existing leaf entry,
-+	 * and so normally don't require allocations from the memcache. The
-+	 * only exception to this is when dirty logging is enabled at runtime
-+	 * and a write fault needs to collapse a block entry into a table.
-+	 */
-+	if (fault_status != FSC_PERM ||
-+	    (logging_active && write_fault)) {
-+		ret = kvm_mmu_topup_memory_cache(memcache,
-+						 kvm_mmu_cache_min_pages(kvm));
-+		if (ret)
-+			return ret;
-+	}
-+
- 	/*
- 	 * Let's check if we will get back a huge page backed by hugetlbfs, or
- 	 * get block mapping for device MMIO region.
-@@ -1051,36 +1065,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		fault_ipa &= ~(vma_pagesize - 1);
- 
- 	gfn = fault_ipa >> PAGE_SHIFT;
--	mmap_read_unlock(current->mm);
--
--	/*
--	 * Permission faults just need to update the existing leaf entry,
--	 * and so normally don't require allocations from the memcache. The
--	 * only exception to this is when dirty logging is enabled at runtime
--	 * and a write fault needs to collapse a block entry into a table.
--	 */
--	if (fault_status != FSC_PERM || (logging_active && write_fault)) {
--		ret = kvm_mmu_topup_memory_cache(memcache,
--						 kvm_mmu_cache_min_pages(kvm));
--		if (ret)
--			return ret;
--	}
- 
--	mmu_seq = vcpu->kvm->mmu_notifier_seq;
- 	/*
--	 * Ensure the read of mmu_notifier_seq happens before we call
--	 * gfn_to_pfn_prot (which calls get_user_pages), so that we don't risk
--	 * the page we just got a reference to gets unmapped before we have a
--	 * chance to grab the mmu_lock, which ensure that if the page gets
--	 * unmapped afterwards, the call to kvm_unmap_gfn will take it away
--	 * from us again properly. This smp_rmb() interacts with the smp_wmb()
--	 * in kvm_mmu_notifier_invalidate_<page|range_end>.
-+	 * Read mmu_notifier_seq so that KVM can detect if the results of
-+	 * vma_lookup() or __gfn_to_pfn_memslot() become stale prior to
-+	 * acquiring kvm->mmu_lock.
- 	 *
--	 * Besides, __gfn_to_pfn_memslot() instead of gfn_to_pfn_prot() is
--	 * used to avoid unnecessary overhead introduced to locate the memory
--	 * slot because it's always fixed even @gfn is adjusted for huge pages.
-+	 * Rely on mmap_read_unlock() for an implicit smp_rmb(), which pairs
-+	 * with the smp_wmb() in kvm_dec_notifier_count().
- 	 */
--	smp_rmb();
-+	mmu_seq = vcpu->kvm->mmu_notifier_seq;
-+	mmap_read_unlock(current->mm);
- 
- 	pfn = __gfn_to_pfn_memslot(memslot, gfn, false, NULL,
- 				   write_fault, &writable, NULL);
--- 
-2.40.0.634.g4ca3ef3211-goog
-
+> Thank you for the review!
+> 
+> Eric
+> >
+> > Thanks,
+> > Alex
+> >
+> >>  	"       msr     pmcr_el0, %[pmcr]\n"
+> >>  	"       isb\n"
+> >>  	"       mov     x10, %[loop]\n"
+> >> @@ -308,6 +309,7 @@ asm volatile(
+> >>  	"       ldr	x9, [%[addr]]\n"
+> >>  	"       cmp     x10, #0x0\n"
+> >>  	"       b.gt    1b\n"
+> >> +	"       dsb     ish\n"
+> >>  	"       msr     pmcr_el0, xzr\n"
+> >>  	"       isb\n"
+> >>  	:
+> >> -- 
+> >> 2.38.1
+> >>
+> >>
+> 
