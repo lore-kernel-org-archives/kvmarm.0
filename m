@@ -1,144 +1,196 @@
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C8A97B
-	for <kvmarm@lists.linux.dev>; Tue, 25 Apr 2023 00:16:26 +0000 (UTC)
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-760bba6404cso127310139f.1
-        for <kvmarm@lists.linux.dev>; Mon, 24 Apr 2023 17:16:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 955907B
+	for <kvmarm@lists.linux.dev>; Tue, 25 Apr 2023 00:26:54 +0000 (UTC)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-63b62529864so6161543b3a.2
+        for <kvmarm@lists.linux.dev>; Mon, 24 Apr 2023 17:26:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682381785; x=1684973785;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jYjYx2JYgMep7ykgw713/kJqG1zOdgowgQyCGeaWEOM=;
-        b=bZ7x0Fqh8VqcZJLI6uXAMdtjih4a9KY2QUtSsDn+zJ2CTbuOXb7e0pmC1b5jhmV0SZ
-         IDgLLrUZIqa5oLlUmfSKgvFAU0eMBM0H126E4An+dCZylUjH9oDa+ahtknCQmUt4dxF2
-         64vjWcDBs5i6n+7jmAVdtecXmDmS2LyIJZWeOy3vcK4GW1WqoSzwiVMwcqbZVJ42DKuI
-         cJqQgIwYYgZmmLoFhFfEH7LWNRFr3CwQssFfh1nXEdx9WyCcHI5KmSLdAhEvWJD4WGhb
-         9CEWXZ2CRX94CGNyWNUyAzB4zKD1ewfAhxYjLCTiB5VOyRHfCyZbyuvSE6fOrrcQCQ2x
-         PXqA==
+        d=google.com; s=20221208; t=1682382414; x=1684974414;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=y0GPAfq/j4MMCYY86VsVn6XSmEmWKaT+hC5gEQAEWk0=;
+        b=sRYyfK3bSX8g4lhgYnedgFn1fFqLheztmVjxU9hGPDp5YUEp21SDreqifcis7RDfR2
+         MSr3PpTwIw13MYHkmSAjSrfx5nGZymVG8W/K2GpkQKQ2EMGm9ya9SgSyxE4MewAR+vnE
+         NajUdfe94j47kx2RR8RgG1/0pxHgNLuyNL26Y8K1xT8cIpb3O5gawV4ogvEDQXDrg0Au
+         WdFrniMaqlYqkUW+jE1ShVEVreohZfjr0tra6mY5NUGfsCDlr0UyYHYNVQxPS9LuMElY
+         aGGFLVuuRlXxZ/sXHtdywNcCZmGl7lJWxHZBq1r2kxxY+WGMNyNptHZAxwgRu5O5oBSX
+         etuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682381785; x=1684973785;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jYjYx2JYgMep7ykgw713/kJqG1zOdgowgQyCGeaWEOM=;
-        b=ia6wKW+vFh3gbSVgn0hse+1BXVa1hOrsmW+FKm5DSyKn9HYOTlVgY6KPOXmXiy2GnS
-         cxIMflobpMlBjV6nCT7mGO+XuoawC+L7Q/b5t6skHNZtKI96ka2u61q/GQJqR7yuaL+U
-         /vjieUV6LwZDZqSQnUlDdK+pKphwqi//JxgEcZFVhv07+TmRP88Ioi+bfANGTRxNqiNo
-         zLrmRb2Wd3hD3nHMj2pz1kC0634huWsLIBQkCz41bscJR6h1MsEdvpujzYESaLb51By+
-         aLC93ll8axui5QuYSOXqXhySrjASRkrzTngCLXXlsmbCous5Jg5OsyzFxcScrht9sSZm
-         dIIQ==
-X-Gm-Message-State: AAQBX9cKl+MDie+LIe08V9HRkdSYPYCW3q4QEjmDNfk09i0zNmiEh1Fo
-	WxQJ2mFqhTmCDxy20fGq/We72rn8FkEjN5gu0BE4Vg==
-X-Google-Smtp-Source: AKy350bdbln+TZ4ZAJiXukmbIMgAC1nNj9fC3Dd5rUTgy9CejdNoJYq1YW1y5ahwdGbFPHNWwmcqADgcC4DOQfykySo=
-X-Received: by 2002:a5e:8c09:0:b0:763:570c:3a97 with SMTP id
- n9-20020a5e8c09000000b00763570c3a97mr5943427ioj.15.1682381785539; Mon, 24 Apr
- 2023 17:16:25 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1682382414; x=1684974414;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=y0GPAfq/j4MMCYY86VsVn6XSmEmWKaT+hC5gEQAEWk0=;
+        b=D0YKNLf7tiB0q+2tP91rJH4MarPJmxpvkXnLRuYDr4OqWwisnkBcsZuKfVkK2nryHY
+         fpXp1SWzPuQFsl4fJ/r7S6YToycFvIyMzA3Ep2XMqs6L0kNq+wxnDzEcEHQuLtv88NAz
+         NayIttgSTiEFKK79ONxysLszjR27w4VQIxvae51arQ2pdvM3cFAeKTRUQ4qzAENITvXI
+         oVf3LJLZmfAmGLEVtFmXTaYXcDEMHwlEDAGhmbO8tZ6mszyFz+sKwxoeUp+UzpxXhhWa
+         xx16nkpK3UdE7bwinYWOFwd3rhsQZ2KMdtO9A7TF9F9oJsSlXwmLaOoD4ZEeoRfekqi8
+         cOBw==
+X-Gm-Message-State: AAQBX9fcEpS3kPjk0B5WFKYPB86TRJyH04MdtG+iKaJQiPvLfcAfCh4f
+	jVo90BSTBRIu//Fx6lzHa8i4ATSs/9Q=
+X-Google-Smtp-Source: AKy350aI9KacLpcTntdEX1t+hfE6tIu7SRzJPK26wBgjP1Z3PO7Z4GKT2vF6R3sPyluoW2IYzKiT3vpf03c=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:1a53:b0:63d:46f0:2370 with SMTP id
+ h19-20020a056a001a5300b0063d46f02370mr6654126pfv.6.1682382413946; Mon, 24 Apr
+ 2023 17:26:53 -0700 (PDT)
+Date: Mon, 24 Apr 2023 17:26:52 -0700
+In-Reply-To: <B6EEF84A-CCEA-44D7-B5AA-EA40073C81D4@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230412213510.1220557-1-amoorthy@google.com> <ZEBHTw3+DcAnPc37@x1n>
- <CAJHvVchBqQ8iVHgF9cVZDusMKQM2AjtNx2z=i9ZHP2BosN4tBg@mail.gmail.com>
+Mime-Version: 1.0
+References: <ZEBHTw3+DcAnPc37@x1n> <CAJHvVchBqQ8iVHgF9cVZDusMKQM2AjtNx2z=i9ZHP2BosN4tBg@mail.gmail.com>
  <ZEBXi5tZZNxA+jRs@x1n> <CAF7b7mo68VLNp=QynfT7QKgdq=d1YYGv1SEVEDxF9UwHzF6YDw@mail.gmail.com>
  <ZEGuogfbtxPNUq7t@x1n> <46DD705B-3A3F-438E-A5B1-929C1E43D11F@gmail.com>
- <CAF7b7mo78e2YPHU5YrhzuORdpGXCVRxXr6kSyMa+L+guW8jKGw@mail.gmail.com> <84DD9212-31FB-4AF6-80DD-9BA5AEA0EC1A@gmail.com>
-In-Reply-To: <84DD9212-31FB-4AF6-80DD-9BA5AEA0EC1A@gmail.com>
-From: Anish Moorthy <amoorthy@google.com>
-Date: Mon, 24 Apr 2023 17:15:49 -0700
-Message-ID: <CAF7b7mr-_U6vU1iOwukdmOoaT0G1ttyxD62cv=vebnQeXL3R0w@mail.gmail.com>
+ <CAF7b7mo78e2YPHU5YrhzuORdpGXCVRxXr6kSyMa+L+guW8jKGw@mail.gmail.com>
+ <84DD9212-31FB-4AF6-80DD-9BA5AEA0EC1A@gmail.com> <ZEboGH28IVKPZ2vo@google.com>
+ <B6EEF84A-CCEA-44D7-B5AA-EA40073C81D4@gmail.com>
+Message-ID: <ZEceTNvdaLKJPTZ5@google.com>
 Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
  migration via annotated memory faults.
+From: Sean Christopherson <seanjc@google.com>
 To: Nadav Amit <nadav.amit@gmail.com>
-Cc: Peter Xu <peterx@redhat.com>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org, oliver.upton@linux.dev, 
-	Sean Christopherson <seanjc@google.com>, James Houghton <jthoughton@google.com>, bgardon@google.com, 
+Cc: Anish Moorthy <amoorthy@google.com>, Peter Xu <peterx@redhat.com>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org, 
+	oliver.upton@linux.dev, James Houghton <jthoughton@google.com>, bgardon@google.com, 
 	dmatlack@google.com, ricarkol@google.com, kvm <kvm@vger.kernel.org>, 
 	kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 24, 2023 at 12:44=E2=80=AFPM Nadav Amit <nadav.amit@gmail.com> =
-wrote:
+On Mon, Apr 24, 2023, Nadav Amit wrote:
+> Feel free to tell me to shut up, as it is none of my business, and I migh=
+t be
+> missing a lot of context. Yet, it never stopped me before. :)
+>=20
+> > On Apr 24, 2023, at 1:35 PM, Sean Christopherson <seanjc@google.com> wr=
+ote:
+> >=20
+> > On Mon, Apr 24, 2023, Nadav Amit wrote:
+> >>=20
+> >>> On Apr 24, 2023, at 10:54 AM, Anish Moorthy <amoorthy@google.com> wro=
+te:
+> >>> Sean did mention that he wanted KVM_CAP_MEMORY_FAULT_INFO in general,
+> >>> so I'm guessing (some version of) that will (eventually :) be merged
+> >>> in any case.
+> >>=20
+> >> It certainly not my call. But if you ask me, introducing a solution fo=
+r
+> >> a concrete use-case that requires API changes/enhancements is not
+> >> guaranteed to be the best solution. It may be better first to fully
+> >> understand the existing overheads and agree that there is no alternati=
+ve
+> >> cleaner and more general solution with similar performance.
+> >=20
+> > KVM already returns -EFAULT for these situations, the change I really w=
+ant to land
+> > is to have KVM report detailed information about why the -EFAULT occurr=
+ed.  I'll be
+> > happy to carry the code in KVM even if userspace never does anything be=
+yond dumping
+> > the extra information on failures.
+>=20
+> I thought that the change is to inform on page-faults through a new inter=
+face
+> instead of the existing uffd-file-based one. There is already another int=
+erface
+> (signals) and I thought (but did not upstream) io-uring. You now suggest =
+yet
+> another one.
+
+There are two capabilities proposed in this series: one to provide more inf=
+ormation
+when KVM encounters a fault it can't resolve, and another to tell KVM to ki=
+ck out
+to userspace instead of attempting to resolve a fault when a given address =
+couldn't
+be resolved with fast gup.  I'm talking purely about the first one: providi=
+ng more
+information when KVM exits.
+
+As for the second, my plan is to try and stay out of the way and let people=
+ that
+actually deal with the userspace side of things settle on an approach.  Fro=
+m the
+KVM side, supporting the "don't wait to resolve faults" flag is quite simpl=
+e so
+long as KVM punts the heavy lifting to userspace, e.g. identifying _why_ th=
+e address
+isn't mapped with the appropriate permissions.
+
+> I am not sure it is very clean. IIUC, it means that you would still need =
+in
+> userspace to monitor uffd, as qemu (or whatever-kvm-userspace-counterpart=
+-you-
+> use) might also trigger a page-fault. So userspace becomes more complicat=
+ed,
+> and the ordering of different events/page-faults reporting becomes even m=
+ore
+> broken.
+>=20
+> At the same time, you also break various assumptions of userfaultfd. I do=
+n=E2=80=99t
+> immediately find some functionality that would break, but I am not very
+> confident about it either.
+>=20
+> >=20
+> >> Considering the mess that KVM async-PF introduced, I would be very car=
+eful
+> >> before introducing such API changes. I did not look too much on the de=
+tails,
+> >> but some things anyhow look slightly strange (which might be since I a=
+m
+> >> out-of-touch with KVM). For instance, returning -EFAULT on from KVM_RU=
+N? I
+> >> would have assumed -EAGAIN would be more appropriate since the invocat=
+ion did
+> >> succeed.
+> >=20
+> > Yeah, returning -EFAULT is somewhat odd, but as above, that's pre-exist=
+ing
+> > behavior that's been around for many years.
+>=20
+> Again, it is none of my business, but don=E2=80=99t you want to gradually=
+ try to fix
+> the interface so maybe on day you would be able to deprecate it?
 >
->
->
-> > On Apr 24, 2023, at 10:54 AM, Anish Moorthy <amoorthy@google.com> wrote=
-:
-> >
-> > On Fri, Apr 21, 2023 at 10:40=E2=80=AFAM Nadav Amit <nadav.amit@gmail.c=
-om> wrote:
-> >>
-> >> If I understand the problem correctly, it sounds as if the proper solu=
-tion
-> >> should be some kind of a range-locks. If it is too heavy or the interf=
-ace can
-> >> be changed/extended to wake a single address (instead of a range),
-> >> simpler hashed-locks can be used.
-> >
-> > Some sort of range-based locking system does seem relevant, although I
-> > don't see how that would necessarily speed up the delivery of faults
-> > to UFFD readers: I'll have to think about it more.
->
-> Perhaps I misread your issue. Based on the scalability issues you raised,
-> I assumed that the problem you encountered is related to lock contention.
-> I do not know whether your profiled it, but some information would be
-> useful.
+> IOW, if you already introduce a new interface which is enabled with a new
+> flag, which would require userspace change, then you can return the more
+> appropriate error-code.
 
-No, you had it right: the issue at hand is contention on the uffd wait
-queues. I'm just not sure what the range-based locking would really be
-doing. Events would still have to be delivered to userspace in an
-ordered manner, so it seems to me that each uffd would still need to
-maintain a queue (and the associated contention).
+In a perfect world, yes.  But unfortunately, the relevant plumbing in KVM i=
+s quite
+brittle (understatement) with respect to returning "0", and AFAICT, returni=
+ng
+-EFAULT instead of 0 is nothing more than an odditity.  E.g. at worst, it c=
+ould be
+suprising to users writing a new VMM from scratch.
 
-With respect to the "sharding" idea, I collected some more runs of the
-self test (full command in [1]). This time I omitted the "-a" flag, so
-that every vCPU accesses a different range of guest memory with its
-own UFFD, and set the number of reader threads per UFFD to 1.
+But I hadn't thought about returning a _different_ error code.  -EAGAIN isn=
+'t
+obviously better though, e.g. my understanding is that -EAGAIN typically me=
+ans that
+retrying will succeed, but in pretty much every case where KVM returns -EFA=
+ULT,
+simply trying again will never succeed.  It's not even guaranteed to be app=
+ropriate
+in the "don't wait to resolve faults" case, because KVM won't actually know=
+ why
+an address isn't accessible, e.g. it could be because the page needs to be =
+faulted
+in, but it could also be a due to a guest bug that resulted in a permission
+violation.
 
-vCPUs, Average Paging Rate (w/o new caps), Average Paging Rate (w/ new caps=
-)
-1      180     307
-2       85      220
-4       80      206
-8       39     163
-16     18     104
-32      8      73
-64      4      57
-128    1      37
-256    1      16
-
-I'm reporting paging rate on a per-vcpu rather than total basis, which
-is why the numbers look so different than the ones in the cover
-letter. I'm actually not sure why the demand paging rate falls off
-with the number of vCPUs (maybe a prioritization issue on my side?),
-but even when UFFDs aren't being contended for it's clear that demand
-paging via memory fault exits is significantly faster.
-
-I'll try to get some perf traces as well: that will take a little bit
-of time though, as to do it for cycler will involve patching our VMM
-first.
-
-[1] ./demand_paging_test -b 64M -u MINOR -s shmem -v <n> -r 1 [-w]
-
-> It certainly not my call. But if you ask me, introducing a solution for
-> a concrete use-case that requires API changes/enhancements is not
-> guaranteed to be the best solution. It may be better first to fully
-> understand the existing overheads and agree that there is no alternative
-> cleaner and more general solution with similar performance.
->
-> Considering the mess that KVM async-PF introduced, I
-> would be very careful before introducing such API changes. I did not look
-> too much on the details, but some things anyhow look slightly strange
-> (which might be since I am out-of-touch with KVM). For instance, returnin=
-g
-> -EFAULT on from KVM_RUN? I would have assumed -EAGAIN would be more
-> appropriate since the invocation did succeed.
-
-I'm not quite sure whether you're focusing on
-KVM_CAP_MEMORY_FAULT_INFO or KVM_CAP_ABSENT_MAPPING_FAULT here. But to
-my knowledge, none of the KVM folks have objections to either:
-hopefully it stays that way, but we'll have to see :)
+All in all, returning -EFAULT doesn't seem egregious.  I can't recall a sin=
+gle complaint
+about returning -EFAULT instead of -XYZ, just complaints about not KVM prov=
+iding any
+useful information.  So absent a concrete need for returning something othe=
+r than
+-EFAULT, I'm definitely inclined to maintain the status quo, even though it=
+'s imperfect.
