@@ -1,355 +1,328 @@
-Received: from out-54.mta1.migadu.com (out-54.mta1.migadu.com [95.215.58.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 952D1EA2
-	for <kvmarm@lists.linux.dev>; Tue, 25 Apr 2023 18:31:16 +0000 (UTC)
-Date: Tue, 25 Apr 2023 20:31:12 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1682447474;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bGCouJwWz7IPVyz6KiYsgWM2eEjPWxZ4Fw/TQ+3nhuQ=;
-	b=by354ZVsNW5s1cLPT11ZUwYQOq5mca4qFhZteelDRp20bAII6vF1rd+wDMAJ6R2Wr+EtW4
-	szj3LbeBPeGvR89esYzcNR4PJdXXI8VoimZDDprEtt+uPppjJvxjLdESKf+0egKxlWjgIg
-	VX8NlDo4Xayzq6AvPJNT1iwMjMBddDw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Nikos Nikoleris <nikos.nikoleris@arm.com>
-Cc: Shaoqin Huang <shahuang@redhat.com>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, alexandru.elisei@arm.com, 
-	ricarkol@google.com
-Subject: Re: [PATCH v4 23/30] arm64: Add a setup sequence for systems that
- boot through EFI
-Message-ID: <w42xq2sfwx64qvmca6b7niokvhzkri3rufilmhznms2hpauvk5@dj277vxepv5z>
-References: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
- <20230213101759.2577077-24-nikos.nikoleris@arm.com>
- <cf161112-ba2c-0dfb-9bcd-ffd288f2ae0b@redhat.com>
- <6e2e50a5-13a1-c783-12dc-692901e35aa5@arm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7233F15A0
+	for <kvmarm@lists.linux.dev>; Wed, 26 Apr 2023 04:01:17 +0000 (UTC)
+Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-38ef6217221so1300331b6e.3
+        for <kvmarm@lists.linux.dev>; Tue, 25 Apr 2023 21:01:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1682481676; x=1685073676;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qHY6h3hNkkFEPHwHsQwq+F8sgWI3ZrGdKW8QmbX4Kxs=;
+        b=vQxgNDOhyb7Yg0iBvinGF4Ux09UdqqhMXXJgi85qMyfans6d8ON6Ug/54tibv92odv
+         dI8GZeJXDHyFUwL0MLebe76NYgO6gGgJW3wLiKN47zcWsj3M8n3NYR4YcPeYHqKbh22D
+         4z/Zs9dAzjeL+g+dBMGw0NcbkgP6hftN3TAsePCxqFbh5Flw3nwmH6Rcb1qcCB6niT/m
+         FC0k0cea/itzaUpmf322n0Z9GdOM6HhGUB062nbYQmpkNhhLLIUSY/Zi8jLDprNKluN1
+         112RVGTIED2e/QPgg/4QqRm0hldtiuL8giCzLu2+UxKyklpYstS2DvcIOt2RM+I4dg49
+         6EJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682481676; x=1685073676;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qHY6h3hNkkFEPHwHsQwq+F8sgWI3ZrGdKW8QmbX4Kxs=;
+        b=kTSb/MnCH9ZblrE+FFRKE70Kx096Pfyanb5a09gn1Cx9/ihWMTGWpIyd3ppp3d9AbV
+         4aj/NkrCdmFsJsTNLkTqhP/JaFshAJP5RC5YdCpHPuMF8J3hBLbCkTD+9vQv7h/fs69x
+         eAkwg8Idn4lA+BKlPJd0G4nlv+xGvCxNLgkIs3xxKfF2Y2an3Mr8/+5J0VDdWsdun3a4
+         VXZQ1oI7HhKaAjfn3OL8SiTxrwUqJD1COO/Y/wGkh/QeRUUt7/yoKkltUJN1aQx6tQr5
+         Iw4PJxG/whq52EqEhbn+hGWtO8zOPRw6cRbbH1gCY0vI22LsZXb3XGJhoxs7uAmUuIOR
+         p42g==
+X-Gm-Message-State: AAQBX9e9xSbEFeuxojTxW9ht9FmZ3djUEf4nymTfSOBf3LjaOwW+ZO2o
+	pDmrVmoPr5u339G3tD8dP0w0Nk+D2n0z+OISRbY6UQ==
+X-Google-Smtp-Source: AKy350byh8JWLoLwRpgtDRnhM0bT2xxozsIFi27AvYcKsGC0oONK4aIGbp/TulglADb9qt73DzAdJD5dVUQkEqcMj08=
+X-Received: by 2002:a05:6808:190a:b0:38d:ec65:aa85 with SMTP id
+ bf10-20020a056808190a00b0038dec65aa85mr12878023oib.19.1682481674908; Tue, 25
+ Apr 2023 21:01:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6e2e50a5-13a1-c783-12dc-692901e35aa5@arm.com>
-X-Migadu-Flow: FLOW_OUT
+References: <20230424234704.2571444-1-jingzhangos@google.com>
+ <20230424234704.2571444-3-jingzhangos@google.com> <ZEeGnwVxytVuZejC@linux.dev>
+In-Reply-To: <ZEeGnwVxytVuZejC@linux.dev>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Tue, 25 Apr 2023 21:01:02 -0700
+Message-ID: <CAAdAUtgkeAjijwtYGJBV85SR=GjkJ1dom140Lwhf90Rf_MUYzA@mail.gmail.com>
+Subject: Re: [PATCH v7 2/6] KVM: arm64: Save ID registers' sanitized value per guest
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@google.com>, Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, 
+	Reiji Watanabe <reijiw@google.com>, Raghavendra Rao Ananta <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 25, 2023 at 10:09:51AM +0100, Nikos Nikoleris wrote:
-> Hi Shaoqin,
-> 
-> On 25/04/2023 08:04, Shaoqin Huang wrote:
-> > Hi Nikos,
-> > 
-> > For that DABT_EL1 error, I have some clues about how it happens. It's
-> > mainly because this patch includes a memory overflow. I will explain in
-> > the code body.
-> > 
-> 
-> Many thanks for this. This is the 2nd time I get caught by this :(
+Hi Oliver,
 
-Yes, thank you Shaoqin for getting to the bottom of this and reporting it!
-
-> 
-> > On 2/13/23 18:17, Nikos Nikoleris wrote:
-> > > This change implements an alternative setup sequence for the system
-> > > when we are booting through EFI. The memory map is discovered through
-> > > EFI boot services and devices through ACPI.
-> > > 
-> > > This change is based on a change initially proposed by
-> > > Andrew Jones <drjones@redhat.com>
-> > > 
-> > > Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-> > > ---
-> > >    arm/cstart.S        |   1 +
-> > >    arm/cstart64.S      |   1 +
-> > >    lib/arm/asm/setup.h |   8 ++
-> > >    lib/arm/setup.c     | 181 +++++++++++++++++++++++++++++++++++++++++++-
-> > >    lib/linux/efi.h     |   1 +
-> > >    5 files changed, 190 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/arm/cstart.S b/arm/cstart.S
-> > > index 7036e67f..3dd71ed9 100644
-> > > --- a/arm/cstart.S
-> > > +++ b/arm/cstart.S
-> > > @@ -242,6 +242,7 @@ asm_mmu_disable:
-> > >     *
-> > >     * Input r0 is the stack top, which is the exception stacks base
-> > >     */
-> > > +.globl exceptions_init
-> > >    exceptions_init:
-> > >    	mrc	p15, 0, r2, c1, c0, 0	@ read SCTLR
-> > >    	bic	r2, #CR_V		@ SCTLR.V := 0
-> > > diff --git a/arm/cstart64.S b/arm/cstart64.S
-> > > index e4ab7d06..223c1092 100644
-> > > --- a/arm/cstart64.S
-> > > +++ b/arm/cstart64.S
-> > > @@ -265,6 +265,7 @@ asm_mmu_disable:
-> > >     * Vectors
-> > >     */
-> > > +.globl exceptions_init
-> > >    exceptions_init:
-> > >    	adrp	x4, vector_table
-> > >    	add	x4, x4, :lo12:vector_table
-> > > diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
-> > > index 64cd379b..06069116 100644
-> > > --- a/lib/arm/asm/setup.h
-> > > +++ b/lib/arm/asm/setup.h
-> > > @@ -38,4 +38,12 @@ extern unsigned int mem_region_get_flags(phys_addr_t paddr);
-> > >    void setup(const void *fdt, phys_addr_t freemem_start);
-> > > +#ifdef CONFIG_EFI
-> > > +
-> > > +#include <efi.h>
-> > > +
-> > > +efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo);
-> > > +
-> > > +#endif
-> > > +
-> > >    #endif /* _ASMARM_SETUP_H_ */
-> > > diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-> > > index 03a4098e..cab19b1e 100644
-> > > --- a/lib/arm/setup.c
-> > > +++ b/lib/arm/setup.c
-> > > @@ -33,7 +33,7 @@
-> > >    #define NR_EXTRA_MEM_REGIONS	16
-> > >    #define NR_INITIAL_MEM_REGIONS	(MAX_DT_MEM_REGIONS + NR_EXTRA_MEM_REGIONS)
-> > > -extern unsigned long _etext;
-> > > +extern unsigned long _text, _etext, _data, _edata;
-> > >    char *initrd;
-> > >    u32 initrd_size;
-> > > @@ -43,7 +43,10 @@ int nr_cpus;
-> > >    static struct mem_region __initial_mem_regions[NR_INITIAL_MEM_REGIONS + 1];
-> > >    struct mem_region *mem_regions = __initial_mem_regions;
-> > > -phys_addr_t __phys_offset, __phys_end;
-> > > +phys_addr_t __phys_offset = (phys_addr_t)-1, __phys_end = 0;
-> > > +
-> > > +extern void exceptions_init(void);
-> > > +extern void asm_mmu_disable(void);
-> > >    int mpidr_to_cpu(uint64_t mpidr)
-> > >    {
-> > > @@ -289,3 +292,177 @@ void setup(const void *fdt, phys_addr_t freemem_start)
-> > >    	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
-> > >    		setup_vm();
-> > >    }
-> > > +
-> > > +#ifdef CONFIG_EFI
-> > > +
-> > > +#include <efi.h>
-> > > +
-> > > +static efi_status_t setup_rsdp(efi_bootinfo_t *efi_bootinfo)
-> > > +{
-> > > +	efi_status_t status;
-> > > +	struct acpi_table_rsdp *rsdp;
-> > > +
-> > > +	/*
-> > > +	 * RSDP resides in an EFI_ACPI_RECLAIM_MEMORY region, which is not used
-> > > +	 * by kvm-unit-tests arm64 memory allocator. So it is not necessary to
-> > > +	 * copy the data structure to another memory region to prevent
-> > > +	 * unintentional overwrite.
-> > > +	 */
-> > > +	status = efi_get_system_config_table(ACPI_20_TABLE_GUID, (void **)&rsdp);
-> > > +	if (status != EFI_SUCCESS)
-> > > +		return status;
-> > > +
-> > > +	set_efi_rsdp(rsdp);
-> > > +
-> > > +	return EFI_SUCCESS;
-> > > +}
-> > > +
-> > > +static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
-> > > +{
-> > > +	int i;
-> > > +	unsigned long free_mem_pages = 0;
-> > > +	unsigned long free_mem_start = 0;
-> > > +	struct efi_boot_memmap *map = &(efi_bootinfo->mem_map);
-> > > +	efi_memory_desc_t *buffer = *map->map;
-> > > +	efi_memory_desc_t *d = NULL;
-> > > +	phys_addr_t base, top;
-> > > +	struct mem_region *r;
-> > > +	uintptr_t text = (uintptr_t)&_text, etext = __ALIGN((uintptr_t)&_etext, 4096);
-> > > +	uintptr_t data = (uintptr_t)&_data, edata = __ALIGN((uintptr_t)&_edata, 4096);
-> > > +
-> > > +	/*
-> > > +	 * Record the largest free EFI_CONVENTIONAL_MEMORY region
-> > > +	 * which will be used to set up the memory allocator, so that
-> > > +	 * the memory allocator can work in the largest free
-> > > +	 * continuous memory region.
-> > > +	 */
-> > > +	for (i = 0, r = &mem_regions[0]; i < *(map->map_size); i += *(map->desc_size), ++r) {
-> > 
-> > At here, we can see here use the mem_regions to record the
-> > efi_boot_memmap information, so we will iterate the efi_boot_memmap
-> > which has (*map->map_size)/(*map->desc_size) number of the structure.
-> > Obviously, here didn't check if the mem_regions is fulled, so when the
-> > efi_boot_memmap is bigger than the mem_regions, the memory overflow happens.
-> > 
-> > And when memory overflow happens, Coincidentally, the mmu_idmap is just
-> > follow the memory of the mem_regions, so this iteration will write to
-> > mmu_idmap memory, which cause the mmu_idmap not NULL, so when the first
-> > time the __ioremap being called, which the call trace is:
-> > 
-> > efi_main->
-> >     setup_efi->
-> >       io_init->
-> >         uart0_init_acpi->
-> >           ioremap->
-> > 	  __ioremap
-> > 
-> > 	   if (mmu_enabled()) {
-> >                      pgtable = current_thread_info()->pgtable;
-> >              } else {
-> >                      if (!mmu_idmap)
-> >                              mmu_idmap = alloc_page();
-> >                      pgtable = mmu_idmap;
-> >              }
-> > 
-> > When it first arrive at here, the mmu_idmap should be NULL, and a new
-> > mmu_idmap will be allocated, but unfortunately, the mmu_idmap has been
-> > write to a value, so it is not NULL, so the dirty mmu_idmap will be used
-> > as a pgtable. Which cause the DABT_EL1 error when continue build the
-> > page table.
-> > 
-> > And the solution is very easy, just make the mem_regions bigger, for
-> > example:
-> > 
-> > static struct mem_region __initial_mem_regions[NR_INITIAL_MEM_REGIONS + 20];
-> > struct mem_region *mem_regions = __initial_mem_regions;
-> > 
-> > After make it bigger, the DABT_EL1 error will not happen on my machine.
-> > Hope it works for you.
-> > 
-> 
-> Indeed, I can confirm that this is the issue I run into. It would be nice if
-> Drew can confirm as well. Just to be on the safe side in the v5 I will apply
-> these changes.
-> 
-> Thanks,
-> 
-> Nikos
-
-I gave the below patch a try and it appears to have resolved the issue.
-I'll look forward to a refresh of the series which, fingers crossed,
-will be finally merged!
-
-Thanks,
-drew
-
-> 
-> From a836dc91706cc9e9aee5ce6b8b659d74d98c7bd7 Mon Sep 17 00:00:00 2001
-> From: Nikos Nikoleris <nikos.nikoleris@arm.com>
-> Date: Wed, 3 Aug 2022 13:47:56 +0100
-> Subject: [kvm-unit-tests PATCH] fixup! arm/arm64: Add a setup sequence for
-> systems that boot through EFI
-> X-ARM-No-Footer: FoSSMail
-> 
-> ---
->  lib/arm/setup.c | 45 ++++++++++++++++++++++++---------------------
->  1 file changed, 24 insertions(+), 21 deletions(-)
-> 
-> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-> index cab19b1e..c4f495a9 100644
-> --- a/lib/arm/setup.c
-> +++ b/lib/arm/setup.c
-> @@ -30,7 +30,7 @@
->  #include "io.h"
-> 
->  #define MAX_DT_MEM_REGIONS	16
-> -#define NR_EXTRA_MEM_REGIONS	16
-> +#define NR_EXTRA_MEM_REGIONS	64
->  #define NR_INITIAL_MEM_REGIONS	(MAX_DT_MEM_REGIONS + NR_EXTRA_MEM_REGIONS)
-> 
->  extern unsigned long _text, _etext, _data, _edata;
-> @@ -326,7 +326,7 @@ static efi_status_t efi_mem_init(efi_bootinfo_t
-> *efi_bootinfo)
->  	efi_memory_desc_t *buffer = *map->map;
->  	efi_memory_desc_t *d = NULL;
->  	phys_addr_t base, top;
-> -	struct mem_region *r;
-> +	struct mem_region r;
->  	uintptr_t text = (uintptr_t)&_text, etext = __ALIGN((uintptr_t)&_etext,
-> 4096);
->  	uintptr_t data = (uintptr_t)&_data, edata = __ALIGN((uintptr_t)&_edata,
-> 4096);
-> 
-> @@ -336,11 +336,12 @@ static efi_status_t efi_mem_init(efi_bootinfo_t
-> *efi_bootinfo)
->  	 * the memory allocator can work in the largest free
->  	 * continuous memory region.
->  	 */
-> -	for (i = 0, r = &mem_regions[0]; i < *(map->map_size); i +=
-> *(map->desc_size), ++r) {
-> +	for (i = 0; i < *(map->map_size); i += *(map->desc_size)) {
->  		d = (efi_memory_desc_t *)(&((u8 *)buffer)[i]);
-> 
-> -		r->start = d->phys_addr;
-> -		r->end = d->phys_addr + d->num_pages * EFI_PAGE_SIZE;
-> +		r.start = d->phys_addr;
-> +		r.end = d->phys_addr + d->num_pages * EFI_PAGE_SIZE;
-> +		r.flags = 0;
-> 
->  		switch (d->type) {
->  		case EFI_RESERVED_TYPE:
-> @@ -353,26 +354,27 @@ static efi_status_t efi_mem_init(efi_bootinfo_t
-> *efi_bootinfo)
->  		case EFI_ACPI_RECLAIM_MEMORY:
->  		case EFI_ACPI_MEMORY_NVS:
->  		case EFI_PAL_CODE:
-> -			r->flags = MR_F_RESERVED;
-> +			r.flags = MR_F_RESERVED;
->  			break;
->  		case EFI_MEMORY_MAPPED_IO:
->  		case EFI_MEMORY_MAPPED_IO_PORT_SPACE:
-> -			r->flags = MR_F_IO;
-> +			r.flags = MR_F_IO;
->  			break;
->  		case EFI_LOADER_CODE:
-> -			if (r->start <= text && r->end > text) {
-> +			if (r.start <= text && r.end > text) {
->  				/* This is the unit test region. Flag the code separately. */
-> -				phys_addr_t tmp = r->end;
-> +				phys_addr_t tmp = r.end;
-> 
->  				assert(etext <= data);
-> -				assert(edata <= r->end);
-> -				r->flags = MR_F_CODE;
-> -				r->end = data;
-> -				++r;
-> -				r->start = data;
-> -				r->end = tmp;
-> +				assert(edata <= r.end);
-> +				r.flags = MR_F_CODE;
-> +				r.end = data;
-> +				mem_region_add(&r);
-> +				r.start = data;
-> +				r.end = tmp;
-> +				r.flags = 0;
->  			} else {
-> -				r->flags = MR_F_RESERVED;
-> +				r.flags = MR_F_RESERVED;
->  			}
->  			break;
->  		case EFI_CONVENTIONAL_MEMORY:
-> @@ -383,12 +385,13 @@ static efi_status_t efi_mem_init(efi_bootinfo_t
-> *efi_bootinfo)
->  			break;
->  		}
-> 
-> -		if (!(r->flags & MR_F_IO)) {
-> -			if (r->start < __phys_offset)
-> -				__phys_offset = r->start;
-> -			if (r->end > __phys_end)
-> -				__phys_end = r->end;
-> +		if (!(r.flags & MR_F_IO)) {
-> +			if (r.start < __phys_offset)
-> +				__phys_offset = r.start;
-> +			if (r.end > __phys_end)
-> +				__phys_end = r.end;
->  		}
-> +		mem_region_add(&r);
->  	}
->  	__phys_end &= PHYS_MASK;
->  	asm_mmu_disable();
+On Tue, Apr 25, 2023 at 12:52=E2=80=AFAM Oliver Upton <oliver.upton@linux.d=
+ev> wrote:
+>
+> Hi Jing,
+>
+> On Mon, Apr 24, 2023 at 11:47:00PM +0000, Jing Zhang wrote:
+> > Introduce id_regs[] in kvm_arch as a storage of guest's ID registers,
+> > and save ID registers' sanitized value in the array at KVM_CREATE_VM.
+> > Use the saved ones when ID registers are read by the guest or
+> > userspace (via KVM_GET_ONE_REG).
+> >
+> > No functional change intended.
+> >
+> > Co-developed-by: Reiji Watanabe <reijiw@google.com>
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h | 47 +++++++++++++++++++++++++++++
+> >  arch/arm64/kvm/arm.c              |  1 +
+> >  arch/arm64/kvm/id_regs.c          | 49 +++++++++++++++++++++++++------
+> >  arch/arm64/kvm/sys_regs.c         |  2 +-
+> >  arch/arm64/kvm/sys_regs.h         |  3 +-
+> >  5 files changed, 90 insertions(+), 12 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm=
+/kvm_host.h
+> > index bcd774d74f34..2b1fe90a1790 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -177,6 +177,20 @@ struct kvm_smccc_features {
+> >       unsigned long vendor_hyp_bmap;
+> >  };
+> >
+> > +/*
+> > + * Emualted CPU ID registers per VM
+>
+> typo: emulated
+Will fix it.
+>
+> > + * (Op0, Op1, CRn, CRm, Op2) of the ID registers to be saved in it
+> > + * is (3, 0, 0, crm, op2), where 1<=3Dcrm<8, 0<=3Dop2<8.
+> > + *
+> > + * These emulated idregs are VM-wide, but accessed from the context of=
+ a vCPU.
+> > + * Access to id regs are guarded by kvm_arch.config_lock.
+> > + */
+> > +#define KVM_ARM_ID_REG_NUM   56
+> > +#define IDREG_IDX(id)                (((sys_reg_CRm(id) - 1) << 3) | s=
+ys_reg_Op2(id))
+> > +struct kvm_idregs {
+> > +     u64 regs[KVM_ARM_ID_REG_NUM];
+> > +};
+>
+> What is the purpose of declaring the register array as a separate
+> structure? It has no meaning (nor use) outside of the context of a VM.
+>
+> I'd prefer the 'regs' array be embedded directly in kvm_arch, and just
+> name it 'idregs'. You can move your macro definitions there as well to
+> immediately precede the field.
+>
+It was declared as you suggested in the older series. The separate
+structure was suggested by Marc.
+> >  typedef unsigned int pkvm_handle_t;
+> >
+> >  struct kvm_protected_vm {
+> > @@ -243,6 +257,9 @@ struct kvm_arch {
+> >       /* Hypercall features firmware registers' descriptor */
+> >       struct kvm_smccc_features smccc_feat;
+> >
+> > +     /* Emulated CPU ID registers */
+> > +     struct kvm_idregs idregs;
+> > +
+> >       /*
+> >        * For an untrusted host VM, 'pkvm.handle' is used to lookup
+> >        * the associated pKVM instance in the hypervisor.
+> > @@ -1008,6 +1025,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *v=
+cpu,
+> >  long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+> >                               struct kvm_arm_copy_mte_tags *copy_tags);
+> >
+> > +void kvm_arm_init_id_regs(struct kvm *kvm);
+> > +
+> >  /* Guest/host FPSIMD coordination helpers */
+> >  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+> >  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
+> > @@ -1073,4 +1092,32 @@ static inline void kvm_hyp_reserve(void) { }
+> >  void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
+> >  bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu);
+> >
+> > +static inline u64 _idreg_read(struct kvm_arch *arch, u32 id)
+>
+> <bikeshed>
+>
+> Personally, I find passing 'kvm_arch' around to be a bit clunky. Almost
+> all functions in KVM take 'struct kvm' as an argument, even if it only
+> accesses the data in 'kvm_arch'.
+>
+> So, I'd prefer if all these helpers took 'struct kvm *'.
+>
+> </bikeshed>
+>
+There is a reason why 'struct kvm' was not used.
+Usually arch dependent headers don't include <linux/kvm_host.h> which
+declares the 'struct kvm'. But here we need to reference the fields in
+'struct kvm', we need to include <linux/kvm_host.h>. But
+<linux/kvm_host.h> is dependent on arch dependent structures defined
+in <asm/kvm_host.h>.
+To use 'struct kvm', one way is to include <linux/kvm_host.h> in the
+middle of <asm/kvm_host.h> (after those arch dependent structures but
+before those idregs read/write inlines). Or we can move these idregs
+read/write functions to id_regs.c as non-static functions, since they
+are not only used by id_regs.c.
+> > +{
+> > +     return arch->idregs.regs[IDREG_IDX(id)];
+> > +}
+> > +
+> > +static inline void _idreg_write(struct kvm_arch *arch, u32 id, u64 val=
+)
+> > +{
+> > +     arch->idregs.regs[IDREG_IDX(id)] =3D val;
+> > +}
+> > +
+> > +static inline u64 idreg_read(struct kvm_arch *arch, u32 id)
+> > +{
+> > +     u64 val;
+> > +
+> > +     mutex_lock(&arch->config_lock);
+> > +     val =3D _idreg_read(arch, id);
+> > +     mutex_unlock(&arch->config_lock);
+>
+> What exactly are we protecting against by taking the config_lock here?
+The intention is to use the config_lock to protect the whole id_regs[]
+array, all idregs, not on the granularity of a single idreg.
+IIUC, there might be some dependencies between feature fields in
+different idregs, like the PMUVer and PerfMon. If there is no lock for
+reads from the guest, the guest may get inconsistent values for PMUVer
+and PerfMon.
+But since no changes are allowed when the VM is running, the reads
+from the guests don't have to use the lock as you suggested below.
+>
+> While I do believe there is value in serializing writers to the shared
+> data, there isn't a need to serialize reads from the guest.
+>
+> What about implementing the following:
+>
+>  - Acquire the config_lock for handling writes. Only allow the value to
+>    change if !kvm_vm_has_ran_once(). Otherwise, permit identical writes
+>    (useful for hotplug, I imagine) or return EBUSY if userspace tried to
+>    change something after running the VM.
+Sure, will add this check for writes during VM running.
+>
+>  - Acquire the config_lock for handling reads *from userspace*
+>
+>  - Handle reads from the guest with a plain old load, avoiding the need
+>    to acquire any locks.
+Sure, will use this since as long as VM is running, the userspace
+should not change the values of idregs.
+>
+> This has the benefit of avoiding lock contention for guest reads w/o
+> requiring the use of atomic loads/stores (i.e. {READ,WRITE}_ONCE()) to
+> protect said readers.
+>
+> > +     return val;
+> > +}
+> > +
+> > +static inline void idreg_write(struct kvm_arch *arch, u32 id, u64 val)
+> > +{
+> > +     mutex_lock(&arch->config_lock);
+> > +     _idreg_write(arch, id, val);
+> > +     mutex_unlock(&arch->config_lock);
+> > +}
+> > +
+> >  #endif /* __ARM64_KVM_HOST_H__ */
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 4b2e16e696a8..e34744c36406 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -153,6 +153,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long=
+ type)
+> >
+> >       set_default_spectre(kvm);
+> >       kvm_arm_init_hypercalls(kvm);
+> > +     kvm_arm_init_id_regs(kvm);
+> >
+> >       /*
+> >        * Initialise the default PMUver before there is a chance to
+> > diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
+> > index 96b4c43a5100..d2fba2fde01c 100644
+> > --- a/arch/arm64/kvm/id_regs.c
+> > +++ b/arch/arm64/kvm/id_regs.c
+> > @@ -52,16 +52,9 @@ static u8 pmuver_to_perfmon(u8 pmuver)
+> >       }
+> >  }
+> >
+> > -/* Read a sanitised cpufeature ID register by sys_reg_desc */
+> > -static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_des=
+c const *r)
+> > +u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
+> >  {
+> > -     u32 id =3D reg_to_encoding(r);
+> > -     u64 val;
+> > -
+> > -     if (sysreg_visible_as_raz(vcpu, r))
+> > -             return 0;
+> > -
+> > -     val =3D read_sanitised_ftr_reg(id);
+> > +     u64 val =3D idreg_read(&vcpu->kvm->arch, id);
+> >
+> >       switch (id) {
+> >       case SYS_ID_AA64PFR0_EL1:
+> > @@ -126,6 +119,14 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu=
+, struct sys_reg_desc const *r
+> >       return val;
+> >  }
+> >
+> > +static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_des=
+c const *r)
+> > +{
+> > +     if (sysreg_visible_as_raz(vcpu, r))
+> > +             return 0;
+> > +
+> > +     return kvm_arm_read_id_reg(vcpu, reg_to_encoding(r));
+> > +}
+> > +
+> >  /* cpufeature ID register access trap handlers */
+> >
+> >  static bool access_id_reg(struct kvm_vcpu *vcpu,
+> > @@ -458,3 +459,33 @@ int emulate_id_reg(struct kvm_vcpu *vcpu, struct s=
+ys_reg_params *params)
+> >
+> >       return 1;
+> >  }
+> > +
+> > +/*
+> > + * Set the guest's ID registers that are defined in id_reg_descs[]
+> > + * with ID_SANITISED() to the host's sanitized value.
+> > + */
+> > +void kvm_arm_init_id_regs(struct kvm *kvm)
+> > +{
+> > +     int i;
+> > +     u32 id;
+> > +     u64 val;
+>
+> nit: use reverse christmas/fir tree ordering for locals.
+>
+Will do.
+> > +     for (i =3D 0; i < ARRAY_SIZE(id_reg_descs); i++) {
+> > +             id =3D reg_to_encoding(&id_reg_descs[i]);
+> > +             if (WARN_ON_ONCE(!is_id_reg(id)))
+> > +                     /* Shouldn't happen */
+> > +                     continue;
+>
+> I'll make the suggestion once more.
+>
+> Please do not implement these sort of sanity checks on static data
+> structures at the point userspace has gotten involved. Sanity checking
+> on id_reg_descs[] should happen at the time KVM is initialized. If
+> anything is wrong at that point we should return an error and outright
+> refuse to run KVM.
+Sure, will move the check to kvm_sys_reg_table_init.
+>
 > --
-> 2.25.1
+> Thanks,
+> Oliver
+Thanks,
+Jing
