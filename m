@@ -1,165 +1,548 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BBE32573
-	for <kvmarm@lists.linux.dev>; Thu, 27 Apr 2023 11:27:45 +0000 (UTC)
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33R9fLq9006633;
-	Thu, 27 Apr 2023 11:27:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=date : from : to :
- cc : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=qcppdkim1; bh=BE92gzCqC+C4Ky9wpJ6eiYG+0iVQbu2mCeiXeWkkpfo=;
- b=aP7fACfuc7+kI+0tJValOSrHvL15W9P1diOSgk5CBHKwoeDhU/ymGm1an/zwrRU1A0/G
- tvjkHClGmpgiJ2LowpYG8M8CxkkK+GvVy+g1Xw6Q/LkBQq8Z7DHya1dorosqXIHn1aAG
- Vv20QJuwjlf2fxplmIUZigG7lcH0m0x2/R1V9daqVpvq+XvC1ONE5p1V1O/7ae5JBC+A
- 7foEQdS4qpGSB0PdXR/Fw8UMlbNAgeQ3M9eIXU5tOkmFMSKvJByjJofx5wuWJ7VivsQS
- jyNLTYGMY7iPQq7VW2PaavXMAAmepivGGRDunZ+w5jy4mlNolJ7vd0ErcN7RCcPpkTQG /Q== 
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3q7m4y8kqr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 27 Apr 2023 11:27:19 +0000
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 33RBRHmr031560
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 27 Apr 2023 11:27:17 GMT
-Received: from hu-pkondeti-hyd.qualcomm.com (10.80.80.8) by
- nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.42; Thu, 27 Apr 2023 04:27:01 -0700
-Date: Thu, 27 Apr 2023 16:56:57 +0530
-From: Pavan Kondeti <quic_pkondeti@quicinc.com>
-To: "Gupta, Pankaj" <pankaj.gupta@amd.com>
-CC: Pavan Kondeti <quic_pkondeti@quicinc.com>, David Dai <davidai@google.com>,
-        Saravana Kannan <saravanak@google.com>,
-        "Rafael J. Wysocki"
-	<rafael@kernel.org>,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        Rob Herring
-	<robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-        Marc Zyngier <maz@kernel.org>, Oliver Upton
-	<oliver.upton@linux.dev>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose
-	<suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Catalin Marinas
-	<catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Mark Rutland
-	<mark.rutland@arm.com>,
-        Lorenzo Pieralisi <lpieralisi@kernel.org>,
-        "Sudeep
- Holla" <sudeep.holla@arm.com>, Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra
-	<peterz@infradead.org>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot
-	<vincent.guittot@linaro.org>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>, Ben Segall <bsegall@google.com>,
-        "Mel
- Gorman" <mgorman@suse.de>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Valentin Schneider <vschneid@redhat.com>, <kernel-team@android.com>,
-        <linux-pm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.linux.dev>
-Subject: Re: [RFC PATCH 0/6] Improve VM DVFS and task placement behavior
-Message-ID: <20230427112657.GA398143@hu-pkondeti-hyd.qualcomm.com>
-References: <20230330224348.1006691-1-davidai@google.com>
- <20230427074602.GA325349@hu-pkondeti-hyd.qualcomm.com>
- <4eed40a7-d927-1b0c-b19b-9bb5b3083b73@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56E8C8460
+	for <kvmarm@lists.linux.dev>; Thu, 27 Apr 2023 15:48:46 +0000 (UTC)
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-3ef34c49cb9so747991cf.1
+        for <kvmarm@lists.linux.dev>; Thu, 27 Apr 2023 08:48:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1682610525; x=1685202525;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ra3lc9/H4wcgVrQw+kc0T3mP6bSycu04OLDc8L+03Ps=;
+        b=wFO81PkcebqJl2lisLqmfwDZt35a16fGtFBNHSD9fjSAXgLt0NgwwTeZsFebBnYfWn
+         HCkeVlpCOSD4BiS0ZhSzyHU5A5K1LjfzVkPxXF7zsSX5flxyZlKLOoL2pJLRqpH3GJO1
+         YaBADkanAHSYlO1HEdCcgr4URbOWA4HLxDT/1l46p/FXN03wOjc9nT45LfIXuFWqOO69
+         ecnExMuxy1PDHaUeJ2qd3r/FtTHkMAYoNaJljXyI8CuGTjrRCUw19NJdmD0Wy/pNjfAV
+         fVPkx9dZ7IqaF0b5gzpYyWbVMZYi4AbcXeu+y5cRtpz633+GB/x/vP11wMePLMN75Rd9
+         4rrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682610525; x=1685202525;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ra3lc9/H4wcgVrQw+kc0T3mP6bSycu04OLDc8L+03Ps=;
+        b=lYrUknmyflf3sF5CwLoWTl9JwQ9SN8AJjmx33jLb75xgxVjxrEwmV+OXuGTeRdoH7x
+         grqwg9TPRUQbMv+Q40HQ94Jo5oIkj1jUeWspsvsZpZfqk1XnzBtbojnoAq1nAZqfCvfL
+         sy8Fccak/wM/5ZTH2IAzbU03LaRrEcIpEsmc0/MPH00o1u1GtqLyWg6MaGeR8I7+obXW
+         t7HyYEMHb9DCaPTyAC64Tiix4fwUzHMBO/J6CNppwkZzrt5SyZGGZc7Xry9Hh+pw4zgV
+         /AabvEMGdyty5msrTii3IKBSMGoFzSgHbFQBRuyzldK34vVJ1FI6HWYbBm6AkKDh0/jH
+         O3yw==
+X-Gm-Message-State: AC+VfDxGy7uZggE3gkTbDNr0aytuAD8LTVRvEij8yg1VejQMJzmWNvE2
+	5STQW4n1fuWtB1UqiB55/eXJBTqpJwSpbI3xuCwiIQ==
+X-Google-Smtp-Source: ACHHUZ5+Q7lKTCNvx/YBWWqVuIj499763Jrb3yv/iNrFJdpCA24SI8mfYFK41bu1S5E/AobdmI6nDwzFPAZCigXAU18=
+X-Received: by 2002:ac8:594a:0:b0:3d6:5f1b:1e7c with SMTP id
+ 10-20020ac8594a000000b003d65f1b1e7cmr304997qtz.9.1682610525081; Thu, 27 Apr
+ 2023 08:48:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <4eed40a7-d927-1b0c-b19b-9bb5b3083b73@amd.com>
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: ryfOhFsOQxrMKwtftZ-ynjdmARDJT1sV
-X-Proofpoint-ORIG-GUID: ryfOhFsOQxrMKwtftZ-ynjdmARDJT1sV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-27_07,2023-04-27_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- phishscore=0 adultscore=0 malwarescore=0 clxscore=1011 mlxlogscore=999
- spamscore=0 suspectscore=0 lowpriorityscore=0 impostorscore=0 bulkscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2304270100
+References: <20230412213510.1220557-1-amoorthy@google.com> <20230412213510.1220557-23-amoorthy@google.com>
+In-Reply-To: <20230412213510.1220557-23-amoorthy@google.com>
+From: James Houghton <jthoughton@google.com>
+Date: Thu, 27 Apr 2023 08:48:08 -0700
+Message-ID: <CADrL8HUQWFtY+2XgT0f6fBhWrdTCvQ1n-99k9oV_5UiFnamv9Q@mail.gmail.com>
+Subject: Re: [PATCH v3 22/22] KVM: selftests: Handle memory fault exits in demand_paging_test
+To: Anish Moorthy <amoorthy@google.com>
+Cc: pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev, 
+	seanjc@google.com, bgardon@google.com, dmatlack@google.com, 
+	ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com, 
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 27, 2023 at 11:52:29AM +0200, Gupta, Pankaj wrote:
-> 
-> > > This patch series is a continuation of the talk Saravana gave at LPC 2022
-> > > titled "CPUfreq/sched and VM guest workload problems" [1][2][3]. The gist
-> > > of the talk is that workloads running in a guest VM get terrible task
-> > > placement and DVFS behavior when compared to running the same workload in
-> > > the host. Effectively, no EAS for threads inside VMs. This would make power
-> > > and performance terrible just by running the workload in a VM even if we
-> > > assume there is zero virtualization overhead.
-> > > 
-> > > We have been iterating over different options for communicating between
-> > > guest and host, ways of applying the information coming from the
-> > > guest/host, etc to figure out the best performance and power improvements
-> > > we could get.
-> > > 
-> > > The patch series in its current state is NOT meant for landing in the
-> > > upstream kernel. We are sending this patch series to share the current
-> > > progress and data we have so far. The patch series is meant to be easy to
-> > > cherry-pick and test on various devices to see what performance and power
-> > > benefits this might give for others.
-> > > 
-> > > With this series, a workload running in a VM gets the same task placement
-> > > and DVFS treatment as it would when running in the host.
-> > > 
-> > > As expected, we see significant performance improvement and better
-> > > performance/power ratio. If anyone else wants to try this out for your VM
-> > > workloads and report findings, that'd be very much appreciated.
-> > > 
-> > > The idea is to improve VM CPUfreq/sched behavior by:
-> > > - Having guest kernel to do accurate load tracking by taking host CPU
-> > >    arch/type and frequency into account.
-> > > - Sharing vCPU run queue utilization information with the host so that the
-> > >    host can do proper frequency scaling and task placement on the host side.
-> > > 
-> > 
-> > [...]
-> > 
-> > > 
-> > > Next steps:
-> > > ===========
-> > > We are continuing to look into communication mechanisms other than
-> > > hypercalls that are just as/more efficient and avoid switching into the VMM
-> > > userspace. Any inputs in this regard are greatly appreciated.
-> > > 
-> > 
-> > I am trying to understand why virtio based cpufrq does not work here?
-> > The VMM on host can process requests from guest VM like freq table,
-> > current frequency and setting the min_freq. I believe Virtio backend
-> > has mechanisms for acceleration (vhost) so that user space is not
-> > involved for every frequency request from the guest.
-> > 
-> > It has advantages of (1) Hypervisor agnostic (virtio basically)
-> > (2) scheduler does not need additional input, the aggregated min_freq
-> > requests from all guest should be sufficient.
-> 
-> Also want to add, 3) virtio based solution would definitely be better from
-> performance POV as would avoid expense vmexits which we have with
-> hypercalls.
-> 
-> 
-I just went through the whole discussion, it seems David mentioned he would
-re-write this series with virtio frontend and VMM in user space taking
-care of the requests. will wait for that series to land.
+On Wed, Apr 12, 2023 at 2:35=E2=80=AFPM Anish Moorthy <amoorthy@google.com>=
+ wrote:
+>
+> Demonstrate a (very basic) scheme for supporting memory fault exits.
+>
+> From the vCPU threads:
+> 1. Simply issue UFFDIO_COPY/CONTINUEs in response to memory fault exits,
+>    with the purpose of establishing the absent mappings. Do so with
+>    wake_waiters=3Dfalse to avoid serializing on the userfaultfd wait queu=
+e
+>    locks.
+>
+> 2. When the UFFDIO_COPY/CONTINUE in (1) fails with EEXIST,
+>    assume that the mapping was already established but is currently
+>    absent [A] and attempt to populate it using MADV_POPULATE_WRITE.
+>
+> Issue UFFDIO_COPY/CONTINUEs from the reader threads as well, but with
+> wake_waiters=3Dtrue to ensure that any threads sleeping on the uffd are
+> eventually woken up.
+>
+> A real VMM would track whether it had already COPY/CONTINUEd pages (eg,
+> via a bitmap) to avoid calls destined to EEXIST. However, even the
+> naive approach is enough to demonstrate the performance advantages of
+> KVM_EXIT_MEMORY_FAULT.
+>
+> [A] In reality it is much likelier that the vCPU thread simply lost a
+>     race to establish the mapping for the page.
+>
+> Signed-off-by: Anish Moorthy <amoorthy@google.com>
+> Acked-by: James Houghton <jthoughton@google.com>
+> ---
+>  .../selftests/kvm/demand_paging_test.c        | 209 +++++++++++++-----
+>  1 file changed, 155 insertions(+), 54 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/tes=
+ting/selftests/kvm/demand_paging_test.c
+> index e84dde345edbc..668bd63d944e7 100644
+> --- a/tools/testing/selftests/kvm/demand_paging_test.c
+> +++ b/tools/testing/selftests/kvm/demand_paging_test.c
+> @@ -15,6 +15,7 @@
+>  #include <time.h>
+>  #include <pthread.h>
+>  #include <linux/userfaultfd.h>
+> +#include <sys/mman.h>
+>  #include <sys/syscall.h>
+>
+>  #include "kvm_util.h"
+> @@ -31,6 +32,57 @@ static uint64_t guest_percpu_mem_size =3D DEFAULT_PER_=
+VCPU_MEM_SIZE;
+>  static size_t demand_paging_size;
+>  static char *guest_data_prototype;
+>
+> +static int num_uffds;
+> +static size_t uffd_region_size;
+> +static struct uffd_desc **uffd_descs;
+> +/*
+> + * Delay when demand paging is performed through userfaultfd or directly=
+ by
+> + * vcpu_worker in the case of a KVM_EXIT_MEMORY_FAULT.
+> + */
+> +static useconds_t uffd_delay;
+> +static int uffd_mode;
+> +
+> +
+> +static int handle_uffd_page_request(int uffd_mode, int uffd, uint64_t hv=
+a,
+> +                                                                       b=
+ool is_vcpu);
+> +
+> +static void madv_write_or_err(uint64_t gpa)
+> +{
+> +       int r;
+> +       void *hva =3D addr_gpa2hva(memstress_args.vm, gpa);
+> +
+> +       r =3D madvise(hva, demand_paging_size, MADV_POPULATE_WRITE);
+> +       TEST_ASSERT(r =3D=3D 0,
+> +                               "MADV_POPULATE_WRITE on hva 0x%lx (gpa 0x=
+%lx) fail, errno %i\n",
+> +                               (uintptr_t) hva, gpa, errno);
+> +}
+> +
+> +static void ready_page(uint64_t gpa)
+> +{
+> +       int r, uffd;
+> +
+> +       /*
+> +        * This test only registers memslot 1 w/ userfaultfd. Any accesse=
+s outside
+> +        * the registered ranges should fault in the physical pages throu=
+gh
+> +        * MADV_POPULATE_WRITE.
+> +        */
+> +       if ((gpa < memstress_args.gpa)
+> +               || (gpa >=3D memstress_args.gpa + memstress_args.size)) {
+> +               madv_write_or_err(gpa);
+> +       } else {
+> +               if (uffd_delay)
+> +                       usleep(uffd_delay);
+> +
+> +               uffd =3D uffd_descs[(gpa - memstress_args.gpa) / uffd_reg=
+ion_size]->uffd;
+> +
+> +               r =3D handle_uffd_page_request(uffd_mode, uffd,
+> +                                       (uint64_t) addr_gpa2hva(memstress=
+_args.vm, gpa), true);
+> +
+> +               if (r =3D=3D EEXIST)
+> +                       madv_write_or_err(gpa);
+> +       }
+> +}
+> +
+>  static void vcpu_worker(struct memstress_vcpu_args *vcpu_args)
+>  {
+>         struct kvm_vcpu *vcpu =3D vcpu_args->vcpu;
+> @@ -42,25 +94,36 @@ static void vcpu_worker(struct memstress_vcpu_args *v=
+cpu_args)
+>
+>         clock_gettime(CLOCK_MONOTONIC, &start);
+>
+> -       /* Let the guest access its memory */
+> -       ret =3D _vcpu_run(vcpu);
+> -       TEST_ASSERT(ret =3D=3D 0, "vcpu_run failed: %d\n", ret);
+> -       if (get_ucall(vcpu, NULL) !=3D UCALL_SYNC) {
+> -               TEST_ASSERT(false,
+> -                           "Invalid guest sync status: exit_reason=3D%s\=
+n",
+> -                           exit_reason_str(run->exit_reason));
+> -       }
+> +       while (true) {
+> +               /* Let the guest access its memory */
+> +               ret =3D _vcpu_run(vcpu);
+> +               TEST_ASSERT(ret =3D=3D 0
+> +                                       || (errno =3D=3D EFAULT
+> +                                               && run->exit_reason =3D=
+=3D KVM_EXIT_MEMORY_FAULT),
+> +                                       "vcpu_run failed: %d\n", ret);
+> +               if (ret !=3D 0 && get_ucall(vcpu, NULL) !=3D UCALL_SYNC) =
+{
+> +
+> +                       if (run->exit_reason =3D=3D KVM_EXIT_MEMORY_FAULT=
+) {
+> +                               ready_page(run->memory_fault.gpa);
+> +                               continue;
+> +                       }
+> +
+> +                       TEST_ASSERT(false,
+> +                                               "Invalid guest sync statu=
+s: exit_reason=3D%s\n",
+> +                                               exit_reason_str(run->exit=
+_reason));
+> +               }
+>
+> -       ts_diff =3D timespec_elapsed(start);
+> -       PER_VCPU_DEBUG("vCPU %d execution time: %ld.%.9lds\n", vcpu_idx,
+> -                      ts_diff.tv_sec, ts_diff.tv_nsec);
+> +               ts_diff =3D timespec_elapsed(start);
+> +               PER_VCPU_DEBUG("vCPU %d execution time: %ld.%.9lds\n", vc=
+pu_idx,
+> +                                          ts_diff.tv_sec, ts_diff.tv_nse=
+c);
+> +               break;
+> +       }
+>  }
+>
+> -static int handle_uffd_page_request(int uffd_mode, int uffd,
+> -               struct uffd_msg *msg)
+> +static int handle_uffd_page_request(int uffd_mode, int uffd, uint64_t hv=
+a,
+> +                                                                       b=
+ool is_vcpu)
+>  {
+>         pid_t tid =3D syscall(__NR_gettid);
+> -       uint64_t addr =3D msg->arg.pagefault.address;
+>         struct timespec start;
+>         struct timespec ts_diff;
+>         int r;
+> @@ -71,56 +134,78 @@ static int handle_uffd_page_request(int uffd_mode, i=
+nt uffd,
+>                 struct uffdio_copy copy;
+>
+>                 copy.src =3D (uint64_t)guest_data_prototype;
+> -               copy.dst =3D addr;
+> +               copy.dst =3D hva;
+>                 copy.len =3D demand_paging_size;
+> -               copy.mode =3D 0;
+> +               copy.mode =3D UFFDIO_COPY_MODE_DONTWAKE;
+>
+> -               r =3D ioctl(uffd, UFFDIO_COPY, &copy);
+>                 /*
+> -                * With multiple vCPU threads fault on a single page and =
+there are
+> -                * multiple readers for the UFFD, at least one of the UFF=
+DIO_COPYs
+> -                * will fail with EEXIST: handle that case without signal=
+ing an
+> -                * error.
+> +                * With multiple vCPU threads and at least one of multipl=
+e reader threads
+> +                * or vCPU memory faults, multiple vCPUs accessing an abs=
+ent page will
+> +                * almost certainly cause some thread doing the UFFDIO_CO=
+PY here to get
+> +                * EEXIST: make sure to allow that case.
+>                  */
+> -               if (r =3D=3D -1 && errno !=3D EEXIST) {
+> -                       pr_info("Failed UFFDIO_COPY in 0x%lx from thread =
+%d, errno =3D %d\n",
+> -                                       addr, tid, errno);
+> -                       return r;
+> -               }
+> +               r =3D ioctl(uffd, UFFDIO_COPY, &copy);
+> +               TEST_ASSERT(r =3D=3D 0 || errno =3D=3D EEXIST,
+> +                       "Thread 0x%x failed UFFDIO_COPY on hva 0x%lx, err=
+no =3D %d",
+> +                       gettid(), hva, errno);
+>         } else if (uffd_mode =3D=3D UFFDIO_REGISTER_MODE_MINOR) {
+> +               /* The comments in the UFFDIO_COPY branch also apply here=
+. */
+>                 struct uffdio_continue cont =3D {0};
+>
+> -               cont.range.start =3D addr;
+> +               cont.range.start =3D hva;
+>                 cont.range.len =3D demand_paging_size;
+> +               cont.mode =3D UFFDIO_CONTINUE_MODE_DONTWAKE;
+>
+>                 r =3D ioctl(uffd, UFFDIO_CONTINUE, &cont);
+> -               /* See the note about EEXISTs in the UFFDIO_COPY branch. =
+*/
+> -               if (r =3D=3D -1 && errno !=3D EEXIST) {
+> -                       pr_info("Failed UFFDIO_CONTINUE in 0x%lx, thread =
+%d, errno =3D %d\n",
+> -                                       addr, tid, errno);
+> -                       return r;
+> -               }
+> +               TEST_ASSERT(r =3D=3D 0 || errno =3D=3D EEXIST,
+> +                       "Thread 0x%x failed UFFDIO_CONTINUE on hva 0x%lx,=
+ errno =3D %d",
+> +                       gettid(), hva, errno);
+>         } else {
+>                 TEST_FAIL("Invalid uffd mode %d", uffd_mode);
+>         }
+>
+> +       /*
+> +        * If the above UFFDIO_COPY/CONTINUE fails with EEXIST, it will d=
+o so without
+> +        * waking threads waiting on the UFFD: make sure that happens her=
+e.
+> +        */
 
-Thanks,
-Pavan
+This comment sounds a little bit strange because we're always passing
+MODE_DONTWAKE to UFFDIO_COPY/CONTINUE.
+
+You *could* update the comment to reflect what this test is really
+doing, but I think you actually probably want the test to do what the
+comment suggests. That is, I think the code you should write should:
+1. DONTWAKE if is_vcpu
+2. UFFDIO_WAKE if !is_vcpu && UFFDIO_COPY/CONTINUE failed (with
+EEXIST, but we would have already crashed if it weren't).
+
+This way, we can save a syscall with almost no added complexity, and
+the existing userfaultfd tests remain basically untouched (i.e., no
+longer always need an explicit UFFDIO_WAKE).
+
+Thanks!
+
+> +       if (!is_vcpu) {
+> +               struct uffdio_range range =3D {
+> +                       .start =3D hva,
+> +                       .len =3D demand_paging_size
+> +               };
+> +               r =3D ioctl(uffd, UFFDIO_WAKE, &range);
+> +               TEST_ASSERT(
+> +                       r =3D=3D 0,
+> +                       "Thread 0x%x failed UFFDIO_WAKE on hva 0x%lx, err=
+no =3D %d",
+> +                       gettid(), hva, errno);
+> +       }
+> +
+>         ts_diff =3D timespec_elapsed(start);
+>
+>         PER_PAGE_DEBUG("UFFD page-in %d \t%ld ns\n", tid,
+>                        timespec_to_ns(ts_diff));
+>         PER_PAGE_DEBUG("Paged in %ld bytes at 0x%lx from thread %d\n",
+> -                      demand_paging_size, addr, tid);
+> +                      demand_paging_size, hva, tid);
+>
+>         return 0;
+>  }
+>
+> +static int handle_uffd_page_request_from_uffd(int uffd_mode, int uffd,
+> +                               struct uffd_msg *msg)
+> +{
+> +       TEST_ASSERT(msg->event =3D=3D UFFD_EVENT_PAGEFAULT,
+> +               "Received uffd message with event %d !=3D UFFD_EVENT_PAGE=
+FAULT",
+> +               msg->event);
+> +       return handle_uffd_page_request(uffd_mode, uffd,
+> +                                       msg->arg.pagefault.address, false=
+);
+> +}
+> +
+>  struct test_params {
+> -       int uffd_mode;
+>         bool single_uffd;
+> -       useconds_t uffd_delay;
+>         int readers_per_uffd;
+>         enum vm_mem_backing_src_type src_type;
+>         bool partition_vcpu_memory_access;
+> +       bool memfault_exits;
+>  };
+>
+>  static void prefault_mem(void *alias, uint64_t len)
+> @@ -137,15 +222,26 @@ static void prefault_mem(void *alias, uint64_t len)
+>  static void run_test(enum vm_guest_mode mode, void *arg)
+>  {
+>         struct test_params *p =3D arg;
+> -       struct uffd_desc **uffd_descs =3D NULL;
+>         struct timespec start;
+>         struct timespec ts_diff;
+>         struct kvm_vm *vm;
+> -       int i, num_uffds =3D 0;
+> -       uint64_t uffd_region_size;
+> +       int i;
+> +       uint32_t slot_flags =3D 0;
+> +       bool uffd_memfault_exits =3D uffd_mode && p->memfault_exits;
+> +
+> +       if (uffd_memfault_exits) {
+> +               TEST_ASSERT(kvm_has_cap(KVM_CAP_ABSENT_MAPPING_FAULT) > 0=
+,
+> +                                       "KVM does not have KVM_CAP_ABSENT=
+_MAPPING_FAULT");
+> +               slot_flags =3D KVM_MEM_ABSENT_MAPPING_FAULT;
+> +       }
+>
+>         vm =3D memstress_create_vm(mode, nr_vcpus, guest_percpu_mem_size,
+> -                               1, 0, p->src_type, p->partition_vcpu_memo=
+ry_access);
+> +                               1, slot_flags, p->src_type, p->partition_=
+vcpu_memory_access);
+> +
+> +       if (uffd_memfault_exits) {
+> +               vm_enable_cap(vm,
+> +                                         KVM_CAP_MEMORY_FAULT_INFO, KVM_=
+MEMORY_FAULT_INFO_ENABLE);
+> +       }
+>
+>         demand_paging_size =3D get_backing_src_pagesz(p->src_type);
+>
+> @@ -154,12 +250,12 @@ static void run_test(enum vm_guest_mode mode, void =
+*arg)
+>                     "Failed to allocate buffer for guest data pattern");
+>         memset(guest_data_prototype, 0xAB, demand_paging_size);
+>
+> -       if (p->uffd_mode) {
+> +       if (uffd_mode) {
+>                 num_uffds =3D p->single_uffd ? 1 : nr_vcpus;
+>                 uffd_region_size =3D nr_vcpus * guest_percpu_mem_size / n=
+um_uffds;
+>
+>                 uffd_descs =3D malloc(num_uffds * sizeof(struct uffd_desc=
+ *));
+> -               TEST_ASSERT(uffd_descs, "Memory allocation failed");
+> +               TEST_ASSERT(uffd_descs, "Failed to allocate memory of uff=
+d descriptors");
+>
+>                 for (i =3D 0; i < num_uffds; i++) {
+>                         struct memstress_vcpu_args *vcpu_args;
+> @@ -179,10 +275,10 @@ static void run_test(enum vm_guest_mode mode, void =
+*arg)
+>                          * requests.
+>                          */
+>                         uffd_descs[i] =3D uffd_setup_demand_paging(
+> -                               p->uffd_mode, p->uffd_delay, vcpu_hva,
+> +                               uffd_mode, uffd_delay, vcpu_hva,
+>                                 uffd_region_size,
+>                                 p->readers_per_uffd,
+> -                               &handle_uffd_page_request);
+> +                               &handle_uffd_page_request_from_uffd);
+>                 }
+>         }
+>
+> @@ -196,7 +292,7 @@ static void run_test(enum vm_guest_mode mode, void *a=
+rg)
+>         ts_diff =3D timespec_elapsed(start);
+>         pr_info("All vCPU threads joined\n");
+>
+> -       if (p->uffd_mode) {
+> +       if (uffd_mode) {
+>                 /* Tell the user fault fd handler threads to quit */
+>                 for (i =3D 0; i < num_uffds; i++)
+>                         uffd_stop_demand_paging(uffd_descs[i]);
+> @@ -211,7 +307,7 @@ static void run_test(enum vm_guest_mode mode, void *a=
+rg)
+>         memstress_destroy_vm(vm);
+>
+>         free(guest_data_prototype);
+> -       if (p->uffd_mode)
+> +       if (uffd_mode)
+>                 free(uffd_descs);
+>  }
+>
+> @@ -220,7 +316,7 @@ static void help(char *name)
+>         puts("");
+>         printf("usage: %s [-h] [-m vm_mode] [-u uffd_mode] [-a]\n"
+>                    "          [-d uffd_delay_usec] [-r readers_per_uffd] =
+[-b memory]\n"
+> -                  "          [-s type] [-v vcpus] [-o]\n", name);
+> +                  "          [-w] [-s type] [-v vcpus] [-o]\n", name);
+>         guest_modes_help();
+>         printf(" -u: use userfaultfd to handle vCPU page faults. Mode is =
+a\n"
+>                "     UFFD registration mode: 'MISSING' or 'MINOR'.\n");
+> @@ -231,6 +327,7 @@ static void help(char *name)
+>                "     FD handler to simulate demand paging\n"
+>                "     overheads. Ignored without -u.\n");
+>         printf(" -r: Set the number of reader threads per uffd.\n");
+> +       printf(" -w: Enable kvm cap for memory fault exits.\n");
+>         printf(" -b: specify the size of the memory region which should b=
+e\n"
+>                "     demand paged by each vCPU. e.g. 10M or 3G.\n"
+>                "     Default: 1G\n");
+> @@ -250,29 +347,30 @@ int main(int argc, char *argv[])
+>                 .partition_vcpu_memory_access =3D true,
+>                 .readers_per_uffd =3D 1,
+>                 .single_uffd =3D false,
+> +               .memfault_exits =3D false,
+>         };
+>         int opt;
+>
+>         guest_modes_append_default();
+>
+> -       while ((opt =3D getopt(argc, argv, "ahom:u:d:b:s:v:r:")) !=3D -1)=
+ {
+> +       while ((opt =3D getopt(argc, argv, "ahowm:u:d:b:s:v:r:")) !=3D -1=
+) {
+>                 switch (opt) {
+>                 case 'm':
+>                         guest_modes_cmdline(optarg);
+>                         break;
+>                 case 'u':
+>                         if (!strcmp("MISSING", optarg))
+> -                               p.uffd_mode =3D UFFDIO_REGISTER_MODE_MISS=
+ING;
+> +                               uffd_mode =3D UFFDIO_REGISTER_MODE_MISSIN=
+G;
+>                         else if (!strcmp("MINOR", optarg))
+> -                               p.uffd_mode =3D UFFDIO_REGISTER_MODE_MINO=
+R;
+> -                       TEST_ASSERT(p.uffd_mode, "UFFD mode must be 'MISS=
+ING' or 'MINOR'.");
+> +                               uffd_mode =3D UFFDIO_REGISTER_MODE_MINOR;
+> +                       TEST_ASSERT(uffd_mode, "UFFD mode must be 'MISSIN=
+G' or 'MINOR'.");
+>                         break;
+>                 case 'a':
+>                         p.single_uffd =3D true;
+>                         break;
+>                 case 'd':
+> -                       p.uffd_delay =3D strtoul(optarg, NULL, 0);
+> -                       TEST_ASSERT(p.uffd_delay >=3D 0, "A negative UFFD=
+ delay is not supported.");
+> +                       uffd_delay =3D strtoul(optarg, NULL, 0);
+> +                       TEST_ASSERT(uffd_delay >=3D 0, "A negative UFFD d=
+elay is not supported.");
+>                         break;
+>                 case 'b':
+>                         guest_percpu_mem_size =3D parse_size(optarg);
+> @@ -295,6 +393,9 @@ int main(int argc, char *argv[])
+>                                                 "Invalid number of reader=
+s per uffd %d: must be >=3D1",
+>                                                 p.readers_per_uffd);
+>                         break;
+> +               case 'w':
+> +                       p.memfault_exits =3D true;
+> +                       break;
+>                 case 'h':
+>                 default:
+>                         help(argv[0]);
+> @@ -302,7 +403,7 @@ int main(int argc, char *argv[])
+>                 }
+>         }
+>
+> -       if (p.uffd_mode =3D=3D UFFDIO_REGISTER_MODE_MINOR &&
+> +       if (uffd_mode =3D=3D UFFDIO_REGISTER_MODE_MINOR &&
+>             !backing_src_is_shared(p.src_type)) {
+>                 TEST_FAIL("userfaultfd MINOR mode requires shared memory;=
+ pick a different -s");
+>         }
+> --
+> 2.40.0.577.gac1e443424-goog
+>
