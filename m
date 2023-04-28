@@ -1,12 +1,12 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98F652F46
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E38A72F53
 	for <kvmarm@lists.linux.dev>; Fri, 28 Apr 2023 12:04:57 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5151F139F;
-	Fri, 28 Apr 2023 05:05:35 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C5F4D1480;
+	Fri, 28 Apr 2023 05:05:39 -0700 (PDT)
 Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5F8FE3F5A1;
-	Fri, 28 Apr 2023 05:04:50 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D41D93F5A1;
+	Fri, 28 Apr 2023 05:04:54 -0700 (PDT)
 From: Nikos Nikoleris <nikos.nikoleris@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
@@ -14,9 +14,9 @@ To: kvm@vger.kernel.org,
 Cc: pbonzini@redhat.com,
 	alexandru.elisei@arm.com,
 	ricarkol@google.com
-Subject: [kvm-unit-tests PATCH v5 02/29] x86: Move x86_64-specific EFI CFLAGS to x86_64 Makefile
-Date: Fri, 28 Apr 2023 13:03:38 +0100
-Message-Id: <20230428120405.3770496-3-nikos.nikoleris@arm.com>
+Subject: [kvm-unit-tests PATCH v5 06/29] x86: Avoid references to fields of ACPI tables
+Date: Fri, 28 Apr 2023 13:03:42 +0100
+Message-Id: <20230428120405.3770496-7-nikos.nikoleris@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230428120405.3770496-1-nikos.nikoleris@arm.com>
 References: <20230428120405.3770496-1-nikos.nikoleris@arm.com>
@@ -29,50 +29,55 @@ MIME-Version: 1.0
 X-ARM-No-Footer: FoSSMail
 Content-Transfer-Encoding: 8bit
 
-Compiler flag -macculate-outgoing-args is only needed by the x86_64
-ABI. Move it to the relevant Makefile.
+ACPI table definitions in <acpi.h> have to be packed.  However, once
+we do that, direct references to members of the packed struct might
+result in unaligned pointers and gcc complains about them. This change
+modifies the code to avoid such references in preparation for making
+the APCI table definitions packed.
 
 Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-Reviewed-by: Ricardo Koller <ricarkol@google.com>
 ---
- Makefile            | 4 ----
- x86/Makefile.x86_64 | 4 ++++
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ x86/s3.c | 17 +++++------------
+ 1 file changed, 5 insertions(+), 12 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 6ed5deac..307bc291 100644
---- a/Makefile
-+++ b/Makefile
-@@ -40,14 +40,10 @@ OBJDIRS += $(LIBFDT_objdir)
+diff --git a/x86/s3.c b/x86/s3.c
+index 96db728c..910c57fb 100644
+--- a/x86/s3.c
++++ b/x86/s3.c
+@@ -2,15 +2,6 @@
+ #include "acpi.h"
+ #include "asm/io.h"
  
- # EFI App
- ifeq ($(CONFIG_EFI),y)
--EFI_ARCH = x86_64
- EFI_CFLAGS := -DCONFIG_EFI
- # The following CFLAGS and LDFLAGS come from:
- #   - GNU-EFI/Makefile.defaults
- #   - GNU-EFI/apps/Makefile
--# Function calls must include the number of arguments passed to the functions
--# More details: https://wiki.osdev.org/GNU-EFI
--EFI_CFLAGS += -maccumulate-outgoing-args
- # GCC defines wchar to be 32 bits, but EFI expects 16 bits
- EFI_CFLAGS += -fshort-wchar
- # EFI applications use PIC as they are loaded to dynamic addresses, not a fixed
-diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
-index f483dead..2771a6fa 100644
---- a/x86/Makefile.x86_64
-+++ b/x86/Makefile.x86_64
-@@ -2,6 +2,10 @@ cstart.o = $(TEST_DIR)/cstart64.o
- bits = 64
- ldarch = elf64-x86-64
- ifeq ($(CONFIG_EFI),y)
-+# Function calls must include the number of arguments passed to the functions
-+# More details: https://wiki.osdev.org/GNU-EFI
-+CFLAGS += -maccumulate-outgoing-args
-+
- exe = efi
- bin = so
- FORMAT = efi-app-x86_64
+-static u32* find_resume_vector_addr(void)
+-{
+-    struct acpi_table_facs_rev1 *facs = find_acpi_table_addr(FACS_SIGNATURE);
+-    if (!facs)
+-        return 0;
+-    printf("FACS is at %p\n", facs);
+-    return &facs->firmware_waking_vector;
+-}
+-
+ #define RTC_SECONDS_ALARM       1
+ #define RTC_MINUTES_ALARM       3
+ #define RTC_HOURS_ALARM         5
+@@ -40,12 +31,14 @@ extern char resume_start, resume_end;
+ int main(int argc, char **argv)
+ {
+ 	struct acpi_table_fadt_rev1 *fadt = find_acpi_table_addr(FACP_SIGNATURE);
+-	volatile u32 *resume_vector_ptr = find_resume_vector_addr();
++	struct acpi_table_facs_rev1 *facs = find_acpi_table_addr(FACS_SIGNATURE);
+ 	char *addr, *resume_vec = (void*)0x1000;
+ 
+-	*resume_vector_ptr = (u32)(ulong)resume_vec;
++	assert(facs);
++	facs->firmware_waking_vector = (u32)(ulong)resume_vec;
+ 
+-	printf("resume vector addr is %p\n", resume_vector_ptr);
++	printf("FACS is at %p\n", facs);
++	printf("resume vector addr is %p\n", &facs->firmware_waking_vector);
+ 	for (addr = &resume_start; addr < &resume_end; addr++)
+ 		*resume_vec++ = *addr;
+ 	printf("copy resume code from %p\n", &resume_start);
 -- 
 2.25.1
 
