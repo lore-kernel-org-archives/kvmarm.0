@@ -1,22 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 737483229
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EE29322E
 	for <kvmarm@lists.linux.dev>; Fri, 28 Apr 2023 12:04:59 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 992E21474;
-	Fri, 28 Apr 2023 05:05:37 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2F4DAC14;
+	Fri, 28 Apr 2023 05:05:43 -0700 (PDT)
 Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A71163F5A1;
-	Fri, 28 Apr 2023 05:04:52 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 232C33F5A1;
+	Fri, 28 Apr 2023 05:04:58 -0700 (PDT)
 From: Nikos Nikoleris <nikos.nikoleris@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	andrew.jones@linux.dev
 Cc: pbonzini@redhat.com,
 	alexandru.elisei@arm.com,
-	ricarkol@google.com
-Subject: [kvm-unit-tests PATCH v5 04/29] lib: Fix style for acpi.{c,h}
-Date: Fri, 28 Apr 2023 13:03:40 +0100
-Message-Id: <20230428120405.3770496-5-nikos.nikoleris@arm.com>
+	ricarkol@google.com,
+	Andrew Jones <drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH v5 09/29] lib/acpi: Extend the definition of the FADT table
+Date: Fri, 28 Apr 2023 13:03:45 +0100
+Message-Id: <20230428120405.3770496-10-nikos.nikoleris@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230428120405.3770496-1-nikos.nikoleris@arm.com>
 References: <20230428120405.3770496-1-nikos.nikoleris@arm.com>
@@ -29,134 +30,111 @@ MIME-Version: 1.0
 X-ARM-No-Footer: FoSSMail
 Content-Transfer-Encoding: 8bit
 
-Manually fix style issues to make the files consistent with the kernel
-coding style.
-
-Zero-length array members have been replaced with flexible array members
-(for details about the motivation, consult
-Documentation/process/deprecated.rst in the Linux tree, the section about
-zero-length and one-element arrays).
+This change add more fields in the APCI table FADT to allow for the
+discovery of the PSCI conduit in arm64 systems. The definition for
+FADT is similar to the one in include/acpi/actbl.h in Linux.
 
 Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-[ Alex E: changes other than indentation ]
+Reviewed-by: Ricardo Koller <ricarkol@google.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
- lib/acpi.h | 18 +++++++++---------
- lib/acpi.c | 16 ++++++++--------
- 2 files changed, 17 insertions(+), 17 deletions(-)
+ lib/acpi.h   | 33 +++++++++++++++++++++++++++++----
+ lib/acpi.c   |  2 +-
+ x86/s3.c     |  2 +-
+ x86/vmexit.c |  2 +-
+ 4 files changed, 32 insertions(+), 7 deletions(-)
 
 diff --git a/lib/acpi.h b/lib/acpi.h
-index b67bbe19..2da49451 100644
+index 74ba00ac..b714677e 100644
 --- a/lib/acpi.h
 +++ b/lib/acpi.h
-@@ -3,7 +3,7 @@
- 
- #include "libcflat.h"
- 
--#define ACPI_SIGNATURE(c1, c2, c3, c4)				\
-+#define ACPI_SIGNATURE(c1, c2, c3, c4) \
- 	((c1) | ((c2) << 8) | ((c3) << 16) | ((c4) << 24))
- 
- #define RSDP_SIGNATURE ACPI_SIGNATURE('R','S','D','P')
-@@ -11,9 +11,9 @@
- #define FACP_SIGNATURE ACPI_SIGNATURE('F','A','C','P')
- #define FACS_SIGNATURE ACPI_SIGNATURE('F','A','C','S')
- 
--#define ACPI_SIGNATURE_8BYTE(c1, c2, c3, c4, c5, c6, c7, c8)	\
--	((uint64_t)(ACPI_SIGNATURE(c1, c2, c3, c4))) |		\
--	((uint64_t)(ACPI_SIGNATURE(c5, c6, c7, c8)) << 32)
-+#define ACPI_SIGNATURE_8BYTE(c1, c2, c3, c4, c5, c6, c7, c8) \
-+	(((uint64_t)(ACPI_SIGNATURE(c1, c2, c3, c4))) |	     \
-+	 ((uint64_t)(ACPI_SIGNATURE(c5, c6, c7, c8)) << 32))
- 
- #define RSDP_SIGNATURE_8BYTE (ACPI_SIGNATURE_8BYTE('R', 'S', 'D', ' ', 'P', 'T', 'R', ' '))
- 
-@@ -34,20 +34,20 @@ struct rsdp_descriptor {	/* Root System Descriptor Pointer */
- 	u32 length;			/* Length of table, in bytes, including header */ \
- 	u8  revision;			/* ACPI Specification minor version # */	\
- 	u8  checksum;			/* To make sum of entire table == 0 */		\
--	u8  oem_id [6];			/* OEM identification */			\
--	u8  oem_table_id [8];		/* OEM table identification */			\
-+	u8  oem_id[6];			/* OEM identification */			\
-+	u8  oem_table_id[8];		/* OEM table identification */			\
- 	u32 oem_revision;		/* OEM revision number */			\
--	u8  asl_compiler_id [4];	/* ASL compiler vendor ID */			\
-+	u8  asl_compiler_id[4];		/* ASL compiler vendor ID */			\
- 	u32 asl_compiler_revision;	/* ASL compiler revision number */
- 
- struct acpi_table {
- 	ACPI_TABLE_HEADER_DEF
--	char data[0];
-+	char data[];
+@@ -62,7 +62,15 @@ struct acpi_table_xsdt {
+ 	u64 table_offset_entry[];
  };
  
- struct rsdt_descriptor_rev1 {
- 	ACPI_TABLE_HEADER_DEF
--	u32 table_offset_entry[1];
-+	u32 table_offset_entry[];
+-struct acpi_table_fadt_rev1 {
++struct acpi_generic_address {
++	u8 space_id;		/* Address space where struct or register exists */
++	u8 bit_width;		/* Size in bits of given register */
++	u8 bit_offset;		/* Bit offset within the register */
++	u8 access_width;	/* Minimum Access size (ACPI 3.0) */
++	u64 address;		/* 64-bit address of struct or register */
++};
++
++struct acpi_table_fadt {
+ 	ACPI_TABLE_HEADER_DEF	/* ACPI common table header */
+ 	u32 firmware_ctrl;	/* Physical address of FACS */
+ 	u32 dsdt;		/* Physical address of DSDT */
+@@ -99,9 +107,26 @@ struct acpi_table_fadt_rev1 {
+ 	u8 day_alrm;		/* Index to day-of-month alarm in RTC CMOS RAM */
+ 	u8 mon_alrm;		/* Index to month-of-year alarm in RTC CMOS RAM */
+ 	u8 century;		/* Index to century in RTC CMOS RAM */
+-	u8 reserved4;		/* Reserved */
+-	u8 reserved4a;		/* Reserved */
+-	u8 reserved4b;		/* Reserved */
++	u16 boot_flags;		/* IA-PC Boot Architecture Flags (see below for individual flags) */
++	u8 reserved;		/* Reserved, must be zero */
++	u32 flags;		/* Miscellaneous flag bits (see below for individual flags) */
++	struct acpi_generic_address reset_register;	/* 64-bit address of the Reset register */
++	u8 reset_value;		/* Value to write to the reset_register port to reset the system */
++	u16 arm_boot_flags;	/* ARM-Specific Boot Flags (see below for individual flags) (ACPI 5.1) */
++	u8 minor_revision;	/* FADT Minor Revision (ACPI 5.1) */
++	u64 Xfacs;		/* 64-bit physical address of FACS */
++	u64 Xdsdt;		/* 64-bit physical address of DSDT */
++	struct acpi_generic_address xpm1a_event_block;	/* 64-bit Extended Power Mgt 1a Event Reg Blk address */
++	struct acpi_generic_address xpm1b_event_block;	/* 64-bit Extended Power Mgt 1b Event Reg Blk address */
++	struct acpi_generic_address xpm1a_control_block;	/* 64-bit Extended Power Mgt 1a Control Reg Blk address */
++	struct acpi_generic_address xpm1b_control_block;	/* 64-bit Extended Power Mgt 1b Control Reg Blk address */
++	struct acpi_generic_address xpm2_control_block;	/* 64-bit Extended Power Mgt 2 Control Reg Blk address */
++	struct acpi_generic_address xpm_timer_block;	/* 64-bit Extended Power Mgt Timer Ctrl Reg Blk address */
++	struct acpi_generic_address xgpe0_block;	/* 64-bit Extended General Purpose Event 0 Reg Blk address */
++	struct acpi_generic_address xgpe1_block;	/* 64-bit Extended General Purpose Event 1 Reg Blk address */
++	struct acpi_generic_address sleep_control;	/* 64-bit Sleep Control register (ACPI 5.0) */
++	struct acpi_generic_address sleep_status;	/* 64-bit Sleep Status register (ACPI 5.0) */
++	u64 hypervisor_id;	/* Hypervisor Vendor ID (ACPI 6.0) */
  };
  
- struct fadt_descriptor_rev1 {
+ struct acpi_table_facs_rev1 {
 diff --git a/lib/acpi.c b/lib/acpi.c
-index 836156a1..3f87711a 100644
+index d35f09a6..a197f3dd 100644
 --- a/lib/acpi.c
 +++ b/lib/acpi.c
-@@ -11,9 +11,9 @@ void set_efi_rsdp(struct rsdp_descriptor *rsdp)
- 
- static struct rsdp_descriptor *get_rsdp(void)
- {
--	if (efi_rsdp == NULL) {
-+	if (efi_rsdp == NULL)
- 		printf("Can't find RSDP from UEFI, maybe set_efi_rsdp() was not called\n");
--	}
-+
- 	return efi_rsdp;
- }
- #else
-@@ -28,9 +28,8 @@ static struct rsdp_descriptor *get_rsdp(void)
- 			break;
- 	}
- 
--	if (addr == 0x100000) {
-+	if (addr == 0x100000)
- 		return NULL;
--	}
- 
- 	return rsdp;
- }
-@@ -38,18 +37,18 @@ static struct rsdp_descriptor *get_rsdp(void)
- 
- void *find_acpi_table_addr(u32 sig)
- {
--	struct rsdp_descriptor *rsdp;
- 	struct rsdt_descriptor_rev1 *rsdt;
-+	struct rsdp_descriptor *rsdp;
- 	void *end;
- 	int i;
+@@ -45,7 +45,7 @@ void *find_acpi_table_addr(u32 sig)
  
  	/* FACS is special... */
  	if (sig == FACS_SIGNATURE) {
- 		struct fadt_descriptor_rev1 *fadt;
-+
+-		struct acpi_table_fadt_rev1 *fadt;
++		struct acpi_table_fadt *fadt;
+ 
  		fadt = find_acpi_table_addr(FACP_SIGNATURE);
  		if (!fadt)
- 			return NULL;
--
- 		return (void *)(ulong) fadt->firmware_ctrl;
- 	}
+diff --git a/x86/s3.c b/x86/s3.c
+index 910c57fb..6f2d6d10 100644
+--- a/x86/s3.c
++++ b/x86/s3.c
+@@ -30,8 +30,8 @@ extern char resume_start, resume_end;
  
-@@ -72,9 +71,10 @@ void *find_acpi_table_addr(u32 sig)
- 	end = (void *)rsdt + rsdt->length;
- 	for (i = 0; (void *)&rsdt->table_offset_entry[i] < end; i++) {
- 		struct acpi_table *t = (void *)(ulong) rsdt->table_offset_entry[i];
--		if (t && t->signature == sig) {
-+
-+		if (t && t->signature == sig)
- 			return t;
--		}
- 	}
-+
- 	return NULL;
- }
+ int main(int argc, char **argv)
+ {
+-	struct acpi_table_fadt_rev1 *fadt = find_acpi_table_addr(FACP_SIGNATURE);
+ 	struct acpi_table_facs_rev1 *facs = find_acpi_table_addr(FACS_SIGNATURE);
++	struct acpi_table_fadt *fadt = find_acpi_table_addr(FACP_SIGNATURE);
+ 	char *addr, *resume_vec = (void*)0x1000;
+ 
+ 	assert(facs);
+diff --git a/x86/vmexit.c b/x86/vmexit.c
+index 12234f9e..cc086b86 100644
+--- a/x86/vmexit.c
++++ b/x86/vmexit.c
+@@ -206,7 +206,7 @@ int pm_tmr_blk;
+ static void inl_pmtimer(void)
+ {
+     if (!pm_tmr_blk) {
+-	struct acpi_table_fadt_rev1 *fadt;
++	struct acpi_table_fadt *fadt;
+ 
+ 	fadt = find_acpi_table_addr(FACP_SIGNATURE);
+ 	pm_tmr_blk = fadt->pm_tmr_blk;
 -- 
 2.25.1
 
