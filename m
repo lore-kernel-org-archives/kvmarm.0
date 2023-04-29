@@ -1,24 +1,25 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE8EC3C1D
-	for <kvmarm@lists.linux.dev>; Fri, 28 Apr 2023 12:05:21 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DCC3C1596;
-	Fri, 28 Apr 2023 05:06:05 -0700 (PDT)
-Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EB2323F5A1;
-	Fri, 28 Apr 2023 05:05:20 -0700 (PDT)
-From: Nikos Nikoleris <nikos.nikoleris@arm.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	andrew.jones@linux.dev
-Cc: pbonzini@redhat.com,
-	alexandru.elisei@arm.com,
-	ricarkol@google.com
-Subject: [kvm-unit-tests PATCH v5 29/29] arm64: Add an efi/run script
-Date: Fri, 28 Apr 2023 13:04:05 +0100
-Message-Id: <20230428120405.3770496-30-nikos.nikoleris@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230428120405.3770496-1-nikos.nikoleris@arm.com>
+Received: from out-55.mta0.migadu.com (out-55.mta0.migadu.com [91.218.175.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FC2D1FD3
+	for <kvmarm@lists.linux.dev>; Sat, 29 Apr 2023 16:18:27 +0000 (UTC)
+Date: Sat, 29 Apr 2023 18:18:23 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1682785104;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nOodE+NXdu8b0gfIigjUrjTxNTkmlVBWN72aSNWy07k=;
+	b=lrdP7MIuqZFb1efY28d37vQTEsU9bEFJgPojLmGCgvN8JajBxuC0bMAqo6V+OYdFyJyGpm
+	a1L/YPsaGy2WglghppkotSf0AggNP6HzFYyYH2O62vBdfWsG4n5g6rKtoG7CyXYN2GpCtt
+	znMmhmhRCYP/f0F3HoKVhGELKtbIBWI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
+	alexandru.elisei@arm.com, ricarkol@google.com, seanjc@google.com
+Subject: Re: [kvm-unit-tests PATCH v5 00/29] EFI and ACPI support for arm64
+Message-ID: <20230429-6da987552a8d15281f8444c9@orel>
 References: <20230428120405.3770496-1-nikos.nikoleris@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -26,185 +27,131 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-ARM-No-Footer: FoSSMail
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230428120405.3770496-1-nikos.nikoleris@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-This change adds a efi/run script inspired by the one in x86. This
-script will setup a folder with the test compiled as an EFI app and a
-startup.nsh script. The script launches QEMU providing an image with
-EDKII and the path to the folder with the test which is executed
-automatically.
+On Fri, Apr 28, 2023 at 01:03:36PM +0100, Nikos Nikoleris wrote:
+> Hello,
+> 
+> This series adds initial support for building arm64 tests as EFI
+> apps and running them under QEMU. Much like x86_64, we import external
+> dependencies from gnu-efi and adapt them to work with types and other
+> assumptions from kvm-unit-tests. In addition, this series adds support
+> for enumerating parts of the system using ACPI.
+> 
+> The first set of patches, moves the existing ACPI code to the common
+> lib path. Then, it extends definitions and functions to allow for more
+> robust discovery of ACPI tables. We add support for setting up the PSCI
+> conduit, discovering the UART, timers, GIC and cpus via ACPI. The code
+> retains existing behavior and gives priority to discovery through DT
+> when one has been provided.
+> 
+> In the second set of patches, we add support for getting the command
+> line from the EFI shell. This is a requirement for many of the
+> existing arm64 tests.
+> 
+> In the third set of patches, we import code from gnu-efi, make minor
+> changes and add an alternative setup sequence from arm64 systems that
+> boot through EFI. Finally, we add support in the build system and a
+> run script which is used to run an EFI app.
+> 
+> After this set of patches one can build arm64 EFI tests:
+> 
+> $> ./configure --enable-efi
+> $> make
+> 
+> And use the run script to run an EFI tests:
+> 
+> $> ./arm/efi/run ./arm/selftest.efi -smp 2 -m 256 -append "setup smp=2 mem=256"
+> 
+> Or all tests:
+> 
+> $> ./run_tests.sh
+> 
+> There are a few items that this series does not address but they would
+> be useful to have:
+>  - Support for booting the system from EL2. Currently, we assume that a
+>    test starts EL1. This will be required to run EFI tests on sytems
+>    that implement EL2.
+>  - Support for reading environment variables and populating __envp.
+>  - Support for discovering the PCI subsystem using ACPI.
+>  - Get rid of other assumptions (e.g., vmalloc area) that don't hold on
+>    real HW.
+>  - Various fixes related to cache maintaince to better support turn the
+>    MMU off.
+>  - Switch to a new stack and avoid relying on the one provided by EFI.
+> 
+> git branch: https://github.com/relokin/kvm-unit-tests/pull/new/target-efi-upstream-v5
+> 
+> v4: https://lore.kernel.org/kvmarm/20230213101759.2577077-1-nikos.nikoleris@arm.com/
+> v3: https://lore.kernel.org/all/20220630100324.3153655-1-nikos.nikoleris@arm.com/
+> v2: https://lore.kernel.org/kvm/20220506205605.359830-1-nikos.nikoleris@arm.com/
+> 
+> Changes in v5:
+>  - Minor style changes (thanks Shaoqin).
+>  - Avoid including lib/acpi.o to cflatobjs twice (thanks Drew).
+>  - Increase NR_INITIAL_MEM_REGIONS to avoid overflows and add check when
+>    we run out of space (thanks Shaoqin).
+> 
+> Changes in v4:
+>  - Removed patch that reworks cache maintenance when turning the MMU
+>    off. This is not strictly required for EFI tests running with tcg and
+>    will be addressed in a separate series by Alex.
+>  - Fix compilation for arm (Alex).
+>  - Convert ACPI tables to Linux style (Alex).
+> 
+> Changes in v3:
+>  - Addressed feedback from Drew, Alex and Ricardo. Many thanks for the reviews!
+>  - Added support for discovering the GIC through ACPI
+>  - Added a missing header file (<elf.h>)
+>  - Added support for correctly parsing the outcome of tests (./run_tests)
+>
 
-For example:
+Thanks, Nikos!
 
-$> ./arm/efi/run ./arm/selftest.efi -append "setup smp=2 mem=256" -smp 2 -m 256
+I'd like to get an ack from either Paolo or Sean on the changes to ACPI,
+as they're shared with x86, and there are also some x86 code changes.
 
-Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-Reviewed-by: Ricardo Koller <ricarkol@google.com>
----
- scripts/runtime.bash | 13 +++++++---
- arm/efi/run          | 61 ++++++++++++++++++++++++++++++++++++++++++++
- arm/run              | 14 +++++++---
- arm/Makefile.common  |  1 +
- arm/dummy.c          | 12 +++++++++
- 5 files changed, 94 insertions(+), 7 deletions(-)
- create mode 100755 arm/efi/run
- create mode 100644 arm/dummy.c
+Also,
 
-diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-index 07b62b0e..785a7b62 100644
---- a/scripts/runtime.bash
-+++ b/scripts/runtime.bash
-@@ -130,11 +130,18 @@ function run()
-         done
-     fi
- 
--    last_line=$(premature_failure > >(tail -1)) && {
-+    log=$(premature_failure) && {
-         skip=true
--        if [ "${CONFIG_EFI}" == "y" ] && [[ "${last_line}" =~ "Dummy Hello World!" ]]; then
--            skip=false
-+        if [ "${CONFIG_EFI}" == "y" ]; then
-+            if [ "$ARCH" == "x86_64" ] &&
-+               [[ "$(tail -1 <<<"$log")" =~ "Dummy Hello World!" ]]; then
-+                   skip=false
-+            elif [ "$ARCH" == "arm64" ] &&
-+               [[ "$(tail -2 <<<"$log" | head -1)" =~ "Dummy Hello World!" ]]; then
-+                   skip=false
-+            fi
-         fi
-+
-         if [ ${skip} == true ]; then
-             print_result "SKIP" $testname "" "$last_line"
-             return 77
-diff --git a/arm/efi/run b/arm/efi/run
-new file mode 100755
-index 00000000..dfff717a
---- /dev/null
-+++ b/arm/efi/run
-@@ -0,0 +1,61 @@
-+#!/bin/bash
-+
-+set -e
-+
-+if [ $# -eq 0 ]; then
-+	echo "Usage $0 TEST_CASE [QEMU_ARGS]"
-+	exit 2
-+fi
-+
-+if [ ! -f config.mak ]; then
-+	echo "run './configure --enable-efi && make' first. See ./configure -h"
-+	exit 2
-+fi
-+source config.mak
-+source scripts/arch-run.bash
-+source scripts/common.bash
-+
-+: "${EFI_SRC:=$(realpath "$(dirname "$0")/../")}"
-+: "${EFI_UEFI:=/usr/share/qemu-efi-aarch64/QEMU_EFI.fd}"
-+: "${EFI_TEST:=efi-tests}"
-+: "${EFI_CASE:=$(basename $1 .efi)}"
-+
-+if [ ! -f "$EFI_UEFI" ]; then
-+	echo "UEFI firmware not found: $EFI_UEFI"
-+	echo "Please install the UEFI firmware to this path"
-+	echo "Or specify the correct path with the env variable EFI_UEFI"
-+	exit 2
-+fi
-+
-+# Remove the TEST_CASE from $@
-+shift 1
-+
-+# Fish out the arguments for the test, they should be the next string
-+# after the "-append" option
-+qemu_args=()
-+cmd_args=()
-+while (( "$#" )); do
-+	if [ "$1" = "-append" ]; then
-+		cmd_args=$2
-+		shift 2
-+	else
-+		qemu_args+=("$1")
-+		shift 1
-+	fi
-+done
-+
-+if [ "$EFI_CASE" = "_NO_FILE_4Uhere_" ]; then
-+	EFI_CASE=dummy
-+fi
-+
-+: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_CASE"}"
-+mkdir -p "$EFI_CASE_DIR"
-+
-+cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_TEST/$EFI_CASE/"
-+echo "@echo -off" > "$EFI_TEST/$EFI_CASE/startup.nsh"
-+echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_TEST/$EFI_CASE/startup.nsh"
-+
-+EFI_RUN=y $TEST_DIR/run \
-+       -bios "$EFI_UEFI" \
-+       -drive file.dir="$EFI_TEST/$EFI_CASE/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
-+       "${qemu_args[@]}"
-diff --git a/arm/run b/arm/run
-index c6f25b8c..de520c11 100755
---- a/arm/run
-+++ b/arm/run
-@@ -64,8 +64,10 @@ if ! $qemu $M -chardev '?' | grep -q testdev; then
- 	exit 2
- fi
- 
--chr_testdev='-device virtio-serial-device'
--chr_testdev+=' -device virtconsole,chardev=ctd -chardev testdev,id=ctd'
-+if [ "$EFI_RUN" != "y" ]; then
-+	chr_testdev='-device virtio-serial-device'
-+	chr_testdev+=' -device virtconsole,chardev=ctd -chardev testdev,id=ctd'
-+fi
- 
- pci_testdev=
- if $qemu $M -device '?' | grep -q pci-testdev; then
-@@ -74,7 +76,11 @@ fi
- 
- A="-accel $ACCEL"
- command="$qemu -nodefaults $M $A -cpu $processor $chr_testdev $pci_testdev"
--command+=" -display none -serial stdio -kernel"
-+command+=" -display none -serial stdio"
- command="$(migration_cmd) $(timeout_cmd) $command"
- 
--run_qemu $command "$@"
-+if [ "$EFI_RUN" = "y" ]; then
-+	ENVIRON_DEFAULT=n run_qemu_status $command "$@"
-+else
-+	run_qemu $command -kernel "$@"
-+fi
-diff --git a/arm/Makefile.common b/arm/Makefile.common
-index a133309d..d60cf8cd 100644
---- a/arm/Makefile.common
-+++ b/arm/Makefile.common
-@@ -12,6 +12,7 @@ tests-common += $(TEST_DIR)/gic.$(exe)
- tests-common += $(TEST_DIR)/psci.$(exe)
- tests-common += $(TEST_DIR)/sieve.$(exe)
- tests-common += $(TEST_DIR)/pl031.$(exe)
-+tests-common += $(TEST_DIR)/dummy.$(exe)
- 
- tests-all = $(tests-common) $(tests)
- all: directories $(tests-all)
-diff --git a/arm/dummy.c b/arm/dummy.c
-new file mode 100644
-index 00000000..7033bb7c
---- /dev/null
-+++ b/arm/dummy.c
-@@ -0,0 +1,12 @@
-+#include "libcflat.h"
-+
-+int main(int argc, char **argv)
-+{
-+	/*
-+	 * scripts/runtime.bash uses this test as a canary to determine if the
-+	 * basic setup is functional.  Print a magic string to let runtime.bash
-+	 * know that all is well.
-+	 */
-+	printf("Dummy Hello World!");
-+	return 0;
-+}
--- 
-2.25.1
+  1) It'd be nice if this worked with DT, too. We can use UEFI with DT
+     when adding '-no-acpi' to the QEMU command line. setup_efi() needs
+     to learn how to find the dtb and most the '#ifdef CONFIG_EFI's
+     would need to change to a new CONFIG_ACPI guard.
 
+  2) The debug bp and ss tests fail with EFI, but not without, for me.
+
+  3) The timer test runs (and succeeds) when run with
+     './arm/efi/run ./arm/timer.efi', but not when run with
+     './run_tests.sh -g timer'. This is because UEFI takes
+     up all the given timeout time (10s), and then the test times out.
+     The hackyish fix below resolves it for me. I'll consider posting it
+     as a real patch
+
+Thanks,
+drew
+
+diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+index 51e4b97b27d1..72ce718b1170 100644
+--- a/scripts/arch-run.bash
++++ b/scripts/arch-run.bash
+@@ -94,7 +94,17 @@ run_qemu_status ()
+ 
+ timeout_cmd ()
+ {
++	local s
++
+ 	if [ "$TIMEOUT" ] && [ "$TIMEOUT" != "0" ]; then
++		if [ "$CONFIG_EFI" = 'y' ]; then
++			s=${TIMEOUT: -1}
++			if [ "$s" = 's' ]; then
++				TIMEOUT=${TIMEOUT:0:-1}
++				((TIMEOUT += 10)) # Add 10 seconds for booting UEFI
++				TIMEOUT="${TIMEOUT}s"
++			fi
++		fi
+ 		echo "timeout -k 1s --foreground $TIMEOUT"
+ 	fi
+ }
