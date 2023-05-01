@@ -1,105 +1,305 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E589612A
-	for <kvmarm@lists.linux.dev>; Mon,  1 May 2023 18:21:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47652C433EF;
-	Mon,  1 May 2023 18:21:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1682965312;
-	bh=V/JH3cr9i5AijKPl0ZmPkv2OS3bZnxOQkZm7dFZvhHo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=CK5QhAiNIHFoRaUP2WIHEiSGo1c/bRWtHDsZ05Ye/yAQMs9YrQXN4qqaVATAdEOng
-	 E97XWF46/o8TQVVJXRbMg3LO/jwpaQ4vAU24DUrAGpT6Nwm0Zc2chUFHKKIyIEKYcT
-	 vyCt6TDxs951YOUjSx6fUyRjk110t1XneF37n9Uj4mw1V5vfOmOGnCyqPojsO+qYWR
-	 8v64OIaDeJyEijbLQNkFwsmeTaC6u4uz9PD5PGR5cPyKh6tkFE/Mlf0xhuPK6Nq87P
-	 nWoALt8YogrZOwUtqGp541pZF6iotS5lVkbln/3xTslPQhpSfSVU6KdsKAJ1/VmqkR
-	 uUF/NplBt6asg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ptY9l-00CKYH-VJ;
-	Mon, 01 May 2023 19:21:50 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: [PATCH] KVM: arm64: vgic: Add Apple M2 PRO/MAX cpus to the list of broken SEIS implementations
-Date: Mon,  1 May 2023 19:21:41 +0100
-Message-Id: <20230501182141.39770-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D62948C05
+	for <kvmarm@lists.linux.dev>; Mon,  1 May 2023 22:27:40 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 572104B3;
+	Mon,  1 May 2023 15:28:18 -0700 (PDT)
+Received: from [192.168.5.23] (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 34AA33F5A1;
+	Mon,  1 May 2023 15:27:33 -0700 (PDT)
+Message-ID: <658590ba-1c73-87cd-b1b1-bcbf3e556f29@arm.com>
+Date: Mon, 1 May 2023 23:27:23 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.10.1
+Subject: Re: [kvm-unit-tests PATCH v5 00/29] EFI and ACPI support for arm64
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+ alexandru.elisei@arm.com, ricarkol@google.com, seanjc@google.com
+References: <20230428120405.3770496-1-nikos.nikoleris@arm.com>
+ <20230429-6da987552a8d15281f8444c9@orel>
+ <20230429-342c8a26e5db45474631a307@orel>
+ <6857da77-8d1e-ebcb-1571-6419d463fa53@arm.com>
+ <20230501-85b5dca6ed2d86d8bb0e55b6@orel>
+Content-Language: en-GB
+From: Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <20230501-85b5dca6ed2d86d8bb0e55b6@orel>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Unsurprisingly, the M2 PRO is also affected by the SEIS bug, so add it
-to the naughty list. And since M2 MAX is likely to be of the same ilk,
-flag it as well.
+On 01/05/2023 12:21, Andrew Jones wrote:
+> On Sun, Apr 30, 2023 at 01:02:42AM +0100, Nikos Nikoleris wrote:
+>> On 29/04/2023 17:21, Andrew Jones wrote:
+>>> On Sat, Apr 29, 2023 at 06:18:25PM +0200, Andrew Jones wrote:
+>>>> On Fri, Apr 28, 2023 at 01:03:36PM +0100, Nikos Nikoleris wrote:
+>>>>> Hello,
+>>>>>
+>>>>> This series adds initial support for building arm64 tests as EFI
+>>>>> apps and running them under QEMU. Much like x86_64, we import external
+>>>>> dependencies from gnu-efi and adapt them to work with types and other
+>>>>> assumptions from kvm-unit-tests. In addition, this series adds support
+>>>>> for enumerating parts of the system using ACPI.
+>>>>>
+>>>>> The first set of patches, moves the existing ACPI code to the common
+>>>>> lib path. Then, it extends definitions and functions to allow for more
+>>>>> robust discovery of ACPI tables. We add support for setting up the PSCI
+>>>>> conduit, discovering the UART, timers, GIC and cpus via ACPI. The code
+>>>>> retains existing behavior and gives priority to discovery through DT
+>>>>> when one has been provided.
+>>>>>
+>>>>> In the second set of patches, we add support for getting the command
+>>>>> line from the EFI shell. This is a requirement for many of the
+>>>>> existing arm64 tests.
+>>>>>
+>>>>> In the third set of patches, we import code from gnu-efi, make minor
+>>>>> changes and add an alternative setup sequence from arm64 systems that
+>>>>> boot through EFI. Finally, we add support in the build system and a
+>>>>> run script which is used to run an EFI app.
+>>>>>
+>>>>> After this set of patches one can build arm64 EFI tests:
+>>>>>
+>>>>> $> ./configure --enable-efi
+>>>>> $> make
+>>>>>
+>>>>> And use the run script to run an EFI tests:
+>>>>>
+>>>>> $> ./arm/efi/run ./arm/selftest.efi -smp 2 -m 256 -append "setup smp=2 mem=256"
+>>>>>
+>>>>> Or all tests:
+>>>>>
+>>>>> $> ./run_tests.sh
+>>>>>
+>>>>> There are a few items that this series does not address but they would
+>>>>> be useful to have:
+>>>>>    - Support for booting the system from EL2. Currently, we assume that a
+>>>>>      test starts EL1. This will be required to run EFI tests on sytems
+>>>>>      that implement EL2.
+>>>>>    - Support for reading environment variables and populating __envp.
+>>>>>    - Support for discovering the PCI subsystem using ACPI.
+>>>>>    - Get rid of other assumptions (e.g., vmalloc area) that don't hold on
+>>>>>      real HW.
+>>>>>    - Various fixes related to cache maintaince to better support turn the
+>>>>>      MMU off.
+>>>>>    - Switch to a new stack and avoid relying on the one provided by EFI.
+>>>>>
+>>>>> git branch: https://github.com/relokin/kvm-unit-tests/pull/new/target-efi-upstream-v5
+>>>>>
+>>>>> v4: https://lore.kernel.org/kvmarm/20230213101759.2577077-1-nikos.nikoleris@arm.com/
+>>>>> v3: https://lore.kernel.org/all/20220630100324.3153655-1-nikos.nikoleris@arm.com/
+>>>>> v2: https://lore.kernel.org/kvm/20220506205605.359830-1-nikos.nikoleris@arm.com/
+>>>>>
+>>>>> Changes in v5:
+>>>>>    - Minor style changes (thanks Shaoqin).
+>>>>>    - Avoid including lib/acpi.o to cflatobjs twice (thanks Drew).
+>>>>>    - Increase NR_INITIAL_MEM_REGIONS to avoid overflows and add check when
+>>>>>      we run out of space (thanks Shaoqin).
+>>>>>
+>>>>> Changes in v4:
+>>>>>    - Removed patch that reworks cache maintenance when turning the MMU
+>>>>>      off. This is not strictly required for EFI tests running with tcg and
+>>>>>      will be addressed in a separate series by Alex.
+>>>>>    - Fix compilation for arm (Alex).
+>>>>>    - Convert ACPI tables to Linux style (Alex).
+>>>>>
+>>>>> Changes in v3:
+>>>>>    - Addressed feedback from Drew, Alex and Ricardo. Many thanks for the reviews!
+>>>>>    - Added support for discovering the GIC through ACPI
+>>>>>    - Added a missing header file (<elf.h>)
+>>>>>    - Added support for correctly parsing the outcome of tests (./run_tests)
+>>>>>
+>>>>
+>>>> Thanks, Nikos!
+>>>>
+>>>> I'd like to get an ack from either Paolo or Sean on the changes to ACPI,
+>>>> as they're shared with x86, and there are also some x86 code changes.
+>>>
+>>> Actually, there are two build pipeline failures with the new ACPI code.
+>>> Please take a look at
+>>>
+>>> https://gitlab.com/jones-drew/kvm-unit-tests/-/pipelines/852864569
+>>>
+>>
+>> Thanks for reviewing the series!
+>>
+>> I think this fixes the compilation issues:
+>>
+>> diff --git a/lib/acpi.h b/lib/acpi.h
+>> index 202d832e..c330c877 100644
+>> --- a/lib/acpi.h
+>> +++ b/lib/acpi.h
+>> @@ -292,7 +292,8 @@ struct acpi_table_gtdt {
+>>          u32 platform_timer_offset;
+>>   };
+>>
+>> -#pragma pack(0)
+>> +/* Reset to default packing */
+>> +#pragma pack()
+>>
+>>   void set_efi_rsdp(struct acpi_table_rsdp *rsdp);
+>>   void *find_acpi_table_addr(u32 sig);
+>> diff --git a/lib/acpi.c b/lib/acpi.c
+>> index 760cd8b2..0440cddb 100644
+>> --- a/lib/acpi.c
+>> +++ b/lib/acpi.c
+>> @@ -70,7 +70,7 @@ void *find_acpi_table_addr(u32 sig)
+>>                  return rsdt;
+>>
+>>          if (rsdp->revision >= 2) {
+>> -               xsdt = (void *)rsdp->xsdt_physical_address;
+>> +               xsdt = (void *)(ulong) rsdp->xsdt_physical_address;
+>>                  if (xsdt && xsdt->signature != XSDT_SIGNATURE)
+>>                          xsdt = NULL;
+>>          }
+>>
+>>> Thanks,
+>>> drew
+>>>
+>>>>
+>>>> Also,
+>>>>
+>>>>     1) It'd be nice if this worked with DT, too. We can use UEFI with DT
+>>>>        when adding '-no-acpi' to the QEMU command line. setup_efi() needs
+>>>>        to learn how to find the dtb and most the '#ifdef CONFIG_EFI's
+>>>>        would need to change to a new CONFIG_ACPI guard.
+>>>>
+>>
+>> I had a quick look at it at some point and it didn't look straightforward
+>> but I'll check again.
+>>
+>>>>     2) The debug bp and ss tests fail with EFI, but not without, for me.
+>>>>
+>>
+>> I think, I've found the problem, the patch below fixes it for me.
+>>
+>> diff --git a/arm/debug.c b/arm/debug.c
+>> index b3e9749c..126fa267 100644
+>> --- a/arm/debug.c
+>> +++ b/arm/debug.c
+>> @@ -292,11 +292,14 @@ static noinline void test_hw_bp(bool migrate)
+>>          hw_bp_idx = 0;
+>>
+>>          /* Trap on up to 16 debug exception unmask instructions. */
+>> -       asm volatile("hw_bp0:\n"
+>> -            "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr
+>> daifclr, #8\n"
+>> -            "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr
+>> daifclr, #8\n"
+>> -            "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr
+>> daifclr, #8\n"
+>> -            "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr
+>> daifclr, #8\n");
+>> +       asm volatile(
+>> +               ".globl hw_bp0\n"
+>> +               "hw_bp0:\n"
+>> +                       "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8;
+>> msr daifclr, #8\n"
+>> +                       "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8;
+>> msr daifclr, #8\n"
+>> +                       "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8;
+>> msr daifclr, #8\n"
+>> +                       "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8;
+>> msr daifclr, #8\n"
+>> +               );
+>>
+>>          for (i = 0, addr = (uint64_t)&hw_bp0; i < num_bp; i++, addr += 4)
+>>                  report(hw_bp_addr[i] == addr, "hw breakpoint: %d", i);
+>> @@ -367,11 +370,14 @@ static noinline void test_ss(bool migrate)
+>>
+>>          asm volatile("msr daifclr, #8");
+>>
+>> -       asm volatile("ss_start:\n"
+>> +       asm volatile(
+>> +               ".globl ss_start\n"
+>> +               "ss_start:\n"
+>>                          "mrs x0, esr_el1\n"
+>>                          "add x0, x0, #1\n"
+>>                          "msr daifset, #8\n"
+>> -                       : : : "x0");
+>> +                       : : : "x0"
+>> +               );
+>>
+>>          report(ss_addr[0] == (uint64_t)&ss_start, "single step");
+>>   }
+>>
+>>>>     3) The timer test runs (and succeeds) when run with
+>>>>        './arm/efi/run ./arm/timer.efi', but not when run with
+>>>>        './run_tests.sh -g timer'. This is because UEFI takes
+>>>>        up all the given timeout time (10s), and then the test times out.
+>>>>        The hackyish fix below resolves it for me. I'll consider posting it
+>>>>        as a real patch
+>>>>
+>>
+>> I see. I didn't hit the timeout on my test machine but I tried on a slower
+>> machine and I did.
+>>
+>> New branch with the fixups here:
+>>
+>> https://github.com/relokin/kvm-unit-tests/pull/new/target-efi-upstream-v5
+> 
+> Thanks for the quick fixes. Can you update your tree and make an MR? I
+> no longer use github.com/rhdrjones/kvm-unit-tests. I use
+> 
+> https://gitlab.com/jones-drew/kvm-unit-tests.git
+> 
 
-Tested on a M2 PRO mini machine.
+You mean a MR into your repo and to the branch arm/queue, don't you? 
+I've tried doing that but I get an error: "Target branch "arm/queue" 
+does not exist", but it allows me to create a MR into other repos. Am I 
+doing something wrong?
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/cputype.h | 8 ++++++++
- arch/arm64/kvm/vgic/vgic-v3.c    | 4 ++++
- 2 files changed, 12 insertions(+)
+My branch on gitlab:
 
-diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
-index 683ca3af4084..5f6f84837a49 100644
---- a/arch/arm64/include/asm/cputype.h
-+++ b/arch/arm64/include/asm/cputype.h
-@@ -126,6 +126,10 @@
- #define APPLE_CPU_PART_M1_FIRESTORM_MAX	0x029
- #define APPLE_CPU_PART_M2_BLIZZARD	0x032
- #define APPLE_CPU_PART_M2_AVALANCHE	0x033
-+#define APPLE_CPU_PART_M2_BLIZZARD_PRO	0x034
-+#define APPLE_CPU_PART_M2_AVALANCHE_PRO	0x035
-+#define APPLE_CPU_PART_M2_BLIZZARD_MAX	0x038
-+#define APPLE_CPU_PART_M2_AVALANCHE_MAX	0x039
- 
- #define AMPERE_CPU_PART_AMPERE1		0xAC3
- 
-@@ -181,6 +185,10 @@
- #define MIDR_APPLE_M1_FIRESTORM_MAX MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_FIRESTORM_MAX)
- #define MIDR_APPLE_M2_BLIZZARD MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_BLIZZARD)
- #define MIDR_APPLE_M2_AVALANCHE MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_AVALANCHE)
-+#define MIDR_APPLE_M2_BLIZZARD_PRO MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_BLIZZARD_PRO)
-+#define MIDR_APPLE_M2_AVALANCHE_PRO MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_AVALANCHE_PRO)
-+#define MIDR_APPLE_M2_BLIZZARD_MAX MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_BLIZZARD_MAX)
-+#define MIDR_APPLE_M2_AVALANCHE_MAX MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_AVALANCHE_MAX)
- #define MIDR_AMPERE1 MIDR_CPU_MODEL(ARM_CPU_IMP_AMPERE, AMPERE_CPU_PART_AMPERE1)
- 
- /* Fujitsu Erratum 010001 affects A64FX 1.0 and 1.1, (v0r0 and v1r0) */
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 469d816f356f..93a47a515c13 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -616,6 +616,10 @@ static const struct midr_range broken_seis[] = {
- 	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM_MAX),
- 	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD),
- 	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_PRO),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_PRO),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_MAX),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_MAX),
- 	{},
- };
- 
--- 
-2.34.1
+https://gitlab.com/nnikoleris/kvm-unit-tests/-/tree/target-efi-upstream-v6-pre
 
+Has the new fixups squashed and I've added Shaoqin's Reviewed-by tags. 
+And the branch with the fixups separately lives here:
+
+https://gitlab.com/nnikoleris/kvm-unit-tests/-/tree/target-efi-upstream-v5-fixups
+
+Do you want me to add your patch as well? Or are you going to add it 
+afterwards? Meanwhile, I've tried adding support for booting using a 
+fdt. I think it's not too hard, but I wouldn't mind merging this series 
+first and looking at the patches for the fdt support later.
+
+Thanks,
+
+Nikos
+
+
+> Thanks,
+> drew
+> 
+>>
+>> Many thanks,
+>>
+>> Nikos
+>>
+>>>> Thanks,
+>>>> drew
+>>>>
+>>>> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+>>>> index 51e4b97b27d1..72ce718b1170 100644
+>>>> --- a/scripts/arch-run.bash
+>>>> +++ b/scripts/arch-run.bash
+>>>> @@ -94,7 +94,17 @@ run_qemu_status ()
+>>>>    timeout_cmd ()
+>>>>    {
+>>>> +	local s
+>>>> +
+>>>>    	if [ "$TIMEOUT" ] && [ "$TIMEOUT" != "0" ]; then
+>>>> +		if [ "$CONFIG_EFI" = 'y' ]; then
+>>>> +			s=${TIMEOUT: -1}
+>>>> +			if [ "$s" = 's' ]; then
+>>>> +				TIMEOUT=${TIMEOUT:0:-1}
+>>>> +				((TIMEOUT += 10)) # Add 10 seconds for booting UEFI
+>>>> +				TIMEOUT="${TIMEOUT}s"
+>>>> +			fi
+>>>> +		fi
+>>>>    		echo "timeout -k 1s --foreground $TIMEOUT"
+>>>>    	fi
+>>>>    }
