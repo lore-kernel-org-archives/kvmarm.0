@@ -1,147 +1,130 @@
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ECAB29A8;
-	Wed,  3 May 2023 23:43:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1683157422; x=1714693422;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=qTenYN15vOzc0n9ab3eQwMr2KsWCXdTwEdx3dVCYBow=;
-  b=jYAxGoJO0fDVSS+vr6Mi64f4NGcrP/omTTEPUYvZe1TDdGjO5k1h+H9Q
-   Bw7tWhTfY4drtcxwfUu0ELq7RW2K/GZ/H9QZFh85XsVplzzehcVv94QKM
-   bcIspTni/5cVqeYbyC211D6PGJN7anXH90ps1zoIqASaMsqYGI56gimGP
-   iqrLjaugo5t3BVF07TNGxGtCBw1WQ0pC25rBcmm+myzUh9UOfiAKRodJl
-   z+PSaFLH1ULElZmSe5dzz/uCOqfPFogNA/EyfR5fBwcOU/UaGjZODLcIf
-   9yEU+Yudo/bw9Cg6N3GRFgjmQ4yR0IJMeDAYMbBwuvqLWJB3EstjA+5Sl
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10699"; a="350875766"
-X-IronPort-AV: E=Sophos;i="5.99,248,1677571200"; 
-   d="scan'208";a="350875766"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2023 16:43:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10699"; a="840881961"
-X-IronPort-AV: E=Sophos;i="5.99,248,1677571200"; 
-   d="scan'208";a="840881961"
-Received: from lkp-server01.sh.intel.com (HELO e3434d64424d) ([10.239.97.150])
-  by fmsmga001.fm.intel.com with ESMTP; 03 May 2023 16:43:38 -0700
-Received: from kbuild by e3434d64424d with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1puM8H-0002N8-2g;
-	Wed, 03 May 2023 23:43:37 +0000
-Date: Thu, 4 May 2023 07:43:29 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-	KVMARM <kvmarm@lists.linux.dev>,
-	ARMLinux <linux-arm-kernel@lists.infradead.org>,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@google.com>
-Cc: oe-kbuild-all@lists.linux.dev, Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v8 3/6] KVM: arm64: Use per guest ID register for
- ID_AA64PFR0_EL1.[CSV2|CSV3]
-Message-ID: <202305040748.hUxGyrJF-lkp@intel.com>
-References: <20230503171618.2020461-4-jingzhangos@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3DD4FC17
+	for <kvmarm@lists.linux.dev>; Wed,  3 May 2023 23:45:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1683157533;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BMaKw+IppdV4cHhReakXaZPqqwThQZcij9BRR4m2CeA=;
+	b=XKwnuEeDedzni+KyuOJ0zP112fXXGjgVQK1gWqXnUJ5s9RsOXsNvIC4qM5QoKXu3ufigof
+	nsR1c4WYfRpqM29d6cvgxdGra3Z1i8P49BAlPkIYcjD2PlOERhu1OwiW7d584ZpvRuGs8Z
+	P+0R+DI8ErOfYEb6/E0lss5GX3BUtGo=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-308-9fGV3FEhNOCVA3jcgsAtZg-1; Wed, 03 May 2023 19:45:32 -0400
+X-MC-Unique: 9fGV3FEhNOCVA3jcgsAtZg-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-61b5f341341so5473356d6.0
+        for <kvmarm@lists.linux.dev>; Wed, 03 May 2023 16:45:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683157531; x=1685749531;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BMaKw+IppdV4cHhReakXaZPqqwThQZcij9BRR4m2CeA=;
+        b=QKrFFzhAJITanrfDzSsIe4SZB5cRKKB8MKALpl+q/9R7LryyOZKueOSze3bPI+iP9O
+         0oy7x8MOPcton6iSCMSRseZSo3I9GfNhrgFLwMrGhVGJOYxG7KEoJshxlsL5LT8tHSae
+         +l73OC46m4Jf5MPqK187ATaOb9mPR6emxd/yQmuLiC/QY6yLNcQV8qDMT+pDpZvmNUSI
+         g6wrbSSkcJkOOsRtYRAisQeXzfTG0HcwOscANnLsAon6vh0NvDnhmeaVLbOtHs6q2AIp
+         2eAoF9Pq5eQDjeqmOmEjlEllTrxKHkeqrPNGCp1nYR1jDHAwynzgQC9oqxm3/LydW7sj
+         6SNw==
+X-Gm-Message-State: AC+VfDzSBIsbDrIo1hBjgcRQ8JD1EeXalFPOi9SffDFmn8YpPvyydbWI
+	R8kJL8srtzs6zxCsRVlgVb0nMpXCF3cN0Ak0DCY6rljbBbFzr3gT7lNDHP+qUlS0wFWygtmlYbn
+	s3rwm5pdepbaBDP6A
+X-Received: by 2002:a05:6214:4111:b0:61b:9e0f:9398 with SMTP id kc17-20020a056214411100b0061b9e0f9398mr1699825qvb.5.1683157531196;
+        Wed, 03 May 2023 16:45:31 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ4JTxs6jVg6TlbxOKspmgRaahwdFBNfWZjzFxJhtQsbdgr1QwXuBM2wDKtRzzjKkbggRojs5w==
+X-Received: by 2002:a05:6214:4111:b0:61b:9e0f:9398 with SMTP id kc17-20020a056214411100b0061b9e0f9398mr1699802qvb.5.1683157530876;
+        Wed, 03 May 2023 16:45:30 -0700 (PDT)
+Received: from x1n (bras-base-aurron9127w-grc-40-70-52-229-124.dsl.bell.ca. [70.52.229.124])
+        by smtp.gmail.com with ESMTPSA id jo30-20020a056214501e00b0061693e61dbfsm4998439qvb.63.2023.05.03.16.45.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 May 2023 16:45:30 -0700 (PDT)
+Date: Wed, 3 May 2023 19:45:28 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Anish Moorthy <amoorthy@google.com>, Nadav Amit <nadav.amit@gmail.com>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org,
+	oliver.upton@linux.dev, James Houghton <jthoughton@google.com>,
+	bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
+	kvm <kvm@vger.kernel.org>, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
+ migration via annotated memory faults.
+Message-ID: <ZFLyGDoXHQrN1CCD@x1n>
+References: <ZEGuogfbtxPNUq7t@x1n>
+ <46DD705B-3A3F-438E-A5B1-929C1E43D11F@gmail.com>
+ <CAF7b7mo78e2YPHU5YrhzuORdpGXCVRxXr6kSyMa+L+guW8jKGw@mail.gmail.com>
+ <84DD9212-31FB-4AF6-80DD-9BA5AEA0EC1A@gmail.com>
+ <CAF7b7mr-_U6vU1iOwukdmOoaT0G1ttyxD62cv=vebnQeXL3R0w@mail.gmail.com>
+ <ZErahL/7DKimG+46@x1n>
+ <CAF7b7mqaxk6w90+9+5UkEAE13vDTmBMmCO_ZdAEo6pD8_--fZA@mail.gmail.com>
+ <ZFLPlRReglM/Vgfu@x1n>
+ <ZFLRpEV09lrpJqua@x1n>
+ <ZFLVS+UvpG5w747u@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <ZFLVS+UvpG5w747u@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230503171618.2020461-4-jingzhangos@google.com>
 
-Hi Jing,
+On Wed, May 03, 2023 at 02:42:35PM -0700, Sean Christopherson wrote:
+> On Wed, May 03, 2023, Peter Xu wrote:
+> > Oops, bounced back from the list..
+> > 
+> > Forward with no attachment this time - I assume the information is still
+> > enough in the paragraphs even without the flamegraphs.
+> 
+> The flamegraphs are definitely useful beyond what is captured here.  Not sure
+> how to get them accepted on the list though.
 
-kernel test robot noticed the following build errors:
+Trying again with google drive:
 
-[auto build test ERROR on 6a8f57ae2eb07ab39a6f0ccad60c760743051026]
+single uffd:
+https://drive.google.com/file/d/1bYVYefIRRkW8oViRbYv_HyX5Zf81p3Jl/view
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jing-Zhang/KVM-arm64-Move-CPU-ID-feature-registers-emulation-into-a-separate-file/20230504-011759
-base:   6a8f57ae2eb07ab39a6f0ccad60c760743051026
-patch link:    https://lore.kernel.org/r/20230503171618.2020461-4-jingzhangos%40google.com
-patch subject: [PATCH v8 3/6] KVM: arm64: Use per guest ID register for ID_AA64PFR0_EL1.[CSV2|CSV3]
-config: arm64-allyesconfig (https://download.01.org/0day-ci/archive/20230504/202305040748.hUxGyrJF-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/5c887874c5459c9690cf3eac8b68022d72789533
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Jing-Zhang/KVM-arm64-Move-CPU-ID-feature-registers-emulation-into-a-separate-file/20230504-011759
-        git checkout 5c887874c5459c9690cf3eac8b68022d72789533
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=arm64 olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash arch/arm64/
+32 uffds:
+https://drive.google.com/file/d/1T19yTEKKhbjU9G2FpANIvArSC61mqqtp/view
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202305040748.hUxGyrJF-lkp@intel.com/
+> 
+> > > From what I got there, vmx_vcpu_load() gets more highlights than the
+> > > spinlocks. I think that's the tlb flush broadcast.
+> 
+> No, it's KVM dealing with the vCPU being migrated to a different pCPU.  The
+> smp_call_function_single() that shows up is from loaded_vmcs_clear() and is
+> triggered when KVM needs to VMCLEAR the VMCS on the _previous_ pCPU (yay for the
+> VMCS caches not being coherent).
+> 
+> Task migration can also trigger IBPB (if mitigations are enabled), and also does
+> an "all contexts" INVEPT, i.e. flushes all TLB entries for KVM's MMU.
+> 
+> Can you trying 1:1 pinning of vCPUs to pCPUs?  That _should_ eliminate the
+> vmx_vcpu_load_vmcs() hotspot, and for large VMs is likely represenative of a real
+> world configuration.
 
-All errors (new ones prefixed by >>):
+Yes it does went away:
 
-   In file included from include/linux/rhashtable-types.h:14,
-                    from include/linux/ipc.h:7,
-                    from include/uapi/linux/sem.h:5,
-                    from include/linux/sem.h:5,
-                    from include/linux/sched.h:15,
-                    from include/linux/hardirq.h:9,
-                    from include/linux/kvm_host.h:7,
-                    from arch/arm64/kvm/id_regs.c:13:
-   arch/arm64/kvm/id_regs.c: In function 'get_id_reg':
->> arch/arm64/kvm/id_regs.c:152:25: error: 'struct kvm_arch' has no member named 'config_lock'
-     152 |         mutex_lock(&arch->config_lock);
-         |                         ^~
-   include/linux/mutex.h:187:44: note: in definition of macro 'mutex_lock'
-     187 | #define mutex_lock(lock) mutex_lock_nested(lock, 0)
-         |                                            ^~~~
-   arch/arm64/kvm/id_regs.c:154:27: error: 'struct kvm_arch' has no member named 'config_lock'
-     154 |         mutex_unlock(&arch->config_lock);
-         |                           ^~
-   arch/arm64/kvm/id_regs.c: In function 'set_id_aa64pfr0_el1':
-   arch/arm64/kvm/id_regs.c:221:25: error: 'struct kvm_arch' has no member named 'config_lock'
-     221 |         mutex_lock(&arch->config_lock);
-         |                         ^~
-   include/linux/mutex.h:187:44: note: in definition of macro 'mutex_lock'
-     187 | #define mutex_lock(lock) mutex_lock_nested(lock, 0)
-         |                                            ^~~~
-   arch/arm64/kvm/id_regs.c:239:27: error: 'struct kvm_arch' has no member named 'config_lock'
-     239 |         mutex_unlock(&arch->config_lock);
-         |                           ^~
+https://drive.google.com/file/d/1ZFhWnWjoU33Lxy43jTYnKFuluo4zZArm/view
 
+With pinning vcpu threads only (again, over 40 hard cores/threads):
 
-vim +152 arch/arm64/kvm/id_regs.c
+./demand_paging_test -b 512M -u MINOR -s shmem -v 32 -c 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32
 
-   139	
-   140	/*
-   141	 * cpufeature ID register user accessors
-   142	 *
-   143	 * For now, these registers are immutable for userspace, so no values
-   144	 * are stored, and for set_id_reg() we don't allow the effective value
-   145	 * to be changed.
-   146	 */
-   147	static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-   148			      u64 *val)
-   149	{
-   150		struct kvm_arch *arch = &vcpu->kvm->arch;
-   151	
- > 152		mutex_lock(&arch->config_lock);
-   153		*val = read_id_reg(vcpu, rd);
-   154		mutex_unlock(&arch->config_lock);
-   155	
-   156		return 0;
-   157	}
-   158	
+It seems to me for some reason the scheduler ate more than I expected..
+Maybe tomorrow I can try two more things:
+
+  - Do cpu isolations, and
+  - pin reader threads too (or just leave the readers on housekeeping cores)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+Peter Xu
+
