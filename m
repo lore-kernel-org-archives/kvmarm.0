@@ -1,93 +1,158 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 377EA28F1
-	for <kvmarm@lists.linux.dev>; Tue,  2 May 2023 22:31:25 +0000 (UTC)
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-559c416b024so48046717b3.1
-        for <kvmarm@lists.linux.dev>; Tue, 02 May 2023 15:31:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0117DD527
+	for <kvmarm@lists.linux.dev>; Wed,  3 May 2023 17:16:22 +0000 (UTC)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-51b7810ec2cso2706033a12.1
+        for <kvmarm@lists.linux.dev>; Wed, 03 May 2023 10:16:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683066684; x=1685658684;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SIVJcGIva647UNmGPK+udMl/NK3kjFoUm0hqJKOqIDI=;
-        b=yug6czQuDTCW52dBy0FDo7Ylclb8BkXmgTi1DJAnoQ+xgU2idHTbWnXdTTaBWr6dzJ
-         IEdaDHkrbH3ssuq/0xYLXmYabqGtRcwcr+4NpyOB2Sfk09KVuV3cm0jmd8R46YYbKZ9M
-         dErvexVAqOHnTn0m2k69T5hQi/ufSgbuubVsS+RcPUU8J5eJBTDEreEaIwzqQS07CFlx
-         oXQPNrrmE78oDI6/2VBhOdr308e2+MjVjSDM8vbedos5C9W/OsNwIVTvcP1hz3HcY6+v
-         tLWRmTwghSrHm/aghAQOOCRp3mkhP40paoqjzVQ1BhxqUqKiL8BjRoDvhdXJ1y1YD8zp
-         PZ1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683066684; x=1685658684;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+        d=google.com; s=20221208; t=1683134182; x=1685726182;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=SIVJcGIva647UNmGPK+udMl/NK3kjFoUm0hqJKOqIDI=;
-        b=M6IEfQLt94Gbzf+kfDb5v3xCNXNvw8uKrIIZ6PoWfr05WhZ/xuUv993x7nvQaIKpjL
-         05WCoHfpS+dyRHmzwXv+9Zc4uzs2Q3F1H8zcYomvljBWnAcj6eDMRrQKqC6rYG3VZTIs
-         /UzA3Vh2+k+s2fWCQrd+Dd1SVm6lq7ngBkvdEc1M+h3qu5J2uD99FYAatrNv3fDLSLb6
-         fZTjr+LEeCs2DED0RbhgkejZj6gDCbuf54aLpC8mfdklKtiouldfNeGIkTSkf4lLZoDy
-         WNbfTZiJZMUIWsL7YZKoGeTaEoGXct08LpogyZEiqkBY1pNNGGb/w6Jb4rh3fpsznxjy
-         OuIg==
-X-Gm-Message-State: AC+VfDw3Ebj/x1FiQi6I5Vi4HMpO3oA0XKlRE+k/saSSh5irYeQww+Mv
-	xx581LxIxKDY4cQqOcPpDCyl8gXnBzQ=
-X-Google-Smtp-Source: ACHHUZ7EqoPbhh3PehAzC9G/nHvcRMmoqlIIGsHGscULH/yhOYfuJYlRXmZ0yd6tLxOKpU03tK93mgs1Qj8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:72c:b0:52e:e095:d840 with SMTP id
- bt12-20020a05690c072c00b0052ee095d840mr11910199ywb.0.1683066684192; Tue, 02
- May 2023 15:31:24 -0700 (PDT)
-Date: Tue, 2 May 2023 15:31:22 -0700
-In-Reply-To: <CAF7b7moeysHUtiS_5DL9c5OPKnCsiO50zBkjp1m4QjVTvXF58A@mail.gmail.com>
+        bh=6wPIZHfMdyNSUYvu5p6eaccHZlZ9mAn9Wy69dqDKFNM=;
+        b=wbxJz6vFGiiX1ojMxIrNJ89x8V/b6JZAwBvH7KKAsKxsDsbh5DV4Gz7MV/uimhCJWG
+         m3Nne3zkqJudHpzdTxyri5NWzmZ4qfLPp5rvisHHo5/d3hHf23x/A7B5v6PmbfhMtecq
+         MHVeQTVanEQOkk9uNxZiMg8qyxgFrTLPdd9edveTML4SIjqHY/veKHW0P+7516HxnBGA
+         gtv206X0B9bnbqffAMAQy6czUBawqWAVHlHUcZLigBRSCl+fubM8/OPGEKS+IeVExCdn
+         kCaB6sfDfFbQnN+ypV2zZ5U8TP46koV2/H6zLKYK7akBRQkd7vzp7F6BygQmxD1MDHgi
+         OKVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683134182; x=1685726182;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6wPIZHfMdyNSUYvu5p6eaccHZlZ9mAn9Wy69dqDKFNM=;
+        b=L0MtBmCTsczXkp8KTeN+I2VzDsX2FGKft8fiLQ3rOcyktkKq4OPi5gkMZr2iTSMswT
+         9IteQfe3arssy2oLMI702PugVeWqWo3p452bj35P413qBE0tu5/MylZGymxKBiXONLBo
+         L2KWAiiHDtZPmDXUA7pxpZTb/3LVZfSS/f/gJcRIzZxt4SOaNsiAwDzYjjJN83tZsZs2
+         YfPEQMvGhAz89T9ZLZuqoNJ+opMSp714mTGh9D2+pjU2f0CnmNY3PEjlFAbUyzRRfUDW
+         1fERjQ0bOHYQgpExm4pfpjzvVP9y2UB81O+UYR6SxpQ6zXJobEoslsZxtPcC20xdlOJk
+         C3fg==
+X-Gm-Message-State: AC+VfDxI/g0II+8dxD+2tBLIntW8Fwpwy1OwSfdsfHaercbV9hLj4YQK
+	HpwZFrMbJ3+6STwTjtOerHem7nyL8powi8qeDA==
+X-Google-Smtp-Source: ACHHUZ470UCPSPii7GUK6MMRF5uGAqyb9vxQhHSFfnqRY8TQPHDQKxEUJycgvpKWLyAHRnwoC+sbkgADsl8nZdxRVA==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a63:9144:0:b0:52c:41a1:a528 with SMTP
+ id l65-20020a639144000000b0052c41a1a528mr707697pge.12.1683134182463; Wed, 03
+ May 2023 10:16:22 -0700 (PDT)
+Date: Wed,  3 May 2023 17:16:12 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230412213510.1220557-1-amoorthy@google.com> <20230412213510.1220557-5-amoorthy@google.com>
- <CAF7b7mqq3UMeO3M-Fy8SqyL=mjxY4-TyA_PjgGsdVWZrsU2LLQ@mail.gmail.com>
- <ZFFbwOXZ5uI/gdaf@google.com> <CAF7b7moqW41QRNowSnz3E-T+VQMrkeJthDVxM2tuNHtJ5TTjjQ@mail.gmail.com>
- <ZFF1ibyPZHKYzEuY@google.com> <CAF7b7moeysHUtiS_5DL9c5OPKnCsiO50zBkjp1m4QjVTvXF58A@mail.gmail.com>
-Message-ID: <ZFGPOiip/Sf8V8DU@google.com>
-Subject: Re: [PATCH v3 04/22] KVM: x86: Set vCPU exit reason to
- KVM_EXIT_UNKNOWN at the start of KVM_RUN
-From: Sean Christopherson <seanjc@google.com>
-To: Anish Moorthy <amoorthy@google.com>
-Cc: pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev, 
-	jthoughton@google.com, bgardon@google.com, dmatlack@google.com, 
-	ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com, 
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+X-Mailer: git-send-email 2.40.1.495.gc816e09b53d-goog
+Message-ID: <20230503171618.2020461-1-jingzhangos@google.com>
+Subject: [PATCH v8 0/6] Support writable CPU ID registers from userspace
+From: Jing Zhang <jingzhangos@google.com>
+To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@google.com>
+Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, 
+	Reiji Watanabe <reijiw@google.com>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Jing Zhang <jingzhangos@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, May 02, 2023, Anish Moorthy wrote:
-> On Tue, May 2, 2023 at 1:41=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
-> >
-> > If KVM triggers a WARN_ON_ONCE(), then that's an issue.  Though looking=
- at the
-> > code, the cui() aspect is a moot point.  As I stated in the previous di=
-scussion,
-> > the WARN_ON_ONCE() in question needs to be off-by-default.
-> >
-> >  : Hmm, one idea would be to have the initial -EFAULT detection fill kv=
-m_run.memory_fault,
-> >  : but set kvm_run.exit_reason to some magic number, e.g. zero it out. =
- Then KVM could
-> >  : WARN if something tries to overwrite kvm_run.exit_reason.  The WARN =
-would need to
-> >  : be buried by a Kconfig or something since kvm_run can be modified by=
- userspace,
-> >  : but other than that I think it would work.
->=20
-> Ah, ok: I thought using WARN_ON_ONCE instead of WARN might have
-> obviated the Kconfig. I'll go add one.
+This patchset refactors/adds code to support writable per guest CPU ID feature
+registers. Part of the code/ideas are from
+https://lore.kernel.org/all/20220419065544.3616948-1-reijiw@google.com .
+No functional change is intended in this patchset. With the new CPU ID feature
+registers infrastructure, only writtings of ID_AA64PFR0_EL1.[CSV2|CSV3],
+ID_AA64DFR0_EL1.PMUVer and ID_DFR0_ELF.PerfMon are allowed as KVM does before.
 
-Don't put too much effort into anything at this point.  I'm not entirely co=
-nvinced
-that it's worth carrying a Kconfig for this one-off case (my "suggestion" w=
-as mostly
-just me spitballing), and at a quick glance through the rest of the series,=
- I'll
-definitely have more comments when I do a full review, i.e. things may chan=
-ge too.
+Writable (Configurable) per guest CPU ID feature registers are useful for
+creating/migrating guest on ARM CPUs with different kinds of features.
+
+This patchset uses kvm->arch.config_lock from Oliver's lock inversion fixes at
+https://lore.kernel.org/linux-arm-kernel/20230327164747.2466958-1-oliver.upton@linux.dev/
+
+---
+
+* v7 -> v8
+  - Move idregs table sanity check to kvm_sys_reg_table_init.
+  - Only allow userspace writing before VM running.
+  - No lock is hold for guest access to idregs.
+  - Addressed some other comments from Reiji and Oliver.
+
+* v6 -> v7
+  - Rebased to v6.3-rc7.
+  - Add helpers for idregs read/write.
+  - Guard all idregs reads/writes.
+  - Add code to fix features' safe value type which is different for KVM than
+    for the host.
+
+* v5 -> v6
+  - Rebased to v6.3-rc5.
+  - Reuse struct sys_reg_desc's reset() callback and field val for KVM.
+    sanitisation function and writable mask instead of creating a new data
+    structure for idregs.
+  - Use get_arm64_ftr_reg() instead of exposing idregs ftr_bits array.
+
+* v4 -> v5
+  - Rebased to 2fad20ae05cb (kvmarm/next)
+    Merge branch kvm-arm64/selftest/misc-6,4 into kvmarm-master/next
+  - Use kvm->arch.config_lock to guard update to multiple VM scope idregs
+    to avoid lock inversion
+  - Add back IDREG() macro for idregs access
+  - Refactor struct id_reg_desc by using existing infrastructure.
+  - Addressed many other comments from Marc.
+
+* v3 -> v4
+  - Remove IDREG() macro for ID reg access, use simple array access instead
+  - Rename kvm_arm_read_id_reg_with_encoding() to kvm_arm_read_id_reg()
+  - Save perfmon value in ID_DFR0_EL1 instead of pmuver
+  - Update perfmon in ID_DFR0_EL1 and pmuver in ID_AA64DFR0_EL1 atomically
+  - Remove kvm_vcpu_has_pmu() in macro kvm_pmu_is_3p5()
+  - Improve ID register sanity checking in kvm_arm_check_idreg_table()
+
+* v2 -> v3
+  - Rebased to 96a4627dbbd4 (kvmarm/next)
+    Merge tag ' https://github.com/oupton/linux tags/kvmarm-6.3' from into kvmarm-master/next
+  - Add id registere emulation entry point function emulate_id_reg
+  - Fix consistency for ID_AA64DFR0_EL1.PMUVer and ID_DFR0_EL1.PerfMon
+  - Improve the checking for id register table by ensuring that every entry has
+    the correct id register encoding.
+  - Addressed other comments from Reiji and Marc.
+
+* v1 -> v2
+  - Rebase to 7121a2e1d107 (kvmarm/next) Merge branch kvm-arm64/nv-prefix into kvmarm/next
+  - Address writing issue for PMUVer
+
+[1] https://lore.kernel.org/all/20230201025048.205820-1-jingzhangos@google.com
+[2] https://lore.kernel.org/all/20230212215830.2975485-1-jingzhangos@google.com
+[3] https://lore.kernel.org/all/20230228062246.1222387-1-jingzhangos@google.com
+[4] https://lore.kernel.org/all/20230317050637.766317-1-jingzhangos@google.com
+[5] https://lore.kernel.org/all/20230402183735.3011540-1-jingzhangos@google.com
+[6] https://lore.kernel.org/all/20230404035344.4043856-1-jingzhangos@google.com
+[7] https://lore.kernel.org/all/20230424234704.2571444-1-jingzhangos@google.com
+
+---
+
+Jing Zhang (6):
+  KVM: arm64: Move CPU ID feature registers emulation into a separate
+    file
+  KVM: arm64: Save ID registers' sanitized value per guest
+  KVM: arm64: Use per guest ID register for ID_AA64PFR0_EL1.[CSV2|CSV3]
+  KVM: arm64: Use per guest ID register for ID_AA64DFR0_EL1.PMUVer
+  KVM: arm64: Reuse fields of sys_reg_desc for idreg
+  KVM: arm64: Refactor writings for PMUVer/CSV2/CSV3
+
+ arch/arm64/include/asm/cpufeature.h |   1 +
+ arch/arm64/include/asm/kvm_host.h   |  33 +-
+ arch/arm64/kernel/cpufeature.c      |   2 +-
+ arch/arm64/kvm/Makefile             |   2 +-
+ arch/arm64/kvm/arm.c                |  24 +-
+ arch/arm64/kvm/id_regs.c            | 717 ++++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c           | 534 ++++-----------------
+ arch/arm64/kvm/sys_regs.h           |  28 +-
+ include/kvm/arm_pmu.h               |   5 +-
+ 9 files changed, 864 insertions(+), 482 deletions(-)
+ create mode 100644 arch/arm64/kvm/id_regs.c
+
+
+base-commit: 6a8f57ae2eb07ab39a6f0ccad60c760743051026
+-- 
+2.40.1.495.gc816e09b53d-goog
+
