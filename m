@@ -1,585 +1,202 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F1772770C
-	for <kvmarm@lists.linux.dev>; Wed,  3 May 2023 17:16:34 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-559deafac49so95688197b3.1
-        for <kvmarm@lists.linux.dev>; Wed, 03 May 2023 10:16:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E9CDF44
+	for <kvmarm@lists.linux.dev>; Wed,  3 May 2023 19:45:45 +0000 (UTC)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-3f1763ee8f8so37769695e9.1
+        for <kvmarm@lists.linux.dev>; Wed, 03 May 2023 12:45:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683134193; x=1685726193;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LD8eS5xyhGqsj8lKD+Knwax1wsv6Nka1HQ5YxbZTTpk=;
-        b=hUdcrb34PKM/6OzYy8cAIjtKuZ1hUFcsqDUgpup+6Egrx0POlTH883hG4OnE/xO6IQ
-         ewY52J78aTG5B+mECkyYV08WUDXMVOLEyweTOU8Pg51OJoVXyK8GGURKtRDrKYFP9dx+
-         4RjuoDHE43XVL6tbmhbMgmckZzFLb3aeuVt6PfiH1yK5gUkMS9lpujuoHJMsLyrU0Vhp
-         XUMXNEngAoKcLsMN1dGg4KkM7M0bTihx6iBR/m8OiqfrUTeNG0EmuUk+StdcZgFk9ZOd
-         KWgP3jwtrJSfS1cKvWluUbKVLVYlY5y4fx09hvoEgvKS4jtK846sXPVrJc5Q26Wh/jLi
-         FrIQ==
+        d=google.com; s=20221208; t=1683143144; x=1685735144;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZN9SCBcx2ViqEMGRfFXiNyjtqYM584QAIWBPcow4amM=;
+        b=KeUbIYrY5kiOGnFrJaEPoGxzw1X/z5w0adl5bkHFYIzakq2Q81hc4g46g03LjUs80p
+         Bgv7eGdqaJ9RKZayp5zUx4jwVGtLGayekSa1bY53isRcdLnjMrzfiOhBaFpqv8TmxWzk
+         BnePlcwISdbS+maPK79/HxvtP+GFYofHiQH9VKt1vq8IfHd97t+ZNzqTRgsnUXiLgu5i
+         tBQ51+Wx1PZKfSkwHvVMaIN7HEaPtRq/TUXlUOz/y2zKjtgePoazkRM5RsOYd4Ftuzpa
+         4jIkDs3ao5AvqIW0QSqrPhzcGJxEeDakJ70oVTlpnokukvIlXp9TbPwlEfO+ogNwMBpp
+         NVJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683134193; x=1685726193;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LD8eS5xyhGqsj8lKD+Knwax1wsv6Nka1HQ5YxbZTTpk=;
-        b=JIHPFFRV8dMN98wjuTg96foeqN8h+V3S01lNFLj5EPqsOgj5xeETtoHAFOkasWT5+A
-         R/fENtFhq3JxunNgdQHIKNN9K6JvS4mMIaHOSAQc9mf/x/0s62gHCO+VgNGymBJGSrNn
-         MXryUs8OfvicNx3blXsVou+seA9GpHVcz0P3nGRrCPFvYpQ2osbCcLvE5qffqyjnBCYO
-         KoIflWF53i6yVnMfmqzcDTOsf8JeB8BF7/wT797vv1T/WishU3pv4QaKQTKnIqvQz2kZ
-         CfJ/IIreGZoaYIRem7CNBsvdwASeEO9MjcfTSNx8g6VPCHGvBUgTZ+tV1mzq5REOv7u2
-         8RHg==
-X-Gm-Message-State: AC+VfDw904Hg1ERKnatgXiLKCmkJl7GZaia8zONgoSluV4AJ6hA5lRE4
-	Sr9A1OqkWEHo/YDlshdHbUrc9KMYvissq7RZ0A==
-X-Google-Smtp-Source: ACHHUZ5Bke/R8eFg5fwu85amumBg8ZjKsNFYqixYgKNn/2aMA0ejT4WAswtiClIGPEOApKyZF11aOvJbpyH8ZNg+0Q==
-X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a81:b723:0:b0:55a:5641:54be with SMTP
- id v35-20020a81b723000000b0055a564154bemr6097125ywh.6.1683134193225; Wed, 03
- May 2023 10:16:33 -0700 (PDT)
-Date: Wed,  3 May 2023 17:16:18 +0000
-In-Reply-To: <20230503171618.2020461-1-jingzhangos@google.com>
+        d=1e100.net; s=20221208; t=1683143144; x=1685735144;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZN9SCBcx2ViqEMGRfFXiNyjtqYM584QAIWBPcow4amM=;
+        b=fGzpPm+l+2ti4fmWCi/BTzsYfi6uqxaRDQ4ubuCq1/mIId8YD2BrMJRES2pf4nLLVf
+         kfgVAU/SWuNU3WJzz3Y+Pe9Rh0PEVPoIbg7v9frOhYT1P7m4AIUJuRMisCVSs3+kqg8t
+         VTocbtIEMbQ0LGjKLGOdFAC85fRcyXXcdtL+CunTfVQ+ZS8oaJjxzt9YO3RqLFLMEYLi
+         /Wg5tB8lOAF/QlTDrPPpIb94ZXaYIZUldIKzQ9TnUw4hZE4DZv+3vR3XWxoDvR/z7iFD
+         OId6jHWBN0QJWUd0CxJqtnXzKLk5Z0QLSHQN7J8MwTgagH6ePPbYRITJjRPpBfqz5BgB
+         Dq4A==
+X-Gm-Message-State: AC+VfDzjU+LCImaBwFeMvg9OVRD2M47P9091s40v+IFdvCT56O0kVF3s
+	se3e9R2/Dbqf7Lx95/rxyKZvlytzHSGyzxfYVlcTMg==
+X-Google-Smtp-Source: ACHHUZ5egV4i+OwXEdYNDPLGVEGzVG5Seqj9/+jaFq19JZxHvehwHkYKSqZNoYYnKIScfvjfO/pTJpIHUfwq+yQSMw4=
+X-Received: by 2002:a7b:c408:0:b0:3f1:73ce:e1dd with SMTP id
+ k8-20020a7bc408000000b003f173cee1ddmr15362477wmi.10.1683143143896; Wed, 03
+ May 2023 12:45:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230503171618.2020461-1-jingzhangos@google.com>
-X-Mailer: git-send-email 2.40.1.495.gc816e09b53d-goog
-Message-ID: <20230503171618.2020461-7-jingzhangos@google.com>
-Subject: [PATCH v8 6/6] KVM: arm64: Refactor writings for PMUVer/CSV2/CSV3
-From: Jing Zhang <jingzhangos@google.com>
-To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@google.com>
-Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, 
-	Reiji Watanabe <reijiw@google.com>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Jing Zhang <jingzhangos@google.com>
+MIME-Version: 1.0
+References: <20230412213510.1220557-1-amoorthy@google.com> <ZEBHTw3+DcAnPc37@x1n>
+ <CAJHvVchBqQ8iVHgF9cVZDusMKQM2AjtNx2z=i9ZHP2BosN4tBg@mail.gmail.com>
+ <ZEBXi5tZZNxA+jRs@x1n> <CAF7b7mo68VLNp=QynfT7QKgdq=d1YYGv1SEVEDxF9UwHzF6YDw@mail.gmail.com>
+ <ZEGuogfbtxPNUq7t@x1n> <46DD705B-3A3F-438E-A5B1-929C1E43D11F@gmail.com>
+ <CAF7b7mo78e2YPHU5YrhzuORdpGXCVRxXr6kSyMa+L+guW8jKGw@mail.gmail.com>
+ <84DD9212-31FB-4AF6-80DD-9BA5AEA0EC1A@gmail.com> <CAF7b7mr-_U6vU1iOwukdmOoaT0G1ttyxD62cv=vebnQeXL3R0w@mail.gmail.com>
+ <ZErahL/7DKimG+46@x1n>
+In-Reply-To: <ZErahL/7DKimG+46@x1n>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Wed, 3 May 2023 12:45:07 -0700
+Message-ID: <CAF7b7mqaxk6w90+9+5UkEAE13vDTmBMmCO_ZdAEo6pD8_--fZA@mail.gmail.com>
+Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
+ migration via annotated memory faults.
+To: Peter Xu <peterx@redhat.com>
+Cc: Nadav Amit <nadav.amit@gmail.com>, Axel Rasmussen <axelrasmussen@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org, oliver.upton@linux.dev, 
+	Sean Christopherson <seanjc@google.com>, James Houghton <jthoughton@google.com>, bgardon@google.com, 
+	dmatlack@google.com, ricarkol@google.com, kvm <kvm@vger.kernel.org>, 
+	kvmarm@lists.linux.dev
+Content-Type: multipart/mixed; boundary="00000000000033800305facf4d86"
+
+--00000000000033800305facf4d86
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Refactor writings for ID_AA64PFR0_EL1.[CSV2|CSV3],
-ID_AA64DFR0_EL1.PMUVer and ID_DFR0_ELF.PerfMon based on utilities
-introduced by ID register descriptor array.
+On Thu, Apr 27, 2023 at 1:26=E2=80=AFPM Peter Xu <peterx@redhat.com> wrote:
+>
+> Thanks (for doing this test, and also to Nadav for all his inputs), and
+> sorry for a late response.
 
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
----
- arch/arm64/include/asm/cpufeature.h |   1 +
- arch/arm64/kernel/cpufeature.c      |   2 +-
- arch/arm64/kvm/id_regs.c            | 361 ++++++++++++++++++----------
- 3 files changed, 242 insertions(+), 122 deletions(-)
+No need to apologize: anyways, I've got you comfortably beat on being
+late at this point :)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 6bf013fb110d..dc769c2eb7a4 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -915,6 +915,7 @@ static inline unsigned int get_vmid_bits(u64 mmfr1)
- 	return 8;
- }
- 
-+s64 arm64_ftr_safe_value(const struct arm64_ftr_bits *ftrp, s64 new, s64 cur);
- struct arm64_ftr_reg *get_arm64_ftr_reg(u32 sys_id);
- 
- extern struct arm64_ftr_override id_aa64mmfr1_override;
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 2e3e55139777..677ec4fe9f6b 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -791,7 +791,7 @@ static u64 arm64_ftr_set_value(const struct arm64_ftr_bits *ftrp, s64 reg,
- 	return reg;
- }
- 
--static s64 arm64_ftr_safe_value(const struct arm64_ftr_bits *ftrp, s64 new,
-+s64 arm64_ftr_safe_value(const struct arm64_ftr_bits *ftrp, s64 new,
- 				s64 cur)
- {
- 	s64 ret = 0;
-diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
-index 64d40aa395be..6cd56c9e6428 100644
---- a/arch/arm64/kvm/id_regs.c
-+++ b/arch/arm64/kvm/id_regs.c
-@@ -18,6 +18,86 @@
- 
- #include "sys_regs.h"
- 
-+static s64 kvm_arm64_ftr_safe_value(u32 id, const struct arm64_ftr_bits *ftrp,
-+				    s64 new, s64 cur)
-+{
-+	struct arm64_ftr_bits kvm_ftr = *ftrp;
-+
-+	/* Some features have different safe value type in KVM than host features */
-+	switch (id) {
-+	case SYS_ID_AA64DFR0_EL1:
-+		if (kvm_ftr.shift == ID_AA64DFR0_EL1_PMUVer_SHIFT)
-+			kvm_ftr.type = FTR_LOWER_SAFE;
-+		break;
-+	case SYS_ID_DFR0_EL1:
-+		if (kvm_ftr.shift == ID_DFR0_EL1_PerfMon_SHIFT)
-+			kvm_ftr.type = FTR_LOWER_SAFE;
-+		break;
-+	}
-+
-+	return arm64_ftr_safe_value(&kvm_ftr, new, cur);
-+}
-+
-+/**
-+ * arm64_check_features() - Check if a feature register value constitutes
-+ * a subset of features indicated by the idreg's KVM sanitised limit.
-+ *
-+ * This function will check if each feature field of @val is the "safe" value
-+ * against idreg's KVM sanitised limit return from reset() callback.
-+ * If a field value in @val is the same as the one in limit, it is always
-+ * considered the safe value regardless For register fields that are not in
-+ * writable, only the value in limit is considered the safe value.
-+ *
-+ * Return: 0 if all the fields are safe. Otherwise, return negative errno.
-+ */
-+static int arm64_check_features(struct kvm_vcpu *vcpu,
-+				const struct sys_reg_desc *rd,
-+				u64 val)
-+{
-+	const struct arm64_ftr_reg *ftr_reg;
-+	const struct arm64_ftr_bits *ftrp = NULL;
-+	u32 id = reg_to_encoding(rd);
-+	u64 writable_mask = rd->val;
-+	u64 limit = 0;
-+	u64 mask = 0;
-+
-+	/* For hidden and unallocated idregs without reset, only val = 0 is allowed. */
-+	if (rd->reset) {
-+		limit = rd->reset(vcpu, rd);
-+		ftr_reg = get_arm64_ftr_reg(id);
-+		if (!ftr_reg)
-+			return -EINVAL;
-+		ftrp = ftr_reg->ftr_bits;
-+	}
-+
-+	for (; ftrp && ftrp->width; ftrp++) {
-+		s64 f_val, f_lim, safe_val;
-+		u64 ftr_mask;
-+
-+		ftr_mask = arm64_ftr_mask(ftrp);
-+		if ((ftr_mask & writable_mask) != ftr_mask)
-+			continue;
-+
-+		f_val = arm64_ftr_value(ftrp, val);
-+		f_lim = arm64_ftr_value(ftrp, limit);
-+		mask |= ftr_mask;
-+
-+		if (f_val == f_lim)
-+			safe_val = f_val;
-+		else
-+			safe_val = kvm_arm64_ftr_safe_value(id, ftrp, f_val, f_lim);
-+
-+		if (safe_val != f_val)
-+			return -E2BIG;
-+	}
-+
-+	/* For fields that are not writable, values in limit are the safe values. */
-+	if ((val & ~mask) != (limit & ~mask))
-+		return -E2BIG;
-+
-+	return 0;
-+}
-+
- static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
- {
- 	if (kvm_vcpu_has_pmu(vcpu))
-@@ -68,7 +148,6 @@ u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
- 	case SYS_ID_AA64PFR0_EL1:
- 		if (!vcpu_has_sve(vcpu))
- 			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE);
--		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU);
- 		if (kvm_vgic_global_state.type == VGIC_V3) {
- 			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC);
- 			val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC), 1);
-@@ -95,15 +174,10 @@ u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
- 			val &= ~ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_WFxT);
- 		break;
- 	case SYS_ID_AA64DFR0_EL1:
--		/* Limit debug to ARMv8.0 */
--		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer);
--		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer), 6);
- 		/* Set PMUver to the required version */
- 		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
- 		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
- 				  vcpu_pmuver(vcpu));
--		/* Hide SPE from guests */
--		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMSVer);
- 		break;
- 	case SYS_ID_DFR0_EL1:
- 		val &= ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
-@@ -167,11 +241,23 @@ static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 		      u64 val)
- {
--	/* This is what we mean by invariant: you can't change it. */
--	if (val != read_id_reg(vcpu, rd))
--		return -EINVAL;
-+	struct kvm_arch *arch = &vcpu->kvm->arch;
-+	u32 id = reg_to_encoding(rd);
-+	int ret = 0;
- 
--	return 0;
-+	mutex_lock(&arch->config_lock);
-+	/* Only allow userspace to change the idregs before VM running */
-+	if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &vcpu->kvm->arch.flags)) {
-+		if (val != read_id_reg(vcpu, rd))
-+			ret = -EBUSY;
-+	} else {
-+		ret = arm64_check_features(vcpu, rd, val);
-+		if (!ret)
-+			IDREG(vcpu->kvm, id) = val;
-+	}
-+	mutex_unlock(&arch->config_lock);
-+
-+	return ret;
- }
- 
- static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
-@@ -203,14 +289,40 @@ static unsigned int aa32_id_visibility(const struct kvm_vcpu *vcpu,
- 	return id_visibility(vcpu, r);
- }
- 
-+static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
-+					  const struct sys_reg_desc *rd)
-+{
-+	u64 val;
-+	u32 id = reg_to_encoding(rd);
-+
-+	val = read_sanitised_ftr_reg(id);
-+	/*
-+	 * The default is to expose CSV2 == 1 if the HW isn't affected.
-+	 * Although this is a per-CPU feature, we make it global because
-+	 * asymmetric systems are just a nuisance.
-+	 *
-+	 * Userspace can override this as long as it doesn't promise
-+	 * the impossible.
-+	 */
-+	if (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED) {
-+		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
-+		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2), 1);
-+	}
-+	if (arm64_get_meltdown_state() == SPECTRE_UNAFFECTED) {
-+		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
-+		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3), 1);
-+	}
-+
-+	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU);
-+
-+	return val;
-+}
-+
- static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
- 			       const struct sys_reg_desc *rd,
- 			       u64 val)
- {
--	struct kvm_arch *arch = &vcpu->kvm->arch;
--	u64 sval = val;
- 	u8 csv2, csv3;
--	int ret = 0;
- 
- 	/*
- 	 * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long as
-@@ -226,26 +338,30 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
- 	if (csv3 > 1 || (csv3 && arm64_get_meltdown_state() != SPECTRE_UNAFFECTED))
- 		return -EINVAL;
- 
--	mutex_lock(&arch->config_lock);
--	/* We can only differ with CSV[23], and anything else is an error */
--	val ^= read_id_reg(vcpu, rd);
--	val &= ~(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2) |
--		 ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3));
--	if (val) {
--		ret = -EINVAL;
--		goto out;
--	}
-+	return set_id_reg(vcpu, rd, val);
-+}
- 
--	/* Only allow userspace to change the idregs before VM running */
--	if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &vcpu->kvm->arch.flags)) {
--		if (sval != read_id_reg(vcpu, rd))
--			ret = -EBUSY;
--	} else {
--		IDREG(vcpu->kvm, reg_to_encoding(rd)) = sval;
--	}
--out:
--	mutex_unlock(&arch->config_lock);
--	return ret;
-+static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-+					  const struct sys_reg_desc *rd)
-+{
-+	u64 val;
-+	u32 id = reg_to_encoding(rd);
-+
-+	val = read_sanitised_ftr_reg(id);
-+	/* Limit debug to ARMv8.0 */
-+	val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer);
-+	val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer), 6);
-+	/*
-+	 * Initialise the default PMUver before there is a chance to
-+	 * create an actual PMU.
-+	 */
-+	val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-+	val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
-+			  kvm_arm_pmu_get_pmuver_limit());
-+	/* Hide SPE from guests */
-+	val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMSVer);
-+
-+	return val;
- }
- 
- static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-@@ -255,7 +371,6 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
- 	struct kvm_arch *arch = &vcpu->kvm->arch;
- 	u8 pmuver, host_pmuver;
- 	bool valid_pmu;
--	u64 sval = val;
- 	int ret = 0;
- 
- 	host_pmuver = kvm_arm_pmu_get_pmuver_limit();
-@@ -277,40 +392,61 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
- 		return -EINVAL;
- 
- 	mutex_lock(&arch->config_lock);
--	/* We can only differ with PMUver, and anything else is an error */
--	val ^= read_id_reg(vcpu, rd);
--	val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
--	if (val) {
--		ret = -EINVAL;
--		goto out;
--	}
--
- 	/* Only allow userspace to change the idregs before VM running */
- 	if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &vcpu->kvm->arch.flags)) {
--		if (sval != read_id_reg(vcpu, rd))
-+		if (val != read_id_reg(vcpu, rd))
- 			ret = -EBUSY;
--	} else {
--		if (valid_pmu) {
--			val = IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1);
--			val &= ~ID_AA64DFR0_EL1_PMUVer_MASK;
--			val |= FIELD_PREP(ID_AA64DFR0_EL1_PMUVer_MASK, pmuver);
--			IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) = val;
--
--			val = IDREG(vcpu->kvm, SYS_ID_DFR0_EL1);
--			val &= ~ID_DFR0_EL1_PerfMon_MASK;
--			val |= FIELD_PREP(ID_DFR0_EL1_PerfMon_MASK, pmuver_to_perfmon(pmuver));
--			IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) = val;
--		} else {
--			assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags,
--				   pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
--		}
-+		goto out;
-+	}
-+
-+	if (!valid_pmu) {
-+		/*
-+		 * Ignore the PMUVer filed in @val. The PMUVer would be determined
-+		 * by arch flags bit KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU,
-+		 */
-+		pmuver = FIELD_GET(ID_AA64DFR0_EL1_PMUVer_MASK,
-+				   IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1));
-+		val &= ~ID_AA64DFR0_EL1_PMUVer_MASK;
-+		val |= FIELD_PREP(ID_AA64DFR0_EL1_PMUVer_MASK, pmuver);
- 	}
- 
-+	ret = arm64_check_features(vcpu, rd, val);
-+	if (ret)
-+		goto out;
-+
-+	IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) = val;
-+
-+	val = IDREG(vcpu->kvm, SYS_ID_DFR0_EL1);
-+	val &= ~ID_DFR0_EL1_PerfMon_MASK;
-+	val |= FIELD_PREP(ID_DFR0_EL1_PerfMon_MASK, pmuver_to_perfmon(pmuver));
-+	IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) = val;
-+
-+	if (!valid_pmu)
-+		assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags,
-+			   pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
-+
- out:
- 	mutex_unlock(&arch->config_lock);
- 	return ret;
- }
- 
-+static u64 read_sanitised_id_dfr0_el1(struct kvm_vcpu *vcpu,
-+				      const struct sys_reg_desc *rd)
-+{
-+	u64 val;
-+	u32 id = reg_to_encoding(rd);
-+
-+	val = read_sanitised_ftr_reg(id);
-+	/*
-+	 * Initialise the default PMUver before there is a chance to
-+	 * create an actual PMU.
-+	 */
-+	val &= ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
-+	val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon), kvm_arm_pmu_get_pmuver_limit());
-+
-+	return val;
-+}
-+
- static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
- 			   const struct sys_reg_desc *rd,
- 			   u64 val)
-@@ -318,7 +454,6 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
- 	struct kvm_arch *arch = &vcpu->kvm->arch;
- 	u8 perfmon, host_perfmon;
- 	bool valid_pmu;
--	u64 sval = val;
- 	int ret = 0;
- 
- 	host_perfmon = pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit());
-@@ -341,35 +476,39 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
- 		return -EINVAL;
- 
- 	mutex_lock(&arch->config_lock);
--	/* We can only differ with PerfMon, and anything else is an error */
--	val ^= read_id_reg(vcpu, rd);
--	val &= ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
--	if (val) {
--		ret = -EINVAL;
--		goto out;
--	}
--
- 	/* Only allow userspace to change the idregs before VM running */
- 	if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &vcpu->kvm->arch.flags)) {
--		if (sval != read_id_reg(vcpu, rd))
-+		if (val != read_id_reg(vcpu, rd))
- 			ret = -EBUSY;
--	} else {
--		if (valid_pmu) {
--			val = IDREG(vcpu->kvm, SYS_ID_DFR0_EL1);
--			val &= ~ID_DFR0_EL1_PerfMon_MASK;
--			val |= FIELD_PREP(ID_DFR0_EL1_PerfMon_MASK, perfmon);
--			IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) = val;
--
--			val = IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1);
--			val &= ~ID_AA64DFR0_EL1_PMUVer_MASK;
--			val |= FIELD_PREP(ID_AA64DFR0_EL1_PMUVer_MASK, perfmon_to_pmuver(perfmon));
--			IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) = val;
--		} else {
--			assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags,
--				   perfmon == ID_DFR0_EL1_PerfMon_IMPDEF);
--		}
-+		goto out;
-+	}
-+
-+	if (!valid_pmu) {
-+		/*
-+		 * Ignore the PerfMon filed in @val. The PerfMon would be determined
-+		 * by arch flags bit KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU,
-+		 */
-+		perfmon = FIELD_GET(ID_DFR0_EL1_PerfMon_MASK,
-+				    IDREG(vcpu->kvm, SYS_ID_DFR0_EL1));
-+		val &= ~ID_DFR0_EL1_PerfMon_MASK;
-+		val |= FIELD_PREP(ID_DFR0_EL1_PerfMon_MASK, perfmon);
- 	}
- 
-+	ret = arm64_check_features(vcpu, rd, val);
-+	if (ret)
-+		goto out;
-+
-+	IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) = val;
-+
-+	val = IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1);
-+	val &= ~ID_AA64DFR0_EL1_PMUVer_MASK;
-+	val |= FIELD_PREP(ID_AA64DFR0_EL1_PMUVer_MASK, perfmon_to_pmuver(perfmon));
-+	IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) = val;
-+
-+	if (!valid_pmu)
-+		assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags,
-+			   perfmon == ID_DFR0_EL1_PerfMon_IMPDEF);
-+
- out:
- 	mutex_unlock(&arch->config_lock);
- 	return ret;
-@@ -448,9 +587,13 @@ const struct sys_reg_desc id_reg_descs[KVM_ARM_ID_REG_NUM] = {
- 	/* CRm=1 */
- 	AA32_ID_SANITISED(ID_PFR0_EL1),
- 	AA32_ID_SANITISED(ID_PFR1_EL1),
--	{ SYS_DESC(SYS_ID_DFR0_EL1), .access = access_id_reg,
--	  .get_user = get_id_reg, .set_user = set_id_dfr0_el1,
--	  .visibility = aa32_id_visibility, },
-+	{ SYS_DESC(SYS_ID_DFR0_EL1),
-+	  .access = access_id_reg,
-+	  .get_user = get_id_reg,
-+	  .set_user = set_id_dfr0_el1,
-+	  .visibility = aa32_id_visibility,
-+	  .reset = read_sanitised_id_dfr0_el1,
-+	  .val = ID_DFR0_EL1_PerfMon_MASK, },
- 	ID_HIDDEN(ID_AFR0_EL1),
- 	AA32_ID_SANITISED(ID_MMFR0_EL1),
- 	AA32_ID_SANITISED(ID_MMFR1_EL1),
-@@ -479,8 +622,12 @@ const struct sys_reg_desc id_reg_descs[KVM_ARM_ID_REG_NUM] = {
- 
- 	/* AArch64 ID registers */
- 	/* CRm=4 */
--	{ SYS_DESC(SYS_ID_AA64PFR0_EL1), .access = access_id_reg,
--	  .get_user = get_id_reg, .set_user = set_id_aa64pfr0_el1, },
-+	{ SYS_DESC(SYS_ID_AA64PFR0_EL1),
-+	  .access = access_id_reg,
-+	  .get_user = get_id_reg,
-+	  .set_user = set_id_aa64pfr0_el1,
-+	  .reset = read_sanitised_id_aa64pfr0_el1,
-+	  .val = ID_AA64PFR0_EL1_CSV2_MASK | ID_AA64PFR0_EL1_CSV3_MASK, },
- 	ID_SANITISED(ID_AA64PFR1_EL1),
- 	ID_UNALLOCATED(4, 2),
- 	ID_UNALLOCATED(4, 3),
-@@ -490,8 +637,12 @@ const struct sys_reg_desc id_reg_descs[KVM_ARM_ID_REG_NUM] = {
- 	ID_UNALLOCATED(4, 7),
- 
- 	/* CRm=5 */
--	{ SYS_DESC(SYS_ID_AA64DFR0_EL1), .access = access_id_reg,
--	  .get_user = get_id_reg, .set_user = set_id_aa64dfr0_el1, },
-+	{ SYS_DESC(SYS_ID_AA64DFR0_EL1),
-+	  .access = access_id_reg,
-+	  .get_user = get_id_reg,
-+	  .set_user = set_id_aa64dfr0_el1,
-+	  .reset = read_sanitised_id_aa64dfr0_el1,
-+	  .val = ID_AA64DFR0_EL1_PMUVer_MASK, },
- 	ID_SANITISED(ID_AA64DFR1_EL1),
- 	ID_UNALLOCATED(5, 2),
- 	ID_UNALLOCATED(5, 3),
-@@ -563,36 +714,4 @@ void kvm_arm_init_id_regs(struct kvm *kvm)
- 
- 		IDREG(kvm, id) = val;
- 	}
--
--	/*
--	 * The default is to expose CSV2 == 1 if the HW isn't affected.
--	 * Although this is a per-CPU feature, we make it global because
--	 * asymmetric systems are just a nuisance.
--	 *
--	 * Userspace can override this as long as it doesn't promise
--	 * the impossible.
--	 */
--	val = IDREG(kvm, SYS_ID_AA64PFR0_EL1);
--
--	if (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED) {
--		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
--		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2), 1);
--	}
--	if (arm64_get_meltdown_state() == SPECTRE_UNAFFECTED) {
--		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
--		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3), 1);
--	}
--
--	IDREG(kvm, SYS_ID_AA64PFR0_EL1) = val;
--	/*
--	 * Initialise the default PMUver before there is a chance to
--	 * create an actual PMU.
--	 */
--	val = IDREG(kvm, SYS_ID_AA64DFR0_EL1);
--
--	val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
--	val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
--			  kvm_arm_pmu_get_pmuver_limit());
--
--	IDREG(kvm, SYS_ID_AA64DFR0_EL1) = val;
- }
--- 
-2.40.1.495.gc816e09b53d-goog
+> These numbers caught my eye, and I'm very curious why even 2 vcpus can
+> scale that bad.
+>
+> I gave it a shot on a test machine and I got something slightly different=
+:
+>
+>   Intel(R) Xeon(R) CPU E5-2630 v4 @ 2.20GHz (20 cores, 40 threads)
+>   $ ./demand_paging_test -b 512M -u MINOR -s shmem -v N
+>   |-------+----------+--------|
+>   | n_thr | per-vcpu | total  |
+>   |-------+----------+--------|
+>   |     1 | 39.5K    | 39.5K  |
+>   |     2 | 33.8K    | 67.6K  |
+>   |     4 | 31.8K    | 127.2K |
+>   |     8 | 30.8K    | 246.1K |
+>   |    16 | 21.9K    | 351.0K |
+>   |-------+----------+--------|
+>
+> I used larger ram due to less cores.  I didn't try 32+ vcpus to make sure=
+ I
+> don't have two threads content on a core/thread already since I only got =
+40
+> hardware threads there, but still we can compare with your lower half.
+>
+> When I was testing I noticed bad numbers and another bug on not using
+> NSEC_PER_SEC properly, so I did this before the test:
+>
+> https://lore.kernel.org/all/20230427201112.2164776-1-peterx@redhat.com/
+>
+> I think it means it still doesn't scale that good, however not so bad
+> either - no obvious 1/2 drop on using 2vcpus.  There're still a bunch of
+> paths triggered in the test so I also don't expect it to fully scale
+> linearly.  From my numbers I just didn't see as drastic as yours. I'm not
+> sure whether it's simply broken test number, parameter differences
+> (e.g. you used 64M only per-vcpu), or hardware differences.
 
+Hmm, I suspect we're dealing with  hardware differences here. I
+rebased my changes onto those two patches you sent up, taking care not
+to clobber them, but even with the repro command you provided my
+results look very different than yours (at least on 1-4 vcpus) on the
+machine I've been testing on (4x AMD EPYC 7B13 64-Core, 2.2GHz).
+
+(n=3D20)
+n_thr      per_vcpu       total
+1            154K              154K
+2             92k                184K
+4             71K                285K
+8             36K                291K
+16           19K                310K
+
+Out of interested I tested on another machine (Intel(R) Xeon(R)
+Platinum 8273CL CPU @ 2.20GHz) as well, and results are a bit
+different again
+
+(n=3D20)
+n_thr      per_vcpu       total
+1            115K              115K
+2             103k              206K
+4             65K                262K
+8             39K                319K
+16           19K                398K
+
+It is interesting how all three sets of numbers start off different
+but seem to converge around 16 vCPUs. I did check to make sure the
+memory fault exits sped things up in all cases, and that at least
+stays true.
+
+By the way, I've got a little helper script that I've been using to
+run/average the selftest results (which can vary quite a bit). I've
+attached it below- hopefully it doesn't bounce from the mailing list.
+Just for reference, the invocation to test the command you provided is
+
+> python dp_runner.py --num_runs 20 --max_cores 16 --percpu_mem 512M
+
+--00000000000033800305facf4d86
+Content-Type: text/x-python; charset="US-ASCII"; name="dp_runner.py"
+Content-Disposition: attachment; filename="dp_runner.py"
+Content-Transfer-Encoding: base64
+Content-ID: <f_lh83syqb0>
+X-Attachment-Id: f_lh83syqb0
+
+aW1wb3J0IHN1YnByb2Nlc3MKaW1wb3J0IGFyZ3BhcnNlCmltcG9ydCByZQoKZGVmIGdldF9jb21t
+YW5kKHBlcmNwdV9tZW0sIGNvcmVzLCBzaW5nbGVfdWZmZCwgdXNlX21lbWZhdWx0cywgb3Zlcmxh
+cF92Y3B1cyk6CiAgIGlmIG92ZXJsYXBfdmNwdXMgYW5kIG5vdCBzaW5nbGVfdWZmZDoKICAgICAg
+IHJhaXNlIFJ1bnRpbWVFcnJvcigiT3ZlcmxhcHBpbmcgdmNwdXMgYnV0IG5vdCB1c2luZyBzaW5n
+bGUgdWZmZCwgdmVyeSBzdHJhbmdlIikKICAgcmV0dXJuICIuL2RlbWFuZF9wYWdpbmdfdGVzdCAt
+cyBzaG1lbSAtdSBNSU5PUiAiIFwKICAgICAgICArICIgLWIgIiArIHBlcmNwdV9tZW0gXAogICAg
+ICAgICsgKCIgLWEgIiBpZiBzaW5nbGVfdWZmZCBvciBvdmVybGFwX3ZjcHVzIGVsc2UgIiIpIFwK
+ICAgICAgICArICgiIC1vICIgaWYgb3ZlcmxhcF92Y3B1cyBlbHNlICIiKSBcCiAgICAgICAgKyAi
+IC12ICIgKyBzdHIoY29yZXMpIFwKICAgICAgICArICIgLXIgIiArIChzdHIoY29yZXMpIGlmIHNp
+bmdsZV91ZmZkIG9yIG92ZXJsYXBfdmNwdXMgZWxzZSAiMSIpIFwKICAgICAgICArICgiIC13IiBp
+ZiB1c2VfbWVtZmF1bHRzIGVsc2UgIiIpIFwKICAgICAgICArICI7IGV4aXQgMCIKCmRlZiBydW5f
+Y29tbWFuZChjbWQpOgoKICAgIG91dHB1dCA9IHN1YnByb2Nlc3MuY2hlY2tfb3V0cHV0KGNtZCwg
+c2hlbGw9VHJ1ZSkKICAgIHZfcGFnaW5nX3JhdGVfcmUgPSByIlBlci12Y3B1IGRlbWFuZCBwYWdp
+bmcgcmF0ZTpccyooLiopIHBncy9zZWMiCiAgICB0X3BhZ2luZ19yYXRlX3JlID0gciJPdmVyYWxs
+IGRlbWFuZCBwYWdpbmcgcmF0ZTpccyooLiopIHBncy9zZWMiCiAgICB2X21hdGNoID0gcmUuc2Vh
+cmNoKHZfcGFnaW5nX3JhdGVfcmUsIG91dHB1dCwgcmUuTVVMVElMSU5FKQogICAgdF9tYXRjaCA9
+IHJlLnNlYXJjaCh0X3BhZ2luZ19yYXRlX3JlLCBvdXRwdXQsIHJlLk1VTFRJTElORSkKICAgIHJl
+dHVybiBmbG9hdCh2X21hdGNoLmdyb3VwKDEpKSwgZmxvYXQodF9tYXRjaC5ncm91cCgxKSkKCmlm
+IF9fbmFtZV9fID09ICJfX21haW5fXyI6CiAgICBhcCA9IGFyZ3BhcnNlLkFyZ3VtZW50UGFyc2Vy
+KCkKICAgIGFwLmFkZF9hcmd1bWVudCgiLS1udW1fcnVucyIsIHR5cGU9aW50LCBkZXN0PSdudW1f
+cnVucycsIHJlcXVpcmVkPVRydWUpCiAgICBhcC5hZGRfYXJndW1lbnQoIi0tbWF4X2NvcmVzIiwg
+dHlwZT1pbnQsIGRlc3Q9J21heF9jb3JlcycsIHJlcXVpcmVkPVRydWUpCiAgICBhcC5hZGRfYXJn
+dW1lbnQoIi0tcGVyY3B1X21lbSIsIHR5cGU9c3RyLCBkZXN0PSdwZXJjcHVfbWVtJywgcmVxdWly
+ZWQ9VHJ1ZSkKICAgIGFwLmFkZF9hcmd1bWVudCgiLS1vbmV1ZmZkIiwgdHlwZT1ib29sLCBkZXN0
+PSdvbmV1ZmZkJykKICAgIGFwLmFkZF9hcmd1bWVudCgiLS1vdmVybGFwIiwgdHlwZT1ib29sLCBk
+ZXN0PSdvdmVybGFwJykKICAgIGFwLmFkZF9hcmd1bWVudCgiLS1tZW1mYXVsdHMiLCB0eXBlPWJv
+b2wsIGRlc3Q9J21lbWZhdWx0cycpCgogICAgYXJncyA9IGFwLnBhcnNlX2FyZ3MoKQoKICAgIHBy
+aW50KCJUZXN0aW5nIGNvbmZpZ3VyYXRpb246ICIgKyBzdHIoYXJncykpCiAgICBwcmludCgiIikK
+CiAgICBjb3JlcyA9IDEKICAgIGNvcmVzX2FyciA9IFtdCiAgICByZXN1bHRzID0gW10KICAgIHdo
+aWxlIGNvcmVzIDw9IGFyZ3MubWF4X2NvcmVzOgogICAgICAgIGNtZCA9IGdldF9jb21tYW5kKGFy
+Z3MucGVyY3B1X21lbSwgY29yZXMsIGFyZ3Mub25ldWZmZCwgYXJncy5tZW1mYXVsdHMsIGFyZ3Mu
+b3ZlcmxhcCkKICAgICAgICBpZiBjb3JlcyA9PSAxIG9yIGNvcmVzID09IDI6CiAgICAgICAgICAg
+IHByaW50KCJjbWQgPSAiICsgY21kKQoKICAgICAgICBwcmludCgiVGVzdGluZyBjb3JlcyA9ICIg
+KyBzdHIoY29yZXMpKQogICAgICAgIGZ1bGxfcmVzdWx0cyA9IFtydW5fY29tbWFuZChjbWQpIGZv
+ciBfIGluIHJhbmdlKGFyZ3MubnVtX3J1bnMpXQogICAgICAgIHZfcmF0ZXMgPSBbZlswXSBmb3Ig
+ZiBpbiBmdWxsX3Jlc3VsdHNdCiAgICAgICAgdF9yYXRlcyA9IFtmWzFdIGZvciBmIGluIGZ1bGxf
+cmVzdWx0c10KCiAgICAgICAgZGVmIHByaW50X3JhdGVzKHRhZywgcmF0ZXMpOgogICAgICAgICAg
+ICBhdmVyYWdlID0gc3VtKHJhdGVzKSAvIGxlbihyYXRlcykKICAgICAgICAgICAgcHJpbnQodGFn
+ICsgIjpcdFx0IiArIHN0cihpbnQoYXZlcmFnZSAvIDEwKSAvIDEwMCkpCgogICAgICAgIHByaW50
+X3JhdGVzKCJWY3B1IGRlbWFuZCBwYWdpbmcgcmF0ZSIsIHZfcmF0ZXMpCiAgICAgICAgcHJpbnRf
+cmF0ZXMoIlRvdGFsIGRlbWFuZCBwYWdpbmcgcmF0ZSIsIHRfcmF0ZXMpCgogICAgICAgIGNvcmVz
+X2Fyci5hcHBlbmQoY29yZXMpCiAgICAgICAgcmVzdWx0cy5hcHBlbmQoKGNvcmVzLCB2X3JhdGVz
+LCB0X3JhdGVzKSkKICAgICAgICBjb3JlcyAqPSAyCgogICAgZm9yIGMsIHZfcmF0ZXMsIHRfcmF0
+ZXMgaW4gcmVzdWx0czoKICAgICAgICBwcmludCgiRnVsbCByZXN1bHRzIG9uIGNvcmUgIiArIHN0
+cihjKSArICIgOlxuIiArIHN0cih2X3JhdGVzKSArICJcbiIgKyBzdHIodF9yYXRlcykpCgo=
+--00000000000033800305facf4d86--
