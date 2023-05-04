@@ -1,135 +1,143 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52754FBFD
-	for <kvmarm@lists.linux.dev>; Thu,  4 May 2023 15:08:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09FD5C433D2;
-	Thu,  4 May 2023 15:08:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1683212924;
-	bh=axENV78rQZpqfN8ChHqOHY0QRi+reeRgjbPExDDK+rI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ClC5Scz0FilRJcKHjsrN61BDZIyQi8wZY6luMlT8Nd0WfCIAsU8AtefBFKfDWYQel
-	 UkhpfizTeZkNJXhJ6HH/Qoor8knP72kIWfmd8MmNg4UOHuD+rURHuSj2BlJyILFyaS
-	 MoNfpuPKMniaMaj99PCdw6wJ1magbvuFeoU/Kj8urRreczQz/gOin4ZFbpccAeb7TZ
-	 kZLpekEgyAuv89jZWRfB0oK2c9yYEJrcFEvWVM3W8+ENUb/g3acBCb/J8PKEkjcwiS
-	 FSqR9Tj0dD6Z5UdTp0VeECd32LZYbLcGteJT+kauOFO4bH5KFmHsdpunLEt61kxX46
-	 Wt52EUGr2MfbA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1puaZV-00CxWA-Lf;
-	Thu, 04 May 2023 16:08:41 +0100
-Date: Thu, 04 May 2023 16:08:41 +0100
-Message-ID: <86mt2kgmme.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Shivam Kumar <shivam.kumar1@nutanix.com>
-Cc: pbonzini@redhat.com,
-	seanjc@google.com,
-	james.morse@arm.com,
-	borntraeger@linux.ibm.com,
-	aravind.retnakaran@nutanix.com,
-	david@redhat.com,
-	kvm@vger.kernel.org,
-	Shaju Abraham <shaju.abraham@nutanix.com>,
-	Manish Mishra <manish.mishra@nutanix.com>,
-	Anurag Madnawat <anurag.madnawat@nutanix.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	kvmarm <kvmarm@lists.linux.dev>,
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH v9 3/3] KVM: arm64: Dirty quota-based throttling of vcpus
-In-Reply-To: <20230504144328.139462-4-shivam.kumar1@nutanix.com>
-References: <20230504144328.139462-1-shivam.kumar1@nutanix.com>
-	<20230504144328.139462-4-shivam.kumar1@nutanix.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA5397E7
+	for <kvmarm@lists.linux.dev>; Thu,  4 May 2023 19:09:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1683227373;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eu4smx04I1AOShAcSlKxzRKnKb94GOmquYwLELDKb4c=;
+	b=Xf8c2xu0+iCHHm+Ab1ZPz93eNs8VW6OCxBy4+4OBOhupCVhJvxZiAe6qCL4CLIGl0rt+0E
+	DM7bUP71BXk9a0m3XAuQZ1PCJInwfbD4SA+OGZmP/5xwORCINig/1K3AcYFHn5xikLb3vD
+	v4VrXhTKU5/I0k+wOLi0cFN0FyJx6QU=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-386-NZS8uY16Pn295k9ntLwIAw-1; Thu, 04 May 2023 15:09:33 -0400
+X-MC-Unique: NZS8uY16Pn295k9ntLwIAw-1
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-3ed767b30easo1342001cf.1
+        for <kvmarm@lists.linux.dev>; Thu, 04 May 2023 12:09:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683227367; x=1685819367;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eu4smx04I1AOShAcSlKxzRKnKb94GOmquYwLELDKb4c=;
+        b=VbjJqTUueij+UhG+Egt7Q+X3M2og3V97Gi/m9kqSyp8ym0AHqWYDyxDk8q3+7j1/Po
+         ahbHzn7vjeyW9p7mAwrBu7XDoM25jDAf1sXNvJJHBU3+NKUukso7zLBAVJI8tUNIVP7z
+         3tK+Fwfr+V6DY6xXarADL/2O6IHYgr+VK+PuZz6nkJGPAvqL0o+1wh5Ev0qMBk4USIQj
+         c+A1huRnZ1DQlo+u+zf07SxNPiiYC7UhMS+8wdhnc/kXU3FYM0PDpLicYtcovcgRA6ej
+         S1Lc/qoJJNVjadkq4HIMRIzJCqNWUL8l5CXpmj6D2K4sEOxjTAPGHXj7D1zA/y8eFt4K
+         ZS+A==
+X-Gm-Message-State: AC+VfDypMClYr9p0Px4nHqYH4bXpH/Vl3WVY3Mx3KHQqbbam69QFXsvo
+	bfaK7HUuG208z+Gf4r+YPm4BtABIO/FLy/kMMqQaRYQQsGwPY0LOlH1NoChlWKnIL+vpuLEjcP9
+	2HChXE+6r2GpgDUGV
+X-Received: by 2002:a05:622a:1999:b0:3ef:3204:5148 with SMTP id u25-20020a05622a199900b003ef32045148mr16092998qtc.1.1683227367526;
+        Thu, 04 May 2023 12:09:27 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6QNqm7XccS4dHnALMbPxn5A0zXinogoQpNb6AmeNNL6KcjUqhZFOjqDRxXi8Tuj51+zuEF2Q==
+X-Received: by 2002:a05:622a:1999:b0:3ef:3204:5148 with SMTP id u25-20020a05622a199900b003ef32045148mr16092953qtc.1.1683227367219;
+        Thu, 04 May 2023 12:09:27 -0700 (PDT)
+Received: from x1n (bras-base-aurron9127w-grc-40-70-52-229-124.dsl.bell.ca. [70.52.229.124])
+        by smtp.gmail.com with ESMTPSA id i3-20020a37c203000000b0074e0e6aae1csm12050qkm.36.2023.05.04.12.09.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 May 2023 12:09:26 -0700 (PDT)
+Date: Thu, 4 May 2023 15:09:25 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Anish Moorthy <amoorthy@google.com>, Nadav Amit <nadav.amit@gmail.com>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org,
+	oliver.upton@linux.dev, James Houghton <jthoughton@google.com>,
+	bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
+	kvm <kvm@vger.kernel.org>, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
+ migration via annotated memory faults.
+Message-ID: <ZFQC5TZ9tVSvxFWt@x1n>
+References: <46DD705B-3A3F-438E-A5B1-929C1E43D11F@gmail.com>
+ <CAF7b7mo78e2YPHU5YrhzuORdpGXCVRxXr6kSyMa+L+guW8jKGw@mail.gmail.com>
+ <84DD9212-31FB-4AF6-80DD-9BA5AEA0EC1A@gmail.com>
+ <CAF7b7mr-_U6vU1iOwukdmOoaT0G1ttyxD62cv=vebnQeXL3R0w@mail.gmail.com>
+ <ZErahL/7DKimG+46@x1n>
+ <CAF7b7mqaxk6w90+9+5UkEAE13vDTmBMmCO_ZdAEo6pD8_--fZA@mail.gmail.com>
+ <ZFLPlRReglM/Vgfu@x1n>
+ <ZFLRpEV09lrpJqua@x1n>
+ <ZFLVS+UvpG5w747u@google.com>
+ <ZFLyGDoXHQrN1CCD@x1n>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: shivam.kumar1@nutanix.com, pbonzini@redhat.com, seanjc@google.com, james.morse@arm.com, borntraeger@linux.ibm.com, aravind.retnakaran@nutanix.com, david@redhat.com, kvm@vger.kernel.org, shaju.abraham@nutanix.com, manish.mishra@nutanix.com, anurag.madnawat@nutanix.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+In-Reply-To: <ZFLyGDoXHQrN1CCD@x1n>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 
-On Thu, 04 May 2023 15:43:31 +0100,
-Shivam Kumar <shivam.kumar1@nutanix.com> wrote:
+On Wed, May 03, 2023 at 07:45:28PM -0400, Peter Xu wrote:
+> On Wed, May 03, 2023 at 02:42:35PM -0700, Sean Christopherson wrote:
+> > On Wed, May 03, 2023, Peter Xu wrote:
+> > > Oops, bounced back from the list..
+> > > 
+> > > Forward with no attachment this time - I assume the information is still
+> > > enough in the paragraphs even without the flamegraphs.
+> > 
+> > The flamegraphs are definitely useful beyond what is captured here.  Not sure
+> > how to get them accepted on the list though.
 > 
-> Call update_dirty_quota whenever a page is marked dirty with
-> appropriate arch-specific page size. Process the KVM request
-> KVM_REQ_DIRTY_QUOTA_EXIT (raised by update_dirty_quota) to exit to
-> userspace with exit reason KVM_EXIT_DIRTY_QUOTA_EXHAUSTED.
+> Trying again with google drive:
 > 
-> Suggested-by: Shaju Abraham <shaju.abraham@nutanix.com>
-> Suggested-by: Manish Mishra <manish.mishra@nutanix.com>
-> Co-developed-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
-> Signed-off-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
-> Signed-off-by: Shivam Kumar <shivam.kumar1@nutanix.com>
-> ---
->  arch/arm64/kvm/Kconfig | 1 +
->  arch/arm64/kvm/arm.c   | 5 +++++
->  arch/arm64/kvm/mmu.c   | 1 +
->  3 files changed, 7 insertions(+)
+> single uffd:
+> https://drive.google.com/file/d/1bYVYefIRRkW8oViRbYv_HyX5Zf81p3Jl/view
 > 
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index f531da6b362e..06144ad3cfae 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -43,6 +43,7 @@ menuconfig KVM
->  	select SCHED_INFO
->  	select GUEST_PERF_EVENTS if PERF_EVENTS
->  	select INTERVAL_TREE
-> +	select HAVE_KVM_DIRTY_QUOTA
->  	help
->  	  Support hosting virtualized guest machines.
->  
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 14391826241c..f0280c1c1c06 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -792,6 +792,11 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
->  
->  		if (kvm_dirty_ring_check_request(vcpu))
->  			return 0;
-> +
-> +		if (kvm_check_request(KVM_REQ_DIRTY_QUOTA_EXIT, vcpu)) {
-> +			vcpu->run->exit_reason = KVM_EXIT_DIRTY_QUOTA_EXHAUSTED;
-> +			return 0;
-> +		}
->  	}
->  
->  	return 1;
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 3b9d4d24c361..93c52f7464c9 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1419,6 +1419,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	/* Mark the page dirty only if the fault is handled successfully */
->  	if (writable && !ret) {
->  		kvm_set_pfn_dirty(pfn);
-> +		update_dirty_quota(kvm, fault_granule);
->  		mark_page_dirty_in_slot(kvm, memslot, gfn);
->  	}
->  
+> 32 uffds:
+> https://drive.google.com/file/d/1T19yTEKKhbjU9G2FpANIvArSC61mqqtp/view
+> 
+> > 
+> > > > From what I got there, vmx_vcpu_load() gets more highlights than the
+> > > > spinlocks. I think that's the tlb flush broadcast.
+> > 
+> > No, it's KVM dealing with the vCPU being migrated to a different pCPU.  The
+> > smp_call_function_single() that shows up is from loaded_vmcs_clear() and is
+> > triggered when KVM needs to VMCLEAR the VMCS on the _previous_ pCPU (yay for the
+> > VMCS caches not being coherent).
+> > 
+> > Task migration can also trigger IBPB (if mitigations are enabled), and also does
+> > an "all contexts" INVEPT, i.e. flushes all TLB entries for KVM's MMU.
+> > 
+> > Can you trying 1:1 pinning of vCPUs to pCPUs?  That _should_ eliminate the
+> > vmx_vcpu_load_vmcs() hotspot, and for large VMs is likely represenative of a real
+> > world configuration.
+> 
+> Yes it does went away:
+> 
+> https://drive.google.com/file/d/1ZFhWnWjoU33Lxy43jTYnKFuluo4zZArm/view
+> 
+> With pinning vcpu threads only (again, over 40 hard cores/threads):
+> 
+> ./demand_paging_test -b 512M -u MINOR -s shmem -v 32 -c 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32
+> 
+> It seems to me for some reason the scheduler ate more than I expected..
+> Maybe tomorrow I can try two more things:
+> 
+>   - Do cpu isolations, and
+>   - pin reader threads too (or just leave the readers on housekeeping cores)
 
-I already raised this against the previous version of series:
-fault_granule isn't the amount of memory that gets mapped. I urge you
-to actually read the code you're modifying. Ignoring reviewer comments
-is not going to help merging this series. And yes, I ignored your
-reply because it didn't make any sense...
+I gave it a shot by isolating 32 cores and split into two groups, 16 for
+uffd threads and 16 for vcpu threads.  I got similiar results and I don't
+see much changed.
 
-It is also basic courtesy to Cc the maintainers and reviewers of that
-code, as well as the relevant MLs (get_maintainers.pl is, as usual,
-your friend).
+I think it's possible it's just reaching the limit of my host since it only
+got 40 cores anyway.  Throughput never hits over 350K faults/sec overall.
 
-	M.
+I assume this might not be the case for Anish if he has a much larger host.
+So we can have similar test carried out and see how that goes.  I think the
+idea is making sure vcpu load overhead during sched-in is ruled out, then
+see whether it can keep scaling with more cores.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Peter Xu
+
