@@ -1,143 +1,64 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA5397E7
-	for <kvmarm@lists.linux.dev>; Thu,  4 May 2023 19:09:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1683227373;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eu4smx04I1AOShAcSlKxzRKnKb94GOmquYwLELDKb4c=;
-	b=Xf8c2xu0+iCHHm+Ab1ZPz93eNs8VW6OCxBy4+4OBOhupCVhJvxZiAe6qCL4CLIGl0rt+0E
-	DM7bUP71BXk9a0m3XAuQZ1PCJInwfbD4SA+OGZmP/5xwORCINig/1K3AcYFHn5xikLb3vD
-	v4VrXhTKU5/I0k+wOLi0cFN0FyJx6QU=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-386-NZS8uY16Pn295k9ntLwIAw-1; Thu, 04 May 2023 15:09:33 -0400
-X-MC-Unique: NZS8uY16Pn295k9ntLwIAw-1
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-3ed767b30easo1342001cf.1
-        for <kvmarm@lists.linux.dev>; Thu, 04 May 2023 12:09:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683227367; x=1685819367;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eu4smx04I1AOShAcSlKxzRKnKb94GOmquYwLELDKb4c=;
-        b=VbjJqTUueij+UhG+Egt7Q+X3M2og3V97Gi/m9kqSyp8ym0AHqWYDyxDk8q3+7j1/Po
-         ahbHzn7vjeyW9p7mAwrBu7XDoM25jDAf1sXNvJJHBU3+NKUukso7zLBAVJI8tUNIVP7z
-         3tK+Fwfr+V6DY6xXarADL/2O6IHYgr+VK+PuZz6nkJGPAvqL0o+1wh5Ev0qMBk4USIQj
-         c+A1huRnZ1DQlo+u+zf07SxNPiiYC7UhMS+8wdhnc/kXU3FYM0PDpLicYtcovcgRA6ej
-         S1Lc/qoJJNVjadkq4HIMRIzJCqNWUL8l5CXpmj6D2K4sEOxjTAPGHXj7D1zA/y8eFt4K
-         ZS+A==
-X-Gm-Message-State: AC+VfDypMClYr9p0Px4nHqYH4bXpH/Vl3WVY3Mx3KHQqbbam69QFXsvo
-	bfaK7HUuG208z+Gf4r+YPm4BtABIO/FLy/kMMqQaRYQQsGwPY0LOlH1NoChlWKnIL+vpuLEjcP9
-	2HChXE+6r2GpgDUGV
-X-Received: by 2002:a05:622a:1999:b0:3ef:3204:5148 with SMTP id u25-20020a05622a199900b003ef32045148mr16092998qtc.1.1683227367526;
-        Thu, 04 May 2023 12:09:27 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6QNqm7XccS4dHnALMbPxn5A0zXinogoQpNb6AmeNNL6KcjUqhZFOjqDRxXi8Tuj51+zuEF2Q==
-X-Received: by 2002:a05:622a:1999:b0:3ef:3204:5148 with SMTP id u25-20020a05622a199900b003ef32045148mr16092953qtc.1.1683227367219;
-        Thu, 04 May 2023 12:09:27 -0700 (PDT)
-Received: from x1n (bras-base-aurron9127w-grc-40-70-52-229-124.dsl.bell.ca. [70.52.229.124])
-        by smtp.gmail.com with ESMTPSA id i3-20020a37c203000000b0074e0e6aae1csm12050qkm.36.2023.05.04.12.09.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 May 2023 12:09:26 -0700 (PDT)
-Date: Thu, 4 May 2023 15:09:25 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Anish Moorthy <amoorthy@google.com>, Nadav Amit <nadav.amit@gmail.com>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org,
-	oliver.upton@linux.dev, James Houghton <jthoughton@google.com>,
-	bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
-	kvm <kvm@vger.kernel.org>, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
- migration via annotated memory faults.
-Message-ID: <ZFQC5TZ9tVSvxFWt@x1n>
-References: <46DD705B-3A3F-438E-A5B1-929C1E43D11F@gmail.com>
- <CAF7b7mo78e2YPHU5YrhzuORdpGXCVRxXr6kSyMa+L+guW8jKGw@mail.gmail.com>
- <84DD9212-31FB-4AF6-80DD-9BA5AEA0EC1A@gmail.com>
- <CAF7b7mr-_U6vU1iOwukdmOoaT0G1ttyxD62cv=vebnQeXL3R0w@mail.gmail.com>
- <ZErahL/7DKimG+46@x1n>
- <CAF7b7mqaxk6w90+9+5UkEAE13vDTmBMmCO_ZdAEo6pD8_--fZA@mail.gmail.com>
- <ZFLPlRReglM/Vgfu@x1n>
- <ZFLRpEV09lrpJqua@x1n>
- <ZFLVS+UvpG5w747u@google.com>
- <ZFLyGDoXHQrN1CCD@x1n>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B1915383
+	for <kvmarm@lists.linux.dev>; Fri,  5 May 2023 14:55:49 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5EBCD2F4;
+	Fri,  5 May 2023 07:56:33 -0700 (PDT)
+Received: from [10.57.56.190] (unknown [10.57.56.190])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EA19B3F5A1;
+	Fri,  5 May 2023 07:55:47 -0700 (PDT)
+Message-ID: <c0917543-104d-1fe2-4602-c556f168226f@arm.com>
+Date: Fri, 5 May 2023 15:55:46 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <ZFLyGDoXHQrN1CCD@x1n>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.10.1
+Subject: Re: [kvm-unit-tests PATCH v5 00/29] EFI and ACPI support for arm64
+Content-Language: en-GB
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+ alexandru.elisei@arm.com, ricarkol@google.com, seanjc@google.com,
+ Shaoqin Huang <shahuang@redhat.com>
+References: <20230428120405.3770496-1-nikos.nikoleris@arm.com>
+ <20230429-6da987552a8d15281f8444c9@orel>
+ <20230429-342c8a26e5db45474631a307@orel>
+ <6857da77-8d1e-ebcb-1571-6419d463fa53@arm.com>
+ <20230501-85b5dca6ed2d86d8bb0e55b6@orel>
+ <658590ba-1c73-87cd-b1b1-bcbf3e556f29@arm.com>
+ <20230502-7c550b68838ce47572260bd1@orel>
+From: Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <20230502-7c550b68838ce47572260bd1@orel>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, May 03, 2023 at 07:45:28PM -0400, Peter Xu wrote:
-> On Wed, May 03, 2023 at 02:42:35PM -0700, Sean Christopherson wrote:
-> > On Wed, May 03, 2023, Peter Xu wrote:
-> > > Oops, bounced back from the list..
-> > > 
-> > > Forward with no attachment this time - I assume the information is still
-> > > enough in the paragraphs even without the flamegraphs.
-> > 
-> > The flamegraphs are definitely useful beyond what is captured here.  Not sure
-> > how to get them accepted on the list though.
+On 02/05/2023 08:32, Andrew Jones wrote:
+> On Mon, May 01, 2023 at 11:27:23PM +0100, Nikos Nikoleris wrote:
+>> On 01/05/2023 12:21, Andrew Jones wrote:
+...
 > 
-> Trying again with google drive:
-> 
-> single uffd:
-> https://drive.google.com/file/d/1bYVYefIRRkW8oViRbYv_HyX5Zf81p3Jl/view
-> 
-> 32 uffds:
-> https://drive.google.com/file/d/1T19yTEKKhbjU9G2FpANIvArSC61mqqtp/view
-> 
-> > 
-> > > > From what I got there, vmx_vcpu_load() gets more highlights than the
-> > > > spinlocks. I think that's the tlb flush broadcast.
-> > 
-> > No, it's KVM dealing with the vCPU being migrated to a different pCPU.  The
-> > smp_call_function_single() that shows up is from loaded_vmcs_clear() and is
-> > triggered when KVM needs to VMCLEAR the VMCS on the _previous_ pCPU (yay for the
-> > VMCS caches not being coherent).
-> > 
-> > Task migration can also trigger IBPB (if mitigations are enabled), and also does
-> > an "all contexts" INVEPT, i.e. flushes all TLB entries for KVM's MMU.
-> > 
-> > Can you trying 1:1 pinning of vCPUs to pCPUs?  That _should_ eliminate the
-> > vmx_vcpu_load_vmcs() hotspot, and for large VMs is likely represenative of a real
-> > world configuration.
-> 
-> Yes it does went away:
-> 
-> https://drive.google.com/file/d/1ZFhWnWjoU33Lxy43jTYnKFuluo4zZArm/view
-> 
-> With pinning vcpu threads only (again, over 40 hard cores/threads):
-> 
-> ./demand_paging_test -b 512M -u MINOR -s shmem -v 32 -c 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32
-> 
-> It seems to me for some reason the scheduler ate more than I expected..
-> Maybe tomorrow I can try two more things:
-> 
->   - Do cpu isolations, and
->   - pin reader threads too (or just leave the readers on housekeeping cores)
+> I'm also anxious to get this merged, but I'm a little reluctant to
+> take it without DT, since we may find other issues once we boot the
+> tests with DT. I also know how it's easy, at least for me, to let
+> stuff get dropped when their priorities reduce. If you have time now,
+> how about we poke at it until the end of the week? With some luck,
+> it'll be sorted out and we'll also have the x86 ack, which I'd like
+> to get, by then.
+>
 
-I gave it a shot by isolating 32 cores and split into two groups, 16 for
-uffd threads and 16 for vcpu threads.  I got similiar results and I don't
-see much changed.
+Thanks Drew!
 
-I think it's possible it's just reaching the limit of my host since it only
-got 40 cores anyway.  Throughput never hits over 350K faults/sec overall.
+I've now implemented support for using an fdt when running tests as EFI 
+apps. You can find the two additional commits here:
 
-I assume this might not be the case for Anish if he has a much larger host.
-So we can have similar test carried out and see how that goes.  I think the
-idea is making sure vcpu load overhead during sched-in is ruled out, then
-see whether it can keep scaling with more cores.
+https://gitlab.com/nnikoleris/kvm-unit-tests/-/tree/target-efi-upstream-v6-pre
 
--- 
-Peter Xu
+But I suppose, at some point, I should also send the new version of this 
+series to the mailing list? What do you think?
 
+Thanks,
+
+Nikos
