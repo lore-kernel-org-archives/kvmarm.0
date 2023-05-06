@@ -1,166 +1,103 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 587B64C99
-	for <kvmarm@lists.linux.dev>; Fri,  5 May 2023 20:05:16 +0000 (UTC)
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-643557840e4so2532294b3a.2
-        for <kvmarm@lists.linux.dev>; Fri, 05 May 2023 13:05:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E37B1621
+	for <kvmarm@lists.linux.dev>; Sat,  6 May 2023 00:56:03 +0000 (UTC)
+Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-b980e16b27bso2203987276.2
+        for <kvmarm@lists.linux.dev>; Fri, 05 May 2023 17:56:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683317116; x=1685909116;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+        d=google.com; s=20221208; t=1683334563; x=1685926563;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=te4sAuRzX8wSQKX6THFhQ+UogT5JHUxdicm0nlSOK7Q=;
-        b=hTJkx1aBQ3X/ggwMdGwfrocXkNybdm6YFEepVzFvEYp/joksyFqSeT9n3c4irIW6wn
-         lfA3hEGHF2+hDGGh7vlC03BiqVO5xNHOSzAJjvJ841sp0JmwikTvShH3zpyQYLbWjQIv
-         rAUo05ZVovtWF5lmOOEe6JGJ+cfgS+6OqZQNk0EJGf9/8aE3KH+fXdGVL/IZzmD/3RkU
-         WCDBWHaLUa8C7mrSSwDr/hEui2G5B7MteIpTLgAqV9wvTN5fymw0v1PjHgVaL3mlYEwY
-         HWrR/kQ3fA0LPS+TKDohl7M6xOpwg9yKvykzgcSbwExNguOmb5UVyG8ewd8jiiuesC70
-         7MXg==
+        bh=uKg9ooWeNyIkgIgwiRq1E2syoa7nncxzMKLzyswsRsc=;
+        b=oEYCubX2MVaZ3lIzvYofKvwQIDmS/lXvTaPe+nx4JYIouIEOq7/VZNJBz/955TtNWl
+         rYZHJ+9qECqeg4RDvNtvrHP7Ui0lGMPDX2ubGmDW8gNEBQ4HBdjErLbRCtIQE4/ErBRb
+         UlUMiTVsTHoQ8RelA4t0FXBYWpOlPMnSpnz4cQsoVWkXnKmP9FEXp+ofhhYThW6YyuE1
+         IHUvMHy+BC8pzZGtWZNz6yAWNfS98wy2U8g8HBZK4UcJlfQuJKNgMLKe1XbotZB+DRQJ
+         E6hjwHB7/x0k7bAxrYPgZylFDAG4hiLFoxg569IPVzorgRuRk9NqLc9+2y4ttTt5sYY5
+         aecQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683317116; x=1685909116;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1683334563; x=1685926563;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=te4sAuRzX8wSQKX6THFhQ+UogT5JHUxdicm0nlSOK7Q=;
-        b=LZngyfD/B7QR/tBx5ogkz9Q6cFbYhSKTKgMAm3HEfwEwTSAtEh5VM8aXn0ThKikX00
-         Hp8A8hgMR09UL2FR8k/5UYT8fk95hkumKWUS08cih2gdajvvwcEb1scZiv3Avhraz52E
-         BFSlNY7LG+wX+hkVv0izpqOOIog1SzAckoO1Kd1PT2zUYRg/DR0G+Mut7qd3C4W+6M82
-         y/c6zp7+YDOZBI/1hQDE+c3qV86ZxQIOIUMyFuMeC/+nIyEC4TBuarRUluPo3YVWV9EY
-         yU6XoCpMxlk/f+ZDGmI+qMEqYt7yUIPSHef+H26eOtHOi1CbhWLEukVan4KBMkX/OS/k
-         Pj/Q==
-X-Gm-Message-State: AC+VfDyFp90gOHKnmV8TwSDxUI2EoOfU3A94pWiKJJuAzCJHoEIcmw+V
-	vYaKD1W+sMOujFGdle1d5Yc=
-X-Google-Smtp-Source: ACHHUZ75P0u2CxseiLnXqvon8NR428DDVfkd9GBfbjK16rQnl2L1ovsA78wH6CgK7aGsUzIghW9K/Q==
-X-Received: by 2002:a05:6a20:d39b:b0:f6:c920:7870 with SMTP id iq27-20020a056a20d39b00b000f6c9207870mr2724178pzb.59.1683317115161;
-        Fri, 05 May 2023 13:05:15 -0700 (PDT)
-Received: from smtpclient.apple ([66.170.99.2])
-        by smtp.gmail.com with ESMTPSA id v16-20020aa78510000000b005a8de0f4c64sm1988708pfn.82.2023.05.05.13.05.13
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 05 May 2023 13:05:14 -0700 (PDT)
-Content-Type: text/plain;
-	charset=us-ascii
+        bh=uKg9ooWeNyIkgIgwiRq1E2syoa7nncxzMKLzyswsRsc=;
+        b=ILZObD/1SIhji3tOL7R6i6Ob2oBVpFXO6T3gXK0N1z89Aav+Xzib8WpivnCy2ZywMX
+         U3srF1Kh4+bM5hHN4wT/53UMsFX3+4I1WBbfRPcd049/pNg6A7pF6fMATlpZCHt3xLA8
+         biXMQlfyOyWuF5ggZMGWwIrlafD7TkB4DMacw7M2B1ZRRafj0Hz2E+S6eVnXaMVw5n0I
+         0mgnzkpNQHG1hmRipLau0TUZmw0mCJAiKJX7zYtZ8KdT+QWF2yFYgVTfKcPrEmI1asjH
+         oejbPmldIYJtdq1VWwgh+Wi8hPC5RBMsLbTj1zDvqTaZ1f4qntJLgI2kY15D3FfSE92K
+         aT4A==
+X-Gm-Message-State: AC+VfDxY8acI37xJdjOJTLUF7+FqyiF1rfiW2QdjA9EHpt/N+P3DFz5u
+	wezGq8zuJdIapzUVK6a4A0Eh/W2romS2oG9J0Jz04g==
+X-Google-Smtp-Source: ACHHUZ7wTUegv3WyR7/Hq6e7DeiGJOrweEWBdXtRxu9dBQrh9sKO2r4H3TUs5GZtQPSXUUdXPbUlcJtY7oipXngdTpg=
+X-Received: by 2002:a0d:cb44:0:b0:556:b029:e101 with SMTP id
+ n65-20020a0dcb44000000b00556b029e101mr3457366ywd.19.1683334562650; Fri, 05
+ May 2023 17:56:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.500.231\))
-Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
- migration via annotated memory faults.
-From: Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <ZFLyGDoXHQrN1CCD@x1n>
-Date: Fri, 5 May 2023 13:05:02 -0700
-Cc: Sean Christopherson <seanjc@google.com>,
- Anish Moorthy <amoorthy@google.com>,
- Axel Rasmussen <axelrasmussen@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- maz@kernel.org,
- oliver.upton@linux.dev,
- James Houghton <jthoughton@google.com>,
- bgardon@google.com,
- dmatlack@google.com,
- ricarkol@google.com,
- kvm <kvm@vger.kernel.org>,
- kvmarm@lists.linux.dev
+MIME-Version: 1.0
+References: <20230421165305.804301-1-vipinsh@google.com> <20230421165305.804301-10-vipinsh@google.com>
+ <86pm7xjh3y.wl-maz@kernel.org>
+In-Reply-To: <86pm7xjh3y.wl-maz@kernel.org>
+From: Vipin Sharma <vipinsh@google.com>
+Date: Fri, 5 May 2023 17:55:26 -0700
+Message-ID: <CAHVum0d4W0emmyS0G8_nCXQuvgZN-8utDiT6TMYrOq7dF60aAw@mail.gmail.com>
+Subject: Re: [PATCH 9/9] KVM: arm64: Run clear-dirty-log under MMU read lock
+To: Marc Zyngier <maz@kernel.org>
+Cc: oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, 
+	tsbogend@alpha.franken.de, anup@brainfault.org, atishp@atishpatra.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	seanjc@google.com, pbonzini@redhat.com, dmatlack@google.com, 
+	ricarkol@google.com, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kselftest@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <8ED96522-B4A5-4106-B30B-8BE635B5DA7A@gmail.com>
-References: <ZEGuogfbtxPNUq7t@x1n>
- <46DD705B-3A3F-438E-A5B1-929C1E43D11F@gmail.com>
- <CAF7b7mo78e2YPHU5YrhzuORdpGXCVRxXr6kSyMa+L+guW8jKGw@mail.gmail.com>
- <84DD9212-31FB-4AF6-80DD-9BA5AEA0EC1A@gmail.com>
- <CAF7b7mr-_U6vU1iOwukdmOoaT0G1ttyxD62cv=vebnQeXL3R0w@mail.gmail.com>
- <ZErahL/7DKimG+46@x1n>
- <CAF7b7mqaxk6w90+9+5UkEAE13vDTmBMmCO_ZdAEo6pD8_--fZA@mail.gmail.com>
- <ZFLPlRReglM/Vgfu@x1n> <ZFLRpEV09lrpJqua@x1n> <ZFLVS+UvpG5w747u@google.com>
- <ZFLyGDoXHQrN1CCD@x1n>
-To: Peter Xu <peterx@redhat.com>
-X-Mailer: Apple Mail (2.3731.500.231)
 
+On Fri, Apr 21, 2023 at 10:11=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
+e:
+>
+> On Fri, 21 Apr 2023 17:53:05 +0100,
+> Vipin Sharma <vipinsh@google.com> wrote:
+> >
+> > Take MMU read lock for write protecting PTEs and use shared page table
+> > walker for clearing dirty logs.
+> >
+> > Clearing dirty logs are currently performed under MMU write locks. This
+> > means vCPUs write protection fault, which also take MMU read lock,  wil=
+l
+> > be blocked during this operation. This causes guest degradation and
+> > especially noticeable on VMs with lot of vCPUs.
+> >
+> > Taking MMU read lock will allow vCPUs to execute parallelly and reduces
+> > the impact on vCPUs performance.
+>
+> Sure. Taking no lock whatsoever would be even better.
+>
+> What I don't see is the detailed explanation that gives me the warm
+> feeling that this is safe and correct. Such an explanation is the
+> minimum condition for me to even read the patch.
+>
 
+Thanks for freaking me out. Your not getting warm feeling hunch was
+right, stage2_attr_walker() and stage2_update_leaf_attrs() combo do
+not retry if cmpxchg fails for write protection. Write protection
+callers don't check what the return status of the API is and just
+ignores cmpxchg failure. This means a vCPU (MMU read lock user) can
+cause cmpxchg to fail for write protection operation (under read lock,
+which this patch does) and clear ioctl will happily return as if
+everything is good.
 
-> On May 3, 2023, at 4:45 PM, Peter Xu <peterx@redhat.com> wrote:
->=20
-> On Wed, May 03, 2023 at 02:42:35PM -0700, Sean Christopherson wrote:
->> On Wed, May 03, 2023, Peter Xu wrote:
->>> Oops, bounced back from the list..
->>>=20
->>> Forward with no attachment this time - I assume the information is =
-still
->>> enough in the paragraphs even without the flamegraphs.
->>=20
->> The flamegraphs are definitely useful beyond what is captured here.  =
-Not sure
->> how to get them accepted on the list though.
->=20
-> Trying again with google drive:
->=20
-> single uffd:
-> https://drive.google.com/file/d/1bYVYefIRRkW8oViRbYv_HyX5Zf81p3Jl/view
->=20
-> 32 uffds:
-> https://drive.google.com/file/d/1T19yTEKKhbjU9G2FpANIvArSC61mqqtp/view
->=20
->>=20
->>>> =46rom what I got there, vmx_vcpu_load() gets more highlights than =
-the
->>>> spinlocks. I think that's the tlb flush broadcast.
->>=20
->> No, it's KVM dealing with the vCPU being migrated to a different =
-pCPU.  The
->> smp_call_function_single() that shows up is from loaded_vmcs_clear() =
-and is
->> triggered when KVM needs to VMCLEAR the VMCS on the _previous_ pCPU =
-(yay for the
->> VMCS caches not being coherent).
->>=20
->> Task migration can also trigger IBPB (if mitigations are enabled), =
-and also does
->> an "all contexts" INVEPT, i.e. flushes all TLB entries for KVM's MMU.
->>=20
->> Can you trying 1:1 pinning of vCPUs to pCPUs?  That _should_ =
-eliminate the
->> vmx_vcpu_load_vmcs() hotspot, and for large VMs is likely =
-represenative of a real
->> world configuration.
->=20
-> Yes it does went away:
->=20
-> https://drive.google.com/file/d/1ZFhWnWjoU33Lxy43jTYnKFuluo4zZArm/view
->=20
-> With pinning vcpu threads only (again, over 40 hard cores/threads):
->=20
-> ./demand_paging_test -b 512M -u MINOR -s shmem -v 32 -c =
-1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28=
-,29,30,31,32
->=20
-> It seems to me for some reason the scheduler ate more than I =
-expected..
-> Maybe tomorrow I can try two more things:
->=20
->  - Do cpu isolations, and
->  - pin reader threads too (or just leave the readers on housekeeping =
-cores)
+I will update the series and also work on validating the correctness
+to instill more confidence.
 
-For the record (and I hope I do not repeat myself): these scheduler =
-overheads
-is something that I have encountered before.
-
-The two main solutions I tried were:
-
-1. Optional polling on the faulting thread to avoid context switch on =
-the
-   faulting thread.
-
-(something like =
-https://lore.kernel.org/linux-mm/20201129004548.1619714-6-namit@vmware.com=
-/ )
-
-and=20
-
-2. IO-uring to avoid context switch on the handler thread.
-
-In addition, as I mentioned before, the queue locks is something that =
-can be
-simplified.
-
+Thanks
