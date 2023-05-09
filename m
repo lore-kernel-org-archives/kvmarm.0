@@ -1,116 +1,95 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C72415A7
-	for <kvmarm@lists.linux.dev>; Mon,  8 May 2023 01:23:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1683508986;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JWXgJrOi0veApt3CCm2dj5ggLRr24/6U5GIiI/IKSf8=;
-	b=jJ4Nc4QEKCCdyYB34h0WBYYei3H4r7+8r/hKn8cUIxo6A5tzpcyqFj427u2Om21lTBHUUc
-	O01x+R4i8i+I9N+n3j47U2XLRjcKmZVmZtPf/0cOtViBL88EA1lDC4qB07EarS7SKZSq5/
-	rSHydf3vBc7WiwIQKwIC1PB7wG6QIqc=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-464-cZWtHgCTMr--tZ22ZEoMHw-1; Sun, 07 May 2023 21:23:05 -0400
-X-MC-Unique: cZWtHgCTMr--tZ22ZEoMHw-1
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-1ab1b24c7c9so5250125ad.0
-        for <kvmarm@lists.linux.dev>; Sun, 07 May 2023 18:23:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683508983; x=1686100983;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JWXgJrOi0veApt3CCm2dj5ggLRr24/6U5GIiI/IKSf8=;
-        b=ZYl1f8qAWvMYYcv0/t7UGkPkcNM9Jvp9QdNrh+jkVxInB3OX7sn77qMhwQBJcbGLIW
-         KIA+LJFYP0x9uSvvkuYReE7suPbl9NWbduB9g8UliKhU60jifuehdyglsVxiGIWuVdRW
-         IspnxB8efqoBK5udxgTWF9xunnCCQXyzEy/vuZGR3/Ksr+j7g73pGWebvMfkuQcs+u0p
-         FbC30LXsAdFMTceYgpuEvVW4rkf54CqpZKuz0CChkKUi9w3h7m4MPwKhYU+rqX0HNJVg
-         aheJh1AsgiYDDICOdPcZY2K0S6aSGf2q0NhOmn/Q4r8Bk+JoTZoKKgr4JHdPW5o6v67m
-         S0KQ==
-X-Gm-Message-State: AC+VfDxq66WoC4TN9LzXGr0daK3oQ5AEisRnlzqpaaZT8OQkRGSXAlTi
-	9fq+q8rtXa+Lx8qtup65UqEJyBh4sp/Upjt/0SH3R72vLic9tru3Ug6I+mGMLqFDVVaLeWmbJB4
-	DFWOa9LE3TBUIwdcW
-X-Received: by 2002:a17:903:2284:b0:1a9:4b42:a5a2 with SMTP id b4-20020a170903228400b001a94b42a5a2mr10671613plh.0.1683508983339;
-        Sun, 07 May 2023 18:23:03 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ4hHg5Eq2zP00CeLtDM4c3X7G5A0Ae2cCvdNjGap9qMh5qpRSIbSyIM/KwyakcW4TZE8f5Q/A==
-X-Received: by 2002:a17:903:2284:b0:1a9:4b42:a5a2 with SMTP id b4-20020a170903228400b001a94b42a5a2mr10671588plh.0.1683508982912;
-        Sun, 07 May 2023 18:23:02 -0700 (PDT)
-Received: from x1n ([64.114.255.114])
-        by smtp.gmail.com with ESMTPSA id n19-20020a170902969300b001aae625e422sm5796728plp.37.2023.05.07.18.23.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 May 2023 18:23:02 -0700 (PDT)
-Date: Sun, 7 May 2023 21:23:01 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Anish Moorthy <amoorthy@google.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Nadav Amit <nadav.amit@gmail.com>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org,
-	oliver.upton@linux.dev, James Houghton <jthoughton@google.com>,
-	bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
-	kvm <kvm@vger.kernel.org>, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
- migration via annotated memory faults.
-Message-ID: <ZFhO9dlaFQRwaPFa@x1n>
-References: <84DD9212-31FB-4AF6-80DD-9BA5AEA0EC1A@gmail.com>
- <CAF7b7mr-_U6vU1iOwukdmOoaT0G1ttyxD62cv=vebnQeXL3R0w@mail.gmail.com>
- <ZErahL/7DKimG+46@x1n>
- <CAF7b7mqaxk6w90+9+5UkEAE13vDTmBMmCO_ZdAEo6pD8_--fZA@mail.gmail.com>
- <ZFLPlRReglM/Vgfu@x1n>
- <ZFLRpEV09lrpJqua@x1n>
- <ZFLVS+UvpG5w747u@google.com>
- <ZFLyGDoXHQrN1CCD@x1n>
- <ZFQC5TZ9tVSvxFWt@x1n>
- <CAF7b7mrTGL8rLVCmsmX4dZinZHRFFB7R7kX0Wv9FZR-B-4xhhw@mail.gmail.com>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93B6417ACF
+	for <kvmarm@lists.linux.dev>; Tue,  9 May 2023 14:23:21 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4BF40FEC;
+	Tue,  9 May 2023 07:23:59 -0700 (PDT)
+Received: from e126864.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 66C113F663;
+	Tue,  9 May 2023 07:23:12 -0700 (PDT)
+From: Kristina Martsenko <kristina.martsenko@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mark Brown <broonie@kernel.org>,
+	Luis Machado <luis.machado@arm.com>,
+	Vladimir Murzin <vladimir.murzin@arm.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 00/11] arm64: Support for Armv8.8 memcpy instructions in userspace
+Date: Tue,  9 May 2023 15:22:24 +0100
+Message-Id: <20230509142235.3284028-1-kristina.martsenko@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <CAF7b7mrTGL8rLVCmsmX4dZinZHRFFB7R7kX0Wv9FZR-B-4xhhw@mail.gmail.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On Fri, May 05, 2023 at 11:32:11AM -0700, Anish Moorthy wrote:
-> Peter, I'm afraid that isolating cores and splitting them into groups
-> is new to me. Do you mind explaining exactly what you did here?
+The Armv8.8 extension adds new instructions to perform memcpy(), memset() and
+memmove() operations in hardware (FEAT_MOPS). This series adds support for
+using the new instructions in userspace. More information can be found in the
+cover letter for v1:
+  https://lore.kernel.org/linux-arm-kernel/20230216160012.272345-1-kristina.martsenko@arm.com/
 
-So far I think the most important pinning is the vcpu thread pinning, we
-should test always with that in this case to avoid the vcpu load overhead
-not scaling with cores/vcpus.
+Changes in v2:
+ - Removed booting.rst requirement for HCRX_EL2.MCE2
+ - Changed HCRX_EL2 cpucap to be STRICT_BOOT type
+ - Changed HCRX_EL2.SMPME to be set for the guest and unset for the host
+ - Moved HCRX_EL2 initialization into init_el2_state(), dropped ISB
+ - Simplified conditional checks in mops exception handler with XOR
+ - Added comments from Arm ARM into mops exception handler
+ - Converted cpucaps to use the new ARM64_CPUID_FIELDS() helper
+ - Added MOPS to hwcaps kselftest
+ - Improved commit messages
+ - Rebased onto v6.4-rc1
+ - v1: https://lore.kernel.org/linux-arm-kernel/20230216160012.272345-1-kristina.martsenko@arm.com/
 
-What I did was (1) isolate cores (using isolcpus=xxx), then (2) manually
-pinning the userfault threads to some other isolated cores.  But maybe this
-is not needed.
 
-> 
-> Also, I finally got some of my own perf traces for the self test: [1]
-> shows what happens with 32 vCPUs faulting on a single uffd with 32
-> reader threads, with the contention clearly being a huge issue, and
-> [2] shows the effect of demand paging through memory faults on that
-> configuration. Unfortunately the export-to-svg functionality on our
-> internal tool seems broken, so I could only grab pngs :(
-> 
-> [1] https://drive.google.com/file/d/1YWiZTjb2FPmqj0tkbk4cuH0Oq8l65nsU/view?usp=drivesdk
-> [2] https://drive.google.com/file/d/1P76_6SSAHpLxNgDAErSwRmXBLkuDeFoA/view?usp=drivesdk
+Kristina Martsenko (11):
+  KVM: arm64: initialize HCRX_EL2
+  arm64: cpufeature: detect FEAT_HCX
+  KVM: arm64: switch HCRX_EL2 between host and guest
+  arm64: mops: document boot requirements for MOPS
+  arm64: mops: don't disable host MOPS instructions from EL2
+  KVM: arm64: hide MOPS from guests
+  arm64: mops: handle MOPS exceptions
+  arm64: mops: handle single stepping after MOPS exception
+  arm64: mops: detect and enable FEAT_MOPS
+  arm64: mops: allow disabling MOPS from the kernel command line
+  kselftest/arm64: add MOPS to hwcap test
 
-Understood.  What I tested was without -a so it's using >1 uffds.
+ .../admin-guide/kernel-parameters.txt         |  3 +
+ Documentation/arm64/booting.rst               |  6 ++
+ Documentation/arm64/cpu-feature-registers.rst |  2 +
+ Documentation/arm64/elf_hwcaps.rst            |  3 +
+ arch/arm64/include/asm/el2_setup.h            | 18 +++---
+ arch/arm64/include/asm/esr.h                  | 11 +++-
+ arch/arm64/include/asm/exception.h            |  1 +
+ arch/arm64/include/asm/hwcap.h                |  1 +
+ arch/arm64/include/asm/kvm_arm.h              |  4 ++
+ arch/arm64/include/uapi/asm/hwcap.h           |  1 +
+ arch/arm64/kernel/cpufeature.c                | 23 ++++++++
+ arch/arm64/kernel/cpuinfo.c                   |  1 +
+ arch/arm64/kernel/entry-common.c              | 11 ++++
+ arch/arm64/kernel/idreg-override.c            |  2 +
+ arch/arm64/kernel/traps.c                     | 58 +++++++++++++++++++
+ arch/arm64/kvm/hyp/include/hyp/switch.h       |  6 ++
+ arch/arm64/kvm/sys_regs.c                     |  1 +
+ arch/arm64/tools/cpucaps                      |  2 +
+ tools/testing/selftests/arm64/abi/hwcap.c     | 22 +++++++
+ 19 files changed, 167 insertions(+), 9 deletions(-)
 
-I explained why I think it could be useful to test this in my reply to
-Nadav, do you think it makes sense to you?  e.g. compare (1) 32 vcpus + 32
-uffd threads and (2) 64 vcpus + 64 uffd threads, again we need to make sure
-vcpu threads are pinned using -c this time.  It'll be nice to pin the uffd
-threads too but I'm not sure whether it'll make a huge difference.
 
-Thanks,
-
+base-commit: ac9a78681b921877518763ba0e89202254349d1b
 -- 
-Peter Xu
+2.25.1
 
