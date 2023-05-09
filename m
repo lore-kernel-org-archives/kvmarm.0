@@ -1,12 +1,12 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93B6417ACF
-	for <kvmarm@lists.linux.dev>; Tue,  9 May 2023 14:23:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12B1D182D9
+	for <kvmarm@lists.linux.dev>; Tue,  9 May 2023 14:23:22 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4BF40FEC;
-	Tue,  9 May 2023 07:23:59 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EAB7E1576;
+	Tue,  9 May 2023 07:24:05 -0700 (PDT)
 Received: from e126864.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 66C113F663;
-	Tue,  9 May 2023 07:23:12 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7DB2D3F663;
+	Tue,  9 May 2023 07:23:18 -0700 (PDT)
 From: Kristina Martsenko <kristina.martsenko@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
@@ -22,10 +22,12 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Luis Machado <luis.machado@arm.com>,
 	Vladimir Murzin <vladimir.murzin@arm.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 00/11] arm64: Support for Armv8.8 memcpy instructions in userspace
-Date: Tue,  9 May 2023 15:22:24 +0100
-Message-Id: <20230509142235.3284028-1-kristina.martsenko@arm.com>
+Subject: [PATCH v2 02/11] arm64: cpufeature: detect FEAT_HCX
+Date: Tue,  9 May 2023 15:22:26 +0100
+Message-Id: <20230509142235.3284028-3-kristina.martsenko@arm.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230509142235.3284028-1-kristina.martsenko@arm.com>
+References: <20230509142235.3284028-1-kristina.martsenko@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -34,62 +36,59 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The Armv8.8 extension adds new instructions to perform memcpy(), memset() and
-memmove() operations in hardware (FEAT_MOPS). This series adds support for
-using the new instructions in userspace. More information can be found in the
-cover letter for v1:
-  https://lore.kernel.org/linux-arm-kernel/20230216160012.272345-1-kristina.martsenko@arm.com/
+Detect if the system has the new HCRX_EL2 register added in ARMv8.7/9.2,
+so that subsequent patches can check for its presence.
 
-Changes in v2:
- - Removed booting.rst requirement for HCRX_EL2.MCE2
- - Changed HCRX_EL2 cpucap to be STRICT_BOOT type
- - Changed HCRX_EL2.SMPME to be set for the guest and unset for the host
- - Moved HCRX_EL2 initialization into init_el2_state(), dropped ISB
- - Simplified conditional checks in mops exception handler with XOR
- - Added comments from Arm ARM into mops exception handler
- - Converted cpucaps to use the new ARM64_CPUID_FIELDS() helper
- - Added MOPS to hwcaps kselftest
- - Improved commit messages
- - Rebased onto v6.4-rc1
- - v1: https://lore.kernel.org/linux-arm-kernel/20230216160012.272345-1-kristina.martsenko@arm.com/
+KVM currently relies on the register being present on all CPUs (or
+none), so the kernel will panic if that is not the case. Fortunately no
+such systems currently exist, but this can be revisited if they appear.
+Note that the kernel will not panic if CONFIG_KVM is disabled.
 
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
+---
+ arch/arm64/kernel/cpufeature.c | 8 ++++++++
+ arch/arm64/tools/cpucaps       | 1 +
+ 2 files changed, 9 insertions(+)
 
-Kristina Martsenko (11):
-  KVM: arm64: initialize HCRX_EL2
-  arm64: cpufeature: detect FEAT_HCX
-  KVM: arm64: switch HCRX_EL2 between host and guest
-  arm64: mops: document boot requirements for MOPS
-  arm64: mops: don't disable host MOPS instructions from EL2
-  KVM: arm64: hide MOPS from guests
-  arm64: mops: handle MOPS exceptions
-  arm64: mops: handle single stepping after MOPS exception
-  arm64: mops: detect and enable FEAT_MOPS
-  arm64: mops: allow disabling MOPS from the kernel command line
-  kselftest/arm64: add MOPS to hwcap test
-
- .../admin-guide/kernel-parameters.txt         |  3 +
- Documentation/arm64/booting.rst               |  6 ++
- Documentation/arm64/cpu-feature-registers.rst |  2 +
- Documentation/arm64/elf_hwcaps.rst            |  3 +
- arch/arm64/include/asm/el2_setup.h            | 18 +++---
- arch/arm64/include/asm/esr.h                  | 11 +++-
- arch/arm64/include/asm/exception.h            |  1 +
- arch/arm64/include/asm/hwcap.h                |  1 +
- arch/arm64/include/asm/kvm_arm.h              |  4 ++
- arch/arm64/include/uapi/asm/hwcap.h           |  1 +
- arch/arm64/kernel/cpufeature.c                | 23 ++++++++
- arch/arm64/kernel/cpuinfo.c                   |  1 +
- arch/arm64/kernel/entry-common.c              | 11 ++++
- arch/arm64/kernel/idreg-override.c            |  2 +
- arch/arm64/kernel/traps.c                     | 58 +++++++++++++++++++
- arch/arm64/kvm/hyp/include/hyp/switch.h       |  6 ++
- arch/arm64/kvm/sys_regs.c                     |  1 +
- arch/arm64/tools/cpucaps                      |  2 +
- tools/testing/selftests/arm64/abi/hwcap.c     | 22 +++++++
- 19 files changed, 167 insertions(+), 9 deletions(-)
-
-
-base-commit: ac9a78681b921877518763ba0e89202254349d1b
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 7d7128c65161..9898ad77b1db 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -364,6 +364,7 @@ static const struct arm64_ftr_bits ftr_id_aa64mmfr0[] = {
+ static const struct arm64_ftr_bits ftr_id_aa64mmfr1[] = {
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_EL1_TIDCP1_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_EL1_AFP_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_EL1_HCX_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_EL1_ETS_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_EL1_TWED_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_EL1_XNX_SHIFT, 4, 0),
+@@ -2309,6 +2310,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+ 		.matches = is_kvm_protected_mode,
+ 	},
++	{
++		.desc = "HCRX_EL2 register",
++		.capability = ARM64_HAS_HCX,
++		.type = ARM64_CPUCAP_STRICT_BOOT_CPU_FEATURE,
++		.matches = has_cpuid_feature,
++		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, HCX, IMP)
++	},
+ #endif
+ 	{
+ 		.desc = "Kernel page table isolation (KPTI)",
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index 40ba95472594..e1de10fa080e 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -32,6 +32,7 @@ HAS_GENERIC_AUTH_IMP_DEF
+ HAS_GIC_CPUIF_SYSREGS
+ HAS_GIC_PRIO_MASKING
+ HAS_GIC_PRIO_RELAXED_SYNC
++HAS_HCX
+ HAS_LDAPR
+ HAS_LSE_ATOMICS
+ HAS_NESTED_VIRT
 -- 
 2.25.1
 
