@@ -1,12 +1,12 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ECA419525
-	for <kvmarm@lists.linux.dev>; Tue,  9 May 2023 14:23:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8436919525
+	for <kvmarm@lists.linux.dev>; Tue,  9 May 2023 14:23:35 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A0A1FEC;
-	Tue,  9 May 2023 07:24:16 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 973191063;
+	Tue,  9 May 2023 07:24:19 -0700 (PDT)
 Received: from e126864.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BD09D3F840;
-	Tue,  9 May 2023 07:23:28 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3ABC93F663;
+	Tue,  9 May 2023 07:23:32 -0700 (PDT)
 From: Kristina Martsenko <kristina.martsenko@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
@@ -22,9 +22,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Luis Machado <luis.machado@arm.com>,
 	Vladimir Murzin <vladimir.murzin@arm.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 05/11] arm64: mops: don't disable host MOPS instructions from EL2
-Date: Tue,  9 May 2023 15:22:29 +0100
-Message-Id: <20230509142235.3284028-6-kristina.martsenko@arm.com>
+Subject: [PATCH v2 06/11] KVM: arm64: hide MOPS from guests
+Date: Tue,  9 May 2023 15:22:30 +0100
+Message-Id: <20230509142235.3284028-7-kristina.martsenko@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230509142235.3284028-1-kristina.martsenko@arm.com>
 References: <20230509142235.3284028-1-kristina.martsenko@arm.com>
@@ -36,29 +36,30 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To allow nVHE host EL0 and EL1 to use FEAT_MOPS instructions, configure
-EL2 to not cause these instructions to be treated as UNDEFINED. A VHE
-host is unaffected by this control.
+As FEAT_MOPS is not supported in guests yet, hide it from the ID
+registers for guests.
 
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+The MOPS instructions are UNDEFINED in guests as HCRX_EL2.MSCEn is not
+set in HCRX_GUEST_FLAGS, and will take an exception to EL1 if executed.
+
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
 ---
- arch/arm64/include/asm/kvm_arm.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/kvm/sys_regs.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 7bb2fbddda54..d2d4f4cd12b8 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -94,7 +94,7 @@
- #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
- 
- #define HCRX_GUEST_FLAGS (HCRX_EL2_SMPME)
--#define HCRX_HOST_FLAGS 0
-+#define HCRX_HOST_FLAGS (HCRX_EL2_MSCEn)
- 
- /* TCR_EL2 Registers bits */
- #define TCR_EL2_RES1		((1U << 31) | (1 << 23))
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 71b12094d613..6dae7fe91cfa 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1252,6 +1252,7 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r
+ 				 ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_GPA3));
+ 		if (!cpus_have_final_cap(ARM64_HAS_WFXT))
+ 			val &= ~ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_WFxT);
++		val &= ~ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_MOPS);
+ 		break;
+ 	case SYS_ID_AA64DFR0_EL1:
+ 		/* Limit debug to ARMv8.0 */
 -- 
 2.25.1
 
