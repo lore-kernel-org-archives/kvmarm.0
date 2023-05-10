@@ -1,157 +1,102 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975E021CC1
-	for <kvmarm@lists.linux.dev>; Wed, 10 May 2023 21:50:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1683755458;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bhfyLDZL2Wy4NLwhyKEfa0N1V5Lq+EA3KLNXjKgrsmI=;
-	b=W+j3B8rVNhZVOSGdVTT4eVGOlcOO52pn+oSNO8qpp7FYP+V7NdIrLQHkoxqsIJVpz052Kr
-	pIwSB1+rkFpRuJdnPjlDb4BAvx/7dhtSb5bPbTLpRM9Bc4UA+zKld0JJu9suC4zwm+lTZX
-	E+FXOqrJiyd5DZQ74J/2ZpqL52Zprm8=
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
- [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-313-AF6ImZnoOPuEeCSud_s0Pw-1; Wed, 10 May 2023 17:50:57 -0400
-X-MC-Unique: AF6ImZnoOPuEeCSud_s0Pw-1
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-524f4aec154so757364a12.1
-        for <kvmarm@lists.linux.dev>; Wed, 10 May 2023 14:50:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7456E21CF1
+	for <kvmarm@lists.linux.dev>; Wed, 10 May 2023 22:35:50 +0000 (UTC)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6435b851de0so4623835b3a.0
+        for <kvmarm@lists.linux.dev>; Wed, 10 May 2023 15:35:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1683758150; x=1686350150;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AXWsa967kWQ103ztzoiQqsYOxAfVBnqmOcMcaXXMfK0=;
+        b=hLPWW/6LDB/o0VythM97kkqBcdiN8QKk6IiYT09S3iCYw+9ptyULgVnnrfSVpDLPG/
+         v8+BKDKTTzlFxWyxdH88CSwQ9Q7gGmZJRyBCLBKw0gOzF5+YFIpi/JSuswBIutnBSYzL
+         GS2z77PT2rgQL8ZZfCE/wTqNMqV7e/1euiQGssFAPGJhr6Lo839j5RDDbX0MFFi7Uteu
+         a6sN5Eks3+vJhPj+kQAAkaN3jmlrWHiXFJorO4Z6pyAT1oSXARtLsiLT2NqXplxoa339
+         ZgljXKLDsdeBXqdS4dccC1WgQ6cNVBmZQ3FEGdbpCb6SxVYLx5mgqkP8eyeYrqz86rQD
+         V4xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683755451; x=1686347451;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bhfyLDZL2Wy4NLwhyKEfa0N1V5Lq+EA3KLNXjKgrsmI=;
-        b=NTw5nUgprS7VDd9m6kXQ9MceRtQwf26M1q/534qVtoI/QirCjq2J3bCdZUYYDW0kwe
-         /P5DcMNHV8iKS9Jzg7tQnzyzEGMPKvjGdw6RLk7pgailDqrTlPn5m6F42TA7jy/HlLBW
-         7TcoOg+KRC/5Kh3NB0Fn/gEYVvyDkV/Jb40jXyg6Q3cyiw6830Cr9o5T9iSKmt4Un09H
-         sQ6T+43c1m96V/G5eXPNX8AqP/9MT5n4Ft8eAPVUzGhHaG0dg8BygENDxlEyaxTDPmxH
-         YKvtWxEa3V5ls6LR+v3gmhye98YOBkvCDwPrzKOXl+BPBfQIxxt69D/+ax/p3eHsTXBe
-         8ETA==
-X-Gm-Message-State: AC+VfDyLYaP/KZT6h4Th/t54Y2/fn/fa6A7hT0AwaqsdGrwhimywtQew
-	Jj94aW49hcBWCLBOqze9MBIRL8ojBi0YbasZE1eIMV85QUa9FOgHbfi88rPmZs2uwfc8lWIZkfp
-	BobK7nBHwZUdatSx5
-X-Received: by 2002:a17:90b:1b0c:b0:250:d8e1:d326 with SMTP id nu12-20020a17090b1b0c00b00250d8e1d326mr2953771pjb.0.1683755451117;
-        Wed, 10 May 2023 14:50:51 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ4vELi5N4iVjVE7aGE9xoE0xspdoTHNdsD0TLrBv982RL4blARiCA+cRxw/XcIAKdEaDuo4yw==
-X-Received: by 2002:a17:90b:1b0c:b0:250:d8e1:d326 with SMTP id nu12-20020a17090b1b0c00b00250d8e1d326mr2953745pjb.0.1683755450617;
-        Wed, 10 May 2023 14:50:50 -0700 (PDT)
-Received: from x1n ([2001:4958:15a0:30:ea6e:cae6:2dab:2897])
-        by smtp.gmail.com with ESMTPSA id n12-20020a17090a9f0c00b0024e05b7ba8bsm17611209pjp.25.2023.05.10.14.50.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 May 2023 14:50:49 -0700 (PDT)
-Date: Wed, 10 May 2023 14:50:48 -0700
-From: Peter Xu <peterx@redhat.com>
-To: Anish Moorthy <amoorthy@google.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Nadav Amit <nadav.amit@gmail.com>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org,
-	oliver.upton@linux.dev, James Houghton <jthoughton@google.com>,
-	bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
-	kvm <kvm@vger.kernel.org>, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
- migration via annotated memory faults.
-Message-ID: <ZFwRuCuYYMtuUFFA@x1n>
-References: <ZErahL/7DKimG+46@x1n>
- <CAF7b7mqaxk6w90+9+5UkEAE13vDTmBMmCO_ZdAEo6pD8_--fZA@mail.gmail.com>
- <ZFLPlRReglM/Vgfu@x1n>
- <ZFLRpEV09lrpJqua@x1n>
- <ZFLVS+UvpG5w747u@google.com>
- <ZFLyGDoXHQrN1CCD@x1n>
- <ZFQC5TZ9tVSvxFWt@x1n>
- <CAF7b7mrTGL8rLVCmsmX4dZinZHRFFB7R7kX0Wv9FZR-B-4xhhw@mail.gmail.com>
- <ZFhO9dlaFQRwaPFa@x1n>
- <CAF7b7mqPdfbzj6cOWPsg+Owysc-SOTF+6UUymd9f0Mctag=8DQ@mail.gmail.com>
+        d=1e100.net; s=20221208; t=1683758150; x=1686350150;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AXWsa967kWQ103ztzoiQqsYOxAfVBnqmOcMcaXXMfK0=;
+        b=cYQG4oWghcvVpop9sOsj23qTb1EmNeWa330M1gqdsyW/8CUM/LFygTdcevvuG/N30V
+         yeQRH2T7uPoGZnIxkKEbo9GL8WC65wy9sqhep976ePcl2TfclLYzbWCM/SBapDF9AgNB
+         Cav19TJ+2+qKqkj+/0TeU4YXboIGkBWRysUsHFkqdqCXwSG036AM1CsgUh91iYUu/KpX
+         453ZYKIQRvo1U1BT2EQEPt0vHPmTGFO5w9v7QP6j9FF+n25uiER3ckLNVDDA4AHYUhCf
+         dg6PmSmJGyAg6+J9tr2/MK4S/ub0KRCruXL/rYsjGcxduEMui6PK0DY/wgOMWKyj9Xhq
+         Yoxw==
+X-Gm-Message-State: AC+VfDynCno1k6WmkhC38ZQK4oYg4b3dvuGxsLYMg8yrir6b3W1Lm9L1
+	AebKZK0sjIPTHkW7o5DQM/OtuOMI1CQ=
+X-Google-Smtp-Source: ACHHUZ5Gy9IA+Ru/c8L2WMQy1v0wXipJ7RD7p6ZiiwmW9YlFbl+2mMgwKT81N6fwSPogBVGQ0I0240fyYmQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:bd0:b0:63a:ff2a:bf9f with SMTP id
+ x16-20020a056a000bd000b0063aff2abf9fmr5274082pfu.2.1683758149940; Wed, 10 May
+ 2023 15:35:49 -0700 (PDT)
+Date: Wed, 10 May 2023 15:35:48 -0700
+In-Reply-To: <ZFrG4KSacT/K9+k5@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-In-Reply-To: <CAF7b7mqPdfbzj6cOWPsg+Owysc-SOTF+6UUymd9f0Mctag=8DQ@mail.gmail.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20230412213510.1220557-1-amoorthy@google.com> <ZFrG4KSacT/K9+k5@google.com>
+Message-ID: <ZFwcRCSSlpCBspxy@google.com>
+Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
+ migration via annotated memory faults.
+From: Sean Christopherson <seanjc@google.com>
+To: David Matlack <dmatlack@google.com>
+Cc: Anish Moorthy <amoorthy@google.com>, pbonzini@redhat.com, maz@kernel.org, 
+	oliver.upton@linux.dev, jthoughton@google.com, bgardon@google.com, 
+	ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com, 
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
 
-Hi, Anish,
-
-On Tue, May 09, 2023 at 01:52:05PM -0700, Anish Moorthy wrote:
-> On Sun, May 7, 2023 at 6:23 PM Peter Xu <peterx@redhat.com> wrote:
-> >
-> > I explained why I think it could be useful to test this in my reply to
-> > Nadav, do you think it makes sense to you?
+On Tue, May 09, 2023, David Matlack wrote:
+> On Wed, Apr 12, 2023 at 09:34:48PM +0000, Anish Moorthy wrote:
+> > Upon receiving an annotated EFAULT, userspace may take appropriate
+> > action to resolve the failed access. For instance, this might involve a
+> > UFFDIO_CONTINUE or MADV_POPULATE_WRITE in the context of uffd-based live
+> > migration postcopy.
 > 
-> Ah, I actually missed your reply to Nadav: didn't realize you had sent
-> *two* emails.
+> As implemented, I think it will be prohibitively expensive if not
+> impossible for userspace to determine why KVM is returning EFAULT when
+> KVM_CAP_ABSENT_MAPPING_FAULT is enabled, which means userspace can't
+> decide the correct action to take (try to resolve or bail).
 > 
-> > While OTOH if multi-uffd can scale well, then there's a chance of
-> > general solution as long as we can remove the single-queue
-> > contention over the whole guest mem.
+> Consider the direct_map() case in patch in PATCH 15. The only way to hit
+> that condition is a logic bug in KVM or data corruption. There isn't
+> really anything userspace can do to handle this situation, and it has no
+> way to distinguish that from faults to due absent mappings.
 > 
-> I don't quite understand your statement here: if we pursue multi-uffd,
-> then it seems to me that by definition we've removed the single
-> queue(s) for all of guest memory, and thus the associated contention.
-> And we'd still have the issue of multiple vCPUs contending for a
-> single UFFD.
-
-Yes as I mentioned it's purely what I was curious and it also shows the
-best result we can have if we go a more generic solution; it doesn't really
-solve the issue immediately.
-
+> We could end up hitting cases where userspace loops forever doing
+> KVM_RUN, EFAULT, UFFDIO_CONTINUE/MADV_POPULATE_WRITE, KVM_RUN, EFAULT...
 > 
-> But I do share some of your curiosity about multi-uffd performance,
-> especially since some of my earlier numbers indicated that multi-uffd
-> doesn't scale linearly, even when each vCPU corresponds to a single
-> UFFD.
-> 
-> So, I grabbed some more profiles for 32 and 64 vcpus using the following command
-> ./demand_paging_test -b 512M -u MINOR -s shmem -v <n> -r 1 -c <1,...,n>
-> 
-> The 32-vcpu config achieves a per-vcpu paging rate of 8.8k. That rate
-> goes down to 3.9k (!) with 64 vCPUs. I don't immediately see the issue
-> from the traces, but safe to say it's definitely not scaling. Since I
-> applied your fixes from earlier, the prefaulting isn't being counted
-> against the demand paging rate either.
-> 
-> 32-vcpu profile:
-> https://drive.google.com/file/d/19ZZDxZArhSsbW_5u5VcmLT48osHlO9TG/view?usp=drivesdk
-> 64-vcpu profile:
-> https://drive.google.com/file/d/1dyLOLVHRNdkUoFFr7gxqtoSZGn1_GqmS/view?usp=drivesdk
-> 
-> Do let me know if you need svg files instead and I'll try and figure that out.
+> Maybe we should just change direct_map() to use KVM_BUG() and return
+> something other than EFAULT. But the general problem still exists and
+> even if we have confidence in all the current EFAULT sites, we don't have
+> much protection against someone adding an EFAULT in the future that
+> userspace can't handle.
 
-Thanks for trying all these out, and sorry if I caused confusion in my
-reply.
+Yeah, when I speed read the series, several of the conversions stood out as being
+"wrong".  My (potentially unstated) idea was that KVM would only signal
+KVM_EXIT_MEMORY_FAULT when the -EFAULT could be traced back to a user access,
+i.e. when the fault _might_ be resolvable by userspace.
 
-What I wanted to do is to understand whether there's still chance to
-provide a generic solution.  I don't know why you have had a bunch of pmu
-stack showing in the graph, perhaps you forgot to disable some of the perf
-events when doing the test?  Let me know if you figure out why it happened
-like that (so far I didn't see), but I feel guilty to keep overloading you
-with such questions.
+If we want to populate KVM_EXIT_MEMORY_FAULT even on kernel bugs, and anything
+else that userspace can't possibly resolve, then the easiest thing would be to
+add a flag to signal that the fault is fatal, i.e. that userspace shouldn't retry.
+Adding a flag may be more robust in the long term as it will force developers to
+think about whether or not a fault is fatal, versus relying on documentation to
+say "don't signal KVM_EXIT_MEMORY_FAULT for fatal EFAULT conditions".
 
-The major problem I had with this series is it's definitely not a clean
-approach.  Say, even if you'll all rely on userapp you'll still need to
-rely on userfaultfd for kernel traps on corner cases or it just won't work.
-IIUC that's also the concern from Nadav.
-
-But I also agree it seems to resolve every bottleneck in the kernel no
-matter whether it's in scheduler or vcpu loading. After all you throw
-everything into userspace.. :)
-
-Considering that most of the changes are for -EFAULT traps and the 2nd part
-change is very self contained and maintainable, no objection here to have
-it.  I'll leave that to the maintainers to decide.
-
-Thanks,
-
--- 
-Peter Xu
-
+Side topic, KVM x86 really should have a version of KVM_SYNC_X86_REGS that stores
+registers for userspace, but doesn't load registers.  That would allow userspace
+to detect many infinite loops with minimal overhead, e.g. (1) set KVM_STORE_X86_REGS
+during demand paging, (2) check RIP on every exit to see if the vCPU is making
+forward progress, (3) escalate to checking all registers if RIP hasn't changed for
+N exits, and finally (4) take action if the guest is well and truly stuck after
+N more exits.  KVM could even store RIP on every exit if userspace wanted to avoid
+the overhead of storing registers until userspace actually wants all registers.
