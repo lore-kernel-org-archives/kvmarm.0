@@ -1,116 +1,87 @@
-Received: from out-36.mta0.migadu.com (out-36.mta0.migadu.com [91.218.175.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD4A8200AE
-	for <kvmarm@lists.linux.dev>; Fri, 12 May 2023 17:21:09 +0000 (UTC)
-Date: Fri, 12 May 2023 17:21:03 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1683912067;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZSiDQKzm5iZBeoOO1Iqg6S2UdkhlrBZ6VIgs6Brz7tk=;
-	b=waRJ90YZCaVKNpGP/sf+nspzkk5AJ+wR8DzMo+3iy2r9XPvpHBtyAgLKA71aqn6gA533LI
-	F5CCEgU3Z11CgGB1BQ2MsNXsyenYcgmoRGQPwzQ16mZX0pSGcAQ/9b2gHtrxK17n4g1zGB
-	HOBw58bl7kTEcp40WbQGXmHfpF6wYJc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v3 6/7] KVM: arm64: Add 'skip_flush' arg to
- stage2_put_pte()
-Message-ID: <ZF51f5tYPjK1aCpd@linux.dev>
-References: <20230414172922.812640-1-rananta@google.com>
- <20230414172922.812640-7-rananta@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5202F7F0
+	for <kvmarm@lists.linux.dev>; Fri, 12 May 2023 23:31:30 +0000 (UTC)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6434307a64bso10633387b3a.2
+        for <kvmarm@lists.linux.dev>; Fri, 12 May 2023 16:31:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1683934289; x=1686526289;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LOZreDabNqpUj7u+V8APqRqu4TK74uLHH24UEDNUCHI=;
+        b=Zja9mH7oY+lw1E5/US7t2dlayN3yjG5xJZYmUi1MDWPsxw2Sy/jDu9vsw5olTvhSNd
+         QCgQkjoYs8efeFbYFt87WjqxowUr6XJhvHeiVn9eyKykCmOnrNkC55/LgY0EDQKPJWim
+         a6bM36P7UC21fS6BS4B6XHLZIivgPIeib0cLg0JTtNa1n0cX/fMBHSQHX3dvNKG/WG8t
+         7N6LK6oLs/SBnJzm/i9BkS6O236X4516CUCogNmtvONYwYxdHDnwbvIqcgYmEUafFWKk
+         UvqFOltbKLn9ANbffrpoouV/QgP0kXGjj8DMEuk7Yewe9MtzPew9TLs8tss9e/tpkpqd
+         7WPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683934289; x=1686526289;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LOZreDabNqpUj7u+V8APqRqu4TK74uLHH24UEDNUCHI=;
+        b=cJ4SCQ4il0w1SdBApD9/DJjowl9DCbi0mfrTkJIUuoa99h2DEM0TNMOWKB5O5eZW04
+         Q9DvoGaZoTb3pmJzlu1IWUa++vBjYjOToCE/5XRdDhdnlzIxFGglZY0RDDJ5KtNeE97c
+         2eg2Vpdxqci2A4fHusB09e2KAR6/yWwrgrZKqwZ4N39n3jESFdZ3DnBTJ9RYeu2fgPGR
+         Ez019zlIfLfhKeWr8fU0+GFboXHMqm+n4V0d+ONeYX50yWyl4eMHBln3sKHK2Ue8nZX+
+         O2MoSlWlrLmB1vkYYJH6bFernyktTfLlXwOCQxEowT7N+vjxNFuZHbK5Ful6ZWIk//hz
+         ULVQ==
+X-Gm-Message-State: AC+VfDzKPQ/0kDrBsH2rBR0ly7aqO+rHLBgMwjgS+zBOPEsPTLxsDd4/
+	t7SF8ajVq4R5R5fmawi/kcW8agK91JQ=
+X-Google-Smtp-Source: ACHHUZ4+wXYsC9AiEzl5m7UK3UfElGCg0UgJLKMd3X0fuTu7gvDDXKM0VCK/mWN3zQh5HT0lfa6pt+xxtg8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:d42:b0:643:a029:5b3f with SMTP id
+ n2-20020a056a000d4200b00643a0295b3fmr6979951pfv.2.1683934289733; Fri, 12 May
+ 2023 16:31:29 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri, 12 May 2023 16:31:25 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230414172922.812640-7-rananta@google.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.40.1.606.ga4b1b128d6-goog
+Message-ID: <20230512233127.804012-1-seanjc@google.com>
+Subject: [PATCH v2 0/2] KVM: Fix race between reboot and hardware enabling
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
+	Huacai Chen <chenhuacai@kernel.org>, 
+	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, kvm-riscv@lists.infradead.org, 
+	Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Raghavendra,
+Fix a bug where enabling hardware virtualization can race with a forced
+reboot, e.g. `reboot -f`, and result in virt hardware being enabled when
+the reboot is attempted, and thus hanging the reboot.
 
-On Fri, Apr 14, 2023 at 05:29:21PM +0000, Raghavendra Rao Ananta wrote:
-> Add a 'skip_flush' argument in stage2_put_pte() to
-> control the TLB invalidations. This will be leveraged
-> by the upcoming patch to defer the individual PTE
-> invalidations until the entire walk is finished.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> ---
->  arch/arm64/kvm/hyp/pgtable.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index b8f0dbd12f773..3f136e35feb5e 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -772,7 +772,7 @@ static void stage2_make_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t n
->  }
->  
->  static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu,
-> -			   struct kvm_pgtable_mm_ops *mm_ops)
-> +			   struct kvm_pgtable_mm_ops *mm_ops, bool skip_flush)
+Found by inspection, confirmed by hacking the reboot flow to wait until
+KVM loads (the problematic window is ridiculously small).
 
-Assuming you are going to pull the cpufeature checks into this helper,
-it might me helpful to narrow the scope of it. 'stage2_put_pte()' sounds
-very generic, but it is about to have a very precise meaning in relation
-to kvm_pgtable_stage2_unmap().
+Fully tested only on x86, compile tested on other architectures.
 
-So maybe stage2_unmap_put_pte()? While at it, you'd want to have a
-shared helper for the deferral check:
+v2:
+ - Rename KVM's callback to kvm_shutdown() to match the hook. [Marc]
+ - Don't add a spurious newline. [Marc]
 
-static bool stage2_unmap_defer_tlb_flush(struct kvm_pgtable *pgt)
-{
-	/* your blurb for why FWB is required too */
-	return system_supports_tlb_range() && stage2_has_fwb(pgt);
-}
+v1: https://lore.kernel.org/all/20230310221414.811690-1-seanjc@google.com
 
-The 'flush' part is annoying, because the exact term is an invalidation,
-but we already have that pattern in all of our TLB invalidation helpers.
+Sean Christopherson (2):
+  KVM: Use syscore_ops instead of reboot_notifier to hook
+    restart/shutdown
+  KVM: Don't enable hardware after a restart/shutdown is initiated
 
->  {
->  	/*
->  	 * Clear the existing PTE, and perform break-before-make with
-> @@ -780,7 +780,10 @@ static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s
->  	 */
->  	if (kvm_pte_valid(ctx->old)) {
->  		kvm_clear_pte(ctx->ptep);
-> -		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
-> +
-> +		if (!skip_flush)
-> +			kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu,
-> +					ctx->addr, ctx->level);
->  	}
->  
->  	mm_ops->put_page(ctx->ptep);
-> @@ -1015,7 +1018,7 @@ static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
->  	 * block entry and rely on the remaining portions being faulted
->  	 * back lazily.
->  	 */
-> -	stage2_put_pte(ctx, mmu, mm_ops);
-> +	stage2_put_pte(ctx, mmu, mm_ops, false);
->  
->  	if (need_flush && mm_ops->dcache_clean_inval_poc)
->  		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(ctx->old, mm_ops),
-> -- 
-> 2.40.0.634.g4ca3ef3211-goog
-> 
+ virt/kvm/kvm_main.c | 43 +++++++++++++++++++++++++++----------------
+ 1 file changed, 27 insertions(+), 16 deletions(-)
 
+
+base-commit: b3c98052d46948a8d65d2778c7f306ff38366aac
 -- 
-Thanks,
-Oliver
+2.40.1.606.ga4b1b128d6-goog
+
