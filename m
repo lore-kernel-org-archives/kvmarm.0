@@ -1,203 +1,83 @@
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A103B206AE
-	for <kvmarm@lists.linux.dev>; Thu, 11 May 2023 19:46:09 +0000 (UTC)
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-61b79b9f45bso81468436d6.3
-        for <kvmarm@lists.linux.dev>; Thu, 11 May 2023 12:46:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683834368; x=1686426368;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zB5JTYTzbjxzfAcUGW7YtQ3w09yA53VmJwoy9w9h8Mk=;
-        b=MSYO5oY101nXNgFFS5INBeg2REcRI+bKb25dJwtMCcKSB3EDAEemoJ2RsN/mt5/vp1
-         XDxFf+aX8AYgEWlwhXjccCnosCqiGBVJ8BxykT5Q2LDiiX6CwItdMnjLwWH+n8jjD8bv
-         SdFHVLaBMUdKsNEeFF436uQekPut9i21dLMCrLpbR8Jzs8mHk+x0Z3j9Zt7/bO+1WNNW
-         vDf3laD/eLstGDdoy9XZ9dZfGnm/cPqR4dMLS5VwI/PjdDOTznc7dhfy7hPAtGy+Gjzc
-         OIA+E//Ow0LYcHpjyvdF0t9UMzZQdsK88GfkViGJUPSBP4b0YAruoE9aCphuzmEc+Tc/
-         D+Ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683834368; x=1686426368;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zB5JTYTzbjxzfAcUGW7YtQ3w09yA53VmJwoy9w9h8Mk=;
-        b=AB1pG8WfOhjMY2ofvD18I7VSPmHs3yDg+GXOuqYUQW2JO43ic4rcz22qaXolIeOJc7
-         YiuNIslIFJpycnJb61Wka6LlycnngFyw3HWlN8779eKTeZuwmU2P/pUONylFCtdG0XmY
-         lIFGckejmENEzGuamV+M9oO1W3QCbnuZCKscc6DnXxDLr4NTIDuKHWKd+hc1dXoyGTbS
-         A+UYKZGPCjrX0WwQEEwbbaq9MIO/20bEKaibyeM1LYoof7/EdCWOri3FOm+nRFQpWnWA
-         N3WV60/nOr79wbGHNqkg3M+o/I3/bErHwndf6GFuEyOI2t502ftYoYhvg1LTAJ1eL+mT
-         jjxg==
-X-Gm-Message-State: AC+VfDwT9ZowXPWBTF4wPqF9MZkzFURTGLVHBngEGpWtd1YYiGVpJmxE
-	J4fbzFLxwB2eemgTJaQUCah/26fZP9Wd2ruSYs7Dnw==
-X-Google-Smtp-Source: ACHHUZ4192j+G1w1msXArHzmReLPzl2xDtf2sGnLdLch/KHNXXd/yT2Q/my6BF1ZMFaye4VbWvxXT2hCMleHgbz6G7k=
-X-Received: by 2002:a05:6214:c8f:b0:621:451b:6e1b with SMTP id
- r15-20020a0562140c8f00b00621451b6e1bmr13275772qvr.10.1683834368475; Thu, 11
- May 2023 12:46:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDB00A3D
+	for <kvmarm@lists.linux.dev>; Fri, 12 May 2023 04:03:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4C0DC433D2;
+	Fri, 12 May 2023 04:02:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1683864180;
+	bh=4Hv121P/Sj7BAXfRRl37k5PAP4WfnZcp1qJTu0V6SHM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JXHmw7X4NKI6lI1CauY30/ZJlDt+MSyrUDC0CJfgUFRotKK6WtmHMFeGz4hcX/kVH
+	 NoGceq1udwIkzPl1NalO7xaD+Ecd30aC1v0lLmLSGzzjRJ90ewtlVq/CqoK/uuE1jj
+	 55yCmzzl/e5YjZLH6C/57hrCzBNJ64aNxfW1hpK0gVHqktDuZL6OO/Qh3Nr9Z/u40m
+	 xs/A38ElRpSPBabXGYmGGgbKrjhMk0VBPtvyogPGdAntoV+81A3UJfIzzZXOIrbs/F
+	 9uq94IlVnUzmWFD0o6+z+lbDK63SvVfMVBp/jDEZnFdI0dTqGAn3LyY0g9oEixD79r
+	 yz8JGOxMJLqjw==
+Date: Fri, 12 May 2023 13:02:57 +0900
+From: Mark Brown <broonie@kernel.org>
+To: Kristina Martsenko <kristina.martsenko@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Luis Machado <luis.machado@arm.com>,
+	Vladimir Murzin <vladimir.murzin@arm.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 11/11] kselftest/arm64: add MOPS to hwcap test
+Message-ID: <ZF24SVYq27LKOwmW@finisterre.sirena.org.uk>
+References: <20230509142235.3284028-1-kristina.martsenko@arm.com>
+ <20230509142235.3284028-12-kristina.martsenko@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <ZFLRpEV09lrpJqua@x1n> <ZFLVS+UvpG5w747u@google.com>
- <ZFLyGDoXHQrN1CCD@x1n> <ZFQC5TZ9tVSvxFWt@x1n> <CAF7b7mrTGL8rLVCmsmX4dZinZHRFFB7R7kX0Wv9FZR-B-4xhhw@mail.gmail.com>
- <ZFhO9dlaFQRwaPFa@x1n> <CAF7b7mqPdfbzj6cOWPsg+Owysc-SOTF+6UUymd9f0Mctag=8DQ@mail.gmail.com>
- <ZFwRuCuYYMtuUFFA@x1n> <CALzav=e29rRw4TTRGpTkazgJpU1zPML3zQGoyeHj9Zbkq+yAdQ@mail.gmail.com>
- <CAJHvVci4VuQ_vdpRKczg4ic6x7eZRXE4+ZUvzO-xU_9VJ1Vqvg@mail.gmail.com> <ZF08Zg90emoDJJIp@google.com>
-In-Reply-To: <ZF08Zg90emoDJJIp@google.com>
-From: Axel Rasmussen <axelrasmussen@google.com>
-Date: Thu, 11 May 2023 12:45:32 -0700
-Message-ID: <CAJHvVciW4NZ6Jztq_ojsQD6vzD1duyXc7VG4iZyMR1-p=V_yzw@mail.gmail.com>
-Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
- migration via annotated memory faults.
-To: David Matlack <dmatlack@google.com>
-Cc: Peter Xu <peterx@redhat.com>, Anish Moorthy <amoorthy@google.com>, 
-	Sean Christopherson <seanjc@google.com>, Nadav Amit <nadav.amit@gmail.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org, oliver.upton@linux.dev, 
-	James Houghton <jthoughton@google.com>, bgardon@google.com, ricarkol@google.com, 
-	kvm <kvm@vger.kernel.org>, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, May 11, 2023 at 12:05=E2=80=AFPM David Matlack <dmatlack@google.com=
-> wrote:
->
-> On Thu, May 11, 2023 at 10:33:24AM -0700, Axel Rasmussen wrote:
-> > On Thu, May 11, 2023 at 10:18=E2=80=AFAM David Matlack <dmatlack@google=
-.com> wrote:
-> > >
-> > > On Wed, May 10, 2023 at 2:50=E2=80=AFPM Peter Xu <peterx@redhat.com> =
-wrote:
-> > > > On Tue, May 09, 2023 at 01:52:05PM -0700, Anish Moorthy wrote:
-> > > > > On Sun, May 7, 2023 at 6:23=E2=80=AFPM Peter Xu <peterx@redhat.co=
-m> wrote:
-> > > >
-> > > > What I wanted to do is to understand whether there's still chance t=
-o
-> > > > provide a generic solution.  I don't know why you have had a bunch =
-of pmu
-> > > > stack showing in the graph, perhaps you forgot to disable some of t=
-he perf
-> > > > events when doing the test?  Let me know if you figure out why it h=
-appened
-> > > > like that (so far I didn't see), but I feel guilty to keep overload=
-ing you
-> > > > with such questions.
-> > > >
-> > > > The major problem I had with this series is it's definitely not a c=
-lean
-> > > > approach.  Say, even if you'll all rely on userapp you'll still nee=
-d to
-> > > > rely on userfaultfd for kernel traps on corner cases or it just won=
-'t work.
-> > > > IIUC that's also the concern from Nadav.
-> > >
-> > > This is a long thread, so apologies if the following has already been=
- discussed.
-> > >
-> > > Would per-tid userfaultfd support be a generic solution? i.e. Allow
-> > > userspace to create a userfaultfd that is tied to a specific task. An=
-y
-> > > userfaults encountered by that task use that fd, rather than the
-> > > process-wide fd. I'm making the assumption here that each of these fd=
-s
-> > > would have independent signaling mechanisms/queues and so this would
-> > > solve the scaling problem.
-> > >
-> > > A VMM could use this to create 1 userfaultfd per vCPU and 1 thread pe=
-r
-> > > vCPU for handling userfault requests. This seems like it'd have
-> > > roughly the same scalability characteristics as the KVM -EFAULT
-> > > approach.
-> >
-> > I think this would work in principle, but it's significantly different
-> > from what exists today.
-> >
-> > The splitting of userfaultfds Peter is describing is splitting up the
-> > HVA address space, not splitting per-thread.
-> >
-> > I think for this design, we'd need to change UFFD registration so
-> > multiple UFFDs can register the same VMA, but can be filtered so they
-> > only receive fault events caused by some particular tid(s).
-> >
-> > This might also incur some (small?) overhead, because in the fault
-> > path we now need to maintain some data structure so we can lookup
-> > which UFFD to notify based on a combination of the address and our
-> > tid. Today, since VMAs and UFFDs are 1:1 this lookup is trivial.
->
-> I was (perhaps naively) assuming the lookup would be as simple as:
->
-> diff --git a/fs/userfaultfd.c b/fs/userfaultfd.c
-> index 44d1ee429eb0..e9856e2ba9ef 100644
-> --- a/fs/userfaultfd.c
-> +++ b/fs/userfaultfd.c
-> @@ -417,7 +417,10 @@ vm_fault_t handle_userfault(struct vm_fault *vmf, un=
-signed long reason)
->          */
->         mmap_assert_locked(mm);
->
-> -       ctx =3D vma->vm_userfaultfd_ctx.ctx;
-> +       if (current->userfaultfd_ctx)
-> +               ctx =3D current->userfaultfd_ctx;
-> +       else
-> +               ctx =3D vma->vm_userfaultfd_ctx.ctx;
->         if (!ctx)
->                 goto out;
-
-Hmm, perhaps. It might have to be more complicated if we want to allow
-a single task to have both per-TID UFFDs for some addresses, and
-"global" UFFDs for others.
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="CXfWWGf7Bizbf7PV"
+Content-Disposition: inline
+In-Reply-To: <20230509142235.3284028-12-kristina.martsenko@arm.com>
+X-Cookie: Avoid contact with eyes.
 
 
+--CXfWWGf7Bizbf7PV
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Actually, while thinking about this, another wrinkle:
+On Tue, May 09, 2023 at 03:22:35PM +0100, Kristina Martsenko wrote:
+> Add the MOPS hwcap to the hwcap kselftest and check that a SIGILL is not
+> generated when the feature is detected. A SIGILL is reliable when the
+> feature is not detected as SCTLR_EL1.MSCEn won't have been set.
 
-Imagine we have per-thread UFFDs. Thread X faults on some address, and
-goes to sleep waiting for its paired resolver thread to resolve the
-fault.
+Reviewed-by: Mark Brown <broonie@kernel.org>
 
-In the meantime, thread Y also faults on the same address, before the
-resolution happens.
+> +	/* CPYP [x0]!, [x1]!, x2! */
+> +	asm volatile(".inst 0x1d010440"
+> +		     : "+r" (dstp), "+r" (srcp), "+r" (size)
+> +		     :
+> +		     : "cc", "memory");
 
-In the existing model, there is a single UFFD context per VMA, and
-therefore a single wait queue for all threads to wait on. In the
-per-TID-UFFD design, now each thread has its own context, and
-ostensibly its own wait queue (since the wait queue locks are where
-Anish saw the contention, I think this is exactly what we want to
-split up). When we have this "multiple threads waiting on the same
-address" situation, how do we ensure the fault is resolved exactly
-once? And how do we wake up all of the sleeping threads when it is
-resolved?
+Verified against DDI0602 2023-03.
 
-I'm sure it's solvable, but especially doing it without any locks /
-contention seems like it could be a bit complicated.
+--CXfWWGf7Bizbf7PV
+Content-Type: application/pgp-signature; name="signature.asc"
 
->
-> >
-> > I think it's worth keeping in mind that a selling point of Anish's
-> > approach is that it's a very small change. It's plausible we can come
-> > up with some alternative way to scale, but it seems to me everything
-> > suggested so far is likely to require a lot more code, complexity, and
-> > effort vs. Anish's approach.
->
-> Agreed.
->
-> Mostly I think the per-thread UFFD approach would add complexity on the
-> userspace side of things. With Anish's approach userspace is able to
-> trivially re-use the vCPU thread (and it's associated pCPU if pinned) to
-> handle the request. That gets more complicated when juggling the extra
-> paired threads.
->
-> The per-thread approach would requires a new userfault UAPI change which
-> I think is a higher bar than the KVM UAPI change proposed here.
->
-> The per-thread approach would require KVM call into slow GUP and take
-> the mmap_lock before contacting userspace. I'm not 100% convinced that's
-> a bad thing long term (e.g. it avoids the false-positive -EFAULT exits
-> in Anish's proposal), but could have performance implications.
->
-> Lastly, inter-thread communication is likely slower than returning to
-> userspace from KVM_RUN. So the per-thread approach might increase the
-> end-to-end latency of demand fetches.
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmRdunAACgkQJNaLcl1U
+h9CmZggAhHA/CXsC6+GZWboyNKrPZpCGcROekjNW7m2iVobs1ar0sgZ6VZ7TIgFv
+e9T9qiGV1uja3u/kEukTwTHjjSsye7NwxraWPNNxe6eVndkrLk32PTYtoZSDNvfN
+jede3PKmUxWvrK7zWcQSXMImm+PJEEZ+gIzhS5WJ1AyZBfXX5yud1J5k99GKM/MK
+l7mKLH/G5Dj/NqHWntDUXisUP07TIVOlOs+FDJ1I2LOsocJ52mPPwwaq0GcugmP7
+0eLItzCseg9bNc3tKb/wA+AvYt3uTlwcIFq88VTDglllC5B52FWqqUU2NT6uiD3s
+hXORHP7fG9furKNaLPf3yk7SlWuPxw==
+=6yHa
+-----END PGP SIGNATURE-----
+
+--CXfWWGf7Bizbf7PV--
