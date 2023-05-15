@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D57FC1D
-	for <kvmarm@lists.linux.dev>; Mon, 15 May 2023 17:48:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 587EAC433A7;
-	Mon, 15 May 2023 17:48:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF22FC1B
+	for <kvmarm@lists.linux.dev>; Mon, 15 May 2023 17:48:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91B3FC4339E;
+	Mon, 15 May 2023 17:48:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1684172889;
-	bh=PHs4gaxAaWQmUmtjbLODLMqbuuO3t58QTS/ww8BSn6A=;
+	s=k20201202; t=1684172892;
+	bh=FMgg4wiZdu+bXIrl+lmsvQVejvX7jcl3UjMl8JN7Tps=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QKT6iwm5XLO5MaS8SQKdQnAzDpbZFb+di0gNz2OW583gV2Oa1XgXHI2QJCJxmge2S
-	 XmekQJ3HiHt4IRkwWBG/NDZsaBHRCKdjCS7QuPm05+Boez7usZJzKqlrgXcihNUqK6
-	 +uaHyhiQ7ZHHmEujeop9FAzs8e+2zts4lOW+lKAz1oivLvswZ2HoxsiOkRB/N7oOk9
-	 8UWmpfFhpDaWpgmmUKtDNpjHw9JUg5uVhpLiruFIIZseR0jBjaSrp+tOX1EvGtvH7h
-	 m7s95lWA3kwblEqZAu9Rf5hLwaTnDdhpbVVAp+Hhyx64qoRTayT4ZhAN13LNNan0VQ
-	 AOcV/zbwfMEiA==
+	b=LgWPDvla44/F6h1Dl+aI5+nzYB6T8czZXaE57LvgfvPW+z8Fd70jwEAo1pk4iRm6C
+	 bzWAcxwLjLwJX8p8QZuIVKzgwslANo81kLRgzBalU/+GzgyIicXEVzB6WtIvcuZk2r
+	 ZpCwVDiFgGfda6U43d5Xbz6AycBqOuMeXZhGzTHOs2MAMJV+EO5qfS8L11SlalV/ET
+	 UHfQyMjBB6dZPZtRcSeTM/cIfugmlVRu6oqwiLyVQkFGlL5/u1dPR8AD5DeYYIb8tS
+	 gtu9CDmvLx1I9PAlDwl7F2aMu01018wRlThEaMWmHNihIlTYb4lIBNxSay/aeMOntV
+	 UfVeXWjJVnIDg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pyc37-00FJAF-1i;
-	Mon, 15 May 2023 18:31:53 +0100
+	id 1pyc2l-00FJAF-2J;
+	Mon, 15 May 2023 18:31:31 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v10 47/59] KVM: arm64: nv: Add include containing the VNCR_EL2 offsets
-Date: Mon, 15 May 2023 18:30:51 +0100
-Message-Id: <20230515173103.1017669-48-maz@kernel.org>
+Subject: [PATCH v10 29/59] KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
+Date: Mon, 15 May 2023 18:30:33 +0100
+Message-Id: <20230515173103.1017669-30-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230515173103.1017669-1-maz@kernel.org>
 References: <20230515173103.1017669-1-maz@kernel.org>
@@ -56,98 +56,233 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-VNCR_EL2 points to a page containing a number of system registers
-accessed by a guest hypervisor when ARMv8.4-NV is enabled.
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-Let's document the offsets in that page, as we are going to use
-this layout.
+Unmap/flush shadow stage 2 page tables for the nested VMs as well as the
+stage 2 page table for the guest hypervisor.
 
+Note: A bunch of the code in mmu.c relating to MMU notifiers is
+currently dealt with in an extremely abrupt way, for example by clearing
+out an entire shadow stage-2 table. This will be handled in a more
+efficient way using the reverse mapping feature in a later version of
+the patch series.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/vncr_mapping.h | 74 +++++++++++++++++++++++++++
- 1 file changed, 74 insertions(+)
- create mode 100644 arch/arm64/include/asm/vncr_mapping.h
+ arch/arm64/include/asm/kvm_mmu.h    |  3 +++
+ arch/arm64/include/asm/kvm_nested.h |  3 +++
+ arch/arm64/kvm/mmu.c                | 30 ++++++++++++++++++----
+ arch/arm64/kvm/nested.c             | 39 +++++++++++++++++++++++++++++
+ 4 files changed, 70 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/vncr_mapping.h b/arch/arm64/include/asm/vncr_mapping.h
-new file mode 100644
-index 000000000000..c0a2acd5045c
---- /dev/null
-+++ b/arch/arm64/include/asm/vncr_mapping.h
-@@ -0,0 +1,74 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * System register offsets in the VNCR page
-+ * All offsets are *byte* displacements!
-+ */
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 896acdf98e71..d155b3871c4c 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -169,6 +169,8 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+ 			   void __iomem **haddr);
+ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+ 			     void **haddr);
++void kvm_stage2_flush_range(struct kvm_s2_mmu *mmu,
++			    phys_addr_t addr, phys_addr_t end);
+ void __init free_hyp_pgds(void);
+ 
+ void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size);
+@@ -177,6 +179,7 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
+ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 			  phys_addr_t pa, unsigned long size, bool writable);
++void kvm_stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end);
+ 
+ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu);
+ 
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index f20d272fcd6d..d330b947d48a 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -111,6 +111,9 @@ extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+ extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
+ 				    struct kvm_s2_trans *trans);
+ extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
++extern void kvm_nested_s2_wp(struct kvm *kvm);
++extern void kvm_nested_s2_unmap(struct kvm *kvm);
++extern void kvm_nested_s2_flush(struct kvm *kvm);
+ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+ 
+ extern bool forward_smc_trap(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 1e19c59b8235..8144bb9b9ec8 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -245,13 +245,19 @@ void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size)
+ 	__unmap_stage2_range(mmu, start, size, true);
+ }
+ 
++void kvm_stage2_flush_range(struct kvm_s2_mmu *mmu,
++			    phys_addr_t addr, phys_addr_t end)
++{
++	stage2_apply_range_resched(mmu, addr, end, kvm_pgtable_stage2_flush);
++}
 +
-+#ifndef __ARM64_VNCR_MAPPING_H__
-+#define __ARM64_VNCR_MAPPING_H__
+ static void stage2_flush_memslot(struct kvm *kvm,
+ 				 struct kvm_memory_slot *memslot)
+ {
+ 	phys_addr_t addr = memslot->base_gfn << PAGE_SHIFT;
+ 	phys_addr_t end = addr + PAGE_SIZE * memslot->npages;
+ 
+-	stage2_apply_range_resched(&kvm->arch.mmu, addr, end, kvm_pgtable_stage2_flush);
++	kvm_stage2_flush_range(&kvm->arch.mmu, addr, end);
+ }
+ 
+ /**
+@@ -274,6 +280,8 @@ static void stage2_flush_vm(struct kvm *kvm)
+ 	kvm_for_each_memslot(memslot, bkt, slots)
+ 		stage2_flush_memslot(kvm, memslot);
+ 
++	kvm_nested_s2_flush(kvm);
 +
-+#define VNCR_VTTBR_EL2          0x020
-+#define VNCR_VTCR_EL2           0x040
-+#define VNCR_VMPIDR_EL2         0x050
-+#define VNCR_CNTVOFF_EL2        0x060
-+#define VNCR_HCR_EL2            0x078
-+#define VNCR_HSTR_EL2           0x080
-+#define VNCR_VPIDR_EL2          0x088
-+#define VNCR_TPIDR_EL2          0x090
-+#define VNCR_VNCR_EL2           0x0B0
-+#define VNCR_CPACR_EL1          0x100
-+#define VNCR_CONTEXTIDR_EL1     0x108
-+#define VNCR_SCTLR_EL1          0x110
-+#define VNCR_ACTLR_EL1          0x118
-+#define VNCR_TCR_EL1            0x120
-+#define VNCR_AFSR0_EL1          0x128
-+#define VNCR_AFSR1_EL1          0x130
-+#define VNCR_ESR_EL1            0x138
-+#define VNCR_MAIR_EL1           0x140
-+#define VNCR_AMAIR_EL1          0x148
-+#define VNCR_MDSCR_EL1          0x158
-+#define VNCR_SPSR_EL1           0x160
-+#define VNCR_CNTV_CVAL_EL0      0x168
-+#define VNCR_CNTV_CTL_EL0       0x170
-+#define VNCR_CNTP_CVAL_EL0      0x178
-+#define VNCR_CNTP_CTL_EL0       0x180
-+#define VNCR_SCXTNUM_EL1        0x188
-+#define VNCR_TFSR_EL1		0x190
-+#define VNCR_ZCR_EL1            0x1E0
-+#define VNCR_TTBR0_EL1          0x200
-+#define VNCR_TTBR1_EL1          0x210
-+#define VNCR_FAR_EL1            0x220
-+#define VNCR_ELR_EL1            0x230
-+#define VNCR_SP_EL1             0x240
-+#define VNCR_VBAR_EL1           0x250
-+#define VNCR_ICH_LR0_EL2        0x400
-+//      VNCR_ICH_LRN_EL2(n)     VNCR_ICH_LR0_EL2+8*((n) & 7)
-+#define VNCR_ICH_AP0R0_EL2      0x480
-+//      VNCR_ICH_AP0RN_EL2(n)   VNCR_ICH_AP0R0_EL2+8*((n) & 3)
-+#define VNCR_ICH_AP1R0_EL2      0x4A0
-+//      VNCR_ICH_AP1RN_EL2(n)   VNCR_ICH_AP1R0_EL2+8*((n) & 3)
-+#define VNCR_ICH_HCR_EL2        0x4C0
-+#define VNCR_ICH_VMCR_EL2       0x4C8
-+#define VNCR_VDISR_EL2          0x500
-+#define VNCR_PMBLIMITR_EL1      0x800
-+#define VNCR_PMBPTR_EL1         0x810
-+#define VNCR_PMBSR_EL1          0x820
-+#define VNCR_PMSCR_EL1          0x828
-+#define VNCR_PMSEVFR_EL1        0x830
-+#define VNCR_PMSICR_EL1         0x838
-+#define VNCR_PMSIRR_EL1         0x840
-+#define VNCR_PMSLATFR_EL1       0x848
-+#define VNCR_TRFCR_EL1          0x880
-+#define VNCR_MPAM1_EL1          0x900
-+#define VNCR_MPAMHCR_EL2        0x930
-+#define VNCR_MPAMVPMV_EL2       0x938
-+#define VNCR_MPAMVPM0_EL2       0x940
-+#define VNCR_MPAMVPM1_EL2       0x948
-+#define VNCR_MPAMVPM2_EL2       0x950
-+#define VNCR_MPAMVPM3_EL2       0x958
-+#define VNCR_MPAMVPM4_EL2       0x960
-+#define VNCR_MPAMVPM5_EL2       0x968
-+#define VNCR_MPAMVPM6_EL2       0x970
-+#define VNCR_MPAMVPM7_EL2       0x978
+ 	write_unlock(&kvm->mmu_lock);
+ 	srcu_read_unlock(&kvm->srcu, idx);
+ }
+@@ -888,6 +896,8 @@ void stage2_unmap_vm(struct kvm *kvm)
+ 	kvm_for_each_memslot(memslot, bkt, slots)
+ 		stage2_unmap_memslot(kvm, memslot);
+ 
++	kvm_nested_s2_unmap(kvm);
 +
-+#endif /* __ARM64_VNCR_MAPPING_H__ */
+ 	write_unlock(&kvm->mmu_lock);
+ 	mmap_read_unlock(current->mm);
+ 	srcu_read_unlock(&kvm->srcu, idx);
+@@ -987,12 +997,12 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ }
+ 
+ /**
+- * stage2_wp_range() - write protect stage2 memory region range
++ * kvm_stage2_wp_range() - write protect stage2 memory region range
+  * @mmu:        The KVM stage-2 MMU pointer
+  * @addr:	Start address of range
+  * @end:	End address of range
+  */
+-static void stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
++void kvm_stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
+ {
+ 	stage2_apply_range_resched(mmu, addr, end, kvm_pgtable_stage2_wrprotect);
+ }
+@@ -1023,7 +1033,8 @@ static void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot)
+ 	end = (memslot->base_gfn + memslot->npages) << PAGE_SHIFT;
+ 
+ 	write_lock(&kvm->mmu_lock);
+-	stage2_wp_range(&kvm->arch.mmu, start, end);
++	kvm_stage2_wp_range(&kvm->arch.mmu, start, end);
++	kvm_nested_s2_wp(kvm);
+ 	write_unlock(&kvm->mmu_lock);
+ 	kvm_flush_remote_tlbs(kvm);
+ }
+@@ -1047,7 +1058,7 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
+ 	phys_addr_t start = (base_gfn +  __ffs(mask)) << PAGE_SHIFT;
+ 	phys_addr_t end = (base_gfn + __fls(mask) + 1) << PAGE_SHIFT;
+ 
+-	stage2_wp_range(&kvm->arch.mmu, start, end);
++	kvm_stage2_wp_range(&kvm->arch.mmu, start, end);
+ }
+ 
+ /*
+@@ -1062,6 +1073,7 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+ 		gfn_t gfn_offset, unsigned long mask)
+ {
+ 	kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
++	kvm_nested_s2_wp(kvm);
+ }
+ 
+ static void kvm_send_hwpoison_signal(unsigned long address, short lsb)
+@@ -1720,6 +1732,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ 			     (range->end - range->start) << PAGE_SHIFT,
+ 			     range->may_block);
+ 
++	kvm_nested_s2_unmap(kvm);
+ 	return false;
+ }
+ 
+@@ -1754,6 +1767,7 @@ bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 			       PAGE_SIZE, __pfn_to_phys(pfn),
+ 			       KVM_PGTABLE_PROT_R, NULL, 0);
+ 
++	kvm_nested_s2_unmap(kvm);
+ 	return false;
+ }
+ 
+@@ -1772,6 +1786,11 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 					range->start << PAGE_SHIFT);
+ 	pte = __pte(kpte);
+ 	return pte_valid(pte) && pte_young(pte);
++
++	/*
++	 * TODO: Handle nested_mmu structures here using the reverse mapping in
++	 * a later version of patch series.
++	 */
+ }
+ 
+ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+@@ -2004,6 +2023,7 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+ 
+ 	write_lock(&kvm->mmu_lock);
+ 	kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
++	kvm_nested_s2_unmap(kvm);
+ 	write_unlock(&kvm->mmu_lock);
+ }
+ 
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 73c0be25345a..948ac5b9638c 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -523,6 +523,45 @@ int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2)
+ 	return kvm_inject_nested_sync(vcpu, esr_el2);
+ }
+ 
++/* expects kvm->mmu_lock to be held */
++void kvm_nested_s2_wp(struct kvm *kvm)
++{
++	int i;
++
++	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
++		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
++
++		if (kvm_s2_mmu_valid(mmu))
++			kvm_stage2_wp_range(mmu, 0, kvm_phys_size(mmu));
++	}
++}
++
++/* expects kvm->mmu_lock to be held */
++void kvm_nested_s2_unmap(struct kvm *kvm)
++{
++	int i;
++
++	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
++		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
++
++		if (kvm_s2_mmu_valid(mmu))
++			kvm_unmap_stage2_range(mmu, 0, kvm_phys_size(mmu));
++	}
++}
++
++/* expects kvm->mmu_lock to be held */
++void kvm_nested_s2_flush(struct kvm *kvm)
++{
++	int i;
++
++	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
++		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
++
++		if (kvm_s2_mmu_valid(mmu))
++			kvm_stage2_flush_range(mmu, 0, kvm_phys_size(mmu));
++	}
++}
++
+ void kvm_arch_flush_shadow_all(struct kvm *kvm)
+ {
+ 	int i;
 -- 
 2.34.1
 
