@@ -1,244 +1,135 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DB14C2FD
-	for <kvmarm@lists.linux.dev>; Mon, 15 May 2023 15:16:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1684163818;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YCwcJkHP2VwXTHNzCgrgxgRUW6C/jeHxPk/Gqy5woUA=;
-	b=CgpraR36VMiI9bErk5eAvoptiy6lUCB5v7EGyujrjw8Mwd1hWEjOgb6NY53oZGd5cnL7LX
-	43jhy3LIysEVcwsohjfwm+L6f7XkkPqSX/4qcaW36ib4mJHMJwcbAE7EGLWTyqEe4+rGKJ
-	765CXAVk+vt2FCho0waIPkVDcJCY8dY=
-Received: from mail-vs1-f69.google.com (mail-vs1-f69.google.com
- [209.85.217.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-548-7lYoZi95N_aBnS85oFNhVg-1; Mon, 15 May 2023 11:16:56 -0400
-X-MC-Unique: 7lYoZi95N_aBnS85oFNhVg-1
-Received: by mail-vs1-f69.google.com with SMTP id ada2fe7eead31-436142870fcso142730137.0
-        for <kvmarm@lists.linux.dev>; Mon, 15 May 2023 08:16:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684163816; x=1686755816;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YCwcJkHP2VwXTHNzCgrgxgRUW6C/jeHxPk/Gqy5woUA=;
-        b=QxlPUa82V81DikeQRXnwWt/PR95bfBexss4DRJN2pL0J8UsSC/t4/Vzj1AnoIoExH0
-         B2DrySQVUFvFY+zXRB/1H5J5GMHtevk86gPOmQzlXrxae+wHCxW+FJnp9RpOV0TI5XfY
-         4ojiSkZFD3LeZ3EDvi3wlzNDP6gG0MURwhLiei5L+sOC8AEs//9w/DAKlu+NLfRKyd2r
-         PB9kUTqiMttd3+TZDY8nI5h5pAPjvPSBYd0YIEXKJFD2EO90+TH86bzWm/Q8A75LGEHD
-         vpfPPwCPJ6yv4suCVA3opYPa509KHdL/kqfaPTOfHz5iSqjEG7O7KtuAdz4nQc2XTf48
-         N5CA==
-X-Gm-Message-State: AC+VfDxNVelM7A91FFjqOH0dTKWNIyrZvxeznHAVh+CxyJaFJLg+c9kE
-	h5BVNnhv2/ReYDIMHItC3QpHVEziTLLaNmsZffiXNEW5oI9FZZGGaRrBx9dJSH8Nwna0rMTYFqI
-	klY3evnZ2uQIIyRYC
-X-Received: by 2002:a05:6122:997:b0:443:dbd9:793d with SMTP id g23-20020a056122099700b00443dbd9793dmr11025083vkd.1.1684163816091;
-        Mon, 15 May 2023 08:16:56 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5RIGq8qt/SN5aLMHlhA9iOpqU1rzwegJvYxfrc19MpJdS/SVpEbjz0oEsG3xDWVXWwnongjg==
-X-Received: by 2002:a05:6122:997:b0:443:dbd9:793d with SMTP id g23-20020a056122099700b00443dbd9793dmr11025046vkd.1.1684163815688;
-        Mon, 15 May 2023 08:16:55 -0700 (PDT)
-Received: from x1n (bras-base-aurron9127w-grc-62-70-24-86-62.dsl.bell.ca. [70.24.86.62])
-        by smtp.gmail.com with ESMTPSA id o7-20020a05620a130700b0074df5d787f2sm443qkj.89.2023.05.15.08.16.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 May 2023 08:16:54 -0700 (PDT)
-Date: Mon, 15 May 2023 11:16:53 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Axel Rasmussen <axelrasmussen@google.com>
-Cc: David Matlack <dmatlack@google.com>,
-	Anish Moorthy <amoorthy@google.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Nadav Amit <nadav.amit@gmail.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org,
-	oliver.upton@linux.dev, James Houghton <jthoughton@google.com>,
-	bgardon@google.com, ricarkol@google.com, kvm <kvm@vger.kernel.org>,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
- migration via annotated memory faults.
-Message-ID: <ZGJM5VfMT8iQJa0r@x1n>
-References: <ZFLyGDoXHQrN1CCD@x1n>
- <ZFQC5TZ9tVSvxFWt@x1n>
- <CAF7b7mrTGL8rLVCmsmX4dZinZHRFFB7R7kX0Wv9FZR-B-4xhhw@mail.gmail.com>
- <ZFhO9dlaFQRwaPFa@x1n>
- <CAF7b7mqPdfbzj6cOWPsg+Owysc-SOTF+6UUymd9f0Mctag=8DQ@mail.gmail.com>
- <ZFwRuCuYYMtuUFFA@x1n>
- <CALzav=e29rRw4TTRGpTkazgJpU1zPML3zQGoyeHj9Zbkq+yAdQ@mail.gmail.com>
- <CAJHvVci4VuQ_vdpRKczg4ic6x7eZRXE4+ZUvzO-xU_9VJ1Vqvg@mail.gmail.com>
- <ZF08Zg90emoDJJIp@google.com>
- <CAJHvVciW4NZ6Jztq_ojsQD6vzD1duyXc7VG4iZyMR1-p=V_yzw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93B2FBF7
+	for <kvmarm@lists.linux.dev>; Mon, 15 May 2023 17:00:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8533DC433A0;
+	Mon, 15 May 2023 17:00:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1684170022;
+	bh=yaBwlfhHBKhoy9UfTyXssm3QaX93Y5s7wLXz9SfiTQg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=u7tHAFbqO8Z2dIoVQnCdcAnwvfjzoJjhZw75favVb8vk1AvtIj4s8L1qxC9/+3vc2
+	 el3bY0Ki9fpogktyL9DxX6760vx2wlnst/w+riF7xVbLGIyxNOu/dbGIyGs/OVN71K
+	 8ejLPYcNkIKSvzB4hrFAomogX+N7Mb0wM1YdTBfxw2SNzdcLjr7xfcqNdbuuXApi1J
+	 q9fBXm1wB+ywz4W/mzlhT+Xa+Et2rLKY2Y+RaZWOrmoS2yVPQ3ewtECjER09A0+G4o
+	 SHd3MLxyb/K1yLsz8n4gYWWw6PV+nb/7WjCjnWNgpJIIllaURxZ/1Im6B2JJYi/BcU
+	 G0dDgTBpYDddQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pybYZ-00FIeI-3Y;
+	Mon, 15 May 2023 18:00:20 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH] KVM: arm64: Relax trapping of CTR_EL0 when FEAT_EVT is available
+Date: Mon, 15 May 2023 18:00:16 +0100
+Message-Id: <20230515170016.965378-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <CAJHvVciW4NZ6Jztq_ojsQD6vzD1duyXc7VG4iZyMR1-p=V_yzw@mail.gmail.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, May 11, 2023 at 12:45:32PM -0700, Axel Rasmussen wrote:
-> On Thu, May 11, 2023 at 12:05 PM David Matlack <dmatlack@google.com> wrote:
-> >
-> > On Thu, May 11, 2023 at 10:33:24AM -0700, Axel Rasmussen wrote:
-> > > On Thu, May 11, 2023 at 10:18 AM David Matlack <dmatlack@google.com> wrote:
-> > > >
-> > > > On Wed, May 10, 2023 at 2:50 PM Peter Xu <peterx@redhat.com> wrote:
-> > > > > On Tue, May 09, 2023 at 01:52:05PM -0700, Anish Moorthy wrote:
-> > > > > > On Sun, May 7, 2023 at 6:23 PM Peter Xu <peterx@redhat.com> wrote:
-> > > > >
-> > > > > What I wanted to do is to understand whether there's still chance to
-> > > > > provide a generic solution.  I don't know why you have had a bunch of pmu
-> > > > > stack showing in the graph, perhaps you forgot to disable some of the perf
-> > > > > events when doing the test?  Let me know if you figure out why it happened
-> > > > > like that (so far I didn't see), but I feel guilty to keep overloading you
-> > > > > with such questions.
-> > > > >
-> > > > > The major problem I had with this series is it's definitely not a clean
-> > > > > approach.  Say, even if you'll all rely on userapp you'll still need to
-> > > > > rely on userfaultfd for kernel traps on corner cases or it just won't work.
-> > > > > IIUC that's also the concern from Nadav.
-> > > >
-> > > > This is a long thread, so apologies if the following has already been discussed.
-> > > >
-> > > > Would per-tid userfaultfd support be a generic solution? i.e. Allow
-> > > > userspace to create a userfaultfd that is tied to a specific task. Any
-> > > > userfaults encountered by that task use that fd, rather than the
-> > > > process-wide fd. I'm making the assumption here that each of these fds
-> > > > would have independent signaling mechanisms/queues and so this would
-> > > > solve the scaling problem.
-> > > >
-> > > > A VMM could use this to create 1 userfaultfd per vCPU and 1 thread per
-> > > > vCPU for handling userfault requests. This seems like it'd have
-> > > > roughly the same scalability characteristics as the KVM -EFAULT
-> > > > approach.
-> > >
-> > > I think this would work in principle, but it's significantly different
-> > > from what exists today.
-> > >
-> > > The splitting of userfaultfds Peter is describing is splitting up the
-> > > HVA address space, not splitting per-thread.
-> > >
-> > > I think for this design, we'd need to change UFFD registration so
-> > > multiple UFFDs can register the same VMA, but can be filtered so they
-> > > only receive fault events caused by some particular tid(s).
-> > >
-> > > This might also incur some (small?) overhead, because in the fault
-> > > path we now need to maintain some data structure so we can lookup
-> > > which UFFD to notify based on a combination of the address and our
-> > > tid. Today, since VMAs and UFFDs are 1:1 this lookup is trivial.
-> >
-> > I was (perhaps naively) assuming the lookup would be as simple as:
-> >
-> > diff --git a/fs/userfaultfd.c b/fs/userfaultfd.c
-> > index 44d1ee429eb0..e9856e2ba9ef 100644
-> > --- a/fs/userfaultfd.c
-> > +++ b/fs/userfaultfd.c
-> > @@ -417,7 +417,10 @@ vm_fault_t handle_userfault(struct vm_fault *vmf, unsigned long reason)
-> >          */
-> >         mmap_assert_locked(mm);
-> >
-> > -       ctx = vma->vm_userfaultfd_ctx.ctx;
-> > +       if (current->userfaultfd_ctx)
-> > +               ctx = current->userfaultfd_ctx;
-> > +       else
-> > +               ctx = vma->vm_userfaultfd_ctx.ctx;
-> >         if (!ctx)
-> >                 goto out;
+CTR_EL0 can often be used in userspace, and it would be nice if
+KVM didn't have to emulate it unnecessarily.
 
-This is an interesting idea, but I'll just double check before I grow
-task_struct and see whether that's the only solution. :)
+While it isn't possible to trap the cache configuration registers
+indemendently from CTR_EL0 in the base ARMv8.0 architecture, FEAT_EVT
+allows these cache configuration registers (CCSIDR_EL1, CCSIDR2_EL1,
+CLIDR_EL1 and CSSELR_EL1) to be trapped indepdently by setting
+HCR_EL2.TID4.
 
-I'd start with hash(tid) or even hash(pcpu) to choose queue.  In a pinned
-use case hash(pcpu) should probably reach a similar goal here (and I'd
-guess hash(tid) too if vcpus are mostly always created in one shot, just
-slightly trickier).
+Switch to using TID4 instead of TID2 in the cases where FEAT_EVT
+is available *and* that KVM doesn't need to sanitise CTR_EL0 to
+paper over mismatched cache configurations.
 
-> 
-> Hmm, perhaps. It might have to be more complicated if we want to allow
-> a single task to have both per-TID UFFDs for some addresses, and
-> "global" UFFDs for others.
-> 
-> 
-> 
-> Actually, while thinking about this, another wrinkle:
-> 
-> Imagine we have per-thread UFFDs. Thread X faults on some address, and
-> goes to sleep waiting for its paired resolver thread to resolve the
-> fault.
-> 
-> In the meantime, thread Y also faults on the same address, before the
-> resolution happens.
-> 
-> In the existing model, there is a single UFFD context per VMA, and
-> therefore a single wait queue for all threads to wait on. In the
-> per-TID-UFFD design, now each thread has its own context, and
-> ostensibly its own wait queue (since the wait queue locks are where
-> Anish saw the contention, I think this is exactly what we want to
-> split up). When we have this "multiple threads waiting on the same
-> address" situation, how do we ensure the fault is resolved exactly
-> once? And how do we wake up all of the sleeping threads when it is
-> resolved?
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_arm.h     |  2 +-
+ arch/arm64/include/asm/kvm_emulate.h |  6 ++++++
+ arch/arm64/kernel/cpufeature.c       | 11 +++++++++++
+ arch/arm64/tools/cpucaps             |  1 +
+ 4 files changed, 19 insertions(+), 1 deletion(-)
 
-We probably need to wake them one by one in that case.  The 2nd-Nth
-UFFDIO_COPY/CONTINUE will fail with -EEXIST anyway, then the userapp will
-need a UFFDIO_WAKE I assume.
-
-> 
-> I'm sure it's solvable, but especially doing it without any locks /
-> contention seems like it could be a bit complicated.
-
-IMHO no complicated locking is needed.  Here the "complicated locking" is
-done with pgtable lock and it should be reflected by -EEXISTs to userapp.
-
-> 
-> >
-> > >
-> > > I think it's worth keeping in mind that a selling point of Anish's
-> > > approach is that it's a very small change. It's plausible we can come
-> > > up with some alternative way to scale, but it seems to me everything
-> > > suggested so far is likely to require a lot more code, complexity, and
-> > > effort vs. Anish's approach.
-> >
-> > Agreed.
-> >
-> > Mostly I think the per-thread UFFD approach would add complexity on the
-> > userspace side of things. With Anish's approach userspace is able to
-> > trivially re-use the vCPU thread (and it's associated pCPU if pinned) to
-> > handle the request. That gets more complicated when juggling the extra
-> > paired threads.
-> >
-> > The per-thread approach would requires a new userfault UAPI change which
-> > I think is a higher bar than the KVM UAPI change proposed here.
-> >
-> > The per-thread approach would require KVM call into slow GUP and take
-> > the mmap_lock before contacting userspace. I'm not 100% convinced that's
-> > a bad thing long term (e.g. it avoids the false-positive -EFAULT exits
-> > in Anish's proposal), but could have performance implications.
-> >
-> > Lastly, inter-thread communication is likely slower than returning to
-> > userspace from KVM_RUN. So the per-thread approach might increase the
-> > end-to-end latency of demand fetches.
-
-Right.  The overhead here is (IMHO):
-
-  - KVM solution: vcpu exit -> enter again, whatever happens in the
-    procedure of exit/enter will count.
-
-  - mm solution: at least schedule overhead, meanwhile let's hope we can
-    scale first elsewhere (and I'm not sure if there'll be other issues,
-    e.g., even if we can split the uffd queues, hopefully totally nowhere I
-    overlooked that still need the shared uffd context)
-
-I'm not sure which one will be higher or maybe it depends (e.g., some
-specific cases where vcpu KVM_RUN can have higher overhead when loading?).
-
-Thanks,
-
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index baef29fcbeee..209a4fba5d2a 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -86,7 +86,7 @@
+ #define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
+ 			 HCR_BSU_IS | HCR_FB | HCR_TACR | \
+ 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
+-			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 | HCR_TID2)
++			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3)
+ #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
+ #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
+ #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index b31b32ecbe2d..a08291051ac9 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -95,6 +95,12 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.hcr_el2 |= HCR_TVM;
+ 	}
+ 
++	if (cpus_have_final_cap(ARM64_HAS_EVT) &&
++	    !cpus_have_final_cap(ARM64_MISMATCHED_CACHE_TYPE))
++		vcpu->arch.hcr_el2 |= HCR_TID4;
++	else
++		vcpu->arch.hcr_el2 |= HCR_TID2;
++	
+ 	if (vcpu_el1_is_32bit(vcpu))
+ 		vcpu->arch.hcr_el2 &= ~HCR_RW;
+ 
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index c331c49a7d19..bd184c2cef33 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -2783,6 +2783,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.matches = has_cpuid_feature,
+ 		.cpu_enable = cpu_enable_dit,
+ 	},
++	{
++		.desc = "Extended Virtualization Traps",
++		.capability = ARM64_HAS_EVT,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.sys_reg = SYS_ID_AA64MMFR2_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64MMFR2_EL1_EVT_SHIFT,
++		.field_width = 4,
++		.min_field_value = ID_AA64MMFR2_EL1_EVT_IMP,
++		.matches = has_cpuid_feature,
++	},
+ 	{},
+ };
+ 
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index 40ba95472594..606d1184a5e9 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -25,6 +25,7 @@ HAS_E0PD
+ HAS_ECV
+ HAS_ECV_CNTPOFF
+ HAS_EPAN
++HAS_EVT
+ HAS_GENERIC_AUTH
+ HAS_GENERIC_AUTH_ARCH_QARMA3
+ HAS_GENERIC_AUTH_ARCH_QARMA5
 -- 
-Peter Xu
+2.34.1
 
