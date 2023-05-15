@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37388FBF6
-	for <kvmarm@lists.linux.dev>; Mon, 15 May 2023 17:48:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D64FC4339B;
-	Mon, 15 May 2023 17:48:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FA4FFBF6
+	for <kvmarm@lists.linux.dev>; Mon, 15 May 2023 17:48:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0464C433A1;
+	Mon, 15 May 2023 17:48:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1684172915;
-	bh=w+OQ7MZurstG1YAVkDRZaDjvy8cIAuTnz40MwSsMtGQ=;
+	s=k20201202; t=1684172917;
+	bh=aSuH/qbGunv54Cs1Vd08Mq+h/udDTTLxqT5bvmH7o9I=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YF4Y94Kn1N+N4YY15zi1laxUnX9eE4PZ5rqhNxkzZuFlz9wO5eFf0rhGbkUpZnnIS
-	 HePlNpkqGvJ36alnmGLqhAl70t9n5MS39PTX6NrdEWOmwMZdsz9sYAL0dv7qlQopIF
-	 PC/mz9WiTfzA73q61DEUP77aYdSKILY93pyDdeZLJ1smBpdZx6rqoVuTYYoaqR2zdX
-	 kSZGvJlDfaw7aO9zjThqbbvbZJmoEQ8WazcSgdTPJDglR1oUAX4GrSUnieedUrcnpX
-	 rSvei7Tl+8uBaID2ecp5eskxgtWBMpDiQOcToiNw1E9kKBBrAakFErf2mSCwepN4et
-	 DoU7eppDqgNbw==
+	b=qQuXZudtTqX8Q399DGcQ9lnBYxITiirBD9Tlcywklew5cULc+VGSN+xZB9qWTiXWk
+	 9R+7tWTg30vD2AWR3ZAly7JOmG1B4eEs3lPrc7P9tv2yQgfgJMFc+//YVHI+k+Adaw
+	 cJ/E6sKef1tbqY52AlV6//mw3jHW5L2Qp8HQJjF5rjzMaUsfgspjqyHYU2f6o0kCUy
+	 hT6lhcdpajqw2WsLk70UkA7CEXjfhdkLl/bDfE+omWb+vBF17X27FykWkY/0WZdslI
+	 5mivTFGdp2o09v3shwLC+/Tw2qKOXbcWnrljgqk9IJhH9pTKRTzMSWRbzSOoroXfOJ
+	 y7N1NKnrn8NBg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pyc2j-00FJAF-Lr;
-	Mon, 15 May 2023 18:31:29 +0100
+	id 1pyc2z-00FJAF-QA;
+	Mon, 15 May 2023 18:31:46 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v10 24/59] KVM: arm64: nv: Configure HCR_EL2 for nested virtualization
-Date: Mon, 15 May 2023 18:30:28 +0100
-Message-Id: <20230515173103.1017669-25-maz@kernel.org>
+Subject: [PATCH v10 40/59] KVM: arm64: nv: vgic: Allow userland to set VGIC maintenance IRQ
+Date: Mon, 15 May 2023 18:30:44 +0100
+Message-Id: <20230515173103.1017669-41-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230515173103.1017669-1-maz@kernel.org>
 References: <20230515173103.1017669-1-maz@kernel.org>
@@ -56,84 +56,177 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Jintack Lim <jintack.lim@linaro.org>
+From: Andre Przywara <andre.przywara@arm.com>
 
-We enable nested virtualization by setting the HCR NV and NV1 bit.
+The VGIC maintenance IRQ signals various conditions about the LRs, when
+the GIC's virtualization extension is used.
+So far we didn't need it, but nested virtualization needs to know about
+this interrupt, so add a userland interface to setup the IRQ number.
+The architecture mandates that it must be a PPI, on top of that this code
+only exports a per-device option, so the PPI is the same on all VCPUs.
 
-When the virtual E2H bit is set, we can support EL2 register accesses
-via EL1 registers from the virtual EL2 by doing trap-and-emulate. A
-better alternative, however, is to allow the virtual EL2 to access EL2
-register states without trap. This can be easily achieved by not traping
-EL1 registers since those registers already have EL2 register states.
-
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+[added some bits of documentation]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_arm.h |  1 +
- arch/arm64/kvm/hyp/vhe/switch.c  | 38 +++++++++++++++++++++++++++++---
- 2 files changed, 36 insertions(+), 3 deletions(-)
+ .../virt/kvm/devices/arm-vgic-v3.rst          | 12 +++++++-
+ arch/arm64/include/uapi/asm/kvm.h             |  1 +
+ arch/arm64/kvm/vgic/vgic-kvm-device.c         | 29 +++++++++++++++++--
+ include/kvm/arm_vgic.h                        |  3 ++
+ tools/arch/arm/include/uapi/asm/kvm.h         |  1 +
+ 5 files changed, 43 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 4b3e55abb30f..ee1c4d71137c 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -97,6 +97,7 @@
- 			 HCR_BSU_IS | HCR_FB | HCR_TACR | \
- 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
- 			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3)
-+#define HCR_GUEST_NV_FILTER_FLAGS (HCR_ATA | HCR_API | HCR_APK | HCR_FIEN)
- #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
- #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
- #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 8d1a6b007c19..d2fcd881a267 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -38,9 +38,41 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 	u64 hcr = vcpu->arch.hcr_el2;
- 	u64 val;
+diff --git a/Documentation/virt/kvm/devices/arm-vgic-v3.rst b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
+index 51e5e5762571..1901e651cc00 100644
+--- a/Documentation/virt/kvm/devices/arm-vgic-v3.rst
++++ b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
+@@ -284,8 +284,18 @@ Groups:
+       |    Aff3    |    Aff2    |    Aff1    |    Aff0    |
  
--	/* Trap VM sysreg accesses if an EL2 guest is not using VHE. */
--	if (vcpu_is_el2(vcpu) && !vcpu_el2_e2h_is_set(vcpu))
--		hcr |= HCR_TVM | HCR_TRVM;
-+	if (is_hyp_ctxt(vcpu)) {
-+		hcr |= HCR_NV;
+   Errors:
+-
+     =======  =============================================
+     -EINVAL  vINTID is not multiple of 32 or info field is
+ 	     not VGIC_LEVEL_INFO_LINE_LEVEL
+     =======  =============================================
 +
-+		if (!vcpu_el2_e2h_is_set(vcpu)) {
-+			/*
-+			 * For a guest hypervisor on v8.0, trap and emulate
-+			 * the EL1 virtual memory control register accesses.
-+			 */
-+			hcr |= HCR_TVM | HCR_TRVM | HCR_NV1;
-+		} else {
-+			/*
-+			 * For a guest hypervisor on v8.1 (VHE), allow to
-+			 * access the EL1 virtual memory control registers
-+			 * natively. These accesses are to access EL2 register
-+			 * states.
-+			 * Note that we still need to respect the virtual
-+			 * HCR_EL2 state.
-+			 */
-+			u64 vhcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
++  KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ
++   Attributes:
 +
-+			vhcr_el2 &= ~HCR_GUEST_NV_FILTER_FLAGS;
++    The attr field of kvm_device_attr encodes the following values:
 +
-+			/*
-+			 * We already set TVM to handle set/way cache maint
-+			 * ops traps, this somewhat collides with the nested
-+			 * virt trapping for nVHE. So turn this off for now
-+			 * here, in the hope that VHE guests won't ever do this.
-+			 * TODO: find out whether it's worth to support both
-+			 * cases at the same time.
-+			 */
-+			hcr &= ~HCR_TVM;
++      bits:     | 31   ....    5 | 4  ....  0 |
++      values:   |      RES0      |   vINTID   |
 +
-+			hcr |= vhcr_el2 & (HCR_TVM | HCR_TRVM);
-+		}
++    The vINTID specifies which interrupt is generated when the vGIC
++    must generate a maintenance interrupt. This must be a PPI.
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index f7ddd73a8c0f..fafbf12d3b84 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -403,6 +403,7 @@ enum {
+ #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
+ #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
+ #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS 8
++#define KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ  9
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+ 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
+diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+index a6294ec3714c..da7cc135e16d 100644
+--- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
++++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+@@ -292,6 +292,12 @@ static int vgic_get_common_attr(struct kvm_device *dev,
+ 			     VGIC_NR_PRIVATE_IRQS, uaddr);
+ 		break;
+ 	}
++	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
++		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
++
++		r = put_user(dev->kvm->arch.vgic.maint_irq, uaddr);
++		break;
 +	}
+ 	}
  
- 	___activate_traps(vcpu, hcr);
+ 	return r;
+@@ -510,7 +516,7 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+ 	struct vgic_reg_attr reg_attr;
+ 	gpa_t addr;
+ 	struct kvm_vcpu *vcpu;
+-	bool uaccess;
++	bool uaccess, post_init = true;
+ 	u32 val;
+ 	int ret;
  
+@@ -526,6 +532,9 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+ 		/* Sysregs uaccess is performed by the sysreg handling code */
+ 		uaccess = false;
+ 		break;
++	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
++		post_init = false;
++		fallthrough;
+ 	default:
+ 		uaccess = true;
+ 	}
+@@ -545,7 +554,7 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+ 
+ 	mutex_lock(&dev->kvm->arch.config_lock);
+ 
+-	if (unlikely(!vgic_initialized(dev->kvm))) {
++	if (post_init != vgic_initialized(dev->kvm)) {
+ 		ret = -EBUSY;
+ 		goto out;
+ 	}
+@@ -575,6 +584,19 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+ 		}
+ 		break;
+ 	}
++	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
++		if (!is_write) {
++			val = dev->kvm->arch.vgic.maint_irq;
++			ret = 0;
++			break;
++		}
++
++		ret = -EINVAL;
++		if ((val < VGIC_NR_PRIVATE_IRQS) && (val >= VGIC_NR_SGIS)) {
++			dev->kvm->arch.vgic.maint_irq = val;
++			ret = 0;
++		}
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 		break;
+@@ -601,6 +623,7 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
+ 	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
+ 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
+ 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO:
++	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
+ 		return vgic_v3_attr_regs_access(dev, attr, true);
+ 	default:
+ 		return vgic_set_common_attr(dev, attr);
+@@ -615,6 +638,7 @@ static int vgic_v3_get_attr(struct kvm_device *dev,
+ 	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
+ 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
+ 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO:
++	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
+ 		return vgic_v3_attr_regs_access(dev, attr, false);
+ 	default:
+ 		return vgic_get_common_attr(dev, attr);
+@@ -638,6 +662,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
+ 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
+ 		return vgic_v3_has_attr_regs(dev, attr);
+ 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
++	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
+ 		return 0;
+ 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
+ 		if (((attr->attr & KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK) >>
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index ea45accbc690..1a2e2e8abd92 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -243,6 +243,9 @@ struct vgic_dist {
+ 
+ 	int			nr_spis;
+ 
++	/* The GIC maintenance IRQ for nested hypervisors. */
++	u32			maint_irq;
++
+ 	/* base addresses in guest physical address space: */
+ 	gpa_t			vgic_dist_base;		/* distributor */
+ 	union {
+diff --git a/tools/arch/arm/include/uapi/asm/kvm.h b/tools/arch/arm/include/uapi/asm/kvm.h
+index 03cd7c19a683..d5dd96902817 100644
+--- a/tools/arch/arm/include/uapi/asm/kvm.h
++++ b/tools/arch/arm/include/uapi/asm/kvm.h
+@@ -246,6 +246,7 @@ struct kvm_vcpu_events {
+ #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
+ #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
+ #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS	8
++#define KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ	9
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+ 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
 -- 
 2.34.1
 
