@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B45AEFC1B
-	for <kvmarm@lists.linux.dev>; Mon, 15 May 2023 17:48:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B645C433D2;
-	Mon, 15 May 2023 17:48:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2748FBF6
+	for <kvmarm@lists.linux.dev>; Mon, 15 May 2023 17:48:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3F5CC433D2;
+	Mon, 15 May 2023 17:48:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1684172896;
-	bh=m0/+ctwR/uQPhm3OvT5FwLGUnICpS2L/Hfc8LqPbJhA=;
+	s=k20201202; t=1684172900;
+	bh=pJ44ibPw7iC8VlSPLA3z9HDAApoyzXHJEupogxevlCw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=P99mk3IgMZJHCpoG4EoycpIOdUhnez3Hq4FcqRDiuJaeykGrQSulczkqHKKuBv5Jh
-	 yroo1eHOdLmhjd/Ywp3Hw9XWc4ENntbnGciLcwezDRRmbZlSbKxJ+bnt8Ud9jVZg/w
-	 uUUj5ffIeFMWHWSlJAjSFrCU1IdTsN8uL3Odz0co361UwYCwhQ3FRODRP4VXjFw7yu
-	 EXYGrfGxL5/LLdIfmWVueh5ukK22rFv+TEDhFn1qpHMBnUYWWQAJ0wXcBf8lxuHH6x
-	 Y62oqkBEmD8tcjK27Ewvz76vD7Eoo8TqpE4jz2wF3H9PlaASopTGSdmXjyKYWwfAM8
-	 yePk9YbFuuwrw==
+	b=p3k4RiHIJvUC+qK+fNyZ3M4UCGXUdBfBFRVv8vOsARHGr0DfeA+8EOD3oHJfurbaM
+	 vFWe1I3zWUZ5mpZfSQjG2gDjDLIa2ySZdmLhvlQasM5qFsUnkh6QqbvlD5v4Y3/hBd
+	 ryPfq4nDNJUPQTH7FbnHqDERbS92Y6vC8C6XeusLsrXWTKMWGr89iKpNvZM/vnfvkf
+	 nNHUPo8Kf7bRLLDccUslgCFOUPuEw3ZnDlHE6NA3LlUV97MqLk/AWAOJ9ajW6+epck
+	 SCcpdB/ZIeLiYaVBc6qJU0J/oc7bJ9gk95sl+uglGiGvSvveCfEI2rvbWTz1dsmiK1
+	 mcTNqHqGfJYHw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pyc2l-00FJAF-D1;
-	Mon, 15 May 2023 18:31:31 +0100
+	id 1pyc39-00FJAF-Ps;
+	Mon, 15 May 2023 18:31:55 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v10 30/59] KVM: arm64: nv: Set a handler for the system instruction traps
-Date: Mon, 15 May 2023 18:30:34 +0100
-Message-Id: <20230515173103.1017669-31-maz@kernel.org>
+Subject: [PATCH v10 51/59] KVM: arm64: nv: Sync nested timer state with FEAT_NV2
+Date: Mon, 15 May 2023 18:30:55 +0100
+Message-Id: <20230515173103.1017669-52-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230515173103.1017669-1-maz@kernel.org>
 References: <20230515173103.1017669-1-maz@kernel.org>
@@ -56,120 +56,103 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-When HCR.NV bit is set, execution of the EL2 translation regime address
-aranslation instructions and TLB maintenance instructions are trapped to
-EL2. In addition, execution of the EL1 translation regime address
-aranslation instructions and TLB maintenance instructions that are only
-accessible from EL2 and above are trapped to EL2. In these cases,
-ESR_EL2.EC will be set to 0x18.
+From: Christoffer Dall <christoffer.dall@arm.com>
 
-Rework the system instruction emulation framework to handle potentially
-all system instruction traps other than MSR/MRS instructions. Those
-system instructions would be AT and TLBI instructions controlled by
-HCR_EL2.NV, AT, and TTLB bits.
+Emulating the timers with FEAT_NV2 is a bit odd, as the timers
+can be reconfigured behind our back without the hypervisor even
+noticing. In the VHE case, that's an actual regression in the
+architecture...
 
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-[maz: squashed two patches together, redispatched various bits around]
+Co-developed-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 47 +++++++++++++++++++++++++++++++--------
- 1 file changed, 38 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/arch_timer.c  | 44 ++++++++++++++++++++++++++++++++++++
+ arch/arm64/kvm/arm.c         |  3 +++
+ include/kvm/arm_arch_timer.h |  1 +
+ 3 files changed, 48 insertions(+)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 52d798dbc202..1d3676d7b09f 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1940,10 +1940,6 @@ static bool access_spsr_el2(struct kvm_vcpu *vcpu,
-  * guest...
-  */
- static const struct sys_reg_desc sys_reg_descs[] = {
--	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
--	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
--	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
--
- 	DBG_BCR_BVR_WCR_WVR_EL1(0),
- 	DBG_BCR_BVR_WCR_WVR_EL1(1),
- 	{ SYS_DESC(SYS_MDCCINT_EL1), trap_debug_regs, reset_val, MDCCINT_EL1, 0 },
-@@ -2422,6 +2418,12 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
- };
- 
-+static struct sys_reg_desc sys_insn_descs[] = {
-+	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
-+	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
-+	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
-+};
-+
- static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
- 			struct sys_reg_params *p,
- 			const struct sys_reg_desc *r)
-@@ -3112,6 +3114,24 @@ static bool emulate_sys_reg(struct kvm_vcpu *vcpu,
- 	return false;
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 05b022be885b..294ab5013e40 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -914,6 +914,50 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+ 		kvm_timer_blocking(vcpu);
  }
  
-+static int emulate_sys_instr(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
++void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
 +{
-+	const struct sys_reg_desc *r;
++	/*
++	 * When NV2 is on, guest hypervisors have their EL0 timer register
++	 * accesses redirected to the VNCR page. Any guest action taken on
++	 * the timer is postponed until the next exit, leading to a very
++	 * poor quality of emulation.
++	 */
++	if (!is_hyp_ctxt(vcpu))
++		return;
 +
-+	/* Search from the system instruction table. */
-+	r = find_reg(p, sys_insn_descs, ARRAY_SIZE(sys_insn_descs));
-+
-+	if (likely(r)) {
-+		perform_access(vcpu, p, r);
++	if (!vcpu_el2_e2h_is_set(vcpu)) {
++		/*
++		 * A non-VHE guest hypervisor doesn't have any direct access
++		 * to its timers: the EL2 registers trap (and the HW is
++		 * fully emulated), while the EL0 registers access memory
++		 * despite the access being notionally direct. Boo.
++		 *
++		 * We update the hardware timer registers with the
++		 * latest value written by the guest to the VNCR page
++		 * and let the hardware take care of the rest.
++		 */
++		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CTL_EL0),  SYS_CNTV_CTL);
++		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0), SYS_CNTV_CVAL);
++		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CTL_EL0),  SYS_CNTP_CTL);
++		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0), SYS_CNTP_CVAL);
 +	} else {
-+		kvm_err("Unsupported guest sys instruction at: %lx\n",
-+			*vcpu_pc(vcpu));
-+		print_sys_reg_instr(p);
-+		kvm_inject_undefined(vcpu);
++		/*
++		 * For a VHE guest hypervisor, the EL2 state is directly
++		 * stored in the host EL0 timers, while the emulated EL0
++		 * state is stored in the VNCR page. The latter could have
++		 * been updated behind our back, and we must reset the
++		 * emulation of the timers.
++		 */
++		struct timer_map map;
++		get_timer_map(vcpu, &map);
++
++		soft_timer_cancel(&map.emul_vtimer->hrtimer);
++		soft_timer_cancel(&map.emul_ptimer->hrtimer);
++		timer_emulate(map.emul_vtimer);
++		timer_emulate(map.emul_ptimer);
 +	}
-+	return 1;
 +}
 +
- /**
-  * kvm_reset_sys_regs - sets system registers to reset value
-  * @vcpu: The VCPU pointer
-@@ -3129,7 +3149,8 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
- }
+ /*
+  * With a userspace irqchip we have to check if the guest de-asserted the
+  * timer and if so, unmask the timer irq signal on the host interrupt
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index b69fb2c042b6..725439a019bc 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1019,6 +1019,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		if (static_branch_unlikely(&userspace_irqchip_in_use))
+ 			kvm_timer_sync_user(vcpu);
  
- /**
-- * kvm_handle_sys_reg -- handles a mrs/msr trap on a guest sys_reg access
-+ * kvm_handle_sys_reg -- handles a system instruction or mrs/msr instruction
-+ *			 trap on a guest execution
-  * @vcpu: The VCPU pointer
-  */
- int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
-@@ -3146,12 +3167,19 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
- 	params = esr_sys64_to_params(esr);
- 	params.regval = vcpu_get_reg(vcpu, Rt);
- 
--	if (!emulate_sys_reg(vcpu, &params))
-+	/* System register? */
-+	if (params.Op0 == 2 || params.Op0 == 3) {
-+		if (!emulate_sys_reg(vcpu, &params))
-+			return 1;
++		if (vcpu_has_nv2(vcpu))
++			kvm_timer_sync_nested(vcpu);
 +
-+		if (!params.is_write)
-+			vcpu_set_reg(vcpu, Rt, params.regval);
-+
- 		return 1;
-+	}
+ 		kvm_arch_vcpu_ctxsync_fp(vcpu);
  
--	if (!params.is_write)
--		vcpu_set_reg(vcpu, Rt, params.regval);
--	return 1;
-+	/* Hints, PSTATE (Op0 == 0) and System instructions (Op0 == 1) */
-+	return emulate_sys_instr(vcpu, &params);
- }
- 
- /******************************************************************************
-@@ -3543,6 +3571,7 @@ int __init kvm_sys_reg_table_init(void)
- 	valid &= check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), true);
- 	valid &= check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs), true);
- 	valid &= check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs), false);
-+	valid &= check_sysreg_table(sys_insn_descs, ARRAY_SIZE(sys_insn_descs), false);
- 
- 	if (!valid)
- 		return -EINVAL;
+ 		/*
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index bb3cb005873e..7dc9a33c38af 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -96,6 +96,7 @@ int __init kvm_timer_hyp_init(bool has_gic);
+ int kvm_timer_enable(struct kvm_vcpu *vcpu);
+ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu);
+ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
++void kvm_timer_sync_nested(struct kvm_vcpu *vcpu);
+ void kvm_timer_sync_user(struct kvm_vcpu *vcpu);
+ bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu);
+ void kvm_timer_update_run(struct kvm_vcpu *vcpu);
 -- 
 2.34.1
 
