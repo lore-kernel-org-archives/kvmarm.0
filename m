@@ -1,25 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9A29FC15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FBA0FC14
 	for <kvmarm@lists.linux.dev>; Mon, 15 May 2023 17:31:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 954F7C433A0;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53C48C433EF;
 	Mon, 15 May 2023 17:31:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1684171886;
-	bh=R8+Mi/2jgzSmDHYmSudh6OXuZipUlO+XqjSbA8Jh6/Q=;
+	bh=UU4FnB4+acVfWZc7PHZIWb3pt0RhJdTVSo9/IRPo9Aw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VMvhOnTSojI3PdMezu3s17MZfOjtuL30wEL7Mdj1MQk6GsIGYMBaRsVjMuqVpzGZR
-	 qTPLEUpD8M8fGvMfiUIX3r93Tu6Qd8gh9LAP+wV7XaTuv7BOtdCFB9sWaIzrJHI2cf
-	 SnwHOIWGkfmc1bQn+m9sTWnVwDdJbKoHhkYiGs2FzCGL14TgXZTn8C6mJgIxTLVaEY
-	 EI4cYMKEJfUkiEnU9jKDpVRN7nxuAL9CFIHm+hj0/fPjkmEhp70MXR+kAPbXT5N+08
-	 uoIV4b0dAemZaJqN+i5gcfkGUaVtOL36Swp845c3++8V7051sr4zYwOWWqQLsOrsOJ
-	 OO9I5OaFH/JRA==
+	b=s5dE1uaMF0ALVXOro2zFUNWpMqyI5RejXc93Vob3/iYWegowkSx2dJoeqOdmeH9wr
+	 0pK3EEwxgvGN1O9C7mp6y+98XUtUGeEYECAUOIRQIvt2qUmjpxE9c4+upQni8MicMo
+	 lgkTTbmFM/8exi/yp3TOnp/JzYB10D/JwYrbOmeSpeSw7haRCImq5FKwym/vlWJYJX
+	 qkNtSRXVI6CFqj6bE3JrIj8mSY43qIN3/p5k5MDIiCfkv3wyI4fU6/bjKIgmK7B/nA
+	 w8PxXnRojebY2Qln+DjFpZ81dpUR5z4zvlCYLP9EKR0CJtT8K/YaO/uOo/vurvN5Oh
+	 9TsiWgn69Is5w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pyc2e-00FJAF-EL;
+	id 1pyc2e-00FJAF-75;
 	Mon, 15 May 2023 18:31:24 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -38,9 +38,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v10 05/59] arm64: Add missing DC ZVA/GVA/GZVA encodings
-Date: Mon, 15 May 2023 18:30:09 +0100
-Message-Id: <20230515173103.1017669-6-maz@kernel.org>
+Subject: [PATCH v10 04/59] arm64: Add missing ERXMISCx_EL1 encodings
+Date: Mon, 15 May 2023 18:30:08 +0100
+Message-Id: <20230515173103.1017669-5-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230515173103.1017669-1-maz@kernel.org>
 References: <20230515173103.1017669-1-maz@kernel.org>
@@ -56,29 +56,26 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the missing DC *VA encodings.
+We only describe ERXMISC{0,1}_EL1. Add ERXMISC{2,3}_EL1 for a good measure.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/arm64/include/asm/sysreg.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 71305f7425db..28ccc379a172 100644
+index 071cc8545fbe..71305f7425db 100644
 --- a/arch/arm64/include/asm/sysreg.h
 +++ b/arch/arm64/include/asm/sysreg.h
-@@ -150,6 +150,11 @@
- #define SYS_DC_CIGVAC			sys_insn(1, 3, 7, 14, 3)
- #define SYS_DC_CIGDVAC			sys_insn(1, 3, 7, 14, 5)
+@@ -239,6 +239,8 @@
+ #define SYS_ERXADDR_EL1			sys_reg(3, 0, 5, 4, 3)
+ #define SYS_ERXMISC0_EL1		sys_reg(3, 0, 5, 5, 0)
+ #define SYS_ERXMISC1_EL1		sys_reg(3, 0, 5, 5, 1)
++#define SYS_ERXMISC2_EL1		sys_reg(3, 0, 5, 5, 2)
++#define SYS_ERXMISC3_EL1		sys_reg(3, 0, 5, 5, 3)
+ #define SYS_TFSR_EL1			sys_reg(3, 0, 5, 6, 0)
+ #define SYS_TFSRE0_EL1			sys_reg(3, 0, 5, 6, 1)
  
-+/* Data cache zero operations */
-+#define SYS_DC_ZVA			sys_insn(1, 3, 7, 4, 1)
-+#define SYS_DC_GVA			sys_insn(1, 3, 7, 4, 3)
-+#define SYS_DC_GZVA			sys_insn(1, 3, 7, 4, 4)
-+
- /*
-  * Automatically generated definitions for system registers, the
-  * manual encodings below are in the process of being converted to
 -- 
 2.34.1
 
