@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 268A8FC1B
-	for <kvmarm@lists.linux.dev>; Mon, 15 May 2023 17:47:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2455C4339B;
-	Mon, 15 May 2023 17:47:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE18EFBF6
+	for <kvmarm@lists.linux.dev>; Mon, 15 May 2023 17:47:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83FA9C4339E;
+	Mon, 15 May 2023 17:47:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1684172823;
-	bh=si0pj4eLKvyGEpWT8F2+2OVmTMIOYM63o1TwN/EyzSQ=;
+	s=k20201202; t=1684172825;
+	bh=F2GAsieKBw5VrW+Em+AO/TUqoiRZzwdvFq2314raaUA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=e4RxxI8Xkuv4eDBfvHkbk3ywaB93eTtx+sJi+xcx13XOUtU9wHj3xgO4ZswwDkQZ2
-	 7QMkOr4Fo9ZrClwNuwN5HKEiIP6Qw2xazpNTFjm9nDQodyxuMCnICnDPx9L9LEbfnN
-	 4tgpcp8LkWfCGgWHD7btRK4/47/nVFyt1jcd58AKoruSebXFWrgGoTsnEbMWRyv2al
-	 SDjjYKllDUROt6CQzf3wcQeO89q2VT4hiNo+fTr1fKFWSsdhW+exMzVifAdDGva51O
-	 OqqJncQyopLrDxahkGaCMHjDCIitCDijK175pvoyExM7VNhkfXOMGoTIxMa0CGhW2f
-	 UhepKSdeHSMsw==
+	b=e6e1xzVdEE5cBpXaRbeYMZqJzXvCQKNRZczQ191s3U5V/XtFFj6eaH74YxSot2Jri
+	 FlFsIsKcFUse8GYgRuWgOigF68xIbkM4F+AXxWCipDZ4VTcrPWKSRl/uIuBgiDq0/j
+	 0MuaDhmtY93tihpIdggNl4kyeNhsdcSt46Oen9DNbPloNK8k3OJOwG61xVjapXxI8d
+	 iUEdPfh+xEYLmNympr/o+7UKsSiOPuO9cUYesD2eVc7/StcHWkKEmJp9P6uPwByG98
+	 s+VkqjnR0mxllehGt5SI/hDPTYN1RJCjQPSqQv/SoKu+F2UlDCRCPo8Q7Jxhd9e0Oj
+	 vXwy85A1f85Ng==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pyc2i-00FJAF-2P;
-	Mon, 15 May 2023 18:31:28 +0100
+	id 1pyc2u-00FJAF-NT;
+	Mon, 15 May 2023 18:31:42 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v10 18/59] KVM: arm64: nv: Save/Restore vEL2 sysregs
-Date: Mon, 15 May 2023 18:30:22 +0100
-Message-Id: <20230515173103.1017669-19-maz@kernel.org>
+Subject: [PATCH v10 39/59] KVM: arm64: nv: vgic: Emulate the HW bit in software
+Date: Mon, 15 May 2023 18:30:43 +0100
+Message-Id: <20230515173103.1017669-40-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230515173103.1017669-1-maz@kernel.org>
 References: <20230515173103.1017669-1-maz@kernel.org>
@@ -56,219 +56,123 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Whenever we need to restore the guest's system registers to the CPU, we
-now need to take care of the EL2 system registers as well. Most of them
-are accessed via traps only, but some have an immediate effect and also
-a guest running in VHE mode would expect them to be accessible via their
-EL1 encoding, which we do not trap.
+From: Christoffer Dall <christoffer.dall@arm.com>
 
-For vEL2 we write the virtual EL2 registers with an identical format directly
-into their EL1 counterpart, and translate the few registers that have a
-different format for the same effect on the execution when running a
-non-VHE guest guest hypervisor.
+Should the guest hypervisor use the HW bit in the LRs, we need to
+emulate the deactivation from the L2 guest into the L1 distributor
+emulation, which is handled by L0.
 
-Based on an initial patch from Andre Przywara, rewritten many times
-since.
+It's all good fun.
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |   5 +-
- arch/arm64/kvm/hyp/nvhe/sysreg-sr.c        |   2 +-
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c         | 124 ++++++++++++++++++++-
- 3 files changed, 126 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/kvm_hyp.h     |  2 ++
+ arch/arm64/kvm/hyp/vgic-v3-sr.c      |  2 +-
+ arch/arm64/kvm/vgic/vgic-v3-nested.c | 32 ++++++++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic.c           |  6 ++++--
+ include/kvm/arm_vgic.h               |  1 +
+ 5 files changed, 40 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index 699ea1f8d409..d67c620f2af7 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -91,9 +91,10 @@ static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
- 	write_sysreg(ctxt_sys_reg(ctxt, TPIDRRO_EL0),	tpidrro_el0);
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index bdd9cf546d95..d57889de93e6 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -57,6 +57,8 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+ 
+ int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
+ 
++u64 __gic_v3_get_lr(unsigned int lr);
++
+ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if);
+ void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if);
+ void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if);
+diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+index 6cb638b184b1..75152c1ce646 100644
+--- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -18,7 +18,7 @@
+ #define vtr_to_nr_pre_bits(v)		((((u32)(v) >> 26) & 7) + 1)
+ #define vtr_to_nr_apr_regs(v)		(1 << (vtr_to_nr_pre_bits(v) - 5))
+ 
+-static u64 __gic_v3_get_lr(unsigned int lr)
++u64 __gic_v3_get_lr(unsigned int lr)
+ {
+ 	switch (lr & 0xf) {
+ 	case 0:
+diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+index ab8ddf490b31..e88c75e79010 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
++++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+@@ -140,6 +140,38 @@ static void vgic_v3_fixup_shadow_lr_state(struct kvm_vcpu *vcpu)
+ 	}
  }
  
--static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
-+static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
-+					      u64 mpidr)
- {
--	write_sysreg(ctxt_sys_reg(ctxt, MPIDR_EL1),	vmpidr_el2);
-+	write_sysreg(mpidr,				vmpidr_el2);
- 
- 	if (has_vhe() ||
- 	    !cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
-diff --git a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-index 29305022bc04..dba101565de3 100644
---- a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-@@ -28,7 +28,7 @@ void __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt)
- 
- void __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
- {
--	__sysreg_restore_el1_state(ctxt);
-+	__sysreg_restore_el1_state(ctxt, ctxt_sys_reg(ctxt, MPIDR_EL1));
- 	__sysreg_restore_common_state(ctxt);
- 	__sysreg_restore_user_state(ctxt);
- 	__sysreg_restore_el2_return_state(ctxt);
-diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-index b35a178e7e0d..cae3e35a9034 100644
---- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-@@ -15,6 +15,95 @@
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_nested.h>
- 
-+static void __sysreg_save_vel2_state(struct kvm_cpu_context *ctxt)
++void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
 +{
-+	/* These registers are common with EL1 */
-+	ctxt_sys_reg(ctxt, PAR_EL1)	= read_sysreg(par_el1);
-+	ctxt_sys_reg(ctxt, TPIDR_EL1)	= read_sysreg(tpidr_el1);
++	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
++	struct vgic_v3_cpu_if *s_cpu_if = vcpu_shadow_if(vcpu);
++	struct vgic_irq *irq;
++	int i;
 +
-+	ctxt_sys_reg(ctxt, ESR_EL2)	= read_sysreg_el1(SYS_ESR);
-+	ctxt_sys_reg(ctxt, AFSR0_EL2)	= read_sysreg_el1(SYS_AFSR0);
-+	ctxt_sys_reg(ctxt, AFSR1_EL2)	= read_sysreg_el1(SYS_AFSR1);
-+	ctxt_sys_reg(ctxt, FAR_EL2)	= read_sysreg_el1(SYS_FAR);
-+	ctxt_sys_reg(ctxt, MAIR_EL2)	= read_sysreg_el1(SYS_MAIR);
-+	ctxt_sys_reg(ctxt, VBAR_EL2)	= read_sysreg_el1(SYS_VBAR);
-+	ctxt_sys_reg(ctxt, CONTEXTIDR_EL2) = read_sysreg_el1(SYS_CONTEXTIDR);
-+	ctxt_sys_reg(ctxt, AMAIR_EL2)	= read_sysreg_el1(SYS_AMAIR);
++	for (i = 0; i < s_cpu_if->used_lrs; i++) {
++		u64 lr = cpu_if->vgic_lr[i];
++		int l1_irq;
 +
-+	/*
-+	 * In VHE mode those registers are compatible between EL1 and EL2,
-+	 * and the guest uses the _EL1 versions on the CPU naturally.
-+	 * So we save them into their _EL2 versions here.
-+	 * For nVHE mode we trap accesses to those registers, so our
-+	 * _EL2 copy in sys_regs[] is always up-to-date and we don't need
-+	 * to save anything here.
-+	 */
-+	if (__vcpu_el2_e2h_is_set(ctxt)) {
-+		ctxt_sys_reg(ctxt, SCTLR_EL2)	= read_sysreg_el1(SYS_SCTLR);
-+		ctxt_sys_reg(ctxt, CPTR_EL2)	= read_sysreg_el1(SYS_CPACR);
-+		ctxt_sys_reg(ctxt, TTBR0_EL2)	= read_sysreg_el1(SYS_TTBR0);
-+		ctxt_sys_reg(ctxt, TTBR1_EL2)	= read_sysreg_el1(SYS_TTBR1);
-+		ctxt_sys_reg(ctxt, TCR_EL2)	= read_sysreg_el1(SYS_TCR);
-+		ctxt_sys_reg(ctxt, CNTHCTL_EL2)	= read_sysreg_el1(SYS_CNTKCTL);
++		if (!(lr & ICH_LR_HW) || !(lr & ICH_LR_STATE))
++			continue;
++
++		/*
++		 * If we had a HW lr programmed by the guest hypervisor, we
++		 * need to emulate the HW effect between the guest hypervisor
++		 * and the nested guest.
++		 */
++		l1_irq = (lr & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT;
++		irq = vgic_get_irq(vcpu->kvm, vcpu, l1_irq);
++		if (!irq)
++			continue; /* oh well, the guest hyp is broken */
++
++		lr = __gic_v3_get_lr(i);
++		if (!(lr & ICH_LR_STATE))
++			irq->active = false;
++
++		vgic_put_irq(vcpu->kvm, irq);
 +	}
-+
-+	ctxt_sys_reg(ctxt, SP_EL2)	= read_sysreg(sp_el1);
-+	ctxt_sys_reg(ctxt, ELR_EL2)	= read_sysreg_el1(SYS_ELR);
-+	ctxt_sys_reg(ctxt, SPSR_EL2)	= __fixup_spsr_el2_read(ctxt, read_sysreg_el1(SYS_SPSR));
 +}
 +
-+static void __sysreg_restore_vel2_state(struct kvm_cpu_context *ctxt)
-+{
-+	u64 val;
-+
-+	/* These registers are common with EL1 */
-+	write_sysreg(ctxt_sys_reg(ctxt, PAR_EL1),	par_el1);
-+	write_sysreg(ctxt_sys_reg(ctxt, TPIDR_EL1),	tpidr_el1);
-+
-+	write_sysreg(read_cpuid_id(),			vpidr_el2);
-+	write_sysreg(ctxt_sys_reg(ctxt, MPIDR_EL1),	vmpidr_el2);
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, MAIR_EL2),	SYS_MAIR);
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, VBAR_EL2),	SYS_VBAR);
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, CONTEXTIDR_EL2),SYS_CONTEXTIDR);
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, AMAIR_EL2),	SYS_AMAIR);
-+
-+	if (__vcpu_el2_e2h_is_set(ctxt)) {
-+		/*
-+		 * In VHE mode those registers are compatible between
-+		 * EL1 and EL2.
-+		 */
-+		write_sysreg_el1(ctxt_sys_reg(ctxt, SCTLR_EL2),	SYS_SCTLR);
-+		write_sysreg_el1(ctxt_sys_reg(ctxt, CPTR_EL2),	SYS_CPACR);
-+		write_sysreg_el1(ctxt_sys_reg(ctxt, TTBR0_EL2),	SYS_TTBR0);
-+		write_sysreg_el1(ctxt_sys_reg(ctxt, TTBR1_EL2),	SYS_TTBR1);
-+		write_sysreg_el1(ctxt_sys_reg(ctxt, TCR_EL2),	SYS_TCR);
-+		write_sysreg_el1(ctxt_sys_reg(ctxt, CNTHCTL_EL2), SYS_CNTKCTL);
-+	} else {
-+		/*
-+		 * CNTHCTL_EL2 only affects EL1 when running nVHE, so
-+		 * no need to restore it.
-+		 */
-+		val = translate_sctlr_el2_to_sctlr_el1(ctxt_sys_reg(ctxt, SCTLR_EL2));
-+		write_sysreg_el1(val, SYS_SCTLR);
-+		val = translate_cptr_el2_to_cpacr_el1(ctxt_sys_reg(ctxt, CPTR_EL2));
-+		write_sysreg_el1(val, SYS_CPACR);
-+		val = translate_ttbr0_el2_to_ttbr0_el1(ctxt_sys_reg(ctxt, TTBR0_EL2));
-+		write_sysreg_el1(val, SYS_TTBR0);
-+		val = translate_tcr_el2_to_tcr_el1(ctxt_sys_reg(ctxt, TCR_EL2));
-+		write_sysreg_el1(val, SYS_TCR);
-+	}
-+
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, ESR_EL2),	SYS_ESR);
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, AFSR0_EL2),	SYS_AFSR0);
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, AFSR1_EL2),	SYS_AFSR1);
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, FAR_EL2),	SYS_FAR);
-+	write_sysreg(ctxt_sys_reg(ctxt, SP_EL2),	sp_el1);
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, ELR_EL2),	SYS_ELR);
-+
-+	val = __fixup_spsr_el2_write(ctxt, ctxt_sys_reg(ctxt, SPSR_EL2));
-+	write_sysreg_el1(val,	SYS_SPSR);
-+}
-+
- /*
-  * VHE: Host and guest must save mdscr_el1 and sp_el0 (and the PC and
-  * pstate, which are handled as part of the el2 return state) on every
-@@ -66,6 +155,7 @@ void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu)
+ void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
  {
- 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
- 	struct kvm_cpu_context *host_ctxt;
-+	u64 mpidr;
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index 34f13fd1238b..880d33d9d514 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -878,9 +878,11 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+ {
+ 	int used_lrs;
  
- 	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
- 	__sysreg_save_user_state(host_ctxt);
-@@ -89,7 +179,29 @@ void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu)
- 	 */
- 	__sysreg32_restore_state(vcpu);
- 	__sysreg_restore_user_state(guest_ctxt);
--	__sysreg_restore_el1_state(guest_ctxt);
-+
-+	if (unlikely(__is_hyp_ctxt(guest_ctxt))) {
-+		__sysreg_restore_vel2_state(guest_ctxt);
-+	} else {
-+		if (vcpu_has_nv(vcpu)) {
-+			/*
-+			 * Only set VPIDR_EL2 for nested VMs, as this is the
-+			 * only time it changes. We'll restore the MIDR_EL1
-+			 * view on put.
-+			 */
-+			write_sysreg(ctxt_sys_reg(guest_ctxt, VPIDR_EL2), vpidr_el2);
-+
-+			/*
-+			 * As we're restoring a nested guest, set the value
-+			 * provided by the guest hypervisor.
-+			 */
-+			mpidr = ctxt_sys_reg(guest_ctxt, VMPIDR_EL2);
-+		} else {
-+			mpidr = ctxt_sys_reg(guest_ctxt, MPIDR_EL1);
-+		}
-+
-+		__sysreg_restore_el1_state(guest_ctxt, mpidr);
+-	/* If nesting, this is a load/put affair, not flush/sync. */
+-	if (vgic_state_is_nested(vcpu))
++	/* If nesting, emulate the HW effect from L0 to L1 */
++	if (vgic_state_is_nested(vcpu)) {
++		vgic_v3_sync_nested(vcpu);
+ 		return;
 +	}
  
- 	vcpu_set_flag(vcpu, SYSREGS_ON_CPU);
+ 	/* An empty ap_list_head implies used_lrs == 0 */
+ 	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index d775eb50b72c..ea45accbc690 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -400,6 +400,7 @@ void kvm_vgic_load(struct kvm_vcpu *vcpu);
+ void kvm_vgic_put(struct kvm_vcpu *vcpu);
+ void kvm_vgic_vmcr_sync(struct kvm_vcpu *vcpu);
  
-@@ -115,12 +227,20 @@ void kvm_vcpu_put_sysregs_vhe(struct kvm_vcpu *vcpu)
- 	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
- 	deactivate_traps_vhe_put(vcpu);
- 
--	__sysreg_save_el1_state(guest_ctxt);
-+	if (unlikely(__is_hyp_ctxt(guest_ctxt)))
-+		__sysreg_save_vel2_state(guest_ctxt);
-+	else
-+		__sysreg_save_el1_state(guest_ctxt);
-+
- 	__sysreg_save_user_state(guest_ctxt);
- 	__sysreg32_save_state(vcpu);
- 
- 	/* Restore host user state */
- 	__sysreg_restore_user_state(host_ctxt);
- 
-+	/* If leaving a nesting guest, restore MPIDR_EL1 default view */
-+	if (vcpu_has_nv(vcpu))
-+		write_sysreg(read_cpuid_id(),	vpidr_el2);
-+
- 	vcpu_clear_flag(vcpu, SYSREGS_ON_CPU);
- }
++void vgic_v3_sync_nested(struct kvm_vcpu *vcpu);
+ void vgic_v3_load_nested(struct kvm_vcpu *vcpu);
+ void vgic_v3_put_nested(struct kvm_vcpu *vcpu);
+ void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu);
 -- 
 2.34.1
 
