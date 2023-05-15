@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE18EFBF6
-	for <kvmarm@lists.linux.dev>; Mon, 15 May 2023 17:47:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83FA9C4339E;
-	Mon, 15 May 2023 17:47:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94658FC1B
+	for <kvmarm@lists.linux.dev>; Mon, 15 May 2023 17:47:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A3EAC433EF;
+	Mon, 15 May 2023 17:47:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1684172825;
-	bh=F2GAsieKBw5VrW+Em+AO/TUqoiRZzwdvFq2314raaUA=;
+	s=k20201202; t=1684172828;
+	bh=KmAe4RCvGz3DrV/L9BsS52ZuN3hBKfzKPrk4b4Cu6QU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=e6e1xzVdEE5cBpXaRbeYMZqJzXvCQKNRZczQ191s3U5V/XtFFj6eaH74YxSot2Jri
-	 FlFsIsKcFUse8GYgRuWgOigF68xIbkM4F+AXxWCipDZ4VTcrPWKSRl/uIuBgiDq0/j
-	 0MuaDhmtY93tihpIdggNl4kyeNhsdcSt46Oen9DNbPloNK8k3OJOwG61xVjapXxI8d
-	 iUEdPfh+xEYLmNympr/o+7UKsSiOPuO9cUYesD2eVc7/StcHWkKEmJp9P6uPwByG98
-	 s+VkqjnR0mxllehGt5SI/hDPTYN1RJCjQPSqQv/SoKu+F2UlDCRCPo8Q7Jxhd9e0Oj
-	 vXwy85A1f85Ng==
+	b=WGAd1WIuFT11lThiu9ED3SWa22HeKu0y0cnMUToGAEnfJT4/OOPHaP9x/YYpUI5iI
+	 XGOJhdWF602sLjx4EyVzVKIxHbuQUwpWb6lK4YZoKxtZp2gXCaJiKWyodWiF+C1ZvV
+	 ehKTppaWLWrjZkuMnTEK8VkSAG4kcY7WmmQ5Kp7qpyc3wxHz4e8jdQHCPXdFAczV/G
+	 GH2dYApICakrV5hYmisou5Bi0uv3CfFyf4QsoOJ3W9RWJQQ/Rj/RpdV3/1MfKf78kJ
+	 LWsRRtGBRKoEBNMaLVNm75Oix9M1lipmklIdsOOrd3ndoFMU+aMZjcDSAmSmwNNcxa
+	 pZr0gRQqUYa2A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pyc2u-00FJAF-NT;
-	Mon, 15 May 2023 18:31:42 +0100
+	id 1pyc2g-00FJAF-Mn;
+	Mon, 15 May 2023 18:31:26 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v10 39/59] KVM: arm64: nv: vgic: Emulate the HW bit in software
-Date: Mon, 15 May 2023 18:30:43 +0100
-Message-Id: <20230515173103.1017669-40-maz@kernel.org>
+Subject: [PATCH v10 13/59] KVM: arm64: nv: Add trap forwarding for CNTHCTL_EL2
+Date: Mon, 15 May 2023 18:30:17 +0100
+Message-Id: <20230515173103.1017669-14-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230515173103.1017669-1-maz@kernel.org>
 References: <20230515173103.1017669-1-maz@kernel.org>
@@ -56,123 +56,81 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+Describe the CNTHCTL_EL2 register, and associate it with all the sysregs
+it allows to trap.
 
-Should the guest hypervisor use the HW bit in the LRs, we need to
-emulate the deactivation from the L2 guest into the L1 distributor
-emulation, which is handled by L0.
-
-It's all good fun.
-
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_hyp.h     |  2 ++
- arch/arm64/kvm/hyp/vgic-v3-sr.c      |  2 +-
- arch/arm64/kvm/vgic/vgic-v3-nested.c | 32 ++++++++++++++++++++++++++++
- arch/arm64/kvm/vgic/vgic.c           |  6 ++++--
- include/kvm/arm_vgic.h               |  1 +
- 5 files changed, 40 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/emulate-nested.c | 37 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 36 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index bdd9cf546d95..d57889de93e6 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -57,6 +57,8 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 1e2fe192c9a4..101292c43602 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -98,9 +98,11 @@ enum coarse_grain_trap_id {
  
- int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
+ 	/*
+ 	 * Anything after this point requires a callback evaluating a
+-	 * complex trap condition. Hopefully we'll never need this...
++	 * complex trap condition. Ugly stuff.
+ 	 */
+ 	__COMPLEX_CONDITIONS__,
++	CGT_CNTHCTL_EL1PCTEN = __COMPLEX_CONDITIONS__,
++	CGT_CNTHCTL_EL1PTEN,
+ };
  
-+u64 __gic_v3_get_lr(unsigned int lr);
-+
- void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if);
- void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if);
- void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if);
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index 6cb638b184b1..75152c1ce646 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -18,7 +18,7 @@
- #define vtr_to_nr_pre_bits(v)		((((u32)(v) >> 26) & 7) + 1)
- #define vtr_to_nr_apr_regs(v)		(1 << (vtr_to_nr_pre_bits(v) - 5))
+ static const struct trap_bits coarse_trap_bits[] = {
+@@ -358,9 +360,37 @@ static const enum coarse_grain_trap_id *coarse_control_combo[] = {
  
--static u64 __gic_v3_get_lr(unsigned int lr)
-+u64 __gic_v3_get_lr(unsigned int lr)
- {
- 	switch (lr & 0xf) {
- 	case 0:
-diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-index ab8ddf490b31..e88c75e79010 100644
---- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-@@ -140,6 +140,38 @@ static void vgic_v3_fixup_shadow_lr_state(struct kvm_vcpu *vcpu)
- 	}
- }
+ typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu *);
  
-+void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
++static u64 get_sanitized_cnthctl(struct kvm_vcpu *vcpu)
 +{
-+	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
-+	struct vgic_v3_cpu_if *s_cpu_if = vcpu_shadow_if(vcpu);
-+	struct vgic_irq *irq;
-+	int i;
++	u64 val = __vcpu_sys_reg(vcpu, CNTHCTL_EL2);
 +
-+	for (i = 0; i < s_cpu_if->used_lrs; i++) {
-+		u64 lr = cpu_if->vgic_lr[i];
-+		int l1_irq;
++	if (!vcpu_el2_e2h_is_set(vcpu))
++		val = (val & (CNTHCTL_EL1PCEN | CNTHCTL_EL1PCTEN)) << 10;
 +
-+		if (!(lr & ICH_LR_HW) || !(lr & ICH_LR_STATE))
-+			continue;
-+
-+		/*
-+		 * If we had a HW lr programmed by the guest hypervisor, we
-+		 * need to emulate the HW effect between the guest hypervisor
-+		 * and the nested guest.
-+		 */
-+		l1_irq = (lr & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT;
-+		irq = vgic_get_irq(vcpu->kvm, vcpu, l1_irq);
-+		if (!irq)
-+			continue; /* oh well, the guest hyp is broken */
-+
-+		lr = __gic_v3_get_lr(i);
-+		if (!(lr & ICH_LR_STATE))
-+			irq->active = false;
-+
-+		vgic_put_irq(vcpu->kvm, irq);
-+	}
++	return val;
 +}
 +
- void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 34f13fd1238b..880d33d9d514 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -878,9 +878,11 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
- {
- 	int used_lrs;
++static enum trap_behaviour check_cnthctl_el1pcten(struct kvm_vcpu *vcpu)
++{
++	if (get_sanitized_cnthctl(vcpu) & (CNTHCTL_EL1PCTEN << 10))
++		return BEHAVE_HANDLE_LOCALLY;
++
++	return BEHAVE_FORWARD_ANY;
++}
++
++static enum trap_behaviour check_cnthctl_el1pten(struct kvm_vcpu *vcpu)
++{
++	if (get_sanitized_cnthctl(vcpu) & (CNTHCTL_EL1PCEN << 10))
++		return BEHAVE_HANDLE_LOCALLY;
++
++	return BEHAVE_FORWARD_ANY;
++}
++
+ #define CCC(id, fn)	[id - __COMPLEX_CONDITIONS__] = fn
  
--	/* If nesting, this is a load/put affair, not flush/sync. */
--	if (vgic_state_is_nested(vcpu))
-+	/* If nesting, emulate the HW effect from L0 to L1 */
-+	if (vgic_state_is_nested(vcpu)) {
-+		vgic_v3_sync_nested(vcpu);
- 		return;
-+	}
+ static const complex_condition_check ccc[] = {
++	CCC(CGT_CNTHCTL_EL1PCTEN, check_cnthctl_el1pcten),
++	CCC(CGT_CNTHCTL_EL1PTEN, check_cnthctl_el1pten),
+ };
  
- 	/* An empty ap_list_head implies used_lrs == 0 */
- 	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index d775eb50b72c..ea45accbc690 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -400,6 +400,7 @@ void kvm_vgic_load(struct kvm_vcpu *vcpu);
- void kvm_vgic_put(struct kvm_vcpu *vcpu);
- void kvm_vgic_vmcr_sync(struct kvm_vcpu *vcpu);
+ struct encoding_to_trap_configs {
+@@ -769,6 +799,11 @@ static const struct encoding_to_trap_configs encoding_to_traps[] __initdata = {
+ 	SR_TRAP(SYS_TRBPTR_EL1, 	CGT_MDCR_E2TB),
+ 	SR_TRAP(SYS_TRBSR_EL1, 		CGT_MDCR_E2TB),
+ 	SR_TRAP(SYS_TRBTRG_EL1,		CGT_MDCR_E2TB),
++	SR_TRAP(SYS_CNTP_TVAL_EL0,	CGT_CNTHCTL_EL1PTEN),
++	SR_TRAP(SYS_CNTP_CVAL_EL0,	CGT_CNTHCTL_EL1PTEN),
++	SR_TRAP(SYS_CNTP_CTL_EL0,	CGT_CNTHCTL_EL1PTEN),
++	SR_TRAP(SYS_CNTPCT_EL0,		CGT_CNTHCTL_EL1PCTEN),
++	SR_TRAP(SYS_CNTPCTSS_EL0,	CGT_CNTHCTL_EL1PCTEN),
+ };
  
-+void vgic_v3_sync_nested(struct kvm_vcpu *vcpu);
- void vgic_v3_load_nested(struct kvm_vcpu *vcpu);
- void vgic_v3_put_nested(struct kvm_vcpu *vcpu);
- void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu);
+ static DEFINE_XARRAY(sr_forward_xa);
 -- 
 2.34.1
 
