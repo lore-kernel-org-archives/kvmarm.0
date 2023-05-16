@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C18631104
-	for <kvmarm@lists.linux.dev>; Tue, 16 May 2023 16:07:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AC90C433A1;
-	Tue, 16 May 2023 16:07:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB6731104
+	for <kvmarm@lists.linux.dev>; Tue, 16 May 2023 16:07:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43964C433A0;
+	Tue, 16 May 2023 16:07:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1684253248;
-	bh=sgkiqqqqA8+9eb3Dgel5ketA1Ml0WAGFOlqXJkNUjw0=;
+	s=k20201202; t=1684253252;
+	bh=WPczk00OnpL1jBgj+JlXAzNsUnny+CNOuArcW/QKCBo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=s7wApvnm4Y80nrgtT6TInyxuw6OxnXJUv1/2O2vn1woz7HNAJXOYYApw7kNNsH9yQ
-	 Zt3sf3N2/vjQHZpO1OddhDW41LmD8mGdLwXNui0WLbEfJL0PHHFipo9tDTuy0nxLUr
-	 NrPvMTL7WVBX3o9roK7/baG4LKv5EYd1ZrxbNAwBgEslON/WIUWXhneHvQMZ0+tEfQ
-	 bC5lfIsMuwVzS/Vj8aq7XPOlabHuVyl5gI1hz+e4OWv+aoPddnZkOLzFsKl3s8nP54
-	 ZIZ1pLG4d/DrxUTAtgVLEpAoynRpx5TOFLmsj9LlHJVFS0TVV2AOw0fw73vYqkDDzB
-	 hbb1GBpxuRd4g==
+	b=cVh/kACFXxSUhb2GvaZfJcYCsV1OAcUsDa98Md9OyqxoBN+DV6mSHnef4tb8cixO2
+	 gctazSfuTB4U8OHHKFglnRncd2qHo7IKswAfvrilK3P8jow5hWJwoRev7xYNuzQ3AS
+	 ZVmT+yj39izt3BQcn/afpHMkoaz90Jgdg0SB2WK5U7FDNaKIcGwoYYbIG11X9c2MfF
+	 nQ+0QxwCWv0yg39Imc0JuzbkEXe9NZrud6M2QpVT0w14kMd3JteIQs+wjspdKbwQ0O
+	 jECfT/apdnuJVxrW+H9HlclqHlvGQj1KNdHnCQcMNeTQm55JmNsoGR686m4AEbv0zY
+	 kP31/f3NcVtfA==
 From: Arnd Bergmann <arnd@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>
@@ -33,9 +33,9 @@ Cc: Arnd Bergmann <arnd@arndb.de>,
 	linux-kernel@vger.kernel.org,
 	linux-efi@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: [PATCH 08/15] arm64: efi: add efi_handle_corrupted_x18 prototype
-Date: Tue, 16 May 2023 18:06:35 +0200
-Message-Id: <20230516160642.523862-9-arnd@kernel.org>
+Subject: [PATCH 09/15] arm64: hide unused is_valid_bugaddr()
+Date: Tue, 16 May 2023 18:06:36 +0200
+Message-Id: <20230516160642.523862-10-arnd@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230516160642.523862-1-arnd@kernel.org>
 References: <20230516160642.523862-1-arnd@kernel.org>
@@ -49,27 +49,39 @@ Content-Transfer-Encoding: 8bit
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-This functions is only called from assembler and lacks a prototype,
-which is seen from this W=1 warning:
+When generic BUG() support is disabled, this function has no declaration
+and no callers but causes a W=1 warning:
 
-arch/arm64/kernel/efi.c:155:25: error: no previous prototype for 'efi_handle_corrupted_x18' [-Werror=missing-prototypes]
+arch/arm64/kernel/traps.c:950:5: error: no previous prototype for 'is_valid_bugaddr' [-Werror=missing-prototypes]
+
+Add an #ifdef that matches the one around the declaration.
 
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- arch/arm64/include/asm/efi.h | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm64/kernel/traps.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/efi.h b/arch/arm64/include/asm/efi.h
-index f86b157a5da3..ef46f2daca62 100644
---- a/arch/arm64/include/asm/efi.h
-+++ b/arch/arm64/include/asm/efi.h
-@@ -166,4 +166,6 @@ static inline void efi_capsule_flush_cache_range(void *addr, int size)
- 	dcache_clean_inval_poc((unsigned long)addr, (unsigned long)addr + size);
+diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
+index 98898c3108b8..3f5a21e5968e 100644
+--- a/arch/arm64/kernel/traps.c
++++ b/arch/arm64/kernel/traps.c
+@@ -946,7 +946,7 @@ void do_serror(struct pt_regs *regs, unsigned long esr)
  }
  
-+efi_status_t efi_handle_corrupted_x18(efi_status_t s, const char *f);
-+
- #endif /* _ASM_EFI_H */
+ /* GENERIC_BUG traps */
+-
++#ifdef CONFIG_GENERIC_BUG
+ int is_valid_bugaddr(unsigned long addr)
+ {
+ 	/*
+@@ -958,6 +958,7 @@ int is_valid_bugaddr(unsigned long addr)
+ 	 */
+ 	return 1;
+ }
++#endif
+ 
+ static int bug_handler(struct pt_regs *regs, unsigned long esr)
+ {
 -- 
 2.39.2
 
