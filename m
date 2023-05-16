@@ -1,98 +1,150 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E0C3F4FD
-	for <kvmarm@lists.linux.dev>; Tue, 16 May 2023 10:26:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1684232777;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=A8RPDB5oCUZPol53GuFRKa1PDnfifaD9ISAfpPJWqOU=;
-	b=RHEGcnzFpWEMegqM38KS4H7poih+ipa7fJeh6y1nScEdIE+d/rMC/JU8b2ny8d/v1dV5d4
-	NoXK/mshZaxG2DTq2FGEdds3I1ZWzaH8emhjhOV0ZVP1LMz588cD+Bp1u7bNPLe/b8IHfx
-	HYAjC89Pm9mtNlMCYpubrirqanM12SY=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-108-M7Zkyq0vMxez3ve1Zok7Lw-1; Tue, 16 May 2023 06:26:13 -0400
-X-MC-Unique: M7Zkyq0vMxez3ve1Zok7Lw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B31E785A5B1;
-	Tue, 16 May 2023 10:26:12 +0000 (UTC)
-Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 70AA740C206F;
-	Tue, 16 May 2023 10:26:12 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A09171BF
+	for <kvmarm@lists.linux.dev>; Tue, 16 May 2023 10:55:18 +0000 (UTC)
+Received: from lhrpeml100003.china.huawei.com (unknown [172.18.147.206])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4QLCHp3gTlz6J7Ty;
+	Tue, 16 May 2023 18:33:10 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
+ lhrpeml100003.china.huawei.com (7.191.160.210) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Tue, 16 May 2023 11:37:20 +0100
+Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
+ lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.023;
+ Tue, 16 May 2023 11:37:20 +0100
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
 To: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>, KVMARM
- <kvmarm@lists.linux.dev>, ARMLinux <linux-arm-kernel@lists.infradead.org>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@google.com>
-Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- James Morse <james.morse@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>,
- Raghavendra Rao Ananta <rananta@google.com>, Jing Zhang
- <jingzhangos@google.com>
-Subject: Re: [PATCH v8 5/6] KVM: arm64: Reuse fields of sys_reg_desc for idreg
-In-Reply-To: <20230503171618.2020461-6-jingzhangos@google.com>
-Organization: Red Hat GmbH
+	<kvmarm@lists.linux.dev>, ARMLinux <linux-arm-kernel@lists.infradead.org>,
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@google.com>
+CC: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, "James
+ Morse" <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>,
+	Reiji Watanabe <reijiw@google.com>, Raghavendra Rao Ananta
+	<rananta@google.com>
+Subject: RE: [PATCH v8 0/6] Support writable CPU ID registers from userspace
+Thread-Topic: [PATCH v8 0/6] Support writable CPU ID registers from userspace
+Thread-Index: AQHZfeMKF5dz+QbHTkGBOtd/Pa2Gla9cxFkw
+Date: Tue, 16 May 2023 10:37:20 +0000
+Message-ID: <2ef9208dabe44f5db445a1061a0d5918@huawei.com>
 References: <20230503171618.2020461-1-jingzhangos@google.com>
- <20230503171618.2020461-6-jingzhangos@google.com>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date: Tue, 16 May 2023 12:26:11 +0200
-Message-ID: <87ilcsh8sc.fsf@redhat.com>
+In-Reply-To: <20230503171618.2020461-1-jingzhangos@google.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-originating-ip: [10.202.227.178]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-CFilter-Loop: Reflected
 
-On Wed, May 03 2023, Jing Zhang <jingzhangos@google.com> wrote:
-
-> Since reset() and val are not used for idreg in sys_reg_desc, they would
-> be used with other purposes for idregs.
-> The callback reset() would be used to return KVM sanitised id register
-> values. The u64 val would be used as mask for writable fields in idregs.
-> Only bits with 1 in val are writable from userspace.
->
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> ---
->  arch/arm64/kvm/id_regs.c  | 44 +++++++++++++++++++----------
->  arch/arm64/kvm/sys_regs.c | 59 +++++++++++++++++++++++++++------------
->  arch/arm64/kvm/sys_regs.h | 10 ++++---
->  3 files changed, 77 insertions(+), 36 deletions(-)
->
-
-(...)
-
-> diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-> index e88fd77309b2..21869319f6e1 100644
-> --- a/arch/arm64/kvm/sys_regs.h
-> +++ b/arch/arm64/kvm/sys_regs.h
-> @@ -65,12 +65,12 @@ struct sys_reg_desc {
->  		       const struct sys_reg_desc *);
->  
->  	/* Initialization for vcpu. */
-
-Maybe be a bit more verbose here?
-
-/* Initialization for vcpu. Return initialized value, or KVM sanitized
-   value for id registers. */
-
-> -	void (*reset)(struct kvm_vcpu *, const struct sys_reg_desc *);
-> +	u64 (*reset)(struct kvm_vcpu *, const struct sys_reg_desc *);
->  
->  	/* Index into sys_reg[], or 0 if we don't need to save it. */
->  	int reg;
->  
-> -	/* Value (usually reset value) */
-> +	/* Value (usually reset value), or write mask for idregs */
->  	u64 val;
->  
->  	/* Custom get/set_user functions, fallback to generic if NULL */
-
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBKaW5nIFpoYW5nIFttYWlsdG86
+amluZ3poYW5nb3NAZ29vZ2xlLmNvbV0NCj4gU2VudDogMDMgTWF5IDIwMjMgMTg6MTYNCj4gVG86
+IEtWTSA8a3ZtQHZnZXIua2VybmVsLm9yZz47IEtWTUFSTSA8a3ZtYXJtQGxpc3RzLmxpbnV4LmRl
+dj47DQo+IEFSTUxpbnV4IDxsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmc+OyBN
+YXJjIFp5bmdpZXINCj4gPG1hekBrZXJuZWwub3JnPjsgT2xpdmVyIFVwdG9uIDxvdXB0b25AZ29v
+Z2xlLmNvbT4NCj4gQ2M6IFdpbGwgRGVhY29uIDx3aWxsQGtlcm5lbC5vcmc+OyBQYW9sbyBCb256
+aW5pIDxwYm9uemluaUByZWRoYXQuY29tPjsNCj4gSmFtZXMgTW9yc2UgPGphbWVzLm1vcnNlQGFy
+bS5jb20+OyBBbGV4YW5kcnUgRWxpc2VpDQo+IDxhbGV4YW5kcnUuZWxpc2VpQGFybS5jb20+OyBT
+dXp1a2kgSyBQb3Vsb3NlIDxzdXp1a2kucG91bG9zZUBhcm0uY29tPjsNCj4gRnVhZCBUYWJiYSA8
+dGFiYmFAZ29vZ2xlLmNvbT47IFJlaWppIFdhdGFuYWJlIDxyZWlqaXdAZ29vZ2xlLmNvbT47DQo+
+IFJhZ2hhdmVuZHJhIFJhbyBBbmFudGEgPHJhbmFudGFAZ29vZ2xlLmNvbT47IEppbmcgWmhhbmcN
+Cj4gPGppbmd6aGFuZ29zQGdvb2dsZS5jb20+DQo+IFN1YmplY3Q6IFtQQVRDSCB2OCAwLzZdIFN1
+cHBvcnQgd3JpdGFibGUgQ1BVIElEIHJlZ2lzdGVycyBmcm9tIHVzZXJzcGFjZQ0KPiANCj4gVGhp
+cyBwYXRjaHNldCByZWZhY3RvcnMvYWRkcyBjb2RlIHRvIHN1cHBvcnQgd3JpdGFibGUgcGVyIGd1
+ZXN0IENQVSBJRA0KPiBmZWF0dXJlDQo+IHJlZ2lzdGVycy4gUGFydCBvZiB0aGUgY29kZS9pZGVh
+cyBhcmUgZnJvbQ0KPiBodHRwczovL2xvcmUua2VybmVsLm9yZy9hbGwvMjAyMjA0MTkwNjU1NDQu
+MzYxNjk0OC0xLXJlaWppd0Bnb29nbGUuY29tDQoNCkhpIEppbmcvUmVpamksDQoNCkp1c3QgdG8g
+Y2hlY2sgdGhlIHN0YXR1cyBvbiB0aGUgYWJvdmUgbWVudGlvbmVkIHNlcmllcyAiS1ZNOiBhcm02
+NDogTWFrZSBDUFUNCklEIHJlZ2lzdGVycyB3cml0YWJsZSBieSB1c2Vyc3BhY2UiLiBJcyB0aGVy
+ZSBhbnkgcGxhbiB0byByZXNwaW4gdGhhdCBvbmUgc29vbj8NCihTb3JyeSwgbm90IHN1cmUgdGhl
+cmUgaXMgYW55IG90aGVyIHNlcmllcyBpbiBwcm9ncmVzcyBmb3IgdGhhdCBzdXBwb3J0IGN1cnJl
+bnRseSkNCg0KUGxlYXNlIGxldCBtZSBrbm93LiANCg0KVGhhbmtzLA0KU2hhbWVlcg0KPiAuDQo+
+IE5vIGZ1bmN0aW9uYWwgY2hhbmdlIGlzIGludGVuZGVkIGluIHRoaXMgcGF0Y2hzZXQuIFdpdGgg
+dGhlIG5ldyBDUFUgSUQNCj4gZmVhdHVyZQ0KPiByZWdpc3RlcnMgaW5mcmFzdHJ1Y3R1cmUsIG9u
+bHkgd3JpdHRpbmdzIG9mIElEX0FBNjRQRlIwX0VMMS5bQ1NWMnxDU1YzXSwNCj4gSURfQUE2NERG
+UjBfRUwxLlBNVVZlciBhbmQgSURfREZSMF9FTEYuUGVyZk1vbiBhcmUgYWxsb3dlZCBhcyBLVk0N
+Cj4gZG9lcyBiZWZvcmUuDQo+IA0KPiBXcml0YWJsZSAoQ29uZmlndXJhYmxlKSBwZXIgZ3Vlc3Qg
+Q1BVIElEIGZlYXR1cmUgcmVnaXN0ZXJzIGFyZSB1c2VmdWwgZm9yDQo+IGNyZWF0aW5nL21pZ3Jh
+dGluZyBndWVzdCBvbiBBUk0gQ1BVcyB3aXRoIGRpZmZlcmVudCBraW5kcyBvZiBmZWF0dXJlcy4N
+Cj4gDQo+IFRoaXMgcGF0Y2hzZXQgdXNlcyBrdm0tPmFyY2guY29uZmlnX2xvY2sgZnJvbSBPbGl2
+ZXIncyBsb2NrIGludmVyc2lvbiBmaXhlcyBhdA0KPiBodHRwczovL2xvcmUua2VybmVsLm9yZy9s
+aW51eC1hcm0ta2VybmVsLzIwMjMwMzI3MTY0NzQ3LjI0NjY5NTgtMS1vbGl2ZXIuDQo+IHVwdG9u
+QGxpbnV4LmRldi8NCj4gDQo+IC0tLQ0KPiANCj4gKiB2NyAtPiB2OA0KPiAgIC0gTW92ZSBpZHJl
+Z3MgdGFibGUgc2FuaXR5IGNoZWNrIHRvIGt2bV9zeXNfcmVnX3RhYmxlX2luaXQuDQo+ICAgLSBP
+bmx5IGFsbG93IHVzZXJzcGFjZSB3cml0aW5nIGJlZm9yZSBWTSBydW5uaW5nLg0KPiAgIC0gTm8g
+bG9jayBpcyBob2xkIGZvciBndWVzdCBhY2Nlc3MgdG8gaWRyZWdzLg0KPiAgIC0gQWRkcmVzc2Vk
+IHNvbWUgb3RoZXIgY29tbWVudHMgZnJvbSBSZWlqaSBhbmQgT2xpdmVyLg0KPiANCj4gKiB2NiAt
+PiB2Nw0KPiAgIC0gUmViYXNlZCB0byB2Ni4zLXJjNy4NCj4gICAtIEFkZCBoZWxwZXJzIGZvciBp
+ZHJlZ3MgcmVhZC93cml0ZS4NCj4gICAtIEd1YXJkIGFsbCBpZHJlZ3MgcmVhZHMvd3JpdGVzLg0K
+PiAgIC0gQWRkIGNvZGUgdG8gZml4IGZlYXR1cmVzJyBzYWZlIHZhbHVlIHR5cGUgd2hpY2ggaXMg
+ZGlmZmVyZW50IGZvciBLVk0gdGhhbg0KPiAgICAgZm9yIHRoZSBob3N0Lg0KPiANCj4gKiB2NSAt
+PiB2Ng0KPiAgIC0gUmViYXNlZCB0byB2Ni4zLXJjNS4NCj4gICAtIFJldXNlIHN0cnVjdCBzeXNf
+cmVnX2Rlc2MncyByZXNldCgpIGNhbGxiYWNrIGFuZCBmaWVsZCB2YWwgZm9yIEtWTS4NCj4gICAg
+IHNhbml0aXNhdGlvbiBmdW5jdGlvbiBhbmQgd3JpdGFibGUgbWFzayBpbnN0ZWFkIG9mIGNyZWF0
+aW5nIGEgbmV3IGRhdGENCj4gICAgIHN0cnVjdHVyZSBmb3IgaWRyZWdzLg0KPiAgIC0gVXNlIGdl
+dF9hcm02NF9mdHJfcmVnKCkgaW5zdGVhZCBvZiBleHBvc2luZyBpZHJlZ3MgZnRyX2JpdHMgYXJy
+YXkuDQo+IA0KPiAqIHY0IC0+IHY1DQo+ICAgLSBSZWJhc2VkIHRvIDJmYWQyMGFlMDVjYiAoa3Zt
+YXJtL25leHQpDQo+ICAgICBNZXJnZSBicmFuY2gga3ZtLWFybTY0L3NlbGZ0ZXN0L21pc2MtNiw0
+IGludG8ga3ZtYXJtLW1hc3Rlci9uZXh0DQo+ICAgLSBVc2Uga3ZtLT5hcmNoLmNvbmZpZ19sb2Nr
+IHRvIGd1YXJkIHVwZGF0ZSB0byBtdWx0aXBsZSBWTSBzY29wZSBpZHJlZ3MNCj4gICAgIHRvIGF2
+b2lkIGxvY2sgaW52ZXJzaW9uDQo+ICAgLSBBZGQgYmFjayBJRFJFRygpIG1hY3JvIGZvciBpZHJl
+Z3MgYWNjZXNzDQo+ICAgLSBSZWZhY3RvciBzdHJ1Y3QgaWRfcmVnX2Rlc2MgYnkgdXNpbmcgZXhp
+c3RpbmcgaW5mcmFzdHJ1Y3R1cmUuDQo+ICAgLSBBZGRyZXNzZWQgbWFueSBvdGhlciBjb21tZW50
+cyBmcm9tIE1hcmMuDQo+IA0KPiAqIHYzIC0+IHY0DQo+ICAgLSBSZW1vdmUgSURSRUcoKSBtYWNy
+byBmb3IgSUQgcmVnIGFjY2VzcywgdXNlIHNpbXBsZSBhcnJheSBhY2Nlc3MgaW5zdGVhZA0KPiAg
+IC0gUmVuYW1lIGt2bV9hcm1fcmVhZF9pZF9yZWdfd2l0aF9lbmNvZGluZygpIHRvDQo+IGt2bV9h
+cm1fcmVhZF9pZF9yZWcoKQ0KPiAgIC0gU2F2ZSBwZXJmbW9uIHZhbHVlIGluIElEX0RGUjBfRUwx
+IGluc3RlYWQgb2YgcG11dmVyDQo+ICAgLSBVcGRhdGUgcGVyZm1vbiBpbiBJRF9ERlIwX0VMMSBh
+bmQgcG11dmVyIGluIElEX0FBNjRERlIwX0VMMQ0KPiBhdG9taWNhbGx5DQo+ICAgLSBSZW1vdmUg
+a3ZtX3ZjcHVfaGFzX3BtdSgpIGluIG1hY3JvIGt2bV9wbXVfaXNfM3A1KCkNCj4gICAtIEltcHJv
+dmUgSUQgcmVnaXN0ZXIgc2FuaXR5IGNoZWNraW5nIGluIGt2bV9hcm1fY2hlY2tfaWRyZWdfdGFi
+bGUoKQ0KPiANCj4gKiB2MiAtPiB2Mw0KPiAgIC0gUmViYXNlZCB0byA5NmE0NjI3ZGJiZDQgKGt2
+bWFybS9uZXh0KQ0KPiAgICAgTWVyZ2UgdGFnICcgaHR0cHM6Ly9naXRodWIuY29tL291cHRvbi9s
+aW51eCB0YWdzL2t2bWFybS02LjMnIGZyb20NCj4gaW50byBrdm1hcm0tbWFzdGVyL25leHQNCj4g
+ICAtIEFkZCBpZCByZWdpc3RlcmUgZW11bGF0aW9uIGVudHJ5IHBvaW50IGZ1bmN0aW9uIGVtdWxh
+dGVfaWRfcmVnDQo+ICAgLSBGaXggY29uc2lzdGVuY3kgZm9yIElEX0FBNjRERlIwX0VMMS5QTVVW
+ZXIgYW5kDQo+IElEX0RGUjBfRUwxLlBlcmZNb24NCj4gICAtIEltcHJvdmUgdGhlIGNoZWNraW5n
+IGZvciBpZCByZWdpc3RlciB0YWJsZSBieSBlbnN1cmluZyB0aGF0IGV2ZXJ5IGVudHJ5DQo+IGhh
+cw0KPiAgICAgdGhlIGNvcnJlY3QgaWQgcmVnaXN0ZXIgZW5jb2RpbmcuDQo+ICAgLSBBZGRyZXNz
+ZWQgb3RoZXIgY29tbWVudHMgZnJvbSBSZWlqaSBhbmQgTWFyYy4NCj4gDQo+ICogdjEgLT4gdjIN
+Cj4gICAtIFJlYmFzZSB0byA3MTIxYTJlMWQxMDcgKGt2bWFybS9uZXh0KSBNZXJnZSBicmFuY2gN
+Cj4ga3ZtLWFybTY0L252LXByZWZpeCBpbnRvIGt2bWFybS9uZXh0DQo+ICAgLSBBZGRyZXNzIHdy
+aXRpbmcgaXNzdWUgZm9yIFBNVVZlcg0KPiANCj4gWzFdDQo+IGh0dHBzOi8vbG9yZS5rZXJuZWwu
+b3JnL2FsbC8yMDIzMDIwMTAyNTA0OC4yMDU4MjAtMS1qaW5nemhhbmdvc0Bnb29nbGUuDQo+IGNv
+bQ0KPiBbMl0NCj4gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvYWxsLzIwMjMwMjEyMjE1ODMwLjI5
+NzU0ODUtMS1qaW5nemhhbmdvc0Bnb29nbA0KPiBlLmNvbQ0KPiBbM10NCj4gaHR0cHM6Ly9sb3Jl
+Lmtlcm5lbC5vcmcvYWxsLzIwMjMwMjI4MDYyMjQ2LjEyMjIzODctMS1qaW5nemhhbmdvc0Bnb29n
+bA0KPiBlLmNvbQ0KPiBbNF0NCj4gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvYWxsLzIwMjMwMzE3
+MDUwNjM3Ljc2NjMxNy0xLWppbmd6aGFuZ29zQGdvb2dsZS4NCj4gY29tDQo+IFs1XQ0KPiBodHRw
+czovL2xvcmUua2VybmVsLm9yZy9hbGwvMjAyMzA0MDIxODM3MzUuMzAxMTU0MC0xLWppbmd6aGFu
+Z29zQGdvb2dsDQo+IGUuY29tDQo+IFs2XQ0KPiBodHRwczovL2xvcmUua2VybmVsLm9yZy9hbGwv
+MjAyMzA0MDQwMzUzNDQuNDA0Mzg1Ni0xLWppbmd6aGFuZ29zQGdvb2dsDQo+IGUuY29tDQo+IFs3
+XQ0KPiBodHRwczovL2xvcmUua2VybmVsLm9yZy9hbGwvMjAyMzA0MjQyMzQ3MDQuMjU3MTQ0NC0x
+LWppbmd6aGFuZ29zQGdvb2dsDQo+IGUuY29tDQo+IA0KPiAtLS0NCj4gDQo+IEppbmcgWmhhbmcg
+KDYpOg0KPiAgIEtWTTogYXJtNjQ6IE1vdmUgQ1BVIElEIGZlYXR1cmUgcmVnaXN0ZXJzIGVtdWxh
+dGlvbiBpbnRvIGEgc2VwYXJhdGUNCj4gICAgIGZpbGUNCj4gICBLVk06IGFybTY0OiBTYXZlIElE
+IHJlZ2lzdGVycycgc2FuaXRpemVkIHZhbHVlIHBlciBndWVzdA0KPiAgIEtWTTogYXJtNjQ6IFVz
+ZSBwZXIgZ3Vlc3QgSUQgcmVnaXN0ZXIgZm9yIElEX0FBNjRQRlIwX0VMMS5bQ1NWMnxDU1YzXQ0K
+PiAgIEtWTTogYXJtNjQ6IFVzZSBwZXIgZ3Vlc3QgSUQgcmVnaXN0ZXIgZm9yIElEX0FBNjRERlIw
+X0VMMS5QTVVWZXINCj4gICBLVk06IGFybTY0OiBSZXVzZSBmaWVsZHMgb2Ygc3lzX3JlZ19kZXNj
+IGZvciBpZHJlZw0KPiAgIEtWTTogYXJtNjQ6IFJlZmFjdG9yIHdyaXRpbmdzIGZvciBQTVVWZXIv
+Q1NWMi9DU1YzDQo+IA0KPiAgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9jcHVmZWF0dXJlLmggfCAg
+IDEgKw0KPiAgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oICAgfCAgMzMgKy0NCj4g
+IGFyY2gvYXJtNjQva2VybmVsL2NwdWZlYXR1cmUuYyAgICAgIHwgICAyICstDQo+ICBhcmNoL2Fy
+bTY0L2t2bS9NYWtlZmlsZSAgICAgICAgICAgICB8ICAgMiArLQ0KPiAgYXJjaC9hcm02NC9rdm0v
+YXJtLmMgICAgICAgICAgICAgICAgfCAgMjQgKy0NCj4gIGFyY2gvYXJtNjQva3ZtL2lkX3JlZ3Mu
+YyAgICAgICAgICAgIHwgNzE3DQo+ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4gIGFy
+Y2gvYXJtNjQva3ZtL3N5c19yZWdzLmMgICAgICAgICAgIHwgNTM0ICsrKystLS0tLS0tLS0tLS0t
+LS0tLQ0KPiAgYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuaCAgICAgICAgICAgfCAgMjggKy0NCj4g
+IGluY2x1ZGUva3ZtL2FybV9wbXUuaCAgICAgICAgICAgICAgIHwgICA1ICstDQo+ICA5IGZpbGVz
+IGNoYW5nZWQsIDg2NCBpbnNlcnRpb25zKCspLCA0ODIgZGVsZXRpb25zKC0pDQo+ICBjcmVhdGUg
+bW9kZSAxMDA2NDQgYXJjaC9hcm02NC9rdm0vaWRfcmVncy5jDQo+IA0KPiANCj4gYmFzZS1jb21t
+aXQ6IDZhOGY1N2FlMmViMDdhYjM5YTZmMGNjYWQ2MGM3NjA3NDMwNTEwMjYNCj4gLS0NCj4gMi40
+MC4xLjQ5NS5nYzgxNmUwOWI1M2QtZ29vZw0KPiANCg0K
