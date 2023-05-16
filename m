@@ -1,117 +1,168 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 597B42771D
-	for <kvmarm@lists.linux.dev>; Tue, 16 May 2023 14:21:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1684246888;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iI7IGPaVhBWiA9o2JZBNiM8ifHsTLnjxJmTcjx0w6Sw=;
-	b=aqbJxm4U8Op+XdpK69EhjR5U/9zSkAj/TE2a/JZevWm6nJxUGC/fh0KGNDdeKp2SBBvIr2
-	7ptbUysonULr30br5YT5etEzTu0sKx9sW30bAii99iGdRN9MuGEq6Q4f2WOFN3Wba5VbSL
-	yGzUCqoNQJWSQUbhtH2oIe2XdYRf46M=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-651-xYJHXN4xNuSjXGgPbW4jhw-1; Tue, 16 May 2023 10:21:24 -0400
-X-MC-Unique: xYJHXN4xNuSjXGgPbW4jhw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E775C85C06E;
-	Tue, 16 May 2023 14:21:23 +0000 (UTC)
-Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9FB852166B31;
-	Tue, 16 May 2023 14:21:23 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Marc
- Zyngier <maz@kernel.org>
-Cc: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>, KVMARM
- <kvmarm@lists.linux.dev>, ARMLinux <linux-arm-kernel@lists.infradead.org>,
- Oliver Upton <oupton@google.com>, Will Deacon <will@kernel.org>, Paolo
- Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, Alexandru
- Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, Reiji Watanabe
- <reijiw@google.com>, Raghavendra Rao Ananta <rananta@google.com>
-Subject: RE: [PATCH v8 0/6] Support writable CPU ID registers from userspace
-In-Reply-To: <bb1e038f0bf04d62beda15d0830920ee@huawei.com>
-Organization: Red Hat GmbH
-References: <20230503171618.2020461-1-jingzhangos@google.com>
- <2ef9208dabe44f5db445a1061a0d5918@huawei.com>
- <868rdomtfo.wl-maz@kernel.org>
- <1a96a72e87684e2fb3f8c77e32516d04@huawei.com> <87cz30h4nx.fsf@redhat.com>
- <867ct8mnel.wl-maz@kernel.org>
- <bb1e038f0bf04d62beda15d0830920ee@huawei.com>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date: Tue, 16 May 2023 16:21:22 +0200
-Message-ID: <877ct8gxwd.fsf@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E584434CF9
+	for <kvmarm@lists.linux.dev>; Tue, 16 May 2023 15:47:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 968C1C433EF;
+	Tue, 16 May 2023 15:47:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1684252033;
+	bh=0+bt4Jtbt/lY8GWM6lmju26paMyG+7OAx1IOIm4pGBY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UPdagahqFGsct/IwUnGhgKDBUiKTJzwh2T+ZCOvrRfJlFOL/dPFjxJ5EnmWhOA2NB
+	 PO1q6DMg6jsfWS1K2s8gHFN2LD7QdK7Tmhpzl6fhXAoYHVBr1H6DOOPqF0JvVV3eLM
+	 KQ+qQCfyh5P/V78QJKBGGMqbn7cCtDY4XFYKewsiHC5ndkIHevhqRJfTFRj7X0gl/1
+	 bE+e14b8yRCVTSJWaKgGyHf4fxOI/bBrarbJVz0Yr7FAIua4gMpPDdHBAy8vU3ZVVS
+	 cGwXHKcQgOJQlb49Is99A4is+FzrsWbW5JrP8ZbnBNSKRS7sf3uV6BBjn+78YQzhBH
+	 LQ8FbUIcaI9mA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pywtK-00Faph-RT;
+	Tue, 16 May 2023 16:47:11 +0100
+Date: Tue, 16 May 2023 16:47:10 +0100
+Message-ID: <864jocmg75.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: oliver.upton@linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	tabba@google.com,
+	qperret@google.com,
+	will@kernel.org,
+	catalin.marinas@arm.com,
+	yuzenghui@huawei.com,
+	suzuki.poulose@arm.com,
+	james.morse@arm.com,
+	bgardon@google.com,
+	gshan@redhat.com
+Subject: Re: [PATCH] KVM: arm64: Use BTI for pKVM
+In-Reply-To: <20230516141846.792193-1-smostafa@google.com>
+References: <20230516141846.792193-1-smostafa@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: smostafa@google.com, oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, tabba@google.com, qperret@google.com, will@kernel.org, catalin.marinas@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, james.morse@arm.com, bgardon@google.com, gshan@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, May 16 2023, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
+On Tue, 16 May 2023 15:18:46 +0100,
+Mostafa Saleh <smostafa@google.com> wrote:
+> 
+> CONFIG_ARM64_BTI_KERNEL compiles the kernel to support ARMv8.5-BTI.
+> However, the nvhe code doesn't make use of it as it doesn't map any
+> pages with Guarded Page(GP) bit.
+> 
+> This patch maps pKVM .text section with GP bit which matches the
+> kernel handling for BTI.
 
->> -----Original Message-----
->> From: Marc Zyngier [mailto:maz@kernel.org]
->> Sent: 16 May 2023 14:12
->> To: Cornelia Huck <cohuck@redhat.com>
->> Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
->> Jing Zhang <jingzhangos@google.com>; KVM <kvm@vger.kernel.org>;
->> KVMARM <kvmarm@lists.linux.dev>; ARMLinux
->> <linux-arm-kernel@lists.infradead.org>; Oliver Upton <oupton@google.com>;
->> Will Deacon <will@kernel.org>; Paolo Bonzini <pbonzini@redhat.com>;
->> James Morse <james.morse@arm.com>; Alexandru Elisei
->> <alexandru.elisei@arm.com>; Suzuki K Poulose <suzuki.poulose@arm.com>;
->> Fuad Tabba <tabba@google.com>; Reiji Watanabe <reijiw@google.com>;
->> Raghavendra Rao Ananta <rananta@google.com>
->> Subject: Re: [PATCH v8 0/6] Support writable CPU ID registers from
->> userspace
->> 
->> On Tue, 16 May 2023 12:55:14 +0100,
->> Cornelia Huck <cohuck@redhat.com> wrote:
->> >
->> > Do you have more concrete ideas for QEMU CPU models already? Asking
->> > because I wanted to talk about this at KVM Forum, so collecting what
->> > others would like to do seems like a good idea :)
->> 
->> I'm not being asked, but I'll share my thoughts anyway! ;-)
->> 
->> I don't think CPU models are necessarily the most important thing.
->> Specially when you look at the diversity of the ecosystem (and even
->> the same CPU can be configured in different ways at integration
->> time). Case in point, Neoverse N1 which can have its I/D caches made
->> coherent or not. And the guest really wants to know which one it is
->> (you can only lie in one direction).
->> 
->> But being able to control the feature set exposed to the guest from
->> userspace is a huge benefit in terms of migration.
->
-> Yes, this is what we also need and was thinking of adding a named CPU with
-> common min feature set exposed to Guest. There were some previous
-> attempts to add the basic support in Qemu here,
->
-> https://lists.gnu.org/archive/html/qemu-devel/2020-11/msg00087.html
+Why pKVM only? Surely we can benefit from it all over the nvhe code,
+right?
 
-Thanks for the link.
+> 
+> A new flag is added to enum kvm_pgtable_prot: KVM_PGTABLE_PROT_GP_S1,
+> which represents BTI guarded page in hypervisor stage-1 page table.
+> 
+> Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h | 3 +++
+>  arch/arm64/kvm/hyp/nvhe/setup.c      | 8 ++++++--
+>  arch/arm64/kvm/hyp/pgtable.c         | 6 ++++--
+>  3 files changed, 13 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 4cd6762bda80..5bcd06d664d3 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -151,6 +151,7 @@ enum kvm_pgtable_stage2_flags {
+>   * @KVM_PGTABLE_PROT_W:		Write permission.
+>   * @KVM_PGTABLE_PROT_R:		Read permission.
+>   * @KVM_PGTABLE_PROT_DEVICE:	Device attributes.
+> + * @KVM_PGTABLE_PROT_GP_S1:	GP(guarded page) used for BTI in stage-1 only
+>   * @KVM_PGTABLE_PROT_SW0:	Software bit 0.
+>   * @KVM_PGTABLE_PROT_SW1:	Software bit 1.
+>   * @KVM_PGTABLE_PROT_SW2:	Software bit 2.
+> @@ -163,6 +164,8 @@ enum kvm_pgtable_prot {
+>  
+>  	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
+>  
+> +	KVM_PGTABLE_PROT_GP_S1			= BIT(50),
+> +
+>  	KVM_PGTABLE_PROT_SW0			= BIT(55),
+>  	KVM_PGTABLE_PROT_SW1			= BIT(56),
+>  	KVM_PGTABLE_PROT_SW2			= BIT(57),
+> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+> index 110f04627785..95f80e2b2946 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> @@ -66,7 +66,7 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
+>  {
+>  	void *start, *end, *virt = hyp_phys_to_virt(phys);
+>  	unsigned long pgt_size = hyp_s1_pgtable_pages() << PAGE_SHIFT;
+> -	enum kvm_pgtable_prot prot;
+> +	enum kvm_pgtable_prot prot = PAGE_HYP_EXEC;
+>  	int ret, i;
+>  
+>  	/* Recreate the hyp page-table using the early page allocator */
+> @@ -88,7 +88,11 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
+>  	if (ret)
+>  		return ret;
+>  
+> -	ret = pkvm_create_mappings(__hyp_text_start, __hyp_text_end, PAGE_HYP_EXEC);
+> +	/* Hypervisor text is mapped as guarded pages(GP). */
+> +	if (IS_ENABLED(CONFIG_ARM64_BTI_KERNEL) && cpus_have_const_cap(ARM64_BTI))
+> +		prot |= KVM_PGTABLE_PROT_GP_S1;
 
->
->> Now, this is only half of the problem (and we're back to the CPU
->> model): most of these CPUs have various degrees of brokenness. Most of
->> the workarounds have to be implemented by the guest, and are keyed on
->> the MIDR values. So somehow, you need to be able to expose *all* the
->> possible MIDR values that a guest can observe in its lifetime.
->
-> Ok. This will be a problem and I am not sure this has an impact on our 
-> platforms or not.
+Is there any reason why this isn't a final cap? I also dislike the
+IS_ENABLED(), but I can see that we don't have separate caps for
+in-kernel BTI and userspace visible BTI...
 
-Oh, I see that the MIDR fun had already been mentioned in a reply to the
-first version of that patchset; this needs to be addressed for the
-general case, I guess...
+> +
+> +	ret = pkvm_create_mappings(__hyp_text_start, __hyp_text_end, prot);
+>  	if (ret)
+>  		return ret;
+>  
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 3d61bd3e591d..028e198acd48 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -145,7 +145,8 @@ static kvm_pte_t kvm_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
+>  	u64 type = (level == KVM_PGTABLE_MAX_LEVELS - 1) ? KVM_PTE_TYPE_PAGE :
+>  							   KVM_PTE_TYPE_BLOCK;
+>  
+> -	pte |= attr & (KVM_PTE_LEAF_ATTR_LO | KVM_PTE_LEAF_ATTR_HI);
+> +	pte |= attr & (KVM_PTE_LEAF_ATTR_LO | KVM_PTE_LEAF_ATTR_HI |
+> +		       KVM_PGTABLE_PROT_GP_S1);
+>  	pte |= FIELD_PREP(KVM_PTE_TYPE, type);
+>  	pte |= KVM_PTE_VALID;
+>  
+> @@ -378,7 +379,8 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
+>  	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_AP, ap);
+>  	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_SH, sh);
+>  	attr |= KVM_PTE_LEAF_ATTR_LO_S1_AF;
+> -	attr |= prot & KVM_PTE_LEAF_ATTR_HI_SW;
+> +	attr |= prot & (KVM_PTE_LEAF_ATTR_HI_SW | KVM_PGTABLE_PROT_GP_S1);
+> +
 
+You should probably check that the page is executable before blindly
+accepting to set the GP bit (don't accept it for non-exec pages).
+
+Another thing to check would be the state of SCTLR_EL2.BT, which I
+think we clear by construction, but it be worth having a look.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
