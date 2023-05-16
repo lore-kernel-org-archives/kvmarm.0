@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2075B31104
-	for <kvmarm@lists.linux.dev>; Tue, 16 May 2023 16:07:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5741CC4339E;
-	Tue, 16 May 2023 16:07:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 220E731104
+	for <kvmarm@lists.linux.dev>; Tue, 16 May 2023 16:07:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 642E1C433A4;
+	Tue, 16 May 2023 16:07:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1684253256;
-	bh=lW1KqzMPkO/9T0wNrsyzNB3eSEl+jR1P98K2oHwWTq4=;
+	s=k20201202; t=1684253261;
+	bh=lwbLM2icgKpKkO4IGpq+gV4Vi+dLkvFByZ0s3dmZn0k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uwY9shC03I2AynWTfn1puaMzrCGSX7be430QTqTWOKNohXLe5ggwr6JHKP7O2nN2g
-	 qiCEnugST0BGF47rkojJaxUkfdfPRlQ5mzv0KZhIq12lRPSVrtupbwbmVGHWpWYJrb
-	 ehiZYCgqEpEQiAqr6EKwDxql8aysv8TeanMehyUnvUsth2z8fch/JYXJBEtTolk2+N
-	 /GfwGQgP6o8mmjMavYp8tWYirmjyFfcePqV7bxvJO24FpXMEXW/MsfU3KWMBSM+7yT
-	 X4lPBPJhmkn0fpqSaq/30tF6ssHl4K81bUEbNDAeq8lbENAQvVi5pBVJMGofVDJPfr
-	 c6BeSkW9umwiA==
+	b=PSLAJY0XnTiAmwVYnoGliY56cU9hQUxkW1tpiwPg1o/KG+Ngq2c5opKIk1AwXn5PO
+	 EXSt3oKxIS11dOgqD63RM5eXBSolsLG5TMso+ML8PCd8Z9uSVUiU1Ps/wdCZ8859ed
+	 ffqli+mKUmIU6urapJTAphhh9cf3uNVLRrBBszc44njQamfjh1yy2pctXivlpTKAtC
+	 1GqekmzV0bvS1EIYVM/xbwu79KXIbE11b533TA9NecaXU2zBP5o3CuozK/GfVXtKFq
+	 MgjQSifqruIhKMqr8Bf7VrhZwb7kaOv01ziNOGBOopYI0Pi2IRHL87S9jRlBHN5lry
+	 zQCSON3Js6jiA==
 From: Arnd Bergmann <arnd@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>
@@ -33,9 +33,9 @@ Cc: Arnd Bergmann <arnd@arndb.de>,
 	linux-kernel@vger.kernel.org,
 	linux-efi@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: [PATCH 10/15] arm64: module-plts: inline linux/moduleloader.h
-Date: Tue, 16 May 2023 18:06:37 +0200
-Message-Id: <20230516160642.523862-11-arnd@kernel.org>
+Subject: [PATCH 11/15] arm64: flush: include linux/libnvdimm.h
+Date: Tue, 16 May 2023 18:06:38 +0200
+Message-Id: <20230516160642.523862-12-arnd@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230516160642.523862-1-arnd@kernel.org>
 References: <20230516160642.523862-1-arnd@kernel.org>
@@ -49,28 +49,30 @@ Content-Transfer-Encoding: 8bit
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-module_frob_arch_sections() is declared in moduleloader.h, but
-that is not included before the definition:
+The two cache management functions are declared in libnvdimm.h
+but provided by architecture specific code. Without including
+the header, this causes a W=1 warning:
 
-arch/arm64/kernel/module-plts.c:286:5: error: no previous prototype for 'module_frob_arch_sections' [-Werror=missing-prototypes]
+arch/arm64/mm/flush.c:96:6: error: no previous prototype for 'arch_wb_cache_pmem' [-Werror=missing-prototypes]
+arch/arm64/mm/flush.c:104:6: error: no previous prototype for 'arch_invalidate_pmem' [-Werror=missing-prototypes]
 
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- arch/arm64/kernel/module-plts.c | 1 +
+ arch/arm64/mm/flush.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/arch/arm64/kernel/module-plts.c b/arch/arm64/kernel/module-plts.c
-index 543493bf924d..ad02058756b5 100644
---- a/arch/arm64/kernel/module-plts.c
-+++ b/arch/arm64/kernel/module-plts.c
-@@ -7,6 +7,7 @@
- #include <linux/ftrace.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
-+#include <linux/moduleloader.h>
- #include <linux/sort.h>
+diff --git a/arch/arm64/mm/flush.c b/arch/arm64/mm/flush.c
+index 5f9379b3c8c8..4e6476094952 100644
+--- a/arch/arm64/mm/flush.c
++++ b/arch/arm64/mm/flush.c
+@@ -8,6 +8,7 @@
  
- static struct plt_entry __get_adrp_add_pair(u64 dst, u64 pc,
+ #include <linux/export.h>
+ #include <linux/mm.h>
++#include <linux/libnvdimm.h>
+ #include <linux/pagemap.h>
+ 
+ #include <asm/cacheflush.h>
 -- 
 2.39.2
 
