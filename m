@@ -1,66 +1,139 @@
-Received: from out-46.mta0.migadu.com (out-46.mta0.migadu.com [91.218.175.46])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7351334CD7
-	for <kvmarm@lists.linux.dev>; Tue, 16 May 2023 16:57:41 +0000 (UTC)
-Date: Tue, 16 May 2023 16:57:30 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1684256259;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NDIE3ahIKehh4iPVhNy4p8uW83fWb/ed7CSIdO7QIGc=;
-	b=qk4ljCIJjJyU9l/f17uF6YaXKw0X9/VSGtVru/t9yLRSbSsvC/SGdwFUDiVJeCfksvXfBv
-	rJUO+2BrqvzybVXkNVniFxbIcUW0wnrkKfguBylLQE7HKOzdGV7LH0gbwsMB3wxRHnPIdO
-	FkEwVDXb4ocWgPmBAirQc3KeqIfPOUg=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Cornelia Huck <cohuck@redhat.com>,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-	KVMARM <kvmarm@lists.linux.dev>,
-	ARMLinux <linux-arm-kernel@lists.infradead.org>,
-	Oliver Upton <oupton@google.com>, Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v8 0/6] Support writable CPU ID registers from userspace
-Message-ID: <ZGO1+nx/qOpTMQa2@linux.dev>
-References: <20230503171618.2020461-1-jingzhangos@google.com>
- <2ef9208dabe44f5db445a1061a0d5918@huawei.com>
- <868rdomtfo.wl-maz@kernel.org>
- <1a96a72e87684e2fb3f8c77e32516d04@huawei.com>
- <87cz30h4nx.fsf@redhat.com>
- <867ct8mnel.wl-maz@kernel.org>
- <ZGOv4ZA9qxcC5wKv@linux.dev>
- <86zg64kyyi.wl-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 808DD34CD4
+	for <kvmarm@lists.linux.dev>; Tue, 16 May 2023 17:17:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BDB9C433D2
+	for <kvmarm@lists.linux.dev>; Tue, 16 May 2023 17:17:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1684257440;
+	bh=WElwajV57R1ZF+d3DvmtrkbIt4Bk9tb18ajBvlQX0oQ=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=GmVJv/QRb6t7cFLx7+N00ZvbnoIHiXNmN/tOo0s7PCbTU9QPqYTS/8eTyZOGVoj/E
+	 rD9sLojkUUHKGso1uxKjepTnvgrevfCdJm7IMTmOp/wGIIcPeHN8OLHWrTnNINtbiK
+	 u3N3WaIiX2G8ZjkiD8GqAaJeh98dFFpZKS0ij/ig41IY9jbk/eEZarHO0eopMZB9nX
+	 2wadUj4Q2HOqXZ8lA/uzmN1YBjAETaGy8hoyiP/xeWGv9+WxGDMXE/WbOrh/oGr3oy
+	 Gk6hisncCPi+yD4LI1Zrfk8qza6qjaN229bTLbsmVKIG/yJqm4wJKUiYUv4xD+zIzV
+	 q0CUtjsFlzYbw==
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-4eed764a10cso16462017e87.0
+        for <kvmarm@lists.linux.dev>; Tue, 16 May 2023 10:17:20 -0700 (PDT)
+X-Gm-Message-State: AC+VfDyxQo8P0XxnEbtm22xdf/R+afGHkW6s9HSPEL5Cro/jlmw/+Dek
+	QHy97NJDgdOBNT29i87BUDHH2ugReqqSq7/yQsM=
+X-Google-Smtp-Source: ACHHUZ4VMVquCoFbXiDWYhR8Guy+zOWzA/fxaWPI3piMmQSNzbFag9YgignmrUhRLyODzAtSO/Hosm6vdBHv78s5Fw0=
+X-Received: by 2002:a19:ad45:0:b0:4f2:7b64:f16f with SMTP id
+ s5-20020a19ad45000000b004f27b64f16fmr3971449lfd.52.1684257438252; Tue, 16 May
+ 2023 10:17:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86zg64kyyi.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+References: <20230516160642.523862-1-arnd@kernel.org>
+In-Reply-To: <20230516160642.523862-1-arnd@kernel.org>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Tue, 16 May 2023 19:17:07 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXFTYo0HvP3izv2tgewCBT37LG0hgXKvn8zSmNfB0kUFHQ@mail.gmail.com>
+Message-ID: <CAMj1kXFTYo0HvP3izv2tgewCBT37LG0hgXKvn8zSmNfB0kUFHQ@mail.gmail.com>
+Subject: Re: [PATCH 00/15] arm64: address -Wmissing-prototype warnings
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Arnd Bergmann <arnd@arndb.de>, Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Anshuman Khandual <anshuman.khandual@arm.com>, Kees Cook <keescook@chromium.org>, 
+	Suren Baghdasaryan <surenb@google.com>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-efi@vger.kernel.org, 
+	kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, May 16, 2023 at 05:44:53PM +0100, Marc Zyngier wrote:
+On Tue, 16 May 2023 at 18:06, Arnd Bergmann <arnd@kernel.org> wrote:
+>
+> From: Arnd Bergmann <arnd@arndb.de>
+>
+> This addresses all arm64 specific protype warnings. As with the arm32
+> patches, the majority of them  should be straightforward, either adding
+> an #include statement to get the right header, or ensuring that an unused
+> global function is left out of the build when the prototype is hidden.
+>
+> The ones that are a bit awkward are those that just add a prototype to
+> shut up the warning, but the prototypes are never used for calling the
+> function because the only caller is in assembler code. I tried to come
+> up with other ways to shut up the compiler, and ideally this would be
+> triggered by the 'asmlinkage' keyword as Ard suggested in the past, but
+> I could not come up with a way to do this.
+>
+> All of the warnings have to be addressed in some form before the
+> warning can be enabled by default.
+>
+>     Arnd
+>
+> Link: https://people.kernel.org/arnd/missing-prototype-warnings-in-the-kernel
+>
 
-[...]
+For the record, as I mentioned a while ago, I think it is a bit
+disappointing that we cannot teach the compiler that 'asmlinkage'
+functions don't need a prototype. But I don't have any objections to
+these changes, so
 
-> More seriously, I'd expect this to be an ARM spec. But it wouldn't
-> hurt having a prototype that serves as a draft for the spec. Better
-> doing that than leaving it to... someone else.
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
 
-Completely agree. My suggestion was not meant to discourage prototyping,
-just wanted to make sure we have line of sight on making this someone
-else's problem to standardize the interface :)
-
--- 
-Thanks,
-Oliver
+>
+> Arnd Bergmann (15):
+>   arm64: xor-neon: mark xor_arm64_neon_*() static
+>   arm64: add scs_patch_vmlinux prototype
+>   arm64: avoid prototype warnings for syscalls
+>   arm64: move cpu_suspend_set_dbg_restorer() prototype to header
+>   arm64: spectre: provide prototypes for internal functions
+>   arm64: kvm: add prototypes for functions called in asm
+>   arm64: cpuidle: fix #ifdef for acpi functions
+>   arm64: efi: add efi_handle_corrupted_x18 prototype
+>   arm64: hide unused is_valid_bugaddr()
+>   arm64: module-plts: inline linux/moduleloader.h
+>   arm64: flush: include linux/libnvdimm.h
+>   arm64: kaslr: add kaslr_early_init() declaration
+>   arm64: signal: include asm/exception.h
+>   arm64: move early_brk64 prototype to header
+>   arm64: add alt_cb_patch_nops prototype
+>
+>  arch/arm64/include/asm/alternative.h     |  3 +++
+>  arch/arm64/include/asm/archrandom.h      |  2 ++
+>  arch/arm64/include/asm/compat.h          |  2 ++
+>  arch/arm64/include/asm/efi.h             |  2 ++
+>  arch/arm64/include/asm/hw_breakpoint.h   |  8 ++++++++
+>  arch/arm64/include/asm/kvm_asm.h         | 18 ++++++++++++++++++
+>  arch/arm64/include/asm/scs.h             |  1 +
+>  arch/arm64/include/asm/spectre.h         | 16 ++++++++++++++++
+>  arch/arm64/include/asm/syscall_wrapper.h |  4 ++++
+>  arch/arm64/include/asm/traps.h           |  2 ++
+>  arch/arm64/kernel/cpuidle.c              |  2 +-
+>  arch/arm64/kernel/hw_breakpoint.c        |  8 --------
+>  arch/arm64/kernel/module-plts.c          |  1 +
+>  arch/arm64/kernel/signal.c               |  1 +
+>  arch/arm64/kernel/traps.c                |  3 ++-
+>  arch/arm64/lib/xor-neon.c                |  8 ++++----
+>  arch/arm64/mm/fault.c                    |  3 ---
+>  arch/arm64/mm/flush.c                    |  1 +
+>  18 files changed, 68 insertions(+), 17 deletions(-)
+>
+> --
+> 2.39.2
+>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Ard Biesheuvel <ardb@kernel.org>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Zenghui Yu <yuzenghui@huawei.com>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Anshuman Khandual <anshuman.khandual@arm.com>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Suren Baghdasaryan <surenb@google.com>
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: linux-efi@vger.kernel.org
+> Cc: kvmarm@lists.linux.dev
+>
