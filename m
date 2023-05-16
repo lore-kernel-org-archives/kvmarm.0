@@ -1,53 +1,53 @@
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E14B134CD4
-	for <kvmarm@lists.linux.dev>; Tue, 16 May 2023 17:21:45 +0000 (UTC)
-Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-335a61eb904so13025ab.0
-        for <kvmarm@lists.linux.dev>; Tue, 16 May 2023 10:21:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7086534CD4
+	for <kvmarm@lists.linux.dev>; Tue, 16 May 2023 17:32:36 +0000 (UTC)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1aaf702c3ccso7405ad.1
+        for <kvmarm@lists.linux.dev>; Tue, 16 May 2023 10:32:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684257705; x=1686849705;
+        d=google.com; s=20221208; t=1684258356; x=1686850356;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GVZ+9c6lPsr2Ao0MCG6loW9XjO0wPrRtUbpRQdctJK8=;
-        b=V20gW+9L8/ycr7z7MDOazESc5AWPQ6RaLNAU1aDp3gfWGjsTlqyb+MOGJspMnYhrzV
-         ScNhoWkwm/CYep76EmK9b6+uQhuv4UzFHTo8iI1l6ODk5Lhb/+wCt5Yco6qwZDZh7ioT
-         a7am0Lrk/vP105gUHlugDOVJSELWJ3whi/YmC+qBm3zfc5wFKO2hTUrBymF8rfsBFAue
-         DDpMu2gB6x20PZhX+z0pixo0INU7xfSjzx7GnUdutGnIJOzRShVnCsz0dM/Vja2h3alB
-         3jMNtlPhTQTcOYfneJRQRVXF6yQPGblwP5erwuJ63dJnwqq9eCpbNF1J/VyOBsBuNGoZ
-         4hkA==
+        bh=rwakRNEZg00nJzKAJVvqSW5mx9DF58xDsBOKOjXcGQA=;
+        b=48zw4tbCUK3vGZufLMLLEwQ+sgsBMegKdmj0vJqljYT3moOcm3JXbsptCXCTkJkGuw
+         F4Le0TQpKcQI7LVTK/toaaDPgbalw7SjJIGn2JHUg4K3ylsY6S+11ElYio9txLwt5SZU
+         QIZQNV6gWxlBAtqqgy5wQViycV5Qd92NnCemXf33+lgCplDy+s+jOdgn735Jkotk2R63
+         NgLE32DdSzY3Z8U09U1UngZ0PSSvVLOeYy9Ehx2QMPaaXhcWc4Xq5KQVZP2AsEUPf+1z
+         sG2X+iCKKFlNr1J2KvX7XQs44of0426qvz238/vBQARnCyTTplIbzOaaLlfIXMVMOyVK
+         ljoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684257705; x=1686849705;
+        d=1e100.net; s=20221208; t=1684258356; x=1686850356;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GVZ+9c6lPsr2Ao0MCG6loW9XjO0wPrRtUbpRQdctJK8=;
-        b=LlRXkOxkhOIfbek7lzhLkvMr4ZX5CN/nR1uW6NG3YCiieSii1pzxfuZ2hUc1GcsZKb
-         o8xGWUyMb6sa+PS4/8nfvuatkd8SowKd88aO70/qsHsw1ed5LjsCqAPBa7EQJmgp4gR+
-         pb3Bl8YewnFu7NxCDLj8oIdrDozBaV6DskoGL0sa9Tb+vcPoIZKWDkkonJrgQbXzSZRi
-         kQIOxe8Lf8PejPcY0B/RoFbt0dyLc1gKAqTFWBdT6lWRDbhftQ5ERNxU9vncq9wsZ6gW
-         mdxFiW2+f+LyXbFRdAVXrg4nxaFMDdsUgjUkc8LKJuq08BqledMfQ5SxrboajJBV3mk2
-         fU1Q==
-X-Gm-Message-State: AC+VfDwP4V7HQ1esDZdftAU3mMotcW+IT+HW40wsvJVDADmc7ojj2OMy
-	gYitQCVeKUxAjhzRrEz0NrZHf5aQgluhPkCBdsDJUg==
-X-Google-Smtp-Source: ACHHUZ6BL2PMIcSJjwAf2AgEJNcVVxzbOdam3StqauutqGNlV5v/nj8Tk0EG41bRNqE6I54B8OY65aevOf4qC52Evtg=
-X-Received: by 2002:a05:6e02:1a0d:b0:32a:db6c:d51d with SMTP id
- s13-20020a056e021a0d00b0032adb6cd51dmr325280ild.12.1684257704853; Tue, 16 May
- 2023 10:21:44 -0700 (PDT)
+        bh=rwakRNEZg00nJzKAJVvqSW5mx9DF58xDsBOKOjXcGQA=;
+        b=K7NkwnHDuN29qhpwZQ8jV+c00w5Vi/QFhfvl+3r/OPIJT8VMnfzOdDcadANlGYOqGR
+         eZqTUav/ELrBPjUAKLU7XZgBsDJkdbYLTMdA9oo1CC9LVQ3nH7kVxa9dBPuF7eMCGz2P
+         JjNzG1H2F+wkZuaXlebl996v57sSzwLXdqSgMIvSmmf2wtJMvuAw4KTTbN5+SPZH139/
+         HNrNju8/CRAlfk/SsYkSgnGsrUtzxJHdIqCP824hC2Sjlc5cppPsNv+kQbE+S/6KnC7G
+         FXFgIyaB7nIf45iGlzOLaL/HwsuQUHfez2ojbrDojut8pmKEsPl4xuMXCF/eOEiaALUz
+         Kq2w==
+X-Gm-Message-State: AC+VfDxuLFV3m440dEbAvcC3tAIulpQutJq9+mxhp8AtBc0OgOOuNVhQ
+	mDtOSp3oKk3bPYaIDvoQgAglW/JFj/z59n+19EyM4g==
+X-Google-Smtp-Source: ACHHUZ6wWlpTv3IpwTR512FEiD5s98A5U3Lt0r6lTl9BzMmumqhm2ei8LXBGXvZYcIrzuW22YQrsdzk3pHp0zdiWakE=
+X-Received: by 2002:a17:903:187:b0:1a6:6a2d:18f0 with SMTP id
+ z7-20020a170903018700b001a66a2d18f0mr213668plg.9.1684258352254; Tue, 16 May
+ 2023 10:32:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230414172922.812640-1-rananta@google.com> <20230414172922.812640-8-rananta@google.com>
- <ZF5xLrr2tEYdLL1i@linux.dev>
-In-Reply-To: <ZF5xLrr2tEYdLL1i@linux.dev>
+References: <20230414172922.812640-1-rananta@google.com> <20230414172922.812640-7-rananta@google.com>
+ <ZF51f5tYPjK1aCpd@linux.dev>
+In-Reply-To: <ZF51f5tYPjK1aCpd@linux.dev>
 From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Tue, 16 May 2023 10:21:33 -0700
-Message-ID: <CAJHc60wUu3xB4J8oJ+FCxerDad1TzZLCMgHYGFfv0K-hzC0qmw@mail.gmail.com>
-Subject: Re: [PATCH v3 7/7] KVM: arm64: Use TLBI range-based intructions for unmap
+Date: Tue, 16 May 2023 10:32:20 -0700
+Message-ID: <CAJHc60wJob+VpRN-Z3VDTH1sVHSYUxPSCpyKCrC4rFBRuCcsQA@mail.gmail.com>
+Subject: Re: [PATCH v3 6/7] KVM: arm64: Add 'skip_flush' arg to stage2_put_pte()
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
 	Suzuki K Poulose <suzuki.poulose@arm.com>, Ricardo Koller <ricarkol@google.com>, 
@@ -57,119 +57,97 @@ Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 12, 2023 at 10:02=E2=80=AFAM Oliver Upton <oliver.upton@linux.d=
+Hi Oliver,
+
+On Fri, May 12, 2023 at 10:21=E2=80=AFAM Oliver Upton <oliver.upton@linux.d=
 ev> wrote:
 >
 > Hi Raghavendra,
 >
-> On Fri, Apr 14, 2023 at 05:29:22PM +0000, Raghavendra Rao Ananta wrote:
-> > The current implementation of the stage-2 unmap walker traverses
-> > the given range and, as a part of break-before-make, performs
-> > TLB invalidations with a DSB for every PTE. A multitude of this
-> > combination could cause a performance bottleneck.
+> On Fri, Apr 14, 2023 at 05:29:21PM +0000, Raghavendra Rao Ananta wrote:
+> > Add a 'skip_flush' argument in stage2_put_pte() to
+> > control the TLB invalidations. This will be leveraged
+> > by the upcoming patch to defer the individual PTE
+> > invalidations until the entire walk is finished.
 > >
-> > Hence, if the system supports FEAT_TLBIRANGE, defer the TLB
-> > invalidations until the entire walk is finished, and then
-> > use range-based instructions to invalidate the TLBs in one go.
-> > Condition this upon S2FWB in order to avoid walking the page-table
-> > again to perform the CMOs after issuing the TLBI.
+> > No functional change intended.
 > >
 > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > Suggested-by: Oliver Upton <oliver.upton@linux.dev>
 > > ---
-> >  arch/arm64/kvm/hyp/pgtable.c | 33 +++++++++++++++++++++++++++++----
-> >  1 file changed, 29 insertions(+), 4 deletions(-)
+> >  arch/arm64/kvm/hyp/pgtable.c | 9 ++++++---
+> >  1 file changed, 6 insertions(+), 3 deletions(-)
 > >
 > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.=
 c
-> > index 3f136e35feb5e..bcb748e3566c7 100644
+> > index b8f0dbd12f773..3f136e35feb5e 100644
 > > --- a/arch/arm64/kvm/hyp/pgtable.c
 > > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -987,10 +987,16 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtab=
-le *pgt, u64 addr, u64 size,
-> >       return ret;
+> > @@ -772,7 +772,7 @@ static void stage2_make_pte(const struct kvm_pgtabl=
+e_visit_ctx *ctx, kvm_pte_t n
 > >  }
 > >
-> > +struct stage2_unmap_data {
-> > +     struct kvm_pgtable *pgt;
-> > +     bool skip_pte_tlbis;
-> > +};
-> > +
-> >  static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx=
-,
-> >                              enum kvm_pgtable_walk_flags visit)
+> >  static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, st=
+ruct kvm_s2_mmu *mmu,
+> > -                        struct kvm_pgtable_mm_ops *mm_ops)
+> > +                        struct kvm_pgtable_mm_ops *mm_ops, bool skip_f=
+lush)
+>
+> Assuming you are going to pull the cpufeature checks into this helper,
+> it might me helpful to narrow the scope of it. 'stage2_put_pte()' sounds
+> very generic, but it is about to have a very precise meaning in relation
+> to kvm_pgtable_stage2_unmap().
+>
+> So maybe stage2_unmap_put_pte()? While at it, you'd want to have a
+> shared helper for the deferral check:
+>
+Yeah, stage2_unmap_put_pte() sounds better. I'll change that.
+
+> static bool stage2_unmap_defer_tlb_flush(struct kvm_pgtable *pgt)
+> {
+>         /* your blurb for why FWB is required too */
+>         return system_supports_tlb_range() && stage2_has_fwb(pgt);
+> }
+>
+Good idea; I can introduce the helper, now that we'll get rid of
+stage2_unmap_data.skip_pte_tlbis (patch 7/7) as per your comments.
+Also, since we are now making stage2_put_pte() specific to unmap, I
+can also get rid of the 'skip_flush' arg and call
+stage2_unmap_defer_tlb_flush() directly, or do you have a preference
+for the additional arg?
+
+Thank you.
+Raghavendra
+> The 'flush' part is annoying, because the exact term is an invalidation,
+> but we already have that pattern in all of our TLB invalidation helpers.
+>
 > >  {
-> > -     struct kvm_pgtable *pgt =3D ctx->arg;
-> > +     struct stage2_unmap_data *unmap_data =3D ctx->arg;
-> > +     struct kvm_pgtable *pgt =3D unmap_data->pgt;
-> >       struct kvm_s2_mmu *mmu =3D pgt->mmu;
-> >       struct kvm_pgtable_mm_ops *mm_ops =3D ctx->mm_ops;
-> >       kvm_pte_t *childp =3D NULL;
-> > @@ -1018,7 +1024,7 @@ static int stage2_unmap_walker(const struct kvm_p=
+> >       /*
+> >        * Clear the existing PTE, and perform break-before-make with
+> > @@ -780,7 +780,10 @@ static void stage2_put_pte(const struct kvm_pgtabl=
+e_visit_ctx *ctx, struct kvm_s
+> >        */
+> >       if (kvm_pte_valid(ctx->old)) {
+> >               kvm_clear_pte(ctx->ptep);
+> > -             kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ct=
+x->level);
+> > +
+> > +             if (!skip_flush)
+> > +                     kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu,
+> > +                                     ctx->addr, ctx->level);
+> >       }
+> >
+> >       mm_ops->put_page(ctx->ptep);
+> > @@ -1015,7 +1018,7 @@ static int stage2_unmap_walker(const struct kvm_p=
 gtable_visit_ctx *ctx,
 > >        * block entry and rely on the remaining portions being faulted
 > >        * back lazily.
 > >        */
-> > -     stage2_put_pte(ctx, mmu, mm_ops, false);
-> > +     stage2_put_pte(ctx, mmu, mm_ops, unmap_data->skip_pte_tlbis);
+> > -     stage2_put_pte(ctx, mmu, mm_ops);
+> > +     stage2_put_pte(ctx, mmu, mm_ops, false);
 > >
 > >       if (need_flush && mm_ops->dcache_clean_inval_poc)
 > >               mm_ops->dcache_clean_inval_poc(kvm_pte_follow(ctx->old, m=
 m_ops),
-> > @@ -1032,13 +1038,32 @@ static int stage2_unmap_walker(const struct kvm=
-_pgtable_visit_ctx *ctx,
-> >
-> >  int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 si=
-ze)
-> >  {
-> > +     int ret;
-> > +     struct stage2_unmap_data unmap_data =3D {
-> > +             .pgt =3D pgt,
-> > +             /*
-> > +              * If FEAT_TLBIRANGE is implemented, defer the individial=
- PTE
-> > +              * TLB invalidations until the entire walk is finished, a=
-nd
-> > +              * then use the range-based TLBI instructions to do the
-> > +              * invalidations. Condition this upon S2FWB in order to a=
-void
-> > +              * a page-table walk again to perform the CMOs after TLBI=
-.
-> > +              */
-> > +             .skip_pte_tlbis =3D system_supports_tlb_range() &&
-> > +                                     stage2_has_fwb(pgt),
->
-> Why can't the underlying walker just call these two helpers directly?
-> There are static keys behind these...
->
-I wasn't aware of that. Although, I tried to look into the
-definitions, but couldn't understand how static keys are at play here.
-By any chance are you referring to the alternative_has_feature_*()
-implementations when checking for cpu capabilities?
-
-Thank you.
-Raghavendra
-
-> > +     };
-> >       struct kvm_pgtable_walker walker =3D {
-> >               .cb     =3D stage2_unmap_walker,
-> > -             .arg    =3D pgt,
-> > +             .arg    =3D &unmap_data,
-> >               .flags  =3D KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABL=
-E_POST,
-> >       };
-> >
-> > -     return kvm_pgtable_walk(pgt, addr, size, &walker);
-> > +     ret =3D kvm_pgtable_walk(pgt, addr, size, &walker);
-> > +     if (unmap_data.skip_pte_tlbis)
-> > +             /* Perform the deferred TLB invalidations */
-> > +             kvm_call_hyp(__kvm_tlb_flush_vmid_range, pgt->mmu,
-> > +                             addr, addr + size);
-> > +
-> > +     return ret;
-> >  }
-> >
-> >  struct stage2_attr_data {
 > > --
 > > 2.40.0.634.g4ca3ef3211-goog
 > >
