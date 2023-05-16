@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B20A434CF9
-	for <kvmarm@lists.linux.dev>; Tue, 16 May 2023 16:07:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08D8CC433A8;
-	Tue, 16 May 2023 16:07:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B6734CF9
+	for <kvmarm@lists.linux.dev>; Tue, 16 May 2023 16:07:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04AD0C4339E;
+	Tue, 16 May 2023 16:07:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1684253224;
-	bh=zqB0t4DDPA88DPl56qCnn/B7aGxFkn0Y+6dWVn1tZq4=;
+	s=k20201202; t=1684253228;
+	bh=dDeWGPu2Qoc+fpFOXn3k7Xys2RqMy0OtpAINFOM+y3M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uzED3MDYa+zRvydDUY5COe4o/Xb/voIkyoht5i0bOCAOtFsxgd+3vIaWBOhp5PLz8
-	 lMAX24iP0+kK2gm5TkYh1XFkeEqEvltopbJX/w1yHYPBS78PCGiOuMF63PFQ8UB7dy
-	 D/DffvS8p+49Qp9LYljB6QqoSQN0x8uHRu/bfTUofH9RLq8ayT60FCQf/l3Ro7YS5F
-	 G3wnwfaB9v7fTBXvfg5qE7XPBVfEGxuXVMsN8VZ9oHu+yJcK3pHJYJgtxmkpHaxihF
-	 OpbIs/t+R8s40SHXc2Wusw71dWT2zcff8hVIESQPVIGmb4qdMTrq4fDxJkl6nP/eGq
-	 Z/ozEBwlC7dTQ==
+	b=EfUMaEOWjknj06edFveCWT/Zhn6aROXJypSejnFAcBfV22UlNyvV4+f4TmPARYnIi
+	 wGr0ikh464bEhSqc1BTBJ863A8ccvyNk7aTxPvIVN7H+aGiU/Kp4ay8oXIauPtPc4u
+	 5mtjD6x9V5WNnDrPU0txgQrpTZcRCAK7CB2BHeE04BJzybY68SpmpHbN+aoOmsQFID
+	 70844Ej95iG7N5ivr4FykIPpb3tLoRkJ9J7ANI0VXNVVGCT6Xx3cAEC24sE056yZR+
+	 BCbbpCbg1Tbi8eX6tLxMJY5Q3azUj1Uqvyk/4yrJKueesKkuLpkD2T4Xp7txCk0Mus
+	 uEZAyPpD0STAA==
 From: Arnd Bergmann <arnd@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>
@@ -33,9 +33,9 @@ Cc: Arnd Bergmann <arnd@arndb.de>,
 	linux-kernel@vger.kernel.org,
 	linux-efi@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: [PATCH 02/15] arm64: add scs_patch_vmlinux prototype
-Date: Tue, 16 May 2023 18:06:29 +0200
-Message-Id: <20230516160642.523862-3-arnd@kernel.org>
+Subject: [PATCH 03/15] arm64: avoid prototype warnings for syscalls
+Date: Tue, 16 May 2023 18:06:30 +0200
+Message-Id: <20230516160642.523862-4-arnd@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230516160642.523862-1-arnd@kernel.org>
 References: <20230516160642.523862-1-arnd@kernel.org>
@@ -49,28 +49,72 @@ Content-Transfer-Encoding: 8bit
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-scs_patch_vmlinux() is only called from assembler code, so there
-is no prototype, but adding one avoids this warning:
+With W=1 warnings enabled, there are lots of complaints about
+missing prototypes for system calls, plus a few other related
+ones:
 
-arch/arm64/kernel/patch-scs.c:254:24: error: no previous prototype for function 'scs_patch_vmlinux' [-Werror,-Wmissing-prototypes]
+arch/arm64/kernel/sys_compat.c:68:6: error: no previous prototype for 'compat_arm_syscall' [-Werror=missing-prototypes]
+arch/arm64/include/asm/syscall_wrapper.h:76:32: error: no previous prototype for '__arm64_sys_io_setup' [-Werror=missing-prototypes]
+arch/arm64/include/asm/syscall_wrapper.h:41:32: error: no previous prototype for '__arm64_compat_sys_io_setup' [-Werror=missing-prototypes]
+arch/arm64/include/asm/syscall_wrapper.h:76:32: error: no previous prototype for '__arm64_sys_io_destroy' [-Werror=missing-prototypes]
+arch/arm64/include/asm/syscall_wrapper.h:76:32: error: no previous prototype for '__arm64_sys_io_submit' [-Werror=missing-prototypes]
+
+Add declarations to the syscall macros to avoid all of these, plus
+one for the compat syscall entry.
 
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- arch/arm64/include/asm/scs.h | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/include/asm/compat.h          | 2 ++
+ arch/arm64/include/asm/syscall_wrapper.h | 4 ++++
+ 2 files changed, 6 insertions(+)
 
-diff --git a/arch/arm64/include/asm/scs.h b/arch/arm64/include/asm/scs.h
-index 13df982a0808..3fdae5fe3142 100644
---- a/arch/arm64/include/asm/scs.h
-+++ b/arch/arm64/include/asm/scs.h
-@@ -73,6 +73,7 @@ static inline void dynamic_scs_init(void) {}
- #endif
+diff --git a/arch/arm64/include/asm/compat.h b/arch/arm64/include/asm/compat.h
+index 74575c3d6987..ae904a1ad529 100644
+--- a/arch/arm64/include/asm/compat.h
++++ b/arch/arm64/include/asm/compat.h
+@@ -96,6 +96,8 @@ static inline int is_compat_thread(struct thread_info *thread)
+ 	return test_ti_thread_flag(thread, TIF_32BIT);
+ }
  
- int scs_patch(const u8 eh_frame[], int size);
-+asmlinkage void scs_patch_vmlinux(void);
++long compat_arm_syscall(struct pt_regs *regs, int scno);
++
+ #else /* !CONFIG_COMPAT */
  
- #endif /* __ASSEMBLY __ */
+ static inline int is_compat_thread(struct thread_info *thread)
+diff --git a/arch/arm64/include/asm/syscall_wrapper.h b/arch/arm64/include/asm/syscall_wrapper.h
+index d30217c21eff..17f687510c48 100644
+--- a/arch/arm64/include/asm/syscall_wrapper.h
++++ b/arch/arm64/include/asm/syscall_wrapper.h
+@@ -38,6 +38,7 @@
+ 	asmlinkage long __arm64_compat_sys_##sname(const struct pt_regs *__unused)
  
+ #define COND_SYSCALL_COMPAT(name) 							\
++	asmlinkage long __arm64_compat_sys_##name(const struct pt_regs *regs);		\
+ 	asmlinkage long __weak __arm64_compat_sys_##name(const struct pt_regs *regs)	\
+ 	{										\
+ 		return sys_ni_syscall();						\
+@@ -53,6 +54,7 @@
+ 	ALLOW_ERROR_INJECTION(__arm64_sys##name, ERRNO);			\
+ 	static long __se_sys##name(__MAP(x,__SC_LONG,__VA_ARGS__));		\
+ 	static inline long __do_sys##name(__MAP(x,__SC_DECL,__VA_ARGS__));	\
++	asmlinkage long __arm64_sys##name(const struct pt_regs *regs);		\
+ 	asmlinkage long __arm64_sys##name(const struct pt_regs *regs)		\
+ 	{									\
+ 		return __se_sys##name(SC_ARM64_REGS_TO_ARGS(x,__VA_ARGS__));	\
+@@ -73,11 +75,13 @@
+ 	asmlinkage long __arm64_sys_##sname(const struct pt_regs *__unused)
+ 
+ #define COND_SYSCALL(name)							\
++	asmlinkage long __arm64_sys_##name(const struct pt_regs *regs);		\
+ 	asmlinkage long __weak __arm64_sys_##name(const struct pt_regs *regs)	\
+ 	{									\
+ 		return sys_ni_syscall();					\
+ 	}
+ 
++asmlinkage long __arm64_sys_ni_syscall(const struct pt_regs *__unused);
+ #define SYS_NI(name) SYSCALL_ALIAS(__arm64_sys_##name, sys_ni_posix_timers);
+ 
+ #endif /* __ASM_SYSCALL_WRAPPER_H */
 -- 
 2.39.2
 
