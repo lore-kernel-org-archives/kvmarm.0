@@ -1,40 +1,40 @@
-Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 263D829101
-	for <kvmarm@lists.linux.dev>; Tue, 16 May 2023 19:10:56 +0000 (UTC)
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-192cfb46e75so6881573fac.3
-        for <kvmarm@lists.linux.dev>; Tue, 16 May 2023 12:10:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F278B29103
+	for <kvmarm@lists.linux.dev>; Tue, 16 May 2023 19:14:14 +0000 (UTC)
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-6ab1942ea59so28765a34.0
+        for <kvmarm@lists.linux.dev>; Tue, 16 May 2023 12:14:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684264255; x=1686856255;
+        d=google.com; s=20221208; t=1684264454; x=1686856454;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Zqs58sW4gz7Qxr9p0LwrMP2HU2Kr50ptesa2SGlRRdM=;
-        b=jCdBmbvw7U+fBINBBE4URxTbLtvJ6ZLridZpkCD0cw4IupP3ITcj6BqumhRT1C+0Ib
-         3Z94kwLIZJRNEzkksmXrqi5PA/3+CB2Jkr+vLyYuO5m1U6hOfnQS4zRLyR12efrLVp18
-         +gNfd7sGbKfJcGdt8eoCW9ChkIqXJxZ9Er/8wVaim1C0ZNXie+KIAuh89HGv1Gj/BpIz
-         VLpnZ1mBDQDy/ivn92CfH3rACMGF+H0iehxnFoTyu94S11r4Oo+2/RdbbxuNowjhcQR4
-         FGhOgrIhDcP0RPTa1Ao/T/caN7hC2Wo+gxoPnyou7bJaCKYb6PnmJbKJe3wGSqteJlyC
-         oJIQ==
+        bh=XPvU4GCpDRUjtoRqRZA6QpZocRSHyFeHeKs9Xzsz5SE=;
+        b=UjF3qIkYbDoLOOcWkR1rwVW/qTBqj/aXk2y85s6vzRnKGAlQKwJPAJNv8dR+ZTmfxy
+         rswxC5ujj5GkNX/SavhJFN0H7tkbr8ecbJe+Z/UcApo/hexFw75jfOk6EkqaWt6zSE6y
+         LZLRZ6jTqKhdUKrwepK8JUQL8aZHXnc7pFQu3IAthKKHSGgN71CHe4HyHoKALyVwua2R
+         Wix/jKKncCLEi6ekKZRL8MkNwaoDD0U49GtS9K5GihSO+yB4MzM6JOJGMspZhgaHbOOm
+         BJBcfw1XOj2UgWn2/Szq3ZBzdrC6hwAbNKJcjTtN7ibVfk+69BPbpMOU4gasMxCax8io
+         x6jQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684264255; x=1686856255;
+        d=1e100.net; s=20221208; t=1684264454; x=1686856454;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Zqs58sW4gz7Qxr9p0LwrMP2HU2Kr50ptesa2SGlRRdM=;
-        b=Bi588gFmkyZL+Q8z3aZZyi5uSbnUle1o07A8sym6T5WLizifs+DEoS531S5nZnSl9f
-         WAaePFJAbwvMaEjSsGPcLw/lMUsuMWSU+i1pACAAyfS6ccsZpnQ3ONbRBozhGxsUtFTZ
-         wkYsc+lEtb5f/Sf9C7ToXZMSLYqsG+Nmx8KpaTVejsTNNPOeECfsPBtqp4zGjnSF8b3Q
-         +nvtQmTAWU8B6xHsuslWwnw2YxZXpk9AKYE+1AlXa0txoPHMkHBHmUrWvZOt+uEujKcQ
-         Ih//v/u7s8cIxTIeL2QunNMPXP4OUT36A8z2DicykwGCxEozZRd6/bPinQefPvCOCCya
-         QsEg==
-X-Gm-Message-State: AC+VfDzCs08ayK2x3kzI+X411g1EBacPH0nCjrcQ/xVVoMCakIFFDYix
-	q20/B8dFlUbD//9/5bn8YpFbv5+mx/g+aDs0rEnYMw==
-X-Google-Smtp-Source: ACHHUZ5fvh8MxPjnfDNG5zT16zq6o0S7SEkQrJADwI0Lll3Qpdk5+EUHbKRrOvA2p9KMQW+Il4S+yOiHRsozatq7BL0=
-X-Received: by 2002:a05:6870:37c4:b0:195:65eb:57ba with SMTP id
- p4-20020a05687037c400b0019565eb57bamr15147760oai.11.1684264255002; Tue, 16
- May 2023 12:10:55 -0700 (PDT)
+        bh=XPvU4GCpDRUjtoRqRZA6QpZocRSHyFeHeKs9Xzsz5SE=;
+        b=FlUpr8CbcJ26SEl+7tf5JW/Mf7MPLFwgyH0aZeYqCs5rMTFD0hmZzhe1CsA/XrXUZn
+         q5Gj32eiRu1tbvPyJfj4yapW2sCUzU/CrI7xA9a7lzXZkuWBqWARWcgKuqJ+ID/YE8eI
+         L8KInWyHLg3a32zZhJ6fPEJc48jNfsYzlHxRt/MuaemTD/QKykWXbTKMaTPo64AdTp7t
+         /oHPjWQ+QST6Ln6wzsQvDj9wmShP3EHXM85M3N0tNZiXhr6430Xu57AT5lleeWjxTmaL
+         urSB6dZC1+84XpROi5gGXz+0jb8+f5FEMFLFdW3nyg+9jIwP4wsJhBsZ9m/ZHIGUP9DU
+         4Q5w==
+X-Gm-Message-State: AC+VfDyQ0MzyFstPYzfaNRVIgd3Xz9S2jrhXHf7WxfhdysGvyGFLjndm
+	sS3ngfPSusIeMDwty/lMMBIbnixxiI7k60tC1u/FkjrkejtZeGQyXUY=
+X-Google-Smtp-Source: ACHHUZ5ceWiUmfFJLjs+TLJrYt45xeTB53hPSxiwg22yyF9LukggkV0CssCRkcDsSIcgQYsvVkk9ejd9e41yOmDwFpg=
+X-Received: by 2002:a05:6870:b79a:b0:199:d0fa:ee1a with SMTP id
+ ed26-20020a056870b79a00b00199d0faee1amr4374967oab.31.1684264453899; Tue, 16
+ May 2023 12:14:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -42,73 +42,81 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 References: <20230503171618.2020461-1-jingzhangos@google.com>
- <20230503171618.2020461-6-jingzhangos@google.com> <87ilcsh8sc.fsf@redhat.com>
-In-Reply-To: <87ilcsh8sc.fsf@redhat.com>
+ <20230503171618.2020461-2-jingzhangos@google.com> <861qjgmf2t.wl-maz@kernel.org>
+In-Reply-To: <861qjgmf2t.wl-maz@kernel.org>
 From: Jing Zhang <jingzhangos@google.com>
-Date: Tue, 16 May 2023 12:10:44 -0700
-Message-ID: <CAAdAUtj-kzk4utNYezKv-XE7GssvrHLZj04q8Oo_pwMACON2Rw@mail.gmail.com>
-Subject: Re: [PATCH v8 5/6] KVM: arm64: Reuse fields of sys_reg_desc for idreg
-To: Cornelia Huck <cohuck@redhat.com>
+Date: Tue, 16 May 2023 12:14:03 -0700
+Message-ID: <CAAdAUtgEi_4pH+t-kJRjykJg-o2ccHcSVuQ_rn9+-_bbEu8obQ@mail.gmail.com>
+Subject: Re: [PATCH v8 1/6] KVM: arm64: Move CPU ID feature registers
+ emulation into a separate file
+To: Marc Zyngier <maz@kernel.org>
 Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@google.com>, Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, 
-	Reiji Watanabe <reijiw@google.com>, Raghavendra Rao Ananta <rananta@google.com>
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, Oliver Upton <oupton@google.com>, 
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>, 
+	Raghavendra Rao Ananta <rananta@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Cornelia,
+Hi Marc,
 
-
-On Tue, May 16, 2023 at 3:26=E2=80=AFAM Cornelia Huck <cohuck@redhat.com> w=
-rote:
+On Tue, May 16, 2023 at 9:11=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
 >
-> On Wed, May 03 2023, Jing Zhang <jingzhangos@google.com> wrote:
->
-> > Since reset() and val are not used for idreg in sys_reg_desc, they woul=
-d
-> > be used with other purposes for idregs.
-> > The callback reset() would be used to return KVM sanitised id register
-> > values. The u64 val would be used as mask for writable fields in idregs=
-.
-> > Only bits with 1 in val are writable from userspace.
+> On Wed, 03 May 2023 18:16:13 +0100,
+> Jing Zhang <jingzhangos@google.com> wrote:
+> >
+> > Create a new file id_regs.c for CPU ID feature registers emulation code=
+,
+> > which are moved from sys_regs.c and tweak sys_regs code accordingly.
+> >
+> > No functional change intended.
 > >
 > > Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > > ---
-> >  arch/arm64/kvm/id_regs.c  | 44 +++++++++++++++++++----------
-> >  arch/arm64/kvm/sys_regs.c | 59 +++++++++++++++++++++++++++------------
-> >  arch/arm64/kvm/sys_regs.h | 10 ++++---
-> >  3 files changed, 77 insertions(+), 36 deletions(-)
+> >  arch/arm64/kvm/Makefile   |   2 +-
+> >  arch/arm64/kvm/id_regs.c  | 460 +++++++++++++++++++++++++++++++++++++
+> >  arch/arm64/kvm/sys_regs.c | 464 ++++----------------------------------
+> >  arch/arm64/kvm/sys_regs.h |  19 ++
+> >  4 files changed, 519 insertions(+), 426 deletions(-)
+> >  create mode 100644 arch/arm64/kvm/id_regs.c
 > >
+> > diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> > index c0c050e53157..a6a315fcd81e 100644
+> > --- a/arch/arm64/kvm/Makefile
+> > +++ b/arch/arm64/kvm/Makefile
+> > @@ -13,7 +13,7 @@ obj-$(CONFIG_KVM) +=3D hyp/
+> >  kvm-y +=3D arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+> >        inject_fault.o va_layout.o handle_exit.o \
+> >        guest.o debug.o reset.o sys_regs.o stacktrace.o \
+> > -      vgic-sys-reg-v3.o fpsimd.o pkvm.o \
+> > +      vgic-sys-reg-v3.o fpsimd.o pkvm.o id_regs.o \
+> >        arch_timer.o trng.o vmid.o emulate-nested.o nested.o \
+> >        vgic/vgic.o vgic/vgic-init.o \
+> >        vgic/vgic-irqfd.o vgic/vgic-v2.o \
+> > diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
+> > new file mode 100644
+> > index 000000000000..96b4c43a5100
+> > --- /dev/null
+> > +++ b/arch/arm64/kvm/id_regs.c
+> > @@ -0,0 +1,460 @@
 >
-> (...)
+> [...]
 >
-> > diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-> > index e88fd77309b2..21869319f6e1 100644
-> > --- a/arch/arm64/kvm/sys_regs.h
-> > +++ b/arch/arm64/kvm/sys_regs.h
-> > @@ -65,12 +65,12 @@ struct sys_reg_desc {
-> >                      const struct sys_reg_desc *);
-> >
-> >       /* Initialization for vcpu. */
+> I really wonder why we move this to another file. It only creates
+> noise, and doesn't add much. Yes, the file is big. But now you need to
+> expose all the internal machinery that was private until now.
 >
-> Maybe be a bit more verbose here?
+> If you look at the global diffstat, this is "only" another 200
+> lines. I don't think this is worth the churn.
+Yes, the global diff is not that big as in the first patch series now.
+Will do all the changes in the same file in the next version.
 >
-> /* Initialization for vcpu. Return initialized value, or KVM sanitized
->    value for id registers. */
-Sure. Thanks.
+>         M.
 >
-> > -     void (*reset)(struct kvm_vcpu *, const struct sys_reg_desc *);
-> > +     u64 (*reset)(struct kvm_vcpu *, const struct sys_reg_desc *);
-> >
-> >       /* Index into sys_reg[], or 0 if we don't need to save it. */
-> >       int reg;
-> >
-> > -     /* Value (usually reset value) */
-> > +     /* Value (usually reset value), or write mask for idregs */
-> >       u64 val;
-> >
-> >       /* Custom get/set_user functions, fallback to generic if NULL */
->
+> --
+> Without deviation from the norm, progress is not possible.
+
+Thanks,
 Jing
