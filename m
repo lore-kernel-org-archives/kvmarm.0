@@ -1,170 +1,247 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5495C111A2
-	for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 15:53:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06CD7C433EF;
-	Wed, 17 May 2023 15:53:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1684338825;
-	bh=+pjU0O7f8M9zUN8A4umo9QIuzO/idoksUL+TWjtc2tg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=vOKrJM3oWPXCrzsS6UlLZWkBwu+hiVAipLRzS191TfmM8zuS6Vkr+37BPmYzXxErc
-	 lawUo5d06dod1XjHX27oXIfn2Z+olLYd/N4+vI+kpkT3dMxduIsWgIOFousENFxD8S
-	 35vHBEoLJrDK+Lf4TQ2Oj4AXrOzrSnLjDiFk8etHxiRxHX8SWiU4I67gJTsyd+qoqK
-	 UXjQslQzgNXmsur4sznJ8KMC0l0d+hfL3pMYYi3Ktkp0cNC5Gpayza8eMXr6pUS2LF
-	 zt/gEmoD7ihMjxjZmqiJxVqfUVXta02EXENckIonl0idwl7GNdk3cOVWXleG2BmeLs
-	 XghyMqJ6wt5Eg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pzJTC-00Fu2o-NH;
-	Wed, 17 May 2023 16:53:42 +0100
-Date: Wed, 17 May 2023 16:53:42 +0100
-Message-ID: <86o7mjkl89.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	Jing
- Zhang <jingzhangos@google.com>,
-	KVM <kvm@vger.kernel.org>,
-	KVMARM
- <kvmarm@lists.linux.dev>,
-	ARMLinux <linux-arm-kernel@lists.infradead.org>,
-	Oliver Upton <oupton@google.com>,
-	Will Deacon <will@kernel.org>,
-	Paolo
- Bonzini <pbonzini@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru
- Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose
- <suzuki.poulose@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Reiji Watanabe
- <reijiw@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v8 0/6] Support writable CPU ID registers from userspace
-In-Reply-To: <877ct7x94e.fsf@redhat.com>
-References: <20230503171618.2020461-1-jingzhangos@google.com>
-	<2ef9208dabe44f5db445a1061a0d5918@huawei.com>
-	<868rdomtfo.wl-maz@kernel.org>
-	<1a96a72e87684e2fb3f8c77e32516d04@huawei.com>
-	<87cz30h4nx.fsf@redhat.com>
-	<867ct8mnel.wl-maz@kernel.org>
-	<87a5y4gy0b.fsf@redhat.com>
-	<86353wmfj2.wl-maz@kernel.org>
-	<877ct7x94e.fsf@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0FEA111A1
+	for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 16:28:39 +0000 (UTC)
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-6a984993740so481610a34.2
+        for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 09:28:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1684340919; x=1686932919;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3QgUHhC4JatePpcTmhPB3qhllcSFBfrYsd2mZsiUSGc=;
+        b=vForUt72iRFRfuNzyPSOkOdHSHW+KeeVPAQzYm8GDTh4fK7hhWNqnDnU8JNPrLzexH
+         0bMUs0d8vmQwHReADr5ObxWyXaOFcass3YqBtHgor4veie2rAjny7MrgJlualP6RHgWR
+         rFadfAj7xtIIntrNuHZeveXA8bDM/hYhMHkX7eoWvI1CkK6gfn9Kx6flDkntHHaoAsbO
+         yWjXfQ4CpcK5385D1AeiOFUh8+rIzivtuA+jiq4iiX3HadlPZklW7dy/b+67Q0pFtvrh
+         4gB8c40wgz8kD8J1gV11P85VsbCjJfCL8ldHwBMVXjqaurDgM1X1MoyMktE/RvbLTt5r
+         Ot/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684340919; x=1686932919;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3QgUHhC4JatePpcTmhPB3qhllcSFBfrYsd2mZsiUSGc=;
+        b=OVLSwjczemk9KK62I9/YAsRdwuXmWLqLUv4lYibKWA3HQRyausBErRCLO6ONV9uAPf
+         epuAV5HUJsO0q8RVlau4sJ3i14rZDE4rdkFxoZm1o2jafyiY2RStP0hy7uszAUNh7dTx
+         d4qkS5dl+NTukDzrtKCBx43/ss0Y/n35926gXpAOUE3O30KKr58uMAz3AebfIconbKBe
+         do2WTs0k2pSYLEfKm0Rr9gddCabJAswUFNlFOzcHdkpx4iRSqQ3AOQAVvKPsXivgS5kG
+         UOnhyqlmVjs+JbCskb37AfsiU9Dp30hwpMBIRECY4SegpTSh2CKWB/aL0faX3kPm4aye
+         3VLA==
+X-Gm-Message-State: AC+VfDx+UDJ3RyD4o+jfgwgA9TwGg48Zx1SH4OI86p8ocbTU/RQK4fhu
+	KkqL4S3Y9qpgeoXvwi66xs9C7wToSRriSvQGgBIkmA==
+X-Google-Smtp-Source: ACHHUZ5B62w2XtjEh1j0FNvdywiAs5+OnqxjGaWSdNJK+6Pq2+zsclWBeVt3S+tVM3V1rTWfp8jDzER1615TvtFA0iY=
+X-Received: by 2002:a05:6808:1599:b0:396:63a:a715 with SMTP id
+ t25-20020a056808159900b00396063aa715mr6419455oiw.56.1684340918674; Wed, 17
+ May 2023 09:28:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: cohuck@redhat.com, shameerali.kolothum.thodi@huawei.com, jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, reijiw@google.com, rananta@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20230503171618.2020461-1-jingzhangos@google.com>
+ <20230503171618.2020461-3-jingzhangos@google.com> <86wn17l811.wl-maz@kernel.org>
+In-Reply-To: <86wn17l811.wl-maz@kernel.org>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Wed, 17 May 2023 09:28:26 -0700
+Message-ID: <CAAdAUtiiXNLJKXLea1okB25i45FtM52umY2P5WgKxZ1dHz5CYg@mail.gmail.com>
+Subject: Re: [PATCH v8 2/6] KVM: arm64: Save ID registers' sanitized value per guest
+To: Marc Zyngier <maz@kernel.org>
+Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, Oliver Upton <oupton@google.com>, 
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>, 
+	Raghavendra Rao Ananta <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 17 May 2023 16:36:49 +0100,
-Cornelia Huck <cohuck@redhat.com> wrote:
-> 
-> On Tue, May 16 2023, Marc Zyngier <maz@kernel.org> wrote:
-> 
-> > On Tue, 16 May 2023 15:19:00 +0100,
-> > Cornelia Huck <cohuck@redhat.com> wrote:
-> >> 
-> >> On Tue, May 16 2023, Marc Zyngier <maz@kernel.org> wrote:
-> >> 
-> >> > On Tue, 16 May 2023 12:55:14 +0100,
-> >> > Cornelia Huck <cohuck@redhat.com> wrote:
-> >> >> 
-> >> >> Do you have more concrete ideas for QEMU CPU models already? Asking
-> >> >> because I wanted to talk about this at KVM Forum, so collecting what
-> >> >> others would like to do seems like a good idea :)
-> >> >
-> >> > I'm not being asked, but I'll share my thoughts anyway! ;-)
-> >> >
-> >> > I don't think CPU models are necessarily the most important thing.
-> >> > Specially when you look at the diversity of the ecosystem (and even
-> >> > the same CPU can be configured in different ways at integration
-> >> > time). Case in point, Neoverse N1 which can have its I/D caches made
-> >> > coherent or not. And the guest really wants to know which one it is
-> >> > (you can only lie in one direction).
-> >> >
-> >> > But being able to control the feature set exposed to the guest from
-> >> > userspace is a huge benefit in terms of migration.
-> >> 
-> >> Certainly; the important part is that we can keep the guest ABI
-> >> stable... which parts match to a "CPU model" in the way other
-> >> architectures use it is an interesting question. It almost certainly
-> >> will look different from e.g. s390, where we only have to deal with a
-> >> single manufacturer.
-> >> 
-> >> I'm wondering whether we'll end up building frankenmonster CPUs.
+Hi Marc,
+
+On Wed, May 17, 2023 at 12:41=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
+e:
+>
+> On Wed, 03 May 2023 18:16:14 +0100,
+> Jing Zhang <jingzhangos@google.com> wrote:
 > >
-> > We already do. KVM hides a bunch of things we don't want the guest to
-> > see, either because we don't support the feature, or that we want to
-> > present it with a different shape (cache topology, for example), and
-> > these combination don't really exist in any physical implementation.
+> > Introduce id_regs[] in kvm_arch as a storage of guest's ID registers,
+> > and save ID registers' sanitized value in the array at KVM_CREATE_VM.
+> > Use the saved ones when ID registers are read by the guest or
+> > userspace (via KVM_GET_ONE_REG).
 > >
-> > Which is why I don't really buy the "CPU model" concept as defined by
-> > x86 and s390. We already are in a vastly different place.
-> 
-> Yes, I agree that the "named cpu models" approach probably won't work on
-> Arm (especially if you add other accelerators into the mix -- cpu 'foo'
-> with tcg is unlikely to be 100% identical to cpu 'foo' with KVM.) OTOH,
-> "these two cpus are not that different from each other, so we support
-> migration between them with a least common denominator feature/behaviour
-> set" seems more reasonable.
-
-It does, assuming the platform is "compatible". I realise I didn't
-mention the small issue of the counter frequency, which cannot be
-scaled. ARMv8.6 tried to specify a 1GHz counter frequency, but I still
-haven't see a single system having adopted it, and everyone is doing
-something different.
-
-We *could* always trap/emulate the counters/timers, but that quickly
-becomes ridiculously bad. Isn't ARM virtualisation fun?
-
-> > The way I see it, you get a bunch of architectural features that can
-> > be enabled/disabled depending on the underlying HW, hypervisor's
-> > capabilities and userspace input. On top of that, there is a layer of
-> > paint that tells you what is the overall implementation you could be
-> > running on (that's what MIDR+REVIDR+AIDR tell you) so that you can
-> > apply some unspeakable, uarch-specific hacks that keep the machine
-> > going (got to love these CPU errata).
+> > No functional change intended.
 > >
-> >> Another interesting aspect is how KVM ends up influencing what the guest
-> >> sees on the CPU level, as in the case where we migrate across matching
-> >> CPUs, but with a different software level. I think we want userspace to
-> >> control that to some extent, but I'm not sure if this fully matches the
-> >> CPU model context.
+> > Co-developed-by: Reiji Watanabe <reijiw@google.com>
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h | 20 ++++++++++++++
+> >  arch/arm64/kvm/arm.c              |  1 +
+> >  arch/arm64/kvm/id_regs.c          | 46 +++++++++++++++++++++++++------
+> >  arch/arm64/kvm/sys_regs.c         | 11 +++++++-
+> >  arch/arm64/kvm/sys_regs.h         |  3 +-
+> >  5 files changed, 69 insertions(+), 12 deletions(-)
 > >
-> > I'm not sure I get the "different software level" part. Do you mean
-> > VMM revisions?
-> 
-> Yes. Basically, two (for migration purposes) identical machines with
-> different kernel/QEMU versions, but using the same QEMU compat
-> machine. Migrate from old to new, get more regs: works. Migrate from
-> new to old, get less regs: boom. Expectation would be for this to
-> work, and handling it from machine compat code seems very awkward.
-
-Old to new, fine. I'm not sure how we make the other way work.
-Actually, scratch that. I'm pretty sure we can't make it work. You'd
-have constraint your guest at creation time so that it doesn't use any
-feature that isn't available to older VMM/kernel revisions.
-
-I sense some interesting discussions next month! :D
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm=
+/kvm_host.h
+> > index bcd774d74f34..a7d4d9e093e3 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -177,6 +177,21 @@ struct kvm_smccc_features {
+> >       unsigned long vendor_hyp_bmap;
+> >  };
+> >
+> > +/*
+> > + * Emulated CPU ID registers per VM
+> > + * (Op0, Op1, CRn, CRm, Op2) of the ID registers to be saved in it
+> > + * is (3, 0, 0, crm, op2), where 1<=3Dcrm<8, 0<=3Dop2<8.
+> > + *
+> > + * These emulated idregs are VM-wide, but accessed from the context of=
+ a vCPU.
+> > + * Access to id regs are guarded by kvm_arch.config_lock.
+> > + */
+> > +#define KVM_ARM_ID_REG_NUM   56
+>
+> You already have this as part of patch #1 in another include file, and
+> then move it here. Surely you can do that in one go. I'd also like it
+> to be defined in terms of encodings, and not as a raw value.
+Sure, will do.
+>
+> > +#define IDREG_IDX(id)                (((sys_reg_CRm(id) - 1) << 3) | s=
+ys_reg_Op2(id))
+> > +#define IDREG(kvm, id)               kvm->arch.idregs.regs[IDREG_IDX(i=
+d)]
+>
+> Missing brackets around 'kvm'.
+Thanks, will fix.
+>
+> > +struct kvm_idregs {
+> > +     u64 regs[KVM_ARM_ID_REG_NUM];
+> > +};
+> > +
+> >  typedef unsigned int pkvm_handle_t;
+> >
+> >  struct kvm_protected_vm {
+> > @@ -243,6 +258,9 @@ struct kvm_arch {
+> >       /* Hypercall features firmware registers' descriptor */
+> >       struct kvm_smccc_features smccc_feat;
+> >
+> > +     /* Emulated CPU ID registers */
+> > +     struct kvm_idregs idregs;
+> > +
+> >       /*
+> >        * For an untrusted host VM, 'pkvm.handle' is used to lookup
+> >        * the associated pKVM instance in the hypervisor.
+> > @@ -1008,6 +1026,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *v=
+cpu,
+> >  long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+> >                               struct kvm_arm_copy_mte_tags *copy_tags);
+> >
+> > +void kvm_arm_init_id_regs(struct kvm *kvm);
+> > +
+> >  /* Guest/host FPSIMD coordination helpers */
+> >  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+> >  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 4b2e16e696a8..e34744c36406 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -153,6 +153,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long=
+ type)
+> >
+> >       set_default_spectre(kvm);
+> >       kvm_arm_init_hypercalls(kvm);
+> > +     kvm_arm_init_id_regs(kvm);
+> >
+> >       /*
+> >        * Initialise the default PMUver before there is a chance to
+> > diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
+> > index 96b4c43a5100..e769223bcee2 100644
+> > --- a/arch/arm64/kvm/id_regs.c
+> > +++ b/arch/arm64/kvm/id_regs.c
+> > @@ -52,16 +52,9 @@ static u8 pmuver_to_perfmon(u8 pmuver)
+> >       }
+> >  }
+> >
+> > -/* Read a sanitised cpufeature ID register by sys_reg_desc */
+>
+> Why getting rid of this comment instead of moving it next to the
+> (re-implemented) function?
+>
+Right, will move it to the re-implemented function.
+> > -static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_des=
+c const *r)
+> > +u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
+> >  {
+> > -     u32 id =3D reg_to_encoding(r);
+> > -     u64 val;
+> > -
+> > -     if (sysreg_visible_as_raz(vcpu, r))
+> > -             return 0;
+> > -
+> > -     val =3D read_sanitised_ftr_reg(id);
+> > +     u64 val =3D IDREG(vcpu->kvm, id);
+> >
+> >       switch (id) {
+> >       case SYS_ID_AA64PFR0_EL1:
+> > @@ -126,6 +119,14 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu=
+, struct sys_reg_desc const *r
+> >       return val;
+> >  }
+> >
+> > +static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_des=
+c const *r)
+> > +{
+> > +     if (sysreg_visible_as_raz(vcpu, r))
+> > +             return 0;
+> > +
+> > +     return kvm_arm_read_id_reg(vcpu, reg_to_encoding(r));
+> > +}
+> > +
+> >  /* cpufeature ID register access trap handlers */
+> >
+> >  static bool access_id_reg(struct kvm_vcpu *vcpu,
+> > @@ -458,3 +459,30 @@ int emulate_id_reg(struct kvm_vcpu *vcpu, struct s=
+ys_reg_params *params)
+> >
+> >       return 1;
+> >  }
+> > +
+> > +/*
+> > + * Set the guest's ID registers that are defined in id_reg_descs[]
+> > + * with ID_SANITISED() to the host's sanitized value.
+> > + */
+> > +void kvm_arm_init_id_regs(struct kvm *kvm)
+> > +{
+> > +     u64 val;
+> > +     u32 id;
+> > +     int i;
+> > +
+> > +     for (i =3D 0; i < ARRAY_SIZE(id_reg_descs); i++) {
+> > +             id =3D reg_to_encoding(&id_reg_descs[i]);
+> > +
+> > +             /*
+> > +              * Some hidden ID registers which are not in arm64_ftr_re=
+gs[]
+> > +              * would cause warnings from read_sanitised_ftr_reg().
+> > +              * Skip those ID registers to avoid the warnings.
+> > +              */
+> > +             if (id_reg_descs[i].visibility =3D=3D raz_visibility)
+> > +                     /* Hidden or reserved ID register */
+> > +                     continue;
+>
+> Are you sure? What about other visibility attributes that are normally
+> evaluated at runtime? This may work as a short term hack, but I'm not
+> sure this is the correct long-term solution...
+Yes, this is a short term hack. It would be replaced by checking the
+reset() function of idregs in patch #5 in this series.
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Jing
