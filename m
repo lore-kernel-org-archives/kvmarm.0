@@ -1,221 +1,181 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD78D8830
-	for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 07:41:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61F3DC4339B;
-	Wed, 17 May 2023 07:41:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1684309277;
-	bh=jl579H+lvowIwD62rjIEZ6W163467bPWlDxnNI9N+m4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Rhtjo8zm6UVgHseXIlHW1qbPHgB4CMLZ4C1ftiR3UaszefCjrLBIKnefV7zRStcJX
-	 P9VHJLkbIFyCJ/UNIBdMlofd/3plKqLy8XakzW2Hl471gON6IaakXruzrdMC63aKJY
-	 cU1/JUjS3uaCId4GRM1S465lhLFcxbAehmfAfg09ArO9/CZETVPxd4pDe/+AXRSVt9
-	 g4D8X/EHrNoGpnaxO5EvmCTjL5JOZE53es6Q+Y/rV0qfqK4vLbhIjGggZsrB7ro8CN
-	 8JoxpHbhNhBsnc+yPUrXHHcZfAISj8IpYLJ4i52tvZHJUpAVKHiqr6hNZT/cmBJG4W
-	 UcwtInh/0r7eg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pzBmc-00Fm0C-Vw;
-	Wed, 17 May 2023 08:41:15 +0100
-Date: Wed, 17 May 2023 08:41:14 +0100
-Message-ID: <86wn17l811.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jing Zhang <jingzhangos@google.com>
-Cc: KVM <kvm@vger.kernel.org>,
-	KVMARM <kvmarm@lists.linux.dev>,
-	ARMLinux <linux-arm-kernel@lists.infradead.org>,
-	Oliver Upton <oupton@google.com>,
-	Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Reiji Watanabe <reijiw@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v8 2/6] KVM: arm64: Save ID registers' sanitized value per guest
-In-Reply-To: <20230503171618.2020461-3-jingzhangos@google.com>
-References: <20230503171618.2020461-1-jingzhangos@google.com>
-	<20230503171618.2020461-3-jingzhangos@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD15B28ED
+	for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 08:50:01 +0000 (UTC)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-510d8b0163fso732a12.1
+        for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 01:50:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1684313400; x=1686905400;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FV3cgaXrRim03Zv5RsIztXE6qsQTmKvePMx6UdbcnHo=;
+        b=u4+zZhJVd27DKctMsWsPOgOn1m9CFVQEw7gE9RPjW8DqJrnmKYJVldPqnEjDaEyNyC
+         3IbX7M/Iw+pdXmnG0dIPBnaSbVFe6yEcLwe9enb5VKTH/NZoj4lawv9Oi1ov8gXxg8UR
+         GRSC3itpJIDIfEgKM/vO1wgsvxuxQkvLSAgiMNeL87FsAGjJtPz0Lf2YukL8hq4Y/X1B
+         ZRI+9gpRrGgoec7HSGsnSUxUB85c/jCcUCeygMBvMNjqToZ991zTs/TtRu8EgowqtMUM
+         C0bUNN9TbO3J+IH58OegwuWnhEaQNfYB/EkJNsVeMtKTyNDRCgxCdu5Ojd/uOiTFAkg6
+         D6yg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684313400; x=1686905400;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FV3cgaXrRim03Zv5RsIztXE6qsQTmKvePMx6UdbcnHo=;
+        b=ZxmXNtht9RjH/ok/fu222vQP7Clo0JwXtG0G3Q+mMA45ypzMIrDY9a2kOon91z4UaX
+         dc1xixdEr844szVTmPUBAhEQ7KjaWJfwx6zMOiuovIrHyrostGfoWJZIXwOyVDqr6Ndm
+         paOMwooOcUvFhrdAxwlk49RBc8UJOB7YxhZ2+HQkiTdhYu2Av5TktwfLOys46u1tw7WY
+         5bMhyFg7b6FUh9T5+RZDmqXAVqzRXQyAsnSjCkWf5QaUBL6QynfS7NOi5BhiU1+tidcy
+         i3dkexvvFEbx3r9MJNqc7SHYvwLLP3sifJYEDLP934hQoP/Ws5IWDQjIcXqkrgY9o+td
+         RYig==
+X-Gm-Message-State: AC+VfDzIspOaSHhfZgxqdsgy+YM6A7xUvFi/v180lA0CGNtLfZIxZ3fJ
+	Xo/pwpljISBgg4kFdTcD2hAR3lHE0/ivZ3tSnmBQqg==
+X-Google-Smtp-Source: ACHHUZ7iZT4/9Vl8NYIv57z1XhtnLw/lJOemGSIwTmff1YZitCRxWMZh6O31qgrB5k4+XuqNLgLtIA==
+X-Received: by 2002:a50:d59d:0:b0:502:2af:7b1d with SMTP id v29-20020a50d59d000000b0050202af7b1dmr59200edi.3.1684313399910;
+        Wed, 17 May 2023 01:49:59 -0700 (PDT)
+Received: from google.com (44.232.78.34.bc.googleusercontent.com. [34.78.232.44])
+        by smtp.gmail.com with ESMTPSA id u15-20020adfed4f000000b00307c46f4f08sm2001145wro.79.2023.05.17.01.49.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 May 2023 01:49:59 -0700 (PDT)
+Date: Wed, 17 May 2023 08:49:50 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+	tabba@google.com, qperret@google.com, will@kernel.org,
+	catalin.marinas@arm.com, yuzenghui@huawei.com,
+	suzuki.poulose@arm.com, james.morse@arm.com, bgardon@google.com,
+	gshan@redhat.com
+Subject: Re: [PATCH] KVM: arm64: Use BTI for pKVM
+Message-ID: <ZGSVLl90+YHNKWc9@google.com>
+References: <20230516141846.792193-1-smostafa@google.com>
+ <864jocmg75.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, reijiw@google.com, rananta@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <864jocmg75.wl-maz@kernel.org>
 
-On Wed, 03 May 2023 18:16:14 +0100,
-Jing Zhang <jingzhangos@google.com> wrote:
+Hi Marc,
+
+On Tue, May 16, 2023 at 04:47:10PM +0100, Marc Zyngier wrote:
+> On Tue, 16 May 2023 15:18:46 +0100,
+> Mostafa Saleh <smostafa@google.com> wrote:
+> > 
+> > CONFIG_ARM64_BTI_KERNEL compiles the kernel to support ARMv8.5-BTI.
+> > However, the nvhe code doesn't make use of it as it doesn't map any
+> > pages with Guarded Page(GP) bit.
+> > 
+> > This patch maps pKVM .text section with GP bit which matches the
+> > kernel handling for BTI.
 > 
-> Introduce id_regs[] in kvm_arch as a storage of guest's ID registers,
-> and save ID registers' sanitized value in the array at KVM_CREATE_VM.
-> Use the saved ones when ID registers are read by the guest or
-> userspace (via KVM_GET_ONE_REG).
+> Why pKVM only? Surely we can benefit from it all over the nvhe code,
+> right?
+Yes, I will add it also for nvhe in v2.
+
+> > 
+> > A new flag is added to enum kvm_pgtable_prot: KVM_PGTABLE_PROT_GP_S1,
+> > which represents BTI guarded page in hypervisor stage-1 page table.
+> > 
+> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_pgtable.h | 3 +++
+> >  arch/arm64/kvm/hyp/nvhe/setup.c      | 8 ++++++--
+> >  arch/arm64/kvm/hyp/pgtable.c         | 6 ++++--
+> >  3 files changed, 13 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > index 4cd6762bda80..5bcd06d664d3 100644
+> > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > @@ -151,6 +151,7 @@ enum kvm_pgtable_stage2_flags {
+> >   * @KVM_PGTABLE_PROT_W:		Write permission.
+> >   * @KVM_PGTABLE_PROT_R:		Read permission.
+> >   * @KVM_PGTABLE_PROT_DEVICE:	Device attributes.
+> > + * @KVM_PGTABLE_PROT_GP_S1:	GP(guarded page) used for BTI in stage-1 only
+> >   * @KVM_PGTABLE_PROT_SW0:	Software bit 0.
+> >   * @KVM_PGTABLE_PROT_SW1:	Software bit 1.
+> >   * @KVM_PGTABLE_PROT_SW2:	Software bit 2.
+> > @@ -163,6 +164,8 @@ enum kvm_pgtable_prot {
+> >  
+> >  	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
+> >  
+> > +	KVM_PGTABLE_PROT_GP_S1			= BIT(50),
+> > +
+> >  	KVM_PGTABLE_PROT_SW0			= BIT(55),
+> >  	KVM_PGTABLE_PROT_SW1			= BIT(56),
+> >  	KVM_PGTABLE_PROT_SW2			= BIT(57),
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+> > index 110f04627785..95f80e2b2946 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/setup.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> > @@ -66,7 +66,7 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
+> >  {
+> >  	void *start, *end, *virt = hyp_phys_to_virt(phys);
+> >  	unsigned long pgt_size = hyp_s1_pgtable_pages() << PAGE_SHIFT;
+> > -	enum kvm_pgtable_prot prot;
+> > +	enum kvm_pgtable_prot prot = PAGE_HYP_EXEC;
+> >  	int ret, i;
+> >  
+> >  	/* Recreate the hyp page-table using the early page allocator */
+> > @@ -88,7 +88,11 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
+> >  	if (ret)
+> >  		return ret;
+> >  
+> > -	ret = pkvm_create_mappings(__hyp_text_start, __hyp_text_end, PAGE_HYP_EXEC);
+> > +	/* Hypervisor text is mapped as guarded pages(GP). */
+> > +	if (IS_ENABLED(CONFIG_ARM64_BTI_KERNEL) && cpus_have_const_cap(ARM64_BTI))
+> > +		prot |= KVM_PGTABLE_PROT_GP_S1;
 > 
-> No functional change intended.
+> Is there any reason why this isn't a final cap? I also dislike the
+> IS_ENABLED(), but I can see that we don't have separate caps for
+> in-kernel BTI and userspace visible BTI...
+I was trying to make this close to EL1 code (system_supports_bti()),
+I see in hypervisor cpus_have_const_cap is the same as cpus_have_final_cap.
+
+Yes, I don't see a way to distinguish if BTI was enabled for the kernel
+in EL2 without CONFIG_ARM64_BTI_KERNEL.
+
+> > +
+> > +	ret = pkvm_create_mappings(__hyp_text_start, __hyp_text_end, prot);
+> >  	if (ret)
+> >  		return ret;
+> >  
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > index 3d61bd3e591d..028e198acd48 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -145,7 +145,8 @@ static kvm_pte_t kvm_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
+> >  	u64 type = (level == KVM_PGTABLE_MAX_LEVELS - 1) ? KVM_PTE_TYPE_PAGE :
+> >  							   KVM_PTE_TYPE_BLOCK;
+> >  
+> > -	pte |= attr & (KVM_PTE_LEAF_ATTR_LO | KVM_PTE_LEAF_ATTR_HI);
+> > +	pte |= attr & (KVM_PTE_LEAF_ATTR_LO | KVM_PTE_LEAF_ATTR_HI |
+> > +		       KVM_PGTABLE_PROT_GP_S1);
+> >  	pte |= FIELD_PREP(KVM_PTE_TYPE, type);
+> >  	pte |= KVM_PTE_VALID;
+> >  
+> > @@ -378,7 +379,8 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
+> >  	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_AP, ap);
+> >  	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_SH, sh);
+> >  	attr |= KVM_PTE_LEAF_ATTR_LO_S1_AF;
+> > -	attr |= prot & KVM_PTE_LEAF_ATTR_HI_SW;
+> > +	attr |= prot & (KVM_PTE_LEAF_ATTR_HI_SW | KVM_PGTABLE_PROT_GP_S1);
+> > +
 > 
-> Co-developed-by: Reiji Watanabe <reijiw@google.com>
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 20 ++++++++++++++
->  arch/arm64/kvm/arm.c              |  1 +
->  arch/arm64/kvm/id_regs.c          | 46 +++++++++++++++++++++++++------
->  arch/arm64/kvm/sys_regs.c         | 11 +++++++-
->  arch/arm64/kvm/sys_regs.h         |  3 +-
->  5 files changed, 69 insertions(+), 12 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index bcd774d74f34..a7d4d9e093e3 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -177,6 +177,21 @@ struct kvm_smccc_features {
->  	unsigned long vendor_hyp_bmap;
->  };
->  
-> +/*
-> + * Emulated CPU ID registers per VM
-> + * (Op0, Op1, CRn, CRm, Op2) of the ID registers to be saved in it
-> + * is (3, 0, 0, crm, op2), where 1<=crm<8, 0<=op2<8.
-> + *
-> + * These emulated idregs are VM-wide, but accessed from the context of a vCPU.
-> + * Access to id regs are guarded by kvm_arch.config_lock.
-> + */
-> +#define KVM_ARM_ID_REG_NUM	56
+> You should probably check that the page is executable before blindly
+> accepting to set the GP bit (don't accept it for non-exec pages).
+Will do in v2.
 
-You already have this as part of patch #1 in another include file, and
-then move it here. Surely you can do that in one go. I'd also like it
-to be defined in terms of encodings, and not as a raw value.
+> Another thing to check would be the state of SCTLR_EL2.BT, which I
+> think we clear by construction, but it be worth having a look.
+Yes, I see it is initialised by zero in ___kvm_hyp_init in hyp-init.S,
+I believe this should be changed to 1 when BTI is enabled (as in
+bti_enable() for EL1), I will update it.
 
-> +#define IDREG_IDX(id)		(((sys_reg_CRm(id) - 1) << 3) | sys_reg_Op2(id))
-> +#define IDREG(kvm, id)		kvm->arch.idregs.regs[IDREG_IDX(id)]
-
-Missing brackets around 'kvm'.
-
-> +struct kvm_idregs {
-> +	u64 regs[KVM_ARM_ID_REG_NUM];
-> +};
-> +
->  typedef unsigned int pkvm_handle_t;
->  
->  struct kvm_protected_vm {
-> @@ -243,6 +258,9 @@ struct kvm_arch {
->  	/* Hypercall features firmware registers' descriptor */
->  	struct kvm_smccc_features smccc_feat;
->  
-> +	/* Emulated CPU ID registers */
-> +	struct kvm_idregs idregs;
-> +
->  	/*
->  	 * For an untrusted host VM, 'pkvm.handle' is used to lookup
->  	 * the associated pKVM instance in the hypervisor.
-> @@ -1008,6 +1026,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->  long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->  				struct kvm_arm_copy_mte_tags *copy_tags);
->  
-> +void kvm_arm_init_id_regs(struct kvm *kvm);
-> +
->  /* Guest/host FPSIMD coordination helpers */
->  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
->  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 4b2e16e696a8..e34744c36406 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -153,6 +153,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  
->  	set_default_spectre(kvm);
->  	kvm_arm_init_hypercalls(kvm);
-> +	kvm_arm_init_id_regs(kvm);
->  
->  	/*
->  	 * Initialise the default PMUver before there is a chance to
-> diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
-> index 96b4c43a5100..e769223bcee2 100644
-> --- a/arch/arm64/kvm/id_regs.c
-> +++ b/arch/arm64/kvm/id_regs.c
-> @@ -52,16 +52,9 @@ static u8 pmuver_to_perfmon(u8 pmuver)
->  	}
->  }
->  
-> -/* Read a sanitised cpufeature ID register by sys_reg_desc */
-
-Why getting rid of this comment instead of moving it next to the
-(re-implemented) function?
-
-> -static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r)
-> +u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
->  {
-> -	u32 id = reg_to_encoding(r);
-> -	u64 val;
-> -
-> -	if (sysreg_visible_as_raz(vcpu, r))
-> -		return 0;
-> -
-> -	val = read_sanitised_ftr_reg(id);
-> +	u64 val = IDREG(vcpu->kvm, id);
->  
->  	switch (id) {
->  	case SYS_ID_AA64PFR0_EL1:
-> @@ -126,6 +119,14 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r
->  	return val;
->  }
->  
-> +static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r)
-> +{
-> +	if (sysreg_visible_as_raz(vcpu, r))
-> +		return 0;
-> +
-> +	return kvm_arm_read_id_reg(vcpu, reg_to_encoding(r));
-> +}
-> +
->  /* cpufeature ID register access trap handlers */
->  
->  static bool access_id_reg(struct kvm_vcpu *vcpu,
-> @@ -458,3 +459,30 @@ int emulate_id_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *params)
->  
->  	return 1;
->  }
-> +
-> +/*
-> + * Set the guest's ID registers that are defined in id_reg_descs[]
-> + * with ID_SANITISED() to the host's sanitized value.
-> + */
-> +void kvm_arm_init_id_regs(struct kvm *kvm)
-> +{
-> +	u64 val;
-> +	u32 id;
-> +	int i;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(id_reg_descs); i++) {
-> +		id = reg_to_encoding(&id_reg_descs[i]);
-> +
-> +		/*
-> +		 * Some hidden ID registers which are not in arm64_ftr_regs[]
-> +		 * would cause warnings from read_sanitised_ftr_reg().
-> +		 * Skip those ID registers to avoid the warnings.
-> +		 */
-> +		if (id_reg_descs[i].visibility == raz_visibility)
-> +			/* Hidden or reserved ID register */
-> +			continue;
-
-Are you sure? What about other visibility attributes that are normally
-evaluated at runtime? This may work as a short term hack, but I'm not
-sure this is the correct long-term solution...
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Mostafa
