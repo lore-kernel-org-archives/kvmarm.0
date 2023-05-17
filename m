@@ -1,67 +1,152 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EEB35258
-	for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 10:24:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1684319067;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6kCDd/wHVYniWnWaYfQFj8W3J0td+4UsnrwjwgtLZpc=;
-	b=JCvY+TrXctuF7SCjgKhLPmaKCrGtfzJFEAq1HG0xrLOx1brymbdcmH+BN95kIPClUf8FFf
-	j0NO74KigepetdNc2eA4iwMUN/R1tyc3Mah+A8eRXRwRVi3eHCkiByAwXVXNVhsTLM7BFE
-	KAs1GCya+gUTCENYpjNK8V77ZXCFwHA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-399-lMgLT-zQMsGLAlrxWEDyQQ-1; Wed, 17 May 2023 06:24:21 -0400
-X-MC-Unique: lMgLT-zQMsGLAlrxWEDyQQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 890AB101A54F;
-	Wed, 17 May 2023 10:24:20 +0000 (UTC)
-Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5101E1121314;
-	Wed, 17 May 2023 10:24:20 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, Suzuki
- K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, steven.price@arm.com,
- kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: arm64: Handle trap of tagged Set/Way CMOs
-In-Reply-To: <20230515204601.1270428-3-maz@kernel.org>
-Organization: Red Hat GmbH
-References: <20230515204601.1270428-1-maz@kernel.org>
- <20230515204601.1270428-3-maz@kernel.org>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date: Wed, 17 May 2023 12:24:19 +0200
-Message-ID: <87ttwb45nw.fsf@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B25718B16
+	for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 14:12:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5BC8C433EF;
+	Wed, 17 May 2023 14:12:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1684332772;
+	bh=w752a/vCH7cdiwc64hg29QXvoNJTSnKFdp+bBQSM6xE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XXdc2nRyW1m25T9rU1BsCMR6RDMjAsQ3cJ0vKz3Pxag60PeFJ95zTwVwVgglGz6hc
+	 zHmNtHNUHLxRuaGsyoqVDCwx7U5xFmB4CIPIBiHdp9uc+OfnqB7VrvGIG5C4EaRCn+
+	 pFhanLLwvMmX6MYxjoBjm9LeFhTZmRCW+8WN+ymKxuibR+nGXL0bsLaQQJcIzOd4Oj
+	 b+tEhZ3UFFEp76f1jiMyYnsFP3eXOAIpac1dsW7iKcOeZBwYbhBD11IHaybofn1MQi
+	 qt3mrHFicAYfhZTH2Vlt8xxFUz8j8KL9UVR5BhissB27LEQj3QAO7lxzlH2O4PO09v
+	 SNSKV9eI4GYzg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pzHta-00FsEi-El;
+	Wed, 17 May 2023 15:12:50 +0100
+Date: Wed, 17 May 2023 15:12:50 +0100
+Message-ID: <86r0rfkpwd.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Eric Auger <eauger@redhat.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Chase Conklin <chase.conklin@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Darren Hart <darren@os.amperecomputing.com>,
+	Jintack Lim <jintack@cs.columbia.edu>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Miguel Luis <miguel.luis@oracle.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v10 00/59] KVM: arm64: ARMv8.3/8.4 Nested Virtualization support
+In-Reply-To: <d0b77823-c04c-4ee0-cb55-2cc20a48903b@redhat.com>
+References: <20230515173103.1017669-1-maz@kernel.org>
+	<16d9fda4-3ead-7d5e-9f54-ef29fbd932ac@redhat.com>
+	<87zg64nhqh.wl-maz@kernel.org>
+	<d0b77823-c04c-4ee0-cb55-2cc20a48903b@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: eauger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, May 15 2023, Marc Zyngier <maz@kernel.org> wrote:
+On Wed, 17 May 2023 09:59:45 +0100,
+Eric Auger <eauger@redhat.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 5/16/23 22:28, Marc Zyngier wrote:
+> > On Tue, 16 May 2023 17:53:14 +0100,
+> > Eric Auger <eauger@redhat.com> wrote:
+> >>
+> >> Hi Marc,
+> >>
+> >> On 5/15/23 19:30, Marc Zyngier wrote:
+> >>> This is the 4th drop of NV support on arm64 for this year.
+> >>>
+> >>> For the previous episodes, see [1].
+> >>>
+> >>> What's changed:
+> >>>
+> >>> - New framework to track system register traps that are reinjected in
+> >>>   guest EL2. It is expected to replace the discrete handling we have
+> >>>   enjoyed so far, which didn't scale at all. This has already fixed a
+> >>>   number of bugs that were hidden (a bunch of traps were never
+> >>>   forwarded...). Still a work in progress, but this is going in the
+> >>>   right direction.
+> >>>
+> >>> - Allow the L1 hypervisor to have a S2 that has an input larger than
+> >>>   the L0 IPA space. This fixes a number of subtle issues, depending on
+> >>>   how the initial guest was created.
+> >>>
+> >>> - Consequently, the patch series has gone longer again. Boo. But
+> >>>   hopefully some of it is easier to review...
+> >>>
+> >>> [1] https://lore.kernel.org/r/20230405154008.3552854-1-maz@kernel.org
+> >>
+> >> I have started testing this and when booting my fedora guest I get
+> >>
+> >> [  151.796544] kvm [7617]: Unsupported guest sys_reg access at:
+> >> 23f425fd0 [80000209]
+> >> [  151.796544]  { Op0( 3), Op1( 3), CRn(14), CRm( 3), Op2( 1), func_write },
+> >>
+> >> as soon as the host has kvm-arm.mode=nested
+> >>
+> >> This seems to be triggered very early by EDK2
+> >> (ArmPkg/Drivers/TimerDxe/TimerDxe.c).
+> >>
+> >> If I am not wrong this CNTV_CTL_EL0. Do you have any idea?
+> > 
+> > So here's my current analysis:
+> > 
+> > I assume you are running EDK2 as the L1 guest in a nested
+> > configuration. I also assume that you are not running on an Apple
+> > CPU. If these assumptions are correct, then EDK2 runs at vEL2, and is
+> > in nVHE mode.
+> > 
+> > Finally, I'm going to assume that your implementation has FEAT_ECV and
+> > FEAT_NV2, because I can't see how it could fail otherwise.
+> all the above is correct.
+> > 
+> > In these precise conditions, KVM sets the CNTHCTL_EL2.EL1TVT bit so
+> > that we can trap the EL0 virtual timer and faithfully emulate it (it
+> > is otherwise written to memory, which isn't very helpful).
+> 
+> indeed
+> > 
+> > As it turns out, we don't handle these traps. I didn't spot it because
+> > my test machines are all Apple boxes that don't have a nVHE mode, so
+> > nothing on the nVHE path is getting *ANY* coverage. Hint: having
+> > access to such a machine would help (shipping address on request!).
+> > Otherwise, I'll eventually kill the nVHE support altogether.
+> > 
+> > I have written the following patch, which compiles, but that I cannot
+> > test with my current setup. Could you please give it a go?
+> 
+> with the patch below, my guest boots nicely. You did it great on the 1st
+> shot!!! So this fixes my issue. I will continue testing the v10.
 
-> We appear to have missed the Set/Way CMOs when adding MTE support.
-> Not that we really expect anyone to use them, but you never know
-> what stupidity some people can come up with...
->
-> Treat these mostly like we deal with the classic S/W CMOs, only
-> with an additional check that MTE really is enabled.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
+Thanks a lot for reporting the issue and testing my hacks. I'll
+eventually fold it into the rest of the series.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+By the way, what are you using as your VMM? I'd really like to
+reproduce your setup.
 
+Cheers,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
