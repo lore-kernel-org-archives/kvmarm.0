@@ -1,181 +1,251 @@
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD15B28ED
-	for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 08:50:01 +0000 (UTC)
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-510d8b0163fso732a12.1
-        for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 01:50:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684313400; x=1686905400;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FV3cgaXrRim03Zv5RsIztXE6qsQTmKvePMx6UdbcnHo=;
-        b=u4+zZhJVd27DKctMsWsPOgOn1m9CFVQEw7gE9RPjW8DqJrnmKYJVldPqnEjDaEyNyC
-         3IbX7M/Iw+pdXmnG0dIPBnaSbVFe6yEcLwe9enb5VKTH/NZoj4lawv9Oi1ov8gXxg8UR
-         GRSC3itpJIDIfEgKM/vO1wgsvxuxQkvLSAgiMNeL87FsAGjJtPz0Lf2YukL8hq4Y/X1B
-         ZRI+9gpRrGgoec7HSGsnSUxUB85c/jCcUCeygMBvMNjqToZ991zTs/TtRu8EgowqtMUM
-         C0bUNN9TbO3J+IH58OegwuWnhEaQNfYB/EkJNsVeMtKTyNDRCgxCdu5Ojd/uOiTFAkg6
-         D6yg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46A133D62
+	for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 08:59:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1684313990;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HIVGKr92to8Dmk2bxhmzlEfc+g/1vVinSymgfq9Os5w=;
+	b=RlWMIj9KQv1RAuj8BL2u2IQBigUxg7AEbwRMQ46/OCcWXEz0Kkg0NbHOe8QoE0FABZV5vD
+	eEwdKd/LGLp7INWS51Akt8y6bSWEjDQSFEKu7Zyiath6sAr4g1RxckKAKy4gDgtfm6fXrA
+	wOuApvZnuBu5hJ8KsL2pouUeV+RW1vQ=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-451-dvNN3pJjNmeBt2vmV9l-eQ-1; Wed, 17 May 2023 04:59:49 -0400
+X-MC-Unique: dvNN3pJjNmeBt2vmV9l-eQ-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-3f420ec766dso3706795e9.1
+        for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 01:59:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684313400; x=1686905400;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FV3cgaXrRim03Zv5RsIztXE6qsQTmKvePMx6UdbcnHo=;
-        b=ZxmXNtht9RjH/ok/fu222vQP7Clo0JwXtG0G3Q+mMA45ypzMIrDY9a2kOon91z4UaX
-         dc1xixdEr844szVTmPUBAhEQ7KjaWJfwx6zMOiuovIrHyrostGfoWJZIXwOyVDqr6Ndm
-         paOMwooOcUvFhrdAxwlk49RBc8UJOB7YxhZ2+HQkiTdhYu2Av5TktwfLOys46u1tw7WY
-         5bMhyFg7b6FUh9T5+RZDmqXAVqzRXQyAsnSjCkWf5QaUBL6QynfS7NOi5BhiU1+tidcy
-         i3dkexvvFEbx3r9MJNqc7SHYvwLLP3sifJYEDLP934hQoP/Ws5IWDQjIcXqkrgY9o+td
-         RYig==
-X-Gm-Message-State: AC+VfDzIspOaSHhfZgxqdsgy+YM6A7xUvFi/v180lA0CGNtLfZIxZ3fJ
-	Xo/pwpljISBgg4kFdTcD2hAR3lHE0/ivZ3tSnmBQqg==
-X-Google-Smtp-Source: ACHHUZ7iZT4/9Vl8NYIv57z1XhtnLw/lJOemGSIwTmff1YZitCRxWMZh6O31qgrB5k4+XuqNLgLtIA==
-X-Received: by 2002:a50:d59d:0:b0:502:2af:7b1d with SMTP id v29-20020a50d59d000000b0050202af7b1dmr59200edi.3.1684313399910;
-        Wed, 17 May 2023 01:49:59 -0700 (PDT)
-Received: from google.com (44.232.78.34.bc.googleusercontent.com. [34.78.232.44])
-        by smtp.gmail.com with ESMTPSA id u15-20020adfed4f000000b00307c46f4f08sm2001145wro.79.2023.05.17.01.49.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 May 2023 01:49:59 -0700 (PDT)
-Date: Wed, 17 May 2023 08:49:50 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-	tabba@google.com, qperret@google.com, will@kernel.org,
-	catalin.marinas@arm.com, yuzenghui@huawei.com,
-	suzuki.poulose@arm.com, james.morse@arm.com, bgardon@google.com,
-	gshan@redhat.com
-Subject: Re: [PATCH] KVM: arm64: Use BTI for pKVM
-Message-ID: <ZGSVLl90+YHNKWc9@google.com>
-References: <20230516141846.792193-1-smostafa@google.com>
- <864jocmg75.wl-maz@kernel.org>
+        d=1e100.net; s=20221208; t=1684313988; x=1686905988;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HIVGKr92to8Dmk2bxhmzlEfc+g/1vVinSymgfq9Os5w=;
+        b=WXWpGEIu9t6XX8JN9d/GrK1pyxjJ+orbmgChPJx9sUtH4xjYKaM2n1iaLsCNMxUcNa
+         toE0R8vDUtwUIbRV8Sf3/AetWyNHQP+qRX7u+40+V1xU/62Y65EmtVLDyMPWG2oHJZBj
+         nhaZDwGL4t2+My7uIcn4gK4glo4LMhDsSN1OBAhuqcE8vW3tUkjGaWsEjDcVfOlaYq+y
+         kITctltSOvf8yLWCOOxxf/x1OE12QipzWDhVZ//TaJ1fUPV9u5n79U7o5aMsa5Xn7/6k
+         CsjN1c1dt11cgSsdkGslFAuOG5FZG02eOJvVxzqYMeQoFUBXbCbQlJcT87FHWUV85hzl
+         4sKA==
+X-Gm-Message-State: AC+VfDztEM499Nds434SghvAyRsmXzhRFHVGkt70Xrg+RAzsirWKPl7g
+	Fg/lLxM2HBPrZ/mVng1m9x1wymba64r/2pihzD/0QahlrzkHAVHYWGrwA0K0+sKcC10MAdgKe1d
+	FcvGFD0LD61rdHb49
+X-Received: by 2002:a7b:c5d2:0:b0:3f3:2b37:dd34 with SMTP id n18-20020a7bc5d2000000b003f32b37dd34mr26929675wmk.9.1684313987886;
+        Wed, 17 May 2023 01:59:47 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ7zHvTt2KB86FL8HelVnj5IrobJnjcl3UexrHbo6YuaT13OfR4AW0fEjEpq69UXVUCvfNcDXw==
+X-Received: by 2002:a7b:c5d2:0:b0:3f3:2b37:dd34 with SMTP id n18-20020a7bc5d2000000b003f32b37dd34mr26929653wmk.9.1684313987561;
+        Wed, 17 May 2023 01:59:47 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id f6-20020a1cc906000000b003f435652aaesm1557077wmb.11.2023.05.17.01.59.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 May 2023 01:59:46 -0700 (PDT)
+Message-ID: <d0b77823-c04c-4ee0-cb55-2cc20a48903b@redhat.com>
+Date: Wed, 17 May 2023 10:59:45 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <864jocmg75.wl-maz@kernel.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH v10 00/59] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
+ support
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>,
+ Chase Conklin <chase.conklin@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Darren Hart <darren@os.amperecomputing.com>,
+ Jintack Lim <jintack@cs.columbia.edu>,
+ Russell King <rmk+kernel@armlinux.org.uk>,
+ Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20230515173103.1017669-1-maz@kernel.org>
+ <16d9fda4-3ead-7d5e-9f54-ef29fbd932ac@redhat.com>
+ <87zg64nhqh.wl-maz@kernel.org>
+From: Eric Auger <eauger@redhat.com>
+In-Reply-To: <87zg64nhqh.wl-maz@kernel.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
 Hi Marc,
 
-On Tue, May 16, 2023 at 04:47:10PM +0100, Marc Zyngier wrote:
-> On Tue, 16 May 2023 15:18:46 +0100,
-> Mostafa Saleh <smostafa@google.com> wrote:
-> > 
-> > CONFIG_ARM64_BTI_KERNEL compiles the kernel to support ARMv8.5-BTI.
-> > However, the nvhe code doesn't make use of it as it doesn't map any
-> > pages with Guarded Page(GP) bit.
-> > 
-> > This patch maps pKVM .text section with GP bit which matches the
-> > kernel handling for BTI.
+On 5/16/23 22:28, Marc Zyngier wrote:
+> On Tue, 16 May 2023 17:53:14 +0100,
+> Eric Auger <eauger@redhat.com> wrote:
+>>
+>> Hi Marc,
+>>
+>> On 5/15/23 19:30, Marc Zyngier wrote:
+>>> This is the 4th drop of NV support on arm64 for this year.
+>>>
+>>> For the previous episodes, see [1].
+>>>
+>>> What's changed:
+>>>
+>>> - New framework to track system register traps that are reinjected in
+>>>   guest EL2. It is expected to replace the discrete handling we have
+>>>   enjoyed so far, which didn't scale at all. This has already fixed a
+>>>   number of bugs that were hidden (a bunch of traps were never
+>>>   forwarded...). Still a work in progress, but this is going in the
+>>>   right direction.
+>>>
+>>> - Allow the L1 hypervisor to have a S2 that has an input larger than
+>>>   the L0 IPA space. This fixes a number of subtle issues, depending on
+>>>   how the initial guest was created.
+>>>
+>>> - Consequently, the patch series has gone longer again. Boo. But
+>>>   hopefully some of it is easier to review...
+>>>
+>>> [1] https://lore.kernel.org/r/20230405154008.3552854-1-maz@kernel.org
+>>
+>> I have started testing this and when booting my fedora guest I get
+>>
+>> [  151.796544] kvm [7617]: Unsupported guest sys_reg access at:
+>> 23f425fd0 [80000209]
+>> [  151.796544]  { Op0( 3), Op1( 3), CRn(14), CRm( 3), Op2( 1), func_write },
+>>
+>> as soon as the host has kvm-arm.mode=nested
+>>
+>> This seems to be triggered very early by EDK2
+>> (ArmPkg/Drivers/TimerDxe/TimerDxe.c).
+>>
+>> If I am not wrong this CNTV_CTL_EL0. Do you have any idea?
 > 
-> Why pKVM only? Surely we can benefit from it all over the nvhe code,
-> right?
-Yes, I will add it also for nvhe in v2.
-
-> > 
-> > A new flag is added to enum kvm_pgtable_prot: KVM_PGTABLE_PROT_GP_S1,
-> > which represents BTI guarded page in hypervisor stage-1 page table.
-> > 
-> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_pgtable.h | 3 +++
-> >  arch/arm64/kvm/hyp/nvhe/setup.c      | 8 ++++++--
-> >  arch/arm64/kvm/hyp/pgtable.c         | 6 ++++--
-> >  3 files changed, 13 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> > index 4cd6762bda80..5bcd06d664d3 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -151,6 +151,7 @@ enum kvm_pgtable_stage2_flags {
-> >   * @KVM_PGTABLE_PROT_W:		Write permission.
-> >   * @KVM_PGTABLE_PROT_R:		Read permission.
-> >   * @KVM_PGTABLE_PROT_DEVICE:	Device attributes.
-> > + * @KVM_PGTABLE_PROT_GP_S1:	GP(guarded page) used for BTI in stage-1 only
-> >   * @KVM_PGTABLE_PROT_SW0:	Software bit 0.
-> >   * @KVM_PGTABLE_PROT_SW1:	Software bit 1.
-> >   * @KVM_PGTABLE_PROT_SW2:	Software bit 2.
-> > @@ -163,6 +164,8 @@ enum kvm_pgtable_prot {
-> >  
-> >  	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
-> >  
-> > +	KVM_PGTABLE_PROT_GP_S1			= BIT(50),
-> > +
-> >  	KVM_PGTABLE_PROT_SW0			= BIT(55),
-> >  	KVM_PGTABLE_PROT_SW1			= BIT(56),
-> >  	KVM_PGTABLE_PROT_SW2			= BIT(57),
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-> > index 110f04627785..95f80e2b2946 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/setup.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-> > @@ -66,7 +66,7 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
-> >  {
-> >  	void *start, *end, *virt = hyp_phys_to_virt(phys);
-> >  	unsigned long pgt_size = hyp_s1_pgtable_pages() << PAGE_SHIFT;
-> > -	enum kvm_pgtable_prot prot;
-> > +	enum kvm_pgtable_prot prot = PAGE_HYP_EXEC;
-> >  	int ret, i;
-> >  
-> >  	/* Recreate the hyp page-table using the early page allocator */
-> > @@ -88,7 +88,11 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
-> >  	if (ret)
-> >  		return ret;
-> >  
-> > -	ret = pkvm_create_mappings(__hyp_text_start, __hyp_text_end, PAGE_HYP_EXEC);
-> > +	/* Hypervisor text is mapped as guarded pages(GP). */
-> > +	if (IS_ENABLED(CONFIG_ARM64_BTI_KERNEL) && cpus_have_const_cap(ARM64_BTI))
-> > +		prot |= KVM_PGTABLE_PROT_GP_S1;
+> So here's my current analysis:
 > 
-> Is there any reason why this isn't a final cap? I also dislike the
-> IS_ENABLED(), but I can see that we don't have separate caps for
-> in-kernel BTI and userspace visible BTI...
-I was trying to make this close to EL1 code (system_supports_bti()),
-I see in hypervisor cpus_have_const_cap is the same as cpus_have_final_cap.
-
-Yes, I don't see a way to distinguish if BTI was enabled for the kernel
-in EL2 without CONFIG_ARM64_BTI_KERNEL.
-
-> > +
-> > +	ret = pkvm_create_mappings(__hyp_text_start, __hyp_text_end, prot);
-> >  	if (ret)
-> >  		return ret;
-> >  
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index 3d61bd3e591d..028e198acd48 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -145,7 +145,8 @@ static kvm_pte_t kvm_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
-> >  	u64 type = (level == KVM_PGTABLE_MAX_LEVELS - 1) ? KVM_PTE_TYPE_PAGE :
-> >  							   KVM_PTE_TYPE_BLOCK;
-> >  
-> > -	pte |= attr & (KVM_PTE_LEAF_ATTR_LO | KVM_PTE_LEAF_ATTR_HI);
-> > +	pte |= attr & (KVM_PTE_LEAF_ATTR_LO | KVM_PTE_LEAF_ATTR_HI |
-> > +		       KVM_PGTABLE_PROT_GP_S1);
-> >  	pte |= FIELD_PREP(KVM_PTE_TYPE, type);
-> >  	pte |= KVM_PTE_VALID;
-> >  
-> > @@ -378,7 +379,8 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
-> >  	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_AP, ap);
-> >  	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_SH, sh);
-> >  	attr |= KVM_PTE_LEAF_ATTR_LO_S1_AF;
-> > -	attr |= prot & KVM_PTE_LEAF_ATTR_HI_SW;
-> > +	attr |= prot & (KVM_PTE_LEAF_ATTR_HI_SW | KVM_PGTABLE_PROT_GP_S1);
-> > +
+> I assume you are running EDK2 as the L1 guest in a nested
+> configuration. I also assume that you are not running on an Apple
+> CPU. If these assumptions are correct, then EDK2 runs at vEL2, and is
+> in nVHE mode.
 > 
-> You should probably check that the page is executable before blindly
-> accepting to set the GP bit (don't accept it for non-exec pages).
-Will do in v2.
+> Finally, I'm going to assume that your implementation has FEAT_ECV and
+> FEAT_NV2, because I can't see how it could fail otherwise.
+all the above is correct.
+> 
+> In these precise conditions, KVM sets the CNTHCTL_EL2.EL1TVT bit so
+> that we can trap the EL0 virtual timer and faithfully emulate it (it
+> is otherwise written to memory, which isn't very helpful).
 
-> Another thing to check would be the state of SCTLR_EL2.BT, which I
-> think we clear by construction, but it be worth having a look.
-Yes, I see it is initialised by zero in ___kvm_hyp_init in hyp-init.S,
-I believe this should be changed to 1 when BTI is enabled (as in
-bti_enable() for EL1), I will update it.
+indeed
+> 
+> As it turns out, we don't handle these traps. I didn't spot it because
+> my test machines are all Apple boxes that don't have a nVHE mode, so
+> nothing on the nVHE path is getting *ANY* coverage. Hint: having
+> access to such a machine would help (shipping address on request!).
+> Otherwise, I'll eventually kill the nVHE support altogether.
+> 
+> I have written the following patch, which compiles, but that I cannot
+> test with my current setup. Could you please give it a go?
 
-Thanks,
-Mostafa
+with the patch below, my guest boots nicely. You did it great on the 1st
+shot!!! So this fixes my issue. I will continue testing the v10.
+
+Thank you again!
+
+Eric
+
+
+> 
+> Thanks again,
+> 
+> 	M.
+> 
+> From feb03b57de0bcb83254a2d6a3ce320f5e39434b6 Mon Sep 17 00:00:00 2001
+> From: Marc Zyngier <maz@kernel.org>
+> Date: Tue, 16 May 2023 21:06:20 +0100
+> Subject: [PATCH] KVM: arm64: Handle virtual timer traps when
+>  CNTHCTL_EL2.EL1TVT is set
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/sysreg.h |  1 +
+>  arch/arm64/kvm/sys_regs.c       | 28 ++++++++++++++++++++++++++++
+>  2 files changed, 29 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 72ff6df5d75b..77a61179ea37 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -436,6 +436,7 @@
+>  #define SYS_CNTP_CTL_EL0		sys_reg(3, 3, 14, 2, 1)
+>  #define SYS_CNTP_CVAL_EL0		sys_reg(3, 3, 14, 2, 2)
+>  
+> +#define SYS_CNTV_TVAL_EL0		sys_reg(3, 3, 14, 3, 0)
+>  #define SYS_CNTV_CTL_EL0		sys_reg(3, 3, 14, 3, 1)
+>  #define SYS_CNTV_CVAL_EL0		sys_reg(3, 3, 14, 3, 2)
+>  
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 27a29dcbfcd2..9aa9c4e4b4d6 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1328,6 +1328,14 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+>  		treg = TIMER_REG_TVAL;
+>  		break;
+>  
+> +	case SYS_CNTV_TVAL_EL0:
+> +		if (is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu))
+> +			tmr = TIMER_HVTIMER;
+> +		else
+> +			tmr = TIMER_VTIMER;
+> +		treg = TIMER_REG_TVAL;
+> +		break;
+> +
+>  	case SYS_AARCH32_CNTP_TVAL:
+>  	case SYS_CNTP_TVAL_EL02:
+>  		tmr = TIMER_PTIMER;
+> @@ -1357,6 +1365,14 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+>  		treg = TIMER_REG_CTL;
+>  		break;
+>  
+> +	case SYS_CNTV_CTL_EL0:
+> +		if (is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu))
+> +			tmr = TIMER_HVTIMER;
+> +		else
+> +			tmr = TIMER_VTIMER;
+> +		treg = TIMER_REG_CTL;
+> +		break;
+> +
+>  	case SYS_AARCH32_CNTP_CTL:
+>  	case SYS_CNTP_CTL_EL02:
+>  		tmr = TIMER_PTIMER;
+> @@ -1386,6 +1402,14 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+>  		treg = TIMER_REG_CVAL;
+>  		break;
+>  
+> +	case SYS_CNTV_CVAL_EL0:
+> +		if (is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu))
+> +			tmr = TIMER_HVTIMER;
+> +		else
+> +			tmr = TIMER_VTIMER;
+> +		treg = TIMER_REG_CVAL;
+> +		break;
+> +
+>  	case SYS_AARCH32_CNTP_CVAL:
+>  	case SYS_CNTP_CVAL_EL02:
+>  		tmr = TIMER_PTIMER;
+> @@ -2510,6 +2534,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_CNTP_CTL_EL0), access_arch_timer },
+>  	{ SYS_DESC(SYS_CNTP_CVAL_EL0), access_arch_timer },
+>  
+> +	{ SYS_DESC(SYS_CNTV_TVAL_EL0), access_arch_timer },
+> +	{ SYS_DESC(SYS_CNTV_CTL_EL0), access_arch_timer },
+> +	{ SYS_DESC(SYS_CNTV_CVAL_EL0), access_arch_timer },
+> +
+>  	/* PMEVCNTRn_EL0 */
+>  	PMU_PMEVCNTR_EL0(0),
+>  	PMU_PMEVCNTR_EL0(1),
+
