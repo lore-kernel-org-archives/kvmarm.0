@@ -1,232 +1,295 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5580C31133
-	for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 17:36:18 +0000 (UTC)
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3062b468a36so436025f8f.1
-        for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 10:36:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684344976; x=1686936976;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=5uJJv3crY452Cbw+h/uO2M9ipntFn8IiofxC6JQaalg=;
-        b=oTfhi1BZqEqlbSyRZKsaZbxyoT1XGLw0ndFlgxV1Ih5MfIvb9saj+Q8te1b2ZHQWug
-         5AuE7O1jzuWUbCBIcNQX5f4N+yYwOI/x6Ylr69+w7Zq9mDiDpeXrPthRBLmUI2pAcC9f
-         PqsrGGBT1WCMauB0c8AGEG5xE/woeUlAdhNBrjkH3E6YGS5JhbiTIc7HTS5rpzimnnEC
-         Lqv0tw6nPERm6RqH9V+PpS7OgADjWBbMiyoP2lk+K551bdcDZD1nobGj686zIDv1jjpJ
-         co/Kpd6jk9In8B5tXNLaUmMIovihIySZ4ecE0lvpjPDJ3o2EY4ygh2CZDFDIYiw5s2z/
-         GriQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684344976; x=1686936976;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5uJJv3crY452Cbw+h/uO2M9ipntFn8IiofxC6JQaalg=;
-        b=TydrQCKxLr0xzoN/97hn53ZJZg5RQ5ver+XqxM1puxSC1u106FNtNBvsB6eTO7nzIg
-         KM6ppDa39/ONclKxc3LXRJWBU/KhNLtS++9zO86cykZzF2yaiI+4uNdohHI1cYngVlQM
-         I2hkGuRdZZfTH0B+voyNqwlcTtyqTwj04omzuBB1HBAPA8oZ29QAaVrWROWz1mQ7BXSh
-         yDPPdXBUWEUKlkjgYlr505i6HpDeK6tTpwmI4mSZhrzLk3cL5jQjPvDsBlbSAaImvxk0
-         Lfa+kfaL7rK1SFsBoKAjeSJnfu0U4qmvs9pELb5kBcTN8HQMbGdyKWQ8Gez8LBDAh/ii
-         Gopg==
-X-Gm-Message-State: AC+VfDxpNVURAOIcqI74JfQmGuHyuFyjlbkIw/UnE03UirzCBHwmCqvV
-	s3FPDtWxGXKJAgmbnqdfXX6yzpBzuK5kdQ==
-X-Google-Smtp-Source: ACHHUZ6C/5xTtdIqstRhu/xWULwybxRbU5ExPUfg4iVpV0C5ry5eK1AJFKWXZsdClO5EAEDhW6Hu4Njz/NJ5hQ==
-X-Received: from mostafa.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:333c])
- (user=smostafa job=sendgmr) by 2002:a5d:5272:0:b0:2fe:9a9f:195b with SMTP id
- l18-20020a5d5272000000b002fe9a9f195bmr247714wrc.5.1684344976634; Wed, 17 May
- 2023 10:36:16 -0700 (PDT)
-Date: Wed, 17 May 2023 17:35:52 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D1C10966
+	for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 18:16:19 +0000 (UTC)
+Received: from kwepemm600006.china.huawei.com (unknown [172.30.72.57])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4QM13m5xglzTkfy;
+	Thu, 18 May 2023 01:55:32 +0800 (CST)
+Received: from lhrpeml500001.china.huawei.com (7.191.163.213) by
+ kwepemm600006.china.huawei.com (7.193.23.105) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Thu, 18 May 2023 02:00:20 +0800
+Received: from lhrpeml500001.china.huawei.com ([7.191.163.213]) by
+ lhrpeml500001.china.huawei.com ([7.191.163.213]) with mapi id 15.01.2507.023;
+ Wed, 17 May 2023 19:00:18 +0100
+From: Salil Mehta <salil.mehta@huawei.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, James Morse
+	<james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, yuzenghui
+	<yuzenghui@huawei.com>, Sean Christopherson <seanjc@google.com>
+Subject: RE: [PATCH v3 08/13] KVM: arm64: Add support for KVM_EXIT_HYPERCALL
+Thread-Topic: [PATCH v3 08/13] KVM: arm64: Add support for KVM_EXIT_HYPERCALL
+Thread-Index: AQHZZwvyoTfThYxWf0yKNVt4c9uQr68cQ2uAgABJ1QCAQm5ckA==
+Date: Wed, 17 May 2023 18:00:18 +0000
+Message-ID: <fd9aee7022ea47e29cbff3120764c2c6@huawei.com>
+References: <20230404154050.2270077-1-oliver.upton@linux.dev>
+	<20230404154050.2270077-9-oliver.upton@linux.dev>
+	<87o7o26aty.wl-maz@kernel.org> <86pm8iv8tj.wl-maz@kernel.org>
+In-Reply-To: <86pm8iv8tj.wl-maz@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-originating-ip: [10.202.226.45]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.40.1.698.g37aff9b760-goog
-Message-ID: <20230517173552.163711-1-smostafa@google.com>
-Subject: [PATCH v2] KVM: arm64: Use BTI for nvhe
-From: Mostafa Saleh <smostafa@google.com>
-To: maz@kernel.org, oliver.upton@linux.dev, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Cc: tabba@google.com, qperret@google.com, will@kernel.org, 
-	catalin.marinas@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, 
-	james.morse@arm.com, bgardon@google.com, gshan@redhat.com, 
-	Mostafa Saleh <smostafa@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
 
-CONFIG_ARM64_BTI_KERNEL compiles the kernel to support ARMv8.5-BTI.
-However, the nvhe code doesn't make use of it as it doesn't map any
-pages with Guarded Page(GP) bit.
+Hi Marc,
+Sorry for jumping late. I am updating the Qemu code for the VCPU hotplug
+to reflect Oliver's SMCCC filtering changes and I have few doubts.
 
-This patch maps nvhe(and pKVM recreated mapping of) .text section
-with GP bit which matches the kernel handling for BTI.
+Please scroll below.
 
-A new flag is added to enum kvm_pgtable_prot: KVM_PGTABLE_PROT_GP_S1,
-which represents BTI guarded page in hypervisor stage-1 page table.
+> From: Marc Zyngier <maz@kernel.org>
+> Sent: Wednesday, April 5, 2023 12:59 PM
+> To: Oliver Upton <oliver.upton@linux.dev>
+> Cc: kvmarm@lists.linux.dev; kvm@vger.kernel.org; Paolo Bonzini
+> <pbonzini@redhat.com>; James Morse <james.morse@arm.com>; Suzuki K Poulos=
+e
+> <suzuki.poulose@arm.com>; yuzenghui <yuzenghui@huawei.com>; Sean
+> Christopherson <seanjc@google.com>; Salil Mehta <salil.mehta@huawei.com>
+> Subject: Re: [PATCH v3 08/13] KVM: arm64: Add support for
+> KVM_EXIT_HYPERCALL
+>=20
+> On Wed, 05 Apr 2023 08:35:05 +0100,
+> Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Tue, 04 Apr 2023 16:40:45 +0100,
+> > Oliver Upton <oliver.upton@linux.dev> wrote:
+> > >
+> > > In anticipation of user hypercall filters, add the necessary plumbing=
+ to
+> > > get SMCCC calls out to userspace. Even though the exit structure has
+> > > space for KVM to pass register arguments, let's just avoid it altoget=
+her
+> > > and let userspace poke at the registers via KVM_GET_ONE_REG.
+> > >
+> > > This deliberately stretches the definition of a 'hypercall' to cover
+> > > SMCs from EL1 in addition to the HVCs we know and love. KVM doesn't
+> > > support EL1 calls into secure services, but now we can paint that as =
+a
+> > > userspace problem and be done with it.
+> > >
+> > > Finally, we need a flag to let userspace know what conduit instructio=
+n
+> > > was used (i.e. SMC vs. HVC).
+> > >
+> > > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > > ---
+> > >  Documentation/virt/kvm/api.rst    | 18 ++++++++++++++++--
+> > >  arch/arm64/include/uapi/asm/kvm.h |  4 ++++
+> > >  arch/arm64/kvm/handle_exit.c      |  4 +++-
+> > >  arch/arm64/kvm/hypercalls.c       | 16 ++++++++++++++++
+> > >  4 files changed, 39 insertions(+), 3 deletions(-)
+> > >
+> > > diff --git a/Documentation/virt/kvm/api.rst  b/Documentation/virt/kvm=
+/api.rst
+> > > index 9b01e3d0e757..9497792c4ee5 100644
+> > > --- a/Documentation/virt/kvm/api.rst
+> > > +++ b/Documentation/virt/kvm/api.rst
+> > > @@ -6221,11 +6221,25 @@ to the byte array.
+> > >  			__u64 flags;
+> > >  		} hypercall;
+> > >
+> > > -Unused.  This was once used for 'hypercall to userspace'.  To  imple=
+ment
+> > > -such functionality, use KVM_EXIT_IO (x86) or KVM_EXIT_MMIO (all exce=
+pt s390).
+> > > +
+> > > +It is strongly recommended that userspace use ``KVM_EXIT_IO`` (x86) =
+or
+> > > +``KVM_EXIT_MMIO`` (all except s390) to implement functionality that
+> > > +requires a guest to interact with host userpace.
+> > >
+> > >  .. note:: KVM_EXIT_IO is significantly faster than KVM_EXIT_MMIO.
+> > >
+> > > +For arm64:
+> > > +----------
+> > > +
+> > > +``nr`` contains the function ID of the guest's SMCCC call. Userspace=
+ is
+> > > +expected to use the ``KVM_GET_ONE_REG`` ioctl to retrieve the call
+> > > +parameters from the vCPU's GPRs.
+> > > +
+> > > +Definition of ``flags``:
+> > > + - ``KVM_HYPERCALL_EXIT_SMC``: Indicates that the guest used the SMC
+> > > +   conduit to initiate the SMCCC call. If this bit is 0 then the gue=
+st
+> > > +   used the HVC conduit for the SMCCC call.
+> > > +
+> > >  ::
+> > >
+> > >  		/* KVM_EXIT_TPR_ACCESS */
+> > > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/u=
+api/asm/kvm.h
+> > > index f9672ef1159a..f86446c5a7e3 100644
+> > > --- a/arch/arm64/include/uapi/asm/kvm.h
+> > > +++ b/arch/arm64/include/uapi/asm/kvm.h
+> > > @@ -472,12 +472,16 @@ enum {
+> > >  enum kvm_smccc_filter_action {
+> > >  	KVM_SMCCC_FILTER_HANDLE =3D 0,
+> > >  	KVM_SMCCC_FILTER_DENY,
+> > > +	KVM_SMCCC_FILTER_FWD_TO_USER,
+> > >
+> > >  #ifdef __KERNEL__
+> > >  	NR_SMCCC_FILTER_ACTIONS
+> > >  #endif
+> > >  };
+> > >
+> > > +/* arm64-specific KVM_EXIT_HYPERCALL flags */
+> > > +#define KVM_HYPERCALL_EXIT_SMC	(1U << 0)
+> > > +
+> > >  #endif
+> > >
+> > >  #endif /* __ARM_KVM_H__ */
+> > > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exi=
+t.c
+> > > index 68f95dcd41a1..3f43e20c48b6 100644
+> > > --- a/arch/arm64/kvm/handle_exit.c
+> > > +++ b/arch/arm64/kvm/handle_exit.c
+> > > @@ -71,7 +71,9 @@ static int handle_smc(struct kvm_vcpu *vcpu)
+> > >  	 * Trap exception, not a Secure Monitor Call exception [...]"
+> > >  	 *
+> > >  	 * We need to advance the PC after the trap, as it would
+> > > -	 * otherwise return to the same address...
+> > > +	 * otherwise return to the same address. Furthermore, pre-increment=
+ing
+> > > +	 * the PC before potentially exiting to userspace maintains the sam=
+e
+> > > +	 * abstraction for both SMCs and HVCs.
+> >
+> > nit: this comment really needs to find its way in the documentation so
+> > that a VMM author can determine the PC of the SMC/HVC. This is
+> > specially important for 32bit, which has a 16bit encodings for
+> > SMC/HVC.
+> >
+> > And thinking of it, this outlines a small flaw in this API. If
+> > luserspace needs to find out about the address of the HVC/SMC, it
+> > needs to know the *size* of the instruction. But we don't propagate
+> > the ESR value. I think this still works by construction (userspace can
+> > check PSTATE and work out whether we're in ARM or Thumb mode), but
+> > this feels fragile.
+> >
+> > Should we expose the ESR, or at least ESR_EL2.IL as an additional
+> > flag?
 
-At hyp init, SCTLR_EL2.BT is set to 1 to match EL1 configuration
-(SCTLR_EL1.BT1) set in bti_enable().
 
-hyp_init_valid_leaf_pte is added to avoid unnecessary considering GP
-bit for stage-2.
+I think we would need "Immediate value" of the ESR_EL2 register in the
+user-space/VMM to be able to construct the syndrome value. I cannot see
+where it is being sent?=20
 
-Signed-off-by: Mostafa Saleh <smostafa@google.com>
----
-v1 -> v2:
-- Enable BTI for nvhe also.
-- Only set GP bit for executable pages from pgtable code.
-- Set SCTLR_EL2.BT when BTI is used.
-- use system_supports_bti() for consistency.
-- Add hyp_init_valid_leaf_pte.
-v1: https://lore.kernel.org/all/20230516141846.792193-1-smostafa@google.com/
----
- arch/arm64/include/asm/kvm_pgtable.h |  3 +++
- arch/arm64/include/asm/sysreg.h      |  1 +
- arch/arm64/kvm/arm.c                 |  7 ++++++-
- arch/arm64/kvm/hyp/nvhe/hyp-init.S   |  7 +++++++
- arch/arm64/kvm/hyp/nvhe/setup.c      |  8 ++++++--
- arch/arm64/kvm/hyp/pgtable.c         | 11 ++++++++++-
- 6 files changed, 33 insertions(+), 4 deletions(-)
+Please correct me if I am missing anything here.
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 4cd6762bda80..5bcd06d664d3 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -151,6 +151,7 @@ enum kvm_pgtable_stage2_flags {
-  * @KVM_PGTABLE_PROT_W:		Write permission.
-  * @KVM_PGTABLE_PROT_R:		Read permission.
-  * @KVM_PGTABLE_PROT_DEVICE:	Device attributes.
-+ * @KVM_PGTABLE_PROT_GP_S1:	GP(guarded page) used for BTI in stage-1 only
-  * @KVM_PGTABLE_PROT_SW0:	Software bit 0.
-  * @KVM_PGTABLE_PROT_SW1:	Software bit 1.
-  * @KVM_PGTABLE_PROT_SW2:	Software bit 2.
-@@ -163,6 +164,8 @@ enum kvm_pgtable_prot {
- 
- 	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
- 
-+	KVM_PGTABLE_PROT_GP_S1			= BIT(50),
-+
- 	KVM_PGTABLE_PROT_SW0			= BIT(55),
- 	KVM_PGTABLE_PROT_SW1			= BIT(56),
- 	KVM_PGTABLE_PROT_SW2			= BIT(57),
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index e72d9aaab6b1..204124ce86c4 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -558,6 +558,7 @@
- 			 (BIT(18)) | (BIT(22)) | (BIT(23)) | (BIT(28)) | \
- 			 (BIT(29)))
- 
-+#define SCTLR_EL2_BT	(BIT(36))
- #ifdef CONFIG_CPU_BIG_ENDIAN
- #define ENDIAN_SET_EL2		SCTLR_ELx_EE
- #else
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 14391826241c..60c770030b33 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2073,6 +2073,7 @@ static int __init init_hyp_mode(void)
- 	u32 hyp_va_bits;
- 	int cpu;
- 	int err = -ENOMEM;
-+	enum kvm_pgtable_prot text_prot = PAGE_HYP_EXEC;
- 
- 	/*
- 	 * The protected Hyp-mode cannot be initialized if the memory pool
-@@ -2124,8 +2125,12 @@ static int __init init_hyp_mode(void)
- 	/*
- 	 * Map the Hyp-code called directly from the host
- 	 */
-+	if (IS_ENABLED(CONFIG_ARM64_BTI_KERNEL) && system_supports_bti())
-+		text_prot |= KVM_PGTABLE_PROT_GP_S1;
-+
- 	err = create_hyp_mappings(kvm_ksym_ref(__hyp_text_start),
--				  kvm_ksym_ref(__hyp_text_end), PAGE_HYP_EXEC);
-+				  kvm_ksym_ref(__hyp_text_end), text_prot);
-+
- 	if (err) {
- 		kvm_err("Cannot map world-switch code\n");
- 		goto out_err;
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-index a6d67c2bb5ae..e89b694bd8eb 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-@@ -128,6 +128,13 @@ alternative_if ARM64_HAS_ADDRESS_AUTH
- 		     SCTLR_ELx_ENDA | SCTLR_ELx_ENDB)
- 	orr	x0, x0, x1
- alternative_else_nop_endif
-+
-+#ifdef CONFIG_ARM64_BTI_KERNEL
-+alternative_if ARM64_BTI
-+	orr	x0, x0, #SCTLR_EL2_BT
-+alternative_else_nop_endif
-+#endif /* CONFIG_ARM64_BTI_KERNEL */
-+
- 	msr	sctlr_el2, x0
- 	isb
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index 110f04627785..c41065a5a4bd 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -66,7 +66,7 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
- {
- 	void *start, *end, *virt = hyp_phys_to_virt(phys);
- 	unsigned long pgt_size = hyp_s1_pgtable_pages() << PAGE_SHIFT;
--	enum kvm_pgtable_prot prot;
-+	enum kvm_pgtable_prot prot = PAGE_HYP_EXEC;
- 	int ret, i;
- 
- 	/* Recreate the hyp page-table using the early page allocator */
-@@ -88,7 +88,11 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
- 	if (ret)
- 		return ret;
- 
--	ret = pkvm_create_mappings(__hyp_text_start, __hyp_text_end, PAGE_HYP_EXEC);
-+	/* Hypervisor text is mapped as guarded pages(GP). */
-+	if (IS_ENABLED(CONFIG_ARM64_BTI_KERNEL) && system_supports_bti())
-+		prot |= KVM_PGTABLE_PROT_GP_S1;
-+
-+	ret = pkvm_create_mappings(__hyp_text_start, __hyp_text_end, prot);
- 	if (ret)
- 		return ret;
- 
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 3d61bd3e591d..9f68e4ce6d14 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -152,6 +152,13 @@ static kvm_pte_t kvm_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
- 	return pte;
- }
- 
-+static kvm_pte_t hyp_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
-+{
-+	kvm_pte_t pte = kvm_init_valid_leaf_pte(pa, attr, level);
-+
-+	return pte | (attr & KVM_PGTABLE_PROT_GP_S1);
-+}
-+
- static kvm_pte_t kvm_init_invalid_leaf_owner(u8 owner_id)
- {
- 	return FIELD_PREP(KVM_INVALID_PTE_OWNER_MASK, owner_id);
-@@ -371,6 +378,8 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
- 
- 		if (device)
- 			return -EINVAL;
-+
-+		attr |= prot & KVM_PGTABLE_PROT_GP_S1;
- 	} else {
- 		attr |= KVM_PTE_LEAF_ATTR_HI_S1_XN;
- 	}
-@@ -414,7 +423,7 @@ static bool hyp_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
- 		return false;
- 
- 	data->phys += granule;
--	new = kvm_init_valid_leaf_pte(phys, data->attr, ctx->level);
-+	new = hyp_init_valid_leaf_pte(phys, data->attr, ctx->level);
- 	if (ctx->old == new)
- 		return true;
- 	if (!kvm_pte_valid(ctx->old))
--- 
-2.40.1.698.g37aff9b760-goog
 
+> Just to make this a quicker round trip, I hacked the following
+> together. If you agree with it, I'll stick it on top and get the ball
+> rolling.
+>=20
+> Thanks,
+>=20
+> 	M.
+>=20
+> From 9b830e7a3819c2771074bebe66c1d5f20394e3cc Mon Sep 17 00:00:00 2001
+> From: Marc Zyngier <maz@kernel.org>
+> Date: Wed, 5 Apr 2023 12:48:58 +0100
+> Subject: [PATCH] KVM: arm64: Expose SMC/HVC width to userspace
+>=20
+> When returning to userspace to handle a SMCCC call, we consistently
+> set PC to point to the instruction immediately after the HVC/SMC.
+>=20
+> However, should userspace need to know the exact address of the
+> trapping instruction, it needs to know about the *size* of that
+> instruction. For AArch64, this is pretty easy. For AArch32, this
+> is a bit more funky, as Thumb has 16bit encodings for both HVC
+> and SMC.
+>=20
+> Expose this to userspace with a new flag that directly derives
+> from ESR_EL2.IL. Also update the documentation to reflect the PC
+> state at the point of exit.
+>=20
+> Finally, this fixes a small buglet where the hypercall.{args,ret}
+> fields would not be cleared on exit, and could contain some
+> random junk.
+>=20
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  Documentation/virt/kvm/api.rst    |  8 ++++++++
+>  arch/arm64/include/uapi/asm/kvm.h |  3 ++-
+>  arch/arm64/kvm/hypercalls.c       | 16 +++++++++++-----
+>  3 files changed, 21 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/Documentation/virt/kvm/api.rst
+> b/Documentation/virt/kvm/api.rst
+> index c8ab2f730945..103f945959ed 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6244,6 +6244,14 @@ Definition of ``flags``:
+>     conduit to initiate the SMCCC call. If this bit is 0 then the guest
+>     used the HVC conduit for the SMCCC call.
+>=20
+> + - ``KVM_HYPERCALL_EXIT_16BIT``: Indicates that the guest used a 16bit
+> +   instruction to initiate the SMCCC call. If this bit is 0 then the
+> +   guest used a 32bit instruction. An AArch64 guest always has this
+> +   bit set to 0.
+> +
+> +At the point of exit, PC points to the instruction immediately following
+> +the trapping instruction.
+> +
+>  ::
+>=20
+>  		/* KVM_EXIT_TPR_ACCESS */
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h
+> b/arch/arm64/include/uapi/asm/kvm.h
+> index 3dcfa4bfdf83..b1c1edf85480 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -491,7 +491,8 @@ struct kvm_smccc_filter {
+>  };
+>=20
+>  /* arm64-specific KVM_EXIT_HYPERCALL flags */
+> -#define KVM_HYPERCALL_EXIT_SMC	(1U << 0)
+> +#define KVM_HYPERCALL_EXIT_SMC		(1U << 0)
+> +#define KVM_HYPERCALL_EXIT_16BIT	(1U << 1)
+>=20
+>  #endif
+>=20
+> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+> index 9a35d6d18193..3b6523f25afc 100644
+> --- a/arch/arm64/kvm/hypercalls.c
+> +++ b/arch/arm64/kvm/hypercalls.c
+> @@ -222,13 +222,19 @@ static void kvm_prepare_hypercall_exit(struct
+> kvm_vcpu *vcpu, u32 func_id)
+>  {
+>  	u8 ec =3D ESR_ELx_EC(kvm_vcpu_get_esr(vcpu));
+>  	struct kvm_run *run =3D vcpu->run;
+> -
+> -	run->exit_reason =3D KVM_EXIT_HYPERCALL;
+> -	run->hypercall.nr =3D func_id;
+> -	run->hypercall.flags =3D 0;
+> +	u64 flags =3D 0;
+>=20
+>  	if (ec =3D=3D ESR_ELx_EC_SMC32 || ec =3D=3D ESR_ELx_EC_SMC64)
+> -		run->hypercall.flags |=3D KVM_HYPERCALL_EXIT_SMC;
+> +		flags |=3D KVM_HYPERCALL_EXIT_SMC;
+> +
+> +	if (!kvm_vcpu_trap_il_is32bit(vcpu))
+> +		flags |=3D KVM_HYPERCALL_EXIT_16BIT;
+> +
+> +	run->exit_reason =3D KVM_EXIT_HYPERCALL;
+> +	run->hypercall =3D (typeof(run->hypercall)) {
+> +		.nr	=3D func_id,
+
+
+Earlier this was the place holder for the "immediate value"
+
+Best regards
+Salil
