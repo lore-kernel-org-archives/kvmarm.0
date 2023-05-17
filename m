@@ -1,316 +1,416 @@
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC8733F6
-	for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 22:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6137B2A9C0
+	for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 22:55:57 +0000 (UTC)
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-19a19778b09so585319fac.3
+        for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 15:55:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1684360828; x=1715896828;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=DMh2GnHy4DRlnnaezWyc0g3ItT6kGIdtxAftGGXw3s0=;
-  b=Fj9XaZVe+y6k1AMR5N56jxhgmd1lOPwtZssFMt/173hT0MMRTWX4eQyI
-   I8z3ND+sI12Zq4ASQPXCsYe3+cguNttBZu+ndpugOPlMX9uxvMzuIH4Hm
-   Iib1abrZhByZadS0ppKRdDoIDfFGbirwZ+cozIV2TZaUUaKzdTISwxJ+K
-   Y=;
-X-IronPort-AV: E=Sophos;i="5.99,283,1677542400"; 
-   d="scan'208";a="330777155"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-6e7a78d7.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2023 22:00:27 +0000
-Received: from EX19MTAUWC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-	by email-inbound-relay-iad-1e-m6i4x-6e7a78d7.us-east-1.amazon.com (Postfix) with ESMTPS id 81CE080FA0;
-	Wed, 17 May 2023 22:00:21 +0000 (UTC)
-Received: from EX19D030UWB001.ant.amazon.com (10.13.139.159) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Wed, 17 May 2023 22:00:21 +0000
-Received: from EX19D030UWB002.ant.amazon.com (10.13.139.182) by
- EX19D030UWB001.ant.amazon.com (10.13.139.159) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Wed, 17 May 2023 22:00:20 +0000
-Received: from EX19D030UWB002.ant.amazon.com ([fe80::8cbd:fcae:56ad:4dfa]) by
- EX19D030UWB002.ant.amazon.com ([fe80::8cbd:fcae:56ad:4dfa%6]) with mapi id
- 15.02.1118.026; Wed, 17 May 2023 22:00:20 +0000
-From: "Jitindar Singh, Suraj" <surajjs@amazon.com>
-To: "jingzhangos@google.com" <jingzhangos@google.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "maz@kernel.org" <maz@kernel.org>,
-	"oupton@google.com" <oupton@google.com>
-CC: "james.morse@arm.com" <james.morse@arm.com>, "suzuki.poulose@arm.com"
-	<suzuki.poulose@arm.com>, "rananta@google.com" <rananta@google.com>,
-	"tabba@google.com" <tabba@google.com>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "alexandru.elisei@arm.com" <alexandru.elisei@arm.com>,
-	"will@kernel.org" <will@kernel.org>, "reijiw@google.com" <reijiw@google.com>
-Subject: Re: [PATCH v8 6/6] KVM: arm64: Refactor writings for PMUVer/CSV2/CSV3
-Thread-Topic: [PATCH v8 6/6] KVM: arm64: Refactor writings for
- PMUVer/CSV2/CSV3
-Thread-Index: AQHZiQr5jQzeF1NLLE28Gk+kHNwsug==
-Date: Wed, 17 May 2023 22:00:20 +0000
-Message-ID: <b64e5639b1b9bb5e5e4ff8eaa10554ae0d9a6016.camel@amazon.com>
-References: <20230503171618.2020461-1-jingzhangos@google.com>
-	 <20230503171618.2020461-7-jingzhangos@google.com>
-In-Reply-To: <20230503171618.2020461-7-jingzhangos@google.com>
-Accept-Language: en-AU, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [10.187.170.32]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <EAFA9C87004A074997EE046DE8B842E8@amazon.com>
-Content-Transfer-Encoding: base64
+        d=google.com; s=20221208; t=1684364156; x=1686956156;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=46QpodnGSfHclqw+wxHyKFNt8ooXzRh8RHIYqYrx2+k=;
+        b=4+k/qgLfKUbMibjVom5X5UhnGbYr8SY7C4iqF+FjTJPLgxW+FBx+j8VsQMmRbh+LBM
+         4HY/nqXerEYNVykQDDyUKEf1PkTanAbpYJIp+6CT/R0xIDDxnZcIeD0cTsct/n+fL2/h
+         gIlyInibT0h0yvhStw/4gnW7b/RZCvz9SWM5wNrX9jexUtTLoi3zBHKDMpkQhjIvDpFJ
+         CwfGqoDlAf9LQwz/r8jjolXlVq/B2Tn/FfGXbwOnVHffKYY935TCVkIj93Bw33pWsqe3
+         1FmE1LGrNcQCwBuvA/GZyt4U2DHr4ZY8pslIiGPLv2es9DjvjwkhPWAW9XIJmIt+iSVI
+         zBbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684364156; x=1686956156;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=46QpodnGSfHclqw+wxHyKFNt8ooXzRh8RHIYqYrx2+k=;
+        b=jQ251vn/C2MNkFPgbNxV5hyM0C1pA/nNpWVZTEv+mOKZNDOz+iaLkCWmMj7kKhCbWf
+         nyft/GI64kRP96pXlWSyrJy+ML2k/WlF+rHD2jg17V9cWa4h90x2ap3+xJ3nP3jT3FXU
+         EaM0SUGVlUvAGMuygSKmn8hsMyaidv/N/ZiTrILYfvYXKcrxe/5cdZqhheB0rvVCpQo+
+         ElppYsOyLp66NLxLyjWhRuASlmyNyKgIco4XBEMGeYXaUyw14mfnMSUAIpZ6StpMB8Hm
+         I+CmXJJd7NI1pvY+Xf/JiLDbILtBsN2/9u7boebVAgQ7XNw+b0GGTNbzMKwsfvR4ooeB
+         svpQ==
+X-Gm-Message-State: AC+VfDwlPN8JQa8MRcAmVcXltmuNJfkyCb4T6ZtrvSQSxyY/oJB7TeZY
+	Gjf36YKjdnb62ma3M3qeOGhz6sb2VHnjN4BdLOYWAA==
+X-Google-Smtp-Source: ACHHUZ6H1ghtK0PMEZjs5hL/HFrkQgf3pKsDKz0W5jSHZcWf9yXXh6vAhTaYH2vuFwwQF5OoI3Y71eqWqEXYN2I/B3E=
+X-Received: by 2002:a05:6870:a891:b0:188:1195:5ec4 with SMTP id
+ eb17-20020a056870a89100b0018811955ec4mr158820oab.40.1684364156311; Wed, 17
+ May 2023 15:55:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+References: <20230503171618.2020461-1-jingzhangos@google.com>
+ <20230503171618.2020461-7-jingzhangos@google.com> <b64e5639b1b9bb5e5e4ff8eaa10554ae0d9a6016.camel@amazon.com>
+In-Reply-To: <b64e5639b1b9bb5e5e4ff8eaa10554ae0d9a6016.camel@amazon.com>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Wed, 17 May 2023 15:55:44 -0700
+Message-ID: <CAAdAUtibBVuMGhh9NEOxpEyMQ6bxde674ME+hHqERoT5hctETA@mail.gmail.com>
+Subject: Re: [PATCH v8 6/6] KVM: arm64: Refactor writings for PMUVer/CSV2/CSV3
+To: "Jitindar Singh, Suraj" <surajjs@amazon.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "maz@kernel.org" <maz@kernel.org>, 
+	"oupton@google.com" <oupton@google.com>, "james.morse@arm.com" <james.morse@arm.com>, 
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "rananta@google.com" <rananta@google.com>, 
+	"tabba@google.com" <tabba@google.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"alexandru.elisei@arm.com" <alexandru.elisei@arm.com>, "will@kernel.org" <will@kernel.org>, 
+	"reijiw@google.com" <reijiw@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-T24gV2VkLCAyMDIzLTA1LTAzIGF0IDE3OjE2ICswMDAwLCBKaW5nIFpoYW5nIHdyb3RlOgo+IFJl
-ZmFjdG9yIHdyaXRpbmdzIGZvciBJRF9BQTY0UEZSMF9FTDEuW0NTVjJ8Q1NWM10sCj4gSURfQUE2
-NERGUjBfRUwxLlBNVVZlciBhbmQgSURfREZSMF9FTEYuUGVyZk1vbiBiYXNlZCBvbiB1dGlsaXRp
-ZXMKPiBpbnRyb2R1Y2VkIGJ5IElEIHJlZ2lzdGVyIGRlc2NyaXB0b3IgYXJyYXkuCj4gCj4gU2ln
-bmVkLW9mZi1ieTogSmluZyBaaGFuZyA8amluZ3poYW5nb3NAZ29vZ2xlLmNvbT4KPiAtLS0KPiDC
-oGFyY2gvYXJtNjQvaW5jbHVkZS9hc20vY3B1ZmVhdHVyZS5oIHzCoMKgIDEgKwo+IMKgYXJjaC9h
-cm02NC9rZXJuZWwvY3B1ZmVhdHVyZS5jwqDCoMKgwqDCoCB8wqDCoCAyICstCj4gwqBhcmNoL2Fy
-bTY0L2t2bS9pZF9yZWdzLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwgMzYxICsrKysrKysrKysr
-KysrKysrKy0tLS0tLS0tCj4gLS0KPiDCoDMgZmlsZXMgY2hhbmdlZCwgMjQyIGluc2VydGlvbnMo
-KyksIDEyMiBkZWxldGlvbnMoLSkKPiAKPiAKClsgU05JUCBdCgo+IMKgCj4gK3N0YXRpYyB1NjQg
-cmVhZF9zYW5pdGlzZWRfaWRfYWE2NHBmcjBfZWwxKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPiAr
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY29uc3Qgc3RydWN0IHN5c19yZWdfZGVzYwo+ICpyZCkK
-PiArewo+ICvCoMKgwqDCoMKgwqDCoHU2NCB2YWw7Cj4gK8KgwqDCoMKgwqDCoMKgdTMyIGlkID0g
-cmVnX3RvX2VuY29kaW5nKHJkKTsKPiArCj4gK8KgwqDCoMKgwqDCoMKgdmFsID0gcmVhZF9zYW5p
-dGlzZWRfZnRyX3JlZyhpZCk7Cj4gK8KgwqDCoMKgwqDCoMKgLyoKPiArwqDCoMKgwqDCoMKgwqAg
-KiBUaGUgZGVmYXVsdCBpcyB0byBleHBvc2UgQ1NWMiA9PSAxIGlmIHRoZSBIVyBpc24ndAo+IGFm
-ZmVjdGVkLgo+ICvCoMKgwqDCoMKgwqDCoCAqIEFsdGhvdWdoIHRoaXMgaXMgYSBwZXItQ1BVIGZl
-YXR1cmUsIHdlIG1ha2UgaXQgZ2xvYmFsCj4gYmVjYXVzZQo+ICvCoMKgwqDCoMKgwqDCoCAqIGFz
-eW1tZXRyaWMgc3lzdGVtcyBhcmUganVzdCBhIG51aXNhbmNlLgo+ICvCoMKgwqDCoMKgwqDCoCAq
-Cj4gK8KgwqDCoMKgwqDCoMKgICogVXNlcnNwYWNlIGNhbiBvdmVycmlkZSB0aGlzIGFzIGxvbmcg
-YXMgaXQgZG9lc24ndCBwcm9taXNlCj4gK8KgwqDCoMKgwqDCoMKgICogdGhlIGltcG9zc2libGUu
-Cj4gK8KgwqDCoMKgwqDCoMKgICovCj4gK8KgwqDCoMKgwqDCoMKgaWYgKGFybTY0X2dldF9zcGVj
-dHJlX3YyX3N0YXRlKCkgPT0gU1BFQ1RSRV9VTkFGRkVDVEVEKSB7Cj4gK8KgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoHZhbCAmPSB+QVJNNjRfRkVBVFVSRV9NQVNLKElEX0FBNjRQRlIwX0VM
-MV9DU1YyKTsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgdmFsIHw9Cj4gRklFTERf
-UFJFUChBUk02NF9GRUFUVVJFX01BU0soSURfQUE2NFBGUjBfRUwxX0NTVjIpLCAxKTsKPiArwqDC
-oMKgwqDCoMKgwqB9Cj4gK8KgwqDCoMKgwqDCoMKgaWYgKGFybTY0X2dldF9tZWx0ZG93bl9zdGF0
-ZSgpID09IFNQRUNUUkVfVU5BRkZFQ1RFRCkgewo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqB2YWwgJj0gfkFSTTY0X0ZFQVRVUkVfTUFTSyhJRF9BQTY0UEZSMF9FTDFfQ1NWMyk7Cj4g
-K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHZhbCB8PQo+IEZJRUxEX1BSRVAoQVJNNjRf
-RkVBVFVSRV9NQVNLKElEX0FBNjRQRlIwX0VMMV9DU1YzKSwgMSk7Cj4gK8KgwqDCoMKgwqDCoMKg
-fQo+ICsKPiArwqDCoMKgwqDCoMKgwqB2YWwgJj0gfkFSTTY0X0ZFQVRVUkVfTUFTSyhJRF9BQTY0
-UEZSMF9FTDFfQU1VKTsKPiArCj4gK8KgwqDCoMKgwqDCoMKgcmV0dXJuIHZhbDsKPiArfQo+ICsK
-PiDCoHN0YXRpYyBpbnQgc2V0X2lkX2FhNjRwZnIwX2VsMShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUs
-Cj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJkLAo+IMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB1NjQgdmFsKQo+IMKg
-ewo+IC3CoMKgwqDCoMKgwqDCoHN0cnVjdCBrdm1fYXJjaCAqYXJjaCA9ICZ2Y3B1LT5rdm0tPmFy
-Y2g7Cj4gLcKgwqDCoMKgwqDCoMKgdTY0IHN2YWwgPSB2YWw7Cj4gwqDCoMKgwqDCoMKgwqDCoHU4
-IGNzdjIsIGNzdjM7Cj4gLcKgwqDCoMKgwqDCoMKgaW50IHJldCA9IDA7Cj4gwqAKPiDCoMKgwqDC
-oMKgwqDCoMKgLyoKPiDCoMKgwqDCoMKgwqDCoMKgICogQWxsb3cgQUE2NFBGUjBfRUwxLkNTVjIg
-dG8gYmUgc2V0IGZyb20gdXNlcnNwYWNlIGFzIGxvbmcKPiBhcwo+IEBAIC0yMjYsMjYgKzMzOCwz
-MCBAQCBzdGF0aWMgaW50IHNldF9pZF9hYTY0cGZyMF9lbDEoc3RydWN0IGt2bV92Y3B1Cj4gKnZj
-cHUsCj4gwqDCoMKgwqDCoMKgwqDCoGlmIChjc3YzID4gMSB8fCAoY3N2MyAmJiBhcm02NF9nZXRf
-bWVsdGRvd25fc3RhdGUoKSAhPQo+IFNQRUNUUkVfVU5BRkZFQ1RFRCkpCj4gwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm4gLUVJTlZBTDsKCkNhbid0IHdlIHJlbW92ZSB0aGUg
-Y2hlY2tpbmcgb2YgY3N2WzIzXSBoZXJlIGFzIGl0IHdpbGwgYmUgY2hlY2tlZCBieQphcm02NF9j
-aGVja19mZWF0dXJlcygpPwoKaS5lLiBpbiBhcm02NF9jaGVja19mZWF0dXJlcygpIHdlIHdpbGwg
-bG9hZCB0aGUgImxpbWl0IiB2YWx1ZSBmcm9tIHRoZQoicmVzZXQiIGZ1bmN0aW9uIChyZWFkX3Nh
-bml0aXNlZF9pZF9hYTY0cGZyMF9lbDEoKSkgd2hpY2ggaGFzIGNzdlsyM10Kc2V0IGFwcHJvcHJp
-YXRlbHkgYW5kIGxpbWl0IGl0IHRvIGEgc2FmZSB2YWx1ZSBiYXNpY2FsbHkgcGVyZm9ybWluZyB0
-aGUKc2FtZSBjaGVjayBhcyB3ZSBhcmUgaGVyZS4KCj4gwqAKPiAtwqDCoMKgwqDCoMKgwqBtdXRl
-eF9sb2NrKCZhcmNoLT5jb25maWdfbG9jayk7Cj4gLcKgwqDCoMKgwqDCoMKgLyogV2UgY2FuIG9u
-bHkgZGlmZmVyIHdpdGggQ1NWWzIzXSwgYW5kIGFueXRoaW5nIGVsc2UgaXMgYW4KPiBlcnJvciAq
-Lwo+IC3CoMKgwqDCoMKgwqDCoHZhbCBePSByZWFkX2lkX3JlZyh2Y3B1LCByZCk7Cj4gLcKgwqDC
-oMKgwqDCoMKgdmFsICY9IH4oQVJNNjRfRkVBVFVSRV9NQVNLKElEX0FBNjRQRlIwX0VMMV9DU1Yy
-KSB8Cj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBBUk02NF9GRUFUVVJFX01BU0so
-SURfQUE2NFBGUjBfRUwxX0NTVjMpKTsKPiAtwqDCoMKgwqDCoMKgwqBpZiAodmFsKSB7Cj4gLcKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldCA9IC1FSU5WQUw7Cj4gLcKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoGdvdG8gb3V0Owo+IC3CoMKgwqDCoMKgwqDCoH0KPiArwqDCoMKg
-wqDCoMKgwqByZXR1cm4gc2V0X2lkX3JlZyh2Y3B1LCByZCwgdmFsKTsKPiArfQo+IMKgCj4gLcKg
-wqDCoMKgwqDCoMKgLyogT25seSBhbGxvdyB1c2Vyc3BhY2UgdG8gY2hhbmdlIHRoZSBpZHJlZ3Mg
-YmVmb3JlIFZNCj4gcnVubmluZyAqLwo+IC3CoMKgwqDCoMKgwqDCoGlmICh0ZXN0X2JpdChLVk1f
-QVJDSF9GTEFHX0hBU19SQU5fT05DRSwgJnZjcHUtPmt2bS0KPiA+YXJjaC5mbGFncykpIHsKPiAt
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgaWYgKHN2YWwgIT0gcmVhZF9pZF9yZWcodmNw
-dSwgcmQpKQo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-cmV0ID0gLUVCVVNZOwo+IC3CoMKgwqDCoMKgwqDCoH0gZWxzZSB7Cj4gLcKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoElEUkVHKHZjcHUtPmt2bSwgcmVnX3RvX2VuY29kaW5nKHJkKSkgPSBz
-dmFsOwo+IC3CoMKgwqDCoMKgwqDCoH0KPiAtb3V0Ogo+IC3CoMKgwqDCoMKgwqDCoG11dGV4X3Vu
-bG9jaygmYXJjaC0+Y29uZmlnX2xvY2spOwo+IC3CoMKgwqDCoMKgwqDCoHJldHVybiByZXQ7Cj4g
-K3N0YXRpYyB1NjQgcmVhZF9zYW5pdGlzZWRfaWRfYWE2NGRmcjBfZWwxKHN0cnVjdCBrdm1fdmNw
-dSAqdmNwdSwKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY29uc3Qgc3RydWN0IHN5c19yZWdf
-ZGVzYwo+ICpyZCkKPiArewo+ICvCoMKgwqDCoMKgwqDCoHU2NCB2YWw7Cj4gK8KgwqDCoMKgwqDC
-oMKgdTMyIGlkID0gcmVnX3RvX2VuY29kaW5nKHJkKTsKPiArCj4gK8KgwqDCoMKgwqDCoMKgdmFs
-ID0gcmVhZF9zYW5pdGlzZWRfZnRyX3JlZyhpZCk7Cj4gK8KgwqDCoMKgwqDCoMKgLyogTGltaXQg
-ZGVidWcgdG8gQVJNdjguMCAqLwo+ICvCoMKgwqDCoMKgwqDCoHZhbCAmPSB+QVJNNjRfRkVBVFVS
-RV9NQVNLKElEX0FBNjRERlIwX0VMMV9EZWJ1Z1Zlcik7Cj4gK8KgwqDCoMKgwqDCoMKgdmFsIHw9
-Cj4gRklFTERfUFJFUChBUk02NF9GRUFUVVJFX01BU0soSURfQUE2NERGUjBfRUwxX0RlYnVnVmVy
-KSwgNik7Cj4gK8KgwqDCoMKgwqDCoMKgLyoKPiArwqDCoMKgwqDCoMKgwqAgKiBJbml0aWFsaXNl
-IHRoZSBkZWZhdWx0IFBNVXZlciBiZWZvcmUgdGhlcmUgaXMgYSBjaGFuY2UgdG8KPiArwqDCoMKg
-wqDCoMKgwqAgKiBjcmVhdGUgYW4gYWN0dWFsIFBNVS4KPiArwqDCoMKgwqDCoMKgwqAgKi8KPiAr
-wqDCoMKgwqDCoMKgwqB2YWwgJj0gfkFSTTY0X0ZFQVRVUkVfTUFTSyhJRF9BQTY0REZSMF9FTDFf
-UE1VVmVyKTsKPiArwqDCoMKgwqDCoMKgwqB2YWwgfD0gRklFTERfUFJFUChBUk02NF9GRUFUVVJF
-X01BU0soSURfQUE2NERGUjBfRUwxX1BNVVZlciksCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBrdm1fYXJtX3BtdV9nZXRfcG11dmVyX2xpbWl0KCkp
-Owo+ICvCoMKgwqDCoMKgwqDCoC8qIEhpZGUgU1BFIGZyb20gZ3Vlc3RzICovCj4gK8KgwqDCoMKg
-wqDCoMKgdmFsICY9IH5BUk02NF9GRUFUVVJFX01BU0soSURfQUE2NERGUjBfRUwxX1BNU1Zlcik7
-Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoHJldHVybiB2YWw7Cj4gwqB9Cj4gwqAKPiDCoHN0YXRpYyBp
-bnQgc2V0X2lkX2FhNjRkZnIwX2VsMShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCj4gQEAgLTI1NSw3
-ICszNzEsNiBAQCBzdGF0aWMgaW50IHNldF9pZF9hYTY0ZGZyMF9lbDEoc3RydWN0IGt2bV92Y3B1
-Cj4gKnZjcHUsCj4gwqDCoMKgwqDCoMKgwqDCoHN0cnVjdCBrdm1fYXJjaCAqYXJjaCA9ICZ2Y3B1
-LT5rdm0tPmFyY2g7Cj4gwqDCoMKgwqDCoMKgwqDCoHU4IHBtdXZlciwgaG9zdF9wbXV2ZXI7Cj4g
-wqDCoMKgwqDCoMKgwqDCoGJvb2wgdmFsaWRfcG11Owo+IC3CoMKgwqDCoMKgwqDCoHU2NCBzdmFs
-ID0gdmFsOwo+IMKgwqDCoMKgwqDCoMKgwqBpbnQgcmV0ID0gMDsKPiDCoAo+IMKgwqDCoMKgwqDC
-oMKgwqBob3N0X3BtdXZlciA9IGt2bV9hcm1fcG11X2dldF9wbXV2ZXJfbGltaXQoKTsKPiBAQCAt
-Mjc3LDQwICszOTIsNjEgQEAgc3RhdGljIGludCBzZXRfaWRfYWE2NGRmcjBfZWwxKHN0cnVjdCBr
-dm1fdmNwdQo+ICp2Y3B1LAo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmV0dXJu
-IC1FSU5WQUw7Cj4gwqAKPiDCoMKgwqDCoMKgwqDCoMKgbXV0ZXhfbG9jaygmYXJjaC0+Y29uZmln
-X2xvY2spOwo+IC3CoMKgwqDCoMKgwqDCoC8qIFdlIGNhbiBvbmx5IGRpZmZlciB3aXRoIFBNVXZl
-ciwgYW5kIGFueXRoaW5nIGVsc2UgaXMgYW4KPiBlcnJvciAqLwo+IC3CoMKgwqDCoMKgwqDCoHZh
-bCBePSByZWFkX2lkX3JlZyh2Y3B1LCByZCk7Cj4gLcKgwqDCoMKgwqDCoMKgdmFsICY9IH5BUk02
-NF9GRUFUVVJFX01BU0soSURfQUE2NERGUjBfRUwxX1BNVVZlcik7Cj4gLcKgwqDCoMKgwqDCoMKg
-aWYgKHZhbCkgewo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXQgPSAtRUlOVkFM
-Owo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBnb3RvIG91dDsKPiAtwqDCoMKgwqDC
-oMKgwqB9Cj4gLQo+IMKgwqDCoMKgwqDCoMKgwqAvKiBPbmx5IGFsbG93IHVzZXJzcGFjZSB0byBj
-aGFuZ2UgdGhlIGlkcmVncyBiZWZvcmUgVk0KPiBydW5uaW5nICovCj4gwqDCoMKgwqDCoMKgwqDC
-oGlmICh0ZXN0X2JpdChLVk1fQVJDSF9GTEFHX0hBU19SQU5fT05DRSwgJnZjcHUtPmt2bS0KPiA+
-YXJjaC5mbGFncykpIHsKPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgaWYgKHN2YWwg
-IT0gcmVhZF9pZF9yZWcodmNwdSwgcmQpKQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqBpZiAodmFsICE9IHJlYWRfaWRfcmVnKHZjcHUsIHJkKSkKPiDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXQgPSAtRUJVU1k7Cj4gLcKgwqDCoMKgwqDC
-oMKgfSBlbHNlIHsKPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgaWYgKHZhbGlkX3Bt
-dSkgewo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgdmFs
-ID0gSURSRUcodmNwdS0+a3ZtLCBTWVNfSURfQUE2NERGUjBfRUwxKTsKPiAtwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHZhbCAmPSB+SURfQUE2NERGUjBfRUwx
-X1BNVVZlcl9NQVNLOwo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgdmFsIHw9Cj4gRklFTERfUFJFUChJRF9BQTY0REZSMF9FTDFfUE1VVmVyX01BU0ssIHBt
-dXZlcik7Cj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBJ
-RFJFRyh2Y3B1LT5rdm0sIFNZU19JRF9BQTY0REZSMF9FTDEpID0gdmFsOwo+IC0KPiAtwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHZhbCA9IElEUkVHKHZjcHUt
-Pmt2bSwgU1lTX0lEX0RGUjBfRUwxKTsKPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoHZhbCAmPSB+SURfREZSMF9FTDFfUGVyZk1vbl9NQVNLOwo+IC3CoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgdmFsIHw9IEZJRUxEX1BS
-RVAoSURfREZSMF9FTDFfUGVyZk1vbl9NQVNLLAo+IHBtdXZlcl90b19wZXJmbW9uKHBtdXZlcikp
-Owo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgSURSRUco
-dmNwdS0+a3ZtLCBTWVNfSURfREZSMF9FTDEpID0gdmFsOwo+IC3CoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqB9IGVsc2Ugewo+IC0KPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgYXNzaWduX2JpdChLVk1fQVJDSF9GTEFHX1ZDUFVfSEFTX0lNUF9ERUZf
-UE1VLAo+ICZ2Y3B1LT5rdm0tPmFyY2guZmxhZ3MsCj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBwbXV2ZXIgPT0KPiBJ
-RF9BQTY0REZSMF9FTDFfUE1VVmVyX0lNUF9ERUYpOwo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqB9Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGdvdG8gb3V0Owo+ICvC
-oMKgwqDCoMKgwqDCoH0KPiArCj4gK8KgwqDCoMKgwqDCoMKgaWYgKCF2YWxpZF9wbXUpIHsKPiAr
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgLyoKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgICogSWdub3JlIHRoZSBQTVVWZXIgZmlsZWQgaW4gQHZhbC4gVGhlIFBNVVZlciB3
-b3VsZAoKTml0IHMvZmlsZWQvZmllbGQKCj4gYmUgZGV0ZXJtaW5lZAo+ICvCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgKiBieSBhcmNoIGZsYWdzIGJpdAo+IEtWTV9BUkNIX0ZMQUdfVkNQ
-VV9IQVNfSU1QX0RFRl9QTVUsCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqLwo+
-ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBwbXV2ZXIgPSBGSUVMRF9HRVQoSURfQUE2
-NERGUjBfRUwxX1BNVVZlcl9NQVNLLAo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgSURSRUcodmNwdS0+a3ZtLAo+IFNZ
-U19JRF9BQTY0REZSMF9FTDEpKTsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgdmFs
-ICY9IH5JRF9BQTY0REZSMF9FTDFfUE1VVmVyX01BU0s7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoHZhbCB8PSBGSUVMRF9QUkVQKElEX0FBNjRERlIwX0VMMV9QTVVWZXJfTUFTSywK
-PiBwbXV2ZXIpOwo+IMKgwqDCoMKgwqDCoMKgwqB9Cj4gwqAKPiArwqDCoMKgwqDCoMKgwqByZXQg
-PSBhcm02NF9jaGVja19mZWF0dXJlcyh2Y3B1LCByZCwgdmFsKTsKPiArwqDCoMKgwqDCoMKgwqBp
-ZiAocmV0KQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBnb3RvIG91dDsKPiArCj4g
-K8KgwqDCoMKgwqDCoMKgSURSRUcodmNwdS0+a3ZtLCBTWVNfSURfQUE2NERGUjBfRUwxKSA9IHZh
-bDsKPiArCj4gK8KgwqDCoMKgwqDCoMKgdmFsID0gSURSRUcodmNwdS0+a3ZtLCBTWVNfSURfREZS
-MF9FTDEpOwo+ICvCoMKgwqDCoMKgwqDCoHZhbCAmPSB+SURfREZSMF9FTDFfUGVyZk1vbl9NQVNL
-Owo+ICvCoMKgwqDCoMKgwqDCoHZhbCB8PSBGSUVMRF9QUkVQKElEX0RGUjBfRUwxX1BlcmZNb25f
-TUFTSywKPiBwbXV2ZXJfdG9fcGVyZm1vbihwbXV2ZXIpKTsKPiArwqDCoMKgwqDCoMKgwqBJRFJF
-Ryh2Y3B1LT5rdm0sIFNZU19JRF9ERlIwX0VMMSkgPSB2YWw7Cj4gKwo+ICvCoMKgwqDCoMKgwqDC
-oGlmICghdmFsaWRfcG11KQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBhc3NpZ25f
-Yml0KEtWTV9BUkNIX0ZMQUdfVkNQVV9IQVNfSU1QX0RFRl9QTVUsICZ2Y3B1LQo+ID5rdm0tPmFy
-Y2guZmxhZ3MsCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIHBtdXZlciA9PSBJRF9BQTY0REZSMF9FTDFfUE1VVmVyX0lNUF9ERUYpOwo+ICsKPiDC
-oG91dDoKPiDCoMKgwqDCoMKgwqDCoMKgbXV0ZXhfdW5sb2NrKCZhcmNoLT5jb25maWdfbG9jayk7
-Cj4gwqDCoMKgwqDCoMKgwqDCoHJldHVybiByZXQ7Cj4gwqB9Cj4gwqAKPiArc3RhdGljIHU2NCBy
-ZWFkX3Nhbml0aXNlZF9pZF9kZnIwX2VsMShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCj4gK8KgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCBjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZCkKPiArewo+ICvCoMKgwqDC
-oMKgwqDCoHU2NCB2YWw7Cj4gK8KgwqDCoMKgwqDCoMKgdTMyIGlkID0gcmVnX3RvX2VuY29kaW5n
-KHJkKTsKPiArCj4gK8KgwqDCoMKgwqDCoMKgdmFsID0gcmVhZF9zYW5pdGlzZWRfZnRyX3JlZyhp
-ZCk7Cj4gK8KgwqDCoMKgwqDCoMKgLyoKPiArwqDCoMKgwqDCoMKgwqAgKiBJbml0aWFsaXNlIHRo
-ZSBkZWZhdWx0IFBNVXZlciBiZWZvcmUgdGhlcmUgaXMgYSBjaGFuY2UgdG8KPiArwqDCoMKgwqDC
-oMKgwqAgKiBjcmVhdGUgYW4gYWN0dWFsIFBNVS4KPiArwqDCoMKgwqDCoMKgwqAgKi8KPiArwqDC
-oMKgwqDCoMKgwqB2YWwgJj0gfkFSTTY0X0ZFQVRVUkVfTUFTSyhJRF9ERlIwX0VMMV9QZXJmTW9u
-KTsKPiArwqDCoMKgwqDCoMKgwqB2YWwgfD0gRklFTERfUFJFUChBUk02NF9GRUFUVVJFX01BU0so
-SURfREZSMF9FTDFfUGVyZk1vbiksCj4ga3ZtX2FybV9wbXVfZ2V0X3BtdXZlcl9saW1pdCgpKTsK
-PiArCj4gK8KgwqDCoMKgwqDCoMKgcmV0dXJuIHZhbDsKPiArfQo+ICsKPiDCoHN0YXRpYyBpbnQg
-c2V0X2lkX2RmcjBfZWwxKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPiDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNvbnN0IHN0cnVjdCBzeXNfcmVn
-X2Rlc2MgKnJkLAo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqAgdTY0IHZhbCkKPiBAQCAtMzE4LDcgKzQ1NCw2IEBAIHN0YXRpYyBpbnQgc2V0X2lk
-X2RmcjBfZWwxKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPiDCoMKgwqDCoMKgwqDCoMKgc3RydWN0
-IGt2bV9hcmNoICphcmNoID0gJnZjcHUtPmt2bS0+YXJjaDsKPiDCoMKgwqDCoMKgwqDCoMKgdTgg
-cGVyZm1vbiwgaG9zdF9wZXJmbW9uOwo+IMKgwqDCoMKgwqDCoMKgwqBib29sIHZhbGlkX3BtdTsK
-PiAtwqDCoMKgwqDCoMKgwqB1NjQgc3ZhbCA9IHZhbDsKPiDCoMKgwqDCoMKgwqDCoMKgaW50IHJl
-dCA9IDA7Cj4gwqAKPiDCoMKgwqDCoMKgwqDCoMKgaG9zdF9wZXJmbW9uID0KPiBwbXV2ZXJfdG9f
-cGVyZm1vbihrdm1fYXJtX3BtdV9nZXRfcG11dmVyX2xpbWl0KCkpOwo+IEBAIC0zNDEsMzUgKzQ3
-NiwzOSBAQCBzdGF0aWMgaW50IHNldF9pZF9kZnIwX2VsMShzdHJ1Y3Qga3ZtX3ZjcHUKPiAqdmNw
-dSwKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldHVybiAtRUlOVkFMOwo+IMKg
-Cj4gwqDCoMKgwqDCoMKgwqDCoG11dGV4X2xvY2soJmFyY2gtPmNvbmZpZ19sb2NrKTsKPiAtwqDC
-oMKgwqDCoMKgwqAvKiBXZSBjYW4gb25seSBkaWZmZXIgd2l0aCBQZXJmTW9uLCBhbmQgYW55dGhp
-bmcgZWxzZSBpcyBhbgo+IGVycm9yICovCj4gLcKgwqDCoMKgwqDCoMKgdmFsIF49IHJlYWRfaWRf
-cmVnKHZjcHUsIHJkKTsKPiAtwqDCoMKgwqDCoMKgwqB2YWwgJj0gfkFSTTY0X0ZFQVRVUkVfTUFT
-SyhJRF9ERlIwX0VMMV9QZXJmTW9uKTsKPiAtwqDCoMKgwqDCoMKgwqBpZiAodmFsKSB7Cj4gLcKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldCA9IC1FSU5WQUw7Cj4gLcKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoGdvdG8gb3V0Owo+IC3CoMKgwqDCoMKgwqDCoH0KPiAtCj4gwqDC
-oMKgwqDCoMKgwqDCoC8qIE9ubHkgYWxsb3cgdXNlcnNwYWNlIHRvIGNoYW5nZSB0aGUgaWRyZWdz
-IGJlZm9yZSBWTQo+IHJ1bm5pbmcgKi8KPiDCoMKgwqDCoMKgwqDCoMKgaWYgKHRlc3RfYml0KEtW
-TV9BUkNIX0ZMQUdfSEFTX1JBTl9PTkNFLCAmdmNwdS0+a3ZtLQo+ID5hcmNoLmZsYWdzKSkgewo+
-IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBpZiAoc3ZhbCAhPSByZWFkX2lkX3JlZyh2
-Y3B1LCByZCkpCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGlmICh2YWwgIT0gcmVh
-ZF9pZF9yZWcodmNwdSwgcmQpKQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoHJldCA9IC1FQlVTWTsKPiAtwqDCoMKgwqDCoMKgwqB9IGVsc2Ugewo+IC3C
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBpZiAodmFsaWRfcG11KSB7Cj4gLcKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqB2YWwgPSBJRFJFRyh2Y3B1LT5r
-dm0sIFNZU19JRF9ERlIwX0VMMSk7Cj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqB2YWwgJj0gfklEX0RGUjBfRUwxX1BlcmZNb25fTUFTSzsKPiAtwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHZhbCB8PSBGSUVMRF9QUkVQ
-KElEX0RGUjBfRUwxX1BlcmZNb25fTUFTSywKPiBwZXJmbW9uKTsKPiAtwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoElEUkVHKHZjcHUtPmt2bSwgU1lTX0lEX0RG
-UjBfRUwxKSA9IHZhbDsKPiAtCj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqB2YWwgPSBJRFJFRyh2Y3B1LT5rdm0sIFNZU19JRF9BQTY0REZSMF9FTDEpOwo+
-IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgdmFsICY9IH5J
-RF9BQTY0REZSMF9FTDFfUE1VVmVyX01BU0s7Cj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqB2YWwgfD0KPiBGSUVMRF9QUkVQKElEX0FBNjRERlIwX0VMMV9Q
-TVVWZXJfTUFTSywgcGVyZm1vbl90b19wbXV2ZXIocGVyZm1vbikpOwo+IC3CoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgSURSRUcodmNwdS0+a3ZtLCBTWVNfSURf
-QUE2NERGUjBfRUwxKSA9IHZhbDsKPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgfSBl
-bHNlIHsKPiAtCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oGFzc2lnbl9iaXQoS1ZNX0FSQ0hfRkxBR19WQ1BVX0hBU19JTVBfREVGX1BNVSwKPiAmdmNwdS0+
-a3ZtLT5hcmNoLmZsYWdzLAo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcGVyZm1vbiA9PQo+IElEX0RGUjBfRUwxX1Bl
-cmZNb25fSU1QREVGKTsKPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgfQo+ICvCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBnb3RvIG91dDsKPiArwqDCoMKgwqDCoMKgwqB9Cj4g
-Kwo+ICvCoMKgwqDCoMKgwqDCoGlmICghdmFsaWRfcG11KSB7Cj4gK8KgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoC8qCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqIElnbm9y
-ZSB0aGUgUGVyZk1vbiBmaWxlZCBpbiBAdmFsLiBUaGUgUGVyZk1vbgoKTml0IHMvZmlsZWQvZmll
-bGQKCj4gd291bGQgYmUgZGV0ZXJtaW5lZAo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgKiBieSBhcmNoIGZsYWdzIGJpdAo+IEtWTV9BUkNIX0ZMQUdfVkNQVV9IQVNfSU1QX0RFRl9Q
-TVUsCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqLwo+ICvCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqBwZXJmbW9uID0gRklFTERfR0VUKElEX0RGUjBfRUwxX1BlcmZNb25f
-TUFTSywKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAgSURSRUcodmNwdS0+a3ZtLAo+IFNZU19JRF9ERlIwX0VMMSkp
-Owo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqB2YWwgJj0gfklEX0RGUjBfRUwxX1Bl
-cmZNb25fTUFTSzsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgdmFsIHw9IEZJRUxE
-X1BSRVAoSURfREZSMF9FTDFfUGVyZk1vbl9NQVNLLCBwZXJmbW9uKTsKPiDCoMKgwqDCoMKgwqDC
-oMKgfQo+IMKgCj4gK8KgwqDCoMKgwqDCoMKgcmV0ID0gYXJtNjRfY2hlY2tfZmVhdHVyZXModmNw
-dSwgcmQsIHZhbCk7Cj4gK8KgwqDCoMKgwqDCoMKgaWYgKHJldCkKPiArwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgZ290byBvdXQ7Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoElEUkVHKHZjcHUt
-Pmt2bSwgU1lTX0lEX0RGUjBfRUwxKSA9IHZhbDsKPiArCj4gK8KgwqDCoMKgwqDCoMKgdmFsID0g
-SURSRUcodmNwdS0+a3ZtLCBTWVNfSURfQUE2NERGUjBfRUwxKTsKPiArwqDCoMKgwqDCoMKgwqB2
-YWwgJj0gfklEX0FBNjRERlIwX0VMMV9QTVVWZXJfTUFTSzsKPiArwqDCoMKgwqDCoMKgwqB2YWwg
-fD0gRklFTERfUFJFUChJRF9BQTY0REZSMF9FTDFfUE1VVmVyX01BU0ssCj4gcGVyZm1vbl90b19w
-bXV2ZXIocGVyZm1vbikpOwo+ICvCoMKgwqDCoMKgwqDCoElEUkVHKHZjcHUtPmt2bSwgU1lTX0lE
-X0FBNjRERlIwX0VMMSkgPSB2YWw7Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoGlmICghdmFsaWRfcG11
-KQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBhc3NpZ25fYml0KEtWTV9BUkNIX0ZM
-QUdfVkNQVV9IQVNfSU1QX0RFRl9QTVUsICZ2Y3B1LQo+ID5rdm0tPmFyY2guZmxhZ3MsCj4gK8Kg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHBlcmZtb24g
-PT0gSURfREZSMF9FTDFfUGVyZk1vbl9JTVBERUYpOwo+ICsKPiDCoG91dDoKPiDCoMKgwqDCoMKg
-wqDCoMKgbXV0ZXhfdW5sb2NrKCZhcmNoLT5jb25maWdfbG9jayk7Cj4gwqDCoMKgwqDCoMKgwqDC
-oHJldHVybiByZXQ7CgpPdGhlcndpc2UgbG9va3MgZ29vZCEKClRoYW5rcywKU3VyYWoK
+Hi Suraj,
+
+On Wed, May 17, 2023 at 3:00=E2=80=AFPM Jitindar Singh, Suraj
+<surajjs@amazon.com> wrote:
+>
+> On Wed, 2023-05-03 at 17:16 +0000, Jing Zhang wrote:
+> > Refactor writings for ID_AA64PFR0_EL1.[CSV2|CSV3],
+> > ID_AA64DFR0_EL1.PMUVer and ID_DFR0_ELF.PerfMon based on utilities
+> > introduced by ID register descriptor array.
+> >
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  arch/arm64/include/asm/cpufeature.h |   1 +
+> >  arch/arm64/kernel/cpufeature.c      |   2 +-
+> >  arch/arm64/kvm/id_regs.c            | 361 ++++++++++++++++++--------
+> > --
+> >  3 files changed, 242 insertions(+), 122 deletions(-)
+> >
+> >
+>
+> [ SNIP ]
+>
+> >
+> > +static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+> > +                                         const struct sys_reg_desc
+> > *rd)
+> > +{
+> > +       u64 val;
+> > +       u32 id =3D reg_to_encoding(rd);
+> > +
+> > +       val =3D read_sanitised_ftr_reg(id);
+> > +       /*
+> > +        * The default is to expose CSV2 =3D=3D 1 if the HW isn't
+> > affected.
+> > +        * Although this is a per-CPU feature, we make it global
+> > because
+> > +        * asymmetric systems are just a nuisance.
+> > +        *
+> > +        * Userspace can override this as long as it doesn't promise
+> > +        * the impossible.
+> > +        */
+> > +       if (arm64_get_spectre_v2_state() =3D=3D SPECTRE_UNAFFECTED) {
+> > +               val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
+> > +               val |=3D
+> > FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2), 1);
+> > +       }
+> > +       if (arm64_get_meltdown_state() =3D=3D SPECTRE_UNAFFECTED) {
+> > +               val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
+> > +               val |=3D
+> > FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3), 1);
+> > +       }
+> > +
+> > +       val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU);
+> > +
+> > +       return val;
+> > +}
+> > +
+> >  static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+> >                                const struct sys_reg_desc *rd,
+> >                                u64 val)
+> >  {
+> > -       struct kvm_arch *arch =3D &vcpu->kvm->arch;
+> > -       u64 sval =3D val;
+> >         u8 csv2, csv3;
+> > -       int ret =3D 0;
+> >
+> >         /*
+> >          * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long
+> > as
+> > @@ -226,26 +338,30 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu
+> > *vcpu,
+> >         if (csv3 > 1 || (csv3 && arm64_get_meltdown_state() !=3D
+> > SPECTRE_UNAFFECTED))
+> >                 return -EINVAL;
+>
+> Can't we remove the checking of csv[23] here as it will be checked by
+> arm64_check_features()?
+>
+> i.e. in arm64_check_features() we will load the "limit" value from the
+> "reset" function (read_sanitised_id_aa64pfr0_el1()) which has csv[23]
+> set appropriately and limit it to a safe value basically performing the
+> same check as we are here.
+The limit and the check here might be different if like
+arm64_get_meltdown_state() is not SPECTRE_UNAFFECTED.
+i.e. if we remove the check here, theoretically, the csv3 can be set a
+value greater 1 if arm64_get_meltdown_state() is not
+SPECTRE_UNAFFECTED.
+>
+> >
+> > -       mutex_lock(&arch->config_lock);
+> > -       /* We can only differ with CSV[23], and anything else is an
+> > error */
+> > -       val ^=3D read_id_reg(vcpu, rd);
+> > -       val &=3D ~(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2) |
+> > -                ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3));
+> > -       if (val) {
+> > -               ret =3D -EINVAL;
+> > -               goto out;
+> > -       }
+> > +       return set_id_reg(vcpu, rd, val);
+> > +}
+> >
+> > -       /* Only allow userspace to change the idregs before VM
+> > running */
+> > -       if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &vcpu->kvm-
+> > >arch.flags)) {
+> > -               if (sval !=3D read_id_reg(vcpu, rd))
+> > -                       ret =3D -EBUSY;
+> > -       } else {
+> > -               IDREG(vcpu->kvm, reg_to_encoding(rd)) =3D sval;
+> > -       }
+> > -out:
+> > -       mutex_unlock(&arch->config_lock);
+> > -       return ret;
+> > +static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+> > +                                         const struct sys_reg_desc
+> > *rd)
+> > +{
+> > +       u64 val;
+> > +       u32 id =3D reg_to_encoding(rd);
+> > +
+> > +       val =3D read_sanitised_ftr_reg(id);
+> > +       /* Limit debug to ARMv8.0 */
+> > +       val &=3D ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer);
+> > +       val |=3D
+> > FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer), 6);
+> > +       /*
+> > +        * Initialise the default PMUver before there is a chance to
+> > +        * create an actual PMU.
+> > +        */
+> > +       val &=3D ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
+> > +       val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
+> > +                         kvm_arm_pmu_get_pmuver_limit());
+> > +       /* Hide SPE from guests */
+> > +       val &=3D ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMSVer);
+> > +
+> > +       return val;
+> >  }
+> >
+> >  static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+> > @@ -255,7 +371,6 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu
+> > *vcpu,
+> >         struct kvm_arch *arch =3D &vcpu->kvm->arch;
+> >         u8 pmuver, host_pmuver;
+> >         bool valid_pmu;
+> > -       u64 sval =3D val;
+> >         int ret =3D 0;
+> >
+> >         host_pmuver =3D kvm_arm_pmu_get_pmuver_limit();
+> > @@ -277,40 +392,61 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu
+> > *vcpu,
+> >                 return -EINVAL;
+> >
+> >         mutex_lock(&arch->config_lock);
+> > -       /* We can only differ with PMUver, and anything else is an
+> > error */
+> > -       val ^=3D read_id_reg(vcpu, rd);
+> > -       val &=3D ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
+> > -       if (val) {
+> > -               ret =3D -EINVAL;
+> > -               goto out;
+> > -       }
+> > -
+> >         /* Only allow userspace to change the idregs before VM
+> > running */
+> >         if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &vcpu->kvm-
+> > >arch.flags)) {
+> > -               if (sval !=3D read_id_reg(vcpu, rd))
+> > +               if (val !=3D read_id_reg(vcpu, rd))
+> >                         ret =3D -EBUSY;
+> > -       } else {
+> > -               if (valid_pmu) {
+> > -                       val =3D IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1);
+> > -                       val &=3D ~ID_AA64DFR0_EL1_PMUVer_MASK;
+> > -                       val |=3D
+> > FIELD_PREP(ID_AA64DFR0_EL1_PMUVer_MASK, pmuver);
+> > -                       IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) =3D val;
+> > -
+> > -                       val =3D IDREG(vcpu->kvm, SYS_ID_DFR0_EL1);
+> > -                       val &=3D ~ID_DFR0_EL1_PerfMon_MASK;
+> > -                       val |=3D FIELD_PREP(ID_DFR0_EL1_PerfMon_MASK,
+> > pmuver_to_perfmon(pmuver));
+> > -                       IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) =3D val;
+> > -               } else {
+> > -
+> >                        assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU,
+> > &vcpu->kvm->arch.flags,
+> > -                                  pmuver =3D=3D
+> > ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
+> > -               }
+> > +               goto out;
+> > +       }
+> > +
+> > +       if (!valid_pmu) {
+> > +               /*
+> > +                * Ignore the PMUVer filed in @val. The PMUVer would
+>
+> Nit s/filed/field
+Will fix.
+>
+> > be determined
+> > +                * by arch flags bit
+> > KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU,
+> > +                */
+> > +               pmuver =3D FIELD_GET(ID_AA64DFR0_EL1_PMUVer_MASK,
+> > +                                  IDREG(vcpu->kvm,
+> > SYS_ID_AA64DFR0_EL1));
+> > +               val &=3D ~ID_AA64DFR0_EL1_PMUVer_MASK;
+> > +               val |=3D FIELD_PREP(ID_AA64DFR0_EL1_PMUVer_MASK,
+> > pmuver);
+> >         }
+> >
+> > +       ret =3D arm64_check_features(vcpu, rd, val);
+> > +       if (ret)
+> > +               goto out;
+> > +
+> > +       IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) =3D val;
+> > +
+> > +       val =3D IDREG(vcpu->kvm, SYS_ID_DFR0_EL1);
+> > +       val &=3D ~ID_DFR0_EL1_PerfMon_MASK;
+> > +       val |=3D FIELD_PREP(ID_DFR0_EL1_PerfMon_MASK,
+> > pmuver_to_perfmon(pmuver));
+> > +       IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) =3D val;
+> > +
+> > +       if (!valid_pmu)
+> > +               assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu-
+> > >kvm->arch.flags,
+> > +                          pmuver =3D=3D ID_AA64DFR0_EL1_PMUVer_IMP_DEF=
+);
+> > +
+> >  out:
+> >         mutex_unlock(&arch->config_lock);
+> >         return ret;
+> >  }
+> >
+> > +static u64 read_sanitised_id_dfr0_el1(struct kvm_vcpu *vcpu,
+> > +                                     const struct sys_reg_desc *rd)
+> > +{
+> > +       u64 val;
+> > +       u32 id =3D reg_to_encoding(rd);
+> > +
+> > +       val =3D read_sanitised_ftr_reg(id);
+> > +       /*
+> > +        * Initialise the default PMUver before there is a chance to
+> > +        * create an actual PMU.
+> > +        */
+> > +       val &=3D ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
+> > +       val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon),
+> > kvm_arm_pmu_get_pmuver_limit());
+> > +
+> > +       return val;
+> > +}
+> > +
+> >  static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+> >                            const struct sys_reg_desc *rd,
+> >                            u64 val)
+> > @@ -318,7 +454,6 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+> >         struct kvm_arch *arch =3D &vcpu->kvm->arch;
+> >         u8 perfmon, host_perfmon;
+> >         bool valid_pmu;
+> > -       u64 sval =3D val;
+> >         int ret =3D 0;
+> >
+> >         host_perfmon =3D
+> > pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit());
+> > @@ -341,35 +476,39 @@ static int set_id_dfr0_el1(struct kvm_vcpu
+> > *vcpu,
+> >                 return -EINVAL;
+> >
+> >         mutex_lock(&arch->config_lock);
+> > -       /* We can only differ with PerfMon, and anything else is an
+> > error */
+> > -       val ^=3D read_id_reg(vcpu, rd);
+> > -       val &=3D ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
+> > -       if (val) {
+> > -               ret =3D -EINVAL;
+> > -               goto out;
+> > -       }
+> > -
+> >         /* Only allow userspace to change the idregs before VM
+> > running */
+> >         if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &vcpu->kvm-
+> > >arch.flags)) {
+> > -               if (sval !=3D read_id_reg(vcpu, rd))
+> > +               if (val !=3D read_id_reg(vcpu, rd))
+> >                         ret =3D -EBUSY;
+> > -       } else {
+> > -               if (valid_pmu) {
+> > -                       val =3D IDREG(vcpu->kvm, SYS_ID_DFR0_EL1);
+> > -                       val &=3D ~ID_DFR0_EL1_PerfMon_MASK;
+> > -                       val |=3D FIELD_PREP(ID_DFR0_EL1_PerfMon_MASK,
+> > perfmon);
+> > -                       IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) =3D val;
+> > -
+> > -                       val =3D IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1);
+> > -                       val &=3D ~ID_AA64DFR0_EL1_PMUVer_MASK;
+> > -                       val |=3D
+> > FIELD_PREP(ID_AA64DFR0_EL1_PMUVer_MASK, perfmon_to_pmuver(perfmon));
+> > -                       IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) =3D val;
+> > -               } else {
+> > -
+> >                        assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU,
+> > &vcpu->kvm->arch.flags,
+> > -                                  perfmon =3D=3D
+> > ID_DFR0_EL1_PerfMon_IMPDEF);
+> > -               }
+> > +               goto out;
+> > +       }
+> > +
+> > +       if (!valid_pmu) {
+> > +               /*
+> > +                * Ignore the PerfMon filed in @val. The PerfMon
+>
+> Nit s/filed/field
+Thanks, will fix it.
+>
+> > would be determined
+> > +                * by arch flags bit
+> > KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU,
+> > +                */
+> > +               perfmon =3D FIELD_GET(ID_DFR0_EL1_PerfMon_MASK,
+> > +                                   IDREG(vcpu->kvm,
+> > SYS_ID_DFR0_EL1));
+> > +               val &=3D ~ID_DFR0_EL1_PerfMon_MASK;
+> > +               val |=3D FIELD_PREP(ID_DFR0_EL1_PerfMon_MASK, perfmon);
+> >         }
+> >
+> > +       ret =3D arm64_check_features(vcpu, rd, val);
+> > +       if (ret)
+> > +               goto out;
+> > +
+> > +       IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) =3D val;
+> > +
+> > +       val =3D IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1);
+> > +       val &=3D ~ID_AA64DFR0_EL1_PMUVer_MASK;
+> > +       val |=3D FIELD_PREP(ID_AA64DFR0_EL1_PMUVer_MASK,
+> > perfmon_to_pmuver(perfmon));
+> > +       IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) =3D val;
+> > +
+> > +       if (!valid_pmu)
+> > +               assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu-
+> > >kvm->arch.flags,
+> > +                          perfmon =3D=3D ID_DFR0_EL1_PerfMon_IMPDEF);
+> > +
+> >  out:
+> >         mutex_unlock(&arch->config_lock);
+> >         return ret;
+>
+> Otherwise looks good!
+>
+> Thanks,
+> Suraj
+
+Thanks,
+Jing
