@@ -1,152 +1,232 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D33431133
-	for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 17:36:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1684344963;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=puQWJvhyxYukjytjCrrZQqa3KW6zW1mGsvpp553sZtw=;
-	b=fUO3lmQDbBgUNVmUimCg0UQbCIlZTwN53d1ADDfKV8LR0EFY2ZAZ28zUo2Kz1dJAD/JG85
-	o6LVpSXUhDm6LNRGTn0n4kL9CIunGDxV0/90j2vS8tOmmV1skHM07hYZz/4qqtRbuZ75xE
-	bKbTAp4VWIpN7WGknpxDOXNMN1DllOM=
-Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com
- [209.85.222.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-444-3E-0MyyfOvmDO9gNcO61cQ-1; Wed, 17 May 2023 13:36:02 -0400
-X-MC-Unique: 3E-0MyyfOvmDO9gNcO61cQ-1
-Received: by mail-ua1-f69.google.com with SMTP id a1e0cc1a2514c-780fcc24da9so363204241.0
-        for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 10:36:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5580C31133
+	for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 17:36:18 +0000 (UTC)
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3062b468a36so436025f8f.1
+        for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 10:36:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1684344976; x=1686936976;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=5uJJv3crY452Cbw+h/uO2M9ipntFn8IiofxC6JQaalg=;
+        b=oTfhi1BZqEqlbSyRZKsaZbxyoT1XGLw0ndFlgxV1Ih5MfIvb9saj+Q8te1b2ZHQWug
+         5AuE7O1jzuWUbCBIcNQX5f4N+yYwOI/x6Ylr69+w7Zq9mDiDpeXrPthRBLmUI2pAcC9f
+         PqsrGGBT1WCMauB0c8AGEG5xE/woeUlAdhNBrjkH3E6YGS5JhbiTIc7HTS5rpzimnnEC
+         Lqv0tw6nPERm6RqH9V+PpS7OgADjWBbMiyoP2lk+K551bdcDZD1nobGj686zIDv1jjpJ
+         co/Kpd6jk9In8B5tXNLaUmMIovihIySZ4ecE0lvpjPDJ3o2EY4ygh2CZDFDIYiw5s2z/
+         GriQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684344961; x=1686936961;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=puQWJvhyxYukjytjCrrZQqa3KW6zW1mGsvpp553sZtw=;
-        b=DYCOPlbWJQ94B7E6aqFXEHaZsKcoa3QCa2rD4AYnsnhsN5DvJrnpC5O9N3cinIvVvG
-         3lJCF6CKDkPvTTMZ2bx6OM/PojXOrhLfaXAH6U0Mb9rES1uDt17O9VP8YM2abo17q8lZ
-         hfSe6bJi7/eZ+Sp/JYOcU3bBhpz3LXr/wpInID3n9VElYhoK/wScFjZf++Q3QaBAWuIP
-         K7r7U7mtPKfCKiVWmCvuMfByZdNqPA/USakoGZxLymCOZsig5p7sfedO1c4NDrAT10GN
-         jqxsj5pICSqzGLByfjC21BSga4HzoQnQtd1Ib8ji+owHRkUsLO9ep7mWTCswXFOBIk9U
-         i71g==
-X-Gm-Message-State: AC+VfDz4HSpiiu3UOLZIihgLa5oAqDFgHj5N5h+5BCcyGIMNBRTyhx6+
-	B4/ecxRYgPad4AbHMCU1Nt6pzxdbim6ugbH/LV8961XkFG5otcNv6E7iJOl9c5ZcEnym0SM2jDE
-	gbETSO0QT1XsBAuxtrIfBqtPC6J40oR+B
-X-Received: by 2002:a67:e988:0:b0:436:1e1:685e with SMTP id b8-20020a67e988000000b0043601e1685emr13994172vso.28.1684344961432;
-        Wed, 17 May 2023 10:36:01 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5CBOO9lrZpm38AXv4U8EwjpqzO9e3cjzo4meH70K3KkFLoiIuh6P2clRvBZTGyw+vABcuwrE5EAB3pyttPA9c=
-X-Received: by 2002:a67:e988:0:b0:436:1e1:685e with SMTP id
- b8-20020a67e988000000b0043601e1685emr13994153vso.28.1684344961140; Wed, 17
- May 2023 10:36:01 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1684344976; x=1686936976;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5uJJv3crY452Cbw+h/uO2M9ipntFn8IiofxC6JQaalg=;
+        b=TydrQCKxLr0xzoN/97hn53ZJZg5RQ5ver+XqxM1puxSC1u106FNtNBvsB6eTO7nzIg
+         KM6ppDa39/ONclKxc3LXRJWBU/KhNLtS++9zO86cykZzF2yaiI+4uNdohHI1cYngVlQM
+         I2hkGuRdZZfTH0B+voyNqwlcTtyqTwj04omzuBB1HBAPA8oZ29QAaVrWROWz1mQ7BXSh
+         yDPPdXBUWEUKlkjgYlr505i6HpDeK6tTpwmI4mSZhrzLk3cL5jQjPvDsBlbSAaImvxk0
+         Lfa+kfaL7rK1SFsBoKAjeSJnfu0U4qmvs9pELb5kBcTN8HQMbGdyKWQ8Gez8LBDAh/ii
+         Gopg==
+X-Gm-Message-State: AC+VfDxpNVURAOIcqI74JfQmGuHyuFyjlbkIw/UnE03UirzCBHwmCqvV
+	s3FPDtWxGXKJAgmbnqdfXX6yzpBzuK5kdQ==
+X-Google-Smtp-Source: ACHHUZ6C/5xTtdIqstRhu/xWULwybxRbU5ExPUfg4iVpV0C5ry5eK1AJFKWXZsdClO5EAEDhW6Hu4Njz/NJ5hQ==
+X-Received: from mostafa.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:333c])
+ (user=smostafa job=sendgmr) by 2002:a5d:5272:0:b0:2fe:9a9f:195b with SMTP id
+ l18-20020a5d5272000000b002fe9a9f195bmr247714wrc.5.1684344976634; Wed, 17 May
+ 2023 10:36:16 -0700 (PDT)
+Date: Wed, 17 May 2023 17:35:52 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230511143638.350228-1-maz@kernel.org>
-In-Reply-To: <20230511143638.350228-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 17 May 2023 19:35:50 +0200
-Message-ID: <CABgObfYAHbrPJuSHFum4kkeHSb1Msh0u3-6BoOUZVGX6wVd7OQ@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.4, take #1
-To: Marc Zyngier <maz@kernel.org>
-Cc: Christophe JAILLET <christophe.jaillet@wanadoo.fr>, Jingyu Wang <jingyuwang_vip@163.com>, 
-	Mark Brown <broonie@kernel.org>, Mukesh Ojha <quic_mojha@quicinc.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.40.1.698.g37aff9b760-goog
+Message-ID: <20230517173552.163711-1-smostafa@google.com>
+Subject: [PATCH v2] KVM: arm64: Use BTI for nvhe
+From: Mostafa Saleh <smostafa@google.com>
+To: maz@kernel.org, oliver.upton@linux.dev, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Cc: tabba@google.com, qperret@google.com, will@kernel.org, 
+	catalin.marinas@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, 
+	james.morse@arm.com, bgardon@google.com, gshan@redhat.com, 
+	Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 11, 2023 at 4:37=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
-:
->
-> Paolo,
->
-> Here's a first set of fixes, most of which has been simmering in -next
-> for some time now. The most important one is a series from Oliver,
-> plugging a (hard to trigger) race that would result in the wrong
-> mapping being established at S2.
->
-> The rest is a bunch of cleanups and HW workarounds (the usual Apple
-> vgic issue that keeps cropping up on new SoCs).
->
-> Please pull,
+CONFIG_ARM64_BTI_KERNEL compiles the kernel to support ARMv8.5-BTI.
+However, the nvhe code doesn't make use of it as it doesn't map any
+pages with Guarded Page(GP) bit.
 
-Done, thanks.
+This patch maps nvhe(and pKVM recreated mapping of) .text section
+with GP bit which matches the kernel handling for BTI.
 
-Paolo
+A new flag is added to enum kvm_pgtable_prot: KVM_PGTABLE_PROT_GP_S1,
+which represents BTI guarded page in hypervisor stage-1 page table.
 
-> The following changes since commit ac9a78681b921877518763ba0e89202254349d=
-1b:
->
->   Linux 6.4-rc1 (2023-05-07 13:34:35 -0700)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
-marm-fixes-6.4-1
->
-> for you to fetch changes up to c3a62df457ff9ac8c77efe6d1eca2855d399355d:
->
->   Merge branch kvm-arm64/pgtable-fixes-6.4 into kvmarm-master/fixes (2023=
--05-11 15:26:01 +0100)
->
-> ----------------------------------------------------------------
-> KVM/arm64 fixes for 6.4, take #1
->
-> - Plug a race in the stage-2 mapping code where the IPA and the PA
->   would end up being out of sync
->
-> - Make better use of the bitmap API (bitmap_zero, bitmap_zalloc...)
->
-> - FP/SVE/SME documentation update, in the hope that this field
->   becomes clearer...
->
-> - Add workaround for the usual Apple SEIS brokenness
->
-> - Random comment fixes
->
-> ----------------------------------------------------------------
-> Christophe JAILLET (2):
->       KVM: arm64: Slightly optimize flush_context()
->       KVM: arm64: Use the bitmap API to allocate bitmaps
->
-> Jingyu Wang (1):
->       KVM: arm64: Fix repeated words in comments
->
-> Marc Zyngier (4):
->       KVM: arm64: Constify start/end/phys fields of the pgtable walker da=
-ta
->       KVM: arm64: vgic: Add Apple M2 PRO/MAX cpus to the list of broken S=
-EIS implementations
->       Merge branch kvm-arm64/misc-6.4 into kvmarm-master/fixes
->       Merge branch kvm-arm64/pgtable-fixes-6.4 into kvmarm-master/fixes
->
-> Mark Brown (3):
->       KVM: arm64: Document check for TIF_FOREIGN_FPSTATE
->       KVM: arm64: Restructure check for SVE support in FP trap handler
->       KVM: arm64: Clarify host SME state management
->
-> Oliver Upton (2):
->       KVM: arm64: Infer the PA offset from IPA in stage-2 map walker
->       KVM: arm64: Infer PA offset from VA in hyp map walker
->
->  arch/arm64/include/asm/cputype.h        |  8 +++++++
->  arch/arm64/include/asm/kvm_pgtable.h    |  1 +
->  arch/arm64/kvm/fpsimd.c                 | 26 +++++++++++++--------
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 12 ++++++++--
->  arch/arm64/kvm/hyp/pgtable.c            | 41 +++++++++++++++++++++++++--=
-------
->  arch/arm64/kvm/inject_fault.c           |  2 +-
->  arch/arm64/kvm/vgic/vgic-v3.c           |  4 ++++
->  arch/arm64/kvm/vmid.c                   |  7 +++---
->  8 files changed, 76 insertions(+), 25 deletions(-)
->
+At hyp init, SCTLR_EL2.BT is set to 1 to match EL1 configuration
+(SCTLR_EL1.BT1) set in bti_enable().
+
+hyp_init_valid_leaf_pte is added to avoid unnecessary considering GP
+bit for stage-2.
+
+Signed-off-by: Mostafa Saleh <smostafa@google.com>
+---
+v1 -> v2:
+- Enable BTI for nvhe also.
+- Only set GP bit for executable pages from pgtable code.
+- Set SCTLR_EL2.BT when BTI is used.
+- use system_supports_bti() for consistency.
+- Add hyp_init_valid_leaf_pte.
+v1: https://lore.kernel.org/all/20230516141846.792193-1-smostafa@google.com/
+---
+ arch/arm64/include/asm/kvm_pgtable.h |  3 +++
+ arch/arm64/include/asm/sysreg.h      |  1 +
+ arch/arm64/kvm/arm.c                 |  7 ++++++-
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S   |  7 +++++++
+ arch/arm64/kvm/hyp/nvhe/setup.c      |  8 ++++++--
+ arch/arm64/kvm/hyp/pgtable.c         | 11 ++++++++++-
+ 6 files changed, 33 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index 4cd6762bda80..5bcd06d664d3 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -151,6 +151,7 @@ enum kvm_pgtable_stage2_flags {
+  * @KVM_PGTABLE_PROT_W:		Write permission.
+  * @KVM_PGTABLE_PROT_R:		Read permission.
+  * @KVM_PGTABLE_PROT_DEVICE:	Device attributes.
++ * @KVM_PGTABLE_PROT_GP_S1:	GP(guarded page) used for BTI in stage-1 only
+  * @KVM_PGTABLE_PROT_SW0:	Software bit 0.
+  * @KVM_PGTABLE_PROT_SW1:	Software bit 1.
+  * @KVM_PGTABLE_PROT_SW2:	Software bit 2.
+@@ -163,6 +164,8 @@ enum kvm_pgtable_prot {
+ 
+ 	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
+ 
++	KVM_PGTABLE_PROT_GP_S1			= BIT(50),
++
+ 	KVM_PGTABLE_PROT_SW0			= BIT(55),
+ 	KVM_PGTABLE_PROT_SW1			= BIT(56),
+ 	KVM_PGTABLE_PROT_SW2			= BIT(57),
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index e72d9aaab6b1..204124ce86c4 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -558,6 +558,7 @@
+ 			 (BIT(18)) | (BIT(22)) | (BIT(23)) | (BIT(28)) | \
+ 			 (BIT(29)))
+ 
++#define SCTLR_EL2_BT	(BIT(36))
+ #ifdef CONFIG_CPU_BIG_ENDIAN
+ #define ENDIAN_SET_EL2		SCTLR_ELx_EE
+ #else
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 14391826241c..60c770030b33 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2073,6 +2073,7 @@ static int __init init_hyp_mode(void)
+ 	u32 hyp_va_bits;
+ 	int cpu;
+ 	int err = -ENOMEM;
++	enum kvm_pgtable_prot text_prot = PAGE_HYP_EXEC;
+ 
+ 	/*
+ 	 * The protected Hyp-mode cannot be initialized if the memory pool
+@@ -2124,8 +2125,12 @@ static int __init init_hyp_mode(void)
+ 	/*
+ 	 * Map the Hyp-code called directly from the host
+ 	 */
++	if (IS_ENABLED(CONFIG_ARM64_BTI_KERNEL) && system_supports_bti())
++		text_prot |= KVM_PGTABLE_PROT_GP_S1;
++
+ 	err = create_hyp_mappings(kvm_ksym_ref(__hyp_text_start),
+-				  kvm_ksym_ref(__hyp_text_end), PAGE_HYP_EXEC);
++				  kvm_ksym_ref(__hyp_text_end), text_prot);
++
+ 	if (err) {
+ 		kvm_err("Cannot map world-switch code\n");
+ 		goto out_err;
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+index a6d67c2bb5ae..e89b694bd8eb 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+@@ -128,6 +128,13 @@ alternative_if ARM64_HAS_ADDRESS_AUTH
+ 		     SCTLR_ELx_ENDA | SCTLR_ELx_ENDB)
+ 	orr	x0, x0, x1
+ alternative_else_nop_endif
++
++#ifdef CONFIG_ARM64_BTI_KERNEL
++alternative_if ARM64_BTI
++	orr	x0, x0, #SCTLR_EL2_BT
++alternative_else_nop_endif
++#endif /* CONFIG_ARM64_BTI_KERNEL */
++
+ 	msr	sctlr_el2, x0
+ 	isb
+ 
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index 110f04627785..c41065a5a4bd 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -66,7 +66,7 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
+ {
+ 	void *start, *end, *virt = hyp_phys_to_virt(phys);
+ 	unsigned long pgt_size = hyp_s1_pgtable_pages() << PAGE_SHIFT;
+-	enum kvm_pgtable_prot prot;
++	enum kvm_pgtable_prot prot = PAGE_HYP_EXEC;
+ 	int ret, i;
+ 
+ 	/* Recreate the hyp page-table using the early page allocator */
+@@ -88,7 +88,11 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = pkvm_create_mappings(__hyp_text_start, __hyp_text_end, PAGE_HYP_EXEC);
++	/* Hypervisor text is mapped as guarded pages(GP). */
++	if (IS_ENABLED(CONFIG_ARM64_BTI_KERNEL) && system_supports_bti())
++		prot |= KVM_PGTABLE_PROT_GP_S1;
++
++	ret = pkvm_create_mappings(__hyp_text_start, __hyp_text_end, prot);
+ 	if (ret)
+ 		return ret;
+ 
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 3d61bd3e591d..9f68e4ce6d14 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -152,6 +152,13 @@ static kvm_pte_t kvm_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
+ 	return pte;
+ }
+ 
++static kvm_pte_t hyp_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
++{
++	kvm_pte_t pte = kvm_init_valid_leaf_pte(pa, attr, level);
++
++	return pte | (attr & KVM_PGTABLE_PROT_GP_S1);
++}
++
+ static kvm_pte_t kvm_init_invalid_leaf_owner(u8 owner_id)
+ {
+ 	return FIELD_PREP(KVM_INVALID_PTE_OWNER_MASK, owner_id);
+@@ -371,6 +378,8 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
+ 
+ 		if (device)
+ 			return -EINVAL;
++
++		attr |= prot & KVM_PGTABLE_PROT_GP_S1;
+ 	} else {
+ 		attr |= KVM_PTE_LEAF_ATTR_HI_S1_XN;
+ 	}
+@@ -414,7 +423,7 @@ static bool hyp_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+ 		return false;
+ 
+ 	data->phys += granule;
+-	new = kvm_init_valid_leaf_pte(phys, data->attr, ctx->level);
++	new = hyp_init_valid_leaf_pte(phys, data->attr, ctx->level);
+ 	if (ctx->old == new)
+ 		return true;
+ 	if (!kvm_pte_valid(ctx->old))
+-- 
+2.40.1.698.g37aff9b760-goog
 
