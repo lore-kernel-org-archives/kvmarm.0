@@ -1,247 +1,152 @@
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0FEA111A1
-	for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 16:28:39 +0000 (UTC)
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-6a984993740so481610a34.2
-        for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 09:28:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684340919; x=1686932919;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3QgUHhC4JatePpcTmhPB3qhllcSFBfrYsd2mZsiUSGc=;
-        b=vForUt72iRFRfuNzyPSOkOdHSHW+KeeVPAQzYm8GDTh4fK7hhWNqnDnU8JNPrLzexH
-         0bMUs0d8vmQwHReADr5ObxWyXaOFcass3YqBtHgor4veie2rAjny7MrgJlualP6RHgWR
-         rFadfAj7xtIIntrNuHZeveXA8bDM/hYhMHkX7eoWvI1CkK6gfn9Kx6flDkntHHaoAsbO
-         yWjXfQ4CpcK5385D1AeiOFUh8+rIzivtuA+jiq4iiX3HadlPZklW7dy/b+67Q0pFtvrh
-         4gB8c40wgz8kD8J1gV11P85VsbCjJfCL8ldHwBMVXjqaurDgM1X1MoyMktE/RvbLTt5r
-         Ot/A==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D33431133
+	for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 17:36:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1684344963;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=puQWJvhyxYukjytjCrrZQqa3KW6zW1mGsvpp553sZtw=;
+	b=fUO3lmQDbBgUNVmUimCg0UQbCIlZTwN53d1ADDfKV8LR0EFY2ZAZ28zUo2Kz1dJAD/JG85
+	o6LVpSXUhDm6LNRGTn0n4kL9CIunGDxV0/90j2vS8tOmmV1skHM07hYZz/4qqtRbuZ75xE
+	bKbTAp4VWIpN7WGknpxDOXNMN1DllOM=
+Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com
+ [209.85.222.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-444-3E-0MyyfOvmDO9gNcO61cQ-1; Wed, 17 May 2023 13:36:02 -0400
+X-MC-Unique: 3E-0MyyfOvmDO9gNcO61cQ-1
+Received: by mail-ua1-f69.google.com with SMTP id a1e0cc1a2514c-780fcc24da9so363204241.0
+        for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 10:36:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684340919; x=1686932919;
+        d=1e100.net; s=20221208; t=1684344961; x=1686936961;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3QgUHhC4JatePpcTmhPB3qhllcSFBfrYsd2mZsiUSGc=;
-        b=OVLSwjczemk9KK62I9/YAsRdwuXmWLqLUv4lYibKWA3HQRyausBErRCLO6ONV9uAPf
-         epuAV5HUJsO0q8RVlau4sJ3i14rZDE4rdkFxoZm1o2jafyiY2RStP0hy7uszAUNh7dTx
-         d4qkS5dl+NTukDzrtKCBx43/ss0Y/n35926gXpAOUE3O30KKr58uMAz3AebfIconbKBe
-         do2WTs0k2pSYLEfKm0Rr9gddCabJAswUFNlFOzcHdkpx4iRSqQ3AOQAVvKPsXivgS5kG
-         UOnhyqlmVjs+JbCskb37AfsiU9Dp30hwpMBIRECY4SegpTSh2CKWB/aL0faX3kPm4aye
-         3VLA==
-X-Gm-Message-State: AC+VfDx+UDJ3RyD4o+jfgwgA9TwGg48Zx1SH4OI86p8ocbTU/RQK4fhu
-	KkqL4S3Y9qpgeoXvwi66xs9C7wToSRriSvQGgBIkmA==
-X-Google-Smtp-Source: ACHHUZ5B62w2XtjEh1j0FNvdywiAs5+OnqxjGaWSdNJK+6Pq2+zsclWBeVt3S+tVM3V1rTWfp8jDzER1615TvtFA0iY=
-X-Received: by 2002:a05:6808:1599:b0:396:63a:a715 with SMTP id
- t25-20020a056808159900b00396063aa715mr6419455oiw.56.1684340918674; Wed, 17
- May 2023 09:28:38 -0700 (PDT)
+        bh=puQWJvhyxYukjytjCrrZQqa3KW6zW1mGsvpp553sZtw=;
+        b=DYCOPlbWJQ94B7E6aqFXEHaZsKcoa3QCa2rD4AYnsnhsN5DvJrnpC5O9N3cinIvVvG
+         3lJCF6CKDkPvTTMZ2bx6OM/PojXOrhLfaXAH6U0Mb9rES1uDt17O9VP8YM2abo17q8lZ
+         hfSe6bJi7/eZ+Sp/JYOcU3bBhpz3LXr/wpInID3n9VElYhoK/wScFjZf++Q3QaBAWuIP
+         K7r7U7mtPKfCKiVWmCvuMfByZdNqPA/USakoGZxLymCOZsig5p7sfedO1c4NDrAT10GN
+         jqxsj5pICSqzGLByfjC21BSga4HzoQnQtd1Ib8ji+owHRkUsLO9ep7mWTCswXFOBIk9U
+         i71g==
+X-Gm-Message-State: AC+VfDz4HSpiiu3UOLZIihgLa5oAqDFgHj5N5h+5BCcyGIMNBRTyhx6+
+	B4/ecxRYgPad4AbHMCU1Nt6pzxdbim6ugbH/LV8961XkFG5otcNv6E7iJOl9c5ZcEnym0SM2jDE
+	gbETSO0QT1XsBAuxtrIfBqtPC6J40oR+B
+X-Received: by 2002:a67:e988:0:b0:436:1e1:685e with SMTP id b8-20020a67e988000000b0043601e1685emr13994172vso.28.1684344961432;
+        Wed, 17 May 2023 10:36:01 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5CBOO9lrZpm38AXv4U8EwjpqzO9e3cjzo4meH70K3KkFLoiIuh6P2clRvBZTGyw+vABcuwrE5EAB3pyttPA9c=
+X-Received: by 2002:a67:e988:0:b0:436:1e1:685e with SMTP id
+ b8-20020a67e988000000b0043601e1685emr13994153vso.28.1684344961140; Wed, 17
+ May 2023 10:36:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230503171618.2020461-1-jingzhangos@google.com>
- <20230503171618.2020461-3-jingzhangos@google.com> <86wn17l811.wl-maz@kernel.org>
-In-Reply-To: <86wn17l811.wl-maz@kernel.org>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Wed, 17 May 2023 09:28:26 -0700
-Message-ID: <CAAdAUtiiXNLJKXLea1okB25i45FtM52umY2P5WgKxZ1dHz5CYg@mail.gmail.com>
-Subject: Re: [PATCH v8 2/6] KVM: arm64: Save ID registers' sanitized value per guest
+References: <20230511143638.350228-1-maz@kernel.org>
+In-Reply-To: <20230511143638.350228-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 17 May 2023 19:35:50 +0200
+Message-ID: <CABgObfYAHbrPJuSHFum4kkeHSb1Msh0u3-6BoOUZVGX6wVd7OQ@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.4, take #1
 To: Marc Zyngier <maz@kernel.org>
-Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	ARMLinux <linux-arm-kernel@lists.infradead.org>, Oliver Upton <oupton@google.com>, 
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>, 
-	Raghavendra Rao Ananta <rananta@google.com>
+Cc: Christophe JAILLET <christophe.jaillet@wanadoo.fr>, Jingyu Wang <jingyuwang_vip@163.com>, 
+	Mark Brown <broonie@kernel.org>, Mukesh Ojha <quic_mojha@quicinc.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Marc,
+On Thu, May 11, 2023 at 4:37=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> Paolo,
+>
+> Here's a first set of fixes, most of which has been simmering in -next
+> for some time now. The most important one is a series from Oliver,
+> plugging a (hard to trigger) race that would result in the wrong
+> mapping being established at S2.
+>
+> The rest is a bunch of cleanups and HW workarounds (the usual Apple
+> vgic issue that keeps cropping up on new SoCs).
+>
+> Please pull,
 
-On Wed, May 17, 2023 at 12:41=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
-e:
->
-> On Wed, 03 May 2023 18:16:14 +0100,
-> Jing Zhang <jingzhangos@google.com> wrote:
-> >
-> > Introduce id_regs[] in kvm_arch as a storage of guest's ID registers,
-> > and save ID registers' sanitized value in the array at KVM_CREATE_VM.
-> > Use the saved ones when ID registers are read by the guest or
-> > userspace (via KVM_GET_ONE_REG).
-> >
-> > No functional change intended.
-> >
-> > Co-developed-by: Reiji Watanabe <reijiw@google.com>
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h | 20 ++++++++++++++
-> >  arch/arm64/kvm/arm.c              |  1 +
-> >  arch/arm64/kvm/id_regs.c          | 46 +++++++++++++++++++++++++------
-> >  arch/arm64/kvm/sys_regs.c         | 11 +++++++-
-> >  arch/arm64/kvm/sys_regs.h         |  3 +-
-> >  5 files changed, 69 insertions(+), 12 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm=
-/kvm_host.h
-> > index bcd774d74f34..a7d4d9e093e3 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -177,6 +177,21 @@ struct kvm_smccc_features {
-> >       unsigned long vendor_hyp_bmap;
-> >  };
-> >
-> > +/*
-> > + * Emulated CPU ID registers per VM
-> > + * (Op0, Op1, CRn, CRm, Op2) of the ID registers to be saved in it
-> > + * is (3, 0, 0, crm, op2), where 1<=3Dcrm<8, 0<=3Dop2<8.
-> > + *
-> > + * These emulated idregs are VM-wide, but accessed from the context of=
- a vCPU.
-> > + * Access to id regs are guarded by kvm_arch.config_lock.
-> > + */
-> > +#define KVM_ARM_ID_REG_NUM   56
->
-> You already have this as part of patch #1 in another include file, and
-> then move it here. Surely you can do that in one go. I'd also like it
-> to be defined in terms of encodings, and not as a raw value.
-Sure, will do.
->
-> > +#define IDREG_IDX(id)                (((sys_reg_CRm(id) - 1) << 3) | s=
-ys_reg_Op2(id))
-> > +#define IDREG(kvm, id)               kvm->arch.idregs.regs[IDREG_IDX(i=
-d)]
->
-> Missing brackets around 'kvm'.
-Thanks, will fix.
->
-> > +struct kvm_idregs {
-> > +     u64 regs[KVM_ARM_ID_REG_NUM];
-> > +};
-> > +
-> >  typedef unsigned int pkvm_handle_t;
-> >
-> >  struct kvm_protected_vm {
-> > @@ -243,6 +258,9 @@ struct kvm_arch {
-> >       /* Hypercall features firmware registers' descriptor */
-> >       struct kvm_smccc_features smccc_feat;
-> >
-> > +     /* Emulated CPU ID registers */
-> > +     struct kvm_idregs idregs;
-> > +
-> >       /*
-> >        * For an untrusted host VM, 'pkvm.handle' is used to lookup
-> >        * the associated pKVM instance in the hypervisor.
-> > @@ -1008,6 +1026,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *v=
-cpu,
-> >  long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
-> >                               struct kvm_arm_copy_mte_tags *copy_tags);
-> >
-> > +void kvm_arm_init_id_regs(struct kvm *kvm);
-> > +
-> >  /* Guest/host FPSIMD coordination helpers */
-> >  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
-> >  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 4b2e16e696a8..e34744c36406 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -153,6 +153,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long=
- type)
-> >
-> >       set_default_spectre(kvm);
-> >       kvm_arm_init_hypercalls(kvm);
-> > +     kvm_arm_init_id_regs(kvm);
-> >
-> >       /*
-> >        * Initialise the default PMUver before there is a chance to
-> > diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
-> > index 96b4c43a5100..e769223bcee2 100644
-> > --- a/arch/arm64/kvm/id_regs.c
-> > +++ b/arch/arm64/kvm/id_regs.c
-> > @@ -52,16 +52,9 @@ static u8 pmuver_to_perfmon(u8 pmuver)
-> >       }
-> >  }
-> >
-> > -/* Read a sanitised cpufeature ID register by sys_reg_desc */
->
-> Why getting rid of this comment instead of moving it next to the
-> (re-implemented) function?
->
-Right, will move it to the re-implemented function.
-> > -static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_des=
-c const *r)
-> > +u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
-> >  {
-> > -     u32 id =3D reg_to_encoding(r);
-> > -     u64 val;
-> > -
-> > -     if (sysreg_visible_as_raz(vcpu, r))
-> > -             return 0;
-> > -
-> > -     val =3D read_sanitised_ftr_reg(id);
-> > +     u64 val =3D IDREG(vcpu->kvm, id);
-> >
-> >       switch (id) {
-> >       case SYS_ID_AA64PFR0_EL1:
-> > @@ -126,6 +119,14 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu=
-, struct sys_reg_desc const *r
-> >       return val;
-> >  }
-> >
-> > +static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_des=
-c const *r)
-> > +{
-> > +     if (sysreg_visible_as_raz(vcpu, r))
-> > +             return 0;
-> > +
-> > +     return kvm_arm_read_id_reg(vcpu, reg_to_encoding(r));
-> > +}
-> > +
-> >  /* cpufeature ID register access trap handlers */
-> >
-> >  static bool access_id_reg(struct kvm_vcpu *vcpu,
-> > @@ -458,3 +459,30 @@ int emulate_id_reg(struct kvm_vcpu *vcpu, struct s=
-ys_reg_params *params)
-> >
-> >       return 1;
-> >  }
-> > +
-> > +/*
-> > + * Set the guest's ID registers that are defined in id_reg_descs[]
-> > + * with ID_SANITISED() to the host's sanitized value.
-> > + */
-> > +void kvm_arm_init_id_regs(struct kvm *kvm)
-> > +{
-> > +     u64 val;
-> > +     u32 id;
-> > +     int i;
-> > +
-> > +     for (i =3D 0; i < ARRAY_SIZE(id_reg_descs); i++) {
-> > +             id =3D reg_to_encoding(&id_reg_descs[i]);
-> > +
-> > +             /*
-> > +              * Some hidden ID registers which are not in arm64_ftr_re=
-gs[]
-> > +              * would cause warnings from read_sanitised_ftr_reg().
-> > +              * Skip those ID registers to avoid the warnings.
-> > +              */
-> > +             if (id_reg_descs[i].visibility =3D=3D raz_visibility)
-> > +                     /* Hidden or reserved ID register */
-> > +                     continue;
->
-> Are you sure? What about other visibility attributes that are normally
-> evaluated at runtime? This may work as a short term hack, but I'm not
-> sure this is the correct long-term solution...
-Yes, this is a short term hack. It would be replaced by checking the
-reset() function of idregs in patch #5 in this series.
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+Done, thanks.
 
-Thanks,
-Jing
+Paolo
+
+> The following changes since commit ac9a78681b921877518763ba0e89202254349d=
+1b:
+>
+>   Linux 6.4-rc1 (2023-05-07 13:34:35 -0700)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
+marm-fixes-6.4-1
+>
+> for you to fetch changes up to c3a62df457ff9ac8c77efe6d1eca2855d399355d:
+>
+>   Merge branch kvm-arm64/pgtable-fixes-6.4 into kvmarm-master/fixes (2023=
+-05-11 15:26:01 +0100)
+>
+> ----------------------------------------------------------------
+> KVM/arm64 fixes for 6.4, take #1
+>
+> - Plug a race in the stage-2 mapping code where the IPA and the PA
+>   would end up being out of sync
+>
+> - Make better use of the bitmap API (bitmap_zero, bitmap_zalloc...)
+>
+> - FP/SVE/SME documentation update, in the hope that this field
+>   becomes clearer...
+>
+> - Add workaround for the usual Apple SEIS brokenness
+>
+> - Random comment fixes
+>
+> ----------------------------------------------------------------
+> Christophe JAILLET (2):
+>       KVM: arm64: Slightly optimize flush_context()
+>       KVM: arm64: Use the bitmap API to allocate bitmaps
+>
+> Jingyu Wang (1):
+>       KVM: arm64: Fix repeated words in comments
+>
+> Marc Zyngier (4):
+>       KVM: arm64: Constify start/end/phys fields of the pgtable walker da=
+ta
+>       KVM: arm64: vgic: Add Apple M2 PRO/MAX cpus to the list of broken S=
+EIS implementations
+>       Merge branch kvm-arm64/misc-6.4 into kvmarm-master/fixes
+>       Merge branch kvm-arm64/pgtable-fixes-6.4 into kvmarm-master/fixes
+>
+> Mark Brown (3):
+>       KVM: arm64: Document check for TIF_FOREIGN_FPSTATE
+>       KVM: arm64: Restructure check for SVE support in FP trap handler
+>       KVM: arm64: Clarify host SME state management
+>
+> Oliver Upton (2):
+>       KVM: arm64: Infer the PA offset from IPA in stage-2 map walker
+>       KVM: arm64: Infer PA offset from VA in hyp map walker
+>
+>  arch/arm64/include/asm/cputype.h        |  8 +++++++
+>  arch/arm64/include/asm/kvm_pgtable.h    |  1 +
+>  arch/arm64/kvm/fpsimd.c                 | 26 +++++++++++++--------
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 12 ++++++++--
+>  arch/arm64/kvm/hyp/pgtable.c            | 41 +++++++++++++++++++++++++--=
+------
+>  arch/arm64/kvm/inject_fault.c           |  2 +-
+>  arch/arm64/kvm/vgic/vgic-v3.c           |  4 ++++
+>  arch/arm64/kvm/vmid.c                   |  7 +++---
+>  8 files changed, 76 insertions(+), 25 deletions(-)
+>
+
