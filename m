@@ -1,61 +1,62 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31A535258
-	for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 10:06:14 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 67CD31FB;
-	Wed, 17 May 2023 03:06:56 -0700 (PDT)
-Received: from [10.57.58.217] (unknown [10.57.58.217])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C1B3E3F663;
-	Wed, 17 May 2023 03:06:09 -0700 (PDT)
-Message-ID: <fe6f3e07-e24e-65a9-510f-00bdb25ae807@arm.com>
-Date: Wed, 17 May 2023 11:06:07 +0100
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC29156D7
+	for <kvmarm@lists.linux.dev>; Wed, 17 May 2023 10:23:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1684319014;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eU4/kWoSUy/twutiXTRQkS0LhOrBuJa5CPATWrYQIws=;
+	b=RNFgJ+d27j0uFlni1tUPzk3XJM+lQ/QxCblY4AtabMCBtYQtLmSk4zxCG950EALmAWZG8z
+	4JOCFn9gs9w2+lxNXEAYNNy12ZVnhY1Es7Zkej4vGj7Ma2JxcJY2e/K8+px1uOU2ScWnVs
+	0lIM+4hv6SnehVv8BtsvBdJILasTyF0=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-581-dyfsjo8GMoOB2aa5YHpVjw-1; Wed, 17 May 2023 06:23:31 -0400
+X-MC-Unique: dyfsjo8GMoOB2aa5YHpVjw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 654643C0CD44;
+	Wed, 17 May 2023 10:23:30 +0000 (UTC)
+Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 243804078908;
+	Wed, 17 May 2023 10:23:30 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, Suzuki
+ K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, steven.price@arm.com,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org
+Subject: Re: [PATCH 1/2] arm64: Add missing Set/Way CMO encodings
+In-Reply-To: <20230515204601.1270428-2-maz@kernel.org>
+Organization: Red Hat GmbH
+References: <20230515204601.1270428-1-maz@kernel.org>
+ <20230515204601.1270428-2-maz@kernel.org>
+User-Agent: Notmuch/0.37 (https://notmuchmail.org)
+Date: Wed, 17 May 2023 12:23:29 +0200
+Message-ID: <87wn1745pa.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH 0/2] KVM: arm64: Handle MTE Set/Way CMOs
-To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-References: <20230515204601.1270428-1-maz@kernel.org>
-Content-Language: en-GB
-From: Steven Price <steven.price@arm.com>
-In-Reply-To: <20230515204601.1270428-1-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 
-On 15/05/2023 21:45, Marc Zyngier wrote:
-> When the MTE support was added, it seens the handling of MTE Set/Way
-> was ommited, meaning that the guest will get an UNDEF if it tries to
-> do something that is quite stupid, but still allowed by the
-> architecture...
+On Mon, May 15 2023, Marc Zyngier <maz@kernel.org> wrote:
 
-Sorry about that, as you say it's quite a stupid thing for a guest to
-attempt and it hadn't occurred to me when implementing KVM support.
+> Add the missing Set/Way CMOs that apply to tagged memory.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/sysreg.h | 6 ++++++
+>  1 file changed, 6 insertions(+)
 
-Both patches:
-
-Reviewed-by: Steven Price <steven.price@arm.com>
-
-Thanks,
-
-Steve
-
-> 
-> Found by inspection while writting the trap support for NV.
-> 
-> Marc Zyngier (2):
->   arm64: Add missing Set/Way CMO encodings
->   KVM: arm64: Handle trap of tagged Set/Way CMOs
-> 
->  arch/arm64/include/asm/sysreg.h |  6 ++++++
->  arch/arm64/kvm/sys_regs.c       | 19 +++++++++++++++++++
->  2 files changed, 25 insertions(+)
-> 
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
