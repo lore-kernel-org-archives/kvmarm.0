@@ -1,103 +1,135 @@
-Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ED1B17AB8
-	for <kvmarm@lists.linux.dev>; Thu, 18 May 2023 12:15:08 +0000 (UTC)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailout.nyi.internal (Postfix) with ESMTP id 961145C00EC;
-	Thu, 18 May 2023 08:15:07 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute6.internal (MEProxy); Thu, 18 May 2023 08:15:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:sender
-	:subject:subject:to:to; s=fm3; t=1684412107; x=1684498507; bh=fS
-	5DdDFtTTn+8EfiHkrWv7ABPSLcgtewyNrKXdzJzs0=; b=Q7YRtBTF1pz8hraVVH
-	+cr9wqKEaL/zXIHhwE05rzn6ITpGP7IeHlrfUOSSNSFqf2C9ZYr17Ggs92JkqBdo
-	skVQ+s9NN0U15wPsjr9R7wSKZN2XXP4T2a60jG6997EpkjTTekdYOgLvytJlp5fa
-	xYEhqDxz85//H6nYiQ1173fkd6ZOruHC7xnQgpkqHyf6s4A2VB1brNJ2jI5y13gH
-	o2gN9DDk8L5hfMAj/AI7LYnAM5kW7eosyDGED+F9gvVuVJx8DJEOiTPhbxGykdqP
-	c0gUswWp3UhMoSbNRjUidXkS89bcN24EGNfMh0TO3JX+j6/84zTamuLsUbr1cFry
-	gV+Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm1; t=1684412107; x=1684498507; bh=fS5DdDFtTTn+8
-	EfiHkrWv7ABPSLcgtewyNrKXdzJzs0=; b=NGeYbaHU+K4pr/7KGmqf1TnTUfFLZ
-	4Bio3c4/IIGCHL4E8YCncmW+541GIBZRSXuG7t5c6Z5LDWzObS1kgSCM2pCpI/GA
-	W4GSHv31Cj7shqrx2hIcwGYVsktnaypSXy1lJcOHbBk4jeJHQrc9tNNyS4mh+pLW
-	/uuj1+/oJNcz/zxUPj7Tsxm87CpmubGKShp+5beFSotDHZMeOUO9zgcvTPZZE9SP
-	OvVXFe0kq0HGO3a51XK1J6eKJeA3I+qLFmL9Zc8xklGGJayNQF/Kxbvfkc4gTpKv
-	geqzVX3KPfbrHth33eRSiFricZtzsSj7FC33JWkzb3DWvxRu1x853rb5A==
-X-ME-Sender: <xms:yxZmZPXADb9mThc68Q53vbyrn3n6Vuub5vTSpww1n8u9Fw7VkiBSOg>
-    <xme:yxZmZHliCVSrg689UuJ6AmOokKWjRsBOJMj04iiXz5rft0jXfGOUUARgkhglJ4JCp
-    04h5CSExytxL_H72Qw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfeeifedggeelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
-    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:yxZmZLb7Y-Odn2Y-xDQus1bG0zy5rXtGPQE_lkj1N_iA1Gd4Gsrpyg>
-    <xmx:yxZmZKUcY8qdH8EBaj88DaSq1LsCN4EzmILUSF1zQLBo2O1TP6Raag>
-    <xmx:yxZmZJk0T_LgYLRQK1ku5i1OE-NTqXO9-1rrDbKDGs4mgo-gn3cCOg>
-    <xmx:yxZmZM8H66rNa6irTC97CIMg5_CMMo_vWxJVjSpcsoDrX25Etk4LhA>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 29BD4B60086; Thu, 18 May 2023 08:15:07 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-431-g1d6a3ebb56-fm-20230511.001-g1d6a3ebb
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFC0E17AB8
+	for <kvmarm@lists.linux.dev>; Thu, 18 May 2023 12:16:27 +0000 (UTC)
+Received: from kwepemm000005.china.huawei.com (unknown [172.30.72.53])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4QMTQf2LRDzLq4S;
+	Thu, 18 May 2023 20:13:30 +0800 (CST)
+Received: from lhrpeml500001.china.huawei.com (7.191.163.213) by
+ kwepemm000005.china.huawei.com (7.193.23.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Thu, 18 May 2023 20:16:23 +0800
+Received: from lhrpeml500001.china.huawei.com ([7.191.163.213]) by
+ lhrpeml500001.china.huawei.com ([7.191.163.213]) with mapi id 15.01.2507.023;
+ Thu, 18 May 2023 13:16:21 +0100
+From: Salil Mehta <salil.mehta@huawei.com>
+To: Marc Zyngier <maz@kernel.org>
+CC: Oliver Upton <oliver.upton@linux.dev>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Paolo
+ Bonzini" <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, "Suzuki K
+ Poulose" <suzuki.poulose@arm.com>, yuzenghui <yuzenghui@huawei.com>, "Sean
+ Christopherson" <seanjc@google.com>
+Subject: RE: [PATCH v3 08/13] KVM: arm64: Add support for KVM_EXIT_HYPERCALL
+Thread-Topic: [PATCH v3 08/13] KVM: arm64: Add support for KVM_EXIT_HYPERCALL
+Thread-Index: AQHZZwvyoTfThYxWf0yKNVt4c9uQr68cQ2uAgABJ1QCAQm5ckIAAAwIAgADh0gCAAB5bIP///H2AgAA2qwA=
+Date: Thu, 18 May 2023 12:16:21 +0000
+Message-ID: <146e9efc278f4418a21415672715e3f6@huawei.com>
+References: <20230404154050.2270077-1-oliver.upton@linux.dev>
+        <20230404154050.2270077-9-oliver.upton@linux.dev>
+        <87o7o26aty.wl-maz@kernel.org>        <86pm8iv8tj.wl-maz@kernel.org>
+        <fd9aee7022ea47e29cbff3120764c2c6@huawei.com>
+        <ZGUfFn0jai9n4eSF@linux.dev>        <86ilcqkqrf.wl-maz@kernel.org>
+        <30eae0208b55463bb644c6700951d4b8@huawei.com>
+ <86fs7ukmba.wl-maz@kernel.org>
+In-Reply-To: <86fs7ukmba.wl-maz@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-originating-ip: [10.48.154.240]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-Id: <85a2cc47-dd95-4c39-82ab-8bf7a2a1589a@app.fastmail.com>
-In-Reply-To: <86lehmksf1.wl-maz@kernel.org>
-References: <20230517202352.793673-1-arnd@kernel.org>
- <86lehmksf1.wl-maz@kernel.org>
-Date: Thu, 18 May 2023 14:14:46 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Marc Zyngier" <maz@kernel.org>, "Arnd Bergmann" <arnd@kernel.org>
-Cc: "Oliver Upton" <oliver.upton@linux.dev>,
- "Catalin Marinas" <catalin.marinas@arm.com>, "Will Deacon" <will@kernel.org>,
- "Shaoqin Huang" <shahuang@redhat.com>,
- "Ricardo Koller" <ricarkol@google.com>, "Gavin Shan" <gshan@redhat.com>,
- "James Morse" <james.morse@arm.com>,
- "Suzuki K Poulose" <suzuki.poulose@arm.com>,
- "Zenghui Yu" <yuzenghui@huawei.com>, "Cornelia Huck" <cohuck@redhat.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] arm64: kvm: avoid overflow in integer division
-Content-Type: text/plain
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
 
-On Thu, May 18, 2023, at 09:30, Marc Zyngier wrote:
-> On Wed, 17 May 2023 21:23:39 +0100,
-> Arnd Bergmann <arnd@kernel.org> wrote:
->> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> index 3386bd28d267..6db9ef288ec3 100644
->> --- a/arch/arm64/kvm/mmu.c
->> +++ b/arch/arm64/kvm/mmu.c
->> @@ -92,8 +92,8 @@ static int kvm_mmu_split_nr_page_tables(u64 range)
->>  	int n = 0;
->>  
->>  	if (KVM_PGTABLE_MIN_BLOCK_LEVEL < 2)
->> -		n += DIV_ROUND_UP_ULL(range, PUD_SIZE);
->> -	n += DIV_ROUND_UP_ULL(range, PMD_SIZE);
->> +		n += DIV_ROUND_UP(range, PUD_SIZE);
->> +	n += DIV_ROUND_UP(range, PMD_SIZE);
->>  	return n;
->>  }
->
-> This is against -next, right? Oliver, I assume you'll take this as a
-> fix for Ricardo's series?
+Hi Marc,
 
-Yes, correct, I saw it after rebasing my tree from 6.4-rc2 to the
-latest -next.
+> From: Marc Zyngier <maz@kernel.org>
+> Sent: Thursday, May 18, 2023 10:43 AM
+> To: Salil Mehta <salil.mehta@huawei.com>
+> Cc: Oliver Upton <oliver.upton@linux.dev>; kvmarm@lists.linux.dev;
+> kvm@vger.kernel.org; Paolo Bonzini <pbonzini@redhat.com>; James Morse
+> <james.morse@arm.com>; Suzuki K Poulose <suzuki.poulose@arm.com>; yuzengh=
+ui
+> <yuzenghui@huawei.com>; Sean Christopherson <seanjc@google.com>
+> Subject: Re: [PATCH v3 08/13] KVM: arm64: Add support for
+> KVM_EXIT_HYPERCALL
+>=20
 
-     Arnd
+[...]
+
+
+> > > > > > > Should we expose the ESR, or at least ESR_EL2.IL as an additi=
+onal
+> > > > > > > flag?
+> > > > >
+> > > > >
+> > > > > I think we would need "Immediate value" of the ESR_EL2 register i=
+n the
+> > > > > user-space/VMM to be able to construct the syndrome value. I cann=
+ot see
+> > > > > where it is being sent?
+> > > >
+> > > > The immediate value is not exposed to userspace, although by defini=
+tion
+> > > > the immediate value must be zero. The SMCCC spec requires all compl=
+iant
+> > > > calls to use an immediate of zero (DEN0028E 2.9).
+> > > >
+> > > > Is there a legitimate use case for hypercalls with a nonzero immedi=
+ate?
+> > > > They would no longer be considered SMCCC calls at that point, so th=
+ey
+> > > > wouldn't work with the new UAPI.
+> > >
+> > > I agree. The use of non-zero immediate has long been deprecated. I
+> > > guess we should actually reject non-zero immediate for HVC just like
+> > > we do for SMC.
+> >
+> >
+> > Ok. Maybe I will hard code Immediate value as 0 to create a syndrome va=
+lue
+> > at the VMM/Qemu and will also put a note stating non-zero immediate for
+> > HVC/SVC are not supported/deprecated.
+>=20
+> Yes, because this should be the only situation where you should see
+> such an exit to userspace.
+>=20
+> > > If there is an actual need for a non-zero immediate to be propagated
+> > > to userspace (want to emulate Xen's infamous 'HVC #0xEA1'?), then thi=
+s
+> > > should be an extension to the current API.
+> >
+> > Oh ok, then perhaps this new extension change should be simultaneously
+> > committed to avoid breaking Xen?
+>=20
+> How would that break Xen? I don't have any plan to emulate Xen in any
+> shape or form, and I don't think anyone want to do that in userspace
+> either.
+
+
+Ok. I thought you are suggestion an exception which is already in use
+and the current change might break it but now that does not seems to be
+the case.
+
+
+> I really want to see an actual use case to expand this stuff. Because
+> so far, we follow the strict SMCCC spec, and nothing else. But if we
+> admit deviations, do we also have to expose SMC and HVC as different
+> instructions?
+
+
+Ok got it. No problem and makes sense what you just said. Maybe in future
+if it is really required then we can always come back to it. For now, I
+will go ahead with the agreed change in the qemu.
+
+Many thanks
+Salil.
+
+
