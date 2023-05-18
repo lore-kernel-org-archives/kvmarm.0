@@ -1,30 +1,57 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0EBAD46
-	for <kvmarm@lists.linux.dev>; Thu, 18 May 2023 09:58:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03048C433D2;
-	Thu, 18 May 2023 09:58:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1684403929;
-	bh=wPhtXogwWz6NCnVt73wqOVcAkv5wf6+cM0nWx014CaU=;
-	h=From:To:Cc:Subject:Date:From;
-	b=uZxM/XqE71Dmeo0+Od17rfKn7pH7sfysP31FFwFcK3JQfe3LGf2AfTiJ8eiD5dXNo
-	 9dNBl9KaZpyTFTQlozUReE8DnwgZm66Yp9NZoH//7hjWJmJiGRuMNNv0tKQ5yXTbPU
-	 rWTs9t/sWiArzKXNbl0bPM1Mk0xUu2U9gyWIULHne6gCGGIYauIgwNuj4nOyff/UYB
-	 RDONYMxZVz7vT5HUXvHvLIXLT/BVEcWPBGnTbvdMrImoJ676rtKU7z1k5auW+qa2eR
-	 Si3/C95Gn3k3AFZmLexMaWOhpL/XJw5AhVjBrJaJX/oFeDSB+mSYD31onzmoCWHLBd
-	 RYeiM4mALkboQ==
-From: Will Deacon <will@kernel.org>
-To: kvmarm@lists.linux.dev
-Cc: maz@kernel.org,
-	oliver.upton@linux.dev,
-	Will Deacon <will@kernel.org>,
-	Quentin Perret <qperret@google.com>
-Subject: [PATCH] KVM: arm64: Prevent unconditional donation of unmapped regions from the host
-Date: Thu, 18 May 2023 10:58:44 +0100
-Message-Id: <20230518095844.1178-1-will@kernel.org>
-X-Mailer: git-send-email 2.20.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34A0B1C04
+	for <kvmarm@lists.linux.dev>; Thu, 18 May 2023 10:43:20 +0000 (UTC)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-3f41d087b3bso18882335e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 18 May 2023 03:43:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1684406598; x=1686998598;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=a1A5zp19nox+z20d77L7kQ6GgRjn3J68bOPJdNDopDU=;
+        b=C4Z+2kW0NH3TFvYfMcDnh0ui4OpD+d+98cpobngsB7pxYPY0QgTK2LZhRDtkuJnFls
+         4muu/nbMWJLapcXfEegbMiBju0WqH5acOUbtjU7i6oy0PpbyOSjbydqPuFRweCg+iwGO
+         v/3VrffkBI6d3M78kYdP6auO9rcF65UK5c7c3ew+Oi6tjGvhTDBfP7gTf5ml2zvyT2v9
+         iEjFfyVD4GogSHZQLAxcEY9psllzznjsLKvjPCkq+f5nusLBTqTKVp/iLLvk3EUOA24k
+         uDAHbiJWiHtG1YSffr0vNSc0bBHMVnkbnHtv8qznd0x1zbmMtQWvWHmT5aFo+uf59OVx
+         0plA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684406598; x=1686998598;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=a1A5zp19nox+z20d77L7kQ6GgRjn3J68bOPJdNDopDU=;
+        b=CRJP+ykc2RRIPQHL+LQRmc/2j8/HJJeZ8/pImoUzB9PvS8pYr2e2TEwdYy0tZ11cLz
+         tmJeGedhZpfqycAL7EZsYiEWfNfsfPRHT53Xwlibh1Hba8Cb97h1uHqzXDodle7tpiHE
+         e6L8ZcYTDplqLXaIJFNg5vMblax7cwBQ58+ttM6hVyl+ARRX1dihwBTmMCVr9IRtsrb4
+         DS1oSSBigMiQrA2PRrjR4MgTrHg3HInBGu9kMULVfr8oTanIrmZR2nw6yeEeI7xJqXJC
+         P1AJQQsRqhEn97qG6T7zCXNjno66Grid48nDi1+Ld2lD8valpS2iK59dURG4XBrneYh0
+         zN+w==
+X-Gm-Message-State: AC+VfDzhdQymSV+MFHKAUUhANlNlZYy+rt+Ft/Xdoj2YXXR/MIh6g5t7
+	mb+EroMq4VFR/RgjRqlRp1uAIg==
+X-Google-Smtp-Source: ACHHUZ6pgQfC0TLqqQ1Hb+nrANs/LlC0ALkrv2lfrEpi5S7694C2yfzPXC5EkWVcGaYZoTsqRjoM2Q==
+X-Received: by 2002:a05:600c:249:b0:3f5:f83:4d84 with SMTP id 9-20020a05600c024900b003f50f834d84mr1128550wmj.31.1684406598315;
+        Thu, 18 May 2023 03:43:18 -0700 (PDT)
+Received: from localhost.localdomain (5750a5b3.skybroadband.com. [87.80.165.179])
+        by smtp.gmail.com with ESMTPSA id f6-20020a1c6a06000000b003f427cba193sm4880523wmc.41.2023.05.18.03.43.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 May 2023 03:43:17 -0700 (PDT)
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: oliver.upton@linux.dev,
+	maz@kernel.org
+Cc: james.morse@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>
+Subject: [PATCH 0/4] KVM: arm64: vgic: Locking fixes
+Date: Thu, 18 May 2023 11:09:14 +0100
+Message-Id: <20230518100914.2837292-1-jean-philippe@linaro.org>
+X-Mailer: git-send-email 2.40.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -33,69 +60,36 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Since host stage-2 mappings are created lazily, we cannot rely solely on
-the pte in order to recover the target physical address when checking a
-host-initiated memory transition as this permits donation of unmapped
-regions corresponding to MMIO or "no-map" memory.
+Another fun locking puzzle, between the new config_lock and srcu.
+Patch 1 attempts to fix it, and the other patches fix simpler issues.
 
-Instead of inspecting the pte, move the addr_is_allowed_memory() check
-into the host callback function where it is passed the physical address
-directly from the walker.
+I got these lockdep reports while running KVM QEMU on a TCG QEMU, but it
+can also be triggered by running the vgic_irq kselftest on TCG QEMU.
+Now, with the fix and lockdep enabled, vgic_irq hangs but I believe it's
+an unrelated weirdness: if I introduce a separate lockdep warning for
+some made up locks, then the test passes again. So I'm sending this out
+now for discussion, and will investigate that one later.
 
-Cc: Quentin Perret <qperret@google.com>
-Fixes: e82edcc75c4e ("KVM: arm64: Implement do_share() helper for sharing memory")
-Signed-off-by: Will Deacon <will@kernel.org>
----
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+I run the host with:
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 2e9ec4a2a4a3..a8813b212996 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -575,7 +575,7 @@ struct pkvm_mem_donation {
- 
- struct check_walk_data {
- 	enum pkvm_page_state	desired;
--	enum pkvm_page_state	(*get_page_state)(kvm_pte_t pte);
-+	enum pkvm_page_state	(*get_page_state)(kvm_pte_t pte, u64 addr);
- };
- 
- static int __check_page_state_visitor(const struct kvm_pgtable_visit_ctx *ctx,
-@@ -583,10 +583,7 @@ static int __check_page_state_visitor(const struct kvm_pgtable_visit_ctx *ctx,
- {
- 	struct check_walk_data *d = ctx->arg;
- 
--	if (kvm_pte_valid(ctx->old) && !addr_is_allowed_memory(kvm_pte_to_phys(ctx->old)))
--		return -EINVAL;
--
--	return d->get_page_state(ctx->old) == d->desired ? 0 : -EPERM;
-+	return d->get_page_state(ctx->old, ctx->addr) == d->desired ? 0 : -EPERM;
- }
- 
- static int check_page_state_range(struct kvm_pgtable *pgt, u64 addr, u64 size,
-@@ -601,8 +598,11 @@ static int check_page_state_range(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 	return kvm_pgtable_walk(pgt, addr, size, &walker);
- }
- 
--static enum pkvm_page_state host_get_page_state(kvm_pte_t pte)
-+static enum pkvm_page_state host_get_page_state(kvm_pte_t pte, u64 addr)
- {
-+	if (!addr_is_allowed_memory(addr))
-+		return PKVM_NOPAGE;
-+
- 	if (!kvm_pte_valid(pte) && pte)
- 		return PKVM_NOPAGE;
- 
-@@ -709,7 +709,7 @@ static int host_complete_donation(u64 addr, const struct pkvm_mem_transition *tx
- 	return host_stage2_set_owner_locked(addr, size, host_id);
- }
- 
--static enum pkvm_page_state hyp_get_page_state(kvm_pte_t pte)
-+static enum pkvm_page_state hyp_get_page_state(kvm_pte_t pte, u64 addr)
- {
- 	if (!kvm_pte_valid(pte))
- 		return PKVM_NOPAGE;
+qemu-system-aarch64 -M virt,virtualization=true,gic-version=3 -m 2G -smp 8 -cpu max -append 'console=hvc0 root=/dev/vda rw' -kernel Image -nodefaults -chardev stdio,mux=on,id=virtiocon0,signal=off -device virtio-serial-device -device virtconsole,chardev=virtiocon0 -mon chardev=virtiocon0,mode=readline -device virtio-blk-device,drive=hd0 -drive format=raw,if=none,file=virt_root.bin,id=hd0 -nographic
+
+Jean-Philippe Brucker (4):
+  KVM: arm64: vgic: Fix a circular locking issue
+  KVM: arm64: vgic: Wrap vgic_its_create() with config_lock
+  KVM: arm64: vgic: Fix locking comment
+  KVM: arm64: vgic: Fix a comment
+
+ arch/arm64/kvm/vgic/vgic-init.c       | 27 +++++++++++++++++------
+ arch/arm64/kvm/vgic/vgic-its.c        | 14 ++++++++----
+ arch/arm64/kvm/vgic/vgic-kvm-device.c | 10 +++++++--
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c    | 31 ++++++++++++++++++---------
+ arch/arm64/kvm/vgic/vgic-mmio.c       |  8 ++-----
+ arch/arm64/kvm/vgic/vgic-v2.c         |  6 ------
+ arch/arm64/kvm/vgic/vgic-v3.c         |  7 ------
+ arch/arm64/kvm/vgic/vgic-v4.c         |  3 ++-
+ 8 files changed, 64 insertions(+), 42 deletions(-)
+
 -- 
-2.40.1.698.g37aff9b760-goog
+2.40.0
 
