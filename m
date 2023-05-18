@@ -1,97 +1,118 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD6B417FC
-	for <kvmarm@lists.linux.dev>; Thu, 18 May 2023 08:06:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F7A9C433EF;
-	Thu, 18 May 2023 08:06:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1684397191;
-	bh=ukx0kR6wVUdBLLkQ5cmS/keY/vGVx91Dm6ZPJJOPhpQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZxRkmPHDoLnQsX5qXKgkNlZ5SoWn08jKauwPaf4MpcJz35g8dzr+qSzwlg91frT+B
-	 fUVp9Xn7+lwcLjLLc4YAAv8Z2Aj9/ATLnYqvCfsg74OfCh6XXGjrQ1mLLbZLVQ+IK/
-	 7cDuDQK9CkDL061INn0ljrc11hfw/uzVEcgdayO8hc/Ywr8wH/lY49U51+BInUfHGO
-	 pnR0y+yrMG+qV9VnRYQfbwleYSV5V/75uZIPB4XAeI9p6wEKAiyJVa9AWl3sZDVLtK
-	 C3k4bDynI3+kY1wPGycGd8ZdRLxAhJgusOJvx0nal+NysV1+1gCFHdMoYmRVH93VZB
-	 JFq6/N9x+NpWw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pzYeb-00G50K-43;
-	Thu, 18 May 2023 09:06:29 +0100
-Date: Thu, 18 May 2023 09:06:28 +0100
-Message-ID: <86ilcqkqrf.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Salil Mehta <salil.mehta@huawei.com>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	yuzenghui <yuzenghui@huawei.com>,
-	Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH v3 08/13] KVM: arm64: Add support for KVM_EXIT_HYPERCALL
-In-Reply-To: <ZGUfFn0jai9n4eSF@linux.dev>
-References: <20230404154050.2270077-1-oliver.upton@linux.dev>
-	<20230404154050.2270077-9-oliver.upton@linux.dev>
-	<87o7o26aty.wl-maz@kernel.org>
-	<86pm8iv8tj.wl-maz@kernel.org>
-	<fd9aee7022ea47e29cbff3120764c2c6@huawei.com>
-	<ZGUfFn0jai9n4eSF@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65AB73C39
+	for <kvmarm@lists.linux.dev>; Thu, 18 May 2023 08:10:45 +0000 (UTC)
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2533b600d35so1793886a91.1
+        for <kvmarm@lists.linux.dev>; Thu, 18 May 2023 01:10:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1684397445; x=1686989445;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S0YTm0IoXUd5c4n5YN9L5DUYWH7WIf1ootPhSesQtpw=;
+        b=ZcxKVWxTbbBRXRzIs4OQ4ef+VAjO+ndMZFtzZExu3rBaoSOYhiRDwTrHtb1FY0hdJG
+         HGUxEL1az8vR0xr+PEWkNyfoZC7VZmxHQS8puY4JFtyDdFdQdEYCq982C2v+7yQiHUTh
+         2CcMtV71QYcBV9Rd/bRK9tb3hDnWe8UdCiSe01V+/0u30JCDIBXYS27rsgHe3ATjCoJA
+         VK9YXNtMXWhb9c2YGvxMkJ2Y3Joq5SDZMHybJnW4WPe47EY9cGMiT9Du9pGgftpjuTf4
+         HQXcKIEsJ/dQ001VUznykafhZ8OKqYbGpZPg9PjPfzyONW9OZTc1r3x9VXJKDVRo4n9D
+         G4Yg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684397445; x=1686989445;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=S0YTm0IoXUd5c4n5YN9L5DUYWH7WIf1ootPhSesQtpw=;
+        b=JJgUzq5d9XOtTvG0h+PhucGw4zoXX4sjqvw2qiPeyqL+WcrAaHWPYeX9wncTO9d+h8
+         M9qI/+o27ogHb3wJBBRMFy3O2PlNcWspQHvQZYVdODfXQ1k1olALvy2hHvFXW/ZS+7fK
+         uDTwfiFjxrdtW22Kcw6t8Fcoi/AMlk1kx1fo2NWra1vZD2MAwUbr7cG4TgZFyBHz3nsR
+         q8nkyuSenUnC0NWBjVoYZfPPu4lJis7Ls+QuZeqxhfiw21jgXvjIOXRHcY2Dd01kPE5a
+         F9VD8Iz7UDSQXkJ81NVbfJHOecnXqJ+e8MUOLJyS6uWoeMn7b8mcCXKOkN//SU2QThWf
+         xjWw==
+X-Gm-Message-State: AC+VfDzFMtz+QUwarGtqem6n76AfVCCe14aomvwCYyukE1LwCfPICn0G
+	80O/E4fAHPIlpZrfLyRzIUpFiRZNhaI+pF3K/c4=
+X-Google-Smtp-Source: ACHHUZ6onfAai2ygXURVPYRaxZVnlUv+nfcC3Xm7KTFlJ9Cq8cFTmGv8mjKjQj7PLNnBVWE+ADL4xKVZrtzP+tH9rm0=
+X-Received: by 2002:a17:90a:764d:b0:253:30f9:1849 with SMTP id
+ s13-20020a17090a764d00b0025330f91849mr1748821pjl.12.1684397444829; Thu, 18
+ May 2023 01:10:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, salil.mehta@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, pbonzini@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seanjc@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <cover.1683791148.git.haibo1.xu@intel.com> <751a84a9691c86df0e65cdb02abf1e073892d1ca.1683791148.git.haibo1.xu@intel.com>
+ <20230511-28ec368a8168342c68ca2187@orel> <CAJve8okVFr-m6go6dCg7Cf=Uq3Yt9Xmxi0Z3B2vbWvahvx4GgA@mail.gmail.com>
+ <20230518-60da3b82641bdaccec589b8b@orel>
+In-Reply-To: <20230518-60da3b82641bdaccec589b8b@orel>
+From: Haibo Xu <xiaobo55x@gmail.com>
+Date: Thu, 18 May 2023 16:10:33 +0800
+Message-ID: <CAJve8on1qzEZ6MsaV4ZOJoKHwymeEPtd_vmY6ki1Nq9bnUPT2g@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: selftests: Add riscv get-reg-list test
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: Haibo Xu <haibo1.xu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
+	kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 17 May 2023 19:38:14 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> Hi Salil,
-> 
-> On Wed, May 17, 2023 at 06:00:18PM +0000, Salil Mehta wrote:
-> 
-> [...]
-> 
-> > > > Should we expose the ESR, or at least ESR_EL2.IL as an additional
-> > > > flag?
-> > 
-> > 
-> > I think we would need "Immediate value" of the ESR_EL2 register in the
-> > user-space/VMM to be able to construct the syndrome value. I cannot see
-> > where it is being sent? 
-> 
-> The immediate value is not exposed to userspace, although by definition
-> the immediate value must be zero. The SMCCC spec requires all compliant
-> calls to use an immediate of zero (DEN0028E 2.9).
-> 
-> Is there a legitimate use case for hypercalls with a nonzero immediate?
-> They would no longer be considered SMCCC calls at that point, so they
-> wouldn't work with the new UAPI.
+On Thu, May 18, 2023 at 3:32=E2=80=AFPM Andrew Jones <ajones@ventanamicro.c=
+om> wrote:
+>
+> On Thu, May 18, 2023 at 12:17:18PM +0800, Haibo Xu wrote:
+> ...
+> > > The idea of these *to_str functions is to dump output that can be
+> > > copy+pasted into a reg array (hence the trailing commas in print_reg
+> > > lines). So we can't just print random lines here or return '##UNKOWN#=
+#',
+> > > as that won't compile. Instead, the default should return
+> > >
+> > >   str_with_index("KVM_REG_RISCV_CONFIG_REG(##)", reg_off)
+> > >
+> >
+> > Thanks for sharing the detailed idea, will fix it in next version!
+>
+> I guess we could also return a string like,
+>
+> "KVM_REG_RISCV_CONFIG_REG(##) /* UNKNOWN */"
+>
+> as that would still compile and also convey the message that this
+> register doesn't have a name because the test doesn't know it yet.
+>
 
-I agree. The use of non-zero immediate has long been deprecated. I
-guess we should actually reject non-zero immediate for HVC just like
-we do for SMC.
+Yes, that's more friendly and self explanatory. Thanks for the suggestion!
 
-If there is an actual need for a non-zero immediate to be propagated
-to userspace (want to emulate Xen's infamous 'HVC #0xEA1'?), then this
-should be an extension to the current API.
+> ...
+> > > We should share all the code above, except print_reg(), with aarch64.
+> > > I'll send a patch series that splits the arch-neutral code out of
+> > > the aarch64 test that you can base this test on.
+> > >
+> >
+> > Good idea! I will rebase the patch based on your work.
+> >
+>
+> Ok, I've pushed patches to [1]. This series introduces two things to KVM
+> selftests. Primarily it splits the aarch64/get-reg-list test into a
+> cross-arch get-reg-list test and an $ARCH_DIR/get-reg-list.o object file,
+> which the cross-arch test depends on. To do that, it also introduces the
+> concept of a "split test", a test that has a cross-arch part which depend=
+s
+> on an arch-specific part. Using a split test is cleaner than the
+> #ifdeffery we usually do for cross-arch tests.
+>
+> I've added kvmarm@lists.linux.dev, Marc, Oliver, and Sean to the CC of
+> this message. You'll want to add them when you post v2 as well.
+>
 
-Thanks,
+Sure, I will rebase your patch in v2. Thanks for your review!
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> [1] https://github.com/jones-drew/linux/commits/arm64/kself/get-reg-list
+>
+> Thanks,
+> drew
