@@ -1,89 +1,103 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F7911CB4
-	for <kvmarm@lists.linux.dev>; Thu, 18 May 2023 10:43:22 +0000 (UTC)
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-3f4ad71b00eso11869155e9.2
-        for <kvmarm@lists.linux.dev>; Thu, 18 May 2023 03:43:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1684406601; x=1686998601;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mp00WwehAYxhmIULq9IO59RiAwWhddV/IMvvStrd9QY=;
-        b=S2AxPAGUw+TvyThlV0Vf9cbp1xI9Tav8+vI1C0HsNRWQUwjPnUfVaZBIq+Z35A/LpQ
-         BT/LZzrLBEr9cZanYzuUOX0BLluH/JGkUUG+lTV/ICIc82pxJfjUIMyw7/8/FLKN/RBR
-         aSdzIsMBP6x8uF8uKvytzyTv7Nika6GmXKknU1t13judHK5pQXYkc45CH9O/FNZzWelx
-         2xdS/Cd0Lu388nw322+bSI4hANfoaf3sEU5YCoeV5bVT4xUXXGoa1gnunBNzPikdnj4g
-         bJrI3ZFiIRwIxxl2GEFk1IRNhBW81wwgu8mpKAoEGOvXDyZ1t8s1mfcqs8CAKI1GNsph
-         pP1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684406601; x=1686998601;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mp00WwehAYxhmIULq9IO59RiAwWhddV/IMvvStrd9QY=;
-        b=Ybq78mb0ZP2ZmIoVlNFcikd2uF6znD0rNraHPqhtqdXSlLSbMoF7LuCPUmoJsghXWz
-         cUhzaWgIvKmevxXZQacRewXE2Ix3pvs+uwlWnfd9/tlM+3ZbMWU8tePsruC5BCFSqEIS
-         2IaU2ExOv1zXNqu3KhmG4mYdDEOpWbGADacdu/ImSbsAaB8heiYjT5Cee5drMpNuZnB8
-         IJsQIVoSlEe201PupM3mgWYgN9I3vcgjxthJzo5nGeeHOTMpqBnhlEiEiVeBKN8pvV0e
-         rHIFrKXFtGkmPWJM4u82GGEuhtDLrKnxrW1VRyvdSu6j2LGa6SH9pw86NmvLPFQHs9sX
-         elWw==
-X-Gm-Message-State: AC+VfDwNAfKDtw4S0naHITtv1RQHQS9aveCFnYrQihdrzeQTQcwgJPv3
-	ZVFwLdQZK1uV84iOG1VoixrZnA==
-X-Google-Smtp-Source: ACHHUZ74xHy3Q+upbLQlKFFcBssYX0WpfXMEve5SgQOi/ntELy8xB4pjSzgKM2I4g5IiYUtWQ6beAA==
-X-Received: by 2002:a05:600c:2049:b0:3f1:6fea:790a with SMTP id p9-20020a05600c204900b003f16fea790amr1174571wmg.30.1684406601090;
-        Thu, 18 May 2023 03:43:21 -0700 (PDT)
-Received: from localhost.localdomain (5750a5b3.skybroadband.com. [87.80.165.179])
-        by smtp.gmail.com with ESMTPSA id f6-20020a1c6a06000000b003f427cba193sm4880523wmc.41.2023.05.18.03.43.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 May 2023 03:43:20 -0700 (PDT)
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: oliver.upton@linux.dev,
-	maz@kernel.org
-Cc: james.morse@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: [PATCH 4/4] KVM: arm64: vgic: Fix a comment
-Date: Thu, 18 May 2023 11:09:18 +0100
-Message-Id: <20230518100914.2837292-5-jean-philippe@linaro.org>
-X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20230518100914.2837292-1-jean-philippe@linaro.org>
-References: <20230518100914.2837292-1-jean-philippe@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ED1B17AB8
+	for <kvmarm@lists.linux.dev>; Thu, 18 May 2023 12:15:08 +0000 (UTC)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+	by mailout.nyi.internal (Postfix) with ESMTP id 961145C00EC;
+	Thu, 18 May 2023 08:15:07 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute6.internal (MEProxy); Thu, 18 May 2023 08:15:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to; s=fm3; t=1684412107; x=1684498507; bh=fS
+	5DdDFtTTn+8EfiHkrWv7ABPSLcgtewyNrKXdzJzs0=; b=Q7YRtBTF1pz8hraVVH
+	+cr9wqKEaL/zXIHhwE05rzn6ITpGP7IeHlrfUOSSNSFqf2C9ZYr17Ggs92JkqBdo
+	skVQ+s9NN0U15wPsjr9R7wSKZN2XXP4T2a60jG6997EpkjTTekdYOgLvytJlp5fa
+	xYEhqDxz85//H6nYiQ1173fkd6ZOruHC7xnQgpkqHyf6s4A2VB1brNJ2jI5y13gH
+	o2gN9DDk8L5hfMAj/AI7LYnAM5kW7eosyDGED+F9gvVuVJx8DJEOiTPhbxGykdqP
+	c0gUswWp3UhMoSbNRjUidXkS89bcN24EGNfMh0TO3JX+j6/84zTamuLsUbr1cFry
+	gV+Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm1; t=1684412107; x=1684498507; bh=fS5DdDFtTTn+8
+	EfiHkrWv7ABPSLcgtewyNrKXdzJzs0=; b=NGeYbaHU+K4pr/7KGmqf1TnTUfFLZ
+	4Bio3c4/IIGCHL4E8YCncmW+541GIBZRSXuG7t5c6Z5LDWzObS1kgSCM2pCpI/GA
+	W4GSHv31Cj7shqrx2hIcwGYVsktnaypSXy1lJcOHbBk4jeJHQrc9tNNyS4mh+pLW
+	/uuj1+/oJNcz/zxUPj7Tsxm87CpmubGKShp+5beFSotDHZMeOUO9zgcvTPZZE9SP
+	OvVXFe0kq0HGO3a51XK1J6eKJeA3I+qLFmL9Zc8xklGGJayNQF/Kxbvfkc4gTpKv
+	geqzVX3KPfbrHth33eRSiFricZtzsSj7FC33JWkzb3DWvxRu1x853rb5A==
+X-ME-Sender: <xms:yxZmZPXADb9mThc68Q53vbyrn3n6Vuub5vTSpww1n8u9Fw7VkiBSOg>
+    <xme:yxZmZHliCVSrg689UuJ6AmOokKWjRsBOJMj04iiXz5rft0jXfGOUUARgkhglJ4JCp
+    04h5CSExytxL_H72Qw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfeeifedggeelucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
+    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
+    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
+    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hrnhgusegrrhhnuggsrdguvg
+X-ME-Proxy: <xmx:yxZmZLb7Y-Odn2Y-xDQus1bG0zy5rXtGPQE_lkj1N_iA1Gd4Gsrpyg>
+    <xmx:yxZmZKUcY8qdH8EBaj88DaSq1LsCN4EzmILUSF1zQLBo2O1TP6Raag>
+    <xmx:yxZmZJk0T_LgYLRQK1ku5i1OE-NTqXO9-1rrDbKDGs4mgo-gn3cCOg>
+    <xmx:yxZmZM8H66rNa6irTC97CIMg5_CMMo_vWxJVjSpcsoDrX25Etk4LhA>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 29BD4B60086; Thu, 18 May 2023 08:15:07 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-431-g1d6a3ebb56-fm-20230511.001-g1d6a3ebb
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Message-Id: <85a2cc47-dd95-4c39-82ab-8bf7a2a1589a@app.fastmail.com>
+In-Reply-To: <86lehmksf1.wl-maz@kernel.org>
+References: <20230517202352.793673-1-arnd@kernel.org>
+ <86lehmksf1.wl-maz@kernel.org>
+Date: Thu, 18 May 2023 14:14:46 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Marc Zyngier" <maz@kernel.org>, "Arnd Bergmann" <arnd@kernel.org>
+Cc: "Oliver Upton" <oliver.upton@linux.dev>,
+ "Catalin Marinas" <catalin.marinas@arm.com>, "Will Deacon" <will@kernel.org>,
+ "Shaoqin Huang" <shahuang@redhat.com>,
+ "Ricardo Koller" <ricarkol@google.com>, "Gavin Shan" <gshan@redhat.com>,
+ "James Morse" <james.morse@arm.com>,
+ "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+ "Zenghui Yu" <yuzenghui@huawei.com>, "Cornelia Huck" <cohuck@redhat.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] arm64: kvm: avoid overflow in integer division
+Content-Type: text/plain
 
-It is host userspace, not the guest, that issues
-KVM_DEV_ARM_VGIC_GRP_CTRL
+On Thu, May 18, 2023, at 09:30, Marc Zyngier wrote:
+> On Wed, 17 May 2023 21:23:39 +0100,
+> Arnd Bergmann <arnd@kernel.org> wrote:
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index 3386bd28d267..6db9ef288ec3 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -92,8 +92,8 @@ static int kvm_mmu_split_nr_page_tables(u64 range)
+>>  	int n = 0;
+>>  
+>>  	if (KVM_PGTABLE_MIN_BLOCK_LEVEL < 2)
+>> -		n += DIV_ROUND_UP_ULL(range, PUD_SIZE);
+>> -	n += DIV_ROUND_UP_ULL(range, PMD_SIZE);
+>> +		n += DIV_ROUND_UP(range, PUD_SIZE);
+>> +	n += DIV_ROUND_UP(range, PMD_SIZE);
+>>  	return n;
+>>  }
+>
+> This is against -next, right? Oliver, I assume you'll take this as a
+> fix for Ricardo's series?
 
-Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
----
- arch/arm64/kvm/vgic/vgic-init.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Yes, correct, I saw it after rebasing my tree from 6.4-rc2 to the
+latest -next.
 
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index c199ba2f192ef..6eafc2c45cfcf 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -406,7 +406,7 @@ void kvm_vgic_destroy(struct kvm *kvm)
- 
- /**
-  * vgic_lazy_init: Lazy init is only allowed if the GIC exposed to the guest
-- * is a GICv2. A GICv3 must be explicitly initialized by the guest using the
-+ * is a GICv2. A GICv3 must be explicitly initialized by userspace using the
-  * KVM_DEV_ARM_VGIC_GRP_CTRL KVM_DEVICE group.
-  * @kvm: kvm struct pointer
-  */
--- 
-2.40.0
-
+     Arnd
