@@ -1,135 +1,85 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from out-21.mta1.migadu.com (out-21.mta1.migadu.com [95.215.58.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFC0E17AB8
-	for <kvmarm@lists.linux.dev>; Thu, 18 May 2023 12:16:27 +0000 (UTC)
-Received: from kwepemm000005.china.huawei.com (unknown [172.30.72.53])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4QMTQf2LRDzLq4S;
-	Thu, 18 May 2023 20:13:30 +0800 (CST)
-Received: from lhrpeml500001.china.huawei.com (7.191.163.213) by
- kwepemm000005.china.huawei.com (7.193.23.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Thu, 18 May 2023 20:16:23 +0800
-Received: from lhrpeml500001.china.huawei.com ([7.191.163.213]) by
- lhrpeml500001.china.huawei.com ([7.191.163.213]) with mapi id 15.01.2507.023;
- Thu, 18 May 2023 13:16:21 +0100
-From: Salil Mehta <salil.mehta@huawei.com>
-To: Marc Zyngier <maz@kernel.org>
-CC: Oliver Upton <oliver.upton@linux.dev>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Paolo
- Bonzini" <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, "Suzuki K
- Poulose" <suzuki.poulose@arm.com>, yuzenghui <yuzenghui@huawei.com>, "Sean
- Christopherson" <seanjc@google.com>
-Subject: RE: [PATCH v3 08/13] KVM: arm64: Add support for KVM_EXIT_HYPERCALL
-Thread-Topic: [PATCH v3 08/13] KVM: arm64: Add support for KVM_EXIT_HYPERCALL
-Thread-Index: AQHZZwvyoTfThYxWf0yKNVt4c9uQr68cQ2uAgABJ1QCAQm5ckIAAAwIAgADh0gCAAB5bIP///H2AgAA2qwA=
-Date: Thu, 18 May 2023 12:16:21 +0000
-Message-ID: <146e9efc278f4418a21415672715e3f6@huawei.com>
-References: <20230404154050.2270077-1-oliver.upton@linux.dev>
-        <20230404154050.2270077-9-oliver.upton@linux.dev>
-        <87o7o26aty.wl-maz@kernel.org>        <86pm8iv8tj.wl-maz@kernel.org>
-        <fd9aee7022ea47e29cbff3120764c2c6@huawei.com>
-        <ZGUfFn0jai9n4eSF@linux.dev>        <86ilcqkqrf.wl-maz@kernel.org>
-        <30eae0208b55463bb644c6700951d4b8@huawei.com>
- <86fs7ukmba.wl-maz@kernel.org>
-In-Reply-To: <86fs7ukmba.wl-maz@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [10.48.154.240]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD89753A8
+	for <kvmarm@lists.linux.dev>; Thu, 18 May 2023 16:06:37 +0000 (UTC)
+Date: Thu, 18 May 2023 18:06:33 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1684425995;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KHGguFp+orUyyeGUiq903ZvHKiCDRzmx4cH7McznNKM=;
+	b=JMei6YcyuQd3irjiVZHAGYMGwYB+IjxvE5FJo/Sx6/SIggPXHwYhBj0EdK/Mfnw/RhnCCO
+	pPSk8cqV5Vdvgc0F5IC73wDo08rrzdIZv4gGJxMTQPOxs/hOWTfWDne1Htkzt14wOZsGtM
+	u/8a98qcafuwA0fIA+jAo3nXBMYskAs=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, luc.maranget@inria.fr
+Subject: Re: [kvm-unit-tests PATCH] arm64: Make vector_table and vector_stub
+ weak symbols
+Message-ID: <20230518-d8bd66e7bf671f5df706a216@orel>
+References: <20230515221517.646549-1-nikos.nikoleris@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230515221517.646549-1-nikos.nikoleris@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Marc,
+On Mon, May 15, 2023 at 11:15:17PM +0100, Nikos Nikoleris wrote:
+> This changes allows a test to define and override the declared symbols,
+> taking control of the whole vector_table or a vector_stub.
 
-> From: Marc Zyngier <maz@kernel.org>
-> Sent: Thursday, May 18, 2023 10:43 AM
-> To: Salil Mehta <salil.mehta@huawei.com>
-> Cc: Oliver Upton <oliver.upton@linux.dev>; kvmarm@lists.linux.dev;
-> kvm@vger.kernel.org; Paolo Bonzini <pbonzini@redhat.com>; James Morse
-> <james.morse@arm.com>; Suzuki K Poulose <suzuki.poulose@arm.com>; yuzengh=
-ui
-> <yuzenghui@huawei.com>; Sean Christopherson <seanjc@google.com>
-> Subject: Re: [PATCH v3 08/13] KVM: arm64: Add support for
-> KVM_EXIT_HYPERCALL
->=20
+Hi Nikos,
 
-[...]
+Can you add some motivation for this change to the commit message or
+submit it along with some test that needs it?
 
+Thanks,
+drew
 
-> > > > > > > Should we expose the ESR, or at least ESR_EL2.IL as an additi=
-onal
-> > > > > > > flag?
-> > > > >
-> > > > >
-> > > > > I think we would need "Immediate value" of the ESR_EL2 register i=
-n the
-> > > > > user-space/VMM to be able to construct the syndrome value. I cann=
-ot see
-> > > > > where it is being sent?
-> > > >
-> > > > The immediate value is not exposed to userspace, although by defini=
-tion
-> > > > the immediate value must be zero. The SMCCC spec requires all compl=
-iant
-> > > > calls to use an immediate of zero (DEN0028E 2.9).
-> > > >
-> > > > Is there a legitimate use case for hypercalls with a nonzero immedi=
-ate?
-> > > > They would no longer be considered SMCCC calls at that point, so th=
-ey
-> > > > wouldn't work with the new UAPI.
-> > >
-> > > I agree. The use of non-zero immediate has long been deprecated. I
-> > > guess we should actually reject non-zero immediate for HVC just like
-> > > we do for SMC.
-> >
-> >
-> > Ok. Maybe I will hard code Immediate value as 0 to create a syndrome va=
-lue
-> > at the VMM/Qemu and will also put a note stating non-zero immediate for
-> > HVC/SVC are not supported/deprecated.
->=20
-> Yes, because this should be the only situation where you should see
-> such an exit to userspace.
->=20
-> > > If there is an actual need for a non-zero immediate to be propagated
-> > > to userspace (want to emulate Xen's infamous 'HVC #0xEA1'?), then thi=
-s
-> > > should be an extension to the current API.
-> >
-> > Oh ok, then perhaps this new extension change should be simultaneously
-> > committed to avoid breaking Xen?
->=20
-> How would that break Xen? I don't have any plan to emulate Xen in any
-> shape or form, and I don't think anyone want to do that in userspace
-> either.
-
-
-Ok. I thought you are suggestion an exception which is already in use
-and the current change might break it but now that does not seems to be
-the case.
-
-
-> I really want to see an actual use case to expand this stuff. Because
-> so far, we follow the strict SMCCC spec, and nothing else. But if we
-> admit deviations, do we also have to expose SMC and HVC as different
-> instructions?
-
-
-Ok got it. No problem and makes sense what you just said. Maybe in future
-if it is really required then we can always come back to it. For now, I
-will go ahead with the agreed change in the qemu.
-
-Many thanks
-Salil.
-
-
+> 
+> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+> ---
+>  arm/cstart64.S | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index e4ab7d06..eda0daa5 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -275,8 +275,11 @@ exceptions_init:
+>  /*
+>   * Vector stubs
+>   * Adapted from arch/arm64/kernel/entry.S
+> + * Declare as weak to allow external tests to redefine and override a
+> + * vector_stub.
+>   */
+>  .macro vector_stub, name, vec
+> +.weak \name
+>  \name:
+>  	stp	 x0,  x1, [sp, #-S_FRAME_SIZE]!
+>  	stp	 x2,  x3, [sp,  #16]
+> @@ -369,7 +372,13 @@ vector_stub	el0_error_32, 15
+>  	b	\label
+>  .endm
+>  
+> +
+> +/*
+> + * Declare as weak to allow external tests to redefine and override the
+> + * default vector table.
+> + */
+>  .align 11
+> +.weak vector_table
+>  vector_table:
+>  	ventry	el1t_sync			// Synchronous EL1t
+>  	ventry	el1t_irq			// IRQ EL1t
+> -- 
+> 2.25.1
+> 
