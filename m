@@ -1,119 +1,87 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51EC6611C
-	for <kvmarm@lists.linux.dev>; Fri, 19 May 2023 09:16:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFA0DC433D2;
-	Fri, 19 May 2023 09:16:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1684487791;
-	bh=vp8fyf2m1zfTMc2De/CZpZJng1oQxcLCGX8JG2wc9Z4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lx9YbqAUrgEKdhnRZTGrgA5c0PnJKn7rqnRye3oWZBmCQN4Y00d1+qeMdG2x/vQzC
-	 7GGd/haFegIoW+DwuZkQFJsMJD7TJIdqY6Ak15rqtvTNKd98kMncSbR4DhYEPRpMq8
-	 kD6zsMiXvzKmL07HhoHIiJZSzGfmyQYJVJcefxUnaFigZmj1m84BGO4L5LGd0gaBoC
-	 D6yE6bqTbC1x0BaT7Sy3IWzovx4qbsGUyLhmJxA3p0vy//IO9atMPfHf/kFLUtXxWi
-	 2EUQQYedVmrHYc5RAXoGD0me6hYn4FpV7HdtTkH88Suoy5U4cfSveGeC8ZgTzmN2WQ
-	 3jfXqiJwsAAOg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pzwDs-00GNCn-Fn;
-	Fri, 19 May 2023 10:16:28 +0100
-Date: Fri, 19 May 2023 10:16:28 +0100
-Message-ID: <86bkigllzn.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: "Jitindar Singh, Suraj" <surajjs@amazon.com>
-Cc: "jingzhangos@google.com" <jingzhangos@google.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"reijiw@google.com"
-	<reijiw@google.com>,
-	"james.morse@arm.com" <james.morse@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"rananta@google.com" <rananta@google.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>,
-	"tabba@google.com" <tabba@google.com>,
-	"oupton@google.com" <oupton@google.com>,
-	"alexandru.elisei@arm.com" <alexandru.elisei@arm.com>,
-	"will@kernel.org"
-	<will@kernel.org>
-Subject: Re: [PATCH v8 6/6] KVM: arm64: Refactor writings for PMUVer/CSV2/CSV3
-In-Reply-To: <7a4a7d86c851563d5ad631070611918906e92015.camel@amazon.com>
-References: <20230503171618.2020461-1-jingzhangos@google.com>
-	<20230503171618.2020461-7-jingzhangos@google.com>
-	<b64e5639b1b9bb5e5e4ff8eaa10554ae0d9a6016.camel@amazon.com>
-	<CAAdAUtibBVuMGhh9NEOxpEyMQ6bxde674ME+hHqERoT5hctETA@mail.gmail.com>
-	<7a4a7d86c851563d5ad631070611918906e92015.camel@amazon.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DB367C
+	for <kvmarm@lists.linux.dev>; Fri, 19 May 2023 13:22:50 +0000 (UTC)
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-309553c5417so682543f8f.2
+        for <kvmarm@lists.linux.dev>; Fri, 19 May 2023 06:22:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1684502569; x=1687094569;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RlMw0paf1cFnYLwJc02VyWBZPHrMJyJVDdAIIhmPwpE=;
+        b=ifbctZ+naKOekbPoCfJl/TWwhdWu3SuO5GBuQWCD/ojbKvEMAcAW9ckP4qGjRvXOwR
+         DGgXvZmITPzqylDJj2ver01RktPpN2fYCGo2sBBj2bpUTbYVHRnJ29AADoA/2Dj/FV4s
+         3I1vK3bR30pqUsnUKcnywVOXELNNT6gAWPEXYa6+nOH6E9mEmFF4/4JCFTfuxpEmKzBq
+         b/XRvbELeFufclHqty7uR1sTV5ci31bNWg4LgdpKMdbFxDsYqx26PYgrc8l+blIciIuU
+         jihYK3htw6Fvz5oUHUHsepa4e00auUVZX/o45YCH0BZSDhhdgectLjYMb1Wl1SjF0yw6
+         BmFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684502569; x=1687094569;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RlMw0paf1cFnYLwJc02VyWBZPHrMJyJVDdAIIhmPwpE=;
+        b=cXw38eCO1eBy+AP/3TgWdSSqg5a4gl66FrosUzPJcICwQkOIRvkkg8Dex/7C/EdXAr
+         mDQDUVzKGi+hdvybjncTftugPM6HldMO6pWemCeJ1tw3hODNdo5ZxR1OelWdSR/3/eW1
+         hpkKAYrrlF4CTg68prsnTfi/mNL3C8teHtSBnW46YkItCyEMmhAkS9uJBsWpHUlEr1xp
+         QEl0D2C2rNbH1T0zOdPka8VYVfBJqy5OTIo+roYMXobh76WRjDgfgls5xNukknOVUlZP
+         u3P0G0ubSeVeFkqJM8FauTAw/fr4A7WqwsevhwNtxA3JIAwxFwXIjuSq1n9lfG4Tinga
+         eidA==
+X-Gm-Message-State: AC+VfDwd/lWz+zDaSkthpn8Q8SLYB60OKcMs6HG4sOoLnPgI+MS3mhJd
+	0NsUgms/lq1Y51W0aItaJ4d6NA==
+X-Google-Smtp-Source: ACHHUZ5+Audctj3y8gm6RTHI8EcbARoOXLPH+SvSqZHTe5QNUlkBpu+1ADgc/kR0BC0fyu1zEWChLg==
+X-Received: by 2002:adf:eacf:0:b0:309:3da5:be89 with SMTP id o15-20020adfeacf000000b003093da5be89mr2035226wrn.71.1684502568753;
+        Fri, 19 May 2023 06:22:48 -0700 (PDT)
+Received: from myrica (5750a5b3.skybroadband.com. [87.80.165.179])
+        by smtp.gmail.com with ESMTPSA id t18-20020adff052000000b0030922ba6d0csm5274205wro.45.2023.05.19.06.22.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 May 2023 06:22:48 -0700 (PDT)
+Date: Fri, 19 May 2023 14:22:51 +0100
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH 0/4] KVM: arm64: vgic: Locking fixes
+Message-ID: <20230519132251.GA2976986@myrica>
+References: <20230518100914.2837292-1-jean-philippe@linaro.org>
+ <86cz2wlnd6.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: surajjs@amazon.com, jingzhangos@google.com, pbonzini@redhat.com, reijiw@google.com, james.morse@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev, rananta@google.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, tabba@google.com, oupton@google.com, alexandru.elisei@arm.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86cz2wlnd6.wl-maz@kernel.org>
 
-On Thu, 18 May 2023 22:08:15 +0100,
-"Jitindar Singh, Suraj" <surajjs@amazon.com> wrote:
+On Fri, May 19, 2023 at 09:46:45AM +0100, Marc Zyngier wrote:
+> On Thu, 18 May 2023 11:09:14 +0100,
+> Jean-Philippe Brucker <jean-philippe@linaro.org> wrote:
+> > 
+> > Another fun locking puzzle, between the new config_lock and srcu.
+> > Patch 1 attempts to fix it, and the other patches fix simpler issues.
 > 
-> Reading init_cpu_ftr_reg() is hurting my head :p but don't we have
-> basically 2 cases here?
+> Thanks for that and for your excellent description of the problems.
 > 
-> 1. We are unaffected by spectre|meltdown i.e.
-> arm64_get_[spectre|meltdown]_v2_state() will return SPECTRE_UNAFFECTED
-> and we will set the limit to 1 for the csv[1|2] bit fields in
-> read_sanitised_id_aa64pfr0_el1()
->
-> or
+> > I got these lockdep reports while running KVM QEMU on a TCG QEMU, but it
+> > can also be triggered by running the vgic_irq kselftest on TCG QEMU.
+> > Now, with the fix and lockdep enabled, vgic_irq hangs but I believe it's
+> > an unrelated weirdness: if I introduce a separate lockdep warning for
+> > some made up locks, then the test passes again. So I'm sending this out
+> > now for discussion, and will investigate that one later.
 > 
-> 2. We ARE affected by spectre|meltdown in which case
-> arm64_get_[spectre|meltdown]_v2_state() will be
-> SPECTRE_VULNERABLE|SPECTRE_MITIGATED in which case
-> read_sanitised_ftr_reg() will return a value with csv[1|2] set to 0
-> essentially setting the limit for either of these bit fields to 0 in
-> read_sanitised_id_aa64pfr0_el1().
-
-What is "WE"?
-
+> I've taken these patches for a spin, and I cannot reproduce this hang,
+> though I'm running on actual HW and not QEMU. It would be really
+> annoying if lockdep actively introduced issues... :-/
 > 
-> Are we trying to catch the case where csv[1|2] is 0 on the host but we
-> are unaffected as detected by e.g. cpuid and that cpu happens to
-> incorrectly not set csv[1|2] in the ID register but we still want to
-> allow the guest to see those bits as set?
-> 
-> This isn't really related to the CR as I know this is existing code
-> which has just been moved around and sorry if I'm missing something
-> obvious.
+> Any chance you could dig into this as you have a good reproducer? I'll
+> try to setup a TGC environment on my end as well.
 
-This code is called from *userspace*, and tries to cope with a VM
-being restored. So we have 3 (not 2 cases):
+Sure, I'll investigate this. All I know so far is that it is stuck
+somewhere in the first test_inject_preemption()
 
-- both the source and the destination have the same level of CSVx
-  support, and all is great in the world
-
-- the source has CSVx==0, while the destination has CSVx=1. All good,
-  as we won't be lying to the guest, and the extra mitigation
-  executed by the guest isn't a functional problem. The guest will
-  still see CSVx=0 after migration.
-
-- the source has CSVx=1, while the destination has CSVx=0. This isn't
-  an acceptable situation, and we return an error
-
-Is that clearer?
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Jean
