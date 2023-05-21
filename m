@@ -1,34 +1,27 @@
-Received: from out-37.mta1.migadu.com (out-37.mta1.migadu.com [95.215.58.37])
+Received: from out-3.mta1.migadu.com (out-3.mta1.migadu.com [95.215.58.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 090E48F62
-	for <kvmarm@lists.linux.dev>; Sun, 21 May 2023 19:33:01 +0000 (UTC)
-Date: Sun, 21 May 2023 19:32:55 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4F58F65
+	for <kvmarm@lists.linux.dev>; Sun, 21 May 2023 20:08:22 +0000 (UTC)
+Date: Sun, 21 May 2023 20:08:17 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1684697580;
+	t=1684699700;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Akzv5NktCvKGPt0vU42haRZ9ILj4vsVHEjDPh0FBt5c=;
-	b=hL8GqOAV5h82tlgHzhue02i1byAYrjXvnwi5Ela8TBVeuXBMB0Za94zqr7INqehcHRIL/A
-	jITLf8LDah5KC3AJdzTCa0LHbRSoVjL1Acgd+4ZWUV7HbZTwr/Ij/+bsdb8iOUWjHRoDmb
-	HyTrLoAajcfC5oH0wKrD5HhkmkoUGSQ=
+	bh=Q7WQkqZcm04N/jW9ZyNj+nzjjEZmdtn4IamLFYtE6cA=;
+	b=Hh2SlnzhFD7KQb3gu2DVVV36KSCTEoYR8cfHjLW7JhOTOV6Wtd/aG6XbB2pSdQ/7bbHPDw
+	Z0FJsMP3HpZwW2USrs4aOgzfQfZi4WQupxWYmZfDh+A017BkYU6dEZhA+a56qMTIYKl8ta
+	0XE58PVn6TSBtzfBKJjFHerp9lYSKCc=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v4 6/6] KVM: arm64: Use TLBI range-based intructions for
- unmap
-Message-ID: <ZGpx58R6Lp1qpTkA@linux.dev>
-References: <20230519005231.3027912-1-rananta@google.com>
- <20230519005231.3027912-7-rananta@google.com>
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev, maz@kernel.org,
+	Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH] KVM: arm64: Prevent unconditional donation of unmapped
+ regions from the host
+Message-ID: <ZGp6MeRfDOV8EIWz@linux.dev>
+References: <20230518095844.1178-1-will@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -37,118 +30,90 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230519005231.3027912-7-rananta@google.com>
+In-Reply-To: <20230518095844.1178-1-will@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-On Fri, May 19, 2023 at 12:52:31AM +0000, Raghavendra Rao Ananta wrote:
-> The current implementation of the stage-2 unmap walker traverses
-> the given range and, as a part of break-before-make, performs
-> TLB invalidations with a DSB for every PTE. A multitude of this
-> combination could cause a performance bottleneck.
+Hi Will,
+
+On Thu, May 18, 2023 at 10:58:44AM +0100, Will Deacon wrote:
+> Since host stage-2 mappings are created lazily, we cannot rely solely on
+> the pte in order to recover the target physical address when checking a
+> host-initiated memory transition as this permits donation of unmapped
+> regions corresponding to MMIO or "no-map" memory.
 > 
-> Hence, if the system supports FEAT_TLBIRANGE, defer the TLB
-> invalidations until the entire walk is finished, and then
-> use range-based instructions to invalidate the TLBs in one go.
-> Condition this upon S2FWB in order to avoid walking the page-table
-> again to perform the CMOs after issuing the TLBI.
+> Instead of inspecting the pte, move the addr_is_allowed_memory() check
+> into the host callback function where it is passed the physical address
+> directly from the walker.
 
-nit: Rather than discussing a theoretical CMO walker, I think this is
-more readable if you mention the existing behavior of the walker.
+nit: the subtext here is that the host's stage-2 is an identity map.
+That part might not be entirely obvious, as you're passing through the
+input address of the walk.
 
-  Condition deferred TLB invalidation on the system supporting FWB, as
-  the optimization is entirely pointless when the unmap walker needs to
-  perform CMOs.
+Not worth respinning, but I wonder if some additional documentation on
+host stage-2 management would help folks outside of pKVM with reviewing
+pKVM changes. Cache behavior could also use a bit more clarification so
+folks understand why pKVM elides CMOs and doesn't use FWB.
 
-> Rename stage2_put_pte() to stage2_unmap_put_pte() as the function
-> now serves the stage-2 unmap walker specifically, rather than
-> acting generic.
-> 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+Of course, I'm likely fooling myself in believing that additional
+documentation will get non-pKVM folks to review pKVM changes :)
+
+> Cc: Quentin Perret <qperret@google.com>
+> Fixes: e82edcc75c4e ("KVM: arm64: Implement do_share() helper for sharing memory")
+> Signed-off-by: Will Deacon <will@kernel.org>
+
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+
 > ---
->  arch/arm64/kvm/hyp/pgtable.c | 35 ++++++++++++++++++++++++++++++-----
->  1 file changed, 30 insertions(+), 5 deletions(-)
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index b8f0dbd12f773..5832ee3418fb0 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -771,16 +771,34 @@ static void stage2_make_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t n
->  	smp_store_release(ctx->ptep, new);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 2e9ec4a2a4a3..a8813b212996 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -575,7 +575,7 @@ struct pkvm_mem_donation {
+>  
+>  struct check_walk_data {
+>  	enum pkvm_page_state	desired;
+> -	enum pkvm_page_state	(*get_page_state)(kvm_pte_t pte);
+> +	enum pkvm_page_state	(*get_page_state)(kvm_pte_t pte, u64 addr);
+>  };
+>  
+>  static int __check_page_state_visitor(const struct kvm_pgtable_visit_ctx *ctx,
+> @@ -583,10 +583,7 @@ static int __check_page_state_visitor(const struct kvm_pgtable_visit_ctx *ctx,
+>  {
+>  	struct check_walk_data *d = ctx->arg;
+>  
+> -	if (kvm_pte_valid(ctx->old) && !addr_is_allowed_memory(kvm_pte_to_phys(ctx->old)))
+> -		return -EINVAL;
+> -
+> -	return d->get_page_state(ctx->old) == d->desired ? 0 : -EPERM;
+> +	return d->get_page_state(ctx->old, ctx->addr) == d->desired ? 0 : -EPERM;
 >  }
 >  
-> -static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu,
-> -			   struct kvm_pgtable_mm_ops *mm_ops)
-> +static bool stage2_unmap_defer_tlb_flush(struct kvm_pgtable *pgt)
->  {
-> +	/*
-> +	 * If FEAT_TLBIRANGE is implemented, defer the individial PTE
-
-typo: individual
-
-Also, 'PTE' isn't significant here.
-
-> +	 * TLB invalidations until the entire walk is finished, and
-> +	 * then use the range-based TLBI instructions to do the
-> +	 * invalidations. Condition this upon S2FWB in order to avoid
-> +	 * a page-table walk again to perform the CMOs after TLBI.
-> +	 */
-
-Apply the wording suggestion from the changelog here as well.
-
-> +	return system_supports_tlb_range() && stage2_has_fwb(pgt);
-> +}
-> +
-> +static void stage2_unmap_put_pte(const struct kvm_pgtable_visit_ctx *ctx,
-> +				struct kvm_s2_mmu *mmu,
-> +				struct kvm_pgtable_mm_ops *mm_ops)
-> +{
-> +	struct kvm_pgtable *pgt = ctx->arg;
-> +
->  	/*
->  	 * Clear the existing PTE, and perform break-before-make with
->  	 * TLB maintenance if it was valid.
->  	 */
->  	if (kvm_pte_valid(ctx->old)) {
->  		kvm_clear_pte(ctx->ptep);
-> -		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
-> +
-> +		if (!stage2_unmap_defer_tlb_flush(pgt))
-> +			kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu,
-> +					ctx->addr, ctx->level);
->  	}
->  
->  	mm_ops->put_page(ctx->ptep);
-> @@ -1015,7 +1033,7 @@ static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
->  	 * block entry and rely on the remaining portions being faulted
->  	 * back lazily.
->  	 */
-> -	stage2_put_pte(ctx, mmu, mm_ops);
-> +	stage2_unmap_put_pte(ctx, mmu, mm_ops);
->  
->  	if (need_flush && mm_ops->dcache_clean_inval_poc)
->  		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(ctx->old, mm_ops),
-> @@ -1029,13 +1047,20 @@ static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
->  
->  int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
->  {
-> +	int ret;
->  	struct kvm_pgtable_walker walker = {
->  		.cb	= stage2_unmap_walker,
->  		.arg	= pgt,
->  		.flags	= KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABLE_POST,
->  	};
->  
-> -	return kvm_pgtable_walk(pgt, addr, size, &walker);
-> +	ret = kvm_pgtable_walk(pgt, addr, size, &walker);
-> +	if (stage2_unmap_defer_tlb_flush(pgt))
-> +		/* Perform the deferred TLB invalidations */
-> +		kvm_call_hyp(__kvm_tlb_flush_vmid_range, pgt->mmu,
-> +				addr, addr + size);
-> +
-> +	return ret;
+>  static int check_page_state_range(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> @@ -601,8 +598,11 @@ static int check_page_state_range(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>  	return kvm_pgtable_walk(pgt, addr, size, &walker);
 >  }
 >  
->  struct stage2_attr_data {
+> -static enum pkvm_page_state host_get_page_state(kvm_pte_t pte)
+> +static enum pkvm_page_state host_get_page_state(kvm_pte_t pte, u64 addr)
+>  {
+> +	if (!addr_is_allowed_memory(addr))
+> +		return PKVM_NOPAGE;
+> +
+>  	if (!kvm_pte_valid(pte) && pte)
+>  		return PKVM_NOPAGE;
+>  
+> @@ -709,7 +709,7 @@ static int host_complete_donation(u64 addr, const struct pkvm_mem_transition *tx
+>  	return host_stage2_set_owner_locked(addr, size, host_id);
+>  }
+>  
+> -static enum pkvm_page_state hyp_get_page_state(kvm_pte_t pte)
+> +static enum pkvm_page_state hyp_get_page_state(kvm_pte_t pte, u64 addr)
+>  {
+>  	if (!kvm_pte_valid(pte))
+>  		return PKVM_NOPAGE;
 > -- 
 > 2.40.1.698.g37aff9b760-goog
 > 
