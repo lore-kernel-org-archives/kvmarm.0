@@ -1,134 +1,316 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1DD113AD9
-	for <kvmarm@lists.linux.dev>; Mon, 22 May 2023 13:54:17 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DD05211FB;
-	Mon, 22 May 2023 06:55:01 -0700 (PDT)
-Received: from [10.57.59.200] (unknown [10.57.59.200])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 47B0B3F67D;
-	Mon, 22 May 2023 06:54:16 -0700 (PDT)
-Message-ID: <032397f4-62d2-add3-f7d5-0377e125454a@arm.com>
-Date: Mon, 22 May 2023 14:54:14 +0100
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C64E13AE7
+	for <kvmarm@lists.linux.dev>; Mon, 22 May 2023 16:02:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1684771372; x=1716307372;
+  h=date:from:to:cc:subject:message-id;
+  bh=YcKsNrZzbYoapgP2WalAuZDGoxvQoitEkp4ZslZrvY0=;
+  b=WA+wO+LQxS4qRS8zMur7HOQBkshdj3LpG4ARunFYXYn+iocEC//78ZND
+   0pcJiTMG4RmJgkhLWlg/BWuUwkEd63pVkK0CvSenuiMrvqxYHSqqoOx+Q
+   TVpLPZMwCdx2E9TjBrYIlYVhlKsqef2d+akcNtzvLNKW08YVIcU1nmbXl
+   JwQy4ZEwlKh0OgyaMnF70pIrH1t1Fx7QR/7ZZQEtBsU2EzGuaFb5L2Al1
+   9osnUETafo2RylHQpIWCiV5rU9z5uq5g0zmuUZT4xI69WIv3bcRAUQd9X
+   rAozJ0VOF8cwKCYd/915UsdVnJX/i1QFQqEMHnZGrymXqlxTaeXGdR/Wn
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10718"; a="337548595"
+X-IronPort-AV: E=Sophos;i="6.00,184,1681196400"; 
+   d="scan'208";a="337548595"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2023 09:02:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10718"; a="773427999"
+X-IronPort-AV: E=Sophos;i="6.00,184,1681196400"; 
+   d="scan'208";a="773427999"
+Received: from lkp-server01.sh.intel.com (HELO dea6d5a4f140) ([10.239.97.150])
+  by fmsmga004.fm.intel.com with ESMTP; 22 May 2023 09:02:48 -0700
+Received: from kbuild by dea6d5a4f140 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1q17zk-000CyJ-0L;
+	Mon, 22 May 2023 16:02:48 +0000
+Date: Tue, 23 May 2023 00:01:55 +0800
+From: kernel test robot <lkp@intel.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Linux Memory Management List <linux-mm@kvack.org>,
+ amd-gfx@lists.freedesktop.org, kasan-dev@googlegroups.com,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-perf-users@vger.kernel.org, linux-xfs@vger.kernel.org
+Subject: [linux-next:master] BUILD SUCCESS WITH WARNING
+ 9f258af06b6268be8e960f63c3f66e88bdbbbdb0
+Message-ID: <20230522160155.au0hJ%lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.11.0
-Subject: Re: [kvm-unit-tests PATCH] arm64: Make vector_table and vector_stub
- weak symbols
-Content-Language: en-GB
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, luc.maranget@inria.fr
-References: <20230515221517.646549-1-nikos.nikoleris@arm.com>
- <20230518-d8bd66e7bf671f5df706a216@orel>
-From: Nikos Nikoleris <nikos.nikoleris@arm.com>
-In-Reply-To: <20230518-d8bd66e7bf671f5df706a216@orel>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 18/05/2023 17:06, Andrew Jones wrote:
-> On Mon, May 15, 2023 at 11:15:17PM +0100, Nikos Nikoleris wrote:
->> This changes allows a test to define and override the declared symbols,
->> taking control of the whole vector_table or a vector_stub.
-> 
-> Hi Nikos,
-> 
-> Can you add some motivation for this change to the commit message or
-> submit it along with some test that needs it?
-> 
+tree/branch: INFO setup_repo_specs: /db/releases/20230522162832/lkp-src/repo/*/linux-next
+https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+branch HEAD: 9f258af06b6268be8e960f63c3f66e88bdbbbdb0  Add linux-next specific files for 20230522
 
-Hi Drew,
+Warning reports:
 
-Thanks for reviewing this.
+https://lore.kernel.org/oe-kbuild-all/202305132244.DwzBUcUd-lkp@intel.com
 
-What do you think about adding the following to the commit message?
+Warning: (recently discovered and may have been fixed)
 
-> With the ability to override specific exception handlers, litmus7
-> [1] a tool used to generate c sources for a given memory model
-> litmus test, can override the el1h_sync symbol to implement tests
-> with explicit exception handlers. For example:
-> 
-> AArch64 LDRv0+I2V-dsb.ishst
- > { >   [PTE(x)]=(oa:PA(x),valid:0);
->   x=1;
-> 
->   0:X1=x;
->   0:X3=PTE(x); >   0:X2=(oa:PA(x),valid:1);
- > }>  P0          | P0.F         ;
-> L0:          | ADD X8,X8,#1 ;
->  LDR W0,[X1] | STR X2,[X3]  ;
->              | DSB ISHST    ;
->              | ERET         ; > exists(0:X0=0 \/ 0:X8!=1)
-> 
-> In this test, a thread running in core P0 executes a load to a memory
-> location x. The PTE of the virtual address x is initially invalid.
-> The execution of the load causes a synchronous EL1 exception which is
-> handled by the code in P0.F. P0.F increments a counter which is
-> maintained in X8, updates the PTE of x and makes it valid, executes a
-> DSB ISHST and calls ERET which is expected to return and retry the
-> execution of the load in P0:L0.
-> 
-> The postcondition checks if there is any execution where the load 
-> wasn't executed (X0 its destination register is not update), or that 
-> the P0.F > handler was invoked more than once (the counter X8 is not 
-> 1).
-> 
-> For this tests, litmus7 needs to control the el1h_sync. Calling 
-> install_exception_handler() would be suboptimal because the 
-> vector_stub would wrap around the code of P0.F and disturb the test.
-> 
-> [1]: https://diy.inria.fr/doc/litmus.html
-If you think this is sufficient, I will update the patch. If not I could 
-look into adding a test in KUT but generally the code of these tests are 
-generated by a tool and the coding style (if one can call it a style) is 
-very different.
+drivers/base/regmap/regcache-maple.c:113:23: warning: 'lower_index' is used uninitialized [-Wuninitialized]
+drivers/base/regmap/regcache-maple.c:113:36: warning: 'lower_last' is used uninitialized [-Wuninitialized]
+drivers/gpu/drm/amd/amdgpu/../display/amdgpu_dm/amdgpu_dm.c:6396:21: warning: variable 'count' set but not used [-Wunused-but-set-variable]
 
-Thanks,
+Unverified Warning (likely false positive, please contact us if interested):
 
-Nikos
+arch/arm64/kvm/mmu.c:147:3-9: preceding lock on line 140
+fs/xfs/scrub/fscounters.c:459 xchk_fscounters() warn: ignoring unreachable code.
+kernel/events/uprobes.c:478 uprobe_write_opcode() warn: passing zero to 'PTR_ERR'
+kernel/watchdog.c:40:19: sparse: sparse: symbol 'watchdog_hardlockup_user_enabled' was not declared. Should it be static?
+kernel/watchdog.c:41:19: sparse: sparse: symbol 'watchdog_softlockup_user_enabled' was not declared. Should it be static?
 
-> Thanks,
-> drew
-> 
->>
->> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
->> ---
->>   arm/cstart64.S | 9 +++++++++
->>   1 file changed, 9 insertions(+)
->>
->> diff --git a/arm/cstart64.S b/arm/cstart64.S
->> index e4ab7d06..eda0daa5 100644
->> --- a/arm/cstart64.S
->> +++ b/arm/cstart64.S
->> @@ -275,8 +275,11 @@ exceptions_init:
->>   /*
->>    * Vector stubs
->>    * Adapted from arch/arm64/kernel/entry.S
->> + * Declare as weak to allow external tests to redefine and override a
->> + * vector_stub.
->>    */
->>   .macro vector_stub, name, vec
->> +.weak \name
->>   \name:
->>   	stp	 x0,  x1, [sp, #-S_FRAME_SIZE]!
->>   	stp	 x2,  x3, [sp,  #16]
->> @@ -369,7 +372,13 @@ vector_stub	el0_error_32, 15
->>   	b	\label
->>   .endm
->>   
->> +
->> +/*
->> + * Declare as weak to allow external tests to redefine and override the
->> + * default vector table.
->> + */
->>   .align 11
->> +.weak vector_table
->>   vector_table:
->>   	ventry	el1t_sync			// Synchronous EL1t
->>   	ventry	el1t_irq			// IRQ EL1t
->> -- 
->> 2.25.1
->>
+Warning ids grouped by kconfigs:
+
+gcc_recent_errors
+|-- alpha-allyesconfig
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|-- arc-allyesconfig
+|   |-- drivers-base-regmap-regcache-maple.c:warning:lower_index-is-used-uninitialized
+|   |-- drivers-base-regmap-regcache-maple.c:warning:lower_last-is-used-uninitialized
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|-- arc-buildonly-randconfig-r001-20230522
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|-- arm-allmodconfig
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|-- arm-allyesconfig
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|-- arm-randconfig-r036-20230521
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|-- arm64-allyesconfig
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|-- arm64-randconfig-c041-20230521
+|   `-- arch-arm64-kvm-mmu.c:preceding-lock-on-line
+|-- arm64-randconfig-s053-20230521
+|   `-- mm-kfence-core.c:sparse:sparse:cast-to-restricted-__le64
+|-- i386-allyesconfig
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|-- i386-randconfig-m021
+|   `-- kernel-events-uprobes.c-uprobe_write_opcode()-warn:passing-zero-to-PTR_ERR
+|-- ia64-allmodconfig
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|-- ia64-randconfig-m041-20230521
+|   `-- fs-xfs-scrub-fscounters.c-xchk_fscounters()-warn:ignoring-unreachable-code.
+|-- loongarch-allmodconfig
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|-- loongarch-defconfig
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|-- loongarch-randconfig-r033-20230522
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|-- mips-allmodconfig
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|-- mips-allyesconfig
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|-- powerpc-allmodconfig
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|-- riscv-allmodconfig
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|-- riscv-randconfig-r042-20230521
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|-- s390-allyesconfig
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|-- s390-randconfig-s042-20230521
+|   `-- mm-kfence-core.c:sparse:sparse:cast-to-restricted-__le64
+|-- sparc-allyesconfig
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|-- sparc-randconfig-s052-20230521
+|   |-- kernel-watchdog.c:sparse:sparse:symbol-watchdog_hardlockup_user_enabled-was-not-declared.-Should-it-be-static
+|   `-- kernel-watchdog.c:sparse:sparse:symbol-watchdog_softlockup_user_enabled-was-not-declared.-Should-it-be-static
+|-- sparc64-randconfig-r016-20230521
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|-- x86_64-allyesconfig
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|-- x86_64-randconfig-m001
+|   `-- kernel-events-uprobes.c-uprobe_write_opcode()-warn:passing-zero-to-PTR_ERR
+|-- x86_64-randconfig-s021
+|   |-- kernel-watchdog.c:sparse:sparse:symbol-watchdog_hardlockup_user_enabled-was-not-declared.-Should-it-be-static
+|   `-- kernel-watchdog.c:sparse:sparse:symbol-watchdog_softlockup_user_enabled-was-not-declared.-Should-it-be-static
+`-- x86_64-randconfig-s022
+    |-- kernel-watchdog.c:sparse:sparse:symbol-watchdog_hardlockup_user_enabled-was-not-declared.-Should-it-be-static
+    `-- kernel-watchdog.c:sparse:sparse:symbol-watchdog_softlockup_user_enabled-was-not-declared.-Should-it-be-static
+
+elapsed time: 722m
+
+configs tested: 166
+configs skipped: 12
+
+tested configs:
+alpha                            allyesconfig   gcc  
+alpha                               defconfig   gcc  
+alpha                randconfig-r006-20230522   gcc  
+alpha                randconfig-r011-20230522   gcc  
+alpha                randconfig-r024-20230522   gcc  
+arc                              allyesconfig   gcc  
+arc          buildonly-randconfig-r001-20230522   gcc  
+arc          buildonly-randconfig-r003-20230522   gcc  
+arc                                 defconfig   gcc  
+arc                 nsimosci_hs_smp_defconfig   gcc  
+arc                  randconfig-r023-20230522   gcc  
+arc                  randconfig-r043-20230521   gcc  
+arc                  randconfig-r043-20230522   gcc  
+arm                              allmodconfig   gcc  
+arm                              allyesconfig   gcc  
+arm                                 defconfig   gcc  
+arm                          gemini_defconfig   gcc  
+arm                      integrator_defconfig   gcc  
+arm                           omap1_defconfig   clang
+arm                  randconfig-r035-20230521   gcc  
+arm                  randconfig-r036-20230521   gcc  
+arm                  randconfig-r046-20230521   clang
+arm                  randconfig-r046-20230522   gcc  
+arm                          sp7021_defconfig   clang
+arm                    vt8500_v6_v7_defconfig   clang
+arm64                            allyesconfig   gcc  
+arm64        buildonly-randconfig-r006-20230522   gcc  
+arm64                               defconfig   gcc  
+arm64                randconfig-r016-20230522   clang
+csky         buildonly-randconfig-r004-20230521   gcc  
+csky                                defconfig   gcc  
+csky                 randconfig-r012-20230521   gcc  
+hexagon              randconfig-r002-20230522   clang
+hexagon              randconfig-r006-20230521   clang
+hexagon              randconfig-r024-20230521   clang
+hexagon              randconfig-r041-20230521   clang
+hexagon              randconfig-r041-20230522   clang
+hexagon              randconfig-r045-20230521   clang
+hexagon              randconfig-r045-20230522   clang
+i386                              allnoconfig   clang
+i386                             allyesconfig   gcc  
+i386                              debian-10.3   gcc  
+i386                                defconfig   gcc  
+i386                 randconfig-a001-20230522   gcc  
+i386                 randconfig-a002-20230522   gcc  
+i386                 randconfig-a003-20230522   gcc  
+i386                 randconfig-a004-20230522   gcc  
+i386                 randconfig-a005-20230522   gcc  
+i386                 randconfig-a006-20230522   gcc  
+i386                 randconfig-a011-20230522   clang
+i386                 randconfig-a012-20230522   clang
+i386                 randconfig-a013-20230522   clang
+i386                 randconfig-a014-20230522   clang
+i386                 randconfig-a015-20230522   clang
+i386                 randconfig-a016-20230522   clang
+i386                 randconfig-r003-20230522   gcc  
+i386                 randconfig-r026-20230522   clang
+ia64                             allmodconfig   gcc  
+ia64                                defconfig   gcc  
+ia64                 randconfig-r005-20230522   gcc  
+ia64                          tiger_defconfig   gcc  
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+loongarch            randconfig-r033-20230522   gcc  
+m68k                             allmodconfig   gcc  
+m68k                          atari_defconfig   gcc  
+m68k                                defconfig   gcc  
+m68k                 randconfig-r014-20230522   gcc  
+m68k                 randconfig-r034-20230521   gcc  
+mips                             allmodconfig   gcc  
+mips                             allyesconfig   gcc  
+mips                 decstation_r4k_defconfig   gcc  
+mips                           jazz_defconfig   gcc  
+mips                        qi_lb60_defconfig   clang
+mips                 randconfig-r022-20230522   gcc  
+nios2                               defconfig   gcc  
+nios2                randconfig-r004-20230522   gcc  
+nios2                randconfig-r031-20230522   gcc  
+nios2                randconfig-r032-20230521   gcc  
+openrisc     buildonly-randconfig-r002-20230521   gcc  
+openrisc                  or1klitex_defconfig   gcc  
+openrisc             randconfig-r002-20230521   gcc  
+parisc       buildonly-randconfig-r002-20230522   gcc  
+parisc       buildonly-randconfig-r004-20230522   gcc  
+parisc       buildonly-randconfig-r006-20230521   gcc  
+parisc                              defconfig   gcc  
+parisc64                         alldefconfig   gcc  
+parisc64                            defconfig   gcc  
+powerpc                     akebono_defconfig   clang
+powerpc                          allmodconfig   gcc  
+powerpc                           allnoconfig   gcc  
+powerpc                   bluestone_defconfig   clang
+powerpc                      chrp32_defconfig   gcc  
+powerpc                     ksi8560_defconfig   clang
+powerpc                     mpc512x_defconfig   clang
+powerpc                      pcm030_defconfig   gcc  
+powerpc              randconfig-r033-20230521   clang
+powerpc                     skiroot_defconfig   clang
+powerpc                     tqm5200_defconfig   clang
+riscv                            allmodconfig   gcc  
+riscv                             allnoconfig   gcc  
+riscv                               defconfig   gcc  
+riscv                randconfig-r005-20230521   clang
+riscv                randconfig-r042-20230521   gcc  
+riscv                randconfig-r042-20230522   clang
+riscv                          rv32_defconfig   gcc  
+s390                             allmodconfig   gcc  
+s390                             allyesconfig   gcc  
+s390                                defconfig   gcc  
+s390                 randconfig-r003-20230521   clang
+s390                 randconfig-r004-20230521   clang
+s390                 randconfig-r011-20230521   gcc  
+s390                 randconfig-r013-20230521   gcc  
+s390                 randconfig-r023-20230521   gcc  
+s390                 randconfig-r034-20230522   gcc  
+s390                 randconfig-r044-20230521   gcc  
+s390                 randconfig-r044-20230522   clang
+sh                               allmodconfig   gcc  
+sh                         apsh4a3a_defconfig   gcc  
+sh           buildonly-randconfig-r003-20230521   gcc  
+sh                   randconfig-r015-20230521   gcc  
+sh                   randconfig-r021-20230521   gcc  
+sh                           se7722_defconfig   gcc  
+sparc        buildonly-randconfig-r005-20230521   gcc  
+sparc                               defconfig   gcc  
+sparc                randconfig-r015-20230522   gcc  
+sparc                randconfig-r026-20230521   gcc  
+sparc                randconfig-r035-20230522   gcc  
+sparc64              randconfig-r001-20230521   gcc  
+sparc64              randconfig-r016-20230521   gcc  
+sparc64              randconfig-r025-20230521   gcc  
+sparc64              randconfig-r031-20230521   gcc  
+um                             i386_defconfig   gcc  
+um                           x86_64_defconfig   gcc  
+x86_64                            allnoconfig   gcc  
+x86_64                           allyesconfig   gcc  
+x86_64                              defconfig   gcc  
+x86_64                                  kexec   gcc  
+x86_64               randconfig-a001-20230522   gcc  
+x86_64               randconfig-a002-20230522   gcc  
+x86_64               randconfig-a003-20230522   gcc  
+x86_64               randconfig-a004-20230522   gcc  
+x86_64               randconfig-a005-20230522   gcc  
+x86_64               randconfig-a006-20230522   gcc  
+x86_64               randconfig-a011-20230522   clang
+x86_64               randconfig-a012-20230522   clang
+x86_64               randconfig-a013-20230522   clang
+x86_64               randconfig-a014-20230522   clang
+x86_64               randconfig-a015-20230522   clang
+x86_64               randconfig-a016-20230522   clang
+x86_64               randconfig-r013-20230522   clang
+x86_64               randconfig-x051-20230522   clang
+x86_64               randconfig-x052-20230522   clang
+x86_64               randconfig-x053-20230522   clang
+x86_64               randconfig-x054-20230522   clang
+x86_64               randconfig-x055-20230522   clang
+x86_64               randconfig-x056-20230522   clang
+x86_64               randconfig-x061-20230522   clang
+x86_64               randconfig-x062-20230522   clang
+x86_64               randconfig-x063-20230522   clang
+x86_64               randconfig-x064-20230522   clang
+x86_64               randconfig-x065-20230522   clang
+x86_64               randconfig-x066-20230522   clang
+x86_64                               rhel-8.3   gcc  
+xtensa               randconfig-r022-20230521   gcc  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
