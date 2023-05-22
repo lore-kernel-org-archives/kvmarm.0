@@ -1,24 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05EEB16409
-	for <kvmarm@lists.linux.dev>; Mon, 22 May 2023 16:23:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD2F3C4339B;
-	Mon, 22 May 2023 16:22:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 151B5154BB
+	for <kvmarm@lists.linux.dev>; Mon, 22 May 2023 16:24:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C6A9C433EF;
+	Mon, 22 May 2023 16:24:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1684772581;
-	bh=8nGdHG41Sq+2pYzY75ll3lCjhbxICW46NC3itOTILLg=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=R7TlZ/swN6n9ZdujR7/eUkEGWnPXfR/m/fUSJnjfMkjNX/d3U8JJpVB3QG9UQ+18b
-	 3ChwfHMDcb8My8rVJ8qPc540VZ5I6CluEX2qZY7i7YDRZWdpP9BCHG9aEysn2br4W0
-	 pNQbXsJgg65YokDFndYFNZWBtcVaQd6suT2aqrHroiLUfFclM6JYPd/QMuIbff8/UD
-	 u5li13IJZknuBpczlaQBQUT+h5ubO2XVRZhU/ZzFDxtpw2OPLBnzGiN0jXqYVMjuS1
-	 MBB7WM/MQvIrIxRKWLjTHF0q6Ovt8lLWjeUsN0qvDHW/JsKuLDv4biFXOT/VC5rEwH
-	 HoH5B+n7e7M5Q==
+	s=k20201202; t=1684772649;
+	bh=I3YlnBhxCD0gEcml/CcInHo3e5hMQBL8zuDgV1zgfTk=;
+	h=From:Subject:Date:To:Cc:From;
+	b=VANP4UsdACd9ZuXA/xC5fsgPQ6Ld6r03FBaG2cuVsZA8PZyqMbuZna9hPI6IqqZF9
+	 yz+c2EwSVLKGa7c8BfADkPxZCeJ0J8gzQwLdGMgs0PASO9GXgjLyOlmUmT2MfhM0XR
+	 m5W7uaalNEcL0RZqg79Q1x8hvjRmrl9mkg5xvQkv2MXDg6XMeIibWIvlCaufqeLH0n
+	 TKByW6b1Yuj/BJBqbkDw8RMd1YJxKXvJPPFo7HvQ22LtaPJVBU9w8TAAqvwrlocqOC
+	 M+Tj7aJAHjGpc1xWfVPE2Ln5OfnC7XYpCOdpDgMj8nxvyU3zug6g4+l4oYQY1S+jxZ
+	 hdSib2Mz88V3A==
 From: Mark Brown <broonie@kernel.org>
-Date: Mon, 22 May 2023 17:22:44 +0100
-Subject: [PATCH 5/5] arm64/sysreg: Convert OSLAR_EL1 to automatic
- generation
+Subject: [PATCH v4 0/2] KVM: arm64: Support for per-guest fine grained
+ traps configuration
+Date: Mon, 22 May 2023 17:23:55 +0100
+Message-Id: <20230301-kvm-arm64-fgt-v4-0-1bf8d235ac1f@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,68 +28,75 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230419-arm64-syreg-gen-v1-5-936cd769cb9e@kernel.org>
-References: <20230419-arm64-syreg-gen-v1-0-936cd769cb9e@kernel.org>
-In-Reply-To: <20230419-arm64-syreg-gen-v1-0-936cd769cb9e@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+X-B4-Tracking: v=1; b=H4sIABuXa2QC/33NSw6DIBgE4KsY1qXhoWi76j2aLhB+lFjRgCFtj
+ HcvuGuaupxJvpkVBfAWAroWK/IQbbCTS6E8FUj10nWArU4ZMcI44YTiIY5Y+lGU2HQLhkpryup
+ SGFGjZFoZALdeOtVntYxzbmcPxr72l/sj5d6GZfLv/TTS3P7bjxQTrIw2NZVK1FrdBvAOnufJd
+ yhPRXbIWeaUKqKVaSiRP5wfcp54Y6pLVfK2FQ3/4tu2fQC8oETYPwEAAA==
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ James Morse <james.morse@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org, 
  kvmarm@lists.linux.dev, Mark Brown <broonie@kernel.org>
 X-Mailer: b4 0.13-dev-bfdf5
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1203; i=broonie@kernel.org;
- h=from:subject:message-id; bh=8nGdHG41Sq+2pYzY75ll3lCjhbxICW46NC3itOTILLg=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBka5bWlBIlzvv8r7RXpM0eD5xKcfN7tXnKCuoI4k4T
- HPI1ahOJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZGuW1gAKCRAk1otyXVSH0NhaB/
- 9bdRaqARex0WH59AXvDsCZC9s+erjBaqknoy800EVrUq6jyDkxJnG8NPir0O99TAJk7pXmDX/sjD73
- tQ7eOF0pbUEWTlS/qnLeOXqvoOOpAb1aWnDACpAIujz+TDao8NnngqH5qgyPm1Xv7uBKGJ7+3hEoid
- /uCgcmtDO1KXNWH9hx2gb3nlEppBon/Fq321i9iU5xQicecw1a8yC5VyIKC+gprcPPH512TYXTM2wO
- 6vajE1NAtcvXxkyUwIAnPAaRxsQxuq2EMNuIucHwI0HzN6hIWTOJo/sTe5Cfu1G0ATadTMiNSrNwbf
- 3Qk0aJDyBXy27TnWbPPeJdbyIl9w7V
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2217; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=I3YlnBhxCD0gEcml/CcInHo3e5hMQBL8zuDgV1zgfTk=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBka5ck/fW5JvaA+zWZGNCCdlvr+FuHCtCowNiW21s9
+ pyQQZKuJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZGuXJAAKCRAk1otyXVSH0AM4B/
+ 4miRA+qjaR6pqwAZxr9VhEbZZNmLChAzg/WSdQA22cTU8UxrAOht9U06s2IMMF0/SUjwKMghssDSVi
+ Nrlc6S/XolJMsb0hoGELYK8srGd/CVKX/IBg/hzxgmxV53x37thxP7yGm8wdK9B9Hf7tx2hjoKk4WM
+ aIPrO7xazdNh/A3BkBYHICDXLOacDY+N7S1mjiJ9kYn+d25InhVYS+6qscylNM5LE0tKMgCHNPnRNV
+ lWK2tY7Tkbw/Lmb/2D0UoluvU7Kdn11dgOCYqT8udChkpJsAkL5A3i4tJNN+zg7Bygl+wWvDPesddL
+ hSiDAF2yPPHXUMI+H8I1GrHOlu7Z0B
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-Convert OSLAR_EL1 to automatic generation as per DDI0601 2023-03. No
-functional change.
+A number of upcoming features will require per guest configuration of
+the fine grained traps enabled in the guest.  At present the only
+management we do is for SME where we don't yet have guest support so we
+unconditionally enable the traps while guests are running but this will
+change going forward and at present the code isn't particularly
+scalable.  This series aims to make it easier to configure which traps
+are enabled for the guest by making the value set for the guest into
+configuration in the vCPU data which we can set up based on the chosen
+features rather than requiring conditional code in the trap enable and
+disable paths.
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
+This will have no benefit until one of the features that requires
+configuration of these traps is merged but since there's a number of
+such features it seems useful to decide on an approach to handling traps
+for them which can be shared.
+
+Changes in v4:
+- Reboase onto v6.4-rc3.
+- Link to v3: https://lore.kernel.org/r/20230301-kvm-arm64-fgt-v3-0-8f59543bb683@kernel.org
+Changes in v3:
+- Move the HFGxTR_EL2 storage from the sys_regs array to a member
+  variable directly in struct kvm_vcpu_context.
+- Link to v2: https://lore.kernel.org/r/20230301-kvm-arm64-fgt-v2-0-c11c0dcf810a@kernel.org
+Changes in v2:
+- List all the traps enabled by setting the registers to 0 by default.
+- Save the HWFGxTR_EL2 valus in the vCPU/host sysreg structures.
+- Link to v1: https://lore.kernel.org/r/20230301-kvm-arm64-fgt-v1-0-cfdf71ac67dc@kernel.org
+
 ---
- arch/arm64/include/asm/sysreg.h | 3 ---
- arch/arm64/tools/sysreg         | 5 +++++
- 2 files changed, 5 insertions(+), 3 deletions(-)
+Mark Brown (2):
+      arm64: Add feature detection for fine grained traps
+      KVM: arm64: Move FGT value configuration to vCPU state
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 09de958e79ed..3b51e532caa9 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -140,9 +140,6 @@
- #define SYS_DBGWCRn_EL1(n)		sys_reg(2, 0, 0, n, 7)
- #define SYS_MDRAR_EL1			sys_reg(2, 0, 1, 0, 0)
- 
--#define SYS_OSLAR_EL1			sys_reg(2, 0, 1, 0, 4)
--#define OSLAR_EL1_OSLK			BIT(0)
--
- #define SYS_OSLSR_EL1			sys_reg(2, 0, 1, 1, 4)
- #define OSLSR_EL1_OSLM_MASK		(BIT(3) | BIT(0))
- #define OSLSR_EL1_OSLM_NI		0
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index a5ae0e19fc9f..84df0b7feb45 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -83,6 +83,11 @@ Res0	5:1
- Field	0	SS
- EndSysreg
- 
-+Sysreg	OSLAR_EL1	2	0	1	0	4
-+Res0	63:1
-+Field	0	OSLK
-+EndSysreg
-+
- Sysreg ID_PFR0_EL1	3	0	0	1	0
- Res0	63:32
- UnsignedEnum	31:28	RAS
+ arch/arm64/include/asm/kvm_emulate.h    | 16 ++++++++++++++
+ arch/arm64/include/asm/kvm_host.h       |  3 +++
+ arch/arm64/kernel/cpufeature.c          | 11 ++++++++++
+ arch/arm64/kvm/arm.c                    |  1 +
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 37 +++++++++++++++++++--------------
+ arch/arm64/tools/cpucaps                |  1 +
+ 6 files changed, 53 insertions(+), 16 deletions(-)
+---
+base-commit: 44c026a73be8038f03dbdeef028b642880cf1511
+change-id: 20230301-kvm-arm64-fgt-e5dd12746f67
 
+Best regards,
 -- 
-2.30.2
+Mark Brown <broonie@kernel.org>
 
