@@ -1,113 +1,117 @@
-Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com [209.85.217.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54C3779E1
-	for <kvmarm@lists.linux.dev>; Mon, 22 May 2023 11:00:13 +0000 (UTC)
-Received: by mail-vs1-f45.google.com with SMTP id ada2fe7eead31-4394a25867cso380377137.0
-        for <kvmarm@lists.linux.dev>; Mon, 22 May 2023 04:00:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684753212; x=1687345212;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OtO+oDqvW2uZLU4/0eJMtjF3Ro5r+NIMTybey9XIr3o=;
-        b=W+5/vebJfHtd2rRaVplVQuf8fEfmp20u80WNyD0GwJ/cHZ0hLVra/XCvw7z/DYg4Do
-         GUXWD1GEjiQKzvZQ7Le+KFt/HZhgrekbJypaWAKjwZqdzPavcBHGa7u8Z2vCQRKLfbgT
-         nCM5n+H6OfmfakCV7jcepJLOWDZsNuKuUGcMfoLY2/4ibaiVmOmAQqt6aoueOfrIQYo5
-         tMJgb9mwxbcxkHAHE8TdOehwNmj1X5xpDy5LU7My/DN9ow1gFVGzLIZ3A7AhDUunXF7p
-         S5QVAV9KWtC8HikH/98qbbfIun5JFhL+5b6t0pPDRAa6+KluUgZlnNmTtbbAVETUMEvo
-         yDgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684753212; x=1687345212;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OtO+oDqvW2uZLU4/0eJMtjF3Ro5r+NIMTybey9XIr3o=;
-        b=efnjeTSnHqwTDFI71hxCQJZI5AGEMNQe+860ArzbqABM8bSi8KZPwMxz3PJ+E99fu6
-         v6jbrOzgQL0zn6CxYWVD2DVCjLMyiUYDyhMQxwProQWb+LQpvnRV4nGA0Zg/50pGbVVR
-         SnfIZCNRGCOCMTzCMQPSb+T5XIXuMOm/gTdiE43TVNHtQnxl46IWehxzB07P7cA2/VQh
-         YF4pqISBoyPjoXshqLbJNJwQQvxXONHZIe3bhGQx33qH6aKreBFHN4rUlVTmK4Fjp6pJ
-         lsLErHzJR9dhhSXVqIGQ64M9RH4ryEQQraTAsk+Z+kN0Q9fLP9TYeMY3o3eEpvamUcoa
-         pc3Q==
-X-Gm-Message-State: AC+VfDwAmvXZo33Z+OQYODGUHL6JGaJdP4DmALGyVj/rraorRFeAR79F
-	FI/kw0ychVmb1N9wg2973UjetLkCxz8J+nRyA4yoLA==
-X-Google-Smtp-Source: ACHHUZ4BJjuJFxKP9oG0+h0RJt/w2eQIqcZEcpvwAs+VgB5JPyoLrPSxpB1fUymp8ynu51uiqeUAqjHNDEcwiuXWYx0=
-X-Received: by 2002:a05:6102:53c3:b0:437:d738:c2ce with SMTP id
- bs3-20020a05610253c300b00437d738c2cemr1623410vsb.2.1684753212085; Mon, 22 May
- 2023 04:00:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B2179E1
+	for <kvmarm@lists.linux.dev>; Mon, 22 May 2023 11:22:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCA60C433EF;
+	Mon, 22 May 2023 11:22:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1684754547;
+	bh=YkBpB7jMH6+3MZC+ka33JFuH7waAcgd/5sK3Imgnm4w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qMNJpHBkEdX+jEneMe7IcGcqGXSOhBzGN5DMYRwHacFUZkhylfSmjEcA0BeNsuon+
+	 ITLO/Agq7vxgm4ywBFIsrPnlfQQqmjyYM/urIpAKaCUkBWDHUc9JQMjuYuPYnOdoAL
+	 hZWcytMBgIGLHtxf1eJf1J7Ym7lT9k/1RoxglvAsl8Wtz1k/XgpLe9BuO3e4sFlYOi
+	 5A0fPnb4p1GcuyYL5MvII9IKkOoSySrb/yXvnZF0dZEH65rV8x6tN80jTQJmVuPnlt
+	 nD5WN3q+827zHAn92mJ+c7nRL3/bgQeND62PtFXQfzYvvypc8a7qzaNp65klnTMWYr
+	 bYF2L04dpwHuw==
+Date: Mon, 22 May 2023 12:22:20 +0100
+From: Will Deacon <will@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: linux-arm-kernel@lists.infradead.org,
+	Quentin Perret <qperret@google.com>, Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Fuad Tabba <tabba@google.com>, kvmarm@lists.linux.dev,
+	kernel-team@android.com, Andrew Walbran <qwandor@google.com>
+Subject: Re: [PATCH v2 01/10] KVM: arm64: Block unsafe FF-A calls from the
+ host
+Message-ID: <20230522112220.GA5965@willie-the-truck>
+References: <20230419122051.1341-1-will@kernel.org>
+ <20230419122051.1341-2-will@kernel.org>
+ <ZFvrkQ8Nt6AUZwrt@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230522103258.402272-1-tabba@google.com> <86a5xwljzt.wl-maz@kernel.org>
- <868rdgljk2.wl-maz@kernel.org>
-In-Reply-To: <868rdgljk2.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 22 May 2023 11:59:36 +0100
-Message-ID: <CA+EHjTwG+PCy2=xDdFsg9x4fvpJSRhJFrew8d6YpFR561B3HxA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Reload PTE after invoking walker callback on
- preorder traversal
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	james.morse@arm.com, catalin.marinas@arm.com, alexandru.elisei@arm.com, 
-	oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	will@kernel.org, reijiw@google.com, ricarkol@google.com, dmatlack@google.com, 
-	qperret@google.com, bgardon@google.com, gshan@redhat.com, peterx@redhat.com, 
-	seanjc@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZFvrkQ8Nt6AUZwrt@linux.dev>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Mon, May 22, 2023 at 11:58=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
-e:
->
-> On Mon, 22 May 2023 11:48:38 +0100,
-> Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtabl=
-e.c
-> > > index 3d61bd3e591d..120c49d52ca0 100644
-> > > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > > @@ -207,14 +207,26 @@ static inline int __kvm_pgtable_visit(struct kv=
-m_pgtable_walk_data *data,
-> > >             .flags  =3D flags,
-> > >     };
-> > >     int ret =3D 0;
-> > > +   bool reload =3D false;
-> > >     kvm_pteref_t childp;
-> > >     bool table =3D kvm_pte_table(ctx.old, level);
-> > >
-> > > -   if (table && (ctx.flags & KVM_PGTABLE_WALK_TABLE_PRE))
-> > > +   if (table && (ctx.flags & KVM_PGTABLE_WALK_TABLE_PRE)) {
-> > >             ret =3D kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WA=
-LK_TABLE_PRE);
-> > > +           reload =3D true;
-> > > +   }
-> > >
-> > >     if (!table && (ctx.flags & KVM_PGTABLE_WALK_LEAF)) {
-> > >             ret =3D kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WA=
-LK_LEAF);
-> > > +           reload =3D true;
-> > > +   }
-> >
-> > From these two clauses, it is clear that reload is always the value of
-> > (ctx.flags & KVM_PGTABLE_WALK_LEAF). That'd simplify the patch a bit.
->
-> OK, it should be obvious by now that I cannot read, because TABLE_PRE and
-> LEAF are very different things.
->
-> Sorry about the noise. I'll fix the trailer thing and stay quiet for
-> the rest of the day...
+Hi Oliver,
 
-:)
+On Wed, May 10, 2023 at 07:08:01PM +0000, Oliver Upton wrote:
+> On Wed, Apr 19, 2023 at 01:20:42PM +0100, Will Deacon wrote:
+> > +/*
+> > + * Is a given FFA function supported, either by forwarding on directly
+> > + * or by handling at EL2?
+> > + */
+> > +static bool ffa_call_supported(u64 func_id)
+> > +{
+> > +	switch (func_id) {
+> > +	/* Unsupported memory management calls */
+> > +	case FFA_FN64_MEM_RETRIEVE_REQ:
+> > +	case FFA_MEM_RETRIEVE_RESP:
+> > +	case FFA_MEM_RELINQUISH:
+> > +	case FFA_MEM_OP_PAUSE:
+> > +	case FFA_MEM_OP_RESUME:
+> > +	case FFA_MEM_FRAG_RX:
+> > +	case FFA_FN64_MEM_DONATE:
+> > +	/* Indirect message passing via RX/TX buffers */
+> > +	case FFA_MSG_SEND:
+> > +	case FFA_MSG_POLL:
+> > +	case FFA_MSG_WAIT:
+> > +	/* 32-bit variants of 64-bit calls */
+> > +	case FFA_MSG_SEND_DIRECT_REQ:
+> > +	case FFA_MSG_SEND_DIRECT_RESP:
+> > +	case FFA_RXTX_MAP:
+> > +	case FFA_MEM_DONATE:
+> > +	case FFA_MEM_RETRIEVE_REQ:
+> > +	/* Don't advertise any features just yet */
+> > +	case FFA_FEATURES:
+> > +		return false;
+> > +	}
+> > +
+> > +	return true;
+> > +}
+> 
+> Apologies for rehashing something we dicussed in v1...
+> 
+> Enforcing the pKVM policy as a denylist rather than an allowlist
+> deserves a bit more elaboration, at least in the form of a comment. I
+> understand that we must trust EL3 by construction, but it is fuzzy why
+> it gets extended to what EL1 might do with FF-A calls that are unknown
+> to pKVM.
 
-Thanks Marc!
-/fuad
+Sure thing, I'll add a comment for the next version.
 
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+> Broadening the scope for a moment, is my understanding correct that
+> limiting 'unknown' SMCs from host EL1 are an explicit non-goal of pKVM's
+> security model? Assuming a well-intentioned EL3, I'm just a bit worried
+> about any vendor-specific junkware that could be used by a malicious
+> EL1.
+
+It's a valid concern, but the sad reality is that every shipping Android
+device makes use of 'unknown' SMCs and if we reject them at EL2 then the
+device won't function properly and we've shot ourselves in the foot.
+
+So we basically have two options:
+
+  (1) Add per-device logic to EL2 which knows how to introspect the
+      'unknown' SMCs and filter out bad requests from EL1
+
+  (2) Let them through by default, intercepting standard requests such
+      as PSCI and FF-A at EL2 and rely on the firmware not to expose
+      non-standard memory sharing calls
+
+We have patches in Android to support modules loading code into EL2,
+which makes option (1) practical, but without that support upstream, (2)
+is the best we can do for now.
+
+Will
