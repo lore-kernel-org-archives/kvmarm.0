@@ -1,24 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF2B1F94C
-	for <kvmarm@lists.linux.dev>; Tue, 23 May 2023 18:36:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79CEFC4339C;
-	Tue, 23 May 2023 18:36:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6988E1F93C
+	for <kvmarm@lists.linux.dev>; Tue, 23 May 2023 18:37:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E45A2C433D2;
+	Tue, 23 May 2023 18:37:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1684866991;
-	bh=1trlKZwAecGTqrKD0iQKq5crYO5E8+VYUNMVFUR5Ei0=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=BD2vp1wpRNzi10+ritEJUUw3B+MKSXAXhTdKM1A/URGx2Ikv2sSbeKBny1JRahGM3
-	 tU71pyFygfCS89Zi4HVFHQL92Dx1sfMFQ3YhitUgPOCeslXryQyL0oXNj/Ao4+qcBI
-	 vf1OA2JibVLM1l5A2T2eznGiyHjBpoCuQRjbgzbTrfd20SL0CSO2k9M3xBfoH/b8b6
-	 iUfcncJyJpiA4Oxa4roH4jef/neoKd6XPPhrB5Xc1SJcg+JPdwIhLjK7OLhLKZVy90
-	 Lv1U4GiOxxjuyNs33ciwWRPfwXdWKU+NzWIBXghdKT4KgDX5XVDNb/+Z8QAe/xDMOY
-	 5SEolKQ1MVFSw==
+	s=k20201202; t=1684867032;
+	bh=85tRnbat52B6IBzDM3UnXuQ+f5nD406kWabSowIdwAA=;
+	h=From:Subject:Date:To:Cc:From;
+	b=HY+7SGEPmz+PnYzd1K19s5ZCB3+KfWVyYeEwSBtbkUaxVK7rl8J+bKYn6GJGHnzaS
+	 AczhTNPG9As3HLTI4bQuSHVUoFLRQjcSfYx1XyuvUIK8xR4OvlAVTgcKBcZNqd2xuE
+	 AO5kvpF5ZyJVoNhMnXzwvutuNHjk93lVS1dmv6frNerMjbHVEJca8Qq/UBMtGKZK7G
+	 ietkpOULcJhaeUApHmlvRn1Ct9tEEdaya6lgyUOS7XV7XaDxCGoy10kYlGNeQcZ0y7
+	 ZsggIjgS81MWC07h764HkakYr45DUIk4slMSm9QaxCV4sxl/inKRZ83kSUSYq7AcEV
+	 A5EmeN+DtUQnQ==
 From: Mark Brown <broonie@kernel.org>
-Date: Tue, 23 May 2023 19:36:01 +0100
-Subject: [PATCH v2 4/7] arm64/sysreg: Convert OSLAR_EL1 to automatic
+Subject: [PATCH v2 0/7] arm64/sysreg: More conversions to automatic
  generation
+Date: Tue, 23 May 2023 19:36:58 +0100
+Message-Id: <20230419-arm64-syreg-gen-v2-0-4c6add1f6257@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,70 +28,61 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230419-arm64-syreg-gen-v2-4-e0064336e2dd@kernel.org>
-References: <20230419-arm64-syreg-gen-v2-0-e0064336e2dd@kernel.org>
-In-Reply-To: <20230419-arm64-syreg-gen-v2-0-e0064336e2dd@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAMoHbWQC/3WNQQ6CMBAAv0L27BoopFJP/sNwaMtSGrQ1W4MSw
+ t8t3D3OJJNZIRF7SnAtVmCaffIxZBCnAuyogyP0fWYQpajLplKo+SkbTAuTQ0cBjdC6VdK0epC
+ QK6MToWEd7Lh3n8jTrl9Mg/8eo3uXefTpHXk5vnO12/+LucISVS1tf5HKGkW3iTjQ4xzZQbdt2
+ w8w/8I3xgAAAA==
 To: Catalin Marinas <catalin.marinas@arm.com>, 
  Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
  Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
  Suzuki K Poulose <suzuki.poulose@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
  kvmarm@lists.linux.dev, Mark Brown <broonie@kernel.org>, 
+ Anshuman Khandual <anshuman.khandual@arm.com>, 
  Shaoqin Huang <shahuang@redhat.com>
 X-Mailer: b4 0.13-dev-bfdf5
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1253; i=broonie@kernel.org;
- h=from:subject:message-id; bh=1trlKZwAecGTqrKD0iQKq5crYO5E8+VYUNMVFUR5Ei0=;
- b=owGbwMvMwMWocq27KDak/QLjabUkhpRc9vm52/QENbWsT+teDHgcH5yw7JS5itZaRkW/yJDmNbyZ
- V151MhqzMDByMciKKbKsfZaxKj1cYuv8R/NfwQxiZQKZwsDFKQAT8ehm/++UZqi5OF45yC/7qmC0y8
- 8pa7dbNkdZLF+QMbHoWZ2AwTZ/A6dnrcodD302P3P+9jeyIfDSzPxwJQferZlmF7zOv551ZrnoJTeG
- S5IN/lueFqR31kdVKqZt+iS/bll6vmjSx8fJtVGX/ac59zpdv+L6lzebudL5jfGUL6wCHczRrEu/d7
- m/WhPS9NtypVD40RWvrmuJ2xnkXihLMRM4t74t2HE5X3rYC6G5qyZ1OYptP1DIscRIW+tR36SeVTNL
- dXfxl055/+ibTKJMp3DBn1+NFVuqb16r5zm2Kzww99nvqccv3pdh6+CrquGcnn2wYhLr640elTw+4q
- nzK9/I1TE3n/4jKWz3MPDJwTtxAA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1297; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=85tRnbat52B6IBzDM3UnXuQ+f5nD406kWabSowIdwAA=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBkbQfPNZeWD+F+ZKEYK9wEDhAlMa3SfFD2Oh7/dB2S
+ xAkMEVCJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZG0HzwAKCRAk1otyXVSH0HxVB/
+ 43QaDputTKF3OtYBvgFUGwvbT4F88iC4/286aS8jpxDLBL22TKRy8grVT/EGGi3SXKNBsCCYKofvgs
+ nQtKK1axKn8Ks/CIcMluLJAyz80IIre0WlpjgMd3Ma3cYB9ZvktetN5uWDHsa2vMCpVKKELSRkHUxl
+ 8CjAWObXBwOVX/3odXCeQHvH9xvsBbYiQiUaCOAuF4LvYcOXakGGiNjFcVGP+WcTxZU9uifITYDrTA
+ TvLC+Yfv64kQyz5Pxgaw8F3ZSYRcUDTVscFBgEo9MOv8xbmQoFs3fT5bRrmuJLTILMewFvB67aApVW
+ g/c7S+YI5yvsz9kmCYnVLv9nNwalIs
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-Convert OSLAR_EL1 to automatic generation as per DDI0601 2023-03. No
-functional change.
+Continue working through the register defintions, converting them to
+automatic generation.
 
-Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h | 3 ---
- arch/arm64/tools/sysreg         | 5 +++++
- 2 files changed, 5 insertions(+), 3 deletions(-)
+Changes in v2:
+- Also convert OSECCR_EL1, OSDTRRX_EL1 and OSDTRTX_EL1 instead of
+  dropping them.
+- Link to v1: https://lore.kernel.org/r/20230419-arm64-syreg-gen-v1-0-936cd769cb9e@kernel.org
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 979975c8be2c..1901b676d7c6 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -143,9 +143,6 @@
- #define SYS_DBGWCRn_EL1(n)		sys_reg(2, 0, 0, n, 7)
- #define SYS_MDRAR_EL1			sys_reg(2, 0, 1, 0, 0)
- 
--#define SYS_OSLAR_EL1			sys_reg(2, 0, 1, 0, 4)
--#define OSLAR_EL1_OSLK			BIT(0)
--
- #define SYS_OSLSR_EL1			sys_reg(2, 0, 1, 1, 4)
- #define OSLSR_EL1_OSLM_MASK		(BIT(3) | BIT(0))
- #define OSLSR_EL1_OSLM_NI		0
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 601cc8024734..b0aefdf9ed34 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -83,6 +83,11 @@ Res0	5:1
- Field	0	SS
- EndSysreg
- 
-+Sysreg	OSLAR_EL1	2	0	1	0	4
-+Res0	63:1
-+Field	0	OSLK
-+EndSysreg
-+
- Sysreg ID_PFR0_EL1	3	0	0	1	0
- Res0	63:32
- UnsignedEnum	31:28	RAS
+---
+Mark Brown (7):
+      arm64/sysreg: Convert MDCCINT_EL1 to automatic register generation
+      arm64/sysreg: Convert MDSCR_EL1 to automatic register generation
+      arm64/sysreg: Standardise naming of bitfield constants in OSL[AS]R_EL1
+      arm64/sysreg: Convert OSLAR_EL1 to automatic generation
+      arm64/sysreg: Convert OSDTRRX_EL1 to automatic generation
+      arm64/sysreg: Convert OSDTRTX_EL1 to automatic generation
+      arm64/sysreg: Convert OSECCR_EL1 to automatic generation
 
+ arch/arm64/include/asm/kvm_host.h |  2 +-
+ arch/arm64/include/asm/sysreg.h   | 16 +++---------
+ arch/arm64/kvm/sys_regs.c         | 10 +++----
+ arch/arm64/tools/sysreg           | 55 +++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 65 insertions(+), 18 deletions(-)
+---
+base-commit: 44c026a73be8038f03dbdeef028b642880cf1511
+change-id: 20230419-arm64-syreg-gen-b2aa896b8af6
+
+Best regards,
 -- 
-2.30.2
+Mark Brown <broonie@kernel.org>
 
