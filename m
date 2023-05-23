@@ -1,81 +1,81 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BA8E1D2BF
-	for <kvmarm@lists.linux.dev>; Tue, 23 May 2023 08:23:38 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 28F36139F;
-	Tue, 23 May 2023 01:24:23 -0700 (PDT)
-Received: from [10.162.42.7] (unknown [10.162.42.7])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 202113F762;
-	Tue, 23 May 2023 01:23:34 -0700 (PDT)
-Message-ID: <742672ff-bb53-46e9-048c-a2201cb0be2f@arm.com>
-Date: Tue, 23 May 2023 13:53:32 +0530
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5488C4C89
+	for <kvmarm@lists.linux.dev>; Tue, 23 May 2023 08:39:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AE35C433AE;
+	Tue, 23 May 2023 08:39:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1684831149;
+	bh=Oxg2q75s2/zytEn//kA1T8P8jfYGJX4fm7zdbpXI1So=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YPvfG4LK/8erWPIeDmltUeyeQJLDeMTTgm0zh+1fp5kKZ/wZUZByjsvGFbOWhrWF2
+	 dcLAjrahAi5fr7s98/28LWsVhEua07mnSVttMyVD6Q7lbaUZ2HtW39WsWW1R8SH5cc
+	 coqqzNR4Z/4tTYagkRRhHmuLe44QZN0nBdxhGxgL/4D79fWhfzpyCTqq7T9+SX7gsC
+	 PdiZxygjs/ijsVOO4GDkHiRtY12/tltwgf4klt1rXe61uL52Y7D7ow96bfwV1lHO0A
+	 TQMbYb7pLps/+P33T6AG0KcCtUOzLAuidVa7mYiNYM0xN954DdioSx3pykUziXBuPT
+	 TyrhVruuOItmA==
+Date: Tue, 23 May 2023 09:39:02 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH 5/5] arm64/sysreg: Convert OSLAR_EL1 to automatic
+ generation
+Message-ID: <806fdf76-53a0-4ee5-8b57-e7ae7ee80f69@sirena.org.uk>
+References: <20230419-arm64-syreg-gen-v1-0-936cd769cb9e@kernel.org>
+ <20230419-arm64-syreg-gen-v1-5-936cd769cb9e@kernel.org>
+ <ZGx1jT4nQ9HEVWSE@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH 2/5] arm64/sysreg: Convert MDCCINT_EL1 to automatic
- register generation
-To: Mark Brown <broonie@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev
-References: <20230419-arm64-syreg-gen-v1-0-936cd769cb9e@kernel.org>
- <20230419-arm64-syreg-gen-v1-2-936cd769cb9e@kernel.org>
-Content-Language: en-US
-In-Reply-To: <20230419-arm64-syreg-gen-v1-2-936cd769cb9e@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="GY06EX/bWV8Ev7NQ"
+Content-Disposition: inline
+In-Reply-To: <ZGx1jT4nQ9HEVWSE@linux.dev>
+X-Cookie: Beware of low-flying butterflies.
 
 
+--GY06EX/bWV8Ev7NQ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 5/22/23 21:52, Mark Brown wrote:
-> Convert MDCCINT_EL1 to automatic register generation as per DDI0616
-> 2023-03. No functional change.
-> 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
+On Tue, May 23, 2023 at 08:13:01AM +0000, Oliver Upton wrote:
+> On Mon, May 22, 2023 at 05:22:44PM +0100, Mark Brown wrote:
 
-Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> > -#define SYS_OSLAR_EL1			sys_reg(2, 0, 1, 0, 4)
+> > -#define OSLAR_EL1_OSLK			BIT(0)
+> > -
+> >  #define SYS_OSLSR_EL1			sys_reg(2, 0, 1, 1, 4)
+> >  #define OSLSR_EL1_OSLM_MASK		(BIT(3) | BIT(0))
+> >  #define OSLSR_EL1_OSLM_NI		0
 
-> ---
->  arch/arm64/include/asm/sysreg.h | 1 -
->  arch/arm64/tools/sysreg         | 7 +++++++
->  2 files changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 6505665624d4..4e48bb4dca6a 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -134,7 +134,6 @@
->  #define SYS_SVCR_SMSTART_SM_EL0		sys_reg(0, 3, 4, 3, 3)
->  #define SYS_SVCR_SMSTOP_SMZA_EL0	sys_reg(0, 3, 4, 6, 3)
->  
-> -#define SYS_MDCCINT_EL1			sys_reg(2, 0, 0, 2, 0)
->  #define SYS_MDSCR_EL1			sys_reg(2, 0, 0, 2, 2)
->  #define SYS_DBGBVRn_EL1(n)		sys_reg(2, 0, 0, n, 4)
->  #define SYS_DBGBCRn_EL1(n)		sys_reg(2, 0, 0, n, 5)
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index dd5a9c7e310f..1699e87bc0b4 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -48,6 +48,13 @@
->  # feature that introduces them (eg, FEAT_LS64_ACCDATA introduces enumeration
->  # item ACCDATA) though it may be more taseful to do something else.
->  
-> +Sysreg	MDCCINT_EL1	2	0	0	2	0
-> +Res0	63:31
-> +Field	30	RX
-> +Field	29	TX
-> +Res0	28:0
-> +EndSysreg
-> +
->  Sysreg ID_PFR0_EL1	3	0	0	1	0
->  Res0	63:32
->  UnsignedEnum	31:28	RAS
-> 
+> Should the OSLSR_EL1 definitions be rolled over to the generated scheme
+> as well?
+
+It should at some point but it has a field with non-contiguous bits
+which the tool doesn't understand yet so it can wait.
+
+--GY06EX/bWV8Ev7NQ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmRse6UACgkQJNaLcl1U
+h9APgAf/cGnnDxyCsCqfTldJEdy3NBTacODKqVRleuOcGMEYBVySTJl8hbrtmKuk
+W40ZQzG9i9F6rIitsDQwmlzyzBKYLTiRmfS0AcnIyV315QoRYw4hDe+LeHqz0Pb6
+RPJaidZhbDT75qga8FJ77whi1tI4INLRKVzCWU5qyMNj7I1uUeunyZ5QY60tOUjj
+FYd7RJF7TDFdKmxz+N3oH4U9BAsDd4EkDhQE7YVnP80PF5rxrZVFP3ThQ7ihtKZy
+VQfErsB7VoZGL6Uma7b5WeRkE5tl4uSZyG8bM39SGMBEkhxR5K0Cn7Yo9gqtCouX
+pHvdboMpSVe0faicAqaVNaxrhU6WAQ==
+=tUlP
+-----END PGP SIGNATURE-----
+
+--GY06EX/bWV8Ev7NQ--
