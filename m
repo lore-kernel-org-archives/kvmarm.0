@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7C8D1E52D
-	for <kvmarm@lists.linux.dev>; Tue, 23 May 2023 10:18:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1084AC4339C;
-	Tue, 23 May 2023 10:18:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 650CF1E52D
+	for <kvmarm@lists.linux.dev>; Tue, 23 May 2023 10:18:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8DA4C433EF;
+	Tue, 23 May 2023 10:18:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1684837125;
-	bh=QlKAybmXjHrqZw3EIDR4QjkcM51ODc57S6WqcdeNOw0=;
+	s=k20201202; t=1684837128;
+	bh=Mmlqv0ANhcPLl4mKcN4ZvQAijiK59/HWKAkdzlhZNUY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=imBsZu0D3mZYp2qNlfngmCaQEw2u5yOiolqVMoiZyUrpNg7OcwMUeAzWIekA5g58x
-	 8FDRq6LQtz9ylZCU+PgM3hnnua0vUWNI+t8CfkhJRBSHO+hQvs0QG9h4x9D9jNHttX
-	 uZg9GzoTUHV+5RNOpy09tctw4OC9bhGqzn8ndyoYxlCdWmqMzUAlOotRtL2OPHsdUZ
-	 JqlfYpQ1dp0Ngi4R27TJyEucP6/pyNtZDfVBkvmwdl1lSbgVhDCzS0EWNKqdrlEoqa
-	 854Gjf1lEsqn0Oq3YyNz1AvfJfB4giRgvjD3VEx9QBSc/7lYMGtg7g0CbafLjv10QV
-	 icAeCY7SzJUVw==
+	b=YOG/dy1TcuS/tahyLHNgciz3FvfXXXj+EPq55+g5hKcLH1/WgqjBqsq+G4dvMHyZS
+	 3tHxCJxa4YoHj1wnFvtNKugaO9l7ewXsB6/nIj3YFjIBz/dKh+Tc+RZ/iDUnQWwIIQ
+	 6FfOuT8+LeSiG63GyeDsH4TvYTbsmNKeuHROIPRjyEDfdy4HsmzKLOdBtNBRVi/cqj
+	 Dl89l/R+hrLwww3P5zyPOJDaJvMeA7evoK2sA0cjhdUPbVEDSnZm0AA8JeKoaeEaJp
+	 9AGzzvaVpFeHgZhOApPceK0Xq831qKThSCHcVBJQ9x9EQVkpGgwOvX33iWE9de0GnP
+	 JtASt5wcwQXLg==
 From: Will Deacon <will@kernel.org>
 To: linux-arm-kernel@lists.infradead.org
 Cc: Will Deacon <will@kernel.org>,
@@ -30,9 +30,9 @@ Cc: Will Deacon <will@kernel.org>,
 	kvmarm@lists.linux.dev,
 	kernel-team@android.com,
 	Andrew Walbran <qwandor@google.com>
-Subject: [PATCH v3 04/10] KVM: arm64: Handle FFA_RXTX_MAP and FFA_RXTX_UNMAP calls from the host
-Date: Tue, 23 May 2023 11:18:21 +0100
-Message-Id: <20230523101828.7328-5-will@kernel.org>
+Subject: [PATCH v3 05/10] KVM: arm64: Add FF-A helpers to share/unshare memory with secure world
+Date: Tue, 23 May 2023 11:18:22 +0100
+Message-Id: <20230523101828.7328-6-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20230523101828.7328-1-will@kernel.org>
 References: <20230523101828.7328-1-will@kernel.org>
@@ -44,287 +44,143 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Handle FFA_RXTX_MAP and FFA_RXTX_UNMAP calls from the host by sharing
-the host's mailbox memory with the hypervisor and establishing a
-separate pair of mailboxes between the hypervisor and the SPMD at EL3.
+Extend pKVM's memory protection code so that we can update the host's
+stage-2 page-table to track pages shared with secure world by the host
+using FF-A and prevent those pages from being mapped into a guest.
 
 Co-developed-by: Andrew Walbran <qwandor@google.com>
 Signed-off-by: Andrew Walbran <qwandor@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/hyp/nvhe/ffa.c | 188 ++++++++++++++++++++++++++++++++++
- include/linux/arm_ffa.h       |   8 ++
- 2 files changed, 196 insertions(+)
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  3 +
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 68 +++++++++++++++++++
+ 2 files changed, 71 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index c85e5d46a90d..0c020cd9f722 100644
---- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-+++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -31,6 +31,8 @@
- #include <asm/kvm_pkvm.h>
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+index b7bdbe63deed..0972faccc2af 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+@@ -57,6 +57,7 @@ extern struct host_mmu host_mmu;
+ enum pkvm_component_id {
+ 	PKVM_ID_HOST,
+ 	PKVM_ID_HYP,
++	PKVM_ID_FFA,
+ };
  
- #include <nvhe/ffa.h>
-+#include <nvhe/mem_protect.h>
-+#include <nvhe/memory.h>
- #include <nvhe/trap_handler.h>
- #include <nvhe/spinlock.h>
+ extern unsigned long hyp_nr_cpus;
+@@ -66,6 +67,8 @@ int __pkvm_host_share_hyp(u64 pfn);
+ int __pkvm_host_unshare_hyp(u64 pfn);
+ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages);
+ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
++int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages);
++int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages);
  
-@@ -52,6 +54,7 @@ struct kvm_ffa_buffers {
-  * client.
-  */
- static struct kvm_ffa_buffers hyp_buffers;
-+static struct kvm_ffa_buffers host_buffers;
- 
- static void ffa_to_smccc_error(struct arm_smccc_res *res, u64 ffa_errno)
- {
-@@ -61,6 +64,15 @@ static void ffa_to_smccc_error(struct arm_smccc_res *res, u64 ffa_errno)
- 	};
- }
- 
-+static void ffa_to_smccc_res(struct arm_smccc_res *res, int ret)
-+{
-+	if (ret == FFA_RET_SUCCESS) {
-+		*res = (struct arm_smccc_res) { .a0 = FFA_SUCCESS };
-+	} else {
-+		ffa_to_smccc_error(res, ret);
-+	}
-+}
-+
- static void ffa_set_retval(struct kvm_cpu_context *ctxt,
- 			   struct arm_smccc_res *res)
- {
-@@ -78,6 +90,144 @@ static bool is_ffa_call(u64 func_id)
- 	       ARM_SMCCC_FUNC_NUM(func_id) <= FFA_MAX_FUNC_NUM;
- }
- 
-+static int ffa_map_hyp_buffers(u64 ffa_page_count)
-+{
-+	struct arm_smccc_res res;
-+
-+	arm_smccc_1_1_smc(FFA_FN64_RXTX_MAP,
-+			  hyp_virt_to_phys(hyp_buffers.tx),
-+			  hyp_virt_to_phys(hyp_buffers.rx),
-+			  ffa_page_count,
-+			  0, 0, 0, 0,
-+			  &res);
-+
-+	return res.a0 == FFA_SUCCESS ? FFA_RET_SUCCESS : res.a2;
-+}
-+
-+static int ffa_unmap_hyp_buffers(void)
-+{
-+	struct arm_smccc_res res;
-+
-+	arm_smccc_1_1_smc(FFA_RXTX_UNMAP,
-+			  HOST_FFA_ID,
-+			  0, 0, 0, 0, 0, 0,
-+			  &res);
-+
-+	return res.a0 == FFA_SUCCESS ? FFA_RET_SUCCESS : res.a2;
-+}
-+
-+static void do_ffa_rxtx_map(struct arm_smccc_res *res,
-+			    struct kvm_cpu_context *ctxt)
-+{
-+	DECLARE_REG(phys_addr_t, tx, ctxt, 1);
-+	DECLARE_REG(phys_addr_t, rx, ctxt, 2);
-+	DECLARE_REG(u32, npages, ctxt, 3);
-+	int ret = 0;
-+	void *rx_virt, *tx_virt;
-+
-+	if (npages != (KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) / FFA_PAGE_SIZE) {
-+		ret = FFA_RET_INVALID_PARAMETERS;
-+		goto out;
-+	}
-+
-+	if (!PAGE_ALIGNED(tx) || !PAGE_ALIGNED(rx)) {
-+		ret = FFA_RET_INVALID_PARAMETERS;
-+		goto out;
-+	}
-+
-+	hyp_spin_lock(&host_buffers.lock);
-+	if (host_buffers.tx) {
-+		ret = FFA_RET_DENIED;
-+		goto out_unlock;
-+	}
-+
-+	/*
-+	 * Map our hypervisor buffers into the SPMD before mapping and
-+	 * pinning the host buffers in our own address space.
-+	 */
-+	ret = ffa_map_hyp_buffers(npages);
-+	if (ret)
-+		goto out_unlock;
-+
-+	ret = __pkvm_host_share_hyp(hyp_phys_to_pfn(tx));
-+	if (ret) {
-+		ret = FFA_RET_INVALID_PARAMETERS;
-+		goto err_unmap;
-+	}
-+
-+	ret = __pkvm_host_share_hyp(hyp_phys_to_pfn(rx));
-+	if (ret) {
-+		ret = FFA_RET_INVALID_PARAMETERS;
-+		goto err_unshare_tx;
-+	}
-+
-+	tx_virt = hyp_phys_to_virt(tx);
-+	ret = hyp_pin_shared_mem(tx_virt, tx_virt + 1);
-+	if (ret) {
-+		ret = FFA_RET_INVALID_PARAMETERS;
-+		goto err_unshare_rx;
-+	}
-+
-+	rx_virt = hyp_phys_to_virt(rx);
-+	ret = hyp_pin_shared_mem(rx_virt, rx_virt + 1);
-+	if (ret) {
-+		ret = FFA_RET_INVALID_PARAMETERS;
-+		goto err_unpin_tx;
-+	}
-+
-+	host_buffers.tx = tx_virt;
-+	host_buffers.rx = rx_virt;
-+
-+out_unlock:
-+	hyp_spin_unlock(&host_buffers.lock);
-+out:
-+	ffa_to_smccc_res(res, ret);
-+	return;
-+
-+err_unpin_tx:
-+	hyp_unpin_shared_mem(tx_virt, tx_virt + 1);
-+err_unshare_rx:
-+	__pkvm_host_unshare_hyp(hyp_phys_to_pfn(rx));
-+err_unshare_tx:
-+	__pkvm_host_unshare_hyp(hyp_phys_to_pfn(tx));
-+err_unmap:
-+	ffa_unmap_hyp_buffers();
-+	goto out_unlock;
-+}
-+
-+static void do_ffa_rxtx_unmap(struct arm_smccc_res *res,
-+			      struct kvm_cpu_context *ctxt)
-+{
-+	DECLARE_REG(u32, id, ctxt, 1);
-+	int ret = 0;
-+
-+	if (id != HOST_FFA_ID) {
-+		ret = FFA_RET_INVALID_PARAMETERS;
-+		goto out;
-+	}
-+
-+	hyp_spin_lock(&host_buffers.lock);
-+	if (!host_buffers.tx) {
-+		ret = FFA_RET_INVALID_PARAMETERS;
-+		goto out_unlock;
-+	}
-+
-+	hyp_unpin_shared_mem(host_buffers.tx, host_buffers.tx + 1);
-+	WARN_ON(__pkvm_host_unshare_hyp(hyp_virt_to_pfn(host_buffers.tx)));
-+	host_buffers.tx = NULL;
-+
-+	hyp_unpin_shared_mem(host_buffers.rx, host_buffers.rx + 1);
-+	WARN_ON(__pkvm_host_unshare_hyp(hyp_virt_to_pfn(host_buffers.rx)));
-+	host_buffers.rx = NULL;
-+
-+	ffa_unmap_hyp_buffers();
-+
-+out_unlock:
-+	hyp_spin_unlock(&host_buffers.lock);
-+out:
-+	ffa_to_smccc_res(res, ret);
-+}
-+
- /*
-  * Is a given FFA function supported, either by forwarding on directly
-  * or by handling at EL2?
-@@ -132,10 +282,21 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt)
- 	if (!is_ffa_call(func_id))
- 		return false;
- 
-+	switch (func_id) {
-+	/* Memory management */
-+	case FFA_FN64_RXTX_MAP:
-+		do_ffa_rxtx_map(&res, host_ctxt);
-+		goto out_handled;
-+	case FFA_RXTX_UNMAP:
-+		do_ffa_rxtx_unmap(&res, host_ctxt);
-+		goto out_handled;
-+	}
-+
- 	if (ffa_call_supported(func_id))
- 		return false; /* Pass through */
- 
- 	ffa_to_smccc_error(&res, FFA_RET_NOT_SUPPORTED);
-+out_handled:
- 	ffa_set_retval(host_ctxt, &res);
- 	return true;
- }
-@@ -143,6 +304,7 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt)
- int hyp_ffa_init(void *pages)
- {
- 	struct arm_smccc_res res;
-+	size_t min_rxtx_sz;
- 
- 	if (kvm_host_psci_config.smccc_version < ARM_SMCCC_VERSION_1_2)
- 		return 0;
-@@ -161,11 +323,37 @@ int hyp_ffa_init(void *pages)
- 	if (res.a2 != HOST_FFA_ID)
- 		return -EINVAL;
- 
-+	arm_smccc_1_1_smc(FFA_FEATURES, FFA_FN64_RXTX_MAP,
-+			  0, 0, 0, 0, 0, 0, &res);
-+	if (res.a0 != FFA_SUCCESS)
-+		return -EOPNOTSUPP;
-+
-+	switch (res.a2) {
-+	case FFA_FEAT_RXTX_MIN_SZ_4K:
-+		min_rxtx_sz = SZ_4K;
+ bool addr_is_memory(phys_addr_t phys);
+ int host_stage2_idmap_locked(phys_addr_t addr, u64 size, enum kvm_pgtable_prot prot);
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index 2e9ec4a2a4a3..e327e94d0e40 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -842,6 +842,13 @@ static int check_share(struct pkvm_mem_share *share)
+ 	case PKVM_ID_HYP:
+ 		ret = hyp_ack_share(completer_addr, tx, share->completer_prot);
+ 		break;
++	case PKVM_ID_FFA:
++		/*
++		 * We only check the host; the secure side will check the other
++		 * end when we forward the FFA call.
++		 */
++		ret = 0;
 +		break;
-+	case FFA_FEAT_RXTX_MIN_SZ_16K:
-+		min_rxtx_sz = SZ_16K;
+ 	default:
+ 		ret = -EINVAL;
+ 	}
+@@ -870,6 +877,13 @@ static int __do_share(struct pkvm_mem_share *share)
+ 	case PKVM_ID_HYP:
+ 		ret = hyp_complete_share(completer_addr, tx, share->completer_prot);
+ 		break;
++	case PKVM_ID_FFA:
++		/*
++		 * We're not responsible for any secure page-tables, so there's
++		 * nothing to do here.
++		 */
++		ret = 0;
 +		break;
-+	case FFA_FEAT_RXTX_MIN_SZ_64K:
-+		min_rxtx_sz = SZ_64K;
+ 	default:
+ 		ret = -EINVAL;
+ 	}
+@@ -918,6 +932,10 @@ static int check_unshare(struct pkvm_mem_share *share)
+ 	case PKVM_ID_HYP:
+ 		ret = hyp_ack_unshare(completer_addr, tx);
+ 		break;
++	case PKVM_ID_FFA:
++		/* See check_share() */
++		ret = 0;
 +		break;
-+	default:
-+		return -EINVAL;
-+	}
+ 	default:
+ 		ret = -EINVAL;
+ 	}
+@@ -946,6 +964,10 @@ static int __do_unshare(struct pkvm_mem_share *share)
+ 	case PKVM_ID_HYP:
+ 		ret = hyp_complete_unshare(completer_addr, tx);
+ 		break;
++	case PKVM_ID_FFA:
++		/* See __do_share() */
++		ret = 0;
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 	}
+@@ -1235,3 +1257,49 @@ void hyp_unpin_shared_mem(void *from, void *to)
+ 	hyp_unlock_component();
+ 	host_unlock_component();
+ }
 +
-+	if (min_rxtx_sz > PAGE_SIZE)
-+		return -EOPNOTSUPP;
-+
- 	hyp_buffers = (struct kvm_ffa_buffers) {
- 		.lock	= __HYP_SPIN_LOCK_UNLOCKED,
- 		.tx	= pages,
- 		.rx	= pages + (KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE),
- 	};
- 
-+	host_buffers = (struct kvm_ffa_buffers) {
-+		.lock	= __HYP_SPIN_LOCK_UNLOCKED,
++int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages)
++{
++	int ret;
++	struct pkvm_mem_share share = {
++		.tx	= {
++			.nr_pages	= nr_pages,
++			.initiator	= {
++				.id	= PKVM_ID_HOST,
++				.addr	= hyp_pfn_to_phys(pfn),
++			},
++			.completer	= {
++				.id	= PKVM_ID_FFA,
++			},
++		},
 +	};
 +
- 	return 0;
- }
-diff --git a/include/linux/arm_ffa.h b/include/linux/arm_ffa.h
-index c87aeecaa9b2..b9f81035eb41 100644
---- a/include/linux/arm_ffa.h
-+++ b/include/linux/arm_ffa.h
-@@ -94,6 +94,14 @@
-  */
- #define FFA_PAGE_SIZE		SZ_4K
- 
-+/*
-+ * Minimum buffer size/alignment encodings returned by an FFA_FEATURES
-+ * query for FFA_RXTX_MAP.
-+ */
-+#define FFA_FEAT_RXTX_MIN_SZ_4K		0
-+#define FFA_FEAT_RXTX_MIN_SZ_64K	1
-+#define FFA_FEAT_RXTX_MIN_SZ_16K	2
++	host_lock_component();
++	ret = do_share(&share);
++	host_unlock_component();
 +
- /* FFA Bus/Device/Driver related */
- struct ffa_device {
- 	int vm_id;
++	return ret;
++}
++
++int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages)
++{
++	int ret;
++	struct pkvm_mem_share share = {
++		.tx	= {
++			.nr_pages	= nr_pages,
++			.initiator	= {
++				.id	= PKVM_ID_HOST,
++				.addr	= hyp_pfn_to_phys(pfn),
++			},
++			.completer	= {
++				.id	= PKVM_ID_FFA,
++			},
++		},
++	};
++
++	host_lock_component();
++	ret = do_unshare(&share);
++	host_unlock_component();
++
++	return ret;
++}
 -- 
 2.40.1.698.g37aff9b760-goog
 
