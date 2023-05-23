@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB3081E52D
-	for <kvmarm@lists.linux.dev>; Tue, 23 May 2023 10:18:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A2B7C433EF;
-	Tue, 23 May 2023 10:18:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE0B51E52D
+	for <kvmarm@lists.linux.dev>; Tue, 23 May 2023 10:18:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B608C433A4;
+	Tue, 23 May 2023 10:18:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1684837119;
-	bh=L8yKt7Vq5g1Ud//b4jCjAc3FnnBHPcqDCBkW8XNUcoA=;
+	s=k20201202; t=1684837122;
+	bh=Zxi8+MMr297o1thx5u/QpvI7QjTRizBycy88B/7Kyp8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sbWcJRRFM7RQucYGz+OT59lqHYWreLyTItgNb06W+7wkwbye5PMU6qb9ak+36gGhN
-	 otHrKBmBYlgix49bHau8NoBDHopOTgo1gj0mH4Mdf2229hnZEgynfspUN0SBhyH2X1
-	 PJ8lFESbcOvb23SGfxoDfqFvyXGihxloYhKBzXzrxYLYeIsl1G70X66Se2LEbwKeaN
-	 xcXAHRW/FbTDM7ms+9oKU9fOp291jWjtM3iOK76dKL7zT7kaZJGBM1E6bwXHyC+cET
-	 7gCGuAwtBaR8bIdGxFKRJrjtvRfm2JJTL/zETz3EA9Y0QkIfwG82fqkSpPXeWzK4er
-	 9bDfG4rG3CPoA==
+	b=WeozeWF5NOKy963viJBU42q49ljLVG1W/bb9e5rn576kjCfZRg+EKBqQnvGpCmrTq
+	 XeuV49r/WM6uy2lCh0K0eaoQlZJjhB0FVJqzF4ZXJslPafAT7zXhR/qaZx5ta+DJJH
+	 P1rUl9ICsJX0f/FloXjJ7YKaTd6iGojJtbWAI6uHBflXeNTQLieird7V17lWv03mRj
+	 MJGpruVKlAk04n0f8KETKWbe6nwt9OWCchXljyoo3Ui5O+BuHNEHrTUR3kwrmyvbKp
+	 3Usp51Km6YDjsOyAXIi2jTi7O07FgUPKtVafaIxUM+Xe6ZE0NytuW3GvTxgzL/9Goo
+	 eqHX1BmENYDsQ==
 From: Will Deacon <will@kernel.org>
 To: linux-arm-kernel@lists.infradead.org
 Cc: Will Deacon <will@kernel.org>,
@@ -28,10 +28,11 @@ Cc: Will Deacon <will@kernel.org>,
 	Sebastian Ene <sebastianene@google.com>,
 	Fuad Tabba <tabba@google.com>,
 	kvmarm@lists.linux.dev,
-	kernel-team@android.com
-Subject: [PATCH v3 02/10] KVM: arm64: Probe FF-A version and host/hyp partition ID during init
-Date: Tue, 23 May 2023 11:18:19 +0100
-Message-Id: <20230523101828.7328-3-will@kernel.org>
+	kernel-team@android.com,
+	Andrew Walbran <qwandor@google.com>
+Subject: [PATCH v3 03/10] KVM: arm64: Allocate pages for hypervisor FF-A mailboxes
+Date: Tue, 23 May 2023 11:18:20 +0100
+Message-Id: <20230523101828.7328-4-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20230523101828.7328-1-will@kernel.org>
 References: <20230523101828.7328-1-will@kernel.org>
@@ -43,122 +44,155 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Probe FF-A during pKVM initialisation so that we can detect any
-inconsistencies in the version or partition ID early on.
+The FF-A proxy code needs to allocate its own buffer pair for
+communication with EL3 and for forwarding calls from the host at EL1.
 
+Reserve a couple of pages for this purpose and use them to initialise
+the hypervisor's FF-A buffer structure.
+
+Co-developed-by: Andrew Walbran <qwandor@google.com>
+Signed-off-by: Andrew Walbran <qwandor@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h     |  1 +
- arch/arm64/kvm/arm.c                  |  1 +
- arch/arm64/kvm/hyp/include/nvhe/ffa.h |  1 +
- arch/arm64/kvm/hyp/nvhe/ffa.c         | 30 +++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/setup.c       |  5 +++++
- 5 files changed, 38 insertions(+)
+ arch/arm64/include/asm/kvm_pkvm.h     |  8 ++++++++
+ arch/arm64/kvm/hyp/include/nvhe/ffa.h |  2 +-
+ arch/arm64/kvm/hyp/nvhe/ffa.c         | 24 +++++++++++++++++++++++-
+ arch/arm64/kvm/hyp/nvhe/setup.c       |  8 +++++++-
+ arch/arm64/kvm/pkvm.c                 |  1 +
+ 5 files changed, 40 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7e7e19ef6993..396e68cced9e 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -405,6 +405,7 @@ struct kvm_host_data {
- struct kvm_host_psci_config {
- 	/* PSCI version used by host. */
- 	u32 version;
-+	u32 smccc_version;
+diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+index 01129b0d4c68..2b495ec59deb 100644
+--- a/arch/arm64/include/asm/kvm_pkvm.h
++++ b/arch/arm64/include/asm/kvm_pkvm.h
+@@ -106,4 +106,12 @@ static inline unsigned long host_s2_pgtable_pages(void)
+ 	return res;
+ }
  
- 	/* Function IDs used by host if version is v0.1. */
- 	struct psci_0_1_function_ids function_ids_0_1;
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 14391826241c..41395693f3e2 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1910,6 +1910,7 @@ static bool __init init_psci_relay(void)
- 	}
- 
- 	kvm_host_psci_config.version = psci_ops.get_version();
-+	kvm_host_psci_config.smccc_version = arm_smccc_get_version();
- 
- 	if (kvm_host_psci_config.version == PSCI_VERSION(0, 1)) {
- 		kvm_host_psci_config.function_ids_0_1 = get_psci_0_1_function_ids();
++#define KVM_FFA_MBOX_NR_PAGES	1
++
++static inline unsigned long hyp_ffa_proxy_pages(void)
++{
++	/* A page each for the hypervisor's RX and TX mailboxes. */
++	return 2 * KVM_FFA_MBOX_NR_PAGES;
++}
++
+ #endif	/* __ARM64_KVM_PKVM_H__ */
 diff --git a/arch/arm64/kvm/hyp/include/nvhe/ffa.h b/arch/arm64/kvm/hyp/include/nvhe/ffa.h
-index fc09ec671e24..5c9b92430ff3 100644
+index 5c9b92430ff3..1becb10ecd80 100644
 --- a/arch/arm64/kvm/hyp/include/nvhe/ffa.h
 +++ b/arch/arm64/kvm/hyp/include/nvhe/ffa.h
-@@ -11,6 +11,7 @@
+@@ -11,7 +11,7 @@
  #define FFA_MIN_FUNC_NUM 0x60
  #define FFA_MAX_FUNC_NUM 0x7F
  
-+int hyp_ffa_init(void);
+-int hyp_ffa_init(void);
++int hyp_ffa_init(void *pages);
  bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt);
  
  #endif /* __KVM_HYP_FFA_H */
 diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index 302806928a64..abdcaf98d9b0 100644
+index abdcaf98d9b0..c85e5d46a90d 100644
 --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
 +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -31,6 +31,12 @@
+@@ -28,8 +28,11 @@
+ 
+ #include <linux/arm-smccc.h>
+ #include <linux/arm_ffa.h>
++#include <asm/kvm_pkvm.h>
++
  #include <nvhe/ffa.h>
  #include <nvhe/trap_handler.h>
++#include <nvhe/spinlock.h>
  
+ /*
+  * "ID value 0 must be returned at the Non-secure physical FF-A instance"
+@@ -37,6 +40,19 @@
+  */
+ #define HOST_FFA_ID	0
+ 
++struct kvm_ffa_buffers {
++	hyp_spinlock_t lock;
++	void *tx;
++	void *rx;
++};
++
 +/*
-+ * "ID value 0 must be returned at the Non-secure physical FF-A instance"
-+ * We share this ID with the host.
++ * Note that we don't currently lock these buffers explicitly, instead
++ * relying on the locking of the host FFA buffers as we only have one
++ * client.
 + */
-+#define HOST_FFA_ID	0
++static struct kvm_ffa_buffers hyp_buffers;
 +
  static void ffa_to_smccc_error(struct arm_smccc_res *res, u64 ffa_errno)
  {
  	*res = (struct arm_smccc_res) {
-@@ -117,3 +123,27 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt)
- 	ffa_set_retval(host_ctxt, &res);
+@@ -124,7 +140,7 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt)
  	return true;
  }
+ 
+-int hyp_ffa_init(void)
++int hyp_ffa_init(void *pages)
+ {
+ 	struct arm_smccc_res res;
+ 
+@@ -145,5 +161,11 @@ int hyp_ffa_init(void)
+ 	if (res.a2 != HOST_FFA_ID)
+ 		return -EINVAL;
+ 
++	hyp_buffers = (struct kvm_ffa_buffers) {
++		.lock	= __HYP_SPIN_LOCK_UNLOCKED,
++		.tx	= pages,
++		.rx	= pages + (KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE),
++	};
 +
-+int hyp_ffa_init(void)
-+{
-+	struct arm_smccc_res res;
-+
-+	if (kvm_host_psci_config.smccc_version < ARM_SMCCC_VERSION_1_2)
-+		return 0;
-+
-+	arm_smccc_1_1_smc(FFA_VERSION, FFA_VERSION_1_0, 0, 0, 0, 0, 0, 0, &res);
-+	if (res.a0 == FFA_RET_NOT_SUPPORTED)
-+		return 0;
-+
-+	if (res.a0 != FFA_VERSION_1_0)
-+		return -EOPNOTSUPP;
-+
-+	arm_smccc_1_1_smc(FFA_ID_GET, 0, 0, 0, 0, 0, 0, 0, &res);
-+	if (res.a0 != FFA_SUCCESS)
-+		return -EOPNOTSUPP;
-+
-+	if (res.a2 != HOST_FFA_ID)
-+		return -EINVAL;
-+
-+	return 0;
-+}
+ 	return 0;
+ }
 diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index 110f04627785..c4ca174a0592 100644
+index c4ca174a0592..bb98630dfeaf 100644
 --- a/arch/arm64/kvm/hyp/nvhe/setup.c
 +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -11,6 +11,7 @@
- #include <asm/kvm_pkvm.h>
+@@ -29,6 +29,7 @@ static void *vmemmap_base;
+ static void *vm_table_base;
+ static void *hyp_pgt_base;
+ static void *host_s2_pgt_base;
++static void *ffa_proxy_pages;
+ static struct kvm_pgtable_mm_ops pkvm_pgtable_mm_ops;
+ static struct hyp_pool hpool;
  
- #include <nvhe/early_alloc.h>
-+#include <nvhe/ffa.h>
- #include <nvhe/fixed_config.h>
- #include <nvhe/gfp.h>
- #include <nvhe/memory.h>
-@@ -314,6 +315,10 @@ void __noreturn __pkvm_init_finalise(void)
+@@ -58,6 +59,11 @@ static int divide_memory_pool(void *virt, unsigned long size)
+ 	if (!host_s2_pgt_base)
+ 		return -ENOMEM;
+ 
++	nr_pages = hyp_ffa_proxy_pages();
++	ffa_proxy_pages = hyp_early_alloc_contig(nr_pages);
++	if (!ffa_proxy_pages)
++		return -ENOMEM;
++
+ 	return 0;
+ }
+ 
+@@ -315,7 +321,7 @@ void __noreturn __pkvm_init_finalise(void)
  	if (ret)
  		goto out;
  
-+	ret = hyp_ffa_init();
-+	if (ret)
-+		goto out;
-+
- 	pkvm_hyp_vm_table_init(vm_table_base);
- out:
+-	ret = hyp_ffa_init();
++	ret = hyp_ffa_init(ffa_proxy_pages);
+ 	if (ret)
+ 		goto out;
+ 
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index 6e9ece1ebbe7..994a494703c3 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -78,6 +78,7 @@ void __init kvm_hyp_reserve(void)
+ 	hyp_mem_pages += host_s2_pgtable_pages();
+ 	hyp_mem_pages += hyp_vm_table_pages();
+ 	hyp_mem_pages += hyp_vmemmap_pages(STRUCT_HYP_PAGE_SIZE);
++	hyp_mem_pages += hyp_ffa_proxy_pages();
+ 
  	/*
+ 	 * Try to allocate a PMD-aligned region to reduce TLB pressure once
 -- 
 2.40.1.698.g37aff9b760-goog
 
