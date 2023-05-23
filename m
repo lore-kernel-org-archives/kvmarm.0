@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A20CF1EA6B
-	for <kvmarm@lists.linux.dev>; Tue, 23 May 2023 10:18:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FA67C433A8;
-	Tue, 23 May 2023 10:18:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618DC1EA6B
+	for <kvmarm@lists.linux.dev>; Tue, 23 May 2023 10:18:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6EBEC433A4;
+	Tue, 23 May 2023 10:18:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1684837136;
-	bh=8oEz0MTY5vsbOffV05k3O/HgSWc3vJsS4CWhAaejjHc=;
+	s=k20201202; t=1684837139;
+	bh=bVOjEQnVhuatfAAzuLAt5ovgaWm6Wz0ZkmC8mkLZJds=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uIOO3ouVvalw6V53fGCnZOm286yu+AWyjLu4f8041hN3ll0ox0GW8WsXyll0yuSD1
-	 xvWCuBdlyeOv7n1jDowKhvK9EEyD66zDIhSba5Lla7q0bkfFm6piOLYBI90cwYmo4Q
-	 P8fsML90KbiZXn85otfLriMHzqcLH+uYNRVSSQymJNH91kbcQ9NySjxQa/zYr7fJyi
-	 AHu36GmzdbSBKCoOrDSwd6lyNBT/DCRRO38GkhPm/4R70LWWT+16XjUZDNfxQXHu7X
-	 nsjxdE6/IMxFfohcJz/12eXHptiZyIVSpsf12r2qgAHSAQQIBd8fhyB2IyXWx4guEh
-	 5G2QuO3gw3JtA==
+	b=EHPldyrzLff27XQHPks/a8sk6yfKK8GyDW13Q1mYPtij88vcRZgKSlwNv+xtsZH2w
+	 ssXBX5+htbJFllmKKi2WrK9JY8vDwU1QU6giMvKcvPjTLt9NqA61uDZIXfMuc4r1+j
+	 1POCsRnQYIrGO35hJs7ZX+b8zWSQhtu4WDGj0KzyxpeFVuIthl/CcfIznH/H3fTtB7
+	 BF+6+6Ju2GbZfp6OtjzMy8mYVEywRoJeHnlY0G5bD05XHb7yvl+Dh4XGpIYOV+N+Qs
+	 jVAnGAMjc0LBzQarQf8p6PZNe8WwW0VuKHcyqtBo0gbBlYkSrFGd2Yqy6CYkrOddzP
+	 qnOOv4kvlaNEg==
 From: Will Deacon <will@kernel.org>
 To: linux-arm-kernel@lists.infradead.org
 Cc: Will Deacon <will@kernel.org>,
@@ -29,9 +29,9 @@ Cc: Will Deacon <will@kernel.org>,
 	Fuad Tabba <tabba@google.com>,
 	kvmarm@lists.linux.dev,
 	kernel-team@android.com
-Subject: [PATCH v3 08/10] KVM: arm64: Handle FFA_MEM_LEND calls from the host
-Date: Tue, 23 May 2023 11:18:25 +0100
-Message-Id: <20230523101828.7328-9-will@kernel.org>
+Subject: [PATCH v3 09/10] KVM: arm64: Handle FFA_FEATURES call from the host
+Date: Tue, 23 May 2023 11:18:26 +0100
+Message-Id: <20230523101828.7328-10-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20230523101828.7328-1-will@kernel.org>
 References: <20230523101828.7328-1-will@kernel.org>
@@ -43,81 +43,100 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Handle FFA_MEM_LEND calls from the host by treating them identically to
-FFA_MEM_SHARE calls for the purposes of the host stage-2 page-table, but
-forwarding on the original request to EL3.
+From: Fuad Tabba <tabba@google.com>
 
+Filter out advertising unsupported features, and only advertise
+features and properties that are supported by the hypervisor proxy.
+
+Signed-off-by: Fuad Tabba <tabba@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/hyp/nvhe/ffa.c | 22 +++++++++++++++-------
- 1 file changed, 15 insertions(+), 7 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/ffa.c | 45 +++++++++++++++++++++++++++++++----
+ 1 file changed, 41 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index 550936f4b5da..d90ab1c9ec72 100644
+index d90ab1c9ec72..926314a9b9d7 100644
 --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
 +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -116,10 +116,10 @@ static int ffa_unmap_hyp_buffers(void)
- 	return res.a0 == FFA_SUCCESS ? FFA_RET_SUCCESS : res.a2;
+@@ -64,15 +64,21 @@ static void ffa_to_smccc_error(struct arm_smccc_res *res, u64 ffa_errno)
+ 	};
  }
  
--static void ffa_mem_share(struct arm_smccc_res *res, u32 len, u32 fraglen)
-+static void ffa_mem_xfer(struct arm_smccc_res *res, u64 func_id, u32 len,
-+			  u32 fraglen)
+-static void ffa_to_smccc_res(struct arm_smccc_res *res, int ret)
++static void ffa_to_smccc_res_prop(struct arm_smccc_res *res, int ret, u64 prop)
  {
--	arm_smccc_1_1_smc(FFA_FN64_MEM_SHARE,
--			  len, fraglen,
-+	arm_smccc_1_1_smc(func_id, len, fraglen,
- 			  0, 0, 0, 0, 0,
- 			  res);
- }
-@@ -321,8 +321,9 @@ static int ffa_host_unshare_ranges(struct ffa_mem_region_addr_range *ranges,
- 	return ret;
+ 	if (ret == FFA_RET_SUCCESS) {
+-		*res = (struct arm_smccc_res) { .a0 = FFA_SUCCESS };
++		*res = (struct arm_smccc_res) { .a0 = FFA_SUCCESS,
++						.a2 = prop };
+ 	} else {
+ 		ffa_to_smccc_error(res, ret);
+ 	}
  }
  
--static void do_ffa_mem_share(struct arm_smccc_res *res,
--			     struct kvm_cpu_context *ctxt)
-+static __always_inline void do_ffa_mem_xfer(const u64 func_id,
-+					    struct arm_smccc_res *res,
-+					    struct kvm_cpu_context *ctxt)
- {
- 	DECLARE_REG(u32, len, ctxt, 1);
- 	DECLARE_REG(u32, fraglen, ctxt, 2);
-@@ -333,6 +334,9 @@ static void do_ffa_mem_share(struct arm_smccc_res *res,
- 	int ret = 0;
- 	u32 offset;
- 
-+	BUILD_BUG_ON(func_id != FFA_FN64_MEM_SHARE &&
-+		     func_id != FFA_FN64_MEM_LEND);
++static void ffa_to_smccc_res(struct arm_smccc_res *res, int ret)
++{
++	ffa_to_smccc_res_prop(res, ret, 0);
++}
 +
- 	if (addr_mbz || npages_mbz || fraglen > len ||
- 	    fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) {
- 		ret = FFA_RET_INVALID_PARAMETERS;
-@@ -382,7 +386,7 @@ static void do_ffa_mem_share(struct arm_smccc_res *res,
- 	if (ret)
- 		goto out_unlock;
- 
--	ffa_mem_share(res, len, fraglen);
-+	ffa_mem_xfer(res, func_id, len, fraglen);
- 	if (res->a0 != FFA_SUCCESS) {
- 		WARN_ON(ffa_host_unshare_ranges(reg->constituents,
- 						reg->addr_range_cnt));
-@@ -519,11 +523,15 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt)
- 		goto out_handled;
- 	case FFA_MEM_SHARE:
- 	case FFA_FN64_MEM_SHARE:
--		do_ffa_mem_share(&res, host_ctxt);
-+		do_ffa_mem_xfer(FFA_FN64_MEM_SHARE, &res, host_ctxt);
- 		goto out_handled;
- 	case FFA_MEM_RECLAIM:
- 		do_ffa_mem_reclaim(&res, host_ctxt);
- 		goto out_handled;
-+	case FFA_MEM_LEND:
-+	case FFA_FN64_MEM_LEND:
-+		do_ffa_mem_xfer(FFA_FN64_MEM_LEND, &res, host_ctxt);
-+		goto out_handled;
+ static void ffa_set_retval(struct kvm_cpu_context *ctxt,
+ 			   struct arm_smccc_res *res)
+ {
+@@ -484,14 +490,41 @@ static bool ffa_call_supported(u64 func_id)
+ 	case FFA_RXTX_MAP:
+ 	case FFA_MEM_DONATE:
+ 	case FFA_MEM_RETRIEVE_REQ:
+-	/* Don't advertise any features just yet */
+-	case FFA_FEATURES:
+ 		return false;
  	}
  
- 	if (ffa_call_supported(func_id))
+ 	return true;
+ }
+ 
++static bool do_ffa_features(struct arm_smccc_res *res,
++			    struct kvm_cpu_context *ctxt)
++{
++	DECLARE_REG(u32, id, ctxt, 1);
++	u64 prop = 0;
++	int ret = 0;
++
++	if (!ffa_call_supported(id)) {
++		ret = FFA_RET_NOT_SUPPORTED;
++		goto out_handled;
++	}
++
++	switch (id) {
++	case FFA_MEM_SHARE:
++	case FFA_FN64_MEM_SHARE:
++	case FFA_MEM_LEND:
++	case FFA_FN64_MEM_LEND:
++		ret = FFA_RET_SUCCESS;
++		prop = 0; /* No support for dynamic buffers */
++		goto out_handled;
++	default:
++		return false;
++	}
++
++out_handled:
++	ffa_to_smccc_res_prop(res, ret, prop);
++	return true;
++}
++
+ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt)
+ {
+ 	DECLARE_REG(u64, func_id, host_ctxt, 0);
+@@ -514,6 +547,10 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt)
+ 		return false;
+ 
+ 	switch (func_id) {
++	case FFA_FEATURES:
++		if (!do_ffa_features(&res, host_ctxt))
++			return false;
++		goto out_handled;
+ 	/* Memory management */
+ 	case FFA_FN64_RXTX_MAP:
+ 		do_ffa_rxtx_map(&res, host_ctxt);
 -- 
 2.40.1.698.g37aff9b760-goog
 
