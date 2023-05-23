@@ -1,102 +1,110 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DF2B1E516
-	for <kvmarm@lists.linux.dev>; Tue, 23 May 2023 09:52:45 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 88940139F;
-	Tue, 23 May 2023 02:53:24 -0700 (PDT)
-Received: from [192.168.5.13] (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CD0463F6C4;
-	Tue, 23 May 2023 02:52:38 -0700 (PDT)
-Message-ID: <cbda3543-1cad-b05b-1188-e0ecba6f302d@arm.com>
-Date: Tue, 23 May 2023 10:52:37 +0100
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 994E01E52D
+	for <kvmarm@lists.linux.dev>; Tue, 23 May 2023 10:18:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CA34C433EF;
+	Tue, 23 May 2023 10:18:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1684837114;
+	bh=QpvcCky08LZ7m2ESjkii8rm59GSyQ3gaOmbK/Q+UTLc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=p2kyKCeA+1H9SUF0OO0Vq5O0yBRQPnRmyx8m8Dgnahgqf+RV6pkpLkeAL2cFdDnHE
+	 Bk/l+oShre6ry8GhvxDjU71vq4v6i6CQZcHKWxnZ8tHm6Y/HnNDDMzWsTug/q9nqqZ
+	 MD8aobuFzvCb3UXtQCJxkIC6JM6KcTfDTpLQdFF9weRfG328vjC6CNNBRSWaiQekTK
+	 vU8Jc2+jQWPbDcZip0VpJ1swZcGLoAtjoBPbQ7tOw3m7mNmENmpCPXKmM/U+J+0U+S
+	 R427jZ5r51/KstKLJRhEOcpNrWA3kFzFuADaHmN4Y/NScDjK3nt+WJxscyxxJmfeeJ
+	 KUl/W0BKtAuVw==
+From: Will Deacon <will@kernel.org>
+To: linux-arm-kernel@lists.infradead.org
+Cc: Will Deacon <will@kernel.org>,
+	Quentin Perret <qperret@google.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Fuad Tabba <tabba@google.com>,
+	kvmarm@lists.linux.dev,
+	kernel-team@android.com
+Subject: [PATCH v3 00/10] KVM: arm64: FF-A proxy for pKVM
+Date: Tue, 23 May 2023 11:18:17 +0100
+Message-Id: <20230523101828.7328-1-will@kernel.org>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.11.0
-Subject: Re: [kvm-unit-tests PATCH] arm64: Make vector_table and vector_stub
- weak symbols
-Content-Language: en-GB
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, luc.maranget@inria.fr,
- Jade Alglave <Jade.Alglave@arm.com>
-References: <20230515221517.646549-1-nikos.nikoleris@arm.com>
- <20230518-d8bd66e7bf671f5df706a216@orel>
- <032397f4-62d2-add3-f7d5-0377e125454a@arm.com>
- <20230523-3729e940652cc3b2b753cb8d@orel>
-From: Nikos Nikoleris <nikos.nikoleris@arm.com>
-In-Reply-To: <20230523-3729e940652cc3b2b753cb8d@orel>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+Hi all,
 
+This is version three of the pKVM FF-A proxy series previously posted
+here:
 
-On 23/05/2023 09:56, Andrew Jones wrote:
-> On Mon, May 22, 2023 at 02:54:14PM +0100, Nikos Nikoleris wrote:
->> On 18/05/2023 17:06, Andrew Jones wrote:
->>> On Mon, May 15, 2023 at 11:15:17PM +0100, Nikos Nikoleris wrote:
->>>> This changes allows a test to define and override the declared symbols,
->>>> taking control of the whole vector_table or a vector_stub.
->>>
->>> Hi Nikos,
->>>
->>> Can you add some motivation for this change to the commit message or
->>> submit it along with some test that needs it?
->>>
->>
->> Hi Drew,
->>
->> Thanks for reviewing this.
->>
->> What do you think about adding the following to the commit message?
->>
->>> With the ability to override specific exception handlers, litmus7
->>> [1] a tool used to generate c sources for a given memory model
->>> litmus test, can override the el1h_sync symbol to implement tests
->>> with explicit exception handlers. For example:
->>>
->>> AArch64 LDRv0+I2V-dsb.ishst
->>> { >   [PTE(x)]=(oa:PA(x),valid:0);
->>>    x=1;
->>>
->>>    0:X1=x;
->>>    0:X3=PTE(x); >   0:X2=(oa:PA(x),valid:1);
->>> }>  P0          | P0.F         ;
->>> L0:          | ADD X8,X8,#1 ;
->>>   LDR W0,[X1] | STR X2,[X3]  ;
->>>               | DSB ISHST    ;
->>>               | ERET         ; > exists(0:X0=0 \/ 0:X8!=1)
->>>
->>> In this test, a thread running in core P0 executes a load to a memory
->>> location x. The PTE of the virtual address x is initially invalid.
->>> The execution of the load causes a synchronous EL1 exception which is
->>> handled by the code in P0.F. P0.F increments a counter which is
->>> maintained in X8, updates the PTE of x and makes it valid, executes a
->>> DSB ISHST and calls ERET which is expected to return and retry the
->>> execution of the load in P0:L0.
->>>
->>> The postcondition checks if there is any execution where the load wasn't
->>> executed (X0 its destination register is not update), or that the P0.F >
->>> handler was invoked more than once (the counter X8 is not 1).
->>>
->>> For this tests, litmus7 needs to control the el1h_sync. Calling
->>> install_exception_handler() would be suboptimal because the vector_stub
->>> would wrap around the code of P0.F and disturb the test.
->>>
->>> [1]: https://diy.inria.fr/doc/litmus.html
->> If you think this is sufficient, I will update the patch.
-> 
-> The above works for me.
-> 
-> (Unrelated: Sorry I haven't had a chance to give your latest efi branch
-> a test drive. I think you can probably go ahead and post the next version
-> of the series, though. That'll help bring it to the forefront for me to
-> prioritize.)
-> 
+v1: https://lore.kernel.org/r/20221116170335.2341003-1-qperret@google.com
+v2: https://lore.kernel.org/r/20230419122051.1341-1-will@kernel.org
 
-Thanks Drew, I'll send a new revision of this patch and the EFI series.
+Changes since v2 include:
 
-Nikos
+  * Rename 'spmd_' functions per suggestion from Oliver
+  * Add some more comments
+  * Rebase onto 6.4-rc3
+
+Cheers,
+
+Will
+
+Cc: Quentin Perret <qperret@google.com>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: James Morse <james.morse@arm.com>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Sudeep Holla <sudeep.holla@arm.com>
+Cc: Sebastian Ene <sebastianene@google.com>
+Cc: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev
+Cc: kernel-team@android.com
+
+--->8
+
+Fuad Tabba (1):
+  KVM: arm64: Handle FFA_FEATURES call from the host
+
+Quentin Perret (1):
+  KVM: arm64: pkvm: Add support for fragmented FF-A descriptors
+
+Will Deacon (8):
+  KVM: arm64: Block unsafe FF-A calls from the host
+  KVM: arm64: Probe FF-A version and host/hyp partition ID during init
+  KVM: arm64: Allocate pages for hypervisor FF-A mailboxes
+  KVM: arm64: Handle FFA_RXTX_MAP and FFA_RXTX_UNMAP calls from the host
+  KVM: arm64: Add FF-A helpers to share/unshare memory with secure world
+  KVM: arm64: Handle FFA_MEM_SHARE calls from the host
+  KVM: arm64: Handle FFA_MEM_RECLAIM calls from the host
+  KVM: arm64: Handle FFA_MEM_LEND calls from the host
+
+ arch/arm64/include/asm/kvm_host.h             |   1 +
+ arch/arm64/include/asm/kvm_pkvm.h             |  21 +
+ arch/arm64/kvm/arm.c                          |   1 +
+ arch/arm64/kvm/hyp/include/nvhe/ffa.h         |  17 +
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   3 +
+ arch/arm64/kvm/hyp/nvhe/Makefile              |   2 +-
+ arch/arm64/kvm/hyp/nvhe/ffa.c                 | 762 ++++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |   3 +
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  68 ++
+ arch/arm64/kvm/hyp/nvhe/setup.c               |  11 +
+ arch/arm64/kvm/pkvm.c                         |   1 +
+ include/linux/arm_ffa.h                       |   8 +
+ 12 files changed, 897 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/ffa.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/ffa.c
+
+-- 
+2.40.1.698.g37aff9b760-goog
+
