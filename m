@@ -1,92 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF1881F93C
-	for <kvmarm@lists.linux.dev>; Tue, 23 May 2023 18:37:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5B48C4339C;
-	Tue, 23 May 2023 18:37:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1684867049;
-	bh=EQ00lv5/W8EGFC0nJWEZGEzEXY5+IAnxZI57QWN4yuQ=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=mv1sJt9juz0nueQ4tDJU9sjLCGuhvRj9F0PESg1tOvIPTmHgTps7t/2+lzMrc9z0i
-	 Uv0CmzSW+4Pi2xr8YTqHZCKgcC0vXYMdNZcb0PnGuIM06hURR9ds8eBnOGDLoduUS5
-	 V9wZoKX4uyVFM7UP16iNoxj0M9NeYDP1rN59MHQ+gsDR2Yx60WjH4QGZBL6ix2CB1A
-	 Od6oydfa/oCqqNZ7sBcC7Yukjc2ZU64voPVSrzg6RaxhdqdzWdcp/mmrxzQSnvSWvI
-	 qS8183nq5XbbhiE3Eb6r9clDxc0wxBIDUQAiq7TsaiRp0hemnu1wYeQT5rRPZHTF9O
-	 Yzo7XpamKm1iw==
-From: Mark Brown <broonie@kernel.org>
-Date: Tue, 23 May 2023 19:37:05 +0100
-Subject: [PATCH v2 7/7] arm64/sysreg: Convert OSECCR_EL1 to automatic
- generation
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B0860844
+	for <kvmarm@lists.linux.dev>; Wed, 24 May 2023 12:40:42 +0000 (UTC)
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3063433fa66so535102f8f.3
+        for <kvmarm@lists.linux.dev>; Wed, 24 May 2023 05:40:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1684932041; x=1687524041;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bNqHVjiAPgcoX4AAtv5Chj9IfcChBtd2gbcHB24g+D4=;
+        b=HnXXezDYG17WebHzWaeBvSzjE6X5zZ93pBJRnP1uus8Z47y5c4ecwWgXRFimW2mvIm
+         Rbi4sRvb6Gq0HpItiOOaOkKxnGok7GAvz4VlWya9wKiv+yJsCvetAhkaLCRaW6MpipQc
+         duoL79rzF23C90aeofuyMUj0FrHjYIGyeSljHuUgxwJ4tg/FQ9jG0J8mu5Ql7GIWTx4N
+         dH2jyl9J7Aceg6afbTsYDhVnpebnDqi9N/XCkkOUCMahiE7msN0rA0vaGHYfl1VDy06X
+         Q2hR90Q6znvXMQtcNjnqmog2rfKhFFkuvXP2C+kjDIU/Mhp4Y0IYizjD1JpNgS73M/I5
+         knrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684932041; x=1687524041;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bNqHVjiAPgcoX4AAtv5Chj9IfcChBtd2gbcHB24g+D4=;
+        b=E5c/V4ry5I7VnvL2Dn3v+HuyEq+NrhBwwSZ6TB1bKjiuDpmMeEoTbT+0E4xcnAQArC
+         SVJ/gPufhgwVjRbJa1elGQAWIEW0VeVhml5TiRaVyXyHQfRpl3svePO/tjA6rY9GAdQP
+         1WqTeKmgdHy0TCz3adbBUNi41k9Fw9HuniN05sG1u6J9t94PUHoNHe6j1pYmtXhu36Jk
+         bsR9yuHnkXkXGMLd0IZrsD96tQ/8iJnQqwTgMaQu6X1gL95sFjieB/t8+uEF9bQ7yp9/
+         xDL6Pl8JNmlxLKSzMhTKEX11olnZ2Wf8MLYX+kD9ubIMXHY5SxBd2lq78oIkV4EpJxTR
+         z8ug==
+X-Gm-Message-State: AC+VfDyrMLZZzFFxKBNGJvmP4SjytOOdPr6Kpr6pdnA/hZmzC7TMEXY8
+	0o9Am70k8cDlfBjLmIPWDMwWfA==
+X-Google-Smtp-Source: ACHHUZ7nIrqPldKdUyRyL1Ju/ax0rCU5vJ28/C0/Xl8RckP1R2RBfphk946YNTbndFjLzoFRPtUylg==
+X-Received: by 2002:adf:f342:0:b0:306:30ea:a072 with SMTP id e2-20020adff342000000b0030630eaa072mr11215655wrp.53.1684932040673;
+        Wed, 24 May 2023 05:40:40 -0700 (PDT)
+Received: from myrica (5750a5b3.skybroadband.com. [87.80.165.179])
+        by smtp.gmail.com with ESMTPSA id l3-20020a1ced03000000b003f4ddde398csm2303897wmh.21.2023.05.24.05.40.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 May 2023 05:40:39 -0700 (PDT)
+Date: Wed, 24 May 2023 13:40:42 +0100
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH 0/4] KVM: arm64: vgic: Locking fixes
+Message-ID: <20230524124042.GA48723@myrica>
+References: <20230518100914.2837292-1-jean-philippe@linaro.org>
+ <86cz2wlnd6.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230419-arm64-syreg-gen-v2-7-4c6add1f6257@kernel.org>
-References: <20230419-arm64-syreg-gen-v2-0-4c6add1f6257@kernel.org>
-In-Reply-To: <20230419-arm64-syreg-gen-v2-0-4c6add1f6257@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- kvmarm@lists.linux.dev, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.13-dev-bfdf5
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1212; i=broonie@kernel.org;
- h=from:subject:message-id; bh=EQ00lv5/W8EGFC0nJWEZGEzEXY5+IAnxZI57QWN4yuQ=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBkbQfUOJFmOLMG7nJxW7pEg75iGvryikvlRYKtIemc
- CBFf1hOJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZG0H1AAKCRAk1otyXVSH0EX8B/
- 4v1es9OfIXLT09KjiU20Tkupvd1plG9Rims05p7rLWOxpxgbadoRH674jh8V5NI4UG29CFDXLvLbn1
- kpt3UZBJllP3xkrHvn13T8mlSwrbscjeMD8HA/oCh1IW2AJBAcRUj/ZZA17nQ9bbE7cAh6ZAc9M+OV
- wI8JGyfdrmzI6DPdqQdGTdAMWh4Zcg90hxeYLirC/v97qpb83TGCcC6EZX+yZ7+jj6zEnNTR8vtJY0
- 6rovWvaJG6P+eG8/N7lcwvVsFnjzlwQwqDTlwZ/xfErv3aWGD+gNnTcY9kGqhRIlFhGXf3iIIdkgU2
- uklhKKnA5ruLtjPCHfeA2ICnzgaoqU
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86cz2wlnd6.wl-maz@kernel.org>
 
-Convert OSECCR_EL1 to automatic generation as per DDI0601 2023-03, no
-functional changes.
+On Fri, May 19, 2023 at 09:46:45AM +0100, Marc Zyngier wrote:
+> On Thu, 18 May 2023 11:09:14 +0100,
+> Jean-Philippe Brucker <jean-philippe@linaro.org> wrote:
+> > 
+> > Another fun locking puzzle, between the new config_lock and srcu.
+> > Patch 1 attempts to fix it, and the other patches fix simpler issues.
+> 
+> Thanks for that and for your excellent description of the problems.
+> 
+> > I got these lockdep reports while running KVM QEMU on a TCG QEMU, but it
+> > can also be triggered by running the vgic_irq kselftest on TCG QEMU.
+> > Now, with the fix and lockdep enabled, vgic_irq hangs but I believe it's
+> > an unrelated weirdness: if I introduce a separate lockdep warning for
+> > some made up locks, then the test passes again. So I'm sending this out
+> > now for discussion, and will investigate that one later.
+> 
+> I've taken these patches for a spin, and I cannot reproduce this hang,
+> though I'm running on actual HW and not QEMU. It would be really
+> annoying if lockdep actively introduced issues... :-/
+> 
+> Any chance you could dig into this as you have a good reproducer? I'll
+> try to setup a TGC environment on my end as well.
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- arch/arm64/include/asm/sysreg.h | 1 -
- arch/arm64/tools/sysreg         | 5 +++++
- 2 files changed, 5 insertions(+), 1 deletion(-)
+I'm not sure this is a fixable problem, didn't find anything obviously
+wrong. It's just that when running with lockdep and KASAN (forgot about
+that one, sorry) on an emulated platform, some tests can't make progress.
+In this config I can boot a guest without problem, but this particular
+test gets stuck when trying to inject 32 interrupts. What I see is:
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index d9711f1e47b2..23a17da500a4 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -134,7 +134,6 @@
- #define SYS_SVCR_SMSTART_SM_EL0		sys_reg(0, 3, 4, 3, 3)
- #define SYS_SVCR_SMSTOP_SMZA_EL0	sys_reg(0, 3, 4, 6, 3)
- 
--#define SYS_OSECCR_EL1			sys_reg(2, 0, 0, 6, 2)
- #define SYS_DBGBVRn_EL1(n)		sys_reg(2, 0, 0, n, 4)
- #define SYS_DBGBCRn_EL1(n)		sys_reg(2, 0, 0, n, 5)
- #define SYS_DBGWVRn_EL1(n)		sys_reg(2, 0, 0, n, 6)
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index e18ae1df41f4..41462785020b 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -93,6 +93,11 @@ Res0	63:32
- Field	31:0	DTRTX
- EndSysreg
- 
-+Sysreg	OSECCR_EL1	2	0	0	6	2
-+Res0	63:32
-+Field	31:0	EDECCR
-+EndSysreg
-+
- Sysreg	OSLAR_EL1	2	0	1	0	4
- Res0	63:1
- Field	0	OSLK
+1. KVM prepares to enter the guest, spends a lot of time dealing with the
+   vGIC with interrupts disabled.
+2. Just before entering the guest it sees ISR_EL1 set (the timer interrupt
+   is pending), so cancels the return to guest, reprograms the timer and
+   goto 1.
 
--- 
-2.30.2
+For this particular test, trying to inject several interrupts
+simultaneously, I think kvm_vgic_flush_hwstate() needs to take and release
+lots of locks which takes forever with lockdep. I measure about 4ms inside
+that function, which corresponds to the timer period at HZ_250.
 
+Previously, I guess getting a lockdep warning would disable lockdep and
+allow the test to make progress. 
+
+So maybe the vGIC could still be optimized, or maybe this isn't worth
+fixing, we could just say that this setup is too slow to reliably run KVM
+and leave it at that.
+
+Thanks,
+Jean
