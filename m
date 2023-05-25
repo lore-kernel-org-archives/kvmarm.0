@@ -1,33 +1,39 @@
-Received: from out-40.mta0.migadu.com (out-40.mta0.migadu.com [91.218.175.40])
+Received: from out-13.mta1.migadu.com (out-13.mta1.migadu.com [95.215.58.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2041324EA9
-	for <kvmarm@lists.linux.dev>; Thu, 25 May 2023 21:41:49 +0000 (UTC)
-Date: Thu, 25 May 2023 21:41:43 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B6A261C5
+	for <kvmarm@lists.linux.dev>; Thu, 25 May 2023 23:36:30 +0000 (UTC)
+Date: Thu, 25 May 2023 23:36:23 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1685050907;
+	t=1685057788;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7LZyVsixnYHBqqcygXbEeMudfYkIJ0LUQv8Zaxcpdd8=;
-	b=nu5YGcV/j0wPRJrbn6CrAxnJcPrhTjgZJs+p1Ze06BO4708tnL/5Od+eckQEi5IIt1xviL
-	QUhQRxri7yqX5v9BElAW+kapnReg1TQ2yBt49zRof9HwucBH0z3dT811cmXWJaGUqTfAy0
-	eC3g2EAagTPOCHWiIGtoHk6dHMJnjqg=
+	bh=P6zAesvCX1np6qowsiTDFn1Ttg3LeLNqimbKFFrO44k=;
+	b=hFk/P8VbvqCXvnUFBR0TDZqH7RTktZxcVeToKNNL9QKObZGJFbHkEb7Cxwj065MufplhgQ
+	GPjZk2yUiY55AT2nqCd4XmNXwUuD4QkGZi4SwSPCII8JWa8KxwTAQTzJq+7cieq65NF1/v
+	946/dwlxo+XduDWeqmM9BP7IolOhSR4=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+To: Reiji Watanabe <reijiw@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Shaoqin Huang <shahuang@redhat.com>
-Subject: Re: [PATCH v2 0/7] arm64/sysreg: More conversions to automatic
- generation
-Message-ID: <ZG/WF22mB4PiJdl4@linux.dev>
-References: <20230419-arm64-syreg-gen-v2-0-4c6add1f6257@kernel.org>
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Raghavendra Rao Anata <rananta@google.com>,
+	Shaoqin Huang <shahuang@redhat.com>, Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v3 2/2] KVM: arm64: PMU: Don't overwrite PMUSERENR with
+ vcpu loaded
+Message-ID: <ZG/w95pYjWnMJB62@linux.dev>
+References: <20230415164029.526895-1-reijiw@google.com>
+ <20230415164029.526895-3-reijiw@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -36,36 +42,132 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230419-arm64-syreg-gen-v2-0-4c6add1f6257@kernel.org>
+In-Reply-To: <20230415164029.526895-3-reijiw@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, May 23, 2023 at 07:36:58PM +0100, Mark Brown wrote:
-> Continue working through the register defintions, converting them to
-> automatic generation.
-> 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
-> Changes in v2:
-> - Also convert OSECCR_EL1, OSDTRRX_EL1 and OSDTRTX_EL1 instead of
->   dropping them.
-> - Link to v1: https://lore.kernel.org/r/20230419-arm64-syreg-gen-v1-0-936cd769cb9e@kernel.org
-> 
-> ---
-> Mark Brown (7):
->       arm64/sysreg: Convert MDCCINT_EL1 to automatic register generation
->       arm64/sysreg: Convert MDSCR_EL1 to automatic register generation
->       arm64/sysreg: Standardise naming of bitfield constants in OSL[AS]R_EL1
->       arm64/sysreg: Convert OSLAR_EL1 to automatic generation
->       arm64/sysreg: Convert OSDTRRX_EL1 to automatic generation
->       arm64/sysreg: Convert OSDTRTX_EL1 to automatic generation
->       arm64/sysreg: Convert OSECCR_EL1 to automatic generation
+Hi Reiji,
 
-Besides the one comment I had:
+Apologies, this fell off my list of reviews.
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+On Sat, Apr 15, 2023 at 09:40:29AM -0700, Reiji Watanabe wrote:
 
-I imagine these will go through the arm64 tree right? The KVM diff is
-miniscule.
+[...]
+
+>  static void armv8pmu_enable_event(struct perf_event *event)
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 6718731729fd..7e73be12cfaf 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -82,12 +82,24 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+>  	 */
+>  	if (kvm_arm_support_pmu_v3()) {
+>  		struct kvm_cpu_context *hctxt;
+> +		unsigned long flags;
+>  
+>  		write_sysreg(0, pmselr_el0);
+>  
+>  		hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +
+> +		/*
+> +		 * Disable IRQs to prevent a race condition between the
+> +		 * following code and IPIs that attempts to update
+> +		 * PMUSERENR_EL0. See also kvm_set_pmuserenr().
+> +		 */
+> +		local_irq_save(flags);
+> +
+>  		ctxt_sys_reg(hctxt, PMUSERENR_EL0) = read_sysreg(pmuserenr_el0);
+>  		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
+> +		vcpu_set_flag(vcpu, PMUSERENR_ON_CPU);
+> +
+> +		local_irq_restore(flags);
+
+Can the IRQ save/restore be moved to {activate,deactivate}_traps_vhe_{load,put}()?
+
+That'd eliminate the dance to avoid using kernel-only symbols in nVHE
+and would be consistent with the existing usage of
+__{activate,deactivate}_traps_common() from nVHE (IRQs already
+disabled).
+
+IMO, the less nVHE knows about the kernel the better.
+
+>  	}
+>  
+>  	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
+> @@ -112,9 +124,21 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+>  	write_sysreg(0, hstr_el2);
+>  	if (kvm_arm_support_pmu_v3()) {
+>  		struct kvm_cpu_context *hctxt;
+> +		unsigned long flags;
+>  
+>  		hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +
+> +		/*
+> +		 * Disable IRQs to prevent a race condition between the
+> +		 * following code and IPIs that attempts to update
+> +		 * PMUSERENR_EL0. See also kvm_set_pmuserenr().
+> +		 */
+> +		local_irq_save(flags);
+> +
+>  		write_sysreg(ctxt_sys_reg(hctxt, PMUSERENR_EL0), pmuserenr_el0);
+> +		vcpu_clear_flag(vcpu, PMUSERENR_ON_CPU);
+> +
+> +		local_irq_restore(flags);
+>  	}
+>  
+>  	if (cpus_have_final_cap(ARM64_SME)) {
+> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+> index 530347cdebe3..2c08a54ca7d9 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
+> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+> @@ -10,7 +10,7 @@ asflags-y := -D__KVM_NVHE_HYPERVISOR__ -D__DISABLE_EXPORTS
+>  # will explode instantly (Words of Marc Zyngier). So introduce a generic flag
+>  # __DISABLE_TRACE_MMIO__ to disable MMIO tracing for nVHE KVM.
+>  ccflags-y := -D__KVM_NVHE_HYPERVISOR__ -D__DISABLE_EXPORTS -D__DISABLE_TRACE_MMIO__
+> -ccflags-y += -fno-stack-protector	\
+> +ccflags-y += -fno-stack-protector -DNO_TRACE_IRQFLAGS \
+>  	     -DDISABLE_BRANCH_PROFILING	\
+>  	     $(DISABLE_STACKLEAK_PLUGIN)
+>  
+> diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
+> index 7887133d15f0..d6a863853bfe 100644
+> --- a/arch/arm64/kvm/pmu.c
+> +++ b/arch/arm64/kvm/pmu.c
+> @@ -209,3 +209,28 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu)
+>  	kvm_vcpu_pmu_enable_el0(events_host);
+>  	kvm_vcpu_pmu_disable_el0(events_guest);
+>  }
+> +
+> +/*
+> + * With VHE, keep track of the PMUSERENR_EL0 value for the host EL0 on the pCPU
+> + * where PMUSERENR_EL0 for the guest is loaded, since PMUSERENR_EL0 is switched
+> + * to the value for the guest on vcpu_load().  The value for the host EL0
+> + * will be restored on vcpu_put(), before returning to the EL0.
+
+wording: s/the EL0/EL0. Or, alternatively, to avoid repeating yourself
+you can just say "returning to userspace".
+
+You may also want to mention in passing why this isn't necessary for
+nVHE, as the register is context switched for every guest enter/exit.
+
+> + *
+> + * Return true if KVM takes care of the register. Otherwise return false.
+> + */
+> +bool kvm_set_pmuserenr(u64 val)
+> +{
+> +	struct kvm_cpu_context *hctxt;
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	if (!kvm_arm_support_pmu_v3() || !has_vhe())
+> +		return false;
+> +
+> +	vcpu = kvm_get_running_vcpu();
+> +	if (!vcpu || !vcpu_get_flag(vcpu, PMUSERENR_ON_CPU))
+> +		return false;
+> +
+> +	hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +	ctxt_sys_reg(hctxt, PMUSERENR_EL0) = val;
+> +	return true;
+> +}
 
 -- 
 Thanks,
