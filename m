@@ -1,98 +1,91 @@
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378601D2A2
-	for <kvmarm@lists.linux.dev>; Thu, 25 May 2023 17:20:26 +0000 (UTC)
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-3f6e68cc738so2681825e9.1
-        for <kvmarm@lists.linux.dev>; Thu, 25 May 2023 10:20:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1685035224; x=1687627224;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0BsSMy+JyYACPWrjjdZYwT/+fcHGskJiY38T07+T9dQ=;
-        b=pffAAv8U4UDe2UO5AaMNBCKJwsA+fY/uXlxRYWYfOSF/U831Cbn+aYPxlrMSwbhgZb
-         TJ3rx1gTr+K1LN6r+qy3C+Gerl601yJAy8AKOIVHRjsHhwRhM0mR8bH/dqseh0HTJwDl
-         aTiHPcC0yw4VA3HzAumqaPgq0KwYo24ZqEHl9kQtn+U7cDTGuIhcpJuNZs5uHfdAhEEM
-         sYxNXpBUEAAXjC6xxQMqA15kRL462Pj9tKNyS/cgeUu5jjoy+gglRJ4yP7PXtcefEg26
-         u3Y3AIXcDMKw5KULmLOOQImp2uNFtr5k8MA3uRGHPFRaKVMeGy/HWPTjQYaXkLpCGlq1
-         MCag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685035224; x=1687627224;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0BsSMy+JyYACPWrjjdZYwT/+fcHGskJiY38T07+T9dQ=;
-        b=KSIwv4Q4jM33vEK5Ss1Ka3yzpTZYc+T8s+szUfRg/lXTUBXcsfDzDE75DoJ1Ohzac3
-         TK7gePcLGBc3JvOKOcG15E7NlomQ+XsJFSdX4GsUmjHtGmG/+Vlw3/pSP6D70jRxo33t
-         OqSJPYUCJcyRcuS6Jr9lI8H2p3CGsuU7PI8ozkKKVlb0NtY90+X/ZabkHBCfq3MfRKFW
-         51SD5Vb5irv9HKgAW9GNsQVQ0XubpgOb2q+VHCH6eTHFAg4AVyceSbS2h+qVSPqxEmYk
-         6AMKVZ9H1447ZEt8OW5NbHKtA6F3wUl4OYKgBLk1yAFPiMVhMv/6lRkV4/82o/mw1h56
-         t6uQ==
-X-Gm-Message-State: AC+VfDzis+Brw576jXsSFaum51NBFRM64565YCUdSUKMI6icqGOgMY9e
-	NHs7lrT5Ow1i3NmvBYXnTcQcmg==
-X-Google-Smtp-Source: ACHHUZ7XVIxEPsxV1O2HxjW5C+Kciziw8ncF6RMfoJyVKR3UnpdSFexzOl8yKxJCJvMncweFjvx0TA==
-X-Received: by 2002:a05:600c:249:b0:3f5:fb97:eafe with SMTP id 9-20020a05600c024900b003f5fb97eafemr2817182wmj.30.1685035224349;
-        Thu, 25 May 2023 10:20:24 -0700 (PDT)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id e21-20020a05600c219500b003f604ca479esm6313634wme.3.2023.05.25.10.20.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 May 2023 10:20:23 -0700 (PDT)
-Date: Thu, 25 May 2023 19:20:23 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Haibo Xu <haibo1.xu@intel.com>
-Cc: xiaobo55x@gmail.com, maz@kernel.org, oliver.upton@linux.dev, 
-	seanjc@google.com, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Shuah Khan <shuah@kernel.org>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, David Matlack <dmatlack@google.com>, 
-	Ben Gardon <bgardon@google.com>, Vipin Sharma <vipinsh@google.com>, 
-	Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 00/11] RISCV: Add KVM_GET_REG_LIST API
-Message-ID: <20230525-6e0855eb07086a96eaa82362@orel>
-References: <cover.1684999824.git.haibo1.xu@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4859D101DA
+	for <kvmarm@lists.linux.dev>; Thu, 25 May 2023 18:25:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1650CC433D2;
+	Thu, 25 May 2023 18:25:23 +0000 (UTC)
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Will Deacon <will@kernel.org>,
+	Arnd Bergmann <arnd@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Kees Cook <keescook@chromium.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-efi@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH 00/15] arm64: address -Wmissing-prototype warnings
+Date: Thu, 25 May 2023 19:25:22 +0100
+Message-Id: <168503901731.1110505.94060573745937753.b4-ty@arm.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230516160642.523862-1-arnd@kernel.org>
+References: <20230516160642.523862-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1684999824.git.haibo1.xu@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Thu, May 25, 2023 at 03:38:24PM +0800, Haibo Xu wrote:
-> KVM_GET_REG_LIST will dump all register IDs that are available to
-> KVM_GET/SET_ONE_REG and It's very useful to identify some platform
-> regression issue during VM migration.
+On Tue, 16 May 2023 18:06:27 +0200, Arnd Bergmann wrote:
+> This addresses all arm64 specific protype warnings. As with the arm32
+> patches, the majority of them  should be straightforward, either adding
+> an #include statement to get the right header, or ensuring that an unused
+> global function is left out of the build when the prototype is hidden.
 > 
-> Patch 1-7 re-structured the get-reg-list test in aarch64 to make some
-> of the code as common test framework that can be shared by riscv.
+> The ones that are a bit awkward are those that just add a prototype to
+> shut up the warning, but the prototypes are never used for calling the
+> function because the only caller is in assembler code. I tried to come
+> up with other ways to shut up the compiler, and ideally this would be
+> triggered by the 'asmlinkage' keyword as Ard suggested in the past, but
+> I could not come up with a way to do this.
 > 
-> Patch 8 enabled the KVM_GET_REG_LIST API in riscv and patch 9-11 added
-> the corresponding kselftest for checking possible register regressions.
-> 
-> The get-reg-list kvm selftest was ported from aarch64 and tested with
-> Linux 6.4-rc1 on a Qemu riscv virt machine.
-> 
-> ---
-> Changed since v1:
->   * rebase to Andrew's changes
->   * fix coding style
-> 
-> Andrew Jones (7):
->   KVM: arm64: selftests: Replace str_with_index with strdup_printf
->   KVM: arm64: selftests: Drop SVE cap check in print_reg
->   KVM: arm64: selftests: Remove print_reg's dependency on vcpu_config
->   KVM: arm64: selftests: Rename vcpu_config and add to kvm_util.h
->   KVM: arm64: selftests: Delete core_reg_fixup
->   KVM: arm64: selftests: Split get-reg-list test code
->   KVM: arm64: selftests: Finish generalizing get-reg-list
+> [...]
 
-All the patches above should also have your s-o-b since your posting them.
+Applied to arm64 (for-next/missing-proto-warn), thanks!
 
-Thanks,
-drew
+[01/15] arm64: xor-neon: mark xor_arm64_neon_*() static
+        https://git.kernel.org/arm64/c/320a93d4df48
+[02/15] arm64: add scs_patch_vmlinux prototype
+        https://git.kernel.org/arm64/c/aea197160d74
+[03/15] arm64: avoid prototype warnings for syscalls
+        https://git.kernel.org/arm64/c/6ac19f96515e
+[04/15] arm64: move cpu_suspend_set_dbg_restorer() prototype to header
+        https://git.kernel.org/arm64/c/ec3a3db7100d
+[05/15] arm64: spectre: provide prototypes for internal functions
+        https://git.kernel.org/arm64/c/010089e9d3fe
+[06/15] arm64: kvm: add prototypes for functions called in asm
+        https://git.kernel.org/arm64/c/05d557a5cf59
+[07/15] arm64: cpuidle: fix #ifdef for acpi functions
+        https://git.kernel.org/arm64/c/68a879b55346
+[08/15] arm64: efi: add efi_handle_corrupted_x18 prototype
+        https://git.kernel.org/arm64/c/fbc0cd6f6044
+[09/15] arm64: hide unused is_valid_bugaddr()
+        https://git.kernel.org/arm64/c/b925b4314c91
+[10/15] arm64: module-plts: inline linux/moduleloader.h
+        https://git.kernel.org/arm64/c/60a0aab7463e
+[11/15] arm64: flush: include linux/libnvdimm.h
+        https://git.kernel.org/arm64/c/1a1183938946
+[12/15] arm64: kaslr: add kaslr_early_init() declaration
+        https://git.kernel.org/arm64/c/a7f5cb606e99
+[13/15] arm64: signal: include asm/exception.h
+        https://git.kernel.org/arm64/c/8ada7aab02ee
+[14/15] arm64: move early_brk64 prototype to header
+        https://git.kernel.org/arm64/c/e13d32e99264
+[15/15] arm64: add alt_cb_patch_nops prototype
+        https://git.kernel.org/arm64/c/c152aed4dcc2
+
+-- 
+Catalin
+
