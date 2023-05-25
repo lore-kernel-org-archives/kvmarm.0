@@ -1,49 +1,49 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D441FC05
-	for <kvmarm@lists.linux.dev>; Thu, 25 May 2023 19:26:03 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-564f6099813so1360147b3.2
-        for <kvmarm@lists.linux.dev>; Thu, 25 May 2023 12:26:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF28D1DDED
+	for <kvmarm@lists.linux.dev>; Thu, 25 May 2023 19:50:51 +0000 (UTC)
+Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-76c27782e30so4143739f.3
+        for <kvmarm@lists.linux.dev>; Thu, 25 May 2023 12:50:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685042762; x=1687634762;
+        d=google.com; s=20221208; t=1685044251; x=1687636251;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=6Gt90zOwJ9mi5eHlnv2jnI0ySmjYJ4m1WS/nV2KiYm0=;
-        b=xckIqZevWkLNFYjYVIxqvOArlpXTXa4Rn+4hryPquh3h+fqnBRh11PbOzFWkQqTVxr
-         YKTrsk4LdsZOQNB5161ZN7r+8G26/0am4FNkfUNnHLj4I82tsM0bIQW7BqK17N4lpP1A
-         juINJUIkMnkyF11/akp0KAQz+FOQVu+tdKvmOs48FBPnthJUyG27gjE3N08KUAvZddh6
-         U6Ud/NZnyBNJmr5szv7MgCwisGD/M2xNvVOrFmVNa7fELo+a7rOq2FY1nx6VmdO98r14
-         Kd0l5DSs9cvvb6kM73b1KVDcwCfry5cytfwHsLat+ISriw2LmWumooGaDBKsNcB+EvRR
-         BFnQ==
+        bh=ObkkrpGCZ6jiKurOn4Vm2QFLFy19smc7EknbNsel8tg=;
+        b=CGJBCMvbcTH+HOLpI+lEwBcSZfxxUUQpBlZMNGkhR+Zhf9S7X12/5YSUWSb1V85kQ9
+         xNxtLQe2oi8tg1wwdT2U14DOPcpCgTkTAx6hTNiJgEJOJW1c2YWqXdM6QIRZqgD+q8UL
+         ihy0RXE66bzN6bTFFYOM73l4naR9SZ1rIST+PPgtNsGOqRxEG7bisXjpbdbx985ymSUe
+         Ph8WkYdiLNt7Lvx5QqYXen1FUYhycmtjCmMWMxRpwMSJxLIdhRozT4s08C2SXeSvmQaL
+         tweZ0hPcGiDX/YXBltocC7A+WB0aI4MqiAlAgJaVczkZvWTE5mWFcwvxCGbpXcRAJesn
+         fdXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685042762; x=1687634762;
+        d=1e100.net; s=20221208; t=1685044251; x=1687636251;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6Gt90zOwJ9mi5eHlnv2jnI0ySmjYJ4m1WS/nV2KiYm0=;
-        b=hjdAHb6iTtQ3je6J+7Vl2CX3299zH9cD7SInsjrH0huH5gCeta5T6ZkM3E9TltcCbj
-         n5W5famsxh4X7Q+n+5P0TX+zDpIic0+F882nMk3JPj9TyDCMGkqqQkTOj9knnQpxD1mk
-         tlEVG9m8Zly8OUC5s2lMiW96WNPYmeUk/HxLdVZZFGuphcutVtOmoTCZQHxkXFvfnQYp
-         m0Gz063JLwJYnO7hmof9urBB2YVoR+TkVnAnGP0IgQWeeEas6rCYNfC7R+xq70Kwc80C
-         i16UM9YLd6jNfy0/Vi84ohVEM+ok8AJ3h26Gd6ODC6hNbBBLdw9XNEQHpni0dCpZ0XPJ
-         PxLg==
-X-Gm-Message-State: AC+VfDyTLM7UYHA9zFtt7WCaZ/glp3HSKdW0f/B9o7ZQ4rGXETUYkVLj
-	4fHtaeN9jBCZV3vtd6znypSHpEowPP6gDU+kCw==
-X-Google-Smtp-Source: ACHHUZ4uH5AqfAW158utnpLgI3U+J0T8My2BfvrDS2VXq1pyjhZTgWuSJAqcH/fLYDWyCXakupT40XwCiknFplrL1w==
+        bh=ObkkrpGCZ6jiKurOn4Vm2QFLFy19smc7EknbNsel8tg=;
+        b=l8H6I3tT6SlcpH/aoUhkf0YmoGKVJdNlTNwteVOaUa/49/ZRTRppAvIF7A/ZlaLc6C
+         LMDimOw23suS6NQxUriaUtqZkuhfRUgxbRkc4h0yfIWlnAgy8zXFamQ3CP3BS/zrjfzU
+         CAkQWZHnKoeOYTwtVMj8XT9QS/HuZFpHRDy9gbKdCTLIXw1GFSvVMkji1pJorhGDoO/x
+         JmgStPyJsxH8SlWKbhKxW40uP87ffztAnZyKNJBQowHM8O7UO5C3vfEgNXe7TFworI/U
+         CnbPoMmFFdnhRa/pG7UUpDWpaRNkfPvUZEcwNudo50mJ9nxqTho7xqtlIzXL2e1lkoxl
+         P1/g==
+X-Gm-Message-State: AC+VfDzRzFKUNOzJeKpCI+zzjkweblMOWvQ2FPK0CeeeT8sLp4BfI3Bd
+	1sRzYKtKc+jEqFFEfKm8CycHD1KKEk4WAQnS+w==
+X-Google-Smtp-Source: ACHHUZ6Z9KtoHJcC7GMhgxz3P8RqY3VCZI0iGscR2klaQUEZZ+6Qywdmzo991lbX54ZFbRF0UxjhEzYCVxqPJ/+YQA==
 X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a81:b1c6:0:b0:559:e97a:cb21 with SMTP
- id p189-20020a81b1c6000000b00559e97acb21mr346190ywh.9.1685042762258; Thu, 25
- May 2023 12:26:02 -0700 (PDT)
-Date: Thu, 25 May 2023 19:26:01 +0000
-In-Reply-To: <20230509142235.3284028-7-kristina.martsenko@arm.com>
+ (user=coltonlewis job=sendgmr) by 2002:a02:29c7:0:b0:41b:b95:89db with SMTP
+ id p190-20020a0229c7000000b0041b0b9589dbmr5348368jap.5.1685044250766; Thu, 25
+ May 2023 12:50:50 -0700 (PDT)
+Date: Thu, 25 May 2023 19:50:49 +0000
+In-Reply-To: <20230509142235.3284028-8-kristina.martsenko@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-Message-ID: <gsntcz2ob4c6.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: RE: [PATCH v2 06/11] KVM: arm64: hide MOPS from guests
+Message-ID: <gsnta5xsb36u.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: RE: [PATCH v2 07/11] arm64: mops: handle MOPS exceptions
 From: Colton Lewis <coltonlewis@google.com>
 To: Kristina Martsenko <kristina.martsenko@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
@@ -55,11 +55,49 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-> As FEAT_MOPS is not supported in guests yet, hide it from the ID
-> registers for guests.
+> +	if (esr & ESR_ELx_MOPS_ISS_MEM_INST) {
+> +		/* SET* instruction */
+> +		if (option_a ^ wrong_option) {
+> +			/* Format is from Option A; forward set */
+> +			pt_regs_write_reg(regs, dstreg, dst + size);
+> +			pt_regs_write_reg(regs, sizereg, -size);
+> +		}
+> +	} else {
+> +		/* CPY* instruction */
+> +		if (!(option_a ^ wrong_option)) {
+> +			/* Format is from Option B */
+> +			if (regs->pstate & PSR_N_BIT) {
+> +				/* Backward copy */
+> +				pt_regs_write_reg(regs, dstreg, dst - size);
+> +				pt_regs_write_reg(regs, srcreg, src - size);
+> +			}
+> +		} else {
+> +			/* Format is from Option A */
+> +			if (size & BIT(63)) {
+> +				/* Forward copy */
+> +				pt_regs_write_reg(regs, dstreg, dst + size);
+> +				pt_regs_write_reg(regs, srcreg, src + size);
+> +				pt_regs_write_reg(regs, sizereg, -size);
+> +			}
+> +		}
+> +	}
 
-> The MOPS instructions are UNDEFINED in guests as HCRX_EL2.MSCEn is not
-> set in HCRX_GUEST_FLAGS, and will take an exception to EL1 if executed.
+I can see an argument for styling things closely to the ARM manual as
+you have done here, but Linux style recommends against deep nesting. In
+this case it is unneeded. I believe this can be written as a single
+if-else chain and that makes it easier to distinguish the three options.
 
-For my benefit, could you please explain why no support for guests yet?
-Why not set HCRX_EL2.MSCEn in this series?
+if ((esr & ESR_ELx_MOPS_ISS_MEM_INST) && (option_a ^ wrong_option)) {
+	/* Format is from Option A; forward set */
+	pt_regs_write_reg(regs, dstreg, dst + size);
+	pt_regs_write_reg(regs, sizereg, -size);
+} else if ((option_a ^ wrong_option) && (size & BIT(63)) {
+	/* Forward copy */
+	pt_regs_write_reg(regs, dstreg, dst + size);
+	pt_regs_write_reg(regs, srcreg, src + size);
+	pt_regs_write_reg(regs, sizereg, -size);
+} else if (regs-pstate & PSR_N_BIT) {
+	/* Backward copy */
+	pt_regs_write_reg(regs, dstreg, dst - size);
+	pt_regs_write_reg(regs, srcreg, src - size);
+}
