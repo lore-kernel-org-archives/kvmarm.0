@@ -1,18 +1,19 @@
-Received: from out-53.mta1.migadu.com (out-53.mta1.migadu.com [95.215.58.53])
+Received: from out-52.mta1.migadu.com (out-52.mta1.migadu.com [95.215.58.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42A1D1EA8B
-	for <kvmarm@lists.linux.dev>; Thu, 25 May 2023 21:27:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4059B24EA4
+	for <kvmarm@lists.linux.dev>; Thu, 25 May 2023 21:27:52 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1685050068;
+	t=1685050070;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=GcaYIZes7eoQxIcBQ3dy6XEPGIYlpX9Tf7l6FKMLHFE=;
-	b=R6EFO+mfgaKp5pp/vzP4f7bzreOdW4h5fiazXOHHmf1XoP3cfYOKhYGBQ7a65K/bJTkAAU
-	PFkMdU9nLIVmxPd15zyV15Q9oXwFJPe5ZpnP574AdOOJ4X9U5MKi0Dsw6BeJ8rgCt3cso5
-	KtVMqSHkCUAAumdrf8m5r7ETXAn/2Wc=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ps0SIMThuXQvRz20fY7yPgap9nSjnQNggSViKXssVT0=;
+	b=IEw4IzcwKKNBROAs3/Vu1oK6Z8m9MSEqGf2VUkLCm76KjE2m/H3aQyx4LI65lhYEjzkd0g
+	WER84ypA8qinUTu3p7JSdhffy60KdiQFYrD9CYVy5V0NFx1vMDtpI0PWG4FiM3x3KiDLaH
+	Ap8K0CF4CdTGyOye5VPqPQACb0yUA0A=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -25,9 +26,11 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Nathan Chancellor <nathan@kernel.org>,
 	mark.rutland@arm.com,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 0/2] KVM: arm64: Fix for probing default PMU
-Date: Thu, 25 May 2023 21:27:20 +0000
-Message-ID: <20230525212723.3361524-1-oliver.upton@linux.dev>
+Subject: [PATCH 1/2] KVM: arm64: Iterate arm_pmus list to probe for default PMU
+Date: Thu, 25 May 2023 21:27:21 +0000
+Message-ID: <20230525212723.3361524-2-oliver.upton@linux.dev>
+In-Reply-To: <20230525212723.3361524-1-oliver.upton@linux.dev>
+References: <20230525212723.3361524-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -37,29 +40,85 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Follow-up to the discussion in [1].
+To date KVM has relied on using a perf event to probe the core PMU at
+the time of vPMU initialization. Behind the scenes perf_event_init()
+would iteratively walk the PMUs of the system and return the PMU that
+could handle the event. However, an upcoming change in perf core will
+drop the iterative walk, thereby breaking the fragile dance we do on the
+KVM side.
 
-KVM uses a junk perf event to probe for a default PMU instance to use
-for the guest, which depends on perf finding the right PMU instance
-to use for the event. Looks like perf is going to rely strictly on
-the specified PMU type, breaking the entire scheme.
+Avoid the problem altogether by iterating over the list of supported
+PMUs maintained in KVM, returning the core PMU that matches the CPU
+we were called on.
 
-KVM now maintains a list of valid PMU instances that can be selected by
-userspace, we can simply walk that to probe for a default PMU.
+Tested-by: Nathan Chancellor <nathan@kernel.org>
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/kvm/pmu-emul.c | 46 ++++++++++-----------------------------
+ 1 file changed, 12 insertions(+), 34 deletions(-)
 
-Applies to 6.4-rc3 and tested on -next.
-
-[1] https://lore.kernel.org/all/20230524214133.GA2359762@dev-arch.thelio-3990X/
-
-Oliver Upton (2):
-  KVM: arm64: Iterate arm_pmus list to probe for default PMU
-  KVM: arm64: Document default vPMU behavior on heterogeneous systems
-
- arch/arm64/kvm/pmu-emul.c | 58 ++++++++++++++++-----------------------
- 1 file changed, 23 insertions(+), 35 deletions(-)
-
-
-base-commit: 44c026a73be8038f03dbdeef028b642880cf1511
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index 45727d50d18d..5deddc49e745 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -694,45 +694,23 @@ void kvm_host_pmu_init(struct arm_pmu *pmu)
+ 
+ static struct arm_pmu *kvm_pmu_probe_armpmu(void)
+ {
+-	struct perf_event_attr attr = { };
+-	struct perf_event *event;
+-	struct arm_pmu *pmu = NULL;
+-
+-	/*
+-	 * Create a dummy event that only counts user cycles. As we'll never
+-	 * leave this function with the event being live, it will never
+-	 * count anything. But it allows us to probe some of the PMU
+-	 * details. Yes, this is terrible.
+-	 */
+-	attr.type = PERF_TYPE_RAW;
+-	attr.size = sizeof(attr);
+-	attr.pinned = 1;
+-	attr.disabled = 0;
+-	attr.exclude_user = 0;
+-	attr.exclude_kernel = 1;
+-	attr.exclude_hv = 1;
+-	attr.exclude_host = 1;
+-	attr.config = ARMV8_PMUV3_PERFCTR_CPU_CYCLES;
+-	attr.sample_period = GENMASK(63, 0);
++	struct arm_pmu *tmp, *pmu = NULL;
++	struct arm_pmu_entry *entry;
++	int cpu;
+ 
+-	event = perf_event_create_kernel_counter(&attr, -1, current,
+-						 kvm_pmu_perf_overflow, &attr);
++	mutex_lock(&arm_pmus_lock);
+ 
+-	if (IS_ERR(event)) {
+-		pr_err_once("kvm: pmu event creation failed %ld\n",
+-			    PTR_ERR(event));
+-		return NULL;
+-	}
++	cpu = smp_processor_id();
++	list_for_each_entry(entry, &arm_pmus, entry) {
++		tmp = entry->arm_pmu;
+ 
+-	if (event->pmu) {
+-		pmu = to_arm_pmu(event->pmu);
+-		if (pmu->pmuver == ID_AA64DFR0_EL1_PMUVer_NI ||
+-		    pmu->pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
+-			pmu = NULL;
++		if (cpumask_test_cpu(cpu, &tmp->supported_cpus)) {
++			pmu = tmp;
++			break;
++		}
+ 	}
+ 
+-	perf_event_disable(event);
+-	perf_event_release_kernel(event);
++	mutex_unlock(&arm_pmus_lock);
+ 
+ 	return pmu;
+ }
 -- 
 2.41.0.rc0.172.g3f132b7071-goog
 
