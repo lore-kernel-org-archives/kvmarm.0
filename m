@@ -1,91 +1,65 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4859D101DA
-	for <kvmarm@lists.linux.dev>; Thu, 25 May 2023 18:25:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1650CC433D2;
-	Thu, 25 May 2023 18:25:23 +0000 (UTC)
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Will Deacon <will@kernel.org>,
-	Arnd Bergmann <arnd@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Kees Cook <keescook@chromium.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-efi@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 00/15] arm64: address -Wmissing-prototype warnings
-Date: Thu, 25 May 2023 19:25:22 +0100
-Message-Id: <168503901731.1110505.94060573745937753.b4-ty@arm.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230516160642.523862-1-arnd@kernel.org>
-References: <20230516160642.523862-1-arnd@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D441FC05
+	for <kvmarm@lists.linux.dev>; Thu, 25 May 2023 19:26:03 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-564f6099813so1360147b3.2
+        for <kvmarm@lists.linux.dev>; Thu, 25 May 2023 12:26:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1685042762; x=1687634762;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=6Gt90zOwJ9mi5eHlnv2jnI0ySmjYJ4m1WS/nV2KiYm0=;
+        b=xckIqZevWkLNFYjYVIxqvOArlpXTXa4Rn+4hryPquh3h+fqnBRh11PbOzFWkQqTVxr
+         YKTrsk4LdsZOQNB5161ZN7r+8G26/0am4FNkfUNnHLj4I82tsM0bIQW7BqK17N4lpP1A
+         juINJUIkMnkyF11/akp0KAQz+FOQVu+tdKvmOs48FBPnthJUyG27gjE3N08KUAvZddh6
+         U6Ud/NZnyBNJmr5szv7MgCwisGD/M2xNvVOrFmVNa7fELo+a7rOq2FY1nx6VmdO98r14
+         Kd0l5DSs9cvvb6kM73b1KVDcwCfry5cytfwHsLat+ISriw2LmWumooGaDBKsNcB+EvRR
+         BFnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685042762; x=1687634762;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6Gt90zOwJ9mi5eHlnv2jnI0ySmjYJ4m1WS/nV2KiYm0=;
+        b=hjdAHb6iTtQ3je6J+7Vl2CX3299zH9cD7SInsjrH0huH5gCeta5T6ZkM3E9TltcCbj
+         n5W5famsxh4X7Q+n+5P0TX+zDpIic0+F882nMk3JPj9TyDCMGkqqQkTOj9knnQpxD1mk
+         tlEVG9m8Zly8OUC5s2lMiW96WNPYmeUk/HxLdVZZFGuphcutVtOmoTCZQHxkXFvfnQYp
+         m0Gz063JLwJYnO7hmof9urBB2YVoR+TkVnAnGP0IgQWeeEas6rCYNfC7R+xq70Kwc80C
+         i16UM9YLd6jNfy0/Vi84ohVEM+ok8AJ3h26Gd6ODC6hNbBBLdw9XNEQHpni0dCpZ0XPJ
+         PxLg==
+X-Gm-Message-State: AC+VfDyTLM7UYHA9zFtt7WCaZ/glp3HSKdW0f/B9o7ZQ4rGXETUYkVLj
+	4fHtaeN9jBCZV3vtd6znypSHpEowPP6gDU+kCw==
+X-Google-Smtp-Source: ACHHUZ4uH5AqfAW158utnpLgI3U+J0T8My2BfvrDS2VXq1pyjhZTgWuSJAqcH/fLYDWyCXakupT40XwCiknFplrL1w==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a81:b1c6:0:b0:559:e97a:cb21 with SMTP
+ id p189-20020a81b1c6000000b00559e97acb21mr346190ywh.9.1685042762258; Thu, 25
+ May 2023 12:26:02 -0700 (PDT)
+Date: Thu, 25 May 2023 19:26:01 +0000
+In-Reply-To: <20230509142235.3284028-7-kristina.martsenko@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Message-ID: <gsntcz2ob4c6.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: RE: [PATCH v2 06/11] KVM: arm64: hide MOPS from guests
+From: Colton Lewis <coltonlewis@google.com>
+To: Kristina Martsenko <kristina.martsenko@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Mark Rutland <mark.rutland@arm.com>, Mark Brown <broonie@kernel.org>, 
+	Luis Machado <luis.machado@arm.com>, Vladimir Murzin <vladimir.murzin@arm.com>, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-On Tue, 16 May 2023 18:06:27 +0200, Arnd Bergmann wrote:
-> This addresses all arm64 specific protype warnings. As with the arm32
-> patches, the majority of them  should be straightforward, either adding
-> an #include statement to get the right header, or ensuring that an unused
-> global function is left out of the build when the prototype is hidden.
-> 
-> The ones that are a bit awkward are those that just add a prototype to
-> shut up the warning, but the prototypes are never used for calling the
-> function because the only caller is in assembler code. I tried to come
-> up with other ways to shut up the compiler, and ideally this would be
-> triggered by the 'asmlinkage' keyword as Ard suggested in the past, but
-> I could not come up with a way to do this.
-> 
-> [...]
+> As FEAT_MOPS is not supported in guests yet, hide it from the ID
+> registers for guests.
 
-Applied to arm64 (for-next/missing-proto-warn), thanks!
+> The MOPS instructions are UNDEFINED in guests as HCRX_EL2.MSCEn is not
+> set in HCRX_GUEST_FLAGS, and will take an exception to EL1 if executed.
 
-[01/15] arm64: xor-neon: mark xor_arm64_neon_*() static
-        https://git.kernel.org/arm64/c/320a93d4df48
-[02/15] arm64: add scs_patch_vmlinux prototype
-        https://git.kernel.org/arm64/c/aea197160d74
-[03/15] arm64: avoid prototype warnings for syscalls
-        https://git.kernel.org/arm64/c/6ac19f96515e
-[04/15] arm64: move cpu_suspend_set_dbg_restorer() prototype to header
-        https://git.kernel.org/arm64/c/ec3a3db7100d
-[05/15] arm64: spectre: provide prototypes for internal functions
-        https://git.kernel.org/arm64/c/010089e9d3fe
-[06/15] arm64: kvm: add prototypes for functions called in asm
-        https://git.kernel.org/arm64/c/05d557a5cf59
-[07/15] arm64: cpuidle: fix #ifdef for acpi functions
-        https://git.kernel.org/arm64/c/68a879b55346
-[08/15] arm64: efi: add efi_handle_corrupted_x18 prototype
-        https://git.kernel.org/arm64/c/fbc0cd6f6044
-[09/15] arm64: hide unused is_valid_bugaddr()
-        https://git.kernel.org/arm64/c/b925b4314c91
-[10/15] arm64: module-plts: inline linux/moduleloader.h
-        https://git.kernel.org/arm64/c/60a0aab7463e
-[11/15] arm64: flush: include linux/libnvdimm.h
-        https://git.kernel.org/arm64/c/1a1183938946
-[12/15] arm64: kaslr: add kaslr_early_init() declaration
-        https://git.kernel.org/arm64/c/a7f5cb606e99
-[13/15] arm64: signal: include asm/exception.h
-        https://git.kernel.org/arm64/c/8ada7aab02ee
-[14/15] arm64: move early_brk64 prototype to header
-        https://git.kernel.org/arm64/c/e13d32e99264
-[15/15] arm64: add alt_cb_patch_nops prototype
-        https://git.kernel.org/arm64/c/c152aed4dcc2
-
--- 
-Catalin
-
+For my benefit, could you please explain why no support for guests yet?
+Why not set HCRX_EL2.MSCEn in this series?
