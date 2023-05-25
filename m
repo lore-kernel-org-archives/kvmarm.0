@@ -1,44 +1,33 @@
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 462F5D512
-	for <kvmarm@lists.linux.dev>; Thu, 25 May 2023 14:21:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=U8Ak11VIsc+VQhtMvrttpQiETgYMyOlybtRim6fMVi8=; b=NBQsDfTgYYZT0p9hVq/M7btlaw
-	FF3WYNlSo9swkBIqjIu0sUYi3sou4mxgUw9C7Iw+7Q1lrB8d8nhWaDiCn+aucm5HDK9LvwarpDmE0
-	1HiVUN26Q/Qgd399Y5XpfuFJ8DREht21ZUuoorPIjwXqGszB208WDMi8DOhgAqbKKWzHtJANr9Qp3
-	ALs4m7kyHdQ8iTjmDszLjZb5Gr6coOV66fpS8iX4T1aN0zjbg1Hw5MxnrrOv4xPigKqbAThn2WZRm
-	pjz7F/gT34P5LzQHsl5FdcpvrIddoNPh0xwZX9+geRDqBpZfIaNWDMU7P2htPXzhO+WV5JB40wRFV
-	6XXuOs2w==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1q2BpR-006Z1z-2k;
-	Thu, 25 May 2023 14:20:34 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id E3FCC300322;
-	Thu, 25 May 2023 16:20:31 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-	id C8AC3241ECA53; Thu, 25 May 2023 16:20:31 +0200 (CEST)
-Date: Thu, 25 May 2023 16:20:31 +0200
-From: Peter Zijlstra <peterz@infradead.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9FA719BDF
+	for <kvmarm@lists.linux.dev>; Thu, 25 May 2023 15:55:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22E04C433EF;
+	Thu, 25 May 2023 15:55:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1685030133;
+	bh=QgYFhY03eBNOXHKTIvE6AGMDieLcw0Vh3Yokc3ipvrc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=D2Ohl0G3gHcanACbUVsaI/O6pTRv6WE9jRIG7pzPtvxXMK8eSn7XWd1DHBCAWSgGW
+	 qcEEisb4isdfqIa49hRxhX7SrUn18nHWHVbnXVWrvH3Ka2IVR8SXE/Xh5VSQH0KEJi
+	 3AUXWNZb5iL82IgyYPxSu9Ot7uY9fhD/k+lc5OyIWpFRsEHMpWJFGh2VGwMqV1AVg8
+	 JlHM7MJWaSIEYxFJclsFZG9Fpuc0ovxJSCDaGmcY6wM/RhW7UwqoIggzycEYi6c43k
+	 xnaa8D+j1Jp2Xgw0uLktLDydu7tsr/YN77bo7t/JQIelr77AS0laXoBuqEnA3O1pW/
+	 Ld/pCgvwa16uQ==
+Date: Thu, 25 May 2023 08:55:30 -0700
+From: Nathan Chancellor <nathan@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Ravi Bangoria <ravi.bangoria@amd.com>,
-	Nathan Chancellor <nathan@kernel.org>, namhyung@kernel.org,
-	eranian@google.com, acme@kernel.org, mark.rutland@arm.com,
-	jolsa@kernel.org, irogers@google.com, bp@alien8.de,
-	kan.liang@linux.intel.com, adrian.hunter@intel.com,
+Cc: Ravi Bangoria <ravi.bangoria@amd.com>, peterz@infradead.org,
+	namhyung@kernel.org, eranian@google.com, acme@kernel.org,
+	mark.rutland@arm.com, jolsa@kernel.org, irogers@google.com,
+	bp@alien8.de, kan.liang@linux.intel.com, adrian.hunter@intel.com,
 	maddy@linux.ibm.com, x86@kernel.org,
 	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
 	sandipan.das@amd.com, ananth.narayan@amd.com,
 	santosh.shukla@amd.com, maz@kernel.org, kvmarm@lists.linux.dev
 Subject: Re: [PATCH v4 3/4] perf/core: Remove pmu linear searching code
-Message-ID: <20230525142031.GU83892@hirez.programming.kicks-ass.net>
+Message-ID: <20230525155530.GA546949@dev-arch.thelio-3990X>
 References: <20230504110003.2548-1-ravi.bangoria@amd.com>
  <20230504110003.2548-4-ravi.bangoria@amd.com>
  <20230524214133.GA2359762@dev-arch.thelio-3990X>
@@ -55,7 +44,43 @@ Content-Disposition: inline
 In-Reply-To: <ZG8KLbZSECiYaKFc@linux.dev>
 
 On Thu, May 25, 2023 at 07:11:41AM +0000, Oliver Upton wrote:
-
+> On Thu, May 25, 2023 at 10:46:01AM +0530, Ravi Bangoria wrote:
+> > On 25-May-23 3:11 AM, Nathan Chancellor wrote:
+> > > My apologies if this has already been reported or fixed already, I did a
+> > > search of lore.kernel.org and did not find anything. This patch as
+> > > commit 9551fbb64d09 ("perf/core: Remove pmu linear searching code") in
+> > > -next breaks starting QEMU with KVM enabled on two of my arm64 machines:
+> > > 
+> > > $ qemu-system-aarch64 \
+> > >     -display none \
+> > >     -nodefaults \
+> > >     -machine virt,gic-version=max \
+> > >     -append 'console=ttyAMA0 earlycon' \
+> > >     -kernel arch/arm64/boot/Image.gz \
+> > >     -initrd rootfs.cpio \
+> > >     -cpu host \
+> > >     -enable-kvm \
+> > >     -m 512m \
+> > >     -smp 8 \
+> > >     -serial mon:stdio
+> > > qemu-system-aarch64: PMU: KVM_SET_DEVICE_ATTR: No such device
+> > > qemu-system-aarch64: failed to set irq for PMU
+> > > 
+> > > In the kernel log, I see
+> > > 
+> > > [   42.944952] kvm: pmu event creation failed -2
+> > > 
+> > > I am not sure if this issue is unexpected as a result of this change or
+> > > if there is something that needs to change on the arm64 KVM side (it
+> > > appears the kernel message comes from arch/arm64/kvm/pmu-emul.c).
+> > 
+> > Thanks for reporting it.
+> > 
+> > Based on these detail, I feel the pmu registration failed in the host,
+> > most probably because pmu driver did not pass pmu name while calling
+> > perf_pmu_register(). Consequently kvm also failed while trying to use
+> > it for guest. Can you please check host kernel logs.
+> 
 > The PMUv3 driver does pass a name, but it relies on getting back an
 > allocated pmu id as @type is -1 in the call to perf_pmu_register().
 > 
@@ -65,18 +90,7 @@ On Thu, May 25, 2023 at 07:11:41AM +0000, Oliver Upton wrote:
 > effect of eventually stumbling on the correct core PMU and succeeding.
 > 
 > Perf folks: is this WAI for heterogenous systems?
-
-TBH, I'm not sure. hetero and virt don't mix very well AFAIK and I'm not
-sure what ARM64 does here.
-
-IIRC the only way is to hard affine things; that is, force vCPU of
-'type' to the pCPU mask of 'type' CPUs.
-
-If you don't do that; or let userspace 'override' that, things go
-sideways *real* fast.
-
-Mark gonna have to look at this.
-
+> 
 > Either way, the whole KVM end of this scheme is a bit clunky, and I
 > believe it to be unneccessary at this point as we maintain a list of
 > core PMU instances that KVM is able to virtualize. We can just walk
@@ -84,7 +98,15 @@ Mark gonna have to look at this.
 > 
 > Not seeing any issues on -next with the below diff. If this works for
 > folks I can actually wrap it up in a patch and send it out.
-> 
+
+I can start QEMU on both the machines that had issues and my machines
+continue to run without any visible issues but I have never done any
+profile work within them. If there is any further testing or validation
+that I should do, I am more than happy to do so. Until then, consider
+it:
+
+Tested-by: Nathan Chancellor <nathan@kernel.org>
+
 > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
 > index 45727d50d18d..cbc0b662b7f8 100644
 > --- a/arch/arm64/kvm/pmu-emul.c
@@ -149,3 +171,9 @@ Mark gonna have to look at this.
 > -	return pmu;
 > +	return arm_pmu;
 >  }
+>  
+>  u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+> 
+> -- 
+> Thanks,
+> Oliver
