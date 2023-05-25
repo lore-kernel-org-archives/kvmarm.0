@@ -1,19 +1,19 @@
-Received: from out-52.mta1.migadu.com (out-52.mta1.migadu.com [95.215.58.52])
+Received: from out-12.mta1.migadu.com (out-12.mta1.migadu.com [95.215.58.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4059B24EA4
-	for <kvmarm@lists.linux.dev>; Thu, 25 May 2023 21:27:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FDDB1EA8B
+	for <kvmarm@lists.linux.dev>; Thu, 25 May 2023 21:27:54 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1685050070;
+	t=1685050072;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Ps0SIMThuXQvRz20fY7yPgap9nSjnQNggSViKXssVT0=;
-	b=IEw4IzcwKKNBROAs3/Vu1oK6Z8m9MSEqGf2VUkLCm76KjE2m/H3aQyx4LI65lhYEjzkd0g
-	WER84ypA8qinUTu3p7JSdhffy60KdiQFYrD9CYVy5V0NFx1vMDtpI0PWG4FiM3x3KiDLaH
-	Ap8K0CF4CdTGyOye5VPqPQACb0yUA0A=
+	bh=dzfESPWnr/g9ux0llAQCibwDz0KlvK21w6uaollSFxU=;
+	b=nsu7EP0Xfbr6G3wnezyqTP9EqoGyjV3Nxon3DqVENiux+BC2C8UolNxVGmUwbWA6fOkSAf
+	HsKWdw7109gvmzaExgTGum4QCnNb8qL2QJ6iIWMksS4qzIrDz1mVHbKMDWRusmL/LBZtg2
+	UVWcMlxzptipxO6oQEVPA2DUmZ6eXww=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -26,9 +26,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Nathan Chancellor <nathan@kernel.org>,
 	mark.rutland@arm.com,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 1/2] KVM: arm64: Iterate arm_pmus list to probe for default PMU
-Date: Thu, 25 May 2023 21:27:21 +0000
-Message-ID: <20230525212723.3361524-2-oliver.upton@linux.dev>
+Subject: [PATCH 2/2] KVM: arm64: Document default vPMU behavior on heterogeneous systems
+Date: Thu, 25 May 2023 21:27:22 +0000
+Message-ID: <20230525212723.3361524-3-oliver.upton@linux.dev>
 In-Reply-To: <20230525212723.3361524-1-oliver.upton@linux.dev>
 References: <20230525212723.3361524-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -40,85 +40,43 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-To date KVM has relied on using a perf event to probe the core PMU at
-the time of vPMU initialization. Behind the scenes perf_event_init()
-would iteratively walk the PMUs of the system and return the PMU that
-could handle the event. However, an upcoming change in perf core will
-drop the iterative walk, thereby breaking the fragile dance we do on the
-KVM side.
+KVM maintains a mask of supported CPUs when a vPMU type is explicitly
+selected by userspace and is used to reject any attempt to run the vCPU
+on an unsupported CPU. This is great, but we're still beholden to the
+default behavior where vCPUs can be scheduled anywhere and guest
+counters may silently stop working.
 
-Avoid the problem altogether by iterating over the list of supported
-PMUs maintained in KVM, returning the core PMU that matches the CPU
-we were called on.
+Avoid confusing the next poor sod to look at this code and document the
+intended behavior.
 
-Tested-by: Nathan Chancellor <nathan@kernel.org>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/pmu-emul.c | 46 ++++++++++-----------------------------
- 1 file changed, 12 insertions(+), 34 deletions(-)
+ arch/arm64/kvm/pmu-emul.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 45727d50d18d..5deddc49e745 100644
+index 5deddc49e745..491ca7eb2a4c 100644
 --- a/arch/arm64/kvm/pmu-emul.c
 +++ b/arch/arm64/kvm/pmu-emul.c
-@@ -694,45 +694,23 @@ void kvm_host_pmu_init(struct arm_pmu *pmu)
+@@ -890,7 +890,17 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 		return -EBUSY;
  
- static struct arm_pmu *kvm_pmu_probe_armpmu(void)
- {
--	struct perf_event_attr attr = { };
--	struct perf_event *event;
--	struct arm_pmu *pmu = NULL;
--
--	/*
--	 * Create a dummy event that only counts user cycles. As we'll never
--	 * leave this function with the event being live, it will never
--	 * count anything. But it allows us to probe some of the PMU
--	 * details. Yes, this is terrible.
--	 */
--	attr.type = PERF_TYPE_RAW;
--	attr.size = sizeof(attr);
--	attr.pinned = 1;
--	attr.disabled = 0;
--	attr.exclude_user = 0;
--	attr.exclude_kernel = 1;
--	attr.exclude_hv = 1;
--	attr.exclude_host = 1;
--	attr.config = ARMV8_PMUV3_PERFCTR_CPU_CYCLES;
--	attr.sample_period = GENMASK(63, 0);
-+	struct arm_pmu *tmp, *pmu = NULL;
-+	struct arm_pmu_entry *entry;
-+	int cpu;
- 
--	event = perf_event_create_kernel_counter(&attr, -1, current,
--						 kvm_pmu_perf_overflow, &attr);
-+	mutex_lock(&arm_pmus_lock);
- 
--	if (IS_ERR(event)) {
--		pr_err_once("kvm: pmu event creation failed %ld\n",
--			    PTR_ERR(event));
--		return NULL;
--	}
-+	cpu = smp_processor_id();
-+	list_for_each_entry(entry, &arm_pmus, entry) {
-+		tmp = entry->arm_pmu;
- 
--	if (event->pmu) {
--		pmu = to_arm_pmu(event->pmu);
--		if (pmu->pmuver == ID_AA64DFR0_EL1_PMUVer_NI ||
--		    pmu->pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
--			pmu = NULL;
-+		if (cpumask_test_cpu(cpu, &tmp->supported_cpus)) {
-+			pmu = tmp;
-+			break;
-+		}
- 	}
- 
--	perf_event_disable(event);
--	perf_event_release_kernel(event);
-+	mutex_unlock(&arm_pmus_lock);
- 
- 	return pmu;
- }
+ 	if (!kvm->arch.arm_pmu) {
+-		/* No PMU set, get the default one */
++		/*
++		 * No PMU set, get the default one.
++		 *
++		 * The observant among you will notice that the supported_cpus
++		 * mask does not get updated for the default PMU even though it
++		 * is quite possible the selected instance supports only a
++		 * subset of cores in the system. This is intentional, and
++		 * upholds the preexisting behavior on heterogeneous systems
++		 * where vCPUs can be scheduled on any core but the guest
++		 * counters could stop working.
++		 */
+ 		kvm->arch.arm_pmu = kvm_pmu_probe_armpmu();
+ 		if (!kvm->arch.arm_pmu)
+ 			return -ENODEV;
 -- 
 2.41.0.rc0.172.g3f132b7071-goog
 
