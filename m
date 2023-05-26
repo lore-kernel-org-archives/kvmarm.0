@@ -1,72 +1,75 @@
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+Received: from out-51.mta0.migadu.com (out-51.mta0.migadu.com [91.218.175.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A223AD27
-	for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 08:14:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1685088885; x=1716624885;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=HPGDHu6IKq4H5POSoCBIPfi5+ElxIaYyDhGjzmz4eVM=;
-  b=f5Y3sPLcNXPZAmoJOq3z0qA1qNRqNhOA9i5jW3MkmFhgOqxkBQi4LAVy
-   CTKIeSrUEN+j1fTFZSreCY0b8jIeXW8FP5BPOVtMbxx6W77HXMfgzQllB
-   VuvyjpTs+YFtQVGx1oKZi132vNOBVMyqNtu3purXUdfHOO5e0J34m4kEO
-   WxGDcRUWJdyx0Ilyi5A8SogHukp983ZffZTmsQYESsRF2b+XDB/t0DHRD
-   r6Fedl5pZwQGcbYrn35K6zMGwiN/8ABeLcENTnee3hmz0Qs36sGB+YN0w
-   wK/ifoLM2PnKjFR0caVUSyGgQf5s1VYoP2Y0v1yxlQmX9NunWGpYzSfci
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10721"; a="440503371"
-X-IronPort-AV: E=Sophos;i="6.00,193,1681196400"; 
-   d="scan'208";a="440503371"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2023 01:14:44 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10721"; a="705115769"
-X-IronPort-AV: E=Sophos;i="6.00,193,1681196400"; 
-   d="scan'208";a="705115769"
-Received: from ubuntu.bj.intel.com ([10.238.156.105])
-  by orsmga002.jf.intel.com with ESMTP; 26 May 2023 01:14:42 -0700
-From: Jun Miao <jun.miao@intel.com>
-To: maz@kernel.org,
-	oliver.upton@linux.de,
-	james.morse@arm.com,
-	linux-arm-kernel@lists.infradead.org
-Cc: kvmarm@lists.linux.dev,
-	jun.miao@intel.com
-Subject: [PATCH] KVM: arm64: fix typo
-Date: Fri, 26 May 2023 16:15:48 +0800
-Message-Id: <20230526081548.12729-1-jun.miao@intel.com>
-X-Mailer: git-send-email 2.32.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D072923A4
+	for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 08:35:22 +0000 (UTC)
+Date: Fri, 26 May 2023 08:35:17 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1685090121;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=60ZRjnDpSzrKHJnFhfQJQPcygblaw4mPC1sJAyo86Gs=;
+	b=imS8kWAWRPLrNaHU9Yj/6vqLATAdhqtPr7EcSVQL+mbuIsBTcFcQzHsjQTxw1/PzTZkTf1
+	U2NnkWDQpZxliJk4IUsvXWG3Wt/09hNIPIw7xWnd75RrmwTWl0TWZjVBnQbp8sjfjwbnrf
+	vs3/Xm89LSnaQAfSck2DxMZhgX8BUbU=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Jun Miao <jun.miao@intel.com>
+Cc: maz@kernel.org, oliver.upton@linux.de, james.morse@arm.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH] KVM: arm64: fix typo
+Message-ID: <ZHBvRe9ejErYwB0t@linux.dev>
+References: <20230526081548.12729-1-jun.miao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230526081548.12729-1-jun.miao@intel.com>
+X-Migadu-Flow: FLOW_OUT
 
-Change "begining" to "beginning"
+Hi Jun,
 
-Fixes: 8e6bcc3a4502 ("KVM: arm64: Back the hypervisor 'struct hyp_page' array for all memory")
-Signed-off-by: Jun Miao <jun.miao@intel.com>
----
- arch/arm64/kvm/hyp/nvhe/mm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The shortlog is too vague. While typo fixes don't need to be
+exhaustively described, 'Fix typo' doesn't give any indication as to
+where it is.
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
-index 318298eb3d6b..f16d9f38bb48 100644
---- a/arch/arm64/kvm/hyp/nvhe/mm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mm.c
-@@ -145,7 +145,7 @@ int hyp_back_vmemmap(phys_addr_t back)
- 		start = hyp_memory[i].base;
- 		start = ALIGN_DOWN((u64)hyp_phys_to_page(start), PAGE_SIZE);
- 		/*
--		 * The begining of the hyp_vmemmap region for the current
-+		 * The beginning of the hyp_vmemmap region for the current
- 		 * memblock may already be backed by the page backing the end
- 		 * the previous region, so avoid mapping it twice.
- 		 */
+  KVM: arm64: Fix comment typo in hyp_back_vmemmap()
+
+On Fri, May 26, 2023 at 04:15:48PM +0800, Jun Miao wrote:
+> Change "begining" to "beginning"
+> 
+> Fixes: 8e6bcc3a4502 ("KVM: arm64: Back the hypervisor 'struct hyp_page' array for all memory")
+
+This is a misuse of the Fixes tag. A typo in a comment is not a bug.
+
+> Signed-off-by: Jun Miao <jun.miao@intel.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/mm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
+> index 318298eb3d6b..f16d9f38bb48 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
+> @@ -145,7 +145,7 @@ int hyp_back_vmemmap(phys_addr_t back)
+>  		start = hyp_memory[i].base;
+>  		start = ALIGN_DOWN((u64)hyp_phys_to_page(start), PAGE_SIZE);
+>  		/*
+> -		 * The begining of the hyp_vmemmap region for the current
+> +		 * The beginning of the hyp_vmemmap region for the current
+>  		 * memblock may already be backed by the page backing the end
+>  		 * the previous region, so avoid mapping it twice.
+>  		 */
+> -- 
+> 2.32.0
+> 
+> 
+
 -- 
-2.32.0
-
+Thanks,
+Oliver
