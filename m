@@ -1,30 +1,35 @@
 Received: from out-41.mta1.migadu.com (out-41.mta1.migadu.com [95.215.58.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE352CA9
-	for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 20:47:59 +0000 (UTC)
-Date: Fri, 26 May 2023 20:47:52 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 371C22CA9
+	for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 21:37:11 +0000 (UTC)
+Date: Fri, 26 May 2023 21:37:04 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1685134077;
+	t=1685137029;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=tTm2WcrJtXgUhrQ3ARrtwiMqmV3Xwo18CAjwr9+QLWY=;
-	b=uvfcrkBUbEDQTPKSbgcgCTVg5y5DWONMaNXAcOakixAHywg4BZLgE0rXpYTC7kb8HKu3rH
-	/iS9JzWfI3CLzV7tEdkKLcCA74Jq7pfpsJX7Aqk1OCDLu7ggVft9xcHX+lFqRcTXjdjLvD
-	+GzCLvYPATDFTg7QvVtz2+1A0Dr9Ufc=
+	bh=NFmfZJ9XSBvihraEvyzSKBtHQpCcMvW1SpatpSEYiEE=;
+	b=mAQWhVuBWTZ2vUp9QXlpaQmgvIpPn7WZKHBChPEYdJXqisi9FB5bGReorOWP3/umm0nQgh
+	wpQH14L8SKVxqsuP3iyV7hBqWuSQBglt0VRFRwsGr17PN/YnZH5MVM09zmdKOvND3xyqnF
+	qAM4htNt1/pFWDuDRChhDvZDdJZSaHM=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: maz@kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-	tabba@google.com, kaleshsingh@google.com, will@kernel.org,
-	catalin.marinas@arm.com, yuzenghui@huawei.com,
-	suzuki.poulose@arm.com, james.morse@arm.com
-Subject: Re: [PATCH] KVM: arm64: Use different pointer authentication keys
- for pKVM
-Message-ID: <ZHEa+HAixbYijQTA@linux.dev>
-References: <20230516141531.791492-1-smostafa@google.com>
+To: Jing Zhang <jingzhangos@google.com>
+Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+	ARMLinux <linux-arm-kernel@lists.infradead.org>,
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@google.com>,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v10 4/5] KVM: arm64: Reuse fields of sys_reg_desc for
+ idreg
+Message-ID: <ZHEmgPAK59Wh/jv/@linux.dev>
+References: <20230522221835.957419-1-jingzhangos@google.com>
+ <20230522221835.957419-5-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -33,159 +38,82 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230516141531.791492-1-smostafa@google.com>
+In-Reply-To: <20230522221835.957419-5-jingzhangos@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, May 16, 2023 at 02:15:31PM +0000, Mostafa Saleh wrote:
-> When the kernel is compiled with CONFIG_ARM64_PTR_AUTH_KERNEL, it
-> uses Armv8.3-Pauth for return address protection for the kernel code
-> including nvhe code in EL2.
-> 
-> Same keys are used in both kernel(EL1) and nvhe code(EL2), this is
-> fine for nvhe but not when running in protected mode(pKVM) as the host
-> can't be trusted.
+Hi Jing,
 
-But we trust it enough to hand pKVM a fresh set of keys before firing
-off? I understand there is some degree of initialization required to get
-pKVM off the ground, but I question in this case if key handoff is
-strictly necessary.
+On Mon, May 22, 2023 at 10:18:34PM +0000, Jing Zhang wrote:
+> Since reset() and val are not used for idreg in sys_reg_desc, they would
+> be used with other purposes for idregs.
+> The callback reset() would be used to return KVM sanitised id register
+> values. The u64 val would be used as mask for writable fields in idregs.
+> Only bits with 1 in val are writable from userspace.
 
-There are potentially other sources of random directly available at EL2,
-such as the SMCCC TRNG ABI or FEAT_RNG. Should pKVM prefer one of these
-random implementations and only fall back to host-provided keys if
-absolutely necessary?
+The tense of the changelog is wrong (should be in an imperative mood).
+Maybe something like:
 
-> The keys for the hypervisor are generated from the kernel before it
-> de-privileges, each cpu has different keys, this relies on nvhe code
-> not being migratable while running.
-> 
-> This patch adds host/hyp save/restore for the keys.
-> For guest/hyp, they are already handled in common kvm code in
-> __guest_enter, where they are saved/restored if they are not
-> trapped.
+  sys_reg_desc::{reset, val} are presently unused for ID register
+  descriptors. Repurpose these fields to support user-configurable ID
+  registers.
 
-Try to avoid "this patch" or any self-referential language in the
-changelog. Just directly state what the patch does:
+  Use the ::reset() function pointer to return the sanitised value of a
+  given ID register, optionally with KVM-specific feature sanitisation.
+  Additionally, keep a mask of writable register fields in ::val.
 
-  Similar to guest entry/exit, start context switching the pointer
-  authentication keys on host/entry exit if the feature is in use.
-
-> Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > ---
->  arch/arm64/kvm/arm.c           | 26 +++++++++++++++++++++++++
->  arch/arm64/kvm/hyp/nvhe/host.S | 35 +++++++++++++++++++++++++++++++++-
->  2 files changed, 60 insertions(+), 1 deletion(-)
+>  arch/arm64/kvm/sys_regs.c | 101 +++++++++++++++++++++++++++-----------
+>  arch/arm64/kvm/sys_regs.h |  15 ++++--
+>  2 files changed, 82 insertions(+), 34 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 14391826241c..dd03b52f035d 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -51,6 +51,8 @@ DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
->  DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
->  DECLARE_KVM_NVHE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
->  
-> +DECLARE_KVM_NVHE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+
+[...]
+
+> +/*
+> + * Since reset() callback and field val are not used for idregs, they will be
+> + * used for specific purposes for idregs.
+> + * The reset() would return KVM sanitised register value. The value would be the
+> + * same as the host kernel sanitised value if there is no KVM sanitisation.
+> + * The val would be used as a mask indicating writable fields for the idreg.
+> + * Only bits with 1 are writable from userspace. This mask might not be
+> + * necessary in the future whenever all ID registers are enabled as writable
+> + * from userspace.
+> + */
 > +
->  static bool vgic_present;
->  
->  static DEFINE_PER_CPU(unsigned char, kvm_arm_hardware_enabled);
-> @@ -2067,6 +2069,26 @@ static int __init kvm_hyp_init_protection(u32 hyp_va_bits)
->  	return 0;
->  }
->  
-> +static void pkvm_hyp_init_ptrauth(void)
-> +{
-> +	struct kvm_cpu_context *hyp_ctxt;
-> +	int cpu;
-> +
-> +	for_each_possible_cpu(cpu) {
-> +		hyp_ctxt = per_cpu_ptr_nvhe_sym(kvm_hyp_ctxt, cpu);
-> +		hyp_ctxt->sys_regs[APIAKEYLO_EL1] = get_random_long();
-> +		hyp_ctxt->sys_regs[APIAKEYHI_EL1] = get_random_long();
-> +		hyp_ctxt->sys_regs[APIBKEYLO_EL1] = get_random_long();
-> +		hyp_ctxt->sys_regs[APIBKEYHI_EL1] = get_random_long();
-> +		hyp_ctxt->sys_regs[APDAKEYLO_EL1] = get_random_long();
-> +		hyp_ctxt->sys_regs[APDAKEYHI_EL1] = get_random_long();
-> +		hyp_ctxt->sys_regs[APDBKEYLO_EL1] = get_random_long();
-> +		hyp_ctxt->sys_regs[APDBKEYHI_EL1] = get_random_long();
-> +		hyp_ctxt->sys_regs[APGAKEYLO_EL1] = get_random_long();
-> +		hyp_ctxt->sys_regs[APGAKEYHI_EL1] = get_random_long();
-> +	}
-> +}
-> +
->  /* Inits Hyp-mode on all online CPUs */
->  static int __init init_hyp_mode(void)
->  {
-> @@ -2228,6 +2250,10 @@ static int __init init_hyp_mode(void)
->  	kvm_hyp_init_symbols();
->  
->  	if (is_protected_kvm_enabled()) {
-> +		if (IS_ENABLED(CONFIG_ARM64_PTR_AUTH_KERNEL) &&
-> +		    cpus_have_const_cap(ARM64_HAS_ADDRESS_AUTH))
-> +			pkvm_hyp_init_ptrauth();
-> +
->  		init_cpu_logical_map();
->  
->  		if (!init_psci_relay()) {
-> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-> index b6c0188c4b35..255ba4af911b 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/host.S
-> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
-> @@ -10,6 +10,7 @@
->  #include <asm/kvm_arm.h>
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_mmu.h>
-> +#include <asm/kvm_ptrauth.h>
->  
->  	.text
->  
-> @@ -37,10 +38,42 @@ SYM_FUNC_START(__host_exit)
->  
->  	/* Save the host context pointer in x29 across the function call */
->  	mov	x29, x0
-> +
-> +#ifdef CONFIG_ARM64_PTR_AUTH_KERNEL
-> +alternative_if_not ARM64_HAS_ADDRESS_AUTH
-> +b __skip_pauth_save
-> +alternative_else_nop_endif
-> +
-> +alternative_if ARM64_KVM_PROTECTED_MODE
-> +	/* Save kernel ptrauth keys. */
-> +	add x18, x29, #CPU_APIAKEYLO_EL1
-> +	ptrauth_save_state x18, x19, x20
-> +
-> +	/* Use hyp keys. */
-> +	adr_this_cpu x18, kvm_hyp_ctxt, x19
-> +	add x18, x18, #CPU_APIAKEYLO_EL1
-> +	ptrauth_restore_state x18, x19, x20
-> +alternative_else_nop_endif
-> +__skip_pauth_save:
-> +#endif /* CONFIG_ARM64_PTR_AUTH_KERNEL */
-> +
->  	bl	handle_trap
->  
-> -	/* Restore host regs x0-x17 */
->  __host_enter_restore_full:
-> +	/* Restore kernel keys. */
-> +#ifdef CONFIG_ARM64_PTR_AUTH_KERNEL
-> +alternative_if_not ARM64_HAS_ADDRESS_AUTH
-> +b __skip_pauth_restore
-> +alternative_else_nop_endif
-> +
-> +alternative_if ARM64_KVM_PROTECTED_MODE
-> +	add x18, x29, #CPU_APIAKEYLO_EL1
-> +	ptrauth_restore_state x18, x19, x20
-> +alternative_else_nop_endif
-> +__skip_pauth_restore:
-> +#endif /* CONFIG_ARM64_PTR_AUTH_KERNEL */
-> +
-> +	/* Restore host regs x0-x17 */
->  	ldp	x0, x1,   [x29, #CPU_XREG_OFFSET(0)]
->  	ldp	x2, x3,   [x29, #CPU_XREG_OFFSET(2)]
->  	ldp	x4, x5,   [x29, #CPU_XREG_OFFSET(4)]
-> -- 
-> 2.40.1.606.ga4b1b128d6-goog
-> 
+>  /* sys_reg_desc initialiser for known cpufeature ID registers */
+>  #define ID_SANITISED(name) {			\
+>  	SYS_DESC(SYS_##name),			\
+> @@ -1751,6 +1788,8 @@ static unsigned int elx2_visibility(const struct kvm_vcpu *vcpu,
+>  	.get_user = get_id_reg,			\
+>  	.set_user = set_id_reg,			\
+>  	.visibility = id_visibility,		\
+> +	.reset = general_read_kvm_sanitised_reg,\
+> +	.val = 0,				\
+
+I generally think unions are more trouble than they're worth, but it
+might make sense to throw the fields with dual meaning into one, like
+
+  struct sys_reg_desc {
+
+  	[...]
+	union {
+		struct {
+			void (*reset)(struct kvm_vcpu *, const struct sys_reg_desc *);
+			u64 val;
+		};
+		struct {
+			u64 (*read_sanitised)(struct kvm_vcpu *vcpu, const struct sys_reg_desc *);
+			u64 mask;
+		};
+	};
+  }
+
+You could then avoid repainting the world to handle ->reset() returning
+a value and usage of the fields in an id register context become a bit
+more self-documenting. And you get to play with fire while you do it!
+
+Let's see if the other side of the pond agrees with my bikeshedding...
 
 -- 
 Thanks,
