@@ -1,19 +1,19 @@
-Received: from out-6.mta0.migadu.com (out-6.mta0.migadu.com [91.218.175.6])
+Received: from out-46.mta0.migadu.com (out-46.mta0.migadu.com [91.218.175.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C87BA2D242
-	for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 22:17:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8DE72D242
+	for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 22:17:56 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1685139473;
+	t=1685139475;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=p5ZProBAdzCbDVF65eMfiEsUG7+QyRJw/6R/yjscKH0=;
-	b=RAdJpWXfYqV97FeioiCQTbXtEoJCRAOtnnC4o8NgpzUlM4KaObGi2J+h/NlxljagqIINpE
-	BljGf94DkyOPB5wgtZM5IJS9wv08oMy/kMz7PMZn5aukgYF5iLxPuvxHUYD/3h5H4o43Qv
-	eRyU8dGIJ+gPpoV3HnjcjEDo31qdrs8=
+	bh=S18IxtH870DftquD21o7n6kWwLX5SaNnDaD0Dom/QTg=;
+	b=BzyKJLOaung4P0+diZU10+gVqxNUKL3dnOf9jXTmxf5FBxePeWgLGXjV6IHWdk40Wal/0M
+	bHvK1jDd2lVz++XB7giFz7WMxlotkRKBzMCydwagmZXYqn3ZdigynMKizoAI2T0FSRDAVA
+	7PbMaFwKk/iODnRrf4pvHoO1IBjQiwA=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -25,9 +25,9 @@ Cc: kvm@vger.kernel.org,
 	Julien Thierry <julien.thierry.kdev@gmail.com>,
 	Salil Mehta <salil.mehta@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH kvmtool 15/21] aarch64: psci: Implement CPU_SUSPEND
-Date: Fri, 26 May 2023 22:17:06 +0000
-Message-ID: <20230526221712.317287-16-oliver.upton@linux.dev>
+Subject: [PATCH kvmtool 16/21] aarch64: psci: Implement CPU_OFF
+Date: Fri, 26 May 2023 22:17:07 +0000
+Message-ID: <20230526221712.317287-17-oliver.upton@linux.dev>
 In-Reply-To: <20230526221712.317287-1-oliver.upton@linux.dev>
 References: <20230526221712.317287-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -39,91 +39,49 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Implement support for PSCI CPU_SUSPEND, leveraging in-kernel suspend
-emulation (i.e. a WFI state). Eagerly resume the vCPU for any wakeup
-event.
+Add support for PSCI CPU_OFF, relying on KVM emulation of a 'powered
+off' vCPU by setting the MP state to KVM_MP_STATE_STOPPED.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arm/aarch64/kvm-cpu.c | 18 ++++++++++++++++++
- arm/aarch64/psci.c    | 19 +++++++++++++++++++
- 2 files changed, 37 insertions(+)
+ arm/aarch64/psci.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/arm/aarch64/kvm-cpu.c b/arm/aarch64/kvm-cpu.c
-index 4feed9f41cb0..316e20c7f157 100644
---- a/arm/aarch64/kvm-cpu.c
-+++ b/arm/aarch64/kvm-cpu.c
-@@ -263,6 +263,16 @@ void kvm_cpu__show_registers(struct kvm_cpu *vcpu)
- 	dprintf(debug_fd, " LR:    0x%lx\n", data);
- }
- 
-+static void handle_wakeup(struct kvm_cpu *vcpu)
-+{
-+	struct kvm_mp_state mp_state = {
-+		.mp_state = KVM_MP_STATE_RUNNABLE,
-+	};
-+
-+	if (ioctl(vcpu->vcpu_fd, KVM_SET_MP_STATE, &mp_state))
-+		die_perror("KVM_SET_MP_STATE failed");
-+}
-+
- bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
- {
- 	struct kvm_run *run = vcpu->kvm_run;
-@@ -271,6 +281,14 @@ bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
- 	case KVM_EXIT_HYPERCALL:
- 		handle_hypercall(vcpu);
- 		return true;
-+	case KVM_EXIT_SYSTEM_EVENT:
-+		switch (run->system_event.type) {
-+		case KVM_SYSTEM_EVENT_WAKEUP:
-+			handle_wakeup(vcpu);
-+			return true;
-+		default:
-+			return false;
-+		}
- 	default:
- 		return false;
- 	}
 diff --git a/arm/aarch64/psci.c b/arm/aarch64/psci.c
-index 482b9a7442c6..abfdc764b7e0 100644
+index abfdc764b7e0..72429b36a835 100644
 --- a/arm/aarch64/psci.c
 +++ b/arm/aarch64/psci.c
-@@ -15,12 +15,27 @@ static void psci_features(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
- 		return;
- 
+@@ -17,6 +17,7 @@ static void psci_features(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
  	switch (arg) {
-+	case PSCI_0_2_FN_CPU_SUSPEND:
-+	case PSCI_0_2_FN64_CPU_SUSPEND:
+ 	case PSCI_0_2_FN_CPU_SUSPEND:
+ 	case PSCI_0_2_FN64_CPU_SUSPEND:
++	case PSCI_0_2_FN_CPU_OFF:
  	case ARM_SMCCC_VERSION_FUNC_ID:
  		res->a0 = PSCI_RET_SUCCESS;
  		break;
- 	}
+@@ -36,6 +37,16 @@ static void cpu_suspend(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
+ 	res->a0 = PSCI_RET_SUCCESS;
  }
  
-+static void cpu_suspend(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
++static void cpu_off(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
 +{
 +	struct kvm_mp_state mp_state = {
-+		.mp_state	= KVM_MP_STATE_SUSPENDED,
++		.mp_state	= KVM_MP_STATE_STOPPED,
 +	};
 +
-+	/* Rely on in-kernel emulation of a 'suspended' (i.e. WFI) state. */
 +	if (ioctl(vcpu->vcpu_fd, KVM_SET_MP_STATE, &mp_state))
 +		die_perror("KVM_SET_MP_STATE failed");
-+
-+	res->a0 = PSCI_RET_SUCCESS;
 +}
 +
  void handle_psci(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
  {
  	switch (vcpu->kvm_run->hypercall.nr) {
-@@ -30,6 +45,10 @@ void handle_psci(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
- 	case PSCI_1_0_FN_PSCI_FEATURES:
- 		psci_features(vcpu, res);
+@@ -49,6 +60,9 @@ void handle_psci(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
+ 	case PSCI_0_2_FN64_CPU_SUSPEND:
+ 		cpu_suspend(vcpu, res);
  		break;
-+	case PSCI_0_2_FN_CPU_SUSPEND:
-+	case PSCI_0_2_FN64_CPU_SUSPEND:
-+		cpu_suspend(vcpu, res);
++	case PSCI_0_2_FN_CPU_OFF:
++		cpu_off(vcpu, res);
 +		break;
  	default:
  		res->a0 = PSCI_RET_NOT_SUPPORTED;
