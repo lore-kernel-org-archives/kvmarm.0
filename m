@@ -1,25 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82648261F6
-	for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 14:33:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FB0BC4339C;
-	Fri, 26 May 2023 14:33:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF6E1EA6F
+	for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 14:46:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3EFBC433D2;
+	Fri, 26 May 2023 14:46:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1685111635;
-	bh=UaDqzpeXMxTsA0h1VeMgRA4blxON31O7kP8OlVYUq/E=;
+	s=k20201202; t=1685112409;
+	bh=gX1HEG+z9KW3eMtUvCzJlWpVp+Aform3r5YduMPqVos=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YM7MX8Og8fTJWm0KWs/I7dne4K44omL0VLbEekfs24gCmx9xA4Mk2SjugXCspyakv
-	 LLi80+GB4edTIHojuCkYRwVpKm0ToLME9mt3vj5p5xOytsOsbAadmZNt4sn72OqB6U
-	 llDKyzNhvxnzemQqU7FG8OTDdt8jqH1vnqz8+vQDLiKnxrasWtPap7dkD9kRG71+uj
-	 0r6/EbZ2RVJJiLpjwlbrfCjhHVzEXiX1Q4h706Q5oJEdVG0i/V0rkuL2UGxZWYvjre
-	 /4IpGBV7jGvCjCFUWJellPhYwmgGr9haAyyCBejFGRStaHW3MTCL28FF1eBsKS6tH5
-	 /PyI/fRSxuBQg==
+	b=ofsW8JVOTHJSD7OCUF4Swuj9FRlkinEIJ+gqQ5CWgJAG4CwBVcnnEp6B4AQfsqYEu
+	 YEVC+18Zr//6R8aaMN/NsojaGFz650zEI0Wn+pFJ1O/2wjG3tXqhlK4vI0ok0IMiev
+	 GdvnV93rRCmwRZB9eXdWcd+9xtiY5Hg2wsgeXLS9/Wg7rt47eEL0Y6ZCCRcVTDvJCN
+	 xBY/PKtgPSLKF9GRLnIVFyNXjhdQhcAD4MutgwNtF697DV1fpLxWz51zQFsKClapZ2
+	 ZM6wcIhfChWJI3y+PDYhgUU1MHTTSsX0DfvOt4k6t5rQOJ9ShGkwhj411PY3vsQnrQ
+	 FQx/JkXp+9ffw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1q2YVt-000aHS-AY;
+	id 1q2YVt-000aHS-QU;
 	Fri, 26 May 2023 15:33:53 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -32,9 +32,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Quentin Perret <qperret@google.com>,
 	Will Deacon <will@kernel.org>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v2 08/17] KVM: arm64: Remove alternatives from sysreg accessors in VHE hypervisor context
-Date: Fri, 26 May 2023 15:33:39 +0100
-Message-Id: <20230526143348.4072074-9-maz@kernel.org>
+Subject: [PATCH v2 10/17] KVM: arm64: Force HCR_EL2.E2H when ARM64_KVM_HVHE is set
+Date: Fri, 26 May 2023 15:33:41 +0100
+Message-Id: <20230526143348.4072074-11-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230526143348.4072074-1-maz@kernel.org>
 References: <20230526143348.4072074-1-maz@kernel.org>
@@ -50,64 +50,27 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-In the VHE hypervisor code, we should be using the remapped VHE
-accessors, no ifs, no buts. No need to generate any alternative.
+Obviously, in order to be able to use VHE whilst at EL2, we need
+to set HCR_EL2.E2H. Do so when ARM64_KVM_HVHE is set.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_hyp.h | 25 +++++++++++++++++++------
- 1 file changed, 19 insertions(+), 6 deletions(-)
+ arch/arm64/kvm/arm.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index bdd9cf546d95..fea04eb25cb4 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -16,6 +16,23 @@ DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
- DECLARE_PER_CPU(unsigned long, kvm_hyp_vector);
- DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 14391826241c..c12276dd2cf4 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1676,6 +1676,8 @@ static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
+ 		params->hcr_el2 = HCR_HOST_NVHE_PROTECTED_FLAGS;
+ 	else
+ 		params->hcr_el2 = HCR_HOST_NVHE_FLAGS;
++	if (cpus_have_final_cap(ARM64_KVM_HVHE))
++		params->hcr_el2 |= HCR_E2H;
+ 	params->vttbr = params->vtcr = 0;
  
-+/*
-+ * Unified accessors for registers that have a different encoding
-+ * between VHE and non-VHE. They must be specified without their "ELx"
-+ * encoding, but with the SYS_ prefix, as defined in asm/sysreg.h.
-+ */
-+
-+#if defined(__KVM_VHE_HYPERVISOR__)
-+
-+#define read_sysreg_el0(r)	read_sysreg_s(r##_EL02)
-+#define write_sysreg_el0(v,r)	write_sysreg_s(v, r##_EL02)
-+#define read_sysreg_el1(r)	read_sysreg_s(r##_EL12)
-+#define write_sysreg_el1(v,r)	write_sysreg_s(v, r##_EL12)
-+#define read_sysreg_el2(r)	read_sysreg_s(r##_EL1)
-+#define write_sysreg_el2(v,r)	write_sysreg_s(v, r##_EL1)
-+
-+#else // !__KVM_VHE_HYPERVISOR__
-+
- #define read_sysreg_elx(r,nvh,vh)					\
- 	({								\
- 		u64 reg;						\
-@@ -35,12 +52,6 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
- 					 : : "rZ" (__val));		\
- 	} while (0)
- 
--/*
-- * Unified accessors for registers that have a different encoding
-- * between VHE and non-VHE. They must be specified without their "ELx"
-- * encoding, but with the SYS_ prefix, as defined in asm/sysreg.h.
-- */
--
- #define read_sysreg_el0(r)	read_sysreg_elx(r, _EL0, _EL02)
- #define write_sysreg_el0(v,r)	write_sysreg_elx(v, r, _EL0, _EL02)
- #define read_sysreg_el1(r)	read_sysreg_elx(r, _EL1, _EL12)
-@@ -48,6 +59,8 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
- #define read_sysreg_el2(r)	read_sysreg_elx(r, _EL2, _EL1)
- #define write_sysreg_el2(v,r)	write_sysreg_elx(v, r, _EL2, _EL1)
- 
-+#endif	// __KVM_VHE_HYPERVISOR__
-+
- /*
-  * Without an __arch_swab32(), we fall back to ___constant_swab32(), but the
-  * static inline can allow the compiler to out-of-line this. KVM always wants
+ 	/*
 -- 
 2.34.1
 
