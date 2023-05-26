@@ -1,42 +1,42 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0EF28C12
-	for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 23:44:50 +0000 (UTC)
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-babb7aaa605so2784173276.3
-        for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 16:44:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E68072D25B
+	for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 23:44:51 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-babb5e91ab4so2849399276.0
+        for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 16:44:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685144689; x=1687736689;
+        d=google.com; s=20221208; t=1685144691; x=1687736691;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bguo3hUZaLYxse9v+ik+MX3ufqUdHR10jXNpIhPD3cE=;
-        b=Y62V38pt3Kf7P9M2YivEC5661SUHDQjGPJeLNpi65nB4y+p3TsqoRR0z/9AOIr1Kjf
-         gl3yg0EBv9UJcyGGhkoV+eP5nxHHEckaVjNM+WV0ph8y6N8NKNrOoxejQzf6xVLF0GNF
-         CMPzW7iyFKrk0I+YLOBH1dB2cwpR8z8XT9p+1tlyni+H85cDXJGB/ZGkaiDpbVC82/o/
-         GKwW1qcFloQI+vCY/C+X0I8xbKAWwMlWN0KpQsh6osmLARaX2g1tNlgMEbkEwKadQaPu
-         8s3poXNR7qoLyRgjp4108zRCziAP6oNak8GIUn6lV7gRCswVoQjlt0PKr+oTkaiyWyY0
-         Ciug==
+        bh=SAnqMQmXLaJfeZI+VeXqIwvB0doaLL+gp8U5/HUId5I=;
+        b=k8BERP9A+6Uiw+Uaig20mMncTvjKAsRCKq+HC63zo5f14BiSqxPWFPVFrxvd4dUkfQ
+         bKRY2Xn6Sj5cpDeqFqXaOaTxVBSBg6TnHG9z0eetRbywYU3ie/H8/CJOp1+Ez2wWWiIG
+         CY1cPbCWNOAs/19D6iZC6kEHwAF0m7RMLVET0mpluU6zBeVTNhcDLR1hhBJpslaBZ/Nm
+         0fQXpAKGqnmpqrKCUVaNiYpgSsJF+6ODE5plgt1dvul/aWCITvYKB/5mkPp/iio/HINg
+         59adq2fXr8dYaO8RPmc4VSfW2nQVaqhTR9xX4O6C0F0j/4E6MdCu9N0KSqKFRTup9DJ6
+         82/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685144689; x=1687736689;
+        d=1e100.net; s=20221208; t=1685144691; x=1687736691;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bguo3hUZaLYxse9v+ik+MX3ufqUdHR10jXNpIhPD3cE=;
-        b=U+aDz1Qnv0++0gxAs+K3iMcR/bUpe7GT5E6uzz0y4E+eOLiDrEPe9qyl5zjE0xlC0n
-         ug2WKGuvpuIeh6YDR9LfkpytL0WHVWjBRU+kB9wZLxzF/Qg61wmqYQJYmpAp4ROWcLlP
-         bg3bY9IiExA78A24MtXQzkq/V0snZ3T9OpNS+YBFUGlvcfHujlB/6S3zGSLZ3xPRkf7q
-         560QMFNjoabvo0HVrKhGeela9tSjuk1aWk7QNVkhd9t+bm7ia0Hsox3GZZ7cQHPFtaR8
-         3+EXpjzJvBfuBVkkV9tns1i7SHdDxH5z1CBw+KyAamuI5ffNYQ4joAZbaxy7oAHDsaxR
-         72aw==
-X-Gm-Message-State: AC+VfDx4DonVAqFgE+Ct1UTK/u4lEo240riB0H3QaTit4J+VzruTuFRx
-	6SJXccjBKmiFzTCDYvASG2l/w7H19qQ=
-X-Google-Smtp-Source: ACHHUZ72Yke0umLVJsAYBjLDCmB2C1ZbHNslgBIJrMfaEGzX80HaCkEwKhsoBR2khvT0ady9wDj4p4x/v3M=
+        bh=SAnqMQmXLaJfeZI+VeXqIwvB0doaLL+gp8U5/HUId5I=;
+        b=LgQ7sgghD60MWZTf8lbwDqtwj0x72aimFrcOKWySiEo69lQhwp1qv1ago8Zk/sWX01
+         KdJHvYRdrXDz/2FiT2GTK09LqicDJIbqxOTiInsDh+9o32X00gk2QHAtq2dYASaGDPpC
+         Ax/J60PQCyRQVELb49IfKRUIHF44DdX0vyZL13qrWXuTDhOIzRGz9aAL7hUxAMv8uGHX
+         oVBejGmKqgP5TAMy1JB0geWU5T9fcWjbyC8rx1HN8wyQy9Za4fzB1Td1UpXk2iMg+YEt
+         Ez0FiVtXi6PsukSBcDwVmtT0ZuDt2US3e/rf4FK037TErrW7pGcTPcfi/iARIXB5wO1A
+         lTeg==
+X-Gm-Message-State: AC+VfDwVHGSZfjSASVhKJ0S3VLU4oo2k/HPPHlmEsvkZIax5gRp/GnCn
+	n/iVviLtHU8Jh3XzFjuU2Xbw56B+pwY=
+X-Google-Smtp-Source: ACHHUZ56f5xRS5UFm0fGZF6KKL2sEC5mGRlgoj/Qp341qhbzjJy6m3cfCKx+HZdIQ3EgPejfKdLHbTHVxEI=
 X-Received: from yuzhao.bld.corp.google.com ([2620:15c:183:200:910f:8a15:592b:2087])
- (user=yuzhao job=sendgmr) by 2002:a25:3cb:0:b0:ba8:337a:d8a3 with SMTP id
- 194-20020a2503cb000000b00ba8337ad8a3mr1807757ybd.11.1685144689141; Fri, 26
- May 2023 16:44:49 -0700 (PDT)
-Date: Fri, 26 May 2023 17:44:31 -0600
+ (user=yuzhao job=sendgmr) by 2002:a25:8211:0:b0:ba6:e7ee:bb99 with SMTP id
+ q17-20020a258211000000b00ba6e7eebb99mr1850590ybk.12.1685144690927; Fri, 26
+ May 2023 16:44:50 -0700 (PDT)
+Date: Fri, 26 May 2023 17:44:32 -0600
 In-Reply-To: <20230526234435.662652-1-yuzhao@google.com>
-Message-Id: <20230526234435.662652-7-yuzhao@google.com>
+Message-Id: <20230526234435.662652-8-yuzhao@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,7 +45,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230526234435.662652-1-yuzhao@google.com>
 X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
-Subject: [PATCH mm-unstable v2 06/10] kvm/powerpc: make radix page tables RCU safe
+Subject: [PATCH mm-unstable v2 07/10] kvm/powerpc: add kvm_arch_test_clear_young()
 From: Yu Zhao <yuzhao@google.com>
 To: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: Alistair Popple <apopple@nvidia.com>, Anup Patel <anup@brainfault.org>, 
@@ -69,46 +69,183 @@ Cc: Alistair Popple <apopple@nvidia.com>, Anup Patel <anup@brainfault.org>,
 	x86@kernel.org, linux-mm@google.com, Yu Zhao <yuzhao@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-KVM page tables are currently not RCU safe against remapping, i.e.,
-kvmppc_unmap_free_pmd_entry_table() et al. The previous
-mmu_notifier_ops members rely on kvm->mmu_lock to synchronize with
-that operation.
+Implement kvm_arch_test_clear_young() to support the fast path in
+mmu_notifier_ops->test_clear_young().
 
-However, the new mmu_notifier_ops member test_clear_young() provides
-a fast path that does not take kvm->mmu_lock. To implement
-kvm_arch_test_clear_young() for that path, orphan page tables need to
-be freed by RCU.
-
-Unmapping, specifically kvm_unmap_radix(), does not free page tables,
-hence not a concern.
+It focuses on a simple case, i.e., radix MMU sets the accessed bit in
+KVM PTEs and VMs are not nested, where it can rely on RCU and
+pte_xchg() to safely clear the accessed bit without taking
+kvm->mmu_lock. Complex cases fall back to the existing slow path
+where kvm->mmu_lock is then taken.
 
 Signed-off-by: Yu Zhao <yuzhao@google.com>
 ---
- arch/powerpc/kvm/book3s_64_mmu_radix.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ arch/powerpc/include/asm/kvm_host.h    |  8 ++++
+ arch/powerpc/include/asm/kvm_ppc.h     |  1 +
+ arch/powerpc/kvm/book3s.c              |  6 +++
+ arch/powerpc/kvm/book3s.h              |  1 +
+ arch/powerpc/kvm/book3s_64_mmu_radix.c | 59 ++++++++++++++++++++++++++
+ arch/powerpc/kvm/book3s_hv.c           |  5 +++
+ 6 files changed, 80 insertions(+)
 
+diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+index 14ee0dece853..75c260ea8a9e 100644
+--- a/arch/powerpc/include/asm/kvm_host.h
++++ b/arch/powerpc/include/asm/kvm_host.h
+@@ -883,4 +883,12 @@ static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+ static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+ 
++#define kvm_arch_has_test_clear_young kvm_arch_has_test_clear_young
++static inline bool kvm_arch_has_test_clear_young(void)
++{
++	return IS_ENABLED(CONFIG_KVM_BOOK3S_HV_POSSIBLE) &&
++	       cpu_has_feature(CPU_FTR_HVMODE) && cpu_has_feature(CPU_FTR_ARCH_300) &&
++	       radix_enabled();
++}
++
+ #endif /* __POWERPC_KVM_HOST_H__ */
+diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
+index 79a9c0bb8bba..ff1af6a7b44f 100644
+--- a/arch/powerpc/include/asm/kvm_ppc.h
++++ b/arch/powerpc/include/asm/kvm_ppc.h
+@@ -287,6 +287,7 @@ struct kvmppc_ops {
+ 	bool (*unmap_gfn_range)(struct kvm *kvm, struct kvm_gfn_range *range);
+ 	bool (*age_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
+ 	bool (*test_age_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
++	bool (*test_clear_young)(struct kvm *kvm, struct kvm_gfn_range *range);
+ 	bool (*set_spte_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
+ 	void (*free_memslot)(struct kvm_memory_slot *slot);
+ 	int (*init_vm)(struct kvm *kvm);
+diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
+index 686d8d9eda3e..37bf40b0c4ff 100644
+--- a/arch/powerpc/kvm/book3s.c
++++ b/arch/powerpc/kvm/book3s.c
+@@ -899,6 +899,12 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	return kvm->arch.kvm_ops->test_age_gfn(kvm, range);
+ }
+ 
++bool kvm_arch_test_clear_young(struct kvm *kvm, struct kvm_gfn_range *range)
++{
++	return !kvm->arch.kvm_ops->test_clear_young ||
++	       kvm->arch.kvm_ops->test_clear_young(kvm, range);
++}
++
+ bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	return kvm->arch.kvm_ops->set_spte_gfn(kvm, range);
+diff --git a/arch/powerpc/kvm/book3s.h b/arch/powerpc/kvm/book3s.h
+index 58391b4b32ed..fa2659e21ccc 100644
+--- a/arch/powerpc/kvm/book3s.h
++++ b/arch/powerpc/kvm/book3s.h
+@@ -12,6 +12,7 @@ extern void kvmppc_core_flush_memslot_hv(struct kvm *kvm,
+ extern bool kvm_unmap_gfn_range_hv(struct kvm *kvm, struct kvm_gfn_range *range);
+ extern bool kvm_age_gfn_hv(struct kvm *kvm, struct kvm_gfn_range *range);
+ extern bool kvm_test_age_gfn_hv(struct kvm *kvm, struct kvm_gfn_range *range);
++extern bool kvm_test_clear_young_hv(struct kvm *kvm, struct kvm_gfn_range *range);
+ extern bool kvm_set_spte_gfn_hv(struct kvm *kvm, struct kvm_gfn_range *range);
+ 
+ extern int kvmppc_mmu_init_pr(struct kvm_vcpu *vcpu);
 diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-index 461307b89c3a..3b65b3b11041 100644
+index 3b65b3b11041..0a392e9a100a 100644
 --- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
 +++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-@@ -1469,13 +1469,15 @@ int kvmppc_radix_init(void)
- {
- 	unsigned long size = sizeof(void *) << RADIX_PTE_INDEX_SIZE;
+@@ -1088,6 +1088,65 @@ bool kvm_test_age_radix(struct kvm *kvm, struct kvm_memory_slot *memslot,
+ 	return ref;
+ }
  
--	kvm_pte_cache = kmem_cache_create("kvm-pte", size, size, 0, pte_ctor);
-+	kvm_pte_cache = kmem_cache_create("kvm-pte", size, size,
-+					  SLAB_TYPESAFE_BY_RCU, pte_ctor);
- 	if (!kvm_pte_cache)
- 		return -ENOMEM;
++bool kvm_test_clear_young_hv(struct kvm *kvm, struct kvm_gfn_range *range)
++{
++	bool err;
++	gfn_t gfn = range->start;
++
++	rcu_read_lock();
++
++	err = !kvm_is_radix(kvm);
++	if (err)
++		goto unlock;
++
++	/*
++	 * Case 1:  This function          kvmppc_switch_mmu_to_hpt()
++	 *
++	 *          rcu_read_lock()
++	 *          Test kvm_is_radix()    kvm->arch.radix = 0
++	 *          Use kvm->arch.pgtable  synchronize_rcu()
++	 *          rcu_read_unlock()
++	 *                                 kvmppc_free_radix()
++	 *
++	 *
++	 * Case 2:  This function          kvmppc_switch_mmu_to_radix()
++	 *
++	 *                                 kvmppc_init_vm_radix()
++	 *                                 smp_wmb()
++	 *          Test kvm_is_radix()    kvm->arch.radix = 1
++	 *          smp_rmb()
++	 *          Use kvm->arch.pgtable
++	 */
++	smp_rmb();
++
++	while (gfn < range->end) {
++		pte_t *ptep;
++		pte_t old, new;
++		unsigned int shift;
++
++		ptep = find_kvm_secondary_pte_unlocked(kvm, gfn * PAGE_SIZE, &shift);
++		if (!ptep)
++			goto next;
++
++		VM_WARN_ON_ONCE(!page_count(virt_to_page(ptep)));
++
++		old = READ_ONCE(*ptep);
++		if (!pte_present(old) || !pte_young(old))
++			goto next;
++
++		new = pte_mkold(old);
++
++		if (kvm_should_clear_young(range, gfn))
++			pte_xchg(ptep, old, new);
++next:
++		gfn += shift ? BIT(shift - PAGE_SHIFT) : 1;
++	}
++unlock:
++	rcu_read_unlock();
++
++	return err;
++}
++
+ /* Returns the number of PAGE_SIZE pages that are dirty */
+ static int kvm_radix_test_clear_dirty(struct kvm *kvm,
+ 				struct kvm_memory_slot *memslot, int pagenum)
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 130bafdb1430..20a81ec9fde8 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -5262,6 +5262,8 @@ int kvmppc_switch_mmu_to_hpt(struct kvm *kvm)
+ 	spin_lock(&kvm->mmu_lock);
+ 	kvm->arch.radix = 0;
+ 	spin_unlock(&kvm->mmu_lock);
++	/* see the comments in kvm_test_clear_young_hv() */
++	synchronize_rcu();
+ 	kvmppc_free_radix(kvm);
  
- 	size = sizeof(void *) << RADIX_PMD_INDEX_SIZE;
- 
--	kvm_pmd_cache = kmem_cache_create("kvm-pmd", size, size, 0, pmd_ctor);
-+	kvm_pmd_cache = kmem_cache_create("kvm-pmd", size, size,
-+					  SLAB_TYPESAFE_BY_RCU, pmd_ctor);
- 	if (!kvm_pmd_cache) {
- 		kmem_cache_destroy(kvm_pte_cache);
- 		return -ENOMEM;
+ 	lpcr = LPCR_VPM1;
+@@ -5286,6 +5288,8 @@ int kvmppc_switch_mmu_to_radix(struct kvm *kvm)
+ 	if (err)
+ 		return err;
+ 	kvmppc_rmap_reset(kvm);
++	/* see the comments in kvm_test_clear_young_hv() */
++	smp_wmb();
+ 	/* Mutual exclusion with kvm_unmap_gfn_range etc. */
+ 	spin_lock(&kvm->mmu_lock);
+ 	kvm->arch.radix = 1;
+@@ -6185,6 +6189,7 @@ static struct kvmppc_ops kvm_ops_hv = {
+ 	.unmap_gfn_range = kvm_unmap_gfn_range_hv,
+ 	.age_gfn = kvm_age_gfn_hv,
+ 	.test_age_gfn = kvm_test_age_gfn_hv,
++	.test_clear_young = kvm_test_clear_young_hv,
+ 	.set_spte_gfn = kvm_set_spte_gfn_hv,
+ 	.free_memslot = kvmppc_core_free_memslot_hv,
+ 	.init_vm =  kvmppc_core_init_vm_hv,
 -- 
 2.41.0.rc0.172.g3f132b7071-goog
 
