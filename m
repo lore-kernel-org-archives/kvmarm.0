@@ -1,174 +1,104 @@
-Received: from out-13.mta1.migadu.com (out-13.mta1.migadu.com [95.215.58.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B6A261C5
-	for <kvmarm@lists.linux.dev>; Thu, 25 May 2023 23:36:30 +0000 (UTC)
-Date: Thu, 25 May 2023 23:36:23 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1685057788;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=P6zAesvCX1np6qowsiTDFn1Ttg3LeLNqimbKFFrO44k=;
-	b=hFk/P8VbvqCXvnUFBR0TDZqH7RTktZxcVeToKNNL9QKObZGJFbHkEb7Cxwj065MufplhgQ
-	GPjZk2yUiY55AT2nqCd4XmNXwUuD4QkGZi4SwSPCII8JWa8KxwTAQTzJq+7cieq65NF1/v
-	946/dwlxo+XduDWeqmM9BP7IolOhSR4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Reiji Watanabe <reijiw@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Raghavendra Rao Anata <rananta@google.com>,
-	Shaoqin Huang <shahuang@redhat.com>, Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v3 2/2] KVM: arm64: PMU: Don't overwrite PMUSERENR with
- vcpu loaded
-Message-ID: <ZG/w95pYjWnMJB62@linux.dev>
-References: <20230415164029.526895-1-reijiw@google.com>
- <20230415164029.526895-3-reijiw@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31380320A
+	for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 06:23:04 +0000 (UTC)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1ae3a5dfa42so2721395ad.0
+        for <kvmarm@lists.linux.dev>; Thu, 25 May 2023 23:23:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1685082183; x=1687674183;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7cCHBf3UytwZfxePPwE+jd6ort0sOdXbbuo1VvBkL64=;
+        b=In9JMr9pXJKdU4OFNrKA8VkqvzNERFgbkF1WTefIBpZGNH1cm6Wu4vy6gHMfTTbpH5
+         Bxt1r4RdI0sl2apwFfU9YncceU9jlq55r9HxXRy93MWRcYsVcXQ/3fCBv5QBexNmd25X
+         6G2yWYoM0MVRHQMx8eH0pxaCBL360ys2TBubCUiYCToafZ9wgibDjDx0qVGg1QlxwNOJ
+         mLFF8yI2zd7UosSjjmAmMe1b3OntVisxuNwReKnyR4cjSdQqdBe57OFiu7V+h7YbDTD9
+         gS4FVXbZxLBVK9nWMBpD7mMOq0v4voFCeypL5pXo+ai/vZiKklNlarHEiS6wZWvQStAQ
+         076A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685082183; x=1687674183;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7cCHBf3UytwZfxePPwE+jd6ort0sOdXbbuo1VvBkL64=;
+        b=B5Me7flMxuL3oo3QSg1/OoaE9WILQiXsjaoTjIX+LSBci+2atEGt+lhtEYAefjL5Xs
+         UOMQ4LTn3obGyDHci0hbcIjuOG4Po8P3BBKJ0fE51ApIuZJrFWu4kmntB/eJD6LgYimS
+         EDRSnJc3ZEr0o/Tc8x5UBvi9KhkphohPbWabbqloLfMCM9NocLZljPBwFZTuUgUwhsU/
+         qdoq6UL6Fk8R6RKFc4l2GhJ+lOQ9CEZnbwRbFASHnx4n34Y1Z+64MJhbI5UwayU6hx8L
+         mFQa6vH1CWShyEWiQl4Q9HFbN1iWQUU8nV23ilVzm7IGzf8t429eCetmgcHh02QejwQg
+         rgrw==
+X-Gm-Message-State: AC+VfDxszudpGtRfayOjY20XLpiZQRYDWdKkkgj5M84W02x9SbP0CXzO
+	nqAMha8P9H0GDnw1qi3mwbMdbRZ8JMjGbUFUer8=
+X-Google-Smtp-Source: ACHHUZ5+adpq5bn8ccEuSJ16UorMQ11HQo3chgEmsUz3XwrAAvurJ6sIX+3y8mXx79RuaBedX3HqgDmU0iivyP2H1/M=
+X-Received: by 2002:a17:903:2285:b0:1ab:142a:3dd7 with SMTP id
+ b5-20020a170903228500b001ab142a3dd7mr1537487plh.68.1685082183465; Thu, 25 May
+ 2023 23:23:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230415164029.526895-3-reijiw@google.com>
-X-Migadu-Flow: FLOW_OUT
+References: <cover.1684999824.git.haibo1.xu@intel.com> <20230525-6e0855eb07086a96eaa82362@orel>
+In-Reply-To: <20230525-6e0855eb07086a96eaa82362@orel>
+From: Haibo Xu <xiaobo55x@gmail.com>
+Date: Fri, 26 May 2023 14:22:52 +0800
+Message-ID: <CAJve8o=SdjMvsVn=3Vqw3QG5SuU8nqLVC_MRAgPX+GuFZj6jvA@mail.gmail.com>
+Subject: Re: [PATCH v2 00/11] RISCV: Add KVM_GET_REG_LIST API
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: Haibo Xu <haibo1.xu@intel.com>, maz@kernel.org, oliver.upton@linux.dev, 
+	seanjc@google.com, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Shuah Khan <shuah@kernel.org>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, David Matlack <dmatlack@google.com>, 
+	Ben Gardon <bgardon@google.com>, Vipin Sharma <vipinsh@google.com>, 
+	Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Reiji,
+On Fri, May 26, 2023 at 1:20=E2=80=AFAM Andrew Jones <ajones@ventanamicro.c=
+om> wrote:
+>
+> On Thu, May 25, 2023 at 03:38:24PM +0800, Haibo Xu wrote:
+> > KVM_GET_REG_LIST will dump all register IDs that are available to
+> > KVM_GET/SET_ONE_REG and It's very useful to identify some platform
+> > regression issue during VM migration.
+> >
+> > Patch 1-7 re-structured the get-reg-list test in aarch64 to make some
+> > of the code as common test framework that can be shared by riscv.
+> >
+> > Patch 8 enabled the KVM_GET_REG_LIST API in riscv and patch 9-11 added
+> > the corresponding kselftest for checking possible register regressions.
+> >
+> > The get-reg-list kvm selftest was ported from aarch64 and tested with
+> > Linux 6.4-rc1 on a Qemu riscv virt machine.
+> >
+> > ---
+> > Changed since v1:
+> >   * rebase to Andrew's changes
+> >   * fix coding style
+> >
+> > Andrew Jones (7):
+> >   KVM: arm64: selftests: Replace str_with_index with strdup_printf
+> >   KVM: arm64: selftests: Drop SVE cap check in print_reg
+> >   KVM: arm64: selftests: Remove print_reg's dependency on vcpu_config
+> >   KVM: arm64: selftests: Rename vcpu_config and add to kvm_util.h
+> >   KVM: arm64: selftests: Delete core_reg_fixup
+> >   KVM: arm64: selftests: Split get-reg-list test code
+> >   KVM: arm64: selftests: Finish generalizing get-reg-list
+>
+> All the patches above should also have your s-o-b since your posting them=
+.
+>
 
-Apologies, this fell off my list of reviews.
+Sure.
 
-On Sat, Apr 15, 2023 at 09:40:29AM -0700, Reiji Watanabe wrote:
-
-[...]
-
->  static void armv8pmu_enable_event(struct perf_event *event)
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 6718731729fd..7e73be12cfaf 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -82,12 +82,24 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
->  	 */
->  	if (kvm_arm_support_pmu_v3()) {
->  		struct kvm_cpu_context *hctxt;
-> +		unsigned long flags;
->  
->  		write_sysreg(0, pmselr_el0);
->  
->  		hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +
-> +		/*
-> +		 * Disable IRQs to prevent a race condition between the
-> +		 * following code and IPIs that attempts to update
-> +		 * PMUSERENR_EL0. See also kvm_set_pmuserenr().
-> +		 */
-> +		local_irq_save(flags);
-> +
->  		ctxt_sys_reg(hctxt, PMUSERENR_EL0) = read_sysreg(pmuserenr_el0);
->  		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
-> +		vcpu_set_flag(vcpu, PMUSERENR_ON_CPU);
-> +
-> +		local_irq_restore(flags);
-
-Can the IRQ save/restore be moved to {activate,deactivate}_traps_vhe_{load,put}()?
-
-That'd eliminate the dance to avoid using kernel-only symbols in nVHE
-and would be consistent with the existing usage of
-__{activate,deactivate}_traps_common() from nVHE (IRQs already
-disabled).
-
-IMO, the less nVHE knows about the kernel the better.
-
->  	}
->  
->  	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
-> @@ -112,9 +124,21 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
->  	write_sysreg(0, hstr_el2);
->  	if (kvm_arm_support_pmu_v3()) {
->  		struct kvm_cpu_context *hctxt;
-> +		unsigned long flags;
->  
->  		hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +
-> +		/*
-> +		 * Disable IRQs to prevent a race condition between the
-> +		 * following code and IPIs that attempts to update
-> +		 * PMUSERENR_EL0. See also kvm_set_pmuserenr().
-> +		 */
-> +		local_irq_save(flags);
-> +
->  		write_sysreg(ctxt_sys_reg(hctxt, PMUSERENR_EL0), pmuserenr_el0);
-> +		vcpu_clear_flag(vcpu, PMUSERENR_ON_CPU);
-> +
-> +		local_irq_restore(flags);
->  	}
->  
->  	if (cpus_have_final_cap(ARM64_SME)) {
-> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-> index 530347cdebe3..2c08a54ca7d9 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
-> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> @@ -10,7 +10,7 @@ asflags-y := -D__KVM_NVHE_HYPERVISOR__ -D__DISABLE_EXPORTS
->  # will explode instantly (Words of Marc Zyngier). So introduce a generic flag
->  # __DISABLE_TRACE_MMIO__ to disable MMIO tracing for nVHE KVM.
->  ccflags-y := -D__KVM_NVHE_HYPERVISOR__ -D__DISABLE_EXPORTS -D__DISABLE_TRACE_MMIO__
-> -ccflags-y += -fno-stack-protector	\
-> +ccflags-y += -fno-stack-protector -DNO_TRACE_IRQFLAGS \
->  	     -DDISABLE_BRANCH_PROFILING	\
->  	     $(DISABLE_STACKLEAK_PLUGIN)
->  
-> diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-> index 7887133d15f0..d6a863853bfe 100644
-> --- a/arch/arm64/kvm/pmu.c
-> +++ b/arch/arm64/kvm/pmu.c
-> @@ -209,3 +209,28 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu)
->  	kvm_vcpu_pmu_enable_el0(events_host);
->  	kvm_vcpu_pmu_disable_el0(events_guest);
->  }
-> +
-> +/*
-> + * With VHE, keep track of the PMUSERENR_EL0 value for the host EL0 on the pCPU
-> + * where PMUSERENR_EL0 for the guest is loaded, since PMUSERENR_EL0 is switched
-> + * to the value for the guest on vcpu_load().  The value for the host EL0
-> + * will be restored on vcpu_put(), before returning to the EL0.
-
-wording: s/the EL0/EL0. Or, alternatively, to avoid repeating yourself
-you can just say "returning to userspace".
-
-You may also want to mention in passing why this isn't necessary for
-nVHE, as the register is context switched for every guest enter/exit.
-
-> + *
-> + * Return true if KVM takes care of the register. Otherwise return false.
-> + */
-> +bool kvm_set_pmuserenr(u64 val)
-> +{
-> +	struct kvm_cpu_context *hctxt;
-> +	struct kvm_vcpu *vcpu;
-> +
-> +	if (!kvm_arm_support_pmu_v3() || !has_vhe())
-> +		return false;
-> +
-> +	vcpu = kvm_get_running_vcpu();
-> +	if (!vcpu || !vcpu_get_flag(vcpu, PMUSERENR_ON_CPU))
-> +		return false;
-> +
-> +	hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	ctxt_sys_reg(hctxt, PMUSERENR_EL0) = val;
-> +	return true;
-> +}
-
--- 
-Thanks,
-Oliver
+> Thanks,
+> drew
