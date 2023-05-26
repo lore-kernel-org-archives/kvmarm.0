@@ -1,30 +1,30 @@
-Received: from out-9.mta1.migadu.com (out-9.mta1.migadu.com [95.215.58.9])
+Received: from out-41.mta1.migadu.com (out-41.mta1.migadu.com [95.215.58.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7B2824E96
-	for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 19:42:34 +0000 (UTC)
-Date: Fri, 26 May 2023 19:42:27 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE352CA9
+	for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 20:47:59 +0000 (UTC)
+Date: Fri, 26 May 2023 20:47:52 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1685130152;
+	t=1685134077;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+HOhs+G8tayqS3761Ku9853mJxQmfAAb4L3el4gd5LE=;
-	b=bS1vv1nL1oS/LTlqvsDeymDsSStxmIRIHRiCTw+zLgtYEt9W3//Ckw/kZRjn9Fx+u+vmq2
-	wQ2gFOeTvz5CuCvK3SdmIsKNBOZ8vxk2iDEA60l2Q87I8+3btPx8fkVxTzZe72R3B+6MDS
-	KVgpD0I1sRp3shO7CjwLuP66nPmZpeE=
+	bh=tTm2WcrJtXgUhrQ3ARrtwiMqmV3Xwo18CAjwr9+QLWY=;
+	b=uvfcrkBUbEDQTPKSbgcgCTVg5y5DWONMaNXAcOakixAHywg4BZLgE0rXpYTC7kb8HKu3rH
+	/iS9JzWfI3CLzV7tEdkKLcCA74Jq7pfpsJX7Aqk1OCDLu7ggVft9xcHX+lFqRcTXjdjLvD
+	+GzCLvYPATDFTg7QvVtz2+1A0Dr9Ufc=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Mostafa Saleh <smostafa@google.com>
 Cc: maz@kernel.org, linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-	tabba@google.com, qperret@google.com, will@kernel.org,
+	tabba@google.com, kaleshsingh@google.com, will@kernel.org,
 	catalin.marinas@arm.com, yuzenghui@huawei.com,
-	suzuki.poulose@arm.com, james.morse@arm.com, bgardon@google.com,
-	gshan@redhat.com
-Subject: Re: [PATCH v2] KVM: arm64: Use BTI for nvhe
-Message-ID: <ZHELoziooIyk0d+t@linux.dev>
-References: <20230517173552.163711-1-smostafa@google.com>
+	suzuki.poulose@arm.com, james.morse@arm.com
+Subject: Re: [PATCH] KVM: arm64: Use different pointer authentication keys
+ for pKVM
+Message-ID: <ZHEa+HAixbYijQTA@linux.dev>
+References: <20230516141531.791492-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -33,131 +33,158 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230517173552.163711-1-smostafa@google.com>
+In-Reply-To: <20230516141531.791492-1-smostafa@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-Hi Mostafa,
+On Tue, May 16, 2023 at 02:15:31PM +0000, Mostafa Saleh wrote:
+> When the kernel is compiled with CONFIG_ARM64_PTR_AUTH_KERNEL, it
+> uses Armv8.3-Pauth for return address protection for the kernel code
+> including nvhe code in EL2.
+> 
+> Same keys are used in both kernel(EL1) and nvhe code(EL2), this is
+> fine for nvhe but not when running in protected mode(pKVM) as the host
+> can't be trusted.
 
-On Wed, May 17, 2023 at 05:35:52PM +0000, Mostafa Saleh wrote:
-> CONFIG_ARM64_BTI_KERNEL compiles the kernel to support ARMv8.5-BTI.
-> However, the nvhe code doesn't make use of it as it doesn't map any
-> pages with Guarded Page(GP) bit.
+But we trust it enough to hand pKVM a fresh set of keys before firing
+off? I understand there is some degree of initialization required to get
+pKVM off the ground, but I question in this case if key handoff is
+strictly necessary.
+
+There are potentially other sources of random directly available at EL2,
+such as the SMCCC TRNG ABI or FEAT_RNG. Should pKVM prefer one of these
+random implementations and only fall back to host-provided keys if
+absolutely necessary?
+
+> The keys for the hypervisor are generated from the kernel before it
+> de-privileges, each cpu has different keys, this relies on nvhe code
+> not being migratable while running.
 > 
-> This patch maps nvhe(and pKVM recreated mapping of) .text section
-> with GP bit which matches the kernel handling for BTI.
-> 
-> A new flag is added to enum kvm_pgtable_prot: KVM_PGTABLE_PROT_GP_S1,
-> which represents BTI guarded page in hypervisor stage-1 page table.
-> 
-> At hyp init, SCTLR_EL2.BT is set to 1 to match EL1 configuration
-> (SCTLR_EL1.BT1) set in bti_enable().
-> 
-> hyp_init_valid_leaf_pte is added to avoid unnecessary considering GP
-> bit for stage-2.
-> 
+> This patch adds host/hyp save/restore for the keys.
+> For guest/hyp, they are already handled in common kvm code in
+> __guest_enter, where they are saved/restored if they are not
+> trapped.
+
+Try to avoid "this patch" or any self-referential language in the
+changelog. Just directly state what the patch does:
+
+  Similar to guest entry/exit, start context switching the pointer
+  authentication keys on host/entry exit if the feature is in use.
+
 > Signed-off-by: Mostafa Saleh <smostafa@google.com>
 > ---
-> v1 -> v2:
-> - Enable BTI for nvhe also.
-> - Only set GP bit for executable pages from pgtable code.
-> - Set SCTLR_EL2.BT when BTI is used.
-> - use system_supports_bti() for consistency.
-> - Add hyp_init_valid_leaf_pte.
-> v1: https://lore.kernel.org/all/20230516141846.792193-1-smostafa@google.com/
-> ---
->  arch/arm64/include/asm/kvm_pgtable.h |  3 +++
->  arch/arm64/include/asm/sysreg.h      |  1 +
->  arch/arm64/kvm/arm.c                 |  7 ++++++-
->  arch/arm64/kvm/hyp/nvhe/hyp-init.S   |  7 +++++++
->  arch/arm64/kvm/hyp/nvhe/setup.c      |  8 ++++++--
->  arch/arm64/kvm/hyp/pgtable.c         | 11 ++++++++++-
->  6 files changed, 33 insertions(+), 4 deletions(-)
+>  arch/arm64/kvm/arm.c           | 26 +++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/host.S | 35 +++++++++++++++++++++++++++++++++-
+>  2 files changed, 60 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 4cd6762bda80..5bcd06d664d3 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -151,6 +151,7 @@ enum kvm_pgtable_stage2_flags {
->   * @KVM_PGTABLE_PROT_W:		Write permission.
->   * @KVM_PGTABLE_PROT_R:		Read permission.
->   * @KVM_PGTABLE_PROT_DEVICE:	Device attributes.
-> + * @KVM_PGTABLE_PROT_GP_S1:	GP(guarded page) used for BTI in stage-1 only
->   * @KVM_PGTABLE_PROT_SW0:	Software bit 0.
->   * @KVM_PGTABLE_PROT_SW1:	Software bit 1.
->   * @KVM_PGTABLE_PROT_SW2:	Software bit 2.
-> @@ -163,6 +164,8 @@ enum kvm_pgtable_prot {
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 14391826241c..dd03b52f035d 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -51,6 +51,8 @@ DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
+>  DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
+>  DECLARE_KVM_NVHE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
 >  
->  	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
->  
-> +	KVM_PGTABLE_PROT_GP_S1			= BIT(50),
+> +DECLARE_KVM_NVHE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
 > +
-
-This enumeration is used to generically describe permissions that could
-be applied to either stage-1 or stage-2.
-
-Can't we just have KVM_PGTABLE_PROT_X imply GP at hyp stage-1, assuming
-BTI is available and we're using it for the kernel?
-
->  	KVM_PGTABLE_PROT_SW0			= BIT(55),
->  	KVM_PGTABLE_PROT_SW1			= BIT(56),
->  	KVM_PGTABLE_PROT_SW2			= BIT(57),
-
-[...]
-
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 3d61bd3e591d..9f68e4ce6d14 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -152,6 +152,13 @@ static kvm_pte_t kvm_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
->  	return pte;
+>  static bool vgic_present;
+>  
+>  static DEFINE_PER_CPU(unsigned char, kvm_arm_hardware_enabled);
+> @@ -2067,6 +2069,26 @@ static int __init kvm_hyp_init_protection(u32 hyp_va_bits)
+>  	return 0;
 >  }
 >  
-> +static kvm_pte_t hyp_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
+> +static void pkvm_hyp_init_ptrauth(void)
 > +{
-> +	kvm_pte_t pte = kvm_init_valid_leaf_pte(pa, attr, level);
+> +	struct kvm_cpu_context *hyp_ctxt;
+> +	int cpu;
 > +
-> +	return pte | (attr & KVM_PGTABLE_PROT_GP_S1);
-
-This is a bit of a hack to cram the GP bit back in. I'm guessing the
-fact that our ATTR_HI mask doesn't include bit 50 led you here.
-
-My interpretation DDI0487J D8.3.2 is that the upper attribute field is
-63:50 for both stages of translation, but bit 50 is RES0 for stage-2.
-
-So, rather than going this route, I'd recommend tweaking the ATTR_HI
-mask to include bit 50.
-
+> +	for_each_possible_cpu(cpu) {
+> +		hyp_ctxt = per_cpu_ptr_nvhe_sym(kvm_hyp_ctxt, cpu);
+> +		hyp_ctxt->sys_regs[APIAKEYLO_EL1] = get_random_long();
+> +		hyp_ctxt->sys_regs[APIAKEYHI_EL1] = get_random_long();
+> +		hyp_ctxt->sys_regs[APIBKEYLO_EL1] = get_random_long();
+> +		hyp_ctxt->sys_regs[APIBKEYHI_EL1] = get_random_long();
+> +		hyp_ctxt->sys_regs[APDAKEYLO_EL1] = get_random_long();
+> +		hyp_ctxt->sys_regs[APDAKEYHI_EL1] = get_random_long();
+> +		hyp_ctxt->sys_regs[APDBKEYLO_EL1] = get_random_long();
+> +		hyp_ctxt->sys_regs[APDBKEYHI_EL1] = get_random_long();
+> +		hyp_ctxt->sys_regs[APGAKEYLO_EL1] = get_random_long();
+> +		hyp_ctxt->sys_regs[APGAKEYHI_EL1] = get_random_long();
+> +	}
 > +}
 > +
->  static kvm_pte_t kvm_init_invalid_leaf_owner(u8 owner_id)
+>  /* Inits Hyp-mode on all online CPUs */
+>  static int __init init_hyp_mode(void)
 >  {
->  	return FIELD_PREP(KVM_INVALID_PTE_OWNER_MASK, owner_id);
-> @@ -371,6 +378,8 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
+> @@ -2228,6 +2250,10 @@ static int __init init_hyp_mode(void)
+>  	kvm_hyp_init_symbols();
 >  
->  		if (device)
->  			return -EINVAL;
+>  	if (is_protected_kvm_enabled()) {
+> +		if (IS_ENABLED(CONFIG_ARM64_PTR_AUTH_KERNEL) &&
+> +		    cpus_have_const_cap(ARM64_HAS_ADDRESS_AUTH))
+> +			pkvm_hyp_init_ptrauth();
 > +
-> +		attr |= prot & KVM_PGTABLE_PROT_GP_S1;
-
-With the above suggestions, this would become:
-
-		if (IS_ENABLED(CONFIG_ARM64_BTI_KERNEL) && system_supports_bti())
-			attr |= KVM_PTE_LEAF_ATTR_HI_S1_GP;
-
->  	} else {
->  		attr |= KVM_PTE_LEAF_ATTR_HI_S1_XN;
->  	}
-> @@ -414,7 +423,7 @@ static bool hyp_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
->  		return false;
+>  		init_cpu_logical_map();
 >  
->  	data->phys += granule;
-> -	new = kvm_init_valid_leaf_pte(phys, data->attr, ctx->level);
-> +	new = hyp_init_valid_leaf_pte(phys, data->attr, ctx->level);
->  	if (ctx->old == new)
->  		return true;
->  	if (!kvm_pte_valid(ctx->old))
+>  		if (!init_psci_relay()) {
+> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
+> index b6c0188c4b35..255ba4af911b 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/host.S
+> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
+> @@ -10,6 +10,7 @@
+>  #include <asm/kvm_arm.h>
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_mmu.h>
+> +#include <asm/kvm_ptrauth.h>
+>  
+>  	.text
+>  
+> @@ -37,10 +38,42 @@ SYM_FUNC_START(__host_exit)
+>  
+>  	/* Save the host context pointer in x29 across the function call */
+>  	mov	x29, x0
+> +
+> +#ifdef CONFIG_ARM64_PTR_AUTH_KERNEL
+> +alternative_if_not ARM64_HAS_ADDRESS_AUTH
+> +b __skip_pauth_save
+> +alternative_else_nop_endif
+> +
+> +alternative_if ARM64_KVM_PROTECTED_MODE
+> +	/* Save kernel ptrauth keys. */
+> +	add x18, x29, #CPU_APIAKEYLO_EL1
+> +	ptrauth_save_state x18, x19, x20
+> +
+> +	/* Use hyp keys. */
+> +	adr_this_cpu x18, kvm_hyp_ctxt, x19
+> +	add x18, x18, #CPU_APIAKEYLO_EL1
+> +	ptrauth_restore_state x18, x19, x20
+> +alternative_else_nop_endif
+> +__skip_pauth_save:
+> +#endif /* CONFIG_ARM64_PTR_AUTH_KERNEL */
+> +
+>  	bl	handle_trap
+>  
+> -	/* Restore host regs x0-x17 */
+>  __host_enter_restore_full:
+> +	/* Restore kernel keys. */
+> +#ifdef CONFIG_ARM64_PTR_AUTH_KERNEL
+> +alternative_if_not ARM64_HAS_ADDRESS_AUTH
+> +b __skip_pauth_restore
+> +alternative_else_nop_endif
+> +
+> +alternative_if ARM64_KVM_PROTECTED_MODE
+> +	add x18, x29, #CPU_APIAKEYLO_EL1
+> +	ptrauth_restore_state x18, x19, x20
+> +alternative_else_nop_endif
+> +__skip_pauth_restore:
+> +#endif /* CONFIG_ARM64_PTR_AUTH_KERNEL */
+> +
+> +	/* Restore host regs x0-x17 */
+>  	ldp	x0, x1,   [x29, #CPU_XREG_OFFSET(0)]
+>  	ldp	x2, x3,   [x29, #CPU_XREG_OFFSET(2)]
+>  	ldp	x4, x5,   [x29, #CPU_XREG_OFFSET(4)]
 > -- 
-> 2.40.1.698.g37aff9b760-goog
+> 2.40.1.606.ga4b1b128d6-goog
 > 
 
 -- 
