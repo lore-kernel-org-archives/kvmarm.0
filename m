@@ -1,135 +1,190 @@
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E015115B7
-	for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 23:08:30 +0000 (UTC)
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-4f1217f16e9so1232e87.0
-        for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 16:08:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D97E728C12
+	for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 23:44:40 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-ba82ed6e450so2754760276.2
+        for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 16:44:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685142509; x=1687734509;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aQm0gmotPrah6x+grG9q4OwSJysvwUdj8gXMKuWCdC8=;
-        b=GgOh49ZYJZyw5BuVFLr5N/oRkD/zm+nNImmJihXENRaZsCEErJqecQWEEYc2s52/3s
-         HNq22GBX/qF+hjvL/I5P9rRnc9bzNwSRQ3eC6b1O+chWp45ABCOxJijHBmMvoAfbHlAp
-         h7pg6y37u0ngQnz1VhckNCdMZbu1YszTbEY40LWTZNsuVTY2vSbAfv1WN5DyI3zuZ9Kc
-         nqtPjOacAvBoEh1UjCsdDc51h5G6w3WIOYkFN7Ka/k5iVsUlXz5NW+wfMxZdvLUgNGkc
-         8oR4HAWQX9H8wlGoz+iKgtMLiJ7/stNfn0+DEbBynOI4raIfEwKS6yG+HBipzBqFBHY3
-         sCjQ==
+        d=google.com; s=20221208; t=1685144680; x=1687736680;
+        h=cc:to:from:subject:mime-version:message-id:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=p2/B2gpADUVSH4+1+wdvhwwOJ3ZLS46dsub4yrmfIrY=;
+        b=gaII7xm1rKF0WflE0kwbmo9D1wFCFrrD6VH1zQ9TXwAabssHzzxcZKDpxFjf1Ep6KT
+         Z+Qr7BXS8s0v9zHiHqeN2dE3WQB88ARaW8AH1iSDJCS3cr45iCn1L9lVI9ZPcsS480+k
+         wbmFDYCaUAqowUGhuKg1M8XmNsmQHtwbdRXfkKNKftJJVvjlpX0Njj/C3Keo2/5Fq3Ip
+         rJb1BWaFB48m4r9hq6xevdAWxHKsOWbdYQ3JRHwN28GN7dhocxPWoxBC2UOWVDxNAvVb
+         KELlyeUjKRt7k8dTr6Xo/3BcetEN0kRAapuiQFxtxhRi3ZR8WdPaedyJyCpfkgSiKRr3
+         Vpww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685142509; x=1687734509;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aQm0gmotPrah6x+grG9q4OwSJysvwUdj8gXMKuWCdC8=;
-        b=baf6aCb9KgrjxTh17hNiknMZ2/USaHacbTRQhM+1BAHHkq1sX0ohScXRPrX4a3lXXh
-         of6jhChA0CxnP3fh4n33Mkam0lKOUqEuKstP9PW24iu8Dm+s/2Na+7R44frC9wKOKqe1
-         8oiFNaoUldgvrTXLoVjFUZSc0VcnPfIu54FBLqTThaZcrqI0khnUSVGK/pVvGhAWNHWd
-         GD34VxRjzGkuKMuOz2qf4avvzyjaGKtyVxdyqorKTac54Gx99gY1CRc8nEI7K/Ee0gKr
-         3rodbVxU125tqCit+iRMYCSLz78jErJ0uOEwh5lxWilqKjFS2DgwGkyTfU7DQFCt2EoH
-         2zhQ==
-X-Gm-Message-State: AC+VfDwEzPz1hVrVWgGVKFDWJXfMKR1T1H/qQFS439EZbxBhPU+RipxT
-	Muu2zyW5+GU2jgT/01lFpVV0OnYArS88wufLyEGTLg==
-X-Google-Smtp-Source: ACHHUZ7a8zznLZd4lC0AduIo/JFkybDmh4b51Aye1LX/4ZElq5Y8xpY1F0uk+ktmYVc2ax/VATPKbTUA5Vr7GtECDXw=
-X-Received: by 2002:a05:600c:3b8d:b0:3f1:9396:6fbf with SMTP id
- n13-20020a05600c3b8d00b003f193966fbfmr67517wms.4.1685142060245; Fri, 26 May
- 2023 16:01:00 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1685144680; x=1687736680;
+        h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=p2/B2gpADUVSH4+1+wdvhwwOJ3ZLS46dsub4yrmfIrY=;
+        b=O9D8LtBMHlOfvNMj+h2YLkiNOfUP9HmFfC7jwabsBQWoxinAG4x+Ki+ur7Modb6Yz2
+         9yFjgPNiGR6F1H5L0STN1nLV9tjOAEN0AMjYL03z/KKlGbytZgEE5UWF2RpRjGmap0LQ
+         S7sKkzeqc2LFWy/FbGTBS7A8Gq4FLEXJsdfHyOpyijzdMzKbywQsuYJKHeOQ3EE5ocYo
+         41z4V5cFw+juZHjy2I3N+8YLlmoZ2RZhDxM1935ligrOCv0hD1dIyS5Vd4Q3eNy6nhNA
+         lC9c9VhkDgdNyRlQFOR1NSn3nCUyj4EVnYEV8nn//WGi1qx6QR5UaXBJ8L5J/W+sTcvv
+         MMBw==
+X-Gm-Message-State: AC+VfDzNar+3nnEQr4rGeXOxz0YC66jzOTujTG2vhDeLT5FsZawosd7S
+	XwN4xrm1hXStUgYMBR8CzLW7ZE3vH7s=
+X-Google-Smtp-Source: ACHHUZ7YDXs22loXI9Hn4p7O2u7mz3EIOuiyK6CgImdELnj21szlSQpHCqRMIQPES8e6xN/3760vCEBuevA=
+X-Received: from yuzhao.bld.corp.google.com ([2620:15c:183:200:910f:8a15:592b:2087])
+ (user=yuzhao job=sendgmr) by 2002:a25:7343:0:b0:bad:99d:f086 with SMTP id
+ o64-20020a257343000000b00bad099df086mr1339084ybc.10.1685144679852; Fri, 26
+ May 2023 16:44:39 -0700 (PDT)
+Date: Fri, 26 May 2023 17:44:25 -0600
+Message-Id: <20230526234435.662652-1-yuzhao@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230504110003.2548-1-ravi.bangoria@amd.com> <20230504110003.2548-4-ravi.bangoria@amd.com>
- <20230524214133.GA2359762@dev-arch.thelio-3990X> <f02c78e2-34b9-4985-640a-279dae1004a9@amd.com>
- <ZG8KLbZSECiYaKFc@linux.dev> <20230525142031.GU83892@hirez.programming.kicks-ass.net>
- <ZG+FLdP2kkfI1m2Z@linux.dev>
-In-Reply-To: <ZG+FLdP2kkfI1m2Z@linux.dev>
-From: Ian Rogers <irogers@google.com>
-Date: Fri, 26 May 2023 16:00:47 -0700
-Message-ID: <CAP-5=fWYbzmTETgqJ11y22=JaXDM0gnb4qR6KYeRGmFXw08f-Q@mail.gmail.com>
-Subject: Re: [PATCH v4 3/4] perf/core: Remove pmu linear searching code
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Peter Zijlstra <peterz@infradead.org>, Ravi Bangoria <ravi.bangoria@amd.com>, 
-	Nathan Chancellor <nathan@kernel.org>, namhyung@kernel.org, eranian@google.com, 
-	acme@kernel.org, mark.rutland@arm.com, jolsa@kernel.org, bp@alien8.de, 
-	kan.liang@linux.intel.com, adrian.hunter@intel.com, maddy@linux.ibm.com, 
-	x86@kernel.org, linux-perf-users@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, sandipan.das@amd.com, ananth.narayan@amd.com, 
-	santosh.shukla@amd.com, maz@kernel.org, kvmarm@lists.linux.dev
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
+Subject: [PATCH mm-unstable v2 00/10] mm/kvm: locklessly clear the accessed bit
+From: Yu Zhao <yuzhao@google.com>
+To: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alistair Popple <apopple@nvidia.com>, Anup Patel <anup@brainfault.org>, 
+	Ben Gardon <bgardon@google.com>, Borislav Petkov <bp@alien8.de>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Christophe Leroy <christophe.leroy@csgroup.eu>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Fabiano Rosas <farosas@linux.ibm.com>, Gaosheng Cui <cuigaosheng1@huawei.com>, 
+	Gavin Shan <gshan@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
+	James Morse <james.morse@arm.com>, "Jason A. Donenfeld" <Jason@zx2c4.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Michael Larabel <michael@michaellarabel.com>, 
+	Mike Rapoport <rppt@kernel.org>, Nicholas Piggin <npiggin@gmail.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Paul Mackerras <paulus@ozlabs.org>, Peter Xu <peterx@redhat.com>, 
+	Sean Christopherson <seanjc@google.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	linuxppc-dev@lists.ozlabs.org, linux-trace-kernel@vger.kernel.org, 
+	x86@kernel.org, linux-mm@google.com, Yu Zhao <yuzhao@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 25, 2023 at 8:56=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> On Thu, May 25, 2023 at 04:20:31PM +0200, Peter Zijlstra wrote:
-> > On Thu, May 25, 2023 at 07:11:41AM +0000, Oliver Upton wrote:
-> >
-> > > The PMUv3 driver does pass a name, but it relies on getting back an
-> > > allocated pmu id as @type is -1 in the call to perf_pmu_register().
-> > >
-> > > What actually broke is how KVM probes for a default core PMU to use f=
-or
-> > > a guest. kvm_pmu_probe_armpmu() creates a counter w/ PERF_TYPE_RAW an=
-d
-> > > reads the pmu from the returned perf_event. The linear search had the
-> > > effect of eventually stumbling on the correct core PMU and succeeding=
-.
-> > >
-> > > Perf folks: is this WAI for heterogenous systems?
-> >
-> > TBH, I'm not sure. hetero and virt don't mix very well AFAIK and I'm no=
-t
-> > sure what ARM64 does here.
-> >
-> > IIRC the only way is to hard affine things; that is, force vCPU of
-> > 'type' to the pCPU mask of 'type' CPUs.
->
-> We provide absolutely no illusion of consistency across implementations.
-> Userspace can select the PMU type, and then it is a userspace problem
-> affining vCPUs to the right pCPUs.
->
-> And if they get that wrong, we just bail and refuse to run the vCPU.
->
-> > If you don't do that; or let userspace 'override' that, things go
-> > sideways *real* fast.
->
-> Oh yeah, and I wish PMUs were the only problem with these hetero
-> systems...
+TLDR
+====
+This patchset adds a fast path to clear the accessed bit without
+taking kvm->mmu_lock. It can significantly improve the performance of
+guests when the host is under heavy memory pressure.
 
-Just to add some context from what I understand. There are inbuilt
-type numbers for PMUs:
-https://git.kernel.org/pub/scm/linux/kernel/git/acme/linux.git/tree/include=
-/uapi/linux/perf_event.h?h=3Dperf-tools-next#n34
-so the PMU generally called /sys/devices/cpu should have type 4 (ARM
-give it another name). For heterogeneous ARM there is a single PMU and
-the same events are programmed regardless of whether it is a big or a
-little core - the cpumask lists all CPUs. On heterogeneous (aka
-hybrid) Intel there are two PMUs, the performance cores have a PMU
-called /sys/devices/cpu_core and it has type 4, the atom cores have a
-PMU of /sys/devices/cpu_atom and on my Alderlake the type number is 8.
-The cpu_core and cpu_atom PMUs list the CPUs that are valid for raw
-style events, where the config values in perf_event_attr contains all
-of the event programming data. There are also legacy events of
-PERF_TYPE_HARDWARE and PERF_TYPE_HW_CACHE where to specify the PMU the
-type is encoded in the high (and unused) 32-bits of config - so the
-type would be something like PERF_TYPE_HARDWARE and then config would
-be "value | (4 << 32)" for the performance core or "value | (8 << 32)"
-for the atom.
+ChromeOS has been using a similar approach [1] since mid 2021 and it
+was proven successful on tens of millions devices.
 
-If the vCPU and pCPUs mappings vary then there is a chance to change
-the CPU mask on heterogeneous Intel, but it seems if the event is open
-and you move from between core types then things are going to break.
+This v2 addressed previous requests [2] on refactoring code, removing
+inaccurate/redundant texts, etc.
 
-Thanks,
-Ian
+[1] https://crrev.com/c/2987928
+[2] https://lore.kernel.org/r/20230217041230.2417228-1-yuzhao@google.com/
 
-> > Mark gonna have to look at this.
->
-> Cool. I'll go ahead with the KVM cleanup regardless of the outcome.
->
-> --
-> Thanks,
-> Oliver
+Overview
+========
+The goal of this patchset is to optimize the performance of guests
+when the host memory is overcommitted. It focuses on a simple yet
+common case where hardware sets the accessed bit in KVM PTEs and VMs
+are not nested. Complex cases fall back to the existing slow path
+where kvm->mmu_lock is then taken.
+
+The fast path relies on two techniques to safely clear the accessed
+bit: RCU and CAS. The former protects KVM page tables from being
+freed while the latter clears the accessed bit atomically against
+both the hardware and other software page table walkers.
+
+A new mmu_notifier_ops member, test_clear_young(), supersedes the
+existing clear_young() and test_young(). This extended callback can
+operate on a range of KVM PTEs individually according to a bitmap, if
+the caller provides it.
+
+Evaluation
+==========
+An existing selftest can quickly demonstrate the effectiveness of
+this patchset. On a generic workstation equipped with 128 CPUs and
+256GB DRAM:
+
+  $ sudo max_guest_memory_test -c 64 -m 250 -s 250
+  
+  MGLRU         run2
+  ------------------
+  Before [1]    ~64s
+  After         ~51s
+  
+  kswapd (MGLRU before)
+    100.00%  balance_pgdat
+      100.00%  shrink_node
+        100.00%  shrink_one
+          99.99%  try_to_shrink_lruvec
+            99.71%  evict_folios
+              97.29%  shrink_folio_list
+  ==>>          13.05%  folio_referenced
+                  12.83%  rmap_walk_file
+                    12.31%  folio_referenced_one
+                      7.90%  __mmu_notifier_clear_young
+                        7.72%  kvm_mmu_notifier_clear_young
+                          7.34%  _raw_write_lock
+  
+  kswapd (MGLRU after)
+    100.00%  balance_pgdat
+      100.00%  shrink_node
+        100.00%  shrink_one
+          99.99%  try_to_shrink_lruvec
+            99.59%  evict_folios
+              80.37%  shrink_folio_list
+  ==>>          3.74%  folio_referenced
+                  3.59%  rmap_walk_file
+                    3.19%  folio_referenced_one
+                      2.53%  lru_gen_look_around
+                        1.06%  __mmu_notifier_test_clear_young
+
+Comprehensive benchmarks are coming soon.
+
+[1] "mm: rmap: Don't flush TLB after checking PTE young for page
+     reference" was included so that the comparison is apples to
+     apples.
+    https://lore.kernel.org/r/20220706112041.3831-1-21cnbao@gmail.com/
+
+Yu Zhao (10):
+  mm/kvm: add mmu_notifier_ops->test_clear_young()
+  mm/kvm: use mmu_notifier_ops->test_clear_young()
+  kvm/arm64: export stage2_try_set_pte() and macros
+  kvm/arm64: make stage2 page tables RCU safe
+  kvm/arm64: add kvm_arch_test_clear_young()
+  kvm/powerpc: make radix page tables RCU safe
+  kvm/powerpc: add kvm_arch_test_clear_young()
+  kvm/x86: move tdp_mmu_enabled and shadow_accessed_mask
+  kvm/x86: add kvm_arch_test_clear_young()
+  mm: multi-gen LRU: use mmu_notifier_test_clear_young()
+
+ Documentation/admin-guide/mm/multigen_lru.rst |   6 +-
+ arch/arm64/include/asm/kvm_host.h             |   6 +
+ arch/arm64/include/asm/kvm_pgtable.h          |  55 +++++++
+ arch/arm64/kvm/arm.c                          |   1 +
+ arch/arm64/kvm/hyp/pgtable.c                  |  61 +-------
+ arch/arm64/kvm/mmu.c                          |  53 ++++++-
+ arch/powerpc/include/asm/kvm_host.h           |   8 +
+ arch/powerpc/include/asm/kvm_ppc.h            |   1 +
+ arch/powerpc/kvm/book3s.c                     |   6 +
+ arch/powerpc/kvm/book3s.h                     |   1 +
+ arch/powerpc/kvm/book3s_64_mmu_radix.c        |  65 +++++++-
+ arch/powerpc/kvm/book3s_hv.c                  |   5 +
+ arch/x86/include/asm/kvm_host.h               |  13 ++
+ arch/x86/kvm/mmu.h                            |   6 -
+ arch/x86/kvm/mmu/spte.h                       |   1 -
+ arch/x86/kvm/mmu/tdp_mmu.c                    |  34 +++++
+ include/linux/kvm_host.h                      |  22 +++
+ include/linux/mmu_notifier.h                  |  79 ++++++----
+ include/linux/mmzone.h                        |   6 +-
+ include/trace/events/kvm.h                    |  15 --
+ mm/mmu_notifier.c                             |  48 ++----
+ mm/rmap.c                                     |   8 +-
+ mm/vmscan.c                                   | 139 ++++++++++++++++--
+ virt/kvm/kvm_main.c                           | 114 ++++++++------
+ 24 files changed, 546 insertions(+), 207 deletions(-)
+
+-- 
+2.41.0.rc0.172.g3f132b7071-goog
+
