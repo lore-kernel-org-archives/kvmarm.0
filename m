@@ -1,25 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32420171A0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41AE6261F4
 	for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 14:33:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAB81C4339E;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63449C433AC;
 	Fri, 26 May 2023 14:33:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1685111634;
-	bh=RKBJeUiRouPE1bzbetDl/6+P89/xc2hCkSFuNbmCwpA=;
+	bh=Eb4P+yvkDgqtafWekJ5k0MGdRtAE8LRnoYczU5+CLgY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mHyXUlZSJ19LG9+Qga4G5hNza1n7qiZN47MJMWKN91WBKo3UPO9BbFOA5ufOnSNEk
-	 6ZgYTaYGPqLb9q4QexKImkjC9tJwM8Fin7eKXLwhi1y0UcAgF5vKHkOAdIbVaS/KQO
-	 wBXpfNd3wOhz4o9Agr/L2h/lpGmfs3PpmByrOlPwCpVNE1jqymGEEcwhfOxEPft9Vj
-	 ocBpoNtjrzLNsrmfoiUecZ6d4SgBpnE7CYyClr0iDzYz+ITNA2W4BFUOtaJ4+ijvpt
-	 hW0rkA5IH+196D7OHvxuf7OF68lSJcei59ykWUnGaxRctt9GUYBNjIk4dkzg6z53pU
-	 +U5tudgVGnuVQ==
+	b=U+jbSdpAnVTx8gdgO3M4sW3Ek2fLcruyosOEdOe7fjRZRa+ZxHEcQwXsjOm/iFbP2
+	 TxCE651RXucpnzPekydl4mAPYIkT91kRayQoQZ9OCW89vQhrdH5epwUGW7qPMFxj1i
+	 VSH05iaXKPpL1CCReAmV1iE/2bchMxOYAdRpe2Ie4nQXHtccFzMEROGpEgtWnTt8uM
+	 8STSXnRusIYeJLTcOIRN/tGwqkmHobacKE7k00aFUy3+osVAU/h2EoYBfC7ceMJEeZ
+	 t4kZHDjPDKbnQjBYCLab1EnGtLzA7pYtNv56bhnYkZg8bllwFH/VU94P3nhyGRa6j8
+	 Qtk1IxmN3hQnQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1q2YVs-000aHS-Qk;
+	id 1q2YVs-000aHS-Je;
 	Fri, 26 May 2023 15:33:52 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -32,9 +32,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Quentin Perret <qperret@google.com>,
 	Will Deacon <will@kernel.org>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v2 06/17] arm64: Allow EL1 physical timer access when running VHE
-Date: Fri, 26 May 2023 15:33:37 +0100
-Message-Id: <20230526143348.4072074-7-maz@kernel.org>
+Subject: [PATCH v2 05/17] arm64: Don't enable VHE for the kernel if OVERRIDE_HVHE is set
+Date: Fri, 26 May 2023 15:33:36 +0100
+Message-Id: <20230526143348.4072074-6-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230526143348.4072074-1-maz@kernel.org>
 References: <20230526143348.4072074-1-maz@kernel.org>
@@ -50,54 +50,39 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-To initialise the timer access from EL2 when HCR_EL2.E2H is set,
-we must make use the CNTHCTL_EL2 formap used is appropriate.
+If the OVERRIDE_HVHE SW override is set (as a precursor of
+the KVM_HVHE capability), do not enable VHE for the kernel
+and drop to EL1 as if VHE was either disabled or unavailable.
 
-This amounts to shifting the timer/counter enable bits by 10
-to the left.
+Further changes will enable VHE at EL2 only, with the kernel
+still running at EL1.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/el2_setup.h | 5 +++++
- arch/arm64/kvm/hyp/nvhe/hyp-init.S | 9 +++++++++
- 2 files changed, 14 insertions(+)
+ arch/arm64/kernel/hyp-stub.S | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-index 037724b19c5c..225bf1f2514d 100644
---- a/arch/arm64/include/asm/el2_setup.h
-+++ b/arch/arm64/include/asm/el2_setup.h
-@@ -34,6 +34,11 @@
-  */
- .macro __init_el2_timers
- 	mov	x0, #3				// Enable EL1 physical timers
-+	mrs	x1, hcr_el2
-+	and	x1, x1, #HCR_E2H
-+	cbz	x1, .LnVHE_\@
-+	lsl	x0, x0, #10
-+.LnVHE_\@:
- 	msr	cnthctl_el2, x0
- 	msr	cntvoff_el2, xzr		// Clear virtual offset
- .endm
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-index a6d67c2bb5ae..f9ee10e29497 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-@@ -95,6 +95,15 @@ SYM_CODE_START_LOCAL(___kvm_hyp_init)
- 	ldr	x1, [x0, #NVHE_INIT_HCR_EL2]
- 	msr	hcr_el2, x1
+diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
+index 9439240c3fcf..5c71e1019545 100644
+--- a/arch/arm64/kernel/hyp-stub.S
++++ b/arch/arm64/kernel/hyp-stub.S
+@@ -82,7 +82,15 @@ SYM_CODE_START_LOCAL(__finalise_el2)
+ 	tbnz	x1, #0, 1f
  
-+	mov	x2, #HCR_E2H
-+	and	x2, x1, x2
-+	cbz	x2, 1f
+ 	// Needs to be VHE capable, obviously
+-	check_override id_aa64mmfr1 ID_AA64MMFR1_EL1_VH_SHIFT 2f 1f x1 x2
++	check_override id_aa64mmfr1 ID_AA64MMFR1_EL1_VH_SHIFT 0f 1f x1 x2
 +
-+	mrs	x1, cnthctl_el2
-+	and	x1, x1, #~(BIT(0) | BIT(1))
-+	orr	x1, x1, #(BIT(10) | BIT(11))
-+	msr	cnthctl_el2, x1
-+1:
- 	ldr	x1, [x0, #NVHE_INIT_VTTBR]
- 	msr	vttbr_el2, x1
++0:	// Check whether we only want the hypervisor to run VHE, not the kernel
++	adr_l	x1, arm64_sw_feature_override
++	ldr	x2, [x1, FTR_OVR_VAL_OFFSET]
++	ldr	x1, [x1, FTR_OVR_MASK_OFFSET]
++	and	x2, x2, x1
++	ubfx	x2, x2, #ARM64_SW_FEATURE_OVERRIDE_HVHE, #4
++	cbz	x2, 2f
  
+ 1:	mov_q	x0, HVC_STUB_ERR
+ 	eret
 -- 
 2.34.1
 
