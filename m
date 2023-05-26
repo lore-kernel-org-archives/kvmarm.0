@@ -1,25 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 862C7261F1
-	for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 14:33:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 392A8C433A4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32420171A0
+	for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 14:33:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAB81C4339E;
 	Fri, 26 May 2023 14:33:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1685111634;
-	bh=SGsj8ICM0QC50tgffybqC2QCsVSiUinMmvMKn79p3gQ=;
+	bh=RKBJeUiRouPE1bzbetDl/6+P89/xc2hCkSFuNbmCwpA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZXVV2DSmC3ewutGb+m6tch6/0/KqebZxiVCgS9tz32xfawLh+mGHaPaHdISOeMbF4
-	 O91l1xhbZC4+G6HKh6gFjzPasVwI+SH69npCZKuaciTYFBP+L4L5NIRO2S1SMYxFEM
-	 YjOj+48PDrEMXNV1rkXCbpJzrKClO5Yp2EkA4Rln5ETXQMMqnvUL040J6auxuDqd9O
-	 oh/FXGuIqkAMhDF0uQ710nPFx6vVwqntpDRdDfQ0dPPPFT+cZay2fhFOzQ/msg6zzk
-	 sz0LLm6MmZG1YeVW/Okho52GJHR4LBLFU57U3L4H7OvKC0JF2QYOENfn7wRzLJ2394
-	 ua3Il5lUHnWBA==
+	b=mHyXUlZSJ19LG9+Qga4G5hNza1n7qiZN47MJMWKN91WBKo3UPO9BbFOA5ufOnSNEk
+	 6ZgYTaYGPqLb9q4QexKImkjC9tJwM8Fin7eKXLwhi1y0UcAgF5vKHkOAdIbVaS/KQO
+	 wBXpfNd3wOhz4o9Agr/L2h/lpGmfs3PpmByrOlPwCpVNE1jqymGEEcwhfOxEPft9Vj
+	 ocBpoNtjrzLNsrmfoiUecZ6d4SgBpnE7CYyClr0iDzYz+ITNA2W4BFUOtaJ4+ijvpt
+	 hW0rkA5IH+196D7OHvxuf7OF68lSJcei59ykWUnGaxRctt9GUYBNjIk4dkzg6z53pU
+	 +U5tudgVGnuVQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1q2YVs-000aHS-CW;
+	id 1q2YVs-000aHS-Qk;
 	Fri, 26 May 2023 15:33:52 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -32,9 +32,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Quentin Perret <qperret@google.com>,
 	Will Deacon <will@kernel.org>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v2 04/17] arm64: Add KVM_HVHE capability and has_hvhe() predicate
-Date: Fri, 26 May 2023 15:33:35 +0100
-Message-Id: <20230526143348.4072074-5-maz@kernel.org>
+Subject: [PATCH v2 06/17] arm64: Allow EL1 physical timer access when running VHE
+Date: Fri, 26 May 2023 15:33:37 +0100
+Message-Id: <20230526143348.4072074-7-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230526143348.4072074-1-maz@kernel.org>
 References: <20230526143348.4072074-1-maz@kernel.org>
@@ -50,94 +50,54 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Expose a capability keying the hVHE feature as well as a new
-predicate testing it. Nothing is so far using it, and nothing
-is enabling it yet.
+To initialise the timer access from EL2 when HCR_EL2.E2H is set,
+we must make use the CNTHCTL_EL2 formap used is appropriate.
+
+This amounts to shifting the timer/counter enable bits by 10
+to the left.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/cpufeature.h |  1 +
- arch/arm64/include/asm/virt.h       |  8 ++++++++
- arch/arm64/kernel/cpufeature.c      | 15 +++++++++++++++
- arch/arm64/tools/cpucaps            |  1 +
- 4 files changed, 25 insertions(+)
+ arch/arm64/include/asm/el2_setup.h | 5 +++++
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S | 9 +++++++++
+ 2 files changed, 14 insertions(+)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index bc1009890180..3d4b547ae312 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -16,6 +16,7 @@
- #define cpu_feature(x)		KERNEL_HWCAP_ ## x
+diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+index 037724b19c5c..225bf1f2514d 100644
+--- a/arch/arm64/include/asm/el2_setup.h
++++ b/arch/arm64/include/asm/el2_setup.h
+@@ -34,6 +34,11 @@
+  */
+ .macro __init_el2_timers
+ 	mov	x0, #3				// Enable EL1 physical timers
++	mrs	x1, hcr_el2
++	and	x1, x1, #HCR_E2H
++	cbz	x1, .LnVHE_\@
++	lsl	x0, x0, #10
++.LnVHE_\@:
+ 	msr	cnthctl_el2, x0
+ 	msr	cntvoff_el2, xzr		// Clear virtual offset
+ .endm
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+index a6d67c2bb5ae..f9ee10e29497 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+@@ -95,6 +95,15 @@ SYM_CODE_START_LOCAL(___kvm_hyp_init)
+ 	ldr	x1, [x0, #NVHE_INIT_HCR_EL2]
+ 	msr	hcr_el2, x1
  
- #define ARM64_SW_FEATURE_OVERRIDE_NOKASLR	0
-+#define ARM64_SW_FEATURE_OVERRIDE_HVHE		4
- 
- #ifndef __ASSEMBLY__
- 
-diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-index 91029709d133..5f84a87a6a2d 100644
---- a/arch/arm64/include/asm/virt.h
-+++ b/arch/arm64/include/asm/virt.h
-@@ -145,6 +145,14 @@ static __always_inline bool is_protected_kvm_enabled(void)
- 		return cpus_have_final_cap(ARM64_KVM_PROTECTED_MODE);
- }
- 
-+static __always_inline bool has_hvhe(void)
-+{
-+	if (is_vhe_hyp_code())
-+		return false;
++	mov	x2, #HCR_E2H
++	and	x2, x1, x2
++	cbz	x2, 1f
 +
-+	return cpus_have_final_cap(ARM64_KVM_HVHE);
-+}
-+
- static inline bool is_hyp_nvhe(void)
- {
- 	return is_hyp_mode_available() && !is_kernel_in_hyp_mode();
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 2d2b7bb5fa0c..04ef60571b37 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -1998,6 +1998,15 @@ static bool has_nested_virt_support(const struct arm64_cpu_capabilities *cap,
- 	return true;
- }
++	mrs	x1, cnthctl_el2
++	and	x1, x1, #~(BIT(0) | BIT(1))
++	orr	x1, x1, #(BIT(10) | BIT(11))
++	msr	cnthctl_el2, x1
++1:
+ 	ldr	x1, [x0, #NVHE_INIT_VTTBR]
+ 	msr	vttbr_el2, x1
  
-+static bool hvhe_possible(const struct arm64_cpu_capabilities *entry,
-+			  int __unused)
-+{
-+	u64 val;
-+
-+	val = arm64_sw_feature_override.val & arm64_sw_feature_override.mask;
-+	return cpuid_feature_extract_unsigned_field(val, ARM64_SW_FEATURE_OVERRIDE_HVHE);
-+}
-+
- #ifdef CONFIG_ARM64_PAN
- static void cpu_enable_pan(const struct arm64_cpu_capabilities *__unused)
- {
-@@ -2643,6 +2652,12 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.cpu_enable = cpu_enable_dit,
- 		ARM64_CPUID_FIELDS(ID_AA64PFR0_EL1, DIT, IMP)
- 	},
-+	{
-+		.desc = "VHE for hypervisor only",
-+		.capability = ARM64_KVM_HVHE,
-+		.type = ARM64_CPUCAP_STRICT_BOOT_CPU_FEATURE,
-+		.matches = hvhe_possible,
-+	},
- 	{},
- };
- 
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index 40ba95472594..3c23a55d7c2f 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -47,6 +47,7 @@ HAS_TLB_RANGE
- HAS_VIRT_HOST_EXTN
- HAS_WFXT
- HW_DBM
-+KVM_HVHE
- KVM_PROTECTED_MODE
- MISMATCHED_CACHE_TYPE
- MTE
 -- 
 2.34.1
 
