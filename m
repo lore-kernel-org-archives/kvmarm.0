@@ -1,19 +1,19 @@
-Received: from out-52.mta0.migadu.com (out-52.mta0.migadu.com [91.218.175.52])
+Received: from out-40.mta0.migadu.com (out-40.mta0.migadu.com [91.218.175.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E72642D242
-	for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 22:18:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0371D2D242
+	for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 22:18:02 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1685139479;
+	t=1685139481;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=JpFLyH8IT44flboYFu+zqZryYdBFcijp7J6b2FkLdSU=;
-	b=dEumr27VL75Ab1mNv5cYX+C2+pScbWxyPIs1qioG52w8CsmB8pPzSPuCy7lzp5ukjAnj5X
-	iG/kqdaBxa36SymKwpZ+OhKetqA1P2Zwn/nTn/fFK3/0C12G8Pgc6jmsuqYUbrIm/qz8Wa
-	vRkyPmTDraqV+SViU+JLAmnIXCeG0DY=
+	bh=Eu6GarTKeRfflcMAKkkjKhr+irb1TKgaVxp9hpyaxME=;
+	b=IK9ZMmaW5p0DtFduOxXs0dCyOW83cZMrv1x0ts0jC8iaEV2FJ6eW2zhto7neW1FLqE+Aph
+	iWaCF1jYLgdkv4x2JBHi2Wq03lD2yGapP/OKksExDMcGDLm9YD0Hf6r7VhFUYpt9xEAD4P
+	upooHvnnoSb8nYTQHhO3UsORzJBizp8=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -25,9 +25,9 @@ Cc: kvm@vger.kernel.org,
 	Julien Thierry <julien.thierry.kdev@gmail.com>,
 	Salil Mehta <salil.mehta@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH kvmtool 18/21] aarch64: psci: Implement AFFINITY_INFO
-Date: Fri, 26 May 2023 22:17:09 +0000
-Message-ID: <20230526221712.317287-19-oliver.upton@linux.dev>
+Subject: [PATCH kvmtool 19/21] aarch64: psci: Implement MIGRATE_INFO_TYPE
+Date: Fri, 26 May 2023 22:17:10 +0000
+Message-ID: <20230526221712.317287-20-oliver.upton@linux.dev>
 In-Reply-To: <20230526221712.317287-1-oliver.upton@linux.dev>
 References: <20230526221712.317287-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -39,132 +39,33 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Implement support for PSCI AFFINITY_INFO by iteratively searching all of
-the vCPUs in a VM for those that match the specified affinity. Pause the
-VM to avoid racing against other PSCI calls in the system that might
-change the power state of the vCPUs.
+Let the guest know that our PSCI implementation is entirely oblivious to
+the existence of a Trusted OS, and thus shouldn't care about it.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arm/aarch64/include/kvm/kvm-cpu-arch.h | 12 +++++-
- arm/aarch64/psci.c                     | 59 ++++++++++++++++++++++++++
- 2 files changed, 70 insertions(+), 1 deletion(-)
+ arm/aarch64/psci.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-index 264d0016f7db..5dced04d4035 100644
---- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-@@ -5,12 +5,22 @@
- 
- #include "arm-common/kvm-cpu-arch.h"
- 
--#define ARM_MPIDR_HWID_BITMASK	0xFF00FFFFFFUL
- #define ARM_CPU_ID		3, 0, 0, 0
- #define ARM_CPU_ID_MPIDR	5
- #define ARM_CPU_CTRL		3, 0, 1, 0
- #define ARM_CPU_CTRL_SCTLR_EL1	0
- 
-+#define ARM_MPIDR_HWID_BITMASK	0xFF00FFFFFFUL
-+#define ARM_MPIDR_LEVEL_BITS_SHIFT	3
-+#define ARM_MPIDR_LEVEL_BITS	(1 << ARM_MPIDR_LEVEL_BITS_SHIFT)
-+#define ARM_MPIDR_LEVEL_MASK	((1 << ARM_MPIDR_LEVEL_BITS) - 1)
-+
-+#define ARM_MPIDR_LEVEL_SHIFT(level) \
-+	(((1 << level) >> 1) << ARM_MPIDR_LEVEL_BITS_SHIFT)
-+
-+#define ARM_MPIDR_AFFINITY_LEVEL(mpidr, level) \
-+	((mpidr >> ARM_MPIDR_LEVEL_SHIFT(level)) & ARM_MPIDR_LEVEL_MASK)
-+
- static inline __u64 __core_reg_id(__u64 offset)
- {
- 	__u64 id = KVM_REG_ARM64 | KVM_REG_ARM_CORE | offset;
 diff --git a/arm/aarch64/psci.c b/arm/aarch64/psci.c
-index 7bd3ba9d9d75..e32c47e6a2c9 100644
+index e32c47e6a2c9..c33e63bdc3ef 100644
 --- a/arm/aarch64/psci.c
 +++ b/arm/aarch64/psci.c
-@@ -6,6 +6,16 @@
- #include <linux/psci.h>
- #include <linux/types.h>
- 
-+#define AFFINITY_MASK(level)	~((0x1UL << ((level) * ARM_MPIDR_LEVEL_BITS)) - 1)
-+
-+static unsigned long psci_affinity_mask(unsigned long affinity_level)
-+{
-+	if (affinity_level <= 3)
-+		return ARM_MPIDR_HWID_BITMASK & AFFINITY_MASK(affinity_level);
-+
-+	return 0;
-+}
-+
- static void psci_features(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
- {
- 	u32 arg = smccc_get_arg(vcpu, 1);
-@@ -20,6 +30,8 @@ static void psci_features(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
- 	case PSCI_0_2_FN_CPU_OFF:
- 	case PSCI_0_2_FN_CPU_ON:
+@@ -32,6 +32,7 @@ static void psci_features(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
  	case PSCI_0_2_FN64_CPU_ON:
-+	case PSCI_0_2_FN_AFFINITY_INFO:
-+	case PSCI_0_2_FN64_AFFINITY_INFO:
+ 	case PSCI_0_2_FN_AFFINITY_INFO:
+ 	case PSCI_0_2_FN64_AFFINITY_INFO:
++	case PSCI_0_2_FN_MIGRATE_INFO_TYPE:
  	case ARM_SMCCC_VERSION_FUNC_ID:
  		res->a0 = PSCI_RET_SUCCESS;
  		break;
-@@ -110,6 +122,49 @@ out_continue:
- 	kvm_cpu__continue_vm(vcpu);
- }
- 
-+static void affinity_info(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
-+{
-+	u64 target_affinity = smccc_get_arg(vcpu, 1);
-+	u64 lowest_level = smccc_get_arg(vcpu, 2);
-+	u64 mpidr_mask = psci_affinity_mask(lowest_level);
-+	struct kvm *kvm = vcpu->kvm;
-+	bool matched = false;
-+	int i;
-+
-+	if (!psci_valid_affinity(target_affinity) || lowest_level > 3) {
-+		res->a0 = PSCI_RET_INVALID_PARAMS;
-+		return;
-+	}
-+
-+	kvm_cpu__pause_vm(vcpu);
-+
-+	for (i = 0; i < kvm->nrcpus; i++) {
-+		struct kvm_cpu *tmp = kvm->cpus[i];
-+		u64 mpidr = kvm_cpu__get_vcpu_mpidr(tmp);
-+		struct kvm_mp_state mp_state;
-+
-+		if ((mpidr & mpidr_mask) != target_affinity)
-+			continue;
-+
-+		if (ioctl(tmp->vcpu_fd, KVM_GET_MP_STATE, &mp_state))
-+			die_perror("KVM_GET_MP_STATE failed");
-+
-+		if (mp_state.mp_state != KVM_MP_STATE_STOPPED) {
-+			res->a0 = PSCI_0_2_AFFINITY_LEVEL_ON;
-+			goto out_continue;
-+		}
-+
-+		matched = true;
-+	}
-+
-+	if (matched)
-+		res->a0 = PSCI_0_2_AFFINITY_LEVEL_OFF;
-+	else
-+		res->a0 = PSCI_RET_INVALID_PARAMS;
-+out_continue:
-+	kvm_cpu__continue_vm(vcpu);
-+}
-+
- void handle_psci(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
- {
- 	switch (vcpu->kvm_run->hypercall.nr) {
-@@ -130,6 +185,10 @@ void handle_psci(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
- 	case PSCI_0_2_FN64_CPU_ON:
- 		cpu_on(vcpu, res);
+@@ -189,6 +190,10 @@ void handle_psci(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
+ 	case PSCI_0_2_FN64_AFFINITY_INFO:
+ 		affinity_info(vcpu, res);
  		break;
-+	case PSCI_0_2_FN_AFFINITY_INFO:
-+	case PSCI_0_2_FN64_AFFINITY_INFO:
-+		affinity_info(vcpu, res);
++	case PSCI_0_2_FN_MIGRATE_INFO_TYPE:
++		/* Trusted OS not present */
++		res->a0 = PSCI_0_2_TOS_MP;
 +		break;
  	default:
  		res->a0 = PSCI_RET_NOT_SUPPORTED;
