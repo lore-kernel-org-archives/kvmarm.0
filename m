@@ -1,25 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 222DD1EA6F
-	for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 14:47:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6498C433D2;
-	Fri, 26 May 2023 14:47:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347EE1EA6F
+	for <kvmarm@lists.linux.dev>; Fri, 26 May 2023 14:47:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AF54C433D2;
+	Fri, 26 May 2023 14:47:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1685112420;
-	bh=0IXbsbrm0m3kqxst+/4HomRh3sFyzCQF1ni7ZpdNCX0=;
+	s=k20201202; t=1685112423;
+	bh=XkWyzW+sSMEWSg65caOPf/zhuNHxIwdjYYA7HpLQriM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aA4tSc8yfZRbSH/UoUppoWe8h9Mog71lGo53BdHJ/9pv5h0ut6xY5EK7t6+vSP5bN
-	 lkVNRarX8iWzdT15xr3EgzGnLZg3enTeZitkdu3DC5KVGR6cs5knfgPJq7T0ryGeL+
-	 cIUe1eKqeAEu1eonQTEie4UoIVYn6AnayWRDhx5DccUPxjdMTlgJpJCBx1WlGtxX8A
-	 FLDA8VGi9/bOA+MY8lXfMyL4qMo7LeR7g0jccOZ3ystSosKtZtQlLq+aO1FqMimm4H
-	 QwY+5Mswz6aKGllXfFDeu3tLYbFept+DCWwsvSFqNybEJaHYhaV020H3V7EKfAYRH+
-	 1ZGBYni1jhyiA==
+	b=VipzasFZ7QnwjDLqr+Ww2In84+92fEp8yCoQBpVscbftPSrPN5IRxUyqRm0YjMik0
+	 JfZEOYwZQeS20pBrYYGrK1ylsKOpG4kyCacs/oMOG9DO8XUCcm7h4e9g6zlLvkIop2
+	 H3LUsKvsD0o0RL3LaGgVxzmeX2mGilYLVsfJtBKvFa/egPR0feNPhHDfdV2ttVZ0tY
+	 7OCzqzaaI4l6RLmTMynqZq5z3FR5LZnipPxc1/bbPRtywbEJD/X+ZWm/ttaRkADelw
+	 p4dSNROj3Bpux2hdV6X8jhJwoUWasxwBU9cu6BjzyhcEx294MvU5DoGpLGKrJwLgZo
+	 67K2WtyV53f6w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1q2YVu-000aHS-Kx;
+	id 1q2YVu-000aHS-3E;
 	Fri, 26 May 2023 15:33:54 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -32,9 +32,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Quentin Perret <qperret@google.com>,
 	Will Deacon <will@kernel.org>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v2 13/17] KVM: arm64: Rework CPTR_EL2 programming for HVHE configuration
-Date: Fri, 26 May 2023 15:33:44 +0100
-Message-Id: <20230526143348.4072074-14-maz@kernel.org>
+Subject: [PATCH v2 11/17] KVM: arm64: Disable TTBR1_EL2 when using ARM64_KVM_HVHE
+Date: Fri, 26 May 2023 15:33:42 +0100
+Message-Id: <20230526143348.4072074-12-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230526143348.4072074-1-maz@kernel.org>
 References: <20230526143348.4072074-1-maz@kernel.org>
@@ -50,294 +50,36 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Just like we repainted the early arm64 code, we need to update
-the CPTR_EL2 accesses that are taking place in the nVHE code
-when hVHE is used, making them look as if they were CPACR_EL1
-accesses. Just like the VHE code.
+When using hVHE, we end-up with two TTBRs at EL2. That's great,
+but we're not quite ready for this just yet.
+
+Disable TTBR1_EL2 by setting TCR_EL2.EPD1 so that we only
+translate via TTBR0_EL2.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_arm.h        |  4 +---
- arch/arm64/include/asm/kvm_emulate.h    | 31 +++++++++++++++++++++++++
- arch/arm64/kvm/arm.c                    |  2 +-
- arch/arm64/kvm/fpsimd.c                 |  4 ++--
- arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  6 ++++-
- arch/arm64/kvm/hyp/nvhe/pkvm.c          | 24 ++++++++++++++-----
- arch/arm64/kvm/hyp/nvhe/switch.c        | 28 ++++++++++++----------
- arch/arm64/kvm/hyp/vhe/switch.c         |  2 +-
- arch/arm64/kvm/sys_regs.c               |  2 +-
- 10 files changed, 77 insertions(+), 28 deletions(-)
+ arch/arm64/kvm/arm.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index baef29fcbeee..e448f8f7fd7e 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -285,7 +285,6 @@
- #define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
- #define CPTR_EL2_TZ	(1 << 8)
- #define CPTR_NVHE_EL2_RES1	0x000032ff /* known RES1 bits in CPTR_EL2 (nVHE) */
--#define CPTR_EL2_DEFAULT	CPTR_NVHE_EL2_RES1
- #define CPTR_NVHE_EL2_RES0	(GENMASK(63, 32) |	\
- 				 GENMASK(29, 21) |	\
- 				 GENMASK(19, 14) |	\
-@@ -347,8 +346,7 @@
- 	ECN(SOFTSTP_CUR), ECN(WATCHPT_LOW), ECN(WATCHPT_CUR), \
- 	ECN(BKPT32), ECN(VECTOR32), ECN(BRK64), ECN(ERET)
- 
--#define CPACR_EL1_DEFAULT	(CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |\
--				 CPACR_EL1_ZEN_EL1EN)
-+#define CPACR_EL1_TTA		(1 << 28)
- 
- #define kvm_mode_names				\
- 	{ PSR_MODE_EL0t,	"EL0t" },	\
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index b31b32ecbe2d..4d82e622240d 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -570,4 +570,35 @@ static inline bool vcpu_has_feature(struct kvm_vcpu *vcpu, int feature)
- 	return test_bit(feature, vcpu->arch.features);
- }
- 
-+static __always_inline u64 kvm_get_reset_cptr_el2(struct kvm_vcpu *vcpu)
-+{
-+	u64 val;
-+
-+	if (has_vhe()) {
-+		val = (CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |
-+		       CPACR_EL1_ZEN_EL1EN);
-+	} else if (has_hvhe()) {
-+		val = (CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN);
-+	} else {
-+		val = CPTR_NVHE_EL2_RES1;
-+
-+		if (vcpu_has_sve(vcpu) &&
-+		    (vcpu->arch.fp_state == FP_STATE_GUEST_OWNED))
-+			val |= CPTR_EL2_TZ;
-+		if (cpus_have_final_cap(ARM64_SME))
-+			val &= ~CPTR_EL2_TSM;
-+	}
-+
-+	return val;
-+}
-+
-+static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
-+{
-+	u64 val = kvm_get_reset_cptr_el2(vcpu);
-+
-+	if (has_vhe() || has_hvhe())
-+		write_sysreg(val, cpacr_el1);
-+	else
-+		write_sysreg(val, cptr_el2);
-+}
- #endif /* __ARM64_KVM_EMULATE_H__ */
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 35b32cb6faa5..01c975a0acc9 100644
+index c12276dd2cf4..35b32cb6faa5 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -1240,7 +1240,7 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
- 	}
+@@ -1666,7 +1666,13 @@ static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
  
- 	vcpu_reset_hcr(vcpu);
--	vcpu->arch.cptr_el2 = CPTR_EL2_DEFAULT;
-+	vcpu->arch.cptr_el2 = kvm_get_reset_cptr_el2(vcpu);
+ 	params->mair_el2 = read_sysreg(mair_el1);
  
- 	/*
- 	 * Handle the "start in power-off" case.
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index 1279949599b5..62b20ea024a0 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -172,7 +172,7 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
- 
- 	/*
- 	 * If we have VHE then the Hyp code will reset CPACR_EL1 to
--	 * CPACR_EL1_DEFAULT and we need to reenable SME.
-+	 * the default value and we need to reenable SME.
- 	 */
- 	if (has_vhe() && system_supports_sme()) {
- 		/* Also restore EL0 state seen on entry */
-@@ -202,7 +202,7 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
- 		/*
- 		 * The FPSIMD/SVE state in the CPU has not been touched, and we
- 		 * have SVE (and VHE): CPACR_EL1 (alias CPTR_EL2) has been
--		 * reset to CPACR_EL1_DEFAULT by the Hyp code, disabling SVE
-+		 * reset by kvm_reset_cptr_el2() in the Hyp code, disabling SVE
- 		 * for EL0.  To avoid spurious traps, restore the trap state
- 		 * seen by kvm_arch_vcpu_load_fp():
- 		 */
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index c41166f1a1dd..961681f2aed7 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -184,7 +184,7 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	/* Valid trap.  Switch the context: */
- 
- 	/* First disable enough traps to allow us to update the registers */
--	if (has_vhe()) {
-+	if (has_vhe() || has_hvhe()) {
- 		reg = CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN;
- 		if (sve_guest)
- 			reg |= CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN;
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 728e01d4536b..ce602f9e93eb 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -392,7 +392,11 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
- 		handle_host_smc(host_ctxt);
- 		break;
- 	case ESR_ELx_EC_SVE:
--		sysreg_clear_set(cptr_el2, CPTR_EL2_TZ, 0);
-+		if (has_hvhe())
-+			sysreg_clear_set(cpacr_el1, 0, (CPACR_EL1_ZEN_EL1EN |
-+							CPACR_EL1_ZEN_EL0EN));
-+		else
-+			sysreg_clear_set(cptr_el2, CPTR_EL2_TZ, 0);
- 		isb();
- 		sve_cond_update_zcr_vq(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
- 		break;
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index a06ece14a6d8..5d5ee735a7d9 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -27,6 +27,7 @@ static void pvm_init_traps_aa64pfr0(struct kvm_vcpu *vcpu)
- 	u64 hcr_set = HCR_RW;
- 	u64 hcr_clear = 0;
- 	u64 cptr_set = 0;
-+	u64 cptr_clear = 0;
- 
- 	/* Protected KVM does not support AArch32 guests. */
- 	BUILD_BUG_ON(FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL0),
-@@ -57,12 +58,17 @@ static void pvm_init_traps_aa64pfr0(struct kvm_vcpu *vcpu)
- 	}
- 
- 	/* Trap SVE */
--	if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE), feature_ids))
--		cptr_set |= CPTR_EL2_TZ;
-+	if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE), feature_ids)) {
-+		if (has_hvhe())
-+			cptr_clear |= CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN;
-+		else
-+			cptr_set |= CPTR_EL2_TZ;
+-	tcr = (read_sysreg(tcr_el1) & TCR_EL2_MASK) | TCR_EL2_RES1;
++	tcr = read_sysreg(tcr_el1);
++	if (cpus_have_final_cap(ARM64_KVM_HVHE)) {
++		tcr |= TCR_EPD1_MASK;
++	} else {
++		tcr &= TCR_EL2_MASK;
++		tcr |= TCR_EL2_RES1;
 +	}
- 
- 	vcpu->arch.hcr_el2 |= hcr_set;
- 	vcpu->arch.hcr_el2 &= ~hcr_clear;
- 	vcpu->arch.cptr_el2 |= cptr_set;
-+	vcpu->arch.cptr_el2 &= ~cptr_clear;
- }
- 
- /*
-@@ -120,8 +126,12 @@ static void pvm_init_traps_aa64dfr0(struct kvm_vcpu *vcpu)
- 		mdcr_set |= MDCR_EL2_TTRF;
- 
- 	/* Trap Trace */
--	if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_TraceVer), feature_ids))
--		cptr_set |= CPTR_EL2_TTA;
-+	if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_TraceVer), feature_ids)) {
-+		if (has_hvhe())
-+			cptr_set |= CPACR_EL1_TTA;
-+		else
-+			cptr_set |= CPTR_EL2_TTA;
-+	}
- 
- 	vcpu->arch.mdcr_el2 |= mdcr_set;
- 	vcpu->arch.mdcr_el2 &= ~mdcr_clear;
-@@ -176,8 +186,10 @@ static void pvm_init_trap_regs(struct kvm_vcpu *vcpu)
- 	/* Clear res0 and set res1 bits to trap potential new features. */
- 	vcpu->arch.hcr_el2 &= ~(HCR_RES0);
- 	vcpu->arch.mdcr_el2 &= ~(MDCR_EL2_RES0);
--	vcpu->arch.cptr_el2 |= CPTR_NVHE_EL2_RES1;
--	vcpu->arch.cptr_el2 &= ~(CPTR_NVHE_EL2_RES0);
-+	if (!has_hvhe()) {
-+		vcpu->arch.cptr_el2 |= CPTR_NVHE_EL2_RES1;
-+		vcpu->arch.cptr_el2 &= ~(CPTR_NVHE_EL2_RES0);
-+	}
- }
- 
- /*
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 71fa16a0dc77..5fa0b1c9ee8d 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -44,13 +44,24 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 	__activate_traps_common(vcpu);
- 
- 	val = vcpu->arch.cptr_el2;
--	val |= CPTR_EL2_TTA | CPTR_EL2_TAM;
-+	val |= CPTR_EL2_TAM;	/* Same bit irrespective of E2H */
-+	val |= has_hvhe() ? CPACR_EL1_TTA : CPTR_EL2_TTA;
-+	if (cpus_have_final_cap(ARM64_SME)) {
-+		if (has_hvhe())
-+			val &= ~(CPACR_EL1_SMEN_EL1EN | CPACR_EL1_SMEN_EL0EN);
-+		else
-+			val |= CPTR_EL2_TSM;
-+	}
-+
- 	if (!guest_owns_fp_regs(vcpu)) {
--		val |= CPTR_EL2_TFP | CPTR_EL2_TZ;
-+		if (has_hvhe())
-+			val &= ~(CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |
-+				 CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN);
-+		else
-+			val |= CPTR_EL2_TFP | CPTR_EL2_TZ;
-+
- 		__activate_traps_fpsimd32(vcpu);
- 	}
--	if (cpus_have_final_cap(ARM64_SME))
--		val |= CPTR_EL2_TSM;
- 
- 	write_sysreg(val, cptr_el2);
- 	write_sysreg(__this_cpu_read(kvm_hyp_vector), vbar_el2);
-@@ -73,7 +84,6 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- static void __deactivate_traps(struct kvm_vcpu *vcpu)
- {
- 	extern char __kvm_hyp_host_vector[];
--	u64 cptr;
- 
- 	___deactivate_traps(vcpu);
- 
-@@ -98,13 +108,7 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
- 
- 	write_sysreg(this_cpu_ptr(&kvm_init_params)->hcr_el2, hcr_el2);
- 
--	cptr = CPTR_EL2_DEFAULT;
--	if (vcpu_has_sve(vcpu) && (vcpu->arch.fp_state == FP_STATE_GUEST_OWNED))
--		cptr |= CPTR_EL2_TZ;
--	if (cpus_have_final_cap(ARM64_SME))
--		cptr &= ~CPTR_EL2_TSM;
--
--	write_sysreg(cptr, cptr_el2);
-+	kvm_reset_cptr_el2(vcpu);
- 	write_sysreg(__kvm_hyp_host_vector, vbar_el2);
- }
- 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 3d868e84c7a0..034777a23b74 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -84,7 +84,7 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
- 	 */
- 	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT));
- 
--	write_sysreg(CPACR_EL1_DEFAULT, cpacr_el1);
-+	kvm_reset_cptr_el2(vcpu);
- 
- 	if (!arm64_kernel_unmapped_at_el0())
- 		host_vectors = __this_cpu_read(this_cpu_vector);
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 71b12094d613..11ededa80737 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2180,7 +2180,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG(ACTLR_EL2, access_rw, reset_val, 0),
- 	EL2_REG(HCR_EL2, access_rw, reset_val, 0),
- 	EL2_REG(MDCR_EL2, access_rw, reset_val, 0),
--	EL2_REG(CPTR_EL2, access_rw, reset_val, CPTR_EL2_DEFAULT ),
-+	EL2_REG(CPTR_EL2, access_rw, reset_val, CPTR_NVHE_EL2_RES1),
- 	EL2_REG(HSTR_EL2, access_rw, reset_val, 0),
- 	EL2_REG(HACR_EL2, access_rw, reset_val, 0),
- 
+ 	tcr &= ~TCR_T0SZ_MASK;
+ 	tcr |= TCR_T0SZ(hyp_va_bits);
+ 	params->tcr_el2 = tcr;
 -- 
 2.34.1
 
