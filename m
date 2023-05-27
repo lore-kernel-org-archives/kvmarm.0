@@ -1,140 +1,193 @@
-Received: from out-9.mta0.migadu.com (out-9.mta0.migadu.com [91.218.175.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E357B134DE
-	for <kvmarm@lists.linux.dev>; Sat, 27 May 2023 18:08:48 +0000 (UTC)
-Date: Sat, 27 May 2023 18:08:36 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1685210926;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qro1ly8D0IN85bz01iVra27g5btF8pv3UlKO41a9+sM=;
-	b=llE6IRkx/n91QHSJfUuz8Lvf36Zsdvbsda8s4+YDAphela0hHMrM+udZgnGOhdOMmdcMem
-	6eMFZGQIhSrfmCXeAFxKmM8bvTDiACcfidzZol+st9/hDl3h5IknZGYlF6wWBlLroxmus0
-	h5pa83O4YLhVJG62l7K1d5yuFK61noU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Yu Zhao <yuzhao@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	Anup Patel <anup@brainfault.org>, Ben Gardon <bgardon@google.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Fabiano Rosas <farosas@linux.ibm.com>,
-	Gaosheng Cui <cuigaosheng1@huawei.com>,
-	Gavin Shan <gshan@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>,
-	Ingo Molnar <mingo@redhat.com>, James Morse <james.morse@arm.com>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Michael Larabel <michael@michaellarabel.com>,
-	Mike Rapoport <rppt@kernel.org>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Paul Mackerras <paulus@ozlabs.org>, Peter Xu <peterx@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org,
-	linux-trace-kernel@vger.kernel.org, x86@kernel.org,
-	linux-mm@google.com
-Subject: Re: [PATCH mm-unstable v2 04/10] kvm/arm64: make stage2 page tables
- RCU safe
-Message-ID: <ZHJHJPBF6euzOFdw@linux.dev>
-References: <20230526234435.662652-1-yuzhao@google.com>
- <20230526234435.662652-5-yuzhao@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 206112116
+	for <kvmarm@lists.linux.dev>; Sat, 27 May 2023 18:38:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8A83C433D2;
+	Sat, 27 May 2023 18:38:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1685212737;
+	bh=RV3hL6ReTtFRGgRYsgsgbKIZ9umnkgmFml3kwdYCvbs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Fqj08L5EHpJLOVXvKFMY3IYczPPMRtolrgwlH5dWqYZ7wVLikfDfRmuWg3cvJZB52
+	 iE5uUBWvhA5po64mRBGn4Q23gwSa8eg7yiBnKTAz7X4md1nRoZ3pts79sr+thPb99M
+	 BqAGXCvuVvfzn+hdQvTBJ9ojn1plRocMDHrwCw8Mi/YIs4T6a8tu8tuvjMyTdfJyjT
+	 0npIFxowaElV5Opv+70DUfgGz926T9srspfbr7PQbDt9CfGuR/jJMNNC4QgQjFnv4O
+	 mpcDX90HmgociOgXJ0+lU/8f/nTFPVeWK4+OHW3mlgrMkAayxfnXt1kQ4v04TrVqyO
+	 siREY0fAcdhNA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1q2yoZ-000mV3-An;
+	Sat, 27 May 2023 19:38:55 +0100
+Date: Sat, 27 May 2023 19:38:54 +0100
+Message-ID: <86h6rxd3gh.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ian Rogers <irogers@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ravi Bangoria <ravi.bangoria@amd.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	namhyung@kernel.org,
+	eranian@google.com,
+	acme@kernel.org,
+	mark.rutland@arm.com,
+	jolsa@kernel.org,
+	bp@alien8.de,
+	kan.liang@linux.intel.com,
+	adrian.hunter@intel.com,
+	maddy@linux.ibm.com,
+	x86@kernel.org,
+	linux-perf-users@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	sandipan.das@amd.com,
+	ananth.narayan@amd.com,
+	santosh.shukla@amd.com,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 3/4] perf/core: Remove pmu linear searching code
+In-Reply-To: <CAP-5=fVW6KbUbbEfF3mEFvTfFDC5yKSjSpa+w3D55dG3CNUERw@mail.gmail.com>
+References: <20230504110003.2548-1-ravi.bangoria@amd.com>
+	<20230504110003.2548-4-ravi.bangoria@amd.com>
+	<20230524214133.GA2359762@dev-arch.thelio-3990X>
+	<f02c78e2-34b9-4985-640a-279dae1004a9@amd.com>
+	<ZG8KLbZSECiYaKFc@linux.dev>
+	<20230525142031.GU83892@hirez.programming.kicks-ass.net>
+	<ZG+FLdP2kkfI1m2Z@linux.dev>
+	<CAP-5=fWYbzmTETgqJ11y22=JaXDM0gnb4qR6KYeRGmFXw08f-Q@mail.gmail.com>
+	<86jzwtdhmk.wl-maz@kernel.org>
+	<CAP-5=fVW6KbUbbEfF3mEFvTfFDC5yKSjSpa+w3D55dG3CNUERw@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230526234435.662652-5-yuzhao@google.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: irogers@google.com, oliver.upton@linux.dev, peterz@infradead.org, ravi.bangoria@amd.com, nathan@kernel.org, namhyung@kernel.org, eranian@google.com, acme@kernel.org, mark.rutland@arm.com, jolsa@kernel.org, bp@alien8.de, kan.liang@linux.intel.com, adrian.hunter@intel.com, maddy@linux.ibm.com, x86@kernel.org, linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, sandipan.das@amd.com, ananth.narayan@amd.com, santosh.shukla@amd.com, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Yu,
+On Sat, 27 May 2023 18:00:13 +0100,
+Ian Rogers <irogers@google.com> wrote:
+>=20
+> On Sat, May 27, 2023 at 6:32=E2=80=AFAM Marc Zyngier <maz@kernel.org> wro=
+te:
+> >
+> > On Sat, 27 May 2023 00:00:47 +0100,
+> > Ian Rogers <irogers@google.com> wrote:
+> > >
+> > > On Thu, May 25, 2023 at 8:56=E2=80=AFAM Oliver Upton <oliver.upton@li=
+nux.dev> wrote:
+> > > >
+> > > > On Thu, May 25, 2023 at 04:20:31PM +0200, Peter Zijlstra wrote:
+> > > > > On Thu, May 25, 2023 at 07:11:41AM +0000, Oliver Upton wrote:
+> > > > >
+> > > > > > The PMUv3 driver does pass a name, but it relies on getting bac=
+k an
+> > > > > > allocated pmu id as @type is -1 in the call to perf_pmu_registe=
+r().
+> > > > > >
+> > > > > > What actually broke is how KVM probes for a default core PMU to=
+ use for
+> > > > > > a guest. kvm_pmu_probe_armpmu() creates a counter w/ PERF_TYPE_=
+RAW and
+> > > > > > reads the pmu from the returned perf_event. The linear search h=
+ad the
+> > > > > > effect of eventually stumbling on the correct core PMU and succ=
+eeding.
+> > > > > >
+> > > > > > Perf folks: is this WAI for heterogenous systems?
+> > > > >
+> > > > > TBH, I'm not sure. hetero and virt don't mix very well AFAIK and =
+I'm not
+> > > > > sure what ARM64 does here.
+> > > > >
+> > > > > IIRC the only way is to hard affine things; that is, force vCPU of
+> > > > > 'type' to the pCPU mask of 'type' CPUs.
+> > > >
+> > > > We provide absolutely no illusion of consistency across implementat=
+ions.
+> > > > Userspace can select the PMU type, and then it is a userspace probl=
+em
+> > > > affining vCPUs to the right pCPUs.
+> > > >
+> > > > And if they get that wrong, we just bail and refuse to run the vCPU.
+> > > >
+> > > > > If you don't do that; or let userspace 'override' that, things go
+> > > > > sideways *real* fast.
+> > > >
+> > > > Oh yeah, and I wish PMUs were the only problem with these hetero
+> > > > systems...
+> > >
+> > > Just to add some context from what I understand. There are inbuilt
+> > > type numbers for PMUs:
+> > > https://git.kernel.org/pub/scm/linux/kernel/git/acme/linux.git/tree/i=
+nclude/uapi/linux/perf_event.h?h=3Dperf-tools-next#n34
+> > > so the PMU generally called /sys/devices/cpu should have type 4 (ARM
+> > > give it another name). For heterogeneous ARM there is a single PMU and
+> > > the same events are programmed regardless of whether it is a big or a
+> > > little core - the cpumask lists all CPUs.
+> >
+> > I think you misunderstood the way heterogeneous arm64 systems are
+> > described . Each CPU type gets its own PMU type, and its own event
+> > list. Case in point:
+> >
+> > $ grep . /sys/devices/*pmu/{type,cpus}
+> > /sys/devices/apple_avalanche_pmu/type:9
+> > /sys/devices/apple_blizzard_pmu/type:8
+> > /sys/devices/apple_avalanche_pmu/cpus:4-9
+> > /sys/devices/apple_blizzard_pmu/cpus:0-3
+> >
+> > Type 4 (aka PERF_EVENT_RAW) is AFAICT just a way to encode the raw
+> > event number, nothing else.
+>=20
+> Which PMU will a raw event open on?
 
-On Fri, May 26, 2023 at 05:44:29PM -0600, Yu Zhao wrote:
-> Stage2 page tables are currently not RCU safe against unmapping or VM
-> destruction. The previous mmu_notifier_ops members rely on
-> kvm->mmu_lock to synchronize with those operations.
-> 
-> However, the new mmu_notifier_ops member test_clear_young() provides
-> a fast path that does not take kvm->mmu_lock. To implement
-> kvm_arch_test_clear_young() for that path, unmapped page tables need
-> to be freed by RCU and kvm_free_stage2_pgd() needs to be after
-> mmu_notifier_unregister().
-> 
-> Remapping, specifically stage2_free_removed_table(), is already RCU
-> safe.
-> 
-> Signed-off-by: Yu Zhao <yuzhao@google.com>
-> ---
->  arch/arm64/include/asm/kvm_pgtable.h |  2 ++
->  arch/arm64/kvm/arm.c                 |  1 +
->  arch/arm64/kvm/hyp/pgtable.c         |  8 ++++++--
->  arch/arm64/kvm/mmu.c                 | 17 ++++++++++++++++-
->  4 files changed, 25 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index ff520598b62c..5cab52e3a35f 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -153,6 +153,7 @@ static inline bool kvm_level_supports_block_mapping(u32 level)
->   * @put_page:			Decrement the refcount on a page. When the
->   *				refcount reaches 0 the page is automatically
->   *				freed.
-> + * @put_page_rcu:		RCU variant of the above.
+On the PMU that matches the current CPU.
 
-You don't need to add yet another hook to implement this. I was working
-on lock-free walks in a separate context and arrived at the following:
+> Note, the raw events don't support
+> the extended type that is present in PERF_TYPE_HARDWARE and
+> PERF_TYPE_HW_CACHE:
+> https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/tree/include/=
+uapi/linux/perf_event.h#n41
+> as the bits are already in use for being just plain config values.
 
-commit f82d264a37745e07ee28e116c336f139f681fd7f
-Author: Oliver Upton <oliver.upton@linux.dev>
-Date:   Mon May 1 08:53:37 2023 +0000
+I'm not sure how relevant this is to the numbering of PMUs on arm64.
 
-    KVM: arm64: Consistently use free_removed_table() for stage-2
-    
-    free_removed_table() is essential to the RCU-protected parallel walking
-    scheme, as behind the scenes the cleanup is deferred until an RCU grace
-    period. Nonetheless, the stage-2 unmap path calls put_page() directly,
-    which leads to table memory being freed inline with the table walk.
-    
-    This is safe for the time being, as the stage-2 unmap walker is called
-    while holding the write lock. A future change to KVM will further relax
-    the locking mechanics around the stage-2 page tables to allow lock-free
-    walkers protected only by RCU. As such, switch to the RCU-safe mechanism
-    for freeing table memory.
-    
-    Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> I suspect not being type 4 is a bug on apple ARM here.
 
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 3d61bd3e591d..bfbebdcb4ef0 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -1019,7 +1019,7 @@ static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 					       kvm_granule_size(ctx->level));
- 
- 	if (childp)
--		mm_ops->put_page(childp);
-+		mm_ops->free_removed_table(childp, ctx->level);
- 
- 	return 0;
- }
+If that's a bug on this machine, it's a bug on all machines, at which
+point it is the de-facto API:
 
--- 
+$ grep . /sys/devices/armv8*/{type,cpus}
+/sys/devices/armv8_cortex_a53/type:8
+/sys/devices/armv8_cortex_a72/type:9
+/sys/devices/armv8_cortex_a53/cpus:0-3
+/sys/devices/armv8_cortex_a72/cpus:4-5
+
+See, non-Apple HW. And now for a system with homogeneous CPUs:
+
+$ grep . /sys/devices/armv8*/{type,cpus}
+/sys/devices/armv8_pmuv3_0/type:8
+/sys/devices/armv8_pmuv3_0/cpus:0-159
+
+Still no type 4. I could go on for hours, I have plenty of HW around
+me!
+
+So whatever your source of information is, it doesn't match reality.
+Our PMUs are numbered arbitrarily, and have been so for... a very long
+time. At least since perf_pmu_register has supported dynamic
+registration (see 2e80a82a49c4c).
+
 Thanks,
-Oliver
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
