@@ -1,55 +1,59 @@
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+Received: from out-9.mta0.migadu.com (out-9.mta0.migadu.com [91.218.175.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4556F134C1;
-	Sat, 27 May 2023 17:36:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1685208975; x=1716744975;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=QULAGHRfPIcCGNhFsRmU3EDDOLgnaqBRBo8qhWPVE+E=;
-  b=dCSTohGMBmy+DGt8/TJECLu2JWaj4ofqfYIcyHjauZPp0bsj1KtU92tt
-   KbMfxgbuuiu1dw5Qfff+UXCP3LTOa8UtiSGfsVsGsEl4Xze2QWeewOrPa
-   u3wF9o/8ERdJp3Hm+1iUI/c6YicPyTPGa0zHUlQvMgAQv7aBzNc9TOVPp
-   w87c2AlhjN5lb8krwygcy6PIZimnjj+OoXEoFs6vHx0fp5Wi6Z6bh9LNN
-   dbWXof9mj+hlVyLdYoaefWBj6TDYo141zM02K0rPtfyZS2iYT++qW/GQW
-   gM9uogjk5hybIq7Ay4EzXbthDOEEhwfqifiikM8HeX/M0W1mbtYyy8hh5
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10723"; a="351928711"
-X-IronPort-AV: E=Sophos;i="6.00,197,1681196400"; 
-   d="scan'208";a="351928711"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2023 10:36:14 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10723"; a="849883924"
-X-IronPort-AV: E=Sophos;i="6.00,197,1681196400"; 
-   d="scan'208";a="849883924"
-Received: from lkp-server01.sh.intel.com (HELO dea6d5a4f140) ([10.239.97.150])
-  by fmsmga001.fm.intel.com with ESMTP; 27 May 2023 10:36:11 -0700
-Received: from kbuild by dea6d5a4f140 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1q2xpq-000K6c-1J;
-	Sat, 27 May 2023 17:36:10 +0000
-Date: Sun, 28 May 2023 01:35:49 +0800
-From: kernel test robot <lkp@intel.com>
-To: Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
-Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E357B134DE
+	for <kvmarm@lists.linux.dev>; Sat, 27 May 2023 18:08:48 +0000 (UTC)
+Date: Sat, 27 May 2023 18:08:36 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1685210926;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qro1ly8D0IN85bz01iVra27g5btF8pv3UlKO41a9+sM=;
+	b=llE6IRkx/n91QHSJfUuz8Lvf36Zsdvbsda8s4+YDAphela0hHMrM+udZgnGOhdOMmdcMem
+	6eMFZGQIhSrfmCXeAFxKmM8bvTDiACcfidzZol+st9/hDl3h5IknZGYlF6wWBlLroxmus0
+	h5pa83O4YLhVJG62l7K1d5yuFK61noU=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Yu Zhao <yuzhao@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
 	Paolo Bonzini <pbonzini@redhat.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Raghavendra Rao Anata <rananta@google.com>,
-	Will Deacon <will@kernel.org>, Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH 2/4] KVM: arm64: PMU: Set the default PMU for the guest
- on vCPU reset
-Message-ID: <202305280138.CQFgYLdh-lkp@intel.com>
-References: <20230527040236.1875860-3-reijiw@google.com>
+	Alistair Popple <apopple@nvidia.com>,
+	Anup Patel <anup@brainfault.org>, Ben Gardon <bgardon@google.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Chao Peng <chao.p.peng@linux.intel.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Fabiano Rosas <farosas@linux.ibm.com>,
+	Gaosheng Cui <cuigaosheng1@huawei.com>,
+	Gavin Shan <gshan@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>,
+	Ingo Molnar <mingo@redhat.com>, James Morse <james.morse@arm.com>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Michael Larabel <michael@michaellarabel.com>,
+	Mike Rapoport <rppt@kernel.org>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Paul Mackerras <paulus@ozlabs.org>, Peter Xu <peterx@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org,
+	linux-trace-kernel@vger.kernel.org, x86@kernel.org,
+	linux-mm@google.com
+Subject: Re: [PATCH mm-unstable v2 04/10] kvm/arm64: make stage2 page tables
+ RCU safe
+Message-ID: <ZHJHJPBF6euzOFdw@linux.dev>
+References: <20230526234435.662652-1-yuzhao@google.com>
+ <20230526234435.662652-5-yuzhao@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,63 +62,79 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230527040236.1875860-3-reijiw@google.com>
+In-Reply-To: <20230526234435.662652-5-yuzhao@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Reiji,
+Yu,
 
-kernel test robot noticed the following build warnings:
+On Fri, May 26, 2023 at 05:44:29PM -0600, Yu Zhao wrote:
+> Stage2 page tables are currently not RCU safe against unmapping or VM
+> destruction. The previous mmu_notifier_ops members rely on
+> kvm->mmu_lock to synchronize with those operations.
+> 
+> However, the new mmu_notifier_ops member test_clear_young() provides
+> a fast path that does not take kvm->mmu_lock. To implement
+> kvm_arch_test_clear_young() for that path, unmapped page tables need
+> to be freed by RCU and kvm_free_stage2_pgd() needs to be after
+> mmu_notifier_unregister().
+> 
+> Remapping, specifically stage2_free_removed_table(), is already RCU
+> safe.
+> 
+> Signed-off-by: Yu Zhao <yuzhao@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h |  2 ++
+>  arch/arm64/kvm/arm.c                 |  1 +
+>  arch/arm64/kvm/hyp/pgtable.c         |  8 ++++++--
+>  arch/arm64/kvm/mmu.c                 | 17 ++++++++++++++++-
+>  4 files changed, 25 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index ff520598b62c..5cab52e3a35f 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -153,6 +153,7 @@ static inline bool kvm_level_supports_block_mapping(u32 level)
+>   * @put_page:			Decrement the refcount on a page. When the
+>   *				refcount reaches 0 the page is automatically
+>   *				freed.
+> + * @put_page_rcu:		RCU variant of the above.
 
-[auto build test WARNING on 44c026a73be8038f03dbdeef028b642880cf1511]
+You don't need to add yet another hook to implement this. I was working
+on lock-free walks in a separate context and arrived at the following:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Reiji-Watanabe/KVM-arm64-PMU-Introduce-a-helper-to-set-the-guest-s-PMU/20230527-120717
-base:   44c026a73be8038f03dbdeef028b642880cf1511
-patch link:    https://lore.kernel.org/r/20230527040236.1875860-3-reijiw%40google.com
-patch subject: [PATCH 2/4] KVM: arm64: PMU: Set the default PMU for the guest on vCPU reset
-config: arm64-randconfig-r006-20230526 (https://download.01.org/0day-ci/archive/20230528/202305280138.CQFgYLdh-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        mkdir -p ~/bin
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/6339e7261a0e27669f5e17362150b7f3f5681f4a
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Reiji-Watanabe/KVM-arm64-PMU-Introduce-a-helper-to-set-the-guest-s-PMU/20230527-120717
-        git checkout 6339e7261a0e27669f5e17362150b7f3f5681f4a
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 ~/bin/make.cross W=1 O=build_dir ARCH=arm64 olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 ~/bin/make.cross W=1 O=build_dir ARCH=arm64 prepare
+commit f82d264a37745e07ee28e116c336f139f681fd7f
+Author: Oliver Upton <oliver.upton@linux.dev>
+Date:   Mon May 1 08:53:37 2023 +0000
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202305280138.CQFgYLdh-lkp@intel.com/
+    KVM: arm64: Consistently use free_removed_table() for stage-2
+    
+    free_removed_table() is essential to the RCU-protected parallel walking
+    scheme, as behind the scenes the cleanup is deferred until an RCU grace
+    period. Nonetheless, the stage-2 unmap path calls put_page() directly,
+    which leads to table memory being freed inline with the table walk.
+    
+    This is safe for the time being, as the stage-2 unmap walker is called
+    while holding the write lock. A future change to KVM will further relax
+    the locking mechanics around the stage-2 page tables to allow lock-free
+    walkers protected only by RCU. As such, switch to the RCU-safe mechanism
+    for freeing table memory.
+    
+    Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 
-All warnings (new ones prefixed by >>):
-
-   In file included from arch/arm64/include/asm/kvm_host.h:37,
-                    from include/linux/kvm_host.h:45,
-                    from arch/arm64/kernel/asm-offsets.c:16:
->> include/kvm/arm_pmu.h:172:62: warning: 'struct arm_pmu' declared inside parameter list will not be visible outside of this definition or declaration
-     172 | static inline int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
-         |                                                              ^~~~~~~
---
-   In file included from arch/arm64/include/asm/kvm_host.h:37,
-                    from include/linux/kvm_host.h:45,
-                    from arch/arm64/kernel/asm-offsets.c:16:
->> include/kvm/arm_pmu.h:172:62: warning: 'struct arm_pmu' declared inside parameter list will not be visible outside of this definition or declaration
-     172 | static inline int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
-         |                                                              ^~~~~~~
-
-
-vim +172 include/kvm/arm_pmu.h
-
-   171	
- > 172	static inline int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
-   173	{
-   174		return 0;
-   175	}
-   176	
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 3d61bd3e591d..bfbebdcb4ef0 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -1019,7 +1019,7 @@ static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
+ 					       kvm_granule_size(ctx->level));
+ 
+ 	if (childp)
+-		mm_ops->put_page(childp);
++		mm_ops->free_removed_table(childp, ctx->level);
+ 
+ 	return 0;
+ }
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks,
+Oliver
