@@ -1,148 +1,151 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0D8D20EB
-	for <kvmarm@lists.linux.dev>; Sat, 27 May 2023 13:41:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C49DC433D2;
-	Sat, 27 May 2023 13:41:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1685194890;
-	bh=mwhTDDByu0K/0clH3pT3wZsy+vlC2IbWjHkxpXdmxuo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XOSi2fqQ6YSex80VsJRvmY/q2b1gUXvXf+I2icP9Htfb032C9LhoUk6/hMueZa0lv
-	 Z7C8oLI8S5VVMlaYyruM2xSb7VWnWpTIZcob8CBgQzJ5JeICbuczgA8RkxEZuITGID
-	 9HpMfj/rb7mBvSjV1rA7NSa7B6o3yCKk/sXIZdeKcC3HXamibev+nz9UfvrEzqTYac
-	 ZbJYce3+Yazy+fFvNTE8ic9ZvYBp9HGZdeGTfj1TCFoW8DsViu7PYbFgMRdI5soumL
-	 ijd/M01GVe/znG9As1GGtjBy+cS49RVDrRddcIKxZHGVIlG7PR+isQULi6dRnhRIKe
-	 Y2XMxhvtHLk7A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1q2uAi-000lBR-3c;
-	Sat, 27 May 2023 14:41:28 +0100
-Date: Sat, 27 May 2023 14:41:27 +0100
-Message-ID: <86ilcddh88.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Jing Zhang <jingzhangos@google.com>,
-	KVM <kvm@vger.kernel.org>,
-	KVMARM <kvmarm@lists.linux.dev>,
-	ARMLinux <linux-arm-kernel@lists.infradead.org>,
-	Oliver Upton <oupton@google.com>,
-	Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Reiji Watanabe <reijiw@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v10 4/5] KVM: arm64: Reuse fields of sys_reg_desc for idreg
-In-Reply-To: <ZHEmgPAK59Wh/jv/@linux.dev>
-References: <20230522221835.957419-1-jingzhangos@google.com>
-	<20230522221835.957419-5-jingzhangos@google.com>
-	<ZHEmgPAK59Wh/jv/@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B64811CA5
+	for <kvmarm@lists.linux.dev>; Sat, 27 May 2023 17:00:28 +0000 (UTC)
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-3f5dbd8f677so17965e9.1
+        for <kvmarm@lists.linux.dev>; Sat, 27 May 2023 10:00:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1685206826; x=1687798826;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=835du44Mx31StLMyTUW9zq6P6oaX0jDJQHvLjYcMIks=;
+        b=g/e2OD8/lcYnFEB7TjPtnUAWhfOd/2bK12EsBn2OA3a46lLILB7qPx4F/iarCiWsg+
+         iyesd8VmGUdkZ9rLoSniHWnHSwc8ckYrZ6CD8gCN24R7N9iNaJCesv1kU5CFGdiYA9vi
+         Q4J26hnroLEH/p7nYu10W7XCjyvNNXyPzaAtTzQ0E/vY0e6Utx+J38vJe99fCfu+qVXl
+         MJqQaVJOs4ZM4tLJK01LDv/Tmdh8tXwZn1JPOww61qLfg8KHe/H6IUd511666F4wE2TK
+         kzvsibyzvM7bXYPu17eLPZ06veH3GQzgclXlj5lHpg1s+jl4F6IqPhc/hlBrdwcna2xq
+         2QFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685206826; x=1687798826;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=835du44Mx31StLMyTUW9zq6P6oaX0jDJQHvLjYcMIks=;
+        b=gB3EIfLuxsq5900+iw/aGIExfbYnqwSojqWQjp+Jsbv9WisjWhn9QPyJCSwkV2Uv/a
+         00QzfLy9epO8cSsPwpfkroQCcMteGswHh4jynKJLKxH9zxuG9GbVgV2T1BwjuAn4UytA
+         /58l9hNAKKLhC/uVYvNEnc0Sjzo9PKn+JlR0sfp1T9SSP/RreezxTnCTMazLSWtnOfHo
+         QtZ/y8ZXkY5bwZ8Ouf87R2hcvagB9R4rgf/b0Dap/Ewf/bRX9RSbJiIdTK1nAqrE2JzI
+         IA760bu4BhXqtF2CEKdXdH+BouFjtqyoVNDwPY+8Ns9gi2NPnoOrBLrxRvSgVqfFY6l5
+         Rocg==
+X-Gm-Message-State: AC+VfDyUaZAN/Lru0jJ3XllTYws/l4W1xP4nAlQz7ekZtC4byvOFWsX3
+	QJkxiswr3XOMOtp/pG1q2kALFdUzsk4CWd8Po67Law==
+X-Google-Smtp-Source: ACHHUZ4AQ/bE5YgHhD1uPFM4J8yLJ74PCEyrnXodNu4xMmKiVPPom5xBu38zOJ3RsWqN16HNFxmxvevUYXrROl5pj84=
+X-Received: by 2002:a05:600c:3b8d:b0:3f1:9396:6fbf with SMTP id
+ n13-20020a05600c3b8d00b003f193966fbfmr180106wms.4.1685206826363; Sat, 27 May
+ 2023 10:00:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, reijiw@google.com, rananta@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20230504110003.2548-1-ravi.bangoria@amd.com> <20230504110003.2548-4-ravi.bangoria@amd.com>
+ <20230524214133.GA2359762@dev-arch.thelio-3990X> <f02c78e2-34b9-4985-640a-279dae1004a9@amd.com>
+ <ZG8KLbZSECiYaKFc@linux.dev> <20230525142031.GU83892@hirez.programming.kicks-ass.net>
+ <ZG+FLdP2kkfI1m2Z@linux.dev> <CAP-5=fWYbzmTETgqJ11y22=JaXDM0gnb4qR6KYeRGmFXw08f-Q@mail.gmail.com>
+ <86jzwtdhmk.wl-maz@kernel.org>
+In-Reply-To: <86jzwtdhmk.wl-maz@kernel.org>
+From: Ian Rogers <irogers@google.com>
+Date: Sat, 27 May 2023 10:00:13 -0700
+Message-ID: <CAP-5=fVW6KbUbbEfF3mEFvTfFDC5yKSjSpa+w3D55dG3CNUERw@mail.gmail.com>
+Subject: Re: [PATCH v4 3/4] perf/core: Remove pmu linear searching code
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Peter Zijlstra <peterz@infradead.org>, 
+	Ravi Bangoria <ravi.bangoria@amd.com>, Nathan Chancellor <nathan@kernel.org>, namhyung@kernel.org, 
+	eranian@google.com, acme@kernel.org, mark.rutland@arm.com, jolsa@kernel.org, 
+	bp@alien8.de, kan.liang@linux.intel.com, adrian.hunter@intel.com, 
+	maddy@linux.ibm.com, x86@kernel.org, linux-perf-users@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, sandipan.das@amd.com, ananth.narayan@amd.com, 
+	santosh.shukla@amd.com, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 26 May 2023 22:37:04 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> Hi Jing,
-> 
-> On Mon, May 22, 2023 at 10:18:34PM +0000, Jing Zhang wrote:
-> > Since reset() and val are not used for idreg in sys_reg_desc, they would
-> > be used with other purposes for idregs.
-> > The callback reset() would be used to return KVM sanitised id register
-> > values. The u64 val would be used as mask for writable fields in idregs.
-> > Only bits with 1 in val are writable from userspace.
-> 
-> The tense of the changelog is wrong (should be in an imperative mood).
-> Maybe something like:
-> 
->   sys_reg_desc::{reset, val} are presently unused for ID register
->   descriptors. Repurpose these fields to support user-configurable ID
->   registers.
-> 
->   Use the ::reset() function pointer to return the sanitised value of a
->   given ID register, optionally with KVM-specific feature sanitisation.
->   Additionally, keep a mask of writable register fields in ::val.
-> 
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >  arch/arm64/kvm/sys_regs.c | 101 +++++++++++++++++++++++++++-----------
-> >  arch/arm64/kvm/sys_regs.h |  15 ++++--
-> >  2 files changed, 82 insertions(+), 34 deletions(-)
-> > 
-> 
-> [...]
-> 
-> > +/*
-> > + * Since reset() callback and field val are not used for idregs, they will be
-> > + * used for specific purposes for idregs.
-> > + * The reset() would return KVM sanitised register value. The value would be the
-> > + * same as the host kernel sanitised value if there is no KVM sanitisation.
-> > + * The val would be used as a mask indicating writable fields for the idreg.
-> > + * Only bits with 1 are writable from userspace. This mask might not be
-> > + * necessary in the future whenever all ID registers are enabled as writable
-> > + * from userspace.
-> > + */
-> > +
-> >  /* sys_reg_desc initialiser for known cpufeature ID registers */
-> >  #define ID_SANITISED(name) {			\
-> >  	SYS_DESC(SYS_##name),			\
-> > @@ -1751,6 +1788,8 @@ static unsigned int elx2_visibility(const struct kvm_vcpu *vcpu,
-> >  	.get_user = get_id_reg,			\
-> >  	.set_user = set_id_reg,			\
-> >  	.visibility = id_visibility,		\
-> > +	.reset = general_read_kvm_sanitised_reg,\
-> > +	.val = 0,				\
-> 
-> I generally think unions are more trouble than they're worth, but it
-> might make sense to throw the fields with dual meaning into one, like
-> 
->   struct sys_reg_desc {
-> 
->   	[...]
-> 	union {
-> 		struct {
-> 			void (*reset)(struct kvm_vcpu *, const struct sys_reg_desc *);
-> 			u64 val;
-> 		};
-> 		struct {
-> 			u64 (*read_sanitised)(struct kvm_vcpu *vcpu, const struct sys_reg_desc *);
-> 			u64 mask;
-> 		};
-> 	};
->   }
-> 
-> You could then avoid repainting the world to handle ->reset() returning
-> a value and usage of the fields in an id register context become a bit
-> more self-documenting. And you get to play with fire while you do it!
-> 
-> Let's see if the other side of the pond agrees with my bikeshedding...
+On Sat, May 27, 2023 at 6:32=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> On Sat, 27 May 2023 00:00:47 +0100,
+> Ian Rogers <irogers@google.com> wrote:
+> >
+> > On Thu, May 25, 2023 at 8:56=E2=80=AFAM Oliver Upton <oliver.upton@linu=
+x.dev> wrote:
+> > >
+> > > On Thu, May 25, 2023 at 04:20:31PM +0200, Peter Zijlstra wrote:
+> > > > On Thu, May 25, 2023 at 07:11:41AM +0000, Oliver Upton wrote:
+> > > >
+> > > > > The PMUv3 driver does pass a name, but it relies on getting back =
+an
+> > > > > allocated pmu id as @type is -1 in the call to perf_pmu_register(=
+).
+> > > > >
+> > > > > What actually broke is how KVM probes for a default core PMU to u=
+se for
+> > > > > a guest. kvm_pmu_probe_armpmu() creates a counter w/ PERF_TYPE_RA=
+W and
+> > > > > reads the pmu from the returned perf_event. The linear search had=
+ the
+> > > > > effect of eventually stumbling on the correct core PMU and succee=
+ding.
+> > > > >
+> > > > > Perf folks: is this WAI for heterogenous systems?
+> > > >
+> > > > TBH, I'm not sure. hetero and virt don't mix very well AFAIK and I'=
+m not
+> > > > sure what ARM64 does here.
+> > > >
+> > > > IIRC the only way is to hard affine things; that is, force vCPU of
+> > > > 'type' to the pCPU mask of 'type' CPUs.
+> > >
+> > > We provide absolutely no illusion of consistency across implementatio=
+ns.
+> > > Userspace can select the PMU type, and then it is a userspace problem
+> > > affining vCPUs to the right pCPUs.
+> > >
+> > > And if they get that wrong, we just bail and refuse to run the vCPU.
+> > >
+> > > > If you don't do that; or let userspace 'override' that, things go
+> > > > sideways *real* fast.
+> > >
+> > > Oh yeah, and I wish PMUs were the only problem with these hetero
+> > > systems...
+> >
+> > Just to add some context from what I understand. There are inbuilt
+> > type numbers for PMUs:
+> > https://git.kernel.org/pub/scm/linux/kernel/git/acme/linux.git/tree/inc=
+lude/uapi/linux/perf_event.h?h=3Dperf-tools-next#n34
+> > so the PMU generally called /sys/devices/cpu should have type 4 (ARM
+> > give it another name). For heterogeneous ARM there is a single PMU and
+> > the same events are programmed regardless of whether it is a big or a
+> > little core - the cpumask lists all CPUs.
+>
+> I think you misunderstood the way heterogeneous arm64 systems are
+> described . Each CPU type gets its own PMU type, and its own event
+> list. Case in point:
+>
+> $ grep . /sys/devices/*pmu/{type,cpus}
+> /sys/devices/apple_avalanche_pmu/type:9
+> /sys/devices/apple_blizzard_pmu/type:8
+> /sys/devices/apple_avalanche_pmu/cpus:4-9
+> /sys/devices/apple_blizzard_pmu/cpus:0-3
+>
+> Type 4 (aka PERF_EVENT_RAW) is AFAICT just a way to encode the raw
+> event number, nothing else.
 
-I don't think this works just as suggested. It completely breaks all
-the existing macros that use implicit (in order) initialisers. Not
-hard to fix, but pretty invasive (I count 656 warnings in my current
-tree).
+Which PMU will a raw event open on? Note, the raw events don't support
+the extended type that is present in PERF_TYPE_HARDWARE and
+PERF_TYPE_HW_CACHE:
+https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/tree/include/ua=
+pi/linux/perf_event.h#n41
+as the bits are already in use for being just plain config values. I
+suspect not being type 4 is a bug on apple ARM here.
 
-I agree it is much cleaner though.
+Thanks,
+Ian
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
