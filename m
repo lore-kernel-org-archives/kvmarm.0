@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA497E
-	for <kvmarm@lists.linux.dev>; Sun, 28 May 2023 10:53:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77319C433EF;
-	Sun, 28 May 2023 10:53:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340B27E
+	for <kvmarm@lists.linux.dev>; Sun, 28 May 2023 11:05:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA7BCC433D2;
+	Sun, 28 May 2023 11:05:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1685271190;
-	bh=Ug5kWRktJUW8JxUHIhi/JVQATkzY2UsMsgeuXDwr0Jo=;
+	s=k20201202; t=1685271902;
+	bh=zn4SafuYiIteYV5WInbWC7srF7fv0j/nzgR9x3s99Po=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=H/6HZEEIp3JWuN5RIuN4FysQkG4rzIBvtSCgXhhfmUnOL5j6vWeHN0IhsJLfoSxh1
-	 x4LyQ1SkkFZv3cMbz5FeeNICzItS8sDOR01+oJdbfjKVep78SNhv9k3ly8w8n/nvHT
-	 k8iBoZAuJex+oPBeFdmo4yaRNDI+e89Im8OIo/N7qpMQRxfLg9c4owc1iwj4iaIXyd
-	 BZCxCumA2KvYeFdiAeVTf2CDZXV/32x6flTrgaAWzZmmaYP6ulk5o0GMSvwe31E+GX
-	 hhRUL6xhtjjFW0mCSREgoAHBwp3wYAw1iAoJiiRTzQ7d/0jcTcv5As9sSzERPMaLUz
-	 Uyf48eZo3vhIA==
+	b=syVRi+4YD9fUK2iAzaDOQJEZW/nWfnCNsoSfak2g49dcye9K0t+yglzYVDMHN2xk/
+	 Af+PYmvztWva8ub0Y5AlMNoMjIG1dWhrLk7LjvE7YhhqhyjIg5Nym6oK2VqDctj3lL
+	 89YEddXyzIJ6kdDWy9cuOiv+Ex+Qig32g8zxNj23kv5bbsJTj+Vvyjqw26G2ixua7c
+	 rJF1a48ouK+AUrZlkNJMiSFOxvEwaHbKBQCk5tmBwfXe47JamU+vDsMTtkUm318sCA
+	 o9hzz0FxCer0I7yzOCd1EL4cl2ipBIU6EDzfknbiqv5nd1+IXhFBKUTAWg863SuzYt
+	 jyDzPl8our5kg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1q3E1M-000rot-Ej;
-	Sun, 28 May 2023 11:53:08 +0100
-Date: Sun, 28 May 2023 11:52:59 +0100
-Message-ID: <87r0r0ohh0.wl-maz@kernel.org>
+	id 1q3ECq-000ruO-Da;
+	Sun, 28 May 2023 12:05:00 +0100
+Date: Sun, 28 May 2023 12:04:51 +0100
+Message-ID: <87pm6kogx8.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Jing Zhang <jingzhangos@google.com>
 Cc: KVM <kvm@vger.kernel.org>,
@@ -37,10 +37,10 @@ Cc: KVM <kvm@vger.kernel.org>,
 	Fuad Tabba <tabba@google.com>,
 	Reiji Watanabe <reijiw@google.com>,
 	Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v10 3/5] KVM: arm64: Use per guest ID register for ID_AA64DFR0_EL1.PMUVer
-In-Reply-To: <20230522221835.957419-4-jingzhangos@google.com>
+Subject: Re: [PATCH v10 5/5] KVM: arm64: Refactor writings for PMUVer/CSV2/CSV3
+In-Reply-To: <20230522221835.957419-6-jingzhangos@google.com>
 References: <20230522221835.957419-1-jingzhangos@google.com>
-	<20230522221835.957419-4-jingzhangos@google.com>
+	<20230522221835.957419-6-jingzhangos@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -56,268 +56,57 @@ X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.lin
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 22 May 2023 23:18:33 +0100,
+On Mon, 22 May 2023 23:18:35 +0100,
 Jing Zhang <jingzhangos@google.com> wrote:
 > 
-> With per guest ID registers, PMUver settings from userspace
-> can be stored in its corresponding ID register.
-> 
-> No functional change intended.
+> Refactor writings for ID_AA64PFR0_EL1.[CSV2|CSV3],
+> ID_AA64DFR0_EL1.PMUVer and ID_DFR0_ELF.PerfMon based on utilities
+> specific to ID register.
 > 
 > Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > ---
->  arch/arm64/include/asm/kvm_host.h |  12 ++--
->  arch/arm64/kvm/arm.c              |   6 --
->  arch/arm64/kvm/sys_regs.c         | 100 ++++++++++++++++++++++++------
->  include/kvm/arm_pmu.h             |   5 +-
->  4 files changed, 92 insertions(+), 31 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 8a2fde6c04c4..7b0f43373dbe 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -246,6 +246,13 @@ struct kvm_arch {
->  #define KVM_ARCH_FLAG_TIMER_PPIS_IMMUTABLE		7
->  	/* SMCCC filter initialized for the VM */
->  #define KVM_ARCH_FLAG_SMCCC_FILTER_CONFIGURED		8
-> +	/*
-> +	 * AA64DFR0_EL1.PMUver was set as ID_AA64DFR0_EL1_PMUVer_IMP_DEF
-> +	 * or DFR0_EL1.PerfMon was set as ID_DFR0_EL1_PerfMon_IMPDEF from
-> +	 * userspace for VCPUs without PMU.
-> +	 */
-> +#define KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU		9
-> +
->  	unsigned long flags;
->  
->  	/*
-> @@ -257,11 +264,6 @@ struct kvm_arch {
->  
->  	cpumask_var_t supported_cpus;
->  
-> -	struct {
-> -		u8 imp:4;
-> -		u8 unimp:4;
-> -	} dfr0_pmuver;
-> -
->  	/* Hypercall features firmware registers' descriptor */
->  	struct kvm_smccc_features smccc_feat;
->  	struct maple_tree smccc_filter;
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 5114521ace60..ca18c09ccf82 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -148,12 +148,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  	kvm_arm_init_hypercalls(kvm);
->  	kvm_arm_init_id_regs(kvm);
->  
-> -	/*
-> -	 * Initialise the default PMUver before there is a chance to
-> -	 * create an actual PMU.
-> -	 */
-> -	kvm->arch.dfr0_pmuver.imp = kvm_arm_pmu_get_pmuver_limit();
-> -
->  	return 0;
->  
->  err_free_cpumask:
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 9fb1c2f8f5a5..84d9e4baa4f8 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1178,9 +1178,12 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
->  static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
->  {
->  	if (kvm_vcpu_has_pmu(vcpu))
-> -		return vcpu->kvm->arch.dfr0_pmuver.imp;
-> +		return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
-> +				 IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1));
-> +	else if (test_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags))
-> +		return ID_AA64DFR0_EL1_PMUVer_IMP_DEF;
->  
-> -	return vcpu->kvm->arch.dfr0_pmuver.unimp;
-> +	return 0;
->  }
->  
->  static u8 perfmon_to_pmuver(u8 perfmon)
-> @@ -1403,8 +1406,12 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
->  			       const struct sys_reg_desc *rd,
->  			       u64 val)
->  {
-> +	struct kvm_arch *arch = &vcpu->kvm->arch;
-> +	u64 old_val = read_id_reg(vcpu, rd);
->  	u8 pmuver, host_pmuver;
-> +	u64 new_val = val;
->  	bool valid_pmu;
-> +	int ret = 0;
->  
->  	host_pmuver = kvm_arm_pmu_get_pmuver_limit();
->  
-> @@ -1424,26 +1431,51 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
->  	if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
->  		return -EINVAL;
->  
-> +	mutex_lock(&arch->config_lock);
->  	/* We can only differ with PMUver, and anything else is an error */
-> -	val ^= read_id_reg(vcpu, rd);
-> +	val ^= old_val;
->  	val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-> -	if (val)
-> -		return -EINVAL;
-> +	if (val) {
-> +		ret = -EINVAL;
-> +		goto out;
-> +	}
->  
-> -	if (valid_pmu)
-> -		vcpu->kvm->arch.dfr0_pmuver.imp = pmuver;
-> -	else
-> -		vcpu->kvm->arch.dfr0_pmuver.unimp = pmuver;
-> +	/* Only allow userspace to change the idregs before VM running */
-> +	if (kvm_vm_has_ran_once(vcpu->kvm)) {
-> +		if (new_val != old_val)
-> +			ret = -EBUSY;
-> +	} else {
-> +		if (valid_pmu) {
-> +			val = IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1);
-> +			val &= ~ID_AA64DFR0_EL1_PMUVer_MASK;
-> +			val |= FIELD_PREP(ID_AA64DFR0_EL1_PMUVer_MASK, pmuver);
-> +			IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) = val;
-> +
-> +			val = IDREG(vcpu->kvm, SYS_ID_DFR0_EL1);
-> +			val &= ~ID_DFR0_EL1_PerfMon_MASK;
-> +			val |= FIELD_PREP(ID_DFR0_EL1_PerfMon_MASK, pmuver_to_perfmon(pmuver));
-> +			IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) = val;
-> +		} else {
-> +			assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags,
-> +				   pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
-> +		}
-> +	}
->  
-> -	return 0;
-> +out:
-> +	mutex_unlock(&arch->config_lock);
-> +	return ret;
->  }
->  
->  static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
->  			   const struct sys_reg_desc *rd,
->  			   u64 val)
->  {
-> +	struct kvm_arch *arch = &vcpu->kvm->arch;
-> +	u64 old_val = read_id_reg(vcpu, rd);
->  	u8 perfmon, host_perfmon;
-> +	u64 new_val = val;
->  	bool valid_pmu;
-> +	int ret = 0;
->  
->  	host_perfmon = pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit());
->  
-> @@ -1464,18 +1496,39 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
->  	if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
->  		return -EINVAL;
->  
-> +	mutex_lock(&arch->config_lock);
->  	/* We can only differ with PerfMon, and anything else is an error */
-> -	val ^= read_id_reg(vcpu, rd);
-> +	val ^= old_val;
->  	val &= ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
-> -	if (val)
-> -		return -EINVAL;
-> +	if (val) {
-> +		ret = -EINVAL;
-> +		goto out;
-> +	}
->  
-> -	if (valid_pmu)
-> -		vcpu->kvm->arch.dfr0_pmuver.imp = perfmon_to_pmuver(perfmon);
-> -	else
-> -		vcpu->kvm->arch.dfr0_pmuver.unimp = perfmon_to_pmuver(perfmon);
-> +	/* Only allow userspace to change the idregs before VM running */
-> +	if (kvm_vm_has_ran_once(vcpu->kvm)) {
-> +		if (new_val != old_val)
-> +			ret = -EBUSY;
-> +	} else {
-> +		if (valid_pmu) {
-> +			val = IDREG(vcpu->kvm, SYS_ID_DFR0_EL1);
-> +			val &= ~ID_DFR0_EL1_PerfMon_MASK;
-> +			val |= FIELD_PREP(ID_DFR0_EL1_PerfMon_MASK, perfmon);
-> +			IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) = val;
-> +
-> +			val = IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1);
-> +			val &= ~ID_AA64DFR0_EL1_PMUVer_MASK;
-> +			val |= FIELD_PREP(ID_AA64DFR0_EL1_PMUVer_MASK, perfmon_to_pmuver(perfmon));
-> +			IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) = val;
-> +		} else {
-> +			assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags,
-> +				   perfmon == ID_DFR0_EL1_PerfMon_IMPDEF);
-> +		}
-> +	}
+>  arch/arm64/include/asm/cpufeature.h |   1 +
+>  arch/arm64/kernel/cpufeature.c      |   2 +-
+>  arch/arm64/kvm/sys_regs.c           | 365 ++++++++++++++++++----------
+>  3 files changed, 243 insertions(+), 125 deletions(-)
 
-This is the exact same code as for aa64fdr0. Make it a helper, please.
+Reading the result after applying this series, I feel like a stuck
+record. This final series still contains gems like this:
 
->  
-> -	return 0;
-> +out:
-> +	mutex_unlock(&arch->config_lock);
-> +	return ret;
->  }
->  
->  /*
-> @@ -3422,6 +3475,17 @@ void kvm_arm_init_id_regs(struct kvm *kvm)
->  	}
->  
->  	IDREG(kvm, SYS_ID_AA64PFR0_EL1) = val;
-> +	/*
-> +	 * Initialise the default PMUver before there is a chance to
-> +	 * create an actual PMU.
-> +	 */
-> +	val = IDREG(kvm, SYS_ID_AA64DFR0_EL1);
-> +
-> +	val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-> +	val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
-> +			  kvm_arm_pmu_get_pmuver_limit());
-> +
-> +	IDREG(kvm, SYS_ID_AA64DFR0_EL1) = val;
->  }
->  
->  int __init kvm_sys_reg_table_init(void)
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index 1a6a695ca67a..8d70dbdc1e0a 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -92,8 +92,9 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
->  /*
->   * Evaluates as true when emulating PMUv3p5, and false otherwise.
->   */
-> -#define kvm_pmu_is_3p5(vcpu)						\
-> -	(vcpu->kvm->arch.dfr0_pmuver.imp >= ID_AA64DFR0_EL1_PMUVer_V3P5)
-> +#define kvm_pmu_is_3p5(vcpu)									\
-> +	 (FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),					\
-> +		    IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1)) >= ID_AA64DFR0_EL1_PMUVer_V3P5)
+static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+			       const struct sys_reg_desc *rd,
+			       u64 val)
+{
+	u8 csv2, csv3;
 
-This is getting unreadable. How about something like:
+	/*
+	 * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long as
+	 * it doesn't promise more than what is actually provided (the
+	 * guest could otherwise be covered in ectoplasmic residue).
+	 */
+	csv2 = cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_EL1_CSV2_SHIFT);
+	if (csv2 > 1 ||
+	    (csv2 && arm64_get_spectre_v2_state() != SPECTRE_UNAFFECTED))
+		return -EINVAL;
 
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 8d70dbdc1e0a..ecb55d87fa36 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -92,9 +92,13 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
- /*
-  * Evaluates as true when emulating PMUv3p5, and false otherwise.
-  */
--#define kvm_pmu_is_3p5(vcpu)									\
--	 (FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),					\
--		    IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1)) >= ID_AA64DFR0_EL1_PMUVer_V3P5)
-+#define kvm_pmu_is_3p5(vcpu)	({					\
-+	u64 val = IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1); 		\
-+	u8 v;								\
-+									\
-+	v = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), val);	\
-+	v >= ID_AA64DFR0_EL1_PMUVer_V3P5;				\
-+})
- 
- u8 kvm_arm_pmu_get_pmuver_limit(void);
- 
-Thanks,
+	/* Same thing for CSV3 */
+	csv3 = cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_EL1_CSV3_SHIFT);
+	if (csv3 > 1 ||
+	    (csv3 && arm64_get_meltdown_state() != SPECTRE_UNAFFECTED))
+		return -EINVAL;
+
+	return set_id_reg(vcpu, rd, val);
+}
+
+Why do we have this? I've asked the question at least 3 times in the
+previous versions, and I still see the same code.
+
+If we have sane limits, the call to arm64_check_features() in
+set_id_reg() will catch the illegal write. So why do we have this at
+all? The whole point of the exercise was to unify the handling. But
+you're actually making it worse.
+
+So what's the catch?
 
 	M.
 
