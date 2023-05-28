@@ -1,167 +1,286 @@
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F26A27E
-	for <kvmarm@lists.linux.dev>; Sat, 27 May 2023 20:13:44 +0000 (UTC)
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-33164ec77ccso110165ab.0
-        for <kvmarm@lists.linux.dev>; Sat, 27 May 2023 13:13:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685218424; x=1687810424;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hK0j7POD8nRAsgGVVyJyo0UAU2zdW6aeJVN1+UjYElg=;
-        b=QKnbpAkfLda1TvWrqaHzwSET9fcih+s5ib+TdEQpynJiDGgVyvcDWnq3f1jN8iSFFh
-         i4wFHU4TObni6/73zZFM2D/pTSqgWk3+PPUYZMhIR48y37fhDEuDC9+d1+t2fRyrNgkr
-         ayuCVtu0XYwZQdosz7e+wfHDnmUd/KZvqBq519Uy5lfqbbTbuuKK9L+bNXaHlLVwpoUG
-         cBLrrDoSDWDEZ8OZLuLbQmUVgsGX8ts8KOPplFja+x5y6f4LRsCZW4nMJ6qgcp4bf8BG
-         SEOtEkefIHI1t2fsfFozpr5n9BYz9LMkdnQOauJRbx9hSkM/0nH1fRNwjjqiDsKIVZLy
-         cqTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685218424; x=1687810424;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hK0j7POD8nRAsgGVVyJyo0UAU2zdW6aeJVN1+UjYElg=;
-        b=P1Q5sE3UWPPWuWbcAKjDSd7k2su2vdKqKEUNlwQV/E+HQk7M3xXvT4KI6v99qUCVtz
-         bYKtIrUKJb5tHEKQPKCHRGC/cURdAIerBLbBOuH1Hn2MeUumoEm2DkFku+cf5OGYMNm0
-         /D4Kzj+cs/WuazZ6LqoW53peT/SWWu1QW7f4Ipcr4peNshFKazq8HEdpHPEgjL7+BzEp
-         tJKipzb35TcisaBjREAHTJQ5P3SJbNB15ENFX1crA0asJC4WUsOgucmYVchNigSEucS5
-         hodNFOWfIf2+67rmJytr8Jl2BQ9RW5gH219keUryxDLC4xGHrQQpqCMGxEONkuV39TOF
-         LK2g==
-X-Gm-Message-State: AC+VfDxEOYJMlhFUSyJdrIU+CVYqb1sKLdz5NOHsLeAXJ0ytpcwCRdST
-	MIP+65zG/B2e9/tsMYNRNbcuMAWpieDzQgx6Scsbhw==
-X-Google-Smtp-Source: ACHHUZ5RLdNfCuhTMMzeLnK0AkjXh46hEGbQ5DPXaiuA4QGSm27lLMiJSKz6HarBK0wHhmVvVqcZAJpytCQ/s6idEUA=
-X-Received: by 2002:a05:6e02:2185:b0:337:c9ec:4ca with SMTP id
- j5-20020a056e02218500b00337c9ec04camr138001ila.2.1685218423829; Sat, 27 May
- 2023 13:13:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D141137A
+	for <kvmarm@lists.linux.dev>; Sun, 28 May 2023 09:56:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2699AC433D2;
+	Sun, 28 May 2023 09:56:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1685267793;
+	bh=EfunphdzzuCOJc8M0C1p3Vwg9svwPApnZjY/w3bYMWc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DAZPv68frDwURgAeCt3zBfLA9aLhF46YlpWWVFGuTJQQba/GeG9/Il5g2iIYSMbke
+	 WPoi8YDZVvcnbnJqfLWk+3BsNLBhk9Q9DaVdZL0L5MUR/bLK4lM2cSNZwyQ7ziyWyU
+	 s5TsrS2k8AS7droGL9qSB0CzNdVQhLWAvxgBEoq/YUF7Eylbio4v+NkHhaViMwK0HN
+	 4s5g5yy9iOrscHy/BGLtftOYByY2iIEtG+4fnRpF0Rzfb33QZvTL8rjiA4ooTmoWzN
+	 aPUc8T4ACF19y3xsDtxhGPLqFzw48yCvJLxNjmvMBj/fKQqtcI36TkVjcsRV90UdLG
+	 o8V45lFvSP7iA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1q3D8Y-000rUt-MG;
+	Sun, 28 May 2023 10:56:30 +0100
+Date: Sun, 28 May 2023 10:56:22 +0100
+Message-ID: <87ttvwok3d.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jing Zhang <jingzhangos@google.com>
+Cc: KVM <kvm@vger.kernel.org>,
+	KVMARM <kvmarm@lists.linux.dev>,
+	ARMLinux <linux-arm-kernel@lists.infradead.org>,
+	Oliver Upton <oupton@google.com>,
+	Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Reiji Watanabe <reijiw@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v10 1/5] KVM: arm64: Save ID registers' sanitized value per guest
+In-Reply-To: <20230522221835.957419-2-jingzhangos@google.com>
+References: <20230522221835.957419-1-jingzhangos@google.com>
+	<20230522221835.957419-2-jingzhangos@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230526234435.662652-1-yuzhao@google.com> <20230526234435.662652-5-yuzhao@google.com>
- <ZHJHJPBF6euzOFdw@linux.dev>
-In-Reply-To: <ZHJHJPBF6euzOFdw@linux.dev>
-From: Yu Zhao <yuzhao@google.com>
-Date: Sat, 27 May 2023 14:13:07 -0600
-Message-ID: <CAOUHufa74CufHziHSquO5bZwbFXz2MNssBzW+AH7=Xo5RCnQ0A@mail.gmail.com>
-Subject: Re: [PATCH mm-unstable v2 04/10] kvm/arm64: make stage2 page tables
- RCU safe
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Alistair Popple <apopple@nvidia.com>, Anup Patel <anup@brainfault.org>, 
-	Ben Gardon <bgardon@google.com>, Borislav Petkov <bp@alien8.de>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Christophe Leroy <christophe.leroy@csgroup.eu>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	Fabiano Rosas <farosas@linux.ibm.com>, Gaosheng Cui <cuigaosheng1@huawei.com>, 
-	Gavin Shan <gshan@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
-	James Morse <james.morse@arm.com>, "Jason A. Donenfeld" <Jason@zx2c4.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Michael Larabel <michael@michaellarabel.com>, 
-	Mike Rapoport <rppt@kernel.org>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@ozlabs.org>, 
-	Peter Xu <peterx@redhat.com>, Sean Christopherson <seanjc@google.com>, 
-	Steven Rostedt <rostedt@goodmis.org>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	linuxppc-dev@lists.ozlabs.org, linux-trace-kernel@vger.kernel.org, 
-	x86@kernel.org, linux-mm@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, reijiw@google.com, rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, May 27, 2023 at 12:08=E2=80=AFPM Oliver Upton <oliver.upton@linux.d=
-ev> wrote:
->
-> Yu,
->
-> On Fri, May 26, 2023 at 05:44:29PM -0600, Yu Zhao wrote:
-> > Stage2 page tables are currently not RCU safe against unmapping or VM
-> > destruction. The previous mmu_notifier_ops members rely on
-> > kvm->mmu_lock to synchronize with those operations.
-> >
-> > However, the new mmu_notifier_ops member test_clear_young() provides
-> > a fast path that does not take kvm->mmu_lock. To implement
-> > kvm_arch_test_clear_young() for that path, unmapped page tables need
-> > to be freed by RCU and kvm_free_stage2_pgd() needs to be after
-> > mmu_notifier_unregister().
-> >
-> > Remapping, specifically stage2_free_removed_table(), is already RCU
-> > safe.
-> >
-> > Signed-off-by: Yu Zhao <yuzhao@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_pgtable.h |  2 ++
-> >  arch/arm64/kvm/arm.c                 |  1 +
-> >  arch/arm64/kvm/hyp/pgtable.c         |  8 ++++++--
-> >  arch/arm64/kvm/mmu.c                 | 17 ++++++++++++++++-
-> >  4 files changed, 25 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/=
-asm/kvm_pgtable.h
-> > index ff520598b62c..5cab52e3a35f 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -153,6 +153,7 @@ static inline bool kvm_level_supports_block_mapping=
-(u32 level)
-> >   * @put_page:                        Decrement the refcount on a page.=
- When the
-> >   *                           refcount reaches 0 the page is automatica=
-lly
-> >   *                           freed.
-> > + * @put_page_rcu:            RCU variant of the above.
->
-> You don't need to add yet another hook to implement this. I was working
-> on lock-free walks in a separate context and arrived at the following:
->
-> commit f82d264a37745e07ee28e116c336f139f681fd7f
-> Author: Oliver Upton <oliver.upton@linux.dev>
-> Date:   Mon May 1 08:53:37 2023 +0000
->
->     KVM: arm64: Consistently use free_removed_table() for stage-2
->
->     free_removed_table() is essential to the RCU-protected parallel walki=
-ng
->     scheme, as behind the scenes the cleanup is deferred until an RCU gra=
-ce
->     period. Nonetheless, the stage-2 unmap path calls put_page() directly=
-,
->     which leads to table memory being freed inline with the table walk.
->
->     This is safe for the time being, as the stage-2 unmap walker is calle=
-d
->     while holding the write lock. A future change to KVM will further rel=
-ax
->     the locking mechanics around the stage-2 page tables to allow lock-fr=
-ee
->     walkers protected only by RCU. As such, switch to the RCU-safe mechan=
-ism
->     for freeing table memory.
->
->     Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
->
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 3d61bd3e591d..bfbebdcb4ef0 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -1019,7 +1019,7 @@ static int stage2_unmap_walker(const struct kvm_pgt=
-able_visit_ctx *ctx,
->                                                kvm_granule_size(ctx->leve=
-l));
->
->         if (childp)
-> -               mm_ops->put_page(childp);
-> +               mm_ops->free_removed_table(childp, ctx->level);
+On Mon, 22 May 2023 23:18:31 +0100,
+Jing Zhang <jingzhangos@google.com> wrote:
+> 
+> Introduce id_regs[] in kvm_arch as a storage of guest's ID registers,
+> and save ID registers' sanitized value in the array at KVM_CREATE_VM.
+> Use the saved ones when ID registers are read by the guest or
+> userspace (via KVM_GET_ONE_REG).
+> 
+> No functional change intended.
+> 
+> Co-developed-by: Reiji Watanabe <reijiw@google.com>
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 20 +++++++++
+>  arch/arm64/kvm/arm.c              |  1 +
+>  arch/arm64/kvm/sys_regs.c         | 69 +++++++++++++++++++++++++------
+>  arch/arm64/kvm/sys_regs.h         |  7 ++++
+>  4 files changed, 85 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 7e7e19ef6993..069606170c82 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -178,6 +178,21 @@ struct kvm_smccc_features {
+>  	unsigned long vendor_hyp_bmap;
+>  };
+>  
+> +/*
+> + * Emulated CPU ID registers per VM
+> + * (Op0, Op1, CRn, CRm, Op2) of the ID registers to be saved in it
+> + * is (3, 0, 0, crm, op2), where 1<=crm<8, 0<=op2<8.
+> + *
+> + * These emulated idregs are VM-wide, but accessed from the context of a vCPU.
+> + * Atomic access to multiple idregs are guarded by kvm_arch.config_lock.
+> + */
+> +#define IDREG_IDX(id)		(((sys_reg_CRm(id) - 1) << 3) | sys_reg_Op2(id))
+> +#define IDREG(kvm, id)		((kvm)->arch.idregs.regs[IDREG_IDX(id)])
+> +#define KVM_ARM_ID_REG_NUM	(IDREG_IDX(sys_reg(3, 0, 0, 7, 7)) + 1)
+> +struct kvm_idregs {
+> +	u64 regs[KVM_ARM_ID_REG_NUM];
+> +};
+> +
+>  typedef unsigned int pkvm_handle_t;
+>  
+>  struct kvm_protected_vm {
+> @@ -253,6 +268,9 @@ struct kvm_arch {
+>  	struct kvm_smccc_features smccc_feat;
+>  	struct maple_tree smccc_filter;
+>  
+> +	/* Emulated CPU ID registers */
+> +	struct kvm_idregs idregs;
+> +
+>  	/*
+>  	 * For an untrusted host VM, 'pkvm.handle' is used to lookup
+>  	 * the associated pKVM instance in the hypervisor.
+> @@ -1045,6 +1063,8 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+>  int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
+>  				    struct kvm_arm_counter_offset *offset);
+>  
+> +void kvm_arm_init_id_regs(struct kvm *kvm);
+> +
+>  /* Guest/host FPSIMD coordination helpers */
+>  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+>  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 14391826241c..774656a0718d 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -163,6 +163,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  
+>  	set_default_spectre(kvm);
+>  	kvm_arm_init_hypercalls(kvm);
+> +	kvm_arm_init_id_regs(kvm);
+>  
+>  	/*
+>  	 * Initialise the default PMUver before there is a chance to
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 71b12094d613..d2ee3a1c7f03 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -41,6 +41,7 @@
+>   * 64bit interface.
+>   */
+>  
+> +static u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id);
+>  static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
+>  
+>  static bool read_from_write_only(struct kvm_vcpu *vcpu,
+> @@ -364,7 +365,7 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
+>  			  struct sys_reg_params *p,
+>  			  const struct sys_reg_desc *r)
+>  {
+> -	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
+> +	u64 val = kvm_arm_read_id_reg(vcpu, SYS_ID_AA64MMFR1_EL1);
+>  	u32 sr = reg_to_encoding(r);
+>  
+>  	if (!(val & (0xfUL << ID_AA64MMFR1_EL1_LO_SHIFT))) {
+> @@ -1208,16 +1209,9 @@ static u8 pmuver_to_perfmon(u8 pmuver)
+>  	}
+>  }
+>  
+> -/* Read a sanitised cpufeature ID register by sys_reg_desc */
+> -static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r)
+> +static u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
 
-Thanks, Oliver.
+'id' is misleading here. Is it an encoding? Or is it the index in the
+array? Reading the code, it is likely to be the former, but maybe
+calling the parameter 'encoding' would help.
 
-A couple of things I haven't had the chance to verify -- I'm hoping
-you could help clarify:
-1. For unmapping, with free_removed_table(), wouldn't we have to look
-into the table we know it's empty unnecessarily?
-2. For remapping and unmapping, how does free_removed_table() put the
-final refcnt on the table passed in? (Previously we had
-put_page(childp) in stage2_map_walk_table_post(). So I'm assuming we'd
-have to do something equivalent with free_removed_table().)
+>  {
+> -	u32 id = reg_to_encoding(r);
+> -	u64 val;
+> -
+> -	if (sysreg_visible_as_raz(vcpu, r))
+> -		return 0;
+> -
+> -	val = read_sanitised_ftr_reg(id);
+> +	u64 val = IDREG(vcpu->kvm, id);
+>  
+>  	switch (id) {
+>  	case SYS_ID_AA64PFR0_EL1:
+> @@ -1280,6 +1274,26 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r
+>  	return val;
+>  }
+>  
+> +/* Read a sanitised cpufeature ID register by sys_reg_desc */
+> +static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r)
+> +{
+> +	if (sysreg_visible_as_raz(vcpu, r))
+> +		return 0;
+> +
+> +	return kvm_arm_read_id_reg(vcpu, reg_to_encoding(r));
+> +}
+> +
+> +/*
+> + * Return true if the register's (Op0, Op1, CRn, CRm, Op2) is
+> + * (3, 0, 0, crm, op2), where 1<=crm<8, 0<=op2<8.
+> + */
+> +static inline bool is_id_reg(u32 id)
+> +{
+> +	return (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
+> +		sys_reg_CRn(id) == 0 && sys_reg_CRm(id) >= 1 &&
+> +		sys_reg_CRm(id) < 8);
+> +}
+> +
+>  static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
+>  				  const struct sys_reg_desc *r)
+>  {
+> @@ -2244,8 +2258,8 @@ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
+>  	if (p->is_write) {
+>  		return ignore_write(vcpu, p);
+>  	} else {
+> -		u64 dfr = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
+> -		u64 pfr = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+> +		u64 dfr = kvm_arm_read_id_reg(vcpu, SYS_ID_AA64DFR0_EL1);
+> +		u64 pfr = kvm_arm_read_id_reg(vcpu, SYS_ID_AA64PFR0_EL1);
+>  		u32 el3 = !!cpuid_feature_extract_unsigned_field(pfr, ID_AA64PFR0_EL1_EL3_SHIFT);
+>  
+>  		p->regval = ((((dfr >> ID_AA64DFR0_EL1_WRPs_SHIFT) & 0xf) << 28) |
+> @@ -3343,6 +3357,37 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+>  	return write_demux_regids(uindices);
+>  }
+>  
+> +/*
+> + * Set the guest's ID registers with ID_SANITISED() to the host's sanitized value.
+> + */
+> +void kvm_arm_init_id_regs(struct kvm *kvm)
+> +{
+> +	const struct sys_reg_desc *idreg;
+> +	struct sys_reg_params params;
+> +	u32 id;
+> +
+> +	/* Find the first idreg (SYS_ID_PFR0_EL1) in sys_reg_descs. */
+> +	id = SYS_ID_PFR0_EL1;
+> +	params = encoding_to_params(id);
+> +	idreg = find_reg(&params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
+> +	if (WARN_ON(!idreg))
+> +		return;
+
+What is this trying to guard against? Not finding ID_PFR0_EL1 in the
+sysreg table? But this says nothing about the following registers (all
+55 of them), so why do we need to special-case this one?
+
+> +
+> +	/* Initialize all idregs */
+> +	while (is_id_reg(id)) {
+> +		/*
+> +		 * Some hidden ID registers which are not in arm64_ftr_regs[]
+> +		 * would cause warnings from read_sanitised_ftr_reg().
+> +		 * Skip those ID registers to avoid the warnings.
+> +		 */
+> +		if (idreg->visibility != raz_visibility)
+> +			IDREG(kvm, id) = read_sanitised_ftr_reg(id);
+> +
+> +		idreg++;
+> +		id = reg_to_encoding(idreg);
+> +	}
+> +}
+> +
+>  int __init kvm_sys_reg_table_init(void)
+>  {
+>  	bool valid = true;
+> diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+> index 6b11f2cc7146..eba10de2e7ae 100644
+> --- a/arch/arm64/kvm/sys_regs.h
+> +++ b/arch/arm64/kvm/sys_regs.h
+> @@ -27,6 +27,13 @@ struct sys_reg_params {
+>  	bool	is_write;
+>  };
+>  
+> +#define encoding_to_params(reg)						\
+> +	((struct sys_reg_params){ .Op0 = sys_reg_Op0(reg),		\
+> +				  .Op1 = sys_reg_Op1(reg),		\
+> +				  .CRn = sys_reg_CRn(reg),		\
+> +				  .CRm = sys_reg_CRm(reg),		\
+> +				  .Op2 = sys_reg_Op2(reg) })
+> +
+>  #define esr_sys64_to_params(esr)                                               \
+>  	((struct sys_reg_params){ .Op0 = ((esr) >> 20) & 3,                    \
+>  				  .Op1 = ((esr) >> 14) & 0x7,                  \
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
