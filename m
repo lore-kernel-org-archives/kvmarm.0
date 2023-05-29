@@ -1,114 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340B27E
-	for <kvmarm@lists.linux.dev>; Sun, 28 May 2023 11:05:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA7BCC433D2;
-	Sun, 28 May 2023 11:05:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1685271902;
-	bh=zn4SafuYiIteYV5WInbWC7srF7fv0j/nzgR9x3s99Po=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=syVRi+4YD9fUK2iAzaDOQJEZW/nWfnCNsoSfak2g49dcye9K0t+yglzYVDMHN2xk/
-	 Af+PYmvztWva8ub0Y5AlMNoMjIG1dWhrLk7LjvE7YhhqhyjIg5Nym6oK2VqDctj3lL
-	 89YEddXyzIJ6kdDWy9cuOiv+Ex+Qig32g8zxNj23kv5bbsJTj+Vvyjqw26G2ixua7c
-	 rJF1a48ouK+AUrZlkNJMiSFOxvEwaHbKBQCk5tmBwfXe47JamU+vDsMTtkUm318sCA
-	 o9hzz0FxCer0I7yzOCd1EL4cl2ipBIU6EDzfknbiqv5nd1+IXhFBKUTAWg863SuzYt
-	 jyDzPl8our5kg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1q3ECq-000ruO-Da;
-	Sun, 28 May 2023 12:05:00 +0100
-Date: Sun, 28 May 2023 12:04:51 +0100
-Message-ID: <87pm6kogx8.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jing Zhang <jingzhangos@google.com>
-Cc: KVM <kvm@vger.kernel.org>,
-	KVMARM <kvmarm@lists.linux.dev>,
-	ARMLinux <linux-arm-kernel@lists.infradead.org>,
-	Oliver Upton <oupton@google.com>,
-	Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A5F62D
+	for <kvmarm@lists.linux.dev>; Mon, 29 May 2023 02:48:55 +0000 (UTC)
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-64d1e96c082so2075683b3a.1
+        for <kvmarm@lists.linux.dev>; Sun, 28 May 2023 19:48:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20221208.gappssmtp.com; s=20221208; t=1685328535; x=1687920535;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=G4Nb/gFMm8Ye9wyALRV/xgn92872VRuD4vbstmC2QEw=;
+        b=NOjWamSYnCLQvYfKu8DJq+B0/i3lMIg0lSMnghs2kA7eYtwehwitTw8cfLbYhKd0ju
+         foqc4dLoVmDgrUN4Ezs5H6a7UBsIJyFrXiEacDO5HjrImstFrJvGqwuZrTatKkTAarSE
+         O+Y2NpFKFMia/vtb7J1ZW03ErSdff5CWJI7/jkRzHLzbcdT4JCqNigWlprjEou16haR6
+         Pl0P+rk2jW8g8oJx7qBpc4A1n3D6xsfQX5BwzPvKJO3WcrhXerEgnyX6/Pa/4w0Vm83i
+         6CFPiuIuLuF8HOg6QCCOk/haz6HHhzZn4V+eoWVH1z27pqmnnEBa/0ximUKIKtaAC/IJ
+         jFYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685328535; x=1687920535;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=G4Nb/gFMm8Ye9wyALRV/xgn92872VRuD4vbstmC2QEw=;
+        b=K8nl6eD2xiW803UdjXH4Xis1neBLunH3UmkzSr9wnhPEK4ANxDAqGwD7aAJiqG5OAn
+         Hj+U7UwnVkApdgmezOFyod2QcA1WXEmXH83Vt6WZ9q8L4TqfgoJ9l4eW5HSTz3cyk2zd
+         OtHAM6k0LH1kDUjb4wdb6737L4fOXsKcKXagtNf/nJejRDOdUqdnjSwZq7X7GaO/RP4/
+         wFvn6N7CAdeawZbsZTaWhe1LeLJ/7UazsGOcRpmYvZWLmCUBYJQtXcmk3LRUbVUX1PIH
+         vjyfIEgU9Afuk7LkA1XgubdWLh+F8PcURnjXQ0MOVBWR0aU3FT6OlCpf7dgZ6uxR4xgV
+         l4MA==
+X-Gm-Message-State: AC+VfDy5amvbix7HnJcYVWMpuk7O1ObONEcEAKCApMIlSs/2FTrdcGuN
+	owZP4JoQ4oh1m0cmPUYL3fPe2g==
+X-Google-Smtp-Source: ACHHUZ4mx6kzGcSLWLye7VJKM8QzXipRR+WZ0JOezVy9o+7MbOB0M4Cmb/lafTqjjm77gYCEBD9Uxw==
+X-Received: by 2002:a05:6a00:1486:b0:647:b6c9:179d with SMTP id v6-20020a056a00148600b00647b6c9179dmr15084106pfu.21.1685328535460;
+        Sun, 28 May 2023 19:48:55 -0700 (PDT)
+Received: from fedora.. ([157.82.203.71])
+        by smtp.gmail.com with ESMTPSA id c8-20020aa78c08000000b0063d2d9990ecsm5791039pfd.87.2023.05.28.19.48.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 28 May 2023 19:48:55 -0700 (PDT)
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+To: 
+Cc: Marc Zyngier <maz@kernel.org>,
 	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Reiji Watanabe <reijiw@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v10 5/5] KVM: arm64: Refactor writings for PMUVer/CSV2/CSV3
-In-Reply-To: <20230522221835.957419-6-jingzhangos@google.com>
-References: <20230522221835.957419-1-jingzhangos@google.com>
-	<20230522221835.957419-6-jingzhangos@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Akihiko Odaki <akihiko.odaki@daynix.com>
+Subject: [PATCH] KVM: arm64: Populate fault info for watchpoint
+Date: Mon, 29 May 2023 11:48:47 +0900
+Message-Id: <20230529024847.8671-1-akihiko.odaki@daynix.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, reijiw@google.com, rananta@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Mon, 22 May 2023 23:18:35 +0100,
-Jing Zhang <jingzhangos@google.com> wrote:
-> 
-> Refactor writings for ID_AA64PFR0_EL1.[CSV2|CSV3],
-> ID_AA64DFR0_EL1.PMUVer and ID_DFR0_ELF.PerfMon based on utilities
-> specific to ID register.
-> 
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> ---
->  arch/arm64/include/asm/cpufeature.h |   1 +
->  arch/arm64/kernel/cpufeature.c      |   2 +-
->  arch/arm64/kvm/sys_regs.c           | 365 ++++++++++++++++++----------
->  3 files changed, 243 insertions(+), 125 deletions(-)
+When handling ESR_ELx_EC_WATCHPT_LOW, far_el2 member of struct
+kvm_vcpu_fault_info will be copied to far member of struct
+kvm_debug_exit_arch and exposed to the userspace. The userspace will
+see stale values from older faults if the fault info does not get
+populated.
 
-Reading the result after applying this series, I feel like a stuck
-record. This final series still contains gems like this:
+Fixes: 8fb2046180a0 ("KVM: arm64: Move early handlers to per-EC handlers")
+Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+---
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 2 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 6 ++++--
+ arch/arm64/kvm/hyp/vhe/switch.c         | 3 ++-
+ 3 files changed, 7 insertions(+), 4 deletions(-)
 
-static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
-			       const struct sys_reg_desc *rd,
-			       u64 val)
-{
-	u8 csv2, csv3;
-
-	/*
-	 * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long as
-	 * it doesn't promise more than what is actually provided (the
-	 * guest could otherwise be covered in ectoplasmic residue).
-	 */
-	csv2 = cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_EL1_CSV2_SHIFT);
-	if (csv2 > 1 ||
-	    (csv2 && arm64_get_spectre_v2_state() != SPECTRE_UNAFFECTED))
-		return -EINVAL;
-
-	/* Same thing for CSV3 */
-	csv3 = cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_EL1_CSV3_SHIFT);
-	if (csv3 > 1 ||
-	    (csv3 && arm64_get_meltdown_state() != SPECTRE_UNAFFECTED))
-		return -EINVAL;
-
-	return set_id_reg(vcpu, rd, val);
-}
-
-Why do we have this? I've asked the question at least 3 times in the
-previous versions, and I still see the same code.
-
-If we have sane limits, the call to arm64_check_features() in
-set_id_reg() will catch the illegal write. So why do we have this at
-all? The whole point of the exercise was to unify the handling. But
-you're actually making it worse.
-
-So what's the catch?
-
-	M.
-
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 07d37ff88a3f..2eb0a1481ead 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -351,7 +351,7 @@ static bool kvm_hyp_handle_cp15_32(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	return false;
+ }
+ 
+-static bool kvm_hyp_handle_iabt_low(struct kvm_vcpu *vcpu, u64 *exit_code)
++static bool kvm_hyp_handle_generic_fault(struct kvm_vcpu *vcpu, u64 *exit_code)
+ {
+ 	if (!__populate_fault_info(vcpu))
+ 		return true;
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index c2cb46ca4fb6..1b77866079dc 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -184,8 +184,9 @@ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg,
+ 	[ESR_ELx_EC_SVE]		= kvm_hyp_handle_fpsimd,
+ 	[ESR_ELx_EC_FP_ASIMD]		= kvm_hyp_handle_fpsimd,
+-	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
++	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_generic_fault,
+ 	[ESR_ELx_EC_DABT_LOW]		= kvm_hyp_handle_dabt_low,
++	[ESR_ELx_EC_WATCHPT_LOW]	= kvm_hyp_handle_generic_fault,
+ 	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
+ };
+ 
+@@ -194,8 +195,9 @@ static const exit_handler_fn pvm_exit_handlers[] = {
+ 	[ESR_ELx_EC_SYS64]		= kvm_handle_pvm_sys64,
+ 	[ESR_ELx_EC_SVE]		= kvm_handle_pvm_restricted,
+ 	[ESR_ELx_EC_FP_ASIMD]		= kvm_hyp_handle_fpsimd,
+-	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
++	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_generic_fault,
+ 	[ESR_ELx_EC_DABT_LOW]		= kvm_hyp_handle_dabt_low,
++	[ESR_ELx_EC_WATCHPT_LOW]	= kvm_hyp_handle_generic_fault,
+ 	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
+ };
+ 
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 1a97391fedd2..08ae0ee4697b 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -108,8 +108,9 @@ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg,
+ 	[ESR_ELx_EC_SVE]		= kvm_hyp_handle_fpsimd,
+ 	[ESR_ELx_EC_FP_ASIMD]		= kvm_hyp_handle_fpsimd,
+-	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
++	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_generic_fault,
+ 	[ESR_ELx_EC_DABT_LOW]		= kvm_hyp_handle_dabt_low,
++	[ESR_ELx_EC_WATCHPT_LOW]	= kvm_hyp_handle_generic_fault,
+ 	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
+ };
+ 
 -- 
-Without deviation from the norm, progress is not possible.
+2.40.1
+
