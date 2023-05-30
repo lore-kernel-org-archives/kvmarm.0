@@ -1,209 +1,84 @@
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [217.182.43.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C77BD200BC
-	for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 21:36:09 +0000 (UTC)
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-33b7f217dd0so64515ab.0
-        for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 14:36:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685482569; x=1688074569;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ewkLPgc14ELbXHOwD+0DDe9cJ9eyhGp9sBwFGmnJByA=;
-        b=OZBj5K1PJzJq7ysGaWohPD3MWFE3CYtFPYIUSyE/WsUc4uD7FgNgku0xspOed1pXA8
-         bPfgeyybhTt4zAwKD6UOJaGYfhIseE0exPCyHQq2g95hYsXmkdGga6av3EMVZslCOjvm
-         n8xtN4qGcX9z4OFguGscfFpNPt7ZZtuniT0qfzYFPu4f/HaIXaTx73xJ6DbnN1Fvq2Tv
-         z0Tdr+GMEmSSmveJB/xI/Y6oCdtQSEo7wq/d9a3GdKOyXOR1BgMivYo/pKj3EXJKMAbk
-         8TIJ5/l0zTI+LmttQ2gdXcFgkeLIpLX3o6h4w2AV0jp3RyvB0PEkkLrqusv3O/KpcwhX
-         GVSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685482569; x=1688074569;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ewkLPgc14ELbXHOwD+0DDe9cJ9eyhGp9sBwFGmnJByA=;
-        b=ARt6UJttfElfLDyvYVGCNZlkuuQMeDghruAPXHGfxJ6lplaOaryKuSYOp1JEeplt00
-         xE7NxibtEDa62q44RsbRgeqU3BCRyIMwticLec+dbTXGp2UShiHuChHsPZzOA9rN+BCB
-         P2gu5iOjPAMa7BmN0j03JxdYrXdzbMmx44X8XI4JVYKOLmssfU12HCfDqVxpMPcz91rr
-         QXzaQ64omoPzMceT4waSKtO0jyQXN6MJ3/2E9+LfEw5H2cRwsZQGzew+dK9MWr9jloXw
-         fEowivrpIohurHWMwKaLZEfMR5K9A1dWqD88Zoln8dDCqZ7B/RhApPJZS1yVF7A5datE
-         PeXg==
-X-Gm-Message-State: AC+VfDz/DumLM1w4x1hF4fRrIBYJ17PXbFxTvzgbbTipXjH0juVAGAAQ
-	jwqEII7bRwertQcoID3gr3fniTS+wbtsiQ4IRNcapQ==
-X-Google-Smtp-Source: ACHHUZ5Q8wOp3L3qRzQPnewVTnLz0MKHVYAyPyQm/rQZ68d3qLP6Wf9ulIw98RnwKFjSLug+l1YwvGCMH4ys6tKBt8s=
-X-Received: by 2002:a05:6e02:1bab:b0:33b:61f8:5ae5 with SMTP id
- n11-20020a056e021bab00b0033b61f85ae5mr26739ili.15.1685482568731; Tue, 30 May
- 2023 14:36:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC9A5200BC
+	for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 22:16:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=misterjones.org; s=dkim20211231; h=Content-Transfer-Encoding:Content-Type:
+	Message-ID:References:In-Reply-To:Subject:Cc:To:From:Date:MIME-Version:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=FBurYPzx/P+7K1ew3kZobFLL4iaIkaDFy2j8U6Qpz1k=; b=PrFh6GN2xQH9skp71JIvMYYZaa
+	LIncg4/qmMiMllhKjO0lm7V+jeUI82BEwQLByUUAghydE1/mNpBjPAFZxF/yFfbyTn8nsMdQeUSbR
+	OEr1HsLJqZTQHAmq56LqgMRFdTxnKVGD0y76WBVYNFE4D2oZXvth2yJnWyst2zD+NHUnTgfrQ1N6U
+	WaLi50qb9DwIS2HyDgVmbqvJ4obeEl5evjdhTYneYt9QNWwVwe9b+TNkygw4wGNt3zdrZSp2l7nAW
+	jOl3suEKcaOT7lfI/++mLLo3alWHhHY5LB9GyOfqDPMxchXKDcGQDouye+89sfLH1hmIK1F27HgFX
+	t1m/q0pA==;
+Received: from disco-boy.misterjones.org ([217.182.43.188] helo=www.loen.fr)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@misterjones.org>)
+	id 1q46x5-001SHy-2X;
+	Tue, 30 May 2023 22:32:23 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230519005231.3027912-1-rananta@google.com> <20230519005231.3027912-7-rananta@google.com>
- <87ttvvjk5q.wl-maz@kernel.org>
-In-Reply-To: <87ttvvjk5q.wl-maz@kernel.org>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Tue, 30 May 2023 14:35:57 -0700
-Message-ID: <CAJHc60xiiQ8t73wTodZAcyBJomLMAwN_ycMLbjWPyiu8-j4GTA@mail.gmail.com>
-Subject: Re: [PATCH v4 6/6] KVM: arm64: Use TLBI range-based intructions for unmap
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Ricardo Koller <ricarkol@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Jing Zhang <jingzhangos@google.com>, 
-	Colton Lewis <coltonlewis@google.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Date: Tue, 30 May 2023 22:32:22 +0100
+From: Marc Zyngier <maz@misterjones.org>
+To: kernel test robot <lkp@intel.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Linux Memory Management List
+ <linux-mm@kvack.org>, dri-devel@lists.freedesktop.org,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, samba-technical@lists.samba.org
+Subject: Re: [linux-next:master] BUILD REGRESSION
+ 8c33787278ca8db73ad7d23f932c8c39b9f6e543
+In-Reply-To: <20230530182123.UilBt%lkp@intel.com>
+References: <20230530182123.UilBt%lkp@intel.com>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <d65700431ed60877d3ec8e88e1211a97@misterjones.org>
+X-Sender: maz@misterjones.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 217.182.43.188
+X-SA-Exim-Rcpt-To: lkp@intel.com, akpm@linux-foundation.org, linux-mm@kvack.org, dri-devel@lists.freedesktop.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-perf-users@vger.kernel.org, samba-technical@lists.samba.org
+X-SA-Exim-Mail-From: maz@misterjones.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, May 29, 2023 at 7:18=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
-:
->
-> On Fri, 19 May 2023 01:52:31 +0100,
-> Raghavendra Rao Ananta <rananta@google.com> wrote:
-> >
-> > The current implementation of the stage-2 unmap walker traverses
-> > the given range and, as a part of break-before-make, performs
-> > TLB invalidations with a DSB for every PTE. A multitude of this
-> > combination could cause a performance bottleneck.
-> >
-> > Hence, if the system supports FEAT_TLBIRANGE, defer the TLB
-> > invalidations until the entire walk is finished, and then
-> > use range-based instructions to invalidate the TLBs in one go.
-> > Condition this upon S2FWB in order to avoid walking the page-table
-> > again to perform the CMOs after issuing the TLBI.
->
-> But that's the real bottleneck. TLBIs are cheap compared to CMOs, even
-> on remarkably bad implementations. What is your plan to fix this?
->
-Correct me if I'm wrong, but my understanding was that a multiple
-issuance of TLBI + DSB was the bottleneck, and this patch tries to
-avoid this by issuing only one TLBI + DSB at the end.
-> >
-> > Rename stage2_put_pte() to stage2_unmap_put_pte() as the function
-> > now serves the stage-2 unmap walker specifically, rather than
-> > acting generic.
-> >
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/pgtable.c | 35 ++++++++++++++++++++++++++++++-----
-> >  1 file changed, 30 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.=
-c
-> > index b8f0dbd12f773..5832ee3418fb0 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -771,16 +771,34 @@ static void stage2_make_pte(const struct kvm_pgta=
-ble_visit_ctx *ctx, kvm_pte_t n
-> >       smp_store_release(ctx->ptep, new);
-> >  }
-> >
-> > -static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, st=
-ruct kvm_s2_mmu *mmu,
-> > -                        struct kvm_pgtable_mm_ops *mm_ops)
-> > +static bool stage2_unmap_defer_tlb_flush(struct kvm_pgtable *pgt)
-> >  {
-> > +     /*
-> > +      * If FEAT_TLBIRANGE is implemented, defer the individial PTE
-> > +      * TLB invalidations until the entire walk is finished, and
-> > +      * then use the range-based TLBI instructions to do the
-> > +      * invalidations. Condition this upon S2FWB in order to avoid
-> > +      * a page-table walk again to perform the CMOs after TLBI.
-> > +      */
-> > +     return system_supports_tlb_range() && stage2_has_fwb(pgt);
-> > +}
-> > +
-> > +static void stage2_unmap_put_pte(const struct kvm_pgtable_visit_ctx *c=
-tx,
-> > +                             struct kvm_s2_mmu *mmu,
-> > +                             struct kvm_pgtable_mm_ops *mm_ops)
-> > +{
-> > +     struct kvm_pgtable *pgt =3D ctx->arg;
-> > +
-> >       /*
-> >        * Clear the existing PTE, and perform break-before-make with
-> >        * TLB maintenance if it was valid.
-> >        */
-> >       if (kvm_pte_valid(ctx->old)) {
-> >               kvm_clear_pte(ctx->ptep);
-> > -             kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ct=
-x->level);
-> > +
-> > +             if (!stage2_unmap_defer_tlb_flush(pgt))
-> > +                     kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu,
-> > +                                     ctx->addr, ctx->level);
->
-> This really doesn't match the comment anymore.
->
-Right, I can re-write this in the next spin.
+On 2023-05-30 19:21, kernel test robot wrote:
+> tree/branch:
+> https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
+> master
+> branch HEAD: 8c33787278ca8db73ad7d23f932c8c39b9f6e543  Add linux-next
+> specific files for 20230530
+> 
+> Error/Warning reports:
+> 
+> https://lore.kernel.org/oe-kbuild-all/202305070840.X0G3ofjl-lkp@intel.com
+> 
+> Error/Warning: (recently discovered and may have been fixed)
+> 
+> include/drm/drm_print.h:456:39: error: format '%ld' expects argument
+> of type 'long int', but argument 4 has type 'size_t' {aka 'unsigned
+> int'} [-Werror=format=]
+> 
+> Unverified Error/Warning (likely false positive, please contact us if
+> interested):
+> 
+> arch/arm64/kvm/mmu.c:147:3-9: preceding lock on line 140
 
-> Overall, I'm very concerned that we lose the consistency property that
-> the current code has: once called, the TLBs and the page tables are
-> synchronised.
->
-> Yes, this patch looks correct. But it is also really fragile.
->
-Yeah, we were a little skeptical about this too. Till v2, we had a
-different implementation in which we had an independent fast unmap
-path that disconnects the PTE hierarchy if the unmap range was exactly
-KVM_PGTABLE_MIN_BLOCK_LEVEL [1].  But this had some problems, and we
-pivoted to the current implementation.
+This warning looks wrong. The "issue" seems that we acquire the lock
+before exiting the function, but the the whole point is that the
+lock is supposed to be held all along (it is dropped and then acquired
+again).
 
-> >       }
-> >
-> >       mm_ops->put_page(ctx->ptep);
-> > @@ -1015,7 +1033,7 @@ static int stage2_unmap_walker(const struct kvm_p=
-gtable_visit_ctx *ctx,
-> >        * block entry and rely on the remaining portions being faulted
-> >        * back lazily.
-> >        */
-> > -     stage2_put_pte(ctx, mmu, mm_ops);
-> > +     stage2_unmap_put_pte(ctx, mmu, mm_ops);
-> >
-> >       if (need_flush && mm_ops->dcache_clean_inval_poc)
-> >               mm_ops->dcache_clean_inval_poc(kvm_pte_follow(ctx->old, m=
-m_ops),
-> > @@ -1029,13 +1047,20 @@ static int stage2_unmap_walker(const struct kvm=
-_pgtable_visit_ctx *ctx,
-> >
-> >  int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 si=
-ze)
-> >  {
-> > +     int ret;
-> >       struct kvm_pgtable_walker walker =3D {
-> >               .cb     =3D stage2_unmap_walker,
-> >               .arg    =3D pgt,
-> >               .flags  =3D KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABL=
-E_POST,
-> >       };
-> >
-> > -     return kvm_pgtable_walk(pgt, addr, size, &walker);
-> > +     ret =3D kvm_pgtable_walk(pgt, addr, size, &walker);
-> > +     if (stage2_unmap_defer_tlb_flush(pgt))
-> > +             /* Perform the deferred TLB invalidations */
-> > +             kvm_call_hyp(__kvm_tlb_flush_vmid_range, pgt->mmu,
-> > +                             addr, addr + size);
->
-> This "kvm_call_hyp(__kvm_tlb_flush_vmid_range,...)" could do with a
-> wrapper from the point where you introduce it.
->
-Sorry, I didn't get this comment. Do you mind elaborating on it?
+I guess the coccinelle checker doesn't spot this construct?
 
-Thank you.
-Raghavendra
-
-[1]: https://lore.kernel.org/all/20230206172340.2639971-8-rananta@google.co=
-m/
-> > +
-> > +     return ret;
-> >  }
-> >
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+         M.
+-- 
+Who you jivin' with that Cosmik Debris?
