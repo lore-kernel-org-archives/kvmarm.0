@@ -1,183 +1,214 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E4EE17AD4
-	for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 15:08:52 +0000 (UTC)
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-30793c16c78so6314507f8f.3
-        for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 08:08:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685459331; x=1688051331;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=INyGt+QwuTfaFJp7EMJqWEOGoXUhxd+HBtKKNdnZww4=;
-        b=KCvwHCzwHpZZcpBVv1I1bLVHxO8Xn2ykPeOkv2+KApmacnGFPK6nf/m23byfUEnWss
-         JPn9KobcIzYTNjur4ig/onz6AWeR5RNE0aknK92u/onIH9hZ59bkBT/Z3kS42C5bDN2G
-         ijShs3+RjX/Kyug5HfHwMD6rf945IC5Rb60s1gop/te04Uwtr84EwbUEs7YrUqnreG/n
-         eREjm5sR5mqfWssu4wU3/quLaDOUC7QKSQaaiRRHSnhoF7+f+cK+dVXqf95XrN8AdMiI
-         1I08XmHJ2RwLI/M0G/GOXG10F6zNKZxndz8fVfWBLLp0OgpDirhtbwh8taxNGl9nduTd
-         AuiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685459331; x=1688051331;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=INyGt+QwuTfaFJp7EMJqWEOGoXUhxd+HBtKKNdnZww4=;
-        b=dN67t2NyBjZQZmTFjrl/FEmgz4Cz0rrd7FPFr4DuXVwV+iF6gaQCqg2bY1QRQ0MDHj
-         I+Z5ErgaRaCecoG53dUuNgakwnVluNkfuy6YQVs6PPZ5/2MrI/3k3GMhARtiXfJ+Exlr
-         fy5ELo93Z87glRe41R77SB+X4uz4WuVI9M810mbqKbGRl0viU3OdtG2kVd4qhnfTBXGB
-         CR2uUd2ZWpLL0ec8XFHIcRyQ3Eel9q2uqZwNUAThwep75AEMqf0e9PUXvRz/qYpVJO9A
-         IqYA8KHhMvHVkdrWu4R/pDqV5VRFu2nVfETJ+DWUEF/K9kxYifNA7JKRHg08ZB+ACL45
-         +gvw==
-X-Gm-Message-State: AC+VfDwvrVg5TdGtBlhUJOcsco0axt02kzGLMGuwtXBbgmAbbKxCrFXa
-	GwetCP1MFsp1j/CD2m207KJHjyc5TU0xVA==
-X-Google-Smtp-Source: ACHHUZ7trUbccosip83Jp1hHUHvUBBwTyfaeunBbCnY0yI3RJzF02Xs+ZkFq/94n82IAdm05j7g66a3Ser3rDQ==
-X-Received: from mostafa.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:333c])
- (user=smostafa job=sendgmr) by 2002:a05:6000:46:b0:30a:b030:9ce1 with SMTP id
- k6-20020a056000004600b0030ab0309ce1mr431213wrx.5.1685459330796; Tue, 30 May
- 2023 08:08:50 -0700 (PDT)
-Date: Tue, 30 May 2023 15:08:45 +0000
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7500917AD4
+	for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 16:09:52 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F21E016F2;
+	Tue, 30 May 2023 09:10:34 -0700 (PDT)
+Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A6D0A3F663;
+	Tue, 30 May 2023 09:09:48 -0700 (PDT)
+From: Nikos Nikoleris <nikos.nikoleris@arm.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	andrew.jones@linux.dev
+Cc: pbonzini@redhat.com,
+	alexandru.elisei@arm.com,
+	ricarkol@google.com,
+	shahuang@redhat.com
+Subject: [kvm-unit-tests PATCH v6 00/32] EFI and ACPI support for arm64
+Date: Tue, 30 May 2023 17:08:52 +0100
+Message-Id: <20230530160924.82158-1-nikos.nikoleris@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
-Message-ID: <20230530150845.2856828-1-smostafa@google.com>
-Subject: [PATCH v3] KVM: arm64: Use BTI for nvhe
-From: Mostafa Saleh <smostafa@google.com>
-To: maz@kernel.org, oliver.upton@linux.dev, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Cc: tabba@google.com, qperret@google.com, will@kernel.org, 
-	catalin.marinas@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, 
-	james.morse@arm.com, bgardon@google.com, gshan@redhat.com, 
-	Mostafa Saleh <smostafa@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-ARM-No-Footer: FoSSMail
+Content-Transfer-Encoding: 8bit
 
-CONFIG_ARM64_BTI_KERNEL compiles the kernel to support ARMv8.5-BTI.
-However, the nvhe code doesn't make use of it as it doesn't map any
-pages with Guarded Page(GP) bit.
+Hello,
 
-kvm pgtable code is modified to map executable pages with GP bit
-if BTI is enabled for the kernel.
+This series adds initial support for building arm64 tests as EFI
+apps and running them under QEMU. Much like x86_64, we import external
+dependencies from gnu-efi and adapt them to work with types and other
+assumptions from kvm-unit-tests. In addition, this series adds support
+for enumerating parts of the system using ACPI.
 
-At hyp init, SCTLR_EL2.BT is set to 1 to match EL1 configuration
-(SCTLR_EL1.BT1) set in bti_enable().
+The first set of patches, moves the existing ACPI code to the common
+lib path. Then, it extends definitions and functions to allow for more
+robust discovery of ACPI tables. We add support for setting up the PSCI
+conduit, discovering the UART, timers, GIC and cpus via ACPI. The code
+retains existing behavior and gives priority to discovery through DT
+when one has been provided.
 
-One difference between kernel and nvhe code, is that the kernel maps
-.text with GP while nvhe maps all the executable pages, this makes
-nvhe code need to deal with special initialization code coming from
-other executable sections (.idmap.text).
-For this we need to add bti instruction at the beginning of
-__kvm_handle_stub_hvc as it can be called by  __host_hvc through
-branch instruction(br) and unlike SYM_FUNC_START, SYM_CODE_START
-doesn=E2=80=99t add bti instruction at the beginning, and it can=E2=80=99t =
-be modified
-to add it as it is used with vector tables.
-Another solution which is more intrusive is to convert
-__kvm_handle_stub_hvc to a function and inject =E2=80=9Cbti jc=E2=80=9D ins=
-tead of
-=E2=80=9Cbti c=E2=80=9D in SYM_FUNC_START
+In the second set of patches, we add support for getting the command
+line from the EFI shell. This is a requirement for many of the
+existing arm64 tests.
 
-Signed-off-by: Mostafa Saleh <smostafa@google.com>
----
-v2 -> v3:
-- Map all executable pages with GP bit instead of just .text, this
-  simplifies the code and avoids hacks in pgtable code.
-v1 -> v2:
-- Enable BTI for nvhe also.
-- Only set GP bit for executable pages from pgtable code.
-- Set SCTLR_EL2.BT when BTI is used.
-- use system_supports_bti() for consistency.
-- Add hyp_init_valid_leaf_pte.
-v1: https://lore.kernel.org/all/20230516141846.792193-1-smostafa@google.com=
-/
----
- arch/arm64/include/asm/sysreg.h    |  1 +
- arch/arm64/kvm/hyp/nvhe/hyp-init.S | 12 ++++++++++++
- arch/arm64/kvm/hyp/pgtable.c       |  7 ++++++-
- 3 files changed, 19 insertions(+), 1 deletion(-)
+In the third set of patches, we import code from gnu-efi, make minor
+changes and add an alternative setup sequence from arm64 systems that
+boot through EFI. Finally, we add support in the build system and a
+run script which is used to run an EFI app.
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysre=
-g.h
-index e72d9aaab6b1..204124ce86c4 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -558,6 +558,7 @@
- 			 (BIT(18)) | (BIT(22)) | (BIT(23)) | (BIT(28)) | \
- 			 (BIT(29)))
-=20
-+#define SCTLR_EL2_BT	(BIT(36))
- #ifdef CONFIG_CPU_BIG_ENDIAN
- #define ENDIAN_SET_EL2		SCTLR_ELx_EE
- #else
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/h=
-yp-init.S
-index a6d67c2bb5ae..f3ee66aa2f9d 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-@@ -128,6 +128,13 @@ alternative_if ARM64_HAS_ADDRESS_AUTH
- 		     SCTLR_ELx_ENDA | SCTLR_ELx_ENDB)
- 	orr	x0, x0, x1
- alternative_else_nop_endif
-+
-+#ifdef CONFIG_ARM64_BTI_KERNEL
-+alternative_if ARM64_BTI
-+	orr	x0, x0, #SCTLR_EL2_BT
-+alternative_else_nop_endif
-+#endif /* CONFIG_ARM64_BTI_KERNEL */
-+
- 	msr	sctlr_el2, x0
- 	isb
-=20
-@@ -196,6 +203,11 @@ SYM_CODE_START_LOCAL(__kvm_hyp_init_cpu)
- SYM_CODE_END(__kvm_hyp_init_cpu)
-=20
- SYM_CODE_START(__kvm_handle_stub_hvc)
-+	/*
-+	 * __kvm_handle_stub_hvc called from __host_hvc through branch instructio=
-n(br) so
-+	 * we need bti j at beginning.
-+	 */
-+	bti j
- 	cmp	x0, #HVC_SOFT_RESTART
- 	b.ne	1f
-=20
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 3d61bd3e591d..a79a45fc4047 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -34,7 +34,7 @@
- #define KVM_PTE_LEAF_ATTR_LO_S2_SH_IS	3
- #define KVM_PTE_LEAF_ATTR_LO_S2_AF	BIT(10)
-=20
--#define KVM_PTE_LEAF_ATTR_HI		GENMASK(63, 51)
-+#define KVM_PTE_LEAF_ATTR_HI		GENMASK(63, 50)
-=20
- #define KVM_PTE_LEAF_ATTR_HI_SW		GENMASK(58, 55)
-=20
-@@ -42,6 +42,8 @@
-=20
- #define KVM_PTE_LEAF_ATTR_HI_S2_XN	BIT(54)
-=20
-+#define KVM_PTE_LEAF_ATTR_HI_S1_GP	BIT(50)
-+
- #define KVM_PTE_LEAF_ATTR_S2_PERMS	(KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | \
- 					 KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | \
- 					 KVM_PTE_LEAF_ATTR_HI_S2_XN)
-@@ -371,6 +373,9 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot=
-, kvm_pte_t *ptep)
-=20
- 		if (device)
- 			return -EINVAL;
-+
-+		if (IS_ENABLED(CONFIG_ARM64_BTI_KERNEL) && system_supports_bti())
-+			attr |=3D KVM_PTE_LEAF_ATTR_HI_S1_GP;
- 	} else {
- 		attr |=3D KVM_PTE_LEAF_ATTR_HI_S1_XN;
- 	}
---=20
-2.41.0.rc0.172.g3f132b7071-goog
+After this set of patches one can build arm64 EFI tests:
+
+$> ./configure --enable-efi
+$> make
+
+And use the run script to run an EFI tests:
+
+$> ./arm/efi/run ./arm/selftest.efi -smp 2 -m 256 -append "setup smp=2 mem=256"
+
+Or all tests:
+
+$> ./run_tests.sh
+
+There are a few items that this series does not address but they would
+be useful to have:
+ - Support for booting the system from EL2. Currently, we assume that a
+   test starts EL1. This will be required to run EFI tests on sytems
+   that implement EL2.
+ - Support for reading environment variables and populating __envp.
+ - Support for discovering the PCI subsystem using ACPI.
+ - Get rid of other assumptions (e.g., vmalloc area) that don't hold on
+   real HW.
+ - Various fixes related to cache maintaince to better support turn the
+   MMU off.
+ - Switch to a new stack and avoid relying on the one provided by EFI.
+
+git branch: https://gitlab.com/nnikoleris/kvm-unit-tests/-/tree/target-efi-upstream-v6 
+
+v5: https://lore.kernel.org/kvmarm/20230428120405.3770496-1-nikos.nikoleris@arm.com/
+v4: https://lore.kernel.org/kvmarm/20230213101759.2577077-1-nikos.nikoleris@arm.com/
+v3: https://lore.kernel.org/all/20220630100324.3153655-1-nikos.nikoleris@arm.com/
+v2: https://lore.kernel.org/kvm/20220506205605.359830-1-nikos.nikoleris@arm.com/
+
+Changes in v6:
+ - Fixed a symbol issue in the debug tests that would cause them to fail
+   when build with fPIC.
+ - Added support for booting with FDT.
+
+Changes in v5:
+ - Minor style changes (thanks Shaoqin).
+ - Avoid including lib/acpi.o to cflatobjs twice (thanks Drew).
+ - Increase NR_INITIAL_MEM_REGIONS to avoid overflows and add check when
+   we run out of space (thanks Shaoqin).
+
+Changes in v4:
+ - Removed patch that reworks cache maintenance when turning the MMU
+   off. This is not strictly required for EFI tests running with tcg and
+   will be addressed in a separate series by Alex.
+ - Fix compilation for arm (Alex).
+ - Convert ACPI tables to Linux style (Alex).
+
+Changes in v3:
+ - Addressed feedback from Drew, Alex and Ricardo. Many thanks for the reviews!
+ - Added support for discovering the GIC through ACPI
+ - Added a missing header file (<elf.h>)
+ - Added support for correctly parsing the outcome of tests (./run_tests)
+
+Thanks,
+
+Nikos
+
+Alexandru Elisei (2):
+  lib/acpi: Convert table names to Linux style
+  lib: arm: Print test exit status
+
+Andrew Jones (2):
+  arm/arm64: Rename etext to _etext
+  arm64: Add a new type of memory type flag MR_F_RESERVED
+
+Nikos Nikoleris (28):
+  lib: Move acpi header and implementation to lib
+  x86: Move x86_64-specific EFI CFLAGS to x86_64 Makefile
+  lib: Apply Lindent to acpi.{c,h}
+  lib: Fix style for acpi.{c,h}
+  x86: Avoid references to fields of ACPI tables
+  lib/acpi: Ensure all struct definition for ACPI tables are packed
+  lib/acpi: Add support for the XSDT table
+  lib/acpi: Extend the definition of the FADT table
+  devicetree: Check that fdt is not NULL in dt_available()
+  arm64: Add support for setting up the PSCI conduit through ACPI
+  arm64: Add support for discovering the UART through ACPI
+  arm64: Add support for timer initialization through ACPI
+  arm64: Add support for cpu initialization through ACPI
+  arm64: Add support for gic initialization through ACPI
+  lib/printf: Support for precision modifier in printf
+  lib/printf: Add support for printing wide strings
+  lib/efi: Add support for getting the cmdline
+  lib/efi: Add support for reading an FDT
+  lib: Avoid ms_abi for calls related to EFI on arm64
+  arm64: Add a setup sequence for systems that boot through EFI
+  arm64: Copy code from GNU-EFI
+  arm64: Change GNU-EFI imported code to use defined types
+  arm64: Use code from the gnu-efi when booting with EFI
+  lib: Avoid external dependency in libelf
+  arm64: Add support for efi in Makefile
+  arm64: debug: Make inline assembly symbols global
+  arm64: Add an efi/run script
+  arm64: Use the provided fdt when booting through EFI
+
+ scripts/runtime.bash        |  13 +-
+ arm/efi/run                 |  70 +++++++++
+ arm/run                     |  14 +-
+ configure                   |  17 +-
+ Makefile                    |   4 -
+ arm/Makefile.arm            |   6 +
+ arm/Makefile.arm64          |  22 ++-
+ arm/Makefile.common         |  47 ++++--
+ x86/Makefile.common         |   2 +-
+ x86/Makefile.x86_64         |   4 +
+ lib/linux/efi.h             | 126 +++++++++++++++
+ lib/arm/asm/setup.h         |   9 ++
+ lib/arm/asm/timer.h         |   2 +
+ lib/x86/asm/setup.h         |   2 +-
+ lib/acpi.h                  | 302 ++++++++++++++++++++++++++++++++++++
+ lib/argv.h                  |   1 +
+ lib/efi.h                   |  12 ++
+ lib/elf.h                   |  57 +++++++
+ lib/libcflat.h              |   1 +
+ lib/x86/acpi.h              | 112 -------------
+ lib/acpi.c                  | 129 +++++++++++++++
+ lib/argv.c                  |   2 +-
+ lib/arm/gic.c               | 139 ++++++++++++++++-
+ lib/arm/io.c                |  41 ++++-
+ lib/arm/mmu.c               |   4 +
+ lib/arm/psci.c              |  37 ++++-
+ lib/arm/setup.c             | 284 +++++++++++++++++++++++++++------
+ lib/arm/timer.c             |  92 +++++++++++
+ lib/devicetree.c            |   2 +-
+ lib/efi.c                   | 222 ++++++++++++++++++++++++++
+ lib/printf.c                | 194 +++++++++++++++++++++--
+ lib/x86/acpi.c              |  82 ----------
+ lib/x86/setup.c             |   2 +-
+ arm/efi/elf_aarch64_efi.lds |  63 ++++++++
+ arm/flat.lds                |   2 +-
+ arm/cstart.S                |   1 +
+ arm/cstart64.S              |   7 +
+ arm/efi/crt0-efi-aarch64.S  | 141 +++++++++++++++++
+ arm/debug.c                 |  20 ++-
+ arm/dummy.c                 |  12 ++
+ arm/efi/reloc_aarch64.c     |  94 +++++++++++
+ arm/micro-bench.c           |   4 +-
+ arm/timer.c                 |  10 +-
+ x86/s3.c                    |  21 +--
+ x86/vmexit.c                |   4 +-
+ 45 files changed, 2102 insertions(+), 330 deletions(-)
+ create mode 100755 arm/efi/run
+ create mode 100644 lib/acpi.h
+ create mode 100644 lib/elf.h
+ delete mode 100644 lib/x86/acpi.h
+ create mode 100644 lib/acpi.c
+ create mode 100644 lib/arm/timer.c
+ delete mode 100644 lib/x86/acpi.c
+ create mode 100644 arm/efi/elf_aarch64_efi.lds
+ create mode 100644 arm/efi/crt0-efi-aarch64.S
+ create mode 100644 arm/dummy.c
+ create mode 100644 arm/efi/reloc_aarch64.c
+
+-- 
+2.25.1
 
