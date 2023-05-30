@@ -1,110 +1,80 @@
-Received: from out-36.mta0.migadu.com (out-36.mta0.migadu.com [91.218.175.36])
+Received: from out-54.mta0.migadu.com (out-54.mta0.migadu.com [91.218.175.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A1F6200AD
-	for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 19:37:38 +0000 (UTC)
-Date: Tue, 30 May 2023 19:37:25 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E9817FE5
+	for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 19:54:57 +0000 (UTC)
+Date: Tue, 30 May 2023 19:54:51 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1685475455;
+	t=1685476495;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=xJBcu8ATCUO1aDY2yQ8vOVcCThAxEWqTiihzn189BcI=;
-	b=oTgfsm6Y7m0cHeGsa3KJXNWXMuNSlm0sfaQCoEPDjFj6jxNxzseINRPUWevletZvuYk83p
-	+kFUfwmLUYdIL6pvdibsqLd2oceBrIf/xJKHf7O+W7xiGADvFsQD0goq381G/kYiPU+lqt
-	jv2kELueVaqLNY647oTCnG+i/dK3+OY=
+	bh=htwngbgIM6ZN3m6ZvTP5t2aYi4SJcXt18PpdVgVHy80=;
+	b=Nwl2017bgJ899tFHJGB9HffKOzY3lgGKfnWiGeFSxr5rZCDIHtgQL/uvnQ9zbnW80mmi7w
+	4Ls9VxkU7VgpAQ3DwWx8PgiwSRxnWknxVEk4+ZOg13JRGX94IrtSeYqxTTtdJN3FMqThqX
+	q4QsyL705SyPIvgUeorNLzAnkXgbXBo=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Yu Zhao <yuzhao@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	Anup Patel <anup@brainfault.org>, Ben Gardon <bgardon@google.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Fabiano Rosas <farosas@linux.ibm.com>,
-	Gaosheng Cui <cuigaosheng1@huawei.com>,
-	Gavin Shan <gshan@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>,
-	Ingo Molnar <mingo@redhat.com>, James Morse <james.morse@arm.com>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Michael Larabel <michael@michaellarabel.com>,
-	Mike Rapoport <rppt@kernel.org>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Paul Mackerras <paulus@ozlabs.org>, Peter Xu <peterx@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org,
-	linux-trace-kernel@vger.kernel.org, x86@kernel.org,
-	linux-mm@google.com
-Subject: Re: [PATCH mm-unstable v2 04/10] kvm/arm64: make stage2 page tables
- RCU safe
-Message-ID: <ZHZQdQAApIrw6fBu@linux.dev>
-References: <20230526234435.662652-1-yuzhao@google.com>
- <20230526234435.662652-5-yuzhao@google.com>
- <ZHJHJPBF6euzOFdw@linux.dev>
- <CAOUHufa74CufHziHSquO5bZwbFXz2MNssBzW+AH7=Xo5RCnQ0A@mail.gmail.com>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Quentin Perret <qperret@google.com>, Will Deacon <will@kernel.org>,
+	Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v2 02/17] arm64: Prevent the use of
+ is_kernel_in_hyp_mode() in hypervisor code
+Message-ID: <ZHZUi/4kXxRmCa7a@linux.dev>
+References: <20230526143348.4072074-1-maz@kernel.org>
+ <20230526143348.4072074-3-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOUHufa74CufHziHSquO5bZwbFXz2MNssBzW+AH7=Xo5RCnQ0A@mail.gmail.com>
+In-Reply-To: <20230526143348.4072074-3-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-Hi Yu,
+Hi Marc,
 
-On Sat, May 27, 2023 at 02:13:07PM -0600, Yu Zhao wrote:
-> On Sat, May 27, 2023 at 12:08 PM Oliver Upton <oliver.upton@linux.dev> wrote:
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index 3d61bd3e591d..bfbebdcb4ef0 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -1019,7 +1019,7 @@ static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
-> >                                                kvm_granule_size(ctx->level));
-> >
-> >         if (childp)
-> > -               mm_ops->put_page(childp);
-> > +               mm_ops->free_removed_table(childp, ctx->level);
+On Fri, May 26, 2023 at 03:33:33PM +0100, Marc Zyngier wrote:
+> Using is_kernel_in_hyp_mode() in hypervisor code is a pretty bad
+> mistake. This helper only checks for CurrentEL being EL2, which
+> is always true.
 > 
-> Thanks, Oliver.
+> Make the link fail if using the helper in hypervisor context
+> by referencing a non-existent function. Whilst we're at it,
+> flag the helper as __always_inline, which it really should be.
 > 
-> A couple of things I haven't had the chance to verify -- I'm hoping
-> you could help clarify:
-> 1. For unmapping, with free_removed_table(), wouldn't we have to look
-> into the table we know it's empty unnecessarily?
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/virt.h | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+> index 4eb601e7de50..91029709d133 100644
+> --- a/arch/arm64/include/asm/virt.h
+> +++ b/arch/arm64/include/asm/virt.h
+> @@ -110,8 +110,13 @@ static inline bool is_hyp_mode_mismatched(void)
+>  	return __boot_cpu_mode[0] != __boot_cpu_mode[1];
+>  }
+>  
+> -static inline bool is_kernel_in_hyp_mode(void)
+> +extern void gotcha_is_kernel_in_hyp_mode(void);
+> +
+> +static __always_inline bool is_kernel_in_hyp_mode(void)
+>  {
+> +#if defined(__KVM_NVHE_HYPERVISOR__) || defined(__KVM_VHE_HYPERVISOR__)
+> +	gotcha_is_kernel_in_hyp_mode();
+> +#endif
+>  	return read_sysreg(CurrentEL) == CurrentEL_EL2;
+>  }
 
-As it is currently implemented, yes. But, there's potential to fast-path
-the implementation by checking page_count() before starting the walk.
-
-> 2. For remapping and unmapping, how does free_removed_table() put the
-> final refcnt on the table passed in? (Previously we had
-> put_page(childp) in stage2_map_walk_table_post(). So I'm assuming we'd
-> have to do something equivalent with free_removed_table().)
-
-Heh, that's a bug, and an embarrassing one at that!
-
-Sent out a fix for that, since it would appear we leak memory on
-table->block transitions. PTAL if you have a chance.
-
-https://lore.kernel.org/all/20230530193213.1663411-1-oliver.upton@linux.dev/
+Would BUILD_BUG() work in this context, or have I missed something?
 
 -- 
 Thanks,
