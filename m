@@ -1,235 +1,183 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1E01993C
-	for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 14:00:34 +0000 (UTC)
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1ac65ab7432so334245ad.0
-        for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 07:00:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E4EE17AD4
+	for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 15:08:52 +0000 (UTC)
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-30793c16c78so6314507f8f.3
+        for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 08:08:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685455234; x=1688047234;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N2UZx8lRuVV95JLdyEdn9XhsUM2ReQsqKWGI4qb4yJI=;
-        b=cT34SGrTUx7G2y+GF9IExmt66HEAk0TxXg7RkU1Cpyy9QR+fe8x9NxU4QASqdIzs28
-         zINMXUEZi30EQwRE502SDS2rgtrzNjhUJgtkJDcihbMwAHp0bgG3qJI9KE2px04befqq
-         K5i10y/gpHxJaTBixgSe25E7O4LCvEV0uAylxZBL+pQ1p9W5GlTCWiK7wRXnwo32oue5
-         xx5dcdHboQlFY1ujpsPsniOasYntzWQeJK82N16nGdR6CtSPheMsHpXhB5p54otHS4/f
-         VSGyowzxzHSGXaLlktUxF+na9w7jFDZ+tHOEkVThEvvRMiJjYN0+mfEZIVQP+EpK3L0n
-         xjqA==
+        d=google.com; s=20221208; t=1685459331; x=1688051331;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=INyGt+QwuTfaFJp7EMJqWEOGoXUhxd+HBtKKNdnZww4=;
+        b=KCvwHCzwHpZZcpBVv1I1bLVHxO8Xn2ykPeOkv2+KApmacnGFPK6nf/m23byfUEnWss
+         JPn9KobcIzYTNjur4ig/onz6AWeR5RNE0aknK92u/onIH9hZ59bkBT/Z3kS42C5bDN2G
+         ijShs3+RjX/Kyug5HfHwMD6rf945IC5Rb60s1gop/te04Uwtr84EwbUEs7YrUqnreG/n
+         eREjm5sR5mqfWssu4wU3/quLaDOUC7QKSQaaiRRHSnhoF7+f+cK+dVXqf95XrN8AdMiI
+         1I08XmHJ2RwLI/M0G/GOXG10F6zNKZxndz8fVfWBLLp0OgpDirhtbwh8taxNGl9nduTd
+         AuiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685455234; x=1688047234;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=N2UZx8lRuVV95JLdyEdn9XhsUM2ReQsqKWGI4qb4yJI=;
-        b=Qr3yPVibT7AEo7MNioqY5Pu1UBOkD9dDFvhHSVPTJBA7lPiRkSntB8kH5FRJDS1EAL
-         TE13jxN65BYdgQ7P4g2lLtTwayqXKn3tz4XFpQl3LPYYkfmjo/75AJ1bu00y3KpA5RB1
-         oGgr4/RHhd47QhR1qSv+e7hAT1UaVOwPREXNCPmWq7tpZ2kU4HrONVqQ4P2MaudFo2P/
-         a5gExYSnoHtidmA/rN1rgscwKUPYME6+oC7lhw0SbSNtuoHeZVPMQAOhnkH3kPhf+d+/
-         QSh8hmUPMxqE4SKh8RRiTQkwV5WYaoxBeuUAetaCGBve8ab6n0g/hqNq5kQluv+q2bnR
-         SSLg==
-X-Gm-Message-State: AC+VfDzxiazN81ylNEE2kyO0mLbgGU1Y6ZYaTJR7Ge/IBTIcHuSDX3rM
-	7Mf0rjit/6tH8aRVSt34sZiOoRkjZBis9CnpOH3XEQ==
-X-Google-Smtp-Source: ACHHUZ4Rp/ErIVyDCQ2IHBUOh47iZFHwPFvGVtazcxih8Jzal8pvp70DtHeeb89A+lZnrQ5GhQglC5p/FVhmpjaGtmM=
-X-Received: by 2002:a17:902:d490:b0:1b0:cea:294e with SMTP id
- c16-20020a170902d49000b001b00cea294emr125798plg.21.1685455233533; Tue, 30 May
- 2023 07:00:33 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1685459331; x=1688051331;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=INyGt+QwuTfaFJp7EMJqWEOGoXUhxd+HBtKKNdnZww4=;
+        b=dN67t2NyBjZQZmTFjrl/FEmgz4Cz0rrd7FPFr4DuXVwV+iF6gaQCqg2bY1QRQ0MDHj
+         I+Z5ErgaRaCecoG53dUuNgakwnVluNkfuy6YQVs6PPZ5/2MrI/3k3GMhARtiXfJ+Exlr
+         fy5ELo93Z87glRe41R77SB+X4uz4WuVI9M810mbqKbGRl0viU3OdtG2kVd4qhnfTBXGB
+         CR2uUd2ZWpLL0ec8XFHIcRyQ3Eel9q2uqZwNUAThwep75AEMqf0e9PUXvRz/qYpVJO9A
+         IqYA8KHhMvHVkdrWu4R/pDqV5VRFu2nVfETJ+DWUEF/K9kxYifNA7JKRHg08ZB+ACL45
+         +gvw==
+X-Gm-Message-State: AC+VfDwvrVg5TdGtBlhUJOcsco0axt02kzGLMGuwtXBbgmAbbKxCrFXa
+	GwetCP1MFsp1j/CD2m207KJHjyc5TU0xVA==
+X-Google-Smtp-Source: ACHHUZ7trUbccosip83Jp1hHUHvUBBwTyfaeunBbCnY0yI3RJzF02Xs+ZkFq/94n82IAdm05j7g66a3Ser3rDQ==
+X-Received: from mostafa.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:333c])
+ (user=smostafa job=sendgmr) by 2002:a05:6000:46:b0:30a:b030:9ce1 with SMTP id
+ k6-20020a056000004600b0030ab0309ce1mr431213wrx.5.1685459330796; Tue, 30 May
+ 2023 08:08:50 -0700 (PDT)
+Date: Tue, 30 May 2023 15:08:45 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230504110003.2548-1-ravi.bangoria@amd.com> <20230504110003.2548-4-ravi.bangoria@amd.com>
- <20230524214133.GA2359762@dev-arch.thelio-3990X> <f02c78e2-34b9-4985-640a-279dae1004a9@amd.com>
- <ZG8KLbZSECiYaKFc@linux.dev> <20230525142031.GU83892@hirez.programming.kicks-ass.net>
- <ZG+FLdP2kkfI1m2Z@linux.dev> <CAP-5=fWYbzmTETgqJ11y22=JaXDM0gnb4qR6KYeRGmFXw08f-Q@mail.gmail.com>
- <86jzwtdhmk.wl-maz@kernel.org> <CAP-5=fVW6KbUbbEfF3mEFvTfFDC5yKSjSpa+w3D55dG3CNUERw@mail.gmail.com>
- <86h6rxd3gh.wl-maz@kernel.org> <0075d8a9-2df4-86eb-8171-8995f59904e0@linux.ibm.com>
-In-Reply-To: <0075d8a9-2df4-86eb-8171-8995f59904e0@linux.ibm.com>
-From: Ian Rogers <irogers@google.com>
-Date: Tue, 30 May 2023 07:00:22 -0700
-Message-ID: <CAP-5=fXo0t+buDrmf7SyTD97gmTWGoDAO2YXWyav+_79O3MZ0w@mail.gmail.com>
-Subject: Re: [PATCH v4 3/4] perf/core: Remove pmu linear searching code
-To: Thomas Richter <tmricht@linux.ibm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Peter Zijlstra <peterz@infradead.org>, Ravi Bangoria <ravi.bangoria@amd.com>, 
-	Nathan Chancellor <nathan@kernel.org>, namhyung@kernel.org, eranian@google.com, 
-	acme@kernel.org, mark.rutland@arm.com, jolsa@kernel.org, bp@alien8.de, 
-	kan.liang@linux.intel.com, adrian.hunter@intel.com, maddy@linux.ibm.com, 
-	x86@kernel.org, linux-perf-users@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, sandipan.das@amd.com, ananth.narayan@amd.com, 
-	santosh.shukla@amd.com, kvmarm@lists.linux.dev
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
+Message-ID: <20230530150845.2856828-1-smostafa@google.com>
+Subject: [PATCH v3] KVM: arm64: Use BTI for nvhe
+From: Mostafa Saleh <smostafa@google.com>
+To: maz@kernel.org, oliver.upton@linux.dev, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Cc: tabba@google.com, qperret@google.com, will@kernel.org, 
+	catalin.marinas@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, 
+	james.morse@arm.com, bgardon@google.com, gshan@redhat.com, 
+	Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 30, 2023 at 12:45=E2=80=AFAM Thomas Richter <tmricht@linux.ibm.=
-com> wrote:
->
-> On 5/27/23 20:38, Marc Zyngier wrote:
-> > On Sat, 27 May 2023 18:00:13 +0100,
-> > Ian Rogers <irogers@google.com> wrote:
-> >>
-> >> On Sat, May 27, 2023 at 6:32=E2=80=AFAM Marc Zyngier <maz@kernel.org> =
-wrote:
-> >>>
-> >>> On Sat, 27 May 2023 00:00:47 +0100,
-> >>> Ian Rogers <irogers@google.com> wrote:
-> >>>>
-> >>>> On Thu, May 25, 2023 at 8:56=E2=80=AFAM Oliver Upton <oliver.upton@l=
-inux.dev> wrote:
-> >>>>>
-> >>>>> On Thu, May 25, 2023 at 04:20:31PM +0200, Peter Zijlstra wrote:
-> >>>>>> On Thu, May 25, 2023 at 07:11:41AM +0000, Oliver Upton wrote:
-> >>>>>>
-> >>>>>>> The PMUv3 driver does pass a name, but it relies on getting back =
-an
-> >>>>>>> allocated pmu id as @type is -1 in the call to perf_pmu_register(=
-).
-> >>>>>>>
-> >>>>>>> What actually broke is how KVM probes for a default core PMU to u=
-se for
-> >>>>>>> a guest. kvm_pmu_probe_armpmu() creates a counter w/ PERF_TYPE_RA=
-W and
-> >>>>>>> reads the pmu from the returned perf_event. The linear search had=
- the
-> >>>>>>> effect of eventually stumbling on the correct core PMU and succee=
-ding.
-> >>>>>>>
-> >>>>>>> Perf folks: is this WAI for heterogenous systems?
-> >>>>>>
-> >>>>>> TBH, I'm not sure. hetero and virt don't mix very well AFAIK and I=
-'m not
-> >>>>>> sure what ARM64 does here.
-> >>>>>>
-> >>>>>> IIRC the only way is to hard affine things; that is, force vCPU of
-> >>>>>> 'type' to the pCPU mask of 'type' CPUs.
-> >>>>>
-> >>>>> We provide absolutely no illusion of consistency across implementat=
-ions.
-> >>>>> Userspace can select the PMU type, and then it is a userspace probl=
-em
-> >>>>> affining vCPUs to the right pCPUs.
-> >>>>>
-> >>>>> And if they get that wrong, we just bail and refuse to run the vCPU=
-.
-> >>>>>
-> >>>>>> If you don't do that; or let userspace 'override' that, things go
-> >>>>>> sideways *real* fast.
-> >>>>>
-> >>>>> Oh yeah, and I wish PMUs were the only problem with these hetero
-> >>>>> systems...
-> >>>>
-> >>>> Just to add some context from what I understand. There are inbuilt
-> >>>> type numbers for PMUs:
-> >>>> https://git.kernel.org/pub/scm/linux/kernel/git/acme/linux.git/tree/=
-include/uapi/linux/perf_event.h?h=3Dperf-tools-next#n34
-> >>>> so the PMU generally called /sys/devices/cpu should have type 4 (ARM
-> >>>> give it another name). For heterogeneous ARM there is a single PMU a=
-nd
-> >>>> the same events are programmed regardless of whether it is a big or =
-a
-> >>>> little core - the cpumask lists all CPUs.
-> >>>
-> >>> I think you misunderstood the way heterogeneous arm64 systems are
-> >>> described . Each CPU type gets its own PMU type, and its own event
-> >>> list. Case in point:
-> >>>
-> >>> $ grep . /sys/devices/*pmu/{type,cpus}
-> >>> /sys/devices/apple_avalanche_pmu/type:9
-> >>> /sys/devices/apple_blizzard_pmu/type:8
-> >>> /sys/devices/apple_avalanche_pmu/cpus:4-9
-> >>> /sys/devices/apple_blizzard_pmu/cpus:0-3
-> >>>
-> >>> Type 4 (aka PERF_EVENT_RAW) is AFAICT just a way to encode the raw
-> >>> event number, nothing else.
-> >>
-> >> Which PMU will a raw event open on?
-> >
-> > On the PMU that matches the current CPU.
-> >
-> >> Note, the raw events don't support
-> >> the extended type that is present in PERF_TYPE_HARDWARE and
-> >> PERF_TYPE_HW_CACHE:
-> >> https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/tree/inclu=
-de/uapi/linux/perf_event.h#n41
-> >> as the bits are already in use for being just plain config values.
-> >
-> > I'm not sure how relevant this is to the numbering of PMUs on arm64.
-> >
-> >> I suspect not being type 4 is a bug on apple ARM here.
-> >
-> > If that's a bug on this machine, it's a bug on all machines, at which
-> > point it is the de-facto API:
-> >
-> > $ grep . /sys/devices/armv8*/{type,cpus}
-> > /sys/devices/armv8_cortex_a53/type:8
-> > /sys/devices/armv8_cortex_a72/type:9
-> > /sys/devices/armv8_cortex_a53/cpus:0-3
-> > /sys/devices/armv8_cortex_a72/cpus:4-5
-> >
-> > See, non-Apple HW. And now for a system with homogeneous CPUs:
-> >
-> > $ grep . /sys/devices/armv8*/{type,cpus}
-> > /sys/devices/armv8_pmuv3_0/type:8
-> > /sys/devices/armv8_pmuv3_0/cpus:0-159
-> >
-> > Still no type 4. I could go on for hours, I have plenty of HW around
-> > me!
-> >
-> > So whatever your source of information is, it doesn't match reality.
-> > Our PMUs are numbered arbitrarily, and have been so for... a very long
-> > time. At least since perf_pmu_register has supported dynamic
-> > registration (see 2e80a82a49c4c).
-> >
-> > Thanks,
-> >
-> >       M.
-> >
->
->
-> I agree with Marc,
-> on s390 we have 5 different PMUs and all have arbitrary numbers
-> and have totally different features:
->
-> # ll /sys/devices/{cpum,pai}*/type
-> -r--r--r-- 1 root root 4096 May 30 09:33 /sys/devices/cpum_cf_diag/type
-> -r--r--r-- 1 root root 4096 May 30 09:33 /sys/devices/cpum_cf/type
-> -r--r--r-- 1 root root 4096 May 30 09:33 /sys/devices/cpum_sf/type
-> -r--r--r-- 1 root root 4096 May 30 09:33 /sys/devices/pai_crypto/type
-> -r--r--r-- 1 root root 4096 May 30 09:33 /sys/devices/pai_ext/type
-> # grep . /sys/devices/{cpum,pai}*/type
-> /sys/devices/cpum_cf_diag/type:9
-> /sys/devices/cpum_cf/type:8
-> /sys/devices/cpum_sf/type:4
-> /sys/devices/pai_crypto/type:10
-> /sys/devices/pai_ext/type:11
-> #
+CONFIG_ARM64_BTI_KERNEL compiles the kernel to support ARMv8.5-BTI.
+However, the nvhe code doesn't make use of it as it doesn't map any
+pages with Guarded Page(GP) bit.
 
-Thanks Thomas, could you:
-$ ls /sys/devices/*/cpu*
-The assumption is that if a file called "cpus" exists then this a
-"core" PMU, while "cpumask" would indicate an uncore PMU. The
-exception is /sys/devices/cpu where there is no cpus but all online
-CPUs are assumed to be in "cpus" cpu map. On Intel one of the core
-PMUs has type 4 which aligns with the perf_event.h "ABI" constant
-PERF_TYPE_RAW, so opening a type 4 event will open it on that PMU. The
-question is I have is what should be the behavior be on non-Intel for
-type 4, for the big.little/hybrid case it seems opening it on core
-PMUs would make most sense and is what is done for PERF_TYPE_HARDWARE
-and PERF_TYPE_HW_CACHE.
+kvm pgtable code is modified to map executable pages with GP bit
+if BTI is enabled for the kernel.
 
-Thanks,
-Ian
+At hyp init, SCTLR_EL2.BT is set to 1 to match EL1 configuration
+(SCTLR_EL1.BT1) set in bti_enable().
 
-> Thanks Thomas
-> --
-> Thomas Richter, Dept 3303, IBM s390 Linux Development, Boeblingen, German=
-y
-> --
-> Vorsitzender des Aufsichtsrats: Gregor Pillen
-> Gesch=C3=A4ftsf=C3=BChrung: David Faller
-> Sitz der Gesellschaft: B=C3=B6blingen / Registergericht: Amtsgericht Stut=
-tgart, HRB 243294
->
+One difference between kernel and nvhe code, is that the kernel maps
+.text with GP while nvhe maps all the executable pages, this makes
+nvhe code need to deal with special initialization code coming from
+other executable sections (.idmap.text).
+For this we need to add bti instruction at the beginning of
+__kvm_handle_stub_hvc as it can be called by  __host_hvc through
+branch instruction(br) and unlike SYM_FUNC_START, SYM_CODE_START
+doesn=E2=80=99t add bti instruction at the beginning, and it can=E2=80=99t =
+be modified
+to add it as it is used with vector tables.
+Another solution which is more intrusive is to convert
+__kvm_handle_stub_hvc to a function and inject =E2=80=9Cbti jc=E2=80=9D ins=
+tead of
+=E2=80=9Cbti c=E2=80=9D in SYM_FUNC_START
+
+Signed-off-by: Mostafa Saleh <smostafa@google.com>
+---
+v2 -> v3:
+- Map all executable pages with GP bit instead of just .text, this
+  simplifies the code and avoids hacks in pgtable code.
+v1 -> v2:
+- Enable BTI for nvhe also.
+- Only set GP bit for executable pages from pgtable code.
+- Set SCTLR_EL2.BT when BTI is used.
+- use system_supports_bti() for consistency.
+- Add hyp_init_valid_leaf_pte.
+v1: https://lore.kernel.org/all/20230516141846.792193-1-smostafa@google.com=
+/
+---
+ arch/arm64/include/asm/sysreg.h    |  1 +
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S | 12 ++++++++++++
+ arch/arm64/kvm/hyp/pgtable.c       |  7 ++++++-
+ 3 files changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysre=
+g.h
+index e72d9aaab6b1..204124ce86c4 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -558,6 +558,7 @@
+ 			 (BIT(18)) | (BIT(22)) | (BIT(23)) | (BIT(28)) | \
+ 			 (BIT(29)))
+=20
++#define SCTLR_EL2_BT	(BIT(36))
+ #ifdef CONFIG_CPU_BIG_ENDIAN
+ #define ENDIAN_SET_EL2		SCTLR_ELx_EE
+ #else
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/h=
+yp-init.S
+index a6d67c2bb5ae..f3ee66aa2f9d 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+@@ -128,6 +128,13 @@ alternative_if ARM64_HAS_ADDRESS_AUTH
+ 		     SCTLR_ELx_ENDA | SCTLR_ELx_ENDB)
+ 	orr	x0, x0, x1
+ alternative_else_nop_endif
++
++#ifdef CONFIG_ARM64_BTI_KERNEL
++alternative_if ARM64_BTI
++	orr	x0, x0, #SCTLR_EL2_BT
++alternative_else_nop_endif
++#endif /* CONFIG_ARM64_BTI_KERNEL */
++
+ 	msr	sctlr_el2, x0
+ 	isb
+=20
+@@ -196,6 +203,11 @@ SYM_CODE_START_LOCAL(__kvm_hyp_init_cpu)
+ SYM_CODE_END(__kvm_hyp_init_cpu)
+=20
+ SYM_CODE_START(__kvm_handle_stub_hvc)
++	/*
++	 * __kvm_handle_stub_hvc called from __host_hvc through branch instructio=
+n(br) so
++	 * we need bti j at beginning.
++	 */
++	bti j
+ 	cmp	x0, #HVC_SOFT_RESTART
+ 	b.ne	1f
+=20
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 3d61bd3e591d..a79a45fc4047 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -34,7 +34,7 @@
+ #define KVM_PTE_LEAF_ATTR_LO_S2_SH_IS	3
+ #define KVM_PTE_LEAF_ATTR_LO_S2_AF	BIT(10)
+=20
+-#define KVM_PTE_LEAF_ATTR_HI		GENMASK(63, 51)
++#define KVM_PTE_LEAF_ATTR_HI		GENMASK(63, 50)
+=20
+ #define KVM_PTE_LEAF_ATTR_HI_SW		GENMASK(58, 55)
+=20
+@@ -42,6 +42,8 @@
+=20
+ #define KVM_PTE_LEAF_ATTR_HI_S2_XN	BIT(54)
+=20
++#define KVM_PTE_LEAF_ATTR_HI_S1_GP	BIT(50)
++
+ #define KVM_PTE_LEAF_ATTR_S2_PERMS	(KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | \
+ 					 KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | \
+ 					 KVM_PTE_LEAF_ATTR_HI_S2_XN)
+@@ -371,6 +373,9 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot=
+, kvm_pte_t *ptep)
+=20
+ 		if (device)
+ 			return -EINVAL;
++
++		if (IS_ENABLED(CONFIG_ARM64_BTI_KERNEL) && system_supports_bti())
++			attr |=3D KVM_PTE_LEAF_ATTR_HI_S1_GP;
+ 	} else {
+ 		attr |=3D KVM_PTE_LEAF_ATTR_HI_S1_XN;
+ 	}
+--=20
+2.41.0.rc0.172.g3f132b7071-goog
+
