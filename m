@@ -1,123 +1,235 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A8E134C8
-	for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 12:53:31 +0000 (UTC)
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1b025aaeddbso297925ad.1
-        for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 05:53:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1E01993C
+	for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 14:00:34 +0000 (UTC)
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1ac65ab7432so334245ad.0
+        for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 07:00:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685451211; x=1688043211;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6koIQhkVmhWdRRt+kcMPERrPT5zK+VP4WbBi9dIh878=;
-        b=0ZbKnBQb3RTmhl/iyyBZyhicWNfEy8GN3w/IM+LC/c5+R0wcT80mJyHr+vzegZhN8M
-         wSjPUB7vunHICRQ2x4sReR6XsInh2OzQZIhAuJD79P4KMrLtWmxA0+JKGKrdyNpPqjaI
-         AHlg6ySj7oHxPJyf9MgUL4hqQZE5LGBJRSEDj81zSl56Fe8PFKIv3ctYaf4OVW7/uNLX
-         x2TIERQDoL3aJsUsMBwa6bpjzxY4Igum6h2/S/csmbZuHbJBXooTwjUrg/jvyCp1xgPC
-         vzLmWIV3drEz76/vpbIw/t9ylGk/z02+kHHhuAiqB6G64OOYXdFKzCvFo/RvfVqOjy2t
-         3lIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685451211; x=1688043211;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20221208; t=1685455234; x=1688047234;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6koIQhkVmhWdRRt+kcMPERrPT5zK+VP4WbBi9dIh878=;
-        b=TJhwJcLDk1Abp3NZT8zObApa8frT06TrhtSzFy99uzB26f6hCrs8QYiLybX6iOaRFm
-         9ZtGYK2aoA3iBXfQY+2q9SDAJ4W2FZKcwOGD1j0FR0Et+JbAuj4hmVhQvnuMQdmceQyP
-         HlUzypJRLfLyzeTu4raf5S2MUOxkaGR73XJKucSaprucPi3JekeKwufmxjpylFUdl3xH
-         yEwv+8lnmOqzlOs82XbLa1mNMblC1o/PJUMDhBTi9K6s8uOGguHlwUxwqEgs5knv2GgZ
-         UZsplNUzNkQfMScnYer5Roh2aqDXTt85Ati2rGIREUXVYrlGTTTePMFm2yVe1XHKiXrD
-         09og==
-X-Gm-Message-State: AC+VfDxC/W1Spgf6HXN7kkRUMwAMC/CPnBRzONJZOmo/zcbd2KCzzMz9
-	hurbldJkXEPEOnAz5VJI9Ny1yQ==
-X-Google-Smtp-Source: ACHHUZ4R6ppmrf+7RXpaMp+0mg4mZEN9CR2Y1X0Xf0Sr/bTTTPh0apsP/evrOuSgMmI5bK0+koTmzw==
-X-Received: by 2002:a17:903:55:b0:1aa:ea22:8043 with SMTP id l21-20020a170903005500b001aaea228043mr113015pla.7.1685451211116;
-        Tue, 30 May 2023 05:53:31 -0700 (PDT)
-Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id 2-20020a631842000000b0052c22778e64sm8634695pgy.66.2023.05.30.05.53.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 May 2023 05:53:29 -0700 (PDT)
-Date: Tue, 30 May 2023 05:53:24 -0700
-From: Reiji Watanabe <reijiw@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Raghavendra Rao Anata <rananta@google.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 0/4] KVM: arm64: PMU: Fix PMUVer handling on
- heterogeneous PMU systems
-Message-ID: <20230530125324.ijrwrvoll2detpus@google.com>
-References: <20230527040236.1875860-1-reijiw@google.com>
- <87zg5njlyn.wl-maz@kernel.org>
+        bh=N2UZx8lRuVV95JLdyEdn9XhsUM2ReQsqKWGI4qb4yJI=;
+        b=cT34SGrTUx7G2y+GF9IExmt66HEAk0TxXg7RkU1Cpyy9QR+fe8x9NxU4QASqdIzs28
+         zINMXUEZi30EQwRE502SDS2rgtrzNjhUJgtkJDcihbMwAHp0bgG3qJI9KE2px04befqq
+         K5i10y/gpHxJaTBixgSe25E7O4LCvEV0uAylxZBL+pQ1p9W5GlTCWiK7wRXnwo32oue5
+         xx5dcdHboQlFY1ujpsPsniOasYntzWQeJK82N16nGdR6CtSPheMsHpXhB5p54otHS4/f
+         VSGyowzxzHSGXaLlktUxF+na9w7jFDZ+tHOEkVThEvvRMiJjYN0+mfEZIVQP+EpK3L0n
+         xjqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685455234; x=1688047234;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=N2UZx8lRuVV95JLdyEdn9XhsUM2ReQsqKWGI4qb4yJI=;
+        b=Qr3yPVibT7AEo7MNioqY5Pu1UBOkD9dDFvhHSVPTJBA7lPiRkSntB8kH5FRJDS1EAL
+         TE13jxN65BYdgQ7P4g2lLtTwayqXKn3tz4XFpQl3LPYYkfmjo/75AJ1bu00y3KpA5RB1
+         oGgr4/RHhd47QhR1qSv+e7hAT1UaVOwPREXNCPmWq7tpZ2kU4HrONVqQ4P2MaudFo2P/
+         a5gExYSnoHtidmA/rN1rgscwKUPYME6+oC7lhw0SbSNtuoHeZVPMQAOhnkH3kPhf+d+/
+         QSh8hmUPMxqE4SKh8RRiTQkwV5WYaoxBeuUAetaCGBve8ab6n0g/hqNq5kQluv+q2bnR
+         SSLg==
+X-Gm-Message-State: AC+VfDzxiazN81ylNEE2kyO0mLbgGU1Y6ZYaTJR7Ge/IBTIcHuSDX3rM
+	7Mf0rjit/6tH8aRVSt34sZiOoRkjZBis9CnpOH3XEQ==
+X-Google-Smtp-Source: ACHHUZ4Rp/ErIVyDCQ2IHBUOh47iZFHwPFvGVtazcxih8Jzal8pvp70DtHeeb89A+lZnrQ5GhQglC5p/FVhmpjaGtmM=
+X-Received: by 2002:a17:902:d490:b0:1b0:cea:294e with SMTP id
+ c16-20020a170902d49000b001b00cea294emr125798plg.21.1685455233533; Tue, 30 May
+ 2023 07:00:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87zg5njlyn.wl-maz@kernel.org>
+References: <20230504110003.2548-1-ravi.bangoria@amd.com> <20230504110003.2548-4-ravi.bangoria@amd.com>
+ <20230524214133.GA2359762@dev-arch.thelio-3990X> <f02c78e2-34b9-4985-640a-279dae1004a9@amd.com>
+ <ZG8KLbZSECiYaKFc@linux.dev> <20230525142031.GU83892@hirez.programming.kicks-ass.net>
+ <ZG+FLdP2kkfI1m2Z@linux.dev> <CAP-5=fWYbzmTETgqJ11y22=JaXDM0gnb4qR6KYeRGmFXw08f-Q@mail.gmail.com>
+ <86jzwtdhmk.wl-maz@kernel.org> <CAP-5=fVW6KbUbbEfF3mEFvTfFDC5yKSjSpa+w3D55dG3CNUERw@mail.gmail.com>
+ <86h6rxd3gh.wl-maz@kernel.org> <0075d8a9-2df4-86eb-8171-8995f59904e0@linux.ibm.com>
+In-Reply-To: <0075d8a9-2df4-86eb-8171-8995f59904e0@linux.ibm.com>
+From: Ian Rogers <irogers@google.com>
+Date: Tue, 30 May 2023 07:00:22 -0700
+Message-ID: <CAP-5=fXo0t+buDrmf7SyTD97gmTWGoDAO2YXWyav+_79O3MZ0w@mail.gmail.com>
+Subject: Re: [PATCH v4 3/4] perf/core: Remove pmu linear searching code
+To: Thomas Richter <tmricht@linux.ibm.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Peter Zijlstra <peterz@infradead.org>, Ravi Bangoria <ravi.bangoria@amd.com>, 
+	Nathan Chancellor <nathan@kernel.org>, namhyung@kernel.org, eranian@google.com, 
+	acme@kernel.org, mark.rutland@arm.com, jolsa@kernel.org, bp@alien8.de, 
+	kan.liang@linux.intel.com, adrian.hunter@intel.com, maddy@linux.ibm.com, 
+	x86@kernel.org, linux-perf-users@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, sandipan.das@amd.com, ananth.narayan@amd.com, 
+	santosh.shukla@amd.com, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Marc,
+On Tue, May 30, 2023 at 12:45=E2=80=AFAM Thomas Richter <tmricht@linux.ibm.=
+com> wrote:
+>
+> On 5/27/23 20:38, Marc Zyngier wrote:
+> > On Sat, 27 May 2023 18:00:13 +0100,
+> > Ian Rogers <irogers@google.com> wrote:
+> >>
+> >> On Sat, May 27, 2023 at 6:32=E2=80=AFAM Marc Zyngier <maz@kernel.org> =
+wrote:
+> >>>
+> >>> On Sat, 27 May 2023 00:00:47 +0100,
+> >>> Ian Rogers <irogers@google.com> wrote:
+> >>>>
+> >>>> On Thu, May 25, 2023 at 8:56=E2=80=AFAM Oliver Upton <oliver.upton@l=
+inux.dev> wrote:
+> >>>>>
+> >>>>> On Thu, May 25, 2023 at 04:20:31PM +0200, Peter Zijlstra wrote:
+> >>>>>> On Thu, May 25, 2023 at 07:11:41AM +0000, Oliver Upton wrote:
+> >>>>>>
+> >>>>>>> The PMUv3 driver does pass a name, but it relies on getting back =
+an
+> >>>>>>> allocated pmu id as @type is -1 in the call to perf_pmu_register(=
+).
+> >>>>>>>
+> >>>>>>> What actually broke is how KVM probes for a default core PMU to u=
+se for
+> >>>>>>> a guest. kvm_pmu_probe_armpmu() creates a counter w/ PERF_TYPE_RA=
+W and
+> >>>>>>> reads the pmu from the returned perf_event. The linear search had=
+ the
+> >>>>>>> effect of eventually stumbling on the correct core PMU and succee=
+ding.
+> >>>>>>>
+> >>>>>>> Perf folks: is this WAI for heterogenous systems?
+> >>>>>>
+> >>>>>> TBH, I'm not sure. hetero and virt don't mix very well AFAIK and I=
+'m not
+> >>>>>> sure what ARM64 does here.
+> >>>>>>
+> >>>>>> IIRC the only way is to hard affine things; that is, force vCPU of
+> >>>>>> 'type' to the pCPU mask of 'type' CPUs.
+> >>>>>
+> >>>>> We provide absolutely no illusion of consistency across implementat=
+ions.
+> >>>>> Userspace can select the PMU type, and then it is a userspace probl=
+em
+> >>>>> affining vCPUs to the right pCPUs.
+> >>>>>
+> >>>>> And if they get that wrong, we just bail and refuse to run the vCPU=
+.
+> >>>>>
+> >>>>>> If you don't do that; or let userspace 'override' that, things go
+> >>>>>> sideways *real* fast.
+> >>>>>
+> >>>>> Oh yeah, and I wish PMUs were the only problem with these hetero
+> >>>>> systems...
+> >>>>
+> >>>> Just to add some context from what I understand. There are inbuilt
+> >>>> type numbers for PMUs:
+> >>>> https://git.kernel.org/pub/scm/linux/kernel/git/acme/linux.git/tree/=
+include/uapi/linux/perf_event.h?h=3Dperf-tools-next#n34
+> >>>> so the PMU generally called /sys/devices/cpu should have type 4 (ARM
+> >>>> give it another name). For heterogeneous ARM there is a single PMU a=
+nd
+> >>>> the same events are programmed regardless of whether it is a big or =
+a
+> >>>> little core - the cpumask lists all CPUs.
+> >>>
+> >>> I think you misunderstood the way heterogeneous arm64 systems are
+> >>> described . Each CPU type gets its own PMU type, and its own event
+> >>> list. Case in point:
+> >>>
+> >>> $ grep . /sys/devices/*pmu/{type,cpus}
+> >>> /sys/devices/apple_avalanche_pmu/type:9
+> >>> /sys/devices/apple_blizzard_pmu/type:8
+> >>> /sys/devices/apple_avalanche_pmu/cpus:4-9
+> >>> /sys/devices/apple_blizzard_pmu/cpus:0-3
+> >>>
+> >>> Type 4 (aka PERF_EVENT_RAW) is AFAICT just a way to encode the raw
+> >>> event number, nothing else.
+> >>
+> >> Which PMU will a raw event open on?
+> >
+> > On the PMU that matches the current CPU.
+> >
+> >> Note, the raw events don't support
+> >> the extended type that is present in PERF_TYPE_HARDWARE and
+> >> PERF_TYPE_HW_CACHE:
+> >> https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/tree/inclu=
+de/uapi/linux/perf_event.h#n41
+> >> as the bits are already in use for being just plain config values.
+> >
+> > I'm not sure how relevant this is to the numbering of PMUs on arm64.
+> >
+> >> I suspect not being type 4 is a bug on apple ARM here.
+> >
+> > If that's a bug on this machine, it's a bug on all machines, at which
+> > point it is the de-facto API:
+> >
+> > $ grep . /sys/devices/armv8*/{type,cpus}
+> > /sys/devices/armv8_cortex_a53/type:8
+> > /sys/devices/armv8_cortex_a72/type:9
+> > /sys/devices/armv8_cortex_a53/cpus:0-3
+> > /sys/devices/armv8_cortex_a72/cpus:4-5
+> >
+> > See, non-Apple HW. And now for a system with homogeneous CPUs:
+> >
+> > $ grep . /sys/devices/armv8*/{type,cpus}
+> > /sys/devices/armv8_pmuv3_0/type:8
+> > /sys/devices/armv8_pmuv3_0/cpus:0-159
+> >
+> > Still no type 4. I could go on for hours, I have plenty of HW around
+> > me!
+> >
+> > So whatever your source of information is, it doesn't match reality.
+> > Our PMUs are numbered arbitrarily, and have been so for... a very long
+> > time. At least since perf_pmu_register has supported dynamic
+> > registration (see 2e80a82a49c4c).
+> >
+> > Thanks,
+> >
+> >       M.
+> >
+>
+>
+> I agree with Marc,
+> on s390 we have 5 different PMUs and all have arbitrary numbers
+> and have totally different features:
+>
+> # ll /sys/devices/{cpum,pai}*/type
+> -r--r--r-- 1 root root 4096 May 30 09:33 /sys/devices/cpum_cf_diag/type
+> -r--r--r-- 1 root root 4096 May 30 09:33 /sys/devices/cpum_cf/type
+> -r--r--r-- 1 root root 4096 May 30 09:33 /sys/devices/cpum_sf/type
+> -r--r--r-- 1 root root 4096 May 30 09:33 /sys/devices/pai_crypto/type
+> -r--r--r-- 1 root root 4096 May 30 09:33 /sys/devices/pai_ext/type
+> # grep . /sys/devices/{cpum,pai}*/type
+> /sys/devices/cpum_cf_diag/type:9
+> /sys/devices/cpum_cf/type:8
+> /sys/devices/cpum_sf/type:4
+> /sys/devices/pai_crypto/type:10
+> /sys/devices/pai_ext/type:11
+> #
 
-On Mon, May 29, 2023 at 02:39:28PM +0100, Marc Zyngier wrote:
-> On Sat, 27 May 2023 05:02:32 +0100,
-> Reiji Watanabe <reijiw@google.com> wrote:
-> > 
-> > This series fixes issues with PMUVer handling for a guest with
-> > PMU configured on heterogeneous PMU systems.
-> > Specifically, it addresses the following two issues.
-> > 
-> > [A] The default value of ID_AA64DFR0_EL1.PMUVer of the vCPU is set
-> >     to its sanitized value.  This could be inappropriate on
-> >     heterogeneous PMU systems, as arm64_ftr_bits for PMUVer is defined
-> >     as FTR_EXACT with safe_val == 0 (when ID_AA64DFR0_EL1.PMUVer of all
-> >     PEs on the host is not uniform, the sanitized value will be 0).
-> 
-> Why is this a problem? The CPUs don't implement the same version of
-> the architecture, we don't get a PMU. Why should we try to do anything
-> better? I really don't think we should go out or out way and make the
-> code more complicated for something that doesn't really exist.
+Thanks Thomas, could you:
+$ ls /sys/devices/*/cpu*
+The assumption is that if a file called "cpus" exists then this a
+"core" PMU, while "cpumask" would indicate an uncore PMU. The
+exception is /sys/devices/cpu where there is no cpus but all online
+CPUs are assumed to be in "cpus" cpu map. On Intel one of the core
+PMUs has type 4 which aligns with the perf_event.h "ABI" constant
+PERF_TYPE_RAW, so opening a type 4 event will open it on that PMU. The
+question is I have is what should be the behavior be on non-Intel for
+type 4, for the big.little/hybrid case it seems opening it on core
+PMUs would make most sense and is what is done for PERF_TYPE_HARDWARE
+and PERF_TYPE_HW_CACHE.
 
-Even when the CPUs don't implement the same version of the architecture,
-if one of them implement PMUv3, KVM advertises KVM_CAP_ARM_PMU_V3,
-and allows userspace to configure PMU (KVM_ARM_VCPU_PMU_V3) for vCPUs.
+Thanks,
+Ian
 
-In this case, although KVM provides PMU emulations for the guest,
-the guest's ID_AA64DFR0_EL1.PMUVer will be zero.  Also,
-KVM_SET_ONE_REG for ID_AA64DFR0_EL1 will never work for vCPUs
-with PMU configured on such systems (since KVM also doesn't allow
-userspace to set the PMUVer to 0 for the vCPUs with PMU configured).
-
-I would think either ID_AA64DFR0_EL1.PMUVer for the guest should
-indicate PMUv3, or KVM should not allow userspace to configure PMU,
-in this case.
-
-This series is a fix for the former, mainly to keep the current
-behavior of KVM_CAP_ARM_PMU_V3 and KVM_ARM_VCPU_PMU_V3 on such
-systems, since I wasn't sure if such systems don't really exist :)
-(Also, I plan to implement a similar fix for PMCR_EL0.N on top of
-those changes)
-
-I could make a fix for the latter instead though. What do you think ?
-
-Thank you,
-Reiji
-
-> 
-> Or am I missing the problem altogether?
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+> Thanks Thomas
+> --
+> Thomas Richter, Dept 3303, IBM s390 Linux Development, Boeblingen, German=
+y
+> --
+> Vorsitzender des Aufsichtsrats: Gregor Pillen
+> Gesch=C3=A4ftsf=C3=BChrung: David Faller
+> Sitz der Gesellschaft: B=C3=B6blingen / Registergericht: Amtsgericht Stut=
+tgart, HRB 243294
+>
