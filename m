@@ -1,120 +1,123 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F64046B4
-	for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 10:55:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1685444156;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7r4Mnem7kmzwqmYPUjeTXwU41wAFR83DgbxuqCZJ8nM=;
-	b=gEoHNZh5wtYideQk9Tk4SUa7TSyh60aClJ53kU0IiaH7aMIXKp2Tue3NgecXdlrou5YfSC
-	yj5wPw4T6OwFevgW08m3cuDGxs8wCdaOTcQ1g1zIz97updELix/KVq0DTeitlON7hYZ5Pu
-	0b9FHl420JTzeK8lv6p7as6+l3AinZk=
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-421-6th83VKQNk266jIczxOPSA-1; Tue, 30 May 2023 06:55:55 -0400
-X-MC-Unique: 6th83VKQNk266jIczxOPSA-1
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-517f0c08dfaso228742a12.0
-        for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 03:55:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A8E134C8
+	for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 12:53:31 +0000 (UTC)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1b025aaeddbso297925ad.1
+        for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 05:53:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1685451211; x=1688043211;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6koIQhkVmhWdRRt+kcMPERrPT5zK+VP4WbBi9dIh878=;
+        b=0ZbKnBQb3RTmhl/iyyBZyhicWNfEy8GN3w/IM+LC/c5+R0wcT80mJyHr+vzegZhN8M
+         wSjPUB7vunHICRQ2x4sReR6XsInh2OzQZIhAuJD79P4KMrLtWmxA0+JKGKrdyNpPqjaI
+         AHlg6ySj7oHxPJyf9MgUL4hqQZE5LGBJRSEDj81zSl56Fe8PFKIv3ctYaf4OVW7/uNLX
+         x2TIERQDoL3aJsUsMBwa6bpjzxY4Igum6h2/S/csmbZuHbJBXooTwjUrg/jvyCp1xgPC
+         vzLmWIV3drEz76/vpbIw/t9ylGk/z02+kHHhuAiqB6G64OOYXdFKzCvFo/RvfVqOjy2t
+         3lIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685444154; x=1688036154;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7r4Mnem7kmzwqmYPUjeTXwU41wAFR83DgbxuqCZJ8nM=;
-        b=QvQ4ISF2BXBq51PLpQQWP1339Q2n0aDg8UWi0lEc+GFBXC9GohdVh7l62FbNx+as17
-         3YMiCohnJWm51PFPbO68sTcXAzhjEI8GsIaRRPxZ3p/klp6g7JNWlYNxE1NAl1NteP0W
-         cAdaadmzc/fCwRJHGQBhlwXlLPRXhGpm3s9oGdAKubl9IpWen9wFQ83IC21vM8X66MGP
-         JNCDhLGg4WtXGmu1RMZ5u8U0Evtl/2B+FYuCBLZzK8b9RlAoP5xg8BMOhEfB4ABN4E1T
-         gd6knRXZCE79RnxYZatmHk2uN7wFvG2YZUL5j0ptsIIm4jW8az+wbC2GSdE7N1OGuk/A
-         eRVQ==
-X-Gm-Message-State: AC+VfDyaAbLjrel4IbDc6i88v3edA0K/UUqI/R/XGZu7dNV+ASQebgwF
-	vYywdZ79atkYso3L6kyGF/nrc6FOW6C7kFQr4VncRfqJ3lkH3OOhcuWBdrX/qpysEJ5mBxrkjf/
-	jA8dXbOyhFfatw72I
-X-Received: by 2002:a17:902:d2cf:b0:1ad:eada:598b with SMTP id n15-20020a170902d2cf00b001adeada598bmr2094738plc.3.1685444154263;
-        Tue, 30 May 2023 03:55:54 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7CUOUu5tniDT9Anx1jndbJZo9eoV8LSBuK+IXZEX8MBQk8TjG7H9ErpJBB2Mbo63Rdlv0pCg==
-X-Received: by 2002:a17:902:d2cf:b0:1ad:eada:598b with SMTP id n15-20020a170902d2cf00b001adeada598bmr2094720plc.3.1685444153998;
-        Tue, 30 May 2023 03:55:53 -0700 (PDT)
-Received: from [10.66.61.39] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id h20-20020a170902f7d400b001aaed55aff3sm5579270plw.137.2023.05.30.03.55.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 May 2023 03:55:53 -0700 (PDT)
-Message-ID: <3772ec3f-cafa-6d90-77e4-d1594e4046dd@redhat.com>
-Date: Tue, 30 May 2023 18:55:49 +0800
+        d=1e100.net; s=20221208; t=1685451211; x=1688043211;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6koIQhkVmhWdRRt+kcMPERrPT5zK+VP4WbBi9dIh878=;
+        b=TJhwJcLDk1Abp3NZT8zObApa8frT06TrhtSzFy99uzB26f6hCrs8QYiLybX6iOaRFm
+         9ZtGYK2aoA3iBXfQY+2q9SDAJ4W2FZKcwOGD1j0FR0Et+JbAuj4hmVhQvnuMQdmceQyP
+         HlUzypJRLfLyzeTu4raf5S2MUOxkaGR73XJKucSaprucPi3JekeKwufmxjpylFUdl3xH
+         yEwv+8lnmOqzlOs82XbLa1mNMblC1o/PJUMDhBTi9K6s8uOGguHlwUxwqEgs5knv2GgZ
+         UZsplNUzNkQfMScnYer5Roh2aqDXTt85Ati2rGIREUXVYrlGTTTePMFm2yVe1XHKiXrD
+         09og==
+X-Gm-Message-State: AC+VfDxC/W1Spgf6HXN7kkRUMwAMC/CPnBRzONJZOmo/zcbd2KCzzMz9
+	hurbldJkXEPEOnAz5VJI9Ny1yQ==
+X-Google-Smtp-Source: ACHHUZ4R6ppmrf+7RXpaMp+0mg4mZEN9CR2Y1X0Xf0Sr/bTTTPh0apsP/evrOuSgMmI5bK0+koTmzw==
+X-Received: by 2002:a17:903:55:b0:1aa:ea22:8043 with SMTP id l21-20020a170903005500b001aaea228043mr113015pla.7.1685451211116;
+        Tue, 30 May 2023 05:53:31 -0700 (PDT)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id 2-20020a631842000000b0052c22778e64sm8634695pgy.66.2023.05.30.05.53.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 May 2023 05:53:29 -0700 (PDT)
+Date: Tue, 30 May 2023 05:53:24 -0700
+From: Reiji Watanabe <reijiw@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Raghavendra Rao Anata <rananta@google.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 0/4] KVM: arm64: PMU: Fix PMUVer handling on
+ heterogeneous PMU systems
+Message-ID: <20230530125324.ijrwrvoll2detpus@google.com>
+References: <20230527040236.1875860-1-reijiw@google.com>
+ <87zg5njlyn.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v2 7/7] arm64/sysreg: Convert OSECCR_EL1 to automatic
- generation
-To: Mark Brown <broonie@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev
-References: <20230419-arm64-syreg-gen-v2-0-4c6add1f6257@kernel.org>
- <20230419-arm64-syreg-gen-v2-7-4c6add1f6257@kernel.org>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230419-arm64-syreg-gen-v2-7-4c6add1f6257@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87zg5njlyn.wl-maz@kernel.org>
 
+Hi Marc,
 
-
-On 5/24/23 02:37, Mark Brown wrote:
-> Convert OSECCR_EL1 to automatic generation as per DDI0601 2023-03, no
-> functional changes.
+On Mon, May 29, 2023 at 02:39:28PM +0100, Marc Zyngier wrote:
+> On Sat, 27 May 2023 05:02:32 +0100,
+> Reiji Watanabe <reijiw@google.com> wrote:
+> > 
+> > This series fixes issues with PMUVer handling for a guest with
+> > PMU configured on heterogeneous PMU systems.
+> > Specifically, it addresses the following two issues.
+> > 
+> > [A] The default value of ID_AA64DFR0_EL1.PMUVer of the vCPU is set
+> >     to its sanitized value.  This could be inappropriate on
+> >     heterogeneous PMU systems, as arm64_ftr_bits for PMUVer is defined
+> >     as FTR_EXACT with safe_val == 0 (when ID_AA64DFR0_EL1.PMUVer of all
+> >     PEs on the host is not uniform, the sanitized value will be 0).
 > 
-Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->   arch/arm64/include/asm/sysreg.h | 1 -
->   arch/arm64/tools/sysreg         | 5 +++++
->   2 files changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index d9711f1e47b2..23a17da500a4 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -134,7 +134,6 @@
->   #define SYS_SVCR_SMSTART_SM_EL0		sys_reg(0, 3, 4, 3, 3)
->   #define SYS_SVCR_SMSTOP_SMZA_EL0	sys_reg(0, 3, 4, 6, 3)
->   
-> -#define SYS_OSECCR_EL1			sys_reg(2, 0, 0, 6, 2)
->   #define SYS_DBGBVRn_EL1(n)		sys_reg(2, 0, 0, n, 4)
->   #define SYS_DBGBCRn_EL1(n)		sys_reg(2, 0, 0, n, 5)
->   #define SYS_DBGWVRn_EL1(n)		sys_reg(2, 0, 0, n, 6)
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index e18ae1df41f4..41462785020b 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -93,6 +93,11 @@ Res0	63:32
->   Field	31:0	DTRTX
->   EndSysreg
->   
-> +Sysreg	OSECCR_EL1	2	0	0	6	2
-> +Res0	63:32
-> +Field	31:0	EDECCR
-> +EndSysreg
-> +
->   Sysreg	OSLAR_EL1	2	0	1	0	4
->   Res0	63:1
->   Field	0	OSLK
-> 
+> Why is this a problem? The CPUs don't implement the same version of
+> the architecture, we don't get a PMU. Why should we try to do anything
+> better? I really don't think we should go out or out way and make the
+> code more complicated for something that doesn't really exist.
 
--- 
-Shaoqin
+Even when the CPUs don't implement the same version of the architecture,
+if one of them implement PMUv3, KVM advertises KVM_CAP_ARM_PMU_V3,
+and allows userspace to configure PMU (KVM_ARM_VCPU_PMU_V3) for vCPUs.
 
+In this case, although KVM provides PMU emulations for the guest,
+the guest's ID_AA64DFR0_EL1.PMUVer will be zero.  Also,
+KVM_SET_ONE_REG for ID_AA64DFR0_EL1 will never work for vCPUs
+with PMU configured on such systems (since KVM also doesn't allow
+userspace to set the PMUVer to 0 for the vCPUs with PMU configured).
+
+I would think either ID_AA64DFR0_EL1.PMUVer for the guest should
+indicate PMUv3, or KVM should not allow userspace to configure PMU,
+in this case.
+
+This series is a fix for the former, mainly to keep the current
+behavior of KVM_CAP_ARM_PMU_V3 and KVM_ARM_VCPU_PMU_V3 on such
+systems, since I wasn't sure if such systems don't really exist :)
+(Also, I plan to implement a similar fix for PMCR_EL0.N on top of
+those changes)
+
+I could make a fix for the latter instead though. What do you think ?
+
+Thank you,
+Reiji
+
+> 
+> Or am I missing the problem altogether?
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
