@@ -1,289 +1,465 @@
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 133491EA76
-	for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 18:21:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1685470916; x=1717006916;
-  h=date:from:to:cc:subject:message-id;
-  bh=cxvJZD0mWTbcPlz8XjjrAt5OXYm/YdsfjEZbFbCffNI=;
-  b=hNNHy8vCMm0qFxiZopKFRQeZrNGTvpvMYhX+0GPmeGFGK64L3x8qGesP
-   q9lc6WEZ3k3Y7efTZqVssArtQ0jLTkGKAAyw7LpiGC/dCPAB9TvIICn9S
-   NyC1Q1xEQj611drFwxXZZLA+NoWPXX1tm/e9r/yVE/LPDdlZ4O849yfRL
-   3xI/OZIBd6hhO+nTGK7bfKRXPyrPMwngT/jxksYrsVh7xtsbehJEInUHW
-   pGNM0D8+XWNZuVc54itkIRpgRnxo7oTVOTdEkLw+MR9Jg7cbKkacEe5kN
-   v26DKmSJgGAiEsjdmYkNTDG+QIs6IktfH2PjanekClZWcwYW8nbiHPat6
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10726"; a="383267124"
-X-IronPort-AV: E=Sophos;i="6.00,205,1681196400"; 
-   d="scan'208";a="383267124"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2023 11:21:38 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10726"; a="709727323"
-X-IronPort-AV: E=Sophos;i="6.00,205,1681196400"; 
-   d="scan'208";a="709727323"
-Received: from lkp-server01.sh.intel.com (HELO fb1ced2c09fb) ([10.239.97.150])
-  by fmsmga007.fm.intel.com with ESMTP; 30 May 2023 11:21:35 -0700
-Received: from kbuild by fb1ced2c09fb with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1q43yR-0000jV-12;
-	Tue, 30 May 2023 18:21:35 +0000
-Date: Wed, 31 May 2023 02:21:23 +0800
-From: kernel test robot <lkp@intel.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Linux Memory Management List <linux-mm@kvack.org>,
- dri-devel@lists.freedesktop.org, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-cifs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-perf-users@vger.kernel.org,
- samba-technical@lists.samba.org
-Subject: [linux-next:master] BUILD REGRESSION
- 8c33787278ca8db73ad7d23f932c8c39b9f6e543
-Message-ID: <20230530182123.UilBt%lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A13CA2D26E
+	for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 18:32:15 +0000 (UTC)
+Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-6af6b6837acso3501463a34.1
+        for <kvmarm@lists.linux.dev>; Tue, 30 May 2023 11:32:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1685471534; x=1688063534;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cheEfXaFj2n8kemDuWbwvrlht35ZpiS3kuINGwf+1Bo=;
+        b=T0dIdCJ2NvfXxI03oPi/SrCqf51S5DNcI4eU4Ho1PdBB7c7d+q/YxKhIan0iinGw1s
+         rj/x6zATnFTweiFMytx2nz9LjhrYmMT0ftxWR5UJQdr2/bSZLUkxAFk0b6j04uuDnojG
+         vbDDjzVEO+F2mWzNvPBlYlud4mIvb+MZOmxP+RvF8MnLFJVJVie3u7CHqIuX3pStdUWU
+         QjijlTtInBuJdJ7ymuH1LXNfWDTPP6k9aoi4BlMWaLld2cXc/RyArjAH8R5P2In7dnGQ
+         xAgkZOjfBLJHKTwejbEwHi9DNVONuDrPnJLpI1YFDY1NhiLh6SY5mabA4YkdLERX1C43
+         Bw3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685471534; x=1688063534;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cheEfXaFj2n8kemDuWbwvrlht35ZpiS3kuINGwf+1Bo=;
+        b=UoLjhJKzeEgQDcB05T+Q1Rlcoufwq0DMoZ4c3oRSAVEfbSABB665WT0V1L/BEa1sqt
+         pCMJNmQhiPuLRokt4TEzximJugMX/fqadv0bzWw1qubIIk61wSDByfaL4eV6N09Xqro3
+         kSF+fu25kZ5JklDfA44nk7TU3iOirAqdN/beovu45QyR5FR5PJ78duHhpEOe+PBl+8yh
+         gsGzbgj/JiwHDHgsfAD09JR+x9y7yF9GGQHVrYxln+ujfzGr+adGLDVeFpdIp71JyrVZ
+         5Rn7V1TsFFBZhdOKiDgE+P1kpEhTf4PJokzUCTFVWlfO6oxWZSBpaNh4gh57TVIs2MK6
+         ILZw==
+X-Gm-Message-State: AC+VfDxa3ovfyEjv5ZKVcpE81cmrY77Efh5LGiQVZpbmVsyaoR1NvI8v
+	lQUgkepfuTj10o48RhPBDyGBVadpBIDBFxF67E0+/A==
+X-Google-Smtp-Source: ACHHUZ70ClM3dSCArz+o4nkMNyD3bDT6WfLodoMcSMoqXCcEQbAybY4oJZmZm5x5eUm9DMc+5bmJdJKxY4DvoZAjZ7c=
+X-Received: by 2002:a05:6871:c10a:b0:19a:1571:f9dc with SMTP id
+ yq10-20020a056871c10a00b0019a1571f9dcmr1557311oab.49.1685471534496; Tue, 30
+ May 2023 11:32:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+References: <20230522221835.957419-1-jingzhangos@google.com>
+ <20230522221835.957419-3-jingzhangos@google.com> <87sfbgoik6.wl-maz@kernel.org>
+In-Reply-To: <87sfbgoik6.wl-maz@kernel.org>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Tue, 30 May 2023 11:32:02 -0700
+Message-ID: <CAAdAUtgk7BBQEgUSwWWS+YmN5PmVkeU+NvaCJaZ-dEoxk4D06g@mail.gmail.com>
+Subject: Re: [PATCH v10 2/5] KVM: arm64: Use per guest ID register for ID_AA64PFR0_EL1.[CSV2|CSV3]
+To: Marc Zyngier <maz@kernel.org>
+Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, Oliver Upton <oupton@google.com>, 
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>, 
+	Raghavendra Rao Ananta <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-branch HEAD: 8c33787278ca8db73ad7d23f932c8c39b9f6e543  Add linux-next specific files for 20230530
-
-Error/Warning reports:
-
-https://lore.kernel.org/oe-kbuild-all/202305070840.X0G3ofjl-lkp@intel.com
-
-Error/Warning: (recently discovered and may have been fixed)
-
-include/drm/drm_print.h:456:39: error: format '%ld' expects argument of type 'long int', but argument 4 has type 'size_t' {aka 'unsigned int'} [-Werror=format=]
-
-Unverified Error/Warning (likely false positive, please contact us if interested):
-
-arch/arm64/kvm/mmu.c:147:3-9: preceding lock on line 140
-fs/smb/client/cifsfs.c:982 cifs_smb3_do_mount() warn: possible memory leak of 'cifs_sb'
-fs/smb/client/cifssmb.c:4089 CIFSFindFirst() warn: missing error code? 'rc'
-fs/smb/client/cifssmb.c:4216 CIFSFindNext() warn: missing error code? 'rc'
-fs/smb/client/connect.c:2725 cifs_match_super() error: 'tlink' dereferencing possible ERR_PTR()
-fs/smb/client/connect.c:2924 generic_ip_connect() error: we previously assumed 'socket' could be null (see line 2912)
-fs/smb/server/oplock.c:1013 find_same_lease_key() warn: missing error code 'err'
-fs/smb/server/smb2pdu.c:529 smb2_allocate_rsp_buf() warn: Please consider using kvzalloc instead of kvmalloc
-fs/smb/server/smb2pdu.c:6070 smb2_read_pipe() warn: Please consider using kvzalloc instead of kvmalloc
-fs/smb/server/smb2pdu.c:6222 smb2_read() warn: Please consider using kvzalloc instead of kvmalloc
-fs/smb/server/smb2pdu.c:6371 smb2_write_rdma_channel() warn: Please consider using kvzalloc instead of kvmalloc
-fs/smb/server/smb_common.c:350 smb1_allocate_rsp_buf() warn: Please consider using kzalloc instead of kmalloc
-fs/smb/server/transport_ipc.c:232 ipc_msg_alloc() warn: Please consider using kvzalloc instead of kvmalloc
-fs/smb/server/transport_ipc.c:271 handle_response() warn: Please consider using kvzalloc instead of kvmalloc
-fs/smb/server/vfs.c:431 ksmbd_vfs_stream_write() warn: Please consider using kvzalloc instead of kvmalloc
-fs/smb/server/vfs.c:833 ksmbd_vfs_listxattr() warn: Please consider using kvzalloc instead of kvmalloc
-kernel/events/uprobes.c:478 uprobe_write_opcode() warn: passing zero to 'PTR_ERR'
-m68k-linux-ld: section .rodata VMA [00001000,001556af] overlaps section .text VMA [00000400,006ed04f]
-mm/mempolicy.c:1222 new_folio() error: uninitialized symbol 'address'.
-
-Error/Warning ids grouped by kconfigs:
-
-gcc_recent_errors
-|-- arm64-randconfig-c031-20230530
-|   `-- arch-arm64-kvm-mmu.c:preceding-lock-on-line
-|-- i386-allyesconfig
-|   `-- include-drm-drm_print.h:error:format-ld-expects-argument-of-type-long-int-but-argument-has-type-size_t-aka-unsigned-int
-|-- i386-randconfig-m021-20230530
-|   |-- fs-smb-client-cifsfs.c-cifs_smb3_do_mount()-warn:possible-memory-leak-of-cifs_sb
-|   |-- fs-smb-client-cifssmb.c-CIFSFindFirst()-warn:missing-error-code-rc
-|   |-- fs-smb-client-cifssmb.c-CIFSFindNext()-warn:missing-error-code-rc
-|   |-- fs-smb-client-connect.c-cifs_match_super()-error:tlink-dereferencing-possible-ERR_PTR()
-|   `-- fs-smb-client-connect.c-generic_ip_connect()-error:we-previously-assumed-socket-could-be-null-(see-line-)
-|-- m68k-randconfig-m031-20230530
-|   `-- m68k-linux-ld:section-.rodata-VMA-00001556af-overlaps-section-.text-VMA-00000ed04f
-|-- s390-randconfig-s031-20230530
-|   `-- mm-filemap.c:sparse:sparse:Using-plain-integer-as-NULL-pointer
-`-- x86_64-randconfig-m001-20230530
-    |-- fs-smb-client-cifsfs.c-cifs_smb3_do_mount()-warn:possible-memory-leak-of-cifs_sb
-    |-- fs-smb-client-cifssmb.c-CIFSFindFirst()-warn:missing-error-code-rc
-    |-- fs-smb-client-cifssmb.c-CIFSFindNext()-warn:missing-error-code-rc
-    |-- fs-smb-client-connect.c-cifs_match_super()-error:tlink-dereferencing-possible-ERR_PTR()
-    |-- fs-smb-client-connect.c-generic_ip_connect()-error:we-previously-assumed-socket-could-be-null-(see-line-)
-    |-- fs-smb-server-oplock.c-find_same_lease_key()-warn:missing-error-code-err
-    |-- fs-smb-server-smb2pdu.c-smb2_allocate_rsp_buf()-warn:Please-consider-using-kvzalloc-instead-of-kvmalloc
-    |-- fs-smb-server-smb2pdu.c-smb2_read()-warn:Please-consider-using-kvzalloc-instead-of-kvmalloc
-    |-- fs-smb-server-smb2pdu.c-smb2_read_pipe()-warn:Please-consider-using-kvzalloc-instead-of-kvmalloc
-    |-- fs-smb-server-smb2pdu.c-smb2_write_rdma_channel()-warn:Please-consider-using-kvzalloc-instead-of-kvmalloc
-    |-- fs-smb-server-smb_common.c-smb1_allocate_rsp_buf()-warn:Please-consider-using-kzalloc-instead-of-kmalloc
-    |-- fs-smb-server-transport_ipc.c-handle_response()-warn:Please-consider-using-kvzalloc-instead-of-kvmalloc
-    |-- fs-smb-server-transport_ipc.c-ipc_msg_alloc()-warn:Please-consider-using-kvzalloc-instead-of-kvmalloc
-    |-- fs-smb-server-vfs.c-ksmbd_vfs_listxattr()-warn:Please-consider-using-kvzalloc-instead-of-kvmalloc
-    |-- fs-smb-server-vfs.c-ksmbd_vfs_stream_write()-warn:Please-consider-using-kvzalloc-instead-of-kvmalloc
-    |-- kernel-events-uprobes.c-uprobe_write_opcode()-warn:passing-zero-to-PTR_ERR
-    `-- mm-mempolicy.c-new_folio()-error:uninitialized-symbol-address-.
-
-elapsed time: 721m
-
-configs tested: 159
-configs skipped: 6
-
-tested configs:
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-arc                              allyesconfig   gcc  
-arc                                 defconfig   gcc  
-arc                            hsdk_defconfig   gcc  
-arc                  randconfig-r004-20230530   gcc  
-arc                  randconfig-r043-20230530   gcc  
-arm                              allmodconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                                 defconfig   gcc  
-arm                  randconfig-r046-20230530   clang
-arm64                            allyesconfig   gcc  
-arm64                               defconfig   gcc  
-arm64                randconfig-r034-20230530   clang
-csky                                defconfig   gcc  
-hexagon      buildonly-randconfig-r006-20230530   clang
-hexagon              randconfig-r041-20230530   clang
-hexagon              randconfig-r045-20230530   clang
-i386                             allyesconfig   gcc  
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-i386                 randconfig-i001-20230530   clang
-i386                 randconfig-i002-20230530   clang
-i386                 randconfig-i003-20230530   clang
-i386                 randconfig-i004-20230530   clang
-i386                 randconfig-i005-20230530   clang
-i386                 randconfig-i006-20230530   clang
-i386                 randconfig-i011-20230530   gcc  
-i386                 randconfig-i012-20230530   gcc  
-i386                 randconfig-i013-20230530   gcc  
-i386                 randconfig-i014-20230530   gcc  
-i386                 randconfig-i015-20230530   gcc  
-i386                 randconfig-i016-20230530   gcc  
-i386                 randconfig-i051-20230530   clang
-i386                 randconfig-i052-20230530   clang
-i386                 randconfig-i053-20230530   clang
-i386                 randconfig-i054-20230530   clang
-i386                 randconfig-i055-20230530   clang
-i386                 randconfig-i056-20230530   clang
-i386                 randconfig-i061-20230530   clang
-i386                 randconfig-i062-20230530   clang
-i386                 randconfig-i063-20230530   clang
-i386                 randconfig-i064-20230530   clang
-i386                 randconfig-i065-20230530   clang
-i386                 randconfig-i066-20230530   clang
-i386                 randconfig-i071-20230530   gcc  
-i386                 randconfig-i072-20230530   gcc  
-i386                 randconfig-i073-20230530   gcc  
-i386                 randconfig-i074-20230530   gcc  
-i386                 randconfig-i075-20230530   gcc  
-i386                 randconfig-i076-20230530   gcc  
-i386                 randconfig-i081-20230530   gcc  
-i386                 randconfig-i082-20230530   gcc  
-i386                 randconfig-i083-20230530   gcc  
-i386                 randconfig-i084-20230530   gcc  
-i386                 randconfig-i085-20230530   gcc  
-i386                 randconfig-i086-20230530   gcc  
-i386                 randconfig-i091-20230530   clang
-i386                 randconfig-i092-20230530   clang
-i386                 randconfig-i093-20230530   clang
-i386                 randconfig-i094-20230530   clang
-i386                 randconfig-i095-20230530   clang
-i386                 randconfig-i096-20230530   clang
-i386                 randconfig-r016-20230530   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch            randconfig-r025-20230530   gcc  
-m68k                             allmodconfig   gcc  
-m68k                                defconfig   gcc  
-m68k                 randconfig-r015-20230530   gcc  
-microblaze   buildonly-randconfig-r004-20230530   gcc  
-microblaze   buildonly-randconfig-r005-20230530   gcc  
-microblaze           randconfig-r022-20230530   gcc  
-microblaze           randconfig-r033-20230530   gcc  
-mips                             allmodconfig   gcc  
-mips                             allyesconfig   gcc  
-mips                         bigsur_defconfig   gcc  
-mips                 randconfig-r013-20230530   clang
-mips                           xway_defconfig   gcc  
-nios2                               defconfig   gcc  
-nios2                randconfig-r011-20230530   gcc  
-openrisc     buildonly-randconfig-r003-20230530   gcc  
-openrisc             randconfig-r005-20230530   gcc  
-openrisc             randconfig-r012-20230530   gcc  
-openrisc             randconfig-r036-20230530   gcc  
-parisc                              defconfig   gcc  
-parisc               randconfig-r021-20230530   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc      buildonly-randconfig-r002-20230530   gcc  
-riscv                            allmodconfig   gcc  
-riscv                             allnoconfig   clang
-riscv                             allnoconfig   gcc  
-riscv                               defconfig   gcc  
-riscv                randconfig-r042-20230530   gcc  
-riscv                          rv32_defconfig   gcc  
-s390                             allmodconfig   gcc  
-s390                             allyesconfig   gcc  
-s390                                defconfig   gcc  
-s390                 randconfig-r044-20230530   gcc  
-sh                               allmodconfig   gcc  
-sh                   randconfig-r006-20230530   gcc  
-sh                   randconfig-r035-20230530   gcc  
-sparc                               defconfig   gcc  
-sparc                randconfig-r023-20230530   gcc  
-sparc64              randconfig-r032-20230530   gcc  
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64       buildonly-randconfig-r001-20230530   clang
-x86_64                              defconfig   gcc  
-x86_64                                  kexec   gcc  
-x86_64               randconfig-a001-20230530   clang
-x86_64               randconfig-a002-20230530   clang
-x86_64               randconfig-a003-20230530   clang
-x86_64               randconfig-a004-20230530   clang
-x86_64               randconfig-a005-20230530   clang
-x86_64               randconfig-a006-20230530   clang
-x86_64               randconfig-a011-20230530   gcc  
-x86_64               randconfig-a012-20230530   gcc  
-x86_64               randconfig-a013-20230530   gcc  
-x86_64               randconfig-a014-20230530   gcc  
-x86_64               randconfig-a015-20230530   gcc  
-x86_64               randconfig-a016-20230530   gcc  
-x86_64               randconfig-r031-20230530   clang
-x86_64               randconfig-x051-20230530   gcc  
-x86_64               randconfig-x052-20230530   gcc  
-x86_64               randconfig-x053-20230530   gcc  
-x86_64               randconfig-x054-20230530   gcc  
-x86_64               randconfig-x055-20230530   gcc  
-x86_64               randconfig-x056-20230530   gcc  
-x86_64               randconfig-x061-20230530   gcc  
-x86_64               randconfig-x062-20230530   gcc  
-x86_64               randconfig-x063-20230530   gcc  
-x86_64               randconfig-x064-20230530   gcc  
-x86_64               randconfig-x065-20230530   gcc  
-x86_64               randconfig-x066-20230530   gcc  
-x86_64               randconfig-x071-20230530   clang
-x86_64               randconfig-x072-20230530   clang
-x86_64               randconfig-x073-20230530   clang
-x86_64               randconfig-x074-20230530   clang
-x86_64               randconfig-x075-20230530   clang
-x86_64               randconfig-x076-20230530   clang
-x86_64               randconfig-x081-20230530   clang
-x86_64               randconfig-x082-20230530   clang
-x86_64               randconfig-x083-20230530   clang
-x86_64               randconfig-x084-20230530   clang
-x86_64               randconfig-x085-20230530   clang
-x86_64               randconfig-x086-20230530   clang
-x86_64               randconfig-x091-20230530   gcc  
-x86_64               randconfig-x092-20230530   gcc  
-x86_64               randconfig-x093-20230530   gcc  
-x86_64               randconfig-x094-20230530   gcc  
-x86_64               randconfig-x095-20230530   gcc  
-x86_64               randconfig-x096-20230530   gcc  
-x86_64                               rhel-8.3   gcc  
-xtensa               randconfig-r003-20230530   gcc  
-xtensa               randconfig-r024-20230530   gcc  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+On Sun, May 28, 2023 at 3:29=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> On Mon, 22 May 2023 23:18:32 +0100,
+> Jing Zhang <jingzhangos@google.com> wrote:
+> >
+> > With per guest ID registers, ID_AA64PFR0_EL1.[CSV2|CSV3] settings from
+> > userspace can be stored in its corresponding ID register.
+> >
+> > The setting of CSV bits for protected VMs are removed according to the
+> > discussion from Fuad below:
+> > https://lore.kernel.org/all/CA+EHjTwXA9TprX4jeG+-D+c8v9XG+oFdU1o6TSkvVy=
+e145_OvA@mail.gmail.com
+> >
+> > Besides the removal of CSV bits setting for protected VMs, No other
+> > functional change intended.
+>
+> One thing that you don't mention is the addition of some locking,
+> which is a pretty significant change.
+Will update the commit message.
+>
+> >
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h |  2 --
+> >  arch/arm64/kvm/arm.c              | 17 ---------
+> >  arch/arm64/kvm/sys_regs.c         | 58 +++++++++++++++++++++++++------
+> >  3 files changed, 47 insertions(+), 30 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm=
+/kvm_host.h
+> > index 069606170c82..8a2fde6c04c4 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -257,8 +257,6 @@ struct kvm_arch {
+> >
+> >       cpumask_var_t supported_cpus;
+> >
+> > -     u8 pfr0_csv2;
+> > -     u8 pfr0_csv3;
+> >       struct {
+> >               u8 imp:4;
+> >               u8 unimp:4;
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 774656a0718d..5114521ace60 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -102,22 +102,6 @@ static int kvm_arm_default_max_vcpus(void)
+> >       return vgic_present ? kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
+> >  }
+> >
+> > -static void set_default_spectre(struct kvm *kvm)
+> > -{
+> > -     /*
+> > -      * The default is to expose CSV2 =3D=3D 1 if the HW isn't affecte=
+d.
+> > -      * Although this is a per-CPU feature, we make it global because
+> > -      * asymmetric systems are just a nuisance.
+> > -      *
+> > -      * Userspace can override this as long as it doesn't promise
+> > -      * the impossible.
+> > -      */
+> > -     if (arm64_get_spectre_v2_state() =3D=3D SPECTRE_UNAFFECTED)
+> > -             kvm->arch.pfr0_csv2 =3D 1;
+> > -     if (arm64_get_meltdown_state() =3D=3D SPECTRE_UNAFFECTED)
+> > -             kvm->arch.pfr0_csv3 =3D 1;
+> > -}
+> > -
+> >  /**
+> >   * kvm_arch_init_vm - initializes a VM data structure
+> >   * @kvm:     pointer to the KVM struct
+> > @@ -161,7 +145,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long=
+ type)
+> >       /* The maximum number of VCPUs is limited by the host's GIC model=
+ */
+> >       kvm->max_vcpus =3D kvm_arm_default_max_vcpus();
+> >
+> > -     set_default_spectre(kvm);
+> >       kvm_arm_init_hypercalls(kvm);
+> >       kvm_arm_init_id_regs(kvm);
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index d2ee3a1c7f03..9fb1c2f8f5a5 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -1218,10 +1218,6 @@ static u64 kvm_arm_read_id_reg(const struct kvm_=
+vcpu *vcpu, u32 id)
+> >               if (!vcpu_has_sve(vcpu))
+> >                       val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE)=
+;
+> >               val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU);
+> > -             val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
+> > -             val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CS=
+V2), (u64)vcpu->kvm->arch.pfr0_csv2);
+> > -             val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
+> > -             val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CS=
+V3), (u64)vcpu->kvm->arch.pfr0_csv3);
+> >               if (kvm_vgic_global_state.type =3D=3D VGIC_V3) {
+> >                       val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC)=
+;
+> >                       val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR=
+0_EL1_GIC), 1);
+> > @@ -1359,7 +1355,11 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *=
+vcpu,
+> >                              const struct sys_reg_desc *rd,
+> >                              u64 val)
+> >  {
+> > +     struct kvm_arch *arch =3D &vcpu->kvm->arch;
+>
+> The use of kvm_arch as an anchor is very non-idiomatic. Use the kvm
+> pointer for this if you must, but I'd rather you spell the whole thing
+> out.
+Sure, will spell the whole thing out.
+>
+> > +     u64 old_val =3D read_id_reg(vcpu, rd);
+> > +     u64 new_val =3D val;
+> >       u8 csv2, csv3;
+> > +     int ret =3D 0;
+> >
+> >       /*
+> >        * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long as
+> > @@ -1377,17 +1377,26 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu =
+*vcpu,
+> >           (csv3 && arm64_get_meltdown_state() !=3D SPECTRE_UNAFFECTED))
+> >               return -EINVAL;
+> >
+> > +     mutex_lock(&arch->config_lock);
+> >       /* We can only differ with CSV[23], and anything else is an error=
+ */
+> > -     val ^=3D read_id_reg(vcpu, rd);
+> > +     val ^=3D old_val;
+> >       val &=3D ~(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2) |
+> >                ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3));
+> > -     if (val)
+> > -             return -EINVAL;
+> > -
+> > -     vcpu->kvm->arch.pfr0_csv2 =3D csv2;
+> > -     vcpu->kvm->arch.pfr0_csv3 =3D csv3;
+> > +     if (val) {
+> > +             ret =3D -EINVAL;
+> > +             goto out;
+> > +     }
+> >
+> > -     return 0;
+> > +     /* Only allow userspace to change the idregs before VM running */
+> > +     if (kvm_vm_has_ran_once(vcpu->kvm)) {
+> > +             if (new_val !=3D old_val)
+> > +                     ret =3D -EBUSY;
+>
+> This sort of check should be done exactly once in a central spot. For
+> similar reasons, the config_lock should be take in a unique location
+> so that we can actually reason about this globally rather than at a
+> microscopic level.
+>
+> Something like this (which applies to the full series):
+>
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index b3eacfc592eb..e184b9350166 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1534,7 +1534,6 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcp=
+u,
+>                                const struct sys_reg_desc *rd,
+>                                u64 val)
+>  {
+> -       struct kvm_arch *arch =3D &vcpu->kvm->arch;
+>         u8 pmuver, host_pmuver;
+>         bool valid_pmu;
+>         int ret =3D 0;
+> @@ -1557,14 +1556,6 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vc=
+pu,
+>         if (kvm_vcpu_has_pmu(vcpu) !=3D valid_pmu)
+>                 return -EINVAL;
+>
+> -       mutex_lock(&arch->config_lock);
+> -       /* Only allow userspace to change the idregs before VM running */
+> -       if (kvm_vm_has_ran_once(vcpu->kvm)) {
+> -               if (val !=3D read_id_reg(vcpu, rd))
+> -                       ret =3D -EBUSY;
+> -               goto out;
+> -       }
+> -
+>         if (!valid_pmu) {
+>                 /*
+>                  * Ignore the PMUVer field in @val. The PMUVer would be d=
+etermined
+> @@ -1592,7 +1583,6 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcp=
+u,
+>                            pmuver =3D=3D ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
+>
+>  out:
+> -       mutex_unlock(&arch->config_lock);
+>         return ret;
+>  }
+>
+> @@ -1617,7 +1607,6 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+>                            const struct sys_reg_desc *rd,
+>                            u64 val)
+>  {
+> -       struct kvm_arch *arch =3D &vcpu->kvm->arch;
+>         u8 perfmon, host_perfmon;
+>         bool valid_pmu;
+>         int ret =3D 0;
+> @@ -1641,14 +1630,6 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+>         if (kvm_vcpu_has_pmu(vcpu) !=3D valid_pmu)
+>                 return -EINVAL;
+>
+> -       mutex_lock(&arch->config_lock);
+> -       /* Only allow userspace to change the idregs before VM running */
+> -       if (kvm_vm_has_ran_once(vcpu->kvm)) {
+> -               if (val !=3D read_id_reg(vcpu, rd))
+> -                       ret =3D -EBUSY;
+> -               goto out;
+> -       }
+> -
+>         if (!valid_pmu) {
+>                 /*
+>                  * Ignore the PerfMon field in @val. The PerfMon would be=
+ determined
+> @@ -1676,7 +1657,6 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+>                            perfmon =3D=3D ID_DFR0_EL1_PerfMon_IMPDEF);
+>
+>  out:
+> -       mutex_unlock(&arch->config_lock);
+>         return ret;
+>  }
+>
+> @@ -1690,11 +1670,7 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+>  static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *=
+rd,
+>                       u64 *val)
+>  {
+> -       struct kvm_arch *arch =3D &vcpu->kvm->arch;
+> -
+> -       mutex_lock(&arch->config_lock);
+>         *val =3D read_id_reg(vcpu, rd);
+> -       mutex_unlock(&arch->config_lock);
+>
+>         return 0;
+>  }
+> @@ -1702,21 +1678,12 @@ static int get_id_reg(struct kvm_vcpu *vcpu, cons=
+t struct sys_reg_desc *rd,
+>  static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *=
+rd,
+>                       u64 val)
+>  {
+> -       struct kvm_arch *arch =3D &vcpu->kvm->arch;
+>         u32 id =3D reg_to_encoding(rd);
+>         int ret =3D 0;
+>
+> -       mutex_lock(&arch->config_lock);
+> -       /* Only allow userspace to change the idregs before VM running */
+> -       if (kvm_vm_has_ran_once(vcpu->kvm)) {
+> -               if (val !=3D read_id_reg(vcpu, rd))
+> -                       ret =3D -EBUSY;
+> -       } else {
+> -               ret =3D arm64_check_features(vcpu, rd, val);
+> -               if (!ret)
+> -                       IDREG(vcpu->kvm, id) =3D val;
+> -       }
+> -       mutex_unlock(&arch->config_lock);
+> +       ret =3D arm64_check_features(vcpu, rd, val);
+> +       if (!ret)
+> +               IDREG(vcpu->kvm, id) =3D val;
+>
+>         return ret;
+>  }
+> @@ -3438,6 +3405,9 @@ int kvm_sys_reg_get_user(struct kvm_vcpu *vcpu, con=
+st struct kvm_one_reg *reg,
+>         if (!r || sysreg_hidden_user(vcpu, r))
+>                 return -ENOENT;
+>
+> +       if (is_id_reg(reg_to_encoding(r)))
+> +               mutex_lock(&vcpu->kvm->arch.config_lock);
+> +
+>         if (r->get_user) {
+>                 ret =3D (r->get_user)(vcpu, r, &val);
+>         } else {
+> @@ -3445,6 +3415,9 @@ int kvm_sys_reg_get_user(struct kvm_vcpu *vcpu, con=
+st struct kvm_one_reg *reg,
+>                 ret =3D 0;
+>         }
+>
+> +       if (is_id_reg(reg_to_encoding(r)))
+> +               mutex_unlock(&vcpu->kvm->arch.config_lock);
+> +
+>         if (!ret)
+>                 ret =3D put_user(val, uaddr);
+>
+> @@ -3482,9 +3455,21 @@ int kvm_sys_reg_set_user(struct kvm_vcpu *vcpu, co=
+nst struct kvm_one_reg *reg,
+>         if (!r || sysreg_hidden_user(vcpu, r))
+>                 return -ENOENT;
+>
+> +       /* Only allow userspace to change the idregs before VM running */
+> +       if (is_id_reg(reg_to_encoding(r)) &&
+> +           kvm_vm_has_ran_once(vcpu->kvm)) {
+> +               if (val =3D=3D read_id_reg(vcpu, r))
+> +                       return 0;
+> +               return -EBUSY;
+> +       }
+> +
+>         if (sysreg_user_write_ignore(vcpu, r))
+>                 return 0;
+>
+> +       /* ID regs are global to the VM and cannot be updated concurrentl=
+y */
+> +       if (is_id_reg(reg_to_encoding(r)))
+> +               mutex_lock(&vcpu->kvm->arch.config_lock);
+> +
+>         if (r->set_user) {
+>                 ret =3D (r->set_user)(vcpu, r, val);
+>         } else {
+> @@ -3492,6 +3477,9 @@ int kvm_sys_reg_set_user(struct kvm_vcpu *vcpu, con=
+st struct kvm_one_reg *reg,
+>                 ret =3D 0;
+>         }
+>
+> +       if (is_id_reg(reg_to_encoding(r)))
+> +               mutex_unlock(&vcpu->kvm->arch.config_lock);
+> +
+>         return ret;
+>  }
+>
+> and you can then restore the code to its original shape, as there is
+> no need to change the control flow anymore.
+Thanks. Will do as you suggested.
+>
+> > +     } else {
+> > +             IDREG(vcpu->kvm, reg_to_encoding(rd)) =3D new_val;
+> > +     }
+> > +out:
+> > +     mutex_unlock(&arch->config_lock);
+> > +     return ret;
+> >  }
+> >
+> >  static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+> > @@ -1479,7 +1488,12 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu=
+,
+> >  static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc=
+ *rd,
+> >                     u64 *val)
+> >  {
+>
+> Right above this function is a comment that says the idreg are
+> immutable. Time to revisit it?
+Will update the comment.
+>
+> > +     struct kvm_arch *arch =3D &vcpu->kvm->arch;
+> > +
+> > +     mutex_lock(&arch->config_lock);
+> >       *val =3D read_id_reg(vcpu, rd);
+> > +     mutex_unlock(&arch->config_lock);
+> > +
+> >       return 0;
+> >  }
+> >
+> > @@ -3364,6 +3378,7 @@ void kvm_arm_init_id_regs(struct kvm *kvm)
+> >  {
+> >       const struct sys_reg_desc *idreg;
+> >       struct sys_reg_params params;
+> > +     u64 val;
+> >       u32 id;
+> >
+> >       /* Find the first idreg (SYS_ID_PFR0_EL1) in sys_reg_descs. */
+> > @@ -3386,6 +3401,27 @@ void kvm_arm_init_id_regs(struct kvm *kvm)
+> >               idreg++;
+> >               id =3D reg_to_encoding(idreg);
+> >       }
+> > +
+> > +     /*
+> > +      * The default is to expose CSV2 =3D=3D 1 if the HW isn't affecte=
+d.
+> > +      * Although this is a per-CPU feature, we make it global because
+> > +      * asymmetric systems are just a nuisance.
+> > +      *
+> > +      * Userspace can override this as long as it doesn't promise
+> > +      * the impossible.
+> > +      */
+> > +     val =3D IDREG(kvm, SYS_ID_AA64PFR0_EL1);
+> > +
+> > +     if (arm64_get_spectre_v2_state() =3D=3D SPECTRE_UNAFFECTED) {
+> > +             val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
+> > +             val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CS=
+V2), 1);
+> > +     }
+> > +     if (arm64_get_meltdown_state() =3D=3D SPECTRE_UNAFFECTED) {
+> > +             val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
+> > +             val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CS=
+V3), 1);
+> > +     }
+> > +
+> > +     IDREG(kvm, SYS_ID_AA64PFR0_EL1) =3D val;
+> >  }
+> >
+> >  int __init kvm_sys_reg_table_init(void)
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
+Thanks,
+Jing
