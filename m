@@ -1,225 +1,141 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55F7ABE4E
-	for <kvmarm@lists.linux.dev>; Wed, 31 May 2023 08:54:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AA25C433EF;
-	Wed, 31 May 2023 08:54:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1685523262;
-	bh=Sqn3M6dSHNJEqYtJZIRvu64F2FVcoaakUNxFMdpXTJM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HeZE/tncj++dXrRuRsxqnZCmtcksVbV7Hepd7mOs3iyEhSFtfJw3dIWRumbiqkTOe
-	 mezWymVS6m21keQT4VzaKFRqXXKXZEMEmGPXs6OwGkQccCm6Wkxm1OxXQhOmIgKXwm
-	 mTlIY9WFxLp/3fa313tORgmYQcBqp/ImPNKA4lVFwt4RrXU9n/KLfbfnpZ9XSM3bD6
-	 KFzu4kW7vodftmR7gtt/LQO4Y84V4w9K6yRPaXlHN/rEKLfjxlemTqGeCO0Dv9IxL7
-	 Se0zOH4kYHXT8agpYpc6AfMu82+OnHm5df7bXZiOnHtY5Aqd/v0q7Vd/zjx0BBVg4b
-	 0x6rCxIggPvsg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1q4Hb1-001Z7H-UP;
-	Wed, 31 May 2023 09:54:20 +0100
-Date: Wed, 31 May 2023 09:54:19 +0100
-Message-ID: <86y1l4c24k.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v4 6/6] KVM: arm64: Use TLBI range-based intructions for unmap
-In-Reply-To: <CAJHc60xiiQ8t73wTodZAcyBJomLMAwN_ycMLbjWPyiu8-j4GTA@mail.gmail.com>
-References: <20230519005231.3027912-1-rananta@google.com>
-	<20230519005231.3027912-7-rananta@google.com>
-	<87ttvvjk5q.wl-maz@kernel.org>
-	<CAJHc60xiiQ8t73wTodZAcyBJomLMAwN_ycMLbjWPyiu8-j4GTA@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8731D1FBA
+	for <kvmarm@lists.linux.dev>; Wed, 31 May 2023 09:09:55 +0000 (UTC)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34V96TND027292;
+	Wed, 31 May 2023 09:09:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=quP1OhxcIC+x7rTWyNu2EVOZQHAIBAVyyiFtiprOc18=;
+ b=kFd5enSCzfSFZStI/+1xvlHMABZFEy/RK9cX2NfhWwAMNHbFHunKK+bbUdRFwVb4QTBb
+ Wz+gSXFeQBa+21Ln66Km0DWPz8nhF8m6y6w07M+8CwC9GQzcFNMwV/nilvGqylVsiv60
+ RmrGd3NJGIS8R8BquuulAB8GPY+Pv/tiOLcD3w90BAp+EibNsV38HfvDQdNm5qtYnmwt
+ YtdDr5VwAQ8ljjqebLltHl2ne3F858nC/zZkBObeCSbkYsL+x3V9/TZeGYk96qxHgHkf
+ cow7MVDBdFY9FkNa48Y7DlDgU3oP5cpth7gmj7SQ4zPDWvn7P+oZcnZlu6p2KMGOvvIg EA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qwnb32ffm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 31 May 2023 09:09:28 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34V987Wm005274;
+	Wed, 31 May 2023 09:09:27 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qwnb32fe2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 31 May 2023 09:09:27 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+	by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34V982OA032535;
+	Wed, 31 May 2023 09:09:25 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3qu9g59k0u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 31 May 2023 09:09:24 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34V99Mv520578872
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 31 May 2023 09:09:22 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5F6A02004B;
+	Wed, 31 May 2023 09:09:22 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C240620040;
+	Wed, 31 May 2023 09:09:21 +0000 (GMT)
+Received: from [9.152.212.239] (unknown [9.152.212.239])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 31 May 2023 09:09:21 +0000 (GMT)
+Message-ID: <a1f27798-0b06-7dc3-028b-038512947306@linux.ibm.com>
+Date: Wed, 31 May 2023 11:09:21 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v4 3/4] perf/core: Remove pmu linear searching code
+To: Ian Rogers <irogers@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ravi Bangoria
+ <ravi.bangoria@amd.com>,
+        Nathan Chancellor <nathan@kernel.org>, namhyung@kernel.org,
+        eranian@google.com, acme@kernel.org, mark.rutland@arm.com,
+        jolsa@kernel.org, bp@alien8.de, kan.liang@linux.intel.com,
+        adrian.hunter@intel.com, maddy@linux.ibm.com, x86@kernel.org,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        sandipan.das@amd.com, ananth.narayan@amd.com, santosh.shukla@amd.com,
+        kvmarm@lists.linux.dev
+References: <20230504110003.2548-1-ravi.bangoria@amd.com>
+ <20230504110003.2548-4-ravi.bangoria@amd.com>
+ <20230524214133.GA2359762@dev-arch.thelio-3990X>
+ <f02c78e2-34b9-4985-640a-279dae1004a9@amd.com> <ZG8KLbZSECiYaKFc@linux.dev>
+ <20230525142031.GU83892@hirez.programming.kicks-ass.net>
+ <ZG+FLdP2kkfI1m2Z@linux.dev>
+ <CAP-5=fWYbzmTETgqJ11y22=JaXDM0gnb4qR6KYeRGmFXw08f-Q@mail.gmail.com>
+ <86jzwtdhmk.wl-maz@kernel.org>
+ <CAP-5=fVW6KbUbbEfF3mEFvTfFDC5yKSjSpa+w3D55dG3CNUERw@mail.gmail.com>
+ <86h6rxd3gh.wl-maz@kernel.org>
+ <0075d8a9-2df4-86eb-8171-8995f59904e0@linux.ibm.com>
+ <CAP-5=fXo0t+buDrmf7SyTD97gmTWGoDAO2YXWyav+_79O3MZ0w@mail.gmail.com>
+Content-Language: en-US
+From: Thomas Richter <tmricht@linux.ibm.com>
+Organization: IBM
+In-Reply-To: <CAP-5=fXo0t+buDrmf7SyTD97gmTWGoDAO2YXWyav+_79O3MZ0w@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, ricarkol@google.com, pbonzini@redhat.com, jingzhangos@google.com, coltonlewis@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 0X-E-Bx9CV-s14kGjp_31pK7La_mSyw4
+X-Proofpoint-GUID: 0pGHpbZf67DtHx-buIhLHjZBxr92S-Q5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
+ definitions=2023-05-31_04,2023-05-30_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ suspectscore=0 clxscore=1015 malwarescore=0 priorityscore=1501
+ adultscore=0 bulkscore=0 lowpriorityscore=0 spamscore=0 mlxlogscore=999
+ mlxscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2304280000 definitions=main-2305310078
 
-On Tue, 30 May 2023 22:35:57 +0100,
-Raghavendra Rao Ananta <rananta@google.com> wrote:
->=20
-> On Mon, May 29, 2023 at 7:18=E2=80=AFAM Marc Zyngier <maz@kernel.org> wro=
-te:
-> >
-> > On Fri, 19 May 2023 01:52:31 +0100,
-> > Raghavendra Rao Ananta <rananta@google.com> wrote:
-> > >
-> > > The current implementation of the stage-2 unmap walker traverses
-> > > the given range and, as a part of break-before-make, performs
-> > > TLB invalidations with a DSB for every PTE. A multitude of this
-> > > combination could cause a performance bottleneck.
-> > >
-> > > Hence, if the system supports FEAT_TLBIRANGE, defer the TLB
-> > > invalidations until the entire walk is finished, and then
-> > > use range-based instructions to invalidate the TLBs in one go.
-> > > Condition this upon S2FWB in order to avoid walking the page-table
-> > > again to perform the CMOs after issuing the TLBI.
-> >
-> > But that's the real bottleneck. TLBIs are cheap compared to CMOs, even
-> > on remarkably bad implementations. What is your plan to fix this?
-> >
-> Correct me if I'm wrong, but my understanding was that a multiple
-> issuance of TLBI + DSB was the bottleneck, and this patch tries to
-> avoid this by issuing only one TLBI + DSB at the end.
+On 5/30/23 16:00, Ian Rogers wrote:
+> ls /sys/devices/*/cpu*
 
-At least on some of the machines I have access to, CMOs are fare more
-expensive than TLBIs, and they are the ones causing slowdowns. Your
-system shows a different behaviour, and that's fine, but you can't
-draw a general conclusion from it.
+Hi Ian,
 
-> > >
-> > > Rename stage2_put_pte() to stage2_unmap_put_pte() as the function
-> > > now serves the stage-2 unmap walker specifically, rather than
-> > > acting generic.
-> > >
-> > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > > ---
-> > >  arch/arm64/kvm/hyp/pgtable.c | 35 ++++++++++++++++++++++++++++++-----
-> > >  1 file changed, 30 insertions(+), 5 deletions(-)
-> > >
-> > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtabl=
-e.c
-> > > index b8f0dbd12f773..5832ee3418fb0 100644
-> > > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > > @@ -771,16 +771,34 @@ static void stage2_make_pte(const struct kvm_pg=
-table_visit_ctx *ctx, kvm_pte_t n
-> > >       smp_store_release(ctx->ptep, new);
-> > >  }
-> > >
-> > > -static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, =
-struct kvm_s2_mmu *mmu,
-> > > -                        struct kvm_pgtable_mm_ops *mm_ops)
-> > > +static bool stage2_unmap_defer_tlb_flush(struct kvm_pgtable *pgt)
-> > >  {
-> > > +     /*
-> > > +      * If FEAT_TLBIRANGE is implemented, defer the individial PTE
-> > > +      * TLB invalidations until the entire walk is finished, and
-> > > +      * then use the range-based TLBI instructions to do the
-> > > +      * invalidations. Condition this upon S2FWB in order to avoid
-> > > +      * a page-table walk again to perform the CMOs after TLBI.
-> > > +      */
-> > > +     return system_supports_tlb_range() && stage2_has_fwb(pgt);
-> > > +}
-> > > +
-> > > +static void stage2_unmap_put_pte(const struct kvm_pgtable_visit_ctx =
-*ctx,
-> > > +                             struct kvm_s2_mmu *mmu,
-> > > +                             struct kvm_pgtable_mm_ops *mm_ops)
-> > > +{
-> > > +     struct kvm_pgtable *pgt =3D ctx->arg;
-> > > +
-> > >       /*
-> > >        * Clear the existing PTE, and perform break-before-make with
-> > >        * TLB maintenance if it was valid.
-> > >        */
-> > >       if (kvm_pte_valid(ctx->old)) {
-> > >               kvm_clear_pte(ctx->ptep);
-> > > -             kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, =
-ctx->level);
-> > > +
-> > > +             if (!stage2_unmap_defer_tlb_flush(pgt))
-> > > +                     kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu,
-> > > +                                     ctx->addr, ctx->level);
-> >
-> > This really doesn't match the comment anymore.
-> >
-> Right, I can re-write this in the next spin.
->=20
-> > Overall, I'm very concerned that we lose the consistency property that
-> > the current code has: once called, the TLBs and the page tables are
-> > synchronised.
-> >
-> > Yes, this patch looks correct. But it is also really fragile.
-> >
-> Yeah, we were a little skeptical about this too. Till v2, we had a
-> different implementation in which we had an independent fast unmap
-> path that disconnects the PTE hierarchy if the unmap range was exactly
-> KVM_PGTABLE_MIN_BLOCK_LEVEL [1].  But this had some problems, and we
-> pivoted to the current implementation.
+here is the output yo requested:
 
-Can we at least have some sort of runtime assertions that at the point
-we release the write lock, the TLBs have been invalidated? Even if
-that's tied to some debug config.
+# ls /sys/devices/*/cpu*
+cpu0  cpu3  cpu6         hotplug     modalias  possible  smt
+cpu1  cpu4  cpu7         isolated    offline   present   uevent
+cpu2  cpu5  dispatching  kernel_max  online    rescan    vulnerabilities
+#
 
->=20
-> > >       }
-> > >
-> > >       mm_ops->put_page(ctx->ptep);
-> > > @@ -1015,7 +1033,7 @@ static int stage2_unmap_walker(const struct kvm=
-_pgtable_visit_ctx *ctx,
-> > >        * block entry and rely on the remaining portions being faulted
-> > >        * back lazily.
-> > >        */
-> > > -     stage2_put_pte(ctx, mmu, mm_ops);
-> > > +     stage2_unmap_put_pte(ctx, mmu, mm_ops);
-> > >
-> > >       if (need_flush && mm_ops->dcache_clean_inval_poc)
-> > >               mm_ops->dcache_clean_inval_poc(kvm_pte_follow(ctx->old,=
- mm_ops),
-> > > @@ -1029,13 +1047,20 @@ static int stage2_unmap_walker(const struct k=
-vm_pgtable_visit_ctx *ctx,
-> > >
-> > >  int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 =
-size)
-> > >  {
-> > > +     int ret;
-> > >       struct kvm_pgtable_walker walker =3D {
-> > >               .cb     =3D stage2_unmap_walker,
-> > >               .arg    =3D pgt,
-> > >               .flags  =3D KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TA=
-BLE_POST,
-> > >       };
-> > >
-> > > -     return kvm_pgtable_walk(pgt, addr, size, &walker);
-> > > +     ret =3D kvm_pgtable_walk(pgt, addr, size, &walker);
-> > > +     if (stage2_unmap_defer_tlb_flush(pgt))
-> > > +             /* Perform the deferred TLB invalidations */
-> > > +             kvm_call_hyp(__kvm_tlb_flush_vmid_range, pgt->mmu,
-> > > +                             addr, addr + size);
-> >
-> > This "kvm_call_hyp(__kvm_tlb_flush_vmid_range,...)" could do with a
-> > wrapper from the point where you introduce it.
-> >
-> Sorry, I didn't get this comment. Do you mind elaborating on it?
+In fact it is the same as 
+# ls  /sys/devices/system/cpu/
+cpu0  cpu3  cpu6         hotplug     modalias  possible  smt
+cpu1  cpu4  cpu7         isolated    offline   present   uevent
+cpu2  cpu5  dispatching  kernel_max  online    rescan    vulnerabilities
+# 
+This directory tree has nothing to do with events for perf, it is
+merely used to support CPU hotplug on s390.
 
-All I'm saying is that you should have a wrapper like:
+The PMUs on s390 are
+# ls -ld /sys/devices/{cpum_,pai_}*
+drwxr-xr-x 4 root root 0 May 25 15:45 /sys/devices/cpum_cf
+drwxr-xr-x 4 root root 0 May 25 15:45 /sys/devices/cpum_cf_diag
+drwxr-xr-x 4 root root 0 May 25 15:45 /sys/devices/cpum_sf
+drwxr-xr-x 4 root root 0 May 25 15:45 /sys/devices/pai_crypto
+drwxr-xr-x 4 root root 0 May 25 15:45 /sys/devices/pai_ext
+# 
 
-void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
-			      phys_addr_t base, size_t size)
-{
-	kvm_call_hyp(__kvm_tlb_flush_vmid_range,
-		     mmu, base, base + size);
-}
+I hope his helps.
 
-and use it throughout the code.
+-- 
+Thomas Richter, Dept 3303, IBM s390 Linux Development, Boeblingen, Germany
+--
+Vorsitzender des Aufsichtsrats: Gregor Pillen
+Geschäftsführung: David Faller
+Sitz der Gesellschaft: Böblingen / Registergericht: Amtsgericht Stuttgart, HRB 243294
 
-Thanks,
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
