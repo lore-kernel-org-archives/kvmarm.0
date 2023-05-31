@@ -1,189 +1,207 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3E434CE2
-	for <kvmarm@lists.linux.dev>; Wed, 31 May 2023 20:20:20 +0000 (UTC)
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1b025aaeddbso5555ad.1
-        for <kvmarm@lists.linux.dev>; Wed, 31 May 2023 13:20:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF751640F
+	for <kvmarm@lists.linux.dev>; Wed, 31 May 2023 21:13:17 +0000 (UTC)
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-3f804665702so72071cf.0
+        for <kvmarm@lists.linux.dev>; Wed, 31 May 2023 14:13:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685564420; x=1688156420;
+        d=google.com; s=20221208; t=1685567596; x=1688159596;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xAVHdgjCcaQ5AFDJRIEUK8SLG9WPMFRziVwBFjnP+jM=;
-        b=Nv7qOeVLe72ezZKUWypYggz5/CiKmIku+u9LGBbUyELSXM9pYp3g1u3T0UbdxhEV3q
-         QVfRW6ok3FxCJAd0prJYv40lre+F4ncLWwKtUKmAvU5w/5dlZzP7EhQ56Zpab66tU9gq
-         w3tU7ySe1ggSmHZ6zMDMYcBiJTF8OVngEuZusvPj13k7tVIf6KdjjKT9zRFUNd3qprUU
-         UHbGsD13WrpJ2AZPUvit3pseulw0+iCWE1Q31I1q+8yBRj5g9xrYTYUboAL0RmjhOY4C
-         KQdMqt9bSNN4RU+EV8hI9Z5ByzEaJ6n66S0nqYhJk5XiqAcQ4gMo3vzybsMyAZ8yHWbL
-         j7lg==
+        bh=7+2qoqODzznlrzJdzN64MjbCVNNnQuwRRtJuX4ggbCU=;
+        b=kHJHBx69u6844yWRg+bdMx0m0tvgPlagRdL9WAIhqNvPpu8LX6GMuzHUHixyWgd9Mf
+         qMY0qxpAkEmOxYZNrn0heIVjfGWpYgIwlgNcz8wlOeZnnk3GSZB4NDa6DPPoQDzEoBo0
+         lR6HimNkut+XEN2CfKEthgqEw9XODXPnFgApD2MocwWQg3P600hpjTCFdeQ/aa4jxYoA
+         id1X9co22nLUO5CFxyBWnUvevyXMChC/vrSNZ3kgUh9Qq84ljrXGo9BVv2lPuo5FhPmW
+         R5vkwByRhT5602h6iBd8eMi2T7L9oJexCh5hLLcf6GpQ/OcBRYje/jyno1z0YmKsVGx1
+         h3gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685564420; x=1688156420;
+        d=1e100.net; s=20221208; t=1685567596; x=1688159596;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xAVHdgjCcaQ5AFDJRIEUK8SLG9WPMFRziVwBFjnP+jM=;
-        b=fKZhHqCqXtNhJRqjx3Vj44rDOLS8e6aG2LkJjoBkZWDs1NDul/9wfPpBjWEgeS5jRZ
-         RI3g2qJpqIJVLbp5EcNwI3m0oHgfVpOvHb3xLoZ9cnTEEqUf4M7cYl3qrmR1s/G+vQgR
-         TalHmeXW0cVB+TVOineDy4/eKe5THgL6T/LnnmyyZDcnBkVXy5a9hVx/QcrxMQM+Jdbb
-         uuD005HJm5oR4QA4AFvA07EfEnuyg2pVQ2zvJTmXybo1Gciza8zE9+rXSiQIkOwGA+h6
-         sOc2dRtZe7qlC3D9s6iC06WbGDvbrbYxI5I0StMPFBOt5u7QXeQ0Ip2l+rXAzNaqXLD0
-         subQ==
-X-Gm-Message-State: AC+VfDzzNLc2WQhDAsL9WcuQwRlfhyguG1RbkB1+OonI1GlhuI/yXaZ5
-	uLeCcYd9Yn4ZZJdxXfg2egxYhMbWhJnX/Mio7veXyQ==
-X-Google-Smtp-Source: ACHHUZ6wL7U8V/XkpYOMrfW1mzAy/rgPNBZK5vlJcway9TKqXNM1bfxFTaloddleGXya5qBUG5EQLR0Gp4g46YdCW1Q=
-X-Received: by 2002:a17:902:f315:b0:1b0:cea:294e with SMTP id
- c21-20020a170902f31500b001b00cea294emr27790ple.21.1685564419572; Wed, 31 May
- 2023 13:20:19 -0700 (PDT)
+        bh=7+2qoqODzznlrzJdzN64MjbCVNNnQuwRRtJuX4ggbCU=;
+        b=jcnuXRNsguRx9WBziTKBVkqX5LJblR2Gcf/LxEVOrHTp94grnbdtyAr4V44veNcDnP
+         8p5v4xvNd6j3xN/orBO0m/I29FiQLC6v3vB5ums7xo8teAraIRy6UZxm2BHMTqKCqclK
+         wlar/WiNxwh3ECJudkBkOfNfxCDdGkhgjgp7n6g65FU2hNEQx67qk1TUeP5KT3TTQY7r
+         eLLfOBOqFwola6gqEm4BWdnvuvkzbWDvQkLVk2czpeDtM7lqe2n1Q8QQBRl6JH9VdqYd
+         kV8uRTDcrm7HmzOmPk9OqQoUPOW/Yuoxa+xXvSWl2nYDNzAMzNuPqfGLGNrCKcbDxeBY
+         Z2Ag==
+X-Gm-Message-State: AC+VfDzXtFQ9ZP+PV6Wt/IywuoC94QBXk2D7COdvu6Y1zHifqaX5vqXC
+	r6qs8iGzp5Q9kU0XVWZts3V8zj5Lf1spesajMXjhOw==
+X-Google-Smtp-Source: ACHHUZ5WfYJ6eA2+oGfutrPzowugKbbUX/q/GiLW+TIRlZfdD7OeKd4PuotxSoDS0rqsIQKlsK37axqyrYA0yyXPG+Q=
+X-Received: by 2002:a05:622a:1a11:b0:3f8:3065:7fc5 with SMTP id
+ f17-20020a05622a1a1100b003f830657fc5mr7534qtb.1.1685567595969; Wed, 31 May
+ 2023 14:13:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230504110003.2548-1-ravi.bangoria@amd.com> <20230504110003.2548-4-ravi.bangoria@amd.com>
- <20230524214133.GA2359762@dev-arch.thelio-3990X> <f02c78e2-34b9-4985-640a-279dae1004a9@amd.com>
- <ZG8KLbZSECiYaKFc@linux.dev> <20230525142031.GU83892@hirez.programming.kicks-ass.net>
- <ZG+FLdP2kkfI1m2Z@linux.dev> <CAP-5=fWYbzmTETgqJ11y22=JaXDM0gnb4qR6KYeRGmFXw08f-Q@mail.gmail.com>
- <86jzwtdhmk.wl-maz@kernel.org> <CAP-5=fVW6KbUbbEfF3mEFvTfFDC5yKSjSpa+w3D55dG3CNUERw@mail.gmail.com>
- <86h6rxd3gh.wl-maz@kernel.org> <0075d8a9-2df4-86eb-8171-8995f59904e0@linux.ibm.com>
- <CAP-5=fXo0t+buDrmf7SyTD97gmTWGoDAO2YXWyav+_79O3MZ0w@mail.gmail.com> <a1f27798-0b06-7dc3-028b-038512947306@linux.ibm.com>
-In-Reply-To: <a1f27798-0b06-7dc3-028b-038512947306@linux.ibm.com>
-From: Ian Rogers <irogers@google.com>
-Date: Wed, 31 May 2023 13:20:07 -0700
-Message-ID: <CAP-5=fVw3vSEu7yGFDnZi8c3VUFJu_XEZtY9ZcTsD7ip2imR6Q@mail.gmail.com>
-Subject: Re: [PATCH v4 3/4] perf/core: Remove pmu linear searching code
-To: Thomas Richter <tmricht@linux.ibm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Peter Zijlstra <peterz@infradead.org>, Ravi Bangoria <ravi.bangoria@amd.com>, 
-	Nathan Chancellor <nathan@kernel.org>, namhyung@kernel.org, eranian@google.com, 
-	acme@kernel.org, mark.rutland@arm.com, jolsa@kernel.org, bp@alien8.de, 
-	kan.liang@linux.intel.com, adrian.hunter@intel.com, maddy@linux.ibm.com, 
-	x86@kernel.org, linux-perf-users@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, sandipan.das@amd.com, ananth.narayan@amd.com, 
-	santosh.shukla@amd.com, kvmarm@lists.linux.dev
+References: <20230526234435.662652-1-yuzhao@google.com> <20230526234435.662652-6-yuzhao@google.com>
+ <ZHemUc3DiSbxQbxJ@linux.dev>
+In-Reply-To: <ZHemUc3DiSbxQbxJ@linux.dev>
+From: Yu Zhao <yuzhao@google.com>
+Date: Wed, 31 May 2023 15:12:39 -0600
+Message-ID: <CAOUHufa8+NZcctoYXOZQXNdvKTUxAMDF3sC=X+3mv4juMUyrLA@mail.gmail.com>
+Subject: Re: [PATCH mm-unstable v2 05/10] kvm/arm64: add kvm_arch_test_clear_young()
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Alistair Popple <apopple@nvidia.com>, Anup Patel <anup@brainfault.org>, 
+	Ben Gardon <bgardon@google.com>, Borislav Petkov <bp@alien8.de>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Christophe Leroy <christophe.leroy@csgroup.eu>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Fabiano Rosas <farosas@linux.ibm.com>, Gaosheng Cui <cuigaosheng1@huawei.com>, 
+	Gavin Shan <gshan@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
+	James Morse <james.morse@arm.com>, "Jason A. Donenfeld" <Jason@zx2c4.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Michael Larabel <michael@michaellarabel.com>, 
+	Mike Rapoport <rppt@kernel.org>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@ozlabs.org>, 
+	Peter Xu <peterx@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	linuxppc-dev@lists.ozlabs.org, linux-trace-kernel@vger.kernel.org, 
+	x86@kernel.org, linux-mm@google.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 31, 2023 at 2:09=E2=80=AFAM Thomas Richter <tmricht@linux.ibm.c=
-om> wrote:
+On Wed, May 31, 2023 at 1:56=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
 >
-> On 5/30/23 16:00, Ian Rogers wrote:
-> > ls /sys/devices/*/cpu*
+> Hi Yu,
 >
-> Hi Ian,
+> On Fri, May 26, 2023 at 05:44:30PM -0600, Yu Zhao wrote:
+> > Implement kvm_arch_test_clear_young() to support the fast path in
+> > mmu_notifier_ops->test_clear_young().
+> >
+> > It focuses on a simple case, i.e., hardware sets the accessed bit in
+> > KVM PTEs and VMs are not protected, where it can rely on RCU and
+> > cmpxchg to safely clear the accessed bit without taking
+> > kvm->mmu_lock. Complex cases fall back to the existing slow path
+> > where kvm->mmu_lock is then taken.
+> >
+> > Signed-off-by: Yu Zhao <yuzhao@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h |  6 ++++++
+> >  arch/arm64/kvm/mmu.c              | 36 +++++++++++++++++++++++++++++++
+> >  2 files changed, 42 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm=
+/kvm_host.h
+> > index 7e7e19ef6993..da32b0890716 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -1113,4 +1113,10 @@ static inline void kvm_hyp_reserve(void) { }
+> >  void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
+> >  bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu);
+> >
+> > +#define kvm_arch_has_test_clear_young kvm_arch_has_test_clear_young
+> > +static inline bool kvm_arch_has_test_clear_young(void)
+> > +{
+> > +     return cpu_has_hw_af() && !is_protected_kvm_enabled();
+> > +}
 >
-> here is the output yo requested:
+> I would *strongly* suggest you consider supporting test_clear_young on
+> systems that do software Access Flag management. FEAT_HAFDBS is an
+> *optional* extension to the architecture, so we're going to support
+> software AF management for a very long time in KVM. It is also a valid
+> fallback option in the case of hardware errata which render HAFDBS
+> broken.
+
+Hi Oliver,
+
+It's not about willingness but resources. Ideally we want to make
+everything perfect, but in reality, we can only move forward one step
+a time.
+
+If I looked at your request from ARM's POV, I would agree with you.
+But my goal is to lay the foundation for all architectures that could
+benefit, so I may not be able to cover a lot for each architecture.
+Specifically, I don't have the bandwidth to test the !FEAT_HAFDBS case
+for ARM.
+
+So here are some options I could offer, ordered by my preferences:
+1. We proceed as it is for now. I *will* find someone from my team (or
+yours) to follow up -- this way we can make sure !FEAT_HAFDBS is well
+tested.
+2. I drop the cpu_has_hw_af() check above. Not that I think there is
+much risk, I'm just trying to be cautious.
+3. I drop the entire ARM support (and include the RISC-V support which
+I previously deprioritized). We revisit after the test is done.
+
+Sounds reasonable?
+
+> So, we should expect (and support) systems of all shapes and sizes that
+> do software AF. I'm sure we'll hear about more in the not-too-distant
+> future...
 >
-> # ls /sys/devices/*/cpu*
-> cpu0  cpu3  cpu6         hotplug     modalias  possible  smt
-> cpu1  cpu4  cpu7         isolated    offline   present   uevent
-> cpu2  cpu5  dispatching  kernel_max  online    rescan    vulnerabilities
-> #
+> For future reference (even though I'm suggesting you support software
+> AF), decisions such of these need an extremely verbose comment
+> describing the rationale behind the decision.
 >
-> In fact it is the same as
-> # ls  /sys/devices/system/cpu/
-> cpu0  cpu3  cpu6         hotplug     modalias  possible  smt
-> cpu1  cpu4  cpu7         isolated    offline   present   uevent
-> cpu2  cpu5  dispatching  kernel_max  online    rescan    vulnerabilities
-> #
-> This directory tree has nothing to do with events for perf, it is
-> merely used to support CPU hotplug on s390.
+> > +
+> >  #endif /* __ARM64_KVM_HOST_H__ */
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index c3b3e2afe26f..26a8d955b49c 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
 >
-> The PMUs on s390 are
-> # ls -ld /sys/devices/{cpum_,pai_}*
-> drwxr-xr-x 4 root root 0 May 25 15:45 /sys/devices/cpum_cf
-> drwxr-xr-x 4 root root 0 May 25 15:45 /sys/devices/cpum_cf_diag
-> drwxr-xr-x 4 root root 0 May 25 15:45 /sys/devices/cpum_sf
-> drwxr-xr-x 4 root root 0 May 25 15:45 /sys/devices/pai_crypto
-> drwxr-xr-x 4 root root 0 May 25 15:45 /sys/devices/pai_ext
-> #
+> Please do not implement page table walkers outside of hyp/pgtable.c
 >
-> I hope his helps.
-
-Thanks Thomas,
-
-The perf tool has a notion of "core" and "other" PMUs - other means
-uncore and things like interconnect PMUs. The distinction matters as
-PMUs may have a list of CPUs with them, for "other" PMUs the CPU list
-(known in the tool as the CPU map) is a suggestion of the CPU to open
-events on. For example, on my laptop:
-```
-$ cat /sys/devices/system/cpu/online
-0-15
-$ cat /sys/devices/uncore_imc_free_running_0/cpumask
-0
-```
-So I have 16 "CPUs" and the memory controller is suggesting opening
-the events on CPU 0. However, if I do:
-```
-$ sudo perf stat -e 'uncore_imc_free_running_0/data_read/' -C 8 -a -A sleep=
- 1
-
-Performance counter stats for 'system wide':
-
-CPU8                 4,617.60 MiB
-uncore_imc_free_running_0/data_read/
-
-
-      1.001094684 seconds time elapsed
-```
-Then things are good and the event was recorded on CPU 8, even though
-the cpumask of the PMU only said CPU 0.
-
-For "core" PMUs the CPU map works differently. A CPU outside of the
-map is an error. For example, if I have a heterogeneous system with 2
-CPUs, the first CPU on 1 PMU and the second CPU on a different PMU, if
-I try to open events for the wrong PMU  type for the CPU then it
-should fail. The CPU map should be interpreted as the set of CPUs
-events are valid on.
-
-The logic to determine if a PMU is "core" or "other" is here:
-https://git.kernel.org/pub/scm/linux/kernel/git/acme/linux.git/tree/tools/p=
-erf/util/pmu.c?h=3Dperf-tools-next#n1417
-https://git.kernel.org/pub/scm/linux/kernel/git/acme/linux.git/tree/tools/p=
-erf/util/pmu.c?h=3Dperf-tools-next#n609
-
-That is, a PMU is a "core" PMU if it is called "cpu" or if there is a
-file called "cpus" inside the PMU's sysfs directory. It seems on s390
-none of the PMUs are considered "core" and this is why we're having
-issues.
-
-Looking at:
-https://lore.kernel.org/lkml/20180416132314.33249-1-tmricht@linux.ibm.com/
-
-It would seem to make sense that "cpu", "cpum_cf" and "cpum_sf" should
-all cause "is_pmu_core" to return true, From your output I suspect the
-issue is that cpum_cf and cpum_sf both lack the "cpus" file - which is
-also true on homogeneous x86's "cpu" PMU. We can fix the code with:
-
-```
-diff --git a/tools/perf/util/pmu.c b/tools/perf/util/pmu.c
-index 0520aa9fe991..bdc3f3b148fc 100644
---- a/tools/perf/util/pmu.c
-+++ b/tools/perf/util/pmu.c
-@@ -1414,7 +1414,9 @@ void perf_pmu__del_formats(struct list_head *formats)
-
-bool is_pmu_core(const char *name)
-{
--       return !strcmp(name, "cpu") || is_sysfs_pmu_core(name);
-+       return !strcmp(name, "cpu") ||
-+              !strcmp(name, "cpum_cf") || !strcmp(name, "cpum_sf") ||
-+              is_sysfs_pmu_core(name);
-}
-
-bool perf_pmu__supports_legacy_cache(const struct perf_pmu *pmu)
-```
-
-Wdyt? Thanks,
-Ian
-
-> --
-> Thomas Richter, Dept 3303, IBM s390 Linux Development, Boeblingen, German=
-y
-> --
-> Vorsitzender des Aufsichtsrats: Gregor Pillen
-> Gesch=C3=A4ftsf=C3=BChrung: David Faller
-> Sitz der Gesellschaft: B=C3=B6blingen / Registergericht: Amtsgericht Stut=
-tgart, HRB 243294
+> > @@ -1678,6 +1678,42 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kv=
+m_gfn_range *range)
+> >                                          range->start << PAGE_SHIFT);
+> >  }
+> >
+> > +static int stage2_test_clear_young(const struct kvm_pgtable_visit_ctx =
+*ctx,
+> > +                                enum kvm_pgtable_walk_flags flags)
+> > +{
+> > +     kvm_pte_t new =3D ctx->old & ~KVM_PTE_LEAF_ATTR_LO_S2_AF;
+> > +
+> > +     VM_WARN_ON_ONCE(!page_count(virt_to_page(ctx->ptep)));
 >
+> This sort of sanity checking is a bit excessive. Isn't there a risk of
+> false negatives here too? IOW, if we tragically mess up RCU in the page
+> table code, what's stopping a prematurely freed page from being
+> allocated to another user?
+
+Yes, but from my aforementioned POV (the breadth I'm focusing on),
+this is a good practice. I can live without this assertion if you feel
+strongly about it.
+
+> > +     if (!kvm_pte_valid(new))
+> > +             return 0;
+> > +
+> > +     if (new =3D=3D ctx->old)
+> > +             return 0;
+> > +
+> > +     if (kvm_should_clear_young(ctx->arg, ctx->addr / PAGE_SIZE))
+> > +             stage2_try_set_pte(ctx, new);
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +bool kvm_arch_test_clear_young(struct kvm *kvm, struct kvm_gfn_range *=
+range)
+> > +{
+> > +     u64 start =3D range->start * PAGE_SIZE;
+> > +     u64 end =3D range->end * PAGE_SIZE;
+> > +     struct kvm_pgtable_walker walker =3D {
+> > +             .cb     =3D stage2_test_clear_young,
+> > +             .arg    =3D range,
+> > +             .flags  =3D KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_SHAR=
+ED,
+> > +     };
+> > +
+> > +     BUILD_BUG_ON(is_hyp_code());
+>
+> Delete this assertion.
+
+Will do.
