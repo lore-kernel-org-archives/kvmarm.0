@@ -1,141 +1,77 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8731D1FBA
-	for <kvmarm@lists.linux.dev>; Wed, 31 May 2023 09:09:55 +0000 (UTC)
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34V96TND027292;
-	Wed, 31 May 2023 09:09:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=quP1OhxcIC+x7rTWyNu2EVOZQHAIBAVyyiFtiprOc18=;
- b=kFd5enSCzfSFZStI/+1xvlHMABZFEy/RK9cX2NfhWwAMNHbFHunKK+bbUdRFwVb4QTBb
- Wz+gSXFeQBa+21Ln66Km0DWPz8nhF8m6y6w07M+8CwC9GQzcFNMwV/nilvGqylVsiv60
- RmrGd3NJGIS8R8BquuulAB8GPY+Pv/tiOLcD3w90BAp+EibNsV38HfvDQdNm5qtYnmwt
- YtdDr5VwAQ8ljjqebLltHl2ne3F858nC/zZkBObeCSbkYsL+x3V9/TZeGYk96qxHgHkf
- cow7MVDBdFY9FkNa48Y7DlDgU3oP5cpth7gmj7SQ4zPDWvn7P+oZcnZlu6p2KMGOvvIg EA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qwnb32ffm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 31 May 2023 09:09:28 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34V987Wm005274;
-	Wed, 31 May 2023 09:09:27 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qwnb32fe2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 31 May 2023 09:09:27 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-	by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34V982OA032535;
-	Wed, 31 May 2023 09:09:25 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3qu9g59k0u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 31 May 2023 09:09:24 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34V99Mv520578872
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 31 May 2023 09:09:22 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5F6A02004B;
-	Wed, 31 May 2023 09:09:22 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C240620040;
-	Wed, 31 May 2023 09:09:21 +0000 (GMT)
-Received: from [9.152.212.239] (unknown [9.152.212.239])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 31 May 2023 09:09:21 +0000 (GMT)
-Message-ID: <a1f27798-0b06-7dc3-028b-038512947306@linux.ibm.com>
-Date: Wed, 31 May 2023 11:09:21 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 598A1D2F6
+	for <kvmarm@lists.linux.dev>; Wed, 31 May 2023 09:49:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC37DC433D2;
+	Wed, 31 May 2023 09:49:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1685526553;
+	bh=4jykXwP+lKWkfwQ4vtODSm1LzEsTikJ0LsadQGsSeXY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ik/9hYZITPmW0uKQI7stLxn10xtxISPpIF0aA/f3wk5/CeNAHSeSDPjAuJ/qlPmNw
+	 y+6f+1ZMnmneS5zn7x3KOA40dXz8IAZypYABMLhsSdNcdULp5bbNx17EO6ZlynA3lA
+	 SAhY5a1siBjNdF4A5P4H6h3+24ItVkk7XmxsnCDtWos6IWMALY/0Igk0+DIYpXyqLI
+	 sXluxbhD3zotG2lhXmA6wImsMRYTx9B+2d4+90icIeyOMpyQXnnjoJfZrVUq3chhlE
+	 en/Xp7OeRkGzyc2C4a6JK8ZV7A0plAnyEYldXW3F6LDsShUzhlYwgWYmE/+Y8HGcHk
+	 b5LBmFy+9mgvw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1q4IS6-001ZxQ-Mw;
+	Wed, 31 May 2023 10:49:10 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+	mark.rutland@arm.com,
+	Peter Zijlstra <peterz@infradead.org>,
+	Reiji Watanabe <reijiw@google.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Ravi Bangoria <ravi.bangoria@amd.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 0/2] KVM: arm64: Fix for probing default PMU
+Date: Wed, 31 May 2023 10:49:04 +0100
+Message-Id: <168552653957.429005.4230504598358428557.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230525212723.3361524-1-oliver.upton@linux.dev>
+References: <20230525212723.3361524-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v4 3/4] perf/core: Remove pmu linear searching code
-To: Ian Rogers <irogers@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ravi Bangoria
- <ravi.bangoria@amd.com>,
-        Nathan Chancellor <nathan@kernel.org>, namhyung@kernel.org,
-        eranian@google.com, acme@kernel.org, mark.rutland@arm.com,
-        jolsa@kernel.org, bp@alien8.de, kan.liang@linux.intel.com,
-        adrian.hunter@intel.com, maddy@linux.ibm.com, x86@kernel.org,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        sandipan.das@amd.com, ananth.narayan@amd.com, santosh.shukla@amd.com,
-        kvmarm@lists.linux.dev
-References: <20230504110003.2548-1-ravi.bangoria@amd.com>
- <20230504110003.2548-4-ravi.bangoria@amd.com>
- <20230524214133.GA2359762@dev-arch.thelio-3990X>
- <f02c78e2-34b9-4985-640a-279dae1004a9@amd.com> <ZG8KLbZSECiYaKFc@linux.dev>
- <20230525142031.GU83892@hirez.programming.kicks-ass.net>
- <ZG+FLdP2kkfI1m2Z@linux.dev>
- <CAP-5=fWYbzmTETgqJ11y22=JaXDM0gnb4qR6KYeRGmFXw08f-Q@mail.gmail.com>
- <86jzwtdhmk.wl-maz@kernel.org>
- <CAP-5=fVW6KbUbbEfF3mEFvTfFDC5yKSjSpa+w3D55dG3CNUERw@mail.gmail.com>
- <86h6rxd3gh.wl-maz@kernel.org>
- <0075d8a9-2df4-86eb-8171-8995f59904e0@linux.ibm.com>
- <CAP-5=fXo0t+buDrmf7SyTD97gmTWGoDAO2YXWyav+_79O3MZ0w@mail.gmail.com>
-Content-Language: en-US
-From: Thomas Richter <tmricht@linux.ibm.com>
-Organization: IBM
-In-Reply-To: <CAP-5=fXo0t+buDrmf7SyTD97gmTWGoDAO2YXWyav+_79O3MZ0w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 0X-E-Bx9CV-s14kGjp_31pK7La_mSyw4
-X-Proofpoint-GUID: 0pGHpbZf67DtHx-buIhLHjZBxr92S-Q5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-05-31_04,2023-05-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- suspectscore=0 clxscore=1015 malwarescore=0 priorityscore=1501
- adultscore=0 bulkscore=0 lowpriorityscore=0 spamscore=0 mlxlogscore=999
- mlxscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2305310078
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, oliver.upton@linux.dev, suzuki.poulose@arm.com, mark.rutland@arm.com, peterz@infradead.org, reijiw@google.com, nathan@kernel.org, james.morse@arm.com, ravi.bangoria@amd.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 5/30/23 16:00, Ian Rogers wrote:
-> ls /sys/devices/*/cpu*
+On Thu, 25 May 2023 21:27:20 +0000, Oliver Upton wrote:
+> Follow-up to the discussion in [1].
+> 
+> KVM uses a junk perf event to probe for a default PMU instance to use
+> for the guest, which depends on perf finding the right PMU instance
+> to use for the event. Looks like perf is going to rely strictly on
+> the specified PMU type, breaking the entire scheme.
+> 
+> [...]
 
-Hi Ian,
+Applied to fixes, thanks!
 
-here is the output yo requested:
+[1/2] KVM: arm64: Iterate arm_pmus list to probe for default PMU
+      commit: 1c913a1c35aa61cf280173b2bcc133c3953c38fc
+[2/2] KVM: arm64: Document default vPMU behavior on heterogeneous systems
+      commit: 40e54cad454076172cc3e2bca60aa924650a3e4b
 
-# ls /sys/devices/*/cpu*
-cpu0  cpu3  cpu6         hotplug     modalias  possible  smt
-cpu1  cpu4  cpu7         isolated    offline   present   uevent
-cpu2  cpu5  dispatching  kernel_max  online    rescan    vulnerabilities
-#
+Cheers,
 
-In fact it is the same as 
-# ls  /sys/devices/system/cpu/
-cpu0  cpu3  cpu6         hotplug     modalias  possible  smt
-cpu1  cpu4  cpu7         isolated    offline   present   uevent
-cpu2  cpu5  dispatching  kernel_max  online    rescan    vulnerabilities
-# 
-This directory tree has nothing to do with events for perf, it is
-merely used to support CPU hotplug on s390.
-
-The PMUs on s390 are
-# ls -ld /sys/devices/{cpum_,pai_}*
-drwxr-xr-x 4 root root 0 May 25 15:45 /sys/devices/cpum_cf
-drwxr-xr-x 4 root root 0 May 25 15:45 /sys/devices/cpum_cf_diag
-drwxr-xr-x 4 root root 0 May 25 15:45 /sys/devices/cpum_sf
-drwxr-xr-x 4 root root 0 May 25 15:45 /sys/devices/pai_crypto
-drwxr-xr-x 4 root root 0 May 25 15:45 /sys/devices/pai_ext
-# 
-
-I hope his helps.
-
+	M.
 -- 
-Thomas Richter, Dept 3303, IBM s390 Linux Development, Boeblingen, Germany
---
-Vorsitzender des Aufsichtsrats: Gregor Pillen
-Geschäftsführung: David Faller
-Sitz der Gesellschaft: Böblingen / Registergericht: Amtsgericht Stuttgart, HRB 243294
+Without deviation from the norm, progress is not possible.
+
 
