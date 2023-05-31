@@ -1,192 +1,161 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A558A3C0A9
-	for <kvmarm@lists.linux.dev>; Wed, 31 May 2023 20:15:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD2683C0A5
+	for <kvmarm@lists.linux.dev>; Wed, 31 May 2023 20:14:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1685564100;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	s=mimecast20190719; t=1685564095;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=e/lJqPL58JT7TA1o3K6ckEmovJOzHARr6F5XfqlB8+I=;
-	b=KcOz+6+HaX6MJhrHhCKeJZdAF/0g1ZMMCgwFT+2qg9y+Lm7HiBEot7yccAqPOMzfdmFCQ0
-	z7VRQH9KKyYC3loWkEfhmQSBE25h4aWGHrbtZWTz9qjm3nJDF29UU6Ft1kPzlJjCLCTkLr
-	Pq4+3cs76dZdM1ktcpYtMRqJDydU6rI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-562-o3ec14lEMd6dioqaELzRcg-1; Wed, 31 May 2023 16:14:56 -0400
-X-MC-Unique: o3ec14lEMd6dioqaELzRcg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7923E8032EF;
-	Wed, 31 May 2023 20:14:55 +0000 (UTC)
-Received: from laptop.redhat.com (unknown [10.39.193.41])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 67EED407DEC0;
-	Wed, 31 May 2023 20:14:53 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com,
-	eric.auger@redhat.com,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	andrew.jones@linux.dev,
-	maz@kernel.org,
-	will@kernel.org,
-	oliver.upton@linux.dev,
-	ricarkol@google.com,
-	reijiw@google.com,
-	alexandru.elisei@arm.com
-Cc: mark.rutland@arm.com
-Subject: [kvm-unit-tests PATCH v2 5/6] arm: pmu: Add pmu-mem-access-reliability test
-Date: Wed, 31 May 2023 22:14:37 +0200
-Message-Id: <20230531201438.3881600-6-eric.auger@redhat.com>
-In-Reply-To: <20230531201438.3881600-1-eric.auger@redhat.com>
-References: <20230531201438.3881600-1-eric.auger@redhat.com>
+	bh=nTJ77IxJoCf3R6qu07kat3hn+MjqbGQgNapLEu9GtEI=;
+	b=Gy873x6muFst0xkg7wPJe7ZoH+gIaHpvhN11e2Ogis/zXDQf38PBfPsl6M645cxX2z938T
+	GMaXcVZhO0i62zA9tYn6WLaB8PRMhKHqVrBFMINOCvPZqdFS62htsDW4YxrwAQDgRgqHrT
+	tRQq8+ZlXumLAAFUzA8/XVfyl3OkD9M=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-650-UUqeuMahMKW5SubGnzW3Wg-1; Wed, 31 May 2023 16:14:54 -0400
+X-MC-Unique: UUqeuMahMKW5SubGnzW3Wg-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3f6ffc456e7so408525e9.2
+        for <kvmarm@lists.linux.dev>; Wed, 31 May 2023 13:14:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685564093; x=1688156093;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nTJ77IxJoCf3R6qu07kat3hn+MjqbGQgNapLEu9GtEI=;
+        b=G1qkQQhS2pcwLC3bKdQIROoPWU7ZGguyYZfyYa+RjotPNrBM4X9qQdIZZROo/CGN5I
+         G0RJYjfMEdoAv6ZiGFrB/UUcTXVMJlhjkgHKNl0s1+iHT4lHkAA+4zco1FtjYvDI8spd
+         ql1zukGsrgYFq75uYcJnw4UYGELKbVAFI0W7O5VPQs64iHQsf+pkX9Ne3FfW6zy7Q9lQ
+         vpA9e70fWSnA0KUScfa8EWhBp07BFkbo7blMbDeB3Sojs5H7aeiCx2/O4QmTwmjDVxLd
+         +OioRW1wUQRw5P7SkOjHyDP1vjNJquxwNQcd26fQEXDB6w4CdySIQxnbtOplPorXFQt6
+         dJsw==
+X-Gm-Message-State: AC+VfDx5e1wfeqt34dzLwHcOWavoJMXG/oRtpw/sh54dI+iJ9JULkDa6
+	8Yil2Tb7frBEONr/MJNe7MXTpOnkcXFKoZpkEHS1D0/4C2A7SgQbwPCKa6tu3dJmJ9GpbB46n6q
+	YDjhEnceBo4PisFH7
+X-Received: by 2002:a05:600c:2187:b0:3f6:15c:96fc with SMTP id e7-20020a05600c218700b003f6015c96fcmr241483wme.17.1685564093249;
+        Wed, 31 May 2023 13:14:53 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5+R0GqxjLbGqYKkiI0OmLEj0ylpNNXiOUNparec4Ek/XM684Cdlf1oXcU19RgnhhawQ/X+9w==
+X-Received: by 2002:a05:600c:2187:b0:3f6:15c:96fc with SMTP id e7-20020a05600c218700b003f6015c96fcmr241479wme.17.1685564092987;
+        Wed, 31 May 2023 13:14:52 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id m19-20020a7bcb93000000b003f605566610sm25488288wmi.13.2023.05.31.13.14.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 31 May 2023 13:14:52 -0700 (PDT)
+Message-ID: <3b823b3a-16cf-058e-61cd-f02da2614314@redhat.com>
+Date: Wed, 31 May 2023 22:14:51 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH 3/6] arm: pmu: Add extra DSB barriers in
+ the mem_access loop
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ andrew.jones@linux.dev, maz@kernel.org, will@kernel.org,
+ oliver.upton@linux.dev, ricarkol@google.com, reijiw@google.com
+References: <20230315110725.1215523-1-eric.auger@redhat.com>
+ <20230315110725.1215523-4-eric.auger@redhat.com>
+ <ZEJkozep6M4EqxPW@monolith.localdoman>
+ <48ea7b8f-8bc3-def5-3bfa-e4a1ee41971a@redhat.com>
+ <ZEfO8DwsseerTKfK@monolith.localdoman>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <ZEfO8DwsseerTKfK@monolith.localdoman>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Add a new basic test that runs MEM_ACCESS loop over
-100 iterations and make sure the number of measured
-MEM_ACCESS never overflows the margin. Some other
-pmu tests rely on this pattern and if the MEM_ACCESS
-measurement is not reliable, it is better to report
-it beforehand and not confuse the user any further.
+Hi Alexandru,
+On 4/25/23 15:00, Alexandru Elisei wrote:
+> Hi,
+>
+> On Mon, Apr 24, 2023 at 10:11:11PM +0200, Eric Auger wrote:
+>> Hi Alexandru,
+>>
+>> On 4/21/23 12:25, Alexandru Elisei wrote:
+>>> Hi,
+>>>
+>>> On Wed, Mar 15, 2023 at 12:07:22PM +0100, Eric Auger wrote:
+>>>> The mem access loop currently features ISB barriers only. However
+>>>> the mem_access loop counts the number of accesses to memory. ISB
+>>>> do not garantee the PE cannot reorder memory access. Let's
+>>>> add a DSB ISH before the write to PMCR_EL0 that enables the PMU
+>>>> and after the last iteration, before disabling the PMU.
+>>>>
+>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>> Suggested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>>>>
+>>>> ---
+>>>>
+>>>> This was discussed in https://lore.kernel.org/all/YzxmHpV2rpfaUdWi@monolith.localdoman/
+>>>> ---
+>>>>  arm/pmu.c | 2 ++
+>>>>  1 file changed, 2 insertions(+)
+>>>>
+>>>> diff --git a/arm/pmu.c b/arm/pmu.c
+>>>> index b88366a8..dde399e2 100644
+>>>> --- a/arm/pmu.c
+>>>> +++ b/arm/pmu.c
+>>>> @@ -301,6 +301,7 @@ static void mem_access_loop(void *addr, long loop, uint32_t pmcr)
+>>>>  {
+>>>>  	uint64_t pmcr64 = pmcr;
+>>>>  asm volatile(
+>>>> +	"       dsb     ish\n"
+>>> I think it might still be possible to reorder memory accesses which are
+>>> part of the loop after the DSB above and before the PMU is enabled below.
+>>> But the DSB above is needed to make sure previous memory accesses, which
+>>> shouldn't be counted as part of the loop, are completed.
+>>>
+>>> I would put another DSB after the ISB which enables the PMU, that way all
+>>> memory accesses are neatly sandwitches between two DSBs.
+>>>
+>>> Having 3 DSBs might look like overdoing it, but I reason it to be correct.
+>>> What do you think?
+>> I need more time to investigate this. I will come back to you next week
+>> as I am OoO this week. Sorry for the inconvenience.
+> That's fine, I'm swamped too with other things, so don't expect a quick reply
+> :)
 
-Without the subsequent patch, this typically fails on
-ThunderXv2 with the following logs:
+My apologies for following up so late. I took your suggestion into
+account and added this new DSB.
 
-INFO: pmu: pmu-mem-access-reliability: 32-bit overflows:
-overflow=1 min=21 max=41 COUNT=20 MARGIN=15
-FAIL: pmu: pmu-mem-access-reliability: 32-bit overflows:
-mem_access count is reliable
+Thanks
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
----
-
-v1 -> v2:
-- use mem-access instead of memaccess as suggested by Mark
-- simplify the logic and add comments in the test loop
----
- arm/pmu.c         | 58 +++++++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg |  6 +++++
- 2 files changed, 64 insertions(+)
-
-diff --git a/arm/pmu.c b/arm/pmu.c
-index 74c9f6f9..925f277c 100644
---- a/arm/pmu.c
-+++ b/arm/pmu.c
-@@ -56,6 +56,7 @@
- #define EXT_COMMON_EVENTS_HIGH	0x403F
- 
- #define ALL_SET_32		0x00000000FFFFFFFFULL
-+#define ALL_SET_64		0xFFFFFFFFFFFFFFFFULL
- #define ALL_CLEAR		0x0000000000000000ULL
- #define PRE_OVERFLOW_32		0x00000000FFFFFFF0ULL
- #define PRE_OVERFLOW_64		0xFFFFFFFFFFFFFFF0ULL
-@@ -67,6 +68,10 @@
-  * for some observed variability we take into account a given @MARGIN
-  */
- #define PRE_OVERFLOW2_32		(ALL_SET_32 - COUNT - MARGIN)
-+#define PRE_OVERFLOW2_64		(ALL_SET_64 - COUNT - MARGIN)
-+
-+#define PRE_OVERFLOW2(__overflow_at_64bits)				\
-+	(__overflow_at_64bits ? PRE_OVERFLOW2_64 : PRE_OVERFLOW2_32)
- 
- #define PRE_OVERFLOW(__overflow_at_64bits)				\
- 	(__overflow_at_64bits ? PRE_OVERFLOW_64 : PRE_OVERFLOW_32)
-@@ -747,6 +752,56 @@ static void disable_chain_counter(int even)
- 	isb();
- }
- 
-+/*
-+ * This test checks that a mem access loop featuring COUNT accesses
-+ * does not overflow with an init value of PRE_OVERFLOW2. It also
-+ * records the min/max access count to see how much the counting
-+ * is (un)reliable
-+ */
-+static void test_mem_access_reliability(bool overflow_at_64bits)
-+{
-+	uint32_t events[] = {MEM_ACCESS};
-+	void *addr = malloc(PAGE_SIZE);
-+	uint64_t count, delta, max = 0, min = pmevcntr_mask();
-+	uint64_t pre_overflow2 = PRE_OVERFLOW2(overflow_at_64bits);
-+	uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
-+	bool overflow = false;
-+
-+	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
-+	    !check_overflow_prerequisites(overflow_at_64bits))
-+		return;
-+
-+	pmu_reset();
-+	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
-+	for (int i = 0; i < 100; i++) {
-+		pmu_reset();
-+		write_regn_el0(pmevcntr, 0, pre_overflow2);
-+		write_sysreg_s(0x1, PMCNTENSET_EL0);
-+		isb();
-+		mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-+		count = read_regn_el0(pmevcntr, 0);
-+		if (count >= pre_overflow2) {
-+			/* not counter overflow, as expected */
-+			delta = count - pre_overflow2;
-+		} else {
-+			/*
-+			 * unexpected counter overflow meaning the actual
-+			 * mem access count, delta, is count + COUNT + MARGIN
-+			 */
-+			delta = count + COUNT + MARGIN;
-+			overflow = true;
-+			report_info("iter=%d count=%ld min=%ld max=%ld overflow!!!",
-+				    i, delta, min, max);
-+		}
-+		/* record extreme value */
-+		max = MAX(delta, max);
-+		min = MIN(delta, min);
-+	}
-+	report_info("overflow=%d min=%ld max=%ld COUNT=%d MARGIN=%d",
-+		    overflow, min, max, COUNT, MARGIN);
-+	report(!overflow, "mem_access count is reliable");
-+}
-+
- static void test_chain_promotion(bool unused)
- {
- 	uint32_t events[] = {MEM_ACCESS, CHAIN};
-@@ -1204,6 +1259,9 @@ int main(int argc, char *argv[])
- 	} else if (strcmp(argv[1], "pmu-basic-event-count") == 0) {
- 		run_event_test(argv[1], test_basic_event_count, false);
- 		run_event_test(argv[1], test_basic_event_count, true);
-+	} else if (strcmp(argv[1], "pmu-mem-access-reliability") == 0) {
-+		run_event_test(argv[1], test_mem_access_reliability, false);
-+		run_event_test(argv[1], test_mem_access_reliability, true);
- 	} else if (strcmp(argv[1], "pmu-mem-access") == 0) {
- 		run_event_test(argv[1], test_mem_access, false);
- 		run_event_test(argv[1], test_mem_access, true);
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 5e67b558..fe601cbb 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -90,6 +90,12 @@ groups = pmu
- arch = arm64
- extra_params = -append 'pmu-mem-access'
- 
-+[pmu-mem-access-reliability]
-+file = pmu.flat
-+groups = pmu
-+arch = arm64
-+extra_params = -append 'pmu-mem-access-reliability'
-+
- [pmu-sw-incr]
- file = pmu.flat
- groups = pmu
--- 
-2.38.1
+Eric
+>
+> Thanks,
+> Alex
+>
+>> Thank you for the review!
+>>
+>> Eric
+>>> Thanks,
+>>> Alex
+>>>
+>>>>  	"       msr     pmcr_el0, %[pmcr]\n"
+>>>>  	"       isb\n"
+>>>>  	"       mov     x10, %[loop]\n"
+>>>> @@ -308,6 +309,7 @@ asm volatile(
+>>>>  	"       ldr	x9, [%[addr]]\n"
+>>>>  	"       cmp     x10, #0x0\n"
+>>>>  	"       b.gt    1b\n"
+>>>> +	"       dsb     ish\n"
+>>>>  	"       msr     pmcr_el0, xzr\n"
+>>>>  	"       isb\n"
+>>>>  	:
+>>>> -- 
+>>>> 2.38.1
+>>>>
+>>>>
 
