@@ -1,46 +1,157 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E742D1C11
-	for <kvmarm@lists.linux.dev>; Wed, 31 May 2023 10:41:37 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 78F8B1042;
-	Wed, 31 May 2023 03:42:20 -0700 (PDT)
-Received: from [10.57.22.98] (unknown [10.57.22.98])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 811493F67D;
-	Wed, 31 May 2023 03:41:34 -0700 (PDT)
-Message-ID: <100579b3-649b-a57c-8639-edc6b22c7646@arm.com>
-Date: Wed, 31 May 2023 11:41:33 +0100
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23922C8ED
+	for <kvmarm@lists.linux.dev>; Wed, 31 May 2023 11:46:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A511C433D2;
+	Wed, 31 May 2023 11:46:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1685533596;
+	bh=88OU10e4kzT8z8TT+amIVAmCrdCDAdulEGQ6N2xwf3k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ztdf6b96WaoSrN1oeNDYOAxCxn3i1+oDz8BdJ/3tzz0qbgO6Q1w8c/75PrIojFuU0
+	 tMSnka0gKPb30aF1HXTmee7HhSg292TzBPZr4KLGOrrv6HkSKrYiHRWlDA683PykdB
+	 iDKTjUdL9k8b0YWLuXJmTiqZaKrmx7Vc16NPFKiUIWU6J+Q7HSgUOrnM5SGSCLqhqD
+	 yw3L55t/9rSHxTID7Ut8zP6Vz+b8ODMdJNgQlr1veXMa/R3us6CCE+B1rZutNO5WzF
+	 aiAg0UV3zGcoNwIn9SBrnszdOPLI0v5dRZrYgh308QNyJfLEjbnQKmPLd/GQLHTbTp
+	 PWH+VndjmZQ2g==
+Date: Wed, 31 May 2023 12:46:31 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Mike Leach <mike.leach@linaro.org>, Marc Zyngier <maz@kernel.org>,
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	coresight@lists.linaro.org
+Subject: Re: [PATCH] arm64/sysreg: Convert TRBE registers to automatic
+ generation
+Message-ID: <b14abfc9-e6ae-4075-95da-d06947c70db0@sirena.org.uk>
+References: <20230531055524.16562-1-anshuman.khandual@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.11.0
-Content-Language: en-GB
-From: Nikos Nikoleris <nikos.nikoleris@arm.com>
-Subject: [kvm-unit-tests] arm/arm64: psci_cpu_on_test failures with tcg
-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Andrew Jones <andrew.jones@linux.dev>,
- Alexandru Elisei <alexandru.elisei@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="DJKn/AawpZVzxg9g"
+Content-Disposition: inline
+In-Reply-To: <20230531055524.16562-1-anshuman.khandual@arm.com>
+X-Cookie: Will Rogers never met you.
 
-Hi,
 
-I noticed that in the latest master the psci_cpu_on_test fails randomly 
-for both arm and arm64 with tcg.
+--DJKn/AawpZVzxg9g
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-If I do:
+On Wed, May 31, 2023 at 11:25:24AM +0530, Anshuman Khandual wrote:
 
-$> for i in `seq 1 100`; do ACCEL=tcg MAX_SMP=8 ./run_tests.sh psci; 
-done | grep FAIL
+> This converts all TRBE related registers to automatic generation and update
+> the driver as required. This does not cause any functional change.
 
-About 10 of the 100 runs fail for the arm and arm64 builds of the test. 
-I had a look and I am not sure I understand why. When I run the test 
-with kvm, I don't get any failures. Does anyone have an idea what could 
-be causing this?
+>  arch/arm64/include/asm/el2_setup.h           |  2 +-
+>  arch/arm64/include/asm/sysreg.h              | 49 ----------------
+>  arch/arm64/kvm/debug.c                       |  2 +-
+>  arch/arm64/kvm/hyp/nvhe/debug-sr.c           |  2 +-
+>  arch/arm64/tools/sysreg                      | 59 ++++++++++++++++++++
+>  drivers/hwtracing/coresight/coresight-trbe.c | 33 +++++------
+>  drivers/hwtracing/coresight/coresight-trbe.h | 38 +++++--------
+>  7 files changed, 94 insertions(+), 91 deletions(-)
 
-Thanks,
+These changes are easier to review if split up a bit, for example
+separating the renames of constants from the actual conversion (and
+doing different renames separately, though it looks like this only does
+the addition of _EL1) or splitting things up by register so that the
+registers that are OK don't need to be re-reviewed.
 
-Nikos
+> +Sysreg	TRBLIMITR_EL1	3	0	9	11	0
+> +Field	63:12	LIMIT
+> +Res0	11:6
+
+In DDI0601 2023-03 bit 6 is allocated to a field called XE.
+
+> +Field	5	NVM
+
+nVM.
+
+> +Enum	4:3	TRIG_MODE
+> +	0b00	STOP
+> +	0b01	IRQ
+> +	0b11	IGNR
+> +EndEnum
+
+This is documented as TM.
+
+> +Enum	2:1	FILL_MODE
+> +	0b00	FILL
+> +	0b01	WRAP
+> +	0b11	CBUF
+> +EndEnum
+
+This is documented as FM.
+
+> +Field	0	ENABLE
+
+This is documented as E.
+
+> +Sysreg	TRBSR_EL1	3	0	9	11	3
+> +Res0	63:32
+
+In DDI0601 2023-03 MSS2 is allocated in this region from 55:32.
+
+> +Field	31:26	EC
+> +Res0	25:23
+
+In DDI0601 2023-03 DAT is allocated in this region at bit 23.
+
+> +Field	17	STOP
+
+This is called S.
+
+> +Res0	15:6
+> +Field	5:0	BSC
+
+In DDI0601 2023-03 bits 15:0 are a field MSS which has BSC allocated as
+a subfield within it for some events, implementation defined events
+could use a different encoding though.  We don't represent things like
+this (or the various codes in ESR) within the scripting language yet.
+
+> +Sysreg	TRBMAR_EL1	3	0	9	11	4
+> +Res0	63:10
+> +Field	9:8	SH
+> +Field	7:0	ATTR
+> +EndSysreg
+
+DDI0601 2023-03 has a field PAS at bits 11:10.
+
+> +Sysreg	TRBIDR_EL1	3	0	9	11	7
+> +Res0	63:6
+
+DDI0601 2023-03 has a field EA from bits 11:8.
+
+> +Field	5	FLAG
+
+This is documented as F.
+
+> +Field	4	PROG
+
+This is documented as P.
+
+--DJKn/AawpZVzxg9g
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmR3M5YACgkQJNaLcl1U
+h9AVdgf9FzSgWwcEQeyWJ9GQq6tf6MWtlTLL+IWY6oGCMahE2ybTCSF+UU58xtPU
+oxQFg24BAp0EtGz/U35xRm1qLIBJ7GyrcZCpRBG8ldkJGJytZnlm90JLiPb1zIim
+F1sizPL2BYUPlGeSdHgLIWLuF3ilm5W+5o/s8fOJu3TEtk2y6pjVxoKzFg94QHJy
+5xdvvtrQkFKAqcm9dqE0ZDe+A94hyzCFE12E4hQKVCL9Bx4QyVscswDMDihZhb02
+2dyf4xPjjhfeIqCMgn5WiTwBWmUOzcy70aMLXxCapoN3ESFc4N3osYnugJP/c3cb
+MolCHs5u84OsFn3WpMtex8BnOi92LA==
+=5Evs
+-----END PGP SIGNATURE-----
+
+--DJKn/AawpZVzxg9g--
