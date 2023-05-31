@@ -1,40 +1,40 @@
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2FEE17736
-	for <kvmarm@lists.linux.dev>; Wed, 31 May 2023 17:51:57 +0000 (UTC)
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-33bdab7b4caso4774145ab.3
-        for <kvmarm@lists.linux.dev>; Wed, 31 May 2023 10:51:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB7219923
+	for <kvmarm@lists.linux.dev>; Wed, 31 May 2023 18:01:24 +0000 (UTC)
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-33b1e83e1daso9281315ab.0
+        for <kvmarm@lists.linux.dev>; Wed, 31 May 2023 11:01:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685555517; x=1688147517;
+        d=google.com; s=20221208; t=1685556084; x=1688148084;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=R8+/MBQepRDI0OzLzQ5plxv42NdlvgBOSqXlyRiX80Y=;
-        b=hwdhRnAjamBlqJ7UBsp5ijfmrLXQrT7I1mZyxbqpm2tVzcElT4Z7N4MkwGB2xbgSkx
-         2UKy2xsU8L8LQN2bSgrmxYsK9VDjtS9OGASJ5XWujuDUpT0C6x6ozO9OW1dw0DrFnFx1
-         hQkg1g2J/JxoQgjiCVNr83ACf2Ld6u8RAZAF+fVPqXu/0tQJZDK8RZRdn2ivzSItdc20
-         4jS4AoVF9tRyfvcH2pQfjYO25kv8cTFX5z1fFU1gSz7fApwWqsWFt0Lrl+jlMnZQn7gB
-         yluzsiDaskWzNy5zOZacezfK+dLR1o6K0RyjI0O93Z7A82hAK/GV3IcOuzkO6ZGoyejJ
-         u26Q==
+        bh=Oj2Fw5dSQp63bUWr4posajG7QB7Mr0N7IRLnkyA+AtY=;
+        b=k5PC0F1hcx5sRmsEGcmbJqNkl0AiZ0u3z0554PODRPKEAe8W/IWSFsDzrSJbzclnNn
+         sX9RvnOcZQCROQuPBAkjUSBjYPo1m0GOqQS8ZyXS0BHKVdiHbe15U1zd4I62YGYIT3Eh
+         QL7oevgaQCQE1IAX0mP4c37pKHyfnj0fwLTl8fRWrHLzfU2eVnesmVamMn4DXqpLnEKY
+         DhTau8tSMxb+Gz6FH2QV97A7vvKND+MXCncccX3LIQDhSevqdCsGYqVx1NCLNSXkq5zI
+         ojlX+qYIZc3afyzV++768XR6VVrSqf2325c+cVxc8GbGopg5s5KhhVsKuMsvZRYje+yt
+         A9Rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685555517; x=1688147517;
+        d=1e100.net; s=20221208; t=1685556084; x=1688148084;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=R8+/MBQepRDI0OzLzQ5plxv42NdlvgBOSqXlyRiX80Y=;
-        b=EP3edWmFwmbC5zsQFiFuXwfDTOFLp39fk3zWY2plr6ut2N4lQvQcGW4w/jJXXXVrjW
-         1ld4NXWxm3TOJAXOV5iq/lwMmrXfRlxGp01IfwEiUFb7FHbARVI7pMHbsIlMvUAUcZ9h
-         HEYi5W71aPCDsfvFDOoaCMqJ64tIrY2Hn7/LWXcvseLvJ5nnEK8K/HA4EE9BXJ6kCFHr
-         SMauKaoP5DQY1FWpoefBBH6LiXb/C/a6B1sRrh2dqYUaeBJleq4Z1HutbggYgqcOn7N+
-         bI8XsRsZkXAsC9QuSJCUTcOzofWhx/14WNPkDKfl/ZjMVTuvJwq9nl83EqEOvLgLfgCy
-         7zNg==
-X-Gm-Message-State: AC+VfDwTkomkemuFoDByblLUBnWGPu4WE/kEM0U0BtIStsFU6ChrX/Jf
-	IH9Q3uVF9l8iQi2euY/zDoxHXpvX/2uavAN12J2c54zW1m9DxMglNVo=
-X-Google-Smtp-Source: ACHHUZ7yJXTw61LUz1K4R+gWjK7FQ4VYk3Vtr9WfXanKCcQCZmy3tZpSmzEwwwtsQyzOUvwrJEAL8ukZmooRX+6EI54=
-X-Received: by 2002:a05:6870:44c2:b0:19a:71ce:c9f5 with SMTP id
- t2-20020a05687044c200b0019a71cec9f5mr2683493oai.29.1685553912941; Wed, 31 May
- 2023 10:25:12 -0700 (PDT)
+        bh=Oj2Fw5dSQp63bUWr4posajG7QB7Mr0N7IRLnkyA+AtY=;
+        b=WfVcSwxh4W1vw5DwHhmp3/pqZLnTUhpLYae3/5OEQPFPleKdhmOrsprsjswcvCG21o
+         R183jr+mbNHy1YQOn/9uASkdxEcS5ORBbrztU59R0+07jDCxdQjNtymc4zgBFabS3Ou+
+         eBZlONmjkFJEsbX+G38zrCp12akrTDG+1QKTSTH40M2F2YNxdPjJHwzNrRJY1ht+d+2s
+         1Nz1IvD1QI/nP4eNVID2DvIe8P6nsT3PXRs4O9Ut9URFpipjXdeT+U9el/maY2XjQDSI
+         jm0ba7D13mqfiDbGV+1SBczIRs6RwMw4Oer1fy/6rkrP2Q051RlDMu1EwvdGZY8g9TJf
+         NOHQ==
+X-Gm-Message-State: AC+VfDxGKTP9W9j0GLShoSVOp6rbUQuyARONXOKR/uzrm3bHBh3qzlAH
+	vopwZz+0NIyGqqKuu4th30n2RIXkny1mj17CiRvTKbVsgSb1KssLhBs=
+X-Google-Smtp-Source: ACHHUZ7Ghm57psekUGggVXvqnjraOCgCTG4YKtIkmK4ZGcFmqhIkYJecoxryMwL62EWPoE+z7qd/cpdMv+pG2CN0RE0=
+X-Received: by 2002:a05:6870:e606:b0:19f:45a1:b5a2 with SMTP id
+ q6-20020a056870e60600b0019f45a1b5a2mr3974220oag.49.1685554176435; Wed, 31 May
+ 2023 10:29:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -42,14 +42,13 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 References: <20230522221835.957419-1-jingzhangos@google.com>
- <20230522221835.957419-2-jingzhangos@google.com> <87ttvwok3d.wl-maz@kernel.org>
- <CAAdAUtinwccyd+URCLjowXq47_LP_SjLNEqm-F9GqycmTZrYuw@mail.gmail.com> <864jntc6au.wl-maz@kernel.org>
-In-Reply-To: <864jntc6au.wl-maz@kernel.org>
+ <20230522221835.957419-6-jingzhangos@google.com> <87pm6kogx8.wl-maz@kernel.org>
+ <CAAdAUtjJ8n8+jt=Y=oJFuRvERzRY4DQr6S7JThobU=wWMOYaRQ@mail.gmail.com> <86353dc5yr.wl-maz@kernel.org>
+In-Reply-To: <86353dc5yr.wl-maz@kernel.org>
 From: Jing Zhang <jingzhangos@google.com>
-Date: Wed, 31 May 2023 10:25:01 -0700
-Message-ID: <CAAdAUthzGevCPfb=aK0ndTCckLtcHmxZ3kgwYUejMYVy0=CHmg@mail.gmail.com>
-Subject: Re: [PATCH v10 1/5] KVM: arm64: Save ID registers' sanitized value
- per guest
+Date: Wed, 31 May 2023 10:29:24 -0700
+Message-ID: <CAAdAUtjj3MEzGPxVayezcd9x7_4EMsp2UUXZZHJWKLqbz75p5g@mail.gmail.com>
+Subject: Re: [PATCH v10 5/5] KVM: arm64: Refactor writings for PMUVer/CSV2/CSV3
 To: Marc Zyngier <maz@kernel.org>
 Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
 	ARMLinux <linux-arm-kernel@lists.infradead.org>, Oliver Upton <oupton@google.com>, 
@@ -62,52 +61,102 @@ Content-Transfer-Encoding: quoted-printable
 
 Hi Marc,
 
-On Wed, May 31, 2023 at 12:24=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
+On Wed, May 31, 2023 at 12:31=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
 e:
 >
-> On Tue, 30 May 2023 19:02:03 +0100,
+> On Tue, 30 May 2023 22:18:04 +0100,
 > Jing Zhang <jingzhangos@google.com> wrote:
->
-> [...]
->
-> > > > +/*
-> > > > + * Set the guest's ID registers with ID_SANITISED() to the host's =
-sanitized value.
-> > > > + */
-> > > > +void kvm_arm_init_id_regs(struct kvm *kvm)
-> > > > +{
-> > > > +     const struct sys_reg_desc *idreg;
-> > > > +     struct sys_reg_params params;
-> > > > +     u32 id;
-> > > > +
-> > > > +     /* Find the first idreg (SYS_ID_PFR0_EL1) in sys_reg_descs. *=
-/
-> > > > +     id =3D SYS_ID_PFR0_EL1;
-> > > > +     params =3D encoding_to_params(id);
-> > > > +     idreg =3D find_reg(&params, sys_reg_descs, ARRAY_SIZE(sys_reg=
-_descs));
-> > > > +     if (WARN_ON(!idreg))
-> > > > +             return;
+> >
+> > Hi Marc,
+> >
+> > On Sun, May 28, 2023 at 4:05=E2=80=AFAM Marc Zyngier <maz@kernel.org> w=
+rote:
 > > >
-> > > What is this trying to guard against? Not finding ID_PFR0_EL1 in the
-> > > sysreg table? But this says nothing about the following registers (al=
-l
-> > > 55 of them), so why do we need to special-case this one?
-> > Here is to find the first idreg in the array and warn that no idregs
-> > found in the array with the assumption that ID_PFR0_EL1 is the first
-> > one defined and if it is not found, then no other idregs are defined
-> > either.
+> > > On Mon, 22 May 2023 23:18:35 +0100,
+> > > Jing Zhang <jingzhangos@google.com> wrote:
+> > > >
+> > > > Refactor writings for ID_AA64PFR0_EL1.[CSV2|CSV3],
+> > > > ID_AA64DFR0_EL1.PMUVer and ID_DFR0_ELF.PerfMon based on utilities
+> > > > specific to ID register.
+> > > >
+> > > > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > > > ---
+> > > >  arch/arm64/include/asm/cpufeature.h |   1 +
+> > > >  arch/arm64/kernel/cpufeature.c      |   2 +-
+> > > >  arch/arm64/kvm/sys_regs.c           | 365 ++++++++++++++++++------=
+----
+> > > >  3 files changed, 243 insertions(+), 125 deletions(-)
+> > >
+> > > Reading the result after applying this series, I feel like a stuck
+> > > record. This final series still contains gems like this:
+> > >
+> > > static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+> > >                                const struct sys_reg_desc *rd,
+> > >                                u64 val)
+> > > {
+> > >         u8 csv2, csv3;
+> > >
+> > >         /*
+> > >          * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long a=
+s
+> > >          * it doesn't promise more than what is actually provided (th=
+e
+> > >          * guest could otherwise be covered in ectoplasmic residue).
+> > >          */
+> > >         csv2 =3D cpuid_feature_extract_unsigned_field(val, ID_AA64PFR=
+0_EL1_CSV2_SHIFT);
+> > >         if (csv2 > 1 ||
+> > >             (csv2 && arm64_get_spectre_v2_state() !=3D SPECTRE_UNAFFE=
+CTED))
+> > >                 return -EINVAL;
+> > >
+> > >         /* Same thing for CSV3 */
+> > >         csv3 =3D cpuid_feature_extract_unsigned_field(val, ID_AA64PFR=
+0_EL1_CSV3_SHIFT);
+> > >         if (csv3 > 1 ||
+> > >             (csv3 && arm64_get_meltdown_state() !=3D SPECTRE_UNAFFECT=
+ED))
+> > >                 return -EINVAL;
+> > >
+> > >         return set_id_reg(vcpu, rd, val);
+> > > }
+> > >
+> > > Why do we have this? I've asked the question at least 3 times in the
+> > > previous versions, and I still see the same code.
+> > >
+> > > If we have sane limits, the call to arm64_check_features() in
+> > > set_id_reg() will catch the illegal write. So why do we have this at
+> > > all? The whole point of the exercise was to unify the handling. But
+> > > you're actually making it worse.
+> > >
+> > > So what's the catch?
+> > Sorry, I am only aware of one discussion of this code in v8. The
+> > reason I still keep the check here is that the arm64_check_features()
+> > can not catch all illegal writes as this code does.
+> > For example, for CSV2, one concern is:
+> > When arm64_get_spectre_v2_state() !=3D SPECTRE_UNAFFECTED, this code
+> > only allows guest CSV2 to be set to 0, any non-zero value would lead
+> > to -EINVAL. If we remove the check here, the guest CSV2 can be set to
+> > any value lower or equal to host CSV2.
 >
-> I didn't make my point clear. What we have is a purely static array.
-> Why should we perform such a test on every single VM creation? Any
-> structural validation should only happen once, at KVM init time.
+> Sorry, this doesn't make sense. Lower is always fine. If you meant
+> 'higher', then I agree that it would be bad. But that doesn't make
+> keeping this code the right outcome.
+Got it. Then it would be good to remove the check here. Will do that.
 >
-> > Another way is to go through all the regs in array sys_reg_descs and
-> > do the initialization if it is a idreg.
+> > Of course, we can set the sane limit of CSV2 to 0 when
+> > arm64_get_spectre_v2_state() !=3D SPECTRE_UNAFFECTED in
+> > read_sanitised_id_aa64pfr0_el1(). Then we can remove all the checks
+> > here and no specific set_id function for AA64PFR0_EL1 is needed.
 >
-> That'd be a waste of precious cycles.
+> This is what I have been asking for all along: the "sanitised" view of
+> the register *must* return the absolute limit for the fields that are
+> flagged as writable by "mask".
 >
-> This WARN_ON()+early return should go, but the rest is fine.
+> If we need extra code, then something is really wrong. The core
+> feature code manages that without any special casing, and we should be
+> able to reach the same level.
+Understood.
 >
 > Thanks,
 >
@@ -115,11 +164,5 @@ l
 >
 > --
 > Without deviation from the norm, progress is not possible.
-That makes sense. We don't have to do the check on every single VM
-creation. And the code to find the ID_PFR0_EL1 should not be done for
-every VM creation either.
-I'll use a static variable to save the pointer to ID_PFR0_EL1 and do
-the check and search in kvm_sys_reg_table_init().
-
 Thanks,
 Jing
