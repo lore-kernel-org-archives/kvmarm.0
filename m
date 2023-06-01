@@ -1,82 +1,77 @@
-Received: from out-36.mta1.migadu.com (out-36.mta1.migadu.com [95.215.58.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8518D23DF
-	for <kvmarm@lists.linux.dev>; Thu,  1 Jun 2023 19:29:24 +0000 (UTC)
-Date: Thu, 1 Jun 2023 19:29:17 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1685647762;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=suBQTpSxH1G3pSl5ff+0g5WsTk1KtKVAVirQrCqi6oI=;
-	b=WAqzCUAfnnkYf2qFyQckg+U183CgeSu4lzkfoVhYXmExAq5WhTixQoNCprJR4BDabtCQq5
-	gyt8VkFwhVJ25fZM0Qd6E3TjYKmLfepUTiOit0utpQmce40yzLyAx5RaNvNlw/EswiHWpM
-	isVhno6+jQrdftQVVzfWaynSb/5TuaY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Anish Moorthy <amoorthy@google.com>, pbonzini@redhat.com,
-	maz@kernel.org, jthoughton@google.com, bgardon@google.com,
-	dmatlack@google.com, ricarkol@google.com, axelrasmussen@google.com,
-	peterx@redhat.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 17/22] KVM: Introduce KVM_CAP_ABSENT_MAPPING_FAULT
- without implementation
-Message-ID: <ZHjxjcj4AVTRV2A2@linux.dev>
-References: <20230412213510.1220557-1-amoorthy@google.com>
- <20230412213510.1220557-18-amoorthy@google.com>
- <ZHjhSZFwEc+VfjGk@linux.dev>
- <ZHjqkdEOVUiazj5d@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 227D423DF
+	for <kvmarm@lists.linux.dev>; Thu,  1 Jun 2023 19:34:50 +0000 (UTC)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1b04bc1f3cbso5610985ad.2
+        for <kvmarm@lists.linux.dev>; Thu, 01 Jun 2023 12:34:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1685648090; x=1688240090;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5uKRy9be5xz+z4blyIXACShVZUPCjj7pk1gtLgfKMYY=;
+        b=o0mnB4wbetWEuOs9j3/BtFX+p6AEvGNDPlOy4PgK1rZoo5gbYb04nnEJmzUCoqviIa
+         YvumGCxNuWuwea9yUo8PTLK7NZ4rJFxUQaazg/+vcLLIJquNv7kcYevBvav9ZCTrfGZH
+         bNDHfBp/ILYkHg/eKzIHeZGTodjpYiTF7ETGdpZOtyaLOGPe+svvOC0zXgFLfh6pfskp
+         O2CG/EY1kclP5234P3uhrGKy6Fh3ILV0P+/sWjPEjTpIHfrSB5MSzlvd4ECRcl7/pKYt
+         PU9eSe/nzkMFm9dBWIgOUpNMH2CEVR7sPKwXjT2UwJi+21AkqHyjZw10nEuzX2+aRm8h
+         /BVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685648090; x=1688240090;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5uKRy9be5xz+z4blyIXACShVZUPCjj7pk1gtLgfKMYY=;
+        b=etpVspkBGrkLoXYGf8umq1USZiwARoxxod1xOMahs8YTRuhvjHeS4voGKyPxEUYsQH
+         hxXjyZV+coffkgi81P3dXc5Aq+2fI+fUFrqjFTRSqg+sChieY6RafL1UratmBtYPMOOY
+         WAHHzOiTlFdZauHPjJ6STt5CNzVwgC1t2KY6RwQkZaMMHA4rOF6s6Q+0tqPLMXygO39e
+         TRViXkIataUucJk+UHDXXoyWG0+rroQa80Rxlb/cLG96hN3jQELwlNDQ/NOE6hkHARnK
+         XngnchqCgSKsrTEgcFEv4IfpEw3qUt+q0PVBDz2VUFkv88vbgFSyKCh5kUC6x4TVKevh
+         fMiA==
+X-Gm-Message-State: AC+VfDx5ChOdudm6wJtzWlxhOV4+EsdFsQWF3YPbmVAHNXst5cFsPqAd
+	ktoCXqUsi5yPICg3qtu8gjCl8fvxYqc=
+X-Google-Smtp-Source: ACHHUZ7n+yn1GbM4jMgzCsaCebi+5XoxILoTK5BJ9lRipJN0vk1wv9VJ7+Sh+52SC+g1B8OlV1y3ecIe1Ug=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:a585:b0:1a9:8f00:bf6e with SMTP id
+ az5-20020a170902a58500b001a98f00bf6emr99690plb.3.1685648090364; Thu, 01 Jun
+ 2023 12:34:50 -0700 (PDT)
+Date: Thu, 1 Jun 2023 12:34:48 -0700
+In-Reply-To: <ZHjxjcj4AVTRV2A2@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZHjqkdEOVUiazj5d@google.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20230412213510.1220557-1-amoorthy@google.com> <20230412213510.1220557-18-amoorthy@google.com>
+ <ZHjhSZFwEc+VfjGk@linux.dev> <ZHjqkdEOVUiazj5d@google.com> <ZHjxjcj4AVTRV2A2@linux.dev>
+Message-ID: <ZHjy2NRDmTmPc3R5@google.com>
+Subject: Re: [PATCH v3 17/22] KVM: Introduce KVM_CAP_ABSENT_MAPPING_FAULT
+ without implementation
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Anish Moorthy <amoorthy@google.com>, pbonzini@redhat.com, maz@kernel.org, 
+	jthoughton@google.com, bgardon@google.com, dmatlack@google.com, 
+	ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com, 
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Jun 01, 2023 at 11:59:29AM -0700, Sean Christopherson wrote:
-> On Thu, Jun 01, 2023, Oliver Upton wrote:
-> > How do we support a userspace that only cares about NOWAIT exits but
-> > doesn't want other EFAULT exits to be annotated?
-> 
-> We don't.  The proposed approach is to not change the return value, and the
-> vcpu->run union currently holds random garbage on -EFAULT, so I don't see any reason
-> to require userspace to opt-in, or to let userspace opt-out.  I.e. fill
-> vcpu->run->memory_fault unconditionally (for the paths that are converted) and
-> advertise to userspace that vcpu->run->memory_fault *may* contain useful info on
-> -EFAULT when KVM_CAP_MEMORY_FAULT_INFO is supported.  And then we define KVM's
-> ABI such that vcpu->run->memory_fault is guarateed to be valid if an -EFAULT occurs
-> when faulting in guest memory (on supported architectures).
-
-Sure, but the series currently gives userspace an explicit opt-in for
-existing EFAULT paths. Hold your breath, I'll reply over there so we
-don't mix context.
-
-> > It is very likely that userspace will only know how to resolve NOWAIT exits
-> > anyway. Since we do not provide a precise description of the conditions that
-> > caused an exit, there's no way for userspace to differentiate between NOWAIT
-> > exits and other exits it couldn't care less about.
+On Thu, Jun 01, 2023, Oliver Upton wrote:
+> On Thu, Jun 01, 2023 at 11:59:29AM -0700, Sean Christopherson wrote:
+> > On Thu, Jun 01, 2023, Oliver Upton wrote:
+> > > How do we support a userspace that only cares about NOWAIT exits but
+> > > doesn't want other EFAULT exits to be annotated?
 > > 
-> > NOWAIT exits w/o annotation (i.e. a 'bare' EFAULT) make even less sense
-> > since userspace cannot even tell what address needs fixing at that
-> > point.
-> > 
-> > This is why I had been suggesting we separate the two capabilities and
-> > make annotated exits an unconditional property of NOWAIT exits.
+> > We don't.  The proposed approach is to not change the return value, and the
+> > vcpu->run union currently holds random garbage on -EFAULT, so I don't see any reason
+> > to require userspace to opt-in, or to let userspace opt-out.  I.e. fill
+> > vcpu->run->memory_fault unconditionally (for the paths that are converted) and
+> > advertise to userspace that vcpu->run->memory_fault *may* contain useful info on
+> > -EFAULT when KVM_CAP_MEMORY_FAULT_INFO is supported.  And then we define KVM's
+> > ABI such that vcpu->run->memory_fault is guarateed to be valid if an -EFAULT occurs
+> > when faulting in guest memory (on supported architectures).
 > 
-> No, because as I've been stating ad nauseum, KVM cannot differentiate between a
-> NOWAIT -EFAULT and an -EFAULT that would have occurred regardless of the NOWAIT
-> behavior.
+> Sure, but the series currently gives userspace an explicit opt-in for
+> existing EFAULT paths. 
 
-IOW: "If you engage brain for more than a second, you'll actually see
-the point"
-
-Ok, I'm on board now and sorry for the noise.
-
--- 
-Thanks,
-Oliver
+Yeah, that's one of the things I am/was going to provide feedback on, I've been
+really slow getting into reviews for this cycle :-/
