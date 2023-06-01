@@ -1,80 +1,124 @@
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BD3B23404
-	for <kvmarm@lists.linux.dev>; Thu,  1 Jun 2023 11:20:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Jzcx+R+c6UOqzz0gVG07uUa29kOBvr3x5e8X9TFuwcA=; b=oQ8d4cw3GAx07aySlQ39lT4A8H
-	prkDbHMJybq15SDspPHtVe9iiG+gfjkElttDpsY8z8UlgWtby1L64wWiDvn4LCC+WTcKHkzU2uCVU
-	Il3IG6TJVbBw9F0wcsP4EFmQr1my4e2Wh0UYpw8cam+gBKhpQJY7tpxiPeVWY1yhA82CNY6Fx9I5x
-	mM91gUzo12SNrcaM9a68ZIINX0H2/ZLb74OaH9RebDzycs3fze5p/lWol2AQOXOyvokCXPilqkWa5
-	+nhi4EoTnMscy882WT5oR/Y5l8hR6D2t88nbMSI93A02rL9M7UpKAB5iPK226BszP0ZiYxjDrPS8Q
-	i7+Eq3vg==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1q4gM0-00H940-1R;
-	Thu, 01 Jun 2023 11:20:28 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(Client did not present a certificate)
-	by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 34D6630031F;
-	Thu,  1 Jun 2023 13:20:27 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 2450C202BDCB6; Thu,  1 Jun 2023 13:20:27 +0200 (CEST)
-Date: Thu, 1 Jun 2023 13:20:27 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Thomas Richter <tmricht@linux.ibm.com>
-Cc: Ian Rogers <irogers@google.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Ravi Bangoria <ravi.bangoria@amd.com>,
-	Nathan Chancellor <nathan@kernel.org>, namhyung@kernel.org,
-	eranian@google.com, acme@kernel.org, mark.rutland@arm.com,
-	jolsa@kernel.org, bp@alien8.de, kan.liang@linux.intel.com,
-	adrian.hunter@intel.com, maddy@linux.ibm.com, x86@kernel.org,
-	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-	sandipan.das@amd.com, ananth.narayan@amd.com,
-	santosh.shukla@amd.com, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 3/4] perf/core: Remove pmu linear searching code
-Message-ID: <20230601112027.GI38236@hirez.programming.kicks-ass.net>
-References: <CAP-5=fWYbzmTETgqJ11y22=JaXDM0gnb4qR6KYeRGmFXw08f-Q@mail.gmail.com>
- <86jzwtdhmk.wl-maz@kernel.org>
- <CAP-5=fVW6KbUbbEfF3mEFvTfFDC5yKSjSpa+w3D55dG3CNUERw@mail.gmail.com>
- <86h6rxd3gh.wl-maz@kernel.org>
- <0075d8a9-2df4-86eb-8171-8995f59904e0@linux.ibm.com>
- <CAP-5=fXo0t+buDrmf7SyTD97gmTWGoDAO2YXWyav+_79O3MZ0w@mail.gmail.com>
- <a1f27798-0b06-7dc3-028b-038512947306@linux.ibm.com>
- <CAP-5=fVw3vSEu7yGFDnZi8c3VUFJu_XEZtY9ZcTsD7ip2imR6Q@mail.gmail.com>
- <aa2f8581-6440-87c0-1578-157719f7543e@linux.ibm.com>
- <20230601111856.GW4253@hirez.programming.kicks-ass.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E81892341F
+	for <kvmarm@lists.linux.dev>; Thu,  1 Jun 2023 11:59:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BC5DC433EF;
+	Thu,  1 Jun 2023 11:59:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1685620771;
+	bh=qKoC2hIC4v71i+9F5JZZfU7gvWqEbXmVQlWQwA0zVMs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PWGeOcSdKXJGcoDyA81/Q/pGoSCapykCxkP2rCIE0rkP4lSptkq1JvsbmRLJEP8Q9
+	 arG5J8SUmhCV4awyY1o4BdNTlPh5ovx4irDc0GUmvgy18ue+U+q6JyAPjWLboK+/QD
+	 zui5kLlb7mte8b0xNlDHmwYd7H9XL0YJ2p6aqlH5S2ZHAjS13wBYn88HEH2mfL5rYy
+	 gWHy8tKlLTo06WNein/+w1d5EewFehWb/e7yQS8Bf2mHMEOAhyUBcdoUleuErtfAwm
+	 buEgl5AwQFqnH3Tw8hArXiYlP0CIVtEysxh0F6gkIl/dg+YwVGdxqqfbCoJWvxrpaf
+	 02yOlH07Cl9zg==
+Received: from 90.4.23.109.rev.sfr.net ([109.23.4.90] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1q4gxk-0020HB-Q5;
+	Thu, 01 Jun 2023 12:59:29 +0100
+Date: Thu, 01 Jun 2023 12:59:24 +0100
+Message-ID: <87edmvpf4z.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Quentin Perret <qperret@google.com>,
+	Will Deacon <will@kernel.org>,
+	Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v2 06/17] arm64: Allow EL1 physical timer access when running VHE
+In-Reply-To: <ZHg76wizp5RSXTLG@linux.dev>
+References: <20230526143348.4072074-1-maz@kernel.org>
+	<20230526143348.4072074-7-maz@kernel.org>
+	<ZHg76wizp5RSXTLG@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230601111856.GW4253@hirez.programming.kicks-ass.net>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 109.23.4.90
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com, will@kernel.org, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Jun 01, 2023 at 01:18:56PM +0200, Peter Zijlstra wrote:
-> On Thu, Jun 01, 2023 at 01:02:30PM +0200, Thomas Richter wrote:
+On Thu, 01 Jun 2023 07:34:19 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> > PS: I have the feeling, it gets complicated to have multiple hardware PMUs
-> > per platform.
+> Hey Marc,
 > 
-> Recently someone was poking around giving the pmu device a parent, this
-> would, I think, result in sysfs links, which could be used to decide
-> what's what.
+> On Fri, May 26, 2023 at 03:33:37PM +0100, Marc Zyngier wrote:
+> > To initialise the timer access from EL2 when HCR_EL2.E2H is set,
+> > we must make use the CNTHCTL_EL2 formap used is appropriate.
+> > 
+> > This amounts to shifting the timer/counter enable bits by 10
+> > to the left.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/el2_setup.h | 5 +++++
+> >  arch/arm64/kvm/hyp/nvhe/hyp-init.S | 9 +++++++++
+> >  2 files changed, 14 insertions(+)
+> > 
+> > diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+> > index 037724b19c5c..225bf1f2514d 100644
+> > --- a/arch/arm64/include/asm/el2_setup.h
+> > +++ b/arch/arm64/include/asm/el2_setup.h
+> > @@ -34,6 +34,11 @@
+> >   */
+> >  .macro __init_el2_timers
+> >  	mov	x0, #3				// Enable EL1 physical timers
+> > +	mrs	x1, hcr_el2
+> > +	and	x1, x1, #HCR_E2H
+> > +	cbz	x1, .LnVHE_\@
+> > +	lsl	x0, x0, #10
+> > +.LnVHE_\@:
+> >  	msr	cnthctl_el2, x0
+> >  	msr	cntvoff_el2, xzr		// Clear virtual offset
+> >  .endm
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > index a6d67c2bb5ae..f9ee10e29497 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > @@ -95,6 +95,15 @@ SYM_CODE_START_LOCAL(___kvm_hyp_init)
+> >  	ldr	x1, [x0, #NVHE_INIT_HCR_EL2]
+> >  	msr	hcr_el2, x1
+> >  
+> > +	mov	x2, #HCR_E2H
+> > +	and	x2, x1, x2
+> > +	cbz	x2, 1f
+> > +
+> > +	mrs	x1, cnthctl_el2
+> > +	and	x1, x1, #~(BIT(0) | BIT(1))
+> > +	orr	x1, x1, #(BIT(10) | BIT(11))
+> > +	msr	cnthctl_el2, x1
+> > +1:
 > 
-> Core pmus would have the CPU device as their parent, while memory
-> controller thingies would link to the relevant node or something.
-> 
-> Ofc. all that's future-work/pending.
+> Can this be done with an alternative block keyed on ARM64_KVM_HVHE?
+> I get that __init_el2_timers needs to run before the cpu caps have been
+> evaluated, but I don't think the same applies for ___kvm_hyp_init
 
-https://lkml.kernel.org/r/20230404134225.13408-1-Jonathan.Cameron%40huawei.com
+I don't mind either way. My reasoning was that this code is hardly
+ever executed, so the performance benefit of alternatives don't really
+apply here (and the resulting object is smaller by 28 bytes... ;-).
 
-https://lkml.kernel.org/r/20230531110011.13963-2-Jonathan.Cameron%40huawei.com
+Happy to change it if you think this makes sense.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
