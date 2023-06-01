@@ -1,96 +1,133 @@
-Received: from out-54.mta1.migadu.com (out-54.mta1.migadu.com [95.215.58.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35DB023DF
-	for <kvmarm@lists.linux.dev>; Thu,  1 Jun 2023 20:11:01 +0000 (UTC)
-Date: Thu, 1 Jun 2023 20:10:56 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1685650260;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RygkjhnuiaNw7c5uQLoy01AXmbNq/ULLzHOSyqx57zc=;
-	b=C8z6oBXbjtQ7dp9Vuc55GiY+wVtYzNGNdh9RH0ankwutpHqSP6A/PPmgOkXE8vSWfYMMhH
-	VvkXszkK0UrepvIeE6Mng3YF/i8O+Ql5gGqUauRFrTSVxRMUTwE3wiFkycgbXQ00Quy1u6
-	F0CuJIJzTHAuFM7GvR5EoDwYPtb/PLI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Quentin Perret <qperret@google.com>, Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v2 05/17] arm64: Don't enable VHE for the kernel if
- OVERRIDE_HVHE is set
-Message-ID: <ZHj7UM8EbH38Z69k@linux.dev>
-References: <20230526143348.4072074-1-maz@kernel.org>
- <20230526143348.4072074-6-maz@kernel.org>
- <ZHhJmJU/m//uTI9n@linux.dev>
- <87bkhzpcut.wl-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A1833DF
+	for <kvmarm@lists.linux.dev>; Thu,  1 Jun 2023 20:31:36 +0000 (UTC)
+Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-45f2001f10aso174885e0c.3
+        for <kvmarm@lists.linux.dev>; Thu, 01 Jun 2023 13:31:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1685651495; x=1688243495;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fCdppP1yzs2e9HWgLEox7Link4qX3QEAMcIV5JXxai4=;
+        b=N8eO1ZM32oqOBHH95Zbd98y4z9RgkY90p6VScKoG8T6k2j5QsA9kuJM+EVjN5wuPGd
+         aC1MguSg77IKa4H5TMXhYD2cqZQjMgXN3ciiALsg/uAHoYdDClBpvRqyUY6Lv7kW/9dD
+         lgk2GPWMdB7DXjvtYpFvqEDWbibQdnuP6LcLg5B4bwZ5MdkjaKEQKZ1o830vF67a4T+J
+         ATURAoUoMYows1dUccovCZVqJMU57DA35LqRYMAEovWZp+e5YybXCZLuSgfsBUmxe2dl
+         z4KiAfSnUQdYnQZAuPawdvVYG2m7bHHhBSIjr5aoCpSP2ugxQDQeidWT2QziAIXnhQWZ
+         rJ2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685651495; x=1688243495;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fCdppP1yzs2e9HWgLEox7Link4qX3QEAMcIV5JXxai4=;
+        b=a+WbZdxBy9v3yfdYuVe+S8k+dE8M5vD9gKR1QA4jrkfzzsRNlIxrxp+QdkrrDXhlwx
+         9uDgsAdKreGYIfVUlI+B7mvGQlDEM2obdLEbQ/R0j6i8BmbprH6y6UjbvaQm56d5OQMb
+         QpYlu0va/9KokSIJ1aAHB0DrDgYqWSYf1zbEbkm4vcxKdqpHSOl30k6XbtYOIrpIchgc
+         y1O3/9XzAT4Cria3oYQEuL9cUEKY2cFsfroa211kTl6yf3kWP7O1zz5MVShewqUKyCxC
+         dHUUp3rRqx4u4XyMT0WqdqyKWIzlGPPQckzfBcC84zxtfFGxw5AAgwwyqfa7qfVY1bmd
+         zcyA==
+X-Gm-Message-State: AC+VfDyksSNdy5jHCR6d8cU625ToPD5Da3cigtfBDKGzS6FEmlBshG4/
+	tB6Lox4q08Dz75NvZLTfpWcek1h274A3DGYC5ipqnw==
+X-Google-Smtp-Source: ACHHUZ6yUmT7COf02IzIPOe4hskbEzCwLrkpgUz5VmUI8BA1m07nbgRhybPSjRJm4w5iLcdwfXjPF9CdwbXN/2Xv9sM=
+X-Received: by 2002:a1f:52c3:0:b0:440:3ef7:35ba with SMTP id
+ g186-20020a1f52c3000000b004403ef735bamr1076568vkb.13.1685651495198; Thu, 01
+ Jun 2023 13:31:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87bkhzpcut.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+References: <20230412213510.1220557-1-amoorthy@google.com> <20230412213510.1220557-6-amoorthy@google.com>
+ <ZHj25HsCExz/uCo/@linux.dev>
+In-Reply-To: <ZHj25HsCExz/uCo/@linux.dev>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Thu, 1 Jun 2023 13:30:58 -0700
+Message-ID: <CAF7b7mrK+SgyxjYqMyJC0PA4C8SFRX_Q=x7Db+Ck8i89wzvw8w@mail.gmail.com>
+Subject: Re: [PATCH v3 05/22] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: pbonzini@redhat.com, maz@kernel.org, seanjc@google.com, 
+	jthoughton@google.com, bgardon@google.com, dmatlack@google.com, 
+	ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com, 
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 01, 2023 at 01:48:42PM +0100, Marc Zyngier wrote:
-> On Thu, 01 Jun 2023 08:32:40 +0100,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-> > 
-> > On Fri, May 26, 2023 at 03:33:36PM +0100, Marc Zyngier wrote:
-> > > If the OVERRIDE_HVHE SW override is set (as a precursor of
-> > > the KVM_HVHE capability), do not enable VHE for the kernel
-> > > and drop to EL1 as if VHE was either disabled or unavailable.
-> > > 
-> > > Further changes will enable VHE at EL2 only, with the kernel
-> > > still running at EL1.
-> > > 
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/kernel/hyp-stub.S | 10 +++++++++-
-> > >  1 file changed, 9 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
-> > > index 9439240c3fcf..5c71e1019545 100644
-> > > --- a/arch/arm64/kernel/hyp-stub.S
-> > > +++ b/arch/arm64/kernel/hyp-stub.S
-> > > @@ -82,7 +82,15 @@ SYM_CODE_START_LOCAL(__finalise_el2)
-> > >  	tbnz	x1, #0, 1f
-> > >  
-> > >  	// Needs to be VHE capable, obviously
-> > > -	check_override id_aa64mmfr1 ID_AA64MMFR1_EL1_VH_SHIFT 2f 1f x1 x2
-> > > +	check_override id_aa64mmfr1 ID_AA64MMFR1_EL1_VH_SHIFT 0f 1f x1 x2
-> > > +
-> > > +0:	// Check whether we only want the hypervisor to run VHE, not the kernel
-> > > +	adr_l	x1, arm64_sw_feature_override
-> > > +	ldr	x2, [x1, FTR_OVR_VAL_OFFSET]
-> > > +	ldr	x1, [x1, FTR_OVR_MASK_OFFSET]
-> > > +	and	x2, x2, x1
-> > 
-> > nit: is applying the mask even necessary? I get it in the context of an
-> > overlay on top of an ID register, but the software features are more of
-> > a synthetic ID register in their own right.
-> 
-> I guess I don't have a good reason just yet, but on the other hand it
-> makes things predictable if the override code refuses the override for
-> some reason other than not being VHE-capable (mask becomes 0 and val
-> becomes 0xf).
-> 
-> Overall, I feel that this code is too hard to follow to do anything
-> different from the "standard" case.
+On Thu, Jun 1, 2023 at 12:52=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
+>
+> So the other angle of my concern w.r.t. NOWAIT exits is the fact that
+> userspace gets to decide whether or not we annotate such an exit. We all
+> agree that a NOWAIT exit w/o context isn't actionable, right?
 
-Fair enough. Coming at it from the other angle (i.e. ignoring the ID
-reg side) it is only slightly weird, but does not really matter. I'm
-fine with this as-is.
+Yup
 
--- 
-Thanks,
-Oliver
+> Sean is suggesting that we abuse the fact that kvm_run already contains
+> junk for EFAULT exits and populate kvm_run::memory_fault unconditionally
+> [*]. I agree with him, and it eliminates the odd quirk of 'bare' NOWAIT
+> exits too. Old userspace will still see 'garbage' in kvm_run struct,
+> but one man's trash is another man's treasure after all :)
+>
+> So, based on that, could you:
+>
+>  - Unconditionally prepare MEMORY_FAULT exits everywhere you're
+>    converting here
+>
+>  - Redefine KVM_CAP_MEMORY_FAULT_INFO as an informational cap, and do
+>    not accept an attempt to enable it. Instead, have calls to
+>    KVM_CHECK_EXTENSION return a set of flags describing the supported
+>    feature set.
+
+Sure. I've been collecting feedback as it comes in, so I can send up a
+v4 with everything up to now soon. The major thing left to resolve is
+that the exact set of annotations is still waiting on feedback: I've
+already gone ahead and dropped everything I wasn't sure of in [1], so
+the next version will be quite a bit smaller. If it turns out that
+I've dropped too much, then I can add things back in based on the
+feedback.
+
+[1] https://lore.kernel.org/kvm/20230412213510.1220557-1-amoorthy@google.co=
+m/T/#mfe28e6a5015b7cd8c5ea1c351b0ca194aeb33daf
+
+>    Eventually, you can stuff a bit in there to advertise that all
+>    EFAULTs are reliable.
+
+I don't think this is an objective: the idea is to annotate efaults
+tracing back to user accesses (see [2]). Although the idea of
+annotating with some "unrecoverable" flag set for other efaults has
+been tossed around, so we may end up with that.
+
+[2] https://lore.kernel.org/kvm/20230412213510.1220557-1-amoorthy@google.co=
+m/T/#m5715f3a14a6a9ff9a4188918ec105592f0bfc69a
+
+> [*] https://lore.kernel.org/kvmarm/ZHjqkdEOVUiazj5d@google.com/
+>
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index cf7d3de6f3689..f3effc93cbef3 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -1142,6 +1142,7 @@ static struct kvm *kvm_create_vm(unsigned long ty=
+pe, const char *fdname)
+> >       spin_lock_init(&kvm->mn_invalidate_lock);
+> >       rcuwait_init(&kvm->mn_memslots_update_rcuwait);
+> >       xa_init(&kvm->vcpu_array);
+> > +     kvm->fill_efault_info =3D false;
+> >
+> >       INIT_LIST_HEAD(&kvm->gpc_list);
+> >       spin_lock_init(&kvm->gpc_lock);
+> > @@ -4096,6 +4097,8 @@ static long kvm_vcpu_ioctl(struct file *filp,
+> >                       put_pid(oldpid);
+> >               }
+> >               r =3D kvm_arch_vcpu_ioctl_run(vcpu);
+> > +             WARN_ON_ONCE(r =3D=3D -EFAULT &&
+> > +                                      vcpu->run->exit_reason !=3D KVM_=
+EXIT_MEMORY_FAULT);
+>
+> This might be a bit overkill, as it will definitely fire on unsupported
+> architectures. Instead you may want to condition this on an architecture
+> actually selecting support for MEMORY_FAULT_INFO.
+
+Ah, that's embarrassing. Thanks for the catch.
