@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5744D23404
-	for <kvmarm@lists.linux.dev>; Thu,  1 Jun 2023 12:27:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D46FCC433EF;
-	Thu,  1 Jun 2023 12:27:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E172342E
+	for <kvmarm@lists.linux.dev>; Thu,  1 Jun 2023 12:48:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07D8DC4339C;
+	Thu,  1 Jun 2023 12:48:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1685622459;
-	bh=HyqkcnhCU5T36iXrGBlL9WIuUqjX4QxbHofEbqsAwkk=;
+	s=k20201202; t=1685623726;
+	bh=GytX/y1oWBpj3Fnw5IPVnEW36hsGqBLos/gDLfBNgPE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=f+QcCTK05Tz+YiIS2CTYV4uaSzK2H6olrm3kWNViE8Y6hRPKjdHJ8kJZCwnj+JcIq
-	 kaPpjIS+BMEkmQVpJV+gKEuQpiz1e/kochL/Tghgn4++sQ6fL+4qCtCu1qWn4/6PEg
-	 48xGKB5zpcdXH4vtQGf1AwGw3xx9wxO3qslQEXVWS8T2TXWQ/M4ukk1zIaHnHu/njO
-	 +TO/XRvmVn4nNAmWdDD7K2dnTh93cNLhcYSPuCQhKHwo034SjaG37cJcf3Ucfau5Wi
-	 hZ7RRGDNktXZM9KSiWl3OLtSuQzIsGplHVYJ/p8qEU3xoXtR0lXYk1HYEAFICDX+X8
-	 X5ydAD6PcdzqA==
+	b=WWMfoVRvmQtGcdb6aSfWFhb+k3jKow/5CweUDUxQtxSLDvWt6D3jGflO2E1sPSC3r
+	 MwKi47++HBrJ9DuktNUnRCZUt5Mzj19AtsnIm/3NenJ0sTUmIh60x1hsuXueJmwsHb
+	 ZFw0PwcxQYNSvSaydkmkM/Q7oyUM2+6e8S5xZYg6aWS+kqhgrkAjKmdDupg4e+77Wc
+	 iQDmTSb2oF0r4AlMV5tlGvnDaZn22shUdhVwnCCjVPxiL33rAa0863yW43Bz4TcN2T
+	 Bf8MN61ncNeraKCcdzQIEvv2xtA7E/Fmelt3Kngnvt/4QJkc66D65QGVEp2aGNEnWD
+	 Ft/WRYnNPeddg==
 Received: from 90.4.23.109.rev.sfr.net ([109.23.4.90] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1q4hOz-00213h-5X;
-	Thu, 01 Jun 2023 13:27:37 +0100
-Date: Thu, 01 Jun 2023 13:27:35 +0100
-Message-ID: <87cz2fpdu0.wl-maz@kernel.org>
+	id 1q4hjP-0021eM-MP;
+	Thu, 01 Jun 2023 13:48:43 +0100
+Date: Thu, 01 Jun 2023 13:48:42 +0100
+Message-ID: <87bkhzpcut.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -34,11 +34,11 @@ Cc: kvmarm@lists.linux.dev,
 	Quentin Perret <qperret@google.com>,
 	Will Deacon <will@kernel.org>,
 	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v2 04/17] arm64: Add KVM_HVHE capability and has_hvhe() predicate
-In-Reply-To: <ZHhDcIYlAGF4KOK+@linux.dev>
+Subject: Re: [PATCH v2 05/17] arm64: Don't enable VHE for the kernel if OVERRIDE_HVHE is set
+In-Reply-To: <ZHhJmJU/m//uTI9n@linux.dev>
 References: <20230526143348.4072074-1-maz@kernel.org>
-	<20230526143348.4072074-5-maz@kernel.org>
-	<ZHhDcIYlAGF4KOK+@linux.dev>
+	<20230526143348.4072074-6-maz@kernel.org>
+	<ZHhJmJU/m//uTI9n@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -54,98 +54,50 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kern
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Oliver,
-
-On Thu, 01 Jun 2023 08:06:24 +0100,
+On Thu, 01 Jun 2023 08:32:40 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Hey Marc,
-> 
-> I'm an idiot and was responding to v1. Here's the same damn comment, but
-> on v2!
-
-Probably means that I'm even more of an idiot by sending the same
-buggy code twice! :D
-
-> 
-> On Fri, May 26, 2023 at 03:33:35PM +0100, Marc Zyngier wrote:
-> > Expose a capability keying the hVHE feature as well as a new
-> > predicate testing it. Nothing is so far using it, and nothing
-> > is enabling it yet.
+> On Fri, May 26, 2023 at 03:33:36PM +0100, Marc Zyngier wrote:
+> > If the OVERRIDE_HVHE SW override is set (as a precursor of
+> > the KVM_HVHE capability), do not enable VHE for the kernel
+> > and drop to EL1 as if VHE was either disabled or unavailable.
+> > 
+> > Further changes will enable VHE at EL2 only, with the kernel
+> > still running at EL1.
 > > 
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > ---
-> >  arch/arm64/include/asm/cpufeature.h |  1 +
-> >  arch/arm64/include/asm/virt.h       |  8 ++++++++
-> >  arch/arm64/kernel/cpufeature.c      | 15 +++++++++++++++
-> >  arch/arm64/tools/cpucaps            |  1 +
-> >  4 files changed, 25 insertions(+)
+> >  arch/arm64/kernel/hyp-stub.S | 10 +++++++++-
+> >  1 file changed, 9 insertions(+), 1 deletion(-)
 > > 
-> > diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-> > index bc1009890180..3d4b547ae312 100644
-> > --- a/arch/arm64/include/asm/cpufeature.h
-> > +++ b/arch/arm64/include/asm/cpufeature.h
-> > @@ -16,6 +16,7 @@
-> >  #define cpu_feature(x)		KERNEL_HWCAP_ ## x
+> > diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
+> > index 9439240c3fcf..5c71e1019545 100644
+> > --- a/arch/arm64/kernel/hyp-stub.S
+> > +++ b/arch/arm64/kernel/hyp-stub.S
+> > @@ -82,7 +82,15 @@ SYM_CODE_START_LOCAL(__finalise_el2)
+> >  	tbnz	x1, #0, 1f
 > >  
-> >  #define ARM64_SW_FEATURE_OVERRIDE_NOKASLR	0
-> > +#define ARM64_SW_FEATURE_OVERRIDE_HVHE		4
-> >  
-> >  #ifndef __ASSEMBLY__
-> >  
-> > diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-> > index 91029709d133..5f84a87a6a2d 100644
-> > --- a/arch/arm64/include/asm/virt.h
-> > +++ b/arch/arm64/include/asm/virt.h
-> > @@ -145,6 +145,14 @@ static __always_inline bool is_protected_kvm_enabled(void)
-> >  		return cpus_have_final_cap(ARM64_KVM_PROTECTED_MODE);
-> >  }
-> >  
-> > +static __always_inline bool has_hvhe(void)
-> > +{
-> > +	if (is_vhe_hyp_code())
-> > +		return false;
+> >  	// Needs to be VHE capable, obviously
+> > -	check_override id_aa64mmfr1 ID_AA64MMFR1_EL1_VH_SHIFT 2f 1f x1 x2
+> > +	check_override id_aa64mmfr1 ID_AA64MMFR1_EL1_VH_SHIFT 0f 1f x1 x2
 > > +
-> > +	return cpus_have_final_cap(ARM64_KVM_HVHE);
-> > +}
-> > +
-> >  static inline bool is_hyp_nvhe(void)
-> >  {
-> >  	return is_hyp_mode_available() && !is_kernel_in_hyp_mode();
-> > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> > index 2d2b7bb5fa0c..04ef60571b37 100644
-> > --- a/arch/arm64/kernel/cpufeature.c
-> > +++ b/arch/arm64/kernel/cpufeature.c
-> > @@ -1998,6 +1998,15 @@ static bool has_nested_virt_support(const struct arm64_cpu_capabilities *cap,
-> >  	return true;
-> >  }
-> >  
-> > +static bool hvhe_possible(const struct arm64_cpu_capabilities *entry,
-> > +			  int __unused)
-> > +{
-> > +	u64 val;
-> > +
-> > +	val = arm64_sw_feature_override.val & arm64_sw_feature_override.mask;
-> > +	return cpuid_feature_extract_unsigned_field(val, ARM64_SW_FEATURE_OVERRIDE_HVHE);
-> > +}
+> > +0:	// Check whether we only want the hypervisor to run VHE, not the kernel
+> > +	adr_l	x1, arm64_sw_feature_override
+> > +	ldr	x2, [x1, FTR_OVR_VAL_OFFSET]
+> > +	ldr	x1, [x1, FTR_OVR_MASK_OFFSET]
+> > +	and	x2, x2, x1
 > 
-> Does this need to test ID_AA64MMFR1_EL1.VH as well? Otherwise I don't
-> see what would stop us from attempting hVHE on a system with asymmetric
-> support for VHE, as the software override was only evaluated on the boot
-> CPU.
+> nit: is applying the mask even necessary? I get it in the context of an
+> overlay on top of an ID register, but the software features are more of
+> a synthetic ID register in their own right.
 
-Huh. You obviously have a filthy mind. Yeah, we could also test for
-the sanitised view of MMFR1.VH and change our mind at the last minute.
-I'll add a check. It also probably means that I need to make this a
-"ARM64_CPUCAP_SYSTEM_FEATURE" instead of a
-"ARM64_CPUCAP_STRICT_BOOT_CPU_FEATURE" (I think...).
+I guess I don't have a good reason just yet, but on the other hand it
+makes things predictable if the override code refuses the override for
+some reason other than not being VHE-capable (mask becomes 0 and val
+becomes 0xf).
 
-But it has to be said that such a system, even without my hacks, would
-badly explode if the boot CPU was VHE capable and a secondary wasn't.
-The boot logic would keep one CPU at EL2 and move the secondary to
-EL1, and things would seamingly work until you try to do things like
-TLB invalidation (and you probably wouldn't even get a timer
-interrupt...).
+Overall, I feel that this code is too hard to follow to do anything
+different from the "standard" case.
 
 Thanks,
 
