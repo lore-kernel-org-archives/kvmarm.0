@@ -1,385 +1,204 @@
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 195A610E3
-	for <kvmarm@lists.linux.dev>; Fri,  2 Jun 2023 01:03:34 +0000 (UTC)
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6261a61b38cso13680176d6.1
-        for <kvmarm@lists.linux.dev>; Thu, 01 Jun 2023 18:03:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D42C10E3
+	for <kvmarm@lists.linux.dev>; Fri,  2 Jun 2023 01:37:40 +0000 (UTC)
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-33b398f2ab8so62245ab.0
+        for <kvmarm@lists.linux.dev>; Thu, 01 Jun 2023 18:37:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685667814; x=1688259814;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=fifPbYRt7uf4jrnxrsmNmTUn9mTwVSfuWFw3+q4TwW4=;
-        b=e7RU9qqs4L6U85i40ME9dyzQJXpwlCftOi1R9nWukod3Agcnhs30TAxD8LtgeLlujq
-         kKB9XNk6rVLc7GEWpfsTGBfKy0T89eE24XValGAPK9hnMIoC8mX7Fc5u5kDaCHucKy6k
-         d2vXW9xHCEiPQRbWx4sChy4Q6nPxWc8lNLzaX3Bi+KPrwLimAJvH/b846GYEERefarUT
-         P6z61PBGyWsUoG006Yz6zD9sEnI5OgYdh2uabGHNtt5Rgk2LwM0m9m/qVdDGf6wDelWf
-         xRTNowpsmSkzbjL28pGaHUoGCOskLub7pwtzjedwZZfcEeSylZ0ZtjrDgZ/o4xepZA1i
-         AAtw==
+        d=google.com; s=20221208; t=1685669859; x=1688261859;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XqK+LRqUfX7YWXdw+FC58BH33IXhJbV4zkm9bX0JR7g=;
+        b=lNs//9ZjI8SYBNPM84Yyp+jfuQxpvN4VGBDkGBNVlWSSahevpk4zeGRX8Ch6GPM3Hq
+         VnT2ijtWicIIZHThS+cvOf4QwGLiuTxbEfFkbXjB3LkrfHY4xoAz2gTAIgvP30Z9W5Sc
+         Xd4ooWgvhdVYbJfe/SEvqzEl8P6xMoP3Ye7Dz+CFC0SHk7h5dWGe/iQIw3QrWieJGvnR
+         l8z10UpgH45xTmiSJ/Zl60beF+7tIxysma7VFexBlweVYmnT/LoXS80UQyoV0LBCWDiR
+         N4h2fq3Hf+TFGtgT2RrMSnbFrCFM58ckJNrpSMvDIwLFM9SNfccB73Fxhh1Kwj/LNf21
+         oO9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685667814; x=1688259814;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fifPbYRt7uf4jrnxrsmNmTUn9mTwVSfuWFw3+q4TwW4=;
-        b=WbomDQukFDYL50L4Ae+CIucD8DLI053lNhtBUR+Vo53ya2uLZZ/EJg0mloZyEcie8U
-         XV0uysc8ldn2tbqgCQhxDo5RZHeFfxIZTrqXCvXBn6TBtoLpI46mcyGeEHPyT+9NDS19
-         ecIqOb55hDWC52hsDxScwz7naISpJqU1K/UQcR+7ZuQDbW9uLo4b6wNE2nJzAkxoKiij
-         mEkeulWJz+aQqwZRQ3rSKEvAdI0oU/EtsWOreEw8M8G18bcUd8DyhLCFZ9AtEFsSDHCc
-         e0vI/vLzkXwl+DXDn7JlUMsAIznRMy6VqQzsT62ePJJUdUlM8vEFviEpIC9szC+2j2jg
-         2YEg==
-X-Gm-Message-State: AC+VfDxCWaWyvz4WCE2LCf+2CIuOc5Q5g9HbsYDSPNmA0UTeg7X0ZrxV
-	DmJbMZAkKe2k9f+Vp2IfhFE=
-X-Google-Smtp-Source: ACHHUZ5T0KF0cSCpFqB8uSg5fYLmyxjn0HPTgo4HHSq2D++cg5aR8NqChT+OJzQ/G+ItyXaZREE0zQ==
-X-Received: by 2002:a05:6214:1c4a:b0:61a:197b:605 with SMTP id if10-20020a0562141c4a00b0061a197b0605mr15130271qvb.1.1685667813695;
-        Thu, 01 Jun 2023 18:03:33 -0700 (PDT)
-Received: from [192.168.201.150] (54-240-198-32.amazon.com. [54.240.198.32])
-        by smtp.googlemail.com with ESMTPSA id v8-20020ac873c8000000b003f0af201a2dsm82285qtp.81.2023.06.01.18.03.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Jun 2023 18:03:33 -0700 (PDT)
-Message-ID: <cdbbd0d45079d58afcc92318114f04e2a43f0fd7.camel@gmail.com>
-Subject: Re: [PATCH v9 5/5] KVM: arm64: Refactor writings for
- PMUVer/CSV2/CSV3
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-To: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>, KVMARM
- <kvmarm@lists.linux.dev>, ARMLinux <linux-arm-kernel@lists.infradead.org>, 
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@google.com>
-Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
- James Morse <james.morse@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad
- Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>, Raghavendra
- Rao Ananta <rananta@google.com>, Suraj Jitindar Singh <surajjs@amazon.com>
-Date: Thu, 01 Jun 2023 18:03:30 -0700
-In-Reply-To: <20230517061015.1915934-6-jingzhangos@google.com>
-References: <20230517061015.1915934-1-jingzhangos@google.com>
-	 <20230517061015.1915934-6-jingzhangos@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu1 
+        d=1e100.net; s=20221208; t=1685669859; x=1688261859;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XqK+LRqUfX7YWXdw+FC58BH33IXhJbV4zkm9bX0JR7g=;
+        b=ID8WAXXvSW6w2O4kcux5XH1id4x/yy08Nj6Q9K7tPdeY1y1x0ve6kzLaGOkYVnj6RQ
+         6f5xnexB5vFV0eOLIlDPul2CYAGDRPtr3JpfR70dbh73TQWKQcrVlDuvjUbXLIA4QlDk
+         aus7i0pLq0AI0OEJEM3wnAuQf3XRJ/HVn/r4TSu2n1mMQFOB9EfgNLeiVlMxYVyJpVQo
+         Z14eo49PJn5mR7Ss+wlJIoGh2LN5M0yhXCaVui+d7SKM/xuZEpsEP+uMYpFcwbcyvATX
+         SL223WKpoHDzfTuy2N0dAOKAnDBtknIT9YdOaKaoX0QjfRuJr6ORF0KbTFwdqoVMnxSN
+         Z7mA==
+X-Gm-Message-State: AC+VfDyYKV2cw01+gRZhjW1MA1rofdLsfsKImYgHcBN35KAJcAFAAWu7
+	XkdU9TtW05ehAwI8HouzsAnrFu5VX8mRjSwhLiSOHw==
+X-Google-Smtp-Source: ACHHUZ59LayDDuFa4x5N7le29MHxojRgO7APtJiUVFdDa51w0VW6AysowPj3x1sUV/AAwEyyH5BzRW2PlE3RH21PvtU=
+X-Received: by 2002:a05:6e02:214e:b0:33b:3d94:afb5 with SMTP id
+ d14-20020a056e02214e00b0033b3d94afb5mr58573ilv.25.1685669859279; Thu, 01 Jun
+ 2023 18:37:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+References: <20230519005231.3027912-1-rananta@google.com> <20230519005231.3027912-4-rananta@google.com>
+ <87v8gbjkzn.wl-maz@kernel.org> <CAJHc60x0iFWOFxcCYpH6bG+CinBM2TmYxvADKwOqDsUFJCr0AA@mail.gmail.com>
+ <86zg5kc2ho.wl-maz@kernel.org>
+In-Reply-To: <86zg5kc2ho.wl-maz@kernel.org>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Thu, 1 Jun 2023 18:37:28 -0700
+Message-ID: <CAJHc60wKDbfQsjmxkv9A6h56NXtU=DapDynFLDtdvChX_ueQeA@mail.gmail.com>
+Subject: Re: [PATCH v4 3/6] KVM: arm64: Implement kvm_arch_flush_remote_tlbs_range()
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Ricardo Koller <ricarkol@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Jing Zhang <jingzhangos@google.com>, 
+	Colton Lewis <coltonlewis@google.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Wed, May 31, 2023 at 1:46=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> On Tue, 30 May 2023 22:22:23 +0100,
+> Raghavendra Rao Ananta <rananta@google.com> wrote:
+> >
+> > On Mon, May 29, 2023 at 7:00=E2=80=AFAM Marc Zyngier <maz@kernel.org> w=
+rote:
+> > >
+> > > On Fri, 19 May 2023 01:52:28 +0100,
+> > > Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > > >
+> > > > Implement kvm_arch_flush_remote_tlbs_range() for arm64
+> > > > to invalidate the given range in the TLB.
+> > > >
+> > > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > > > ---
+> > > >  arch/arm64/include/asm/kvm_host.h |  3 +++
+> > > >  arch/arm64/kvm/hyp/nvhe/tlb.c     |  4 +---
+> > > >  arch/arm64/kvm/mmu.c              | 11 +++++++++++
+> > > >  3 files changed, 15 insertions(+), 3 deletions(-)
+> > > >
+> > > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include=
+/asm/kvm_host.h
+> > > > index 81ab41b84f436..343fb530eea9c 100644
+> > > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > > @@ -1081,6 +1081,9 @@ struct kvm *kvm_arch_alloc_vm(void);
+> > > >  #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
+> > > >  int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
+> > > >
+> > > > +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
+> > > > +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_=
+gfn, u64 pages);
+> > > > +
+> > > >  static inline bool kvm_vm_is_protected(struct kvm *kvm)
+> > > >  {
+> > > >       return false;
+> > > > diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvh=
+e/tlb.c
+> > > > index d4ea549c4b5c4..d2c7c1bc6d441 100644
+> > > > --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
+> > > > +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> > > > @@ -150,10 +150,8 @@ void __kvm_tlb_flush_vmid_range(struct kvm_s2_=
+mmu *mmu,
+> > > >               return;
+> > > >       }
+> > > >
+> > > > -     dsb(ishst);
+> > > > -
+> > > >       /* Switch to requested VMID */
+> > > > -     __tlb_switch_to_guest(mmu, &cxt);
+> > > > +     __tlb_switch_to_guest(mmu, &cxt, false);
+> > >
+> > > This hunk is in the wrong patch, isn't it?
+> > >
+> > Ah, you are right. It should be part of the previous patch. I think I
+> > introduced it accidentally when I rebased the series. I'll remove it
+> > in the next spin.
+> >
+> >
+> > > >
+> > > >       __flush_tlb_range_op(ipas2e1is, start, pages, stride, 0, 0, f=
+alse);
+> > > >
+> > > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > > > index d0a0d3dca9316..e3673b4c10292 100644
+> > > > --- a/arch/arm64/kvm/mmu.c
+> > > > +++ b/arch/arm64/kvm/mmu.c
+> > > > @@ -92,6 +92,17 @@ int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
+> > > >       return 0;
+> > > >  }
+> > > >
+> > > > +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_=
+gfn, u64 pages)
+> > > > +{
+> > > > +     phys_addr_t start, end;
+> > > > +
+> > > > +     start =3D start_gfn << PAGE_SHIFT;
+> > > > +     end =3D (start_gfn + pages) << PAGE_SHIFT;
+> > > > +
+> > > > +     kvm_call_hyp(__kvm_tlb_flush_vmid_range, &kvm->arch.mmu, star=
+t, end);
+> > >
+> > > So that's the point that I think is not right. It is the MMU code tha=
+t
+> > > should drive the invalidation method, and not the HYP code. The HYP
+> > > code should be as dumb as possible, and the logic should be kept in
+> > > the MMU code.
+> > >
+> > > So when a range invalidation is forwarded to HYP, it's a *valid* rang=
+e
+> > > invalidation. not something that can fallback to VMID-wide invalidati=
+on.
+> > >
+> > I'm guessing that you are referring to patch-2. Do you recommend
+> > moving the 'pages >=3D MAX_TLBI_RANGE_PAGES' logic here and simply
+> > return an error? How about for the other check:
+> > system_supports_tlb_range()?
+> > The idea was for __kvm_tlb_flush_vmid_range() to also implement a
+> > fallback mechanism in case the system doesn't support the range-based
+> > instructions. But if we end up calling __kvm_tlb_flush_vmid_range()
+> > from multiple cases, we'd end up duplicating the checks. WDYT?
+>
+> My take is that there should be a single helper deciding to issue
+> either a number of range-based TLBIs depending on start/end, or a
+> single VMID-based TLBI. Having multiple calling sites is not a
+> problem, and even if that code gets duplicated, big deal.
+>
+Hypothetically, if I move the check to this patch and return an error
+if this situation occurs, since I'm dependending on David's common MMU
+code [1], kvm_main.c would end of calling kvm_flush_remote_tlbs() and
+we'd be doing a VMID-based TLBI.
+One idea would be to issue a WARN_ON() and return 0 so that we don't
+issue any TLBIs. Thoughts?
 
-With the patch set you posted I get some kvm unit tests failures due to
-being unable to update register values from userspace. I propose the
-following patch as a solution:
+> But a hypercall that falls back to global invalidation based on a
+> range evaluation error (more than MAX_TLBI_RANGE_PAGES) is papering
+> over a latent bug.
+>
+If I understand this correctly, MAX_TLBI_RANGE_PAGES is specifically
+the capacity of the range-based instructions itself, isn't it? Is it
+incorrect for the caller to request a higher range be invalidated even
+on systems that do not support these instructions? Probably that's why
+__flush_tlb_range() falls back to a global flush when the range
+request is exceeded?
 
-[PATCH 1/2] KVM: arm64: Update id_reg limit value based on per vcpu
- flags
+Thank you.
+Raghavendra
 
-There are multiple features the availability of which is
-enabled/disabled
-and tracked on a per vcpu level in vcpu->arch.flagset e.g. sve,
-ptrauth,
-and pmu. While the vm wide value of the id regs which represent the
-availability of these features is stored in the id_regs kvm struct
-their
-value needs to be manipulated on a per vcpu basis. This is done at read
-time in kvm_arm_read_id_reg().
+[1]:  https://lore.kernel.org/linux-arm-kernel/20230126184025.2294823-7-dma=
+tlack@google.com/
 
-The value of these per vcpu flags needs to be factored in when
-calculating
-the id_reg limit value in check_features() as otherwise we can run into
-the
-following scenario.
 
-[ running on cpu which supports sve ]
-1. AA64PFR0.SVE set in id_reg by kvm_arm_init_id_regs() (cpu supports
-it
-   and so is set in value returned from read_sanitised_ftr_reg())
-2. vcpus created without sve feature enabled
-3. vmm reads AA64PFR0 and attempts to write the same value back
-   (writing the same value back is allowed)
-4. write fails in check_features() as limit has AA64PFR0.SVE set
-however it
-   is not set in the value being written and although a lower value is
-   allowed for this feature it is not in the mask of bits which can be
-   modified and so much match exactly.
-
-Thus add a step in check_features() to update the limit returned from
-id_reg->reset() with the per vcpu features which may have been
-enabled/disabled at vcpu creation time after the id_regs were
-initialised.
-Split this update into a new function named kvm_arm_update_id_reg() so
-it
-can be called from check_features() as well as kvm_arm_read_id_reg() to
-dedup code.
-
-While we're here there are features which are masked in
-kvm_arm_update_id_reg() which cannot change through out a vms
-lifecycle.
-Thus rather than masking them each time the register is read, mask them
-at
-id_reg init time so that the value in the kvm id_reg reflects the state
-of
-support for that feature.
-Move masking of AA64PFR0_EL1.GIC and AA64PFR0_EL1.AMU into
-read_sanitised_id_aa64pfr0_el1().
-Create read_sanitised_id_aa64pfr1_el1() and mask AA64PFR1_EL1.SME.
-Create read_sanitised_id_[mmfr4|aa64mmfr2] and mask CCIDX.
-
-Finally remove set_id_aa64pfr0_el1() as all it does is mask
-AA64PFR0_EL1_CS[2|3]. The limit for these fields is already set
-according
-to cpu support in read_sanitised_id_aa64pfr0_el1() and then checked
-when
-writing the register in check_features() as such there is no need to
-perform the check twice.
-
-Signed-off-by: Suraj Jitindar Singh <surajjs@amazon.com>
----
- arch/arm64/kvm/sys_regs.c | 113 ++++++++++++++++++++++++--------------
- 1 file changed, 73 insertions(+), 40 deletions(-)
-
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index bec02ba45ee7..ca793cd692fe 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -42,6 +42,7 @@
-  */
-=20
- static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc
-*rd, u64 val);
-+static u64 kvm_arm_update_id_reg(const struct kvm_vcpu *vcpu, u32 id,
-u64 val);
- static u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id);
- static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
-=20
-@@ -1241,6 +1242,7 @@ static int arm64_check_features(struct kvm_vcpu
-*vcpu,
- 	/* For hidden and unallocated idregs without reset, only val =3D
-0 is allowed. */
- 	if (rd->reset) {
- 		limit =3D rd->reset(vcpu, rd);
-+		limit =3D kvm_arm_update_id_reg(vcpu, id, limit);
- 		ftr_reg =3D get_arm64_ftr_reg(id);
- 		if (!ftr_reg)
- 			return -EINVAL;
-@@ -1317,24 +1319,17 @@ static u64
-general_read_kvm_sanitised_reg(struct kvm_vcpu *vcpu, const struct sy
- 	return read_sanitised_ftr_reg(reg_to_encoding(rd));
- }
-=20
--static u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
-+/* Provide an updated value for an ID register based on per vcpu flags
-*/
-+static u64 kvm_arm_update_id_reg(const struct kvm_vcpu *vcpu, u32 id,
-u64 val)
- {
--	u64 val =3D IDREG(vcpu->kvm, id);
--
- 	switch (id) {
- 	case SYS_ID_AA64PFR0_EL1:
- 		if (!vcpu_has_sve(vcpu))
- 			val &=3D
-~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE);
--		if (kvm_vgic_global_state.type =3D=3D VGIC_V3) {
--			val &=3D
-~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC);
--			val |=3D
-FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC), 1);
--		}
- 		break;
- 	case SYS_ID_AA64PFR1_EL1:
- 		if (!kvm_has_mte(vcpu->kvm))
- 			val &=3D
-~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE);
--
--		val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);
- 		break;
- 	case SYS_ID_AA64ISAR1_EL1:
- 		if (!vcpu_has_ptrauth(vcpu))
-@@ -1347,8 +1342,6 @@ static u64 kvm_arm_read_id_reg(const struct
-kvm_vcpu *vcpu, u32 id)
- 		if (!vcpu_has_ptrauth(vcpu))
- 			val &=3D
-~(ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_APA3) |
- 			=09
-ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_GPA3));
--		if (!cpus_have_final_cap(ARM64_HAS_WFXT))
--			val &=3D
-~ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_WFxT);
- 		break;
- 	case SYS_ID_AA64DFR0_EL1:
- 		/* Set PMUver to the required version */
-@@ -1361,17 +1354,18 @@ static u64 kvm_arm_read_id_reg(const struct
-kvm_vcpu *vcpu, u32 id)
- 		val |=3D
-FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon),
- 				=20
-pmuver_to_perfmon(vcpu_pmuver(vcpu)));
- 		break;
--	case SYS_ID_AA64MMFR2_EL1:
--		val &=3D ~ID_AA64MMFR2_EL1_CCIDX_MASK;
--		break;
--	case SYS_ID_MMFR4_EL1:
--		val &=3D ~ARM64_FEATURE_MASK(ID_MMFR4_EL1_CCIDX);
--		break;
- 	}
-=20
- 	return val;
- }
-=20
-+static u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
-+{
-+	u64 val =3D IDREG(vcpu->kvm, id);
-+
-+	return kvm_arm_update_id_reg(vcpu, id, val);
-+}
-+
- /* Read a sanitised cpufeature ID register by sys_reg_desc */
- static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct
-sys_reg_desc const *r)
- {
-@@ -1477,34 +1471,28 @@ static u64
-read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
- 		val |=3D
-FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3), 1);
- 	}
-=20
-+	if (kvm_vgic_global_state.type =3D=3D VGIC_V3) {
-+		val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC);
-+		val |=3D
-FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC), 1);
-+	}
-+
- 	val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU);
-=20
- 	return val;
- }
-=20
--static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
--			       const struct sys_reg_desc *rd,
--			       u64 val)
-+static u64 read_sanitised_id_aa64pfr1_el1(struct kvm_vcpu *vcpu,
-+					  const struct sys_reg_desc
-*rd)
- {
--	u8 csv2, csv3;
-+	u64 val;
-+	u32 id =3D reg_to_encoding(rd);
-=20
--	/*
--	 * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long as
--	 * it doesn't promise more than what is actually provided (the
--	 * guest could otherwise be covered in ectoplasmic residue).
--	 */
--	csv2 =3D cpuid_feature_extract_unsigned_field(val,
-ID_AA64PFR0_EL1_CSV2_SHIFT);
--	if (csv2 > 1 ||
--	    (csv2 && arm64_get_spectre_v2_state() !=3D
-SPECTRE_UNAFFECTED))
--		return -EINVAL;
-+	val =3D read_sanitised_ftr_reg(id);
-=20
--	/* Same thing for CSV3 */
--	csv3 =3D cpuid_feature_extract_unsigned_field(val,
-ID_AA64PFR0_EL1_CSV3_SHIFT);
--	if (csv3 > 1 ||
--	    (csv3 && arm64_get_meltdown_state() !=3D
-SPECTRE_UNAFFECTED))
--		return -EINVAL;
-+	/* SME is not supported */
-+	val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);
-=20
--	return set_id_reg(vcpu, rd, val);
-+	return val;
- }
-=20
- static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-@@ -1680,6 +1668,34 @@ static int set_id_dfr0_el1(struct kvm_vcpu
-*vcpu,
- 	return ret;
- }
-=20
-+static u64 read_sanitised_id_mmfr4_el1(struct kvm_vcpu *vcpu,
-+				       const struct sys_reg_desc *rd)
-+{
-+	u64 val;
-+	u32 id =3D reg_to_encoding(rd);
-+
-+	val =3D read_sanitised_ftr_reg(id);
-+
-+	/* CCIDX is not supported */
-+	val &=3D ~ARM64_FEATURE_MASK(ID_MMFR4_EL1_CCIDX);
-+
-+	return val;
-+}
-+
-+static u64 read_sanitised_id_aa64mmfr2_el1(struct kvm_vcpu *vcpu,
-+					   const struct sys_reg_desc
-*rd)
-+{
-+	u64 val;
-+	u32 id =3D reg_to_encoding(rd);
-+
-+	val =3D read_sanitised_ftr_reg(id);
-+
-+	/* CCIDX is not supported */
-+	val &=3D ~ID_AA64MMFR2_EL1_CCIDX_MASK;
-+
-+	return val;
-+}
-+
- /*
-  * cpufeature ID register user accessors
-  *
-@@ -2089,7 +2105,14 @@ static const struct sys_reg_desc sys_reg_descs[]
-=3D {
- 	AA32_ID_SANITISED(ID_ISAR3_EL1),
- 	AA32_ID_SANITISED(ID_ISAR4_EL1),
- 	AA32_ID_SANITISED(ID_ISAR5_EL1),
--	AA32_ID_SANITISED(ID_MMFR4_EL1),
-+	{ SYS_DESC(SYS_ID_MMFR4_EL1),
-+	  .access     =3D access_id_reg,
-+	  .get_user   =3D get_id_reg,
-+	  .set_user   =3D set_id_reg,
-+	  .visibility =3D aa32_id_visibility,
-+	  .reset      =3D read_sanitised_id_mmfr4_el1,
-+	  .val =3D 0, },
-+	ID_HIDDEN(ID_AFR0_EL1),
- 	AA32_ID_SANITISED(ID_ISAR6_EL1),
-=20
- 	/* CRm=3D3 */
-@@ -2107,10 +2130,15 @@ static const struct sys_reg_desc
-sys_reg_descs[] =3D {
- 	{ SYS_DESC(SYS_ID_AA64PFR0_EL1),
- 	  .access =3D access_id_reg,
- 	  .get_user =3D get_id_reg,
--	  .set_user =3D set_id_aa64pfr0_el1,
-+	  .set_user =3D set_id_reg,
- 	  .reset =3D read_sanitised_id_aa64pfr0_el1,
- 	  .val =3D ID_AA64PFR0_EL1_CSV2_MASK |
-ID_AA64PFR0_EL1_CSV3_MASK, },
--	ID_SANITISED(ID_AA64PFR1_EL1),
-+	{ SYS_DESC(SYS_ID_AA64PFR1_EL1),
-+	  .access =3D access_id_reg,
-+	  .get_user =3D get_id_reg,
-+	  .set_user =3D set_id_reg,
-+	  .reset =3D read_sanitised_id_aa64pfr1_el1,
-+	  .val =3D 0, },
- 	ID_UNALLOCATED(4,2),
- 	ID_UNALLOCATED(4,3),
- 	ID_SANITISED(ID_AA64ZFR0_EL1),
-@@ -2146,7 +2174,12 @@ static const struct sys_reg_desc sys_reg_descs[]
-=3D {
- 	/* CRm=3D7 */
- 	ID_SANITISED(ID_AA64MMFR0_EL1),
- 	ID_SANITISED(ID_AA64MMFR1_EL1),
--	ID_SANITISED(ID_AA64MMFR2_EL1),
-+	{ SYS_DESC(SYS_ID_AA64MMFR2_EL1),
-+	  .access =3D access_id_reg,
-+	  .get_user =3D get_id_reg,
-+	  .set_user =3D set_id_reg,
-+	  .reset =3D read_sanitised_id_aa64mmfr2_el1,
-+	  .val =3D 0, },
- 	ID_UNALLOCATED(7,3),
- 	ID_UNALLOCATED(7,4),
- 	ID_UNALLOCATED(7,5),
-
+> There should be no logic whatsoever in any of the two tlb.c files.
+> Only a switch to the correct context, and the requested invalidation,
+> which *must* be architecturally correct.
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
