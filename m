@@ -1,40 +1,40 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E6631C758
-	for <kvmarm@lists.linux.dev>; Fri,  2 Jun 2023 16:09:39 +0000 (UTC)
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-56552a72cfbso33353427b3.3
-        for <kvmarm@lists.linux.dev>; Fri, 02 Jun 2023 09:09:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8EC81C75A
+	for <kvmarm@lists.linux.dev>; Fri,  2 Jun 2023 16:09:40 +0000 (UTC)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1b020864ae2so22032715ad.3
+        for <kvmarm@lists.linux.dev>; Fri, 02 Jun 2023 09:09:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685722178; x=1688314178;
+        d=google.com; s=20221208; t=1685722180; x=1688314180;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NyrihgmYesBmBKLp4ITVdJ3LGNh6LVDPlJHbJ3BWmKo=;
-        b=6JvB68luEiFeoyKEfjP/g+vMwC/sRddTQaYllS5g+5bpQDmhXIgwwZiHHiYhNY6/hh
-         +N3LQSiNtnyna/XZaiM18ivCXXQ4yuX/15A1AGZwy0Qa/f1hIAf3oKXB2h5AuHkYQgCs
-         xj8Y82H0f8TZvkTqQ0Hx5MWBndbNiI7NCzZ3czEuYGWHs7LAUCirzskxbkVOl+noMZFx
-         tm27fSCTKAwfbeEstcfEbI/nW6D9qAihf0lb2MdszgnmyhfNayDhGNG1boLJ+W+UNY9A
-         PKxN0bCcFoMuNsJAFUnK+mzP9snrdOrZPjuzoVjhjXEuIkdNPWm6zU7rdhcbdNuxMxHK
-         DaOA==
+        bh=i16qvWrTxXmM44zqvAfMO+VQ2ZgLrONxQcP35eFduXw=;
+        b=7epqj+D7b/Vs8MJCaB/Yaig4pdk6Xsa6+PhHha/KiUX7vkzJuwNVRvh/QKSBOYWOoF
+         9Kl1CGagQi1DXxlGyYvTod7C6g15Jc/lvseccbcVTnZGlpUMuN85YotpNb24SiVNDe/4
+         jJWg+BewppQ9iRi+5TbG/EFvPtgidVbx51XdS+ZgnSZfKoodj1WI4tk7ctB/2mpU7ujt
+         5GR5L1lxyi6Yc/dQP61OizppKV4BxJWb97C2tfKTvu6BWLjF7QcXhyPnKGED9xXxbRV0
+         rkKjEao0Yem9n3mVyvzo3PMl7x2joHF/KT0tNezMLtd5RxYZ9imnBCUvokvJr8Ssuvgw
+         mKhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685722178; x=1688314178;
+        d=1e100.net; s=20221208; t=1685722180; x=1688314180;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NyrihgmYesBmBKLp4ITVdJ3LGNh6LVDPlJHbJ3BWmKo=;
-        b=M0evK5XNUndE/UmDeXW9zGO7hmEk80rrAduJ78jCIELKx1TCH4R7YNl6PvmYEQlDNP
-         Vz8Zc40hjoAaQkeiyAAjIKO5hS3NdhQ06wIA23z7tchOQW2YKemg4J0iOqu+6v3e/0be
-         61zJt9bh7/tNzzOreTAdtevyqx1d4iea3NlvXnSav+AHrrZQhZy+qj1E9Kcw3PBIV/Vs
-         jJ6lau1m6XAo5Y43kfeCy1TYgRinUFj6fKI4qbB+jEeghQQ0qjBtmf/bmmSWJIsuusi+
-         /4ZvKHKR5vk7csGIzJrQtg0Uy4fxHAOn1zX5k542d7oOslS39UIkHFEGrUZPMvwSZ1b8
-         UQMQ==
-X-Gm-Message-State: AC+VfDyNrpBWsWhR2Phk9+nJh8RAR6LWMftcbwJnomj96S2684qp/dt5
-	7qS4NbtC6ADFmN0GSVQjto5jWHPlL0M2
-X-Google-Smtp-Source: ACHHUZ7z74Jy0Y96qFW+7u40ZiTgX4ucCC/5bWAvnbf5ZGF1cU7Xjv0z02cQ2QpbWgJAAII5qTnOdyVeR9zk
+        bh=i16qvWrTxXmM44zqvAfMO+VQ2ZgLrONxQcP35eFduXw=;
+        b=XldGwY/Gh65+qHiBmn3LMo6nS9djCKw2ATYRYmcOipXVYeJx0a65j36UaExMGLw4Gw
+         gp51KQPFcVBo2kb0PLoBzCocjyLy83AJtfFykq9gpb58XCW80HLIjMInv7tqFzJBDlcq
+         5d0eeS6vR+p5Jgaf2moGtKA1maA5OSMHrpaqCuxbU5sER5YDU+zyfsSAq/SBeqe9h99b
+         oRmxlRzZC7grYp+VAEU99UMzavyaRp+zgLoCxs1KLeTtp10Lq7MUqkJgQ8Nlh+HF99Zs
+         HSeayv4a37XCNFNMRBlL8byaferhG+DKimgXoT4N8nPOSuJ6F+mo7TW1bEdRcr3i+1Wz
+         Rjrg==
+X-Gm-Message-State: AC+VfDxMwuCqBXZCxvDxb++Y5cKXpryGx8vDVkbV3y+7UUZIoF+u6e9W
+	P29F+WxU8x72Wbgoqg6ytDrUcwAVmE++
+X-Google-Smtp-Source: ACHHUZ50eFmYtmjd+7phpNHJVAKKYKF0b2Pf24cv0bbiOkOy3oeWBFiQvv39uMwyDgbA4q0xlnPSa5qY2vtt
 X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
- (user=vipinsh job=sendgmr) by 2002:a81:b620:0:b0:561:b8d1:743b with SMTP id
- u32-20020a81b620000000b00561b8d1743bmr170869ywh.10.1685722178126; Fri, 02 Jun
- 2023 09:09:38 -0700 (PDT)
-Date: Fri,  2 Jun 2023 09:09:07 -0700
+ (user=vipinsh job=sendgmr) by 2002:a17:903:3251:b0:1b0:6a10:1ba1 with SMTP id
+ ji17-20020a170903325100b001b06a101ba1mr117384plb.13.1685722180001; Fri, 02
+ Jun 2023 09:09:40 -0700 (PDT)
+Date: Fri,  2 Jun 2023 09:09:08 -0700
 In-Reply-To: <20230602160914.4011728-1-vipinsh@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,9 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230602160914.4011728-1-vipinsh@google.com>
 X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
-Message-ID: <20230602160914.4011728-10-vipinsh@google.com>
-Subject: [PATCH v2 09/16] KVM: arm64: Document the page table walker actions
- based on the callback's return value
+Message-ID: <20230602160914.4011728-11-vipinsh@google.com>
+Subject: [PATCH v2 10/16] KVM: arm64: Return -ENOENT if PTE is not valid in stage2_attr_walker
 From: Vipin Sharma <vipinsh@google.com>
 To: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, 
 	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
@@ -62,48 +61,115 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Vipin Sharma <vipinsh@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Document what the page table walker do when walker callback function returns
-a value.
+Return -ENOENT from stage2_attr_walker for invalid PTE. Continue page
+table walk if walker callback returns -ENOENT outside of the fault
+handler path else terminate the walk. In fault handler path, similar to
+-EAGAIN in user_mem_abort, retry guest execution.
 
-Current documentation is not correct as negative error of -EAGAIN on a
-non-shared page table walker doesn't terminate the walker and continues
-to the next step.
+stage2_attr_walker() is used from multiple places like, write
+protection, MMU notifier callbacks, and relaxing permission during vCPU
+faults. This function returns -EAGAIN for different cases:
+1. When PTE is not valid.
+2. When cmpxchg() fails while setting new SPTE.
 
-There might be a better place to keep this information, for now this
-documentation will work as a reference guide until a better way is
-found.
+For non-shared walkers, like write protection and MMU notifier, above 2
+cases are just ignored by walker and it moves to the next SPTE. #2 will
+never happen for non-shared walkers as they don't use cmpxchg() for
+updating SPTEs.
+
+For shared walkers, like vCPU fault handler, above 2 cases results in
+walk termination.
+
+In future commits, clear-dirty-log walker will write protect SPTEs under
+MMU read lock and use shared page table walker. This will result in two
+shared page table walkers type, vCPUs fault handler and clear-dirty-log,
+competing with each other and sometime causing cmpxchg() failure. So,
+-EAGAIN in clear-dirty-log walker due to cmpxchg() failure must be
+retried. Whereas, -EAGAIN in the clear-dirty-log due to invalid SPTE
+must be ignored instead of exiting as per the current logic of shared
+page table walker. This is not needed for vCPU fault handler which also
+runs via shared page table walker and terminates walk on getting -EAGAIN
+due to invalid SPTE.
+
+To handle all these scenarios, stage2_attr_walker must return different
+error codes for invalid SPTEs and cmxchg() failure. -ENOENT for invalid
+SPTE is chosen because it is not used by any other shared walker. When
+clear-dirty-log will be changed to use shared page table walker, it will
+be possible to differentiate cases of retrying, continuing or
+terminating the walk for shared fault handler and shared
+clear-dirty-log.
 
 Signed-off-by: Vipin Sharma <vipinsh@google.com>
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_pgtable.h |  1 +
+ arch/arm64/kvm/hyp/pgtable.c         | 19 ++++++++++++-------
+ arch/arm64/kvm/mmu.c                 |  2 +-
+ 3 files changed, 14 insertions(+), 8 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 8ef7e8f3f054..957bc20dab00 100644
+index 957bc20dab00..23e7e7851f1d 100644
 --- a/arch/arm64/include/asm/kvm_pgtable.h
 +++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -711,8 +711,19 @@ int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
-  * after invoking the walker callback, allowing the walker to descend into
-  * a newly installed table.
-  *
-- * Returning a negative error code from the walker callback function will
-- * terminate the walk immediately with the same error code.
-+ * Depending on the return value from the walker callback function, the page
-+ * table walk will continue or exit the walk. This is also dependent on the
-+ * type of the walker, i.e. shared walker (vCPU fault handlers) or non-shared
-+ * walker.
-+ *
-+ * Walker Type  | Callback         | Walker action
-+ * -------------|------------------|--------------
-+ * Non-Shared   | 0                | Continue
-+ * Non-Shared   | -EAGAIN          | Continue
-+ * Non-Shared   | Any other        | Exit
-+ * -------------|------------------|--------------
-+ * Shared       | 0                | Continue
-+ * Shared       | Any other        | Exit
-  *
-  * Return: 0 on success, negative error code on failure.
-  */
+@@ -720,6 +720,7 @@ int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
+  * -------------|------------------|--------------
+  * Non-Shared   | 0                | Continue
+  * Non-Shared   | -EAGAIN          | Continue
++ * Non-Shared   | -ENOENT          | Continue
+  * Non-Shared   | Any other        | Exit
+  * -------------|------------------|--------------
+  * Shared       | 0                | Continue
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index a3a0812b2301..bc8c5c4ac1cf 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -186,14 +186,19 @@ static bool kvm_pgtable_walk_continue(const struct kvm_pgtable_walker *walker,
+ 	/*
+ 	 * Visitor callbacks return EAGAIN when the conditions that led to a
+ 	 * fault are no longer reflected in the page tables due to a race to
+-	 * update a PTE. In the context of a fault handler this is interpreted
+-	 * as a signal to retry guest execution.
++	 * update a PTE.
+ 	 *
+-	 * Ignore the return code altogether for walkers outside a fault handler
+-	 * (e.g. write protecting a range of memory) and chug along with the
+-	 * page table walk.
++	 * Callbacks can also return ENOENT when PTE which is visited is not
++	 * valid.
++	 *
++	 * In the context of a fault handler interpret these as a signal
++	 * to retry guest execution.
++	 *
++	 * Ignore these return codes altogether for walkers outside a fault
++	 * handler (e.g. write protecting a range of memory) and chug along
++	 * with the page table walk.
+ 	 */
+-	if (r == -EAGAIN)
++	if (r == -EAGAIN || r == -ENOENT)
+ 		return !(walker->flags & KVM_PGTABLE_WALK_HANDLE_FAULT);
+ 
+ 	return !r;
+@@ -1072,7 +1077,7 @@ static int stage2_attr_walker(const struct kvm_pgtable_visit_ctx *ctx,
+ 	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+ 
+ 	if (!kvm_pte_valid(ctx->old))
+-		return -EAGAIN;
++		return -ENOENT;
+ 
+ 	data->level = ctx->level;
+ 	data->pte = pte;
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 1030921d89f8..356dc4131023 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1551,7 +1551,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	read_unlock(&kvm->mmu_lock);
+ 	kvm_set_pfn_accessed(pfn);
+ 	kvm_release_pfn_clean(pfn);
+-	return ret != -EAGAIN ? ret : 0;
++	return (ret != -EAGAIN && ret != -ENOENT) ? ret : 0;
+ }
+ 
+ /* Resolve the access fault by making the page young again. */
 -- 
 2.41.0.rc0.172.g3f132b7071-goog
 
