@@ -1,56 +1,65 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92F3D1B8E7
-	for <kvmarm@lists.linux.dev>; Fri,  2 Jun 2023 15:29:14 +0000 (UTC)
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-3f6da07ff00so21958805e9.3
-        for <kvmarm@lists.linux.dev>; Fri, 02 Jun 2023 08:29:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB791B909
+	for <kvmarm@lists.linux.dev>; Fri,  2 Jun 2023 16:07:07 +0000 (UTC)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1ae64580e9fso127865ad.1
+        for <kvmarm@lists.linux.dev>; Fri, 02 Jun 2023 09:07:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1685719752; x=1688311752;
+        d=google.com; s=20221208; t=1685722027; x=1688314027;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VH7GGl6xtqqxUhhpkRoUtyXARLnTkYCIQf2MqXxYtgE=;
-        b=wvx6yr7ls8G59v9HdpprjDeqwPbh3PT/MkRNNqUqIOTPuW5y9BtJTQ4/2ZgOBv+jiC
-         Md3M06BB1gqI599ZSaq1pEK8bMr/Nu19V6/r4q831YCbQqSFGUQpeWLLoaJ8lgBWQQ4W
-         TVdcIFBvQI1UCRNU0/eT03sKE+2wwFuqnHQRLfndo2O0wCouAqZtRi0/lSefx8kOn59F
-         4ui6mT22g7Rrcz3pUTz9Db0c6aSZM5fagGkykemPGjVbLzGrFeklh5hCoF2zZPaUXo08
-         3IK9vlF+Z/Dvq8VdkhtHAS5CoT18YTCAdPN7ah3Oz/yCd4pTONTXCJh85pOiGF+xORrP
-         8X3w==
+        bh=FMkaKlaqwJTd/DkC7vu4HnfzfgualBygVfd+kRFUQbE=;
+        b=EXzDdY8wCSoIjbo7zDJ5uqedhFmxLgsuhWOYuFNfD94ySeRv6kgvmSKfiR+3VJgOwf
+         JlF3sXuCY01IOlFGu9yJYlhVtIW8CeqmKiv91WB+qQjVEzjgFBQ5jCloTVeKgIWhnbD9
+         2S2aboMLxxMwiCEjxjDPLVUMXdRhIsrhfi1dVMRc/B+IGasEE+HGswhgLAFlwQ5IGSLQ
+         IT9OPI/6uwdhD1L0jnPcgkNNH8eiUIlUeNce0kD59mm33k6IteY2Jkv7sMq5v5a2tlyC
+         HiOfq0Z5zoLuhIX5iOzPAeDrcMWot97GCDdgiDm7uHQrruvdmZjTXxCYbTDL6WESIpV5
+         y70w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685719752; x=1688311752;
+        d=1e100.net; s=20221208; t=1685722027; x=1688314027;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VH7GGl6xtqqxUhhpkRoUtyXARLnTkYCIQf2MqXxYtgE=;
-        b=KWjm/MGuQQ40sp8Ra5iPFcJJrwQV19KZgAoeWfHOdxc9rTnQcP8KJhqUDwcb6UHujh
-         YxECD3oNv0uXp4ocfQjZeZQ5S+QCMMzu8Nw3on7f8LkEf9CKNJPzdl47AJjLsCRp/KHr
-         jYN8eTXZ9ZXI91IU3clf9glPlXpe/t7COGO89tJXmWHkX02f7Co/AY3WOPnyx1VmDDYQ
-         FEliZQIRPcAgySmVB2dCmXzg6/JZjdoGoRBUjoGh12DhMQAiZSnBox8aC0GOtfpn8jIv
-         ZYPRzRRw7AaKqplje5hGMZoJlZHnoOsxX9YpynVx8AUxH7JPRFm/P2aCkFdTbuj+zLdc
-         PH2w==
-X-Gm-Message-State: AC+VfDw18pIlOqWRsiznMajfQbMmGpz6WPtwpwHdgkBZ1gA00cdVAzdG
-	v6HS2j0fmD74hIO9TXvsIDl4XQ==
-X-Google-Smtp-Source: ACHHUZ7BkquLM9YR+ptHVM+gI9HbdVeAE7APzrS45L0kOK0Bup77n/kEEpU6McDR9HpDYdxhBAp3oA==
-X-Received: by 2002:a5d:6210:0:b0:30a:f17e:e02e with SMTP id y16-20020a5d6210000000b0030af17ee02emr235413wru.12.1685719752603;
-        Fri, 02 Jun 2023 08:29:12 -0700 (PDT)
-Received: from myrica (5750a5b3.skybroadband.com. [87.80.165.179])
-        by smtp.gmail.com with ESMTPSA id m4-20020a5d6a04000000b0030aea925fbesm1973116wru.50.2023.06.02.08.29.11
+        bh=FMkaKlaqwJTd/DkC7vu4HnfzfgualBygVfd+kRFUQbE=;
+        b=XsAzNkY36Ib0vGrm7jj4MuBo45L3yzbeLLM72ablq/cUL3Ie0wAP74+cZdSQpNxb14
+         vWCwJ272+xAtNUwCrapHZv72LMs/OjSGTx131zL+dziJCBJUje5dkXrraphOvwjAwbMZ
+         NDoTqdunPbL/0LYK4OMWF46ZJgaULkllWctwVCNQMcWhsNX2TSqxrCHah92BHFNN5s0G
+         QMXDuLeNJaro8ClAkD8h3tvhT5xYplO8jOdjJBiBK2R8bwpZEW0gafPGOkML/BG0V4zW
+         AC2tkUC/+hjGNlylb4Sp6q+sSbIvbUb84S2G4x7MUmWF7/DoFq5TgirPmAMtgx9m2ktF
+         wlGw==
+X-Gm-Message-State: AC+VfDwsGQ4rac8AwCa6lVT4wUuU9d24FcwhXuSUkW/DNZUBmXVDOnV2
+	hDUKn6h9k75RjB2FUieAl0cqqA==
+X-Google-Smtp-Source: ACHHUZ7lLej5a+2f9uxJc46tq7XqOd8AldjW9+7ogPzbLS9WKXHYX5ue+jY9JcESPp/XddyAGbTJDw==
+X-Received: by 2002:a17:903:684:b0:1af:e5e0:a33e with SMTP id ki4-20020a170903068400b001afe5e0a33emr179424plb.7.1685722026950;
+        Fri, 02 Jun 2023 09:07:06 -0700 (PDT)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id o23-20020a17090ac09700b0025900a4b86esm11233pjs.34.2023.06.02.09.07.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Jun 2023 08:29:12 -0700 (PDT)
-Date: Fri, 2 Jun 2023 16:29:07 +0100
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org,
-	joro@8bytes.org, robin.murphy@arm.com, james.morse@arm.com,
-	suzuki.poulose@arm.com, oliver.upton@linux.dev,
-	yuzenghui@huawei.com, dbrazdil@google.com, ryan.roberts@arm.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	iommu@lists.linux.dev
-Subject: Re: [RFC PATCH 19/45] KVM: arm64: iommu: Add domains
-Message-ID: <CAEBBgu3QbgHb2Bf1hTaYL2SDDsYKKqixJ7+u+VCd_sYj6VfWbw@mail.gmail.com>
-References: <20230201125328.2186498-1-jean-philippe@linaro.org>
- <20230201125328.2186498-20-jean-philippe@linaro.org>
- <ZGeWudESZP5BGjaA@google.com>
+        Fri, 02 Jun 2023 09:07:05 -0700 (PDT)
+Date: Fri, 2 Jun 2023 09:07:01 -0700
+From: Reiji Watanabe <reijiw@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Raghavendra Rao Anata <rananta@google.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 0/4] KVM: arm64: PMU: Fix PMUVer handling on
+ heterogeneous PMU systems
+Message-ID: <20230602160701.acbxnwk3owq2ru42@google.com>
+References: <20230527040236.1875860-1-reijiw@google.com>
+ <87zg5njlyn.wl-maz@kernel.org>
+ <20230530125324.ijrwrvoll2detpus@google.com>
+ <87mt1jkc5q.wl-maz@kernel.org>
+ <20230602052323.shjn3q2rslbuwcmc@google.com>
+ <874jnqp73o.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -59,190 +68,117 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZGeWudESZP5BGjaA@google.com>
-X-TUID: AONX6gFSOYg7
+In-Reply-To: <874jnqp73o.wl-maz@kernel.org>
 
-Hi Mostafa,
+> > > Also, didn't you have patches for the EL0 side of the PMU? I've been
+> > > trying to look for a new version, but couldn't find it...
+> > 
+> > While I'm working on fixing the series based on the recent comment from
+> > Oliver (https://lore.kernel.org/all/ZG%2Fw95pYjWnMJB62@linux.dev/),
+> > I have a new PMU EL0 issue, which blocked my testing of the series.
+> > So, I am debugging the new PMU EL0 issue.
+> > 
+> > It appears that arch_perf_update_userpage() defined in
+> > drivers/perf/arm_pmuv3.c isn't used, and instead, the weak one in
+> > kernel/events/core.c is used.
+> 
+> Wut??? How comes? /me disassembles the kernel:
+> 
+> ffff8000082a1ab0 <arch_perf_update_userpage>:
+> ffff8000082a1ab0:       d503201f        nop
+> ffff8000082a1ab4:       d503201f        nop
+> ffff8000082a1ab8:       d65f03c0        ret
+> ffff8000082a1abc:       d503201f        nop
+> ffff8000082a1ac0:       d503201f        nop
+> ffff8000082a1ac4:       d503201f        nop
+> 
+> What the hell is happening here???
+> 
+> > This prevents cap_user_rdpmc (, etc)
+> > from being set (This prevented my test program from directly
+> > accessing counters).  This seems to be caused by the commit 7755cec63ade
+> > ("arm64: perf: Move PMUv3 driver to drivers/perf").
+> 
+> It is becoming more puzzling by the minute.
+> 
+> > 
+> > I have not yet figured out why the one in arm_pmuv3.c isn't used
+> > though (The weak one in core.c seems to take precedence over strong
+> > ones under drivers/ somehow...).
+> > 
+> > Anyway, I worked around the new issue for now, and ran the test for
+> > my series though. I will post the new version of the EL0 series
+> > tomorrow hopefully.
+> 
+> I have a "fix" for this. It doesn't make any sense, but it seems to
+> work here (GCC 10.2.1 from Debian). Can you please give it a shot?
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> From 236ac26bd0e03bf2ca3b40471b61a35b02272662 Mon Sep 17 00:00:00 2001
+> From: Marc Zyngier <maz@kernel.org>
+> Date: Fri, 2 Jun 2023 09:52:25 +0100
+> Subject: [PATCH] perf/core: Drop __weak attribute on arch-specific prototypes
+> 
+> Reiji reports that the arm64 implementation of arch_perf_update_userpage()
+> is now ignored and replaced by the dummy stub in core code.
+> This seems to happen since the PMUv3 driver was moved to driver/perf.
+> 
+> As it turns out, dropping the __weak attribute from the *prototype*
+> of the function solves the problem. You're right, this doesn't seem
+> to make much sense. And yet...
+> 
+> With this, arm64 is able to enjoy arch_perf_update_userpage() again.
 
-On Fri, 19 May 2023 at 16:33, Mostafa Saleh <smostafa@google.com> wrote:
->
-> Hi Jean,
->
-> On Wed, Feb 01, 2023 at 12:53:03PM +0000, Jean-Philippe Brucker wrote:
-> > +/*
-> > + * Serialize access to domains and IOMMU driver internal structures (command
-> > + * queue, device tables)
-> > + */
-> > +static hyp_spinlock_t iommu_lock;
-> > +
-> I was looking more into this lock and I think we can make it per IOMMU instead
-> of having one big lock to avoid congestion, as I see it is only used to
-> protect per-IOMMU resources.
+Oh, that's interesting... But, it worked, thank you!
+(With the patch, the disassembles of the kernel for
+arch_perf_update_userpage look right, and my EL0 test works fine)
 
-Yes it's a major bottleneck, thanks for looking into this. I think we'll
-eventually want to improve scalability within an IOMMU and even a domain:
-a multi-queue network device will share a single domain between multiple
-CPUs, each issuing lots of map/unmap calls. Or just two devices drivers
-working on different CPUs and sharing one IOMMU. In those cases the
-per-IOMMU lock won't be good enough and we'll be back to this problem, but
-a per-IOMMU lock should already improve scalability for some systems.
 
-Currently the global lock protects:
+> And while we're at it, drop the same __weak attribute from the
+> arch_perf_get_page_size() prototype.
 
-(1) The domain array (per IOMMU)
-(2) The io-pgtables (per domain)
-(3) The command queue (per SMMU)
-(4) Power state (per SMMU)
+The arch_perf_get_page_size() prototype seems to be unnecessary now
+(after the commit 8af26be06272 "erf/core: Fix arch_perf_get_page_size()").
+So, it appears that we could drop the prototype itself.
 
-I ran some experiments with refcounting the domains to avoid the lock for
-(1) and (2), which improves map() scalability. See
-https://jpbrucker.net/git/linux/commit/?h=pkvm/smmu-wip&id=5ad3bc6fd589b6f11fe31ccee5b8777ba8739167
-(and another experiment to optimize the DMA refcount on branch pkvm/smmu-wip)
+Thank you,
+Reiji
 
-For (2), the io-pgtable-arm code already supports concurrent accesses
-(2c3d273eabe8 ("iommu/io-pgtable-arm: Support lockless operation")). But
-this one needs careful consideration because in the host, the io-pgtable
-code trusts the device drivers. For example it expects that only buggy
-drivers call map()/unmap() to the same IOVA concurrently. We need to make
-sure a compromised host drivers can't exploit these assumptions to do
-anything nasty.
 
-There are options to improve (3) as well. The host SMMU driver supports
-lockless command-queue (587e6c10a7ce ("iommu/arm-smmu-v3: Reduce
-contention during command-queue insertion")) but it may be too complex to
-put in the hypervisor (or rather, I haven't tried to understand it yet).
-We could also wait for systems with ECMDQ, which enables per-CPU queues.
-
-> Some special handling needed as hyp_spinlock_t is not exposed to EL1.
-> Maybe something like this:
->
-> diff --git a/arch/arm64/kvm/hyp/hyp-constants.c b/arch/arm64/kvm/hyp/hyp-constants.c
-> index b257a3b4bfc5..96d30a37f9e6 100644
-> --- a/arch/arm64/kvm/hyp/hyp-constants.c
-> +++ b/arch/arm64/kvm/hyp/hyp-constants.c
-> @@ -3,11 +3,13 @@
->  #include <linux/kbuild.h>
->  #include <nvhe/memory.h>
->  #include <nvhe/pkvm.h>
-> +#include <nvhe/spinlock.h>
->
->  int main(void)
->  {
->         DEFINE(STRUCT_HYP_PAGE_SIZE,    sizeof(struct hyp_page));
->         DEFINE(PKVM_HYP_VM_SIZE,        sizeof(struct pkvm_hyp_vm));
->         DEFINE(PKVM_HYP_VCPU_SIZE,      sizeof(struct pkvm_hyp_vcpu));
-> +       DEFINE(HYP_SPINLOCK_SIZE,       sizeof(hyp_spinlock_t));
->         return 0;
->  }
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/Makefile b/drivers/iommu/arm/arm-smmu-v3/Makefile
-> index a90b97d8bae3..cf9195e24a08 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/Makefile
-> +++ b/drivers/iommu/arm/arm-smmu-v3/Makefile
-> @@ -6,6 +6,7 @@ arm_smmu_v3-objs-$(CONFIG_ARM_SMMU_V3_SVA) += arm-smmu-v3-sva.o
->  arm_smmu_v3-objs := $(arm_smmu_v3-objs-y)
->
->  obj-$(CONFIG_ARM_SMMU_V3_PKVM) += arm_smmu_v3_kvm.o
-> +ccflags-$(CONFIG_ARM_SMMU_V3_PKVM) += -Iarch/arm64/kvm/
->  arm_smmu_v3_kvm-objs-y += arm-smmu-v3-kvm.o
->  arm_smmu_v3_kvm-objs-y += arm-smmu-v3-common.o
->  arm_smmu_v3_kvm-objs := $(arm_smmu_v3_kvm-objs-y)
-> diff --git a/include/kvm/iommu.h b/include/kvm/iommu.h
-> index ab888da731bc..82827b99b1ed 100644
-> --- a/include/kvm/iommu.h
-> +++ b/include/kvm/iommu.h
-> @@ -5,6 +5,12 @@
->  #include <asm/kvm_host.h>
->  #include <kvm/power_domain.h>
->  #include <linux/io-pgtable.h>
-> +#ifdef __KVM_NVHE_HYPERVISOR__
-> +#include <nvhe/spinlock.h>
-> +#else
-> +#include "hyp_constants.h"
-> +#endif
->
+> 
+> Reported-by: Reiji Watanabe <reijiw@google.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  include/linux/perf_event.h | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+> index d5628a7b5eaa..1509aea69a16 100644
+> --- a/include/linux/perf_event.h
+> +++ b/include/linux/perf_event.h
+> @@ -1845,12 +1845,12 @@ int perf_event_exit_cpu(unsigned int cpu);
+>  #define perf_event_exit_cpu	NULL
+>  #endif
+>  
+> -extern void __weak arch_perf_update_userpage(struct perf_event *event,
+> -					     struct perf_event_mmap_page *userpg,
+> -					     u64 now);
+> +extern void arch_perf_update_userpage(struct perf_event *event,
+> +				      struct perf_event_mmap_page *userpg,
+> +				      u64 now);
+>  
+>  #ifdef CONFIG_MMU
+> -extern __weak u64 arch_perf_get_page_size(struct mm_struct *mm, unsigned long addr);
+> +extern u64 arch_perf_get_page_size(struct mm_struct *mm, unsigned long addr);
+>  #endif
+>  
 >  /*
->   * Parameters from the trusted host:
-> @@ -23,6 +29,11 @@ struct kvm_hyp_iommu {
->
->         struct io_pgtable_params        *pgtable;
->         bool                            power_is_off;
-> +#ifdef __KVM_NVHE_HYPERVISOR__
-> +       hyp_spinlock_t                  iommu_lock;
-> +#else
-> +       u8 unused[HYP_SPINLOCK_SIZE];
-> +#endif
->  };
->
->  struct kvm_hyp_iommu_memcache {
-> diff --git a/arch/arm64/kvm/hyp/nvhe/iommu/iommu.c b/arch/arm64/kvm/hyp/nvhe/iommu/iommu.c
-> index 1f4d5fcc1386..afaf173e65ed 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/iommu/iommu.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/iommu/iommu.c
-> @@ -14,12 +14,6 @@
->
->  struct kvm_hyp_iommu_memcache __ro_after_init *kvm_hyp_iommu_memcaches;
->
-> -/*
-> - * Serialize access to domains and IOMMU driver internal structures (command
-> - * queue, device tables)
-> - */
-> -static hyp_spinlock_t iommu_lock;
-> -
->  #define domain_to_iopt(_iommu, _domain, _domain_id)            \
->         (struct io_pgtable) {                                   \
->                 .ops = &(_iommu)->pgtable->ops,                 \
-> @@ -93,10 +87,10 @@ int kvm_iommu_alloc_domain(pkvm_handle_t iommu_id, pkvm_handle_t domain_id,
->  {
->         int ret = -EINVAL;
->         struct io_pgtable iopt;
-> -       struct kvm_hyp_iommu *iommu;
-> +       struct kvm_hyp_iommu *iommu = kvm_iommu_ops.get_iommu_by_id(iommu_id);
->         struct kvm_hyp_iommu_domain *domain;
->
-> -       hyp_spin_lock(&iommu_lock);
-> +       hyp_spin_lock(&iommu->iommu_lock);
->         domain = handle_to_domain(iommu_id, domain_id, &iommu);
->         if (!domain)
->                 goto out_unlock;
-> @@ -112,7 +106,7 @@ int kvm_iommu_alloc_domain(pkvm_handle_t iommu_id, pkvm_handle_t domain_id,
->         domain->refs = 1;
->         domain->pgd = iopt.pgd;
->  out_unlock:
-> -       hyp_spin_unlock(&iommu_lock);
-> +       hyp_spin_unlock(&iommu->iommu_lock);
->         return ret;
->  }
->
-> @@ -120,10 +114,10 @@ int kvm_iommu_free_domain(pkvm_handle_t iommu_id, pkvm_handle_t domain_id)
->  {
->         int ret = -EINVAL;
->         struct io_pgtable iopt;
-> -       struct kvm_hyp_iommu *iommu;
-> +       struct kvm_hyp_iommu *iommu = kvm_iommu_ops.get_iommu_by_id(iommu_id);
->         struct kvm_hyp_iommu_domain *domain;
->
-> -       hyp_spin_lock(&iommu_lock);
-> +       hyp_spin_lock(&iommu->iommu_lock);
->         domain = handle_to_domain(iommu_id, domain_id, &iommu);
->         if (!domain)
->                 goto out_unlock;
-> @@ -137,7 +131,7 @@ int kvm_iommu_free_domain(pkvm_handle_t iommu_id, pkvm_handle_t domain_id)
->         memset(domain, 0, sizeof(*domain));
->
->  out_unlock:
-> -       hyp_spin_unlock(&iommu_lock);
-> +       hyp_spin_unlock(&iommu->iommu_lock);
->         return ret;
->  }
-> --
->
-> (I didn't include full patch as it is too long, but mainly the
-> rest is s/&iommu_lock/&iommu->iommu_lock)
->
-> Please let me know what do you think?
-
-It makes sense, I can append it to my tree or squash it (with your S-o-B)
-if you want to send the full patch
-
-Thanks,
-Jean
+> -- 
+> 2.39.2
+> 
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
