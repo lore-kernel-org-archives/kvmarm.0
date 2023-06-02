@@ -1,40 +1,40 @@
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B51521C750
-	for <kvmarm@lists.linux.dev>; Fri,  2 Jun 2023 16:19:58 +0000 (UTC)
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-75b3b759217so319060085a.1
-        for <kvmarm@lists.linux.dev>; Fri, 02 Jun 2023 09:19:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84FB51C765
+	for <kvmarm@lists.linux.dev>; Fri,  2 Jun 2023 16:19:59 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-babb51cb4d4so2959310276.1
+        for <kvmarm@lists.linux.dev>; Fri, 02 Jun 2023 09:19:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685722797; x=1688314797;
+        d=google.com; s=20221208; t=1685722798; x=1688314798;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FXT5aMAcAtW/D2yhSA+7CF5prLM3G5exI8idyNJeqlQ=;
-        b=MrEIIigb/YWqQ92xzazuzi8enjhLzSd+deyqUfxtAuxGcNqxPI1zoRqcgcPsZY0in6
-         qI3YYemk7dYSuAVwReP578ivZLe/S+Vb2LcuohJjUFeOTbSYeRByh+dDUtwGlWd7bqiJ
-         DaF+LJTYubD/Il4ugc/2AikpfHGkcDTqSnLD7Au/SIooTtUGWzqZ8jw3NAlmur2U5N5F
-         Gi8UEFQVo81bXlMd3kDzyQgcnjMyuxHFAHBtWhXgkIj1fL4mmWbKeGkw5tRZomR5ScUp
-         oRXjUOSbG4XMo5NR2eWkCn9pKDfIrWQE8UmzWf7SrW9kbXzhzgVc13lSDq1ZHIf25HIU
-         1OEg==
+        bh=uBjGdxZGKqeTkEhLIRcA2ijpoB4ObDOso7jT09Bdmyk=;
+        b=tgIJe4LUodVd8sWxyV+CkHwf0yCW7CfowcU4dW/0jY/jUCD8U6qotmarbTupMGnEXK
+         Pimz2/Z158ToWRqHqrGh53nmsETixzBUMqGP55QlX8XqM4WclLWl00PCtOHlGHVDZniw
+         pi+KwqT1viiO9avRcfyJAHSDIKKcSAk94XnvZmTCClhJsoxAoCyEC7+LS2D8O7lTJ+Wm
+         hJvCeN60aNWM6dIc3oqPqGbLwzebcVF/WcwH3eVVVnUd/BewHuZbNX6v+mce7bTNIz69
+         y2+8XWWJli8LU0ko9/K+1Kp6PjLZ8sCqrH2OcH4ugUs6/Yr2YfDXZmIr90rhSeuK6QXl
+         arWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685722797; x=1688314797;
+        d=1e100.net; s=20221208; t=1685722798; x=1688314798;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FXT5aMAcAtW/D2yhSA+7CF5prLM3G5exI8idyNJeqlQ=;
-        b=DmqGjQSmYrVmefhTHCHLgxpE9V8aMCbQ56mSS17A9TIo7PBEprNnLwv6wDEgWGP43b
-         f05SyVIFB748k2d1pBD1GPLPjuzjY7JW/ioUEOwJaSBCIqaoQFrf1Is4zpBidtw2ouQl
-         +Ab1J/HyibR0FVWwjd5OZLg5FvMgmTG2kObkGB2vP/Hu4q1osiNRNhazVePX6uUWx9Fm
-         SwXVmr32GQTqhdVbEcRcvkeN+xAgeptfX5V3HPDw0Q0HdlbmRI8iHuxz4dNPs4oyXCLM
-         TBzB/FgA51g1mgjjSxX3noL/fslrvesrD3Qzw2HWxltnH5ofBBInygefmlASm84tfeDf
-         gD4Q==
-X-Gm-Message-State: AC+VfDya+7Nu/JhkkrwPQOhruM5qQjsqP9/hqqvvNyQpru7uGdtlmmKA
-	PxZH4Mvv785Xx3J5MY+y63J/TD1LfUT/dQ==
-X-Google-Smtp-Source: ACHHUZ59szArc2J5yzRQ+OH/b4av8GVrQhCDas0t1JFvDETpn96b9hqdXPaAc3D2wV6P4OkT5+sVUxvqNLjTZg==
+        bh=uBjGdxZGKqeTkEhLIRcA2ijpoB4ObDOso7jT09Bdmyk=;
+        b=j0ZV6U/L9BA/NVAxbg1Urho1dm/YuAU5Wv0LNpaSpbLToeYeDGnnd/JgYSb/V71M+S
+         m30Ur1zEhzzvDbw2Mdfc9DkWEMz2bqSTe9qy5Hbd4BBdgx6CYV5IFAhSQg5vK+CFuKXX
+         QRHteE2QhmfPpZnPEA2KG2QkYkUFI3G+TBLLLMeA8PlLR6CKW8v8jodidc4P/YvoU6C6
+         EmV5jB2m4tuDbQWHSr40nDoiwv9MiwI1tY/xmsnzWUYs/1W2RxSa2+CCUmNFdF6fenmF
+         Ir/58y54XfTgh3u9BGa8Gk/ie8m3oZFExI04W+Av3MQIH8jb5x6lhpwwgzpOYe78Gs7o
+         81Ag==
+X-Gm-Message-State: AC+VfDwvunfE5ZIPRVwirrlmA+M/4Tli5iUPrNZpdkwVpRwzFwz5KVN2
+	9rQ9/oKn9xQ0bMCYM6Q7IYPm1ICDPFxZiA==
+X-Google-Smtp-Source: ACHHUZ6hqKP9JyWyo3n6zvDrZCg7oqkFbVaKZzaVMEn43NzxaLbbSVdUk5kev4pbduM0axca+nM241uku9ASRA==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a05:620a:3950:b0:75b:3839:7176 with SMTP
- id qs16-20020a05620a395000b0075b38397176mr3883333qkn.13.1685722797500; Fri,
- 02 Jun 2023 09:19:57 -0700 (PDT)
-Date: Fri,  2 Jun 2023 16:19:12 +0000
+ (user=amoorthy job=sendgmr) by 2002:a25:bc7:0:b0:ba8:cbd2:61b3 with SMTP id
+ 190-20020a250bc7000000b00ba8cbd261b3mr1233071ybl.5.1685722798429; Fri, 02 Jun
+ 2023 09:19:58 -0700 (PDT)
+Date: Fri,  2 Jun 2023 16:19:13 +0000
 In-Reply-To: <20230602161921.208564-1-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230602161921.208564-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
-Message-ID: <20230602161921.208564-8-amoorthy@google.com>
-Subject: [PATCH v4 07/16] KVM: Simplify error handling in __gfn_to_pfn_memslot()
+Message-ID: <20230602161921.208564-9-amoorthy@google.com>
+Subject: [PATCH v4 08/16] KVM: x86: Annotate -EFAULTs from kvm_handle_error_pfn()
 From: Anish Moorthy <amoorthy@google.com>
 To: seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org, 
 	kvmarm@lists.linux.dev
@@ -55,41 +55,45 @@ Cc: pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com,
 	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 
-KVM_HVA_ERR_RO_BAD satisfies kvm_is_error_hva(), so there's no need to
-duplicate the "if (writable)" block. Fix this by bringing all
-kvm_is_error_hva() cases under one conditional.
+Implement KVM_CAP_MEMORY_FAULT_INFO for efaults generated by
+kvm_handle_error_pfn().
 
 Signed-off-by: Anish Moorthy <amoorthy@google.com>
 ---
- virt/kvm/kvm_main.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index b9d2606f9251..05d6e7e3994d 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2711,16 +2711,14 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
- 	if (hva)
- 		*hva = addr;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index c8961f45e3b1..cb71aae9aaec 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3291,6 +3291,10 @@ static void kvm_send_hwpoison_signal(struct kvm_memory_slot *slot, gfn_t gfn)
  
--	if (addr == KVM_HVA_ERR_RO_BAD) {
--		if (writable)
--			*writable = false;
--		return KVM_PFN_ERR_RO_FAULT;
--	}
--
- 	if (kvm_is_error_hva(addr)) {
- 		if (writable)
- 			*writable = false;
--		return KVM_PFN_NOSLOT;
+ static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ {
++	uint64_t rounded_gfn;
++	uint64_t fault_size;
++	uint64_t fault_flags;
 +
-+		if (addr == KVM_HVA_ERR_RO_BAD)
-+			return KVM_PFN_ERR_RO_FAULT;
-+		else
-+			return KVM_PFN_NOSLOT;
+ 	if (is_sigpending_pfn(fault->pfn)) {
+ 		kvm_handle_signal_exit(vcpu);
+ 		return -EINTR;
+@@ -3309,6 +3313,15 @@ static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fa
+ 		return RET_PF_RETRY;
  	}
  
- 	/* Do not map writable pfn in the readonly memslot. */
++	fault_size = KVM_HPAGE_SIZE(fault->goal_level);
++	rounded_gfn = round_down(fault->gfn * PAGE_SIZE, fault_size);
++
++	fault_flags = 0;
++	if (fault->write)
++		fault_flags |= KVM_MEMORY_FAULT_FLAG_WRITE;
++	if (fault->exec)
++		fault_flags |= KVM_MEMORY_FAULT_FLAG_EXEC;
++	kvm_populate_efault_info(vcpu, rounded_gfn, fault_size, fault_flags);
+ 	return -EFAULT;
+ }
+ 
 -- 
 2.41.0.rc0.172.g3f132b7071-goog
 
