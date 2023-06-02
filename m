@@ -1,40 +1,40 @@
-Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
+Received: from mail-il1-f201.google.com (mail-il1-f201.google.com [209.85.166.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8CD1332F8
-	for <kvmarm@lists.linux.dev>; Fri,  2 Jun 2023 17:02:52 +0000 (UTC)
-Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-76998d984b0so116987839f.2
-        for <kvmarm@lists.linux.dev>; Fri, 02 Jun 2023 10:02:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8114C33303
+	for <kvmarm@lists.linux.dev>; Fri,  2 Jun 2023 17:02:53 +0000 (UTC)
+Received: by mail-il1-f201.google.com with SMTP id e9e14a558f8ab-33b4cbdd21aso20243345ab.2
+        for <kvmarm@lists.linux.dev>; Fri, 02 Jun 2023 10:02:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685725371; x=1688317371;
+        d=google.com; s=20221208; t=1685725372; x=1688317372;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DZrtPESLe1mA5daPGrUc+60GXQlGnhOLsAUJu36d7rQ=;
-        b=Qq3RLBS2mk0SnALShNCtm+TQlg+XH/AHekNH7/7QlGAv3Kwq/6fPi6+CvfRavpIs4G
-         RjyTeXe+0RGaZAufFJ8EvFNFa8pOjeTTjjb8sD9rItu1zRExurnNtBOtX6w1QJedD+7I
-         afR/Bn/wNwB2NO7fNerz8ES6XgY4MyN711P03otg/ynXmiG0KHjiA/NCjGChETeqa8Sq
-         PPIW2euhDqJ/s3oFviuWT4EcIxz18d4QuSIOimUwO4KwNQ9xdjmAWN3FZO+WhB+n8/fm
-         Z+b1LzGrVLf99x0xH1gni5y4fL0Jf+jIx8h2sro9EeSCJDdt5AbgU5s/l97G1yjsUE5q
-         7IyQ==
+        bh=jc0HXGzYvsWKFFqMwew1siGd4KbapSh3HWhZ39XsN18=;
+        b=j+tKfi2kSo+PoSM8bzNfiRyUHJOyeGZ8cXfsmhGYboQIkXNZcgKm7MC/cWX/C6ZkqG
+         60f7UABnT6ErAicHdSv8GNsaMsxzvOwv4YmniUVjWIoOAFBY8RnuSFSvJlf10WPLD0Pl
+         04johD9tWvxiLCZi1WR0w+oOd0+AB/CP+2jYhm7evUJn7pTqemwzVAxdP+R68pydUGOA
+         HIqJ0F9ltOSTrTcu2f3O/9bIynM8h5wdOVo4MLk5r9Ic6t6CxEi8rZbTDEZoGZX1Jbzt
+         PmrdFFznsQ54/dOus3KfJ9Qig75zKJPzP+rVna7qVoudLzvULSQv2dyT4F4wCWi6idZ2
+         o0vQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685725371; x=1688317371;
+        d=1e100.net; s=20221208; t=1685725372; x=1688317372;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DZrtPESLe1mA5daPGrUc+60GXQlGnhOLsAUJu36d7rQ=;
-        b=ISX9tDK3uqqMzDm9PATtDZo662zbF7qWeglO4caurOeKxU1n5vieyNmpFuCL7md7RX
-         7pkstIIH/tczeXp6B8bcXgqkE6AULgRhylFr3vCXFkWRWQuOWH0l8DlkjIokMUe+gdQH
-         aonuNcja+f0gW/Fs/3Yw5RO/a/CVRsuE71Ng3z6G4TnsgMc8bx9YopU/TntqrI5JRxRx
-         ZZ9HjXbxzKBiH9zZCqju7KnJoLVcOQejt0EpsqFlW7Hqelj7CSYnqN8bhvsLU0fKcUU9
-         O+lLq+cKMNgbz4cmFdkw/crKm+sCi451w9dS51TO82Brukn91i8HkHIWthVy3+BjwmC6
-         wgiQ==
-X-Gm-Message-State: AC+VfDy+wLS2RE1AVa/mC8PjeQpaOUufBvI0EPGQ39Gy0WOgVonUFLdE
-	/w69K8rn1/fRFc5AzluOq4/8lVCwIzXUNiaZeA==
-X-Google-Smtp-Source: ACHHUZ7jQlp0MVeJbVOdhempnaGESwJq6ISHR98G4dlzn8EXHZtiMaS3iQFnqJ6k1wVSGZ9JZpTQJ2Y+ISmEsdfLAw==
+        bh=jc0HXGzYvsWKFFqMwew1siGd4KbapSh3HWhZ39XsN18=;
+        b=h4XzAZGF/pEwVAhxNZnAgDLUz+JszGczri2ImoyEtGDo8IjzOTpqCdFR9ln3BgTJo5
+         KF21z/PbMKyqLyyQPJHOoFJRvSV9XGhzYmsNSG+SHGZeRaF7TvX/IdYH5D6WD2OhhuL5
+         GPzpEs/xRCVc50V32hn2NN7jJ0QFaAHOVKpDjUE+iTzE1sO22p69YdWuJO+0vBZEgTgP
+         /u8tDPhEteROTNrwRk4XK9qTCu6xgo6vLQDEOZPTgk+wgv9vFHPVXiHtxb8ipIuspmCL
+         UygWSjx8A5mp8qrVka0tl/TBHBwjyQry4DtPrQTAg6zwIRvvRtqYaJqwevrjDKxBh8gd
+         PMAw==
+X-Gm-Message-State: AC+VfDwX5F53WaYEDcrQz24jZoU8B4qk4yGD9WWErQP/2V9PgWB20TMS
+	mfa2awR0Xb/GCS+mLkH1WNwQtaPd73IvaDgGqw==
+X-Google-Smtp-Source: ACHHUZ7+edDLEpgV1IGnbtuAGa0C22RGdZstxlqcJBRqQ5INrzQuoJ8ypYZbCeOZkcJOp1lxWUSrEVByOHlYXL/q9g==
 X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a6b:5904:0:b0:766:6741:8849 with SMTP
- id n4-20020a6b5904000000b0076667418849mr1203200iob.3.1685725371731; Fri, 02
- Jun 2023 10:02:51 -0700 (PDT)
-Date: Fri,  2 Jun 2023 17:01:45 +0000
+ (user=coltonlewis job=sendgmr) by 2002:a92:db52:0:b0:335:908b:8f9 with SMTP
+ id w18-20020a92db52000000b00335908b08f9mr4386617ilq.1.1685725372593; Fri, 02
+ Jun 2023 10:02:52 -0700 (PDT)
+Date: Fri,  2 Jun 2023 17:01:46 +0000
 In-Reply-To: <20230602170147.1541355-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230602170147.1541355-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
-Message-ID: <20230602170147.1541355-2-coltonlewis@google.com>
-Subject: [PATCH 1/3] arm64: Add a capability for FEAT_BBM level 2
+Message-ID: <20230602170147.1541355-3-coltonlewis@google.com>
+Subject: [PATCH 2/3] KVM: arm64: Clear possible conflict aborts
 From: Colton Lewis <coltonlewis@google.com>
 To: kvm@vger.kernel.org
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
@@ -53,53 +53,50 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
 	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
 	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
 	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
-	Ricardo Koller <ricarkol@google.com>
+	Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Ricardo Koller <ricarkol@google.com>
+Clear possible conflict aborts by TLB invalidation targeted to the
+address that caused the abort.
 
-Add a new capability to detect "Stage-2 Translation table
-break-before-make" (FEAT_BBM) level 2.
+Making use of FEAT_BBM Level 2 creates the possibility of a conflict
+abort when translating addresses, where multiple entries exist in the
+TLB for a single input address.
 
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
+Signed-off-by: Colton Lewis <coltonlewis@google.com>
 ---
- arch/arm64/kernel/cpufeature.c | 11 +++++++++++
- arch/arm64/tools/cpucaps       |  1 +
- 2 files changed, 12 insertions(+)
+ arch/arm64/include/asm/esr.h | 1 +
+ arch/arm64/kvm/mmu.c         | 6 ++++++
+ 2 files changed, 7 insertions(+)
 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index c331c49a7d19c..c538060f7f66b 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -2455,6 +2455,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.min_field_value = 1,
- 		.matches = has_cpuid_feature,
- 	},
-+	{
-+		.desc = "Stage-2 Translation table break-before-make level 2",
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.capability = ARM64_HAS_STAGE2_BBM2,
-+		.sys_reg = SYS_ID_AA64MMFR2_EL1,
-+		.sign = FTR_UNSIGNED,
-+		.field_pos = ID_AA64MMFR2_EL1_BBM_SHIFT,
-+		.field_width = 4,
-+		.min_field_value = 2,
-+		.matches = has_cpuid_feature,
-+	},
- 	{
- 		.desc = "TLB range maintenance instructions",
- 		.capability = ARM64_HAS_TLB_RANGE,
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index 40ba95472594d..010aca1892642 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -41,6 +41,7 @@ HAS_PAN
- HAS_RAS_EXTN
- HAS_RNG
- HAS_SB
-+HAS_STAGE2_BBM2
- HAS_STAGE2_FWB
- HAS_TIDCP1
- HAS_TLB_RANGE
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index 8487aec9b6587..41336cfa19ff3 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -123,6 +123,7 @@
+ #define ESR_ELx_FSC_SECC_TTW1	(0x1d)
+ #define ESR_ELx_FSC_SECC_TTW2	(0x1e)
+ #define ESR_ELx_FSC_SECC_TTW3	(0x1f)
++#define ESR_ELx_FSC_CONFLICT	(0x30)
+
+ /* ISS field definitions for Data Aborts */
+ #define ESR_ELx_ISV_SHIFT	(24)
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 7a68398517c95..96b950f20c8d0 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1591,6 +1591,12 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 		return 1;
+ 	}
+
++	if (fault_status == ESR_ELx_FSC_CONFLICT) {
++		/* We could be at any level. 0 covers all levels. */
++		__kvm_tlb_flush_vmid_ipa(vcpu->arch.hw_mmu, fault_ipa, 0);
++		return 1;
++	}
++
+ 	trace_kvm_guest_fault(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
+ 			      kvm_vcpu_get_hfar(vcpu), fault_ipa);
+
 --
 2.41.0.rc0.172.g3f132b7071-goog
