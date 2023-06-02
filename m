@@ -1,40 +1,40 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A57081C750
-	for <kvmarm@lists.linux.dev>; Fri,  2 Jun 2023 16:20:00 +0000 (UTC)
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-ba8c3186735so2971369276.3
-        for <kvmarm@lists.linux.dev>; Fri, 02 Jun 2023 09:20:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A49801C765
+	for <kvmarm@lists.linux.dev>; Fri,  2 Jun 2023 16:20:01 +0000 (UTC)
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-75aff1596d3so342888585a.2
+        for <kvmarm@lists.linux.dev>; Fri, 02 Jun 2023 09:20:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685722799; x=1688314799;
+        d=google.com; s=20221208; t=1685722800; x=1688314800;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4E8+zNfn1rJk8U6PDocth2WfbfjiLTYwf3mfdWaR2yU=;
-        b=gWDsLQXMBko5cslhOYtYqHCyQkoSrIwxBgZlMhgc7PNFm+zEUTxO94Bb/6m4V/EXdI
-         ttDq2ZVJ3U/LswNpYO7WaOvKJQ1mU2ohVzru4+1yqUgYvW05Z+rRWP5SJEurktQZ25op
-         YB/K+hiuDlX+gtpUN/hQOEkjouBS4zjKnwcJCF/H7COoAVWeG5994D9XMONrga8GdVyH
-         rJOrqLcrmwMzoWNdKHNiNP3fLnxHVzb0XhtEFp7916G+C9v60v5qYJjg15saFy1OKfe5
-         fRnGlvd0yd/9HdwMa9oN9ANxKkQfA2K6mQOuAQ3dG+X4EysL8mmVa1H9MXxwN5Gef3Br
-         rN7A==
+        bh=NmNcA4xrgkLcuCGWOYpC0PmEaXmJrDnJmM0yVjAGGFM=;
+        b=0IIUK1mWMEG2R6N4d5epNpupo33pLP7t2ryHaqSkREVc7duxUDfOYqbEupeqxyxidc
+         A7rZ95wvqt524EgYfMuqPFlV+xw2egXfhPMcz7dGPu1gAkNGZPENuPINAV6DC8a76ANF
+         IQxKtqJAI7RbssURcnYAUR07XZZW1kvRP+GXvkk4wrMF49u+xAsb3v4me+WS8QuVbN87
+         9UvfaTFppf5lxb3L2CfyH48+R84uevexSATlfBbRU6cOM3MEQsHpeasNIRBiThOu7PnC
+         SV0YhLbsVRMUpHiAx6gpKJyQgBnP0fwcgc/StbmQCevxrEVqYp+57ivSKLZj1JG46c4Q
+         XmIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685722799; x=1688314799;
+        d=1e100.net; s=20221208; t=1685722800; x=1688314800;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4E8+zNfn1rJk8U6PDocth2WfbfjiLTYwf3mfdWaR2yU=;
-        b=G4A9vGDM7Sjyg0bduY4gkUfaB6/993eOF+TsTaF5HdVyIC4yXB1+7ZRl0OQUjAt7Q5
-         pWxk3O9FtvZyW35z3qabd0yOWbQjwgqmQhGpOyqg54uNH+SrmK/9hH8kq5qgAh9UhlIT
-         L5G3dqW1Z+qc92O4FqzdV0lde8viRY0+RMzfB+niuNrvBZihWm2K/7eG6gft4UrfiBsB
-         +xlfA4lzFdZc25LITcD2PHMI6xe4EhrWVve3BiqtmOZQ8ZfYoWXM+05iSBZzeNHDgoeN
-         IkmPp9zYLSHgxFNRC+WOz3Ws38me63Cxer+jZNnDsBec+JudI76k62gjDTCaDJUAeD8O
-         NeyA==
-X-Gm-Message-State: AC+VfDxGHFvnC5Kl89HQhmIF0M8BugMGedpYyZQbiGN6ZR/lDVRG34s4
-	TJ8TRccwlKBqVRJRUpZcb761xivy/V8hUw==
-X-Google-Smtp-Source: ACHHUZ7IOKhrQkM5+thZOkEyj7PyCIBHPmI5OcHGabjfs9Y8mO4Rss5CHJYmBbwWqftwew9oXtBqqj0YAR1ilA==
+        bh=NmNcA4xrgkLcuCGWOYpC0PmEaXmJrDnJmM0yVjAGGFM=;
+        b=d7vJGI4CA2S02/dJCw5Dr3to097ZWvAgEzEBCY6apbQWlUMR4siNQBDrdVaLZCBebo
+         Ny3V+uQM96jiaECxv/Ro1sxzAj1hss+zmZG6T0Hvb7mGkNhUjoqOgq670vjMZHdi8Tc+
+         5/vqiVE+lUfFXzjP5ix7r9dsCc7XGnksb+7aCAVhQLMuADkE+NYEg3EPMCryG6J4p4Rk
+         nxMx3p7OT9V+0ggNq2rvRlVdWWGeN75PXJyIiHDocSXdKpUgVFtkgKfmk4KurRcscPJh
+         tt2k/ZrWbjrP8NmQ3GrJrLpM0IIQzCG8lnv4bL62rkjfnmlgslCMH5II6A1tyccot9ux
+         vqTw==
+X-Gm-Message-State: AC+VfDwkHSnA2x7K6IijWP/Q6Ij6A/dRte306EXKQwdRMFgx8ue2ixgy
+	dx4aHR5UUADBsdOBl4YfCs4c7g+6UWpdpw==
+X-Google-Smtp-Source: ACHHUZ6bv1kbPvWMJXUXqPMgDp4g1CaZyD97JDkp7fAkdZjAvm6jS8/kc+tAuHTNuKRQ9BOzT/F7nAiehCTHeA==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a25:e7c6:0:b0:ba8:8fad:c19d with SMTP id
- e189-20020a25e7c6000000b00ba88fadc19dmr1257767ybh.8.1685722799503; Fri, 02
- Jun 2023 09:19:59 -0700 (PDT)
-Date: Fri,  2 Jun 2023 16:19:14 +0000
+ (user=amoorthy job=sendgmr) by 2002:a05:620a:29cb:b0:75c:a6ff:3462 with SMTP
+ id s11-20020a05620a29cb00b0075ca6ff3462mr3860470qkp.4.1685722800556; Fri, 02
+ Jun 2023 09:20:00 -0700 (PDT)
+Date: Fri,  2 Jun 2023 16:19:15 +0000
 In-Reply-To: <20230602161921.208564-1-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230602161921.208564-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
-Message-ID: <20230602161921.208564-10-amoorthy@google.com>
-Subject: [PATCH v4 09/16] KVM: Introduce KVM_CAP_NOWAIT_ON_FAULT without implementation
+Message-ID: <20230602161921.208564-11-amoorthy@google.com>
+Subject: [PATCH v4 10/16] KVM: x86: Implement KVM_CAP_NOWAIT_ON_FAULT
 From: Anish Moorthy <amoorthy@google.com>
 To: seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org, 
 	kvmarm@lists.linux.dev
@@ -55,147 +55,85 @@ Cc: pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com,
 	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 
-Add documentation, memslot flags, useful helper functions, and the
-actual new capability itself.
-
-Memory fault exits on absent mappings are particularly useful for
-userfaultfd-based postcopy live migration. When many vCPUs fault on a
-single userfaultfd the faults can take a while to surface to userspace
-due to having to contend for uffd wait queue locks. Bypassing the uffd
-entirely by returning information directly to the vCPU exit avoids this
-contention and improves the fault rate.
+When the memslot flag is enabled, fail guest memory accesses for which
+fast-gup fails (ie, where resolving the page fault would require putting
+the faulting thread to sleep).
 
 Suggested-by: James Houghton <jthoughton@google.com>
 Signed-off-by: Anish Moorthy <amoorthy@google.com>
 ---
- Documentation/virt/kvm/api.rst | 32 +++++++++++++++++++++++++++++---
- include/linux/kvm_host.h       |  6 ++++++
- include/uapi/linux/kvm.h       |  2 ++
- tools/include/uapi/linux/kvm.h |  1 +
- virt/kvm/kvm_main.c            |  3 +++
- 5 files changed, 41 insertions(+), 3 deletions(-)
+ Documentation/virt/kvm/api.rst |  2 +-
+ arch/x86/kvm/mmu/mmu.c         | 17 ++++++++++++-----
+ arch/x86/kvm/x86.c             |  1 +
+ 3 files changed, 14 insertions(+), 6 deletions(-)
 
 diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 5b24059143b3..9daadbe2c7ed 100644
+index 9daadbe2c7ed..aa7b4024fd41 100644
 --- a/Documentation/virt/kvm/api.rst
 +++ b/Documentation/virt/kvm/api.rst
-@@ -1312,6 +1312,7 @@ yet and must be cleared on entry.
-   /* for kvm_userspace_memory_region::flags */
-   #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
-   #define KVM_MEM_READONLY	(1UL << 1)
-+  #define KVM_MEM_NOWAIT_ON_FAULT (1UL << 2)
+@@ -7783,7 +7783,7 @@ bugs and reported to the maintainers so that annotations can be added.
+ 7.35 KVM_CAP_NOWAIT_ON_FAULT
+ ----------------------------
  
- This ioctl allows the user to create, modify or delete a guest physical
- memory slot.  Bits 0-15 of "slot" specify the slot id and this value
-@@ -1342,12 +1343,15 @@ It is recommended that the lower 21 bits of guest_phys_addr and userspace_addr
- be identical.  This allows large pages in the guest to be backed by large
- pages in the host.
+-:Architectures: None
++:Architectures: x86
+ :Returns: -EINVAL.
  
--The flags field supports two flags: KVM_MEM_LOG_DIRTY_PAGES and
--KVM_MEM_READONLY.  The former can be set to instruct KVM to keep track of
-+The flags field supports three flags
+ The presence of this capability indicates that userspace may pass the
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index cb71aae9aaec..288008a64e5c 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4299,7 +4299,9 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+ 	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true, NULL);
+ }
+ 
+-static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
++static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu,
++			     struct kvm_page_fault *fault,
++			     bool nowait)
+ {
+ 	struct kvm_memory_slot *slot = fault->slot;
+ 	bool async;
+@@ -4332,9 +4334,12 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 	}
+ 
+ 	async = false;
+-	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, false, &async,
+-					  fault->write, &fault->map_writable,
+-					  &fault->hva);
 +
-+1.  KVM_MEM_LOG_DIRTY_PAGES: can be set to instruct KVM to keep track of
- writes to memory within the slot.  See KVM_GET_DIRTY_LOG ioctl to know how to
--use it.  The latter can be set, if KVM_CAP_READONLY_MEM capability allows it,
-+use it.
-+2.  KVM_MEM_READONLY: can be set, if KVM_CAP_READONLY_MEM capability allows it,
- to make a new slot read-only.  In this case, writes to this memory will be
- posted to userspace as KVM_EXIT_MMIO exits.
-+3.  KVM_MEM_NOWAIT_ON_FAULT: see KVM_CAP_NOWAIT_ON_FAULT for details.
- 
- When the KVM_CAP_SYNC_MMU capability is available, changes in the backing of
- the memory region are automatically reflected into the guest.  For example, an
-@@ -7776,6 +7780,28 @@ userspace may receive "bare" EFAULTs (i.e. exit reason != KVM_EXIT_MEMORY_FAULT)
- from KVM_RUN for failures which may be resolvable. These should be considered
- bugs and reported to the maintainers so that annotations can be added.
- 
-+7.35 KVM_CAP_NOWAIT_ON_FAULT
-+----------------------------
++	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn,
++					  nowait, false,
++					  nowait ? NULL : &async,
++					  fault->write, &fault->map_writable, &fault->hva);
 +
-+:Architectures: None
-+:Returns: -EINVAL.
-+
-+The presence of this capability indicates that userspace may pass the
-+KVM_MEM_NOWAIT_ON_FAULT flag to KVM_SET_USER_MEMORY_REGION to cause KVM_RUN
-+to fail (-EFAULT) in response to page faults for which resolution would require
-+the faulting thread to sleep.
-+
-+The range of guest physical memory causing the fault is advertised to userspace
-+through KVM_CAP_MEMORY_FAULT_INFO.
-+
-+Userspace should determine how best to make the mapping present, then take
-+appropriate action. For instance establishing the mapping could involve a
-+MADV_POPULATE_READ|WRITE, in the context of userfaultfd a UFFDIO_COPY|CONTINUE
-+could be appropriate, etc. After establishing the mapping, userspace can return
-+to KVM to retry the memory access.
-+
-+Attempts to enable this capability directly will fail.
-+
- 8. Other capabilities.
- ======================
+ 	if (!async)
+ 		return RET_PF_CONTINUE; /* *pfn has correct page already */
  
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 69a221f71914..abbc5dd72292 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2297,4 +2297,10 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
-  */
- inline void kvm_populate_efault_info(struct kvm_vcpu *vcpu,
- 				     uint64_t gpa, uint64_t len, uint64_t flags);
-+
-+static inline bool kvm_slot_nowait_on_fault(
-+	const struct kvm_memory_slot *slot)
-+{
-+	return slot->flags & KVM_MEM_NOWAIT_ON_FAULT;
-+}
- #endif
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 143abb334f56..595c3d7d36aa 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -102,6 +102,7 @@ struct kvm_userspace_memory_region {
-  */
- #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
- #define KVM_MEM_READONLY	(1UL << 1)
-+#define KVM_MEM_NOWAIT_ON_FAULT	(1UL << 2)
+@@ -4368,7 +4373,9 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+ 	fault->mmu_seq = vcpu->kvm->mmu_invalidate_seq;
+ 	smp_rmb();
  
- /* for KVM_IRQ_LINE */
- struct kvm_irq_level {
-@@ -1198,6 +1199,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_PMU_EVENT_MASKED_EVENTS 226
- #define KVM_CAP_COUNTER_OFFSET 227
- #define KVM_CAP_MEMORY_FAULT_INFO 228
-+#define KVM_CAP_NOWAIT_ON_FAULT 229
+-	ret = __kvm_faultin_pfn(vcpu, fault);
++	ret = __kvm_faultin_pfn(vcpu, fault,
++				likely(fault->slot)
++					&& kvm_slot_nowait_on_fault(fault->slot));
+ 	if (ret != RET_PF_CONTINUE)
+ 		return ret;
  
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-index 5476fe169921..f64845cd599f 100644
---- a/tools/include/uapi/linux/kvm.h
-+++ b/tools/include/uapi/linux/kvm.h
-@@ -102,6 +102,7 @@ struct kvm_userspace_memory_region {
-  */
- #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
- #define KVM_MEM_READONLY	(1UL << 1)
-+#define KVM_MEM_NOWAIT_ON_FAULT (1UL << 2)
- 
- /* for KVM_IRQ_LINE */
- struct kvm_irq_level {
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 05d6e7e3994d..2c276d4d0821 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1527,6 +1527,9 @@ static int check_memory_region_flags(const struct kvm_userspace_memory_region *m
- 	valid_flags |= KVM_MEM_READONLY;
- #endif
- 
-+	if (kvm_vm_ioctl_check_extension(NULL, KVM_CAP_NOWAIT_ON_FAULT))
-+		valid_flags |= KVM_MEM_NOWAIT_ON_FAULT;
-+
- 	if (mem->flags & ~valid_flags)
- 		return -EINVAL;
- 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index d15bacb3f634..4fbe9c811cc7 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4498,6 +4498,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
+ 	case KVM_CAP_IRQFD_RESAMPLE:
+ 	case KVM_CAP_MEMORY_FAULT_INFO:
++	case KVM_CAP_NOWAIT_ON_FAULT:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_EXIT_HYPERCALL:
 -- 
 2.41.0.rc0.172.g3f132b7071-goog
 
