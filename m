@@ -1,118 +1,257 @@
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F1771F936
-	for <kvmarm@lists.linux.dev>; Fri,  2 Jun 2023 20:30:33 +0000 (UTC)
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-6af6f4a0e11so2266809a34.0
-        for <kvmarm@lists.linux.dev>; Fri, 02 Jun 2023 13:30:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46390C13B
+	for <kvmarm@lists.linux.dev>; Fri,  2 Jun 2023 22:15:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685737833; x=1688329833;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=10hRcwQ0GUO47GW14pu/UVUtmrspce6JF9a1n+Kc3qE=;
-        b=Zz8mOG+01aBDLhMelg/oVY0aJ+ahToA3CsO5FgnuWse/iLJYWAvzRW8Thv3erz8/Qm
-         Q8euilE9CNud+9F6VgkY9OI8T9W2gUKvmOWogqHWBfTbe+aokT5yvZcvGnEE3Om0BM8+
-         g7MPCtSE5Dg9KezwmDNrexeCYs+YCorqP3h9KgGjjUQNSMH1EKlH6FTkkdXfaztTFuCb
-         /chbxyT9iewP5HbgrkGQcogswZqYMjhBw169tZWg/WbH+F18r1M0WZ0yFkp9lfGmnUo2
-         vW5jhTWRJodkqlrdYrEaE83bczJj/UZqeXj5WVjY2aW4SvPk9mZsYdkUp0nBdUODl9bG
-         Si8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685737833; x=1688329833;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=10hRcwQ0GUO47GW14pu/UVUtmrspce6JF9a1n+Kc3qE=;
-        b=BQ666O03VsOWuOMtMM7mHFexkXptGOW25tadcrQ86mvE+eC6e18Xz2Hy3cH9dn/iwD
-         Qfkd2iRSZduFU0OOYLl3TwV+IjF01oNg8SC85mGMSMRbdU/mhAToOdSE9CNSKTPQ7Zja
-         2btGV7cyZLXAN0UcjrnKENWyY5tl3GzxiUUOolZlfzD5WnZgh0QsggzGzmGIjCCgV2Hu
-         k/Pz+DHbwl9NLC2w4/7pjph8IriOCWdyAwNDb/fCB1z1K9ZpVA9G9BV2mB4u0Z/s2Iue
-         hGyWy+H8ccBFzxYrAapDpe3tA5MSH2oQY4ZauburVvm/FfVRi6/jGJtXWzrxYAifAo37
-         EaXA==
-X-Gm-Message-State: AC+VfDxNEDIOMjST+ZfYUnXF6uS9+zXZZFy1/aM6ZMuYerTbgETEgW4K
-	cfEFsUulruXN4d8nJdUpHsA=
-X-Google-Smtp-Source: ACHHUZ49DbSF/X0jUtqmRxmK9L5eLFTOBftgLIkXQIZHoEIa5ad6d0gDp0cQuMTvw0tf+FqPJTKLAg==
-X-Received: by 2002:a05:6830:3a92:b0:6b0:cde0:d9a with SMTP id dj18-20020a0568303a9200b006b0cde00d9amr3709371otb.21.1685737832986;
-        Fri, 02 Jun 2023 13:30:32 -0700 (PDT)
-Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id 196-20020a6302cd000000b0053ef188c90bsm1628121pgc.89.2023.06.02.13.30.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Jun 2023 13:30:32 -0700 (PDT)
-Date: Fri, 2 Jun 2023 13:30:31 -0700
-From: Isaku Yamahata <isaku.yamahata@gmail.com>
-To: Anish Moorthy <amoorthy@google.com>
-Cc: seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
-	robert.hoo.linux@gmail.com, jthoughton@google.com,
-	bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
-	axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
-	isaku.yamahata@gmail.com
-Subject: Re: [PATCH v4 02/16] KVM: x86: Set vCPU exit reason to
- KVM_EXIT_UNKNOWN at the start of KVM_RUN
-Message-ID: <20230602203031.GK1234772@ls.amr.corp.intel.com>
-References: <20230602161921.208564-1-amoorthy@google.com>
- <20230602161921.208564-3-amoorthy@google.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1685744103; x=1717280103;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=HXE0fDLOEs7j1TW6PF3FEXVGqXW2NKvsNmy+oRJV/2s=;
+  b=b6P/czDqHUW7DwEQovVAWbKuBsAo7vUfwEM6q3Ktr5/hm24iiVHT1KRl
+   hegHGbWBg2wLChmlDmuuxrsz8aFOmCwsF1qIZ3IxZURy+ww5BCtVEx7XV
+   GZ3VoA2kTlFkqeDKZ6+VPJpA2mEj3bx8VSt8MFvFXZW7v4sWhdeyvZhYp
+   M=;
+X-IronPort-AV: E=Sophos;i="6.00,214,1681171200"; 
+   d="scan'208";a="589129086"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-f253a3a3.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2023 22:15:01 +0000
+Received: from EX19MTAUWB002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+	by email-inbound-relay-pdx-2b-m6i4x-f253a3a3.us-west-2.amazon.com (Postfix) with ESMTPS id AED7582279;
+	Fri,  2 Jun 2023 22:14:59 +0000 (UTC)
+Received: from EX19D030UWB002.ant.amazon.com (10.13.139.182) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Fri, 2 Jun 2023 22:14:59 +0000
+Received: from u1e958862c3245e.ant.amazon.com (10.187.170.26) by
+ EX19D030UWB002.ant.amazon.com (10.13.139.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Fri, 2 Jun 2023 22:14:58 +0000
+From: Suraj Jitindar Singh <surajjs@amazon.com>
+To: <jingzhangos@google.com>
+CC: <alexandru.elisei@arm.com>, <james.morse@arm.com>, <kvm@vger.kernel.org>,
+	<kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
+	<maz@kernel.org>, <oupton@google.com>, <pbonzini@redhat.com>,
+	<rananta@google.com>, <reijiw@google.com>, <suzuki.poulose@arm.com>,
+	<tabba@google.com>, <will@kernel.org>, <sjitindarsingh@gmail.com>, "Suraj
+ Jitindar Singh" <surajjs@amazon.com>
+Subject: [PATCH 2/3] KVM: arm64: Move non per vcpu flag checks out of kvm_arm_update_id_reg()
+Date: Fri, 2 Jun 2023 15:14:46 -0700
+Message-ID: <20230602221447.1809849-3-surajjs@amazon.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230602221447.1809849-1-surajjs@amazon.com>
+References: <20230602005118.2899664-1-jingzhangos@google.com>
+ <20230602221447.1809849-1-surajjs@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230602161921.208564-3-amoorthy@google.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.187.170.26]
+X-ClientProxiedBy: EX19D031UWC003.ant.amazon.com (10.13.139.252) To
+ EX19D030UWB002.ant.amazon.com (10.13.139.182)
 
-On Fri, Jun 02, 2023 at 04:19:07PM +0000,
-Anish Moorthy <amoorthy@google.com> wrote:
+There are features which are masked in kvm_arm_update_id_reg() which cannot
+change throughout the lifecycle of a VM. Thus rather than masking them each
+time the register is read, mask them at idreg init time so that the value
+in the kvm id_reg correctly reflects the state of support for that feature.
 
-> Give kvm_run.exit_reason a defined initial value on entry into KVM_RUN:
-> other architectures (riscv, arm64) already use KVM_EXIT_UNKNOWN for this
-> purpose, so copy that convention.
-> 
-> This gives vCPUs trying to fill the run struct a mechanism to avoid
-> overwriting already-populated data, albeit an imperfect one. Being able
-> to detect an already-populated KVM run struct will prevent at least some
-> bugs in the upcoming implementation of KVM_CAP_MEMORY_FAULT_INFO, which
-> will attempt to fill the run struct whenever a vCPU fails a guest memory
-> access.
-> 
-> Without the already-populated check, KVM_CAP_MEMORY_FAULT_INFO could
-> change kvm_run in any code paths which
-> 
-> 1. Populate kvm_run for some exit and prepare to return to userspace
-> 2. Access guest memory for some reason (but without returning -EFAULTs
->     to userspace)
-> 3. Finish the return to userspace set up in (1), now with the contents
->     of kvm_run changed to contain efault info.
-> 
+Move masking of AA64PFR0_EL1.GIC and AA64PFR0_EL1.AMU into
+read_sanitised_id_aa64pfr0_el1().
+Create read_sanitised_id_aa64pfr1_el1() and mask AA64PFR1_EL1.SME.
+Create read_sanitised_id_[mmfr4|aa64mmfr2] and mask CCIDX.
 
-As vmx code uses KVM_EXIT_UNKNOWN with hardware_exit_reason=exit reason,
-Can we initialize hardware_exit_reason to -1.
-It's just in case.
+Signed-off-by: Suraj Jitindar Singh <surajjs@amazon.com>
+---
+ arch/arm64/kvm/sys_regs.c | 104 +++++++++++++++++++++++++++++++-------
+ 1 file changed, 86 insertions(+), 18 deletions(-)
 
-
-> Signed-off-by: Anish Moorthy <amoorthy@google.com>
-> ---
->  arch/x86/kvm/x86.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index ceb7c5e9cf9e..a7725d41570a 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -11163,6 +11163,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  	if (r <= 0)
->  		goto out;
->  
-> +	kvm_run->exit_reason = KVM_EXIT_UNKNOWN;
-
-+	kvm_run->hardware_exit_reason = -1;     /* unused exit reason value */
-
->  	r = vcpu_run(vcpu);
->  
->  out:
-> -- 
-> 2.41.0.rc0.172.g3f132b7071-goog
-> 
-
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index a4e662bd218b..59f8adda47fa 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1355,16 +1355,10 @@ static u64 kvm_arm_update_id_reg(const struct kvm_vcpu *vcpu, u32 encoding, u64
+ 	case SYS_ID_AA64PFR0_EL1:
+ 		if (!vcpu_has_sve(vcpu))
+ 			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE);
+-		if (kvm_vgic_global_state.type == VGIC_V3) {
+-			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC);
+-			val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC), 1);
+-		}
+ 		break;
+ 	case SYS_ID_AA64PFR1_EL1:
+ 		if (!kvm_has_mte(vcpu->kvm))
+ 			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE);
+-
+-		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);
+ 		break;
+ 	case SYS_ID_AA64ISAR1_EL1:
+ 		if (!vcpu_has_ptrauth(vcpu))
+@@ -1377,8 +1371,6 @@ static u64 kvm_arm_update_id_reg(const struct kvm_vcpu *vcpu, u32 encoding, u64
+ 		if (!vcpu_has_ptrauth(vcpu))
+ 			val &= ~(ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_APA3) |
+ 				 ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_GPA3));
+-		if (!cpus_have_final_cap(ARM64_HAS_WFXT))
+-			val &= ~ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_WFxT);
+ 		break;
+ 	case SYS_ID_AA64DFR0_EL1:
+ 		/* Set PMUver to the required version */
+@@ -1391,12 +1383,6 @@ static u64 kvm_arm_update_id_reg(const struct kvm_vcpu *vcpu, u32 encoding, u64
+ 		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon),
+ 				  pmuver_to_perfmon(vcpu_pmuver(vcpu)));
+ 		break;
+-	case SYS_ID_AA64MMFR2_EL1:
+-		val &= ~ID_AA64MMFR2_EL1_CCIDX_MASK;
+-		break;
+-	case SYS_ID_MMFR4_EL1:
+-		val &= ~ARM64_FEATURE_MASK(ID_MMFR4_EL1_CCIDX);
+-		break;
+ 	}
+ 
+ 	return val;
+@@ -1490,6 +1476,20 @@ static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
+ 	return REG_HIDDEN;
+ }
+ 
++static u64 read_sanitised_id_mmfr4_el1(struct kvm_vcpu *vcpu,
++				       const struct sys_reg_desc *rd)
++{
++	u64 val;
++	u32 id = reg_to_encoding(rd);
++
++	val = read_sanitised_ftr_reg(id);
++
++	/* CCIDX is not supported */
++	val &= ~ARM64_FEATURE_MASK(ID_MMFR4_EL1_CCIDX);
++
++	return val;
++}
++
+ static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+ 					  const struct sys_reg_desc *rd)
+ {
+@@ -1516,6 +1516,25 @@ static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+ 
+ 	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU);
+ 
++	if (kvm_vgic_global_state.type == VGIC_V3) {
++		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC);
++		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC), 1);
++	}
++
++	return val;
++}
++
++static u64 read_sanitised_id_aa64pfr1_el1(struct kvm_vcpu *vcpu,
++					  const struct sys_reg_desc *rd)
++{
++	u64 val;
++	u32 id = reg_to_encoding(rd);
++
++	val = read_sanitised_ftr_reg(id);
++
++	/* SME is not supported */
++	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);
++
+ 	return val;
+ }
+ 
+@@ -1638,6 +1657,34 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+ 	return pmuver_update(vcpu, rd, val, perfmon_to_pmuver(perfmon), valid_pmu);
+ }
+ 
++static u64 read_sanitised_id_aa64isar2_el1(struct kvm_vcpu *vcpu,
++					   const struct sys_reg_desc *rd)
++{
++	u64 val;
++	u32 id = reg_to_encoding(rd);
++
++	val = read_sanitised_ftr_reg(id);
++
++	if (!cpus_have_final_cap(ARM64_HAS_WFXT))
++		val &= ~ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_WFxT);
++
++	return val;
++}
++
++static u64 read_sanitised_id_aa64mmfr2_el1(struct kvm_vcpu *vcpu,
++					   const struct sys_reg_desc *rd)
++{
++	u64 val;
++	u32 id = reg_to_encoding(rd);
++
++	val = read_sanitised_ftr_reg(id);
++
++	/* CCIDX is not supported */
++	val &= ~ID_AA64MMFR2_EL1_CCIDX_MASK;
++
++	return val;
++}
++
+ /*
+  * cpufeature ID register user accessors
+  *
+@@ -2033,7 +2080,13 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	AA32_ID_SANITISED(ID_ISAR3_EL1),
+ 	AA32_ID_SANITISED(ID_ISAR4_EL1),
+ 	AA32_ID_SANITISED(ID_ISAR5_EL1),
+-	AA32_ID_SANITISED(ID_MMFR4_EL1),
++	{ SYS_DESC(SYS_ID_MMFR4_EL1),
++	  .access     = access_id_reg,
++	  .get_user   = get_id_reg,
++	  .set_user   = set_id_reg,
++	  .visibility = aa32_id_visibility,
++	  .reset      = read_sanitised_id_mmfr4_el1,
++	  .val        = 0, },
+ 	AA32_ID_SANITISED(ID_ISAR6_EL1),
+ 
+ 	/* CRm=3 */
+@@ -2054,7 +2107,12 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  .set_user = set_id_reg,
+ 	  .reset = read_sanitised_id_aa64pfr0_el1,
+ 	  .val = ID_AA64PFR0_EL1_CSV2_MASK | ID_AA64PFR0_EL1_CSV3_MASK, },
+-	ID_SANITISED(ID_AA64PFR1_EL1),
++	{ SYS_DESC(SYS_ID_AA64PFR1_EL1),
++	  .access   = access_id_reg,
++	  .get_user = get_id_reg,
++	  .set_user = set_id_reg,
++	  .reset    = read_sanitised_id_aa64pfr1_el1,
++	  .val      = 0, },
+ 	ID_UNALLOCATED(4,2),
+ 	ID_UNALLOCATED(4,3),
+ 	ID_SANITISED(ID_AA64ZFR0_EL1),
+@@ -2080,7 +2138,12 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	/* CRm=6 */
+ 	ID_SANITISED(ID_AA64ISAR0_EL1),
+ 	ID_SANITISED(ID_AA64ISAR1_EL1),
+-	ID_SANITISED(ID_AA64ISAR2_EL1),
++	{ SYS_DESC(SYS_ID_AA64ISAR2_EL1),
++	  .access   = access_id_reg,
++	  .get_user = get_id_reg,
++	  .set_user = set_id_reg,
++	  .reset    = read_sanitised_id_aa64isar2_el1,
++	  .val      = 0, },
+ 	ID_UNALLOCATED(6,3),
+ 	ID_UNALLOCATED(6,4),
+ 	ID_UNALLOCATED(6,5),
+@@ -2090,7 +2153,12 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	/* CRm=7 */
+ 	ID_SANITISED(ID_AA64MMFR0_EL1),
+ 	ID_SANITISED(ID_AA64MMFR1_EL1),
+-	ID_SANITISED(ID_AA64MMFR2_EL1),
++	{ SYS_DESC(SYS_ID_AA64MMFR2_EL1),
++	  .access   = access_id_reg,
++	  .get_user = get_id_reg,
++	  .set_user = set_id_reg,
++	  .reset    = read_sanitised_id_aa64mmfr2_el1,
++	  .val      = 0, },
+ 	ID_UNALLOCATED(7,3),
+ 	ID_UNALLOCATED(7,4),
+ 	ID_UNALLOCATED(7,5),
 -- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+2.34.1
+
