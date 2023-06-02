@@ -1,33 +1,33 @@
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2EB8C13B
-	for <kvmarm@lists.linux.dev>; Fri,  2 Jun 2023 22:15:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C216C13B
+	for <kvmarm@lists.linux.dev>; Fri,  2 Jun 2023 22:15:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1685744108; x=1717280108;
+  t=1685744112; x=1717280112;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=HVajRo8XvA6o1Hf7ztsb8kI06QIJmMblpNYA1lMUgkw=;
-  b=eNXE9L0nWZUuCKFQMSAW4j/y/zY7W6S4DcGFok0s0WLIz0SlwZ8TvAAA
-   7OCcneP/P69Q8PIFVpoaSXS4VtK54HGZ70lHkZ5Wsl1fQzH8k8NjyWbuH
-   NTT20iP8KaM5X2NknRaEiLv7bOvucMK0oXYmgQbGHF0Hxa/9jx6tDzIGD
-   8=;
+  bh=M/pB0Sn9Zyc2BxOPXPcGGAHlw3YZBnje4rXEs81o8no=;
+  b=dEYLFN6Azc4WWLEy6+QPzMgr6W2u1EZ/IwiUPoicleJTDEXQKdprHsHL
+   EtZO2trr3BMPJherMLmW7KFgD5vmWPL9F2LenJ5khaofqfHALI8x4lHt3
+   mjX47xcznQO46uldDfN7CDDukVdPfJ02HhmkHlM4pNTC6xVQxIrN97zmO
+   s=;
 X-IronPort-AV: E=Sophos;i="6.00,214,1681171200"; 
-   d="scan'208";a="7805059"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-153b24bc.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2023 22:15:06 +0000
-Received: from EX19MTAUWC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-	by email-inbound-relay-iad-1d-m6i4x-153b24bc.us-east-1.amazon.com (Postfix) with ESMTPS id B05B9C16E0;
-	Fri,  2 Jun 2023 22:15:01 +0000 (UTC)
+   d="scan'208";a="218333667"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-b5bd57cf.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2023 22:15:10 +0000
+Received: from EX19MTAUWA002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+	by email-inbound-relay-iad-1a-m6i4x-b5bd57cf.us-east-1.amazon.com (Postfix) with ESMTPS id 00BC146487;
+	Fri,  2 Jun 2023 22:15:04 +0000 (UTC)
 Received: from EX19D030UWB002.ant.amazon.com (10.13.139.182) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Fri, 2 Jun 2023 22:14:58 +0000
+ 15.2.1118.26; Fri, 2 Jun 2023 22:14:59 +0000
 Received: from u1e958862c3245e.ant.amazon.com (10.187.170.26) by
  EX19D030UWB002.ant.amazon.com (10.13.139.182) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Fri, 2 Jun 2023 22:14:58 +0000
+ 15.2.1118.26; Fri, 2 Jun 2023 22:14:59 +0000
 From: Suraj Jitindar Singh <surajjs@amazon.com>
 To: <jingzhangos@google.com>
 CC: <alexandru.elisei@arm.com>, <james.morse@arm.com>, <kvm@vger.kernel.org>,
@@ -36,9 +36,9 @@ CC: <alexandru.elisei@arm.com>, <james.morse@arm.com>, <kvm@vger.kernel.org>,
 	<rananta@google.com>, <reijiw@google.com>, <suzuki.poulose@arm.com>,
 	<tabba@google.com>, <will@kernel.org>, <sjitindarsingh@gmail.com>, "Suraj
  Jitindar Singh" <surajjs@amazon.com>
-Subject: [PATCH 1/3] KVM: arm64: Update id_reg limit value based on per vcpu flags
-Date: Fri, 2 Jun 2023 15:14:45 -0700
-Message-ID: <20230602221447.1809849-2-surajjs@amazon.com>
+Subject: [PATCH 3/3] KVM: arm64: Use per guest ID register for ID_AA64PFR1_EL1.MTE
+Date: Fri, 2 Jun 2023 15:14:47 -0700
+Message-ID: <20230602221447.1809849-4-surajjs@amazon.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230602221447.1809849-1-surajjs@amazon.com>
 References: <20230602005118.2899664-1-jingzhangos@google.com>
@@ -55,86 +55,112 @@ X-Originating-IP: [10.187.170.26]
 X-ClientProxiedBy: EX19D031UWC003.ant.amazon.com (10.13.139.252) To
  EX19D030UWB002.ant.amazon.com (10.13.139.182)
 
-There are multiple features the availability of which is enabled/disabled
-and tracked on a per vcpu level in vcpu->arch.flagset e.g. sve, ptrauth,
-and pmu. While the vm wide value of the id regs which represent the
-availability of these features is stored in the id_regs kvm struct their
-value needs to be manipulated on a per vcpu basis. This is done at read
-time in kvm_arm_read_id_reg().
+With per guest ID registers, MTE settings from userspace can be stored in
+its corresponding ID register.
 
-The value of these per vcpu flags needs to be factored in when calculating
-the id_reg limit value in check_features() as otherwise we can run into the
-following scenario.
-
-[ running on cpu which supports sve ]
-1. AA64PFR0.SVE set in id_reg by kvm_arm_init_id_regs() (cpu supports it
-   and so is set in value returned from read_sanitised_ftr_reg())
-2. vcpus created without sve feature enabled
-3. vmm reads AA64PFR0 and attempts to write the same value back
-   (writing the same value back is allowed)
-4. write fails in check_features() as limit has AA64PFR0.SVE set however it
-   is not set in the value being written and although a lower value is
-   allowed for this feature it is not in the mask of bits which can be
-   modified and so much match exactly.
-
-Thus add a step in check_features() to update the limit returned from
-id_reg->reset() with the per vcpu features which may have been
-enabled/disabled at vcpu creation time after the id_regs were initialised.
-Split this update into a new function named kvm_arm_update_id_reg() so it
-can be called from check_features() as well as kvm_arm_read_id_reg() to
-dedup code.
+No functional change intended.
 
 Signed-off-by: Suraj Jitindar Singh <surajjs@amazon.com>
 ---
- arch/arm64/kvm/sys_regs.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 21 ++++++++++-----------
+ arch/arm64/kvm/arm.c              | 11 ++++++++++-
+ arch/arm64/kvm/sys_regs.c         |  5 +++++
+ 3 files changed, 25 insertions(+), 12 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 7b0f43373dbe..861997a14ba1 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -226,9 +226,7 @@ struct kvm_arch {
+ 	 */
+ #define KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER	0
+ 	/* Memory Tagging Extension enabled for the guest */
+-#define KVM_ARCH_FLAG_MTE_ENABLED			1
+-	/* At least one vCPU has ran in the VM */
+-#define KVM_ARCH_FLAG_HAS_RAN_ONCE			2
++#define KVM_ARCH_FLAG_HAS_RAN_ONCE			1
+ 	/*
+ 	 * The following two bits are used to indicate the guest's EL1
+ 	 * register width configuration. A value of KVM_ARCH_FLAG_EL1_32BIT
+@@ -236,22 +234,22 @@ struct kvm_arch {
+ 	 * Otherwise, the guest's EL1 register width has not yet been
+ 	 * determined yet.
+ 	 */
+-#define KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED		3
+-#define KVM_ARCH_FLAG_EL1_32BIT				4
++#define KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED		2
++#define KVM_ARCH_FLAG_EL1_32BIT				3
+ 	/* PSCI SYSTEM_SUSPEND enabled for the guest */
+-#define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		5
++#define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		4
+ 	/* VM counter offset */
+-#define KVM_ARCH_FLAG_VM_COUNTER_OFFSET			6
++#define KVM_ARCH_FLAG_VM_COUNTER_OFFSET			5
+ 	/* Timer PPIs made immutable */
+-#define KVM_ARCH_FLAG_TIMER_PPIS_IMMUTABLE		7
++#define KVM_ARCH_FLAG_TIMER_PPIS_IMMUTABLE		6
+ 	/* SMCCC filter initialized for the VM */
+-#define KVM_ARCH_FLAG_SMCCC_FILTER_CONFIGURED		8
++#define KVM_ARCH_FLAG_SMCCC_FILTER_CONFIGURED		7
+ 	/*
+ 	 * AA64DFR0_EL1.PMUver was set as ID_AA64DFR0_EL1_PMUVer_IMP_DEF
+ 	 * or DFR0_EL1.PerfMon was set as ID_DFR0_EL1_PerfMon_IMPDEF from
+ 	 * userspace for VCPUs without PMU.
+ 	 */
+-#define KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU		9
++#define KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU		8
+ 
+ 	unsigned long flags;
+ 
+@@ -1112,7 +1110,8 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+ 
+ #define kvm_has_mte(kvm)					\
+ 	(system_supports_mte() &&				\
+-	 test_bit(KVM_ARCH_FLAG_MTE_ENABLED, &(kvm)->arch.flags))
++	 FIELD_GET(ID_AA64PFR1_EL1_MTE_MASK,			\
++		   IDREG(kvm, SYS_ID_AA64PFR1_EL1)))
+ 
+ #define kvm_supports_32bit_el0()				\
+ 	(system_supports_32bit_el0() &&				\
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index ca18c09ccf82..6fc4190559d1 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -80,8 +80,17 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		if (!system_supports_mte() || kvm->created_vcpus) {
+ 			r = -EINVAL;
+ 		} else {
++			u64 val;
++
++			/* Protects the idregs against modification */
++			mutex_lock(&kvm->arch.config_lock);
++
++			val = IDREG(kvm, SYS_ID_AA64PFR1_EL1);
++			val |= FIELD_PREP(ID_AA64PFR1_EL1_MTE_MASK, 1);
++			IDREG(kvm, SYS_ID_AA64PFR1_EL1) = val;
++
++			mutex_unlock(&kvm->arch.config_lock);
+ 			r = 0;
+-			set_bit(KVM_ARCH_FLAG_MTE_ENABLED, &kvm->arch.flags);
+ 		}
+ 		mutex_unlock(&kvm->lock);
+ 		break;
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 50d4e25f42d3..a4e662bd218b 100644
+index 59f8adda47fa..8cffb82dd10d 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -42,6 +42,7 @@
-  */
- 
- static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd, u64 val);
-+static u64 kvm_arm_update_id_reg(const struct kvm_vcpu *vcpu, u32 id, u64 val);
- static u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 encoding);
- static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
- 
-@@ -1241,6 +1242,7 @@ static int arm64_check_features(struct kvm_vcpu *vcpu,
- 	/* For hidden and unallocated idregs without reset, only val = 0 is allowed. */
- 	if (rd->reset) {
- 		limit = rd->reset(vcpu, rd);
-+		limit = kvm_arm_update_id_reg(vcpu, id, limit);
- 		ftr_reg = get_arm64_ftr_reg(id);
- 		if (!ftr_reg)
- 			return -EINVAL;
-@@ -1347,10 +1349,8 @@ static u64 general_read_kvm_sanitised_reg(struct kvm_vcpu *vcpu, const struct sy
- 	return read_sanitised_ftr_reg(reg_to_encoding(rd));
+@@ -3672,6 +3672,11 @@ void kvm_arm_init_id_regs(struct kvm *kvm)
+ 		idreg++;
+ 		id = reg_to_encoding(idreg);
+ 	}
++
++	/* MTE disabled by default even when supported */
++	val = IDREG(kvm, SYS_ID_AA64PFR1_EL1);
++	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE);
++	IDREG(kvm, SYS_ID_AA64PFR1_EL1) = val;
  }
  
--static u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 encoding)
-+static u64 kvm_arm_update_id_reg(const struct kvm_vcpu *vcpu, u32 encoding, u64 val)
- {
--	u64 val = IDREG(vcpu->kvm, encoding);
--
- 	switch (encoding) {
- 	case SYS_ID_AA64PFR0_EL1:
- 		if (!vcpu_has_sve(vcpu))
-@@ -1402,6 +1402,13 @@ static u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 encoding)
- 	return val;
- }
- 
-+static u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 encoding)
-+{
-+	u64 val = IDREG(vcpu->kvm, encoding);
-+
-+	return kvm_arm_update_id_reg(vcpu, encoding, val);
-+}
-+
- /* Read a sanitised cpufeature ID register by sys_reg_desc */
- static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r)
- {
+ int __init kvm_sys_reg_table_init(void)
 -- 
 2.34.1
 
