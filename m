@@ -1,504 +1,95 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 825571C765
-	for <kvmarm@lists.linux.dev>; Fri,  2 Jun 2023 16:20:08 +0000 (UTC)
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-565ef5a707dso33949267b3.3
-        for <kvmarm@lists.linux.dev>; Fri, 02 Jun 2023 09:20:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF42332E1
+	for <kvmarm@lists.linux.dev>; Fri,  2 Jun 2023 17:02:51 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-565a33c35b1so30870687b3.0
+        for <kvmarm@lists.linux.dev>; Fri, 02 Jun 2023 10:02:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685722807; x=1688314807;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fjr+ZPckWN7Gx9rztoPLqlQL95Os2FCGsaYIxOJlwEU=;
-        b=f0RsgKF8wPQKyJU1BSLOTRfMpnb2lnN8CKlcVQ/GQy+u+O7d3IZ2y4PW2KDD5UyMYh
-         inP0exrOa+PYutRAiNzuiIdWUYc2DFogHMh1TeXGnj0yxfSEoL24EGx48T/sgAm9tibb
-         3s7oFFLzcsHKs7cwtIbVr9XaxWDxbCBB2AqVApuQ77eKShQzCMz86n/6yXaQuH8y9LPt
-         khKTMSygKBtX/VAoWPVyENhbtNq3/wFxhmnRjhuzsvYzT4c9oSDbEFml9qEwLyrmSDpZ
-         zsd7lDXWb/gqYPG/P/IcJaEokZJgy9evLucKs1JWanPJC9bzOzTfQPX9/uinaiBZ67Ne
-         kxOA==
+        d=google.com; s=20221208; t=1685725370; x=1688317370;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=yIiKOLGKczROWKwulUVtZ2M9/BiqL1vWmyT9WxaSM60=;
+        b=pgEp6VvqA7aBhrJuKZzQ4zBVM03oPZHiD+4ylV7AFMyKOKMZY+kiaxDz5l0Ypk+iO2
+         MUF7c2eCaBHPpjtDiRh4GgjpTtJsKr/1ezP7uIgCNumlJZWWgEbgxSkLBGDTITBINiP0
+         h/+lY9p5RUWI1mm3RgI0TT6fMDQdeLaT406FqAvUvjluat/s5sl9h9AAkK/1H2Hx1sPb
+         TIkOmqDFjvVeSWe6Fnaup3uBKk9/wxZeRRXAEAdCIgNMknlLeaSgWKp6DPYDAKTDliwK
+         r7EIWTuWCPHj9hwA5oafkO5VzVh8JjN1pTIPxJYZHGvkqCYUIOhocoXxB+jqaTvCi1vw
+         DqAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685722807; x=1688314807;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fjr+ZPckWN7Gx9rztoPLqlQL95Os2FCGsaYIxOJlwEU=;
-        b=QKXUPyBakw1AEGRh5WXPhLncstm4n1jwNXN1Btn70M9O+Qq4H6E7pFlhMpXlQ5NAjQ
-         ekNNJ6JzTm5LH1kvz3FhRQCAh/A91/oUy5rQfvZGO7ph9nTqdMGToeC/cobxYQC3uU/T
-         IrM6RQaZPhLl6nSPG3qwgIcd9qICEqU/6ZngjqVEf5KmGn1Aco8+oems9MhvII/iXsNc
-         7Q+ARxgBVpFx5n44beFcXEyz+o1EQgOfl9SjgIxLaeUN1/g1ZnTLPAOJLp2vO/2Py/UO
-         9JeYaNQ5a8hM2ID2MyFl5C3XBZbJvQZFLyhFCgTUrKzPFfJCgGnxUF+rKzEkQxMUpZd1
-         E2Mg==
-X-Gm-Message-State: AC+VfDwnkWt1ya7EBYyG4RqXMCmpN+nz6DGXeJGQQTTWL5fIrCDBMm8z
-	MBX/KjFCQegRglwohtPOkJ2ktnsZ3uS2/A==
-X-Google-Smtp-Source: ACHHUZ4kyomLPjNrpmZGSEmjERTKhRgM/HbMdd/I2GSnguMlYgyBWXsI9bzDHvsG86Ix1B8Cff0q6n4gBWJGlQ==
-X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a81:ad19:0:b0:565:ba21:8123 with SMTP id
- l25-20020a81ad19000000b00565ba218123mr229495ywh.1.1685722807425; Fri, 02 Jun
- 2023 09:20:07 -0700 (PDT)
-Date: Fri,  2 Jun 2023 16:19:21 +0000
-In-Reply-To: <20230602161921.208564-1-amoorthy@google.com>
+        d=1e100.net; s=20221208; t=1685725370; x=1688317370;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yIiKOLGKczROWKwulUVtZ2M9/BiqL1vWmyT9WxaSM60=;
+        b=ld7+sOSjiEz0hMYLcYGfj5qEnv3oIc8EblxZWNSNJib9y9nEf6RU2x1d/huTSa69+Q
+         f/s0fK58oeFsP/JaJ4EDJw4FruSPygvMKLREc/+++VRNEAR1cXKGye9LZ1578wq2gUn4
+         LKynoqPsX+QCAUAx81iaS3kTcasrvrCAbYm5iUBSaf/fZLnCM7SkLvnAjWFJHTdkmzf6
+         Y1xW84B2Cp5x7LhstRnZgpjltD1jo/yp3H/Jwv1soieE6t/5ghCNKaP1JwB+zzTKbEaM
+         oRRy5d3f2cTaAhQPJi6j9DLQXDV7j26wT+Tqjfv6KLANOW5N+SrOfCbHHYrsd4ujEynH
+         T5nQ==
+X-Gm-Message-State: AC+VfDyz7uS+FUKoc9/lf2sEhBRTtvflZn/J6EKJ4B1T+9SGkRCekeFH
+	652NivssWKLVWxHte5GK4U2khH6fjdC1nsn8qA==
+X-Google-Smtp-Source: ACHHUZ6Vu7NrmZDIrdvPM8A+x+HDDvlXsWN3Wbj3yjrPjyPq4Je9swBQszqmoLNylUJ2YOeY/0U1p8/9fWz27M9x5g==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a05:6902:114b:b0:bad:89:29d5 with SMTP
+ id p11-20020a056902114b00b00bad008929d5mr1364181ybu.2.1685725370603; Fri, 02
+ Jun 2023 10:02:50 -0700 (PDT)
+Date: Fri,  2 Jun 2023 17:01:44 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230602161921.208564-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
-Message-ID: <20230602161921.208564-17-amoorthy@google.com>
-Subject: [PATCH v4 16/16] KVM: selftests: Handle memory fault exits in demand_paging_test
-From: Anish Moorthy <amoorthy@google.com>
-To: seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev
-Cc: pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
-	jthoughton@google.com, amoorthy@google.com, bgardon@google.com, 
-	dmatlack@google.com, ricarkol@google.com, axelrasmussen@google.com, 
-	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com
+Message-ID: <20230602170147.1541355-1-coltonlewis@google.com>
+Subject: [PATCH 0/3] Relax break-before-make use with FEAT_BBM
+From: Colton Lewis <coltonlewis@google.com>
+To: kvm@vger.kernel.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Demonstrate a (very basic) scheme for supporting memory fault exits.
+Currently KVM follows the lengthy break-before-make process every time
+the page size changes, which requires KVM to do a broadcast TLB
+invalidation and data serialization for every affected page table
+entry. This is expensive.
 
-From the vCPU threads:
-1. Simply issue UFFDIO_COPY/CONTINUEs in response to memory fault exits,
-   with the purpose of establishing the absent mappings. Do so with
-   wake_waiters=false to avoid serializing on the userfaultfd wait queue
-   locks.
+FEAT_BBM Level 2 support precludes the need to follow the whole
+process when page size is the only thing that changed. This series
+detects said support and avoids the unnecessary expensive operations,
+speeding up the execution of the stage2 page table walkers.
 
-2. When the UFFDIO_COPY/CONTINUE in (1) fails with EEXIST,
-   assume that the mapping was already established but is currently
-   absent [A] and attempt to populate it using MADV_POPULATE_WRITE.
+Considerable time and effort has been spent trying to measure the
+performance benefit, mainly using dirty_log_perf_test with huge pages,
+but nothing was seen that stood out from ordinary variation between
+runs. This is puzzling, but getting the series reviewed anyway may
+spark some ideas.
 
-Issue UFFDIO_COPY/CONTINUEs from the reader threads as well, but with
-wake_waiters=true to ensure that any threads sleeping on the uffd are
-eventually woken up.
+This is based on kvmarm-6.4 + Ricardo's eager page splitting series
+[1] to cover the eager splitting case as well. Similar changes were
+originally part of that series but it was suggested FEAT_BBM should be
+its own series.
 
-A real VMM would track whether it had already COPY/CONTINUEd pages (eg,
-via a bitmap) to avoid calls destined to EEXIST. However, even the
-naive approach is enough to demonstrate the performance advantages of
-KVM_EXIT_MEMORY_FAULT.
+[1] https://lore.kernel.org/kvmarm/20230426172330.1439644-1-ricarkol@google.com/
 
-[A] In reality it is much likelier that the vCPU thread simply lost a
-    race to establish the mapping for the page.
+Colton Lewis (2):
+  KVM: arm64: Clear possible conflict aborts
+  KVM: arm64: Skip break phase when we have FEAT_BBM level 2
 
-Signed-off-by: Anish Moorthy <amoorthy@google.com>
-Acked-by: James Houghton <jthoughton@google.com>
----
- .../selftests/kvm/demand_paging_test.c        | 235 +++++++++++++-----
- 1 file changed, 166 insertions(+), 69 deletions(-)
+Ricardo Koller (1):
+  arm64: Add a capability for FEAT_BBM level 2
 
-diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-index ffbc89300c46..4b79c88cb22d 100644
---- a/tools/testing/selftests/kvm/demand_paging_test.c
-+++ b/tools/testing/selftests/kvm/demand_paging_test.c
-@@ -15,6 +15,7 @@
- #include <time.h>
- #include <pthread.h>
- #include <linux/userfaultfd.h>
-+#include <linux/mman.h>
- #include <sys/syscall.h>
- 
- #include "kvm_util.h"
-@@ -31,36 +32,99 @@ static uint64_t guest_percpu_mem_size = DEFAULT_PER_VCPU_MEM_SIZE;
- static size_t demand_paging_size;
- static char *guest_data_prototype;
- 
-+static int num_uffds;
-+static size_t uffd_region_size;
-+static struct uffd_desc **uffd_descs;
-+/*
-+ * Delay when demand paging is performed through userfaultfd or directly by
-+ * vcpu_worker in the case of a KVM_EXIT_MEMORY_FAULT.
-+ */
-+static useconds_t uffd_delay;
-+static int uffd_mode;
-+
-+
-+static int handle_uffd_page_request(int uffd_mode, int uffd, uint64_t hva,
-+				    bool is_vcpu);
-+
-+static void madv_write_or_err(uint64_t gpa)
-+{
-+	int r;
-+	void *hva = addr_gpa2hva(memstress_args.vm, gpa);
-+
-+	r = madvise(hva, demand_paging_size, MADV_POPULATE_WRITE);
-+	TEST_ASSERT(r == 0,
-+		    "MADV_POPULATE_WRITE on hva 0x%lx (gpa 0x%lx) fail, errno %i\n",
-+		    (uintptr_t) hva, gpa, errno);
-+}
-+
-+static void ready_page(uint64_t gpa)
-+{
-+	int r, uffd;
-+
-+	/*
-+	 * This test only registers memslot 1 w/ userfaultfd. Any accesses outside
-+	 * the registered ranges should fault in the physical pages through
-+	 * MADV_POPULATE_WRITE.
-+	 */
-+	if ((gpa < memstress_args.gpa)
-+		|| (gpa >= memstress_args.gpa + memstress_args.size)) {
-+		madv_write_or_err(gpa);
-+	} else {
-+		if (uffd_delay)
-+			usleep(uffd_delay);
-+
-+		uffd = uffd_descs[(gpa - memstress_args.gpa) / uffd_region_size]->uffd;
-+
-+		r = handle_uffd_page_request(uffd_mode, uffd,
-+					     (uint64_t) addr_gpa2hva(memstress_args.vm, gpa), true);
-+
-+		if (r == EEXIST)
-+			madv_write_or_err(gpa);
-+	}
-+}
-+
- static void vcpu_worker(struct memstress_vcpu_args *vcpu_args)
- {
- 	struct kvm_vcpu *vcpu = vcpu_args->vcpu;
- 	int vcpu_idx = vcpu_args->vcpu_idx;
- 	struct kvm_run *run = vcpu->run;
--	struct timespec start;
--	struct timespec ts_diff;
-+	struct timespec last_start;
-+	struct timespec total_runtime = {};
- 	int ret;
- 
--	clock_gettime(CLOCK_MONOTONIC, &start);
- 
--	/* Let the guest access its memory */
--	ret = _vcpu_run(vcpu);
--	TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
--	if (get_ucall(vcpu, NULL) != UCALL_SYNC) {
--		TEST_ASSERT(false,
--			    "Invalid guest sync status: exit_reason=%s\n",
--			    exit_reason_str(run->exit_reason));
--	}
-+	while (true) {
-+		clock_gettime(CLOCK_MONOTONIC, &last_start);
-+		/* Let the guest access its memory */
-+		ret = _vcpu_run(vcpu);
-+		TEST_ASSERT(ret == 0
-+			    || (errno == EFAULT
-+				&& run->exit_reason == KVM_EXIT_MEMORY_FAULT),
-+			    "vcpu_run failed: %d\n", ret);
- 
--	ts_diff = timespec_elapsed(start);
-+		total_runtime = timespec_add(total_runtime,
-+					     timespec_elapsed(last_start));
-+		if (ret != 0 && get_ucall(vcpu, NULL) != UCALL_SYNC) {
-+
-+			if (run->exit_reason == KVM_EXIT_MEMORY_FAULT) {
-+				ready_page(run->memory_fault.gpa);
-+				continue;
-+			}
-+
-+			TEST_ASSERT(false,
-+				    "Invalid guest sync status: exit_reason=%s\n",
-+				    exit_reason_str(run->exit_reason));
-+		}
-+		break;
-+	}
- 	PER_VCPU_DEBUG("vCPU %d execution time: %ld.%.9lds\n", vcpu_idx,
--		       ts_diff.tv_sec, ts_diff.tv_nsec);
-+			total_runtime.tv_sec, total_runtime.tv_nsec);
- }
- 
--static int handle_uffd_page_request(int uffd_mode, int uffd,
--		struct uffd_msg *msg)
-+static int handle_uffd_page_request(int uffd_mode, int uffd, uint64_t hva,
-+				    bool is_vcpu)
- {
- 	pid_t tid = syscall(__NR_gettid);
--	uint64_t addr = msg->arg.pagefault.address;
- 	struct timespec start;
- 	struct timespec ts_diff;
- 	int r;
-@@ -71,16 +135,15 @@ static int handle_uffd_page_request(int uffd_mode, int uffd,
- 		struct uffdio_copy copy;
- 
- 		copy.src = (uint64_t)guest_data_prototype;
--		copy.dst = addr;
-+		copy.dst = hva;
- 		copy.len = demand_paging_size;
--		copy.mode = 0;
-+		copy.mode = is_vcpu ? UFFDIO_COPY_MODE_DONTWAKE : 0;
- 
--		r = ioctl(uffd, UFFDIO_COPY, &copy);
- 		/*
--		 * With multiple vCPU threads fault on a single page and there are
--		 * multiple readers for the UFFD, at least one of the UFFDIO_COPYs
--		 * will fail with EEXIST: handle that case without signaling an
--		 * error.
-+		 * With multiple vCPU threads and at least one of multiple reader threads
-+		 * or vCPU memory faults, multiple vCPUs accessing an absent page will
-+		 * almost certainly cause some thread doing the UFFDIO_COPY here to get
-+		 * EEXIST: make sure to allow that case.
- 		 *
- 		 * Note that this also suppress any EEXISTs occurring from,
- 		 * e.g., the first UFFDIO_COPY/CONTINUEs on a page. That never
-@@ -88,23 +151,24 @@ static int handle_uffd_page_request(int uffd_mode, int uffd,
- 		 * some external state to correctly surface EEXISTs to userspace
- 		 * (or prevent duplicate COPY/CONTINUEs in the first place).
- 		 */
--		if (r == -1 && errno != EEXIST) {
--			pr_info("Failed UFFDIO_COPY in 0x%lx from thread %d, errno = %d\n",
--				addr, tid, errno);
--			return r;
--		}
-+		r = ioctl(uffd, UFFDIO_COPY, &copy);
-+		TEST_ASSERT(r == 0 || errno == EEXIST,
-+			    "Thread 0x%x failed UFFDIO_COPY on hva 0x%lx, errno = %d",
-+			    tid, hva, errno);
- 	} else if (uffd_mode == UFFDIO_REGISTER_MODE_MINOR) {
-+		/* The comments in the UFFDIO_COPY branch also apply here. */
- 		struct uffdio_continue cont = {0};
- 
--		cont.range.start = addr;
-+		cont.range.start = hva;
- 		cont.range.len = demand_paging_size;
-+		cont.mode = is_vcpu ? UFFDIO_CONTINUE_MODE_DONTWAKE : 0;
- 
- 		r = ioctl(uffd, UFFDIO_CONTINUE, &cont);
- 		/*
--		 * With multiple vCPU threads fault on a single page and there are
--		 * multiple readers for the UFFD, at least one of the UFFDIO_COPYs
--		 * will fail with EEXIST: handle that case without signaling an
--		 * error.
-+		 * With multiple vCPU threads and at least one of multiple reader threads
-+		 * or vCPU memory faults, multiple vCPUs accessing an absent page will
-+		 * almost certainly cause some thread doing the UFFDIO_COPY here to get
-+		 * EEXIST: make sure to allow that case.
- 		 *
- 		 * Note that this also suppress any EEXISTs occurring from,
- 		 * e.g., the first UFFDIO_COPY/CONTINUEs on a page. That never
-@@ -112,32 +176,54 @@ static int handle_uffd_page_request(int uffd_mode, int uffd,
- 		 * some external state to correctly surface EEXISTs to userspace
- 		 * (or prevent duplicate COPY/CONTINUEs in the first place).
- 		 */
--		if (r == -1 && errno != EEXIST) {
--			pr_info("Failed UFFDIO_CONTINUE in 0x%lx, thread %d, errno = %d\n",
--				addr, tid, errno);
--			return r;
--		}
-+		TEST_ASSERT(r == 0 || errno == EEXIST,
-+			    "Thread 0x%x failed UFFDIO_CONTINUE on hva 0x%lx, errno = %d",
-+			    tid, hva, errno);
- 	} else {
- 		TEST_FAIL("Invalid uffd mode %d", uffd_mode);
- 	}
- 
-+	/*
-+	 * If the above UFFDIO_COPY/CONTINUE failed with EEXIST, waiting threads
-+	 * will not have been woken: wake them here.
-+	 */
-+	if (!is_vcpu && r != 0) {
-+		struct uffdio_range range = {
-+			.start = hva,
-+			.len = demand_paging_size
-+		};
-+		r = ioctl(uffd, UFFDIO_WAKE, &range);
-+		TEST_ASSERT(r == 0,
-+			    "Thread 0x%x failed UFFDIO_WAKE on hva 0x%lx, errno = %d",
-+			    tid, hva, errno);
-+	}
-+
- 	ts_diff = timespec_elapsed(start);
- 
- 	PER_PAGE_DEBUG("UFFD page-in %d \t%ld ns\n", tid,
- 		       timespec_to_ns(ts_diff));
- 	PER_PAGE_DEBUG("Paged in %ld bytes at 0x%lx from thread %d\n",
--		       demand_paging_size, addr, tid);
-+		       demand_paging_size, hva, tid);
- 
- 	return 0;
- }
- 
-+static int handle_uffd_page_request_from_uffd(int uffd_mode, int uffd,
-+					      struct uffd_msg *msg)
-+{
-+	TEST_ASSERT(msg->event == UFFD_EVENT_PAGEFAULT,
-+		    "Received uffd message with event %d != UFFD_EVENT_PAGEFAULT",
-+		    msg->event);
-+	return handle_uffd_page_request(uffd_mode, uffd,
-+					msg->arg.pagefault.address, false);
-+}
-+
- struct test_params {
--	int uffd_mode;
- 	bool single_uffd;
--	useconds_t uffd_delay;
- 	int readers_per_uffd;
- 	enum vm_mem_backing_src_type src_type;
- 	bool partition_vcpu_memory_access;
-+	bool memfault_exits;
- };
- 
- static void prefault_mem(void *alias, uint64_t len)
-@@ -155,16 +241,22 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- {
- 	struct memstress_vcpu_args *vcpu_args;
- 	struct test_params *p = arg;
--	struct uffd_desc **uffd_descs = NULL;
- 	struct timespec start;
- 	struct timespec ts_diff;
- 	struct kvm_vm *vm;
--	int i, num_uffds = 0;
-+	int i;
- 	double vcpu_paging_rate;
--	uint64_t uffd_region_size;
-+	uint32_t slot_flags = 0;
-+	bool uffd_memfault_exits = uffd_mode && p->memfault_exits;
- 
--	vm = memstress_create_vm(mode, nr_vcpus, guest_percpu_mem_size, 1, 0,
--				 p->src_type, p->partition_vcpu_memory_access);
-+	if (uffd_memfault_exits) {
-+		TEST_ASSERT(kvm_has_cap(KVM_CAP_NOWAIT_ON_FAULT) > 0,
-+					"KVM does not have KVM_CAP_NOWAIT_ON_FAULT");
-+		slot_flags = KVM_MEM_NOWAIT_ON_FAULT;
-+	}
-+
-+	vm = memstress_create_vm(mode, nr_vcpus, guest_percpu_mem_size,
-+				 1, slot_flags, p->src_type, p->partition_vcpu_memory_access);
- 
- 	demand_paging_size = get_backing_src_pagesz(p->src_type);
- 
-@@ -173,21 +265,21 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 		    "Failed to allocate buffer for guest data pattern");
- 	memset(guest_data_prototype, 0xAB, demand_paging_size);
- 
--	if (p->uffd_mode == UFFDIO_REGISTER_MODE_MINOR) {
--		num_uffds = p->single_uffd ? 1 : nr_vcpus;
--		for (i = 0; i < num_uffds; i++) {
--			vcpu_args = &memstress_args.vcpu_args[i];
--			prefault_mem(addr_gpa2alias(vm, vcpu_args->gpa),
--				     vcpu_args->pages * memstress_args.guest_page_size);
--		}
--	}
--
--	if (p->uffd_mode) {
-+	if (uffd_mode) {
- 		num_uffds = p->single_uffd ? 1 : nr_vcpus;
- 		uffd_region_size = nr_vcpus * guest_percpu_mem_size / num_uffds;
- 
-+		if (uffd_mode == UFFDIO_REGISTER_MODE_MINOR) {
-+			for (i = 0; i < num_uffds; i++) {
-+				vcpu_args = &memstress_args.vcpu_args[i];
-+				prefault_mem(addr_gpa2alias(vm, vcpu_args->gpa),
-+					     uffd_region_size);
-+			}
-+		}
-+
- 		uffd_descs = malloc(num_uffds * sizeof(struct uffd_desc *));
--		TEST_ASSERT(uffd_descs, "Memory allocation failed");
-+		TEST_ASSERT(uffd_descs, "Failed to allocate uffd descriptors");
-+
- 		for (i = 0; i < num_uffds; i++) {
- 			struct memstress_vcpu_args *vcpu_args;
- 			void *vcpu_hva;
-@@ -201,10 +293,10 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 			 * requests.
- 			 */
- 			uffd_descs[i] = uffd_setup_demand_paging(
--				p->uffd_mode, p->uffd_delay, vcpu_hva,
-+				uffd_mode, uffd_delay, vcpu_hva,
- 				uffd_region_size,
- 				p->readers_per_uffd,
--				&handle_uffd_page_request);
-+				&handle_uffd_page_request_from_uffd);
- 		}
- 	}
- 
-@@ -218,7 +310,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	ts_diff = timespec_elapsed(start);
- 	pr_info("All vCPU threads joined\n");
- 
--	if (p->uffd_mode) {
-+	if (uffd_mode) {
- 		/* Tell the user fault fd handler threads to quit */
- 		for (i = 0; i < num_uffds; i++)
- 			uffd_stop_demand_paging(uffd_descs[i]);
-@@ -239,7 +331,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	memstress_destroy_vm(vm);
- 
- 	free(guest_data_prototype);
--	if (p->uffd_mode)
-+	if (uffd_mode)
- 		free(uffd_descs);
- }
- 
-@@ -248,7 +340,7 @@ static void help(char *name)
- 	puts("");
- 	printf("usage: %s [-h] [-m vm_mode] [-u uffd_mode] [-a]\n"
- 		   "          [-d uffd_delay_usec] [-r readers_per_uffd] [-b memory]\n"
--		   "          [-s type] [-v vcpus] [-o]\n", name);
-+		   "          [-w] [-s type] [-v vcpus] [-o]\n", name);
- 	guest_modes_help();
- 	printf(" -u: use userfaultfd to handle vCPU page faults. Mode is a\n"
- 	       "     UFFD registration mode: 'MISSING' or 'MINOR'.\n");
-@@ -259,6 +351,7 @@ static void help(char *name)
- 	       "     FD handler to simulate demand paging\n"
- 	       "     overheads. Ignored without -u.\n");
- 	printf(" -r: Set the number of reader threads per uffd.\n");
-+	printf(" -w: Enable kvm cap for memory fault exits.\n");
- 	printf(" -b: specify the size of the memory region which should be\n"
- 	       "     demand paged by each vCPU. e.g. 10M or 3G.\n"
- 	       "     Default: 1G\n");
-@@ -278,29 +371,30 @@ int main(int argc, char *argv[])
- 		.partition_vcpu_memory_access = true,
- 		.readers_per_uffd = 1,
- 		.single_uffd = false,
-+		.memfault_exits = false,
- 	};
- 	int opt;
- 
- 	guest_modes_append_default();
- 
--	while ((opt = getopt(argc, argv, "ahom:u:d:b:s:v:r:")) != -1) {
-+	while ((opt = getopt(argc, argv, "ahowm:u:d:b:s:v:r:")) != -1) {
- 		switch (opt) {
- 		case 'm':
- 			guest_modes_cmdline(optarg);
- 			break;
- 		case 'u':
- 			if (!strcmp("MISSING", optarg))
--				p.uffd_mode = UFFDIO_REGISTER_MODE_MISSING;
-+				uffd_mode = UFFDIO_REGISTER_MODE_MISSING;
- 			else if (!strcmp("MINOR", optarg))
--				p.uffd_mode = UFFDIO_REGISTER_MODE_MINOR;
--			TEST_ASSERT(p.uffd_mode, "UFFD mode must be 'MISSING' or 'MINOR'.");
-+				uffd_mode = UFFDIO_REGISTER_MODE_MINOR;
-+			TEST_ASSERT(uffd_mode, "UFFD mode must be 'MISSING' or 'MINOR'.");
- 			break;
- 		case 'a':
- 			p.single_uffd = true;
- 			break;
- 		case 'd':
--			p.uffd_delay = strtoul(optarg, NULL, 0);
--			TEST_ASSERT(p.uffd_delay >= 0, "A negative UFFD delay is not supported.");
-+			uffd_delay = strtoul(optarg, NULL, 0);
-+			TEST_ASSERT(uffd_delay >= 0, "A negative UFFD delay is not supported.");
- 			break;
- 		case 'b':
- 			guest_percpu_mem_size = parse_size(optarg);
-@@ -323,6 +417,9 @@ int main(int argc, char *argv[])
- 				    "Invalid number of readers per uffd %d: must be >=1",
- 				    p.readers_per_uffd);
- 			break;
-+		case 'w':
-+			p.memfault_exits = true;
-+			break;
- 		case 'h':
- 		default:
- 			help(argv[0]);
-@@ -330,7 +427,7 @@ int main(int argc, char *argv[])
- 		}
- 	}
- 
--	if (p.uffd_mode == UFFDIO_REGISTER_MODE_MINOR &&
-+	if (uffd_mode == UFFDIO_REGISTER_MODE_MINOR &&
- 	    !backing_src_is_shared(p.src_type)) {
- 		TEST_FAIL("userfaultfd MINOR mode requires shared memory; pick a different -s");
- 	}
--- 
+ arch/arm64/include/asm/esr.h   |  1 +
+ arch/arm64/kernel/cpufeature.c | 11 +++++++
+ arch/arm64/kvm/hyp/pgtable.c   | 58 ++++++++++++++++++++++++++++++----
+ arch/arm64/kvm/mmu.c           |  6 ++++
+ arch/arm64/tools/cpucaps       |  1 +
+ 5 files changed, 70 insertions(+), 7 deletions(-)
+
+--
 2.41.0.rc0.172.g3f132b7071-goog
-
