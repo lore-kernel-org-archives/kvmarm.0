@@ -1,267 +1,186 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E532179
-	for <kvmarm@lists.linux.dev>; Sat,  3 Jun 2023 02:52:03 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-56536dd5f79so41815477b3.3
-        for <kvmarm@lists.linux.dev>; Fri, 02 Jun 2023 19:52:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685760722; x=1688352722;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KDFXlg40JZK7tD1QcINc3yvgddagMFe1ISddFDG7yUk=;
-        b=jjrCMUfevaPYgb2kZwsK1yDw7Qlp8585C9teElxM/xHufCFV3l63n5NHNbiPffqLeV
-         KmpleA/Kdn1JqTCpeOrLlqzCz0KhToR5k7o3gU0zyJlErZFHsvIKm4nm0Tj4RW6krX45
-         dx1KBykEOQpPDW5NccaI7csUq/WQkGCQps/wA1aq79jwWiyI9ThIgRSchtJuwSuVzKKa
-         v3hGZ1WKVhKnMPrvuDnawLt+L2qyKD98LfwjhFUUEOqfFn4nFF09pYRWAq33+MtW/26j
-         drcEZZuTyh16IOrbgy++GzYImwlu8KEsa8nvMvI3+LA1TFZow7KsYlTtArA61oWr4Yv9
-         jKMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685760722; x=1688352722;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KDFXlg40JZK7tD1QcINc3yvgddagMFe1ISddFDG7yUk=;
-        b=XAxPRwmIEeoDJ5MuXfX1vt1qWrLB0xkyuqGy7oEKd2j3EJ6CrRT+ugnB2/eahtb3Xt
-         yha5P6cGYfbeyWodj4U8QQeEuwqrvJi8JFEwrCgpxQKRZbglROqx+DIgCKpi1Su9mvXO
-         R/UjEV7MvRjfFS2gm3aOiZELkFdWKcZfPzIz0GIQGwgN8Nr6Xdwo5p+r6R2bfyCqz+Aa
-         N2RVPHiN1LiYnK1mEtQM92P2SZHuEmtgOOYV3qTo2YF2Aszl/nezsIMKFe0XhU6IvA0O
-         Z2CQpr2bli5agKIGfr6Rli6FZ4xeVT0uXVdHInEPMv1CyuWALsM1xlzg87y22wrdnjG/
-         O8mA==
-X-Gm-Message-State: AC+VfDxFWa/uS1LyAtmKP7YUUQ9OX0IeNjJdgLIvvZunG3qw/tSqbxHm
-	ravwnpHhgdgBtdJp2aXvqZ2GmR9YM8A=
-X-Google-Smtp-Source: ACHHUZ4CDztfSVCjau0l24GyQAsrUl9AQhGkOIfEYDSBDcjmK8RGLjB3vZ/MQohARF1O0R5waBVGa8RCccg=
-X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a81:ad06:0:b0:565:bf4b:de20 with SMTP id
- l6-20020a81ad06000000b00565bf4bde20mr926860ywh.2.1685760722413; Fri, 02 Jun
- 2023 19:52:02 -0700 (PDT)
-Date: Fri,  2 Jun 2023 19:50:35 -0700
-In-Reply-To: <20230603025035.3781797-1-reijiw@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F3FEA0
+	for <kvmarm@lists.linux.dev>; Sat,  3 Jun 2023 08:28:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9169DC433EF;
+	Sat,  3 Jun 2023 08:28:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1685780917;
+	bh=IOH6BDtjdHdj2Ki7Qz9IKgk5ZqvOjp0LEXK8sZ8Oj/M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AqibLvnDTSdlltYZ76xopNcV9SGEyFAqKBJKY16SvdI/KZVj7tBcHz4znHSXtv3vV
+	 2DfdbMkiu/b8C+NZEzx1sGFqkuqQXpIN29Qeek+xcS5ikA/E683px4GhYivLIHyWn+
+	 M9QcoVn1gAKgBtFMZ5Pi3j1055dgh79mJLhXMB7SJEN2A+SD2wqSfjXqKGWq9krvyP
+	 +/0Cj2jz0eyLX6H98AhIuOg6eX9uaLHLcMf4M/0uX2aANUT9Kbso/rtQk73l+kuRWW
+	 oqVEvbSJjlFLdTFpMZsG6ElEOT3WNxLft7fPrMdcU//hszoKNBSzy00bzbdy9wgyXx
+	 SCsOVKLW+7khg==
+Received: from [37.166.197.171] (helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1q5Mcl-002Wla-25;
+	Sat, 03 Jun 2023 09:28:35 +0100
+Date: Sat, 03 Jun 2023 09:28:33 +0100
+Message-ID: <873539ospa.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Suraj Jitindar Singh <surajjs@amazon.com>
+Cc: <jingzhangos@google.com>,
+	<alexandru.elisei@arm.com>,
+	<james.morse@arm.com>,
+	<kvm@vger.kernel.org>,
+	<kvmarm@lists.linux.dev>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<oupton@google.com>,
+	<pbonzini@redhat.com>,
+	<rananta@google.com>,
+	<reijiw@google.com>,
+	<suzuki.poulose@arm.com>,
+	<tabba@google.com>,
+	<will@kernel.org>,
+	<sjitindarsingh@gmail.com>
+Subject: Re: [PATCH 3/3] KVM: arm64: Use per guest ID register for ID_AA64PFR1_EL1.MTE
+In-Reply-To: <20230602221447.1809849-4-surajjs@amazon.com>
+References: <20230602005118.2899664-1-jingzhangos@google.com>
+	<20230602221447.1809849-1-surajjs@amazon.com>
+	<20230602221447.1809849-4-surajjs@amazon.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230603025035.3781797-1-reijiw@google.com>
-X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
-Message-ID: <20230603025035.3781797-3-reijiw@google.com>
-Subject: [PATCH v5 2/2] KVM: arm64: PMU: Don't overwrite PMUSERENR with vcpu loaded
-From: Reiji Watanabe <reijiw@google.com>
-To: Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Will Deacon <will@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Ricardo Koller <ricarkol@google.com>, 
-	Jing Zhang <jingzhangos@google.com>, Raghavendra Rao Anata <rananta@google.com>, 
-	Shaoqin Huang <shahuang@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Reiji Watanabe <reijiw@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 37.166.197.171
+X-SA-Exim-Rcpt-To: surajjs@amazon.com, jingzhangos@google.com, alexandru.elisei@arm.com, james.morse@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, pbonzini@redhat.com, rananta@google.com, reijiw@google.com, suzuki.poulose@arm.com, tabba@google.com, will@kernel.org, sjitindarsingh@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Currently, with VHE, KVM sets ER, CR, SW and EN bits of
-PMUSERENR_EL0 to 1 on vcpu_load(), and saves and restores
-the register value for the host on vcpu_load() and vcpu_put().
-If the value of those bits are cleared on a pCPU with a vCPU
-loaded (armv8pmu_start() would do that when PMU counters are
-programmed for the guest), PMU access from the guest EL0 might
-be trapped to the guest EL1 directly regardless of the current
-PMUSERENR_EL0 value of the vCPU.
+On Fri, 02 Jun 2023 23:14:47 +0100,
+Suraj Jitindar Singh <surajjs@amazon.com> wrote:
+> 
+> With per guest ID registers, MTE settings from userspace can be stored in
+> its corresponding ID register.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Suraj Jitindar Singh <surajjs@amazon.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 21 ++++++++++-----------
+>  arch/arm64/kvm/arm.c              | 11 ++++++++++-
+>  arch/arm64/kvm/sys_regs.c         |  5 +++++
+>  3 files changed, 25 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 7b0f43373dbe..861997a14ba1 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -226,9 +226,7 @@ struct kvm_arch {
+>  	 */
+>  #define KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER	0
+>  	/* Memory Tagging Extension enabled for the guest */
+> -#define KVM_ARCH_FLAG_MTE_ENABLED			1
+> -	/* At least one vCPU has ran in the VM */
+> -#define KVM_ARCH_FLAG_HAS_RAN_ONCE			2
+> +#define KVM_ARCH_FLAG_HAS_RAN_ONCE			1
+>  	/*
+>  	 * The following two bits are used to indicate the guest's EL1
+>  	 * register width configuration. A value of KVM_ARCH_FLAG_EL1_32BIT
+> @@ -236,22 +234,22 @@ struct kvm_arch {
+>  	 * Otherwise, the guest's EL1 register width has not yet been
+>  	 * determined yet.
+>  	 */
+> -#define KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED		3
+> -#define KVM_ARCH_FLAG_EL1_32BIT				4
+> +#define KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED		2
+> +#define KVM_ARCH_FLAG_EL1_32BIT				3
+>  	/* PSCI SYSTEM_SUSPEND enabled for the guest */
+> -#define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		5
+> +#define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		4
+>  	/* VM counter offset */
+> -#define KVM_ARCH_FLAG_VM_COUNTER_OFFSET			6
+> +#define KVM_ARCH_FLAG_VM_COUNTER_OFFSET			5
+>  	/* Timer PPIs made immutable */
+> -#define KVM_ARCH_FLAG_TIMER_PPIS_IMMUTABLE		7
+> +#define KVM_ARCH_FLAG_TIMER_PPIS_IMMUTABLE		6
+>  	/* SMCCC filter initialized for the VM */
+> -#define KVM_ARCH_FLAG_SMCCC_FILTER_CONFIGURED		8
+> +#define KVM_ARCH_FLAG_SMCCC_FILTER_CONFIGURED		7
+>  	/*
+>  	 * AA64DFR0_EL1.PMUver was set as ID_AA64DFR0_EL1_PMUVer_IMP_DEF
+>  	 * or DFR0_EL1.PerfMon was set as ID_DFR0_EL1_PerfMon_IMPDEF from
+>  	 * userspace for VCPUs without PMU.
+>  	 */
+> -#define KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU		9
+> +#define KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU		8
+>  
+>  	unsigned long flags;
+>  
+> @@ -1112,7 +1110,8 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+>  
+>  #define kvm_has_mte(kvm)					\
+>  	(system_supports_mte() &&				\
+> -	 test_bit(KVM_ARCH_FLAG_MTE_ENABLED, &(kvm)->arch.flags))
+> +	 FIELD_GET(ID_AA64PFR1_EL1_MTE_MASK,			\
+> +		   IDREG(kvm, SYS_ID_AA64PFR1_EL1)))
+>  
+>  #define kvm_supports_32bit_el0()				\
+>  	(system_supports_32bit_el0() &&				\
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index ca18c09ccf82..6fc4190559d1 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -80,8 +80,17 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>  		if (!system_supports_mte() || kvm->created_vcpus) {
+>  			r = -EINVAL;
+>  		} else {
+> +			u64 val;
+> +
+> +			/* Protects the idregs against modification */
+> +			mutex_lock(&kvm->arch.config_lock);
+> +
+> +			val = IDREG(kvm, SYS_ID_AA64PFR1_EL1);
+> +			val |= FIELD_PREP(ID_AA64PFR1_EL1_MTE_MASK, 1);
 
-Fix this by not letting armv8pmu_start() overwrite PMUSERENR_EL0
-on the pCPU where PMUSERENR_EL0 for the guest is loaded, and
-instead updating the saved shadow register value for the host
-so that the value can be restored on vcpu_put() later.
-While vcpu_{put,load}() are manipulating PMUSERENR_EL0, disable
-IRQs to prevent a race condition between these processes and IPIs
-that attempt to update PMUSERENR_EL0 for the host EL0.
+The architecture specifies 3 versions of MTE in the published ARM ARM,
+with a 4th coming up as part of the 2022 extensions. Why are you
+actively crippling the MTE version presented to the guest, and
+potentially introduce unexpected behaviours?
 
-Suggested-by: Mark Rutland <mark.rutland@arm.com>
-Suggested-by: Marc Zyngier <maz@kernel.org>
-Fixes: 83a7a4d643d3 ("arm64: perf: Enable PMU counter userspace access for perf event")
-Signed-off-by: Reiji Watanabe <reijiw@google.com>
----
- arch/arm/include/asm/arm_pmuv3.h        |  5 +++++
- arch/arm64/include/asm/kvm_host.h       |  7 +++++++
- arch/arm64/kvm/hyp/include/hyp/switch.h |  2 ++
- arch/arm64/kvm/hyp/vhe/switch.c         | 14 +++++++++++++
- arch/arm64/kvm/pmu.c                    | 27 +++++++++++++++++++++++++
- drivers/perf/arm_pmuv3.c                | 21 ++++++++++++++++---
- 6 files changed, 73 insertions(+), 3 deletions(-)
+> +			IDREG(kvm, SYS_ID_AA64PFR1_EL1) = val;
+> +
+> +			mutex_unlock(&kvm->arch.config_lock);
+>  			r = 0;
+> -			set_bit(KVM_ARCH_FLAG_MTE_ENABLED, &kvm->arch.flags);
+>  		}
+>  		mutex_unlock(&kvm->lock);
+>  		break;
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 59f8adda47fa..8cffb82dd10d 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -3672,6 +3672,11 @@ void kvm_arm_init_id_regs(struct kvm *kvm)
+>  		idreg++;
+>  		id = reg_to_encoding(idreg);
+>  	}
+> +
+> +	/* MTE disabled by default even when supported */
+> +	val = IDREG(kvm, SYS_ID_AA64PFR1_EL1);
+> +	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE);
+> +	IDREG(kvm, SYS_ID_AA64PFR1_EL1) = val;
+>  }
+>  
+>  int __init kvm_sys_reg_table_init(void)
 
-diff --git a/arch/arm/include/asm/arm_pmuv3.h b/arch/arm/include/asm/arm_pmuv3.h
-index f4db3e75d75f..f3cd04ff022d 100644
---- a/arch/arm/include/asm/arm_pmuv3.h
-+++ b/arch/arm/include/asm/arm_pmuv3.h
-@@ -222,6 +222,11 @@ static inline bool kvm_pmu_counter_deferred(struct perf_event_attr *attr)
- 	return false;
- }
- 
-+static inline bool kvm_set_pmuserenr(u64 val)
-+{
-+	return false;
-+}
-+
- /* PMU Version in DFR Register */
- #define ARMV8_PMU_DFR_VER_NI        0
- #define ARMV8_PMU_DFR_VER_V3P4      0x5
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7e7e19ef6993..9787503ff43f 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -699,6 +699,8 @@ struct kvm_vcpu_arch {
- #define SYSREGS_ON_CPU		__vcpu_single_flag(sflags, BIT(4))
- /* Software step state is Active-pending */
- #define DBG_SS_ACTIVE_PENDING	__vcpu_single_flag(sflags, BIT(5))
-+/* PMUSERENR for the guest EL0 is on physical CPU */
-+#define PMUSERENR_ON_CPU	__vcpu_single_flag(sflags, BIT(6))
- 
- 
- /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-@@ -1065,9 +1067,14 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu);
- #ifdef CONFIG_KVM
- void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
- void kvm_clr_pmu_events(u32 clr);
-+bool kvm_set_pmuserenr(u64 val);
- #else
- static inline void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr) {}
- static inline void kvm_clr_pmu_events(u32 clr) {}
-+static inline bool kvm_set_pmuserenr(u64 val)
-+{
-+	return false;
-+}
- #endif
- 
- void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 51229d847103..c530cf6b4bef 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -89,6 +89,7 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
- 		hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
- 		ctxt_sys_reg(hctxt, PMUSERENR_EL0) = read_sysreg(pmuserenr_el0);
- 		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
-+		vcpu_set_flag(vcpu, PMUSERENR_ON_CPU);
- 	}
- 
- 	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
-@@ -116,6 +117,7 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
- 
- 		hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
- 		write_sysreg(ctxt_sys_reg(hctxt, PMUSERENR_EL0), pmuserenr_el0);
-+		vcpu_clear_flag(vcpu, PMUSERENR_ON_CPU);
- 	}
- 
- 	if (cpus_have_final_cap(ARM64_SME)) {
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 3d868e84c7a0..3f0b5756c956 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -92,14 +92,28 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
- }
- NOKPROBE_SYMBOL(__deactivate_traps);
- 
-+/*
-+ * Disable IRQs in {activate,deactivate}_traps_vhe_{load,put}() to
-+ * prevent a race condition between context switching of PMUSERENR_EL0
-+ * in __{activate,deactivate}_traps_common() and IPIs that attempts to
-+ * update PMUSERENR_EL0. See also kvm_set_pmuserenr().
-+ */
- void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
- {
-+	unsigned long flags;
-+
-+	local_irq_save(flags);
- 	__activate_traps_common(vcpu);
-+	local_irq_restore(flags);
- }
- 
- void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
- {
-+	unsigned long flags;
-+
-+	local_irq_save(flags);
- 	__deactivate_traps_common(vcpu);
-+	local_irq_restore(flags);
- }
- 
- static const exit_handler_fn hyp_exit_handlers[] = {
-diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-index 7887133d15f0..121f1a14c829 100644
---- a/arch/arm64/kvm/pmu.c
-+++ b/arch/arm64/kvm/pmu.c
-@@ -209,3 +209,30 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu)
- 	kvm_vcpu_pmu_enable_el0(events_host);
- 	kvm_vcpu_pmu_disable_el0(events_guest);
- }
-+
-+/*
-+ * With VHE, keep track of the PMUSERENR_EL0 value for the host EL0 on the pCPU
-+ * where PMUSERENR_EL0 for the guest is loaded, since PMUSERENR_EL0 is switched
-+ * to the value for the guest on vcpu_load().  The value for the host EL0
-+ * will be restored on vcpu_put(), before returning to userspace.
-+ * This isn't necessary for nVHE, as the register is context switched for
-+ * every guest enter/exit.
-+ *
-+ * Return true if KVM takes care of the register. Otherwise return false.
-+ */
-+bool kvm_set_pmuserenr(u64 val)
-+{
-+	struct kvm_cpu_context *hctxt;
-+	struct kvm_vcpu *vcpu;
-+
-+	if (!kvm_arm_support_pmu_v3() || !has_vhe())
-+		return false;
-+
-+	vcpu = kvm_get_running_vcpu();
-+	if (!vcpu || !vcpu_get_flag(vcpu, PMUSERENR_ON_CPU))
-+		return false;
-+
-+	hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-+	ctxt_sys_reg(hctxt, PMUSERENR_EL0) = val;
-+	return true;
-+}
-diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
-index c98e4039386d..93b7edb5f1e7 100644
---- a/drivers/perf/arm_pmuv3.c
-+++ b/drivers/perf/arm_pmuv3.c
-@@ -677,9 +677,25 @@ static inline u32 armv8pmu_getreset_flags(void)
- 	return value;
- }
- 
-+static void update_pmuserenr(u64 val)
-+{
-+	lockdep_assert_irqs_disabled();
-+
-+	/*
-+	 * The current PMUSERENR_EL0 value might be the value for the guest.
-+	 * If that's the case, have KVM keep tracking of the register value
-+	 * for the host EL0 so that KVM can restore it before returning to
-+	 * the host EL0. Otherwise, update the register now.
-+	 */
-+	if (kvm_set_pmuserenr(val))
-+		return;
-+
-+	write_pmuserenr(val);
-+}
-+
- static void armv8pmu_disable_user_access(void)
- {
--	write_pmuserenr(0);
-+	update_pmuserenr(0);
- }
- 
- static void armv8pmu_enable_user_access(struct arm_pmu *cpu_pmu)
-@@ -695,8 +711,7 @@ static void armv8pmu_enable_user_access(struct arm_pmu *cpu_pmu)
- 			armv8pmu_write_evcntr(i, 0);
- 	}
- 
--	write_pmuserenr(0);
--	write_pmuserenr(ARMV8_PMU_USERENR_ER | ARMV8_PMU_USERENR_CR);
-+	update_pmuserenr(ARMV8_PMU_USERENR_ER | ARMV8_PMU_USERENR_CR);
- }
- 
- static void armv8pmu_enable_event(struct perf_event *event)
+Overall, I don't really see the point of such a change. It creates
+more problems than it solves.
+
+Thanks,
+
+	M.
+
 -- 
-2.41.0.rc0.172.g3f132b7071-goog
-
+Without deviation from the norm, progress is not possible.
