@@ -1,110 +1,85 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACB9C28FE
-	for <kvmarm@lists.linux.dev>; Sat,  3 Jun 2023 16:58:05 +0000 (UTC)
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1b026657a6fso28565085ad.0
-        for <kvmarm@lists.linux.dev>; Sat, 03 Jun 2023 09:58:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685811485; x=1688403485;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fD563CwulsYBsCRbMeiZXEqAZf28bpbXjXYl9VaY7hc=;
-        b=pF6ZfHq7T5l8tFokkSNTb6TTd6Ye6x7tsjLJQr9KSp76luti9ceI8OH78+iAceFxGa
-         NoE+0AHrVN4WRfrdNeTKbjeEAVsaZ5pFuT3eyol0PAUuZvcnITfBcgYgXyqvoa5dfKFz
-         klwuEbfMcG8wgi4ZA+1K4gHF2097zdVzKrcdzmNqJfR2v3p4pK/sU2rFB7cRT5YhaPZY
-         y0qKXDBbwOU46lYkBd5pVysSQZe1rhhRa1YNwDx7kgNuZ+3TFw2lBxgZQIaAUxuP1pC0
-         jiHNwkE+YBprIHgcGC/dUSrYfcuTmrxuHxq9/43gaqzieWdevo+3BxWjTlHQEEbZ4PV2
-         +Dcg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 492C620EB
+	for <kvmarm@lists.linux.dev>; Sat,  3 Jun 2023 19:15:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1685819705;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DnPK8tVOnIu5iVyOmiMdqzb+Fu0aARjMaEhuhDTR2qQ=;
+	b=evwIt6HB6zREOV39/oEnVfIpubggDSG1OS+a/wmMtGOzj/7lZcfsw/5PSJPZjSJ1hJLotf
+	5ivlW8P2+hZeksTsUmoR/R3MwZvAKQ1y/UQuq7pKD2VLegNyU41qKKDKyIZyBCsZRcaPaD
+	SHMY2zFqY6p9dC08a4ipQhnu9/tvoqQ=
+Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
+ [209.85.217.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-319-_-2_OhGAMBSIaTS0ev9p1w-1; Sat, 03 Jun 2023 15:15:04 -0400
+X-MC-Unique: _-2_OhGAMBSIaTS0ev9p1w-1
+Received: by mail-vs1-f71.google.com with SMTP id ada2fe7eead31-437e78027a9so732149137.3
+        for <kvmarm@lists.linux.dev>; Sat, 03 Jun 2023 12:15:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685811485; x=1688403485;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fD563CwulsYBsCRbMeiZXEqAZf28bpbXjXYl9VaY7hc=;
-        b=Vt64HfrBLxX6atu15M96/ULXAHE78bzOBWd1PS/nlhMKH26zTsxaBqPd1w3lvJMeNQ
-         T8zgYTOz5J4DjpUNF263WqkHvpcSbngM8bC7mN9Rj/4Jp6XCNE7Dgid0gPgWEs+TuHcG
-         VQAuWcjjd4V6uNxXam+Rg76aUe8Y3Oqy9FO60PX+xRfyO3UBHtJeyGWqT1PAWbwVjdXj
-         SiVlWXuNU6FDeHG9EkxSkOxU1vhi+6Km0gecXz/b69udkP5+N5R/KxB9yowP5Pss98lT
-         xfA+50xuYDPPHxeBgzSKx29evNBBrjC9M6zpoKsy2eqSufbV8J0l4BCtQXd3iQl3kXEC
-         PBLA==
-X-Gm-Message-State: AC+VfDw1Lhv/fVVRvs4bJeqbTkTa5oig3aX5XrB4iauRkBcbfg2thXcM
-	CaVqyckRbIWfMXO26vA7ESo=
-X-Google-Smtp-Source: ACHHUZ5IKgb+gH993OmkKYdYvIAppWzeNOHH0sT3hZJoXPU1Cg1kghmJIMAHEoWJ5XwF+y858qAECQ==
-X-Received: by 2002:a17:903:1cc:b0:1b0:2658:db20 with SMTP id e12-20020a17090301cc00b001b02658db20mr3275518plh.53.1685811484740;
-        Sat, 03 Jun 2023 09:58:04 -0700 (PDT)
-Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id w4-20020a170902d70400b001a95f632340sm3433296ply.46.2023.06.03.09.58.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 03 Jun 2023 09:58:04 -0700 (PDT)
-Date: Sat, 3 Jun 2023 09:58:02 -0700
-From: Isaku Yamahata <isaku.yamahata@gmail.com>
-To: Anish Moorthy <amoorthy@google.com>
-Cc: seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
-	robert.hoo.linux@gmail.com, jthoughton@google.com,
-	bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
-	axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
-	isaku.yamahata@gmail.com
-Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
-Message-ID: <20230603165802.GL1234772@ls.amr.corp.intel.com>
-References: <20230602161921.208564-1-amoorthy@google.com>
- <20230602161921.208564-4-amoorthy@google.com>
+        d=1e100.net; s=20221208; t=1685819704; x=1688411704;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DnPK8tVOnIu5iVyOmiMdqzb+Fu0aARjMaEhuhDTR2qQ=;
+        b=Xc2YnIft+K+w/MjTto3Gm6dfYASYZbgXcPvAbgNYxVD+kimR/eF4lOWe/WtRMz15iR
+         HoEaZRUqhnPyWfJJgdlBCPc1jNuM/OIGfJm1KiRwaCx2hcirREIbaNHsf6BYURihhxDK
+         ve0JaYzQStEp5gw7uEO7Jk+gfSlev3vwuCLxVLjrEMjhGmZcRjvWmmrkgw/XXplUxMMa
+         hgDLw1KfuZtJBOtAmG5uqY5DbjOLdJQjNugKqsd3HAoOCiS/E4uuvtsp1Y9CiZeB3vNT
+         VR1or97ocmo0W6eExWOu620QvM0uXTXwAAaoKPgT0saO3fMiIcDDuJ90Av1rZ+CURFa8
+         r0Lw==
+X-Gm-Message-State: AC+VfDzBHOwjBKqDn4vU0J0ARk6qDFEm1d9plmI/CdYuAqdzs2wbXS4p
+	XkgPwvWMhUNlHRRKUuj6CT9RJP159rSSyL6OxWGkW4UlynRm20mM1b+AiWyGWzbBQd8FiiXbCB5
+	iqrpuVPYZKnWmzNhK64MhSZJQRwItxchW
+X-Received: by 2002:a67:f516:0:b0:43b:1a6e:b105 with SMTP id u22-20020a67f516000000b0043b1a6eb105mr3300215vsn.13.1685819704085;
+        Sat, 03 Jun 2023 12:15:04 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5Bst0bhcf5pkOuZSlY76/be3DNNv46RicRmDFmPPFPfvt9ff7FUTtG4TIWehE6uZmToXLR2lgL8HtrGGGuonY=
+X-Received: by 2002:a67:f516:0:b0:43b:1a6e:b105 with SMTP id
+ u22-20020a67f516000000b0043b1a6eb105mr3300212vsn.13.1685819703859; Sat, 03
+ Jun 2023 12:15:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230602161921.208564-4-amoorthy@google.com>
+References: <20230524125757.3631091-1-maz@kernel.org> <e6baaa4dbb813cd46c41d079154e3e15@kernel.org>
+In-Reply-To: <e6baaa4dbb813cd46c41d079154e3e15@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Sat, 3 Jun 2023 21:14:52 +0200
+Message-ID: <CABgObfY5igVKMre4Ze21XrGffuG9wEa1ROpLDqk8_4PNi0h7xQ@mail.gmail.com>
+Subject: Re: [GIC PULL] KVM/arm64 fixes for 6.4, take #2
+To: Marc Zyngier <maz@kernel.org>
+Cc: Cornelia Huck <cohuck@redhat.com>, Fuad Tabba <tabba@google.com>, 
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Quentin Perret <qperret@google.com>, Steven Price <steven.price@arm.com>, Will Deacon <will@kernel.org>, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 02, 2023 at 04:19:08PM +0000,
-Anish Moorthy <amoorthy@google.com> wrote:
+On Wed, May 24, 2023 at 4:18=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> On 2023-05-24 13:57, Marc Zyngier wrote:
+> > Paolo,
+> >
+> > Here's the second batch of fixes for 6.4: two interesting MMU-related
+> > fixes that affect pKVM, a set of locking fixes, and the belated
+> > emulation of Set/Way MTE CMO.
+>
+> OK, $subject is an indication of what's on my mind...
+>
+> But please pull anyway!
 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index add067793b90..5b24059143b3 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6700,6 +6700,18 @@ array field represents return values. The userspace should update the return
->  values of SBI call before resuming the VCPU. For more details on RISC-V SBI
->  spec refer, https://github.com/riscv/riscv-sbi-doc.
->  
-> +::
-> +
-> +		/* KVM_EXIT_MEMORY_FAULT */
-> +		struct {
-> +			__u64 flags;
-> +			__u64 gpa;
-> +			__u64 len; /* in bytes */
+Uh oh, this was not filtered correctly. Pulled now, separately to
+preserve the tag message.
 
+Paolo
 
-UPM or gmem uses size instead of len. Personally I don't have any strong
-preference.  It's better to converge. (or use union to accept both?)
-
-I check the existing one.
-KVM_EXIT_IO: size.
-KVM_EXIT_MMIO: len.
-KVM_INTERNAL_ERROR_EMULATION: insn_size
-struct kvm_coalesced_mmio_zone: size
-struct kvm_coalesced_mmio: len
-struct kvm_ioeventfd: len
-struct kvm_enc_region: size
-struct kvm_sev_*: len
-struct kvm_memory_attributes: size
-struct kvm_create_guest_memfd: size
-
-
-> +		} memory_fault;
-> +
-> +Indicates a vCPU memory fault on the guest physical address range
-> +[gpa, gpa + len). See KVM_CAP_MEMORY_FAULT_INFO for more details.
-> +
->  ::
->  
->      /* KVM_EXIT_NOTIFY */
-
-
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
