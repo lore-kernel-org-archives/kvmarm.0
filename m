@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5751623BC
-	for <kvmarm@lists.linux.dev>; Sat,  3 Jun 2023 08:40:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E30AC433EF;
-	Sat,  3 Jun 2023 08:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBBA63C17
+	for <kvmarm@lists.linux.dev>; Sat,  3 Jun 2023 08:42:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39A53C433EF;
+	Sat,  3 Jun 2023 08:42:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1685781628;
-	bh=CfIACcU56/Kirmxg5qc6aUq7hEIljLaNTuavfT7lt4M=;
+	s=k20201202; t=1685781742;
+	bh=XjNjfMoMDbotqrNdLrQzzOxnnbAn0kn7kYrkkhODOtw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hxcPNskgeoZ56ulkyTmvZ+gNOrIiz6irG+I7g0vIk7XkdxMvUMMkQN/in+IEJR/2i
-	 RBsgwt6NYYE+U9lMwU6u//zk7HQpXMrVR0iO9I0OkGX0EG+Gub2Kn5Kqr1+PwvQgfb
-	 B/f7VfRhYpB/uqcEr+zfwC/I2PJE0FMqV4vHBoCZ0XyifMJbmFPpEtRoDDwZgzXXk3
-	 V3PJOIt4zEgYGLMZX9dSRAvG3jHo7K2kA7w0/ExbA2vJG5ddFLlsTnbhuaT3z3Rn2d
-	 qx/phWwd4c824RsejW4+RFK+ndyJE7pelEQCYXuoYzKQYwOhnr96R17GfHEIix2jjn
-	 UfLbCEiR1jhDA==
+	b=if0swBwI9fuJ59QcXFRA9QNyelnMnPoNuFUdOO6VY4w2Hfr+ORdJH8aRiVGSKjYLz
+	 ACC5ZOREGYpLndX/rXLc2G7H1b5Mudy7uYuZjU8Zu4t3qpus+2pctFNQ8VtUlxeuac
+	 rbAEWDhzjxXMtTTwAKdHVZ2nuFrLZg60YsRuook3tHbaJ/bh2rpx1sGtUsobPHGS9z
+	 +AypHdWeVK85rTFXDtiqI6KQ0B/8H7bxX16RDsnzCI4sLsg+Q1BwBOLu+TrX7gCuIg
+	 GzLyZ+cAgnL7fUjcaTsrwoQ9B8oynrPjeRotM5hZPk1MVWFYY9KRhQ/a6ebiJ9ft5O
+	 MMthyytlKVHzw==
 Received: from [37.166.197.171] (helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1q5MoE-002Ws2-0C;
-	Sat, 03 Jun 2023 09:40:26 +0100
-Date: Sat, 03 Jun 2023 09:40:22 +0100
-Message-ID: <87v8g5ndl5.wl-maz@kernel.org>
+	id 1q5Mq4-002Wsz-0o;
+	Sat, 03 Jun 2023 09:42:20 +0100
+Date: Sat, 03 Jun 2023 09:42:18 +0100
+Message-ID: <87ttvpndhx.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Kristina Martsenko <kristina.martsenko@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -38,10 +38,10 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Luis Machado <luis.machado@arm.com>,
 	Vladimir Murzin <vladimir.murzin@arm.com>,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 03/11] KVM: arm64: switch HCRX_EL2 between host and guest
-In-Reply-To: <20230509142235.3284028-4-kristina.martsenko@arm.com>
+Subject: Re: [PATCH v2 06/11] KVM: arm64: hide MOPS from guests
+In-Reply-To: <20230509142235.3284028-7-kristina.martsenko@arm.com>
 References: <20230509142235.3284028-1-kristina.martsenko@arm.com>
-	<20230509142235.3284028-4-kristina.martsenko@arm.com>
+	<20230509142235.3284028-7-kristina.martsenko@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -57,17 +57,21 @@ X-SA-Exim-Rcpt-To: kristina.martsenko@arm.com, linux-arm-kernel@lists.infradead.
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 09 May 2023 15:22:27 +0100,
+On Tue, 09 May 2023 15:22:30 +0100,
 Kristina Martsenko <kristina.martsenko@arm.com> wrote:
 > 
-> Switch the HCRX_EL2 register between host and guest configurations, in
-> order to enable different features in the host and guest.
+> As FEAT_MOPS is not supported in guests yet, hide it from the ID
+> registers for guests.
 > 
-> Now that there are separate guest flags, we can also remove SMPME from
-> the host flags, as SMPME is used for virtualizing SME priorities and has
-> no use in the host.
+> The MOPS instructions are UNDEFINED in guests as HCRX_EL2.MSCEn is not
+> set in HCRX_GUEST_FLAGS, and will take an exception to EL1 if executed.
 > 
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 > Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
+
+This is very likely to clash with Jing's series that completely
+reworks the whole idreg series, but as long as this is on its own
+branch, we can deal with that.
 
 Acked-by: Marc Zyngier <maz@kernel.org>
 
