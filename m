@@ -1,81 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBBA63C17
-	for <kvmarm@lists.linux.dev>; Sat,  3 Jun 2023 08:42:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39A53C433EF;
-	Sat,  3 Jun 2023 08:42:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1685781742;
-	bh=XjNjfMoMDbotqrNdLrQzzOxnnbAn0kn7kYrkkhODOtw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=if0swBwI9fuJ59QcXFRA9QNyelnMnPoNuFUdOO6VY4w2Hfr+ORdJH8aRiVGSKjYLz
-	 ACC5ZOREGYpLndX/rXLc2G7H1b5Mudy7uYuZjU8Zu4t3qpus+2pctFNQ8VtUlxeuac
-	 rbAEWDhzjxXMtTTwAKdHVZ2nuFrLZg60YsRuook3tHbaJ/bh2rpx1sGtUsobPHGS9z
-	 +AypHdWeVK85rTFXDtiqI6KQ0B/8H7bxX16RDsnzCI4sLsg+Q1BwBOLu+TrX7gCuIg
-	 GzLyZ+cAgnL7fUjcaTsrwoQ9B8oynrPjeRotM5hZPk1MVWFYY9KRhQ/a6ebiJ9ft5O
-	 MMthyytlKVHzw==
-Received: from [37.166.197.171] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1q5Mq4-002Wsz-0o;
-	Sat, 03 Jun 2023 09:42:20 +0100
-Date: Sat, 03 Jun 2023 09:42:18 +0100
-Message-ID: <87ttvpndhx.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Kristina Martsenko <kristina.martsenko@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Luis Machado <luis.machado@arm.com>,
-	Vladimir Murzin <vladimir.murzin@arm.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 06/11] KVM: arm64: hide MOPS from guests
-In-Reply-To: <20230509142235.3284028-7-kristina.martsenko@arm.com>
-References: <20230509142235.3284028-1-kristina.martsenko@arm.com>
-	<20230509142235.3284028-7-kristina.martsenko@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACB9C28FE
+	for <kvmarm@lists.linux.dev>; Sat,  3 Jun 2023 16:58:05 +0000 (UTC)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1b026657a6fso28565085ad.0
+        for <kvmarm@lists.linux.dev>; Sat, 03 Jun 2023 09:58:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1685811485; x=1688403485;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fD563CwulsYBsCRbMeiZXEqAZf28bpbXjXYl9VaY7hc=;
+        b=pF6ZfHq7T5l8tFokkSNTb6TTd6Ye6x7tsjLJQr9KSp76luti9ceI8OH78+iAceFxGa
+         NoE+0AHrVN4WRfrdNeTKbjeEAVsaZ5pFuT3eyol0PAUuZvcnITfBcgYgXyqvoa5dfKFz
+         klwuEbfMcG8wgi4ZA+1K4gHF2097zdVzKrcdzmNqJfR2v3p4pK/sU2rFB7cRT5YhaPZY
+         y0qKXDBbwOU46lYkBd5pVysSQZe1rhhRa1YNwDx7kgNuZ+3TFw2lBxgZQIaAUxuP1pC0
+         jiHNwkE+YBprIHgcGC/dUSrYfcuTmrxuHxq9/43gaqzieWdevo+3BxWjTlHQEEbZ4PV2
+         +Dcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685811485; x=1688403485;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fD563CwulsYBsCRbMeiZXEqAZf28bpbXjXYl9VaY7hc=;
+        b=Vt64HfrBLxX6atu15M96/ULXAHE78bzOBWd1PS/nlhMKH26zTsxaBqPd1w3lvJMeNQ
+         T8zgYTOz5J4DjpUNF263WqkHvpcSbngM8bC7mN9Rj/4Jp6XCNE7Dgid0gPgWEs+TuHcG
+         VQAuWcjjd4V6uNxXam+Rg76aUe8Y3Oqy9FO60PX+xRfyO3UBHtJeyGWqT1PAWbwVjdXj
+         SiVlWXuNU6FDeHG9EkxSkOxU1vhi+6Km0gecXz/b69udkP5+N5R/KxB9yowP5Pss98lT
+         xfA+50xuYDPPHxeBgzSKx29evNBBrjC9M6zpoKsy2eqSufbV8J0l4BCtQXd3iQl3kXEC
+         PBLA==
+X-Gm-Message-State: AC+VfDw1Lhv/fVVRvs4bJeqbTkTa5oig3aX5XrB4iauRkBcbfg2thXcM
+	CaVqyckRbIWfMXO26vA7ESo=
+X-Google-Smtp-Source: ACHHUZ5IKgb+gH993OmkKYdYvIAppWzeNOHH0sT3hZJoXPU1Cg1kghmJIMAHEoWJ5XwF+y858qAECQ==
+X-Received: by 2002:a17:903:1cc:b0:1b0:2658:db20 with SMTP id e12-20020a17090301cc00b001b02658db20mr3275518plh.53.1685811484740;
+        Sat, 03 Jun 2023 09:58:04 -0700 (PDT)
+Received: from localhost ([192.55.54.55])
+        by smtp.gmail.com with ESMTPSA id w4-20020a170902d70400b001a95f632340sm3433296ply.46.2023.06.03.09.58.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 03 Jun 2023 09:58:04 -0700 (PDT)
+Date: Sat, 3 Jun 2023 09:58:02 -0700
+From: Isaku Yamahata <isaku.yamahata@gmail.com>
+To: Anish Moorthy <amoorthy@google.com>
+Cc: seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
+	robert.hoo.linux@gmail.com, jthoughton@google.com,
+	bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
+	axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
+	isaku.yamahata@gmail.com
+Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+Message-ID: <20230603165802.GL1234772@ls.amr.corp.intel.com>
+References: <20230602161921.208564-1-amoorthy@google.com>
+ <20230602161921.208564-4-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 37.166.197.171
-X-SA-Exim-Rcpt-To: kristina.martsenko@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, broonie@kernel.org, luis.machado@arm.com, vladimir.murzin@arm.com, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230602161921.208564-4-amoorthy@google.com>
 
-On Tue, 09 May 2023 15:22:30 +0100,
-Kristina Martsenko <kristina.martsenko@arm.com> wrote:
-> 
-> As FEAT_MOPS is not supported in guests yet, hide it from the ID
-> registers for guests.
-> 
-> The MOPS instructions are UNDEFINED in guests as HCRX_EL2.MSCEn is not
-> set in HCRX_GUEST_FLAGS, and will take an exception to EL1 if executed.
-> 
-> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-> Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
+On Fri, Jun 02, 2023 at 04:19:08PM +0000,
+Anish Moorthy <amoorthy@google.com> wrote:
 
-This is very likely to clash with Jing's series that completely
-reworks the whole idreg series, but as long as this is on its own
-branch, we can deal with that.
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index add067793b90..5b24059143b3 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6700,6 +6700,18 @@ array field represents return values. The userspace should update the return
+>  values of SBI call before resuming the VCPU. For more details on RISC-V SBI
+>  spec refer, https://github.com/riscv/riscv-sbi-doc.
+>  
+> +::
+> +
+> +		/* KVM_EXIT_MEMORY_FAULT */
+> +		struct {
+> +			__u64 flags;
+> +			__u64 gpa;
+> +			__u64 len; /* in bytes */
 
-Acked-by: Marc Zyngier <maz@kernel.org>
 
-	M.
+UPM or gmem uses size instead of len. Personally I don't have any strong
+preference.  It's better to converge. (or use union to accept both?)
+
+I check the existing one.
+KVM_EXIT_IO: size.
+KVM_EXIT_MMIO: len.
+KVM_INTERNAL_ERROR_EMULATION: insn_size
+struct kvm_coalesced_mmio_zone: size
+struct kvm_coalesced_mmio: len
+struct kvm_ioeventfd: len
+struct kvm_enc_region: size
+struct kvm_sev_*: len
+struct kvm_memory_attributes: size
+struct kvm_create_guest_memfd: size
+
+
+> +		} memory_fault;
+> +
+> +Indicates a vCPU memory fault on the guest physical address range
+> +[gpa, gpa + len). See KVM_CAP_MEMORY_FAULT_INFO for more details.
+> +
+>  ::
+>  
+>      /* KVM_EXIT_NOTIFY */
+
 
 -- 
-Without deviation from the norm, progress is not possible.
+Isaku Yamahata <isaku.yamahata@gmail.com>
