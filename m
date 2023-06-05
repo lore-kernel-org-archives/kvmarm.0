@@ -1,95 +1,70 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFC141F169
-	for <kvmarm@lists.linux.dev>; Mon,  5 Jun 2023 15:07:18 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 60B7FD75;
-	Mon,  5 Jun 2023 08:08:03 -0700 (PDT)
-Received: from [10.57.85.135] (unknown [10.57.85.135])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BED333F663;
-	Mon,  5 Jun 2023 08:07:14 -0700 (PDT)
-Message-ID: <79f43d6b-7407-56c5-3c7d-c8fc48625e95@arm.com>
-Date: Mon, 5 Jun 2023 16:07:09 +0100
+Received: from out-10.mta1.migadu.com (out-10.mta1.migadu.com [95.215.58.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE5020698
+	for <kvmarm@lists.linux.dev>; Mon,  5 Jun 2023 15:41:17 +0000 (UTC)
+Date: Mon, 5 Jun 2023 15:41:10 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1685979676;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GoZGAOTBvlr1nlPErXnetSaPgiXMcLx2bMeCqDLA1dk=;
+	b=PivUa3rReYTnWwK9qzsAl7TVQSXztMg4Tj2jSXkRklNXzzHrH9eEHLzBq1b1cu/7VjtJAQ
+	r3iniQ+ra6KyqjFwT2g0zigWYeRj+dReKT6T78yu35CWbJtDe0fLF7Qt64ZoPF9/0vbLKn
+	ibqWLX433iGoUtvLnqtuA/o+6gp4rm8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Kristina Martsenko <kristina.martsenko@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mark Brown <broonie@kernel.org>,
+	Luis Machado <luis.machado@arm.com>,
+	Vladimir Murzin <vladimir.murzin@arm.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 01/11] KVM: arm64: initialize HCRX_EL2
+Message-ID: <ZH4CFmwo+BBPMWiY@linux.dev>
+References: <20230509142235.3284028-1-kristina.martsenko@arm.com>
+ <20230509142235.3284028-2-kristina.martsenko@arm.com>
+ <ZHnzfhi2KCMPucQJ@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH 1/3] arm64: Add a capability for FEAT_BBM level 2
-Content-Language: en-GB
-To: Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev, Ricardo Koller <ricarkol@google.com>
-References: <20230602170147.1541355-1-coltonlewis@google.com>
- <20230602170147.1541355-2-coltonlewis@google.com>
-From: Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <20230602170147.1541355-2-coltonlewis@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZHnzfhi2KCMPucQJ@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 2023-06-02 18:01, Colton Lewis wrote:
-> From: Ricardo Koller <ricarkol@google.com>
+On Fri, Jun 02, 2023 at 02:49:50PM +0100, Catalin Marinas wrote:
+> On Tue, May 09, 2023 at 03:22:25PM +0100, Kristina Martsenko wrote:
+> > ARMv8.7/9.2 adds a new hypervisor configuration register HCRX_EL2.
+> > Initialize the register to a safe value (all fields 0), to be robust
+> > against firmware that has not initialized it. This is also needed to
+> > ensure that the register is reinitialized after a kexec by a future
+> > kernel.
+> > 
+> > In addition, move SMPME setup over to the new flags, as it would
+> > otherwise get overridden. It is safe to set the bit even if SME is not
+> > (uniformly) supported, as it will write to a RES0 bit (having no
+> > effect), and SME will be disabled by the cpufeature framework.
+> > (Similar to how e.g. the API bit is handled in HCR_HOST_NVHE_FLAGS.)
 > 
-> Add a new capability to detect "Stage-2 Translation table
-> break-before-make" (FEAT_BBM) level 2.
+> This looks fine to me but I may have lost track of the VHE/nVHE code
+> initialisation paths.
+> 
+> Marc/Oliver, are you ok with this patch (or this series in general)? I'd
+> like to merge it through the arm64 tree.
 
-Why does this patch invent spurious "stage 2" references everywhere? The 
-full name of FEAT_BBM is "Translation table break-before-make levels", 
-and it is not specific to one stage of translation.
+Acked-by: Oliver Upton <oliver.upton@linux.dev>
 
+-- 
 Thanks,
-Robin.
-
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->   arch/arm64/kernel/cpufeature.c | 11 +++++++++++
->   arch/arm64/tools/cpucaps       |  1 +
->   2 files changed, 12 insertions(+)
-> 
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index c331c49a7d19c..c538060f7f66b 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -2455,6 +2455,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->   		.min_field_value = 1,
->   		.matches = has_cpuid_feature,
->   	},
-> +	{
-> +		.desc = "Stage-2 Translation table break-before-make level 2",
-> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> +		.capability = ARM64_HAS_STAGE2_BBM2,
-> +		.sys_reg = SYS_ID_AA64MMFR2_EL1,
-> +		.sign = FTR_UNSIGNED,
-> +		.field_pos = ID_AA64MMFR2_EL1_BBM_SHIFT,
-> +		.field_width = 4,
-> +		.min_field_value = 2,
-> +		.matches = has_cpuid_feature,
-> +	},
->   	{
->   		.desc = "TLB range maintenance instructions",
->   		.capability = ARM64_HAS_TLB_RANGE,
-> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-> index 40ba95472594d..010aca1892642 100644
-> --- a/arch/arm64/tools/cpucaps
-> +++ b/arch/arm64/tools/cpucaps
-> @@ -41,6 +41,7 @@ HAS_PAN
->   HAS_RAS_EXTN
->   HAS_RNG
->   HAS_SB
-> +HAS_STAGE2_BBM2
->   HAS_STAGE2_FWB
->   HAS_TIDCP1
->   HAS_TLB_RANGE
-> --
-> 2.41.0.rc0.172.g3f132b7071-goog
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+Oliver
