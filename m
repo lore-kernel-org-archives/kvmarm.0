@@ -1,120 +1,131 @@
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 505ADDDC0
-	for <kvmarm@lists.linux.dev>; Mon,  5 Jun 2023 17:46:40 +0000 (UTC)
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-45f10f5882fso999978e0c.1
-        for <kvmarm@lists.linux.dev>; Mon, 05 Jun 2023 10:46:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685987200; x=1688579200;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sLmydWHjLSbXU8tIcqSwN4g2fOd1z0gySQpKm7q+7yE=;
-        b=blMiOClG9Py2mCB0eYhbQNQlNaJEUfyVnYFk5NBG6u4SazxSAucT99b2neLnU0FaDX
-         7vE+lxRUVuGtc/lnAJEILSA84POKGbKmjXVQHHB3o60yKgJ+YLK5U7JddTblQ+qREJGx
-         BpIDD2ceKosHjRebexq9qoWzZAKVX5bi5VcLM/53CCbm8FBuDM7DvYIm24wNlZZ9BiFW
-         Z1OhALBYz5KfJ3z40sgfLUbNV1er50ccipDxFsfnTTWHJggvZe9UI77xITgg3RmVwwah
-         HCA8mpFNYtF6QhcWhJ/3crf8/NRJrR/8jpnktgTUc2m0EOFNUP0nUwxwXQCQ1fjkg9pj
-         l+Wg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24288DDC0
+	for <kvmarm@lists.linux.dev>; Mon,  5 Jun 2023 17:47:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1685987222;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+uRs0E0ZsQo9CBSAvjs75Bate5XC6YOXzDnFeKEEASU=;
+	b=D5JaJ/jjehk8bDQqYQDWtTxMF4YyCvk5CgsdEC1aefRcSDUFlT4gud+z18b5ylVUrDW7hA
+	iQxRcGAQeHfNu2gICDz+6eOhfi+YbW2C8mp4irWp/iiKzaPxevttMcMdHaukkb+fDnpEy4
+	23HrBlgC4PkHEZgY+5HXT6+xdw08uzE=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-417-_ZEy9yJIPOmIuuQdYHAnDA-1; Mon, 05 Jun 2023 13:47:01 -0400
+X-MC-Unique: _ZEy9yJIPOmIuuQdYHAnDA-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3079c6648e3so2694919f8f.2
+        for <kvmarm@lists.linux.dev>; Mon, 05 Jun 2023 10:47:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685987200; x=1688579200;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sLmydWHjLSbXU8tIcqSwN4g2fOd1z0gySQpKm7q+7yE=;
-        b=e1wpQYD36RQvvwrSk63gvDHw3HlxV9xzlFhwhwmZz99t+Ptcy45OFHRgyHgVu84Qjr
-         CD2jBNsZveTWJrFpi3v4wfiibQXYrIa0eGfOjH96W5gCntsEgN3JbsG4LafxViunLCmm
-         a05eKHMWeaNnfUfO0sSlVVY/QWxnEVyAX6oScql3JAOy6ou/4N9TZOxXR7KsSsRdXu8A
-         fRko9ORIFn9wmXxiAmvxn18btK4rgKJcs8gJZWnjqwc8Ol4IcYg4c4XyWsJJdY99cJ2y
-         vJh/EQJf6P///DjsK7mNbxj0x1Qu5d1GTWRIVDq7/KckL8OeZxIo6Eb2plgB1/m6DhiZ
-         j3iQ==
-X-Gm-Message-State: AC+VfDysoFy1SMjWX3n2VDd393y0a8F+yQZ+fmmQbpNpVwb3bGJ337Yi
-	hHxRECL9vBwFfRKNcc5lo8wL/V9ZtgUyxaYElN5VKw==
-X-Google-Smtp-Source: ACHHUZ4Gv2+q+vynU6HEULCsA7sYdJuP/Sw+DQ5YTtegMnvWhx0lzh5D/f0UxCNMgD7DlI/ccPxmRquzz4Ysn+6H41o=
-X-Received: by 2002:a1f:bf49:0:b0:462:ac61:27e7 with SMTP id
- p70-20020a1fbf49000000b00462ac6127e7mr2295162vkf.16.1685987199816; Mon, 05
- Jun 2023 10:46:39 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1685987220; x=1688579220;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+uRs0E0ZsQo9CBSAvjs75Bate5XC6YOXzDnFeKEEASU=;
+        b=WzGJWIkYgBYgDn3V9D1LNJ4ttHsW63aCvgQ4jYPY0gjlLedBpqh4SS5tcnqz0erbWy
+         UEDaGWYubuuoEs9KZ50qXjrHz+/MF/WotW9fcX0s35gfCoCxmtc26SgF+xCslOKhXrH6
+         hZplsw00VtDjSTUtGwoDxTHX091fn1gZJK1sgu2fVB0SjZEkT/w7wwqV6NCOtTiYx1dg
+         vA0SRho1jvNtAWJzjrxapFXbFk6AsiGf1MopMmh67nl+dTr5CbnXm9+A68SZtXsUNK4S
+         yMtX7tWjRwgwMjquILmgL79BMk+ZTGZ1qlv5ttFKVd6vtqe/PapycrbMGYkyNeeDqwGa
+         9OEQ==
+X-Gm-Message-State: AC+VfDymnvUpvtmSR2YOUEn7SkMTwSHNTMEFw/ttrTi8L4BWNFReplBq
+	lRHWDhpvm3JL8pmaaXKOu1X6CcKAmKm24/1A6GgPewlLcHAnsEO2KUxQIZNMWAVk3a1oP95Joet
+	XCOJs9GCzbIo5zyFN
+X-Received: by 2002:adf:ce89:0:b0:2f9:4fe9:74bb with SMTP id r9-20020adfce89000000b002f94fe974bbmr5734021wrn.40.1685987220048;
+        Mon, 05 Jun 2023 10:47:00 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ68oEP7AT12T23v/QzZD9CTbrZYbJ6uz4hfM0/PmGVU73mfT0itIWdf6a88W0ApVEhjxV8M2w==
+X-Received: by 2002:adf:ce89:0:b0:2f9:4fe9:74bb with SMTP id r9-20020adfce89000000b002f94fe974bbmr5733996wrn.40.1685987219732;
+        Mon, 05 Jun 2023 10:46:59 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id 8-20020a05600c230800b003f6cf9afc25sm15229244wmo.40.2023.06.05.10.46.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Jun 2023 10:46:59 -0700 (PDT)
+Message-ID: <19c775ad-9573-b4d4-886d-c631b468856f@redhat.com>
+Date: Mon, 5 Jun 2023 19:46:57 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-4-amoorthy@google.com>
-In-Reply-To: <20230602161921.208564-4-amoorthy@google.com>
-From: Anish Moorthy <amoorthy@google.com>
-Date: Mon, 5 Jun 2023 10:46:03 -0700
-Message-ID: <CAF7b7moGyGqd-83xaJ0pLVSyWSRmPmKNZ_=6OzZAU4ytUPXYCw@mail.gmail.com>
-Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
-To: seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev
-Cc: pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
-	jthoughton@google.com, bgardon@google.com, dmatlack@google.com, 
-	ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com, 
-	nadav.amit@gmail.com, isaku.yamahata@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH v10 03/59] arm64: Add missing VA CMO encodings
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>,
+ Chase Conklin <chase.conklin@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Darren Hart <darren@os.amperecomputing.com>,
+ Jintack Lim <jintack@cs.columbia.edu>,
+ Russell King <rmk+kernel@armlinux.org.uk>,
+ Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20230515173103.1017669-1-maz@kernel.org>
+ <20230515173103.1017669-4-maz@kernel.org>
+From: Eric Auger <eauger@redhat.com>
+In-Reply-To: <20230515173103.1017669-4-maz@kernel.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-By the way, I'd like to solicit opinions on the checks that
-kvm_populate_efault_info is performing: specifically the the
-exit-reason-unset check
 
-On Fri, Jun 2, 2023 at 9:19=E2=80=AFAM Anish Moorthy <amoorthy@google.com> =
-wrote:
->
-> +inline void kvm_populate_efault_info(struct kvm_vcpu *vcpu,
-> +                                    uint64_t gpa, uint64_t len, uint64_t=
- flags)
-> +{
->  ...
-> +       else if (WARN_ON_ONCE(vcpu->run->exit_reason !=3D KVM_EXIT_UNKNOW=
-N))
-> +               goto out;
 
-What I intended this check to guard against was the first problematic
-case (A) I called out in the cover letter
+On 5/15/23 19:30, Marc Zyngier wrote:
+> Add the missing VA-based CMOs encodings.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-> The implementation strategy for KVM_CAP_MEMORY_FAULT_INFO has risks: for
-> example, if there are any existing paths in KVM_RUN which cause a vCPU
-> to (1) populate the kvm_run struct then (2) fail a vCPU guest memory
-> access but ignore the failure and then (3) complete the exit to
-> userspace set up in (1), then the contents of the kvm_run struct written
-> in (1) will be corrupted.
+Eric
+> ---
+>  arch/arm64/include/asm/sysreg.h | 26 ++++++++++++++++++++++++++
+>  1 file changed, 26 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 108663aebccb..071cc8545fbe 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -124,6 +124,32 @@
+>  #define SYS_DC_CIGSW			sys_insn(1, 0, 7, 14, 4)
+>  #define SYS_DC_CIGDSW			sys_insn(1, 0, 7, 14, 6)
+>  
+> +#define SYS_IC_IALLUIS			sys_insn(1, 0, 7, 1, 0)
+> +#define SYS_IC_IALLU			sys_insn(1, 0, 7, 5, 0)
+> +#define SYS_IC_IVAU			sys_insn(1, 3, 7, 5, 1)
+> +
+> +#define SYS_DC_IVAC			sys_insn(1, 0, 7, 6, 1)
+> +#define SYS_DC_IGVAC			sys_insn(1, 0, 7, 6, 3)
+> +#define SYS_DC_IGDVAC			sys_insn(1, 0, 7, 6, 5)
+> +
+> +#define SYS_DC_CVAC			sys_insn(1, 3, 7, 10, 1)
+> +#define SYS_DC_CGVAC			sys_insn(1, 3, 7, 10, 3)
+> +#define SYS_DC_CGDVAC			sys_insn(1, 3, 7, 10, 5)
+> +
+> +#define SYS_DC_CVAU			sys_insn(1, 3, 7, 11, 1)
+> +
+> +#define SYS_DC_CVAP			sys_insn(1, 3, 7, 12, 1)
+> +#define SYS_DC_CGVAP			sys_insn(1, 3, 7, 12, 3)
+> +#define SYS_DC_CGDVAP			sys_insn(1, 3, 7, 12, 5)
+> +
+> +#define SYS_DC_CVADP			sys_insn(1, 3, 7, 13, 1)
+> +#define SYS_DC_CGVADP			sys_insn(1, 3, 7, 13, 3)
+> +#define SYS_DC_CGDVADP			sys_insn(1, 3, 7, 13, 5)
+> +
+> +#define SYS_DC_CIVAC			sys_insn(1, 3, 7, 14, 1)
+> +#define SYS_DC_CIGVAC			sys_insn(1, 3, 7, 14, 3)
+> +#define SYS_DC_CIGDVAC			sys_insn(1, 3, 7, 14, 5)
+> +
+>  /*
+>   * Automatically generated definitions for system registers, the
+>   * manual encodings below are in the process of being converted to
 
-What I wrote was actually incorrect, as you may see: if in (1) the
-exit reason !=3D KVM_EXIT_UNKNOWN then the exit-reason-unset check will
-prevent writing to the run struct. Now, if for some reason this flow
-involved populating most of the run struct in (1) but only setting the
-exit reason in (3) then we'd still have a problem: but it's not
-feasible to anticipate everything after all :)
-
-I also mentioned a different error case (B)
-
-> Another example: if KVM_RUN fails a guest memory access for which the
-> EFAULT is annotated but does not return the EFAULT to userspace, then
-> later returns an *un*annotated EFAULT to userspace, then userspace will
-> receive incorrect information.
-
-When the second EFAULT is un-annotated the presence/absence of the
-exit-reason-unset check is irrelevant: userspace will observe an
-annotated EFAULT in place of an un-annotated one either way.
-
-There's also a third interesting case (C) which I didn't mention: an
-annotated EFAULT which is ignored/suppressed followed by one which is
-propagated to userspace. Here the exit-reason-unset check will prevent
-the second annotation from being written, so userspace sees an
-annotation with bad contents, If we believe that case (A) is a weird
-sequence of events that shouldn't be happening in the first place,
-then case (C) seems more important to ensure correctness in. But I
-don't know anything about how often (A) happens in KVM, which is why I
-want others' opinions.
-
-So, should we drop the exit-reason-unset check (and the accompanying
-patch 4) and treat existing occurrences of case (A) as bugs, or should
-we maintain the check at the cost of incorrect behavior in case (C)?
-Or is there another option here entirely?
-
-Sean, I remember you calling out that some of the emulated mmio code
-follows the pattern in (A), but it's been a while and my memory is
-fuzzy. What's your opinion here?
