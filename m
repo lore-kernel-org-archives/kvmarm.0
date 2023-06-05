@@ -1,131 +1,95 @@
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EAB210FB
-	for <kvmarm@lists.linux.dev>; Mon,  5 Jun 2023 14:36:06 +0000 (UTC)
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5147f32df82so688591a12.0
-        for <kvmarm@lists.linux.dev>; Mon, 05 Jun 2023 07:36:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685975764; x=1688567764;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/nEIx2pKx8MANmuUD53PuQCkyn4NP8umHBPTpshdhtE=;
-        b=X4pOGtiEGzl58GIFHbyV096t93IrJzELqcypLc4QMyHeBwAan/aALSMopAZ+lqPIs/
-         PZNtR1f+KboWQSY8gUKV8bP6VLPOPyLj9X+PcDBik6Rb1GkoW1dQzGRxs/VB+cefUAHk
-         oqOoq9ZzN1ix9J54M/O922WWDlAgpQE5AKeuQY1UWV5aftGRdFXROUT/wO25J2bq7tvJ
-         ntDFTIewi2nWrpz4P99jP9etHFIKzZEQQ2s93Ttnro2HDYWUBGQU+f9mpHNbRQ5IlJbB
-         1OEzF7yvggyK3Clsj7G1B3wcFoRHXo6xJ+JId++mQ9eGPjlFHkVYB7SLL19lfxy+iJ6r
-         HQbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685975764; x=1688567764;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/nEIx2pKx8MANmuUD53PuQCkyn4NP8umHBPTpshdhtE=;
-        b=XAceIgxRh8PzEd8kAKGctmQYD+jLERUlQgtYzlbuyLTJfIbtsXqVkRIA8xIF3GO+LB
-         pOIwI8X8je7JA4U5KmWHlsqr79aI6SUChhQnCD1IHRMppOq7BJMiEPbVgu7U1b3AOCzw
-         YWj+DkSwH6WHxlTV4idJiW6Ip8tgstLROOF/GcK07Dv4aNogk7yX1rcsCuiNwYHw6H0p
-         Fufl3coUgZHQpTGRNkuLth/TSgNIhuywB8kFXm9GBRW6+HE8VY6CdiGpymabbUKltjDV
-         K39RuhDu22Y3Tzeeq+bpmXURtiKlBzw0ZnEcFk+x4HkmnANjgIx6Vt0fP/D8XjNDkvsw
-         ctnw==
-X-Gm-Message-State: AC+VfDyQXAeXwoy0uSX8HOj4RpdeKWo8TWGeGuL8IgjKY2Yp4SkGVHm8
-	5hcdpOqb8wdNhFLNteV9h8M=
-X-Google-Smtp-Source: ACHHUZ64cK7Y08p9XC1fThPd/qyz85iOAi9xrRj76BmDStiQbKH5iM+XYS3Sd25RTQiQg9fupo3QbA==
-X-Received: by 2002:a17:906:7a17:b0:974:56cb:9dfc with SMTP id d23-20020a1709067a1700b0097456cb9dfcmr9788715ejo.1.1685975764343;
-        Mon, 05 Jun 2023 07:36:04 -0700 (PDT)
-Received: from localhost ([134.191.220.83])
-        by smtp.gmail.com with ESMTPSA id i21-20020a170906851500b00965e9a23f2bsm4364473ejx.134.2023.06.05.07.35.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jun 2023 07:36:04 -0700 (PDT)
-Date: Mon, 5 Jun 2023 22:35:20 +0800
-From: Zhi Wang <zhi.wang.linux@gmail.com>
-To: Vipin Sharma <vipinsh@google.com>
-Cc: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com,
- suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com,
- will@kernel.org, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com,
- tsbogend@alpha.franken.de, anup@brainfault.org, atishp@atishpatra.org,
- paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
- seanjc@google.com, pbonzini@redhat.com, dmatlack@google.com,
- ricarkol@google.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 09/16] KVM: arm64: Document the page table walker
- actions based on the callback's return value
-Message-ID: <20230605223520.00007fbd.zhi.wang.linux@gmail.com>
-In-Reply-To: <20230602160914.4011728-10-vipinsh@google.com>
-References: <20230602160914.4011728-1-vipinsh@google.com>
-	<20230602160914.4011728-10-vipinsh@google.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFC141F169
+	for <kvmarm@lists.linux.dev>; Mon,  5 Jun 2023 15:07:18 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 60B7FD75;
+	Mon,  5 Jun 2023 08:08:03 -0700 (PDT)
+Received: from [10.57.85.135] (unknown [10.57.85.135])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BED333F663;
+	Mon,  5 Jun 2023 08:07:14 -0700 (PDT)
+Message-ID: <79f43d6b-7407-56c5-3c7d-c8fc48625e95@arm.com>
+Date: Mon, 5 Jun 2023 16:07:09 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH 1/3] arm64: Add a capability for FEAT_BBM level 2
+Content-Language: en-GB
+To: Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ kvmarm@lists.linux.dev, Ricardo Koller <ricarkol@google.com>
+References: <20230602170147.1541355-1-coltonlewis@google.com>
+ <20230602170147.1541355-2-coltonlewis@google.com>
+From: Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <20230602170147.1541355-2-coltonlewis@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Fri,  2 Jun 2023 09:09:07 -0700
-Vipin Sharma <vipinsh@google.com> wrote:
-
-> Document what the page table walker do when walker callback function returns
-> a value.
+On 2023-06-02 18:01, Colton Lewis wrote:
+> From: Ricardo Koller <ricarkol@google.com>
 > 
-> Current documentation is not correct as negative error of -EAGAIN on a
-> non-shared page table walker doesn't terminate the walker and continues
-> to the next step.
-> 
-> There might be a better place to keep this information, for now this
-> documentation will work as a reference guide until a better way is
-> found.
->
+> Add a new capability to detect "Stage-2 Translation table
+> break-before-make" (FEAT_BBM) level 2.
 
-After reading the whole patch series, I was thinking it might be a good
-time to improve the way how the visitor function and page table walker
-talk to each other. The error code is good enough before, but its meaning
-seems limited and vague when the visitor function wants to express more about
-what exactly happens inside. I am not sure if it is a good idea to continue
-that way: 1. found a new situation. 2. choosing a error code for visitor
-function. 3. walker translates the error code into the situation to
-handle. 4. document the error code and its actual meaning.
+Why does this patch invent spurious "stage 2" references everywhere? The 
+full name of FEAT_BBM is "Translation table break-before-make levels", 
+and it is not specific to one stage of translation.
 
-Eventually I am afraid that we are going to abuse the error code.
+Thanks,
+Robin.
 
-What about introducing a set of flags for the visitor function to express
-what happened and simplify the existing error code?
-
-> Signed-off-by: Vipin Sharma <vipinsh@google.com>
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > ---
->  arch/arm64/include/asm/kvm_pgtable.h | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
+>   arch/arm64/kernel/cpufeature.c | 11 +++++++++++
+>   arch/arm64/tools/cpucaps       |  1 +
+>   2 files changed, 12 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 8ef7e8f3f054..957bc20dab00 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -711,8 +711,19 @@ int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
->   * after invoking the walker callback, allowing the walker to descend into
->   * a newly installed table.
->   *
-> - * Returning a negative error code from the walker callback function will
-> - * terminate the walk immediately with the same error code.
-> + * Depending on the return value from the walker callback function, the page
-> + * table walk will continue or exit the walk. This is also dependent on the
-> + * type of the walker, i.e. shared walker (vCPU fault handlers) or non-shared
-> + * walker.
-> + *
-> + * Walker Type  | Callback         | Walker action
-> + * -------------|------------------|--------------
-> + * Non-Shared   | 0                | Continue
-> + * Non-Shared   | -EAGAIN          | Continue
-> + * Non-Shared   | Any other        | Exit
-> + * -------------|------------------|--------------
-> + * Shared       | 0                | Continue
-> + * Shared       | Any other        | Exit
->   *
->   * Return: 0 on success, negative error code on failure.
->   */
-
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index c331c49a7d19c..c538060f7f66b 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -2455,6 +2455,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+>   		.min_field_value = 1,
+>   		.matches = has_cpuid_feature,
+>   	},
+> +	{
+> +		.desc = "Stage-2 Translation table break-before-make level 2",
+> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+> +		.capability = ARM64_HAS_STAGE2_BBM2,
+> +		.sys_reg = SYS_ID_AA64MMFR2_EL1,
+> +		.sign = FTR_UNSIGNED,
+> +		.field_pos = ID_AA64MMFR2_EL1_BBM_SHIFT,
+> +		.field_width = 4,
+> +		.min_field_value = 2,
+> +		.matches = has_cpuid_feature,
+> +	},
+>   	{
+>   		.desc = "TLB range maintenance instructions",
+>   		.capability = ARM64_HAS_TLB_RANGE,
+> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+> index 40ba95472594d..010aca1892642 100644
+> --- a/arch/arm64/tools/cpucaps
+> +++ b/arch/arm64/tools/cpucaps
+> @@ -41,6 +41,7 @@ HAS_PAN
+>   HAS_RAS_EXTN
+>   HAS_RNG
+>   HAS_SB
+> +HAS_STAGE2_BBM2
+>   HAS_STAGE2_FWB
+>   HAS_TIDCP1
+>   HAS_TLB_RANGE
+> --
+> 2.41.0.rc0.172.g3f132b7071-goog
+> 
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
