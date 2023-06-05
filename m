@@ -1,87 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E42FDAD2E
-	for <kvmarm@lists.linux.dev>; Mon,  5 Jun 2023 17:46:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C15BC433EF;
-	Mon,  5 Jun 2023 17:46:04 +0000 (UTC)
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Kristina Martsenko <kristina.martsenko@arm.com>
-Cc: Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Luis Machado <luis.machado@arm.com>,
-	Vladimir Murzin <vladimir.murzin@arm.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 00/11] arm64: Support for Armv8.8 memcpy instructions in userspace
-Date: Mon,  5 Jun 2023 18:46:02 +0100
-Message-Id: <168598715797.875812.8370226994264203453.b4-ty@arm.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230509142235.3284028-1-kristina.martsenko@arm.com>
-References: <20230509142235.3284028-1-kristina.martsenko@arm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 505ADDDC0
+	for <kvmarm@lists.linux.dev>; Mon,  5 Jun 2023 17:46:40 +0000 (UTC)
+Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-45f10f5882fso999978e0c.1
+        for <kvmarm@lists.linux.dev>; Mon, 05 Jun 2023 10:46:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1685987200; x=1688579200;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sLmydWHjLSbXU8tIcqSwN4g2fOd1z0gySQpKm7q+7yE=;
+        b=blMiOClG9Py2mCB0eYhbQNQlNaJEUfyVnYFk5NBG6u4SazxSAucT99b2neLnU0FaDX
+         7vE+lxRUVuGtc/lnAJEILSA84POKGbKmjXVQHHB3o60yKgJ+YLK5U7JddTblQ+qREJGx
+         BpIDD2ceKosHjRebexq9qoWzZAKVX5bi5VcLM/53CCbm8FBuDM7DvYIm24wNlZZ9BiFW
+         Z1OhALBYz5KfJ3z40sgfLUbNV1er50ccipDxFsfnTTWHJggvZe9UI77xITgg3RmVwwah
+         HCA8mpFNYtF6QhcWhJ/3crf8/NRJrR/8jpnktgTUc2m0EOFNUP0nUwxwXQCQ1fjkg9pj
+         l+Wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685987200; x=1688579200;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sLmydWHjLSbXU8tIcqSwN4g2fOd1z0gySQpKm7q+7yE=;
+        b=e1wpQYD36RQvvwrSk63gvDHw3HlxV9xzlFhwhwmZz99t+Ptcy45OFHRgyHgVu84Qjr
+         CD2jBNsZveTWJrFpi3v4wfiibQXYrIa0eGfOjH96W5gCntsEgN3JbsG4LafxViunLCmm
+         a05eKHMWeaNnfUfO0sSlVVY/QWxnEVyAX6oScql3JAOy6ou/4N9TZOxXR7KsSsRdXu8A
+         fRko9ORIFn9wmXxiAmvxn18btK4rgKJcs8gJZWnjqwc8Ol4IcYg4c4XyWsJJdY99cJ2y
+         vJh/EQJf6P///DjsK7mNbxj0x1Qu5d1GTWRIVDq7/KckL8OeZxIo6Eb2plgB1/m6DhiZ
+         j3iQ==
+X-Gm-Message-State: AC+VfDysoFy1SMjWX3n2VDd393y0a8F+yQZ+fmmQbpNpVwb3bGJ337Yi
+	hHxRECL9vBwFfRKNcc5lo8wL/V9ZtgUyxaYElN5VKw==
+X-Google-Smtp-Source: ACHHUZ4Gv2+q+vynU6HEULCsA7sYdJuP/Sw+DQ5YTtegMnvWhx0lzh5D/f0UxCNMgD7DlI/ccPxmRquzz4Ysn+6H41o=
+X-Received: by 2002:a1f:bf49:0:b0:462:ac61:27e7 with SMTP id
+ p70-20020a1fbf49000000b00462ac6127e7mr2295162vkf.16.1685987199816; Mon, 05
+ Jun 2023 10:46:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-4-amoorthy@google.com>
+In-Reply-To: <20230602161921.208564-4-amoorthy@google.com>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Mon, 5 Jun 2023 10:46:03 -0700
+Message-ID: <CAF7b7moGyGqd-83xaJ0pLVSyWSRmPmKNZ_=6OzZAU4ytUPXYCw@mail.gmail.com>
+Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+To: seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev
+Cc: pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
+	jthoughton@google.com, bgardon@google.com, dmatlack@google.com, 
+	ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com, 
+	nadav.amit@gmail.com, isaku.yamahata@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 09 May 2023 15:22:24 +0100, Kristina Martsenko wrote:
-> The Armv8.8 extension adds new instructions to perform memcpy(), memset() and
-> memmove() operations in hardware (FEAT_MOPS). This series adds support for
-> using the new instructions in userspace. More information can be found in the
-> cover letter for v1:
->   https://lore.kernel.org/linux-arm-kernel/20230216160012.272345-1-kristina.martsenko@arm.com/
-> 
-> Changes in v2:
->  - Removed booting.rst requirement for HCRX_EL2.MCE2
->  - Changed HCRX_EL2 cpucap to be STRICT_BOOT type
->  - Changed HCRX_EL2.SMPME to be set for the guest and unset for the host
->  - Moved HCRX_EL2 initialization into init_el2_state(), dropped ISB
->  - Simplified conditional checks in mops exception handler with XOR
->  - Added comments from Arm ARM into mops exception handler
->  - Converted cpucaps to use the new ARM64_CPUID_FIELDS() helper
->  - Added MOPS to hwcaps kselftest
->  - Improved commit messages
->  - Rebased onto v6.4-rc1
->  - v1: https://lore.kernel.org/linux-arm-kernel/20230216160012.272345-1-kristina.martsenko@arm.com/
-> 
-> [...]
+By the way, I'd like to solicit opinions on the checks that
+kvm_populate_efault_info is performing: specifically the the
+exit-reason-unset check
 
-Applied to arm64 (for-next/feat_mops), thanks!
+On Fri, Jun 2, 2023 at 9:19=E2=80=AFAM Anish Moorthy <amoorthy@google.com> =
+wrote:
+>
+> +inline void kvm_populate_efault_info(struct kvm_vcpu *vcpu,
+> +                                    uint64_t gpa, uint64_t len, uint64_t=
+ flags)
+> +{
+>  ...
+> +       else if (WARN_ON_ONCE(vcpu->run->exit_reason !=3D KVM_EXIT_UNKNOW=
+N))
+> +               goto out;
 
-[01/11] KVM: arm64: initialize HCRX_EL2
-        https://git.kernel.org/arm64/c/af94aad4c915
-[02/11] arm64: cpufeature: detect FEAT_HCX
-        https://git.kernel.org/arm64/c/b0c756fe996a
-[03/11] KVM: arm64: switch HCRX_EL2 between host and guest
-        https://git.kernel.org/arm64/c/306b4c9f7120
-[04/11] arm64: mops: document boot requirements for MOPS
-        https://git.kernel.org/arm64/c/f32c053b9806
-[05/11] arm64: mops: don't disable host MOPS instructions from EL2
-        https://git.kernel.org/arm64/c/b1319c0e9559
-[06/11] KVM: arm64: hide MOPS from guests
-        https://git.kernel.org/arm64/c/3172613fbcbb
-[07/11] arm64: mops: handle MOPS exceptions
-        https://git.kernel.org/arm64/c/8536ceaa7471
-[08/11] arm64: mops: handle single stepping after MOPS exception
-        https://git.kernel.org/arm64/c/8cd076a67dc8
-[09/11] arm64: mops: detect and enable FEAT_MOPS
-        https://git.kernel.org/arm64/c/b7564127ffcb
-[10/11] arm64: mops: allow disabling MOPS from the kernel command line
-        https://git.kernel.org/arm64/c/3e1dedb29d0f
-[11/11] kselftest/arm64: add MOPS to hwcap test
-        https://git.kernel.org/arm64/c/d8a324f102cc
+What I intended this check to guard against was the first problematic
+case (A) I called out in the cover letter
 
--- 
-Catalin
+> The implementation strategy for KVM_CAP_MEMORY_FAULT_INFO has risks: for
+> example, if there are any existing paths in KVM_RUN which cause a vCPU
+> to (1) populate the kvm_run struct then (2) fail a vCPU guest memory
+> access but ignore the failure and then (3) complete the exit to
+> userspace set up in (1), then the contents of the kvm_run struct written
+> in (1) will be corrupted.
 
+What I wrote was actually incorrect, as you may see: if in (1) the
+exit reason !=3D KVM_EXIT_UNKNOWN then the exit-reason-unset check will
+prevent writing to the run struct. Now, if for some reason this flow
+involved populating most of the run struct in (1) but only setting the
+exit reason in (3) then we'd still have a problem: but it's not
+feasible to anticipate everything after all :)
+
+I also mentioned a different error case (B)
+
+> Another example: if KVM_RUN fails a guest memory access for which the
+> EFAULT is annotated but does not return the EFAULT to userspace, then
+> later returns an *un*annotated EFAULT to userspace, then userspace will
+> receive incorrect information.
+
+When the second EFAULT is un-annotated the presence/absence of the
+exit-reason-unset check is irrelevant: userspace will observe an
+annotated EFAULT in place of an un-annotated one either way.
+
+There's also a third interesting case (C) which I didn't mention: an
+annotated EFAULT which is ignored/suppressed followed by one which is
+propagated to userspace. Here the exit-reason-unset check will prevent
+the second annotation from being written, so userspace sees an
+annotation with bad contents, If we believe that case (A) is a weird
+sequence of events that shouldn't be happening in the first place,
+then case (C) seems more important to ensure correctness in. But I
+don't know anything about how often (A) happens in KVM, which is why I
+want others' opinions.
+
+So, should we drop the exit-reason-unset check (and the accompanying
+patch 4) and treat existing occurrences of case (A) as bugs, or should
+we maintain the check at the cost of incorrect behavior in case (C)?
+Or is there another option here entirely?
+
+Sean, I remember you calling out that some of the emulated mmio code
+follows the pattern in (A), but it's been a while and my memory is
+fuzzy. What's your opinion here?
