@@ -1,70 +1,68 @@
-Received: from out-10.mta1.migadu.com (out-10.mta1.migadu.com [95.215.58.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0A71F93A
-	for <kvmarm@lists.linux.dev>; Mon,  5 Jun 2023 15:45:16 +0000 (UTC)
-Date: Mon, 5 Jun 2023 15:45:10 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1685979914;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+5LUtWzKmYjDV4nZKzC4q3Djt7pncEjD8QMEpJ4KCyA=;
-	b=R5NBp7zZ7fiJGgGmahE2wkbha2vpqQfOgtOabW8PjJwXnaosJWHnULmmToS920oLU0j9ES
-	DEOKTJK+7rtQvtvhIS3UP4Pj6JgDkZg65I4gS+iTsOdBUr0TzShGEMUXB+AAhDzMXFGjzv
-	WQrK4vu1z4npD7q+hvPMu+N8pqIR9cs=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Kristina Martsenko <kristina.martsenko@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Luis Machado <luis.machado@arm.com>,
-	Vladimir Murzin <vladimir.murzin@arm.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 06/11] KVM: arm64: hide MOPS from guests
-Message-ID: <ZH4DBoFv2CkoxFmX@linux.dev>
-References: <20230509142235.3284028-1-kristina.martsenko@arm.com>
- <20230509142235.3284028-7-kristina.martsenko@arm.com>
- <87ttvpndhx.wl-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A16836FC3
+	for <kvmarm@lists.linux.dev>; Mon,  5 Jun 2023 16:37:59 +0000 (UTC)
+Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-45d59140bbdso1602717e0c.1
+        for <kvmarm@lists.linux.dev>; Mon, 05 Jun 2023 09:37:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1685983078; x=1688575078;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4GNtd8GQvgY7F2DHMM4zSSgC1V5KrK5LXShf2LAeh84=;
+        b=d2cXwO6omaKLj3TF9XVq42fESQt6+RQeekobXZ3VLELNJjnmF8bzV6YiWcQXD3lgff
+         T2ptMjKduZIcL5qCXwy5pJu/kHGFr51p9HipIihz0ZAukNUamMMZNQX5J+i/HIMZUGiJ
+         CvnHGSY8mvwLCKP9N/q17/Gfs635PLDQP/xBZvMc4Lui+GVcCNojooh3m8J2ARU2bHfr
+         QEmjAKUAxa9nosqwQdDgc8KKYTu06Gcr5IrgkkdMHAlAPbaNsYgL/4cEnuVbqtG4Vfzh
+         vVUafCE2L2MJG7oTOhqvRw53McZSvssVCd5PHYG6acX1sVyO2seLRQvisOePwPyTjwkk
+         ykMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685983078; x=1688575078;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4GNtd8GQvgY7F2DHMM4zSSgC1V5KrK5LXShf2LAeh84=;
+        b=S/eNeBYyBcQHLCOoAQVAy+ChHkAmoZrMKLBXmcw0saw8MFmIJUi+/3J6uXPZ6M12LD
+         ipp0e5u4SX62deFDr8N3E4zW+lmsPYMKBWeUpuYfsbajaOh1MbdWOYGvA7cm0qLKmnFV
+         mZSARSI/oiCo7vscFi8HyyG3iSZV8mdLJH7D0+bkTQrfrgU6mr4o0UFTrOsPjGjO1tW6
+         FZeItS6s8alyjBBgCaWKjVYMUIUA287gvx9uzApohhF5z43Uk2KiVCnpAlK1aoqIH3e4
+         FkAbGtbmVDAq+lJ8HRTR0DNcy8wNaSckK+w6bglgNsAjJwK/kkImH/fRP8GI9hyhh4SI
+         RbVw==
+X-Gm-Message-State: AC+VfDzmWhXfzrezLf5Zmlhbr+AWRKl9aYxTlZ1mwOM5feVbJ6Gr7qlg
+	AxkclnKtjWMIsA/zkSPrwExHzHfKtvOj+XUxghWPRw==
+X-Google-Smtp-Source: ACHHUZ4gRpc6q7ReKbOOrt1DjQ8GOTzV3ROA2uR3fx5vrGDFukKvNPNd5Diam8tM0+WDBgl5vbrCCsJcsYbVUu0r+C8=
+X-Received: by 2002:a1f:bd55:0:b0:45c:b73c:260c with SMTP id
+ n82-20020a1fbd55000000b0045cb73c260cmr5834715vkf.12.1685983078309; Mon, 05
+ Jun 2023 09:37:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87ttvpndhx.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-4-amoorthy@google.com>
+ <20230603165802.GL1234772@ls.amr.corp.intel.com>
+In-Reply-To: <20230603165802.GL1234772@ls.amr.corp.intel.com>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Mon, 5 Jun 2023 09:37:19 -0700
+Message-ID: <CAF7b7mr+suxFe63GXJWMK_XX8J1kp5Pi2yg_bNUi_0h0ub_4Jw@mail.gmail.com>
+Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+To: Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc: seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org, 
+	robert.hoo.linux@gmail.com, jthoughton@google.com, bgardon@google.com, 
+	dmatlack@google.com, ricarkol@google.com, axelrasmussen@google.com, 
+	peterx@redhat.com, nadav.amit@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jun 03, 2023 at 09:42:18AM +0100, Marc Zyngier wrote:
-> On Tue, 09 May 2023 15:22:30 +0100,
-> Kristina Martsenko <kristina.martsenko@arm.com> wrote:
-> > 
-> > As FEAT_MOPS is not supported in guests yet, hide it from the ID
-> > registers for guests.
-> > 
-> > The MOPS instructions are UNDEFINED in guests as HCRX_EL2.MSCEn is not
-> > set in HCRX_GUEST_FLAGS, and will take an exception to EL1 if executed.
-> > 
-> > Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-> > Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
-> 
-> This is very likely to clash with Jing's series that completely
-> reworks the whole idreg series, but as long as this is on its own
-> branch, we can deal with that.
+On Sat, Jun 3, 2023 at 9:58=E2=80=AFAM Isaku Yamahata <isaku.yamahata@gmail=
+.com> wrote:
+>
+> UPM or gmem uses size instead of len. Personally I don't have any strong
+> preference.  It's better to converge. (or use union to accept both?)
 
-Yup, we will definitely want to get that ironed out. I'll pull Catalin's
-branch when this all gets queued up.
-
-Acked-by: Oliver Upton <oliver.upton@linux.dev>
-
--- 
-Thanks,
-Oliver
+I like "len" because to me it implies a contiguous range, whereas
+"size" does not: but it's a minor thing. Converging does seem good
+though.
