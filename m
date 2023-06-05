@@ -1,102 +1,69 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A6176FC3
-	for <kvmarm@lists.linux.dev>; Mon,  5 Jun 2023 16:39:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1685983196;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+WZAeY2M1M3VRyRqli4bEzyT4GZo8nI6OGMhk9CIMS4=;
-	b=Lq+8ytBDT5ijmNoiVk96tBV1zav2afpbvEww0yyA93oh3yZFtrmYWE5B/VK+LthUqt0hJL
-	kfe/1mbT7Kd91K/Z/nJs9u7cyi+Hg9WsENGqW8bAgYRZ2KJT+alLeF5y3w13NkcIcCy5yp
-	99QaPOOXVWUK10VPM0bgWSMN21Fo81g=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-58-7PjixWQCPJq1B7YkvSGeOg-1; Mon, 05 Jun 2023 12:39:53 -0400
-X-MC-Unique: 7PjixWQCPJq1B7YkvSGeOg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1504285A5BA;
-	Mon,  5 Jun 2023 16:39:52 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.252])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id AC91348205E;
-	Mon,  5 Jun 2023 16:39:51 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Marc Zyngier <maz@kernel.org>, Suraj Jitindar Singh <surajjs@amazon.com>
-Cc: jingzhangos@google.com, alexandru.elisei@arm.com, james.morse@arm.com,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, oupton@google.com,
- pbonzini@redhat.com, rananta@google.com, reijiw@google.com,
- suzuki.poulose@arm.com, tabba@google.com, will@kernel.org,
- sjitindarsingh@gmail.com
-Subject: Re: [PATCH 3/3] KVM: arm64: Use per guest ID register for
- ID_AA64PFR1_EL1.MTE
-In-Reply-To: <873539ospa.wl-maz@kernel.org>
-Organization: Red Hat GmbH
-References: <20230602005118.2899664-1-jingzhangos@google.com>
- <20230602221447.1809849-1-surajjs@amazon.com>
- <20230602221447.1809849-4-surajjs@amazon.com>
- <873539ospa.wl-maz@kernel.org>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date: Mon, 05 Jun 2023 18:39:50 +0200
-Message-ID: <87h6rl50dl.fsf@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BDDB749A
+	for <kvmarm@lists.linux.dev>; Mon,  5 Jun 2023 16:42:28 +0000 (UTC)
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-45d3e523a43so1651486e0c.2
+        for <kvmarm@lists.linux.dev>; Mon, 05 Jun 2023 09:42:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1685983347; x=1688575347;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r7FCKK87DvKxeumyy9SDd2/SDnDekXDap0QpJp+wkJ0=;
+        b=cWdp1XmK5svgOe4l0TjsaQ8jjivdFIm3dMhGNN479CW6NPGgwdIvsYcFL6mf501/0I
+         trdXpgFP9MvAvz8docIpatqv/zl4OinM66kgjuqwoQnJX0IGuVQmhq+c8oRuCwfA1Xgs
+         ax2TYDkeGC1/Yl5N38C3YTrAh1TWvKbQ0oKe2hHfgHgvxvNMM7nnY5Hakew+2s7isuuO
+         7iIg7aIlSMz6+sX2eTUCxhMiux14eD271uYOeUvCiBawAXyqy3ptyJOGBfiRMiKdptG+
+         oHwdZf5luJuYlTih6+rbnpEIHsXMXygRssPbxJL4PaxxWAGldQEvSD/Fs/bhKX3aZnke
+         oZaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685983347; x=1688575347;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=r7FCKK87DvKxeumyy9SDd2/SDnDekXDap0QpJp+wkJ0=;
+        b=g6ul0VDcZk+6d+DXyU7856Mmlezi5FQ3om6UiOmkuPAbe/LHYifd5BoN1bIs8Am4BC
+         fRljMVNC7rKRsxMUrK+LYPMRhF6B5HnvF9nSi+fHamaO+j2mMrHhYLQEnc4vYyBQBsn0
+         cOYkABRBRTzAfasHtaL8Gpji+awgW7PrbuLYlr08v629vtiGOylSO9RX/doAj0RXcUpz
+         fp2BIynQFTyinYbnPS6o8MdHCQ/VDK6jNRQHf5ioUIFgVwgI2Z9IWmWNAPOYFeehZrQQ
+         4r4gjikcQbGrgcVWDQrLEUKN8EnsGfUmEVEONAOjzxvZXYTKaBIztO+2pTide3O5DgHX
+         82qg==
+X-Gm-Message-State: AC+VfDys8Qx6cUFG934EyQ1Lu7RbhYVDCHYHh7gX/u44/8hLrZj14Z+4
+	gfJ8L8HkJtHccJJGU0GSmj3pKhfq32cW5dFN/kdE3g==
+X-Google-Smtp-Source: ACHHUZ5aDqxqtFCwzCxAXkm7KOLQsjJTn5mGkQBeDWdNKAW515azAvtnqClsKAZnwGpKwxavXkJhAvvMTQivl+YRx0k=
+X-Received: by 2002:a1f:48c1:0:b0:461:37d:dd3e with SMTP id
+ v184-20020a1f48c1000000b00461037ddd3emr3540042vka.15.1685983346888; Mon, 05
+ Jun 2023 09:42:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-3-amoorthy@google.com>
+ <20230602203031.GK1234772@ls.amr.corp.intel.com>
+In-Reply-To: <20230602203031.GK1234772@ls.amr.corp.intel.com>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Mon, 5 Jun 2023 09:41:48 -0700
+Message-ID: <CAF7b7mp2kccagOipwZ_d+n6KEjY5zu=k3XVq0wZJ_GHvMqWqtg@mail.gmail.com>
+Subject: Re: [PATCH v4 02/16] KVM: x86: Set vCPU exit reason to
+ KVM_EXIT_UNKNOWN at the start of KVM_RUN
+To: Isaku Yamahata <isaku.yamahata@gmail.com>, Sean Christopherson <seanjc@google.com>
+Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
+	jthoughton@google.com, bgardon@google.com, dmatlack@google.com, 
+	ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com, 
+	nadav.amit@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jun 03 2023, Marc Zyngier <maz@kernel.org> wrote:
-
-> On Fri, 02 Jun 2023 23:14:47 +0100,
-> Suraj Jitindar Singh <surajjs@amazon.com> wrote:
->> 
->> With per guest ID registers, MTE settings from userspace can be stored in
->> its corresponding ID register.
->> 
->> No functional change intended.
->> 
->> Signed-off-by: Suraj Jitindar Singh <surajjs@amazon.com>
->> ---
->>  arch/arm64/include/asm/kvm_host.h | 21 ++++++++++-----------
->>  arch/arm64/kvm/arm.c              | 11 ++++++++++-
->>  arch/arm64/kvm/sys_regs.c         |  5 +++++
->>  3 files changed, 25 insertions(+), 12 deletions(-)
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index ca18c09ccf82..6fc4190559d1 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -80,8 +80,17 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->>  		if (!system_supports_mte() || kvm->created_vcpus) {
->>  			r = -EINVAL;
->>  		} else {
->> +			u64 val;
->> +
->> +			/* Protects the idregs against modification */
->> +			mutex_lock(&kvm->arch.config_lock);
->> +
->> +			val = IDREG(kvm, SYS_ID_AA64PFR1_EL1);
->> +			val |= FIELD_PREP(ID_AA64PFR1_EL1_MTE_MASK, 1);
+On Fri, Jun 2, 2023 at 1:30=E2=80=AFPM Isaku Yamahata <isaku.yamahata@gmail=
+.com> wrote:
 >
-> The architecture specifies 3 versions of MTE in the published ARM ARM,
-> with a 4th coming up as part of the 2022 extensions.
+> As vmx code uses KVM_EXIT_UNKNOWN with hardware_exit_reason=3Dexit reason=
+,
+> Can we initialize hardware_exit_reason to -1.
+> It's just in case.
 
-Is that the one that adds some more MTE<foo> bits in AA64PFR1 and
-AA64PFR2?
-
-> Why are you
-> actively crippling the MTE version presented to the guest, and
-> potentially introduce unexpected behaviours?
-
-While the code does not look correct here, I think we'll need some way to
-control which version of MTE is presented to the guest for compatibility
-handling; does it make sense to control this per-cpu, or does it need to
-be a vm-wide setting?
-
+Will do
