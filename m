@@ -1,69 +1,87 @@
-Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BDDB749A
-	for <kvmarm@lists.linux.dev>; Mon,  5 Jun 2023 16:42:28 +0000 (UTC)
-Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-45d3e523a43so1651486e0c.2
-        for <kvmarm@lists.linux.dev>; Mon, 05 Jun 2023 09:42:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685983347; x=1688575347;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r7FCKK87DvKxeumyy9SDd2/SDnDekXDap0QpJp+wkJ0=;
-        b=cWdp1XmK5svgOe4l0TjsaQ8jjivdFIm3dMhGNN479CW6NPGgwdIvsYcFL6mf501/0I
-         trdXpgFP9MvAvz8docIpatqv/zl4OinM66kgjuqwoQnJX0IGuVQmhq+c8oRuCwfA1Xgs
-         ax2TYDkeGC1/Yl5N38C3YTrAh1TWvKbQ0oKe2hHfgHgvxvNMM7nnY5Hakew+2s7isuuO
-         7iIg7aIlSMz6+sX2eTUCxhMiux14eD271uYOeUvCiBawAXyqy3ptyJOGBfiRMiKdptG+
-         oHwdZf5luJuYlTih6+rbnpEIHsXMXygRssPbxJL4PaxxWAGldQEvSD/Fs/bhKX3aZnke
-         oZaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685983347; x=1688575347;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=r7FCKK87DvKxeumyy9SDd2/SDnDekXDap0QpJp+wkJ0=;
-        b=g6ul0VDcZk+6d+DXyU7856Mmlezi5FQ3om6UiOmkuPAbe/LHYifd5BoN1bIs8Am4BC
-         fRljMVNC7rKRsxMUrK+LYPMRhF6B5HnvF9nSi+fHamaO+j2mMrHhYLQEnc4vYyBQBsn0
-         cOYkABRBRTzAfasHtaL8Gpji+awgW7PrbuLYlr08v629vtiGOylSO9RX/doAj0RXcUpz
-         fp2BIynQFTyinYbnPS6o8MdHCQ/VDK6jNRQHf5ioUIFgVwgI2Z9IWmWNAPOYFeehZrQQ
-         4r4gjikcQbGrgcVWDQrLEUKN8EnsGfUmEVEONAOjzxvZXYTKaBIztO+2pTide3O5DgHX
-         82qg==
-X-Gm-Message-State: AC+VfDys8Qx6cUFG934EyQ1Lu7RbhYVDCHYHh7gX/u44/8hLrZj14Z+4
-	gfJ8L8HkJtHccJJGU0GSmj3pKhfq32cW5dFN/kdE3g==
-X-Google-Smtp-Source: ACHHUZ5aDqxqtFCwzCxAXkm7KOLQsjJTn5mGkQBeDWdNKAW515azAvtnqClsKAZnwGpKwxavXkJhAvvMTQivl+YRx0k=
-X-Received: by 2002:a1f:48c1:0:b0:461:37d:dd3e with SMTP id
- v184-20020a1f48c1000000b00461037ddd3emr3540042vka.15.1685983346888; Mon, 05
- Jun 2023 09:42:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E42FDAD2E
+	for <kvmarm@lists.linux.dev>; Mon,  5 Jun 2023 17:46:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C15BC433EF;
+	Mon,  5 Jun 2023 17:46:04 +0000 (UTC)
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Kristina Martsenko <kristina.martsenko@arm.com>
+Cc: Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mark Brown <broonie@kernel.org>,
+	Luis Machado <luis.machado@arm.com>,
+	Vladimir Murzin <vladimir.murzin@arm.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 00/11] arm64: Support for Armv8.8 memcpy instructions in userspace
+Date: Mon,  5 Jun 2023 18:46:02 +0100
+Message-Id: <168598715797.875812.8370226994264203453.b4-ty@arm.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230509142235.3284028-1-kristina.martsenko@arm.com>
+References: <20230509142235.3284028-1-kristina.martsenko@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-3-amoorthy@google.com>
- <20230602203031.GK1234772@ls.amr.corp.intel.com>
-In-Reply-To: <20230602203031.GK1234772@ls.amr.corp.intel.com>
-From: Anish Moorthy <amoorthy@google.com>
-Date: Mon, 5 Jun 2023 09:41:48 -0700
-Message-ID: <CAF7b7mp2kccagOipwZ_d+n6KEjY5zu=k3XVq0wZJ_GHvMqWqtg@mail.gmail.com>
-Subject: Re: [PATCH v4 02/16] KVM: x86: Set vCPU exit reason to
- KVM_EXIT_UNKNOWN at the start of KVM_RUN
-To: Isaku Yamahata <isaku.yamahata@gmail.com>, Sean Christopherson <seanjc@google.com>
-Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
-	jthoughton@google.com, bgardon@google.com, dmatlack@google.com, 
-	ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com, 
-	nadav.amit@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jun 2, 2023 at 1:30=E2=80=AFPM Isaku Yamahata <isaku.yamahata@gmail=
-.com> wrote:
->
-> As vmx code uses KVM_EXIT_UNKNOWN with hardware_exit_reason=3Dexit reason=
-,
-> Can we initialize hardware_exit_reason to -1.
-> It's just in case.
+On Tue, 09 May 2023 15:22:24 +0100, Kristina Martsenko wrote:
+> The Armv8.8 extension adds new instructions to perform memcpy(), memset() and
+> memmove() operations in hardware (FEAT_MOPS). This series adds support for
+> using the new instructions in userspace. More information can be found in the
+> cover letter for v1:
+>   https://lore.kernel.org/linux-arm-kernel/20230216160012.272345-1-kristina.martsenko@arm.com/
+> 
+> Changes in v2:
+>  - Removed booting.rst requirement for HCRX_EL2.MCE2
+>  - Changed HCRX_EL2 cpucap to be STRICT_BOOT type
+>  - Changed HCRX_EL2.SMPME to be set for the guest and unset for the host
+>  - Moved HCRX_EL2 initialization into init_el2_state(), dropped ISB
+>  - Simplified conditional checks in mops exception handler with XOR
+>  - Added comments from Arm ARM into mops exception handler
+>  - Converted cpucaps to use the new ARM64_CPUID_FIELDS() helper
+>  - Added MOPS to hwcaps kselftest
+>  - Improved commit messages
+>  - Rebased onto v6.4-rc1
+>  - v1: https://lore.kernel.org/linux-arm-kernel/20230216160012.272345-1-kristina.martsenko@arm.com/
+> 
+> [...]
 
-Will do
+Applied to arm64 (for-next/feat_mops), thanks!
+
+[01/11] KVM: arm64: initialize HCRX_EL2
+        https://git.kernel.org/arm64/c/af94aad4c915
+[02/11] arm64: cpufeature: detect FEAT_HCX
+        https://git.kernel.org/arm64/c/b0c756fe996a
+[03/11] KVM: arm64: switch HCRX_EL2 between host and guest
+        https://git.kernel.org/arm64/c/306b4c9f7120
+[04/11] arm64: mops: document boot requirements for MOPS
+        https://git.kernel.org/arm64/c/f32c053b9806
+[05/11] arm64: mops: don't disable host MOPS instructions from EL2
+        https://git.kernel.org/arm64/c/b1319c0e9559
+[06/11] KVM: arm64: hide MOPS from guests
+        https://git.kernel.org/arm64/c/3172613fbcbb
+[07/11] arm64: mops: handle MOPS exceptions
+        https://git.kernel.org/arm64/c/8536ceaa7471
+[08/11] arm64: mops: handle single stepping after MOPS exception
+        https://git.kernel.org/arm64/c/8cd076a67dc8
+[09/11] arm64: mops: detect and enable FEAT_MOPS
+        https://git.kernel.org/arm64/c/b7564127ffcb
+[10/11] arm64: mops: allow disabling MOPS from the kernel command line
+        https://git.kernel.org/arm64/c/3e1dedb29d0f
+[11/11] kselftest/arm64: add MOPS to hwcap test
+        https://git.kernel.org/arm64/c/d8a324f102cc
+
+-- 
+Catalin
+
