@@ -1,86 +1,67 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B794DDAE
-	for <kvmarm@lists.linux.dev>; Sun,  4 Jun 2023 16:23:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D687C433EF;
-	Sun,  4 Jun 2023 16:23:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1685895808;
-	bh=lUrm+PEuJ42JVt5iXc2aFfMeyCqoaeWTJYNhcIoFNic=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DRa/eNO5IbQ4eWC6ONJjq0r7WMGBye7BPwyfeDgxpspFSLIPDdbDps+/6CRcaeCr3
-	 85t/b+KUkW4MOEB/gH9HhDqCJgaSc7XS5ecT0An0OcMCq/DFY12jLlZjRo4B9PyqU9
-	 S+IK/H3vL0G/aDwFRbtHGD7yFR6tOSAEILyRI6gJGBZTzR2HtaAvzZdDQ3gD6f62SC
-	 8crV5xAxxaUegbHDDdIcU8aH+0IUR8Cfu02LVS168shhh1X9t+9CXXIeav3Uud50Gj
-	 tmEc8YuerHDn2IXyCoqLvYgX/cCuvFPlnv6OS+/GYxUDAqaN+yFqFte82l62kH2Ite
-	 JNOzir/0dxSNw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1q5qVp-002jga-NC;
-	Sun, 04 Jun 2023 17:23:25 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Reiji Watanabe <reijiw@google.com>,
-	Will Deacon <will@kernel.org>
-Cc: Zenghui Yu <yuzenghui@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Rob Herring <robh@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	kvm@vger.kernel.org,
-	Shaoqin Huang <shahuang@redhat.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Raghavendra Rao Anata <rananta@google.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v5 0/2] KVM: arm64: PMU: Correct the handling of PMUSERENR_EL0
-Date: Sun,  4 Jun 2023 17:23:22 +0100
-Message-Id: <168589579607.1101692.3753432023819504330.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230603025035.3781797-1-reijiw@google.com>
-References: <20230603025035.3781797-1-reijiw@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D708381
+	for <kvmarm@lists.linux.dev>; Mon,  5 Jun 2023 01:32:33 +0000 (UTC)
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5149aafef44so6153648a12.0
+        for <kvmarm@lists.linux.dev>; Sun, 04 Jun 2023 18:32:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1685928751; x=1688520751;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=r5td+redj+BCltRLZ11fp4poQTI56kTLzT9HA93AbpE=;
+        b=H21hQKMRD9Rb7Xhud2NMe3oh3m9V7MNmokvx2z41HTTNJPIzfZ0r6bumbXTmtpGxCl
+         R6MJYWSw71UIp2a3Fj538Zwkhp+Uyb+0DxqQNN6tN9OO1xTWYTzChSBC1S87xTcJTJAH
+         3uD0vsIIcV7cEOq/2GItHrc99Dz+HuAkgMC7LTXT19aPvxdFVjja/cx5n2nOXAExgTBS
+         faBKh/Idh4XMkgkxhQF31c7ribowNjjrTx5YrJTndO0dUPRGOucYnIls5LjnfH/SJVPg
+         jU5duXh2AgfDhPDVC9ym5IF06cChOvxYqMNk00f7SU5J3sKFlufPdwV4RsAFLHjxlwpW
+         Qh9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685928751; x=1688520751;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=r5td+redj+BCltRLZ11fp4poQTI56kTLzT9HA93AbpE=;
+        b=Jhf0UnGyxs0dGp2uBj39ep3EhukBotRyLPoRizct+imf6zBVXX1p8XM1noPqrLxvKM
+         I/krO4TYdlzKDS2cOjxTDwnSJvtFNJviYB9wZH5Q3TP/EPvPgWr//8rxa8W0CtsHdDRn
+         vDorIE8b9v9L8eO8Q8tobtlT3Tg7GL5zrBECQurTjFkUCTlgXr8kVtlJ4vEZ4rcJ3RTy
+         v9c1gczJ2gMFIrm9QeUP1D5IHijLkFFEWB75rBdmtEQXq5/JhMNPlpgtPZAMDPvZK03T
+         bgoNvb66xV+r1665cyZ/1kq/s3jw9g3bDQygTwRuR7GBrrsAAQkpNL/ujp7YXISEncja
+         Qctg==
+X-Gm-Message-State: AC+VfDyhdHbxpmwsJ8MkeUCWi0VIUTDYT5GTQXKxFJ3+utWnE9fDcSnA
+	VFMHFc54IFVdx1X4dpkfEAICP40yllBu/CWr2Il2em/XP36p+g==
+X-Google-Smtp-Source: ACHHUZ4gdXqGzd1Lu4Fuf091c/amO0GubgMyGpoBGUMtDJ6ApK0W6CyPyQShfRojjYwpGrzM91iCoMxSFQOzgScrU/0=
+X-Received: by 2002:aa7:d293:0:b0:514:a157:c1b0 with SMTP id
+ w19-20020aa7d293000000b00514a157c1b0mr6054489edq.10.1685928751008; Sun, 04
+ Jun 2023 18:32:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, oliver.upton@linux.dev, catalin.marinas@arm.com, mark.rutland@arm.com, reijiw@google.com, will@kernel.org, yuzenghui@huawei.com, suzuki.poulose@arm.com, robh@kernel.org, james.morse@arm.com, kvm@vger.kernel.org, shahuang@redhat.com, ricarkol@google.com, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, rananta@google.com, alexandru.elisei@arm.com, jingzhangos@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+From: Xuheng Li <technicfree@gmail.com>
+Date: Sun, 4 Jun 2023 21:32:20 -0400
+Message-ID: <CAOBxttgrNuU33Az=MDrP8RDhFKcjZ30hUsnwxm5WP94kLGDLMg@mail.gmail.com>
+Subject: Running Protected KVM on non-Android Device
+To: kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 2 Jun 2023 19:50:33 -0700, Reiji Watanabe wrote:
-> This series will fix bugs in KVM's handling of PMUSERENR_EL0.
-> 
-> With PMU access support from EL0 [1], the perf subsystem would
-> set CR and ER bits of PMUSERENR_EL0 as needed to allow EL0 to have
-> a direct access to PMU counters.  However, KVM appears to assume
-> that the register value is always zero for the host EL0, and has
-> the following two problems in handling the register.
-> 
-> [...]
+Hi,
 
-Applied to fixes, thanks!
+I am interested in pKVM and want to try it on a normal Linux distro
+such as Ubuntu.
 
-[1/2] KVM: arm64: PMU: Restore the host's PMUSERENR_EL0
-      commit: 8681f71759010503892f9e3ddb05f65c0f21b690
-[2/2] KVM: arm64: PMU: Don't overwrite PMUSERENR with vcpu loaded
-      commit: 0c2f9acf6ae74118385f7a7d48f4b2d93637b628
+But it seems the current upstream pKVM doesn't have protection over
+the VM's memory and vCPU state. I found the android-kvm tree
+(https://android-kvm.googlesource.com/linux/+/refs/tags/pkvm-core-6.3)
+has the protection and there's a
+kvmtool(https://android-kvm.googlesource.com/kvmtool/) for launching
+the VM in protected mode.
 
-Cheers,
+Am I looking into the right place? And, if possible, are there any
+instructions on how to run the protected VM?
 
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+Any help would be appreciated!
 
-
+---
+Xuheng Li
