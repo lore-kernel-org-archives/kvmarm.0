@@ -1,64 +1,102 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A08174D4
-	for <kvmarm@lists.linux.dev>; Tue,  6 Jun 2023 17:04:15 +0000 (UTC)
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-bacfa4eefcbso13610171276.1
-        for <kvmarm@lists.linux.dev>; Tue, 06 Jun 2023 10:04:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686071054; x=1688663054;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=V8qzwnilU7CBlAyrORrX+Rq/xc7XcjCZI3HBcrsSReA=;
-        b=AHguQPaCli0Z6Kk+CO5rYFKKfQWZY0OhpKc5L71HVklmdkvCAO1wmDuyVEKmh9ewUU
-         ZgcNzq7xdni1a3CtugomLcW1MAII4596bWnto4+D2qqcJMKr8v3+RiRZqaYxWGrITiKm
-         rkGNCX6ed2Fkxt9vXgOPTcvkD4SeXKKOA3SAS3b0kf65oyUIrb10oZ0EBGciPjhcmLL+
-         e9oArNo6WBao2TwmmH/+9C754jWjiV2QJzHYOUSQUdnIrKtz/7CiM6scXZ4Bs0yc+JFh
-         IBuIq0PfbvSQJJboJee8nSpLJM/xi9r2FM0kQUSvVbSSJb+yDeOq59lT6kOXYeMLh0bj
-         OUTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686071054; x=1688663054;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V8qzwnilU7CBlAyrORrX+Rq/xc7XcjCZI3HBcrsSReA=;
-        b=glQQLwdiNfPCDptCV3cA8vO/lZJzXznZywY91ubPxPbLCCur6S1W1SRbZgAoJ6GlCx
-         6n06TWP5Xe/xhaPmJiL2ZWe8Z+DV9nc7kFg+X4GWRLS1jGDcOLHnDgkByl0SmwBB7twF
-         mkSF30PnHw4AQab+o9CyjMfQulwccIgLlekiAKTzEHkq9vBQMUF+9GNtUVyau5Kj1esF
-         hEJy/yFB/wd5+YKGsNvy/svHhhXi5DCMIDO9YknNfdyFeL5VyR88MqvZJxx1ysXLQsdi
-         LpnpFr9t7xBJbB/ry3g/HkZ1BalB6NuRBtSU/qmmkzsT82sTkanZFxfrZAaiJ/RP56s8
-         oaiQ==
-X-Gm-Message-State: AC+VfDyZYk1GcYTtaZ8Hdo8555MTcRT58rCMF+D/8S7oYn9JQMPId+KD
-	4Wb/z1JNPns1eIYn46OS4kbBV35jU74=
-X-Google-Smtp-Source: ACHHUZ4qZcjvSUYMxKH7ZqKK5jG3I1bcHk8c4YCSNi3BAUw5BflMSXSLu5LCw/yiBxYmezusTpkyPX7rEy0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:f50d:0:b0:bb1:ca0e:29a0 with SMTP id
- a13-20020a25f50d000000b00bb1ca0e29a0mr1657054ybe.0.1686071054799; Tue, 06 Jun
- 2023 10:04:14 -0700 (PDT)
-Date: Tue, 6 Jun 2023 10:04:13 -0700
-In-Reply-To: <ZH9mOXYDWnMqoL9c@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54FF11ED33
+	for <kvmarm@lists.linux.dev>; Tue,  6 Jun 2023 17:10:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADB95C433D2;
+	Tue,  6 Jun 2023 17:10:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1686071445;
+	bh=z6sz91MRATzTZbRLgJHMdnl08AW9XjGtfAyBuMhixws=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bgFQDc0n9a4wP8vjEGq5bR1aVIvOgZu9WEq88MFjgCAOLOhc8BBofPF8qmRRIsqEQ
+	 41SNHbvid/KnIp9L+krDQOVt95cpnBcFiGtthqw7lGl31gHZuspXtthnKpEvIJNBTc
+	 lOMfTLLXoPRxlqvsNJJSnskQxX6EHymDy/TfbAqyb6MKnQjg9/08zH9BwYJlkX1h4N
+	 Uq4KAfp8NTfJo8YuShSCjhhLEkkWCksR+ThkI7wFTHYatUJPMClV0rYYSZKv/x05e7
+	 SeAiO7OOri5H3b6bGWCImiZD+31TFOzjQPSFybU9G7mK33TIYslmDqQTLKEeLmADUd
+	 zeZhTkYFNabZA==
+Received: from 152.5.30.93.rev.sfr.net ([93.30.5.152] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1q6aCh-003Gvi-Gp;
+	Tue, 06 Jun 2023 18:10:43 +0100
+Date: Tue, 06 Jun 2023 18:10:42 +0100
+Message-ID: <87ilc0o6st.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Sebastian Ott <sebott@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH] KVM: arm64: Fix smp_processor_id() call in preemptible context
+In-Reply-To: <ZH9jTrR8cdkOdJKu@linux.dev>
+References: <2f16f83e-ed60-fcb7-7f3d-0fa216c41cb9@redhat.com>
+	<ZH8+ZG7DOX9TYcIY@linux.dev>
+	<87pm68o99d.wl-maz@kernel.org>
+	<ZH9jTrR8cdkOdJKu@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <2f16f83e-ed60-fcb7-7f3d-0fa216c41cb9@redhat.com>
- <ZH8+ZG7DOX9TYcIY@linux.dev> <ZH9CvE54NSVXqjlO@google.com>
- <ZH9OQzKIfwxR3q54@linux.dev> <ZH9UwSueTP37NaY7@google.com> <ZH9mOXYDWnMqoL9c@linux.dev>
-Message-ID: <ZH9nDSPySNFs8tW/@google.com>
-Subject: Re: [PATCH] KVM: arm64: Fix smp_processor_id() call in preemptible context
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Sebastian Ott <sebott@redhat.com>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 93.30.5.152
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, sebott@redhat.com, seanjc@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Jun 06, 2023, Oliver Upton wrote:
-> On Tue, Jun 06, 2023 at 03:46:09PM +0000, Sean Christopherson wrote:
-> > I.e. can't you just do?
+On Tue, 06 Jun 2023 17:48:14 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> No, this would break the 'old' ABI, but if we decide to deliberately
-> break it I prefer your suggestion over using CPU0.
+> On Tue, Jun 06, 2023 at 05:17:34PM +0100, Marc Zyngier wrote:
+> > On Tue, 06 Jun 2023 15:10:44 +0100, Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> > > index 491ca7eb2a4c..933a6331168b 100644
+> > > --- a/arch/arm64/kvm/pmu-emul.c
+> > > +++ b/arch/arm64/kvm/pmu-emul.c
+> > > @@ -700,7 +700,7 @@ static struct arm_pmu *kvm_pmu_probe_armpmu(void)
+> > >  
+> > >  	mutex_lock(&arm_pmus_lock);
+> > >  
+> > > -	cpu = smp_processor_id();
+> > > +	cpu = raw_smp_processor_id();
+> > >  	list_for_each_entry(entry, &arm_pmus, entry) {
+> > >  		tmp = entry->arm_pmu;
+> > >  
+> > > 
+> > 
+> > If preemption doesn't matter (and I really don't think it does), why
+> > are we looking for a the current CPU? I'd rather we pick the PMU that
+> > is associated with CPU0 (we're pretty sure it exists), and be done
+> > with it.
+> 
+> Getting the current CPU is still useful, we just don't care about that
+> cpu# being stale. Unconditionally using CPU0 could break existing usage
+> patterns.
+>
+> A not-too-contrived example would be to taskset QEMU onto a cluster of
+> cores in a big.LITTLE system (I do this). The current behavior would
+> assign the right PMU to the guest. I've made my opinions about the 'old'
+> ABI quite clear, but I don't have too great of an appetite for breakage,
+> though fragile.
 
-Ah, if userspace pins the task when doing KVM_ARM_VCPU_PMU_V3_CTRL, then factoring
-in the pCPU matters.
+Fair enough.
+
+> 
+> Can we proceed with the fix I had suggested along with a more complete
+> description of the baggage that we're carrying?
+
+Sure. Please post a separate patch and I'll queue that together with
+Reiji's EL0 PMU stuff for the next bag of fixes.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
