@@ -1,168 +1,185 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFED337B97
-	for <kvmarm@lists.linux.dev>; Tue,  6 Jun 2023 15:46:11 +0000 (UTC)
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-ba81b238ee8so9109387276.0
-        for <kvmarm@lists.linux.dev>; Tue, 06 Jun 2023 08:46:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686066370; x=1688658370;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rMZ/HynJl/U9NP5QUyvGk441HSk6eKuPcYI7/KzvY+g=;
-        b=VemcZxxL/Mwa5LaodHaVh0gQd91nJG7t168j+wph+uUsnSEVTBGBJ37C+dCreZ4Ov6
-         fuWKNgcSFWD67BOLqxNxUKkuu5kUlS3tNZz/Lvxw1wDm9P6bDG/eQ3qYheT3vcwSOO3o
-         HDqiHgKvFaYB4gMr2c2mTkW77rIarqRCAibbW4+F37gMnCRlZ7u+oYJFZ7lfOTdrPnte
-         T0nRgM/COgO/8Xi4OCYUzXbz51p8THzKxGlDlH+hlCYfst6GiOKiABJtXBQFcuolm5i2
-         ojOiTsZBQFrHMlYeDzu4Fr5WwRjo3iWfcHpQwa3JO4AChSMF3nQrY7Di0IpAPCD3m6Jj
-         Hs0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686066370; x=1688658370;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rMZ/HynJl/U9NP5QUyvGk441HSk6eKuPcYI7/KzvY+g=;
-        b=IdaRkXYUgIVwyyZbY+NYnDskVwaGcOFFgQCojfEE3hEOzCT+ZvEtNKAH2I79iGWIci
-         MqnU53cgV+tybMkUw8HIxkZnuOFiOvRPGrvitQo6z/VtukY22mXFzlXIs+g31TwUYm2X
-         k+KtaHjtVKrdo5VvMGMermPiXMjPZklPe4WQOw1EMGgojUEJ1At3qxceItZUmzsgEKhw
-         M+YWnJr+vTEHI61r5e02MSPvPu3Qt0A6GyMNoY+eDhhAo22vjuSYUPUpyHvY+LMHel3R
-         9rpX4sOOyofoloECTKQ9Zg+QF1eBwcBQfUqTN9PUwlJZOEQ34emC6UvtU/DP63/5bocJ
-         M0jQ==
-X-Gm-Message-State: AC+VfDxa/lbhVLK1Z8j0o/D+M0lXhpV4wtEBPbMLbk07WmU1HfJh9Np6
-	UWZCnOw275VR5XZ1F09x2JgV9Lm9pV8=
-X-Google-Smtp-Source: ACHHUZ7NK2LHIl646bV6Su+7Y/8II8GFzLB7DYdKI8npF3vvxrgmzCuYGhM+6Tpb0TB4YQVrFWEtO9gtwWI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:d15:0:b0:bac:7086:c9b2 with SMTP id
- 21-20020a250d15000000b00bac7086c9b2mr853310ybn.12.1686066370747; Tue, 06 Jun
- 2023 08:46:10 -0700 (PDT)
-Date: Tue, 6 Jun 2023 15:46:09 +0000
-In-Reply-To: <ZH9OQzKIfwxR3q54@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ACC237B97
+	for <kvmarm@lists.linux.dev>; Tue,  6 Jun 2023 16:17:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0DB3C433EF;
+	Tue,  6 Jun 2023 16:17:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1686068257;
+	bh=puBrJe09EWkxcLq1OswbHibnXWpV18HLn2Flaeb+RM4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=j/G4UlqT33dRc0tFbQ9HONz5HmPtR3zuf6zZN8t8KSLcdTuaxEHgxMZRzLu2lKsHP
+	 8/BLy1pEj6svf+Ja5S3N9LAgat5Ok91t10aPRNKRJl4u3ON0+7qisghC63qaWpYw9/
+	 IR/y/+mr6KdCr9h+PwRkiVenO25FM/6nAUD7itSYc4hggv/zqxjkcogUiARenSmiR+
+	 5ptZC2RrgfWegAyNeUM5lhy+T0dqmGhOaq4vjHSkEwmQ+h08YrsL75/dJsurEVnnxB
+	 Upk3ouV+36+CRfasGUiQlvzt/iNm31KW047CVelLuZWkK5Vqpgy0kL13NWaQgGENWU
+	 qUIaDfZ3kBB5A==
+Received: from 152.5.30.93.rev.sfr.net ([93.30.5.152] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1q6ZNH-003G2u-6D;
+	Tue, 06 Jun 2023 17:17:35 +0100
+Date: Tue, 06 Jun 2023 17:17:34 +0100
+Message-ID: <87pm68o99d.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Sebastian Ott <sebott@redhat.com>, Sean Christopherson <seanjc@google.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH] KVM: arm64: Fix smp_processor_id() call in preemptible context
+In-Reply-To: <ZH8+ZG7DOX9TYcIY@linux.dev>
+References: <2f16f83e-ed60-fcb7-7f3d-0fa216c41cb9@redhat.com>
+	<ZH8+ZG7DOX9TYcIY@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <2f16f83e-ed60-fcb7-7f3d-0fa216c41cb9@redhat.com>
- <ZH8+ZG7DOX9TYcIY@linux.dev> <ZH9CvE54NSVXqjlO@google.com> <ZH9OQzKIfwxR3q54@linux.dev>
-Message-ID: <ZH9UwSueTP37NaY7@google.com>
-Subject: Re: [PATCH] KVM: arm64: Fix smp_processor_id() call in preemptible context
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Sebastian Ott <sebott@redhat.com>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 93.30.5.152
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, sebott@redhat.com, seanjc@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Jun 06, 2023, Oliver Upton wrote:
-> On Tue, Jun 06, 2023 at 07:29:16AM -0700, Sean Christopherson wrote:
-> > On Tue, Jun 06, 2023, Oliver Upton wrote:
-> > > The call from a preemptible context is intentional, so this really
-> > > should just be raw_smp_processor_id(). Do you mind if we fix it with the
-> > > following?
-> > 
-> > ...
-> > 
-> > > Nonetheless, there's no functional requirement for disabling preemption,
-> > > as the cpu # is only used to walk the arm_pmus list. Fix it by using
-> > > raw_smp_processor_id() instead.
-> > 
-> > As a partial outsider, that needs an explanation, and the code could really use a
-> > comment.  I assume KVM's ABI is that it's userspace's responsibility to ensure that
-> > the CPU(s) used for KVM_RUN is compatible with the CPU used for KVM_ARM_VCPU_PMU_V3_CTRL,
-> > but neither the original changelog nor the above state that, nor does anything
-> > explain what happens if userspace doesn't uphold its side of things.
+On Tue, 06 Jun 2023 15:10:44 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> See commit 40e54cad4540 ("KVM: arm64: Document default vPMU behavior on
-> heterogeneous systems"), which documents the subtlety of vCPU scheduling
-> with the 'old' ABI at the callsite of this function. I don't want to
-> bleed any details of this crap into user documentation, since the entire
-> scheme is irretrievably broken.
-
-I wasn't suggesting adding anything to user documentation, I was suggesting/asking
-that the changelog explain the assertion "there's no functional requirement for
-disabling preemption".
-
-> See Documentation/virt/kvm/api/devices/vcpu.rst 1.4 for the 'new' ABI
-> where userspace explicitly selects a vPMU instance.
+> Hi Sebastian,
 > 
-> > That stuff might be covered in documentation somewhere, but for someone
-> > just looking at git blame, this is all very magical.
+> On Tue, Jun 06, 2023 at 12:37:30PM +0200, Sebastian Ott wrote:
+> > Commit 1c913a1c35aa ("KVM: arm64: Iterate arm_pmus list to probe for
+> > default PMU") introduced a smp_processor_id() call in preemtible context:
+> > 
+> > [70506.110187] BUG: using smp_processor_id() in preemptible [00000000] code: qemu-system-aar/3078242
+> > [70506.119077] caller is debug_smp_processor_id+0x20/0x30
+> > [70506.124229] CPU: 129 PID: 3078242 Comm: qemu-system-aar Tainted: G        W          6.4.0-rc5 #25
+> > [70506.133176] Hardware name: GIGABYTE R181-T92-00/MT91-FS4-00, BIOS F34 08/13/2020
+> > [70506.140559] Call trace:
+> > [70506.142993]  dump_backtrace+0xa4/0x130
+> > [70506.146737]  show_stack+0x20/0x38
+> > [70506.150040]  dump_stack_lvl+0x48/0x60
+> > [70506.153704]  dump_stack+0x18/0x28
+> > [70506.157007]  check_preemption_disabled+0xe4/0x108
+> > [70506.161701]  debug_smp_processor_id+0x20/0x30
+> > [70506.166046]  kvm_arm_pmu_v3_set_attr+0x460/0x628
+> > [70506.170662]  kvm_arm_vcpu_arch_set_attr+0x88/0xd8
+> > [70506.175363]  kvm_arch_vcpu_ioctl+0x258/0x4a8
+> > [70506.179632]  kvm_vcpu_ioctl+0x32c/0x6b8
+> > [70506.183465]  __arm64_sys_ioctl+0xb4/0x100
+> > [70506.187467]  invoke_syscall+0x78/0x108
+> > [70506.191205]  el0_svc_common.constprop.0+0x4c/0x100
+> > [70506.195984]  do_el0_svc+0x34/0x50
+> > [70506.199287]  el0_svc+0x34/0x108
+> > [70506.202416]  el0t_64_sync_handler+0xf4/0x120
+> > [70506.206674]  el0t_64_sync+0x194/0x198
+> > 
+> > Just disable preemption for this section.
 > 
-> Personally, I find any other fix that involves disabling preemption to be
-> quite a lot more 'magical', as there isn't any percpu data we're working
-> with in the loop.
+> The call from a preemptible context is intentional, so this really
+> should just be raw_smp_processor_id(). Do you mind if we fix it with the
+> following?
+> 
+> From 2f4680ee6a5aea5c3cf826c84b86172b0b2c1a67 Mon Sep 17 00:00:00 2001
+> From: Oliver Upton <oliver.upton@linux.dev>
+> Date: Tue, 6 Jun 2023 06:44:54 -0700
+> Subject: [PATCH] KVM: arm64: Use raw_smp_processor_id() in
+>  kvm_pmu_probe_armpmu()
+> 
+> Sebastian reports that commit 1c913a1c35aa ("KVM: arm64: Iterate
+> arm_pmus list to probe for default PMU") introduced the following splat
+> with CONFIG_DEBUG_PREEMPT enabled:
+> 
+> [70506.110187] BUG: using smp_processor_id() in preemptible [00000000] code: qemu-system-aar/3078242
+> [70506.119077] caller is debug_smp_processor_id+0x20/0x30
+> [70506.124229] CPU: 129 PID: 3078242 Comm: qemu-system-aar Tainted: G        W          6.4.0-rc5 #25
+> [70506.133176] Hardware name: GIGABYTE R181-T92-00/MT91-FS4-00, BIOS F34 08/13/2020
+> [70506.140559] Call trace:
+> [70506.142993]  dump_backtrace+0xa4/0x130
+> [70506.146737]  show_stack+0x20/0x38
+> [70506.150040]  dump_stack_lvl+0x48/0x60
+> [70506.153704]  dump_stack+0x18/0x28
+> [70506.157007]  check_preemption_disabled+0xe4/0x108
+> [70506.161701]  debug_smp_processor_id+0x20/0x30
+> [70506.166046]  kvm_arm_pmu_v3_set_attr+0x460/0x628
+> [70506.170662]  kvm_arm_vcpu_arch_set_attr+0x88/0xd8
+> [70506.175363]  kvm_arch_vcpu_ioctl+0x258/0x4a8
+> [70506.179632]  kvm_vcpu_ioctl+0x32c/0x6b8
+> [70506.183465]  __arm64_sys_ioctl+0xb4/0x100
+> [70506.187467]  invoke_syscall+0x78/0x108
+> [70506.191205]  el0_svc_common.constprop.0+0x4c/0x100
+> [70506.195984]  do_el0_svc+0x34/0x50
+> [70506.199287]  el0_svc+0x34/0x108
+> [70506.202416]  el0t_64_sync_handler+0xf4/0x120
+> [70506.206674]  el0t_64_sync+0x194/0x198
+> 
+> Nonetheless, there's no functional requirement for disabling preemption,
+> as the cpu # is only used to walk the arm_pmus list. Fix it by using
+> raw_smp_processor_id() instead.
+> 
+> Fixes: 1c913a1c35aa ("KVM: arm64: Iterate arm_pmus list to probe for default PMU")
+> Reported-by: Sebastian Ott <sebott@redhat.com>
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/pmu-emul.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 491ca7eb2a4c..933a6331168b 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -700,7 +700,7 @@ static struct arm_pmu *kvm_pmu_probe_armpmu(void)
+>  
+>  	mutex_lock(&arm_pmus_lock);
+>  
+> -	cpu = smp_processor_id();
+> +	cpu = raw_smp_processor_id();
+>  	list_for_each_entry(entry, &arm_pmus, entry) {
+>  		tmp = entry->arm_pmu;
+>  
+> 
 
-Heh, and?  I wasn't suggesting you take Sebastian's fix, nor was I arguing that
-disabling preemption is any more or less magical.  I was simply calling out that
-for folks that aren't already familiar with the code, it's not obvious why using
-an unstable CPU is functionally correct.
+If preemption doesn't matter (and I really don't think it does), why
+are we looking for a the current CPU? I'd rather we pick the PMU that
+is associated with CPU0 (we're pretty sure it exists), and be done
+with it.
 
-Poking around more, it looks like the answer is that kvm_arch_vcpu_load() will
-mark the vCPU as being loaded on an unsupported pCPU, which will prevent running
-on the target pCPU, and thus presumably prevent creating new perf events on the
-incompatible pCPU.
-
-Though following the breadcrumbs from the commit you referenced above, the set of
-"supported" CPUs at this point is all possible CPUs in the system.  So unless I'm
-missing something, testing that the current, unstable CPU is a "supported" CPU is
-unnecessary because running on an impossible CPU is, um, impossible.
-
-I.e. can't you just do?
-
----
- arch/arm64/kvm/pmu-emul.c | 31 +++++++------------------------
- 1 file changed, 7 insertions(+), 24 deletions(-)
+Something like:
 
 diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 491ca7eb2a4c..b899d580ff73 100644
+index 491ca7eb2a4c..fce9d07fe26b 100644
 --- a/arch/arm64/kvm/pmu-emul.c
 +++ b/arch/arm64/kvm/pmu-emul.c
-@@ -692,29 +692,6 @@ void kvm_host_pmu_init(struct arm_pmu *pmu)
- 	mutex_unlock(&arm_pmus_lock);
- }
- 
--static struct arm_pmu *kvm_pmu_probe_armpmu(void)
--{
--	struct arm_pmu *tmp, *pmu = NULL;
--	struct arm_pmu_entry *entry;
--	int cpu;
--
--	mutex_lock(&arm_pmus_lock);
--
--	cpu = smp_processor_id();
--	list_for_each_entry(entry, &arm_pmus, entry) {
--		tmp = entry->arm_pmu;
--
--		if (cpumask_test_cpu(cpu, &tmp->supported_cpus)) {
--			pmu = tmp;
--			break;
--		}
--	}
--
--	mutex_unlock(&arm_pmus_lock);
--
--	return pmu;
--}
--
- u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+@@ -696,15 +696,14 @@ static struct arm_pmu *kvm_pmu_probe_armpmu(void)
  {
- 	unsigned long *bmap = vcpu->kvm->arch.pmu_filter;
-@@ -900,8 +877,14 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 		 * upholds the preexisting behavior on heterogeneous systems
- 		 * where vCPUs can be scheduled on any core but the guest
- 		 * counters could stop working.
-+		 *
-+		 * In short, the set of "supported" CPUS for the default PMU is
-+		 * all possible CPUs in the system, simply grab the first PMU.
- 		 */
--		kvm->arch.arm_pmu = kvm_pmu_probe_armpmu();
-+		mutex_lock(&arm_pmus_lock);
-+		kvm->arch.arm_pmu = list_first_entry_or_null(&arm_pmus);
-+		mutex_unlock(&arm_pmus_lock);
-+
- 		if (!kvm->arch.arm_pmu)
- 			return -ENODEV;
- 	}
+ 	struct arm_pmu *tmp, *pmu = NULL;
+ 	struct arm_pmu_entry *entry;
+-	int cpu;
+ 
+ 	mutex_lock(&arm_pmus_lock);
+ 
+-	cpu = smp_processor_id();
+ 	list_for_each_entry(entry, &arm_pmus, entry) {
+ 		tmp = entry->arm_pmu;
+ 
+-		if (cpumask_test_cpu(cpu, &tmp->supported_cpus)) {
++		/* Pick the CPU associated with CPU0 as the default */
++		if (cpumask_test_cpu(0, &tmp->supported_cpus)) {
+ 			pmu = tmp;
+ 			break;
+ 		}
 
-base-commit: 40e54cad454076172cc3e2bca60aa924650a3e4b
+At least, it saves us wondering about the rationale for picking one or
+the other.
+
+Thanks,
+
+	M.
+
 -- 
-
+Without deviation from the norm, progress is not possible.
