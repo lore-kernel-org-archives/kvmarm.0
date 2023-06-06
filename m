@@ -1,115 +1,64 @@
-Received: from out-8.mta1.migadu.com (out-8.mta1.migadu.com [95.215.58.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 189C6174D4
-	for <kvmarm@lists.linux.dev>; Tue,  6 Jun 2023 17:00:46 +0000 (UTC)
-Date: Tue, 6 Jun 2023 17:00:41 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1686070845;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PzjLQrjDjBeulzQc97rzJ5uq4+/AmqzZhJCe+jDpdIw=;
-	b=DPLylzWCRfC0dYXIBK1fY671JjxWOnTZDW+ZAvFedjJB9P/fHF+o9107jAs9KsyvkGtQXt
-	/9itav9DsgvCeIRrGk7zaxCPokQ6iMHXX6yXaB4gXoLJJclrM5Fof6ExKDwGpTILhTfhH/
-	Ba8iTY4WMZozchv4Ikc8dkuDpfmUdOA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Sebastian Ott <sebott@redhat.com>, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Fix smp_processor_id() call in preemptible
- context
-Message-ID: <ZH9mOXYDWnMqoL9c@linux.dev>
-References: <2f16f83e-ed60-fcb7-7f3d-0fa216c41cb9@redhat.com>
- <ZH8+ZG7DOX9TYcIY@linux.dev>
- <ZH9CvE54NSVXqjlO@google.com>
- <ZH9OQzKIfwxR3q54@linux.dev>
- <ZH9UwSueTP37NaY7@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A08174D4
+	for <kvmarm@lists.linux.dev>; Tue,  6 Jun 2023 17:04:15 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-bacfa4eefcbso13610171276.1
+        for <kvmarm@lists.linux.dev>; Tue, 06 Jun 2023 10:04:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1686071054; x=1688663054;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=V8qzwnilU7CBlAyrORrX+Rq/xc7XcjCZI3HBcrsSReA=;
+        b=AHguQPaCli0Z6Kk+CO5rYFKKfQWZY0OhpKc5L71HVklmdkvCAO1wmDuyVEKmh9ewUU
+         ZgcNzq7xdni1a3CtugomLcW1MAII4596bWnto4+D2qqcJMKr8v3+RiRZqaYxWGrITiKm
+         rkGNCX6ed2Fkxt9vXgOPTcvkD4SeXKKOA3SAS3b0kf65oyUIrb10oZ0EBGciPjhcmLL+
+         e9oArNo6WBao2TwmmH/+9C754jWjiV2QJzHYOUSQUdnIrKtz/7CiM6scXZ4Bs0yc+JFh
+         IBuIq0PfbvSQJJboJee8nSpLJM/xi9r2FM0kQUSvVbSSJb+yDeOq59lT6kOXYeMLh0bj
+         OUTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686071054; x=1688663054;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=V8qzwnilU7CBlAyrORrX+Rq/xc7XcjCZI3HBcrsSReA=;
+        b=glQQLwdiNfPCDptCV3cA8vO/lZJzXznZywY91ubPxPbLCCur6S1W1SRbZgAoJ6GlCx
+         6n06TWP5Xe/xhaPmJiL2ZWe8Z+DV9nc7kFg+X4GWRLS1jGDcOLHnDgkByl0SmwBB7twF
+         mkSF30PnHw4AQab+o9CyjMfQulwccIgLlekiAKTzEHkq9vBQMUF+9GNtUVyau5Kj1esF
+         hEJy/yFB/wd5+YKGsNvy/svHhhXi5DCMIDO9YknNfdyFeL5VyR88MqvZJxx1ysXLQsdi
+         LpnpFr9t7xBJbB/ry3g/HkZ1BalB6NuRBtSU/qmmkzsT82sTkanZFxfrZAaiJ/RP56s8
+         oaiQ==
+X-Gm-Message-State: AC+VfDyZYk1GcYTtaZ8Hdo8555MTcRT58rCMF+D/8S7oYn9JQMPId+KD
+	4Wb/z1JNPns1eIYn46OS4kbBV35jU74=
+X-Google-Smtp-Source: ACHHUZ4qZcjvSUYMxKH7ZqKK5jG3I1bcHk8c4YCSNi3BAUw5BflMSXSLu5LCw/yiBxYmezusTpkyPX7rEy0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:f50d:0:b0:bb1:ca0e:29a0 with SMTP id
+ a13-20020a25f50d000000b00bb1ca0e29a0mr1657054ybe.0.1686071054799; Tue, 06 Jun
+ 2023 10:04:14 -0700 (PDT)
+Date: Tue, 6 Jun 2023 10:04:13 -0700
+In-Reply-To: <ZH9mOXYDWnMqoL9c@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZH9UwSueTP37NaY7@google.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <2f16f83e-ed60-fcb7-7f3d-0fa216c41cb9@redhat.com>
+ <ZH8+ZG7DOX9TYcIY@linux.dev> <ZH9CvE54NSVXqjlO@google.com>
+ <ZH9OQzKIfwxR3q54@linux.dev> <ZH9UwSueTP37NaY7@google.com> <ZH9mOXYDWnMqoL9c@linux.dev>
+Message-ID: <ZH9nDSPySNFs8tW/@google.com>
+Subject: Re: [PATCH] KVM: arm64: Fix smp_processor_id() call in preemptible context
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Sebastian Ott <sebott@redhat.com>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jun 06, 2023 at 03:46:09PM +0000, Sean Christopherson wrote:
-> On Tue, Jun 06, 2023, Oliver Upton wrote:
-> > On Tue, Jun 06, 2023 at 07:29:16AM -0700, Sean Christopherson wrote:
-> > > On Tue, Jun 06, 2023, Oliver Upton wrote:
-> > > > The call from a preemptible context is intentional, so this really
-> > > > should just be raw_smp_processor_id(). Do you mind if we fix it with the
-> > > > following?
-> > > 
-> > > ...
-> > > 
-> > > > Nonetheless, there's no functional requirement for disabling preemption,
-> > > > as the cpu # is only used to walk the arm_pmus list. Fix it by using
-> > > > raw_smp_processor_id() instead.
-> > > 
-> > > As a partial outsider, that needs an explanation, and the code could really use a
-> > > comment.  I assume KVM's ABI is that it's userspace's responsibility to ensure that
-> > > the CPU(s) used for KVM_RUN is compatible with the CPU used for KVM_ARM_VCPU_PMU_V3_CTRL,
-> > > but neither the original changelog nor the above state that, nor does anything
-> > > explain what happens if userspace doesn't uphold its side of things.
-> > 
-> > See commit 40e54cad4540 ("KVM: arm64: Document default vPMU behavior on
-> > heterogeneous systems"), which documents the subtlety of vCPU scheduling
-> > with the 'old' ABI at the callsite of this function. I don't want to
-> > bleed any details of this crap into user documentation, since the entire
-> > scheme is irretrievably broken.
+On Tue, Jun 06, 2023, Oliver Upton wrote:
+> On Tue, Jun 06, 2023 at 03:46:09PM +0000, Sean Christopherson wrote:
+> > I.e. can't you just do?
 > 
-> I wasn't suggesting adding anything to user documentation, I was suggesting/asking
-> that the changelog explain the assertion "there's no functional requirement for
-> disabling preemption".
+> No, this would break the 'old' ABI, but if we decide to deliberately
+> break it I prefer your suggestion over using CPU0.
 
-Let's continue this on Marc's reply (don't want to spread context over
-multiple threads).
-
-> Poking around more, it looks like the answer is that kvm_arch_vcpu_load() will
-> mark the vCPU as being loaded on an unsupported pCPU, which will prevent running
-> on the target pCPU, and thus presumably prevent creating new perf events on the
-> incompatible pCPU.
-
-That's only the case with the 'new' ABI, where userspace has explicitly
-selected a PMU instance. The answer for the 'old' interface is here:
-
-	/*
-	 * No PMU set, get the default one.
-	 *
-	 * The observant among you will notice that the supported_cpus
-	 * mask does not get updated for the default PMU even though it
-	 * is quite possible the selected instance supports only a
-	 * subset of cores in the system. This is intentional, and
-	 * upholds the preexisting behavior on heterogeneous systems
-	 * where vCPUs can be scheduled on any core but the guest
-	 * counters could stop working.
-	 */
-	kvm->arch.arm_pmu = kvm_pmu_probe_armpmu();
-
-
-> Though following the breadcrumbs from the commit you referenced above, the set of
-> "supported" CPUs at this point is all possible CPUs in the system.  So unless I'm
-> missing something, testing that the current, unstable CPU is a "supported" CPU is
-> unnecessary because running on an impossible CPU is, um, impossible.
-
-Careful -- arm_pmu->supported_cpus is different from kvm->arch.supported_cpus.
-The former describes a PMU instance in the system and the latter
-enforces our scheduling requirements when userspace _explicitly_ sets a
-PMU type, i.e. KVM_ARM_VCPU_PMU_V3_SET_PMU.
-
-So it is probable that some of the PMUs in the arm_pmus list *do not*
-support the calling CPU.
-
-> I.e. can't you just do?
-
-No, this would break the 'old' ABI, but if we decide to deliberately
-break it I prefer your suggestion over using CPU0.
-
--- 
-Thanks,
-Oliver
+Ah, if userspace pins the task when doing KVM_ARM_VCPU_PMU_V3_CTRL, then factoring
+in the pCPU matters.
