@@ -1,165 +1,90 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857A45697
-	for <kvmarm@lists.linux.dev>; Tue,  6 Jun 2023 07:30:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AF17C433EF;
-	Tue,  6 Jun 2023 07:30:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E7B818
+	for <kvmarm@lists.linux.dev>; Tue,  6 Jun 2023 08:34:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8EF9C4339B;
+	Tue,  6 Jun 2023 08:34:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1686036655;
-	bh=rO+/sQIGRRdehRdleQZnp1sl7uLZSD6lohy5Rq9t20I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=B/dKhXQRDFrD2OgwZ7k3IZT1d5V46+HiNX2fAQcacX7rmpQpe4v/pE+oa2fc5oqEW
-	 n3/URPbh2dM3wLXHN+pqG4nKkhBFHB148Nb7tjzD+zqJbg9d2EuPewKMHIEZ1PxyAJ
-	 OmAQAUwVuEWfRxDAPdyXPOIwSPBJDoGcPk2UWhovFwX/bRocg8NnkafaQcjeRwpy0G
-	 wj42VXXYYpyRDrV6pdwUVT0b2zngPrXrwErCUMad0uXXcB7G+OCne6t+a2itezu987
-	 SiJPFGYp33a5BURb8S/fRL2p2ZOxMZ/RFYH180I2XKLDE6v1ESG3nWKXoli7Itp9xV
-	 JFRX3ldxxazzg==
-Received: from 152.5.30.93.rev.sfr.net ([93.30.5.152] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1q6R9Y-0036r9-BZ;
-	Tue, 06 Jun 2023 08:30:52 +0100
-Date: Tue, 06 Jun 2023 08:30:50 +0100
-Message-ID: <87r0qpnj2t.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Eric Auger <eauger@redhat.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Darren Hart <darren@os.amperecomputing.com>,
-	Jintack Lim <jintack@cs.columbia.edu>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Miguel Luis <miguel.luis@oracle.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	s=k20201202; t=1686040464;
+	bh=IBidPa4YTyIF5atWcJcRcHpMTfYQvXCVIu3C1ReCwe8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FtdmKnJTbh0Th4rLzQVdzsyHI4nobuWxYORj11iWeWhGlMgvLcF7mRuKDFP/3SjWj
+	 E5Za6vAzdwMhU2Fl7W+Yd14DBVHDobnBWLRAmob+EsEIFyB5d80PGYjA3JIjQUBajb
+	 InBHOAv0cNMXRLtMH0xOOu4RRhUp3kA2MYZeOzlJOygnQC7JmPUZ5PDtqTXJfHRnP2
+	 1AWELankUVH81S+2sDfidjLYiiUjlwt7jNuRuO9T4Eih88JdAH2XgOt0pTjw3cIR7b
+	 lmQCCanbigXkSgQ/AIlWp5wfiem/MA7KeHluPdl6au2zq8eAq591Yb0A87DeofIIFq
+	 Tf4L4UWn/XCBw==
+Date: Tue, 6 Jun 2023 16:34:15 +0800
+From: Tzung-Bi Shih <tzungbi@kernel.org>
+To: Yu Zhao <yuzhao@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Alistair Popple <apopple@nvidia.com>,
+	Anup Patel <anup@brainfault.org>, Ben Gardon <bgardon@google.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Chao Peng <chao.p.peng@linux.intel.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Fabiano Rosas <farosas@linux.ibm.com>,
+	Gaosheng Cui <cuigaosheng1@huawei.com>,
+	Gavin Shan <gshan@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>,
+	Ingo Molnar <mingo@redhat.com>, James Morse <james.morse@arm.com>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Michael Larabel <michael@michaellarabel.com>,
+	Mike Rapoport <rppt@kernel.org>,
+	Nicholas Piggin <npiggin@gmail.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v10 00/59] KVM: arm64: ARMv8.3/8.4 Nested Virtualization support
-In-Reply-To: <9cf2356b-f990-1cd2-c7e6-a984e9f604c6@redhat.com>
-References: <20230515173103.1017669-1-maz@kernel.org>
-	<9cf2356b-f990-1cd2-c7e6-a984e9f604c6@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Paul Mackerras <paulus@ozlabs.org>, Peter Xu <peterx@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org,
+	linux-trace-kernel@vger.kernel.org, x86@kernel.org,
+	linux-mm@google.com
+Subject: Re: [PATCH mm-unstable v2 01/10] mm/kvm: add
+ mmu_notifier_ops->test_clear_young()
+Message-ID: <ZH7vh1GmsV+UCPwv@google.com>
+References: <20230526234435.662652-1-yuzhao@google.com>
+ <20230526234435.662652-2-yuzhao@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 93.30.5.152
-X-SA-Exim-Rcpt-To: eauger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230526234435.662652-2-yuzhao@google.com>
 
-Hey Eric,
+On Fri, May 26, 2023 at 05:44:26PM -0600, Yu Zhao wrote:
+> +/*
+> + * Architectures that implement kvm_arch_test_clear_young() should override
+> + * kvm_arch_has_test_clear_young().
+> + *
+> + * kvm_arch_has_test_clear_young() is allowed to return false positive, i.e., it
+> + * can return true if kvm_arch_test_clear_young() is supported but disabled due
+> + * to some runtime constraint. In this case, kvm_arch_test_clear_young() should
 
-On Mon, 05 Jun 2023 12:28:12 +0100,
-Eric Auger <eauger@redhat.com> wrote:
-> 
-> Hi Marc,
-> 
-> On 5/15/23 19:30, Marc Zyngier wrote:
-> > This is the 4th drop of NV support on arm64 for this year.
-> > 
-> > For the previous episodes, see [1].
-> > 
-> > What's changed:
-> > 
-> > - New framework to track system register traps that are reinjected in
-> >   guest EL2. It is expected to replace the discrete handling we have
-> >   enjoyed so far, which didn't scale at all. This has already fixed a
-> >   number of bugs that were hidden (a bunch of traps were never
-> >   forwarded...). Still a work in progress, but this is going in the
-> >   right direction.
-> > 
-> > - Allow the L1 hypervisor to have a S2 that has an input larger than
-> >   the L0 IPA space. This fixes a number of subtle issues, depending on
-> >   how the initial guest was created.
-> > 
-> > - Consequently, the patch series has gone longer again. Boo. But
-> >   hopefully some of it is easier to review...
-> > 
-> > [1] https://lore.kernel.org/r/20230405154008.3552854-1-maz@kernel.org
-> > 
-> > Andre Przywara (1):
-> >   KVM: arm64: nv: vgic: Allow userland to set VGIC maintenance IRQ
-> 
-> I guess you have executed kselftests on L1 guests. Have all the tests
-> passed there? On my end it stalls in the KVM_RUN.
+Is it a typo here?  s/kvm_arch_test_clear_young/kvm_arch_has_test_clear_young/.
 
-No, I hardly run any kselftest, because they are just not designed to
-run at EL2 at all. There's some work to be done there, but I just
-don't have the bandwidth for that (hint, wink...)
+> +static inline int mmu_notifier_clear_young(struct mm_struct *mm,
+> +					   unsigned long start,
+> +					   unsigned long end)
+> +{
+> +	return 0;
+> +}
+> +
 
-> 
-> for instance
-> tools/testing/selftests/kvm/aarch64/aarch32_id_regs.c fails in
-> test_guest_raz(vcpu) on the KVM_RUN. Even with a basic
-> 
-> static void guest_main(void)
-> {
-> GUEST_DONE();
-> }
-
-My guess is that the test harness expects things to run at EL1.
-Depending on the value you get for HCR_EL2, you could get all sort of
-odd behaviours. Also, the harness configures EL1 only, which is
-unlikely to work at EL2. My conclusion is that "processor.c" needs to
-be taught about EL2, at the very least.
-
-> 
-> I get
->  aarch32_id_regs-768     [002] .....   410.544665: kvm_exit: IRQ:
-> HSR_EC: 0x0000 (UNKNOWN), PC: 0x0000000000401ec4
->  aarch32_id_regs-768     [002] d....   410.544666: kvm_entry: PC:
-> 0x0000000000401ec4
->  aarch32_id_regs-768     [002] .....   410.544675: kvm_exit: IRQ:
-> HSR_EC: 0x0000 (UNKNOWN), PC: 0x0000000000401ec4
->  aarch32_id_regs-768     [002] d....   410.544676: kvm_entry: PC:
-> 0x0000000000401ec4
->  aarch32_id_regs-768     [002] .....   410.544685: kvm_exit: IRQ:
-> HSR_EC: 0x0000 (UNKNOWN), PC: 0x0000000000401ec4
-> 
-> looping forever instead of
-> 
-> aarch32_id_regs-1085576 [079] d..1. 1401295.068739: kvm_entry: PC:
-> 0x0000000000401ec4
->  aarch32_id_regs-1085576 [079] ...1. 1401295.068745: kvm_exit: TRAP:
-> HSR_EC: 0x0020 (IABT_LOW), PC: 0x0000000000401ec4
->  aarch32_id_regs-1085576 [079] d..1. 1401295.068790: kvm_entry: PC:
-> 0x0000000000401ec4
->  aarch32_id_regs-1085576 [079] ...1. 1401295.068792: kvm_exit: TRAP:
-> HSR_EC: 0x0020 (IABT_LOW), PC: 0x0000000000401ec4
->  aarch32_id_regs-1085576 [079] d..1. 1401295.068794: kvm_entry: PC:
-> 0x0000000000401ec4
->  aarch32_id_regs-1085576 [079] ...1. 1401295.068795: kvm_exit: TRAP:
-> HSR_EC: 0x0020 (IABT_LOW), PC: 0x0000000000401ec4
->  aarch32_id_regs-1085576 [079] d..1. 1401295.068797: kvm_entry: PC:
-> 0x0000000000401ec4
-> ../..
-> 
-> Any idea or any known restriction wrt kselftests?
-
-See above. I'd love someone to actually start looking into it and
-devise a testing harness that would run both at EL{0,1,2} *at the same
-time* so that we can start exercising some of the trap behaviours that
-the architecture mandates.
-
-Also, Alexandru had a some KUT tests a few years ago, but I don't know
-what happened of them.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+This looks irrelevant to the patch but a fix for commit 1d7715c676a1
+("mmu-notifier: add clear_young callback") instead.
