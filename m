@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E4C37B97
-	for <kvmarm@lists.linux.dev>; Tue,  6 Jun 2023 16:22:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC4AEC433EF;
-	Tue,  6 Jun 2023 16:22:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1783C35C70
+	for <kvmarm@lists.linux.dev>; Tue,  6 Jun 2023 16:30:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CAF3C433EF;
+	Tue,  6 Jun 2023 16:30:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1686068525;
-	bh=fSQG8PElKqmUmE2jmLjjguImLMrx4MO3J5T6s68QSBQ=;
+	s=k20201202; t=1686069049;
+	bh=pBplO4+hU+s0fObqkw4P608h259jrji39gOalnCZFBA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=axONMmfbs/GxPS4Vqsz3sLeZ0YFLag3LHhkB5vmznI12/0ueriMqW/fP3odPa1Uhr
-	 rr6G1MMRPNBiiKlZb6FKgNWks5+86gyfM3ZYVzG9u5l0/z4MvqEHqmzLjHSoEW4CjJ
-	 Oq3QNNTHl6SdJCBz66SCaWgh4i0zkWEEaFIYhEIvHW/zZEK1aZ92JfaLn/yQ9yealP
-	 +7p1J5+gLN/w0DvbbRDPhPBMyw7U+3iQ4z3cZ39URwDanCuT21PEkfDP503iPgbMa8
-	 1gIpnmMTkkcS49+CU06jIDn9KigOMl/F7S/wTJBxjd9cBySPPS611fyGP6G974dHvu
-	 rb5DcWyCOg93w==
+	b=JeuQkTZzeUx/ZGr+pGJd6IsRLavZrbj5hI/vtjLiiSrg0zWauEWA9ZsWaLws2tei5
+	 L5p+HKoSLlC++xltdfOZHblNZQk/M1PEceDrBYrrdqxkJasPk3UhF2aoD6GTEOdrfo
+	 UVQ/ETo1pVpUS19Sbgc2XfDCJQLR11bwGNFSWYe0p3DZZ+n3G+Qbel/3OHWhAfea6G
+	 mnMlFhfEpMP69R/ZU7lHl92QEd1/1JIuvOri5kWc5ss7JdlcxWKFIDb/YPKnURi+un
+	 96zyfPyv5bJLjqPuKs6bzSnfsQUAcMwZqzhOQ6CykC38uk4HJx+mUNdYYbc985M68n
+	 aQHOHmkPiCiPw==
 Received: from 152.5.30.93.rev.sfr.net ([93.30.5.152] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1q6ZRb-003G6y-CJ;
-	Tue, 06 Jun 2023 17:22:03 +0100
-Date: Tue, 06 Jun 2023 17:22:01 +0100
-Message-ID: <87o7lso91y.wl-maz@kernel.org>
+	id 1q6Za2-003GH8-Rk;
+	Tue, 06 Jun 2023 17:30:47 +0100
+Date: Tue, 06 Jun 2023 17:30:45 +0100
+Message-ID: <87mt1co8ne.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Eric Auger <eauger@redhat.com>
 Cc: kvmarm@lists.linux.dev,
@@ -42,11 +42,13 @@ Cc: kvmarm@lists.linux.dev,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
 Subject: Re: [PATCH v10 00/59] KVM: arm64: ARMv8.3/8.4 Nested Virtualization support
-In-Reply-To: <c46da9eb-a02d-1b1d-9c1b-9f900a5e9e6d@redhat.com>
+In-Reply-To: <bdcf630c-b6a7-0649-8419-15f98f6b1a0c@redhat.com>
 References: <20230515173103.1017669-1-maz@kernel.org>
-	<9cf2356b-f990-1cd2-c7e6-a984e9f604c6@redhat.com>
-	<87r0qpnj2t.wl-maz@kernel.org>
-	<c46da9eb-a02d-1b1d-9c1b-9f900a5e9e6d@redhat.com>
+	<16d9fda4-3ead-7d5e-9f54-ef29fbd932ac@redhat.com>
+	<87zg64nhqh.wl-maz@kernel.org>
+	<d0b77823-c04c-4ee0-cb55-2cc20a48903b@redhat.com>
+	<86r0rfkpwd.wl-maz@kernel.org>
+	<bdcf630c-b6a7-0649-8419-15f98f6b1a0c@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -62,56 +64,33 @@ X-SA-Exim-Rcpt-To: eauger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.or
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 06 Jun 2023 10:29:36 +0100,
+On Tue, 06 Jun 2023 10:33:27 +0100,
 Eric Auger <eauger@redhat.com> wrote:
 > 
-> Hi Marc,
-> On 6/6/23 09:30, Marc Zyngier wrote:
-> > Hey Eric,
-> > 
-> > On Mon, 05 Jun 2023 12:28:12 +0100,
-> > Eric Auger <eauger@redhat.com> wrote:
-> >>
-> >> Hi Marc,
-> >>
-> >> On 5/15/23 19:30, Marc Zyngier wrote:
-> >>> This is the 4th drop of NV support on arm64 for this year.
-> >>>
-> >>> For the previous episodes, see [1].
-> >>>
-> >>> What's changed:
-> >>>
-> >>> - New framework to track system register traps that are reinjected in
-> >>>   guest EL2. It is expected to replace the discrete handling we have
-> >>>   enjoyed so far, which didn't scale at all. This has already fixed a
-> >>>   number of bugs that were hidden (a bunch of traps were never
-> >>>   forwarded...). Still a work in progress, but this is going in the
-> >>>   right direction.
-> >>>
-> >>> - Allow the L1 hypervisor to have a S2 that has an input larger than
-> >>>   the L0 IPA space. This fixes a number of subtle issues, depending on
-> >>>   how the initial guest was created.
-> >>>
-> >>> - Consequently, the patch series has gone longer again. Boo. But
-> >>>   hopefully some of it is easier to review...
-> >>>
-> >>> [1] https://lore.kernel.org/r/20230405154008.3552854-1-maz@kernel.org
-> >>>
-> >>> Andre Przywara (1):
-> >>>   KVM: arm64: nv: vgic: Allow userland to set VGIC maintenance IRQ
-> >>
-> >> I guess you have executed kselftests on L1 guests. Have all the tests
-> >> passed there? On my end it stalls in the KVM_RUN.
-> > 
-> > No, I hardly run any kselftest, because they are just not designed to
-> > run at EL2 at all. There's some work to be done there, but I just
-> > don't have the bandwidth for that (hint, wink...)
-> 
-> oh OK, I missed that point. If nobody is working on this I can start
-> looking at it. Would be interesting to run them on nested guest too.
+> > By the way, what are you using as your VMM? I'd really like to
+> > reproduce your setup.
+> Sorry I missed your reply. I am using libvirt + qemu (feat Miguel's RFC)
+> and fedora L1 guest.
 
-If you want to pick this up, it would be extremely helpful. And no,
-nobody is really looking into it at the moment, so it's all yours!
+OK, so that's *very* different for what I'm using, which is good! Do
+you have a QEMU branch somewhere?
+
+> Thanks to your fix, this boots fine. But at the moment it does not
+> reboot and hangs in edk2 I think. Unfortunately this time I have no
+> trace on host :-( While looking at your series I will add some traces.
+
+I've been able to run EDK2 compiled for kvmtool with only a couple of
+change (such as using SMCs instead of HVCs, and disabling the broken
+DT-to-ACPI convertion). However, reboot isn't something I've played
+with, as kvmtool doesn't even try to reboot the guest (reboot is
+handled as power-off).
+
+I'm pretty sure this is related to tearing down the shadow S2 MMU
+contexts when QEMU reinit the vcpus, and we may fail to clean things
+up.
+
+I'll try and have a look once I'm back from holiday (and we can have a
+look at KVM Forum).
 
 Thanks,
 
