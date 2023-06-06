@@ -1,110 +1,84 @@
-Received: from out-52.mta0.migadu.com (out-52.mta0.migadu.com [91.218.175.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA414125CC
-	for <kvmarm@lists.linux.dev>; Tue,  6 Jun 2023 18:48:29 +0000 (UTC)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1686077307;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=zeitnPAEOPr7c8IqrDUw5PgkA0zWXnnty+s2icrtZpY=;
-	b=p8YUAR0XZ6+plhjQmyXLoliw5R1MZvTGNlo1AacNuOKhE0EuhTZCDoGk7d6ZhTtVajTi0P
-	EM2Qh0O+xxN3IcWXwRocw/yRnVDwdAPc5XGwjyQh/NYcWdIamYSRhbXaHeiP9eYjTXOZfA
-	FBfjR6aQwFLdVMtCEXh0LUMfX2e0Bi4=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Sebastian Ott <sebott@redhat.com>
-Subject: [PATCH] KVM: arm64: Use raw_smp_processor_id() in kvm_pmu_probe_armpmu()
-Date: Tue,  6 Jun 2023 18:48:14 +0000
-Message-ID: <20230606184814.456743-1-oliver.upton@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3801125CC
+	for <kvmarm@lists.linux.dev>; Tue,  6 Jun 2023 18:50:51 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-bb05f0e6ef9so9619344276.1
+        for <kvmarm@lists.linux.dev>; Tue, 06 Jun 2023 11:50:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1686077450; x=1688669450;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/kxh2UcUAcpjTVTH58LFlj31OMBp369OV6aYglfRazo=;
+        b=paNtY3H6eqkQlzGxUw0CdfHkDeW3N+mHSa9Bmq1zenbINTGE1DcEi87/JJAIxZWZfZ
+         8XxT6w+gua+A46wZqWG3L7WN06vswB0/q8EWRFyboaDdsGME/t/DxonPsI7RIX30AvJN
+         a0TCHlWVIOF/cqLPIYkYhCbeF2idLmuYlndKCeOyCLRFEjSzK9UfKMIVmwV+1Px5gPR7
+         u9bkHVmxwjbi8XuvSzis6u6EUM+HrokocTpobniJ/YXqxRUhSSuDnBiprIX7WyBD5rsx
+         IAJTW8HEyWcmxASKqmxqw4IguBH4GgJEQRVwaGmUOGOVTKiCVzbGRwmMCLT5CFqKKCqy
+         miwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686077450; x=1688669450;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/kxh2UcUAcpjTVTH58LFlj31OMBp369OV6aYglfRazo=;
+        b=OMs9zBarg2j+dl6mk7Ztg/0v/OMZhM6h22ZvVQ1t+sFPk62cqh5PwJ0Ch8fek/LXOO
+         iJoc7WNzpRMDVmpm3SQysYRnVxmW9f8VuiGDmqVdII4LKWFH6O6CkNDXm3XzHRZtpAcw
+         WjHfgui5ALysqaVVGzYesnpRkw7etL3GjVonfnCe7eEkIU5ago1DfELN6yCim6dRdB/0
+         HgGZfmV/S3Y1Aa70LxQlmD02/hEX6qccSKuHfwodzc5Xi76l6Ik3FyF+N30yCp4UdKTq
+         I8tTD3LhgXw5gxjGWIqGHXBJokP3VrcT7M+uBt2PHLjlMwtPXTIs16t91Ip6dPLFXXQH
+         SWzg==
+X-Gm-Message-State: AC+VfDy8LKNyay66OiYiTT6O2Ttr0P8W6bBkxTNLqK/Kb1I9Z4mjFy8k
+	RjohisGBCMmxBYVBsR/i9R8ZuGe136I=
+X-Google-Smtp-Source: ACHHUZ4S2fmiUfxNuzvbexh6Uq0pRVx67oOgXZbtqqduZR2jJggkiI9o4A1c+992b/T5KHLfsG9o6WoAvJo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:4ec3:0:b0:ba8:6422:bbec with SMTP id
+ c186-20020a254ec3000000b00ba86422bbecmr1576209ybb.4.1686077450594; Tue, 06
+ Jun 2023 11:50:50 -0700 (PDT)
+Date: Tue, 6 Jun 2023 18:50:48 +0000
+In-Reply-To: <20230606184814.456743-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20230606184814.456743-1-oliver.upton@linux.dev>
+Message-ID: <ZH+ACORPo5OxAl29@google.com>
+Subject: Re: [PATCH] KVM: arm64: Use raw_smp_processor_id() in kvm_pmu_probe_armpmu()
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Sebastian Ott <sebott@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Sebastian reports that commit 1c913a1c35aa ("KVM: arm64: Iterate
-arm_pmus list to probe for default PMU") introduced the following splat
-with CONFIG_DEBUG_PREEMPT enabled:
+On Tue, Jun 06, 2023, Oliver Upton wrote:
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 491ca7eb2a4c..560650972478 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -700,7 +700,25 @@ static struct arm_pmu *kvm_pmu_probe_armpmu(void)
+>  
+>  	mutex_lock(&arm_pmus_lock);
+>  
+> -	cpu = smp_processor_id();
+> +	/*
+> +	 * It is safe to use a stale cpu to iterate the list of PMUs so long as
+> +	 * the same value is used for the entirety of the loop. Given this, and
+> +	 * the fact that no percpu data is used for the lookup there is no need
+> +	 * to disable preemption.
+> +	 *
+> +	 * It is still necessary to get a valid cpu, though, to probe for the
+> +	 * default PMU instance as userspace is not required to specify a PMU
+> +	 * type. In order to uphold the preexisting behavior KVM selects the
+> +	 * PMU instance for the core where the first call to the
+> +	 * KVM_ARM_VCPU_PMU_V3_CTRL attribute group occurs. A dependent use case
+> +	 * would be a user with disdain of all things big.LITTLE that affines
+> +	 * the VMM to a particular cluster of cores.
+> +	 *
+> +	 * In any case, userspace should just do the sane thing and use the UAPI
+> +	 * to select a PMU type directly. But, be wary of the baggage being
+> +	 * carried here.
+> +	 */
 
-[70506.110187] BUG: using smp_processor_id() in preemptible [00000000] code: qemu-system-aar/3078242
-[70506.119077] caller is debug_smp_processor_id+0x20/0x30
-[70506.124229] CPU: 129 PID: 3078242 Comm: qemu-system-aar Tainted: G        W          6.4.0-rc5 #25
-[70506.133176] Hardware name: GIGABYTE R181-T92-00/MT91-FS4-00, BIOS F34 08/13/2020
-[70506.140559] Call trace:
-[70506.142993]  dump_backtrace+0xa4/0x130
-[70506.146737]  show_stack+0x20/0x38
-[70506.150040]  dump_stack_lvl+0x48/0x60
-[70506.153704]  dump_stack+0x18/0x28
-[70506.157007]  check_preemption_disabled+0xe4/0x108
-[70506.161701]  debug_smp_processor_id+0x20/0x30
-[70506.166046]  kvm_arm_pmu_v3_set_attr+0x460/0x628
-[70506.170662]  kvm_arm_vcpu_arch_set_attr+0x88/0xd8
-[70506.175363]  kvm_arch_vcpu_ioctl+0x258/0x4a8
-[70506.179632]  kvm_vcpu_ioctl+0x32c/0x6b8
-[70506.183465]  __arm64_sys_ioctl+0xb4/0x100
-[70506.187467]  invoke_syscall+0x78/0x108
-[70506.191205]  el0_svc_common.constprop.0+0x4c/0x100
-[70506.195984]  do_el0_svc+0x34/0x50
-[70506.199287]  el0_svc+0x34/0x108
-[70506.202416]  el0t_64_sync_handler+0xf4/0x120
-[70506.206674]  el0t_64_sync+0x194/0x198
-
-Fix the issue by using the raw variant that bypasses the debug
-assertion. While at it, stick all of the nuance and UAPI baggage into a
-comment for posterity.
-
-Fixes: 1c913a1c35aa ("KVM: arm64: Iterate arm_pmus list to probe for default PMU")
-Reported-by: Sebastian Ott <sebott@redhat.com>
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/kvm/pmu-emul.c | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 491ca7eb2a4c..560650972478 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -700,7 +700,25 @@ static struct arm_pmu *kvm_pmu_probe_armpmu(void)
- 
- 	mutex_lock(&arm_pmus_lock);
- 
--	cpu = smp_processor_id();
-+	/*
-+	 * It is safe to use a stale cpu to iterate the list of PMUs so long as
-+	 * the same value is used for the entirety of the loop. Given this, and
-+	 * the fact that no percpu data is used for the lookup there is no need
-+	 * to disable preemption.
-+	 *
-+	 * It is still necessary to get a valid cpu, though, to probe for the
-+	 * default PMU instance as userspace is not required to specify a PMU
-+	 * type. In order to uphold the preexisting behavior KVM selects the
-+	 * PMU instance for the core where the first call to the
-+	 * KVM_ARM_VCPU_PMU_V3_CTRL attribute group occurs. A dependent use case
-+	 * would be a user with disdain of all things big.LITTLE that affines
-+	 * the VMM to a particular cluster of cores.
-+	 *
-+	 * In any case, userspace should just do the sane thing and use the UAPI
-+	 * to select a PMU type directly. But, be wary of the baggage being
-+	 * carried here.
-+	 */
-+	cpu = raw_smp_processor_id();
- 	list_for_each_entry(entry, &arm_pmus, entry) {
- 		tmp = entry->arm_pmu;
- 
-
-base-commit: 9561de3a55bed6bdd44a12820ba81ec416e705a7
--- 
-2.41.0.rc2.161.g9c6817b8e7-goog
-
+Thanks for humoring me :-)
