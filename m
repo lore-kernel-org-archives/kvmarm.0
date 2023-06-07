@@ -1,49 +1,51 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1647C182AE
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jun 2023 19:45:57 +0000 (UTC)
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-65a971d7337so711509b3a.1
-        for <kvmarm@lists.linux.dev>; Wed, 07 Jun 2023 12:45:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D72F182AE
+	for <kvmarm@lists.linux.dev>; Wed,  7 Jun 2023 19:46:01 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-565a33c35b1so117305697b3.0
+        for <kvmarm@lists.linux.dev>; Wed, 07 Jun 2023 12:46:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686167157; x=1688759157;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=aPgsero69xFwJck0QKcCtV9CkkDCHybrauN68WHLy4A=;
-        b=0A1Gsrces1skjswFsF50lVK2JnRk4tWOxR3MV+vcU6MJ2VWsqnwLTGQTi5DUD6N4Tm
-         AJqBBH8FlWGmBNje8EQDCdql8N3cksHKiTRBxIhvaymhDkRV8zNLBNn/G+nYmvsbgjnZ
-         STTQwiqz1grZqjk7XeQRIoJ9XdKxKpuVTPPtNCwpCQWABAytR+77MQ0Vg5vGq06osEQh
-         yqPq+QKph9ugRXDTZshpK9pQZscYfiSAPtLYluUenFItsEid0QoRfBEDAUKbjR0ORjGX
-         gxnSOzJ1nxT82tsjGK4RviJ/p8RCpLY8HZyW3jKypnYe4mWIITRS9pgrQfKMurJns8qv
-         b74w==
+        d=google.com; s=20221208; t=1686167160; x=1688759160;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hzxVwxnrNt+YQp7iV0J7o3+qKksOkJQBVAdrxipkKZg=;
+        b=fMZYG2zR8/wyVaV7AOWU2176k/b30yDMKXHbC/LdYCNKxTdoLKCXlQ6JSsEJpKCovx
+         u9u+W+rKoRyLy9Nud2MHk1nP4o/c3i4sFDaqNU5Tz18ncnoHJWBcV7YBp35rYblNSMrB
+         Srt2tjPaFXVZin7mr/aGXsbIXt58qgfwgTEdJPUyg6mM2OwgX47KdIHSaIQqmi0eqIPL
+         5v2P2BX/GBKy3oqa1yCJwfGXELL6EMogyVQSIkmTzCQjg5UWFxSp21LfjJpQZem0aQR2
+         wMmq8AKiEtvscrwUGTY8A+yxh1qWK/2oPM6gQEZ/Tb/oHE/8BwS7FZkxI6PRefMOjJOI
+         XiPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686167157; x=1688759157;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aPgsero69xFwJck0QKcCtV9CkkDCHybrauN68WHLy4A=;
-        b=F2byWnaEiMpQaNUdcf95DbcZN9Dvs70YfVY9EXEwPDu6dUdI8RYgqYDiW9rv2bkZZp
-         PAQUDg7kuS5DAr2SCuzZoD1RppCHXX4gIkCuya/x6LQUUfYZ9XqJlar4s/yrGgBp3hJl
-         Vbs9CXuVvdb9oP1aJ0F5ruIzK61kZ1LxzfkcqPu1okiIuZh8rhFkd9BgWjKFTXrXqtU9
-         YWKgJOjROCsadcthFEmZyZA/tQzD+zNDyQ9DlkFyXja1Jopu5TbNTcgDSp8oygig1qAh
-         LVyC0RcRhvWki996qh1Dbgc7Hc2N46FI6g7GzkvJT+bRUH+Lc2gQqyjXA3YB71BHEJRK
-         DIyQ==
-X-Gm-Message-State: AC+VfDwZbVY/jAVAilc/NRO7XUjwapobBnEY8/P6VyU6gYGBJKVwV26P
-	tffz59L6niFt5dpoUfWuNB7CXJ9YXiaPXSrPug==
-X-Google-Smtp-Source: ACHHUZ6Jdfp4KijOKoJc8iKkNnAT7j0Cg3mZuagkHodcduTq2g3SvL98qNbl8Vxb4j+cbgqMwwZpEe1BEtzg62RjVg==
+        d=1e100.net; s=20221208; t=1686167160; x=1688759160;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hzxVwxnrNt+YQp7iV0J7o3+qKksOkJQBVAdrxipkKZg=;
+        b=HsnJK3SHDBLDC7vj7a+URfU5VTCQ5bZSra4gIRCdrs4a0C1z5MJ+dysE/7BkVgHmGh
+         pHSW60I8W/9KLV8/pfA72yPaLtCruIJRWNb1ahDSmWio9FnfIPK8zewtJ23bw0zeTzUW
+         O42VxAguJCeELUCNw/T7cj8HQ0rktfW45w7ZSKZX/RoMy4B1X1P45kkWKu30EOJmbyG1
+         Shmh4fiZexVCwaAvTOzHPPpsuc84jfLx5CZiKpOVLDCelZNghzw8ia4HRtgrdY2kNCHW
+         CaSkRLEg0Wc9M9RdmUrDeEzoYcWtwWdQo8zEu9k0STETvPWQim4DYD3RyfX2llampInx
+         waGQ==
+X-Gm-Message-State: AC+VfDyUCEKBP/ScAGD4SbGP+WqMZhFzHGrDJ+ZdJ4EY1HGOtuXG7SfG
+	eI1RGQwC+ResPWULoTNuPYkc1LWJrFLOo+Uh4A==
+X-Google-Smtp-Source: ACHHUZ6V41FX37D247KNGDPz31teBiVq6V+3LyWxqzaVMHNbR4cZ9zys4EkzeS1q16KMxoLnqrscogFEIf4yfE0S0w==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a05:6a00:2e0e:b0:64f:5406:d5a2 with
- SMTP id fc14-20020a056a002e0e00b0064f5406d5a2mr25720pfb.0.1686167157264; Wed,
- 07 Jun 2023 12:45:57 -0700 (PDT)
-Date: Wed,  7 Jun 2023 19:45:50 +0000
+ (user=jingzhangos job=sendgmr) by 2002:a81:ae17:0:b0:568:9bcc:5e16 with SMTP
+ id m23-20020a81ae17000000b005689bcc5e16mr3400413ywh.2.1686167159720; Wed, 07
+ Jun 2023 12:45:59 -0700 (PDT)
+Date: Wed,  7 Jun 2023 19:45:51 +0000
+In-Reply-To: <20230607194554.87359-1-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20230607194554.87359-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
-Message-ID: <20230607194554.87359-1-jingzhangos@google.com>
-Subject: [PATCH v4 0/4] Enable writable for idregs DFR0,PFR0, MMFR{0,1,2}
+Message-ID: <20230607194554.87359-2-jingzhangos@google.com>
+Subject: [PATCH v4 1/4] KVM: arm64: Enable writable for ID_AA64DFR0_EL1
 From: Jing Zhang <jingzhangos@google.com>
 To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
 	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
@@ -55,44 +57,44 @@ Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
 	Suraj Jitindar Singh <surajjs@amazon.com>, Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
+Since number of context-aware breakpoints must be no more than number
+of supported breakpoints according to Arm ARM, return an error if
+userspace tries to set CTX_CMPS field to such value.
 
-This patch series enable userspace writable for below idregs:
-ID_AA64DFR0_EL1, ID_DFR0_EL1, ID_AA64PFR0_EL1, ID_AA64MMFR{0, 1, 2}_EL1.
-
-It is based on below series [2] which add infrastructure for writable idregs.
-
+Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
+ arch/arm64/kvm/sys_regs.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-* v3 -> v4
-  - Rebase on v11 of writable idregs series at [2].
-
-* v2 -> v3
-  - Rebase on v6 of writable idregs series.
-  - Enable writable for ID_AA64PFR0_EL1 and ID_AA64MMFR{0, 1, 2}_EL1.
-
-* v1 -> v2
-  - Rebase on latest patch series [1] of enabling writable ID register.
-
-[1] https://lore.kernel.org/all/20230402183735.3011540-1-jingzhangos@google.com
-[2] https://lore.kernel.org/all/20230602005118.2899664-1-jingzhangos@google.com
-
-[v1] https://lore.kernel.org/all/20230326011950.405749-1-jingzhangos@google.com
-[v2] https://lore.kernel.org/all/20230403003723.3199828-1-jingzhangos@google.com
-[v3] https://lore.kernel.org/all/20230405172146.297208-1-jingzhangos@google.com
-
----
-
-Jing Zhang (4):
-  KVM: arm64: Enable writable for ID_AA64DFR0_EL1
-  KVM: arm64: Enable writable for ID_DFR0_EL1
-  KVM: arm64: Enable writable for ID_AA64PFR0_EL1
-  KVM: arm64: Enable writable for ID_AA64MMFR{0, 1, 2}_EL1
-
- arch/arm64/kvm/sys_regs.c | 78 +++++++++++++++++++++++++++++++++------
- 1 file changed, 67 insertions(+), 11 deletions(-)
-
-
-base-commit: 01b532e41af091a48287dd45f763db4b887bcdfc
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 50d4e25f42d3..a6299c796d03 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1539,9 +1539,14 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ 			       const struct sys_reg_desc *rd,
+ 			       u64 val)
+ {
+-	u8 pmuver, host_pmuver;
++	u8 pmuver, host_pmuver, brps, ctx_cmps;
+ 	bool valid_pmu;
+ 
++	brps = FIELD_GET(ID_AA64DFR0_EL1_BRPs_MASK, val);
++	ctx_cmps = FIELD_GET(ID_AA64DFR0_EL1_CTX_CMPs_MASK, val);
++	if (ctx_cmps > brps)
++		return -EINVAL;
++
+ 	host_pmuver = kvm_arm_pmu_get_pmuver_limit();
+ 
+ 	/*
+@@ -2061,7 +2066,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  .get_user = get_id_reg,
+ 	  .set_user = set_id_aa64dfr0_el1,
+ 	  .reset = read_sanitised_id_aa64dfr0_el1,
+-	  .val = ID_AA64DFR0_EL1_PMUVer_MASK, },
++	  .val = GENMASK(63, 0), },
+ 	ID_SANITISED(ID_AA64DFR1_EL1),
+ 	ID_UNALLOCATED(5,2),
+ 	ID_UNALLOCATED(5,3),
 -- 
 2.41.0.rc0.172.g3f132b7071-goog
 
