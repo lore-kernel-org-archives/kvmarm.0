@@ -1,40 +1,40 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C24C038CC2
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jun 2023 19:46:04 +0000 (UTC)
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2562b26cfafso2869522a91.0
-        for <kvmarm@lists.linux.dev>; Wed, 07 Jun 2023 12:46:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C1A838CC2
+	for <kvmarm@lists.linux.dev>; Wed,  7 Jun 2023 19:46:06 +0000 (UTC)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2562fbb193bso2595202a91.1
+        for <kvmarm@lists.linux.dev>; Wed, 07 Jun 2023 12:46:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686167164; x=1688759164;
+        d=google.com; s=20221208; t=1686167166; x=1688759166;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=huLg6ss0tcmHNDWws/J4wYZLAswrAiv7bwqrVCr+Www=;
-        b=rvQpvgjutLDBUFD6re8s66cYIwgJnhk30RuWpsooLwa0/DnV1KMpLh1QKXz+AU3+EJ
-         toULyYGPVwLcH+MSf1zAwjIgC+QmNBB84JuvtVGLm32grPQNsyGJC3yXIN+pXqUx0vmf
-         kYkm0cPqzfksnRtP/WQ3XaIV5kyL5FExnTnvHnNEHk9QkXCUYZPtMjAyqZOwoW4K0Hq1
-         y35uWuI4QoY/hqnEX3uFzWlae+hnEGx6aU+9CDnIEosOHdw7Xdp/4v0Mg9VKQ9GeT0yk
-         980+Iqqj10VIbOSXVkqMt9C0azx+wOnrkAIodnSMgi7gX9SdshzFmuUiEcp8K2mTBDU0
-         eicg==
+        bh=Kt9Re8VhD2+c+e08bfchTfKK01Rj2MUePQIf0sCv4Xg=;
+        b=qnLVcf4LBOV1GocAfKmE7OOXWzG9JXsx+o5fD5NyUihLa4ZmEEtGXBCpzgiwnDFzpW
+         3i9IE5h6ihvg8wwHtLHRzRrmvSiqyq53LJ5VdfHiV/e3LDQnWSjiBl2omUAEyOSXHCvb
+         CHDx0jkRuYbIVXezwbq9YBlEropjp33Q5X5v8O3ixEuMOEQeQ8f1dVDxgyOFKJPD+e8v
+         8eqaxzIAlQKYECNoDAZ2EDzO7PmAJgcbwIXx6TA6P1gNq8IfNTK8hknyk2zzl5/syfVP
+         N64VmdmpBXc9YSc4MaxWzquMO6VleuSWpfh2cPXzcRKY2zF8umgZx0vTVuieF++qHdj4
+         q5Pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686167164; x=1688759164;
+        d=1e100.net; s=20221208; t=1686167166; x=1688759166;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=huLg6ss0tcmHNDWws/J4wYZLAswrAiv7bwqrVCr+Www=;
-        b=NcVo3bJgAaZfje5El93wzZ0wnRMx0m8TpUFG6f8bvKqNW0pySF3SpY8AjOXAKfmlKt
-         SwrKU6iLqpGJ0bXrW7jJhA5ZQv1YKxvSvbbudUjhu0kwchvjrPseZXW7GTYQKX7jXWp4
-         B1ZmSaRx/d6RggADL2EIuAd5UlBxPnQs6AH03T3SUQE7KIv80xp7eKByeC35QDi8BJqj
-         /VOweelUKISUl03LuythXCa/Iq6enOZg14Y1An+gJeiBEVs9wEZqMlU1CVjQnrLRYLAc
-         4iiq/pxdkaPCeuSoh1T7VEQYQt2N7RZfJaK/vob8Np3FbZOLlZiVUhRshYsoBtSNgTHF
-         QgKg==
-X-Gm-Message-State: AC+VfDzziryPQ4xCPef3FLpgdsXaSlz5pWTG6/MySaIbwkCzYG8USRQc
-	tATWYfZUNkooPGyJpX/EqrUbEdHRZ9nxGAc8AA==
-X-Google-Smtp-Source: ACHHUZ4hJXt9tbUdkBWtP+0/4Tl+ZJnlb3E1BRZjLecrD3nbq3Co9zEpbNCwpWdnYYtl6Y/VvwJ4Y5DV8ySaS3odNA==
+        bh=Kt9Re8VhD2+c+e08bfchTfKK01Rj2MUePQIf0sCv4Xg=;
+        b=C/A75LXSbgoFpX2bWBKhvCrWwYgfixgVv2n0mce4O90L4etkQh289PGkasLmkVcgpM
+         8Ykl7to/MzgBBsW94+9Nw5r4poZy8O4H8iCqVoB2rchxjq5WtAPcpeUA5C1FiAfEzdBX
+         URMy0pGmzl9WAxQxSo/WeiykLzqdq1N6w1J5PuH3q0mESM8BE9vH2mmHHGvtTxz4z00m
+         EJgAgqpqkWe7optcuzM6irvtDEScIVCpFBxSiXURN8T0616FZI37Ym5RE4nzqzd2iQh7
+         bc4KGVMETInMNt8Hh48ezZYK1afNZoSn0wWR6tvnnyGja3xE2gSqX79WhHyXpDxFj6ut
+         /u8g==
+X-Gm-Message-State: AC+VfDyhwkWpaFfRF/By/CRb7HOXWJwlgvwYrhuIp3EJ0R9C5gPbvwvf
+	yiud9skMy2Y6MWI5Ol6RR+/vdsjR/eLm1kmKiw==
+X-Google-Smtp-Source: ACHHUZ6AdZhHVsK3gBqZ29mngq3wYJzUe8nyFBCy0MXmvWuiKLwI//W+KPq7fWqN45t7RWSqbJlvv7QNt3JQHgOuqw==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a17:903:453:b0:1ae:549f:af6e with SMTP
- id iw19-20020a170903045300b001ae549faf6emr1907179plb.7.1686167163943; Wed, 07
- Jun 2023 12:46:03 -0700 (PDT)
-Date: Wed,  7 Jun 2023 19:45:53 +0000
+ (user=jingzhangos job=sendgmr) by 2002:a17:902:db02:b0:1b0:4af9:9032 with
+ SMTP id m2-20020a170902db0200b001b04af99032mr2121642plx.0.1686167165934; Wed,
+ 07 Jun 2023 12:46:05 -0700 (PDT)
+Date: Wed,  7 Jun 2023 19:45:54 +0000
 In-Reply-To: <20230607194554.87359-1-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230607194554.87359-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
-Message-ID: <20230607194554.87359-4-jingzhangos@google.com>
-Subject: [PATCH v4 3/4] KVM: arm64: Enable writable for ID_AA64PFR0_EL1
+Message-ID: <20230607194554.87359-5-jingzhangos@google.com>
+Subject: [PATCH v4 4/4] KVM: arm64: Enable writable for ID_AA64MMFR{0, 1, 2}_EL1
 From: Jing Zhang <jingzhangos@google.com>
 To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
 	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
@@ -57,69 +57,82 @@ Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
 	Suraj Jitindar Singh <surajjs@amazon.com>, Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Return an error if userspace tries to set SVE field of the register
-to a value that conflicts with SVE configuration for the guest.
-SIMD/FP/SVE fields of the requested value are validated according to
-Arm ARM.
+Enable writable from userspace for ID_AA64MMFR{0, 1, 2}_EL1.
+Added a macro for defining general writable idregs.
 
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 31 +++++++++++++++++++++++++++++--
- 1 file changed, 29 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 36 ++++++++++++++++++++++++++++++------
+ 1 file changed, 30 insertions(+), 6 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 3964a85a89fe..8f3ad9c12b27 100644
+index 8f3ad9c12b27..54c762c95983 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1509,9 +1509,36 @@ static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
- 
- 	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU);
- 
-+	if (!system_supports_sve())
-+		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE);
-+
- 	return val;
+@@ -1391,9 +1391,6 @@ static u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 encoding)
+ 		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon),
+ 				  pmuver_to_perfmon(vcpu_pmuver(vcpu)));
+ 		break;
+-	case SYS_ID_AA64MMFR2_EL1:
+-		val &= ~ID_AA64MMFR2_EL1_CCIDX_MASK;
+-		break;
+ 	case SYS_ID_MMFR4_EL1:
+ 		val &= ~ARM64_FEATURE_MASK(ID_MMFR4_EL1_CCIDX);
+ 		break;
+@@ -1663,6 +1660,18 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+ 	return pmuver_update(vcpu, rd, val, perfmon_to_pmuver(perfmon), valid_pmu);
  }
  
-+static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
-+			       const struct sys_reg_desc *rd,
-+			       u64 val)
++static u64 read_sanitised_id_aa64mmfr2_el1(struct kvm_vcpu *vcpu,
++					   const struct sys_reg_desc *rd)
 +{
-+	int fp, simd;
-+	bool has_sve = id_aa64pfr0_sve(val);
++	u64 val;
++	u32 id = reg_to_encoding(rd);
 +
-+	simd = cpuid_feature_extract_signed_field(val, ID_AA64PFR0_EL1_AdvSIMD_SHIFT);
-+	fp = cpuid_feature_extract_signed_field(val, ID_AA64PFR0_EL1_FP_SHIFT);
-+	/* AdvSIMD field must have the same value as FP field */
-+	if (simd != fp)
-+		return -EINVAL;
++	val = read_sanitised_ftr_reg(id);
++	val &= ~ID_AA64MMFR2_EL1_CCIDX_MASK;
 +
-+	/* fp must be supported when sve is supported */
-+	if (has_sve && (fp < 0))
-+		return -EINVAL;
-+
-+	/* Check if there is a conflict with a request via KVM_ARM_VCPU_INIT */
-+	if (vcpu_has_sve(vcpu) ^ has_sve)
-+		return -EPERM;
-+
-+	return set_id_reg(vcpu, rd, val);
++	return val;
 +}
 +
- static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
- 					  const struct sys_reg_desc *rd)
- {
-@@ -2049,9 +2076,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_ID_AA64PFR0_EL1),
- 	  .access = access_id_reg,
- 	  .get_user = get_id_reg,
--	  .set_user = set_id_reg,
-+	  .set_user = set_id_aa64pfr0_el1,
- 	  .reset = read_sanitised_id_aa64pfr0_el1,
--	  .val = ID_AA64PFR0_EL1_CSV2_MASK | ID_AA64PFR0_EL1_CSV3_MASK, },
+ /*
+  * cpufeature ID register user accessors
+  *
+@@ -1898,6 +1907,16 @@ static unsigned int elx2_visibility(const struct kvm_vcpu *vcpu,
+ 	.val = 0,				\
+ }
+ 
++#define ID_SANITISED_WRITABLE(name) {		\
++	SYS_DESC(SYS_##name),			\
++	.access	= access_id_reg,		\
++	.get_user = get_id_reg,			\
++	.set_user = set_id_reg,			\
++	.visibility = id_visibility,		\
++	.reset = general_read_kvm_sanitised_reg,\
++	.val = GENMASK(63, 0),			\
++}
++
+ /* sys_reg_desc initialiser for known cpufeature ID registers */
+ #define AA32_ID_SANITISED(name) {		\
+ 	SYS_DESC(SYS_##name),			\
+@@ -2113,9 +2132,14 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	ID_UNALLOCATED(6,7),
+ 
+ 	/* CRm=7 */
+-	ID_SANITISED(ID_AA64MMFR0_EL1),
+-	ID_SANITISED(ID_AA64MMFR1_EL1),
+-	ID_SANITISED(ID_AA64MMFR2_EL1),
++	ID_SANITISED_WRITABLE(ID_AA64MMFR0_EL1),
++	ID_SANITISED_WRITABLE(ID_AA64MMFR1_EL1),
++	{ SYS_DESC(SYS_ID_AA64MMFR2_EL1),
++	  .access = access_id_reg,
++	  .get_user = get_id_reg,
++	  .set_user = set_id_reg,
++	  .reset = read_sanitised_id_aa64mmfr2_el1,
 +	  .val = GENMASK(63, 0), },
- 	ID_SANITISED(ID_AA64PFR1_EL1),
- 	ID_UNALLOCATED(4,2),
- 	ID_UNALLOCATED(4,3),
+ 	ID_UNALLOCATED(7,3),
+ 	ID_UNALLOCATED(7,4),
+ 	ID_UNALLOCATED(7,5),
 -- 
 2.41.0.rc0.172.g3f132b7071-goog
 
