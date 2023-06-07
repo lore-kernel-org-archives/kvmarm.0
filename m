@@ -1,463 +1,135 @@
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCBB5626
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jun 2023 12:37:34 +0000 (UTC)
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-94ea38c90ccso155267066b.1
-        for <kvmarm@lists.linux.dev>; Wed, 07 Jun 2023 05:37:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E885C139F
+	for <kvmarm@lists.linux.dev>; Wed,  7 Jun 2023 13:28:37 +0000 (UTC)
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-3f6d3f83d0cso74253685e9.2
+        for <kvmarm@lists.linux.dev>; Wed, 07 Jun 2023 06:28:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686141453; x=1688733453;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bnQ/nlpXFdeDPVk23AiI85QWmxk4si1+qvDGQ2nGaVk=;
-        b=WdCmcmi6gOeqxet6yu45NdHenR/U+n90arFfFlbF92f1bGKkUxUJcZbgN70kep5JoH
-         a28BTB/g1yUqMFuaG0oRtd+goDlcr5IWteNAtcdGtDczLW8T1oEfO1zTMkyTMRaZJtQB
-         ir+U2yW2RefYHyPwHgNGGRPwn6aj18N5pbozR/bcopObOpzeXEEOp07mvxZqVBNwEVIe
-         yWIxPf8xE1ekX5iNx4B6NJLu89rJegQoaHG0VgWHmVeUJMK8n5fB53uUYnBE4gm8PGlp
-         SKTO0QDN5jtwxOicVMnJC1LrNlR3ChPRu1/lnsVAY0E2cXz/zvyddhTzMSmMi6PuMb1P
-         T2VQ==
+        d=linaro.org; s=google; t=1686144516; x=1688736516;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=NCR0Rk6m49JCUnfFidBMgakEp3k+e1YUOo/bxDNnCyg=;
+        b=qlx4HGb3g1M8KIQ7tSfdrAabKQYEXrZznam6R2hO1jgi58Xrv6Qw+qG+kq+WFTjL2q
+         A7cxSjK8Y1C4oZYyyLcBHkc/QnkHxETzFVUu04q+42jEKKLH8RymeFHcq38ZjEdrdRa2
+         nM/Y0JYk6NSR3/goE3XcnjjZ/bE620Fj963hAXDwWQbXdGfE/rNaokMzedlAdDCkw7Kg
+         zafDCEEfyqFIeqOb3Wjx2qhQei9ya8JhsD5lIlzC32fYJe/T3CIjKX7hpBkBzKfoAf/i
+         ++gzDXgeawjf7Ep0uzFO5NHZZpoMDPzAQKQVMMNUuA5VcbA3S5wtQUFeSIeTGjCOyPAY
+         m1+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686141453; x=1688733453;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bnQ/nlpXFdeDPVk23AiI85QWmxk4si1+qvDGQ2nGaVk=;
-        b=TOX1fwMPfpKNLhY6KtaBzFO7qJZB74vP5VMyblvEW0dLDiZcwIg5L2c8sX+hPtesK3
-         iDF1ScN/tkqr5FMK7El80z0AWPo+98R2TC14E6us+1v766BYzH2CnfVKBVpw+S0fHLJo
-         4+ZgaQMkozadj7HJ/e7D/b6XpzTG4yrl2qA+2jDA361ZMQ1JL4ci776HcsiMmkAY9N1f
-         9RwOumTP3ZEfuc5nHlha4q6UjiZSFdHAz3losZbtnXVgc5GZ8JimcbhI52DTWmd7Yote
-         Th4rsbLIM3NN6ynvbgXMXUCUGFIfzCuf2OnTo8qtc16ZxymTWArCpT5bhp7DPLQ5F7nD
-         mY0A==
-X-Gm-Message-State: AC+VfDzvbqIIXzm+h3aZl7mOWUV3WPjxrMa3NEQwF/OE2dEpOJ0uXkfP
-	ihbLtiO4uaWPXQS8kVJriZU=
-X-Google-Smtp-Source: ACHHUZ5Os8gHz/sUk05VCKCffL41JXPyEnL05xlbL7bdzUPi2lubA4aZLrQ2dJfHDa3HHg5XmuWhRQ==
-X-Received: by 2002:a17:906:9d:b0:977:c446:3a24 with SMTP id 29-20020a170906009d00b00977c4463a24mr1734728ejc.7.1686141452404;
-        Wed, 07 Jun 2023 05:37:32 -0700 (PDT)
-Received: from localhost ([134.191.220.83])
-        by smtp.gmail.com with ESMTPSA id pw12-20020a17090720ac00b00973fac6065esm6777913ejb.223.2023.06.07.05.37.20
+        d=1e100.net; s=20221208; t=1686144516; x=1688736516;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NCR0Rk6m49JCUnfFidBMgakEp3k+e1YUOo/bxDNnCyg=;
+        b=UamOMUPWIZbDXtGpHl4mQXYpD5MaY2zN5JkvQ/yKPxfeVTO4FKMkZVCbumDTJ3Y0zU
+         VDlBu4sk806CoYkF4vUJr3GCrv/vhe4KDfrQnZshpPAnM29BGtMWpa0dJo0QYQANKSVI
+         OUe0r1Z+WhweH4scxZuf/tt1188KdrDowMiBLwGJXEfgdIM8UDuWA0zRkZtwFXvn9xuo
+         JmQ0+oHxyP4EJlgE6eYgX11DdCDawYVprUXDuFkcbZD4CdVDNifDLoe/qQEI2tL4K05z
+         gZrB5iuHLmJJ2IVJiC5ldIaM9IS2ejFv1ELkU5ydke+0Zx8+50a6BvbHPS0DFUAK5n2H
+         S57A==
+X-Gm-Message-State: AC+VfDwn0QzZ/bdyyrYdgBQjLNfrf3nr1zcv3ztPxw6iXSwA1uZfeaCq
+	WNRJoGQe22rPh6Xv2NREV2jqlg==
+X-Google-Smtp-Source: ACHHUZ5nu5UMw2zXQy7pWjoHQNbAcv+sR+coiEHan62nqyjEaqy1g+18b28XjsCCSB5vi90X94WvMQ==
+X-Received: by 2002:a7b:cd10:0:b0:3f7:e65f:7adf with SMTP id f16-20020a7bcd10000000b003f7e65f7adfmr5755472wmj.14.1686144515975;
+        Wed, 07 Jun 2023 06:28:35 -0700 (PDT)
+Received: from myrica (5750a5b3.skybroadband.com. [87.80.165.179])
+        by smtp.gmail.com with ESMTPSA id a4-20020a05600c224400b003f5ffba9ae1sm2182683wmm.24.2023.06.07.06.28.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jun 2023 05:37:32 -0700 (PDT)
-Date: Wed, 7 Jun 2023 20:37:11 +0800
-From: Zhi Wang <zhi.wang.linux@gmail.com>
-To: Vipin Sharma <vipinsh@google.com>
-Cc: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com,
- suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com,
- will@kernel.org, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com,
- tsbogend@alpha.franken.de, anup@brainfault.org, atishp@atishpatra.org,
- paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
- seanjc@google.com, pbonzini@redhat.com, dmatlack@google.com,
- ricarkol@google.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 09/16] KVM: arm64: Document the page table walker
- actions based on the callback's return value
-Message-ID: <20230607203711.000054ae.zhi.wang.linux@gmail.com>
-In-Reply-To: <ZH9tQjQk7QLyhUQR@google.com>
-References: <20230602160914.4011728-1-vipinsh@google.com>
-	<20230602160914.4011728-10-vipinsh@google.com>
-	<20230605223520.00007fbd.zhi.wang.linux@gmail.com>
-	<ZH9tQjQk7QLyhUQR@google.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        Wed, 07 Jun 2023 06:28:35 -0700 (PDT)
+Date: Wed, 7 Jun 2023 14:28:19 +0100
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Nathan Chancellor <nathan@kernel.org>, james.morse@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH 1/4] KVM: arm64: vgic: Fix a circular locking issue
+Message-ID: <20230607132819.GA1086197@myrica>
+References: <20230518100914.2837292-1-jean-philippe@linaro.org>
+ <20230518100914.2837292-2-jean-philippe@linaro.org>
+ <20230606221525.GA2269598@dev-arch.thelio-3990X>
+ <ZIAUTD9Og0ccyzrv@linux.dev>
+ <87h6rjoeh7.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87h6rjoeh7.wl-maz@kernel.org>
 
-On Tue, 6 Jun 2023 10:30:42 -0700
-Vipin Sharma <vipinsh@google.com> wrote:
-
-> On Mon, Jun 05, 2023 at 10:35:20PM +0800, Zhi Wang wrote:
-> > On Fri,  2 Jun 2023 09:09:07 -0700
-> > Vipin Sharma <vipinsh@google.com> wrote:
+On Wed, Jun 07, 2023 at 09:37:08AM +0100, Marc Zyngier wrote:
+> > > After this change landed in 6.4-rc5 as commit 59112e9c390b
+> > > ("KVM: arm64: vgic: Fix a circular locking issue"), my QEMU Fedora VM on
+> > > my SolidRun Honeycomb fails to get to GRUB.
 > > 
-> > > Document what the page table walker do when walker callback function returns
-> > > a value.
-> > > 
-> > > Current documentation is not correct as negative error of -EAGAIN on a
-> > > non-shared page table walker doesn't terminate the walker and continues
-> > > to the next step.
-> > > 
-> > > There might be a better place to keep this information, for now this
-> > > documentation will work as a reference guide until a better way is
-> > > found.
-> > >
+> > [...]
 > > 
-> > After reading the whole patch series, I was thinking it might be a good
-> > time to improve the way how the visitor function and page table walker
-> > talk to each other. The error code is good enough before, but its meaning
-> > seems limited and vague when the visitor function wants to express more about
-> > what exactly happens inside. I am not sure if it is a good idea to continue
-> > that way: 1. found a new situation. 2. choosing a error code for visitor
-> > function. 3. walker translates the error code into the situation to
-> > handle. 4. document the error code and its actual meaning.
+> > > I built a kernel with CONFIG_PROVE_LOCKING=y but I do not see any splats
+> > > while this is occurring. Additionally, neither my Raspberry Pi 4 or my
+> > > Ampere Altra system have any issues, so it is possible this could be a
+> > > platform specific problem. I am more than happy to provide any
+> > > additional information and test kernels and patches to help get to the
+> > > bottom of this. My kernel configuration is attached.
 > > 
-> > Eventually I am afraid that we are going to abuse the error code.
-> 
-> I agree that error numbers are not sufficient and this will become more
-> difficult and cumbersome for more cases in future if we need different
-> behavior based on different error codes for different visitor functions.
->
+> > I was unable to reproduce the issues you're seeing on 6.4-rc5, but I
+> > don't have any different machines from you available atm. Based on
+> > your description it sounds like your VM was able to do _something_
+> > since it sounds like a few escape codes got out over serial...
+> > I'm wondering if you're getting wedged somewhere on a VGIC MMIO access.
 > > 
-> > What about introducing a set of flags for the visitor function to express
-> > what happened and simplify the existing error code?
+> > We don't have a precise tracepoint for VGIC accesses, but kvm:kvm_mmio
+> > should do the trick. So, given that you're the lucky winner at
+> > reproducing this bug right now, do you mind collecting a dump from that
+> > tracepoint and sharing the access that happens before your VM gets
+> > wedged?
 > > 
+> > Curious if Marc has any additional insight, since (unsurprisingly) he
+> > has a lot more experience in dealing with the GIC than I. In the
+> > meantime I'll stare at the locking flows and see if anything stands
+> > out.
 > 
-> If I understood correctly what you meant, I think this will also end up
-> having the same issue down the line, we are just switching errors with
-> flags as they might not be able to express everything.
+> RPI4 is GICv2 nVHE, the NXP machine is GICv3 nVHE, and the Altra is
+> GICv3 VHE. Not sure this is relevant here, but that's one data point.
 > 
-> "Flags for visitor function to express what happened"  - This is what
-> ret val and errors do.
+> Having been able to start the guest means that we should have fully
+> initialised the GIC. So a lockup is likely be an interaction with the
+> GIC emulation itself, either because we failed to release a lock
+> during initialisation, or due to some logic error in the GIC emulation
+> (which is not necessarily MMIO...).
 > 
-
-Thanks so much for the efforts of the sample code.
-
-But when the "ret val" is an error code for pgtable matters, It turns vague.
-We have -EAGAIN to represent "retry" and "-ENONET" to represent PTE not there,
-and they seems end up with different behaviors in different types of pgtable
-walk. That is what I feels off.
-
-visitor_cb has two different requirements of returning the status: 1)
-something wrong happens *not* related to the pgtable, e.g. failing to
-allocate memory. 2) something happens related to the pgtable. e.g PTE doesn't
-exists.
-
-For 1) It is natural to return an error code and the caller might just bail out
-via its error handling path.
-
-I think the core problem is: the two different usages are mixed and they don't
-actually fit with each other. 2) is requiring more details in the future other
-than a simple error code. 
-
-
-For 2) I think it is better have a set of flags. the name of the flags can
-carry more explicit meanings than error code. E.g.:
-
-------------------
-
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 4cd6762bda80..b3f24b321cd7 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -204,6 +204,15 @@ enum kvm_pgtable_walk_flags {
-        KVM_PGTABLE_WALK_HANDLE_FAULT           = BIT(4),
- };
-
-+struct kvm_pgtable_walk_status {
-+       union {
-+               u8 raw;
-+               struct {
-+                       unsigned retry:1;
-+                       unsigned stop:1;
-+                       unsigned ignore:1;
-+               	/* more to come */
-+               };
-+       };
-+};
-+
- struct kvm_pgtable_visit_ctx {
-        kvm_pte_t                               *ptep;
-        kvm_pte_t                               old;
-@@ -213,8 +222,10 @@ struct kvm_pgtable_visit_ctx {
-        u64                                     end;
-        u32                                     level;
-        enum kvm_pgtable_walk_flags             flags;
-+       struct kvm_pgtable_walk_status          *status;
- };
-
- typedef int (*kvm_pgtable_visitor_fn_t)(const struct kvm_pgtable_visit_ctx *ctx,
-                                        enum kvm_pgtable_walk_flags visit);
-
-----------------
-
-Visitor functions sets the flags via ctx->status and kvm_pgtable_walk_xxx can
-check the bits in the ctx to decide what to do for the next.
-
-I can cook a patch for re-factoring this part if we think it is a good idea. 
-
-> "simplify existing error code" - is very dependent on visitor function
-> and caller of page table walker. This might not be able to cover all
-> cases for the future also.
+> I've just given 6.4-rc5 a go on my Synquacer, which is the closest
+> thing I have to Nathan's NXP box, and I can't spot anything odd.
 > 
-> But I do agree that just error code is not sufficient and it will make
-> it harder to handle shared vs non-shared walkers combinations with error
-> code from visitor functions and walk action (exit, next, retry).
-> 
-> One approach I can think of is:
-> Based on the visitor function return value, a page table walker will do
-> 3 things:
-> 
-> 1. Move to next SPTE
-> 2. Retry the current SPTE
-> 3. Exit the walk and return the exit code.
-> 
-> struct kvm_pgtable_walker{}  will have two more callbacks
-> 1. kvm_pgtable_walk_ignore(int ret, enum kvm_pgtable_walk_flags):
->    This will be set for each walker and walker will check with this
->    function intead of kvm_pgtable_walk_continue().
-> 
-> 2. kvm_pgtable_walk_retry(int ret, enum kvm_pgtable_walk_flags):
->    This will be set for each walker and walker will use it in
->    __kvm_pgtable_walk()  on the return value of __kvm_pgtable_visit() to
->    retry again.
-> 
-> This will allow to have walker be more configurable and each type of
-> walker can be customized based on vistor function return and
-> shared/non-shared walker combo. It will avoid having visitor function
-> error code handling same in all walkers.
-> 
-> Below is a sample code (compile tested only):
-> 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 850d65f705fa..9a96f61208af 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -243,6 +243,10 @@ struct kvm_pgtable_visit_ctx {
->  
->  typedef int (*kvm_pgtable_visitor_fn_t)(const struct kvm_pgtable_visit_ctx *ctx,
->  					enum kvm_pgtable_walk_flags visit);
-> +struct kvm_pgtable_walker;
-> +typedef bool (*kvm_pgtable_walker_action_fn_t)(const struct kvm_pgtable_walker *walker,
-> +					      int ret);
-> +
->  
->  static inline bool kvm_pgtable_walk_shared(const struct kvm_pgtable_visit_ctx *ctx)
->  {
-> @@ -258,6 +262,8 @@ static inline bool kvm_pgtable_walk_shared(const struct kvm_pgtable_visit_ctx *c
->   */
->  struct kvm_pgtable_walker {
->  	const kvm_pgtable_visitor_fn_t		cb;
-> +	const kvm_pgtable_walker_action_fn_t	ignore;
-> +	const kvm_pgtable_walker_action_fn_t	retry;
->  	void * const				arg;
->  	const enum kvm_pgtable_walk_flags	flags;
->  };
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 364b68013038..28891a9c463a 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -180,6 +180,12 @@ static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data,
->  	return walker->cb(ctx, visit);
->  }
->  
-> +static bool kvm_pgtable_walk_retry(const struct kvm_pgtable_walker *walker,
-> +				      int r)
-> +{
-> +	return false;
-> +}
-> +
->  static bool kvm_pgtable_walk_continue(const struct kvm_pgtable_walker *walker,
->  				      int r)
->  {
-> @@ -231,7 +237,7 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
->  		table = kvm_pte_table(ctx.old, level);
->  	}
->  
-> -	if (!kvm_pgtable_walk_continue(data->walker, ret))
-> +	if (!data->walker->ignore(data->walker, ret))
->  		goto out;
->  
->  	if (!table) {
-> @@ -242,14 +248,14 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
->  
->  	childp = (kvm_pteref_t)kvm_pte_follow(ctx.old, mm_ops);
->  	ret = __kvm_pgtable_walk(data, mm_ops, childp, level + 1);
-> -	if (!kvm_pgtable_walk_continue(data->walker, ret))
-> +	if (!data->walker->ignore(data->walker, ret))
->  		goto out;
->  
->  	if (ctx.flags & KVM_PGTABLE_WALK_TABLE_POST)
->  		ret = kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_TABLE_POST);
->  
->  out:
-> -	if (kvm_pgtable_walk_continue(data->walker, ret))
-> +	if (!data->walker->ignore(data->walker, ret))
->  		return 0;
->  
->  	return ret;
-> @@ -260,19 +266,25 @@ static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
->  {
->  	u32 idx;
->  	int ret = 0;
-> +	kvm_pteref_t pteref;
->  
->  	if (WARN_ON_ONCE(level >= KVM_PGTABLE_MAX_LEVELS))
->  		return -EINVAL;
->  
->  	for (idx = kvm_pgtable_idx(data, level); idx < PTRS_PER_PTE; ++idx) {
-> -		kvm_pteref_t pteref = &pgtable[idx];
-> +retry:
-> +		pteref = &pgtable[idx];
->  
->  		if (data->addr >= data->end)
->  			break;
->  
->  		ret = __kvm_pgtable_visit(data, mm_ops, pteref, level);
-> -		if (ret)
-> +		if (ret) {
-> +			if (data->walker->retry(data->walker, ret)) {
-> +				goto retry;
-> +			}
->  			break;
-> +		}
->  	}
->  
->  	return ret;
-> @@ -343,6 +355,8 @@ int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
->  	struct leaf_walk_data data;
->  	struct kvm_pgtable_walker walker = {
->  		.cb	= leaf_walker,
-> +		.ignore = kvm_pgtable_walk_continue,
-> +		.retry	= kvm_pgtable_walk_retry,
->  		.flags	= KVM_PGTABLE_WALK_LEAF,
->  		.arg	= &data,
->  	};
-> @@ -474,6 +488,8 @@ int kvm_pgtable_hyp_map(struct kvm_pgtable *pgt, u64 addr, u64 size, u64 phys,
->  	};
->  	struct kvm_pgtable_walker walker = {
->  		.cb	= hyp_map_walker,
-> +		.ignore = kvm_pgtable_walk_continue,
-> +		.retry	= kvm_pgtable_walk_retry,
->  		.flags	= KVM_PGTABLE_WALK_LEAF,
->  		.arg	= &map_data,
->  	};
-> @@ -533,6 +549,8 @@ u64 kvm_pgtable_hyp_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
->  	u64 unmapped = 0;
->  	struct kvm_pgtable_walker walker = {
->  		.cb	= hyp_unmap_walker,
-> +		.ignore = kvm_pgtable_walk_continue,
-> +		.retry	= kvm_pgtable_walk_retry,
->  		.arg	= &unmapped,
->  		.flags	= KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABLE_POST,
->  	};
-> @@ -582,6 +600,8 @@ void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt)
->  {
->  	struct kvm_pgtable_walker walker = {
->  		.cb	= hyp_free_walker,
-> +		.ignore = kvm_pgtable_walk_continue,
-> +		.retry	= kvm_pgtable_walk_retry,
->  		.flags	= KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABLE_POST,
->  	};
->  
-> @@ -958,6 +978,8 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
->  	};
->  	struct kvm_pgtable_walker walker = {
->  		.cb		= stage2_map_walker,
-> +		.ignore		= kvm_pgtable_walk_continue,
-> +		.retry		= kvm_pgtable_walk_retry,
->  		.flags		= flags |
->  				  KVM_PGTABLE_WALK_TABLE_PRE |
->  				  KVM_PGTABLE_WALK_LEAF,
-> @@ -989,6 +1011,8 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
->  	};
->  	struct kvm_pgtable_walker walker = {
->  		.cb		= stage2_map_walker,
-> +		.ignore		= kvm_pgtable_walk_continue,
-> +		.retry		= kvm_pgtable_walk_retry,
->  		.flags		= KVM_PGTABLE_WALK_TABLE_PRE |
->  				  KVM_PGTABLE_WALK_LEAF,
->  		.arg		= &map_data,
-> @@ -1048,6 +1072,8 @@ int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
->  {
->  	struct kvm_pgtable_walker walker = {
->  		.cb	= stage2_unmap_walker,
-> +		.ignore	= kvm_pgtable_walk_continue,
-> +		.retry	= kvm_pgtable_walk_retry,
->  		.arg	= pgt,
->  		.flags	= KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABLE_POST,
->  	};
-> @@ -1070,7 +1096,7 @@ static int stage2_attr_walker(const struct kvm_pgtable_visit_ctx *ctx,
->  	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
->  
->  	if (!kvm_pte_valid(ctx->old))
-> -		return -EAGAIN;
-> +		return -ENOENT;
->  
->  	data->level = ctx->level;
->  	data->pte = pte;
-> @@ -1099,6 +1125,23 @@ static int stage2_attr_walker(const struct kvm_pgtable_visit_ctx *ctx,
->  	return 0;
->  }
->  
-> +static bool stage2_attr_walker_retry(const struct kvm_pgtable_walker *walker, int ret)
-> +{
-> +	if (ret == -EAGAIN)
-> +		return walker->flags & KVM_PGTABLE_WALK_SHARED
-> +				&& !(walker->flags & KVM_PGTABLE_WALK_HANDLE_FAULT);
-> +	return false;
-> +}
-> +
-> +static bool stage2_attr_walker_ignore(const struct kvm_pgtable_walker * walker, int ret)
-> +{
-> +	if (ret == -EAGAIN)
-> +		return !(walker->flags & KVM_PGTABLE_WALK_SHARED);
-> +	if (ret == -ENOENT)
-> +		return !(walker->flags & KVM_PGTABLE_WALK_HANDLE_FAULT);
-> +	return false;
-> +}
-> +
->  static int stage2_update_leaf_attrs(struct kvm_pgtable *pgt, u64 addr,
->  				    u64 size, kvm_pte_t attr_set,
->  				    kvm_pte_t attr_clr, kvm_pte_t *orig_pte,
-> @@ -1112,6 +1155,8 @@ static int stage2_update_leaf_attrs(struct kvm_pgtable *pgt, u64 addr,
->  	};
->  	struct kvm_pgtable_walker walker = {
->  		.cb		= stage2_attr_walker,
-> +		.ignore		= stage2_attr_walker_ignore,
-> +		.retry		= stage2_attr_walker_retry,
->  		.arg		= &data,
->  		.flags		= flags | KVM_PGTABLE_WALK_LEAF,
->  	};
-> @@ -1217,6 +1262,8 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
->  {
->  	struct kvm_pgtable_walker walker = {
->  		.cb	= stage2_flush_walker,
-> +		.ignore	= kvm_pgtable_walk_continue,
-> +		.retry	= kvm_pgtable_walk_retry,
->  		.flags	= KVM_PGTABLE_WALK_LEAF,
->  		.arg	= pgt,
->  	};
-> @@ -1240,6 +1287,8 @@ kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
->  	};
->  	struct kvm_pgtable_walker walker = {
->  		.cb		= stage2_map_walker,
-> +		.ignore		= kvm_pgtable_walk_continue,
-> +		.retry		= kvm_pgtable_walk_retry,
->  		.flags		= KVM_PGTABLE_WALK_LEAF |
->  				  KVM_PGTABLE_WALK_SKIP_BBM_TLBI |
->  				  KVM_PGTABLE_WALK_SKIP_CMO,
-> @@ -1377,6 +1426,8 @@ int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
->  {
->  	struct kvm_pgtable_walker walker = {
->  		.cb	= stage2_split_walker,
-> +		.ignore	= kvm_pgtable_walk_continue,
-> +		.retry	= kvm_pgtable_walk_retry,
->  		.flags	= KVM_PGTABLE_WALK_LEAF,
->  		.arg	= mc,
->  	};
-> @@ -1442,6 +1493,8 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
->  	size_t pgd_sz;
->  	struct kvm_pgtable_walker walker = {
->  		.cb	= stage2_free_walker,
-> +		.ignore	= kvm_pgtable_walk_continue,
-> +		.retry	= kvm_pgtable_walk_retry,
->  		.flags	= KVM_PGTABLE_WALK_LEAF |
->  			  KVM_PGTABLE_WALK_TABLE_POST,
->  	};
-> @@ -1457,6 +1510,8 @@ void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *p
->  	kvm_pteref_t ptep = (kvm_pteref_t)pgtable;
->  	struct kvm_pgtable_walker walker = {
->  		.cb	= stage2_free_walker,
-> +		.ignore	= kvm_pgtable_walk_continue,
-> +		.retry	= kvm_pgtable_walk_retry,
->  		.flags	= KVM_PGTABLE_WALK_LEAF |
->  			  KVM_PGTABLE_WALK_TABLE_POST,
->  	};
+> It would also help to get access to the EDK2 build. It wouldn't be the
+> first time that a change in KVM breaks some EDK2 behaviour.
 
+I found a build here:
+https://koji.fedoraproject.org/koji/buildinfo?buildID=2204660
+edk2-aarch64-20230301gitf80f052277c8-31.fc39.noarch.rpm
+usr/share/edk2/aarch64/QEMU_EFI-silent-pflash.raw
+
+Haven't managed to reproduce the issue yet, but I can only test with QEMU
+emulating the cortex-a72 and GICv3 at the moment, and I still need to
+reproduce the VMM command-line exactly. I think it would be helpful to get
+the exact grub image as well, right now I'm using
+Fedora-Server-KVM-38-1.6.aarch64.qcow2
+
+Thanks,
+Jean
+
+> 
+> Finally, on top of the traces that Oliver asked above, looking at
+> where the QEMU vcpu threads are would be interesting (I assume they'd
+> be sleeping in the kernel).
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
