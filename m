@@ -1,26 +1,26 @@
-Received: from out-61.mta1.migadu.com (out-61.mta1.migadu.com [95.215.58.61])
+Received: from out-5.mta1.migadu.com (out-5.mta1.migadu.com [95.215.58.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 527856118
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jun 2023 18:49:37 +0000 (UTC)
-Date: Wed, 7 Jun 2023 20:49:34 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF1E6118
+	for <kvmarm@lists.linux.dev>; Wed,  7 Jun 2023 18:52:35 +0000 (UTC)
+Date: Wed, 7 Jun 2023 20:52:32 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1686163776;
+	t=1686163953;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3c51gT0c8ge8bN5s6qtc7sw8/WCeotK+DEJcJTjknHU=;
-	b=qNuRLgR3+4ow49U5nHkOmjCRtfnSVDow8jM6GwT1qw1gn7HyNjdOH9c1invgoqcSkc9vrQ
-	52h6lGYqId7UORj1JndcOkzIHduQfWW0mAATE9YtC0iCqulkzCTWg6aiGeh3328ymnhq3I
-	M8CDYhbqwHY3rPneVEhhqLOo7dmnJIg=
+	bh=jvZ6xTwagi2X5T/9lZN7YuM3WLVq29x4N6G6EzrAEN4=;
+	b=qRMmCzlQ0168QELnq5OEikMBNJeBD2EW9ugsCoXVkVJfSgM7zEE4WpbRr/+BIXEsFZTFT2
+	QyoMb/N4b8grTCdNfdMcvhju9o7Q+QbG5pFcoo4lbHf1/RuiLltqGgq9ZJyerdPT+o5jbc
+	tGiQf8mHKIUxn1qysqUL5DhRMLTBtT8=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
 To: Nikos Nikoleris <nikos.nikoleris@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, thuth@redhat.com
-Subject: Re: [kvm-unit-tests] arm/arm64: psci_cpu_on_test failures with tcg
-Message-ID: <20230607-a09e9dfd2719c01bd6b39df5@orel>
-References: <100579b3-649b-a57c-8639-edc6b22c7646@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
+	alexandru.elisei@arm.com, ricarkol@google.com, shahuang@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v6 00/32] EFI and ACPI support for arm64
+Message-ID: <20230607-49d0c961801a046da5b39457@orel>
+References: <20230530160924.82158-1-nikos.nikoleris@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -29,29 +29,98 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <100579b3-649b-a57c-8639-edc6b22c7646@arm.com>
+In-Reply-To: <20230530160924.82158-1-nikos.nikoleris@arm.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, May 31, 2023 at 11:41:33AM +0100, Nikos Nikoleris wrote:
-> Hi,
+On Tue, May 30, 2023 at 05:08:52PM +0100, Nikos Nikoleris wrote:
+> Hello,
 > 
-> I noticed that in the latest master the psci_cpu_on_test fails randomly for
-> both arm and arm64 with tcg.
+> This series adds initial support for building arm64 tests as EFI
+> apps and running them under QEMU. Much like x86_64, we import external
+> dependencies from gnu-efi and adapt them to work with types and other
+> assumptions from kvm-unit-tests. In addition, this series adds support
+> for enumerating parts of the system using ACPI.
 > 
-> If I do:
+> The first set of patches, moves the existing ACPI code to the common
+> lib path. Then, it extends definitions and functions to allow for more
+> robust discovery of ACPI tables. We add support for setting up the PSCI
+> conduit, discovering the UART, timers, GIC and cpus via ACPI. The code
+> retains existing behavior and gives priority to discovery through DT
+> when one has been provided.
 > 
-> $> for i in `seq 1 100`; do ACCEL=tcg MAX_SMP=8 ./run_tests.sh psci; done |
-> grep FAIL
+> In the second set of patches, we add support for getting the command
+> line from the EFI shell. This is a requirement for many of the
+> existing arm64 tests.
 > 
-> About 10 of the 100 runs fail for the arm and arm64 builds of the test. I
-> had a look and I am not sure I understand why. When I run the test with kvm,
-> I don't get any failures. Does anyone have an idea what could be causing
-> this?
+> In the third set of patches, we import code from gnu-efi, make minor
+> changes and add an alternative setup sequence from arm64 systems that
+> boot through EFI. Finally, we add support in the build system and a
+> run script which is used to run an EFI app.
 > 
+> After this set of patches one can build arm64 EFI tests:
+> 
+> $> ./configure --enable-efi
+> $> make
+> 
+> And use the run script to run an EFI tests:
+> 
+> $> ./arm/efi/run ./arm/selftest.efi -smp 2 -m 256 -append "setup smp=2 mem=256"
+> 
+> Or all tests:
+> 
+> $> ./run_tests.sh
+> 
+> There are a few items that this series does not address but they would
+> be useful to have:
+>  - Support for booting the system from EL2. Currently, we assume that a
+>    test starts EL1. This will be required to run EFI tests on sytems
+>    that implement EL2.
+>  - Support for reading environment variables and populating __envp.
+>  - Support for discovering the PCI subsystem using ACPI.
+>  - Get rid of other assumptions (e.g., vmalloc area) that don't hold on
+>    real HW.
+>  - Various fixes related to cache maintaince to better support turn the
+>    MMU off.
+>  - Switch to a new stack and avoid relying on the one provided by EFI.
+> 
+> git branch: https://gitlab.com/nnikoleris/kvm-unit-tests/-/tree/target-efi-upstream-v6 
+> 
+> v5: https://lore.kernel.org/kvmarm/20230428120405.3770496-1-nikos.nikoleris@arm.com/
+> v4: https://lore.kernel.org/kvmarm/20230213101759.2577077-1-nikos.nikoleris@arm.com/
+> v3: https://lore.kernel.org/all/20220630100324.3153655-1-nikos.nikoleris@arm.com/
+> v2: https://lore.kernel.org/kvm/20220506205605.359830-1-nikos.nikoleris@arm.com/
+> 
+> Changes in v6:
+>  - Fixed a symbol issue in the debug tests that would cause them to fail
+>    when build with fPIC.
+>  - Added support for booting with FDT.
+> 
+> Changes in v5:
+>  - Minor style changes (thanks Shaoqin).
+>  - Avoid including lib/acpi.o to cflatobjs twice (thanks Drew).
+>  - Increase NR_INITIAL_MEM_REGIONS to avoid overflows and add check when
+>    we run out of space (thanks Shaoqin).
+> 
+> Changes in v4:
+>  - Removed patch that reworks cache maintenance when turning the MMU
+>    off. This is not strictly required for EFI tests running with tcg and
+>    will be addressed in a separate series by Alex.
+>  - Fix compilation for arm (Alex).
+>  - Convert ACPI tables to Linux style (Alex).
+> 
+> Changes in v3:
+>  - Addressed feedback from Drew, Alex and Ricardo. Many thanks for the reviews!
+>  - Added support for discovering the GIC through ACPI
+>  - Added a missing header file (<elf.h>)
+>  - Added support for correctly parsing the outcome of tests (./run_tests)
+> 
+> Thanks,
+> 
+> Nikos
+>
 
-I've also seen this failure on QEMU several times, but never investigated
-it. Now that the CI is running the tests under TCG the urgency of fixing
-it is higher, but we could also drop the psci test from the CI for now...
+Applied to arm/queue. Thanks!
 
-Thanks,
+https://gitlab.com/jones-drew/kvm-unit-tests/-/commits/arm/queue
+
 drew
