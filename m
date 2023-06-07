@@ -1,26 +1,28 @@
-Received: from out-23.mta1.migadu.com (out-23.mta1.migadu.com [95.215.58.23])
+Received: from out-37.mta1.migadu.com (out-37.mta1.migadu.com [95.215.58.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119926118
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jun 2023 18:53:19 +0000 (UTC)
-Date: Wed, 7 Jun 2023 20:53:16 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D536118
+	for <kvmarm@lists.linux.dev>; Wed,  7 Jun 2023 19:07:14 +0000 (UTC)
+Date: Wed, 7 Jun 2023 21:07:09 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1686163997;
+	t=1686164832;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uZriKRSNBbzvJHJtIENKwxHY6qma95a+SzevJ1d0sZU=;
-	b=Obvn7QhCH0nPk/AqET+xjZel4gBk1D7AgZS9WWgfpiUTvNwdwQaWpmCeFyRxMMbq6JLlVM
-	wyryjmNPVs9na3YDvP+vJdPecKr4NsE/ZJTXINNu9i5hv9oQnI7C2cvnLqNwDAorOPymkG
-	EcQpDG0gT/MKF4nKRsinTqu6Ir5L7zw=
+	bh=Cp/j3lpAjoA93pjc15VpuFruRtECtbGhaqaYmi+uaO8=;
+	b=D+SPzO7/r1BmYqrzM4dcRYiMjPoxgnLZjzFApnPX2US1oxAiprh53/iViae3U9OXjl96KA
+	cBoEKM70d8XrKsn3vjrdep6lpNn5ww6IljRaCafseSC+XYJKAwRI5+T66UmzQarm0ivKUz
+	O55VlPCv5zgVhQSGctLaajh7MUTUciM=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
-To: Nikos Nikoleris <nikos.nikoleris@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [kvm-unit-tests PATCH v2] arm64: Make vector_table and
- vector_stub weak symbols
-Message-ID: <20230607-5a5ef657ae5d4c001b388b26@orel>
-References: <20230523135325.1081036-1-nikos.nikoleris@arm.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	maz@kernel.org, will@kernel.org, oliver.upton@linux.dev, ricarkol@google.com, 
+	reijiw@google.com, alexandru.elisei@arm.com, mark.rutland@arm.com
+Subject: Re: [kvm-unit-tests PATCH v2 0/6] arm: pmu: Fix random failures of
+ pmu-chain-promotion
+Message-ID: <20230607-a12c8e1d270b53e522756648@orel>
+References: <20230531201438.3881600-1-eric.auger@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -29,95 +31,66 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230523135325.1081036-1-nikos.nikoleris@arm.com>
+In-Reply-To: <20230531201438.3881600-1-eric.auger@redhat.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, May 23, 2023 at 02:53:25PM +0100, Nikos Nikoleris wrote:
-> This changes allows a test to define and override the declared symbols,
-> taking control of all or some execptions.
+On Wed, May 31, 2023 at 10:14:32PM +0200, Eric Auger wrote:
+> On some HW (ThunderXv2), some random failures of
+> pmu-chain-promotion test can be observed.
 > 
-> With the ability to override specific exception handlers, litmus7 [1] a
-> tool used to generate c sources for a given memory model litmus test,
-> can override the el1h_sync symbol to implement tests with explicit
-> exception handlers. For example:
+> pmu-chain-promotion is composed of several subtests
+> which run 2 mem_access loops. The initial value of
+> the counter is set so that no overflow is expected on
+> the first loop run and overflow is expected on the second.
+> However it is observed that sometimes we get an overflow
+> on the first run. It looks related to some variability of
+> the mem_acess count. This variability is observed on all
+> HW I have access to, with different span though. On
+> ThunderX2 HW it looks the margin that is currently taken
+> is too small and we regularly hit failure.
 > 
-> AArch64 LDRv0+I2V-dsb.ishst-once
-> {
->   [PTE(x)]=(oa:PA(x),valid:0);
->   x=1;
+> although the first goal of this series is to increase
+> the count/margin used in those tests, it also attempts
+> to improve the pmu-chain-promotion logs, add some barriers
+> in the mem-access loop, clarify the chain counter
+> enable/disable sequence.
 > 
->   0:X1=x;
->   0:X3=PTE(x);
->   0:X2=(oa:PA(x),valid:1);
-> }
->  P0          | P0.F           ;
-> L0:          | ADD X8,X8,#1   ;
->  LDR W0,[X1] | STR X2,[X3]    ;
->              | DSB ISHST      ;
->              | ADR X9,L0      ;
->              | MSR ELR_EL1,X9 ;
->              | ERET           ;
-> exists(0:X0=0 \/ 0:X8!=1)
+> A new 'pmu-mem-access-reliability' is also introduced to
+> detect issues with MEM_ACCESS event variability and make
+> the debug easier.
 > 
-> In this test, a thread running in core P0 executes a load to a memory
-> location x. The PTE of the virtual address x is initially invalid.  The
-> execution of the load causes a synchronous EL1 exception which is
-> handled by the code in P0.F. P0.F increments a counter which is
-> maintained in X8, updates the PTE of x and makes it valid, executes a
-> DSB ISHST and calls ERET which is expected to return and retry the
-> execution of the load in P0:L0.
+> Obviously one can wonder if this variability is something normal
+> and does not hide any other bug. I hope this series will raise
+> additional discussions about this.
 > 
-> The postcondition checks if there is any execution where the load wasn't
-> executed (X0 its destination register is not update), or that the P0.F
-> handler was invoked more than once (the counter X8 is not 1).
+> https://github.com/eauger/kut/tree/pmu-chain-promotion-fixes-v2
 > 
-> For this tests, litmus7 needs to control the el1h_sync. Calling
-> install_exception_handler() would be suboptimal because the
-> vector_stub would wrap around the code of P0.F and perturb the test.
+> History:
+> v1 -> v2:
+> - Take into account Alexandru's & Mark's comments. Added some
+>   R-b's and T-b's.
 > 
-> [1]: https://diy.inria.fr/doc/litmus.html
+> Eric Auger (6):
+>   arm: pmu: pmu-chain-promotion: Improve debug messages
+>   arm: pmu: pmu-chain-promotion: Introduce defines for count and margin
+>     values
+>   arm: pmu: Add extra DSB barriers in the mem_access loop
+>   arm: pmu: Fix chain counter enable/disable sequences
+>   arm: pmu: Add pmu-mem-access-reliability test
+>   arm: pmu-chain-promotion: Increase the count and margin values
 > 
-> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-> ---
->  arm/cstart64.S | 9 +++++++++
->  1 file changed, 9 insertions(+)
+>  arm/pmu.c         | 196 +++++++++++++++++++++++++++++++++-------------
+>  arm/unittests.cfg |   6 ++
+>  2 files changed, 148 insertions(+), 54 deletions(-)
 > 
-> diff --git a/arm/cstart64.S b/arm/cstart64.S
-> index e4ab7d06..eda0daa5 100644
-> --- a/arm/cstart64.S
-> +++ b/arm/cstart64.S
-> @@ -275,8 +275,11 @@ exceptions_init:
->  /*
->   * Vector stubs
->   * Adapted from arch/arm64/kernel/entry.S
-> + * Declare as weak to allow external tests to redefine and override a
-> + * vector_stub.
->   */
->  .macro vector_stub, name, vec
-> +.weak \name
->  \name:
->  	stp	 x0,  x1, [sp, #-S_FRAME_SIZE]!
->  	stp	 x2,  x3, [sp,  #16]
-> @@ -369,7 +372,13 @@ vector_stub	el0_error_32, 15
->  	b	\label
->  .endm
->  
-> +
-> +/*
-> + * Declare as weak to allow external tests to redefine and override the
-> + * default vector table.
-> + */
->  .align 11
-> +.weak vector_table
->  vector_table:
->  	ventry	el1t_sync			// Synchronous EL1t
->  	ventry	el1t_irq			// IRQ EL1t
 > -- 
-> 2.25.1
+> 2.38.1
 >
 
-Applied to arm/queue. Thanks!
+Hi Eric,
 
-https://gitlab.com/jones-drew/kvm-unit-tests/-/commits/arm/queue
+I'm eager to merge this, but I'll give Alexandru some time to revisit it
+since he had comments on the last revision.
 
+Thanks,
 drew
