@@ -1,130 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C7881104
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jun 2023 08:37:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1353C433D2;
-	Wed,  7 Jun 2023 08:37:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1686127032;
-	bh=fLcIJINBY2tIla5fnDbAixYa2pUls5zFI6qF4VH9tVY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tdWcl/idUg8GvzBdIGE45jZBOpO9lzK6Vf3U80IsI5b9jezt1z57yjJW+yKbrhqPo
-	 TwKRaLRI8juew8GStEBlfgyMfyHUcpQ0SrLKFbQiuo0o0b90gbH2WjBvfKEqxrKtng
-	 0onXc9KHC7SlqAY/f0A2yk9wysbN/BKuOfe9VbPI5osIKZe2LUnKXZMBWy8+7txCRY
-	 D0jS381rpayqlknMVdSqrkIAD7nQ0Ng68iqk3aTaEqZVA474mfuyBEONw6rJ6StDfE
-	 a/cGCoonB0UJtHuldObY7+ib5wLG5j6hVuDcMXowP0jh4h+TivCWEy7uG7pi39O+9I
-	 pfIHwSe7/VBqA==
-Received: from 152.5.30.93.rev.sfr.net ([93.30.5.152] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1q6ofG-003R7h-6T;
-	Wed, 07 Jun 2023 09:37:10 +0100
-Date: Wed, 07 Jun 2023 09:37:08 +0100
-Message-ID: <87h6rjoeh7.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>, Nathan Chancellor <nathan@kernel.org>
-Cc: 	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	james.morse@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 1/4] KVM: arm64: vgic: Fix a circular locking issue
-In-Reply-To: <ZIAUTD9Og0ccyzrv@linux.dev>
-References: <20230518100914.2837292-1-jean-philippe@linaro.org>
-	<20230518100914.2837292-2-jean-philippe@linaro.org>
-	<20230606221525.GA2269598@dev-arch.thelio-3990X>
-	<ZIAUTD9Og0ccyzrv@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B5657488
+	for <kvmarm@lists.linux.dev>; Wed,  7 Jun 2023 10:09:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1686132561;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BeQhaSHu7cWs6XucEltOCfbvT3TUoRppwvtRNtAUuIY=;
+	b=I8ehIBoSAiWr58tPHoH8l7svrRxYdxG6EEBIaFgmbIsWXMBaWqYPLDSYlieu3XdNq0m2zJ
+	AcpfJ1TflvhhQyH7QwPRv6ySAexDyOECXeR7B1noEg3cBuuk8/6KZNftPWHJbjSHhzj+9P
+	dEruk/YqfuGE3LzEGgLw7RuTI5K+6UM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-612-Oj4KIRh6NymDk4IfVC_MTA-1; Wed, 07 Jun 2023 06:09:16 -0400
+X-MC-Unique: Oj4KIRh6NymDk4IfVC_MTA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6488485A5BB;
+	Wed,  7 Jun 2023 10:09:15 +0000 (UTC)
+Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1DB292026D49;
+	Wed,  7 Jun 2023 10:09:15 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Suraj Jitindar Singh <surajjs@amazon.com>, jingzhangos@google.com,
+ alexandru.elisei@arm.com, james.morse@arm.com, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ oupton@google.com, pbonzini@redhat.com, rananta@google.com,
+ reijiw@google.com, suzuki.poulose@arm.com, tabba@google.com,
+ will@kernel.org, sjitindarsingh@gmail.com
+Subject: Re: [PATCH 3/3] KVM: arm64: Use per guest ID register for
+ ID_AA64PFR1_EL1.MTE
+In-Reply-To: <87legwo83z.wl-maz@kernel.org>
+Organization: Red Hat GmbH
+References: <20230602005118.2899664-1-jingzhangos@google.com>
+ <20230602221447.1809849-1-surajjs@amazon.com>
+ <20230602221447.1809849-4-surajjs@amazon.com>
+ <873539ospa.wl-maz@kernel.org> <87h6rl50dl.fsf@redhat.com>
+ <87legwo83z.wl-maz@kernel.org>
+User-Agent: Notmuch/0.37 (https://notmuchmail.org)
+Date: Wed, 07 Jun 2023 12:09:14 +0200
+Message-ID: <87wn0fmvn9.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 93.30.5.152
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, nathan@kernel.org, jean-philippe@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 
-On Wed, 07 Jun 2023 06:23:24 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> Nathan,
-> 
-> First and foremost, thanks for testing this.
-> 
-> On Tue, Jun 06, 2023 at 03:15:25PM -0700, Nathan Chancellor wrote:
-> > My apologies if this has been addressed or reported somewhere, I did a
-> > search of lore.kernel.org and browsed the kvmarm archives and did not
-> > see anything.
-> 
-> This is news to me, but even if it had already been reported there's
-> nothing wrong with bumping the issue. Makes it hard for us to bury our
-> heads in the sand :)
+On Tue, Jun 06 2023, Marc Zyngier <maz@kernel.org> wrote:
 
-AFAICT, this is the very first report of this problem.
+> On Mon, 05 Jun 2023 17:39:50 +0100,
+> Cornelia Huck <cohuck@redhat.com> wrote:
+>> 
+>> On Sat, Jun 03 2023, Marc Zyngier <maz@kernel.org> wrote:
+>> 
+>> > On Fri, 02 Jun 2023 23:14:47 +0100,
+>> > Suraj Jitindar Singh <surajjs@amazon.com> wrote:
+>> >> 
+>> >> With per guest ID registers, MTE settings from userspace can be stored in
+>> >> its corresponding ID register.
+>> >> 
+>> >> No functional change intended.
+>> >> 
+>> >> Signed-off-by: Suraj Jitindar Singh <surajjs@amazon.com>
+>> >> ---
+>> >>  arch/arm64/include/asm/kvm_host.h | 21 ++++++++++-----------
+>> >>  arch/arm64/kvm/arm.c              | 11 ++++++++++-
+>> >>  arch/arm64/kvm/sys_regs.c         |  5 +++++
+>> >>  3 files changed, 25 insertions(+), 12 deletions(-)
+>> >> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> >> index ca18c09ccf82..6fc4190559d1 100644
+>> >> --- a/arch/arm64/kvm/arm.c
+>> >> +++ b/arch/arm64/kvm/arm.c
+>> >> @@ -80,8 +80,17 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>> >>  		if (!system_supports_mte() || kvm->created_vcpus) {
+>> >>  			r = -EINVAL;
+>> >>  		} else {
+>> >> +			u64 val;
+>> >> +
+>> >> +			/* Protects the idregs against modification */
+>> >> +			mutex_lock(&kvm->arch.config_lock);
+>> >> +
+>> >> +			val = IDREG(kvm, SYS_ID_AA64PFR1_EL1);
+>> >> +			val |= FIELD_PREP(ID_AA64PFR1_EL1_MTE_MASK, 1);
+>> >
+>> > The architecture specifies 3 versions of MTE in the published ARM ARM,
+>> > with a 4th coming up as part of the 2022 extensions.
+>> 
+>> Is that the one that adds some more MTE<foo> bits in AA64PFR1 and
+>> AA64PFR2?
+>
+> Yeah, that. You get ID_AA64PFR1_EL1.{MTE,MTE_frac,MTEX}, plus
+> ID_AA64PFR2_EL1.{MTEFAR,MTESTOREONLY,MTEPERM}... It this sounds like a
+> train wreck, then it probably is one!
 
-> 
-> > After this change landed in 6.4-rc5 as commit 59112e9c390b
-> > ("KVM: arm64: vgic: Fix a circular locking issue"), my QEMU Fedora VM on
-> > my SolidRun Honeycomb fails to get to GRUB.
-> 
-> [...]
-> 
-> > I built a kernel with CONFIG_PROVE_LOCKING=y but I do not see any splats
-> > while this is occurring. Additionally, neither my Raspberry Pi 4 or my
-> > Ampere Altra system have any issues, so it is possible this could be a
-> > platform specific problem. I am more than happy to provide any
-> > additional information and test kernels and patches to help get to the
-> > bottom of this. My kernel configuration is attached.
-> 
-> I was unable to reproduce the issues you're seeing on 6.4-rc5, but I
-> don't have any different machines from you available atm. Based on
-> your description it sounds like your VM was able to do _something_
-> since it sounds like a few escape codes got out over serial...
-> I'm wondering if you're getting wedged somewhere on a VGIC MMIO access.
-> 
-> We don't have a precise tracepoint for VGIC accesses, but kvm:kvm_mmio
-> should do the trick. So, given that you're the lucky winner at
-> reproducing this bug right now, do you mind collecting a dump from that
-> tracepoint and sharing the access that happens before your VM gets
-> wedged?
-> 
-> Curious if Marc has any additional insight, since (unsurprisingly) he
-> has a lot more experience in dealing with the GIC than I. In the
-> meantime I'll stare at the locking flows and see if anything stands
-> out.
+With that many features, what could possibly go wrong!
 
-RPI4 is GICv2 nVHE, the NXP machine is GICv3 nVHE, and the Altra is
-GICv3 VHE. Not sure this is relevant here, but that's one data point.
+>
+>> 
+>> > Why are you
+>> > actively crippling the MTE version presented to the guest, and
+>> > potentially introduce unexpected behaviours?
+>> 
+>> While the code does not look correct here, I think we'll need some way to
+>> control which version of MTE is presented to the guest for compatibility
+>> handling; does it make sense to control this per-cpu, or does it need to
+>> be a vm-wide setting?
+>
+> It absolutely needs to be VM-wide. Only having half the vcpus
+> supporting tags wouldn't make much sense.
+>
+> But the problem is that the various versions of MTE are not
+> necessarily compatible, as MTE4 makes MTE3 optional (with a fallback
+> to MTE2)... There are more subtleties around the what instructions are
+> available in which mode, and whether the various subfeatures can be
+> configured or not.
 
-Having been able to start the guest means that we should have fully
-initialised the GIC. So a lockup is likely be an interaction with the
-GIC emulation itself, either because we failed to release a lock
-during initialisation, or due to some logic error in the GIC emulation
-(which is not necessarily MMIO...).
+So I guess we'll have to expose all of that to userspace, so that it can
+actually configure the various configurations that will surely show up
+in the wild...
 
-I've just given 6.4-rc5 a go on my Synquacer, which is the closest
-thing I have to Nathan's NXP box, and I can't spot anything odd.
-
-It would also help to get access to the EDK2 build. It wouldn't be the
-first time that a change in KVM breaks some EDK2 behaviour.
-
-Finally, on top of the traces that Oliver asked above, looking at
-where the QEMU vcpu threads are would be interesting (I assume they'd
-be sleeping in the kernel).
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
