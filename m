@@ -1,106 +1,210 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D1119930
-	for <kvmarm@lists.linux.dev>; Thu,  8 Jun 2023 17:57:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D14ACC433D2;
-	Thu,  8 Jun 2023 17:57:09 +0000 (UTC)
-Date: Thu, 8 Jun 2023 18:57:07 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Cornelia Huck <cohuck@redhat.com>,
-	Suraj Jitindar Singh <surajjs@amazon.com>, jingzhangos@google.com,
-	alexandru.elisei@arm.com, james.morse@arm.com, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	oupton@google.com, pbonzini@redhat.com, rananta@google.com,
-	reijiw@google.com, suzuki.poulose@arm.com, tabba@google.com,
-	will@kernel.org, sjitindarsingh@gmail.com
-Subject: Re: [PATCH 3/3] KVM: arm64: Use per guest ID register for
- ID_AA64PFR1_EL1.MTE
-Message-ID: <ZIIWc5v67cpMqEMU@arm.com>
-References: <20230602005118.2899664-1-jingzhangos@google.com>
- <20230602221447.1809849-1-surajjs@amazon.com>
- <20230602221447.1809849-4-surajjs@amazon.com>
- <873539ospa.wl-maz@kernel.org>
- <87h6rl50dl.fsf@redhat.com>
- <87legwo83z.wl-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45D9D1F187
+	for <kvmarm@lists.linux.dev>; Thu,  8 Jun 2023 20:17:46 +0000 (UTC)
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5169f614977so1824266a12.3
+        for <kvmarm@lists.linux.dev>; Thu, 08 Jun 2023 13:17:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1686255464; x=1688847464;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yFfOuXxs8iGOdfT2qhI1JEq3SXtax8RxnY5/Fc1nskw=;
+        b=tOrPL690XMDizppt1902CZdnVhRRGiAVY2h6pQOMPMquGW96yGqxA0WIbSxFO2hzYj
+         QJWnaa2e9gObU8AZ2JFs1RnUAEJIDlYvyz3Vk0eN8oMhXzeUPdODFYrHIciSsxP+IkvB
+         jQwIzPalMrRq9DKz/4lf8td/DpbRjoc5ifdZhGCvIzaMTootBnpupjCsIyoRUICz4e/t
+         s7DCsNccifNfK4D9fga3PZMYqo8cjQOHa1g5+0GmjGcyvRnrUycsTbOan/Dr+m5rK0cw
+         99nId16qyeJxOEnOuTWeiopCyGHCtsnDGSzjOlTPx/PNiWyaKL9qyVPA3bhi1oIBq4wV
+         bWXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686255464; x=1688847464;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yFfOuXxs8iGOdfT2qhI1JEq3SXtax8RxnY5/Fc1nskw=;
+        b=hBiQYnB62nicvL7lDM+1MKugsaEfEkwg0Zo1GV6h6fzki6kpIqmsoAflsmaweUjGBw
+         XENxSIiiM9bi6+RcBAPGa0wJ5aAkiNWYDgRR+6M46MCM2xE/eHS6CSaVBBZHbFZJXBj3
+         tGm27i/KW2r8CsjPdJ92bhSxh2lQ9lHrQcbtupMqPgjRBBMKAov66oSI3ECtM25+Mwkx
+         n+pvsoCXAlvKzO1UXW4LcPQ0kXPzuFC2eQXIYSCPYc+a3X9j5b15LrMlh1GOb8X5lPGE
+         7X8+4/EqGbDN+0XY3ypGfjjlO6LVFLgP05yr7Wms6uFC3Sj3B4Q1UAM5FHsjpcYe6RUD
+         Nqag==
+X-Gm-Message-State: AC+VfDwUaMu9EUrW47YjdX8XZuvE2uOqlaF2QgcSV3oM6u+plY6R3oDO
+	CXkr6qqISMdH+ie604xmyRsbrqQ5MRa1NVvkm0tvtg==
+X-Google-Smtp-Source: ACHHUZ5rIRRCqsHv8Mj5sYTFvVoPuCCGYYh1ahL9p64lBD/iRVAni/xzcUb+JGKF5FFtYateiNco/3eYHVsT49XamTA=
+X-Received: by 2002:a17:907:c13:b0:973:d846:cd5d with SMTP id
+ ga19-20020a1709070c1300b00973d846cd5dmr154165ejc.74.1686255464184; Thu, 08
+ Jun 2023 13:17:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87legwo83z.wl-maz@kernel.org>
+References: <20230602160914.4011728-1-vipinsh@google.com> <20230602160914.4011728-10-vipinsh@google.com>
+ <20230605223520.00007fbd.zhi.wang.linux@gmail.com> <ZH9tQjQk7QLyhUQR@google.com>
+ <20230607203711.000054ae.zhi.wang.linux@gmail.com>
+In-Reply-To: <20230607203711.000054ae.zhi.wang.linux@gmail.com>
+From: Vipin Sharma <vipinsh@google.com>
+Date: Thu, 8 Jun 2023 13:17:08 -0700
+Message-ID: <CAHVum0dtZ2wW+itsOE=a7wwATu4VcGN-dQH1zF7Pz1LYy7J4UQ@mail.gmail.com>
+Subject: Re: [PATCH v2 09/16] KVM: arm64: Document the page table walker
+ actions based on the callback's return value
+To: Zhi Wang <zhi.wang.linux@gmail.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, 
+	tsbogend@alpha.franken.de, anup@brainfault.org, atishp@atishpatra.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	seanjc@google.com, pbonzini@redhat.com, dmatlack@google.com, 
+	ricarkol@google.com, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kselftest@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 06, 2023 at 05:42:24PM +0100, Marc Zyngier wrote:
-> On Mon, 05 Jun 2023 17:39:50 +0100,
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> > On Sat, Jun 03 2023, Marc Zyngier <maz@kernel.org> wrote:
-> > > On Fri, 02 Jun 2023 23:14:47 +0100,
-> > > Suraj Jitindar Singh <surajjs@amazon.com> wrote:
-> > >> 
-> > >> With per guest ID registers, MTE settings from userspace can be stored in
-> > >> its corresponding ID register.
-> > >> 
-> > >> No functional change intended.
-> > >> 
-> > >> Signed-off-by: Suraj Jitindar Singh <surajjs@amazon.com>
-> > >> ---
-> > >>  arch/arm64/include/asm/kvm_host.h | 21 ++++++++++-----------
-> > >>  arch/arm64/kvm/arm.c              | 11 ++++++++++-
-> > >>  arch/arm64/kvm/sys_regs.c         |  5 +++++
-> > >>  3 files changed, 25 insertions(+), 12 deletions(-)
-> > >> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > >> index ca18c09ccf82..6fc4190559d1 100644
-> > >> --- a/arch/arm64/kvm/arm.c
-> > >> +++ b/arch/arm64/kvm/arm.c
-> > >> @@ -80,8 +80,17 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-> > >>  		if (!system_supports_mte() || kvm->created_vcpus) {
-> > >>  			r = -EINVAL;
-> > >>  		} else {
-> > >> +			u64 val;
-> > >> +
-> > >> +			/* Protects the idregs against modification */
-> > >> +			mutex_lock(&kvm->arch.config_lock);
-> > >> +
-> > >> +			val = IDREG(kvm, SYS_ID_AA64PFR1_EL1);
-> > >> +			val |= FIELD_PREP(ID_AA64PFR1_EL1_MTE_MASK, 1);
+On Wed, Jun 7, 2023 at 5:37=E2=80=AFAM Zhi Wang <zhi.wang.linux@gmail.com> =
+wrote:
+>
+> On Tue, 6 Jun 2023 10:30:42 -0700
+> Vipin Sharma <vipinsh@google.com> wrote:
+>
+> > On Mon, Jun 05, 2023 at 10:35:20PM +0800, Zhi Wang wrote:
+> > > On Fri,  2 Jun 2023 09:09:07 -0700
+> > > Vipin Sharma <vipinsh@google.com> wrote:
 > > >
-> > > The architecture specifies 3 versions of MTE in the published ARM ARM,
-> > > with a 4th coming up as part of the 2022 extensions.
-> > 
-> > Is that the one that adds some more MTE<foo> bits in AA64PFR1 and
-> > AA64PFR2?
-> 
-> Yeah, that. You get ID_AA64PFR1_EL1.{MTE,MTE_frac,MTEX}, plus
-> ID_AA64PFR2_EL1.{MTEFAR,MTESTOREONLY,MTEPERM}... It this sounds like a
-> train wreck, then it probably is one!
+> > > > Document what the page table walker do when walker callback functio=
+n returns
+> > > > a value.
+> > > >
+> > > > Current documentation is not correct as negative error of -EAGAIN o=
+n a
+> > > > non-shared page table walker doesn't terminate the walker and conti=
+nues
+> > > > to the next step.
+> > > >
+> > > > There might be a better place to keep this information, for now thi=
+s
+> > > > documentation will work as a reference guide until a better way is
+> > > > found.
+> > > >
+> > >
+> > > After reading the whole patch series, I was thinking it might be a go=
+od
+> > > time to improve the way how the visitor function and page table walke=
+r
+> > > talk to each other. The error code is good enough before, but its mea=
+ning
+> > > seems limited and vague when the visitor function wants to express mo=
+re about
+> > > what exactly happens inside. I am not sure if it is a good idea to co=
+ntinue
+> > > that way: 1. found a new situation. 2. choosing a error code for visi=
+tor
+> > > function. 3. walker translates the error code into the situation to
+> > > handle. 4. document the error code and its actual meaning.
+> > >
+> > > Eventually I am afraid that we are going to abuse the error code.
+> >
+> > I agree that error numbers are not sufficient and this will become more
+> > difficult and cumbersome for more cases in future if we need different
+> > behavior based on different error codes for different visitor functions=
+.
+> >
+> > >
+> > > What about introducing a set of flags for the visitor function to exp=
+ress
+> > > what happened and simplify the existing error code?
+> > >
+> >
+> > If I understood correctly what you meant, I think this will also end up
+> > having the same issue down the line, we are just switching errors with
+> > flags as they might not be able to express everything.
+> >
+> > "Flags for visitor function to express what happened"  - This is what
+> > ret val and errors do.
+> >
+>
+> Thanks so much for the efforts of the sample code.
+>
+> But when the "ret val" is an error code for pgtable matters, It turns vag=
+ue.
+> We have -EAGAIN to represent "retry" and "-ENONET" to represent PTE not t=
+here,
+> and they seems end up with different behaviors in different types of pgta=
+ble
+> walk. That is what I feels off.
+>
+> visitor_cb has two different requirements of returning the status: 1)
+> something wrong happens *not* related to the pgtable, e.g. failing to
+> allocate memory. 2) something happens related to the pgtable. e.g PTE doe=
+sn't
+> exists.
+>
+> For 1) It is natural to return an error code and the caller might just ba=
+il out
+> via its error handling path.
+>
+> I think the core problem is: the two different usages are mixed and they =
+don't
+> actually fit with each other. 2) is requiring more details in the future =
+other
+> than a simple error code.
+>
+>
+> For 2) I think it is better have a set of flags. the name of the flags ca=
+n
+> carry more explicit meanings than error code. E.g.:
+>
+> ------------------
+>
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/as=
+m/kvm_pgtable.h
+> index 4cd6762bda80..b3f24b321cd7 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -204,6 +204,15 @@ enum kvm_pgtable_walk_flags {
+>         KVM_PGTABLE_WALK_HANDLE_FAULT           =3D BIT(4),
+>  };
+>
+> +struct kvm_pgtable_walk_status {
+> +       union {
+> +               u8 raw;
+> +               struct {
+> +                       unsigned retry:1;
+> +                       unsigned stop:1;
+> +                       unsigned ignore:1;
+> +                       /* more to come */
+> +               };
+> +       };
+> +};
+> +
+>  struct kvm_pgtable_visit_ctx {
+>         kvm_pte_t                               *ptep;
+>         kvm_pte_t                               old;
+> @@ -213,8 +222,10 @@ struct kvm_pgtable_visit_ctx {
+>         u64                                     end;
+>         u32                                     level;
+>         enum kvm_pgtable_walk_flags             flags;
+> +       struct kvm_pgtable_walk_status          *status;
+>  };
+>
+>  typedef int (*kvm_pgtable_visitor_fn_t)(const struct kvm_pgtable_visit_c=
+tx *ctx,
+>                                         enum kvm_pgtable_walk_flags visit=
+);
+>
+> ----------------
+>
+> Visitor functions sets the flags via ctx->status and kvm_pgtable_walk_xxx=
+ can
+> check the bits in the ctx to decide what to do for the next.
+>
+> I can cook a patch for re-factoring this part if we think it is a good id=
+ea.
+>
 
-I stared about an hour at that documentation and I think I got it (well,
-for the next couple of hours). The disappearing of MTE_FEAT_ASYNC from
-MTE2 is potentially problematic but the worst that can happen is that
-async faults are simply not triggered (and TBH, those "faults" were not
-that useful anyway). MTE4 without ASYM is defined in a weird way.
-Basically there's no such thing as MTE4, just 2 and 3 (the latter
-bringing in ASYM) with some extra features like store-only, stage 2
-permission, canonical tag checking.
-
-I don't think any of these new MTE extensions add any state that KVM
-should care context-switch, so we should be fine. Does KVM limit the
-maximum value of the ID field exposed to user? Some future MTE9 may add
-new state, so better to be safe (I thought we handled these cases but
-can't find it now).
-
-It's also probably safe to disable MTE altogether if there's any
-difference between all these fields on different CPUs (I don't think we
-currently do, we just go for lower safe while ignoring MTE_frac, MTEX).
-
-Regarding MTEX, I don't think Linux would ever make use of the canonical
-tag checking. The enabling bit is unfortunately in TCR_EL1 which we
-don't context-switch (and maybe cached in the TLB, I haven't checked the
-latest spec).
-
--- 
-Catalin
+This can also be one option. I will wait till others also weigh in on
+how to make walkers and callbacks work together for more use cases.
