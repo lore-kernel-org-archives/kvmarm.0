@@ -1,295 +1,79 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60A441429A
-	for <kvmarm@lists.linux.dev>; Thu,  8 Jun 2023 20:42:11 +0000 (UTC)
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-653bed78635so775992b3a.0
-        for <kvmarm@lists.linux.dev>; Thu, 08 Jun 2023 13:42:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686256931; x=1688848931;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OJc7v2gd1zqw9e9bXf/VJ7wneJW7ODsFhMJ4UoXicLA=;
-        b=iFL9SJTHPhDtJAMHT5UcHxie49cfExl7x/YdNXtwsgagji48BOma96AV8tdHcdTiNy
-         a1vShxLaY/FyfFzHTCD3z18X1lL+idX0cFKVNEuAryukWPFBSzYNR1s+/Z2FOSTki3OZ
-         gZXB57arsO9wgclWML5w5uR4NM8TjK2afXA/8+gOQnogugAHr/VTZe9hQvdoKOcgYS0n
-         h7Pyyyze7Urfs3xb4C682RXJ91ZcTKedPprQXyOZC8QglK4XB5Af4gFHqavoHrDWkykS
-         THxK6FCQPP1k99ce5pXXIJt/NHtiHvueMMvZD9MQf+/Sq5oqWrfaa0CH4MlhziEgbye1
-         SbIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686256931; x=1688848931;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OJc7v2gd1zqw9e9bXf/VJ7wneJW7ODsFhMJ4UoXicLA=;
-        b=Hge0Njs+LrtOB3p444fuqFH3We0GFV/gor71r6SH2Ky3PyhI0Y3ErfcaH+KzwQdb5I
-         qVZQlbfJOOu/Sx2mBlfHFgku99QbbT7BpxotY+ZIWsib4xXUeYcn6IYeS91fQDeqI+pB
-         LriGokle84hh+xF12isSlKHSzOCcfLMfEwskXLQUz521EMpmlbD0K8rs+apaLzrcDhL3
-         FHkdmgsudCJANn2HoGGg3RwK0/jjP6k7K90f6dJEY5Pifc+cBQ5lomPgOOdOp8W9FwUx
-         zjb32HHOjtIzZXQg907ucjiuAUBCXC1ns79T8gwR77bBrENc86NUfDVjJ5t9LT3iG8CT
-         uhMA==
-X-Gm-Message-State: AC+VfDzhQ/pJ2AmFaTfUEwqpEJSE90pgldWG6BGoiBkNxmgM1DLWlY1O
-	y1mUB5ES4+x2bPJJ9fLYwyHf7bmmNpo=
-X-Google-Smtp-Source: ACHHUZ6eV8Cg3uXBSyDetZpxlRVx+tS8gqRI4k8h37IQMzMrSLgRCaMDbvwv31xXOT8jQJsFtdyhLA==
-X-Received: by 2002:a17:903:41d0:b0:1af:df8e:d534 with SMTP id u16-20020a17090341d000b001afdf8ed534mr3591931ple.27.1686256930335;
-        Thu, 08 Jun 2023 13:42:10 -0700 (PDT)
-Received: from smtpclient.apple ([66.170.99.113])
-        by smtp.gmail.com with ESMTPSA id d15-20020a170902cecf00b001ab09f5ca61sm1841183plg.55.2023.06.08.13.42.09
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 08 Jun 2023 13:42:09 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 574207464
+	for <kvmarm@lists.linux.dev>; Thu,  8 Jun 2023 21:55:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92874C433D2;
+	Thu,  8 Jun 2023 21:55:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1686261331;
+	bh=jLLIY+6XSJEnROaCzPa2cWfvfUfImfLErJ0cuoIYyGM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PY2OcR2XIqmjOkJa9pEgbQUEQtTTesBr8kBDccpp+O9oUuJZarlgUG2A/BKmmrYfZ
+	 a42HZQ0ESa5M2JKbDiQ40tREnJzfUk9mKKZbkyoLKHYuN2YiVBBdJmSWemmmuvzvG9
+	 ZNHfAwdY9gtdTLkSRfbeHkDukF87wFfCe1Aya3mPo6sfgChzHDJRxrRJ3bCb09AYTQ
+	 SDNsT2KXlyU1rm9xCFQ2qW9nSyS4/lz3x3oCQ6O5fcfNwrrHEPc67d/V2x2stK7m6k
+	 nmWyp1PDWfA7yrZzWIz+ZazhJhIFmeggvTNA3Z0q2jdXEoL6SDG32yhz4tPIoEtIZ0
+	 6gNggbFSCE1lQ==
+Date: Thu, 8 Jun 2023 22:55:26 +0100
+From: Will Deacon <will@kernel.org>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>, maz@kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, tabba@google.com,
+	kaleshsingh@google.com, catalin.marinas@arm.com,
+	yuzenghui@huawei.com, suzuki.poulose@arm.com, james.morse@arm.com
+Subject: Re: [PATCH] KVM: arm64: Use different pointer authentication keys
+ for pKVM
+Message-ID: <20230608215525.GA2742@willie-the-truck>
+References: <20230516141531.791492-1-smostafa@google.com>
+ <ZHEa+HAixbYijQTA@linux.dev>
+ <ZHSJ38WATzgJF7SR@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.600.7\))
-Subject: Re: [kvm-unit-tests PATCH v6 28/32] arm64: Add support for efi in
- Makefile
-From: Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <20230530160924.82158-29-nikos.nikoleris@arm.com>
-Date: Thu, 8 Jun 2023 13:41:58 -0700
-Cc: kvm@vger.kernel.org,
- kvmarm@lists.linux.dev,
- andrew.jones@linux.dev,
- Paolo Bonzini <pbonzini@redhat.com>,
- alexandru.elisei@arm.com,
- ricarkol@google.com,
- shahuang@redhat.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <197A5432-65EA-49A7-AD6D-1AFCB58D30D0@gmail.com>
-References: <20230530160924.82158-1-nikos.nikoleris@arm.com>
- <20230530160924.82158-29-nikos.nikoleris@arm.com>
-To: Nikos Nikoleris <nikos.nikoleris@arm.com>
-X-Mailer: Apple Mail (2.3731.600.7)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZHSJ38WATzgJF7SR@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
+On Mon, May 29, 2023 at 11:17:51AM +0000, Mostafa Saleh wrote:
+> On Fri, May 26, 2023 at 08:47:52PM +0000, Oliver Upton wrote:
+> > On Tue, May 16, 2023 at 02:15:31PM +0000, Mostafa Saleh wrote:
+> > > When the kernel is compiled with CONFIG_ARM64_PTR_AUTH_KERNEL, it
+> > > uses Armv8.3-Pauth for return address protection for the kernel code
+> > > including nvhe code in EL2.
+> > > 
+> > > Same keys are used in both kernel(EL1) and nvhe code(EL2), this is
+> > > fine for nvhe but not when running in protected mode(pKVM) as the host
+> > > can't be trusted.
+> > 
+> > But we trust it enough to hand pKVM a fresh set of keys before firing
+> > off? I understand there is some degree of initialization required to get
+> > pKVM off the ground, but I question in this case if key handoff is
+> > strictly necessary.
+> >
+> > There are potentially other sources of random directly available at EL2,
+> > such as the SMCCC TRNG ABI or FEAT_RNG. Should pKVM prefer one of these
+> > random implementations and only fall back to host-provided keys if
+> > absolutely necessary?
+> > 
+> According to my understanding, the kernel is still completely trusted at
+> this point (it sets the initial page table for the hypervisor), so I
+> believe it should be fine to trust it for ptrauth keys. However, I agree,
+> it would be better if the hypervisor can get its own keys through
+> firmware/hardware if supported. I will add this in V2.
 
+I appreciate the sentiment, but I think we should avoid adding additional
+complexity here if it adds no security benefit. If nothing else, it adds
+pointless overhead, but beyond that it gives the false illusion of a
+security boundary.
 
-> On May 30, 2023, at 9:09 AM, Nikos Nikoleris <nikos.nikoleris@arm.com> =
-wrote:
->=20
-> Users can now build kvm-unit-tests as efi apps by supplying an extra
-> argument when invoking configure:
->=20
-> $> ./configure --enable-efi
->=20
-> This patch is based on an earlier version by
-> Andrew Jones <drjones@redhat.com>
->=20
-> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-> Reviewed-by: Ricardo Koller <ricarkol@google.com>
-> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> ---
-> configure           | 17 +++++++++++++----
-> arm/Makefile.arm    |  6 ++++++
-> arm/Makefile.arm64  | 18 ++++++++++++++----
-> arm/Makefile.common | 45 ++++++++++++++++++++++++++++++++++-----------
-> 4 files changed, 67 insertions(+), 19 deletions(-)
->=20
-> diff --git a/configure b/configure
-> index c36fd290..b665f7d5 100755
-> --- a/configure
-> +++ b/configure
-> @@ -86,7 +86,7 @@ usage() {
->               pl011,mmio32,ADDR
->                           Specify a PL011 compatible UART at address =
-ADDR. Supported
->                           register stride is 32 bit only.
-> -    --[enable|disable]-efi Boot and run from UEFI (disabled by =
-default, x86_64 only)
-> +    --[enable|disable]-efi Boot and run from UEFI (disabled by =
-default, x86_64 and arm64 only)
->    --[enable|disable]-werror
->                           Select whether to compile with the -Werror =
-compiler flag
-> EOF
-> @@ -208,14 +208,19 @@ else
->     fi
-> fi
->=20
-> -if [ "$efi" ] && [ "$arch" !=3D "x86_64" ]; then
-> +if [ "$efi" ] && [ "$arch" !=3D "x86_64" ] && [ "$arch" !=3D "arm64" =
-]; then
->     echo "--[enable|disable]-efi is not supported for $arch"
->     usage
-> fi
->=20
-> if [ -z "$page_size" ]; then
-> -    [ "$arch" =3D "arm64" ] && page_size=3D"65536"
-> -    [ "$arch" =3D "arm" ] && page_size=3D"4096"
-> +    if [ "$efi" =3D 'y' ] && [ "$arch" =3D "arm64" ]; then
-> +        page_size=3D"4096"
-> +    elif [ "$arch" =3D "arm64" ]; then
-> +        page_size=3D"65536"
-> +    elif [ "$arch" =3D "arm" ]; then
-> +        page_size=3D"4096"
-> +    fi
-> else
->     if [ "$arch" !=3D "arm64" ]; then
->         echo "--page-size is not supported for $arch"
-> @@ -230,6 +235,10 @@ else
->         echo "arm64 doesn't support page size of $page_size"
->         usage
->     fi
-> +    if [ "$efi" =3D 'y' ] && [ "$page_size" !=3D "4096" ]; then
-> +        echo "efi must use 4K pages"
-> +        exit 1
-> +    fi
-> fi
->=20
-> [ -z "$processor" ] && processor=3D"$arch"
-> diff --git a/arm/Makefile.arm b/arm/Makefile.arm
-> index 01fd4c7b..2ce00f52 100644
-> --- a/arm/Makefile.arm
-> +++ b/arm/Makefile.arm
-> @@ -7,6 +7,10 @@ bits =3D 32
-> ldarch =3D elf32-littlearm
-> machine =3D -marm -mfpu=3Dvfp
->=20
-> +ifeq ($(CONFIG_EFI),y)
-> +$(error Cannot build arm32 tests as EFI apps)
-> +endif
-> +
-> # stack.o relies on frame pointers.
-> KEEP_FRAME_POINTER :=3D y
->=20
-> @@ -32,6 +36,8 @@ cflatobjs +=3D lib/arm/stack.o
-> cflatobjs +=3D lib/ldiv32.o
-> cflatobjs +=3D lib/arm/ldivmod.o
->=20
-> +exe =3D flat
-> +
-> # arm specific tests
-> tests =3D
->=20
-> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-> index 6dff6cad..eada7f9a 100644
-> --- a/arm/Makefile.arm64
-> +++ b/arm/Makefile.arm64
-> @@ -31,11 +31,21 @@ endif
->=20
-> OBJDIRS +=3D lib/arm64
->=20
-> +ifeq ($(CONFIG_EFI),y)
-> +# avoid jump tables before all relocations have been processed
-> +arm/efi/reloc_aarch64.o: CFLAGS +=3D -fno-jump-tables
-> +cflatobjs +=3D arm/efi/reloc_aarch64.o
-> +
-> +exe =3D efi
-> +else
-> +exe =3D flat
-> +endif
-> +
-> # arm64 specific tests
-> -tests =3D $(TEST_DIR)/timer.flat
-> -tests +=3D $(TEST_DIR)/micro-bench.flat
-> -tests +=3D $(TEST_DIR)/cache.flat
-> -tests +=3D $(TEST_DIR)/debug.flat
-> +tests =3D $(TEST_DIR)/timer.$(exe)
-> +tests +=3D $(TEST_DIR)/micro-bench.$(exe)
-> +tests +=3D $(TEST_DIR)/cache.$(exe)
-> +tests +=3D $(TEST_DIR)/debug.$(exe)
->=20
-> include $(SRCDIR)/$(TEST_DIR)/Makefile.common
->=20
-> diff --git a/arm/Makefile.common b/arm/Makefile.common
-> index 647b0fb1..a133309d 100644
-> --- a/arm/Makefile.common
-> +++ b/arm/Makefile.common
-> @@ -4,14 +4,14 @@
-> # Authors: Andrew Jones <drjones@redhat.com>
-> #
->=20
-> -tests-common  =3D $(TEST_DIR)/selftest.flat
-> -tests-common +=3D $(TEST_DIR)/spinlock-test.flat
-> -tests-common +=3D $(TEST_DIR)/pci-test.flat
-> -tests-common +=3D $(TEST_DIR)/pmu.flat
-> -tests-common +=3D $(TEST_DIR)/gic.flat
-> -tests-common +=3D $(TEST_DIR)/psci.flat
-> -tests-common +=3D $(TEST_DIR)/sieve.flat
-> -tests-common +=3D $(TEST_DIR)/pl031.flat
-> +tests-common  =3D $(TEST_DIR)/selftest.$(exe)
-> +tests-common +=3D $(TEST_DIR)/spinlock-test.$(exe)
-> +tests-common +=3D $(TEST_DIR)/pci-test.$(exe)
-> +tests-common +=3D $(TEST_DIR)/pmu.$(exe)
-> +tests-common +=3D $(TEST_DIR)/gic.$(exe)
-> +tests-common +=3D $(TEST_DIR)/psci.$(exe)
-> +tests-common +=3D $(TEST_DIR)/sieve.$(exe)
-> +tests-common +=3D $(TEST_DIR)/pl031.$(exe)
->=20
-> tests-all =3D $(tests-common) $(tests)
-> all: directories $(tests-all)
-> @@ -54,6 +54,9 @@ cflatobjs +=3D lib/arm/smp.o
-> cflatobjs +=3D lib/arm/delay.o
-> cflatobjs +=3D lib/arm/gic.o lib/arm/gic-v2.o lib/arm/gic-v3.o
-> cflatobjs +=3D lib/arm/timer.o
-> +ifeq ($(CONFIG_EFI),y)
-> +cflatobjs +=3D lib/efi.o
-> +endif
->=20
-> OBJDIRS +=3D lib/arm
->=20
-> @@ -61,6 +64,25 @@ libeabi =3D lib/arm/libeabi.a
-> eabiobjs =3D lib/arm/eabi_compat.o
->=20
-> FLATLIBS =3D $(libcflat) $(LIBFDT_archive) $(libeabi)
-> +
-> +ifeq ($(CONFIG_EFI),y)
-> +%.so: EFI_LDFLAGS +=3D -defsym=3DEFI_SUBSYSTEM=3D0xa --no-undefined
-> +%.so: %.o $(FLATLIBS) $(SRCDIR)/arm/efi/elf_aarch64_efi.lds =
-$(cstart.o)
-> + $(CC) $(CFLAGS) -c -o $(@:.so=3D.aux.o) $(SRCDIR)/lib/auxinfo.c \
-> + -DPROGNAME=3D\"$(@:.so=3D.efi)\" -DAUXFLAGS=3D$(AUXFLAGS)
-> + $(LD) $(EFI_LDFLAGS) -o $@ -T $(SRCDIR)/arm/efi/elf_aarch64_efi.lds =
-\
-> + $(filter %.o, $^) $(FLATLIBS) $(@:.so=3D.aux.o) \
-> + $(EFI_LIBS)
-> + $(RM) $(@:.so=3D.aux.o)
-> +
-> +%.efi: %.so
-> + $(call arch_elf_check, $^)
-> + $(OBJCOPY) \
-> + -j .text -j .sdata -j .data -j .dynamic -j .dynsym \
-> + -j .rel -j .rela -j .rel.* -j .rela.* -j .rel* -j .rela* \
-> + -j .reloc \
-> + -O binary $^ $@
+Prior to deprivilege, the kernel can write to the hypervisor text, modify
+its stage-1 page-table and change its data values. I think the pointer
+auth keys are the least of our worries if it's compromised...
 
-I really appreciate your work Nikos, and I might be late since I see =
-Drew
-already applied it to his queue. So consider this email, my previous =
-one, and
-others that might follow more as grievances that can easily be addressed =
-later.
-
-So: It would=E2=80=99ve been nice to keep the symbols and debug =
-information in a
-separate file. Something like:
-
-diff --git a/arm/Makefile.common b/arm/Makefile.common
-index d60cf8c..f904702 100644
---- a/arm/Makefile.common
-+++ b/arm/Makefile.common
-@@ -69,7 +69,7 @@ FLATLIBS =3D $(libcflat) $(LIBFDT_archive) $(libeabi)
- ifeq ($(CONFIG_EFI),y)
- %.so: EFI_LDFLAGS +=3D -defsym=3DEFI_SUBSYSTEM=3D0xa --no-undefined
- %.so: %.o $(FLATLIBS) $(SRCDIR)/arm/efi/elf_aarch64_efi.lds $(cstart.o)
--       $(CC) $(CFLAGS) -c -o $(@:.so=3D.aux.o) $(SRCDIR)/lib/auxinfo.c =
-\
-+       $(CC) $(CFLAGS) -c -g -o $(@:.so=3D.aux.o) =
-$(SRCDIR)/lib/auxinfo.c \
-                -DPROGNAME=3D\"$(@:.so=3D.efi)\" -DAUXFLAGS=3D$(AUXFLAGS)
-        $(LD) $(EFI_LDFLAGS) -o $@ -T =
-$(SRCDIR)/arm/efi/elf_aarch64_efi.lds \
-                $(filter %.o, $^) $(FLATLIBS) $(@:.so=3D.aux.o) \
-@@ -78,6 +78,9 @@ ifeq ($(CONFIG_EFI),y)
-   %.efi: %.so
-        $(call arch_elf_check, $^)
-+       $(OBJCOPY) --only-keep-debug $^ $@.debug
-+       $(OBJCOPY) --strip-debug $^
-+       $(OBJCOPY) --add-gnu-debuglink=3D$@.debug $^
-        $(OBJCOPY) \
-                -j .text -j .sdata -j .data -j .dynamic -j .dynsym \
-                -j .rel -j .rela -j .rel.* -j .rela.* -j .rel* -j .rela* =
-\=
+Will
