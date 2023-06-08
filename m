@@ -1,100 +1,89 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FFC333E2
-	for <kvmarm@lists.linux.dev>; Thu,  8 Jun 2023 16:38:15 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9ADA6AB6;
-	Thu,  8 Jun 2023 09:39:00 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3BE433F587;
-	Thu,  8 Jun 2023 09:38:13 -0700 (PDT)
-Date: Thu, 8 Jun 2023 17:38:10 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
-	will@kernel.org, oliver.upton@linux.dev, ricarkol@google.com,
-	reijiw@google.com, mark.rutland@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 0/6] arm: pmu: Fix random failures of
- pmu-chain-promotion
-Message-ID: <ZIID8psAxNOoMSIM@monolith.localdoman>
-References: <20230531201438.3881600-1-eric.auger@redhat.com>
- <20230607-a12c8e1d270b53e522756648@orel>
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA06F19E44
+	for <kvmarm@lists.linux.dev>; Thu,  8 Jun 2023 17:19:07 +0000 (UTC)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1b24ff03400so5417255ad.3
+        for <kvmarm@lists.linux.dev>; Thu, 08 Jun 2023 10:19:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686244747; x=1688836747;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xn4z4bAdLLnUlD27MUprwNeTY3jrE96t84qZ964f9xY=;
+        b=A7nR4+SOsuhrP4/mJAD4mWHu+cMDM2QkXpBSOkdYLrelvxn+IvdhuS6cxi5mB4yiam
+         ogbRfUtaU9t3ZBBMl/KXuDl85TOjXMPFwZHjC7A/0q2tY6RiF0KYwJ+kxQbJJ9JQa4/g
+         N7yY2aL1r8T5znpL37Uev3UBg2SnMwqQwf2rvoW72nmShobFz5deiPceOT/4YkJA4Bcu
+         JsdfiA4vZhbx43LJOe/blRxtHReFCPL/+/M0oKkBarN6bNOATxsuCteuMZUdjdDPTikD
+         qrqcaff/skuy4qFqDouHZP41H9lPYRm654HcGpZO27UthFcqYPc6vZ6J88FbrCDT+o0D
+         NUZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686244747; x=1688836747;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xn4z4bAdLLnUlD27MUprwNeTY3jrE96t84qZ964f9xY=;
+        b=IjrxFIQNrc9YtmWggCgTVDu9XBksmnAxelBUbFy0+YE22xVYphQsUqevDQTH8rJRF8
+         MvnM4JRDjCokQCdd7u3BwspDu9IEAtmTBs50+UE1vNhCMtASaeiPJW8LFYDEM4nvYC+f
+         hSft69mHyTJNtJkFF5tuRV1q9sRFrgntixMj8pf1l7X4cQTbsCffOs0y6mCjuMRXLOn0
+         0lf4cghgLoWSvTSzGMTAYp7MZP6eLXx65BCIL0QP75Vc0DdkX2vMGtnj5o0HVzdyRtqI
+         9Do1LVY+U0+K6gn/H5ps4SvLCM3n8N9pOQRIBBJ0EQLRFLurfw2sRykN09PqVRPqejZJ
+         a00w==
+X-Gm-Message-State: AC+VfDyXQtHH+aNQkk0SdQ3V+VI4pssvLwIHteYaE3sLbcNSdKhb/n/v
+	Zcjl02YuxqUfZ8ZoajVm19VSsSVzuuc=
+X-Google-Smtp-Source: ACHHUZ7adI2YgI6vjLXTvVu6AZpT3Ndk7WpCL9qLv9m7+wBNFY63OV6LQ4FpJW8k1QuodPQZnNrIow==
+X-Received: by 2002:a17:902:b20e:b0:1b1:9218:6bf9 with SMTP id t14-20020a170902b20e00b001b192186bf9mr5547527plr.43.1686244746610;
+        Thu, 08 Jun 2023 10:19:06 -0700 (PDT)
+Received: from smtpclient.apple ([66.170.99.113])
+        by smtp.gmail.com with ESMTPSA id j3-20020a17090276c300b001ac7af58b66sm1674083plt.224.2023.06.08.10.19.05
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 08 Jun 2023 10:19:06 -0700 (PDT)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230607-a12c8e1d270b53e522756648@orel>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.600.7\))
+Subject: Re: [kvm-unit-tests PATCH v6 12/32] arm64: Add support for
+ discovering the UART through ACPI
+From: Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <20230530160924.82158-13-nikos.nikoleris@arm.com>
+Date: Thu, 8 Jun 2023 10:18:54 -0700
+Cc: kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev,
+ andrew.jones@linux.dev,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ alexandru.elisei@arm.com,
+ ricarkol@google.com,
+ shahuang@redhat.com,
+ Andrew Jones <drjones@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <7DA92888-3042-4036-A769-E9F941AF98A5@gmail.com>
+References: <20230530160924.82158-1-nikos.nikoleris@arm.com>
+ <20230530160924.82158-13-nikos.nikoleris@arm.com>
+To: Nikos Nikoleris <nikos.nikoleris@arm.com>
+X-Mailer: Apple Mail (2.3731.600.7)
 
-Hi,
 
-On Wed, Jun 07, 2023 at 09:07:09PM +0200, Andrew Jones wrote:
-> On Wed, May 31, 2023 at 10:14:32PM +0200, Eric Auger wrote:
-> > On some HW (ThunderXv2), some random failures of
-> > pmu-chain-promotion test can be observed.
-> > 
-> > pmu-chain-promotion is composed of several subtests
-> > which run 2 mem_access loops. The initial value of
-> > the counter is set so that no overflow is expected on
-> > the first loop run and overflow is expected on the second.
-> > However it is observed that sometimes we get an overflow
-> > on the first run. It looks related to some variability of
-> > the mem_acess count. This variability is observed on all
-> > HW I have access to, with different span though. On
-> > ThunderX2 HW it looks the margin that is currently taken
-> > is too small and we regularly hit failure.
-> > 
-> > although the first goal of this series is to increase
-> > the count/margin used in those tests, it also attempts
-> > to improve the pmu-chain-promotion logs, add some barriers
-> > in the mem-access loop, clarify the chain counter
-> > enable/disable sequence.
-> > 
-> > A new 'pmu-mem-access-reliability' is also introduced to
-> > detect issues with MEM_ACCESS event variability and make
-> > the debug easier.
-> > 
-> > Obviously one can wonder if this variability is something normal
-> > and does not hide any other bug. I hope this series will raise
-> > additional discussions about this.
-> > 
-> > https://github.com/eauger/kut/tree/pmu-chain-promotion-fixes-v2
-> > 
-> > History:
-> > v1 -> v2:
-> > - Take into account Alexandru's & Mark's comments. Added some
-> >   R-b's and T-b's.
-> > 
-> > Eric Auger (6):
-> >   arm: pmu: pmu-chain-promotion: Improve debug messages
-> >   arm: pmu: pmu-chain-promotion: Introduce defines for count and margin
-> >     values
-> >   arm: pmu: Add extra DSB barriers in the mem_access loop
-> >   arm: pmu: Fix chain counter enable/disable sequences
-> >   arm: pmu: Add pmu-mem-access-reliability test
-> >   arm: pmu-chain-promotion: Increase the count and margin values
-> > 
-> >  arm/pmu.c         | 196 +++++++++++++++++++++++++++++++++-------------
-> >  arm/unittests.cfg |   6 ++
-> >  2 files changed, 148 insertions(+), 54 deletions(-)
-> > 
-> > -- 
-> > 2.38.1
-> >
-> 
-> Hi Eric,
-> 
-> I'm eager to merge this, but I'll give Alexandru some time to revisit it
-> since he had comments on the last revision.
+On May 30, 2023, at 9:09 AM, Nikos Nikoleris <nikos.nikoleris@arm.com> =
+wrote:
 
-I've just come back from holiday, I'll have a look next week.
+>=20
+> +static void uart0_init_acpi(void)
+> +{
+> +	struct spcr_descriptor *spcr =3D =
+find_acpi_table_addr(SPCR_SIGNATURE);
+> +
+> +	assert_msg(spcr, "Unable to find ACPI SPCR");
+> +	uart0_base =3D ioremap(spcr->serial_port.address, =
+spcr->serial_port.bit_width);
+> +}
 
-Thanks,
-Alex
+Is it possible as a fallback, is SPCR is not available, to =
+UART_EARLY_BASE as
+address and bit_width as bit-width?
 
-> 
-> Thanks,
-> drew
+I would appreciate it, since it would help my setup.
+
