@@ -1,110 +1,100 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 039D115ADE
-	for <kvmarm@lists.linux.dev>; Thu,  8 Jun 2023 15:53:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC887C433EF;
-	Thu,  8 Jun 2023 15:53:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1686239587;
-	bh=eM0r7LYZ4B4QPeMwyPpJr5eyhDkivEWbzbqklj2jVoY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=R3qgBH2Yr4nTEIq4BcMwCHY14gD1SdwiSYB3GWouB0FG1t1/qLlvMFEbHAoQwL0xm
-	 R7GeVeRb9mmTaGFCsHU8zErJDofuWe2HYa7HKN78H1UJBsCKtCd3MrB6SdiGEsUEF8
-	 lhAESqDwYtPzRlyqAZDmE+53i1LxibM6hubEaZ9V4CaTTt2AIDPncvrEx8HIh2jwWo
-	 Ui8CBvTKCMM/6ZZKPNlIsvCk+Aj6tyUFmVEoetcALcWRVS+UAAdaKux2upPTVWrgF6
-	 SuvqDUhMU1IcGaLj/OL3C7kCpmD/iIIPFxMevyc+gyvYt0IiSOgZAMQg1Vl4VcqTC4
-	 yJAlKLGKvBZwA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1q7Hwf-003pzj-GO;
-	Thu, 08 Jun 2023 16:53:05 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Mark Rutland <mark.rutland@arm.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Reiji Watanabe <reijiw@google.com>,
-	Sebastian Ott <sebott@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.4, take #4
-Date: Thu,  8 Jun 2023 16:52:55 +0100
-Message-Id: <20230608155255.1850620-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FFC333E2
+	for <kvmarm@lists.linux.dev>; Thu,  8 Jun 2023 16:38:15 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9ADA6AB6;
+	Thu,  8 Jun 2023 09:39:00 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3BE433F587;
+	Thu,  8 Jun 2023 09:38:13 -0700 (PDT)
+Date: Thu, 8 Jun 2023 17:38:10 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+	will@kernel.org, oliver.upton@linux.dev, ricarkol@google.com,
+	reijiw@google.com, mark.rutland@arm.com
+Subject: Re: [kvm-unit-tests PATCH v2 0/6] arm: pmu: Fix random failures of
+ pmu-chain-promotion
+Message-ID: <ZIID8psAxNOoMSIM@monolith.localdoman>
+References: <20230531201438.3881600-1-eric.auger@redhat.com>
+ <20230607-a12c8e1d270b53e522756648@orel>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, mark.rutland@arm.com, nathan@kernel.org, oliver.upton@linux.dev, reijiw@google.com, sebott@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230607-a12c8e1d270b53e522756648@orel>
 
-Paolo,
+Hi,
 
-Here's yet another batch of fixes, two of them addressing pretty
-recent regressions: GICv2 emulation on GICv3 was accidently killed,
-and the PMU rework needed some tweaking.
+On Wed, Jun 07, 2023 at 09:07:09PM +0200, Andrew Jones wrote:
+> On Wed, May 31, 2023 at 10:14:32PM +0200, Eric Auger wrote:
+> > On some HW (ThunderXv2), some random failures of
+> > pmu-chain-promotion test can be observed.
+> > 
+> > pmu-chain-promotion is composed of several subtests
+> > which run 2 mem_access loops. The initial value of
+> > the counter is set so that no overflow is expected on
+> > the first loop run and overflow is expected on the second.
+> > However it is observed that sometimes we get an overflow
+> > on the first run. It looks related to some variability of
+> > the mem_acess count. This variability is observed on all
+> > HW I have access to, with different span though. On
+> > ThunderX2 HW it looks the margin that is currently taken
+> > is too small and we regularly hit failure.
+> > 
+> > although the first goal of this series is to increase
+> > the count/margin used in those tests, it also attempts
+> > to improve the pmu-chain-promotion logs, add some barriers
+> > in the mem-access loop, clarify the chain counter
+> > enable/disable sequence.
+> > 
+> > A new 'pmu-mem-access-reliability' is also introduced to
+> > detect issues with MEM_ACCESS event variability and make
+> > the debug easier.
+> > 
+> > Obviously one can wonder if this variability is something normal
+> > and does not hide any other bug. I hope this series will raise
+> > additional discussions about this.
+> > 
+> > https://github.com/eauger/kut/tree/pmu-chain-promotion-fixes-v2
+> > 
+> > History:
+> > v1 -> v2:
+> > - Take into account Alexandru's & Mark's comments. Added some
+> >   R-b's and T-b's.
+> > 
+> > Eric Auger (6):
+> >   arm: pmu: pmu-chain-promotion: Improve debug messages
+> >   arm: pmu: pmu-chain-promotion: Introduce defines for count and margin
+> >     values
+> >   arm: pmu: Add extra DSB barriers in the mem_access loop
+> >   arm: pmu: Fix chain counter enable/disable sequences
+> >   arm: pmu: Add pmu-mem-access-reliability test
+> >   arm: pmu-chain-promotion: Increase the count and margin values
+> > 
+> >  arm/pmu.c         | 196 +++++++++++++++++++++++++++++++++-------------
+> >  arm/unittests.cfg |   6 ++
+> >  2 files changed, 148 insertions(+), 54 deletions(-)
+> > 
+> > -- 
+> > 2.38.1
+> >
+> 
+> Hi Eric,
+> 
+> I'm eager to merge this, but I'll give Alexandru some time to revisit it
+> since he had comments on the last revision.
 
-The last two patches address an annoying PMU (again) problem where
-the KVM requirements were never factored in when PMU counters were
-directly exposed to userspace. Reiji has been working on a fix, which
-is now readdy to be merged.
+I've just come back from holiday, I'll have a look next week.
 
-Please pull,
+Thanks,
+Alex
 
-        M.
-
-The following changes since commit 40e54cad454076172cc3e2bca60aa924650a3e4b:
-
-  KVM: arm64: Document default vPMU behavior on heterogeneous systems (2023-05-31 10:29:56 +0100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.4-4
-
-for you to fetch changes up to 30c60dda219ddda0bc6ff6ac55d493d9db8be4fa:
-
-  KVM: arm64: Use raw_smp_processor_id() in kvm_pmu_probe_armpmu() (2023-06-07 16:48:34 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.4, take #4
-
-- Correctly save/restore PMUSERNR_EL0 when host userspace is using
-  PMU counters directly
-
-- Fix GICv2 emulation on GICv3 after the locking rework
-
-- Don't use smp_processor_id() in kvm_pmu_probe_armpmu(), and
-  document why...
-
-----------------------------------------------------------------
-Marc Zyngier (1):
-      KVM: arm64: Restore GICv2-on-GICv3 functionality
-
-Oliver Upton (1):
-      KVM: arm64: Use raw_smp_processor_id() in kvm_pmu_probe_armpmu()
-
-Reiji Watanabe (2):
-      KVM: arm64: PMU: Restore the host's PMUSERENR_EL0
-      KVM: arm64: PMU: Don't overwrite PMUSERENR with vcpu loaded
-
- arch/arm/include/asm/arm_pmuv3.h        |  5 +++++
- arch/arm64/include/asm/kvm_host.h       |  7 +++++++
- arch/arm64/kvm/hyp/include/hyp/switch.h | 15 +++++++++++++--
- arch/arm64/kvm/hyp/vhe/switch.c         | 14 ++++++++++++++
- arch/arm64/kvm/pmu-emul.c               | 20 +++++++++++++++++++-
- arch/arm64/kvm/pmu.c                    | 27 +++++++++++++++++++++++++++
- arch/arm64/kvm/vgic/vgic-init.c         | 11 +++++++----
- drivers/perf/arm_pmuv3.c                | 21 ++++++++++++++++++---
- 8 files changed, 110 insertions(+), 10 deletions(-)
+> 
+> Thanks,
+> drew
