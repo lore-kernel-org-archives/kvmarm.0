@@ -1,89 +1,79 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA06F19E44
-	for <kvmarm@lists.linux.dev>; Thu,  8 Jun 2023 17:19:07 +0000 (UTC)
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1b24ff03400so5417255ad.3
-        for <kvmarm@lists.linux.dev>; Thu, 08 Jun 2023 10:19:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686244747; x=1688836747;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xn4z4bAdLLnUlD27MUprwNeTY3jrE96t84qZ964f9xY=;
-        b=A7nR4+SOsuhrP4/mJAD4mWHu+cMDM2QkXpBSOkdYLrelvxn+IvdhuS6cxi5mB4yiam
-         ogbRfUtaU9t3ZBBMl/KXuDl85TOjXMPFwZHjC7A/0q2tY6RiF0KYwJ+kxQbJJ9JQa4/g
-         N7yY2aL1r8T5znpL37Uev3UBg2SnMwqQwf2rvoW72nmShobFz5deiPceOT/4YkJA4Bcu
-         JsdfiA4vZhbx43LJOe/blRxtHReFCPL/+/M0oKkBarN6bNOATxsuCteuMZUdjdDPTikD
-         qrqcaff/skuy4qFqDouHZP41H9lPYRm654HcGpZO27UthFcqYPc6vZ6J88FbrCDT+o0D
-         NUZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686244747; x=1688836747;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xn4z4bAdLLnUlD27MUprwNeTY3jrE96t84qZ964f9xY=;
-        b=IjrxFIQNrc9YtmWggCgTVDu9XBksmnAxelBUbFy0+YE22xVYphQsUqevDQTH8rJRF8
-         MvnM4JRDjCokQCdd7u3BwspDu9IEAtmTBs50+UE1vNhCMtASaeiPJW8LFYDEM4nvYC+f
-         hSft69mHyTJNtJkFF5tuRV1q9sRFrgntixMj8pf1l7X4cQTbsCffOs0y6mCjuMRXLOn0
-         0lf4cghgLoWSvTSzGMTAYp7MZP6eLXx65BCIL0QP75Vc0DdkX2vMGtnj5o0HVzdyRtqI
-         9Do1LVY+U0+K6gn/H5ps4SvLCM3n8N9pOQRIBBJ0EQLRFLurfw2sRykN09PqVRPqejZJ
-         a00w==
-X-Gm-Message-State: AC+VfDyXQtHH+aNQkk0SdQ3V+VI4pssvLwIHteYaE3sLbcNSdKhb/n/v
-	Zcjl02YuxqUfZ8ZoajVm19VSsSVzuuc=
-X-Google-Smtp-Source: ACHHUZ7adI2YgI6vjLXTvVu6AZpT3Ndk7WpCL9qLv9m7+wBNFY63OV6LQ4FpJW8k1QuodPQZnNrIow==
-X-Received: by 2002:a17:902:b20e:b0:1b1:9218:6bf9 with SMTP id t14-20020a170902b20e00b001b192186bf9mr5547527plr.43.1686244746610;
-        Thu, 08 Jun 2023 10:19:06 -0700 (PDT)
-Received: from smtpclient.apple ([66.170.99.113])
-        by smtp.gmail.com with ESMTPSA id j3-20020a17090276c300b001ac7af58b66sm1674083plt.224.2023.06.08.10.19.05
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 08 Jun 2023 10:19:06 -0700 (PDT)
-Content-Type: text/plain;
-	charset=us-ascii
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBB3F19922
+	for <kvmarm@lists.linux.dev>; Thu,  8 Jun 2023 17:21:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBBADC433EF;
+	Thu,  8 Jun 2023 17:21:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1686244878;
+	bh=+1JMZudb5uniaYe3Y3wFcz2tkfuMGhPDOo6QPhGbJeI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hvsQRNBUpffh2bzrvN4vsPMPOZ/NuzUw6AHwjYs+TmO/+5bq/B1NLn/y9DvjM3vhD
+	 qSYXcAB1x479VEs7sJKgWqnpn1IxrjyvRCEHsQpzVJ2wAtqfyTdzWnp2kqDYhndLTF
+	 7lNh5AlZn4b7Gp1kiAVotShPo4PJIvxx5SJexnBt7DGohA6CcKd2HCSbS0Y09VYk6M
+	 y5iOpEOFO7lRNIFm9ZNMfqWzNmIBEOylkDaVyxyf5C+GS0RZkmTx2ywWbtBx80IMXu
+	 aFRCzIeUuHSohx/8P4St1qor5bg+AYU8lVoMceWtUHz66aZlJ1OC/N/AgBafHJP/j1
+	 +WU4ndAfymBuA==
+Date: Thu, 8 Jun 2023 18:21:13 +0100
+From: Will Deacon <will@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Colton Lewis <coltonlewis@google.com>,
+	kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH 3/3] KVM: arm64: Skip break phase when we have FEAT_BBM
+ level 2
+Message-ID: <20230608172112.GA1606@willie-the-truck>
+References: <20230602170147.1541355-1-coltonlewis@google.com>
+ <20230602170147.1541355-4-coltonlewis@google.com>
+ <87sfb7octw.wl-maz@kernel.org>
+ <ZH5VQMEoiHEITmF4@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.600.7\))
-Subject: Re: [kvm-unit-tests PATCH v6 12/32] arm64: Add support for
- discovering the UART through ACPI
-From: Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <20230530160924.82158-13-nikos.nikoleris@arm.com>
-Date: Thu, 8 Jun 2023 10:18:54 -0700
-Cc: kvm@vger.kernel.org,
- kvmarm@lists.linux.dev,
- andrew.jones@linux.dev,
- Paolo Bonzini <pbonzini@redhat.com>,
- alexandru.elisei@arm.com,
- ricarkol@google.com,
- shahuang@redhat.com,
- Andrew Jones <drjones@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <7DA92888-3042-4036-A769-E9F941AF98A5@gmail.com>
-References: <20230530160924.82158-1-nikos.nikoleris@arm.com>
- <20230530160924.82158-13-nikos.nikoleris@arm.com>
-To: Nikos Nikoleris <nikos.nikoleris@arm.com>
-X-Mailer: Apple Mail (2.3731.600.7)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZH5VQMEoiHEITmF4@linux.dev>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
+On Mon, Jun 05, 2023 at 02:36:00PM -0700, Oliver Upton wrote:
+> On Sun, Jun 04, 2023 at 09:23:39AM +0100, Marc Zyngier wrote:
+> > On Fri, 02 Jun 2023 18:01:47 +0100, Colton Lewis <coltonlewis@google.com> wrote:
+> > > +static bool stage2_try_make_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu, kvm_pte_t new)
+> > >  {
+> > >  	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+> > > 
+> > > -	WARN_ON(!stage2_pte_is_locked(*ctx->ptep));
+> > > +	if (!stage2_has_bbm_level2())
+> > > +		WARN_ON(!stage2_pte_is_locked(*ctx->ptep));
+> > > +
+> > > +	if (!stage2_try_set_pte(ctx, new))
+> > > +		return false;
+> > > +
+> > > +	if (kvm_pte_table(ctx->old, ctx->level))
+> > > +		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
+> > > +	else if (kvm_pte_valid(ctx->old) && !stage2_pte_perms_equal(ctx->old, new))
+> > > +		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa_nsh, mmu, ctx->addr, ctx->level);
+> > 
+> > Why a non-shareable invalidation? Nothing in this code captures the
+> > rationale for it. What if the permission change was a *restriction* of
+> > the permission? It should absolutely be global, and not local.
+> 
+> IIRC, Colton was testing largely with permission relaxation, and had
+> forward progress issues b.c. the stale TLB entry was never invalidated
+> in response to a permission fault.
 
-On May 30, 2023, at 9:09 AM, Nikos Nikoleris <nikos.nikoleris@arm.com> =
-wrote:
+Would the series at:
 
->=20
-> +static void uart0_init_acpi(void)
-> +{
-> +	struct spcr_descriptor *spcr =3D =
-find_acpi_table_addr(SPCR_SIGNATURE);
-> +
-> +	assert_msg(spcr, "Unable to find ACPI SPCR");
-> +	uart0_base =3D ioremap(spcr->serial_port.address, =
-spcr->serial_port.bit_width);
-> +}
+https://lore.kernel.org/r/5d8e1f752051173d2d1b5c3e14b54eb3506ed3ef.1684892404.git-series.apopple@nvidia.com
 
-Is it possible as a fallback, is SPCR is not available, to =
-UART_EARLY_BASE as
-address and bit_width as bit-width?
+help with that?
 
-I would appreciate it, since it would help my setup.
-
+Will
