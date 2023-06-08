@@ -1,114 +1,150 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F7BA3B3FA
-	for <kvmarm@lists.linux.dev>; Thu,  8 Jun 2023 09:04:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1686215048;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=dagrqDiq3A7dkc7gq9vL9zi12EhyXb6jT5d9cSUCfXk=;
-	b=Hb25tLGkeSP6Pdbk4jT7TFRCyuOquKpXFvVSe6gSGJMyKSFAbOcWwLxqPNfCi2SEouXnL0
-	90ykdM8xduBXP+TknUKTcrr/jXlM8jGW7OjN28OCWQKCjVVgpz4CFyzxxNobmP+De+2A69
-	Db55EtpGEmlAYPAqKUo6+sItgDMyMH0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-481-uYlwIiBtPiGpmZWNBjNLZA-1; Thu, 08 Jun 2023 05:04:06 -0400
-X-MC-Unique: uYlwIiBtPiGpmZWNBjNLZA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 079FF185A78E;
-	Thu,  8 Jun 2023 09:04:06 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-168.bne.redhat.com [10.64.54.168])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C3DC40D1B66;
-	Thu,  8 Jun 2023 09:04:02 +0000 (UTC)
-From: Gavin Shan <gshan@redhat.com>
-To: kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	pbonzini@redhat.com,
-	seanjc@google.com,
-	oliver.upton@linux.dev,
-	maz@kernel.org,
-	hshuai@redhat.com,
-	zhenyzha@redhat.com,
-	shan.gavin@gmail.com
-Subject: [PATCH] KVM: Avoid illegal stage2 mapping on invalid memory slot
-Date: Thu,  8 Jun 2023 19:03:48 +1000
-Message-Id: <20230608090348.414990-1-gshan@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26E9F539B
+	for <kvmarm@lists.linux.dev>; Thu,  8 Jun 2023 09:45:33 +0000 (UTC)
+Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-1a3136fd194so327591fac.2
+        for <kvmarm@lists.linux.dev>; Thu, 08 Jun 2023 02:45:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686217533; x=1688809533;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KWfXcI9qpNRXyZ49c1qVkzQX/sqIlGyUNHOIKGAzDQA=;
+        b=OoOYd2Yl2fvO4CeoY9SXHmrdO/GnjLe13sWCrJ7lGe1yhDuyXVDlqo0aUAKF0FKt9F
+         uEbaKxjDxSqxqK3VGqMeVp/mo6E9VAG1KNWCB0Y1+PWB/moUVnUjS1NHX3MLj8gLWZ6z
+         SsE9OQSfsUMJoyg9sQB2EtUigZho4LxaKSjdF4sCvz6wVdlD4AGj9a0TH/W8c5cYCVQP
+         4kTNx9yq3tD7FM3+jK+lGWxjLs98WKyMsVCvksXQYHXH/ArNdQ0oQUlPlOSpbl04LXv5
+         8Urqn++vTFktCKLCVxhFq0WA7NQuJmzpA31w40ViBGkfOQ8lMcSiN/BxLM8WpSOTLZL5
+         6DiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686217533; x=1688809533;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KWfXcI9qpNRXyZ49c1qVkzQX/sqIlGyUNHOIKGAzDQA=;
+        b=GdhsVDjepge86wwIfEsmKBgc/hn8bnb7e0wRf0rqjnVLJ9W8RblOCiwMU7y+5xZgNz
+         N3Ax70L15BZ2j113pX7LfYXA5L4RZyJnuNqSLtN6B82x5xyrZ8Oo6xn/OZhHShseHDaM
+         OhbX4PDq05Q89yvgBqxWyzTrowZRBOBd296R6AgYj70EEkE8QU5gI1I+VMGBD1/zehVy
+         bBOxC6gz3AAbHdnesoqnVprDODq0GSxRSTbrCzBxkilbQUOxt/T23D8RhdvX7XiJaMeH
+         nuJEe7lv//kx5byQEjpRcs2ktpRqy/fx0WBWRAFBiEyHSUVPKnbgIvfFRsrBHhUdEWYz
+         C3cw==
+X-Gm-Message-State: AC+VfDx2Z8CNuLselDmH7JQXlVPqUptd25ApVA87BdxP7LzAcZ86ymf4
+	SPuAfUGEzp9TAHCTRy5iNDe16zVrrzoO5edkCdc=
+X-Google-Smtp-Source: ACHHUZ5IWgmj+LEHtiTJyB5L+4nONSN43H9fR9QcrJW/5jde8UjA7NnpuuS9XpaB5O5YV3svfxnb3boBreWg1R1DcOk=
+X-Received: by 2002:a05:6808:315:b0:39a:62f7:9463 with SMTP id
+ i21-20020a056808031500b0039a62f79463mr4776127oie.41.1686217532902; Thu, 08
+ Jun 2023 02:45:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+References: <cover.1684999824.git.haibo1.xu@intel.com> <da390e6200e838fce320a2a43b2f87951b4e0bbb.1684999824.git.haibo1.xu@intel.com>
+ <20230525-2bab5376987792eab73507ac@orel>
+In-Reply-To: <20230525-2bab5376987792eab73507ac@orel>
+From: Haibo Xu <xiaobo55x@gmail.com>
+Date: Thu, 8 Jun 2023 17:45:21 +0800
+Message-ID: <CAJve8okR_iH4vF9DV9zTkDaeYe25kP7KUcKQphmjG5q-iVb-KA@mail.gmail.com>
+Subject: Re: [PATCH v2 11/11] KVM: riscv: selftests: Add get-reg-list test
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: Haibo Xu <haibo1.xu@intel.com>, maz@kernel.org, oliver.upton@linux.dev, 
+	seanjc@google.com, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Shuah Khan <shuah@kernel.org>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, David Matlack <dmatlack@google.com>, 
+	Ben Gardon <bgardon@google.com>, Vipin Sharma <vipinsh@google.com>, 
+	Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-We run into guest hang in edk2 firmware when KSM is kept as running
-on the host. The edk2 firmware is waiting for status 0x80 from QEMU's
-pflash device (TYPE_PFLASH_CFI01) during the operation for sector
-erasing or buffered write. The status is returned by reading the
-memory region of the pflash device and the read request should
-have been forwarded to QEMU and emulated by it. Unfortunately, the
-read request is covered by an illegal stage2 mapping when the guest
-hang issue occurs. The read request is completed with QEMU bypassed and
-wrong status is fetched.
+On Fri, May 26, 2023 at 1:18=E2=80=AFAM Andrew Jones <ajones@ventanamicro.c=
+om> wrote:
+>
 
-The illegal stage2 mapping is populated due to same page mering by
-KSM at (C) even the associated memory slot has been marked as invalid
-at (B).
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CORE | KVM_REG_R=
+ISCV_CORE_REG(mode),
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RI=
+SCV_CSR_REG(sstatus),
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RI=
+SCV_CSR_REG(sie),
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RI=
+SCV_CSR_REG(stvec),
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RI=
+SCV_CSR_REG(sscratch),
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RI=
+SCV_CSR_REG(sepc),
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RI=
+SCV_CSR_REG(scause),
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RI=
+SCV_CSR_REG(stval),
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RI=
+SCV_CSR_REG(sip),
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RI=
+SCV_CSR_REG(satp),
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RI=
+SCV_CSR_REG(scounteren),
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_REG_=
+RISCV_TIMER_REG(frequency),
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_REG_=
+RISCV_TIMER_REG(time),
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_REG_=
+RISCV_TIMER_REG(compare),
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_REG_=
+RISCV_TIMER_REG(state),
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_ISA_EXT | KVM_RI=
+SCV_ISA_EXT_A,
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_ISA_EXT | KVM_RI=
+SCV_ISA_EXT_C,
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_ISA_EXT | KVM_RI=
+SCV_ISA_EXT_D,
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_ISA_EXT | KVM_RI=
+SCV_ISA_EXT_F,
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_ISA_EXT | KVM_RI=
+SCV_ISA_EXT_H,
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_ISA_EXT | KVM_RI=
+SCV_ISA_EXT_I,
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_ISA_EXT | KVM_RI=
+SCV_ISA_EXT_M,
+>
+> I think all the above should have the size KVM_REG_SIZE_ULONG. Please als=
+o
+> test with a 32-bit host.
+>
 
-  CPU-A                    CPU-B
-  -----                    -----
-                           ioctl(kvm_fd, KVM_SET_USER_MEMORY_REGION)
-                           kvm_vm_ioctl_set_memory_region
-                           kvm_set_memory_region
-                           __kvm_set_memory_region
-                           kvm_set_memslot(kvm, old, NULL, KVM_MR_DELETE)
-                             kvm_invalidate_memslot
-                               kvm_copy_memslot
-                               kvm_replace_memslot
-                               kvm_swap_active_memslots        (A)
-                               kvm_arch_flush_shadow_memslot   (B)
-  same page merging by KSM
-  kvm_mmu_notifier_change_pte
-  kvm_handle_hva_range
-  __kvm_handle_hva_range       (C)
+Hi Andrew,
 
-Fix the issue by skipping the invalid memory slot at (C) to avoid the
-illegal stage2 mapping. Without the illegal stage2 mapping, the read
-request for the pflash's status is forwarded to QEMU and emulated by
-it. The correct pflash's status can be returned from QEMU to break
-the infinite wait in edk2 firmware.
+Just noticed the RISC-V 32-bit kvm selftests was not supported currently.
+Even though I tried to remove the below check for 32-bit, there were
+still many warning and error messages during compiling.
+It seems 32-bit KVM selftests was not supported either for ARM/x86. Do
+we have a plan to support it on risc-v?
 
-Cc: stable@vger.kernel.org # v5.13+
-Fixes: 3039bcc74498 ("KVM: Move x86's MMU notifier memslot walkers to generic code")
-Reported-by: Shuai Hu <hshuai@redhat.com>
-Reported-by: Zhenyu Zhang <zhenyzha@redhat.com>
-Signed-off-by: Gavin Shan <gshan@redhat.com>
----
- virt/kvm/kvm_main.c | 3 +++
- 1 file changed, 3 insertions(+)
+Regards,
+Haibo
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 479802a892d4..7f81a3a209b6 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -598,6 +598,9 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
- 			unsigned long hva_start, hva_end;
- 
- 			slot = container_of(node, struct kvm_memory_slot, hva_node[slots->node_idx]);
-+			if (slot->flags & KVM_MEMSLOT_INVALID)
-+				continue;
-+
- 			hva_start = max(range->start, slot->userspace_addr);
- 			hva_end = min(range->end, slot->userspace_addr +
- 						  (slot->npages << PAGE_SHIFT));
--- 
-2.23.0
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h
+b/tools/testing/selftests/kvm/include/kvm_util_base.h
+index ac4aaa21deee..a32ccc06435b 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -205,9 +205,9 @@ extern enum vm_guest_mode vm_mode_default;
 
+ #elif defined(__riscv)
+
+-#if __riscv_xlen =3D=3D 32
+-#error "RISC-V 32-bit kvm selftests not supported"
+-#endif
++//#if __riscv_xlen =3D=3D 32
++//#error "RISC-V 32-bit kvm selftests not supported"
++//#endif
+
+>
+> Thanks,
+> drew
