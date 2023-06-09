@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E18620682
-	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 16:22:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0E5FC433AE;
-	Fri,  9 Jun 2023 16:22:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F6C20695
+	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 16:22:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22AEFC4339C;
+	Fri,  9 Jun 2023 16:22:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1686327731;
-	bh=PWi6LY8XpJQzudXyIWXRXdjw/fgswuqZz0wPMwkGK68=;
+	s=k20201202; t=1686327732;
+	bh=kD0iyRxdqfv2pvJX3Hjwo3JKxYWjJAruZ+EvPdKsFjc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=K/0Rf2wHBnIwMtjD2MpgEMHhwaejFyC2B7sotvaATGgppNBY4meIlU2O2x4FKvDbG
-	 PNzGYvj31IfT5hdTOMe+Te6Im1xjOtKD4mmImOKeL+RpEFrOwpjhlxtZKAcbk3tLNc
-	 1BZ/O37kHq8ikOLKR7T4G3MIIVwOoQA46IOvkl4v9qnhYnDK+uSgkWMievn1bDKEqO
-	 mbUUIPyI5g1rVOTt8eI4fqeEd4adLUuug7Wfew6SQWsclSjrqRNL4s4qnGAyNT3w7C
-	 xtW/i/ANTav410IedHLbEFp+/Tv1lBzHkV7FCHKURWtzFi53Q1US9vjpJ/lSjE0SLc
-	 x00PscsI3UJkA==
+	b=T77I4xNyTP4kfLvFsfAACsVOKobtphgj2ize8XFYx9gEyi0umuz2k7u/h9Vf7mCaE
+	 5NIOCl5mjuMNciHw2oancboQJVpyOOO1F8h1SxD8b7Fe+NIzf38sD5yJnfPXCVpWht
+	 N4ZwaJ0SrdafPg2i+2b9rO3MVHNIV6/d24Nhq1AnBwL5hfgqSzzZ6F8Bsrg9IVCLMy
+	 m7l2dda0HbPRYAK6t7ofG04XZuiYZyNz3BGDp8VllsHmlLo7N+k5HZnoHFRQvVtvL3
+	 xslSZiBB3gqPE5+FK07S1cAVP+6YIrzYyAxrQvA3GsobovE71qeBXAlHY1gi690jcX
+	 NSELVd9m3majA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1q7esL-0048L7-TF;
-	Fri, 09 Jun 2023 17:22:09 +0100
+	id 1q7esM-0048L7-AB;
+	Fri, 09 Jun 2023 17:22:10 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -32,9 +32,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Quentin Perret <qperret@google.com>,
 	Will Deacon <will@kernel.org>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v3 07/17] arm64: Use CPACR_EL1 format to set CPTR_EL2 when E2H is set
-Date: Fri,  9 Jun 2023 17:21:50 +0100
-Message-Id: <20230609162200.2024064-8-maz@kernel.org>
+Subject: [PATCH v3 09/17] KVM: arm64: Key use of VHE instructions in nVHE code off ARM64_KVM_HVHE
+Date: Fri,  9 Jun 2023 17:21:52 +0100
+Message-Id: <20230609162200.2024064-10-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230609162200.2024064-1-maz@kernel.org>
 References: <20230609162200.2024064-1-maz@kernel.org>
@@ -50,65 +50,52 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-When HCR_EL2.E2H is set, the CPTR_EL2 register takes the CPACR_EL1
-format. Yes, this is good fun.
+We can now start with the fun stuff: if we enable VHE *only* for
+the hypervisor, we need to generate the VHE instructions when
+accessing the system registers.
 
-Hack the bits of startup code that assume E2H=0 while setting up
-CPTR_EL2 to make them grok the CPTR_EL1 format.
+For this, reporpose the alternative sequence to be keyed off
+ARM64_KVM_HVHE in the nVHE hypervisor code, and only there.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/el2_setup.h | 21 +++++++++++++++++++--
- 1 file changed, 19 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_hyp.h | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-index 225bf1f2514d..bba508ffa12d 100644
---- a/arch/arm64/include/asm/el2_setup.h
-+++ b/arch/arm64/include/asm/el2_setup.h
-@@ -129,8 +129,15 @@
- .endm
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index fea04eb25cb4..b7238c72a04c 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -33,12 +33,18 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
  
- /* Coprocessor traps */
--.macro __init_el2_nvhe_cptr
-+.macro __init_el2_cptr
-+	mrs	x1, hcr_el2
-+	and	x1, x1, #HCR_E2H
-+	cbz	x1, .LnVHE_\@
-+	mov	x0, #(CPACR_EL1_FPEN_EL1EN | CPACR_EL1_FPEN_EL0EN)
-+	b	.Lset_cptr_\@
-+.LnVHE_\@:
- 	mov	x0, #0x33ff
-+.Lset_cptr_\@:
- 	msr	cptr_el2, x0			// Disable copro. traps to EL2
- .endm
+ #else // !__KVM_VHE_HYPERVISOR__
  
-@@ -196,7 +203,7 @@
- 	__init_el2_gicv3
- 	__init_el2_hstr
- 	__init_el2_nvhe_idregs
--	__init_el2_nvhe_cptr
-+	__init_el2_cptr
- 	__init_el2_fgt
- 	__init_el2_nvhe_prepare_eret
- .endm
-@@ -244,7 +251,17 @@
- 
- .Linit_sve_\@:	/* SVE register access */
- 	mrs	x0, cptr_el2			// Disable SVE traps
-+	mrs	x1, hcr_el2
-+	and	x1, x1, #HCR_E2H
-+	cbz	x1, .Lcptr_nvhe_\@
++#if defined(__KVM_NVHE_HYPERVISOR__)
++#define VHE_ALT_KEY	ARM64_KVM_HVHE
++#else
++#define VHE_ALT_KEY	ARM64_HAS_VIRT_HOST_EXTN
++#endif
 +
-+	// VHE case
-+	orr	x0, x0, #(CPACR_EL1_ZEN_EL1EN | CPACR_EL1_ZEN_EL0EN)
-+	b	.Lset_cptr_\@
-+
-+.Lcptr_nvhe_\@: // nVHE case
- 	bic	x0, x0, #CPTR_EL2_TZ
-+.Lset_cptr_\@:
- 	msr	cptr_el2, x0
- 	isb
- 	mov	x1, #ZCR_ELx_LEN_MASK		// SVE: Enable full vector
+ #define read_sysreg_elx(r,nvh,vh)					\
+ 	({								\
+ 		u64 reg;						\
+-		asm volatile(ALTERNATIVE(__mrs_s("%0", r##nvh),	\
++		asm volatile(ALTERNATIVE(__mrs_s("%0", r##nvh),		\
+ 					 __mrs_s("%0", r##vh),		\
+-					 ARM64_HAS_VIRT_HOST_EXTN)	\
++					 VHE_ALT_KEY)			\
+ 			     : "=r" (reg));				\
+ 		reg;							\
+ 	})
+@@ -48,7 +54,7 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+ 		u64 __val = (u64)(v);					\
+ 		asm volatile(ALTERNATIVE(__msr_s(r##nvh, "%x0"),	\
+ 					 __msr_s(r##vh, "%x0"),		\
+-					 ARM64_HAS_VIRT_HOST_EXTN)	\
++					 VHE_ALT_KEY)			\
+ 					 : : "rZ" (__val));		\
+ 	} while (0)
+ 
 -- 
 2.34.1
 
