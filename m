@@ -1,19 +1,19 @@
-Received: from out-29.mta1.migadu.com (out-29.mta1.migadu.com [95.215.58.29])
+Received: from out-40.mta1.migadu.com (out-40.mta1.migadu.com [95.215.58.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8C71800E
-	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 19:01:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1EB118C34
+	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 19:01:27 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1686337283;
+	t=1686337285;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=zy1yXF73OpNsgeqdmiDV5zf3CZjnO5nH7k9Ph0YQJ4o=;
-	b=aeS3YT93+PnE/+oa98nCsabI+HajiNfD91qH6/EqqwZfWnpXYMqbpyOaeiZp1c5i7gKK2y
-	gF/lbIij5uQmkJjjrvdk8koYS6hcHlX2x+Sey+ZYNwdiGhvRFSiM3v4hcEdIW1veOjn0iF
-	I4tvJHHHuuMfCLQYyql1Z9ppTJe80vM=
+	bh=4nIgOz3LTxxT+yyK3YFCL27lV4sCWQlvepV/PBWNpb8=;
+	b=iVftcYIMMgyQP1w7izcIUPRYmRbkgmPWy91tPr6dKSvioaoWk3M1aP1FTPaySt51So8+bP
+	O9eJq8z25+W2mfrWCqZFBORKgzsjXCBfSRTyt0kafADgt192mrL7rvrCnY2+ILMsYZOvEw
+	3otqjBIjHoB5tHowB8/wwHABn6BmUVE=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -29,9 +29,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
 	Jing Zhang <jingzhangos@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v12 07/11] KVM: arm64: Use arm64_ftr_bits to sanitise ID register writes
-Date: Fri,  9 Jun 2023 19:00:50 +0000
-Message-ID: <20230609190054.1542113-8-oliver.upton@linux.dev>
+Subject: [PATCH v12 08/11] KVM: arm64: Use generic sanitisation for ID_(AA64)DFR0_EL1
+Date: Fri,  9 Jun 2023 19:00:51 +0000
+Message-ID: <20230609190054.1542113-9-oliver.upton@linux.dev>
 In-Reply-To: <20230609190054.1542113-1-oliver.upton@linux.dev>
 References: <20230609190054.1542113-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -45,182 +45,192 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Jing Zhang <jingzhangos@google.com>
 
-Rather than reinventing the wheel in KVM to do ID register sanitisation
-we can rely on the work already done in the core kernel. Implement a
-generalized sanitisation of ID registers based on the combination of the
-arm64_ftr_bits definitions from the core kernel and (optionally) a set
-of KVM-specific overrides.
+KVM allows userspace to specify a PMU version for the guest by writing
+to the corresponding ID registers. Currently the validation of these
+writes is done manuallly, but there's no reason we can't switch over to
+the generic sanitisation infrastructure.
 
-This all amounts to absolutely nothing for now, but will be used in
-subsequent changes to realize user-configurable ID registers.
+Start screening user writes through arm64_check_features() to prevent
+userspace from over-promising in terms of vPMU support. Leave the old
+masking in place for now, as we aren't completely ready to serve reads
+from the VM-wide values.
 
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
-[Oliver: split off from monster patch, rewrote commit description,
- reworked RAZ handling]
+[Oliver: split off from monster patch, cleaned up handling of NI vPMU
+ values, wrote commit description]
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/cpufeature.h |   1 +
- arch/arm64/kernel/cpufeature.c      |   2 +-
- arch/arm64/kvm/sys_regs.c           | 113 +++++++++++++++++++++++++++-
- 3 files changed, 111 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 106 ++++++++++++++++++++++----------------
+ 1 file changed, 61 insertions(+), 45 deletions(-)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 6bf013fb110d..dc769c2eb7a4 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -915,6 +915,7 @@ static inline unsigned int get_vmid_bits(u64 mmfr1)
- 	return 8;
- }
- 
-+s64 arm64_ftr_safe_value(const struct arm64_ftr_bits *ftrp, s64 new, s64 cur);
- struct arm64_ftr_reg *get_arm64_ftr_reg(u32 sys_id);
- 
- extern struct arm64_ftr_override id_aa64mmfr1_override;
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 7d7128c65161..3317a7b6deac 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -798,7 +798,7 @@ static u64 arm64_ftr_set_value(const struct arm64_ftr_bits *ftrp, s64 reg,
- 	return reg;
- }
- 
--static s64 arm64_ftr_safe_value(const struct arm64_ftr_bits *ftrp, s64 new,
-+s64 arm64_ftr_safe_value(const struct arm64_ftr_bits *ftrp, s64 new,
- 				s64 cur)
- {
- 	s64 ret = 0;
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 3015c860deca..0fbdb6ef68e4 100644
+index 0fbdb6ef68e4..feefa2454620 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1201,6 +1201,91 @@ static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
+@@ -42,6 +42,8 @@
+  */
+ 
+ static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
++static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
++		      u64 val);
+ 
+ static bool read_from_write_only(struct kvm_vcpu *vcpu,
+ 				 struct sys_reg_params *params,
+@@ -1503,15 +1505,35 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
  	return 0;
  }
  
-+static s64 kvm_arm64_ftr_safe_value(u32 id, const struct arm64_ftr_bits *ftrp,
-+				    s64 new, s64 cur)
++static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
++					  const struct sys_reg_desc *rd)
 +{
-+	struct arm64_ftr_bits kvm_ftr = *ftrp;
++	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
 +
-+	/* Some features have different safe value type in KVM than host features */
-+	switch (id) {
-+	case SYS_ID_AA64DFR0_EL1:
-+		if (kvm_ftr.shift == ID_AA64DFR0_EL1_PMUVer_SHIFT)
-+			kvm_ftr.type = FTR_LOWER_SAFE;
-+		break;
-+	case SYS_ID_DFR0_EL1:
-+		if (kvm_ftr.shift == ID_DFR0_EL1_PerfMon_SHIFT)
-+			kvm_ftr.type = FTR_LOWER_SAFE;
-+		break;
-+	}
-+
-+	return arm64_ftr_safe_value(&kvm_ftr, new, cur);
-+}
-+
-+/**
-+ * arm64_check_features() - Check if a feature register value constitutes
-+ * a subset of features indicated by the idreg's KVM sanitised limit.
-+ *
-+ * This function will check if each feature field of @val is the "safe" value
-+ * against idreg's KVM sanitised limit return from reset() callback.
-+ * If a field value in @val is the same as the one in limit, it is always
-+ * considered the safe value regardless For register fields that are not in
-+ * writable, only the value in limit is considered the safe value.
-+ *
-+ * Return: 0 if all the fields are safe. Otherwise, return negative errno.
-+ */
-+static int arm64_check_features(struct kvm_vcpu *vcpu,
-+				const struct sys_reg_desc *rd,
-+				u64 val)
-+{
-+	const struct arm64_ftr_reg *ftr_reg;
-+	const struct arm64_ftr_bits *ftrp = NULL;
-+	u32 id = reg_to_encoding(rd);
-+	u64 writable_mask = rd->val;
-+	u64 limit = rd->reset(vcpu, rd);
-+	u64 mask = 0;
++	/* Limit debug to ARMv8.0 */
++	val &= ~ID_AA64DFR0_EL1_DebugVer_MASK;
++	val |= SYS_FIELD_PREP_ENUM(ID_AA64DFR0_EL1, DebugVer, IMP);
 +
 +	/*
-+	 * Hidden and unallocated ID registers may not have a corresponding
-+	 * struct arm64_ftr_reg. Of course, if the register is RAZ we know the
-+	 * only safe value is 0.
++	 * Only initialize the PMU version if the vCPU was configured with one.
 +	 */
-+	if (sysreg_visible_as_raz(vcpu, rd))
-+		return val ? -E2BIG : 0;
++	val &= ~ID_AA64DFR0_EL1_PMUVer_MASK;
++	if (kvm_vcpu_has_pmu(vcpu))
++		val |= SYS_FIELD_PREP(ID_AA64DFR0_EL1, PMUVer,
++				      kvm_arm_pmu_get_pmuver_limit());
 +
-+	ftr_reg = get_arm64_ftr_reg(id);
-+	if (!ftr_reg)
-+		return -EINVAL;
++	/* Hide SPE from guests */
++	val &= ~ID_AA64DFR0_EL1_PMSVer_MASK;
 +
-+	ftrp = ftr_reg->ftr_bits;
++	return val;
++}
 +
-+	for (; ftrp && ftrp->width; ftrp++) {
-+		s64 f_val, f_lim, safe_val;
-+		u64 ftr_mask;
-+
-+		ftr_mask = arm64_ftr_mask(ftrp);
-+		if ((ftr_mask & writable_mask) != ftr_mask)
-+			continue;
-+
-+		f_val = arm64_ftr_value(ftrp, val);
-+		f_lim = arm64_ftr_value(ftrp, limit);
-+		mask |= ftr_mask;
-+
-+		if (f_val == f_lim)
-+			safe_val = f_val;
-+		else
-+			safe_val = kvm_arm64_ftr_safe_value(id, ftrp, f_val, f_lim);
-+
-+		if (safe_val != f_val)
-+			return -E2BIG;
-+	}
-+
-+	/* For fields that are not writable, values in limit are the safe values. */
-+	if ((val & ~mask) != (limit & ~mask))
-+		return -E2BIG;
-+
+ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ 			       const struct sys_reg_desc *rd,
+ 			       u64 val)
+ {
+-	u8 pmuver, host_pmuver;
+-	bool valid_pmu;
+-
+-	host_pmuver = kvm_arm_pmu_get_pmuver_limit();
+-	pmuver = SYS_FIELD_GET(ID_AA64DFR0_EL1, PMUVer, val);
++	u8 pmuver = SYS_FIELD_GET(ID_AA64DFR0_EL1, PMUVer, val);
++	int r;
+ 
+ 	/*
+ 	 * Prior to commit 3d0dba5764b9 ("KVM: arm64: PMU: Move the
+@@ -1532,38 +1554,33 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ 		pmuver = 0;
+ 	}
+ 
+-	/*
+-	 * Allow AA64DFR0_EL1.PMUver to be set from userspace as long
+-	 * as it doesn't promise more than what the HW gives us.
+-	 */
+-	if (pmuver > host_pmuver)
+-		return -EINVAL;
++	r = set_id_reg(vcpu, rd, val);
++	if (r)
++		return r;
+ 
+-	valid_pmu = pmuver;
++	vcpu->kvm->arch.dfr0_pmuver = pmuver;
 +	return 0;
 +}
-+
- static u8 perfmon_to_pmuver(u8 perfmon)
- {
- 	switch (perfmon) {
-@@ -1528,11 +1613,31 @@ static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 		      u64 val)
- {
--	/* This is what we mean by invariant: you can't change it. */
--	if (val != read_id_reg(vcpu, rd))
--		return -EINVAL;
-+	u32 id = reg_to_encoding(rd);
-+	int ret;
  
+-	/* Make sure view register and PMU support do match */
+-	if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
+-		return -EINVAL;
++static u64 read_sanitised_id_dfr0_el1(struct kvm_vcpu *vcpu,
++				      const struct sys_reg_desc *rd)
++{
++	u8 perfmon = pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit());
++	u64 val = read_sanitised_ftr_reg(SYS_ID_DFR0_EL1);
+ 
+-	/* We can only differ with PMUver, and anything else is an error */
+-	val ^= read_id_reg(vcpu, rd);
+-	val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
+-	if (val)
+-		return -EINVAL;
++	val &= ~ID_DFR0_EL1_PerfMon_MASK;
++	if (kvm_vcpu_has_pmu(vcpu))
++		val |= SYS_FIELD_PREP(ID_DFR0_EL1, PerfMon, perfmon);
+ 
+-	vcpu->kvm->arch.dfr0_pmuver = pmuver;
 -	return 0;
-+	mutex_lock(&vcpu->kvm->arch.config_lock);
-+
-+	/*
-+	 * Once the VM has started the ID registers are immutable. Reject any
-+	 * write that does not match the final register value.
-+	 */
-+	if (kvm_vm_has_ran_once(vcpu->kvm)) {
-+		if (val != read_id_reg(vcpu, rd))
-+			ret = -EBUSY;
-+		else
-+			ret = 0;
-+
-+		mutex_unlock(&vcpu->kvm->arch.config_lock);
-+		return ret;
-+	}
-+
-+	ret = arm64_check_features(vcpu, rd, val);
-+	if (!ret)
-+		IDREG(vcpu->kvm, id) = val;
-+
-+	mutex_unlock(&vcpu->kvm->arch.config_lock);
-+	return ret;
++	return val;
  }
  
- static int get_raz_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+ 			   const struct sys_reg_desc *rd,
+ 			   u64 val)
+ {
+-	u8 perfmon, host_perfmon;
+-	bool valid_pmu;
+-
+-	host_perfmon = pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit());
+-	perfmon = SYS_FIELD_GET(ID_DFR0_EL1, PerfMon, val);
++	u8 perfmon = SYS_FIELD_GET(ID_DFR0_EL1, PerfMon, val);
++	int r;
+ 
+ 	if (perfmon == ID_DFR0_EL1_PerfMon_IMPDEF) {
+ 		val &= ~ID_DFR0_EL1_PerfMon_MASK;
+@@ -1576,21 +1593,12 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+ 	 * AArch64 side (as everything is emulated with that), and
+ 	 * that this is a PMUv3.
+ 	 */
+-	if (perfmon > host_perfmon ||
+-	    (perfmon != 0 && perfmon < ID_DFR0_EL1_PerfMon_PMUv3))
+-		return -EINVAL;
+-
+-	valid_pmu = perfmon;
+-
+-	/* Make sure view register and PMU support do match */
+-	if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
++	if (perfmon != 0 && perfmon < ID_DFR0_EL1_PerfMon_PMUv3)
+ 		return -EINVAL;
+ 
+-	/* We can only differ with PerfMon, and anything else is an error */
+-	val ^= read_id_reg(vcpu, rd);
+-	val &= ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
+-	if (val)
+-		return -EINVAL;
++	r = set_id_reg(vcpu, rd, val);
++	if (r)
++		return r;
+ 
+ 	vcpu->kvm->arch.dfr0_pmuver = perfmon_to_pmuver(perfmon);
+ 	return 0;
+@@ -1988,9 +1996,13 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	/* CRm=1 */
+ 	AA32_ID_SANITISED(ID_PFR0_EL1),
+ 	AA32_ID_SANITISED(ID_PFR1_EL1),
+-	{ SYS_DESC(SYS_ID_DFR0_EL1), .access = access_id_reg,
+-	  .get_user = get_id_reg, .set_user = set_id_dfr0_el1,
+-	  .visibility = aa32_id_visibility, },
++	{ SYS_DESC(SYS_ID_DFR0_EL1),
++	  .access = access_id_reg,
++	  .get_user = get_id_reg,
++	  .set_user = set_id_dfr0_el1,
++	  .visibility = aa32_id_visibility,
++	  .reset = read_sanitised_id_dfr0_el1,
++	  .val = ID_DFR0_EL1_PerfMon_MASK, },
+ 	ID_HIDDEN(ID_AFR0_EL1),
+ 	AA32_ID_SANITISED(ID_MMFR0_EL1),
+ 	AA32_ID_SANITISED(ID_MMFR1_EL1),
+@@ -2030,8 +2042,12 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	ID_UNALLOCATED(4,7),
+ 
+ 	/* CRm=5 */
+-	{ SYS_DESC(SYS_ID_AA64DFR0_EL1), .access = access_id_reg,
+-	  .get_user = get_id_reg, .set_user = set_id_aa64dfr0_el1, },
++	{ SYS_DESC(SYS_ID_AA64DFR0_EL1),
++	  .access = access_id_reg,
++	  .get_user = get_id_reg,
++	  .set_user = set_id_aa64dfr0_el1,
++	  .reset = read_sanitised_id_aa64dfr0_el1,
++	  .val = ID_AA64DFR0_EL1_PMUVer_MASK, },
+ 	ID_SANITISED(ID_AA64DFR1_EL1),
+ 	ID_UNALLOCATED(5,2),
+ 	ID_UNALLOCATED(5,3),
 -- 
 2.41.0.162.gfafddb0af9-goog
 
