@@ -1,67 +1,90 @@
-Received: from out-26.mta1.migadu.com (out-26.mta1.migadu.com [95.215.58.26])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F3719539
-	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 15:44:56 +0000 (UTC)
-Date: Fri, 9 Jun 2023 08:44:48 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1686325494;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vPnlIRVGxj8AeQiaq3bAFwvGduBuAp2E7TLGSfDQuEY=;
-	b=kCvdF6x5Ui7p2uYuAw8e0+ZOCZ9jdiuTfejEV/+f9FynBFrrivqpYS+WgpldF4ADxknz7n
-	EnUpapJPqGOr4cWrWST9aM/SroIqLJ7rNerE/Kv1NsLUi4P0U9F92hSfAzcjdykt0K8vtP
-	MSOED852Q/+yMxfDpf0O/bS5SQ8UZ34=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C254200BC
+	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 16:22:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0979C433EF;
+	Fri,  9 Jun 2023 16:22:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1686327730;
+	bh=6wNp/EjkCubmH4jSbimzQJEPlzEQpa08AFTUAXoa3iE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Jye1Nk/+4Te91qjbLwqvi9ZDCPP+hc7Wlo6lpIbdBdOF1VLFeSuiH49BjbZyDH4g6
+	 YwW2zBcxlCsijgjA8yZ05QEkUyvSKXgaut8tC2oSFzqYPFo2Ic73bmvUWwTKXIP+Ul
+	 t7kpLuveL0traTpHkcO5Cz2huC2EvctjYqpMk3qYwjXSaA0YVNoOUK0L2NtKkdYTy+
+	 FxQ2DhBe+Kdlza5Ay4wgTST0IPbGcwdmurr5U95GewTDeChpvDeigc7+ihUz4xF5fs
+	 y4TFudjX8vo3v8gJjpIDJEdmLbOYGcLZONCQ7IRjLRXyRRciDYMU0BE74y7iBwpup9
+	 AWsYiJoVBinWw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1q7esK-0048L7-KZ;
+	Fri, 09 Jun 2023 17:22:08 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 2/3] KVM: arm64: Clear possible conflict aborts
-Message-ID: <ZINI8KpQsrSOW0I5@linux.dev>
-References: <20230602170147.1541355-1-coltonlewis@google.com>
- <20230602170147.1541355-3-coltonlewis@google.com>
+	Quentin Perret <qperret@google.com>,
+	Will Deacon <will@kernel.org>,
+	Fuad Tabba <tabba@google.com>
+Subject: [PATCH v3 01/17] KVM: arm64: Drop is_kernel_in_hyp_mode() from __invalidate_icache_guest_page()
+Date: Fri,  9 Jun 2023 17:21:44 +0100
+Message-Id: <20230609162200.2024064-2-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230609162200.2024064-1-maz@kernel.org>
+References: <20230609162200.2024064-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230602170147.1541355-3-coltonlewis@google.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, qperret@google.com, will@kernel.org, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Jun 02, 2023 at 05:01:46PM +0000, Colton Lewis wrote:
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 7a68398517c95..96b950f20c8d0 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1591,6 +1591,12 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->  		return 1;
->  	}
-> 
-> +	if (fault_status == ESR_ELx_FSC_CONFLICT) {
-> +		/* We could be at any level. 0 covers all levels. */
-> +		__kvm_tlb_flush_vmid_ipa(vcpu->arch.hw_mmu, fault_ipa, 0);
-> +		return 1;
-> +	}
-> +
+It is pretty obvious that is_kernel_in_hyp_mode() doesn't make much
+sense in the hypervisor part of KVM, and should be reserved to the
+kernel side.
 
-This does not match the architecture. Please read DDI0487J D8.14.3
-"TLB maintenance due to TLB conflict", which tells you exactly how to
-resolve the conflict. TL; DR: TLBI by address is _not_ guaranteed to
-invalidate duplicate TLB entries. vmalls12e1 is your friend.
+However, mem_protect.c::invalidate_icache_guest_page() calls into
+__invalidate_icache_guest_page(), which uses is_kernel_in_hyp_mode().
+Given that this is part of the pKVM side of the hypervisor, this
+helper can only return true.
 
-The conflicting TLB entries are local to the CPU that took the abort, so
-you don't need to do any broadcast.
+Nothing goes really bad, but __invalidate_icache_guest_page() could
+spell out what the actual check is: we cannot invalidate the cache
+if the i-cache is VPIPT and we're running at EL1.
 
---
-Thanks,
-Oliver
+Drop the is_kernel_in_hyp_mode() check for an explicit check against
+CurrentEL being EL1 or not.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_mmu.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 27e63c111f78..c8113b931263 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -227,7 +227,8 @@ static inline void __invalidate_icache_guest_page(void *va, size_t size)
+ 	if (icache_is_aliasing()) {
+ 		/* any kind of VIPT cache */
+ 		icache_inval_all_pou();
+-	} else if (is_kernel_in_hyp_mode() || !icache_is_vpipt()) {
++	} else if (read_sysreg(CurrentEL) != CurrentEL_EL1 ||
++		   !icache_is_vpipt()) {
+ 		/* PIPT or VPIPT at EL2 (see comment in __kvm_tlb_flush_vmid_ipa) */
+ 		icache_inval_pou((unsigned long)va, (unsigned long)va + size);
+ 	}
+-- 
+2.34.1
+
