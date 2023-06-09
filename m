@@ -1,119 +1,116 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23418BE53
-	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 09:08:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1686301690;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+lS4qtD2LImPdpu4Ozd1FIICWXob78VQWCuBmNpNqeU=;
-	b=iMpy6h9MGhybAsGZPh0/hEsnC8MrGq+DU1A23pFDVfnL4yPv5Xh/0FRsPPNI8sQCbm3VIZ
-	Zi2/QueZQI56iusjrOZw8Jj4FQITVd9r97NdKVMrrXXYxAKTpZabAyDO6w5hMHeo6lywsH
-	TWtxRSzz1BEmOWDM0CYLyR2YmhR2ZVU=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-258--jXK01O2MvibG0wCi3ecNA-1; Fri, 09 Jun 2023 05:08:02 -0400
-X-MC-Unique: -jXK01O2MvibG0wCi3ecNA-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-94a348facbbso186016966b.1
-        for <kvmarm@lists.linux.dev>; Fri, 09 Jun 2023 02:08:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 042EEC8FA
+	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 09:24:41 +0000 (UTC)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-51494659d49so2686888a12.3
+        for <kvmarm@lists.linux.dev>; Fri, 09 Jun 2023 02:24:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1686302680; x=1688894680;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8ZarEebR8QFxdGd6BDii6BW9L7KO3qDDoKK/MEwvn90=;
+        b=Rs9/5cIfXIF0X9dJtfJjl+S6T33jQp4Px3GDSrcvuwkppHWZXUsL8ehgtlEdVWgQhp
+         wZ7iBamYWGVLJ2Km1VI+A0c5Pj7Vi69maem4T1UfWqzM1ICaSwbq2qvkARzSMmxsidJ4
+         Z5s05RkJYCldhPOJj5incQPIqdVf8FiB/bV5WhSttaKgHDMK9XkzcR2l0+oh0PPWQR6l
+         uxEnpUlJ/GuQWDgQMmKCIbr+mIkQxQIkjpUfyCHTc3RKgv8Hd2GG7MxnWsWVzPJErurs
+         8/ZrLm00PA/JasYULG9e43reLoImOlkCmqVWgNktIvQsgTUqewnuDM6i+qfRNSbyMjR2
+         JIPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686301681; x=1688893681;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+lS4qtD2LImPdpu4Ozd1FIICWXob78VQWCuBmNpNqeU=;
-        b=cyY0hUYMGAnPCh1sehLtYywg6T3EfDMQE7w+H/aI7VVKinTFRJN/P34yOUgmkrQg1I
-         jAEu4t+PS4AVxK6vcGmiPJdYTVTZ/FG9cmnSkZDUvaAlj/j3Ph3krBSDIobc9dumhIYn
-         gN5Y+29KNuQbX5qJys7ZQ6x6GhDzlztBb/th0GQfROmKjw+xdp6siw8T+21zdXVtHoyX
-         cBanqLrQM4llZmq5gRC2SL4kVpTvfcJbHPU4H0eeOhExkS0t+3DBMfAocGReS+Vto+Ed
-         Dq/uovjkIgvdH8F7W4vM1Tlmrhi2hHEbmcUSv1ycIDQFM42S5Bxg+svtnR0PMl5syhAw
-         nU+g==
-X-Gm-Message-State: AC+VfDyR80Bnzvo3Doact3GakdBT1E/lPItRmduDYRDVAXjUnjMSM8aA
-	Ng5skeCzZtRtE/WiCHRwlQF4GThye39kL+uwso3ZbXASrt7LnrIDm/y7TNy1pJQDdDL//gXhfNu
-	ab0gSOzcXLIf/BNcG
-X-Received: by 2002:a17:907:94cb:b0:97a:e0c0:2f8f with SMTP id dn11-20020a17090794cb00b0097ae0c02f8fmr315226ejc.65.1686301681504;
-        Fri, 09 Jun 2023 02:08:01 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6fk08I4RsyK9p9wcnjDRbMYLy3XBaoHlqt3xl1DLkFDODgHMHCV4XPzuR/CPTVwoW0y6Qefw==
-X-Received: by 2002:a17:907:94cb:b0:97a:e0c0:2f8f with SMTP id dn11-20020a17090794cb00b0097ae0c02f8fmr315171ejc.65.1686301681128;
-        Fri, 09 Jun 2023 02:08:01 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id z8-20020a1709067e4800b00977ecf6942bsm1036209ejr.90.2023.06.09.02.07.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Jun 2023 02:08:00 -0700 (PDT)
-Message-ID: <26cf0b0a-cda5-08a9-a669-6966f9e626b1@redhat.com>
-Date: Fri, 9 Jun 2023 11:07:55 +0200
+        d=1e100.net; s=20221208; t=1686302680; x=1688894680;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8ZarEebR8QFxdGd6BDii6BW9L7KO3qDDoKK/MEwvn90=;
+        b=lx534SyYMsWKq92kBvjL50zRIm2fRiBTGPkiGnZH4WnH2hwo2+D9XgGX9I13NX1bfw
+         Nz5I17sX0JXilCsjgxWtBtzwfWOT1ywTE0odoTfQKnW+L3HA8NEVWeBDRaUn+bEIZKJ8
+         7yH+uMpRrFWpfqUUUFD1PKx/717NSlGtp49dqZt6mK9C2iAtZzV71/rjioCcS/qoWp9F
+         3LogSs+X2dt9NZmCrdzYShQfT3xFFuZ8p304ayws/T4gCuQd8IQ+WqmSxUQ4/hK1WflL
+         9SS3+DnKz6H4JboxEJHXl0ZSjM0tIzB93nF/zOZP/Kn23xUuPLAdEnF/j4O8CbOQy2lN
+         9cCw==
+X-Gm-Message-State: AC+VfDzbGnyXH59TsILp2JncTgXfjBHFRvRVN426lGsrCvAAmB2p9xtt
+	9Ld/26II3KyX/V2l3Vlhl0Q0rQ==
+X-Google-Smtp-Source: ACHHUZ57wveqIUZeYQtbwSYnijhoIMs/IsyQJREmzHYMiZkR8YpHPOCyKtzTyeI/sdX9LNwraQyNBg==
+X-Received: by 2002:a50:fb94:0:b0:4fa:3b3:c867 with SMTP id e20-20020a50fb94000000b004fa03b3c867mr858539edq.17.1686302679914;
+        Fri, 09 Jun 2023 02:24:39 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id n27-20020a056402515b00b00502689a06b2sm1537895edd.91.2023.06.09.02.24.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Jun 2023 02:24:39 -0700 (PDT)
+Date: Fri, 9 Jun 2023 11:24:38 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Haibo Xu <haibo1.xu@intel.com>
+Cc: xiaobo55x@gmail.com, maz@kernel.org, oliver.upton@linux.dev, 
+	seanjc@google.com, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Shuah Khan <shuah@kernel.org>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, David Matlack <dmatlack@google.com>, 
+	Ben Gardon <bgardon@google.com>, Vipin Sharma <vipinsh@google.com>, 
+	Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 09/10] KVM: riscv: selftests: Skip some registers set
+ operation
+Message-ID: <20230609-05521f954b0485c69612f00b@orel>
+References: <cover.1686275310.git.haibo1.xu@intel.com>
+ <73045958d9ab71d5266d012f1e13061afa8c5331.1686275310.git.haibo1.xu@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-To: Yu Zhao <yuzhao@google.com>, Andrew Morton <akpm@linux-foundation.org>
-Cc: Alistair Popple <apopple@nvidia.com>, Anup Patel <anup@brainfault.org>,
- Ben Gardon <bgardon@google.com>, Borislav Petkov <bp@alien8.de>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Chao Peng <chao.p.peng@linux.intel.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Dave Hansen <dave.hansen@linux.intel.com>,
- Fabiano Rosas <farosas@linux.ibm.com>, Gaosheng Cui
- <cuigaosheng1@huawei.com>, Gavin Shan <gshan@redhat.com>,
- "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
- James Morse <james.morse@arm.com>, "Jason A. Donenfeld" <Jason@zx2c4.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>,
- Marc Zyngier <maz@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
- Michael Ellerman <mpe@ellerman.id.au>,
- Michael Larabel <michael@michaellarabel.com>, Mike Rapoport
- <rppt@kernel.org>, Nicholas Piggin <npiggin@gmail.com>,
- Oliver Upton <oliver.upton@linux.dev>, Paul Mackerras <paulus@ozlabs.org>,
- Peter Xu <peterx@redhat.com>, Sean Christopherson <seanjc@google.com>,
- Steven Rostedt <rostedt@goodmis.org>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Thomas Gleixner <tglx@linutronix.de>, Thomas Huth <thuth@redhat.com>,
- Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
- kvmarm@lists.linux.dev, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- linuxppc-dev@lists.ozlabs.org, linux-trace-kernel@vger.kernel.org,
- x86@kernel.org, linux-mm@google.com
-References: <20230526234435.662652-1-yuzhao@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH mm-unstable v2 00/10] mm/kvm: locklessly clear the
- accessed bit
-In-Reply-To: <20230526234435.662652-1-yuzhao@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <73045958d9ab71d5266d012f1e13061afa8c5331.1686275310.git.haibo1.xu@intel.com>
 
-On 5/27/23 01:44, Yu Zhao wrote:
-> TLDR
-> ====
-> This patchset adds a fast path to clear the accessed bit without
-> taking kvm->mmu_lock. It can significantly improve the performance of
-> guests when the host is under heavy memory pressure.
+On Fri, Jun 09, 2023 at 10:12:17AM +0800, Haibo Xu wrote:
+> Set operation on some riscv registers(mostly pesudo ones) was not
+> supported and should be skipped in the get-reg-list test. Just
+> reuse the rejects_set utilities to handle it in riscv.
 > 
-> ChromeOS has been using a similar approach [1] since mid 2021 and it
-> was proven successful on tens of millions devices.
+> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
+> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> ---
+>  tools/testing/selftests/kvm/get-reg-list.c | 20 +++++++++++++-------
+>  1 file changed, 13 insertions(+), 7 deletions(-)
 > 
-> This v2 addressed previous requests [2] on refactoring code, removing
-> inaccurate/redundant texts, etc.
-> 
-> [1]https://crrev.com/c/2987928
-> [2]https://lore.kernel.org/r/20230217041230.2417228-1-yuzhao@google.com/
+> diff --git a/tools/testing/selftests/kvm/get-reg-list.c b/tools/testing/selftests/kvm/get-reg-list.c
+> index c4bd5a5259da..abacb95c21c6 100644
+> --- a/tools/testing/selftests/kvm/get-reg-list.c
+> +++ b/tools/testing/selftests/kvm/get-reg-list.c
+> @@ -211,16 +211,22 @@ static void run_test(struct vcpu_reg_list *c)
+>  			++failed_get;
+>  		}
+>  
+> -		/* rejects_set registers are rejected after KVM_ARM_VCPU_FINALIZE */
+> +		/*
+> +		 * rejects_set registers are rejected after KVM_ARM_VCPU_FINALIZE on aarch64,
+> +		 * or registers that should skip set operation on riscv.
+> +		 */
+>  		for_each_sublist(c, s) {
+>  			if (s->rejects_set && find_reg(s->rejects_set, s->rejects_set_n, reg.id)) {
+>  				reject_reg = true;
+> -				ret = __vcpu_ioctl(vcpu, KVM_SET_ONE_REG, &reg);
+> -				if (ret != -1 || errno != EPERM) {
+> -					printf("%s: Failed to reject (ret=%d, errno=%d) ", config_name(c), ret, errno);
+> -					print_reg(config_name(c), reg.id);
+> -					putchar('\n');
+> -					++failed_reject;
+> +				if ((reg.id & KVM_REG_ARCH_MASK) == KVM_REG_ARM64) {
+> +					ret = __vcpu_ioctl(vcpu, KVM_SET_ONE_REG, &reg);
+> +					if (ret != -1 || errno != EPERM) {
+> +						printf("%s: Failed to reject (ret=%d, errno=%d) ",
+> +								config_name(c), ret, errno);
+> +						print_reg(config_name(c), reg.id);
+> +						putchar('\n');
+> +						++failed_reject;
+> +					}
 
- From the KVM point of view the patches look good (though I wouldn't 
-mind if Nicholas took a look at the ppc part).  Jason's comment on the 
-MMU notifier side are promising as well.  Can you send v3 with Oliver's 
-comments addressed?
+Thinking about this some more, shouldn't we attempt the set ioctl for
+riscv reject registers as well, but look for different error numbers?
 
 Thanks,
-
-Paolo
-
+drew
