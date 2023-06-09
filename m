@@ -1,42 +1,42 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7C27E9
-	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 00:59:40 +0000 (UTC)
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5618857518dso16260097b3.2
-        for <kvmarm@lists.linux.dev>; Thu, 08 Jun 2023 17:59:40 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021BEA46
+	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 00:59:43 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-ba87bd29e9dso1724481276.3
+        for <kvmarm@lists.linux.dev>; Thu, 08 Jun 2023 17:59:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686272379; x=1688864379;
+        d=google.com; s=20221208; t=1686272383; x=1688864383;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0D7F9pDbG9FXqs6+iQJrvOEyVDkJYxW5kzmn8NxTXSM=;
-        b=BDzc1aMRHWXMiLk4E+pANQvv85EBP8Fbmqip6g4XnCghOWEy+T3hHMA98y7gu3MrzJ
-         m9ZUmOHYqjH9lz2cLAdIslB62deMkVm5FAytrF1l0ADpuk18V34OtWN8S0hJyOMsYZKG
-         DZ3FeQwAgU/HrpcxXBWW2H8tt/UuIX4ypLlLVKfqSh3rXART4r4Tw/QKjnEtg7JS8CHS
-         CWcIW0q6hoRoggptEjKDZYq373BjG6IuT0/lhqlLaPYC66B04C52gE09wIc5hlW88owA
-         Gr5feq82Y0tlKosId/vUE/V228jTsXcOxUsj2CaGmnAfl6wsi8uq3/SNbii3CwrF5QN8
-         PobQ==
+        bh=kfRq4neZrPjb9Lck7talXrCmxVTayuyWN8AeTYnUB40=;
+        b=FMN3dhDuy89W3YL34iGrOcxlPjg1bzMkLLXo1TdyO66RGSvbHlps7gdvHr44ss3LGk
+         MR0VFD1DRCFTNC9tyqK5ReMEOiPx2JNiCbTUTyUv9FMGeK9nCNoAU6WnXWYbBC+Dw27V
+         niwud/7XN7pCGjqFT4B3VS+EBw+uLus4pO0EQ6k6SszjrU1zFcD9yQh/qzHLrmZknfvX
+         XuK4cXbAzi1gsEYKdbrLfMfylLB6JTl2vYXAwWR55yMmpFjT1Lojk1XODC7sstmSmHo4
+         uXWebCC18fjzj/uapeQiZlzXqVxfdSytOTcShko5dqCAeC6bbLhPv2RLA/d/FJo+pzzy
+         govw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686272379; x=1688864379;
+        d=1e100.net; s=20221208; t=1686272383; x=1688864383;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0D7F9pDbG9FXqs6+iQJrvOEyVDkJYxW5kzmn8NxTXSM=;
-        b=bg/w9Kig6XZ7/XKHesJxsMC5pLx2Wn012brIhovjvscHPM/mBDySpHMttLFSuX4VzO
-         l97NgL2z+0D6a1kJn9dRGaeBeQruw75u8mc2qknXCe7YTQVdJp2sWc/lMcvlS5DDiK4l
-         9ElnsTVlRs7Bqp1LCi1+wg1R99A703LliX0d8HjoKjXvxRVHwPgIgHh9JrHtCxzA7XSO
-         qYE+Ks5anjDtoTPy/CczNjaRjH6x1geTRLKyHrXy8+9LqPg/zBKrTZov7pCkxOV4282K
-         6A7V8kAI8Vhp+CD5f04OBgznLY55SEk+uRbuZy3fEZpTEFxzQhFvYiKkmCNDRTRjGLf1
-         oJqw==
-X-Gm-Message-State: AC+VfDzJ46mxotuHetRK7otcensaeLO84OOIxvEaoQWRfHtlD0nuOvIn
-	AtICx1DO7LgaRSu6SMPuv0ezef0T6lg=
-X-Google-Smtp-Source: ACHHUZ4+oKNZvW2k4pUHaG+wjpqVYAXO5ZmY9/JryBcaWXlbxmXfyr05oUuxiW1jF2Vui38QPi/ByPbILxk=
+        bh=kfRq4neZrPjb9Lck7talXrCmxVTayuyWN8AeTYnUB40=;
+        b=KX+nWapWDo2QjnHCy9UzdQ2O3VwLz635wdVVGKU6C4a0pXpzvwj4qndpRXJBjU9RuD
+         SGAWzqEk73zwq320shgtceQ5eAaz21uDgTTAuZF8wMvJsu84HCvaSQ0toaLDuyicAyP9
+         wjjcq3kvwJPn3NTE4+FX12QiXueBr3FG9brkzZn7nVARDC5r7n0rId6Z9hVr2wi3a7Fh
+         4nRY53/gHQyRbXjXwKe80xxJVAgae7BvY+00cOIdM/1u36ELyBZpJuxd3JSYXahfFpza
+         tUudSaivJpwWe1p2lz5u5SMmKt4sRdUT48NWLtmNJlA6cITBQh1VXN1O/vnXv2AQM0h2
+         3K5A==
+X-Gm-Message-State: AC+VfDx1DyYCbOqwcY+a7ByZOhy3MGhKqFVk/OuDWmxCzssStCBm80mw
+	ikUu0bPcIU2PynZ+8KyEdP/yi28v48o=
+X-Google-Smtp-Source: ACHHUZ6QOfrw0l3bdpvvlmXUNnamszuXXqEgiHjhlXZ1bthx0t+lBEyPW/rr7RnEuOk5SiS3J1yRldpoYHg=
 X-Received: from yuzhao.bld.corp.google.com ([2620:15c:183:200:f582:c9e5:6c95:4461])
- (user=yuzhao job=sendgmr) by 2002:a81:ae60:0:b0:565:e712:422c with SMTP id
- g32-20020a81ae60000000b00565e712422cmr809562ywk.1.1686272379675; Thu, 08 Jun
- 2023 17:59:39 -0700 (PDT)
-Date: Thu,  8 Jun 2023 18:59:35 -0600
+ (user=yuzhao job=sendgmr) by 2002:a5b:784:0:b0:bad:99d:f087 with SMTP id
+ b4-20020a5b0784000000b00bad099df087mr697256ybq.6.1686272382836; Thu, 08 Jun
+ 2023 17:59:42 -0700 (PDT)
+Date: Thu,  8 Jun 2023 18:59:39 -0600
 In-Reply-To: <20230526234435.662652-1-yuzhao@google.com>
-Message-Id: <20230609005935.42390-1-yuzhao@google.com>
+Message-Id: <20230609005940.42722-1-yuzhao@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,7 +45,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230526234435.662652-1-yuzhao@google.com>
 X-Mailer: git-send-email 2.41.0.162.gfafddb0af9-goog
-Subject: kvm/arm64: Spark benchmark
+Subject: kvm/powerpc: memcached benchmark
 From: Yu Zhao <yuzhao@google.com>
 To: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: Alistair Popple <apopple@nvidia.com>, Anup Patel <anup@brainfault.org>, 
@@ -71,61 +71,56 @@ Content-Type: text/plain; charset="UTF-8"
 
 TLDR
 ====
-Apache Spark spent 12% less time sorting four billion random integers twenty times (in ~4 hours) after this patchset [1].
+Memcached achieved 10% more operations per second (in ~4 hours) after this patchset [1].
 
 Hardware
 ========
 HOST $ lscpu
-Architecture:           aarch64
-  CPU op-mode(s):       32-bit, 64-bit
-  Byte Order:           Little Endian
-CPU(s):                 128
-  On-line CPU(s) list:  0-127
-Vendor ID:              ARM
-  Model name:           Neoverse-N1
-    Model:              1
-    Thread(s) per core: 1
-    Core(s) per socket: 64
-    Socket(s):          2
-    Stepping:           r3p1
-    Frequency boost:    disabled
-    CPU max MHz:        2800.0000
-    CPU min MHz:        1000.0000
-    BogoMIPS:           50.00
-    Flags:              fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp ssbs
+Architecture:          ppc64le
+  Byte Order:          Little Endian
+CPU(s):                184
+  On-line CPU(s) list: 0-183
+Model name:            POWER9 (raw), altivec supported
+  Model:               2.2 (pvr 004e 1202)
+  Thread(s) per core:  4
+  Core(s) per socket:  23
+  Socket(s):           2
+  CPU max MHz:         3000.0000
+  CPU min MHz:         2300.0000
 Caches (sum of all):
-  L1d:                  8 MiB (128 instances)
-  L1i:                  8 MiB (128 instances)
-  L2:                   128 MiB (128 instances)
+  L1d:                 1.4 MiB (46 instances)
+  L1i:                 1.4 MiB (46 instances)
+  L2:                  12 MiB (24 instances)
+  L3:                  240 MiB (24 instances)
 NUMA:
-  NUMA node(s):         2
-  NUMA node0 CPU(s):    0-63
-  NUMA node1 CPU(s):    64-127
+  NUMA node(s):        2
+  NUMA node0 CPU(s):   0-91
+  NUMA node1 CPU(s):   92-183
 Vulnerabilities:
-  Itlb multihit:        Not affected
-  L1tf:                 Not affected
-  Mds:                  Not affected
-  Meltdown:             Not affected
-  Mmio stale data:      Not affected
-  Retbleed:             Not affected
-  Spec store bypass:    Mitigation; Speculative Store Bypass disabled via prctl
-  Spectre v1:           Mitigation; __user pointer sanitization
-  Spectre v2:           Mitigation; CSV2, BHB
-  Srbds:                Not affected
-  Tsx async abort:      Not affected
+  Itlb multihit:       Not affected
+  L1tf:                Mitigation; RFI Flush, L1D private per thread
+  Mds:                 Not affected
+  Meltdown:            Mitigation; RFI Flush, L1D private per thread
+  Mmio stale data:     Not affected
+  Retbleed:            Not affected
+  Spec store bypass:   Mitigation; Kernel entry/exit barrier (eieio)
+  Spectre v1:          Mitigation; __user pointer sanitization, ori31 speculation barrier enabled
+  Spectre v2:          Mitigation; Indirect branch serialisation (kernel only), Indirect branch cache disabled, Software link stack flush
+  Srbds:               Not affected
+  Tsx async abort:     Not affected
 
 HOST $ numactl -H
 available: 2 nodes (0-1)
-node 0 cpus: 0-63
-node 0 size: 257730 MB
-node 0 free: 1447 MB
-node 1 cpus: 64-127
-node 1 size: 256877 MB
-node 1 free: 256093 MB
+node 0 cpus: 0-91
+node 0 size: 261659 MB
+node 0 free: 259152 MB
+node 1 cpus: 92-183
+node 1 size: 261713 MB
+node 1 free: 261076 MB
 node distances:
 node   0   1
-  0:  10  20
-  1:  20  10
+  0:  10  40
+  1:  40  10
 
 HOST $ cat /sys/class/nvme/nvme0/model
 INTEL SSDPF21Q800GB
@@ -139,17 +134,17 @@ HOST $ cat /etc/lsb-release
 DISTRIB_ID=Ubuntu
 DISTRIB_RELEASE=22.04
 DISTRIB_CODENAME=jammy
-DISTRIB_DESCRIPTION="Ubuntu 22.04.1 LTS"
+DISTRIB_DESCRIPTION="Ubuntu 22.04 LTS"
 
 HOST $ uname -a
-Linux arm 6.4.0-rc4 #1 SMP Sat Jun  3 05:30:06 UTC 2023 aarch64 aarch64 aarch64 GNU/Linux
+Linux ppc 6.3.0 #1 SMP Sun Jun  4 18:26:37 UTC 2023 ppc64le ppc64le ppc64le GNU/Linux
 
 HOST $ cat /proc/swaps
-Filename				Type		Size		Used		Priority
-/dev/nvme0n1p2                          partition	466838356	116922112	-2
+Filename          Type         Size         Used    Priority
+/dev/nvme0n1p2    partition	    466838272    0       -2
 
 HOST $ cat /sys/kernel/mm/lru_gen/enabled
-0x000b
+0x0009
 
 HOST $ cat /sys/kernel/mm/transparent_hugepage/enabled
 always madvise [never]
@@ -157,7 +152,7 @@ always madvise [never]
 HOST $ cat /sys/kernel/mm/transparent_hugepage/defrag
 always defer defer+madvise madvise [never]
 
-HOST $ qemu-system-aarch64 --version
+HOST $ qemu-system-ppc64 --version
 QEMU emulator version 6.2.0 (Debian 1:6.2+dfsg-2ubuntu6.6)
 Copyright (c) 2003-2021 Fabrice Bellard and the QEMU Project developers
 
@@ -165,89 +160,48 @@ GUEST $ cat /etc/lsb-release
 DISTRIB_ID=Ubuntu
 DISTRIB_RELEASE=22.04
 DISTRIB_CODENAME=jammy
-DISTRIB_DESCRIPTION="Ubuntu 22.04.2 LTS"
+DISTRIB_DESCRIPTION="Ubuntu 22.04.1 LTS"
 
-GUEST $ java --version
-openjdk 17.0.7 2023-04-18
-OpenJDK Runtime Environment (build 17.0.7+7-Ubuntu-0ubuntu122.04.2)
-OpenJDK 64-Bit Server VM (build 17.0.7+7-Ubuntu-0ubuntu122.04.2, mixed mode, sharing)
+GUEST $ cat /etc/memcached.conf
+...
+-t 92
+-m 262144
+-B binary
+-s /var/run/memcached/memcached.sock
+-a 0766
 
-GUEST $ spark-shell --version
-Welcome to
-      ____              __
-     / __/__  ___ _____/ /__
-    _\ \/ _ \/ _ `/ __/  '_/
-   /___/ .__/\_,_/_/ /_/\_\   version 3.4.0
-      /_/
-
-Using Scala version 2.12.17, OpenJDK 64-Bit Server VM, 17.0.7
-Branch HEAD
-Compiled by user xinrong.meng on 2023-04-07T02:18:01Z
-Revision 87a5442f7ed96b11051d8a9333476d080054e5a0
-Url https://github.com/apache/spark
-Type --help for more information.
+GUEST $ memtier_benchmark -v
+memtier_benchmark 1.4.0
+Copyright (C) 2011-2022 Redis Ltd.
+This is free software.  You may redistribute copies of it under the terms of
+the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.
+There is NO WARRANTY, to the extent permitted by law.
 
 Procedure
 =========
-HOST $ sudo numactl -N 0 -m 0 qemu-system-aarch64 \
-    -M virt,accel=kvm -cpu host -smp 64 -m 300g -nographic -nic user \
-    -bios /usr/share/qemu-efi-aarch64/QEMU_EFI.fd \
+HOST $ sudo numactl -N 0 -m 0 qemu-system-ppc64 \
+    -M pseries,accel=kvm,kvm-type=HV -cpu host -smp 92 -m 270g
+    -nographic -nic user \
     -drive if=virtio,format=raw,file=/dev/nvme0n1p1
 
-GUEST $ cat gen.scala
-import java.io._
-import scala.collection.mutable.ArrayBuffer
+GUEST $ memtier_benchmark -S /var/run/memcached/memcached.sock \
+    -P memcache_binary -c 1 -t 92 --pipeline 1 --ratio 1:0 \
+    --key-minimum=1 --key-maximum=120000000 --key-pattern=P:P \
+    -n allkeys -d 2000
 
-object GenData {
-    def main(args: Array[String]): Unit = {
-        val file = new File("/dev/shm/dataset.txt")
-        val writer = new BufferedWriter(new FileWriter(file))
-        val buf = ArrayBuffer(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L)
-        for(_ <- 0 until 400000000) {
-            for (i <- 0 until 10) {
-                buf.update(i, scala.util.Random.nextLong())
-            }
-            writer.write(s"${buf.mkString(",")}\n")
-        }
-        writer.close()
-    }
-}
-GenData.main(Array())
-
-GUEST $ cat sort.scala
-import java.time.temporal.ChronoUnit
-import org.apache.spark.sql.SparkSession
-
-object SparkSort {
-    def main(args: Array[String]): Unit = {
-        val spark = SparkSession.builder().getOrCreate()
-        val file = sc.textFile("/dev/shm/dataset.txt", 64)
-        val results = file.flatMap(_.split(",")).map(x => (x, 1)).sortByKey().takeOrdered(10)
-        results.foreach(println)
-        spark.stop()
-    }
-}
-SparkSort.main(Array())
-
-GUEST $ cat run_spark.sh
-export SPARK_LOCAL_DIRS=/dev/shm/
-
-spark-shell <gen.scala
-
-start=$SECONDS
-
-for ((i=0; i<20; i++))
-do
-	spark-3.4.0-bin-hadoop3/bin/spark-shell --master "local[64]" --driver-memory 160g <sort.scala
-done
-
-echo "wall time: $((SECONDS - start))"
+GUEST $ memtier_benchmark -S /var/run/memcached/memcached.sock \
+    -P memcache_binary -c 1 -t 92 --pipeline 1 --ratio 0:1 \
+    --key-minimum=1 --key-maximum=120000000 --key-pattern=R:R \
+    -n allkeys --randomize --distinct-client-seed
 
 Results
 =======
-                       Before [1]    After    Change
-----------------------------------------------------
-Wall time (seconds)    14455         12865    -12%
+                Before [1]    After        Change
+-------------------------------------------------
+Ops/sec         721586.10     800210.12    +10%
+Avg. Latency    0.12546       0.11260      -10%
+p50 Latency     0.08700       0.08700      N/C
+p99 Latency     0.28700       0.24700      -13%
 
 Notes
 =====
