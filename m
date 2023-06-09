@@ -1,116 +1,129 @@
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 042EEC8FA
-	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 09:24:41 +0000 (UTC)
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-51494659d49so2686888a12.3
-        for <kvmarm@lists.linux.dev>; Fri, 09 Jun 2023 02:24:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1686302680; x=1688894680;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8ZarEebR8QFxdGd6BDii6BW9L7KO3qDDoKK/MEwvn90=;
-        b=Rs9/5cIfXIF0X9dJtfJjl+S6T33jQp4Px3GDSrcvuwkppHWZXUsL8ehgtlEdVWgQhp
-         wZ7iBamYWGVLJ2Km1VI+A0c5Pj7Vi69maem4T1UfWqzM1ICaSwbq2qvkARzSMmxsidJ4
-         Z5s05RkJYCldhPOJj5incQPIqdVf8FiB/bV5WhSttaKgHDMK9XkzcR2l0+oh0PPWQR6l
-         uxEnpUlJ/GuQWDgQMmKCIbr+mIkQxQIkjpUfyCHTc3RKgv8Hd2GG7MxnWsWVzPJErurs
-         8/ZrLm00PA/JasYULG9e43reLoImOlkCmqVWgNktIvQsgTUqewnuDM6i+qfRNSbyMjR2
-         JIPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686302680; x=1688894680;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8ZarEebR8QFxdGd6BDii6BW9L7KO3qDDoKK/MEwvn90=;
-        b=lx534SyYMsWKq92kBvjL50zRIm2fRiBTGPkiGnZH4WnH2hwo2+D9XgGX9I13NX1bfw
-         Nz5I17sX0JXilCsjgxWtBtzwfWOT1ywTE0odoTfQKnW+L3HA8NEVWeBDRaUn+bEIZKJ8
-         7yH+uMpRrFWpfqUUUFD1PKx/717NSlGtp49dqZt6mK9C2iAtZzV71/rjioCcS/qoWp9F
-         3LogSs+X2dt9NZmCrdzYShQfT3xFFuZ8p304ayws/T4gCuQd8IQ+WqmSxUQ4/hK1WflL
-         9SS3+DnKz6H4JboxEJHXl0ZSjM0tIzB93nF/zOZP/Kn23xUuPLAdEnF/j4O8CbOQy2lN
-         9cCw==
-X-Gm-Message-State: AC+VfDzbGnyXH59TsILp2JncTgXfjBHFRvRVN426lGsrCvAAmB2p9xtt
-	9Ld/26II3KyX/V2l3Vlhl0Q0rQ==
-X-Google-Smtp-Source: ACHHUZ57wveqIUZeYQtbwSYnijhoIMs/IsyQJREmzHYMiZkR8YpHPOCyKtzTyeI/sdX9LNwraQyNBg==
-X-Received: by 2002:a50:fb94:0:b0:4fa:3b3:c867 with SMTP id e20-20020a50fb94000000b004fa03b3c867mr858539edq.17.1686302679914;
-        Fri, 09 Jun 2023 02:24:39 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id n27-20020a056402515b00b00502689a06b2sm1537895edd.91.2023.06.09.02.24.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jun 2023 02:24:39 -0700 (PDT)
-Date: Fri, 9 Jun 2023 11:24:38 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Haibo Xu <haibo1.xu@intel.com>
-Cc: xiaobo55x@gmail.com, maz@kernel.org, oliver.upton@linux.dev, 
-	seanjc@google.com, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Shuah Khan <shuah@kernel.org>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, David Matlack <dmatlack@google.com>, 
-	Ben Gardon <bgardon@google.com>, Vipin Sharma <vipinsh@google.com>, 
-	Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 09/10] KVM: riscv: selftests: Skip some registers set
- operation
-Message-ID: <20230609-05521f954b0485c69612f00b@orel>
-References: <cover.1686275310.git.haibo1.xu@intel.com>
- <73045958d9ab71d5266d012f1e13061afa8c5331.1686275310.git.haibo1.xu@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2961F14A87
+	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 10:04:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1686305073;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=njD4ofcynuYebNknPBZtA2FLfXlSODuIM4FJO18H+mI=;
+	b=FqP1pjjK68+nGLebDNXKXo1Q4dkep5m8aOz1aq7zYeJgdgiM1+C4DzSLCon2kQ/ZNmtZX6
+	8Wk2vgNxDloUyFZYQJrFGrIDFXw78NsoyQa/+T/+JRlHKtrNdWytMGTGnlsJ8zyOBrYag/
+	U86RMiwaKFRTIeYYRCJY06CpwVaD9z8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-439-NHEqEWI7P7GuI-zXwyl0MQ-1; Fri, 09 Jun 2023 06:04:29 -0400
+X-MC-Unique: NHEqEWI7P7GuI-zXwyl0MQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3AEAF811E92;
+	Fri,  9 Jun 2023 10:04:29 +0000 (UTC)
+Received: from gshan.redhat.com (vpn2-54-168.bne.redhat.com [10.64.54.168])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7D05CC154D2;
+	Fri,  9 Jun 2023 10:04:25 +0000 (UTC)
+From: Gavin Shan <gshan@redhat.com>
+To: kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pbonzini@redhat.com,
+	maz@kernel.org,
+	seanjc@google.com,
+	oliver.upton@linux.dev,
+	aarcange@redhat.com,
+	peterx@redhat.com,
+	david@redhat.com,
+	hshuai@redhat.com,
+	zhenyzha@redhat.com,
+	shan.gavin@gmail.com
+Subject: [PATCH v2] KVM: Avoid illegal stage2 mapping on invalid memory slot
+Date: Fri,  9 Jun 2023 20:04:20 +1000
+Message-Id: <20230609100420.521351-1-gshan@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <73045958d9ab71d5266d012f1e13061afa8c5331.1686275310.git.haibo1.xu@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 
-On Fri, Jun 09, 2023 at 10:12:17AM +0800, Haibo Xu wrote:
-> Set operation on some riscv registers(mostly pesudo ones) was not
-> supported and should be skipped in the get-reg-list test. Just
-> reuse the rejects_set utilities to handle it in riscv.
-> 
-> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> ---
->  tools/testing/selftests/kvm/get-reg-list.c | 20 +++++++++++++-------
->  1 file changed, 13 insertions(+), 7 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/get-reg-list.c b/tools/testing/selftests/kvm/get-reg-list.c
-> index c4bd5a5259da..abacb95c21c6 100644
-> --- a/tools/testing/selftests/kvm/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/get-reg-list.c
-> @@ -211,16 +211,22 @@ static void run_test(struct vcpu_reg_list *c)
->  			++failed_get;
->  		}
->  
-> -		/* rejects_set registers are rejected after KVM_ARM_VCPU_FINALIZE */
-> +		/*
-> +		 * rejects_set registers are rejected after KVM_ARM_VCPU_FINALIZE on aarch64,
-> +		 * or registers that should skip set operation on riscv.
-> +		 */
->  		for_each_sublist(c, s) {
->  			if (s->rejects_set && find_reg(s->rejects_set, s->rejects_set_n, reg.id)) {
->  				reject_reg = true;
-> -				ret = __vcpu_ioctl(vcpu, KVM_SET_ONE_REG, &reg);
-> -				if (ret != -1 || errno != EPERM) {
-> -					printf("%s: Failed to reject (ret=%d, errno=%d) ", config_name(c), ret, errno);
-> -					print_reg(config_name(c), reg.id);
-> -					putchar('\n');
-> -					++failed_reject;
-> +				if ((reg.id & KVM_REG_ARCH_MASK) == KVM_REG_ARM64) {
-> +					ret = __vcpu_ioctl(vcpu, KVM_SET_ONE_REG, &reg);
-> +					if (ret != -1 || errno != EPERM) {
-> +						printf("%s: Failed to reject (ret=%d, errno=%d) ",
-> +								config_name(c), ret, errno);
-> +						print_reg(config_name(c), reg.id);
-> +						putchar('\n');
-> +						++failed_reject;
-> +					}
+We run into guest hang in edk2 firmware when KSM is kept as running on
+the host. The edk2 firmware is waiting for status 0x80 from QEMU's pflash
+device (TYPE_PFLASH_CFI01) during the operation of sector erasing or
+buffered write. The status is returned by reading the memory region of
+the pflash device and the read request should have been forwarded to QEMU
+and emulated by it. Unfortunately, the read request is covered by an
+illegal stage2 mapping when the guest hang issue occurs. The read request
+is completed with QEMU bypassed and wrong status is fetched. The edk2
+firmware runs into an infinite loop with the wrong status.
 
-Thinking about this some more, shouldn't we attempt the set ioctl for
-riscv reject registers as well, but look for different error numbers?
+The illegal stage2 mapping is populated due to same page sharing by KSM
+at (C) even the associated memory slot has been marked as invalid at (B)
+when the memory slot is requested to be deleted. It's notable that the
+active and inactive memory slots can't be swapped when we're in the middle
+of kvm_mmu_notifier_change_pte() because kvm->mn_active_invalidate_count
+is elevated, and kvm_swap_active_memslots() will busy loop until it reaches
+to zero again. Besides, the swapping from the active to the inactive memory
+slots is also avoided by holding &kvm->srcu in __kvm_handle_hva_range(),
+corresponding to synchronize_srcu_expedited() in kvm_swap_active_memslots().
 
-Thanks,
-drew
+  CPU-A                    CPU-B
+  -----                    -----
+                           ioctl(kvm_fd, KVM_SET_USER_MEMORY_REGION)
+                           kvm_vm_ioctl_set_memory_region
+                           kvm_set_memory_region
+                           __kvm_set_memory_region
+                           kvm_set_memslot(kvm, old, NULL, KVM_MR_DELETE)
+                             kvm_invalidate_memslot
+                               kvm_copy_memslot
+                               kvm_replace_memslot
+                               kvm_swap_active_memslots        (A)
+                               kvm_arch_flush_shadow_memslot   (B)
+  same page sharing by KSM
+  kvm_mmu_notifier_invalidate_range_start
+        :
+  kvm_mmu_notifier_change_pte
+    kvm_handle_hva_range
+    __kvm_handle_hva_range       (C)
+        :
+  kvm_mmu_notifier_invalidate_range_end
+
+Fix the issue by skipping the invalid memory slot at (C) to avoid the
+illegal stage2 mapping so that the read request for the pflash's status
+is forwarded to QEMU and emulated by it. In this way, the correct pflash's
+status can be returned from QEMU to break the infinite loop in the edk2
+firmware.
+
+Cc: stable@vger.kernel.org # v5.13+
+Fixes: 3039bcc74498 ("KVM: Move x86's MMU notifier memslot walkers to generic code")
+Reported-by: Shuai Hu <hshuai@redhat.com>
+Reported-by: Zhenyu Zhang <zhenyzha@redhat.com>
+Signed-off-by: Gavin Shan <gshan@redhat.com>
+---
+v2: Improved changelog suggested by Marc
+---
+ virt/kvm/kvm_main.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 479802a892d4..7f81a3a209b6 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -598,6 +598,9 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+ 			unsigned long hva_start, hva_end;
+ 
+ 			slot = container_of(node, struct kvm_memory_slot, hva_node[slots->node_idx]);
++			if (slot->flags & KVM_MEMSLOT_INVALID)
++				continue;
++
+ 			hva_start = max(range->start, slot->userspace_addr);
+ 			hva_end = min(range->end, slot->userspace_addr +
+ 						  (slot->npages << PAGE_SHIFT));
+-- 
+2.23.0
+
