@@ -1,34 +1,36 @@
-Received: from out-56.mta0.migadu.com (out-56.mta0.migadu.com [91.218.175.56])
+Received: from out-40.mta1.migadu.com (out-40.mta1.migadu.com [95.215.58.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E86F256D
-	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 14:51:18 +0000 (UTC)
-Date: Fri, 9 Jun 2023 14:51:09 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CD92171A3
+	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 14:59:56 +0000 (UTC)
+Date: Fri, 9 Jun 2023 14:59:50 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1686322274;
+	t=1686322794;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ugtlLEv+hNjZV95DRBMsv7OADrgkWrCWZxoVXaMhWzM=;
-	b=wl6Gjiblbj7fO7EYBkWbx3a+IBk/MtpnHPpaMubTxoj53g8s2Rcx5xm94W51E8Oty9MV90
-	cvORNsoiQS5rS0pvl5s4vyD4mD83CYpo+bTyXAxRUZ8YydHp9RQxnxX2HDpIuwP3m6CXIO
-	yTZCuO9vIGnNChBfIdcd4VlXZosEqHw=
+	bh=tjX8DzT+VkdDDHfdUii6WZAg+8YtJ/Le8qPqCL2aFIg=;
+	b=W1j3MzafFpna6foeRceMZoNVh+mGTUjdhwuAw8nMLJT3L1F1f2IJN6Mf9KJOvSOuRuiO6Q
+	1jLF5iAJd183k0VguYGNXFIS9TJy6XND+BMHrqBRkf04HI+VKUCz6lKW9nd+kjPKJMf2f1
+	PgNbT9fvR4pH0UChxo/8rFuqqN6KiH4=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Chun-Tse Shao <ctshao@google.com>
-Cc: linux-kernel@vger.kernel.org, yuzhao@google.com,
-	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+To: Will Deacon <will@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Colton Lewis <coltonlewis@google.com>,
+	kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Ben Gardon <bgardon@google.com>,
-	Gavin Shan <gshan@redhat.com>, linux-arm-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v1 3/3] KVM: arm64: Using rcu_read_lock() for
- kvm_pgtable_stage2_mkyoung()
-Message-ID: <ZIM8XccN31XSb+Qh@linux.dev>
-References: <20230608220558.39094-1-ctshao@google.com>
- <20230608220558.39094-4-ctshao@google.com>
+Subject: Re: [PATCH 3/3] KVM: arm64: Skip break phase when we have FEAT_BBM
+ level 2
+Message-ID: <ZIM+ZgFji/H3Y/9U@linux.dev>
+References: <20230602170147.1541355-1-coltonlewis@google.com>
+ <20230602170147.1541355-4-coltonlewis@google.com>
+ <87sfb7octw.wl-maz@kernel.org>
+ <ZH5VQMEoiHEITmF4@linux.dev>
+ <20230608172112.GA1606@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -37,33 +39,30 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230608220558.39094-4-ctshao@google.com>
+In-Reply-To: <20230608172112.GA1606@willie-the-truck>
 X-Migadu-Flow: FLOW_OUT
 
-On Thu, Jun 08, 2023 at 03:05:41PM -0700, Chun-Tse Shao wrote:
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 3b9d4d24c361..0f7ea66fb894 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1437,10 +1437,10 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
->  
->  	trace_kvm_access_fault(fault_ipa);
->  
-> -	read_lock(&vcpu->kvm->mmu_lock);
-> +	rcu_read_lock();
->  	mmu = vcpu->arch.hw_mmu;
->  	pte = kvm_pgtable_stage2_mkyoung(mmu->pgt, fault_ipa);
-> -	read_unlock(&vcpu->kvm->mmu_lock);
-> +	rcu_read_unlock();
+Hey Will,
 
-What is the point of acquiring the RCU read lock here?
-kvm_pgtable_walk_{begin,end}() already do the exact same for any
-'shared' walk.
+On Thu, Jun 08, 2023 at 06:21:13PM +0100, Will Deacon wrote:
+> > IIRC, Colton was testing largely with permission relaxation, and had
+> > forward progress issues b.c. the stale TLB entry was never invalidated
+> > in response to a permission fault.
+> 
+> Would the series at:
+> 
+> https://lore.kernel.org/r/5d8e1f752051173d2d1b5c3e14b54eb3506ed3ef.1684892404.git-series.apopple@nvidia.com
+> 
+> help with that?
 
-I agree with Marc that this warrants some very clear benchmark data
-showing the value of the change. As I had mentioned to Yu, I already
-implemented this for my own purposes, but wasn't able to see a
-significant improvement over acquiring the MMU lock for read.
+Heh, that's a rather interesting patch :)
+
+I don't think it is directly related to the problem Colton encounters,
+though the symptoms are similar. This crops up when KVM uses a stricter
+permission set than the primary MMU, like lazy X for deferred I$
+maintenance and write-protection for dirty logging. KVM policy led to
+the stale TLB entry, so KVM is the one that needs to initiate the
+invalidation.
 
 -- 
 Thanks,
