@@ -1,19 +1,19 @@
-Received: from out-39.mta1.migadu.com (out-39.mta1.migadu.com [95.215.58.39])
+Received: from out-36.mta1.migadu.com (out-36.mta1.migadu.com [95.215.58.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9890A408F1
-	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 19:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E57C8F4
+	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 19:01:14 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1686337266;
+	t=1686337272;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=iVoCbGcSXc3YlNbdxbQ4Np4WjjRfqNezMOxc2Wb+q4w=;
-	b=WCfXlrUVAOrCjMM67pSGKlWNQbtJWDYJU4CRR4c2/gWNrFLLptSVqu9Glc4jgCv6igym5P
-	1YaWmxZL7K/d0lRt0BmEr4MCJ3m5gNPyx9+kY2UnUx3A6dxRxE+QYmqjmsEmALv4rST17B
-	tQwzl2/eljs2iKV5ylYvl8qI6PsMmsE=
+	bh=tItGoF8BhDVztrUiIc+AuTU29mTV71m1mnJE4Zpdg24=;
+	b=LWyLA1Ow1Z+VKG0OJPDbZZAL4gLnsxxwpc4oCva9cJMjwv4VPyHxhTcuolTIm62dHJ1mii
+	x1ZT8kCZbi6oIso0nmbE+mBQCHUpn2BqfUeO/EIk9nkLG7JXIz7y0CF4c6cTaTTUtVpbTV
+	0noIjU1xt2sIeEJXPLHGeO8FiiGIMNc=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -29,9 +29,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
 	Jing Zhang <jingzhangos@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v12 01/11] KVM: arm64: Separate out feature sanitisation and initialisation
-Date: Fri,  9 Jun 2023 19:00:44 +0000
-Message-ID: <20230609190054.1542113-2-oliver.upton@linux.dev>
+Subject: [PATCH v12 03/11] KVM: arm64: Make vCPU feature flags consistent VM-wide
+Date: Fri,  9 Jun 2023 19:00:46 +0000
+Message-ID: <20230609190054.1542113-4-oliver.upton@linux.dev>
 In-Reply-To: <20230609190054.1542113-1-oliver.upton@linux.dev>
 References: <20230609190054.1542113-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -43,134 +43,230 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-kvm_vcpu_set_target() iteratively sanitises and copies feature flags in
-one go. This is rather odd, especially considering the fact that bitmap
-accessors can do the heavy lifting. A subsequent change will make vCPU
-features VM-wide, and fitting that into the present implementation is
-just a chore.
+To date KVM has allowed userspace to construct asymmetric VMs where
+particular features may only be supported on a subset of vCPUs. This
+wasn't really the intened usage pattern, and it is a total pain in the
+ass to keep working in the kernel. What's more, this is at odds with CPU
+features in host userspace, where asymmetric features are largely hidden
+or disabled.
 
-Rework the whole thing to use bitmap accessors to sanitise and copy
-flags.
+It's time to put an end to the whole game. Require all vCPUs in the VM
+to have the same feature set, rejecting deviants in the
+KVM_ARM_VCPU_INIT ioctl. Preserve some of the vestiges of per-vCPU
+feature flags in case we need to reinstate the old behavior for some
+limited configurations. Yes, this is a sign of cowardice around a
+user-visibile change.
+
+Hoist all of the 32-bit limitations into kvm_vcpu_init_check_features()
+to avoid nested attempts to acquire the config_lock, which won't end
+well.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_host.h |  1 +
- arch/arm64/kvm/arm.c              | 75 +++++++++++++++++++------------
- 2 files changed, 48 insertions(+), 28 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h |  7 +---
+ arch/arm64/include/asm/kvm_host.h    | 22 +++++------
+ arch/arm64/kvm/arm.c                 | 31 ++++++++++++++-
+ arch/arm64/kvm/reset.c               | 58 ----------------------------
+ 4 files changed, 40 insertions(+), 78 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index b31b32ecbe2d..b19c35129d1c 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -62,12 +62,7 @@ static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+ #else
+ static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+ {
+-	struct kvm *kvm = vcpu->kvm;
+-
+-	WARN_ON_ONCE(!test_bit(KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED,
+-			       &kvm->arch.flags));
+-
+-	return test_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags);
++	return test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features);
+ }
+ #endif
+ 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7e7e19ef6993..565cad211388 100644
+index 565cad211388..2c8c4ace81ef 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -39,6 +39,7 @@
- #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
+@@ -215,25 +215,21 @@ struct kvm_arch {
+ #define KVM_ARCH_FLAG_MTE_ENABLED			1
+ 	/* At least one vCPU has ran in the VM */
+ #define KVM_ARCH_FLAG_HAS_RAN_ONCE			2
+-	/*
+-	 * The following two bits are used to indicate the guest's EL1
+-	 * register width configuration. A value of KVM_ARCH_FLAG_EL1_32BIT
+-	 * bit is valid only when KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED is set.
+-	 * Otherwise, the guest's EL1 register width has not yet been
+-	 * determined yet.
+-	 */
+-#define KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED		3
+-#define KVM_ARCH_FLAG_EL1_32BIT				4
++	/* The vCPU feature set for the VM is configured */
++#define KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED		3
+ 	/* PSCI SYSTEM_SUSPEND enabled for the guest */
+-#define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		5
++#define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		4
+ 	/* VM counter offset */
+-#define KVM_ARCH_FLAG_VM_COUNTER_OFFSET			6
++#define KVM_ARCH_FLAG_VM_COUNTER_OFFSET			5
+ 	/* Timer PPIs made immutable */
+-#define KVM_ARCH_FLAG_TIMER_PPIS_IMMUTABLE		7
++#define KVM_ARCH_FLAG_TIMER_PPIS_IMMUTABLE		6
+ 	/* SMCCC filter initialized for the VM */
+-#define KVM_ARCH_FLAG_SMCCC_FILTER_CONFIGURED		8
++#define KVM_ARCH_FLAG_SMCCC_FILTER_CONFIGURED		7
+ 	unsigned long flags;
  
- #define KVM_VCPU_MAX_FEATURES 7
-+#define KVM_VCPU_VALID_FEATURES	(BIT(KVM_VCPU_MAX_FEATURES) - 1)
- 
- #define KVM_REQ_SLEEP \
- 	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
++	/* VM-wide vCPU feature set */
++	DECLARE_BITMAP(vcpu_features, KVM_VCPU_MAX_FEATURES);
++
+ 	/*
+ 	 * VM-wide PMU filter, implemented as a bitmap and big enough for
+ 	 * up to 2^10 events (ARMv8.0) or 2^16 events (ARMv8.1+).
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 14391826241c..d5298054a8ed 100644
+index a9c18f45df3f..85c978ad1f27 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -1167,42 +1167,40 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
- 	return -EINVAL;
+@@ -170,6 +170,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	 */
+ 	kvm->arch.dfr0_pmuver.imp = kvm_arm_pmu_get_pmuver_limit();
+ 
++	bitmap_zero(kvm->arch.vcpu_features, KVM_VCPU_MAX_FEATURES);
++
+ 	return 0;
+ 
+ err_free_cpumask:
+@@ -1181,6 +1183,20 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
+ 			return -ENOENT;
+ 	}
+ 
++	if (!test_bit(KVM_ARM_VCPU_EL1_32BIT, &features))
++		return 0;
++
++	if (!cpus_have_const_cap(ARM64_HAS_32BIT_EL1))
++		return -EINVAL;
++
++	/* MTE is incompatible with AArch32 */
++	if (kvm_has_mte(vcpu->kvm))
++		return -EINVAL;
++
++	/* NV is incompatible with AArch32 */
++	if (test_bit(KVM_ARM_VCPU_HAS_EL2, &features))
++		return -EINVAL;
++
+ 	return 0;
  }
  
--static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
--			       const struct kvm_vcpu_init *init)
-+static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
-+					const struct kvm_vcpu_init *init)
+@@ -1197,7 +1213,14 @@ static int __kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
+ 				 const struct kvm_vcpu_init *init)
  {
--	unsigned int i, ret;
--	u32 phys_target = kvm_target_cpu();
-+	unsigned long features = init->features[0];
-+	int i;
+ 	unsigned long features = init->features[0];
+-	int ret;
++	struct kvm *kvm = vcpu->kvm;
++	int ret = -EINVAL;
++
++	mutex_lock(&kvm->arch.config_lock);
++
++	if (test_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED, &kvm->arch.flags) &&
++	    !bitmap_equal(kvm->arch.vcpu_features, &features, KVM_VCPU_MAX_FEATURES))
++		goto out_unlock;
  
--	if (init->target != phys_target)
--		return -EINVAL;
-+	if (features & ~KVM_VCPU_VALID_FEATURES)
-+		return -ENOENT;
+ 	vcpu->arch.target = init->target;
+ 	bitmap_copy(vcpu->arch.features, &features, KVM_VCPU_MAX_FEATURES);
+@@ -1207,8 +1230,14 @@ static int __kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
+ 	if (ret) {
+ 		vcpu->arch.target = -1;
+ 		bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
++		goto out_unlock;
+ 	}
  
--	/*
--	 * Secondary and subsequent calls to KVM_ARM_VCPU_INIT must
--	 * use the same target.
--	 */
--	if (vcpu->arch.target != -1 && vcpu->arch.target != init->target)
--		return -EINVAL;
-+	for (i = 1; i < ARRAY_SIZE(init->features); i++) {
-+		if (init->features[i])
-+			return -ENOENT;
-+	}
- 
--	/* -ENOENT for unknown features, -EINVAL for invalid combinations. */
--	for (i = 0; i < sizeof(init->features) * 8; i++) {
--		bool set = (init->features[i / 32] & (1 << (i % 32)));
-+	return 0;
-+}
- 
--		if (set && i >= KVM_VCPU_MAX_FEATURES)
--			return -ENOENT;
-+static bool kvm_vcpu_init_changed(struct kvm_vcpu *vcpu,
-+				  const struct kvm_vcpu_init *init)
-+{
-+	unsigned long features = init->features[0];
- 
--		/*
--		 * Secondary and subsequent calls to KVM_ARM_VCPU_INIT must
--		 * use the same feature set.
--		 */
--		if (vcpu->arch.target != -1 && i < KVM_VCPU_MAX_FEATURES &&
--		    test_bit(i, vcpu->arch.features) != set)
--			return -EINVAL;
-+	return !bitmap_equal(vcpu->arch.features, &features, KVM_VCPU_MAX_FEATURES) ||
-+			vcpu->arch.target != init->target;
-+}
- 
--		if (set)
--			set_bit(i, vcpu->arch.features);
--	}
-+static int __kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
-+				 const struct kvm_vcpu_init *init)
-+{
-+	unsigned long features = init->features[0];
-+	int ret;
- 
--	vcpu->arch.target = phys_target;
-+	vcpu->arch.target = init->target;
-+	bitmap_copy(vcpu->arch.features, &features, KVM_VCPU_MAX_FEATURES);
- 
- 	/* Now we know what it is, we can reset it. */
- 	ret = kvm_reset_vcpu(vcpu);
-@@ -1214,6 +1212,27 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
++	bitmap_copy(kvm->arch.vcpu_features, &features, KVM_VCPU_MAX_FEATURES);
++	set_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED, &kvm->arch.flags);
++
++out_unlock:
++	mutex_unlock(&kvm->arch.config_lock);
  	return ret;
  }
  
-+static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
-+			       const struct kvm_vcpu_init *init)
-+{
-+	int ret;
-+
-+	if (init->target != kvm_target_cpu())
-+		return -EINVAL;
-+
-+	ret = kvm_vcpu_init_check_features(vcpu, init);
-+	if (ret)
-+		return ret;
-+
-+	if (vcpu->arch.target == -1)
-+		return __kvm_vcpu_set_target(vcpu, init);
-+
-+	if (kvm_vcpu_init_changed(vcpu, init))
-+		return -EINVAL;
-+
-+	return kvm_reset_vcpu(vcpu);
-+}
-+
- static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
- 					 struct kvm_vcpu_init *init)
- {
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index b5dee8e57e77..bc8556b6f459 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -186,57 +186,6 @@ static int kvm_vcpu_enable_ptrauth(struct kvm_vcpu *vcpu)
+ 	return 0;
+ }
+ 
+-/**
+- * kvm_set_vm_width() - set the register width for the guest
+- * @vcpu: Pointer to the vcpu being configured
+- *
+- * Set both KVM_ARCH_FLAG_EL1_32BIT and KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED
+- * in the VM flags based on the vcpu's requested register width, the HW
+- * capabilities and other options (such as MTE).
+- * When REG_WIDTH_CONFIGURED is already set, the vcpu settings must be
+- * consistent with the value of the FLAG_EL1_32BIT bit in the flags.
+- *
+- * Return: 0 on success, negative error code on failure.
+- */
+-static int kvm_set_vm_width(struct kvm_vcpu *vcpu)
+-{
+-	struct kvm *kvm = vcpu->kvm;
+-	bool is32bit;
+-
+-	is32bit = vcpu_has_feature(vcpu, KVM_ARM_VCPU_EL1_32BIT);
+-
+-	lockdep_assert_held(&kvm->arch.config_lock);
+-
+-	if (test_bit(KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED, &kvm->arch.flags)) {
+-		/*
+-		 * The guest's register width is already configured.
+-		 * Make sure that the vcpu is consistent with it.
+-		 */
+-		if (is32bit == test_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags))
+-			return 0;
+-
+-		return -EINVAL;
+-	}
+-
+-	if (!cpus_have_const_cap(ARM64_HAS_32BIT_EL1) && is32bit)
+-		return -EINVAL;
+-
+-	/* MTE is incompatible with AArch32 */
+-	if (kvm_has_mte(kvm) && is32bit)
+-		return -EINVAL;
+-
+-	/* NV is incompatible with AArch32 */
+-	if (vcpu_has_nv(vcpu) && is32bit)
+-		return -EINVAL;
+-
+-	if (is32bit)
+-		set_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags);
+-
+-	set_bit(KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED, &kvm->arch.flags);
+-
+-	return 0;
+-}
+-
+ /**
+  * kvm_reset_vcpu - sets core registers and sys_regs to reset value
+  * @vcpu: The VCPU pointer
+@@ -262,13 +211,6 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 	bool loaded;
+ 	u32 pstate;
+ 
+-	mutex_lock(&vcpu->kvm->arch.config_lock);
+-	ret = kvm_set_vm_width(vcpu);
+-	mutex_unlock(&vcpu->kvm->arch.config_lock);
+-
+-	if (ret)
+-		return ret;
+-
+ 	spin_lock(&vcpu->arch.mp_state_lock);
+ 	reset_state = vcpu->arch.reset_state;
+ 	vcpu->arch.reset_state.reset = false;
 -- 
 2.41.0.162.gfafddb0af9-goog
 
