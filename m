@@ -1,51 +1,51 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECAD0BE4B
-	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 09:06:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23418BE53
+	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 09:08:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1686301567;
+	s=mimecast20190719; t=1686301690;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=eyj9qAaMTXhV0BDBMXgw3bkhoC43Djt8OMEq06UECOo=;
-	b=EpEzYbuFJzJ16t3cdUerq6nBDlvoivWJ3MML+Iyfnbd9IV1J+lbRAWAGTC/WE/nnuDkpl6
-	tmgga0QiW/vgwKCuBiGxXIdelZsc6ZbDhUQFR4otrSRuKhUIV059Ykvp0/WPBjZhMP/X8X
-	lxRNrnwMOi2/nlWxG1ZLVtp2G0u1jZM=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=+lS4qtD2LImPdpu4Ozd1FIICWXob78VQWCuBmNpNqeU=;
+	b=iMpy6h9MGhybAsGZPh0/hEsnC8MrGq+DU1A23pFDVfnL4yPv5Xh/0FRsPPNI8sQCbm3VIZ
+	Zi2/QueZQI56iusjrOZw8Jj4FQITVd9r97NdKVMrrXXYxAKTpZabAyDO6w5hMHeo6lywsH
+	TWtxRSzz1BEmOWDM0CYLyR2YmhR2ZVU=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-37-kHopoNLrMHGAB6QeZp3aWg-1; Fri, 09 Jun 2023 05:06:06 -0400
-X-MC-Unique: kHopoNLrMHGAB6QeZp3aWg-1
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-51566dc6066so1498204a12.3
-        for <kvmarm@lists.linux.dev>; Fri, 09 Jun 2023 02:06:06 -0700 (PDT)
+ us-mta-258--jXK01O2MvibG0wCi3ecNA-1; Fri, 09 Jun 2023 05:08:02 -0400
+X-MC-Unique: -jXK01O2MvibG0wCi3ecNA-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-94a348facbbso186016966b.1
+        for <kvmarm@lists.linux.dev>; Fri, 09 Jun 2023 02:08:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686301565; x=1688893565;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20221208; t=1686301681; x=1688893681;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eyj9qAaMTXhV0BDBMXgw3bkhoC43Djt8OMEq06UECOo=;
-        b=ciE1+BtFieZ2PljZFkMRuiCJdQThQDzkYJozQF1dpuxYd3MBSOzl7Rqfu3vE9pwJdQ
-         L362FXP893pKcJ8f6J1GTJVMvK2khDKDSwepPCfjhKEsEKc2beWfnn5TIymlhtzyOOGU
-         AzlE07oDt5iVnj0yt7lhr+xQty/jKQx5BIh2IXytUhr/ZXP62x38n7xBLpxQK5Rm4Qbz
-         isiNu+x8j2Sk+w/F+WjkQ5St0Pu4KXJ1nS/i4NeoN2UVy/D8sE5EuhE7xR3cFVbMrv+M
-         +c43KTOpstJKuigFPL9NyylxGtz1c1Jg18ieqlAstqDSnyqwMRnK/CeR4iHcWSovw6UV
-         i6Dw==
-X-Gm-Message-State: AC+VfDzJECpMt6UEoX/a66Y64qH8etJIEMuPCP5uFZTpJx0KR/VPV6OD
-	PksxKLw7wkIF6TWWx48uVr40+wFC+0hI0Y8a5oK8O0JOE/AsdvNLHPVxkNirQyt4M512Cq0TDYS
-	uWD3ZvrkyrZ2HSFdb
-X-Received: by 2002:a05:6402:643:b0:510:82b4:844d with SMTP id u3-20020a056402064300b0051082b4844dmr902489edx.2.1686301565421;
-        Fri, 09 Jun 2023 02:06:05 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5Eo2fL8sg8ZAFF9ExDb1hoz+RWsXilNiiceAqQ1jh6YF+h+q2Lb+V5P8mQdJn5E/+DPP6p2g==
-X-Received: by 2002:a05:6402:643:b0:510:82b4:844d with SMTP id u3-20020a056402064300b0051082b4844dmr902445edx.2.1686301565157;
-        Fri, 09 Jun 2023 02:06:05 -0700 (PDT)
+        bh=+lS4qtD2LImPdpu4Ozd1FIICWXob78VQWCuBmNpNqeU=;
+        b=cyY0hUYMGAnPCh1sehLtYywg6T3EfDMQE7w+H/aI7VVKinTFRJN/P34yOUgmkrQg1I
+         jAEu4t+PS4AVxK6vcGmiPJdYTVTZ/FG9cmnSkZDUvaAlj/j3Ph3krBSDIobc9dumhIYn
+         gN5Y+29KNuQbX5qJys7ZQ6x6GhDzlztBb/th0GQfROmKjw+xdp6siw8T+21zdXVtHoyX
+         cBanqLrQM4llZmq5gRC2SL4kVpTvfcJbHPU4H0eeOhExkS0t+3DBMfAocGReS+Vto+Ed
+         Dq/uovjkIgvdH8F7W4vM1Tlmrhi2hHEbmcUSv1ycIDQFM42S5Bxg+svtnR0PMl5syhAw
+         nU+g==
+X-Gm-Message-State: AC+VfDyR80Bnzvo3Doact3GakdBT1E/lPItRmduDYRDVAXjUnjMSM8aA
+	Ng5skeCzZtRtE/WiCHRwlQF4GThye39kL+uwso3ZbXASrt7LnrIDm/y7TNy1pJQDdDL//gXhfNu
+	ab0gSOzcXLIf/BNcG
+X-Received: by 2002:a17:907:94cb:b0:97a:e0c0:2f8f with SMTP id dn11-20020a17090794cb00b0097ae0c02f8fmr315226ejc.65.1686301681504;
+        Fri, 09 Jun 2023 02:08:01 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6fk08I4RsyK9p9wcnjDRbMYLy3XBaoHlqt3xl1DLkFDODgHMHCV4XPzuR/CPTVwoW0y6Qefw==
+X-Received: by 2002:a17:907:94cb:b0:97a:e0c0:2f8f with SMTP id dn11-20020a17090794cb00b0097ae0c02f8fmr315171ejc.65.1686301681128;
+        Fri, 09 Jun 2023 02:08:01 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id f9-20020a056402068900b0051495ce23absm1517006edy.10.2023.06.09.02.06.02
+        by smtp.googlemail.com with ESMTPSA id z8-20020a1709067e4800b00977ecf6942bsm1036209ejr.90.2023.06.09.02.07.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Jun 2023 02:06:04 -0700 (PDT)
-Message-ID: <f0fc6e43-ffe3-dc38-03c1-77b2105cd0fb@redhat.com>
-Date: Fri, 9 Jun 2023 11:06:02 +0200
+        Fri, 09 Jun 2023 02:08:00 -0700 (PDT)
+Message-ID: <26cf0b0a-cda5-08a9-a669-6966f9e626b1@redhat.com>
+Date: Fri, 9 Jun 2023 11:07:55 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,8 +54,6 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.10.0
-Subject: Re: [PATCH mm-unstable v2 09/10] kvm/x86: add
- kvm_arch_test_clear_young()
 To: Yu Zhao <yuzhao@google.com>, Andrew Morton <akpm@linux-foundation.org>
 Cc: Alistair Popple <apopple@nvidia.com>, Anup Patel <anup@brainfault.org>,
  Ben Gardon <bgardon@google.com>, Borislav Petkov <bp@alien8.de>,
@@ -84,9 +82,10 @@ Cc: Alistair Popple <apopple@nvidia.com>, Anup Patel <anup@brainfault.org>,
  linuxppc-dev@lists.ozlabs.org, linux-trace-kernel@vger.kernel.org,
  x86@kernel.org, linux-mm@google.com
 References: <20230526234435.662652-1-yuzhao@google.com>
- <20230526234435.662652-10-yuzhao@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20230526234435.662652-10-yuzhao@google.com>
+Subject: Re: [PATCH mm-unstable v2 00/10] mm/kvm: locklessly clear the
+ accessed bit
+In-Reply-To: <20230526234435.662652-1-yuzhao@google.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -94,17 +93,27 @@ Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 5/27/23 01:44, Yu Zhao wrote:
-> +#define kvm_arch_has_test_clear_young kvm_arch_has_test_clear_young
-> +static inline bool kvm_arch_has_test_clear_young(void)
-> +{
-> +	return IS_ENABLED(CONFIG_X86_64) &&
-> +	       (!IS_REACHABLE(CONFIG_KVM) || (tdp_mmu_enabled && shadow_accessed_mask));
-> +}
+> TLDR
+> ====
+> This patchset adds a fast path to clear the accessed bit without
+> taking kvm->mmu_lock. It can significantly improve the performance of
+> guests when the host is under heavy memory pressure.
+> 
+> ChromeOS has been using a similar approach [1] since mid 2021 and it
+> was proven successful on tens of millions devices.
+> 
+> This v2 addressed previous requests [2] on refactoring code, removing
+> inaccurate/redundant texts, etc.
+> 
+> [1]https://crrev.com/c/2987928
+> [2]https://lore.kernel.org/r/20230217041230.2417228-1-yuzhao@google.com/
 
-I don't think you need IS_REACHABLE(CONFIG_KVM) here, it would be a bug 
-if this is called from outside KVM code.
+ From the KVM point of view the patches look good (though I wouldn't 
+mind if Nicholas took a look at the ppc part).  Jason's comment on the 
+MMU notifier side are promising as well.  Can you send v3 with Oliver's 
+comments addressed?
 
-Maybe make it a BUILD_BUG_ON?
+Thanks,
 
 Paolo
 
