@@ -1,161 +1,137 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D949C171B4
-	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 16:54:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58AEAC433EF;
-	Fri,  9 Jun 2023 16:54:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1686329668;
-	bh=VEAIm3KCiR+BrjqeYaNfEcUH21Zmuw15Ud5A/ghy6dw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=P7nlIQsTe+zKQOBoDoQNrZgVEnVxaaQCSazIQlrw1L/K6o3AIqG2KdShyOph+t3Ak
-	 g0UmYlP65doFVX9/WWLq/IULDVnLcKNkIYPZ44XMio1CAD1JHvEgkg1UBjDsbkXyjK
-	 qQpTwinC1bofjIUqHMHt8VMvgQB1aaNlIcXZwcWnnoh79htFsZd7FTfyJU+pac7ink
-	 WrcQP+5W6jREfEXGQ9LuBvZWR+M2qZ9H48/GTS7H8WCSyGKx9erqDrjU6rlucSY+46
-	 TSNrUz8HWHkOenaJ5VyJWeoKRniMh2+HN0SNt6o5i8GbhmkXNPmod9aHobjadlW8Cg
-	 EsW3NG6tRTtXA==
-Received: from 152.5.30.93.rev.sfr.net ([93.30.5.152] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1q7fNZ-0048zH-Kn;
-	Fri, 09 Jun 2023 17:54:26 +0100
-Date: Fri, 09 Jun 2023 17:54:23 +0100
-Message-ID: <87zg58mv9c.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Quentin Perret <qperret@google.com>,
-	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v3 00/17] KVM: arm64: Allow using VHE in the nVHE hypervisor
-In-Reply-To: <20230609162200.2024064-1-maz@kernel.org>
-References: <20230609162200.2024064-1-maz@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B45D81B915
+	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 17:14:44 +0000 (UTC)
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-256e1d87998so851876a91.3
+        for <kvmarm@lists.linux.dev>; Fri, 09 Jun 2023 10:14:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686330884; x=1688922884;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8Sw7MOr+3hnVEmOQlDXydslwjILda+scHccINsHsaSw=;
+        b=mG/nfttSkrdk7C0BSGSr7wCIQeMKSTBtKlye3RaAwU6LncIf6g/898kAUadZsiYvF7
+         BhTF29dwuQ9nNl9vinDfD92+2MgGWOMm7zttIDy8YxDe517xcUNSl9DbkE4YxRbiys1I
+         vOYHP+nVUrqKBaa2aPywvEWu0FyQvbZhbE7QHT5g1EobVzI/sj1wj7VExGmDGxFtQDBf
+         r3nX/MjBQCZcP2edeA8njFSfACzGQFpjVct+LoAeQbQAcAKExT4YrtXGwvAhUva8nvSv
+         NLLyCR0+eOSaxca/4wbZz3ndCR4g5TyLJZ6qgp+WfQ/+IRy4eqNpUIhAymSDJAjJweMY
+         o+2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686330884; x=1688922884;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8Sw7MOr+3hnVEmOQlDXydslwjILda+scHccINsHsaSw=;
+        b=JJeIEjqazpuoeD2dkA7XMRyJ1weqn/rPdSANql4Fk9bTYRp1vvR6zJIPGjaouz8qqi
+         CI++dsCdC3wioqNYiJS9g1ENyYY3JqiX1t9Lkl25nkvT3m9IQUYKSuh5yVMkPSV2MmMa
+         5nJdDtBE0sRxMCH5mid+v4b9Y2W3opClmjX10z+1njXel97s5xfVsQfFknIiYCpWk6Kt
+         qJ3aNpjSoHAPkhKcNT49BHShOOq52FIf4WtreZqXkeL3t8xOwawV8EblHrSwBM9z+UNs
+         bYUTJ0+szMHyVXnQ9Ygi/bnqHm7dBl672TZPRiziuwHU2z5luF5ATP4cFVHIL2WnyHMk
+         XEVg==
+X-Gm-Message-State: AC+VfDyk5MPq6Nw6euObk2UvbViBkoceqgB9cwUd76LlTeN0T5V/IYWT
+	8oLNPNfrqjN0PZqCyU3aoaE=
+X-Google-Smtp-Source: ACHHUZ6LD2YKs6nr9I9wxjQHET90p4R47jYGk6zWEjv3TEEgWiIuKzmmbCdSsqb0wBL8oiyQndc+cQ==
+X-Received: by 2002:a17:90a:7104:b0:255:d878:704a with SMTP id h4-20020a17090a710400b00255d878704amr1861381pjk.4.1686330883399;
+        Fri, 09 Jun 2023 10:14:43 -0700 (PDT)
+Received: from smtpclient.apple (c-24-6-216-183.hsd1.ca.comcast.net. [24.6.216.183])
+        by smtp.gmail.com with ESMTPSA id b16-20020a17090a551000b0024e026444b6sm6779121pji.2.2023.06.09.10.14.42
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 09 Jun 2023 10:14:42 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 93.30.5.152
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, qperret@google.com, will@kernel.org, tabba@google.com, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.600.7\))
+Subject: Re: [kvm-unit-tests PATCH v6 28/32] arm64: Add support for efi in
+ Makefile
+From: Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <20230609-2c01e3ece17d5c6b3005ee4e@orel>
+Date: Fri, 9 Jun 2023 10:14:31 -0700
+Cc: Nikos Nikoleris <nikos.nikoleris@arm.com>,
+ kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ alexandru.elisei@arm.com,
+ ricarkol@google.com,
+ shahuang@redhat.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <E89A8FE9-E27D-422B-84FE-1F69AD3C239C@gmail.com>
+References: <20230530160924.82158-1-nikos.nikoleris@arm.com>
+ <20230530160924.82158-29-nikos.nikoleris@arm.com>
+ <197A5432-65EA-49A7-AD6D-1AFCB58D30D0@gmail.com>
+ <20230609-2c01e3ece17d5c6b3005ee4e@orel>
+To: Andrew Jones <andrew.jones@linux.dev>
+X-Mailer: Apple Mail (2.3731.600.7)
 
-+ Catalin, as this changes a bunch of arch stuff (nothing major, but
-still...)
 
-On Fri, 09 Jun 2023 17:21:43 +0100,
-Marc Zyngier <maz@kernel.org> wrote:
-> 
-> KVM (on ARMv8.0) and pKVM (on all revisions of the architecture) use
-> the split hypervisor model that makes the EL2 code more or less
-> standalone. In the later case, we totally ignore the VHE mode and
-> stick with the good old v8.0 EL2 setup.
-> 
-> This is all good, but means that the EL2 code is limited in what it
-> can do with its own address space. This series proposes to remove this
-> limitation and to allow VHE to be used even with the split hypervisor
-> model. This has some potential isolation benefits[1], and eventually
-> allow systems that do not support HCR_EL2.E2H==0 to run pKVM.
-> 
-> We introduce a new "mode" for KVM called hVHE, in reference to the
-> nVHE mode, and indicating that only the hypervisor is using VHE. Note
-> that this is all this series does. No effort is made to improve the VA
-> space management, which will be the subject of another series if this
-> one ever makes it.
-> 
-> This has been tested on a M1 box (bare metal) as well as as a nested
-> guest on M2, both with the standard nVHE and protected modes, with no
-> measurable change in performance.
-> 
-> Note: the last patch of this series is not a merge candidate.
-> 
-> Thanks,
-> 
->         M.
-> 
-> [1] https://www.youtube.com/watch?v=1F_Mf2j9eIo&list=PLbzoR-pLrL6qWL3v2KOcvwZ54-w0z5uXV&index=11
-> 
-> * From v2:
->   - Use BUILD_BUG_ON() to prevent the use of is_kernel_in_hyp_mode()
->     form hypervisor context
->   - Validate that all CPUs are VHE-capable before flipping the
->     capability
-> 
-> * From v1:
->   - Fixed CNTHCTL_EL2 setup when switching from E2H=0 to E2H=1
->     Amusingly, this was found on NV...
->   - Rebased on 6.4-rc2
-> 
-> Marc Zyngier (17):
->   KVM: arm64: Drop is_kernel_in_hyp_mode() from
->     __invalidate_icache_guest_page()
->   arm64: Prevent the use of is_kernel_in_hyp_mode() in hypervisor code
->   arm64: Turn kaslr_feature_override into a generic SW feature override
->   arm64: Add KVM_HVHE capability and has_hvhe() predicate
->   arm64: Don't enable VHE for the kernel if OVERRIDE_HVHE is set
->   arm64: Allow EL1 physical timer access when running VHE
->   arm64: Use CPACR_EL1 format to set CPTR_EL2 when E2H is set
->   KVM: arm64: Remove alternatives from sysreg accessors in VHE
->     hypervisor context
->   KVM: arm64: Key use of VHE instructions in nVHE code off
->     ARM64_KVM_HVHE
->   KVM: arm64: Force HCR_EL2.E2H when ARM64_KVM_HVHE is set
->   KVM: arm64: Disable TTBR1_EL2 when using ARM64_KVM_HVHE
->   KVM: arm64: Adjust EL2 stage-1 leaf AP bits when ARM64_KVM_HVHE is set
->   KVM: arm64: Rework CPTR_EL2 programming for HVHE configuration
->   KVM: arm64: Program the timer traps with VHE layout in hVHE mode
->   KVM: arm64: Force HCR_E2H in guest context when ARM64_KVM_HVHE is set
->   arm64: Allow arm64_sw.hvhe on command line
->   KVM: arm64: Terrible timer hack for M1 with hVHE
-> 
->  arch/arm64/include/asm/arch_timer.h     |  8 ++++
->  arch/arm64/include/asm/cpufeature.h     |  5 +++
->  arch/arm64/include/asm/el2_setup.h      | 26 ++++++++++++-
->  arch/arm64/include/asm/kvm_arm.h        |  4 +-
->  arch/arm64/include/asm/kvm_asm.h        |  1 +
->  arch/arm64/include/asm/kvm_emulate.h    | 33 +++++++++++++++-
->  arch/arm64/include/asm/kvm_hyp.h        | 37 +++++++++++++-----
->  arch/arm64/include/asm/kvm_mmu.h        |  3 +-
->  arch/arm64/include/asm/virt.h           | 12 +++++-
->  arch/arm64/kernel/cpufeature.c          | 21 +++++++++++
->  arch/arm64/kernel/hyp-stub.S            | 10 ++++-
->  arch/arm64/kernel/idreg-override.c      | 25 ++++++++-----
->  arch/arm64/kernel/image-vars.h          |  3 ++
->  arch/arm64/kernel/kaslr.c               |  6 +--
->  arch/arm64/kvm/arch_timer.c             |  5 +++
->  arch/arm64/kvm/arm.c                    | 12 +++++-
->  arch/arm64/kvm/fpsimd.c                 |  4 +-
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
->  arch/arm64/kvm/hyp/nvhe/hyp-init.S      |  9 +++++
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 17 ++++++++-
->  arch/arm64/kvm/hyp/nvhe/pkvm.c          | 27 ++++++++++---
->  arch/arm64/kvm/hyp/nvhe/switch.c        | 28 ++++++++------
->  arch/arm64/kvm/hyp/nvhe/timer-sr.c      | 25 +++++++++++--
->  arch/arm64/kvm/hyp/pgtable.c            |  6 ++-
->  arch/arm64/kvm/hyp/vhe/switch.c         |  2 +-
->  arch/arm64/kvm/sys_regs.c               |  2 +-
->  arch/arm64/tools/cpucaps                |  1 +
->  drivers/irqchip/irq-apple-aic.c         | 50 ++++++++++++++++++++++++-
->  28 files changed, 320 insertions(+), 64 deletions(-)
-> 
-> -- 
-> 2.34.1
-> 
-> 
-> 
 
--- 
-Without deviation from the norm, progress is not possible.
+> On Jun 9, 2023, at 12:36 AM, Andrew Jones <andrew.jones@linux.dev> =
+wrote:
+>=20
+> On Thu, Jun 08, 2023 at 01:41:58PM -0700, Nadav Amit wrote:
+> ...
+>>> +%.efi: %.so
+>>> + $(call arch_elf_check, $^)
+>>> + $(OBJCOPY) \
+>>> + -j .text -j .sdata -j .data -j .dynamic -j .dynsym \
+>>> + -j .rel -j .rela -j .rel.* -j .rela.* -j .rel* -j .rela* \
+>>> + -j .reloc \
+>>> + -O binary $^ $@
+>>=20
+>> I really appreciate your work Nikos, and I might be late since I see =
+Drew
+>> already applied it to his queue.
+>=20
+> It's not too late. arm/queue isn't stable so we can apply fixes while =
+it
+> bakes there.
+>=20
+>> So consider this email, my previous one, and
+>> others that might follow more as grievances that can easily be =
+addressed later.
+>>=20
+>> So: It would=E2=80=99ve been nice to keep the symbols and debug =
+information in a
+>> separate file. Something like:
+>>=20
+>> diff --git a/arm/Makefile.common b/arm/Makefile.common
+>> index d60cf8c..f904702 100644
+>> --- a/arm/Makefile.common
+>> +++ b/arm/Makefile.common
+>> @@ -69,7 +69,7 @@ FLATLIBS =3D $(libcflat) $(LIBFDT_archive) =
+$(libeabi)
+>> ifeq ($(CONFIG_EFI),y)
+>> %.so: EFI_LDFLAGS +=3D -defsym=3DEFI_SUBSYSTEM=3D0xa --no-undefined
+>> %.so: %.o $(FLATLIBS) $(SRCDIR)/arm/efi/elf_aarch64_efi.lds =
+$(cstart.o)
+>> -       $(CC) $(CFLAGS) -c -o $(@:.so=3D.aux.o) =
+$(SRCDIR)/lib/auxinfo.c \
+>> +       $(CC) $(CFLAGS) -c -g -o $(@:.so=3D.aux.o) =
+$(SRCDIR)/lib/auxinfo.c \
+>>                -DPROGNAME=3D\"$(@:.so=3D.efi)\" =
+-DAUXFLAGS=3D$(AUXFLAGS)
+>>        $(LD) $(EFI_LDFLAGS) -o $@ -T =
+$(SRCDIR)/arm/efi/elf_aarch64_efi.lds \
+>>                $(filter %.o, $^) $(FLATLIBS) $(@:.so=3D.aux.o) \
+>> @@ -78,6 +78,9 @@ ifeq ($(CONFIG_EFI),y)
+>>   %.efi: %.so
+>>        $(call arch_elf_check, $^)
+>> +       $(OBJCOPY) --only-keep-debug $^ $@.debug
+>> +       $(OBJCOPY) --strip-debug $^
+>> +       $(OBJCOPY) --add-gnu-debuglink=3D$@.debug $^
+>>        $(OBJCOPY) \
+>>                -j .text -j .sdata -j .data -j .dynamic -j .dynsym \
+>>                -j .rel -j .rela -j .rel.* -j .rela.* -j .rel* -j =
+.rela* \
+>=20
+> This is nice, but I think it can wait and be posted later.
+>=20
+
+Sure thing. Thanks. I still got few problems I need to finish resolving,
+and some other minor improvements, so I will post them all later.
+
+
