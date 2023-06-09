@@ -1,137 +1,99 @@
-Received: from out-15.mta0.migadu.com (out-15.mta0.migadu.com [91.218.175.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C6923C93
-	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 22:01:21 +0000 (UTC)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1686348079;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zv7Bx0yRs6nsqKrUyo8o/8EZhHqpOYtikkq6kaKoeUY=;
-	b=JEjZMwmuXW4aBwPnFUNSUZiNtHFoWlY6HoUhj1xBxp4oMVJjA0SbvFatni5TN7cxH34Moj
-	AUZylj18vEAdZE16SG/SoJrBTviav7Rt/AWempDCEkwUYiewSRMr37apFjD6qH9PH1TOXk
-	UzpKWEF4zMsW3uhGlXjysZttn9y3naM=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Darren Hart <darren@os.amperecomputing.com>,
-	D Scott Phillips <scott@os.amperecomputing.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 3/3] KVM: arm64: Prevent guests from enabling HA/HD on Ampere1
-Date: Fri,  9 Jun 2023 22:01:04 +0000
-Message-ID: <20230609220104.1836988-4-oliver.upton@linux.dev>
-In-Reply-To: <20230609220104.1836988-1-oliver.upton@linux.dev>
-References: <20230609220104.1836988-1-oliver.upton@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 789B1408F8
+	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 22:58:57 +0000 (UTC)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-3f7359a3b78so23815e9.0
+        for <kvmarm@lists.linux.dev>; Fri, 09 Jun 2023 15:58:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1686351535; x=1688943535;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zhSuAAYkjO4mSfTM7j2Zrn+Ge99zKCVDXuALbQ64GlM=;
+        b=aWAYDSz9kYHjivc5EPQCAcnNIQ7EsxbZzXWVqRidl3AzqgBVql3teVbl5ctpRNVQBR
+         ZwBStvD1xYwTCB6hcgdnP7Qh+kVAAj/vhRhdH6KOE7mVRHzIsC5jWQxqmQ06LdBhp5Mo
+         wDECzvNZeUvBgN3BgXU2RiU3qpl85v5XshXPq7sSEZAFXH+7ToDeQJ/3kwIYzE1UeIq1
+         uB4TAPqNKbW3e09X+80Nfq6HWYvhGp5+mcD92iwq0TUepbI425D+SlrIhSBJv64+0gBw
+         U3UpYfN+g5pDsGTtgWaWmCTkXoqCdaWFc6IgRzHUbsPDr7ZwmcRy9SU96i5ZC6VdO6+v
+         B8yA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686351535; x=1688943535;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zhSuAAYkjO4mSfTM7j2Zrn+Ge99zKCVDXuALbQ64GlM=;
+        b=E56Mx5i9zZY9+nPKeNB1+znROi4IHHqBNmSknOpSNx6SSG2aqABFJW+5/ZzIdyPX76
+         fbtxNZRVpxGTij2IaY63vJ+L7a/lgiyJPpQEVUQ78/IgyZg/V2emLhBbP1dPKe9QMKW/
+         h6ZNtEL0HW8C0peI49YzqEcOFxWMofgjXki55InSzj4BMF4srq31G5fkCV1N5xuv34Nq
+         xVwAZz/7xjckPpnPHWxOYUqHdXjeT3b0UnS2g8oe0KrdmP4KxSyBytDXkZuuYf/CIJ16
+         NLfqk42pvG5NyeSBB/D9eF7SVXEw9JfUTk7wGGmU0AqyIhvjVWP0oq1mkGBDqGF6ccOT
+         DYMQ==
+X-Gm-Message-State: AC+VfDyQa8xynxvbifj+sCQuFVZptKc1wsukgGnZcnF5sNlYqCa34MP+
+	XfIesLV7bV8EnaqwixHAFZJJ1y7wv+OPfsW5cs6n9w==
+X-Google-Smtp-Source: ACHHUZ6tFSQ3jSKz6Gn6QifMsxKaOHFdz2lMG9AU9FIAwd4NiFOYvnPz9hTFf3gOv0EaPRSzfnvu1VJ8Vby/ABDofdg=
+X-Received: by 2002:a05:600c:46c6:b0:3f7:e59f:2183 with SMTP id
+ q6-20020a05600c46c600b003f7e59f2183mr26384wmo.5.1686351535398; Fri, 09 Jun
+ 2023 15:58:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20230608220558.39094-1-ctshao@google.com> <20230608220558.39094-4-ctshao@google.com>
+ <878rctnkqg.wl-maz@kernel.org>
+In-Reply-To: <878rctnkqg.wl-maz@kernel.org>
+From: Chun-Tse Shao <ctshao@google.com>
+Date: Fri, 9 Jun 2023 15:58:44 -0700
+Message-ID: <CAJpZYjVcDAU94Abx7BUV-nZeTJ88ggYs=n8gBUyRUGQ=iQWPvw@mail.gmail.com>
+Subject: Re: [PATCH v1 3/3] KVM: arm64: Using rcu_read_lock() for kvm_pgtable_stage2_mkyoung()
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-kernel@vger.kernel.org, yuzhao@google.com, oliver.upton@linux.dev, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Ben Gardon <bgardon@google.com>, Gavin Shan <gshan@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-An erratum in the HAFDBS implementation in AmpereOne was addressed by
-clearing the feature in the ID register, with the expectation that
-software would not attempt to use the corresponding controls in TCR_EL1.
-The architecture, on the other hand, takes a much more pedantic stance
-on the subject, requiring the TCR bits behave as RES0.
+On Fri, Jun 9, 2023 at 12:44=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> On Thu, 08 Jun 2023 23:05:41 +0100,
+> Chun-Tse Shao <ctshao@google.com> wrote:
+> >
+> > Access bit is RCU safe and can be set without taking kvm->mmu_lock().
+>
+> Please explain why. What happens when the page tables are *not* RCU
+> controlled, such as in the pKVM case?
+>
+> > Replacing existing kvm->mmu_lock() with rcu_read_lock() for better
+> > performance.
+>
+> Please define "better performance", quote workloads, figures, HW setup
+> and point to a reproducer. Please add a cover letter to your patch
+> series explaining the context this happens in.
 
-Take an extremely conservative stance on the issue and leverage the
-precise write trap afforded by FGT. Handle guest writes by clearing HA
-and HD before writing the intended value to the EL1 register alias.
+Thanks for the suggestion, we are currently working on the performance
+test in parallel and will update after gathering more data.
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/kvm/hyp/include/hyp/switch.h | 39 +++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+>
+> Also, I'm getting increasingly annoyed by the lack of coordination
+> between seamingly overlapping patch series (this, Yu's, Anish's and
+> Vipin's), all from a single company.
+>
+> Surely you can talk to each other and devise a coordinated approach?
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index e5702c27a8b2..17d6bcd321d8 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -75,6 +75,9 @@ static inline bool __hfgxtr_traps_required(void)
- 	if (cpus_have_final_cap(ARM64_SME))
- 		return true;
- 
-+	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
-+		return true;
-+
- 	return false;
- }
- 
-@@ -89,6 +92,12 @@ static inline void __activate_traps_hfgxtr(void)
- 		w_clr |= tmp;
- 	}
- 
-+	/*
-+	 * Trap guest writes to TCR_EL1 to prevent it from enabling HA or HD.
-+	 */
-+	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
-+		w_set |= HFGxTR_EL2_TCR_EL1_MASK;
-+
- 	sysreg_clear_set_s(SYS_HFGRTR_EL2, r_clr, r_set);
- 	sysreg_clear_set_s(SYS_HFGWTR_EL2, w_clr, w_set);
- }
-@@ -104,6 +113,9 @@ static inline void __deactivate_traps_hfgxtr(void)
- 		w_set |= tmp;
- 	}
- 
-+	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
-+		w_clr |= HFGxTR_EL2_TCR_EL1_MASK;
-+
- 	sysreg_clear_set_s(SYS_HFGRTR_EL2, r_clr, r_set);
- 	sysreg_clear_set_s(SYS_HFGWTR_EL2, w_clr, w_set);
- }
-@@ -400,12 +412,39 @@ static bool kvm_hyp_handle_cntpct(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
-+static bool handle_ampere1_tcr(struct kvm_vcpu *vcpu)
-+{
-+	u32 sysreg = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
-+	int rt = kvm_vcpu_sys_get_rt(vcpu);
-+	u64 val = vcpu_get_reg(vcpu, rt);
-+
-+	if (sysreg != SYS_TCR_EL1)
-+		return false;
-+
-+	/*
-+	 * Affected parts do not advertise support for hardware Access Flag /
-+	 * Dirty state management in ID_AA64MMFR1_EL1.HAFDBS, but the underlying
-+	 * control bits are still functional. The architecture requires these be
-+	 * RES0 on systems that do not implement FEAT_HAFDBS.
-+	 *
-+	 * Uphold the requirements of the architecture by masking guest writes
-+	 * to TCR_EL1.{HA,HD} here.
-+	 */
-+	val &= ~(TCR_HD | TCR_HA);
-+	write_sysreg_el1(val, SYS_TCR);
-+	return true;
-+}
-+
- static bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM) &&
- 	    handle_tx2_tvm(vcpu))
- 		return true;
- 
-+	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38) &&
-+	    handle_ampere1_tcr(vcpu))
-+		return true;
-+
- 	if (static_branch_unlikely(&vgic_v3_cpuif_trap) &&
- 	    __vgic_v3_perform_cpuif_access(vcpu) == 1)
- 		return true;
--- 
-2.41.0.162.gfafddb0af9-goog
+Sure, I will start internal meeting as needed.
 
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
+
+Thanks,
+CT
