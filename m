@@ -1,137 +1,153 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A4D79E2
-	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 11:00:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1686308400;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hp1V+H0c0blZeFGezmZ2Jagy9PHvvFYZ0tk77cJraXU=;
-	b=UObiRaNbsPSw3qqCEAL2FjZqUDYLc3zZ32RFxC5Ymg1SG6+RBaMkBydaki8ct5aitg+Uwg
-	MgK3xkABPecUvqPZY+gsUKrrUMIzD+cYEW21kYPvsqetnJ4cUYsu2zwZIjcFUygXDQC+UR
-	u7+vseowmv/mtiS0GZnxDjMBabe4ZME=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-206-LiT2uz2SMzCiCXlJ2JPW5Q-1; Fri, 09 Jun 2023 06:59:59 -0400
-X-MC-Unique: LiT2uz2SMzCiCXlJ2JPW5Q-1
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-74faf5008bbso39695185a.0
-        for <kvmarm@lists.linux.dev>; Fri, 09 Jun 2023 03:59:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C41174D2
+	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 12:30:45 +0000 (UTC)
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-4f629ccb8ebso2102470e87.1
+        for <kvmarm@lists.linux.dev>; Fri, 09 Jun 2023 05:30:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1686313843; x=1688905843;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8h26DQt30aCyEhPT/ooAbXH6FQid93QFBSmTC7V6R+4=;
+        b=A1lJFrFXashPyOVE6TwjfXwLaFl61XNjBlCsCbs7HxXdXlscKu2aQeb9jnMUEWsnFP
+         Gqa4zxdJoUevS4rlfUKzeXGooNKBl4E8McMllHfEube1l2jxq71XlpYKaEuc/AZTzZGU
+         FsJEx0y3rWxOwbP1p8DZ4JU1y29iK9r7H2K4jK3YiLEIbADb92nGDzMy8FKbGTP1EjBu
+         3917iiGGQ3TOwK7VW37L0tpiNLdcO/xRJYaSVn899cvVXqbC0NpJnY27H3fNnzr7Hp3R
+         YkdzhR8Zn3sKS5jyM7PVZnwGzGYfrvHrwJrvRUDWtwkbk8efwrHQ7bTVrSq6sPp2DS0N
+         OEaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686308399; x=1688900399;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hp1V+H0c0blZeFGezmZ2Jagy9PHvvFYZ0tk77cJraXU=;
-        b=ZN4RZtMpl/12cpQe87PawdQjwhdYVEOLi88z+9InWbAeMFc9Ur9pATblGc7cXEYFi6
-         Svas40VWHNpoecv80a6u7VrGysk+mg26LHva4MH5N1cWlkKSJLVSqwH15bwbifkd7aI3
-         SVZAyMX2RrGdDBu51fio/9nf86poHuYnlabe6eY7z01QdXpfBBOhRatnyq4WUtiZTA1P
-         W/gCk6oRwfrAycRJynNP81/CtHL7sPcwppZE0rkEB9a+B2ESkJA6RPbN7gTRHU6kb7R/
-         vHyd+vxrEBIVTD/bwRGA+/hydIHYgeh4gUs6ITUpjSm6QiHF/x6LcFABSK74vmyjsODg
-         X5nQ==
-X-Gm-Message-State: AC+VfDz6H0Sbc09TC/MZFXQabGvZpspSa2C7dFu3dVFhrWhxre67yIde
-	Sq+dlDPf0vlIL+4rnzhGwEFya5sCbwlsQuL4+kIpibfr6xGLHxt3YK2aU4KlpHBGbDx2hMvi9GU
-	TIuDKNOugeIS1uuLI
-X-Received: by 2002:a05:620a:8908:b0:75e:bd15:d95a with SMTP id ql8-20020a05620a890800b0075ebd15d95amr826642qkn.6.1686308399086;
-        Fri, 09 Jun 2023 03:59:59 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5pX2BgRt1yhMGjAkkAV6A3kyJooZuyypF9hAb1zGeqztu2HxgfV33qrZip60badBxrIS0f0w==
-X-Received: by 2002:a05:620a:8908:b0:75e:bd15:d95a with SMTP id ql8-20020a05620a890800b0075ebd15d95amr826625qkn.6.1686308398848;
-        Fri, 09 Jun 2023 03:59:58 -0700 (PDT)
-Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id s1-20020a05620a16a100b0075b35e72a21sm951485qkj.86.2023.06.09.03.59.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Jun 2023 03:59:58 -0700 (PDT)
-Message-ID: <10695b6a-65d5-2df3-e89e-8cc2cd75b8ac@redhat.com>
-Date: Fri, 9 Jun 2023 18:59:53 +0800
+        d=1e100.net; s=20221208; t=1686313843; x=1688905843;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8h26DQt30aCyEhPT/ooAbXH6FQid93QFBSmTC7V6R+4=;
+        b=hHrg2wn1NsNO23XYAfzTgbuJx3IxcUtKMOKzdYLVqsoPXJM2lM3dA4ExOue1NMoun0
+         PD8dOrAuZHGHyAv/5cLmqda+M8QXcrW7PttlGIIEwNLB8j+sixNud5n7Tai0OdYkyixz
+         qKxwZQns5UPGxZyfJbYzFMdeXev4gVKLx/PLLSFSN2buf5gd1h2t63X0oGMHrNnJ3nM9
+         v6o1aofxfbBCBsVa95Gh4vR94lh4CvENf4+mI3yDxTGjUCGkBThsjb30kYyKCG6iYipC
+         wgAZNi0RvhAjy6niNEKit96GfMhii+N5+aTFmsWYr3hJ4qhjPEKsH9p6M/tpB1sqg8Ta
+         31oA==
+X-Gm-Message-State: AC+VfDz9dkFjL07JZJM/aHfUoPVkLyqJSVp7ns84yaYKRnX7iiR2h42K
+	VRu0BFVadH+Ha63290UI/MWz/w==
+X-Google-Smtp-Source: ACHHUZ7LLidgDgGdihFdLBcYHtdurgJJ/J4UsIY+yeDDqqFfP2vMmCiYedKW6YkV6nfEzVsYqhM/Ow==
+X-Received: by 2002:ac2:5bd0:0:b0:4f2:40dd:e2cf with SMTP id u16-20020ac25bd0000000b004f240dde2cfmr773184lfn.55.1686313843048;
+        Fri, 09 Jun 2023 05:30:43 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id v26-20020aa7dbda000000b0050cc4461fc5sm1703120edt.92.2023.06.09.05.30.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Jun 2023 05:30:42 -0700 (PDT)
+Date: Fri, 9 Jun 2023 14:30:41 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Haibo Xu <haibo1.xu@intel.com>
+Cc: xiaobo55x@gmail.com, maz@kernel.org, oliver.upton@linux.dev, 
+	seanjc@google.com, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Shuah Khan <shuah@kernel.org>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, David Matlack <dmatlack@google.com>, 
+	Ben Gardon <bgardon@google.com>, Vipin Sharma <vipinsh@google.com>, 
+	Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 07/10] KVM: arm64: selftests: Finish generalizing
+ get-reg-list
+Message-ID: <20230609-b900162a66c26a004b751b1f@orel>
+References: <cover.1686275310.git.haibo1.xu@intel.com>
+ <450cb59db52ebeaa68f3d77f1bd995618f3612b8.1686275310.git.haibo1.xu@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH kvmtool 12/21] Add helpers to pause the VM from vCPU
- thread
-To: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Will Deacon <will@kernel.org>, Julien Thierry
- <julien.thierry.kdev@gmail.com>, Salil Mehta <salil.mehta@huawei.com>
-References: <20230526221712.317287-1-oliver.upton@linux.dev>
- <20230526221712.317287-13-oliver.upton@linux.dev>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230526221712.317287-13-oliver.upton@linux.dev>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <450cb59db52ebeaa68f3d77f1bd995618f3612b8.1686275310.git.haibo1.xu@intel.com>
 
-Hi Oliver,
-
-I have a play with this series, the guest always hang when hotplug two 
-more cpus, it seems the kvm_cpu_continue_vm forget to continue the 
-current cpu.
-
-On 5/27/23 06:17, Oliver Upton wrote:
-> Pausing the VM from a vCPU thread is perilous with the current helpers,
-> as it waits indefinitely for a signal that never comes when invoked from
-> a vCPU thread. Instead, add a helper for pausing the VM from a vCPU,
-> working around the issue by explicitly marking the caller as paused
-> before proceeding.
+On Fri, Jun 09, 2023 at 10:12:15AM +0800, Haibo Xu wrote:
+> From: Andrew Jones <ajones@ventanamicro.com>
 > 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> Add some unfortunate #ifdeffery to ensure the common get-reg-list.c
+> can be compiled and run with other architectures. The next
+> architecture to support get-reg-list should now only need to provide
+> $(ARCH_DIR)/get-reg-list.c where arch-specific print_reg() and
+> vcpu_configs[] get defined.
+> 
+> Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
+> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
 > ---
->   include/kvm/kvm-cpu.h |  3 +++
->   kvm-cpu.c             | 15 +++++++++++++++
->   2 files changed, 18 insertions(+)
+>  tools/testing/selftests/kvm/get-reg-list.c | 24 ++++++++++++++++++----
+>  1 file changed, 20 insertions(+), 4 deletions(-)
 > 
-> diff --git a/include/kvm/kvm-cpu.h b/include/kvm/kvm-cpu.h
-> index 0f16f8d6e872..9a4901bf94ca 100644
-> --- a/include/kvm/kvm-cpu.h
-> +++ b/include/kvm/kvm-cpu.h
-> @@ -29,4 +29,7 @@ void kvm_cpu__show_page_tables(struct kvm_cpu *vcpu);
->   void kvm_cpu__arch_nmi(struct kvm_cpu *cpu);
->   void kvm_cpu__run_on_all_cpus(struct kvm *kvm, struct kvm_cpu_task *task);
->   
-> +void kvm_cpu__pause_vm(struct kvm_cpu *vcpu);
-> +void kvm_cpu__continue_vm(struct kvm_cpu *vcpu);
-> +
->   #endif /* KVM__KVM_CPU_H */
-> diff --git a/kvm-cpu.c b/kvm-cpu.c
-> index 7dec08894cd3..9eb857b859c3 100644
-> --- a/kvm-cpu.c
-> +++ b/kvm-cpu.c
-> @@ -141,6 +141,21 @@ void kvm_cpu__run_on_all_cpus(struct kvm *kvm, struct kvm_cpu_task *task)
->   	mutex_unlock(&task_lock);
->   }
->   
-> +void kvm_cpu__pause_vm(struct kvm_cpu *vcpu)
+> diff --git a/tools/testing/selftests/kvm/get-reg-list.c b/tools/testing/selftests/kvm/get-reg-list.c
+> index 69bb91087081..c4bd5a5259da 100644
+> --- a/tools/testing/selftests/kvm/get-reg-list.c
+> +++ b/tools/testing/selftests/kvm/get-reg-list.c
+> @@ -98,6 +98,7 @@ void __weak print_reg(const char *prefix, __u64 id)
+>  	printf("\t0x%llx,\n", id);
+>  }
+>  
+> +#ifdef __aarch64__
+>  static void prepare_vcpu_init(struct vcpu_reg_list *c, struct kvm_vcpu_init *init)
+>  {
+>  	struct vcpu_reg_sublist *s;
+> @@ -120,6 +121,24 @@ static void finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu_reg_list *c)
+>  	}
+>  }
+>  
+> +static struct kvm_vcpu *vcpu_config_get_vcpu(struct vcpu_reg_list *c, struct kvm_vm *vm)
 > +{
-> +	/*
-> +	 * Mark the calling vCPU as paused to avoid waiting indefinitely for a
-> +	 * signal exit.
-> +	 */
-> +	vcpu->paused = true;
-> +	kvm__pause(vcpu->kvm);
-> +}
+> +	struct kvm_vcpu_init init = { .target = -1, };
+> +	struct kvm_vcpu *vcpu;
 > +
-> +void kvm_cpu__continue_vm(struct kvm_cpu *vcpu)
+> +	prepare_vcpu_init(c, &init);
+> +	vcpu = __vm_vcpu_add(vm, 0);
+> +	aarch64_vcpu_setup(vcpu, &init);
+> +
+> +	return vcpu;
+> +}
+> +#else
+> +static struct kvm_vcpu *vcpu_config_get_vcpu(struct vcpu_reg_list *c, struct kvm_vm *vm)
 > +{
-Here should add:
-	vcpu->paused = false;
-> +	kvm__continue(vcpu->kvm);
+> +	return __vm_vcpu_add(vm, 0);
 > +}
+> +#endif
 > +
->   int kvm_cpu__start(struct kvm_cpu *cpu)
->   {
->   	sigset_t sigset;
+>  static void check_supported(struct vcpu_reg_list *c)
+>  {
+>  	struct vcpu_reg_sublist *s;
+> @@ -139,7 +158,6 @@ static bool print_filtered;
+>  
+>  static void run_test(struct vcpu_reg_list *c)
+>  {
+> -	struct kvm_vcpu_init init = { .target = -1, };
+>  	int new_regs = 0, missing_regs = 0, i, n;
+>  	int failed_get = 0, failed_set = 0, failed_reject = 0;
+>  	struct kvm_vcpu *vcpu;
+> @@ -149,9 +167,7 @@ static void run_test(struct vcpu_reg_list *c)
+>  	check_supported(c);
+>  
+>  	vm = vm_create_barebones();
+> -	prepare_vcpu_init(c, &init);
+> -	vcpu = __vm_vcpu_add(vm, 0);
+> -	aarch64_vcpu_setup(vcpu, &init);
+> +	vcpu = vcpu_config_get_vcpu(c, vm);
+>  	finalize_vcpu(vcpu, c);
 
--- 
-Shaoqin
+I just noticed that this has been modified from what I posted to leave
+the finalize_vcpu() call here, despite it now being inside the #ifdef
+__aarch64__. That breaks the purpose of the patch. Please make sure this
+file compiles for other architectures without requiring additional
+patches, which would keep the commit message honest. You can either
+revert this to what I posted, and then readd the finalize_vcpu() call in
+another patch, or you can add a finalize_vcpu() stub to the #else part
+of the ifdef in this patch.
 
+Also please don't modify patches authored by others without calling out
+the modifications somewhere, either the commit message or under the ---
+of the patch or in the cover letter.
+
+Thanks,
+drew
