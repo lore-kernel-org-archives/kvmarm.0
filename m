@@ -1,25 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C21B19509
-	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 16:22:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8DF7C433D2;
-	Fri,  9 Jun 2023 16:22:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D199200C6
+	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 16:22:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13C88C433A1;
+	Fri,  9 Jun 2023 16:22:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1686327730;
-	bh=zMmxvGzDXTNMjhw5dTDc3LorMJo7C5rGh8NutswreXI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=JthpAM9RM3WbmCm5mBXeS9o+6djxmNtljc2rBgGtPtzX8y8ec3/s1Sa9e43dq3NUJ
-	 ML8Wm5P15g61rQW7/O3Ezqh6xIRgWJTIsJ0stU6qpnVhOUf0/R0tL+HmwG/B4kVlWr
-	 zqnXiGZbiHvbVfWUszyMZRhtsdIFytO4WBpuEDorQ1+z9/qveeM98kIVStF1uCJTKx
-	 CmCV1/6TUBhKdxvxWpr6M7akm/6aGRXy7ZyBHD/6UnezwDVSmbTQ4+elt6jkWP2vIi
-	 G2EpL+6HsdrMNs6e5mRpHJAxXUNrhLZ1S3FLq2RT/uR5nwz8APHZqN0zRF2wI2ElQT
-	 V7F+H6Ez+qvCQ==
+	s=k20201202; t=1686327731;
+	bh=jTsm32MCUnOGraMWZ9kT4/kHOKFUxtgEvgqjHx4EAyY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Q2sHLaqpJbyUUpm0EgO0nZkz7wyxYIVstwAFSUqjeafV3YVsyg1VhJaiFZrIAkIuh
+	 wKMMrvlmrnZHgWubmM6ztT0kvgm2IAdICtdnNy2HbVqjGl71r+QnEcW7HB/tD8BeQ2
+	 r2SJoG16aXoWfZlSUNauYKhLEu6neWfxNxYDJHoPefA/+58aqTiGwArBEX7UJxjxYf
+	 Eg5SDqVXmFXfnBOvIJSHMiRdy1vRxR4rCDdUXrtEPohowhSaUa+JIFQGbSIE8kQHr1
+	 Wtor3w7kbKl2qR96mxtWokN07MenmNTR3ACN4UZu/mRDQTfhB8buEJjm10GimFp7ZE
+	 ssv9JDTU5Tyag==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1q7esK-0048L7-AD;
+	id 1q7esK-0048L7-RF;
 	Fri, 09 Jun 2023 17:22:08 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -32,10 +32,12 @@ Cc: James Morse <james.morse@arm.com>,
 	Quentin Perret <qperret@google.com>,
 	Will Deacon <will@kernel.org>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v3 00/17] KVM: arm64: Allow using VHE in the nVHE hypervisor
-Date: Fri,  9 Jun 2023 17:21:43 +0100
-Message-Id: <20230609162200.2024064-1-maz@kernel.org>
+Subject: [PATCH v3 02/17] arm64: Prevent the use of is_kernel_in_hyp_mode() in hypervisor code
+Date: Fri,  9 Jun 2023 17:21:45 +0100
+Message-Id: <20230609162200.2024064-3-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230609162200.2024064-1-maz@kernel.org>
+References: <20230609162200.2024064-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,98 +50,35 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-KVM (on ARMv8.0) and pKVM (on all revisions of the architecture) use
-the split hypervisor model that makes the EL2 code more or less
-standalone. In the later case, we totally ignore the VHE mode and
-stick with the good old v8.0 EL2 setup.
+Using is_kernel_in_hyp_mode() in hypervisor code is a pretty bad
+mistake. This helper only checks for CurrentEL being EL2, which
+is always true.
 
-This is all good, but means that the EL2 code is limited in what it
-can do with its own address space. This series proposes to remove this
-limitation and to allow VHE to be used even with the split hypervisor
-model. This has some potential isolation benefits[1], and eventually
-allow systems that do not support HCR_EL2.E2H==0 to run pKVM.
+Make the compilation fail if using the helper in hypervisor context
+Whilst we're at it, flag the helper as __always_inline, which it
+really should be.
 
-We introduce a new "mode" for KVM called hVHE, in reference to the
-nVHE mode, and indicating that only the hypervisor is using VHE. Note
-that this is all this series does. No effort is made to improve the VA
-space management, which will be the subject of another series if this
-one ever makes it.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/virt.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-This has been tested on a M1 box (bare metal) as well as as a nested
-guest on M2, both with the standard nVHE and protected modes, with no
-measurable change in performance.
-
-Note: the last patch of this series is not a merge candidate.
-
-Thanks,
-
-        M.
-
-[1] https://www.youtube.com/watch?v=1F_Mf2j9eIo&list=PLbzoR-pLrL6qWL3v2KOcvwZ54-w0z5uXV&index=11
-
-* From v2:
-  - Use BUILD_BUG_ON() to prevent the use of is_kernel_in_hyp_mode()
-    form hypervisor context
-  - Validate that all CPUs are VHE-capable before flipping the
-    capability
-
-* From v1:
-  - Fixed CNTHCTL_EL2 setup when switching from E2H=0 to E2H=1
-    Amusingly, this was found on NV...
-  - Rebased on 6.4-rc2
-
-Marc Zyngier (17):
-  KVM: arm64: Drop is_kernel_in_hyp_mode() from
-    __invalidate_icache_guest_page()
-  arm64: Prevent the use of is_kernel_in_hyp_mode() in hypervisor code
-  arm64: Turn kaslr_feature_override into a generic SW feature override
-  arm64: Add KVM_HVHE capability and has_hvhe() predicate
-  arm64: Don't enable VHE for the kernel if OVERRIDE_HVHE is set
-  arm64: Allow EL1 physical timer access when running VHE
-  arm64: Use CPACR_EL1 format to set CPTR_EL2 when E2H is set
-  KVM: arm64: Remove alternatives from sysreg accessors in VHE
-    hypervisor context
-  KVM: arm64: Key use of VHE instructions in nVHE code off
-    ARM64_KVM_HVHE
-  KVM: arm64: Force HCR_EL2.E2H when ARM64_KVM_HVHE is set
-  KVM: arm64: Disable TTBR1_EL2 when using ARM64_KVM_HVHE
-  KVM: arm64: Adjust EL2 stage-1 leaf AP bits when ARM64_KVM_HVHE is set
-  KVM: arm64: Rework CPTR_EL2 programming for HVHE configuration
-  KVM: arm64: Program the timer traps with VHE layout in hVHE mode
-  KVM: arm64: Force HCR_E2H in guest context when ARM64_KVM_HVHE is set
-  arm64: Allow arm64_sw.hvhe on command line
-  KVM: arm64: Terrible timer hack for M1 with hVHE
-
- arch/arm64/include/asm/arch_timer.h     |  8 ++++
- arch/arm64/include/asm/cpufeature.h     |  5 +++
- arch/arm64/include/asm/el2_setup.h      | 26 ++++++++++++-
- arch/arm64/include/asm/kvm_arm.h        |  4 +-
- arch/arm64/include/asm/kvm_asm.h        |  1 +
- arch/arm64/include/asm/kvm_emulate.h    | 33 +++++++++++++++-
- arch/arm64/include/asm/kvm_hyp.h        | 37 +++++++++++++-----
- arch/arm64/include/asm/kvm_mmu.h        |  3 +-
- arch/arm64/include/asm/virt.h           | 12 +++++-
- arch/arm64/kernel/cpufeature.c          | 21 +++++++++++
- arch/arm64/kernel/hyp-stub.S            | 10 ++++-
- arch/arm64/kernel/idreg-override.c      | 25 ++++++++-----
- arch/arm64/kernel/image-vars.h          |  3 ++
- arch/arm64/kernel/kaslr.c               |  6 +--
- arch/arm64/kvm/arch_timer.c             |  5 +++
- arch/arm64/kvm/arm.c                    | 12 +++++-
- arch/arm64/kvm/fpsimd.c                 |  4 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
- arch/arm64/kvm/hyp/nvhe/hyp-init.S      |  9 +++++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 17 ++++++++-
- arch/arm64/kvm/hyp/nvhe/pkvm.c          | 27 ++++++++++---
- arch/arm64/kvm/hyp/nvhe/switch.c        | 28 ++++++++------
- arch/arm64/kvm/hyp/nvhe/timer-sr.c      | 25 +++++++++++--
- arch/arm64/kvm/hyp/pgtable.c            |  6 ++-
- arch/arm64/kvm/hyp/vhe/switch.c         |  2 +-
- arch/arm64/kvm/sys_regs.c               |  2 +-
- arch/arm64/tools/cpucaps                |  1 +
- drivers/irqchip/irq-apple-aic.c         | 50 ++++++++++++++++++++++++-
- 28 files changed, 320 insertions(+), 64 deletions(-)
-
+diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+index 4eb601e7de50..21e94068804d 100644
+--- a/arch/arm64/include/asm/virt.h
++++ b/arch/arm64/include/asm/virt.h
+@@ -110,8 +110,10 @@ static inline bool is_hyp_mode_mismatched(void)
+ 	return __boot_cpu_mode[0] != __boot_cpu_mode[1];
+ }
+ 
+-static inline bool is_kernel_in_hyp_mode(void)
++static __always_inline bool is_kernel_in_hyp_mode(void)
+ {
++	BUILD_BUG_ON(__is_defined(__KVM_NVHE_HYPERVISOR__) ||
++		     __is_defined(__KVM_VHE_HYPERVISOR__));
+ 	return read_sysreg(CurrentEL) == CurrentEL_EL2;
+ }
+ 
 -- 
 2.34.1
 
