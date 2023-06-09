@@ -1,19 +1,19 @@
-Received: from out-4.mta1.migadu.com (out-4.mta1.migadu.com [95.215.58.4])
+Received: from out-29.mta1.migadu.com (out-29.mta1.migadu.com [95.215.58.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B5441548C
-	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 19:01:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8C71800E
+	for <kvmarm@lists.linux.dev>; Fri,  9 Jun 2023 19:01:24 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1686337280;
+	t=1686337283;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=w/FQV1u6k/vmjhjKH6y7PilsmMno9isZ0LhyzzC2110=;
-	b=fBpK2qOzR8aClywwyMse2BXuq2254jQEOY513gG0PjXSBmYM5DJa4ajexvTKKkJqVp4+Vj
-	zKyG1HHecoNfrWBsyHV/m4UXw1jSmgzetZBENfJpKNixR6p7BkkopCbk2R+8T1f12nNlRA
-	x7IX0OJXGkz4VD9oLNx0lb+kflyLNv8=
+	bh=zy1yXF73OpNsgeqdmiDV5zf3CZjnO5nH7k9Ph0YQJ4o=;
+	b=aeS3YT93+PnE/+oa98nCsabI+HajiNfD91qH6/EqqwZfWnpXYMqbpyOaeiZp1c5i7gKK2y
+	gF/lbIij5uQmkJjjrvdk8koYS6hcHlX2x+Sey+ZYNwdiGhvRFSiM3v4hcEdIW1veOjn0iF
+	I4tvJHHHuuMfCLQYyql1Z9ppTJe80vM=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -28,11 +28,10 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Cornelia Huck <cohuck@redhat.com>,
 	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
 	Jing Zhang <jingzhangos@google.com>,
-	Reiji Watanabe <reijiw@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v12 06/11] KVM: arm64: Save ID registers' sanitized value per guest
-Date: Fri,  9 Jun 2023 19:00:49 +0000
-Message-ID: <20230609190054.1542113-7-oliver.upton@linux.dev>
+Subject: [PATCH v12 07/11] KVM: arm64: Use arm64_ftr_bits to sanitise ID register writes
+Date: Fri,  9 Jun 2023 19:00:50 +0000
+Message-ID: <20230609190054.1542113-8-oliver.upton@linux.dev>
 In-Reply-To: <20230609190054.1542113-1-oliver.upton@linux.dev>
 References: <20230609190054.1542113-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -46,177 +45,182 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Jing Zhang <jingzhangos@google.com>
 
-Initialize the default ID register values upon the first call to
-KVM_ARM_VCPU_INIT. The vCPU feature flags are finalized at that point,
-so it is possible to determine the maximum feature set supported by a
-particular VM configuration. Do nothing with these values for now, as we
-need to rework the plumbing of what's already writable to be compatible
-with the generic infrastructure.
+Rather than reinventing the wheel in KVM to do ID register sanitisation
+we can rely on the work already done in the core kernel. Implement a
+generalized sanitisation of ID registers based on the combination of the
+arm64_ftr_bits definitions from the core kernel and (optionally) a set
+of KVM-specific overrides.
 
-Co-developed-by: Reiji Watanabe <reijiw@google.com>
-Signed-off-by: Reiji Watanabe <reijiw@google.com>
+This all amounts to absolutely nothing for now, but will be used in
+subsequent changes to realize user-configurable ID registers.
+
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
-[Oliver: Hoist everything into KVM_ARM_VCPU_INIT time, so the features
- are final]
+[Oliver: split off from monster patch, rewrote commit description,
+ reworked RAZ handling]
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_host.h | 15 +++++++++
- arch/arm64/kvm/sys_regs.c         | 56 +++++++++++++++++++++++++++++--
- arch/arm64/kvm/sys_regs.h         |  7 ++++
- 3 files changed, 75 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/cpufeature.h |   1 +
+ arch/arm64/kernel/cpufeature.c      |   2 +-
+ arch/arm64/kvm/sys_regs.c           | 113 +++++++++++++++++++++++++++-
+ 3 files changed, 111 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 44da989435fc..39270bc29a3f 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -225,6 +225,8 @@ struct kvm_arch {
- #define KVM_ARCH_FLAG_TIMER_PPIS_IMMUTABLE		6
- 	/* SMCCC filter initialized for the VM */
- #define KVM_ARCH_FLAG_SMCCC_FILTER_CONFIGURED		7
-+	/* Initial ID reg values loaded */
-+#define KVM_ARCH_FLAG_ID_REGS_INITIALIZED		8
- 	unsigned long flags;
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 6bf013fb110d..dc769c2eb7a4 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -915,6 +915,7 @@ static inline unsigned int get_vmid_bits(u64 mmfr1)
+ 	return 8;
+ }
  
- 	/* VM-wide vCPU feature set */
-@@ -247,6 +249,19 @@ struct kvm_arch {
- 	struct kvm_smccc_features smccc_feat;
- 	struct maple_tree smccc_filter;
++s64 arm64_ftr_safe_value(const struct arm64_ftr_bits *ftrp, s64 new, s64 cur);
+ struct arm64_ftr_reg *get_arm64_ftr_reg(u32 sys_id);
  
-+	/*
-+	 * Emulated CPU ID registers per VM
-+	 * (Op0, Op1, CRn, CRm, Op2) of the ID registers to be saved in it
-+	 * is (3, 0, 0, crm, op2), where 1<=crm<8, 0<=op2<8.
-+	 *
-+	 * These emulated idregs are VM-wide, but accessed from the context of a vCPU.
-+	 * Atomic access to multiple idregs are guarded by kvm_arch.config_lock.
-+	 */
-+#define IDREG_IDX(id)		(((sys_reg_CRm(id) - 1) << 3) | sys_reg_Op2(id))
-+#define IDREG(kvm, id)		((kvm)->arch.id_regs[IDREG_IDX(id)])
-+#define KVM_ARM_ID_REG_NUM	(IDREG_IDX(sys_reg(3, 0, 0, 7, 7)) + 1)
-+	u64 id_regs[KVM_ARM_ID_REG_NUM];
-+
- 	/*
- 	 * For an untrusted host VM, 'pkvm.handle' is used to lookup
- 	 * the associated pKVM instance in the hypervisor.
+ extern struct arm64_ftr_override id_aa64mmfr1_override;
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 7d7128c65161..3317a7b6deac 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -798,7 +798,7 @@ static u64 arm64_ftr_set_value(const struct arm64_ftr_bits *ftrp, s64 reg,
+ 	return reg;
+ }
+ 
+-static s64 arm64_ftr_safe_value(const struct arm64_ftr_bits *ftrp, s64 new,
++s64 arm64_ftr_safe_value(const struct arm64_ftr_bits *ftrp, s64 new,
+ 				s64 cur)
+ {
+ 	s64 ret = 0;
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 9d37f16cfb7b..3015c860deca 100644
+index 3015c860deca..0fbdb6ef68e4 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1311,6 +1311,17 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu, const struct sys_reg_desc *r
- 	return __kvm_read_sanitised_id_reg(vcpu, r);
- }
- 
-+/*
-+ * Return true if the register's (Op0, Op1, CRn, CRm, Op2) is
-+ * (3, 0, 0, crm, op2), where 1<=crm<8, 0<=op2<8.
-+ */
-+static inline bool is_id_reg(u32 id)
-+{
-+	return (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
-+		sys_reg_CRn(id) == 0 && sys_reg_CRm(id) >= 1 &&
-+		sys_reg_CRm(id) < 8);
-+}
-+
- static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
- 				  const struct sys_reg_desc *r)
- {
-@@ -2303,6 +2314,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
- };
- 
-+static const struct sys_reg_desc *first_idreg;
-+
- static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
- 			struct sys_reg_params *p,
- 			const struct sys_reg_desc *r)
-@@ -2993,6 +3006,28 @@ static bool emulate_sys_reg(struct kvm_vcpu *vcpu,
- 	return false;
- }
- 
-+static void kvm_reset_id_regs(struct kvm_vcpu *vcpu)
-+{
-+	const struct sys_reg_desc *idreg = first_idreg;
-+	u32 id = reg_to_encoding(idreg);
-+	struct kvm *kvm = vcpu->kvm;
-+
-+	if (test_bit(KVM_ARCH_FLAG_ID_REGS_INITIALIZED, &kvm->arch.flags))
-+		return;
-+
-+	lockdep_assert_held(&kvm->arch.config_lock);
-+
-+	/* Initialize all idregs */
-+	while (is_id_reg(id)) {
-+		IDREG(kvm, id) = idreg->reset(vcpu, idreg);
-+
-+		idreg++;
-+		id = reg_to_encoding(idreg);
-+	}
-+
-+	set_bit(KVM_ARCH_FLAG_ID_REGS_INITIALIZED, &kvm->arch.flags);
-+}
-+
- /**
-  * kvm_reset_sys_regs - sets system registers to reset value
-  * @vcpu: The VCPU pointer
-@@ -3004,9 +3039,17 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
- {
- 	unsigned long i;
- 
--	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++)
--		if (sys_reg_descs[i].reset)
--			sys_reg_descs[i].reset(vcpu, &sys_reg_descs[i]);
-+	kvm_reset_id_regs(vcpu);
-+
-+	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
-+		const struct sys_reg_desc *r = &sys_reg_descs[i];
-+
-+		if (is_id_reg(reg_to_encoding(r)))
-+			continue;
-+
-+		if (r->reset)
-+			r->reset(vcpu, r);
-+	}
- }
- 
- /**
-@@ -3413,6 +3456,7 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
- 
- int __init kvm_sys_reg_table_init(void)
- {
-+	struct sys_reg_params params;
- 	bool valid = true;
- 	unsigned int i;
- 
-@@ -3431,5 +3475,11 @@ int __init kvm_sys_reg_table_init(void)
- 	for (i = 0; i < ARRAY_SIZE(invariant_sys_regs); i++)
- 		invariant_sys_regs[i].reset(NULL, &invariant_sys_regs[i]);
- 
-+	/* Find the first idreg (SYS_ID_PFR0_EL1) in sys_reg_descs. */
-+	params = encoding_to_params(SYS_ID_PFR0_EL1);
-+	first_idreg = find_reg(&params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
-+	if (!first_idreg)
-+		return -EINVAL;
-+
+@@ -1201,6 +1201,91 @@ static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
  	return 0;
  }
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index 63bca7521dfd..c65c129b3500 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -27,6 +27,13 @@ struct sys_reg_params {
- 	bool	is_write;
- };
  
-+#define encoding_to_params(reg)						\
-+	((struct sys_reg_params){ .Op0 = sys_reg_Op0(reg),		\
-+				  .Op1 = sys_reg_Op1(reg),		\
-+				  .CRn = sys_reg_CRn(reg),		\
-+				  .CRm = sys_reg_CRm(reg),		\
-+				  .Op2 = sys_reg_Op2(reg) })
++static s64 kvm_arm64_ftr_safe_value(u32 id, const struct arm64_ftr_bits *ftrp,
++				    s64 new, s64 cur)
++{
++	struct arm64_ftr_bits kvm_ftr = *ftrp;
 +
- #define esr_sys64_to_params(esr)                                               \
- 	((struct sys_reg_params){ .Op0 = ((esr) >> 20) & 3,                    \
- 				  .Op1 = ((esr) >> 14) & 0x7,                  \
++	/* Some features have different safe value type in KVM than host features */
++	switch (id) {
++	case SYS_ID_AA64DFR0_EL1:
++		if (kvm_ftr.shift == ID_AA64DFR0_EL1_PMUVer_SHIFT)
++			kvm_ftr.type = FTR_LOWER_SAFE;
++		break;
++	case SYS_ID_DFR0_EL1:
++		if (kvm_ftr.shift == ID_DFR0_EL1_PerfMon_SHIFT)
++			kvm_ftr.type = FTR_LOWER_SAFE;
++		break;
++	}
++
++	return arm64_ftr_safe_value(&kvm_ftr, new, cur);
++}
++
++/**
++ * arm64_check_features() - Check if a feature register value constitutes
++ * a subset of features indicated by the idreg's KVM sanitised limit.
++ *
++ * This function will check if each feature field of @val is the "safe" value
++ * against idreg's KVM sanitised limit return from reset() callback.
++ * If a field value in @val is the same as the one in limit, it is always
++ * considered the safe value regardless For register fields that are not in
++ * writable, only the value in limit is considered the safe value.
++ *
++ * Return: 0 if all the fields are safe. Otherwise, return negative errno.
++ */
++static int arm64_check_features(struct kvm_vcpu *vcpu,
++				const struct sys_reg_desc *rd,
++				u64 val)
++{
++	const struct arm64_ftr_reg *ftr_reg;
++	const struct arm64_ftr_bits *ftrp = NULL;
++	u32 id = reg_to_encoding(rd);
++	u64 writable_mask = rd->val;
++	u64 limit = rd->reset(vcpu, rd);
++	u64 mask = 0;
++
++	/*
++	 * Hidden and unallocated ID registers may not have a corresponding
++	 * struct arm64_ftr_reg. Of course, if the register is RAZ we know the
++	 * only safe value is 0.
++	 */
++	if (sysreg_visible_as_raz(vcpu, rd))
++		return val ? -E2BIG : 0;
++
++	ftr_reg = get_arm64_ftr_reg(id);
++	if (!ftr_reg)
++		return -EINVAL;
++
++	ftrp = ftr_reg->ftr_bits;
++
++	for (; ftrp && ftrp->width; ftrp++) {
++		s64 f_val, f_lim, safe_val;
++		u64 ftr_mask;
++
++		ftr_mask = arm64_ftr_mask(ftrp);
++		if ((ftr_mask & writable_mask) != ftr_mask)
++			continue;
++
++		f_val = arm64_ftr_value(ftrp, val);
++		f_lim = arm64_ftr_value(ftrp, limit);
++		mask |= ftr_mask;
++
++		if (f_val == f_lim)
++			safe_val = f_val;
++		else
++			safe_val = kvm_arm64_ftr_safe_value(id, ftrp, f_val, f_lim);
++
++		if (safe_val != f_val)
++			return -E2BIG;
++	}
++
++	/* For fields that are not writable, values in limit are the safe values. */
++	if ((val & ~mask) != (limit & ~mask))
++		return -E2BIG;
++
++	return 0;
++}
++
+ static u8 perfmon_to_pmuver(u8 perfmon)
+ {
+ 	switch (perfmon) {
+@@ -1528,11 +1613,31 @@ static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 		      u64 val)
+ {
+-	/* This is what we mean by invariant: you can't change it. */
+-	if (val != read_id_reg(vcpu, rd))
+-		return -EINVAL;
++	u32 id = reg_to_encoding(rd);
++	int ret;
+ 
+-	return 0;
++	mutex_lock(&vcpu->kvm->arch.config_lock);
++
++	/*
++	 * Once the VM has started the ID registers are immutable. Reject any
++	 * write that does not match the final register value.
++	 */
++	if (kvm_vm_has_ran_once(vcpu->kvm)) {
++		if (val != read_id_reg(vcpu, rd))
++			ret = -EBUSY;
++		else
++			ret = 0;
++
++		mutex_unlock(&vcpu->kvm->arch.config_lock);
++		return ret;
++	}
++
++	ret = arm64_check_features(vcpu, rd, val);
++	if (!ret)
++		IDREG(vcpu->kvm, id) = val;
++
++	mutex_unlock(&vcpu->kvm->arch.config_lock);
++	return ret;
+ }
+ 
+ static int get_raz_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
 -- 
 2.41.0.162.gfafddb0af9-goog
 
