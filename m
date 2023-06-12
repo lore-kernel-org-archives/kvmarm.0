@@ -1,120 +1,111 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A6091C06
-	for <kvmarm@lists.linux.dev>; Mon, 12 Jun 2023 05:07:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1686546442;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=2KwLEKyk3OHL6JZRSL3mC7Y+rJWSx7IrBJpbK44Gq+g=;
-	b=ExKa6jwTBvnSyO5DcJ5tFf+05DeuGcsMecufte/Y2mTdxq+FfWR47PBGy42istyx4bC4NM
-	2SGwfcMCMhLFFGiMlWzQCLjKZTNmL8aQ5p39f6vw2ImRoeIRDbreOnr4875W5J0QTVxehT
-	Ntq1xgirrfcFDBNE8CLMA1N4UlKWY4Y=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-516-Prprt-4aOf-o61__KKOBLg-1; Mon, 12 Jun 2023 01:07:18 -0400
-X-MC-Unique: Prprt-4aOf-o61__KKOBLg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3285E3C01C15;
-	Mon, 12 Jun 2023 05:07:18 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-97.bne.redhat.com [10.64.54.97])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3DF13167EE;
-	Mon, 12 Jun 2023 05:07:14 +0000 (UTC)
-From: Gavin Shan <gshan@redhat.com>
-To: kvmarm@lists.linux.dev
-Cc: kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org,
-	andrew.jones@linux.dev,
-	frankja@linux.ibm.com,
-	imbrenda@linux.ibm.com,
-	nrb@linux.ibm.com,
-	thuth@redhat.com,
-	shan.gavin@gmail.com
-Subject: [kvm-unit-tests PATCH] runtime: Allow to specify properties for accelerator
-Date: Mon, 12 Jun 2023 15:07:08 +1000
-Message-Id: <20230612050708.584111-1-gshan@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3820ABE77
+	for <kvmarm@lists.linux.dev>; Mon, 12 Jun 2023 07:07:53 +0000 (UTC)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-3f7f4819256so28710675e9.1
+        for <kvmarm@lists.linux.dev>; Mon, 12 Jun 2023 00:07:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1686553672; x=1689145672;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tnCxW0itTMo6yA3XNQbbmF8xoq0kbOuc9xf7ZwUXCgc=;
+        b=AjUEzLuwBYYyf1jbHOpvc6+JllXdUSMtkFr7TKGPKZqLBlwOnHdzRr9qoaUibyzByR
+         a991lbdsojsORGHg6in+lAYfB9j+dMIoJtcLQ9eJGWGuLXQLvXtkrWseNO/H6dQ4KDeE
+         A2pqJXmxFq6OE9g9/+3ni3XOKzCPNffoizAvUD77PzhVLQ3jimoQ3GNHe7uWHDXrSLQI
+         ReMP8kHpIBPYOJNCgdjgMzQrF2ZRXkzTkic7vvCw5qqOyE4nNRTHQBX3jO2z4Dq89mR1
+         I76wcyDZnfDpKiBnuwHfsClrmYl+MxdYAktvhxyErCq6i5orQU4fD/9PNuehG7Jpcf7S
+         cWOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686553672; x=1689145672;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tnCxW0itTMo6yA3XNQbbmF8xoq0kbOuc9xf7ZwUXCgc=;
+        b=XObu7lwQTYLyua0jPKxS6L3kurRV7b/1yrQone3+oTv6RfP7WrHX6tphw+mxSMoX/i
+         378IfkEJOw0Btbvh8FBx/dRfSRp8luJiG3uzOSICp9fyW1H+YGIeCPn33suWWA5xW+f2
+         HIRw1h9URT8TszGTei8RQcrOQHfzedDFb1c5OoD7PZ12s58QDobbCfhS8mFwmGtFULdA
+         ZVfzbOnK0+gv7FVZLtHkay4u3CPuXs9G3p3mPjizjoY8uIn3CjTeGiAhQCWV4Hwtrmrd
+         uEpYMdeJMmH9kTGHQR2Z612uLArYOY7TKCKUrvKuiYFt0oIfvOC04h7kdPOrTiyG7Ahg
+         uBtA==
+X-Gm-Message-State: AC+VfDwn815UcSpSLnhoY+Rdz7RiXpIcm9cx5v75nHamYXxFK+t6lfqx
+	muKBigZQVJHmhJWvdxWhir7ZMQ==
+X-Google-Smtp-Source: ACHHUZ4pmw8BWg0wWjjye8G9cWexophtsTqyab55gNCps5/WPk8Yrdx2UsNUrSaI5OFSkNxilzQIDQ==
+X-Received: by 2002:a7b:c8da:0:b0:3f7:e8fc:678d with SMTP id f26-20020a7bc8da000000b003f7e8fc678dmr5977585wml.13.1686553672137;
+        Mon, 12 Jun 2023 00:07:52 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id e13-20020a05600c218d00b003f709a7e46bsm10317708wme.46.2023.06.12.00.07.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jun 2023 00:07:50 -0700 (PDT)
+Date: Mon, 12 Jun 2023 10:07:46 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Marc Zyngier <maz@kernel.org>,
+	Christoffer Dall <christoffer.dall@arm.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, kernel-janitors@vger.kernel.org
+Subject: [PATCH] KVM: arm64: timers: Fix resource leaks in
+ kvm_timer_hyp_init()
+Message-ID: <e0dd820f-52d2-4c54-97f3-5aa02e0bd6e0@kili.mountain>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
-There are extra properties for accelerators to enable the specific
-features. For example, the dirty ring for KVM accelerator can be
-enabled by "-accel kvm,dirty-ring-size=65536". Unfortuntely, the
-extra properties for the accelerators aren't supported. It makes
-it's impossible to test the combination of KVM and dirty ring
-as the following error message indicates.
+Smatch detected this bug:
+    arch/arm64/kvm/arch_timer.c:1425 kvm_timer_hyp_init()
+    warn: missing unwind goto?
 
-  # cd /home/gavin/sandbox/kvm-unit-tests/tests
-  # QEMU=/home/gavin/sandbox/qemu.main/build/qemu-system-aarch64 \
-    ACCEL=kvm,dirty-ring-size=65536 ./its-migration
-     :
-  BUILD_HEAD=2fffb37e
-  timeout -k 1s --foreground 90s /home/gavin/sandbox/qemu.main/build/qemu-system-aarch64 \
-  -nodefaults -machine virt -accel kvm,dirty-ring-size=65536 -cpu cortex-a57             \
-  -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd   \
-  -device pci-testdev -display none -serial stdio -kernel _NO_FILE_4Uhere_ -smp 160      \
-  -machine gic-version=3 -append its-pending-migration # -initrd /tmp/tmp.gfDLa1EtWk
-  qemu-system-aarch64: kvm_init_vcpu: kvm_arch_init_vcpu failed (0): Invalid argument
+There are a couple error paths which do not release their resources
+correctly.  Fix them.
 
-Allow to specify extra properties for accelerators. With this, the
-"its-migration" can be tested for the combination of KVM and dirty
-ring.
-
-Signed-off-by: Gavin Shan <gshan@redhat.com>
+Fixes: 9e01dc76be6a ("KVM: arm/arm64: arch_timer: Assign the phys timer on VHE systems")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 ---
- arm/run               | 4 ++--
- scripts/arch-run.bash | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/arch_timer.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/arm/run b/arm/run
-index c6f25b8..bbf80e0 100755
---- a/arm/run
-+++ b/arm/run
-@@ -35,13 +35,13 @@ fi
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 05b022be885b..c2df8332d2bd 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -1422,7 +1422,7 @@ int __init kvm_timer_hyp_init(bool has_gic)
+ 		if (err) {
+ 			kvm_err("kvm_arch_timer: can't request ptimer interrupt %d (%d)\n",
+ 				host_ptimer_irq, err);
+-			return err;
++			goto out_free_irq;
+ 		}
  
- M='-machine virt'
+ 		if (has_gic) {
+@@ -1430,7 +1430,7 @@ int __init kvm_timer_hyp_init(bool has_gic)
+ 						    kvm_get_running_vcpus());
+ 			if (err) {
+ 				kvm_err("kvm_arch_timer: error setting vcpu affinity\n");
+-				goto out_free_irq;
++				goto out_free_ptimer_irq;
+ 			}
+ 		}
  
--if [ "$ACCEL" = "kvm" ]; then
-+if [[ "$ACCEL" =~ ^kvm.* ]]; then
- 	if $qemu $M,\? | grep -q gic-version; then
- 		M+=',gic-version=host'
- 	fi
- fi
+@@ -1443,6 +1443,10 @@ int __init kvm_timer_hyp_init(bool has_gic)
+ 	}
  
--if [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ]; then
-+if [[ "$ACCEL" =~ ^kvm.* ]] || [[ "$ACCEL" =~ ^hvf.* ]]; then
- 	if [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ]; then
- 		processor="host"
- 		if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
-diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-index 51e4b97..e20b965 100644
---- a/scripts/arch-run.bash
-+++ b/scripts/arch-run.bash
-@@ -412,11 +412,11 @@ hvf_available ()
- 
- get_qemu_accelerator ()
- {
--	if [ "$ACCEL" = "kvm" ] && ! kvm_available; then
-+	if [[ "$ACCEL" =~ ^kvm.* ]] && [[ ! kvm_available ]]; then
- 		echo "KVM is needed, but not available on this host" >&2
- 		return 2
- 	fi
--	if [ "$ACCEL" = "hvf" ] && ! hvf_available; then
-+	if [[ "$ACCEL" =~ ^hvf.* ]] && [[ ! hvf_available ]]; then
- 		echo "HVF is needed, but not available on this host" >&2
- 		return 2
- 	fi
+ 	return 0;
++
++out_free_ptimer_irq:
++	if (info->physical_irq > 0)
++		free_percpu_irq(host_ptimer_irq, kvm_get_running_vcpus());
+ out_free_irq:
+ 	free_percpu_irq(host_vtimer_irq, kvm_get_running_vcpus());
+ 	return err;
 -- 
-2.23.0
+2.39.2
 
