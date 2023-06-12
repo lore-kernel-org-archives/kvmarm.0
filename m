@@ -1,157 +1,247 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E163AD3C
-	for <kvmarm@lists.linux.dev>; Mon, 12 Jun 2023 11:18:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A6811C99
+	for <kvmarm@lists.linux.dev>; Mon, 12 Jun 2023 11:25:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1686568729;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=36d2tYssi0iWXab/pB5scxxolTXYqFelDGqk9IVpbfg=;
-	b=GNM7uhE8ypaO3ftctMcn1jS46LrjLanwVcXE6OkT4nG8POCcLhJ1bTDfVz8V/h+lRAbPpM
-	Zm+5uEofkvKTdlpRuWK/Imoo7g8ZUlT7HfMnxEzvYDPGpH62nnqQuC+nBUlCFjSk/Tect7
-	9xGohG2z4U5NudlZUe36PS2juJBWyFk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+	s=mimecast20190719; t=1686569111;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=SDTcsG0aKECYSCw6frb1v3Y9aLT/hdvMgzOOCya5nPI=;
+	b=emHTaR3mu8JLrX1irvlcT+PIv2fJdCWuoHZJW/C3ajyVCSOXqX8OVtVbHSwUm7XhfLyHqn
+	38i3zs0gZ0kxWPRrpLIqh7zEKILud5LWNudyKMVjLlQFMGnAhfVFLU4RjenVF4lhwrxqhI
+	TkmEEe0LZQtrm/K+u7qelE8XJC1RFnI=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-215-WFFF9uCqO_iBEVhnCIfLcQ-1; Mon, 12 Jun 2023 07:18:44 -0400
-X-MC-Unique: WFFF9uCqO_iBEVhnCIfLcQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+ us-mta-86-BPKGNHukOVi10Sbgz4PQnQ-1; Mon, 12 Jun 2023 07:25:07 -0400
+X-MC-Unique: BPKGNHukOVi10Sbgz4PQnQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 05E838032FE;
-	Mon, 12 Jun 2023 11:18:44 +0000 (UTC)
-Received: from [10.64.54.97] (vpn2-54-97.bne.redhat.com [10.64.54.97])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 83EFB492CAC;
-	Mon, 12 Jun 2023 11:18:41 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH] runtime: Allow to specify properties for
- accelerator
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
- nrb@linux.ibm.com, thuth@redhat.com, shan.gavin@gmail.com
-References: <20230612050708.584111-1-gshan@redhat.com>
- <20230612-4c2e1b03885ddc0f55eb1988@orel>
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2B3953849525;
+	Mon, 12 Jun 2023 11:25:07 +0000 (UTC)
+Received: from gshan.redhat.com (vpn2-54-97.bne.redhat.com [10.64.54.97])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 770D92907;
+	Mon, 12 Jun 2023 11:25:04 +0000 (UTC)
 From: Gavin Shan <gshan@redhat.com>
-Message-ID: <46ee043a-1ef4-4786-459c-f1b9e6fe7e96@redhat.com>
-Date: Mon, 12 Jun 2023 21:18:39 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+To: kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org,
+	andrew.jones@linux.dev,
+	frankja@linux.ibm.com,
+	imbrenda@linux.ibm.com,
+	nrb@linux.ibm.com,
+	thuth@redhat.com,
+	shan.gavin@gmail.com
+Subject: [PATCH v2] runtime: Allow to specify properties for accelerator
+Date: Mon, 12 Jun 2023 21:24:59 +1000
+Message-Id: <20230612112459.597882-1-gshan@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <20230612-4c2e1b03885ddc0f55eb1988@orel>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 
-Hi Drew,
+There are extra properties for accelerators to enable the specific
+features. For example, the dirty ring for KVM accelerator can be
+enabled by "-accel kvm,dirty-ring-size=65536". Unfortuntely, the
+extra properties for the accelerators aren't supported. It makes
+it's impossible to test the combination of KVM and dirty ring
+as the following error message indicates.
 
-On 6/12/23 6:27 PM, Andrew Jones wrote:
-> On Mon, Jun 12, 2023 at 03:07:08PM +1000, Gavin Shan wrote:
->> There are extra properties for accelerators to enable the specific
->> features. For example, the dirty ring for KVM accelerator can be
->> enabled by "-accel kvm,dirty-ring-size=65536". Unfortuntely, the
->> extra properties for the accelerators aren't supported. It makes
->> it's impossible to test the combination of KVM and dirty ring
->> as the following error message indicates.
->>
->>    # cd /home/gavin/sandbox/kvm-unit-tests/tests
->>    # QEMU=/home/gavin/sandbox/qemu.main/build/qemu-system-aarch64 \
->>      ACCEL=kvm,dirty-ring-size=65536 ./its-migration
->>       :
->>    BUILD_HEAD=2fffb37e
->>    timeout -k 1s --foreground 90s /home/gavin/sandbox/qemu.main/build/qemu-system-aarch64 \
->>    -nodefaults -machine virt -accel kvm,dirty-ring-size=65536 -cpu cortex-a57             \
->>    -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd   \
->>    -device pci-testdev -display none -serial stdio -kernel _NO_FILE_4Uhere_ -smp 160      \
->>    -machine gic-version=3 -append its-pending-migration # -initrd /tmp/tmp.gfDLa1EtWk
->>    qemu-system-aarch64: kvm_init_vcpu: kvm_arch_init_vcpu failed (0): Invalid argument
->>
->> Allow to specify extra properties for accelerators. With this, the
->> "its-migration" can be tested for the combination of KVM and dirty
->> ring.
->>
->> Signed-off-by: Gavin Shan <gshan@redhat.com>
->> ---
->>   arm/run               | 4 ++--
->>   scripts/arch-run.bash | 4 ++--
->>   2 files changed, 4 insertions(+), 4 deletions(-)
->>
->> diff --git a/arm/run b/arm/run
->> index c6f25b8..bbf80e0 100755
->> --- a/arm/run
->> +++ b/arm/run
->> @@ -35,13 +35,13 @@ fi
->>   
->>   M='-machine virt'
->>   
->> -if [ "$ACCEL" = "kvm" ]; then
->> +if [[ "$ACCEL" =~ ^kvm.* ]]; then
->>   	if $qemu $M,\? | grep -q gic-version; then
->>   		M+=',gic-version=host'
->>   	fi
->>   fi
->>   
->> -if [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ]; then
->> +if [[ "$ACCEL" =~ ^kvm.* ]] || [[ "$ACCEL" =~ ^hvf.* ]]; then
->>   	if [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ]; then
->>   		processor="host"
->>   		if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
->> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
->> index 51e4b97..e20b965 100644
->> --- a/scripts/arch-run.bash
->> +++ b/scripts/arch-run.bash
->> @@ -412,11 +412,11 @@ hvf_available ()
->>   
->>   get_qemu_accelerator ()
->>   {
->> -	if [ "$ACCEL" = "kvm" ] && ! kvm_available; then
->> +	if [[ "$ACCEL" =~ ^kvm.* ]] && [[ ! kvm_available ]]; then
->>   		echo "KVM is needed, but not available on this host" >&2
->>   		return 2
->>   	fi
->> -	if [ "$ACCEL" = "hvf" ] && ! hvf_available; then
->> +	if [[ "$ACCEL" =~ ^hvf.* ]] && [[ ! hvf_available ]]; then
->>   		echo "HVF is needed, but not available on this host" >&2
->>   		return 2
->>   	fi
->> -- 
-> 
-> I'd prefer that when we want to match 'kvm', 'tcg', etc. that we split
-> on the first comma, rather than use a regular expression that allows
-> arbitrary characters to follow the pattern. Actually
-> get_qemu_accelerator() could do the splitting itself, providing two
-> variables, ACCEL (only kvm, tcg, etc.) and ACCEL_PROPS (which is
-> either null or has a leading comma). Then command lines just need
-> to use $ACCEL$ACCEL_PROPS. If we do that, then get_qemu_accelerator()
-> should also allow the user to pre-split, i.e.
-> 
->    ACCEL=kvm ACCEL_PROPS=dirty-ring-size=65536 arm/run ...
-> 
-> Finally, did you also test this with the accel property in the
-> unittests.cfg file run with run_tests.sh?
-> 
+  # cd /home/gavin/sandbox/kvm-unit-tests/tests
+  # QEMU=/home/gavin/sandbox/qemu.main/build/qemu-system-aarch64 \
+    ACCEL=kvm,dirty-ring-size=65536 ./its-migration
+     :
+  BUILD_HEAD=2fffb37e
+  timeout -k 1s --foreground 90s /home/gavin/sandbox/qemu.main/build/qemu-system-aarch64 \
+  -nodefaults -machine virt -accel kvm,dirty-ring-size=65536 -cpu cortex-a57             \
+  -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd   \
+  -device pci-testdev -display none -serial stdio -kernel _NO_FILE_4Uhere_ -smp 160      \
+  -machine gic-version=3 -append its-pending-migration # -initrd /tmp/tmp.gfDLa1EtWk
+  qemu-system-aarch64: kvm_init_vcpu: kvm_arch_init_vcpu failed (0): Invalid argument
 
-Thanks for your quick comments. I think we can be smart to split
-$ACCEL in get_qemu_accelarator() into $ACCEL and $ACCEL_PROPS if you
-agree. It's not free to maintain another user visible property for
-$ACCEL_PROPS.
+Allow to specify extra properties for accelerators. With this, the
+"its-migration" can be tested for the combination of KVM and dirty
+ring.
 
-I forgot to run "./runtest.sh" to make sure nothing is broken. I will
-do this before v2 is posted. Note that v2 will be posted shortly :)
+Signed-off-by: Gavin Shan <gshan@redhat.com>
+---
+v2: Only tested on aarch64. Split accelerator and its properties in
+    function get_qemu_accelerator() suggested by Drew
+---
+ arm/run               | 12 ++++++------
+ powerpc/run           |  6 ++++--
+ s390x/run             |  6 ++++--
+ scripts/arch-run.bash | 27 +++++++++++++++++----------
+ x86/run               |  6 ++++--
+ 5 files changed, 35 insertions(+), 22 deletions(-)
 
-Thanks,
-Gavin
-
-
-
+diff --git a/arm/run b/arm/run
+index c6f25b8..80ffd39 100755
+--- a/arm/run
++++ b/arm/run
+@@ -10,10 +10,12 @@ if [ -z "$KUT_STANDALONE" ]; then
+ fi
+ processor="$PROCESSOR"
+ 
+-accel=$(get_qemu_accelerator) ||
++accel_list=($(get_qemu_accelerator)) ||
+ 	exit $?
++ACCEL=${accel_list[0]}
++ACCEL_PROPS=${accel_list[1]}
+ 
+-if [ "$accel" = "kvm" ]; then
++if [ "$ACCEL" = "kvm" ]; then
+ 	QEMU_ARCH=$HOST
+ fi
+ 
+@@ -23,11 +25,9 @@ qemu=$(search_qemu_binary) ||
+ if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
+    [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ] &&
+    [ "$(basename $QEMU)" = "qemu-system-arm" ]; then
+-	accel=tcg
++	ACCEL="tcg"
+ fi
+ 
+-ACCEL=$accel
+-
+ if ! $qemu -machine '?' | grep -q 'ARM Virtual Machine'; then
+ 	echo "$qemu doesn't support mach-virt ('-machine virt'). Exiting."
+ 	exit 2
+@@ -72,7 +72,7 @@ if $qemu $M -device '?' | grep -q pci-testdev; then
+ 	pci_testdev="-device pci-testdev"
+ fi
+ 
+-A="-accel $ACCEL"
++A="-accel $ACCEL$ACCEL_PROPS"
+ command="$qemu -nodefaults $M $A -cpu $processor $chr_testdev $pci_testdev"
+ command+=" -display none -serial stdio -kernel"
+ command="$(migration_cmd) $(timeout_cmd) $command"
+diff --git a/powerpc/run b/powerpc/run
+index ee38e07..8aa000b 100755
+--- a/powerpc/run
++++ b/powerpc/run
+@@ -9,8 +9,10 @@ if [ -z "$KUT_STANDALONE" ]; then
+ 	source scripts/arch-run.bash
+ fi
+ 
+-ACCEL=$(get_qemu_accelerator) ||
++accel_list=($(get_qemu_accelerator)) ||
+ 	exit $?
++ACCEL=${accel_list[0]}
++ACCEL_PROPS=${accel_list[1]}
+ 
+ qemu=$(search_qemu_binary) ||
+ 	exit $?
+@@ -21,7 +23,7 @@ if ! $qemu -machine '?' 2>&1 | grep 'pseries' > /dev/null; then
+ fi
+ 
+ M='-machine pseries'
+-M+=",accel=$ACCEL"
++M+=",accel=$ACCEL$ACCEL_PROPS"
+ command="$qemu -nodefaults $M -bios $FIRMWARE"
+ command+=" -display none -serial stdio -kernel"
+ command="$(migration_cmd) $(timeout_cmd) $command"
+diff --git a/s390x/run b/s390x/run
+index f1111db..e5d23db 100755
+--- a/s390x/run
++++ b/s390x/run
+@@ -9,8 +9,10 @@ if [ -z "$KUT_STANDALONE" ]; then
+ 	source scripts/arch-run.bash
+ fi
+ 
+-ACCEL=$(get_qemu_accelerator) ||
++accel_list=($(get_qemu_accelerator)) ||
+ 	exit $?
++ACCEL=${accel_list[0]}
++ACCEL_PROPS=${accel_list[1]}
+ 
+ qemu=$(search_qemu_binary) ||
+ 	exit $?
+@@ -26,7 +28,7 @@ if [ "${1: -7}" = ".pv.bin" ] || [ "${TESTNAME: -3}" = "_PV" ] && [ "$MIGRATION"
+ fi
+ 
+ M='-machine s390-ccw-virtio'
+-M+=",accel=$ACCEL"
++M+=",accel=$ACCEL$ACCEL_PROPS"
+ command="$qemu -nodefaults -nographic $M"
+ command+=" -chardev stdio,id=con0 -device sclpconsole,chardev=con0"
+ command+=" -kernel"
+diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+index 51e4b97..12dabf9 100644
+--- a/scripts/arch-run.bash
++++ b/scripts/arch-run.bash
+@@ -412,22 +412,29 @@ hvf_available ()
+ 
+ get_qemu_accelerator ()
+ {
+-	if [ "$ACCEL" = "kvm" ] && ! kvm_available; then
++	local accel_list
++
++	accel_list[0]=${ACCEL%%,*}
++	accel_list[1]=${ACCEL#"${accel_list[0]}"}
++
++	if [ "${accel_list[0]}" = "kvm" ] && ! kvm_available; then
+ 		echo "KVM is needed, but not available on this host" >&2
+ 		return 2
+ 	fi
+-	if [ "$ACCEL" = "hvf" ] && ! hvf_available; then
++	if [ "${accel_list[0]}" = "hvf" ] && ! hvf_available; then
+ 		echo "HVF is needed, but not available on this host" >&2
+ 		return 2
+ 	fi
+ 
+-	if [ "$ACCEL" ]; then
+-		echo $ACCEL
+-	elif kvm_available; then
+-		echo kvm
+-	elif hvf_available; then
+-		echo hvf
+-	else
+-		echo tcg
++	if [ ! -n "${accel_list[0]}" ]; then
++		if kvm_available; then
++			accel_list[0]="kvm"
++		elif hvf_available; then
++			accel_list[0]="hvf"
++		else
++			accel_list[0]="tcg"
++		fi
+ 	fi
++
++	echo ${accel_list[*]}
+ }
+diff --git a/x86/run b/x86/run
+index 4d53b72..f0b0b4a 100755
+--- a/x86/run
++++ b/x86/run
+@@ -9,8 +9,10 @@ if [ -z "$KUT_STANDALONE" ]; then
+ 	source scripts/arch-run.bash
+ fi
+ 
+-ACCEL=$(get_qemu_accelerator) ||
++accel_list=($(get_qemu_accelerator)) ||
+ 	exit $?
++ACCEL=${accel_list[0]}
++ACCEL_PROPS=${accel_list[1]}
+ 
+ qemu=$(search_qemu_binary) ||
+ 	exit $?
+@@ -38,7 +40,7 @@ else
+ fi
+ 
+ command="${qemu} --no-reboot -nodefaults $pc_testdev -vnc none -serial stdio $pci_testdev"
+-command+=" -machine accel=$ACCEL"
++command+=" -machine accel=$ACCEL$ACCEL_PROPS"
+ if [ "${CONFIG_EFI}" != y ]; then
+ 	command+=" -kernel"
+ fi
+-- 
+2.23.0
 
