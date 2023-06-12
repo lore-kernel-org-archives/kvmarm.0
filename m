@@ -1,107 +1,68 @@
-Received: from out-4.mta1.migadu.com (out-4.mta1.migadu.com [95.215.58.4])
+Received: from out-24.mta1.migadu.com (out-24.mta1.migadu.com [95.215.58.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000ADAD2C
-	for <kvmarm@lists.linux.dev>; Mon, 12 Jun 2023 07:32:59 +0000 (UTC)
-Date: Mon, 12 Jun 2023 07:32:52 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADFBA1FA5
+	for <kvmarm@lists.linux.dev>; Mon, 12 Jun 2023 07:52:28 +0000 (UTC)
+Date: Mon, 12 Jun 2023 09:52:23 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1686555176;
+	t=1686556346;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=SULM+6FThJzvyXwxyj7QV3ZUjutT1xQE2B8Rpur3KF0=;
-	b=YhBOPHhqecDo0QBxQKFf6UUQcHLixyhGC06NV3PEDYOaLxc7CA6VTowu4E1L6pbHCrsSR4
-	mrVV/B8dk/NzdAbAohKWuD8TfuiEOqKgNJnQFPWoaNu4nD+UW7tj6QmSDd6FKwQR9frLIS
-	Zt3OTxpCy5JykEGumS6rHt26OjZvCmE=
+	bh=WU+Rz4tch7eIwv3TMFZIV3pBP1OaRdHuLjagG6Uf+rI=;
+	b=A6Jjk76tyZCdM6dELtjhE6hb6DbONAbGQE917lhLDbiiyGe3yIIdlJU2bDRUuC/s2SHhkA
+	ZZCW+EpREAJflkdsEt695ZeBGBmrsVySUGqeQiMwpUCPWbEw8o6UfSaXGfJgEerAvWUuJO
+	7VjKFioSsaW78Qh3/1eBBfmJOtDkBfo=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Marc Zyngier <maz@kernel.org>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: timers: Fix resource leaks in
- kvm_timer_hyp_init()
-Message-ID: <ZIbKJPx2RR0Le7Zl@linux.dev>
-References: <e0dd820f-52d2-4c54-97f3-5aa02e0bd6e0@kili.mountain>
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Nadav Amit <nadav.amit@gmail.com>
+Cc: Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>, alexandru.elisei@arm.com, 
+	ricarkol@google.com, shahuang@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v6 00/32] EFI and ACPI support for arm64
+Message-ID: <20230612-6e1f6fac1759f06309be3342@orel>
+References: <20230530160924.82158-1-nikos.nikoleris@arm.com>
+ <CC2B570B-9EE0-4686-ADF3-82D1ECDD5D8A@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <e0dd820f-52d2-4c54-97f3-5aa02e0bd6e0@kili.mountain>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CC2B570B-9EE0-4686-ADF3-82D1ECDD5D8A@gmail.com>
 X-Migadu-Flow: FLOW_OUT
 
-Hi Dan,
-
-Thanks for fixing this. Couple of small comments:
-
-On Mon, Jun 12, 2023 at 10:07:46AM +0300, Dan Carpenter wrote:
-> Smatch detected this bug:
->     arch/arm64/kvm/arch_timer.c:1425 kvm_timer_hyp_init()
->     warn: missing unwind goto?
+On Sat, Jun 10, 2023 at 01:32:59AM -0700, Nadav Amit wrote:
 > 
-> There are a couple error paths which do not release their resources
-> correctly.  Fix them.
+> > On May 30, 2023, at 9:08 AM, Nikos Nikoleris <nikos.nikoleris@arm.com> wrote:
+> > 
+> > Hello,
+> > 
+> > This series adds initial support for building arm64 tests as EFI
+> > apps and running them under QEMU. Much like x86_64, we import external
+> > dependencies from gnu-efi and adapt them to work with types and other
+> > assumptions from kvm-unit-tests. In addition, this series adds support
+> > for enumerating parts of the system using ACPI.
 > 
-> Fixes: 9e01dc76be6a ("KVM: arm/arm64: arch_timer: Assign the phys timer on VHE systems")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
->  arch/arm64/kvm/arch_timer.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
+> Just an issue I encountered, which I am not sure is arm64 specific:
 > 
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 05b022be885b..c2df8332d2bd 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -1422,7 +1422,7 @@ int __init kvm_timer_hyp_init(bool has_gic)
->  		if (err) {
->  			kvm_err("kvm_arch_timer: can't request ptimer interrupt %d (%d)\n",
->  				host_ptimer_irq, err);
-> -			return err;
-> +			goto out_free_irq;
->  		}
->  
->  		if (has_gic) {
-> @@ -1430,7 +1430,7 @@ int __init kvm_timer_hyp_init(bool has_gic)
->  						    kvm_get_running_vcpus());
->  			if (err) {
->  				kvm_err("kvm_arch_timer: error setting vcpu affinity\n");
-> -				goto out_free_irq;
-> +				goto out_free_ptimer_irq;
->  			}
->  		}
->  
-> @@ -1443,6 +1443,10 @@ int __init kvm_timer_hyp_init(bool has_gic)
->  	}
->  
->  	return 0;
-> +
-> +out_free_ptimer_irq:
-> +	if (info->physical_irq > 0)
-> +		free_percpu_irq(host_ptimer_irq, kvm_get_running_vcpus());
-
-nit: we shouldn't even jump to this label in the first place if
-there was no ptimer irq to set up... Maybe just drop the condition?
-
->  out_free_irq:
-
-I'd prefer this label be renamed 'out_free_vtimer_irq' to make it
-unambiguous.
-
->  	free_percpu_irq(host_vtimer_irq, kvm_get_running_vcpus());
->  	return err;
-> -- 
-> 2.39.2
+> All the printf’s in efi_main() are before current_thread_info() is
+> initialized (or even memset’d to zero, as done in setup_efi).
 > 
+> But printf() calls puts() which checks if mmu_enabled(). And
+> mmu_enabled() uses is_user() and current_thread_info()->cpu, both
+> of which read uninitialized data from current_thread_info().
+> 
+> IOW: Any printf in efi_main() can cause a crash.
+>
 
--- 
+Nice catch, Nadav. Nikos, shouldn't we drop the memset() in setup_efi and
+put a zero_range call, similar to the one in arm/cstart64.S which zero's
+the thread-info area, in arm/efi/crt0-efi-aarch64.S?
+
 Thanks,
-Oliver
+drew
