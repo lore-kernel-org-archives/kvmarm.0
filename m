@@ -1,254 +1,231 @@
-Received: from out-50.mta1.migadu.com (out-50.mta1.migadu.com [95.215.58.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A303A18C31
-	for <kvmarm@lists.linux.dev>; Mon, 12 Jun 2023 12:06:43 +0000 (UTC)
-Date: Mon, 12 Jun 2023 14:06:40 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1686571601;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+Ufnr2VLltjRM49vnXRPKyhqX2jWNB06JNcqK8M4LT0=;
-	b=pgNUJJePQvnxgcb6hhZ4MfL3btd5j5YXxEDwuSjhQTMsL0dRkBu8GPphhM02i3itCXblT/
-	7EtGWtZMbaBw25SZCrx1/8DSDxMs5jGmKVFnVwOcSvuJim4MqZHMO/cHqZV5QCb5UInvEB
-	bAS1M3ScEK8tM06x4vKKqLCMyAeZDA0=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Gavin Shan <gshan@redhat.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, frankja@linux.ibm.com, 
-	imbrenda@linux.ibm.com, nrb@linux.ibm.com, thuth@redhat.com, shan.gavin@gmail.com
-Subject: Re: [PATCH v2] runtime: Allow to specify properties for accelerator
-Message-ID: <20230612-1f3dd50d2b6e0c97632e42ec@orel>
-References: <20230612112459.597882-1-gshan@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F148156EB
+	for <kvmarm@lists.linux.dev>; Mon, 12 Jun 2023 14:41:20 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-bced8e88018so446182276.1
+        for <kvmarm@lists.linux.dev>; Mon, 12 Jun 2023 07:41:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1686580879; x=1689172879;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=r96CKlC+BBXhesVFXxXqygeyQq0poKy+xHh5QJBs4Hs=;
+        b=y5PvZbyvq4ur+SImkmV6DIR+nXay4q20zUtWROecR8NkFyPCbRlfzlSXb08VHyg/vM
+         dOWUJGqoSQckjKNyaz+pnvlIbc/677Wf4OzrLTPm1+LO4/mptCVJ4e/Uk+aHgUwJ+qSO
+         6q3pBgeV/DXdB2SrpAoZHsul6MRWS/ngRQx7PvnfSncRT+IhtiBjR2O5HaFqcuUji5y/
+         DOi2db5ZPa4WjG6g0fnovTI6kQ3PEcYEB8tswr99owkyAhvk3/tSEErpWrgDXQt9LTPZ
+         /nTtyzShFuyCqIkJg63tnvrN+wl2h1zgCd7ffB+m3fyoqhO7Xk893eGC+g3501H5ycqW
+         mSIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686580879; x=1689172879;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=r96CKlC+BBXhesVFXxXqygeyQq0poKy+xHh5QJBs4Hs=;
+        b=d0D3mlI3YbUlna+KQLGGFTFJufqmpYvL5gHH5QlOsC+Ea6nL0aYX0uHd9/P1/HlhyJ
+         LdHosWwB2lmONFSzvSgeQBu0AeZU6lVmMMue0SXH3bpEapo8sSLYiSOnPMZgaYR/LSsh
+         zU51FxRI33T07p/MlQDF+DGw/qjpaie1k8j+foKuA9+NCNEqO4l4dPN3ohEtUu78+zyF
+         TtgWNTugDplswPBo6BcOuN+76lCLPQ2E9msT7lidnTGFFkzi5GVAxKfKiEYLLmqrZRsM
+         ZuA8NVu1+IwP4hks9IDs2NxBeGDFmxJEGqv19Y+hIl1JTUC2PqCif2ZPydYqbNUmO28L
+         ynYw==
+X-Gm-Message-State: AC+VfDzA6dySXxIQP2kgjkrLct82IQ1baPQpzuIeHwPD+m0z/9qXu8SW
+	a5p2tTxI8h1gDZRvo0twZ/XbUxp/i8Y=
+X-Google-Smtp-Source: ACHHUZ6zdAuLarXFuermSwK+q6naBdSNEG8tLfWV/XWK13b5XH60U7w3+nxNcTpXxK1HrGqXhuWbcHMQm9g=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:bc2:0:b0:ba6:e7ee:bb99 with SMTP id
+ 185-20020a250bc2000000b00ba6e7eebb99mr5041142ybl.12.1686580879112; Mon, 12
+ Jun 2023 07:41:19 -0700 (PDT)
+Date: Mon, 12 Jun 2023 07:41:16 -0700
+In-Reply-To: <20230608090348.414990-1-gshan@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230612112459.597882-1-gshan@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20230608090348.414990-1-gshan@redhat.com>
+Message-ID: <ZIcujNKVosLeQEqR@google.com>
+Subject: Re: [PATCH] KVM: Avoid illegal stage2 mapping on invalid memory slot
+From: Sean Christopherson <seanjc@google.com>
+To: Gavin Shan <gshan@redhat.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	pbonzini@redhat.com, oliver.upton@linux.dev, maz@kernel.org, 
+	hshuai@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Jun 12, 2023 at 09:24:59PM +1000, Gavin Shan wrote:
-> There are extra properties for accelerators to enable the specific
-> features. For example, the dirty ring for KVM accelerator can be
-> enabled by "-accel kvm,dirty-ring-size=65536". Unfortuntely, the
-> extra properties for the accelerators aren't supported. It makes
-> it's impossible to test the combination of KVM and dirty ring
-> as the following error message indicates.
+On Thu, Jun 08, 2023, Gavin Shan wrote:
+> We run into guest hang in edk2 firmware when KSM is kept as running
+> on the host. The edk2 firmware is waiting for status 0x80 from QEMU's
+> pflash device (TYPE_PFLASH_CFI01) during the operation for sector
+> erasing or buffered write. The status is returned by reading the
+> memory region of the pflash device and the read request should
+> have been forwarded to QEMU and emulated by it. Unfortunately, the
+> read request is covered by an illegal stage2 mapping when the guest
+> hang issue occurs. The read request is completed with QEMU bypassed and
+> wrong status is fetched.
 > 
->   # cd /home/gavin/sandbox/kvm-unit-tests/tests
->   # QEMU=/home/gavin/sandbox/qemu.main/build/qemu-system-aarch64 \
->     ACCEL=kvm,dirty-ring-size=65536 ./its-migration
->      :
->   BUILD_HEAD=2fffb37e
->   timeout -k 1s --foreground 90s /home/gavin/sandbox/qemu.main/build/qemu-system-aarch64 \
->   -nodefaults -machine virt -accel kvm,dirty-ring-size=65536 -cpu cortex-a57             \
->   -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd   \
->   -device pci-testdev -display none -serial stdio -kernel _NO_FILE_4Uhere_ -smp 160      \
->   -machine gic-version=3 -append its-pending-migration # -initrd /tmp/tmp.gfDLa1EtWk
->   qemu-system-aarch64: kvm_init_vcpu: kvm_arch_init_vcpu failed (0): Invalid argument
+> The illegal stage2 mapping is populated due to same page mering by
+> KSM at (C) even the associated memory slot has been marked as invalid
+> at (B).
 > 
-> Allow to specify extra properties for accelerators. With this, the
-> "its-migration" can be tested for the combination of KVM and dirty
-> ring.
+>   CPU-A                    CPU-B
+>   -----                    -----
+>                            ioctl(kvm_fd, KVM_SET_USER_MEMORY_REGION)
+>                            kvm_vm_ioctl_set_memory_region
+>                            kvm_set_memory_region
+>                            __kvm_set_memory_region
+>                            kvm_set_memslot(kvm, old, NULL, KVM_MR_DELETE)
+>                              kvm_invalidate_memslot
+>                                kvm_copy_memslot
+>                                kvm_replace_memslot
+>                                kvm_swap_active_memslots        (A)
+>                                kvm_arch_flush_shadow_memslot   (B)
+>   same page merging by KSM
+>   kvm_mmu_notifier_change_pte
+>   kvm_handle_hva_range
+>   __kvm_handle_hva_range       (C)
 > 
+> Fix the issue by skipping the invalid memory slot at (C) to avoid the
+> illegal stage2 mapping. Without the illegal stage2 mapping, the read
+> request for the pflash's status is forwarded to QEMU and emulated by
+> it. The correct pflash's status can be returned from QEMU to break
+> the infinite wait in edk2 firmware.
+> 
+> Cc: stable@vger.kernel.org # v5.13+
+> Fixes: 3039bcc74498 ("KVM: Move x86's MMU notifier memslot walkers to generic code")
+
+This Fixes isn't correct.  That change only affected x86, which doesn't have this
+bug.  And looking at commit cd4c71835228 ("KVM: arm64: Convert to the gfn-based MMU
+notifier callbacks"), arm64 did NOT skip invalid slots
+
+        slots = kvm_memslots(kvm);
+
+        /* we only care about the pages that the guest sees */
+        kvm_for_each_memslot(memslot, slots) {
+                unsigned long hva_start, hva_end;
+                gfn_t gpa;
+
+                hva_start = max(start, memslot->userspace_addr);
+                hva_end = min(end, memslot->userspace_addr +
+                                        (memslot->npages << PAGE_SHIFT));
+                if (hva_start >= hva_end)
+                        continue;
+
+                gpa = hva_to_gfn_memslot(hva_start, memslot) << PAGE_SHIFT;
+                ret |= handler(kvm, gpa, (u64)(hva_end - hva_start), data);
+        }
+
+#define kvm_for_each_memslot(memslot, slots)                            \
+        for (memslot = &slots->memslots[0];                             \
+             memslot < slots->memslots + slots->used_slots; memslot++)  \
+                if (WARN_ON_ONCE(!memslot->npages)) {                   \
+                } else
+
+Unless I'm missing something, this goes all the way back to initial arm64 support
+added by commit d5d8184d35c9 ("KVM: ARM: Memory virtualization setup").
+
+> Reported-by: Shuai Hu <hshuai@redhat.com>
+> Reported-by: Zhenyu Zhang <zhenyzha@redhat.com>
 > Signed-off-by: Gavin Shan <gshan@redhat.com>
 > ---
-> v2: Only tested on aarch64. Split accelerator and its properties in
->     function get_qemu_accelerator() suggested by Drew
-> ---
->  arm/run               | 12 ++++++------
->  powerpc/run           |  6 ++++--
->  s390x/run             |  6 ++++--
->  scripts/arch-run.bash | 27 +++++++++++++++++----------
->  x86/run               |  6 ++++--
->  5 files changed, 35 insertions(+), 22 deletions(-)
+>  virt/kvm/kvm_main.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> diff --git a/arm/run b/arm/run
-> index c6f25b8..80ffd39 100755
-> --- a/arm/run
-> +++ b/arm/run
-> @@ -10,10 +10,12 @@ if [ -z "$KUT_STANDALONE" ]; then
->  fi
->  processor="$PROCESSOR"
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 479802a892d4..7f81a3a209b6 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -598,6 +598,9 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+>  			unsigned long hva_start, hva_end;
 >  
-> -accel=$(get_qemu_accelerator) ||
-> +accel_list=($(get_qemu_accelerator)) ||
->  	exit $?
+>  			slot = container_of(node, struct kvm_memory_slot, hva_node[slots->node_idx]);
+> +			if (slot->flags & KVM_MEMSLOT_INVALID)
+> +				continue;
 
-I'd rather not do this. I think get_qemu_accelerator can be changed to
-just set ACCEL and ACCEL_PROPS without echo'ing anything. Only arm/run
-needs to be reworked a bit to not use $accel. The other architectures
-were already just setting ACCEL to the output of the function anyway.
-But, when reworking arm/run make sure not to break the purpose of
-commit c7d6c7f00e7c ("arm/run: Use TCG with qemu-system-arm on arm64
-systems"), which is what introduced $accel. I'm pretty sure the way
-this patch is currently done would break it.
+Skipping the memslot will lead to use-after-free.  E.g. if an invalidate_range_start()
+comes along between installing the invalid slot and zapping SPTEs, KVM will
+return from kvm_mmu_notifier_invalidate_range_start() without having dropped all
+references to the range.
 
-To be clear,
+I.e.
 
- # ACCEL and ACCEL_PROPS may or may not be set
- set_qemu_accelerator
- # Now ACCEL and maybe ACCEL_PROPS are set
+	kvm_copy_memslot(invalid_slot, old);
+	invalid_slot->flags |= KVM_MEMSLOT_INVALID;
+	kvm_replace_memslot(kvm, old, invalid_slot);
 
-(Note my subtle change of the function name, changing get to set.)
+	/*
+	 * Activate the slot that is now marked INVALID, but don't propagate
+	 * the slot to the now inactive slots. The slot is either going to be
+	 * deleted or recreated as a new slot.
+	 */
+	kvm_swap_active_memslots(kvm, old->as_id);
 
-Thanks,
-drew
 
-> +ACCEL=${accel_list[0]}
-> +ACCEL_PROPS=${accel_list[1]}
->  
-> -if [ "$accel" = "kvm" ]; then
-> +if [ "$ACCEL" = "kvm" ]; then
->  	QEMU_ARCH=$HOST
->  fi
->  
-> @@ -23,11 +25,9 @@ qemu=$(search_qemu_binary) ||
->  if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
->     [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ] &&
->     [ "$(basename $QEMU)" = "qemu-system-arm" ]; then
-> -	accel=tcg
-> +	ACCEL="tcg"
->  fi
->  
-> -ACCEL=$accel
-> -
->  if ! $qemu -machine '?' | grep -q 'ARM Virtual Machine'; then
->  	echo "$qemu doesn't support mach-virt ('-machine virt'). Exiting."
->  	exit 2
-> @@ -72,7 +72,7 @@ if $qemu $M -device '?' | grep -q pci-testdev; then
->  	pci_testdev="-device pci-testdev"
->  fi
->  
-> -A="-accel $ACCEL"
-> +A="-accel $ACCEL$ACCEL_PROPS"
->  command="$qemu -nodefaults $M $A -cpu $processor $chr_testdev $pci_testdev"
->  command+=" -display none -serial stdio -kernel"
->  command="$(migration_cmd) $(timeout_cmd) $command"
-> diff --git a/powerpc/run b/powerpc/run
-> index ee38e07..8aa000b 100755
-> --- a/powerpc/run
-> +++ b/powerpc/run
-> @@ -9,8 +9,10 @@ if [ -z "$KUT_STANDALONE" ]; then
->  	source scripts/arch-run.bash
->  fi
->  
-> -ACCEL=$(get_qemu_accelerator) ||
-> +accel_list=($(get_qemu_accelerator)) ||
->  	exit $?
-> +ACCEL=${accel_list[0]}
-> +ACCEL_PROPS=${accel_list[1]}
->  
->  qemu=$(search_qemu_binary) ||
->  	exit $?
-> @@ -21,7 +23,7 @@ if ! $qemu -machine '?' 2>&1 | grep 'pseries' > /dev/null; then
->  fi
->  
->  M='-machine pseries'
-> -M+=",accel=$ACCEL"
-> +M+=",accel=$ACCEL$ACCEL_PROPS"
->  command="$qemu -nodefaults $M -bios $FIRMWARE"
->  command+=" -display none -serial stdio -kernel"
->  command="$(migration_cmd) $(timeout_cmd) $command"
-> diff --git a/s390x/run b/s390x/run
-> index f1111db..e5d23db 100755
-> --- a/s390x/run
-> +++ b/s390x/run
-> @@ -9,8 +9,10 @@ if [ -z "$KUT_STANDALONE" ]; then
->  	source scripts/arch-run.bash
->  fi
->  
-> -ACCEL=$(get_qemu_accelerator) ||
-> +accel_list=($(get_qemu_accelerator)) ||
->  	exit $?
-> +ACCEL=${accel_list[0]}
-> +ACCEL_PROPS=${accel_list[1]}
->  
->  qemu=$(search_qemu_binary) ||
->  	exit $?
-> @@ -26,7 +28,7 @@ if [ "${1: -7}" = ".pv.bin" ] || [ "${TESTNAME: -3}" = "_PV" ] && [ "$MIGRATION"
->  fi
->  
->  M='-machine s390-ccw-virtio'
-> -M+=",accel=$ACCEL"
-> +M+=",accel=$ACCEL$ACCEL_PROPS"
->  command="$qemu -nodefaults -nographic $M"
->  command+=" -chardev stdio,id=con0 -device sclpconsole,chardev=con0"
->  command+=" -kernel"
-> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> index 51e4b97..12dabf9 100644
-> --- a/scripts/arch-run.bash
-> +++ b/scripts/arch-run.bash
-> @@ -412,22 +412,29 @@ hvf_available ()
->  
->  get_qemu_accelerator ()
->  {
-> -	if [ "$ACCEL" = "kvm" ] && ! kvm_available; then
-> +	local accel_list
-> +
-> +	accel_list[0]=${ACCEL%%,*}
-> +	accel_list[1]=${ACCEL#"${accel_list[0]}"}
-> +
-> +	if [ "${accel_list[0]}" = "kvm" ] && ! kvm_available; then
->  		echo "KVM is needed, but not available on this host" >&2
->  		return 2
->  	fi
-> -	if [ "$ACCEL" = "hvf" ] && ! hvf_available; then
-> +	if [ "${accel_list[0]}" = "hvf" ] && ! hvf_available; then
->  		echo "HVF is needed, but not available on this host" >&2
->  		return 2
->  	fi
->  
-> -	if [ "$ACCEL" ]; then
-> -		echo $ACCEL
-> -	elif kvm_available; then
-> -		echo kvm
-> -	elif hvf_available; then
-> -		echo hvf
-> -	else
-> -		echo tcg
-> +	if [ ! -n "${accel_list[0]}" ]; then
-> +		if kvm_available; then
-> +			accel_list[0]="kvm"
-> +		elif hvf_available; then
-> +			accel_list[0]="hvf"
-> +		else
-> +			accel_list[0]="tcg"
-> +		fi
->  	fi
-> +
-> +	echo ${accel_list[*]}
->  }
-> diff --git a/x86/run b/x86/run
-> index 4d53b72..f0b0b4a 100755
-> --- a/x86/run
-> +++ b/x86/run
-> @@ -9,8 +9,10 @@ if [ -z "$KUT_STANDALONE" ]; then
->  	source scripts/arch-run.bash
->  fi
->  
-> -ACCEL=$(get_qemu_accelerator) ||
-> +accel_list=($(get_qemu_accelerator)) ||
->  	exit $?
-> +ACCEL=${accel_list[0]}
-> +ACCEL_PROPS=${accel_list[1]}
->  
->  qemu=$(search_qemu_binary) ||
->  	exit $?
-> @@ -38,7 +40,7 @@ else
->  fi
->  
->  command="${qemu} --no-reboot -nodefaults $pc_testdev -vnc none -serial stdio $pci_testdev"
-> -command+=" -machine accel=$ACCEL"
-> +command+=" -machine accel=$ACCEL$ACCEL_PROPS"
->  if [ "${CONFIG_EFI}" != y ]; then
->  	command+=" -kernel"
->  fi
-> -- 
-> 2.23.0
-> 
+==> invalidate_range_start()
+
+	/*
+	 * From this point no new shadow pages pointing to a deleted, or moved,
+	 * memslot will be created.  Validation of sp->gfn happens in:
+	 *	- gfn_to_hva (kvm_read_guest, gfn_to_pfn)
+	 *	- kvm_is_visible_gfn (mmu_check_root)
+	 */
+	kvm_arch_flush_shadow_memslot(kvm, old);
+
+And even for change_pte(), skipping the memslot is wrong, as KVM would then fail
+unmap the prior SPTE.  Of course, that can't happen in the current code base
+because change_pte() is wrapped with invalidate_range_{start,end}(), but that's
+more of a bug than a design choice (see c13fda237f08 "KVM: Assert that notifier
+count is elevated in .change_pte()" for details).  That's also why this doesn't
+show up on x86; x86 installs a SPTE for the change_pte() notifier iff an existing
+SPTE is present, which is never true due to the invalidation.
+
+I'd honestly love to just delete the change_pte() callback, but my opinion is more
+than a bit biased since we don't use KSM.  Assuming we keep change_pte(), the best
+option is probably to provide a wrapper around kvm_set_spte_gfn() to skip the
+memslot, but with a sanity check and comment explaining the dependency on there
+being no SPTEs due to the invalidation.  E.g.
+
+---
+ virt/kvm/kvm_main.c | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 479802a892d4..b4987b49fac3 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -686,6 +686,24 @@ static __always_inline int kvm_handle_hva_range_no_flush(struct mmu_notifier *mn
+ 
+ 	return __kvm_handle_hva_range(kvm, &range);
+ }
++
++static bool kvm_change_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++{
++	/*
++	 * Skipping invalid memslots is correct if and only change_pte() is
++	 * surrounded by invalidate_range_{start,end}(), which is currently
++	 * guaranteed by the primary MMU.  If that ever changes, KVM needs to
++	 * unmap the memslot instead of skipping the memslot to ensure that KVM
++	 * doesn't hold references to the old PFN.
++	 */
++	WARN_ON_ONCE(!READ_ONCE(kvm->mn_active_invalidate_count));
++
++        if (range->slot->flags & KVM_MEMSLOT_INVALID)
++		return false;
++
++	return kvm_set_spte_gfn(kvm, range);
++}
++
+ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
+ 					struct mm_struct *mm,
+ 					unsigned long address,
+@@ -707,7 +725,7 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
+ 	if (!READ_ONCE(kvm->mmu_invalidate_in_progress))
+ 		return;
+ 
+-	kvm_handle_hva_range(mn, address, address + 1, pte, kvm_set_spte_gfn);
++	kvm_handle_hva_range(mn, address, address + 1, pte, kvm_change_spte_gfn);
+ }
+ 
+ void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
+
+base-commit: 94cdeebd82111d7b7da5bd4da053eed9e0f65d72
+--
