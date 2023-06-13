@@ -1,129 +1,106 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 843982915
-	for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 09:57:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1686650259;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d24qNgsK4YI73pNJSGPXOXGrlkTr7CIQRglIpszf5fE=;
-	b=D2zsPIKRl4u7tgWbYHj+a2KXtaYwpushvvRgzGKz99AFUxoCWreYcUIdZNrtviANt9vMq4
-	JO9M2Suq0euWX+JnV4HaVCmyuSKafcjQlJPI89tpb3C+J2z3m9V/oy+o6KW2LReBtnOzpn
-	Sw3xW0POMfyqBcHeTzoo5F+oWF7tcpE=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-628-f1FL6ds_NkW24F471tEJGw-1; Tue, 13 Jun 2023 05:57:30 -0400
-X-MC-Unique: f1FL6ds_NkW24F471tEJGw-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3f73936c258so7043935e9.1
-        for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 02:57:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686650249; x=1689242249;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=d24qNgsK4YI73pNJSGPXOXGrlkTr7CIQRglIpszf5fE=;
-        b=Yq2f9L8+v9IctBhv1efV/a9T+pwteXqp+6sSKnUC4I+5kF1luTipsO5eKEPzSR+DJg
-         VRoajulk5RCn1Xw+tiAI6OHLBBWbAJoSNEOJW0MNVIl8dcEenKC89zOdLFxPtnIPNI93
-         N2e/T7dy/vBETEiW+J023RHTegzMWPxvAF96O6ebrl9iLwDeIN7s6/Q/oIV7vnc25/TM
-         XNiliqPr8F79sURWp9G7SHpLzu+oDBGadLjRFWw2PejMojQh52JdbFjO8roP5FjlBklG
-         iPra7aVab5iindM9ApHuRpjEQbnZVugLpIMfUjVbyG7NTn/z24pgJXYNcSWoCOHuxjbU
-         CA+g==
-X-Gm-Message-State: AC+VfDyl2jdMPomyj5VLl/8jbSB8VEvyE/P0J4h5c0H2cJw+GF8QoKxd
-	2RkHSMwTmMMLudU3ht19TpgYsUfs96ckSz/6UMkFR5LcZOV+88mOpxzxsKF3wZJnru8r4gmgJML
-	hMpgf+Gy0GpFV/mHr
-X-Received: by 2002:a05:600c:3843:b0:3f7:1483:b229 with SMTP id s3-20020a05600c384300b003f71483b229mr9712647wmr.3.1686650249190;
-        Tue, 13 Jun 2023 02:57:29 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5DWlGtfOHfyQjcabrgMLJ7MLmCh6LzHVrUWcE9P78XidO1dSdo0iXISnggfacCEipbLVgi+A==
-X-Received: by 2002:a05:600c:3843:b0:3f7:1483:b229 with SMTP id s3-20020a05600c384300b003f71483b229mr9712637wmr.3.1686650248918;
-        Tue, 13 Jun 2023 02:57:28 -0700 (PDT)
-Received: from [10.66.61.39] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id z10-20020a05600c114a00b003f7e60622f0sm13922898wmz.6.2023.06.13.02.57.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Jun 2023 02:57:28 -0700 (PDT)
-Message-ID: <92b65190-b39b-e410-1831-31d63a6aa129@redhat.com>
-Date: Tue, 13 Jun 2023 17:57:21 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B2C3C25
+	for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 11:02:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50A99C433EF;
+	Tue, 13 Jun 2023 11:02:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1686654156;
+	bh=xTXLg6Gmd35HxM/DB6S7j9/iRs4jOwAr4ziLjh9QAYg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Su4olLirkWNUvyiNlpG+6n7FFzfa8TNzL0BdpeYFHYR7+oDYZRnqFCWtcLXfvIqpL
+	 WzgCy/ZlMhXb+ZGul217aC5jD+xxAlPn518Xm4OOBfm0HXaMVEV6jrnYWxWQJnZ5Hw
+	 v2Wit34P5NY0EObKCin6wU5ofWD0i1x+e1wMTXxWbbNSGZ8EjL3u2RIDUL2BRqPz2T
+	 gwNygVM7sJokIUjJ63nMow3gwlYaoZrpQc1HkfChPS8NmTM9ZJxTv/VUfAkZqF1xBi
+	 5myvPWVEv8UHqgHKbMvQhDp6d0T0Zy7U17hFekTZFOGwJIGBs5jVTusm1zADlji+Gc
+	 zyqb3CSi0kbqA==
+Date: Tue, 13 Jun 2023 12:02:31 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev,
+	coresight@lists.linaro.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V2 14/14] arm64/sysreg: Convert TRBIDR_EL1 register to
+ automatic generation
+Message-ID: <8bfffd83-f4a3-445b-9343-7325c671bd00@sirena.org.uk>
+References: <20230602062552.565992-1-anshuman.khandual@arm.com>
+ <20230602062552.565992-15-anshuman.khandual@arm.com>
+ <4de1ec32-f07b-4eca-99e2-f71a08f5cd5b@sirena.org.uk>
+ <1dca7ec8-a0d1-3038-7e9f-0d2934dc2e37@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v3 09/17] KVM: arm64: Key use of VHE instructions in nVHE
- code off ARM64_KVM_HVHE
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- Quentin Perret <qperret@google.com>, Will Deacon <will@kernel.org>,
- Fuad Tabba <tabba@google.com>
-References: <20230609162200.2024064-1-maz@kernel.org>
- <20230609162200.2024064-10-maz@kernel.org>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230609162200.2024064-10-maz@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="tPwiVwOaYEtW6aoV"
+Content-Disposition: inline
+In-Reply-To: <1dca7ec8-a0d1-3038-7e9f-0d2934dc2e37@arm.com>
+X-Cookie: Made with real ingredients.
 
-Hi Marc,
 
-On 6/10/23 00:21, Marc Zyngier wrote:
-> We can now start with the fun stuff: if we enable VHE *only* for
-> the hypervisor, we need to generate the VHE instructions when
-> accessing the system registers.
-> 
-> For this, reporpose the alternative sequence to be keyed off
-s/reporpose/repropose or s/reporpose/repurpose ?
-> ARM64_KVM_HVHE in the nVHE hypervisor code, and only there.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->   arch/arm64/include/asm/kvm_hyp.h | 12 +++++++++---
->   1 file changed, 9 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index fea04eb25cb4..b7238c72a04c 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -33,12 +33,18 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
->   
->   #else // !__KVM_VHE_HYPERVISOR__
->   
-> +#if defined(__KVM_NVHE_HYPERVISOR__)
-> +#define VHE_ALT_KEY	ARM64_KVM_HVHE
-> +#else
-> +#define VHE_ALT_KEY	ARM64_HAS_VIRT_HOST_EXTN
-> +#endif
-> +
->   #define read_sysreg_elx(r,nvh,vh)					\
->   	({								\
->   		u64 reg;						\
-> -		asm volatile(ALTERNATIVE(__mrs_s("%0", r##nvh),	\
-> +		asm volatile(ALTERNATIVE(__mrs_s("%0", r##nvh),		\
->   					 __mrs_s("%0", r##vh),		\
-> -					 ARM64_HAS_VIRT_HOST_EXTN)	\
-> +					 VHE_ALT_KEY)			\
->   			     : "=r" (reg));				\
->   		reg;							\
->   	})
-> @@ -48,7 +54,7 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
->   		u64 __val = (u64)(v);					\
->   		asm volatile(ALTERNATIVE(__msr_s(r##nvh, "%x0"),	\
->   					 __msr_s(r##vh, "%x0"),		\
-> -					 ARM64_HAS_VIRT_HOST_EXTN)	\
-> +					 VHE_ALT_KEY)			\
->   					 : : "rZ" (__val));		\
->   	} while (0)
->   
+--tPwiVwOaYEtW6aoV
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Shaoqin
+On Tue, Jun 13, 2023 at 09:56:31AM +0530, Anshuman Khandual wrote:
 
+>  Sysreg TRBIDR_EL1      3       0       9       11      7
+>  Res0   63:12
+> -Field  11:8    EA
+> +Enum   11:8    EA
+> +       0b0000  NON_DESC
+> +       0b0001  IGNORE
+> +       0b0010  SERROR
+> +EndEnum
+
+Sure.
+
+> >> +Field	3:0	Align
+> >=20
+> > Align arguably too though really it's just encoding the relevant power
+> > of 2 with the enum coming from the fact that it's limited to at most 2KB
+> > alignment so a Field may well make more sense.
+>=20
+> Can fold the following changes in this patch (if required) unless the Fie=
+ld
+> looks better than Enum.
+>=20
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -2275,5 +2275,18 @@ EndEnum
+>  Res0   7:6
+>  Field  5       F
+>  Field  4       P
+> -Field  3:0     Align
+> +Enum   3:0     Align
+> +       0b0000  BYTE
+> +       0b0001  HALF_WORD
+> +       0b0010  WORD
+
+I'm not sure this one makes sense as an enum, though it is technically
+one.
+
+--tPwiVwOaYEtW6aoV
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmSITMYACgkQJNaLcl1U
+h9Cebwf/YnyUkQpHVypDqyv2AXpb4cbOcLaeN51ltZjX+52q7Hfj5X9gMcClDYpy
+nS6Zs7MUlCVB5z0oT4jLmrNE199Kl4XfizF93KX9eY3xXJV97nhdswOum4KaDViP
+KJZfmSyu4iTqgVc8XrNzORTwX09RxwxQ5AFGLvImzVHjM5DFXUY6QaBpbYWgz/9I
+vouoTBegdtm91HLm9JfBCnpFpdjgIweGwcreFssr+iFgXwZKh+Ro9XdX4RQmwVNs
+1L1tguc8jFnQyNxbN9u5UemC+eq5GY5tecERTf+apqmWSEw48y0tiN2bofJxJX6Q
+/duLdurFMRpeOpsa+6gPCs5MGOWY+A==
+=zLcy
+-----END PGP SIGNATURE-----
+
+--tPwiVwOaYEtW6aoV--
