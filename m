@@ -1,51 +1,51 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02AB567E
-	for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 08:25:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 843982915
+	for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 09:57:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1686644724;
+	s=mimecast20190719; t=1686650259;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=P1syNaBAKkffiLL0bv/EmGcINY+iq9kUOB1DQ8J5+wk=;
-	b=TG478KWL4BwhakhIVcoM88wUPpWoMnYHp4D2y7K3bdMVZWqJc3zI7iXuZKZRlJJvw4SgCb
-	UVoOc/ZmhPJXyfTzVYXX4XTu0dLjBhI23UtEXquNVVD1Efd2669AYC55dTUybBTU32uDnN
-	teuBMueW30Fxu2Q93IOE2iX+2idN+rE=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=d24qNgsK4YI73pNJSGPXOXGrlkTr7CIQRglIpszf5fE=;
+	b=D2zsPIKRl4u7tgWbYHj+a2KXtaYwpushvvRgzGKz99AFUxoCWreYcUIdZNrtviANt9vMq4
+	JO9M2Suq0euWX+JnV4HaVCmyuSKafcjQlJPI89tpb3C+J2z3m9V/oy+o6KW2LReBtnOzpn
+	Sw3xW0POMfyqBcHeTzoo5F+oWF7tcpE=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-74-5WPgH2OtPJ6BkS0nx6dXhw-1; Tue, 13 Jun 2023 04:25:22 -0400
-X-MC-Unique: 5WPgH2OtPJ6BkS0nx6dXhw-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-30fb7b82e15so469919f8f.0
-        for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 01:25:22 -0700 (PDT)
+ us-mta-628-f1FL6ds_NkW24F471tEJGw-1; Tue, 13 Jun 2023 05:57:30 -0400
+X-MC-Unique: f1FL6ds_NkW24F471tEJGw-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3f73936c258so7043935e9.1
+        for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 02:57:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686644721; x=1689236721;
+        d=1e100.net; s=20221208; t=1686650249; x=1689242249;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P1syNaBAKkffiLL0bv/EmGcINY+iq9kUOB1DQ8J5+wk=;
-        b=eHnmAET/Ahd4EBqGE0A1baYY7DGmlZz2Hc0LDffLQbpp8eGCYFttKS7ozHkGKDT0SC
-         4KpfRhhSG12+g3zKaCfcdlV4e7Z2MJAnNyinhRQ8VZ9h/8KGlp44PNdYPF0SaAQEJDPc
-         XG7jSZ/VBr4QHM2WBGCpSNZVfbCzfSPogStSWQKeRd/oVChSWs6uknaOyPT0QZNgyIdW
-         xlv1d5jgurtKSququMWSK3QEoqSQuonEUG15G45BfGKpXD+/WGKZwghx5sxtIt+UoeJN
-         gVck1kq4iCSzNpnyfh+/rVsp37qwaFSRLwgwdLgVIg1KaNuCW/ehcjbXD0zaOGjAe4VA
-         +dgA==
-X-Gm-Message-State: AC+VfDwmEw3cIKr6kfMk2llbKbyuiJDU9LSObptpRLCPafoHRaPmcKR+
-	z7T/wABnu5W09DImjGXz8WPma46KGosxEK1xUHScDj26GHGlRqaUxZSqH+SRhw0cG5vtrCqAJ6X
-	5gV4qYE9OpHZjW1sa
-X-Received: by 2002:a5d:630b:0:b0:30f:c0a8:973c with SMTP id i11-20020a5d630b000000b0030fc0a8973cmr4182802wru.7.1686644721766;
-        Tue, 13 Jun 2023 01:25:21 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ54+a0ZNqCyRceTdBNOPN8n0EMFWs7KGngnKpklEwP2qo3zBges6I9cDMRiOnw/znCcScLd0Q==
-X-Received: by 2002:a5d:630b:0:b0:30f:c0a8:973c with SMTP id i11-20020a5d630b000000b0030fc0a8973cmr4182787wru.7.1686644721492;
-        Tue, 13 Jun 2023 01:25:21 -0700 (PDT)
-Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id h14-20020a5d6e0e000000b003078354f774sm14594095wrz.36.2023.06.13.01.25.16
+        bh=d24qNgsK4YI73pNJSGPXOXGrlkTr7CIQRglIpszf5fE=;
+        b=Yq2f9L8+v9IctBhv1efV/a9T+pwteXqp+6sSKnUC4I+5kF1luTipsO5eKEPzSR+DJg
+         VRoajulk5RCn1Xw+tiAI6OHLBBWbAJoSNEOJW0MNVIl8dcEenKC89zOdLFxPtnIPNI93
+         N2e/T7dy/vBETEiW+J023RHTegzMWPxvAF96O6ebrl9iLwDeIN7s6/Q/oIV7vnc25/TM
+         XNiliqPr8F79sURWp9G7SHpLzu+oDBGadLjRFWw2PejMojQh52JdbFjO8roP5FjlBklG
+         iPra7aVab5iindM9ApHuRpjEQbnZVugLpIMfUjVbyG7NTn/z24pgJXYNcSWoCOHuxjbU
+         CA+g==
+X-Gm-Message-State: AC+VfDyl2jdMPomyj5VLl/8jbSB8VEvyE/P0J4h5c0H2cJw+GF8QoKxd
+	2RkHSMwTmMMLudU3ht19TpgYsUfs96ckSz/6UMkFR5LcZOV+88mOpxzxsKF3wZJnru8r4gmgJML
+	hMpgf+Gy0GpFV/mHr
+X-Received: by 2002:a05:600c:3843:b0:3f7:1483:b229 with SMTP id s3-20020a05600c384300b003f71483b229mr9712647wmr.3.1686650249190;
+        Tue, 13 Jun 2023 02:57:29 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5DWlGtfOHfyQjcabrgMLJ7MLmCh6LzHVrUWcE9P78XidO1dSdo0iXISnggfacCEipbLVgi+A==
+X-Received: by 2002:a05:600c:3843:b0:3f7:1483:b229 with SMTP id s3-20020a05600c384300b003f71483b229mr9712637wmr.3.1686650248918;
+        Tue, 13 Jun 2023 02:57:28 -0700 (PDT)
+Received: from [10.66.61.39] ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id z10-20020a05600c114a00b003f7e60622f0sm13922898wmz.6.2023.06.13.02.57.24
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Jun 2023 01:25:21 -0700 (PDT)
-Message-ID: <02f40638-0230-ab06-6ccd-6bdbab814000@redhat.com>
-Date: Tue, 13 Jun 2023 16:25:13 +0800
+        Tue, 13 Jun 2023 02:57:28 -0700 (PDT)
+Message-ID: <92b65190-b39b-e410-1831-31d63a6aa129@redhat.com>
+Date: Tue, 13 Jun 2023 17:57:21 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,8 +54,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.10.0
-Subject: Re: [PATCH v3 02/17] arm64: Prevent the use of
- is_kernel_in_hyp_mode() in hypervisor code
+Subject: Re: [PATCH v3 09/17] KVM: arm64: Key use of VHE instructions in nVHE
+ code off ARM64_KVM_HVHE
 To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
  kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 Cc: James Morse <james.morse@arm.com>,
@@ -64,47 +64,64 @@ Cc: James Morse <james.morse@arm.com>,
  Quentin Perret <qperret@google.com>, Will Deacon <will@kernel.org>,
  Fuad Tabba <tabba@google.com>
 References: <20230609162200.2024064-1-maz@kernel.org>
- <20230609162200.2024064-3-maz@kernel.org>
+ <20230609162200.2024064-10-maz@kernel.org>
 From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230609162200.2024064-3-maz@kernel.org>
+In-Reply-To: <20230609162200.2024064-10-maz@kernel.org>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-
+Hi Marc,
 
 On 6/10/23 00:21, Marc Zyngier wrote:
-> Using is_kernel_in_hyp_mode() in hypervisor code is a pretty bad
-> mistake. This helper only checks for CurrentEL being EL2, which
-> is always true.
+> We can now start with the fun stuff: if we enable VHE *only* for
+> the hypervisor, we need to generate the VHE instructions when
+> accessing the system registers.
 > 
-> Make the compilation fail if using the helper in hypervisor context
-> Whilst we're at it, flag the helper as __always_inline, which it
-> really should be.
+> For this, reporpose the alternative sequence to be keyed off
+s/reporpose/repropose or s/reporpose/repurpose ?
+> ARM64_KVM_HVHE in the nVHE hypervisor code, and only there.
 > 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
 > ---
->   arch/arm64/include/asm/virt.h | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
+>   arch/arm64/include/asm/kvm_hyp.h | 12 +++++++++---
+>   1 file changed, 9 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-> index 4eb601e7de50..21e94068804d 100644
-> --- a/arch/arm64/include/asm/virt.h
-> +++ b/arch/arm64/include/asm/virt.h
-> @@ -110,8 +110,10 @@ static inline bool is_hyp_mode_mismatched(void)
->   	return __boot_cpu_mode[0] != __boot_cpu_mode[1];
->   }
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index fea04eb25cb4..b7238c72a04c 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -33,12 +33,18 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
 >   
-> -static inline bool is_kernel_in_hyp_mode(void)
-> +static __always_inline bool is_kernel_in_hyp_mode(void)
->   {
-> +	BUILD_BUG_ON(__is_defined(__KVM_NVHE_HYPERVISOR__) ||
-> +		     __is_defined(__KVM_VHE_HYPERVISOR__));
->   	return read_sysreg(CurrentEL) == CurrentEL_EL2;
->   }
+>   #else // !__KVM_VHE_HYPERVISOR__
+>   
+> +#if defined(__KVM_NVHE_HYPERVISOR__)
+> +#define VHE_ALT_KEY	ARM64_KVM_HVHE
+> +#else
+> +#define VHE_ALT_KEY	ARM64_HAS_VIRT_HOST_EXTN
+> +#endif
+> +
+>   #define read_sysreg_elx(r,nvh,vh)					\
+>   	({								\
+>   		u64 reg;						\
+> -		asm volatile(ALTERNATIVE(__mrs_s("%0", r##nvh),	\
+> +		asm volatile(ALTERNATIVE(__mrs_s("%0", r##nvh),		\
+>   					 __mrs_s("%0", r##vh),		\
+> -					 ARM64_HAS_VIRT_HOST_EXTN)	\
+> +					 VHE_ALT_KEY)			\
+>   			     : "=r" (reg));				\
+>   		reg;							\
+>   	})
+> @@ -48,7 +54,7 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+>   		u64 __val = (u64)(v);					\
+>   		asm volatile(ALTERNATIVE(__msr_s(r##nvh, "%x0"),	\
+>   					 __msr_s(r##vh, "%x0"),		\
+> -					 ARM64_HAS_VIRT_HOST_EXTN)	\
+> +					 VHE_ALT_KEY)			\
+>   					 : : "rZ" (__val));		\
+>   	} while (0)
 >   
 
 -- 
