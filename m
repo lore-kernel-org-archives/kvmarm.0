@@ -1,132 +1,231 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24BD134B4
-	for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 12:55:08 +0000 (UTC)
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-65242634690so4147195b3a.0
-        for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 05:55:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EBFE23DB
+	for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 14:58:45 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-bc97822915aso2923607276.1
+        for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 07:58:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686660908; x=1689252908;
-        h=to:references:message-id:cc:date:in-reply-to:from:subject
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=N9+J5pkzNukUkC+uqb2tz8DIK3px0ww4xZnjqp8unR0=;
-        b=bKuxr4gjk2PMj61xfuW+ebHXU8+iCXVxu3jnqjg+5fgtRsnA2us+DfnrHaM2rka0Fj
-         AqpYG7fycKc80sFo4JRtHu+kRafFlBnTmFHR0R96zVr9wnQUKyFpMk2lFvmD7/36FJH6
-         CPMryp9EuBngD8qVgoxwVMLCmtRas9uT7yV+LfGliL0JZeFSHJumKgbWgqbcd26aGmVE
-         YVRyvV6u9K1uA6DXLLJsZ9FO9siuFNSXpRj9vJxOIqGZVD0+A+RllTpNrQjJaK38c7LA
-         soMcmByTGygWFzo+1JVOZSH7WR4m/7mXhmIix1SR8OFrEgeB7t+l/8aKXsw1lm1HfoCB
-         Lnag==
+        d=google.com; s=20221208; t=1686668324; x=1689260324;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=K+0kD4PW2dGvQpmF8P/dLcdDL49MrQOe0Bs/vjodXCo=;
+        b=s2yBwT/46quu0M19ZvyZP44LoDcCKdMQJ+XCkKZbDNyv+8ckqdNWOyCvkG8VjAfgN7
+         uoiWalI4a8yp5SOMD6vH553yZNIzDjAkzQ239tTAj6IhyfEhQKiz0ZFgNzkAZQ5Rg4lc
+         vY8AZ7Tq6at3vgdO6nOz88vcWuNRmK2AHw7CqKwZOS1ZzhUPpLOdCFFQAg7usWc0KIXA
+         IsEx7XaFzEoUxWZWK33CoQkBNI/vMlBuybEkOvNtPBfghXhuvaE2IIoqd4OJub7loHTY
+         Cv2lqA2gqJqOXdrTezHH/eKF4JQ8DTBI9CPHbQhTu+Kb9VEboFZiAKVm64JJAwJFxidO
+         pGqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686660908; x=1689252908;
-        h=to:references:message-id:cc:date:in-reply-to:from:subject
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=N9+J5pkzNukUkC+uqb2tz8DIK3px0ww4xZnjqp8unR0=;
-        b=BC01SxfwiKpApryR65mn7uJ3nMTFwLS6U4MnTyQMbThqI95PcyDEap32IrRowMhqDK
-         INg60ymB3D8zx02rKrBFlwrO8UPLI9EHKO5JSiut8tiTrn7DG/MrE1PuXZZ4FhQgwmLT
-         lv1obW9wQ39X13mOxZWx2LwRhrrNcdYqtg/+GvGzpN7CoZVsLYIPHLcKQgwTJxIRVbl9
-         FWnqYmYQ/r0MpGnr6e3Ik/qqhR3GLdoDAsrJCbIbjTOkLey1rDEM0wfeYJQrEiiPiyFl
-         g52lbbr/UM2rhMAtob1KilzcpVRmAC9UMuWUUQZ0mJRRGyWV74eEgyrlXMS3LCgcmN2M
-         7hUQ==
-X-Gm-Message-State: AC+VfDxAdsiLpr1bUmjkYSpGpIlnsWLLxkJRnXfHc1JUo4Z/ignQ4UNy
-	gKrIbkBtR1hY8025ZiNug/0g9b0VGU8=
-X-Google-Smtp-Source: ACHHUZ7MfQ83oeDmCKmmF5IR2/dUBT3Uiq0Q33EsEyZFdNt5EmdBPOC7p+P3Sv0wyKFxK0zN35mfmA==
-X-Received: by 2002:a05:6a20:3d17:b0:10c:41a6:ac1f with SMTP id y23-20020a056a203d1700b0010c41a6ac1fmr13360873pzi.16.1686660907717;
-        Tue, 13 Jun 2023 05:55:07 -0700 (PDT)
-Received: from smtpclient.apple (c-24-6-216-183.hsd1.ca.comcast.net. [24.6.216.183])
-        by smtp.gmail.com with ESMTPSA id v3-20020a170902d68300b001b243a5a5e1sm3553874ply.298.2023.06.13.05.55.06
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 13 Jun 2023 05:55:07 -0700 (PDT)
-Content-Type: multipart/signed;
-	boundary="Apple-Mail=_2916A246-24B3-4374-86EF-1037BF8708A3";
-	protocol="application/pgp-signature";
-	micalg=pgp-sha256
+        d=1e100.net; s=20221208; t=1686668324; x=1689260324;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=K+0kD4PW2dGvQpmF8P/dLcdDL49MrQOe0Bs/vjodXCo=;
+        b=K6OMW1UgNyFxmchr1rYWCyvyWeAa2W6mBKIjpNIhNIP0um3U0EHkp4xyREkWOTotAy
+         rajhlg/V0F4X+FWcyQ86PAUJ8jDFnSC2flOi7Z/QXi0KwnDLcune1mZGKBJpDJ5r1Ful
+         KEjY0Sj//vmD6fOTRYKwvZmz5bli0dH7jFGwDiPqLm2rhZE7J5JZNlKdEL5AyTrGweMZ
+         uZa04WhSSzFRU3ZKKut5S9CFIJZC89HVf4W5Z11TyycX46Yz2A9evRShIAPmfYu3aqjn
+         sWQE49Av6UnwFtNjAtTDo9gD+9vAOpSCNlC67zE1sfkQEQdTA1CxVn1tXU099fdEuneB
+         YzQQ==
+X-Gm-Message-State: AC+VfDzVSHTCiUZVXgO8sTRd2TzBsZ/XwnoIbIXL01JtIAgIHNM3Sdra
+	OKEhBWMO0I/K8n53qSqStQ911I5a4lo=
+X-Google-Smtp-Source: ACHHUZ45bwZa/PJKAhYeklX7zhd5j76j407QtmxG6njgLhIsPRNiUhLcNEOwpA1xPza96/WjN2Xmwx93NXE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:352:b0:bcd:f98e:f5f with SMTP id
+ e18-20020a056902035200b00bcdf98e0f5fmr765169ybs.13.1686668324159; Tue, 13 Jun
+ 2023 07:58:44 -0700 (PDT)
+Date: Tue, 13 Jun 2023 07:58:42 -0700
+In-Reply-To: <6e335f13-01bd-2972-ead2-3081819aa151@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.600.7\))
-Subject: Re: [kvm-unit-tests PATCH v6 00/32] EFI and ACPI support for arm64
-From: Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <20230613-6b1cb3080babea45f2542c49@orel>
-Date: Tue, 13 Jun 2023 05:54:53 -0700
-Cc: Nikos Nikoleris <nikos.nikoleris@arm.com>,
- kvm@vger.kernel.org,
- kvmarm@lists.linux.dev,
- Paolo Bonzini <pbonzini@redhat.com>,
- alexandru.elisei@arm.com,
- ricarkol@google.com,
- shahuang@redhat.com
-Message-Id: <D24DE2A5-2655-41C8-8320-69E1AD67823D@gmail.com>
-References: <20230530160924.82158-1-nikos.nikoleris@arm.com>
- <CC2B570B-9EE0-4686-ADF3-82D1ECDD5D8A@gmail.com>
- <20230612-6e1f6fac1759f06309be3342@orel>
- <5fb09d21-437d-f83e-120f-8908a9b354c1@arm.com>
- <EE9170FC-8229-4D93-AD98-35394494CE61@gmail.com>
- <de16e445-b119-d908-a4dc-c0d7cf942413@arm.com>
- <20230613-6b1cb3080babea45f2542c49@orel>
-To: Andrew Jones <andrew.jones@linux.dev>
-X-Mailer: Apple Mail (2.3731.600.7)
+Mime-Version: 1.0
+References: <20230608090348.414990-1-gshan@redhat.com> <ZIcujNKVosLeQEqR@google.com>
+ <6e335f13-01bd-2972-ead2-3081819aa151@redhat.com>
+Message-ID: <ZIiEIkn1lFU7Vr1z@google.com>
+Subject: Re: [PATCH] KVM: Avoid illegal stage2 mapping on invalid memory slot
+From: Sean Christopherson <seanjc@google.com>
+To: Gavin Shan <gshan@redhat.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	pbonzini@redhat.com, oliver.upton@linux.dev, maz@kernel.org, 
+	hshuai@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+Content-Type: text/plain; charset="us-ascii"
 
+On Tue, Jun 13, 2023, Gavin Shan wrote:
+> Hi Sean,
+> 
+> On 6/13/23 12:41 AM, Sean Christopherson wrote:
+> > > Fixes: 3039bcc74498 ("KVM: Move x86's MMU notifier memslot walkers to generic code")
+> > 
+> > This Fixes isn't correct.  That change only affected x86, which doesn't have this
+> > bug.  And looking at commit cd4c71835228 ("KVM: arm64: Convert to the gfn-based MMU
+> > notifier callbacks"), arm64 did NOT skip invalid slots
 
---Apple-Mail=_2916A246-24B3-4374-86EF-1037BF8708A3
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
+...
 
+> > Unless I'm missing something, this goes all the way back to initial arm64 support
+> > added by commit d5d8184d35c9 ("KVM: ARM: Memory virtualization setup").
+> > 
+> 
+> The fixes tag was sorted out based on 'git-bisect', not static code analysis. I
+> agree it should be d5d8184d35c9 ("KVM: ARM: Memory virtualization setup") from
+> the code. From the 'git-bisect', we found the issue disappears when the head is
+> commit 3039bcc74498 ("KVM: Move x86's MMU notifier memslot walkers to generic code").
+> And yes, the fixes tag should be cd4c71835228 ("KVM: arm64: Convert to the gfn-based
+> MMU notifier callbacks").
 
+No, just because bisect points at a commit doesn't mean that's the commit that
+introduced a bug.  It's not uncommon for a completely valid change to expose a
+pre-existing bug, which is what I suspect happened here, e.g. after switching to
+the generic framework, clean_dcache_guest_page() is called *after* retrieving the
+memslot, versus clean_dcache_guest_page() being called before walking memslots.
 
-> On Jun 13, 2023, at 4:21 AM, Andrew Jones <andrew.jones@linux.dev> =
-wrote:
->=20
-> On Mon, Jun 12, 2023 at 10:53:56PM +0100, Nikos Nikoleris wrote:
->> On 12/06/2023 16:59, Nadav Amit wrote:>
->>> Thanks. I am still struggling to run the tests on my environment. =
-Why the
->>> heck frame-pointers are disabled on arm64? Perhaps I=E2=80=99ll send =
-my patch to
->>> enable them (and add one on exception handling).
->>>=20
->>=20
->> I am afraid I don't know why it's omitted. It seems that x86 and arm =
-keep
->> it:
->=20
-> The support was first added to x86 and then I ported it to arm and =
-gave
-> porting it to arm64 a small effort too, but it didn't work off the =
-bat.
-> I wrote it down on my TODO, but it eventually fell off the bottom=E2=80=A6=
+Blaming the correct commit matters, both so that it's clear to future readers what
+went wrong, and also so that people maintaining older kernels at least are aware
+that there kernel may be affected.  E.g. a fix in generic KVM obviously won't
+backport to 5.10, but someone who cares deeply about a 5.10-based kernel on arm64
+could manually port the fix to KVM arm64 code.
 
+> I'm declined to fix the issue only for ARM64,
 
-Thanks. Don=E2=80=99t worry. I=E2=80=99ll send my implementation.
+I never suggested that an ARM-only fix be made, in fact I explicitly suggested
+the exact opposite.
 
+> more details are given below. If we're going to limit the issue to ARM64 and
+> fix it for ARM64 only, the fixes tag should be the one as you pointed. Lets
+> correct it in next revision with:
 
+For a generic fix, just blame multiple commits, e.g. the guilty arm64, RISC-V,
+and MIPS commits, which at a glance are the affected architectures.  At one point
+in time, x86 was also likely affected, but that's probably not worth more than a
+brief mention in the changelog as I don't see any value in tracking down a very
+theoretical window of time where x86 was affected.
 
---Apple-Mail=_2916A246-24B3-4374-86EF-1037BF8708A3
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
+>   Cc: stable@vger.kernel.org # v3.9+
+>   Fixes: d5d8184d35c9 ("KVM: ARM: Memory virtualization setup")
+> 
+> > > Reported-by: Shuai Hu <hshuai@redhat.com>
+> > > Reported-by: Zhenyu Zhang <zhenyzha@redhat.com>
+> > > Signed-off-by: Gavin Shan <gshan@redhat.com>
+> > > ---
+> > >   virt/kvm/kvm_main.c | 3 +++
+> > >   1 file changed, 3 insertions(+)
+> > > 
+> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > > index 479802a892d4..7f81a3a209b6 100644
+> > > --- a/virt/kvm/kvm_main.c
+> > > +++ b/virt/kvm/kvm_main.c
+> > > @@ -598,6 +598,9 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+> > >   			unsigned long hva_start, hva_end;
+> > >   			slot = container_of(node, struct kvm_memory_slot, hva_node[slots->node_idx]);
+> > > +			if (slot->flags & KVM_MEMSLOT_INVALID)
+> > > +				continue;
+> > 
+> > Skipping the memslot will lead to use-after-free.  E.g. if an invalidate_range_start()
+> > comes along between installing the invalid slot and zapping SPTEs, KVM will
+> > return from kvm_mmu_notifier_invalidate_range_start() without having dropped all
+> > references to the range.
+> > 
+> > I.e.
+> > 
+> > 	kvm_copy_memslot(invalid_slot, old);
+> > 	invalid_slot->flags |= KVM_MEMSLOT_INVALID;
+> > 	kvm_replace_memslot(kvm, old, invalid_slot);
+> > 
+> > 	/*
+> > 	 * Activate the slot that is now marked INVALID, but don't propagate
+> > 	 * the slot to the now inactive slots. The slot is either going to be
+> > 	 * deleted or recreated as a new slot.
+> > 	 */
+> > 	kvm_swap_active_memslots(kvm, old->as_id);
+> > 
+> > 
+> > ==> invalidate_range_start()
+> > 
+> > 	/*
+> > 	 * From this point no new shadow pages pointing to a deleted, or moved,
+> > 	 * memslot will be created.  Validation of sp->gfn happens in:
+> > 	 *	- gfn_to_hva (kvm_read_guest, gfn_to_pfn)
+> > 	 *	- kvm_is_visible_gfn (mmu_check_root)
+> > 	 */
+> > 	kvm_arch_flush_shadow_memslot(kvm, old);
+> > 
+> > And even for change_pte(), skipping the memslot is wrong, as KVM would then fail
+> > unmap the prior SPTE.  Of course, that can't happen in the current code base
+> > because change_pte() is wrapped with invalidate_range_{start,end}(), but that's
+> > more of a bug than a design choice (see c13fda237f08 "KVM: Assert that notifier
+> > count is elevated in .change_pte()" for details).  That's also why this doesn't
+> > show up on x86; x86 installs a SPTE for the change_pte() notifier iff an existing
+> > SPTE is present, which is never true due to the invalidation.
+> > 
+> 
+> Right, those architectural dependencies are really something I worried about.
 
------BEGIN PGP SIGNATURE-----
+The zap case isn't a architecture specific, that's true for all KVM architectures.
 
-iQIzBAEBCAAdFiEESJL3osl5Ymx/w9I1HaAqSabaD1oFAmSIZx0ACgkQHaAqSaba
-D1pJTA//eDphpaaagDgAqhCvKZmAzI6/Jg7kihKfKAiRy/p29ZfD1r4hHcE/X4XC
-qWvyvFVc3qkKUhUayGW7w3+XsJibZ7mbUzoWZFIu1IL+C5SpLJOvbaVObu05j3pV
-aZicJ1JLXoo2HM6mMvz4Y5hYRlHnyQes2qvOmqtQ8Z2vI2NWS0PJI9tsQW7R08pQ
-mgeyjjnOudh0MjMGIB+FlmFRnfM4wRaxAT/3WibqR36u7Lupaz8OHa81t0JjPNku
-+GxztEiMkJZDNB5O6H/QXfnOn2GiFwIVxpXKnP0lM+IowLKDDCxijcodVkdsm6ON
-Gvye3w8r2A2aSGb83XWZqy09FlWlMq0asUKLIIhk0pyUEvxeOnQpPnKyCqFT2jVY
-gNzeKi3ZfpxeKkWwYLqZworaGuBbkt4iKPWm8KVBZo0kQzefIU534a9GfZUzyHvk
-IKLWpzip7/rsXBWXOXcivcenizEYCuNJlc25DKtzOPbFvU3gJF6dafq7LcZb9yRq
-biQwQrXtCnFZNlSs0Uzb7BQM6hNJyDeJ8KwjCs8rnBXf7Al+zGGT5V/8CyR1Kvbw
-prfjIRvEd85aJOrqQYWmcX1WbfU8rTze+jImsDYN74U/Wix42j4jiFZCp8/uxKQx
-omMbG4ddTbY+gsL150AWfKQKAVCDO2T3ZwjdMbH4CjOXmUP/Jfg=
-=L0j+
------END PGP SIGNATURE-----
+> It's safe to skip the invalid memory slots for ARM64,
 
---Apple-Mail=_2916A246-24B3-4374-86EF-1037BF8708A3--
+No, it's not.  The problematic window where an invalidation can be incorrectly
+skipped is very tiny, and would have zero chance of being seen without something
+generating invalidations, e.g. page migration.  But that doesn't mean there's no
+bug.
+
+> but it may be unsafe to do so for other architectures. You've listed the
+> potential risks to do so for x86. It might be risky with PowerPC's reverse
+> mapping stuff either. I didn't look into the code for the left architectures.
+> In order to escape from the architectural conflicts, I would move the check
+> and skip the invalid memory slot in arch/arm64/kvm/mmu.c::kvm_set_spte_gfn(),
+> something like below. In this way, the guest hang issue in ARM64 guest is
+> fixed. We may have similar issue on other architectures, but we can figure
+> out the fix when we have to.  Sean, please let me know if you're happy with
+> this?
+> 
+> arch/arm64/kvm/mmu.c::kvm_set_spte_gfn()
+> ----------------------------------------
+> 
+> bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+> {
+>         kvm_pfn_t pfn = pte_pfn(range->pte);
+> 
+>         if (!kvm->arch.mmu.pgt)
+>                 return false;
+> 
+>         /*
+>          * The memory slot can become invalid temporarily or permanently
+>          * when it's being moved or deleted. Avoid the stage2 mapping so
+>          * that all the read and write requests to the region of the memory
+>          * slot can be forwarded to VMM and emulated there.
+>          */
+>          if (range->slot->flags & KVM_MEMSLOT_INVALID)
+>              return false;
+
+Please no.  (a) it papers over common KVM's reliance on the SPTE being zapped by
+invalidate_range_start(), and (b) it leaves the same bug in RISC-V (which copy+pasted
+much of arm64's MMU code) and in MIPS (which also installs SPTEs in its callback).
+
+>          WARN_ON(range->end - range->start != 1);
+> 
+>          :
+> }
+> 
+> > I'd honestly love to just delete the change_pte() callback, but my opinion is more
+> > than a bit biased since we don't use KSM.  Assuming we keep change_pte(), the best
+> > option is probably to provide a wrapper around kvm_set_spte_gfn() to skip the
+> > memslot, but with a sanity check and comment explaining the dependency on there
+> > being no SPTEs due to the invalidation.  E.g.
+> > 
+> 
+> It's good idea, but I'm afraid other architectures like PowerPC will still be
+> affected.
+
+I don't follow.  PPC unmaps in response to a PTE change, but that's effectively
+dead code due to change_pte() being wrapped with invalidate_range_{start,end}().
+
+> So I would like to limit this issue to ARM64 and fix it in its
+> kvm_set_spte_gfn() variant, as above. One question about "we don't use KSM":
+> could you please share more information about this? I'm blindly guessing
+> you're saying KSM isn't used in google cloud?
+
+Yeah, we == Google/GCE.  Sorry, should have clarified that.
