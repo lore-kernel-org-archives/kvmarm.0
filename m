@@ -1,115 +1,252 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD70F17E
-	for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 00:26:40 +0000 (UTC)
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1b3b9413baaso45825ad.1
-        for <kvmarm@lists.linux.dev>; Mon, 12 Jun 2023 17:26:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686616000; x=1689208000;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sG+y868fGGwtVP8PKGF9VF3f/ok7RNLP2cQ05nH3HUE=;
-        b=iWHBXILMJIPATpHcRZR4K1vDWcdjC9GrHG/2SCQKB+qQux//FBSWKENP5iHy2ZTKSK
-         lexK9lzm24crVVGD/M+6lGwOghCYJPsk6VJGNt6JOJO8Vb85Rziw+Xo17R12cN9bJczB
-         Iw20rMMwG6iReqNa6VmAdNg5LOo0KPTgycf9hY+AbaXLHOoZT70xB/lFaWt46aWw8C2f
-         sOx+UHc+HxE8tjb8+si1A91i2C+v4VNATOVwsZjf3UEMTWXRnid6hURKa2jwf1PG1TNA
-         IRPQLqwoHzdideu67RL8A3Q8sivQ1F5h4Hcy2NSmFagKG7LWbgwYqP/Mgdawax0TPilF
-         xDlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686616000; x=1689208000;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sG+y868fGGwtVP8PKGF9VF3f/ok7RNLP2cQ05nH3HUE=;
-        b=WjxSDAZJCoLlOj6ayoSgr10y+WlTGE+JzIGXW66QCJdscRyZIsMiNjE8did7rN7Vud
-         d67CC1rEGog/KA4mE9I860q9l0fvilrgSv7f23y3uAppuZWtM5A67SPrdlwEMa00/uF+
-         1hAGuv5tAQcLR4Fak81hWIidODgSzVzVxKKdDdzJoz68ioJ/1MJDqMtURSGIA2laR0hL
-         Vrmk23Lo7jsZvvkA/0o79aLxnjGy0OeVOt0N/ABFoJdtea4KU6ZTlfRJJEs6PZCKavxg
-         i9Qh3vB7L7FEQlvxuOcZexYhs2CPKOjMC9k1sn4WkY+nmttCswPRDb3dZdN7g71F51HA
-         DX3w==
-X-Gm-Message-State: AC+VfDxoIvQhhmyADd6Y8V9rjIx/atEm7963tfi3W6WtZnfc3wouCyoG
-	wXY0GRUdeMtal3PJu25Qa2RDPg==
-X-Google-Smtp-Source: ACHHUZ5JkU/ii+XmIgB87RwAT7Cx/A9282/kfWxND7P1Sgc1Ov+FJ2HY/A4GhuBLgDV2fuWre9y5tQ==
-X-Received: by 2002:a17:903:22c6:b0:1b1:b2a9:f256 with SMTP id y6-20020a17090322c600b001b1b2a9f256mr6266plg.1.1686615999648;
-        Mon, 12 Jun 2023 17:26:39 -0700 (PDT)
-Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id b16-20020a170902d51000b001af98dcf958sm8841656plg.288.2023.06.12.17.26.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jun 2023 17:26:38 -0700 (PDT)
-Date: Mon, 12 Jun 2023 17:26:33 -0700
-From: Reiji Watanabe <reijiw@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Raghavendra Rao Anata <rananta@google.com>
-Subject: Re: [PATCH 1/1] KVM: arm64: PMU: Avoid inappropriate use of host's
- PMUVer
-Message-ID: <20230613002633.gdttlmn5bnkr4l5i@google.com>
-References: <20230610194510.4146549-1-reijiw@google.com>
- <ZIUb/ozyloOm6DfY@linux.dev>
- <20230611045430.evkcp4py4yuw5qgr@google.com>
- <ZIV7+yKUdRticwfF@linux.dev>
- <20230611160105.orvjohigsaevkcrf@google.com>
- <ZIdzxmgt8257Kv09@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E38BF17C7
+	for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 01:06:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1686618409;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pp2v4JGg/azUMKE4ngBrTREnGkx7OP+Tpx1fYNaDsgg=;
+	b=SOHqUTq7Hwdiepg5dprKFIhR0dULWPXURWKBt+c7emxlM1B8k3VOZgxxU7TvZfjxyNPizx
+	bZupK0Yvp5HMeI1G20jzoZJJmJB6bfn6UnD1oUrOe90yOkJQGy1K6RQiXtw9eBEavJb+Db
+	OdYixuvktobMbyHSj/EAh6/tkDfINN4=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-396-rKSvumxhOQaDYJhfz4Fpow-1; Mon, 12 Jun 2023 21:06:45 -0400
+X-MC-Unique: rKSvumxhOQaDYJhfz4Fpow-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B3CE61C06EC2;
+	Tue, 13 Jun 2023 01:06:44 +0000 (UTC)
+Received: from [10.64.54.138] (vpn2-54-138.bne.redhat.com [10.64.54.138])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id BA249C1604C;
+	Tue, 13 Jun 2023 01:06:41 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH] KVM: Avoid illegal stage2 mapping on invalid memory slot
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, pbonzini@redhat.com, oliver.upton@linux.dev,
+ maz@kernel.org, hshuai@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+References: <20230608090348.414990-1-gshan@redhat.com>
+ <ZIcujNKVosLeQEqR@google.com>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <6e335f13-01bd-2972-ead2-3081819aa151@redhat.com>
+Date: Tue, 13 Jun 2023 11:06:39 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZIdzxmgt8257Kv09@linux.dev>
+In-Reply-To: <ZIcujNKVosLeQEqR@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 
-On Mon, Jun 12, 2023 at 09:36:38PM +0200, Oliver Upton wrote:
-> On Sun, Jun 11, 2023 at 09:01:05AM -0700, Reiji Watanabe wrote:
+Hi Sean,
+
+On 6/13/23 12:41 AM, Sean Christopherson wrote:
+> On Thu, Jun 08, 2023, Gavin Shan wrote:
+>> We run into guest hang in edk2 firmware when KSM is kept as running
+>> on the host. The edk2 firmware is waiting for status 0x80 from QEMU's
+>> pflash device (TYPE_PFLASH_CFI01) during the operation for sector
+>> erasing or buffered write. The status is returned by reading the
+>> memory region of the pflash device and the read request should
+>> have been forwarded to QEMU and emulated by it. Unfortunately, the
+>> read request is covered by an illegal stage2 mapping when the guest
+>> hang issue occurs. The read request is completed with QEMU bypassed and
+>> wrong status is fetched.
+>>
+>> The illegal stage2 mapping is populated due to same page mering by
+>> KSM at (C) even the associated memory slot has been marked as invalid
+>> at (B).
+>>
+>>    CPU-A                    CPU-B
+>>    -----                    -----
+>>                             ioctl(kvm_fd, KVM_SET_USER_MEMORY_REGION)
+>>                             kvm_vm_ioctl_set_memory_region
+>>                             kvm_set_memory_region
+>>                             __kvm_set_memory_region
+>>                             kvm_set_memslot(kvm, old, NULL, KVM_MR_DELETE)
+>>                               kvm_invalidate_memslot
+>>                                 kvm_copy_memslot
+>>                                 kvm_replace_memslot
+>>                                 kvm_swap_active_memslots        (A)
+>>                                 kvm_arch_flush_shadow_memslot   (B)
+>>    same page merging by KSM
+>>    kvm_mmu_notifier_change_pte
+>>    kvm_handle_hva_range
+>>    __kvm_handle_hva_range       (C)
+>>
+>> Fix the issue by skipping the invalid memory slot at (C) to avoid the
+>> illegal stage2 mapping. Without the illegal stage2 mapping, the read
+>> request for the pflash's status is forwarded to QEMU and emulated by
+>> it. The correct pflash's status can be returned from QEMU to break
+>> the infinite wait in edk2 firmware.
+>>
+>> Cc: stable@vger.kernel.org # v5.13+
+>> Fixes: 3039bcc74498 ("KVM: Move x86's MMU notifier memslot walkers to generic code")
 > 
-> [...]
+> This Fixes isn't correct.  That change only affected x86, which doesn't have this
+> bug.  And looking at commit cd4c71835228 ("KVM: arm64: Convert to the gfn-based MMU
+> notifier callbacks"), arm64 did NOT skip invalid slots
 > 
-> > > Suppose KVM is running on a v3p5+ implementation, but userspace has set
-> > > ID_AA64DFR0_EL1.PMUVer to v3p0. In this case the read of PMCEID1_EL0 on
-> > > the preceding line would advertise the STALL_SLOT event, and KVM fails
-> > > to mask it due to the ID register value. The fact we do not support the
-> > > event is an invariant, in the worst case we wind up clearing a bit
-> > > that's already 0.
-> > 
-> > As far as I checked ArmARM, the STALL_SLOT event can be supported on
-> > any PMUv3 version (including on v3p0).  Assuming that is true, I don't
-> > see any reason to not expose the event to the guest in this particular
-> > example. Or can the STALL_SLOT event only be implemented from certain
-> > versions of PMUv3 ?
+>          slots = kvm_memslots(kvm);
 > 
-> Well, users of the event don't get the full picture w/o PMMIR_EL1.SLOTS,
-> which is only available on v3p4+. We probably should start exposing the
-> register + event (separate from this change).
+>          /* we only care about the pages that the guest sees */
+>          kvm_for_each_memslot(memslot, slots) {
+>                  unsigned long hva_start, hva_end;
+>                  gfn_t gpa;
 > 
-> > > This is why I'd suggested just unconditionally clearing the bit. While
-> > 
-> > When the hardware supports the STALL_SLOT event (again, I assume any
-> > PMUv3 version hardware can support the event), and the guest's PMUVer
-> > is older than v3p4, what is the reason why we want to clear the bit ?
+>                  hva_start = max(start, memslot->userspace_addr);
+>                  hva_end = min(end, memslot->userspace_addr +
+>                                          (memslot->npages << PAGE_SHIFT));
+>                  if (hva_start >= hva_end)
+>                          continue;
 > 
-> What's the value of the event w/o PMMIR_EL1? I agree there's no
+>                  gpa = hva_to_gfn_memslot(hva_start, memslot) << PAGE_SHIFT;
+>                  ret |= handler(kvm, gpa, (u64)(hva_end - hva_start), data);
+>          }
+> 
+> #define kvm_for_each_memslot(memslot, slots)                            \
+>          for (memslot = &slots->memslots[0];                             \
+>               memslot < slots->memslots + slots->used_slots; memslot++)  \
+>                  if (WARN_ON_ONCE(!memslot->npages)) {                   \
+>                  } else
+> 
+> Unless I'm missing something, this goes all the way back to initial arm64 support
+> added by commit d5d8184d35c9 ("KVM: ARM: Memory virtualization setup").
+> 
 
-I agree that the value of the event w/o PMMIR_EL1 is pretty limited.
+The fixes tag was sorted out based on 'git-bisect', not static code analysis. I
+agree it should be d5d8184d35c9 ("KVM: ARM: Memory virtualization setup") from
+the code. From the 'git-bisect', we found the issue disappears when the head is
+commit 3039bcc74498 ("KVM: Move x86's MMU notifier memslot walkers to generic code").
+And yes, the fixes tag should be cd4c71835228 ("KVM: arm64: Convert to the gfn-based
+MMU notifier callbacks").
 
+I'm declined to fix the issue only for ARM64, more details are given below. If we're
+going to limit the issue to ARM64 and fix it for ARM64 only, the fixes tag should be
+the one as you pointed. Lets correct it in next revision with:
 
-> fundamental issue with letting it past, but I'd rather we start
-> exposing the feature when we provide all the necessary detail.
+   Cc: stable@vger.kernel.org # v3.9+
+   Fixes: d5d8184d35c9 ("KVM: ARM: Memory virtualization setup")
 
-To confirm, are you suggesting to stop exposing the event even on hosts
-w/o PMMIR_EL1 until KVM gets ready to support PMMIR_EL1 ?
-(guests on those hosts won't get PMMIR_EL1 in any case though?)
-Could you please explain why ?
+>> Reported-by: Shuai Hu <hshuai@redhat.com>
+>> Reported-by: Zhenyu Zhang <zhenyzha@redhat.com>
+>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>> ---
+>>   virt/kvm/kvm_main.c | 3 +++
+>>   1 file changed, 3 insertions(+)
+>>
+>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>> index 479802a892d4..7f81a3a209b6 100644
+>> --- a/virt/kvm/kvm_main.c
+>> +++ b/virt/kvm/kvm_main.c
+>> @@ -598,6 +598,9 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+>>   			unsigned long hva_start, hva_end;
+>>   
+>>   			slot = container_of(node, struct kvm_memory_slot, hva_node[slots->node_idx]);
+>> +			if (slot->flags & KVM_MEMSLOT_INVALID)
+>> +				continue;
+> 
+> Skipping the memslot will lead to use-after-free.  E.g. if an invalidate_range_start()
+> comes along between installing the invalid slot and zapping SPTEs, KVM will
+> return from kvm_mmu_notifier_invalidate_range_start() without having dropped all
+> references to the range.
+> 
+> I.e.
+> 
+> 	kvm_copy_memslot(invalid_slot, old);
+> 	invalid_slot->flags |= KVM_MEMSLOT_INVALID;
+> 	kvm_replace_memslot(kvm, old, invalid_slot);
+> 
+> 	/*
+> 	 * Activate the slot that is now marked INVALID, but don't propagate
+> 	 * the slot to the now inactive slots. The slot is either going to be
+> 	 * deleted or recreated as a new slot.
+> 	 */
+> 	kvm_swap_active_memslots(kvm, old->as_id);
+> 
+> 
+> ==> invalidate_range_start()
+> 
+> 	/*
+> 	 * From this point no new shadow pages pointing to a deleted, or moved,
+> 	 * memslot will be created.  Validation of sp->gfn happens in:
+> 	 *	- gfn_to_hva (kvm_read_guest, gfn_to_pfn)
+> 	 *	- kvm_is_visible_gfn (mmu_check_root)
+> 	 */
+> 	kvm_arch_flush_shadow_memslot(kvm, old);
+> 
+> And even for change_pte(), skipping the memslot is wrong, as KVM would then fail
+> unmap the prior SPTE.  Of course, that can't happen in the current code base
+> because change_pte() is wrapped with invalidate_range_{start,end}(), but that's
+> more of a bug than a design choice (see c13fda237f08 "KVM: Assert that notifier
+> count is elevated in .change_pte()" for details).  That's also why this doesn't
+> show up on x86; x86 installs a SPTE for the change_pte() notifier iff an existing
+> SPTE is present, which is never true due to the invalidation.
+> 
 
-Perhaps I think I would rather keep the code as it is?
-(since I'm simply not sure what would be the benefits of that)
+Right, those architectural dependencies are really something I worried about.
+It's safe to skip the invalid memory slots for ARM64, but it may be unsafe to
+do so for other architectures. You've listed the potential risks to do so for
+x86. It might be risky with PowerPC's reverse mapping stuff either. I didn't
+look into the code for the left architectures. In order to escape from the
+architectural conflicts, I would move the check and skip the invalid memory
+slot in arch/arm64/kvm/mmu.c::kvm_set_spte_gfn(), something like below. In
+this way, the guest hang issue in ARM64 guest is fixed. We may have similar
+issue on other architectures, but we can figure out the fix when we have to.
+Sean, please let me know if you're happy with this?
 
-Thank you,
-Reiji
+arch/arm64/kvm/mmu.c::kvm_set_spte_gfn()
+----------------------------------------
+
+bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+{
+         kvm_pfn_t pfn = pte_pfn(range->pte);
+
+         if (!kvm->arch.mmu.pgt)
+                 return false;
+
+         /*
+          * The memory slot can become invalid temporarily or permanently
+          * when it's being moved or deleted. Avoid the stage2 mapping so
+          * that all the read and write requests to the region of the memory
+          * slot can be forwarded to VMM and emulated there.
+          */
+          if (range->slot->flags & KVM_MEMSLOT_INVALID)
+              return false;
+
+          WARN_ON(range->end - range->start != 1);
+
+          :
+}
+
+> I'd honestly love to just delete the change_pte() callback, but my opinion is more
+> than a bit biased since we don't use KSM.  Assuming we keep change_pte(), the best
+> option is probably to provide a wrapper around kvm_set_spte_gfn() to skip the
+> memslot, but with a sanity check and comment explaining the dependency on there
+> being no SPTEs due to the invalidation.  E.g.
+> 
+
+It's good idea, but I'm afraid other architectures like PowerPC will still be
+affected. So I would like to limit this issue to ARM64 and fix it in its
+kvm_set_spte_gfn() variant, as above. One question about "we don't use KSM":
+could you please share more information about this? I'm blindly guessing you're
+saying KSM isn't used in google cloud?
+
+[...]
+
+Thanks,
+Gavin
+
