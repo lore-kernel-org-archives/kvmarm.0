@@ -1,14 +1,14 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC49D7F
-	for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 04:26:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46AD7F
+	for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 04:28:03 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 081661FB;
-	Mon, 12 Jun 2023 21:27:23 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 58BD71FB;
+	Mon, 12 Jun 2023 21:28:48 -0700 (PDT)
 Received: from [10.162.42.9] (unknown [10.162.42.9])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 77E0B3F587;
-	Mon, 12 Jun 2023 21:26:34 -0700 (PDT)
-Message-ID: <1dca7ec8-a0d1-3038-7e9f-0d2934dc2e37@arm.com>
-Date: Tue, 13 Jun 2023 09:56:31 +0530
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 16A713F587;
+	Mon, 12 Jun 2023 21:27:59 -0700 (PDT)
+Message-ID: <34360cc9-b2ef-ec44-db93-b93b224fe1cb@arm.com>
+Date: Tue, 13 Jun 2023 09:57:57 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -17,92 +17,37 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.11.0
-Subject: Re: [PATCH V2 14/14] arm64/sysreg: Convert TRBIDR_EL1 register to
+Subject: Re: [PATCH V2 00/14] arm64/sysreg: Convert TRBE registers to
  automatic generation
 Content-Language: en-US
-To: Mark Brown <broonie@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Rob Herring <robh@kernel.org>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, James Morse
- <james.morse@arm.com>, kvmarm@lists.linux.dev, coresight@lists.linaro.org,
- linux-kernel@vger.kernel.org
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, broonie@kernel.org,
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Rob Herring <robh@kernel.org>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev,
+ coresight@lists.linaro.org, linux-kernel@vger.kernel.org
 References: <20230602062552.565992-1-anshuman.khandual@arm.com>
- <20230602062552.565992-15-anshuman.khandual@arm.com>
- <4de1ec32-f07b-4eca-99e2-f71a08f5cd5b@sirena.org.uk>
+ <ZIISaXnrhDtauY2G@arm.com>
 From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <4de1ec32-f07b-4eca-99e2-f71a08f5cd5b@sirena.org.uk>
+In-Reply-To: <ZIISaXnrhDtauY2G@arm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 
-On 6/2/23 17:42, Mark Brown wrote:
-> On Fri, Jun 02, 2023 at 11:55:52AM +0530, Anshuman Khandual wrote:
->> This converts TRBIDR_EL1 register to automatic generation without
->> causing any functional change.
+On 6/8/23 23:09, Catalin Marinas wrote:
+> Hi Anshuman,
 > 
->> +Sysreg	TRBIDR_EL1	3	0	9	11	7
->> +Res0	63:12
->> +Field	11:8	EA
+> On Fri, Jun 02, 2023 at 11:55:38AM +0530, Anshuman Khandual wrote:
+>> Changes in V2:
+>>
+>> - Renamed each individual TRBE register fields as per auto-gen tools
+>> - Converted each individual TRBE registers as per auto-gen tools
+>> - Added new register fields as per DDI0601 2023-03
 > 
-> EA is another field which looks like it should be an enum, as with the
-> others this shouldn't be a blocker and could be done incrementally.
+> Mark had some comments about using Enum for some bitfields. While not
+> essential, it would be nice to have those fixed. It's probably easier to
+> do an incremental patch fixing those, so please post one (or repost the
+> whole series, whatever is easier for you).
 
-Will fold the following changes in this patch.
-
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -2267,7 +2267,11 @@ EndSysreg
- 
- Sysreg TRBIDR_EL1      3       0       9       11      7
- Res0   63:12
--Field  11:8    EA
-+Enum   11:8    EA
-+       0b0000  NON_DESC
-+       0b0001  IGNORE
-+       0b0010  SERROR
-+EndEnum
- Res0   7:6
- Field  5       F
- Field  4       P
-
-
-> 
->> +Res0	7:6
->> +Field	5	F
->> +Field	4	P
->> +Field	3:0	Align
-> 
-> Align arguably too though really it's just encoding the relevant power
-> of 2 with the enum coming from the fact that it's limited to at most 2KB
-> alignment so a Field may well make more sense.
-
-Can fold the following changes in this patch (if required) unless the Field
-looks better than Enum.
-
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -2275,5 +2275,18 @@ EndEnum
- Res0   7:6
- Field  5       F
- Field  4       P
--Field  3:0     Align
-+Enum   3:0     Align
-+       0b0000  BYTE
-+       0b0001  HALF_WORD
-+       0b0010  WORD
-+       0b0011  DOUBLE_WORD
-+       0b0100  16_BYTES
-+       0b0101  32_BYTES
-+       0b0110  64_BYTES
-+       0b0111  128_BYTES
-+       0b1000  156_BYTES
-+       0b1001  512_BYTES
-+       0b1010  1_KB
-+       0b1011  2_KB
-+EndEnum
- EndSysreg
-
-> 
-> Reviewed-by: Mark Brown <broonie@kernel.org>
+Sure, will fold in those suggested changes and re-post the series soon.
