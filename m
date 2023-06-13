@@ -1,231 +1,428 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2082.outbound.protection.outlook.com [40.107.21.82])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EBFE23DB
-	for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 14:58:45 +0000 (UTC)
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-bc97822915aso2923607276.1
-        for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 07:58:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686668324; x=1689260324;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K+0kD4PW2dGvQpmF8P/dLcdDL49MrQOe0Bs/vjodXCo=;
-        b=s2yBwT/46quu0M19ZvyZP44LoDcCKdMQJ+XCkKZbDNyv+8ckqdNWOyCvkG8VjAfgN7
-         uoiWalI4a8yp5SOMD6vH553yZNIzDjAkzQ239tTAj6IhyfEhQKiz0ZFgNzkAZQ5Rg4lc
-         vY8AZ7Tq6at3vgdO6nOz88vcWuNRmK2AHw7CqKwZOS1ZzhUPpLOdCFFQAg7usWc0KIXA
-         IsEx7XaFzEoUxWZWK33CoQkBNI/vMlBuybEkOvNtPBfghXhuvaE2IIoqd4OJub7loHTY
-         Cv2lqA2gqJqOXdrTezHH/eKF4JQ8DTBI9CPHbQhTu+Kb9VEboFZiAKVm64JJAwJFxidO
-         pGqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686668324; x=1689260324;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=K+0kD4PW2dGvQpmF8P/dLcdDL49MrQOe0Bs/vjodXCo=;
-        b=K6OMW1UgNyFxmchr1rYWCyvyWeAa2W6mBKIjpNIhNIP0um3U0EHkp4xyREkWOTotAy
-         rajhlg/V0F4X+FWcyQ86PAUJ8jDFnSC2flOi7Z/QXi0KwnDLcune1mZGKBJpDJ5r1Ful
-         KEjY0Sj//vmD6fOTRYKwvZmz5bli0dH7jFGwDiPqLm2rhZE7J5JZNlKdEL5AyTrGweMZ
-         uZa04WhSSzFRU3ZKKut5S9CFIJZC89HVf4W5Z11TyycX46Yz2A9evRShIAPmfYu3aqjn
-         sWQE49Av6UnwFtNjAtTDo9gD+9vAOpSCNlC67zE1sfkQEQdTA1CxVn1tXU099fdEuneB
-         YzQQ==
-X-Gm-Message-State: AC+VfDzVSHTCiUZVXgO8sTRd2TzBsZ/XwnoIbIXL01JtIAgIHNM3Sdra
-	OKEhBWMO0I/K8n53qSqStQ911I5a4lo=
-X-Google-Smtp-Source: ACHHUZ45bwZa/PJKAhYeklX7zhd5j76j407QtmxG6njgLhIsPRNiUhLcNEOwpA1xPza96/WjN2Xmwx93NXE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:352:b0:bcd:f98e:f5f with SMTP id
- e18-20020a056902035200b00bcdf98e0f5fmr765169ybs.13.1686668324159; Tue, 13 Jun
- 2023 07:58:44 -0700 (PDT)
-Date: Tue, 13 Jun 2023 07:58:42 -0700
-In-Reply-To: <6e335f13-01bd-2972-ead2-3081819aa151@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1060A23DB
+	for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 15:10:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rIPA1XMqfRB8e0hYGw9NXjuLUjzUjF/hoJYvecm3LVE=;
+ b=4aY9XQrFedAhgIUZ36Fi0U5csmpuVttpJDEC9s0hotB1xrN6/yDYeE59S5XfdfrVLo2gbnjP2puFvfBx0PlzjmZFy6cVYdmWdg2OmXP+f4W9NcojsucOR8NWlj1bLjYqNodNs6vZyZFxZc09KCfjz1+DxEc54ySDqY4leiauk3g=
+Received: from AM6PR0502CA0048.eurprd05.prod.outlook.com
+ (2603:10a6:20b:56::25) by AM7PR08MB5384.eurprd08.prod.outlook.com
+ (2603:10a6:20b:10c::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.38; Tue, 13 Jun
+ 2023 15:10:55 +0000
+Received: from AM7EUR03FT059.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:20b:56:cafe::db) by AM6PR0502CA0048.outlook.office365.com
+ (2603:10a6:20b:56::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.34 via Frontend
+ Transport; Tue, 13 Jun 2023 15:10:55 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
+ smtp.mailfrom=arm.com; dkim=pass (signature was verified)
+ header.d=armh.onmicrosoft.com;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
+ client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
+ pr=C
+Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
+ AM7EUR03FT059.mail.protection.outlook.com (100.127.140.215) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6477.24 via Frontend Transport; Tue, 13 Jun 2023 15:10:54 +0000
+Received: ("Tessian outbound 5bb4c51d5a1f:v136"); Tue, 13 Jun 2023 15:10:54 +0000
+X-CheckRecipientChecked: true
+X-CR-MTA-CID: edb2e63d90049da8
+X-CR-MTA-TID: 64aa7808
+Received: from 325d364791b6.1
+	by 64aa7808-outbound-1.mta.getcheckrecipient.com id 83763F12-B74F-42E2-B97B-3F2F4A7D3B16.1;
+	Tue, 13 Jun 2023 15:10:48 +0000
+Received: from EUR01-VE1-obe.outbound.protection.outlook.com
+    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 325d364791b6.1
+    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
+    Tue, 13 Jun 2023 15:10:48 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ToYwiAvnBZbLnn3ZtcWYuNkzVIISbbUwYFI05KbuAjktXLQB8EWVDabXfwCvIU8lnPXZf4NeSkOGQg85CrYY/SAX3Z6w5Z4B1z+Z1T5slpc+KAgdv4i7+VKdJGaVUmheqqEkJ/VrcudUbKqXFZDIpL5RhU1p+/HEhiLjjSSKiPl0zjw/xeMFl3AiDJ/aBZXA9MPe91Y/qTjreDyLh3ZMpbwvUimUb7A4YrA0h6LIEYdmgq+RHiGTuolCOGOP/Hpw81BYnYgin7ricbtxz0sQEZ+lRkFtWpDYOQ/7HDWWV+NxD+onx/bA2t2TCMHF/soh7Lnv/8M5p1GwEja0dntJBg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rIPA1XMqfRB8e0hYGw9NXjuLUjzUjF/hoJYvecm3LVE=;
+ b=E66JqnmRYMbgox0sRzeJWCQ+OOBsmPqoEOJGGFAmV0Aoc5bs2BmVzXWuT7E9XotTOuLQh/+2TV7Q9Bl90KfsjKdvKcl7mRw8RX8Q4/6bGc1PNQttbwDAVohX/EiO9xjId7xgv86utlRTmLVzTR41gArC4v4D8R9TUTBucjV5H5n+1uOMGba5qcpctvir/Mi49ssRSzaRQt8koukhTcFSDUsJ2vWtB86UvmwHTAyrTXOs0piVaJPy+A5q8SSNru+usvFRxoHpdvfNmFayKC18QKhnnQ7KwF/bRFtEdF7O3WDT1QFbUH0pgbuDQNbSI0g5b4b8J3ezGYB1QE3111lHRw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 40.67.248.234) smtp.rcpttodomain=linux.dev smtp.mailfrom=arm.com; dmarc=pass
+ (p=none sp=none pct=100) action=none header.from=arm.com; dkim=none (message
+ not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rIPA1XMqfRB8e0hYGw9NXjuLUjzUjF/hoJYvecm3LVE=;
+ b=4aY9XQrFedAhgIUZ36Fi0U5csmpuVttpJDEC9s0hotB1xrN6/yDYeE59S5XfdfrVLo2gbnjP2puFvfBx0PlzjmZFy6cVYdmWdg2OmXP+f4W9NcojsucOR8NWlj1bLjYqNodNs6vZyZFxZc09KCfjz1+DxEc54ySDqY4leiauk3g=
+Received: from DB6PR0501CA0013.eurprd05.prod.outlook.com (2603:10a6:4:8f::23)
+ by DB4PR08MB8198.eurprd08.prod.outlook.com (2603:10a6:10:382::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.29; Tue, 13 Jun
+ 2023 15:10:44 +0000
+Received: from DBAEUR03FT054.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:4:8f:cafe::df) by DB6PR0501CA0013.outlook.office365.com
+ (2603:10a6:4:8f::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.28 via Frontend
+ Transport; Tue, 13 Jun 2023 15:10:44 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 40.67.248.234)
+ smtp.mailfrom=arm.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 40.67.248.234 as permitted sender) receiver=protection.outlook.com;
+ client-ip=40.67.248.234; helo=nebula.arm.com; pr=C
+Received: from nebula.arm.com (40.67.248.234) by
+ DBAEUR03FT054.mail.protection.outlook.com (100.127.142.218) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6500.23 via Frontend Transport; Tue, 13 Jun 2023 15:10:44 +0000
+Received: from AZ-NEU-EX03.Arm.com (10.251.24.31) by AZ-NEU-EX04.Arm.com
+ (10.251.24.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Tue, 13 Jun
+ 2023 15:10:43 +0000
+Received: from e124191.cambridge.arm.com (10.1.197.45) by mail.arm.com
+ (10.251.24.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23 via Frontend
+ Transport; Tue, 13 Jun 2023 15:10:43 +0000
+Date: Tue, 13 Jun 2023 16:10:41 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+CC: <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>, Marc Zyngier
+	<maz@kernel.org>, James Morse <james.morse@arm.com>, Suzuki K Poulose
+	<suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Will Deacon
+	<will@kernel.org>, Julien Thierry <julien.thierry.kdev@gmail.com>, "Salil
+ Mehta" <salil.mehta@huawei.com>, <nd@arm.com>
+Subject: Re: [PATCH kvmtool 14/21] aarch64: Add skeleton implementation for
+ PSCI
+Message-ID: <20230613151041.GA2636717@e124191.cambridge.arm.com>
+References: <20230526221712.317287-1-oliver.upton@linux.dev>
+ <20230526221712.317287-15-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230608090348.414990-1-gshan@redhat.com> <ZIcujNKVosLeQEqR@google.com>
- <6e335f13-01bd-2972-ead2-3081819aa151@redhat.com>
-Message-ID: <ZIiEIkn1lFU7Vr1z@google.com>
-Subject: Re: [PATCH] KVM: Avoid illegal stage2 mapping on invalid memory slot
-From: Sean Christopherson <seanjc@google.com>
-To: Gavin Shan <gshan@redhat.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	pbonzini@redhat.com, oliver.upton@linux.dev, maz@kernel.org, 
-	hshuai@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230526221712.317287-15-oliver.upton@linux.dev>
+X-EOPAttributedMessage: 1
+X-MS-TrafficTypeDiagnostic:
+	DBAEUR03FT054:EE_|DB4PR08MB8198:EE_|AM7EUR03FT059:EE_|AM7PR08MB5384:EE_
+X-MS-Office365-Filtering-Correlation-Id: dbbd18a5-bf28-4fe5-b138-08db6c206276
+x-checkrecipientrouted: true
+NoDisclaimer: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted: BCL:0;
+X-Microsoft-Antispam-Message-Info-Original:
+ EuQUbMp2R2xTplraInoCQz+6OtozJky/DD326LRei+fWA8nKJXOIkxNbOwQVvrJuKw5ZfJjnK5YUCQyDfNBiJzne2wfM+1BKqONpybT2XklA+aMO3gRo3ZUtsOM+P9ASs12mqdwxasyq98aeJRSLSyS+KZIpYzthOZeJ7xxcYCUS/XR66LwOMFkxRsew5m9zoU57P7R31dT2Q0b7TWAwsAeGiFp/b6goszpmzNgg3UVLBr7vGUD6QW733D2cC7vzvsa7hijvO5cbr9lS4ev/kN6gtz4L0wNvRYCnL5OudqF8jtXIJpjxKKyfxSoYRk8XSOEk8sOeuY4IAw9eKqnPM2YDIGxZ2Q9ZCozaQrdGPWS8BLO3KlOu1NZldZq5JhnBZpSwvPbxLknPsmXWV0x3Pk04nPD0CAfTruY0YkuynAMmGqIuRtFboz0UkgHpxtdzbB0CqMUNf70gTwhxOSF19eBu6++exAAWI+WAPbZ/sJ2BN+cAl1hITQ4NF3dlTPH2zzKmcou1Vj/23eh/WoBCVjs/1E5JcJvLMioxvEO6d2XaVPgdiuiO0Ja3fTCHAlKo4sl+eYGimQJxK+aApK7fqUWmIpvhD3otAkeROTJVnvCVFcc6QwvRrF0tb3YCehbeELLLfWUrFPmaoacQ8wqTJTO/IGtqmfgmGFEI7QyLZotIt+F5YeYtoTf5sV3dJM2iV4ZiIL41oW4tZfiGj9ZLGAh+hXvoJrIs4DDcRBXkNcGUTIK+Z05vdee3F7hoPblq
+X-Forefront-Antispam-Report-Untrusted:
+ CIP:40.67.248.234;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:nebula.arm.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(346002)(39860400002)(136003)(451199021)(36840700001)(46966006)(5660300002)(8676002)(8936002)(2906002)(70206006)(70586007)(54906003)(44832011)(7696005)(4326008)(26005)(1076003)(41300700001)(316002)(6916009)(186003)(36860700001)(82740400003)(356005)(336012)(426003)(47076005)(83380400001)(478600001)(40480700001)(33656002)(86362001)(55016003)(82310400005)(81166007)(36900700001);DIR:OUT;SFP:1101;
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB4PR08MB8198
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ AM7EUR03FT059.eop-EUR03.prod.protection.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+	9fbf28f5-9bfd-420f-20d7-08db6c205c15
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	E2TmNOkwtOYOdVMJG7HWBObSh323c2CyE24wOLIrzQM1twNL59fc4CZ70FtaIZvryTBmXX3Ubhfe0GLhD2KE8eLScxpF4ndU2bTK4fYtFyAo01IuKbZ9ux5PaDSKIwY51LAKZymvi1zaZhR353AGmzSu8AH7Q4CtDNfFJAaLusPq8X1hnAMafLR5ickkBuKrUO8uCQHLLKNTPNkb7PHQ4dveoLLcnKLxMeRoLkg0o873s5pNnPbKq00CN4tSPqDk96CcYZ9WJFrXvLamQtVUG83IgX9mQ9i4DNWzMo4vhRkio1B/y3tSzjvxmq/AcMwvXnW+s62o1IoeuSqoXU668ylnaYxAGJ4OgK1PNk/k9Gi//AsE2Jr0fnlbUuR4iwjjChLf3REDuNvLQ34SYbD7omzTXVqx56XU5jvicvWvKKciJoxnTO3f89p0rpysd67NC7DQJ0z9OsT/MHeKGQPvgGmv6NzLBSpP+K1EH3HkcJyuv0+AHgV1Xi5GIag5WZvZG7s6pllvwfs9jlw5X4BIMUc0upuR7tU/o2KyM0v0gaMggYNyhm3VfRGcTBSVOXu3mo5OKE9k7yWmKJRpH/KyaingRI6lqUAoBvZBSTekeqhLFWQ5r9bjDTff9mJpmYeVsyIscdRTOVKuQGvujESFSPN+3LpXCrYfJOQnKv0RgQM6oGh10LskFUl4sHBcKeutzHcpo9Xy4KehHYLv5YS8uTs4iuI2N01wHghbN1IlriKwrBYE8rYET7BaKw1lWWU2
+X-Forefront-Antispam-Report:
+	CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230028)(4636009)(346002)(376002)(136003)(396003)(39860400002)(451199021)(40470700004)(46966006)(36840700001)(33656002)(2906002)(86362001)(82310400005)(44832011)(40480700001)(55016003)(83380400001)(7696005)(1076003)(47076005)(336012)(36860700001)(186003)(426003)(40460700003)(5660300002)(26005)(478600001)(54906003)(82740400003)(70586007)(81166007)(4326008)(70206006)(316002)(41300700001)(8936002)(6862004)(8676002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jun 2023 15:10:54.9131
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: dbbd18a5-bf28-4fe5-b138-08db6c206276
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AM7EUR03FT059.eop-EUR03.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5384
 
-On Tue, Jun 13, 2023, Gavin Shan wrote:
-> Hi Sean,
+Hi Oliver,
+
+On Fri, May 26, 2023 at 10:17:05PM +0000, Oliver Upton wrote:
+> Add an extremely barebones implementation for handling PSCI, where the
+> only supported call is PSCI_VERSION.
 > 
-> On 6/13/23 12:41 AM, Sean Christopherson wrote:
-> > > Fixes: 3039bcc74498 ("KVM: Move x86's MMU notifier memslot walkers to generic code")
-> > 
-> > This Fixes isn't correct.  That change only affected x86, which doesn't have this
-> > bug.  And looking at commit cd4c71835228 ("KVM: arm64: Convert to the gfn-based MMU
-> > notifier callbacks"), arm64 did NOT skip invalid slots
-
-...
-
-> > Unless I'm missing something, this goes all the way back to initial arm64 support
-> > added by commit d5d8184d35c9 ("KVM: ARM: Memory virtualization setup").
-> > 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  Makefile                        |  4 +-
+>  arm/aarch32/kvm-cpu.c           |  5 +++
+>  arm/aarch64/include/asm/smccc.h | 65 +++++++++++++++++++++++++++++++++
+>  arm/aarch64/kvm-cpu.c           | 14 +++++++
+>  arm/aarch64/kvm.c               |  2 +
+>  arm/aarch64/psci.c              | 36 ++++++++++++++++++
+>  arm/aarch64/smccc.c             | 45 +++++++++++++++++++++++
+>  arm/kvm-cpu.c                   |  5 ---
+>  8 files changed, 170 insertions(+), 6 deletions(-)
+>  create mode 100644 arm/aarch64/include/asm/smccc.h
+>  create mode 100644 arm/aarch64/psci.c
+>  create mode 100644 arm/aarch64/smccc.c
 > 
-> The fixes tag was sorted out based on 'git-bisect', not static code analysis. I
-> agree it should be d5d8184d35c9 ("KVM: ARM: Memory virtualization setup") from
-> the code. From the 'git-bisect', we found the issue disappears when the head is
-> commit 3039bcc74498 ("KVM: Move x86's MMU notifier memslot walkers to generic code").
-> And yes, the fixes tag should be cd4c71835228 ("KVM: arm64: Convert to the gfn-based
-> MMU notifier callbacks").
+> diff --git a/Makefile b/Makefile
+> index ed2414bd8d1a..fa4836aebc5e 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -190,8 +190,10 @@ ifeq ($(ARCH), arm64)
+>  	OBJS		+= arm/aarch64/arm-cpu.o
+>  	OBJS		+= arm/aarch64/kvm-cpu.o
+>  	OBJS		+= arm/aarch64/kvm.o
+> -	OBJS		+= arm/aarch64/pvtime.o
+>  	OBJS		+= arm/aarch64/pmu.o
+> +	OBJS		+= arm/aarch64/psci.o
+> +	OBJS		+= arm/aarch64/pvtime.o
+> +	OBJS		+= arm/aarch64/smccc.o
+>  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
+>  	ARCH_INCLUDE	+= -Iarm/aarch64/include
+>  
+> diff --git a/arm/aarch32/kvm-cpu.c b/arm/aarch32/kvm-cpu.c
+> index 95fb1da5ba3d..1063b9e5b6a9 100644
+> --- a/arm/aarch32/kvm-cpu.c
+> +++ b/arm/aarch32/kvm-cpu.c
+> @@ -130,3 +130,8 @@ void kvm_cpu__show_registers(struct kvm_cpu *vcpu)
+>  		die("KVM_GET_ONE_REG failed (LR_svc)");
+>  	dprintf(debug_fd, " LR_svc:  0x%x\n", data);
+>  }
+> +
+> +bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
+> +{
+> +	return false;
+> +}
+> diff --git a/arm/aarch64/include/asm/smccc.h b/arm/aarch64/include/asm/smccc.h
+> new file mode 100644
+> index 000000000000..c1be21a7d6f6
+> --- /dev/null
+> +++ b/arm/aarch64/include/asm/smccc.h
+> @@ -0,0 +1,65 @@
+> +#ifndef __ARM_SMCCC_H__
+> +#define __ARM_SMCCC_H__
+> +
+> +#include "kvm/kvm-cpu.h"
+> +
+> +#include <linux/arm-smccc.h>
+> +#include <linux/types.h>
+> +
+> +static inline bool smccc_is_64bit(struct kvm_cpu *vcpu)
+> +{
+> +	return ARM_SMCCC_IS_64(vcpu->kvm_run->hypercall.nr);
+> +}
+> +
+> +static inline bool smccc_calling_conv_allowed(struct kvm_cpu *vcpu, u32 fn)
+> +{
+> +	return !(vcpu->kvm->cfg.arch.aarch32_guest && ARM_SMCCC_IS_64(fn));
+> +}
+> +
+> +static inline u64 smccc_get_arg(struct kvm_cpu *vcpu, u8 arg)
+> +{
+> +	u64 val;
+> +	struct kvm_one_reg reg = {
+> +		.id	= ARM64_CORE_REG(regs.regs[arg]),
+> +		.addr	= (u64)&val,
+> +	};
+> +
+> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg))
+> +		die_perror("KVM_GET_ONE_REG failed");
+> +
+> +	if (!smccc_is_64bit(vcpu))
+> +		val = (u32)val;
+> +
+> +	return val;
+> +}
+> +
+> +static inline void smccc_return_result(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
+> +{
+> +	unsigned long *vals = (unsigned long *)res;
+> +	unsigned long i;
+> +
+> +	/*
+> +	 * The author was lazy and chose to abuse the layout of struct
+> +	 * arm_smccc_res to write a loop set the retvals.
+> +	 */
+> +	for (i = 0; i < sizeof(*res) / sizeof(unsigned long); i++) {
+> +		u64 val = vals[i];
+> +		struct kvm_one_reg reg = {
+> +			.id	= ARM64_CORE_REG(regs.regs[i]),
+> +			.addr	= (u64)&val,
+> +		};
+> +
+> +		if (!smccc_is_64bit(vcpu))
+> +			val = (u32)val;
+> +
+> +		if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg))
+> +			die_perror("KVM_SET_ONE_REG failed");
+> +	}
+> +}
+> +
+> +bool handle_hypercall(struct kvm_cpu *vcpu);
+> +void handle_psci(struct kvm_cpu *vcpu, struct arm_smccc_res *res);
+> +
+> +void kvm__setup_smccc(struct kvm *kvm);
+> +
+> +#endif /* __ARM_SMCCC_H__ */
+> diff --git a/arm/aarch64/kvm-cpu.c b/arm/aarch64/kvm-cpu.c
+> index 1e5a6cfdaf40..4feed9f41cb0 100644
+> --- a/arm/aarch64/kvm-cpu.c
+> +++ b/arm/aarch64/kvm-cpu.c
+> @@ -1,3 +1,4 @@
+> +#include "asm/smccc.h"
+>  #include "kvm/kvm-cpu.h"
+>  #include "kvm/kvm.h"
+>  #include "kvm/virtio.h"
+> @@ -261,3 +262,16 @@ void kvm_cpu__show_registers(struct kvm_cpu *vcpu)
+>  		die("KVM_GET_ONE_REG failed (lr)");
+>  	dprintf(debug_fd, " LR:    0x%lx\n", data);
+>  }
+> +
+> +bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
+> +{
+> +	struct kvm_run *run = vcpu->kvm_run;
+> +
+> +	switch (run->exit_reason) {
+> +	case KVM_EXIT_HYPERCALL:
+> +		handle_hypercall(vcpu);
+> +		return true;
+> +	default:
+> +		return false;
+> +	}
+> +}
+> diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
+> index 4929ce48843b..ce917ed01349 100644
+> --- a/arm/aarch64/kvm.c
+> +++ b/arm/aarch64/kvm.c
+> @@ -1,3 +1,4 @@
+> +#include "asm/smccc.h"
+>  #include "kvm/kvm.h"
+>  #include "kvm/kvm-cpu.h"
+>  
+> @@ -165,6 +166,7 @@ static void kvm__arch_enable_mte(struct kvm *kvm)
+>  void __kvm__arm_init(struct kvm *kvm)
+>  {
+>  	kvm__arch_enable_mte(kvm);
+> +	kvm__setup_smccc(kvm);
+>  }
+>  
+>  struct kvm_cpu *kvm__arch_mpidr_to_vcpu(struct kvm *kvm, u64 target_mpidr)
+> diff --git a/arm/aarch64/psci.c b/arm/aarch64/psci.c
+> new file mode 100644
+> index 000000000000..482b9a7442c6
+> --- /dev/null
+> +++ b/arm/aarch64/psci.c
+> @@ -0,0 +1,36 @@
+> +#include "asm/smccc.h"
+> +#include "kvm/kvm.h"
+> +#include "kvm/kvm-cpu.h"
+> +#include "kvm/util.h"
+> +
+> +#include <linux/psci.h>
+> +#include <linux/types.h>
+> +
+> +static void psci_features(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
+> +{
+> +	u32 arg = smccc_get_arg(vcpu, 1);
+> +
+> +	res->a0 = PSCI_RET_NOT_SUPPORTED;
+> +	if (!smccc_calling_conv_allowed(vcpu, arg))
+> +		return;
+> +
+> +	switch (arg) {
+> +	case ARM_SMCCC_VERSION_FUNC_ID:
+> +		res->a0 = PSCI_RET_SUCCESS;
+> +		break;
+> +	}
+> +}
+> +
+> +void handle_psci(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
+> +{
+> +	switch (vcpu->kvm_run->hypercall.nr) {
+> +	case PSCI_0_2_FN_PSCI_VERSION:
+> +		res->a0 = PSCI_VERSION(1, 0);
+> +		break;
+> +	case PSCI_1_0_FN_PSCI_FEATURES:
+> +		psci_features(vcpu, res);
+> +		break;
+> +	default:
+> +		res->a0 = PSCI_RET_NOT_SUPPORTED;
+> +	}
+> +}
+> diff --git a/arm/aarch64/smccc.c b/arm/aarch64/smccc.c
+> new file mode 100644
+> index 000000000000..b95077305ffa
+> --- /dev/null
+> +++ b/arm/aarch64/smccc.c
+> @@ -0,0 +1,45 @@
+> +#include "asm/smccc.h"
+> +#include "kvm/kvm.h"
+> +#include "kvm/kvm-cpu.h"
+> +#include "kvm/util.h"
+> +
+> +#include <linux/types.h>
+> +
+> +static void handle_std_call(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
+> +{
+> +	u32 fn = vcpu->kvm_run->hypercall.nr;
+> +
+> +	switch (ARM_SMCCC_FUNC_NUM(fn)) {
+> +	/* PSCI */
+> +	case 0x00 ... 0x1F:
+> +		handle_psci(vcpu, res);
+> +		break;
+> +	}
+> +}
+> +
+> +bool handle_hypercall(struct kvm_cpu *vcpu)
+> +{
+> +	u32 fn = vcpu->kvm_run->hypercall.nr;
+> +	struct arm_smccc_res res = {
+> +		.a0	= SMCCC_RET_NOT_SUPPORTED,
+> +	};
+> +
+> +	if (!smccc_calling_conv_allowed(vcpu, fn))
+> +		goto out;
+> +
+> +	switch (ARM_SMCCC_OWNER_NUM(fn)) {
+> +	case ARM_SMCCC_OWNER_STANDARD:
+> +		handle_std_call(vcpu, &res);
+> +		break;
+> +	default:
 
-No, just because bisect points at a commit doesn't mean that's the commit that
-introduced a bug.  It's not uncommon for a completely valid change to expose a
-pre-existing bug, which is what I suspect happened here, e.g. after switching to
-the generic framework, clean_dcache_guest_page() is called *after* retrieving the
-memslot, versus clean_dcache_guest_page() being called before walking memslots.
+I get the following error while compiling (adding a `break;` fixes things):
 
-Blaming the correct commit matters, both so that it's clear to future readers what
-went wrong, and also so that people maintaining older kernels at least are aware
-that there kernel may be affected.  E.g. a fix in generic KVM obviously won't
-backport to 5.10, but someone who cares deeply about a 5.10-based kernel on arm64
-could manually port the fix to KVM arm64 code.
+	arm/aarch64/smccc.c: In function 'handle_hypercall':
+	arm/aarch64/smccc.c:34:2: error: label at end of compound statement
+	   34 |  default:
+	      |  ^~~~~~~
 
-> I'm declined to fix the issue only for ARM64,
+> +	}
+> +
+> +out:
+> +	smccc_return_result(vcpu, &res);
+> +	return true;
+> +}
+> +
+> +void kvm__setup_smccc(struct kvm *kvm)
+> +{
+> +
+> +}
+> diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
+> index 12a366b9b38b..3e383065ddaa 100644
+> --- a/arm/kvm-cpu.c
+> +++ b/arm/kvm-cpu.c
+> @@ -158,11 +158,6 @@ void kvm_cpu__delete(struct kvm_cpu *vcpu)
+>  	free(vcpu);
+>  }
+>  
+> -bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
+> -{
+> -	return false;
+> -}
+> -
+>  void kvm_cpu__show_page_tables(struct kvm_cpu *vcpu)
+>  {
+>  }
 
-I never suggested that an ARM-only fix be made, in fact I explicitly suggested
-the exact opposite.
-
-> more details are given below. If we're going to limit the issue to ARM64 and
-> fix it for ARM64 only, the fixes tag should be the one as you pointed. Lets
-> correct it in next revision with:
-
-For a generic fix, just blame multiple commits, e.g. the guilty arm64, RISC-V,
-and MIPS commits, which at a glance are the affected architectures.  At one point
-in time, x86 was also likely affected, but that's probably not worth more than a
-brief mention in the changelog as I don't see any value in tracking down a very
-theoretical window of time where x86 was affected.
-
->   Cc: stable@vger.kernel.org # v3.9+
->   Fixes: d5d8184d35c9 ("KVM: ARM: Memory virtualization setup")
-> 
-> > > Reported-by: Shuai Hu <hshuai@redhat.com>
-> > > Reported-by: Zhenyu Zhang <zhenyzha@redhat.com>
-> > > Signed-off-by: Gavin Shan <gshan@redhat.com>
-> > > ---
-> > >   virt/kvm/kvm_main.c | 3 +++
-> > >   1 file changed, 3 insertions(+)
-> > > 
-> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > > index 479802a892d4..7f81a3a209b6 100644
-> > > --- a/virt/kvm/kvm_main.c
-> > > +++ b/virt/kvm/kvm_main.c
-> > > @@ -598,6 +598,9 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
-> > >   			unsigned long hva_start, hva_end;
-> > >   			slot = container_of(node, struct kvm_memory_slot, hva_node[slots->node_idx]);
-> > > +			if (slot->flags & KVM_MEMSLOT_INVALID)
-> > > +				continue;
-> > 
-> > Skipping the memslot will lead to use-after-free.  E.g. if an invalidate_range_start()
-> > comes along between installing the invalid slot and zapping SPTEs, KVM will
-> > return from kvm_mmu_notifier_invalidate_range_start() without having dropped all
-> > references to the range.
-> > 
-> > I.e.
-> > 
-> > 	kvm_copy_memslot(invalid_slot, old);
-> > 	invalid_slot->flags |= KVM_MEMSLOT_INVALID;
-> > 	kvm_replace_memslot(kvm, old, invalid_slot);
-> > 
-> > 	/*
-> > 	 * Activate the slot that is now marked INVALID, but don't propagate
-> > 	 * the slot to the now inactive slots. The slot is either going to be
-> > 	 * deleted or recreated as a new slot.
-> > 	 */
-> > 	kvm_swap_active_memslots(kvm, old->as_id);
-> > 
-> > 
-> > ==> invalidate_range_start()
-> > 
-> > 	/*
-> > 	 * From this point no new shadow pages pointing to a deleted, or moved,
-> > 	 * memslot will be created.  Validation of sp->gfn happens in:
-> > 	 *	- gfn_to_hva (kvm_read_guest, gfn_to_pfn)
-> > 	 *	- kvm_is_visible_gfn (mmu_check_root)
-> > 	 */
-> > 	kvm_arch_flush_shadow_memslot(kvm, old);
-> > 
-> > And even for change_pte(), skipping the memslot is wrong, as KVM would then fail
-> > unmap the prior SPTE.  Of course, that can't happen in the current code base
-> > because change_pte() is wrapped with invalidate_range_{start,end}(), but that's
-> > more of a bug than a design choice (see c13fda237f08 "KVM: Assert that notifier
-> > count is elevated in .change_pte()" for details).  That's also why this doesn't
-> > show up on x86; x86 installs a SPTE for the change_pte() notifier iff an existing
-> > SPTE is present, which is never true due to the invalidation.
-> > 
-> 
-> Right, those architectural dependencies are really something I worried about.
-
-The zap case isn't a architecture specific, that's true for all KVM architectures.
-
-> It's safe to skip the invalid memory slots for ARM64,
-
-No, it's not.  The problematic window where an invalidation can be incorrectly
-skipped is very tiny, and would have zero chance of being seen without something
-generating invalidations, e.g. page migration.  But that doesn't mean there's no
-bug.
-
-> but it may be unsafe to do so for other architectures. You've listed the
-> potential risks to do so for x86. It might be risky with PowerPC's reverse
-> mapping stuff either. I didn't look into the code for the left architectures.
-> In order to escape from the architectural conflicts, I would move the check
-> and skip the invalid memory slot in arch/arm64/kvm/mmu.c::kvm_set_spte_gfn(),
-> something like below. In this way, the guest hang issue in ARM64 guest is
-> fixed. We may have similar issue on other architectures, but we can figure
-> out the fix when we have to.  Sean, please let me know if you're happy with
-> this?
-> 
-> arch/arm64/kvm/mmu.c::kvm_set_spte_gfn()
-> ----------------------------------------
-> 
-> bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
-> {
->         kvm_pfn_t pfn = pte_pfn(range->pte);
-> 
->         if (!kvm->arch.mmu.pgt)
->                 return false;
-> 
->         /*
->          * The memory slot can become invalid temporarily or permanently
->          * when it's being moved or deleted. Avoid the stage2 mapping so
->          * that all the read and write requests to the region of the memory
->          * slot can be forwarded to VMM and emulated there.
->          */
->          if (range->slot->flags & KVM_MEMSLOT_INVALID)
->              return false;
-
-Please no.  (a) it papers over common KVM's reliance on the SPTE being zapped by
-invalidate_range_start(), and (b) it leaves the same bug in RISC-V (which copy+pasted
-much of arm64's MMU code) and in MIPS (which also installs SPTEs in its callback).
-
->          WARN_ON(range->end - range->start != 1);
-> 
->          :
-> }
-> 
-> > I'd honestly love to just delete the change_pte() callback, but my opinion is more
-> > than a bit biased since we don't use KSM.  Assuming we keep change_pte(), the best
-> > option is probably to provide a wrapper around kvm_set_spte_gfn() to skip the
-> > memslot, but with a sanity check and comment explaining the dependency on there
-> > being no SPTEs due to the invalidation.  E.g.
-> > 
-> 
-> It's good idea, but I'm afraid other architectures like PowerPC will still be
-> affected.
-
-I don't follow.  PPC unmaps in response to a PTE change, but that's effectively
-dead code due to change_pte() being wrapped with invalidate_range_{start,end}().
-
-> So I would like to limit this issue to ARM64 and fix it in its
-> kvm_set_spte_gfn() variant, as above. One question about "we don't use KSM":
-> could you please share more information about this? I'm blindly guessing
-> you're saying KSM isn't used in google cloud?
-
-Yeah, we == Google/GCE.  Sorry, should have clarified that.
+Thanks,
+Joey
