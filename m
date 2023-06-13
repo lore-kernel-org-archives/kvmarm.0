@@ -1,14 +1,14 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF75D7F
-	for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 04:01:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC49D7F
+	for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 04:26:38 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 519A91FB;
-	Mon, 12 Jun 2023 21:02:25 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 081661FB;
+	Mon, 12 Jun 2023 21:27:23 -0700 (PDT)
 Received: from [10.162.42.9] (unknown [10.162.42.9])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BCA513F587;
-	Mon, 12 Jun 2023 21:01:36 -0700 (PDT)
-Message-ID: <4fec9cf7-b4b6-c5c1-7db5-493240c54ef1@arm.com>
-Date: Tue, 13 Jun 2023 09:31:13 +0530
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 77E0B3F587;
+	Mon, 12 Jun 2023 21:26:34 -0700 (PDT)
+Message-ID: <1dca7ec8-a0d1-3038-7e9f-0d2934dc2e37@arm.com>
+Date: Tue, 13 Jun 2023 09:56:31 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -17,7 +17,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.11.0
-Subject: Re: [PATCH V2 12/14] arm64/sysreg: Convert TRBMAR_EL1 register to
+Subject: Re: [PATCH V2 14/14] arm64/sysreg: Convert TRBIDR_EL1 register to
  automatic generation
 Content-Language: en-US
 To: Mark Brown <broonie@kernel.org>
@@ -28,51 +28,80 @@ Cc: linux-arm-kernel@lists.infradead.org,
  <james.morse@arm.com>, kvmarm@lists.linux.dev, coresight@lists.linaro.org,
  linux-kernel@vger.kernel.org
 References: <20230602062552.565992-1-anshuman.khandual@arm.com>
- <20230602062552.565992-13-anshuman.khandual@arm.com>
- <8a352dec-9655-4e7c-ba35-1c48e154bc71@sirena.org.uk>
+ <20230602062552.565992-15-anshuman.khandual@arm.com>
+ <4de1ec32-f07b-4eca-99e2-f71a08f5cd5b@sirena.org.uk>
 From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <8a352dec-9655-4e7c-ba35-1c48e154bc71@sirena.org.uk>
+In-Reply-To: <4de1ec32-f07b-4eca-99e2-f71a08f5cd5b@sirena.org.uk>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 
-On 6/2/23 17:35, Mark Brown wrote:
-> On Fri, Jun 02, 2023 at 11:55:50AM +0530, Anshuman Khandual wrote:
+On 6/2/23 17:42, Mark Brown wrote:
+> On Fri, Jun 02, 2023 at 11:55:52AM +0530, Anshuman Khandual wrote:
+>> This converts TRBIDR_EL1 register to automatic generation without
+>> causing any functional change.
 > 
->> +Sysreg	TRBMAR_EL1	3	0	9	11	4
+>> +Sysreg	TRBIDR_EL1	3	0	9	11	7
 >> +Res0	63:12
->> +Field	11:10	PAS
->> +Field	9:8	SH
->> +Field	7:0	Attr
->> +EndSysreg
+>> +Field	11:8	EA
 > 
-> PAS and SH look like they should be enums, Attr is a bit more complex so
-> Field is probably a good fit there.  Adding the enum information could
-> be done incrementally though so:
+> EA is another field which looks like it should be an enum, as with the
+> others this shouldn't be a blocker and could be done incrementally.
 
 Will fold the following changes in this patch.
 
 --- a/arch/arm64/tools/sysreg
 +++ b/arch/arm64/tools/sysreg
-@@ -2246,8 +2246,17 @@ EndSysreg
+@@ -2267,7 +2267,11 @@ EndSysreg
  
- Sysreg TRBMAR_EL1      3       0       9       11      4
+ Sysreg TRBIDR_EL1      3       0       9       11      7
  Res0   63:12
--Field  11:10   PAS
--Field  9:8     SH
-+Enum   11:10   PAS
-+       0b00    SECURE
-+       0b01    NON_SECURE
-+       0b10    ROOT
-+       0b11    REALM
+-Field  11:8    EA
++Enum   11:8    EA
++       0b0000  NON_DESC
++       0b0001  IGNORE
++       0b0010  SERROR
 +EndEnum
-+Enum   9:8     SH
-+       0b00    NON_SHAREABLE
-+       0b10    OUTER_SHAREABLE
-+       0b11    INNER_SHAREABLE
+ Res0   7:6
+ Field  5       F
+ Field  4       P
+
+
+> 
+>> +Res0	7:6
+>> +Field	5	F
+>> +Field	4	P
+>> +Field	3:0	Align
+> 
+> Align arguably too though really it's just encoding the relevant power
+> of 2 with the enum coming from the fact that it's limited to at most 2KB
+> alignment so a Field may well make more sense.
+
+Can fold the following changes in this patch (if required) unless the Field
+looks better than Enum.
+
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -2275,5 +2275,18 @@ EndEnum
+ Res0   7:6
+ Field  5       F
+ Field  4       P
+-Field  3:0     Align
++Enum   3:0     Align
++       0b0000  BYTE
++       0b0001  HALF_WORD
++       0b0010  WORD
++       0b0011  DOUBLE_WORD
++       0b0100  16_BYTES
++       0b0101  32_BYTES
++       0b0110  64_BYTES
++       0b0111  128_BYTES
++       0b1000  156_BYTES
++       0b1001  512_BYTES
++       0b1010  1_KB
++       0b1011  2_KB
 +EndEnum
- Field  7:0     Attr
  EndSysreg
 
 > 
