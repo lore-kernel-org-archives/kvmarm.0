@@ -1,21 +1,21 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B2C3C25
-	for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 11:02:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50A99C433EF;
-	Tue, 13 Jun 2023 11:02:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ACA83C25
+	for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 11:03:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28616C433D2;
+	Tue, 13 Jun 2023 11:03:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1686654156;
-	bh=xTXLg6Gmd35HxM/DB6S7j9/iRs4jOwAr4ziLjh9QAYg=;
+	s=k20201202; t=1686654228;
+	bh=YnMdriFhR0QLK6Wr4HwnKvTCrkhUnKOohsa4d+Pwns0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Su4olLirkWNUvyiNlpG+6n7FFzfa8TNzL0BdpeYFHYR7+oDYZRnqFCWtcLXfvIqpL
-	 WzgCy/ZlMhXb+ZGul217aC5jD+xxAlPn518Xm4OOBfm0HXaMVEV6jrnYWxWQJnZ5Hw
-	 v2Wit34P5NY0EObKCin6wU5ofWD0i1x+e1wMTXxWbbNSGZ8EjL3u2RIDUL2BRqPz2T
-	 gwNygVM7sJokIUjJ63nMow3gwlYaoZrpQc1HkfChPS8NmTM9ZJxTv/VUfAkZqF1xBi
-	 5myvPWVEv8UHqgHKbMvQhDp6d0T0Zy7U17hFekTZFOGwJIGBs5jVTusm1zADlji+Gc
-	 zyqb3CSi0kbqA==
-Date: Tue, 13 Jun 2023 12:02:31 +0100
+	b=h/V9x4jC59Qd+RqLIO8G2UUptpHxW8R5iFT6MSVK70D67DxzPh1JhxUconq49vHWl
+	 MIkv2exk+6ufOtQGL5RgOyYZJlB1EIfEuE9XwXS+kAUBaGF9p5vaB7AurBHQbrCGnc
+	 +Vkn/hluGl0m8pz5e4TgIZG6LWIUn9hxJc9+16nOThe+soeTbGDsD5+q3cG5H60Q3T
+	 9aaDA1c4xlZlvnTN6AKQj3yoVvHgo8DEF49RXPSRksvmGrnJEuUAtENDDTrGHszyrd
+	 PetyCgrhcJm2WjQO6tvFIiSjHNQLPs7T6i0keK2kTcWHUNB8uj5OYz3J25+fy1iPFs
+	 V05vfkMA0iODw==
+Date: Tue, 13 Jun 2023 12:03:42 +0100
 From: Mark Brown <broonie@kernel.org>
 To: Anshuman Khandual <anshuman.khandual@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -25,13 +25,13 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev,
 	coresight@lists.linaro.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V2 14/14] arm64/sysreg: Convert TRBIDR_EL1 register to
+Subject: Re: [PATCH V2 12/14] arm64/sysreg: Convert TRBMAR_EL1 register to
  automatic generation
-Message-ID: <8bfffd83-f4a3-445b-9343-7325c671bd00@sirena.org.uk>
+Message-ID: <7d84c1be-db01-4890-b90d-78d600382cb0@sirena.org.uk>
 References: <20230602062552.565992-1-anshuman.khandual@arm.com>
- <20230602062552.565992-15-anshuman.khandual@arm.com>
- <4de1ec32-f07b-4eca-99e2-f71a08f5cd5b@sirena.org.uk>
- <1dca7ec8-a0d1-3038-7e9f-0d2934dc2e37@arm.com>
+ <20230602062552.565992-13-anshuman.khandual@arm.com>
+ <8a352dec-9655-4e7c-ba35-1c48e154bc71@sirena.org.uk>
+ <4fec9cf7-b4b6-c5c1-7db5-493240c54ef1@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -39,68 +39,45 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="tPwiVwOaYEtW6aoV"
+	protocol="application/pgp-signature"; boundary="+1MUGCqGsULEzIf5"
 Content-Disposition: inline
-In-Reply-To: <1dca7ec8-a0d1-3038-7e9f-0d2934dc2e37@arm.com>
+In-Reply-To: <4fec9cf7-b4b6-c5c1-7db5-493240c54ef1@arm.com>
 X-Cookie: Made with real ingredients.
 
 
---tPwiVwOaYEtW6aoV
+--+1MUGCqGsULEzIf5
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 13, 2023 at 09:56:31AM +0530, Anshuman Khandual wrote:
+On Tue, Jun 13, 2023 at 09:31:13AM +0530, Anshuman Khandual wrote:
 
->  Sysreg TRBIDR_EL1      3       0       9       11      7
->  Res0   63:12
-> -Field  11:8    EA
-> +Enum   11:8    EA
-> +       0b0000  NON_DESC
-> +       0b0001  IGNORE
-> +       0b0010  SERROR
+> +Enum   11:10   PAS
+> +       0b00    SECURE
+> +       0b01    NON_SECURE
+> +       0b10    ROOT
+> +       0b11    REALM
+> +EndEnum
+> +Enum   9:8     SH
+> +       0b00    NON_SHAREABLE
+> +       0b10    OUTER_SHAREABLE
+> +       0b11    INNER_SHAREABLE
 > +EndEnum
 
 Sure.
 
-> >> +Field	3:0	Align
-> >=20
-> > Align arguably too though really it's just encoding the relevant power
-> > of 2 with the enum coming from the fact that it's limited to at most 2KB
-> > alignment so a Field may well make more sense.
->=20
-> Can fold the following changes in this patch (if required) unless the Fie=
-ld
-> looks better than Enum.
->=20
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -2275,5 +2275,18 @@ EndEnum
->  Res0   7:6
->  Field  5       F
->  Field  4       P
-> -Field  3:0     Align
-> +Enum   3:0     Align
-> +       0b0000  BYTE
-> +       0b0001  HALF_WORD
-> +       0b0010  WORD
-
-I'm not sure this one makes sense as an enum, though it is technically
-one.
-
---tPwiVwOaYEtW6aoV
+--+1MUGCqGsULEzIf5
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmSITMYACgkQJNaLcl1U
-h9Cebwf/YnyUkQpHVypDqyv2AXpb4cbOcLaeN51ltZjX+52q7Hfj5X9gMcClDYpy
-nS6Zs7MUlCVB5z0oT4jLmrNE199Kl4XfizF93KX9eY3xXJV97nhdswOum4KaDViP
-KJZfmSyu4iTqgVc8XrNzORTwX09RxwxQ5AFGLvImzVHjM5DFXUY6QaBpbYWgz/9I
-vouoTBegdtm91HLm9JfBCnpFpdjgIweGwcreFssr+iFgXwZKh+Ro9XdX4RQmwVNs
-1L1tguc8jFnQyNxbN9u5UemC+eq5GY5tecERTf+apqmWSEw48y0tiN2bofJxJX6Q
-/duLdurFMRpeOpsa+6gPCs5MGOWY+A==
-=zLcy
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmSITQ4ACgkQJNaLcl1U
+h9B6mQf7BQTf1ld8cXz4BGi4QoEeyPp0ksRvEy5L2e2x5oIfcJvFbn7wRGZnpwQb
+8c92AfbnTa7p1CjaT8D4u99W+8rizPIuugKYuHQZ8Ugb3oFtPeT/xYrtc9AOAnxO
+uTO/4MPmr0ZeBa1+NX8fQllPStpKviXqlx22PFZM7jf/cY3WIipoG52Zp2ygChTY
+8j/JSqpMfJQAmzil31nOQTfikpBFOFd+7EBaEsL0/Athi0Veq16ve9PtQLeMWxvq
+GtE/P4JsF/69PkIP3wY21sY+/3/LCHw9axPrpFf56wjM8r7my349U4zkf/FnXtRy
+kvlmdVw929GCFRiIsdKU33TL/a+ufw==
+=1AW3
 -----END PGP SIGNATURE-----
 
---tPwiVwOaYEtW6aoV--
+--+1MUGCqGsULEzIf5--
