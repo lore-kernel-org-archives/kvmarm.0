@@ -1,50 +1,50 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5824A11C85
-	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 19:22:03 +0000 (UTC)
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-568a85f180dso12404037b3.2
-        for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 12:22:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72D632EC16
+	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 19:26:46 +0000 (UTC)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-25e803def73so407502a91.1
+        for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 12:26:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686770522; x=1689362522;
+        d=google.com; s=20221208; t=1686770805; x=1689362805;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=i/rLVEpofQ0Syv4PvfDPAbW4A331iFXceGCzfBsi28U=;
-        b=PL2iPrBfrKmXWEBz7vuBuxZ7qckazlTTOs/xfuGuY4nyuX0n5iZ3LQlNbqI01Sj3sL
-         lH4BASGdKby+IjXBFsi2RGxfRbnrnTFv1xltUC4ljposNxP0zoLCavrmvD/U+ts7N39Y
-         Mg2WyAebEctMEXgsbIK8F5BuVXiM/P4DVt9EgGOyON3H90vHpV3iWO/rRVjF/NEV7Tdk
-         TGJW2DO1PMxKVO54DXFknrsvaH8usosUD6DLTl4/AyiNaWzV3g4jgInGaoHpBCozt3cd
-         9B8Sfp2RR1sgdmTSmTllDOLRrY+6VvNxSILF3w6DBdjjZ75IYtgxnQ3GWfBmGQ1lUtHg
-         RKhg==
+        bh=EMoZVBBfAkPJKgsC9TR9d3GGxsO25gF0HsErm4KOn9w=;
+        b=VUAau8TOMKQ3oHB9kg8YFP7Oq22r/p+u3cdV5cLi1CW8fh3wktB0cNjzHumTXCKhVX
+         MxntIO6xZR11kSqSPcaD1PJGjmeOgWZXDpmzfeoaMhfdyZr6z1hhV62a6OzrwEMxbWDg
+         uWktLUI7ZBBfYBxbcd3H80W/W1z0a2uBsONuBy3NxGtuBb+8kiw/HOjXzQdRkVe+VVHX
+         wSR9OvDo9qVg23ER08IIdyUWfEcBtENty+CHaEoZVy5uMoEcptz2tqJYPsffLSxFfooS
+         U9/rA82ugPJckLF8Dg9UlEepEZqHSTf7wcaHOZzyBwkD7/K2MjrPUtGLOdZNNtRcU/LU
+         spWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686770522; x=1689362522;
+        d=1e100.net; s=20221208; t=1686770805; x=1689362805;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=i/rLVEpofQ0Syv4PvfDPAbW4A331iFXceGCzfBsi28U=;
-        b=j5vX26H6eZgYbxxhWyoJYDQYWrAzNxc3lG/srtJYYTfLyaCgptvuYiGxx4UP8LtfTb
-         tXZXowqs6G4HnkArWBkPUapk+iTUXyscOj1XplDMDaR75+mBgVhJD6r6MSPKk+lJsPXY
-         Go4Tfh3ECw8FqWgHo/AXcK7NqdMuCd9LR9x3Qe5q3uQppXOXSlTjdp/DNt6NGC7tILUK
-         QOeyCUSBt9Ph5Ycmsrzpnz5gNcG9sJBXT6cs/YePstHJJUg3++FDYCBkYnu3mNNOQNGR
-         yyCrrrFGTnQltnY+uVDtYHsxF8zCzo0hzK2c8/kv0TjTmtEZSRC8OFwsUEhmxvYuz0X5
-         Z9/w==
-X-Gm-Message-State: AC+VfDyLJZGoMnlAW8MbqsyajCbh2g00P8ry++1lvF13/X+T7qzf2X+U
-	fsVQjDul1wW74/lpJkl9CbOGxT5gPzk=
-X-Google-Smtp-Source: ACHHUZ4XL4je8bVAYp8sAYeHVrXp2XZS1qxkvwKba+fbhBkdCi0K0movi/2XR1PLhVUYWMzlpC7tHAxehGk=
+        bh=EMoZVBBfAkPJKgsC9TR9d3GGxsO25gF0HsErm4KOn9w=;
+        b=gI/CGmt6ZhgnUeR1sfldqWkKpFpP2AKUFb2QA6Qpgzp6Hn8c73bOYFjFlNIPsgvdZ/
+         hVkmUPxM1rRKyzWtwiVrhlwHkPVFZlO+C2cqS1Br1cgXuu9xR/56hHSt/8HqxMjhAfsQ
+         auekf9ibbKt+MbRzQjdSNdHLlncKdSSYvfh/NtkpUUhx8OgtM1sVlPR3wkp0k5FzXUO9
+         bUCtldi8xP1RPujq2Ukg/HrIVVIfXFzMVdpZjiWSIsqX1XobPgNfWJForgX6JiJ9cKLd
+         ydo8ruObywQErHlH4+H/zLygqa45ECvJ1fB0vx5c3suB1h1NMBoGYeqhDxwpmOHb46N7
+         h9Rg==
+X-Gm-Message-State: AC+VfDyqosiH9/RP2kH6ftixjmtMH6QUsgq5USdbrU8FfJLlpO7wW97u
+	Clu/G1LW0Cp7EuTE2zPzLRTE3F9eqmY=
+X-Google-Smtp-Source: ACHHUZ7UY/1dGDE3Zk8+hssNCDQ9Ipi/kqHb2vuOsuwkF68VkWgX3v+6zrE0+PsnZX+5BgxV70uRL71I0MU=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:4501:0:b0:56d:21a1:16a1 with SMTP id
- s1-20020a814501000000b0056d21a116a1mr1209862ywa.5.1686770522234; Wed, 14 Jun
- 2023 12:22:02 -0700 (PDT)
-Date: Wed, 14 Jun 2023 12:22:00 -0700
-In-Reply-To: <20230602161921.208564-7-amoorthy@google.com>
+ (user=seanjc job=sendgmr) by 2002:a17:90a:a684:b0:25b:ea08:d641 with SMTP id
+ d4-20020a17090aa68400b0025bea08d641mr412405pjq.7.1686770805592; Wed, 14 Jun
+ 2023 12:26:45 -0700 (PDT)
+Date: Wed, 14 Jun 2023 12:26:43 -0700
+In-Reply-To: <20230602161921.208564-8-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-7-amoorthy@google.com>
-Message-ID: <ZIoTWOmM2a3iVDAi@google.com>
-Subject: Re: [PATCH v4 06/16] KVM: Annotate -EFAULTs from kvm_vcpu_read_guest_page()
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-8-amoorthy@google.com>
+Message-ID: <ZIoUc2hLd0zMOhO+@google.com>
+Subject: Re: [PATCH v4 07/16] KVM: Simplify error handling in __gfn_to_pfn_memslot()
 From: Sean Christopherson <seanjc@google.com>
 To: Anish Moorthy <amoorthy@google.com>
 Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
@@ -55,9 +55,52 @@ Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
 Content-Type: text/plain; charset="us-ascii"
 
 On Fri, Jun 02, 2023, Anish Moorthy wrote:
-> Implement KVM_CAP_MEMORY_FAULT_INFO for uaccess failures within
-> kvm_vcpu_read_guest_page().
+> KVM_HVA_ERR_RO_BAD satisfies kvm_is_error_hva(), so there's no need to
+> duplicate the "if (writable)" block. Fix this by bringing all
+> kvm_is_error_hva() cases under one conditional.
+> 
+> Signed-off-by: Anish Moorthy <amoorthy@google.com>
+> ---
+>  virt/kvm/kvm_main.c | 12 +++++-------
+>  1 file changed, 5 insertions(+), 7 deletions(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index b9d2606f9251..05d6e7e3994d 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2711,16 +2711,14 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
+>  	if (hva)
+>  		*hva = addr;
+>  
+> -	if (addr == KVM_HVA_ERR_RO_BAD) {
+> -		if (writable)
+> -			*writable = false;
+> -		return KVM_PFN_ERR_RO_FAULT;
+> -	}
+> -
+>  	if (kvm_is_error_hva(addr)) {
+>  		if (writable)
+>  			*writable = false;
+> -		return KVM_PFN_NOSLOT;
+> +
+> +		if (addr == KVM_HVA_ERR_RO_BAD)
+> +			return KVM_PFN_ERR_RO_FAULT;
+> +		else
+> +			return KVM_PFN_NOSLOT;
 
-Same comments as the "write" patch.  And while I often advocate for tiny patches,
-I see no reason to split the read and write changes into separate patches, they're
-thematically identical enough to count as a "single logical change".
+Similar to an earlier patch, preferred style for terminal if-statements is
+
+		if (addr == KVM_HVA_ERR_RO_BAD)
+			return KVM_PFN_ERR_RO_FAULT;
+
+		return KVM_PFN_NOSLOT;
+
+Again, there are reasons for the style/rule.  In this case, it will yield a smaller
+diff (obviously not a huge deal, but helpful), and it makes it more obvious that
+the taken path of "if (kvm_is_error_hva(addr))" is itself terminal.
+
+Alternatively, a ternary operator is often used for these types of things, though
+in this case I much prefer the above, as I find the below hard to read.
+
+		return addr == KVM_HVA_ERR_RO_BAD ? KVM_PFN_ERR_RO_FAULT :
+						    KVM_PFN_NOSLOT;
