@@ -1,283 +1,101 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A1753EDAE
-	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 00:01:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1686700882;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OIxUJi3S3V13SdWktR3hCfDl7HtGJShCUEdBONYksjo=;
-	b=QZQOwrP0li72iigbBVnw+os5H40SEbPVsg3W4sybRpoAOxMH/fbqvdlvr8vDu+JSWDElsV
-	pOrFEcLont0lW0Wyw8Gf1tyh59x8OEbp5VqOlI4bxGlzn0QyaA/VeNRsJ6lObshxlEZdIS
-	36xKuJSq7+6HESaWaoH+Z7Wh4cr1I/c=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-18-pBknOAWuN_CsLynMcDgNDQ-1; Tue, 13 Jun 2023 20:01:21 -0400
-X-MC-Unique: pBknOAWuN_CsLynMcDgNDQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CA6EC185A795;
-	Wed, 14 Jun 2023 00:01:20 +0000 (UTC)
-Received: from [10.64.54.118] (vpn2-54-118.bne.redhat.com [10.64.54.118])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C76F1121314;
-	Wed, 14 Jun 2023 00:01:17 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH] KVM: Avoid illegal stage2 mapping on invalid memory slot
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, pbonzini@redhat.com, oliver.upton@linux.dev,
- maz@kernel.org, hshuai@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com
-References: <20230608090348.414990-1-gshan@redhat.com>
- <ZIcujNKVosLeQEqR@google.com>
- <6e335f13-01bd-2972-ead2-3081819aa151@redhat.com>
- <ZIiEIkn1lFU7Vr1z@google.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <16d8b137-7e61-b981-e1cd-9f06f73d4300@redhat.com>
-Date: Wed, 14 Jun 2023 10:01:14 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5AE97F
+	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 07:00:14 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3A5761FB;
+	Wed, 14 Jun 2023 00:00:53 -0700 (PDT)
+Received: from a077893.arm.com (unknown [10.163.46.15])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 9D5F23F663;
+	Wed, 14 Jun 2023 00:00:04 -0700 (PDT)
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	broonie@kernel.org
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	James Morse <james.morse@arm.com>,
+	kvmarm@lists.linux.dev,
+	coresight@lists.linaro.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH V3 00/14] arm64/sysreg: Convert TRBE registers to automatic generation
+Date: Wed, 14 Jun 2023 12:29:35 +0530
+Message-Id: <20230614065949.146187-1-anshuman.khandual@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <ZIiEIkn1lFU7Vr1z@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+Content-Transfer-Encoding: 8bit
 
-Hi Sean,
+This series converts TRBE registers to automatic generation, after renaming
+their fields as per the auto-gen tools format. Although the following field
+still renames in arch/arm64/include/asm/sysreg.h, as it cannot be converted
+(shares bits with other fields) in the tools format.
 
-On 6/14/23 12:58 AM, Sean Christopherson wrote:
-> On Tue, Jun 13, 2023, Gavin Shan wrote:
->> On 6/13/23 12:41 AM, Sean Christopherson wrote:
->>>> Fixes: 3039bcc74498 ("KVM: Move x86's MMU notifier memslot walkers to generic code")
->>>
->>> This Fixes isn't correct.  That change only affected x86, which doesn't have this
->>> bug.  And looking at commit cd4c71835228 ("KVM: arm64: Convert to the gfn-based MMU
->>> notifier callbacks"), arm64 did NOT skip invalid slots
-> 
-> ...
-> 
->>> Unless I'm missing something, this goes all the way back to initial arm64 support
->>> added by commit d5d8184d35c9 ("KVM: ARM: Memory virtualization setup").
->>>
->>
->> The fixes tag was sorted out based on 'git-bisect', not static code analysis. I
->> agree it should be d5d8184d35c9 ("KVM: ARM: Memory virtualization setup") from
->> the code. From the 'git-bisect', we found the issue disappears when the head is
->> commit 3039bcc74498 ("KVM: Move x86's MMU notifier memslot walkers to generic code").
->> And yes, the fixes tag should be cd4c71835228 ("KVM: arm64: Convert to the gfn-based
->> MMU notifier callbacks").
-> 
-> No, just because bisect points at a commit doesn't mean that's the commit that
-> introduced a bug.  It's not uncommon for a completely valid change to expose a
-> pre-existing bug, which is what I suspect happened here, e.g. after switching to
-> the generic framework, clean_dcache_guest_page() is called *after* retrieving the
-> memslot, versus clean_dcache_guest_page() being called before walking memslots.
-> 
-> Blaming the correct commit matters, both so that it's clear to future readers what
-> went wrong, and also so that people maintaining older kernels at least are aware
-> that there kernel may be affected.  E.g. a fix in generic KVM obviously won't
-> backport to 5.10, but someone who cares deeply about a 5.10-based kernel on arm64
-> could manually port the fix to KVM arm64 code.
-> 
+#define TRBSR_EL1_BSC_MASK		GENMASK(5, 0)
+#define TRBSR_EL1_BSC_SHIFT		0
 
-Yes, the change of the call site on clean_dcache_guest_page() enlarges the race
-condition window between memory slot removal and change_pte() theoretically.
-With this, we were able to reproduce the issue in a practical test. In next
-revision, lets put a note about this in the changelog, like below.
+This series applies on v6.4-rc6.
 
-   We tried a git-bisect and the first problematic commit is cd4c71835228 ("
-   KVM: arm64: Convert to the gfn-based MMU notifier callbacks"). With this,
-   clean_dcache_guest_page() is called after the memory slots are iterated
-   in kvm_mmu_notifier_change_pte(). Without this commit, clean_dcache_guest_page()
-   is called before the iteration on the memory slots. This change literally
-   enlarges the racy window between kvm_mmu_notifier_change_pte() and memory
-   slot removal so that we're able to reproduce the issue in a practical test
-   case. However, the issue exists since d5d8184d35c9 ("KVM: ARM: Memory
-   virtualization setup").
-   
-   Cc: stable@vger.kernel.org # v3.9+
-   Fixes: d5d8184d35c9 ("KVM: ARM: Memory virtualization setup")
+Changes in V3:
 
->> I'm declined to fix the issue only for ARM64,
-> 
-> I never suggested that an ARM-only fix be made, in fact I explicitly suggested
-> the exact opposite.
-> 
+- Defined enum for both PAS and SH fields in TRBMAR_EL1
+- Defined enum for EA field in TRBIDR_EL1
 
-Well, the original patch ignores the invalid memory slot for all MMU notifiers.
-You suggested to have this ignorance only for change_pte(). The scope is decreased
-and I was following this direction to narrow this issue/fix to change_pte() on
-ARM64 only. Sorry that I misunderstood your suggestion.
+Changes in V2:
 
->> more details are given below. If we're going to limit the issue to ARM64 and
->> fix it for ARM64 only, the fixes tag should be the one as you pointed. Lets
->> correct it in next revision with:
-> 
-> For a generic fix, just blame multiple commits, e.g. the guilty arm64, RISC-V,
-> and MIPS commits, which at a glance are the affected architectures.  At one point
-> in time, x86 was also likely affected, but that's probably not worth more than a
-> brief mention in the changelog as I don't see any value in tracking down a very
-> theoretical window of time where x86 was affected.
-> 
+https://lore.kernel.org/all/20230602062552.565992-1-anshuman.khandual@arm.com/
 
-Right. Please refer to above reply. I plan to add a section in the changelog
-in next revision.
+- Renamed each individual TRBE register fields as per auto-gen tools
+- Converted each individual TRBE registers as per auto-gen tools
+- Added new register fields as per DDI0601 2023-03
 
->>    Cc: stable@vger.kernel.org # v3.9+
->>    Fixes: d5d8184d35c9 ("KVM: ARM: Memory virtualization setup")
->>
->>>> Reported-by: Shuai Hu <hshuai@redhat.com>
->>>> Reported-by: Zhenyu Zhang <zhenyzha@redhat.com>
->>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
->>>> ---
->>>>    virt/kvm/kvm_main.c | 3 +++
->>>>    1 file changed, 3 insertions(+)
->>>>
->>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->>>> index 479802a892d4..7f81a3a209b6 100644
->>>> --- a/virt/kvm/kvm_main.c
->>>> +++ b/virt/kvm/kvm_main.c
->>>> @@ -598,6 +598,9 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
->>>>    			unsigned long hva_start, hva_end;
->>>>    			slot = container_of(node, struct kvm_memory_slot, hva_node[slots->node_idx]);
->>>> +			if (slot->flags & KVM_MEMSLOT_INVALID)
->>>> +				continue;
->>>
->>> Skipping the memslot will lead to use-after-free.  E.g. if an invalidate_range_start()
->>> comes along between installing the invalid slot and zapping SPTEs, KVM will
->>> return from kvm_mmu_notifier_invalidate_range_start() without having dropped all
->>> references to the range.
->>>
->>> I.e.
->>>
->>> 	kvm_copy_memslot(invalid_slot, old);
->>> 	invalid_slot->flags |= KVM_MEMSLOT_INVALID;
->>> 	kvm_replace_memslot(kvm, old, invalid_slot);
->>>
->>> 	/*
->>> 	 * Activate the slot that is now marked INVALID, but don't propagate
->>> 	 * the slot to the now inactive slots. The slot is either going to be
->>> 	 * deleted or recreated as a new slot.
->>> 	 */
->>> 	kvm_swap_active_memslots(kvm, old->as_id);
->>>
->>>
->>> ==> invalidate_range_start()
->>>
->>> 	/*
->>> 	 * From this point no new shadow pages pointing to a deleted, or moved,
->>> 	 * memslot will be created.  Validation of sp->gfn happens in:
->>> 	 *	- gfn_to_hva (kvm_read_guest, gfn_to_pfn)
->>> 	 *	- kvm_is_visible_gfn (mmu_check_root)
->>> 	 */
->>> 	kvm_arch_flush_shadow_memslot(kvm, old);
->>>
->>> And even for change_pte(), skipping the memslot is wrong, as KVM would then fail
->>> unmap the prior SPTE.  Of course, that can't happen in the current code base
->>> because change_pte() is wrapped with invalidate_range_{start,end}(), but that's
->>> more of a bug than a design choice (see c13fda237f08 "KVM: Assert that notifier
->>> count is elevated in .change_pte()" for details).  That's also why this doesn't
->>> show up on x86; x86 installs a SPTE for the change_pte() notifier iff an existing
->>> SPTE is present, which is never true due to the invalidation.
->>>
->>
->> Right, those architectural dependencies are really something I worried about.
-> 
-> The zap case isn't a architecture specific, that's true for all KVM architectures.
-> 
+Changes in V1:
 
-Yes.
+https://lore.kernel.org/all/20230531055524.16562-1-anshuman.khandual@arm.com/
 
->> It's safe to skip the invalid memory slots for ARM64,
-> 
-> No, it's not.  The problematic window where an invalidation can be incorrectly
-> skipped is very tiny, and would have zero chance of being seen without something
-> generating invalidations, e.g. page migration.  But that doesn't mean there's no
-> bug.
-> 
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Mark Brown <broonie@kernel.org>
+Cc: Rob Herring <robh@kernel.org>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: James Morse <james.morse@arm.com>
+Cc: kvmarm@lists.linux.dev
+Cc: coresight@lists.linaro.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org
 
-Yeah, Agree.
+Anshuman Khandual (14):
+  arm64/sysreg: Rename TRBLIMITR_EL1 fields per auto-gen tools format
+  arm64/sysreg: Rename TRBPTR_EL1 fields per auto-gen tools format
+  arm64/sysreg: Rename TRBBASER_EL1 fields per auto-gen tools format
+  arm64/sysreg: Rename TRBSR_EL1 fields per auto-gen tools format
+  arm64/sysreg: Rename TRBMAR_EL1 fields per auto-gen tools format
+  arm64/sysreg: Rename TRBTRG_EL1 fields per auto-gen tools format
+  arm64/sysreg: Rename TRBIDR_EL1 fields per auto-gen tools format
+  arm64/sysreg: Convert TRBLIMITR_EL1 register to automatic generation
+  arm64/sysreg: Convert TRBPTR_EL1 register to automatic generation
+  arm64/sysreg: Convert TRBBASER_EL1 register to automatic generation
+  arm64/sysreg: Convert TRBSR_EL1 register to automatic generation
+  arm64/sysreg: Convert TRBMAR_EL1 register to automatic generation
+  arm64/sysreg: Convert TRBTRG_EL1 register to automatic generation
+  arm64/sysreg: Convert TRBIDR_EL1 register to automatic generation
 
->> but it may be unsafe to do so for other architectures. You've listed the
->> potential risks to do so for x86. It might be risky with PowerPC's reverse
->> mapping stuff either. I didn't look into the code for the left architectures.
->> In order to escape from the architectural conflicts, I would move the check
->> and skip the invalid memory slot in arch/arm64/kvm/mmu.c::kvm_set_spte_gfn(),
->> something like below. In this way, the guest hang issue in ARM64 guest is
->> fixed. We may have similar issue on other architectures, but we can figure
->> out the fix when we have to.  Sean, please let me know if you're happy with
->> this?
->>
->> arch/arm64/kvm/mmu.c::kvm_set_spte_gfn()
->> ----------------------------------------
->>
->> bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
->> {
->>          kvm_pfn_t pfn = pte_pfn(range->pte);
->>
->>          if (!kvm->arch.mmu.pgt)
->>                  return false;
->>
->>          /*
->>           * The memory slot can become invalid temporarily or permanently
->>           * when it's being moved or deleted. Avoid the stage2 mapping so
->>           * that all the read and write requests to the region of the memory
->>           * slot can be forwarded to VMM and emulated there.
->>           */
->>           if (range->slot->flags & KVM_MEMSLOT_INVALID)
->>               return false;
-> 
-> Please no.  (a) it papers over common KVM's reliance on the SPTE being zapped by
-> invalidate_range_start(), and (b) it leaves the same bug in RISC-V (which copy+pasted
-> much of arm64's MMU code) and in MIPS (which also installs SPTEs in its callback).
-> 
+ arch/arm64/include/asm/el2_setup.h           |  2 +-
+ arch/arm64/include/asm/sysreg.h              | 50 +------------
+ arch/arm64/kvm/debug.c                       |  2 +-
+ arch/arm64/kvm/hyp/nvhe/debug-sr.c           |  2 +-
+ arch/arm64/tools/sysreg                      | 77 ++++++++++++++++++++
+ drivers/hwtracing/coresight/coresight-trbe.c | 33 +++++----
+ drivers/hwtracing/coresight/coresight-trbe.h | 38 ++++------
+ 7 files changed, 114 insertions(+), 90 deletions(-)
 
-Ok. Now I understand your suggestion to fix the issue for architectures. I will post
-v3 with your suggested changes.
-
->>           WARN_ON(range->end - range->start != 1);
->>
->>           :
->> }
->>
->>> I'd honestly love to just delete the change_pte() callback, but my opinion is more
->>> than a bit biased since we don't use KSM.  Assuming we keep change_pte(), the best
->>> option is probably to provide a wrapper around kvm_set_spte_gfn() to skip the
->>> memslot, but with a sanity check and comment explaining the dependency on there
->>> being no SPTEs due to the invalidation.  E.g.
->>>
->>
->> It's good idea, but I'm afraid other architectures like PowerPC will still be
->> affected.
-> 
-> I don't follow.  PPC unmaps in response to a PTE change, but that's effectively
-> dead code due to change_pte() being wrapped with invalidate_range_{start,end}().
-> 
-
-You're right. I forgot the fact that change_pte() is surrounded by invalidate_{start,end}().
-
->> So I would like to limit this issue to ARM64 and fix it in its
->> kvm_set_spte_gfn() variant, as above. One question about "we don't use KSM":
->> could you please share more information about this? I'm blindly guessing
->> you're saying KSM isn't used in google cloud?
-> 
-> Yeah, we == Google/GCE.  Sorry, should have clarified that.
-> 
-
-Ok, thanks for your clarification.
-
-Thanks,
-Gavin
-
+-- 
+2.25.1
 
