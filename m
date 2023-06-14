@@ -1,71 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E127476
-	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 11:45:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24378C433C0;
-	Wed, 14 Jun 2023 11:45:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1686743150;
-	bh=RnYUYlyseQWe6kP6NkFrayfM25rEhRPBxhVqsJcyjXM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Q+gQTP4iSjBsGZCwnog4aQwiSTZR5h9yTG+rTdD2EqvsfsmcL5ItbziHcC/0fqVB9
-	 FSsO9CDZ7l2FMFHXa4HxKvowoFxPbcU7AQAnd0Qgq0FJb1DUzR7ukXyU3JSovP+oJL
-	 nxP/EwAKh5keL8sN3w1lAhFvfaR8bkzd0HkrgxZlHqagRDVuwh8jbj8tDt8wWF8h9n
-	 LV1T+s+Xi1QPZEh0edDxxNMByoVNtcWzDKcwsPUhK61DsBPJ+/Z1QMYjbiT5+d/QiD
-	 aU416k5EsBx9wJE4H9+CewJHF2o8ihzUgAPFuRnROHrOoOn3vzqNEbJbL1Hoz+TpuA
-	 9uNP2kQm2xG+A==
-Date: Wed, 14 Jun 2023 12:45:45 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev,
-	coresight@lists.linaro.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V3 14/14] arm64/sysreg: Convert TRBIDR_EL1 register to
- automatic generation
-Message-ID: <1b11779b-fda6-4542-86e6-b3680b0797d7@sirena.org.uk>
-References: <20230614065949.146187-1-anshuman.khandual@arm.com>
- <20230614065949.146187-15-anshuman.khandual@arm.com>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6627079E1
+	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 11:54:14 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B55031FB;
+	Wed, 14 Jun 2023 04:54:57 -0700 (PDT)
+Received: from [10.57.25.82] (unknown [10.57.25.82])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3300E3F71E;
+	Wed, 14 Jun 2023 04:54:11 -0700 (PDT)
+Message-ID: <2874efc6-a022-c97e-7e38-ccf8b4b5938d@arm.com>
+Date: Wed, 14 Jun 2023 13:54:09 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="s0Bh6Ya3IA1ZXxZP"
-Content-Disposition: inline
-In-Reply-To: <20230614065949.146187-15-anshuman.khandual@arm.com>
-X-Cookie: At participating locations only.
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.11.1
+Subject: Re: [PATCH V3 00/14] arm64/sysreg: Convert TRBE registers to
+ automatic generation
+To: Anshuman Khandual <anshuman.khandual@arm.com>,
+ linux-arm-kernel@lists.infradead.org, broonie@kernel.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Rob Herring <robh@kernel.org>,
+ James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev,
+ coresight@lists.linaro.org, linux-kernel@vger.kernel.org
+References: <20230614065949.146187-1-anshuman.khandual@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20230614065949.146187-1-anshuman.khandual@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+On 14/06/2023 07:59, Anshuman Khandual wrote:
+> This series converts TRBE registers to automatic generation, after renaming
+> their fields as per the auto-gen tools format. Although the following field
+> still renames in arch/arm64/include/asm/sysreg.h, as it cannot be converted
+> (shares bits with other fields) in the tools format.
+> 
+> #define TRBSR_EL1_BSC_MASK		GENMASK(5, 0)
+> #define TRBSR_EL1_BSC_SHIFT		0
+> 
+> This series applies on v6.4-rc6.
+> 
+> Changes in V3:
+> 
+> - Defined enum for both PAS and SH fields in TRBMAR_EL1
+> - Defined enum for EA field in TRBIDR_EL1
+> 
+> Changes in V2:
+> 
+> https://lore.kernel.org/all/20230602062552.565992-1-anshuman.khandual@arm.com/
+> 
+> - Renamed each individual TRBE register fields as per auto-gen tools
+> - Converted each individual TRBE registers as per auto-gen tools
+> - Added new register fields as per DDI0601 2023-03
+> 
+> Changes in V1:
+> 
+> https://lore.kernel.org/all/20230531055524.16562-1-anshuman.khandual@arm.com/
+> 
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Mark Brown <broonie@kernel.org>
+> Cc: Rob Herring <robh@kernel.org>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: kvmarm@lists.linux.dev
+> Cc: coresight@lists.linaro.org
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-kernel@vger.kernel.org
+> 
+> Anshuman Khandual (14):
+>    arm64/sysreg: Rename TRBLIMITR_EL1 fields per auto-gen tools format
+>    arm64/sysreg: Rename TRBPTR_EL1 fields per auto-gen tools format
+>    arm64/sysreg: Rename TRBBASER_EL1 fields per auto-gen tools format
+>    arm64/sysreg: Rename TRBSR_EL1 fields per auto-gen tools format
+>    arm64/sysreg: Rename TRBMAR_EL1 fields per auto-gen tools format
+>    arm64/sysreg: Rename TRBTRG_EL1 fields per auto-gen tools format
+>    arm64/sysreg: Rename TRBIDR_EL1 fields per auto-gen tools format
+>    arm64/sysreg: Convert TRBLIMITR_EL1 register to automatic generation
+>    arm64/sysreg: Convert TRBPTR_EL1 register to automatic generation
+>    arm64/sysreg: Convert TRBBASER_EL1 register to automatic generation
+>    arm64/sysreg: Convert TRBSR_EL1 register to automatic generation
+>    arm64/sysreg: Convert TRBMAR_EL1 register to automatic generation
+>    arm64/sysreg: Convert TRBTRG_EL1 register to automatic generation
+>    arm64/sysreg: Convert TRBIDR_EL1 register to automatic generation
+> 
+>   arch/arm64/include/asm/el2_setup.h           |  2 +-
+>   arch/arm64/include/asm/sysreg.h              | 50 +------------
+>   arch/arm64/kvm/debug.c                       |  2 +-
+>   arch/arm64/kvm/hyp/nvhe/debug-sr.c           |  2 +-
+>   arch/arm64/tools/sysreg                      | 77 ++++++++++++++++++++
+>   drivers/hwtracing/coresight/coresight-trbe.c | 33 +++++----
+>   drivers/hwtracing/coresight/coresight-trbe.h | 38 ++++------
+>   7 files changed, 114 insertions(+), 90 deletions(-)
+> 
 
 
---s0Bh6Ya3IA1ZXxZP
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+For the coresight-trbe.* bits:
 
-On Wed, Jun 14, 2023 at 12:29:49PM +0530, Anshuman Khandual wrote:
-> This converts TRBIDR_EL1 register to automatic generation without
-> causing any functional change.
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
-
---s0Bh6Ya3IA1ZXxZP
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmSJqGgACgkQJNaLcl1U
-h9AMiQf/dhEyCHXQn9f0aYQEEXv9tph7vPyq4K6kLVyUwBcwzy+J1Ro9UjUz/EeZ
-1eWPHFRfgVn/5nAdCoGj95bsdXUMhTAiKwmRg1++OnIjoUwJODMu5YcBWXxPeEhB
-0LFSGi4/cuHxYDqqrCGsew6F6+HC4Lr34Eh6m47KH/ZS0wGlcYDdfqGH+WxwYfKr
-EgBo5LOp2rHKxmdamAkkBKQV+MsFLfDIqS/qiMU90UiJwqnYBBMw1xgd3GTb9y5e
-nb5oN+e8Uwf/q+I0klxE8urD+HYqILrTksdr9Un2UDN1Tmrf1ctGzLpZ04mDbGnm
-CRjUb93TBXjpMHAPVV3GDXuxJaJk9g==
-=mnQ0
------END PGP SIGNATURE-----
-
---s0Bh6Ya3IA1ZXxZP--
