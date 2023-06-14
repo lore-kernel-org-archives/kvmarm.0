@@ -1,12 +1,12 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C74E37F
-	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 07:01:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 659277F
+	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 07:01:16 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 028441FB;
-	Wed, 14 Jun 2023 00:01:56 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7CCC5152B;
+	Wed, 14 Jun 2023 00:02:00 -0700 (PDT)
 Received: from a077893.arm.com (unknown [10.163.46.15])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 75AE43F663;
-	Wed, 14 Jun 2023 00:01:07 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 1E48E3F663;
+	Wed, 14 Jun 2023 00:01:11 -0700 (PDT)
 From: Anshuman Khandual <anshuman.khandual@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	broonie@kernel.org
@@ -20,9 +20,9 @@ Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
 	kvmarm@lists.linux.dev,
 	coresight@lists.linaro.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH V3 13/14] arm64/sysreg: Convert TRBTRG_EL1 register to automatic generation
-Date: Wed, 14 Jun 2023 12:29:48 +0530
-Message-Id: <20230614065949.146187-14-anshuman.khandual@arm.com>
+Subject: [PATCH V3 14/14] arm64/sysreg: Convert TRBIDR_EL1 register to automatic generation
+Date: Wed, 14 Jun 2023 12:29:49 +0530
+Message-Id: <20230614065949.146187-15-anshuman.khandual@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230614065949.146187-1-anshuman.khandual@arm.com>
 References: <20230614065949.146187-1-anshuman.khandual@arm.com>
@@ -34,7 +34,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This converts TRBTRG_EL1 register to automatic generation without
+This converts TRBIDR_EL1 register to automatic generation without
 causing any functional change.
 
 Cc: Catalin Marinas <catalin.marinas@arm.com>
@@ -49,40 +49,49 @@ Cc: linux-kernel@vger.kernel.org
 Reviewed-by: Mark Brown <broonie@kernel.org>
 Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 ---
- arch/arm64/include/asm/sysreg.h | 3 ---
- arch/arm64/tools/sysreg         | 5 +++++
- 2 files changed, 5 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/sysreg.h |  6 ------
+ arch/arm64/tools/sysreg         | 13 +++++++++++++
+ 2 files changed, 13 insertions(+), 6 deletions(-)
 
 diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 1d87de37364a..088831b6cf6c 100644
+index 088831b6cf6c..1b71bbd8b4e0 100644
 --- a/arch/arm64/include/asm/sysreg.h
 +++ b/arch/arm64/include/asm/sysreg.h
-@@ -241,13 +241,10 @@
+@@ -241,14 +241,8 @@
  
  /*** End of Statistical Profiling Extension ***/
  
--#define SYS_TRBTRG_EL1			sys_reg(3, 0, 9, 11, 6)
- #define SYS_TRBIDR_EL1			sys_reg(3, 0, 9, 11, 7)
- 
+-#define SYS_TRBIDR_EL1			sys_reg(3, 0, 9, 11, 7)
+-
  #define TRBSR_EL1_BSC_MASK		GENMASK(5, 0)
  #define TRBSR_EL1_BSC_SHIFT		0
--#define TRBTRG_EL1_TRG_MASK		GENMASK(31, 0)
--#define TRBTRG_EL1_TRG_SHIFT		0
- #define TRBIDR_EL1_F			BIT(5)
- #define TRBIDR_EL1_P			BIT(4)
- #define TRBIDR_EL1_Align_MASK		GENMASK(3, 0)
+-#define TRBIDR_EL1_F			BIT(5)
+-#define TRBIDR_EL1_P			BIT(4)
+-#define TRBIDR_EL1_Align_MASK		GENMASK(3, 0)
+-#define TRBIDR_EL1_Align_SHIFT		0
+ 
+ #define SYS_PMINTENSET_EL1		sys_reg(3, 0, 9, 14, 1)
+ #define SYS_PMINTENCLR_EL1		sys_reg(3, 0, 9, 14, 2)
 diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index ef2cea2aa037..4292e6014d2e 100644
+index 4292e6014d2e..7f22faeaaba0 100644
 --- a/arch/arm64/tools/sysreg
 +++ b/arch/arm64/tools/sysreg
-@@ -2259,3 +2259,8 @@ Enum	9:8	SH
- EndEnum
- Field	7:0	Attr
+@@ -2264,3 +2264,16 @@ Sysreg	TRBTRG_EL1	3	0	9	11	6
+ Res0	63:32
+ Field	31:0	TRG
  EndSysreg
 +
-+Sysreg	TRBTRG_EL1	3	0	9	11	6
-+Res0	63:32
-+Field	31:0	TRG
++Sysreg	TRBIDR_EL1	3	0	9	11	7
++Res0	63:12
++Enum	11:8	EA
++	0b0000	NON_DESC
++	0b0001	IGNORE
++	0b0010	SERROR
++EndEnum
++Res0	7:6
++Field	5	F
++Field	4	P
++Field	3:0	Align
 +EndSysreg
 -- 
 2.25.1
