@@ -1,12 +1,12 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4B787F
-	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 07:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C3257F
+	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 07:00:34 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A737D2F4;
-	Wed, 14 Jun 2023 00:01:13 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 709781FB;
+	Wed, 14 Jun 2023 00:01:18 -0700 (PDT)
 Received: from a077893.arm.com (unknown [10.163.46.15])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id DFA1E3F663;
-	Wed, 14 Jun 2023 00:00:24 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id CAEE23F663;
+	Wed, 14 Jun 2023 00:00:29 -0700 (PDT)
 From: Anshuman Khandual <anshuman.khandual@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	broonie@kernel.org
@@ -20,9 +20,9 @@ Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
 	kvmarm@lists.linux.dev,
 	coresight@lists.linaro.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH V3 04/14] arm64/sysreg: Rename TRBSR_EL1 fields per auto-gen tools format
-Date: Wed, 14 Jun 2023 12:29:39 +0530
-Message-Id: <20230614065949.146187-5-anshuman.khandual@arm.com>
+Subject: [PATCH V3 05/14] arm64/sysreg: Rename TRBMAR_EL1 fields per auto-gen tools format
+Date: Wed, 14 Jun 2023 12:29:40 +0530
+Message-Id: <20230614065949.146187-6-anshuman.khandual@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230614065949.146187-1-anshuman.khandual@arm.com>
 References: <20230614065949.146187-1-anshuman.khandual@arm.com>
@@ -34,7 +34,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This renames TRBSR_EL1 register fields per auto-gen tools format without
+This renames TRBMAR_EL1 register fields per auto-gen tools format without
 causing any functional change in the TRBE driver.
 
 Cc: Catalin Marinas <catalin.marinas@arm.com>
@@ -50,132 +50,30 @@ Cc: linux-arm-kernel@lists.infradead.org
 Cc: linux-kernel@vger.kernel.org
 Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 ---
- arch/arm64/include/asm/sysreg.h              | 26 ++++++++++----------
- drivers/hwtracing/coresight/coresight-trbe.c | 12 ++++-----
- drivers/hwtracing/coresight/coresight-trbe.h | 16 ++++++------
- 3 files changed, 27 insertions(+), 27 deletions(-)
+ arch/arm64/include/asm/sysreg.h | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
 diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 896b9b6334b4..6ee331a52bb2 100644
+index 6ee331a52bb2..8080c52d2fff 100644
 --- a/arch/arm64/include/asm/sysreg.h
 +++ b/arch/arm64/include/asm/sysreg.h
-@@ -264,19 +264,19 @@
- #define TRBPTR_EL1_PTR_SHIFT		0
- #define TRBBASER_EL1_BASE_MASK		GENMASK_ULL(63, 12)
- #define TRBBASER_EL1_BASE_SHIFT		12
--#define TRBSR_EC_MASK			GENMASK(5, 0)
--#define TRBSR_EC_SHIFT			26
--#define TRBSR_IRQ			BIT(22)
--#define TRBSR_TRG			BIT(21)
--#define TRBSR_WRAP			BIT(20)
--#define TRBSR_ABORT			BIT(18)
--#define TRBSR_STOP			BIT(17)
--#define TRBSR_MSS_MASK			GENMASK(15, 0)
--#define TRBSR_MSS_SHIFT			0
--#define TRBSR_BSC_MASK			GENMASK(5, 0)
--#define TRBSR_BSC_SHIFT			0
--#define TRBSR_FSC_MASK			GENMASK(5, 0)
--#define TRBSR_FSC_SHIFT			0
-+#define TRBSR_EL1_EC_MASK		GENMASK(31, 26)
-+#define TRBSR_EL1_EC_SHIFT		26
-+#define TRBSR_EL1_IRQ			BIT(22)
-+#define TRBSR_EL1_TRG			BIT(21)
-+#define TRBSR_EL1_WRAP			BIT(20)
-+#define TRBSR_EL1_EA			BIT(18)
-+#define TRBSR_EL1_S			BIT(17)
-+#define TRBSR_EL1_MSS_MASK		GENMASK(15, 0)
-+#define TRBSR_EL1_MSS_SHIFT		0
-+#define TRBSR_EL1_BSC_MASK		GENMASK(5, 0)
-+#define TRBSR_EL1_BSC_SHIFT		0
-+#define TRBSR_EL1_FSC_MASK		GENMASK(5, 0)
-+#define TRBSR_EL1_FSC_SHIFT		0
- #define TRBMAR_SHARE_MASK		GENMASK(1, 0)
- #define TRBMAR_SHARE_SHIFT		8
- #define TRBMAR_OUTER_MASK		GENMASK(3, 0)
-diff --git a/drivers/hwtracing/coresight/coresight-trbe.c b/drivers/hwtracing/coresight/coresight-trbe.c
-index 1d9d141c62e9..1bab91ce8e95 100644
---- a/drivers/hwtracing/coresight/coresight-trbe.c
-+++ b/drivers/hwtracing/coresight/coresight-trbe.c
-@@ -582,12 +582,12 @@ static void clr_trbe_status(void)
- 	u64 trbsr = read_sysreg_s(SYS_TRBSR_EL1);
- 
- 	WARN_ON(is_trbe_enabled());
--	trbsr &= ~TRBSR_IRQ;
--	trbsr &= ~TRBSR_TRG;
--	trbsr &= ~TRBSR_WRAP;
--	trbsr &= ~(TRBSR_EC_MASK << TRBSR_EC_SHIFT);
--	trbsr &= ~(TRBSR_BSC_MASK << TRBSR_BSC_SHIFT);
--	trbsr &= ~TRBSR_STOP;
-+	trbsr &= ~TRBSR_EL1_IRQ;
-+	trbsr &= ~TRBSR_EL1_TRG;
-+	trbsr &= ~TRBSR_EL1_WRAP;
-+	trbsr &= ~TRBSR_EL1_EC_MASK;
-+	trbsr &= ~TRBSR_EL1_BSC_MASK;
-+	trbsr &= ~TRBSR_EL1_S;
- 	write_sysreg_s(trbsr, SYS_TRBSR_EL1);
- }
- 
-diff --git a/drivers/hwtracing/coresight/coresight-trbe.h b/drivers/hwtracing/coresight/coresight-trbe.h
-index 0b73d9d10aa8..3743d9085355 100644
---- a/drivers/hwtracing/coresight/coresight-trbe.h
-+++ b/drivers/hwtracing/coresight/coresight-trbe.h
-@@ -39,7 +39,7 @@ static inline bool is_trbe_enabled(void)
- 
- static inline int get_trbe_ec(u64 trbsr)
- {
--	return (trbsr >> TRBSR_EC_SHIFT) & TRBSR_EC_MASK;
-+	return (trbsr & TRBSR_EL1_EC_MASK) >> TRBSR_EL1_EC_SHIFT;
- }
- 
- #define TRBE_BSC_NOT_STOPPED 0
-@@ -48,40 +48,40 @@ static inline int get_trbe_ec(u64 trbsr)
- 
- static inline int get_trbe_bsc(u64 trbsr)
- {
--	return (trbsr >> TRBSR_BSC_SHIFT) & TRBSR_BSC_MASK;
-+	return (trbsr & TRBSR_EL1_BSC_MASK) >> TRBSR_EL1_BSC_SHIFT;
- }
- 
- static inline void clr_trbe_irq(void)
- {
- 	u64 trbsr = read_sysreg_s(SYS_TRBSR_EL1);
- 
--	trbsr &= ~TRBSR_IRQ;
-+	trbsr &= ~TRBSR_EL1_IRQ;
- 	write_sysreg_s(trbsr, SYS_TRBSR_EL1);
- }
- 
- static inline bool is_trbe_irq(u64 trbsr)
- {
--	return trbsr & TRBSR_IRQ;
-+	return trbsr & TRBSR_EL1_IRQ;
- }
- 
- static inline bool is_trbe_trg(u64 trbsr)
- {
--	return trbsr & TRBSR_TRG;
-+	return trbsr & TRBSR_EL1_TRG;
- }
- 
- static inline bool is_trbe_wrap(u64 trbsr)
- {
--	return trbsr & TRBSR_WRAP;
-+	return trbsr & TRBSR_EL1_WRAP;
- }
- 
- static inline bool is_trbe_abort(u64 trbsr)
- {
--	return trbsr & TRBSR_ABORT;
-+	return trbsr & TRBSR_EL1_EA;
- }
- 
- static inline bool is_trbe_running(u64 trbsr)
- {
--	return !(trbsr & TRBSR_STOP);
-+	return !(trbsr & TRBSR_EL1_S);
- }
- 
- #define TRBE_TRIG_MODE_STOP		0
+@@ -277,12 +277,10 @@
+ #define TRBSR_EL1_BSC_SHIFT		0
+ #define TRBSR_EL1_FSC_MASK		GENMASK(5, 0)
+ #define TRBSR_EL1_FSC_SHIFT		0
+-#define TRBMAR_SHARE_MASK		GENMASK(1, 0)
+-#define TRBMAR_SHARE_SHIFT		8
+-#define TRBMAR_OUTER_MASK		GENMASK(3, 0)
+-#define TRBMAR_OUTER_SHIFT		4
+-#define TRBMAR_INNER_MASK		GENMASK(3, 0)
+-#define TRBMAR_INNER_SHIFT		0
++#define TRBMAR_EL1_SH_MASK		GENMASK(9, 8)
++#define TRBMAR_EL1_SH_SHIFT		8
++#define TRBMAR_EL1_Attr_MASK		GENMASK(7, 0)
++#define TRBMAR_EL1_Attr_SHIFT		0
+ #define TRBTRG_TRG_MASK			GENMASK(31, 0)
+ #define TRBTRG_TRG_SHIFT		0
+ #define TRBIDR_FLAG			BIT(5)
 -- 
 2.25.1
 
