@@ -1,102 +1,68 @@
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-32.mta1.migadu.com (out-32.mta1.migadu.com [95.215.58.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD8188F74
-	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 12:28:30 +0000 (UTC)
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-3f9d619103dso172381cf.1
-        for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 05:28:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686745709; x=1689337709;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1RWp1GSa1iVrR/gkhCLlSHzUXoyA8xu5TUgKxG/0iXE=;
-        b=XMls8vVHJsWXkcMU3k+sdL9oFwWkx7On44gyfOhi9i9Q7VO5887jHk2RKMPnicHbRA
-         Xhnq9Mz87opchiA6GKhiRdKv/ET8G7G74ZkbuyhsFas5ZT7KKnfzJbzicEcjiJGaE46T
-         7o6NiR/qKDScEy5Z3ZsdWZgFXnCV5+GioL1CIL7NOayTnpZ2djL7yo8XS0aNCnL7Z56I
-         C0PMRJBONZO7qBRSbl/6RKqgIIJZrv7rTQedTFhvR7xzgJ0VdK+xIkr/iyrNClx4htyI
-         RX5X2cmxEYo139BMcPyD/a7JJNVqsCTFZIbn9Kc1xoNKqB6alUEjpFsxKD2TDzd9FZFO
-         sazg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686745709; x=1689337709;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1RWp1GSa1iVrR/gkhCLlSHzUXoyA8xu5TUgKxG/0iXE=;
-        b=GKSX29d9Yg1yGW+gHIysVaHGEinyRbZ2gh5D/fkMWWxpXZ6k0QxRskVFt9hUT/snyt
-         c4V4L6w+HMGCCjq/RAUqkzXSHFem51WiZSc4B2/m9IUtyxxeR+6nuswdI4XWxTgf3Puh
-         M+JUwmhbGRiWdYnRVPM9E1r3jy+BNNdOudIoP21+TKtIDw7ItF+IoSg1cma6NVnxrRss
-         FFCqp+Nr3KtM+Ewq5dZSpDWxUtUoVOkUeuDSLGsrSB0ho/hldHfai9HJQlyylbfG7C4h
-         zwSDGZhCyMQ7AQOVja7ewYXMmFgBqBqzaXlj6IjtPTaapgZT1u5fDDq1YeTbT7Gx95X1
-         jFXA==
-X-Gm-Message-State: AC+VfDzMDrM2iqnyRhmf4bHOfzNLkefFgvguaWrMbmoOX6LXQMnqUuvY
-	PuorWBH/J9p54l6gOps7YV7yhVqzRNX64RhAZ2a8Nw==
-X-Google-Smtp-Source: ACHHUZ5dqL77liI4l+c08Guv5ROvl3QHRcpLv2NCdISXswAWjKdvZWOFuyr+PEbvd1f47DparMcXIZFsJ15tekvYmBU=
-X-Received: by 2002:a05:622a:19a7:b0:3ef:5f97:258f with SMTP id
- u39-20020a05622a19a700b003ef5f97258fmr227795qtc.16.1686745709282; Wed, 14 Jun
- 2023 05:28:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9399C3D99
+	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 12:42:01 +0000 (UTC)
+Date: Wed, 14 Jun 2023 12:41:53 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1686746518;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vVgohHr+8y/naKxQ8awxRJilZdLTVuzyEw7fAcdG64A=;
+	b=vXtoWCWGoWUj4X5qVEdoEmWU3Lyx+lZaNsCO4a9ZC729SBpKTdzHAGvXWIq1eE6BaF+f5C
+	I3pxRCZKlinyC6IeKMy0sqHImLvoZTu17N/DA0fxQBR4wOWyX1CWIFKgz0mI3m8GDtNr7l
+	D7Q2U/q5bDPVLB5U2ddsJl1pTPLiTaI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Reiji Watanabe <reijiw@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Raghavendra Rao Anata <rananta@google.com>
+Subject: Re: [PATCH 1/1] KVM: arm64: PMU: Avoid inappropriate use of host's
+ PMUVer
+Message-ID: <ZIm1kdFBfXYMdfbV@linux.dev>
+References: <20230610194510.4146549-1-reijiw@google.com>
+ <ZIUb/ozyloOm6DfY@linux.dev>
+ <20230611045430.evkcp4py4yuw5qgr@google.com>
+ <ZIV7+yKUdRticwfF@linux.dev>
+ <20230611160105.orvjohigsaevkcrf@google.com>
+ <ZIdzxmgt8257Kv09@linux.dev>
+ <20230613002633.gdttlmn5bnkr4l5i@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230516141531.791492-1-smostafa@google.com> <168665854178.2681974.13725664134174024912.b4-ty@linux.dev>
- <ZIiY8lrLKv4amCu7@google.com>
-In-Reply-To: <ZIiY8lrLKv4amCu7@google.com>
-From: Mostafa Saleh <smostafa@google.com>
-Date: Wed, 14 Jun 2023 13:28:18 +0100
-Message-ID: <CAFgf54q=hr9OoNdfDnMD3_4OHN6sz4928gYgvmz6bdSEpztUUw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Use different pointer authentication keys for pKVM
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, maz@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, suzuki.poulose@arm.com, 
-	kaleshsingh@google.com, tabba@google.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, james.morse@arm.com, will@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230613002633.gdttlmn5bnkr4l5i@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jun 13, 2023 at 5:27=E2=80=AFPM Mostafa Saleh <smostafa@google.com>=
- wrote:
->
-> Hi Oliver,
->
-> On Tue, Jun 13, 2023 at 12:16:02PM +0000, Oliver Upton wrote:
-> > On Tue, 16 May 2023 14:15:31 +0000, Mostafa Saleh wrote:
-> > > When the kernel is compiled with CONFIG_ARM64_PTR_AUTH_KERNEL, it
-> > > uses Armv8.3-Pauth for return address protection for the kernel code
-> > > including nvhe code in EL2.
-> > >
-> > > Same keys are used in both kernel(EL1) and nvhe code(EL2), this is
-> > > fine for nvhe but not when running in protected mode(pKVM) as the hos=
-t
-> > > can't be trusted.
-> > >
-> > > [...]
-> >
-> > Applied to kvmarm/next, thanks!
-> >
-> > [1/1] KVM: arm64: Use different pointer authentication keys for pKVM
-> >       https://git.kernel.org/kvmarm/kvmarm/c/fb737685beee
-> >
-> > --
->
-> Thanks! I did more testing and I found a bug in this patch.
->
-> It seems there is another entry point for the kenrel where pauth was
-> not handled properly "kvm_host_psci_cpu_entry", I will investigate this
-> further and send V2.
->
-> Sorry for the inconvenience!
->
-> Thanks,
-> Mostafa
+On Mon, Jun 12, 2023 at 05:26:33PM -0700, Reiji Watanabe wrote:
+> On Mon, Jun 12, 2023 at 09:36:38PM +0200, Oliver Upton wrote:
+> > I'd rather we start exposing the feature when we provide all the
+> > necessary detail.
+> 
+> To confirm, are you suggesting to stop exposing the event even on hosts
+> w/o PMMIR_EL1 until KVM gets ready to support PMMIR_EL1 ?
+> (guests on those hosts won't get PMMIR_EL1 in any case though?)
+> Could you please explain why ?
+> 
+> Perhaps I think I would rather keep the code as it is?
+> (since I'm simply not sure what would be the benefits of that)
 
-I investigated the problem further and actually the bug is missing
-isb() after updating
-Pauth system registers at EL2, I sent a v2 with this fix.
+I'd rather not keep confusing code hanging around. The fact that KVM
+does not support the STALL_SLOTS event is invariant of both the hardware
+PMU implementation and the userspace value for the ID register field.
+Let's make sure the implementation exactly matches this position.
 
-Although when entering from kvm_host_psci_cpu_entry, the hyp keys are not u=
-sed,
-but this call directly exists to the host, so I believe this should be fine=
-.
+-- 
+Thanks,
+Oliver
