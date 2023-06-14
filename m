@@ -1,68 +1,146 @@
-Received: from out-46.mta1.migadu.com (out-46.mta1.migadu.com [95.215.58.46])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9420101F7
-	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 15:31:46 +0000 (UTC)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1686756704;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CYKbp9Q0BeM52+XXi3aMvjzJfNpfbqXByiTdIuieW4g=;
-	b=ejyEaxmgzfyiMYJ2Vleh7ornI7PLLaFCXL0QtoGCEzSqXZeE+aeSAHa9bGs8qcEfvN+GdI
-	6QBiDAhRREsBGwDEHb0do6SgyuATtK5gKrAL0AETuPTeqL2mRZM939ezA8/a7/MJ6DBnmu
-	hE3lVIU9tPflVcLqFu/8HdfnZ2QR9og=
-From: Oliver Upton <oliver.upton@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDAF11094C
+	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 15:51:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53BEAC433C8;
+	Wed, 14 Jun 2023 15:51:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1686757907;
+	bh=aXqtfOPOwE4+iz5gui+z2qSlHu7RCO7EOHT8YCzHfjM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Y+JnNjm3LfeUwZ1pdv/r3OMvgTcBrxSU6DkRiywsxq9EYrLkt5UnnNH7ghJ9rTYny
+	 XiBP2na+f4sK2QAKS0NcM8ykQdlGm9wDqou8P2nKQbIvB1ptW8s3DLalnqC6Qfpkn5
+	 CGj54INXz4UHJeiORao+pbl4SqtgWXef/LExLZbiIeG57giFCKJ326pRVCokegu98f
+	 8WczCTQcr+UjE+jkqSoIi23lMatU+NnRwhl7Wgbpefy2tFwyKKYS6r2dPkbFKIE76A
+	 I/N5WyEIhc0BNPvyR+glsF51EbJujeli8PWDtSupKo6U47BhMXgU+eHyvjrYgkixGu
+	 5khK1/K/O49AA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1q9Sme-005NHQ-PJ;
+	Wed, 14 Jun 2023 16:51:45 +0100
+From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
-	Mostafa Saleh <smostafa@google.com>,
-	maz@kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	catalin.marinas@arm.com,
-	yuzenghui@huawei.com,
-	tabba@google.com,
-	kaleshsingh@google.com,
-	suzuki.poulose@arm.com,
-	will@kernel.org,
-	james.morse@arm.com
-Subject: Re: [PATCH v2] KVM: arm64: Use different pointer authentication keys for pKVM
-Date: Wed, 14 Jun 2023 15:31:28 +0000
-Message-ID: <168675651878.3255755.17510485264525909343.b4-ty@linux.dev>
-In-Reply-To: <20230614122600.2098901-1-smostafa@google.com>
-References: <20230614122600.2098901-1-smostafa@google.com>
+	kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH] KVM: arm64: Fix hVHE init on CPUs where HCR_EL2.E2H is not RES1
+Date: Wed, 14 Jun 2023 16:51:29 +0100
+Message-Id: <20230614155129.2697388-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 14 Jun 2023 12:25:59 +0000, Mostafa Saleh wrote:
-> When the use of pointer authentication is enabled in the kernel it
-> applies to both the kernel itself as well as KVM's nVHE hypervisor. The
-> same keys are used for both the kernel and the nVHE hypervisor, which is
-> less than desirable for pKVM as the host is not trusted at runtime.
-> 
-> Naturally, the fix is to use a different set of keys for the hypervisor
-> when running in protected mode. Have the host generate a new set of keys
-> for the hypervisor before deprivileging the kernel. While there might be
-> other sources of random directly available at EL2, this keeps the
-> implementation simple, and the host is trusted anyways until it is
-> deprivileged.
-> 
-> [...]
+On CPUs where E2H is RES1, we very quickly set the scene for
+running EL2 with a VHE configuration, as we do not have any other
+choice.
 
-Applied to kvmarm/next, thanks!
+However, CPUs that conform to the current writing of the architecture
+start with E2H=0, and only later upgrade with E2H=1. This is all
+good, but nothing there is actually reconfiguring EL2 to be able
+to correctly run the kernel at EL1. Huhuh...
 
-[1/1] KVM: arm64: Use different pointer authentication keys for pKVM
-      https://git.kernel.org/kvmarm/kvmarm/c/8c15c2a02810
+The "obvious" solution is not to just reinitialise the timer
+controls like we do, but to really intitialise *everything*
+unconditionally.
 
---
-Best,
-Oliver
+This requires a bit of surgery, and is a good opportunity to
+remove the macro that messes with SPSR_EL2 in init_el2_state.
+
+With that, hVHE now works correctly on my trusted A55 machine!
+
+Reported-by: Oliver Upton <oliver.upton@linux.dev>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/el2_setup.h |  1 -
+ arch/arm64/kernel/head.S           |  2 ++
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S | 19 ++++++++++++-------
+ 3 files changed, 14 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+index bba508ffa12d..5a353f94e9cd 100644
+--- a/arch/arm64/include/asm/el2_setup.h
++++ b/arch/arm64/include/asm/el2_setup.h
+@@ -205,7 +205,6 @@
+ 	__init_el2_nvhe_idregs
+ 	__init_el2_cptr
+ 	__init_el2_fgt
+-	__init_el2_nvhe_prepare_eret
+ .endm
+ 
+ #ifndef __KVM_NVHE_HYPERVISOR__
+diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+index e92caebff46a..23955050da73 100644
+--- a/arch/arm64/kernel/head.S
++++ b/arch/arm64/kernel/head.S
+@@ -603,6 +603,8 @@ SYM_INNER_LABEL(init_el2, SYM_L_LOCAL)
+ 	msr	sctlr_el1, x1
+ 	mov	x2, xzr
+ 2:
++	__init_el2_nvhe_prepare_eret
++
+ 	mov	w0, #BOOT_CPU_MODE_EL2
+ 	orr	x0, x0, x2
+ 	eret
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+index f9ee10e29497..74ee77d9cfd0 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+@@ -83,9 +83,6 @@ SYM_CODE_END(__kvm_hyp_init)
+  * x0: struct kvm_nvhe_init_params PA
+  */
+ SYM_CODE_START_LOCAL(___kvm_hyp_init)
+-	ldr	x1, [x0, #NVHE_INIT_TPIDR_EL2]
+-	msr	tpidr_el2, x1
+-
+ 	ldr	x1, [x0, #NVHE_INIT_STACK_HYP_VA]
+ 	mov	sp, x1
+ 
+@@ -99,11 +96,18 @@ SYM_CODE_START_LOCAL(___kvm_hyp_init)
+ 	and	x2, x1, x2
+ 	cbz	x2, 1f
+ 
+-	mrs	x1, cnthctl_el2
+-	and	x1, x1, #~(BIT(0) | BIT(1))
+-	orr	x1, x1, #(BIT(10) | BIT(11))
+-	msr	cnthctl_el2, x1
++	// hVHE: Replay the EL2 setup to account for the E2H bit
++	// TPIDR_EL2 is used to preserve x0 across the macro maze...
++	isb
++	msr	tpidr_el2, x0
++	init_el2_state
++	finalise_el2_state
++	mrs	x0, tpidr_el2
++
+ 1:
++	ldr	x1, [x0, #NVHE_INIT_TPIDR_EL2]
++	msr	tpidr_el2, x1
++
+ 	ldr	x1, [x0, #NVHE_INIT_VTTBR]
+ 	msr	vttbr_el2, x1
+ 
+@@ -193,6 +197,7 @@ SYM_CODE_START_LOCAL(__kvm_hyp_init_cpu)
+ 	/* Initialize EL2 CPU state to sane values. */
+ 	init_el2_state				// Clobbers x0..x2
+ 	finalise_el2_state
++	__init_el2_nvhe_prepare_eret
+ 
+ 	/* Enable MMU, set vectors and stack. */
+ 	mov	x0, x28
+-- 
+2.34.1
+
