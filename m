@@ -1,319 +1,283 @@
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 117953C0A7
-	for <kvmarm@lists.linux.dev>; Tue, 13 Jun 2023 21:38:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686692315; x=1718228315;
-  h=date:from:to:cc:subject:message-id;
-  bh=Guc7gtRTxli+wBjPsahIGhnNE4Kjiv1U0ukfm90hN6g=;
-  b=MsQSOTElt6HfUNZJkjXsORK3nDi1/c9I/KfFd5VQhXMCZZZKhTA765gS
-   JV926etWKiFFMR9baEqZ0/ESYADvkxw5w59odJMmDS3LW+OKt7ON2vNvl
-   UzaKk7kD7YftO0tpCNy/8tGrM5JOO3oIsFV+uIC1PFVZ6LNlfnyqd86OL
-   btmqSHD+zvu9acCbjzL5XtWFbJy/VOKkTd9yVKPBO84chIq1BPo3CAiDh
-   j3sXfu943pCj915mTYdxvpRGuGXA2Al7xghXVWDxInO7pgvYr94lTlDqu
-   GJwdG0IQa6N30iS82lwrNa6vEW2F6HPU7R8ou2mOC4aaIJHogpAVYIf6p
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10740"; a="386859608"
-X-IronPort-AV: E=Sophos;i="6.00,240,1681196400"; 
-   d="scan'208";a="386859608"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2023 14:38:32 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10740"; a="662147806"
-X-IronPort-AV: E=Sophos;i="6.00,240,1681196400"; 
-   d="scan'208";a="662147806"
-Received: from lkp-server01.sh.intel.com (HELO 211f47bdb1cb) ([10.239.97.150])
-  by orsmga003.jf.intel.com with ESMTP; 13 Jun 2023 14:38:23 -0700
-Received: from kbuild by 211f47bdb1cb with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1q9BiZ-0001ng-01;
-	Tue, 13 Jun 2023 21:38:23 +0000
-Date: Wed, 14 Jun 2023 05:38:21 +0800
-From: kernel test robot <lkp@intel.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Linux Memory Management List <linux-mm@kvack.org>,
- amd-gfx@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- kunit-dev@googlegroups.com, kvmarm@lists.linux.dev,
- linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-leds@vger.kernel.org,
- linux-parisc@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-usb@vger.kernel.org, netdev@vger.kernel.org,
- samba-technical@lists.samba.org
-Subject: [linux-next:master] BUILD REGRESSION
- 1f6ce8392d6ff486af5ca96df9ded5882c4b6977
-Message-ID: <202306140504.RvxBbOLo-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A1753EDAE
+	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 00:01:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1686700882;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OIxUJi3S3V13SdWktR3hCfDl7HtGJShCUEdBONYksjo=;
+	b=QZQOwrP0li72iigbBVnw+os5H40SEbPVsg3W4sybRpoAOxMH/fbqvdlvr8vDu+JSWDElsV
+	pOrFEcLont0lW0Wyw8Gf1tyh59x8OEbp5VqOlI4bxGlzn0QyaA/VeNRsJ6lObshxlEZdIS
+	36xKuJSq7+6HESaWaoH+Z7Wh4cr1I/c=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-18-pBknOAWuN_CsLynMcDgNDQ-1; Tue, 13 Jun 2023 20:01:21 -0400
+X-MC-Unique: pBknOAWuN_CsLynMcDgNDQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CA6EC185A795;
+	Wed, 14 Jun 2023 00:01:20 +0000 (UTC)
+Received: from [10.64.54.118] (vpn2-54-118.bne.redhat.com [10.64.54.118])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C76F1121314;
+	Wed, 14 Jun 2023 00:01:17 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH] KVM: Avoid illegal stage2 mapping on invalid memory slot
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, pbonzini@redhat.com, oliver.upton@linux.dev,
+ maz@kernel.org, hshuai@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+References: <20230608090348.414990-1-gshan@redhat.com>
+ <ZIcujNKVosLeQEqR@google.com>
+ <6e335f13-01bd-2972-ead2-3081819aa151@redhat.com>
+ <ZIiEIkn1lFU7Vr1z@google.com>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <16d8b137-7e61-b981-e1cd-9f06f73d4300@redhat.com>
+Date: Wed, 14 Jun 2023 10:01:14 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+In-Reply-To: <ZIiEIkn1lFU7Vr1z@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-branch HEAD: 1f6ce8392d6ff486af5ca96df9ded5882c4b6977  Add linux-next specific files for 20230613
+Hi Sean,
 
-Error/Warning reports:
+On 6/14/23 12:58 AM, Sean Christopherson wrote:
+> On Tue, Jun 13, 2023, Gavin Shan wrote:
+>> On 6/13/23 12:41 AM, Sean Christopherson wrote:
+>>>> Fixes: 3039bcc74498 ("KVM: Move x86's MMU notifier memslot walkers to generic code")
+>>>
+>>> This Fixes isn't correct.  That change only affected x86, which doesn't have this
+>>> bug.  And looking at commit cd4c71835228 ("KVM: arm64: Convert to the gfn-based MMU
+>>> notifier callbacks"), arm64 did NOT skip invalid slots
+> 
+> ...
+> 
+>>> Unless I'm missing something, this goes all the way back to initial arm64 support
+>>> added by commit d5d8184d35c9 ("KVM: ARM: Memory virtualization setup").
+>>>
+>>
+>> The fixes tag was sorted out based on 'git-bisect', not static code analysis. I
+>> agree it should be d5d8184d35c9 ("KVM: ARM: Memory virtualization setup") from
+>> the code. From the 'git-bisect', we found the issue disappears when the head is
+>> commit 3039bcc74498 ("KVM: Move x86's MMU notifier memslot walkers to generic code").
+>> And yes, the fixes tag should be cd4c71835228 ("KVM: arm64: Convert to the gfn-based
+>> MMU notifier callbacks").
+> 
+> No, just because bisect points at a commit doesn't mean that's the commit that
+> introduced a bug.  It's not uncommon for a completely valid change to expose a
+> pre-existing bug, which is what I suspect happened here, e.g. after switching to
+> the generic framework, clean_dcache_guest_page() is called *after* retrieving the
+> memslot, versus clean_dcache_guest_page() being called before walking memslots.
+> 
+> Blaming the correct commit matters, both so that it's clear to future readers what
+> went wrong, and also so that people maintaining older kernels at least are aware
+> that there kernel may be affected.  E.g. a fix in generic KVM obviously won't
+> backport to 5.10, but someone who cares deeply about a 5.10-based kernel on arm64
+> could manually port the fix to KVM arm64 code.
+> 
 
-https://lore.kernel.org/oe-kbuild-all/202306082341.UQtCM8PO-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202306122223.HHER4zOo-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202306132155.BFZc9arF-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202306132237.Z4LJE8bP-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202306140347.S9nJS3Al-lkp@intel.com
+Yes, the change of the call site on clean_dcache_guest_page() enlarges the race
+condition window between memory slot removal and change_pte() theoretically.
+With this, we were able to reproduce the issue in a practical test. In next
+revision, lets put a note about this in the changelog, like below.
 
-Error/Warning: (recently discovered and may have been fixed)
+   We tried a git-bisect and the first problematic commit is cd4c71835228 ("
+   KVM: arm64: Convert to the gfn-based MMU notifier callbacks"). With this,
+   clean_dcache_guest_page() is called after the memory slots are iterated
+   in kvm_mmu_notifier_change_pte(). Without this commit, clean_dcache_guest_page()
+   is called before the iteration on the memory slots. This change literally
+   enlarges the racy window between kvm_mmu_notifier_change_pte() and memory
+   slot removal so that we're able to reproduce the issue in a practical test
+   case. However, the issue exists since d5d8184d35c9 ("KVM: ARM: Memory
+   virtualization setup").
+   
+   Cc: stable@vger.kernel.org # v3.9+
+   Fixes: d5d8184d35c9 ("KVM: ARM: Memory virtualization setup")
 
-arch/microblaze/include/asm/page.h:34: warning: "ARCH_DMA_MINALIGN" redefined
-arch/parisc/kernel/pdt.c:65:6: warning: no previous prototype for 'arch_report_meminfo' [-Wmissing-prototypes]
-csky-linux-ld: drivers/net/ethernet/sfc/ef100_netdev.c:114: undefined reference to `efx_tc_netevent_event'
-drivers/gpu/drm/amd/amdgpu/amdgpu_ras_eeprom.c:76: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
-drivers/gpu/drm/i915/display/intel_display_power.h:256:70: error: declaration of 'struct seq_file' will not be visible outside of this function [-Werror,-Wvisibility]
-drivers/leds/leds-cht-wcove.c:144:21: warning: no previous prototype for 'cht_wc_leds_brightness_get' [-Wmissing-prototypes]
-include/asm-generic/bitops/instrumented-non-atomic.h:141: undefined reference to `uv_info'
-lib/kunit/executor_test.c:138:4: warning: cast from 'void (*)(const void *)' to 'kunit_action_t *' (aka 'void (*)(void *)') converts to incompatible function type [-Wcast-function-type-strict]
-lib/kunit/test.c:775:38: warning: cast from 'void (*)(const void *)' to 'kunit_action_t *' (aka 'void (*)(void *)') converts to incompatible function type [-Wcast-function-type-strict]
+>> I'm declined to fix the issue only for ARM64,
+> 
+> I never suggested that an ARM-only fix be made, in fact I explicitly suggested
+> the exact opposite.
+> 
 
-Unverified Error/Warning (likely false positive, please contact us if interested):
+Well, the original patch ignores the invalid memory slot for all MMU notifiers.
+You suggested to have this ignorance only for change_pte(). The scope is decreased
+and I was following this direction to narrow this issue/fix to change_pte() on
+ARM64 only. Sorry that I misunderstood your suggestion.
 
-arch/arm64/kvm/mmu.c:147:3-9: preceding lock on line 140
-drivers/net/ethernet/mellanox/mlx5/core/lib/devcom.c:98 mlx5_devcom_register_device() error: uninitialized symbol 'tmp_dev'.
-drivers/usb/cdns3/cdns3-starfive.c:23: warning: expecting prototype for cdns3(). Prototype was for USB_STRAP_HOST() instead
-fs/btrfs/volumes.c:6404 btrfs_map_block() error: we previously assumed 'mirror_num_ret' could be null (see line 6242)
-fs/smb/client/cifsfs.c:982 cifs_smb3_do_mount() warn: possible memory leak of 'cifs_sb'
-fs/smb/client/cifssmb.c:4089 CIFSFindFirst() warn: missing error code? 'rc'
-fs/smb/client/cifssmb.c:4216 CIFSFindNext() warn: missing error code? 'rc'
-fs/smb/client/connect.c:2775 cifs_match_super() error: 'tlink' dereferencing possible ERR_PTR()
-fs/smb/client/connect.c:2974 generic_ip_connect() error: we previously assumed 'socket' could be null (see line 2962)
-lib/kunit/test.c:336 __kunit_abort() warn: ignoring unreachable code.
+>> more details are given below. If we're going to limit the issue to ARM64 and
+>> fix it for ARM64 only, the fixes tag should be the one as you pointed. Lets
+>> correct it in next revision with:
+> 
+> For a generic fix, just blame multiple commits, e.g. the guilty arm64, RISC-V,
+> and MIPS commits, which at a glance are the affected architectures.  At one point
+> in time, x86 was also likely affected, but that's probably not worth more than a
+> brief mention in the changelog as I don't see any value in tracking down a very
+> theoretical window of time where x86 was affected.
+> 
 
-Error/Warning ids grouped by kconfigs:
+Right. Please refer to above reply. I plan to add a section in the changelog
+in next revision.
 
-gcc_recent_errors
-|-- alpha-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_ras_eeprom.c:warning:This-comment-starts-with-but-isn-t-a-kernel-doc-comment.-Refer-Documentation-doc-guide-kernel-doc.rst
-|-- arc-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_ras_eeprom.c:warning:This-comment-starts-with-but-isn-t-a-kernel-doc-comment.-Refer-Documentation-doc-guide-kernel-doc.rst
-|-- arm-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_ras_eeprom.c:warning:This-comment-starts-with-but-isn-t-a-kernel-doc-comment.-Refer-Documentation-doc-guide-kernel-doc.rst
-|-- arm-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_ras_eeprom.c:warning:This-comment-starts-with-but-isn-t-a-kernel-doc-comment.-Refer-Documentation-doc-guide-kernel-doc.rst
-|-- arm64-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_ras_eeprom.c:warning:This-comment-starts-with-but-isn-t-a-kernel-doc-comment.-Refer-Documentation-doc-guide-kernel-doc.rst
-|-- arm64-randconfig-c033-20230611
-|   `-- arch-arm64-kvm-mmu.c:preceding-lock-on-line
-|-- csky-randconfig-c044-20230612
-|   |-- csky-linux-ld:drivers-net-ethernet-sfc-ef100_netdev.c:undefined-reference-to-efx_tc_netevent_event
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_ras_eeprom.c:warning:This-comment-starts-with-but-isn-t-a-kernel-doc-comment.-Refer-Documentation-doc-guide-kernel-doc.rst
-|-- i386-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_ras_eeprom.c:warning:This-comment-starts-with-but-isn-t-a-kernel-doc-comment.-Refer-Documentation-doc-guide-kernel-doc.rst
-|   `-- drivers-leds-leds-cht-wcove.c:warning:no-previous-prototype-for-cht_wc_leds_brightness_get
-|-- i386-randconfig-m021-20230612
-|   |-- fs-smb-client-cifsfs.c-cifs_smb3_do_mount()-warn:possible-memory-leak-of-cifs_sb
-|   |-- fs-smb-client-cifssmb.c-CIFSFindFirst()-warn:missing-error-code-rc
-|   |-- fs-smb-client-cifssmb.c-CIFSFindNext()-warn:missing-error-code-rc
-|   |-- fs-smb-client-connect.c-cifs_match_super()-error:tlink-dereferencing-possible-ERR_PTR()
-|   `-- fs-smb-client-connect.c-generic_ip_connect()-error:we-previously-assumed-socket-could-be-null-(see-line-)
-|-- m68k-randconfig-m031-20230612
-|   |-- fs-btrfs-volumes.c-btrfs_map_block()-error:we-previously-assumed-mirror_num_ret-could-be-null-(see-line-)
-|   `-- lib-kunit-test.c-__kunit_abort()-warn:ignoring-unreachable-code.
-|-- microblaze-buildonly-randconfig-r002-20230612
-|   `-- arch-microblaze-include-asm-page.h:warning:ARCH_DMA_MINALIGN-redefined
-|-- mips-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_ras_eeprom.c:warning:This-comment-starts-with-but-isn-t-a-kernel-doc-comment.-Refer-Documentation-doc-guide-kernel-doc.rst
-|-- mips-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_ras_eeprom.c:warning:This-comment-starts-with-but-isn-t-a-kernel-doc-comment.-Refer-Documentation-doc-guide-kernel-doc.rst
-|-- openrisc-randconfig-r013-20230612
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_ras_eeprom.c:warning:This-comment-starts-with-but-isn-t-a-kernel-doc-comment.-Refer-Documentation-doc-guide-kernel-doc.rst
-|-- parisc-allyesconfig
-|   |-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_ras_eeprom.c:warning:This-comment-starts-with-but-isn-t-a-kernel-doc-comment.-Refer-Documentation-doc-guide-kernel-doc.rst
-|-- parisc-defconfig
-|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
-|-- parisc-randconfig-r004-20230612
-|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
-|-- parisc-randconfig-s031-20230612
-|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
-|-- parisc64-defconfig
-|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
-|-- powerpc-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_ras_eeprom.c:warning:This-comment-starts-with-but-isn-t-a-kernel-doc-comment.-Refer-Documentation-doc-guide-kernel-doc.rst
-|-- riscv-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_ras_eeprom.c:warning:This-comment-starts-with-but-isn-t-a-kernel-doc-comment.-Refer-Documentation-doc-guide-kernel-doc.rst
-|   `-- drivers-usb-cdns3-cdns3-starfive.c:warning:expecting-prototype-for-cdns3().-Prototype-was-for-USB_STRAP_HOST()-instead
-|-- riscv-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_ras_eeprom.c:warning:This-comment-starts-with-but-isn-t-a-kernel-doc-comment.-Refer-Documentation-doc-guide-kernel-doc.rst
-|   `-- drivers-usb-cdns3-cdns3-starfive.c:warning:expecting-prototype-for-cdns3().-Prototype-was-for-USB_STRAP_HOST()-instead
-|-- s390-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_ras_eeprom.c:warning:This-comment-starts-with-but-isn-t-a-kernel-doc-comment.-Refer-Documentation-doc-guide-kernel-doc.rst
-|-- s390-randconfig-r026-20230612
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_ras_eeprom.c:warning:This-comment-starts-with-but-isn-t-a-kernel-doc-comment.-Refer-Documentation-doc-guide-kernel-doc.rst
-|-- s390-randconfig-r044-20230612
-|   `-- include-asm-generic-bitops-instrumented-non-atomic.h:undefined-reference-to-uv_info
-|-- sparc-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_ras_eeprom.c:warning:This-comment-starts-with-but-isn-t-a-kernel-doc-comment.-Refer-Documentation-doc-guide-kernel-doc.rst
-|-- x86_64-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_ras_eeprom.c:warning:This-comment-starts-with-but-isn-t-a-kernel-doc-comment.-Refer-Documentation-doc-guide-kernel-doc.rst
-|   `-- drivers-leds-leds-cht-wcove.c:warning:no-previous-prototype-for-cht_wc_leds_brightness_get
-`-- x86_64-randconfig-m001-20230612
-    |-- drivers-net-ethernet-mellanox-mlx5-core-lib-devcom.c-mlx5_devcom_register_device()-error:uninitialized-symbol-tmp_dev-.
-    |-- fs-smb-client-cifsfs.c-cifs_smb3_do_mount()-warn:possible-memory-leak-of-cifs_sb
-    |-- fs-smb-client-cifssmb.c-CIFSFindFirst()-warn:missing-error-code-rc
-    |-- fs-smb-client-cifssmb.c-CIFSFindNext()-warn:missing-error-code-rc
-    |-- fs-smb-client-connect.c-cifs_match_super()-error:tlink-dereferencing-possible-ERR_PTR()
-    `-- fs-smb-client-connect.c-generic_ip_connect()-error:we-previously-assumed-socket-could-be-null-(see-line-)
-clang_recent_errors
-|-- hexagon-buildonly-randconfig-r006-20230612
-|   |-- lib-kunit-executor_test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-|-- hexagon-randconfig-r041-20230612
-|   |-- lib-kunit-executor_test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-|-- hexagon-randconfig-r045-20230612
-|   |-- lib-kunit-executor_test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-|-- riscv-randconfig-r003-20230612
-|   |-- lib-kunit-executor_test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-`-- x86_64-randconfig-r036-20230612
-    `-- drivers-gpu-drm-i915-display-intel_display_power.h:error:declaration-of-struct-seq_file-will-not-be-visible-outside-of-this-function-Werror-Wvisibility
+>>    Cc: stable@vger.kernel.org # v3.9+
+>>    Fixes: d5d8184d35c9 ("KVM: ARM: Memory virtualization setup")
+>>
+>>>> Reported-by: Shuai Hu <hshuai@redhat.com>
+>>>> Reported-by: Zhenyu Zhang <zhenyzha@redhat.com>
+>>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>>>> ---
+>>>>    virt/kvm/kvm_main.c | 3 +++
+>>>>    1 file changed, 3 insertions(+)
+>>>>
+>>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>>>> index 479802a892d4..7f81a3a209b6 100644
+>>>> --- a/virt/kvm/kvm_main.c
+>>>> +++ b/virt/kvm/kvm_main.c
+>>>> @@ -598,6 +598,9 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+>>>>    			unsigned long hva_start, hva_end;
+>>>>    			slot = container_of(node, struct kvm_memory_slot, hva_node[slots->node_idx]);
+>>>> +			if (slot->flags & KVM_MEMSLOT_INVALID)
+>>>> +				continue;
+>>>
+>>> Skipping the memslot will lead to use-after-free.  E.g. if an invalidate_range_start()
+>>> comes along between installing the invalid slot and zapping SPTEs, KVM will
+>>> return from kvm_mmu_notifier_invalidate_range_start() without having dropped all
+>>> references to the range.
+>>>
+>>> I.e.
+>>>
+>>> 	kvm_copy_memslot(invalid_slot, old);
+>>> 	invalid_slot->flags |= KVM_MEMSLOT_INVALID;
+>>> 	kvm_replace_memslot(kvm, old, invalid_slot);
+>>>
+>>> 	/*
+>>> 	 * Activate the slot that is now marked INVALID, but don't propagate
+>>> 	 * the slot to the now inactive slots. The slot is either going to be
+>>> 	 * deleted or recreated as a new slot.
+>>> 	 */
+>>> 	kvm_swap_active_memslots(kvm, old->as_id);
+>>>
+>>>
+>>> ==> invalidate_range_start()
+>>>
+>>> 	/*
+>>> 	 * From this point no new shadow pages pointing to a deleted, or moved,
+>>> 	 * memslot will be created.  Validation of sp->gfn happens in:
+>>> 	 *	- gfn_to_hva (kvm_read_guest, gfn_to_pfn)
+>>> 	 *	- kvm_is_visible_gfn (mmu_check_root)
+>>> 	 */
+>>> 	kvm_arch_flush_shadow_memslot(kvm, old);
+>>>
+>>> And even for change_pte(), skipping the memslot is wrong, as KVM would then fail
+>>> unmap the prior SPTE.  Of course, that can't happen in the current code base
+>>> because change_pte() is wrapped with invalidate_range_{start,end}(), but that's
+>>> more of a bug than a design choice (see c13fda237f08 "KVM: Assert that notifier
+>>> count is elevated in .change_pte()" for details).  That's also why this doesn't
+>>> show up on x86; x86 installs a SPTE for the change_pte() notifier iff an existing
+>>> SPTE is present, which is never true due to the invalidation.
+>>>
+>>
+>> Right, those architectural dependencies are really something I worried about.
+> 
+> The zap case isn't a architecture specific, that's true for all KVM architectures.
+> 
 
-elapsed time: 816m
+Yes.
 
-configs tested: 126
-configs skipped: 6
+>> It's safe to skip the invalid memory slots for ARM64,
+> 
+> No, it's not.  The problematic window where an invalidation can be incorrectly
+> skipped is very tiny, and would have zero chance of being seen without something
+> generating invalidations, e.g. page migration.  But that doesn't mean there's no
+> bug.
+> 
 
-tested configs:
-alpha                            allyesconfig   gcc  
-alpha        buildonly-randconfig-r001-20230612   gcc  
-alpha                               defconfig   gcc  
-alpha                randconfig-r031-20230612   gcc  
-arc                              allyesconfig   gcc  
-arc                                 defconfig   gcc  
-arc                  randconfig-r015-20230612   gcc  
-arc                  randconfig-r025-20230612   gcc  
-arc                  randconfig-r043-20230612   gcc  
-arm                              alldefconfig   clang
-arm                              allmodconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                         axm55xx_defconfig   gcc  
-arm          buildonly-randconfig-r005-20230612   clang
-arm                     davinci_all_defconfig   clang
-arm                                 defconfig   gcc  
-arm                            hisi_defconfig   gcc  
-arm                            mmp2_defconfig   clang
-arm                         nhk8815_defconfig   gcc  
-arm                  randconfig-r046-20230612   clang
-arm                           spitz_defconfig   clang
-arm                           u8500_defconfig   gcc  
-arm64                            allyesconfig   gcc  
-arm64                               defconfig   gcc  
-csky                                defconfig   gcc  
-hexagon      buildonly-randconfig-r006-20230612   clang
-hexagon              randconfig-r041-20230612   clang
-hexagon              randconfig-r045-20230612   clang
-i386                             allyesconfig   gcc  
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-i386                 randconfig-i001-20230612   clang
-i386                 randconfig-i002-20230612   clang
-i386                 randconfig-i003-20230612   clang
-i386                 randconfig-i004-20230612   clang
-i386                 randconfig-i005-20230612   clang
-i386                 randconfig-i006-20230612   clang
-i386                 randconfig-i011-20230612   gcc  
-i386                 randconfig-i012-20230612   gcc  
-i386                 randconfig-i013-20230612   gcc  
-i386                 randconfig-i014-20230612   gcc  
-i386                 randconfig-i015-20230612   gcc  
-i386                 randconfig-i016-20230612   gcc  
-i386                 randconfig-r012-20230612   gcc  
-i386                 randconfig-r014-20230612   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch            randconfig-r035-20230612   gcc  
-m68k                             allmodconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                                defconfig   gcc  
-m68k                        m5307c3_defconfig   gcc  
-m68k                 randconfig-r023-20230612   gcc  
-mips                             allmodconfig   gcc  
-mips                             allyesconfig   gcc  
-mips                        maltaup_defconfig   clang
-mips                        omega2p_defconfig   clang
-mips                 randconfig-r001-20230612   gcc  
-mips                 randconfig-r011-20230612   clang
-mips                       rbtx49xx_defconfig   clang
-mips                         rt305x_defconfig   gcc  
-mips                           xway_defconfig   gcc  
-nios2        buildonly-randconfig-r003-20230612   gcc  
-nios2                               defconfig   gcc  
-nios2                randconfig-r022-20230612   gcc  
-openrisc     buildonly-randconfig-r004-20230612   gcc  
-openrisc             randconfig-r013-20230612   gcc  
-openrisc             randconfig-r024-20230612   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc               randconfig-r004-20230612   gcc  
-parisc64                            defconfig   gcc  
-powerpc                    adder875_defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc                     mpc512x_defconfig   clang
-powerpc                  mpc885_ads_defconfig   clang
-powerpc                    mvme5100_defconfig   clang
-powerpc                     rainier_defconfig   gcc  
-powerpc              randconfig-r033-20230612   clang
-powerpc                    sam440ep_defconfig   gcc  
-powerpc                      walnut_defconfig   clang
-riscv                            allmodconfig   gcc  
-riscv                             allnoconfig   clang
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   gcc  
-riscv                               defconfig   gcc  
-riscv                randconfig-r003-20230612   clang
-riscv                randconfig-r042-20230612   gcc  
-riscv                          rv32_defconfig   gcc  
-s390                             allmodconfig   gcc  
-s390                             allyesconfig   gcc  
-s390                                defconfig   gcc  
-s390                 randconfig-r016-20230612   gcc  
-s390                 randconfig-r026-20230612   gcc  
-s390                 randconfig-r044-20230612   gcc  
-sh                               allmodconfig   gcc  
-sh                             espt_defconfig   gcc  
-sh                          polaris_defconfig   gcc  
-sh                   randconfig-r002-20230612   gcc  
-sparc                            allyesconfig   gcc  
-sparc                               defconfig   gcc  
-sparc64              randconfig-r021-20230612   gcc  
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   clang
-um                           x86_64_defconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64       buildonly-randconfig-r002-20230612   clang
-x86_64                              defconfig   gcc  
-x86_64                                  kexec   gcc  
-x86_64               randconfig-a001-20230613   gcc  
-x86_64               randconfig-a002-20230613   gcc  
-x86_64               randconfig-a003-20230613   gcc  
-x86_64               randconfig-a004-20230613   gcc  
-x86_64               randconfig-a005-20230613   gcc  
-x86_64               randconfig-a006-20230613   gcc  
-x86_64               randconfig-a011-20230612   gcc  
-x86_64               randconfig-a012-20230612   gcc  
-x86_64               randconfig-a013-20230612   gcc  
-x86_64               randconfig-a014-20230612   gcc  
-x86_64               randconfig-a015-20230612   gcc  
-x86_64               randconfig-a016-20230612   gcc  
-x86_64               randconfig-r005-20230612   clang
-x86_64               randconfig-r036-20230612   clang
-x86_64                          rhel-8.3-rust   clang
-x86_64                               rhel-8.3   gcc  
-xtensa                          iss_defconfig   gcc  
+Yeah, Agree.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>> but it may be unsafe to do so for other architectures. You've listed the
+>> potential risks to do so for x86. It might be risky with PowerPC's reverse
+>> mapping stuff either. I didn't look into the code for the left architectures.
+>> In order to escape from the architectural conflicts, I would move the check
+>> and skip the invalid memory slot in arch/arm64/kvm/mmu.c::kvm_set_spte_gfn(),
+>> something like below. In this way, the guest hang issue in ARM64 guest is
+>> fixed. We may have similar issue on other architectures, but we can figure
+>> out the fix when we have to.  Sean, please let me know if you're happy with
+>> this?
+>>
+>> arch/arm64/kvm/mmu.c::kvm_set_spte_gfn()
+>> ----------------------------------------
+>>
+>> bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>> {
+>>          kvm_pfn_t pfn = pte_pfn(range->pte);
+>>
+>>          if (!kvm->arch.mmu.pgt)
+>>                  return false;
+>>
+>>          /*
+>>           * The memory slot can become invalid temporarily or permanently
+>>           * when it's being moved or deleted. Avoid the stage2 mapping so
+>>           * that all the read and write requests to the region of the memory
+>>           * slot can be forwarded to VMM and emulated there.
+>>           */
+>>           if (range->slot->flags & KVM_MEMSLOT_INVALID)
+>>               return false;
+> 
+> Please no.  (a) it papers over common KVM's reliance on the SPTE being zapped by
+> invalidate_range_start(), and (b) it leaves the same bug in RISC-V (which copy+pasted
+> much of arm64's MMU code) and in MIPS (which also installs SPTEs in its callback).
+> 
+
+Ok. Now I understand your suggestion to fix the issue for architectures. I will post
+v3 with your suggested changes.
+
+>>           WARN_ON(range->end - range->start != 1);
+>>
+>>           :
+>> }
+>>
+>>> I'd honestly love to just delete the change_pte() callback, but my opinion is more
+>>> than a bit biased since we don't use KSM.  Assuming we keep change_pte(), the best
+>>> option is probably to provide a wrapper around kvm_set_spte_gfn() to skip the
+>>> memslot, but with a sanity check and comment explaining the dependency on there
+>>> being no SPTEs due to the invalidation.  E.g.
+>>>
+>>
+>> It's good idea, but I'm afraid other architectures like PowerPC will still be
+>> affected.
+> 
+> I don't follow.  PPC unmaps in response to a PTE change, but that's effectively
+> dead code due to change_pte() being wrapped with invalidate_range_{start,end}().
+> 
+
+You're right. I forgot the fact that change_pte() is surrounded by invalidate_{start,end}().
+
+>> So I would like to limit this issue to ARM64 and fix it in its
+>> kvm_set_spte_gfn() variant, as above. One question about "we don't use KSM":
+>> could you please share more information about this? I'm blindly guessing
+>> you're saying KSM isn't used in google cloud?
+> 
+> Yeah, we == Google/GCE.  Sorry, should have clarified that.
+> 
+
+Ok, thanks for your clarification.
+
+Thanks,
+Gavin
+
+
