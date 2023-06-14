@@ -1,146 +1,67 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-26.mta0.migadu.com (out-26.mta0.migadu.com [91.218.175.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDAF11094C
-	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 15:51:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53BEAC433C8;
-	Wed, 14 Jun 2023 15:51:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1686757907;
-	bh=aXqtfOPOwE4+iz5gui+z2qSlHu7RCO7EOHT8YCzHfjM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Y+JnNjm3LfeUwZ1pdv/r3OMvgTcBrxSU6DkRiywsxq9EYrLkt5UnnNH7ghJ9rTYny
-	 XiBP2na+f4sK2QAKS0NcM8ykQdlGm9wDqou8P2nKQbIvB1ptW8s3DLalnqC6Qfpkn5
-	 CGj54INXz4UHJeiORao+pbl4SqtgWXef/LExLZbiIeG57giFCKJ326pRVCokegu98f
-	 8WczCTQcr+UjE+jkqSoIi23lMatU+NnRwhl7Wgbpefy2tFwyKKYS6r2dPkbFKIE76A
-	 I/N5WyEIhc0BNPvyR+glsF51EbJujeli8PWDtSupKo6U47BhMXgU+eHyvjrYgkixGu
-	 5khK1/K/O49AA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1q9Sme-005NHQ-PJ;
-	Wed, 14 Jun 2023 16:51:45 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: James Morse <james.morse@arm.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548E110966
+	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 16:05:28 +0000 (UTC)
+Date: Wed, 14 Jun 2023 16:05:16 +0000
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH] KVM: arm64: Fix hVHE init on CPUs where HCR_EL2.E2H is not RES1
-Date: Wed, 14 Jun 2023 16:51:29 +0100
-Message-Id: <20230614155129.2697388-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
+	Julien Thierry <julien.thierry.kdev@gmail.com>,
+	Salil Mehta <salil.mehta@huawei.com>, nd@arm.com
+Subject: Re: [PATCH kvmtool 00/21] arm64: Handle PSCI calls in userspace
+Message-ID: <ZInlPE/J7W/FLX6P@linux.dev>
+References: <20230526221712.317287-1-oliver.upton@linux.dev>
+ <20230614120503.GA3015626@e124191.cambridge.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230614120503.GA3015626@e124191.cambridge.arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-On CPUs where E2H is RES1, we very quickly set the scene for
-running EL2 with a VHE configuration, as we do not have any other
-choice.
+Hey Joey,
 
-However, CPUs that conform to the current writing of the architecture
-start with E2H=0, and only later upgrade with E2H=1. This is all
-good, but nothing there is actually reconfiguring EL2 to be able
-to correctly run the kernel at EL1. Huhuh...
+Thanks for the review and taking the patches for a spin.
 
-The "obvious" solution is not to just reinitialise the timer
-controls like we do, but to really intitialise *everything*
-unconditionally.
+On Wed, Jun 14, 2023 at 01:05:03PM +0100, Joey Gouly wrote:
+> `kvm_cpu__configure_features` in kvmtool is failing because Linux returns an
+> error if SVE was already finalised (arch/arm64/kvm/reset.c):
+> 
+> ```
+> int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature)
+> {
+>         switch (feature) {
+>         case KVM_ARM_VCPU_SVE:
+>                 if (!vcpu_has_sve(vcpu))
+>                         return -EINVAL;
+> 
+>                 if (kvm_arm_vcpu_sve_finalized(vcpu))
+>                         return -EPERM; // <---- returns here
+> 
+>                 return kvm_vcpu_finalize_sve(vcpu);
+>         }
+> 
+>         return -EINVAL;
+> }
+> ```
+> 
+> It's not immediately obvious to me why finalising SVE twice is an error.
+> Changing that to `return 0;` gets the test passing, but not sure if there
+> are other implications.
 
-This requires a bit of surgery, and is a good opportunity to
-remove the macro that messes with SPSR_EL2 in init_el2_state.
+This is utterly mindless on my part, apologies. The SVE feature
+shouldn't be finalised (again). I'll probably drop patch 8 altogether
+and replace its usage with a direct call to KVM_ARM_VCPU_INIT.
 
-With that, hVHE now works correctly on my trusted A55 machine!
-
-Reported-by: Oliver Upton <oliver.upton@linux.dev>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/el2_setup.h |  1 -
- arch/arm64/kernel/head.S           |  2 ++
- arch/arm64/kvm/hyp/nvhe/hyp-init.S | 19 ++++++++++++-------
- 3 files changed, 14 insertions(+), 8 deletions(-)
-
-diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-index bba508ffa12d..5a353f94e9cd 100644
---- a/arch/arm64/include/asm/el2_setup.h
-+++ b/arch/arm64/include/asm/el2_setup.h
-@@ -205,7 +205,6 @@
- 	__init_el2_nvhe_idregs
- 	__init_el2_cptr
- 	__init_el2_fgt
--	__init_el2_nvhe_prepare_eret
- .endm
- 
- #ifndef __KVM_NVHE_HYPERVISOR__
-diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-index e92caebff46a..23955050da73 100644
---- a/arch/arm64/kernel/head.S
-+++ b/arch/arm64/kernel/head.S
-@@ -603,6 +603,8 @@ SYM_INNER_LABEL(init_el2, SYM_L_LOCAL)
- 	msr	sctlr_el1, x1
- 	mov	x2, xzr
- 2:
-+	__init_el2_nvhe_prepare_eret
-+
- 	mov	w0, #BOOT_CPU_MODE_EL2
- 	orr	x0, x0, x2
- 	eret
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-index f9ee10e29497..74ee77d9cfd0 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-@@ -83,9 +83,6 @@ SYM_CODE_END(__kvm_hyp_init)
-  * x0: struct kvm_nvhe_init_params PA
-  */
- SYM_CODE_START_LOCAL(___kvm_hyp_init)
--	ldr	x1, [x0, #NVHE_INIT_TPIDR_EL2]
--	msr	tpidr_el2, x1
--
- 	ldr	x1, [x0, #NVHE_INIT_STACK_HYP_VA]
- 	mov	sp, x1
- 
-@@ -99,11 +96,18 @@ SYM_CODE_START_LOCAL(___kvm_hyp_init)
- 	and	x2, x1, x2
- 	cbz	x2, 1f
- 
--	mrs	x1, cnthctl_el2
--	and	x1, x1, #~(BIT(0) | BIT(1))
--	orr	x1, x1, #(BIT(10) | BIT(11))
--	msr	cnthctl_el2, x1
-+	// hVHE: Replay the EL2 setup to account for the E2H bit
-+	// TPIDR_EL2 is used to preserve x0 across the macro maze...
-+	isb
-+	msr	tpidr_el2, x0
-+	init_el2_state
-+	finalise_el2_state
-+	mrs	x0, tpidr_el2
-+
- 1:
-+	ldr	x1, [x0, #NVHE_INIT_TPIDR_EL2]
-+	msr	tpidr_el2, x1
-+
- 	ldr	x1, [x0, #NVHE_INIT_VTTBR]
- 	msr	vttbr_el2, x1
- 
-@@ -193,6 +197,7 @@ SYM_CODE_START_LOCAL(__kvm_hyp_init_cpu)
- 	/* Initialize EL2 CPU state to sane values. */
- 	init_el2_state				// Clobbers x0..x2
- 	finalise_el2_state
-+	__init_el2_nvhe_prepare_eret
- 
- 	/* Enable MMU, set vectors and stack. */
- 	mov	x0, x28
 -- 
-2.34.1
-
+Thanks,
+Oliver
