@@ -1,36 +1,38 @@
-Received: from out-8.mta1.migadu.com (out-8.mta1.migadu.com [95.215.58.8])
+Received: from out-46.mta1.migadu.com (out-46.mta1.migadu.com [95.215.58.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA5FB2C9C
-	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 15:31:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9420101F7
+	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 15:31:46 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1686756702;
+	t=1686756704;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=01sXW6nMco73wjdCgRrO6l/Ruca2vxtKLoH6pkBbbok=;
-	b=xLuio2pVOymqCJ0Wtdcda0yNBqV2wLptNoIRi1WXDSdEZqlk3PuEZr8neT6b7Qzp/0/7Ei
-	xgVlbnxto/Ac8YkThjeSkCoMD9cL8ZD3rrqUyg4GpNZ5Pi1jVyqhSVEJxJAci9SNdTVtLj
-	yys7tBM63a7M2BuWq76w4l9r0ll45eA=
+	bh=CYKbp9Q0BeM52+XXi3aMvjzJfNpfbqXByiTdIuieW4g=;
+	b=ejyEaxmgzfyiMYJ2Vleh7ornI7PLLaFCXL0QtoGCEzSqXZeE+aeSAHa9bGs8qcEfvN+GdI
+	6QBiDAhRREsBGwDEHb0do6SgyuATtK5gKrAL0AETuPTeqL2mRZM939ezA8/a7/MJ6DBnmu
+	hE3lVIU9tPflVcLqFu/8HdfnZ2QR9og=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
+	Mostafa Saleh <smostafa@google.com>,
+	maz@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
 Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Quentin Perret <qperret@google.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: (subset) [PATCH v3 00/17] KVM: arm64: Allow using VHE in the nVHE hypervisor
-Date: Wed, 14 Jun 2023 15:31:27 +0000
-Message-ID: <168675651876.3255755.11650251411681563144.b4-ty@linux.dev>
-In-Reply-To: <20230609162200.2024064-1-maz@kernel.org>
-References: <20230609162200.2024064-1-maz@kernel.org>
+	catalin.marinas@arm.com,
+	yuzenghui@huawei.com,
+	tabba@google.com,
+	kaleshsingh@google.com,
+	suzuki.poulose@arm.com,
+	will@kernel.org,
+	james.morse@arm.com
+Subject: Re: [PATCH v2] KVM: arm64: Use different pointer authentication keys for pKVM
+Date: Wed, 14 Jun 2023 15:31:28 +0000
+Message-ID: <168675651878.3255755.17510485264525909343.b4-ty@linux.dev>
+In-Reply-To: <20230614122600.2098901-1-smostafa@google.com>
+References: <20230614122600.2098901-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,57 +43,25 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On Fri, 9 Jun 2023 17:21:43 +0100, Marc Zyngier wrote:
-> KVM (on ARMv8.0) and pKVM (on all revisions of the architecture) use
-> the split hypervisor model that makes the EL2 code more or less
-> standalone. In the later case, we totally ignore the VHE mode and
-> stick with the good old v8.0 EL2 setup.
+On Wed, 14 Jun 2023 12:25:59 +0000, Mostafa Saleh wrote:
+> When the use of pointer authentication is enabled in the kernel it
+> applies to both the kernel itself as well as KVM's nVHE hypervisor. The
+> same keys are used for both the kernel and the nVHE hypervisor, which is
+> less than desirable for pKVM as the host is not trusted at runtime.
 > 
-> This is all good, but means that the EL2 code is limited in what it
-> can do with its own address space. This series proposes to remove this
-> limitation and to allow VHE to be used even with the split hypervisor
-> model. This has some potential isolation benefits[1], and eventually
-> allow systems that do not support HCR_EL2.E2H==0 to run pKVM.
+> Naturally, the fix is to use a different set of keys for the hypervisor
+> when running in protected mode. Have the host generate a new set of keys
+> for the hypervisor before deprivileging the kernel. While there might be
+> other sources of random directly available at EL2, this keeps the
+> implementation simple, and the host is trusted anyways until it is
+> deprivileged.
 > 
 > [...]
 
-I decided we should probably should have this in -next for a bit before
-sending a pull request. We can shove any fixes on top as needed.
-
 Applied to kvmarm/next, thanks!
 
-[01/17] KVM: arm64: Drop is_kernel_in_hyp_mode() from __invalidate_icache_guest_page()
-        https://git.kernel.org/kvmarm/kvmarm/c/c4b9fd2ac035
-[02/17] arm64: Prevent the use of is_kernel_in_hyp_mode() in hypervisor code
-        https://git.kernel.org/kvmarm/kvmarm/c/35230be87ec6
-[03/17] arm64: Turn kaslr_feature_override into a generic SW feature override
-        https://git.kernel.org/kvmarm/kvmarm/c/0ddc312b7c73
-[04/17] arm64: Add KVM_HVHE capability and has_hvhe() predicate
-        https://git.kernel.org/kvmarm/kvmarm/c/e2d6c906f0ac
-[05/17] arm64: Don't enable VHE for the kernel if OVERRIDE_HVHE is set
-        https://git.kernel.org/kvmarm/kvmarm/c/7a26e1f51e3c
-[06/17] arm64: Allow EL1 physical timer access when running VHE
-        https://git.kernel.org/kvmarm/kvmarm/c/9e7462bbe00d
-[07/17] arm64: Use CPACR_EL1 format to set CPTR_EL2 when E2H is set
-        https://git.kernel.org/kvmarm/kvmarm/c/659803aef48b
-[08/17] KVM: arm64: Remove alternatives from sysreg accessors in VHE hypervisor context
-        https://git.kernel.org/kvmarm/kvmarm/c/57e784b4079e
-[09/17] KVM: arm64: Key use of VHE instructions in nVHE code off ARM64_KVM_HVHE
-        https://git.kernel.org/kvmarm/kvmarm/c/6f617d3aa643
-[10/17] KVM: arm64: Force HCR_EL2.E2H when ARM64_KVM_HVHE is set
-        https://git.kernel.org/kvmarm/kvmarm/c/d0daf5a21e63
-[11/17] KVM: arm64: Disable TTBR1_EL2 when using ARM64_KVM_HVHE
-        https://git.kernel.org/kvmarm/kvmarm/c/cff3b5cf96ed
-[12/17] KVM: arm64: Adjust EL2 stage-1 leaf AP bits when ARM64_KVM_HVHE is set
-        https://git.kernel.org/kvmarm/kvmarm/c/6537565fd9b7
-[13/17] KVM: arm64: Rework CPTR_EL2 programming for HVHE configuration
-        https://git.kernel.org/kvmarm/kvmarm/c/75c76ab5a641
-[14/17] KVM: arm64: Program the timer traps with VHE layout in hVHE mode
-        https://git.kernel.org/kvmarm/kvmarm/c/aca18585db4f
-[15/17] KVM: arm64: Force HCR_E2H in guest context when ARM64_KVM_HVHE is set
-        https://git.kernel.org/kvmarm/kvmarm/c/38cba55008e5
-[16/17] arm64: Allow arm64_sw.hvhe on command line
-        https://git.kernel.org/kvmarm/kvmarm/c/ad744e8cb346
+[1/1] KVM: arm64: Use different pointer authentication keys for pKVM
+      https://git.kernel.org/kvmarm/kvmarm/c/8c15c2a02810
 
 --
 Best,
