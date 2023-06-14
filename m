@@ -1,50 +1,50 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72D632EC16
-	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 19:26:46 +0000 (UTC)
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-25e803def73so407502a91.1
-        for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 12:26:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74E092EC11
+	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 20:03:32 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-bb2202e0108so1125682276.1
+        for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 13:03:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686770805; x=1689362805;
+        d=google.com; s=20221208; t=1686773011; x=1689365011;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EMoZVBBfAkPJKgsC9TR9d3GGxsO25gF0HsErm4KOn9w=;
-        b=VUAau8TOMKQ3oHB9kg8YFP7Oq22r/p+u3cdV5cLi1CW8fh3wktB0cNjzHumTXCKhVX
-         MxntIO6xZR11kSqSPcaD1PJGjmeOgWZXDpmzfeoaMhfdyZr6z1hhV62a6OzrwEMxbWDg
-         uWktLUI7ZBBfYBxbcd3H80W/W1z0a2uBsONuBy3NxGtuBb+8kiw/HOjXzQdRkVe+VVHX
-         wSR9OvDo9qVg23ER08IIdyUWfEcBtENty+CHaEoZVy5uMoEcptz2tqJYPsffLSxFfooS
-         U9/rA82ugPJckLF8Dg9UlEepEZqHSTf7wcaHOZzyBwkD7/K2MjrPUtGLOdZNNtRcU/LU
-         spWA==
+        bh=xth/dKnZ4X28lQoTZbFQ4tulO57k+1JCaPSWj9iO4eA=;
+        b=a2rTpf7tk/AhTyaMcYRwTgveD/G8LLIuNF+Gea95Z3/RsC3wXxo0/bTqFAHMnfze4L
+         eH2vCFSAcUaRd7/8sO+PgzGelO8zrfjlb9IG8QqyC59Ph/lXTWsBYnR/oom4t7T3UNL7
+         kGC34V5rXEAZoVoUDymcTzLyTBV+bRMjMMrmqlIuq6rbluMMs5hvDWNYWma2QcTe3KzU
+         0k04HeWakaDnpABs8q3TNyI6rnjZKZmoeUL4MzEuwMzJEe0gNWpmMuJaZI9PlbxKuoeI
+         9ArdigBUyHR9upmYoGm3/n2arWjzhVC+SqOptnenPIXJkw1vyxDT8CuIJtqYmk6FpDrg
+         ly5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686770805; x=1689362805;
+        d=1e100.net; s=20221208; t=1686773011; x=1689365011;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EMoZVBBfAkPJKgsC9TR9d3GGxsO25gF0HsErm4KOn9w=;
-        b=gI/CGmt6ZhgnUeR1sfldqWkKpFpP2AKUFb2QA6Qpgzp6Hn8c73bOYFjFlNIPsgvdZ/
-         hVkmUPxM1rRKyzWtwiVrhlwHkPVFZlO+C2cqS1Br1cgXuu9xR/56hHSt/8HqxMjhAfsQ
-         auekf9ibbKt+MbRzQjdSNdHLlncKdSSYvfh/NtkpUUhx8OgtM1sVlPR3wkp0k5FzXUO9
-         bUCtldi8xP1RPujq2Ukg/HrIVVIfXFzMVdpZjiWSIsqX1XobPgNfWJForgX6JiJ9cKLd
-         ydo8ruObywQErHlH4+H/zLygqa45ECvJ1fB0vx5c3suB1h1NMBoGYeqhDxwpmOHb46N7
-         h9Rg==
-X-Gm-Message-State: AC+VfDyqosiH9/RP2kH6ftixjmtMH6QUsgq5USdbrU8FfJLlpO7wW97u
-	Clu/G1LW0Cp7EuTE2zPzLRTE3F9eqmY=
-X-Google-Smtp-Source: ACHHUZ7UY/1dGDE3Zk8+hssNCDQ9Ipi/kqHb2vuOsuwkF68VkWgX3v+6zrE0+PsnZX+5BgxV70uRL71I0MU=
+        bh=xth/dKnZ4X28lQoTZbFQ4tulO57k+1JCaPSWj9iO4eA=;
+        b=H5RcocuUnP2j3sQ02DA23scP2/NPe0qSjTJPepM9BHqIkJhRnwPheNqbVhhotlE191
+         ChKsT1ZGGzMTC37z3FWecz3fveb1J0z09mVnkWG/B+0T37s9YDHDuwyu1zcv1NTMvyj9
+         vd3wreRUJNIC/ZPIa73WbhhllgS8bcXX4ovxmFcJgLlKxGOvgQudhywYt5nBeqZ864QY
+         NvWLAKQR/RDW/UEaxLpYBoBOyx+xYlzCH2PTt0ympKWcQoDJuCZU2pJJLD0ivWAICfV1
+         LY9h6Ay1vo0JOrNZlDy4yS4bHEY5/uyWUQ4OcbgXUqVwGuaESyIgg1jbtg/lRe9sJJ9a
+         954A==
+X-Gm-Message-State: AC+VfDzl9e7wHNS2huWxuBFLLSsvJSOGABJUC3tF7c74eAbCxtSl7VUb
+	C6WawwtWXtDYairfWZiw8GeqQDdW33M=
+X-Google-Smtp-Source: ACHHUZ5YC9fqFsbs2BK2YWnqhrDW9n8lci9HZwrS4su/Z+3YN/mtXio3BUOmvgDd38altuGk76kFhSg88x4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:a684:b0:25b:ea08:d641 with SMTP id
- d4-20020a17090aa68400b0025bea08d641mr412405pjq.7.1686770805592; Wed, 14 Jun
- 2023 12:26:45 -0700 (PDT)
-Date: Wed, 14 Jun 2023 12:26:43 -0700
-In-Reply-To: <20230602161921.208564-8-amoorthy@google.com>
+ (user=seanjc job=sendgmr) by 2002:a5b:608:0:b0:ba8:54dc:9d0 with SMTP id
+ d8-20020a5b0608000000b00ba854dc09d0mr383540ybq.12.1686773011429; Wed, 14 Jun
+ 2023 13:03:31 -0700 (PDT)
+Date: Wed, 14 Jun 2023 13:03:30 -0700
+In-Reply-To: <20230602161921.208564-9-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-8-amoorthy@google.com>
-Message-ID: <ZIoUc2hLd0zMOhO+@google.com>
-Subject: Re: [PATCH v4 07/16] KVM: Simplify error handling in __gfn_to_pfn_memslot()
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-9-amoorthy@google.com>
+Message-ID: <ZIodEnUmwIv+Iuqd@google.com>
+Subject: Re: [PATCH v4 08/16] KVM: x86: Annotate -EFAULTs from kvm_handle_error_pfn()
 From: Sean Christopherson <seanjc@google.com>
 To: Anish Moorthy <amoorthy@google.com>
 Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
@@ -55,52 +55,113 @@ Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
 Content-Type: text/plain; charset="us-ascii"
 
 On Fri, Jun 02, 2023, Anish Moorthy wrote:
-> KVM_HVA_ERR_RO_BAD satisfies kvm_is_error_hva(), so there's no need to
-> duplicate the "if (writable)" block. Fix this by bringing all
-> kvm_is_error_hva() cases under one conditional.
+> Implement KVM_CAP_MEMORY_FAULT_INFO for efaults generated by
+> kvm_handle_error_pfn().
 > 
 > Signed-off-by: Anish Moorthy <amoorthy@google.com>
 > ---
->  virt/kvm/kvm_main.c | 12 +++++-------
->  1 file changed, 5 insertions(+), 7 deletions(-)
+>  arch/x86/kvm/mmu/mmu.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
 > 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index b9d2606f9251..05d6e7e3994d 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2711,16 +2711,14 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
->  	if (hva)
->  		*hva = addr;
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index c8961f45e3b1..cb71aae9aaec 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3291,6 +3291,10 @@ static void kvm_send_hwpoison_signal(struct kvm_memory_slot *slot, gfn_t gfn)
 >  
-> -	if (addr == KVM_HVA_ERR_RO_BAD) {
-> -		if (writable)
-> -			*writable = false;
-> -		return KVM_PFN_ERR_RO_FAULT;
-> -	}
-> -
->  	if (kvm_is_error_hva(addr)) {
->  		if (writable)
->  			*writable = false;
-> -		return KVM_PFN_NOSLOT;
+>  static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>  {
+> +	uint64_t rounded_gfn;
+
+gfn_t, and probably no need to specificy "rounded", let the code do the talking.
+
+> +	uint64_t fault_size;
+> +	uint64_t fault_flags;
+
+With a few exceptions that we should kill off, KVM uses "u64", not "uint64_t".
+Though arguably the "size" should be gfn_t too.
+
+And these can all go on a single line, e.g.
+
+	u64 fault_size, fault_flags;
+
+Though since the kvm_run.memory_fault field and the param to the helper are "len",
+a simple "len" here is better IMO.
+
+And since this is not remotely performance sensitive, I wouldn't bother deferring
+the initialization, e.g.
+
+	gfn_t gfn = gfn_round_for_level(fault->gfn, fault->goal_level);
+	gfn_t len = KVM_HPAGE_SIZE(fault->goal_level);
+	u64 fault_flags;
+
+All that said, consuming fault->goal_level is unnecessary, and not be coincidence.
+The *only* time KVM should bail to userspace is if KVM failed to faultin a 4KiB
+page.  Providing a hugepage is done opportunistically, it's never a hard requirement.
+So throw away all of the above and see below.
+
 > +
-> +		if (addr == KVM_HVA_ERR_RO_BAD)
-> +			return KVM_PFN_ERR_RO_FAULT;
-> +		else
-> +			return KVM_PFN_NOSLOT;
+>  	if (is_sigpending_pfn(fault->pfn)) {
+>  		kvm_handle_signal_exit(vcpu);
+>  		return -EINTR;
+> @@ -3309,6 +3313,15 @@ static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fa
+>  		return RET_PF_RETRY;
+>  	}
+>  
+> +	fault_size = KVM_HPAGE_SIZE(fault->goal_level);
+> +	rounded_gfn = round_down(fault->gfn * PAGE_SIZE, fault_size);
 
-Similar to an earlier patch, preferred style for terminal if-statements is
+We have a helper for this too, gfn_round_for_level().  Ooh, but this isn't storing
+a gfn, it's storing a gpa.  Naughty, naughty.
+	
+> +
+> +	fault_flags = 0;
+> +	if (fault->write)
+> +		fault_flags |= KVM_MEMORY_FAULT_FLAG_WRITE;
+> +	if (fault->exec)
 
-		if (addr == KVM_HVA_ERR_RO_BAD)
-			return KVM_PFN_ERR_RO_FAULT;
+exec and write are mutually exclusive.  There's even documented precedent for
+this in page_fault_can_be_fast().
 
-		return KVM_PFN_NOSLOT;
+So with a READ flag, this can be
 
-Again, there are reasons for the style/rule.  In this case, it will yield a smaller
-diff (obviously not a huge deal, but helpful), and it makes it more obvious that
-the taken path of "if (kvm_is_error_hva(addr))" is itself terminal.
+	if (fault->write)
+		fault_flags = KVM_MEMORY_FAULT_FLAG_WRITE;
+	else if (fault->exec)
+		fault_flags = KVM_MEMORY_FAULT_FLAG_EXEC;
+	else
+		fault_flags = KVM_MEMORY_FAULT_FLAG_READ;
 
-Alternatively, a ternary operator is often used for these types of things, though
-in this case I much prefer the above, as I find the below hard to read.
+Or as Paolo would probably write it ;-)
 
-		return addr == KVM_HVA_ERR_RO_BAD ? KVM_PFN_ERR_RO_FAULT :
-						    KVM_PFN_NOSLOT;
+	fault_flags = (fault->write & 1) << KVM_MEMORY_FAULT_FLAG_WRITE_SHIFT |
+		      (fault->exec & 1) << KVM_MEMORY_FAULT_FLAG_EXEC_SHIFT |
+		      (!fault->write && !fault->exec) << KVM_MEMORY_FAULT_FLAG_READ_SHIFT;
+
+(that was a joke, don't actually do that)
+
+> +		fault_flags |= KVM_MEMORY_FAULT_FLAG_EXEC;
+> +	kvm_populate_efault_info(vcpu, rounded_gfn, fault_size, fault_flags);
+
+This is where passing a "gfn" variable as a "gpa" looks broken.
+
+>  	return -EFAULT;
+
+All in all, something like this?
+
+	u64 fault_flags;
+
+	<other error handling>
+
+	/* comment goes here */
+	WARN_ON_ONCE(fault->goal_level != PG_LEVEL_4K);
+
+	if (fault->write)
+		fault_flags = KVM_MEMORY_FAULT_FLAG_WRITE;
+	else if (fault->exec)
+		fault_flags = KVM_MEMORY_FAULT_FLAG_EXEC;
+	else
+		fault_flags = KVM_MEMORY_FAULT_FLAG_READ;
+
+	kvm_handle_blahblahblah_fault(vcpu, gfn_to_gpa(fault->gfn), PAGE_SIZE,
+				      fault_flags);
