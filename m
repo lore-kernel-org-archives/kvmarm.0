@@ -1,50 +1,50 @@
 Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27F7D101DD
-	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 20:25:18 +0000 (UTC)
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-bcef239a9fbso143792276.1
-        for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 13:25:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB376D3F
+	for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 21:20:35 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-bb2fae9b286so1130040276.3
+        for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 14:20:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686774318; x=1689366318;
+        d=google.com; s=20221208; t=1686777634; x=1689369634;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TQP3yKANSdJaGpHIoSjygsRuBRtatk9kXbKWlLHfOX0=;
-        b=mBRUipmKMnt/8crj4NeT1dfesMkIIaLHc109CZoZqwN4fM4pLmESBO4fBRiYCneCwy
-         mDygdWsNM7SZXMC3zSIWpumHCIig9eaDA9A7+ndsxOozz88/qMSiWVim4HFEF9+/McSI
-         4ARNDtuClWiXSzSSn0QqHTAl4YHKakhpnlKpe///BtlQrkLLtFqr/JRL8ZBZJc4fEt+r
-         7GYUF+3dERlV3iSFmSvZP0N7JhQOKlAt9UM5+YxJfQpLM6E0c3Vs+JXSmPcFxU/ly84K
-         MfwarMHIPDgVsR4EUsBOMHhh7mmn5nFC85ZvgwNAYekLTmdzHOjIO3A32mG64UM5obhz
-         avRg==
+        bh=x6hmc6akWZOXS6z57inXO64YQNQW6poAh6GVOTwAKPI=;
+        b=wIvB/HT/XmzHwNVWmyp4gmc9ivMsqG6Vv+COxc694rcZRkSui7P0fdvEyRLm/RIo8c
+         7C6nStlgSUi8l94T+XiRi7phPIx5ApGS2Dxfld5jVKNyn/Z9mFWzz/8yfdF7uPsWHBs9
+         ZusULuK0gkIyHC73eD9oSibp9POPfmzMbBrXe3+yfDY9aAYMYBniUjH8PPMVbYFKOVAF
+         BzjUIVjJmzBJIagyUMDpv1vwgDxiFO2x9nzlYnnrWQ9N+yMM9YCTFx++JKDpP2rzfdJn
+         OWlV0iUsEDO9vzdxXcNsHrQ02mCED5KCVK2hoa3DaSDo2pxCP5VSUMfv5Y0mA12Q34d/
+         2L0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686774318; x=1689366318;
+        d=1e100.net; s=20221208; t=1686777634; x=1689369634;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TQP3yKANSdJaGpHIoSjygsRuBRtatk9kXbKWlLHfOX0=;
-        b=DgUh3fgsfo+MEKnRUgp/Rhoiu0t/mMEGHMIThyu4R6DCqoH/Xy6Efu/dGcBZKG9UL8
-         2sE9CHyUSaQdSiEktRM1kfjghgeH38uAPDRzi+D6YpAWA8FkH9UJDhSTJEChg1l1OGRF
-         PnwUeo/uRLnPjM0uFpFwjR576crjqxNeZNvDfZMFwLOJQ/5WVJugHgGfJwX+QU0dbmgr
-         6ftijdgihuGcioJc5dIVzufNj8amA5ZRu6oFsEoQYaxE/1i/TPWKwiz6np2zgQ7ogVEF
-         pdJbkW1P9RmvSI8EJL741zilx7+X37wocDOTORiYMANGWlK/1MsGAXxGZ1LLFwyyW8es
-         U/ZQ==
-X-Gm-Message-State: AC+VfDwbRFvjcnouU4woy0l1o8FIHqomUC/gbxlgcfL/HOhWsgXQ9nwq
-	to+tJhtjDRe+A6u/7BFIGFNlLHEIrVk=
-X-Google-Smtp-Source: ACHHUZ7uV3qfE5wDKEFNhAw0hJ7SWAeJwh3eagfxYc279M8XxA1fVNOzH1aWNqsgS6QXoYvvT84EtADmvu4=
+        bh=x6hmc6akWZOXS6z57inXO64YQNQW6poAh6GVOTwAKPI=;
+        b=HGFem2xhmwZ+v5HA36U+U2WMudmpUVO8otArzOuPSe0xhVaLtH0jkRrtOE8RHpwwiy
+         fwmB4s+DWSe8CdjgWcL+58WR1PfzNxf4ruhG/6EJcBgCIFFa9JdLX+B1tXsCzTvSuR1Y
+         33kZgSSlLFkuUmT93u+GJEsA3dhZ9FhHZ2nnc37afJ/Mxf3t0/v9By1yWc4znJ1TnTQ/
+         P3SDBPBF951hroSTw3FGBq22noSVtY6x/VAKSzoIqW64/JT9ORZ1u1hhGOAYRYJA5REo
+         r8iJT6oOWl5w5e9brcEEEGBBN38Jb/tkiSjXmqGHocf4hb+yLQMv8wu6MshJ5KNhzSQV
+         5Ahg==
+X-Gm-Message-State: AC+VfDzG/p7N4mr6bu6F33iUTg4MclcW06Ly0ZcDuBJCwZjk/8nvOiqM
+	ePeLd6z9LzWJPN+TnKvi5/qOjIYmw2Y=
+X-Google-Smtp-Source: ACHHUZ7/OAjVtrru1qxA+/Rr5tOMBJ37bkvlWQL8ZDLr371hkMHH9s1uHK7jXpwqUhzy6BE8Id0Xvpy0vvs=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1185:b0:ba8:381b:f764 with SMTP id
- m5-20020a056902118500b00ba8381bf764mr1192321ybu.3.1686774318001; Wed, 14 Jun
- 2023 13:25:18 -0700 (PDT)
-Date: Wed, 14 Jun 2023 13:25:16 -0700
-In-Reply-To: <20230602161921.208564-11-amoorthy@google.com>
+ (user=seanjc job=sendgmr) by 2002:a25:e6c7:0:b0:bc6:8b95:5bd6 with SMTP id
+ d190-20020a25e6c7000000b00bc68b955bd6mr451694ybh.1.1686777634367; Wed, 14 Jun
+ 2023 14:20:34 -0700 (PDT)
+Date: Wed, 14 Jun 2023 14:20:32 -0700
+In-Reply-To: <20230602161921.208564-10-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-11-amoorthy@google.com>
-Message-ID: <ZIoiLGotFsDDvRN3@google.com>
-Subject: Re: [PATCH v4 10/16] KVM: x86: Implement KVM_CAP_NOWAIT_ON_FAULT
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-10-amoorthy@google.com>
+Message-ID: <ZIovIBVLIM69E5Bo@google.com>
+Subject: Re: [PATCH v4 09/16] KVM: Introduce KVM_CAP_NOWAIT_ON_FAULT without implementation
 From: Sean Christopherson <seanjc@google.com>
 To: Anish Moorthy <amoorthy@google.com>
 Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
@@ -55,76 +55,76 @@ Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
 Content-Type: text/plain; charset="us-ascii"
 
 On Fri, Jun 02, 2023, Anish Moorthy wrote:
-> When the memslot flag is enabled, fail guest memory accesses for which
-> fast-gup fails (ie, where resolving the page fault would require putting
-> the faulting thread to sleep).
-> 
-> Suggested-by: James Houghton <jthoughton@google.com>
-> Signed-off-by: Anish Moorthy <amoorthy@google.com>
-> ---
->  Documentation/virt/kvm/api.rst |  2 +-
->  arch/x86/kvm/mmu/mmu.c         | 17 ++++++++++++-----
->  arch/x86/kvm/x86.c             |  1 +
->  3 files changed, 14 insertions(+), 6 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 9daadbe2c7ed..aa7b4024fd41 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -7783,7 +7783,7 @@ bugs and reported to the maintainers so that annotations can be added.
->  7.35 KVM_CAP_NOWAIT_ON_FAULT
->  ----------------------------
->  
-> -:Architectures: None
-> +:Architectures: x86
->  :Returns: -EINVAL.
->  
->  The presence of this capability indicates that userspace may pass the
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index cb71aae9aaec..288008a64e5c 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -4299,7 +4299,9 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
->  	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true, NULL);
->  }
->  
-> -static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> +static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu,
-> +			     struct kvm_page_fault *fault,
-> +			     bool nowait)
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 69a221f71914..abbc5dd72292 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -2297,4 +2297,10 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
+>   */
+>  inline void kvm_populate_efault_info(struct kvm_vcpu *vcpu,
+>  				     uint64_t gpa, uint64_t len, uint64_t flags);
+> +
+> +static inline bool kvm_slot_nowait_on_fault(
+> +	const struct kvm_memory_slot *slot)
 
-More booleans!?  Just say no!  And in this case, there's no reason to pass in a
-flag, just handle this entirely in __kvm_faultin_pfn().
+Just when I was starting to think that we had beat all of the Google3 out of you :-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 7b6eab6f84e8..ebf21f1f43ce 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4302,6 +4302,7 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
- static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- {
-        struct kvm_memory_slot *slot = fault->slot;
-+       bool nowait = kvm_is_slot_nowait_on_fault(slot);
-        bool async;
+And predicate helpers in KVM typically have "is" or "has" in the name, so that it's
+clear the helper queries, versus e.g. sets the flag or something. 
+
+> +{
+> +	return slot->flags & KVM_MEM_NOWAIT_ON_FAULT;
+
+KVM is anything but consistent, but if the helper is likely to be called without
+a known good memslot, it probably makes sense to have the helper check for NULL,
+e.g.
+
+static inline bool kvm_is_slot_nowait_on_fault(const struct kvm_memory_slot *slot)
+{
+	return slot && slot->flags & KVM_MEM_NOWAIT_ON_FAULT;
+}
+
+However, do we actually need to force vendor code to query nowait?  At a glance,
+the only external (relative to kvm_main.c) users of __gfn_to_pfn_memslot() are
+in flows that play nice with nowait or that don't support it at all.  So I *think*
+we can do this?
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index be06b09e9104..78024318286d 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2403,6 +2403,11 @@ static bool memslot_is_readonly(const struct kvm_memory_slot *slot)
+        return slot->flags & KVM_MEM_READONLY;
+ }
  
-        /*
-@@ -4332,9 +4333,12 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
++static bool memslot_is_nowait_on_fault(const struct kvm_memory_slot *slot)
++{
++       return slot->flags & KVM_MEM_NOWAIT_ON_FAULT;
++}
++
+ static unsigned long __gfn_to_hva_many(const struct kvm_memory_slot *slot, gfn_t gfn,
+                                       gfn_t *nr_pages, bool write)
+ {
+@@ -2730,6 +2735,11 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
+                writable = NULL;
         }
  
-        async = false;
--       fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, false, &async,
--                                         fault->write, &fault->map_writable,
--                                         &fault->hva);
++       if (async && memslot_is_nowait_on_fault(slot)) {
++               *async = false;
++               async = NULL;
++       }
 +
-+       fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn,
-+                                         nowait, false,
-+                                         nowait ? NULL : &async,
-+                                         fault->write, &fault->map_writable, &fault->hva);
-+
-        if (!async)
-                return RET_PF_CONTINUE; /* *pfn has correct page already */
+        return hva_to_pfn(addr, atomic, interruptible, async, write_fault,
+                          writable);
+ }
 
+Ah, crud.  The above highlights something I missed in v3.  The memslot NOWAIT
+flag isn't tied to FOLL_NOWAIT, it's really truly a "fast-only" flag.  And even
+more confusingly, KVM does set FOLL_NOWAIT, but for the async #PF case, which will
+get even more confusing if/when KVM uses FOLL_NOWAIT internally.
 
-On a related topic, I would *love* for someone to overhaul gfn_to_pfn() to replace
-the "booleans for everything" approach and instead have KVM pass FOLL_* flags
-internally.  Rough sketch here: https://lkml.kernel.org/r/ZGvUsf7lMkrNDHuE%40google.com
+Drat.  I really like the NOWAIT name, but unfortunately it doesn't do what as the
+name says.
+
+I still don't love "fast-only" as that bleeds kernel internals to userspace.
+Anyone have ideas?  Maybe something about not installing new mappings?
