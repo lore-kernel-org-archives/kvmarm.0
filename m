@@ -1,92 +1,166 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A59379
-	for <kvmarm@lists.linux.dev>; Thu, 15 Jun 2023 01:57:13 +0000 (UTC)
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1b4fe2139a8so58395ad.1
-        for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 18:57:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 273FC36A
+	for <kvmarm@lists.linux.dev>; Thu, 15 Jun 2023 02:41:24 +0000 (UTC)
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-662f0feafb2so236968b3a.1
+        for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 19:41:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686794233; x=1689386233;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FMLY1axQ9dhHgS2evzrC32ToK9p7zpIVVjZVrkVP9Q4=;
-        b=JgGHVcV8/EOlg76CXREOFygRfcPLh0TvPl2YGB0VlwURFpypN66Kb1alr53MRziI0e
-         HBYWPc90/oiaA7G6zUyWrl/uxY/oAhW9DKtoyE8Ho3PoorWVYZdX4w3Fxq1OcnWLaBu6
-         0LKDTDBzdo+KJIsG26awIGClEZe4bI/iRsZu0tmLTBVPsEH5a72580lO+Sy8YC0GOW6g
-         o08HyBosEsk2I2G38RG0zWToRkkdp29E/XznTlNmnTiVzEmZY/AWdY+4p3O/H67u6ndI
-         38FJWCrJAW8asX0QUo3w9AW+tptp2b5A3zCqQDu8DCVyosUvLpbpp5JXKWyLmpsPZkbg
-         VkUA==
+        d=gmail.com; s=20221208; t=1686796884; x=1689388884;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=H0KWirj61OciDiKkuJb2kcKl5riA4zYenELsrCoOXwc=;
+        b=g0x4Kk5QVrYK6g3XrklRcZ2chcFjE/ajQ+magWolwg5VZcTZdwXKxBIyHwi7EQsr72
+         cWCzFXhpyM7eUudHMqc/JmeuNptP6gmufrlD/Eqf1Op677rlYm517hhuz9Grxm11ZvIz
+         7cvG0dDawb5JGYrOWdVkZPH25y0daOLmtmd2cCPEtXBg7sPz+5+Hi7I0Nesn6VKcj/mK
+         qHI4Lc13Um0e98ruYJOdmfSxQwIIVnusO8EsjQM5mTe1TRf2UoHhk+h4OiqRboEa1RlY
+         8D1GitmfKqO64qhL8VDf5bM5YGiJpl1PikeNpOGJXXbVNn6Kb43CeBqZwm5FIX+VI2aY
+         5wug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686794233; x=1689386233;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FMLY1axQ9dhHgS2evzrC32ToK9p7zpIVVjZVrkVP9Q4=;
-        b=Z5MArfth6jxdIA/X37PT2quJ5ow3FgQIV1oWOTEEA0q7nNhTcvuvjA6cxL7p1eF0uE
-         6O5EGLESVg5qR7HBYTSWqrGX1TiRN0Lammq/7gUYIzNmfl+jDsTM0SXNGjS0xV8oOnJE
-         RLlohP9SH7h9QewN1y0mxJ4yrrsqYgkpg7mXG1HcM4IPRUp8Sll9/tH6cC03h0171XxN
-         657aqVs9HJ96V0XrJ9zbzLWsXAHVI9sSHrV3YsaqmKj3m4xQmGMaKnpcDKZxjy7Uz6zU
-         zHPwRKYEL4WZhmgPTfmNdVpeQ5FNgHBSadq1nqWMz0onYirfU4mdeXDfj82RV5SxRXwV
-         AoYA==
-X-Gm-Message-State: AC+VfDx9Zv7ifZX8Jt9wAZ07irYOrOT+RUny31DDY1xkk9BVCSPGSAJN
-	LdcBGz7p0QwDTzouUHGAaPAg2bNajgxBgEgA4lttig==
-X-Google-Smtp-Source: ACHHUZ7k0wQBEo+NKxdCH3hP8L0i+8TYR5xJPePgVUW4Nh6Q7s/Lv/FmuVPnnao1IQ/tXOiUiu+GK3HzgdtUQbbtnqs=
-X-Received: by 2002:a17:902:f684:b0:1b3:a195:12d4 with SMTP id
- l4-20020a170902f68400b001b3a19512d4mr124232plg.12.1686794232483; Wed, 14 Jun
- 2023 18:57:12 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1686796884; x=1689388884;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=H0KWirj61OciDiKkuJb2kcKl5riA4zYenELsrCoOXwc=;
+        b=JTyf7K63UVxa/rY+f8iKrR3CGkFpWkK/mTG3T2hmr8UktD/6t+Xaaadf7Gw/Sr9Asc
+         doIuvzXL2ArA5eCYVOOtMYsMTqFjxr6mRxXJYC6eRQyAEb0hJpzJCDAGti2cab/qUY3/
+         1dpZAKPrjpEAQN5uKlUAzdS53A2eEYk152BFZQnH155wadmApSPM6srZYYyV84OelRe1
+         9s0a9KGpxLQc8uSmderXl0B92IDjDJp7nSXaazG4Tfrg76+6dOkZ8Q+8/33V8wCKF2B0
+         MBLFzRjjBTE9ZUGQoIcbtkiiZhHvl1bpHnTG5YqkDQ1Ioyi2mlkj1ljlrQDqWWFVGz5f
+         iXPA==
+X-Gm-Message-State: AC+VfDwL+TqytFrzGQONUIGtaOhJfKk4YYfZkFM3soxHG0pZU2Zg3HGi
+	U8ukXU6ZoDM32c5AP8nVIBo=
+X-Google-Smtp-Source: ACHHUZ5bcWotQvDPkVXRNgOwhiD4egWOFQz0n0Qy54KMeekV8MW45E7iLjrggEVf+3fljnRbnXrp7A==
+X-Received: by 2002:a05:6a00:1901:b0:666:7eb0:12d8 with SMTP id y1-20020a056a00190100b006667eb012d8mr2667177pfi.12.1686796884275;
+        Wed, 14 Jun 2023 19:41:24 -0700 (PDT)
+Received: from [172.27.232.119] (ec2-16-163-40-128.ap-east-1.compute.amazonaws.com. [16.163.40.128])
+        by smtp.gmail.com with ESMTPSA id b24-20020aa78718000000b006666699be98sm1703746pfo.34.2023.06.14.19.41.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 14 Jun 2023 19:41:23 -0700 (PDT)
+Message-ID: <d5ebb72d-393d-f61b-6a6f-760c6a5d7469@gmail.com>
+Date: Thu, 15 Jun 2023 10:41:17 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230606192858.3600174-1-rananta@google.com> <ZImwRAuSXcVt3UPV@linux.dev>
-In-Reply-To: <ZImwRAuSXcVt3UPV@linux.dev>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Wed, 14 Jun 2023 18:57:01 -0700
-Message-ID: <CAJHc60wUSNpFLeESWcpEa5OmN4bJg9wBre-2k8803WHpn03LGw@mail.gmail.com>
-Subject: Re: [PATCH v5 0/7] KVM: arm64: Add support for FEAT_TLBIRANGE
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jing Zhang <jingzhangos@google.com>, Colton Lewis <coltonlewis@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+From: Robert Hoo <robert.hoo.linux@gmail.com>
+Subject: Re: [PATCH v4 04/16] KVM: Add docstrings to __kvm_write_guest_page()
+ and __kvm_read_guest_page()
+To: Anish Moorthy <amoorthy@google.com>, seanjc@google.com,
+ oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: pbonzini@redhat.com, maz@kernel.org, jthoughton@google.com,
+ bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
+ axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
+ isaku.yamahata@gmail.com
+References: <20230602161921.208564-1-amoorthy@google.com>
+ <20230602161921.208564-5-amoorthy@google.com>
+Content-Language: en-US
+In-Reply-To: <20230602161921.208564-5-amoorthy@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 14, 2023 at 5:19=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> Hi Raghavendra,
->
-> On Tue, Jun 06, 2023 at 07:28:51PM +0000, Raghavendra Rao Ananta wrote:
-> > The series is based off of upstream v6.4-rc2, and applied David
-> > Matlack's common API for TLB invalidations[1] on top.
->
-> Sorry I didn't spot the dependency earlier, but this isn't helpful TBH.
->
-> David's series was partially applied, and what remains no longer cleanly
-> applies to the base you suggest. Independent of that, my *strong*
-> preference is that you just send out a series containing your patches as
-> well as David's. Coordinating dependent efforts is the only sane thing
-> to do. Also, those patches are 5 months old at this point which is
-> ancient history.
->
-Would you rather prefer I detach this series from David's as I'm not
-sure what his plans are for future versions?
-On the other hand, the patches seem simple enough to rebase and give
-another shot at review, but may end up delaying this series.
-WDYT?
+On 6/3/2023 12:19 AM, Anish Moorthy wrote:
+> The order of parameters in these function signature is a little strange,
+> with "offset" actually applying to "gfn" rather than to "data". Add
+> short comments to make things perfectly clear.
+> 
+> Signed-off-by: Anish Moorthy <amoorthy@google.com>
+> ---
+>   virt/kvm/kvm_main.c | 6 ++++++
+>   1 file changed, 6 insertions(+)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 09d4d85691e1..d9c0fa7c907f 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2984,6 +2984,9 @@ static int next_segment(unsigned long len, int offset)
+>   		return len;
+>   }
+>   
+> +/*
+> + * Copy 'len' bytes from guest memory at '(gfn * PAGE_SIZE) + offset' to 'data'
+> + */
+>   static int __kvm_read_guest_page(struct kvm_memory_slot *slot, gfn_t gfn,
+>   				 void *data, int offset, int len)
+>   {
+> @@ -3085,6 +3088,9 @@ int kvm_vcpu_read_guest_atomic(struct kvm_vcpu *vcpu, gpa_t gpa,
+>   }
+>   EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest_atomic);
+>   
+> +/*
+> + * Copy 'len' bytes from 'data' into guest memory at '(gfn * PAGE_SIZE) + offset'
+> + */
+>   static int __kvm_write_guest_page(struct kvm *kvm,
+>   				  struct kvm_memory_slot *memslot, gfn_t gfn,
+>   			          const void *data, int offset, int len)
 
-Thank you.
-Raghavendra
+Agree, and how about one step further, i.e. adjust the param's sequence.
 
-> > [1]:
-> > https://lore.kernel.org/linux-arm-kernel/20230126184025.2294823-1-dmatl=
-ack@google.com/
->
-> --
-> Thanks,
-> Oliver
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 2c276d4d0821..db2bc5d3e2c2 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2992,7 +2992,7 @@ static int next_segment(unsigned long len, int offset)
+   */
+  static int __kvm_read_guest_page(struct kvm_memory_slot *slot,
+                                  struct kvm_vcpu *vcpu,
+-                                gfn_t gfn, void *data, int offset, int len)
++                                gfn_t gfn, int offset, void *data, int len)
+  {
+         int r;
+         unsigned long addr;
+@@ -3015,7 +3015,7 @@ int kvm_read_guest_page(struct kvm *kvm, gfn_t gfn, void 
+*data, int offset,
+  {
+         struct kvm_memory_slot *slot = gfn_to_memslot(kvm, gfn);
+
+-       return __kvm_read_guest_page(slot, NULL, gfn, data, offset, len);
++       return __kvm_read_guest_page(slot, NULL, gfn, offset, data, len);
+  }
+  EXPORT_SYMBOL_GPL(kvm_read_guest_page);
+
+@@ -3024,7 +3024,7 @@ int kvm_vcpu_read_guest_page(struct kvm_vcpu *vcpu, gfn_t 
+gfn, void *data,
+  {
+         struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+
+-       return __kvm_read_guest_page(slot, vcpu, gfn, data, offset, len);
++       return __kvm_read_guest_page(slot, vcpu, gfn, offset, data, len);
+  }
+  EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest_page);
+
+@@ -3103,7 +3103,7 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest_atomic);
+   */
+  static int __kvm_write_guest_page(struct kvm *kvm, struct kvm_vcpu *vcpu,
+                                   struct kvm_memory_slot *memslot, gfn_t gfn,
+-                                 const void *data, int offset, int len)
++                                 int offset, const void *data, int len)
+  {
+         int r;
+         unsigned long addr;
+@@ -3128,7 +3128,7 @@ int kvm_write_guest_page(struct kvm *kvm, gfn_t gfn,
+  {
+         struct kvm_memory_slot *slot = gfn_to_memslot(kvm, gfn);
+
+-       return __kvm_write_guest_page(kvm, NULL, slot, gfn, data, offset, len);
++       return __kvm_write_guest_page(kvm, NULL, slot, gfn, offset, data, len);
+  }
+  EXPORT_SYMBOL_GPL(kvm_write_guest_page);
+
+@@ -3136,8 +3136,8 @@ int kvm_vcpu_write_guest_page(struct kvm_vcpu *vcpu, gfn_t 
+gfn,
+                               const void *data, int offset, int len)
+  {
+         struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+-       return __kvm_write_guest_page(vcpu->kvm, vcpu, slot, gfn, data,
+-                                     offset, len);
++       return __kvm_write_guest_page(vcpu->kvm, vcpu, slot, gfn, offset,
++                                     data, len);
+  }
+  EXPORT_SYMBOL_GPL(kvm_vcpu_write_guest_page);
+
