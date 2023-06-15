@@ -1,118 +1,249 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 433F836A
-	for <kvmarm@lists.linux.dev>; Thu, 15 Jun 2023 02:43:51 +0000 (UTC)
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-652699e72f7so5700545b3a.3
-        for <kvmarm@lists.linux.dev>; Wed, 14 Jun 2023 19:43:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686797030; x=1689389030;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CxCZkvy5CRmJqiPa7JJmlai93hOqrgA6UMh4PzPRLXQ=;
-        b=jZk0O+85Vc8ng3Z+WAZtZg80rlz7vJdqN6RzRISvR8WDlk6LfayCiJrD4cQwb902SU
-         KH7gRpD2qjPxsnA7np8OYFoqD+vjjrW4sHqD5tG9Y2CK+XWJkfiB2gfONdQDu21hJ4+g
-         V6hogrIR3eFWMkDhAKUPyDaUTAOCGEqUpDBa6AhvzJO5lELtke4ZwftmottY/eCTnK8B
-         V94ltqBg10e+JedEQ0hoIEvMm4YOFvVBkseQo7Hpca7MINzEeiMXzltHMgD0StriD/N/
-         IiTcZBdS8Yf/LgLiVMJBQQv6xEc3zL0nyvM8FgF+CbgG7teAW/212XRKvAhB2qNxtnIE
-         Z90g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686797030; x=1689389030;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CxCZkvy5CRmJqiPa7JJmlai93hOqrgA6UMh4PzPRLXQ=;
-        b=DW6fNKv5CsasnGj8l0+wKoTmyf5WypMu4S/JGSgp71in2bCbNrpnvY9z9mApE1t3q3
-         AP/2sVjV/0t/OJHyMvTno9J+m4pvFeDi5c+/QwkyhTrc61jkhHYgyw+hqVpa8av9r3ym
-         2S+beb86zvuUzGwCrHljnvkhGPgpQIyFlZOC6QO0t6sv3bovvdBRpktgfD+4Mw4K1wcE
-         yzWeOM478mJ8xQPDGjXd024DiB4CZp1z0UgvpwWsTZeyagMdD3DxpO9MFQaNamGweVHa
-         hbAnN6UzIvBeQeGYaPOiIB9qbbGMt0P4hfIcBduMdvXqmFgihKH70jT7hEqteyP9+XiC
-         cy5A==
-X-Gm-Message-State: AC+VfDyMIj3iY6OUVBR50dqIGqGJwlYablxgpVQnXD6fZYu/Mj3R7a6D
-	XVbV/7Iv9+RMSSc2ieFEQWU=
-X-Google-Smtp-Source: ACHHUZ4sxVWEp4CkSEL0T8BuWhDfBI0ssqyECY9RQCHka3kQoz553dN4xmWXeF4q/z85WlXH02cVZQ==
-X-Received: by 2002:a05:6a00:9a4:b0:664:2f24:5578 with SMTP id u36-20020a056a0009a400b006642f245578mr4361236pfg.13.1686797030477;
-        Wed, 14 Jun 2023 19:43:50 -0700 (PDT)
-Received: from [172.27.232.119] (ec2-16-163-40-128.ap-east-1.compute.amazonaws.com. [16.163.40.128])
-        by smtp.gmail.com with ESMTPSA id q23-20020a62ae17000000b0065992d334f4sm11316966pff.177.2023.06.14.19.43.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Jun 2023 19:43:50 -0700 (PDT)
-Message-ID: <d4131051-8b71-fab3-59a8-2f15381c2d41@gmail.com>
-Date: Thu, 15 Jun 2023 10:43:44 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB0F625
+	for <kvmarm@lists.linux.dev>; Thu, 15 Jun 2023 03:55:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1686801345; x=1718337345;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=9HVh19T/xrssGO0M38LxYkdXFGBa+4hTIqfPloLZATU=;
+  b=jzwEKyBdtOCbdOihB/o1w71INHXLALBm1uNqExCnCu6Aiki0RW/ODEUB
+   9WXDjiPHZuJQBKDbI81QfhvzuMVmAdfit2v3qpxtpcKN2mELOenuhsaKD
+   VOjj6fkUsKkgmvHJUyr7DO6Lz4D8qb9zXAFJwzCnSVyOhrn+COrPfjoTL
+   BcM9aKhxOsnJ4LEPFcw4XYHjrL7JYa4mrgZctNe5CjdDjK3pn1Sm9B1zy
+   w6xsE+pyZhOKXgXGNFIeh5WCkyMVe//eoeRllkQSasDKzrHROfkTefOUe
+   xRl5OT+ZZxZyEXDNPhD9TAEQKghO/DYz2AbbBuoW5uV7JHKxrBGxv86Nw
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10741"; a="362184554"
+X-IronPort-AV: E=Sophos;i="6.00,243,1681196400"; 
+   d="scan'208";a="362184554"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2023 20:55:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10741"; a="662627831"
+X-IronPort-AV: E=Sophos;i="6.00,243,1681196400"; 
+   d="scan'208";a="662627831"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga003.jf.intel.com with ESMTP; 14 Jun 2023 20:55:44 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Wed, 14 Jun 2023 20:55:44 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Wed, 14 Jun 2023 20:55:44 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.170)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Wed, 14 Jun 2023 20:55:42 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nNZuF7Xz+zzCRC+0Lfnhu0km+HUcW4eyi2Loh14xO50Ut4BDOTeokSkMMYegUicp7kFy8dN+79uspop4ZC22kS+8FvDyvaSCacSlHF5qDthPU72qSUGS908XiIoAdStr5cVopVbcUA1hE9tUCYueBiPTIb8xjWQBOhqw83f1uqeKzArEIC9ZCD96BixkebNQuBgOkdhhnCduO4XEh+t6+mCNeS8JkkKichAnMzYgme58xFyzea+YzlIR+FChiuSRNOqkgiKnpLYxobsRCkICjHl+D7drG55sdO9RJixwnbLT2KhFO6wDW3QTSRi80+25oj/ZyS2kfB6lr1PWd4sxYQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cpBjlUGrunxgFf9lx47tP6hN76TGKJc3HOINvuj2VcY=;
+ b=eLekLcacW6O3idCJcm57c/9+cnP22NCiSPH5hZDBLnXBYW3UB7A/ncgB8pKQjzhiunWljI4aDgsQjneGdiOxYOgmxAPoBrLV2W/tt73f9tfUlIxnLBQRCUi0uMvBmpneGU2vhxx3nxoOk7WXjmpJv+hEYtmnZ8fAJRUojORy4ufJWLJtX2jUKJj/mlE5jUwEC563blbpkUMDiL66LM8zTm4BWd1aSsktpdF8i1/W5s7X2pxQct2hjBJ/CYEuHmi25mBPW021acc4V3wuk0E24FGzAc+fvyQZLJUgKspM6g4K3mo3BSLZJGB3cUZ5tLVhLmo/PrMJtYRG7Vug2wsoTg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB6373.namprd11.prod.outlook.com (2603:10b6:8:cb::20) by
+ DS7PR11MB6294.namprd11.prod.outlook.com (2603:10b6:8:96::18) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6455.46; Thu, 15 Jun 2023 03:55:40 +0000
+Received: from DS0PR11MB6373.namprd11.prod.outlook.com
+ ([fe80::e8f3:851f:3ddc:fdeb]) by DS0PR11MB6373.namprd11.prod.outlook.com
+ ([fe80::e8f3:851f:3ddc:fdeb%7]) with mapi id 15.20.6477.028; Thu, 15 Jun 2023
+ 03:55:40 +0000
+From: "Wang, Wei W" <wei.w.wang@intel.com>
+To: "Christopherson,, Sean" <seanjc@google.com>, Anish Moorthy
+	<amoorthy@google.com>
+CC: "oliver.upton@linux.dev" <oliver.upton@linux.dev>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "maz@kernel.org"
+	<maz@kernel.org>, "robert.hoo.linux@gmail.com" <robert.hoo.linux@gmail.com>,
+	"jthoughton@google.com" <jthoughton@google.com>, "bgardon@google.com"
+	<bgardon@google.com>, "dmatlack@google.com" <dmatlack@google.com>,
+	"ricarkol@google.com" <ricarkol@google.com>, "axelrasmussen@google.com"
+	<axelrasmussen@google.com>, "peterx@redhat.com" <peterx@redhat.com>,
+	"nadav.amit@gmail.com" <nadav.amit@gmail.com>, "isaku.yamahata@gmail.com"
+	<isaku.yamahata@gmail.com>
+Subject: RE: [PATCH v4 09/16] KVM: Introduce KVM_CAP_NOWAIT_ON_FAULT without
+ implementation
+Thread-Topic: [PATCH v4 09/16] KVM: Introduce KVM_CAP_NOWAIT_ON_FAULT without
+ implementation
+Thread-Index: AQHZlW423muHblFfrkaOENvhBA1a26+K4T0AgABrGqA=
+Date: Thu, 15 Jun 2023 03:55:39 +0000
+Message-ID: <DS0PR11MB6373969DA5CCDD6EBBC9CB7ADC5BA@DS0PR11MB6373.namprd11.prod.outlook.com>
+References: <20230602161921.208564-1-amoorthy@google.com>
+ <20230602161921.208564-10-amoorthy@google.com> <ZIovIBVLIM69E5Bo@google.com>
+In-Reply-To: <ZIovIBVLIM69E5Bo@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR11MB6373:EE_|DS7PR11MB6294:EE_
+x-ms-office365-filtering-correlation-id: 424ebe64-2fb0-4f03-69c1-08db6d546247
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: iYESQlWd64zIyahhoc9kAeN8g/+rt6M1RlhGrbqS+Z5zVT8kPJ7TK0JCxc10l/P3BsQ8l1D9mNaUls3YVjx6216kl8xsofuijArOR4SBph3okeAjs22a71zgtflRd07yMTQswhh6yQJz/Bh7k/RvwjB/dzIO77JNGcsW1u9kbMar5Fec89vMFx3tYCqM/JQTmfLG2p2mL+8TWtXovi15K8/mLPBZ7a3+daNHo5xpage+aEdU/hA2N4KIUl7GK6xpY7NaVKUfM04ODKhCP/idWabSyqO23AC7smi/G4h+Ns5J7mqsunMp7n7rCXfx70qzIKMJGUNwrYl/49yAdnFKIpAx1uTM+4iFhjUWdpWFBlMtW3PnzUmRjXk7N/KfprjSwKnBHZtcYKJkInuvBE0/ZGcRIea3I4bVOXncV7lvXvxrISYoTkCtuh1YhWFXmaPYQDqGjgLwLgSnvfc4E8Wt7pNhgMsZEVn3FEXYB4b8/QCfu/9Rxc0+zP8CRhkLzmn2FiM5TlynZQgZIkh2tzePPk+QuL33KEEG+Z/Nz7r4kPcVBOkxJwRrhTXIyrRZnEleKxbmeCodXuv0OEeKrPDfDnrCFpFDMz/dN0OWFj9oNFTzzQ5kd4UbQDuZndm7LJrJ
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB6373.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(366004)(346002)(376002)(39860400002)(136003)(451199021)(186003)(26005)(53546011)(9686003)(6506007)(41300700001)(38100700002)(316002)(7696005)(83380400001)(52536014)(33656002)(110136005)(478600001)(71200400001)(5660300002)(54906003)(86362001)(38070700005)(2906002)(8676002)(7416002)(8936002)(82960400001)(122000001)(66556008)(76116006)(64756008)(4326008)(55016003)(66946007)(66476007)(66446008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?1iA/QCoyYYc80y6M1mTRmfR0VLFQW4lnmuS5eujgV+429kedkCEzPtnRhdsw?=
+ =?us-ascii?Q?tfgbXMSQmxfMa64hToLS5A3/lrrLGPGq7T2GTufHCKdLuo9Uo3YTap+Eh3T3?=
+ =?us-ascii?Q?ElBJk5dhLARyVMVDXr7VbmhAIcfSTcEZwYDKFCMogG0f4wU0edSCrz91spxo?=
+ =?us-ascii?Q?QWuPsQ7O96Bu8X6xSf8A6fLGi9e87BCPh+n1grX/dlRZFuPM6KspHOIfqOQa?=
+ =?us-ascii?Q?c/ayDobQXO+Y+8Ot8xhT7BmLtCOQPYEhg5nOfyKDFgnakONSptCldh0nu2ho?=
+ =?us-ascii?Q?ZR48oC7yLA7mWvmrCrso9G+cZBZtdUsvX4kqQlaq8P5ePJzCIqYNrZvZJEwG?=
+ =?us-ascii?Q?W6lnUWbfcZ1xz8IVQo2Glq3Oi/ywGNmZ9KvXoo462cyHf/QQJTSahbTF3J73?=
+ =?us-ascii?Q?qQQpn7jSYu/CIzipCoADlOVsodTW8FMESyGiBv0RSgc5zaRhagQnbPnjfP39?=
+ =?us-ascii?Q?xcnJFmWk+4pmNU3lpafN0IzPsLmjiG2Jpy/bLfU1aEIfTiYyzxrUZUBwdqBV?=
+ =?us-ascii?Q?I14auTwVcoFLYybuoEly/92jFki6fkdIplrHqR596kzYXU1lvD21SP1BsHO+?=
+ =?us-ascii?Q?mw8hlsVjXIvsxka5+WgeeIddV4e0pjORgiGO2THEv+JZajfQAmelxSmDsTXC?=
+ =?us-ascii?Q?hrR7eFQJvEhwNA2eEGdAQDHcxtbUJAClvpkCbfln9aRJ8cidqsA62TTl/urz?=
+ =?us-ascii?Q?N3MVSXyF5bXBABIPkhHZ6SGT3vBayZdxK4z3ZNhHxGdTRPhp481M2F27Pj6G?=
+ =?us-ascii?Q?vB93oqfc/wD/1QkzAbroejWo6d840YNGyk8j23SPId/eIj80V1Lgo/Sbflxy?=
+ =?us-ascii?Q?++53dWeMlW9vD64W/PCO9oPgEKGzJyrJqiSbe37b+Yr7IL0gcqFYykAmEhUp?=
+ =?us-ascii?Q?EQ5pTbdVgJ302XcAOa5Okh3Rqh+iz6eGg9NLKhSk5UMJIapmxF47ueToKCYT?=
+ =?us-ascii?Q?C8LnkdpDmd2BgwUCBDHIWnddl/zwwZQTbERNr8er4g79eFIbgrMtfLhKH2ny?=
+ =?us-ascii?Q?slkuIyNrzyEaOCx2SASUTEvK9HnQbNIYxKjJc1XAp1QLyDw5a1mzXoiN0Lof?=
+ =?us-ascii?Q?FRvfgFqNK94n3lk8xrLt4Jn3T5afUNE6pl4WxweQ3f6nAcF/cAyvglECrILk?=
+ =?us-ascii?Q?WSzDRysJ+xccF7DU/f/P1t5HudKGW0jCL7vyEOkDa5erue1CqgCZBwdz/bhz?=
+ =?us-ascii?Q?leRhBlLV1hZUJh1B2I1zHu1cqmSgcXyLKvd8EIARdILKSfiGNgrKj8eg5t0f?=
+ =?us-ascii?Q?PmGWpmJAUIiEKD7YG+b7D2TEs6xO4nw+d2UUswwUrVHpf9+3Wi4T9vzofthI?=
+ =?us-ascii?Q?vuZn/HlBoyUiDwKye/MvAD18lHnEZv6wmMSR7K38vijPTRNC7/XM3SoKtFLw?=
+ =?us-ascii?Q?1GPQelfHgcICk//++N1lHVyuQhTIDt8t4diZ0XhN9UVsVb9GgP73zVLLzAyS?=
+ =?us-ascii?Q?cxBVbdcxN5nIM4PqBNgBs3eHlya1/L8HRjsz99QcauBajsWEm7yVUa6gbeQU?=
+ =?us-ascii?Q?yz3I6P2g/t16/q3yB95DLwxf/ZDk95b8Ym2v9SAlbHQ5yAGSCeCtmsS0BnWM?=
+ =?us-ascii?Q?04uT/hI67wXlns+SCZ26tppXdKUtBQdHgYXXchbK?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-From: Robert Hoo <robert.hoo.linux@gmail.com>
-Subject: Re: [PATCH v4 08/16] KVM: x86: Annotate -EFAULTs from
- kvm_handle_error_pfn()
-To: Anish Moorthy <amoorthy@google.com>, seanjc@google.com,
- oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: pbonzini@redhat.com, maz@kernel.org, jthoughton@google.com,
- bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
- axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
- isaku.yamahata@gmail.com
-References: <20230602161921.208564-1-amoorthy@google.com>
- <20230602161921.208564-9-amoorthy@google.com>
-Content-Language: en-US
-In-Reply-To: <20230602161921.208564-9-amoorthy@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB6373.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 424ebe64-2fb0-4f03-69c1-08db6d546247
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jun 2023 03:55:39.6170
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 8qMQbFLXL4QYC3NVQQtyrol5+r6ctQhqOunmv6ROjklqd2zJCLU21vOoyX5bibIdWihMIkC9ysy81hk9AITVpw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6294
+X-OriginatorOrg: intel.com
 
-On 6/3/2023 12:19 AM, Anish Moorthy wrote:
-> Implement KVM_CAP_MEMORY_FAULT_INFO for efaults generated by
-> kvm_handle_error_pfn().
-> 
-> Signed-off-by: Anish Moorthy <amoorthy@google.com>
-> ---
->   arch/x86/kvm/mmu/mmu.c | 13 +++++++++++++
->   1 file changed, 13 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index c8961f45e3b1..cb71aae9aaec 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3291,6 +3291,10 @@ static void kvm_send_hwpoison_signal(struct kvm_memory_slot *slot, gfn_t gfn)
->   
->   static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->   {
-> +	uint64_t rounded_gfn;
-> +	uint64_t fault_size;
-> +	uint64_t fault_flags;
+On Thursday, June 15, 2023 5:21 AM, Sean Christopherson wrote:
+> On Fri, Jun 02, 2023, Anish Moorthy wrote:
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h index
+> > 69a221f71914..abbc5dd72292 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -2297,4 +2297,10 @@ static inline void
+> kvm_account_pgtable_pages(void *virt, int nr)
+> >   */
+> >  inline void kvm_populate_efault_info(struct kvm_vcpu *vcpu,
+> >  				     uint64_t gpa, uint64_t len, uint64_t flags);
+> > +
+> > +static inline bool kvm_slot_nowait_on_fault(
+> > +	const struct kvm_memory_slot *slot)
+>=20
+> Just when I was starting to think that we had beat all of the Google3 out=
+ of
+> you :-)
+>=20
+> And predicate helpers in KVM typically have "is" or "has" in the name, so=
+ that it's
+> clear the helper queries, versus e.g. sets the flag or something.
+>=20
+> > +{
+> > +	return slot->flags & KVM_MEM_NOWAIT_ON_FAULT;
+>=20
+> KVM is anything but consistent, but if the helper is likely to be called =
+without a
+> known good memslot, it probably makes sense to have the helper check for
+> NULL, e.g.
+>=20
+> static inline bool kvm_is_slot_nowait_on_fault(const struct kvm_memory_sl=
+ot
+> *slot) {
+> 	return slot && slot->flags & KVM_MEM_NOWAIT_ON_FAULT; }
+>=20
+> However, do we actually need to force vendor code to query nowait?  At a
+> glance, the only external (relative to kvm_main.c) users of
+> __gfn_to_pfn_memslot() are in flows that play nice with nowait or that do=
+n't
+> support it at all.  So I *think* we can do this?
+>=20
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c index
+> be06b09e9104..78024318286d 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2403,6 +2403,11 @@ static bool memslot_is_readonly(const struct
+> kvm_memory_slot *slot)
+>         return slot->flags & KVM_MEM_READONLY;  }
+>=20
+> +static bool memslot_is_nowait_on_fault(const struct kvm_memory_slot
+> +*slot) {
+> +       return slot->flags & KVM_MEM_NOWAIT_ON_FAULT; }
 > +
->   	if (is_sigpending_pfn(fault->pfn)) {
->   		kvm_handle_signal_exit(vcpu);
->   		return -EINTR;
-> @@ -3309,6 +3313,15 @@ static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fa
->   		return RET_PF_RETRY;
->   	}
->   
-> +	fault_size = KVM_HPAGE_SIZE(fault->goal_level);
-
-IIUC, here fault->goal_level is always PG_LEVEL_4K.
-goal_level could be adjusted in later kvm_tdp_mmu_map() --> 
-kvm_mmu_hugepage_adjust(), if kvm_faultin_pfn() doesn't fail, that is to say, 
-code path doesn't go through here.
-
-I wonder, if you would like put (kind of) kvm_mmu_hugepage_adjust() here as 
-well, reporting to user space the maximum map size it could do with, OR, just 
-report 4K size, let user space itself to detect/decide max possible size (but 
-now I've no idea how to).
-
-> +	rounded_gfn = round_down(fault->gfn * PAGE_SIZE, fault_size);
+>  static unsigned long __gfn_to_hva_many(const struct kvm_memory_slot *slo=
+t,
+> gfn_t gfn,
+>                                        gfn_t *nr_pages, bool write)  { @@=
+ -2730,6 +2735,11 @@
+> kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t
+> gfn,
+>                 writable =3D NULL;
+>         }
+>=20
+> +       if (async && memslot_is_nowait_on_fault(slot)) {
+> +               *async =3D false;
+> +               async =3D NULL;
+> +       }
 > +
-> +	fault_flags = 0;
-> +	if (fault->write)
-> +		fault_flags |= KVM_MEMORY_FAULT_FLAG_WRITE;
-> +	if (fault->exec)
-> +		fault_flags |= KVM_MEMORY_FAULT_FLAG_EXEC;
-> +	kvm_populate_efault_info(vcpu, rounded_gfn, fault_size, fault_flags);
->   	return -EFAULT;
->   }
->   
+>         return hva_to_pfn(addr, atomic, interruptible, async, write_fault=
+,
+>                           writable);
+>  }
+>=20
+> Ah, crud.  The above highlights something I missed in v3.  The memslot NO=
+WAIT
+> flag isn't tied to FOLL_NOWAIT, it's really truly a "fast-only" flag.  An=
+d even
+> more confusingly, KVM does set FOLL_NOWAIT, but for the async #PF case,
+> which will get even more confusing if/when KVM uses FOLL_NOWAIT internall=
+y.
+>=20
+> Drat.  I really like the NOWAIT name, but unfortunately it doesn't do wha=
+t as the
+> name says.
+>=20
+> I still don't love "fast-only" as that bleeds kernel internals to userspa=
+ce.
+> Anyone have ideas?  Maybe something about not installing new mappings?
 
+Yes, "NOWAIT" sounds a bit confusing here. If this is a patch applied to us=
+erfaultfd
+to solve the "wait" issue on queuing/handling faults, then it would make se=
+nse.
+But this is a KVM specific solution, which is not directly related to userf=
+aultfd, and
+it's not related to FOLL_NOWAIT. There seems nothing to wait in the KVM con=
+text
+here.
+
+Why not just name the cap as what it does (i.e. something to indicate the c=
+ap of
+having the fault exited to userspace to handle), e.g. KVM_CAP_EXIT_ON_FAULT
+or KVM_CAP_USERSPACE_FAULT.
