@@ -1,103 +1,101 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26F8A17748
-	for <kvmarm@lists.linux.dev>; Thu, 15 Jun 2023 14:14:28 +0000 (UTC)
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-56ff7b4feefso27414687b3.0
-        for <kvmarm@lists.linux.dev>; Thu, 15 Jun 2023 07:14:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1022220E2
+	for <kvmarm@lists.linux.dev>; Thu, 15 Jun 2023 14:40:14 +0000 (UTC)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-53f06f7cc74so526829a12.1
+        for <kvmarm@lists.linux.dev>; Thu, 15 Jun 2023 07:40:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686838468; x=1689430468;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7viRfd/Ct8U5RrqgvCgGqBfozF7RQD4igs0DqRCL6cE=;
-        b=N/9efvZeguJ9mTYp5uqlZJJgM9UzRYdeH+vy0nBO00FHtIhj1v5S8J8uFMHxXAdPq5
-         HMY7gCgct/iykDoEMY/UG1qvaS4tT96uzlhEPWL0wuon7fNHgp+8zvFR59EqaGk0IcR5
-         GIOIV7t4D2hGoqqUlwNaHk7O/lN3NwsHonXsFnvPwEXiapoG1W/+AS4q2pjBmrakJSVF
-         yBuwQ8oL0P8aYozIPFw4J1XAu0B0MLnP7ZuaGljQ1bIP+UL6K+Kg4Wn6tI5ZM7QUJHq1
-         DHMrSnuQrFIh+FjNv6J2EzUG6FbU+pYRhEnJGAtfHyCFNX57WYLzlhP+493R4eeaCpDG
-         TlLw==
+        d=google.com; s=20221208; t=1686840014; x=1689432014;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bIrBNkZ9zKS9U5KeK7d+FaQMKemGy6nHExMMevpFFFU=;
+        b=Rp2/4KfTpi/ecFRTS49d42Q664LFIcaODsBJ8mojuIxoCiwP/gG1eyjRC6hOxE60O/
+         1aKKYOpSESIfe8WmOSkMMiBM+iSWB3a15qlxX34wypFNvlC4axW87m7MzWZKakvED9dn
+         lvtxAKI8GGht6q9NqiGo1yJn87y01XPJl1Gg0fjsb4XjMLhRbVuBrdWPdT9XxBlSf53Z
+         MY30Bz8TW+rmFWJaoFxtt/SWyoL+R20m+vlM59nOEbrLIbhpzo7Fx31h40qeNiE4sLcl
+         T6UtDjvMfqP6cWk52PaxYEKiGSJWKbMPWboALiSToUzDmaHx2KC21YkoXyXEYQGjeDg5
+         RAoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686838468; x=1689430468;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=7viRfd/Ct8U5RrqgvCgGqBfozF7RQD4igs0DqRCL6cE=;
-        b=eNbnCQrolP8nieqpZbo5oGEvPDTXY0h+yCW1l7y3FamtaS1YH+yxYOTgsMGkpMSYKx
-         SCwDYg6zs8KHU0hWYf/sBjT6fPEl1cUK53x+GBZzxJASgo1eT19J+mLVKY9qTRWeG3KD
-         w5D5OM7urBLa4Qhik597EnJ+Sg0LYjfBEgX8r2hyiFj8EA7hKFWAon/RiKgiq/sVamvs
-         c1duTYC/5dKh1CzABfVtRjSr3n0Qbxe0abfo6qITha3IppesPajMte0Sjqdw8B7KyGtv
-         FIOqcHZqQO6bCO7bmlZzxQrux2EnU7EtIDjoNM95OQ0zReVEOWLG3/VLDDKoeIh2q+HZ
-         57IQ==
-X-Gm-Message-State: AC+VfDyom3PGXqmQbbYM6kIKvZ+kcGRevbwLuulTkARxOr8xCyfTFVF0
-	XB/VgpdE0rLF9CeekdY0lEXeVZOmBJM=
-X-Google-Smtp-Source: ACHHUZ6EIKcKvq/hS/fOZS8agFpvn3GY3pzYqorAftldiJlQkHc522gAG3GeNLMI7TYIN2aK4x1LHQhybZ4=
+        d=1e100.net; s=20221208; t=1686840014; x=1689432014;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bIrBNkZ9zKS9U5KeK7d+FaQMKemGy6nHExMMevpFFFU=;
+        b=cF/C6oslMqnYMb5A4uf/nX4U1AfhFtcspqvNesnVE+iOjtEXXip0qamSk1mIDm+aKv
+         aPgGX5hJE2lQe4wYluX087LvKrSZ5oxsVdvjxax+a8oRdLeazG4xvo0OaOg+g6Z8Ils3
+         T653N3wtjaGZKWGu3WxzfsyfHnHSzzHD/yZB4DE6t9tx/b1CMFbYFZu7pcwg03dCLU7n
+         65ynGzOWqElBv51lGVHo1juNyzNJOWLEbmWL80wl6mqrSadW6zJ8RmNuJa7Tvov1nlVz
+         z0ryc9Zs+BAW7BkUQCSHSSKtwi21Pl4VbNKCam3mviOt97soyegaVyqT33ZAP72Mmdj+
+         Zxkg==
+X-Gm-Message-State: AC+VfDz5ZJ8t96I9n8p9EqdgN30+DG4Z0LPqkmX3Dl+F+AbTA1mb3Oej
+	LlwlLTLiNn1fARtMOjJQx+/DQl+e8E4=
+X-Google-Smtp-Source: ACHHUZ4ImrZRGKXrUehYcg6Mu58huGQo2fCvfr3+VnpcSsl+lnS/4G/v4KJtNEzrOEcBexGy313QNxHZVA4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:bc0f:0:b0:56d:2abf:f0c with SMTP id
- a15-20020a81bc0f000000b0056d2abf0f0cmr2288100ywi.10.1686838467967; Thu, 15
- Jun 2023 07:14:27 -0700 (PDT)
-Date: Thu, 15 Jun 2023 07:14:26 -0700
-In-Reply-To: <ZIrONR6cSegiK1e2@linux.dev>
+ (user=seanjc job=sendgmr) by 2002:a63:f30c:0:b0:53f:9e36:1d58 with SMTP id
+ l12-20020a63f30c000000b0053f9e361d58mr739967pgh.0.1686840014295; Thu, 15 Jun
+ 2023 07:40:14 -0700 (PDT)
+Date: Thu, 15 Jun 2023 07:40:12 -0700
+In-Reply-To: <d4131051-8b71-fab3-59a8-2f15381c2d41@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230606192858.3600174-1-rananta@google.com> <ZImwRAuSXcVt3UPV@linux.dev>
- <CAJHc60wUSNpFLeESWcpEa5OmN4bJg9wBre-2k8803WHpn03LGw@mail.gmail.com> <ZIrONR6cSegiK1e2@linux.dev>
-Message-ID: <ZIscwv1NABW+wZ4J@google.com>
-Subject: Re: [PATCH v5 0/7] KVM: arm64: Add support for FEAT_TLBIRANGE
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-9-amoorthy@google.com>
+ <d4131051-8b71-fab3-59a8-2f15381c2d41@gmail.com>
+Message-ID: <ZIsizBERLVMSIz+T@google.com>
+Subject: Re: [PATCH v4 08/16] KVM: x86: Annotate -EFAULTs from kvm_handle_error_pfn()
 From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Raghavendra Rao Ananta <rananta@google.com>, Marc Zyngier <maz@kernel.org>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Jing Zhang <jingzhangos@google.com>, 
-	Colton Lewis <coltonlewis@google.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Robert Hoo <robert.hoo.linux@gmail.com>
+Cc: Anish Moorthy <amoorthy@google.com>, oliver.upton@linux.dev, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org, 
+	jthoughton@google.com, bgardon@google.com, dmatlack@google.com, 
+	ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com, 
+	nadav.amit@gmail.com, isaku.yamahata@gmail.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Jun 15, 2023, Oliver Upton wrote:
-> +cc Sean
->=20
-> On Wed, Jun 14, 2023 at 06:57:01PM -0700, Raghavendra Rao Ananta wrote:
-> > On Wed, Jun 14, 2023 at 5:19=E2=80=AFAM Oliver Upton <oliver.upton@linu=
-x.dev> wrote:
-> > >
-> > > Hi Raghavendra,
-> > >
-> > > On Tue, Jun 06, 2023 at 07:28:51PM +0000, Raghavendra Rao Ananta wrot=
-e:
-> > > > The series is based off of upstream v6.4-rc2, and applied David
-> > > > Matlack's common API for TLB invalidations[1] on top.
-> > >
-> > > Sorry I didn't spot the dependency earlier, but this isn't helpful TB=
-H.
-> > >
-> > > David's series was partially applied, and what remains no longer clea=
-nly
-> > > applies to the base you suggest. Independent of that, my *strong*
-> > > preference is that you just send out a series containing your patches=
- as
-> > > well as David's. Coordinating dependent efforts is the only sane thin=
-g
-> > > to do. Also, those patches are 5 months old at this point which is
-> > > ancient history.
-> > >
-> > Would you rather prefer I detach this series from David's as I'm not
-> > sure what his plans are for future versions?
-> > On the other hand, the patches seem simple enough to rebase and give
-> > another shot at review, but may end up delaying this series.
-> > WDYT?
->=20
-> In cases such as this you'd typically coordinate with the other
-> developer to pick up their changes as part of your series. Especially
-> for this case -- David's refactoring is _pointless_ without another
-> user for that code (i.e. arm64). As fun as it might be to antagonize
-> Sean, that series pokes x86 and I'd like an ack from on it.
->=20
-> So, please post a combined series that applies cleanly to an early 6.4
-> rc of your choosing, and cc all affected reviewers/maintainers.
+On Thu, Jun 15, 2023, Robert Hoo wrote:
+> On 6/3/2023 12:19 AM, Anish Moorthy wrote:
+> > Implement KVM_CAP_MEMORY_FAULT_INFO for efaults generated by
+> > kvm_handle_error_pfn().
+> > 
+> > Signed-off-by: Anish Moorthy <amoorthy@google.com>
+> > ---
+> >   arch/x86/kvm/mmu/mmu.c | 13 +++++++++++++
+> >   1 file changed, 13 insertions(+)
+> > 
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index c8961f45e3b1..cb71aae9aaec 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -3291,6 +3291,10 @@ static void kvm_send_hwpoison_signal(struct kvm_memory_slot *slot, gfn_t gfn)
+> >   static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> >   {
+> > +	uint64_t rounded_gfn;
+> > +	uint64_t fault_size;
+> > +	uint64_t fault_flags;
+> > +
+> >   	if (is_sigpending_pfn(fault->pfn)) {
+> >   		kvm_handle_signal_exit(vcpu);
+> >   		return -EINTR;
+> > @@ -3309,6 +3313,15 @@ static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fa
+> >   		return RET_PF_RETRY;
+> >   	}
+> > +	fault_size = KVM_HPAGE_SIZE(fault->goal_level);
+> 
+> IIUC, here fault->goal_level is always PG_LEVEL_4K.
+> goal_level could be adjusted in later kvm_tdp_mmu_map() -->
+> kvm_mmu_hugepage_adjust(), if kvm_faultin_pfn() doesn't fail, that is to
+> say, code path doesn't go through here.
+> 
+> I wonder, if you would like put (kind of) kvm_mmu_hugepage_adjust() here as
+> well, reporting to user space the maximum map size it could do with, OR,
+> just report 4K size, let user space itself to detect/decide max possible
+> size (but now I've no idea how to).
 
-+1
+No, that's nonsensical because KVM uses the host mapping to compute the max
+mapping level.  If there's no valid mapping, then there's no defined level.  And
+as I said in my reply, KVM should never kick out to userspace if KVM can establish
+a 4KiB mapping, i.e. 4KiB is always the effective scope, and reporting anything
+else would just be wild speculation.
