@@ -1,50 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36150656
-	for <kvmarm@lists.linux.dev>; Thu, 15 Jun 2023 05:43:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65CE9A52
+	for <kvmarm@lists.linux.dev>; Thu, 15 Jun 2023 06:22:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1686807806;
+	s=mimecast20190719; t=1686810124;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=fTVBhd2O8vf77jTBRd3Tg3ob9ZgPUk+x+oUF3261NzI=;
-	b=gcjcsrCu0wrhz/t/RWXplc+vEI3BCjwS8QrHp4ZA4p7/c+Ars52YbUXmIfkTvCQj2FL3Ty
-	ABq9xk9uvCY+5G2Zhv0Tu9S4kn613XbZWwKC5zpnZCpsrg0euAU+M/zbLt4BZTKVCAWVyB
-	Zzt1lTf6G2b/jb6vknNlGt2kMXqpgxo=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=1Jdp2Dt66ASZ0j6UJlOPexywjJsI21/1kai5Bt5vA3Q=;
+	b=OBTkDG7Og6GYdAXwyktF3PlkQu+DYQ1uj/nAxGzAXw+D2P6R1RY9ZcBXxEqbKyyornP+TQ
+	3BGiKbwTgNkrOi9414m+7TSrB19WGs9TO9EUsfA4wiYzvLLqvuaHv2kq88uDQl4fPm1qaZ
+	LQqyeoFblsJjt4dmSh1Rew54Lp3NwFo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-599-sfMH6exIOPqEjtPgaFe5EA-1; Thu, 15 Jun 2023 01:43:16 -0400
-X-MC-Unique: sfMH6exIOPqEjtPgaFe5EA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+ us-mta-493-0OugQtqSP-aWHUMc0XuZHg-1; Thu, 15 Jun 2023 02:21:58 -0400
+X-MC-Unique: 0OugQtqSP-aWHUMc0XuZHg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 337541C0726C;
-	Thu, 15 Jun 2023 05:43:16 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 38B3E101A528;
+	Thu, 15 Jun 2023 06:21:58 +0000 (UTC)
 Received: from gshan.redhat.com (vpn2-54-145.bne.redhat.com [10.64.54.145])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id EB9A32166B25;
-	Thu, 15 Jun 2023 05:43:10 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 73E5F2026D49;
+	Thu, 15 Jun 2023 06:21:53 +0000 (UTC)
 From: Gavin Shan <gshan@redhat.com>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	pbonzini@redhat.com,
-	seanjc@google.com,
-	mtosatti@redhat.com,
-	maz@kernel.org,
-	will@kernel.org,
-	c.dall@virtualopensystems.com,
-	peterx@redhat.com,
+	kvm-ppc@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	andrew.jones@linux.dev,
+	lvivier@redhat.com,
+	thuth@redhat.com,
+	frankja@linux.ibm.com,
+	imbrenda@linux.ibm.com,
 	david@redhat.com,
-	aarcange@redhat.com,
-	shahuang@redhat.com,
-	hshuai@redhat.com,
-	zhenyzha@redhat.com,
+	pbonzini@redhat.com,
+	nrb@linux.ibm.com,
 	shan.gavin@gmail.com
-Subject: [PATCH v3] KVM: Avoid illegal stage2 mapping on invalid memory slot
-Date: Thu, 15 Jun 2023 15:42:59 +1000
-Message-Id: <20230615054259.14911-1-gshan@redhat.com>
+Subject: [kvm-unit-tests PATCH v3] runtime: Allow to specify properties for accelerator
+Date: Thu, 15 Jun 2023 16:21:48 +1000
+Message-Id: <20230615062148.19883-1-gshan@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -53,117 +50,189 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 
-We run into guest hang in edk2 firmware when KSM is kept as running on
-the host. The edk2 firmware is waiting for status 0x80 from QEMU's pflash
-device (TYPE_PFLASH_CFI01) during the operation of sector erasing or
-buffered write. The status is returned by reading the memory region of
-the pflash device and the read request should have been forwarded to QEMU
-and emulated by it. Unfortunately, the read request is covered by an
-illegal stage2 mapping when the guest hang issue occurs. The read request
-is completed with QEMU bypassed and wrong status is fetched. The edk2
-firmware runs into an infinite loop with the wrong status.
+There are extra properties for accelerators to enable the specific
+features. For example, the dirty ring for KVM accelerator can be
+enabled by "-accel kvm,dirty-ring-size=65536". Unfortuntely, the
+extra properties for the accelerators aren't supported. It makes
+it's impossible to test the combination of KVM and dirty ring
+as the following error message indicates.
 
-The illegal stage2 mapping is populated due to same page sharing by KSM
-at (C) even the associated memory slot has been marked as invalid at (B)
-when the memory slot is requested to be deleted. It's notable that the
-active and inactive memory slots can't be swapped when we're in the middle
-of kvm_mmu_notifier_change_pte() because kvm->mn_active_invalidate_count
-is elevated, and kvm_swap_active_memslots() will busy loop until it reaches
-to zero again. Besides, the swapping from the active to the inactive memory
-slots is also avoided by holding &kvm->srcu in __kvm_handle_hva_range(),
-corresponding to synchronize_srcu_expedited() in kvm_swap_active_memslots().
+  # cd /home/gavin/sandbox/kvm-unit-tests/tests
+  # QEMU=/home/gavin/sandbox/qemu.main/build/qemu-system-aarch64 \
+    ACCEL=kvm,dirty-ring-size=65536 ./its-migration
+     :
+  BUILD_HEAD=2fffb37e
+  timeout -k 1s --foreground 90s /home/gavin/sandbox/qemu.main/build/qemu-system-aarch64 \
+  -nodefaults -machine virt -accel kvm,dirty-ring-size=65536 -cpu cortex-a57             \
+  -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd   \
+  -device pci-testdev -display none -serial stdio -kernel _NO_FILE_4Uhere_ -smp 160      \
+  -machine gic-version=3 -append its-pending-migration # -initrd /tmp/tmp.gfDLa1EtWk
+  qemu-system-aarch64: kvm_init_vcpu: kvm_arch_init_vcpu failed (0): Invalid argument
 
-  CPU-A                    CPU-B
-  -----                    -----
-                           ioctl(kvm_fd, KVM_SET_USER_MEMORY_REGION)
-                           kvm_vm_ioctl_set_memory_region
-                           kvm_set_memory_region
-                           __kvm_set_memory_region
-                           kvm_set_memslot(kvm, old, NULL, KVM_MR_DELETE)
-                             kvm_invalidate_memslot
-                               kvm_copy_memslot
-                               kvm_replace_memslot
-                               kvm_swap_active_memslots        (A)
-                               kvm_arch_flush_shadow_memslot   (B)
-  same page sharing by KSM
-  kvm_mmu_notifier_invalidate_range_start
-        :
-  kvm_mmu_notifier_change_pte
-    kvm_handle_hva_range
-    __kvm_handle_hva_range
-    kvm_set_spte_gfn            (C)
-        :
-  kvm_mmu_notifier_invalidate_range_end
+Allow to specify extra properties for accelerators. With this, the
+"its-migration" can be tested for the combination of KVM and dirty
+ring.
 
-Fix the issue by skipping the invalid memory slot at (C) to avoid the
-illegal stage2 mapping so that the read request for the pflash's status
-is forwarded to QEMU and emulated by it. In this way, the correct pflash's
-status can be returned from QEMU to break the infinite loop in the edk2
-firmware.
-
-We tried a git-bisect and the first problematic commit is cd4c71835228 ("
-KVM: arm64: Convert to the gfn-based MMU notifier callbacks"). With this,
-clean_dcache_guest_page() is called after the memory slots are iterated
-in kvm_mmu_notifier_change_pte(). clean_dcache_guest_page() is called
-before the iteration on the memory slots before this commit. This change
-literally enlarges the racy window between kvm_mmu_notifier_change_pte()
-and memory slot removal so that we're able to reproduce the issue in a
-practical test case. However, the issue exists since commit d5d8184d35c9
-("KVM: ARM: Memory virtualization setup").
-
-Cc: stable@vger.kernel.org # v3.9+
-Fixes: d5d8184d35c9 ("KVM: ARM: Memory virtualization setup")
-Reported-by: Shuai Hu <hshuai@redhat.com>
-Reported-by: Zhenyu Zhang <zhenyzha@redhat.com>
 Signed-off-by: Gavin Shan <gshan@redhat.com>
 ---
-v3: Skip the invalid memory slots in change_pte() MMU notifier only,
-    suggested by Sean. Improved changelog to describe how the fixes
-    tag is given.
+v3: Split $ACCEL to $ACCEL and $ACCEL_PROPS in get_qemu_accelerator()
+    and don't print them as output, suggested by Drew.
 ---
- virt/kvm/kvm_main.c | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+ arm/run               | 12 ++++--------
+ powerpc/run           |  5 ++---
+ s390x/run             |  5 ++---
+ scripts/arch-run.bash | 21 +++++++++++++--------
+ x86/run               |  5 ++---
+ 5 files changed, 23 insertions(+), 25 deletions(-)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 479802a892d4..65f94f592ff8 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -686,6 +686,24 @@ static __always_inline int kvm_handle_hva_range_no_flush(struct mmu_notifier *mn
+diff --git a/arm/run b/arm/run
+index c6f25b8..d9ebe59 100755
+--- a/arm/run
++++ b/arm/run
+@@ -10,10 +10,8 @@ if [ -z "$KUT_STANDALONE" ]; then
+ fi
+ processor="$PROCESSOR"
  
- 	return __kvm_handle_hva_range(kvm, &range);
+-accel=$(get_qemu_accelerator) ||
+-	exit $?
+-
+-if [ "$accel" = "kvm" ]; then
++get_qemu_accelerator || exit $?
++if [ "$ACCEL" = "kvm" ]; then
+ 	QEMU_ARCH=$HOST
+ fi
+ 
+@@ -23,11 +21,9 @@ qemu=$(search_qemu_binary) ||
+ if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
+    [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ] &&
+    [ "$(basename $QEMU)" = "qemu-system-arm" ]; then
+-	accel=tcg
++	ACCEL="tcg"
+ fi
+ 
+-ACCEL=$accel
+-
+ if ! $qemu -machine '?' | grep -q 'ARM Virtual Machine'; then
+ 	echo "$qemu doesn't support mach-virt ('-machine virt'). Exiting."
+ 	exit 2
+@@ -72,7 +68,7 @@ if $qemu $M -device '?' | grep -q pci-testdev; then
+ 	pci_testdev="-device pci-testdev"
+ fi
+ 
+-A="-accel $ACCEL"
++A="-accel $ACCEL$ACCEL_PROPS"
+ command="$qemu -nodefaults $M $A -cpu $processor $chr_testdev $pci_testdev"
+ command+=" -display none -serial stdio -kernel"
+ command="$(migration_cmd) $(timeout_cmd) $command"
+diff --git a/powerpc/run b/powerpc/run
+index ee38e07..3988e72 100755
+--- a/powerpc/run
++++ b/powerpc/run
+@@ -9,8 +9,7 @@ if [ -z "$KUT_STANDALONE" ]; then
+ 	source scripts/arch-run.bash
+ fi
+ 
+-ACCEL=$(get_qemu_accelerator) ||
+-	exit $?
++get_qemu_accelerator || exit $?
+ 
+ qemu=$(search_qemu_binary) ||
+ 	exit $?
+@@ -21,7 +20,7 @@ if ! $qemu -machine '?' 2>&1 | grep 'pseries' > /dev/null; then
+ fi
+ 
+ M='-machine pseries'
+-M+=",accel=$ACCEL"
++M+=",accel=$ACCEL$ACCEL_PROPS"
+ command="$qemu -nodefaults $M -bios $FIRMWARE"
+ command+=" -display none -serial stdio -kernel"
+ command="$(migration_cmd) $(timeout_cmd) $command"
+diff --git a/s390x/run b/s390x/run
+index f1111db..c57862f 100755
+--- a/s390x/run
++++ b/s390x/run
+@@ -9,8 +9,7 @@ if [ -z "$KUT_STANDALONE" ]; then
+ 	source scripts/arch-run.bash
+ fi
+ 
+-ACCEL=$(get_qemu_accelerator) ||
+-	exit $?
++get_qemu_accelerator || exit $?
+ 
+ qemu=$(search_qemu_binary) ||
+ 	exit $?
+@@ -26,7 +25,7 @@ if [ "${1: -7}" = ".pv.bin" ] || [ "${TESTNAME: -3}" = "_PV" ] && [ "$MIGRATION"
+ fi
+ 
+ M='-machine s390-ccw-virtio'
+-M+=",accel=$ACCEL"
++M+=",accel=$ACCEL$ACCEL_PROPS"
+ command="$qemu -nodefaults -nographic $M"
+ command+=" -chardev stdio,id=con0 -device sclpconsole,chardev=con0"
+ command+=" -kernel"
+diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+index 51e4b97..19c16c1 100644
+--- a/scripts/arch-run.bash
++++ b/scripts/arch-run.bash
+@@ -412,6 +412,9 @@ hvf_available ()
+ 
+ get_qemu_accelerator ()
+ {
++	ACCEL_PROPS=${ACCEL#"${ACCEL%%,*}"}
++	ACCEL=${ACCEL%%,*}
++
+ 	if [ "$ACCEL" = "kvm" ] && ! kvm_available; then
+ 		echo "KVM is needed, but not available on this host" >&2
+ 		return 2
+@@ -421,13 +424,15 @@ get_qemu_accelerator ()
+ 		return 2
+ 	fi
+ 
+-	if [ "$ACCEL" ]; then
+-		echo $ACCEL
+-	elif kvm_available; then
+-		echo kvm
+-	elif hvf_available; then
+-		echo hvf
+-	else
+-		echo tcg
++	if [ -z "$ACCEL" ]; then
++		if kvm_available; then
++			ACCEL="kvm"
++		elif hvf_available; then
++			ACCEL="hvf"
++		else
++			ACCEL="tcg"
++		fi
+ 	fi
++
++	return 0
  }
-+
-+static bool kvm_change_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
-+{
-+	/*
-+	 * Skipping invalid memslots is correct if and only change_pte() is
-+	 * surrounded by invalidate_range_{start,end}(), which is currently
-+	 * guaranteed by the primary MMU.  If that ever changes, KVM needs to
-+	 * unmap the memslot instead of skipping the memslot to ensure that KVM
-+	 * doesn't hold references to the old PFN.
-+	 */
-+	WARN_ON_ONCE(!READ_ONCE(kvm->mn_active_invalidate_count));
-+
-+	if (range->slot->flags & KVM_MEMSLOT_INVALID)
-+		return false;
-+
-+	return kvm_set_spte_gfn(kvm, range);
-+}
-+
- static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
- 					struct mm_struct *mm,
- 					unsigned long address,
-@@ -707,7 +725,7 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
- 	if (!READ_ONCE(kvm->mmu_invalidate_in_progress))
- 		return;
+diff --git a/x86/run b/x86/run
+index 4d53b72..9a10703 100755
+--- a/x86/run
++++ b/x86/run
+@@ -9,8 +9,7 @@ if [ -z "$KUT_STANDALONE" ]; then
+ 	source scripts/arch-run.bash
+ fi
  
--	kvm_handle_hva_range(mn, address, address + 1, pte, kvm_set_spte_gfn);
-+	kvm_handle_hva_range(mn, address, address + 1, pte, kvm_change_spte_gfn);
- }
+-ACCEL=$(get_qemu_accelerator) ||
+-	exit $?
++get_qemu_accelerator || exit $?
  
- void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
+ qemu=$(search_qemu_binary) ||
+ 	exit $?
+@@ -38,7 +37,7 @@ else
+ fi
+ 
+ command="${qemu} --no-reboot -nodefaults $pc_testdev -vnc none -serial stdio $pci_testdev"
+-command+=" -machine accel=$ACCEL"
++command+=" -machine accel=$ACCEL$ACCEL_PROPS"
+ if [ "${CONFIG_EFI}" != y ]; then
+ 	command+=" -kernel"
+ fi
 -- 
 2.40.1
 
