@@ -1,65 +1,82 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-26.mta1.migadu.com (out-26.mta1.migadu.com [95.215.58.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA0D10FF
-	for <kvmarm@lists.linux.dev>; Thu, 15 Jun 2023 08:36:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CCD7C433C8;
-	Thu, 15 Jun 2023 08:36:17 +0000 (UTC)
-Date: Thu, 15 Jun 2023 09:36:14 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54F233D84
+	for <kvmarm@lists.linux.dev>; Thu, 15 Jun 2023 08:39:25 +0000 (UTC)
+Date: Thu, 15 Jun 2023 08:39:17 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1686818362;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Gz3kiTPD1i8pSYPebBODTPl6dCik1dmiIWWuoo4q9xU=;
+	b=MD6laGEukKWpVKXpKSLgfCPgbCy/4H8HB11XY9lDuC687B3NTM2X5zpDjvuQV5DNZE5MoE
+	zMH4vV/ALY1EPtIMPbYfEuMHIx2XvixQGjjsqG7l9OSj75lWkkD/z5mcosowAC5DWhQFeN
+	yibe9YNMXZ8+XJ6iNPUkIci5SqosbX0=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	Darren Hart <darren@os.amperecomputing.com>,
-	D Scott Phillips <scott@os.amperecomputing.com>
-Subject: Re: [PATCH 0/3] KVM: arm64: Work around Ampere1 erratum AC03_CPU_38
-Message-ID: <ZIrNfh8ArloYtbem@arm.com>
-References: <20230609220104.1836988-1-oliver.upton@linux.dev>
- <ZInxk+75cYfP3N4S@arm.com>
- <ZIpIAB5EOls/Io4+@linux.dev>
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	seanjc@google.com
+Subject: Re: [PATCH v5 0/7] KVM: arm64: Add support for FEAT_TLBIRANGE
+Message-ID: <ZIrONR6cSegiK1e2@linux.dev>
+References: <20230606192858.3600174-1-rananta@google.com>
+ <ZImwRAuSXcVt3UPV@linux.dev>
+ <CAJHc60wUSNpFLeESWcpEa5OmN4bJg9wBre-2k8803WHpn03LGw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZIpIAB5EOls/Io4+@linux.dev>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJHc60wUSNpFLeESWcpEa5OmN4bJg9wBre-2k8803WHpn03LGw@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jun 14, 2023 at 11:06:40PM +0000, Oliver Upton wrote:
-> Hey Catalin,
-> 
-> On Wed, Jun 14, 2023 at 05:57:55PM +0100, Catalin Marinas wrote:
-> > On Fri, Jun 09, 2023 at 10:01:01PM +0000, Oliver Upton wrote:
-> > > Small series to work around a CPU erratum on AmpereOne. While the
-> > > implementation does not advertise support for FEAT_HAFDBS (due to
-> > > another erratum), the associated control bits do not have RES0 behavior
-> > > as required by the architecture.
-> > > 
-> > > Usage of HAFDBS at stage-1 is unaffected, since HA and HD are only
-> > > enabled on implementations that advertise the feature. However, KVM
-> > > relies on HA having RES0 semantics if the feature isn't implemented. The
-> > > end result is that KVM enables a broken hardware access flag
-> > > implementation that could lead to correctness issues.
-> > 
-> > Just curious, what's the correctness issue here? The access flag is
-> > mostly indicative of which pages are old for swapping out/discarding.
-> > It's not like the dirty state which would be dangerous if we get wrong.
-> 
-> I probably could have helped out by giving the full context.
-> 
-> The software-observable behavior on this system is that the A or D
-> updates could arrive after a PTE has been marked as invalid, which could
-> corrupt software metadata stuffed into the page tables. We do exactly
-> that at stage-2 in KVM for parallel fault handling, where a magic value
-> indicates a PTE is being updated by another thread.
++cc Sean
 
-Ah, ok, that's dangerous indeed. Thanks for the details (you may want to
-add them in the patch description or the erratum kconfig entry).
+On Wed, Jun 14, 2023 at 06:57:01PM -0700, Raghavendra Rao Ananta wrote:
+> On Wed, Jun 14, 2023 at 5:19 AM Oliver Upton <oliver.upton@linux.dev> wrote:
+> >
+> > Hi Raghavendra,
+> >
+> > On Tue, Jun 06, 2023 at 07:28:51PM +0000, Raghavendra Rao Ananta wrote:
+> > > The series is based off of upstream v6.4-rc2, and applied David
+> > > Matlack's common API for TLB invalidations[1] on top.
+> >
+> > Sorry I didn't spot the dependency earlier, but this isn't helpful TBH.
+> >
+> > David's series was partially applied, and what remains no longer cleanly
+> > applies to the base you suggest. Independent of that, my *strong*
+> > preference is that you just send out a series containing your patches as
+> > well as David's. Coordinating dependent efforts is the only sane thing
+> > to do. Also, those patches are 5 months old at this point which is
+> > ancient history.
+> >
+> Would you rather prefer I detach this series from David's as I'm not
+> sure what his plans are for future versions?
+> On the other hand, the patches seem simple enough to rebase and give
+> another shot at review, but may end up delaying this series.
+> WDYT?
+
+In cases such as this you'd typically coordinate with the other
+developer to pick up their changes as part of your series. Especially
+for this case -- David's refactoring is _pointless_ without another
+user for that code (i.e. arm64). As fun as it might be to antagonize
+Sean, that series pokes x86 and I'd like an ack from on it.
+
+So, please post a combined series that applies cleanly to an early 6.4
+rc of your choosing, and cc all affected reviewers/maintainers.
 
 -- 
-Catalin
+Thanks,
+Oliver
