@@ -1,122 +1,227 @@
-Received: from CY4PR02CU007.outbound.protection.outlook.com (mail-westcentralusazon11011001.outbound.protection.outlook.com [40.93.199.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516937FA
-	for <kvmarm@lists.linux.dev>; Sat, 17 Jun 2023 01:52:15 +0000 (UTC)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZRgX3U53iREBBX5g8llTaep3gH7eHV1QXOR+mRkE+kPBPHopGnfbi1U/jMMaPfc6g6lElADE31LEFs2MEgW9dcvwdIpbUW1P8MEtLdQCrzFAGP3i7fsBCwUwUTyER/duOQ72U+gc8cdO8USYbiD8qp8zM0f+yL8v74umerKa1tiJEvSfBSCmAEzsbdNVzhaACTS6ej8D/aeUxMGPt56xvvv06XdjwX378BG+pzBBNLj/8Ebf+Qx48GXtPNiaKM+WOeFX2qw348NOcz4TaH2mReAJuug+nk2kr1RS8rW8Gz1ZmRjkPTFe5bzM2zlxj0Q64fHwqw5JBLOODF1H9NlY+w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=txlbpfncO8rB3QOcX/VJT+CRZcsl7oOJPj1MK4oBvyg=;
- b=HQtjTO+ALBGpwgZi0vJuwm5MnE4j38W2D4vA9KH60aKX+RmOBp4C3MDIV0tYBplAiFsbqo4cf0izyt1saRVrQPjOmt+DgNcXEbHJVcnxALD3mHbHRb7aNVZ2WK7j7nKSE20cxUGcus0dgWTWUOo118S4W51m8RbbfS2xub7z+Fdqvb2qO4iYFf67otk4dn77wyZ/DSGRSQuROLwAD4n2BEYMcCuJe0bPdVF/twDrhQfR5/cFsA5jFrZ6eGtLnqkD5cnr7T6eyAy3Px7/B840IPPrLAhhQJ9G4mdNKHGFwuRD0PpGxSQqq4RAGljyclW3LZ3QwH+Y/8mymSxeQ1Nu+g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vmware.com; dmarc=pass action=none header.from=vmware.com;
- dkim=pass header.d=vmware.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=txlbpfncO8rB3QOcX/VJT+CRZcsl7oOJPj1MK4oBvyg=;
- b=xqo2Mt4ZmKeNJdwULki4JQs2qanaITLjouju9H0saD42FMcLrNeo88YDpMjKjBNY1nHTDeEpFVOQN+3nDZGCL80DTvc1ekZV7Gi1NKUf8vjq2tPqCgw+bS63DuQU3fqFLIvxaF+hdD45oY82CM7gXqug3n4cqR2niCp646mxGEA=
-Received: from BY3PR05MB8531.namprd05.prod.outlook.com (2603:10b6:a03:3ce::6)
- by SN7PR05MB9261.namprd05.prod.outlook.com (2603:10b6:806:26f::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.36; Sat, 17 Jun
- 2023 01:52:13 +0000
-Received: from BY3PR05MB8531.namprd05.prod.outlook.com
- ([fe80::45c9:cdc8:ff01:5e8a]) by BY3PR05MB8531.namprd05.prod.outlook.com
- ([fe80::45c9:cdc8:ff01:5e8a%6]) with mapi id 15.20.6500.032; Sat, 17 Jun 2023
- 01:52:13 +0000
-From: Nadav Amit <namit@vmware.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, Nikos Nikoleris
-	<nikos.nikoleris@arm.com>
-Subject: Re: [kvm-unit-tests PATCH 6/6] arm64: dump stack on bad exception
-Thread-Topic: [kvm-unit-tests PATCH 6/6] arm64: dump stack on bad exception
-Thread-Index: AQHZoL4LOiB8/aauukytYwf8UyR8cK+OOyIA
-Date: Sat, 17 Jun 2023 01:52:13 +0000
-Message-ID: <651794A2-0FE7-4F9E-9C4E-60D48C6D19A4@vmware.com>
-References: <20230617014930.2070-1-namit@vmware.com>
- <20230617014930.2070-7-namit@vmware.com>
-In-Reply-To: <20230617014930.2070-7-namit@vmware.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-mailer: Apple Mail (2.3731.600.7)
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vmware.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BY3PR05MB8531:EE_|SN7PR05MB9261:EE_
-x-ms-office365-filtering-correlation-id: 42617142-096c-435d-0221-08db6ed57887
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- V9lTkiHO+hLIQY9UJufsX8UnyjnaC7pOOwCj+jdcUr9IMLAddl8C/NrRBG4tH6xT4lUzIElGpNhCVfHEGhjuMzm7Rsr6XljxHu3cKGwKkGAIryQReeipfAXnvuW4XN9EVBiFRXO6PyVazKdKnx0AGXNyHrzFdJcVetwb3Um6dF21/wFX9J2U4r2t05fzdSGxUAVROJ4zc57w1x8tfXB6safdq6vYj7PLnJ0pWkbw2RwKvQlsPhFlS0PPjUFYPKY7MF8S/OrntPfitMiqTfWjpyfQoND1x+M8RGKuOfZayhE+XP7pj7OKshVdsaoLT/misNajq8VTIJHRY3zmwMNyQ6JWFiFWHvvn5yqnC9d1NNuOU0Eb3aTkEmif7NI9BA7RfCM6AJQLctQnjPBm2eb445e3EOQ1aSgzIqXl7Uo/wD5ypNsDwENHv09B6SG2pUrpXy6H6qdUOYAMxwhXrFozMVGhbDu0HGulh0FJqoE6fHLywMwwSBjAbhR7rL6ielcQQI+z/XORV7jiSjAbEUBKVpW1XQZRL9TSmSYU49aWY6nszdJ3EwGVUmjBhBNCbFiJmQkz8i+Vr8Q2+C+1eRN/rP2X4vVdWC0CMtfquecOfjehnSTrtKPeDg1J+FbSaZB/s56hPbwHO1k5Fzhr6eLZ7w==
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY3PR05MB8531.namprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(366004)(396003)(376002)(39860400002)(136003)(451199021)(6916009)(26005)(5660300002)(41300700001)(53546011)(2616005)(186003)(6506007)(558084003)(33656002)(6512007)(36756003)(316002)(66476007)(76116006)(8936002)(66946007)(4326008)(66556008)(64756008)(66446008)(71200400001)(478600001)(38070700005)(6486002)(8676002)(54906003)(2906002)(38100700002)(122000001)(86362001)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?uMSMxMmhqJxDvIaJ1M0IYEFs+dzYmtb54l5OdxDmfXTFlQ9A/bv1ZKiTjvY0?=
- =?us-ascii?Q?uZ9SMgwBOWiyaGyEiApsq7Ce7id14GJcxBmlkYH/SE4xJtaYA5ICVMVwXz7C?=
- =?us-ascii?Q?nUZpeLX/mzDjbKWKCRY1fd8a5KWd+K3KFBkm9JOU3dptq26zINg2rDklNYgN?=
- =?us-ascii?Q?s5bf128XcHSOvdz99xpIutVKz+pUe5WCS+cxuqaWm6G5dOwbe11qUh19mpfR?=
- =?us-ascii?Q?pJ0J5Nv7LVO/5whV+cfqno7M+oj6M8GbBTniAEAsEEpyo1uKbdpIjcFUuiy5?=
- =?us-ascii?Q?ivXPjqB/CvG9KDW4A+2wjEjIAyZvPFuqBW0G4eF1537AezHbHmDQj6EXpaYu?=
- =?us-ascii?Q?dP7pQ2qTuC/hPmSD153O+gilRoW516sDUxbzLoQJLlgmCHIb3MqYzXJnYrSu?=
- =?us-ascii?Q?KTGSl2R+DskK2M9ic1HCinw0nPVvWD4kq7zhN2gc+LiUy0NpWDHoqDS026Es?=
- =?us-ascii?Q?XwDxJA4EmaSLh74URqdnrCKIAr/mRP6gBi+6HNLSPa7p67L+1VsB61VtzaiD?=
- =?us-ascii?Q?Dp26yXP3tN/JxNGNW7m9JMglPUqehuQzRI2xBgljh58L7+aJt4L06fxYbJwY?=
- =?us-ascii?Q?5oLYoo6pWyzHXAZW/vhY81oWO58XiniZrLtmpNSAhB5E0uOfdFX0ARGhplSG?=
- =?us-ascii?Q?PAjFHkILHtHDtSW8+/uWMOGhBtD5s+f2skWcAdL2w5qymECYTgt0opwLWHEZ?=
- =?us-ascii?Q?fd1K741Bc1iZY9iaepCp/R3QLlkd7LYZpAAAivPke/PqFdqae6k7eQX3TlXz?=
- =?us-ascii?Q?hI1u24MRc6cKYUAuYLFeekTCCLG0JorAwAiqe70Fa0BqawXm2hwI4E1DmHjQ?=
- =?us-ascii?Q?7E6NoPz+dv83nZJj7TmlHBpaplkyAzIfW+9z5U7ztCupdGQH8sIGaEwlmxEc?=
- =?us-ascii?Q?+9H7CnV4evg6lfsb+GW+PDptUkgPm3FL7kBfowGgoxBMeuD0t+GTnS3bZep+?=
- =?us-ascii?Q?lAYaXsrit6oq0Kd9gLKQSHHvzU3W2vGbqOr8LWGMpUSzWzyXebJlnRjIe8D7?=
- =?us-ascii?Q?1OGM2KJhSBPyE/QJ///5E3M0qLhyohaFYrJlM/9uD2Wn3GEvQ19QDTqCEJ80?=
- =?us-ascii?Q?3PkNMaVaGzton7P3xQM0/+ZksoKPfBQNeU92MpD0CcnoWpuU9pA9zlKhGwxs?=
- =?us-ascii?Q?gqEm9RLF+5T03xYm4L1q/xQfk45uMqht2HAuyo+wh8cHD/tGpH/2TnbZLg+P?=
- =?us-ascii?Q?3B++LaP9bE+DSaSTJOiCrPDeZJXs6heJlh6YWvN5Dmiq/1anlgsJ6bqS6Yqs?=
- =?us-ascii?Q?61PEgu0nZ6hoGRAsqFYMsRcou95G1HREQSG8r/gPwgetwH/SSjS1Fj5bhLPH?=
- =?us-ascii?Q?z2519gThQbifMiV+NQR8a2M1rMFrNdctC7av3GJG6N7uCpD+2Hdlv5x+Tu1I?=
- =?us-ascii?Q?v19kcgno7SBd440B8iXW3VKclPlK9LhJm5Ghb4gNF3iihFHmZlE4FfWYlGpM?=
- =?us-ascii?Q?mrK6dOOi9pMFbymPhQebMbKtjmFZBmpPpgx2YhixmwO2FKrQ/gxDgQyhKR7Q?=
- =?us-ascii?Q?Mw7HyJYCla8K7plygs2f1virimsYkTMhfamN9pDvhn2D2jLUCHUhBedlIx1o?=
- =?us-ascii?Q?w1PJ7zyQfrUR7kdcQSi8aF2p3K5/Jpk2uEGL/FPK?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <4258E6C0B15B3149AC8AB20D4F67EBFE@namprd05.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705253D74
+	for <kvmarm@lists.linux.dev>; Sun, 18 Jun 2023 19:19:52 +0000 (UTC)
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-3fddc620055so202231cf.1
+        for <kvmarm@lists.linux.dev>; Sun, 18 Jun 2023 12:19:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1687115991; x=1689707991;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JbR6FYiZlzxET1aZbxa1LnPa25BlJwTh4qhaLJ4bvzg=;
+        b=eeTeUO735vurVqYffUSvtO4InMdD7ecrFouGxTvZhYEKJAFj+iNmhaN9tu2ONEh2zq
+         89mW0ayvjTPwrfBsoKUi9fd5fr9ze0ICHF7BxV4woHO5JqvPZRPKLY2xrrn26G+NJH0x
+         DUxE98voVWezGuxg9OUVAFu8rupSLoeVL/QnMQxAmb/k40sScPQjWMg9w2/P2DgTkMb8
+         SHdvwblgqJJHWx+7iPLuQxgNy100g4QEuXp4/vYMvNUabSEKRH66I5WIJ93nZtC1CnKk
+         7RYEIUbSVvCf3kGwuVSB8mzNNo/aPYY38t591pX2WAN2fS9n4tJiTPSz8cqRXqfOVBu7
+         hOsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687115991; x=1689707991;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JbR6FYiZlzxET1aZbxa1LnPa25BlJwTh4qhaLJ4bvzg=;
+        b=ZOwEFMk8pAtMU9OmgZvv1n/iJijXxpIEiAs/gv1sM1rO/bPwqswsaDk31KTdujjyy3
+         9TT/TLzNtj0ZNm8Gj1bomqFqwVLYyMs4zhPjyr+jpcm0vBgvFE1KQDpwQND0PCPz5/Aw
+         mciq5TPX4zFmwbqz/6CiA1tKMoOWZPgEj4zTWDWe3COnJj61ldqOLpjfwx0tI4V3F/+o
+         0e+chqpS8O9W0ENZ/feC0yJt3uS5iEqNw5Q2VRu0Gx6MMVQJc2fzET/CMaY/FZhygOhA
+         hvuELNS7XbPS3CSo0SSYANEXqazpY6h1OeNWXY6kD7KkoKg9ZAsBaFhCCtsJvfx4QAMn
+         cuuQ==
+X-Gm-Message-State: AC+VfDyG9fKwX3p+XfUO3lUrFkobtuy6xkvt0nRBvaXRgisUhRdpS46F
+	ZheZszRvwmZf7sC+Ty+hXtOPQ/AePwrPOCvw/pCMBg==
+X-Google-Smtp-Source: ACHHUZ4amVIobuPycpFLC2fHeYKXTl1nn9tY9t3tZcZ8KQLrci6OwIYFpzYKhnwEJ6EGI3MQyCTT/zihLmvQ2yroRTk=
+X-Received: by 2002:a05:622a:589:b0:3ed:210b:e698 with SMTP id
+ c9-20020a05622a058900b003ed210be698mr754708qtb.7.1687115990926; Sun, 18 Jun
+ 2023 12:19:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-OriginatorOrg: vmware.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BY3PR05MB8531.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 42617142-096c-435d-0221-08db6ed57887
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jun 2023 01:52:13.1728
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: D6xBaDvYFbyoy7MDLtjtn+rMG6MQTzreOi2Lv7yBx0wlgYRQVBKlXeAfMwfjZ/YDqLQCiSHi58uq5cwUomNrVQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR05MB9261
+References: <20230526234435.662652-1-yuzhao@google.com> <20230609005943.43041-1-yuzhao@google.com>
+In-Reply-To: <20230609005943.43041-1-yuzhao@google.com>
+From: Yu Zhao <yuzhao@google.com>
+Date: Sun, 18 Jun 2023 13:19:14 -0600
+Message-ID: <CAOUHufZm9gDxRoVCc+hrZeyr=n9s-sa0i1DDGkWq2N_N9Sznmw@mail.gmail.com>
+Subject: Re: kvm/x86: multichase benchmark
+To: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alistair Popple <apopple@nvidia.com>, Anup Patel <anup@brainfault.org>, 
+	Ben Gardon <bgardon@google.com>, Borislav Petkov <bp@alien8.de>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Christophe Leroy <christophe.leroy@csgroup.eu>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Fabiano Rosas <farosas@linux.ibm.com>, Gaosheng Cui <cuigaosheng1@huawei.com>, 
+	Gavin Shan <gshan@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
+	James Morse <james.morse@arm.com>, "Jason A. Donenfeld" <Jason@zx2c4.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Michael Larabel <michael@michaellarabel.com>, 
+	Mike Rapoport <rppt@kernel.org>, Nicholas Piggin <npiggin@gmail.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Paul Mackerras <paulus@ozlabs.org>, Peter Xu <peterx@redhat.com>, 
+	Sean Christopherson <seanjc@google.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	linuxppc-dev@lists.ozlabs.org, linux-trace-kernel@vger.kernel.org, 
+	x86@kernel.org, linux-mm@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Jun 8, 2023 at 6:59=E2=80=AFPM Yu Zhao <yuzhao@google.com> wrote:
+>
+> TLDR
+> =3D=3D=3D=3D
+> Multichase in 64 microVMs achieved 6% more total samples (in ~4 hours) af=
+ter this patchset [1].
+>
+> Hardware
+> =3D=3D=3D=3D=3D=3D=3D=3D
+> HOST $ lscpu
+> Architecture:            x86_64
+>   CPU op-mode(s):        32-bit, 64-bit
+>   Address sizes:         43 bits physical, 48 bits virtual
+>   Byte Order:            Little Endian
+> CPU(s):                  128
+>   On-line CPU(s) list:   0-127
+> Vendor ID:               AuthenticAMD
+>   Model name:            AMD Ryzen Threadripper PRO 3995WX 64-Cores
+>     CPU family:          23
+>     Model:               49
+>     Thread(s) per core:  2
+>     Core(s) per socket:  64
+>     Socket(s):           1
+>     Stepping:            0
+>     Frequency boost:     disabled
+>     CPU max MHz:         4308.3979
+>     CPU min MHz:         2200.0000
+>     BogoMIPS:            5390.20
+>     Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr=
+ pge mca cmov pat pse36 clflush mmx fxsr sse sse2
+>                          ...
+> Virtualization features:
+>   Virtualization:        AMD-V
+> Caches (sum of all):
+>   L1d:                   2 MiB (64 instances)
+>   L1i:                   2 MiB (64 instances)
+>   L2:                    32 MiB (64 instances)
+>   L3:                    256 MiB (16 instances)
+> NUMA:
+>   NUMA node(s):          1
+>   NUMA node0 CPU(s):     0-127
+> Vulnerabilities:
+>   Itlb multihit:         Not affected
+>   L1tf:                  Not affected
+>   Mds:                   Not affected
+>   Meltdown:              Not affected
+>   Mmio stale data:       Not affected
+>   Retbleed:              Mitigation; untrained return thunk; SMT enabled =
+with STIBP protection
+>   Spec store bypass:     Mitigation; Speculative Store Bypass disabled vi=
+a prctl
+>   Spectre v1:            Mitigation; usercopy/swapgs barriers and __user =
+pointer sanitization
+>   Spectre v2:            Mitigation; Retpolines, IBPB conditional, STIBP =
+always-on, RSB filling, PBRSB-eIBRS Not affected
+>   Srbds:                 Not affected
+>   Tsx async abort:       Not affected
+>
+> HOST $ numactl -H
+> available: 1 nodes (0)
+> node 0 cpus: 0-127
+> node 0 size: 257542 MB
+> node 0 free: 224855 MB
+> node distances:
+> node   0
+>   0:  10
+>
+> HOST $ cat /sys/class/nvme/nvme0/model
+> INTEL SSDPF21Q800GB
+>
+> HOST $ cat /sys/class/nvme/nvme0/numa_node
+> 0
+>
+> Software
+> =3D=3D=3D=3D=3D=3D=3D=3D
+> HOST $ cat /etc/lsb-release
+> DISTRIB_ID=3DUbuntu
+> DISTRIB_RELEASE=3D22.04
+> DISTRIB_CODENAME=3Djammy
+> DISTRIB_DESCRIPTION=3D"Ubuntu 22.04.1 LTS"
+>
+> HOST $ uname -a
+> Linux x86 6.4.0-rc5+ #1 SMP PREEMPT_DYNAMIC Wed Jun  7 22:17:47 UTC 2023 =
+x86_64 x86_64 x86_64 GNU/Linux
+>
+> HOST $ cat /proc/swaps
+> Filename          Type         Size         Used    Priority
+> /dev/nvme0n1p2    partition    466838356    0       -2
+>
+> HOST $ cat /sys/kernel/mm/lru_gen/enabled
+> 0x000f
+>
+> HOST $ cat /sys/kernel/mm/transparent_hugepage/enabled
+> always madvise [never]
+>
+> HOST $ cat /sys/kernel/mm/transparent_hugepage/defrag
+> always defer defer+madvise madvise [never]
+>
+> Procedure
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D
+> HOST $ git clone https://github.com/google/multichase
+>
+> HOST $ <Build multichase>
+> HOST $ <Unpack /boot/initrd.img into ./initrd/>
+>
+> HOST $ cp multichase/multichase ./initrd/bin/
+> HOST $ sed -i \
+>     "/^maybe_break top$/i multichase -t 2 -m 4g -n 28800; poweroff" \
 
+I was reminded that I missed one parameter above, i.e.,
 
-> On Jun 16, 2023, at 6:49 PM, Nadav Amit <nadav.amit@gmail.com> wrote:
->=20
-> From: Nadav Amit <namit@vmware.com>
->=20
-> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
+"/^maybe_break top$/i multichase -N -t 2 -m 4g -n 28800; poweroff" \
+                                 ^^
 
-Ugh.
+>     ./initrd/init
+>
+> HOST $ <Pack ./initrd/ into ./initrd.img>
+>
+> HOST $ cat run_microvms.sh
+> memcgs=3D64
+>
+> run() {
+>     path=3D/sys/fs/cgroup/memcg$1
+>
+>     mkdir $path
+>     echo $BASHPID >$path/cgroup.procs
 
-Signed-off-by: Nadav Amit <namit@vmware.com <mailto:namit@vmware.com>>
+And one line here:
 
+echo 4000m >$path/memory.min # or the largest size that doesn't cause OOM k=
+ills
+
+>     qemu-system-x86_64 -M microvm,accel=3Dkvm -cpu host -smp 2 -m 6g \
+>         -nographic -kernel /boot/vmlinuz -initrd ./initrd.img \
+>         -append "console=3DttyS0 loglevel=3D0"
+> }
+>
+> for ((memcg =3D 0; memcg < $memcgs; memcg++)); do
+>     run $memcg &
+> done
+>
+> wait
+>
+> Results
+> =3D=3D=3D=3D=3D=3D=3D
+>                  Before [1]    After    Change
+> ----------------------------------------------
+> Total samples    6824          7237     +6%
+>
+> Notes
+> =3D=3D=3D=3D=3D
+> [1] "mm: rmap: Don't flush TLB after checking PTE young for page
+>     reference" was included so that the comparison is apples to
+>     Apples.
+>     https://lore.kernel.org/r/20220706112041.3831-1-21cnbao@gmail.com/
