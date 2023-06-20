@@ -1,155 +1,173 @@
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3480CED5
-	for <kvmarm@lists.linux.dev>; Tue, 20 Jun 2023 02:44:36 +0000 (UTC)
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-763ac8282a3so42242585a.0
-        for <kvmarm@lists.linux.dev>; Mon, 19 Jun 2023 19:44:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687229076; x=1689821076;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LfUNRUM1h2YyuDNdLgmHc3JvRKvju4SHuCqjDXIk+uc=;
-        b=bC3AfGTQCUYFohvPkc4osyRXMzjjHYkDArvFOabW9zNPBUQOOq4ppfLK/JxFduK3Uz
-         OrojvYYuTK/vAWl2lY4RL86o8C6W76b4g8my6f5tYxLouqz3o/F5CU1IMAroLnxaVwkm
-         WnSWscZ6qcdqJK6gGwFz8JOpNfn3QqwRWrXpG73q3jA692UkiGbfjORWYzOCkp0773xE
-         YK9ajY9qFP9KImfrIl+nkXEIapxJJskUzqM1GUgW6ywWpMqtKrY9sfjbgWK7zk+M7r+t
-         Mj+MPzW3CL8uotm6zhD+1IbHU801DBPjN1d//kpPbSJSW383LLcki5V+Nq/UmD2o0i3m
-         Hngg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4EFA15AE
+	for <kvmarm@lists.linux.dev>; Tue, 20 Jun 2023 04:13:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1687234415;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DgbqzAuPyAfpFUWhZFLJCOhBcWUc6MZhREMA0o9RDBs=;
+	b=J8UiqtB++Bhy/d8K90RsO/8Nu1W8xEoByVAn6JYSQqa443hglDUG2Nu+sQU6NgCDXdeJx2
+	rDMyQJu9ghGPC5DQVLelVENd1gaSViOlEdC7Y/BMKjzFPvi8baWy9UbnlKz++LUFB3amzd
+	YnS5f2JXGEcT3cV/f59KheezpfkvYh0=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-108-aKI7_L_GNHS5opHJ_Xe17g-1; Tue, 20 Jun 2023 00:13:34 -0400
+X-MC-Unique: aKI7_L_GNHS5opHJ_Xe17g-1
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-3f9f44bba08so44272951cf.2
+        for <kvmarm@lists.linux.dev>; Mon, 19 Jun 2023 21:13:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687229076; x=1689821076;
+        d=1e100.net; s=20221208; t=1687234414; x=1689826414;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LfUNRUM1h2YyuDNdLgmHc3JvRKvju4SHuCqjDXIk+uc=;
-        b=aBtgC9i1VBDfmnFox0up7stKnOG0wFVP6cmoRfJvg9gEBPHuld0s7Z6CxJTveLkODx
-         YTYzE+hq/xU62b0io/GGBthnKpqlU20Y2UntTvGMAUB/O/DxbPIZrdMgOQ8yplot6Zpo
-         /6tZWP5Rblcl28bOHkCcyxk8yCk93/4OObAjPRKqKB0HD7n3QqiIZXVFVuOw6Sw1cbA2
-         8EbybFkRKKug/jfJSxCJ6z3NN9OrG/uEYKX5zh3Htb2XxEO/LH3KHDazxlKWiZr9CrPN
-         BhLkjeGJqs/H/1rnvScmx5ex+KDUgehd5x64wDWejhcH4tFhPXcMKK8CmcpvzAqgIAYj
-         SgrA==
-X-Gm-Message-State: AC+VfDzgDMMcFaKNqny/xGgZSgXXhXJ0zkbdbpdXuOFaOlJRXqwPZC4g
-	/bXKeJpCEoQfSbz7tT2EUBU=
-X-Google-Smtp-Source: ACHHUZ4hB8VltlKYkQ7lgdVOdmNZdYf1Ired4GhNDWRF0gJLtQ7F2RZrt3wZiREni2gqvCMujgRHYw==
-X-Received: by 2002:a05:620a:1b8b:b0:760:7da5:ef2a with SMTP id dv11-20020a05620a1b8b00b007607da5ef2amr12265723qkb.36.1687229075937;
-        Mon, 19 Jun 2023 19:44:35 -0700 (PDT)
-Received: from [172.27.224.21] (ec2-16-163-40-128.ap-east-1.compute.amazonaws.com. [16.163.40.128])
-        by smtp.gmail.com with ESMTPSA id n4-20020a170903110400b001b55c0548dfsm460364plh.97.2023.06.19.19.44.31
+        bh=DgbqzAuPyAfpFUWhZFLJCOhBcWUc6MZhREMA0o9RDBs=;
+        b=drZXwEeSjxLQRWFrv8cxCb3JwoKt/VVe/diiR1s5XB15U4DK+fsv2uJjL1i4CLLRaF
+         KAsBZa8vrbUS9D/qM6iLUOMGPB1Y9sfbjkUcXi5j6Rjyda7pQUVTD2NEZZvw6/qzTEK4
+         KzZJjjsPIoWSrNdXze/LOEB9fsBCKJg/yypEefCYt23nG0EZ9cClY+wS/JBhXZsI7jor
+         mpSfAI5nXERYbgJVYp9bDX+by4FROWvLWk6WT9qJrKKySjeVNK2Y1BuzNyrVRwNhbYi/
+         xrv84f2exHFblmBu7gjpTarKjjxhQ3n8bAU5FnedTE1KxPuKoUDExd6WEo2GBriVK01V
+         cluA==
+X-Gm-Message-State: AC+VfDz+87BIj3hDViKYL90dsQsaC0Bqky1kliSQY5VbX6dnHbe3OGB5
+	UA8dpMbrmy7g6LMVH2kEPODUHLZjsevfp0EmN2Hjjt6Q6Hlj4YppFHF6c9NKmKtrc2aIptFRmEU
+	jTSV5Ja28sttknsvh
+X-Received: by 2002:a05:622a:11d3:b0:3ff:1f86:81be with SMTP id n19-20020a05622a11d300b003ff1f8681bemr4982730qtk.36.1687234413733;
+        Mon, 19 Jun 2023 21:13:33 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ4VikTMDxrm2lwtMxbVKAbjd6H2SzNCaieiXTnBw5q4yoNulJefaR1mHFOrWLlt3nZwLBBUow==
+X-Received: by 2002:a05:622a:11d3:b0:3ff:1f86:81be with SMTP id n19-20020a05622a11d300b003ff1f8681bemr4982716qtk.36.1687234413489;
+        Mon, 19 Jun 2023 21:13:33 -0700 (PDT)
+Received: from ?IPV6:2001:8003:7475:6e00:1e1e:4135:2440:ee05? ([2001:8003:7475:6e00:1e1e:4135:2440:ee05])
+        by smtp.gmail.com with ESMTPSA id j19-20020a62b613000000b00640f51801e6sm371313pff.159.2023.06.19.21.13.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Jun 2023 19:44:35 -0700 (PDT)
-Message-ID: <7ca95d15-43c8-b9f5-a419-07bb4c27862f@gmail.com>
-Date: Tue, 20 Jun 2023 10:44:29 +0800
+        Mon, 19 Jun 2023 21:13:32 -0700 (PDT)
+Message-ID: <766a1dc4-a5ad-725a-b25e-438bf1387a4f@redhat.com>
+Date: Tue, 20 Jun 2023 14:13:22 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v4 16/16] KVM: selftests: Handle memory fault exits in
- demand_paging_test
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [kvm-unit-tests PATCH v3] runtime: Allow to specify properties
+ for accelerator
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+ linux-s390@vger.kernel.org, lvivier@redhat.com, thuth@redhat.com,
+ frankja@linux.ibm.com, imbrenda@linux.ibm.com, david@redhat.com,
+ pbonzini@redhat.com, nrb@linux.ibm.com, shan.gavin@gmail.com
+References: <20230615062148.19883-1-gshan@redhat.com>
+ <20230619-339675e424da033000049f83@orel>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20230619-339675e424da033000049f83@orel>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Language: en-US
-To: Anish Moorthy <amoorthy@google.com>, seanjc@google.com,
- oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: pbonzini@redhat.com, maz@kernel.org, jthoughton@google.com,
- bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
- axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
- isaku.yamahata@gmail.com
-References: <20230602161921.208564-1-amoorthy@google.com>
- <20230602161921.208564-17-amoorthy@google.com>
-From: Robert Hoo <robert.hoo.linux@gmail.com>
-In-Reply-To: <20230602161921.208564-17-amoorthy@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 6/3/2023 12:19 AM, Anish Moorthy wrote:
-[...]
->   static void vcpu_worker(struct memstress_vcpu_args *vcpu_args)
->   {
->   	struct kvm_vcpu *vcpu = vcpu_args->vcpu;
->   	int vcpu_idx = vcpu_args->vcpu_idx;
->   	struct kvm_run *run = vcpu->run;
-> -	struct timespec start;
-> -	struct timespec ts_diff;
-> +	struct timespec last_start;
-> +	struct timespec total_runtime = {};
->   	int ret;
->   
-> -	clock_gettime(CLOCK_MONOTONIC, &start);
->   
-> -	/* Let the guest access its memory */
-> -	ret = _vcpu_run(vcpu);
-> -	TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
-> -	if (get_ucall(vcpu, NULL) != UCALL_SYNC) {
-> -		TEST_ASSERT(false,
-> -			    "Invalid guest sync status: exit_reason=%s\n",
-> -			    exit_reason_str(run->exit_reason));
-> -	}
-> +	while (true) {
-> +		clock_gettime(CLOCK_MONOTONIC, &last_start);
-> +		/* Let the guest access its memory */
-> +		ret = _vcpu_run(vcpu);
-> +		TEST_ASSERT(ret == 0
-> +			    || (errno == EFAULT
-> +				&& run->exit_reason == KVM_EXIT_MEMORY_FAULT),
-> +			    "vcpu_run failed: %d\n", ret);
->   
-> -	ts_diff = timespec_elapsed(start);
-> +		total_runtime = timespec_add(total_runtime,
-> +					     timespec_elapsed(last_start));
-> +		if (ret != 0 && get_ucall(vcpu, NULL) != UCALL_SYNC) {
-> +
-> +			if (run->exit_reason == KVM_EXIT_MEMORY_FAULT) {
-> +				ready_page(run->memory_fault.gpa);
-> +				continue;
-> +			}
-> +
-> +			TEST_ASSERT(false,
-> +				    "Invalid guest sync status: exit_reason=%s\n",
-> +				    exit_reason_str(run->exit_reason));
-> +		}
-> +		break;
-> +	}
->   	PER_VCPU_DEBUG("vCPU %d execution time: %ld.%.9lds\n", vcpu_idx,
-> -		       ts_diff.tv_sec, ts_diff.tv_nsec);
-> +			total_runtime.tv_sec, total_runtime.tv_nsec);
->   }
+Hi Drew,
 
-Can include number of #PF handled by vcpu worker in PER_VCPU_DEBUG output.
+On 6/19/23 18:45, Andrew Jones wrote:
+> On Thu, Jun 15, 2023 at 04:21:48PM +1000, Gavin Shan wrote:
+>> There are extra properties for accelerators to enable the specific
+>> features. For example, the dirty ring for KVM accelerator can be
+>> enabled by "-accel kvm,dirty-ring-size=65536". Unfortuntely, the
+>> extra properties for the accelerators aren't supported. It makes
+>> it's impossible to test the combination of KVM and dirty ring
+>> as the following error message indicates.
+>>
+>>    # cd /home/gavin/sandbox/kvm-unit-tests/tests
+>>    # QEMU=/home/gavin/sandbox/qemu.main/build/qemu-system-aarch64 \
+>>      ACCEL=kvm,dirty-ring-size=65536 ./its-migration
+>>       :
+>>    BUILD_HEAD=2fffb37e
+>>    timeout -k 1s --foreground 90s /home/gavin/sandbox/qemu.main/build/qemu-system-aarch64 \
+>>    -nodefaults -machine virt -accel kvm,dirty-ring-size=65536 -cpu cortex-a57             \
+>>    -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd   \
+>>    -device pci-testdev -display none -serial stdio -kernel _NO_FILE_4Uhere_ -smp 160      \
+>>    -machine gic-version=3 -append its-pending-migration # -initrd /tmp/tmp.gfDLa1EtWk
+>>    qemu-system-aarch64: kvm_init_vcpu: kvm_arch_init_vcpu failed (0): Invalid argument
+>>
+>> Allow to specify extra properties for accelerators. With this, the
+>> "its-migration" can be tested for the combination of KVM and dirty
+>> ring.
+>>
+>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>> ---
+>> v3: Split $ACCEL to $ACCEL and $ACCEL_PROPS in get_qemu_accelerator()
+>>      and don't print them as output, suggested by Drew.
+>> ---
+>>   arm/run               | 12 ++++--------
+>>   powerpc/run           |  5 ++---
+>>   s390x/run             |  5 ++---
+>>   scripts/arch-run.bash | 21 +++++++++++++--------
+>>   x86/run               |  5 ++---
+>>   5 files changed, 23 insertions(+), 25 deletions(-)
+>>
+>> diff --git a/arm/run b/arm/run
+>> index c6f25b8..d9ebe59 100755
+>> --- a/arm/run
+>> +++ b/arm/run
+>> @@ -10,10 +10,8 @@ if [ -z "$KUT_STANDALONE" ]; then
+>>   fi
+>>   processor="$PROCESSOR"
+>>   
+>> -accel=$(get_qemu_accelerator) ||
+>> -	exit $?
+>> -
+>> -if [ "$accel" = "kvm" ]; then
+>> +get_qemu_accelerator || exit $?
+>> +if [ "$ACCEL" = "kvm" ]; then
+>>   	QEMU_ARCH=$HOST
+>>   fi
+>>   
+>> @@ -23,11 +21,9 @@ qemu=$(search_qemu_binary) ||
+>>   if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
+>>      [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ] &&
+>>      [ "$(basename $QEMU)" = "qemu-system-arm" ]; then
+>> -	accel=tcg
+>> +	ACCEL="tcg"
+>>   fi
+>>   
+> 
+> As I pointed out in the v2 review we can't just s/accel/ACCEL/ without
+> other changes. Now ACCEL will also be set when the above condition
+> is checked, making it useless. Please ensure the test case that commit
+> c7d6c7f00e7c ("arm/run: Use TCG with qemu-system-arm on arm64 systems")
+> fixed still works with your patch.
+> 
 
-diff --git a/tools/testing/selftests/kvm/demand_paging_test.c 
-b/tools/testing/selftests/kvm/demand_paging_test.c
-index 4b79c88cb22d..8841150b0e2b 100644
---- a/tools/testing/selftests/kvm/demand_paging_test.c
-+++ b/tools/testing/selftests/kvm/demand_paging_test.c
-@@ -91,7 +91,7 @@ static void vcpu_worker(struct memstress_vcpu_args *vcpu_args)
-         struct timespec last_start;
-         struct timespec total_runtime = {};
-         int ret;
--
-+       int pages = 0;
+Sorry that I missed your comments for v2. In order to make the test case
+in c7d6c7f00e7c working, we just need to call set_qemu_accelerator() after
+the chunk of code, like below. When $ACCEL is set to "tcg" by the conditional
+code, it won't be changed in the following set_qemu_accelerator().
 
-         while (true) {
-                 clock_gettime(CLOCK_MONOTONIC, &last_start);
-@@ -108,6 +108,7 @@ static void vcpu_worker(struct memstress_vcpu_args *vcpu_args)
+Could you Please confirm if it looks good to you so that I can integrate
+the changes to v4 and post it.
 
-                         if (run->exit_reason == KVM_EXIT_MEMORY_FAULT) {
-                                 ready_page(run->memory_fault.gpa);
-+                               pages++;
-                                 continue;
-                         }
+arm/run
+--------
 
-@@ -117,8 +118,8 @@ static void vcpu_worker(struct memstress_vcpu_args *vcpu_args)
-                 }
-                 break;
-         }
--       PER_VCPU_DEBUG("vCPU %d execution time: %ld.%.9lds\n", vcpu_idx,
--                       total_runtime.tv_sec, total_runtime.tv_nsec);
-+       PER_VCPU_DEBUG("vCPU %d execution time: %ld.%.9lds, %d page faults 
-handled\n", vcpu_idx,
-+                       total_runtime.tv_sec, total_runtime.tv_nsec, pages);
-  }
+processor="$PROCESSOR"
 
+if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
+    [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ] &&
+    [ "$(basename $QEMU)" = "qemu-system-arm" ]; then
+         ACCEL="tcg"
+fi
+
+set_qemu_accelerator || exit $?
+if [ "$ACCEL" = "kvm" ]; then
+         QEMU_ARCH=$HOST
+fi
+
+
+Thanks,
+Gavin
 
