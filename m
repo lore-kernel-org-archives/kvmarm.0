@@ -1,19 +1,19 @@
-Received: from out-27.mta0.migadu.com (out-27.mta0.migadu.com [91.218.175.27])
+Received: from out-45.mta0.migadu.com (out-45.mta0.migadu.com [91.218.175.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55F16290EA
-	for <kvmarm@lists.linux.dev>; Tue, 20 Jun 2023 16:34:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4671E3089E
+	for <kvmarm@lists.linux.dev>; Tue, 20 Jun 2023 16:34:30 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1687278867;
+	t=1687278869;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ozp7nMJBIanGFpLhSsXzbcxvf6QycLsafj4anW0+fyw=;
-	b=SBY5/RZCtM3Uh0uG7/OIYYrYgCb0GAzJxEU8DZUCZu8vZFkVJVwcwWI/1ltK2JWUPz1dDF
-	3on8eKtZWw5J8aGJek2GkFM09k7fy4jUdNUI3AMk5/c9XhsHga6GPPtO7gxkXQIQs2edg0
-	ER1WJ08mQ8VOCKkYc2x/s0ubgK/dPyU=
+	bh=BH+4B6YnDKlj9OKWRCpY2U/dsfTmAuzng4u9SSgU/Eo=;
+	b=nd/o1nMr+oGYw8TPTig9BVx08mzZDy7q0/Yu3XyeXAv1TKdCItaaWIzlIyyG2OdefahBQ8
+	DN9Q7Do+kumZAveiJRXN/Rb1LXSvb0XNUQ6gxn7hac1zpCloFleL8V4wH82VgNGTsKceAj
+	c+loXLUDd8UNnDPq/ZHTJpDICfxjTiU=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -25,9 +25,9 @@ Cc: kvm@vger.kernel.org,
 	Julien Thierry <julien.thierry.kdev@gmail.com>,
 	Salil Mehta <salil.mehta@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 07/20] arm: Stash kvm_vcpu_init for later use
-Date: Tue, 20 Jun 2023 11:33:40 -0500
-Message-ID: <20230620163353.2688567-8-oliver.upton@linux.dev>
+Subject: [PATCH v2 08/20] arm: Use KVM_SET_MP_STATE ioctl to power off non-boot vCPUs
+Date: Tue, 20 Jun 2023 11:33:41 -0500
+Message-ID: <20230620163353.2688567-9-oliver.upton@linux.dev>
 In-Reply-To: <20230620163353.2688567-1-oliver.upton@linux.dev>
 References: <20230620163353.2688567-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -39,42 +39,47 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-A subsequent change will add support for resetting a vCPU, which
-requires reissuing the KVM_ARM_VCPU_INIT ioctl. Save the kvm_vcpu_init
-worked out for later use.
+Using the POWER_OFF flag in kvm_vcpu_init gets in the way of resetting a
+vCPU in response to a PSCI CPU_ON call, for obvious reasons. Drop the
+flag in favor of using the KVM_SET_MP_STATE call for non-boot vCPUs.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arm/include/arm-common/kvm-cpu-arch.h | 2 +-
- arm/kvm-cpu.c                         | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ arm/kvm-cpu.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/arm/include/arm-common/kvm-cpu-arch.h b/arm/include/arm-common/kvm-cpu-arch.h
-index 923d2c4..bf5223e 100644
---- a/arm/include/arm-common/kvm-cpu-arch.h
-+++ b/arm/include/arm-common/kvm-cpu-arch.h
-@@ -11,7 +11,7 @@ struct kvm_cpu {
- 	pthread_t	thread;
- 
- 	unsigned long	cpu_id;
--	unsigned long	cpu_type;
-+	struct kvm_vcpu_init	init;
- 	const char	*cpu_compatible;
- 
- 	struct kvm	*kvm;
 diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-index a43eb90..0769eef 100644
+index 0769eef..7934d79 100644
 --- a/arm/kvm-cpu.c
 +++ b/arm/kvm-cpu.c
-@@ -114,7 +114,7 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
- 	/* Populate the vcpu structure. */
- 	vcpu->kvm		= kvm;
- 	vcpu->cpu_id		= cpu_id;
--	vcpu->cpu_type		= vcpu_init.target;
-+	vcpu->init		= vcpu_init;
- 	vcpu->cpu_compatible	= target->compatible;
- 	vcpu->is_running	= true;
+@@ -63,10 +63,6 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+ 	if (vcpu->kvm_run == MAP_FAILED)
+ 		die("unable to mmap vcpu fd");
  
+-	/* VCPU 0 is the boot CPU, the others start in a poweroff state. */
+-	if (cpu_id > 0)
+-		vcpu_init.features[0] |= (1UL << KVM_ARM_VCPU_POWER_OFF);
+-
+ 	/* Set KVM_ARM_VCPU_PSCI_0_2 if available */
+ 	if (kvm__supports_extension(kvm, KVM_CAP_ARM_PSCI_0_2)) {
+ 		vcpu_init.features[0] |= (1UL << KVM_ARM_VCPU_PSCI_0_2);
+@@ -121,6 +117,16 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+ 	if (err || target->init(vcpu))
+ 		die("Unable to initialise vcpu");
+ 
++	/* VCPU 0 is the boot CPU, the others start in a poweroff state. */
++	if (cpu_id > 0) {
++		struct kvm_mp_state mp_state = {
++			.mp_state	= KVM_MP_STATE_STOPPED,
++		};
++
++		if (ioctl(vcpu->vcpu_fd, KVM_SET_MP_STATE, &mp_state))
++			die_perror("KVM_SET_MP_STATE failed");
++	}
++
+ 	coalesced_offset = ioctl(kvm->sys_fd, KVM_CHECK_EXTENSION,
+ 				 KVM_CAP_COALESCED_MMIO);
+ 	if (coalesced_offset)
 -- 
 2.41.0.162.gfafddb0af9-goog
 
