@@ -1,338 +1,140 @@
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03B05EC3
-	for <kvmarm@lists.linux.dev>; Wed, 21 Jun 2023 00:38:49 +0000 (UTC)
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-3f9d619103dso21381cf.1
-        for <kvmarm@lists.linux.dev>; Tue, 20 Jun 2023 17:38:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B62AF17EF
+	for <kvmarm@lists.linux.dev>; Wed, 21 Jun 2023 01:55:27 +0000 (UTC)
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-4f86dbce369so4323998e87.0
+        for <kvmarm@lists.linux.dev>; Tue, 20 Jun 2023 18:55:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687307928; x=1689899928;
+        d=gmail.com; s=20221208; t=1687312525; x=1689904525;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UbeEtUy9SR2M7k28TLFp+3oTL4iFQyUyRuoTI6dZXb8=;
-        b=0kug6R+GWSxgd5hSxLlcycwxHzz/P0efqWWmQ0XJGjPTw0p18ICZI+ckgtCD2EgDM0
-         tpETl0tLYLIg0uN3zbUrotFafJfZ99YCdjPSCVmb8+2eqsLu2yK2G6zzoy2tS7GGZGS6
-         FkCkh37ZJEcrXrkFNC8KktqvO9y1ghN5ZT05cmxNTPiRsvVHDwzcUsXc+UtzA2a9Q6+t
-         7jJbW0Wafek2eGbY7aWKk2RLY7wgWd175TmL/pFPlLDjbat4owzU/m1qg7mJTSxvGJpY
-         BmQyB24jIDfoMSdHUCS1pi/9MXSiZo79glRZ8ODdRwUIngU3r17N7qtKchHOQMg1ICkb
-         aGjw==
+        bh=Wz+JcRD5iqUFNC0O0Ru60ZgS8tD+DjfgbMM6b7JgDDE=;
+        b=I4Xks4H0f9hjuiTto0xGg2qYpfM1NZn0dyFE3RFSgjOTxwdHLkw2aJFM6SQ4UPOBl2
+         dNK6TDWAZALS3CRzxzO+dpAo1U9mCItEUs562QTVmbmesDW2NSyCOoPgJOgoYQAz7I81
+         HLw63JGcQ4kMncWwX/yetxeXc4t9tZnic1kQbgvD1AUCJKn28T1HFnucS8Q2s7Nx+DQZ
+         f8U5MS+CPM3LZ1R10maFt1FXao1Rfu9UuLwRlmRiKcyG4Eu87O2mrDltGfJ0J9bBeZ4/
+         piitDPizcx0RsJDQqHWespeaFg6I0iuKgvJ4MSz6hINYPHYT0FU7ayv5Ygm+4xicdr1J
+         wVig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687307928; x=1689899928;
+        d=1e100.net; s=20221208; t=1687312525; x=1689904525;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UbeEtUy9SR2M7k28TLFp+3oTL4iFQyUyRuoTI6dZXb8=;
-        b=mIweOY4Bw4q1y6gdQMspNRhFqjq1D+eJqvoyaPwbrz20R8iXaST5Hr20FF9/bBhIzJ
-         5Npkzw4cDUgpB80Xa8uKQLiuCCkyHbMpkNu6TYz3cs+6NoVrfga8HDuap6l9gkEQ7Hx3
-         rE+1w/Rf7Q79RQc+tz1MxKPemMw3Yds2h92SdmX8vV1cmZIepNSZSWDGjl/sYeAojdFj
-         QXd8dYugGXShcxZCDPTPprW8hYOOdE84Q6elLxrsnXPvJpyApuNwr7ZX7n/8BOx20Zfl
-         n/BsnsClYqv87SMS4GQOBkenhgA/xE57W+jZWbbVaPeScpPLZ+unDzzHveLT2Ifjaswe
-         2yKw==
-X-Gm-Message-State: AC+VfDxFc+lYBc54WQCTYiLGlrtH1GRpUaPovMHv5x5wqV2QKuOScP1q
-	Jngc/AK4ipPpk/qtri0RXR6Z8itf/E2XTfaicY1tvA==
-X-Google-Smtp-Source: ACHHUZ7DuWH27EJU0J2gyK8ww3GkEqCk3IcP9Lpwqnc/rAmLtX0jV9Bm68MFgueqO2IKbOsYe97TGNyxr+bVvBWc0gU=
-X-Received: by 2002:ac8:7f93:0:b0:3ef:404a:b291 with SMTP id
- z19-20020ac87f93000000b003ef404ab291mr397682qtj.7.1687307928570; Tue, 20 Jun
- 2023 17:38:48 -0700 (PDT)
+        bh=Wz+JcRD5iqUFNC0O0Ru60ZgS8tD+DjfgbMM6b7JgDDE=;
+        b=dGJVlG23g/AAKugj9Kb9sZmXm28uSgCFrrJF6h5TgSOUQjukAo9Couhaca4UqSazZn
+         Ez5TZLz+fZzlNt9VW7+/FFruV2m1CDckrAz+eaGZ0eXBeWOHjLsgqiXIxo95+BUJK2w1
+         gksIWBnzTUNGWji0vKOKRq98rxTG8bmqDx4M7ZCoh15KN5LKhUmsUbWZY/Ai0sFMaJqJ
+         DrIPMcF6sxlUiYD58IJFB0WwOIjeujvwiGQykDROdpwettpFQ9aORoIHfJiNPMJyVbuN
+         +9v3/XLxGQNGZzRkbk3M+sorS7Xz66hxi9m9JY/zJzEVox0KCVi0IeqrvyGpJkkQMB1E
+         xVPg==
+X-Gm-Message-State: AC+VfDxromNK48u2EuI1mND9nRqC0FQqfe6GSXFFO3XAqFIdCrOfm+RE
+	7dE5e0khFHfWKmXXGPlus+fkUqvJINPRFaxpZko=
+X-Google-Smtp-Source: ACHHUZ6wY9wkDAsQKF4/pJB6A70/338sp9DCerB/qo1fiLgVSLjXYq0d7uPy8bn+2oY5S0+fhyThzcL/uGhJOGcqvb4=
+X-Received: by 2002:a05:6512:1cd:b0:4f9:573a:689d with SMTP id
+ f13-20020a05651201cd00b004f9573a689dmr610014lfp.37.1687312525203; Tue, 20 Jun
+ 2023 18:55:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230526234435.662652-1-yuzhao@google.com> <20230526234435.662652-8-yuzhao@google.com>
- <CTHB6A4EL3IH.3UJFAJ4LV85X6@wheely>
-In-Reply-To: <CTHB6A4EL3IH.3UJFAJ4LV85X6@wheely>
-From: Yu Zhao <yuzhao@google.com>
-Date: Tue, 20 Jun 2023 18:38:12 -0600
-Message-ID: <CAOUHufaEpyXjr-zPRXRsGdiJV9ZDo2qxA32swcJ30=7Nmyg3vQ@mail.gmail.com>
-Subject: Re: [PATCH mm-unstable v2 07/10] kvm/powerpc: add kvm_arch_test_clear_young()
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Alistair Popple <apopple@nvidia.com>, Anup Patel <anup@brainfault.org>, 
-	Ben Gardon <bgardon@google.com>, Borislav Petkov <bp@alien8.de>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Christophe Leroy <christophe.leroy@csgroup.eu>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	Fabiano Rosas <farosas@linux.ibm.com>, Gaosheng Cui <cuigaosheng1@huawei.com>, 
-	Gavin Shan <gshan@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
-	James Morse <james.morse@arm.com>, "Jason A. Donenfeld" <Jason@zx2c4.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Michael Larabel <michael@michaellarabel.com>, 
-	Mike Rapoport <rppt@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Paul Mackerras <paulus@ozlabs.org>, Peter Xu <peterx@redhat.com>, 
-	Sean Christopherson <seanjc@google.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	linuxppc-dev@lists.ozlabs.org, linux-trace-kernel@vger.kernel.org, 
-	x86@kernel.org, linux-mm@google.com
+References: <cover.1686275310.git.haibo1.xu@intel.com> <8cd4ce50f5f4a639f4508085959aae222d4d4386.1686275310.git.haibo1.xu@intel.com>
+ <20230609-fba04b424a4d46574e04e587@orel> <CAJve8okjRZEt6_6SB9EWm+6c7utpExzenfWo2T1N-J6G9w9czQ@mail.gmail.com>
+ <20230620-95ce8ab70956a72b9da3a31a@orel>
+In-Reply-To: <20230620-95ce8ab70956a72b9da3a31a@orel>
+From: Haibo Xu <xiaobo55x@gmail.com>
+Date: Wed, 21 Jun 2023 09:55:13 +0800
+Message-ID: <CAJve8onNFfHFcvAGkbtnxjzqgfq4geL1zOwJEc8Xzc=NHVDrFg@mail.gmail.com>
+Subject: Re: [PATCH v3 10/10] KVM: riscv: selftests: Add get-reg-list test
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: Haibo Xu <haibo1.xu@intel.com>, maz@kernel.org, oliver.upton@linux.dev, 
+	seanjc@google.com, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Shuah Khan <shuah@kernel.org>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Ben Gardon <bgardon@google.com>, 
+	David Matlack <dmatlack@google.com>, Vipin Sharma <vipinsh@google.com>, 
+	Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 20, 2023 at 1:48=E2=80=AFAM Nicholas Piggin <npiggin@gmail.com>=
- wrote:
+On Tue, Jun 20, 2023 at 6:44=E2=80=AFPM Andrew Jones <ajones@ventanamicro.c=
+om> wrote:
 >
-> On Sat May 27, 2023 at 9:44 AM AEST, Yu Zhao wrote:
-> > Implement kvm_arch_test_clear_young() to support the fast path in
-> > mmu_notifier_ops->test_clear_young().
+> On Tue, Jun 20, 2023 at 06:05:59PM +0800, Haibo Xu wrote:
+> > On Fri, Jun 9, 2023 at 9:35=E2=80=AFPM Andrew Jones <ajones@ventanamicr=
+o.com> wrote:
+> > >
+> > > On Fri, Jun 09, 2023 at 10:12:18AM +0800, Haibo Xu wrote:
+> > > > +static struct vcpu_reg_list aia_config =3D {
+> > > > +     .sublists =3D {
+> > > > +     BASE_SUBLIST,
+> > > > +     AIA_REGS_SUBLIST,
+> > > > +     {0},
+> > > > +     },
+> > > > +};
+> > > > +
+> > > > +static struct vcpu_reg_list fp_f_d_config =3D {
+> > > > +     .sublists =3D {
+> > > > +     BASE_SUBLIST,
+> > > > +     FP_F_REGS_SUBLIST,
+> > > > +     FP_D_REGS_SUBLIST,
+> > > > +     {0},
+> > > > +     },
+> > > > +};
+> > > > +
+> > > > +struct vcpu_reg_list *vcpu_configs[] =3D {
+> > > > +     &zicbo_config,
+> > > > +     &aia_config,
+> > > > +     &fp_f_d_config,
+> > > > +};
+> > > > +int vcpu_configs_n =3D ARRAY_SIZE(vcpu_configs);
+> > > > --
+> > > > 2.34.1
+> > > >
+> > >
+> > > I see we have a bit of a problem with the configs for riscv. Since we
+> > > don't disable anything we're not testing, then for any test that is
+> > > missing, for example, the f and d registers, we'll get output like
+> > > "There are 66 new registers. Consider adding them to the blessed reg
+> > > list with the following lines:" and then a dump of all the f and d
+> > > registers. The test doesn't fail, but it's messy and confusing. Ideal=
+ly
+> > > we'd disable all registers of all sublists not in the config, probabl=
+y
+> > > by starting by disabling everything and then only reenabling the ones
+> > > in the config.
+> > >
+> > > Anything that can't be disabled is either a KVM bug, i.e. we should
+> > > be able to disable it, because we can't expect every host to have it,
+> > > or it needs to be in the base register sublist (meaning every host
+> > > will always have it).
+> > >
 > >
-> > It focuses on a simple case, i.e., radix MMU sets the accessed bit in
-> > KVM PTEs and VMs are not nested, where it can rely on RCU and
-> > pte_xchg() to safely clear the accessed bit without taking
-> > kvm->mmu_lock. Complex cases fall back to the existing slow path
-> > where kvm->mmu_lock is then taken.
+> > HI Andrew,
 > >
-> > Signed-off-by: Yu Zhao <yuzhao@google.com>
-> > ---
-> >  arch/powerpc/include/asm/kvm_host.h    |  8 ++++
-> >  arch/powerpc/include/asm/kvm_ppc.h     |  1 +
-> >  arch/powerpc/kvm/book3s.c              |  6 +++
-> >  arch/powerpc/kvm/book3s.h              |  1 +
-> >  arch/powerpc/kvm/book3s_64_mmu_radix.c | 59 ++++++++++++++++++++++++++
-> >  arch/powerpc/kvm/book3s_hv.c           |  5 +++
-> >  6 files changed, 80 insertions(+)
-> >
-> > diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include=
-/asm/kvm_host.h
-> > index 14ee0dece853..75c260ea8a9e 100644
-> > --- a/arch/powerpc/include/asm/kvm_host.h
-> > +++ b/arch/powerpc/include/asm/kvm_host.h
-> > @@ -883,4 +883,12 @@ static inline void kvm_arch_sched_in(struct kvm_vc=
-pu *vcpu, int cpu) {}
-> >  static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
-> >  static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
-> >
-> > +#define kvm_arch_has_test_clear_young kvm_arch_has_test_clear_young
-> > +static inline bool kvm_arch_has_test_clear_young(void)
-> > +{
-> > +     return IS_ENABLED(CONFIG_KVM_BOOK3S_HV_POSSIBLE) &&
-> > +            cpu_has_feature(CPU_FTR_HVMODE) && cpu_has_feature(CPU_FTR=
-_ARCH_300) &&
-> > +            radix_enabled();
+> > I found several multi-letters ISA EXT(AIA/SSTC etc) were not allowed
+> > to be disabled.
+> > Is it a bug? shall we fix it=EF=BC=9F
 >
-> This could probably be radix_enabled() && !kvmhv_on_pseries().
-
-Will do. (I used !kvmhv_on_pseries() in v1 but had second thoughts on
-moving kvmhv_on_pseries() into this file.)
-
-> Although unclear why not nested hypervisor... I'd have to think about it =
-a bit
-> more. Do you have any idea what might go wrong, or just didn't have the
-> time to consider it? (Not just powerpc nested but any others).
-
-Yes, this series excludes nested KVM support on all architures. The
-common reason for such a decision on powerpc and x86 (aarch64 doesn't
-support nested yet) is that it's quite challenging to make the rmap, a
-complex data structure that maps one PFN to multiple GFNs, lockless.
-(See kvmhv_insert_nest_rmap().) It might be possible, however, the
-potential ROI would be in question.
-
-> > +}
-> > +
-> >  #endif /* __POWERPC_KVM_HOST_H__ */
-> > diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/=
-asm/kvm_ppc.h
-> > index 79a9c0bb8bba..ff1af6a7b44f 100644
-> > --- a/arch/powerpc/include/asm/kvm_ppc.h
-> > +++ b/arch/powerpc/include/asm/kvm_ppc.h
-> > @@ -287,6 +287,7 @@ struct kvmppc_ops {
-> >       bool (*unmap_gfn_range)(struct kvm *kvm, struct kvm_gfn_range *ra=
-nge);
-> >       bool (*age_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
-> >       bool (*test_age_gfn)(struct kvm *kvm, struct kvm_gfn_range *range=
-);
-> > +     bool (*test_clear_young)(struct kvm *kvm, struct kvm_gfn_range *r=
-ange);
-> >       bool (*set_spte_gfn)(struct kvm *kvm, struct kvm_gfn_range *range=
-);
-> >       void (*free_memslot)(struct kvm_memory_slot *slot);
-> >       int (*init_vm)(struct kvm *kvm);
-> > diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-> > index 686d8d9eda3e..37bf40b0c4ff 100644
-> > --- a/arch/powerpc/kvm/book3s.c
-> > +++ b/arch/powerpc/kvm/book3s.c
-> > @@ -899,6 +899,12 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_=
-gfn_range *range)
-> >       return kvm->arch.kvm_ops->test_age_gfn(kvm, range);
-> >  }
-> >
-> > +bool kvm_arch_test_clear_young(struct kvm *kvm, struct kvm_gfn_range *=
-range)
-> > +{
-> > +     return !kvm->arch.kvm_ops->test_clear_young ||
-> > +            kvm->arch.kvm_ops->test_clear_young(kvm, range);
-> > +}
-> > +
-> >  bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
-> >  {
-> >       return kvm->arch.kvm_ops->set_spte_gfn(kvm, range);
-> > diff --git a/arch/powerpc/kvm/book3s.h b/arch/powerpc/kvm/book3s.h
-> > index 58391b4b32ed..fa2659e21ccc 100644
-> > --- a/arch/powerpc/kvm/book3s.h
-> > +++ b/arch/powerpc/kvm/book3s.h
-> > @@ -12,6 +12,7 @@ extern void kvmppc_core_flush_memslot_hv(struct kvm *=
-kvm,
-> >  extern bool kvm_unmap_gfn_range_hv(struct kvm *kvm, struct kvm_gfn_ran=
-ge *range);
-> >  extern bool kvm_age_gfn_hv(struct kvm *kvm, struct kvm_gfn_range *rang=
-e);
-> >  extern bool kvm_test_age_gfn_hv(struct kvm *kvm, struct kvm_gfn_range =
-*range);
-> > +extern bool kvm_test_clear_young_hv(struct kvm *kvm, struct kvm_gfn_ra=
-nge *range);
-> >  extern bool kvm_set_spte_gfn_hv(struct kvm *kvm, struct kvm_gfn_range =
-*range);
-> >
-> >  extern int kvmppc_mmu_init_pr(struct kvm_vcpu *vcpu);
-> > diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/=
-book3s_64_mmu_radix.c
-> > index 3b65b3b11041..0a392e9a100a 100644
-> > --- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
-> > +++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-> > @@ -1088,6 +1088,65 @@ bool kvm_test_age_radix(struct kvm *kvm, struct =
-kvm_memory_slot *memslot,
-> >       return ref;
-> >  }
-> >
-> > +bool kvm_test_clear_young_hv(struct kvm *kvm, struct kvm_gfn_range *ra=
-nge)
-> > +{
-> > +     bool err;
-> > +     gfn_t gfn =3D range->start;
-> > +
-> > +     rcu_read_lock();
-> > +
-> > +     err =3D !kvm_is_radix(kvm);
-> > +     if (err)
-> > +             goto unlock;
-> > +
-> > +     /*
-> > +      * Case 1:  This function          kvmppc_switch_mmu_to_hpt()
-> > +      *
-> > +      *          rcu_read_lock()
-> > +      *          Test kvm_is_radix()    kvm->arch.radix =3D 0
-> > +      *          Use kvm->arch.pgtable  synchronize_rcu()
-> > +      *          rcu_read_unlock()
-> > +      *                                 kvmppc_free_radix()
-> > +      *
-> > +      *
-> > +      * Case 2:  This function          kvmppc_switch_mmu_to_radix()
-> > +      *
-> > +      *                                 kvmppc_init_vm_radix()
-> > +      *                                 smp_wmb()
-> > +      *          Test kvm_is_radix()    kvm->arch.radix =3D 1
-> > +      *          smp_rmb()
-> > +      *          Use kvm->arch.pgtable
-> > +      */
-> > +     smp_rmb();
+> Extensions that a guest could use (regardless of whether or not the host
+> described it in the guest's isa string), because the instructions or CSR
+> accesses don't trap, can't truly be disabled. So, it's not a bug to
+> prohibit disabling them and indeed the test cases should actually ensure
+> disabling them fails.
 >
-> Comment could stand to expand slightly on what you are solving, in
-> words.
 
-Will do.
+So these kinds of ISA_EXT_* regs should be in the base reg list, right?
 
-> If you use synchronize_rcu() on both sides, you wouldn't need the
-> barrier, right?
+Thanks,
+Haibo
 
-Case 2 is about memory ordering, which is orthogonal to case 1 (RCU
-freeing). So we need the r/w barrier regardless.
-
-> > +     while (gfn < range->end) {
-> > +             pte_t *ptep;
-> > +             pte_t old, new;
-> > +             unsigned int shift;
-> > +
-> > +             ptep =3D find_kvm_secondary_pte_unlocked(kvm, gfn * PAGE_=
-SIZE, &shift);
-> > +             if (!ptep)
-> > +                     goto next;
-> > +
-> > +             VM_WARN_ON_ONCE(!page_count(virt_to_page(ptep)));
->
-> Not really appropriate at the KVM level. mm enforces this kind of
-> thing (with notifiers).
-
-Will remove this.
-
-> > +
-> > +             old =3D READ_ONCE(*ptep);
-> > +             if (!pte_present(old) || !pte_young(old))
-> > +                     goto next;
-> > +
-> > +             new =3D pte_mkold(old);
-> > +
-> > +             if (kvm_should_clear_young(range, gfn))
-> > +                     pte_xchg(ptep, old, new);
->
-> *Probably* will work. I can't think of a reason why not at the
-> moment anyway :)
-
-My reasoning:
-* It should work if we only change the dedicated A bit, i.e., not
-shared for other purposes, because races are safe (the case here).
-* It may not work for x86 EPT without the A bit (excluded in this
-series) where accesses are trapped by the R/X bits, because races in
-changing the R/X bits can be unsafe.
-
-> > +next:
-> > +             gfn +=3D shift ? BIT(shift - PAGE_SHIFT) : 1;
-> > +     }
-> > +unlock:
-> > +     rcu_read_unlock();
-> > +
-> > +     return err;
-> > +}
-> > +
-> >  /* Returns the number of PAGE_SIZE pages that are dirty */
-> >  static int kvm_radix_test_clear_dirty(struct kvm *kvm,
-> >                               struct kvm_memory_slot *memslot, int page=
-num)
-> > diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.=
-c
-> > index 130bafdb1430..20a81ec9fde8 100644
-> > --- a/arch/powerpc/kvm/book3s_hv.c
-> > +++ b/arch/powerpc/kvm/book3s_hv.c
-> > @@ -5262,6 +5262,8 @@ int kvmppc_switch_mmu_to_hpt(struct kvm *kvm)
-> >       spin_lock(&kvm->mmu_lock);
-> >       kvm->arch.radix =3D 0;
-> >       spin_unlock(&kvm->mmu_lock);
-> > +     /* see the comments in kvm_test_clear_young_hv() */
->
-> I'm guilty of such comments at times, but it wouldn't hurt to say
->         /* Finish concurrent kvm_test_clear_young_hv access to page table=
-s */
->
-> Then you know where to look for more info and you have a vague
-> idea what it's for.
-
-Will do.
-
-> > +     synchronize_rcu();
->
-> >       kvmppc_free_radix(kvm);
-> >
-> >       lpcr =3D LPCR_VPM1;
-> > @@ -5286,6 +5288,8 @@ int kvmppc_switch_mmu_to_radix(struct kvm *kvm)
-> >       if (err)
-> >               return err;
-> >       kvmppc_rmap_reset(kvm);
-> > +     /* see the comments in kvm_test_clear_young_hv() */
-> > +     smp_wmb();
-> >       /* Mutual exclusion with kvm_unmap_gfn_range etc. */
-> >       spin_lock(&kvm->mmu_lock);
-> >       kvm->arch.radix =3D 1;
-> > @@ -6185,6 +6189,7 @@ static struct kvmppc_ops kvm_ops_hv =3D {
-> >       .unmap_gfn_range =3D kvm_unmap_gfn_range_hv,
-> >       .age_gfn =3D kvm_age_gfn_hv,
-> >       .test_age_gfn =3D kvm_test_age_gfn_hv,
-> > +     .test_clear_young =3D kvm_test_clear_young_hv,
-> >       .set_spte_gfn =3D kvm_set_spte_gfn_hv,
-> >       .free_memslot =3D kvmppc_core_free_memslot_hv,
-> >       .init_vm =3D  kvmppc_core_init_vm_hv,
->
-> Thanks for looking at the powerpc conversion!
-
-Thanks for reviewing!
+> Thanks,
+> drew
