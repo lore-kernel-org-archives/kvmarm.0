@@ -1,40 +1,40 @@
-Received: from mail-il1-f202.google.com (mail-il1-f202.google.com [209.85.166.202])
+Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3570D19E5B
-	for <kvmarm@lists.linux.dev>; Wed, 21 Jun 2023 17:50:30 +0000 (UTC)
-Received: by mail-il1-f202.google.com with SMTP id e9e14a558f8ab-340c149231fso49107995ab.2
-        for <kvmarm@lists.linux.dev>; Wed, 21 Jun 2023 10:50:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15C4819E45
+	for <kvmarm@lists.linux.dev>; Wed, 21 Jun 2023 17:50:31 +0000 (UTC)
+Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-77e2c123e8aso472034439f.1
+        for <kvmarm@lists.linux.dev>; Wed, 21 Jun 2023 10:50:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687369829; x=1689961829;
+        d=google.com; s=20221208; t=1687369830; x=1689961830;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dtGUI04cZLcqHqfVph3GLMvS0CVYqac6sXI/vA3EN9c=;
-        b=wUCfp8LIVxVyw9rOjJ+xxvqYiNhrMKEQGqZAIrYsflCWYaL7sMIjnn5LDzBF8HHkci
-         fU6aqWxAcgnmVfiz4UwopUTnDAafaCROX3yoC8OfXmrNVemh4RlpXriU2kIUlflYJXHw
-         uMCeKHy/l1FGUBNLLAGrP3KIWF3x8c8QA6lH15hhdrXNCDtmipcd1fYAZABG46exGlSO
-         gFSuHconOaa66m/06jG0Ro0iy0bHzhaKM98M74q46S68x0wg14fu0205JCX28SDxNDoC
-         IeVohMieqPadYlEk/nIWyWNaXHuxsT0P5qiOFBg+yGi/qLEjpv50H3iXe5QJF2vkwCpH
-         B3PA==
+        bh=kpR1MspLCCKbLGu542rFrU99snL12qe0SU5vnENHbnc=;
+        b=obkQNETduI4Wdlr8DqbH6rQDpqF2mUi0lafiiZR1QXrNN2+tKemED10KMGrakG13Nq
+         +F9e7JIuRjiRR9EfoJnua+9jPsENy4Tu90Vrn/2nK11OMp8Aj/golURDqyPfJ94Cfrxi
+         hdWdLoNiohD/PMMDEG0mtQHMd7A92j4tIxNPh8D/cM9gYPH0WwqnOU4OcPsZKdr9HTOs
+         pyGKjpe6+P6Xcb6ByP94N+J+yZmYDJogpjw8kcjVcP5B1YTqtAJdqi8Hp9kutYXKuAUx
+         OCxMudA25zodKFZSyAwbz9vLyvHyzcqnxGuKjUldsdPVjyx7x6uGCQbzc3ZzHDMDOM0D
+         Kg8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687369829; x=1689961829;
+        d=1e100.net; s=20221208; t=1687369830; x=1689961830;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dtGUI04cZLcqHqfVph3GLMvS0CVYqac6sXI/vA3EN9c=;
-        b=S+ivUQFr+OAQjN5XOBCPqV3cAhGWHD8hFYf5D9+7Js2yOVBeHGx8SbZLSKyZTnD01G
-         n00TU7uuhyxMj3tcHg2othE2U9sK6VUYh5/Vh8LI73j2vWJkLYA8VD2SAibjNz0A27La
-         fCq3250P13glBK0Bxm71LJfq/C4BcwGFTjcN3YwuDNeUdlQy4TApxVjyN6uUiinob9BK
-         M4KQrSATWPu8amsatUKtKPUbyGl4H9MTeKKe0FmF9v7vSa7DhkPWbHTSZR+J3Eqx9M7o
-         DjZ3ZKfvv3Sh9vHnyDFr9YGrK4SiVVJLZx1XZH97UelNwj1JYGiVfJPVHkHNNs4neHtf
-         1d1Q==
-X-Gm-Message-State: AC+VfDzsMdKCXzgGIqUACRZnH8YRptQHkYJvG0iJzuMFDeIVPPYdqZuM
-	qPIatZ5HQKBpq8TjIdOBx1hBkqirKwM3
-X-Google-Smtp-Source: ACHHUZ6E9qc4T7u9+yG0bI7LCSWrNIIprVuEXDN8tL08Gxqy8ruadzAtjVxDCW2tLBKnP2MlbqXA+k7+GwdZ
+        bh=kpR1MspLCCKbLGu542rFrU99snL12qe0SU5vnENHbnc=;
+        b=cXpRNIbmXwLDoSL3bBQQR3GL2oYNbOmYnil6VBUj+uZIPcIpBTHsmX7shvexyyafDg
+         wb+ueA/aU2/0Lg3s8ajdG1CaddoKyeR+B0KCMMnXNxMzquk5U2dSypD8v1cHYZ85saQY
+         5873BPncwIbVNR+KJcsm2DN26ucKEkYnqkFhk8rPL4CNP/T3hB89wWWFSGSkCjAevUbk
+         fs0KIkdS/tVyl7IsErtTs2coaa/4gHhru4PXD88speBzuEK/vhRqRFdd6VhtZVmzaBj1
+         3Vvdb8gm49YI8z2VTL/4uag56aKSMlkoZLZYpEbWPEwuhIVoTNp3HHiCXDWd01JUU4X2
+         M4+A==
+X-Gm-Message-State: AC+VfDxS2aDLAej5/SatW2E2D9act0PqKHMoJNeC0Ro/A4LzEbeS57pf
+	8TOxGvgge7YeagJa0nQjmZcsxrhiwHgk
+X-Google-Smtp-Source: ACHHUZ6lEejYkvXSZImNPgkcjtxASyr0tUJRYFuyzfo7eVoPr61PQ+mo3lAqnIjMYGuKsT4NfkEe3+3Un922
 X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
- (user=rananta job=sendgmr) by 2002:a92:c9cb:0:b0:33e:6230:aa65 with SMTP id
- k11-20020a92c9cb000000b0033e6230aa65mr6242404ilq.0.1687369829258; Wed, 21 Jun
- 2023 10:50:29 -0700 (PDT)
-Date: Wed, 21 Jun 2023 17:49:59 +0000
+ (user=rananta job=sendgmr) by 2002:a05:6602:152:b0:777:b38d:2333 with SMTP id
+ v18-20020a056602015200b00777b38d2333mr5713635iot.3.1687369830330; Wed, 21 Jun
+ 2023 10:50:30 -0700 (PDT)
+Date: Wed, 21 Jun 2023 17:50:00 +0000
 In-Reply-To: <20230621175002.2832640-1-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230621175002.2832640-1-rananta@google.com>
 X-Mailer: git-send-email 2.41.0.162.gfafddb0af9-goog
-Message-ID: <20230621175002.2832640-9-rananta@google.com>
-Subject: [RESEND PATCH v5 08/11] KVM: arm64: Implement kvm_arch_flush_remote_tlbs_range()
+Message-ID: <20230621175002.2832640-10-rananta@google.com>
+Subject: [RESEND PATCH v5 09/11] KVM: arm64: Flush only the memslot after write-protect
 From: Raghavendra Rao Ananta <rananta@google.com>
 To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
 	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>
@@ -60,47 +60,31 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
 	kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Implement kvm_arch_flush_remote_tlbs_range() for arm64
-to invalidate the given range in the TLB.
+After write-protecting the region, currently KVM invalidates
+the entire TLB entries using kvm_flush_remote_tlbs(). Instead,
+scope the invalidation only to the targeted memslot. If
+supported, the architecture would use the range-based TLBI
+instructions to flush the memslot or else fallback to flushing
+all of the TLBs.
 
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 3 +++
- arch/arm64/kvm/mmu.c              | 7 +++++++
- 2 files changed, 10 insertions(+)
+ arch/arm64/kvm/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 81ab41b84f436..343fb530eea9c 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1081,6 +1081,9 @@ struct kvm *kvm_arch_alloc_vm(void);
- #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
- int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
- 
-+#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
-+int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn, u64 pages);
-+
- static inline bool kvm_vm_is_protected(struct kvm *kvm)
- {
- 	return false;
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index d0a0d3dca9316..c3ec2141c3284 100644
+index c3ec2141c3284..94f10e670c100 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -92,6 +92,13 @@ int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
- 	return 0;
+@@ -992,7 +992,7 @@ static void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot)
+ 	write_lock(&kvm->mmu_lock);
+ 	stage2_wp_range(&kvm->arch.mmu, start, end);
+ 	write_unlock(&kvm->mmu_lock);
+-	kvm_flush_remote_tlbs(kvm);
++	kvm_flush_remote_tlbs_memslot(kvm, memslot);
  }
  
-+int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn, u64 pages)
-+{
-+	kvm_tlb_flush_vmid_range(&kvm->arch.mmu,
-+				start_gfn << PAGE_SHIFT, pages << PAGE_SHIFT);
-+	return 0;
-+}
-+
- static bool kvm_is_device_pfn(unsigned long pfn)
- {
- 	return !pfn_is_map_memory(pfn);
+ /**
 -- 
 2.41.0.162.gfafddb0af9-goog
 
