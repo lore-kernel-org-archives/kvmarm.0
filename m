@@ -1,58 +1,82 @@
-Received: from out-31.mta1.migadu.com (out-31.mta1.migadu.com [95.215.58.31])
+Received: from out-7.mta1.migadu.com (out-7.mta1.migadu.com [95.215.58.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A435A200A8
-	for <kvmarm@lists.linux.dev>; Thu, 22 Jun 2023 17:18:13 +0000 (UTC)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE4B51F16A
+	for <kvmarm@lists.linux.dev>; Thu, 22 Jun 2023 17:20:05 +0000 (UTC)
+Date: Thu, 22 Jun 2023 17:20:01 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1687454291;
+	t=1687454404;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=gHykEPQXA9+eJ0Z724D3BRxoxSL/mGpodLg/RPdfWeM=;
-	b=eywEDEMULiEAxaN1fq9QxYJQSEs1YYsog/5+x632SInLRcEKkQEy3UEkISzDwpYvGYMn7w
-	RX8Sw7G9hSZ/XR1mUaAMeymqKzy2Tayh0+ly7amaTcsl3v6X7xS2ufD0QitdSMq5capYnr
-	hl7e5tLitQ8LBw/duGrlpfnQHkt878g=
+	bh=WckLBxk9OxSq5fZgxiuJq8OmJ9YI+NLDWnL+U8xBYTc=;
+	b=thMCH8sTfbBGdRb4BZgzkBQAUZXrWLYMQ1jQlKY3ZebLXNOSMVzWm+LC7zVwrGvHiJ8FGL
+	DOpv0kkxSmKFQR3CzqhKPdJMingJFiiVvCDEif2XJ6+Z/DCi8JbmzimNsYIs1sJwvPFGop
+	3b+17RB7qatwqhwsxRr72PWw/B4ij2Y=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Oliver Upton <oliver.upton@linux.dev>,
-	kvmarm@lists.linux.dev
-Cc: Dan Carpenter <dan.carpenter@linaro.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Fix misuse of KVM_ARM_VCPU_POWER_OFF bit index
-Date: Thu, 22 Jun 2023 17:17:44 +0000
-Message-ID: <168745425982.2113651.18159840293696452756.b4-ty@linux.dev>
-In-Reply-To: <20230622160922.1925530-1-oliver.upton@linux.dev>
-References: <20230622160922.1925530-1-oliver.upton@linux.dev>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: kvmarm@lists.linux.dev
+Subject: Re: [bug report] KVM: arm64: Relax invariance of
+ KVM_ARM_VCPU_POWER_OFF
+Message-ID: <ZJSCwWF/nFFkXY+W@linux.dev>
+References: <50fed6cc-5772-4bb2-b72a-bc7e4f9e93d2@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <50fed6cc-5772-4bb2-b72a-bc7e4f9e93d2@moroto.mountain>
 X-Migadu-Flow: FLOW_OUT
 
-On Thu, 22 Jun 2023 16:09:22 +0000, Oliver Upton wrote:
-> KVM_ARM_VCPU_POWER_OFF is as bit index, _not_ a literal bitmask.
-> Nonetheless, commit e3c1c0cae31e ("KVM: arm64: Relax invariance
-> of KVM_ARM_VCPU_POWER_OFF") started using it that way, meaning that
-> powering off a vCPU with the KVM_ARM_VCPU_INIT ioctl is completely
-> broken.
+Hey Dan,
+
+On Thu, Jun 22, 2023 at 03:49:18PM +0300, Dan Carpenter wrote:
+> Hello Oliver Upton,
 > 
-> Fix it by using a shifted bit for the bitwise operations instead.
+> The patch e3c1c0cae31e: "KVM: arm64: Relax invariance of
+> KVM_ARM_VCPU_POWER_OFF" from Jun 9, 2023, leads to the following
+> Smatch static checker warning:
 > 
-> [...]
+> 	arch/arm64/kvm/arm.c:1283 kvm_arch_vcpu_ioctl_vcpu_init()
+> 	warn: bitwise AND condition is false here
+> 
+> arch/arm64/kvm/arm.c
+>     1272 static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+>     1273                                          struct kvm_vcpu_init *init)
+>     1274 {
+>     1275         bool power_off = false;
+>     1276         int ret;
+>     1277 
+>     1278         /*
+>     1279          * Treat the power-off vCPU feature as ephemeral. Clear the bit to avoid
+>     1280          * reflecting it in the finalized feature set, thus limiting its scope
+>     1281          * to a single KVM_ARM_VCPU_INIT call.
+>     1282          */
+> --> 1283         if (init->features[0] & KVM_ARM_VCPU_POWER_OFF) {
+> 
+> Prior to this commit KVM_ARM_VCPU_POWER_OFF was a bit number.  I think
+> it still should be.  As in:
+> 
+> #define KVM_ARM_VCPU_POWER_OFF BIT(0)
+> 
+>     1284                 init->features[0] &= ~KVM_ARM_VCPU_POWER_OFF;
+>     1285                 power_off = true;
+>     1286         }
+>     1287 
+>     1288         ret = kvm_vcpu_set_target(vcpu, init);
+>     1289         if (ret)
+>     1290                 return ret;
+>     1291 
 
-Applied, w/ Marc's suggestion to just use BIT() instead.
+Thanks for the bug report. I had to go find my brown paper bag, but the
+fix is now queued up for 6.5:
 
-[1/1] KVM: arm64: Fix misuse of KVM_ARM_VCPU_POWER_OFF bit index
-      https://git.kernel.org/kvmarm/kvmarm/c/192df2aa0113
+https://lore.kernel.org/kvmarm/20230622160922.1925530-1-oliver.upton@linux.dev/
 
---
-Best,
+-- 
+Thanks,
 Oliver
