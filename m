@@ -1,82 +1,98 @@
-Received: from out-7.mta1.migadu.com (out-7.mta1.migadu.com [95.215.58.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE4B51F16A
-	for <kvmarm@lists.linux.dev>; Thu, 22 Jun 2023 17:20:05 +0000 (UTC)
-Date: Thu, 22 Jun 2023 17:20:01 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1687454404;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E75820690
+	for <kvmarm@lists.linux.dev>; Thu, 22 Jun 2023 19:39:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1687462784;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=WckLBxk9OxSq5fZgxiuJq8OmJ9YI+NLDWnL+U8xBYTc=;
-	b=thMCH8sTfbBGdRb4BZgzkBQAUZXrWLYMQ1jQlKY3ZebLXNOSMVzWm+LC7zVwrGvHiJ8FGL
-	DOpv0kkxSmKFQR3CzqhKPdJMingJFiiVvCDEif2XJ6+Z/DCi8JbmzimNsYIs1sJwvPFGop
-	3b+17RB7qatwqhwsxRr72PWw/B4ij2Y=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: kvmarm@lists.linux.dev
-Subject: Re: [bug report] KVM: arm64: Relax invariance of
- KVM_ARM_VCPU_POWER_OFF
-Message-ID: <ZJSCwWF/nFFkXY+W@linux.dev>
-References: <50fed6cc-5772-4bb2-b72a-bc7e4f9e93d2@moroto.mountain>
+	bh=Edd2SuIQ3rUI8IaV9M9bH7sRwy/Lge1qapI4gHEyAgk=;
+	b=OIUnQEbRhBxmbBVFev6PhYTv/dTe105WgDnz6KwZCut9FSG1bwo6RqsaYkTb8KZdRZm4xn
+	38BbTBC5aQ15uczZOiPyxqyBAYkopme/5L3qRX3PFWpaO0MhBhsdtcIoKn9G9udvZOvcgi
+	r3iZULZzBJjuIOeqIizTkojWqteM+HQ=
+Received: from mail-vs1-f69.google.com (mail-vs1-f69.google.com
+ [209.85.217.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-270-n7yZWqUpPdyRx_hJRIATaQ-1; Thu, 22 Jun 2023 15:39:43 -0400
+X-MC-Unique: n7yZWqUpPdyRx_hJRIATaQ-1
+Received: by mail-vs1-f69.google.com with SMTP id ada2fe7eead31-440b5fc1749so1189797137.1
+        for <kvmarm@lists.linux.dev>; Thu, 22 Jun 2023 12:39:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687462781; x=1690054781;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Edd2SuIQ3rUI8IaV9M9bH7sRwy/Lge1qapI4gHEyAgk=;
+        b=SEML3sMbAYzakhLwrNYv5nv6O0iVqo1POfWI/zmDLYfgVCG5JE/umGGpxYHqHKTnRV
+         HS1y0nhIXgOPx/5J2tsdqYL0kYzGCw2pfKOFzE9ip2XcPtGk7vSS3LlnV/42MTA01tA+
+         /gqcmCtgVeUYok5zQ9gzeZ4DTSG1RyoqsbzTSFv5M2tPevauYNxpzlPj2fjWVf8f2QuY
+         Px9Y1LtUY6+Pr6VGuyARDULzMiUWf//hgMjNyoYQfypAOJ7hZq8o5fVWebFul1RbY0rY
+         EN2PPhWFGqsVay0Xk5rzcUNPM8TufUi2n6N2zlLEykjVfX+ovk1svFw1WiUHjSK2R2Ft
+         H1YQ==
+X-Gm-Message-State: AC+VfDy5YnS9Ra1lP37jXatyNpEW+R38EVMryuYlvi1GAQFE1oF/mX2c
+	hv46fCKmh2tgS8woOUmJHEs/ZoYpomD4O3wlgg+78Y+YuV4nglINJTykPAtWlxO3/W8iY81fT/E
+	ZuVTMZHcftCQpq2rVEUvKNSHRP+tUIBrC
+X-Received: by 2002:a05:6102:485:b0:440:b6b5:eb30 with SMTP id n5-20020a056102048500b00440b6b5eb30mr5603039vsa.10.1687462781615;
+        Thu, 22 Jun 2023 12:39:41 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6v49HgjgIIqCSi3sjYhFVyX+ZxdXrX5nJ0x5xE7UTZXMcQlvPQVMPZn47t28O8kk5Ah4NtrZD5jfO+Peujdv0=
+X-Received: by 2002:a05:6102:485:b0:440:b6b5:eb30 with SMTP id
+ n5-20020a056102048500b00440b6b5eb30mr5603019vsa.10.1687462781337; Thu, 22 Jun
+ 2023 12:39:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <50fed6cc-5772-4bb2-b72a-bc7e4f9e93d2@moroto.mountain>
-X-Migadu-Flow: FLOW_OUT
+References: <20230608155255.1850620-1-maz@kernel.org>
+In-Reply-To: <20230608155255.1850620-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 22 Jun 2023 21:39:30 +0200
+Message-ID: <CABgObfYTyzDQoGrt=cFHyejH7e=R3jZ+K5BC=Wa4SyQJ_UbNEQ@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.4, take #4
+To: Marc Zyngier <maz@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>, Nathan Chancellor <nathan@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Reiji Watanabe <reijiw@google.com>, 
+	Sebastian Ott <sebott@redhat.com>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hey Dan,
+On Thu, Jun 8, 2023 at 5:53=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Paolo,
+>
+> Here's yet another batch of fixes, two of them addressing pretty
+> recent regressions: GICv2 emulation on GICv3 was accidently killed,
+> and the PMU rework needed some tweaking.
+>
+> The last two patches address an annoying PMU (again) problem where
+> the KVM requirements were never factored in when PMU counters were
+> directly exposed to userspace. Reiji has been working on a fix, which
+> is now readdy to be merged.
+>
+> Please pull,
+>
+>         M.
+>
+> The following changes since commit 40e54cad454076172cc3e2bca60aa924650a3e=
+4b:
+>
+>   KVM: arm64: Document default vPMU behavior on heterogeneous systems (20=
+23-05-31 10:29:56 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
+marm-fixes-6.4-4
 
-On Thu, Jun 22, 2023 at 03:49:18PM +0300, Dan Carpenter wrote:
-> Hello Oliver Upton,
-> 
-> The patch e3c1c0cae31e: "KVM: arm64: Relax invariance of
-> KVM_ARM_VCPU_POWER_OFF" from Jun 9, 2023, leads to the following
-> Smatch static checker warning:
-> 
-> 	arch/arm64/kvm/arm.c:1283 kvm_arch_vcpu_ioctl_vcpu_init()
-> 	warn: bitwise AND condition is false here
-> 
-> arch/arm64/kvm/arm.c
->     1272 static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
->     1273                                          struct kvm_vcpu_init *init)
->     1274 {
->     1275         bool power_off = false;
->     1276         int ret;
->     1277 
->     1278         /*
->     1279          * Treat the power-off vCPU feature as ephemeral. Clear the bit to avoid
->     1280          * reflecting it in the finalized feature set, thus limiting its scope
->     1281          * to a single KVM_ARM_VCPU_INIT call.
->     1282          */
-> --> 1283         if (init->features[0] & KVM_ARM_VCPU_POWER_OFF) {
-> 
-> Prior to this commit KVM_ARM_VCPU_POWER_OFF was a bit number.  I think
-> it still should be.  As in:
-> 
-> #define KVM_ARM_VCPU_POWER_OFF BIT(0)
-> 
->     1284                 init->features[0] &= ~KVM_ARM_VCPU_POWER_OFF;
->     1285                 power_off = true;
->     1286         }
->     1287 
->     1288         ret = kvm_vcpu_set_target(vcpu, init);
->     1289         if (ret)
->     1290                 return ret;
->     1291 
+Pulled, finally. Apologies for the delay.
 
-Thanks for the bug report. I had to go find my brown paper bag, but the
-fix is now queued up for 6.5:
+Paolo
 
-https://lore.kernel.org/kvmarm/20230622160922.1925530-1-oliver.upton@linux.dev/
-
--- 
-Thanks,
-Oliver
