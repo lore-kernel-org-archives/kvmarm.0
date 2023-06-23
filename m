@@ -1,48 +1,37 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C82323109
-	for <kvmarm@lists.linux.dev>; Fri, 23 Jun 2023 12:54:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118BF79CF
+	for <kvmarm@lists.linux.dev>; Fri, 23 Jun 2023 13:05:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687524890;
+	s=mimecast20190719; t=1687525544;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rMJsEqZxFDEiOpUmf5NTUaCgnapiJoAxYbiFoSk82wQ=;
-	b=Cy+h4B7zo8hz9yDqXteOAXQFq8XnOHIb4JSbxOjab57z10CJzARkitlHsB14+crUEdczDk
-	i/SMjUeHY8P3fm1j1dPsGUkVisyHKojTyhU1vfr94iA1c+SP+omRY+GzNAO07ccAp/w6MB
-	DRfE2yMCp581htaLjdW/GnXdZtgIhms=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=El4VroHOllIBmAMq4mcyvIq/rdpFjMS5b4p6zjgT9ik=;
+	b=hDgWb05GDxGlbBsmHpI0iv9mP41tyc7bO8u1yFzaCFfv4ElEUavdyqd++7B4ezsb9a+rtz
+	6YMc0nrCX//rPnArV5TA2eGsFjIPY3UsMBvFWCvzmpLdhjEkLwrmGA5ZnJuhz1buvd2YV7
+	WZjSNwvW6mxcDQoLOdunX+PVE68X6kI=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-179-UhauKGHCN2CMcbORgDFUJg-1; Fri, 23 Jun 2023 08:54:43 -0400
-X-MC-Unique: UhauKGHCN2CMcbORgDFUJg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+ us-mta-244-Uf5bNq_8M_6EQypVaKhmOw-1; Fri, 23 Jun 2023 09:05:40 -0400
+X-MC-Unique: Uf5bNq_8M_6EQypVaKhmOw-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 965728CC200;
-	Fri, 23 Jun 2023 12:54:42 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 25D1783505D;
+	Fri, 23 Jun 2023 13:05:32 +0000 (UTC)
 Received: from thuth.com (unknown [10.39.192.208])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 2AD80F5AC5;
-	Fri, 23 Jun 2023 12:54:24 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 3FB04425357;
+	Fri, 23 Jun 2023 13:05:31 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
-To: kvm@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?q?Nico=20B=C3=B6hr?= <nrb@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Andrew Jones <andrew.jones@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-s390@vger.kernel.org,
-	David Hildenbrand <david@redhat.com>,
-	Laurent Vivier <lvivier@redhat.com>
-Subject: [kvm-unit-tests PATCH 2/2] Link with "-z noexecstack" to avoid warning from newer versions of ld
-Date: Fri, 23 Jun 2023 14:54:16 +0200
-Message-Id: <20230623125416.481755-3-thuth@redhat.com>
-In-Reply-To: <20230623125416.481755-1-thuth@redhat.com>
-References: <20230623125416.481755-1-thuth@redhat.com>
+To: Andrew Jones <andrew.jones@linux.dev>,
+	kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org
+Subject: [kvm-unit-tests PATCH] arm/flat.lds: Specify program headers with flags to avoid linker warnings
+Date: Fri, 23 Jun 2023 15:05:28 +0200
+Message-Id: <20230623130528.483909-1-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -50,38 +39,58 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 
-Newer versions of ld (from binutils 2.40) complain on s390x and x86:
+With ld from binutils v2.40 I currently get warning messages like this:
 
- ld: warning: s390x/cpu.o: missing .note.GNU-stack section implies
-              executable stack
- ld: NOTE: This behaviour is deprecated and will be removed in a
-           future version of the linker
+ ld: warning: arm/spinlock-test.elf has a LOAD segment with RWX permissions
+ ld: warning: arm/selftest.elf has a LOAD segment with RWX permissions
+ ld: warning: arm/pci-test.elf has a LOAD segment with RWX permissions
+ ld: warning: arm/pmu.elf has a LOAD segment with RWX permissions
+ ...
 
-We can silence these warnings by using "-z noexecstack" for linking
-(which should not have any real influence on the kvm-unit-tests since
-the information from the ELF header is not used here anyway, so it's
-just cosmetics).
+Seems like these can be silenced by explicitly specifying the program
+headers with the appropriate flags (like we did in commit 0a06949aafac4a4
+on x86 and in commit 5126732d73aa75 on powerpc already).
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arm/flat.lds | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 0e5d85a1..20f7137c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -96,7 +96,7 @@ CFLAGS += -Woverride-init -Wmissing-prototypes -Wstrict-prototypes
+diff --git a/arm/flat.lds b/arm/flat.lds
+index 47fcb649..f722c650 100644
+--- a/arm/flat.lds
++++ b/arm/flat.lds
+@@ -22,10 +22,16 @@
+  *    +----------------------+   <-- physical address 0x0
+  */
  
- autodepend-flags = -MMD -MF $(dir $*).$(notdir $*).d
++PHDRS
++{
++    text PT_LOAD FLAGS(5);
++    data PT_LOAD FLAGS(6);
++}
++
+ SECTIONS
+ {
+     PROVIDE(_text = .);
+-    .text : { *(.init) *(.text) *(.text.*) }
++    .text : { *(.init) *(.text) *(.text.*) } :text
+     . = ALIGN(64K);
+     PROVIDE(etext = .);
  
--LDFLAGS += -nostdlib
-+LDFLAGS += -nostdlib -z noexecstack
+@@ -39,8 +45,8 @@ SECTIONS
+     .got      : { *(.got) *(.got.plt) }
+     .eh_frame : { *(.eh_frame) }
  
- $(libcflat): $(cflatobjs)
- 	$(AR) rcs $@ $^
+-    .rodata   : { *(.rodata*) }
+-    .data     : { *(.data) }
++    .rodata   : { *(.rodata*) } :data
++    .data     : { *(.data) } :data
+     . = ALIGN(16);
+     PROVIDE(bss = .);
+     .bss      : { *(.bss) }
 -- 
 2.39.3
 
