@@ -1,43 +1,43 @@
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C699468
-	for <kvmarm@lists.linux.dev>; Sun, 25 Jun 2023 23:07:52 +0000 (UTC)
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-666e6541c98so2710878b3a.2
-        for <kvmarm@lists.linux.dev>; Sun, 25 Jun 2023 16:07:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F214C9463
+	for <kvmarm@lists.linux.dev>; Sun, 25 Jun 2023 23:07:53 +0000 (UTC)
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-668704a5b5bso2547134b3a.0
+        for <kvmarm@lists.linux.dev>; Sun, 25 Jun 2023 16:07:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687734472; x=1690326472;
+        d=gmail.com; s=20221208; t=1687734473; x=1690326473;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=21SpjF+xBmEu7QPQNtztE4cG4YYUJTEjHrp9rj09zZA=;
-        b=mYKRtXtslrTwwqDTD/ejgHiqY78Bg3f0Ow86sGs6aIrEeLpYfPezvuDIh78Jlg8dbb
-         dpGgzXCTTictLDtnIsHyiSWMfFM+/RoLRRIvrYNCulZ6FJnVbg+tsHpuaxPkMjbsjVcx
-         ob74xAx+pweCRjtsPaF/4dQlHbjlZCIDJP+rUSeVBy1V+zM7maAED2cQtj2ToZnitM6x
-         qr8ToXU/jiSmQGv6eyCbzXzlkfPbb0wqNg2PTjVKm+SEq8DPJ7lQ5ns++UOonYtp4eA1
-         vd9dOx2U6CPxTc5K6QcasCO2Ote5f30zpJ1Nl0OW5jv+rfJnoOIjgQC6tL6NSW1mnhxz
-         5vLw==
+        bh=ZBy1+s5+1bIZxGdZDUFvFfxmlLpG2meXbQVky29avoY=;
+        b=G/FpgPODODp9mcQcSfDie54CU2ZqB6gIZ3CSo/h7Fv69axSgfZuNvgVUd7/7FgCjfU
+         hfWMQpS0uVcv0U3IG0odySZ9l0urUV2kGFd41tZtxI+DWHK47DPHLavDaWIPGl8fy7fv
+         ck6ndoWc26joVkr3hx3MLvMggCDPv1AH7NHbUX4nVRo7cw1xTef5Hl9PwpC4WENrXMsJ
+         7WtNpbEiAPZSDyiLV+x44i+v24CqJcsEFYAa97ocfMMuN2QBCtFRSs/fw410/OHpvhlp
+         9jJSBj6iq6PpLp/g1DkUhDlp2SarcflfuOt+SNNFE8zP7QcnlMvcOVEkpOIN9UXPbcB3
+         5HpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687734472; x=1690326472;
+        d=1e100.net; s=20221208; t=1687734473; x=1690326473;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=21SpjF+xBmEu7QPQNtztE4cG4YYUJTEjHrp9rj09zZA=;
-        b=aA6yCsvTggDvSaQsqTlvZZaOHV2czR1C/0EKxXRLqq/YDXTvwOJKxnX8T4ANjEnGFj
-         Te1WoPuxoub2YmN5cez2VCjpU1tqbYrdSrUO676eT7CJ2ai0mO07WwRfdOsIdgGjwbba
-         m1ZHdM1btINBS852iAQnHP5kxWRhGYzL0vNK3Bko0UQIml5HUTtY8uLNksROS3HZT+nH
-         7+JPFyGFKLJ7M5YV2vwPuRAfJoMTasq4d2dT3isnQAjsxDeGNxZBo1DHItvOq30skEjJ
-         xuf61g4euQbJSwYgv54fhu7efAmDMqQ7SuAOYx/1SjSnTd3WO8lqnV15+OtbucB9OCcL
-         vXHA==
-X-Gm-Message-State: AC+VfDyxHWL0sXfdW8BaeOCa0LWKfMjLSVM8Jij20EbXn9c1pDcrtyNp
-	sbnRKWrPQgvtEqWUIStMMe7CUtMOnzk=
-X-Google-Smtp-Source: ACHHUZ4g4Mp3PlNC3YacyCrfQUvV+O+hcyfuZIxxGIcHCdWEgNp471z0bfFiNEcrbg19bvWen6IgdA==
-X-Received: by 2002:a05:6a20:3d81:b0:107:35ed:28a7 with SMTP id s1-20020a056a203d8100b0010735ed28a7mr36176837pzi.8.1687734471696;
-        Sun, 25 Jun 2023 16:07:51 -0700 (PDT)
+        bh=ZBy1+s5+1bIZxGdZDUFvFfxmlLpG2meXbQVky29avoY=;
+        b=ABP96/N1PpMcitZnSUShlXjNYmrFTeKJYa2x6k5KaWzo06w5HuxWIldGC7wmF6H7od
+         wFgRaB5VVfiBedEMbnZehl2GDFSvmnTb5OaqgI6IaOQAl19VNC3bepKVOajM/1p7hWrF
+         KzA7fNpWLS8sNBIUfiqnNJhHW3oAe3RuqmTTCtQJxfBj8zv+CXz6nVnOMY9pigKtySmL
+         YUa76y3qhTrVlmXQsdc+ibV4W+3PUjPr5dokgZMlC0J8pBBqlit5J1hneLaJ0sXrWhs3
+         1avh23y6Qen3zdjjC3QAkemQyOXyFWl+LnMMANt/w9BIcDczJdIB/YKk7WQSKGxLvZ8v
+         xaZQ==
+X-Gm-Message-State: AC+VfDypX9MokKkTUA7E89rbAREpWY0pOrFaOym9uTsPEzCbKnlIkbY3
+	DJ/oQLcKqBbDY96lQda7tTw=
+X-Google-Smtp-Source: ACHHUZ4x2qSpG9IBvl8L3NEad+JX+3ufu1ezTQHpdRotTSivpeCHXX1ZaOBT3uFQ1NKhHAc16/WAAQ==
+X-Received: by 2002:a05:6a00:1595:b0:666:e8e1:bc8d with SMTP id u21-20020a056a00159500b00666e8e1bc8dmr36877858pfk.11.1687734473111;
+        Sun, 25 Jun 2023 16:07:53 -0700 (PDT)
 Received: from sc9-mailhost1.vmware.com (c-24-6-216-183.hsd1.ca.comcast.net. [24.6.216.183])
-        by smtp.gmail.com with ESMTPSA id x20-20020aa79194000000b006668f004420sm2716397pfa.148.2023.06.25.16.07.50
+        by smtp.gmail.com with ESMTPSA id x20-20020aa79194000000b006668f004420sm2716397pfa.148.2023.06.25.16.07.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Jun 2023 16:07:51 -0700 (PDT)
+        Sun, 25 Jun 2023 16:07:52 -0700 (PDT)
 From: Nadav Amit <nadav.amit@gmail.com>
 X-Google-Original-From: Nadav Amit
 To: Andrew Jones <andrew.jones@linux.dev>
@@ -46,9 +46,9 @@ Cc: kvmarm@lists.linux.dev,
 	Nikos Nikoleris <nikos.nikoleris@arm.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Nadav Amit <namit@vmware.com>
-Subject: [kvm-unit-tests PATCH v2 3/6] arm64: enable frame pointer and support stack unwinding
-Date: Sun, 25 Jun 2023 23:07:13 +0000
-Message-Id: <20230625230716.2922-4-namit@vmware.com>
+Subject: [kvm-unit-tests PATCH v2 4/6] arm64: stack: update trace stack on exception
+Date: Sun, 25 Jun 2023 23:07:14 +0000
+Message-Id: <20230625230716.2922-5-namit@vmware.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230625230716.2922-1-namit@vmware.com>
 References: <20230625230716.2922-1-namit@vmware.com>
@@ -62,127 +62,126 @@ Content-Transfer-Encoding: 8bit
 
 From: Nadav Amit <namit@vmware.com>
 
-Enable frame pointers for arm64 and perform stack unwinding based on
-arm64 convention.
+Using gdb for backtracing or dumping the stack following an exception is
+not very helpful as the exact location of the exception is not saved.
+
+Add an additional frame to save the location of the exception.
+
+One delicate point is dealing with the pretty_print_stacks script. When
+the stack is dumped, the script would not print the right address for
+the exception address: for every return address it deducts "1" before
+looking for the instruction location in the code (using addr2line). As a
+somewhat hacky solution add "1" for the exception address when dumping
+the stack.
 
 Signed-off-by: Nadav Amit <namit@vmware.com>
 
 ---
 v1->v2:
-* Adding SPDX [checkpatch]
-* Moving some unused declarations to next patch [Andrew]
-* Adding recursion prevention
+* .globl before label [Andrew]
+* Some comments [Andrew]
 ---
- arm/Makefile.arm      |  3 ---
- arm/Makefile.arm64    |  1 +
- arm/Makefile.common   |  3 +++
- lib/arm64/asm/stack.h |  3 +++
- lib/arm64/stack.c     | 44 +++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 51 insertions(+), 3 deletions(-)
- create mode 100644 lib/arm64/stack.c
+ arm/cstart64.S          | 13 +++++++++++++
+ lib/arm64/asm-offsets.c |  6 +++++-
+ lib/arm64/stack.c       | 18 ++++++++++++++++++
+ 3 files changed, 36 insertions(+), 1 deletion(-)
 
-diff --git a/arm/Makefile.arm b/arm/Makefile.arm
-index 2ce00f5..7fd39f3 100644
---- a/arm/Makefile.arm
-+++ b/arm/Makefile.arm
-@@ -11,9 +11,6 @@ ifeq ($(CONFIG_EFI),y)
- $(error Cannot build arm32 tests as EFI apps)
- endif
+diff --git a/arm/cstart64.S b/arm/cstart64.S
+index cbd6b51..865a96d 100644
+--- a/arm/cstart64.S
++++ b/arm/cstart64.S
+@@ -314,6 +314,13 @@ exceptions_init:
+ 	mrs	x2, spsr_el1
+ 	stp	x1, x2, [sp, #S_PC]
  
--# stack.o relies on frame pointers.
--KEEP_FRAME_POINTER := y
--
- CFLAGS += $(machine)
- CFLAGS += -mcpu=$(PROCESSOR)
- CFLAGS += -mno-unaligned-access
-diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-index eada7f9..60385e2 100644
---- a/arm/Makefile.arm64
-+++ b/arm/Makefile.arm64
-@@ -21,6 +21,7 @@ define arch_elf_check =
- endef
- 
- cstart.o = $(TEST_DIR)/cstart64.o
-+cflatobjs += lib/arm64/stack.o
- cflatobjs += lib/arm64/processor.o
- cflatobjs += lib/arm64/spinlock.o
- cflatobjs += lib/arm64/gic-v3-its.o lib/arm64/gic-v3-its-cmd.o
-diff --git a/arm/Makefile.common b/arm/Makefile.common
-index 9b45a8f..bc86e44 100644
---- a/arm/Makefile.common
-+++ b/arm/Makefile.common
-@@ -22,6 +22,9 @@ $(TEST_DIR)/sieve.elf: AUXFLAGS = 0x1
- ##################################################################
- AUXFLAGS ?= 0x0
- 
-+# stack.o relies on frame pointers.
-+KEEP_FRAME_POINTER := y
-+
- CFLAGS += -std=gnu99
- CFLAGS += -ffreestanding
- CFLAGS += -O2
-diff --git a/lib/arm64/asm/stack.h b/lib/arm64/asm/stack.h
-index d000624..be486cf 100644
---- a/lib/arm64/asm/stack.h
-+++ b/lib/arm64/asm/stack.h
-@@ -5,4 +5,7 @@
- #error Do not directly include <asm/stack.h>. Just use <stack.h>.
- #endif
- 
-+#define HAVE_ARCH_BACKTRACE_FRAME
-+#define HAVE_ARCH_BACKTRACE
-+
- #endif
-diff --git a/lib/arm64/stack.c b/lib/arm64/stack.c
-new file mode 100644
-index 0000000..a2024e8
---- /dev/null
-+++ b/lib/arm64/stack.c
-@@ -0,0 +1,44 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Backtrace support.
-+ */
-+#include <libcflat.h>
-+#include <stdbool.h>
-+#include <stack.h>
-+
-+int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
-+{
-+	const void *fp = frame;
-+	static bool walking;
-+	void *lr;
-+	int depth;
-+
-+	if (walking) {
-+		printf("RECURSIVE STACK WALK!!!\n");
-+		return 0;
-+	}
-+	walking = true;
-+
 +	/*
-+	 * ARM64 stack grows down. fp points to the previous fp on the stack,
-+	 * and lr is just above it
++	 * Save a frame pointer using the link to allow unwinding of
++	 * exceptions.
 +	 */
-+	for (depth = 0; fp && depth < max_depth; ++depth) {
++	stp	x29, x1, [sp, #S_FP]
++	add 	x29, sp, #S_FP
 +
-+		asm volatile ("ldp %0, %1, [%2]"
-+				  : "=r" (fp), "=r" (lr)
-+				  : "r" (fp)
-+				  : );
+ 	mov	x0, \vec
+ 	mov	x1, sp
+ 	mrs	x2, esr_el1
+@@ -349,6 +356,9 @@ exceptions_init:
+ 	eret
+ .endm
+ 
++.globl vector_stub_start
++vector_stub_start:
 +
-+		return_addrs[depth] = lr;
-+	}
+ vector_stub	el1t_sync,     0
+ vector_stub	el1t_irq,      1
+ vector_stub	el1t_fiq,      2
+@@ -369,6 +379,9 @@ vector_stub	el0_irq_32,   13
+ vector_stub	el0_fiq_32,   14
+ vector_stub	el0_error_32, 15
+ 
++.globl vector_stub_end
++vector_stub_end:
 +
-+	walking = false;
-+	return depth;
-+}
+ .section .text.ex
+ 
+ .macro ventry, label
+diff --git a/lib/arm64/asm-offsets.c b/lib/arm64/asm-offsets.c
+index 53a1277..80de023 100644
+--- a/lib/arm64/asm-offsets.c
++++ b/lib/arm64/asm-offsets.c
+@@ -25,6 +25,10 @@ int main(void)
+ 	OFFSET(S_PSTATE, pt_regs, pstate);
+ 	OFFSET(S_ORIG_X0, pt_regs, orig_x0);
+ 	OFFSET(S_SYSCALLNO, pt_regs, syscallno);
+-	DEFINE(S_FRAME_SIZE, sizeof(struct pt_regs));
 +
-+int backtrace(const void **return_addrs, int max_depth)
-+{
-+	return backtrace_frame(__builtin_frame_address(0),
-+			       return_addrs, max_depth);
-+}
++	/* FP and LR (16 bytes) go on the frame above pt_regs */
++	DEFINE(S_FP, sizeof(struct pt_regs));
++	DEFINE(S_FRAME_SIZE, (sizeof(struct pt_regs) + 16));
++
+ 	return 0;
+ }
+diff --git a/lib/arm64/stack.c b/lib/arm64/stack.c
+index a2024e8..82611f4 100644
+--- a/lib/arm64/stack.c
++++ b/lib/arm64/stack.c
+@@ -6,12 +6,16 @@
+ #include <stdbool.h>
+ #include <stack.h>
+ 
++extern char vector_stub_start, vector_stub_end;
++
+ int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
+ {
+ 	const void *fp = frame;
+ 	static bool walking;
+ 	void *lr;
+ 	int depth;
++	bool is_exception = false;
++	unsigned long addr;
+ 
+ 	if (walking) {
+ 		printf("RECURSIVE STACK WALK!!!\n");
+@@ -31,6 +35,20 @@ int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
+ 				  : );
+ 
+ 		return_addrs[depth] = lr;
++
++		/*
++		 * If this is an exception, add 1 to the pointer so when the
++		 * pretty_print_stacks script is run it would get the right
++		 * address (it deducts 1 to find the call address, but we want
++		 * the actual address).
++		 */
++		if (is_exception)
++			return_addrs[depth] += 1;
++
++		/* Check if we are in the exception handlers for the next entry */
++		addr = (unsigned long)lr;
++		is_exception = (addr >= (unsigned long)&vector_stub_start &&
++				addr < (unsigned long)&vector_stub_end);
+ 	}
+ 
+ 	walking = false;
 -- 
 2.34.1
 
