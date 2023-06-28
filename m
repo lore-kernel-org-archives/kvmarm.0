@@ -1,171 +1,80 @@
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-37.mta0.migadu.com (out-37.mta0.migadu.com [91.218.175.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 537BDA923
-	for <kvmarm@lists.linux.dev>; Wed, 28 Jun 2023 10:29:23 +0000 (UTC)
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2b6994a8ce3so55274171fa.1
-        for <kvmarm@lists.linux.dev>; Wed, 28 Jun 2023 03:29:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687948161; x=1690540161;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/9+dB0uPjR6dzec0l9qeLYrn0RkeAmaPi6wiBE0Rz0s=;
-        b=b2Rs2cSK28LUBmSPPPXn1tL6IRsmSP2tJgPSfQSx4O5vycvWrA8kXiiRZLuf47VqNQ
-         3T5FosiCwHUqAqiWFHaG1ckoLAJZE8HaG1zHw5D8T0V+TrINR2QnL3/PH2dd8VbGR0O/
-         A/bGKjFPDpYY/4XE571aMQ29SutOrFhUowFPKjCXEV8NJSbkp1tNbP4Vhgu8hW7zlCY9
-         LIkALG9i847X5HSNaM32b94V+lrtjI9t6xRUthyF3e8TsPSeoRv5f8s0GX/aMf89bYrC
-         cp+awk1KsU8+n8daJmyM+z1eW9ItpBDv93fq6bcTCW6DP4TZAhyDJkSjmYdWiR6uPH2q
-         dKdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687948161; x=1690540161;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/9+dB0uPjR6dzec0l9qeLYrn0RkeAmaPi6wiBE0Rz0s=;
-        b=CHttvTKvyGHmfLooC1EzzuWgw7+cOJN5R4dbNpmxK+GROY0WyRDikjeourx6fH3l61
-         nF6GTt1NSgGa7pgQ6Ok7zVIIh4JSZNqShOtJWkBeCHsc817gA3PvI2NxqTY8AK6joy5P
-         OvH9WF2oVp4AwX35+pdD+VLQXIg+YYlFEOW77TdM+EiEXBaCr21tv88A/BQ6E45I/S9N
-         9kR00Gz9JVXFGHidgaVQri9ieXtiMqXB2nTvyrr4EcWzsx7wh0i2e7hdbHpJgErCFjn1
-         lAxy8C4QdQI7HFMTVQNCnTMZl3h+gacrGoPchEi9/7clv/0u9CTSAThN+AxdkM4LMUjr
-         ZMQg==
-X-Gm-Message-State: AC+VfDzeq4FwwkdbaNYWntLmAFF+a4ecHLGECuYOWuHASik5orZhoY7T
-	ouePKwO2g3qjvaUL1ObsqAt3DK75HHcAU0tbPHw=
-X-Google-Smtp-Source: ACHHUZ4h09V3wI1azpJqOp/sAeZVBD2vtw10dniqbPA1C8M7x23FpqEn0BF2WO5Dy4bGcYG4R5lh8sQuVPSUE5aJ9aE=
-X-Received: by 2002:a2e:9183:0:b0:2b4:6e21:637e with SMTP id
- f3-20020a2e9183000000b002b46e21637emr17706195ljg.16.1687948161020; Wed, 28
- Jun 2023 03:29:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D043DBA32
+	for <kvmarm@lists.linux.dev>; Wed, 28 Jun 2023 11:40:26 +0000 (UTC)
+Date: Wed, 28 Jun 2023 13:40:24 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1687952424;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=T42XXTPlA/u7vCJ89unfBNk6XLUFAADuVLoneR5wo+E=;
+	b=KCPrdNnhyNXAuTSJsgftkIEon/E+Ter3yhK1Ene2LaoPdz00Qoa8Zg9gbDge1NrjBRNNzI
+	bsRKK4+FHIlocS60UcDWFOoPp99afkgQpGg7rPrSFgT4NI0rJI2FreOt8WR7jlC2L0xnrL
+	WYchhcrJpHnTaWY9AE3A6OhLwrAFL50=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Nadav Amit <nadav.amit@gmail.com>
+Cc: kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, 
+	kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH] arm64: timer: ignore ISTATUS with
+ disabled timer
+Message-ID: <20230628-1a712a9e7c4710acaa744f52@orel>
+References: <20230615003832.161134-1-namit@vmware.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <cover.1687515463.git.haibo1.xu@intel.com> <fa6b80b578553e561ccacaeb24091e0716975593.1687515463.git.haibo1.xu@intel.com>
- <20230627-feb5bf584a3fd16d2c0ffe66@orel>
-In-Reply-To: <20230627-feb5bf584a3fd16d2c0ffe66@orel>
-From: Haibo Xu <xiaobo55x@gmail.com>
-Date: Wed, 28 Jun 2023 18:29:09 +0800
-Message-ID: <CAJve8o=CN4TJz5R9+zne_mA9L_doNTwg+w39OgU5HKXPzb4hmg@mail.gmail.com>
-Subject: Re: [PATCH v4 11/12] KVM: riscv: selftests: Add finalize_vcpu check
- in run_test
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: Haibo Xu <haibo1.xu@intel.com>, maz@kernel.org, oliver.upton@linux.dev, 
-	seanjc@google.com, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Shuah Khan <shuah@kernel.org>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, David Matlack <dmatlack@google.com>, 
-	Ben Gardon <bgardon@google.com>, Ricardo Koller <ricarkol@google.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Vipin Sharma <vipinsh@google.com>, 
-	Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230615003832.161134-1-namit@vmware.com>
+X-Migadu-Flow: FLOW_OUT
 
-Thanks a lot!
+On Wed, Jun 14, 2023 at 05:38:32PM -0700, Nadav Amit wrote:
+> From: Nadav Amit <nadav.amit@gmail.com>
+> 
+> According to ARM specifications for the vtimer (CNTV_CTL_EL0): "When the
+> value of the ENABLE bit is 0, the ISTATUS field is UNKNOWN."
+> 
+> Currently the test, however, does check that ISTATUS is cleared when the
+> ENABLE bit is zero. Remove this check as the value is unknown.
 
-On Tue, Jun 27, 2023 at 5:16=E2=80=AFPM Andrew Jones <ajones@ventanamicro.c=
-om> wrote:
->
-> On Fri, Jun 23, 2023 at 06:40:13PM +0800, Haibo Xu wrote:
-> > Disable all vcpu extensions which were enabled by default
-> > if they were available in the risc-v host, and only enable
-> > the desired one for a vcpu_config.
-> >
-> > Suggested-by: Andrew Jones <ajones@ventanamicro.com>
-> > Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
-> > ---
-> >  tools/testing/selftests/kvm/get-reg-list.c | 42 +++++++++++++++++++++-
-> >  1 file changed, 41 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/tools/testing/selftests/kvm/get-reg-list.c b/tools/testing=
-/selftests/kvm/get-reg-list.c
-> > index 3beb6b62de0a..612dabc61137 100644
-> > --- a/tools/testing/selftests/kvm/get-reg-list.c
-> > +++ b/tools/testing/selftests/kvm/get-reg-list.c
-> > @@ -138,11 +138,50 @@ static struct kvm_vcpu *vcpu_config_get_vcpu(stru=
-ct vcpu_reg_list *c, struct kvm
-> >       prepare_vcpu_init(c, &init);
-> >       vcpu =3D __vm_vcpu_add(vm, 0);
-> >       aarch64_vcpu_setup(vcpu, &init);
-> > -     finalize_vcpu(vcpu, c);
-> >
-> >       return vcpu;
-> >  }
-> >  #else
-> > +static inline bool vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
-> > +{
-> > +     int ret;
-> > +     unsigned long value;
-> > +
-> > +     ret =3D __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
-> > +     if (ret) {
-> > +             printf("Failed to get ext %d", ext);
-> > +             return false;
-> > +     }
-> > +
-> > +     return !!value;
-> > +}
-> > +
-> > +static void finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu_reg_list =
-*c)
-> > +{
-> > +     struct vcpu_reg_sublist *s;
-> > +
-> > +     /*
-> > +      * Disable all extensions which were enabled by default
-> > +      * if they were available in the risc-v host.
-> > +      */
-> > +     for (int i =3D 0; i < KVM_RISCV_ISA_EXT_MAX; i++) {
-> > +             __vcpu_set_reg(vcpu, RISCV_ISA_EXT_REG(i), 0);
-> > +     }
->
-> nit: can drop the {}
->
-> > +
-> > +     for_each_sublist(c, s) {
-> > +             if (!s->feature)
-> > +                     continue;
-> > +
-> > +             /* Try to enable the desired extension */
-> > +             __vcpu_set_reg(vcpu, RISCV_ISA_EXT_REG(s->feature), 1);
-> > +
-> > +             /* Double check whether the desired extension was enabled=
- */
-> > +             __TEST_REQUIRE(vcpu_has_ext(vcpu, s->feature),
-> > +                            "%s: %s not available, skipping tests\n",
-> > +                            config_name(c), s->name);
-> > +     }
-> > +}
-> > +
-> >  static struct kvm_vcpu *vcpu_config_get_vcpu(struct vcpu_reg_list *c, =
-struct kvm_vm *vm)
-> >  {
-> >       return __vm_vcpu_add(vm, 0);
-> > @@ -178,6 +217,7 @@ static void run_test(struct vcpu_reg_list *c)
-> >
-> >       vm =3D vm_create_barebones();
-> >       vcpu =3D vcpu_config_get_vcpu(c, vm);
-> > +     finalize_vcpu(vcpu, c);
->
-> Now that both arm and riscv call finalize_vcpu() we could do the weak
-> function trick for it and move the arch-specific implementations to
-> their own arch-specific files.
->
-> >
-> >       reg_list =3D vcpu_get_reg_list(vcpu);
-> >
-> > --
-> > 2.34.1
-> >
->
-> Otherwise,
->
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
->
-> Thanks,
-> drew
+Hmm, does it? timer_pending() is
+
+ /* Check that the timer condition is met. */
+ static bool timer_pending(struct timer_info *info)
+ {
+        return (info->read_ctl() & ARCH_TIMER_CTL_ENABLE) &&
+                (info->read_ctl() & ARCH_TIMER_CTL_ISTATUS);
+ }
+
+which I would expect to short-circuit when ENABLE is zero.
+
+Thanks,
+drew
+
+> 
+> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
+> ---
+>  arm/timer.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arm/timer.c b/arm/timer.c
+> index 2cb8051..0b976a7 100644
+> --- a/arm/timer.c
+> +++ b/arm/timer.c
+> @@ -256,7 +256,7 @@ static void test_timer_pending(struct timer_info *info)
+>  	set_timer_irq_enabled(info, true);
+>  
+>  	report(!info->irq_received, "no interrupt when timer is disabled");
+> -	report(!timer_pending(info) && gic_timer_check_state(info, GIC_IRQ_STATE_INACTIVE),
+> +	report(gic_timer_check_state(info, GIC_IRQ_STATE_INACTIVE),
+>  			"interrupt signal no longer pending");
+>  
+>  	info->write_cval(now - 1);
+> -- 
+> 2.34.1
+> 
