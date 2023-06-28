@@ -1,28 +1,24 @@
-Received: from out-58.mta0.migadu.com (out-58.mta0.migadu.com [91.218.175.58])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F185D63C9
-	for <kvmarm@lists.linux.dev>; Wed, 28 Jun 2023 08:22:38 +0000 (UTC)
-Date: Wed, 28 Jun 2023 10:22:34 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1687940556;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yE+zAS36vm7c0KpHY1t0fhT+UJHRW10aXuD6DFFQQx8=;
-	b=b02zPhyrB0viWXXh0GLBNtTOP2VDJjlJViMJyRiczXLw1D+sUdDQWf5iQBRbiwAUm+DSZ4
-	GwkfOLZSJAijtQiWM1wC82flqBWV6mqVQSyDTnWfZX3pNn60lf6rushEvaa8oYNSNBesqV
-	V0n7owwtOFAkbSRFCaRoQNe5qayGTXA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Nadav Amit <nadav.amit@gmail.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	Nikos Nikoleris <nikos.nikoleris@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Huth <thuth@redhat.com>, Nadav Amit <namit@vmware.com>
-Subject: Re: [PATCH] .debug ignore - to squash with efi:keep efi
-Message-ID: <20230628-b2233c7a1459191cc7b0c9c0@orel>
-References: <20230628001356.2706-1-namit@vmware.com>
- <20230628-646da878865323f64fc52452@orel>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3933A923
+	for <kvmarm@lists.linux.dev>; Wed, 28 Jun 2023 10:18:22 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D2067113E;
+	Wed, 28 Jun 2023 03:18:59 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4F5463F663;
+	Wed, 28 Jun 2023 03:18:14 -0700 (PDT)
+Date: Wed, 28 Jun 2023 11:18:11 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	andrew.jones@linux.dev, maz@kernel.org, will@kernel.org,
+	oliver.upton@linux.dev, ricarkol@google.com, reijiw@google.com,
+	mark.rutland@arm.com
+Subject: Re: [kvm-unit-tests PATCH v3 0/6] arm: pmu: Fix random failures of
+ pmu-chain-promotion
+Message-ID: <ZJwI45VTkf6TppBm@monolith.localdoman>
+References: <20230619200401.1963751-1-eric.auger@redhat.com>
+ <0aa48994-96b3-b5a1-e72b-961e6e892142@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -31,42 +27,77 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230628-646da878865323f64fc52452@orel>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <0aa48994-96b3-b5a1-e72b-961e6e892142@redhat.com>
 
-On Wed, Jun 28, 2023 at 10:19:03AM +0200, Andrew Jones wrote:
-> On Wed, Jun 28, 2023 at 12:13:48AM +0000, Nadav Amit wrote:
-> > From: Nadav Amit <namit@vmware.com>
+Hi,
+
+On Wed, Jun 28, 2023 at 09:44:44AM +0200, Eric Auger wrote:
+> Hi Alexandru, Drew,
 > 
-> Missing s-o-b.
-> 
-> > 
-> > ---
-> >  .gitignore | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/.gitignore b/.gitignore
-> > index 29f352c..2168e01 100644
-> > --- a/.gitignore
-> > +++ b/.gitignore
-> > @@ -7,6 +7,7 @@ tags
-> >  *.flat
-> >  *.efi
-> >  *.elf
-> > +*.debug
-> >  *.patch
-> >  .pc
-> >  patches
-> > -- 
-> > 2.34.1
+> On 6/19/23 22:03, Eric Auger wrote:
+> > On some HW (ThunderXv2), some random failures of
+> > pmu-chain-promotion test can be observed.
 > >
-> 
-> The patch threading is busted. Everything in the thread, including the
-> cover letter, is in reply to this patch.
->
+> > pmu-chain-promotion is composed of several subtests
+> > which run 2 mem_access loops. The initial value of
+> > the counter is set so that no overflow is expected on
+> > the first loop run and overflow is expected on the second.
+> > However it is observed that sometimes we get an overflow
+> > on the first run. It looks related to some variability of
+> > the mem_acess count. This variability is observed on all
+> > HW I have access to, with different span though. On
+> > ThunderX2 HW it looks the margin that is currently taken
+> > is too small and we regularly hit failure.
+> >
+> > although the first goal of this series is to increase
+> > the count/margin used in those tests, it also attempts
+> > to improve the pmu-chain-promotion logs, add some barriers
+> > in the mem-access loop, clarify the chain counter
+> > enable/disable sequence.
+> >
+> > A new 'pmu-mem-access-reliability' is also introduced to
+> > detect issues with MEM_ACCESS event variability and make
+> > the debug easier.
+> >
+> > Obviously one can wonder if this variability is something normal
+> > and does not hide any other bug. I hope this series will raise
+> > additional discussions about this.
+> >
+> > https://github.com/eauger/kut/tree/pmu-chain-promotion-fixes-v3
+> >
+> > History:
+> >
+> > v2 -> v3:
+> > - took into account Alexandru's comments. See individual log
+> >   files
+> Gentle ping. Does this version match all your expectations?
 
-OK, I see the .gitignore hunk in patch 1, which is good, since it
-certainly doesn't need its own patch. I'll just ignore this "patch".
+The series are on my radar, I'll have a look this Friday.
 
 Thanks,
-drew
+Alex
+
+> 
+> Thanks
+> 
+> Eric
+> >
+> > v1 -> v2:
+> > - Take into account Alexandru's & Mark's comments. Added some
+> >   R-b's and T-b's.
+> >
+> >
+> > Eric Auger (6):
+> >   arm: pmu: pmu-chain-promotion: Improve debug messages
+> >   arm: pmu: pmu-chain-promotion: Introduce defines for count and margin
+> >     values
+> >   arm: pmu: Add extra DSB barriers in the mem_access loop
+> >   arm: pmu: Fix chain counter enable/disable sequences
+> >   arm: pmu: Add pmu-mem-access-reliability test
+> >   arm: pmu-chain-promotion: Increase the count and margin values
+> >
+> >  arm/pmu.c         | 208 ++++++++++++++++++++++++++++++++--------------
+> >  arm/unittests.cfg |   6 ++
+> >  2 files changed, 153 insertions(+), 61 deletions(-)
+> >
+> 
