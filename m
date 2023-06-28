@@ -1,42 +1,43 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B38267EA
-	for <kvmarm@lists.linux.dev>; Wed, 28 Jun 2023 00:14:28 +0000 (UTC)
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1b82bf265b2so6269475ad.0
-        for <kvmarm@lists.linux.dev>; Tue, 27 Jun 2023 17:14:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B835804
+	for <kvmarm@lists.linux.dev>; Wed, 28 Jun 2023 00:14:29 +0000 (UTC)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1b80512a7f2so19528595ad.3
+        for <kvmarm@lists.linux.dev>; Tue, 27 Jun 2023 17:14:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687911268; x=1690503268;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4ZjcXPxOnEy7+SOVIdg9yFzDIlL6q00qvIVRkRmdKtM=;
-        b=DKB7JOxPefuZO7KixVJFWWixhZBrTUmoOWjWM6HbkNPtDJ7RbVMWVl6G+QYa8/0Nez
-         VHQVCnrnSTflid3YqbihoTRbjdG7G0cJHmZOgIfoEorGz8Op/66NSyMDNTTtlUDzw4JU
-         aMKiH+2Vw0Tgx2tMg9ITPTCQP69+dvxX1tatkgiK5oR8pL+yrznMTNWbHvORRCs5Sp++
-         XEh0e9zrdznltdWvWNkc3wOlpsb0AuPPu0LN+zg7fj/OzOWE+EIsND1JVrKHMQZ4ZY2p
-         TAZCmwRU4oT6/4tm6fmZGWH4Cni0vHZG5naAUjbEM4lu6mgCdpx3HiPS7zENgM9B0V5k
-         GdHg==
+        d=gmail.com; s=20221208; t=1687911269; x=1690503269;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=54YEzEQBCutR+gefBVnLuCnoFZSPr1AQvRKrvXs8DRM=;
+        b=rssPJ9pe0NTvz6xb8tjHKDIANdYWah6ocqGDWrYFtdHXhtR690CLpGIwP4JxsRyT6R
+         ei1iFw3MDnCoowyq7LzVPyYZEvx4ovKQpT/IJ49IWoAwqdC1hnLqjPUBwGEuPSmcoeXH
+         GXdPo47a43QoXcdQ0DRPerhCmr0mu+6fpT1Ky+z7naeXZf6NYd2sJfah/GGGqm4Qjb+x
+         oRDt3Dm3BoEXk8bMc+LK/XqRlCLSpvCUVHUR65GrBJbFZOwIczJQKJmD3UOh0K3PuGOi
+         GqQ9fvA80M/XWHjpFPy7PFGs6pAJCb1EZdQjdAdRs/i3ZZ+6tJoiNj3eRzOsDYp+SBis
+         2opw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687911268; x=1690503268;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4ZjcXPxOnEy7+SOVIdg9yFzDIlL6q00qvIVRkRmdKtM=;
-        b=DZCUBGzI+cPVU4vDcpY5G/gArzxBW+ZazGOxMzMXas/KR2uurwACthW880rA7cdJUO
-         3u+aK5qc5cteanSwECZlmhPkz6GJDcyJNA7GDv5VeoqzpL3QUE/uir+BbsOhqcHgohdx
-         PVT8lNwfojsJZS7v3155Hs4S/Ot5ZGcK0MfI4Aj661dqTPdQAW5q2p2I9atQUgfU6eDh
-         DsPvO6QdHQTiCNklZaD/f5b+en4R1xY+C2ct/BFNyR4iDgjkei5vsVPxwXpiVRoI+bFR
-         d/ToMZ7hb+YedBXOh0SZdUj2MO8X6o0eHyv0FQTQBSel/l9fYev0yZLtPKj0lARqeiR+
-         4oGg==
-X-Gm-Message-State: AC+VfDxXYIsA3Q/F85DPeTDOSBCOzYDlbPM7qm68KxWvoNzmuX7S9c7J
-	DcVRBFfccxXfBFQiOFsvIAI=
-X-Google-Smtp-Source: ACHHUZ4ajl/K9Afuy4wmkbZFJTlHaXfzvMo7K6CnfYtIi4x1dX/K2YDRLAr1sl1b7VUp9WmPnjfpFA==
-X-Received: by 2002:a17:902:ea06:b0:1b8:50d:9dd9 with SMTP id s6-20020a170902ea0600b001b8050d9dd9mr7276070plg.51.1687911267850;
-        Tue, 27 Jun 2023 17:14:27 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1687911269; x=1690503269;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=54YEzEQBCutR+gefBVnLuCnoFZSPr1AQvRKrvXs8DRM=;
+        b=eQAa1q1JYz9g9Us5tOJTSPZa2wibc/hbxegnthbCId0e+6VRNEZnNuXr4Z3oO6XO3y
+         7u+Gj4OKzZRzMvjEH7OKeE/bSznDATc0Slc8+C87KETgA1hhocLsi+i+p65eCJMej5VN
+         c3dxwqxuhWNSzy1I77dnP3KQqej/vdtPQ7pyjjqR42GyEOzSBt409zjvZE/RE3/0eACe
+         etWnZ0z8ilee0eOx8UzLKw7FcHmc9R67laBrPs81H9GuD5NRPry/iN35n08952HKAseV
+         ER1RRAayQDMLvLZVslNasVJBCzevAg8hUuBSYKuPxZI519Cnc9jytTj6SXupC0xRl6xd
+         oQuA==
+X-Gm-Message-State: AC+VfDywH0wFXR5DYyGTjhMaY7wkQDf9qGxDOXSvrDyiKzCgZtKgDnMA
+	KUPtg3vCAZieBMAlhlzGLA8=
+X-Google-Smtp-Source: ACHHUZ50pa0YiATIK/COunvYOh3th4Bjpa5itlHWiS7QVeAqx+bEb4TeM16vZWNOaPfnRdlXozFEbw==
+X-Received: by 2002:a17:902:f7c4:b0:1b3:d4aa:461 with SMTP id h4-20020a170902f7c400b001b3d4aa0461mr7901602plw.44.1687911269190;
+        Tue, 27 Jun 2023 17:14:29 -0700 (PDT)
 Received: from sc9-mailhost2.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id jd4-20020a170903260400b001b1920cffdasm343796plb.204.2023.06.27.17.14.26
+        by smtp.gmail.com with ESMTPSA id jd4-20020a170903260400b001b1920cffdasm343796plb.204.2023.06.27.17.14.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jun 2023 17:14:27 -0700 (PDT)
+        Tue, 27 Jun 2023 17:14:28 -0700 (PDT)
 From: Nadav Amit <nadav.amit@gmail.com>
 X-Google-Original-From: Nadav Amit
 To: Andrew Jones <andrew.jones@linux.dev>
@@ -46,10 +47,12 @@ Cc: kvmarm@lists.linux.dev,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Thomas Huth <thuth@redhat.com>,
 	Nadav Amit <namit@vmware.com>
-Subject: [PATCH] .debug ignore - to squash with efi:keep efi
-Date: Wed, 28 Jun 2023 00:13:48 +0000
-Message-Id: <20230628001356.2706-1-namit@vmware.com>
+Subject: [kvm-unit-tests PATCH v3 0/6] arm64: improve debuggability
+Date: Wed, 28 Jun 2023 00:13:49 +0000
+Message-Id: <20230628001356.2706-2-namit@vmware.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230628001356.2706-1-namit@vmware.com>
+References: <20230628001356.2706-1-namit@vmware.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -60,22 +63,61 @@ Content-Transfer-Encoding: 8bit
 
 From: Nadav Amit <namit@vmware.com>
 
----
- .gitignore | 1 +
- 1 file changed, 1 insertion(+)
+My recent experience in debugging ARM64 tests on EFI was not as fun as I
+expected it to be.
 
-diff --git a/.gitignore b/.gitignore
-index 29f352c..2168e01 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -7,6 +7,7 @@ tags
- *.flat
- *.efi
- *.elf
-+*.debug
- *.patch
- .pc
- patches
+There were several reasons for that besides the questionable definition
+of "fun":
+
+1. ARM64 is not compiled with frame pointers and there is no stack
+   unwinder when the stack is dumped.
+
+2. Building an EFI drops the debug information.
+
+3. The addresses that are printed on dump_stack() and the use of GDB
+   are hard because taking code relocation into account is non trivial.
+
+The patches help both ARM64 and EFI for this matter. The image address
+is printed when EFI is used to allow the use of GDB. Symbols are emitted
+into a separate debug file. The frame pointer is included and special
+entry is added upon an exception to allow backtracing across
+exceptions.
+
+[ PowerPC: Please ack patches 1,2 ]
+[ x86: Please ack patches 1,2,5 ]
+
+v2->v3:
+* Consider PowerPC for reloc and related fixes [Andrew]
+
+v1->v2:
+* Andrew comments [see in individual patches]
+* Few cleanups
+
+Nadav Amit (6):
+  efi: keep efi debug information in a separate file
+  lib/stack: print base addresses on relocation setups
+  arm64: enable frame pointer and support stack unwinding
+  arm64: stack: update trace stack on exception
+  efi: print address of image
+  arm64: dump stack on bad exception
+
+ .gitignore              |  1 +
+ Makefile                |  2 +-
+ arm/Makefile.arm        |  3 --
+ arm/Makefile.arm64      |  2 ++
+ arm/Makefile.common     |  8 +++++-
+ arm/cstart64.S          | 13 +++++++++
+ lib/arm64/asm-offsets.c |  6 +++-
+ lib/arm64/asm/stack.h   |  3 ++
+ lib/arm64/processor.c   |  1 +
+ lib/arm64/stack.c       | 62 +++++++++++++++++++++++++++++++++++++++++
+ lib/efi.c               |  4 +++
+ lib/stack.c             | 31 +++++++++++++++++++--
+ powerpc/Makefile.common |  1 +
+ x86/Makefile.common     |  5 +++-
+ 14 files changed, 133 insertions(+), 9 deletions(-)
+ create mode 100644 lib/arm64/stack.c
+
 -- 
 2.34.1
 
