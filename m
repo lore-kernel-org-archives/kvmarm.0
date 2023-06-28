@@ -1,85 +1,81 @@
-Received: from out-46.mta0.migadu.com (out-46.mta0.migadu.com [91.218.175.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7671842
-	for <kvmarm@lists.linux.dev>; Wed, 28 Jun 2023 00:00:11 +0000 (UTC)
-Date: Wed, 28 Jun 2023 00:00:06 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1687910409;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L8slz7l2d2NtGk0xl0oPNP/LaUMaD5wPj4T+5f/9a5c=;
-	b=c89u9EwzjV3RDnKWYFOSiAwpuuuc3LcLL3QEbjcUa0KVKYbZPi+MCK3Opz3j2o3Ih5evfw
-	ehVODi85nSuBCFZf1gZh+K1EyHYFlzhx+IoRV9IuX2SY8huWA+4F312y7+t5SxdEdSpGOI
-	nYbUaeynTGn+8yQ6TS8WOGBWKs6//XE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Reiji Watanabe <reijiw@google.com>, stable@vger.kernel.org,
-	Yu Zhao <yuzhao@google.com>
-Subject: Re: [PATCH v2] KVM: arm64: Correctly handle page aging notifiers for
- unaligned memslot
-Message-ID: <ZJt4BqFmYCLXxC2N@linux.dev>
-References: <20230627235405.4069823-1-oliver.upton@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B38267EA
+	for <kvmarm@lists.linux.dev>; Wed, 28 Jun 2023 00:14:28 +0000 (UTC)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1b82bf265b2so6269475ad.0
+        for <kvmarm@lists.linux.dev>; Tue, 27 Jun 2023 17:14:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687911268; x=1690503268;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4ZjcXPxOnEy7+SOVIdg9yFzDIlL6q00qvIVRkRmdKtM=;
+        b=DKB7JOxPefuZO7KixVJFWWixhZBrTUmoOWjWM6HbkNPtDJ7RbVMWVl6G+QYa8/0Nez
+         VHQVCnrnSTflid3YqbihoTRbjdG7G0cJHmZOgIfoEorGz8Op/66NSyMDNTTtlUDzw4JU
+         aMKiH+2Vw0Tgx2tMg9ITPTCQP69+dvxX1tatkgiK5oR8pL+yrznMTNWbHvORRCs5Sp++
+         XEh0e9zrdznltdWvWNkc3wOlpsb0AuPPu0LN+zg7fj/OzOWE+EIsND1JVrKHMQZ4ZY2p
+         TAZCmwRU4oT6/4tm6fmZGWH4Cni0vHZG5naAUjbEM4lu6mgCdpx3HiPS7zENgM9B0V5k
+         GdHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687911268; x=1690503268;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4ZjcXPxOnEy7+SOVIdg9yFzDIlL6q00qvIVRkRmdKtM=;
+        b=DZCUBGzI+cPVU4vDcpY5G/gArzxBW+ZazGOxMzMXas/KR2uurwACthW880rA7cdJUO
+         3u+aK5qc5cteanSwECZlmhPkz6GJDcyJNA7GDv5VeoqzpL3QUE/uir+BbsOhqcHgohdx
+         PVT8lNwfojsJZS7v3155Hs4S/Ot5ZGcK0MfI4Aj661dqTPdQAW5q2p2I9atQUgfU6eDh
+         DsPvO6QdHQTiCNklZaD/f5b+en4R1xY+C2ct/BFNyR4iDgjkei5vsVPxwXpiVRoI+bFR
+         d/ToMZ7hb+YedBXOh0SZdUj2MO8X6o0eHyv0FQTQBSel/l9fYev0yZLtPKj0lARqeiR+
+         4oGg==
+X-Gm-Message-State: AC+VfDxXYIsA3Q/F85DPeTDOSBCOzYDlbPM7qm68KxWvoNzmuX7S9c7J
+	DcVRBFfccxXfBFQiOFsvIAI=
+X-Google-Smtp-Source: ACHHUZ4ajl/K9Afuy4wmkbZFJTlHaXfzvMo7K6CnfYtIi4x1dX/K2YDRLAr1sl1b7VUp9WmPnjfpFA==
+X-Received: by 2002:a17:902:ea06:b0:1b8:50d:9dd9 with SMTP id s6-20020a170902ea0600b001b8050d9dd9mr7276070plg.51.1687911267850;
+        Tue, 27 Jun 2023 17:14:27 -0700 (PDT)
+Received: from sc9-mailhost2.vmware.com ([66.170.99.1])
+        by smtp.gmail.com with ESMTPSA id jd4-20020a170903260400b001b1920cffdasm343796plb.204.2023.06.27.17.14.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Jun 2023 17:14:27 -0700 (PDT)
+From: Nadav Amit <nadav.amit@gmail.com>
+X-Google-Original-From: Nadav Amit
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	Nikos Nikoleris <nikos.nikoleris@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Huth <thuth@redhat.com>,
+	Nadav Amit <namit@vmware.com>
+Subject: [PATCH] .debug ignore - to squash with efi:keep efi
+Date: Wed, 28 Jun 2023 00:13:48 +0000
+Message-Id: <20230628001356.2706-1-namit@vmware.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230627235405.4069823-1-oliver.upton@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jun 27, 2023 at 11:54:05PM +0000, Oliver Upton wrote:
-> Userspace is allowed to select any PAGE_SIZE aligned hva to back guest
-> memory. This is even the case with hugepages, although it is a rather
-> suboptimal configuration as PTE level mappings are used at stage-2.
-> 
-> The arm64 page aging handlers have an assumption that the specified
-> range is exactly one page/block of memory, which in the aforementioned
-> case is not necessarily true. All together this leads to the WARN() in
-> kvm_age_gfn() firing.
-> 
-> However, the WARN is only part of the issue as the table walkers visit
-> at most a single leaf PTE. For hugepage-backed memory in a memslot that
-> isn't hugepage-aligned, page aging entirely misses accesses to the
-> hugepage beyond the first page in the memslot.
-> 
-> Add a new walker dedicated to handling page aging MMU notifiers capable
-> of walking a range of PTEs. Convert kvm(_test)_age_gfn() over to the new
-> walker and drop the WARN that caught the issue in the first place. The
-> implementation of this walker was inspired by the test_clear_young()
-> implementation by Yu Zhao [*], but repurposed to address a bug in the
-> existing aging implementation.
-> 
-> Cc: stable@vger.kernel.org # v5.15
-> Fixes: 056aad67f836 ("kvm: arm/arm64: Rework gpa callback handlers")
-> Link: https://lore.kernel.org/kvmarm/20230526234435.662652-6-yuzhao@google.com/
-> Co-developed-by: Yu Zhao <yuzhao@google.com>
-> Signed-off-by: Yu Zhao <yuzhao@google.com>
-> Reported-by: Reiji Watanabe <reijiw@google.com>
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
+From: Nadav Amit <namit@vmware.com>
 
-Derp. I blew away my patch that had comments here.
+---
+ .gitignore | 1 +
+ 1 file changed, 1 insertion(+)
 
-Marc, per our discussion forever ago, I went about implementing a
-dedicated walker for handling the page aging notifiers. This aligns
-pretty well with the test_clear_young() changes that Yu is working on.
-So much so that I repurposed some of the plumbing.
+diff --git a/.gitignore b/.gitignore
+index 29f352c..2168e01 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -7,6 +7,7 @@ tags
+ *.flat
+ *.efi
+ *.elf
++*.debug
+ *.patch
+ .pc
+ patches
+-- 
+2.34.1
 
-I'd like to limit backports to 5.15, as making this patch work with the
-old hva-to-gfn notifier dance doesn't seem worth the effort to me.
-Tested with access_tracking_perf_test.
-
-v1: https://lore.kernel.org/kvmarm/20230111000300.2034799-1-oliver.upton@linux.dev/
-
---
-Thanks,
-Oliver
