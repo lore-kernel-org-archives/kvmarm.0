@@ -1,43 +1,43 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B835804
-	for <kvmarm@lists.linux.dev>; Wed, 28 Jun 2023 00:14:29 +0000 (UTC)
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1b80512a7f2so19528595ad.3
-        for <kvmarm@lists.linux.dev>; Tue, 27 Jun 2023 17:14:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ECA7A4E
+	for <kvmarm@lists.linux.dev>; Wed, 28 Jun 2023 00:14:31 +0000 (UTC)
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-262ff3a4659so1785050a91.0
+        for <kvmarm@lists.linux.dev>; Tue, 27 Jun 2023 17:14:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687911269; x=1690503269;
+        d=gmail.com; s=20221208; t=1687911271; x=1690503271;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=54YEzEQBCutR+gefBVnLuCnoFZSPr1AQvRKrvXs8DRM=;
-        b=rssPJ9pe0NTvz6xb8tjHKDIANdYWah6ocqGDWrYFtdHXhtR690CLpGIwP4JxsRyT6R
-         ei1iFw3MDnCoowyq7LzVPyYZEvx4ovKQpT/IJ49IWoAwqdC1hnLqjPUBwGEuPSmcoeXH
-         GXdPo47a43QoXcdQ0DRPerhCmr0mu+6fpT1Ky+z7naeXZf6NYd2sJfah/GGGqm4Qjb+x
-         oRDt3Dm3BoEXk8bMc+LK/XqRlCLSpvCUVHUR65GrBJbFZOwIczJQKJmD3UOh0K3PuGOi
-         GqQ9fvA80M/XWHjpFPy7PFGs6pAJCb1EZdQjdAdRs/i3ZZ+6tJoiNj3eRzOsDYp+SBis
-         2opw==
+        bh=vcITuuApT8BB1DergEM0uY4hFVcspCnprAWBbOfWs/s=;
+        b=sEZyWLJ8PWKZnhovvXmlZjBe315oX+wAO1VaSsRvyuHsB8w8pIKfalNm2ZKSEa+XlX
+         6euNJgvuML8ZhztB0m35jtGRQtoARrzJCbnV30gK25dnuNFdO8tTjnSBtoeFSmAQPJix
+         omx5rVF+6oAQVIxqtQ2h6Zt4/RZVZf3YZTCJzxsPJBDCZyG7PhNcCemSRjbwGXic+/J6
+         brb4DJFY3RXcY1EBsf7F+eaMWoFMvlI/EKFnnWEeICMbQBLSyR6P2wQwH6qASRpqEP6T
+         RvqsREBBVq28RC97wIYGXx+YFXYoJK/kpUMvvo+kjR9qfceR9fm2bxXA6nXGYZpg4nqX
+         sYBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687911269; x=1690503269;
+        d=1e100.net; s=20221208; t=1687911271; x=1690503271;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=54YEzEQBCutR+gefBVnLuCnoFZSPr1AQvRKrvXs8DRM=;
-        b=eQAa1q1JYz9g9Us5tOJTSPZa2wibc/hbxegnthbCId0e+6VRNEZnNuXr4Z3oO6XO3y
-         7u+Gj4OKzZRzMvjEH7OKeE/bSznDATc0Slc8+C87KETgA1hhocLsi+i+p65eCJMej5VN
-         c3dxwqxuhWNSzy1I77dnP3KQqej/vdtPQ7pyjjqR42GyEOzSBt409zjvZE/RE3/0eACe
-         etWnZ0z8ilee0eOx8UzLKw7FcHmc9R67laBrPs81H9GuD5NRPry/iN35n08952HKAseV
-         ER1RRAayQDMLvLZVslNasVJBCzevAg8hUuBSYKuPxZI519Cnc9jytTj6SXupC0xRl6xd
-         oQuA==
-X-Gm-Message-State: AC+VfDywH0wFXR5DYyGTjhMaY7wkQDf9qGxDOXSvrDyiKzCgZtKgDnMA
-	KUPtg3vCAZieBMAlhlzGLA8=
-X-Google-Smtp-Source: ACHHUZ50pa0YiATIK/COunvYOh3th4Bjpa5itlHWiS7QVeAqx+bEb4TeM16vZWNOaPfnRdlXozFEbw==
-X-Received: by 2002:a17:902:f7c4:b0:1b3:d4aa:461 with SMTP id h4-20020a170902f7c400b001b3d4aa0461mr7901602plw.44.1687911269190;
-        Tue, 27 Jun 2023 17:14:29 -0700 (PDT)
+        bh=vcITuuApT8BB1DergEM0uY4hFVcspCnprAWBbOfWs/s=;
+        b=dRZiBMPAsP1wlxPaR8zDgXIz4tygLPfaUel6cAy9b7f/UC3hhfKgOl3PJvhzN5NyzT
+         oKT5vzXImTWgxZgsCiRfjxm0hshCbTCIwzo2qAEUXtwivaArEi/r8aWGAJgd7vFNg1je
+         LLAu9t7PU0vai8t1HjUGyFlWQc/y2ZXYFOjw1YPrPygzPBpK7dTQVBPrO5QhbEp+Cx0Q
+         UAGRSxOK/4Cf/a7R4/rlDUxJC27QO3xYF72on27z5ENcTnEu7/2W6znEW9IWcKMfp9ul
+         etdYQ7l9LsRvQndkp5iWqwxlxuY8AyFEp713hVv7SIw2NK9ZvZcC0sWfVGNRIECuDh9t
+         L0Rg==
+X-Gm-Message-State: AC+VfDyesWPryskbM2D+ZSznRWG3TAzJNstFtzHHhKlGhCVdloGeo8m7
+	E9VijpD2C0DaFyViE+f5DgA=
+X-Google-Smtp-Source: ACHHUZ7WT0YdLJ5x5NFAHL4wyFzvepYBp7coQmyERcaSCKvmq1olpjIBkSIrC7nW5/0S0fhJbXSseg==
+X-Received: by 2002:a17:90b:4d83:b0:263:4164:dfba with SMTP id oj3-20020a17090b4d8300b002634164dfbamr143028pjb.6.1687911270531;
+        Tue, 27 Jun 2023 17:14:30 -0700 (PDT)
 Received: from sc9-mailhost2.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id jd4-20020a170903260400b001b1920cffdasm343796plb.204.2023.06.27.17.14.28
+        by smtp.gmail.com with ESMTPSA id jd4-20020a170903260400b001b1920cffdasm343796plb.204.2023.06.27.17.14.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jun 2023 17:14:28 -0700 (PDT)
+        Tue, 27 Jun 2023 17:14:29 -0700 (PDT)
 From: Nadav Amit <nadav.amit@gmail.com>
 X-Google-Original-From: Nadav Amit
 To: Andrew Jones <andrew.jones@linux.dev>
@@ -47,9 +47,9 @@ Cc: kvmarm@lists.linux.dev,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Thomas Huth <thuth@redhat.com>,
 	Nadav Amit <namit@vmware.com>
-Subject: [kvm-unit-tests PATCH v3 0/6] arm64: improve debuggability
-Date: Wed, 28 Jun 2023 00:13:49 +0000
-Message-Id: <20230628001356.2706-2-namit@vmware.com>
+Subject: [kvm-unit-tests PATCH v3 1/6] efi: keep efi debug information in a separate file
+Date: Wed, 28 Jun 2023 00:13:50 +0000
+Message-Id: <20230628001356.2706-3-namit@vmware.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230628001356.2706-1-namit@vmware.com>
 References: <20230628001356.2706-1-namit@vmware.com>
@@ -63,61 +63,81 @@ Content-Transfer-Encoding: 8bit
 
 From: Nadav Amit <namit@vmware.com>
 
-My recent experience in debugging ARM64 tests on EFI was not as fun as I
-expected it to be.
+Debugging tests that run on EFI is hard because the debug information is
+not included in the EFI file. Dump it into a separeate .debug file to
+allow the use of gdb or pretty_print_stacks script.
 
-There were several reasons for that besides the questionable definition
-of "fun":
+Signed-off-by: Nadav Amit <namit@vmware.com>
 
-1. ARM64 is not compiled with frame pointers and there is no stack
-   unwinder when the stack is dumped.
-
-2. Building an EFI drops the debug information.
-
-3. The addresses that are printed on dump_stack() and the use of GDB
-   are hard because taking code relocation into account is non trivial.
-
-The patches help both ARM64 and EFI for this matter. The image address
-is printed when EFI is used to allow the use of GDB. Symbols are emitted
-into a separate debug file. The frame pointer is included and special
-entry is added upon an exception to allow backtracing across
-exceptions.
-
-[ PowerPC: Please ack patches 1,2 ]
-[ x86: Please ack patches 1,2,5 ]
+---
 
 v2->v3:
-* Consider PowerPC for reloc and related fixes [Andrew]
+* Add *.debug to .gitignore [Andrew]
 
 v1->v2:
-* Andrew comments [see in individual patches]
-* Few cleanups
+* Making clean should remove .debug [Andrew]
+* x86 EFI support [Andrew]
+---
+ .gitignore          | 1 +
+ arm/Makefile.common | 5 ++++-
+ x86/Makefile.common | 5 ++++-
+ 3 files changed, 9 insertions(+), 2 deletions(-)
 
-Nadav Amit (6):
-  efi: keep efi debug information in a separate file
-  lib/stack: print base addresses on relocation setups
-  arm64: enable frame pointer and support stack unwinding
-  arm64: stack: update trace stack on exception
-  efi: print address of image
-  arm64: dump stack on bad exception
-
- .gitignore              |  1 +
- Makefile                |  2 +-
- arm/Makefile.arm        |  3 --
- arm/Makefile.arm64      |  2 ++
- arm/Makefile.common     |  8 +++++-
- arm/cstart64.S          | 13 +++++++++
- lib/arm64/asm-offsets.c |  6 +++-
- lib/arm64/asm/stack.h   |  3 ++
- lib/arm64/processor.c   |  1 +
- lib/arm64/stack.c       | 62 +++++++++++++++++++++++++++++++++++++++++
- lib/efi.c               |  4 +++
- lib/stack.c             | 31 +++++++++++++++++++--
- powerpc/Makefile.common |  1 +
- x86/Makefile.common     |  5 +++-
- 14 files changed, 133 insertions(+), 9 deletions(-)
- create mode 100644 lib/arm64/stack.c
-
+diff --git a/.gitignore b/.gitignore
+index 29f352c..2168e01 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -7,6 +7,7 @@ tags
+ *.flat
+ *.efi
+ *.elf
++*.debug
+ *.patch
+ .pc
+ patches
+diff --git a/arm/Makefile.common b/arm/Makefile.common
+index d60cf8c..9b45a8f 100644
+--- a/arm/Makefile.common
++++ b/arm/Makefile.common
+@@ -78,6 +78,9 @@ ifeq ($(CONFIG_EFI),y)
+ 
+ %.efi: %.so
+ 	$(call arch_elf_check, $^)
++	$(OBJCOPY) --only-keep-debug $^ $@.debug
++	$(OBJCOPY) --strip-debug $^
++	$(OBJCOPY) --add-gnu-debuglink=$@.debug $^
+ 	$(OBJCOPY) \
+ 		-j .text -j .sdata -j .data -j .dynamic -j .dynsym \
+ 		-j .rel -j .rela -j .rel.* -j .rela.* -j .rel* -j .rela* \
+@@ -103,7 +106,7 @@ $(libeabi): $(eabiobjs)
+ 	$(AR) rcs $@ $^
+ 
+ arm_clean: asm_offsets_clean
+-	$(RM) $(TEST_DIR)/*.{o,flat,elf,so,efi} $(libeabi) $(eabiobjs) \
++	$(RM) $(TEST_DIR)/*.{o,flat,elf,so,efi,debug} $(libeabi) $(eabiobjs) \
+ 	      $(TEST_DIR)/.*.d $(TEST_DIR)/efi/.*.d lib/arm/.*.d
+ 
+ generated-files = $(asm-offsets)
+diff --git a/x86/Makefile.common b/x86/Makefile.common
+index 9f2bc93..c42c3e4 100644
+--- a/x86/Makefile.common
++++ b/x86/Makefile.common
+@@ -54,6 +54,9 @@ ifeq ($(CONFIG_EFI),y)
+ 	@chmod a-x $@
+ 
+ %.efi: %.so
++	$(OBJCOPY) --only-keep-debug $^ $@.debug
++	$(OBJCOPY) --strip-debug $^
++	$(OBJCOPY) --add-gnu-debuglink=$@.debug $^
+ 	$(OBJCOPY) \
+ 		-j .text -j .sdata -j .data -j .dynamic -j .dynsym -j .rel \
+ 		-j .rela -j .reloc -S --target=$(FORMAT) $< $@
+@@ -124,4 +127,4 @@ arch_clean:
+ 	$(RM) $(TEST_DIR)/*.o $(TEST_DIR)/*.flat $(TEST_DIR)/*.elf \
+ 	$(TEST_DIR)/.*.d lib/x86/.*.d \
+ 	$(TEST_DIR)/efi/*.o $(TEST_DIR)/efi/.*.d \
+-	$(TEST_DIR)/*.so $(TEST_DIR)/*.efi
++	$(TEST_DIR)/*.so $(TEST_DIR)/*.efi $(TEST_DIR)/*.debug
 -- 
 2.34.1
 
