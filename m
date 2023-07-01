@@ -1,101 +1,138 @@
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DM4PR02CU002.outbound.protection.outlook.com (mail-centralusazon11013011.outbound.protection.outlook.com [52.101.64.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 002EB4415
-	for <kvmarm@lists.linux.dev>; Sat,  1 Jul 2023 14:53:50 +0000 (UTC)
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5149aafef44so3062046a12.0
-        for <kvmarm@lists.linux.dev>; Sat, 01 Jul 2023 07:53:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1688223229; x=1690815229;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4z5avgOZM94E55xJX5yHh1jEBdl/Nv8eTHj3o1PmFnI=;
-        b=IqkaY/63sYcOG0vwtmF02wpU+mNr/gP2fHYz9of1UNY2Q45RQUGKnr0nycE74z3Vq+
-         vRH+iq/bEWHzZQJFNk5D1eABcSm/7HMxFYJiaIg+wuXbW55cwpQiwwq7ZbxPO2QlnkIj
-         9iVfVrEWAevgKZSOtWpo/0swSzpiq3/5R0+5tvpX1ycDHSi/sX9HFmLv96haLzn08jMc
-         DY4baiQluiuE8NdVxL1tqe/WSUZ5z1uxB9P1GEc7MeQjDLyJWrhwO9i9VTqG5iE4w+Nj
-         cKCOO9fcg9SfxcuWGrOsZkI7RcxYFElB3npOI1snh4RreMoNrKyv6N+PeDCQ9R1qg56C
-         GLsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688223229; x=1690815229;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4z5avgOZM94E55xJX5yHh1jEBdl/Nv8eTHj3o1PmFnI=;
-        b=l8lrtUwUtqzN6ijC5Ybdl3vJmPoXP4Hhz8CnN3ewSgClr2o2NRPjJGrvTlzqzvPpdZ
-         IpCSkQn1Avvqz0vxT+nK9sXtdDxZD4cGXdzlVnJomQEplAt5FaOULywZovkp0wU4NaNf
-         9J/kgtBHFVq362VcMMZE+fxq3Nzkpb6Wf65jWifl32cpv1oMotsrSgy4kxuOSkL4RvSM
-         RVS64y2KWZVbW/HZCPEPwqN74douTNcAyj1K+rF0lsGw+rwB9xhnKMmZYMAj/qm7nf5X
-         KO1foPDUZxhL9nRjXaTHsvK6qpdotFvoikToOlMaPabe+34GV+joK0Y63Rgd8zR+UlJu
-         M75A==
-X-Gm-Message-State: AC+VfDxhaYQwyLi6MJlSKPLJQUrWAKJXox831FCdJHlnnQaMpnFxYALT
-	Jog3cA1Mh+55DdhCh4s4w1BDEQ==
-X-Google-Smtp-Source: APBJJlFbTncNQknWuK6Y34dd/Vq9wobBPzkzq5+JVS2JfwhQSw4EsBA/mzFykhnRWmdndPeE2HFOZQ==
-X-Received: by 2002:a17:906:4093:b0:992:a85d:278b with SMTP id u19-20020a170906409300b00992a85d278bmr3179852ejj.59.1688223228877;
-        Sat, 01 Jul 2023 07:53:48 -0700 (PDT)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id lf1-20020a170907174100b0098d2261d189sm1025110ejc.19.2023.07.01.07.53.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 01 Jul 2023 07:53:48 -0700 (PDT)
-Date: Sat, 1 Jul 2023 16:53:47 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Haibo Xu <haibo1.xu@intel.com>
-Cc: xiaobo55x@gmail.com, maz@kernel.org, oliver.upton@linux.dev, 
-	seanjc@google.com, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Shuah Khan <shuah@kernel.org>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Ricardo Koller <ricarkol@google.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Vipin Sharma <vipinsh@google.com>, 
-	David Matlack <dmatlack@google.com>, Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v5 00/13] RISCV: Add KVM_GET_REG_LIST API
-Message-ID: <20230701-e1bff47a0ed38ec3ab6ca252@orel>
-References: <cover.1688010022.git.haibo1.xu@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D80183C3E
+	for <kvmarm@lists.linux.dev>; Sat,  1 Jul 2023 17:18:35 +0000 (UTC)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SurTxzyuB6x9xciMYynpazkj+onSgHdKoFrzI7EkjcpmKEN6hRRP5uBvaz0bLKuNTIEopxVkSYlgw7g06MyE+4Pw84Re+Gsbm5ZcutJkk/NeE+1b2S+SbJMwUuRa8LL6rVLfOeFpVuEKwpPZ3CbnZAVxRST2FIPTHL+xzk/5Bz385aMd42JOsSDvS9q3gWstyIFiN+MBWXXwi8M5NU3+P7/9EOepiQtIkr77uxJXuRa3Idk5QFpT4qKOyCR7shDHBcs8phasXuo/Itxal9JL8v2jZouFur2ltsr30+L0dhR5S39AXkSvvBgOwbwLoEoiYQYLfSh78U5WKOP88zmYww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Z3w2RuqCs8psCJdkHTHwPX8lZx5/NhmhVE2KRjV960Y=;
+ b=HobMXUyh52sov39lmaznOY5rrPhknEb4GGT0Xuz2sdMK912AMcZOuGQaXYoBlgpHy1emCNlWRXqJg1GtEytQUfmFWEjD6/yeW7yG+ad1e7CrP4GdOUVKPFwh6e1FIub49z6UhG/FOvgdPgY+QJ2hLbFU2xIN7OClL75nz9iLXVFYn/VbWquINFT3oAu0q9CcRNILwK5qYImqK9T8V9dCUr93JMXLZbVPogQkd7ILS622PJuv10YQ4OWEC/ZHT76YVxD1BnFIzmkcOADqv1SHVwBHOddFhSkFgm8JZd9quLGyYosTq5/Ycrx7Xtcovap7lGhAjHJ1gaK1xghmpBsIpQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vmware.com; dmarc=pass action=none header.from=vmware.com;
+ dkim=pass header.d=vmware.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Z3w2RuqCs8psCJdkHTHwPX8lZx5/NhmhVE2KRjV960Y=;
+ b=sANBYhjNT/0nsORzgnvCzl0doQXD1IVJPzF+eFB00aGoiUmgzaW+tS0HW9tQcC1QSBAWUu0R2/1s87Npct62nRfwS062lZI/PFpuEQ5W+qFvaHMRGxmTtCfrnrQORbtJCMcKIKUfW9PrLU331IPEeG4ykXGyP+AbD1wx1lWpHUg=
+Received: from BY3PR05MB8531.namprd05.prod.outlook.com (2603:10b6:a03:3ce::6)
+ by BL0PR05MB6628.namprd05.prod.outlook.com (2603:10b6:208:92::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.19; Sat, 1 Jul
+ 2023 17:18:26 +0000
+Received: from BY3PR05MB8531.namprd05.prod.outlook.com
+ ([fe80::45c9:cdc8:ff01:5e8a]) by BY3PR05MB8531.namprd05.prod.outlook.com
+ ([fe80::45c9:cdc8:ff01:5e8a%6]) with mapi id 15.20.6544.024; Sat, 1 Jul 2023
+ 17:18:25 +0000
+From: Nadav Amit <namit@vmware.com>
+To: Andrew Jones <andrew.jones@linux.dev>
+CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, Nikos Nikoleris <nikos.nikoleris@arm.com>, Paolo
+ Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier
+	<lvivier@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v3 2/6] lib/stack: print base addresses on
+ relocation setups
+Thread-Topic: [kvm-unit-tests PATCH v3 2/6] lib/stack: print base addresses on
+ relocation setups
+Thread-Index: AQHZqVWELUuGLVOi5kCckOd0a/6tZK+kzViAgABgBgA=
+Date: Sat, 1 Jul 2023 17:18:25 +0000
+Message-ID: <22AFB204-4D90-4322-8348-27DFB5E647B6@vmware.com>
+References: <20230628001356.2706-1-namit@vmware.com>
+ <20230628001356.2706-4-namit@vmware.com>
+ <20230701-d9eb38f32bb8f376336d9443@orel>
+In-Reply-To: <20230701-d9eb38f32bb8f376336d9443@orel>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-mailer: Apple Mail (2.3731.600.7)
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vmware.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BY3PR05MB8531:EE_|BL0PR05MB6628:EE_
+x-ms-office365-filtering-correlation-id: 1f0cc748-79bf-4881-7f3c-08db7a572df1
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ j5nibZL5o5Kg4kWvSrux4wN+UtRiuU49nf3nR8bCV2coT3vg2CF9dc+bBzSdmFfC5tPsNYAlwJRwWpKu+wPosZZpFssM51JiLvqUVArmBldU5yG2/0QqggHk6lTINd1JlqBx9ddEzaWFdcuGm+KcRPSXSi2HGgzb1srrFt/HuO+qs8Xr3XcwYJnZEXglge9ozr1Z691wPkFjYQATIeLuf7bbaC3xpdpKZnrrActJBmKv3mdyHL3yL2p2waaGkYEGoEoyp+pRBnnR4QLzGz/YU9Da7iV2Dlc0Y7M7W1OTe18g2Vt+3GbXSvDGG/HXS3kThdk6ca/ZWYN9d+3tXw8p2RfWkODruYKdDHIoLcCpjTsNOfgH+HkBzUCGXp7/ZOSWLSdq9ZM79mFYutlKYNp/C7HXq30eq3fU1FyItJLu2IQFZzlnfaJldRCxnSLQqJUOJ3sG8RrbywxoFoWjdastCm7eu7bzJ4N7oHt3pLK/cN3Vm9lRWPkQtGH93wRm+k7uXpkWnLlbtkT2mJa2g7TPJ7fFz4r/CknwknmldAF2FxmL40Zy5SLx66oaK5+uXoOA3CGiHiVyOBZ0YY/VRl91hNzOHFaNzlLrA1Jnd3/UNddq8Zp8/hVSjODKue4/WNGbvYhbM/DkFgYF8SeLY78km+eYCXFBoSBLxYHe6YOFSl356NFldOkOVA5MAMroM/BU0DQ67swauzAItudCzAKwAQ==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY3PR05MB8531.namprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(39850400004)(366004)(396003)(376002)(136003)(451199021)(38070700005)(2616005)(2906002)(4744005)(122000001)(38100700002)(36756003)(8936002)(8676002)(5660300002)(86362001)(71200400001)(54906003)(6512007)(41300700001)(64756008)(6916009)(4326008)(76116006)(66946007)(66556008)(316002)(66446008)(66476007)(478600001)(6486002)(186003)(33656002)(53546011)(6506007)(26005)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?bEtDZUt0VTNDSUNOVUR2cDJ0TFRpS0ZUeHE5djBDcVkwYktZditwU21ieWxp?=
+ =?utf-8?B?RXFqbnNOY2VTam9SK1F6T2FHeXRqV1FJeURHd2ptelpZM0lFdGVJMW9FRk5B?=
+ =?utf-8?B?UnhkdkpPK3pqS2FuNGFhWlk1L1A4VGlOSG9ZUjhLcGpWRXJrUm5qWitsZTVt?=
+ =?utf-8?B?YUpMb3ZxL0FNdS9CaSsvMlhidHMwelpKZzVZWEpPcmFpcHV6c2k5b2lVZjlQ?=
+ =?utf-8?B?Ykg5b0dKTDN5bTdDVDVCLzBmK0FHSFVsUnFLejZMdXE4djRuYjBubXBmR04x?=
+ =?utf-8?B?UkxZMlVSUnJLZE1tYXErYUFXUXpmWHNhWENjUFRIdzF1WHBUbm5YOXJBZmZn?=
+ =?utf-8?B?SUtyMWNhbDc2S2VGZ1J0T0ZrVGZRRGorWmZJUzlic3R2UHNPUzJPYVFXUzQr?=
+ =?utf-8?B?cGhseGJYNmtvRVZTME9RQjJKSEVFVHQ5S1FuSHNpVjgxMzJlbEk0QUpFSjB0?=
+ =?utf-8?B?QTJ1MnZWQ3BpYkJKODhHdWxKVHdZWWFTVzhUNUtsNzIxQUQvT3VpZVg4ZE1t?=
+ =?utf-8?B?dDVsMWw0ZkxIblE5RHpjQUZ2VDZ1dUlMQ3RBWGVpRVRxSkx1UzN4ckRycWF6?=
+ =?utf-8?B?U2hrSGRrRWtZR2g2R1ErTXZCeFc5N1hYOVpqRkYvRll4OEQ5T2dMSzFQS2Y1?=
+ =?utf-8?B?V042ZmFwREQ4OTE4cmFoSWo4Sk1Qenp6MGVBR1dDU3IxdmU2L1RZRTFjRmw0?=
+ =?utf-8?B?bndqS2cwR0NOV05zVkNZOGpkTVo3WTQ5RWZwZnVERk45S1VaR1pXcHorTEJG?=
+ =?utf-8?B?MnpBdml0YWUvbStXTkJQZkFxOWhDVldqdUx4RDNoRVNCaDN1OFVVZFJicXBq?=
+ =?utf-8?B?SjB1N2JTNEErbkhUK0dCMjJHWHdod2RpN0xVR2NhY1ltcjA1M2s3QUZHcHMw?=
+ =?utf-8?B?NUZGa0NWa05YU29hejdqNUpERGltNTdwcmYzM0ZCTFVhbEpwZkUrbWc4akx4?=
+ =?utf-8?B?SUJIMk55am5MT1FlajUvbUVDUUV2UllLVlFiSFdacEQzUVEzUUdhM2dFZndH?=
+ =?utf-8?B?SEZpWnBoLzhPQ251a1RXWmFhaDgwdE5tZmdWY01MRUVlM25XSlpWRGswZFFa?=
+ =?utf-8?B?VXU1VlgvdzFwVStobDJBZ05JR3cvYUVIYUNnOUpieWpPTUdobkVSajIzWjhT?=
+ =?utf-8?B?Nk5valVJbjVrQ0ZhQVFnK0tyQklxdnk3OVlaMVlVWEp4dnVsSVpMeVI4dDBT?=
+ =?utf-8?B?YVRJZzdwS3NqYjd5RSttRWtzeURlZnMrY1drTnZSb0FHbXZVWEdFSnM2TkZ0?=
+ =?utf-8?B?QjJ6ZjVLVzYxbU13WStDMitqZDdKejNFOWZXMitPSWx4cXFldnNoeklqNjFY?=
+ =?utf-8?B?b2p4YTlRdk1xTFB4eUU1aXBrdlZEaWp6dUticERSM3JVd2p5WkxtT1ltcEJh?=
+ =?utf-8?B?blo3YUR2RlBwTG01TlJCSVV5Tk9YR21XN2ZQVWF5clN3QlBUWWpxZWRITTk0?=
+ =?utf-8?B?TUV6K2IwbFlYZTdFSmVNMFNzd0NyMU9nQWFSOFpuQzVubkhDNmxhSU83NFpN?=
+ =?utf-8?B?aVFwYW53c3J4ckNuNXhWTFNtWHhPd1RWWHpOVTZXUkhheGJzbkRFUDJMV2lu?=
+ =?utf-8?B?cDJJQ285OXA2NllBdTFFWVZRSEVLdTYvQnBTVlpOTmtVSzRkRWhFejlYRG5U?=
+ =?utf-8?B?b2lNZUl1aVNOWDY5RCtFRVdrcnIrbXZKeHg2eUY2VlZjMVhaMzRqbmZlVCtj?=
+ =?utf-8?B?ZW1pRTRaUHJ2RkJ6dllFVEh6WWF6cVk1UmNQRjJlcEpOb2gyMlVpZXAwd2Ux?=
+ =?utf-8?B?OGdmUXNUQjZ5UUZIZ202K1M0bTRubEJRd0ZKcEVQSGtOSEZIQzlaU3EvSzR3?=
+ =?utf-8?B?ZkNkMDl5WXl5cFYycW1SOWRwOC9YOTZHdjJyUFVsc2lZTHhLczdBSnhNWS94?=
+ =?utf-8?B?WWFSSmFkOEZ6MVpLbFJIYnJGZTFVMThNSDhtbzNlOHVrdThmSFc3dUprU3l3?=
+ =?utf-8?B?TC9LTDhzNnk1ZnoyVnVHblF0aUNCNE9vaFdmVHB5bmo3Y293Y0xNSFkzUmZp?=
+ =?utf-8?B?b2dsaWgxbWxrdGt0bzNZK2FTcHlxRTVJa0hvN3VnL0sxRXA2TnRZby9KYlNK?=
+ =?utf-8?B?bUFJODk2OElKNUVaRjRNWTRQcHVTQUxNTlB6eS91b0ZKcmpzZDFTZVgyMTV3?=
+ =?utf-8?Q?WFls1AasFp1+zU5AUQtHgCDQ4?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <4E725BB24351124B8DE314315DF785E0@namprd05.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1688010022.git.haibo1.xu@intel.com>
+X-OriginatorOrg: vmware.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY3PR05MB8531.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1f0cc748-79bf-4881-7f3c-08db7a572df1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Jul 2023 17:18:25.4543
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: JcuRZ2FuKaurWP03ci5lPUO5+YI2HaKziVuEQJw8C1NmHc3Fkgo5fGl1201w3N81o8CgDMJdaVk7zJp+Mach7A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR05MB6628
 
-On Sat, Jul 01, 2023 at 09:42:48PM +0800, Haibo Xu wrote:
-> KVM_GET_REG_LIST will dump all register IDs that are available to
-> KVM_GET/SET_ONE_REG and It's very useful to identify some platform
-> regression issue during VM migration.
-> 
-> Patch 1-7 re-structured the get-reg-list test in aarch64 to make some
-> of the code as common test framework that can be shared by riscv.
-> 
-> Patch 8 move reject_set check logic to a function so as to check for
-> different errno for different registers.
-> Patch 9 move finalize_vcpu back to run_test so that riscv can implement
-> its specific operation.
-> Patch 10 change to do the get/set operation only on present-blessed list.
-> Patch 11 add the skip_set facilities so that riscv can skip set operation
-> on some registers.
-> Patch 12 enabled the KVM_GET_REG_LIST API in riscv.
-> patch 13 added the corresponding kselftest for checking possible
-> register regressions.
-> 
-> The get-reg-list kvm selftest was ported from aarch64 and tested with
-> Linux v6.4 on a Qemu riscv64 virt machine.
-
-Hi Haibo,
-
-This series needs a rebase on top of these recent patches
-
- commit ee053e03b08e ("KVM: selftests: get-reg-list: support ID register features")
- commit 5f0419a0083b ("KVM: selftests: get-reg-list: add Permission Indirection registers")
-
-The conflicts will be in my patches, which do the splitting of the test.
-I'll do the rebase and push it to a branch for you to pick up.
-
-Thanks,
-drew
+DQoNCj4gT24gSnVsIDEsIDIwMjMsIGF0IDQ6MzQgQU0sIEFuZHJldyBKb25lcyA8YW5kcmV3Lmpv
+bmVzQGxpbnV4LmRldj4gd3JvdGU6DQo+IA0KPiAhISBFeHRlcm5hbCBFbWFpbA0KPiANCj4gT24g
+V2VkLCBKdW4gMjgsIDIwMjMgYXQgMTI6MTM6NTFBTSArMDAwMCwgTmFkYXYgQW1pdCB3cm90ZToN
+Cj4gLi4uDQo+PiBkaWZmIC0tZ2l0IGEvcG93ZXJwYy9NYWtlZmlsZS5jb21tb24gYi9wb3dlcnBj
+L01ha2VmaWxlLmNvbW1vbg0KPj4gaW5kZXggOGNlMDAzNC4uYzJlOTc2ZSAxMDA2NDQNCj4+IC0t
+LSBhL3Bvd2VycGMvTWFrZWZpbGUuY29tbW9uDQo+PiArKysgYi9wb3dlcnBjL01ha2VmaWxlLmNv
+bW1vbg0KPj4gQEAgLTI0LDYgKzI0LDcgQEAgQ0ZMQUdTICs9IC1mZnJlZXN0YW5kaW5nDQo+PiBD
+RkxBR1MgKz0gLU8yIC1tc29mdC1mbG9hdCAtbW5vLWFsdGl2ZWMgJChtYWJpX25vX2FsdGl2ZWMp
+DQo+PiBDRkxBR1MgKz0gLUkgJChTUkNESVIpL2xpYiAtSSAkKFNSQ0RJUikvbGliL2xpYmZkdCAt
+SSBsaWINCj4+IENGTEFHUyArPSAtV2EsLW1yZWduYW1lcw0KPj4gK0NGTEFHUyArPSAtRENPTkZJ
+R19SRUxPQw0KPj4gDQo+IA0KPiBJIGRyb3BwZWQgdGhpcyBjaGFuZ2UuIHBvd2VycGMgZG9lc24n
+dCBkZWZpbmUgX3RleHQgYW5kIF9ldGV4dC4NCj4gSSdsbCBsZWF2ZSBpdCB0byB0aGUgcHBjIHBl
+b3BsZSB0byBkZWNpZGUgaWYgdGhleSB3YW50IHRoaXMgYW5kDQo+IHdhbnQgdG8gYWRkIF90ZXh0
+IGFuZCBfZXRleHQgdG8gZ2V0IGl0Lg0KDQpUaGFua3MgZm9yIHRha2luZyBjYXJlIG9mIGl0LiBT
+b3JyeSBmb3Igbm90IG5vdGljaW5nLiBJIGFtIGFsd2F5cw0Kbm90IGluY2xpbmVkIHRvIGNoYW5n
+ZSBhcmNo4oCZcyB0aGF0IEkgZG9u4oCZdCB1c2Uu
