@@ -1,26 +1,28 @@
-Received: from out-52.mta1.migadu.com (out-52.mta1.migadu.com [95.215.58.52])
+Received: from out-17.mta0.migadu.com (out-17.mta0.migadu.com [91.218.175.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E63585CA1
-	for <kvmarm@lists.linux.dev>; Sat,  1 Jul 2023 12:18:16 +0000 (UTC)
-Date: Sat, 1 Jul 2023 14:18:12 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F3EF5CA1
+	for <kvmarm@lists.linux.dev>; Sat,  1 Jul 2023 12:19:59 +0000 (UTC)
+Date: Sat, 1 Jul 2023 14:19:55 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1688213893;
+	t=1688213997;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=LsRteDgJP/2zCvkpBVoOVyDzfBBR9KshRxmyWDFTyTw=;
-	b=BpWq+zB+l+P9/UjT1g6lIbqzNMbWRO69Dr7K1vTVoz05j/I2mU8AyKmsZQrPb/k018tNOC
-	NolDz3dhqXyoR+u/XuLO7jxpljB0iMr8synV6QZyJgIFKHwnMDTBqTExw/UXo9/dmElkNV
-	f6qSOQBaPJxNMMzpe5jx83F8BlNs1FU=
+	bh=HZB2bGBkn5d6CHuki+ERtjHGx2S+05KaB+KmuyYenvM=;
+	b=nNDx4JgNEClmHgDdJP8DL3JRx5IhV2N1WGvDsOWVDfAwjwvfIDRR+Y/YvT3+9wZtTIVJYP
+	IGnzjiomk4ERi26ufTIUFyQzW0UpWsq/LlJiMhpieZWgHEC4cKysm3BKT4LHsE0a4ZQ26D
+	YTpIBucGSKIll02+7cfIHAPbAdvXJIU=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
-To: Nikos Nikoleris <nikos.nikoleris@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
-	alexandru.elisei@arm.com, ricarkol@google.com, shahuang@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v6 00/32] EFI and ACPI support for arm64
-Message-ID: <20230701-f8dc5f619eeb2849f8861bd5@orel>
-References: <20230530160924.82158-1-nikos.nikoleris@arm.com>
+To: Nadav Amit <nadav.amit@gmail.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	Nikos Nikoleris <nikos.nikoleris@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Huth <thuth@redhat.com>, Nadav Amit <namit@vmware.com>
+Subject: Re: [kvm-unit-tests PATCH v3 0/6] arm64: improve debuggability
+Message-ID: <20230701-dccaf2ea1b37017f542857ee@orel>
+References: <20230628001356.2706-1-namit@vmware.com>
+ <20230628001356.2706-2-namit@vmware.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -29,53 +31,73 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230530160924.82158-1-nikos.nikoleris@arm.com>
+In-Reply-To: <20230628001356.2706-2-namit@vmware.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, May 30, 2023 at 05:08:52PM +0100, Nikos Nikoleris wrote:
-> Hello,
+On Wed, Jun 28, 2023 at 12:13:49AM +0000, Nadav Amit wrote:
+> From: Nadav Amit <namit@vmware.com>
 > 
-> This series adds initial support for building arm64 tests as EFI
-> apps and running them under QEMU. Much like x86_64, we import external
-> dependencies from gnu-efi and adapt them to work with types and other
-> assumptions from kvm-unit-tests. In addition, this series adds support
-> for enumerating parts of the system using ACPI.
+> My recent experience in debugging ARM64 tests on EFI was not as fun as I
+> expected it to be.
 > 
-> The first set of patches, moves the existing ACPI code to the common
-> lib path. Then, it extends definitions and functions to allow for more
-> robust discovery of ACPI tables. We add support for setting up the PSCI
-> conduit, discovering the UART, timers, GIC and cpus via ACPI. The code
-> retains existing behavior and gives priority to discovery through DT
-> when one has been provided.
+> There were several reasons for that besides the questionable definition
+> of "fun":
 > 
-> In the second set of patches, we add support for getting the command
-> line from the EFI shell. This is a requirement for many of the
-> existing arm64 tests.
+> 1. ARM64 is not compiled with frame pointers and there is no stack
+>    unwinder when the stack is dumped.
 > 
-> In the third set of patches, we import code from gnu-efi, make minor
-> changes and add an alternative setup sequence from arm64 systems that
-> boot through EFI. Finally, we add support in the build system and a
-> run script which is used to run an EFI app.
+> 2. Building an EFI drops the debug information.
 > 
-> After this set of patches one can build arm64 EFI tests:
+> 3. The addresses that are printed on dump_stack() and the use of GDB
+>    are hard because taking code relocation into account is non trivial.
 > 
-> $> ./configure --enable-efi
-> $> make
+> The patches help both ARM64 and EFI for this matter. The image address
+> is printed when EFI is used to allow the use of GDB. Symbols are emitted
+> into a separate debug file. The frame pointer is included and special
+> entry is added upon an exception to allow backtracing across
+> exceptions.
 > 
-> And use the run script to run an EFI tests:
+> [ PowerPC: Please ack patches 1,2 ]
+> [ x86: Please ack patches 1,2,5 ]
 > 
-> $> ./arm/efi/run ./arm/selftest.efi -smp 2 -m 256 -append "setup smp=2 mem=256"
+> v2->v3:
+> * Consider PowerPC for reloc and related fixes [Andrew]
 > 
-> Or all tests:
+> v1->v2:
+> * Andrew comments [see in individual patches]
+> * Few cleanups
 > 
-> $> ./run_tests.sh
+> Nadav Amit (6):
+>   efi: keep efi debug information in a separate file
+>   lib/stack: print base addresses on relocation setups
+>   arm64: enable frame pointer and support stack unwinding
+>   arm64: stack: update trace stack on exception
+>   efi: print address of image
+>   arm64: dump stack on bad exception
+> 
+>  .gitignore              |  1 +
+>  Makefile                |  2 +-
+>  arm/Makefile.arm        |  3 --
+>  arm/Makefile.arm64      |  2 ++
+>  arm/Makefile.common     |  8 +++++-
+>  arm/cstart64.S          | 13 +++++++++
+>  lib/arm64/asm-offsets.c |  6 +++-
+>  lib/arm64/asm/stack.h   |  3 ++
+>  lib/arm64/processor.c   |  1 +
+>  lib/arm64/stack.c       | 62 +++++++++++++++++++++++++++++++++++++++++
+>  lib/efi.c               |  4 +++
+>  lib/stack.c             | 31 +++++++++++++++++++--
+>  powerpc/Makefile.common |  1 +
+>  x86/Makefile.common     |  5 +++-
+>  14 files changed, 133 insertions(+), 9 deletions(-)
+>  create mode 100644 lib/arm64/stack.c
+> 
+> -- 
+> 2.34.1
 >
 
-Hey Nikos,
+Merged. arm64 backtraces will be really nice to have!
 
-I've just merged this. Thanks for all your hard work and patience. Now we
-need to get it to work on bare-metal, starting with early zeroing of BSS
-and anything else we deferred from this review.
+Thanks, Nadav!
 
-Yay!
 drew
