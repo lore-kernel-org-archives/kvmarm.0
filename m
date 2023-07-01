@@ -1,251 +1,372 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC4B168B4
-	for <kvmarm@lists.linux.dev>; Fri, 30 Jun 2023 17:15:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF1C723AD
+	for <kvmarm@lists.linux.dev>; Sat,  1 Jul 2023 11:07:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688145342;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
+	s=mimecast20190719; t=1688209650;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ZdTDhbZr4eQQTRSk7eayCEYmdszTgdjX7jCu+h7WTEM=;
-	b=EQzIsnvsD54GlIYNfLNEqA/H04on3PWIi18eqe6CARt4ZNav2dMHON3ZsRjxMBYSaB6Tzx
-	ZRSB1HI2i/jYetFTLqTTDScUYJVlv+5dPpICRRyQHMnTlDXbPVCb/3gKN2DGSawp1owrqx
-	oOp5SfD9QB0hU0+du3ZvmHgnKrHrmwc=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=GEPC3wPJB2gC7yCYRTmojTsOvtit32ELqJXWgwNC13o=;
+	b=POX0RgQaU7oe/RWyJBktnnZij9Ve4T5U/D7MCEUGzemKpTxmvZKZkYqPSYO+Yc10DMQD1W
+	niUhf1oNU6mElVP2nirz9mhqHQGwA9g35CNgizrtJUkNvGiXurYH3v5s0IuIqRHBbb2oev
+	NUrZO9bf0mcQ3d0P6arzhT/Hv3J6usQ=
+Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
+ [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-475-MxA8HRRgM6Cyj_IT_IAa-g-1; Fri, 30 Jun 2023 13:15:41 -0400
-X-MC-Unique: MxA8HRRgM6Cyj_IT_IAa-g-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-314291caa91so37901f8f.2
-        for <kvmarm@lists.linux.dev>; Fri, 30 Jun 2023 10:15:40 -0700 (PDT)
+ us-mta-674-_8mkn2gsPxq1AcRq3c1SSA-1; Sat, 01 Jul 2023 07:07:29 -0400
+X-MC-Unique: _8mkn2gsPxq1AcRq3c1SSA-1
+Received: by mail-ua1-f70.google.com with SMTP id a1e0cc1a2514c-791ba72ab57so574297241.1
+        for <kvmarm@lists.linux.dev>; Sat, 01 Jul 2023 04:07:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688145340; x=1690737340;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZdTDhbZr4eQQTRSk7eayCEYmdszTgdjX7jCu+h7WTEM=;
-        b=XcvMfvMjwkqChsnWVodCEnBWUKDjarT0nINHxOQzTei7CB2ugcM+CfSHfEhgzIDLh1
-         V2/t6BHu88gYpkg6/z7ncTwJ8oHAa6V+x/WtoqnnxVDpk85usLcVnBe3P0O26FwGl/Hp
-         sOxiXEAkUNGssHJbXgqzKA3URYC5WYmN+MK2+nCIan1LecFNaFZNybe+30ClVzW7L6kV
-         5oFi+R1d81qou2jxB/uUAHc8SWt1KP4mcjLkLIV2ecIw9QY0ncOnTfIXoa8gi87f3M3K
-         +AXXoi/sZgO/n6waWwqXNNXYmDKOjdR4xHKu8ExK9INRIX6EBiUidZe3GlP4Fn/cghGT
-         vl2w==
-X-Gm-Message-State: ABy/qLa1yAVcwafb2+T+UvSAGen9HfiZv49G2xjg9ILrdFlsueT40NRE
-	c1DShhqmQcBMUSkB/DoAyI0lk6EysUd5DIthAkN80ufEFo9CwMUjEJZnuqFzoUZTzT0DuXL+zIL
-	lc0HDKxn436X0+/1c
-X-Received: by 2002:a5d:63ca:0:b0:314:2594:7b9f with SMTP id c10-20020a5d63ca000000b0031425947b9fmr1537713wrw.11.1688145340110;
-        Fri, 30 Jun 2023 10:15:40 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGYQtNnqxzBlUMaJpB4SLIl9agMNRhMzLKZKgZfHAAAO79NYFKr3eANPETkJIKzZ3Y9SRHyrA==
-X-Received: by 2002:a5d:63ca:0:b0:314:2594:7b9f with SMTP id c10-20020a5d63ca000000b0031425947b9fmr1537691wrw.11.1688145339672;
-        Fri, 30 Jun 2023 10:15:39 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id h11-20020a1ccc0b000000b003fa8158135esm20167744wmb.11.2023.06.30.10.15.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 Jun 2023 10:15:38 -0700 (PDT)
-Message-ID: <829d87f7-2103-ef6f-5d3b-18aa8f8cb850@redhat.com>
-Date: Fri, 30 Jun 2023 19:15:37 +0200
+        d=1e100.net; s=20221208; t=1688209649; x=1690801649;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GEPC3wPJB2gC7yCYRTmojTsOvtit32ELqJXWgwNC13o=;
+        b=faN8wD8LaDdWQ64VhrFe5cpjO2/Ng78yUqyNzupC31qct7DwQsm6nH338dzHpvSHIT
+         U7WjW3NIQjGinXO+g0mAOuWefKlFVI9Mt9ItDFZ0YacCTatMoeMyv0lMxG3zwKTzY9xg
+         /WaMo0IoMYHGka2rqQiNfmkwFQHhYaAgtK4k3vDTZcoFCxZaTFMlmH51NEy9DTN+aI3n
+         tSw56duRO1QV2ZakVWb7zt3biZBpv1Kr6ql/LRVdNe8sJnxIPd2TfHOT7YfEMNqgiZf7
+         z/xLdXIbbN6Ci8RHkGkjQLchrsWr44ZbtP9smSx02YYVB+PJARdU4NcTIITA4CZ90LUm
+         hQbA==
+X-Gm-Message-State: ABy/qLYEPXhFEmxBJbWRGhihyT1DaFpxQcJTuEYGybLjhIRQX4tW8JpR
+	BU8arda52Y+VMwj61ssjlis0R2raKzfW29Jhq1UuB/F/cvdysdkAwRJ+BmlKnnTY/+5ghTbTWfC
+	kiOLz7vp/dqo///Jso7On37ly9QrIXCtU
+X-Received: by 2002:a05:6102:118:b0:444:c0d7:5e9f with SMTP id z24-20020a056102011800b00444c0d75e9fmr3077759vsq.25.1688209648869;
+        Sat, 01 Jul 2023 04:07:28 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFlu0khA1b2E79Px9CwjSXPPH39gzGmOWQevvorJSg17+o94Z3NhziEogZFOIVi3s5lPPm9zS7uJ7URmtzBIYc=
+X-Received: by 2002:a05:6102:118:b0:444:c0d7:5e9f with SMTP id
+ z24-20020a056102011800b00444c0d75e9fmr3077753vsq.25.1688209648510; Sat, 01
+ Jul 2023 04:07:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v3 5/6] arm: pmu: Add
- pmu-mem-access-reliability test
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- andrew.jones@linux.dev, maz@kernel.org, will@kernel.org,
- oliver.upton@linux.dev, ricarkol@google.com, reijiw@google.com,
- mark.rutland@arm.com
-References: <20230619200401.1963751-1-eric.auger@redhat.com>
- <20230619200401.1963751-6-eric.auger@redhat.com>
- <ZJ7_UrrBdgn6FB7-@monolith.localdoman>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <ZJ7_UrrBdgn6FB7-@monolith.localdoman>
+References: <ZJWxQuyuWc1AtmEz@thinky-boi>
+In-Reply-To: <ZJWxQuyuWc1AtmEz@thinky-boi>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Sat, 1 Jul 2023 13:07:17 +0200
+Message-ID: <CABgObfY+-pHEU2FBQJ6Sv2AmE4xSJ-bm2WdFQr0KA=Gm1Evz8A@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 updates for 6.5
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
+	Ricardo Koller <ricarkol@google.com>, Fuad Tabba <tabba@google.com>, 
+	Quentin Perret <qperret@google.com>, Jing Zhang <jingzhangos@google.com>, 
+	Dan Carpenter <dan.carpenter@linaro.org>, Arnd Bergmann <arnd@kernel.org>, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Alexandru,
+On Fri, Jun 23, 2023 at 4:50=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
+>
+> Hi Paolo,
+>
+> Here are the KVM/arm64 updates for 6.5. Note that the for-next/module-all=
+oc
+> branch was merged to resolve a nontrivial conflict with the arm64 tree.
+>
+> There is still an outstanding conflict with the arm64 tree with a rather
+> straightforward resolution, I've included mine in the diff at the end.
+>
+> I will be handling fixes for 6.5, so please expect subsequent pulls to
+> be coming from me. Marc will take over starting with the 6.6 merge
+> window.
 
-On 6/30/23 18:14, Alexandru Elisei wrote:
-> Hi,
->
-> On Mon, Jun 19, 2023 at 10:04:00PM +0200, Eric Auger wrote:
->> Add a new basic test that runs MEM_ACCESS loop over
->> 100 iterations and make sure the number of measured
->> MEM_ACCESS never overflows the margin. Some other
->> pmu tests rely on this pattern and if the MEM_ACCESS
->> measurement is not reliable, it is better to report
->> it beforehand and not confuse the user any further.
->>
->> Without the subsequent patch, this typically fails on
->> ThunderXv2 with the following logs:
->>
->> INFO: pmu: pmu-mem-access-reliability: 32-bit overflows:
->> overflow=1 min=21 max=41 COUNT=20 MARGIN=15
->> FAIL: pmu: pmu-mem-access-reliability: 32-bit overflows:
->> mem_access count is reliable
-> Looks good:
->
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
->
-> Also ran the test on my rockpro64, with qemu and kvmtool. With kvmtool,
-> when running on the little cores, min=max=250, but when running on the big
-> cores, there was some deviation from that, I would say about 5 events,
-> varying from run to run. I assume this is because the little cores are in
-> order, and the big cores are out of order. Maybe the reason why you are
-> seeing such a big difference between min and max on the ThunderX 2, the
-> core might be speculating more aggressively.
+Pulled, thanks for telling me about the conflict. :)
 
-thank you for your time. At least this new test outputting the min/max
-will give interesting indications of what can be expected from the mem
-access count precision on a given HW.
->
-> Anyway:
->
-> Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Paolo
 
-Thanks!
-
-Eric
->
+> --
 > Thanks,
-> Alex
+> Oliver
 >
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->> v2 -> v3:
->> - rename variables as suggested by Alexandru, rework the
->>   traces accordingly. Use all_set.
->>
->> v1 -> v2:
->> - use mem-access instead of memaccess as suggested by Mark
->> - simplify the logic and add comments in the test loop
->> ---
->>  arm/pmu.c         | 59 +++++++++++++++++++++++++++++++++++++++++++++++
->>  arm/unittests.cfg |  6 +++++
->>  2 files changed, 65 insertions(+)
->>
->> diff --git a/arm/pmu.c b/arm/pmu.c
->> index 0995a249..491d2958 100644
->> --- a/arm/pmu.c
->> +++ b/arm/pmu.c
->> @@ -56,6 +56,11 @@
->>  #define EXT_COMMON_EVENTS_HIGH	0x403F
->>  
->>  #define ALL_SET_32		0x00000000FFFFFFFFULL
->> +#define ALL_SET_64		0xFFFFFFFFFFFFFFFFULL
->> +
->> +#define ALL_SET(__overflow_at_64bits)				\
->> +	(__overflow_at_64bits ? ALL_SET_64 : ALL_SET_32)
->> +
->>  #define ALL_CLEAR		0x0000000000000000ULL
->>  #define PRE_OVERFLOW_32		0x00000000FFFFFFF0ULL
->>  #define PRE_OVERFLOW_64		0xFFFFFFFFFFFFFFF0ULL
->> @@ -67,6 +72,10 @@
->>   * for some observed variability we take into account a given @MARGIN
->>   */
->>  #define PRE_OVERFLOW2_32		(ALL_SET_32 - COUNT - MARGIN)
->> +#define PRE_OVERFLOW2_64		(ALL_SET_64 - COUNT - MARGIN)
->> +
->> +#define PRE_OVERFLOW2(__overflow_at_64bits)				\
->> +	(__overflow_at_64bits ? PRE_OVERFLOW2_64 : PRE_OVERFLOW2_32)
->>  
->>  #define PRE_OVERFLOW(__overflow_at_64bits)				\
->>  	(__overflow_at_64bits ? PRE_OVERFLOW_64 : PRE_OVERFLOW_32)
->> @@ -744,6 +753,53 @@ static void test_chained_sw_incr(bool unused)
->>  		    read_regn_el0(pmevcntr, 0), \
->>  		    read_sysreg(pmovsclr_el0))
->>  
->> +/*
->> + * This test checks that a mem access loop featuring COUNT accesses
->> + * does not overflow with an init value of PRE_OVERFLOW2. It also
->> + * records the min/max access count to see how much the counting
->> + * is (un)reliable
->> + */
->> +static void test_mem_access_reliability(bool overflow_at_64bits)
->> +{
->> +	uint32_t events[] = {MEM_ACCESS};
->> +	void *addr = malloc(PAGE_SIZE);
->> +	uint64_t cntr_val, num_events, max = 0, min = pmevcntr_mask();
->> +	uint64_t pre_overflow2 = PRE_OVERFLOW2(overflow_at_64bits);
->> +	uint64_t all_set = ALL_SET(overflow_at_64bits);
->> +	uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
->> +	bool overflow = false;
->> +
->> +	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
->> +	    !check_overflow_prerequisites(overflow_at_64bits))
->> +		return;
->> +
->> +	pmu_reset();
->> +	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
->> +	for (int i = 0; i < 100; i++) {
->> +		pmu_reset();
->> +		write_regn_el0(pmevcntr, 0, pre_overflow2);
->> +		write_sysreg_s(0x1, PMCNTENSET_EL0);
->> +		isb();
->> +		mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->> +		cntr_val = read_regn_el0(pmevcntr, 0);
->> +		if (cntr_val >= pre_overflow2) {
->> +			num_events = cntr_val - pre_overflow2;
->> +		} else {
->> +			/* unexpected counter overflow */
->> +			num_events = cntr_val + all_set - pre_overflow2;
->> +			overflow = true;
->> +			report_info("iter=%d num_events=%ld min=%ld max=%ld overflow!!!",
->> +				    i, num_events, min, max);
->> +		}
->> +		/* record extreme value */
->> +		max = MAX(num_events, max);
->> +		min = MIN(num_events, min);
->> +	}
->> +	report_info("overflow=%d min=%ld max=%ld expected=%d acceptable margin=%d",
->> +		    overflow, min, max, COUNT, MARGIN);
->> +	report(!overflow, "mem_access count is reliable");
->> +}
->> +
->>  static void test_chain_promotion(bool unused)
->>  {
->>  	uint32_t events[] = {MEM_ACCESS, CHAIN};
->> @@ -1201,6 +1257,9 @@ int main(int argc, char *argv[])
->>  	} else if (strcmp(argv[1], "pmu-basic-event-count") == 0) {
->>  		run_event_test(argv[1], test_basic_event_count, false);
->>  		run_event_test(argv[1], test_basic_event_count, true);
->> +	} else if (strcmp(argv[1], "pmu-mem-access-reliability") == 0) {
->> +		run_event_test(argv[1], test_mem_access_reliability, false);
->> +		run_event_test(argv[1], test_mem_access_reliability, true);
->>  	} else if (strcmp(argv[1], "pmu-mem-access") == 0) {
->>  		run_event_test(argv[1], test_mem_access, false);
->>  		run_event_test(argv[1], test_mem_access, true);
->> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
->> index 5e67b558..fe601cbb 100644
->> --- a/arm/unittests.cfg
->> +++ b/arm/unittests.cfg
->> @@ -90,6 +90,12 @@ groups = pmu
->>  arch = arm64
->>  extra_params = -append 'pmu-mem-access'
->>  
->> +[pmu-mem-access-reliability]
->> +file = pmu.flat
->> +groups = pmu
->> +arch = arm64
->> +extra_params = -append 'pmu-mem-access-reliability'
->> +
->>  [pmu-sw-incr]
->>  file = pmu.flat
->>  groups = pmu
->> -- 
->> 2.38.1
->>
+> The following changes since commit 44c026a73be8038f03dbdeef028b642880cf15=
+11:
+>
+>   Linux 6.4-rc3 (2023-05-21 14:05:48 -0700)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
+marm-6.5
+>
+> for you to fetch changes up to 192df2aa0113ddddee2a93e453ff46610807b425:
+>
+>   KVM: arm64: Fix misuse of KVM_ARM_VCPU_POWER_OFF bit index (2023-06-22 =
+17:17:14 +0000)
+>
+> ----------------------------------------------------------------
+> KVM/arm64 updates for 6.5
+>
+>  - Eager page splitting optimization for dirty logging, optionally
+>    allowing for a VM to avoid the cost of block splitting in the stage-2
+>    fault path.
+>
+>  - Arm FF-A proxy for pKVM, allowing a pKVM host to safely interact with
+>    services that live in the Secure world. pKVM intervenes on FF-A calls
+>    to guarantee the host doesn't misuse memory donated to the hyp or a
+>    pKVM guest.
+>
+>  - Support for running the split hypervisor with VHE enabled, known as
+>    'hVHE' mode. This is extremely useful for testing the split
+>    hypervisor on VHE-only systems, and paves the way for new use cases
+>    that depend on having two TTBRs available at EL2.
+>
+>  - Generalized framework for configurable ID registers from userspace.
+>    KVM/arm64 currently prevents arbitrary CPU feature set configuration
+>    from userspace, but the intent is to relax this limitation and allow
+>    userspace to select a feature set consistent with the CPU.
+>
+>  - Enable the use of Branch Target Identification (FEAT_BTI) in the
+>    hypervisor.
+>
+>  - Use a separate set of pointer authentication keys for the hypervisor
+>    when running in protected mode, as the host is untrusted at runtime.
+>
+>  - Ensure timer IRQs are consistently released in the init failure
+>    paths.
+>
+>  - Avoid trapping CTR_EL0 on systems with Enhanced Virtualization Traps
+>    (FEAT_EVT), as it is a register commonly read from userspace.
+>
+>  - Erratum workaround for the upcoming AmpereOne part, which has broken
+>    hardware A/D state management.
+>
+> As a consequence of the hVHE series reworking the arm64 software
+> features framework, the for-next/module-alloc branch from the arm64 tree
+> comes along for the ride.
+>
+> ----------------------------------------------------------------
+> Arnd Bergmann (1):
+>       arm64: kvm: avoid overflow in integer division
+>
+> Dan Carpenter (1):
+>       KVM: arm64: timers: Fix resource leaks in kvm_timer_hyp_init()
+>
+> Fuad Tabba (1):
+>       KVM: arm64: Handle FFA_FEATURES call from the host
+>
+> Jing Zhang (5):
+>       KVM: arm64: Reuse fields of sys_reg_desc for idreg
+>       KVM: arm64: Save ID registers' sanitized value per guest
+>       KVM: arm64: Use arm64_ftr_bits to sanitise ID register writes
+>       KVM: arm64: Use generic sanitisation for ID_(AA64)DFR0_EL1
+>       KVM: arm64: Use generic sanitisation for ID_AA64PFR0_EL1
+>
+> Marc Zyngier (19):
+>       KVM: arm64: Use local TLBI on permission relaxation
+>       KVM: arm64: Relax trapping of CTR_EL0 when FEAT_EVT is available
+>       KVM: arm64: Drop is_kernel_in_hyp_mode() from __invalidate_icache_g=
+uest_page()
+>       arm64: Prevent the use of is_kernel_in_hyp_mode() in hypervisor cod=
+e
+>       arm64: Turn kaslr_feature_override into a generic SW feature overri=
+de
+>       arm64: Add KVM_HVHE capability and has_hvhe() predicate
+>       arm64: Don't enable VHE for the kernel if OVERRIDE_HVHE is set
+>       arm64: Allow EL1 physical timer access when running VHE
+>       arm64: Use CPACR_EL1 format to set CPTR_EL2 when E2H is set
+>       KVM: arm64: Remove alternatives from sysreg accessors in VHE hyperv=
+isor context
+>       KVM: arm64: Key use of VHE instructions in nVHE code off ARM64_KVM_=
+HVHE
+>       KVM: arm64: Force HCR_EL2.E2H when ARM64_KVM_HVHE is set
+>       KVM: arm64: Disable TTBR1_EL2 when using ARM64_KVM_HVHE
+>       KVM: arm64: Adjust EL2 stage-1 leaf AP bits when ARM64_KVM_HVHE is =
+set
+>       KVM: arm64: Rework CPTR_EL2 programming for HVHE configuration
+>       KVM: arm64: Program the timer traps with VHE layout in hVHE mode
+>       KVM: arm64: Force HCR_E2H in guest context when ARM64_KVM_HVHE is s=
+et
+>       arm64: Allow arm64_sw.hvhe on command line
+>       KVM: arm64: Fix hVHE init on CPUs where HCR_EL2.E2H is not RES1
+>
+> Mark Rutland (6):
+>       arm64: module: remove old !KASAN_VMALLOC logic
+>       arm64: kasan: remove !KASAN_VMALLOC remnants
+>       arm64: kaslr: split kaslr/module initialization
+>       arm64: module: move module randomization to module.c
+>       arm64: module: mandate MODULE_PLTS
+>       arm64: module: rework module VA range selection
+>
+> Mostafa Saleh (2):
+>       KVM: arm64: Use BTI for nvhe
+>       KVM: arm64: Use different pointer authentication keys for pKVM
+>
+> Oliver Upton (17):
+>       KVM: arm64: Separate out feature sanitisation and initialisation
+>       KVM: arm64: Relax invariance of KVM_ARM_VCPU_POWER_OFF
+>       KVM: arm64: Make vCPU feature flags consistent VM-wide
+>       KVM: arm64: Rewrite IMPDEF PMU version as NI
+>       KVM: arm64: Handle ID register reads using the VM-wide values
+>       KVM: arm64: Rip out the vestiges of the 'old' ID register scheme
+>       Merge branch kvm-arm64/eager-page-splitting into kvmarm/next
+>       Merge branch kvm-arm64/ffa-proxy into kvmarm/next
+>       Merge branch kvm-arm64/hvhe into kvmarm/next
+>       Merge branch for-next/module-alloc into kvmarm/next
+>       Merge branch kvm-arm64/configurable-id-regs into kvmarm/next
+>       Merge branch kvm-arm64/misc into kvmarm/next
+>       arm64: errata: Mitigate Ampere1 erratum AC03_CPU_38 at stage-2
+>       KVM: arm64: Refactor HFGxTR configuration into separate helpers
+>       KVM: arm64: Prevent guests from enabling HA/HD on Ampere1
+>       Merge branch kvm-arm64/ampere1-hafdbs-mitigation into kvmarm/next
+>       KVM: arm64: Fix misuse of KVM_ARM_VCPU_POWER_OFF bit index
+>
+> Quentin Perret (1):
+>       KVM: arm64: pkvm: Add support for fragmented FF-A descriptors
+>
+> Ricardo Koller (11):
+>       KVM: arm64: Rename free_removed to free_unlinked
+>       KVM: arm64: Add KVM_PGTABLE_WALK flags for skipping CMOs and BBM TL=
+BIs
+>       KVM: arm64: Add helper for creating unlinked stage2 subtrees
+>       KVM: arm64: Export kvm_are_all_memslots_empty()
+>       KVM: arm64: Add KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+>       KVM: arm64: Add kvm_pgtable_stage2_split()
+>       KVM: arm64: Refactor kvm_arch_commit_memory_region()
+>       KVM: arm64: Add kvm_uninit_stage2_mmu()
+>       KVM: arm64: Split huge pages when dirty logging is enabled
+>       KVM: arm64: Open-code kvm_mmu_write_protect_pt_masked()
+>       KVM: arm64: Split huge pages during KVM_CLEAR_DIRTY_LOG
+>
+> Will Deacon (8):
+>       KVM: arm64: Block unsafe FF-A calls from the host
+>       KVM: arm64: Probe FF-A version and host/hyp partition ID during ini=
+t
+>       KVM: arm64: Allocate pages for hypervisor FF-A mailboxes
+>       KVM: arm64: Handle FFA_RXTX_MAP and FFA_RXTX_UNMAP calls from the h=
+ost
+>       KVM: arm64: Add FF-A helpers to share/unshare memory with secure wo=
+rld
+>       KVM: arm64: Handle FFA_MEM_SHARE calls from the host
+>       KVM: arm64: Handle FFA_MEM_RECLAIM calls from the host
+>       KVM: arm64: Handle FFA_MEM_LEND calls from the host
+>
+>  Documentation/arm64/memory.rst                |   8 +-
+>  Documentation/arm64/silicon-errata.rst        |   3 +
+>  Documentation/virt/kvm/api.rst                |  27 +
+>  arch/arm64/Kconfig                            |  47 +-
+>  arch/arm64/include/asm/cpufeature.h           |   6 +
+>  arch/arm64/include/asm/el2_setup.h            |  27 +-
+>  arch/arm64/include/asm/kvm_arm.h              |   7 +-
+>  arch/arm64/include/asm/kvm_asm.h              |   4 +
+>  arch/arm64/include/asm/kvm_emulate.h          |  46 +-
+>  arch/arm64/include/asm/kvm_host.h             |  61 ++-
+>  arch/arm64/include/asm/kvm_hyp.h              |  37 +-
+>  arch/arm64/include/asm/kvm_mmu.h              |   4 +-
+>  arch/arm64/include/asm/kvm_pgtable.h          |  79 ++-
+>  arch/arm64/include/asm/kvm_pkvm.h             |  21 +
+>  arch/arm64/include/asm/memory.h               |  16 +-
+>  arch/arm64/include/asm/module.h               |   8 -
+>  arch/arm64/include/asm/module.lds.h           |   2 -
+>  arch/arm64/include/asm/sysreg.h               |   1 +
+>  arch/arm64/include/asm/virt.h                 |  12 +-
+>  arch/arm64/kernel/Makefile                    |   3 +-
+>  arch/arm64/kernel/cpu_errata.c                |   7 +
+>  arch/arm64/kernel/cpufeature.c                |  34 +-
+>  arch/arm64/kernel/ftrace.c                    |   8 +-
+>  arch/arm64/kernel/head.S                      |   2 +
+>  arch/arm64/kernel/hyp-stub.S                  |  10 +-
+>  arch/arm64/kernel/idreg-override.c            |  25 +-
+>  arch/arm64/kernel/kaslr.c                     |  87 +--
+>  arch/arm64/kernel/module.c                    | 159 ++++--
+>  arch/arm64/kernel/setup.c                     |   2 +
+>  arch/arm64/kvm/arch_timer.c                   |  14 +-
+>  arch/arm64/kvm/arm.c                          | 201 +++++--
+>  arch/arm64/kvm/fpsimd.c                       |   4 +-
+>  arch/arm64/kvm/hyp/include/hyp/switch.h       | 101 +++-
+>  arch/arm64/kvm/hyp/include/nvhe/ffa.h         |  17 +
+>  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   3 +
+>  arch/arm64/kvm/hyp/nvhe/Makefile              |   2 +-
+>  arch/arm64/kvm/hyp/nvhe/ffa.c                 | 762 ++++++++++++++++++++=
+++++++
+>  arch/arm64/kvm/hyp/nvhe/host.S                |  36 +-
+>  arch/arm64/kvm/hyp/nvhe/hyp-init.S            |  32 +-
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  19 +-
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  74 ++-
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c                |  27 +-
+>  arch/arm64/kvm/hyp/nvhe/setup.c               |  11 +
+>  arch/arm64/kvm/hyp/nvhe/switch.c              |  28 +-
+>  arch/arm64/kvm/hyp/nvhe/timer-sr.c            |  16 +-
+>  arch/arm64/kvm/hyp/nvhe/tlb.c                 |  52 ++
+>  arch/arm64/kvm/hyp/pgtable.c                  | 228 +++++++-
+>  arch/arm64/kvm/hyp/vhe/switch.c               |   2 +-
+>  arch/arm64/kvm/hyp/vhe/tlb.c                  |  32 ++
+>  arch/arm64/kvm/mmu.c                          | 207 +++++--
+>  arch/arm64/kvm/pkvm.c                         |   1 +
+>  arch/arm64/kvm/reset.c                        |  58 --
+>  arch/arm64/kvm/sys_regs.c                     | 505 ++++++++++++-----
+>  arch/arm64/kvm/sys_regs.h                     |  22 +-
+>  arch/arm64/mm/kasan_init.c                    |  17 +-
+>  arch/arm64/tools/cpucaps                      |   3 +
+>  include/kvm/arm_pmu.h                         |   8 +-
+>  include/linux/arm_ffa.h                       |   8 +
+>  include/linux/kvm_host.h                      |   2 +
+>  include/uapi/linux/kvm.h                      |   2 +
+>  virt/kvm/kvm_main.c                           |   3 +-
+>  61 files changed, 2631 insertions(+), 619 deletions(-)
+>  create mode 100644 arch/arm64/kvm/hyp/include/nvhe/ffa.h
+>  create mode 100644 arch/arm64/kvm/hyp/nvhe/ffa.c
+>
+> --
+> diff --cc arch/arm64/kernel/cpufeature.c
+> index 3d93147179a0,6ea7f23b1287..000000000000
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@@ -2656,23 -2662,27 +2677,44 @@@ static const struct arm64_cpu_capabili=
+t
+>                 .cpu_enable =3D cpu_enable_dit,
+>                 ARM64_CPUID_FIELDS(ID_AA64PFR0_EL1, DIT, IMP)
+>         },
+> +       {
+> +               .desc =3D "Memory Copy and Memory Set instructions",
+> +               .capability =3D ARM64_HAS_MOPS,
+> +               .type =3D ARM64_CPUCAP_SYSTEM_FEATURE,
+> +               .matches =3D has_cpuid_feature,
+> +               .cpu_enable =3D cpu_enable_mops,
+> +               ARM64_CPUID_FIELDS(ID_AA64ISAR2_EL1, MOPS, IMP)
+> +       },
+> +       {
+> +               .capability =3D ARM64_HAS_TCR2,
+> +               .type =3D ARM64_CPUCAP_SYSTEM_FEATURE,
+> +               .matches =3D has_cpuid_feature,
+> +               ARM64_CPUID_FIELDS(ID_AA64MMFR3_EL1, TCRX, IMP)
+> +       },
+> +       {
+> +               .desc =3D "Stage-1 Permission Indirection Extension (S1PI=
+E)",
+> +               .capability =3D ARM64_HAS_S1PIE,
+> +               .type =3D ARM64_CPUCAP_BOOT_CPU_FEATURE,
+> +               .matches =3D has_cpuid_feature,
+> +               ARM64_CPUID_FIELDS(ID_AA64MMFR3_EL1, S1PIE, IMP)
+> +       },
+>  +      {
+>  +              .desc =3D "VHE for hypervisor only",
+>  +              .capability =3D ARM64_KVM_HVHE,
+>  +              .type =3D ARM64_CPUCAP_SYSTEM_FEATURE,
+>  +              .matches =3D hvhe_possible,
+>  +      },
+>  +      {
+>  +              .desc =3D "Enhanced Virtualization Traps",
+>  +              .capability =3D ARM64_HAS_EVT,
+>  +              .type =3D ARM64_CPUCAP_SYSTEM_FEATURE,
+>  +              .sys_reg =3D SYS_ID_AA64MMFR2_EL1,
+>  +              .sign =3D FTR_UNSIGNED,
+>  +              .field_pos =3D ID_AA64MMFR2_EL1_EVT_SHIFT,
+>  +              .field_width =3D 4,
+>  +              .min_field_value =3D ID_AA64MMFR2_EL1_EVT_IMP,
+>  +              .matches =3D has_cpuid_feature,
+>  +      },
+>         {},
+>   };
+>
+>
 
