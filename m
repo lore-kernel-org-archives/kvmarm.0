@@ -1,104 +1,133 @@
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2F2110FF
-	for <kvmarm@lists.linux.dev>; Mon,  3 Jul 2023 08:18:38 +0000 (UTC)
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-51de841a727so4116479a12.3
-        for <kvmarm@lists.linux.dev>; Mon, 03 Jul 2023 01:18:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1688372317; x=1690964317;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=f0AIPmQjwEPFU9S6QPuv3kXAJyYa7R0ahvO9uqbNsw0=;
-        b=CTXm0Evd7f9xNERgFGe8Kgf2dIrXOUMZPOBGhEgXQdvIjRhhrv5Qh3s5ENWJ09z7ev
-         5wm7FiXz+iF/TvW0dDpczV2RwoT7ClRWoiG7fSddWKzNyBagcc/r7pNw84OiXN04lL4z
-         wC0LmC5S4SY3KJKOoKwf0war+sU1MsM9XTZc+Scp7fmMYsS9QJtvuv34rKr0yMZAysn8
-         D2fh7In8mMCQM9+yNYsq6aVEQIOZzk4aw7h/eGK/mN535gJJ9Vny0AUFRXYlZM0dEbQr
-         O8A0Ma5CFWhzbHzM3joBe8qmF4w64d0CQLFSC5gbL99qho7IZPwuRlOOued1WUV58MLW
-         eK2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688372317; x=1690964317;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f0AIPmQjwEPFU9S6QPuv3kXAJyYa7R0ahvO9uqbNsw0=;
-        b=kYfCDRVE9fRVjLsrabtkwyFFNTbVBcRrV77op0J3z0EP4rL6N4hPi/bLN08VPDIt8W
-         sn4gBGPGjLb+mMj+RlYfEwIRN/aBmhztjsIxur2DZQgM97xZWyoS7fLjey8+8HHb6nJT
-         o5izXSsddrSjvgAG98bQbtP7N+gGsiLZsARSNAC4pSR+OrPhuG4vmsLxTeDDxVc2vYTa
-         tl+tfsg1W5c3hxvxIud1iU3Jm3trIiSnuSincNi3mu5p8y4c3KuVqGVIMcLE0T6u0nwR
-         6n0nQMrBp1XBF0L3AgZ+uEhABWkSdn/fdWGfgIjBhehBZqDxMdAEv4EHcc4sZZ/QrZ16
-         f3oA==
-X-Gm-Message-State: ABy/qLZgmO+ZGQeJnNlj7zGk/C+FiWLOgNVvyvh1lFdSkWzBIeuA+l28
-	BbRBqdXFLoWomAVgbijh6i0x0w==
-X-Google-Smtp-Source: APBJJlFjFKFq1EVk2plu+5SIDoHMMxjYDFXuQ8UHkU0hLQGKGPcjw2PacRkzpqFIW8QfcigNzutaAw==
-X-Received: by 2002:a05:6402:4497:b0:51a:200b:d8ff with SMTP id er23-20020a056402449700b0051a200bd8ffmr6795812edb.13.1688372316835;
-        Mon, 03 Jul 2023 01:18:36 -0700 (PDT)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id n22-20020a056402515600b0051e0f100c48sm1171605edd.22.2023.07.03.01.18.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jul 2023 01:18:36 -0700 (PDT)
-Date: Mon, 3 Jul 2023 10:18:35 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Haibo Xu <haibo1.xu@intel.com>
-Cc: xiaobo55x@gmail.com, maz@kernel.org, oliver.upton@linux.dev, 
-	seanjc@google.com, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Shuah Khan <shuah@kernel.org>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Ricardo Koller <ricarkol@google.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Vipin Sharma <vipinsh@google.com>, 
-	David Matlack <dmatlack@google.com>, Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v5 10/13] KVM: selftests: Only do get/set tests on
- present blessed list
-Message-ID: <20230702-49c5545eb1ae2d0cf11c7b95@orel>
-References: <cover.1688010022.git.haibo1.xu@intel.com>
- <f44c3aa46971d524319c6340f9ce1b00c0182fd2.1688010022.git.haibo1.xu@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 904D71C2F
+	for <kvmarm@lists.linux.dev>; Mon,  3 Jul 2023 09:45:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02412C433C8;
+	Mon,  3 Jul 2023 09:45:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1688377530;
+	bh=07vPEXuHNAjSyb/jCUmI2nBGwG00D9SJ31afLJUgB10=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ekNgQGsW5LceWciZOTwVmsTRBUks/1hJheWaZlaPwggWKp2ncHo5CsiPqrLwfwo41
+	 3u3HRKntVO0KGjU5mxvQJKRfxhObIT3+rf0N/BU0cOmaQw5hpAW9DT9I+nTs2yzqJ7
+	 C29MnDWjoZ2KcJIML8pfp9Wv1SpCsKgSZHA759ql+QEcHonijAcIelfoKFkU0tJhSs
+	 VUfTas7Std/Yjmq9UQ3mtkdARrqA2yaZ2bWm5PTNP46H4Mq8ZUhTmiNqdUAfVPrvjS
+	 f8FiFLKZeajO1xXnuRyJ39XkbQNKT1WnBQYcq0GMU36E5gFoN71OrfVYXvxItod5Qw
+	 j85J53OspIPgQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qGG7a-00A7cd-S8;
+	Mon, 03 Jul 2023 10:45:27 +0100
+Date: Mon, 03 Jul 2023 10:45:26 +0100
+Message-ID: <867crhxr9l.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>, Kristina Martsenko <kristina.martsenko@arm.com>
+Cc: 	isaku.yamahata@intel.com,
+	seanjc@google.com,
+	pbonzini@redhat.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>
+Subject: Re: KVM CPU hotplug notifier triggers BUG_ON on arm64
+In-Reply-To: <ZKBlhJwl9YD5FHvs@linux.dev>
+References: <aeab7562-2d39-e78e-93b1-4711f8cc3fa5@arm.com>
+	<ZKBlhJwl9YD5FHvs@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f44c3aa46971d524319c6340f9ce1b00c0182fd2.1688010022.git.haibo1.xu@intel.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kristina.martsenko@arm.com, isaku.yamahata@intel.com, seanjc@google.com, pbonzini@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, Jul 01, 2023 at 09:42:58PM +0800, Haibo Xu wrote:
-> Only do the get/set tests on present and blessed registers
-> since we don't know the capabilities of any new ones.
+On Sat, 01 Jul 2023 18:42:28 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Suggested-by: Andrew Jones <ajones@ventanamicro.com>
-> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> ---
->  tools/testing/selftests/kvm/get-reg-list.c | 29 ++++++++++++++--------
->  1 file changed, 18 insertions(+), 11 deletions(-)
+> Hi Kristina,
 > 
-> diff --git a/tools/testing/selftests/kvm/get-reg-list.c b/tools/testing/selftests/kvm/get-reg-list.c
-> index c61090806007..74fb6f6fdd09 100644
-> --- a/tools/testing/selftests/kvm/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/get-reg-list.c
-> @@ -49,6 +49,10 @@ extern int vcpu_configs_n;
->  	for_each_reg_filtered(i)						\
->  		if (!find_reg(blessed_reg, blessed_n, reg_list->reg[i]))
->  
-> +#define for_each_present_blessed_reg(i)			\
-> +	for ((i) = 0; (i) < blessed_n; ++(i))		\
-> +		if (find_reg(reg_list->reg, reg_list->n, blessed_reg[i]))
+> Thanks for the bug report.
+> 
+> On Sat, Jul 01, 2023 at 01:50:52PM +0100, Kristina Martsenko wrote:
+> > Hi,
+> > 
+> > When I try to online a CPU on arm64 while a KVM guest is running, I hit a
+> > BUG_ON(preemptible()) (as well as a WARN_ON). See below for the full log.
+> > 
+> > This is on kvmarm/next, but seems to have been broken since 6.3. Bisecting it
+> > points at commit:
+> > 
+> >   0bf50497f03b ("KVM: Drop kvm_count_lock and instead protect kvm_usage_count with kvm_lock")
+> 
+> Makes sense. We were using a spinlock before, which implictly disables
+> preemption.
+> 
+> Well, one way to hack around the problem would be to just cram
+> preempt_{disable,enable}() into kvm_arch_hardware_disable(), but that's
+> kinda gross in the context of cpuhp which isn't migratable in the first
+> place. Let me have a look...
 
-I just realized this is backwards. We need 'i' to index reg_list->reg in
-the body of the loop. That means we need to write this as
+An alternative would be to replace the preemptible() checks with a one
+that looks at the migration state, but I'm not sure that's much better
+(it certainly looks more costly).
 
-#define for_each_present_blessed_reg(i)                                         \
-        for_each_reg(i)                                                         \
-                if (find_reg(blessed_reg, blessed_n, reg_list->reg[i]))
+There is also the fact that most of our per-CPU accessors are already
+using preemption disabling, and this code has a bunch of them. So I'm
+not sure there is a lot to be gained from not disabling preemption
+upfront.
 
-(Which, in hindsight, makes sense since we're replacing a for_each_reg()
-loop.)
+Anyway, as I was able to reproduce the issue under NV, I tested the
+hack below. If anything, I expect it to be a reasonable fix for
+6.3/6.4, and until we come up with a better approach.
 
 Thanks,
-drew
+
+	M.
+
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index aaeae1145359..a28c4ffe4932 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1894,8 +1894,17 @@ static void _kvm_arch_hardware_enable(void *discard)
+ 
+ int kvm_arch_hardware_enable(void)
+ {
+-	int was_enabled = __this_cpu_read(kvm_arm_hardware_enabled);
++	int was_enabled;
+ 
++	/*
++	 * Most calls to this function are made with migration
++	 * disabled, but not with preemption disabled. The former is
++	 * enough to ensure correctness, but most of the helpers
++	 * expect the later and will throw a tantrum otherwise.
++	 */
++	preempt_disable();
++
++	was_enabled = __this_cpu_read(kvm_arm_hardware_enabled);
+ 	_kvm_arch_hardware_enable(NULL);
+ 
+ 	if (!was_enabled) {
+@@ -1903,6 +1912,8 @@ int kvm_arch_hardware_enable(void)
+ 		kvm_timer_cpu_up();
+ 	}
+ 
++	preempt_enable();
++
+ 	return 0;
+ }
+ 
+
+
+
+-- 
+Without deviation from the norm, progress is not possible.
