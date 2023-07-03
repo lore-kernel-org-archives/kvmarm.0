@@ -1,86 +1,285 @@
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0011FAC
-	for <kvmarm@lists.linux.dev>; Mon,  3 Jul 2023 10:41:59 +0000 (UTC)
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3143493728dso1345904f8f.1
-        for <kvmarm@lists.linux.dev>; Mon, 03 Jul 2023 03:41:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1688380917; x=1690972917;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cefly1GwtRhN7DQubvj71xCv2sWrmliQoTLwjdvrN3M=;
-        b=cBGWPSPt4tEcCJ69DxyGXWhm20o6MynGAVzAQmcGnp/avie15eGjwOKb8YAoggbdn5
-         GzUk6s6q1Y87NyRckVTI4CPPAw+yhParh6uFm1XFoM/jnWFqi3FyrodhIe9EsAODU+HQ
-         YF9XsiPuhSA2Z/nexgJCcuW+2yhHYKGNGIJKxe+VeXQ4R4PthI5iBtXI9DIg3oIOCaoW
-         Hp1C6sFTzL7LXJRHNsj/rwuLdyuIPnphoPwuK3G8Qzvq0teH+c9or6kpntqpUzbW2ucC
-         zb+akqM49N8H5Cf5fykFQEKPRhqTZUikSjxj00LMI38Gj3mAaX05cDVtYI6dNwiEM57D
-         ndow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688380917; x=1690972917;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cefly1GwtRhN7DQubvj71xCv2sWrmliQoTLwjdvrN3M=;
-        b=ZD5Y7HPr8xBAg0+U16Fy+iESrocL9STTYzyDahckKBF9CHMtrX1ExCBbZwyuPEME2Q
-         jGhpzWtDDnia/NEbJ7nCm2rzkOSl1CdeFhlodF5eVqTNK8fQdJc/e8Pvp/fcChASKOWe
-         ezVcqNVpcuaHcKoo25AP1+4coLA/0Zhyo2TfU4jL6xrlyNudP6JVJqy/UXnkZq+kAk+B
-         hpp9iO9PCcxTtUc64rH/cDiotrz3yItoshENY3/KON54+uu1k9ljaoAEq8qbPKE1QkaC
-         i3C1X0lv3dRH1VulaD7Ij0ERdVDl783vMPU0EdlU0LeIpeBJOIxesYr8RDgUNhvJ0Z4A
-         /W9Q==
-X-Gm-Message-State: ABy/qLb9oJKdu86f+e/SlnAURTFo3pLJoRY47F4W49mVuQ3F8Wns/3mE
-	6ry8FYJ1g7Efhttk34/7H1SabA==
-X-Google-Smtp-Source: APBJJlHjQY5wS4Wm5OydaNz9HLZuUE94gA3T/csBsXJLJ9RDfVNFA2Z1ykgnyXuPvZ8PBhKd7GQcwQ==
-X-Received: by 2002:adf:f3c4:0:b0:313:ebf3:850e with SMTP id g4-20020adff3c4000000b00313ebf3850emr8270897wrp.37.1688380917352;
-        Mon, 03 Jul 2023 03:41:57 -0700 (PDT)
-Received: from myrica ([2.219.138.198])
-        by smtp.gmail.com with ESMTPSA id b7-20020a5d45c7000000b003141a3c4353sm10606788wrs.30.2023.07.03.03.41.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jul 2023 03:41:56 -0700 (PDT)
-Date: Mon, 3 Jul 2023 11:41:56 +0100
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org,
-	joro@8bytes.org, robin.murphy@arm.com, james.morse@arm.com,
-	suzuki.poulose@arm.com, oliver.upton@linux.dev,
-	yuzenghui@huawei.com, dbrazdil@google.com, ryan.roberts@arm.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	iommu@lists.linux.dev
-Subject: Re: [RFC PATCH 27/45] KVM: arm64: smmu-v3: Setup domains and page
- table configuration
-Message-ID: <20230703104156.GB2439191@myrica>
-References: <20230201125328.2186498-1-jean-philippe@linaro.org>
- <20230201125328.2186498-28-jean-philippe@linaro.org>
- <ZJXuhQeDgK4sShRA@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 520C9100A3
+	for <kvmarm@lists.linux.dev>; Mon,  3 Jul 2023 15:12:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688397142; x=1719933142;
+  h=date:from:to:cc:subject:message-id;
+  bh=W0xbU9nEE3TH0xg7aDTg6qtQ4+f5eySxUTOggB2dw2Q=;
+  b=H2vXYsE6b3akL4zVRk9lz2eH0gKJaDz2gpWzA0n2f7Pj0M8pg+d+0EsX
+   /z0EM0Nj8X4nh5OykhdSnc8S5mxv0/Pl2/JpGJa9UVCZh7HXXvvnb5SEF
+   9DW1lsPRXdJSnXHYiXEeoHxpBZzKH/bbA0vPsgZIdQxpmDgSrQOqz/rhf
+   eXjXl6mJNim3Pvlb6tiQvmrADQqlAbUaI6HyIlRNTHH7W61zC5EMEYghJ
+   EuWh2Fxq9fu7Eb/sx3jy+wPLIImdhSdABD5AiDuJb4ikPCuVAAtj8xTIs
+   CYjJGtYVCnoHrJh2Co3Azl1fNl0vA+o1GPKtxDY+w5EFrGkO+6dlD/AfU
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="343239958"
+X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
+   d="scan'208";a="343239958"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2023 08:12:17 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="788557478"
+X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
+   d="scan'208";a="788557478"
+Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
+  by fmsmga004.fm.intel.com with ESMTP; 03 Jul 2023 08:12:13 -0700
+Received: from kbuild by 783282924a45 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qGLDo-000HR9-2I;
+	Mon, 03 Jul 2023 15:12:12 +0000
+Date: Mon, 03 Jul 2023 23:11:26 +0800
+From: kernel test robot <lkp@intel.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Linux Memory Management List <linux-mm@kvack.org>,
+ kunit-dev@googlegroups.com, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-parisc@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-riscv@lists.infradead.org, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: [linux-next:master] BUILD REGRESSION
+ 296d53d8f84ce50ffaee7d575487058c8d437335
+Message-ID: <202307032309.v4K1IBoR-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZJXuhQeDgK4sShRA@google.com>
 
-Hi Mostafa,
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+branch HEAD: 296d53d8f84ce50ffaee7d575487058c8d437335  Add linux-next specific files for 20230703
 
-On Fri, Jun 23, 2023 at 07:12:05PM +0000, Mostafa Saleh wrote:
-> > +static int smmu_detach_dev(struct kvm_hyp_iommu *iommu, pkvm_handle_t domain_id,
-> > +			   struct kvm_hyp_iommu_domain *domain, u32 sid)
-> > +{
-> > +	u64 ttb;
-> > +	u64 *dst;
-> > +	int i, ret;
-> > +	struct hyp_arm_smmu_v3_device *smmu = to_smmu(iommu);
-> > +
-> > +	dst = smmu_get_ste_ptr(smmu, sid);
-> > +	if (!dst)
-> > +		return -ENODEV;
-> > +
-> > +	ttb = dst[3] & STRTAB_STE_3_S2TTB_MASK;
-> This is unused, does detach needs to do anything with ttb?
+Error/Warning reports:
 
-No it doesn't look like I've ever used this, I removed it
+https://lore.kernel.org/oe-kbuild-all/202306122223.HHER4zOo-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202306151954.Rsz6HP7h-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202306301709.lvrxzyCj-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202306301756.x8dgyYnL-lkp@intel.com
 
-Thanks,
-Jean
+Error/Warning: (recently discovered and may have been fixed)
+
+arch/parisc/kernel/pdt.c:66:6: warning: no previous prototype for 'arch_report_meminfo' [-Wmissing-prototypes]
+drivers/bluetooth/btmtk.c:386:32: error: no member named 'dump' in 'struct hci_dev'
+drivers/bluetooth/btmtk.c:386:44: error: 'struct hci_dev' has no member named 'dump'
+drivers/char/mem.c:164:25: error: implicit declaration of function 'unxlate_dev_mem_ptr'; did you mean 'xlate_dev_mem_ptr'? [-Werror=implicit-function-declaration]
+lib/kunit/executor_test.c:138:4: warning: cast from 'void (*)(const void *)' to 'kunit_action_t *' (aka 'void (*)(void *)') converts to incompatible function type [-Wcast-function-type-strict]
+lib/kunit/test.c:775:38: warning: cast from 'void (*)(const void *)' to 'kunit_action_t *' (aka 'void (*)(void *)') converts to incompatible function type [-Wcast-function-type-strict]
+
+Unverified Error/Warning (likely false positive, please contact us if interested):
+
+arch/arm64/kvm/mmu.c:147:3-9: preceding lock on line 140
+drivers/clk/qcom/gpucc-sm8550.c:37:22: sparse: sparse: decimal constant 2300000000 is between LONG_MAX and ULONG_MAX. For C99 that means long long, C90 compilers are very likely to produce unsigned long (and a warning) here
+drivers/net/ethernet/mellanox/mlx5/core/lib/devcom.c:98 mlx5_devcom_register_device() error: uninitialized symbol 'tmp_dev'.
+drivers/usb/cdns3/cdns3-starfive.c:23: warning: expecting prototype for cdns3(). Prototype was for USB_STRAP_HOST() instead
+{standard input}: Error: local label `"2" (instance number 9 of a fb label)' is not defined
+
+Error/Warning ids grouped by kconfigs:
+
+gcc_recent_errors
+|-- alpha-randconfig-r025-20230703
+|   `-- drivers-bluetooth-btmtk.c:error:struct-hci_dev-has-no-member-named-dump
+|-- arm-randconfig-r073-20230703
+|   `-- drivers-clk-qcom-gpucc-sm8550.c:sparse:sparse:decimal-constant-is-between-LONG_MAX-and-ULONG_MAX.-For-C99-that-means-long-long-C90-compilers-are-very-likely-to-produce-unsigned-long-(and-a-warning)-he
+|-- arm64-randconfig-r054-20230703
+|   `-- arch-arm64-kvm-mmu.c:preceding-lock-on-line
+|-- i386-randconfig-m031-20230703
+|   `-- drivers-net-ethernet-mellanox-mlx5-core-lib-devcom.c-mlx5_devcom_register_device()-error:uninitialized-symbol-tmp_dev-.
+|-- parisc-allnoconfig
+|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
+|-- parisc-allyesconfig
+|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
+|-- parisc-defconfig
+|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
+|-- parisc-randconfig-r011-20230703
+|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
+|-- parisc-randconfig-r035-20230703
+|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
+|-- parisc64-defconfig
+|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
+|-- riscv-allmodconfig
+|   `-- drivers-usb-cdns3-cdns3-starfive.c:warning:expecting-prototype-for-cdns3().-Prototype-was-for-USB_STRAP_HOST()-instead
+|-- riscv-allyesconfig
+|   `-- drivers-usb-cdns3-cdns3-starfive.c:warning:expecting-prototype-for-cdns3().-Prototype-was-for-USB_STRAP_HOST()-instead
+|-- riscv-randconfig-r091-20230703
+|   |-- arch-riscv-kernel-signal.c:sparse:sparse:incorrect-type-in-initializer-(different-address-spaces)-expected-void-__val-got-void-noderef-__user-assigned-datap
+|   `-- drivers-bluetooth-btmtk.c:error:struct-hci_dev-has-no-member-named-dump
+|-- sh-allmodconfig
+|   |-- drivers-char-mem.c:error:implicit-declaration-of-function-unxlate_dev_mem_ptr
+|   `-- standard-input:Error:local-label-(instance-number-of-a-fb-label)-is-not-defined
+|-- sh-randconfig-r015-20230703
+|   `-- drivers-char-mem.c:error:implicit-declaration-of-function-unxlate_dev_mem_ptr
+|-- sh-randconfig-r024-20230703
+|   `-- drivers-char-mem.c:error:implicit-declaration-of-function-unxlate_dev_mem_ptr
+|-- sh-se7619_defconfig
+|   `-- drivers-char-mem.c:error:implicit-declaration-of-function-unxlate_dev_mem_ptr
+`-- x86_64-buildonly-randconfig-r003-20230703
+    `-- drivers-bluetooth-btmtk.c:error:struct-hci_dev-has-no-member-named-dump
+clang_recent_errors
+|-- arm-randconfig-r005-20230703
+|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
+|-- arm-randconfig-r035-20230703
+|   |-- lib-kunit-executor_test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
+|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
+|-- arm64-randconfig-r026-20230703
+|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
+|-- hexagon-randconfig-r041-20230703
+|   |-- drivers-bluetooth-btmtk.c:error:no-member-named-dump-in-struct-hci_dev
+|   |-- lib-kunit-executor_test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
+|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
+|-- hexagon-randconfig-r045-20230703
+|   |-- lib-kunit-executor_test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
+|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
+`-- i386-randconfig-i011-20230703
+    `-- drivers-bluetooth-btmtk.c:error:no-member-named-dump-in-struct-hci_dev
+
+elapsed time: 747m
+
+configs tested: 136
+configs skipped: 5
+
+tested configs:
+alpha                            alldefconfig   gcc  
+alpha                            allyesconfig   gcc  
+alpha                               defconfig   gcc  
+alpha                randconfig-r002-20230703   gcc  
+alpha                randconfig-r025-20230703   gcc  
+arc                              allyesconfig   gcc  
+arc                                 defconfig   gcc  
+arc                     nsimosci_hs_defconfig   gcc  
+arc                  randconfig-r014-20230703   gcc  
+arc                  randconfig-r043-20230703   gcc  
+arm                              allmodconfig   gcc  
+arm                              allyesconfig   gcc  
+arm                                 defconfig   clang
+arm                                 defconfig   gcc  
+arm                         lpc32xx_defconfig   clang
+arm                           omap1_defconfig   clang
+arm                          pxa168_defconfig   clang
+arm                  randconfig-r005-20230703   clang
+arm                  randconfig-r035-20230703   clang
+arm                  randconfig-r046-20230703   gcc  
+arm                         socfpga_defconfig   clang
+arm                         wpcm450_defconfig   gcc  
+arm64                            alldefconfig   gcc  
+arm64                            allyesconfig   gcc  
+arm64                               defconfig   gcc  
+arm64                randconfig-r026-20230703   clang
+csky                                defconfig   gcc  
+csky                 randconfig-r006-20230703   gcc  
+csky                 randconfig-r021-20230703   gcc  
+hexagon              randconfig-r041-20230703   clang
+hexagon              randconfig-r045-20230703   clang
+i386                             allyesconfig   gcc  
+i386         buildonly-randconfig-r004-20230703   gcc  
+i386         buildonly-randconfig-r005-20230703   gcc  
+i386         buildonly-randconfig-r006-20230703   gcc  
+i386                              debian-10.3   gcc  
+i386                                defconfig   gcc  
+i386                 randconfig-i001-20230703   gcc  
+i386                 randconfig-i002-20230703   gcc  
+i386                 randconfig-i003-20230703   gcc  
+i386                 randconfig-i004-20230703   gcc  
+i386                 randconfig-i005-20230703   gcc  
+i386                 randconfig-i006-20230703   gcc  
+i386                 randconfig-i011-20230703   clang
+i386                 randconfig-i012-20230703   clang
+i386                 randconfig-i013-20230703   clang
+i386                 randconfig-i014-20230703   clang
+i386                 randconfig-i016-20230703   clang
+i386                 randconfig-r036-20230703   gcc  
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+m68k                             allmodconfig   gcc  
+m68k                             allyesconfig   gcc  
+m68k                         apollo_defconfig   gcc  
+m68k                                defconfig   gcc  
+m68k                 randconfig-r013-20230703   gcc  
+microblaze                          defconfig   gcc  
+mips                             allmodconfig   gcc  
+mips                             allyesconfig   gcc  
+mips                            ar7_defconfig   gcc  
+mips                           gcw0_defconfig   gcc  
+mips                           ip32_defconfig   gcc  
+mips                           jazz_defconfig   gcc  
+mips                       lemote2f_defconfig   clang
+mips                 randconfig-r023-20230703   gcc  
+mips                 randconfig-r031-20230703   clang
+nios2                               defconfig   gcc  
+openrisc             randconfig-r034-20230703   gcc  
+parisc                           allyesconfig   gcc  
+parisc                              defconfig   gcc  
+parisc               randconfig-r011-20230703   gcc  
+parisc               randconfig-r035-20230703   gcc  
+parisc64                            defconfig   gcc  
+powerpc                          allmodconfig   gcc  
+powerpc                           allnoconfig   gcc  
+powerpc                 canyonlands_defconfig   gcc  
+powerpc                     ep8248e_defconfig   gcc  
+powerpc                        icon_defconfig   clang
+powerpc                    klondike_defconfig   gcc  
+powerpc                     ksi8560_defconfig   clang
+powerpc                     mpc5200_defconfig   clang
+powerpc                     mpc83xx_defconfig   gcc  
+powerpc                  storcenter_defconfig   gcc  
+powerpc                         wii_defconfig   gcc  
+riscv                            alldefconfig   clang
+riscv                            allmodconfig   gcc  
+riscv                             allnoconfig   gcc  
+riscv                            allyesconfig   gcc  
+riscv                               defconfig   gcc  
+riscv                randconfig-r042-20230703   clang
+riscv                          rv32_defconfig   gcc  
+s390                             allmodconfig   gcc  
+s390                             allyesconfig   gcc  
+s390                                defconfig   gcc  
+s390                 randconfig-r004-20230703   gcc  
+s390                 randconfig-r033-20230703   gcc  
+s390                 randconfig-r044-20230703   clang
+sh                               allmodconfig   gcc  
+sh                         apsh4a3a_defconfig   gcc  
+sh                   randconfig-r015-20230703   gcc  
+sh                   randconfig-r024-20230703   gcc  
+sh                   randconfig-r031-20230703   gcc  
+sh                   rts7751r2dplus_defconfig   gcc  
+sh                           se7619_defconfig   gcc  
+sh                           se7751_defconfig   gcc  
+sh                  sh7785lcr_32bit_defconfig   gcc  
+sparc                            allyesconfig   gcc  
+sparc                               defconfig   gcc  
+sparc                randconfig-r022-20230703   gcc  
+sparc64              randconfig-r001-20230703   gcc  
+sparc64              randconfig-r033-20230703   gcc  
+um                               allmodconfig   clang
+um                                allnoconfig   clang
+um                               allyesconfig   clang
+um                                  defconfig   gcc  
+um                             i386_defconfig   gcc  
+um                   randconfig-r034-20230703   clang
+um                   randconfig-r036-20230703   clang
+um                           x86_64_defconfig   gcc  
+x86_64                           allyesconfig   gcc  
+x86_64       buildonly-randconfig-r001-20230703   gcc  
+x86_64       buildonly-randconfig-r002-20230703   gcc  
+x86_64       buildonly-randconfig-r003-20230703   gcc  
+x86_64                              defconfig   gcc  
+x86_64                                  kexec   gcc  
+x86_64               randconfig-x001-20230703   clang
+x86_64               randconfig-x002-20230703   clang
+x86_64               randconfig-x003-20230703   clang
+x86_64               randconfig-x004-20230703   clang
+x86_64               randconfig-x005-20230703   clang
+x86_64               randconfig-x006-20230703   clang
+x86_64                          rhel-8.3-rust   clang
+x86_64                               rhel-8.3   gcc  
+xtensa               randconfig-r003-20230703   gcc  
+xtensa               randconfig-r012-20230703   gcc  
+xtensa               randconfig-r032-20230703   gcc  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
