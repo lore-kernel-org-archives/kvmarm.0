@@ -1,110 +1,100 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05A31625
-	for <kvmarm@lists.linux.dev>; Mon,  3 Jul 2023 02:53:28 +0000 (UTC)
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2b5c231c23aso62053621fa.0
-        for <kvmarm@lists.linux.dev>; Sun, 02 Jul 2023 19:53:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688352807; x=1690944807;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fhyBGVQ1gaH5Dq33+rfxBQOlHqFL4drvkmIj6aJ3EDI=;
-        b=O1hWsfHy6op+iJK7RchZka3HezdQVlH4vq5oZ4Ax4HtYBJHdp7SiTUlOd/0MeGRlXW
-         qD/ZIYJ7S7K1mp3qOnr6kToxa76JlnRwNUBFg8F1baXgmRqJNnWHdQllc+zNQ/KDquxA
-         7ErHevq/QuYL5AcR4Ql1h5QzNaJ9QIQcafCqt4dGXfaEkOM3HL++icZX1GE7OHuqT4Je
-         cvxgKsI/a5C0cZWpASXrd1T8JMo5yoIoj74Zs2ka04Rmp+6QnFbys2scKj3azEQXgQ2p
-         1SDy5h+KL7Ty3XPYq179EooH/TEpDroawrvKxJ2iJS0i2N+UJhV225NmXPpDfy0Ly7ur
-         MwBQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75890A52
+	for <kvmarm@lists.linux.dev>; Mon,  3 Jul 2023 08:08:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688371735;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FXPKfZsTXzahD7ycQScFS2q+Sn+AkPPRgq7/KVL7l/U=;
+	b=g2UJrTGB+D/M8M9cCVZfZMdASRyfrPyL2w3hcjwNmxxmI57uGW7LKm2aYcL3dJlnW+ItFe
+	nUVwHZFNHQ69pi7b4+5IoAIxKcpJVK9D6uVorYvbqbpU0TdG4z6slVzJRqk9Oukf0KEb1y
+	v41x4n+tVa3PdtuqWWgFj0aP7skA4+c=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-672-r0woUOlCPnuHX3VzQ4moKQ-1; Mon, 03 Jul 2023 04:08:54 -0400
+X-MC-Unique: r0woUOlCPnuHX3VzQ4moKQ-1
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-635e91cba88so47563776d6.0
+        for <kvmarm@lists.linux.dev>; Mon, 03 Jul 2023 01:08:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688352807; x=1690944807;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fhyBGVQ1gaH5Dq33+rfxBQOlHqFL4drvkmIj6aJ3EDI=;
-        b=kjVL6scHNGb5jt2FQbeHyibc1OIVnfpRgsoiQUgY8DWm/1bwZFSqX/C1ugNVyajPl7
-         +5VevhfNvk8hqbR7UEXclorc5+pJgNbpdqcr4mNflMZclsUa9e1c7uOIkVXZWnWVNpQV
-         1a+PgMcvnRUrUU0KzykyScXzmKanan7rcK8iNUTh/i4GQCM1daxHkFQpRXfD+3EbTg1Q
-         FDzZZNWenHusl3bsntSnQW+4uR47yORdxjrcZuHxGbo1t/Pg4QhYRNbZOeOy4d9vb7uf
-         vjDYSgYtdWdEfeTQO59mIOXuqw3dHfgdE2M7SjdSTeHLCBxAsM3gnhghxXXcF62xsJaU
-         cbKQ==
-X-Gm-Message-State: ABy/qLZsEkGV7SyK2O4Ei2nPDkHK/VYLmaeCPKYsnmNPEXEWLJXSgpkj
-	C6Cd12hHFf+xE8cLHxHj+rOvh1y8hmt0tJ5y3t8=
-X-Google-Smtp-Source: APBJJlFfL2px5Y6Cyr17rNDrNo5fJ8sdzYko47a6W75rx7foKvBUjbZJAB2cC/NyOavCuc3SoyWVNmryeUVMgdKDyso=
-X-Received: by 2002:a2e:9205:0:b0:2b6:e128:e7a3 with SMTP id
- k5-20020a2e9205000000b002b6e128e7a3mr2116081ljg.33.1688352806560; Sun, 02 Jul
- 2023 19:53:26 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1688371734; x=1690963734;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FXPKfZsTXzahD7ycQScFS2q+Sn+AkPPRgq7/KVL7l/U=;
+        b=UrKyJspapQ1yaRordeJh4x+Nb+I9IDc7ZqaXRIhk0C486chIXrpj/4bPV+FUOjIyMv
+         n1QsyOwfpF3NBD/6iZXW09ae+sDoPKR4tR9l3MQi7VIA2AYKJlf6llYiW6oRiqZNaovo
+         MAYaaw+P3F0icUnrpAmGs2+Xf95NN4w+qct+UNQ+BqUyV5g8WqSIVIDElMOW0ol4rY6c
+         pRauSKNEhSulQAuEYa6auz2+PHhcesjQGjNUiFstbpq44hIAe7Og5YTst7XcpY046Mtm
+         f9SLAy0mrtaBoDAoxUdWk7quUGLsfbUcAr77AyrXZgcgBqQOIgmY1lraP+JjZz27V/+E
+         Qtsw==
+X-Gm-Message-State: ABy/qLYdqKXgkWTIwrxziC17BmaS436BeMSaIn4NAKZ2rPKxKVMCSWhY
+	TrYZDtkpWsUjvBMU0+J7/cPu2hQ5+ji+F12sK3IAjo4arwp9uP2aSSCPxFX98rwCXgBthryJXrc
+	N2YCretosrw+W7e0j
+X-Received: by 2002:a05:6214:c3:b0:635:de52:8385 with SMTP id f3-20020a05621400c300b00635de528385mr8486495qvs.65.1688371733896;
+        Mon, 03 Jul 2023 01:08:53 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGKzp5ZiukExyOrvxJTeHKv24OOZijoaMTKRVV4KAAWAvgblhqLeAZDPyKzp3kaChdmwgOQmg==
+X-Received: by 2002:a05:6214:c3:b0:635:de52:8385 with SMTP id f3-20020a05621400c300b00635de528385mr8486485qvs.65.1688371733711;
+        Mon, 03 Jul 2023 01:08:53 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id l15-20020ad4444f000000b0062439f05b87sm11201681qvt.45.2023.07.03.01.08.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Jul 2023 01:08:53 -0700 (PDT)
+Message-ID: <6b7c593e-d735-93ae-2e5c-99d87b4604cc@redhat.com>
+Date: Mon, 3 Jul 2023 10:08:49 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <cover.1688010022.git.haibo1.xu@intel.com> <20230701-e1bff47a0ed38ec3ab6ca252@orel>
-In-Reply-To: <20230701-e1bff47a0ed38ec3ab6ca252@orel>
-From: Haibo Xu <xiaobo55x@gmail.com>
-Date: Mon, 3 Jul 2023 10:53:15 +0800
-Message-ID: <CAJve8on_SRbPmQ4U16imMUjrqs_abLsW64xJotBxRSv65WJa-w@mail.gmail.com>
-Subject: Re: [PATCH v5 00/13] RISCV: Add KVM_GET_REG_LIST API
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: Haibo Xu <haibo1.xu@intel.com>, maz@kernel.org, oliver.upton@linux.dev, 
-	seanjc@google.com, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Shuah Khan <shuah@kernel.org>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Ricardo Koller <ricarkol@google.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Vipin Sharma <vipinsh@google.com>, 
-	David Matlack <dmatlack@google.com>, Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v3 5/6] arm: pmu: Add
+ pmu-mem-access-reliability test
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ maz@kernel.org, will@kernel.org, oliver.upton@linux.dev,
+ ricarkol@google.com, reijiw@google.com, alexandru.elisei@arm.com,
+ mark.rutland@arm.com
+References: <20230619200401.1963751-1-eric.auger@redhat.com>
+ <20230619200401.1963751-6-eric.auger@redhat.com>
+ <20230701-daff0cec48c2329abd7ede9f@orel>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230701-daff0cec48c2329abd7ede9f@orel>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sat, Jul 1, 2023 at 10:53=E2=80=AFPM Andrew Jones <ajones@ventanamicro.c=
-om> wrote:
->
-> On Sat, Jul 01, 2023 at 09:42:48PM +0800, Haibo Xu wrote:
-> > KVM_GET_REG_LIST will dump all register IDs that are available to
-> > KVM_GET/SET_ONE_REG and It's very useful to identify some platform
-> > regression issue during VM migration.
-> >
-> > Patch 1-7 re-structured the get-reg-list test in aarch64 to make some
-> > of the code as common test framework that can be shared by riscv.
-> >
-> > Patch 8 move reject_set check logic to a function so as to check for
-> > different errno for different registers.
-> > Patch 9 move finalize_vcpu back to run_test so that riscv can implement
-> > its specific operation.
-> > Patch 10 change to do the get/set operation only on present-blessed lis=
-t.
-> > Patch 11 add the skip_set facilities so that riscv can skip set operati=
-on
-> > on some registers.
-> > Patch 12 enabled the KVM_GET_REG_LIST API in riscv.
-> > patch 13 added the corresponding kselftest for checking possible
-> > register regressions.
-> >
-> > The get-reg-list kvm selftest was ported from aarch64 and tested with
-> > Linux v6.4 on a Qemu riscv64 virt machine.
->
-> Hi Haibo,
->
-> This series needs a rebase on top of these recent patches
->
->  commit ee053e03b08e ("KVM: selftests: get-reg-list: support ID register =
-features")
->  commit 5f0419a0083b ("KVM: selftests: get-reg-list: add Permission Indir=
-ection registers")
->
-> The conflicts will be in my patches, which do the splitting of the test.
-> I'll do the rebase and push it to a branch for you to pick up.
->
+Hi Drew,
 
-Thanks for the heads up. I will include your changes in v6.
+On 7/1/23 13:36, Andrew Jones wrote:
+> On Mon, Jun 19, 2023 at 10:04:00PM +0200, Eric Auger wrote:
+> ...
+>> @@ -1201,6 +1257,9 @@ int main(int argc, char *argv[])
+>>  	} else if (strcmp(argv[1], "pmu-basic-event-count") == 0) {
+>>  		run_event_test(argv[1], test_basic_event_count, false);
+>>  		run_event_test(argv[1], test_basic_event_count, true);
+>> +	} else if (strcmp(argv[1], "pmu-mem-access-reliability") == 0) {
+>> +		run_event_test(argv[1], test_mem_access_reliability, false);
+>> +		run_event_test(argv[1], test_mem_access_reliability, true);
+> This breaks compilation for arm since this patch is missing the stub.
+> I've added it.
 
+sorry for the oversight and thanks for adding it ;-)
+
+Eric
+>
 > Thanks,
 > drew
+>
+
