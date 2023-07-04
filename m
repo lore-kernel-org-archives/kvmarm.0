@@ -1,106 +1,115 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE64A2C
-	for <kvmarm@lists.linux.dev>; Tue,  4 Jul 2023 14:33:44 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BCD7B1516;
-	Tue,  4 Jul 2023 07:34:26 -0700 (PDT)
-Received: from bogus (e103737-lin.cambridge.arm.com [10.1.197.49])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4C9103F73F;
-	Tue,  4 Jul 2023 07:33:42 -0700 (PDT)
-Date: Tue, 4 Jul 2023 15:33:39 +0100
-From: Sudeep Holla <sudeep.holla@arm.com>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: maz@kernel.org, oliver.upton@linux.dev,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, tabba@google.com, qperret@google.com,
-	will@kernel.org, catalin.marinas@arm.com, yuzenghui@huawei.com,
-	suzuki.poulose@arm.com, james.morse@arm.com, bgardon@google.com,
-	gshan@redhat.com, Sudeep Holla <sudeep.holla@arm.com>
-Subject: Re: [PATCH v3] KVM: arm64: Use BTI for nvhe
-Message-ID: <20230704143339.cqrvntq7rmmb2on3@bogus>
-References: <20230530150845.2856828-1-smostafa@google.com>
- <20230704134136.a5znw4jupt5yp5kg@bogus>
- <ZKQqIYRrckLlXqkx@google.com>
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE3CA2C
+	for <kvmarm@lists.linux.dev>; Tue,  4 Jul 2023 15:06:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688483195;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HxNSeorzFhEFOo0iS/GO95xpCNcPqOVD1/XTzwVYfhw=;
+	b=L+4S5xmxA4PUBqeFJnTkQLMy9+AErIrzg1e3llZKQz+i1fkcUHVqZxyNhvmK0QGivAea+o
+	qCGN3rLXM9Pu+QTd6GXTw9GHj4TGrubcVVLtxINnW/MI8QpDDcQ8d5AucMTOiz8IqbJlvA
+	0meBxZe05LFj71fZDLhw/4kQblsx92A=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-470-lrd9Cgr6MpeMF9gT0piRjA-1; Tue, 04 Jul 2023 11:06:32 -0400
+X-MC-Unique: lrd9Cgr6MpeMF9gT0piRjA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8D9653810B0B;
+	Tue,  4 Jul 2023 15:06:31 +0000 (UTC)
+Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5173640C2063;
+	Tue,  4 Jul 2023 15:06:31 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>, Jing Zhang <jingzhangos@google.com>
+Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, ARMLinux
+ <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oupton@google.com>, Will Deacon <will@kernel.org>, Paolo
+ Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, Reiji Watanabe
+ <reijiw@google.com>, Raghavendra Rao Ananta <rananta@google.com>, Suraj
+ Jitindar Singh <surajjs@amazon.com>
+Subject: Re: [PATCH v4 1/4] KVM: arm64: Enable writable for ID_AA64DFR0_EL1
+In-Reply-To: <ZJm+Kj0C5YySp055@linux.dev>
+Organization: Red Hat GmbH
+References: <20230607194554.87359-1-jingzhangos@google.com>
+ <20230607194554.87359-2-jingzhangos@google.com>
+ <ZJm+Kj0C5YySp055@linux.dev>
+User-Agent: Notmuch/0.37 (https://notmuchmail.org)
+Date: Tue, 04 Jul 2023 17:06:30 +0200
+Message-ID: <874jmjiumh.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZKQqIYRrckLlXqkx@google.com>
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 
-Hi Mostafa,
+On Mon, Jun 26 2023, Oliver Upton <oliver.upton@linux.dev> wrote:
 
-On Tue, Jul 04, 2023 at 02:18:09PM +0000, Mostafa Saleh wrote:
-> Hi Sudeep,
-> 
-> On Tue, Jul 04, 2023 at 02:41:36PM +0100, Sudeep Holla wrote:
-> > On Tue, May 30, 2023 at 03:08:45PM +0000, Mostafa Saleh wrote:
-> > > CONFIG_ARM64_BTI_KERNEL compiles the kernel to support ARMv8.5-BTI.
-> > > However, the nvhe code doesn't make use of it as it doesn't map any
-> > > pages with Guarded Page(GP) bit.
-> > > 
-> > > kvm pgtable code is modified to map executable pages with GP bit
-> > > if BTI is enabled for the kernel.
-> > > 
-> > > At hyp init, SCTLR_EL2.BT is set to 1 to match EL1 configuration
-> > > (SCTLR_EL1.BT1) set in bti_enable().
-> > > 
-> > > One difference between kernel and nvhe code, is that the kernel maps
-> > > .text with GP while nvhe maps all the executable pages, this makes
-> > > nvhe code need to deal with special initialization code coming from
-> > > other executable sections (.idmap.text).
-> > > For this we need to add bti instruction at the beginning of
-> > > __kvm_handle_stub_hvc as it can be called by  __host_hvc through
-> > > branch instruction(br) and unlike SYM_FUNC_START, SYM_CODE_START
-> > > doesn’t add bti instruction at the beginning, and it can’t be modified
-> > > to add it as it is used with vector tables.
-> > > Another solution which is more intrusive is to convert
-> > > __kvm_handle_stub_hvc to a function and inject “bti jc” instead of
-> > > “bti c” in SYM_FUNC_START
-> > >
-> > 
-> > I was chasing a bug in linux-next yesterday with protected nVHE(pKVM) and
-> > cpuidle enabled. The system fails to boot. I just bisected the issue to this
-> > patch and also saw this patch landed in the linus tree yesterday/today.
-> 
-> One of the challenges of BTI is that we need to add explicit BTI instructions
-> for assembly code. I checked the code to make sure that nothing was missing,
-> but maybe this is not the case.
-> Can you please share more about the issue (is ESR a Branch Target Exception,
-> call stack...) if possible.
-
-I haven't debugged it any further, just reported it as soon as I bisected it.
-Reverting this get back the booting system. I am not sure if anything is going
-wrong when the CPU is entering suspend(highly unlikely in normal scenario but
-I am not so sure with pKVM trapping these PSCI calls now) or when it is woken
-up and resuming back. IIUC this now will happen via kvm_hyp_cpu_resume->
-__kvm_hyp_init_cpu->___kvm_hyp_init. 
-
-> Also, is this with CONFIG_ARM_PSCI_CPUIDLE?
-
-Yes, basically the cpus can enter cpu_suspend which IIUC pKVM traps and
-handle for the host.
-
-> 
-> > Not sure if this is something to do with the fact that pKVM skips to
-> > __kvm_handle_stub_hvc in __host_hvc.
-
-Sorry, my bad. I meant pKVM skips calling __kvm_handle_stub_hvc in __host_hvc
-and jumps to __host_exit directly. Sorry for that, one wrong "to" changed the
-whole meaning.
-
-> __kvm_handle_stub_hvc is called from __host_hvc with "br x5"
-> That's why "bti j" was added at the beginning of __kvm_handle_stub_hvc,
-> so this should be fine.
+> On Wed, Jun 07, 2023 at 07:45:51PM +0000, Jing Zhang wrote:
+>> Since number of context-aware breakpoints must be no more than number
+>> of supported breakpoints according to Arm ARM, return an error if
+>> userspace tries to set CTX_CMPS field to such value.
+>> 
+>> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+>> ---
+>>  arch/arm64/kvm/sys_regs.c | 9 +++++++--
+>>  1 file changed, 7 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index 50d4e25f42d3..a6299c796d03 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -1539,9 +1539,14 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+>>  			       const struct sys_reg_desc *rd,
+>>  			       u64 val)
+>>  {
+>> -	u8 pmuver, host_pmuver;
+>> +	u8 pmuver, host_pmuver, brps, ctx_cmps;
+>>  	bool valid_pmu;
+>>  
+>> +	brps = FIELD_GET(ID_AA64DFR0_EL1_BRPs_MASK, val);
+>> +	ctx_cmps = FIELD_GET(ID_AA64DFR0_EL1_CTX_CMPs_MASK, val);
+>> +	if (ctx_cmps > brps)
+>> +		return -EINVAL;
+>> +
 >
+> I'm not fully convinced on the need to do this sort of cross-field
+> validation... I think it is probably more trouble than it is worth. If
+> userspace writes something illogical to the register, oh well. All we
+> should care about is that the advertised feature set is a subset of
+> what's supported by the host.
+>
+> The series doesn't even do complete sanity checking, and instead works
+> on a few cherry-picked examples. AA64PFR0.EL{0-3} would also require
+> special handling depending on how pedantic you're feeling. AArch32
+> support at a higher exception level implies AArch32 support at all lower
+> exception levels.
+>
+> But that isn't a suggestion to implement it, more of a suggestion to
+> just avoid the problem as a whole.
 
-Yes I saw that and understood that but I wanted to tell the above which went
-horribly wrong before.
+Generally speaking, how much effort do we want to invest to prevent
+userspace from doing dumb things? "Make sure we advertise a subset of
+features of what the host supports" and "disallow writing values that
+are not allowed by the architecture in the first place" seem reasonable,
+but if userspace wants to create weird frankencpus[1], should it be
+allowed to break the guest and get to keep the pieces?
 
--- 
-Regards,
-Sudeep
+I'd be more in favour to rely on userspace to configure something that
+is actually usable; it needs to sanitize any user-provided configuration
+anyway.
+
+[1] I think userspace will end up creating frankencpus in any case, but
+at least it should be the kind that doesn't look out of place in the
+subway if you dress it in proper clothing.
+
