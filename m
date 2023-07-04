@@ -1,162 +1,192 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49CDA6FBA
-	for <kvmarm@lists.linux.dev>; Tue,  4 Jul 2023 19:25:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944196128
+	for <kvmarm@lists.linux.dev>; Tue,  4 Jul 2023 19:32:50 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AEB4615DB;
-	Tue,  4 Jul 2023 12:26:17 -0700 (PDT)
-Received: from bogus (unknown [10.57.76.100])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5715A3F663;
-	Tue,  4 Jul 2023 12:25:32 -0700 (PDT)
-Date: Tue, 4 Jul 2023 20:25:29 +0100
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E3AFB1650;
+	Tue,  4 Jul 2023 12:33:29 -0700 (PDT)
+Received: from usa.arm.com (e103737-lin.cambridge.arm.com [10.1.197.49])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 385D03F663;
+	Tue,  4 Jul 2023 12:32:46 -0700 (PDT)
 From: Sudeep Holla <sudeep.holla@arm.com>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: maz@kernel.org, oliver.upton@linux.dev,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, tabba@google.com, qperret@google.com,
-	will@kernel.org, catalin.marinas@arm.com, yuzenghui@huawei.com,
-	suzuki.poulose@arm.com, james.morse@arm.com, bgardon@google.com,
-	gshan@redhat.com, Sudeep Holla <sudeep.holla@arm.com>
-Subject: Re: [PATCH v3] KVM: arm64: Use BTI for nvhe
-Message-ID: <20230704192529.d4x2p7ndz2dc4q52@bogus>
-References: <20230530150845.2856828-1-smostafa@google.com>
- <20230704134136.a5znw4jupt5yp5kg@bogus>
- <ZKQqIYRrckLlXqkx@google.com>
- <20230704143339.cqrvntq7rmmb2on3@bogus>
- <ZKRIWJKn7aVSOvjd@google.com>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Sudeep Holla <sudeep.holla@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH] KVM: arm64: Handle kvm_arm_init failure correctly in finalize_pkvm
+Date: Tue,  4 Jul 2023 20:32:43 +0100
+Message-ID: <20230704193243.3300506-1-sudeep.holla@arm.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZKRIWJKn7aVSOvjd@google.com>
 
-On Tue, Jul 04, 2023 at 04:27:04PM +0000, Mostafa Saleh wrote:
-> Hi Sudeep,
-> 
-> On Tue, Jul 04, 2023 at 03:33:39PM +0100, Sudeep Holla wrote:
-> > Hi Mostafa,
-> > 
-> > On Tue, Jul 04, 2023 at 02:18:09PM +0000, Mostafa Saleh wrote:
-> > > Hi Sudeep,
-> > > 
-> > > On Tue, Jul 04, 2023 at 02:41:36PM +0100, Sudeep Holla wrote:
-> > > > On Tue, May 30, 2023 at 03:08:45PM +0000, Mostafa Saleh wrote:
-> > > > > CONFIG_ARM64_BTI_KERNEL compiles the kernel to support ARMv8.5-BTI.
-> > > > > However, the nvhe code doesn't make use of it as it doesn't map any
-> > > > > pages with Guarded Page(GP) bit.
-> > > > > 
-> > > > > kvm pgtable code is modified to map executable pages with GP bit
-> > > > > if BTI is enabled for the kernel.
-> > > > > 
-> > > > > At hyp init, SCTLR_EL2.BT is set to 1 to match EL1 configuration
-> > > > > (SCTLR_EL1.BT1) set in bti_enable().
-> > > > > 
-> > > > > One difference between kernel and nvhe code, is that the kernel maps
-> > > > > .text with GP while nvhe maps all the executable pages, this makes
-> > > > > nvhe code need to deal with special initialization code coming from
-> > > > > other executable sections (.idmap.text).
-> > > > > For this we need to add bti instruction at the beginning of
-> > > > > __kvm_handle_stub_hvc as it can be called by  __host_hvc through
-> > > > > branch instruction(br) and unlike SYM_FUNC_START, SYM_CODE_START
-> > > > > doesn’t add bti instruction at the beginning, and it can’t be modified
-> > > > > to add it as it is used with vector tables.
-> > > > > Another solution which is more intrusive is to convert
-> > > > > __kvm_handle_stub_hvc to a function and inject “bti jc” instead of
-> > > > > “bti c” in SYM_FUNC_START
-> > > > >
-> > > > 
-> > > > I was chasing a bug in linux-next yesterday with protected nVHE(pKVM) and
-> > > > cpuidle enabled. The system fails to boot. I just bisected the issue to this
-> > > > patch and also saw this patch landed in the linus tree yesterday/today.
-> > > 
-> > > One of the challenges of BTI is that we need to add explicit BTI instructions
-> > > for assembly code. I checked the code to make sure that nothing was missing,
-> > > but maybe this is not the case.
-> > > Can you please share more about the issue (is ESR a Branch Target Exception,
-> > > call stack...) if possible.
-> > 
-> > I haven't debugged it any further, just reported it as soon as I bisected it.
-> > Reverting this get back the booting system. I am not sure if anything is going
-> > wrong when the CPU is entering suspend(highly unlikely in normal scenario but
-> > I am not so sure with pKVM trapping these PSCI calls now) or when it is woken
-> > up and resuming back. IIUC this now will happen via kvm_hyp_cpu_resume->
-> > __kvm_hyp_init_cpu->___kvm_hyp_init. 
-> 
-> Thanks a lot for the information.
-> 
-> I checked this now, and I believe I found an issue. I see that __kvm_hyp_init_cpu
-> calls kvm_host_psci_cpu_entry indirectly and there is no BTI there.
-> I think this is the only C function that needs special handling.
->
+Currently there is no synchronisation between finalize_pkvm() and
+kvm_arm_init() initcalls. The finalize_pkvm() proceeds happily even if
+kvm_arm_init() fails resulting in the following warning on all the CPUs
+and eventually a HYP panic:
 
-So it is in the wake up path. Thanks for the description, now I understand
-the issue and fix better.
+  | kvm [1]: IPA Size Limit: 48 bits
+  | kvm [1]: Failed to init hyp memory protection
+  | kvm [1]: error initializing Hyp mode: -22
+  |
+  | <snip>
+  |
+  | WARNING: CPU: 0 PID: 0 at arch/arm64/kvm/pkvm.c:226 _kvm_host_prot_finalize+0x30/0x50
+  | Modules linked in:
+  | CPU: 0 PID: 0 Comm: swapper/0 Not tainted 6.4.0 #237
+  | Hardware name: FVP Base RevC (DT)
+  | pstate: 634020c5 (nZCv daIF +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
+  | pc : _kvm_host_prot_finalize+0x30/0x50
+  | lr : __flush_smp_call_function_queue+0xd8/0x230
+  |
+  | Call trace:
+  |  _kvm_host_prot_finalize+0x3c/0x50
+  |  on_each_cpu_cond_mask+0x3c/0x6c
+  |  pkvm_drop_host_privileges+0x4c/0x78
+  |  finalize_pkvm+0x3c/0x5c
+  |  do_one_initcall+0xcc/0x240
+  |  do_initcall_level+0x8c/0xac
+  |  do_initcalls+0x54/0x94
+  |  do_basic_setup+0x1c/0x28
+  |  kernel_init_freeable+0x100/0x16c
+  |  kernel_init+0x20/0x1a0
+  |  ret_from_fork+0x10/0x20
+  | Failed to finalize Hyp protection: -22
+  |     dtb=fvp-base-revc.dtb
+  | kvm [95]: nVHE hyp BUG at: arch/arm64/kvm/hyp/nvhe/mem_protect.c:540!
+  | kvm [95]: nVHE call trace:
+  | kvm [95]:  [<ffff800081052984>] __kvm_nvhe_hyp_panic+0xac/0xf8
+  | kvm [95]:  [<ffff800081059644>] __kvm_nvhe_handle_host_mem_abort+0x1a0/0x2ac
+  | kvm [95]:  [<ffff80008105511c>] __kvm_nvhe_handle_trap+0x4c/0x160
+  | kvm [95]:  [<ffff8000810540fc>] __kvm_nvhe___skip_pauth_save+0x4/0x4
+  | kvm [95]: ---[ end nVHE call trace ]---
+  | kvm [95]: Hyp Offset: 0xfffe8db00ffa0000
+  | Kernel panic - not syncing: HYP panic:
+  | PS:a34023c9 PC:0000f250710b973c ESR:00000000f2000800
+  | FAR:ffff000800cb00d0 HPFAR:000000000880cb00 PAR:0000000000000000
+  | VCPU:0000000000000000
+  | CPU: 3 PID: 95 Comm: kworker/u16:2 Tainted: G        W          6.4.0 #237
+  | Hardware name: FVP Base RevC (DT)
+  | Workqueue: rpciod rpc_async_schedule
+  | Call trace:
+  |  dump_backtrace+0xec/0x108
+  |  show_stack+0x18/0x2c
+  |  dump_stack_lvl+0x50/0x68
+  |  dump_stack+0x18/0x24
+  |  panic+0x138/0x33c
+  |  nvhe_hyp_panic_handler+0x100/0x184
+  |  new_slab+0x23c/0x54c
+  |  ___slab_alloc+0x3e4/0x770
+  |  kmem_cache_alloc_node+0x1f0/0x278
+  |  __alloc_skb+0xdc/0x294
+  |  tcp_stream_alloc_skb+0x2c/0xf0
+  |  tcp_sendmsg_locked+0x3d0/0xda4
+  |  tcp_sendmsg+0x38/0x5c
+  |  inet_sendmsg+0x44/0x60
+  |  sock_sendmsg+0x1c/0x34
+  |  xprt_sock_sendmsg+0xdc/0x274
+  |  xs_tcp_send_request+0x1ac/0x28c
+  |  xprt_transmit+0xcc/0x300
+  |  call_transmit+0x78/0x90
+  |  __rpc_execute+0x114/0x3d8
+  |  rpc_async_schedule+0x28/0x48
+  |  process_one_work+0x1d8/0x314
+  |  worker_thread+0x248/0x474
+  |  kthread+0xfc/0x184
+  |  ret_from_fork+0x10/0x20
+  | SMP: stopping secondary CPUs
+  | Kernel Offset: 0x57c5cb460000 from 0xffff800080000000
+  | PHYS_OFFSET: 0x80000000
+  | CPU features: 0x00000000,1035b7a3,ccfe773f
+  | Memory Limit: none
+  | ---[ end Kernel panic - not syncing: HYP panic:
+  | PS:a34023c9 PC:0000f250710b973c ESR:00000000f2000800
+  | FAR:ffff000800cb00d0 HPFAR:000000000880cb00 PAR:0000000000000000
+  | VCPU:0000000000000000 ]---
 
-> Can you please check if this solves the issue?
->
+Fix it by checking for the successfull initialisation of kvm_arm_init()
+in finalize_pkvm() before proceeding any futher.
 
-Yes, the below patch fixed the issue. Feel free to add when you post the
-formal patch.
+Fixes: 87727ba2bb05 ("KVM: arm64: Ensure CPU PMU probes before pKVM host de-privilege")
+Cc: Will Deacon <will@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: James Morse <james.morse@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Zenghui Yu <yuzenghui@huawei.com>
+Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+---
+ arch/arm64/include/asm/virt.h | 1 +
+ arch/arm64/kvm/arm.c          | 9 ++++++++-
+ arch/arm64/kvm/pkvm.c         | 2 +-
+ 3 files changed, 10 insertions(+), 2 deletions(-)
 
-Reported-and-Tested-by: Sudeep Holla <sudeep.holla@arm.com>
-
-> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-> index c87c63133e10..7df63f364c3c 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/host.S
-> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
-> @@ -297,3 +297,8 @@ SYM_CODE_START(__kvm_hyp_host_forward_smc)
->  
->         ret
->  SYM_CODE_END(__kvm_hyp_host_forward_smc)
-> +
-> +SYM_CODE_START(kvm_host_psci_cpu_entry)
-> +       bti j
-> +       b __kvm_host_psci_cpu_entry
-> +SYM_CODE_END(kvm_host_psci_cpu_entry)
-> diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-> index 08508783ec3d..24543d2a3490 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-> @@ -200,7 +200,7 @@ static int psci_system_suspend(u64 func_id, struct kvm_cpu_context *host_ctxt)
->                          __hyp_pa(init_params), 0);
->  }
->  
-> -asmlinkage void __noreturn kvm_host_psci_cpu_entry(bool is_cpu_on)
-> +asmlinkage void __noreturn __kvm_host_psci_cpu_entry(bool is_cpu_on)
->  {
->         struct psci_boot_args *boot_args;
->         struct kvm_cpu_context *host_ctxt;
-> 
-> 
-> > > Also, is this with CONFIG_ARM_PSCI_CPUIDLE?
-> > 
-> > Yes, basically the cpus can enter cpu_suspend which IIUC pKVM traps and
-> > handle for the host.
-> 
-> My current setup has no CONFIG_ARM_PSCI_CPUIDLE?, I will try to find
-> something I can test with.
->
-
-No worries, I can help until you find one.
-
-
-> > > 
-> > > > Not sure if this is something to do with the fact that pKVM skips to
-> > > > __kvm_handle_stub_hvc in __host_hvc.
-> > 
-> > Sorry, my bad. I meant pKVM skips calling __kvm_handle_stub_hvc in __host_hvc
-> > and jumps to __host_exit directly. Sorry for that, one wrong "to" changed the
-> > whole meaning.
-> 
-> I don't see an issue in this, as this path has no indirect branches.
->
-
-Understood.
-
+diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+index 5227db7640c8..261d6e9df2e1 100644
+--- a/arch/arm64/include/asm/virt.h
++++ b/arch/arm64/include/asm/virt.h
+@@ -78,6 +78,7 @@ extern u32 __boot_cpu_mode[2];
+ 
+ void __hyp_set_vectors(phys_addr_t phys_vector_base);
+ void __hyp_reset_vectors(void);
++bool is_kvm_arm_initialised(void);
+ 
+ DECLARE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
+ 
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 173abca08b53..4e0176b44af3 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -53,11 +53,16 @@ DECLARE_KVM_NVHE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+ 
+ DECLARE_KVM_NVHE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+ 
+-static bool vgic_present;
++static bool vgic_present, kvm_arm_initialised;
+ 
+ static DEFINE_PER_CPU(unsigned char, kvm_arm_hardware_enabled);
+ DEFINE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+ 
++bool is_kvm_arm_initialised(void)
++{
++	return kvm_arm_initialised;
++}
++
+ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
+ {
+ 	return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
+@@ -2484,6 +2489,8 @@ static __init int kvm_arm_init(void)
+ 	if (err)
+ 		goto out_subs;
+ 
++	kvm_arm_initialised = true;
++
+ 	return 0;
+ 
+ out_subs:
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index 994a494703c3..6ff3ec18c925 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -244,7 +244,7 @@ static int __init finalize_pkvm(void)
+ {
+ 	int ret;
+ 
+-	if (!is_protected_kvm_enabled())
++	if (!is_protected_kvm_enabled() || !is_kvm_arm_initialised())
+ 		return 0;
+ 
+ 	/*
 -- 
-Regards,
-Sudeep
+2.41.0
+
