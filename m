@@ -1,108 +1,182 @@
-Received: from out-56.mta1.migadu.com (out-56.mta1.migadu.com [95.215.58.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAFBC63C1
-	for <kvmarm@lists.linux.dev>; Tue,  4 Jul 2023 16:04:01 +0000 (UTC)
-Date: Tue, 4 Jul 2023 09:04:03 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1688486639;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Xg1CxT90wNmSWa/vx8SW5k6nUJUgbxG4tgKxda7745o=;
-	b=uaRPw79dm4tUwP/VcgTH/hskZNj+VzcQJ36RKXDXu0TGH2w7ty2bSyzUxwCF/MEH22YRL7
-	l8Wjxr9kN+IOFC1wPh7SbH0PJiTzddIGLKylgFpABhbXVZ6ot1UsqNrRfBhmyc3v2pUPSh
-	VyxXFHDBJClzHSI1N8Ie+KOtCG/u80Y=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-	KVMARM <kvmarm@lists.linux.dev>,
-	ARMLinux <linux-arm-kernel@lists.infradead.org>,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@google.com>,
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Suraj Jitindar Singh <surajjs@amazon.com>
-Subject: Re: [PATCH v4 1/4] KVM: arm64: Enable writable for ID_AA64DFR0_EL1
-Message-ID: <ZKRC80hb4hXwW8WK@thinky-boi>
-References: <20230607194554.87359-1-jingzhangos@google.com>
- <20230607194554.87359-2-jingzhangos@google.com>
- <ZJm+Kj0C5YySp055@linux.dev>
- <874jmjiumh.fsf@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 179A653B6
+	for <kvmarm@lists.linux.dev>; Tue,  4 Jul 2023 16:27:10 +0000 (UTC)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-3fbb07e7155so275605e9.0
+        for <kvmarm@lists.linux.dev>; Tue, 04 Jul 2023 09:27:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1688488029; x=1691080029;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=OwQr9W55X8RNR2CtPf2qZuGcHu62lyr7ZUFMcJnQdtM=;
+        b=dEpRBkMSbilzHcQr1TMq36A+As+SAUWyE6TsMGiKt2KbeS3xIsT0UMjIQP7a83WnQ5
+         hAzTGdi1L7TCDYZfNqN4VOGkKIrZVJeCiu0zGQ+PCHQeCWWV/aVPnnR3xfXpoC1AD+rK
+         1aZmz+VfUe3T/ILRj2BcIGe2ymiFj3YJLcnAtpprZwSysOC6eaYshs+VBhth48cCvfoN
+         pfKVKpLWAowNo+puq6121BYciZI7feJo4QY3UI/ux8+7lSUc26wQDxlIOK7RnoMW0Gdf
+         se3NJQuiFW6oQdHiSMwrS1H+xguvlnTTT4SKCpcxVbl4oLoBevwT9cznGXmS9NRry4Gg
+         Cn6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688488029; x=1691080029;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OwQr9W55X8RNR2CtPf2qZuGcHu62lyr7ZUFMcJnQdtM=;
+        b=mFZGBNaLIZeTWUHFyq+KtlMPmX6eqh/bGmXqfKNEDGvA69OhYqLwPMkIaGy7KFCVHx
+         wtASnfSEkFiB70JN6xX0eVg73/7/VHPssaz6KgwIOb7BMX+jKh4xPo8j1V80Xffw4wBA
+         W2IFW2zhvtziVlWGqovnjviC8T+imkYdABZKKg23gDRaMJdplqoZqnYs5hcxzKkCjG/X
+         ilIlJaicb9R8NyH50joCIX6+fWkaFu7tlP0b8S+mzY/UT8tgO+m1vgfc21pOhjupfE9f
+         L825A0miB3x2/e306JFJCUVAIDvRozisGYvRvwFzmzDgQ9JI1PARMFnjmJwQno+P+zx9
+         xkvQ==
+X-Gm-Message-State: ABy/qLamhWinlKpTYLkKKAi3dWe68L58J83UIj8DYXdQziYLGUv7BkA2
+	XHn3/7i+ebSdNn/MMwxmn9EpAw==
+X-Google-Smtp-Source: APBJJlE/AWwOljtrJpRMbdFlc2ytul4cxt3bN0oyBiY21F7m9kugng668rUy4tPk1a6xsNgtqZdjWg==
+X-Received: by 2002:a05:600c:4f49:b0:3f1:9a3d:4f7f with SMTP id m9-20020a05600c4f4900b003f19a3d4f7fmr79554wmq.1.1688488029067;
+        Tue, 04 Jul 2023 09:27:09 -0700 (PDT)
+Received: from google.com (44.232.78.34.bc.googleusercontent.com. [34.78.232.44])
+        by smtp.gmail.com with ESMTPSA id y19-20020a05600c365300b003fa8dbb7b5dsm26836778wmq.25.2023.07.04.09.27.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jul 2023 09:27:08 -0700 (PDT)
+Date: Tue, 4 Jul 2023 16:27:04 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Sudeep Holla <sudeep.holla@arm.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, tabba@google.com, qperret@google.com,
+	will@kernel.org, catalin.marinas@arm.com, yuzenghui@huawei.com,
+	suzuki.poulose@arm.com, james.morse@arm.com, bgardon@google.com,
+	gshan@redhat.com
+Subject: Re: [PATCH v3] KVM: arm64: Use BTI for nvhe
+Message-ID: <ZKRIWJKn7aVSOvjd@google.com>
+References: <20230530150845.2856828-1-smostafa@google.com>
+ <20230704134136.a5znw4jupt5yp5kg@bogus>
+ <ZKQqIYRrckLlXqkx@google.com>
+ <20230704143339.cqrvntq7rmmb2on3@bogus>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <874jmjiumh.fsf@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230704143339.cqrvntq7rmmb2on3@bogus>
 
-Hi Cornelia,
+Hi Sudeep,
 
-On Tue, Jul 04, 2023 at 05:06:30PM +0200, Cornelia Huck wrote:
-> On Mon, Jun 26 2023, Oliver Upton <oliver.upton@linux.dev> wrote:
+On Tue, Jul 04, 2023 at 03:33:39PM +0100, Sudeep Holla wrote:
+> Hi Mostafa,
 > 
-> > On Wed, Jun 07, 2023 at 07:45:51PM +0000, Jing Zhang wrote:
-> >> +	brps = FIELD_GET(ID_AA64DFR0_EL1_BRPs_MASK, val);
-> >> +	ctx_cmps = FIELD_GET(ID_AA64DFR0_EL1_CTX_CMPs_MASK, val);
-> >> +	if (ctx_cmps > brps)
-> >> +		return -EINVAL;
-> >> +
-> >
-> > I'm not fully convinced on the need to do this sort of cross-field
-> > validation... I think it is probably more trouble than it is worth. If
-> > userspace writes something illogical to the register, oh well. All we
-> > should care about is that the advertised feature set is a subset of
-> > what's supported by the host.
-> >
-> > The series doesn't even do complete sanity checking, and instead works
-> > on a few cherry-picked examples. AA64PFR0.EL{0-3} would also require
-> > special handling depending on how pedantic you're feeling. AArch32
-> > support at a higher exception level implies AArch32 support at all lower
-> > exception levels.
-> >
-> > But that isn't a suggestion to implement it, more of a suggestion to
-> > just avoid the problem as a whole.
+> On Tue, Jul 04, 2023 at 02:18:09PM +0000, Mostafa Saleh wrote:
+> > Hi Sudeep,
+> > 
+> > On Tue, Jul 04, 2023 at 02:41:36PM +0100, Sudeep Holla wrote:
+> > > On Tue, May 30, 2023 at 03:08:45PM +0000, Mostafa Saleh wrote:
+> > > > CONFIG_ARM64_BTI_KERNEL compiles the kernel to support ARMv8.5-BTI.
+> > > > However, the nvhe code doesn't make use of it as it doesn't map any
+> > > > pages with Guarded Page(GP) bit.
+> > > > 
+> > > > kvm pgtable code is modified to map executable pages with GP bit
+> > > > if BTI is enabled for the kernel.
+> > > > 
+> > > > At hyp init, SCTLR_EL2.BT is set to 1 to match EL1 configuration
+> > > > (SCTLR_EL1.BT1) set in bti_enable().
+> > > > 
+> > > > One difference between kernel and nvhe code, is that the kernel maps
+> > > > .text with GP while nvhe maps all the executable pages, this makes
+> > > > nvhe code need to deal with special initialization code coming from
+> > > > other executable sections (.idmap.text).
+> > > > For this we need to add bti instruction at the beginning of
+> > > > __kvm_handle_stub_hvc as it can be called by  __host_hvc through
+> > > > branch instruction(br) and unlike SYM_FUNC_START, SYM_CODE_START
+> > > > doesn’t add bti instruction at the beginning, and it can’t be modified
+> > > > to add it as it is used with vector tables.
+> > > > Another solution which is more intrusive is to convert
+> > > > __kvm_handle_stub_hvc to a function and inject “bti jc” instead of
+> > > > “bti c” in SYM_FUNC_START
+> > > >
+> > > 
+> > > I was chasing a bug in linux-next yesterday with protected nVHE(pKVM) and
+> > > cpuidle enabled. The system fails to boot. I just bisected the issue to this
+> > > patch and also saw this patch landed in the linus tree yesterday/today.
+> > 
+> > One of the challenges of BTI is that we need to add explicit BTI instructions
+> > for assembly code. I checked the code to make sure that nothing was missing,
+> > but maybe this is not the case.
+> > Can you please share more about the issue (is ESR a Branch Target Exception,
+> > call stack...) if possible.
 > 
-> Generally speaking, how much effort do we want to invest to prevent
-> userspace from doing dumb things? "Make sure we advertise a subset of
-> features of what the host supports" and "disallow writing values that
-> are not allowed by the architecture in the first place" seem reasonable,
-> but if userspace wants to create weird frankencpus[1], should it be
-> allowed to break the guest and get to keep the pieces?
+> I haven't debugged it any further, just reported it as soon as I bisected it.
+> Reverting this get back the booting system. I am not sure if anything is going
+> wrong when the CPU is entering suspend(highly unlikely in normal scenario but
+> I am not so sure with pKVM trapping these PSCI calls now) or when it is woken
+> up and resuming back. IIUC this now will happen via kvm_hyp_cpu_resume->
+> __kvm_hyp_init_cpu->___kvm_hyp_init. 
 
-What I'm specifically objecting to is having KVM do sanity checks across
-multiple fields. That requires explicit, per-field plumbing that will
-eventually become a tangled mess that Marc and I will have to maintain.
-The context-aware breakpoints is one example, as is ensuring SVE is
-exposed iff FP is too. In all likelihood we'll either get some part of
-this wrong, or miss a required check altogether.
+Thanks a lot for the information.
 
-Modulo a few exceptions to this case, I think per-field validation is
-going to cover almost everything we're worried about, and we get that
-largely for free from arm64_check_features().
+I checked this now, and I believe I found an issue. I see that __kvm_hyp_init_cpu
+calls kvm_host_psci_cpu_entry indirectly and there is no BTI there.
+I think this is the only C function that needs special handling.
 
-> I'd be more in favour to rely on userspace to configure something that
-> is actually usable; it needs to sanitize any user-provided configuration
-> anyway.
+Can you please check if this solves the issue?
 
-Just want to make sure I understand your sentiment here, you'd be in
-favor of the more robust sanitization?
+diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
+index c87c63133e10..7df63f364c3c 100644
+--- a/arch/arm64/kvm/hyp/nvhe/host.S
++++ b/arch/arm64/kvm/hyp/nvhe/host.S
+@@ -297,3 +297,8 @@ SYM_CODE_START(__kvm_hyp_host_forward_smc)
+ 
+        ret
+ SYM_CODE_END(__kvm_hyp_host_forward_smc)
++
++SYM_CODE_START(kvm_host_psci_cpu_entry)
++       bti j
++       b __kvm_host_psci_cpu_entry
++SYM_CODE_END(kvm_host_psci_cpu_entry)
+diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
+index 08508783ec3d..24543d2a3490 100644
+--- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
++++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
+@@ -200,7 +200,7 @@ static int psci_system_suspend(u64 func_id, struct kvm_cpu_context *host_ctxt)
+                         __hyp_pa(init_params), 0);
+ }
+ 
+-asmlinkage void __noreturn kvm_host_psci_cpu_entry(bool is_cpu_on)
++asmlinkage void __noreturn __kvm_host_psci_cpu_entry(bool is_cpu_on)
+ {
+        struct psci_boot_args *boot_args;
+        struct kvm_cpu_context *host_ctxt;
 
-> [1] I think userspace will end up creating frankencpus in any case, but
-> at least it should be the kind that doesn't look out of place in the
-> subway if you dress it in proper clothing.
 
-I mean, KVM already advertises a frankencpu in the first place, so we're
-off to a good start :)
+> > Also, is this with CONFIG_ARM_PSCI_CPUIDLE?
+> 
+> Yes, basically the cpus can enter cpu_suspend which IIUC pKVM traps and
+> handle for the host.
 
---
+My current setup has no CONFIG_ARM_PSCI_CPUIDLE?, I will try to find
+something I can test with.
+
+> > 
+> > > Not sure if this is something to do with the fact that pKVM skips to
+> > > __kvm_handle_stub_hvc in __host_hvc.
+> 
+> Sorry, my bad. I meant pKVM skips calling __kvm_handle_stub_hvc in __host_hvc
+> and jumps to __host_exit directly. Sorry for that, one wrong "to" changed the
+> whole meaning.
+
+I don't see an issue in this, as this path has no indirect branches.
+
+> > __kvm_handle_stub_hvc is called from __host_hvc with "br x5"
+> > That's why "bti j" was added at the beginning of __kvm_handle_stub_hvc,
+> > so this should be fine.
+> >
+> 
+> Yes I saw that and understood that but I wanted to tell the above which went
+> horribly wrong before.
+> 
+
 Thanks,
-Oliver
+Mostafa
