@@ -1,192 +1,176 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944196128
-	for <kvmarm@lists.linux.dev>; Tue,  4 Jul 2023 19:32:50 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E3AFB1650;
-	Tue,  4 Jul 2023 12:33:29 -0700 (PDT)
-Received: from usa.arm.com (e103737-lin.cambridge.arm.com [10.1.197.49])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 385D03F663;
-	Tue,  4 Jul 2023 12:32:46 -0700 (PDT)
-From: Sudeep Holla <sudeep.holla@arm.com>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Sudeep Holla <sudeep.holla@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH] KVM: arm64: Handle kvm_arm_init failure correctly in finalize_pkvm
-Date: Tue,  4 Jul 2023 20:32:43 +0100
-Message-ID: <20230704193243.3300506-1-sudeep.holla@arm.com>
-X-Mailer: git-send-email 2.41.0
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37EC436C
+	for <kvmarm@lists.linux.dev>; Tue,  4 Jul 2023 23:23:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688512999;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4PCpsOElklGvTmmWH0OQRonwleLOQrzWZC/RGYQTYPQ=;
+	b=Vk17hLkYP+wOQPkcJOBZCYcxM/zpqLXnZtwEu/Ecx0hG/BqHefzFbo4JCQPZp0YVyJciBa
+	bq+qQOMUYoj/4VirRnbR7zCIK/XADcmsJl1/mn/bosmgrSQuDLD7leihWO80znhUa6b6Ov
+	pzRWYIR1riBHnAWEEFPvB1VYUcMbqLc=
+Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
+ [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-5-L80_AdhWMUmTGOURK31z2A-1; Tue, 04 Jul 2023 19:23:17 -0400
+X-MC-Unique: L80_AdhWMUmTGOURK31z2A-1
+Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-66a44bf4651so156398b3a.1
+        for <kvmarm@lists.linux.dev>; Tue, 04 Jul 2023 16:23:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688512997; x=1691104997;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4PCpsOElklGvTmmWH0OQRonwleLOQrzWZC/RGYQTYPQ=;
+        b=hGYcov7onSFeBO9siPr2450Qsdq4Ww5Hs1LPnGnWAoa8rx+S7OSBXLjHroyvQJdAYe
+         OkZ0Lz6aIyK/d++CmTGU3+6TbBVqAWTont2Ww5AYaPtTITDyCyQgN1Q9DBjhT3YzN4wf
+         nQgDVDpEzkd4TV+UXou2OaBUwMGS9H+FYflD3bemubo53FV63UG18OnHp1x4+a10NyQ4
+         5PltznHmHQcEkQAz0hqOluiJdW2sgBTcG1CGhC0d8uknbJKCiM1zFYWkfbfHa+DKPI4b
+         J61HQtJ0KKMoTuIJLWvgg2r7K6cEJH4nLKKI9mSxXaiLQjFL7zo3e7gK+DI60X20YnTq
+         zfcw==
+X-Gm-Message-State: ABy/qLZvGNBgjKObQ/UPIlTXjD9Puv0hOAbHzWzabx8jL1AiHkX/V2EU
+	97N923aK7Ks6Fuk1TX1Ok9cNP7Z0kuzVrwwR90gx0Rnqm1hJVYGSdAhMdkPSjX9h9SPIZatmZai
+	DkYvx9X4Toc1jgXtE
+X-Received: by 2002:a05:6a00:1ca9:b0:682:5e8f:d8ba with SMTP id y41-20020a056a001ca900b006825e8fd8bamr724746pfw.11.1688512996830;
+        Tue, 04 Jul 2023 16:23:16 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlG0UBpOEK5SPsF31xr5f/9Wg1BBxO8IhEOWDLX7lSVKCKwsJxsntJWPkQLzTCSx4pQPuvCDfA==
+X-Received: by 2002:a05:6a00:1ca9:b0:682:5e8f:d8ba with SMTP id y41-20020a056a001ca900b006825e8fd8bamr724711pfw.11.1688512996441;
+        Tue, 04 Jul 2023 16:23:16 -0700 (PDT)
+Received: from ?IPV6:2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5? ([2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5])
+        by smtp.gmail.com with ESMTPSA id bn10-20020a056a00324a00b0065980654baasm16109591pfb.130.2023.07.04.16.23.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Jul 2023 16:23:15 -0700 (PDT)
+Message-ID: <b977abe4-71b9-daa1-da1b-b111f0afbe51@redhat.com>
+Date: Wed, 5 Jul 2023 09:23:05 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [RESEND PATCH v5 01/11] KVM: Rename kvm_arch_flush_remote_tlb()
+ to kvm_arch_flush_remote_tlbs()
+To: Raghavendra Rao Ananta <rananta@google.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
+ James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Sean Christopherson <seanjc@google.com>, Huacai Chen
+ <chenhuacai@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+ Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>,
+ Jing Zhang <jingzhangos@google.com>, Colton Lewis <coltonlewis@google.com>,
+ David Matlack <dmatlack@google.com>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20230621175002.2832640-1-rananta@google.com>
+ <20230621175002.2832640-2-rananta@google.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20230621175002.2832640-2-rananta@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Currently there is no synchronisation between finalize_pkvm() and
-kvm_arm_init() initcalls. The finalize_pkvm() proceeds happily even if
-kvm_arm_init() fails resulting in the following warning on all the CPUs
-and eventually a HYP panic:
+On 6/22/23 03:49, Raghavendra Rao Ananta wrote:
+> From: David Matlack <dmatlack@google.com>
+> 
+> Rename kvm_arch_flush_remote_tlb() and the associated macro
+> __KVM_HAVE_ARCH_FLUSH_REMOTE_TLB to kvm_arch_flush_remote_tlbs() and
+> __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS respectively.
+> 
+> Making the name plural matches kvm_flush_remote_tlbs() and makes it more
+> clear that this function can affect more than one remote TLB.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>   arch/mips/include/asm/kvm_host.h | 4 ++--
+>   arch/mips/kvm/mips.c             | 2 +-
+>   arch/x86/include/asm/kvm_host.h  | 4 ++--
+>   include/linux/kvm_host.h         | 4 ++--
+>   virt/kvm/kvm_main.c              | 2 +-
+>   5 files changed, 8 insertions(+), 8 deletions(-)
+> 
 
-  | kvm [1]: IPA Size Limit: 48 bits
-  | kvm [1]: Failed to init hyp memory protection
-  | kvm [1]: error initializing Hyp mode: -22
-  |
-  | <snip>
-  |
-  | WARNING: CPU: 0 PID: 0 at arch/arm64/kvm/pkvm.c:226 _kvm_host_prot_finalize+0x30/0x50
-  | Modules linked in:
-  | CPU: 0 PID: 0 Comm: swapper/0 Not tainted 6.4.0 #237
-  | Hardware name: FVP Base RevC (DT)
-  | pstate: 634020c5 (nZCv daIF +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
-  | pc : _kvm_host_prot_finalize+0x30/0x50
-  | lr : __flush_smp_call_function_queue+0xd8/0x230
-  |
-  | Call trace:
-  |  _kvm_host_prot_finalize+0x3c/0x50
-  |  on_each_cpu_cond_mask+0x3c/0x6c
-  |  pkvm_drop_host_privileges+0x4c/0x78
-  |  finalize_pkvm+0x3c/0x5c
-  |  do_one_initcall+0xcc/0x240
-  |  do_initcall_level+0x8c/0xac
-  |  do_initcalls+0x54/0x94
-  |  do_basic_setup+0x1c/0x28
-  |  kernel_init_freeable+0x100/0x16c
-  |  kernel_init+0x20/0x1a0
-  |  ret_from_fork+0x10/0x20
-  | Failed to finalize Hyp protection: -22
-  |     dtb=fvp-base-revc.dtb
-  | kvm [95]: nVHE hyp BUG at: arch/arm64/kvm/hyp/nvhe/mem_protect.c:540!
-  | kvm [95]: nVHE call trace:
-  | kvm [95]:  [<ffff800081052984>] __kvm_nvhe_hyp_panic+0xac/0xf8
-  | kvm [95]:  [<ffff800081059644>] __kvm_nvhe_handle_host_mem_abort+0x1a0/0x2ac
-  | kvm [95]:  [<ffff80008105511c>] __kvm_nvhe_handle_trap+0x4c/0x160
-  | kvm [95]:  [<ffff8000810540fc>] __kvm_nvhe___skip_pauth_save+0x4/0x4
-  | kvm [95]: ---[ end nVHE call trace ]---
-  | kvm [95]: Hyp Offset: 0xfffe8db00ffa0000
-  | Kernel panic - not syncing: HYP panic:
-  | PS:a34023c9 PC:0000f250710b973c ESR:00000000f2000800
-  | FAR:ffff000800cb00d0 HPFAR:000000000880cb00 PAR:0000000000000000
-  | VCPU:0000000000000000
-  | CPU: 3 PID: 95 Comm: kworker/u16:2 Tainted: G        W          6.4.0 #237
-  | Hardware name: FVP Base RevC (DT)
-  | Workqueue: rpciod rpc_async_schedule
-  | Call trace:
-  |  dump_backtrace+0xec/0x108
-  |  show_stack+0x18/0x2c
-  |  dump_stack_lvl+0x50/0x68
-  |  dump_stack+0x18/0x24
-  |  panic+0x138/0x33c
-  |  nvhe_hyp_panic_handler+0x100/0x184
-  |  new_slab+0x23c/0x54c
-  |  ___slab_alloc+0x3e4/0x770
-  |  kmem_cache_alloc_node+0x1f0/0x278
-  |  __alloc_skb+0xdc/0x294
-  |  tcp_stream_alloc_skb+0x2c/0xf0
-  |  tcp_sendmsg_locked+0x3d0/0xda4
-  |  tcp_sendmsg+0x38/0x5c
-  |  inet_sendmsg+0x44/0x60
-  |  sock_sendmsg+0x1c/0x34
-  |  xprt_sock_sendmsg+0xdc/0x274
-  |  xs_tcp_send_request+0x1ac/0x28c
-  |  xprt_transmit+0xcc/0x300
-  |  call_transmit+0x78/0x90
-  |  __rpc_execute+0x114/0x3d8
-  |  rpc_async_schedule+0x28/0x48
-  |  process_one_work+0x1d8/0x314
-  |  worker_thread+0x248/0x474
-  |  kthread+0xfc/0x184
-  |  ret_from_fork+0x10/0x20
-  | SMP: stopping secondary CPUs
-  | Kernel Offset: 0x57c5cb460000 from 0xffff800080000000
-  | PHYS_OFFSET: 0x80000000
-  | CPU features: 0x00000000,1035b7a3,ccfe773f
-  | Memory Limit: none
-  | ---[ end Kernel panic - not syncing: HYP panic:
-  | PS:a34023c9 PC:0000f250710b973c ESR:00000000f2000800
-  | FAR:ffff000800cb00d0 HPFAR:000000000880cb00 PAR:0000000000000000
-  | VCPU:0000000000000000 ]---
+Reviewed-by: Gavin Shan <gshan@redhat.com>
 
-Fix it by checking for the successfull initialisation of kvm_arm_init()
-in finalize_pkvm() before proceeding any futher.
-
-Fixes: 87727ba2bb05 ("KVM: arm64: Ensure CPU PMU probes before pKVM host de-privilege")
-Cc: Will Deacon <will@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: James Morse <james.morse@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Zenghui Yu <yuzenghui@huawei.com>
-Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
----
- arch/arm64/include/asm/virt.h | 1 +
- arch/arm64/kvm/arm.c          | 9 ++++++++-
- arch/arm64/kvm/pkvm.c         | 2 +-
- 3 files changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-index 5227db7640c8..261d6e9df2e1 100644
---- a/arch/arm64/include/asm/virt.h
-+++ b/arch/arm64/include/asm/virt.h
-@@ -78,6 +78,7 @@ extern u32 __boot_cpu_mode[2];
- 
- void __hyp_set_vectors(phys_addr_t phys_vector_base);
- void __hyp_reset_vectors(void);
-+bool is_kvm_arm_initialised(void);
- 
- DECLARE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
- 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 173abca08b53..4e0176b44af3 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -53,11 +53,16 @@ DECLARE_KVM_NVHE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
- 
- DECLARE_KVM_NVHE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
- 
--static bool vgic_present;
-+static bool vgic_present, kvm_arm_initialised;
- 
- static DEFINE_PER_CPU(unsigned char, kvm_arm_hardware_enabled);
- DEFINE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
- 
-+bool is_kvm_arm_initialised(void)
-+{
-+	return kvm_arm_initialised;
-+}
-+
- int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
- {
- 	return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
-@@ -2484,6 +2489,8 @@ static __init int kvm_arm_init(void)
- 	if (err)
- 		goto out_subs;
- 
-+	kvm_arm_initialised = true;
-+
- 	return 0;
- 
- out_subs:
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 994a494703c3..6ff3ec18c925 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -244,7 +244,7 @@ static int __init finalize_pkvm(void)
- {
- 	int ret;
- 
--	if (!is_protected_kvm_enabled())
-+	if (!is_protected_kvm_enabled() || !is_kvm_arm_initialised())
- 		return 0;
- 
- 	/*
--- 
-2.41.0
+> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
+> index 957121a495f0b..1473cf923ee37 100644
+> --- a/arch/mips/include/asm/kvm_host.h
+> +++ b/arch/mips/include/asm/kvm_host.h
+> @@ -896,7 +896,7 @@ static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+>   static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+>   static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+>   
+> -#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLB
+> -int kvm_arch_flush_remote_tlb(struct kvm *kvm);
+> +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
+> +int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
+>   
+>   #endif /* __MIPS_KVM_HOST_H__ */
+> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+> index 884be4ef99dc1..6e34bbe244462 100644
+> --- a/arch/mips/kvm/mips.c
+> +++ b/arch/mips/kvm/mips.c
+> @@ -981,7 +981,7 @@ void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
+>   
+>   }
+>   
+> -int kvm_arch_flush_remote_tlb(struct kvm *kvm)
+> +int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
+>   {
+>   	kvm_mips_callbacks->prepare_flush_shadow(kvm);
+>   	return 1;
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index fb9d1f2d6136c..f6e3aa617d8b8 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1794,8 +1794,8 @@ static inline struct kvm *kvm_arch_alloc_vm(void)
+>   #define __KVM_HAVE_ARCH_VM_FREE
+>   void kvm_arch_free_vm(struct kvm *kvm);
+>   
+> -#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLB
+> -static inline int kvm_arch_flush_remote_tlb(struct kvm *kvm)
+> +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
+> +static inline int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
+>   {
+>   	if (kvm_x86_ops.flush_remote_tlbs &&
+>   	    !static_call(kvm_x86_flush_remote_tlbs)(kvm))
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 0e571e973bc28..95c3e364f24b4 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1477,8 +1477,8 @@ static inline void kvm_arch_free_vm(struct kvm *kvm)
+>   }
+>   #endif
+>   
+> -#ifndef __KVM_HAVE_ARCH_FLUSH_REMOTE_TLB
+> -static inline int kvm_arch_flush_remote_tlb(struct kvm *kvm)
+> +#ifndef __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
+> +static inline int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
+>   {
+>   	return -ENOTSUPP;
+>   }
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index cb5c13eee1936..a475ff9ef156d 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -366,7 +366,7 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
+>   	 * kvm_make_all_cpus_request() reads vcpu->mode. We reuse that
+>   	 * barrier here.
+>   	 */
+> -	if (!kvm_arch_flush_remote_tlb(kvm)
+> +	if (!kvm_arch_flush_remote_tlbs(kvm)
+>   	    || kvm_make_all_cpus_request(kvm, KVM_REQ_TLB_FLUSH))
+>   		++kvm->stat.generic.remote_tlb_flush;
+>   }
 
