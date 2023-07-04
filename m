@@ -1,68 +1,84 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D011612C
-	for <kvmarm@lists.linux.dev>; Tue,  4 Jul 2023 13:41:46 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E97351480;
-	Tue,  4 Jul 2023 06:42:22 -0700 (PDT)
-Received: from bogus (e103737-lin.cambridge.arm.com [10.1.197.49])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9523B3F663;
-	Tue,  4 Jul 2023 06:41:38 -0700 (PDT)
-Date: Tue, 4 Jul 2023 14:41:36 +0100
-From: Sudeep Holla <sudeep.holla@arm.com>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: maz@kernel.org, oliver.upton@linux.dev,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, tabba@google.com, qperret@google.com,
-	will@kernel.org, catalin.marinas@arm.com, yuzenghui@huawei.com,
-	suzuki.poulose@arm.com, james.morse@arm.com, bgardon@google.com,
-	gshan@redhat.com
-Subject: Re: [PATCH v3] KVM: arm64: Use BTI for nvhe
-Message-ID: <20230704134136.a5znw4jupt5yp5kg@bogus>
-References: <20230530150845.2856828-1-smostafa@google.com>
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37BC12575
+	for <kvmarm@lists.linux.dev>; Tue,  4 Jul 2023 14:11:39 +0000 (UTC)
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-55b5a3915f5so2716395a12.0
+        for <kvmarm@lists.linux.dev>; Tue, 04 Jul 2023 07:11:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688479899; x=1691071899;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gVWqdQakMSUsv5oj8nSg9QczQrmrUO38b67MhpmWVYY=;
+        b=dtC1ItQT3bOdvrLdBB5GlaktkLycKL2qXYMZGyPYbRcPKAINuXOdSi2pqWbjq0X2W8
+         FJjgtv2EtoiykvX97reTkJxxZeuJs3WZOwefzGzDbU0evEKjgmI/jUYrfDmodLb5ujZR
+         IDNuDDfIbzp9KEFSDRldGRlbp37xZsMcZmNqVi9edx2cPqEMJO5BiRTJMS9MWVb9DiUk
+         CAVwBPqCfqHq5fO0w4TfTFcAMhpG6snZISS2MwRRtMOQs0nMwzjWybJGo8z+MHUmiegG
+         l2ufETKraXLzTX+a+KbDouUu1MKuuAcKyRPT3ygmk8y0Y8+JVJecVFqx6Ajudq148KrX
+         5cfg==
+X-Gm-Message-State: AC+VfDy0OfXQfczz8xHeppXM8/zuPF2SdYr+wdVNMMizEV+QEFEcWS3+
+	1GFurOLV9whMef9S7tTRCZw=
+X-Google-Smtp-Source: ACHHUZ4mKI72SACTkxfTB3tQ6Ji13XYniCvY2MHAxg/n5JeT4DfHtHYI7qLyK+rPyEqNoEPYk2/cWg==
+X-Received: by 2002:a05:6a20:1456:b0:12c:d9cc:340e with SMTP id a22-20020a056a20145600b0012cd9cc340emr10681222pzi.5.1688479899229;
+        Tue, 04 Jul 2023 07:11:39 -0700 (PDT)
+Received: from [192.168.50.14] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id e26-20020a62aa1a000000b00682a9325ffcsm1178509pff.5.2023.07.04.07.11.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Jul 2023 07:11:38 -0700 (PDT)
+Message-ID: <739807cf-4551-4760-83e0-a94026b5c1b8@acm.org>
+Date: Tue, 4 Jul 2023 07:11:37 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [linux-next:master] BUILD REGRESSION
+ 296d53d8f84ce50ffaee7d575487058c8d437335
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>, kernel test robot <lkp@intel.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ Linux Memory Management List <linux-mm@kvack.org>,
+ kunit-dev@googlegroups.com, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-parisc@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-riscv@lists.infradead.org, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <202307032309.v4K1IBoR-lkp@intel.com>
+ <7d3d61c694c0e57b096ff7af6277ed6b@kernel.org>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <7d3d61c694c0e57b096ff7af6277ed6b@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230530150845.2856828-1-smostafa@google.com>
 
-On Tue, May 30, 2023 at 03:08:45PM +0000, Mostafa Saleh wrote:
-> CONFIG_ARM64_BTI_KERNEL compiles the kernel to support ARMv8.5-BTI.
-> However, the nvhe code doesn't make use of it as it doesn't map any
-> pages with Guarded Page(GP) bit.
+On 7/4/23 00:15, Marc Zyngier wrote:
+> On 2023-07-03 16:11, kernel test robot wrote:
+>> tree/branch:
+>> https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
+>> master
+>> branch HEAD: 296d53d8f84ce50ffaee7d575487058c8d437335  Add linux-next
+>> specific files for 20230703
+>>
 > 
-> kvm pgtable code is modified to map executable pages with GP bit
-> if BTI is enabled for the kernel.
+> [...]
 > 
-> At hyp init, SCTLR_EL2.BT is set to 1 to match EL1 configuration
-> (SCTLR_EL1.BT1) set in bti_enable().
+>> Unverified Error/Warning (likely false positive, please contact us if
+>> interested):
+>>
+>> arch/arm64/kvm/mmu.c:147:3-9: preceding lock on line 140
 > 
-> One difference between kernel and nvhe code, is that the kernel maps
-> .text with GP while nvhe maps all the executable pages, this makes
-> nvhe code need to deal with special initialization code coming from
-> other executable sections (.idmap.text).
-> For this we need to add bti instruction at the beginning of
-> __kvm_handle_stub_hvc as it can be called by  __host_hvc through
-> branch instruction(br) and unlike SYM_FUNC_START, SYM_CODE_START
-> doesn’t add bti instruction at the beginning, and it can’t be modified
-> to add it as it is used with vector tables.
-> Another solution which is more intrusive is to convert
-> __kvm_handle_stub_hvc to a function and inject “bti jc” instead of
-> “bti c” in SYM_FUNC_START
->
+> This *is* a false positive. The function is entered with a lock
+> held, it will exit with the lock held as well. Inside the body
+> of the function, we release and reacquire the lock.
 
-I was chasing a bug in linux-next yesterday with protected nVHE(pKVM) and
-cpuidle enabled. The system fails to boot. I just bisected the issue to this
-patch and also saw this patch landed in the linus tree yesterday/today.
-Not sure if this is something to do with the fact that pKVM skips to
-__kvm_handle_stub_hvc in __host_hvc.
+Which tool reported this message? If this message was reported by 
+sparse, has it been considered to add a __must_hold() annotation?
 
-Let me know if you want be to try something.
+Thanks,
 
--- 
-Regards,
-Sudeep
+Bart.
+
