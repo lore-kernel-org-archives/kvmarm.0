@@ -1,44 +1,62 @@
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 059F420E8
-	for <kvmarm@lists.linux.dev>; Wed,  5 Jul 2023 08:07:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688544476; x=1720080476;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Cn1WBv4JrMsrgoasE/lasO/n0SnRwlADo/SoWnSzf8M=;
-  b=lsZ5SoVwR3idIfCHjkIkIXc3xBayaZeRdhKH6ZwBNO3IMIkSGzj6ScAU
-   85fsUvgTQDmoLp4128dcr5VTzt5k51reV67k0nRyEmnAkh3/Qmbdzewhg
-   UmP6LrivNtLZyh9jRKRHxgUnFl4gdz39d/lMIF9VTaA1wER4TnTmTFjSk
-   vFcFDgMhm4YOF5L8CkLFohIFgYSRrAINd6AUt+GAXZD2Mhp96pHHwO0EN
-   QmHBmAOTfUQySQEc7D8WiWn9iQFpu9j2Ilud23Kh5Oeos9II2FanrP7SX
-   5Rs5tpuQfWQSIg4CM7X7huAa6LGF+wwTVvlAqEp4V1Q8H7xa7MILu0K2e
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="343610816"
-X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="343610816"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 01:07:54 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="669323671"
-X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="669323671"
-Received: from jialinji-mobl4.ccr.corp.intel.com (HELO localhost) ([10.255.30.200])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 01:07:50 -0700
-Date: Wed, 5 Jul 2023 16:07:56 +0800
-From: Yu Zhang <yu.c.zhang@linux.intel.com>
-To: David Stevens <stevensd@chromium.org>
-Cc: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>, Peter Xu <peterx@redhat.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v7 4/8] KVM: x86/mmu: Migrate to __kvm_follow_pfn
-Message-ID: <20230705080756.xv7fm3jxewipunvn@linux.intel.com>
-References: <20230704075054.3344915-1-stevensd@google.com>
- <20230704075054.3344915-5-stevensd@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C1CE1C15
+	for <kvmarm@lists.linux.dev>; Wed,  5 Jul 2023 08:39:41 +0000 (UTC)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3658HcwC028486;
+	Wed, 5 Jul 2023 08:21:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=fkyPXjO8/F+cWUP+ZPKbGDIJ5dfTpmNiFp01dSVrcUY=;
+ b=eENWUy+YHgWMRrmTFvVMv5o01jUUPMiRKm5eSooCw5FRLVhfbHCSQEJUSgrvN6grTj7a
+ usTgS4f6YlhrAx8Jtc8QtIeM09dX75rx9QS+lD9E1MRMKK0FasMfnXb5XS1KEdPgmLSh
+ I7TddJUBk9lCZCDo62QbtaQfjRtoNGXZvkrmaLOK5pplyvYZveMibBZuTZJtpsqicL6g
+ imdlcc+cecjtmPI4Zm4x/qhKpITkLG2Q7KNBT7gvRkudZgweLdYj/KNg9ZUwrKO3Q1Gu
+ ObHM+j2bQYzaffnUzfmt26+vutL1t7wUf5BjquS3W9rEJf7mpHhvJ7jdnwp6F+SLrlHZ ww== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rn4vh82fe-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Jul 2023 08:21:57 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3658IVD8031194;
+	Wed, 5 Jul 2023 08:21:57 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rn4vh82ej-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Jul 2023 08:21:56 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+	by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3651PhAx011735;
+	Wed, 5 Jul 2023 08:21:54 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3rjbde2f8g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Jul 2023 08:21:54 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3658LpHY6292168
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 5 Jul 2023 08:21:51 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9F6152016C;
+	Wed,  5 Jul 2023 08:21:51 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2D40920168;
+	Wed,  5 Jul 2023 08:21:46 +0000 (GMT)
+Received: from li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com (unknown [9.171.67.112])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Wed,  5 Jul 2023 08:21:45 +0000 (GMT)
+Date: Wed, 5 Jul 2023 13:51:42 +0530
+From: Kautuk Consul <kconsul@linux.vnet.ibm.com>
+To: Anish Moorthy <amoorthy@google.com>
+Cc: seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
+        robert.hoo.linux@gmail.com, jthoughton@google.com, bgardon@google.com,
+        dmatlack@google.com, ricarkol@google.com, axelrasmussen@google.com,
+        peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com
+Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+Message-ID: <ZKUoFqGr5H0x/DIN@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
+References: <20230602161921.208564-1-amoorthy@google.com>
+ <20230602161921.208564-4-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,58 +65,70 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230704075054.3344915-5-stevensd@google.com>
-User-Agent: NeoMutt/20171215
+In-Reply-To: <20230602161921.208564-4-amoorthy@google.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: OTBVPG8mru5mZB3f2H-c6aDI9A45DyD3
+X-Proofpoint-ORIG-GUID: qS4furHV_RduUROiLjqaJG1AX6jLl6Jt
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-04_16,2023-07-04_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
+ priorityscore=1501 bulkscore=0 adultscore=0 mlxscore=0 spamscore=0
+ impostorscore=0 clxscore=1015 mlxlogscore=639 phishscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2307050073
 
-On Tue, Jul 04, 2023 at 04:50:49PM +0900, David Stevens wrote:
-> From: David Stevens <stevensd@chromium.org>
-> 
-> Migrate from __gfn_to_pfn_memslot to __kvm_follow_pfn.
-> 
-> Signed-off-by: David Stevens <stevensd@chromium.org>
-> ---
->  arch/x86/kvm/mmu/mmu.c | 35 +++++++++++++++++++++++++----------
->  1 file changed, 25 insertions(+), 10 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index ec169f5c7dce..e44ab512c3a1 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -4296,7 +4296,12 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
->  static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->  {
->  	struct kvm_memory_slot *slot = fault->slot;
-> -	bool async;
-> +	struct kvm_follow_pfn foll = {
-> +		.slot = slot,
-> +		.gfn = fault->gfn,
-> +		.flags = FOLL_GET | (fault->write ? FOLL_WRITE : 0),
-> +		.allow_write_mapping = true,
-> +	};
->  
->  	/*
->  	 * Retry the page fault if the gfn hit a memslot that is being deleted
-> @@ -4325,12 +4330,14 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->  			return RET_PF_EMULATE;
->  	}
->  
-> -	async = false;
-> -	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, false, &async,
-> -					  fault->write, &fault->map_writable,
-> -					  &fault->hva);
-> -	if (!async)
-> -		return RET_PF_CONTINUE; /* *pfn has correct page already */
-> +	foll.flags |= FOLL_NOWAIT;
-> +	fault->pfn = __kvm_follow_pfn(&foll);
+Hi,
+
 > +
-> +	if (!is_error_noslot_pfn(fault->pfn))
-> +		goto success;
+> +inline void kvm_populate_efault_info(struct kvm_vcpu *vcpu,
+> +				     uint64_t gpa, uint64_t len, uint64_t flags)
+> +{
+> +	if (WARN_ON_ONCE(!vcpu))
+> +		return;
 > +
-> +	if (fault->pfn != KVM_PFN_ERR_NEEDS_IO)
-> +		return RET_PF_CONTINUE;
-
-IIUC, FOLL_NOWAIT is set only when we wanna an async fault. So
-KVM_PFN_ERR_NEEDS_IO may not be necessary? 
-
-B.R.
-Yu
+> +	preempt_disable();
+> +	/*
+> +	 * Ensure the this vCPU isn't modifying another vCPU's run struct, which
+> +	 * would open the door for races between concurrent calls to this
+> +	 * function.
+> +	 */
+> +	if (WARN_ON_ONCE(vcpu != __this_cpu_read(kvm_running_vcpu)))
+> +		goto out;
+Sorry, I also wrote to the v3 discussion for this patch.
+Re-iterating what I said there:
+Why use WARN_ON_ONCE when there is a clear possiblity of preemption
+kicking in (with the possibility of vcpu_load/vcpu_put being called
+in the new task) before preempt_disable() is called in this function ?
+I think you should use WARN_ON_ONCE only where there is some impossible
+or unhandled situation happening, not when there is a possibility of that
+situation clearly happening as per the kernel code. I think that this WARN_ON_ONCE
+could make sense if kvm_populate_efault_info() is called from atomic context,
+but not when you are disabling preemption from this function itself.
+Basically I don't think there is any way we can guarantee that
+preemption DOESN'T kick in before the preempt_disable() such that
+this if-check is actually something that deserves to have a kernel
+WARN_ON_ONCE() warning.
+Can we get rid of this WARN_ON_ONCE and straightaway jump to the
+out label if "(vcpu != __this_cpu_read(kvm_running_vcpu))" is true, or
+please do correct me if I am wrong about something ?
+> +	/*
+> +	 * Try not to overwrite an already-populated run struct.
+> +	 * This isn't a perfect solution, as there's no guarantee that the exit
+> +	 * reason is set before the run struct is populated, but it should prevent
+> +	 * at least some bugs.
+> +	 */
+> +	else if (WARN_ON_ONCE(vcpu->run->exit_reason != KVM_EXIT_UNKNOWN))
+> +		goto out;
+> +
+> +	vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
+> +	vcpu->run->memory_fault.gpa = gpa;
+> +	vcpu->run->memory_fault.len = len;
+> +	vcpu->run->memory_fault.flags = flags;
+> +
+> +out:
+> +	preempt_enable();
+> +}
+> -- 
+> 2.41.0.rc0.172.g3f132b7071-goog
+> 
