@@ -1,126 +1,214 @@
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095E846AB
-	for <kvmarm@lists.linux.dev>; Wed,  5 Jul 2023 17:16:38 +0000 (UTC)
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-31443e13f9dso872817f8f.0
-        for <kvmarm@lists.linux.dev>; Wed, 05 Jul 2023 10:16:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F4BC134A7
+	for <kvmarm@lists.linux.dev>; Wed,  5 Jul 2023 18:16:41 +0000 (UTC)
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-40371070eb7so36011cf.1
+        for <kvmarm@lists.linux.dev>; Wed, 05 Jul 2023 11:16:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688577397; x=1691169397;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=JinL7apUcf1gP8XFQ2zINdZou7Iz++svzqv8hjqcpG4=;
-        b=qhATiPaQGUeviA9TREjpGVzTZx+eTBG89ShqA4kl7lRGvGT2pMGvWUaqt7NNkQzxyq
-         /8PfVlQzl2LO6vi9TG7V/WxWFIjejptKtQ3gE+KS0fttIaQaez4asKtUnqd5AUYlLpuD
-         awhMObsKdv38WIDH0dL6OgfJy5Ni8d4zakklW1EH4W0zfmNzHTBiGO0AhOyjihEADCxH
-         Fg9FGroFeOnM7yzvUcvZ3ud/7en6PdC+nOVuASFjR7k1Q1TKyabCB3ANMsSDPWmGrMd3
-         dsBf2Q/ywjG5B7GVmP2r7lTkTjtFXCkkDKTM8UkQgRORQmnMuSdIO/t0keG1MCfuxilF
-         52pw==
+        d=google.com; s=20221208; t=1688581001; x=1691173001;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SvseMdfzClF+MPNM/24H781NReITore/0VUmVpYyoUI=;
+        b=YWn97/s+haYpnp7JM+lGOqIaNf1PHwHvanWwXP5CzbQa54oQzmrrJ6pXKQLH70ScqZ
+         XFCwZ3h5UHPxricAGZ2foWVdgVgoV6BBv5ej1kFNni9LdW3zYm3qgQvEAdRDjQmEjVjB
+         dwFy1Uvg5lnQ43M+TrFK5GmoOfRMxtfSxKclahwYbfGOknv7o8JMJlFKmVWlIRyDa6mu
+         4769/B5RKe48KrQNEp4lhvtgT30p4ccTsAXVDW5mJnn+YSIzwTIEvZOSi+Pt3tTE+VAC
+         rG/SauxRcXhO+WXk48N4URBWOV9AuSLqH+NNRUU2MTMib2QLGh0MIiiCygQe/UDP+3sN
+         nVjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688577397; x=1691169397;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JinL7apUcf1gP8XFQ2zINdZou7Iz++svzqv8hjqcpG4=;
-        b=dkZBFCUVZapHBl6WI5v/F7bhAXgg5KqHDb/9Pv8+9uR9meE/fwm0UfFZVMJemwKQ0I
-         J00uPpJ8rRqpZIjbRC6MGW9OrOK43z8gj9aPev3qOf+93QbqY4vpqZ3NsUWSb3ocQoeh
-         /JHnc8vn23slRVzgt7b2fNBh2G2JsNbopphEmZZHf0h/z0GTfGC1Ic5+YNcV+Q5atENS
-         87nwtAO6j6g5fixY3m+h1wXuf+t10ryy9b94RczxMrqYu4NABYceEsoxv/zN6AnPON1h
-         zpZSfBEuZ6S4CZtnhto7dLTOIvvEoJWa7Cd/IsSNr/R9cbg6pWzjdj1Iib3MZGyeOq/0
-         PL9A==
-X-Gm-Message-State: ABy/qLZn85aq9yN+W9hAawCGRiapjBGpou1553zB1SBx0OaYg9tUxrBM
-	V2cvh2q2O+6/zfr4IGrAyMhfFKNt3FPdww==
-X-Google-Smtp-Source: APBJJlFkHZZLMEUKPg1ln3ifk7FwbaHB5Cy7w0D302g94jAtmOYJbK1FmiBpCETF2/qG1bslXczmFq8a2EmO8w==
-X-Received: from mostafa.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:333c])
- (user=smostafa job=sendgmr) by 2002:adf:dd0a:0:b0:313:ff50:2855 with SMTP id
- a10-20020adfdd0a000000b00313ff502855mr108174wrm.9.1688577396831; Wed, 05 Jul
- 2023 10:16:36 -0700 (PDT)
-Date: Wed,  5 Jul 2023 17:16:32 +0000
+        d=1e100.net; s=20221208; t=1688581001; x=1691173001;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SvseMdfzClF+MPNM/24H781NReITore/0VUmVpYyoUI=;
+        b=lI73j/Va7lXsbVwxlQHcKkTi3tmb9a3gJdLdAbCTg8a5gvUYTv73QPB1RbOf8WNhMm
+         nmLfZtxZhYXTONJA3JxgQAqtHqGD4+TSet3ell22Mcwm9pQ0sqtl1vvoJPjsYZDJD01L
+         bdJGoaBG1Pb97fvheq5gpMcgbJ9kYL3R3RMoI6kI92WyCGHQsUGZipZYP6g1PgfhwPrV
+         FqvEK1wLAqHtomR8bAn7qIvJ4sSHbc4kZpXhpDh0j9yx8nGFXCg+nQcjO2QyHUD7XGA3
+         owUX9FqCwIeMDHh7NZGrf/dEeVIhkUtMFaXsvgNheVuGla6mctzzhkhPICGyg4wTzZ7l
+         eOkQ==
+X-Gm-Message-State: ABy/qLYxOVxX80uWdpRdkdQSCc0Tuk7cQnQHaLPPzLLPXGmPl3sqULpX
+	WTgBU8T6stUXwVTp3qYs+xSdjKSotBqc3ECJIWwx2w==
+X-Google-Smtp-Source: APBJJlHHPAHCADMGOtpqExEIHo4pAuoVXPYM60W1cKm1ySWlgGvmriHeyHCfDzchsTSnbmqE7IlXLycziclYclkRLGM=
+X-Received: by 2002:ac8:5ac7:0:b0:3f0:af20:1a37 with SMTP id
+ d7-20020ac85ac7000000b003f0af201a37mr13421qtd.15.1688581000623; Wed, 05 Jul
+ 2023 11:16:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
-Message-ID: <20230705171632.3912123-1-smostafa@google.com>
-Subject: [PATCH] KVM: arm64: Add missing BTI instruction in kvm_host_psci_cpu_entry
-From: Mostafa Saleh <smostafa@google.com>
-To: maz@kernel.org, oliver.upton@linux.dev, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Cc: tabba@google.com, qperret@google.com, will@kernel.org, 
-	catalin.marinas@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, 
-	james.morse@arm.com, bgardon@google.com, gshan@redhat.com, 
-	sudeep.holla@arm.com, Mostafa Saleh <smostafa@google.com>
+MIME-Version: 1.0
+References: <20230621175002.2832640-1-rananta@google.com> <20230621175002.2832640-3-rananta@google.com>
+ <0bdc3105-fc3d-d0e1-60e7-d626171e1057@redhat.com>
+In-Reply-To: <0bdc3105-fc3d-d0e1-60e7-d626171e1057@redhat.com>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Wed, 5 Jul 2023 11:16:29 -0700
+Message-ID: <CAJHc60yZEbmbak=5kfFd4v60dtk3k0JHbXKh3nCSB3VjFShGUQ@mail.gmail.com>
+Subject: Re: [RESEND PATCH v5 02/11] KVM: arm64: Use kvm_arch_flush_remote_tlbs()
+To: Gavin Shan <gshan@redhat.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Huacai Chen <chenhuacai@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Jing Zhang <jingzhangos@google.com>, Colton Lewis <coltonlewis@google.com>, 
+	David Matlack <dmatlack@google.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	Zenghui Yu <zenghui.yu@linux.dev>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-kvm_host_psci_cpu_entry is called from __kvm_hyp_init_cpu through "br"
-instruction as __kvm_hyp_init_cpu resides in idmap section while
-kvm_host_psci_cpu_entry is in hyp .text so the offset is larger than
-26 bits covered by "b".
-Which means that this function should start with "bti j" instruction.
+On Tue, Jul 4, 2023 at 4:38=E2=80=AFPM Gavin Shan <gshan@redhat.com> wrote:
+>
+> On 6/22/23 03:49, Raghavendra Rao Ananta wrote:
+> > From: David Matlack <dmatlack@google.com>
+> >
+> > Use kvm_arch_flush_remote_tlbs() instead of
+> > CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL. The two mechanisms solve the same
+> > problem, allowing architecture-specific code to provide a non-IPI
+> > implementation of remote TLB flushing.
+> >
+> > Dropping CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL allows KVM to standardize
+> > all architectures on kvm_arch_flush_remote_tlbs() instead of maintainin=
+g
+> > two mechanisms.
+> >
+> > Opt to standardize on kvm_arch_flush_remote_tlbs() since it avoids
+> > duplicating the generic TLB stats across architectures that implement
+> > their own remote TLB flush.
+> >
+> > This adds an extra function call to the ARM64 kvm_flush_remote_tlbs()
+> > path, but that is a small cost in comparison to flushing remote TLBs.
+> >
+> > No functional change intended.
+>    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>
+> It's not true and please refer to the below explanation.
+>
+> >
+> > Signed-off-by: David Matlack <dmatlack@google.com>
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > Reviewed-by: Zenghui Yu <zenghui.yu@linux.dev>
+> > Acked-by: Oliver Upton <oliver.upton@linux.dev>
+> > ---
+> >   arch/arm64/include/asm/kvm_host.h | 3 +++
+> >   arch/arm64/kvm/Kconfig            | 1 -
+> >   arch/arm64/kvm/mmu.c              | 6 +++---
+> >   virt/kvm/Kconfig                  | 3 ---
+> >   virt/kvm/kvm_main.c               | 2 --
+> >   5 files changed, 6 insertions(+), 9 deletions(-)
+> >
+>
+> The changes make sense and look good to me. However, there is a functiona=
+l change because
+> the generic kvm_arch_flush_remote_tlbs() isn't exactly same to ARM64's va=
+riant. Strictly
+> speaking, they're not interchangeable. In the generic function, both stat=
+istics (
+> remote_tlb_flush_requests and remote_tlb_flush) are increased. Only the f=
+ormer statistic
+> is increased in ARM64's variant.
+>
+> It looks correct to increase both statistics, but the commit log may need=
+ tweak to reflect
+> it. With this resolved:
+Good catch! I agree, there's a slight functional change here and I'll
+adjust the commit message in my next revision.
 
-LLVM which is the only compiler supporting BTI for Linux, adds "bti j"
-for jump tables or by when taking the address of the block [1].
-And same behaviour is observed with GCC.
+Thank you.
+Raghavendra
 
-As kvm_host_psci_cpu_entry is a C function, this must be done in
-assembly.
-
-Another solution is to use X16/X17 with "br", as according to ARM
-ARM DDI0487I.a RLJHCL/IGMGRS, PACIASP has an implicit branch
-target identification instruction that is compatible with
-PSTATE.BTYPE 0b01 which includes "br X16/X17"
-And the kvm_host_psci_cpu_entry has PACIASP as it is an external
-function.
-Although I see that using explicit "bti" makes more clear than relying
-on which register is used.
-
-A third solution is to clear SCTLR_EL2.BT, which would make PACIASP
-compatible PSTATE.BTYPE 0b11 ( "br" to other registers).
-However this deviates from the kernel behaviour (in bti_enable()).
-
-[1] https://reviews.llvm.org/D52867
-
-Fixes: b53d4a272349 ("KVM: arm64: Use BTI for nvhe")
-Signed-off-by: Mostafa Saleh <smostafa@google.com>
-Reported-and-tested-by: Sudeep Holla <sudeep.holla@arm.com>
----
- arch/arm64/kvm/hyp/nvhe/host.S       | 10 ++++++++++
- arch/arm64/kvm/hyp/nvhe/psci-relay.c |  2 +-
- 2 files changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-index c87c63133e10..9d6e95b32097 100644
---- a/arch/arm64/kvm/hyp/nvhe/host.S
-+++ b/arch/arm64/kvm/hyp/nvhe/host.S
-@@ -297,3 +297,13 @@ SYM_CODE_START(__kvm_hyp_host_forward_smc)
- 
- 	ret
- SYM_CODE_END(__kvm_hyp_host_forward_smc)
-+
-+/*
-+ * kvm_host_psci_cpu_entry is called through br instruction, which requires
-+ * BTI J instruction, compilers (gcc and llvm) doesn't insert BTI J for external
-+ * functions, but BTI C instead.
-+ */
-+SYM_CODE_START(kvm_host_psci_cpu_entry)
-+       bti j
-+       b __kvm_host_psci_cpu_entry
-+SYM_CODE_END(kvm_host_psci_cpu_entry)
-diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-index 08508783ec3d..24543d2a3490 100644
---- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-+++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-@@ -200,7 +200,7 @@ static int psci_system_suspend(u64 func_id, struct kvm_cpu_context *host_ctxt)
- 			 __hyp_pa(init_params), 0);
- }
- 
--asmlinkage void __noreturn kvm_host_psci_cpu_entry(bool is_cpu_on)
-+asmlinkage void __noreturn __kvm_host_psci_cpu_entry(bool is_cpu_on)
- {
- 	struct psci_boot_args *boot_args;
- 	struct kvm_cpu_context *host_ctxt;
--- 
-2.41.0.255.g8b1d071c50-goog
-
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm=
+/kvm_host.h
+> > index 7e7e19ef6993e..81ab41b84f436 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -1078,6 +1078,9 @@ int __init kvm_set_ipa_limit(void);
+> >   #define __KVM_HAVE_ARCH_VM_ALLOC
+> >   struct kvm *kvm_arch_alloc_vm(void);
+> >
+> > +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
+> > +int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
+> > +
+> >   static inline bool kvm_vm_is_protected(struct kvm *kvm)
+> >   {
+> >       return false;
+> > diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> > index f531da6b362e9..6b730fcfee379 100644
+> > --- a/arch/arm64/kvm/Kconfig
+> > +++ b/arch/arm64/kvm/Kconfig
+> > @@ -25,7 +25,6 @@ menuconfig KVM
+> >       select MMU_NOTIFIER
+> >       select PREEMPT_NOTIFIERS
+> >       select HAVE_KVM_CPU_RELAX_INTERCEPT
+> > -     select HAVE_KVM_ARCH_TLB_FLUSH_ALL
+> >       select KVM_MMIO
+> >       select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+> >       select KVM_XFER_TO_GUEST_WORK
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 3b9d4d24c361a..d0a0d3dca9316 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -81,15 +81,15 @@ static bool memslot_is_logging(struct kvm_memory_sl=
+ot *memslot)
+> >   }
+> >
+> >   /**
+> > - * kvm_flush_remote_tlbs() - flush all VM TLB entries for v7/8
+> > + * kvm_arch_flush_remote_tlbs() - flush all VM TLB entries for v7/8
+> >    * @kvm:    pointer to kvm structure.
+> >    *
+> >    * Interface to HYP function to flush all VM TLB entries
+> >    */
+> > -void kvm_flush_remote_tlbs(struct kvm *kvm)
+> > +int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
+> >   {
+> > -     ++kvm->stat.generic.remote_tlb_flush_requests;
+> >       kvm_call_hyp(__kvm_tlb_flush_vmid, &kvm->arch.mmu);
+> > +     return 0;
+> >   }
+> >
+> >   static bool kvm_is_device_pfn(unsigned long pfn)
+> > diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> > index b74916de5183a..484d0873061ca 100644
+> > --- a/virt/kvm/Kconfig
+> > +++ b/virt/kvm/Kconfig
+> > @@ -62,9 +62,6 @@ config HAVE_KVM_CPU_RELAX_INTERCEPT
+> >   config KVM_VFIO
+> >          bool
+> >
+> > -config HAVE_KVM_ARCH_TLB_FLUSH_ALL
+> > -       bool
+> > -
+> >   config HAVE_KVM_INVALID_WAKEUPS
+> >          bool
+> >
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index a475ff9ef156d..600a985b86215 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -350,7 +350,6 @@ bool kvm_make_all_cpus_request(struct kvm *kvm, uns=
+igned int req)
+> >   }
+> >   EXPORT_SYMBOL_GPL(kvm_make_all_cpus_request);
+> >
+> > -#ifndef CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL
+> >   void kvm_flush_remote_tlbs(struct kvm *kvm)
+> >   {
+> >       ++kvm->stat.generic.remote_tlb_flush_requests;
+> > @@ -371,7 +370,6 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
+> >               ++kvm->stat.generic.remote_tlb_flush;
+> >   }
+> >   EXPORT_SYMBOL_GPL(kvm_flush_remote_tlbs);
+> > -#endif
+> >
+> >   static void kvm_flush_shadow_all(struct kvm *kvm)
+> >   {
+>
