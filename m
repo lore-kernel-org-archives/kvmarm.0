@@ -1,33 +1,33 @@
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD33F1C2E
-	for <kvmarm@lists.linux.dev>; Wed,  5 Jul 2023 10:17:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 460EB1C2E
+	for <kvmarm@lists.linux.dev>; Wed,  5 Jul 2023 10:25:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688552275; x=1720088275;
+  t=1688552743; x=1720088743;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=oLxACQJJ5+O8I5OycraL/46XHwuWjbLPz8/XoWWOHjg=;
-  b=Mnn+HoPz0qna1i0f7IRCiprB16wNIfrQ9e5Z4ahaBsAYwDdtolu1ZHld
-   wL8pm4hFu/OZd7y5XzYyRONPQ+ZkPrLQ+mJ8TNDsmoTccZOk3EumnY5lM
-   Z7Q2SUa6FVHK9rzy8qwbV/1KhzFCTrLaGFwIR/HxjI+A1u/I6X+A2ehJN
-   OjgaKbRGgVcWux9BPz1Lc8R8bTlrIxeUD03E1z4EybMRJaXWgL7kgdwV8
-   VxUG/Ii6gIfiMFoQKF8Qt8eCtXdjss77/RJyYgwmHDRzy0sRrnvHaWhqW
-   zP3eGdaF6E5EeEHJB6MvaEXr+P8jSWiWsicWh98eWG9zQDhhdWy8iNVh0
+  bh=y8+es5GU/s3CDdhqqc9dbSKcYl4fiYpoYuR8e98/2/o=;
+  b=Cz6oWgMGZm+f+HSgdJJqg911pnkxF0OteEkFwJSJZS+ObBw9KlKhLovZ
+   p2nhB3RsUVpp8ksHX4ukhK2wkTVD4LLO61zK8SB6dr2kl76urgViAaFqw
+   cZBmcfDDDiieJ38OP66FlIqkOvqeX8PsRbkNNNoUf668mWFSeAwAxOk1M
+   +QTzwHO5X27f47tgYmTiXYP6nWtqoMKqcy9kGHJMMsCqbGIg38Jmw1ven
+   ya3uRX15OPsYoiIp8hB1t85f4QEuOFwv2iXX3Ls6+Cj2XlP/ymnNbiN8L
+   DL28uWh45Jc6RSFsBOuNOmqedtVPYVxNFvY74+LXiAcku+Zz4Hr1S94aT
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="365873176"
+X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="342894975"
 X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="365873176"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 03:17:55 -0700
+   d="scan'208";a="342894975"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 03:25:42 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="965775138"
+X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="719171428"
 X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="965775138"
+   d="scan'208";a="719171428"
 Received: from jialinji-mobl4.ccr.corp.intel.com (HELO localhost) ([10.255.30.200])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 03:17:51 -0700
-Date: Wed, 5 Jul 2023 18:18:00 +0800
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 03:25:38 -0700
+Date: Wed, 5 Jul 2023 18:25:47 +0800
 From: Yu Zhang <yu.c.zhang@linux.intel.com>
 To: David Stevens <stevensd@chromium.org>
 Cc: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
@@ -37,7 +37,7 @@ Cc: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
 	kvm@vger.kernel.org
 Subject: Re: [PATCH v7 5/8] KVM: x86/mmu: Don't pass FOLL_GET to
  __kvm_follow_pfn
-Message-ID: <20230705101800.ut4c6topn6ylwczs@linux.intel.com>
+Message-ID: <20230705102547.hr2zxkdkecdxp5tf@linux.intel.com>
 References: <20230704075054.3344915-1-stevensd@google.com>
  <20230704075054.3344915-6-stevensd@google.com>
 Precedence: bulk
@@ -58,25 +58,10 @@ On Tue, Jul 04, 2023 at 04:50:50PM +0900, David Stevens wrote:
 > memory into the guest that is backed by un-refcounted struct pages - for
 > example, higher order non-compound pages allocated by the amdgpu driver
 > via ttm_pool_alloc_page.
-
-I guess you mean the tail pages of the higher order non-compound pages?
-And as to the head page, it is said to be set to one coincidentally[*],
-and shall not be considered as refcounted.  IIUC, refcount of this head
-page will be increased and decreased soon in hva_to_pfn_remapped(), so
-this may not be a problem(?). But treating this head page differently,
-as a refcounted one(e.g., to set the A/D flags), is weired. 
-
-Or maybe I missed some context, e.g., can the head page be allocted to
-guest at all? 
-
-
 > 
 > The bulk of this change is tracking the is_refcounted_page flag so that
 > non-refcounted pages don't trigger page_count() == 0 warnings. This is
 > done by storing the flag in an unused bit in the sptes.
-
-Also, maybe we should mention this only works on x86-64. 
-
 > 
 > Signed-off-by: David Stevens <stevensd@chromium.org>
 > ---
@@ -92,44 +77,133 @@ Also, maybe we should mention this only works on x86-64.
 > index e44ab512c3a1..b1607e314497 100644
 > --- a/arch/x86/kvm/mmu/mmu.c
 > +++ b/arch/x86/kvm/mmu/mmu.c
-
-...
-
+> @@ -553,12 +553,14 @@ static bool mmu_spte_update(u64 *sptep, u64 new_spte)
+>  
+>  	if (is_accessed_spte(old_spte) && !is_accessed_spte(new_spte)) {
+>  		flush = true;
+> -		kvm_set_pfn_accessed(spte_to_pfn(old_spte));
+> +		if (is_refcounted_page_pte(old_spte))
+> +			kvm_set_page_accessed(pfn_to_page(spte_to_pfn(old_spte)));
+>  	}
+>  
+>  	if (is_dirty_spte(old_spte) && !is_dirty_spte(new_spte)) {
+>  		flush = true;
+> -		kvm_set_pfn_dirty(spte_to_pfn(old_spte));
+> +		if (is_refcounted_page_pte(old_spte))
+> +			kvm_set_page_dirty(pfn_to_page(spte_to_pfn(old_spte)));
+>  	}
+>  
+>  	return flush;
+> @@ -596,14 +598,18 @@ static u64 mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
+>  	 * before they are reclaimed.  Sanity check that, if the pfn is backed
+>  	 * by a refcounted page, the refcount is elevated.
+>  	 */
+> -	page = kvm_pfn_to_refcounted_page(pfn);
+> -	WARN_ON(page && !page_count(page));
+> +	if (is_refcounted_page_pte(old_spte)) {
+> +		page = kvm_pfn_to_refcounted_page(pfn);
+> +		WARN_ON(!page || !page_count(page));
+> +	}
+>  
+> -	if (is_accessed_spte(old_spte))
+> -		kvm_set_pfn_accessed(pfn);
+> +	if (is_refcounted_page_pte(old_spte)) {
+> +		if (is_accessed_spte(old_spte))
+> +			kvm_set_page_accessed(pfn_to_page(pfn));
+>  
+> -	if (is_dirty_spte(old_spte))
+> -		kvm_set_pfn_dirty(pfn);
+> +		if (is_dirty_spte(old_spte))
+> +			kvm_set_page_dirty(pfn_to_page(pfn));
+> +	}
+>  
+>  	return old_spte;
+>  }
+> @@ -639,8 +645,8 @@ static bool mmu_spte_age(u64 *sptep)
+>  		 * Capture the dirty status of the page, so that it doesn't get
+>  		 * lost when the SPTE is marked for access tracking.
+>  		 */
+> -		if (is_writable_pte(spte))
+> -			kvm_set_pfn_dirty(spte_to_pfn(spte));
+> +		if (is_writable_pte(spte) && is_refcounted_page_pte(spte))
+> +			kvm_set_page_dirty(pfn_to_page(spte_to_pfn(spte)));
+>  
+>  		spte = mark_spte_for_access_track(spte);
+>  		mmu_spte_update_no_track(sptep, spte);
+> @@ -1278,8 +1284,8 @@ static bool spte_wrprot_for_clear_dirty(u64 *sptep)
+>  {
+>  	bool was_writable = test_and_clear_bit(PT_WRITABLE_SHIFT,
+>  					       (unsigned long *)sptep);
+> -	if (was_writable && !spte_ad_enabled(*sptep))
+> -		kvm_set_pfn_dirty(spte_to_pfn(*sptep));
+> +	if (was_writable && !spte_ad_enabled(*sptep) && is_refcounted_page_pte(*sptep))
+> +		kvm_set_page_dirty(pfn_to_page(spte_to_pfn(*sptep)));
+>  
+>  	return was_writable;
+>  }
 > @@ -2937,6 +2943,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
 >  	bool host_writable = !fault || fault->map_writable;
 >  	bool prefetch = !fault || fault->prefetch;
 >  	bool write_fault = fault && fault->write;
 > +	bool is_refcounted = !fault || fault->is_refcounted_page;
-
-Just wonder, what if a non-refcounted page is prefetched?  Or is it possible in
-practice?
-
-...
 >  
-> @@ -883,7 +884,7 @@ static gpa_t FNAME(gva_to_gpa)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
->   */
->  static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int i)
->  {
-> -	bool host_writable;
-> +	bool host_writable, is_refcounted;
->  	gpa_t first_pte_gpa;
->  	u64 *sptep, spte;
->  	struct kvm_memory_slot *slot;
-> @@ -940,10 +941,12 @@ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int
->  	sptep = &sp->spt[i];
->  	spte = *sptep;
->  	host_writable = spte & shadow_host_writable_mask;
-> +	// TODO: is this correct?
-> +	is_refcounted = spte & SPTE_MMU_PAGE_REFCOUNTED;
->  	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
->  	make_spte(vcpu, sp, slot, pte_access, gfn,
->  		  spte_to_pfn(spte), spte, true, false,
-> -		  host_writable, &spte);
-> +		  host_writable, is_refcounted, &spte);
+>  	pgprintk("%s: spte %llx write_fault %d gfn %llx\n", __func__,
+>  		 *sptep, write_fault, gfn);
+> @@ -2969,7 +2976,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+>  	}
+>  
+>  	wrprot = make_spte(vcpu, sp, slot, pte_access, gfn, pfn, *sptep, prefetch,
+> -			   true, host_writable, &spte);
+> +			   true, host_writable, is_refcounted, &spte);
+>  
+>  	if (*sptep == spte) {
+>  		ret = RET_PF_SPURIOUS;
+> @@ -4299,8 +4306,9 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>  	struct kvm_follow_pfn foll = {
+>  		.slot = slot,
+>  		.gfn = fault->gfn,
+> -		.flags = FOLL_GET | (fault->write ? FOLL_WRITE : 0),
+> +		.flags = fault->write ? FOLL_WRITE : 0,
+>  		.allow_write_mapping = true,
+> +		.guarded_by_mmu_notifier = true,
+>  	};
+>  
+>  	/*
+> @@ -4317,6 +4325,7 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>  			fault->slot = NULL;
+>  			fault->pfn = KVM_PFN_NOSLOT;
+>  			fault->map_writable = false;
+> +			fault->is_refcounted_page = false;
+>  			return RET_PF_CONTINUE;
+>  		}
+>  		/*
+> @@ -4366,6 +4375,7 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>  success:
+>  	fault->hva = foll.hva;
+>  	fault->map_writable = foll.writable;
+> +	fault->is_refcounted_page = foll.is_refcounted_page;
+>  	return RET_PF_CONTINUE;
+>  }
+>  
+> @@ -4451,7 +4461,8 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>  
+>  out_unlock:
+>  	write_unlock(&vcpu->kvm->mmu_lock);
+> -	kvm_release_pfn_clean(fault->pfn);
+> +	if (fault->is_refcounted_page)
+> +		kvm_set_page_accessed(pfn_to_page(fault->pfn));
+>  	return r;
+>  }
+>  
+> @@ -4529,7 +4540,8 @@ static int kvm_tdp_mmu_page_fault(struct kvm_vcpu *vcpu,
+>  
+>  out_unlock:
+>  	read_unlock(&vcpu->kvm->mmu_lock);
+> -	kvm_release_pfn_clean(fault->pfn);
 
-Could we restrict that a non-refcounted page shall not be used as shadow page?
-
-[*] https://lore.kernel.org/all/8caf3008-dcf3-985a-631e-e019b277c6f0@amd.com/
+Yet kvm_release_pfn() can still be triggered for the kvm_vcpu_maped gfns.
+What if guest uses a non-referenced page(e.g., as a vmcs12)? Although I
+believe this is not gonna happen in real world... 
 
 B.R.
 Yu
