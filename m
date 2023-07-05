@@ -1,51 +1,51 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAC2F63C
-	for <kvmarm@lists.linux.dev>; Wed,  5 Jul 2023 00:35:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 406A363C
+	for <kvmarm@lists.linux.dev>; Wed,  5 Jul 2023 00:51:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688517340;
+	s=mimecast20190719; t=1688518290;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9kggeUHVn+fybi/vP4cTbHO7AeLXxPNqVprkHx0Chh4=;
-	b=O81tKq8fRI8p+KUS98bkZeL+2EcMSYw834SFyQqs681DLC7biTgM/aKdv09zVSncHYPypj
-	0d05YEp+krPQE7WX3RCmlVn60sUrwF2IZ+dJLfDiC5WWgRRcqhySV09PK7AfLdmyj9QVK1
-	4ODMTLBTUEgVU5UnGTvcrnzRi1HozLU=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=05Y7FRqpionSiuOM6vbmN3tWEYWnCWQeWHLoVh2gOCU=;
+	b=ff31dfAYVERqJhJ7S+5eF6w3+Q65AET1yMIV6LQVZsOq7ijAIBSdwj1wJaia537gNQQDpm
+	tVq+ALb0JCnhdxBzwDNtaZptc6gbOJ+65epLmoqsMW9GgrrIv0pleOv2AYc2YjgE+kSlb2
+	Et5eZevWYcTMNLW9VTcrp3pIxUxFBHI=
+Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
+ [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-561-leEEovG7Np-2DM4WzUrvvA-1; Tue, 04 Jul 2023 20:35:38 -0400
-X-MC-Unique: leEEovG7Np-2DM4WzUrvvA-1
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1b817cda09bso57903935ad.3
-        for <kvmarm@lists.linux.dev>; Tue, 04 Jul 2023 17:35:38 -0700 (PDT)
+ us-mta-641-_YRS5x0zPlWcYcdBhl5x8w-1; Tue, 04 Jul 2023 20:51:29 -0400
+X-MC-Unique: _YRS5x0zPlWcYcdBhl5x8w-1
+Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-57059f90cc5so66417907b3.0
+        for <kvmarm@lists.linux.dev>; Tue, 04 Jul 2023 17:51:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688517338; x=1691109338;
+        d=1e100.net; s=20221208; t=1688518289; x=1691110289;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9kggeUHVn+fybi/vP4cTbHO7AeLXxPNqVprkHx0Chh4=;
-        b=KsRMozgF1MmOSnSj+IaW6+MPQ4GnOh2DSDGGxmY8oF1BETs6zt9ua3T4SGuG+HA2Qw
-         cz9hP2ajYJa8UP/WtwDfLRsUDjpQvPkIuZFIaCzBgNocEPUZV0D2La/T69484XCuIiyx
-         Up50zSKtqabfVnW8qiKVkzhXGQWYFf3qv0CnTYTE2d9pUJFgyAHqpzkrztLDZoGZpLSq
-         aoLtxB9WHhBrNdgBxYWBlqeuKaqt1GBfklcD9ZqNNI5tK0jMO3v+C1ZtU73ZtnzC5aDz
-         Epesbzrhj3Y9KTqg7lYikgZvFihJ4FFK5ckXHBbrvVWkZJH4WfrhDZMPvZT9QjU7jV1/
-         U0mw==
-X-Gm-Message-State: ABy/qLbYa4s80w2Ry+WE7AJ5KfuYN9R7QwfE9hu+kmQqG3Tvp7BE1F2y
-	XJg1g5SkgPBtwlfX69yn9zwKcGKXZRJWbHKwdtiZJm2HLQYsKllBv+actdCC7MgGmI4VWTHpQ5U
-	+vKDxdWhjuKuNavRY
-X-Received: by 2002:a17:902:dac4:b0:1b8:9195:1dd8 with SMTP id q4-20020a170902dac400b001b891951dd8mr5383567plx.51.1688517337913;
-        Tue, 04 Jul 2023 17:35:37 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlG1dv3HBeoyb27A4Q9lu9hw82Tk11vqBX4veNPK7IWmCWzA4mOu6o5korMa8AFQToKad6zjdQ==
-X-Received: by 2002:a17:902:dac4:b0:1b8:9195:1dd8 with SMTP id q4-20020a170902dac400b001b891951dd8mr5383559plx.51.1688517337630;
-        Tue, 04 Jul 2023 17:35:37 -0700 (PDT)
+        bh=05Y7FRqpionSiuOM6vbmN3tWEYWnCWQeWHLoVh2gOCU=;
+        b=d1S9oWVx/RuzG24KLhwGCNG53pN1zTfHLa3S4XkDbO5HRqvO3b4k9E+MzR5MpfIHvh
+         GfGk5uXOT3EKDiRDCBsfDQ+GaMCEdHphKPnLEAIOqFzIAnuhEZbTMCeZ80NP2rVYdwCs
+         NMpfQx7WBprO/LBB4o5Gd1AKNDkl72iQJxuuSTb3lK8P0Y0Rp0OXlz1MKIjh5BG8LcI2
+         xd0K3O6UilklRIz0TZGsAkORCfPAhwYy0Em2MZJ43u7DZglHuQGbEGMT+n9qmMha9+pG
+         RE9NDOb2xxOg8YMlm4e8icdQhNMQ1uIq8xLXFNQC9QjLXHuppti/RPa0KofaIPARGVXZ
+         AtPg==
+X-Gm-Message-State: ABy/qLbpTWNSpPWsq9qkDfg6vcrz8Nmx+e05Ia2DTcgFhJmAgIRUQisd
+	ybJHqu/7vUV1+kY8YDgG2zYSAJ1vvg1wVhxUn95C/E0zsgE4z/aRo1LFPEPRBfiS2ETGnZ3LK/r
+	ak8kB2zAwEPXTRH9z
+X-Received: by 2002:a81:6643:0:b0:573:592a:6f7e with SMTP id a64-20020a816643000000b00573592a6f7emr15236889ywc.19.1688518289388;
+        Tue, 04 Jul 2023 17:51:29 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGNQHLeMCWSeIz0qJufd+RXKyUWMQNzzlL6WDmNr44iY2x5LiPzRok2Cx6uzmegN+Hqo8Q60A==
+X-Received: by 2002:a81:6643:0:b0:573:592a:6f7e with SMTP id a64-20020a816643000000b00573592a6f7emr15236876ywc.19.1688518289160;
+        Tue, 04 Jul 2023 17:51:29 -0700 (PDT)
 Received: from ?IPV6:2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5? ([2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5])
-        by smtp.gmail.com with ESMTPSA id ix6-20020a170902f80600b001b87f957ba5sm6601048plb.12.2023.07.04.17.35.29
+        by smtp.gmail.com with ESMTPSA id j25-20020aa78dd9000000b006687b4f2044sm16074713pfr.164.2023.07.04.17.51.21
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Jul 2023 17:35:37 -0700 (PDT)
-Message-ID: <73a4655a-2c63-3209-1153-2fc816e8990e@redhat.com>
-Date: Wed, 5 Jul 2023 10:35:28 +1000
+        Tue, 04 Jul 2023 17:51:28 -0700 (PDT)
+Message-ID: <fa99d4ea-7390-906e-b691-9fa838df2788@redhat.com>
+Date: Wed, 5 Jul 2023 10:51:18 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,8 +54,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
-Subject: Re: [RESEND PATCH v5 09/11] KVM: arm64: Flush only the memslot after
- write-protect
+Subject: Re: [RESEND PATCH v5 10/11] KVM: arm64: Invalidate the table entries
+ upon a range
 To: Raghavendra Rao Ananta <rananta@google.com>,
  Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
  James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>
@@ -69,42 +69,48 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
  kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
  linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 References: <20230621175002.2832640-1-rananta@google.com>
- <20230621175002.2832640-10-rananta@google.com>
+ <20230621175002.2832640-11-rananta@google.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20230621175002.2832640-10-rananta@google.com>
+In-Reply-To: <20230621175002.2832640-11-rananta@google.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
+
 On 6/22/23 03:50, Raghavendra Rao Ananta wrote:
-> After write-protecting the region, currently KVM invalidates
-> the entire TLB entries using kvm_flush_remote_tlbs(). Instead,
-> scope the invalidation only to the targeted memslot. If
-> supported, the architecture would use the range-based TLBI
-> instructions to flush the memslot or else fallback to flushing
-> all of the TLBs.
+> Currently, during the operations such as a hugepage collapse,
+> KVM would flush the entire VM's context using 'vmalls12e1is'
+> TLBI operation. Specifically, if the VM is faulting on many
+> hugepages (say after dirty-logging), it creates a performance
+> penalty for the guest whose pages have already been faulted
+> earlier as they would have to refill their TLBs again.
+> 
+> Instead, leverage kvm_tlb_flush_vmid_range() for table entries.
+> If the system supports it, only the required range will be
+> flushed. Else, it'll fallback to the previous mechanism.
 > 
 > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 > ---
->   arch/arm64/kvm/mmu.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   arch/arm64/kvm/hyp/pgtable.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
 > 
 
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index c3ec2141c3284..94f10e670c100 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -992,7 +992,7 @@ static void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot)
->   	write_lock(&kvm->mmu_lock);
->   	stage2_wp_range(&kvm->arch.mmu, start, end);
->   	write_unlock(&kvm->mmu_lock);
-> -	kvm_flush_remote_tlbs(kvm);
-> +	kvm_flush_remote_tlbs_memslot(kvm, memslot);
->   }
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index df8ac14d9d3d4..50ef7623c54db 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -766,7 +766,8 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
+>   	 * value (if any).
+>   	 */
+>   	if (kvm_pte_table(ctx->old, ctx->level))
+> -		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
+> +		kvm_tlb_flush_vmid_range(mmu, ctx->addr,
+> +					kvm_granule_size(ctx->level));
+>   	else if (kvm_pte_valid(ctx->old))
+>   		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
 >   
->   /**
 
