@@ -1,156 +1,93 @@
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C733E14A8F
-	for <kvmarm@lists.linux.dev>; Wed,  5 Jul 2023 18:28:30 +0000 (UTC)
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4036bd4fff1so45071cf.0
-        for <kvmarm@lists.linux.dev>; Wed, 05 Jul 2023 11:28:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1FC311CA4
+	for <kvmarm@lists.linux.dev>; Wed,  5 Jul 2023 19:26:09 +0000 (UTC)
+Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-6b72c4038b6so5687105a34.0
+        for <kvmarm@lists.linux.dev>; Wed, 05 Jul 2023 12:26:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688581709; x=1691173709;
+        d=google.com; s=20221208; t=1688585168; x=1691177168;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=e8dndtCGBviDKso48620x/RRDlxyTnfI7vX9Z8Kirm4=;
-        b=qHerNChH5eP9A1oGMa/u9oWkmuCgznM2HVxsH+LjQhf818ADYLHImqByT6aQXQhInT
-         lsPnmURbNPO6fppcnuOnamesFjBJKNU2VjGsp7/zxpl38hCRF7pbMARmx/fH4RtrBMXV
-         lQCBcftHQe7vy8FS1hGBIKM2SVaXZc1yMDHJKL+p6iFTBjybLHnCmhC3ptpPAjUBADqF
-         3xClQ5mQkWbYUptl2dibTwnozlhBXkK1U0l3tZ6Z5T6JHE7q8ixwHU+MB8RFml50gCT1
-         uyWFL1uZ2eGNwS7NmGPjVfeFoLHTmgcENG6AZUnGhL3wV09Qm91ASD61v7QtiUdM7Tit
-         M5jQ==
+        bh=9KIxxp026/w7UKJlFK3fYGlwG+XSxn3u3/0XumxsaeA=;
+        b=054SwNoSENr7q1hk4ph8TPf6/Rl9OBTQDS21mJ2SKL3lagyOMq34Swlbd6UcIJGfxk
+         6FfgtaKhK/V/WLW0AfBdjrNpSSsskPUsobYjWw1XAtCUKud1vJ8g435rvAZd8dM3+AIr
+         qzQ5hJl9FQpbRU4d1NqR8SrFS2BwF7tCJbNbcFAG/EEY0U2ndRg5plumKc1aRgDD910u
+         Xi/SDhlkvO6L5DktKz/M82eAU8mqOfF3GBnyi01If851eD59MG6hCk5io8gIu4HbqxoE
+         1riwvUFiezCOF5HRYHr5GoZDGAEKkMwC/RV+udIvu6n2h5nmggpZ/By9liaRjRMUz0UG
+         lD/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688581709; x=1691173709;
+        d=1e100.net; s=20221208; t=1688585168; x=1691177168;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=e8dndtCGBviDKso48620x/RRDlxyTnfI7vX9Z8Kirm4=;
-        b=k+5C1JHR1iWq1VnaKyKM3HgadqXO++UEjJgsY0Snf8uVDQlMt3YMObAqF0OyTKN2Ex
-         BQxcJOLQcwsec1JtoWfzu1UsX7m+oIR4yBRcIM+HosWrkCCWTMYvq4uxG6avBi+5YfuF
-         TcBU+Pd00dwG3LoW0/efxtZnkgm/6UqbPikr3WnqHPRyHnp0anjbiZNpBkYP5zyRyfoH
-         VL1ZjDOzj5fTTJRnSqHns8XrajrJ9m5fEu1oyGzbvgjQaUhVFGnQXmoo8HQJ2NYtA0zf
-         0/0X0cTntC2cBGsVn/tPU1l+6UmTdcbVnRY7MSIsvRP2FTMm39o+HDKpCLQm+wEwBa6F
-         k/fw==
-X-Gm-Message-State: ABy/qLbQDi8klm0ANL50JSftP1LIE0ospIj3/MSICoYMlDSIVwVRQNnd
-	hjZ0BPKV7EmpSFj+1pSLUh/6SkhhyLT6XR6aLOCbYg==
-X-Google-Smtp-Source: APBJJlGb5UHuGR9v4dIzL9FTRyvRdUi3B9fkgynBbnAtVZ2X8ICkvXAlrTkWscrnk/Iu+8sDpm99vm1xuq8baNEkTO8=
-X-Received: by 2002:ac8:580b:0:b0:3ed:86f6:6eab with SMTP id
- g11-20020ac8580b000000b003ed86f66eabmr26383qtg.14.1688581709489; Wed, 05 Jul
- 2023 11:28:29 -0700 (PDT)
+        bh=9KIxxp026/w7UKJlFK3fYGlwG+XSxn3u3/0XumxsaeA=;
+        b=TPDnqiAb6ofeaQp9kpwCBGUEhdAaYvsuyVHawpnBzbBGDFx506kQtc8pi2yjbFIkTB
+         Ab9HjmEkoRNlF5pO+24XDAe85g4kJMC3q6JA+be+JfPVuIKU41rPMayYCSJtSvvm1nuX
+         Y6vBVkIut4TO9dGNUoPIy1EfIfeChyNWAd28Efa2KoiG0mFNSDoCc0KIxOchmJL6UoS6
+         eI7+85ESXuV+tDRZP38xu6BYHHBQvPdAYheTfPdk88eTm2eJz9k0elJRYT1rZd/qsegJ
+         +P6fW/LY2FmA8qmlUpyC/fnraQimMBlsq29feCrk7qD2B2/in80/Lb9t9cMPwfhcrKYs
+         rYoA==
+X-Gm-Message-State: ABy/qLb17tApu/8pagG3F3i5QJfOcnxAVNumup3x/ayaNlc4tRRVgaV2
+	B8lVkPh/+9E65Cv7AESV9zuJw5Elr37Ch9ZrgfUmig==
+X-Google-Smtp-Source: APBJJlGvXWeSNtOCYEgeQwfIozB9e87JkiwqFzwV4rWdasBMr59GIrb4XnRvhSMyWX4xvVnZXe/BP2yXaEGboH9NXRU=
+X-Received: by 2002:a05:6871:4409:b0:1b0:5290:c95e with SMTP id
+ nd9-20020a056871440900b001b05290c95emr15909408oab.42.1688585168238; Wed, 05
+ Jul 2023 12:26:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230621175002.2832640-1-rananta@google.com> <20230621175002.2832640-8-rananta@google.com>
- <1fe280a7-0f10-e124-00aa-b137df722c33@redhat.com>
-In-Reply-To: <1fe280a7-0f10-e124-00aa-b137df722c33@redhat.com>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Wed, 5 Jul 2023 11:28:18 -0700
-Message-ID: <CAJHc60xQtjvVsWRE=w-pAioNJW6uh-qKuZz2wp6bkT=X4oCm5A@mail.gmail.com>
-Subject: Re: [RESEND PATCH v5 07/11] KVM: arm64: Define kvm_tlb_flush_vmid_range()
-To: Gavin Shan <gshan@redhat.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
-	Huacai Chen <chenhuacai@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Jing Zhang <jingzhangos@google.com>, Colton Lewis <coltonlewis@google.com>, 
-	David Matlack <dmatlack@google.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20230607194554.87359-1-jingzhangos@google.com> <ZJn6niA1RgAqu7DC@linux.dev>
+In-Reply-To: <ZJn6niA1RgAqu7DC@linux.dev>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Wed, 5 Jul 2023 12:25:57 -0700
+Message-ID: <CAAdAUtjqR1WrCNF9OFxe0atWj1P_Mc+OPv9tLKU3t7QbeiWaqg@mail.gmail.com>
+Subject: Re: [PATCH v4 0/4] Enable writable for idregs DFR0,PFR0, MMFR{0,1,2}
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@google.com>, Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, 
+	Reiji Watanabe <reijiw@google.com>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Suraj Jitindar Singh <surajjs@amazon.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 4, 2023 at 5:31=E2=80=AFPM Gavin Shan <gshan@redhat.com> wrote:
->
->
-> On 6/22/23 03:49, Raghavendra Rao Ananta wrote:
-> > Implement the helper kvm_tlb_flush_vmid_range() that acts
-> > as a wrapper for range-based TLB invalidations. For the
-> > given VMID, use the range-based TLBI instructions to do
-> > the job or fallback to invalidating all the TLB entries.
-> >
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >   arch/arm64/include/asm/kvm_pgtable.h | 10 ++++++++++
-> >   arch/arm64/kvm/hyp/pgtable.c         | 20 ++++++++++++++++++++
-> >   2 files changed, 30 insertions(+)
-> >
->
-> It may be reasonable to fold this to PATCH[08/11] since kvm_tlb_flush_vmi=
-d_range() is
-> only called by ARM64's kvm_arch_flush_remote_tlbs_range(), which is added=
- by PATCH[08/11].
-> In either way, the changes look good to me:
->
-Ah, the patches 10 and 11 also call kvm_tlb_flush_vmid_range(), so
-probably it's better to keep the definition isolated?
+Hi Oliver,
 
-Regards,
-Raghavendra
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
+On Mon, Jun 26, 2023 at 1:52=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
 >
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/=
-asm/kvm_pgtable.h
-> > index 4cd6762bda805..1b12295a83595 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -682,4 +682,14 @@ enum kvm_pgtable_prot kvm_pgtable_stage2_pte_prot(=
-kvm_pte_t pte);
-> >    *     kvm_pgtable_prot format.
-> >    */
-> >   enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte);
-> > +
-> > +/**
-> > + * kvm_tlb_flush_vmid_range() - Invalidate/flush a range of TLB entrie=
-s
-> > + *
-> > + * @mmu:     Stage-2 KVM MMU struct
-> > + * @addr:    The base Intermediate physical address from which to inva=
-lidate
-> > + * @size:    Size of the range from the base to invalidate
-> > + */
-> > +void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
-> > +                             phys_addr_t addr, size_t size);
-> >   #endif      /* __ARM64_KVM_PGTABLE_H__ */
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.=
-c
-> > index 3d61bd3e591d2..df8ac14d9d3d4 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -631,6 +631,26 @@ static bool stage2_has_fwb(struct kvm_pgtable *pgt=
-)
-> >       return !(pgt->flags & KVM_PGTABLE_S2_NOFWB);
-> >   }
-> >
-> > +void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
-> > +                             phys_addr_t addr, size_t size)
-> > +{
-> > +     unsigned long pages, inval_pages;
-> > +
-> > +     if (!system_supports_tlb_range()) {
-> > +             kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> > +             return;
-> > +     }
-> > +
-> > +     pages =3D size >> PAGE_SHIFT;
-> > +     while (pages > 0) {
-> > +             inval_pages =3D min(pages, MAX_TLBI_RANGE_PAGES);
-> > +             kvm_call_hyp(__kvm_tlb_flush_vmid_range, mmu, addr, inval=
-_pages);
-> > +
-> > +             addr +=3D inval_pages << PAGE_SHIFT;
-> > +             pages -=3D inval_pages;
-> > +     }
-> > +}
-> > +
-> >   #define KVM_S2_MEMATTR(pgt, attr) PAGE_S2_MEMATTR(attr, stage2_has_fw=
-b(pgt))
-> >
-> >   static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgt=
-able_prot prot,
+> Hi Jing,
 >
+> On Wed, Jun 07, 2023 at 07:45:50PM +0000, Jing Zhang wrote:
+> >
+> > This patch series enable userspace writable for below idregs:
+> > ID_AA64DFR0_EL1, ID_DFR0_EL1, ID_AA64PFR0_EL1, ID_AA64MMFR{0, 1, 2}_EL1=
+.
+> >
+> > It is based on below series [2] which add infrastructure for writable i=
+dregs.
+>
+> Could you implement some tests for these changes? We really need to see
+> that userspace is only allowed to select a subset of features that're
+> provided by the host, and that the CPU feature set never exceeds what
+> the host can support.
+Sure, will add a selftest for these.
+>
+> Additionally, there are places in the kernel where we use host ID
+> register values for the sake of emulation (DBGDIDR, LORegion). These
+> both should instead be using the _guest_ ID register values.
+Will add a new commit for these change.
+>
+> --
 > Thanks,
-> Gavin
->
+> Oliver
+
+Thanks,
+Jing
