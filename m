@@ -1,33 +1,33 @@
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9A6A137F
-	for <kvmarm@lists.linux.dev>; Wed,  5 Jul 2023 07:23:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 059F420E8
+	for <kvmarm@lists.linux.dev>; Wed,  5 Jul 2023 08:07:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688541814; x=1720077814;
+  t=1688544476; x=1720080476;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=NS28w+WymzMKhKs2KK3bH5xOvIImsi/4GcjzUcK6qWc=;
-  b=DycUrvykXu/+MQPUVrs7LVJidAJ4S4ABZgrmiwHHzL7If6Yb+JPr87+9
-   i70UtabVFNNybSWKNN2frODEGnns7wbNchDA9AEMcfaupmCpXHAyW8lsv
-   O8RGLbxzvV9gYaxUvkqwHdKLCcEkKW45YxNo53fS/vvG26YfHaPggVtnF
-   F+SOEcmQdjfS4yZ0zEjN5IVi4Ywe4tR9OtPX3BQ83NsAHV1Q6cw7eKzmb
-   RUQXakVHfHrhzH3yvPT9Bjy2ME4nN/67DjP/KVOtNiDHFTm/zkwjH4/Gm
-   pXPe+01Hmy398lhdOJaVUMqCREcdyo5nL8WDK9XV6uXrXHaHOiiDMVNsM
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="365838936"
+  bh=Cn1WBv4JrMsrgoasE/lasO/n0SnRwlADo/SoWnSzf8M=;
+  b=lsZ5SoVwR3idIfCHjkIkIXc3xBayaZeRdhKH6ZwBNO3IMIkSGzj6ScAU
+   85fsUvgTQDmoLp4128dcr5VTzt5k51reV67k0nRyEmnAkh3/Qmbdzewhg
+   UmP6LrivNtLZyh9jRKRHxgUnFl4gdz39d/lMIF9VTaA1wER4TnTmTFjSk
+   vFcFDgMhm4YOF5L8CkLFohIFgYSRrAINd6AUt+GAXZD2Mhp96pHHwO0EN
+   QmHBmAOTfUQySQEc7D8WiWn9iQFpu9j2Ilud23Kh5Oeos9II2FanrP7SX
+   5Rs5tpuQfWQSIg4CM7X7huAa6LGF+wwTVvlAqEp4V1Q8H7xa7MILu0K2e
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="343610816"
 X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="365838936"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 00:23:34 -0700
+   d="scan'208";a="343610816"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 01:07:54 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="789062435"
+X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="669323671"
 X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="789062435"
+   d="scan'208";a="669323671"
 Received: from jialinji-mobl4.ccr.corp.intel.com (HELO localhost) ([10.255.30.200])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 00:23:29 -0700
-Date: Wed, 5 Jul 2023 15:23:35 +0800
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 01:07:50 -0700
+Date: Wed, 5 Jul 2023 16:07:56 +0800
 From: Yu Zhang <yu.c.zhang@linux.intel.com>
 To: David Stevens <stevensd@chromium.org>
 Cc: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
@@ -35,10 +35,10 @@ Cc: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
 	kvm@vger.kernel.org
-Subject: Re: [PATCH v7 3/8] KVM: Make __kvm_follow_pfn not imply FOLL_GET
-Message-ID: <20230705072335.xfest7csh27f67v3@linux.intel.com>
+Subject: Re: [PATCH v7 4/8] KVM: x86/mmu: Migrate to __kvm_follow_pfn
+Message-ID: <20230705080756.xv7fm3jxewipunvn@linux.intel.com>
 References: <20230704075054.3344915-1-stevensd@google.com>
- <20230704075054.3344915-4-stevensd@google.com>
+ <20230704075054.3344915-5-stevensd@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,39 +47,58 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230704075054.3344915-4-stevensd@google.com>
+In-Reply-To: <20230704075054.3344915-5-stevensd@google.com>
 User-Agent: NeoMutt/20171215
 
+On Tue, Jul 04, 2023 at 04:50:49PM +0900, David Stevens wrote:
+> From: David Stevens <stevensd@chromium.org>
+> 
+> Migrate from __gfn_to_pfn_memslot to __kvm_follow_pfn.
+> 
+> Signed-off-by: David Stevens <stevensd@chromium.org>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 35 +++++++++++++++++++++++++----------
+>  1 file changed, 25 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index ec169f5c7dce..e44ab512c3a1 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4296,7 +4296,12 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+>  static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>  {
+>  	struct kvm_memory_slot *slot = fault->slot;
+> -	bool async;
+> +	struct kvm_follow_pfn foll = {
+> +		.slot = slot,
+> +		.gfn = fault->gfn,
+> +		.flags = FOLL_GET | (fault->write ? FOLL_WRITE : 0),
+> +		.allow_write_mapping = true,
+> +	};
 >  
-> +void kvm_set_page_accessed(struct page *page);
-> +void kvm_set_page_dirty(struct page *page);
+>  	/*
+>  	 * Retry the page fault if the gfn hit a memslot that is being deleted
+> @@ -4325,12 +4330,14 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>  			return RET_PF_EMULATE;
+>  	}
+>  
+> -	async = false;
+> -	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, false, &async,
+> -					  fault->write, &fault->map_writable,
+> -					  &fault->hva);
+> -	if (!async)
+> -		return RET_PF_CONTINUE; /* *pfn has correct page already */
+> +	foll.flags |= FOLL_NOWAIT;
+> +	fault->pfn = __kvm_follow_pfn(&foll);
 > +
-No one calls these 2 routines in this patch. How about move this change to
-[PATCH v7 5/8] KVM: x86/mmu: Don't pass FOLL_GET to __kvm_follow_pfn ?
+> +	if (!is_error_noslot_pfn(fault->pfn))
+> +		goto success;
+> +
+> +	if (fault->pfn != KVM_PFN_ERR_NEEDS_IO)
+> +		return RET_PF_CONTINUE;
 
-...
-
-> @@ -2930,17 +2933,19 @@ static bool kvm_is_ad_tracked_page(struct page *page)
->  	return !PageReserved(page);
->  }
->  
-> -static void kvm_set_page_dirty(struct page *page)
-> +void kvm_set_page_dirty(struct page *page)
->  {
->  	if (kvm_is_ad_tracked_page(page))
->  		SetPageDirty(page);
->  }
-> +EXPORT_SYMBOL_GPL(kvm_set_page_dirty);
->  
-> -static void kvm_set_page_accessed(struct page *page)
-> +void kvm_set_page_accessed(struct page *page)
->  {
->  	if (kvm_is_ad_tracked_page(page))
->  		mark_page_accessed(page);
->  }
-> +EXPORT_SYMBOL_GPL(kvm_set_page_accessed);
-
-Same here.
+IIUC, FOLL_NOWAIT is set only when we wanna an async fault. So
+KVM_PFN_ERR_NEEDS_IO may not be necessary? 
 
 B.R.
 Yu
