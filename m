@@ -1,60 +1,24 @@
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 601D69453
-	for <kvmarm@lists.linux.dev>; Thu,  6 Jul 2023 15:58:09 +0000 (UTC)
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-6b71cdb47e1so810905a34.2
-        for <kvmarm@lists.linux.dev>; Thu, 06 Jul 2023 08:58:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688659088; x=1691251088;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ELX9uuKAjfgek1/p+NwumoGO6BxLWYptg064O9OiHBc=;
-        b=eom9rNUvY8PSvEiS2yEy5jzWdJZzDvOogRDYqmeCMmwnH49PDRAlb6A64DC/BsFdvw
-         8sB/gBTWnJUy3Vf5sxBQdnzN798+8M5al/Six8srqG7vFuN2j7eIGkCoIn1jGVbxOdlQ
-         k0TJlPB+p1leNL2pQtt57MxN0BJjUABkoTMJ7K06jyI0oSeTnDNIW3BFtD36isceJnhC
-         Ov1RKDxVv9ttVhyc/ajzhjVYQ408TrEBueG0oqMFX09h5Wm5fiw3CBKSJWuZpbbW9mDl
-         fzgNaq6H/z5+MW47FmpSbb1giv9UrEZWmHwC2aEaPtVkw0QUhiZaco32bqgO4JpuPB+3
-         c8qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688659088; x=1691251088;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ELX9uuKAjfgek1/p+NwumoGO6BxLWYptg064O9OiHBc=;
-        b=PXJq/RgRT7DnP6Im+tyD3k42EwBb+iQKu+xvH7DLvOHn/U9XDiO7OIx9ebjjvdal0T
-         mwP5S32ijNurn+SCiaeyaoycsa2JYOd1Tq7mBL7SIYdnB5fK5MCooP8p8gCwKyQxNlF7
-         bVl1Bsh13wtlmMYukFMG3QJRLn5TjSntm0fePx1qiGWf5bznehRi+lXM2V+J+0lnN5p2
-         nFv1peoAxALfE4rPMtspiw7qk7kVDQ1UBxA/y6SnX3pKEWwvKGWGaJJFj6n5UiDJK2nS
-         02LDrn1s8E1dGEpcokfcrKr470iLxuCZuHrKrzQCWBacBFs8OhBjA1tKSAdLRj36EZfM
-         cPFA==
-X-Gm-Message-State: ABy/qLY6nbLd6FEHmlRvZPaWQA4bE8CwWe+eQdsri7ONXB80LTXhRM1e
-	BQE82m0akiM8uPL3Eb0/UqQ=
-X-Google-Smtp-Source: APBJJlFDnf5rOYi7hzzNB1UrOiVyacVt/Eu6Y2AcAbTzk9CE0nP6/LyCfIuOIjrJ9jJQIFHGu3ZFYg==
-X-Received: by 2002:a05:6830:1e42:b0:6b7:4e97:343 with SMTP id e2-20020a0568301e4200b006b74e970343mr2928881otj.27.1688659088029;
-        Thu, 06 Jul 2023 08:58:08 -0700 (PDT)
-Received: from localhost ([192.55.54.50])
-        by smtp.gmail.com with ESMTPSA id q17-20020a656a91000000b005533c53f550sm1366282pgu.45.2023.07.06.08.58.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jul 2023 08:58:07 -0700 (PDT)
-Date: Thu, 6 Jul 2023 08:58:05 -0700
-From: Isaku Yamahata <isaku.yamahata@gmail.com>
-To: David Stevens <stevensd@chromium.org>
-Cc: Yu Zhang <yu.c.zhang@linux.intel.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>, Peter Xu <peterx@redhat.com>,
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 154AB8C17
+	for <kvmarm@lists.linux.dev>; Thu,  6 Jul 2023 16:23:16 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F2C23D75;
+	Thu,  6 Jul 2023 09:23:56 -0700 (PDT)
+Received: from bogus (unknown [10.57.76.100])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 210013F762;
+	Thu,  6 Jul 2023 09:23:11 -0700 (PDT)
+Date: Thu, 6 Jul 2023 17:23:08 +0100
+From: Sudeep Holla <sudeep.holla@arm.com>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	kvm@vger.kernel.org, isaku.yamahata@gmail.com
-Subject: Re: [PATCH v7 5/8] KVM: x86/mmu: Don't pass FOLL_GET to
- __kvm_follow_pfn
-Message-ID: <20230706155805.GD3894444@ls.amr.corp.intel.com>
-References: <20230704075054.3344915-1-stevensd@google.com>
- <20230704075054.3344915-6-stevensd@google.com>
- <20230705101800.ut4c6topn6ylwczs@linux.intel.com>
- <CAD=HUj41PAKC0x+c3zWAr-aCm59K7hs2zRh1uWs9778_Mai4UA@mail.gmail.com>
+	linux-kernel@vger.kernel.org, tabba@google.com, qperret@google.com,
+	will@kernel.org, catalin.marinas@arm.com, yuzenghui@huawei.com,
+	suzuki.poulose@arm.com, james.morse@arm.com, bgardon@google.com,
+	gshan@redhat.com, Sudeep Holla <sudeep.holla@arm.com>
+Subject: Re: [PATCH v2] KVM: arm64: Add missing BTI instructions
+Message-ID: <20230706162308.kyeitspgfaqb6vgn@bogus>
+References: <20230706152240.685684-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -64,91 +28,58 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAD=HUj41PAKC0x+c3zWAr-aCm59K7hs2zRh1uWs9778_Mai4UA@mail.gmail.com>
+In-Reply-To: <20230706152240.685684-1-smostafa@google.com>
 
-On Thu, Jul 06, 2023 at 01:52:08PM +0900,
-David Stevens <stevensd@chromium.org> wrote:
-
-> On Wed, Jul 5, 2023 at 7:17 PM Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
-> >
-> > On Tue, Jul 04, 2023 at 04:50:50PM +0900, David Stevens wrote:
-> > > From: David Stevens <stevensd@chromium.org>
-> > >
-> > > Stop passing FOLL_GET to __kvm_follow_pfn. This allows the host to map
-> > > memory into the guest that is backed by un-refcounted struct pages - for
-> > > example, higher order non-compound pages allocated by the amdgpu driver
-> > > via ttm_pool_alloc_page.
-> >
-> > I guess you mean the tail pages of the higher order non-compound pages?
-> > And as to the head page, it is said to be set to one coincidentally[*],
-> > and shall not be considered as refcounted.  IIUC, refcount of this head
-> > page will be increased and decreased soon in hva_to_pfn_remapped(), so
-> > this may not be a problem(?). But treating this head page differently,
-> > as a refcounted one(e.g., to set the A/D flags), is weired.
-> >
-> > Or maybe I missed some context, e.g., can the head page be allocted to
-> > guest at all?
+On Thu, Jul 06, 2023 at 03:22:40PM +0000, Mostafa Saleh wrote:
+> Some bti instructions were missing from
+> commit b53d4a272349 ("KVM: arm64: Use BTI for nvhe")
 > 
-> Yes, this is to allow mapping the tail pages of higher order
-> non-compound pages - I should have been more precise in my wording.
-> The head pages can already be mapped into the guest.
+> 1) kvm_host_psci_cpu_entry
+> kvm_host_psci_cpu_entry is called from __kvm_hyp_init_cpu through "br"
+> instruction as __kvm_hyp_init_cpu resides in idmap section while
+> kvm_host_psci_cpu_entry is in hyp .text so the offset is larger than
+> 128MB range covered by "b".
+> Which means that this function should start with "bti j" instruction.
 > 
-> Treating the head and tail pages would require changing how KVM
-> behaves in a situation it supports today (rather than just adding
-> support for an unsupported situation). Currently, without this series,
-> KVM can map VM_PFNMAP|VM_IO memory backed by refcounted pages into the
-> guest. When that happens, KVM sets the A/D flags. I'm not sure whether
-> that's actually valid behavior, nor do I know whether anyone actually
-> cares about it. But it's what KVM does today, and I would shy away
-> from modifying that behavior without good reason.
+> LLVM which is the only compiler supporting BTI for Linux, adds "bti j"
+> for jump tables or by when taking the address of the block [1].
+> Same behaviour is observed with GCC.
 > 
-> > >
-> > > The bulk of this change is tracking the is_refcounted_page flag so that
-> > > non-refcounted pages don't trigger page_count() == 0 warnings. This is
-> > > done by storing the flag in an unused bit in the sptes.
-> >
-> > Also, maybe we should mention this only works on x86-64.
-> >
-> > >
-> > > Signed-off-by: David Stevens <stevensd@chromium.org>
-> > > ---
-> > >  arch/x86/kvm/mmu/mmu.c          | 44 +++++++++++++++++++++------------
-> > >  arch/x86/kvm/mmu/mmu_internal.h |  1 +
-> > >  arch/x86/kvm/mmu/paging_tmpl.h  |  9 ++++---
-> > >  arch/x86/kvm/mmu/spte.c         |  4 ++-
-> > >  arch/x86/kvm/mmu/spte.h         | 12 ++++++++-
-> > >  arch/x86/kvm/mmu/tdp_mmu.c      | 22 ++++++++++-------
-> > >  6 files changed, 62 insertions(+), 30 deletions(-)
-> > >
-> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > > index e44ab512c3a1..b1607e314497 100644
-> > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > +++ b/arch/x86/kvm/mmu/mmu.c
-> >
-> > ...
-> >
-> > > @@ -2937,6 +2943,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
-> > >       bool host_writable = !fault || fault->map_writable;
-> > >       bool prefetch = !fault || fault->prefetch;
-> > >       bool write_fault = fault && fault->write;
-> > > +     bool is_refcounted = !fault || fault->is_refcounted_page;
-> >
-> > Just wonder, what if a non-refcounted page is prefetched?  Or is it possible in
-> > practice?
+> As kvm_host_psci_cpu_entry is a C function, this must be done in
+> assembly.
 > 
-> Prefetching is still done via gfn_to_page_many_atomic, which sets
-> FOLL_GET. That's fixable, but it's not something this series currently
-> does.
+> Another solution is to use X16/X17 with "br", as according to ARM
+> ARM DDI0487I.a RLJHCL/IGMGRS, PACIASP has an implicit branch
+> target identification instruction that is compatible with
+> PSTATE.BTYPE 0b01 which includes "br X16/X17"
+> And the kvm_host_psci_cpu_entry has PACIASP as it is an external
+> function.
+> Although, using explicit "bti" makes it more clear than relying on
+> which register is used.
+> 
+> A third solution is to clear SCTLR_EL2.BT, which would make PACIASP
+> compatible PSTATE.BTYPE 0b11 ("br" to other registers).
+> However this deviates from the kernel behaviour (in bti_enable()).
+> 
+> 2) Spectre vector table
+> "br" instructions are generated at runtime for the vector table
+> (__bp_harden_hyp_vecs).
+> These branches would land on vectors in __kvm_hyp_vector at offset 8.
+> As all the macros are defined with valid_vect/invalid_vect, it is
+> sufficient to add "bti j" at the correct offset.
+> 
+> [1] https://reviews.llvm.org/D52867
+> 
+> Fixes: b53d4a272349 ("KVM: arm64: Use BTI for nvhe")
+> Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> Reported-by: Sudeep Holla <sudeep.holla@arm.com>
 
-So if we prefetch a page, REFCOUNTED bit is cleared unconditionally with this
-hunk.  kvm_set_page_{dirty, accessed} won't be called as expected for prefetched
-spte.  If I read the patch correctly, REFCOUNTED bit in SPTE should represent
-whether the corresponding page is ref-countable or not, right?
+Nothing change w.r.t cpu suspend-resume path in v2 anyways, but I assure
+I tested this again just be absolutely sure and it still fixes the issue
+I reported 😄, so
 
-Because direct_pte_prefetch_many() is for legacy KVM MMU and FNAME(prefetch_pte)
-is shadow paging, we need to test it with legacy KVM MMU or shadow paging to hit
-the issue, though.
+Tested-by: Sudeep Holla <sudeep.holla@arm.com>
 
-Thanks,
 -- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+Regards,
+Sudeep
