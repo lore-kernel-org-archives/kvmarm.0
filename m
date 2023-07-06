@@ -1,51 +1,52 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B04DA47
-	for <kvmarm@lists.linux.dev>; Thu,  6 Jul 2023 05:18:20 +0000 (UTC)
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2b703d7ed3aso3354731fa.1
-        for <kvmarm@lists.linux.dev>; Wed, 05 Jul 2023 22:18:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70E70A47
+	for <kvmarm@lists.linux.dev>; Thu,  6 Jul 2023 05:29:37 +0000 (UTC)
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2b5c2433134so3526931fa.0
+        for <kvmarm@lists.linux.dev>; Wed, 05 Jul 2023 22:29:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1688620698; x=1691212698;
+        d=chromium.org; s=google; t=1688621375; x=1691213375;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4Pyew4brPaMX67Blh5xxcFOiu+e7xaU8tvYkzN+gBE8=;
-        b=ZboYtskoEVGQ3PAqWlv+EBZjzbuk1OtrqlZtJIldGS6YDLutnht+md5ynH3JRJ8reP
-         O9sA9xzXz5EHSG2POC0lUxSiVgvc7g7xpfmgJTsbBuVsmqpgLvDG6AOnubNdoIhOMyYk
-         j58tsmmg6qUEhR8g9N0K5S6HWrxFegfdCvcp4=
+        bh=FaztYOK3CeeSOgdOjNlGUDoiqmvgCpcAtf+Kjtl/Zxo=;
+        b=oLDUHC7o8LLIpKQ47Bka4IhCDsnUOJ8PJa0mHtGy5+xmtH0ph+DN7fT2bOCyxUZ/OK
+         voaasNoiVitwlvc6GdEXWSG+xw+zAyvNt5YIOkZ1Gv4N8GPo9GksM1sfnehNwooTJ6MC
+         TIGRcSt6tw1MrfY6kMBuzzrrO3OFxrZGWrz+M=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688620698; x=1691212698;
+        d=1e100.net; s=20221208; t=1688621375; x=1691213375;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4Pyew4brPaMX67Blh5xxcFOiu+e7xaU8tvYkzN+gBE8=;
-        b=KK7s/izcjTR863noQFdrOwEHaQzBaF9UqFIgA0btOZ5ZPEfz+7m0GgplrCYTEsMN0z
-         6bSPpG61Oblu/OEmdUEqGIKU18p2RfNgyjZuBn7lFpOvqf7Z+lQdUJCy0sl8AwlT6Tlj
-         S5sRW5cyqPIEpEXkExPRMgzeNhZluc7M17dC0j/Z8tiK71CVBCd9G9YhP7Vt8Unld+PB
-         wyvUjJrk6iVnV92V8Ra2USQv+O5OrjjS26ZJgD8lvOel5Vg+OFWIbB89/l25oD82ZynB
-         I82FIkWEj/rbnSEPHAzASDlNIsWMHcwedfXJrXj96Y0ZNRpywk3cfdxtZjx5dtxpMk9t
-         I6aw==
-X-Gm-Message-State: ABy/qLZvAlMi61wT+az0/dv6gXhuai1/JONS3B5KpigZ4zXiQW+ys781
-	4cfvNFO/pU6gpIgLCyHfige0IhaImMezr1AEta6Txw==
-X-Google-Smtp-Source: APBJJlFiaE5Rjy8N1mpXTKWuoY2gflHQlG7Qa0YN0CEaaUlIylK7sjjnfKxe8x2S2ynq0UzPO6qqGQ3z9DYXcAHxgSU=
-X-Received: by 2002:a2e:8902:0:b0:2b6:de6d:8148 with SMTP id
- d2-20020a2e8902000000b002b6de6d8148mr499717lji.31.1688620697982; Wed, 05 Jul
- 2023 22:18:17 -0700 (PDT)
+        bh=FaztYOK3CeeSOgdOjNlGUDoiqmvgCpcAtf+Kjtl/Zxo=;
+        b=Q5gA3dZo7juS9AO9TW5VJCp5IfpdReBqy8fV/ODEAIxXw9hxWPEtqpRewfloGEOHFO
+         +Ur2Qq4j3L3f6vDdxMfLNMkYcbzjpk+syuUzTsQUPKfaYPUaQHQmwGLL8j4eqLsHi4gQ
+         NFhGb5nV+EYLGZ1STNu7p9XxWUOo5aS9LHp6FKpDSDDNTkeaZeYwKZc2A+3HHodG+5qU
+         RVsoM66MD/8BFWUywLb7cXFgot9zmITErf23Q2qYjI/YnUVSY47gBvRAs8Q8CukD9V2e
+         lC+fThX/YcARS9K7J5u+Hqh2/6NVph/UJ1cq+F0JoNlE9QFokKM+1uLTo31600CVJeTX
+         7hAA==
+X-Gm-Message-State: ABy/qLYE8/nbp90yp5rFTv4XVdRiHQ2xAWNTcHCgx8i8jtT49jAhRz7X
+	yc633zhLQfjwsiu9uN6J8o1yFdK1CrpFcTWxTp9ZjQ==
+X-Google-Smtp-Source: APBJJlFoQbGHquM/8F8vHFVN0DzDyQkinz8d9jngOAhWJR4+2GRUPIv/nW729Pai2dwCQYTiCsN6nZl/3HDPmf9AC/g=
+X-Received: by 2002:a05:651c:107b:b0:2b6:d7d2:1a65 with SMTP id
+ y27-20020a05651c107b00b002b6d7d21a65mr1632317ljm.18.1688621375279; Wed, 05
+ Jul 2023 22:29:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-6-stevensd@google.com>
- <20230706021016.GC3894444@ls.amr.corp.intel.com>
-In-Reply-To: <20230706021016.GC3894444@ls.amr.corp.intel.com>
+References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-3-stevensd@google.com>
+ <20230705031002.xrxk42hli6oavtlt@linux.intel.com> <CAD=HUj6-VbznOOtn5WJee7Of_nh33ygg7_ph2G=hgnvNk_Cbsw@mail.gmail.com>
+ <20230705105343.iounmlflfued7lco@linux.intel.com>
+In-Reply-To: <20230705105343.iounmlflfued7lco@linux.intel.com>
 From: David Stevens <stevensd@chromium.org>
-Date: Thu, 6 Jul 2023 14:18:06 +0900
-Message-ID: <CAD=HUj5ermRAjxVYhERDA7fE0cZ5TAGunP6j7zM5YC6PyiZh-g@mail.gmail.com>
-Subject: Re: [PATCH v7 5/8] KVM: x86/mmu: Don't pass FOLL_GET to __kvm_follow_pfn
-To: Isaku Yamahata <isaku.yamahata@gmail.com>
+Date: Thu, 6 Jul 2023 14:29:24 +0900
+Message-ID: <CAD=HUj5ezWt7rLAv2qOpFsMHyFU87Hqtw_p8pWNF5+oxbLhxDg@mail.gmail.com>
+Subject: Re: [PATCH v7 2/8] KVM: Introduce __kvm_follow_pfn function
+To: Yu Zhang <yu.c.zhang@linux.intel.com>
 Cc: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
 	Michael Ellerman <mpe@ellerman.id.au>, Peter Xu <peterx@redhat.com>, 
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
@@ -54,39 +55,73 @@ Cc: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 6, 2023 at 11:10=E2=80=AFAM Isaku Yamahata <isaku.yamahata@gmai=
+On Wed, Jul 5, 2023 at 7:53=E2=80=AFPM Yu Zhang <yu.c.zhang@linux.intel.com=
+> wrote:
+>
+> On Wed, Jul 05, 2023 at 06:22:59PM +0900, David Stevens wrote:
+> > On Wed, Jul 5, 2023 at 12:10=E2=80=AFPM Yu Zhang <yu.c.zhang@linux.inte=
 l.com> wrote:
->
-> On Tue, Jul 04, 2023 at 04:50:50PM +0900,
-> David Stevens <stevensd@chromium.org> wrote:
->
-> > diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-> > index cf2c6426a6fc..46c681dc45e6 100644
-> > --- a/arch/x86/kvm/mmu/spte.c
-> > +++ b/arch/x86/kvm/mmu/spte.c
-> > @@ -138,7 +138,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mm=
-u_page *sp,
-> >              const struct kvm_memory_slot *slot,
-> >              unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
-> >              u64 old_spte, bool prefetch, bool can_unsync,
-> > -            bool host_writable, u64 *new_spte)
-> > +            bool host_writable, bool is_refcounted, u64 *new_spte)
-> >  {
-> >       int level =3D sp->role.level;
-> >       u64 spte =3D SPTE_MMU_PRESENT_MASK;
-> > @@ -188,6 +188,8 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mm=
-u_page *sp,
+> > >
+> > > > @@ -2514,35 +2512,26 @@ static bool hva_to_pfn_fast(unsigned long a=
+ddr, bool write_fault,
+> > > >   * The slow path to get the pfn of the specified host virtual addr=
+ess,
+> > > >   * 1 indicates success, -errno is returned if error is detected.
+> > > >   */
+> > > > -static int hva_to_pfn_slow(unsigned long addr, bool *async, bool w=
+rite_fault,
+> > > > -                        bool interruptible, bool *writable, kvm_pf=
+n_t *pfn)
+> > > > +static int hva_to_pfn_slow(struct kvm_follow_pfn *foll, kvm_pfn_t =
+*pfn)
+> > > >  {
+> > > > -     unsigned int flags =3D FOLL_HWPOISON;
+> > > > +     unsigned int flags =3D FOLL_HWPOISON | FOLL_GET | foll->flags=
+;
+> > > >       struct page *page;
+> > > >       int npages;
+> > > >
+> > > >       might_sleep();
+> > > >
+> > > > -     if (writable)
+> > > > -             *writable =3D write_fault;
+> > > > -
+> > > > -     if (write_fault)
+> > > > -             flags |=3D FOLL_WRITE;
+> > > > -     if (async)
+> > > > -             flags |=3D FOLL_NOWAIT;
+> > > > -     if (interruptible)
+> > > > -             flags |=3D FOLL_INTERRUPTIBLE;
+> > > > -
+> > > > -     npages =3D get_user_pages_unlocked(addr, 1, &page, flags);
+> > > > +     npages =3D get_user_pages_unlocked(foll->hva, 1, &page, flags=
+);
+> > > >       if (npages !=3D 1)
+> > > >               return npages;
+> > > >
+> > > > +     foll->writable =3D (foll->flags & FOLL_WRITE) && foll->allow_=
+write_mapping;
+> > > > +
+> > > >       /* map read fault as writable if possible */
+> > > > -     if (unlikely(!write_fault) && writable) {
+> > > > +     if (unlikely(!foll->writable) && foll->allow_write_mapping) {
+> > >
+> > > I guess !foll->writable should be !(foll->flags & FOLL_WRITE) here.
 > >
-> >       if (level > PG_LEVEL_4K)
-> >               spte |=3D PT_PAGE_SIZE_MASK;
-> > +     else if (is_refcounted)
-> > +             spte |=3D SPTE_MMU_PAGE_REFCOUNTED;
+> > The two statements are logically equivalent, although I guess using
+> > !(foll->flags & FOLL_WRITE) may be a little clearer, if a little more
+> > verbose.
 >
-> Is REFCOUNTED for 4K page only?  What guarantees that large page doesn't =
-have
-> FOLL_GET? or can we set the bit for large page?
+> Well, as the comment says, we wanna try to map the read fault as writable
+> whenever possible. And __gfn_to_pfn_memslot() will only set the FOLL_WRIT=
+E
+> for write faults. So I guess using !foll->writable will not allow this.
+> Did I miss anything?
 
-Oh, you're right, it should apply to >4K pages as well. This was based
-on stale thinking from earlier versions of this series.
+We just set the foll->writable out parameter to be equal to
+((foll->flags & FOLL_WRITE) && foll->allow_write_mapping). Taking a =3D
+foll->flags & FOLL_WRITE and b =3D foll->allow_write_mapping, we have
+!(a && b) && b -> (!a || !b) && b -> (!a && b) || (!b && b) -> !a &&
+b.
 
 -David
