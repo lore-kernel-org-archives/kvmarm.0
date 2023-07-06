@@ -1,168 +1,143 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06B0BA934
-	for <kvmarm@lists.linux.dev>; Thu,  6 Jul 2023 15:22:45 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5734d919156so9388527b3.3
-        for <kvmarm@lists.linux.dev>; Thu, 06 Jul 2023 08:22:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A0FA934
+	for <kvmarm@lists.linux.dev>; Thu,  6 Jul 2023 15:23:39 +0000 (UTC)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-3fbb07e7155so138165e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 06 Jul 2023 08:23:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688656965; x=1691248965;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=VKkGNFGAOB4USWKpvy2EpxfGhrOPACQMax7HtOyXC/I=;
-        b=CyZPgXDdQ30bQCb+jUXEjDDQXXJT5YgeNBsjGo+1f3Glm2lnPhGi/N/oCHxE8goUvy
-         ZWFLQOncK2rg99pr6GAB+tLnbXmaKUIjNKHenSrHkcoksyZfKlptazxIFWma25pIVAGh
-         yZrWcJL4CwqFgcE/hjAto4uuJ6E+pqSUfoBIa+CssasTC0TdWtSKLbMdMLvllY9iIvhg
-         6hkdI4/k0+WcjLZnLbI5i4a8wuSs7/bPbKMTwuipRzYvnckjt4RYqYPOZBgcdWei++4t
-         CUXP2ZiHe2YeEY620Noqz5gCChdRA5NnbbuXfoYF1DfU6rVR5dvdMZvbRLZXoEDqPzQD
-         xY/w==
+        d=google.com; s=20221208; t=1688657017; x=1691249017;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y6qis8CnT+xpm3hc78+sJPYYplKlMZhcwZsxd3FBsB0=;
+        b=bcB9+xfY27xSFVigr4qzoaT1bXwyVfL7cV9cR1lj4nkkq4cj6u6M70kYX6IKLgWfq/
+         coCkE1TPHHK3J+UbNGZQEAzgG+pYn65TrDOgl7kosOEptK7fiIjPLER17OCXobybXyqH
+         wKAuu72b5U0pogvwL/hTwJMiHrQkbdIAA2PQAGs5gElWRWG9ZNE7nJZIAEoRF1xXaQ7w
+         0CylC9GSRUIRRHRNStCd8V2o/Uibwsr/2Ll1Kzxk2SvhsginXwiyMLDxZbhhsyEJhqB7
+         yU9KbngrenPiE+8WiUYymW1F0B2FaJKOF2k3Inq/rBKqMKdmGPknGFq+E8IGafmiUKkB
+         Mqgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688656965; x=1691248965;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VKkGNFGAOB4USWKpvy2EpxfGhrOPACQMax7HtOyXC/I=;
-        b=BAxcag6GzU3/QGwAQSN6SZe9yJocu3+saw6xtI1xzRhCQzR2nO0Vxo4477qa+ek2Yr
-         L1B1m7QA3r4BZAzpFDrlcC4+6IuHNvp6FLBho8UhelgWldFCkgCjtpBLJwYWvtOoPcZA
-         oFPUb7HUEJEX1nNB2gHiN0Sqhw5qTcn9Hhino39mfetjN0nHcypXm/vlOV46zFyQMUU9
-         eN9MTrXwCVOG/Pt6+JP/76dHYtdyvla1/mU2Y42XhYLCsX4Meq3TTqXllXzCU9Gjim51
-         +tcFIN/N8G22k70wfPTZj3VRBrWm2K82cylU6w5JRN+6AZfikYQHTAqsF/ZK7y//abqR
-         nSAg==
-X-Gm-Message-State: ABy/qLZTPG7EdSXqVCOHlcqrWNonOzIhiu1Bdy9RE9Can/wQFmRuIFYl
-	KA9DpFLkMgxQ25Dv93R8NA21Kbu66np/pQ==
-X-Google-Smtp-Source: APBJJlEko497DGUDiRAMdGkTRXbHaagFdl9o7KP6ciruOG47DGGSg4wy6ycDr0AdERo3Ke4qRabvPOuh2fk33g==
-X-Received: from mostafa.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:333c])
- (user=smostafa job=sendgmr) by 2002:a81:4323:0:b0:56c:e585:8b17 with SMTP id
- q35-20020a814323000000b0056ce5858b17mr16822ywa.5.1688656964807; Thu, 06 Jul
- 2023 08:22:44 -0700 (PDT)
-Date: Thu,  6 Jul 2023 15:22:40 +0000
+        d=1e100.net; s=20221208; t=1688657017; x=1691249017;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y6qis8CnT+xpm3hc78+sJPYYplKlMZhcwZsxd3FBsB0=;
+        b=ZuiuxgjUOXJKq5EVy2xTH3u6dHCPYHC9smjvxTl+tCTeGkR3K2K50cFscy1cCXNMi/
+         J0MTTKeJ4iSdKkLwX3cCX0m87VVb4uVKfpsb8cRyPB7T+BVlwNeXV9/lk4LjMAGyQXDw
+         kspu5xO4+vjD/qmGJIBwFvHdQ6vQ0RJS7OtMtmCC5KjiesptJ0iicljwJIwIMqEh5r4V
+         qFyYF4h7CXZwDFCrQXEPGk++ntMfg6ewHptD8+h6W5I2fKeJoYYLTwpKsFWygiRIdW8N
+         MjIiYj02WE5Jv/jx7/nrilARa6/gmWeQEfwBIPplMTwiwua+hZS0vGW48Cy/zRembXuv
+         UY1w==
+X-Gm-Message-State: ABy/qLY8JoOA+8ieMpJNsVVW6msfU+HLNjpk0XRIPllho8evFI2WYvSn
+	s1J9QurA1/sGbr8ZM6I62l1JeQ==
+X-Google-Smtp-Source: APBJJlEVZPjavZNR3a4RhEKi5usCLZuBG+o7AGWWWk8qr/QqNNQ1Ew+k2sJlSWVllKPPgSIFvYBf0Q==
+X-Received: by 2002:a05:600c:45ca:b0:3f6:f4b:d4a6 with SMTP id s10-20020a05600c45ca00b003f60f4bd4a6mr87572wmo.7.1688657017311;
+        Thu, 06 Jul 2023 08:23:37 -0700 (PDT)
+Received: from google.com (44.232.78.34.bc.googleusercontent.com. [34.78.232.44])
+        by smtp.gmail.com with ESMTPSA id j14-20020a056000124e00b0031274a184d5sm2110136wrx.109.2023.07.06.08.23.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Jul 2023 08:23:36 -0700 (PDT)
+Date: Thu, 6 Jul 2023 15:23:32 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: oliver.upton@linux.dev, Sudeep Holla <sudeep.holla@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, tabba@google.com, qperret@google.com,
+	will@kernel.org, catalin.marinas@arm.com, yuzenghui@huawei.com,
+	suzuki.poulose@arm.com, james.morse@arm.com, bgardon@google.com,
+	gshan@redhat.com
+Subject: Re: [PATCH v3] KVM: arm64: Use BTI for nvhe
+Message-ID: <ZKbcdGNurXPdNJgf@google.com>
+References: <20230530150845.2856828-1-smostafa@google.com>
+ <20230704134136.a5znw4jupt5yp5kg@bogus>
+ <ZKQqIYRrckLlXqkx@google.com>
+ <20230704143339.cqrvntq7rmmb2on3@bogus>
+ <ZKRIWJKn7aVSOvjd@google.com>
+ <20230704192529.d4x2p7ndz2dc4q52@bogus>
+ <ZKWSkB1/5Zlm7mdR@google.com>
+ <CAFgf54rQmBMgvRWj2yqQ90=12x-Tm1BkHj_-pf+ZBYPmBU_Swg@mail.gmail.com>
+ <873521yv1j.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
-Message-ID: <20230706152240.685684-1-smostafa@google.com>
-Subject: [PATCH v2] KVM: arm64: Add missing BTI instructions
-From: Mostafa Saleh <smostafa@google.com>
-To: maz@kernel.org, oliver.upton@linux.dev, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Cc: tabba@google.com, qperret@google.com, will@kernel.org, 
-	catalin.marinas@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, 
-	james.morse@arm.com, bgardon@google.com, gshan@redhat.com, 
-	sudeep.holla@arm.com, Mostafa Saleh <smostafa@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <873521yv1j.wl-maz@kernel.org>
 
-Some bti instructions were missing from
-commit b53d4a272349 ("KVM: arm64: Use BTI for nvhe")
+On Thu, Jul 06, 2023 at 03:27:36PM +0100, Marc Zyngier wrote:
+> Hi Mostafa,
+> 
+> On Thu, 06 Jul 2023 13:49:04 +0100,
+> Mostafa Saleh <smostafa@google.com> wrote:
+> > 
+> > Hi Marc and Oliver,
+> > 
+> > I was double checking that nothing else was missed.
+> > 
+> > I found there is another problem for hw that has BTI and is affected
+> > by specterv3a.
+> > 
+> > "br'' instructions are generated at runtime for the vector
+> > table(__bp_harden_hyp_vecs).  These branches would land on vectors
+> > in __kvm_hyp_vector at offset 8.
+> > 
+> > As all the macros are defined with valid_vect/invalid_vect, it is
+> > sufficient to add "bti j" there at the correct offset.
+> >
+> > I am not sure if such hardware exists. I tested this with a stubbed
+> > "has_spectre_v3a" which confirms the issue and the fix.
+> 
+> Thanks for the heads up.
+> 
+> Fortunately, there is no such HW as far as I can tell. Only Cortex-A57
+> and A72 are affected by this (and the only two CPUs for which we
+> engage the mitigation), and they are way too old to know about BTI.
+> 
+> > Please let me know if this fix suitable, I can include it with the other fix in
+> > "[PATCH] KVM: arm64: Add missing BTI instruction in kvm_host_psci_cpu_entry"
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+> > index 8f3f93fa119e..175c030379e3 100644
+> > --- a/arch/arm64/kvm/hyp/hyp-entry.S
+> > +++ b/arch/arm64/kvm/hyp/hyp-entry.S
+> > @@ -154,6 +154,12 @@ SYM_CODE_END(\label)
+> >   esb
+> >   stp x0, x1, [sp, #-16]!
+> >  662:
+> > + /*
+> > + * Specter vectors __bp_harden_hyp_vecs generate br instructions at runtime
+> > + * that jump at offset 8 at __kvm_hyp_vector.
+> > + * As hyp .text is guarded section, it needs bti j.
+> > + */
+> > + bti j
+> >   b \target
+> > 
+> >  check_preamble_length 661b, 662b
+> > @@ -165,6 +171,8 @@ check_preamble_length 661b, 662b
+> >   nop
+> >   stp x0, x1, [sp, #-16]!
+> >  662:
+> > + /* Check valid_vect */
+> > + bti j
+> >   b \target
+> > 
+> >  check_preamble_length 661b, 662b
+> 
+> This looks correct to me.
+> 
+> If you can respin you initial patch (with maybe a slightly more
+> generic subject) so that Oliver can pick it up as part of the next
+> batch of fixes, that'd be great.
 
-1) kvm_host_psci_cpu_entry
-kvm_host_psci_cpu_entry is called from __kvm_hyp_init_cpu through "br"
-instruction as __kvm_hyp_init_cpu resides in idmap section while
-kvm_host_psci_cpu_entry is in hyp .text so the offset is larger than
-128MB range covered by "b".
-Which means that this function should start with "bti j" instruction.
+Thanks a lot, I just sent v2.
+[PATCH v2] KVM: arm64: Add missing BTI instructions
 
-LLVM which is the only compiler supporting BTI for Linux, adds "bti j"
-for jump tables or by when taking the address of the block [1].
-Same behaviour is observed with GCC.
-
-As kvm_host_psci_cpu_entry is a C function, this must be done in
-assembly.
-
-Another solution is to use X16/X17 with "br", as according to ARM
-ARM DDI0487I.a RLJHCL/IGMGRS, PACIASP has an implicit branch
-target identification instruction that is compatible with
-PSTATE.BTYPE 0b01 which includes "br X16/X17"
-And the kvm_host_psci_cpu_entry has PACIASP as it is an external
-function.
-Although, using explicit "bti" makes it more clear than relying on
-which register is used.
-
-A third solution is to clear SCTLR_EL2.BT, which would make PACIASP
-compatible PSTATE.BTYPE 0b11 ("br" to other registers).
-However this deviates from the kernel behaviour (in bti_enable()).
-
-2) Spectre vector table
-"br" instructions are generated at runtime for the vector table
-(__bp_harden_hyp_vecs).
-These branches would land on vectors in __kvm_hyp_vector at offset 8.
-As all the macros are defined with valid_vect/invalid_vect, it is
-sufficient to add "bti j" at the correct offset.
-
-[1] https://reviews.llvm.org/D52867
-
-Fixes: b53d4a272349 ("KVM: arm64: Use BTI for nvhe")
-Signed-off-by: Mostafa Saleh <smostafa@google.com>
-Reported-by: Sudeep Holla <sudeep.holla@arm.com>
----
-v1 -> v2:
-- Add another missing bti in spectre vector table.
-v1: https://lore.kernel.org/all/20230705171632.3912123-1-smostafa@google.com/
----
- arch/arm64/kvm/hyp/hyp-entry.S       |  8 ++++++++
- arch/arm64/kvm/hyp/nvhe/host.S       | 10 ++++++++++
- arch/arm64/kvm/hyp/nvhe/psci-relay.c |  2 +-
- 3 files changed, 19 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index 8f3f93fa119e..03f97d71984c 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -154,6 +154,12 @@ SYM_CODE_END(\label)
- 	esb
- 	stp	x0, x1, [sp, #-16]!
- 662:
-+	/*
-+	 * spectre vectors __bp_harden_hyp_vecs generate br instructions at runtime
-+	 * that jump at offset 8 at __kvm_hyp_vector.
-+	 * As hyp .text is guarded section, it needs bti j.
-+	 */
-+	bti j
- 	b	\target
- 
- check_preamble_length 661b, 662b
-@@ -165,6 +171,8 @@ check_preamble_length 661b, 662b
- 	nop
- 	stp	x0, x1, [sp, #-16]!
- 662:
-+	/* Check valid_vect */
-+	bti j
- 	b	\target
- 
- check_preamble_length 661b, 662b
-diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-index c87c63133e10..7693a6757cd7 100644
---- a/arch/arm64/kvm/hyp/nvhe/host.S
-+++ b/arch/arm64/kvm/hyp/nvhe/host.S
-@@ -297,3 +297,13 @@ SYM_CODE_START(__kvm_hyp_host_forward_smc)
- 
- 	ret
- SYM_CODE_END(__kvm_hyp_host_forward_smc)
-+
-+/*
-+ * kvm_host_psci_cpu_entry is called through br instruction, which requires
-+ * bti j instruction as compilers (gcc and llvm) doesn't insert bti j for external
-+ * functions, but bti c instead.
-+ */
-+SYM_CODE_START(kvm_host_psci_cpu_entry)
-+       bti j
-+       b __kvm_host_psci_cpu_entry
-+SYM_CODE_END(kvm_host_psci_cpu_entry)
-diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-index 08508783ec3d..24543d2a3490 100644
---- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-+++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-@@ -200,7 +200,7 @@ static int psci_system_suspend(u64 func_id, struct kvm_cpu_context *host_ctxt)
- 			 __hyp_pa(init_params), 0);
- }
- 
--asmlinkage void __noreturn kvm_host_psci_cpu_entry(bool is_cpu_on)
-+asmlinkage void __noreturn __kvm_host_psci_cpu_entry(bool is_cpu_on)
- {
- 	struct psci_boot_args *boot_args;
- 	struct kvm_cpu_context *host_ctxt;
--- 
-2.41.0.255.g8b1d071c50-goog
-
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
