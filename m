@@ -1,37 +1,37 @@
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09702137C
-	for <kvmarm@lists.linux.dev>; Thu,  6 Jul 2023 06:09:30 +0000 (UTC)
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2b70404a5a0so3445461fa.2
-        for <kvmarm@lists.linux.dev>; Wed, 05 Jul 2023 23:09:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 895541102
+	for <kvmarm@lists.linux.dev>; Thu,  6 Jul 2023 06:49:52 +0000 (UTC)
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2b700e85950so3945461fa.3
+        for <kvmarm@lists.linux.dev>; Wed, 05 Jul 2023 23:49:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1688623769; x=1691215769;
+        d=chromium.org; s=google; t=1688626190; x=1691218190;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nnXCFXxOhLyq4lCoBGcKBYyF+4vukIbIpcnG55iOM5c=;
-        b=Mb8mQeODhASdfKj+hHmylndEuVUiM/b1apoiBK04bLwBY4ajtvROBk8GMW7aZY/V0i
-         W1Z+4ltSxdNVbESwxHXe2Nto30vwXM0F3QS91jS46XmSmaIFT07lHu3Fjhw9FLn8BQ2Y
-         YvMVdpKSmiU70sMHWlcr+gv3eHgbBItZzvHwg=
+        bh=r5eWkSj4KC5nS3P+RLvcZXPptH23EBW7FjX/9bZ4xeY=;
+        b=ja4IOO3xVZ6/Tc75u/mIiFFibtnYxJ3DyQJiezKFRO1BT/i/tInsQdPBwqV1K6c8OB
+         NzrTW0CCdwtJDcyKr+K7eaRAfl7gSY3EPoTgo/V1gOdfqehluk6JZK6F4LvwA1z4DQCk
+         aCMPhrABaGhAhTIgENGDgkn/PB5cEiYnULzWI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688623769; x=1691215769;
+        d=1e100.net; s=20221208; t=1688626190; x=1691218190;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nnXCFXxOhLyq4lCoBGcKBYyF+4vukIbIpcnG55iOM5c=;
-        b=XxGzZIesalsxHE15uaphigUyKC8oeygZoXL4byZdBWAHLiht46wnWKwgAYVB1VCUin
-         0N1wKGS5EelUNio6Vr+mDq/cjXXOlpehoF+tSxkBfzrhS4e24z/OcgI5D2lBT/+b7Prf
-         8Dym/kd4m7UvlAQU0VazcNWqkAEB6lDgvNRm+/NFmgayTF4ZpRffKRMeLy6Hkiv8IDuI
-         CZsno28zIJzTW0QRO5i5oiW2C4MkeNppQxt1/l6bu4FOQcuUPB2YQo+IuqUYCVRVBz9a
-         opdOJVNe/ZyfbMGzdd/tvhlLbS7DS/bq/BetAGBu07T/xg+2GEPwtbHsf6lz84S67FkC
-         ywrg==
-X-Gm-Message-State: ABy/qLZNnXRbzQh26k4LUxgH+tbecS6jZGNknpoXTCOJPnkSppAsO5o8
-	cjqWpi6ypsz/1our1yFh1z6yuXqeI+s6o4CiE3caNA==
-X-Google-Smtp-Source: APBJJlFQB6JQNb0dZ8JFG6eZYjbcpaXMlqxVbVKudZNWo1HIe+n1zgkzENdCl4UX7JHIJWm/W9286vJy7CQ1VvEz4L0=
-X-Received: by 2002:a2e:9c46:0:b0:2b7:857:7cb5 with SMTP id
- t6-20020a2e9c46000000b002b708577cb5mr58264ljj.24.1688623768867; Wed, 05 Jul
- 2023 23:09:28 -0700 (PDT)
+        bh=r5eWkSj4KC5nS3P+RLvcZXPptH23EBW7FjX/9bZ4xeY=;
+        b=eoF1TyBgvTvLPtawoDWxXvCWT/gRHNo1oax+66MYy9D6JyaxPpHqztAiwLOQcgeHmE
+         9mnjY9FadA2ZD5bCjRSoCsCv1C5fl620dE7jj1k4EZjrNKT3ngnsrzHt+jjZpmQoVjyN
+         av5odf3QU8PUfFNDeLW9aBz//nO7X19Y5zEOieV6zmhoneGUJW7ReY26QtQSLpgLatxX
+         VxeamKx6rX7uyCOpgMaWcNE5HeBkTdTFzTGykUZ9yBchdp4KwHN/KbeY+/XeXIez5wWc
+         OcJvsepWS2brZ36lBn/cKazCJCZ1kiFOggmTtB/mXGkp4cVovLF+vW17u8ER3nCTyIDy
+         RILA==
+X-Gm-Message-State: ABy/qLZf7FZtqDbuHHhpb7oLSROlWRFMMGW0rrBBhmttjCcwRZjPgar5
+	iU3jDGhkNLTrj2+IXIZwsFM72Qhf0Coxg7xxnnUktg==
+X-Google-Smtp-Source: APBJJlF7htU9Rd6ty5mPrsHjdKtTcK7sc+s+47FH3YkpHGjHXvbMbW6eRVcyDM6GyWvtGpLRUG3fOJ+jUV4yvf2Vv+s=
+X-Received: by 2002:a2e:b60d:0:b0:2b6:bb08:91c4 with SMTP id
+ r13-20020a2eb60d000000b002b6bb0891c4mr609674ljn.42.1688626190310; Wed, 05 Jul
+ 2023 23:49:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -39,13 +39,13 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-4-stevensd@google.com>
- <20230705115653.5whvhvcvmflqmcse@linux.intel.com>
-In-Reply-To: <20230705115653.5whvhvcvmflqmcse@linux.intel.com>
+ <20230705161914.00004070.zhi.wang.linux@gmail.com>
+In-Reply-To: <20230705161914.00004070.zhi.wang.linux@gmail.com>
 From: David Stevens <stevensd@chromium.org>
-Date: Thu, 6 Jul 2023 15:09:17 +0900
-Message-ID: <CAD=HUj4E84MxZn8=U3wkBtx-VYdeD1mqOH9BUYpG=Y2POvY6sg@mail.gmail.com>
+Date: Thu, 6 Jul 2023 15:49:39 +0900
+Message-ID: <CAD=HUj5cbzjrc0KD7xcibtRMRCzoJRJAzt7jTHSXUSpzyAYbdg@mail.gmail.com>
 Subject: Re: [PATCH v7 3/8] KVM: Make __kvm_follow_pfn not imply FOLL_GET
-To: Yu Zhang <yu.c.zhang@linux.intel.com>
+To: Zhi Wang <zhi.wang.linux@gmail.com>
 Cc: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
 	Michael Ellerman <mpe@ellerman.id.au>, Peter Xu <peterx@redhat.com>, 
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
@@ -54,10 +54,12 @@ Cc: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 5, 2023 at 8:56=E2=80=AFPM Yu Zhang <yu.c.zhang@linux.intel.com=
-> wrote:
+On Wed, Jul 5, 2023 at 10:19=E2=80=AFPM Zhi Wang <zhi.wang.linux@gmail.com>=
+ wrote:
 >
-> On Tue, Jul 04, 2023 at 04:50:48PM +0900, David Stevens wrote:
+> On Tue,  4 Jul 2023 16:50:48 +0900
+> David Stevens <stevensd@chromium.org> wrote:
+>
 > > From: David Stevens <stevensd@chromium.org>
 > >
 > > Make it so that __kvm_follow_pfn does not imply FOLL_GET. This allows
@@ -104,18 +106,37 @@ memory_slot *slot, gfn_t gfn,
 > > +     /*
 > > +      * Usage of the returned pfn will be guared by a mmu notifier. Mu=
 st
+>                                               ^guarded
 > > +      * be true if FOLL_GET is not set.
 > > +      */
 > > +     bool guarded_by_mmu_notifier;
->
-> And how? Any place to check the invalidate seq?
+> >
+> It seems no one sets the guraded_by_mmu_notifier in this patch. Is
+> guarded_by_mmu_notifier always equal to !foll->FOLL_GET and set by the
+> caller of __kvm_follow_pfn()?
 
-kvm_follow_pfn can't meaningfully validate the seq number, since the
-mmu notifier locking is handled by the caller. This is more of a
-sanity check that the API is being used properly, as proposed here
-[1]. I did deviate from the proposal with a bool instead of some type
-of integer, since the exact value of mmu_seq wouldn't be useful.
+Yes, this is the case.
 
-[1] https://lore.kernel.org/all/ZGvUsf7lMkrNDHuE@google.com/#t
+> If yes, do we have to use FOLL_GET to resolve GFN associated with a tail =
+page?
+> It seems gup can tolerate gup_flags without FOLL_GET, but it is more like=
+ a
+> temporary solution. I don't think it is a good idea to play tricks with
+> a temporary solution, more like we are abusing the toleration.
+
+I'm not sure I understand what you're getting at. This series never
+calls gup without FOLL_GET.
+
+This series aims to provide kvm_follow_pfn as a unified API on top of
+gup+follow_pte. Since one of the major clients of this API uses an mmu
+notifier, it makes sense to support returning a pfn without taking a
+reference. And we indeed need to do that for certain types of memory.
+
+> Is a flag like guarded_by_mmu_notifier (perhaps a better name) enough to
+> indicate a tail page?
+
+What do you mean by to indicate a tail page? Do you mean to indicate
+that the returned pfn refers to non-refcounted page? That's specified
+by is_refcounted_page.
 
 -David
