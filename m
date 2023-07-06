@@ -1,136 +1,121 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79A2EA920
-	for <kvmarm@lists.linux.dev>; Thu,  6 Jul 2023 14:27:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 449FFC433C7;
-	Thu,  6 Jul 2023 14:27:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688653667;
-	bh=XjMcz5uZNstuRDH3jnBWjbSJFiV7skHvPFlp98zFaNI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BhAi0ogwapMqRb9bpapU3oUWnc7D4mZZ/5AokTrCdVsbl2BdVT8SJyQdWKJ+VC1Fk
-	 v3yy86953vnQPJI3nGDoREpbFSt8as5YUGBSRKx6AsGMRkOXbAlZXdjOyJrIkORYCy
-	 YeStLA8+YflkUTqkGJ2lhVq41/1NhacWHTx9CmjetWfE5r29mJEypyKVd5TALcIRqE
-	 sbdye9kHbOYkLY8kkdLUmu3n/B5k9EilXDMNcXRHCw7SjWfu+v4M3t41dvaD+kpt/e
-	 G0Rk0/05pAAoDhG2BAHT04XZKysR7Jp7Do3dbLTpbyzw52RVthudlnw7wFAoMlqFAX
-	 5N9P0FJZD55xw==
-Received: from 84-53-99-172.bbserv.nl ([84.53.99.172] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qHPxQ-00AxTm-Ul;
-	Thu, 06 Jul 2023 15:27:45 +0100
-Date: Thu, 06 Jul 2023 15:27:36 +0100
-Message-ID: <873521yv1j.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: oliver.upton@linux.dev,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	tabba@google.com,
-	qperret@google.com,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	yuzenghui@huawei.com,
-	suzuki.poulose@arm.com,
-	james.morse@arm.com,
-	bgardon@google.com,
-	gshan@redhat.com
-Subject: Re: [PATCH v3] KVM: arm64: Use BTI for nvhe
-In-Reply-To: <CAFgf54rQmBMgvRWj2yqQ90=12x-Tm1BkHj_-pf+ZBYPmBU_Swg@mail.gmail.com>
-References: <20230530150845.2856828-1-smostafa@google.com>
-	<20230704134136.a5znw4jupt5yp5kg@bogus>
-	<ZKQqIYRrckLlXqkx@google.com>
-	<20230704143339.cqrvntq7rmmb2on3@bogus>
-	<ZKRIWJKn7aVSOvjd@google.com>
-	<20230704192529.d4x2p7ndz2dc4q52@bogus>
-	<ZKWSkB1/5Zlm7mdR@google.com>
-	<CAFgf54rQmBMgvRWj2yqQ90=12x-Tm1BkHj_-pf+ZBYPmBU_Swg@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA640A924
+	for <kvmarm@lists.linux.dev>; Thu,  6 Jul 2023 14:52:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688655174; x=1720191174;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=7TWDTrZhqpzH7WQViyzB8gJRad/lUc15Zt3pA8KbCZI=;
+  b=NOsBcAXWHEPGB6y1Dtgg7QVx9K+nPaoNJbMwiEX8DH3l3Wgaj8yJMVui
+   9QYKrFTM2mDkESEyU2v+Yx7mLO3TS0g9uze/mZiHZaczkcvVYvxPJ1bh/
+   cLfqOTlygiup5BMQqikimzp5kcaVzagSF+lEr8GIzVb4gxRXpDX0q86h9
+   ZpdNkv3i8s3y9WmkVw8JTDvOqrfRdlFFFMpdMYjshGCbwUyiliMdf+gdC
+   IaPHeekFlzNVSScHfP3RD/bA+OaedZ1jQ82tjjGgTUvygPrw0qDPai2BE
+   BLuJajr9YvWcQn6rWsE2qJDT4+Qe/ViBpWKt/ruha5N1PCJvy9Eluvg5/
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="394380266"
+X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
+   d="scan'208";a="394380266"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 07:52:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="669777985"
+X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
+   d="scan'208";a="669777985"
+Received: from hegang-mobl.ccr.corp.intel.com (HELO localhost) ([10.255.31.139])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 07:52:50 -0700
+Date: Thu, 6 Jul 2023 22:52:47 +0800
+From: Yu Zhang <yu.c.zhang@linux.intel.com>
+To: David Stevens <stevensd@chromium.org>
+Cc: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>, Peter Xu <peterx@redhat.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v7 2/8] KVM: Introduce __kvm_follow_pfn function
+Message-ID: <20230706145247.ddjqsvmfdeimzva6@linux.intel.com>
+References: <20230704075054.3344915-1-stevensd@google.com>
+ <20230704075054.3344915-3-stevensd@google.com>
+ <20230705031002.xrxk42hli6oavtlt@linux.intel.com>
+ <CAD=HUj6-VbznOOtn5WJee7Of_nh33ygg7_ph2G=hgnvNk_Cbsw@mail.gmail.com>
+ <20230705105343.iounmlflfued7lco@linux.intel.com>
+ <CAD=HUj5ezWt7rLAv2qOpFsMHyFU87Hqtw_p8pWNF5+oxbLhxDg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 84.53.99.172
-X-SA-Exim-Rcpt-To: smostafa@google.com, oliver.upton@linux.dev, sudeep.holla@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, tabba@google.com, qperret@google.com, will@kernel.org, catalin.marinas@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, james.morse@arm.com, bgardon@google.com, gshan@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAD=HUj5ezWt7rLAv2qOpFsMHyFU87Hqtw_p8pWNF5+oxbLhxDg@mail.gmail.com>
+User-Agent: NeoMutt/20171215
 
-Hi Mostafa,
-
-On Thu, 06 Jul 2023 13:49:04 +0100,
-Mostafa Saleh <smostafa@google.com> wrote:
+On Thu, Jul 06, 2023 at 02:29:24PM +0900, David Stevens wrote:
+> On Wed, Jul 5, 2023 at 7:53 PM Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
+> >
+> > On Wed, Jul 05, 2023 at 06:22:59PM +0900, David Stevens wrote:
+> > > On Wed, Jul 5, 2023 at 12:10 PM Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
+> > > >
+> > > > > @@ -2514,35 +2512,26 @@ static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
+> > > > >   * The slow path to get the pfn of the specified host virtual address,
+> > > > >   * 1 indicates success, -errno is returned if error is detected.
+> > > > >   */
+> > > > > -static int hva_to_pfn_slow(unsigned long addr, bool *async, bool write_fault,
+> > > > > -                        bool interruptible, bool *writable, kvm_pfn_t *pfn)
+> > > > > +static int hva_to_pfn_slow(struct kvm_follow_pfn *foll, kvm_pfn_t *pfn)
+> > > > >  {
+> > > > > -     unsigned int flags = FOLL_HWPOISON;
+> > > > > +     unsigned int flags = FOLL_HWPOISON | FOLL_GET | foll->flags;
+> > > > >       struct page *page;
+> > > > >       int npages;
+> > > > >
+> > > > >       might_sleep();
+> > > > >
+> > > > > -     if (writable)
+> > > > > -             *writable = write_fault;
+> > > > > -
+> > > > > -     if (write_fault)
+> > > > > -             flags |= FOLL_WRITE;
+> > > > > -     if (async)
+> > > > > -             flags |= FOLL_NOWAIT;
+> > > > > -     if (interruptible)
+> > > > > -             flags |= FOLL_INTERRUPTIBLE;
+> > > > > -
+> > > > > -     npages = get_user_pages_unlocked(addr, 1, &page, flags);
+> > > > > +     npages = get_user_pages_unlocked(foll->hva, 1, &page, flags);
+> > > > >       if (npages != 1)
+> > > > >               return npages;
+> > > > >
+> > > > > +     foll->writable = (foll->flags & FOLL_WRITE) && foll->allow_write_mapping;
+> > > > > +
+> > > > >       /* map read fault as writable if possible */
+> > > > > -     if (unlikely(!write_fault) && writable) {
+> > > > > +     if (unlikely(!foll->writable) && foll->allow_write_mapping) {
+> > > >
+> > > > I guess !foll->writable should be !(foll->flags & FOLL_WRITE) here.
+> > >
+> > > The two statements are logically equivalent, although I guess using
+> > > !(foll->flags & FOLL_WRITE) may be a little clearer, if a little more
+> > > verbose.
+> >
+> > Well, as the comment says, we wanna try to map the read fault as writable
+> > whenever possible. And __gfn_to_pfn_memslot() will only set the FOLL_WRITE
+> > for write faults. So I guess using !foll->writable will not allow this.
+> > Did I miss anything?
 > 
-> Hi Marc and Oliver,
-> 
-> I was double checking that nothing else was missed.
-> 
-> I found there is another problem for hw that has BTI and is affected
-> by specterv3a.
-> 
-> "br'' instructions are generated at runtime for the vector
-> table(__bp_harden_hyp_vecs).  These branches would land on vectors
-> in __kvm_hyp_vector at offset 8.
-> 
-> As all the macros are defined with valid_vect/invalid_vect, it is
-> sufficient to add "bti j" there at the correct offset.
->
-> I am not sure if such hardware exists. I tested this with a stubbed
-> "has_spectre_v3a" which confirms the issue and the fix.
+> We just set the foll->writable out parameter to be equal to
+> ((foll->flags & FOLL_WRITE) && foll->allow_write_mapping). Taking a =
+> foll->flags & FOLL_WRITE and b = foll->allow_write_mapping, we have
+> !(a && b) && b -> (!a || !b) && b -> (!a && b) || (!b && b) -> !a &&
+> b.
 
-Thanks for the heads up.
+Ouch, my bad again... I typed "!foll->writable", but missed the "!" in
+my head while calculating... Thanks! :)
 
-Fortunately, there is no such HW as far as I can tell. Only Cortex-A57
-and A72 are affected by this (and the only two CPUs for which we
-engage the mitigation), and they are way too old to know about BTI.
-
-> Please let me know if this fix suitable, I can include it with the other fix in
-> "[PATCH] KVM: arm64: Add missing BTI instruction in kvm_host_psci_cpu_entry"
-> 
-> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-> index 8f3f93fa119e..175c030379e3 100644
-> --- a/arch/arm64/kvm/hyp/hyp-entry.S
-> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
-> @@ -154,6 +154,12 @@ SYM_CODE_END(\label)
->   esb
->   stp x0, x1, [sp, #-16]!
->  662:
-> + /*
-> + * Specter vectors __bp_harden_hyp_vecs generate br instructions at runtime
-> + * that jump at offset 8 at __kvm_hyp_vector.
-> + * As hyp .text is guarded section, it needs bti j.
-> + */
-> + bti j
->   b \target
-> 
->  check_preamble_length 661b, 662b
-> @@ -165,6 +171,8 @@ check_preamble_length 661b, 662b
->   nop
->   stp x0, x1, [sp, #-16]!
->  662:
-> + /* Check valid_vect */
-> + bti j
->   b \target
-> 
->  check_preamble_length 661b, 662b
-
-This looks correct to me.
-
-If you can respin you initial patch (with maybe a slightly more
-generic subject) so that Oliver can pick it up as part of the next
-batch of fixes, that'd be great.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+B.R.
+Yu
