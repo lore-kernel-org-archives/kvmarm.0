@@ -1,143 +1,154 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A0FA934
-	for <kvmarm@lists.linux.dev>; Thu,  6 Jul 2023 15:23:39 +0000 (UTC)
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-3fbb07e7155so138165e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 06 Jul 2023 08:23:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 601D69453
+	for <kvmarm@lists.linux.dev>; Thu,  6 Jul 2023 15:58:09 +0000 (UTC)
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-6b71cdb47e1so810905a34.2
+        for <kvmarm@lists.linux.dev>; Thu, 06 Jul 2023 08:58:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688657017; x=1691249017;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y6qis8CnT+xpm3hc78+sJPYYplKlMZhcwZsxd3FBsB0=;
-        b=bcB9+xfY27xSFVigr4qzoaT1bXwyVfL7cV9cR1lj4nkkq4cj6u6M70kYX6IKLgWfq/
-         coCkE1TPHHK3J+UbNGZQEAzgG+pYn65TrDOgl7kosOEptK7fiIjPLER17OCXobybXyqH
-         wKAuu72b5U0pogvwL/hTwJMiHrQkbdIAA2PQAGs5gElWRWG9ZNE7nJZIAEoRF1xXaQ7w
-         0CylC9GSRUIRRHRNStCd8V2o/Uibwsr/2Ll1Kzxk2SvhsginXwiyMLDxZbhhsyEJhqB7
-         yU9KbngrenPiE+8WiUYymW1F0B2FaJKOF2k3Inq/rBKqMKdmGPknGFq+E8IGafmiUKkB
-         Mqgw==
+        d=gmail.com; s=20221208; t=1688659088; x=1691251088;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ELX9uuKAjfgek1/p+NwumoGO6BxLWYptg064O9OiHBc=;
+        b=eom9rNUvY8PSvEiS2yEy5jzWdJZzDvOogRDYqmeCMmwnH49PDRAlb6A64DC/BsFdvw
+         8sB/gBTWnJUy3Vf5sxBQdnzN798+8M5al/Six8srqG7vFuN2j7eIGkCoIn1jGVbxOdlQ
+         k0TJlPB+p1leNL2pQtt57MxN0BJjUABkoTMJ7K06jyI0oSeTnDNIW3BFtD36isceJnhC
+         Ov1RKDxVv9ttVhyc/ajzhjVYQ408TrEBueG0oqMFX09h5Wm5fiw3CBKSJWuZpbbW9mDl
+         fzgNaq6H/z5+MW47FmpSbb1giv9UrEZWmHwC2aEaPtVkw0QUhiZaco32bqgO4JpuPB+3
+         c8qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688657017; x=1691249017;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y6qis8CnT+xpm3hc78+sJPYYplKlMZhcwZsxd3FBsB0=;
-        b=ZuiuxgjUOXJKq5EVy2xTH3u6dHCPYHC9smjvxTl+tCTeGkR3K2K50cFscy1cCXNMi/
-         J0MTTKeJ4iSdKkLwX3cCX0m87VVb4uVKfpsb8cRyPB7T+BVlwNeXV9/lk4LjMAGyQXDw
-         kspu5xO4+vjD/qmGJIBwFvHdQ6vQ0RJS7OtMtmCC5KjiesptJ0iicljwJIwIMqEh5r4V
-         qFyYF4h7CXZwDFCrQXEPGk++ntMfg6ewHptD8+h6W5I2fKeJoYYLTwpKsFWygiRIdW8N
-         MjIiYj02WE5Jv/jx7/nrilARa6/gmWeQEfwBIPplMTwiwua+hZS0vGW48Cy/zRembXuv
-         UY1w==
-X-Gm-Message-State: ABy/qLY8JoOA+8ieMpJNsVVW6msfU+HLNjpk0XRIPllho8evFI2WYvSn
-	s1J9QurA1/sGbr8ZM6I62l1JeQ==
-X-Google-Smtp-Source: APBJJlEVZPjavZNR3a4RhEKi5usCLZuBG+o7AGWWWk8qr/QqNNQ1Ew+k2sJlSWVllKPPgSIFvYBf0Q==
-X-Received: by 2002:a05:600c:45ca:b0:3f6:f4b:d4a6 with SMTP id s10-20020a05600c45ca00b003f60f4bd4a6mr87572wmo.7.1688657017311;
-        Thu, 06 Jul 2023 08:23:37 -0700 (PDT)
-Received: from google.com (44.232.78.34.bc.googleusercontent.com. [34.78.232.44])
-        by smtp.gmail.com with ESMTPSA id j14-20020a056000124e00b0031274a184d5sm2110136wrx.109.2023.07.06.08.23.36
+        d=1e100.net; s=20221208; t=1688659088; x=1691251088;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ELX9uuKAjfgek1/p+NwumoGO6BxLWYptg064O9OiHBc=;
+        b=PXJq/RgRT7DnP6Im+tyD3k42EwBb+iQKu+xvH7DLvOHn/U9XDiO7OIx9ebjjvdal0T
+         mwP5S32ijNurn+SCiaeyaoycsa2JYOd1Tq7mBL7SIYdnB5fK5MCooP8p8gCwKyQxNlF7
+         bVl1Bsh13wtlmMYukFMG3QJRLn5TjSntm0fePx1qiGWf5bznehRi+lXM2V+J+0lnN5p2
+         nFv1peoAxALfE4rPMtspiw7qk7kVDQ1UBxA/y6SnX3pKEWwvKGWGaJJFj6n5UiDJK2nS
+         02LDrn1s8E1dGEpcokfcrKr470iLxuCZuHrKrzQCWBacBFs8OhBjA1tKSAdLRj36EZfM
+         cPFA==
+X-Gm-Message-State: ABy/qLY6nbLd6FEHmlRvZPaWQA4bE8CwWe+eQdsri7ONXB80LTXhRM1e
+	BQE82m0akiM8uPL3Eb0/UqQ=
+X-Google-Smtp-Source: APBJJlFDnf5rOYi7hzzNB1UrOiVyacVt/Eu6Y2AcAbTzk9CE0nP6/LyCfIuOIjrJ9jJQIFHGu3ZFYg==
+X-Received: by 2002:a05:6830:1e42:b0:6b7:4e97:343 with SMTP id e2-20020a0568301e4200b006b74e970343mr2928881otj.27.1688659088029;
+        Thu, 06 Jul 2023 08:58:08 -0700 (PDT)
+Received: from localhost ([192.55.54.50])
+        by smtp.gmail.com with ESMTPSA id q17-20020a656a91000000b005533c53f550sm1366282pgu.45.2023.07.06.08.58.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jul 2023 08:23:36 -0700 (PDT)
-Date: Thu, 6 Jul 2023 15:23:32 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: oliver.upton@linux.dev, Sudeep Holla <sudeep.holla@arm.com>,
+        Thu, 06 Jul 2023 08:58:07 -0700 (PDT)
+Date: Thu, 6 Jul 2023 08:58:05 -0700
+From: Isaku Yamahata <isaku.yamahata@gmail.com>
+To: David Stevens <stevensd@chromium.org>
+Cc: Yu Zhang <yu.c.zhang@linux.intel.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>, Peter Xu <peterx@redhat.com>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, tabba@google.com, qperret@google.com,
-	will@kernel.org, catalin.marinas@arm.com, yuzenghui@huawei.com,
-	suzuki.poulose@arm.com, james.morse@arm.com, bgardon@google.com,
-	gshan@redhat.com
-Subject: Re: [PATCH v3] KVM: arm64: Use BTI for nvhe
-Message-ID: <ZKbcdGNurXPdNJgf@google.com>
-References: <20230530150845.2856828-1-smostafa@google.com>
- <20230704134136.a5znw4jupt5yp5kg@bogus>
- <ZKQqIYRrckLlXqkx@google.com>
- <20230704143339.cqrvntq7rmmb2on3@bogus>
- <ZKRIWJKn7aVSOvjd@google.com>
- <20230704192529.d4x2p7ndz2dc4q52@bogus>
- <ZKWSkB1/5Zlm7mdR@google.com>
- <CAFgf54rQmBMgvRWj2yqQ90=12x-Tm1BkHj_-pf+ZBYPmBU_Swg@mail.gmail.com>
- <873521yv1j.wl-maz@kernel.org>
+	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	kvm@vger.kernel.org, isaku.yamahata@gmail.com
+Subject: Re: [PATCH v7 5/8] KVM: x86/mmu: Don't pass FOLL_GET to
+ __kvm_follow_pfn
+Message-ID: <20230706155805.GD3894444@ls.amr.corp.intel.com>
+References: <20230704075054.3344915-1-stevensd@google.com>
+ <20230704075054.3344915-6-stevensd@google.com>
+ <20230705101800.ut4c6topn6ylwczs@linux.intel.com>
+ <CAD=HUj41PAKC0x+c3zWAr-aCm59K7hs2zRh1uWs9778_Mai4UA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <873521yv1j.wl-maz@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAD=HUj41PAKC0x+c3zWAr-aCm59K7hs2zRh1uWs9778_Mai4UA@mail.gmail.com>
 
-On Thu, Jul 06, 2023 at 03:27:36PM +0100, Marc Zyngier wrote:
-> Hi Mostafa,
-> 
-> On Thu, 06 Jul 2023 13:49:04 +0100,
-> Mostafa Saleh <smostafa@google.com> wrote:
-> > 
-> > Hi Marc and Oliver,
-> > 
-> > I was double checking that nothing else was missed.
-> > 
-> > I found there is another problem for hw that has BTI and is affected
-> > by specterv3a.
-> > 
-> > "br'' instructions are generated at runtime for the vector
-> > table(__bp_harden_hyp_vecs).  These branches would land on vectors
-> > in __kvm_hyp_vector at offset 8.
-> > 
-> > As all the macros are defined with valid_vect/invalid_vect, it is
-> > sufficient to add "bti j" there at the correct offset.
+On Thu, Jul 06, 2023 at 01:52:08PM +0900,
+David Stevens <stevensd@chromium.org> wrote:
+
+> On Wed, Jul 5, 2023 at 7:17 PM Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
 > >
-> > I am not sure if such hardware exists. I tested this with a stubbed
-> > "has_spectre_v3a" which confirms the issue and the fix.
+> > On Tue, Jul 04, 2023 at 04:50:50PM +0900, David Stevens wrote:
+> > > From: David Stevens <stevensd@chromium.org>
+> > >
+> > > Stop passing FOLL_GET to __kvm_follow_pfn. This allows the host to map
+> > > memory into the guest that is backed by un-refcounted struct pages - for
+> > > example, higher order non-compound pages allocated by the amdgpu driver
+> > > via ttm_pool_alloc_page.
+> >
+> > I guess you mean the tail pages of the higher order non-compound pages?
+> > And as to the head page, it is said to be set to one coincidentally[*],
+> > and shall not be considered as refcounted.  IIUC, refcount of this head
+> > page will be increased and decreased soon in hva_to_pfn_remapped(), so
+> > this may not be a problem(?). But treating this head page differently,
+> > as a refcounted one(e.g., to set the A/D flags), is weired.
+> >
+> > Or maybe I missed some context, e.g., can the head page be allocted to
+> > guest at all?
 > 
-> Thanks for the heads up.
+> Yes, this is to allow mapping the tail pages of higher order
+> non-compound pages - I should have been more precise in my wording.
+> The head pages can already be mapped into the guest.
 > 
-> Fortunately, there is no such HW as far as I can tell. Only Cortex-A57
-> and A72 are affected by this (and the only two CPUs for which we
-> engage the mitigation), and they are way too old to know about BTI.
+> Treating the head and tail pages would require changing how KVM
+> behaves in a situation it supports today (rather than just adding
+> support for an unsupported situation). Currently, without this series,
+> KVM can map VM_PFNMAP|VM_IO memory backed by refcounted pages into the
+> guest. When that happens, KVM sets the A/D flags. I'm not sure whether
+> that's actually valid behavior, nor do I know whether anyone actually
+> cares about it. But it's what KVM does today, and I would shy away
+> from modifying that behavior without good reason.
 > 
-> > Please let me know if this fix suitable, I can include it with the other fix in
-> > "[PATCH] KVM: arm64: Add missing BTI instruction in kvm_host_psci_cpu_entry"
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-> > index 8f3f93fa119e..175c030379e3 100644
-> > --- a/arch/arm64/kvm/hyp/hyp-entry.S
-> > +++ b/arch/arm64/kvm/hyp/hyp-entry.S
-> > @@ -154,6 +154,12 @@ SYM_CODE_END(\label)
-> >   esb
-> >   stp x0, x1, [sp, #-16]!
-> >  662:
-> > + /*
-> > + * Specter vectors __bp_harden_hyp_vecs generate br instructions at runtime
-> > + * that jump at offset 8 at __kvm_hyp_vector.
-> > + * As hyp .text is guarded section, it needs bti j.
-> > + */
-> > + bti j
-> >   b \target
-> > 
-> >  check_preamble_length 661b, 662b
-> > @@ -165,6 +171,8 @@ check_preamble_length 661b, 662b
-> >   nop
-> >   stp x0, x1, [sp, #-16]!
-> >  662:
-> > + /* Check valid_vect */
-> > + bti j
-> >   b \target
-> > 
-> >  check_preamble_length 661b, 662b
+> > >
+> > > The bulk of this change is tracking the is_refcounted_page flag so that
+> > > non-refcounted pages don't trigger page_count() == 0 warnings. This is
+> > > done by storing the flag in an unused bit in the sptes.
+> >
+> > Also, maybe we should mention this only works on x86-64.
+> >
+> > >
+> > > Signed-off-by: David Stevens <stevensd@chromium.org>
+> > > ---
+> > >  arch/x86/kvm/mmu/mmu.c          | 44 +++++++++++++++++++++------------
+> > >  arch/x86/kvm/mmu/mmu_internal.h |  1 +
+> > >  arch/x86/kvm/mmu/paging_tmpl.h  |  9 ++++---
+> > >  arch/x86/kvm/mmu/spte.c         |  4 ++-
+> > >  arch/x86/kvm/mmu/spte.h         | 12 ++++++++-
+> > >  arch/x86/kvm/mmu/tdp_mmu.c      | 22 ++++++++++-------
+> > >  6 files changed, 62 insertions(+), 30 deletions(-)
+> > >
+> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > index e44ab512c3a1..b1607e314497 100644
+> > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > +++ b/arch/x86/kvm/mmu/mmu.c
+> >
+> > ...
+> >
+> > > @@ -2937,6 +2943,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+> > >       bool host_writable = !fault || fault->map_writable;
+> > >       bool prefetch = !fault || fault->prefetch;
+> > >       bool write_fault = fault && fault->write;
+> > > +     bool is_refcounted = !fault || fault->is_refcounted_page;
+> >
+> > Just wonder, what if a non-refcounted page is prefetched?  Or is it possible in
+> > practice?
 > 
-> This looks correct to me.
-> 
-> If you can respin you initial patch (with maybe a slightly more
-> generic subject) so that Oliver can pick it up as part of the next
-> batch of fixes, that'd be great.
+> Prefetching is still done via gfn_to_page_many_atomic, which sets
+> FOLL_GET. That's fixable, but it's not something this series currently
+> does.
 
-Thanks a lot, I just sent v2.
-[PATCH v2] KVM: arm64: Add missing BTI instructions
+So if we prefetch a page, REFCOUNTED bit is cleared unconditionally with this
+hunk.  kvm_set_page_{dirty, accessed} won't be called as expected for prefetched
+spte.  If I read the patch correctly, REFCOUNTED bit in SPTE should represent
+whether the corresponding page is ref-countable or not, right?
 
-> Thanks,
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+Because direct_pte_prefetch_many() is for legacy KVM MMU and FNAME(prefetch_pte)
+is shadow paging, we need to test it with legacy KVM MMU or shadow paging to hit
+the issue, though.
+
+Thanks,
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
