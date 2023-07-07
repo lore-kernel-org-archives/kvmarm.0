@@ -1,93 +1,62 @@
-Received: from out-40.mta0.migadu.com (out-40.mta0.migadu.com [91.218.175.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0C511196
-	for <kvmarm@lists.linux.dev>; Fri,  7 Jul 2023 17:16:18 +0000 (UTC)
-Date: Fri, 7 Jul 2023 17:16:12 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1688750175;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MgD/1IVW5Bgo6C3rsqk1ZusNkWbZT0MYcmbLOXvyZ0A=;
-	b=CdaxDCJR240gLrTWtVoeHO2R6gLfUd9xPnAwu59N9o4AZk20jbnzIKDFRc2sGZYCcWGUcF
-	z80ksCHzKWmG+AZk20trbkVD4KN3KMmwTfjfIJNxQLMmTz0SFpvU8j6KtyTJzSiehVnYVH
-	0tPfWPKFYiu1W+mxvAatu7Lj6r7GmiQ=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: chenxiang <chenxiang66@hisilicon.com>
-Cc: maz@kernel.org, james.morse@arm.com, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linuxarm@huawei.com
-Subject: Re: [PATCH] KVM: arm64: Keep need_db always true in vgic_v4_put()
- when emulating WFI
-Message-ID: <ZKhIXFlPykpvI8MG@linux.dev>
-References: <1688720145-37923-1-git-send-email-chenxiang66@hisilicon.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BF395381
+	for <kvmarm@lists.linux.dev>; Fri,  7 Jul 2023 17:33:55 +0000 (UTC)
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-794cddcab71so821482241.1
+        for <kvmarm@lists.linux.dev>; Fri, 07 Jul 2023 10:33:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1688751234; x=1691343234;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=4mMOiGGWfSgQUV0NfkWe8yufDp7AyZbYXXdDzBmEvKU=;
+        b=MAxHnYzA5EIjqml/WSQZK9Z1mksPsbZAJHdmddPeh2/2igAnmPHbJ5HPh4QZUQ0PsP
+         vqqf8k26Sq0Pzr35rpBA8DgbyvNkgiqg6igQ3FGsefgG/13OJSJN39hx1yMhGPDuv/dS
+         yg0ynhkrO7u6yhbLyTYUEnxP2bJnrZamJM5eGrMpQgT0Z4rQFROxYX49gtSMZd7lOYfx
+         YRZth89KBr0tlZzJ6Gw5V3dnesBunFf4C6YkRB0F8JnL5Jb0g08+0vWZ0feY3FWK893z
+         0NTj2DXKwA4CifwoAtVmicBXZwSoLBLS+OG+a/t5sIF70DemdUMjxMbArHBKNO85JgZ9
+         HtjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688751234; x=1691343234;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4mMOiGGWfSgQUV0NfkWe8yufDp7AyZbYXXdDzBmEvKU=;
+        b=fw5M1U8Eg7bPTmZsgnZf4oe5GGiCAbJvzXo32arsfimj6RBTXrI2TNBoDZj1/L19Dz
+         bJ3RTihLJNCqKhEhoWfF1lLfr0/JxIW8ixoChoET+peDq59EnKRTSVa2BPkce1zzyfIQ
+         f/h/IYZ6//utkcxP/FyCUAd8wW3CsNXGWk4Q5ss0bRFuDwJwqFNlI4pzQpwAkzlbQSWQ
+         LXXt15L/21YKJEjvdxv/2tbg4HEi9TgRzefE2kXZYDykv11b8smfr2YmHEdwEFmpRQbS
+         F2/gebfhmCogHGAiBXsRgJzPvEDvOkf3+Zo9/siZy47nx+xdwKVR627Hsv+/JX2eNWI4
+         Y4IQ==
+X-Gm-Message-State: ABy/qLaF3edx11W514ui3B4qeM8AovoszGt6Tc81lpRJUeCsoPxj0jr/
+	QDhC5XsXxoItIjkok5+PkC7n79yyH0msiAseQybiKg==
+X-Google-Smtp-Source: APBJJlFR4KNOJRbrQtlj8C2ws1LLrgKjQ8Vx35fAKhuAVMV1LErH4cOIuWnQm1EVnoRsJ6LuuI0NyqvlgSBWdFbbjO4=
+X-Received: by 2002:a1f:3d11:0:b0:471:875d:598e with SMTP id
+ k17-20020a1f3d11000000b00471875d598emr3772263vka.14.1688751233855; Fri, 07
+ Jul 2023 10:33:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1688720145-37923-1-git-send-email-chenxiang66@hisilicon.com>
-X-Migadu-Flow: FLOW_OUT
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-8-amoorthy@google.com>
+ <ZIoUc2hLd0zMOhO+@google.com>
+In-Reply-To: <ZIoUc2hLd0zMOhO+@google.com>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Fri, 7 Jul 2023 10:33:18 -0700
+Message-ID: <CAF7b7mrDH4Y+uWPW9kxL==i1LDURMHdNv+maFj_PH7jwPb3JwQ@mail.gmail.com>
+Subject: Re: [PATCH v4 07/16] KVM: Simplify error handling in __gfn_to_pfn_memslot()
+To: Sean Christopherson <seanjc@google.com>
+Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
+	jthoughton@google.com, bgardon@google.com, dmatlack@google.com, 
+	ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com, 
+	nadav.amit@gmail.com, isaku.yamahata@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Xiang,
+Done
 
-Thanks for reporting this.
-
-On Fri, Jul 07, 2023 at 04:55:45PM +0800, chenxiang wrote:
-> When enabled GICv4.1 on Kunpeng 920 platform with 6.4 kernel (preemptible
-> kernel), running a vm with 128 vcpus on 64 pcpu, sometimes vm is not booted
-> successfully, and we find there is a situation that doorbell interrupt will
-> not occur event if there is a pending interrupt.
-
-Oh, that's no good.
-
-> ---
->  arch/arm64/kvm/vgic/vgic-v4.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-> index c1c28fe..37152cf8 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v4.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
-> @@ -343,6 +343,9 @@ int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db)
->  	if (!vgic_supports_direct_msis(vcpu->kvm) || !vpe->resident)
->  		return 0;
->  
-> +	if (vcpu->stat.generic.blocking == 1)
-> +		need_db = true;
-> +
-
-As I understand it, the issue really comes from the fact that @need_db
-is always false when called from vgic_v3_put(). I'd rather we not
-override the argument, as that could have unintended consequences in the
-future.
-
-You could also use the helper we already have for determining if a vCPU
-is blocking, which we could use as a hint for requesting a doorbell
-interrupt on sched out.
-
-Putting the two comments together, I arrived at the following (untested)
-diff. I don't have a GICv4 system on hand, sadly. Mind taking it for a
-spin?
-
---
-Thanks,
-Oliver
-
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 93a47a515c13..8c743643b122 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -756,7 +756,7 @@ void vgic_v3_put(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
- 
--	WARN_ON(vgic_v4_put(vcpu, false));
-+	WARN_ON(vgic_v4_put(vcpu, kvm_vcpu_is_blocking(vcpu)));
- 
- 	vgic_v3_vmcr_sync(vcpu);
- 
+(somebody please let me know if these short "ack"/"done" messages are
+frowned upon btw. Nobody's complained about it so far, but I'm not
+sure if people consider it spam)
