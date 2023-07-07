@@ -1,64 +1,27 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from out-40.mta0.migadu.com (out-40.mta0.migadu.com [91.218.175.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4598FBE7A
-	for <kvmarm@lists.linux.dev>; Fri,  7 Jul 2023 11:50:48 +0000 (UTC)
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 367BmEKI002105;
-	Fri, 7 Jul 2023 11:50:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=OgrbxqxZiy/IEV/pD1B9ZsIerk6P1eg9FNEREDyUkBo=;
- b=rAQgeKn0poml1n3TpcdDi9n7v1mV2PIelNj54Rxqd2xNa4T7bgsITEYdle/P8J4+kOWT
- NrvuHa+ZXB6EPDCxWuqLyYhgvt3e4HReW6SgrDze9zqC2R42svkJliFcZsZ4lOQkJxN2
- bhisuj4v2Saagg28YLYeNYjYa5PxgnLPZV5HIUuXH52I/oj5BJSOz7Yi8wbBBsdJCoCP
- MkoOak3IB7pt5pKv6WQkyZWduUqsJ1Cvojqv74qM8yI7le+jaCALE+O8cTmKftn8b+NO
- igEveuxgVVf18ulF+hM9Mt4tOxbR8oIyqG6RN4Qo6GTQnLOcZtTeJJ268VqdUQYQm2Wj WA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rpj59g3j9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 07 Jul 2023 11:50:30 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 367BmibW005217;
-	Fri, 7 Jul 2023 11:50:30 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rpj59g3hr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 07 Jul 2023 11:50:30 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-	by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3677meuI016768;
-	Fri, 7 Jul 2023 11:50:28 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3rjbs4uyvs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 07 Jul 2023 11:50:28 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 367BoPmk43057786
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 7 Jul 2023 11:50:25 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9547B20040;
-	Fri,  7 Jul 2023 11:50:25 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3DEBF20043;
-	Fri,  7 Jul 2023 11:50:20 +0000 (GMT)
-Received: from li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com (unknown [9.179.3.211])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri,  7 Jul 2023 11:50:19 +0000 (GMT)
-Date: Fri, 7 Jul 2023 17:20:16 +0530
-From: Kautuk Consul <kconsul@linux.vnet.ibm.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Anish Moorthy <amoorthy@google.com>, oliver.upton@linux.dev,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
-        maz@kernel.org, robert.hoo.linux@gmail.com, jthoughton@google.com,
-        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
-        axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
-        isaku.yamahata@gmail.com
-Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
-Message-ID: <ZKf7+D474ESdNP3D@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
-References: <20230602161921.208564-1-amoorthy@google.com>
- <20230602161921.208564-4-amoorthy@google.com>
- <ZIn6VQSebTRN1jtX@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0C511196
+	for <kvmarm@lists.linux.dev>; Fri,  7 Jul 2023 17:16:18 +0000 (UTC)
+Date: Fri, 7 Jul 2023 17:16:12 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1688750175;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MgD/1IVW5Bgo6C3rsqk1ZusNkWbZT0MYcmbLOXvyZ0A=;
+	b=CdaxDCJR240gLrTWtVoeHO2R6gLfUd9xPnAwu59N9o4AZk20jbnzIKDFRc2sGZYCcWGUcF
+	z80ksCHzKWmG+AZk20trbkVD4KN3KMmwTfjfIJNxQLMmTz0SFpvU8j6KtyTJzSiehVnYVH
+	0tPfWPKFYiu1W+mxvAatu7Lj6r7GmiQ=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: chenxiang <chenxiang66@hisilicon.com>
+Cc: maz@kernel.org, james.morse@arm.com, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linuxarm@huawei.com
+Subject: Re: [PATCH] KVM: arm64: Keep need_db always true in vgic_v4_put()
+ when emulating WFI
+Message-ID: <ZKhIXFlPykpvI8MG@linux.dev>
+References: <1688720145-37923-1-git-send-email-chenxiang66@hisilicon.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -67,46 +30,64 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZIn6VQSebTRN1jtX@google.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: hKZ61VUave8D7AzCiDtdaJxWSBJ_c5bk
-X-Proofpoint-GUID: ojZ9cFLOkXewqrpaSn_t0VT2W2qDTc9O
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-07_08,2023-07-06_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
- bulkscore=0 phishscore=0 adultscore=0 priorityscore=1501 malwarescore=0
- spamscore=0 clxscore=1015 mlxlogscore=755 suspectscore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
- definitions=main-2307070107
+In-Reply-To: <1688720145-37923-1-git-send-email-chenxiang66@hisilicon.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi,
+Hi Xiang,
+
+Thanks for reporting this.
+
+On Fri, Jul 07, 2023 at 04:55:45PM +0800, chenxiang wrote:
+> When enabled GICv4.1 on Kunpeng 920 platform with 6.4 kernel (preemptible
+> kernel), running a vm with 128 vcpus on 64 pcpu, sometimes vm is not booted
+> successfully, and we find there is a situation that doorbell interrupt will
+> not occur event if there is a pending interrupt.
+
+Oh, that's no good.
+
+> ---
+>  arch/arm64/kvm/vgic/vgic-v4.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> > +
-> > +	preempt_disable();
-> > +	/*
-> > +	 * Ensure the this vCPU isn't modifying another vCPU's run struct, which
-> > +	 * would open the door for races between concurrent calls to this
-> > +	 * function.
-> > +	 */
-> > +	if (WARN_ON_ONCE(vcpu != __this_cpu_read(kvm_running_vcpu)))
-> > +		goto out;
-> 
-> Meh, this is overkill IMO.  The check in mark_page_dirty_in_slot() is an
-> abomination that I wish didn't exist, not a pattern that should be copied.  If
-> we do keep this sanity check, it can simply be
-> 
-> 	if (WARN_ON_ONCE(vcpu != kvm_get_running_vcpu()))
-> 		return;
-> 
-> because as the comment for kvm_get_running_vcpu() explains, the returned vCPU
-> pointer won't change even if this task gets migrated to a different pCPU.  If
-> this code were doing something with vcpu->cpu then preemption would need to be
-> disabled throughout, but that's not the case.
-> 
-I think that this check is needed but without the WARN_ON_ONCE as per my 
-other comment.
-Reason is that we really need to insulate the code against preemption
-kicking in before the call to preempt_disable() as the logic seems to
-need this check to avoid concurrency problems.
-(I don't think Anish simply copied this if-check from mark_page_dirty_in_slot)
+> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+> index c1c28fe..37152cf8 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v4.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
+> @@ -343,6 +343,9 @@ int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db)
+>  	if (!vgic_supports_direct_msis(vcpu->kvm) || !vpe->resident)
+>  		return 0;
+>  
+> +	if (vcpu->stat.generic.blocking == 1)
+> +		need_db = true;
+> +
+
+As I understand it, the issue really comes from the fact that @need_db
+is always false when called from vgic_v3_put(). I'd rather we not
+override the argument, as that could have unintended consequences in the
+future.
+
+You could also use the helper we already have for determining if a vCPU
+is blocking, which we could use as a hint for requesting a doorbell
+interrupt on sched out.
+
+Putting the two comments together, I arrived at the following (untested)
+diff. I don't have a GICv4 system on hand, sadly. Mind taking it for a
+spin?
+
+--
+Thanks,
+Oliver
+
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 93a47a515c13..8c743643b122 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -756,7 +756,7 @@ void vgic_v3_put(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+ 
+-	WARN_ON(vgic_v4_put(vcpu, false));
++	WARN_ON(vgic_v4_put(vcpu, kvm_vcpu_is_blocking(vcpu)));
+ 
+ 	vgic_v3_vmcr_sync(vcpu);
+ 
