@@ -1,236 +1,117 @@
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2129.outbound.protection.outlook.com [40.107.223.129])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FA9BA954
-	for <kvmarm@lists.linux.dev>; Fri,  7 Jul 2023 09:47:03 +0000 (UTC)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YhI5mdr8lASZshiFXb2euHC3Wn5pCodLy0DCv2wtGTu++UnX8yu8v2bWhNeQG/lsl2yx7ZJ7KZzBgZJ+cDazHyLVmmNcmQUhsUGUMImNO1lm+hE7Qher2kXSB5fZU+ufJJvEE3aIJvwhGumaUxlCEcRlgXeYmiGd5093p3XzO/KjMavpjy6q4ECMfwAk3WdEOiuwbETMrQiMKlP5NLMMS04it6iBR6iXa8BJSaSLvLORgrrmygk9qQKho0fNgOMKUGmxq9YZChIrqYgZTfMYa6jbVWYeCHy0ildCrDs6Svns0zEPA306PsOtHNBtJEr/Z+nQT8bTgznrNGgZp8ovnw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6bjT9UnK2Ol3R0A6OOsAJEereU+L2DbilErJit4+JsQ=;
- b=TDXnnosMsTDDWeyI9WXoUD/gIek7CIn+LTrMa9jVCQjFR0kNtnUXnXrJAhdr6BiSUARWdqZOT+Bit8LOWJ5v5m9L+SeTgh6ZBUHRxA2euGhVkLP/xUPgd1ihHZwGpCHWrA8HuJe2KRPdB2dOQH55mt7assxN/rVJ+wLsq6tFiFJVKP2Z2oTgyd3QJVvHkoYf64STcDMjjP4nkAjcgZxtP+/VeMq/Ck0JnWBypA/WZMU8Nvi5XxdjT0za45CIYe7LSaUmRdS5tzZVmsLNTgbG0gW53ggP6zBfILzxm7VB5t9uOXjnr49b+Yrec3DCm5DQNaLu9x3UCUX3OH+WuwDTUQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000CFBA47
+	for <kvmarm@lists.linux.dev>; Fri,  7 Jul 2023 10:59:37 +0000 (UTC)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-3fbd200d354so74555e9.1
+        for <kvmarm@lists.linux.dev>; Fri, 07 Jul 2023 03:59:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6bjT9UnK2Ol3R0A6OOsAJEereU+L2DbilErJit4+JsQ=;
- b=PK+4nC4ZJW8zSAPHpXgVaYyY5nW7PVvElno/44gbyNnU7Di1/x1e9JOJvtuo9Nbna16RLyFfGtOGz9cLpTIbLHV07tCCxhQIXoSrXQ/ryJ1HyG+8SSbujw2nuR58WfpYNtc/TAmD4WYRdZXSjlkcybv4Op3OWQIWoGMUCqEu2IQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
- DM8PR01MB7190.prod.exchangelabs.com (2603:10b6:8:9::23) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6565.25; Fri, 7 Jul 2023 09:46:58 +0000
-Received: from DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::88ed:9a2b:46b7:1eb0]) by DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::88ed:9a2b:46b7:1eb0%6]) with mapi id 15.20.6565.016; Fri, 7 Jul 2023
- 09:46:58 +0000
-Message-ID: <04ec8efb-33ff-153e-3be5-5c84a01bff2a@os.amperecomputing.com>
-Date: Fri, 7 Jul 2023 15:16:49 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v10 00/59] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
- support
-From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-To: Marc Zyngier <maz@kernel.org>, Miguel Luis <miguel.luis@oracle.com>,
- Eric Auger <eauger@redhat.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Andre Przywara <andre.przywara@arm.com>,
- Chase Conklin <chase.conklin@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>,
- Darren Hart <darren@os.amperecomputing.com>,
- Jintack Lim <jintack@cs.columbia.edu>,
- Russell King <rmk+kernel@armlinux.org.uk>, James Morse
- <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
-References: <20230515173103.1017669-1-maz@kernel.org>
- <f19bb506-3e21-2bd6-7463-9aea8ab912f5@os.amperecomputing.com>
- <877crmzr5j.wl-maz@kernel.org>
- <a62dba1a-86b7-45ab-f6a8-f88b224af402@os.amperecomputing.com>
-Content-Language: en-US
-In-Reply-To: <a62dba1a-86b7-45ab-f6a8-f88b224af402@os.amperecomputing.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: CH0PR03CA0374.namprd03.prod.outlook.com
- (2603:10b6:610:119::34) To DM8PR01MB6824.prod.exchangelabs.com
- (2603:10b6:8:23::24)
+        d=google.com; s=20221208; t=1688727576; x=1691319576;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=N/x5Wj/WL6k7KcWrje94j9nFZPfPj+YDs51VmCpKkkI=;
+        b=tLKBqqLcbwiuJ4HJSMiKoyUCqJ2pofweLBAP4wX35TMUoWjCm37+wTM8Vc1H9pAse1
+         DAPjP/yBO/EcMTcpEQfvBMqU7uexy/8CI06hiLXPRojm/cm0aXwpzO5QyNS6Ddg/Pjus
+         iHPjpLreMPzUk0NgRJFSF3WnaZohIxJrRZJPm3nmjsl5alBSVVCVfoItqdlS8PG/XeQ9
+         H3Ng7liy8ktNjwz43gp+qpBf0ovJ2ReA+4dDz0P55Qewv8nWINbf0CXarkGqeXW5tyIx
+         ah/7LgzBafIXOV3IGQKaXyNKPLKxXwnx8siuu1fs5Ui+W4sJZCFHNcehgZOcZEcNXWvF
+         VCzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688727576; x=1691319576;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=N/x5Wj/WL6k7KcWrje94j9nFZPfPj+YDs51VmCpKkkI=;
+        b=WoLJ3znW+23R0/3+qdxQATJDsfnzyWcmDZwiM+v261/pzMvBxct+K3lMMrLZjNR0Gu
+         Fo/dbpgo1VX/wOU/aCEmEjwZSSLZi+aRz5LOlGzFtjwTuVOCt6kt36sqPe8Qplh/jkLM
+         jv6DKniu9HnVl/gwVjlqyARFGdgFwHy5WgD/ijrF1+7Maj6TOf8z/SNGdlBqetQ4j6Mk
+         ctS9OzRU666cbH05JMO+pK68UfLrfMQeuJAyYshhYY7Wykw6F/K/qbhIk89tmyZgPQea
+         y23wHoJ3h05h1kOQjkfpysZbYAQlxeasVJBp53x1B38RI77Dp2o88YBTyYOeGOoqdvfx
+         raYQ==
+X-Gm-Message-State: ABy/qLb5XRJj/ROZxtZawMesVIKUCgbnYw7Y6n7c1rPqhhv//qtoEYyA
+	hysceGbR+jR6gJVSXz+7ZSr11g==
+X-Google-Smtp-Source: APBJJlHavId3npqyWjwmxxh+L3MOX+TI2eDAvEBy5QXlXnLOCWoT4gzGdsCPE5FEAqODsyU9NRKh2A==
+X-Received: by 2002:a05:600c:1d15:b0:3fb:c838:c681 with SMTP id l21-20020a05600c1d1500b003fbc838c681mr104628wms.4.1688727575832;
+        Fri, 07 Jul 2023 03:59:35 -0700 (PDT)
+Received: from google.com (44.232.78.34.bc.googleusercontent.com. [34.78.232.44])
+        by smtp.gmail.com with ESMTPSA id l4-20020a1ced04000000b003fbe561f6a3sm2100287wmh.37.2023.07.07.03.59.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Jul 2023 03:59:35 -0700 (PDT)
+Date: Fri, 7 Jul 2023 10:59:31 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Sudeep Holla <sudeep.holla@arm.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, tabba@google.com, qperret@google.com,
+	will@kernel.org, catalin.marinas@arm.com, yuzenghui@huawei.com,
+	suzuki.poulose@arm.com, james.morse@arm.com, bgardon@google.com,
+	gshan@redhat.com
+Subject: Re: [PATCH v2] KVM: arm64: Add missing BTI instructions
+Message-ID: <ZKfwE2VlaxXDoh8R@google.com>
+References: <20230706152240.685684-1-smostafa@google.com>
+ <20230706162308.kyeitspgfaqb6vgn@bogus>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM8PR01MB6824:EE_|DM8PR01MB7190:EE_
-X-MS-Office365-Filtering-Correlation-Id: b9b3e8fa-f606-4a0e-2516-08db7ecf1ae2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	s+Lb9GxIxelQYQNU+ZnXp1+o8TOc7wIIDjjQJ8sj1kMbktV+KR1ths2oDg9b+nHEw6+Gao4fd86WZFJc7to5TuwHbNLU5HE8DUZnz07rxn5PVXmxLGsaDxEm8RdSo+Apzd7l8SahbUahTbCIRSFpKqXI5+Jkn7hRS2K3yK0fgtq3pPKCpPvQSu1VpAGkrOSVvmJ8bFmPpc1t5f9kJjPOzO/V0UOd4A93NP/cUz51VQ5VM1aej1ycq+w3hrXAoMwuZySG5Ru0NpdH8Ik1t3zIVbxniSNo8L1TkjrwkpoVWSVmkKnQigJiRT/6JjdG5/T6p2+DTAXNEmTSifsNNYxECB+e/HUA7RpdlJYtz+tgQxQCV4OwyENz6eAFo24/fi5dN1KqZTYEWd3+so6libz9Z7rx/p6WpL2my+YHPpEz8Dj8OnqWQaJ4X4dmNQhMas9eyP9aLCKskEOo0G4iECoPywDGtFWkswb6Gp8R6YEEk0c53IzBiIIKl1H7esKpQzo1Ef+v5NpKzJys4+fjkvCffuR3wLwL93bkcCQAjU8rI0eQKMuXQHrbWjZERTNU7YgOaIHaVQDg5X7huAVOYbnyVzXuA7ksaxRjgwuVcS4YyGmgCL31Cg7bk75KiVxP1tZY
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR01MB6824.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(396003)(366004)(39850400004)(136003)(451199021)(6666004)(6486002)(478600001)(110136005)(54906003)(53546011)(6506007)(26005)(186003)(6512007)(2906002)(41300700001)(316002)(66556008)(66476007)(4326008)(66946007)(5660300002)(7416002)(8936002)(8676002)(38100700002)(86362001)(31696002)(2616005)(31686004)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NVBUTFNsYjRiYzdybzBqK21YSVBXNndZR2hEa3hGU0o1NGJPQi9Yb1k5bWs2?=
- =?utf-8?B?TmZFdVA3Wi9odExTVU9MaG9KQlovVVVjUGZxdTBuYTlrZHRwbmtiNmxrbzJ1?=
- =?utf-8?B?bEN6LytLOTBaeC8yZTFHbExCUTlwZktDUUVwR1ZIOStUR3JhWkZHRDRmME1Q?=
- =?utf-8?B?N0R6SjZ4R0RwejVQdXhMQjloMm1qbHI4VFZrSHBDUEJCbVcyKzYvSmhTT1c1?=
- =?utf-8?B?aDJhZXUvT1BrWGlqQWtCZ28vaVRidlo2VlhYV2w3VTFtejNXRXdIbXpLNUxF?=
- =?utf-8?B?VnZaVkI5Y3k4WDlqQ2FKVlA5ZVV5NE8rNzVIdVpJL0lkTlhGQzlJcm5BMDUx?=
- =?utf-8?B?RDVFV3E0YisvOXhVVUFpeTBwc08zNUJ2Rit5REttUTRLS0JNT1R1ZlNoaHpx?=
- =?utf-8?B?NEQ0RkpXQmc4ckk1VnZPNVljTE9HejFGcE5Td29uZXY2M1lwS2RXdjFQOHN5?=
- =?utf-8?B?TFFLbS9uRWZ6aUhWaHI0ZEpRdUN5WEhncnVHc1RNSGdJNktlQUxJOGNvOGVi?=
- =?utf-8?B?eTJrSnBQMWRPeXBQVnc1QVV2SXZsTngxUVpLQkw1WnNzamJzTlRmY2djVDdH?=
- =?utf-8?B?Y1AwMkd0WXJ3b0RSU1ZqaVJkbExxUGZPM3NGMVhvdWNSbk5HeGxhT01OMU8x?=
- =?utf-8?B?ME9udllEd2Q1WWsvWTJTNXlxWnUvclZCNDZrdzFlOEZhYStYbWdSWlFnSXVL?=
- =?utf-8?B?ZWJvUXZJNEZPRmlsYkVOUm9NQUdLakYwSlVLV3FlaTBkQk9GZUt2TFVMbk41?=
- =?utf-8?B?R0Z3eHl6cTFhNmxGTE9HQ3Zxc2RxeFBic1NZdjVXRE1kZ09sZVE4Sy9KNjNp?=
- =?utf-8?B?dFRLbHlRWHBoa0diaTBaVVpha0JNQzNGdHIxOWZaUWVmUkdqalExNkNVWldV?=
- =?utf-8?B?ZVhsdDV5TmQ1cDA5NjlodFlKMUc4MGVhYVVZcmFwVEZuclN3L2ZxdCtoQ1BX?=
- =?utf-8?B?cHY5dktwVlM2MzY4ZXZTdzdvK0ZwYUtZOTYxU1lOWWNQNmwwR3dwOWJJb3NQ?=
- =?utf-8?B?b1VyVmVmaThoSUN4QkJlcnhrUG9nZk5RZnMvRDlmT25YVGVlRmVoUmdMREQy?=
- =?utf-8?B?bVNvc01vZzVsVXE3VGVDRWN2S2dZSjcveTE4amtpdkZuU1pvZHdidlE1azY2?=
- =?utf-8?B?cWlKVm5tYjRaVmd0ejNjdWwrRXNaMzJwVFIrRzRPQ3JlcFFINnFYVmFQSk83?=
- =?utf-8?B?UERGL3YydmRIRGpHeFFVQUhSaUhkbU9FVU5yamhqY1RaRzBKNE5kYm9OZCt1?=
- =?utf-8?B?aTRWbHA2REhacTZLeExURFdGVHVoQ2RETzZNQ1VBeThvMmxJY1ZET0hZWmVK?=
- =?utf-8?B?QklGQ1M5eW5RZlp3SlBCd0wrMDNvUkJBVC9paVprV2FvOGV6L3JCZ1Z1ODdW?=
- =?utf-8?B?WjNLNEQyY0gwTnFqU1lYMDJzWmViTUtudmNlSnJOWlZzRDBULzR3cGl5K09n?=
- =?utf-8?B?SmQyVFliUnRIRUpTWTY5eXNlc0ErVjh6eGMxOUVzeG1nNll5YWFPMHd6Vzkv?=
- =?utf-8?B?ckQrUXFiS3RlblpvaDgyaGZCNGw2cStwRzRlSEp1ZEFMaGlPcWNkQXU3QWdR?=
- =?utf-8?B?b3VKamRMbGQ4K3VqY1REbjQyUkRyNHZKcnBzVHJBTExRZ2E1RmRqajRQbmQ1?=
- =?utf-8?B?K29RdEszMkpXQzRVbUFDUFY2NkxRZlI5bXV1VjRQYlNOeWNQVzBoelY0ZXdt?=
- =?utf-8?B?c3orVkdEY3dkWTJQSGhDWWNMR1lyS3lNWUp4QVVaUUFCYitzenR1Zm5PNUVF?=
- =?utf-8?B?aE5kTkE0cXNSQVBpWXJwWkJyVFd4Wmd4VWp6NXVyVUlzUUlMdnk3UmRpU2Fo?=
- =?utf-8?B?eWEwdDdrQTV5dlJCWG5uZHVBSUMyU2ZrMXEwNjk0K3BTNS8wcjlSbTAzQmQx?=
- =?utf-8?B?NnJzNmZFOE1SNnhUazlZZ1FxWVBMaGdRdFU2a2JmQWdheGVDaFpVNTBjZGdU?=
- =?utf-8?B?SzlGdjhmVEczaEt3ZVQ5TmlHSHMvbVJSUHJEY05QY05ldGxzOFY0QUlkTEVZ?=
- =?utf-8?B?S0tCSW5EMkI4MmRJejJjZVd6NDJCQVBLUmFhdEVkR3gvWlYwZFNpY2ROd1ZP?=
- =?utf-8?B?MHRkaVRRUVhMZ2xhSG54S0xsZ3lnWXZkeXZ5SHZsR2h1RGlnbkFRQ0Vmc005?=
- =?utf-8?B?Q2tZc0V0UGsvbGYwM1JmbVV3WjRSZTNnQ0VYT2FXNy84Qm5IcnViWWVuQWJC?=
- =?utf-8?Q?6JE+6tjyui57x9APdqTGMxiugG5OXv1XbaWR+T/ZuoGU?=
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b9b3e8fa-f606-4a0e-2516-08db7ecf1ae2
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2023 09:46:57.9520
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rp9pONHMhh9mBHg5E7S9gi/oaMWLlUFDdlDDqFG6MBVGKmS/EGYiMQXX3GasxSW/zURlA3CqF+hBdCWTcLmFQ5qQ1NQymXhNlbIaCUreb+LGhITkcfcYUn3r9i91QHkq
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR01MB7190
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230706162308.kyeitspgfaqb6vgn@bogus>
 
+On Thu, Jul 06, 2023 at 05:23:08PM +0100, Sudeep Holla wrote:
+> On Thu, Jul 06, 2023 at 03:22:40PM +0000, Mostafa Saleh wrote:
+> > Some bti instructions were missing from
+> > commit b53d4a272349 ("KVM: arm64: Use BTI for nvhe")
+> > 
+> > 1) kvm_host_psci_cpu_entry
+> > kvm_host_psci_cpu_entry is called from __kvm_hyp_init_cpu through "br"
+> > instruction as __kvm_hyp_init_cpu resides in idmap section while
+> > kvm_host_psci_cpu_entry is in hyp .text so the offset is larger than
+> > 128MB range covered by "b".
+> > Which means that this function should start with "bti j" instruction.
+> > 
+> > LLVM which is the only compiler supporting BTI for Linux, adds "bti j"
+> > for jump tables or by when taking the address of the block [1].
+> > Same behaviour is observed with GCC.
+> > 
+> > As kvm_host_psci_cpu_entry is a C function, this must be done in
+> > assembly.
+> > 
+> > Another solution is to use X16/X17 with "br", as according to ARM
+> > ARM DDI0487I.a RLJHCL/IGMGRS, PACIASP has an implicit branch
+> > target identification instruction that is compatible with
+> > PSTATE.BTYPE 0b01 which includes "br X16/X17"
+> > And the kvm_host_psci_cpu_entry has PACIASP as it is an external
+> > function.
+> > Although, using explicit "bti" makes it more clear than relying on
+> > which register is used.
+> > 
+> > A third solution is to clear SCTLR_EL2.BT, which would make PACIASP
+> > compatible PSTATE.BTYPE 0b11 ("br" to other registers).
+> > However this deviates from the kernel behaviour (in bti_enable()).
+> > 
+> > 2) Spectre vector table
+> > "br" instructions are generated at runtime for the vector table
+> > (__bp_harden_hyp_vecs).
+> > These branches would land on vectors in __kvm_hyp_vector at offset 8.
+> > As all the macros are defined with valid_vect/invalid_vect, it is
+> > sufficient to add "bti j" at the correct offset.
+> > 
+> > [1] https://reviews.llvm.org/D52867
+> > 
+> > Fixes: b53d4a272349 ("KVM: arm64: Use BTI for nvhe")
+> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> > Reported-by: Sudeep Holla <sudeep.holla@arm.com>
+> 
+> Nothing change w.r.t cpu suspend-resume path in v2 anyways, but I assure
+> I tested this again just be absolutely sure and it still fixes the issue
+> I reported 😄, so
+> 
+> Tested-by: Sudeep Holla <sudeep.holla@arm.com>
 
+Thanks for testing the patch again!
 
-On 04-07-2023 06:01 pm, Ganapatrao Kulkarni wrote:
-> 
-> Hi Marc,
-> 
-> On 29-06-2023 12:33 pm, Marc Zyngier wrote:
->> Hi Ganapatrao,
->>
->> On Wed, 28 Jun 2023 07:45:55 +0100,
->> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
->>>
->>>
->>> Hi Marc,
->>>
->>>
->>> On 15-05-2023 11:00 pm, Marc Zyngier wrote:
->>>> This is the 4th drop of NV support on arm64 for this year.
->>>>
->>>> For the previous episodes, see [1].
->>>>
->>>> What's changed:
->>>>
->>>> - New framework to track system register traps that are reinjected in
->>>>     guest EL2. It is expected to replace the discrete handling we have
->>>>     enjoyed so far, which didn't scale at all. This has already fixed a
->>>>     number of bugs that were hidden (a bunch of traps were never
->>>>     forwarded...). Still a work in progress, but this is going in the
->>>>     right direction.
->>>>
->>>> - Allow the L1 hypervisor to have a S2 that has an input larger than
->>>>     the L0 IPA space. This fixes a number of subtle issues, 
->>>> depending on
->>>>     how the initial guest was created.
->>>>
->>>> - Consequently, the patch series has gone longer again. Boo. But
->>>>     hopefully some of it is easier to review...
->>>>
->>>
->>> I am facing issue in booting NestedVM with V9 as well with 10 patchset.
->>>
->>> I have tried V9/V10 on Ampere platform using kvmtool and I could boot
->>> Guest-Hypervisor and then NestedVM without any issue.
->>> However when I try to boot using QEMU(not using EDK2/EFI),
->>> Guest-Hypervisor is booted with Fedora 37 using virtio disk. From
->>> Guest-Hypervisor console(or ssh shell), If I try to boot NestedVM,
->>> boot hangs very early stage of the boot.
->>>
->>> I did some debug using ftrace and it seems the Guest-Hypervisor is
->>> getting very high rate of arch-timer interrupts,
->>> due to that all CPU time is going on in serving the Guest-Hypervisor
->>> and it is never going back to NestedVM.
->>>
->>> I am using QEMU vanilla version v7.2.0 with top-up patches for NV [1]
->>
->> So I went ahead and gave QEMU a go. On my systems, *nothing* works (I
->> cannot even boot a L1 with 'virtualization=on" (the guest is stuck at
->> the point where virtio gets probed and waits for its first interrupt).
->>
->> Worse, booting a hVHE guest results in QEMU generating an assert as it
->> tries to inject an interrupt using the QEMU GICv3 model, something
->> that should *NEVER* be in use with KVM.
->>
->> With help from Eric, I got to a point where the hVHE guest could boot
->> as long as I kept injecting console interrupts, which is again a
->> symptom of the vGIC not being used.
->>
->> So something is *majorly* wrong with the QEMU patches. I don't know
->> what makes it possible for you to even boot the L1 - if the GIC is
->> external, injecting an interrupt in the L2 is simply impossible.
->>
->> Miguel, can you please investigate this?
->>
->> In the meantime, I'll add some code to the kernel side to refuse the
->> external interrupt controller configuration with NV. Hopefully that
->> will lead to some clues about what is going on.
-> 
-> Continued debugging of the issue and it seems the endless ptimer 
-> interrupts on Ampere platform is due to some mess up of CVAL of ptimer, 
-> resulting in interrupt triggered always when it is enabled.
-> 
-> I see function "timer_set_offset" called from kvm_arm_timer_set_reg in 
-> QEMU case but there is no such calls in kvmtool boot.
-> 
-> If I comment the timer_set_offset calls in kvm_arm_timer_set_reg 
-> function, then I could boot the Guest-Hypervisor then NestedVM from GH/L1.
-> 
-> I also observed in QEMU case, kvm_arm_timer_set_reg is called to set 
-> CNT, CVAL and CTL of both vtimer and ptimer.
-> Not sure why QEMU is setting these registers explicitly? need to dig.
-> 
-
-I don't see any direct ioctl calls to change any timer registers. Looks 
-like it is happening from the emulation code(target/arm/helper.c)?
-
->>
->> Thanks,
->>
->>     M.
->>
-> 
-> Thanks,
-> Ganapat
-> 
-
-Thanks,
-Ganapat
