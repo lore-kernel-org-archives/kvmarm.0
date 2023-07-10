@@ -1,174 +1,113 @@
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 562C113AC2
-	for <kvmarm@lists.linux.dev>; Mon, 10 Jul 2023 20:54:59 +0000 (UTC)
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6b91ad1f9c1so2599230a34.3
-        for <kvmarm@lists.linux.dev>; Mon, 10 Jul 2023 13:54:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F0D1156CD
+	for <kvmarm@lists.linux.dev>; Mon, 10 Jul 2023 22:13:33 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-c6ab0d1b1dcso5193137276.0
+        for <kvmarm@lists.linux.dev>; Mon, 10 Jul 2023 15:13:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689022498; x=1691614498;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SBIy9U5euos68Ioe2CrWIhGDyG7Iu4LaGu80DwtO+UU=;
-        b=0uFnyoSlD9e9Pqno9Cj3zBzBokPvPTN9nnR0ZH1aOMeDpCmFfgLqqGqI/4QLzTAH5j
-         Zoy4YJ6vhm8jqkg9AKvMryFf+WXwrWNdbyDJfmx9dHjwyUopP3TzT9Az1nT9h3N88SGO
-         qPJ6D1MpwpoIS+7JJSzxDUmDbW3OlwmCVNH56yt9uc7FPmruOHOTUJlfOhvNY8xbi7eL
-         39YYtw6/FPauq6INlrIxs9h8frwLA7stwjaMai3Ixoyf43/chZ02sefZbfP+sp4agKWE
-         2Iep0P04hIePO+biGk8SPE/vwEO6WACfmSAyy/oh/JL+LPb7SqthspKPaI87ElmeW0T5
-         raLQ==
+        d=google.com; s=20221208; t=1689027212; x=1691619212;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VhyuhUu7ArHYZFjkYslfHWi7GXr3zNNFUwoXSJr15Gs=;
+        b=STVcaaR6HH1MmFncFyTKauvrHE7UvRNbNSVW/i5IKGtGvhl2UQnGE0vFR8gJ66Uk2c
+         pWD9/7AWt0Iqe8hrimzxYspFm62Tpuf0XaR47UwByAWC2rQ0T6kPQCe8oLGEGk2MMwkv
+         rBmWDcKgO+1vIm/903NAi1T6/+F83sjnYUCBHkfmOJZxODUEirpiNccdSuOM2hW0217K
+         OlU7wM3kxncMAm2W+HP6uuGbfTIlJjhGRCFIXTnESPbtqbxag+pdinbQYT2Zj96mVyvK
+         gugeJt7F2/3TjWMxVge86PJm6T+A3+F3MQhVXNhtRqdv1t9Vs+Kv55CAEUsXVZc2WS7i
+         fOKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689022498; x=1691614498;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SBIy9U5euos68Ioe2CrWIhGDyG7Iu4LaGu80DwtO+UU=;
-        b=WiwUNRSY/M4eL1BkB5zQJ0/OnFqrXRt3dw2V7c2hYT9rxUA7en0IfyAUs8rBJeTHvj
-         q5PSi1EQK5wYKID3Umk/vNEUTyNxfThLJN74M1ylEluaEutBwXvacZEAEcAIVQPCs+Fp
-         7aRN7b2U9LSeulJdz8ncvJmZmbq37VB87p6Sal8yisu6qD3vmUsdEWid0RyYrcHi+kng
-         e+M4VkUKAESZvOyzaKWIb/y7a7Qte1AuAsDNDHimMSkVIc0e1AIdc6/jty+wgXXOD4X3
-         x7rRBK2eUdZaFw3EY8AOYSOdTLkVowUIH6UjhtsfLXNoiQBgucqhLD+qSPtIBP+YZeHz
-         7cwg==
-X-Gm-Message-State: ABy/qLZhnBM1wN5DjV+lUBUlcO7cveqtFhwMKOn47EGodzrraC+965DY
-	oOshAx83Je1IVzCuAPpq9BHtMelwD2zZ2e2TNNaMmw==
-X-Google-Smtp-Source: APBJJlHbwMgpuYCM62wvrmc7Y7DUTz2Yb3NfLRrk9RXPdkhcJ8bweakuc8XVp4gdphMJtKYHuW+D4qD5w2BrMGElZ1E=
-X-Received: by 2002:a05:6870:a107:b0:1b0:43b6:e13b with SMTP id
- m7-20020a056870a10700b001b043b6e13bmr14830764oae.54.1689022498207; Mon, 10
- Jul 2023 13:54:58 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1689027212; x=1691619212;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VhyuhUu7ArHYZFjkYslfHWi7GXr3zNNFUwoXSJr15Gs=;
+        b=iWEuRuzs7lvgnngrICCdWu5RvDJqjmoLMCmS+RsuqX4XOigIQnIG171C266ad7BPSk
+         dEeNhsJrkQGmpzF1feO51Pi2ivmNxUYjyokjTyHkaUAqjMx/1iosHqF7dYLv15++BZH+
+         K8b2zSH3Ry3PlNTe+mrQpH1n6OnAcETNgO1x5m1cUJdtT+6MztmtqNRvr/OgYgxI0zU9
+         FGmEb5jmquc4MazqnZ7PdRX+Hf0WhSCGMu5ahs9ey2G5LdV9N7GIkI+otJd3fKSZzE3e
+         jJPbdtXA9nFQrbnieioag/BcG//S+lvi5vmhEB25oQfbas3cH5JATSqk1guSLOJRxtMo
+         LfYg==
+X-Gm-Message-State: ABy/qLZ+Zq6MGbpZzojW2ClnHi2xr9B+8jJfqsbYzqG5bn9vl+ogCzRO
+	0GTzNklBlgipDOqvRUvxlTs/sduHSB4=
+X-Google-Smtp-Source: APBJJlGicNB3k+jdZ6LQfesOWoW0KcNW9IGPTA9A/vbsEkgluZUxiXkGaHoqNIMT3Y4Zm0AQCJca26jhABo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:c05:0:b0:c70:d138:51b1 with SMTP id
+ 5-20020a250c05000000b00c70d13851b1mr42859ybm.12.1689027212157; Mon, 10 Jul
+ 2023 15:13:32 -0700 (PDT)
+Date: Mon, 10 Jul 2023 15:13:30 -0700
+In-Reply-To: <ZKxL09AW1s2uL28x@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230710192430.1992246-1-jingzhangos@google.com>
- <20230710192430.1992246-4-jingzhangos@google.com> <ZKxnp6Tm3WwXupXw@linux.dev>
-In-Reply-To: <ZKxnp6Tm3WwXupXw@linux.dev>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Mon, 10 Jul 2023 13:54:46 -0700
-Message-ID: <CAAdAUtiKmRwPwWp7wPcejn+j1YbDxO7zyXVXTTV2d5BjLixCZw@mail.gmail.com>
-Subject: Re: [PATCH v5 3/6] KVM: arm64: Reject attempts to set invalid debug
- arch version
+Mime-Version: 1.0
+References: <20230703163548.1498943-1-maz@kernel.org> <ZKxIGOAcQbknIcBL@google.com>
+ <ZKxL09AW1s2uL28x@linux.dev>
+Message-ID: <ZKyCimgRJThIR0pw@google.com>
+Subject: Re: [PATCH] KVM: arm64: Disable preemption in kvm_arch_hardware_enable()
+From: Sean Christopherson <seanjc@google.com>
 To: Oliver Upton <oliver.upton@linux.dev>
-Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>, 
-	Raghavendra Rao Ananta <rananta@google.com>, Suraj Jitindar Singh <surajjs@amazon.com>, 
-	Cornelia Huck <cohuck@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, isaku.yamahata@intel.com, pbonzini@redhat.com, 
+	Kristina Martsenko <kristina.martsenko@arm.com>, stable@vger.kernek.org
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Oliver,
+On Mon, Jul 10, 2023, Oliver Upton wrote:
+> On Mon, Jul 10, 2023 at 11:04:08AM -0700, Sean Christopherson wrote:
+> > On Mon, Jul 03, 2023, Marc Zyngier wrote:
+> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > > index aaeae1145359..a28c4ffe4932 100644
+> > > --- a/arch/arm64/kvm/arm.c
+> > > +++ b/arch/arm64/kvm/arm.c
+> > > @@ -1894,8 +1894,17 @@ static void _kvm_arch_hardware_enable(void *discard)
+> > >  
+> > >  int kvm_arch_hardware_enable(void)
+> > >  {
+> > > -	int was_enabled = __this_cpu_read(kvm_arm_hardware_enabled);
+> > > +	int was_enabled;
+> > >  
+> > > +	/*
+> > > +	 * Most calls to this function are made with migration
+> > > +	 * disabled, but not with preemption disabled. The former is
+> > > +	 * enough to ensure correctness, but most of the helpers
+> > > +	 * expect the later and will throw a tantrum otherwise.
+> > > +	 */
+> > > +	preempt_disable();
+> > > +
+> > > +	was_enabled = __this_cpu_read(kvm_arm_hardware_enabled);
+> > 
+> > IMO, this_cpu_has_cap() is at fault.
+> 
+> Who ever said otherwise?
 
-On Mon, Jul 10, 2023 at 1:18=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> Jing,
->
-> On Mon, Jul 10, 2023 at 07:24:26PM +0000, Jing Zhang wrote:
-> > From: Oliver Upton <oliver.upton@linux.dev>
-> >
-> > The debug architecture is mandatory in ARMv8, so KVM should not allow
-> > userspace to configure a vCPU with less than that. Of course, this isn'=
-t
-> > handled elegantly by the generic ID register plumbing, as the respectiv=
-e
-> > ID register fields have a nonzero starting value.
-> >
-> > Add an explicit check for debug versions less than v8 of the
-> > architecture.
-> >
-> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
->
-> This patch should be ordered before the change that permits writes to
-> the DebugVer field (i.e. the previous patch). While we're at it, there's
-> another set of prerequisites for actually making the field writable.
->
-> As Suraj pointed out earlier, we need to override the type of the field
-> to be FTR_LOWER_SAFE instead of EXACT. Beyond that, KVM limits the field
-> to 0x6, which is the minimum value for an ARMv8 implementation. We can
-> relax this limitation up to v8p8, as I believe all of the changes are to
-> external debug and wouldn't affect a KVM guest.
->
-> Below is my (untested) diff on top of your series for both of these
-> changes.
->
-> --
-> Thanks,
-> Oliver
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 78ccc95624fa..35c4ab8cb5c8 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1216,8 +1216,14 @@ static s64 kvm_arm64_ftr_safe_value(u32 id, const =
-struct arm64_ftr_bits *ftrp,
->         /* Some features have different safe value type in KVM than host =
-features */
->         switch (id) {
->         case SYS_ID_AA64DFR0_EL1:
-> -               if (kvm_ftr.shift =3D=3D ID_AA64DFR0_EL1_PMUVer_SHIFT)
-> +               switch (kvm_ftr.shift) {
-> +               case ID_AA64DFR0_EL1_PMUVer_SHIFT:
->                         kvm_ftr.type =3D FTR_LOWER_SAFE;
-> +                       break;
-> +               case ID_AA64DFR0_EL1_DebugVer_SHIFT:
-> +                       kvm_ftr.type =3D FTR_LOWER_SAFE;
-> +                       break;
-> +               }
->                 break;
->         case SYS_ID_DFR0_EL1:
->                 if (kvm_ftr.shift =3D=3D ID_DFR0_EL1_PerfMon_SHIFT)
-> @@ -1466,14 +1472,22 @@ static u64 read_sanitised_id_aa64pfr0_el1(struct =
-kvm_vcpu *vcpu,
->         return val;
->  }
->
-> +#define ID_REG_LIMIT_FIELD_ENUM(val, reg, field, limit)                 =
-               \
-> +({                                                                      =
-       \
-> +       u64 __f_val =3D FIELD_GET(reg##_##field##_MASK, val);            =
-         \
-> +       (val) &=3D ~reg##_##field##_MASK;                                =
-         \
-> +       (val) |=3D FIELD_PREP(reg##_##field##_MASK,                      =
-         \
-> +                         min(__f_val, (u64)reg##_##field##_##limit));   =
-       \
-> +       (val);                                                           =
-       \
-> +})
-> +
->  static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
->                                           const struct sys_reg_desc *rd)
->  {
->         u64 val =3D read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
->
->         /* Limit debug to ARMv8.0 */
-> -       val &=3D ~ID_AA64DFR0_EL1_DebugVer_MASK;
-> -       val |=3D SYS_FIELD_PREP_ENUM(ID_AA64DFR0_EL1, DebugVer, IMP);
-> +       val =3D ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, V=
-8P8);
->
->         /*
->          * Only initialize the PMU version if the vCPU was configured wit=
-h one.
-> @@ -1529,6 +1543,8 @@ static u64 read_sanitised_id_dfr0_el1(struct kvm_vc=
-pu *vcpu,
->         u8 perfmon =3D pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit());
->         u64 val =3D read_sanitised_ftr_reg(SYS_ID_DFR0_EL1);
->
-> +       val =3D ID_REG_LIMIT_FIELD_ENUM(val, ID_DFR0_EL1, CopDbg, Debugv8=
-p8);
-> +
->         val &=3D ~ID_DFR0_EL1_PerfMon_MASK;
->         if (kvm_vcpu_has_pmu(vcpu))
->                 val |=3D SYS_FIELD_PREP(ID_DFR0_EL1, PerfMon, perfmon);
->
-Thanks for the details. Will improve it in the next version.
+Sorry, should have phrased that as "should be fixed".
+ 
+> > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> > index 7d7128c65161..b862477de2ce 100644
+> > --- a/arch/arm64/kernel/cpufeature.c
+> > +++ b/arch/arm64/kernel/cpufeature.c
+> > @@ -3193,7 +3193,9 @@ static void __init setup_boot_cpu_capabilities(void)
+> >  
+> >  bool this_cpu_has_cap(unsigned int n)
+> >  {
+> > -       if (!WARN_ON(preemptible()) && n < ARM64_NCAPS) {
+> > +       __this_cpu_preempt_check("has_cap");
+> > +
+> > +       if (n < ARM64_NCAPS) {
+> 
+> This is likely sufficient, but to Marc's point we have !preemptible()
+> checks littered about, it just so happens that this_cpu_has_cap() is the
+> first to get called. We need to make sure there aren't any other checks
+> that'd break under hotplug.
 
-Jing
+Ah, "we" is all of arm64.  E.g. this pattern in arch/arm64/kernel/cpu_errata.c
+is splattered all over the place.
+
+  WARN_ON(scope != SCOPE_LOCAL_CPU || preemptible());
+
+AFAICT, the only issue in KVM proper is the BUG_ON() in kvm_vgic_init_cpu_hardware().
+
+Sadly, a hack-a-fix for stable probably does make sense :-(
