@@ -1,171 +1,82 @@
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778B43D76
-	for <kvmarm@lists.linux.dev>; Mon, 10 Jul 2023 15:02:00 +0000 (UTC)
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-47dcf42d3a0so4006550e0c.1
-        for <kvmarm@lists.linux.dev>; Mon, 10 Jul 2023 08:02:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689001319; x=1691593319;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d/sUNdtXxakq8jmp5wcqZtKus2+6D3V7y8Xb9orW/bc=;
-        b=lR0HiSsQ75xixs2SGZAUx9sppXeb2VUtOOA1aLvD1Hb0V2qN+kBZC9UiNkUQ53tEu1
-         9Q5CiNzlQZz8mFacRo11LBsVS1pTeTyHcDtR0FEIGnbtzOXQzTv8b0khJsEAa0DtMT+m
-         QXMw0qiZ+RRp+XH8/b/zhruC9D2pJ29/6N6NCYarnnTRaU4xL7uZrWYrhoSRtEay2v+9
-         CW5iqSb1KxLwErSMdYZCBTqHsSu4tZzjBa11fXJ3Ps6aUMwC/HLTMQDtlZegse4hJam7
-         vYtL82aJNmt5uP7KQD13A1hocVwS1F73iAyEppsbQilE+60bBvi+ZMrWmbfoa5+ZEj4W
-         FKTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689001319; x=1691593319;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=d/sUNdtXxakq8jmp5wcqZtKus2+6D3V7y8Xb9orW/bc=;
-        b=EdOwj2mEyKx5r72lYn18eOAE3etWcxGb36gqHgq1h40hw0lxJGHlJ6j/3IzEoxW50h
-         WqbyIXF4w40p1jc2E4ygsz2q84IMsof38GNbXKBkwJBRqp+aad4o0xEMDsl/IILvd8Wp
-         3kFppdJCSKcA4Ji/Vna3MwH/rtYht9t2jPSBwDRtJ1rQkN/GXlWRfgTtYAqaxZwsRKcj
-         yTkjfApq3j1whY0+ISjfsqoDXgkotygYGPHZZRniOTIhq8oMIfAi6LqYj1aW++uiUP6K
-         vrDtxf5DU3t8KRv7fTMDlx/ohudyttyiXW8VU6+nCn6lXr46Yok/lLkWEfkD/zGEqcL9
-         0d1A==
-X-Gm-Message-State: ABy/qLbSklW2OT3cAl/J0HlO6JtA37gafehZ/KucPqDuPYtRO9ZKtZCF
-	P0QqhHZ9iu9yRbdpaCUkdGaACgny4eKb91/0JaQo+Q==
-X-Google-Smtp-Source: APBJJlF2giwme5p7futOTNlJ8L8M/CNv5v2eRtIYUGAvhRDJ73OwpteVzgCU/DW4qF+q9LfswGKQiPI9yXVkzTwPeH8=
-X-Received: by 2002:a1f:c1ce:0:b0:46e:1a21:b52d with SMTP id
- r197-20020a1fc1ce000000b0046e1a21b52dmr4103998vkf.5.1689001319090; Mon, 10
- Jul 2023 08:01:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503683D76
+	for <kvmarm@lists.linux.dev>; Mon, 10 Jul 2023 15:13:39 +0000 (UTC)
+Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.57])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4R06tf1PVkzTmPj;
+	Mon, 10 Jul 2023 23:12:26 +0800 (CST)
+Received: from [10.174.185.179] (10.174.185.179) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 10 Jul 2023 23:13:35 +0800
+Subject: Re: [PATCH 4/4] KVM: arm64: Always return generic v8 as the preferred
+ target
+To: Oliver Upton <oliver.upton@linux.dev>
+CC: <kvmarm@lists.linux.dev>, Marc Zyngier <maz@kernel.org>, James Morse
+	<james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Jing Zhang
+	<jingzhangos@google.com>, Reiji Watanabe <reijiw@google.com>
+References: <20230623194258.2648987-1-oliver.upton@linux.dev>
+ <20230623194258.2648987-5-oliver.upton@linux.dev>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <23bdb1d7-4153-594b-75e7-3452385f81a6@huawei.com>
+Date: Mon, 10 Jul 2023 23:13:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-4-amoorthy@google.com>
- <ZIn6VQSebTRN1jtX@google.com> <ZKf7+D474ESdNP3D@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
-In-Reply-To: <ZKf7+D474ESdNP3D@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
-From: Anish Moorthy <amoorthy@google.com>
-Date: Mon, 10 Jul 2023 08:00:00 -0700
-Message-ID: <CAF7b7mr7BZayOxE2y8K87+AfYuGoDc7_kA2ouA3kBuhSgDiomg@mail.gmail.com>
-Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
-To: Kautuk Consul <kconsul@linux.vnet.ibm.com>
-Cc: Sean Christopherson <seanjc@google.com>, oliver.upton@linux.dev, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org, 
-	robert.hoo.linux@gmail.com, jthoughton@google.com, bgardon@google.com, 
-	dmatlack@google.com, ricarkol@google.com, axelrasmussen@google.com, 
-	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20230623194258.2648987-5-oliver.upton@linux.dev>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.185.179]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
+X-CFilter-Loop: Reflected
 
-> > > +   preempt_disable();
-> > > +   /*
-> > > +    * Ensure the this vCPU isn't modifying another vCPU's run struct=
-, which
-> > > +    * would open the door for races between concurrent calls to this
-> > > +    * function.
-> > > +    */
-> > > +   if (WARN_ON_ONCE(vcpu !=3D __this_cpu_read(kvm_running_vcpu)))
-> > > +           goto out;
-> >
-> > Meh, this is overkill IMO.  The check in mark_page_dirty_in_slot() is a=
-n
-> > abomination that I wish didn't exist, not a pattern that should be copi=
-ed.  If
-> > we do keep this sanity check, it can simply be
-> >
-> >       if (WARN_ON_ONCE(vcpu !=3D kvm_get_running_vcpu()))
-> >               return;
-> >
-> > because as the comment for kvm_get_running_vcpu() explains, the returne=
-d vCPU
-> > pointer won't change even if this task gets migrated to a different pCP=
-U.  If
-> > this code were doing something with vcpu->cpu then preemption would nee=
-d to be
-> > disabled throughout, but that's not the case.
-> >
-> I think that this check is needed but without the WARN_ON_ONCE as per my
-> other comment.
-> Reason is that we really need to insulate the code against preemption
-> kicking in before the call to preempt_disable() as the logic seems to
-> need this check to avoid concurrency problems.
-> (I don't think Anish simply copied this if-check from mark_page_dirty_in_=
-slot)
+Hi Oliver,
 
-Heh, you're giving me too much credit here. I did copy-paste this
-check, not from from mark_page_dirty_in_slot() but from one of Sean's
-old responses [1]
+On 2023/6/24 3:42, Oliver Upton wrote:
+> Userspace selecting an implementation-specific vCPU target has been
+> completely useless for a very long time. Let's go whole hog and start
+> returning the generic v8 target across all implementations as the
+> preferred target.
+> 
+> Uphold the pre-existing behavior by tolerating either the generic target
+> or an implementation-specific target if the vCPU happens to be running
+> on one of the lucky few parts.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 
-> That said, I agree that there's a risk that KVM could clobber vcpu->run_r=
-un by
-> hitting an -EFAULT without the vCPU loaded, but that's a solvable problem=
-, e.g.
-> the helper to fill KVM_EXIT_MEMORY_FAULT could be hardened to yell if cal=
-led
-> without the target vCPU being loaded:
->
->     int kvm_handle_efault(struct kvm_vcpu *vcpu, ...)
->     {
->         preempt_disable();
->         if (WARN_ON_ONCE(vcpu !=3D __this_cpu_read(kvm_running_vcpu)))
->             goto out;
->
->         vcpu->run->exit_reason =3D KVM_EXIT_MEMORY_FAULT;
->         ...
->     out:
->         preempt_enable();
->         return -EFAULT;
->     }
+I love the idea.
 
-Ancient history aside, let's figure out what's really needed here.
+Acked-by: Zenghui Yu <yuzenghui@huawei.com>
 
-> Why use WARN_ON_ONCE when there is a clear possiblity of preemption
-> kicking in (with the possibility of vcpu_load/vcpu_put being called
-> in the new task) before preempt_disable() is called in this function ?
-> I think you should use WARN_ON_ONCE only where there is some impossible
-> or unhandled situation happening, not when there is a possibility of that
-> situation clearly happening as per the kernel code.
+> ---
+>  arch/arm64/kvm/arm.c   | 3 ++-
+>  arch/arm64/kvm/guest.c | 4 +---
+>  2 files changed, 3 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 3fa63fdbbf34..5a3b8b2e779b 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1250,7 +1250,8 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
+>  {
+>  	int ret;
+>  
+> -	if (init->target != kvm_target_cpu())
+> +	if (init->target != KVM_ARM_TARGET_GENERIC_V8 &&
+> +	    init->target != kvm_target_cpu())
+>  		return -EINVAL;
 
-I did some mucking around to try and understand the kvm_running_vcpu
-variable, and I don't think preemption/rescheduling actually trips the
-WARN here? From my (limited) understanding, it seems that the
-thread being preempted will cause a vcpu_put() via kvm_sched_out().
-But when the thread is eventually scheduled back in onto whatever
-core, it'll vcpu_load() via kvm_sched_in(), and the docstring for
-kvm_get_running_vcpu() seems to imply the thing that vcpu_load()
-stores into the per-cpu "kvm_running_vcpu" variable will be the same
-thing which would have been observed before preemption.
+I can see that user-space can now select GENERIC_V8 or CORTEX_A53 (for
+example) between two KVM_ARM_VCPU_INIT calls on an A53 host, which was
+forbidden before this change. I don't think it's a big deal though.
 
-All that's to say: I wouldn't expect the value of
-"__this_cpu_read(kvm_running_vcpu)" to change in any given thread. If
-that's true, then the things I would expect this WARN to catch are (a)
-bugs where somehow the thread gets scheduled without calling
-vcpu_load() or (b) bizarre situations (probably all bugs?) where some
-vcpu thread has a hold of some _other_ kvm_vcpu* and is trying to do
-something with it.
-
-
-On Wed, Jun 14, 2023 at 10:35=E2=80=AFAM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> Meh, this is overkill IMO.  The check in mark_page_dirty_in_slot() is an
-> abomination that I wish didn't exist, not a pattern that should be copied=
-.  If
-> we do keep this sanity check, it can simply be
->
->         if (WARN_ON_ONCE(vcpu !=3D kvm_get_running_vcpu()))
->                 return;
->
-> because as the comment for kvm_get_running_vcpu() explains, the returned =
-vCPU
-> pointer won't change even if this task gets migrated to a different pCPU.=
-  If
-> this code were doing something with vcpu->cpu then preemption would need =
-to be
-> disabled throughout, but that's not the case.
-
-Oh, looks like Sean said the same thing. Guess I probably should have
-read that reply more closely first :/
-
-
-[1] https://lore.kernel.org/kvm/ZBnLaidtZEM20jMp@google.com/
+Thanks,
+Zenghui
