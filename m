@@ -1,119 +1,109 @@
-Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0458523C7
-	for <kvmarm@lists.linux.dev>; Fri,  7 Jul 2023 20:07:50 +0000 (UTC)
-Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-47e655e9a9aso918217e0c.2
-        for <kvmarm@lists.linux.dev>; Fri, 07 Jul 2023 13:07:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688760469; x=1691352469;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=N9qU/Uq2LcL3uTNrj7xBoEZcMO3Zt2Ax77k0O53wuuw=;
-        b=DFJe3y+AnMA3aG++VmiJOc9libNpH39V8Q7JlXqLpPhd7smK3iuJs4YLVGa44gtUFz
-         BNn2oQSlkAQQdufYUKJQLABklLX9nm5xT2Nm7TaPSSf8LB3t3Jzwfv8XqVb8CyKYW6Lb
-         sgli/ABMJurdaUSnPTUcJCv5vUm2tfPObPwIVq6ZBFSdXnTei/04LFIKYjJBN/Qz5pLl
-         2X4Qy4aNwBe5rl+nI7D3PWXc9Rk2D8idPH5tFgULjE3nsFzU8i9k94D6a7gS6lvOUWqo
-         1NFkOIojfE4KbkwqbqlEyjNeyPzMKbnyb6H3A+0BcNIU6MBLYl5BGDTscZ9pBIp41+Ip
-         XaBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688760469; x=1691352469;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=N9qU/Uq2LcL3uTNrj7xBoEZcMO3Zt2Ax77k0O53wuuw=;
-        b=To+k7LrWGsa02wzpHPjTa+PUMxZ6mnbK9XBXYeVIaX01ZsP5y4dN/Ib4v3GHfgUorO
-         p2PPuAVI4zetLFxN2styKO5ELS6/MPMBj02BDExJoMbpeB2/VB+t+brXBi6O7TpuSN0x
-         aE/xeY2K2s0B2Hi/rjkeASh8VCFbdwjbg564iyC+XiMXTHPyrsQimMZ86tQAHRA2IrgW
-         vDfKRs0XhKDPc85B3FqFFEwOM+XF9J3tm++5QavpwJTzw0Le6ikI5ulEp1bojopI7Ge2
-         ubt+WaiANOE7yqzC1caPN11000Ka6sT2bQ1BuKuWuSHYrv8H+Qxg95gFT6RFOCwIHZKs
-         5Q4A==
-X-Gm-Message-State: ABy/qLYPQl9FbWk9wrazpIhB8cRlquqgLGsOP15hrCSok7ucxSl/BArV
-	cb7WdD90lTYWXF91Carl8+WWmnUrHhDlS8GjtzfN8w==
-X-Google-Smtp-Source: APBJJlFbA0+MGli2FsF318+uGY/31P13FYZhO0TBRccUTaBDtFPRrBVZo40WEwkxXIkbpoi5LgXyRrYmK2gGB/VxSZU=
-X-Received: by 2002:a1f:d605:0:b0:471:7996:228f with SMTP id
- n5-20020a1fd605000000b004717996228fmr4417802vkg.7.1688760469605; Fri, 07 Jul
- 2023 13:07:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282DD17C8
+	for <kvmarm@lists.linux.dev>; Mon, 10 Jul 2023 02:04:45 +0000 (UTC)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.57])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4QznN41q1JzTmQZ;
+	Mon, 10 Jul 2023 10:03:16 +0800 (CST)
+Received: from [10.40.193.166] (10.40.193.166) by
+ kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 10 Jul 2023 10:04:25 +0800
+Subject: Re: [PATCH] KVM: arm64: Keep need_db always true in vgic_v4_put()
+ when emulating WFI
+To: Oliver Upton <oliver.upton@linux.dev>
+References: <1688720145-37923-1-git-send-email-chenxiang66@hisilicon.com>
+ <ZKhIXFlPykpvI8MG@linux.dev>
+CC: <maz@kernel.org>, <james.morse@arm.com>, <kvmarm@lists.linux.dev>,
+	<kvm@vger.kernel.org>, <linuxarm@huawei.com>
+From: "chenxiang (M)" <chenxiang66@hisilicon.com>
+Message-ID: <24c130cd-b4ac-de18-770e-8495acd41114@hisilicon.com>
+Date: Mon, 10 Jul 2023 10:04:24 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.2.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-10-amoorthy@google.com>
- <ZIovIBVLIM69E5Bo@google.com> <CAF7b7mqKJTCENsb+5MZT+D=DwcSva-jMANjtYszMTm-ACvkiKA@mail.gmail.com>
-In-Reply-To: <CAF7b7mqKJTCENsb+5MZT+D=DwcSva-jMANjtYszMTm-ACvkiKA@mail.gmail.com>
-From: Anish Moorthy <amoorthy@google.com>
-Date: Fri, 7 Jul 2023 13:07:13 -0700
-Message-ID: <CAF7b7mrabLtnq+0Gtsg9FA+Gfr12FqbmfxwJZuQcBNDz1+3yLw@mail.gmail.com>
-Subject: Re: [PATCH v4 09/16] KVM: Introduce KVM_CAP_NOWAIT_ON_FAULT without implementation
-To: Sean Christopherson <seanjc@google.com>
-Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
-	jthoughton@google.com, bgardon@google.com, dmatlack@google.com, 
-	ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com, 
-	nadav.amit@gmail.com, isaku.yamahata@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <ZKhIXFlPykpvI8MG@linux.dev>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.40.193.166]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemi500016.china.huawei.com (7.221.188.220)
+X-CFilter-Loop: Reflected
 
-> > However, do we actually need to force vendor code to query nowait?  At a glance,
-> > the only external (relative to kvm_main.c) users of __gfn_to_pfn_memslot() are
-> > in flows that play nice with nowait or that don't support it at all.  So I *think*
-> > we can do this?
-> >
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index be06b09e9104..78024318286d 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -2403,6 +2403,11 @@ static bool memslot_is_readonly(const struct kvm_memory_slot *slot)
-> >         return slot->flags & KVM_MEM_READONLY;
-> >  }
-> >
-> > +static bool memslot_is_nowait_on_fault(const struct kvm_memory_slot *slot)
-> > +{
-> > +       return slot->flags & KVM_MEM_NOWAIT_ON_FAULT;
-> > +}
-> > +
-> >  static unsigned long __gfn_to_hva_many(const struct kvm_memory_slot *slot, gfn_t gfn,
-> >                                        gfn_t *nr_pages, bool write)
-> >  {
-> > @@ -2730,6 +2735,11 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
-> >                 writable = NULL;
-> >         }
-> >
-> > +       if (async && memslot_is_nowait_on_fault(slot)) {
-> > +               *async = false;
-> > +               async = NULL;
-> > +       }
-> > +
-> >         return hva_to_pfn(addr, atomic, interruptible, async, write_fault,
-> >                           writable);
-> >  }
+Hi Oliver,
+
+
+在 2023/7/8 星期六 1:16, Oliver Upton 写道:
+> Hi Xiang,
 >
-> Hmm, well not having to modify the vendor code would be nice... but
-> I'll have to look more at __gfn_to_pfn_memslot()'s callers (and
-> probably send more questions your way :). Hopefully it works out more
-> like what you suggest.
+> Thanks for reporting this.
+>
+> On Fri, Jul 07, 2023 at 04:55:45PM +0800, chenxiang wrote:
+>> When enabled GICv4.1 on Kunpeng 920 platform with 6.4 kernel (preemptible
+>> kernel), running a vm with 128 vcpus on 64 pcpu, sometimes vm is not booted
+>> successfully, and we find there is a situation that doorbell interrupt will
+>> not occur event if there is a pending interrupt.
+> Oh, that's no good.
+>
+>> ---
+>>   arch/arm64/kvm/vgic/vgic-v4.c | 3 +++
+>>   1 file changed, 3 insertions(+)
+>>
+>> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+>> index c1c28fe..37152cf8 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-v4.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
+>> @@ -343,6 +343,9 @@ int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db)
+>>   	if (!vgic_supports_direct_msis(vcpu->kvm) || !vpe->resident)
+>>   		return 0;
+>>   
+>> +	if (vcpu->stat.generic.blocking == 1)
+>> +		need_db = true;
+>> +
+> As I understand it, the issue really comes from the fact that @need_db
+> is always false when called from vgic_v3_put(). I'd rather we not
+> override the argument, as that could have unintended consequences in the
+> future.
+>
+> You could also use the helper we already have for determining if a vCPU
+> is blocking, which we could use as a hint for requesting a doorbell
+> interrupt on sched out.
+>
+> Putting the two comments together, I arrived at the following (untested)
+> diff. I don't have a GICv4 system on hand, sadly. Mind taking it for a
+> spin?
 
-I took a look of my own, and I don't think moving the nowait query
-into __gfn_to_pfn_memslot() would work. At issue is the actual
-behavior of KVM_CAP_NOWAIT_ON_FAULT, which I documented as follows:
+Right, it is more suitable to use the helper we already have for 
+determining if a vCPU is blocking.
+We have tested the following diff you provide, and it solves the issue, 
+so please feel free to add for the change:
+Tested-by: Xiang Chen <chenxiang66@hisilicon.com>
 
-> The presence of this capability indicates that userspace may pass the
-> KVM_MEM_NOWAIT_ON_FAULT flag to KVM_SET_USER_MEMORY_REGION to cause KVM_RUN
-> to fail (-EFAULT) in response to page faults for which resolution would require
-> the faulting thread to sleep.
 
- Moving the nowait check out of __kvm_faultin_pfn()/user_mem_abort()
-and into __gfn_to_pfn_memslot() means that, obviously, other callers
-will start to see behavior changes. Some of that is probably actually
-necessary for that documentation to be accurate (since any usages of
-__gfn_to_pfn_memslot() under KVM_RUN should respect the memslot flag),
-but I think there are consumers of __gfn_to_pfn_memslot() from outside
-KVM_RUN.
+>
+> --
+> Thanks,
+> Oliver
+>
+> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+> index 93a47a515c13..8c743643b122 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+> @@ -756,7 +756,7 @@ void vgic_v3_put(struct kvm_vcpu *vcpu)
+>   {
+>   	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+>   
+> -	WARN_ON(vgic_v4_put(vcpu, false));
+> +	WARN_ON(vgic_v4_put(vcpu, kvm_vcpu_is_blocking(vcpu)));
+>   
+>   	vgic_v3_vmcr_sync(vcpu);
+>   
+> .
+>
 
-Anyways, after some searching on my end: I think the only caller of
-__gfn_to_pfn_memslot() in core kvm/x86/arm64 where moving the "nowait"
-check into the function actually changes anything is gfn_to_pfn(). But
-that function gets called from vmx_vcpu_create() (through
-kvm_alloc_apic_access_page()), and *that* certainly doesn't look like
-something KVM_RUN does or would ever call.
