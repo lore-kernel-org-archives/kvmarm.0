@@ -1,40 +1,40 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0748614AB3
-	for <kvmarm@lists.linux.dev>; Mon, 10 Jul 2023 19:24:35 +0000 (UTC)
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1b8a8154fcaso74331315ad.1
-        for <kvmarm@lists.linux.dev>; Mon, 10 Jul 2023 12:24:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6084614AB3
+	for <kvmarm@lists.linux.dev>; Mon, 10 Jul 2023 19:24:38 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-c926075a50cso570560276.1
+        for <kvmarm@lists.linux.dev>; Mon, 10 Jul 2023 12:24:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689017075; x=1691609075;
+        d=google.com; s=20221208; t=1689017077; x=1691609077;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=T195FWXfqucyEBgiIGQAY+Lmu6WGEseWSNrrUvHiu4k=;
-        b=WEL8yeJBXLqzExhD6IHURdek5D4wvVU763ij1nXK8iYTaLrwHbm45oCwnW5EiOyICr
-         ECOVHHRt04C8aCXCcHarD1e5tpbz/VD9139ooil7auwC5ZX9SeFEFSQJQEYvgMCiTJJT
-         priMyy7eGQZOHQvWd+Rnvzdk2a6yDeqadOA2wAjDN8MohQcROJA4VCNaJhMeqzczzGNc
-         Q4fO1VvryLtbUuk7JkXj6jkZV2sPZ65InW8KYpLm/PQIIg1Nyn5ZjHpKrB8rZ3myZCNl
-         WhDLT/kCjBT6z1aYNMZP2KN/0p6C17+ILwBIKj2LCquGaWN+Po9fmNCZD1mreciXtBox
-         ZcGA==
+        bh=NjXGqinFg6JbUCcCuD1314VDCv679WJcMyQaO6pNuqI=;
+        b=riWsju77MCgLxcyPUA5zvABoTX1/n+uRhqXiNScFzay1HPX99z0tc697bB4UPgxFup
+         v6vjFDK+OpdAh+ZfjD+AN7l24j6yRvX3XtBvROnruXBLFl2kWNA8PHx/58YzuBVEhk5A
+         tzoGrsxzCwHBrSrfUBwlAu5r1zF87t1cTryo+Ov3gX8k5EDIk63Rk7uqhpoTmNfHtVXW
+         iB6XkV+A/4mmcFig5KzmD1Tjd2NkDPiTGmGTlD/9MwaZtYufwCgye+a0Yei9/XK5XQg8
+         xopGAsDxQTs9dWPaMe8zfQxyD4pigDfKPNFKYllHwZX0MpFq1iOzO70eUexC7njvYRQ6
+         kegg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689017075; x=1691609075;
+        d=1e100.net; s=20221208; t=1689017077; x=1691609077;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T195FWXfqucyEBgiIGQAY+Lmu6WGEseWSNrrUvHiu4k=;
-        b=AoWdhLTv+ePDjDW8/phvhViA/ElnaCulOaplrxR7dyyERdsHM0ZOjamSYdEKmsfJLl
-         Of8jfEwPXHGJJ7UB8vuatKa9WE3HPtoYJhWT4cBJTRS8jGzy7WL7qkhGFFbBmXxbUHEy
-         W57X2Fs8DH8SNyRO++TZ581Pp9bXTYqziTTpUtCzPI8PIHOFkhb0FJHyCaW3a0oAfpfY
-         lG5Is+zC9DfSBeVc27loSqBmaMQjiII8A6t8jUKXtwottq5sNHGwelyfEJMltO2RwFdQ
-         j3IuJAH2ib+xbCUt3GY9r+hSrJcMY5igbOW1ul7UVjogzD2kLi+sITWrwA7Wkev/JVjD
-         n2tA==
-X-Gm-Message-State: ABy/qLbFHXRGX+AlPXONFTJNeMwjT6OJaA+ffeEZi+243VXVBxSSCVJ0
-	Jsr5RqabGQ4oNzCcQOdRFP0SLHI75lgIwBbuWg==
-X-Google-Smtp-Source: APBJJlF18xsYgsI0CxYuUZH80Cwz7kk1zPTVFelfLYuD+GDrkVgWul4z+afhe2yJxGfDVGHbruy74hyRYY9cbvtPLw==
+        bh=NjXGqinFg6JbUCcCuD1314VDCv679WJcMyQaO6pNuqI=;
+        b=aRtMrJvbSNnoxhK5zDgBhExavFsAPFVP4th9gNefSf5mpL/MGX7cVlpDVnOk22AV1I
+         AkEHBxbMW1xetwZXeA/t/jBVOIaSk1B0kP9r0cTB4wGyFmjp1f7K9xYH4HvlTJqZrQJw
+         kopQUIKVcDlZn+u9xMKghxQgBM7Wc121Y6SYootid+peUeAsQXT+aa09XyjSK10tPZoQ
+         dzuKX5f/ozbqSkSK/l1RDcqWs/oXrGvovvTap2MCEr8LO3AKwP5loJn7iS0gRBBbp1TS
+         zDkuA3MvOhLYEc1VQ3RGSOgbVa+KF1vUOCbmUvOgrqUfxjtKxyOS9ukgBRRJ4hO5UfqI
+         iA9Q==
+X-Gm-Message-State: ABy/qLbLgi84BQ8kdR9UjCl18Y5zx7Zzdv+tCZURjcuZ6/F0T1P7uowS
+	k1f5jMbUG+7IfHWyzwfOPImmmBTyMDQ1Pvsvvw==
+X-Google-Smtp-Source: APBJJlFU/3p3XZytGnnz4g0xxHNMZggWlz1mMLZ78y9fLOkMhIqS/5mIom3amLly/wcRCruQ7qwxSVnY/RznFpLozw==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a17:903:41c9:b0:1b7:ef3f:5ed3 with
- SMTP id u9-20020a17090341c900b001b7ef3f5ed3mr13176575ple.5.1689017075354;
- Mon, 10 Jul 2023 12:24:35 -0700 (PDT)
-Date: Mon, 10 Jul 2023 19:24:24 +0000
+ (user=jingzhangos job=sendgmr) by 2002:a25:ab90:0:b0:bc4:a660:528f with SMTP
+ id v16-20020a25ab90000000b00bc4a660528fmr143365ybi.5.1689017077178; Mon, 10
+ Jul 2023 12:24:37 -0700 (PDT)
+Date: Mon, 10 Jul 2023 19:24:25 +0000
 In-Reply-To: <20230710192430.1992246-1-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,9 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230710192430.1992246-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
-Message-ID: <20230710192430.1992246-2-jingzhangos@google.com>
-Subject: [PATCH v5 1/6] KVM: arm64: Use guest ID register values for the sake
- of emulation
+Message-ID: <20230710192430.1992246-3-jingzhangos@google.com>
+Subject: [PATCH v5 2/6] KVM: arm64: Enable writable for ID_AA64DFR0_EL1 and ID_DFR0_EL1
 From: Jing Zhang <jingzhangos@google.com>
 To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
 	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
@@ -59,38 +58,36 @@ Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
 	Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Since KVM now supports per-VM ID registers, use per-VM ID register
-values for the sake of emulation for DBGDIDR and LORegion.
+All valid fields in ID_AA64DFR0_EL1 and ID_DFR0_EL1 are writable
+from usrespace with this change.
 
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index bd3431823ec5..c1a5ec1a016e 100644
+index c1a5ec1a016e..0160ef9cfe18 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -379,7 +379,7 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
- 			  struct sys_reg_params *p,
- 			  const struct sys_reg_desc *r)
- {
--	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-+	u64 val = IDREG(vcpu->kvm, SYS_ID_AA64MMFR1_EL1);
- 	u32 sr = reg_to_encoding(r);
- 
- 	if (!(val & (0xfUL << ID_AA64MMFR1_EL1_LO_SHIFT))) {
-@@ -2429,8 +2429,8 @@ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
- 	if (p->is_write) {
- 		return ignore_write(vcpu, p);
- 	} else {
--		u64 dfr = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
--		u64 pfr = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
-+		u64 dfr = IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1);
-+		u64 pfr = IDREG(vcpu->kvm, SYS_ID_AA64PFR0_EL1);
- 		u32 el3 = !!cpuid_feature_extract_unsigned_field(pfr, ID_AA64PFR0_EL1_EL3_SHIFT);
- 
- 		p->regval = ((((dfr >> ID_AA64DFR0_EL1_WRPs_SHIFT) & 0xf) << 28) |
+@@ -1980,7 +1980,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  .set_user = set_id_dfr0_el1,
+ 	  .visibility = aa32_id_visibility,
+ 	  .reset = read_sanitised_id_dfr0_el1,
+-	  .val = ID_DFR0_EL1_PerfMon_MASK, },
++	  .val = GENMASK(63, 0), },
+ 	ID_HIDDEN(ID_AFR0_EL1),
+ 	AA32_ID_SANITISED(ID_MMFR0_EL1),
+ 	AA32_ID_SANITISED(ID_MMFR1_EL1),
+@@ -2029,7 +2029,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  .get_user = get_id_reg,
+ 	  .set_user = set_id_aa64dfr0_el1,
+ 	  .reset = read_sanitised_id_aa64dfr0_el1,
+-	  .val = ID_AA64DFR0_EL1_PMUVer_MASK, },
++	  .val = GENMASK(63, 0), },
+ 	ID_SANITISED(ID_AA64DFR1_EL1),
+ 	ID_UNALLOCATED(5,2),
+ 	ID_UNALLOCATED(5,3),
 -- 
 2.41.0.255.g8b1d071c50-goog
 
