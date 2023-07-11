@@ -1,113 +1,117 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFB7B14AB5
-	for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 14:25:28 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5704e551e8bso64873967b3.3
-        for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 07:25:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6472F37D
+	for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 15:29:18 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-c5d16402b4eso6528012276.3
+        for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 08:29:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689085527; x=1691677527;
+        d=google.com; s=20221208; t=1689089357; x=1691681357;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=p56sBbCS+VPrS5cOX2wwAyiH2Cg/fGXPAAbSLjc9HmQ=;
-        b=G9ZmthhhEWojkB7p9qdG0NlmayOu64h8X2dBXxGMYbiFdGXXEUX2oyzC6fFrumID5N
-         98vlOxYGDbsB8BsZYbCu5+cNjdgpXDDF3wPvFmpX1D/3wiXeEI7iIbWaLd2Y8S1kcK51
-         g9AEp3AGfRn3IH5ErdyFegxvkav3Hez4Pqo60UTx9c8Mo77h2wLDQUn/qNlpfbjeYv3l
-         BXG4TLJ1lnjA9oyO1JcxOVrUNvF1oP+UeGFwZ78x/HxF67SpfkkngNuMfv0ud6ParpnM
-         ur81S62LVTRhXeUfmkPypJAXBF0q5GmQYpveV1kpJbP42oZcLd7cONmfF2+Ipt3sxdG7
-         gZpw==
+        bh=BZNT+5cYt7mx7oEaiQ13ihjtEzSR8MjFtzStZZPURr4=;
+        b=gypF4zw0UurGdZNnY7tnZPzjmzPO0RfqKibCydwdPBEGXgbUv+lfc/TYNQ7xQhqnoH
+         IHDl5pNu9grquWf9ybhtrBkmnXq2a2enN7dZlVAChyz8igGvGXR7X1/0+Ye41RCY6eET
+         z9pITmnv5VbSV7ed+9hXSzgMhmpdgdFx4dPujjW4ngz2zJKWIp42x/Pz/UPvMG5zA5BM
+         893hc/eA8cM8/u5uaIkZEJKM4VaPBigIj1MOOgMjRIiYUyhztY194IZdvSvkD2bqEByG
+         2hng92wvdPACTfDST52dj+cJejFvfOBiF9YkgWXarz8E5tP/HwfQez9roz5A1iundo/P
+         80aQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689085527; x=1691677527;
+        d=1e100.net; s=20221208; t=1689089357; x=1691681357;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p56sBbCS+VPrS5cOX2wwAyiH2Cg/fGXPAAbSLjc9HmQ=;
-        b=Ei5RdsEdGDZv+hSAGb0bYCIe8YdLL/h+uX6rYJCkZTFeSndS95ARhoYub12Syiwhbi
-         ABYp7aiU7rb2tUtZPFi2bQK4QWlqZwX5h9zmH8nU/Oq7W8IpA3SUw1o1QqCap/neqQd0
-         vaC1mtClo0nPfyZDRBEY0imdH5nCNCZuAPwL4qS+wPqNGvDOKcKwlPZIiJ7MtYjwn4wy
-         GA8Nh6hjtdb24dIxByRNrNZOZykyN6VX9Gds4Z0z8TlkUEvV0q3OVBrmpU1gGAmmb/KP
-         RpqTnlXxnvQVAk8eZPxQPJgwggvrDiYtHfR4R+XT2DqGm1wnly+KNRzFQL44bnBKfMwk
-         oTCQ==
-X-Gm-Message-State: ABy/qLY/QoeD6TA/EDnY06CX1W/kpcgeTgfa9Yi/xqynqv2nc9jcexEX
-	7wun3gmQgjPrvIgHRIlrDRVcn+FBF6w=
-X-Google-Smtp-Source: APBJJlGypUsi6FziBQD/5n1q9oaBq8wtOZmggi8VuvEfNqxbkCHQTwUdZQaONZSNZ8Qt3Y2NvWdpI/kBNjM=
+        bh=BZNT+5cYt7mx7oEaiQ13ihjtEzSR8MjFtzStZZPURr4=;
+        b=E8GXnd9TRZfrtLB+SB0Mq2PlpPbAZVKrDx4NgQMQkL/W2nIuQs6nPdYP/0nS92EIdU
+         ePsA8peQRWj6INb1582lIpZiaZQpYcurRRBIJ7YPeJ/WTUEPl7yQS05H+Tdf6UtZyxc+
+         M2v/cKNfYWhUZ0HCHlCLA+Ni4pXBixyxDQdunVDifFleXSwqnKaoDDqZuU4CXlzLrNFY
+         nY6HoJCRM5gsD3klS9P+05AlrVLcC2IHiJQDQ3wqIDTZUYGn8nO1laqAWxsIFMXH20/S
+         DKpT1AVMuQRZrTGYXhjmvRbr63d4BgNEbUHsQIExfdTOBhEb3N0fEyx3Kdx/NUoqnCYR
+         r/0g==
+X-Gm-Message-State: ABy/qLYOGtCsges9tzBZSoyjTj1gMWnMIu1TXxnPBZN+cF/Y0zUODAxO
+	814Jr/G8rzGDvdEd5NP57K+SN88o9Dk=
+X-Google-Smtp-Source: APBJJlGFGYYGagVN7vTY3wC9eCumsMZqXbeKPXvjR5MQqtf90kvmwuPYWXIb7T3NbU7esv5D5N974RuQD6o=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:ac44:0:b0:55d:6af3:1e2c with SMTP id
- z4-20020a81ac44000000b0055d6af31e2cmr126252ywj.3.1689085527641; Tue, 11 Jul
- 2023 07:25:27 -0700 (PDT)
-Date: Tue, 11 Jul 2023 07:25:26 -0700
-In-Reply-To: <ZKzSf82kuik7wYkA@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
+ (user=seanjc job=sendgmr) by 2002:a25:5585:0:b0:bed:d03a:fc5f with SMTP id
+ j127-20020a255585000000b00bedd03afc5fmr90974ybb.11.1689089357189; Tue, 11 Jul
+ 2023 08:29:17 -0700 (PDT)
+Date: Tue, 11 Jul 2023 08:29:15 -0700
+In-Reply-To: <CAF7b7mrabLtnq+0Gtsg9FA+Gfr12FqbmfxwJZuQcBNDz1+3yLw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-4-amoorthy@google.com>
- <ZIn6VQSebTRN1jtX@google.com> <ZKf7+D474ESdNP3D@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
- <CAF7b7mr7BZayOxE2y8K87+AfYuGoDc7_kA2ouA3kBuhSgDiomg@mail.gmail.com> <ZKzSf82kuik7wYkA@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
-Message-ID: <ZK1mVriphYnZu6Cd@google.com>
-Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-10-amoorthy@google.com>
+ <ZIovIBVLIM69E5Bo@google.com> <CAF7b7mqKJTCENsb+5MZT+D=DwcSva-jMANjtYszMTm-ACvkiKA@mail.gmail.com>
+ <CAF7b7mrabLtnq+0Gtsg9FA+Gfr12FqbmfxwJZuQcBNDz1+3yLw@mail.gmail.com>
+Message-ID: <ZK11Sxobf53RsAmH@google.com>
+Subject: Re: [PATCH v4 09/16] KVM: Introduce KVM_CAP_NOWAIT_ON_FAULT without implementation
 From: Sean Christopherson <seanjc@google.com>
-To: Kautuk Consul <kconsul@linux.vnet.ibm.com>
-Cc: Anish Moorthy <amoorthy@google.com>, oliver.upton@linux.dev, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org, 
-	robert.hoo.linux@gmail.com, jthoughton@google.com, bgardon@google.com, 
-	dmatlack@google.com, ricarkol@google.com, axelrasmussen@google.com, 
-	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com
+To: Anish Moorthy <amoorthy@google.com>
+Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
+	jthoughton@google.com, bgardon@google.com, dmatlack@google.com, 
+	ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com, 
+	nadav.amit@gmail.com, isaku.yamahata@gmail.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jul 11, 2023, Kautuk Consul wrote:
-> > > That said, I agree that there's a risk that KVM could clobber vcpu->run_run by
-> > > hitting an -EFAULT without the vCPU loaded, but that's a solvable problem, e.g.
-> > > the helper to fill KVM_EXIT_MEMORY_FAULT could be hardened to yell if called
-> > > without the target vCPU being loaded:
-> > >
-> > >     int kvm_handle_efault(struct kvm_vcpu *vcpu, ...)
-> > >     {
-> > >         preempt_disable();
-> > >         if (WARN_ON_ONCE(vcpu != __this_cpu_read(kvm_running_vcpu)))
-> > >             goto out;
-> > >
-> > >         vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
-> > >         ...
-> > >     out:
-> > >         preempt_enable();
-> > >         return -EFAULT;
-> > >     }
-> > 
-> > Ancient history aside, let's figure out what's really needed here.
-> > 
-> > > Why use WARN_ON_ONCE when there is a clear possiblity of preemption
-> > > kicking in (with the possibility of vcpu_load/vcpu_put being called
-> > > in the new task) before preempt_disable() is called in this function ?
-> > > I think you should use WARN_ON_ONCE only where there is some impossible
-> > > or unhandled situation happening, not when there is a possibility of that
-> > > situation clearly happening as per the kernel code.
-> > 
-> > I did some mucking around to try and understand the kvm_running_vcpu
-> > variable, and I don't think preemption/rescheduling actually trips the
-> > WARN here? From my (limited) understanding, it seems that the
-> > thread being preempted will cause a vcpu_put() via kvm_sched_out().
-> > But when the thread is eventually scheduled back in onto whatever
-> > core, it'll vcpu_load() via kvm_sched_in(), and the docstring for
-> > kvm_get_running_vcpu() seems to imply the thing that vcpu_load()
-> > stores into the per-cpu "kvm_running_vcpu" variable will be the same
-> > thing which would have been observed before preemption.
-> > 
-> > All that's to say: I wouldn't expect the value of
-> > "__this_cpu_read(kvm_running_vcpu)" to change in any given thread. If
-> > that's true, then the things I would expect this WARN to catch are (a)
-> > bugs where somehow the thread gets scheduled without calling
-> > vcpu_load() or (b) bizarre situations (probably all bugs?) where some
-> > vcpu thread has a hold of some _other_ kvm_vcpu* and is trying to do
-> > something with it.
-> Oh I completely missed the scheduling path for KVM.
-> But since vcpu_put and vcpu_load are exported symbols, I wonder what'll
-> happen when there are calls to these functions from places other
-> than kvm_sched_in() and kvm_sched_out() ? Just thinking out loud.
+On Fri, Jul 07, 2023, Anish Moorthy wrote:
+> > Hmm, well not having to modify the vendor code would be nice... but
+> > I'll have to look more at __gfn_to_pfn_memslot()'s callers (and
+> > probably send more questions your way :). Hopefully it works out more
+> > like what you suggest.
+> 
+> I took a look of my own, and I don't think moving the nowait query
+> into __gfn_to_pfn_memslot() would work. At issue is the actual
+> behavior of KVM_CAP_NOWAIT_ON_FAULT, which I documented as follows:
+> 
+> > The presence of this capability indicates that userspace may pass the
+> > KVM_MEM_NOWAIT_ON_FAULT flag to KVM_SET_USER_MEMORY_REGION to cause KVM_RUN
+> > to fail (-EFAULT) in response to page faults for which resolution would require
+> > the faulting thread to sleep.
 
-Invoking this helper without the target vCPU loaded on the current task would be
-considered a bug.  kvm.ko exports a rather disgusting number of symbols purely for
-use by vendor modules, e.g. kvm-intel.ko and kvm-amd.ko on x86.  The exports are
-not at all intended to be used by non-KVM code, i.e. any such misuse would also be
-considered a bug.
+Well, that description is wrong for other reasons.  As mentioned in my reply
+(got snipped), the behavior is not tied to sleeping or waiting on I/O.
+
+>  Moving the nowait check out of __kvm_faultin_pfn()/user_mem_abort()
+> and into __gfn_to_pfn_memslot() means that, obviously, other callers
+> will start to see behavior changes. Some of that is probably actually
+> necessary for that documentation to be accurate (since any usages of
+> __gfn_to_pfn_memslot() under KVM_RUN should respect the memslot flag),
+> but I think there are consumers of __gfn_to_pfn_memslot() from outside
+> KVM_RUN.
+
+Yeah, replace "in response to page faults" with something along the lines of "if
+an access in guest context ..."
+
+> Anyways, after some searching on my end: I think the only caller of
+> __gfn_to_pfn_memslot() in core kvm/x86/arm64 where moving the "nowait"
+> check into the function actually changes anything is gfn_to_pfn(). But
+> that function gets called from vmx_vcpu_create() (through
+> kvm_alloc_apic_access_page()), and *that* certainly doesn't look like
+> something KVM_RUN does or would ever call.
+
+Correct, but that particular gfn_to_pfn() works on a KVM-internal memslot, i.e.
+will never have the "fast-only" flag set.
+
+	hva = __x86_set_memory_region(kvm, APIC_ACCESS_PAGE_PRIVATE_MEMSLOT, <===
+				      APIC_DEFAULT_PHYS_BASE, PAGE_SIZE);
+	if (IS_ERR(hva)) {
+		ret = PTR_ERR(hva);
+		goto out;
+	}
+
+	page = gfn_to_page(kvm, APIC_DEFAULT_PHYS_BASE >> PAGE_SHIFT);
+	if (is_error_page(page)) {
+		ret = -EFAULT;
+		goto out;
+	} 
+
+On x86, there should not be any other usages of user memslots outside of KVM_RUN.
+arm64 is unfortunately a different story (see this thread[*]), but we may be able
+to solve that with a documentation update.  I *think* the accesses are limited to
+the sub-ioctl KVM_DEV_ARM_VGIC_GRP_CTRL, and more precisely the sub-sub-ioctls
+KVM_DEV_ARM_ITS_{SAVE,RESTORE}_TABLES and KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES.
+
+[*] https://lore.kernel.org/all/Y1ghIKrAsRFwSFsO@google.com
