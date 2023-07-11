@@ -1,115 +1,171 @@
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F8CC7F
-	for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 02:59:21 +0000 (UTC)
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2b6f0508f54so79822881fa.3
-        for <kvmarm@lists.linux.dev>; Mon, 10 Jul 2023 19:59:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1689044360; x=1691636360;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+DBmSxEV9koNvPnH4f6fQb1MyHlXgygw1qw/AWmL9NU=;
-        b=jbRRZbz4ynuhPqqeV5apPzs0jqkJtDi55aZFCp3oS1Ky8RkTvPlwMnB4q/fiemRBoQ
-         /nqmDMG2P1A6auw8vdVkBVLFNlCCKg5J2gfTl+c6qkohrCouZIFJFDxXVd83G/CNdJVI
-         qpp4LD8m9YAEdXqPmRzBi1781HakxZf9US60Y=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689044360; x=1691636360;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+DBmSxEV9koNvPnH4f6fQb1MyHlXgygw1qw/AWmL9NU=;
-        b=LkUFiYgeUINKnGzdF54XQi9zVfjgOZ3ZtSVn2mhucC4JMizD9FbqxCeShW6uKVgtnL
-         /7ds1xdDR9xqvkD2EmkK7bmRqGG4rVHStkVAFZdtT7bXGbypN3SAR/bMbqt4Y8rGrkwa
-         y6D6o/NhqnwckIdB3ZHfoCg2cENEfwhX4rDKncBFEyVdhGQ8xoh8zv+L+CJp6DifF9n1
-         ExaYeb43EFZoqdgkAe+u3UL7X2xEDNr1aANqvcSxKGTBzNhBo4qw+sOuGSb3otncXVyP
-         PL3W6eHtng9tD39GXnixK0Tw7Pm4koBJ+ifVIlqmf66vmhWdbgpOc9SjXZL8HY0w2mbx
-         3Iaw==
-X-Gm-Message-State: ABy/qLZ+lLljyPxBHNKkLjWrhjtatFgNGO0ybf6gaOEeCVEZ48A6LWC0
-	LUPjCn6OBsFYi4rb2lEm2PMi8TTEZLMnaPxdJKccyQ==
-X-Google-Smtp-Source: APBJJlFhZxK1fGMNnOjl8Qk8f7Az5wy8Xg34SBiq6VLsMfXYX+pfTJMvsTItHqfjvno05fAVxl0LMgHzDd+1uLzcle4=
-X-Received: by 2002:a2e:7e12:0:b0:2b7:1b63:4657 with SMTP id
- z18-20020a2e7e12000000b002b71b634657mr5157080ljc.37.1689044359940; Mon, 10
- Jul 2023 19:59:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D08383D6E
+	for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 03:55:05 +0000 (UTC)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36B3lJqi021585;
+	Tue, 11 Jul 2023 03:54:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : content-type : in-reply-to :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=RwCO+2bmBWnvFOWtZ+uBFn/VKgVsxYa70c97zzbGSUQ=;
+ b=O5MkhUOCNCd1klcuCM19HjOkCVXASr5KaUMCZszKKY0KUEeui7ssZlZqw/S/QVs5IGaD
+ X70OCwB6UcExBtiM9O0Rm2XE+Q324MvLiCNgvJ9UWILjWO0JOL+hsIehefQWKxbBuRsM
+ 8/JXmuf+crjvrLZnwzQhpMMHdrTWbGkqTOwpfwXG10Bx0UowVqYPtdqIeCfE52DTwFYM
+ AEEaftvxAXWDx447rIbg/xQwL8HcsDT3Me+UQ9mQT7zU82cd1w9/q8qYnISitqrmzTe1
+ XdFFLGXmRjCJ0UrVDAnTSuGX1kCRzvgcFVOTZKbOQeSkOLIE/kMLEqxwawuSY7DMUxnM sA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rryfu039c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Jul 2023 03:54:52 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36B3rGqS005096;
+	Tue, 11 Jul 2023 03:54:51 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rryfu038x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Jul 2023 03:54:51 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+	by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36B3S4mw011446;
+	Tue, 11 Jul 2023 03:54:49 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3rpye5163x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Jul 2023 03:54:48 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36B3sk9E27198132
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 11 Jul 2023 03:54:46 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 578D02004B;
+	Tue, 11 Jul 2023 03:54:46 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D51C120040;
+	Tue, 11 Jul 2023 03:54:42 +0000 (GMT)
+Received: from li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com (unknown [9.109.216.99])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 11 Jul 2023 03:54:42 +0000 (GMT)
+Date: Tue, 11 Jul 2023 09:24:39 +0530
+From: Kautuk Consul <kconsul@linux.vnet.ibm.com>
+To: Anish Moorthy <amoorthy@google.com>
+Cc: Sean Christopherson <seanjc@google.com>, oliver.upton@linux.dev,
+        kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+        maz@kernel.org, robert.hoo.linux@gmail.com, jthoughton@google.com,
+        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
+        axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
+        isaku.yamahata@gmail.com
+Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+Message-ID: <ZKzSf82kuik7wYkA@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
+References: <20230602161921.208564-1-amoorthy@google.com>
+ <20230602161921.208564-4-amoorthy@google.com>
+ <ZIn6VQSebTRN1jtX@google.com>
+ <ZKf7+D474ESdNP3D@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
+ <CAF7b7mr7BZayOxE2y8K87+AfYuGoDc7_kA2ouA3kBuhSgDiomg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAF7b7mr7BZayOxE2y8K87+AfYuGoDc7_kA2ouA3kBuhSgDiomg@mail.gmail.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: zqeUP3KPyL2ytxwyzGGJ8LPyUyHSPe0b
+X-Proofpoint-ORIG-GUID: e1LTHjhHKowPrJB5hpHp2zzubW8LwU8K
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-6-stevensd@google.com>
- <20230705101800.ut4c6topn6ylwczs@linux.intel.com> <CAD=HUj41PAKC0x+c3zWAr-aCm59K7hs2zRh1uWs9778_Mai4UA@mail.gmail.com>
- <20230706155805.GD3894444@ls.amr.corp.intel.com> <CAD=HUj6GiK3TSSe7UY8C2Jd+3tjZNBa-TLgk-UodyL=E+qKavg@mail.gmail.com>
- <20230710163448.GE3894444@ls.amr.corp.intel.com>
-In-Reply-To: <20230710163448.GE3894444@ls.amr.corp.intel.com>
-From: David Stevens <stevensd@chromium.org>
-Date: Tue, 11 Jul 2023 11:59:08 +0900
-Message-ID: <CAD=HUj6ZEzVEFgn_J_9EPNMj5i-N=MSc0xZF8FweqrgTxUks0g@mail.gmail.com>
-Subject: Re: [PATCH v7 5/8] KVM: x86/mmu: Don't pass FOLL_GET to __kvm_follow_pfn
-To: Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc: Yu Zhang <yu.c.zhang@linux.intel.com>, Sean Christopherson <seanjc@google.com>, 
-	Marc Zyngier <maz@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, Peter Xu <peterx@redhat.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-10_18,2023-07-06_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ mlxlogscore=999 mlxscore=0 spamscore=0 phishscore=0 impostorscore=0
+ clxscore=1015 suspectscore=0 malwarescore=0 lowpriorityscore=0
+ adultscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2307110031
 
-On Tue, Jul 11, 2023 at 1:34=E2=80=AFAM Isaku Yamahata <isaku.yamahata@gmai=
-l.com> wrote:
->
-> On Fri, Jul 07, 2023 at 10:35:02AM +0900,
-> David Stevens <stevensd@chromium.org> wrote:
->
-> > > > > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > > > > > index e44ab512c3a1..b1607e314497 100644
-> > > > > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > > > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > > >
-> > > > > ...
-> > > > >
-> > > > > > @@ -2937,6 +2943,7 @@ static int mmu_set_spte(struct kvm_vcpu *=
-vcpu, struct kvm_memory_slot *slot,
-> > > > > >       bool host_writable =3D !fault || fault->map_writable;
-> > > > > >       bool prefetch =3D !fault || fault->prefetch;
-> > > > > >       bool write_fault =3D fault && fault->write;
-> > > > > > +     bool is_refcounted =3D !fault || fault->is_refcounted_pag=
-e;
-> > > > >
-> > > > > Just wonder, what if a non-refcounted page is prefetched?  Or is =
-it possible in
-> > > > > practice?
-> > > >
-> > > > Prefetching is still done via gfn_to_page_many_atomic, which sets
-> > > > FOLL_GET. That's fixable, but it's not something this series curren=
-tly
-> > > > does.
 > > >
-> > > So if we prefetch a page, REFCOUNTED bit is cleared unconditionally w=
-ith this
-> > > hunk.  kvm_set_page_{dirty, accessed} won't be called as expected for=
- prefetched
-> > > spte.  If I read the patch correctly, REFCOUNTED bit in SPTE should r=
-epresent
-> > > whether the corresponding page is ref-countable or not, right?
-> > >
-> > > Because direct_pte_prefetch_many() is for legacy KVM MMU and FNAME(pr=
-efetch_pte)
-> > > is shadow paging, we need to test it with legacy KVM MMU or shadow pa=
-ging to hit
-> > > the issue, though.
-> > >
+> > I think that this check is needed but without the WARN_ON_ONCE as per my
+> > other comment.
+> > Reason is that we really need to insulate the code against preemption
+> > kicking in before the call to preempt_disable() as the logic seems to
+> > need this check to avoid concurrency problems.
+> > (I don't think Anish simply copied this if-check from mark_page_dirty_in_slot)
+> 
+> Heh, you're giving me too much credit here. I did copy-paste this
+> check, not from from mark_page_dirty_in_slot() but from one of Sean's
+> old responses [1]
+Oh, I see.
+> 
+> > That said, I agree that there's a risk that KVM could clobber vcpu->run_run by
+> > hitting an -EFAULT without the vCPU loaded, but that's a solvable problem, e.g.
+> > the helper to fill KVM_EXIT_MEMORY_FAULT could be hardened to yell if called
+> > without the target vCPU being loaded:
 > >
-> > direct_pte_prefetch_many and prefetch_gpte both pass NULL for the
-> > fault parameter, so is_refcounted will evaluate to true. So the spte's
-> > refcounted bit will get set in that case.
->
-> Oops, my bad.  My point is "unconditionally".  Is the bit always set for
-> non-refcountable pages?  Or non-refcountable pages are not prefeched?
-
-The bit is never set for non-refcounted pages, and is always set for
-refcounted pages. The current series never prefetches non-refcounted
-pages, since it continues to use the gfn_to_page_many_atomic API.
-
--David
+> >     int kvm_handle_efault(struct kvm_vcpu *vcpu, ...)
+> >     {
+> >         preempt_disable();
+> >         if (WARN_ON_ONCE(vcpu != __this_cpu_read(kvm_running_vcpu)))
+> >             goto out;
+> >
+> >         vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
+> >         ...
+> >     out:
+> >         preempt_enable();
+> >         return -EFAULT;
+> >     }
+> 
+> Ancient history aside, let's figure out what's really needed here.
+> 
+> > Why use WARN_ON_ONCE when there is a clear possiblity of preemption
+> > kicking in (with the possibility of vcpu_load/vcpu_put being called
+> > in the new task) before preempt_disable() is called in this function ?
+> > I think you should use WARN_ON_ONCE only where there is some impossible
+> > or unhandled situation happening, not when there is a possibility of that
+> > situation clearly happening as per the kernel code.
+> 
+> I did some mucking around to try and understand the kvm_running_vcpu
+> variable, and I don't think preemption/rescheduling actually trips the
+> WARN here? From my (limited) understanding, it seems that the
+> thread being preempted will cause a vcpu_put() via kvm_sched_out().
+> But when the thread is eventually scheduled back in onto whatever
+> core, it'll vcpu_load() via kvm_sched_in(), and the docstring for
+> kvm_get_running_vcpu() seems to imply the thing that vcpu_load()
+> stores into the per-cpu "kvm_running_vcpu" variable will be the same
+> thing which would have been observed before preemption.
+> 
+> All that's to say: I wouldn't expect the value of
+> "__this_cpu_read(kvm_running_vcpu)" to change in any given thread. If
+> that's true, then the things I would expect this WARN to catch are (a)
+> bugs where somehow the thread gets scheduled without calling
+> vcpu_load() or (b) bizarre situations (probably all bugs?) where some
+> vcpu thread has a hold of some _other_ kvm_vcpu* and is trying to do
+> something with it.
+Oh I completely missed the scheduling path for KVM.
+But since vcpu_put and vcpu_load are exported symbols, I wonder what'll
+happen when there are calls to these functions from places other
+than kvm_sched_in() and kvm_sched_out() ? Just thinking out loud.
+> 
+> 
+> On Wed, Jun 14, 2023 at 10:35 AM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > Meh, this is overkill IMO.  The check in mark_page_dirty_in_slot() is an
+> > abomination that I wish didn't exist, not a pattern that should be copied.  If
+> > we do keep this sanity check, it can simply be
+> >
+> >         if (WARN_ON_ONCE(vcpu != kvm_get_running_vcpu()))
+> >                 return;
+> >
+> > because as the comment for kvm_get_running_vcpu() explains, the returned vCPU
+> > pointer won't change even if this task gets migrated to a different pCPU.  If
+> > this code were doing something with vcpu->cpu then preemption would need to be
+> > disabled throughout, but that's not the case.
+> 
+> Oh, looks like Sean said the same thing. Guess I probably should have
+> read that reply more closely first :/
+I too get less time to completely read through emails and
+associated code between my work assignments. :-).
+> 
+> 
+> [1] https://lore.kernel.org/kvm/ZBnLaidtZEM20jMp@google.com/
