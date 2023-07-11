@@ -1,113 +1,115 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F0D1156CD
-	for <kvmarm@lists.linux.dev>; Mon, 10 Jul 2023 22:13:33 +0000 (UTC)
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-c6ab0d1b1dcso5193137276.0
-        for <kvmarm@lists.linux.dev>; Mon, 10 Jul 2023 15:13:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F8CC7F
+	for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 02:59:21 +0000 (UTC)
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2b6f0508f54so79822881fa.3
+        for <kvmarm@lists.linux.dev>; Mon, 10 Jul 2023 19:59:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689027212; x=1691619212;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VhyuhUu7ArHYZFjkYslfHWi7GXr3zNNFUwoXSJr15Gs=;
-        b=STVcaaR6HH1MmFncFyTKauvrHE7UvRNbNSVW/i5IKGtGvhl2UQnGE0vFR8gJ66Uk2c
-         pWD9/7AWt0Iqe8hrimzxYspFm62Tpuf0XaR47UwByAWC2rQ0T6kPQCe8oLGEGk2MMwkv
-         rBmWDcKgO+1vIm/903NAi1T6/+F83sjnYUCBHkfmOJZxODUEirpiNccdSuOM2hW0217K
-         OlU7wM3kxncMAm2W+HP6uuGbfTIlJjhGRCFIXTnESPbtqbxag+pdinbQYT2Zj96mVyvK
-         gugeJt7F2/3TjWMxVge86PJm6T+A3+F3MQhVXNhtRqdv1t9Vs+Kv55CAEUsXVZc2WS7i
-         fOKA==
+        d=chromium.org; s=google; t=1689044360; x=1691636360;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+DBmSxEV9koNvPnH4f6fQb1MyHlXgygw1qw/AWmL9NU=;
+        b=jbRRZbz4ynuhPqqeV5apPzs0jqkJtDi55aZFCp3oS1Ky8RkTvPlwMnB4q/fiemRBoQ
+         /nqmDMG2P1A6auw8vdVkBVLFNlCCKg5J2gfTl+c6qkohrCouZIFJFDxXVd83G/CNdJVI
+         qpp4LD8m9YAEdXqPmRzBi1781HakxZf9US60Y=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689027212; x=1691619212;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VhyuhUu7ArHYZFjkYslfHWi7GXr3zNNFUwoXSJr15Gs=;
-        b=iWEuRuzs7lvgnngrICCdWu5RvDJqjmoLMCmS+RsuqX4XOigIQnIG171C266ad7BPSk
-         dEeNhsJrkQGmpzF1feO51Pi2ivmNxUYjyokjTyHkaUAqjMx/1iosHqF7dYLv15++BZH+
-         K8b2zSH3Ry3PlNTe+mrQpH1n6OnAcETNgO1x5m1cUJdtT+6MztmtqNRvr/OgYgxI0zU9
-         FGmEb5jmquc4MazqnZ7PdRX+Hf0WhSCGMu5ahs9ey2G5LdV9N7GIkI+otJd3fKSZzE3e
-         jJPbdtXA9nFQrbnieioag/BcG//S+lvi5vmhEB25oQfbas3cH5JATSqk1guSLOJRxtMo
-         LfYg==
-X-Gm-Message-State: ABy/qLZ+Zq6MGbpZzojW2ClnHi2xr9B+8jJfqsbYzqG5bn9vl+ogCzRO
-	0GTzNklBlgipDOqvRUvxlTs/sduHSB4=
-X-Google-Smtp-Source: APBJJlGicNB3k+jdZ6LQfesOWoW0KcNW9IGPTA9A/vbsEkgluZUxiXkGaHoqNIMT3Y4Zm0AQCJca26jhABo=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:c05:0:b0:c70:d138:51b1 with SMTP id
- 5-20020a250c05000000b00c70d13851b1mr42859ybm.12.1689027212157; Mon, 10 Jul
- 2023 15:13:32 -0700 (PDT)
-Date: Mon, 10 Jul 2023 15:13:30 -0700
-In-Reply-To: <ZKxL09AW1s2uL28x@linux.dev>
+        d=1e100.net; s=20221208; t=1689044360; x=1691636360;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+DBmSxEV9koNvPnH4f6fQb1MyHlXgygw1qw/AWmL9NU=;
+        b=LkUFiYgeUINKnGzdF54XQi9zVfjgOZ3ZtSVn2mhucC4JMizD9FbqxCeShW6uKVgtnL
+         /7ds1xdDR9xqvkD2EmkK7bmRqGG4rVHStkVAFZdtT7bXGbypN3SAR/bMbqt4Y8rGrkwa
+         y6D6o/NhqnwckIdB3ZHfoCg2cENEfwhX4rDKncBFEyVdhGQ8xoh8zv+L+CJp6DifF9n1
+         ExaYeb43EFZoqdgkAe+u3UL7X2xEDNr1aANqvcSxKGTBzNhBo4qw+sOuGSb3otncXVyP
+         PL3W6eHtng9tD39GXnixK0Tw7Pm4koBJ+ifVIlqmf66vmhWdbgpOc9SjXZL8HY0w2mbx
+         3Iaw==
+X-Gm-Message-State: ABy/qLZ+lLljyPxBHNKkLjWrhjtatFgNGO0ybf6gaOEeCVEZ48A6LWC0
+	LUPjCn6OBsFYi4rb2lEm2PMi8TTEZLMnaPxdJKccyQ==
+X-Google-Smtp-Source: APBJJlFhZxK1fGMNnOjl8Qk8f7Az5wy8Xg34SBiq6VLsMfXYX+pfTJMvsTItHqfjvno05fAVxl0LMgHzDd+1uLzcle4=
+X-Received: by 2002:a2e:7e12:0:b0:2b7:1b63:4657 with SMTP id
+ z18-20020a2e7e12000000b002b71b634657mr5157080ljc.37.1689044359940; Mon, 10
+ Jul 2023 19:59:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230703163548.1498943-1-maz@kernel.org> <ZKxIGOAcQbknIcBL@google.com>
- <ZKxL09AW1s2uL28x@linux.dev>
-Message-ID: <ZKyCimgRJThIR0pw@google.com>
-Subject: Re: [PATCH] KVM: arm64: Disable preemption in kvm_arch_hardware_enable()
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, isaku.yamahata@intel.com, pbonzini@redhat.com, 
-	Kristina Martsenko <kristina.martsenko@arm.com>, stable@vger.kernek.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-6-stevensd@google.com>
+ <20230705101800.ut4c6topn6ylwczs@linux.intel.com> <CAD=HUj41PAKC0x+c3zWAr-aCm59K7hs2zRh1uWs9778_Mai4UA@mail.gmail.com>
+ <20230706155805.GD3894444@ls.amr.corp.intel.com> <CAD=HUj6GiK3TSSe7UY8C2Jd+3tjZNBa-TLgk-UodyL=E+qKavg@mail.gmail.com>
+ <20230710163448.GE3894444@ls.amr.corp.intel.com>
+In-Reply-To: <20230710163448.GE3894444@ls.amr.corp.intel.com>
+From: David Stevens <stevensd@chromium.org>
+Date: Tue, 11 Jul 2023 11:59:08 +0900
+Message-ID: <CAD=HUj6ZEzVEFgn_J_9EPNMj5i-N=MSc0xZF8FweqrgTxUks0g@mail.gmail.com>
+Subject: Re: [PATCH v7 5/8] KVM: x86/mmu: Don't pass FOLL_GET to __kvm_follow_pfn
+To: Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc: Yu Zhang <yu.c.zhang@linux.intel.com>, Sean Christopherson <seanjc@google.com>, 
+	Marc Zyngier <maz@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, Peter Xu <peterx@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 10, 2023, Oliver Upton wrote:
-> On Mon, Jul 10, 2023 at 11:04:08AM -0700, Sean Christopherson wrote:
-> > On Mon, Jul 03, 2023, Marc Zyngier wrote:
-> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > > index aaeae1145359..a28c4ffe4932 100644
-> > > --- a/arch/arm64/kvm/arm.c
-> > > +++ b/arch/arm64/kvm/arm.c
-> > > @@ -1894,8 +1894,17 @@ static void _kvm_arch_hardware_enable(void *discard)
-> > >  
-> > >  int kvm_arch_hardware_enable(void)
-> > >  {
-> > > -	int was_enabled = __this_cpu_read(kvm_arm_hardware_enabled);
-> > > +	int was_enabled;
-> > >  
-> > > +	/*
-> > > +	 * Most calls to this function are made with migration
-> > > +	 * disabled, but not with preemption disabled. The former is
-> > > +	 * enough to ensure correctness, but most of the helpers
-> > > +	 * expect the later and will throw a tantrum otherwise.
-> > > +	 */
-> > > +	preempt_disable();
-> > > +
-> > > +	was_enabled = __this_cpu_read(kvm_arm_hardware_enabled);
-> > 
-> > IMO, this_cpu_has_cap() is at fault.
-> 
-> Who ever said otherwise?
+On Tue, Jul 11, 2023 at 1:34=E2=80=AFAM Isaku Yamahata <isaku.yamahata@gmai=
+l.com> wrote:
+>
+> On Fri, Jul 07, 2023 at 10:35:02AM +0900,
+> David Stevens <stevensd@chromium.org> wrote:
+>
+> > > > > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > > > > index e44ab512c3a1..b1607e314497 100644
+> > > > > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > > > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > > >
+> > > > > ...
+> > > > >
+> > > > > > @@ -2937,6 +2943,7 @@ static int mmu_set_spte(struct kvm_vcpu *=
+vcpu, struct kvm_memory_slot *slot,
+> > > > > >       bool host_writable =3D !fault || fault->map_writable;
+> > > > > >       bool prefetch =3D !fault || fault->prefetch;
+> > > > > >       bool write_fault =3D fault && fault->write;
+> > > > > > +     bool is_refcounted =3D !fault || fault->is_refcounted_pag=
+e;
+> > > > >
+> > > > > Just wonder, what if a non-refcounted page is prefetched?  Or is =
+it possible in
+> > > > > practice?
+> > > >
+> > > > Prefetching is still done via gfn_to_page_many_atomic, which sets
+> > > > FOLL_GET. That's fixable, but it's not something this series curren=
+tly
+> > > > does.
+> > >
+> > > So if we prefetch a page, REFCOUNTED bit is cleared unconditionally w=
+ith this
+> > > hunk.  kvm_set_page_{dirty, accessed} won't be called as expected for=
+ prefetched
+> > > spte.  If I read the patch correctly, REFCOUNTED bit in SPTE should r=
+epresent
+> > > whether the corresponding page is ref-countable or not, right?
+> > >
+> > > Because direct_pte_prefetch_many() is for legacy KVM MMU and FNAME(pr=
+efetch_pte)
+> > > is shadow paging, we need to test it with legacy KVM MMU or shadow pa=
+ging to hit
+> > > the issue, though.
+> > >
+> >
+> > direct_pte_prefetch_many and prefetch_gpte both pass NULL for the
+> > fault parameter, so is_refcounted will evaluate to true. So the spte's
+> > refcounted bit will get set in that case.
+>
+> Oops, my bad.  My point is "unconditionally".  Is the bit always set for
+> non-refcountable pages?  Or non-refcountable pages are not prefeched?
 
-Sorry, should have phrased that as "should be fixed".
- 
-> > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> > index 7d7128c65161..b862477de2ce 100644
-> > --- a/arch/arm64/kernel/cpufeature.c
-> > +++ b/arch/arm64/kernel/cpufeature.c
-> > @@ -3193,7 +3193,9 @@ static void __init setup_boot_cpu_capabilities(void)
-> >  
-> >  bool this_cpu_has_cap(unsigned int n)
-> >  {
-> > -       if (!WARN_ON(preemptible()) && n < ARM64_NCAPS) {
-> > +       __this_cpu_preempt_check("has_cap");
-> > +
-> > +       if (n < ARM64_NCAPS) {
-> 
-> This is likely sufficient, but to Marc's point we have !preemptible()
-> checks littered about, it just so happens that this_cpu_has_cap() is the
-> first to get called. We need to make sure there aren't any other checks
-> that'd break under hotplug.
+The bit is never set for non-refcounted pages, and is always set for
+refcounted pages. The current series never prefetches non-refcounted
+pages, since it continues to use the gfn_to_page_many_atomic API.
 
-Ah, "we" is all of arm64.  E.g. this pattern in arch/arm64/kernel/cpu_errata.c
-is splattered all over the place.
-
-  WARN_ON(scope != SCOPE_LOCAL_CPU || preemptible());
-
-AFAICT, the only issue in KVM proper is the BUG_ON() in kvm_vgic_init_cpu_hardware().
-
-Sadly, a hack-a-fix for stable probably does make sense :-(
+-David
