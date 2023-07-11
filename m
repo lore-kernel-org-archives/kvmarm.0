@@ -1,213 +1,139 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 991DB182AB
-	for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 10:10:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03B5DC433C7;
-	Tue, 11 Jul 2023 10:10:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689070204;
-	bh=xvD9qOibcpIE57JzhSjo57C0b5FnYP22lRIrz4WjLd4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UKXqKoWtgS/06BqN1/gx6XjfRQLf7alc2DGHshVpPDQ/i/5t4ed1nAge60F23iHZD
-	 p8sKkBjYc458c6Vo8aYA83nBK5Bkp+XoyfioPK/jjAAlxd2Seflnb4AMtB7ej5nXZh
-	 EuvzNuRYWzCMrAXQUUD1X8cI8EAysLHIQDN6UXHI1nqYgmXm5zTdViiEpQhyxIDaoG
-	 p+1JDML4nUb38buoCe3dJ/WyPnfdNJfYbtohCV7BUKDkgZRpZnEPhcLP3QZyOPkg0K
-	 jf6OtBqZUZ/XZ0jEur2s8f0GwdG5DbPy4//WURkXn5BDOS6sjQFAIw+AlGxsllEkc2
-	 lm4b//i+QX3tQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qJAJl-00C5JM-Dt;
-	Tue, 11 Jul 2023 11:10:01 +0100
-Date: Tue, 11 Jul 2023 11:10:01 +0100
-Message-ID: <86edlewyh2.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Reiji Watanabe <reijiw@google.com>,
-	stable@vger.kernel.org,
-	Yu Zhao <yuzhao@google.com>
-Subject: Re: [PATCH v2] KVM: arm64: Correctly handle page aging notifiers for unaligned memslot
-In-Reply-To: <20230627235405.4069823-1-oliver.upton@linux.dev>
-References: <20230627235405.4069823-1-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2916C18AF7
+	for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 10:35:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689071706;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=C44gRJnvKK81y1lA/2BMOESkp91eyGlQDqSpbuXrUhI=;
+	b=KbEiKk88PnmXn8P9zqstnKw4YfDOzEL8EMZXcmbztA9ZiypK25196LizYqe9EKhkqde1rX
+	9zdFpDgxUJxobjH7MCuRzsf6ASRforqJ+/4kITnfTrPKCGycKPcsMzbq9zUP9lK9faqO39
+	oDMc/AJOlsqafpTeN78rZFHQAMDWbcE=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-288-6Z33H3wnMPCjqtyJfTFaLA-1; Tue, 11 Jul 2023 06:35:05 -0400
+X-MC-Unique: 6Z33H3wnMPCjqtyJfTFaLA-1
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-765a632f342so621070585a.0
+        for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 03:35:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689071705; x=1691663705;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=C44gRJnvKK81y1lA/2BMOESkp91eyGlQDqSpbuXrUhI=;
+        b=cTXX0nO5607xptB2ebJLCp0HWuzttuykyE3fFsU1cuL41qd+jTR9gZyD6VLp7LMsNk
+         CzD76CK0Pjn9mJIBnfDOg9Yh61fC4NcNQxbZRcXTvFDEXy/cKcRrHX8HIE9SL7sCMSaS
+         eOekcYjKSmdC6etbZR8uromVYYJAK8ODoJeHvziRPL7aipTTiuapYoL2TaEPeGjo58r9
+         0IBcsfFKNR7UIS/leulWf2Uc75dS/JedQm4bgsslGQe7jifOpDChVn5KYBgJW2snGg8G
+         HtB+4GzDgZ/s0FNvEtPNSyc0n2Bl1NvYr/t8yx1OzDlLewztf3tmS8v2GuuBhyulnEKK
+         mArQ==
+X-Gm-Message-State: ABy/qLaW7To+ATSZRFgToNKO45Fu/zd5n0aXn1CjHV85yddLmuhDIs59
+	RYedkD5mvbqGngZs0QL9h1065E8tlfRYAgE/t4fstAF83igNlAGxDM2Ad9YGbINX7Z6mBBewiYf
+	6Aqnb/EuzqopqEbYc
+X-Received: by 2002:a37:9341:0:b0:75e:6837:19f8 with SMTP id v62-20020a379341000000b0075e683719f8mr13771833qkd.54.1689071705001;
+        Tue, 11 Jul 2023 03:35:05 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGxlq/7A4GdGaqnzBhicpMrwD0GAvJBt2eUgALa1GF781GEgnyNumTSHDI13TYvBhLFGWjlpA==
+X-Received: by 2002:a37:9341:0:b0:75e:6837:19f8 with SMTP id v62-20020a379341000000b0075e683719f8mr13771821qkd.54.1689071704760;
+        Tue, 11 Jul 2023 03:35:04 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id d13-20020a05620a140d00b00767e62bcf0csm167613qkj.65.2023.07.11.03.35.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Jul 2023 03:35:04 -0700 (PDT)
+Message-ID: <d49225cb-3240-ea8e-11e6-b8ed30ce2fc8@redhat.com>
+Date: Tue, 11 Jul 2023 12:35:00 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, reijiw@google.com, stable@vger.kernel.org, yuzhao@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH] KVM: arm64: timers: Use CNTHCTL_EL2 when setting
+ non-CNTKCTL_EL1 bits
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ stable@vger.kernel.org
+References: <20230627140557.544885-1-maz@kernel.org>
+From: Eric Auger <eauger@redhat.com>
+In-Reply-To: <20230627140557.544885-1-maz@kernel.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, 28 Jun 2023 00:54:05 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+Hi Marc,
+On 6/27/23 16:05, Marc Zyngier wrote:
+> It recently appeared that, whien running VHE, there is a notable
+when
+> difference between using CNTKCTL_EL1 and CNTHCTL_EL2, despite what
+> the architecture documents:
 > 
-> Userspace is allowed to select any PAGE_SIZE aligned hva to back guest
-> memory. This is even the case with hugepages, although it is a rather
-> suboptimal configuration as PTE level mappings are used at stage-2.
+> - When accessed from EL2, bits [19:18] and [16:10] same bits have
+s/same bits/of CNTKCTL_EL1/ ?
+>   the same assignment as CNTHCTL_EL2
+> - When accessed from EL1, bits [19:18] and [16:10] are RES0
+s/bits/the same bits/
 > 
-> The arm64 page aging handlers have an assumption that the specified
-> range is exactly one page/block of memory, which in the aforementioned
-> case is not necessarily true. All together this leads to the WARN() in
-> kvm_age_gfn() firing.
+> It is all OK, until you factor in NV, where the EL2 guest runs at EL1.
+> In this configuration, CNTKCTL_EL11 doesn't trap, nor ends up in
+s/CNTKCTL_EL11/CNTKCTL_EL1
+> the VNCR page. This means that any write from the guest affecting
+> CNTHCTL_EL2 using CNTKCTL_EL1 ends up losing some state. Not good.
 > 
-> However, the WARN is only part of the issue as the table walkers visit
-> at most a single leaf PTE. For hugepage-backed memory in a memslot that
-> isn't hugepage-aligned, page aging entirely misses accesses to the
-> hugepage beyond the first page in the memslot.
+> The fix it obvious: don't use CNTKCTL_EL1 if you want to change bits
+> that are not part of the EL1 definition of CNTKCTL_EL1, and use
+> CNTHCTL_EL2 instead. This doesn't change anything for a bare-metal OS,
+> and fixes it when running under NV. The NV hypervisor will itself
+> have to work harder to merge the two accessors.
 > 
-> Add a new walker dedicated to handling page aging MMU notifiers capable
-> of walking a range of PTEs. Convert kvm(_test)_age_gfn() over to the new
-> walker and drop the WARN that caught the issue in the first place. The
-> implementation of this walker was inspired by the test_clear_young()
-> implementation by Yu Zhao [*], but repurposed to address a bug in the
-> existing aging implementation.
+> Note that there is a pending update to the architecture to address
+> this issue by making the affected bits UNKNOWN when CNTKCTL_EL1 is
+> user from EL2 with VHE enabled.
+used
 > 
-> Cc: stable@vger.kernel.org # v5.15
-> Fixes: 056aad67f836 ("kvm: arm/arm64: Rework gpa callback handlers")
-> Link: https://lore.kernel.org/kvmarm/20230526234435.662652-6-yuzhao@google.com/
-> Co-developed-by: Yu Zhao <yuzhao@google.com>
-> Signed-off-by: Yu Zhao <yuzhao@google.com>
-> Reported-by: Reiji Watanabe <reijiw@google.com>
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> Fixes: c605ee245097 ("KVM: arm64: timers: Allow physical offset without CNTPOFF_EL2")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: stable@vger.kernel.org # v6.4
 > ---
->  arch/arm64/include/asm/kvm_pgtable.h | 26 ++++++------------
->  arch/arm64/kvm/hyp/pgtable.c         | 41 ++++++++++++++++++++++------
->  arch/arm64/kvm/mmu.c                 | 18 ++++++------
->  3 files changed, 49 insertions(+), 36 deletions(-)
+>  arch/arm64/kvm/arch_timer.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index dc3c072e862f..75f437e8cd15 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -556,22 +556,26 @@ int kvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size);
->  kvm_pte_t kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr);
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 0696732fa38c..6dcdae4d38cb 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -827,8 +827,8 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
+>  	assign_clear_set_bit(tpt, CNTHCTL_EL1PCEN << 10, set, clr);
+>  	assign_clear_set_bit(tpc, CNTHCTL_EL1PCTEN << 10, set, clr);
 >  
->  /**
-> - * kvm_pgtable_stage2_mkold() - Clear the access flag in a page-table entry.
-> + * kvm_pgtable_stage2_test_clear_young() - Test and optionally clear the access
-> + *					   flag in a page-table entry.
->   * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
->   * @addr:	Intermediate physical address to identify the page-table entry.
-> + * @size:	Size of the address range to visit.
-> + * @mkold:	True if the access flag should be cleared.
->   *
->   * The offset of @addr within a page is ignored.
->   *
-> - * If there is a valid, leaf page-table entry used to translate @addr, then
-> - * clear the access flag in that entry.
-> + * Tests and conditionally clears the access flag for every valid, leaf
-> + * page-table entry used to translate the range [@addr, @addr + @size).
->   *
->   * Note that it is the caller's responsibility to invalidate the TLB after
->   * calling this function to ensure that the updated permissions are visible
->   * to the CPUs.
->   *
-> - * Return: The old page-table entry prior to clearing the flag, 0 on failure.
-> + * Return: True if any of the visited PTEs had the access flag set.
->   */
-> -kvm_pte_t kvm_pgtable_stage2_mkold(struct kvm_pgtable *pgt, u64 addr);
-> +bool kvm_pgtable_stage2_test_clear_young(struct kvm_pgtable *pgt, u64 addr,
-> +					 u64 size, bool mkold);
->  
->  /**
->   * kvm_pgtable_stage2_relax_perms() - Relax the permissions enforced by a
-> @@ -593,18 +597,6 @@ kvm_pte_t kvm_pgtable_stage2_mkold(struct kvm_pgtable *pgt, u64 addr);
->  int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
->  				   enum kvm_pgtable_prot prot);
->  
-> -/**
-> - * kvm_pgtable_stage2_is_young() - Test whether a page-table entry has the
-> - *				   access flag set.
-> - * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
-> - * @addr:	Intermediate physical address to identify the page-table entry.
-> - *
-> - * The offset of @addr within a page is ignored.
-> - *
-> - * Return: True if the page-table entry has the access flag set, false otherwise.
-> - */
-> -bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr);
-> -
->  /**
->   * kvm_pgtable_stage2_flush_range() - Clean and invalidate data cache to Point
->   * 				      of Coherency for guest stage-2 address
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 5282cb9ca4cf..5d701e9adf5c 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -1153,25 +1153,48 @@ kvm_pte_t kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr)
->  	return pte;
+> -	/* This only happens on VHE, so use the CNTKCTL_EL1 accessor */
+> -	sysreg_clear_set(cntkctl_el1, clr, set);
+> +	/* This only happens on VHE, so use the CNTHCTL_EL2 accessor. */
+> +	sysreg_clear_set(cnthctl_el2, clr, set);
 >  }
 >  
-> -kvm_pte_t kvm_pgtable_stage2_mkold(struct kvm_pgtable *pgt, u64 addr)
-> +struct stage2_age_data {
-> +	bool	mkold;
-> +	bool	young;
-> +};
-> +
-> +static int stage2_age_walker(const struct kvm_pgtable_visit_ctx *ctx,
-> +			     enum kvm_pgtable_walk_flags visit)
+>  void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+> @@ -1563,7 +1563,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+>  void kvm_timer_init_vhe(void)
 >  {
-> -	kvm_pte_t pte = 0;
-> -	stage2_update_leaf_attrs(pgt, addr, 1, 0, KVM_PTE_LEAF_ATTR_LO_S2_AF,
-> -				 &pte, NULL, 0);
-> +	kvm_pte_t new = ctx->old & ~KVM_PTE_LEAF_ATTR_LO_S2_AF;
-> +	struct stage2_age_data *data = ctx->arg;
-> +
-> +	if (!kvm_pte_valid(ctx->old) || new == ctx->old)
-> +		return 0;
-> +
-> +	data->young = true;
-> +
-> +	if (data->mkold && !stage2_try_set_pte(ctx, new))
-> +		return -EAGAIN;
-> +
->  	/*
->  	 * "But where's the TLBI?!", you scream.
->  	 * "Over in the core code", I sigh.
->  	 *
->  	 * See the '->clear_flush_young()' callback on the KVM mmu notifier.
->  	 */
-> -	return pte;
-> +	return 0;
+>  	if (cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF))
+> -		sysreg_clear_set(cntkctl_el1, 0, CNTHCTL_ECV);
+> +		sysreg_clear_set(cnthctl_el2, 0, CNTHCTL_ECV);
 >  }
 >  
-> -bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr)
-> +bool kvm_pgtable_stage2_test_clear_young(struct kvm_pgtable *pgt, u64 addr,
-> +					 u64 size, bool mkold)
->  {
-> -	kvm_pte_t pte = 0;
-> -	stage2_update_leaf_attrs(pgt, addr, 1, 0, 0, &pte, NULL, 0);
-> -	return pte & KVM_PTE_LEAF_ATTR_LO_S2_AF;
-> +	struct stage2_age_data data = {
-> +		.mkold		= mkold,
-> +	};
-> +	struct kvm_pgtable_walker walker = {
-> +		.cb		= stage2_age_walker,
-> +		.arg		= &data,
-> +		.flags		= KVM_PGTABLE_WALK_LEAF,
-> +	};
-> +
-> +	WARN_ON(kvm_pgtable_walk(pgt, addr, size, &walker));
+>  int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
 
-Do we really want a WARN_ON() here? From what I can tell, it can be
-(trivially?) triggered by the previous function returning -EAGAIN if
-the pte update fails in the case of a shared walk.
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Otherwise, look OK to me.
+Eric
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
