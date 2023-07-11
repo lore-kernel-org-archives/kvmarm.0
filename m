@@ -1,51 +1,51 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F8FD17755
-	for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 13:30:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A5218AFF
+	for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 13:38:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689082217;
+	s=mimecast20190719; t=1689082687;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4embjR8yHEs1N6hH60Rckk7FTcDnPGGpJd8CK6UGxfU=;
-	b=DAOR/3yikuCrfmw6MY/fgFBaLWmScpn6RK9MyvlAyOzlaty+WSUAsXk1VgWaQGEvHPST5x
-	vaGfDeQNcjIj4GGuM2xsI6/aiv3L9qa02LaLxY3VRZtdQwX6uEj0mGGPjNd9oXP8TAIkRq
-	SLUoYqGCdsEK1nij/2gSFapTfWdSMc0=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=1yG7su0lWGREXXiyOTctgrvSS6fNzhkoaCR5hRK7VuE=;
+	b=a73Bg8CpVq7BzBCQK8SQWTDjQNU7iTeLoZfvuQbDb45TAaesg6Ki8TKk6s2c2SSlLSthiL
+	fpv1O6i08gQ1qXjPfdIUCuwb+xdpHWx1bJVAioIz8Xrpu0Zq+Q6pJ8ZB8DuXiWTCLSfAwk
+	E6j8XdnCED3t4N7Rq085YH+3zbPzxnk=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-613-y7yWv2YkOPCRVm0oVEtz6A-1; Tue, 11 Jul 2023 09:30:15 -0400
-X-MC-Unique: y7yWv2YkOPCRVm0oVEtz6A-1
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-785d6b1c8ccso46289739f.1
-        for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 06:30:15 -0700 (PDT)
+ us-mta-248--vdtfuo6P7igO4RvEfp7cw-1; Tue, 11 Jul 2023 09:38:06 -0400
+X-MC-Unique: -vdtfuo6P7igO4RvEfp7cw-1
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-51dcec9425bso867832a12.0
+        for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 06:38:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689082214; x=1691674214;
+        d=1e100.net; s=20221208; t=1689082685; x=1691674685;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4embjR8yHEs1N6hH60Rckk7FTcDnPGGpJd8CK6UGxfU=;
-        b=Rei90ALJMi9oo9P8Gi4LDLjxUyVTUQDj4GCvIXZbrfKCFDvuWwEO5ojMIOPgoaVFWZ
-         zO0JXVGpDQPt4mDGWnKKgHVWbFvF6fc+V1qVvwPC8mCVcou6n0WBmemNihJkADA9RGJz
-         7/sCIOs0VR3Sw8vI+G6UmE1g5IbZjkVPPmGvNFG1aDnh7jSJ379dpkRi+vl6Waxp59yO
-         BdfeAeUuaALo9D+Qvbv8e6eu1pD2axTfCNLBvtW5aGZ0D12b1um3xzZmAcq1v+XppiBC
-         jIUV0a63O5mdjlAY9ZmAYZcROdQok9dXivj32wZSj0LqTKcbmb+Cop4bWDBElrC89M8d
-         3DBw==
-X-Gm-Message-State: ABy/qLbNSiwXhsHGvV/ObmxB7HtuDQP/4yGxKSi9vHi+urqZqf/8KyI9
-	RkrVfT+ZES4quXFztZhlKZd2eKtJsz1NOG/9t03KcIVNGCcWPRhttgfW0xT5C2+c4E7mqIHsqo9
-	wo4oIEfmwsl4aZjU9
-X-Received: by 2002:a92:c688:0:b0:346:3173:2374 with SMTP id o8-20020a92c688000000b0034631732374mr15400097ilg.0.1689082214457;
-        Tue, 11 Jul 2023 06:30:14 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlF0rhT0sBw2g1YQccz1f6XDguNfmRFr7qqZbIIIodJDGga2C3bv5AjugZlQ7enmmmtyaNlJ2A==
-X-Received: by 2002:a92:c688:0:b0:346:3173:2374 with SMTP id o8-20020a92c688000000b0034631732374mr15400073ilg.0.1689082214155;
-        Tue, 11 Jul 2023 06:30:14 -0700 (PDT)
+        bh=1yG7su0lWGREXXiyOTctgrvSS6fNzhkoaCR5hRK7VuE=;
+        b=irHpnVCwZbPIlKw6UdQqFmuk9mWP9T4Wbjh444UoCK3WSDVt2IcaAO2WmNN9MQAkV6
+         7C+/K0eSypSYahdEnFrGLU30rD0aKhOzVZvTt2SzklznTonslluWj2E13EbnjM/+/+Ye
+         sA0jAfhwEHYWUU5s1yr9ZBGEiw2/3f48tX0hP23OdLUluqkQOrTUq2LkwjMGhxuEOG99
+         G7ah2Abd0ficR8zkXE1CmpqKPFadLvUEkdN+wvNDvMH6YNFjNRrS997Xn66F7+ozrqRF
+         iNFNYKW9U9M4Nx6XdpCWNsb947OAAgGpgnI/NYQOUf6sSnn7bkNmfKVRtDEu78/e0TT/
+         XMrQ==
+X-Gm-Message-State: ABy/qLZQcsJCINl/f536KSAQpPSBekFoPazhIeLyztPzCa0AuvML2Gu0
+	E5qGgzj0rwy9lFF+HYk/tK1qTp+VQf9cplI0CJgjjrEUYz76idDTsQRVEXneOpc0bwuuFFOuHsb
+	OtwAPVqA5khFXbIPrqvKOPbyccqZ7lg==
+X-Received: by 2002:a05:6a20:3ca7:b0:11a:efaa:eb88 with SMTP id b39-20020a056a203ca700b0011aefaaeb88mr20308668pzj.3.1689082684891;
+        Tue, 11 Jul 2023 06:38:04 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlH3waarxfx/9EXBW0IYRWtInIeKrArTDBJjjntjjyhzn4UJud7oSfSNgQtZCczPhPmQBvKbiQ==
+X-Received: by 2002:a05:6a20:3ca7:b0:11a:efaa:eb88 with SMTP id b39-20020a056a203ca700b0011aefaaeb88mr20308654pzj.3.1689082684627;
+        Tue, 11 Jul 2023 06:38:04 -0700 (PDT)
 Received: from [10.72.12.150] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id a23-20020a637f17000000b0055b3af821d5sm1606826pgd.25.2023.07.11.06.30.11
+        by smtp.gmail.com with ESMTPSA id t9-20020a63b709000000b0055be951145csm1463853pgf.36.2023.07.11.06.38.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Jul 2023 06:30:13 -0700 (PDT)
-Message-ID: <3f7a74af-5450-d01c-6469-fd8a1391d183@redhat.com>
-Date: Tue, 11 Jul 2023 21:30:04 +0800
+        Tue, 11 Jul 2023 06:38:04 -0700 (PDT)
+Message-ID: <5995ad7a-0867-a3d7-09cd-78382501e779@redhat.com>
+Date: Tue, 11 Jul 2023 21:37:59 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,15 +54,15 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.10.0
-Subject: Re: [PATCH v2 3/4] KVM: arm64: Replace vCPU target with a
- configuration flag
+Subject: Re: [PATCH v2 2/4] KVM: arm64: Remove pointless check for changed
+ init target
 To: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
  Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
 References: <20230710193140.1706399-1-oliver.upton@linux.dev>
- <20230710193140.1706399-4-oliver.upton@linux.dev>
+ <20230710193140.1706399-3-oliver.upton@linux.dev>
 From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230710193140.1706399-4-oliver.upton@linux.dev>
+In-Reply-To: <20230710193140.1706399-3-oliver.upton@linux.dev>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -72,122 +72,34 @@ Content-Transfer-Encoding: 7bit
 
 
 On 7/11/23 03:31, Oliver Upton wrote:
-> The value of kvm_vcpu_arch::target has been used to determine if a vCPU
-> has actually been initialized. Storing this as an integer is needless at
-> this point, as KVM doesn't do any microarch-specific emulation in the
-> first place. Instead, all we care about is whether or not the vCPU has
-> been initialized.
+> At any time there is only a single valid value for KVM_ARM_VCPU_INIT,
+> depending on the current CPU implementation. In all likelihood, this
+> will be the generic ARMv8 target.
 > 
-> Delete the field in favor of a vCPU configuration flag indicating if
-> KVM_ARM_VCPU_INIT has completed for the vCPU.
+> Drop the pointless check for a changed target value between calls to
+> KVM_ARM_VCPU_INIT and instead rely on the check against
+> kvm_target_cpu().
 > 
-> Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
 > ---
->   arch/arm64/include/asm/kvm_host.h |  5 +++--
->   arch/arm64/kvm/arm.c              | 12 +++++-------
->   arch/arm64/kvm/hyp/nvhe/switch.c  |  2 +-
->   3 files changed, 9 insertions(+), 10 deletions(-)
+>   arch/arm64/kvm/arm.c | 3 +--
+>   1 file changed, 1 insertion(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 8b6096753740..b53105bccff9 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -567,8 +567,7 @@ struct kvm_vcpu_arch {
->   	/* Cache some mmu pages needed inside spinlock regions */
->   	struct kvm_mmu_memory_cache mmu_page_cache;
->   
-> -	/* Target CPU and feature flags */
-> -	int target;
-> +	/* feature flags */
->   	DECLARE_BITMAP(features, KVM_VCPU_MAX_FEATURES);
->   
->   	/* Virtual SError ESR to restore when HCR_EL2.VSE is set */
-> @@ -669,6 +668,8 @@ struct kvm_vcpu_arch {
->   #define VCPU_SVE_FINALIZED	__vcpu_single_flag(cflags, BIT(1))
->   /* PTRAUTH exposed to guest */
->   #define GUEST_HAS_PTRAUTH	__vcpu_single_flag(cflags, BIT(2))
-> +/* KVM_ARM_VCPU_INIT completed */
-> +#define VCPU_INITIALIZED	__vcpu_single_flag(cflags, BIT(3))
->   
->   /* Exception pending */
->   #define PENDING_EXCEPTION	__vcpu_single_flag(iflags, BIT(0))
 > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 3f844934b9f3..13f1bde0bc2d 100644
+> index c2c14059f6a8..3f844934b9f3 100644
 > --- a/arch/arm64/kvm/arm.c
 > +++ b/arch/arm64/kvm/arm.c
-> @@ -360,7 +360,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->   #endif
->   
->   	/* Force users to call KVM_ARM_VCPU_INIT */
-> -	vcpu->arch.target = -1;
-> +	vcpu_clear_flag(vcpu, VCPU_INITIALIZED);
->   	bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
->   
->   	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
-> @@ -569,7 +569,7 @@ unsigned long kvm_arch_vcpu_get_ip(struct kvm_vcpu *vcpu)
->   
->   static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
+> @@ -1212,8 +1212,7 @@ static bool kvm_vcpu_init_changed(struct kvm_vcpu *vcpu,
 >   {
-> -	return vcpu->arch.target >= 0;
-> +	return vcpu_get_flag(vcpu, VCPU_INITIALIZED);
+>   	unsigned long features = init->features[0];
+>   
+> -	return !bitmap_equal(vcpu->arch.features, &features, KVM_VCPU_MAX_FEATURES) ||
+> -			vcpu->arch.target != init->target;
+> +	return !bitmap_equal(vcpu->arch.features, &features, KVM_VCPU_MAX_FEATURES);
 >   }
 >   
->   /*
-> @@ -1051,7 +1051,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->   			 * invalid. The VMM can try and fix it by issuing  a
->   			 * KVM_ARM_VCPU_INIT if it really wants to.
->   			 */
-> -			vcpu->arch.target = -1;
-> +			vcpu_clear_flag(vcpu, VCPU_INITIALIZED);
->   			ret = ARM_EXCEPTION_IL;
->   		}
->   
-> @@ -1228,20 +1228,18 @@ static int __kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
->   	    !bitmap_equal(kvm->arch.vcpu_features, &features, KVM_VCPU_MAX_FEATURES))
->   		goto out_unlock;
->   
-> -	vcpu->arch.target = init->target;
->   	bitmap_copy(vcpu->arch.features, &features, KVM_VCPU_MAX_FEATURES);
->   
->   	/* Now we know what it is, we can reset it. */
->   	ret = kvm_reset_vcpu(vcpu);
->   	if (ret) {
-> -		vcpu->arch.target = -1;
->   		bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
->   		goto out_unlock;
->   	}
->   
->   	bitmap_copy(kvm->arch.vcpu_features, &features, KVM_VCPU_MAX_FEATURES);
->   	set_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED, &kvm->arch.flags);
-> -
-> +	vcpu_set_flag(vcpu, VCPU_INITIALIZED);
->   out_unlock:
->   	mutex_unlock(&kvm->arch.config_lock);
->   	return ret;
-> @@ -1259,7 +1257,7 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
->   	if (ret)
->   		return ret;
->   
-> -	if (vcpu->arch.target == -1)
-> +	if (!kvm_vcpu_initialized(vcpu))
->   		return __kvm_vcpu_set_target(vcpu, init);
->   
->   	if (kvm_vcpu_init_changed(vcpu, init))
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index 0a6271052def..b9caac3e7b1d 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -236,7 +236,7 @@ static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code)
->   		 * KVM_ARM_VCPU_INIT, however, this is likely not possible for
->   		 * protected VMs.
->   		 */
-> -		vcpu->arch.target = -1;
-> +		vcpu_clear_flag(vcpu, VCPU_INITIALIZED);
->   		*exit_code &= BIT(ARM_EXIT_WITH_SERROR_BIT);
->   		*exit_code |= ARM_EXCEPTION_IL;
->   	}
+>   static int __kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
 
 -- 
 Shaoqin
