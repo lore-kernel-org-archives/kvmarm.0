@@ -1,106 +1,113 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A5218AFF
-	for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 13:38:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689082687;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1yG7su0lWGREXXiyOTctgrvSS6fNzhkoaCR5hRK7VuE=;
-	b=a73Bg8CpVq7BzBCQK8SQWTDjQNU7iTeLoZfvuQbDb45TAaesg6Ki8TKk6s2c2SSlLSthiL
-	fpv1O6i08gQ1qXjPfdIUCuwb+xdpHWx1bJVAioIz8Xrpu0Zq+Q6pJ8ZB8DuXiWTCLSfAwk
-	E6j8XdnCED3t4N7Rq085YH+3zbPzxnk=
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-248--vdtfuo6P7igO4RvEfp7cw-1; Tue, 11 Jul 2023 09:38:06 -0400
-X-MC-Unique: -vdtfuo6P7igO4RvEfp7cw-1
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-51dcec9425bso867832a12.0
-        for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 06:38:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFB7B14AB5
+	for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 14:25:28 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5704e551e8bso64873967b3.3
+        for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 07:25:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689085527; x=1691677527;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=p56sBbCS+VPrS5cOX2wwAyiH2Cg/fGXPAAbSLjc9HmQ=;
+        b=G9ZmthhhEWojkB7p9qdG0NlmayOu64h8X2dBXxGMYbiFdGXXEUX2oyzC6fFrumID5N
+         98vlOxYGDbsB8BsZYbCu5+cNjdgpXDDF3wPvFmpX1D/3wiXeEI7iIbWaLd2Y8S1kcK51
+         g9AEp3AGfRn3IH5ErdyFegxvkav3Hez4Pqo60UTx9c8Mo77h2wLDQUn/qNlpfbjeYv3l
+         BXG4TLJ1lnjA9oyO1JcxOVrUNvF1oP+UeGFwZ78x/HxF67SpfkkngNuMfv0ud6ParpnM
+         ur81S62LVTRhXeUfmkPypJAXBF0q5GmQYpveV1kpJbP42oZcLd7cONmfF2+Ipt3sxdG7
+         gZpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689082685; x=1691674685;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1yG7su0lWGREXXiyOTctgrvSS6fNzhkoaCR5hRK7VuE=;
-        b=irHpnVCwZbPIlKw6UdQqFmuk9mWP9T4Wbjh444UoCK3WSDVt2IcaAO2WmNN9MQAkV6
-         7C+/K0eSypSYahdEnFrGLU30rD0aKhOzVZvTt2SzklznTonslluWj2E13EbnjM/+/+Ye
-         sA0jAfhwEHYWUU5s1yr9ZBGEiw2/3f48tX0hP23OdLUluqkQOrTUq2LkwjMGhxuEOG99
-         G7ah2Abd0ficR8zkXE1CmpqKPFadLvUEkdN+wvNDvMH6YNFjNRrS997Xn66F7+ozrqRF
-         iNFNYKW9U9M4Nx6XdpCWNsb947OAAgGpgnI/NYQOUf6sSnn7bkNmfKVRtDEu78/e0TT/
-         XMrQ==
-X-Gm-Message-State: ABy/qLZQcsJCINl/f536KSAQpPSBekFoPazhIeLyztPzCa0AuvML2Gu0
-	E5qGgzj0rwy9lFF+HYk/tK1qTp+VQf9cplI0CJgjjrEUYz76idDTsQRVEXneOpc0bwuuFFOuHsb
-	OtwAPVqA5khFXbIPrqvKOPbyccqZ7lg==
-X-Received: by 2002:a05:6a20:3ca7:b0:11a:efaa:eb88 with SMTP id b39-20020a056a203ca700b0011aefaaeb88mr20308668pzj.3.1689082684891;
-        Tue, 11 Jul 2023 06:38:04 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlH3waarxfx/9EXBW0IYRWtInIeKrArTDBJjjntjjyhzn4UJud7oSfSNgQtZCczPhPmQBvKbiQ==
-X-Received: by 2002:a05:6a20:3ca7:b0:11a:efaa:eb88 with SMTP id b39-20020a056a203ca700b0011aefaaeb88mr20308654pzj.3.1689082684627;
-        Tue, 11 Jul 2023 06:38:04 -0700 (PDT)
-Received: from [10.72.12.150] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id t9-20020a63b709000000b0055be951145csm1463853pgf.36.2023.07.11.06.38.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Jul 2023 06:38:04 -0700 (PDT)
-Message-ID: <5995ad7a-0867-a3d7-09cd-78382501e779@redhat.com>
-Date: Tue, 11 Jul 2023 21:37:59 +0800
+        d=1e100.net; s=20221208; t=1689085527; x=1691677527;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=p56sBbCS+VPrS5cOX2wwAyiH2Cg/fGXPAAbSLjc9HmQ=;
+        b=Ei5RdsEdGDZv+hSAGb0bYCIe8YdLL/h+uX6rYJCkZTFeSndS95ARhoYub12Syiwhbi
+         ABYp7aiU7rb2tUtZPFi2bQK4QWlqZwX5h9zmH8nU/Oq7W8IpA3SUw1o1QqCap/neqQd0
+         vaC1mtClo0nPfyZDRBEY0imdH5nCNCZuAPwL4qS+wPqNGvDOKcKwlPZIiJ7MtYjwn4wy
+         GA8Nh6hjtdb24dIxByRNrNZOZykyN6VX9Gds4Z0z8TlkUEvV0q3OVBrmpU1gGAmmb/KP
+         RpqTnlXxnvQVAk8eZPxQPJgwggvrDiYtHfR4R+XT2DqGm1wnly+KNRzFQL44bnBKfMwk
+         oTCQ==
+X-Gm-Message-State: ABy/qLY/QoeD6TA/EDnY06CX1W/kpcgeTgfa9Yi/xqynqv2nc9jcexEX
+	7wun3gmQgjPrvIgHRIlrDRVcn+FBF6w=
+X-Google-Smtp-Source: APBJJlGypUsi6FziBQD/5n1q9oaBq8wtOZmggi8VuvEfNqxbkCHQTwUdZQaONZSNZ8Qt3Y2NvWdpI/kBNjM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:ac44:0:b0:55d:6af3:1e2c with SMTP id
+ z4-20020a81ac44000000b0055d6af31e2cmr126252ywj.3.1689085527641; Tue, 11 Jul
+ 2023 07:25:27 -0700 (PDT)
+Date: Tue, 11 Jul 2023 07:25:26 -0700
+In-Reply-To: <ZKzSf82kuik7wYkA@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v2 2/4] KVM: arm64: Remove pointless check for changed
- init target
-To: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
-References: <20230710193140.1706399-1-oliver.upton@linux.dev>
- <20230710193140.1706399-3-oliver.upton@linux.dev>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230710193140.1706399-3-oliver.upton@linux.dev>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-4-amoorthy@google.com>
+ <ZIn6VQSebTRN1jtX@google.com> <ZKf7+D474ESdNP3D@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
+ <CAF7b7mr7BZayOxE2y8K87+AfYuGoDc7_kA2ouA3kBuhSgDiomg@mail.gmail.com> <ZKzSf82kuik7wYkA@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
+Message-ID: <ZK1mVriphYnZu6Cd@google.com>
+Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+From: Sean Christopherson <seanjc@google.com>
+To: Kautuk Consul <kconsul@linux.vnet.ibm.com>
+Cc: Anish Moorthy <amoorthy@google.com>, oliver.upton@linux.dev, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org, 
+	robert.hoo.linux@gmail.com, jthoughton@google.com, bgardon@google.com, 
+	dmatlack@google.com, ricarkol@google.com, axelrasmussen@google.com, 
+	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com
+Content-Type: text/plain; charset="us-ascii"
 
+On Tue, Jul 11, 2023, Kautuk Consul wrote:
+> > > That said, I agree that there's a risk that KVM could clobber vcpu->run_run by
+> > > hitting an -EFAULT without the vCPU loaded, but that's a solvable problem, e.g.
+> > > the helper to fill KVM_EXIT_MEMORY_FAULT could be hardened to yell if called
+> > > without the target vCPU being loaded:
+> > >
+> > >     int kvm_handle_efault(struct kvm_vcpu *vcpu, ...)
+> > >     {
+> > >         preempt_disable();
+> > >         if (WARN_ON_ONCE(vcpu != __this_cpu_read(kvm_running_vcpu)))
+> > >             goto out;
+> > >
+> > >         vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
+> > >         ...
+> > >     out:
+> > >         preempt_enable();
+> > >         return -EFAULT;
+> > >     }
+> > 
+> > Ancient history aside, let's figure out what's really needed here.
+> > 
+> > > Why use WARN_ON_ONCE when there is a clear possiblity of preemption
+> > > kicking in (with the possibility of vcpu_load/vcpu_put being called
+> > > in the new task) before preempt_disable() is called in this function ?
+> > > I think you should use WARN_ON_ONCE only where there is some impossible
+> > > or unhandled situation happening, not when there is a possibility of that
+> > > situation clearly happening as per the kernel code.
+> > 
+> > I did some mucking around to try and understand the kvm_running_vcpu
+> > variable, and I don't think preemption/rescheduling actually trips the
+> > WARN here? From my (limited) understanding, it seems that the
+> > thread being preempted will cause a vcpu_put() via kvm_sched_out().
+> > But when the thread is eventually scheduled back in onto whatever
+> > core, it'll vcpu_load() via kvm_sched_in(), and the docstring for
+> > kvm_get_running_vcpu() seems to imply the thing that vcpu_load()
+> > stores into the per-cpu "kvm_running_vcpu" variable will be the same
+> > thing which would have been observed before preemption.
+> > 
+> > All that's to say: I wouldn't expect the value of
+> > "__this_cpu_read(kvm_running_vcpu)" to change in any given thread. If
+> > that's true, then the things I would expect this WARN to catch are (a)
+> > bugs where somehow the thread gets scheduled without calling
+> > vcpu_load() or (b) bizarre situations (probably all bugs?) where some
+> > vcpu thread has a hold of some _other_ kvm_vcpu* and is trying to do
+> > something with it.
+> Oh I completely missed the scheduling path for KVM.
+> But since vcpu_put and vcpu_load are exported symbols, I wonder what'll
+> happen when there are calls to these functions from places other
+> than kvm_sched_in() and kvm_sched_out() ? Just thinking out loud.
 
-
-On 7/11/23 03:31, Oliver Upton wrote:
-> At any time there is only a single valid value for KVM_ARM_VCPU_INIT,
-> depending on the current CPU implementation. In all likelihood, this
-> will be the generic ARMv8 target.
-> 
-> Drop the pointless check for a changed target value between calls to
-> KVM_ARM_VCPU_INIT and instead rely on the check against
-> kvm_target_cpu().
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> ---
->   arch/arm64/kvm/arm.c | 3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index c2c14059f6a8..3f844934b9f3 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1212,8 +1212,7 @@ static bool kvm_vcpu_init_changed(struct kvm_vcpu *vcpu,
->   {
->   	unsigned long features = init->features[0];
->   
-> -	return !bitmap_equal(vcpu->arch.features, &features, KVM_VCPU_MAX_FEATURES) ||
-> -			vcpu->arch.target != init->target;
-> +	return !bitmap_equal(vcpu->arch.features, &features, KVM_VCPU_MAX_FEATURES);
->   }
->   
->   static int __kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
-
--- 
-Shaoqin
-
+Invoking this helper without the target vCPU loaded on the current task would be
+considered a bug.  kvm.ko exports a rather disgusting number of symbols purely for
+use by vendor modules, e.g. kvm-intel.ko and kvm-amd.ko on x86.  The exports are
+not at all intended to be used by non-KVM code, i.e. any such misuse would also be
+considered a bug.
