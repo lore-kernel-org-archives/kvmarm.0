@@ -1,48 +1,227 @@
-Received: from out-21.mta1.migadu.com (out-21.mta1.migadu.com [95.215.58.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6124D17FE0
-	for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 20:02:53 +0000 (UTC)
-Date: Tue, 11 Jul 2023 20:02:47 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1689105771;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=j7wpPKSWBw5SPfNkCzcIKlvtgTa7z9041l05WeQlyP8=;
-	b=p2knxbGe3yEElrh6ORsVsqD09+UwWkdlHYdv7AwamdXCHy7HAb9LoSpOMkPv6hVmc+gct3
-	7ye/cwJk4MZUKJ2suXw/hq0Rv0vmOlvqLc2I3OKwkXsGyuGuTspq1eNqEUHG4kNOMMKI/q
-	yGVOr4mOfyPNt0fsCTPvRWpGWfLFf58=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Eric Auger <eauger@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: timers: Use CNTHCTL_EL2 when setting
- non-CNTKCTL_EL1 bits
-Message-ID: <ZK21Z5WB6+bTjWA0@linux.dev>
-References: <20230627140557.544885-1-maz@kernel.org>
- <d49225cb-3240-ea8e-11e6-b8ed30ce2fc8@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E157B1DDEE
+	for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 22:00:01 +0000 (UTC)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-57704a25be9so1460947b3.1
+        for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 15:00:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689112801; x=1691704801;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ccVD+v/KXcHhv0uWZezqc41e6QVd7uWNQyLzMUxhDwI=;
+        b=e/OHUuoBBcGsOIwFM1ihGsxpoWFlVjzLMAWcIxlED6fy/pQq7H8OwqSGXEvry5gTmX
+         4n4LJm3GrKYhp1rDcb2yZjoYmKujuDdwTE/pTr0qBWVQ3Mv7FqTUboTB8BJqLnZ++eP3
+         +Z5AMrB4uV2t/Yv3OGB4AzzvzxiLBamqfxXJJchimaePAXxst2FicMRdYA3ExEYktE31
+         eN5Wkg4N5lrPnQj1QCrAi02P4cVVslhw60TH3+m1+hFgH21D8rCn0hHB6zVsMmcWGVZt
+         f1BVBLr3QqPY8xNPlcA8vnOEbH04GpDVqoNu17fMR6IWcB/HZElSHY1LVXPIBa+K7LMT
+         zAVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689112801; x=1691704801;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ccVD+v/KXcHhv0uWZezqc41e6QVd7uWNQyLzMUxhDwI=;
+        b=UrE0fl0eNK2782clZA6qOL7xdUEIcQqX7DwxYvsiWVcrj0H1qO8Qm4C+u0N8Le0NZx
+         wZ7WUA7eqpWNlIQZ+HANF03p3DKwCHEhRR1LykQVwNJJaXx2nttIUIv4nQYl4HtWpS75
+         9MHjo5uAKJHQfrrsh0KlDFYHQjKtxIrvTK7e+ByWdA6f2s0e1aNjmN99go3Ej5Vyx3pj
+         cKAz5zIqfDIClb2g4fqoUSj+S6FSoiACHgHd56g36LuB8ryeLA1uCnVt3zcUsf7kuRiZ
+         ZRIDOymmc+zQ1yCLFxCXI+bO8Isy48VVb2zgxt0SOJhJbgdr242ksZzSNPjrXGjXcpk/
+         Fq2w==
+X-Gm-Message-State: ABy/qLb8bY681+4urY2pKqtC7nPNQ6qgKG0js1vrdi9ZiJYhwmQNr20A
+	ZpIgLjCKkbKOVi6/x+jMvVsta/9NKPs=
+X-Google-Smtp-Source: APBJJlGIAl79q11h5ZhsnevB6cH0mxnTImxDoBGf6sOpWk2D0KKk/yU+n2H4PPFE466tsXaDVFr5sq8QXGg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:ae4b:0:b0:56c:ed45:442c with SMTP id
+ g11-20020a81ae4b000000b0056ced45442cmr1839ywk.5.1689112800813; Tue, 11 Jul
+ 2023 15:00:00 -0700 (PDT)
+Date: Tue, 11 Jul 2023 14:59:59 -0700
+In-Reply-To: <20230711203348.00000fb8.zhi.wang.linux@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d49225cb-3240-ea8e-11e6-b8ed30ce2fc8@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-4-stevensd@google.com>
+ <20230705161914.00004070.zhi.wang.linux@gmail.com> <CAD=HUj5cbzjrc0KD7xcibtRMRCzoJRJAzt7jTHSXUSpzyAYbdg@mail.gmail.com>
+ <20230711203348.00000fb8.zhi.wang.linux@gmail.com>
+Message-ID: <ZK3Q34WNLjGVQQw+@google.com>
+Subject: Re: [PATCH v7 3/8] KVM: Make __kvm_follow_pfn not imply FOLL_GET
+From: Sean Christopherson <seanjc@google.com>
+To: Zhi Wang <zhi.wang.linux@gmail.com>
+Cc: David Stevens <stevensd@chromium.org>, Marc Zyngier <maz@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Peter Xu <peterx@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jul 11, 2023 at 12:35:00PM +0200, Eric Auger wrote:
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+On Tue, Jul 11, 2023, Zhi Wang wrote:
+> On Thu, 6 Jul 2023 15:49:39 +0900
+> David Stevens <stevensd@chromium.org> wrote:
+> 
+> > On Wed, Jul 5, 2023 at 10:19___PM Zhi Wang <zhi.wang.linux@gmail.com> wrote:
+> > >
+> > > On Tue,  4 Jul 2023 16:50:48 +0900
+> > > David Stevens <stevensd@chromium.org> wrote:
+> > > If yes, do we have to use FOLL_GET to resolve GFN associated with a tail page?
+> > > It seems gup can tolerate gup_flags without FOLL_GET, but it is more like a
+> > > temporary solution. I don't think it is a good idea to play tricks with
+> > > a temporary solution, more like we are abusing the toleration.  
+> > 
+> > I'm not sure I understand what you're getting at. This series never
+> > calls gup without FOLL_GET.
+> > 
+> > This series aims to provide kvm_follow_pfn as a unified API on top of
+> > gup+follow_pte. Since one of the major clients of this API uses an mmu
+> > notifier, it makes sense to support returning a pfn without taking a
+> > reference. And we indeed need to do that for certain types of memory.
+> > 
+> 
+> I am not having prob with taking a pfn without taking a ref. I am
+> questioning if using !FOLL_GET in struct kvm_follow_pfn to indicate taking
+> a pfn without a ref is a good idea or not, while there is another flag
+> actually showing it.
+> 
+> I can understand that using FOLL_XXX in kvm_follow_pfn saves some
+> translation between struct kvm_follow_pfn.{write, async, xxxx} and GUP
+> flags. However FOLL_XXX is for GUP. Using FOLL_XXX for reflecting the
+> requirements of GUP in the code path that going to call GUP is reasonable.
+> 
+> But using FOLL_XXX with purposes that are not related to GUP call really
+> feels off.
 
-Thanks for reviewing this Eric. I addressed your comments and picked up
-your R-b when applying Marc's patch.
+I agree, assuming you're talking specifically about the logic in hva_to_pfn_remapped()
+that handles non-refcounted pages, i.e. this
 
--- 
-Thanks,
-Oliver
+	if (get_page_unless_zero(page)) {
+		foll->is_refcounted_page = true;
+		if (!(foll->flags & FOLL_GET))
+			put_page(page);
+	} else if (foll->flags & FOLL_GET) {
+		r = -EFAULT;
+	}
+
+should be
+
+	if (get_page_unless_zero(page)) {
+		foll->is_refcounted_page = true;
+		if (!(foll->flags & FOLL_GET))
+			put_page(page);
+	else if (!foll->guarded_by_mmu_notifier)
+		r = -EFAULT;
+
+because it's not the desire to grab a reference that makes getting non-refcounted
+pfns "safe", it's whether or not the caller is plugged into the MMU notifiers.
+
+Though that highlights that checking guarded_by_mmu_notifier should be done for
+*all* non-refcounted pfns, not just non-refcounted struct page memory.
+
+As for the other usage of FOLL_GET in this series (using it to conditionally do
+put_page()), IMO that's very much related to the GUP call.  Invoking put_page()
+is a hack to workaround the fact that GUP doesn't provide a way to get the pfn
+without grabbing a reference to the page.  In an ideal world, KVM would NOT pass
+FOLL_GET to the various GUP helpers, i.e. FOLL_GET would be passed as-is and KVM
+wouldn't "need" to kinda sorta overload FOLL_GET to manually drop the reference.
+
+I do think it's worth providing a helper to consolidate and document that hacky
+code, e.g. add a kvm_follow_refcounted_pfn() helper.
+
+All in all, I think the below (completely untested) is what we want?
+
+David (and others), I am planning on doing a full review of this series "soon",
+but it will likely be a few weeks until that happens.  I jumped in on this
+specific thread because this caught my eye and I really don't want to throw out
+*all* of the FOLL_GET usage.
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 5b5afd70f239..90d424990e0a 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2481,6 +2481,25 @@ static inline int check_user_page_hwpoison(unsigned long addr)
+        return rc == -EHWPOISON;
+ }
+ 
++static kvm_pfn_t kvm_follow_refcounted_pfn(struct kvm_follow_pfn *foll,
++                                          struct page *page)
++{
++       kvm_pfn_t pfn = page_to_pfn(page);
++
++       foll->is_refcounted_page = true;
++
++       /*
++        * FIXME: Ideally, KVM wouldn't pass FOLL_GET to gup() when the caller
++        * doesn't want to grab a reference, but gup() doesn't support getting
++        * just the pfn, i.e. FOLL_GET is effectively mandatory.  If that ever
++        * changes, drop this and simply don't pass FOLL_GET to gup().
++        */
++       if (!(foll->flags & FOLL_GET))
++               put_page(page);
++
++       return pfn;
++}
++
+ /*
+  * The fast path to get the writable pfn which will be stored in @pfn,
+  * true indicates success, otherwise false is returned.  It's also the
+@@ -2500,11 +2519,9 @@ static bool hva_to_pfn_fast(struct kvm_follow_pfn *foll, kvm_pfn_t *pfn)
+                return false;
+ 
+        if (get_user_page_fast_only(foll->hva, FOLL_WRITE, page)) {
+-               *pfn = page_to_pfn(page[0]);
+                foll->writable = foll->allow_write_mapping;
+-               foll->is_refcounted_page = true;
+-               if (!(foll->flags & FOLL_GET))
+-                       put_page(page[0]);
++
++               *pfn = kvm_follow_refcounted_pfn(foll, page[0]);
+                return true;
+        }
+ 
+@@ -2528,7 +2545,6 @@ static int hva_to_pfn_slow(struct kvm_follow_pfn *foll, kvm_pfn_t *pfn)
+                return npages;
+ 
+        foll->writable = (foll->flags & FOLL_WRITE) && foll->allow_write_mapping;
+-       foll->is_refcounted_page = true;
+ 
+        /* map read fault as writable if possible */
+        if (unlikely(!foll->writable) && foll->allow_write_mapping) {
+@@ -2540,9 +2556,8 @@ static int hva_to_pfn_slow(struct kvm_follow_pfn *foll, kvm_pfn_t *pfn)
+                        page = wpage;
+                }
+        }
+-       *pfn = page_to_pfn(page);
+-       if (!(foll->flags & FOLL_GET))
+-               put_page(page);
++
++       *pfn = kvm_follow_refcounted_pfn(foll, page);
+        return npages;
+ }
+ 
+@@ -2610,17 +2625,16 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma, struct kvm_follow_pfn
+        if (!page)
+                goto out;
+ 
+-       if (get_page_unless_zero(page)) {
+-               foll->is_refcounted_page = true;
+-               if (!(foll->flags & FOLL_GET))
+-                       put_page(page);
+-       } else if (foll->flags & FOLL_GET) {
+-               r = -EFAULT;
+-       }
+-
++       if (get_page_unless_zero(page))
++               WARN_ON_ONCE(kvm_follow_refcounted_pfn(foll, page) != pfn);
+ out:
+        pte_unmap_unlock(ptep, ptl);
+-       *p_pfn = pfn;
++
++       if (!foll->is_refcounted_page && !foll->guarded_by_mmu_notifier &&
++           !allow_unsafe_mappings)
++               r = -EFAULT;
++       else
++               *p_pfn = pfn;
+ 
+        return r;
+ }
+
