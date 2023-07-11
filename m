@@ -1,195 +1,125 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E71F718C16
-	for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 12:30:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C15AC433C9;
-	Tue, 11 Jul 2023 12:30:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689078624;
-	bh=JAoQImOGHobEUP97NTQ9fB21QVqS1rQvMSn2Qvf/Blk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FqsLHE4HlNiVsy3AeTCslZ0MXzU8I+NbNL9dVneGWTvy0RYjmv11hA+18zVF5e5KA
-	 EGLaz9msRGRngFnOhWRUmembwHyP8j4V3ePaogTYpe+UxVhs4HYssI4ezgmx88YHl6
-	 GgdGvooQ5MS1AGtxV43hLbrH5bdjpsEWOGi33Y3fnhn/HSkHTe3sGoejVl28kMcpuk
-	 V03vDTdobKEjTB9iO1dRRMNOTVukPnM9WPPgsA9KYkXwcvxG4JPpj7YEwVP4iOtBE+
-	 4HcA6vJZFB8Ffr3WenAdm2onyIGXDQdPF0Ptss0iDUZh7TXdkq+rInAciFEAeoczz+
-	 0djTss0FyrToA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qJCVZ-00C7H6-Se;
-	Tue, 11 Jul 2023 13:30:21 +0100
-Date: Tue, 11 Jul 2023 13:30:21 +0100
-Message-ID: <86bkgiwrz6.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: Miguel Luis <miguel.luis@oracle.com>,
-	Eric Auger <eauger@redhat.com>,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Darren Hart <darren@os.amperecomputing.com>,
-	Jintack Lim <jintack@cs.columbia.edu>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	James Morse
- <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v10 00/59] KVM: arm64: ARMv8.3/8.4 Nested Virtualization support
-In-Reply-To: <853a5f76-74fe-a38d-f2cd-785963177c8a@os.amperecomputing.com>
-References: <20230515173103.1017669-1-maz@kernel.org>
-	<f19bb506-3e21-2bd6-7463-9aea8ab912f5@os.amperecomputing.com>
-	<877crmzr5j.wl-maz@kernel.org>
-	<a62dba1a-86b7-45ab-f6a8-f88b224af402@os.amperecomputing.com>
-	<04ec8efb-33ff-153e-3be5-5c84a01bff2a@os.amperecomputing.com>
-	<853a5f76-74fe-a38d-f2cd-785963177c8a@os.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A732598
+	for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 13:01:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689080469;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dM/oA3ylwQcxdQzGFJBZacj4io37QMRhZqmBvFcKjyM=;
+	b=dgy27UdoeESFXLwFbXlmOiR9aM3asqPNROr4MH/KIk5Pjj+dwmJdp0BgSqi9NZ9rMH9Rzc
+	ZFLewpc8HunozZ8AuA5TWs88PMQ5UBxHUlLCgC61FiFpRg5dKvZzXoMf1ZE0BFZHaaWkgG
+	1Q/H5uPtN9+vc5lc/hh/kVb6K80iXRs=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-5-GDXQ_eTRNqCU5cVXFONYIw-1; Tue, 11 Jul 2023 09:01:08 -0400
+X-MC-Unique: GDXQ_eTRNqCU5cVXFONYIw-1
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-262d2cae3efso1130730a91.1
+        for <kvmarm@lists.linux.dev>; Tue, 11 Jul 2023 06:01:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689080467; x=1689685267;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dM/oA3ylwQcxdQzGFJBZacj4io37QMRhZqmBvFcKjyM=;
+        b=aKKljbnIgCo1whVIsAl4c+ZtbERXVfuYjR1Sl1XgOldLfYSYg0d8soSBTLoXE1OAj+
+         R+ZMkF6OU7POiG3quY1izXAmjhFmIXqsMYZG9ftn5lmQWIh4vT1kqyqXqAqFj1hMJRBJ
+         WoEZmLSDb2+YUWV6c8cJnkjR2zlZ1eiH00c/tCEEcqBp+gsJ07Vgp5aNzOblo7RictkM
+         gTuekDM2+bLcpliL67T8SlpNgAj7JVGCEq8Z5Nk9RvF4tVr9/3JkKXdN4NpVvMLOpHu0
+         IQBFE8keVmwMeytMilRev5cobh0LGB7FlE0xPl8GMgka+j2tyWPSg7b7KjPN0EntnP8W
+         STlQ==
+X-Gm-Message-State: ABy/qLYA31rrHnYu58JX6j/uXHVvQ3EMXMXfihtnBLgu1CxwIXV951Ah
+	H/r44LH6T4mzdb1F+qhTHINQ3ppmkLp6zJ1VvyqflmbBS4YLev193QY5abpPI4RhvNEZeZcY67O
+	1QdOEc6aMu4A8urNf
+X-Received: by 2002:a17:90b:1946:b0:262:c2a1:c01f with SMTP id nk6-20020a17090b194600b00262c2a1c01fmr16865562pjb.3.1689080467351;
+        Tue, 11 Jul 2023 06:01:07 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFrDDIqLGT9ndqAm+HeCdCQR/rFwQCn7tXXse5z4hCaX8XXiR26OPsEVob4h+T8oo/l/5/nHw==
+X-Received: by 2002:a17:90b:1946:b0:262:c2a1:c01f with SMTP id nk6-20020a17090b194600b00262c2a1c01fmr16865514pjb.3.1689080466739;
+        Tue, 11 Jul 2023 06:01:06 -0700 (PDT)
+Received: from [10.72.12.150] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id y6-20020a17090a1f4600b00262e485156esm8656011pjy.57.2023.07.11.06.01.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Jul 2023 06:01:06 -0700 (PDT)
+Message-ID: <ffc2f370-97e1-0252-0322-28bffddcbe6b@redhat.com>
+Date: Tue, 11 Jul 2023 21:00:54 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, miguel.luis@oracle.com, eauger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v2 1/4] KVM: arm64: Delete pointless switch statement in
+ kvm_reset_vcpu()
+To: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20230710193140.1706399-1-oliver.upton@linux.dev>
+ <20230710193140.1706399-2-oliver.upton@linux.dev>
+From: Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <20230710193140.1706399-2-oliver.upton@linux.dev>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, 11 Jul 2023 12:56:48 +0100,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
->=20
->=20
->=20
-> On 07-07-2023 03:16 pm, Ganapatrao Kulkarni wrote:
-> >=20
-> >=20
-> > On 04-07-2023 06:01 pm, Ganapatrao Kulkarni wrote:
-> >>=20
-> >> Hi Marc,
-> >>=20
-> >> On 29-06-2023 12:33 pm, Marc Zyngier wrote:
-> >>> Hi Ganapatrao,
-> >>>=20
-> >>> On Wed, 28 Jun 2023 07:45:55 +0100,
-> >>> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> >>>>=20
-> >>>>=20
-> >>>> Hi Marc,
-> >>>>=20
-> >>>>=20
-> >>>> On 15-05-2023 11:00 pm, Marc Zyngier wrote:
-> >>>>> This is the 4th drop of NV support on arm64 for this year.
-> >>>>>=20
-> >>>>> For the previous episodes, see [1].
-> >>>>>=20
-> >>>>> What's changed:
-> >>>>>=20
-> >>>>> - New framework to track system register traps that are reinjected =
-in
-> >>>>> =C2=A0=C2=A0=C2=A0 guest EL2. It is expected to replace the discret=
-e handling we have
-> >>>>> =C2=A0=C2=A0=C2=A0 enjoyed so far, which didn't scale at all. This =
-has already
-> >>>>> fixed a
-> >>>>> =C2=A0=C2=A0=C2=A0 number of bugs that were hidden (a bunch of trap=
-s were never
-> >>>>> =C2=A0=C2=A0=C2=A0 forwarded...). Still a work in progress, but thi=
-s is going in the
-> >>>>> =C2=A0=C2=A0=C2=A0 right direction.
-> >>>>>=20
-> >>>>> - Allow the L1 hypervisor to have a S2 that has an input larger than
-> >>>>> =C2=A0=C2=A0=C2=A0 the L0 IPA space. This fixes a number of subtle =
-issues,
-> >>>>> depending on
-> >>>>> =C2=A0=C2=A0=C2=A0 how the initial guest was created.
-> >>>>>=20
-> >>>>> - Consequently, the patch series has gone longer again. Boo. But
-> >>>>> =C2=A0=C2=A0=C2=A0 hopefully some of it is easier to review...
-> >>>>>=20
-> >>>>=20
-> >>>> I am facing issue in booting NestedVM with V9 as well with 10 patchs=
-et.
-> >>>>=20
-> >>>> I have tried V9/V10 on Ampere platform using kvmtool and I could boot
-> >>>> Guest-Hypervisor and then NestedVM without any issue.
-> >>>> However when I try to boot using QEMU(not using EDK2/EFI),
-> >>>> Guest-Hypervisor is booted with Fedora 37 using virtio disk. From
-> >>>> Guest-Hypervisor console(or ssh shell), If I try to boot NestedVM,
-> >>>> boot hangs very early stage of the boot.
-> >>>>=20
-> >>>> I did some debug using ftrace and it seems the Guest-Hypervisor is
-> >>>> getting very high rate of arch-timer interrupts,
-> >>>> due to that all CPU time is going on in serving the Guest-Hypervisor
-> >>>> and it is never going back to NestedVM.
-> >>>>=20
-> >>>> I am using QEMU vanilla version v7.2.0 with top-up patches for NV [1]
-> >>>=20
-> >>> So I went ahead and gave QEMU a go. On my systems, *nothing* works (I
-> >>> cannot even boot a L1 with 'virtualization=3Don" (the guest is stuck =
-at
-> >>> the point where virtio gets probed and waits for its first interrupt).
-> >>>=20
-> >>> Worse, booting a hVHE guest results in QEMU generating an assert as it
-> >>> tries to inject an interrupt using the QEMU GICv3 model, something
-> >>> that should *NEVER* be in use with KVM.
-> >>>=20
-> >>> With help from Eric, I got to a point where the hVHE guest could boot
-> >>> as long as I kept injecting console interrupts, which is again a
-> >>> symptom of the vGIC not being used.
-> >>>=20
-> >>> So something is *majorly* wrong with the QEMU patches. I don't know
-> >>> what makes it possible for you to even boot the L1 - if the GIC is
-> >>> external, injecting an interrupt in the L2 is simply impossible.
-> >>>=20
-> >>> Miguel, can you please investigate this?
-> >>>=20
-> >>> In the meantime, I'll add some code to the kernel side to refuse the
-> >>> external interrupt controller configuration with NV. Hopefully that
-> >>> will lead to some clues about what is going on.
-> >>=20
-> >> Continued debugging of the issue and it seems the endless ptimer
-> >> interrupts on Ampere platform is due to some mess up of CVAL of
-> >> ptimer, resulting in interrupt triggered always when it is enabled.
-> >>=20
-> >> I see function "timer_set_offset" called from kvm_arm_timer_set_reg
-> >> in QEMU case but there is no such calls in kvmtool boot.
-> >>=20
-> >> If I comment the timer_set_offset calls in kvm_arm_timer_set_reg
-> >> function, then I could boot the Guest-Hypervisor then NestedVM from
-> >> GH/L1.
-> >>=20
-> >> I also observed in QEMU case, kvm_arm_timer_set_reg is called to
-> >> set CNT, CVAL and CTL of both vtimer and ptimer.
-> >> Not sure why QEMU is setting these registers explicitly? need to dig.
-> >>=20
-> >=20
-> > I don't see any direct ioctl calls to change any timer
-> > registers. Looks like it is happening from the emulation
-> > code(target/arm/helper.c)?
->=20
-> function "write_list_to_kvmstate(target/arm/kvm.c)" is issuing ioctl
-> to write timer registers. PTIMER_CNT and TIMER_CNT writes from this
-> function is resulting in offsets change.
 
-Madness. Why is QEMU doing this? It has no business writing to the
-timer at any stage, at least with KVM.
 
-This confirms my suspicions that QEMU is confused about what mode it
-runs in, and does all sort of funky things it was never expected to
-do.
+On 7/11/23 03:31, Oliver Upton wrote:
+> The vCPU target hasn't mattered for quite a long time now. Delete the
+> useless switch statement in kvm_reset_vcpu(), which hilariously only had
+> a default case in it.
+> 
+> Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> ---
+>   arch/arm64/kvm/reset.c | 25 ++++++++++---------------
+>   1 file changed, 10 insertions(+), 15 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index bc8556b6f459..7a65a35ee4ac 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -248,21 +248,16 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>   		}
+>   	}
+>   
+> -	switch (vcpu->arch.target) {
+> -	default:
+> -		if (vcpu_el1_is_32bit(vcpu)) {
+> -			pstate = VCPU_RESET_PSTATE_SVC;
+> -		} else if (vcpu_has_nv(vcpu)) {
+> -			pstate = VCPU_RESET_PSTATE_EL2;
+> -		} else {
+> -			pstate = VCPU_RESET_PSTATE_EL1;
+> -		}
+> -
+> -		if (kvm_vcpu_has_pmu(vcpu) && !kvm_arm_support_pmu_v3()) {
+> -			ret = -EINVAL;
+> -			goto out;
+> -		}
+> -		break;
+> +	if (vcpu_el1_is_32bit(vcpu))
+> +		pstate = VCPU_RESET_PSTATE_SVC;
+> +	else if (vcpu_has_nv(vcpu))
+> +		pstate = VCPU_RESET_PSTATE_EL2;
+> +	else
+> +		pstate = VCPU_RESET_PSTATE_EL1;
+> +
+> +	if (kvm_vcpu_has_pmu(vcpu) && !kvm_arm_support_pmu_v3()) {
+> +		ret = -EINVAL;
+> +		goto out;
+>   	}
+>   
+>   	/* Reset core registers */
 
-	M.
+-- 
+Shaoqin
 
---=20
-Without deviation from the norm, progress is not possible.
