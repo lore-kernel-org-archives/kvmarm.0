@@ -1,125 +1,71 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-39.mta1.migadu.com (out-39.mta1.migadu.com [95.215.58.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74BC1F9C4
-	for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 21:15:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70C27C433C8;
-	Wed, 12 Jul 2023 21:15:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689196534;
-	bh=srSlB45+tKsynjd6lCyOzCxBjejSi0aDwrSiQqn1wyY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OiE8UQug9Lz2a6vhipxEPBqS6prjPYc7yMA2qulV1NLKTEryjgF1cpaowmNBIKDJr
-	 5kyucBnEjLgZ31kwqimtZY+X6DISdfJQpUSpgMCNtO1JirIW1qnspmNgY92/PnKoHv
-	 CUgp0Z++IhVn0Vc6erne+uFpZMTt4tp7PxVSJn+bfL07EuMAuRQD2VjjUlSfc6xMx8
-	 uPasvsJ+z+b5mSJ80gTA+oZNLy3tIwc7BTdFapRQmYKf5tc6tVvEBWSQ79u3yyHECZ
-	 b8ucBuuUihR0maADZncjMFyT+QuYT4EaujYHYG/SqwAthN9opwUT2Ruro/Pnn9sMAs
-	 6/zOwFa76frSQ==
-Date: Wed, 12 Jul 2023 22:15:27 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Darren Hart <darren@os.amperecomputing.com>,
-	Miguel Luis <miguel.luis@oracle.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 14/27] KVM: arm64: Restructure FGT register switching
-Message-ID: <2dbb5fd5-a275-432e-832b-7926060c9254@sirena.org.uk>
-References: <20230712145810.3864793-1-maz@kernel.org>
- <20230712145810.3864793-15-maz@kernel.org>
- <b9ccca23-65d5-4ed1-976e-63d51e3457e3@sirena.org.uk>
- <87edlcao9b.wl-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C21591D2EA
+	for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 22:50:46 +0000 (UTC)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1689202244;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UGwO+NFWVQ6+B443EQUy8r3A++Fa14LZLWf0tT7Rus0=;
+	b=UxHnr5rV6hfCEyOAsdIBnSUrJOh9nbAbwubUfn49e15xmnCPJ9mAqlFvwBT7px7TMqShj/
+	sYSNok/9alT3jgq8AZzMqyexGbwaShTsLvoWs0dfgzvVMvh5WynUXUO2DeYeJRpuTlHO2q
+	R02CeVXI72J9fYLWnOSFb4UoNJk/u0A=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	maz@kernel.org,
+	Mostafa Saleh <smostafa@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	suzuki.poulose@arm.com,
+	tabba@google.com,
+	james.morse@arm.com,
+	qperret@google.com,
+	bgardon@google.com,
+	sudeep.holla@arm.com,
+	gshan@redhat.com,
+	yuzenghui@huawei.com,
+	will@kernel.org,
+	catalin.marinas@arm.com
+Subject: Re: [PATCH v2] KVM: arm64: Add missing BTI instructions
+Date: Wed, 12 Jul 2023 22:50:34 +0000
+Message-ID: <168920214959.3096128.780259299986215400.b4-ty@linux.dev>
+In-Reply-To: <20230706152240.685684-1-smostafa@google.com>
+References: <20230706152240.685684-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="LgilXWRWGTBHM5Pp"
-Content-Disposition: inline
-In-Reply-To: <87edlcao9b.wl-maz@kernel.org>
-X-Cookie: Dammit Jim, I'm an actor, not a doctor.
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
+On Thu, 6 Jul 2023 15:22:40 +0000, Mostafa Saleh wrote:
+> Some bti instructions were missing from
+> commit b53d4a272349 ("KVM: arm64: Use BTI for nvhe")
+> 
+> 1) kvm_host_psci_cpu_entry
+> kvm_host_psci_cpu_entry is called from __kvm_hyp_init_cpu through "br"
+> instruction as __kvm_hyp_init_cpu resides in idmap section while
+> kvm_host_psci_cpu_entry is in hyp .text so the offset is larger than
+> 128MB range covered by "b".
+> Which means that this function should start with "bti j" instruction.
+> 
+> [...]
 
---LgilXWRWGTBHM5Pp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Applied to kvmarm/fixes. Sorry this took longer than expected, Mostafa. I
+was hitting an unrelated issue with pKVM initialization on the only system
+I have that supports BTI.
 
-On Wed, Jul 12, 2023 at 09:06:08PM +0100, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
+[1/1] KVM: arm64: Add missing BTI instructions
+      https://git.kernel.org/kvmarm/kvmarm/c/dcf89d111199
 
-> > > + * RES0 and polarity masks as of DDI0487J.a, to be updated as needed.
-> > > + * We're not using the generated masks as they are usually ahead of
-> > > + * the published ARM ARM, which we use as a reference.
-
-> > What's the issue here?  The generated definitions should be aligned with
-> > what's published in DDI0601.  That AIUI exists in large part due to
-> > concerns people were having with the amount of time it can take to fold
-> > new features into the ARM, it's official.
-
-> For multiple reasons:
-
-> - What's published as DDI0601 is a list of registers, without any
->   context and no relation to the wider architecture (it is basically
->   the XML dumped as a PDF). That's not enough to implement the
->   architecture as it is missing all the content of the engineering
->   specs, which are not public documents.
-
-Right, it's not the full spec - I was just thinking it was enough to
-cover the use here with finding RES0 bits.  The actual XML is
-downloadable as well, via=20
-
-    https://developer.arm.com/downloads/-/exploration-tools
-
-if that's more convenient (I am not sure why that's not available if you
-go looking for DDI0601), not that that addresses the issue with not
-having the non-XML part of things.  I know the people responsible for
-producing the ARM are actively working on improving the production
-process to address the lag so the ARM is available much more promptly.
-
-> - I have no motivation in supporting the latest and greatest. NV is
->   hard enough without all the (still evolving) crop of 8.9/9.4
->   extensions.  As long as what I have is a legal implementation and
->   runs on the HW I have access to, that's good enough for me.
-
-> - I want to look at a single document and support what's in there. Not
->   two. Because it is hard enough to follow when you're implementing
->   this crap, and even harder for someone trying to review it.
-
-> So I firmly intend to totally ignore most of what's outside of the
-> published ARM ARM unless it makes my life so much easier that I can't
-> afford not to implement it.
-
-That's definitely fair, my concern here is the risk that we might end up
-with issues due to the manual definitions drifting from the generated
-ones without people noticing as things go forwards.  Hopefully that's a
-minor risk.
-
---LgilXWRWGTBHM5Pp
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmSvF+4ACgkQJNaLcl1U
-h9Civwf/ZXWGE/hczTCulEMG2U6Wn7o9Ym9bVTemK3dSzhcUr869CF5uYsqOCd8D
-5C8zdI44DKVAVKBP8dKZPuT/AI7WzIW+GY02+xGyqKVkZWl1zczQt4uYfUCKFPnU
-TTBPMYXNxvh3yS7i1NXBhcdvbJebdE8GHRhQyHQNUXrOpv6HjzlqLpMXTGNWvv08
-nEGnatET3TdJl+UkO5B1/sHDJ+hVWacgTeixZJEJ1KBSRg8OFlh+E6gLkRDCj5gU
-IwLXM1KQGrghwT1TIaskC6XxiMhT3HIrIouF2QXOlSoPI3uBULWVMl7KiCPfDPe9
-BYAiQnXnlLtCIzw0ychfACdnUjv50A==
-=X6vv
------END PGP SIGNATURE-----
-
---LgilXWRWGTBHM5Pp--
+--
+Best,
+Oliver
