@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD67A24160
-	for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 15:16:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A9D0C433CB;
-	Wed, 12 Jul 2023 15:16:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6D5124160
+	for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 15:16:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A39C2C433C7;
+	Wed, 12 Jul 2023 15:16:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689175014;
-	bh=rfxI7Sh9daFDuE8ouniGrC/3Vk1JdjRjJ9OUx9/VLdg=;
+	s=k20201202; t=1689175016;
+	bh=Ougbb/b2LQOph+Wd0F9oEnAPbzfPMhNfc3JchyGIJdM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KMKeYsya5PcJ1PtxOW7lr9SsNCGIlpBS4RgZDi9spoonwzK6Fywv5JfBdfqrQoPP4
-	 67FiLml9Wl1fNXt3VDNjpsSBCywXH5ZZWmk2bdRmuC5Nt2o2749kPBcoH79Zstkr6p
-	 U3Mibteh8EB3df20HcVGupr/nITiXT8zaSWExQlmF25UQnOQKeqzv3ZfUtRMaYgGu8
-	 nUOewh6/MpXl+pC24nRZc9xQIeXDpNEwUW7s0J8CoMxvyHwCGkpa0wRWDetfSNDhiF
-	 B3LqcvwE0kTpchzryySreP0Q9rW5stN7LI6p+MK4VCRSmGVFjblvSIluDmCAaZdSnh
-	 Ip3v+U16fzeeg==
+	b=XD8K+CmLD0q+xkzXK+iFgn+r0mc1xkW6cyvQbkKGEoq1sktLOtKAGA6GOktoIM8+1
+	 uPDWyi4645lvQEPJBLr5bacR23LgeswoFJ+zTeaVyv98vNWDc9EoIrFh3NjhOVaAfP
+	 815TrN6/AF8PD+cjkCl9P3wDc0sv5YikMqbwzTxw1Kl0azrL0In9gOhaJzZBLP45yU
+	 uHZ9rZ9OJtAjsqCwP968UxhHvtpMVFabp1sPsAgDHd89zgScMnzg2VBr4z/NH7y1V6
+	 ys7NJat563h+8i63HIoraxxTJduhvODxj3JzYYKpJN90ZQECepoR95Q2fcAjLVlsBg
+	 y+5xlwoO5o3gQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qJbIu-00CUNF-1W;
-	Wed, 12 Jul 2023 15:58:56 +0100
+	id 1qJbIo-00CUNF-Jk;
+	Wed, 12 Jul 2023 15:58:50 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 26/27] KVM: arm64: Move HCRX_EL2 switch to load/put on VHE systems
-Date: Wed, 12 Jul 2023 15:58:09 +0100
-Message-Id: <20230712145810.3864793-27-maz@kernel.org>
+Subject: [PATCH 11/27] KVM: arm64: Correctly handle ACCDATA_EL1 traps
+Date: Wed, 12 Jul 2023 15:57:54 +0100
+Message-Id: <20230712145810.3864793-12-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230712145810.3864793-1-maz@kernel.org>
 References: <20230712145810.3864793-1-maz@kernel.org>
@@ -58,68 +58,50 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Although the nVHE behaviour requires HCRX_EL2 to be switched
-on each switch between host and guest, there is nothing in
-this register that would affect a VHE host.
+As we blindly reset some HFGxTR_EL2 bits to 0, we also randomly trap
+unsuspecting sysregs that have their trap bits with a negative
+polarity.
 
-It is thus possible to save/restore this register on load/put
-on VHE systems, avoiding unnecessary sysreg access on the hot
-path. Additionally, it avoids unnecessary traps when running
-with NV.
+ACCDATA_EL1 is one such register that can be accessed by the guest,
+causing a splat on the host as we don't have a proper handler for
+it.
 
-To achieve this, simply move the read/writes to the *_common()
-helpers, which are called on load/put on VHE, and more eagerly
-on nVHE.
+Adding such handler addresses the issue, though there are a number
+of other registers missing as the current architecture documentation
+doesn't describe them yet.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/hyp/switch.h | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/sysreg.h | 2 ++
+ arch/arm64/kvm/sys_regs.c       | 2 ++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 5fa1ae26f075..f07523d7d4ec 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -196,6 +196,9 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
- 	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
- 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 6d3d16fac227..d528a79417a0 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -389,6 +389,8 @@
+ #define SYS_ICC_IGRPEN0_EL1		sys_reg(3, 0, 12, 12, 6)
+ #define SYS_ICC_IGRPEN1_EL1		sys_reg(3, 0, 12, 12, 7)
  
-+	if (cpus_have_final_cap(ARM64_HAS_HCX))
-+		write_sysreg_s(HCRX_GUEST_FLAGS, SYS_HCRX_EL2);
++#define SYS_ACCDATA_EL1			sys_reg(3, 0, 13, 0, 5)
 +
- 	__activate_traps_hfgxtr(vcpu);
- }
+ #define SYS_CNTKCTL_EL1			sys_reg(3, 0, 14, 1, 0)
  
-@@ -212,6 +215,9 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
- 		vcpu_clear_flag(vcpu, PMUSERENR_ON_CPU);
- 	}
+ #define SYS_AIDR_EL1			sys_reg(3, 1, 0, 0, 7)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index bd3431823ec5..3a6f678ca67d 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2151,6 +2151,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_CONTEXTIDR_EL1), access_vm_reg, reset_val, CONTEXTIDR_EL1, 0 },
+ 	{ SYS_DESC(SYS_TPIDR_EL1), NULL, reset_unknown, TPIDR_EL1 },
  
-+	if (cpus_have_final_cap(ARM64_HAS_HCX))
-+		write_sysreg_s(HCRX_HOST_FLAGS, SYS_HCRX_EL2);
++	{ SYS_DESC(SYS_ACCDATA_EL1), undef_access },
 +
- 	__deactivate_traps_hfgxtr(vcpu);
- }
+ 	{ SYS_DESC(SYS_SCXTNUM_EL1), undef_access },
  
-@@ -226,9 +232,6 @@ static inline void ___activate_traps(struct kvm_vcpu *vcpu)
- 
- 	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_VSE))
- 		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
--
--	if (cpus_have_final_cap(ARM64_HAS_HCX))
--		write_sysreg_s(HCRX_GUEST_FLAGS, SYS_HCRX_EL2);
- }
- 
- static inline void ___deactivate_traps(struct kvm_vcpu *vcpu)
-@@ -243,9 +246,6 @@ static inline void ___deactivate_traps(struct kvm_vcpu *vcpu)
- 		vcpu->arch.hcr_el2 &= ~HCR_VSE;
- 		vcpu->arch.hcr_el2 |= read_sysreg(hcr_el2) & HCR_VSE;
- 	}
--
--	if (cpus_have_final_cap(ARM64_HAS_HCX))
--		write_sysreg_s(HCRX_HOST_FLAGS, SYS_HCRX_EL2);
- }
- 
- static inline bool __populate_fault_info(struct kvm_vcpu *vcpu)
+ 	{ SYS_DESC(SYS_CNTKCTL_EL1), NULL, reset_val, CNTKCTL_EL1, 0},
 -- 
 2.34.1
 
