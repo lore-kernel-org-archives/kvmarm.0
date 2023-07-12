@@ -1,227 +1,103 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E53A2AB5C
-	for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 13:49:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5610C433C8;
-	Wed, 12 Jul 2023 13:49:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689169757;
-	bh=QAoHzBlcPsI3h1ifZtKDeNtJ7LninhYCe47Wu+MoAGQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hjUpZRQN/Tr7z7RRfHP5h4+3hErX50O17w/WsnXiZrX2cdR/I1Oegq0Ox1ewJgNfD
-	 0vJ25Ea1vN79JwiAo4fKOtfIMndFM58icgpI4iF1AYI1tivZkJRYsibqUP7ir4Wqyf
-	 MnYrSJWGlrfjCO4SRP99mF4tW4wlStvee2U2CXSd9joACAsWjlvJciiM31LEmlhh5y
-	 H4dH8jnCoEh2AI57chwbj08NT96V1kcxic+s2Xw8X4P6ck2XTW9hpO2NM342MZ+cbJ
-	 LP1Pm5Ihom11Eh9SBP0+06/yun4FOqB/KATbXsuhPF4joKC93ncIaQS8UWlBZ/Nvo/
-	 6UU/PlEWq4eqg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qJaDT-00CSyH-DO;
-	Wed, 12 Jul 2023 14:49:15 +0100
-Date: Wed, 12 Jul 2023 14:49:15 +0100
-Message-ID: <86zg41utno.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Zenghui Yu <yuzenghui@huawei.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	<kvmarm@lists.linux.dev>,
-	James Morse
-	<james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	<stable@vger.kernel.org>,
-	Xiang Chen <chenxiang66@hisilicon.com>
-Subject: Re: [PATCH] KVM: arm64: vgic-v4: Consistently request doorbell irq for blocking vCPU
-In-Reply-To: <14acf0fd-e5eb-8a14-986a-b8fe4a44cec9@huawei.com>
-References: <20230710175553.1477762-1-oliver.upton@linux.dev>
-	<86jzv6x66q.wl-maz@kernel.org>
-	<ZK0EPhvLzhaFepGk@linux.dev>
-	<14acf0fd-e5eb-8a14-986a-b8fe4a44cec9@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF83100AE
+	for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 14:08:48 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-c83284edf0eso3266467276.3
+        for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 07:08:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689170927; x=1691762927;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=61Bb86vxt9PpkUcz935uJ7O0G2xXf3VyMbaMcGvnRT4=;
+        b=Yti+bExW+ZX8aBNYkyF+7gOY1gDsT3YtIr0sz8jtb963EUPi0YHptmlxRpIgAq8krX
+         rPvaFqHisX5lV6SnBLuIkaldD0tpF0thm7rcn1IUMpgg5bAJFxMDVEOv+3BBSFX5DE0R
+         RAdIvHkn2Znuw+IpLcTp3ImsK9G+ose7oBNwwmHO61RmWaCe+LIjW8Nd4Kp55AWwC8BT
+         IifqYHvOs0oQokFE+9PRt78v1CemvelioyZaWix/B9QEZtg5Xo0otlPF2nm5o/uUTSVT
+         NS4JxshMd/kSwIeu0oiAJPt7U5ivim6aiipUfyHBdWP4anir08CAFDVnbc8me5EBJZn0
+         8Aqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689170927; x=1691762927;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=61Bb86vxt9PpkUcz935uJ7O0G2xXf3VyMbaMcGvnRT4=;
+        b=e6VFJBwN6Onm2KMI9NPG79AH2m8qFYMOjfIzi4Jz3cnpCUWL8SgGuJPSdIyFfN8wZD
+         f+CGi/m57D/qQykzAaDZdWT5F4msIRVC+/icZXXWHG0cKoZqa0DCbciNzjpEf/AP5pom
+         CQUNGKyMaWaFs/sC0QWCGj0o605vRraLfZ6Y3opVjy6VivMgE5MVysuZrc1QSJNlQWGJ
+         igJ0zx9w7sM9MdCJXHeSpym1mF4hy7206LqGLc+zK8s98ApyiY56jvABSZV3fx3or6k0
+         6jsK/S6LctPbLNss8RaHroaczn4YBuLe326pvehIg9vUxBI97N8K1k+4sDxq2O57pN1c
+         KiDA==
+X-Gm-Message-State: ABy/qLaIMxvYHWe08aJuOvKg2+MV5OaFLsMsC6qdn0GD7XI0eyxnMMWC
+	4J+4wFxCwTAIIQwb/CQjHSN1rT4XDmQ=
+X-Google-Smtp-Source: APBJJlHCEzVLrClhpPb8qPoDTeJqu/2HP+RHYiydI+UaZZBLeQbY5BG0fq3uGfdwzCnf84xvbcW4T8rCazs=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a5b:90e:0:b0:bc0:bfa7:7647 with SMTP id
+ a14-20020a5b090e000000b00bc0bfa77647mr129497ybq.0.1689170927305; Wed, 12 Jul
+ 2023 07:08:47 -0700 (PDT)
+Date: Wed, 12 Jul 2023 07:08:45 -0700
+In-Reply-To: <CAF7b7mrxNdMJZT=BQC5VP2EK7SdihW_BfaSywbtJpFz0bgiUbw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, stable@vger.kernel.org, chenxiang66@hisilicon.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-6-amoorthy@google.com>
+ <ZIoQoIe+UF6qix5v@google.com> <CAF7b7mrxNdMJZT=BQC5VP2EK7SdihW_BfaSywbtJpFz0bgiUbw@mail.gmail.com>
+Message-ID: <ZK6z7dkTmdeiwVrL@google.com>
+Subject: Re: [PATCH v4 05/16] KVM: Annotate -EFAULTs from kvm_vcpu_write_guest_page()
+From: Sean Christopherson <seanjc@google.com>
+To: Anish Moorthy <amoorthy@google.com>
+Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
+	jthoughton@google.com, bgardon@google.com, dmatlack@google.com, 
+	ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com, 
+	nadav.amit@gmail.com, isaku.yamahata@gmail.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 12 Jul 2023 13:09:45 +0100,
-Zenghui Yu <yuzenghui@huawei.com> wrote:
-> 
-> On 2023/7/11 15:26, Oliver Upton wrote:
-> > On Tue, Jul 11, 2023 at 08:23:25AM +0100, Marc Zyngier wrote:
-> >> On Mon, 10 Jul 2023 18:55:53 +0100,
-> >> Oliver Upton <oliver.upton@linux.dev> wrote:
-> >>> 
-> >>> Xiang reports that VMs occasionally fail to boot on GICv4.1 systems when
-> >>> running a preemptible kernel, as it is possible that a vCPU is blocked
-> >>> without requesting a doorbell interrupt.
-> >>> 
-> >>> The issue is that any preemption that occurs between vgic_v4_put() and
-> >>> schedule() on the block path will mark the vPE as nonresident and *not*
-> >>> request a doorbell irq.
-> >> 
-> >> It'd be worth spelling out. You need to go via *three* schedule()
-> >> calls: one to be preempted (with DB set), one to be made resident
-> >> again, and then the final one in kvm_vcpu_halt(), clearing the DB on
-> >> vcpu_put() due to the bug.
-> > 
-> > Yeah, a bit lazy in the wording. What I had meant to imply was
-> > preemption happening after the doorbell is set up and before the thread
-> > has an opportunity to explicitly schedule out. Perhaps I should just say
-> > that.
-> > 
-> >>> 
-> >>> Fix it by consistently requesting a doorbell irq in the vcpu put path if
-> >>> the vCPU is blocking.
-> 
-> Yup. Agreed!
-> 
-> >>> While this technically means we could drop the
-> >>> early doorbell irq request in kvm_vcpu_wfi(), deliberately leave it
-> >>> intact such that vCPU halt polling can properly detect the wakeup
-> >>> condition before actually scheduling out a vCPU.
-> 
-> Yeah, just like what we did in commit 07ab0f8d9a12 ("KVM: Call
-> kvm_arch_vcpu_blocking early into the blocking sequence").
-> 
-> My only concern is that if the preemption happens before halt polling,
-> we would enter the polling loop with VPE already resident on the RD and
-> can't recognize any firing GICv4.x virtual interrupts (targeting this
-> VPE) in polling. [1]
+On Thu, Jul 06, 2023, Anish Moorthy wrote:
+> On Wed, Jun 14, 2023 at 12:10=E2=80=AFPM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> > static int __kvm_write_guest_page(struct kvm *kvm,
+> >     struct kvm_memory_slot *memslot, gfn_t gfn,
+> >     const void *data, int offset, int len)
+> > {
+> >     int r;
+> >     unsigned long addr;
+> >
+> >     addr =3D gfn_to_hva_memslot(memslot, gfn);
+> >     if (kvm_is_error_hva(addr))
+> >         return -EFAULT;
+> > ...
+>=20
+> Is it ok to catch these with an annotated efault? Strictly speaking
+> they don't seem to arise from a failed user access (perhaps my
+> definition is wrong: I'm looking at uaccess.h) so I'm not sure that
+> annotating them is valid.
 
-The status of the pending bit is recorded in pending_last, so we don't
-lose what was snapshot at the point of hitting WFI. But we indeed
-don't have any idea for something firing during the polling loop.
+IMO it's ok, and even desirable, to annotate them.  This is a judgment call=
+ we
+need to make as gfn=3D>hva translations are a KVM concept, i.e. aren't cove=
+red by
+uaccess or anything else in the kernel.  Userspace would need to be aware t=
+hat
+an annotated -EFAULT may have failed due to the memslot lookup, but I don't=
+ see
+that as being problematic, e.g. userspace will likely need to do its own me=
+mslot
+lookup anyways.
 
-> Given that making VPE resident on the vcpu block path (i.e., in
-> kvm_vcpu_halt()) makes little sense (right?) and leads to this sort of
-> problem, a crude idea is that we can probably keep track of the
-> "nested" vgic_v4_{put,load} calls (instead of a single vpe->resident
-> flag) and keep VPE *not resident* on the whole block path (like what we
-> had before commit 8e01d9a396e6). And we then rely on
-> kvm_vcpu_wfi/vgic_v4_load to actually schedule the VPE on...
-
-I'm not sure about the nested tracking part, but it's easy enough to
-have a vcpu flag indicating that we're in WFI. So an *alternative* to
-the current fix would be something like this:
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index f54ba0a63669..417a0e85456b 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -817,6 +817,8 @@ struct kvm_vcpu_arch {
- #define DBG_SS_ACTIVE_PENDING	__vcpu_single_flag(sflags, BIT(5))
- /* PMUSERENR for the guest EL0 is on physical CPU */
- #define PMUSERENR_ON_CPU	__vcpu_single_flag(sflags, BIT(6))
-+/* WFI instruction trapped */
-+#define IN_WFI			__vcpu_single_flag(sflags, BIT(7))
- 
- /* vcpu entered with HCR_EL2.E2H set */
- #define VCPU_HCR_E2H		__vcpu_single_flag(oflags, BIT(0))
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 236c5f1c9090..cf208d30a9ea 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -725,13 +725,15 @@ void kvm_vcpu_wfi(struct kvm_vcpu *vcpu)
- 	 */
- 	preempt_disable();
- 	kvm_vgic_vmcr_sync(vcpu);
--	vgic_v4_put(vcpu, true);
-+	vcpu_set_flag(vcpu, IN_WFI);
-+	vgic_v4_put(vcpu);
- 	preempt_enable();
- 
- 	kvm_vcpu_halt(vcpu);
- 	vcpu_clear_flag(vcpu, IN_WFIT);
- 
- 	preempt_disable();
-+	vcpu_clear_flag(vcpu, IN_WFI);
- 	vgic_v4_load(vcpu);
- 	preempt_enable();
- }
-@@ -799,7 +801,7 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
- 		if (kvm_check_request(KVM_REQ_RELOAD_GICv4, vcpu)) {
- 			/* The distributor enable bits were changed */
- 			preempt_disable();
--			vgic_v4_put(vcpu, false);
-+			vgic_v4_put(vcpu);
- 			vgic_v4_load(vcpu);
- 			preempt_enable();
- 		}
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 49d35618d576..df61ead7c757 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -780,7 +780,7 @@ void vgic_v3_put(struct kvm_vcpu *vcpu)
- 	 * done a vgic_v4_put) and when running a nested guest (the
- 	 * vPE was never resident in order to generate a doorbell).
- 	 */
--	WARN_ON(vgic_v4_put(vcpu, false));
-+	WARN_ON(vgic_v4_put(vcpu));
- 
- 	vgic_v3_vmcr_sync(vcpu);
- 
-diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-index c1c28fe680ba..339a55194b2c 100644
---- a/arch/arm64/kvm/vgic/vgic-v4.c
-+++ b/arch/arm64/kvm/vgic/vgic-v4.c
-@@ -336,14 +336,14 @@ void vgic_v4_teardown(struct kvm *kvm)
- 	its_vm->vpes = NULL;
- }
- 
--int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db)
-+int vgic_v4_put(struct kvm_vcpu *vcpu)
- {
- 	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
- 
- 	if (!vgic_supports_direct_msis(vcpu->kvm) || !vpe->resident)
- 		return 0;
- 
--	return its_make_vpe_non_resident(vpe, need_db);
-+	return its_make_vpe_non_resident(vpe, !!vcpu_get_flag(vcpu, IN_WFI));
- }
- 
- int vgic_v4_load(struct kvm_vcpu *vcpu)
-@@ -354,6 +354,9 @@ int vgic_v4_load(struct kvm_vcpu *vcpu)
- 	if (!vgic_supports_direct_msis(vcpu->kvm) || vpe->resident)
- 		return 0;
- 
-+	if (vcpu_get_flag(vcpu, IN_WFI))
-+		return 0;
-+
- 	/*
- 	 * Before making the VPE resident, make sure the redistributor
- 	 * corresponding to our current CPU expects us here. See the
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 9b91a8135dac..765d801d1ddc 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -446,7 +446,7 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int irq,
- 
- int vgic_v4_load(struct kvm_vcpu *vcpu);
- void vgic_v4_commit(struct kvm_vcpu *vcpu);
--int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db);
-+int vgic_v4_put(struct kvm_vcpu *vcpu);
- 
- bool vgic_state_is_nested(struct kvm_vcpu *vcpu);
- 
-
-Of course, it is totally untested... ;-) But I like that the doorbell
-request is solely driven by the WFI state, and we avoid leaking the
-knowledge outside of the vgic code.
-
-Thoughts?
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+In an ideal world, KVM would flag such "faults" as failing the hva lookup, =
+and
+provide the hva when it's a uaccess (or gup()) that fails, i.e. provide use=
+rspace
+with precise details on the unresolved fault.  But I don't think I want to =
+take
+that on in KVM unless it proves to be absolutely necessary.  Userspace *sho=
+uld*
+be able to derive the same information, and I'm concerned that providing pr=
+ecise
+*and accurate* reporting in KVM would be a maintenance burden.
