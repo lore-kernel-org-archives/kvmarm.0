@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2151234CF4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AF3734CF5
 	for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 14:58:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB8E0C433CC;
-	Wed, 12 Jul 2023 14:58:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADE51C43391;
+	Wed, 12 Jul 2023 14:58:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689173930;
-	bh=GjW92eLPQB/b++Gprz2H0IZOgXi3BU2wMKh/iuL1bTY=;
+	s=k20201202; t=1689173931;
+	bh=d8wIl9lTuWwNMtBBjm2pAq8N/AAPYD5w2LQCFNLPZzk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Oo0b2aaEHUtm/2W7nuR6CVR51RIdL/cv73VadWjpYeXliwSZ4x5tmdDfdxlVNhRrt
-	 vYP24d6Z+ecMWfOVB3TSq9Ehye4xRYXJcDWhq8dIH5k1ive/mau1AOynaFwnZ0dwkE
-	 r5xpQMx6n1KlY0AZVokciuYZ9GQuCHbQ5p0F1kD9N3LqsacSRY9IBqdmn/ZQ8Z+TW1
-	 f9FmrltEabcH1HbRuwIsZEu/K1ABh+KnW162E4umKDM0wqQQA5QIr1JHfj2U2+p0kN
-	 cYIxfRNrhDcmPEoWQpoV7bC6LeNYhRHQp0jGVUhfBg0j8HogwJ/VQRkQ3jGkAykk9t
-	 Wjmw3Qj4/DrwQ==
+	b=uBTecaE4NkiVuMY92JmBxuyIpQgUZMxWI0cq3PMOlbSmPXCMNxQcMywQYp9/7cLS1
+	 tNNWjS9D3F/9ZFz9qUDF1EeJ0r5TJzQK7BhLEVTM7cgy3qzzKmbo8QGyVSNxn5UjSb
+	 dCX+d9B/vXFaFYrl2xSEnptQOk/B1UEw4eTxndYb2nuzts4o4beIUK0Bfs7fywxb96
+	 mpVeMJgnZEGqS4Zj749Vb9JVFsMa5TuQcLCxlOpAU/GZAcJ8PvHR+5I9QEOHcnU8WY
+	 WinNnv792Ngf9L9WpJ875CGJabdGeZ3P37fOFARtBpIZZ7WYqIkp1stE0AhevoKIM0
+	 flFHQ3oYJWmPA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qJbIm-00CUNF-Td;
-	Wed, 12 Jul 2023 15:58:48 +0100
+	id 1qJbIn-00CUNF-OV;
+	Wed, 12 Jul 2023 15:58:49 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 05/27] arm64: Add AT operation encodings
-Date: Wed, 12 Jul 2023 15:57:48 +0100
-Message-Id: <20230712145810.3864793-6-maz@kernel.org>
+Subject: [PATCH 08/27] arm64: Fix HFGxTR_EL2 field naming
+Date: Wed, 12 Jul 2023 15:57:51 +0100
+Message-Id: <20230712145810.3864793-9-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230712145810.3864793-1-maz@kernel.org>
 References: <20230712145810.3864793-1-maz@kernel.org>
@@ -58,42 +58,60 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the encodings for the AT operation that are usable from NS.
+The HFGxTR_EL2 fields do not always follow the naming described
+in the spec, nor do they match the name of the register they trap
+in the rest of the kernel.
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+It is a bit sad that they were written by hand despite the availability
+of a machine readable version...
+
+Fixes: cc077e7facbe ("arm64/sysreg: Convert HFG[RW]TR_EL2 to automatic generation")
 Signed-off-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Mark Brown <broonie@kernel.org>
+Cc: Will Deacon <will@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
 ---
- arch/arm64/include/asm/sysreg.h | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ arch/arm64/tools/sysreg | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 72e18480ce62..76289339b43b 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -514,6 +514,23 @@
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 1ea4a3dc68f8..65866bf819c3 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -2017,7 +2017,7 @@ Field	0	SM
+ EndSysreg
  
- #define SYS_SP_EL2			sys_reg(3, 6,  4, 1, 0)
- 
-+/* AT instructions */
-+#define AT_Op0 1
-+#define AT_CRn 7
-+
-+#define OP_AT_S1E1R	sys_insn(AT_Op0, 0, AT_CRn, 8, 0)
-+#define OP_AT_S1E1W	sys_insn(AT_Op0, 0, AT_CRn, 8, 1)
-+#define OP_AT_S1E0R	sys_insn(AT_Op0, 0, AT_CRn, 8, 2)
-+#define OP_AT_S1E0W	sys_insn(AT_Op0, 0, AT_CRn, 8, 3)
-+#define OP_AT_S1E1RP	sys_insn(AT_Op0, 0, AT_CRn, 9, 0)
-+#define OP_AT_S1E1WP	sys_insn(AT_Op0, 0, AT_CRn, 9, 1)
-+#define OP_AT_S1E2R	sys_insn(AT_Op0, 4, AT_CRn, 8, 0)
-+#define OP_AT_S1E2W	sys_insn(AT_Op0, 4, AT_CRn, 8, 1)
-+#define OP_AT_S12E1R	sys_insn(AT_Op0, 4, AT_CRn, 8, 4)
-+#define OP_AT_S12E1W	sys_insn(AT_Op0, 4, AT_CRn, 8, 5)
-+#define OP_AT_S12E0R	sys_insn(AT_Op0, 4, AT_CRn, 8, 6)
-+#define OP_AT_S12E0W	sys_insn(AT_Op0, 4, AT_CRn, 8, 7)
-+
- /* TLBI instructions */
- #define OP_TLBI_VMALLE1OS		sys_insn(1, 0, 8, 1, 0)
- #define OP_TLBI_VAE1OS			sys_insn(1, 0, 8, 1, 1)
+ SysregFields	HFGxTR_EL2
+-Field	63	nAMIAIR2_EL1
++Field	63	nAMAIR2_EL1
+ Field	62	nMAIR2_EL1
+ Field	61	nS2POR_EL1
+ Field	60	nPOR_EL1
+@@ -2032,9 +2032,9 @@ Field	52	nGCS_EL0
+ Res0	51
+ Field	50	nACCDATA_EL1
+ Field	49	ERXADDR_EL1
+-Field	48	EXRPFGCDN_EL1
+-Field	47	EXPFGCTL_EL1
+-Field	46	EXPFGF_EL1
++Field	48	ERXPFGCDN_EL1
++Field	47	ERXPFGCTL_EL1
++Field	46	ERXPFGF_EL1
+ Field	45	ERXMISCn_EL1
+ Field	44	ERXSTATUS_EL1
+ Field	43	ERXCTLR_EL1
+@@ -2049,8 +2049,8 @@ Field	35	TPIDR_EL0
+ Field	34	TPIDRRO_EL0
+ Field	33	TPIDR_EL1
+ Field	32	TCR_EL1
+-Field	31	SCTXNUM_EL0
+-Field	30	SCTXNUM_EL1
++Field	31	SCXTNUM_EL0
++Field	30	SCXTNUM_EL1
+ Field	29	SCTLR_EL1
+ Field	28	REVIDR_EL1
+ Field	27	PAR_EL1
 -- 
 2.34.1
 
