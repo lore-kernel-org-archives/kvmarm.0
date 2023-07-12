@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04E1E34CED
-	for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 14:58:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87BC7C433C8;
-	Wed, 12 Jul 2023 14:58:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1AE234CEB
+	for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 14:58:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62856C43395;
+	Wed, 12 Jul 2023 14:58:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689173930;
-	bh=okNUsYGpEYItC1lJOpaDqh0SnEOZcMjOA+yK1Kq6j4Y=;
+	s=k20201202; t=1689173931;
+	bh=gOk3OWoFOLQUhWPkERnNSXJ0DDK3pSnDGy2b6/Nh01k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Q/IsWrrLm+Tfycfi7M09kmUKLbugD621X9+mW0TTo/1KDi6Leu+DWEb+0+aKKTqln
-	 pPf/90rGXVITKXi1NZr3gHJ92rnb0ZJwlkVYPV+q5ZpWzNckdHhtnKiik7fBStwOBb
-	 naZMx1p7CwZ1iQzalKir2Ww8YPDAvKrHC7sZ2FmdeE3aHhgrjBHppl4k7ojrE5yj5t
-	 0E0yAHUlwolC4yN4PUaKRna59k7/PfN4m2rUPW78ILfmP+fx8TyYtsu6xuMKHmAprN
-	 lD8yOo0HZ42qaMLGHg9qxdLC6baH9g3TTApevWW6ujBA9B6zdzaS4QyHyFeNGJWQqS
-	 Su9453My7wRxg==
+	b=ECtoLclg4shj7pqzf3mv5f8r9rDuWXp2/A3Y/hcsDbe2QqNJOVjB9G6cF1/HZAqyQ
+	 0maVUMZ6BhbberZPh3m9MrF4J1HdnnVKQqEYd51CAnJZefYCozzBpcZhM4AuhYSi1w
+	 h2C5UHZg51HrCER++LwpSif0ILxdYCO1RT95a4iVgKweTs4gpHDI/rAQtXzYCLMm4a
+	 6Mjsf3Ml1E2bzM63QQPhgdanUdQQoOdpUlSCDuYIVNJAFVqeGCBSeJOgEVjqzEJaua
+	 jw3Z6rICLqUXHKccZOyjuF2NEKrFp45HwuYs5PW8tzcahupUOBhC95iKE6MlAlwK6z
+	 KekGrXBm8pxUg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qJbIm-00CUNF-AO;
-	Wed, 12 Jul 2023 15:58:48 +0100
+	id 1qJbIn-00CUNF-Ev;
+	Wed, 12 Jul 2023 15:58:49 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 03/27] arm64: Add missing DC ZVA/GVA/GZVA encodings
-Date: Wed, 12 Jul 2023 15:57:46 +0100
-Message-Id: <20230712145810.3864793-4-maz@kernel.org>
+Subject: [PATCH 07/27] arm64: Add missing BRB/CFP/DVP/CPP instructions
+Date: Wed, 12 Jul 2023 15:57:50 +0100
+Message-Id: <20230712145810.3864793-8-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230712145810.3864793-1-maz@kernel.org>
 References: <20230712145810.3864793-1-maz@kernel.org>
@@ -58,30 +58,32 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the missing DC *VA encodings.
+HFGITR_EL2 traps a bunch of instructions for which we don't have
+encodings yet. Add them.
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/arm64/include/asm/sysreg.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index ed2739897859..5084add86897 100644
+index 9dfd127be55a..e2357529c633 100644
 --- a/arch/arm64/include/asm/sysreg.h
 +++ b/arch/arm64/include/asm/sysreg.h
-@@ -150,6 +150,11 @@
- #define SYS_DC_CIGVAC			sys_insn(1, 3, 7, 14, 3)
- #define SYS_DC_CIGDVAC			sys_insn(1, 3, 7, 14, 5)
+@@ -737,6 +737,13 @@
+ #define OP_TLBI_VALE2NXS		sys_insn(1, 4, 9, 7, 5)
+ #define OP_TLBI_VMALLS12E1NXS		sys_insn(1, 4, 9, 7, 6)
  
-+/* Data cache zero operations */
-+#define SYS_DC_ZVA			sys_insn(1, 3, 7, 4, 1)
-+#define SYS_DC_GVA			sys_insn(1, 3, 7, 4, 3)
-+#define SYS_DC_GZVA			sys_insn(1, 3, 7, 4, 4)
++/* Misc instructions */
++#define OP_BRB_IALL			sys_insn(1, 1, 7, 2, 4)
++#define OP_BRB_INJ			sys_insn(1, 1, 7, 2, 5)
++#define OP_CFP_RCTX			sys_insn(1, 3, 7, 3, 4)
++#define OP_DVP_RCTX			sys_insn(1, 3, 7, 3, 5)
++#define OP_CPP_RCTX			sys_insn(1, 3, 7, 3, 7)
 +
- /*
-  * Automatically generated definitions for system registers, the
-  * manual encodings below are in the process of being converted to
+ /* Common SCTLR_ELx flags. */
+ #define SCTLR_ELx_ENTP2	(BIT(60))
+ #define SCTLR_ELx_DSSBS	(BIT(44))
 -- 
 2.34.1
 
