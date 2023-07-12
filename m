@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AF3734CF5
-	for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 14:58:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADE51C43391;
-	Wed, 12 Jul 2023 14:58:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFD882AB41
+	for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 14:58:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52CB4C433CB;
+	Wed, 12 Jul 2023 14:58:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689173931;
-	bh=d8wIl9lTuWwNMtBBjm2pAq8N/AAPYD5w2LQCFNLPZzk=;
+	s=k20201202; t=1689173930;
+	bh=xY7aI3tySPAJRY/KJj2jeubjRjDW8SI+/eWlYwOfsaw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uBTecaE4NkiVuMY92JmBxuyIpQgUZMxWI0cq3PMOlbSmPXCMNxQcMywQYp9/7cLS1
-	 tNNWjS9D3F/9ZFz9qUDF1EeJ0r5TJzQK7BhLEVTM7cgy3qzzKmbo8QGyVSNxn5UjSb
-	 dCX+d9B/vXFaFYrl2xSEnptQOk/B1UEw4eTxndYb2nuzts4o4beIUK0Bfs7fywxb96
-	 mpVeMJgnZEGqS4Zj749Vb9JVFsMa5TuQcLCxlOpAU/GZAcJ8PvHR+5I9QEOHcnU8WY
-	 WinNnv792Ngf9L9WpJ875CGJabdGeZ3P37fOFARtBpIZZ7WYqIkp1stE0AhevoKIM0
-	 flFHQ3oYJWmPA==
+	b=XTuMlq4Q8zuWDpAytXteFghWQndGJSkRvDTsqJlAinGLhWcTV1io8FY/9bz4JwZuq
+	 cLIfH5nM5imK1qDPAyXiagssqKIqMneqIKoHkWngPcyDa7NoDwRxb20RCqgMW08ubk
+	 4qI75a0KQDGwQnQlxbI3aj0s/f6bDmtpfgPbR4seJUYb5xPo/Rd3r0ugN8ocBWKtQ0
+	 tmpALEowTnJ/iCeAWqojw5vkQpfxWXrObGxo6qEAGZdZZMNHdCBm5QDCNlJaebCswr
+	 wj8pGcOTsw03Xsk+LGtPhNpv3zpXWO+EIBuf/iZQ61BkeAPdABuBvnseAciRHjPkVU
+	 7feLeN2MzHcng==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qJbIn-00CUNF-OV;
-	Wed, 12 Jul 2023 15:58:49 +0100
+	id 1qJbIl-00CUNF-W0;
+	Wed, 12 Jul 2023 15:58:48 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 08/27] arm64: Fix HFGxTR_EL2 field naming
-Date: Wed, 12 Jul 2023 15:57:51 +0100
-Message-Id: <20230712145810.3864793-9-maz@kernel.org>
+Subject: [PATCH 02/27] arm64: Add missing ERX*_EL1 encodings
+Date: Wed, 12 Jul 2023 15:57:45 +0100
+Message-Id: <20230712145810.3864793-3-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230712145810.3864793-1-maz@kernel.org>
 References: <20230712145810.3864793-1-maz@kernel.org>
@@ -58,60 +58,34 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The HFGxTR_EL2 fields do not always follow the naming described
-in the spec, nor do they match the name of the register they trap
-in the rest of the kernel.
+We only describe a few of the ERX*_EL1 registers. Add the missing
+ones (ERXPFGF_EL1, ERXPFGCTL_EL1, ERXPFGCDN_EL1, ERXMISC2_EL1 and
+ERXMISC3_EL1).
 
-It is a bit sad that they were written by hand despite the availability
-of a machine readable version...
-
-Fixes: cc077e7facbe ("arm64/sysreg: Convert HFG[RW]TR_EL2 to automatic generation")
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Mark Brown <broonie@kernel.org>
-Cc: Will Deacon <will@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Mark Rutland <mark.rutland@arm.com>
 ---
- arch/arm64/tools/sysreg | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/sysreg.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 1ea4a3dc68f8..65866bf819c3 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -2017,7 +2017,7 @@ Field	0	SM
- EndSysreg
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 85447e68951a..ed2739897859 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -229,8 +229,13 @@
+ #define SYS_ERXCTLR_EL1			sys_reg(3, 0, 5, 4, 1)
+ #define SYS_ERXSTATUS_EL1		sys_reg(3, 0, 5, 4, 2)
+ #define SYS_ERXADDR_EL1			sys_reg(3, 0, 5, 4, 3)
++#define SYS_ERXPFGF_EL1			sys_reg(3, 0, 5, 4, 4)
++#define SYS_ERXPFGCTL_EL1		sys_reg(3, 0, 5, 4, 5)
++#define SYS_ERXPFGCDN_EL1		sys_reg(3, 0, 5, 4, 6)
+ #define SYS_ERXMISC0_EL1		sys_reg(3, 0, 5, 5, 0)
+ #define SYS_ERXMISC1_EL1		sys_reg(3, 0, 5, 5, 1)
++#define SYS_ERXMISC2_EL1		sys_reg(3, 0, 5, 5, 2)
++#define SYS_ERXMISC3_EL1		sys_reg(3, 0, 5, 5, 3)
+ #define SYS_TFSR_EL1			sys_reg(3, 0, 5, 6, 0)
+ #define SYS_TFSRE0_EL1			sys_reg(3, 0, 5, 6, 1)
  
- SysregFields	HFGxTR_EL2
--Field	63	nAMIAIR2_EL1
-+Field	63	nAMAIR2_EL1
- Field	62	nMAIR2_EL1
- Field	61	nS2POR_EL1
- Field	60	nPOR_EL1
-@@ -2032,9 +2032,9 @@ Field	52	nGCS_EL0
- Res0	51
- Field	50	nACCDATA_EL1
- Field	49	ERXADDR_EL1
--Field	48	EXRPFGCDN_EL1
--Field	47	EXPFGCTL_EL1
--Field	46	EXPFGF_EL1
-+Field	48	ERXPFGCDN_EL1
-+Field	47	ERXPFGCTL_EL1
-+Field	46	ERXPFGF_EL1
- Field	45	ERXMISCn_EL1
- Field	44	ERXSTATUS_EL1
- Field	43	ERXCTLR_EL1
-@@ -2049,8 +2049,8 @@ Field	35	TPIDR_EL0
- Field	34	TPIDRRO_EL0
- Field	33	TPIDR_EL1
- Field	32	TCR_EL1
--Field	31	SCTXNUM_EL0
--Field	30	SCTXNUM_EL1
-+Field	31	SCXTNUM_EL0
-+Field	30	SCXTNUM_EL1
- Field	29	SCTLR_EL1
- Field	28	REVIDR_EL1
- Field	27	PAR_EL1
 -- 
 2.34.1
 
