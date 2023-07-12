@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E8C24163
-	for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 15:17:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3158FC433C8;
-	Wed, 12 Jul 2023 15:17:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C73724163
+	for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 15:17:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 389E9C433C8;
+	Wed, 12 Jul 2023 15:17:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689175029;
-	bh=xRSHvD6XN2zS+QQtTRecIvHJ68WslxD8+cODMslX5pA=;
+	s=k20201202; t=1689175031;
+	bh=mkA6NbpYDV60Ei094JxQThch//Imsik/QfnXZEhvtFA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=b/ogAjUWWx8fx+orAXUjskuQC4RoQ1ta7NqPgTFlAerqXPhCvoXLxYiTWU2j1ssxD
-	 KOk7+Zi3XqmkIfJe5tJUAwKlEZ2dXdSC4IsZ9aFkfgYChwBC+fWxv9UfYcwdEB3XfP
-	 BeRUt7Kc/olV8IW0RVe0WYX2vJRU1B9j/8ujFX1eXZy5BHzwR5eroLhx/DkDxFKhlA
-	 9uMLluLNAqZnJohCqaXyhUvwoWlDJ2nruRrWuDoDmMIV5NJJ2F4tLM4MiWPdzbkRyY
-	 r6GSXSgRpj1iVW5+fuEEyGrMtmIkpCUACfRPeYaX3I5rXbXGUQIVHyfwB8V1Mb5MkY
-	 QO4y3i+XuCGhw==
+	b=iLbhqWKIiENupNk35SF+CZZn3vu2HYQ97wf4O/4WIF5eV26pYnZi1m0tXVlyICvNe
+	 wv/PDQMjvTFShbZ/RMCjY1Z5uyEX2/H6deg8pgX4eCZN3Ubs5Ys7Fp0LE+pB4fea7q
+	 RCV0MP5gCp73aMtsIxWZUPU4htzZxHu8Ddal0FjQZRQDl7sj8OoNNnBSn5re/EGuUA
+	 XEXRnsdrTnYcnEkqVI0IsE7k817F7d2MvHTLSid5+AyJoyALgbKI5Rxdh/zDFS+PIP
+	 r2wyXF3ZMz0gcjzVJ3qTgS5W3Xb95dT2T7qhPX6V5d6MerkkU3Un6/GGAEUrB0aswt
+	 gxGEs4tPndzug==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qJbIp-00CUNF-EN;
-	Wed, 12 Jul 2023 15:58:51 +0100
+	id 1qJbIs-00CUNF-5O;
+	Wed, 12 Jul 2023 15:58:55 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 14/27] KVM: arm64: Restructure FGT register switching
-Date: Wed, 12 Jul 2023 15:57:57 +0100
-Message-Id: <20230712145810.3864793-15-maz@kernel.org>
+Subject: [PATCH 24/27] KVM: arm64: nv: Add switching support for HFGxTR/HDFGxTR
+Date: Wed, 12 Jul 2023 15:58:07 +0100
+Message-Id: <20230712145810.3864793-25-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230712145810.3864793-1-maz@kernel.org>
 References: <20230712145810.3864793-1-maz@kernel.org>
@@ -58,148 +58,96 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-As we're about to majorly extend the handling of FGT registers,
-restructure the code to actually save/restore the registers
-as required. This is made easy thanks to the previous addition
-of the EL2 registers, allowing us to use the host context for
-this purpose.
+Now that we can evaluate the FGT registers, allow them to be merged
+with the hypervisor's own configuration (in the case of HFG{RW}TR_EL2)
+or simply set for HFGITR_EL2, HDGFRTR_EL2 and HDFGWTR_EL2.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_arm.h        | 21 ++++++++++
- arch/arm64/kvm/hyp/include/hyp/switch.h | 55 +++++++++++++------------
- 2 files changed, 49 insertions(+), 27 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 48 +++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 028049b147df..85908aa18908 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -333,6 +333,27 @@
- 				 BIT(18) |		\
- 				 GENMASK(16, 15))
- 
-+/*
-+ * FGT register definitions
-+ *
-+ * RES0 and polarity masks as of DDI0487J.a, to be updated as needed.
-+ * We're not using the generated masks as they are usually ahead of
-+ * the published ARM ARM, which we use as a reference.
-+ *
-+ * Once we get to a point where the two describe the same thing, we'll
-+ * merge the definitions. One day.
-+ */
-+#define __HFGRTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51))
-+#define __HFGRTR_EL2_MASK	GENMASK(49, 0)
-+#define __HFGRTR_EL2_nMASK	(GENMASK(55, 54) | BIT(50))
-+
-+#define __HFGWTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51) |	\
-+				 BIT(46) | BIT(42) | BIT(40) | BIT(28) | \
-+				 GENMASK(26, 25) | BIT(21) | BIT(18) |	\
-+				 GENMASK(15, 14) | GENMASK(10, 9) | BIT(2))
-+#define __HFGWTR_EL2_MASK	GENMASK(49, 0)
-+#define __HFGWTR_EL2_nMASK	(GENMASK(55, 54) | BIT(50))
-+
- /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
- #define HPFAR_MASK	(~UL(0xf))
- /*
 diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 4bddb8541bec..9781e79a5127 100644
+index 9781e79a5127..5fa1ae26f075 100644
 --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
 +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -70,20 +70,19 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+@@ -70,6 +70,13 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
  	}
  }
  
--static inline bool __hfgxtr_traps_required(void)
--{
--	if (cpus_have_final_cap(ARM64_SME))
--		return true;
--
--	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
--		return true;
++#define compute_clr_set(vcpu, reg, clr, set)				\
++	do {								\
++		u64 hfg;						\
++		hfg = __vcpu_sys_reg(vcpu, reg) & ~__ ## reg ## _RES0;	\
++		set |= hfg & __ ## reg ## _MASK; 			\
++		clr |= ~hfg & __ ## reg ## _nMASK; 			\
++	} while(0)
  
--	return false;
--}
  
--static inline void __activate_traps_hfgxtr(void)
-+static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
- {
-+	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
- 	u64 r_clr = 0, w_clr = 0, r_set = 0, w_set = 0, tmp;
-+	u64 r_val, w_val;
-+
-+	if (!cpus_have_final_cap(ARM64_HAS_FGT))
-+		return;
-+
-+	ctxt_sys_reg(hctxt, HFGRTR_EL2) = read_sysreg_s(SYS_HFGRTR_EL2);
-+	ctxt_sys_reg(hctxt, HFGWTR_EL2) = read_sysreg_s(SYS_HFGWTR_EL2);
- 
- 	if (cpus_have_final_cap(ARM64_SME)) {
- 		tmp = HFGxTR_EL2_nSMPRI_EL1_MASK | HFGxTR_EL2_nTPIDR2_EL0_MASK;
-@@ -98,26 +97,30 @@ static inline void __activate_traps_hfgxtr(void)
+ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+@@ -97,6 +104,10 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
  	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
  		w_set |= HFGxTR_EL2_TCR_EL1_MASK;
  
--	sysreg_clear_set_s(SYS_HFGRTR_EL2, r_clr, r_set);
--	sysreg_clear_set_s(SYS_HFGWTR_EL2, w_clr, w_set);
++	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
++		compute_clr_set(vcpu, HFGRTR_EL2, r_clr, r_set);
++		compute_clr_set(vcpu, HFGWTR_EL2, w_clr, w_set);
++	}
+ 
+ 	r_val = __HFGRTR_EL2_nMASK & ~HFGxTR_EL2_nACCDATA_EL1;
+ 	r_val |= r_set;
+@@ -108,6 +119,38 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+ 
+ 	write_sysreg_s(r_val, SYS_HFGRTR_EL2);
+ 	write_sysreg_s(w_val, SYS_HFGWTR_EL2);
 +
-+	r_val = __HFGRTR_EL2_nMASK & ~HFGxTR_EL2_nACCDATA_EL1;
++	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
++		return;
++
++	ctxt_sys_reg(hctxt, HFGITR_EL2) = read_sysreg_s(SYS_HFGITR_EL2);
++
++	r_set = r_clr = 0;
++	compute_clr_set(vcpu, HFGITR_EL2, r_clr, r_set);
++	r_val = __HFGITR_EL2_nMASK;
 +	r_val |= r_set;
 +	r_val &= ~r_clr;
 +
-+	w_val = __HFGWTR_EL2_nMASK & ~HFGxTR_EL2_nACCDATA_EL1;
++	write_sysreg_s(r_val, SYS_HFGITR_EL2);
++
++	ctxt_sys_reg(hctxt, HDFGRTR_EL2) = read_sysreg_s(SYS_HDFGRTR_EL2);
++	ctxt_sys_reg(hctxt, HDFGWTR_EL2) = read_sysreg_s(SYS_HDFGWTR_EL2);
++
++	r_clr = r_set = w_clr = w_set = 0;
++
++	compute_clr_set(vcpu, HDFGRTR_EL2, r_clr, r_set);
++	compute_clr_set(vcpu, HDFGWTR_EL2, w_clr, w_set);
++
++	r_val = __HDFGRTR_EL2_nMASK;
++	r_val |= r_set;
++	r_val &= ~r_clr;
++
++	w_val = __HDFGWTR_EL2_nMASK;
 +	w_val |= w_set;
 +	w_val &= ~w_clr;
 +
-+	write_sysreg_s(r_val, SYS_HFGRTR_EL2);
-+	write_sysreg_s(w_val, SYS_HFGWTR_EL2);
++	write_sysreg_s(r_val, SYS_HDFGRTR_EL2);
++	write_sysreg_s(w_val, SYS_HDFGWTR_EL2);
  }
  
--static inline void __deactivate_traps_hfgxtr(void)
-+static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
- {
--	u64 r_clr = 0, w_clr = 0, r_set = 0, w_set = 0, tmp;
-+	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+ static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+@@ -120,7 +163,12 @@ static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+ 	write_sysreg_s(ctxt_sys_reg(hctxt, HFGRTR_EL2), SYS_HFGRTR_EL2);
+ 	write_sysreg_s(ctxt_sys_reg(hctxt, HFGWTR_EL2), SYS_HFGWTR_EL2);
  
--	if (cpus_have_final_cap(ARM64_SME)) {
--		tmp = HFGxTR_EL2_nSMPRI_EL1_MASK | HFGxTR_EL2_nTPIDR2_EL0_MASK;
-+	if (!cpus_have_final_cap(ARM64_HAS_FGT))
++	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
 +		return;
  
--		r_set |= tmp;
--		w_set |= tmp;
--	}
-+	write_sysreg_s(ctxt_sys_reg(hctxt, HFGRTR_EL2), SYS_HFGRTR_EL2);
-+	write_sysreg_s(ctxt_sys_reg(hctxt, HFGWTR_EL2), SYS_HFGWTR_EL2);
- 
--	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
--		w_clr |= HFGxTR_EL2_TCR_EL1_MASK;
- 
--	sysreg_clear_set_s(SYS_HFGRTR_EL2, r_clr, r_set);
--	sysreg_clear_set_s(SYS_HFGWTR_EL2, w_clr, w_set);
++	write_sysreg_s(ctxt_sys_reg(hctxt, HFGITR_EL2), SYS_HFGITR_EL2);
++	write_sysreg_s(ctxt_sys_reg(hctxt, HDFGRTR_EL2), SYS_HDFGRTR_EL2);
++	write_sysreg_s(ctxt_sys_reg(hctxt, HDFGWTR_EL2), SYS_HDFGWTR_EL2);
  }
  
  static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
-@@ -145,8 +148,7 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
- 	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
- 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
- 
--	if (__hfgxtr_traps_required())
--		__activate_traps_hfgxtr();
-+	__activate_traps_hfgxtr(vcpu);
- }
- 
- static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
-@@ -162,8 +164,7 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
- 		vcpu_clear_flag(vcpu, PMUSERENR_ON_CPU);
- 	}
- 
--	if (__hfgxtr_traps_required())
--		__deactivate_traps_hfgxtr();
-+	__deactivate_traps_hfgxtr(vcpu);
- }
- 
- static inline void ___activate_traps(struct kvm_vcpu *vcpu)
 -- 
 2.34.1
 
