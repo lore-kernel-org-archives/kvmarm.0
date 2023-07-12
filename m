@@ -1,224 +1,176 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F85924166
-	for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 15:17:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E74F9C433CA;
-	Wed, 12 Jul 2023 15:17:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689175056;
-	bh=/t2HindnsHFyw/uzvyCsPY17kD2TJkMO+2PB7mGjRYE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qpVnODZ+8oHv5QXwQGppTjvIE7odOkV5tUyvvfCYyC0mRTCHHcwcHvKjIqK25Hrtt
-	 PSDkaOaP0zXLyPUTqK/kov+9rcxD26CoHEz2dD6jqVHSx43inbflx3jUCgj7HkOEvb
-	 nL+az7mhOd2tXlnNVQD7GvUFsG9T+bHJSLUIh5fiFjC1WWT4eAFLydtuxFi5vN5h78
-	 +zgszQ3d26ZeZe3BFQi1Qa6PgkIUiMhyLs0aRlD/tBS06GDxOQ718N4Sb84/toDGTs
-	 w5qlboybChMymvbPw12K2XiIWQYSkhF2niyDcngo6229n5DoO8JpWnH54aCkOrEJOd
-	 ta5E90FIBEvLQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qJbIr-00CUNF-Ca;
-	Wed, 12 Jul 2023 15:58:53 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Mark Brown <broonie@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Darren Hart <darren@os.amperecomputing.com>,
-	Miguel Luis <miguel.luis@oracle.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 21/27] KVM: arm64: nv: Add trap forwarding for HFGITR_EL2
-Date: Wed, 12 Jul 2023 15:58:04 +0100
-Message-Id: <20230712145810.3864793-22-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230712145810.3864793-1-maz@kernel.org>
-References: <20230712145810.3864793-1-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 598B724169
+	for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 15:29:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689175794;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0wpptoa13iOAA2eHt3VMAIlTNSbRsG5Q+DUZsMk48HA=;
+	b=L0CivdoQdcHHLZF1W5g6vv5cbn0p4+ZXncEK8pshV/uUsadDvlyjguATxGbJtoYU87joiZ
+	p/skOqhDThbL8EL7KNYQlHeOyrgrA9fgPN0xko1CWjtAWI46J/rx/lIMiolavAeRlwTEJR
+	AqVlf644lQQ+UOW2JfZCnNy/sU11dAc=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-664-VddD-l8oO1G4WVCyymScOA-1; Wed, 12 Jul 2023 11:29:49 -0400
+X-MC-Unique: VddD-l8oO1G4WVCyymScOA-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7659cb9c3b3so693739785a.1
+        for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 08:29:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689175769; x=1689780569;
+        h=content-transfer-encoding:in-reply-to:references:reply-to:cc:to
+         :from:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0wpptoa13iOAA2eHt3VMAIlTNSbRsG5Q+DUZsMk48HA=;
+        b=DazLMbDLnmD0P23v5gPO1sUXrkHPZCoKyF2JdQzripTNzCABE99hjWSZx+QcQ8XeWp
+         JV7tFT00aiHU+7BrrRatHSbAl8vbRpMrsDzpY8LDOuDKvqxt/TpzpCfi8WCwPo4JsIAv
+         k7KgsexzspUSxbsKs2BoqzWKqjDIktNmdsD3l5pr2gg239TBo7TEcq2uR9RNKuhZe1ZY
+         LbOSkGeWczh5bQoiziYq1XytPT7Hk3wWVe3Adj9RVIFmH4PiP/7EEllM0olqh5z6oC02
+         FvzJ6GepQpRE0pq5hH5EhloHuIlL5VWIYksRFXKyUCJ5FqG4r4JQIa+LXO2wpYprbLwL
+         su5w==
+X-Gm-Message-State: ABy/qLZEut40XOKLn/y42PVEqIJ5Sp4SkEN+++ImuAM4Q7ZYKWwsB3tT
+	mF45tJf0f+4YH472uyix8XB6N55ABSpNNZLLIsdTG7AN/LC4QzzSIp4I0ouQAXw0oqljuQ5A/6r
+	YgKaZ4SHXlNYIZyiDJ4JvDtI/
+X-Received: by 2002:a05:620a:24d3:b0:765:a828:7d02 with SMTP id m19-20020a05620a24d300b00765a8287d02mr21371757qkn.24.1689175769595;
+        Wed, 12 Jul 2023 08:29:29 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFwqlGaun9VRfsJk+xBXYQQRWJBoUgTzbPMVWczaf/7qJOdeBt6gjx7mXtgfckw9FV3yiXQSA==
+X-Received: by 2002:a05:620a:24d3:b0:765:a828:7d02 with SMTP id m19-20020a05620a24d300b00765a8287d02mr21371739qkn.24.1689175769353;
+        Wed, 12 Jul 2023 08:29:29 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id w14-20020a05620a148e00b00767b4fa5d96sm2231565qkj.27.2023.07.12.08.29.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Jul 2023 08:29:28 -0700 (PDT)
+Message-ID: <3501eaf9-5b24-8c4c-939b-79cdc43cfc25@redhat.com>
+Date: Wed, 12 Jul 2023 17:29:24 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH 00/27] KVM: arm64: NV trap forwarding infrastructure
+From: Eric Auger <eric.auger@redhat.com>
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Mark Brown
+ <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Will Deacon <will@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>,
+ Chase Conklin <chase.conklin@arm.com>,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Darren Hart <darren@os.amperecomputing.com>,
+ Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+Reply-To: eric.auger@redhat.com, eric.auger@redhat.com
+References: <20230712145810.3864793-1-maz@kernel.org>
+ <f1e3b52d-bb6b-6d1d-5194-1a445a1d7cf1@redhat.com>
+In-Reply-To: <f1e3b52d-bb6b-6d1d-5194-1a445a1d7cf1@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Similarly, implement the trap forwarding for instructions affected
-by HFGITR_EL2.
+Hi,
 
-Note that the TLBI*nXS instructions should be affected by HCRX_EL2,
-which will be dealt with down the line.
+On 7/12/23 17:16, Eric Auger wrote:
+> Hi Marc,
+> 
+> On 7/12/23 16:57, Marc Zyngier wrote:
+>> As people are getting tired of seeing the full NV series, I've
+>> extracted some of the easy stuff which I'm targeting for 6.6.
+>>
+>> This implements the so called "trap forwarding" infrastructure, which
+>> gets used when we take a trap from an L2 guest and that the L1 guest
+>> wants to see the trap for itself.
+>>
+>> Most of the series is pretty boring stuff, mostly a long list of
+>> encodings which are mapped to a set of trap bits. I swear they are
+>> correct. Sort of.
+>>
+>> The interesting bit is around how we compute the trap result, which is
+>> pretty complex due to the layers of crap the architecture has piled
+>> over the years (a single op can be trapped by multiple coarse grained
+>> trap bits, or a fine grained trap bit, which may itself be conditioned
+>> by another control bit -- madness).
+>>
+>> This also results in some rework of both the FGT stuff (for which I
+>> carry a patch from Mark) and newly introduced the HCRX support.
+>>
+>> With that (and the rest of the NV series[1]), FGT gets exposed to guests
+>> and the trapping seems to work as expected.
+>>
+>> [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-6.6-WIP
+> 
+> I have not received patches 10-27 and I do not see them on lore archive
+> https://lore.kernel.org/all/20230712145810.3864793-1-maz@kernel.org/#r
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_arm.h |   4 ++
- arch/arm64/kvm/emulate-nested.c  | 109 +++++++++++++++++++++++++++++++
- 2 files changed, 113 insertions(+)
+Hum I was too eager to see them. Now I have received everything and they
+are all visible on lore.
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 85908aa18908..809bc86acefd 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -354,6 +354,10 @@
- #define __HFGWTR_EL2_MASK	GENMASK(49, 0)
- #define __HFGWTR_EL2_nMASK	(GENMASK(55, 54) | BIT(50))
- 
-+#define __HFGITR_EL2_RES0	GENMASK(63, 57)
-+#define __HFGITR_EL2_MASK	GENMASK(54, 0)
-+#define __HFGITR_EL2_nMASK	GENMASK(56, 55)
-+
- /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
- #define HPFAR_MASK	(~UL(0xf))
- /*
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 51b9df19bdfa..d4838b395566 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -897,6 +897,7 @@ static DEFINE_XARRAY(sr_forward_xa);
- enum fgt_group_id {
- 	__NO_FGT_GROUP__,
- 	HFGxTR_GROUP,
-+	HFGITR_GROUP,
- };
- 
- #define SR_FGT(sr, g, b, p)					\
-@@ -974,6 +975,110 @@ static const struct encoding_to_trap_config encoding_to_fgt[] __initdata = {
- 	SR_FGT(SYS_AIDR_EL1, 		HFGxTR, AIDR_EL1, 1),
- 	SR_FGT(SYS_AFSR1_EL1, 		HFGxTR, AFSR1_EL1, 1),
- 	SR_FGT(SYS_AFSR0_EL1, 		HFGxTR, AFSR0_EL1, 1),
-+	/* HFGITR_EL2 */
-+	SR_FGT(OP_BRB_IALL, 		HFGITR, nBRBIALL, 0),
-+	SR_FGT(OP_BRB_INJ, 		HFGITR, nBRBINJ, 0),
-+	SR_FGT(SYS_DC_CVAC, 		HFGITR, DCCVAC, 1),
-+	SR_FGT(SYS_DC_CGVAC, 		HFGITR, DCCVAC, 1),
-+	SR_FGT(SYS_DC_CGDVAC, 		HFGITR, DCCVAC, 1),
-+	SR_FGT(OP_CPP_RCTX, 		HFGITR, CPPRCTX, 1),
-+	SR_FGT(OP_DVP_RCTX, 		HFGITR, DVPRCTX, 1),
-+	SR_FGT(OP_CFP_RCTX, 		HFGITR, CFPRCTX, 1),
-+	SR_FGT(OP_TLBI_VAALE1, 		HFGITR, TLBIVAALE1, 1),
-+	SR_FGT(OP_TLBI_VALE1, 		HFGITR, TLBIVALE1, 1),
-+	SR_FGT(OP_TLBI_VAAE1, 		HFGITR, TLBIVAAE1, 1),
-+	SR_FGT(OP_TLBI_ASIDE1, 		HFGITR, TLBIASIDE1, 1),
-+	SR_FGT(OP_TLBI_VAE1, 		HFGITR, TLBIVAE1, 1),
-+	SR_FGT(OP_TLBI_VMALLE1, 	HFGITR, TLBIVMALLE1, 1),
-+	SR_FGT(OP_TLBI_RVAALE1, 	HFGITR, TLBIRVAALE1, 1),
-+	SR_FGT(OP_TLBI_RVALE1, 		HFGITR, TLBIRVALE1, 1),
-+	SR_FGT(OP_TLBI_RVAAE1, 		HFGITR, TLBIRVAAE1, 1),
-+	SR_FGT(OP_TLBI_RVAE1, 		HFGITR, TLBIRVAE1, 1),
-+	SR_FGT(OP_TLBI_RVAALE1IS, 	HFGITR, TLBIRVAALE1IS, 1),
-+	SR_FGT(OP_TLBI_RVALE1IS, 	HFGITR, TLBIRVALE1IS, 1),
-+	SR_FGT(OP_TLBI_RVAAE1IS, 	HFGITR, TLBIRVAAE1IS, 1),
-+	SR_FGT(OP_TLBI_RVAE1IS, 	HFGITR, TLBIRVAE1IS, 1),
-+	SR_FGT(OP_TLBI_VAALE1IS, 	HFGITR, TLBIVAALE1IS, 1),
-+	SR_FGT(OP_TLBI_VALE1IS, 	HFGITR, TLBIVALE1IS, 1),
-+	SR_FGT(OP_TLBI_VAAE1IS, 	HFGITR, TLBIVAAE1IS, 1),
-+	SR_FGT(OP_TLBI_ASIDE1IS, 	HFGITR, TLBIASIDE1IS, 1),
-+	SR_FGT(OP_TLBI_VAE1IS, 		HFGITR, TLBIVAE1IS, 1),
-+	SR_FGT(OP_TLBI_VMALLE1IS, 	HFGITR, TLBIVMALLE1IS, 1),
-+	SR_FGT(OP_TLBI_RVAALE1OS, 	HFGITR, TLBIRVAALE1OS, 1),
-+	SR_FGT(OP_TLBI_RVALE1OS, 	HFGITR, TLBIRVALE1OS, 1),
-+	SR_FGT(OP_TLBI_RVAAE1OS, 	HFGITR, TLBIRVAAE1OS, 1),
-+	SR_FGT(OP_TLBI_RVAE1OS, 	HFGITR, TLBIRVAE1OS, 1),
-+	SR_FGT(OP_TLBI_VAALE1OS, 	HFGITR, TLBIVAALE1OS, 1),
-+	SR_FGT(OP_TLBI_VALE1OS, 	HFGITR, TLBIVALE1OS, 1),
-+	SR_FGT(OP_TLBI_VAAE1OS, 	HFGITR, TLBIVAAE1OS, 1),
-+	SR_FGT(OP_TLBI_ASIDE1OS, 	HFGITR, TLBIASIDE1OS, 1),
-+	SR_FGT(OP_TLBI_VAE1OS, 		HFGITR, TLBIVAE1OS, 1),
-+	SR_FGT(OP_TLBI_VMALLE1OS, 	HFGITR, TLBIVMALLE1OS, 1),
-+	/* FIXME: nXS variants must be checked against HCRX_EL2.FGTnXS */
-+	SR_FGT(OP_TLBI_VAALE1NXS, 	HFGITR, TLBIVAALE1, 1),
-+	SR_FGT(OP_TLBI_VALE1NXS, 	HFGITR, TLBIVALE1, 1),
-+	SR_FGT(OP_TLBI_VAAE1NXS, 	HFGITR, TLBIVAAE1, 1),
-+	SR_FGT(OP_TLBI_ASIDE1NXS, 	HFGITR, TLBIASIDE1, 1),
-+	SR_FGT(OP_TLBI_VAE1NXS, 	HFGITR, TLBIVAE1, 1),
-+	SR_FGT(OP_TLBI_VMALLE1NXS, 	HFGITR, TLBIVMALLE1, 1),
-+	SR_FGT(OP_TLBI_RVAALE1NXS, 	HFGITR, TLBIRVAALE1, 1),
-+	SR_FGT(OP_TLBI_RVALE1NXS, 	HFGITR, TLBIRVALE1, 1),
-+	SR_FGT(OP_TLBI_RVAAE1NXS, 	HFGITR, TLBIRVAAE1, 1),
-+	SR_FGT(OP_TLBI_RVAE1NXS, 	HFGITR, TLBIRVAE1, 1),
-+	SR_FGT(OP_TLBI_RVAALE1ISNXS, 	HFGITR, TLBIRVAALE1IS, 1),
-+	SR_FGT(OP_TLBI_RVALE1ISNXS, 	HFGITR, TLBIRVALE1IS, 1),
-+	SR_FGT(OP_TLBI_RVAAE1ISNXS, 	HFGITR, TLBIRVAAE1IS, 1),
-+	SR_FGT(OP_TLBI_RVAE1ISNXS, 	HFGITR, TLBIRVAE1IS, 1),
-+	SR_FGT(OP_TLBI_VAALE1ISNXS, 	HFGITR, TLBIVAALE1IS, 1),
-+	SR_FGT(OP_TLBI_VALE1ISNXS, 	HFGITR, TLBIVALE1IS, 1),
-+	SR_FGT(OP_TLBI_VAAE1ISNXS, 	HFGITR, TLBIVAAE1IS, 1),
-+	SR_FGT(OP_TLBI_ASIDE1ISNXS, 	HFGITR, TLBIASIDE1IS, 1),
-+	SR_FGT(OP_TLBI_VAE1ISNXS, 	HFGITR, TLBIVAE1IS, 1),
-+	SR_FGT(OP_TLBI_VMALLE1ISNXS, 	HFGITR, TLBIVMALLE1IS, 1),
-+	SR_FGT(OP_TLBI_RVAALE1OSNXS, 	HFGITR, TLBIRVAALE1OS, 1),
-+	SR_FGT(OP_TLBI_RVALE1OSNXS, 	HFGITR, TLBIRVALE1OS, 1),
-+	SR_FGT(OP_TLBI_RVAAE1OSNXS, 	HFGITR, TLBIRVAAE1OS, 1),
-+	SR_FGT(OP_TLBI_RVAE1OSNXS, 	HFGITR, TLBIRVAE1OS, 1),
-+	SR_FGT(OP_TLBI_VAALE1OSNXS, 	HFGITR, TLBIVAALE1OS, 1),
-+	SR_FGT(OP_TLBI_VALE1OSNXS, 	HFGITR, TLBIVALE1OS, 1),
-+	SR_FGT(OP_TLBI_VAAE1OSNXS, 	HFGITR, TLBIVAAE1OS, 1),
-+	SR_FGT(OP_TLBI_ASIDE1OSNXS, 	HFGITR, TLBIASIDE1OS, 1),
-+	SR_FGT(OP_TLBI_VAE1OSNXS, 	HFGITR, TLBIVAE1OS, 1),
-+	SR_FGT(OP_TLBI_VMALLE1OSNXS, 	HFGITR, TLBIVMALLE1OS, 1),
-+	SR_FGT(OP_AT_S1E1WP, 		HFGITR, ATS1E1WP, 1),
-+	SR_FGT(OP_AT_S1E1RP, 		HFGITR, ATS1E1RP, 1),
-+	SR_FGT(OP_AT_S1E0W, 		HFGITR, ATS1E0W, 1),
-+	SR_FGT(OP_AT_S1E0R, 		HFGITR, ATS1E0R, 1),
-+	SR_FGT(OP_AT_S1E1W, 		HFGITR, ATS1E1W, 1),
-+	SR_FGT(OP_AT_S1E1R, 		HFGITR, ATS1E1R, 1),
-+	SR_FGT(SYS_DC_ZVA, 		HFGITR, DCZVA, 1),
-+	SR_FGT(SYS_DC_GVA, 		HFGITR, DCZVA, 1),
-+	SR_FGT(SYS_DC_GZVA, 		HFGITR, DCZVA, 1),
-+	SR_FGT(SYS_DC_CIVAC, 		HFGITR, DCCIVAC, 1),
-+	SR_FGT(SYS_DC_CIGVAC, 		HFGITR, DCCIVAC, 1),
-+	SR_FGT(SYS_DC_CIGDVAC, 		HFGITR, DCCIVAC, 1),
-+	SR_FGT(SYS_DC_CVADP, 		HFGITR, DCCVADP, 1),
-+	SR_FGT(SYS_DC_CGVADP, 		HFGITR, DCCVADP, 1),
-+	SR_FGT(SYS_DC_CGDVADP, 		HFGITR, DCCVADP, 1),
-+	SR_FGT(SYS_DC_CVAP, 		HFGITR, DCCVAP, 1),
-+	SR_FGT(SYS_DC_CGVAP, 		HFGITR, DCCVAP, 1),
-+	SR_FGT(SYS_DC_CGDVAP, 		HFGITR, DCCVAP, 1),
-+	SR_FGT(SYS_DC_CVAU, 		HFGITR, DCCVAU, 1),
-+	SR_FGT(SYS_DC_CISW, 		HFGITR, DCCISW, 1),
-+	SR_FGT(SYS_DC_CIGSW, 		HFGITR, DCCISW, 1),
-+	SR_FGT(SYS_DC_CIGDSW, 		HFGITR, DCCISW, 1),
-+	SR_FGT(SYS_DC_CSW, 		HFGITR, DCCSW, 1),
-+	SR_FGT(SYS_DC_CGSW, 		HFGITR, DCCSW, 1),
-+	SR_FGT(SYS_DC_CGDSW, 		HFGITR, DCCSW, 1),
-+	SR_FGT(SYS_DC_ISW, 		HFGITR, DCISW, 1),
-+	SR_FGT(SYS_DC_IGSW, 		HFGITR, DCISW, 1),
-+	SR_FGT(SYS_DC_IGDSW, 		HFGITR, DCISW, 1),
-+	SR_FGT(SYS_DC_IVAC, 		HFGITR, DCIVAC, 1),
-+	SR_FGT(SYS_DC_IGVAC, 		HFGITR, DCIVAC, 1),
-+	SR_FGT(SYS_DC_IGDVAC, 		HFGITR, DCIVAC, 1),
-+	SR_FGT(SYS_IC_IVAU, 		HFGITR, ICIVAU, 1),
-+	SR_FGT(SYS_IC_IALLU, 		HFGITR, ICIALLU, 1),
-+	SR_FGT(SYS_IC_IALLUIS, 		HFGITR, ICIALLUIS, 1),
- };
- 
- static union trap_config get_trap_config(u32 sysreg)
-@@ -1107,6 +1212,10 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
- 		else
- 			val = sanitised_sys_reg(vcpu, HFGWTR_EL2);
- 		break;
-+
-+	case HFGITR_GROUP:
-+		val = sanitised_sys_reg(vcpu, HFGITR_EL2);
-+		break;
- 	}
- 
- 	if (tc.fgt != __NO_FGT_GROUP__ && check_fgt_bit(val, tc))
--- 
-2.34.1
+Sorry for the noise
+
+Eric
+> 
+> Thanks
+> 
+> Eric
+>>
+>> Marc Zyngier (26):
+>>   arm64: Add missing VA CMO encodings
+>>   arm64: Add missing ERX*_EL1 encodings
+>>   arm64: Add missing DC ZVA/GVA/GZVA encodings
+>>   arm64: Add TLBI operation encodings
+>>   arm64: Add AT operation encodings
+>>   arm64: Add debug registers affected by HDFGxTR_EL2
+>>   arm64: Add missing BRB/CFP/DVP/CPP instructions
+>>   arm64: Fix HFGxTR_EL2 field naming
+>>   arm64: Add HDFGRTR_EL2 and HDFGWTR_EL2 layouts
+>>   KVM: arm64: Correctly handle ACCDATA_EL1 traps
+>>   KVM: arm64: Add missing HCR_EL2 trap bits
+>>   KVM: arm64: nv: Add FGT registers
+>>   KVM: arm64: Restructure FGT register switching
+>>   KVM: arm64: nv: Add trap forwarding infrastructure
+>>   KVM: arm64: nv: Add trap forwarding for HCR_EL2
+>>   KVM: arm64: nv: Expose FEAT_EVT to nested guests
+>>   KVM: arm64: nv: Add trap forwarding for MDCR_EL2
+>>   KVM: arm64: nv: Add trap forwarding for CNTHCTL_EL2
+>>   KVM: arm64: nv: Add trap forwarding for HFGxTR_EL2
+>>   KVM: arm64: nv: Add trap forwarding for HFGITR_EL2
+>>   KVM: arm64: nv: Add trap forwarding for HDFGxTR_EL2
+>>   KVM: arm64: nv: Add SVC trap forwarding
+>>   KVM: arm64: nv: Add switching support for HFGxTR/HDFGxTR
+>>   KVM: arm64: nv: Expose FGT to nested guests
+>>   KVM: arm64: Move HCRX_EL2 switch to load/put on VHE systems
+>>   KVM: arm64: nv: Add support for HCRX_EL2
+>>
+>> Mark Brown (1):
+>>   arm64: Add feature detection for fine grained traps
+>>
+>>  arch/arm64/include/asm/kvm_arm.h        |   50 +
+>>  arch/arm64/include/asm/kvm_host.h       |    7 +
+>>  arch/arm64/include/asm/kvm_nested.h     |    2 +
+>>  arch/arm64/include/asm/sysreg.h         |  270 +++-
+>>  arch/arm64/kernel/cpufeature.c          |   11 +
+>>  arch/arm64/kvm/arm.c                    |    4 +
+>>  arch/arm64/kvm/emulate-nested.c         | 1703 +++++++++++++++++++++++
+>>  arch/arm64/kvm/handle_exit.c            |   12 +
+>>  arch/arm64/kvm/hyp/include/hyp/switch.h |  126 +-
+>>  arch/arm64/kvm/nested.c                 |   11 +-
+>>  arch/arm64/kvm/sys_regs.c               |   15 +
+>>  arch/arm64/kvm/trace_arm.h              |   19 +
+>>  arch/arm64/tools/cpucaps                |    1 +
+>>  arch/arm64/tools/sysreg                 |  141 +-
+>>  14 files changed, 2326 insertions(+), 46 deletions(-)
+>>
+> 
 
