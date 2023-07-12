@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E000824169
-	for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 15:17:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2872CC433C8;
-	Wed, 12 Jul 2023 15:17:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ADE924173
+	for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 15:17:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33918C433C9;
+	Wed, 12 Jul 2023 15:17:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689175033;
-	bh=gBwAfq9SsNAPW8vcF4E9vrGRDVAxYUToe2OaoqglIC0=;
+	s=k20201202; t=1689175036;
+	bh=qFiFCwf9NqO0iROI75+6lAUsxudw2m4gH6UKyYL4dW8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iXIfGAQUdY1zntNxJNiIleDSAzf3hyfXoDAUbOL8ZDgnE0ldCRNpaMhWXNZousZWj
-	 9B/sE/mqhkrvqrL1TqdaD31ojp1CNGBT3Gf83eWu4Qsi6eYh7b0KAvPo+9jeMmUbm1
-	 C/rJ6Uy46JxiO0806LyQLOYGHaqy1XetK9WP0IN1uCPFUaEiGH0imvgRNUU7m9y5wL
-	 meUmzMdIxOcwF9R8U2+ys9/29pClKDx+NQDWRF+6xZtDYuHhvp2dn7iiQe2WzxLsVT
-	 xMJ6PzidR5bXKRLLS1kTJfSa9+H9FOfI/wy0HRv9v3M99rOojlNFfHapuhFzqbmy3r
-	 9pzQ7KepdI9sg==
+	b=OoUZFlzCbmAF2+gAlcnxd9WSk1eXLyfM/rb21XerbUo8D50XBIuYU4QWUi7BaM5Ij
+	 kALFGEzhT4XraOkpGTdE5/dd9lwXidbtK5X5iCY2a694NMtAIaOj1t0XCXa1V+vYjY
+	 ajhXmrhDVuVeoHfDQOoQyllBd8fC1uBkhwn5bnTxtebzd5PvK4R8D8LeRyqfV4sUB5
+	 PQWcy3XvJHB+1/iWKqWLyfEwj5cfzPHSS93CGlIdu07WJVecA0M9G1mzZE1CTt41pW
+	 YSoCpwPspxp2PoGwxL1FeVRNtPMWcOtKLCWUIRP5XLMjTAurTEfqqWVSbdvuODX9DT
+	 tCqICpPPM7hkQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qJbIp-00CUNF-Vu;
-	Wed, 12 Jul 2023 15:58:52 +0100
+	id 1qJbIr-00CUNF-2M;
+	Wed, 12 Jul 2023 15:58:53 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 16/27] KVM: arm64: nv: Add trap forwarding for HCR_EL2
-Date: Wed, 12 Jul 2023 15:57:59 +0100
-Message-Id: <20230712145810.3864793-17-maz@kernel.org>
+Subject: [PATCH 20/27] KVM: arm64: nv: Add trap forwarding for HFGxTR_EL2
+Date: Wed, 12 Jul 2023 15:58:03 +0100
+Message-Id: <20230712145810.3864793-21-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230712145810.3864793-1-maz@kernel.org>
 References: <20230712145810.3864793-1-maz@kernel.org>
@@ -58,527 +58,194 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Describe the HCR_EL2 register, and associate it with all the sysregs
-it allows to trap.
+Fine Grained Traps are fun. Not.
+
+Implement the trap forwarding for traps describer by HFGxTR_EL2,
+reusing the Coarse Grained Traps infrastructure previously implemented.
+
+Each sysreg/instruction inserted in the xarray gets a FGT group
+(vaguely equivalent to a register number), a bit number in that register,
+and a polarity.
+
+It is then pretty easy to check the FGT state at handling time, just
+like we do for the coarse version (it is just faster).
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/emulate-nested.c | 475 ++++++++++++++++++++++++++++++++
- 1 file changed, 475 insertions(+)
+ arch/arm64/kvm/emulate-nested.c | 133 +++++++++++++++++++++++++++++++-
+ 1 file changed, 132 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 5bab2e85d70c..51901e85e43d 100644
+index c07c0f3361d7..51b9df19bdfa 100644
 --- a/arch/arm64/kvm/emulate-nested.c
 +++ b/arch/arm64/kvm/emulate-nested.c
-@@ -37,12 +37,47 @@ enum coarse_grain_trap_id {
- 	 * on their own instead of being part of a combination of
- 	 * trap controls.
- 	 */
-+	CGT_HCR_TID1,
-+	CGT_HCR_TID2,
-+	CGT_HCR_TID3,
-+	CGT_HCR_IMO,
-+	CGT_HCR_FMO,
-+	CGT_HCR_TIDCP,
-+	CGT_HCR_TACR,
-+	CGT_HCR_TSW,
-+	CGT_HCR_TPC,
-+	CGT_HCR_TPU,
-+	CGT_HCR_TTLB,
-+	CGT_HCR_TVM,
-+	CGT_HCR_TDZ,
-+	CGT_HCR_TRVM,
-+	CGT_HCR_TLOR,
-+	CGT_HCR_TERR,
-+	CGT_HCR_APK,
-+	CGT_HCR_NV,
-+	CGT_HCR_NV1,
-+	CGT_HCR_AT,
-+	CGT_HCR_FIEN,
-+	CGT_HCR_TID4,
-+	CGT_HCR_TICAB,
-+	CGT_HCR_TOCU,
-+	CGT_HCR_ENSCXT,
-+	CGT_HCR_TTLBIS,
-+	CGT_HCR_TTLBOS,
- 
- 	/*
- 	 * Anything after this point is a combination of trap controls,
- 	 * which all must be evaluated to decide what to do.
- 	 */
- 	__MULTIPLE_CONTROL_BITS__,
-+	CGT_HCR_IMO_FMO = __MULTIPLE_CONTROL_BITS__,
-+	CGT_HCR_TID2_TID4,
-+	CGT_HCR_TTLB_TTLBIS,
-+	CGT_HCR_TTLB_TTLBOS,
-+	CGT_HCR_TVM_TRVM,
-+	CGT_HCR_TPU_TICAB,
-+	CGT_HCR_TPU_TOCU,
-+	CGT_HCR_NV1_ENSCXT,
- 
- 	/*
- 	 * Anything after this point requires a callback evaluating a
-@@ -52,6 +87,168 @@ enum coarse_grain_trap_id {
- };
- 
- static const struct trap_bits coarse_trap_bits[] = {
-+	[CGT_HCR_TID1] = {
-+		.index		= HCR_EL2,
-+		.value 		= HCR_TID1,
-+		.mask		= HCR_TID1,
-+		.behaviour	= BEHAVE_FORWARD_READ,
-+	},
-+	[CGT_HCR_TID2] = {
-+		.index		= HCR_EL2,
-+		.value 		= HCR_TID2,
-+		.mask		= HCR_TID2,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_HCR_TID3] = {
-+		.index		= HCR_EL2,
-+		.value 		= HCR_TID3,
-+		.mask		= HCR_TID3,
-+		.behaviour	= BEHAVE_FORWARD_READ,
-+	},
-+	[CGT_HCR_IMO] = {
-+		.index		= HCR_EL2,
-+		.value 		= HCR_IMO,
-+		.mask		= HCR_IMO,
-+		.behaviour	= BEHAVE_FORWARD_WRITE,
-+	},
-+	[CGT_HCR_FMO] = {
-+		.index		= HCR_EL2,
-+		.value 		= HCR_FMO,
-+		.mask		= HCR_FMO,
-+		.behaviour	= BEHAVE_FORWARD_WRITE,
-+	},
-+	[CGT_HCR_TIDCP] = {
-+		.index		= HCR_EL2,
-+		.value		= HCR_TIDCP,
-+		.mask		= HCR_TIDCP,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_HCR_TACR] = {
-+		.index		= HCR_EL2,
-+		.value		= HCR_TACR,
-+		.mask		= HCR_TACR,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_HCR_TSW] = {
-+		.index		= HCR_EL2,
-+		.value		= HCR_TSW,
-+		.mask		= HCR_TSW,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_HCR_TPC] = {
-+		.index		= HCR_EL2,
-+		.value		= HCR_TPC,
-+		.mask		= HCR_TPC,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_HCR_TPU] = {
-+		.index		= HCR_EL2,
-+		.value		= HCR_TPU,
-+		.mask		= HCR_TPU,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_HCR_TTLB] = {
-+		.index		= HCR_EL2,
-+		.value		= HCR_TTLB,
-+		.mask		= HCR_TTLB,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_HCR_TVM] = {
-+		.index		= HCR_EL2,
-+		.value		= HCR_TVM,
-+		.mask		= HCR_TVM,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_HCR_TDZ] = {
-+		.index		= HCR_EL2,
-+		.value		= HCR_TDZ,
-+		.mask		= HCR_TDZ,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_HCR_TRVM] = {
-+		.index		= HCR_EL2,
-+		.value		= HCR_TRVM,
-+		.mask		= HCR_TRVM,
-+		.behaviour	= BEHAVE_FORWARD_READ,
-+	},
-+	[CGT_HCR_TLOR] = {
-+		.index		= HCR_EL2,
-+		.value		= HCR_TLOR,
-+		.mask		= HCR_TLOR,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_HCR_TERR] = {
-+		.index		= HCR_EL2,
-+		.value		= HCR_TERR,
-+		.mask		= HCR_TERR,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_HCR_APK] = {
-+		.index		= HCR_EL2,
-+		.value		= 0,
-+		.mask		= HCR_APK,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_HCR_NV] = {
-+		.index		= HCR_EL2,
-+		.value		= HCR_NV,
-+		.mask		= HCR_NV | HCR_NV2,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_HCR_NV1] = {
-+		.index		= HCR_EL2,
-+		.value		= HCR_NV | HCR_NV1,
-+		.mask		= HCR_NV | HCR_NV1 | HCR_NV2,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_HCR_AT] = {
-+		.index		= HCR_EL2,
-+		.value		= HCR_AT,
-+		.mask		= HCR_AT,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_HCR_FIEN] = {
-+		.index		= HCR_EL2,
-+		.value		= HCR_FIEN,
-+		.mask		= HCR_FIEN,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_HCR_TID4] = {
-+		.index		= HCR_EL2,
-+		.value 		= HCR_TID4,
-+		.mask		= HCR_TID4,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_HCR_TICAB] = {
-+		.index		= HCR_EL2,
-+		.value 		= HCR_TICAB,
-+		.mask		= HCR_TICAB,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_HCR_TOCU] = {
-+		.index		= HCR_EL2,
-+		.value 		= HCR_TOCU,
-+		.mask		= HCR_TOCU,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_HCR_ENSCXT] = {
-+		.index		= HCR_EL2,
-+		.value 		= 0,
-+		.mask		= HCR_ENSCXT,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_HCR_TTLBIS] = {
-+		.index		= HCR_EL2,
-+		.value		= HCR_TTLBIS,
-+		.mask		= HCR_TTLBIS,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_HCR_TTLBOS] = {
-+		.index		= HCR_EL2,
-+		.value		= HCR_TTLBOS,
-+		.mask		= HCR_TTLBOS,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
- };
- 
- #define MCB(id, ...)					\
-@@ -61,6 +258,14 @@ static const struct trap_bits coarse_trap_bits[] = {
- 		}
- 
- static const enum coarse_grain_trap_id *coarse_control_combo[] = {
-+	MCB(CGT_HCR_IMO_FMO,		CGT_HCR_IMO, CGT_HCR_FMO),
-+	MCB(CGT_HCR_TID2_TID4,		CGT_HCR_TID2, CGT_HCR_TID4),
-+	MCB(CGT_HCR_TTLB_TTLBIS,	CGT_HCR_TTLB, CGT_HCR_TTLBIS),
-+	MCB(CGT_HCR_TTLB_TTLBOS,	CGT_HCR_TTLB, CGT_HCR_TTLBOS),
-+	MCB(CGT_HCR_TVM_TRVM,		CGT_HCR_TVM, CGT_HCR_TRVM),
-+	MCB(CGT_HCR_TPU_TICAB,		CGT_HCR_TPU, CGT_HCR_TICAB),
-+	MCB(CGT_HCR_TPU_TOCU,		CGT_HCR_TPU, CGT_HCR_TOCU),
-+	MCB(CGT_HCR_NV1_ENSCXT,		CGT_HCR_NV1, CGT_HCR_ENSCXT),
- };
- 
- typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu *);
-@@ -118,6 +323,276 @@ struct encoding_to_trap_config {
-  * re-injected in the nested hypervisor.
-  */
- static const struct encoding_to_trap_config encoding_to_cgt[] __initdata = {
-+	SR_TRAP(SYS_REVIDR_EL1,		CGT_HCR_TID1),
-+	SR_TRAP(SYS_AIDR_EL1,		CGT_HCR_TID1),
-+	SR_TRAP(SYS_SMIDR_EL1,		CGT_HCR_TID1),
-+	SR_TRAP(SYS_CTR_EL0,		CGT_HCR_TID2),
-+	SR_TRAP(SYS_CCSIDR_EL1,		CGT_HCR_TID2_TID4),
-+	SR_TRAP(SYS_CCSIDR2_EL1,	CGT_HCR_TID2_TID4),
-+	SR_TRAP(SYS_CLIDR_EL1,		CGT_HCR_TID2_TID4),
-+	SR_TRAP(SYS_CSSELR_EL1,		CGT_HCR_TID2_TID4),
-+	SR_RANGE_TRAP(SYS_ID_PFR0_EL1,
-+		      sys_reg(3, 0, 0, 7, 7), CGT_HCR_TID3),
-+	SR_TRAP(SYS_ICC_SGI0R_EL1,	CGT_HCR_IMO_FMO),
-+	SR_TRAP(SYS_ICC_ASGI1R_EL1,	CGT_HCR_IMO_FMO),
-+	SR_TRAP(SYS_ICC_SGI1R_EL1,	CGT_HCR_IMO_FMO),
-+	SR_RANGE_TRAP(sys_reg(3, 0, 11, 0, 0),
-+		      sys_reg(3, 0, 11, 15, 7), CGT_HCR_TIDCP),
-+	SR_RANGE_TRAP(sys_reg(3, 1, 11, 0, 0),
-+		      sys_reg(3, 1, 11, 15, 7), CGT_HCR_TIDCP),
-+	SR_RANGE_TRAP(sys_reg(3, 2, 11, 0, 0),
-+		      sys_reg(3, 2, 11, 15, 7), CGT_HCR_TIDCP),
-+	SR_RANGE_TRAP(sys_reg(3, 3, 11, 0, 0),
-+		      sys_reg(3, 3, 11, 15, 7), CGT_HCR_TIDCP),
-+	SR_RANGE_TRAP(sys_reg(3, 4, 11, 0, 0),
-+		      sys_reg(3, 4, 11, 15, 7), CGT_HCR_TIDCP),
-+	SR_RANGE_TRAP(sys_reg(3, 5, 11, 0, 0),
-+		      sys_reg(3, 5, 11, 15, 7), CGT_HCR_TIDCP),
-+	SR_RANGE_TRAP(sys_reg(3, 6, 11, 0, 0),
-+		      sys_reg(3, 6, 11, 15, 7), CGT_HCR_TIDCP),
-+	SR_RANGE_TRAP(sys_reg(3, 7, 11, 0, 0),
-+		      sys_reg(3, 7, 11, 15, 7), CGT_HCR_TIDCP),
-+	SR_RANGE_TRAP(sys_reg(3, 0, 15, 0, 0),
-+		      sys_reg(3, 0, 15, 15, 7), CGT_HCR_TIDCP),
-+	SR_RANGE_TRAP(sys_reg(3, 1, 15, 0, 0),
-+		      sys_reg(3, 1, 15, 15, 7), CGT_HCR_TIDCP),
-+	SR_RANGE_TRAP(sys_reg(3, 2, 15, 0, 0),
-+		      sys_reg(3, 2, 15, 15, 7), CGT_HCR_TIDCP),
-+	SR_RANGE_TRAP(sys_reg(3, 3, 15, 0, 0),
-+		      sys_reg(3, 3, 15, 15, 7), CGT_HCR_TIDCP),
-+	SR_RANGE_TRAP(sys_reg(3, 4, 15, 0, 0),
-+		      sys_reg(3, 4, 15, 15, 7), CGT_HCR_TIDCP),
-+	SR_RANGE_TRAP(sys_reg(3, 5, 15, 0, 0),
-+		      sys_reg(3, 5, 15, 15, 7), CGT_HCR_TIDCP),
-+	SR_RANGE_TRAP(sys_reg(3, 6, 15, 0, 0),
-+		      sys_reg(3, 6, 15, 15, 7), CGT_HCR_TIDCP),
-+	SR_RANGE_TRAP(sys_reg(3, 7, 15, 0, 0),
-+		      sys_reg(3, 7, 15, 15, 7), CGT_HCR_TIDCP),
-+	SR_TRAP(SYS_ACTLR_EL1,		CGT_HCR_TACR),
-+	SR_TRAP(SYS_DC_ISW,		CGT_HCR_TSW),
-+	SR_TRAP(SYS_DC_CSW,		CGT_HCR_TSW),
-+	SR_TRAP(SYS_DC_CISW,		CGT_HCR_TSW),
-+	SR_TRAP(SYS_DC_IGSW,		CGT_HCR_TSW),
-+	SR_TRAP(SYS_DC_IGDSW,		CGT_HCR_TSW),
-+	SR_TRAP(SYS_DC_CGSW,		CGT_HCR_TSW),
-+	SR_TRAP(SYS_DC_CGDSW,		CGT_HCR_TSW),
-+	SR_TRAP(SYS_DC_CIGSW,		CGT_HCR_TSW),
-+	SR_TRAP(SYS_DC_CIGDSW,		CGT_HCR_TSW),
-+	SR_TRAP(SYS_DC_CIVAC,		CGT_HCR_TPC),
-+	SR_TRAP(SYS_DC_CVAC,		CGT_HCR_TPC),
-+	SR_TRAP(SYS_DC_CVAP,		CGT_HCR_TPC),
-+	SR_TRAP(SYS_DC_IVAC,		CGT_HCR_TPC),
-+	SR_TRAP(SYS_DC_CIGVAC,		CGT_HCR_TPC),
-+	SR_TRAP(SYS_DC_CIGDVAC,		CGT_HCR_TPC),
-+	SR_TRAP(SYS_DC_IGVAC,		CGT_HCR_TPC),
-+	SR_TRAP(SYS_DC_IGDVAC,		CGT_HCR_TPC),
-+	SR_TRAP(SYS_DC_CGVAC,		CGT_HCR_TPC),
-+	SR_TRAP(SYS_DC_CGDVAC,		CGT_HCR_TPC),
-+	SR_TRAP(SYS_DC_CGVAP,		CGT_HCR_TPC),
-+	SR_TRAP(SYS_DC_CGDVAP,		CGT_HCR_TPC),
-+	SR_TRAP(SYS_DC_CGVADP,		CGT_HCR_TPC),
-+	SR_TRAP(SYS_DC_CGDVADP,		CGT_HCR_TPC),
-+	SR_TRAP(SYS_IC_IVAU,		CGT_HCR_TPU_TOCU),
-+	SR_TRAP(SYS_IC_IALLU,		CGT_HCR_TPU_TOCU),
-+	SR_TRAP(SYS_IC_IALLUIS,		CGT_HCR_TPU_TICAB),
-+	SR_TRAP(SYS_DC_CVAU,		CGT_HCR_TPU_TOCU),
-+	SR_TRAP(OP_TLBI_RVAE1,		CGT_HCR_TTLB),
-+	SR_TRAP(OP_TLBI_RVAAE1,		CGT_HCR_TTLB),
-+	SR_TRAP(OP_TLBI_RVALE1,		CGT_HCR_TTLB),
-+	SR_TRAP(OP_TLBI_RVAALE1,	CGT_HCR_TTLB),
-+	SR_TRAP(OP_TLBI_VMALLE1,	CGT_HCR_TTLB),
-+	SR_TRAP(OP_TLBI_VAE1,		CGT_HCR_TTLB),
-+	SR_TRAP(OP_TLBI_ASIDE1,		CGT_HCR_TTLB),
-+	SR_TRAP(OP_TLBI_VAAE1,		CGT_HCR_TTLB),
-+	SR_TRAP(OP_TLBI_VALE1,		CGT_HCR_TTLB),
-+	SR_TRAP(OP_TLBI_VAALE1,		CGT_HCR_TTLB),
-+	SR_TRAP(OP_TLBI_RVAE1NXS,	CGT_HCR_TTLB),
-+	SR_TRAP(OP_TLBI_RVAAE1NXS,	CGT_HCR_TTLB),
-+	SR_TRAP(OP_TLBI_RVALE1NXS,	CGT_HCR_TTLB),
-+	SR_TRAP(OP_TLBI_RVAALE1NXS,	CGT_HCR_TTLB),
-+	SR_TRAP(OP_TLBI_VMALLE1NXS,	CGT_HCR_TTLB),
-+	SR_TRAP(OP_TLBI_VAE1NXS,	CGT_HCR_TTLB),
-+	SR_TRAP(OP_TLBI_ASIDE1NXS,	CGT_HCR_TTLB),
-+	SR_TRAP(OP_TLBI_VAAE1NXS,	CGT_HCR_TTLB),
-+	SR_TRAP(OP_TLBI_VALE1NXS,	CGT_HCR_TTLB),
-+	SR_TRAP(OP_TLBI_VAALE1NXS,	CGT_HCR_TTLB),
-+	SR_TRAP(OP_TLBI_RVAE1IS,	CGT_HCR_TTLB_TTLBIS),
-+	SR_TRAP(OP_TLBI_RVAAE1IS,	CGT_HCR_TTLB_TTLBIS),
-+	SR_TRAP(OP_TLBI_RVALE1IS,	CGT_HCR_TTLB_TTLBIS),
-+	SR_TRAP(OP_TLBI_RVAALE1IS,	CGT_HCR_TTLB_TTLBIS),
-+	SR_TRAP(OP_TLBI_VMALLE1IS,	CGT_HCR_TTLB_TTLBIS),
-+	SR_TRAP(OP_TLBI_VAE1IS,		CGT_HCR_TTLB_TTLBIS),
-+	SR_TRAP(OP_TLBI_ASIDE1IS,	CGT_HCR_TTLB_TTLBIS),
-+	SR_TRAP(OP_TLBI_VAAE1IS,	CGT_HCR_TTLB_TTLBIS),
-+	SR_TRAP(OP_TLBI_VALE1IS,	CGT_HCR_TTLB_TTLBIS),
-+	SR_TRAP(OP_TLBI_VAALE1IS,	CGT_HCR_TTLB_TTLBIS),
-+	SR_TRAP(OP_TLBI_RVAE1ISNXS,	CGT_HCR_TTLB_TTLBIS),
-+	SR_TRAP(OP_TLBI_RVAAE1ISNXS,	CGT_HCR_TTLB_TTLBIS),
-+	SR_TRAP(OP_TLBI_RVALE1ISNXS,	CGT_HCR_TTLB_TTLBIS),
-+	SR_TRAP(OP_TLBI_RVAALE1ISNXS,	CGT_HCR_TTLB_TTLBIS),
-+	SR_TRAP(OP_TLBI_VMALLE1ISNXS,	CGT_HCR_TTLB_TTLBIS),
-+	SR_TRAP(OP_TLBI_VAE1ISNXS,	CGT_HCR_TTLB_TTLBIS),
-+	SR_TRAP(OP_TLBI_ASIDE1ISNXS,	CGT_HCR_TTLB_TTLBIS),
-+	SR_TRAP(OP_TLBI_VAAE1ISNXS,	CGT_HCR_TTLB_TTLBIS),
-+	SR_TRAP(OP_TLBI_VALE1ISNXS,	CGT_HCR_TTLB_TTLBIS),
-+	SR_TRAP(OP_TLBI_VAALE1ISNXS,	CGT_HCR_TTLB_TTLBIS),
-+	SR_TRAP(OP_TLBI_VMALLE1OS,	CGT_HCR_TTLB_TTLBOS),
-+	SR_TRAP(OP_TLBI_VAE1OS,		CGT_HCR_TTLB_TTLBOS),
-+	SR_TRAP(OP_TLBI_ASIDE1OS,	CGT_HCR_TTLB_TTLBOS),
-+	SR_TRAP(OP_TLBI_VAAE1OS,	CGT_HCR_TTLB_TTLBOS),
-+	SR_TRAP(OP_TLBI_VALE1OS,	CGT_HCR_TTLB_TTLBOS),
-+	SR_TRAP(OP_TLBI_VAALE1OS,	CGT_HCR_TTLB_TTLBOS),
-+	SR_TRAP(OP_TLBI_RVAE1OS,	CGT_HCR_TTLB_TTLBOS),
-+	SR_TRAP(OP_TLBI_RVAAE1OS,	CGT_HCR_TTLB_TTLBOS),
-+	SR_TRAP(OP_TLBI_RVALE1OS,	CGT_HCR_TTLB_TTLBOS),
-+	SR_TRAP(OP_TLBI_RVAALE1OS,	CGT_HCR_TTLB_TTLBOS),
-+	SR_TRAP(OP_TLBI_VMALLE1OSNXS,	CGT_HCR_TTLB_TTLBOS),
-+	SR_TRAP(OP_TLBI_VAE1OSNXS,	CGT_HCR_TTLB_TTLBOS),
-+	SR_TRAP(OP_TLBI_ASIDE1OSNXS,	CGT_HCR_TTLB_TTLBOS),
-+	SR_TRAP(OP_TLBI_VAAE1OSNXS,	CGT_HCR_TTLB_TTLBOS),
-+	SR_TRAP(OP_TLBI_VALE1OSNXS,	CGT_HCR_TTLB_TTLBOS),
-+	SR_TRAP(OP_TLBI_VAALE1OSNXS,	CGT_HCR_TTLB_TTLBOS),
-+	SR_TRAP(OP_TLBI_RVAE1OSNXS,	CGT_HCR_TTLB_TTLBOS),
-+	SR_TRAP(OP_TLBI_RVAAE1OSNXS,	CGT_HCR_TTLB_TTLBOS),
-+	SR_TRAP(OP_TLBI_RVALE1OSNXS,	CGT_HCR_TTLB_TTLBOS),
-+	SR_TRAP(OP_TLBI_RVAALE1OSNXS,	CGT_HCR_TTLB_TTLBOS),
-+	SR_TRAP(SYS_SCTLR_EL1,		CGT_HCR_TVM_TRVM),
-+	SR_TRAP(SYS_TTBR0_EL1,		CGT_HCR_TVM_TRVM),
-+	SR_TRAP(SYS_TTBR1_EL1,		CGT_HCR_TVM_TRVM),
-+	SR_TRAP(SYS_TCR_EL1,		CGT_HCR_TVM_TRVM),
-+	SR_TRAP(SYS_ESR_EL1,		CGT_HCR_TVM_TRVM),
-+	SR_TRAP(SYS_FAR_EL1,		CGT_HCR_TVM_TRVM),
-+	SR_TRAP(SYS_AFSR0_EL1,		CGT_HCR_TVM_TRVM),
-+	SR_TRAP(SYS_AFSR1_EL1,		CGT_HCR_TVM_TRVM),
-+	SR_TRAP(SYS_MAIR_EL1,		CGT_HCR_TVM_TRVM),
-+	SR_TRAP(SYS_AMAIR_EL1,		CGT_HCR_TVM_TRVM),
-+	SR_TRAP(SYS_CONTEXTIDR_EL1,	CGT_HCR_TVM_TRVM),
-+	SR_TRAP(SYS_DC_ZVA,		CGT_HCR_TDZ),
-+	SR_TRAP(SYS_DC_GVA,		CGT_HCR_TDZ),
-+	SR_TRAP(SYS_DC_GZVA,		CGT_HCR_TDZ),
-+	SR_TRAP(SYS_LORSA_EL1,		CGT_HCR_TLOR),
-+	SR_TRAP(SYS_LOREA_EL1, 		CGT_HCR_TLOR),
-+	SR_TRAP(SYS_LORN_EL1, 		CGT_HCR_TLOR),
-+	SR_TRAP(SYS_LORC_EL1, 		CGT_HCR_TLOR),
-+	SR_TRAP(SYS_LORID_EL1,		CGT_HCR_TLOR),
-+	SR_TRAP(SYS_ERRIDR_EL1,		CGT_HCR_TERR),
-+	SR_TRAP(SYS_ERRSELR_EL1,	CGT_HCR_TERR),
-+	SR_TRAP(SYS_ERXADDR_EL1,	CGT_HCR_TERR),
-+	SR_TRAP(SYS_ERXCTLR_EL1,	CGT_HCR_TERR),
-+	SR_TRAP(SYS_ERXFR_EL1,		CGT_HCR_TERR),
-+	SR_TRAP(SYS_ERXMISC0_EL1,	CGT_HCR_TERR),
-+	SR_TRAP(SYS_ERXMISC1_EL1,	CGT_HCR_TERR),
-+	SR_TRAP(SYS_ERXMISC2_EL1,	CGT_HCR_TERR),
-+	SR_TRAP(SYS_ERXMISC3_EL1,	CGT_HCR_TERR),
-+	SR_TRAP(SYS_ERXSTATUS_EL1,	CGT_HCR_TERR),
-+	SR_TRAP(SYS_APIAKEYLO_EL1,	CGT_HCR_APK),
-+	SR_TRAP(SYS_APIAKEYHI_EL1,	CGT_HCR_APK),
-+	SR_TRAP(SYS_APIBKEYLO_EL1,	CGT_HCR_APK),
-+	SR_TRAP(SYS_APIBKEYHI_EL1,	CGT_HCR_APK),
-+	SR_TRAP(SYS_APDAKEYLO_EL1,	CGT_HCR_APK),
-+	SR_TRAP(SYS_APDAKEYHI_EL1,	CGT_HCR_APK),
-+	SR_TRAP(SYS_APDBKEYLO_EL1,	CGT_HCR_APK),
-+	SR_TRAP(SYS_APDBKEYHI_EL1,	CGT_HCR_APK),
-+	SR_TRAP(SYS_APGAKEYLO_EL1,	CGT_HCR_APK),
-+	SR_TRAP(SYS_APGAKEYHI_EL1,	CGT_HCR_APK),
-+	/* All _EL2 registers */
-+	SR_RANGE_TRAP(sys_reg(3, 4, 0, 0, 0),
-+		      sys_reg(3, 4, 10, 15, 7), CGT_HCR_NV),
-+	SR_RANGE_TRAP(sys_reg(3, 4, 12, 0, 0),
-+		      sys_reg(3, 4, 14, 15, 7), CGT_HCR_NV),
-+	/* All _EL02, _EL12 registers */
-+	SR_RANGE_TRAP(sys_reg(3, 5, 0, 0, 0),
-+		      sys_reg(3, 5, 10, 15, 7), CGT_HCR_NV),
-+	SR_RANGE_TRAP(sys_reg(3, 5, 12, 0, 0),
-+		      sys_reg(3, 5, 14, 15, 7), CGT_HCR_NV),
-+	SR_TRAP(SYS_SP_EL1,		CGT_HCR_NV),
-+	SR_TRAP(OP_AT_S1E2R,		CGT_HCR_NV),
-+	SR_TRAP(OP_AT_S1E2W,		CGT_HCR_NV),
-+	SR_TRAP(OP_AT_S12E1R,		CGT_HCR_NV),
-+	SR_TRAP(OP_AT_S12E1W,		CGT_HCR_NV),
-+	SR_TRAP(OP_AT_S12E0R,		CGT_HCR_NV),
-+	SR_TRAP(OP_AT_S12E0W,		CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_IPAS2E1,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RIPAS2E1,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_IPAS2LE1,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RIPAS2LE1,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RVAE2,		CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RVALE2,		CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_ALLE2,		CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_VAE2,		CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_ALLE1,		CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_VALE2,		CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_VMALLS12E1,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_IPAS2E1NXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RIPAS2E1NXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_IPAS2LE1NXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RIPAS2LE1NXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RVAE2NXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RVALE2NXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_ALLE2NXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_VAE2NXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_ALLE1NXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_VALE2NXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_VMALLS12E1NXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_IPAS2E1IS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RIPAS2E1IS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_IPAS2LE1IS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RIPAS2LE1IS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RVAE2IS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RVALE2IS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_ALLE2IS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_VAE2IS,		CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_ALLE1IS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_VALE2IS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_VMALLS12E1IS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_IPAS2E1ISNXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RIPAS2E1ISNXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_IPAS2LE1ISNXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RIPAS2LE1ISNXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RVAE2ISNXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RVALE2ISNXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_ALLE2ISNXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_VAE2ISNXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_ALLE1ISNXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_VALE2ISNXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_VMALLS12E1ISNXS,CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_ALLE2OS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_VAE2OS,		CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_ALLE1OS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_VALE2OS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_VMALLS12E1OS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_IPAS2E1OS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RIPAS2E1OS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_IPAS2LE1OS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RIPAS2LE1OS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RVAE2OS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RVALE2OS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_ALLE2OSNXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_VAE2OSNXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_ALLE1OSNXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_VALE2OSNXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_VMALLS12E1OSNXS,CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_IPAS2E1OSNXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RIPAS2E1OSNXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_IPAS2LE1OSNXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RIPAS2LE1OSNXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RVAE2OSNXS,	CGT_HCR_NV),
-+	SR_TRAP(OP_TLBI_RVALE2OSNXS,	CGT_HCR_NV),
-+	SR_TRAP(SYS_VBAR_EL1,		CGT_HCR_NV1),
-+	SR_TRAP(SYS_ELR_EL1,		CGT_HCR_NV1),
-+	SR_TRAP(SYS_SPSR_EL1,		CGT_HCR_NV1),
-+	SR_TRAP(SYS_SCXTNUM_EL1,	CGT_HCR_NV1_ENSCXT),
-+	SR_TRAP(SYS_SCXTNUM_EL0,	CGT_HCR_ENSCXT),
-+	SR_TRAP(OP_AT_S1E1R, 		CGT_HCR_AT),
-+	SR_TRAP(OP_AT_S1E1W, 		CGT_HCR_AT),
-+	SR_TRAP(OP_AT_S1E0R, 		CGT_HCR_AT),
-+	SR_TRAP(OP_AT_S1E0W, 		CGT_HCR_AT),
-+	SR_TRAP(OP_AT_S1E1RP, 		CGT_HCR_AT),
-+	SR_TRAP(OP_AT_S1E1WP, 		CGT_HCR_AT),
-+	SR_TRAP(SYS_ERXPFGF_EL1,	CGT_HCR_FIEN),
-+	SR_TRAP(SYS_ERXPFGCTL_EL1,	CGT_HCR_FIEN),
-+	SR_TRAP(SYS_ERXPFGCDN_EL1,	CGT_HCR_FIEN),
-+	SR_TRAP(SYS_SCXTNUM_EL0,	CGT_HCR_ENSCXT),
- };
+@@ -894,6 +894,88 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initdata = {
  
  static DEFINE_XARRAY(sr_forward_xa);
+ 
++enum fgt_group_id {
++	__NO_FGT_GROUP__,
++	HFGxTR_GROUP,
++};
++
++#define SR_FGT(sr, g, b, p)					\
++	{							\
++		.encoding	= sr,				\
++		.end		= sr,				\
++		.tc		= {				\
++			.fgt = g ## _GROUP,			\
++			.bit = g ## _EL2_ ## b ## _SHIFT,	\
++			.pol = p,				\
++		},						\
++	}
++
++static const struct encoding_to_trap_config encoding_to_fgt[] __initdata = {
++	/* HFGTR_EL2, HFGWTR_EL2 */
++	SR_FGT(SYS_TPIDR2_EL0,		HFGxTR, nTPIDR2_EL0, 0),
++	SR_FGT(SYS_SMPRI_EL1,		HFGxTR, nSMPRI_EL1, 0),
++	SR_FGT(SYS_ACCDATA_EL1,		HFGxTR, nACCDATA_EL1, 0),
++	SR_FGT(SYS_ERXADDR_EL1,		HFGxTR, ERXADDR_EL1, 1),
++	SR_FGT(SYS_ERXPFGCDN_EL1,	HFGxTR, ERXPFGCDN_EL1, 1),
++	SR_FGT(SYS_ERXPFGCTL_EL1,	HFGxTR, ERXPFGCTL_EL1, 1),
++	SR_FGT(SYS_ERXPFGF_EL1,		HFGxTR, ERXPFGF_EL1, 1),
++	SR_FGT(SYS_ERXMISC0_EL1,	HFGxTR, ERXMISCn_EL1, 1),
++	SR_FGT(SYS_ERXMISC1_EL1,	HFGxTR, ERXMISCn_EL1, 1),
++	SR_FGT(SYS_ERXMISC2_EL1,	HFGxTR, ERXMISCn_EL1, 1),
++	SR_FGT(SYS_ERXMISC3_EL1,	HFGxTR, ERXMISCn_EL1, 1),
++	SR_FGT(SYS_ERXSTATUS_EL1,	HFGxTR, ERXSTATUS_EL1, 1),
++	SR_FGT(SYS_ERXCTLR_EL1,		HFGxTR, ERXCTLR_EL1, 1),
++	SR_FGT(SYS_ERXFR_EL1,		HFGxTR, ERXFR_EL1, 1),
++	SR_FGT(SYS_ERRSELR_EL1,		HFGxTR, ERRSELR_EL1, 1),
++	SR_FGT(SYS_ERRIDR_EL1,		HFGxTR, ERRIDR_EL1, 1),
++	SR_FGT(SYS_ICC_IGRPEN0_EL1,	HFGxTR, ICC_IGRPENn_EL1, 1),
++	SR_FGT(SYS_ICC_IGRPEN1_EL1,	HFGxTR, ICC_IGRPENn_EL1, 1),
++	SR_FGT(SYS_VBAR_EL1,		HFGxTR, VBAR_EL1, 1),
++	SR_FGT(SYS_TTBR1_EL1,		HFGxTR, TTBR1_EL1, 1),
++	SR_FGT(SYS_TTBR0_EL1,		HFGxTR, TTBR0_EL1, 1),
++	SR_FGT(SYS_TPIDR_EL0,		HFGxTR, TPIDR_EL0, 1),
++	SR_FGT(SYS_TPIDRRO_EL0,		HFGxTR, TPIDRRO_EL0, 1),
++	SR_FGT(SYS_TPIDR_EL1,		HFGxTR, TPIDR_EL1, 1),
++	SR_FGT(SYS_TCR_EL1,		HFGxTR, TCR_EL1, 1),
++	SR_FGT(SYS_SCXTNUM_EL0,		HFGxTR, SCXTNUM_EL0, 1),
++	SR_FGT(SYS_SCXTNUM_EL1, 	HFGxTR, SCXTNUM_EL1, 1),
++	SR_FGT(SYS_SCTLR_EL1, 		HFGxTR, SCTLR_EL1, 1),
++	SR_FGT(SYS_REVIDR_EL1, 		HFGxTR, REVIDR_EL1, 1),
++	SR_FGT(SYS_PAR_EL1, 		HFGxTR, PAR_EL1, 1),
++	SR_FGT(SYS_MPIDR_EL1, 		HFGxTR, MPIDR_EL1, 1),
++	SR_FGT(SYS_MIDR_EL1, 		HFGxTR, MIDR_EL1, 1),
++	SR_FGT(SYS_MAIR_EL1, 		HFGxTR, MAIR_EL1, 1),
++	SR_FGT(SYS_LORSA_EL1, 		HFGxTR, LORSA_EL1, 1),
++	SR_FGT(SYS_LORN_EL1, 		HFGxTR, LORN_EL1, 1),
++	SR_FGT(SYS_LORID_EL1, 		HFGxTR, LORID_EL1, 1),
++	SR_FGT(SYS_LOREA_EL1, 		HFGxTR, LOREA_EL1, 1),
++	SR_FGT(SYS_LORC_EL1, 		HFGxTR, LORC_EL1, 1),
++	SR_FGT(SYS_ISR_EL1, 		HFGxTR, ISR_EL1, 1),
++	SR_FGT(SYS_FAR_EL1, 		HFGxTR, FAR_EL1, 1),
++	SR_FGT(SYS_ESR_EL1, 		HFGxTR, ESR_EL1, 1),
++	SR_FGT(SYS_DCZID_EL0, 		HFGxTR, DCZID_EL0, 1),
++	SR_FGT(SYS_CTR_EL0, 		HFGxTR, CTR_EL0, 1),
++	SR_FGT(SYS_CSSELR_EL1, 		HFGxTR, CSSELR_EL1, 1),
++	SR_FGT(SYS_CPACR_EL1, 		HFGxTR, CPACR_EL1, 1),
++	SR_FGT(SYS_CONTEXTIDR_EL1, 	HFGxTR, CONTEXTIDR_EL1, 1),
++	SR_FGT(SYS_CLIDR_EL1, 		HFGxTR, CLIDR_EL1, 1),
++	SR_FGT(SYS_CCSIDR_EL1, 		HFGxTR, CCSIDR_EL1, 1),
++	SR_FGT(SYS_APIBKEYLO_EL1, 	HFGxTR, APIBKey, 1),
++	SR_FGT(SYS_APIBKEYHI_EL1, 	HFGxTR, APIBKey, 1),
++	SR_FGT(SYS_APIAKEYLO_EL1, 	HFGxTR, APIAKey, 1),
++	SR_FGT(SYS_APIAKEYHI_EL1, 	HFGxTR, APIAKey, 1),
++	SR_FGT(SYS_APGAKEYLO_EL1, 	HFGxTR, APGAKey, 1),
++	SR_FGT(SYS_APGAKEYHI_EL1, 	HFGxTR, APGAKey, 1),
++	SR_FGT(SYS_APDBKEYLO_EL1, 	HFGxTR, APDBKey, 1),
++	SR_FGT(SYS_APDBKEYHI_EL1, 	HFGxTR, APDBKey, 1),
++	SR_FGT(SYS_APDAKEYLO_EL1, 	HFGxTR, APDAKey, 1),
++	SR_FGT(SYS_APDAKEYHI_EL1, 	HFGxTR, APDAKey, 1),
++	SR_FGT(SYS_AMAIR_EL1, 		HFGxTR, AMAIR_EL1, 1),
++	SR_FGT(SYS_AIDR_EL1, 		HFGxTR, AIDR_EL1, 1),
++	SR_FGT(SYS_AFSR1_EL1, 		HFGxTR, AFSR1_EL1, 1),
++	SR_FGT(SYS_AFSR0_EL1, 		HFGxTR, AFSR0_EL1, 1),
++};
++
+ static union trap_config get_trap_config(u32 sysreg)
+ {
+ 	return (union trap_config) {
+@@ -915,6 +997,27 @@ void __init populate_nv_trap_config(void)
+ 	kvm_info("nv: %ld coarse grained trap handlers\n",
+ 		 ARRAY_SIZE(encoding_to_cgt));
+ 
++	for (int i = 0; i < ARRAY_SIZE(encoding_to_fgt); i++) {
++		const struct encoding_to_trap_config *fgt = &encoding_to_fgt[i];
++		union trap_config tc;
++
++		tc = get_trap_config(fgt->encoding);
++
++		WARN(tc.fgt,
++		     "Duplicate FGT for sys_reg(%d, %d, %d, %d, %d)\n",
++		     sys_reg_Op0(fgt->encoding),
++		     sys_reg_Op1(fgt->encoding),
++		     sys_reg_CRn(fgt->encoding),
++		     sys_reg_CRm(fgt->encoding),
++		     sys_reg_Op2(fgt->encoding));
++
++		tc.val |= fgt->tc.val;
++		xa_store(&sr_forward_xa, fgt->encoding,
++			 xa_mk_value(tc.val), GFP_KERNEL);
++	}
++
++	kvm_info("nv: %ld fine grained trap handlers\n",
++		 ARRAY_SIZE(encoding_to_fgt));
+ }
+ 
+ static enum trap_behaviour get_behaviour(struct kvm_vcpu *vcpu,
+@@ -964,13 +1067,26 @@ static enum trap_behaviour compute_behaviour(struct kvm_vcpu *vcpu,
+ 	return __do_compute_behaviour(vcpu, tc.cgt, b);
+ }
+ 
++static bool check_fgt_bit(u64 val, const union trap_config tc)
++{
++	return ((val >> tc.bit) & 1) == tc.pol;
++}
++
++#define sanitised_sys_reg(vcpu, reg)			\
++	({						\
++		u64 __val;				\
++		__val = __vcpu_sys_reg(vcpu, reg);	\
++		__val &= ~__ ## reg ## _RES0;		\
++		(__val);				\
++	})
++
+ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+ {
+ 	union trap_config tc;
+ 	enum trap_behaviour b;
+ 	bool is_read;
+ 	u32 sysreg;
+-	u64 esr;
++	u64 esr, val;
+ 
+ 	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
+ 		return false;
+@@ -981,6 +1097,21 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+ 
+ 	tc = get_trap_config(sysreg);
+ 
++	switch ((enum fgt_group_id)tc.fgt) {
++	case __NO_FGT_GROUP__:
++		break;
++
++	case HFGxTR_GROUP:
++		if (is_read)
++			val = sanitised_sys_reg(vcpu, HFGRTR_EL2);
++		else
++			val = sanitised_sys_reg(vcpu, HFGWTR_EL2);
++		break;
++	}
++
++	if (tc.fgt != __NO_FGT_GROUP__ && check_fgt_bit(val, tc))
++		goto inject;
++
+ 	b = compute_behaviour(vcpu, tc);
+ 
+ 	if (((b & BEHAVE_FORWARD_READ) && is_read) ||
 -- 
 2.34.1
 
