@@ -1,60 +1,125 @@
-Received: from out-26.mta1.migadu.com (out-26.mta1.migadu.com [95.215.58.26])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37FBA21514
-	for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 20:14:38 +0000 (UTC)
-Date: Wed, 12 Jul 2023 20:14:33 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1689192877;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HicFuXZ+TFJew/uDO2ovyYUA1NOwa0rshkpJ4NgZ5FI=;
-	b=vSENsTxjZG+wLXanCSGVxCizJomoYL8l4CqqgwoxdhwhwO5q+PqffDK+y7nem+K8Vks1kU
-	M0VO+Njo3B2aacz/CEcxZKo9of1hjwQKYhnI0Rz5mkQzxL9UQTbB41O7TfqacTR76MH0Y6
-	Eao/1lCYLPLPILO4ElMCO4tAOntKZeU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74BC1F9C4
+	for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 21:15:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70C27C433C8;
+	Wed, 12 Jul 2023 21:15:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689196534;
+	bh=srSlB45+tKsynjd6lCyOzCxBjejSi0aDwrSiQqn1wyY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OiE8UQug9Lz2a6vhipxEPBqS6prjPYc7yMA2qulV1NLKTEryjgF1cpaowmNBIKDJr
+	 5kyucBnEjLgZ31kwqimtZY+X6DISdfJQpUSpgMCNtO1JirIW1qnspmNgY92/PnKoHv
+	 CUgp0Z++IhVn0Vc6erne+uFpZMTt4tp7PxVSJn+bfL07EuMAuRQD2VjjUlSfc6xMx8
+	 uPasvsJ+z+b5mSJ80gTA+oZNLy3tIwc7BTdFapRQmYKf5tc6tVvEBWSQ79u3yyHECZ
+	 b8ucBuuUihR0maADZncjMFyT+QuYT4EaujYHYG/SqwAthN9opwUT2Ruro/Pnn9sMAs
+	 6/zOwFa76frSQ==
+Date: Wed, 12 Jul 2023 22:15:27 +0100
+From: Mark Brown <broonie@kernel.org>
 To: Marc Zyngier <maz@kernel.org>
-Cc: Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Chase Conklin <chase.conklin@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Darren Hart <darren@os.amperecomputing.com>,
+	Miguel Luis <miguel.luis@oracle.com>,
 	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>, stable@vger.kernel.org,
-	Xiang Chen <chenxiang66@hisilicon.com>
-Subject: Re: [PATCH] KVM: arm64: vgic-v4: Consistently request doorbell irq
- for blocking vCPU
-Message-ID: <ZK8JqbLrwWE6sFSe@linux.dev>
-References: <20230710175553.1477762-1-oliver.upton@linux.dev>
- <86jzv6x66q.wl-maz@kernel.org>
- <ZK0EPhvLzhaFepGk@linux.dev>
- <14acf0fd-e5eb-8a14-986a-b8fe4a44cec9@huawei.com>
- <86zg41utno.wl-maz@kernel.org>
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 14/27] KVM: arm64: Restructure FGT register switching
+Message-ID: <2dbb5fd5-a275-432e-832b-7926060c9254@sirena.org.uk>
+References: <20230712145810.3864793-1-maz@kernel.org>
+ <20230712145810.3864793-15-maz@kernel.org>
+ <b9ccca23-65d5-4ed1-976e-63d51e3457e3@sirena.org.uk>
+ <87edlcao9b.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="LgilXWRWGTBHM5Pp"
+Content-Disposition: inline
+In-Reply-To: <87edlcao9b.wl-maz@kernel.org>
+X-Cookie: Dammit Jim, I'm an actor, not a doctor.
+
+
+--LgilXWRWGTBHM5Pp
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86zg41utno.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 12, 2023 at 02:49:15PM +0100, Marc Zyngier wrote:
-> > Given that making VPE resident on the vcpu block path (i.e., in
-> > kvm_vcpu_halt()) makes little sense (right?) and leads to this sort of
-> > problem, a crude idea is that we can probably keep track of the
-> > "nested" vgic_v4_{put,load} calls (instead of a single vpe->resident
-> > flag) and keep VPE *not resident* on the whole block path (like what we
-> > had before commit 8e01d9a396e6). And we then rely on
-> > kvm_vcpu_wfi/vgic_v4_load to actually schedule the VPE on...
-> 
-> I'm not sure about the nested tracking part, but it's easy enough to
-> have a vcpu flag indicating that we're in WFI. So an *alternative* to
-> the current fix would be something like this:
+On Wed, Jul 12, 2023 at 09:06:08PM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
-Yeah, I like your approach better. I've gone ahead and backed out my
-change and can take this instead once someone tests it out :)
+> > > + * RES0 and polarity masks as of DDI0487J.a, to be updated as needed.
+> > > + * We're not using the generated masks as they are usually ahead of
+> > > + * the published ARM ARM, which we use as a reference.
 
--- 
-Thanks,
-Oliver
+> > What's the issue here?  The generated definitions should be aligned with
+> > what's published in DDI0601.  That AIUI exists in large part due to
+> > concerns people were having with the amount of time it can take to fold
+> > new features into the ARM, it's official.
+
+> For multiple reasons:
+
+> - What's published as DDI0601 is a list of registers, without any
+>   context and no relation to the wider architecture (it is basically
+>   the XML dumped as a PDF). That's not enough to implement the
+>   architecture as it is missing all the content of the engineering
+>   specs, which are not public documents.
+
+Right, it's not the full spec - I was just thinking it was enough to
+cover the use here with finding RES0 bits.  The actual XML is
+downloadable as well, via=20
+
+    https://developer.arm.com/downloads/-/exploration-tools
+
+if that's more convenient (I am not sure why that's not available if you
+go looking for DDI0601), not that that addresses the issue with not
+having the non-XML part of things.  I know the people responsible for
+producing the ARM are actively working on improving the production
+process to address the lag so the ARM is available much more promptly.
+
+> - I have no motivation in supporting the latest and greatest. NV is
+>   hard enough without all the (still evolving) crop of 8.9/9.4
+>   extensions.  As long as what I have is a legal implementation and
+>   runs on the HW I have access to, that's good enough for me.
+
+> - I want to look at a single document and support what's in there. Not
+>   two. Because it is hard enough to follow when you're implementing
+>   this crap, and even harder for someone trying to review it.
+
+> So I firmly intend to totally ignore most of what's outside of the
+> published ARM ARM unless it makes my life so much easier that I can't
+> afford not to implement it.
+
+That's definitely fair, my concern here is the risk that we might end up
+with issues due to the manual definitions drifting from the generated
+ones without people noticing as things go forwards.  Hopefully that's a
+minor risk.
+
+--LgilXWRWGTBHM5Pp
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmSvF+4ACgkQJNaLcl1U
+h9Civwf/ZXWGE/hczTCulEMG2U6Wn7o9Ym9bVTemK3dSzhcUr869CF5uYsqOCd8D
+5C8zdI44DKVAVKBP8dKZPuT/AI7WzIW+GY02+xGyqKVkZWl1zczQt4uYfUCKFPnU
+TTBPMYXNxvh3yS7i1NXBhcdvbJebdE8GHRhQyHQNUXrOpv6HjzlqLpMXTGNWvv08
+nEGnatET3TdJl+UkO5B1/sHDJ+hVWacgTeixZJEJ1KBSRg8OFlh+E6gLkRDCj5gU
+IwLXM1KQGrghwT1TIaskC6XxiMhT3HIrIouF2QXOlSoPI3uBULWVMl7KiCPfDPe9
+BYAiQnXnlLtCIzw0ychfACdnUjv50A==
+=X6vv
+-----END PGP SIGNATURE-----
+
+--LgilXWRWGTBHM5Pp--
