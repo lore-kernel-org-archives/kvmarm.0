@@ -1,25 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F78834CC8
-	for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 14:58:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFDD8C433C7;
-	Wed, 12 Jul 2023 14:58:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7514834CEB
+	for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 14:58:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0352CC433C9;
+	Wed, 12 Jul 2023 14:58:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689173929;
-	bh=480Ex+I67BuLKPVUPyqtEP991jxIiG64Qxv2L2yhxp0=;
-	h=From:To:Cc:Subject:Date:From;
-	b=DhYM4TzFzxv4ERRk9y1z2+ObPM/+jMKtMU98agWcBDinklrO3yR/Qf6mOMZMrEeyj
-	 ndwNOOM7HJgGxPZBxaIqaIMvO0pXS20DQgTZXjD2CcOnIeN+GRamEfSWuwYNFt13RJ
-	 QvYFGBkGftGzZMw25duEaFFw4XEBbAU3PJT7R43jpIXpzTVW1AT8LA7nusWhJ2MhyJ
-	 4O6tcvDO80C+aI6Adc4uu2Fqau+mMuOEAGgPHj5+tXGH4EkUEjPIDDlrjSA/hLGYLm
-	 zmpsM3vW037NdMvvTWFJ6AWGQUBlzKbxCeFl/KrlgjpvULQIDXYSV+Om268csCVRFv
-	 AWu5RuaBrdCJw==
+	s=k20201202; t=1689173930;
+	bh=r+g/VcnlqQCVOIqSl1HA4CWQfHzoONGsqLE5TosmZy0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=tOGgZAbTPzu+YbkkNZG2nUa3vnEGsqEP3tmLgB/sf7RMVJLc+nkO0lvwHWiSvjgJH
+	 W4+FcDyaiNXFSEDcGdzPdcu6Q/oDh842vWsxgsscHBOUybJnsKwfQ46TAJF5OZXf5q
+	 Tbt42I5CpXfKycZdo/1PgDPD7t3u1OgLnYNWEsyTk4TIgK3XejAjHwXkRRvLQ8aoaU
+	 ZGB/SzO4wHz+gkfpfaiKmx6xMMWVJr72aa0vClXNaDk1XsRk7l4RL1BkZ7kGGFUZvq
+	 QgW09kRHS9Fp7KwMn+xuEq6ICOOpeqfhsdDx2ukv7ZXpFOQROPZMaBSg46q/u0xb84
+	 5svBJWqhKnAXA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qJbIl-00CUNF-AW;
+	id 1qJbIl-00CUNF-NV;
 	Wed, 12 Jul 2023 15:58:47 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -40,10 +40,12 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 00/27] KVM: arm64: NV trap forwarding infrastructure
-Date: Wed, 12 Jul 2023 15:57:43 +0100
-Message-Id: <20230712145810.3864793-1-maz@kernel.org>
+Subject: [PATCH 01/27] arm64: Add missing VA CMO encodings
+Date: Wed, 12 Jul 2023 15:57:44 +0100
+Message-Id: <20230712145810.3864793-2-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230712145810.3864793-1-maz@kernel.org>
+References: <20230712145810.3864793-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -56,78 +58,51 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-As people are getting tired of seeing the full NV series, I've
-extracted some of the easy stuff which I'm targeting for 6.6.
+Add the missing VA-based CMOs encodings.
 
-This implements the so called "trap forwarding" infrastructure, which
-gets used when we take a trap from an L2 guest and that the L1 guest
-wants to see the trap for itself.
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/sysreg.h | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-Most of the series is pretty boring stuff, mostly a long list of
-encodings which are mapped to a set of trap bits. I swear they are
-correct. Sort of.
-
-The interesting bit is around how we compute the trap result, which is
-pretty complex due to the layers of crap the architecture has piled
-over the years (a single op can be trapped by multiple coarse grained
-trap bits, or a fine grained trap bit, which may itself be conditioned
-by another control bit -- madness).
-
-This also results in some rework of both the FGT stuff (for which I
-carry a patch from Mark) and newly introduced the HCRX support.
-
-With that (and the rest of the NV series[1]), FGT gets exposed to guests
-and the trapping seems to work as expected.
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-6.6-WIP
-
-Marc Zyngier (26):
-  arm64: Add missing VA CMO encodings
-  arm64: Add missing ERX*_EL1 encodings
-  arm64: Add missing DC ZVA/GVA/GZVA encodings
-  arm64: Add TLBI operation encodings
-  arm64: Add AT operation encodings
-  arm64: Add debug registers affected by HDFGxTR_EL2
-  arm64: Add missing BRB/CFP/DVP/CPP instructions
-  arm64: Fix HFGxTR_EL2 field naming
-  arm64: Add HDFGRTR_EL2 and HDFGWTR_EL2 layouts
-  KVM: arm64: Correctly handle ACCDATA_EL1 traps
-  KVM: arm64: Add missing HCR_EL2 trap bits
-  KVM: arm64: nv: Add FGT registers
-  KVM: arm64: Restructure FGT register switching
-  KVM: arm64: nv: Add trap forwarding infrastructure
-  KVM: arm64: nv: Add trap forwarding for HCR_EL2
-  KVM: arm64: nv: Expose FEAT_EVT to nested guests
-  KVM: arm64: nv: Add trap forwarding for MDCR_EL2
-  KVM: arm64: nv: Add trap forwarding for CNTHCTL_EL2
-  KVM: arm64: nv: Add trap forwarding for HFGxTR_EL2
-  KVM: arm64: nv: Add trap forwarding for HFGITR_EL2
-  KVM: arm64: nv: Add trap forwarding for HDFGxTR_EL2
-  KVM: arm64: nv: Add SVC trap forwarding
-  KVM: arm64: nv: Add switching support for HFGxTR/HDFGxTR
-  KVM: arm64: nv: Expose FGT to nested guests
-  KVM: arm64: Move HCRX_EL2 switch to load/put on VHE systems
-  KVM: arm64: nv: Add support for HCRX_EL2
-
-Mark Brown (1):
-  arm64: Add feature detection for fine grained traps
-
- arch/arm64/include/asm/kvm_arm.h        |   50 +
- arch/arm64/include/asm/kvm_host.h       |    7 +
- arch/arm64/include/asm/kvm_nested.h     |    2 +
- arch/arm64/include/asm/sysreg.h         |  270 +++-
- arch/arm64/kernel/cpufeature.c          |   11 +
- arch/arm64/kvm/arm.c                    |    4 +
- arch/arm64/kvm/emulate-nested.c         | 1703 +++++++++++++++++++++++
- arch/arm64/kvm/handle_exit.c            |   12 +
- arch/arm64/kvm/hyp/include/hyp/switch.h |  126 +-
- arch/arm64/kvm/nested.c                 |   11 +-
- arch/arm64/kvm/sys_regs.c               |   15 +
- arch/arm64/kvm/trace_arm.h              |   19 +
- arch/arm64/tools/cpucaps                |    1 +
- arch/arm64/tools/sysreg                 |  141 +-
- 14 files changed, 2326 insertions(+), 46 deletions(-)
-
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index b481935e9314..85447e68951a 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -124,6 +124,32 @@
+ #define SYS_DC_CIGSW			sys_insn(1, 0, 7, 14, 4)
+ #define SYS_DC_CIGDSW			sys_insn(1, 0, 7, 14, 6)
+ 
++#define SYS_IC_IALLUIS			sys_insn(1, 0, 7, 1, 0)
++#define SYS_IC_IALLU			sys_insn(1, 0, 7, 5, 0)
++#define SYS_IC_IVAU			sys_insn(1, 3, 7, 5, 1)
++
++#define SYS_DC_IVAC			sys_insn(1, 0, 7, 6, 1)
++#define SYS_DC_IGVAC			sys_insn(1, 0, 7, 6, 3)
++#define SYS_DC_IGDVAC			sys_insn(1, 0, 7, 6, 5)
++
++#define SYS_DC_CVAC			sys_insn(1, 3, 7, 10, 1)
++#define SYS_DC_CGVAC			sys_insn(1, 3, 7, 10, 3)
++#define SYS_DC_CGDVAC			sys_insn(1, 3, 7, 10, 5)
++
++#define SYS_DC_CVAU			sys_insn(1, 3, 7, 11, 1)
++
++#define SYS_DC_CVAP			sys_insn(1, 3, 7, 12, 1)
++#define SYS_DC_CGVAP			sys_insn(1, 3, 7, 12, 3)
++#define SYS_DC_CGDVAP			sys_insn(1, 3, 7, 12, 5)
++
++#define SYS_DC_CVADP			sys_insn(1, 3, 7, 13, 1)
++#define SYS_DC_CGVADP			sys_insn(1, 3, 7, 13, 3)
++#define SYS_DC_CGDVADP			sys_insn(1, 3, 7, 13, 5)
++
++#define SYS_DC_CIVAC			sys_insn(1, 3, 7, 14, 1)
++#define SYS_DC_CIGVAC			sys_insn(1, 3, 7, 14, 3)
++#define SYS_DC_CIGDVAC			sys_insn(1, 3, 7, 14, 5)
++
+ /*
+  * Automatically generated definitions for system registers, the
+  * manual encodings below are in the process of being converted to
 -- 
 2.34.1
 
