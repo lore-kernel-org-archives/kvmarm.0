@@ -1,71 +1,85 @@
-Received: from out-39.mta1.migadu.com (out-39.mta1.migadu.com [95.215.58.39])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C21591D2EA
-	for <kvmarm@lists.linux.dev>; Wed, 12 Jul 2023 22:50:46 +0000 (UTC)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1689202244;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UGwO+NFWVQ6+B443EQUy8r3A++Fa14LZLWf0tT7Rus0=;
-	b=UxHnr5rV6hfCEyOAsdIBnSUrJOh9nbAbwubUfn49e15xmnCPJ9mAqlFvwBT7px7TMqShj/
-	sYSNok/9alT3jgq8AZzMqyexGbwaShTsLvoWs0dfgzvVMvh5WynUXUO2DeYeJRpuTlHO2q
-	R02CeVXI72J9fYLWnOSFb4UoNJk/u0A=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	maz@kernel.org,
-	Mostafa Saleh <smostafa@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	suzuki.poulose@arm.com,
-	tabba@google.com,
-	james.morse@arm.com,
-	qperret@google.com,
-	bgardon@google.com,
-	sudeep.holla@arm.com,
-	gshan@redhat.com,
-	yuzenghui@huawei.com,
-	will@kernel.org,
-	catalin.marinas@arm.com
-Subject: Re: [PATCH v2] KVM: arm64: Add missing BTI instructions
-Date: Wed, 12 Jul 2023 22:50:34 +0000
-Message-ID: <168920214959.3096128.780259299986215400.b4-ty@linux.dev>
-In-Reply-To: <20230706152240.685684-1-smostafa@google.com>
-References: <20230706152240.685684-1-smostafa@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FAAC7C
+	for <kvmarm@lists.linux.dev>; Thu, 13 Jul 2023 02:35:43 +0000 (UTC)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.55])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4R1dtc0XJmztQTv;
+	Thu, 13 Jul 2023 10:32:40 +0800 (CST)
+Received: from [10.40.193.166] (10.40.193.166) by
+ kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Thu, 13 Jul 2023 10:35:39 +0800
+Subject: Re: [PATCH] KVM: arm64: Fix the name of sys_reg_desc related to PMU
+To: Marc Zyngier <maz@kernel.org>
+References: <1689148505-13914-1-git-send-email-chenxiang66@hisilicon.com>
+ <868rblwmpn.wl-maz@kernel.org>
+CC: <oliver.upton@linux.dev>, <james.morse@arm.com>, <kvmarm@lists.linux.dev>,
+	<kvm@vger.kernel.org>, <linuxarm@huawei.com>
+From: "chenxiang (M)" <chenxiang66@hisilicon.com>
+Message-ID: <5c513a72-9ae9-22ca-a9a6-8b3c481e0921@hisilicon.com>
+Date: Thu, 13 Jul 2023 10:35:39 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.2.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <868rblwmpn.wl-maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Originating-IP: [10.40.193.166]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemi500016.china.huawei.com (7.221.188.220)
+X-CFilter-Loop: Reflected
 
-On Thu, 6 Jul 2023 15:22:40 +0000, Mostafa Saleh wrote:
-> Some bti instructions were missing from
-> commit b53d4a272349 ("KVM: arm64: Use BTI for nvhe")
-> 
-> 1) kvm_host_psci_cpu_entry
-> kvm_host_psci_cpu_entry is called from __kvm_hyp_init_cpu through "br"
-> instruction as __kvm_hyp_init_cpu resides in idmap section while
-> kvm_host_psci_cpu_entry is in hyp .text so the offset is larger than
-> 128MB range covered by "b".
-> Which means that this function should start with "bti j" instruction.
-> 
-> [...]
+Hi Marc,
 
-Applied to kvmarm/fixes. Sorry this took longer than expected, Mostafa. I
-was hitting an unrelated issue with pKVM initialization on the only system
-I have that supports BTI.
 
-[1/1] KVM: arm64: Add missing BTI instructions
-      https://git.kernel.org/kvmarm/kvmarm/c/dcf89d111199
+在 2023/7/12 星期三 16:36, Marc Zyngier 写道:
+> On Wed, 12 Jul 2023 08:55:05 +0100,
+> chenxiang <chenxiang66@hisilicon.com> wrote:
+>> From: Xiang Chen <chenxiang66@hisilicon.com>
+>>
+>> For those PMU system registers defined in sys_reg_descs[], use macro
+>> PMU_SYS_REG() / PMU_PMEVCNTR_EL0 / PMU_PMEVTYPER_EL0 to define them, and
+>> later two macros call macro PMU_SYS_REG() actually.
+>> Currently the input parameter of PMU_SYS_REG() is other macro which is
+>> calculation formula of the value of system registers, so for example, if
+>> we want to "SYS_PMINTENSET_EL1" as the name of sys register, actually
+>> the name will be as following:
+>> (((3) << 19) | ((0) << 16) | ((9) << 12) | ((14) << 8) | ((1) << 5))
+>>
+>> To fix the issue, use the name as a input parameter of PMU_SYS_REG like
+>> MTE_REG or EL2_REG.
+> Why is the name relevant? Is this related to tracing?
+I think It is not related to tracing. I find the issue when i want to 
+know which system reigsters are set
+when on live migration and printk the name of sys_reg_desc in function 
+kvm_sys_reg_set_user,
+find the name of some registers are abnormal as followings:
 
---
-Best,
-Oliver
+[  227.145540] kvm_sys_reg_set_user 3427:SYS_FAR_EL1
+[  227.158057] kvm_sys_reg_set_user 3427:SYS_PAR_EL1
+[  227.170574] kvm_sys_reg_set_user 3427:(((3) << 19) | ((0) << 16) | 
+((9) << 12) | ((14) << 8) | ((1) << 5))
+[  227.188037] kvm_sys_reg_set_user 3427:(((3) << 19) | ((0) << 16) | 
+((9) << 12) | ((14) << 8) | ((2) << 5))
+[  227.205511] kvm_sys_reg_set_user 3427:SYS_MAIR_EL1
+[  227.218117] kvm_sys_reg_set_user 3427:SYS_PIRE0_EL1
+
+I think it is caused by the macro PMU_SYS_REG().  For example 
+PMU_SYS_REG(SYS_PMINTENSET_EL1),
+#define SYS_PMINTENSET_EL1 sys_reg(3, 0, 9, 14, 1)
+#define sys_reg(op0, op1, crn, crm, op2) (((op0) << OP0_shift) | ((op1) 
+<< OP1_shift) | ((crn) << CRn_shift) | ((crm) << CRm_shift) | ((op2) << 
+OP2_shift))
+
+So SYS_PMINTENSET_EL1 is equal to (((3) << 19) | ((0) << 16) | ((9) << 
+12) | ((14) << 8) | ((1) << 5)), and PMU_SYS_REG(SYS_PMINTENSET_EL1) calls
+SYS_DESC() which uses the input parameter as the name, so the name of 
+SYS_PMINTENSET_EL1 becomes  (((3) << 19) | ((0) << 16) | ((9) << 12) | 
+((14) << 8) | ((1) << 5)).
+
