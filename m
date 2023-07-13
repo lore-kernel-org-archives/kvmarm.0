@@ -1,402 +1,172 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108DF1F190
-	for <kvmarm@lists.linux.dev>; Thu, 13 Jul 2023 17:34:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689269686;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q8/ResZwPvuv4tGVhWF3Aj+P0gkju6yAs+IwBrPVVMI=;
-	b=OGQO8CuJ5NrKrIJo0W9z4EOA+A5gd+xVWDHojEMS1s37gKi5fYJUiGnjxWAcyGy+W3xj9/
-	BM3WrOVONZuD/C6VdsUqJ5ElnkNevOvKftg6PgSFCbT1qBVyoRKL5qjJYWT3iDhoxCb8I9
-	oksoQMztCz5Ne1WVwMsh9Z33xjZjmlc=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-550-6Uu43WikM3us4oMK4moE9w-1; Thu, 13 Jul 2023 13:34:45 -0400
-X-MC-Unique: 6Uu43WikM3us4oMK4moE9w-1
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-40327302341so9106701cf.3
-        for <kvmarm@lists.linux.dev>; Thu, 13 Jul 2023 10:34:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF52F3224
+	for <kvmarm@lists.linux.dev>; Thu, 13 Jul 2023 18:47:34 +0000 (UTC)
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1b52875b8d9so28335ad.0
+        for <kvmarm@lists.linux.dev>; Thu, 13 Jul 2023 11:47:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689274054; x=1689878854;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cCMwVIQzOUutbhN/GsjN6pM+paFnW3LWSf+I9hKYPpQ=;
+        b=3lxVvYBLFqoAJ02OKTEDfVZUUK0wkW5kJ6VSqGoJM7b4lBnNFpCFUCFtiPuM7u9nOX
+         VSzLx40KDeP0giCms38tanWNG5c8xfii4A4aZi/1HhYtk68VovRyTHE2Tw9kgrwbUWYk
+         lgrmNm/UXJYJ3QUrwEpWVqgYQQt7CWi61h13oFp4tb/Z9qxx4ZK/T0ji1ZZoxOI2eUmA
+         40KTd3OKOpoIH89wLfbNxh4/jZ8GdPRsy6Oxi+4m+Sv9jvQBFc4+hHiNNXGDKsBRO5ya
+         acMC0ar3TRzt2JiLwJDPfGeVijikeplK1YGsCdeFNniK+KiZ+wOosH+qnrRf1sTm/NZ0
+         fP2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689269685; x=1689874485;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=q8/ResZwPvuv4tGVhWF3Aj+P0gkju6yAs+IwBrPVVMI=;
-        b=Wu8MoSdZAL88n7sy4aF0iEv+qUhEu94YeE5Ml63vq6bmplAm+4yf6dSawpJ6Dkn4nb
-         DBM13RliU603hYs+8QHo96ETVu9guWTVzhG4Iij/NEC8vGulKV3o+InAN2Eoae4QaUnu
-         PyyRZ83UfR/xCJ0IIX0KUVrVuEQPiWbpVgxiUc5AHjunP7ZUCNZtp9W+tCX6gXyw09dO
-         vpGtVM0o+NSfDp2tcMXbYDTD1U8AaMFnLRj826/zPqGaJFMfx4Ae9tDXtn5J36xT1wpq
-         A4JRCqu6L6IAdlhYcOJ1A6PsmUiy3db7wmwvNcW8suQVfRVGFhtz8LxacUq4sWpqM2wV
-         xGzQ==
-X-Gm-Message-State: ABy/qLaAds+KKzlZADsA3RIilBC95hy0O8MKw9JIgbev9KCGJd1WOdaq
-	M5uEWjit0T1fwiHmK0R3I6w1E+wuOYxpXa4GJ2wDPDD9mVSh44XcKMK+z1IB3WwdbGymqx/FOuz
-	ZFEThlPLCbWull3mm
-X-Received: by 2002:a05:622a:18e:b0:403:b0f5:fcbc with SMTP id s14-20020a05622a018e00b00403b0f5fcbcmr1898238qtw.36.1689269685109;
-        Thu, 13 Jul 2023 10:34:45 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHgY87S1RWJK0LiAT9ThKEK/1QQ73ITZ8AoXT1ea09hJK3I7V4Wl5EMPuWRKI0BJncdjcCVkA==
-X-Received: by 2002:a05:622a:18e:b0:403:b0f5:fcbc with SMTP id s14-20020a05622a018e00b00403b0f5fcbcmr1898221qtw.36.1689269684742;
-        Thu, 13 Jul 2023 10:34:44 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id d4-20020ac851c4000000b00403ad6ec2e8sm3258550qtn.26.2023.07.13.10.34.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Jul 2023 10:34:44 -0700 (PDT)
-Message-ID: <a2efafbe-bdde-1853-007a-8dd97a9b919f@redhat.com>
-Date: Thu, 13 Jul 2023 19:34:39 +0200
+        d=1e100.net; s=20221208; t=1689274054; x=1689878854;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cCMwVIQzOUutbhN/GsjN6pM+paFnW3LWSf+I9hKYPpQ=;
+        b=CzGmwnrKS0WtFm9WxhggPnK0tqjVg1OAUjeLl4mvMTZCk1u0qkm/UkZsSw6siAQnyJ
+         OZGaeWVVH6wAGwl4nMrJmh535SnZD8Ixn9a9N76UulAuBed2uZMAbpYNT+93w5UJRQ9+
+         6sWGyJ9JkWg6OXG06U5+3s/HMEwy6n9b08Q2XAEHXA3r8WIsuiudJmhC2s0glmr3depW
+         OHw/qURTL4g64w46uagthheSKPRv9vLaVn+9AzGU5jDq/h3K1R0Cnz88M5dra/s8kPXu
+         mjobw/Qitm9bEto6Zqnd70sKtIu9gCiRjesItd7KeF2/hn8gtcBGmUJ99rPhD+4FolCQ
+         BGGQ==
+X-Gm-Message-State: ABy/qLYeBtQ+CY0SX2JbP5xsElBBPfgGCTFIf1NZwBF76REOHSB6Kn8Q
+	8iIEr3g2sL1fwiJUxOlt9NIyh0awG/m6QRGcTAo7tA==
+X-Google-Smtp-Source: APBJJlFBmm7dpauUp37YeMKq373RcC3tN66u8ZQjiY1ufKfbpQJ/qTz6oxjhnsAqBc5kb4Tn8fRf3T+9JjhqDu8XLg4=
+X-Received: by 2002:a17:902:bb0f:b0:1b8:9044:91d3 with SMTP id
+ im15-20020a170902bb0f00b001b8904491d3mr552902plb.18.1689274053909; Thu, 13
+ Jul 2023 11:47:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH 18/27] KVM: arm64: nv: Add trap forwarding for MDCR_EL2
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Mark Brown
- <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Will Deacon <will@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>,
- Andre Przywara <andre.przywara@arm.com>,
- Chase Conklin <chase.conklin@arm.com>,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Darren Hart <darren@os.amperecomputing.com>,
- Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
-References: <20230712145810.3864793-1-maz@kernel.org>
- <20230712145810.3864793-19-maz@kernel.org>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230712145810.3864793-19-maz@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20230621175002.2832640-1-rananta@google.com> <20230621175002.2832640-8-rananta@google.com>
+ <1fe280a7-0f10-e124-00aa-b137df722c33@redhat.com> <CAJHc60xQtjvVsWRE=w-pAioNJW6uh-qKuZz2wp6bkT=X4oCm5A@mail.gmail.com>
+ <60ba5bb4-6fad-0e51-2cd5-845610e6631d@redhat.com>
+In-Reply-To: <60ba5bb4-6fad-0e51-2cd5-845610e6631d@redhat.com>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Thu, 13 Jul 2023 11:47:19 -0700
+Message-ID: <CAJHc60y6AaAUVy=V6GHTpVhHGO3Bjn1vpTnYpdFiFLjS-vR-uA@mail.gmail.com>
+Subject: Re: [RESEND PATCH v5 07/11] KVM: arm64: Define kvm_tlb_flush_vmid_range()
+To: Gavin Shan <gshan@redhat.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Huacai Chen <chenhuacai@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Jing Zhang <jingzhangos@google.com>, Colton Lewis <coltonlewis@google.com>, 
+	David Matlack <dmatlack@google.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Marc,
+Hi Gavin,
 
-On 7/12/23 16:58, Marc Zyngier wrote:
-> Describe the MDCR_EL2 register, and associate it with all the sysregs
-> it allows to trap.
+On Wed, Jul 5, 2023 at 5:04=E2=80=AFPM Gavin Shan <gshan@redhat.com> wrote:
 >
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/emulate-nested.c | 262 ++++++++++++++++++++++++++++++++
->  1 file changed, 262 insertions(+)
+> On 7/6/23 04:28, Raghavendra Rao Ananta wrote:
+> > On Tue, Jul 4, 2023 at 5:31=E2=80=AFPM Gavin Shan <gshan@redhat.com> wr=
+ote:
+> >> On 6/22/23 03:49, Raghavendra Rao Ananta wrote:
+> >>> Implement the helper kvm_tlb_flush_vmid_range() that acts
+> >>> as a wrapper for range-based TLB invalidations. For the
+> >>> given VMID, use the range-based TLBI instructions to do
+> >>> the job or fallback to invalidating all the TLB entries.
+> >>>
+> >>> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> >>> ---
+> >>>    arch/arm64/include/asm/kvm_pgtable.h | 10 ++++++++++
+> >>>    arch/arm64/kvm/hyp/pgtable.c         | 20 ++++++++++++++++++++
+> >>>    2 files changed, 30 insertions(+)
+> >>>
+> >>
+> >> It may be reasonable to fold this to PATCH[08/11] since kvm_tlb_flush_=
+vmid_range() is
+> >> only called by ARM64's kvm_arch_flush_remote_tlbs_range(), which is ad=
+ded by PATCH[08/11].
+> >> In either way, the changes look good to me:
+> >>
+> > Ah, the patches 10 and 11 also call kvm_tlb_flush_vmid_range(), so
+> > probably it's better to keep the definition isolated?
+> >
 >
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index 51901e85e43d..25e4842ac334 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -65,6 +65,18 @@ enum coarse_grain_trap_id {
->  	CGT_HCR_TTLBIS,
->  	CGT_HCR_TTLBOS,
->  
-> +	CGT_MDCR_TPMCR,
-> +	CGT_MDCR_TPM,
-> +	CGT_MDCR_TDE,
-> +	CGT_MDCR_TDA,
-> +	CGT_MDCR_TDOSA,
-> +	CGT_MDCR_TDRA,
-> +	CGT_MDCR_E2PB,
-> +	CGT_MDCR_TPMS,
-> +	CGT_MDCR_TTRF,
-> +	CGT_MDCR_E2TB,
-> +	CGT_MDCR_TDCC,
-> +
->  	/*
->  	 * Anything after this point is a combination of trap controls,
->  	 * which all must be evaluated to decide what to do.
-> @@ -78,6 +90,11 @@ enum coarse_grain_trap_id {
->  	CGT_HCR_TPU_TICAB,
->  	CGT_HCR_TPU_TOCU,
->  	CGT_HCR_NV1_ENSCXT,
-> +	CGT_MDCR_TPM_TPMCR,
-> +	CGT_MDCR_TDE_TDA,
-> +	CGT_MDCR_TDE_TDOSA,
-> +	CGT_MDCR_TDE_TDRA,
-> +	CGT_MDCR_TDCC_TDE_TDA,
->  
->  	/*
->  	 * Anything after this point requires a callback evaluating a
-> @@ -249,6 +266,72 @@ static const struct trap_bits coarse_trap_bits[] = {
->  		.mask		= HCR_TTLBOS,
->  		.behaviour	= BEHAVE_FORWARD_ANY,
->  	},
-> +	[CGT_MDCR_TPMCR] = {
-> +		.index		= MDCR_EL2,
-> +		.value		= MDCR_EL2_TPMCR,
-> +		.mask		= MDCR_EL2_TPMCR,
-> +		.behaviour	= BEHAVE_FORWARD_ANY,
-> +	},
-> +	[CGT_MDCR_TPM] = {
-> +		.index		= MDCR_EL2,
-> +		.value		= MDCR_EL2_TPM,
-> +		.mask		= MDCR_EL2_TPM,
-> +		.behaviour	= BEHAVE_FORWARD_ANY,
-> +	},
-> +	[CGT_MDCR_TDE] = {
-> +		.index		= MDCR_EL2,
-> +		.value		= MDCR_EL2_TDE,
-> +		.mask		= MDCR_EL2_TDE,
-> +		.behaviour	= BEHAVE_FORWARD_ANY,
-> +	},
-> +	[CGT_MDCR_TDA] = {
-> +		.index		= MDCR_EL2,
-> +		.value		= MDCR_EL2_TDA,
-> +		.mask		= MDCR_EL2_TDA,
-> +		.behaviour	= BEHAVE_FORWARD_ANY,
-> +	},
-> +	[CGT_MDCR_TDOSA] = {
-> +		.index		= MDCR_EL2,
-> +		.value		= MDCR_EL2_TDOSA,
-> +		.mask		= MDCR_EL2_TDOSA,
-> +		.behaviour	= BEHAVE_FORWARD_ANY,
-> +	},
-> +	[CGT_MDCR_TDRA] = {
-> +		.index		= MDCR_EL2,
-> +		.value		= MDCR_EL2_TDRA,
-> +		.mask		= MDCR_EL2_TDRA,
-> +		.behaviour	= BEHAVE_FORWARD_ANY,
-> +	},
-> +	[CGT_MDCR_E2PB] = {
-> +		.index		= MDCR_EL2,
-> +		.value		= 0,
-> +		.mask		= BIT(MDCR_EL2_E2PB_SHIFT),
-> +		.behaviour	= BEHAVE_FORWARD_ANY,
-> +	},
-> +	[CGT_MDCR_TPMS] = {
-> +		.index		= MDCR_EL2,
-> +		.value		= MDCR_EL2_TPMS,
-> +		.mask		= MDCR_EL2_TPMS,
-> +		.behaviour	= BEHAVE_FORWARD_ANY,
-> +	},
-> +	[CGT_MDCR_TTRF] = {
-> +		.index		= MDCR_EL2,
-> +		.value		= MDCR_EL2_TTRF,
-> +		.mask		= MDCR_EL2_TTRF,
-> +		.behaviour	= BEHAVE_FORWARD_ANY,
-> +	},
-> +	[CGT_MDCR_E2TB] = {
-> +		.index		= MDCR_EL2,
-> +		.value		= 0,
-> +		.mask		= BIT(MDCR_EL2_E2TB_SHIFT),
-> +		.behaviour	= BEHAVE_FORWARD_ANY,
-> +	},
-> +	[CGT_MDCR_TDCC] = {
-> +		.index		= MDCR_EL2,
-> +		.value		= MDCR_EL2_TDCC,
-> +		.mask		= MDCR_EL2_TDCC,
-> +		.behaviour	= BEHAVE_FORWARD_ANY,
-> +	},
->  };
->  
->  #define MCB(id, ...)					\
-> @@ -266,6 +349,11 @@ static const enum coarse_grain_trap_id *coarse_control_combo[] = {
->  	MCB(CGT_HCR_TPU_TICAB,		CGT_HCR_TPU, CGT_HCR_TICAB),
->  	MCB(CGT_HCR_TPU_TOCU,		CGT_HCR_TPU, CGT_HCR_TOCU),
->  	MCB(CGT_HCR_NV1_ENSCXT,		CGT_HCR_NV1, CGT_HCR_ENSCXT),
-> +	MCB(CGT_MDCR_TPM_TPMCR,		CGT_MDCR_TPM, CGT_MDCR_TPMCR),
-> +	MCB(CGT_MDCR_TDE_TDA,		CGT_MDCR_TDE, CGT_MDCR_TDA),
-> +	MCB(CGT_MDCR_TDE_TDOSA,		CGT_MDCR_TDE, CGT_MDCR_TDOSA),
-> +	MCB(CGT_MDCR_TDE_TDRA,		CGT_MDCR_TDE, CGT_MDCR_TDRA),
-> +	MCB(CGT_MDCR_TDCC_TDE_TDA,	CGT_MDCR_TDCC, CGT_MDCR_TDE_TDA),
->  };
->  
->  typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu *);
-> @@ -593,6 +681,180 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initdata = {
->  	SR_TRAP(SYS_ERXPFGCTL_EL1,	CGT_HCR_FIEN),
->  	SR_TRAP(SYS_ERXPFGCDN_EL1,	CGT_HCR_FIEN),
->  	SR_TRAP(SYS_SCXTNUM_EL0,	CGT_HCR_ENSCXT),
-> +	SR_TRAP(SYS_PMCR_EL0,		CGT_MDCR_TPM_TPMCR), *
-> +	SR_TRAP(SYS_PMCNTENSET_EL0,	CGT_MDCR_TPM),*
-> +	SR_TRAP(SYS_PMCNTENCLR_EL0,	CGT_MDCR_TPM),*
-> +	SR_TRAP(SYS_PMOVSSET_EL0,	CGT_MDCR_TPM),*
-> +	SR_TRAP(SYS_PMOVSCLR_EL0,	CGT_MDCR_TPM),*
-> +	SR_TRAP(SYS_PMCEID0_EL0,	CGT_MDCR_TPM),*
-> +	SR_TRAP(SYS_PMCEID1_EL0,	CGT_MDCR_TPM),*
-> +	SR_TRAP(SYS_PMXEVTYPER_EL0,	CGT_MDCR_TPM),*
-> +	SR_TRAP(SYS_PMSWINC_EL0,	CGT_MDCR_TPM),*
-> +	SR_TRAP(SYS_PMSELR_EL0,		CGT_MDCR_TPM),*
-> +	SR_TRAP(SYS_PMXEVCNTR_EL0,	CGT_MDCR_TPM),*
-> +	SR_TRAP(SYS_PMCCNTR_EL0,	CGT_MDCR_TPM),*
-> +	SR_TRAP(SYS_PMUSERENR_EL0,	CGT_MDCR_TPM),*
-> +	SR_TRAP(SYS_PMINTENSET_EL1,	CGT_MDCR_TPM),*
-> +	SR_TRAP(SYS_PMINTENCLR_EL1,	CGT_MDCR_TPM),*
-> +	SR_TRAP(SYS_PMMIR_EL1,		CGT_MDCR_TPM),*
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(0),	CGT_MDCR_TPM),*
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(1),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(2),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(3),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(4),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(5),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(6),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(7),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(8),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(9),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(10),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(11),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(12),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(13),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(14),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(15),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(16),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(17),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(18),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(19),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(20),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(21),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(22),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(23),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(24),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(25),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(26),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(27),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(28),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(29),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVCNTRn_EL0(30),	CGT_MDCR_TPM),*
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(0),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(1),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(2),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(3),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(4),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(5),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(6),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(7),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(8),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(9),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(10),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(11),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(12),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(13),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(14),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(15),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(16),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(17),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(18),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(19),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(20),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(21),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(22),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(23),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(24),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(25),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(26),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(27),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(28),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(29),	CGT_MDCR_TPM),
-> +	SR_TRAP(SYS_PMEVTYPERn_EL0(30),	CGT_MDCR_TPM),*
-> +	SR_TRAP(SYS_PMCCFILTR_EL0,	CGT_MDCR_TPM),*
-> +	SR_TRAP(SYS_MDCCSR_EL0,		CGT_MDCR_TDCC_TDE_TDA),*
-> +	SR_TRAP(SYS_MDCCINT_EL1,	CGT_MDCR_TDCC_TDE_TDA),*
-> +	SR_TRAP(SYS_OSDTRRX_EL1,	CGT_MDCR_TDCC_TDE_TDA),*
-> +	SR_TRAP(SYS_OSDTRTX_EL1,	CGT_MDCR_TDCC_TDE_TDA),*
-Please also double check DBGDTR_EL0, DBGDTRRX/TX_EL0. I understand from
-the spec they may end up in CGT_MDCR_TDCC_TDE_TDA too
-> +	SR_TRAP(SYS_MDSCR_EL1,		CGT_MDCR_TDE_TDA),*
-> +	SR_TRAP(SYS_OSECCR_EL1,		CGT_MDCR_TDE_TDA),*
-> +	SR_TRAP(SYS_DBGBVRn_EL1(0),	CGT_MDCR_TDE_TDA),*
-> +	SR_TRAP(SYS_DBGBVRn_EL1(1),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBVRn_EL1(2),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBVRn_EL1(3),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBVRn_EL1(4),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBVRn_EL1(5),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBVRn_EL1(6),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBVRn_EL1(7),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBVRn_EL1(8),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBVRn_EL1(9),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBVRn_EL1(10),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBVRn_EL1(11),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBVRn_EL1(12),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBVRn_EL1(13),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBVRn_EL1(14),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBVRn_EL1(15),	CGT_MDCR_TDE_TDA),*
-> +	SR_TRAP(SYS_DBGBCRn_EL1(0),	CGT_MDCR_TDE_TDA),*
-> +	SR_TRAP(SYS_DBGBCRn_EL1(1),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBCRn_EL1(2),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBCRn_EL1(3),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBCRn_EL1(4),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBCRn_EL1(5),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBCRn_EL1(6),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBCRn_EL1(7),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBCRn_EL1(8),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBCRn_EL1(9),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBCRn_EL1(10),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBCRn_EL1(11),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBCRn_EL1(12),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBCRn_EL1(13),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBCRn_EL1(14),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGBCRn_EL1(15),	CGT_MDCR_TDE_TDA),*
-> +	SR_TRAP(SYS_DBGWVRn_EL1(0),	CGT_MDCR_TDE_TDA),*
-> +	SR_TRAP(SYS_DBGWVRn_EL1(1),	CGT_MDCR_TDE_TDA),*
-> +	SR_TRAP(SYS_DBGWVRn_EL1(2),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWVRn_EL1(3),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWVRn_EL1(4),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWVRn_EL1(5),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWVRn_EL1(6),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWVRn_EL1(7),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWVRn_EL1(8),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWVRn_EL1(9),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWVRn_EL1(10),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWVRn_EL1(11),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWVRn_EL1(12),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWVRn_EL1(13),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWVRn_EL1(14),	CGT_MDCR_TDE_TDA),*
-> +	SR_TRAP(SYS_DBGWVRn_EL1(15),	CGT_MDCR_TDE_TDA),*
-> +	SR_TRAP(SYS_DBGWCRn_EL1(0),	CGT_MDCR_TDE_TDA),*
-> +	SR_TRAP(SYS_DBGWCRn_EL1(1),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWCRn_EL1(2),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWCRn_EL1(3),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWCRn_EL1(4),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWCRn_EL1(5),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWCRn_EL1(6),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWCRn_EL1(7),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWCRn_EL1(8),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWCRn_EL1(9),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWCRn_EL1(10),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWCRn_EL1(11),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWCRn_EL1(12),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWCRn_EL1(13),	CGT_MDCR_TDE_TDA),
-> +	SR_TRAP(SYS_DBGWCRn_EL1(14),	CGT_MDCR_TDE_TDA),*
-> +	SR_TRAP(SYS_DBGCLAIMSET_EL1,	CGT_MDCR_TDE_TDA),*
-> +	SR_TRAP(SYS_DBGCLAIMCLR_EL1,	CGT_MDCR_TDE_TDA),*
-> +	SR_TRAP(SYS_DBGAUTHSTATUS_EL1,	CGT_MDCR_TDE_TDA),*
-> +	SR_TRAP(SYS_OSLAR_EL1,		CGT_MDCR_TDE_TDOSA),*
-> +	SR_TRAP(SYS_OSLSR_EL1,		CGT_MDCR_TDE_TDOSA),*
-> +	SR_TRAP(SYS_OSDLR_EL1,		CGT_MDCR_TDE_TDOSA),*
-> +	SR_TRAP(SYS_DBGPRCR_EL1,	CGT_MDCR_TDE_TDOSA),*
-> +	SR_TRAP(SYS_MDRAR_EL1,		CGT_MDCR_TDE_TDRA),*
-> +	SR_TRAP(SYS_PMBLIMITR_EL1,	CGT_MDCR_E2PB),*
-> +	SR_TRAP(SYS_PMBPTR_EL1,		CGT_MDCR_E2PB),*
-> +	SR_TRAP(SYS_PMBSR_EL1,		CGT_MDCR_E2PB),*
-> +	SR_TRAP(SYS_PMSCR_EL1,		CGT_MDCR_TPMS),*
-> +	SR_TRAP(SYS_PMSEVFR_EL1,	CGT_MDCR_TPMS),*
-> +	SR_TRAP(SYS_PMSFCR_EL1,		CGT_MDCR_TPMS),*
-> +	SR_TRAP(SYS_PMSICR_EL1,		CGT_MDCR_TPMS),*
-> +	SR_TRAP(SYS_PMSIDR_EL1,		CGT_MDCR_TPMS),*
-> +	SR_TRAP(SYS_PMSIRR_EL1,		CGT_MDCR_TPMS),*
-> +	SR_TRAP(SYS_PMSLATFR_EL1,	CGT_MDCR_TPMS),*
-> +	SR_TRAP(SYS_PMSNEVFR_EL1,	CGT_MDCR_TPMS),*
-> +	SR_TRAP(SYS_TRFCR_EL1,		CGT_MDCR_TTRF),*
-> +	SR_TRAP(SYS_TRBBASER_EL1,	CGT_MDCR_E2TB),*
-> +	SR_TRAP(SYS_TRBLIMITR_EL1,	CGT_MDCR_E2TB),*
-> +	SR_TRAP(SYS_TRBMAR_EL1, 	CGT_MDCR_E2TB),*
-> +	SR_TRAP(SYS_TRBPTR_EL1, 	CGT_MDCR_E2TB),*
-> +	SR_TRAP(SYS_TRBSR_EL1, 		CGT_MDCR_E2TB),*
-> +	SR_TRAP(SYS_TRBTRG_EL1,		CGT_MDCR_E2TB),*
->  };
->  
->  static DEFINE_XARRAY(sr_forward_xa);
-Besides
+> Thanks for your explanation. It's fine to have two separate patches in th=
+is
+> case. I still need to spend some time to look at PATCH[11/11] whose subje=
+ct
+> includes typo (intructions -> instructions)
+>
+I'm planning to send v6 soon, but I'm happy to wait if you have any
+other comments on v5 patch-11.
+Appreciate your help with the reviews.
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Eric
-
+Thank you.
+Raghavendra
+> Thanks,
+> Gavin
+>
+> >> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> >>
+> >>> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/includ=
+e/asm/kvm_pgtable.h
+> >>> index 4cd6762bda805..1b12295a83595 100644
+> >>> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> >>> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> >>> @@ -682,4 +682,14 @@ enum kvm_pgtable_prot kvm_pgtable_stage2_pte_pro=
+t(kvm_pte_t pte);
+> >>>     *     kvm_pgtable_prot format.
+> >>>     */
+> >>>    enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte);
+> >>> +
+> >>> +/**
+> >>> + * kvm_tlb_flush_vmid_range() - Invalidate/flush a range of TLB entr=
+ies
+> >>> + *
+> >>> + * @mmu:     Stage-2 KVM MMU struct
+> >>> + * @addr:    The base Intermediate physical address from which to in=
+validate
+> >>> + * @size:    Size of the range from the base to invalidate
+> >>> + */
+> >>> +void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+> >>> +                             phys_addr_t addr, size_t size);
+> >>>    #endif      /* __ARM64_KVM_PGTABLE_H__ */
+> >>> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtabl=
+e.c
+> >>> index 3d61bd3e591d2..df8ac14d9d3d4 100644
+> >>> --- a/arch/arm64/kvm/hyp/pgtable.c
+> >>> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> >>> @@ -631,6 +631,26 @@ static bool stage2_has_fwb(struct kvm_pgtable *p=
+gt)
+> >>>        return !(pgt->flags & KVM_PGTABLE_S2_NOFWB);
+> >>>    }
+> >>>
+> >>> +void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+> >>> +                             phys_addr_t addr, size_t size)
+> >>> +{
+> >>> +     unsigned long pages, inval_pages;
+> >>> +
+> >>> +     if (!system_supports_tlb_range()) {
+> >>> +             kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
+> >>> +             return;
+> >>> +     }
+> >>> +
+> >>> +     pages =3D size >> PAGE_SHIFT;
+> >>> +     while (pages > 0) {
+> >>> +             inval_pages =3D min(pages, MAX_TLBI_RANGE_PAGES);
+> >>> +             kvm_call_hyp(__kvm_tlb_flush_vmid_range, mmu, addr, inv=
+al_pages);
+> >>> +
+> >>> +             addr +=3D inval_pages << PAGE_SHIFT;
+> >>> +             pages -=3D inval_pages;
+> >>> +     }
+> >>> +}
+> >>> +
+> >>>    #define KVM_S2_MEMATTR(pgt, attr) PAGE_S2_MEMATTR(attr, stage2_has=
+_fwb(pgt))
+> >>>
+> >>>    static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_=
+pgtable_prot prot,
+>
