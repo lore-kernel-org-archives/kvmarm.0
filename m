@@ -1,112 +1,212 @@
-Received: from out-55.mta0.migadu.com (out-55.mta0.migadu.com [91.218.175.55])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5618E629
-	for <kvmarm@lists.linux.dev>; Thu, 13 Jul 2023 04:54:17 +0000 (UTC)
-Date: Wed, 12 Jul 2023 21:54:28 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1689224055;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jvatkfDYHCzc/v6qAGFyRVg8w34hfubtE7G647tEMHw=;
-	b=mA/uVKEvJgw2M8wAYWYl+WGAYZ/R/QfRxWBlDDWZB8+SwLbUbpICDlE6XivZmtOpWh6iIH
-	TzjVbCXe3Mz78JIzu8M7rzjwIgEYOmR7Qme0Vdv1eIdpzlm4FrWiJCSgupkVx+1Zm3mU6P
-	hA1AK5Dx2EI3X59RUf2T6nDYEQ9IsDg=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: chenqingyun001@208suo.com
-Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-Subject: Re: [PATCH] KVM: arm64:Use #include <linux/cpufeature.h> instead of
- <asm/cpufeature.h> 	   trailing whitespace 	   braces {} are not
- necessary for any arm of this statement
-Message-ID: <ZK+DhMfudVdhXnm2@thinky-boi>
-References: <tencent_1B7BA6D8EFD533563E01F8EB64A145417008@qq.com>
- <ef2ecfd960b2141b143003cc41ee551a@208suo.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4039566E
+	for <kvmarm@lists.linux.dev>; Thu, 13 Jul 2023 05:57:51 +0000 (UTC)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.56])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4R1kNZ303kzLnhN;
+	Thu, 13 Jul 2023 13:55:26 +0800 (CST)
+Received: from [10.40.193.166] (10.40.193.166) by
+ kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Thu, 13 Jul 2023 13:57:46 +0800
+Subject: Re: [PATCH] KVM: arm64: vgic-v4: Consistently request doorbell irq
+ for blocking vCPU
+To: Marc Zyngier <maz@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20230710175553.1477762-1-oliver.upton@linux.dev>
+ <86jzv6x66q.wl-maz@kernel.org> <ZK0EPhvLzhaFepGk@linux.dev>
+ <14acf0fd-e5eb-8a14-986a-b8fe4a44cec9@huawei.com>
+ <86zg41utno.wl-maz@kernel.org>
+CC: Oliver Upton <oliver.upton@linux.dev>, <kvmarm@lists.linux.dev>, James
+ Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	<stable@vger.kernel.org>
+From: "chenxiang (M)" <chenxiang66@hisilicon.com>
+Message-ID: <092f42c5-02d1-6f05-ea92-0eae3a55341e@hisilicon.com>
+Date: Thu, 13 Jul 2023 13:57:46 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.2.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ef2ecfd960b2141b143003cc41ee551a@208suo.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <86zg41utno.wl-maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.40.193.166]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemi500016.china.huawei.com (7.221.188.220)
+X-CFilter-Loop: Reflected
 
-Qingyun,
+Hi,
 
-I'm guessing you did not read our developer documentation, nor did you
-run scripts/checkpatch.pl... 
 
- - The shortlog should be at most 75 characters, but ideally less.
-
- - The body should not be a restatement of the shortlog, and actually
-   provide meaningful information to the reader not yet captured in the
-   shortlog.
-
-[*] https://www.kernel.org/doc/html/latest/process/submitting-patches.html
-
-On Thu, Jul 13, 2023 at 11:03:44AM +0800, chenqingyun001@208suo.com wrote:
-> include <linux/cpufeature.h> is a generic
-> Having extra spaces or tabs has no real effect
-> If there is only one statement in the if branch,
-> curly braces {} can be omitted
-> 
-> Signed-off-by: Qingyun Chen <chenqingyun001@208suo.com>
-> ---
->  arch/arm64/kvm/reset.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index b5dee8e57e77..4e6305dd1909 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -19,7 +19,7 @@
-> 
->  #include <kvm/arm_arch_timer.h>
-> 
-> -#include <asm/cpufeature.h>
-> +#include <linux/cpufeature.h>
-
-Changing the include provides absolutely nothing of value. All the
-things this compilation unit depends on are described in the asm header.
-Furthermore, use of the asm header appears all throughout the arm64
-code.
-
->  #include <asm/cputype.h>
->  #include <asm/fpsimd.h>
->  #include <asm/ptrace.h>
-> @@ -122,7 +122,7 @@ static int kvm_vcpu_finalize_sve(struct kvm_vcpu *vcpu)
->          kfree(buf);
->          return ret;
->      }
-> -
+在 2023/7/12 星期三 21:49, Marc Zyngier 写道:
+> On Wed, 12 Jul 2023 13:09:45 +0100,
+> Zenghui Yu <yuzenghui@huawei.com> wrote:
+>> On 2023/7/11 15:26, Oliver Upton wrote:
+>>> On Tue, Jul 11, 2023 at 08:23:25AM +0100, Marc Zyngier wrote:
+>>>> On Mon, 10 Jul 2023 18:55:53 +0100,
+>>>> Oliver Upton <oliver.upton@linux.dev> wrote:
+>>>>> Xiang reports that VMs occasionally fail to boot on GICv4.1 systems when
+>>>>> running a preemptible kernel, as it is possible that a vCPU is blocked
+>>>>> without requesting a doorbell interrupt.
+>>>>>
+>>>>> The issue is that any preemption that occurs between vgic_v4_put() and
+>>>>> schedule() on the block path will mark the vPE as nonresident and *not*
+>>>>> request a doorbell irq.
+>>>> It'd be worth spelling out. You need to go via *three* schedule()
+>>>> calls: one to be preempted (with DB set), one to be made resident
+>>>> again, and then the final one in kvm_vcpu_halt(), clearing the DB on
+>>>> vcpu_put() due to the bug.
+>>> Yeah, a bit lazy in the wording. What I had meant to imply was
+>>> preemption happening after the doorbell is set up and before the thread
+>>> has an opportunity to explicitly schedule out. Perhaps I should just say
+>>> that.
+>>>
+>>>>> Fix it by consistently requesting a doorbell irq in the vcpu put path if
+>>>>> the vCPU is blocking.
+>> Yup. Agreed!
+>>
+>>>>> While this technically means we could drop the
+>>>>> early doorbell irq request in kvm_vcpu_wfi(), deliberately leave it
+>>>>> intact such that vCPU halt polling can properly detect the wakeup
+>>>>> condition before actually scheduling out a vCPU.
+>> Yeah, just like what we did in commit 07ab0f8d9a12 ("KVM: Call
+>> kvm_arch_vcpu_blocking early into the blocking sequence").
+>>
+>> My only concern is that if the preemption happens before halt polling,
+>> we would enter the polling loop with VPE already resident on the RD and
+>> can't recognize any firing GICv4.x virtual interrupts (targeting this
+>> VPE) in polling. [1]
+> The status of the pending bit is recorded in pending_last, so we don't
+> lose what was snapshot at the point of hitting WFI. But we indeed
+> don't have any idea for something firing during the polling loop.
+>
+>> Given that making VPE resident on the vcpu block path (i.e., in
+>> kvm_vcpu_halt()) makes little sense (right?) and leads to this sort of
+>> problem, a crude idea is that we can probably keep track of the
+>> "nested" vgic_v4_{put,load} calls (instead of a single vpe->resident
+>> flag) and keep VPE *not resident* on the whole block path (like what we
+>> had before commit 8e01d9a396e6). And we then rely on
+>> kvm_vcpu_wfi/vgic_v4_load to actually schedule the VPE on...
+> I'm not sure about the nested tracking part, but it's easy enough to
+> have a vcpu flag indicating that we're in WFI. So an *alternative* to
+> the current fix would be something like this:
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index f54ba0a63669..417a0e85456b 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -817,6 +817,8 @@ struct kvm_vcpu_arch {
+>   #define DBG_SS_ACTIVE_PENDING	__vcpu_single_flag(sflags, BIT(5))
+>   /* PMUSERENR for the guest EL0 is on physical CPU */
+>   #define PMUSERENR_ON_CPU	__vcpu_single_flag(sflags, BIT(6))
+> +/* WFI instruction trapped */
+> +#define IN_WFI			__vcpu_single_flag(sflags, BIT(7))
+>   
+>   /* vcpu entered with HCR_EL2.E2H set */
+>   #define VCPU_HCR_E2H		__vcpu_single_flag(oflags, BIT(0))
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 236c5f1c9090..cf208d30a9ea 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -725,13 +725,15 @@ void kvm_vcpu_wfi(struct kvm_vcpu *vcpu)
+>   	 */
+>   	preempt_disable();
+>   	kvm_vgic_vmcr_sync(vcpu);
+> -	vgic_v4_put(vcpu, true);
+> +	vcpu_set_flag(vcpu, IN_WFI);
+> +	vgic_v4_put(vcpu);
+>   	preempt_enable();
+>   
+>   	kvm_vcpu_halt(vcpu);
+>   	vcpu_clear_flag(vcpu, IN_WFIT);
+>   
+>   	preempt_disable();
+> +	vcpu_clear_flag(vcpu, IN_WFI);
+>   	vgic_v4_load(vcpu);
+>   	preempt_enable();
+>   }
+> @@ -799,7 +801,7 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+>   		if (kvm_check_request(KVM_REQ_RELOAD_GICv4, vcpu)) {
+>   			/* The distributor enable bits were changed */
+>   			preempt_disable();
+> -			vgic_v4_put(vcpu, false);
+> +			vgic_v4_put(vcpu);
+>   			vgic_v4_load(vcpu);
+>   			preempt_enable();
+>   		}
+> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+> index 49d35618d576..df61ead7c757 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+> @@ -780,7 +780,7 @@ void vgic_v3_put(struct kvm_vcpu *vcpu)
+>   	 * done a vgic_v4_put) and when running a nested guest (the
+>   	 * vPE was never resident in order to generate a doorbell).
+>   	 */
+> -	WARN_ON(vgic_v4_put(vcpu, false));
+> +	WARN_ON(vgic_v4_put(vcpu));
+>   
+>   	vgic_v3_vmcr_sync(vcpu);
+>   
+> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+> index c1c28fe680ba..339a55194b2c 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v4.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
+> @@ -336,14 +336,14 @@ void vgic_v4_teardown(struct kvm *kvm)
+>   	its_vm->vpes = NULL;
+>   }
+>   
+> -int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db)
+> +int vgic_v4_put(struct kvm_vcpu *vcpu)
+>   {
+>   	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
+>   
+>   	if (!vgic_supports_direct_msis(vcpu->kvm) || !vpe->resident)
+>   		return 0;
+>   
+> -	return its_make_vpe_non_resident(vpe, need_db);
+> +	return its_make_vpe_non_resident(vpe, !!vcpu_get_flag(vcpu, IN_WFI));
+>   }
+>   
+>   int vgic_v4_load(struct kvm_vcpu *vcpu)
+> @@ -354,6 +354,9 @@ int vgic_v4_load(struct kvm_vcpu *vcpu)
+>   	if (!vgic_supports_direct_msis(vcpu->kvm) || vpe->resident)
+>   		return 0;
+>   
+> +	if (vcpu_get_flag(vcpu, IN_WFI))
+> +		return 0;
 > +
->      vcpu->arch.sve_state = buf;
->      vcpu_set_flag(vcpu, VCPU_SVE_FINALIZED);
->      return 0;
-> @@ -308,9 +308,9 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
-> 
->      switch (vcpu->arch.target) {
->      default:
-> -        if (vcpu_el1_is_32bit(vcpu)) {
-> +        if (vcpu_el1_is_32bit(vcpu))
->              pstate = VCPU_RESET_PSTATE_SVC;
-> -        } else if (vcpu_has_nv(vcpu)) {
-> +        else if (vcpu_has_nv(vcpu)) {
+>   	/*
+>   	 * Before making the VPE resident, make sure the redistributor
+>   	 * corresponding to our current CPU expects us here. See the
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 9b91a8135dac..765d801d1ddc 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -446,7 +446,7 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int irq,
+>   
+>   int vgic_v4_load(struct kvm_vcpu *vcpu);
+>   void vgic_v4_commit(struct kvm_vcpu *vcpu);
+> -int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db);
+> +int vgic_v4_put(struct kvm_vcpu *vcpu);
+>   
+>   bool vgic_state_is_nested(struct kvm_vcpu *vcpu);
+>   
+>
+> Of course, it is totally untested... ;-) But I like that the doorbell
+> request is solely driven by the WFI state, and we avoid leaking the
+> knowledge outside of the vgic code.
 
-No. What we have matches the kernel style guide. If one branch of a
-conditional statement requires braces, _all_ branches get braces.
+I have tested this approach and it also solves the issue. Please feel 
+free to add:
+Tested-by: Xiang Chen <chenxiang66@hisilicon.com>
 
-[*] https://www.kernel.org/doc/html/latest/process/coding-style.html#placing-braces-and-spaces
+>
+> Thoughts?
+>
+> 	M.
+>
 
-I strongly suggest you read up on the kernel developer documentation
-before your next contribution, as you're unlikely to win any favors with
-reviewers with problematic submissions such as this.
-
---
-Thanks,
-Oliver
