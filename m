@@ -1,91 +1,90 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2C95101DB
-	for <kvmarm@lists.linux.dev>; Thu, 13 Jul 2023 09:49:03 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A2D641570;
-	Thu, 13 Jul 2023 02:49:39 -0700 (PDT)
-Received: from [10.1.36.45] (FVFF763DQ05P.cambridge.arm.com [10.1.36.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D0BFC3F740;
-	Thu, 13 Jul 2023 02:48:55 -0700 (PDT)
-Message-ID: <740731b6-5f3f-7acd-6d9f-8adfcef833ab@arm.com>
-Date: Thu, 13 Jul 2023 10:48:54 +0100
+Received: from mail.208.org (unknown [183.242.55.162])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C8011775F
+	for <kvmarm@lists.linux.dev>; Thu, 13 Jul 2023 12:19:46 +0000 (UTC)
+Received: from mail.208.org (email.208.org [127.0.0.1])
+	by mail.208.org (Postfix) with ESMTP id 4R1tvy0kPWzBRSV7
+	for <kvmarm@lists.linux.dev>; Thu, 13 Jul 2023 20:19:42 +0800 (CST)
+Authentication-Results: mail.208.org (amavisd-new); dkim=pass
+	reason="pass (just generated, assumed good)" header.d=208.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=208.org; h=
+	content-transfer-encoding:content-type:message-id:user-agent
+	:references:in-reply-to:subject:to:from:date:mime-version; s=
+	dkim; t=1689250782; x=1691842783; bh=r7J75gJn0L5wuugvzGABNEIG4Fd
+	2ejoVXDfNg+ybWRw=; b=SRGvJb4ymU2AbaiXP/PxsqgSiY8feDCP51hCM3h8k7M
+	YYvDPyV9M+rPZ5CdgXMHmYVrW/DJ+6tZMqucWZKz9ENoYZUzZSGWFambaFvawKCM
+	swzKN/97U7hORR7HVP621PbBZBDtemvoYznEjR9OM3t7hB7+WtZqqExjgPpv9jnM
+	Z1l9qbVPjiKxsEFpb8LvZ0/A3ur2mNHB8YxQz6+wgEWR/j/K17vsKbuwgPbSRgOn
+	8fv8HEkVlKGZN4Q75xgF0xJUI/jclx3/ZlPkuNTHBVmj0N1fCLj9FNuWaTNr/qQ3
+	JEa1b4enX/mKxL8ZPa38z2VJhUYEBNyFGhgpXqLT1ew==
+X-Virus-Scanned: amavisd-new at mail.208.org
+Received: from mail.208.org ([127.0.0.1])
+	by mail.208.org (mail.208.org [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id dZuRV_vIl2Fu for <kvmarm@lists.linux.dev>;
+	Thu, 13 Jul 2023 20:19:42 +0800 (CST)
+Received: from localhost (email.208.org [127.0.0.1])
+	by mail.208.org (Postfix) with ESMTPSA id 4R1tvx4g1wzBRRLw;
+	Thu, 13 Jul 2023 20:19:41 +0800 (CST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH v5 2/2] KVM: arm64: Move FGT value configuration to vCPU
- state
-To: Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev
-References: <20230712-kvm-arm64-fgt-v5-0-dae3ec236288@kernel.org>
- <20230712-kvm-arm64-fgt-v5-2-dae3ec236288@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20230712-kvm-arm64-fgt-v5-2-dae3ec236288@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Date: Thu, 13 Jul 2023 20:19:41 +0800
+From: chenqingyun001@208suo.com
+To: maz@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com,
+ will@kernel.org
+Cc: kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+ james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+Subject: [PATCH] KVM: arm64:space prohibited between function name 	   and
+ open parenthesis '(';space required 	   before the open parenthesis '('
+In-Reply-To: <tencent_A24E3EC2F8CE6474455D704AA667EF103308@qq.com>
+References: <tencent_A24E3EC2F8CE6474455D704AA667EF103308@qq.com>
+User-Agent: Roundcube Webmail
+Message-ID: <a9d6a2ccfa775c0ea91032ac5c76ea8e@208suo.com>
+X-Sender: chenqingyun001@208suo.com
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 12/07/2023 13:50, Mark Brown wrote:
-> Currently the only fine grained traps we use are the SME ones and we decide
-> which to enable based on the presence of that feature. In order to support
-> SME, GCS and other features where we need fine grained traps we will need to
-> select per guest which traps are enabled. Move to storing the traps to
-> enable in the vCPU data, updating the registers if fine grained traps are
-> supported and any are enabled.
-> 
-> The code assumes that we never change the set of fine grained traps for the
-> host after boot.
-> 
-> No functional change, though there will be a small overhead on systems with
-> fine grained traps supported.  We could optimise slightly by assuming that
-> host and guest always set the same pattern for read and write (they do
-> currently) but this seemed more likely to cause surprises in future than
-> it was worth.
-> 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->   arch/arm64/include/asm/kvm_emulate.h    | 21 +++++++++++
->   arch/arm64/include/asm/kvm_host.h       |  6 ++++
->   arch/arm64/kvm/arm.c                    |  1 +
->   arch/arm64/kvm/hyp/include/hyp/switch.h | 62 +++++++++------------------------
->   4 files changed, 44 insertions(+), 46 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index efc0b45d79c3..0d6c8d7e2aaa 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -108,6 +108,27 @@ static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
->   	return (unsigned long *)&vcpu->arch.hcr_el2;
->   }
->   
-> +static inline void vcpu_reset_fgt(struct kvm_vcpu *vcpu)
-> +{
-> +	if (!cpus_have_const_cap(ARM64_HAS_FGT))
-> +		return;
-> +
-> +	vcpu->arch.hfgrtr_el2 = 0;
-> +	vcpu->arch.hfgwtr_el2 = 0;
-> +
-> +	/*
-> +	 * Trap guest writes to TCR_EL1 to prevent it from enabling HA or HD.
-> +	 */
-> +	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38)) {
-> +		vcpu->arch.hfgrtr_el2 |= HFGxTR_EL2_TCR_EL1_MASK;
-> +		vcpu->arch.hfgwtr_el2 |= HFGxTR_EL2_TCR_EL1_MASK;
-> +	}
-> +
-> +	/* We currently assume the host configuration never changes */
-> +	vcpu->arch.hfgrtr_el2_host = read_sysreg_s(SYS_HFGRTR_EL2);
-> +	vcpu->arch.hfgwtr_el2_host = read_sysreg_s(SYS_HFGWTR_EL2);
+Using spaces can affect the readability and consistency
+of your code. If you use a space between the function name
+and the opening parenthesis, it may be mistaken for the
+function name instead of the actual function name.
+Use spaces between keywords and opening parentheses to
+distinguish function calls from control statements
 
-Doesn't this crash an nVHE host ?
+Signed-off-by: Qingyun Chen <chenqingyun001@208suo.com>
+---
+  arch/arm64/kvm/hyp/exception.c | 4 ++--
+  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Suzuki
+diff --git a/arch/arm64/kvm/hyp/exception.c 
+b/arch/arm64/kvm/hyp/exception.c
+index 424a5107cddb..46888dba3def 100644
+--- a/arch/arm64/kvm/hyp/exception.c
++++ b/arch/arm64/kvm/hyp/exception.c
+@@ -16,7 +16,7 @@
+  #include <asm/kvm_mmu.h>
+  #include <asm/kvm_nested.h>
 
+-#if !defined (__KVM_NVHE_HYPERVISOR__) && !defined 
+(__KVM_VHE_HYPERVISOR__)
++#if !defined(__KVM_NVHE_HYPERVISOR__) && 
+!defined(__KVM_VHE_HYPERVISOR__)
+  #error Hypervisor code only!
+  #endif
+
+@@ -295,7 +295,7 @@ static void enter_exception32(struct kvm_vcpu *vcpu, 
+u32 mode, u32 vect_offset)
+      return_address  += return_offsets[vect_offset >> 2][is_thumb];
+
+      /* KVM only enters the ABT and UND modes, so only deal with those 
+*/
+-    switch(mode) {
++    switch (mode) {
+      case PSR_AA32_MODE_ABT:
+          __vcpu_write_spsr_abt(vcpu, host_spsr_to_spsr32(spsr));
+          vcpu_gp_regs(vcpu)->compat_lr_abt = return_address;
