@@ -1,68 +1,98 @@
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2F1211A
-	for <kvmarm@lists.linux.dev>; Thu, 13 Jul 2023 07:23:00 +0000 (UTC)
-Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.55])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4R1mGr3CYpzLnj9;
-	Thu, 13 Jul 2023 15:20:36 +0800 (CST)
-Received: from [10.174.185.179] (10.174.185.179) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65597DDCD
+	for <kvmarm@lists.linux.dev>; Thu, 13 Jul 2023 09:10:13 +0000 (UTC)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.56])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4R1phR0VHGz18Lrk;
+	Thu, 13 Jul 2023 17:09:27 +0800 (CST)
+Received: from [10.40.193.166] (10.40.193.166) by
+ kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Thu, 13 Jul 2023 15:22:56 +0800
-Subject: Re: [PATCH] KVM: arm64: vgic-v4: Make the doorbell request robust
- w.r.t preemption
+ 15.1.2507.27; Thu, 13 Jul 2023 17:10:02 +0800
+Subject: Re: [PATCH] KVM: arm64: Fix the name of sys_reg_desc related to PMU
 To: Marc Zyngier <maz@kernel.org>
-CC: <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton
-	<oliver.upton@linux.dev>, <stable@vger.kernel.org>, Xiang Chen
-	<chenxiang66@hisilicon.com>
-References: <20230713070657.3873244-1-maz@kernel.org>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <f5096fb2-f96d-a553-364b-a7f6b5158e23@huawei.com>
-Date: Thu, 13 Jul 2023 15:22:55 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+References: <1689148505-13914-1-git-send-email-chenxiang66@hisilicon.com>
+ <868rblwmpn.wl-maz@kernel.org>
+ <5c513a72-9ae9-22ca-a9a6-8b3c481e0921@hisilicon.com>
+ <87bkgg9u54.wl-maz@kernel.org>
+CC: <oliver.upton@linux.dev>, <james.morse@arm.com>, <kvmarm@lists.linux.dev>,
+	<kvm@vger.kernel.org>, <linuxarm@huawei.com>
+From: "chenxiang (M)" <chenxiang66@hisilicon.com>
+Message-ID: <4cbcc10d-6cd2-d88e-b15d-bd4f1a229251@hisilicon.com>
+Date: Thu, 13 Jul 2023 17:10:01 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.2.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <20230713070657.3873244-1-maz@kernel.org>
+In-Reply-To: <87bkgg9u54.wl-maz@kernel.org>
 Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.185.179]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.40.193.166]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemi500016.china.huawei.com (7.221.188.220)
 X-CFilter-Loop: Reflected
 
-On 2023/7/13 15:06, Marc Zyngier wrote:
-> Xiang reports that VMs occasionally fail to boot on GICv4.1 systems when
-> running a preemptible kernel, as it is possible that a vCPU is blocked
-> without requesting a doorbell interrupt.
-> 
-> The issue is that any preemption that occurs between vgic_v4_put() and
-> schedule() on the block path will mark the vPE as nonresident and *not*
-> request a doorbell irq. This occurs because when the vcpu thread is
-> resumed on its way to block, vcpu_load() will make the vPE resident
-> again. Once the vcpu actually blocks, we don't request a doorbell
-> anymore, and the vcpu won't be woken up on interrupt delivery.
-> 
-> Fix it by tracking that we're entering WFI, and key the doorbell
-> request on that flag. This allows us not to make the vPE resident
-> when going through a preempt/schedule cycle, meaning we don't lose
-> any state.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 8e01d9a396e6 ("KVM: arm64: vgic-v4: Move the GICv4 residency flow to be driven by vcpu_load/put")
-> Reported-by: Xiang Chen <chenxiang66@hisilicon.com>
-> Suggested-by: Zenghui Yu <yuzenghui@huawei.com>
-> Tested-by: Xiang Chen <chenxiang66@hisilicon.com>
-> Co-developed-by: Oliver Upton <oliver.upton@linux.dev>
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+Hi Marc,
 
-Acked-by: Zenghui Yu <yuzenghui@huawei.com>
+
+在 2023/7/13 星期四 14:56, Marc Zyngier 写道:
+> On Thu, 13 Jul 2023 03:35:39 +0100,
+> "chenxiang (M)" <chenxiang66@hisilicon.com> wrote:
+>> Hi Marc,
+>>
+>>
+>> 在 2023/7/12 星期三 16:36, Marc Zyngier 写道:
+>>> On Wed, 12 Jul 2023 08:55:05 +0100,
+>>> chenxiang <chenxiang66@hisilicon.com> wrote:
+>>>> From: Xiang Chen <chenxiang66@hisilicon.com>
+>>>>
+>>>> For those PMU system registers defined in sys_reg_descs[], use macro
+>>>> PMU_SYS_REG() / PMU_PMEVCNTR_EL0 / PMU_PMEVTYPER_EL0 to define them, and
+>>>> later two macros call macro PMU_SYS_REG() actually.
+>>>> Currently the input parameter of PMU_SYS_REG() is other macro which is
+>>>> calculation formula of the value of system registers, so for example, if
+>>>> we want to "SYS_PMINTENSET_EL1" as the name of sys register, actually
+>>>> the name will be as following:
+>>>> (((3) << 19) | ((0) << 16) | ((9) << 12) | ((14) << 8) | ((1) << 5))
+>>>>
+>>>> To fix the issue, use the name as a input parameter of PMU_SYS_REG like
+>>>> MTE_REG or EL2_REG.
+>>> Why is the name relevant? Is this related to tracing?
+>> I think It is not related to tracing. I find the issue when i want to
+>> know which system reigsters are set
+>> when on live migration and printk the name of sys_reg_desc in function
+>> kvm_sys_reg_set_user,
+>> find the name of some registers are abnormal as followings:
+>>
+>> [  227.145540] kvm_sys_reg_set_user 3427:SYS_FAR_EL1
+>> [  227.158057] kvm_sys_reg_set_user 3427:SYS_PAR_EL1
+>> [  227.170574] kvm_sys_reg_set_user 3427:(((3) << 19) | ((0) << 16) |
+>> ((9) << 12) | ((14) << 8) | ((1) << 5))
+>> [  227.188037] kvm_sys_reg_set_user 3427:(((3) << 19) | ((0) << 16) |
+>> ((9) << 12) | ((14) << 8) | ((2) << 5))
+>> [  227.205511] kvm_sys_reg_set_user 3427:SYS_MAIR_EL1
+>> [  227.218117] kvm_sys_reg_set_user 3427:SYS_PIRE0_EL1
+> So what is this if not some form of tracing?
+
+Ah, i was misunderstood your question. I thought you aksed whether it is 
+related to kernel tracing
+  (which is already existed in kernel) such as tracepoint or debugfs.
+
+>
+> I agree that it would be good to fix it, at least because the register
+> name is smaller than the encoding, but the commit message should at
+> least mention what this is used for.
+
+Ok, i will modify commit message in next version.
+
+>
+> Thanks,
+>
+> 	M.
+>
+
