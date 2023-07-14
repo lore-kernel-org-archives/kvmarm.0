@@ -1,138 +1,189 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81992F9FE
-	for <kvmarm@lists.linux.dev>; Fri, 14 Jul 2023 09:57:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689328657;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gCu33ziM562YgoYaGWLee8XNj2HHD6OoiAz2SuMASII=;
-	b=DhTcKhzxvjLZ3jmvOA3SU1N7nV3/mvs8/myirNOAawY3rUYTprGsHc5dxNOjCY7eDl7Dhn
-	YrBPcyBnaKAX7RcyA2IkZEXTdQ6ZQct80/yOAA6qj/Z4ywk+KwBR3OcSPtZIApOStSX3W6
-	IJChy5mnsVRT80+HuXk8PtwpMApGqdw=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-286-neIxy83_PvOcw-Z2ZzroWQ-1; Fri, 14 Jul 2023 05:57:36 -0400
-X-MC-Unique: neIxy83_PvOcw-Z2ZzroWQ-1
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-635e91e5537so17350226d6.2
-        for <kvmarm@lists.linux.dev>; Fri, 14 Jul 2023 02:57:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689328655; x=1689933455;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gCu33ziM562YgoYaGWLee8XNj2HHD6OoiAz2SuMASII=;
-        b=iCuu0cpAZpx6dpS7bZuQwwWYghp2Bff6d+t7GE9g6YG7bYDtwCfhBEaQfPCoKEPBJX
-         FPNDobH7sA8YgaHKDSs1bEqHiqMMb2ZSH6X4inR1VY7TUf5yidlRpcCHF5cES8z/N2Ol
-         AkXgMQehIUtkaMqPhjJ24L0JltHFTTLxVqi4AWM8Y/yETW6Pyiv4135Uc9GEhainiPUH
-         nxeraEqOkUl/r4dgAuZxW5pq+D3HB0Erp1l2o62ycwAb2MTq4CgOldkEpANQS/acsCTZ
-         QusRXrBk1FMRCk5y2Rd1Ai5ZgTEdAnL8IieepBw5NZj98Xy1Vz4TA6KV2gCmTyjBU9Vr
-         4wGQ==
-X-Gm-Message-State: ABy/qLbPJeaAD2FT0ACowPKSVAYrpAe+5DTe/NwxCQpz4J3heNp4JlpQ
-	8fXO0Qrqn8UL0CVPLn/UrLX6ApYY6HLR33EH/iWceTE+I61hhkOsOg+aE+1/hEpUYdNAEZn9F6m
-	s4JzBW9W3KfsWjpRM
-X-Received: by 2002:ad4:504e:0:b0:628:35b0:e966 with SMTP id m14-20020ad4504e000000b0062835b0e966mr3805633qvq.21.1689328655670;
-        Fri, 14 Jul 2023 02:57:35 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFzMd8R1o7Y2YsrxyRprJ8q0Sa8uedD+jvkqyOU9OZseNveBJ7ue4hLIFSqRa2Cbz6Htb/SZg==
-X-Received: by 2002:ad4:504e:0:b0:628:35b0:e966 with SMTP id m14-20020ad4504e000000b0062835b0e966mr3805623qvq.21.1689328655382;
-        Fri, 14 Jul 2023 02:57:35 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id m10-20020ae9e70a000000b007654bb4a842sm3669537qka.104.2023.07.14.02.57.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Jul 2023 02:57:34 -0700 (PDT)
-Message-ID: <fc99e975-4625-6d1c-f6d0-08ad5af4233a@redhat.com>
-Date: Fri, 14 Jul 2023 11:57:30 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35ED111188
+	for <kvmarm@lists.linux.dev>; Fri, 14 Jul 2023 10:10:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93D39C433C8;
+	Fri, 14 Jul 2023 10:10:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689329456;
+	bh=+/1In3CXHwiwXI4REHPVuSWLDLkcJnvdHWDtDgrkD88=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BKSJupn7Q3v9eo27uP9DJOXtii0v/GcYQJ5Y/fyXiB/c/dgVb/yAilbRajbnIW/RE
+	 EABJGGY4DFDUYSyB3s2je2tDWfvKhyGcH9Gs02hHCq4YUsQD7MplUqfdw2WuUFUsVk
+	 bvMc2LnZfXuTBTfh03RQD8cVZ6Ww2Y5aPUG/jTHYZQYyF6qkEXZrkELdM15vY4l/H0
+	 pT6+L8D4ozKC3JD3f5X1Ggm9lH7czirS7SBVciYZiP6x1JXnX0ga9lq2jbYkdl4DzR
+	 dBDucakasgdhGnJ0JN2ECn8Ak512oJOV7Mg8m583QbRqKv3Lw+wl4JGkXUgYDjeJ5W
+	 ymfdBGR9js7lQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qKFlF-00D4U3-Sn;
+	Fri, 14 Jul 2023 11:10:54 +0100
+Date: Fri, 14 Jul 2023 11:10:53 +0100
+Message-ID: <86ilamvm4y.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: eric.auger@redhat.com
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Brown
+ <broonie@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Chase Conklin <chase.conklin@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Darren Hart <darren@os.amperecomputing.com>,
+	Miguel Luis <miguel.luis@oracle.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 16/27] KVM: arm64: nv: Add trap forwarding for HCR_EL2
+In-Reply-To: <86sf9rvmd7.wl-maz@kernel.org>
+References: <20230712145810.3864793-1-maz@kernel.org>
+	<20230712145810.3864793-17-maz@kernel.org>
+	<8c32ebdc-a3bc-aabe-5098-3754159d22cd@redhat.com>
+	<86sf9rvmd7.wl-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH 10/27] arm64: Add feature detection for fine grained traps
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Mark Brown
- <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Will Deacon <will@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>,
- Andre Przywara <andre.przywara@arm.com>,
- Chase Conklin <chase.conklin@arm.com>,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Darren Hart <darren@os.amperecomputing.com>,
- Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
-References: <20230712145810.3864793-1-maz@kernel.org>
- <20230712145810.3864793-11-maz@kernel.org>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230712145810.3864793-11-maz@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi,
+On Thu, 13 Jul 2023 16:53:40 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
+> 
+> Hey Eric,
+> 
+> Thanks for looking into this, much appreciated given how tedious it
+> is.
 
-On 7/12/23 16:57, Marc Zyngier wrote:
-> From: Mark Brown <broonie@kernel.org>
->
-> In order to allow us to have shared code for managing fine grained traps
-> for KVM guests add it as a detected feature rather than relying on it
-> being a dependency of other features.
->
-> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Link: https://lore.kernel.org/r/20230301-kvm-arm64-fgt-v4-1-1bf8d235ac1f@kernel.org
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+FWIW, here are the changes I'm going to squash in that patch. Shout if
+you spot something that looks odd...
 
-Eric
-> ---
->  arch/arm64/kernel/cpufeature.c | 11 +++++++++++
->  arch/arm64/tools/cpucaps       |  1 +
->  2 files changed, 12 insertions(+)
->
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index f9d456fe132d..0768f98c49cc 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -2627,6 +2627,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->  		.matches = has_cpuid_feature,
->  		ARM64_CPUID_FIELDS(ID_AA64ISAR1_EL1, LRCPC, IMP)
->  	},
-> +	{
-> +		.desc = "Fine Grained Traps",
-> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> +		.capability = ARM64_HAS_FGT,
-> +		.sys_reg = SYS_ID_AA64MMFR0_EL1,
-> +		.sign = FTR_UNSIGNED,
-> +		.field_pos = ID_AA64MMFR0_EL1_FGT_SHIFT,
-> +		.field_width = 4,
-> +		.min_field_value = 1,
-> +		.matches = has_cpuid_feature,
-> +	},
->  #ifdef CONFIG_ARM64_SME
->  	{
->  		.desc = "Scalable Matrix Extension",
-> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-> index c80ed4f3cbce..c3f06fdef609 100644
-> --- a/arch/arm64/tools/cpucaps
-> +++ b/arch/arm64/tools/cpucaps
-> @@ -26,6 +26,7 @@ HAS_ECV
->  HAS_ECV_CNTPOFF
->  HAS_EPAN
->  HAS_EVT
-> +HAS_FGT
->  HAS_GENERIC_AUTH
->  HAS_GENERIC_AUTH_ARCH_QARMA3
->  HAS_GENERIC_AUTH_ARCH_QARMA5
+Thanks,
 
+	M.
+
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index c4057f4ff72d..f5978b463aca 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -55,7 +55,8 @@ enum coarse_grain_trap_id {
+ 	CGT_HCR_TERR,
+ 	CGT_HCR_APK,
+ 	CGT_HCR_NV,
+-	CGT_HCR_NV1,
++	CGT_HCR_NV_nNV2,
++	CGT_HCR_NV1_nNV2,
+ 	CGT_HCR_AT,
+ 	CGT_HCR_FIEN,
+ 	CGT_HCR_TID4,
+@@ -89,7 +90,7 @@ enum coarse_grain_trap_id {
+ 	CGT_HCR_TVM_TRVM,
+ 	CGT_HCR_TPU_TICAB,
+ 	CGT_HCR_TPU_TOCU,
+-	CGT_HCR_NV1_ENSCXT,
++	CGT_HCR_NV1_nNV2_ENSCXT,
+ 	CGT_MDCR_TPM_TPMCR,
+ 	CGT_MDCR_TDE_TDA,
+ 	CGT_MDCR_TDE_TDOSA,
+@@ -154,7 +155,7 @@ static const struct trap_bits coarse_trap_bits[] = {
+ 		.mask		= HCR_TSW,
+ 		.behaviour	= BEHAVE_FORWARD_ANY,
+ 	},
+-	[CGT_HCR_TPC] = {
++	[CGT_HCR_TPC] = { /* Also called TCPC when FEAT_DPB is implemented */
+ 		.index		= HCR_EL2,
+ 		.value		= HCR_TPC,
+ 		.mask		= HCR_TPC,
+@@ -176,7 +177,7 @@ static const struct trap_bits coarse_trap_bits[] = {
+ 		.index		= HCR_EL2,
+ 		.value		= HCR_TVM,
+ 		.mask		= HCR_TVM,
+-		.behaviour	= BEHAVE_FORWARD_ANY,
++		.behaviour	= BEHAVE_FORWARD_WRITE,
+ 	},
+ 	[CGT_HCR_TDZ] = {
+ 		.index		= HCR_EL2,
+@@ -209,12 +210,18 @@ static const struct trap_bits coarse_trap_bits[] = {
+ 		.behaviour	= BEHAVE_FORWARD_ANY,
+ 	},
+ 	[CGT_HCR_NV] = {
++		.index		= HCR_EL2,
++		.value		= HCR_NV,
++		.mask		= HCR_NV,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_HCR_NV_nNV2] = {
+ 		.index		= HCR_EL2,
+ 		.value		= HCR_NV,
+ 		.mask		= HCR_NV | HCR_NV2,
+ 		.behaviour	= BEHAVE_FORWARD_ANY,
+ 	},
+-	[CGT_HCR_NV1] = {
++	[CGT_HCR_NV1_nNV2] = {
+ 		.index		= HCR_EL2,
+ 		.value		= HCR_NV | HCR_NV1,
+ 		.mask		= HCR_NV | HCR_NV1 | HCR_NV2,
+@@ -350,7 +357,7 @@ static const enum coarse_grain_trap_id *coarse_control_combo[] = {
+ 	MCB(CGT_HCR_TVM_TRVM,		CGT_HCR_TVM, CGT_HCR_TRVM),
+ 	MCB(CGT_HCR_TPU_TICAB,		CGT_HCR_TPU, CGT_HCR_TICAB),
+ 	MCB(CGT_HCR_TPU_TOCU,		CGT_HCR_TPU, CGT_HCR_TOCU),
+-	MCB(CGT_HCR_NV1_ENSCXT,		CGT_HCR_NV1, CGT_HCR_ENSCXT),
++	MCB(CGT_HCR_NV1_nNV2_ENSCXT,	CGT_HCR_NV1_nNV2, CGT_HCR_ENSCXT),
+ 	MCB(CGT_MDCR_TPM_TPMCR,		CGT_MDCR_TPM, CGT_MDCR_TPMCR),
+ 	MCB(CGT_MDCR_TDE_TDA,		CGT_MDCR_TDE, CGT_MDCR_TDA),
+ 	MCB(CGT_MDCR_TDE_TDOSA,		CGT_MDCR_TDE, CGT_MDCR_TDOSA),
+@@ -501,6 +508,7 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initdata = {
+ 	SR_TRAP(SYS_DC_CIVAC,		CGT_HCR_TPC),
+ 	SR_TRAP(SYS_DC_CVAC,		CGT_HCR_TPC),
+ 	SR_TRAP(SYS_DC_CVAP,		CGT_HCR_TPC),
++	SR_TRAP(SYS_DC_CVADP,		CGT_HCR_TPC),
+ 	SR_TRAP(SYS_DC_IVAC,		CGT_HCR_TPC),
+ 	SR_TRAP(SYS_DC_CIGVAC,		CGT_HCR_TPC),
+ 	SR_TRAP(SYS_DC_CIGDVAC,		CGT_HCR_TPC),
+@@ -625,7 +633,6 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initdata = {
+ 		      sys_reg(3, 5, 10, 15, 7), CGT_HCR_NV),
+ 	SR_RANGE_TRAP(sys_reg(3, 5, 12, 0, 0),
+ 		      sys_reg(3, 5, 14, 15, 7), CGT_HCR_NV),
+-	SR_TRAP(SYS_SP_EL1,		CGT_HCR_NV),
+ 	SR_TRAP(OP_AT_S1E2R,		CGT_HCR_NV),
+ 	SR_TRAP(OP_AT_S1E2W,		CGT_HCR_NV),
+ 	SR_TRAP(OP_AT_S12E1R,		CGT_HCR_NV),
+@@ -698,10 +705,14 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initdata = {
+ 	SR_TRAP(OP_TLBI_RIPAS2LE1OSNXS,	CGT_HCR_NV),
+ 	SR_TRAP(OP_TLBI_RVAE2OSNXS,	CGT_HCR_NV),
+ 	SR_TRAP(OP_TLBI_RVALE2OSNXS,	CGT_HCR_NV),
+-	SR_TRAP(SYS_VBAR_EL1,		CGT_HCR_NV1),
+-	SR_TRAP(SYS_ELR_EL1,		CGT_HCR_NV1),
+-	SR_TRAP(SYS_SPSR_EL1,		CGT_HCR_NV1),
+-	SR_TRAP(SYS_SCXTNUM_EL1,	CGT_HCR_NV1_ENSCXT),
++	SR_TRAP(OP_CPP_RCTX, 		CGT_HCR_NV),
++	SR_TRAP(OP_DVP_RCTX, 		CGT_HCR_NV),
++	SR_TRAP(OP_CFP_RCTX, 		CGT_HCR_NV),
++	SR_TRAP(SYS_SP_EL1,		CGT_HCR_NV_nNV2),
++	SR_TRAP(SYS_VBAR_EL1,		CGT_HCR_NV1_nNV2),
++	SR_TRAP(SYS_ELR_EL1,		CGT_HCR_NV1_nNV2),
++	SR_TRAP(SYS_SPSR_EL1,		CGT_HCR_NV1_nNV2),
++	SR_TRAP(SYS_SCXTNUM_EL1,	CGT_HCR_NV1_nNV2_ENSCXT),
+ 	SR_TRAP(SYS_SCXTNUM_EL0,	CGT_HCR_ENSCXT),
+ 	SR_TRAP(OP_AT_S1E1R, 		CGT_HCR_AT),
+ 	SR_TRAP(OP_AT_S1E1W, 		CGT_HCR_AT),
+
+-- 
+Without deviation from the norm, progress is not possible.
