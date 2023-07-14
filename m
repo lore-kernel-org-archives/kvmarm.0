@@ -1,293 +1,190 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7CE820E8;
-	Fri, 14 Jul 2023 14:05:50 +0000 (UTC)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.200])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4R2XlY35r1z6J6c3;
-	Fri, 14 Jul 2023 21:44:41 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 14 Jul
- 2023 14:46:58 +0100
-Date: Fri, 14 Jul 2023 14:46:57 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-CC: <linux-coco@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
-	<kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>, Alexandru Elisei
-	<alexandru.elisei@arm.com>, Andrew Jones <andrew.jones@linux.dev>, "Catalin
- Marinas" <catalin.marinas@arm.com>, Chao Peng <chao.p.peng@linux.intel.com>,
-	Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
-	James Morse <james.morse@arm.com>, Jean-Philippe Brucker
-	<jean-philippe@linaro.org>, Joey Gouly <Joey.Gouly@arm.com>, Marc Zyngier
-	<maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Oliver Upton
-	<oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, "Quentin
- Perret" <qperret@google.com>, Sean Christopherson <seanjc@google.com>, Steven
- Price <steven.price@arm.com>, Thomas Huth <thuth@redhat.com>, "Will Deacon"
-	<will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
-	<kvmarm@lists.cs.columbia.edu>
-Subject: Re: [RFC] Support for Arm CCA VMs on Linux
-Message-ID: <20230714144657.000064ef@Huawei.com>
-In-Reply-To: <20230127112248.136810-1-suzuki.poulose@arm.com>
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4691313715
+	for <kvmarm@lists.linux.dev>; Fri, 14 Jul 2023 14:47:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689346074;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0yeAVZWo1nWpXTxx8uqutMR7qyb06BZkClmdEo5RsCo=;
+	b=CP7C0yUFDqa6mw/h8X5F/Dw6UpexKux0cG+ZrPke7s5YOItVhva4sSdvKjPl7e+B+fjkvf
+	HZjehFGgXRimFVFvlHlq5MMtm0A1o1F2dbDVcEioap9q3SY5F6afOWq+WTI/qeWvYDdZFW
+	bimp52QGtVwEWOQa+j1W5t3qMzV/0iM=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-481-WYO54QpfPSyBuePJf-kFZw-1; Fri, 14 Jul 2023 10:47:53 -0400
+X-MC-Unique: WYO54QpfPSyBuePJf-kFZw-1
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-765de3a3404so256651785a.2
+        for <kvmarm@lists.linux.dev>; Fri, 14 Jul 2023 07:47:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689346067; x=1689950867;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0yeAVZWo1nWpXTxx8uqutMR7qyb06BZkClmdEo5RsCo=;
+        b=CKaZLpnb6TGL88rPG0CqQViLBa8UhFzetWqB9fnr6EX2oVSEV5Gq5XrevST0KCXT2z
+         MRwnIqtnO+zFYtxwtEbCa9pSdMzYzvPPwjEZ69+9qK24RHOuaFwnUBwAjc5xwZ6hkHg+
+         uxZARFJVrQWMNj8lEgYc00eELLFr7OXgSfAlF65xLqVHOZnofwSxuVH2kMrhiz1y/7nq
+         BZRliPASMcmk+CSJhqgin38mgkzg0BjL/KUVukLiQB8IQ0xbiG0h9Y6NS1Lk3jIawWVw
+         dSD7FMoLTA05eD2W0UvIECFas2P5lWYVRZ4Fcse2gbVpa/XE6NZ7FIh5/7+geOvRvhi9
+         fJoA==
+X-Gm-Message-State: ABy/qLbEUKeLHsoM+Q6dZxgc2Ri3QN4pFvDNFK7UUS/6GS1Hj1wXvS6w
+	FJh3NObgEPdIC6BiPcRhxRLNzWlU2m5cLtAyuAx5xVEpKHhzFPNMD5XmcMbxfCaWxm7CLJr7mQ+
+	fNs6iyIjPB499UMYvscfl/J4a
+X-Received: by 2002:a05:620a:2a52:b0:765:8f07:da2a with SMTP id q18-20020a05620a2a5200b007658f07da2amr6199706qkp.48.1689346067665;
+        Fri, 14 Jul 2023 07:47:47 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFPiwN0coRoVEHSHclkiGDuZAE9bXk7/SQzfTkLjYV51VKaJ8eGxttE5jlHnNJx6ctJJ5EcmQ==
+X-Received: by 2002:a05:622a:1647:b0:403:2966:8fc8 with SMTP id y7-20020a05622a164700b0040329668fc8mr5837668qtj.2.1689346046486;
+        Fri, 14 Jul 2023 07:47:26 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id a8-20020ac84348000000b003e69c51cf53sm4015856qtn.72.2023.07.14.07.47.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Jul 2023 07:47:25 -0700 (PDT)
+Message-ID: <a69eda3e-d255-1eb4-c6d2-7ba02ba02468@redhat.com>
+Date: Fri, 14 Jul 2023 16:47:20 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH 06/27] arm64: Add debug registers affected by HDFGxTR_EL2
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Mark Brown
+ <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Will Deacon <will@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>,
+ Chase Conklin <chase.conklin@arm.com>,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Darren Hart <darren@os.amperecomputing.com>,
+ Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20230712145810.3864793-1-maz@kernel.org>
+ <20230712145810.3864793-7-maz@kernel.org>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230712145810.3864793-7-maz@kernel.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.227.76]
-X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
-X-CFilter-Loop: Reflected
 
-On Fri, 27 Jan 2023 11:22:48 +0000
-Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+Hi Marc,
 
-
-Hi Suzuki,
-
-Looking at this has been on the backlog for a while from our side and we are finally
-getting to it.  So before we dive in and given it's been 6 months, I wanted to check
-if you expect to post a new version shortly or if there is a rebased tree available?
-
-Jonathan
-  
-> We are happy to announce the early RFC version of the Arm
-> Confidential Compute Architecture (CCA) support for the Linux
-> stack. The intention is to seek early feedback in the following areas:
->  * KVM integration of the Arm CCA
->  * KVM UABI for managing the Realms, seeking to generalise the operations
->    wherever possible with other Confidential Compute solutions.
->    Note: This version doesn't support Guest Private memory, which will be added
->    later (see below).
->  * Linux Guest support for Realms
-> 
-> Arm CCA Introduction
-> =====================
-> 
-> The Arm CCA is a reference software architecture and implementation that builds
-> on the Realm Management Extension (RME), enabling the execution of Virtual
-> machines, while preventing access by more privileged software, such as hypervisor.
-> The Arm CCA allows the hypervisor to control the VM, but removes the right for
-> access to the code, register state or data that is used by VM.
-> More information on the architecture is available here[0].
-> 
->     Arm CCA Reference Software Architecture
-> 
->         Realm World    ||    Normal World   ||  Secure World  ||
->                        ||        |          ||                ||
->  EL0 x-------x         || x----x | x------x ||                ||
->      | Realm |         || |    | | |      | ||                ||
->      |       |         || | VM | | |      | ||                ||
->  ----|  VM*  |---------||-|    |---|      |-||----------------||
->      |       |         || |    | | |  H   | ||                ||
->  EL1 x-------x         || x----x | |      | ||                ||
->          ^             ||        | |  o   | ||                ||
->          |             ||        | |      | ||                ||
->  ------- R*------------------------|  s  -|---------------------
->          S             ||          |      | ||                ||
->          I             ||          |  t   | ||                ||
->          |             ||          |      | ||                || 
->          v             ||          x------x ||                ||
->  EL2    RMM*           ||              ^    ||                ||
->          ^             ||              |    ||                ||
->  ========|=============================|========================
->          |                             | SMC
->          x--------- *RMI* -------------x
-> 
->  EL3                   Root World
->                        EL3 Firmware
->  ===============================================================
-> Where :
->  RMM - Realm Management Monitor
->  RMI - Realm Management Interface
->  RSI - Realm Service Interface
->  SMC - Secure Monitor Call
-> 
-> RME introduces a new security state "Realm world", in addition to the
-> traditional Secure and Non-Secure states. The Arm CCA defines a new component,
-> Realm Management Monitor (RMM) that runs at R-EL2. This is a standard piece of
-> firmware, verified, installed and loaded by the EL3 firmware (e.g, TF-A), at
-> system boot.
-> 
-> The RMM provides standard interfaces - Realm Management Interface (RMI) - to the
-> Normal world hypervisor to manage the VMs running in the Realm world (also called
-> Realms in short). These are exposed via SMC and are routed through the EL3
-> firmwre.
-> The RMI interface includes:
->   - Move a physical page from the Normal world to the Realm world
->   - Creating a Realm with requested parameters, tracked via Realm Descriptor (RD)
->   - Creating VCPUs aka Realm Execution Context (REC), with initial register state.
->   - Create stage2 translation table at any level.
->   - Load initial images into Realm Memory from normal world memory
->   - Schedule RECs (vCPUs) and handle exits
->   - Inject virtual interrupts into the Realm
->   - Service stage2 runtime faults with pages (provided by host, scrubbed by RMM).
->   - Create "shared" mappings that can be accessed by VMM/Hyp.
->   - Reclaim the memory allocated for the RAM and RTTs (Realm Translation Tables)
-> 
-> However v1.0 of RMM specifications doesn't support:
->  - Paging protected memory of a Realm VM. Thus the pages backing the protected
->    memory region must be pinned.
->  - Live migration of Realms.
->  - Trusted Device assignment.
->  - Physical interrupt backed Virtual interrupts for Realms
-> 
-> RMM also provides certain services to the Realms via SMC, called Realm Service
-> Interface (RSI). These include:
->  - Realm Guest Configuration.
->  - Attestation & Measurement services
->  - Managing the state of an Intermediate Physical Address (IPA aka GPA) page.
->  - Host Call service (Communication with the Normal world Hypervisor)
-> 
-> The specifications for the RMM software is currently at *v1.0-Beta2* and the
-> latest version is available here [1].
-> 
-> The Trusted Firmware foundation has an implementation of the RMM - TF-RMM -
-> available here [3].
-> 
-> Implementation
-> =================
-> 
-> This version of the stack is based on the RMM specification v1.0-Beta0[2], with
-> following exceptions :
->   - TF-RMM/KVM currently doesn't support the optional features of PMU,
->      SVE and Self-hosted debug (coming soon).
->   - The RSI_HOST_CALL structure alignment requirement is reduced to match
->      RMM v1.0 Beta1
->   - RMI/RSI version numbers do not match the RMM spec. This will be
->     resolved once the spec/implementation is complete, across TF-RMM+Linux stack.
-> 
-> We plan to update the stack to support the latest version of the RMMv1.0 spec
-> in the coming revisions.
-> 
-> This release includes the following components :
-> 
->  a) Linux Kernel
->      i) Host / KVM support - Support for driving the Realms via RMI. This is
->      dependent on running in the Kernel at EL2 (aka VHE mode). Also provides
->      UABI for VMMs to manage the Realm VMs. The support is restricted to 4K page
->      size, matching the Stage2 granule supported by RMM. The VMM is responsible
->      for making sure the guest memory is locked.
-> 
->        TODO: Guest Private memory[10] integration - We have been following the
->        series and support will be added once it is merged upstream.
->      
->      ii) Guest support - Support for a Linux Kernel to run in the Realm VM at
->      Realm-EL1, using RSI services. This includes virtio support (virtio-v1.0
->      only). All I/O are treated as non-secure/shared.
+On 7/12/23 16:57, Marc Zyngier wrote:
+> The HDFGxTR_EL2 registers trap a (huge) set of debug and trace
+> related registers. Add their encodings (and only that, because
+> we really don't care about what these registers actually do at
+> this stage).
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/sysreg.h | 78 +++++++++++++++++++++++++++++++++
+>  1 file changed, 78 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 76289339b43b..9dfd127be55a 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -194,6 +194,84 @@
+>  #define SYS_DBGDTRTX_EL0		sys_reg(2, 3, 0, 5, 0)*
+>  #define SYS_DBGVCR32_EL2		sys_reg(2, 4, 0, 7, 0)*
 >  
->  c) kvmtool - VMM changes required to manage Realm VMs. No guest private memory
->     as mentioned above.
->  d) kvm-unit-tests - Support for running in Realms along with additional tests
->     for RSI ABI.
-> 
-> Running the stack
-> ====================
-> 
-> To run/test the stack, you would need the following components :
-> 
-> 1) FVP Base AEM RevC model with FEAT_RME support [4]
-> 2) TF-A firmware for EL3 [5]
-> 3) TF-A RMM for R-EL2 [3]
-> 4) Linux Kernel [6]
-> 5) kvmtool [7]
-> 6) kvm-unit-tests [8]
-> 
-> Instructions for building the firmware components and running the model are
-> available here [9]. Once, the host kernel is booted, a Realm can be launched by
-> invoking the `lkvm` commad as follows:
-> 
->  $ lkvm run --realm 				 \
-> 	 --measurement-algo=["sha256", "sha512"] \
-> 	 --disable-sve				 \
-> 	 <normal-vm-options>
-> 
-> Where:
->  * --measurement-algo (Optional) specifies the algorithm selected for creating the
->    initial measurements by the RMM for this Realm (defaults to sha256).
->  * GICv3 is mandatory for the Realms.
->  * SVE is not yet supported in the TF-RMM, and thus must be disabled using
->    --disable-sve
-> 
-> You may also run the kvm-unit-tests inside the Realm world, using the similar
-> options as above.
-> 
-> 
-> Links
-> ============
-> 
-> [0] Arm CCA Landing page (See Key Resources section for various documentations)
->     https://www.arm.com/architecture/security-features/arm-confidential-compute-architecture
-> 
-> [1] RMM Specification Latest
->     https://developer.arm.com/documentation/den0137/latest
-> 
-> [2] RMM v1.0-Beta0 specification
->     https://developer.arm.com/documentation/den0137/1-0bet0/
-> 
-> [3] Trusted Firmware RMM - TF-RMM
->     https://www.trustedfirmware.org/projects/tf-rmm/
->     GIT: https://git.trustedfirmware.org/TF-RMM/tf-rmm.git
-> 
-> [4] FVP Base RevC AEM Model (available on x86_64 / Arm64 Linux)
->     https://developer.arm.com/Tools%20and%20Software/Fixed%20Virtual%20Platforms
-> 
-> [5] Trusted Firmware for A class
->     https://www.trustedfirmware.org/projects/tf-a/
-> 
-> [6] Linux kernel support for Arm-CCA
->     https://gitlab.arm.com/linux-arm/linux-cca
->     Host Support branch:	cca-host/rfc-v1
->     Guest Support branch:	cca-guest/rfc-v1
-> 
-> [7] kvmtool support for Arm CCA
->     https://gitlab.arm.com/linux-arm/kvmtool-cca cca/rfc-v1
-> 
-> [8] kvm-unit-tests support for Arm CCA
->     https://gitlab.arm.com/linux-arm/kvm-unit-tests-cca  cca/rfc-v1
-> 
-> [9] Instructions for Building Firmware components and running the model, see
->     section 4.19.2 "Building and running TF-A with RME"
->     https://trustedfirmware-a.readthedocs.io/en/latest/components/realm-management-extension.html#building-and-running-tf-a-with-rme
-> 
-> [10] fd based Guest Private memory for KVM
->    https://lkml.kernel.org/r/20221202061347.1070246-1-chao.p.peng@linux.intel.com
-> 
-> Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-> Cc: Andrew Jones <andrew.jones@linux.dev>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Chao Peng <chao.p.peng@linux.intel.com>
-> Cc: Christoffer Dall <christoffer.dall@arm.com>
-> Cc: Fuad Tabba <tabba@google.com>
-> Cc: James Morse <james.morse@arm.com>
-> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Cc: Joey Gouly <Joey.Gouly@arm.com>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Quentin Perret <qperret@google.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: Steven Price <steven.price@arm.com>
-> Cc: Thomas Huth <thuth@redhat.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: Zenghui Yu <yuzenghui@huawei.com>
-> To: linux-coco@lists.linux.dev
-> To: kvmarm@lists.linux.dev
-> Cc: kvmarm@lists.cs.columbia.edu
-> Cc: linux-arm-kernel@lists.infradead.org
-> To: linux-kernel@vger.kernel.org
-> To: kvm@vger.kernel.org
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> +#define SYS_BRBINF_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 0))*
+> +#define SYS_BRBINFINJ_EL1		sys_reg(2, 1, 9, 1, 0)*
+> +#define SYS_BRBSRC_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 1))*
+> +#define SYS_BRBSRCINJ_EL1		sys_reg(2, 1, 9, 1, 1)*
+> +#define SYS_BRBTGT_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 2))*
+> +#define SYS_BRBTGTINJ_EL1		sys_reg(2, 1, 9, 1, 2)*
+> +#define SYS_BRBTS_EL1			sys_reg(2, 1, 9, 0, 2)*
+> +
+> +#define SYS_BRBCR_EL1			sys_reg(2, 1, 9, 0, 0)*
+> +#define SYS_BRBFCR_EL1			sys_reg(2, 1, 9, 0, 1)*
+> +#define SYS_BRBIDR0_EL1			sys_reg(2, 1, 9, 2, 0)*
+> +
+> +#define SYS_TRCITECR_EL1		sys_reg(3, 0, 1, 2, 3)
+> +#define SYS_TRCITECR_EL1		sys_reg(3, 0, 1, 2, 3)
+I cannot find this one - which is duplicated by the way - in DDI0487Jaa
+> +#define SYS_TRCACATR(m)			sys_reg(2, 1, 2, ((m & 7) << 1), (2 | (m >> 3)))*
+> +#define SYS_TRCACVR(m)			sys_reg(2, 1, 2, ((m & 7) << 1), (0 | (m >> 3)))*
+> +#define SYS_TRCAUTHSTATUS		sys_reg(2, 1, 7, 14, 6)*
+> +#define SYS_TRCAUXCTLR			sys_reg(2, 1, 0, 6, 0)*
+> +#define SYS_TRCBBCTLR			sys_reg(2, 1, 0, 15, 0)*
+> +#define SYS_TRCCCCTLR			sys_reg(2, 1, 0, 14, 0)*
+> +#define SYS_TRCCIDCCTLR0		sys_reg(2, 1, 3, 0, 2)*
+> +#define SYS_TRCCIDCCTLR1		sys_reg(2, 1, 3, 1, 2)*
+> +#define SYS_TRCCIDCVR(m)		sys_reg(2, 1, 3, ((m & 7) << 1), 0)*
+> +#define SYS_TRCCLAIMCLR			sys_reg(2, 1, 7, 9, 6)*
+> +#define SYS_TRCCLAIMSET			sys_reg(2, 1, 7, 8, 6)*
+> +#define SYS_TRCCNTCTLR(m)		sys_reg(2, 1, 0, (4 | (m & 3)), 5)*
+> +#define SYS_TRCCNTRLDVR(m)		sys_reg(2, 1, 0, (0 | (m & 3)), 5)*
+> +#define SYS_TRCCNTVR(m)			sys_reg(2, 1, 0, (8 | (m & 3)), 5)*
+> +#define SYS_TRCCONFIGR			sys_reg(2, 1, 0, 4, 0)*
+> +#define SYS_TRCDEVARCH			sys_reg(2, 1, 7, 15, 6)*
+> +#define SYS_TRCDEVID			sys_reg(2, 1, 7, 2, 7)*
+> +#define SYS_TRCEVENTCTL0R		sys_reg(2, 1, 0, 8, 0)*
+> +#define SYS_TRCEVENTCTL1R		sys_reg(2, 1, 0, 9, 0)*
+> +#define SYS_TRCEXTINSELR(m)		sys_reg(2, 1, 0, (8 | (m & 3)), 4)*
+> +#define SYS_TRCIDR0			sys_reg(2, 1, 0, 8, 7)*
+> +#define SYS_TRCIDR10			sys_reg(2, 1, 0, 2, 6)*
+> +#define SYS_TRCIDR11			sys_reg(2, 1, 0, 3, 6)*
+> +#define SYS_TRCIDR12			sys_reg(2, 1, 0, 4, 6)*
+> +#define SYS_TRCIDR13			sys_reg(2, 1, 0, 5, 6)*
+> +#define SYS_TRCIDR1			sys_reg(2, 1, 0, 9, 7)*
+> +#define SYS_TRCIDR2			sys_reg(2, 1, 0, 10, 7)*
+> +#define SYS_TRCIDR3			sys_reg(2, 1, 0, 11, 7)*
+> +#define SYS_TRCIDR4			sys_reg(2, 1, 0, 12, 7)*
+> +#define SYS_TRCIDR5			sys_reg(2, 1, 0, 13, 7)*
+> +#define SYS_TRCIDR6			sys_reg(2, 1, 0, 14, 7)*
+> +#define SYS_TRCIDR7			sys_reg(2, 1, 0, 15, 7)*
+> +#define SYS_TRCIDR8			sys_reg(2, 1, 0, 0, 6)*
+> +#define SYS_TRCIDR9			sys_reg(2, 1, 0, 1, 6)*
+> +#define SYS_TRCIMSPEC0			sys_reg(2, 1, 0, 0, 7)*
+> +#define SYS_TRCIMSPEC(m)		sys_reg(2, 1, 0, (m & 7), 7)*
+> +#define SYS_TRCITEEDCR			sys_reg(2, 1, 0, 2, 1)
+I cannot find this one in D18-1 or elsewhere in DDI0487Jaa
+> +#define SYS_TRCOSLSR			sys_reg(2, 1, 1, 1, 4)*
+> +#define SYS_TRCPRGCTLR			sys_reg(2, 1, 0, 1, 0)*
+> +#define SYS_TRCQCTLR			sys_reg(2, 1, 0, 1, 1)*
+> +#define SYS_TRCRSCTLR(m)		sys_reg(2, 1, 1, (m & 15), (0 | (m >> 4)))*
+> +#define SYS_TRCRSR			sys_reg(2, 1, 0, 10, 0)*
+> +#define SYS_TRCSEQEVR(m)		sys_reg(2, 1, 0, (m & 3), 4)*
+> +#define SYS_TRCSEQRSTEVR		sys_reg(2, 1, 0, 6, 4)*
+> +#define SYS_TRCSEQSTR			sys_reg(2, 1, 0, 7, 4)*
+> +#define SYS_TRCSSCCR(m)			sys_reg(2, 1, 1, (m & 7), 2)*
+> +#define SYS_TRCSSCSR(m)			sys_reg(2, 1, 1, (8 | (m & 7)), 2)*
+> +#define SYS_TRCSSPCICR(m)		sys_reg(2, 1, 1, (m & 7), 3)*
+> +#define SYS_TRCSTALLCTLR		sys_reg(2, 1, 0, 11, 0)*
+> +#define SYS_TRCSTATR			sys_reg(2, 1, 0, 3, 0)*
+> +#define SYS_TRCSYNCPR			sys_reg(2, 1, 0, 13, 0)*
+> +#define SYS_TRCTRACEIDR			sys_reg(2, 1, 0, 0, 1)*
+> +#define SYS_TRCTSCTLR			sys_reg(2, 1, 0, 12, 0)*
+> +#define SYS_TRCVICTLR			sys_reg(2, 1, 0, 0, 2)*
+> +#define SYS_TRCVIIECTLR			sys_reg(2, 1, 0, 1, 2)*
+> +#define SYS_TRCVIPCSSCTLR		sys_reg(2, 1, 0, 3, 2)*
+> +#define SYS_TRCVISSCTLR			sys_reg(2, 1, 0, 2, 2)*
+> +#define SYS_TRCVMIDCCTLR0		sys_reg(2, 1, 3, 2, 2)*
+> +#define SYS_TRCVMIDCCTLR1		sys_reg(2, 1, 3, 3, 2)*
+> +#define SYS_TRCVMIDCVR(m)		sys_reg(2, 1, 3, ((m & 7) << 1), 1)*
+> +
+> +/* ETM */
+> +#define SYS_TRCOSLAR			sys_reg(2, 1, 1, 0, 4)
+not able to locate this one either. I see the bit of HDFGWTR_EL2 though
+
+Eric
+> +
+>  #define SYS_MIDR_EL1			sys_reg(3, 0, 0, 0, 0)
+>  #define SYS_MPIDR_EL1			sys_reg(3, 0, 0, 0, 5)
+>  #define SYS_REVIDR_EL1			sys_reg(3, 0, 0, 0, 6)
 
