@@ -1,162 +1,74 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from mail.208.org (unknown [183.242.55.162])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28971C16
-	for <kvmarm@lists.linux.dev>; Fri, 14 Jul 2023 03:39:07 +0000 (UTC)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.55])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4R2HHG72HTzVjhr;
-	Fri, 14 Jul 2023 11:37:46 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.58) by
- kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Fri, 14 Jul 2023 11:39:02 +0800
-From: chenxiang <chenxiang66@hisilicon.com>
-To: <maz@kernel.org>, <oliver.upton@linux.dev>, <james.morse@arm.com>
-CC: <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>, <linuxarm@huawei.com>,
-	Xiang Chen <chenxiang66@hisilicon.com>
-Subject: [PATCH v2] KVM: arm64: Fix the name of sys_reg_desc related to PMU
-Date: Fri, 14 Jul 2023 11:38:40 +0800
-Message-ID: <1689305920-170523-1-git-send-email-chenxiang66@hisilicon.com>
-X-Mailer: git-send-email 2.8.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C06ED5224
+	for <kvmarm@lists.linux.dev>; Fri, 14 Jul 2023 04:44:45 +0000 (UTC)
+Received: from mail.208.org (email.208.org [127.0.0.1])
+	by mail.208.org (Postfix) with ESMTP id 4R2JmJ00QkzBS5q0
+	for <kvmarm@lists.linux.dev>; Fri, 14 Jul 2023 12:44:31 +0800 (CST)
+Authentication-Results: mail.208.org (amavisd-new); dkim=pass
+	reason="pass (just generated, assumed good)" header.d=208.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=208.org; h=
+	content-transfer-encoding:content-type:message-id:user-agent
+	:references:in-reply-to:subject:to:from:date:mime-version; s=
+	dkim; t=1689309871; x=1691901872; bh=uqV/KVaosrZlp0sdvjEgoWRj1jH
+	nPyBvXFKURudroCg=; b=ZOzmu5JDNWwKS+/E19qIDFG1wqAvDrFwi4NJL6ZQlnC
+	XidPQvfuQZyOAnxALTb/VQHOD9f39m37VLUZ+YTZU+hliByn3KEQ7qdppO2jsrLj
+	W7cFehWoKhRfkh7KPhDr8k3pr1+3DtzdzVJpf1lAoIenakziOsAUPIHNLVQ/AVNx
+	/04XIJ//cHOWq+TGkGoYZJ/jIdb0BN1leusgAJ7EOJxC+uluHhFtCF8kxn1PGlQo
+	OGuejtSd2KzrGwfyVShGEImVzTmRMEcWZpF1VXdLb5rAHEJkYgeSIjAJBQjcsihw
+	k1lFnHkiWYR9t8Xq2OgZggIEVzid6T0dBrfD4XPvXGA==
+X-Virus-Scanned: amavisd-new at mail.208.org
+Received: from mail.208.org ([127.0.0.1])
+	by mail.208.org (mail.208.org [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id JOu9nVwZ0x7v for <kvmarm@lists.linux.dev>;
+	Fri, 14 Jul 2023 12:44:31 +0800 (CST)
+Received: from localhost (email.208.org [127.0.0.1])
+	by mail.208.org (Postfix) with ESMTPSA id 4R2JmH3R0hzBRSVj;
+	Fri, 14 Jul 2023 12:44:31 +0800 (CST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.58]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemi500016.china.huawei.com (7.221.188.220)
-X-CFilter-Loop: Reflected
+Date: Fri, 14 Jul 2023 12:44:31 +0800
+From: chenqingyun001@208suo.com
+To: maz@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com,
+ will@kernel.org
+Cc: kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+ james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+Subject: [PATCH] KVM: arm64:space required before the open parenthesis '('
+In-Reply-To: <tencent_40330B3E7AF84464D54533700BA6A0EF3F08@qq.com>
+References: <tencent_40330B3E7AF84464D54533700BA6A0EF3F08@qq.com>
+User-Agent: Roundcube Webmail
+Message-ID: <46eb0d5df76c8ac67c752d747b58be55@208suo.com>
+X-Sender: chenqingyun001@208suo.com
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Xiang Chen <chenxiang66@hisilicon.com>
+To make the code easier and understandable, put a space
+before the opening parenthesis to distinguish functions
+from parentheses for other purposes. Doing so can also
+avoid some potential errors or ambiguities.
 
-For those PMU system registers defined in sys_reg_descs[], use macro
-PMU_SYS_REG() / PMU_PMEVCNTR_EL0 / PMU_PMEVTYPER_EL0 to define them, and
-later two macros call macro PMU_SYS_REG() actually.
-Currently the input parameter of PMU_SYS_REG() is another macro which is
-calculation formula of the value of system registers, so for example, if 
-we want to "SYS_PMINTENSET_EL1" as the name of sys register, actually 
-the name we get is as following:
-(((3) << 19) | ((0) << 16) | ((9) << 12) | ((14) << 8) | ((1) << 5))
-The name of system register is used in some tracepoints such as 
-trace_kvm_sys_access(), if not set correctly, we need to analyze the
-inaccurate name to get the exact name (which also is inconsistent with 
-other system registers), and also the inaccurate name occupies more space.
-
-To fix the issue, use the name as a input parameter of PMU_SYS_REG like
-MTE_REG or EL2_REG.
-
-Signed-off-by: Xiang Chen <chenxiang66@hisilicon.com>
+Signed-off-by: Qingyun Chen <chenqingyun001@208suo.com>
 ---
- arch/arm64/kvm/sys_regs.c | 41 +++++++++++++++++++++--------------------
- 1 file changed, 21 insertions(+), 20 deletions(-)
+  arch/arm64/kvm/inject_fault.c | 2 +-
+  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index bd34318..0af5f2f 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1115,18 +1115,19 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	{ SYS_DESC(SYS_DBGWCRn_EL1(n)),					\
- 	  trap_wcr, reset_wcr, 0, 0,  get_wcr, set_wcr }
- 
--#define PMU_SYS_REG(r)						\
--	SYS_DESC(r), .reset = reset_pmu_reg, .visibility = pmu_visibility
-+#define PMU_SYS_REG(name)						\
-+	SYS_DESC(SYS_##name), .reset = reset_pmu_reg,			\
-+	.visibility = pmu_visibility
- 
- /* Macro to expand the PMEVCNTRn_EL0 register */
- #define PMU_PMEVCNTR_EL0(n)						\
--	{ PMU_SYS_REG(SYS_PMEVCNTRn_EL0(n)),				\
-+	{ PMU_SYS_REG(PMEVCNTRn_EL0(n)),				\
- 	  .reset = reset_pmevcntr, .get_user = get_pmu_evcntr,		\
- 	  .access = access_pmu_evcntr, .reg = (PMEVCNTR0_EL0 + n), }
- 
- /* Macro to expand the PMEVTYPERn_EL0 register */
- #define PMU_PMEVTYPER_EL0(n)						\
--	{ PMU_SYS_REG(SYS_PMEVTYPERn_EL0(n)),				\
-+	{ PMU_SYS_REG(PMEVTYPERn_EL0(n)),				\
- 	  .reset = reset_pmevtyper,					\
- 	  .access = access_pmu_evtyper, .reg = (PMEVTYPER0_EL0 + n), }
- 
-@@ -2115,9 +2116,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_PMBSR_EL1), undef_access },
- 	/* PMBIDR_EL1 is not trapped */
- 
--	{ PMU_SYS_REG(SYS_PMINTENSET_EL1),
-+	{ PMU_SYS_REG(PMINTENSET_EL1),
- 	  .access = access_pminten, .reg = PMINTENSET_EL1 },
--	{ PMU_SYS_REG(SYS_PMINTENCLR_EL1),
-+	{ PMU_SYS_REG(PMINTENCLR_EL1),
- 	  .access = access_pminten, .reg = PMINTENSET_EL1 },
- 	{ SYS_DESC(SYS_PMMIR_EL1), trap_raz_wi },
- 
-@@ -2164,41 +2165,41 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_CTR_EL0), access_ctr },
- 	{ SYS_DESC(SYS_SVCR), undef_access },
- 
--	{ PMU_SYS_REG(SYS_PMCR_EL0), .access = access_pmcr,
-+	{ PMU_SYS_REG(PMCR_EL0), .access = access_pmcr,
- 	  .reset = reset_pmcr, .reg = PMCR_EL0 },
--	{ PMU_SYS_REG(SYS_PMCNTENSET_EL0),
-+	{ PMU_SYS_REG(PMCNTENSET_EL0),
- 	  .access = access_pmcnten, .reg = PMCNTENSET_EL0 },
--	{ PMU_SYS_REG(SYS_PMCNTENCLR_EL0),
-+	{ PMU_SYS_REG(PMCNTENCLR_EL0),
- 	  .access = access_pmcnten, .reg = PMCNTENSET_EL0 },
--	{ PMU_SYS_REG(SYS_PMOVSCLR_EL0),
-+	{ PMU_SYS_REG(PMOVSCLR_EL0),
- 	  .access = access_pmovs, .reg = PMOVSSET_EL0 },
- 	/*
- 	 * PM_SWINC_EL0 is exposed to userspace as RAZ/WI, as it was
- 	 * previously (and pointlessly) advertised in the past...
- 	 */
--	{ PMU_SYS_REG(SYS_PMSWINC_EL0),
-+	{ PMU_SYS_REG(PMSWINC_EL0),
- 	  .get_user = get_raz_reg, .set_user = set_wi_reg,
- 	  .access = access_pmswinc, .reset = NULL },
--	{ PMU_SYS_REG(SYS_PMSELR_EL0),
-+	{ PMU_SYS_REG(PMSELR_EL0),
- 	  .access = access_pmselr, .reset = reset_pmselr, .reg = PMSELR_EL0 },
--	{ PMU_SYS_REG(SYS_PMCEID0_EL0),
-+	{ PMU_SYS_REG(PMCEID0_EL0),
- 	  .access = access_pmceid, .reset = NULL },
--	{ PMU_SYS_REG(SYS_PMCEID1_EL0),
-+	{ PMU_SYS_REG(PMCEID1_EL0),
- 	  .access = access_pmceid, .reset = NULL },
--	{ PMU_SYS_REG(SYS_PMCCNTR_EL0),
-+	{ PMU_SYS_REG(PMCCNTR_EL0),
- 	  .access = access_pmu_evcntr, .reset = reset_unknown,
- 	  .reg = PMCCNTR_EL0, .get_user = get_pmu_evcntr},
--	{ PMU_SYS_REG(SYS_PMXEVTYPER_EL0),
-+	{ PMU_SYS_REG(PMXEVTYPER_EL0),
- 	  .access = access_pmu_evtyper, .reset = NULL },
--	{ PMU_SYS_REG(SYS_PMXEVCNTR_EL0),
-+	{ PMU_SYS_REG(PMXEVCNTR_EL0),
- 	  .access = access_pmu_evcntr, .reset = NULL },
- 	/*
- 	 * PMUSERENR_EL0 resets as unknown in 64bit mode while it resets as zero
- 	 * in 32bit mode. Here we choose to reset it as zero for consistency.
- 	 */
--	{ PMU_SYS_REG(SYS_PMUSERENR_EL0), .access = access_pmuserenr,
-+	{ PMU_SYS_REG(PMUSERENR_EL0), .access = access_pmuserenr,
- 	  .reset = reset_val, .reg = PMUSERENR_EL0, .val = 0 },
--	{ PMU_SYS_REG(SYS_PMOVSSET_EL0),
-+	{ PMU_SYS_REG(PMOVSSET_EL0),
- 	  .access = access_pmovs, .reg = PMOVSSET_EL0 },
- 
- 	{ SYS_DESC(SYS_TPIDR_EL0), NULL, reset_unknown, TPIDR_EL0 },
-@@ -2354,7 +2355,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	 * PMCCFILTR_EL0 resets as unknown in 64bit mode while it resets as zero
- 	 * in 32bit mode. Here we choose to reset it as zero for consistency.
- 	 */
--	{ PMU_SYS_REG(SYS_PMCCFILTR_EL0), .access = access_pmu_evtyper,
-+	{ PMU_SYS_REG(PMCCFILTR_EL0), .access = access_pmu_evtyper,
- 	  .reset = reset_val, .reg = PMCCFILTR_EL0, .val = 0 },
- 
- 	EL2_REG(VPIDR_EL2, access_rw, reset_unknown, 0),
--- 
-2.8.1
-
+diff --git a/arch/arm64/kvm/inject_fault.c 
+b/arch/arm64/kvm/inject_fault.c
+index 0bd93a5f21ce..3cc891c0b292 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -29,7 +29,7 @@ static void pend_sync_exception(struct kvm_vcpu *vcpu)
+       * changing context, and the exception itself can be delayed
+       * until the next entry.
+       */
+-    switch(*vcpu_cpsr(vcpu) & PSR_MODE_MASK) {
++    switch (*vcpu_cpsr(vcpu) & PSR_MODE_MASK) {
+      case PSR_MODE_EL2h:
+      case PSR_MODE_EL2t:
+          kvm_pend_exception(vcpu, EXCEPT_AA64_EL2_SYNC);
