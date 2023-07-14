@@ -1,105 +1,162 @@
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CF1510F4
-	for <kvmarm@lists.linux.dev>; Fri, 14 Jul 2023 03:13:46 +0000 (UTC)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.57])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4R2Gkq14Lwz18M7y;
-	Fri, 14 Jul 2023 11:13:07 +0800 (CST)
-Received: from [10.40.193.166] (10.40.193.166) by
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28971C16
+	for <kvmarm@lists.linux.dev>; Fri, 14 Jul 2023 03:39:07 +0000 (UTC)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.55])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4R2HHG72HTzVjhr;
+	Fri, 14 Jul 2023 11:37:46 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.58) by
  kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Fri, 14 Jul 2023 11:13:43 +0800
-Subject: Re: [PATCH] KVM: arm64: Fix the name of sys_reg_desc related to PMU
-To: Marc Zyngier <maz@kernel.org>
-References: <1689148505-13914-1-git-send-email-chenxiang66@hisilicon.com>
- <868rblwmpn.wl-maz@kernel.org>
- <5c513a72-9ae9-22ca-a9a6-8b3c481e0921@hisilicon.com>
- <87bkgg9u54.wl-maz@kernel.org>
- <4cbcc10d-6cd2-d88e-b15d-bd4f1a229251@hisilicon.com>
- <86wmz4up2z.wl-maz@kernel.org>
-CC: <oliver.upton@linux.dev>, <james.morse@arm.com>, <kvmarm@lists.linux.dev>,
-	<kvm@vger.kernel.org>, <linuxarm@huawei.com>
-From: "chenxiang (M)" <chenxiang66@hisilicon.com>
-Message-ID: <04ff4473-0d01-8054-8381-d11b6ecd68ad@hisilicon.com>
-Date: Fri, 14 Jul 2023 11:13:42 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.2.0
+ 15.1.2507.27; Fri, 14 Jul 2023 11:39:02 +0800
+From: chenxiang <chenxiang66@hisilicon.com>
+To: <maz@kernel.org>, <oliver.upton@linux.dev>, <james.morse@arm.com>
+CC: <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>, <linuxarm@huawei.com>,
+	Xiang Chen <chenxiang66@hisilicon.com>
+Subject: [PATCH v2] KVM: arm64: Fix the name of sys_reg_desc related to PMU
+Date: Fri, 14 Jul 2023 11:38:40 +0800
+Message-ID: <1689305920-170523-1-git-send-email-chenxiang66@hisilicon.com>
+X-Mailer: git-send-email 2.8.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <86wmz4up2z.wl-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.40.193.166]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.58]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
  kwepemi500016.china.huawei.com (7.221.188.220)
 X-CFilter-Loop: Reflected
 
-Hi Marc,
+From: Xiang Chen <chenxiang66@hisilicon.com>
 
+For those PMU system registers defined in sys_reg_descs[], use macro
+PMU_SYS_REG() / PMU_PMEVCNTR_EL0 / PMU_PMEVTYPER_EL0 to define them, and
+later two macros call macro PMU_SYS_REG() actually.
+Currently the input parameter of PMU_SYS_REG() is another macro which is
+calculation formula of the value of system registers, so for example, if 
+we want to "SYS_PMINTENSET_EL1" as the name of sys register, actually 
+the name we get is as following:
+(((3) << 19) | ((0) << 16) | ((9) << 12) | ((14) << 8) | ((1) << 5))
+The name of system register is used in some tracepoints such as 
+trace_kvm_sys_access(), if not set correctly, we need to analyze the
+inaccurate name to get the exact name (which also is inconsistent with 
+other system registers), and also the inaccurate name occupies more space.
 
-在 2023/7/13 星期四 17:40, Marc Zyngier 写道:
-> On Thu, 13 Jul 2023 10:10:01 +0100,
-> "chenxiang (M)" <chenxiang66@hisilicon.com> wrote:
->> Hi Marc,
->>
->>
->> 在 2023/7/13 星期四 14:56, Marc Zyngier 写道:
->>> On Thu, 13 Jul 2023 03:35:39 +0100,
->>> "chenxiang (M)" <chenxiang66@hisilicon.com> wrote:
->>>> Hi Marc,
->>>>
->>>>
->>>> 在 2023/7/12 星期三 16:36, Marc Zyngier 写道:
->>>>> On Wed, 12 Jul 2023 08:55:05 +0100,
->>>>> chenxiang <chenxiang66@hisilicon.com> wrote:
->>>>>> From: Xiang Chen <chenxiang66@hisilicon.com>
->>>>>>
->>>>>> For those PMU system registers defined in sys_reg_descs[], use macro
->>>>>> PMU_SYS_REG() / PMU_PMEVCNTR_EL0 / PMU_PMEVTYPER_EL0 to define them, and
->>>>>> later two macros call macro PMU_SYS_REG() actually.
->>>>>> Currently the input parameter of PMU_SYS_REG() is other macro which is
->>>>>> calculation formula of the value of system registers, so for example, if
->>>>>> we want to "SYS_PMINTENSET_EL1" as the name of sys register, actually
->>>>>> the name will be as following:
->>>>>> (((3) << 19) | ((0) << 16) | ((9) << 12) | ((14) << 8) | ((1) << 5))
->>>>>>
->>>>>> To fix the issue, use the name as a input parameter of PMU_SYS_REG like
->>>>>> MTE_REG or EL2_REG.
->>>>> Why is the name relevant? Is this related to tracing?
->>>> I think It is not related to tracing. I find the issue when i want to
->>>> know which system reigsters are set
->>>> when on live migration and printk the name of sys_reg_desc in function
->>>> kvm_sys_reg_set_user,
->>>> find the name of some registers are abnormal as followings:
->>>>
->>>> [  227.145540] kvm_sys_reg_set_user 3427:SYS_FAR_EL1
->>>> [  227.158057] kvm_sys_reg_set_user 3427:SYS_PAR_EL1
->>>> [  227.170574] kvm_sys_reg_set_user 3427:(((3) << 19) | ((0) << 16) |
->>>> ((9) << 12) | ((14) << 8) | ((1) << 5))
->>>> [  227.188037] kvm_sys_reg_set_user 3427:(((3) << 19) | ((0) << 16) |
->>>> ((9) << 12) | ((14) << 8) | ((2) << 5))
->>>> [  227.205511] kvm_sys_reg_set_user 3427:SYS_MAIR_EL1
->>>> [  227.218117] kvm_sys_reg_set_user 3427:SYS_PIRE0_EL1
->>> So what is this if not some form of tracing?
->> Ah, i was misunderstood your question. I thought you aksed whether
->> it is related to kernel tracing (which is already existed in kernel)
->> such as tracepoint or debugfs.
-> But that's my point: tracepoints such as kvm_sys_access already output
-> the name (as well as the encoding), and are likely to be affected by
-> this problem.
->
-> And that's a much more interesting justification for this change.
+To fix the issue, use the name as a input parameter of PMU_SYS_REG like
+MTE_REG or EL2_REG.
 
-Got it. Thanks.
+Signed-off-by: Xiang Chen <chenxiang66@hisilicon.com>
+---
+ arch/arm64/kvm/sys_regs.c | 41 +++++++++++++++++++++--------------------
+ 1 file changed, 21 insertions(+), 20 deletions(-)
 
->
-> Thanks,
->
-> 	M.
->
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index bd34318..0af5f2f 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1115,18 +1115,19 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	{ SYS_DESC(SYS_DBGWCRn_EL1(n)),					\
+ 	  trap_wcr, reset_wcr, 0, 0,  get_wcr, set_wcr }
+ 
+-#define PMU_SYS_REG(r)						\
+-	SYS_DESC(r), .reset = reset_pmu_reg, .visibility = pmu_visibility
++#define PMU_SYS_REG(name)						\
++	SYS_DESC(SYS_##name), .reset = reset_pmu_reg,			\
++	.visibility = pmu_visibility
+ 
+ /* Macro to expand the PMEVCNTRn_EL0 register */
+ #define PMU_PMEVCNTR_EL0(n)						\
+-	{ PMU_SYS_REG(SYS_PMEVCNTRn_EL0(n)),				\
++	{ PMU_SYS_REG(PMEVCNTRn_EL0(n)),				\
+ 	  .reset = reset_pmevcntr, .get_user = get_pmu_evcntr,		\
+ 	  .access = access_pmu_evcntr, .reg = (PMEVCNTR0_EL0 + n), }
+ 
+ /* Macro to expand the PMEVTYPERn_EL0 register */
+ #define PMU_PMEVTYPER_EL0(n)						\
+-	{ PMU_SYS_REG(SYS_PMEVTYPERn_EL0(n)),				\
++	{ PMU_SYS_REG(PMEVTYPERn_EL0(n)),				\
+ 	  .reset = reset_pmevtyper,					\
+ 	  .access = access_pmu_evtyper, .reg = (PMEVTYPER0_EL0 + n), }
+ 
+@@ -2115,9 +2116,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_PMBSR_EL1), undef_access },
+ 	/* PMBIDR_EL1 is not trapped */
+ 
+-	{ PMU_SYS_REG(SYS_PMINTENSET_EL1),
++	{ PMU_SYS_REG(PMINTENSET_EL1),
+ 	  .access = access_pminten, .reg = PMINTENSET_EL1 },
+-	{ PMU_SYS_REG(SYS_PMINTENCLR_EL1),
++	{ PMU_SYS_REG(PMINTENCLR_EL1),
+ 	  .access = access_pminten, .reg = PMINTENSET_EL1 },
+ 	{ SYS_DESC(SYS_PMMIR_EL1), trap_raz_wi },
+ 
+@@ -2164,41 +2165,41 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_CTR_EL0), access_ctr },
+ 	{ SYS_DESC(SYS_SVCR), undef_access },
+ 
+-	{ PMU_SYS_REG(SYS_PMCR_EL0), .access = access_pmcr,
++	{ PMU_SYS_REG(PMCR_EL0), .access = access_pmcr,
+ 	  .reset = reset_pmcr, .reg = PMCR_EL0 },
+-	{ PMU_SYS_REG(SYS_PMCNTENSET_EL0),
++	{ PMU_SYS_REG(PMCNTENSET_EL0),
+ 	  .access = access_pmcnten, .reg = PMCNTENSET_EL0 },
+-	{ PMU_SYS_REG(SYS_PMCNTENCLR_EL0),
++	{ PMU_SYS_REG(PMCNTENCLR_EL0),
+ 	  .access = access_pmcnten, .reg = PMCNTENSET_EL0 },
+-	{ PMU_SYS_REG(SYS_PMOVSCLR_EL0),
++	{ PMU_SYS_REG(PMOVSCLR_EL0),
+ 	  .access = access_pmovs, .reg = PMOVSSET_EL0 },
+ 	/*
+ 	 * PM_SWINC_EL0 is exposed to userspace as RAZ/WI, as it was
+ 	 * previously (and pointlessly) advertised in the past...
+ 	 */
+-	{ PMU_SYS_REG(SYS_PMSWINC_EL0),
++	{ PMU_SYS_REG(PMSWINC_EL0),
+ 	  .get_user = get_raz_reg, .set_user = set_wi_reg,
+ 	  .access = access_pmswinc, .reset = NULL },
+-	{ PMU_SYS_REG(SYS_PMSELR_EL0),
++	{ PMU_SYS_REG(PMSELR_EL0),
+ 	  .access = access_pmselr, .reset = reset_pmselr, .reg = PMSELR_EL0 },
+-	{ PMU_SYS_REG(SYS_PMCEID0_EL0),
++	{ PMU_SYS_REG(PMCEID0_EL0),
+ 	  .access = access_pmceid, .reset = NULL },
+-	{ PMU_SYS_REG(SYS_PMCEID1_EL0),
++	{ PMU_SYS_REG(PMCEID1_EL0),
+ 	  .access = access_pmceid, .reset = NULL },
+-	{ PMU_SYS_REG(SYS_PMCCNTR_EL0),
++	{ PMU_SYS_REG(PMCCNTR_EL0),
+ 	  .access = access_pmu_evcntr, .reset = reset_unknown,
+ 	  .reg = PMCCNTR_EL0, .get_user = get_pmu_evcntr},
+-	{ PMU_SYS_REG(SYS_PMXEVTYPER_EL0),
++	{ PMU_SYS_REG(PMXEVTYPER_EL0),
+ 	  .access = access_pmu_evtyper, .reset = NULL },
+-	{ PMU_SYS_REG(SYS_PMXEVCNTR_EL0),
++	{ PMU_SYS_REG(PMXEVCNTR_EL0),
+ 	  .access = access_pmu_evcntr, .reset = NULL },
+ 	/*
+ 	 * PMUSERENR_EL0 resets as unknown in 64bit mode while it resets as zero
+ 	 * in 32bit mode. Here we choose to reset it as zero for consistency.
+ 	 */
+-	{ PMU_SYS_REG(SYS_PMUSERENR_EL0), .access = access_pmuserenr,
++	{ PMU_SYS_REG(PMUSERENR_EL0), .access = access_pmuserenr,
+ 	  .reset = reset_val, .reg = PMUSERENR_EL0, .val = 0 },
+-	{ PMU_SYS_REG(SYS_PMOVSSET_EL0),
++	{ PMU_SYS_REG(PMOVSSET_EL0),
+ 	  .access = access_pmovs, .reg = PMOVSSET_EL0 },
+ 
+ 	{ SYS_DESC(SYS_TPIDR_EL0), NULL, reset_unknown, TPIDR_EL0 },
+@@ -2354,7 +2355,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	 * PMCCFILTR_EL0 resets as unknown in 64bit mode while it resets as zero
+ 	 * in 32bit mode. Here we choose to reset it as zero for consistency.
+ 	 */
+-	{ PMU_SYS_REG(SYS_PMCCFILTR_EL0), .access = access_pmu_evtyper,
++	{ PMU_SYS_REG(PMCCFILTR_EL0), .access = access_pmu_evtyper,
+ 	  .reset = reset_val, .reg = PMCCFILTR_EL0, .val = 0 },
+ 
+ 	EL2_REG(VPIDR_EL2, access_rw, reset_unknown, 0),
+-- 
+2.8.1
 
