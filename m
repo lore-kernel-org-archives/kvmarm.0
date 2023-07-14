@@ -1,214 +1,196 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58A3FEEA8
-	for <kvmarm@lists.linux.dev>; Fri, 14 Jul 2023 15:06:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689347186;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NhAdzRqVaDVvjuIFyaXtqr2FeclLRFcObYE4UtowWCU=;
-	b=U+0VuvfxoT3S8ST/l7iAG75TmlEBk0DoTbAMulGfBBi29UviFa1D8AlSuc4a6FGonL2FRG
-	v73h4mAwpkqzf7Eh9x8cgCWgXjhUwCu9IvBoZKMI1jKGcjGGZ3BblhWjuqAov8ScZyV1ma
-	0Xi3DAGERtfch54tSL1BYq9ulvPDVWo=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-434-F1ByRj6MMmeLIZhPDOBEMA-1; Fri, 14 Jul 2023 11:06:24 -0400
-X-MC-Unique: F1ByRj6MMmeLIZhPDOBEMA-1
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7623d5cb0caso266527885a.3
-        for <kvmarm@lists.linux.dev>; Fri, 14 Jul 2023 08:06:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689347184; x=1689951984;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NhAdzRqVaDVvjuIFyaXtqr2FeclLRFcObYE4UtowWCU=;
-        b=iJClbwkhZmkWpqpcvF7PxHEfvzgUEyegUNP5T3drbpyn4utXJ7WMGjMSxV2hMvRcVj
-         nClVL06u56VD28gX1fmHAZqdwBD1brdWRQOTk6qCFJnEcjBdLpUcHCiCfIOmeGayTace
-         kYGLJLSg7HSuPaKBIDT5bRRi3wwJ1PcezbwEjVRYHJHAKs0teratXpjKrfi07hNF0epZ
-         u7OBTGymzbp0KkkgDa2JXKOFER1E0Gr16k4pVr3T+hIoc4W+EPAkEtx3XFPV1Vq5oe4M
-         7HUSSHhp/LA+ZXhh21auhhVH2+JKev6mOk8hSkHq2pjG5UeXgQTr/oYvEEtUu3pcJ7Oa
-         h+kQ==
-X-Gm-Message-State: ABy/qLYJCUECZXOnehR8yX1+8mmsg+pHtQd9CtiuE9QexHvrPXt+u0TN
-	OqCyV0UDHhfShonChrtSqHQVkLgfyC/4UrPGRkmXT/8dRHBL+AVyGzjA/VNXHhBEOMnOU7SUqhn
-	n9OkQ28iH+bJtagWI
-X-Received: by 2002:a05:620a:1a1a:b0:765:87e1:f60b with SMTP id bk26-20020a05620a1a1a00b0076587e1f60bmr6306965qkb.64.1689347184298;
-        Fri, 14 Jul 2023 08:06:24 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlG5wd7LauXlPfX7A79ukkFzMX+DaIH+H6LmRPp7woUZKMmgdgcjGaSdEv63FDRt/trlBlzgMA==
-X-Received: by 2002:a05:620a:1a1a:b0:765:87e1:f60b with SMTP id bk26-20020a05620a1a1a00b0076587e1f60bmr6306938qkb.64.1689347183951;
-        Fri, 14 Jul 2023 08:06:23 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id oq25-20020a05620a611900b00767db6f47bbsm3863390qkn.73.2023.07.14.08.06.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Jul 2023 08:06:23 -0700 (PDT)
-Message-ID: <669c82dc-44c1-ef3f-1285-87369c4d7276@redhat.com>
-Date: Fri, 14 Jul 2023 17:06:18 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544A44C7D
+	for <kvmarm@lists.linux.dev>; Fri, 14 Jul 2023 16:09:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E9F9C433C7;
+	Fri, 14 Jul 2023 16:09:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689350979;
+	bh=EUHHrFEC5avoJeQwK4fIb7NvmO3f3Kv10+EE0AQ8rm8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KeRQU3cCmTVOtRvjHnkuLnSeBVBN36QxKyrZzR25OsMB9ejoHOM9VHRwG15DwB/ia
+	 TDphIbEBRsPTYFZOxY0Iz6DblAbg5zsoiV1Kd8YfuXFDV5NeXo+nG8Esk7DJ6C6nG2
+	 ha/3RIathejiOeHlyBzKGtwH9vsobbhIOfcqMbAVL5sKS88dpv4g849zJWKYdEw0m+
+	 9KjzmXrSNoTb3RM9zEem63mW+sXKu8uptnXJWvwefjsrfLq7IfkFOd1Pc1I9GWciOp
+	 mLMcO0vQjMFwddoCwZ4xnrRpI9gD4u1sR6nWr0l4s5Ki+2Kv02/P5rdwjkv/99M0E5
+	 fGkHymcs4h7hw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qKLMP-00D9iv-1C;
+	Fri, 14 Jul 2023 17:09:37 +0100
+Date: Fri, 14 Jul 2023 17:09:36 +0100
+Message-ID: <86bkgev5j3.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: eric.auger@redhat.com
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Brown
+ <broonie@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Chase Conklin <chase.conklin@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Darren Hart <darren@os.amperecomputing.com>,
+	Miguel Luis <miguel.luis@oracle.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 06/27] arm64: Add debug registers affected by HDFGxTR_EL2
+In-Reply-To: <a69eda3e-d255-1eb4-c6d2-7ba02ba02468@redhat.com>
+References: <20230712145810.3864793-1-maz@kernel.org>
+	<20230712145810.3864793-7-maz@kernel.org>
+	<a69eda3e-d255-1eb4-c6d2-7ba02ba02468@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH 16/27] KVM: arm64: nv: Add trap forwarding for HCR_EL2
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org,
- Catalin Marinas <catalin.marinas@arm.com>, Mark Brown <broonie@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Andre Przywara <andre.przywara@arm.com>,
- Chase Conklin <chase.conklin@arm.com>,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Darren Hart <darren@os.amperecomputing.com>,
- Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
-References: <20230712145810.3864793-1-maz@kernel.org>
- <20230712145810.3864793-17-maz@kernel.org>
- <8c32ebdc-a3bc-aabe-5098-3754159d22cd@redhat.com>
- <86sf9rvmd7.wl-maz@kernel.org> <86ilamvm4y.wl-maz@kernel.org>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <86ilamvm4y.wl-maz@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Marc,
+Hey Eric,
 
-On 7/14/23 12:10, Marc Zyngier wrote:
-> On Thu, 13 Jul 2023 16:53:40 +0100,
-> Marc Zyngier <maz@kernel.org> wrote:
->> Hey Eric,
->>
->> Thanks for looking into this, much appreciated given how tedious it
->> is.
-> FWIW, here are the changes I'm going to squash in that patch. Shout if
-> you spot something that looks odd...
->
-> Thanks,
->
-> 	M.
->
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index c4057f4ff72d..f5978b463aca 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -55,7 +55,8 @@ enum coarse_grain_trap_id {
->  	CGT_HCR_TERR,
->  	CGT_HCR_APK,
->  	CGT_HCR_NV,
-> -	CGT_HCR_NV1,
-> +	CGT_HCR_NV_nNV2,
-> +	CGT_HCR_NV1_nNV2,
->  	CGT_HCR_AT,
->  	CGT_HCR_FIEN,
->  	CGT_HCR_TID4,
-> @@ -89,7 +90,7 @@ enum coarse_grain_trap_id {
->  	CGT_HCR_TVM_TRVM,
->  	CGT_HCR_TPU_TICAB,
->  	CGT_HCR_TPU_TOCU,
-> -	CGT_HCR_NV1_ENSCXT,
-> +	CGT_HCR_NV1_nNV2_ENSCXT,
->  	CGT_MDCR_TPM_TPMCR,
->  	CGT_MDCR_TDE_TDA,
->  	CGT_MDCR_TDE_TDOSA,
-> @@ -154,7 +155,7 @@ static const struct trap_bits coarse_trap_bits[] = {
->  		.mask		= HCR_TSW,
->  		.behaviour	= BEHAVE_FORWARD_ANY,
->  	},
-> -	[CGT_HCR_TPC] = {
-> +	[CGT_HCR_TPC] = { /* Also called TCPC when FEAT_DPB is implemented */
->  		.index		= HCR_EL2,
->  		.value		= HCR_TPC,
->  		.mask		= HCR_TPC,
-> @@ -176,7 +177,7 @@ static const struct trap_bits coarse_trap_bits[] = {
->  		.index		= HCR_EL2,
->  		.value		= HCR_TVM,
->  		.mask		= HCR_TVM,
-> -		.behaviour	= BEHAVE_FORWARD_ANY,
-> +		.behaviour	= BEHAVE_FORWARD_WRITE,
->  	},
->  	[CGT_HCR_TDZ] = {
->  		.index		= HCR_EL2,
-> @@ -209,12 +210,18 @@ static const struct trap_bits coarse_trap_bits[] = {
->  		.behaviour	= BEHAVE_FORWARD_ANY,
->  	},
->  	[CGT_HCR_NV] = {
-> +		.index		= HCR_EL2,
-> +		.value		= HCR_NV,
-> +		.mask		= HCR_NV,
-> +		.behaviour	= BEHAVE_FORWARD_ANY,
-> +	},
-> +	[CGT_HCR_NV_nNV2] = {
->  		.index		= HCR_EL2,
->  		.value		= HCR_NV,
->  		.mask		= HCR_NV | HCR_NV2,
->  		.behaviour	= BEHAVE_FORWARD_ANY,
->  	},
-> -	[CGT_HCR_NV1] = {
-> +	[CGT_HCR_NV1_nNV2] = {
->  		.index		= HCR_EL2,
->  		.value		= HCR_NV | HCR_NV1,
->  		.mask		= HCR_NV | HCR_NV1 | HCR_NV2,
-> @@ -350,7 +357,7 @@ static const enum coarse_grain_trap_id *coarse_control_combo[] = {
->  	MCB(CGT_HCR_TVM_TRVM,		CGT_HCR_TVM, CGT_HCR_TRVM),
->  	MCB(CGT_HCR_TPU_TICAB,		CGT_HCR_TPU, CGT_HCR_TICAB),
->  	MCB(CGT_HCR_TPU_TOCU,		CGT_HCR_TPU, CGT_HCR_TOCU),
-> -	MCB(CGT_HCR_NV1_ENSCXT,		CGT_HCR_NV1, CGT_HCR_ENSCXT),
-> +	MCB(CGT_HCR_NV1_nNV2_ENSCXT,	CGT_HCR_NV1_nNV2, CGT_HCR_ENSCXT),
->  	MCB(CGT_MDCR_TPM_TPMCR,		CGT_MDCR_TPM, CGT_MDCR_TPMCR),
->  	MCB(CGT_MDCR_TDE_TDA,		CGT_MDCR_TDE, CGT_MDCR_TDA),
->  	MCB(CGT_MDCR_TDE_TDOSA,		CGT_MDCR_TDE, CGT_MDCR_TDOSA),
-> @@ -501,6 +508,7 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initdata = {
->  	SR_TRAP(SYS_DC_CIVAC,		CGT_HCR_TPC),
->  	SR_TRAP(SYS_DC_CVAC,		CGT_HCR_TPC),
->  	SR_TRAP(SYS_DC_CVAP,		CGT_HCR_TPC),
-> +	SR_TRAP(SYS_DC_CVADP,		CGT_HCR_TPC),
->  	SR_TRAP(SYS_DC_IVAC,		CGT_HCR_TPC),
->  	SR_TRAP(SYS_DC_CIGVAC,		CGT_HCR_TPC),
->  	SR_TRAP(SYS_DC_CIGDVAC,		CGT_HCR_TPC),
-> @@ -625,7 +633,6 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initdata = {
->  		      sys_reg(3, 5, 10, 15, 7), CGT_HCR_NV),
->  	SR_RANGE_TRAP(sys_reg(3, 5, 12, 0, 0),
->  		      sys_reg(3, 5, 14, 15, 7), CGT_HCR_NV),
-> -	SR_TRAP(SYS_SP_EL1,		CGT_HCR_NV),
->  	SR_TRAP(OP_AT_S1E2R,		CGT_HCR_NV),
->  	SR_TRAP(OP_AT_S1E2W,		CGT_HCR_NV),
->  	SR_TRAP(OP_AT_S12E1R,		CGT_HCR_NV),
-> @@ -698,10 +705,14 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initdata = {
->  	SR_TRAP(OP_TLBI_RIPAS2LE1OSNXS,	CGT_HCR_NV),
->  	SR_TRAP(OP_TLBI_RVAE2OSNXS,	CGT_HCR_NV),
->  	SR_TRAP(OP_TLBI_RVALE2OSNXS,	CGT_HCR_NV),
-> -	SR_TRAP(SYS_VBAR_EL1,		CGT_HCR_NV1),
-> -	SR_TRAP(SYS_ELR_EL1,		CGT_HCR_NV1),
-> -	SR_TRAP(SYS_SPSR_EL1,		CGT_HCR_NV1),
-> -	SR_TRAP(SYS_SCXTNUM_EL1,	CGT_HCR_NV1_ENSCXT),
-> +	SR_TRAP(OP_CPP_RCTX, 		CGT_HCR_NV),
-> +	SR_TRAP(OP_DVP_RCTX, 		CGT_HCR_NV),
-> +	SR_TRAP(OP_CFP_RCTX, 		CGT_HCR_NV),
-> +	SR_TRAP(SYS_SP_EL1,		CGT_HCR_NV_nNV2),
-> +	SR_TRAP(SYS_VBAR_EL1,		CGT_HCR_NV1_nNV2),
-> +	SR_TRAP(SYS_ELR_EL1,		CGT_HCR_NV1_nNV2),
-> +	SR_TRAP(SYS_SPSR_EL1,		CGT_HCR_NV1_nNV2),
-> +	SR_TRAP(SYS_SCXTNUM_EL1,	CGT_HCR_NV1_nNV2_ENSCXT),
->  	SR_TRAP(SYS_SCXTNUM_EL0,	CGT_HCR_ENSCXT),
->  	SR_TRAP(OP_AT_S1E1R, 		CGT_HCR_AT),
->  	SR_TRAP(OP_AT_S1E1W, 		CGT_HCR_AT),
->
-Looks good to me. Feel free to add my
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+On Fri, 14 Jul 2023 15:47:20 +0100,
+Eric Auger <eric.auger@redhat.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 7/12/23 16:57, Marc Zyngier wrote:
+> > The HDFGxTR_EL2 registers trap a (huge) set of debug and trace
+> > related registers. Add their encodings (and only that, because
+> > we really don't care about what these registers actually do at
+> > this stage).
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/sysreg.h | 78 +++++++++++++++++++++++++++++++++
+> >  1 file changed, 78 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > index 76289339b43b..9dfd127be55a 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -194,6 +194,84 @@
+> >  #define SYS_DBGDTRTX_EL0		sys_reg(2, 3, 0, 5, 0)*
+> >  #define SYS_DBGVCR32_EL2		sys_reg(2, 4, 0, 7, 0)*
+> >  
+> > +#define SYS_BRBINF_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 0))*
+> > +#define SYS_BRBINFINJ_EL1		sys_reg(2, 1, 9, 1, 0)*
+> > +#define SYS_BRBSRC_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 1))*
+> > +#define SYS_BRBSRCINJ_EL1		sys_reg(2, 1, 9, 1, 1)*
+> > +#define SYS_BRBTGT_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 2))*
+> > +#define SYS_BRBTGTINJ_EL1		sys_reg(2, 1, 9, 1, 2)*
+> > +#define SYS_BRBTS_EL1			sys_reg(2, 1, 9, 0, 2)*
+> > +
+> > +#define SYS_BRBCR_EL1			sys_reg(2, 1, 9, 0, 0)*
+> > +#define SYS_BRBFCR_EL1			sys_reg(2, 1, 9, 0, 1)*
+> > +#define SYS_BRBIDR0_EL1			sys_reg(2, 1, 9, 2, 0)*
+> > +
+> > +#define SYS_TRCITECR_EL1		sys_reg(3, 0, 1, 2, 3)
+> > +#define SYS_TRCITECR_EL1		sys_reg(3, 0, 1, 2, 3)
+> I cannot find this one - which is duplicated by the way - in DDI0487Jaa
 
-Thanks
+Ah, that's one of the sucker I got from peeking at the 2023-03 XML and
+wrote it twice for a good measure. You can see it there:
 
-Eric
+https://developer.arm.com/documentation/ddi0601/2023-03/AArch64-Registers/TRCITECR-EL1--Instrumentation-Trace-Control-Register--EL1-
 
+> > +#define SYS_TRCACATR(m)			sys_reg(2, 1, 2, ((m & 7) << 1), (2 | (m >> 3)))*
+> > +#define SYS_TRCACVR(m)			sys_reg(2, 1, 2, ((m & 7) << 1), (0 | (m >> 3)))*
+> > +#define SYS_TRCAUTHSTATUS		sys_reg(2, 1, 7, 14, 6)*
+> > +#define SYS_TRCAUXCTLR			sys_reg(2, 1, 0, 6, 0)*
+> > +#define SYS_TRCBBCTLR			sys_reg(2, 1, 0, 15, 0)*
+> > +#define SYS_TRCCCCTLR			sys_reg(2, 1, 0, 14, 0)*
+> > +#define SYS_TRCCIDCCTLR0		sys_reg(2, 1, 3, 0, 2)*
+> > +#define SYS_TRCCIDCCTLR1		sys_reg(2, 1, 3, 1, 2)*
+> > +#define SYS_TRCCIDCVR(m)		sys_reg(2, 1, 3, ((m & 7) << 1), 0)*
+> > +#define SYS_TRCCLAIMCLR			sys_reg(2, 1, 7, 9, 6)*
+> > +#define SYS_TRCCLAIMSET			sys_reg(2, 1, 7, 8, 6)*
+> > +#define SYS_TRCCNTCTLR(m)		sys_reg(2, 1, 0, (4 | (m & 3)), 5)*
+> > +#define SYS_TRCCNTRLDVR(m)		sys_reg(2, 1, 0, (0 | (m & 3)), 5)*
+> > +#define SYS_TRCCNTVR(m)			sys_reg(2, 1, 0, (8 | (m & 3)), 5)*
+> > +#define SYS_TRCCONFIGR			sys_reg(2, 1, 0, 4, 0)*
+> > +#define SYS_TRCDEVARCH			sys_reg(2, 1, 7, 15, 6)*
+> > +#define SYS_TRCDEVID			sys_reg(2, 1, 7, 2, 7)*
+> > +#define SYS_TRCEVENTCTL0R		sys_reg(2, 1, 0, 8, 0)*
+> > +#define SYS_TRCEVENTCTL1R		sys_reg(2, 1, 0, 9, 0)*
+> > +#define SYS_TRCEXTINSELR(m)		sys_reg(2, 1, 0, (8 | (m & 3)), 4)*
+> > +#define SYS_TRCIDR0			sys_reg(2, 1, 0, 8, 7)*
+> > +#define SYS_TRCIDR10			sys_reg(2, 1, 0, 2, 6)*
+> > +#define SYS_TRCIDR11			sys_reg(2, 1, 0, 3, 6)*
+> > +#define SYS_TRCIDR12			sys_reg(2, 1, 0, 4, 6)*
+> > +#define SYS_TRCIDR13			sys_reg(2, 1, 0, 5, 6)*
+> > +#define SYS_TRCIDR1			sys_reg(2, 1, 0, 9, 7)*
+> > +#define SYS_TRCIDR2			sys_reg(2, 1, 0, 10, 7)*
+> > +#define SYS_TRCIDR3			sys_reg(2, 1, 0, 11, 7)*
+> > +#define SYS_TRCIDR4			sys_reg(2, 1, 0, 12, 7)*
+> > +#define SYS_TRCIDR5			sys_reg(2, 1, 0, 13, 7)*
+> > +#define SYS_TRCIDR6			sys_reg(2, 1, 0, 14, 7)*
+> > +#define SYS_TRCIDR7			sys_reg(2, 1, 0, 15, 7)*
+> > +#define SYS_TRCIDR8			sys_reg(2, 1, 0, 0, 6)*
+> > +#define SYS_TRCIDR9			sys_reg(2, 1, 0, 1, 6)*
+> > +#define SYS_TRCIMSPEC0			sys_reg(2, 1, 0, 0, 7)*
+> > +#define SYS_TRCIMSPEC(m)		sys_reg(2, 1, 0, (m & 7), 7)*
+> > +#define SYS_TRCITEEDCR			sys_reg(2, 1, 0, 2, 1)
+> I cannot find this one in D18-1 or elsewhere in DDI0487Jaa
+
+Same thing. You can find it here:
+
+https://developer.arm.com/documentation/ddi0601/2023-03/AArch64-Registers/TRCITEEDCR--Instrumentation-Trace-Extension-External-Debug-Control-Register
+
+> > +#define SYS_TRCOSLSR			sys_reg(2, 1, 1, 1, 4)*
+> > +#define SYS_TRCPRGCTLR			sys_reg(2, 1, 0, 1, 0)*
+> > +#define SYS_TRCQCTLR			sys_reg(2, 1, 0, 1, 1)*
+> > +#define SYS_TRCRSCTLR(m)		sys_reg(2, 1, 1, (m & 15), (0 | (m >> 4)))*
+> > +#define SYS_TRCRSR			sys_reg(2, 1, 0, 10, 0)*
+> > +#define SYS_TRCSEQEVR(m)		sys_reg(2, 1, 0, (m & 3), 4)*
+> > +#define SYS_TRCSEQRSTEVR		sys_reg(2, 1, 0, 6, 4)*
+> > +#define SYS_TRCSEQSTR			sys_reg(2, 1, 0, 7, 4)*
+> > +#define SYS_TRCSSCCR(m)			sys_reg(2, 1, 1, (m & 7), 2)*
+> > +#define SYS_TRCSSCSR(m)			sys_reg(2, 1, 1, (8 | (m & 7)), 2)*
+> > +#define SYS_TRCSSPCICR(m)		sys_reg(2, 1, 1, (m & 7), 3)*
+> > +#define SYS_TRCSTALLCTLR		sys_reg(2, 1, 0, 11, 0)*
+> > +#define SYS_TRCSTATR			sys_reg(2, 1, 0, 3, 0)*
+> > +#define SYS_TRCSYNCPR			sys_reg(2, 1, 0, 13, 0)*
+> > +#define SYS_TRCTRACEIDR			sys_reg(2, 1, 0, 0, 1)*
+> > +#define SYS_TRCTSCTLR			sys_reg(2, 1, 0, 12, 0)*
+> > +#define SYS_TRCVICTLR			sys_reg(2, 1, 0, 0, 2)*
+> > +#define SYS_TRCVIIECTLR			sys_reg(2, 1, 0, 1, 2)*
+> > +#define SYS_TRCVIPCSSCTLR		sys_reg(2, 1, 0, 3, 2)*
+> > +#define SYS_TRCVISSCTLR			sys_reg(2, 1, 0, 2, 2)*
+> > +#define SYS_TRCVMIDCCTLR0		sys_reg(2, 1, 3, 2, 2)*
+> > +#define SYS_TRCVMIDCCTLR1		sys_reg(2, 1, 3, 3, 2)*
+> > +#define SYS_TRCVMIDCVR(m)		sys_reg(2, 1, 3, ((m & 7) << 1), 1)*
+> > +
+> > +/* ETM */
+> > +#define SYS_TRCOSLAR			sys_reg(2, 1, 1, 0, 4)
+> not able to locate this one either. I see the bit of HDFGWTR_EL2 though
+
+This one lives in the ETM spec:
+
+https://documentation-service.arm.com/static/60017fbb3f22832ff1d6872b
+
+Page 7-342 has the register number, and the encoding is computed as
+per the formula in 4.3.6 "System instructions", page 4-169.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
