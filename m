@@ -1,40 +1,40 @@
-Received: from mail-oo1-f74.google.com (mail-oo1-f74.google.com [209.85.161.74])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 049C6A35
-	for <kvmarm@lists.linux.dev>; Sat, 15 Jul 2023 00:54:16 +0000 (UTC)
-Received: by mail-oo1-f74.google.com with SMTP id 006d021491bc7-5667afccc45so3471555eaf.3
-        for <kvmarm@lists.linux.dev>; Fri, 14 Jul 2023 17:54:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ABE6A44
+	for <kvmarm@lists.linux.dev>; Sat, 15 Jul 2023 00:54:17 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-c0f35579901so2014432276.0
+        for <kvmarm@lists.linux.dev>; Fri, 14 Jul 2023 17:54:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689382456; x=1689987256;
+        d=google.com; s=20221208; t=1689382457; x=1689987257;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3JwopgRpIMp0X2glfVxGtAHu1MpQVveVbpsM0JdVJZQ=;
-        b=WzuwSrgUcQNReWT/D/pSdl6UdHpKLb7UWimjp08dHNmKHuBIOKxgMS6JBBZc39QJNk
-         eacA7f7nF2F6YWMDYDnPPQvEpz3NlFofChUilfoTLlEYkk0DkhCZgLEynkawoE+RpTUX
-         Ns4tBoa5xtQc+9jQWG0frC1oChGMy8jf+AuG/sc6qu/CzdXVdWhW5hphT+444Z7wyXI1
-         BLI2JkvNKoV1cv5zYFt2wIvBAI14k4hN+8Tbsy3tnISF81SvhE7X+mz/35ntRFv3hhr4
-         TqaflOLXmJSXILRf6JGluQkxdFIkW50nBjB6DNmc1BPVJQa5wqAG7QvgmBMK+IThkKHH
-         yaZQ==
+        bh=jRNC6fA4vY9IIzTukCRjUclh2x+xk9hgJU6Rf1v4LlI=;
+        b=GW/dL6s1ehKPh/5954DkfJFtt3h3bcvOw4zkislkY8qK/1gk4+IB9PZ0pWKbs7As/w
+         WLd3uXnV+TeINcdWYtR2Ax9+3sunPIRl05fMKVwT6nxoKsWRIWuqU6T1AMR8PBIXGFMB
+         ThxrhSRkJhAOyfKke14JFi4gXqsuF7cGsE+8y69+pCVSOBD2/EOplkKl5jdn7f1ymKki
+         fux7ZH3kEaGgnTscwY7Wn3SmQKlRKcEJCnXC2VhKA8NnHtIjIbKmIdP3XUWRAdm2wVvS
+         jqjXT7vnYWM0iLubSMIpiEg87B345lhKUXH+eRlPDsS8pyTgaSBcs0SbejpIZsn0E72D
+         29PQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689382456; x=1689987256;
+        d=1e100.net; s=20221208; t=1689382457; x=1689987257;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3JwopgRpIMp0X2glfVxGtAHu1MpQVveVbpsM0JdVJZQ=;
-        b=dkZgWfvbnes+Mcv2JJIvhap4kah7udNMX1i+I5GDZ03A+53wbVBNybv4Z5KahFV30W
-         qj3iDcdEVYlkQVTdP/aSFCHsUn/Fmm9F2DVko5SXLgyUtOqK+bft+qxoKInx9Md1nQ9x
-         9dT2q3PAeDfGY1V5NU7EGAgqL48lIDymJ0nRqWufvovs9A6cdFvmif6oG8RgqY4ViN45
-         F6o8bXunRBVZZyP3HIKL4Ewskwi9WrF2DcpKxPkluEc2UdcOLV37RzPulhxdlDP3yMy2
-         25uTNCvU8FmSEyjCBdfT0pJwMkAorCtTYaDsV205Lp2jPWs5Np9DjORD7TmPiD/PZYSY
-         q1ZQ==
-X-Gm-Message-State: ABy/qLb8nrwq0cvH+GM98GCjMnXIsnvWr6fIWp0yuST6Db1GQdb1OYlh
-	YC0Csd4noFFzg2wADaViNofXNIRhdTIy
-X-Google-Smtp-Source: APBJJlE+23Zlyi1NCHMzx496SqRzQzk0piEvAkVf0LldPKrAVErByool5AO571hFmEWHsnBTx1b/9eA4mVow
+        bh=jRNC6fA4vY9IIzTukCRjUclh2x+xk9hgJU6Rf1v4LlI=;
+        b=dIKKu/PQIgCQzNETDI/ObhvHyRHd5xpbgYbLcuoJflp2f2sG25Xyrdpi3krUC5m9sG
+         Nk+uod7f+LTq4u5OBi2GuA0D7vb+IIxSV2YZSreMNakKgsuQMe22adObFclQ5RHI/j6l
+         qlEJwY6rE628GyaSTs2SN9GnE/yDMe/4tqEZtlp+T0wUYf3FcFlitSQlXrOxnwqS9+To
+         ws1/Xhe/nZz60NqgILzfa77QBVaVKdsr39NnZZEc8VY1+CaeZJOH9AAscoLkPIodJjY2
+         10SCTTzi6NV2sNbgwao3OJl6SAvOjc0NqbINjipc7h28mh8+rs1m9Mo52wrOPO/aDIcu
+         sNsw==
+X-Gm-Message-State: ABy/qLaZyxoAjr78YSSJEyZqFOi1a148EY7OLboblPMEmO5Qadwvoltw
+	gbWTBTqFU3nswwobeD2W/BnPCDyoJyPn
+X-Google-Smtp-Source: APBJJlEA9KEZVMk/ou9H9hfwDv90RgOlHXktQfG21vm7Jdj4BjS7QOiWzDLO5fSMZvDv9BrKfFrVIlqO7Eih
 X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
- (user=rananta job=sendgmr) by 2002:a05:6870:d883:b0:1b3:7919:e9dd with SMTP
- id dv3-20020a056870d88300b001b37919e9ddmr6035172oab.5.1689382455968; Fri, 14
- Jul 2023 17:54:15 -0700 (PDT)
-Date: Sat, 15 Jul 2023 00:53:59 +0000
+ (user=rananta job=sendgmr) by 2002:a25:2551:0:b0:cb6:6c22:d0f8 with SMTP id
+ l78-20020a252551000000b00cb66c22d0f8mr37682ybl.4.1689382457013; Fri, 14 Jul
+ 2023 17:54:17 -0700 (PDT)
+Date: Sat, 15 Jul 2023 00:54:00 +0000
 In-Reply-To: <20230715005405.3689586-1-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230715005405.3689586-1-rananta@google.com>
 X-Mailer: git-send-email 2.41.0.455.g037347b96a-goog
-Message-ID: <20230715005405.3689586-6-rananta@google.com>
-Subject: [PATCH v6 05/11] arm64: tlb: Refactor the core flush algorithm of __flush_tlb_range
+Message-ID: <20230715005405.3689586-7-rananta@google.com>
+Subject: [PATCH v6 06/11] KVM: arm64: Implement  __kvm_tlb_flush_vmid_range()
 From: Raghavendra Rao Ananta <rananta@google.com>
 To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
 	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>
@@ -57,159 +57,150 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
 	linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, 
 	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, 
-	Gavin Shan <gshan@redhat.com>
+	kvm@vger.kernel.org, Gavin Shan <gshan@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Currently, the core TLB flush functionality of __flush_tlb_range()
-hardcodes vae1is (and variants) for the flush operation. In the
-upcoming patches, the KVM code reuses this core algorithm with
-ipas2e1is for range based TLB invalidations based on the IPA.
-Hence, extract the core flush functionality of __flush_tlb_range()
-into its own macro that accepts an 'op' argument to pass any
-TLBI operation, such that other callers (KVM) can benefit.
-
-No functional changes intended.
+Define  __kvm_tlb_flush_vmid_range() (for VHE and nVHE)
+to flush a range of stage-2 page-tables using IPA in one go.
+If the system supports FEAT_TLBIRANGE, the following patches
+would conviniently replace global TLBI such as vmalls12e1is
+in the map, unmap, and dirty-logging paths with ripas2e1is
+instead.
 
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 ---
- arch/arm64/include/asm/tlbflush.h | 109 +++++++++++++++---------------
- 1 file changed, 56 insertions(+), 53 deletions(-)
+ arch/arm64/include/asm/kvm_asm.h   |  3 +++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 11 +++++++++++
+ arch/arm64/kvm/hyp/nvhe/tlb.c      | 30 ++++++++++++++++++++++++++++++
+ arch/arm64/kvm/hyp/vhe/tlb.c       | 23 +++++++++++++++++++++++
+ 4 files changed, 67 insertions(+)
 
-diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
-index 412a3b9a3c25..f7fafba25add 100644
---- a/arch/arm64/include/asm/tlbflush.h
-+++ b/arch/arm64/include/asm/tlbflush.h
-@@ -278,14 +278,62 @@ static inline void flush_tlb_page(struct vm_area_struct *vma,
-  */
- #define MAX_TLBI_OPS	PTRS_PER_PTE
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 7d170aaa2db4..2c27cb8cf442 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -70,6 +70,7 @@ enum __kvm_host_smccc_func {
+ 	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa,
+ 	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa_nsh,
+ 	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid,
++	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_range,
+ 	__KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context,
+ 	__KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff,
+ 	__KVM_HOST_SMCCC_FUNC___vgic_v3_read_vmcr,
+@@ -229,6 +230,8 @@ extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
+ extern void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
+ 					 phys_addr_t ipa,
+ 					 int level);
++extern void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
++					phys_addr_t start, unsigned long pages);
+ extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
  
-+/* When the CPU does not support TLB range operations, flush the TLB
-+ * entries one by one at the granularity of 'stride'. If the TLB
-+ * range ops are supported, then:
-+ *
-+ * 1. If 'pages' is odd, flush the first page through non-range
-+ *    operations;
-+ *
-+ * 2. For remaining pages: the minimum range granularity is decided
-+ *    by 'scale', so multiple range TLBI operations may be required.
-+ *    Start from scale = 0, flush the corresponding number of pages
-+ *    ((num+1)*2^(5*scale+1) starting from 'addr'), then increase it
-+ *    until no pages left.
-+ *
-+ * Note that certain ranges can be represented by either num = 31 and
-+ * scale or num = 0 and scale + 1. The loop below favours the latter
-+ * since num is limited to 30 by the __TLBI_RANGE_NUM() macro.
-+ */
-+#define __flush_tlb_range_op(op, start, pages, stride,			\
-+				asid, tlb_level, tlbi_user)		\
-+do {									\
-+	int num = 0;							\
-+	int scale = 0;							\
-+	unsigned long addr;						\
-+									\
-+	while (pages > 0) {						\
-+		if (!system_supports_tlb_range() ||			\
-+		    pages % 2 == 1) {					\
-+			addr = __TLBI_VADDR(start, asid);		\
-+			__tlbi_level(op, addr, tlb_level);		\
-+			if (tlbi_user)					\
-+				__tlbi_user_level(op, addr, tlb_level);	\
-+			start += stride;				\
-+			pages -= stride >> PAGE_SHIFT;			\
-+			continue;					\
-+		}							\
-+									\
-+		num = __TLBI_RANGE_NUM(pages, scale);			\
-+		if (num >= 0) {						\
-+			addr = __TLBI_VADDR_RANGE(start, asid, scale,	\
-+						  num, tlb_level);	\
-+			__tlbi(r##op, addr);				\
-+			if (tlbi_user)					\
-+				__tlbi_user(r##op, addr);		\
-+			start += __TLBI_RANGE_PAGES(num, scale) << PAGE_SHIFT; \
-+			pages -= __TLBI_RANGE_PAGES(num, scale);	\
-+		}							\
-+		scale++;						\
-+	}								\
-+} while (0)
-+
- static inline void __flush_tlb_range(struct vm_area_struct *vma,
- 				     unsigned long start, unsigned long end,
- 				     unsigned long stride, bool last_level,
- 				     int tlb_level)
- {
--	int num = 0;
--	int scale = 0;
--	unsigned long asid, addr, pages;
-+	unsigned long asid, pages;
- 
- 	start = round_down(start, stride);
- 	end = round_up(end, stride);
-@@ -307,56 +355,11 @@ static inline void __flush_tlb_range(struct vm_area_struct *vma,
- 	dsb(ishst);
- 	asid = ASID(vma->vm_mm);
- 
--	/*
--	 * When the CPU does not support TLB range operations, flush the TLB
--	 * entries one by one at the granularity of 'stride'. If the TLB
--	 * range ops are supported, then:
--	 *
--	 * 1. If 'pages' is odd, flush the first page through non-range
--	 *    operations;
--	 *
--	 * 2. For remaining pages: the minimum range granularity is decided
--	 *    by 'scale', so multiple range TLBI operations may be required.
--	 *    Start from scale = 0, flush the corresponding number of pages
--	 *    ((num+1)*2^(5*scale+1) starting from 'addr'), then increase it
--	 *    until no pages left.
--	 *
--	 * Note that certain ranges can be represented by either num = 31 and
--	 * scale or num = 0 and scale + 1. The loop below favours the latter
--	 * since num is limited to 30 by the __TLBI_RANGE_NUM() macro.
--	 */
--	while (pages > 0) {
--		if (!system_supports_tlb_range() ||
--		    pages % 2 == 1) {
--			addr = __TLBI_VADDR(start, asid);
--			if (last_level) {
--				__tlbi_level(vale1is, addr, tlb_level);
--				__tlbi_user_level(vale1is, addr, tlb_level);
--			} else {
--				__tlbi_level(vae1is, addr, tlb_level);
--				__tlbi_user_level(vae1is, addr, tlb_level);
--			}
--			start += stride;
--			pages -= stride >> PAGE_SHIFT;
--			continue;
--		}
--
--		num = __TLBI_RANGE_NUM(pages, scale);
--		if (num >= 0) {
--			addr = __TLBI_VADDR_RANGE(start, asid, scale,
--						  num, tlb_level);
--			if (last_level) {
--				__tlbi(rvale1is, addr);
--				__tlbi_user(rvale1is, addr);
--			} else {
--				__tlbi(rvae1is, addr);
--				__tlbi_user(rvae1is, addr);
--			}
--			start += __TLBI_RANGE_PAGES(num, scale) << PAGE_SHIFT;
--			pages -= __TLBI_RANGE_PAGES(num, scale);
--		}
--		scale++;
--	}
-+	if (last_level)
-+		__flush_tlb_range_op(vale1is, start, pages, stride, asid, tlb_level, true);
-+	else
-+		__flush_tlb_range_op(vae1is, start, pages, stride, asid, tlb_level, true);
-+
- 	dsb(ish);
+ extern void __kvm_timer_set_cntvoff(u64 cntvoff);
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index a169c619db60..857d9bc04fd4 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -135,6 +135,16 @@ static void handle___kvm_tlb_flush_vmid_ipa_nsh(struct kvm_cpu_context *host_ctx
+ 	__kvm_tlb_flush_vmid_ipa_nsh(kern_hyp_va(mmu), ipa, level);
  }
  
++static void
++handle___kvm_tlb_flush_vmid_range(struct kvm_cpu_context *host_ctxt)
++{
++	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
++	DECLARE_REG(phys_addr_t, start, host_ctxt, 2);
++	DECLARE_REG(unsigned long, pages, host_ctxt, 3);
++
++	__kvm_tlb_flush_vmid_range(kern_hyp_va(mmu), start, pages);
++}
++
+ static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
+ {
+ 	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
+@@ -327,6 +337,7 @@ static const hcall_t host_hcall[] = {
+ 	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
+ 	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa_nsh),
+ 	HANDLE_FUNC(__kvm_tlb_flush_vmid),
++	HANDLE_FUNC(__kvm_tlb_flush_vmid_range),
+ 	HANDLE_FUNC(__kvm_flush_cpu_context),
+ 	HANDLE_FUNC(__kvm_timer_set_cntvoff),
+ 	HANDLE_FUNC(__vgic_v3_read_vmcr),
+diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+index b9991bbd8e3f..09347111c2cd 100644
+--- a/arch/arm64/kvm/hyp/nvhe/tlb.c
++++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+@@ -182,6 +182,36 @@ void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
+ 	__tlb_switch_to_host(&cxt);
+ }
+ 
++void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
++				phys_addr_t start, unsigned long pages)
++{
++	struct tlb_inv_context cxt;
++	unsigned long stride;
++
++	/*
++	 * Since the range of addresses may not be mapped at
++	 * the same level, assume the worst case as PAGE_SIZE
++	 */
++	stride = PAGE_SIZE;
++	start = round_down(start, stride);
++
++	/* Switch to requested VMID */
++	__tlb_switch_to_guest(mmu, &cxt, false);
++
++	__flush_tlb_range_op(ipas2e1is, start, pages, stride, 0, 0, false);
++
++	dsb(ish);
++	__tlbi(vmalle1is);
++	dsb(ish);
++	isb();
++
++	/* See the comment in __kvm_tlb_flush_vmid_ipa() */
++	if (icache_is_vpipt())
++		icache_inval_all_pou();
++
++	__tlb_switch_to_host(&cxt);
++}
++
+ void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
+ {
+ 	struct tlb_inv_context cxt;
+diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
+index e69da550cdc5..4ed8a1786812 100644
+--- a/arch/arm64/kvm/hyp/vhe/tlb.c
++++ b/arch/arm64/kvm/hyp/vhe/tlb.c
+@@ -138,6 +138,29 @@ void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
+ 	dsb(nsh);
+ 	__tlbi(vmalle1);
+ 	dsb(nsh);
++
++	__tlb_switch_to_host(&cxt);
++}
++
++void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
++				phys_addr_t start, unsigned long pages)
++{
++	struct tlb_inv_context cxt;
++	unsigned long stride;
++
++	/*
++	 * Since the range of addresses may not be mapped at
++	 * the same level, assume the worst case as PAGE_SIZE
++	 */
++	stride = PAGE_SIZE;
++	start = round_down(start, stride);
++
++	dsb(ishst);
++	__flush_tlb_range_op(ipas2e1is, start, pages, stride, 0, 0, false);
++
++	dsb(ish);
++	__tlbi(vmalle1is);
++	dsb(ish);
+ 	isb();
+ 
+ 	__tlb_switch_to_host(&cxt);
 -- 
 2.41.0.455.g037347b96a-goog
 
