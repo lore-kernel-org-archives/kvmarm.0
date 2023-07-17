@@ -1,157 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-9.mta0.migadu.com (out-9.mta0.migadu.com [91.218.175.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 096CE9443
-	for <kvmarm@lists.linux.dev>; Sun, 16 Jul 2023 21:56:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFA34C433C9;
-	Sun, 16 Jul 2023 21:56:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689544591;
-	bh=1uknQQAJm7Zcgtc49DMW82pswMUU7bOoBBe2xNDqskk=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=HYCi+HJcMYksgMlSsz5SeJKHMIPo9eezjQ6k/dwWnPejxrCUitkbJm0rPO7Z6jYLu
-	 o8aVLkRa1vPbCbt14ue/98nFQ/+kf/rFZHt/pvr0DSCwuOHZm87O/V3suA+YyjfeDq
-	 7l1WRJrAqsEeQUl4rwvoMbwDPkCb7+DOyk3Jy5u4qUAj++g3JdBxG2LdxExndUaRlR
-	 X0HuUzoy3RiYRj8uvjK+ECln4B8fvBvH1JH0VQl7Y9K45Y+1zqZx6MBmz2fh3RmOWr
-	 Qh0CAowHOVjL3xPH7QcUq2qx4+7MJXCNBEXNSAw5Oy/W5lIykrgPLNOvg5QHo1QKRd
-	 wA/S1uejub5jA==
-From: Mark Brown <broonie@kernel.org>
-Date: Sun, 16 Jul 2023 22:51:31 +0100
-Subject: [PATCH 35/35] kselftest/arm64: Enable GCS for the FP stress tests
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E9F78464
+	for <kvmarm@lists.linux.dev>; Mon, 17 Jul 2023 06:50:32 +0000 (UTC)
+Date: Mon, 17 Jul 2023 08:50:21 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1689576630;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rdjnG9KSgHGUuHJshf606dH+Q25wQfX+wSglBAOxsNU=;
+	b=r6qEVg8qskHTK9mb7Xxm0iIil54THr/HF8riWUNLXXazt5wFW2Muc2ct3LUd74FtVADiCZ
+	9cZ0iGaMfkpP3Y5JQoRP7k5qYZjtQJw6OkVUro8TDHQgFHV0PoMUEwydKS7xGNV7wK4fdt
+	fl31kBQ6W+wQpPBdwKABCK3IKIyx5GY=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Nadav Amit <namit@vmware.com>
+Cc: Shaoqin Huang <shahuang@redhat.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, Nikos Nikoleris <nikos.nikoleris@arm.com>
+Subject: Re: [kvm-unit-tests PATCH 1/2] arm64: set sctlr_el1.SPAN
+Message-ID: <20230717-52b1cacc323e5105506e5079@orel>
+References: <20230617013138.1823-1-namit@vmware.com>
+ <20230617013138.1823-2-namit@vmware.com>
+ <ZLEj_UnDnE4ZJtnD@monolith.localdoman>
+ <94bd19db-7177-9e90-dc1a-de7485ebb18f@redhat.com>
+ <57A6ABC7-8A95-4199-92E3-FA4D89D6705F@vmware.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230716-arm64-gcs-v1-35-bf567f93bba6@kernel.org>
-References: <20230716-arm64-gcs-v1-0-bf567f93bba6@kernel.org>
-In-Reply-To: <20230716-arm64-gcs-v1-0-bf567f93bba6@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Andrew Morton <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, 
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, 
- Oleg Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, 
- Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, 
- "Rick P. Edgecombe" <rick.p.edgecombe@intel.com>, 
- Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, 
- Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Cc: "H.J. Lu" <hjl.tools@gmail.com>, 
- Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
- linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
- kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
- linux-arch@vger.kernel.org, linux-mm@kvack.org, 
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-riscv@lists.infradead.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.13-dev-099c9
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3085; i=broonie@kernel.org;
- h=from:subject:message-id; bh=1uknQQAJm7Zcgtc49DMW82pswMUU7bOoBBe2xNDqskk=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBktGaqmYOxTQGWh9HskLim53vCootcqf2/ddkPhC00
- Odm1DY2JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZLRmqgAKCRAk1otyXVSH0PDXB/
- 90DyWLWRjEtd7nn3ZQR7fbY40YyGkh8XYKiRwLIDVIydAzHvcByMZWD+a4Uv6Xdeu1w89et6R4V/X9
- H/3ZhsDt7CJzpTn13Xgt0BsZOcX8oegAiBb+nJR6UUb4SMzZ8xERXst50kf9UXPUhcRdUk8hiuiqjg
- qO7tQMbP8v14LaNXegZqEN5YlcXPMVBNKVwojwyXuZhvtp09OZl1ngcUtMsl5JxIAGJSEVka+duVfb
- y8ir6M5SA8HNklCb4Ff1y9JEFJPwQpAtSgZ9G0iU4DH9Dk8qTEAupS2NE1jgwTTni47nCYc5Gs6KFX
- 2lymhms33vgR5jCsHTYDBT33smrX8x
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <57A6ABC7-8A95-4199-92E3-FA4D89D6705F@vmware.com>
+X-Migadu-Flow: FLOW_OUT
 
-While it's a bit off topic for them the floating point stress tests do give
-us some coverage of context thrashing cases, and also of active signal
-delivery separate to the relatively complicated framework in the actual
-signals tests. Have the tests enable GCS on startup, ignoring failures so
-they continue to work as before on systems without GCS.
+On Fri, Jul 14, 2023 at 06:42:25PM +0000, Nadav Amit wrote:
+> 
+> 
+> > On Jul 14, 2023, at 4:29 AM, Shaoqin Huang <shahuang@redhat.com> wrote:
+> > 
+> > !! External Email
+> > 
+> > Hi,
+> > 
+> > On 7/14/23 18:31, Alexandru Elisei wrote:
+> >> Hi,
+> >> 
+> >> On Sat, Jun 17, 2023 at 01:31:37AM +0000, Nadav Amit wrote:
+> >>> From: Nadav Amit <namit@vmware.com>
+> >>> 
+> >>> Do not assume PAN is not supported or that sctlr_el1.SPAN is already set.
+> >> 
+> >> In arm/cstart64.S
+> >> 
+> >> .globl start
+> >> start:
+> >>         /* get our base address */
+> >>      [..]
+> >> 
+> >> 1:
+> >>         /* zero BSS */
+> >>      [..]
+> >> 
+> >>         /* zero and set up stack */
+> >>      [..]
+> >> 
+> >>         /* set SCTLR_EL1 to a known value */
+> >>         ldr     x4, =INIT_SCTLR_EL1_MMU_OFF
+> >>      [..]
+> >> 
+> >>         /* set up exception handling */
+> >>         bl      exceptions_init
+> >>      [..]
+> >> 
+> >> Where in lib/arm64/asm/sysreg.h:
+> >> 
+> >> #define SCTLR_EL1_RES1  (_BITUL(7) | _BITUL(8) | _BITUL(11) | _BITUL(20) | \
+> >>                          _BITUL(22) | _BITUL(23) | _BITUL(28) | _BITUL(29))
+> >> #define INIT_SCTLR_EL1_MMU_OFF  \
+> >>                         SCTLR_EL1_RES1
+> >> 
+> >> Look like bit 23 (SPAN) should be set.
+> >> 
+> >> How are you seeing SCTLR_EL1.SPAN unset?
+> > 
+> > Yeah. the sctlr_el1.SPAN has always been set by the above flow. So Nadav
+> > you can describe what you encounter with more details. Like which tests
+> > crash you encounter, and how to reproduce it.
+> 
+> I am using Nikos’s work to run the test using EFI, not from QEMU.
+> 
+> So the code that you mentioned - which is supposed to initialize SCTLR -
+> is not executed (and actually not part of the EFI image).
+> 
+> Note that using EFI, the entry point is _start [1], and not “start”.
+> 
+> That is also the reason lack of BSS zeroing also caused me issues with the
+> EFI setup, which I reported before.
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/arm64/fp/assembler.h   | 15 +++++++++++++++
- tools/testing/selftests/arm64/fp/fpsimd-test.S |  2 ++
- tools/testing/selftests/arm64/fp/sve-test.S    |  2 ++
- tools/testing/selftests/arm64/fp/za-test.S     |  2 ++
- tools/testing/selftests/arm64/fp/zt-test.S     |  2 ++
- 5 files changed, 23 insertions(+)
+Nadav,
 
-diff --git a/tools/testing/selftests/arm64/fp/assembler.h b/tools/testing/selftests/arm64/fp/assembler.h
-index 9b38a0da407d..d01b61947f56 100644
---- a/tools/testing/selftests/arm64/fp/assembler.h
-+++ b/tools/testing/selftests/arm64/fp/assembler.h
-@@ -65,4 +65,19 @@ endfunction
- 	bl	puts
- .endm
- 
-+#define PR_SET_SHADOW_STACK_STATUS      72
-+# define PR_SHADOW_STACK_ENABLE         (1UL << 1)
-+
-+.macro enable_gcs
-+	// Run with GCS
-+	mov	x0, PR_SET_SHADOW_STACK_STATUS
-+	mov	x1, PR_SHADOW_STACK_ENABLE
-+	mov	x2, xzr
-+	mov	x3, xzr
-+	mov	x4, xzr
-+	mov	x5, xzr
-+	mov	x8, #__NR_prctl
-+	svc	#0
-+.endm
-+
- #endif /* ! ASSEMBLER_H */
-diff --git a/tools/testing/selftests/arm64/fp/fpsimd-test.S b/tools/testing/selftests/arm64/fp/fpsimd-test.S
-index 8b960d01ed2e..b16fb7f42e3e 100644
---- a/tools/testing/selftests/arm64/fp/fpsimd-test.S
-+++ b/tools/testing/selftests/arm64/fp/fpsimd-test.S
-@@ -215,6 +215,8 @@ endfunction
- // Main program entry point
- .globl _start
- function _start
-+	enable_gcs
-+
- 	mov	x23, #0		// signal count
- 
- 	mov	w0, #SIGINT
-diff --git a/tools/testing/selftests/arm64/fp/sve-test.S b/tools/testing/selftests/arm64/fp/sve-test.S
-index 4328895dfc87..486634bc7def 100644
---- a/tools/testing/selftests/arm64/fp/sve-test.S
-+++ b/tools/testing/selftests/arm64/fp/sve-test.S
-@@ -378,6 +378,8 @@ endfunction
- // Main program entry point
- .globl _start
- function _start
-+	enable_gcs
-+
- 	mov	x23, #0		// Irritation signal count
- 
- 	mov	w0, #SIGINT
-diff --git a/tools/testing/selftests/arm64/fp/za-test.S b/tools/testing/selftests/arm64/fp/za-test.S
-index 9dcd70911397..f789694fa3ea 100644
---- a/tools/testing/selftests/arm64/fp/za-test.S
-+++ b/tools/testing/selftests/arm64/fp/za-test.S
-@@ -231,6 +231,8 @@ endfunction
- // Main program entry point
- .globl _start
- function _start
-+	enable_gcs
-+
- 	mov	x23, #0		// signal count
- 
- 	mov	w0, #SIGINT
-diff --git a/tools/testing/selftests/arm64/fp/zt-test.S b/tools/testing/selftests/arm64/fp/zt-test.S
-index d63286397638..ea5e55310705 100644
---- a/tools/testing/selftests/arm64/fp/zt-test.S
-+++ b/tools/testing/selftests/arm64/fp/zt-test.S
-@@ -200,6 +200,8 @@ endfunction
- // Main program entry point
- .globl _start
- function _start
-+	enable_gcs
-+
- 	mov	x23, #0		// signal count
- 
- 	mov	w0, #SIGINT
+Would you mind reposting this along with the BSS zeroing patch, the
+way I proposed we do that, and anything else you've discovered when
+trying to use the EFI unit tests without QEMU? We'll call that our
+first non-QEMU EFI support series, since the first EFI series was
+only targeting QEMU.
 
--- 
-2.30.2
+Thanks,
+drew
+
+> 
+> 
+> 
+> [1] https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/blob/master/arm/efi/crt0-efi-aarch64.S#L113
+> 
+
 
