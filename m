@@ -1,49 +1,52 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21614253C3
-	for <kvmarm@lists.linux.dev>; Mon, 17 Jul 2023 15:27:25 +0000 (UTC)
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-c6dd0e46a52so4068955276.2
-        for <kvmarm@lists.linux.dev>; Mon, 17 Jul 2023 08:27:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CDAB253C8
+	for <kvmarm@lists.linux.dev>; Mon, 17 Jul 2023 15:27:27 +0000 (UTC)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1b8a7734734so22518275ad.2
+        for <kvmarm@lists.linux.dev>; Mon, 17 Jul 2023 08:27:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689607645; x=1692199645;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=z+GoOgxgwqzG8TiJ0AXDkgFfXlL5tU7wLHV5OMoSBQw=;
-        b=ADYRa1t6AtRHEcHbwJ6vPTV4QHdiGXiNBh2VvuC3GHyRATt9vkXRfOf9C1xqttp9k/
-         B7wG81ICFtphg1VJqQ4BOrXJtT+ufIiCu3GFlIIs2RG4Aa8Hu1aM2KitlSnm+dN13gO4
-         ZuaQVX1OHoc3o+hx3YfYg6ledLUZQumssa91UJia1zw5LhoPW/lDGcCsGmHl4gs1OrL6
-         t0kqxpPh+LPkSmmesDSw/8G97Y2BUlYBAtIdD8WRcxUTdwZ6ol/rYRAJHal/lnmE08l2
-         91v4s3ZBNfoI2PBp0Mx97QVRH8+tUNFdoZKhH+liRDwHoCGjEYb1JL8uRXaydFBxBipb
-         NU2Q==
+        d=google.com; s=20221208; t=1689607647; x=1692199647;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=T195FWXfqucyEBgiIGQAY+Lmu6WGEseWSNrrUvHiu4k=;
+        b=kOoTOacFJO9+uHVWHHqMzZUX8/dwgTKGK16Eo5ITJVuv8lBgElCfJCMjxew+K8LFhS
+         0GysunMasR920l3SSl3P1E9H6MG66vreYE/A/hoaEEJom/uKr7dGst7zkry0m4tU49E3
+         tvH8jPnZrUJ3n4XKLeUkSZ/GdivDj+baCykn44EudzfpfOvTXDaDSw3twySIRBSrD8pS
+         uorNxDt+Xg1bfg7pWfLzylmCrMXSCayowem3n4taDuSjy3E+hAsxqwYdpbZBKJsCKwNW
+         jwfXjyOrHVd8AasOuj+dAbxTjBnEw2867xWLAV6e4Fexi+xj9wlHjDFJehhW18rNQh2o
+         EnsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689607645; x=1692199645;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=z+GoOgxgwqzG8TiJ0AXDkgFfXlL5tU7wLHV5OMoSBQw=;
-        b=awG32TfYPNq+O25l/bcak1SXOAFKron/zLO2rl3dwcnMe5ofs8/dVNtacABFCRbgLr
-         Z6btO3OxNuswqvwfXrHL9AJaBYXRwQMmJfHobqKCl18TI7SKdnBVk2R1HNZp/gJTnjDM
-         zQnQihRD70gMN6eO2JtlBxhMIMGqsFVRn5FVOn68qL3XeIHalcSNPZ2Xz54TR6Y+aQqS
-         JWOnlzpFPhe4M2XQH6t2qpBaF1dcUvc6Xzi5Fdyh+cgmyDP652mNR8YsDxhTZMTi3gdK
-         0hfqI29IED5laSAKRdlGD4mVZlNGx6CauWumhLyvlF3Q/t7RYD868UmCCslDWMUUBF0B
-         tXcQ==
-X-Gm-Message-State: ABy/qLbl77Psp8hcl1bZK3+mnPUcXCTuVny4r1d0R1samcuYBajIMxg3
-	tFx+oly6X99pkPTmyJrj3Urr5EvU3RpVFZpkAA==
-X-Google-Smtp-Source: APBJJlGi+t+Jvz5YnzmYs2pb+P74IDdQheGqP83Hl+qUs/2Tdm5fbiUccEVezqIwu/5WgDEpXDFGz/Yty21s9i3pIQ==
+        d=1e100.net; s=20221208; t=1689607647; x=1692199647;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=T195FWXfqucyEBgiIGQAY+Lmu6WGEseWSNrrUvHiu4k=;
+        b=ijZR/9+U9cqyfKBpme66HJA4e3uiD85L8uvpLCAdH1J8yR2mqGvu8Wgj0HCWSoD8ID
+         uRxh8VuB1apB9O4AXr+ngAlS3GCPQyi05Skc3RHgqp0VB52gW7ZwPMHHGRi2cvqquVfo
+         qv75hakWMC91l7u3lFuyhzjjnBcyLj6LV7zqI9nrks9nrkwPa1e1/O+aJRQsfhqKqIDG
+         y9ez7UT1shOFu3ZtTJqQzC4eJkW/wWnKjyrlUesQEhkpmb5Q9tQj7VZWwuk6eV0CPe+p
+         Vpz+7B43z8qY98yhl+l9HbMLINaz/UQSPYziQ+Qs36OVrUEYAMGuj8QCjE4TrRbmTbdn
+         WSbg==
+X-Gm-Message-State: ABy/qLY1PKb3TrvadKx/mhUx30YnvYH1ptpJ8rU4AafwuHWOkJ2EuUfw
+	oT/tt4inqiX4ToIEDnKjfOMkgWRtGn2muE8irg==
+X-Google-Smtp-Source: APBJJlHIl7j3tQllnrhzxMlMfd0kK1zkhxUn4crAb5Cbfzt/zjRHX6e+NgOaoE/NYrO8gVVSsE2pUunvbNtvgstR8g==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a25:40d6:0:b0:ca1:179e:5d7d with SMTP
- id n205-20020a2540d6000000b00ca1179e5d7dmr120332yba.3.1689607644948; Mon, 17
- Jul 2023 08:27:24 -0700 (PDT)
-Date: Mon, 17 Jul 2023 15:27:17 +0000
+ (user=jingzhangos job=sendgmr) by 2002:a17:902:d503:b0:1b8:8c7:31e6 with SMTP
+ id b3-20020a170902d50300b001b808c731e6mr83plg.1.1689607646689; Mon, 17 Jul
+ 2023 08:27:26 -0700 (PDT)
+Date: Mon, 17 Jul 2023 15:27:18 +0000
+In-Reply-To: <20230717152722.1837864-1-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20230717152722.1837864-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
-Message-ID: <20230717152722.1837864-1-jingzhangos@google.com>
-Subject: [PATCH v6 0/6] Enable writable for idregs DFR0,PFR0, MMFR{0,1,2, 3}
+Message-ID: <20230717152722.1837864-2-jingzhangos@google.com>
+Subject: [PATCH v6 1/5] KVM: arm64: Use guest ID register values for the sake
+ of emulation
 From: Jing Zhang <jingzhangos@google.com>
 To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
 	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
@@ -56,66 +59,38 @@ Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
 	Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This patch series enable userspace writable for below idregs:
-ID_AA64DFR0_EL1, ID_DFR0_EL1, ID_AA64PFR0_EL1, ID_AA64MMFR{0, 1, 2, 3}_EL1.
+Since KVM now supports per-VM ID registers, use per-VM ID register
+values for the sake of emulation for DBGDIDR and LORegion.
 
-It is based on v6.5-rc1 which contains infrastructure for writable idregs.
-
-A selftest is added to verify that KVM handles the writings from user space
-correctly.
-
-A relevant patch from Oliver is picked from [3].
-
+Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
+ arch/arm64/kvm/sys_regs.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-* v5 -> v6
-  - Override the type of field AA64DFR0_EL1_DebugVer to be FTR_LOWER_SAFE by the
-    discussion of Oliver and Suraj.
-
-* v4 -> v5
-  - Rebase on v6.4-rc1 which contains infrastructure for writable idregs.
-  - Use guest ID registers values for the sake of emulation.
-  - Added a selftest to verify idreg userspace writing.
-
-* v3 -> v4
-  - Rebase on v11 of writable idregs series at [2].
-
-* v2 -> v3
-  - Rebase on v6 of writable idregs series.
-  - Enable writable for ID_AA64PFR0_EL1 and ID_AA64MMFR{0, 1, 2}_EL1.
-
-* v1 -> v2
-  - Rebase on latest patch series [1] of enabling writable ID register.
-
-[1] https://lore.kernel.org/all/20230402183735.3011540-1-jingzhangos@google.com
-[2] https://lore.kernel.org/all/20230602005118.2899664-1-jingzhangos@google.com
-[3] https://lore.kernel.org/kvmarm/20230623205232.2837077-1-oliver.upton@linux.dev
-
-[v1] https://lore.kernel.org/all/20230326011950.405749-1-jingzhangos@google.com
-[v2] https://lore.kernel.org/all/20230403003723.3199828-1-jingzhangos@google.com
-[v3] https://lore.kernel.org/all/20230405172146.297208-1-jingzhangos@google.com
-[v4] https://lore.kernel.org/all/20230607194554.87359-1-jingzhangos@google.com
-[v5] https://lore.kernel.org/all/20230710192430.1992246-1-jingzhangos@google.com
-
----
-
-Jing Zhang (4):
-  KVM: arm64: Use guest ID register values for the sake of emulation
-  KVM: arm64: Enable writable for ID_AA64PFR0_EL1
-  KVM: arm64: Enable writable for ID_AA64MMFR{0, 1, 2, 3}_EL1
-  KVM: arm64: selftests: Test for setting ID register from usersapce
-
-Oliver Upton (1):
-  KVM: arm64: Reject attempts to set invalid debug arch version
-
- arch/arm64/kvm/sys_regs.c                     |  80 +++++++--
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/aarch64/set_id_regs.c       | 163 ++++++++++++++++++
- 3 files changed, 230 insertions(+), 14 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/aarch64/set_id_regs.c
-
-
-base-commit: 06c2afb862f9da8dc5efa4b6076a0e48c3fbaaa5
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index bd3431823ec5..c1a5ec1a016e 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -379,7 +379,7 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
+ 			  struct sys_reg_params *p,
+ 			  const struct sys_reg_desc *r)
+ {
+-	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
++	u64 val = IDREG(vcpu->kvm, SYS_ID_AA64MMFR1_EL1);
+ 	u32 sr = reg_to_encoding(r);
+ 
+ 	if (!(val & (0xfUL << ID_AA64MMFR1_EL1_LO_SHIFT))) {
+@@ -2429,8 +2429,8 @@ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
+ 	if (p->is_write) {
+ 		return ignore_write(vcpu, p);
+ 	} else {
+-		u64 dfr = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
+-		u64 pfr = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
++		u64 dfr = IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1);
++		u64 pfr = IDREG(vcpu->kvm, SYS_ID_AA64PFR0_EL1);
+ 		u32 el3 = !!cpuid_feature_extract_unsigned_field(pfr, ID_AA64PFR0_EL1_EL3_SHIFT);
+ 
+ 		p->regval = ((((dfr >> ID_AA64DFR0_EL1_WRPs_SHIFT) & 0xf) << 28) |
 -- 
 2.41.0.255.g8b1d071c50-goog
 
