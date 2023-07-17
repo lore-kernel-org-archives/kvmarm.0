@@ -1,232 +1,159 @@
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BL0PR02CU006.outbound.protection.outlook.com (mail-eastusazon11013010.outbound.protection.outlook.com [52.101.54.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B4310E7
-	for <kvmarm@lists.linux.dev>; Mon, 17 Jul 2023 16:37:17 +0000 (UTC)
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-346258cf060so2225ab.0
-        for <kvmarm@lists.linux.dev>; Mon, 17 Jul 2023 09:37:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689611836; x=1690216636;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9uIEdBE5/V8mtrIJ86bMEt1YlGPQReRHT+9wS4K4FB4=;
-        b=OWHrFN2QTW3UJN0pNRFGTth7sEd5Dw7sjggstuUU7FV9QMT2n63OgPRS5VJJVeGyDl
-         Z1aCxXXSSL7lbOeKaqH9uzgIZoOd3a4cSFlQWY8DAAVk2hVhBktYxB3Cjl0Qr6hg0f2N
-         cbxxuZL/fYo6GBCiyMmZc7+utv9P9s70Y7FI287tO+3wr0A+ZGEOlF49j/9FY9aMyq98
-         SQmF6dsU04+/lJBQcBsO5YwCCOp43Pw83PRsVPqbFJUbzaSBmheT5yPv+dkXMPda7xZ+
-         8g2BcY5k4LYQ+33V19zi2oOHswaaMCCFMEfRQKmssQNIZE4Z/gLXt9l18MBgmieiGH90
-         hTug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689611836; x=1690216636;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9uIEdBE5/V8mtrIJ86bMEt1YlGPQReRHT+9wS4K4FB4=;
-        b=VD/0BTjX1YNhEmKseuRGPiU4zrpvivz88SNgaIp3oTOZ2kBPWVnm3dvBY9lcPphw2s
-         6c82f+vIpbyNvQ7klxY/jKG7KrnOyXuXKnVXQp+sffYWaDtm13XdnP+tA0ZtPsy+YTNT
-         gZESbDAzXIUghTIZohgdTTcGdzbU5jcGqgOw57iyRSaanyPL2deajqJUdCQ/5EvfeBHg
-         jEkf+J/B93HlrDNfw6bqgIlFml3MBIyebPx9ygOBPx1MGotYG6Ed+atCSVoTkkXe98uf
-         7RHTS/OXsj/cHZ7NdG4YvlMNgnRaxJjTWH4UXh7jRH3apZ3aQ4pNksAdAH1ekL9a2G+D
-         R3wg==
-X-Gm-Message-State: ABy/qLZOjnepAvtQl5rSbD4DH6ZC+UrfOQwG5o+fruw9QdxTWoBB0kV5
-	ZcxYmYSLwvOT8sDo3DuER1AqR2035DyIvg3abTFkHg==
-X-Google-Smtp-Source: APBJJlGMfnLl/VH8ZDf7IouzF+AemA7yqLQkI7oavRJWnulUuwCOZ3ikGsNQPfEomUZ5dTddNqkXnqp2ix1LaTkk0TQ=
-X-Received: by 2002:a05:6e02:1c2e:b0:348:72eb:150d with SMTP id
- m14-20020a056e021c2e00b0034872eb150dmr599165ilh.21.1689611836063; Mon, 17 Jul
- 2023 09:37:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F9C91878
+	for <kvmarm@lists.linux.dev>; Mon, 17 Jul 2023 17:05:09 +0000 (UTC)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZLHzX4u/95zbaYzpSxP0HUs+UlquJt6fWrOp2N0XeyM+dvSZzUx/P1TXjJbkPMRx/KFyuH1DuUpVf8gC42bYI2gdhkWjIjogJbTUiQJ4Zni3cH+6Fd0MtaRLjyVOdV8AlBS2OZUK92f1M8Tfb8qnVg/GRxV3+AU+zBH5YS7yJNdcmmj/yzy7NipM47zKg3R7Xz/M4lIsgQP6eSc1jztfirqoo5qOa9ajVOm4Wglut3A00h1dgwtT4SujQnli10bp65ves8/VMxBgXvuvmzxt8lANWTwxbxlCM4XG5eFDRM2l1EgvAuTiFLzxvqbLdsamZSTxjXRh1HQS5Xm6yLgPZg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HIpTiER+uL1On0m//e1/ULEd4tFQlQHPjbEVefg27Bs=;
+ b=neChzCfU6a9PTUWOTt2b6nh2KaIF4ozpU7tXlM6hhSdsnU8AalwGyCnd+glFWCFeiRX6mF8KZJyEW82JlllSZVQLDlaWbCvZkGBwcY7J3QyFoNXOJ1RcI2HnImXNf9brMcPpwIOQM69Tf8IFxMBOiECtl3080zj+IjhRduCcGAbtI6OcYgjMj7sA90ExI991RPwILwazW+Qb/pHoljXN6XElBfewfFXsGAFFDuYw1Ns4+p3WcwnfV/8jGTkWnP5QB0a915UkzKnUPp7YUEcyYs5Mhd+GrSYXXZin12aYW4R1BaS0v3u7gHk5l/seM+wgjfsP7DRjWIl+YXhP/BRPdQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vmware.com; dmarc=pass action=none header.from=vmware.com;
+ dkim=pass header.d=vmware.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HIpTiER+uL1On0m//e1/ULEd4tFQlQHPjbEVefg27Bs=;
+ b=xaN3ggPQxil3MnLKkufQ1kYsc63tavdKKQoD1BK97Ar/q+oCe/30wLA/lhqLq37q0x1UdX4GCLNaYIfSa6JWiZnxj6fY6eeA7D3XKhr6ipjySQ3hD+S2hUg1OV5if0GCeY/kvl5T+IuFQOM+MeJJA6//mA/VFFk4vd7DKRcl/J4=
+Received: from BY3PR05MB8531.namprd05.prod.outlook.com (2603:10b6:a03:3ce::6)
+ by SA1PR05MB8000.namprd05.prod.outlook.com (2603:10b6:806:1a8::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.32; Mon, 17 Jul
+ 2023 17:05:07 +0000
+Received: from BY3PR05MB8531.namprd05.prod.outlook.com
+ ([fe80::45c9:cdc8:ff01:5e8a]) by BY3PR05MB8531.namprd05.prod.outlook.com
+ ([fe80::45c9:cdc8:ff01:5e8a%6]) with mapi id 15.20.6588.031; Mon, 17 Jul 2023
+ 17:05:07 +0000
+From: Nadav Amit <namit@vmware.com>
+To: Nikos Nikoleris <nikos.nikoleris@arm.com>, Andrew Jones
+	<andrew.jones@linux.dev>
+CC: Shaoqin Huang <shahuang@redhat.com>, Alexandru Elisei
+	<alexandru.elisei@arm.com>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [kvm-unit-tests PATCH 1/2] arm64: set sctlr_el1.SPAN
+Thread-Topic: [kvm-unit-tests PATCH 1/2] arm64: set sctlr_el1.SPAN
+Thread-Index:
+ AQHZoLuTHvENrVBKJ02px/P+RINq6q+5OzeAgAAQOACABGkToYAAAHsAgAAhxwCAAIlkAA==
+Date: Mon, 17 Jul 2023 17:05:06 +0000
+Message-ID: <4C6E9B6F-1879-48FB-98B6-6F271982067D@vmware.com>
+References: <20230617013138.1823-1-namit@vmware.com>
+ <20230617013138.1823-2-namit@vmware.com>
+ <ZLEj_UnDnE4ZJtnD@monolith.localdoman>
+ <94bd19db-7177-9e90-dc1a-de7485ebb18f@redhat.com>
+ <57A6ABC7-8A95-4199-92E3-FA4D89D6705F@vmware.com>
+ <20230717-52b1cacc323e5105506e5079@orel>
+ <20230717-085f1ee1d631f213544fed03@orel>
+ <8d4c1105-bf9b-d4b0-a2a3-be306474bf56@arm.com>
+In-Reply-To: <8d4c1105-bf9b-d4b0-a2a3-be306474bf56@arm.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-mailer: Apple Mail (2.3731.600.7)
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vmware.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BY3PR05MB8531:EE_|SA1PR05MB8000:EE_
+x-ms-office365-filtering-correlation-id: 7988180f-0f1d-4070-b0eb-08db86e7f89d
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ 84BO2AAmAmZNm2g3ai4YuMFByuShOM9nTSQBG5kGPpZT3YNYrwfxooqLEzT+3FKM+4+h2F61u6X9y3eACDmGwyzSCK7uhO4aEnroVCs8dznpPMTC1Wam+HfURfi5c2KcA5gERoGjlLbuNFRRRRvddWJm1YadGNF6ZYiTbba5PJ+OA+994H/wfwcMCiVWAmLHNZ/qJy3wvHf1KPPLysfR50BSc3oOAs5kGSS0Q6wzM1fLa45IF4WmBoTzFA0Lh4yQM8FvrkcArrF3K6y/795zmg+nFk425aFXrjEvAtuwswrap/jtGLmf/TzxpTQMEpBYBcV/o5uE8kKVlPuBHoNTAVoYvyvNud4eRKos6AryCABv7rMI+T5nQYXJiCflEXlystxx8G/RV/VUGq0ARntABijq+jiqhg2kHtV4CFNlMba0aLp2PB1eRtbRPCZo3D5T+VHgE0GyFDiS+/Ojdpmiw2dSHkieJ4k5t64yOcHgr3o0AymON5gvV3nV3j+sw/7lROzzE96PuLVRTP96pIYtzKeUulVOh+UvhxB5PtB/vP3PhWC2VqS6S6gRFCI5xlHSj3rcHYB1FHttSTrqajFjSXrEFTiW90I6l3tbvh5GAxAdyQFsB3jMDLY8UFH/04+FnqKxB98TK/iYZUenUEquI3GLyTp0ijuJP8ib0iav9EbHtvX+L61a/9qHozly3+1egkBm/LRbgCrmdphvZGwK9g==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY3PR05MB8531.namprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(396003)(39860400002)(376002)(366004)(136003)(451199021)(478600001)(71200400001)(6486002)(54906003)(110136005)(2616005)(33656002)(86362001)(36756003)(38070700005)(2906002)(186003)(53546011)(6506007)(6512007)(26005)(64756008)(38100700002)(122000001)(66446008)(4326008)(66556008)(76116006)(66476007)(66946007)(41300700001)(316002)(8676002)(5660300002)(8936002)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?c3l2UnZEMEltWFhaSmdsOVo0anVlcXNOQjVpdkFsYkl2QjJNT0lBMjVrVmdn?=
+ =?utf-8?B?S25HT1l3TUwrVFBNU21YcmVTQWdESUtEWHJzWFd6RjF1b3JyWlNZaDlMN2Mr?=
+ =?utf-8?B?NmZhOTRQZlp1SVJaM1FLSS9lUDlYNmhZajl2TWY5S2hmNTNvSnErL2tSRVJZ?=
+ =?utf-8?B?ajVRdTdkUXNVdCtNa2F1VjVZQ1cwdTJrSmloSW0yZ2toNERGbTMyTFJ0ZVFm?=
+ =?utf-8?B?TjdzeFl5QkxYdy9iMmhncjJuSkdnMjYzZWhtazFNWkl1WjJ3OTdndXV4SVNq?=
+ =?utf-8?B?ajFmclRDR0lzN3lzWHcyNXVDUnpZU1orUnlGcVQ5UkxnL0xvWWxTMElXNjBC?=
+ =?utf-8?B?MXM0aHUyQWVkNElRM1d0RUlIdm1FOWFBRE5uUVREWTF2bVlFazlkRXdkNXpo?=
+ =?utf-8?B?c25iT0NNbG9yQ3ptc0NlRFltVExDNU45eHFxTWRCRDdsN0ZXTDk4VC9lSnN6?=
+ =?utf-8?B?ZFprL2diZHIvekZhQU9wM0FkNGJrUGhIOXUzWE5JbmVyT3BieUg3bWhjUmdK?=
+ =?utf-8?B?VnpCa3cweUZna200MmZndkNOazVzOEw0cndWQlorV2EwSGswSlR6WWRaZmth?=
+ =?utf-8?B?b3M4amFRQ2tmQm9uMm16bGVob3BrTFV1VXFqMUhLK1RkS0RUVG1aL0k5Y3ZQ?=
+ =?utf-8?B?enp2UkQ0NTVsWDVXUzByVnJDeHJxNWRGV2lCMiswZ0JTdU1DK1RNWW9oeTFF?=
+ =?utf-8?B?UVVWc2tBbjhXVTZySXVkTi94T2dnWUZiT3hFbUw1aU52ZGZBcDZ3ait0S29S?=
+ =?utf-8?B?c2JqeUptMXAwMkEvYTdoVit0eTZSRGJMcFprSzd2a3EyZGN0NXhoaU1vVEFv?=
+ =?utf-8?B?eVFOVDE5TzA0QzQ4TXdQemMyQlBtQjdWK0ZaejA0RHhyWXRFVU8wc2YvZDY3?=
+ =?utf-8?B?N25xUXBwb3pSQzN1eUdacUdPbExXR1FVS09xZWswc3YyNUZZQVFzb1FKNW83?=
+ =?utf-8?B?eWRMeUdqQURjcy9GaDY3azhVZys0ei9nWWdyMm84Vy9OV1lNSVREQ2RCYktE?=
+ =?utf-8?B?ZjdQODNMSDNSVVdrOFUyMHFUQkdaTTRUUzBxSktwdVNMZ3JTb0w1OS9ZY2dR?=
+ =?utf-8?B?cTlQNzl0c3BFYWxvMnhPQ2Zjdy9PT0owbEc4WmNYZEpjMEdXRmxIaXFmZ2o0?=
+ =?utf-8?B?Zm9LY2lBOUR6a3cwN1k4azRJdTlFcllqa1EwMDgvQzZybDczUk5LdEF6djZX?=
+ =?utf-8?B?WXZFblVWYUUreXJDQlNMMHZQeHBnMDcvNllHRTFvMlIyVCtSTVRLbUk5ZDlo?=
+ =?utf-8?B?S0NiYkI4T2hjRXNrckdnaFNseEpEdk95ME9lZGMvZ2x6cU1uTTBSWVJ1NDNi?=
+ =?utf-8?B?YUJYR2k3bVJ0SStacEpaNlJ2anVyM1ZHVGdYbnRHUHZPQXVZZFNkNVNmREFT?=
+ =?utf-8?B?ZURLUTB4WVcrQWtQRFFNdFozODBXSmMwTHFnaDBYajhVRERmeDRzQzMyOHpp?=
+ =?utf-8?B?b2JYTjZzS1hIb2lDZVhjVGFQYUM5UGgxMnBhK2dkT3FNTUNVc05CR0h6SldN?=
+ =?utf-8?B?M2JtSnhpYjN1Sld6aTdBbU4vRlFTVTBhZnFGZGZUcjdmeEhRUmo0bGpOQk9Q?=
+ =?utf-8?B?TUZ1N1pWRFdOY05rZHg2U2hWeFk0Z2xCbUtTVDlSUStQaUpTUER3eUQ2NmVU?=
+ =?utf-8?B?LzVxbkRxTG9Bei9HSmV6ZFNVODdKWUJVZzA0MWZuaktIdXJEMGZHRGMyN2dI?=
+ =?utf-8?B?RUVnbFlNaUNPK1FWVGQrdjU1V1hFdTByNWxQajdyT3N0a2hkV3pyVmFiRHpv?=
+ =?utf-8?B?eEJWYzdwY0YvSU91WlZvRW1ZWXJINW1yTVlWWHNHTWx6cUhxRFlIcEtBNXVP?=
+ =?utf-8?B?V2N5RXQxNUJHYjBTdTRJYVRaMmltK2NGWVhuSjVqbTRpMWNZRWNjaTNOM2h4?=
+ =?utf-8?B?c3pORjl1Snh5UGF2bFBqdS83dTVXcm92OEJzYmM3Y2VDR3JhdUVBZ1B5VUZI?=
+ =?utf-8?B?S0svM0NnMHYwV1ZXNEExMjFPNzNxM0I0NitHNkIzdXE4N0hFd2tYRWNXQ0tS?=
+ =?utf-8?B?YXV6RVZiOG13WUtWbWpqQXZnOFJBMFRDYVhvVXIrdUpZZDlwaElQd3RMSzk3?=
+ =?utf-8?B?VXVTR0tDZ29mY1NZOTNXaTgvWXV1VEZEYnMvUExDYjBWbGxJdjJPeCtjZUpB?=
+ =?utf-8?Q?M7NQ3YmEweFok2UY+k7tlyOV9?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EF94CE8AD837194282E4860929DB30DE@namprd05.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230715005405.3689586-1-rananta@google.com> <20230715005405.3689586-4-rananta@google.com>
- <199d18de-1214-7683-b87a-03cc7e49719a@redhat.com>
-In-Reply-To: <199d18de-1214-7683-b87a-03cc7e49719a@redhat.com>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Mon, 17 Jul 2023 09:37:04 -0700
-Message-ID: <CAJHc60zhVco3uTq97vDHMk8cgg1psPtwHT6MN1eKP1Yr18d9cw@mail.gmail.com>
-Subject: Re: [PATCH v6 03/11] KVM: Allow range-based TLB invalidation from
- common code
-To: Shaoqin Huang <shahuang@redhat.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
-	Huacai Chen <chenhuacai@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Jing Zhang <jingzhangos@google.com>, Colton Lewis <coltonlewis@google.com>, 
-	David Matlack <dmatlack@google.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Gavin Shan <gshan@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: vmware.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY3PR05MB8531.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7988180f-0f1d-4070-b0eb-08db86e7f89d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jul 2023 17:05:06.9418
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: sCFW0ekl5IFrSyq9R1I4Ey77yCyAsFuCNa78fTiZchkt8Jk3SFlmjIDN0vwlnCAwIugeL3TjxEI2ahL4Ec4V8Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR05MB8000
 
-On Mon, Jul 17, 2023 at 4:40=E2=80=AFAM Shaoqin Huang <shahuang@redhat.com>=
- wrote:
->
->
->
-> On 7/15/23 08:53, Raghavendra Rao Ananta wrote:
-> > From: David Matlack <dmatlack@google.com>
-> >
-> > Make kvm_flush_remote_tlbs_range() visible in common code and create a
-> > default implementation that just invalidates the whole TLB.
-> >
-> > This paves the way for several future features/cleanups:
-> >
-> >   - Introduction of range-based TLBI on ARM.
-> >   - Eliminating kvm_arch_flush_remote_tlbs_memslot()
-> >   - Moving the KVM/x86 TDP MMU to common code.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: David Matlack <dmatlack@google.com>
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > Reviewed-by: Gavin Shan <gshan@redhat.com>
-> > ---
-> >   arch/x86/include/asm/kvm_host.h |  3 +++
-> >   arch/x86/kvm/mmu/mmu.c          |  9 ++++-----
-> >   arch/x86/kvm/mmu/mmu_internal.h |  3 ---
-> >   include/linux/kvm_host.h        |  9 +++++++++
-> >   virt/kvm/kvm_main.c             | 13 +++++++++++++
-> >   5 files changed, 29 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm=
-_host.h
-> > index a2d3cfc2eb75..08900afbf2ad 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1804,6 +1804,9 @@ static inline int kvm_arch_flush_remote_tlbs(stru=
-ct kvm *kvm)
-> >               return -ENOTSUPP;
-> >   }
-> >
-> > +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
-> > +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,=
- u64 pages);
-> > +
-> >   #define kvm_arch_pmi_in_guest(vcpu) \
-> >       ((vcpu) && (vcpu)->arch.handling_intr_from_guest)
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index ec169f5c7dce..aaa5e336703a 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -278,16 +278,15 @@ static inline bool kvm_available_flush_remote_tlb=
-s_range(void)
-> >       return kvm_x86_ops.flush_remote_tlbs_range;
-> >   }
-> >
-> > -void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
-> > -                              gfn_t nr_pages)
-> > +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,=
- u64 pages)
-> >   {
-> >       int ret =3D -EOPNOTSUPP;
-> >
-> >       if (kvm_x86_ops.flush_remote_tlbs_range)
-> >               ret =3D static_call(kvm_x86_flush_remote_tlbs_range)(kvm,=
- start_gfn,
-> > -                                                                nr_pag=
-es);
-> > -     if (ret)
-> > -             kvm_flush_remote_tlbs(kvm);
-> > +                                                                     p=
-ages);
-> This will be good if parameter pages aligned with parameter kvm.
->
-Agreed, but pulling 'pages' above brings the char count to 83. If
-that's acceptable, I'm happy to do it in v7.
-
-Thank you.
-Raghavendra
-> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> > +
-> > +     return ret;
-> >   }
-> >
-> >   static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)=
-;
-> > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_int=
-ernal.h
-> > index d39af5639ce9..86cb83bb3480 100644
-> > --- a/arch/x86/kvm/mmu/mmu_internal.h
-> > +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> > @@ -170,9 +170,6 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm=
-,
-> >                                   struct kvm_memory_slot *slot, u64 gfn=
-,
-> >                                   int min_level);
-> >
-> > -void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
-> > -                              gfn_t nr_pages);
-> > -
-> >   /* Flush the given page (huge or not) of guest memory. */
-> >   static inline void kvm_flush_remote_tlbs_gfn(struct kvm *kvm, gfn_t g=
-fn, int level)
-> >   {
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index e3f968b38ae9..a731967b24ff 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -1359,6 +1359,7 @@ int kvm_vcpu_yield_to(struct kvm_vcpu *target);
-> >   void kvm_vcpu_on_spin(struct kvm_vcpu *vcpu, bool yield_to_kernel_mod=
-e);
-> >
-> >   void kvm_flush_remote_tlbs(struct kvm *kvm);
-> > +void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 pages=
-);
-> >
-> >   #ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
-> >   int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int m=
-in);
-> > @@ -1486,6 +1487,14 @@ static inline int kvm_arch_flush_remote_tlbs(str=
-uct kvm *kvm)
-> >   }
-> >   #endif
-> >
-> > +#ifndef __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
-> > +static inline int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm,
-> > +                                                gfn_t gfn, u64 pages)
-> > +{
-> > +     return -EOPNOTSUPP;
-> > +}
-> > +#endif
-> > +
-> >   #ifdef __KVM_HAVE_ARCH_NONCOHERENT_DMA
-> >   void kvm_arch_register_noncoherent_dma(struct kvm *kvm);
-> >   void kvm_arch_unregister_noncoherent_dma(struct kvm *kvm);
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index d6b050786155..804470fccac7 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -366,6 +366,19 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
-> >   }
-> >   EXPORT_SYMBOL_GPL(kvm_flush_remote_tlbs);
-> >
-> > +void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 pages=
-)
-> > +{
-> > +     if (!kvm_arch_flush_remote_tlbs_range(kvm, gfn, pages))
-> > +             return;
-> > +
-> > +     /*
-> > +      * Fall back to a flushing entire TLBs if the architecture range-=
-based
-> > +      * TLB invalidation is unsupported or can't be performed for what=
-ever
-> > +      * reason.
-> > +      */
-> > +     kvm_flush_remote_tlbs(kvm);
-> > +}
-> > +
-> >   static void kvm_flush_shadow_all(struct kvm *kvm)
-> >   {
-> >       kvm_arch_flush_shadow_all(kvm);
->
-> --
-> Shaoqin
->
+Q29tYmluaW5nIHRoZSBhbnN3ZXJzIHRvIEFuZHJldyBhbmQgTmlrb3MuDQoNCk9uIEp1bCAxNywg
+MjAyMywgYXQgMTo1MyBBTSwgTmlrb3MgTmlrb2xlcmlzIDxuaWtvcy5uaWtvbGVyaXNAYXJtLmNv
+bT4gd3JvdGU6DQo+IA0KPj4+IA0KPj4+IFdvdWxkIHlvdSBtaW5kIHJlcG9zdGluZyB0aGlzIGFs
+b25nIHdpdGggdGhlIEJTUyB6ZXJvaW5nIHBhdGNoLCB0aGUNCj4+PiB3YXkgSSBwcm9wb3NlZCB3
+ZSBkbyB0aGF0LCBhbmQgYW55dGhpbmcgZWxzZSB5b3UndmUgZGlzY292ZXJlZCB3aGVuDQo+Pj4g
+dHJ5aW5nIHRvIHVzZSB0aGUgRUZJIHVuaXQgdGVzdHMgd2l0aG91dCBRRU1VPyBXZSdsbCBjYWxs
+IHRoYXQgb3VyDQo+Pj4gZmlyc3Qgbm9uLVFFTVUgRUZJIHN1cHBvcnQgc2VyaWVzLCBzaW5jZSB0
+aGUgZmlyc3QgRUZJIHNlcmllcyB3YXMNCj4+PiBvbmx5IHRhcmdldGluZyBRRU1VLg0KDQpJIG5l
+ZWQgdG8gcmVoYXNoIHRoZSBzb2x1dGlvbiB0aGF0IHlvdSBwcm9wb3NlZCBmb3IgQlNTIChpZiB0
+aGVyZSBpcw0KYW55dGhpbmcgc3BlY2lhbCB0aGVyZSkuIEkgaGFkIGEgZGlmZmVyZW50IHdvcmth
+cm91bmQgZm9yIHRoYXQgaXNzdWUsDQpiZWNhdXNlIElJUkMgSSBoYWQgc29tZSBpc3N1ZXMgd2l0
+aCB0aGUgemVyb2luZy4gSeKAmWxsIGdpdmUgaXQgYW5vdGhlcg0KDQo+PiANCj4+IE9oLCBhbmQg
+SSBtZWFudCB0byBtZW50aW9uIHRoYXQsIHdoZW4gcmVwb3N0aW5nIHRoaXMgcGF0Y2gsIG1heWJl
+IHdlDQo+PiBjYW4gY29uc2lkZXIgbWFuYWdpbmcgc2N0bHIgaW4gYSBzaW1pbGFyIHdheSB0byB0
+aGUgbm9uLWVmaSBzdGFydCBwYXRoPw0KPj4gDQoNCkkgYW0gYWZyYWlkIG9mIHR1cm5pbmcgb24g
+cmFuZG9tIGJpdHMgb24gU0NUTFIuIEFyZ3VhYmx5LCB0aGUgd2F5IHRoYXQNCnRoZSBub24tZWZp
+IHRlc3Qgc2V0cyB0aGUgZGVmYXVsdCB2YWx1ZSBvZiBTQ1RMUiAod2l0aCBubyBuYW1pbmcgb2Yg
+dGhlDQpkaWZmZXJlbnQgYml0cykgaXMgbm90IHZlcnkgZnJpZW5kbHkuDQoNCkkgd2lsbCBoYXZl
+IGEgbG9vayBvbiB0aGUgb3RoZXIgYml0cyBvZiBTQ1RMUiBhbmQgc2VlIGlmIEkgY2FuIGRvIHNv
+bWV0aGluZw0KcXVpY2sgYW5kIHNpbXBsZSwgYnV0IEkgZG9u4oCZdCB3YW50IHRvIHJlZmFjdG9y
+IHRoaW5ncyBpbiBhIHdheSB0aGF0IG1pZ2h0DQpicmVhayB0aGluZ3MuDQoNCj4gDQo+IE5hZGF2
+LCBpZiB5b3UgYXJlIHJ1bm5pbmcgYmFyZW1ldGFsLCBpdCBtaWdodCBiZSB3b3J0aCBjaGVja2lu
+ZyB3aGF0IEVMDQo+IHlvdSdyZSBydW5uaW5nIGluIGFzIHdlbGwuIElmIEhXIGlzIGltcGxlbWVu
+dGluZyBFTDIsIEVGSSB3aWxsIGhhbmRvdmVyDQo+IGluIEVMMi4NCg0KSSBkb27igJl0LiBJIHJ1
+biB0aGUgdGVzdCBvbiBhIGRpZmZlcmVudCBoeXBlcnZpc29yLiBXaGVuIEkgZW5hYmxlZCB0aGUg
+eDg2DQp0ZXN0cyB0byBydW4gb24gYSBkaWZmZXJlbnQgaHlwZXJ2aXNvciB5ZWFycyBhZ28sIHRo
+ZXJlIHdlcmUgbWFueSBtYW55DQp0ZXN0IGFuZCByZWFsIGlzc3VlcyB0aGF0IHJlcXVpcmVkIG1l
+IHRvIHJ1biBLVk0tdW5pdC10ZXN0cyBvbiBiYXJlDQptZXRhbCAtIGFuZCB0aGVyZWZvcmUgSSBm
+aXhlZCB0aGVzZSB0ZXN0cyB0byBydW4gb24gYmFyZS1tZXRhbCBhcyB3ZWxsLg0KDQpXaXRoIEFS
+TSwgZXhjbHVkaW5nIHRoZSBCU1MgYW5kIHRoZSBTQ1RMUiBpc3N1ZSwgSSBkaWRu4oCZdCBlbmNv
+dW50ZXIgYW55DQphZGRpdGlvbmFsIHRlc3QgaXNzdWVzLiBTbyBJIGRvbuKAmXQgaGF2ZSB0aGUg
+bmVlZCBvciB0aW1lIHRvIGVuYWJsZSBpdA0KdG8gcnVuIG9uIGJhcmUtbWV0YWzigKYgc29ycnku
+DQog
