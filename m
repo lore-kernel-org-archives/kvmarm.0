@@ -1,45 +1,14 @@
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F62615A8
-	for <kvmarm@lists.linux.dev>; Mon, 17 Jul 2023 08:13:03 +0000 (UTC)
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3141c3a7547so4004789f8f.2
-        for <kvmarm@lists.linux.dev>; Mon, 17 Jul 2023 01:13:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1689581581; x=1692173581;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VT24UUIzDMth5tPZL5Y5vTEOs+P0BwYmDWZgKveF0+M=;
-        b=K/iJhKX4wID4O6BHCkqoNDeKizzM0ai2C/JJVSYMd+iQ+t5gkYEyqR8OcId9s6Uw/g
-         +AIOCIIHWgQP5i51DcuabWMLSpL4+g4yBFEaNnFvCFvlOvJtDRtBZSsu4q/eyraIhxnF
-         34lFSWsMuYImH0tASUyIG9UN5kV+zySjXP1wgy3I0PiMTd8SGe0bBTaL1/3m+AIDIUri
-         t2pJXylGN30xSlpLDQiAnrflPN5i2wyDLNiZpxqAYVBhvceI1p6Lvuk8qVu8Vmd37D5M
-         py/+IAtS+moAn/+PGdzK6ETPGkvlELAfB3SP0bODnQ1hd3dVHt1OhCJkizrojhSmGnF9
-         2zag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689581581; x=1692173581;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VT24UUIzDMth5tPZL5Y5vTEOs+P0BwYmDWZgKveF0+M=;
-        b=Fe4MTvmISrf6mtHlzkaz4J7/inVPmYWLU7ho6QLtNasdGZaWfE1W9papbsS10z8mCE
-         l1Yl9cXDVUG/UKwVpLOrzn7zb78EEwuevCv+dHYYZNif7/GitrP15EWjTwa/7CTKxSWY
-         3XPo+JWrYQYFOV+upqnU3coURRFwOIsj51Dbjs3dzQwJL/WIms9vQWbmOMkxnF53yiMo
-         XMaql/d2Z7GhISGfgx23LiUiLxc9adYeJ33CBDO2q07Bk3P60UUnNBqogQph9zKL6QSc
-         UJ3vMth4+76F9eVLvoMCnokTitCehH8RjOw8vYlhyawZP/irdiBNdUIRPJTv6AvjWirA
-         SbNQ==
-X-Gm-Message-State: ABy/qLZ/bkb1tXvH2PCUTP3Zd1x4m9rkWya6He4GUjcYbSM2o8jl1DLA
-	xvedozwyD+9TNX2Q9QCmPbsjqw==
-X-Google-Smtp-Source: APBJJlHUSWcZYlPppSbFTXSEdHwpgpaTrSSog0KcOaUXq6539rjFQxsogmQ3Co+Knjkf78qoCa1SzQ==
-X-Received: by 2002:adf:f206:0:b0:314:34dd:aaec with SMTP id p6-20020adff206000000b0031434ddaaecmr9504790wro.8.1689581581381;
-        Mon, 17 Jul 2023 01:13:01 -0700 (PDT)
-Received: from [192.168.69.115] ([176.176.144.39])
-        by smtp.gmail.com with ESMTPSA id b2-20020a5d4b82000000b0031432c2fb95sm18429372wrt.88.2023.07.17.01.12.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Jul 2023 01:13:00 -0700 (PDT)
-Message-ID: <ef2dddcd-f4dd-da9b-c03f-ccd852bb8543@linaro.org>
-Date: Mon, 17 Jul 2023 10:12:57 +0200
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C4FE846E
+	for <kvmarm@lists.linux.dev>; Mon, 17 Jul 2023 08:53:15 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C93CD75;
+	Mon, 17 Jul 2023 01:53:58 -0700 (PDT)
+Received: from [10.57.28.142] (unknown [10.57.28.142])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 73AD93F73F;
+	Mon, 17 Jul 2023 01:53:14 -0700 (PDT)
+Message-ID: <8d4c1105-bf9b-d4b0-a2a3-be306474bf56@arm.com>
+Date: Mon, 17 Jul 2023 09:53:12 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,79 +17,122 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [PATCH v6 02/11] KVM: arm64: Use kvm_arch_flush_remote_tlbs()
-Content-Language: en-US
-To: Raghavendra Rao Ananta <rananta@google.com>,
- Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>, Huacai Chen
- <chenhuacai@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
- Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>,
- Jing Zhang <jingzhangos@google.com>, Colton Lewis <coltonlewis@google.com>,
- David Matlack <dmatlack@google.com>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- Zenghui Yu <zenghui.yu@linux.dev>, Gavin Shan <gshan@redhat.com>
-References: <20230715005405.3689586-1-rananta@google.com>
- <20230715005405.3689586-3-rananta@google.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
-In-Reply-To: <20230715005405.3689586-3-rananta@google.com>
+Subject: Re: [kvm-unit-tests PATCH 1/2] arm64: set sctlr_el1.SPAN
+Content-Language: en-GB
+To: Andrew Jones <andrew.jones@linux.dev>, Nadav Amit <namit@vmware.com>
+Cc: Shaoqin Huang <shahuang@redhat.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+References: <20230617013138.1823-1-namit@vmware.com>
+ <20230617013138.1823-2-namit@vmware.com>
+ <ZLEj_UnDnE4ZJtnD@monolith.localdoman>
+ <94bd19db-7177-9e90-dc1a-de7485ebb18f@redhat.com>
+ <57A6ABC7-8A95-4199-92E3-FA4D89D6705F@vmware.com>
+ <20230717-52b1cacc323e5105506e5079@orel>
+ <20230717-085f1ee1d631f213544fed03@orel>
+From: Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <20230717-085f1ee1d631f213544fed03@orel>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Raghavendra, David,
-
-On 15/7/23 02:53, Raghavendra Rao Ananta wrote:
-> From: David Matlack <dmatlack@google.com>
+On 17/07/2023 07:52, Andrew Jones wrote:
+> On Mon, Jul 17, 2023 at 08:50:30AM +0200, Andrew Jones wrote:
+>> On Fri, Jul 14, 2023 at 06:42:25PM +0000, Nadav Amit wrote:
+>>>
+>>>
+>>>> On Jul 14, 2023, at 4:29 AM, Shaoqin Huang <shahuang@redhat.com> wrote:
+>>>>
+>>>> !! External Email
+>>>>
+>>>> Hi,
+>>>>
+>>>> On 7/14/23 18:31, Alexandru Elisei wrote:
+>>>>> Hi,
+>>>>>
+>>>>> On Sat, Jun 17, 2023 at 01:31:37AM +0000, Nadav Amit wrote:
+>>>>>> From: Nadav Amit <namit@vmware.com>
+>>>>>>
+>>>>>> Do not assume PAN is not supported or that sctlr_el1.SPAN is already set.
+>>>>>
+>>>>> In arm/cstart64.S
+>>>>>
+>>>>> .globl start
+>>>>> start:
+>>>>>          /* get our base address */
+>>>>>       [..]
+>>>>>
+>>>>> 1:
+>>>>>          /* zero BSS */
+>>>>>       [..]
+>>>>>
+>>>>>          /* zero and set up stack */
+>>>>>       [..]
+>>>>>
+>>>>>          /* set SCTLR_EL1 to a known value */
+>>>>>          ldr     x4, =INIT_SCTLR_EL1_MMU_OFF
+>>>>>       [..]
+>>>>>
+>>>>>          /* set up exception handling */
+>>>>>          bl      exceptions_init
+>>>>>       [..]
+>>>>>
+>>>>> Where in lib/arm64/asm/sysreg.h:
+>>>>>
+>>>>> #define SCTLR_EL1_RES1  (_BITUL(7) | _BITUL(8) | _BITUL(11) | _BITUL(20) | \
+>>>>>                           _BITUL(22) | _BITUL(23) | _BITUL(28) | _BITUL(29))
+>>>>> #define INIT_SCTLR_EL1_MMU_OFF  \
+>>>>>                          SCTLR_EL1_RES1
+>>>>>
+>>>>> Look like bit 23 (SPAN) should be set.
+>>>>>
+>>>>> How are you seeing SCTLR_EL1.SPAN unset?
+>>>>
+>>>> Yeah. the sctlr_el1.SPAN has always been set by the above flow. So Nadav
+>>>> you can describe what you encounter with more details. Like which tests
+>>>> crash you encounter, and how to reproduce it.
+>>>
+>>> I am using Nikos’s work to run the test using EFI, not from QEMU.
+>>>
+>>> So the code that you mentioned - which is supposed to initialize SCTLR -
+>>> is not executed (and actually not part of the EFI image).
+>>>
+>>> Note that using EFI, the entry point is _start [1], and not “start”.
+>>>
+>>> That is also the reason lack of BSS zeroing also caused me issues with the
+>>> EFI setup, which I reported before.
+>>
+>> Nadav,
+>>
+>> Would you mind reposting this along with the BSS zeroing patch, the
+>> way I proposed we do that, and anything else you've discovered when
+>> trying to use the EFI unit tests without QEMU? We'll call that our
+>> first non-QEMU EFI support series, since the first EFI series was
+>> only targeting QEMU.
 > 
-> Use kvm_arch_flush_remote_tlbs() instead of
-> CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL. The two mechanisms solve the same
-> problem, allowing architecture-specific code to provide a non-IPI
-> implementation of remote TLB flushing.
+> Oh, and I meant to mention that, when reposting this patch, maybe we
+> can consider managing sctlr in a similar way to the non-efi start path?
 > 
-> Dropping CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL allows KVM to standardize
-> all architectures on kvm_arch_flush_remote_tlbs() instead of maintaining
-> two mechanisms.
-> 
-> Opt to standardize on kvm_arch_flush_remote_tlbs() since it avoids
-> duplicating the generic TLB stats across architectures that implement
-> their own remote TLB flush.
-> 
-> This adds an extra function call to the ARM64 kvm_flush_remote_tlbs()
-> path, but that is a small cost in comparison to flushing remote TLBs.
-> 
-> In addition, instead of just incrementing remote_tlb_flush_requests
-> stat, the generic interface would also increment the
-> remote_tlb_flush stat.
-> 
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> Reviewed-by: Zenghui Yu <zenghui.yu@linux.dev>
-> Acked-by: Oliver Upton <oliver.upton@linux.dev>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> ---
->   arch/arm64/include/asm/kvm_host.h | 3 +++
->   arch/arm64/kvm/Kconfig            | 1 -
->   arch/arm64/kvm/mmu.c              | 6 +++---
->   virt/kvm/Kconfig                  | 3 ---
->   virt/kvm/kvm_main.c               | 2 --
->   5 files changed, 6 insertions(+), 9 deletions(-)
 
-You are doing 2 changes in the same patch:
+Nadav, if you are running baremetal, it might be worth checking what EL 
+you're running in as well. If HW is implementing EL2, EFI will handover 
+in EL2.
 
-- Have ARM use kvm_arch_flush_remote_tlbs() instead of
-   HAVE_KVM_ARCH_TLB_FLUSH_ALL,
-- Drop the now unused HAVE_KVM_ARCH_TLB_FLUSH_ALL.
+I was planning to rebase an old patch (more like rewrite it) but I 
+haven't found the time yet [1]. If I remember correctly, we have to 
+check what EL we're running in and if it's EL2 we have to add a stub 
+EL2, drop to EL1 and setup EL1. But things have change since that patch 
+and with the new structure, I am not sure if we would drop to EL1 right 
+at the start (crt0-efi-aarch64.S) or somewhere in setup_efi().
 
-Commits should be atomic, to allow partial
-revert or cherry-pick.
+In general, I think, it would be easier to deal with this in QEMU 
+(-machine secure=on) and before we even start thinking about real 
+hardware where it is very likely that we will have to address other 
+issues (such as the problem with the BSS, cache maintenance) as well.
 
-Preferably splitting this patch in 2:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+[1]: 
+https://github.com/relokin/kvm-unit-tests/commit/1468abeee7be1d85140ed92cb91a42ee27a9bf1f
 
-Regards,
+Thanks,
 
-Phil.
-
+Nikos
