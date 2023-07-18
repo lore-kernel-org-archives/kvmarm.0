@@ -1,126 +1,238 @@
-Received: from out-46.mta0.migadu.com (out-46.mta0.migadu.com [91.218.175.46])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B78B015A9
-	for <kvmarm@lists.linux.dev>; Tue, 18 Jul 2023 05:49:51 +0000 (UTC)
-Date: Mon, 17 Jul 2023 22:49:49 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1689659389;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81AE715A9
+	for <kvmarm@lists.linux.dev>; Tue, 18 Jul 2023 06:21:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689661300;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=W53G0tfjAcoafVNhqSK8+p1MBUpcZTTwnG2E5iFB4SI=;
-	b=t1TSvYAZ8HkJVA12xzCIeuh09Dk4QODOBz4ODy0jzchKrFdlTE9Bth/wdLIKw8647z5Isw
-	VzqaOC4PbkgmIvoqFtdSr3w0Kdw7Qch3/RxVBKnbXBTCZDyf4ede+uWB2twP/u/YwZxiR8
-	YtF0Px1YaoFVVI4DtaW6dtKm2kXrXVU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Sudeep Holla <sudeep.holla@arm.com>,
-	Mostafa Saleh <smostafa@google.com>,
-	Xiang Chen <chenxiang66@hisilicon.com>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.5, part #1
-Message-ID: <ZLYn/RAovUs+U0r+@thinky-boi>
-References: <ZLYnolPWJubKLZY8@thinky-boi>
+	bh=RvSmM7MQhdDXRVA2Uryq4YVNwYFzTKNqJe4q9sLr7I8=;
+	b=B2dgonFpE7SM7Z+2R3VYzFpfSEUOvoKM3VvmV6GV/rImT+pba9BkKfOj32JzLqkUuXAw7P
+	HdNmpj0gSSrVODGdqJ0jFaDCPW6sNf+tlWptiOb36umD3v9AeuHCqH8LMcOe4oblzEjMXa
+	MkBLxqthngysHhf/Ldi8s/sZwLOJ5HM=
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
+ [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-319-_TYgqdGzMHyOppAukiZ5Kw-1; Tue, 18 Jul 2023 02:21:39 -0400
+X-MC-Unique: _TYgqdGzMHyOppAukiZ5Kw-1
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1baff697979so7372415ad.0
+        for <kvmarm@lists.linux.dev>; Mon, 17 Jul 2023 23:21:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689661297; x=1690266097;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RvSmM7MQhdDXRVA2Uryq4YVNwYFzTKNqJe4q9sLr7I8=;
+        b=TAnB5H2a6hx0RByE/b2To4dI8zMhoBoM2SNBIdnwzC9+rMMHLVcJMUP47q6o27tALE
+         2T/+vJbUZUHKhNJ4DcjR/awpwx1hMunxSWYMJe4xHgy228bQOebgH6k5oknLX8iGErRX
+         /+4jjH8Iqnxt47C1+77KL3CFk/IiCi0BglTSyQ+saSV0s1bmtZc+vM0je2sQFnSPofKX
+         KabrMZLc4QHcf5o7FJhHLDmMu+/ZHcLK6qOYX0Yvo4ktvRQZQjgRyxw3OsW0lv8VvrUY
+         ZseSpE+tuj24/kDZmYi3CmhEKWoM4gV6PgfPsWGhR4M6zMVcFnVknX5K/t/LLobjbf2H
+         oa7A==
+X-Gm-Message-State: ABy/qLYeS6QSRDzLOC4BChYmzW8cpqSskLTWTBLXqyluqUi/aRDukfyd
+	ETY7F2O/MTKhV8h1PtqT3y1M/yNDkq7ulozhWi12uxtLuRayehPMP4t716lfJouEWN2xT3rrFuj
+	kfWmglBL4B5RsZ7N8
+X-Received: by 2002:a17:902:da85:b0:1b8:9fc4:2733 with SMTP id j5-20020a170902da8500b001b89fc42733mr10753847plx.3.1689661297274;
+        Mon, 17 Jul 2023 23:21:37 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGwK4O80e6YQEGnzMYTYf6ot+mFwRDf85YBN8hCoLDeCfJGnn+lZlhDjDiUb0dFs/RD5ECIfQ==
+X-Received: by 2002:a17:902:da85:b0:1b8:9fc4:2733 with SMTP id j5-20020a170902da8500b001b89fc42733mr10753835plx.3.1689661296887;
+        Mon, 17 Jul 2023 23:21:36 -0700 (PDT)
+Received: from [10.66.61.39] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id 13-20020a170902c20d00b001b392bf9192sm941082pll.145.2023.07.17.23.21.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Jul 2023 23:21:36 -0700 (PDT)
+Message-ID: <8987d68b-d62a-7a9b-3aa3-cd5cc7ad551c@redhat.com>
+Date: Tue, 18 Jul 2023 14:21:30 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZLYnolPWJubKLZY8@thinky-boi>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v6 05/11] arm64: tlb: Refactor the core flush algorithm of
+ __flush_tlb_range
+To: Raghavendra Rao Ananta <rananta@google.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
+ James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Sean Christopherson <seanjc@google.com>, Huacai Chen
+ <chenhuacai@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+ Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>,
+ Jing Zhang <jingzhangos@google.com>, Colton Lewis <coltonlewis@google.com>,
+ David Matlack <dmatlack@google.com>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Gavin Shan <gshan@redhat.com>
+References: <20230715005405.3689586-1-rananta@google.com>
+ <20230715005405.3689586-6-rananta@google.com>
+From: Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <20230715005405.3689586-6-rananta@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-+cc lists, because I'm an idiot.
 
-On Mon, Jul 17, 2023 at 10:48:23PM -0700, Oliver Upton wrote:
-> Hi Paolo,
+
+On 7/15/23 08:53, Raghavendra Rao Ananta wrote:
+> Currently, the core TLB flush functionality of __flush_tlb_range()
+> hardcodes vae1is (and variants) for the flush operation. In the
+> upcoming patches, the KVM code reuses this core algorithm with
+> ipas2e1is for range based TLB invalidations based on the IPA.
+> Hence, extract the core flush functionality of __flush_tlb_range()
+> into its own macro that accepts an 'op' argument to pass any
+> TLBI operation, such that other callers (KVM) can benefit.
 > 
-> Quite a pile of fixes for the first batch. The most noteworthy here is
-> the BTI + pKVM finalization fixes, which address an early boot failure
-> when using the split hypervisor on systems that support BTI and make the
-> overall pKVM flow more robust to failures.
+> No functional changes intended.
 > 
-> Otherwise, we have a respectable collection of one-offs described in the
-> tag message.
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> ---
+>   arch/arm64/include/asm/tlbflush.h | 109 +++++++++++++++---------------
+>   1 file changed, 56 insertions(+), 53 deletions(-)
 > 
-> Please pull.
-> 
-> --
-> Thanks,
-> Oliver
-> 
-> The following changes since commit 06c2afb862f9da8dc5efa4b6076a0e48c3fbaaa5:
-> 
->   Linux 6.5-rc1 (2023-07-09 13:53:13 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.5-1
-> 
-> for you to fetch changes up to 9d2a55b403eea26cab7c831d8e1c00ef1e6a6850:
-> 
->   KVM: arm64: Fix the name of sys_reg_desc related to PMU (2023-07-14 23:34:05 +0000)
-> 
-> ----------------------------------------------------------------
-> KVM/arm64 fixes for 6.5, part #1
-> 
->  - Avoid pKVM finalization if KVM initialization fails
-> 
->  - Add missing BTI instructions in the hypervisor, fixing an early boot
->    failure on BTI systems
-> 
->  - Handle MMU notifiers correctly for non hugepage-aligned memslots
-> 
->  - Work around a bug in the architecture where hypervisor timer controls
->    have UNKNOWN behavior under nested virt.
-> 
->  - Disable preemption in kvm_arch_hardware_enable(), fixing a kernel BUG
->    in cpu hotplug resulting from per-CPU accessor sanity checking.
-> 
->  - Make WFI emulation on GICv4 systems robust w.r.t. preemption,
->    consistently requesting a doorbell interrupt on vcpu_put()
-> 
->  - Uphold RES0 sysreg behavior when emulating older PMU versions
-> 
->  - Avoid macro expansion when initializing PMU register names, ensuring
->    the tracepoints pretty-print the sysreg.
-> 
-> ----------------------------------------------------------------
-> Marc Zyngier (3):
->       KVM: arm64: timers: Use CNTHCTL_EL2 when setting non-CNTKCTL_EL1 bits
->       KVM: arm64: Disable preemption in kvm_arch_hardware_enable()
->       KVM: arm64: vgic-v4: Make the doorbell request robust w.r.t preemption
-> 
-> Mostafa Saleh (1):
->       KVM: arm64: Add missing BTI instructions
-> 
-> Oliver Upton (2):
->       KVM: arm64: Correctly handle page aging notifiers for unaligned memslot
->       KVM: arm64: Correctly handle RES0 bits PMEVTYPER<n>_EL0.evtCount
-> 
-> Sudeep Holla (1):
->       KVM: arm64: Handle kvm_arm_init failure correctly in finalize_pkvm
-> 
-> Xiang Chen (1):
->       KVM: arm64: Fix the name of sys_reg_desc related to PMU
-> 
->  arch/arm64/include/asm/kvm_host.h    |  2 ++
->  arch/arm64/include/asm/kvm_pgtable.h | 26 +++++++-------------
->  arch/arm64/include/asm/virt.h        |  1 +
->  arch/arm64/kvm/arch_timer.c          |  6 ++---
->  arch/arm64/kvm/arm.c                 | 28 ++++++++++++++++++---
->  arch/arm64/kvm/hyp/hyp-entry.S       |  8 ++++++
->  arch/arm64/kvm/hyp/nvhe/host.S       | 10 ++++++++
->  arch/arm64/kvm/hyp/nvhe/psci-relay.c |  2 +-
->  arch/arm64/kvm/hyp/pgtable.c         | 47 +++++++++++++++++++++++++++++-------
->  arch/arm64/kvm/mmu.c                 | 18 ++++++--------
->  arch/arm64/kvm/pkvm.c                |  2 +-
->  arch/arm64/kvm/sys_regs.c            | 42 ++++++++++++++++----------------
->  arch/arm64/kvm/vgic/vgic-v3.c        |  2 +-
->  arch/arm64/kvm/vgic/vgic-v4.c        |  7 ++++--
->  include/kvm/arm_vgic.h               |  2 +-
->  15 files changed, 133 insertions(+), 70 deletions(-)
+> diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
+> index 412a3b9a3c25..f7fafba25add 100644
+> --- a/arch/arm64/include/asm/tlbflush.h
+> +++ b/arch/arm64/include/asm/tlbflush.h
+> @@ -278,14 +278,62 @@ static inline void flush_tlb_page(struct vm_area_struct *vma,
+>    */
+>   #define MAX_TLBI_OPS	PTRS_PER_PTE
+>   
+> +/* When the CPU does not support TLB range operations, flush the TLB
+> + * entries one by one at the granularity of 'stride'. If the TLB
+> + * range ops are supported, then:
+> + *
+> + * 1. If 'pages' is odd, flush the first page through non-range
+> + *    operations;
+> + *
+> + * 2. For remaining pages: the minimum range granularity is decided
+> + *    by 'scale', so multiple range TLBI operations may be required.
+> + *    Start from scale = 0, flush the corresponding number of pages
+> + *    ((num+1)*2^(5*scale+1) starting from 'addr'), then increase it
+> + *    until no pages left.
+> + *
+> + * Note that certain ranges can be represented by either num = 31 and
+> + * scale or num = 0 and scale + 1. The loop below favours the latter
+> + * since num is limited to 30 by the __TLBI_RANGE_NUM() macro.
+> + */
+> +#define __flush_tlb_range_op(op, start, pages, stride,			\
+> +				asid, tlb_level, tlbi_user)		\
+> +do {									\
+> +	int num = 0;							\
+> +	int scale = 0;							\
+> +	unsigned long addr;						\
+> +									\
+> +	while (pages > 0) {						\
+> +		if (!system_supports_tlb_range() ||			\
+> +		    pages % 2 == 1) {					\
+> +			addr = __TLBI_VADDR(start, asid);		\
+> +			__tlbi_level(op, addr, tlb_level);		\
+> +			if (tlbi_user)					\
+> +				__tlbi_user_level(op, addr, tlb_level);	\
+> +			start += stride;				\
+> +			pages -= stride >> PAGE_SHIFT;			\
+> +			continue;					\
+> +		}							\
+> +									\
+> +		num = __TLBI_RANGE_NUM(pages, scale);			\
+> +		if (num >= 0) {						\
+> +			addr = __TLBI_VADDR_RANGE(start, asid, scale,	\
+> +						  num, tlb_level);	\
+> +			__tlbi(r##op, addr);				\
+> +			if (tlbi_user)					\
+> +				__tlbi_user(r##op, addr);		\
+> +			start += __TLBI_RANGE_PAGES(num, scale) << PAGE_SHIFT; \
+> +			pages -= __TLBI_RANGE_PAGES(num, scale);	\
+> +		}							\
+> +		scale++;						\
+> +	}								\
+> +} while (0)
+> +
+>   static inline void __flush_tlb_range(struct vm_area_struct *vma,
+>   				     unsigned long start, unsigned long end,
+>   				     unsigned long stride, bool last_level,
+>   				     int tlb_level)
+>   {
+> -	int num = 0;
+> -	int scale = 0;
+> -	unsigned long asid, addr, pages;
+> +	unsigned long asid, pages;
+>   
+>   	start = round_down(start, stride);
+>   	end = round_up(end, stride);
+> @@ -307,56 +355,11 @@ static inline void __flush_tlb_range(struct vm_area_struct *vma,
+>   	dsb(ishst);
+>   	asid = ASID(vma->vm_mm);
+>   
+> -	/*
+> -	 * When the CPU does not support TLB range operations, flush the TLB
+> -	 * entries one by one at the granularity of 'stride'. If the TLB
+> -	 * range ops are supported, then:
+> -	 *
+> -	 * 1. If 'pages' is odd, flush the first page through non-range
+> -	 *    operations;
+> -	 *
+> -	 * 2. For remaining pages: the minimum range granularity is decided
+> -	 *    by 'scale', so multiple range TLBI operations may be required.
+> -	 *    Start from scale = 0, flush the corresponding number of pages
+> -	 *    ((num+1)*2^(5*scale+1) starting from 'addr'), then increase it
+> -	 *    until no pages left.
+> -	 *
+> -	 * Note that certain ranges can be represented by either num = 31 and
+> -	 * scale or num = 0 and scale + 1. The loop below favours the latter
+> -	 * since num is limited to 30 by the __TLBI_RANGE_NUM() macro.
+> -	 */
+> -	while (pages > 0) {
+> -		if (!system_supports_tlb_range() ||
+> -		    pages % 2 == 1) {
+> -			addr = __TLBI_VADDR(start, asid);
+> -			if (last_level) {
+> -				__tlbi_level(vale1is, addr, tlb_level);
+> -				__tlbi_user_level(vale1is, addr, tlb_level);
+> -			} else {
+> -				__tlbi_level(vae1is, addr, tlb_level);
+> -				__tlbi_user_level(vae1is, addr, tlb_level);
+> -			}
+> -			start += stride;
+> -			pages -= stride >> PAGE_SHIFT;
+> -			continue;
+> -		}
+> -
+> -		num = __TLBI_RANGE_NUM(pages, scale);
+> -		if (num >= 0) {
+> -			addr = __TLBI_VADDR_RANGE(start, asid, scale,
+> -						  num, tlb_level);
+> -			if (last_level) {
+> -				__tlbi(rvale1is, addr);
+> -				__tlbi_user(rvale1is, addr);
+> -			} else {
+> -				__tlbi(rvae1is, addr);
+> -				__tlbi_user(rvae1is, addr);
+> -			}
+> -			start += __TLBI_RANGE_PAGES(num, scale) << PAGE_SHIFT;
+> -			pages -= __TLBI_RANGE_PAGES(num, scale);
+> -		}
+> -		scale++;
+> -	}
+> +	if (last_level)
+> +		__flush_tlb_range_op(vale1is, start, pages, stride, asid, tlb_level, true);
+> +	else
+> +		__flush_tlb_range_op(vae1is, start, pages, stride, asid, tlb_level, true);
+> +
+>   	dsb(ish);
+>   }
+>   
+
+-- 
+Shaoqin
+
