@@ -1,42 +1,42 @@
-Received: from mail-oa1-f74.google.com (mail-oa1-f74.google.com [209.85.160.74])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3239117AC3
-	for <kvmarm@lists.linux.dev>; Tue, 18 Jul 2023 23:48:52 +0000 (UTC)
-Received: by mail-oa1-f74.google.com with SMTP id 586e51a60fabf-1b73ae7dedfso9641022fac.0
-        for <kvmarm@lists.linux.dev>; Tue, 18 Jul 2023 16:48:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EA9617ADB
+	for <kvmarm@lists.linux.dev>; Tue, 18 Jul 2023 23:48:53 +0000 (UTC)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1b8a7734734so32264885ad.2
+        for <kvmarm@lists.linux.dev>; Tue, 18 Jul 2023 16:48:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689724131; x=1692316131;
+        d=google.com; s=20221208; t=1689724133; x=1692316133;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=muvilKyoWvn1tarN80afquV4Wd3ZvyUZATzGD2ucPnA=;
-        b=dy1/NFlQGuJqswhd4jyp5/5Y2DKjXWq8ZhDnL7jyfQUkTP7A9Hvq/HvrZglV4JQg4M
-         0K4GnyosjYX3JEla9t9lm8LJXLHv4GUKKzg9xFm9cJWrlQ5Qmy5LmSHitAR/Xzi9H8/Y
-         MjJIFDOPL8g3wik3LCZjllYyd45Gr2H0qgazCaqc+yiHTFw7sn+VQEAa9DzzRpRQoil4
-         OF2suL13dOrJbxrD1Es2a+3MSZoSnJ4hgva3/KXiELtegBBB1WkzGy/iAanliFh6iYW0
-         B8x8MynR4QN8rTTnTiUPKbxJnJ7ZIBs38bI6aS2sGXphM22HDrUDYnhUpurmEDIvnFzg
-         o5tw==
+        bh=SDxWIrfosG9XJ1i6+ao4lNZmMm/71hk0CPfpAh3rles=;
+        b=oKgQFwiCrPvHzuuXJTxGw9fTJQCZKL9TyIsnHUo20k7J6vJr/dP2UuT8GyfaXNhKWl
+         lfnwI4SNZlla+krW1fx/4HTGrmx9tbRfRVWIu3HGnyMHAJnHjaH8b3Nn7OD9lub8Upfz
+         ScGl6hIrQNtyqOKMdvwG71E9U1LJYrTTZQq71Kwv4L3GIqczSYB1Q2ibrVYwZRMv7ks2
+         QNhyu3W0Ns8Grpmlyc83iZpzHpUsL+aloKwTrirYI0WDq4iN8t2n8ha5cP4AK06m8uQ9
+         dXuqm5q+qG2yKgB+nUEYuog82s4uX9rRPSCnrZx4hsx8m3v5+ZWIujkgaic/poWXwLCP
+         o9Tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689724131; x=1692316131;
+        d=1e100.net; s=20221208; t=1689724133; x=1692316133;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=muvilKyoWvn1tarN80afquV4Wd3ZvyUZATzGD2ucPnA=;
-        b=EG7Zw3/+fzcFrL1e4aLr2Pp0q4PrRug4jgTO/HYy0aiZoyduD1uTsPnAuLkemXYrmo
-         GZ0vPcC7zzrP4ySBdzJpUhJ/9ML7+DpkWE8MCzok3Adq6TZrqUscTLeLz1UGoO25Gb+P
-         K9S6nmPatx8S3PCJ8aja6QMnWpO4wFjyxdmRIy0ZG2UIqe0VTJdHhrhASaxv46vI0e5i
-         VW948t3Gu9JH2Aq/CWZS7PW50HXDDLEhbApqT2NePtKxIChj83v9b8N7ONQGux+OTDIP
-         phtM5auGCVvHyu17y9S32GGDvKEQYWHj+HGPnPCKGFLA0i0cPHo41770zr+GobTVlmCa
-         Izew==
-X-Gm-Message-State: ABy/qLb5GMorUz5GzPlkGm3oywte656+wYzTRNhhpJwWLMeywXkwINdZ
-	u6VkiRCcnB9Jm1pcfewTad8CtEVhGWw=
-X-Google-Smtp-Source: APBJJlE49QI+GKjHT7/jwtmKHpb+kXt66N6K7QDVRkzJgeGH+MWu0bF/51TSJcseqrb6U54aALrx+EClwNQ=
+        bh=SDxWIrfosG9XJ1i6+ao4lNZmMm/71hk0CPfpAh3rles=;
+        b=S0mkRo+S6yufZj2vMFdudj8zVAjCy0SHo2BN6yhiKPiKKSMDmh5Dk17ibpUSeGP49H
+         q4WY15YgmMuAgvSU3pfmRbJkAIIvKYB10ncYZuAi/WhDabolMS1h/Iz6giE/mcvXXuR7
+         Luc+OBhcQmEVOwk8ROKgZFSibs6FBQ6mhaL01D77mdQ+fWLW8gk2nEkmKGuI74lS5pUC
+         5UxEDLTC8BsxnyBCcgGcjRPMz+ug9ZMONCx7a+OijYnYvYCbdmf5mIXqnyNWiKifWymB
+         1BfXTLGYzlRd+7oyMVXdCAbX6LRw+irVtqiRoGH3lThOy/OSWcaamtviN+44CMPIug2D
+         W0cA==
+X-Gm-Message-State: ABy/qLZWOSYkGR2wQiY8C7MOikQSIXa2ShbwQT9smIQfbmIPNxjit/j0
+	N3NkQdj0VjQf3YHT0H12njV666DiKmw=
+X-Google-Smtp-Source: APBJJlFRkrJKR6wk6kjyyawD9jUVadK517ZfNP5yf1yjj9/O0JQ+6He3HEMs3LUDgHlJok/ugi+AWDRSDQU=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6870:c796:b0:1b0:20bd:eef with SMTP id
- dy22-20020a056870c79600b001b020bd0eefmr758790oab.2.1689724131216; Tue, 18 Jul
- 2023 16:48:51 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:c412:b0:1ba:1704:89d1 with SMTP id
+ k18-20020a170902c41200b001ba170489d1mr21516plk.10.1689724133087; Tue, 18 Jul
+ 2023 16:48:53 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 18 Jul 2023 16:44:53 -0700
+Date: Tue, 18 Jul 2023 16:44:54 -0700
 In-Reply-To: <20230718234512.1690985-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -46,9 +46,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230718234512.1690985-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
-Message-ID: <20230718234512.1690985-11-seanjc@google.com>
-Subject: [RFC PATCH v11 10/29] mm: Add AS_UNMOVABLE to mark mapping as
- completely unmovable
+Message-ID: <20230718234512.1690985-12-seanjc@google.com>
+Subject: [RFC PATCH v11 11/29] security: Export security_inode_init_security_anon()
+ for use by KVM
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
@@ -75,68 +75,21 @@ Content-Type: text/plain; charset="UTF-8"
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- include/linux/pagemap.h | 11 +++++++++++
- mm/compaction.c         |  4 ++++
- mm/migrate.c            |  2 ++
- 3 files changed, 17 insertions(+)
+ security/security.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index 716953ee1ebd..931d2f1da7d5 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -203,6 +203,7 @@ enum mapping_flags {
- 	/* writeback related tags are not used */
- 	AS_NO_WRITEBACK_TAGS = 5,
- 	AS_LARGE_FOLIO_SUPPORT = 6,
-+	AS_UNMOVABLE	= 7,	/* The mapping cannot be moved, ever */
- };
- 
- /**
-@@ -273,6 +274,16 @@ static inline int mapping_use_writeback_tags(struct address_space *mapping)
- 	return !test_bit(AS_NO_WRITEBACK_TAGS, &mapping->flags);
+diff --git a/security/security.c b/security/security.c
+index b720424ca37d..7fc78f0f3622 100644
+--- a/security/security.c
++++ b/security/security.c
+@@ -1654,6 +1654,7 @@ int security_inode_init_security_anon(struct inode *inode,
+ 	return call_int_hook(inode_init_security_anon, 0, inode, name,
+ 			     context_inode);
  }
++EXPORT_SYMBOL_GPL(security_inode_init_security_anon);
  
-+static inline void mapping_set_unmovable(struct address_space *mapping)
-+{
-+	set_bit(AS_UNMOVABLE, &mapping->flags);
-+}
-+
-+static inline bool mapping_unmovable(struct address_space *mapping)
-+{
-+	return test_bit(AS_UNMOVABLE, &mapping->flags);
-+}
-+
- static inline gfp_t mapping_gfp_mask(struct address_space * mapping)
- {
- 	return mapping->gfp_mask;
-diff --git a/mm/compaction.c b/mm/compaction.c
-index dbc9f86b1934..a3d2b132df52 100644
---- a/mm/compaction.c
-+++ b/mm/compaction.c
-@@ -1047,6 +1047,10 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
- 		if (!mapping && (folio_ref_count(folio) - 1) > folio_mapcount(folio))
- 			goto isolate_fail_put;
- 
-+		/* The mapping truly isn't movable. */
-+		if (mapping && mapping_unmovable(mapping))
-+			goto isolate_fail_put;
-+
- 		/*
- 		 * Only allow to migrate anonymous pages in GFP_NOFS context
- 		 * because those do not depend on fs locks.
-diff --git a/mm/migrate.c b/mm/migrate.c
-index 24baad2571e3..c00a4ca86698 100644
---- a/mm/migrate.c
-+++ b/mm/migrate.c
-@@ -954,6 +954,8 @@ static int move_to_new_folio(struct folio *dst, struct folio *src,
- 
- 		if (!mapping)
- 			rc = migrate_folio(mapping, dst, src, mode);
-+		else if (mapping_unmovable(mapping))
-+			rc = -EOPNOTSUPP;
- 		else if (mapping->a_ops->migrate_folio)
- 			/*
- 			 * Most folios have a mapping and most filesystems
+ #ifdef CONFIG_SECURITY_PATH
+ /**
 -- 
 2.41.0.255.g8b1d071c50-goog
 
