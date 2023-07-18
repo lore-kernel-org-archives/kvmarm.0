@@ -1,40 +1,40 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CB6FD50F
-	for <kvmarm@lists.linux.dev>; Tue, 18 Jul 2023 16:45:33 +0000 (UTC)
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-c64521ac8d6so5151054276.1
-        for <kvmarm@lists.linux.dev>; Tue, 18 Jul 2023 09:45:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93421D536
+	for <kvmarm@lists.linux.dev>; Tue, 18 Jul 2023 16:45:35 +0000 (UTC)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5834d9ec5f7so21142357b3.1
+        for <kvmarm@lists.linux.dev>; Tue, 18 Jul 2023 09:45:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689698733; x=1692290733;
+        d=google.com; s=20221208; t=1689698734; x=1692290734;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BJAEm87EHCeOWjKJA30wa69olvlB7/s8Sl9tx5zF2lQ=;
-        b=tfkUfwMnUrklnQXtS24STivSqw+iQ+fA4TFwL7HBlnVEqzpPO8wCQ0LzpDSsOXDIpq
-         x1/xbW5Lhl6F4kgls2JBqjroHcaQnRMYYJLqW0gMXBA7aLWFZfF7BOvE2ePSI4YJGRyq
-         tywUlFjWuB1m0rig8gPtAG6ItxfiXWgZks/sD6CDikU55wFiKZseByVkSBlcnOcVegfQ
-         +i69uPR777tzcJrLjb0dFAMyV7mgl0lLfmDOUSf99DAyjF20886gF+hjgJTC1GBY8SF/
-         +MkAxzuIn0PQYGkJCzAuprDebJHw1S8ISx4qq165nToNntEQ+6B/I30mZedwjS5SCiro
-         8iBw==
+        bh=xS0acJp+aIDXIQPo5QGK2XMol5RfSj1wMM22zpXYALg=;
+        b=EmteLCMQlNbrceRaps12nferypQUXRntTEFrR9lZz6K827vbH7l9xInXAD8nRBwgvg
+         Nva18ll74bKF8/JyGdMnCPK6Z5eslobhaqxhrZQXBercFtxS1nvRRu6VslmWJ9U5xlzC
+         J82k7CDSz52ze/FeoVydqdPa0/dVg1iSLdO9q1FCCO8sqCF5WHiCRTu4+p/e9SlcTfbA
+         Rc/JesNjjDk9jSuEVjFWNQFfHkMlTK2oJmGd9ptCIhR5AoSRUHhNWPA264e7oLmqdDgL
+         +2Y7q2wR2u7v/LnQXbl2PTC6Z0bqSTlqmvRIh6DIgrGRYcHCTTCxgzeZ5vJgJiP3rQ9T
+         j/Yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689698733; x=1692290733;
+        d=1e100.net; s=20221208; t=1689698734; x=1692290734;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BJAEm87EHCeOWjKJA30wa69olvlB7/s8Sl9tx5zF2lQ=;
-        b=aDOfSZUljexmUBfHNajkp34nbnS89P7lj+kdRtD7uOuWeYT1UjmOO60wMp+1811XmQ
-         wFRToBzJcg6mgCglVfsC+fjWNP1QpJxGQbHgIl6nlHi2px2XzscAL4jtpqTf+6K4wyhf
-         Rq+z8zKwu59UKrQYMbhFse2KGu6nIP0pDWtcoo+xyz6FNB96EcJTQjeN1ZtRCzE96ahW
-         h/0no3GqVFOZ5f0qViXonHtLmwAgm9M3CwbJMSMotPlwUdpWkynqf6R3nBL8YvwMls/w
-         2l/+YCzMVb9QTf7LZZCL/k+G+7pQLbXXLMQWQEoPo3n7495s0us81pgd/+9ZAsfokOUO
-         M2AQ==
-X-Gm-Message-State: ABy/qLZJJzNuXF14Ml6MTCm1R5Cj4l2dBB16BPix8X/Q7t/yROViAQaR
-	+H+Y7gTPbUVc3q4zxPQ7w5yGt1eWdtKp9N5JbQ==
-X-Google-Smtp-Source: APBJJlG7+TffRkqMu2lcoVZqj2J4kwXnhwITwWw6ib/WW3uqG7zZKtjT/gjSzmWi7SNVPapr4h2k9BU/V5PlgHmjwA==
+        bh=xS0acJp+aIDXIQPo5QGK2XMol5RfSj1wMM22zpXYALg=;
+        b=d0smglocmVgvLTcp7WC15Guq8vDAZ3u3Y3izFveCaWBn68qFJuyR9XQPf75ICRmkp1
+         y3g0QxDa1436amtVFG9f0PnWAs40Yd9XSmHv49BNfEW4egBKNnsSLrIgcxjIcrUfMcMX
+         mqbsUJGwWRuIDjPdxY/yxvegDDyxO1ShvZ5X5GLst6th21Fz6JCvpQWsCyljiBfexzKZ
+         0Rw18ARlkPvN1Rwlvnx7mH/xjdDAL5EjCY5ER8HO8jyqB1fb9d1fKSrsQn6hUJaZfiEL
+         2KhXrqfFOX7HwiqQd6R42hEtgTwhMnZgkH4V+HSRez0QN6oKv06WpEnnWXt8O6NlRsbL
+         eItw==
+X-Gm-Message-State: ABy/qLbNxCbi5fkAgT+Ckk90yo97FxrYJIT7cPzAQpNAZE4shEH2Y0LA
+	kn7ZTy+oqNbMJx40yQgwB9ycS+qpRLsGDVq0dw==
+X-Google-Smtp-Source: APBJJlEQmDSoHkGi9JQIAr4wuITHz7fAluVasMRt8k18NTKlsRsIsnD0bdJ4EqDubIUM0oQB7DLI1CT99QjPdZDFHQ==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a25:9745:0:b0:ce9:4c77:bc0b with SMTP
- id h5-20020a259745000000b00ce94c77bc0bmr2571ybo.11.1689698732911; Tue, 18 Jul
- 2023 09:45:32 -0700 (PDT)
-Date: Tue, 18 Jul 2023 16:45:19 +0000
+ (user=jingzhangos job=sendgmr) by 2002:a81:fe09:0:b0:57a:6019:62aa with SMTP
+ id j9-20020a81fe09000000b0057a601962aamr237002ywn.5.1689698734735; Tue, 18
+ Jul 2023 09:45:34 -0700 (PDT)
+Date: Tue, 18 Jul 2023 16:45:20 +0000
 In-Reply-To: <20230718164522.3498236-1-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230718164522.3498236-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
-Message-ID: <20230718164522.3498236-4-jingzhangos@google.com>
-Subject: [PATCH v6 3/6] KVM: arm64: Enable writable for ID_AA64DFR0_EL1 and ID_DFR0_EL1
+Message-ID: <20230718164522.3498236-5-jingzhangos@google.com>
+Subject: [PATCH v6 4/6] KVM: arm64: Enable writable for ID_AA64PFR0_EL1
 From: Jing Zhang <jingzhangos@google.com>
 To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
 	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
@@ -58,36 +58,27 @@ Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
 	Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-All valid fields in ID_AA64DFR0_EL1 and ID_DFR0_EL1 are writable
-from usrespace with this change.
+All valid fields in ID_AA64PFR0_EL1 are writable from usrespace
+with this change.
 
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 053d8057ff1e..f33aec83f1b4 100644
+index f33aec83f1b4..12b81ab27dbe 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -2008,7 +2008,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  .set_user = set_id_dfr0_el1,
- 	  .visibility = aa32_id_visibility,
- 	  .reset = read_sanitised_id_dfr0_el1,
--	  .val = ID_DFR0_EL1_PerfMon_MASK, },
-+	  .val = GENMASK(63, 0), },
- 	ID_HIDDEN(ID_AFR0_EL1),
- 	AA32_ID_SANITISED(ID_MMFR0_EL1),
- 	AA32_ID_SANITISED(ID_MMFR1_EL1),
-@@ -2057,7 +2057,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+@@ -2042,7 +2042,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
  	  .get_user = get_id_reg,
- 	  .set_user = set_id_aa64dfr0_el1,
- 	  .reset = read_sanitised_id_aa64dfr0_el1,
--	  .val = ID_AA64DFR0_EL1_PMUVer_MASK, },
+ 	  .set_user = set_id_reg,
+ 	  .reset = read_sanitised_id_aa64pfr0_el1,
+-	  .val = ID_AA64PFR0_EL1_CSV2_MASK | ID_AA64PFR0_EL1_CSV3_MASK, },
 +	  .val = GENMASK(63, 0), },
- 	ID_SANITISED(ID_AA64DFR1_EL1),
- 	ID_UNALLOCATED(5,2),
- 	ID_UNALLOCATED(5,3),
+ 	ID_SANITISED(ID_AA64PFR1_EL1),
+ 	ID_UNALLOCATED(4,2),
+ 	ID_UNALLOCATED(4,3),
 -- 
 2.41.0.255.g8b1d071c50-goog
 
