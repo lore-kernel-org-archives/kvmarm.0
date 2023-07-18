@@ -1,40 +1,40 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB99DF508
-	for <kvmarm@lists.linux.dev>; Tue, 18 Jul 2023 16:45:36 +0000 (UTC)
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-55c964d031aso4119673a12.1
-        for <kvmarm@lists.linux.dev>; Tue, 18 Jul 2023 09:45:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7FEFC16
+	for <kvmarm@lists.linux.dev>; Tue, 18 Jul 2023 16:45:39 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-573d70da2dcso53367397b3.1
+        for <kvmarm@lists.linux.dev>; Tue, 18 Jul 2023 09:45:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689698736; x=1692290736;
+        d=google.com; s=20221208; t=1689698738; x=1692290738;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7vkCbr047ltjyeNSod64c+hA+AaA1LNd8Iy2F1bOfBE=;
-        b=yDDdm3Z98ZL51ezeU3dyZisGjIZSm1scHPakb810LlPtbzZdWtSUIYn/IEOov5bS/a
-         HhyaKTMZfG3GGLqUcOZEO3jWAbeBWbTi5j8vYHEICwvgbi8Qv93SV86ZXZ0R9uRIOEfU
-         tfW4QxvXTLOQmrAp6N5uWwOcYGCQ1yrqQNnUXmzNz4YhAyyA4TJE3vbPvZe52JEjQ19o
-         rSCyDjo7l5I7KgLtNETHDoB9SexVb9joZl0xIE+DtxXUBwwJrN0HrgEesHZL1dS3a3f9
-         1WXahQMOWqNCdfgQgckue6kJBtPxpTLLOYavVWjQIXyOfD4f5EYp3T1flDKM9NrTNHJg
-         ca5w==
+        bh=f6NXlz6D/782SdBzr3IeFN6HXvUmoGCjaw12aI23xnw=;
+        b=UgpR3zd8Vwdo9jKsFeX+C8lfGVgsHVsC93K4Srj+qwQBEmH4IbeK9gCIxkC2gkmyzF
+         sVYc7CatQ4EcZD82XuyUrFD/d8AsOlh52qlFYCTLHGf2FcZEBLtW7Sw3ZTAx2xSxCvkj
+         gKoiKRD5CQzXa7Y9oLNTgyZBNgau9c9v4bZyYcZPXwjFYABruk+nl92hUHkVeXFlY3dX
+         6wPEyCuU75lk5fLn0FGaX4rur/c8ZRuSrfqpq6s8rDvsYwlr9xzXiBcBZd1uZhKMQ6Oi
+         efspitsNXWraehwYFLxevmEQMMUOTGFO/rsSshN/hvf5ThmySgFOQVR67x/lXMsTaMyJ
+         GmLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689698736; x=1692290736;
+        d=1e100.net; s=20221208; t=1689698738; x=1692290738;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7vkCbr047ltjyeNSod64c+hA+AaA1LNd8Iy2F1bOfBE=;
-        b=Soudo/3ICowASLAP2G7z61C8rQUbm0MNJs8mqagdvjLzH/Z5dBuyBgmqRWhX7f5vCS
-         EEDimlDbIDuiId1JpBrjbb5kr5JjndKpskMnMEfMI7rtiOxESF24e3V01XbQbsx3hIKx
-         +u69u4rquE+kGntLThI9UrtblboSrF0rBsDu/zj9C9XTRSLz4EQFAQ7oHoN4RcO5q1Gu
-         TiGGJi0hxsus+WuLu8vgo07dSIFScvmJc69U8Q/h0rr6GhtA0fuKLnuWTCOgMxx9M/ep
-         My1ZtUY867SgkKY14Ye03/FKyPjP3VSQpAD4krltyvesRTRZDqAc0Pr+dSkbkSjuUtGC
-         TPqw==
-X-Gm-Message-State: ABy/qLbBUzS91LKG4gMUDK8mEoe25L4LEfuKykfyVpEQ234hIBuKR5XX
-	DPYLlM6dq2bYcHjtYJtFeNp7RPPhR+BUy9o8tA==
-X-Google-Smtp-Source: APBJJlHDDu+HxPs3scZlNF4+YoM4eumiXMxf7JemKCB4eK0aLPYXrlzf6mMhZxkgAMPgiQBQLnY7YjFAQ4oSoy0Zbw==
+        bh=f6NXlz6D/782SdBzr3IeFN6HXvUmoGCjaw12aI23xnw=;
+        b=g5P5mX7HHaEddTcTlWp+Qxx+YQgGPT1Rl0YSs1hC0OSUI0h10LjWdkHZbp9zNn8YyD
+         wIWX7WvZc3YCdtr+4dlpsgAC3umaXRjDoNnlLvK/JrhH80G0YkTSpusw9Uz8DvxDb9BK
+         pvfbrpPaWQiirZuJYKYNHwpmbf6cN60yVfElx4S3qL7gmTY+gF6p92KYFaMuonVOqmcy
+         q24uYk9nJ4s4iRp6qaLn4WEp0bh/L5fEBNpQJmU2JLTEW4tOkyERjTaB1rk2PmT0oRct
+         cq4ehUYIb1/74fFTlvapXckmLJRAyhz3Mm5WZS/l9UvdEHas1PsPyOESm2QIC6mr1hqq
+         tmYQ==
+X-Gm-Message-State: ABy/qLZNyrSmINL+LCnmXvarOeR3z+Ca6VQokFRMsW4ILNPLWI0yIrFr
+	VANxJ1ZPssmufM5fEIfgXPcYJr7zT6Y1TGDTFA==
+X-Google-Smtp-Source: APBJJlFQfOABzqiiF7DAq8fLGdHU4mtWhNKbQb0rOFTg9K46DQvwrbM/DePnnn41SzrwvpIZDYuIXA5dFNd5TFmZVA==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a05:6a00:158e:b0:677:c9da:14b6 with
- SMTP id u14-20020a056a00158e00b00677c9da14b6mr159486pfk.4.1689698736287; Tue,
- 18 Jul 2023 09:45:36 -0700 (PDT)
-Date: Tue, 18 Jul 2023 16:45:21 +0000
+ (user=jingzhangos job=sendgmr) by 2002:a81:b70d:0:b0:581:7b58:5e70 with SMTP
+ id v13-20020a81b70d000000b005817b585e70mr3233ywh.5.1689698738270; Tue, 18 Jul
+ 2023 09:45:38 -0700 (PDT)
+Date: Tue, 18 Jul 2023 16:45:22 +0000
 In-Reply-To: <20230718164522.3498236-1-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230718164522.3498236-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
-Message-ID: <20230718164522.3498236-6-jingzhangos@google.com>
-Subject: [PATCH v6 5/6] KVM: arm64: Enable writable for ID_AA64MMFR{0, 1, 2, 3}_EL1
+Message-ID: <20230718164522.3498236-7-jingzhangos@google.com>
+Subject: [PATCH v6 6/6] KVM: arm64: selftests: Test for setting ID register
+ from usersapce
 From: Jing Zhang <jingzhangos@google.com>
 To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
 	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
@@ -58,84 +59,197 @@ Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
 	Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Enable writable from userspace for ID_AA64MMFR{0, 1, 2, 3}_EL1.
-Added a macro for defining general writable idregs.
+Add a test to verify setting ID registers from userapce is handled
+correctly by KVM.
 
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 38 +++++++++++++++++++++++++++++++-------
- 1 file changed, 31 insertions(+), 7 deletions(-)
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/set_id_regs.c       | 163 ++++++++++++++++++
+ 2 files changed, 164 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/set_id_regs.c
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 12b81ab27dbe..d560fc178a76 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1346,9 +1346,6 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
- 			val &= ~ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_WFxT);
- 		val &= ~ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_MOPS);
- 		break;
--	case SYS_ID_AA64MMFR2_EL1:
--		val &= ~ID_AA64MMFR2_EL1_CCIDX_MASK;
--		break;
- 	case SYS_ID_MMFR4_EL1:
- 		val &= ~ARM64_FEATURE_MASK(ID_MMFR4_EL1_CCIDX);
- 		break;
-@@ -1582,6 +1579,18 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
- 	return set_id_reg(vcpu, rd, val);
- }
- 
-+static u64 read_sanitised_id_aa64mmfr2_el1(struct kvm_vcpu *vcpu,
-+					   const struct sys_reg_desc *rd)
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index c692cc86e7da..87ceadc1292a 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -144,6 +144,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
+ TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
+ TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
+ TEST_GEN_PROGS_aarch64 += aarch64/psci_test
++TEST_GEN_PROGS_aarch64 += aarch64/set_id_regs
+ TEST_GEN_PROGS_aarch64 += aarch64/smccc_filter
+ TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
+ TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
+diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+new file mode 100644
+index 000000000000..e2242ef36bab
+--- /dev/null
++++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+@@ -0,0 +1,163 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * set_id_regs - Test for setting ID register from usersapce.
++ *
++ * Copyright (c) 2023 Google LLC.
++ *
++ *
++ * Test that KVM supports setting ID registers from userspace and handles the
++ * feature set correctly.
++ */
++
++#include <stdint.h>
++#include "kvm_util.h"
++#include "processor.h"
++#include "test_util.h"
++#include <linux/bitfield.h>
++
++#define field_get(_mask, _reg) (((_reg) & (_mask)) >> (ffs(_mask) - 1))
++#define field_prep(_mask, _val) (((_val) << (ffs(_mask) - 1)) & (_mask))
++
++struct reg_feature {
++	uint64_t reg;
++	uint64_t ftr_mask;
++};
++
++static void guest_code(void)
 +{
-+	u64 val;
-+	u32 id = reg_to_encoding(rd);
-+
-+	val = read_sanitised_ftr_reg(id);
-+	val &= ~ID_AA64MMFR2_EL1_CCIDX_MASK;
-+
-+	return val;
++	for (;;)
++		GUEST_SYNC(0);
 +}
 +
- /*
-  * cpufeature ID register user accessors
-  *
-@@ -1856,6 +1865,16 @@ static unsigned int elx2_visibility(const struct kvm_vcpu *vcpu,
- 	.val = 0,				\
- }
- 
-+#define ID_SANITISED_WRITABLE(name) {		\
-+	SYS_DESC(SYS_##name),			\
-+	.access	= access_id_reg,		\
-+	.get_user = get_id_reg,			\
-+	.set_user = set_id_reg,			\
-+	.visibility = id_visibility,		\
-+	.reset = kvm_read_sanitised_id_reg,	\
-+	.val = GENMASK(63, 0),			\
++static struct reg_feature lower_safe_reg_ftrs[] = {
++	{ KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), ARM64_FEATURE_MASK(ID_AA64DFR0_BRPS) },
++	{ KVM_ARM64_SYS_REG(SYS_ID_DFR0_EL1), ARM64_FEATURE_MASK(ID_DFR0_COPDBG) },
++	{ KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), ARM64_FEATURE_MASK(ID_AA64PFR0_EL3) },
++	{ KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR0_EL1), ARM64_FEATURE_MASK(ID_AA64MMFR0_TGRAN4) },
++};
++
++static void test_user_set_lower_safe(struct kvm_vcpu *vcpu)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(lower_safe_reg_ftrs); i++) {
++		struct reg_feature *reg_ftr = lower_safe_reg_ftrs + i;
++		uint64_t val, new_val, ftr;
++
++		vcpu_get_reg(vcpu, reg_ftr->reg, &val);
++		ftr = field_get(reg_ftr->ftr_mask, val);
++
++		/* Set a safe value for the feature */
++		if (ftr > 0)
++			ftr--;
++
++		val &= ~reg_ftr->ftr_mask;
++		val |= field_prep(reg_ftr->ftr_mask, ftr);
++
++		vcpu_set_reg(vcpu, reg_ftr->reg, val);
++		vcpu_get_reg(vcpu, reg_ftr->reg, &new_val);
++		ASSERT_EQ(new_val, val);
++	}
 +}
 +
- /* sys_reg_desc initialiser for known cpufeature ID registers */
- #define AA32_ID_SANITISED(name) {		\
- 	SYS_DESC(SYS_##name),			\
-@@ -2077,10 +2096,15 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	ID_UNALLOCATED(6,7),
- 
- 	/* CRm=7 */
--	ID_SANITISED(ID_AA64MMFR0_EL1),
--	ID_SANITISED(ID_AA64MMFR1_EL1),
--	ID_SANITISED(ID_AA64MMFR2_EL1),
--	ID_SANITISED(ID_AA64MMFR3_EL1),
-+	ID_SANITISED_WRITABLE(ID_AA64MMFR0_EL1),
-+	ID_SANITISED_WRITABLE(ID_AA64MMFR1_EL1),
-+	{ SYS_DESC(SYS_ID_AA64MMFR2_EL1),
-+	  .access = access_id_reg,
-+	  .get_user = get_id_reg,
-+	  .set_user = set_id_reg,
-+	  .reset = read_sanitised_id_aa64mmfr2_el1,
-+	  .val = GENMASK(63, 0), },
-+	ID_SANITISED_WRITABLE(ID_AA64MMFR3_EL1),
- 	ID_UNALLOCATED(7,4),
- 	ID_UNALLOCATED(7,5),
- 	ID_UNALLOCATED(7,6),
++static struct reg_feature exact_reg_ftrs[] = {
++	{ KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER) },
++};
++
++static void test_user_set_exact(struct kvm_vcpu *vcpu)
++{
++	int i, r;
++
++	for (i = 0; i < ARRAY_SIZE(exact_reg_ftrs); i++) {
++		struct reg_feature *reg_ftr = exact_reg_ftrs + i;
++		uint64_t val, old_val, ftr;
++
++		vcpu_get_reg(vcpu, reg_ftr->reg, &val);
++		ftr = field_get(reg_ftr->ftr_mask, val);
++		old_val = val;
++
++		/* Exact match */
++		vcpu_set_reg(vcpu, reg_ftr->reg, val);
++		vcpu_get_reg(vcpu, reg_ftr->reg, &val);
++		ASSERT_EQ(val, old_val);
++
++		/* Smaller value */
++		if (ftr > 0)
++			ftr--;
++		val &= ~reg_ftr->ftr_mask;
++		val |= field_prep(reg_ftr->ftr_mask, ftr);
++		r = __vcpu_set_reg(vcpu, reg_ftr->reg, val);
++		TEST_ASSERT(r < 0 && errno == EINVAL,
++			    "Unexpected KVM_SET_ONE_REG error: r=%d, errno=%d", r, errno);
++		vcpu_get_reg(vcpu, reg_ftr->reg, &val);
++		ASSERT_EQ(val, old_val);
++
++		/* Bigger value */
++		ftr += 2;
++		val &= ~reg_ftr->ftr_mask;
++		val |= field_prep(reg_ftr->ftr_mask, ftr);
++		r = __vcpu_set_reg(vcpu, reg_ftr->reg, val);
++		TEST_ASSERT(r < 0 && errno == EINVAL,
++			    "Unexpected KVM_SET_ONE_REG error: r=%d, errno=%d", r, errno);
++		vcpu_get_reg(vcpu, reg_ftr->reg, &val);
++		ASSERT_EQ(val, old_val);
++	}
++}
++
++static struct reg_feature fail_reg_ftrs[] = {
++	{ KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), ARM64_FEATURE_MASK(ID_AA64DFR0_WRPS) },
++	{ KVM_ARM64_SYS_REG(SYS_ID_DFR0_EL1), ARM64_FEATURE_MASK(ID_DFR0_MPROFDBG) },
++	{ KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), ARM64_FEATURE_MASK(ID_AA64PFR0_EL2) },
++	{ KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR0_EL1), ARM64_FEATURE_MASK(ID_AA64MMFR0_TGRAN64) },
++};
++
++static void test_user_set_fail(struct kvm_vcpu *vcpu)
++{
++	int i, r;
++
++	for (i = 0; i < ARRAY_SIZE(fail_reg_ftrs); i++) {
++		struct reg_feature *reg_ftr = fail_reg_ftrs + i;
++		uint64_t val, old_val, ftr;
++
++		vcpu_get_reg(vcpu, reg_ftr->reg, &val);
++		ftr = field_get(reg_ftr->ftr_mask, val);
++
++		/* Set a invalid value (too big) for the feature */
++		ftr++;
++
++		old_val = val;
++		val &= ~reg_ftr->ftr_mask;
++		val |= field_prep(reg_ftr->ftr_mask, ftr);
++
++		r = __vcpu_set_reg(vcpu, reg_ftr->reg, val);
++		TEST_ASSERT(r < 0 && errno == EINVAL,
++			    "Unexpected KVM_SET_ONE_REG error: r=%d, errno=%d", r, errno);
++
++		vcpu_get_reg(vcpu, reg_ftr->reg, &val);
++		ASSERT_EQ(val, old_val);
++	}
++}
++
++int main(void)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++
++	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
++
++	ksft_print_header();
++	ksft_set_plan(3);
++
++	test_user_set_lower_safe(vcpu);
++	ksft_test_result_pass("test_user_set_lower_safe\n");
++
++	test_user_set_exact(vcpu);
++	ksft_test_result_pass("test_user_set_exact\n");
++
++	test_user_set_fail(vcpu);
++	ksft_test_result_pass("test_user_set_fail\n");
++
++	kvm_vm_free(vm);
++
++	ksft_finished();
++}
 -- 
 2.41.0.255.g8b1d071c50-goog
 
