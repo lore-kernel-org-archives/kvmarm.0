@@ -1,100 +1,87 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9789125AD
-	for <kvmarm@lists.linux.dev>; Wed, 19 Jul 2023 14:16:56 +0000 (UTC)
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-267a0a0382eso2197439a91.1
-        for <kvmarm@lists.linux.dev>; Wed, 19 Jul 2023 07:16:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE761FC1
+	for <kvmarm@lists.linux.dev>; Wed, 19 Jul 2023 15:06:42 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-cf70b25bec1so458881276.3
+        for <kvmarm@lists.linux.dev>; Wed, 19 Jul 2023 08:06:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689776216; x=1692368216;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ply9vOQ7PKiPIjqcvpgXEIwEBxatqkRJB2ZRy5lS2Xc=;
-        b=QCgn5pm8yPPImP/ZfLF2Ea0jJXDpcGNQ/LF2jNeNTBG71TLZwae17UnwEuo78ONGHP
-         atCG9sArqHfv277Ky9HWUevcQtozR/I9rfoMFWMGzH2p/tn1UptotifJkTzwcjUzjGM4
-         2mRccC+Qe6eelyvVpzgsii1Dz38eewFROpWBRyPZo22w72yv1RXU/kRjiIgbgdf4vOiO
-         m+eFtOZOtzemALwYg0UpO5hPIX4qNwingmWVGWsEqCwrs8u/CIQrQXsRy9c4nWVOA7nY
-         TgAf9p3r7jbBOiu0L+1TlKBrMt3e7HNn72eYqwvkzNmnIVVzm8emG5isi9/yOnMB2w1e
-         eLcA==
+        d=google.com; s=20221208; t=1689779202; x=1690384002;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=eBIhzWfDS+UF35slzZBaGQv35ttbn9DL2xgC+Ekb+iQ=;
+        b=IlGZPX5F4SSdyFnDJtp36bcl6o7wvow7cHpDq0et6kecKltHa/FzES8Fi8MDnph9ox
+         QWHhwAqzLbgbdEpW3DxIZtS3t6ke4allTLDYG1uBiXX9mdwM2y9LV4iElZiyN/AlJhGw
+         8+nPgIJSBxz886OZq/48cD1WTjD2w08p8IsUtj1tIhbXlkOqO65leXl7E2+vxmvJUKQv
+         qoRK5RtiLdEHZbs5StSAfhBfXveYgUNpRZK5yZjSTEIihrLjh9RaVX2ScgaF5rUPtWQh
+         zw2Zm/Od0EcAuCssAnxAJsyoovhSqdxlS0Fu+UFi363v2TyuWdS712WjUYGZ7UwDUgt9
+         Zu1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689776216; x=1692368216;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ply9vOQ7PKiPIjqcvpgXEIwEBxatqkRJB2ZRy5lS2Xc=;
-        b=OmzBht1QbVTbvlr8lf8iWRd/3lApx2cDadJ2bXojcH6cxcty6aMnUGxrpFNiPqBkFM
-         9JVUZpB1l277o1m6+qjvKsWPwBUp2SXKvcvIXFOdo9T5AgJ6kOzGmXulEczTTyubOnBA
-         s870ibdF002a9jEKuj2BD+7atnIb/NfBme1/4Iq7uTPPL+j7IwmNVM5NhmjWgWf5tNN1
-         cCmrQ+PnAh8Qond66DVfIoeqqFLLmakdr+BoxI3VUu90VsCthHkEM/bvkxw8g25D7SRN
-         h9dFZZJi4uVABxAJxSspo9AqURbg8advNfXsGHUFaMoeJm2lyEMhgpTmn8ufbZf5DEdF
-         /z0w==
-X-Gm-Message-State: ABy/qLa6I3f45U1VoA1hRyexXHqKQc92L6YOhDbqyle22PuealjSs7nx
-	9cxMzPCG/2ZG5BG9zjOvu+bx/OOOJ4g=
-X-Google-Smtp-Source: APBJJlHe5KmJdZof+vQtZ6M87xlqjK1Ejx8t4AB5DMX6de6h21FipxJ2lQkyFnlQoXRyf3eYpC2jq3S2bQ0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:e542:b0:25b:f9e3:deab with SMTP id
- ei2-20020a17090ae54200b0025bf9e3deabmr136275pjb.9.1689776216142; Wed, 19 Jul
- 2023 07:16:56 -0700 (PDT)
-Date: Wed, 19 Jul 2023 07:16:54 -0700
-In-Reply-To: <20230719075440.m3h653frqggaiusc@yy-desk-7060>
+        d=1e100.net; s=20221208; t=1689779202; x=1690384002;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eBIhzWfDS+UF35slzZBaGQv35ttbn9DL2xgC+Ekb+iQ=;
+        b=NahOiYgf0y8obiTfPgQirvmT2lf9tKAgph0QKqoGcK1AXMGBbKALpuBML7CkIFDJwl
+         xlkpJDubfxbZb+B9RQWe7l3po2ziF6AeA0HZVP0wxB0blpcR1sMJrQXH/astAqpZuIS4
+         zL7GvKfBq/BjMlIYewRDArqgXC1fUbWvsLWBc8okDiFuJdZW3SfQo7I4Wt6wa612HCLg
+         5XHLwia3c7MUFyEt+bTDtsco6GKYQnz/gfnx6fnMW9QYsWB+lgznLirZiFxvM8C6L++u
+         l710zrDLfeB+uCvjTY5bVd8sGRLEOQnOxw1/DvBJ/uUQKQeNvwjdWY1pPMtt39zOdmSO
+         E+qA==
+X-Gm-Message-State: ABy/qLa47ViCrKsuk38F0X/9eokH/hINE5L+B+ktn4MLC9QI+BcZ9Kyt
+	2iwvF8QRQl20oXcmzNj0fchpaEDRiMY9NAlxt/Eo75ui4y9fRuWs0TQBb96GyBjq2ulzXrvo+/t
+	v1Vu8ou2eLNPExKlcau3kZwAOdWETYNd/vreAGsIGiJkJ+c/tk/16Dl/NKyw=
+X-Google-Smtp-Source: APBJJlEnpyER6hasefyardCvdGyJFKFkgPt6JYKN68YOsv9RGWEbjPakhns/+sjGbVIEhAIyuRR5WDxmKg==
+X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
+ (user=tabba job=sendgmr) by 2002:a5b:b03:0:b0:c5e:9e7e:4847 with SMTP id
+ z3-20020a5b0b03000000b00c5e9e7e4847mr24956ybp.5.1689779201652; Wed, 19 Jul
+ 2023 08:06:41 -0700 (PDT)
+Date: Wed, 19 Jul 2023 16:06:34 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-8-seanjc@google.com>
- <20230719075440.m3h653frqggaiusc@yy-desk-7060>
-Message-ID: <ZLfwVki27oLBGO6D@google.com>
-Subject: Re: [RFC PATCH v11 07/29] KVM: Add KVM_EXIT_MEMORY_FAULT exit
-From: Sean Christopherson <seanjc@google.com>
-To: Yuan Yao <yuan.yao@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Paul Moore <paul@paul-moore.com>, 
-	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Maciej Szmigiero <mail@maciej.szmigiero.name>, Vlastimil Babka <vbabka@suse.cz>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
+Message-ID: <20230719150639.1968034-1-tabba@google.com>
+Subject: [PATCH v1 0/5] Fix setting SVE and SME traps in (h)VHE
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.linux.dev
+Cc: maz@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com, 
+	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	will@kernel.org, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Jul 19, 2023, Yuan Yao wrote:
-> On Tue, Jul 18, 2023 at 04:44:50PM -0700, Sean Christopherson wrote:
-> > From: Chao Peng <chao.p.peng@linux.intel.com>
-> >
-> > This new KVM exit allows userspace to handle memory-related errors. It
-> > indicates an error happens in KVM at guest memory range [gpa, gpa+size).
-> > The flags includes additional information for userspace to handle the
-> > error. Currently bit 0 is defined as 'private memory' where '1'
-> > indicates error happens due to private memory access and '0' indicates
-> > error happens due to shared memory access.
-> 
-> Now it's bit 3:
+The (re)setting and disabling of SVE/SME trap handling (mostly)
+done for the hVHE work [*] misses a couple of cases.
 
-Yeah, I need to update (or write) a lot of changelogs.
+This patch series ensures that these traps are disabled on setup
+and reset. Moreover, it makes the code consistent in using
+CPACR_EL1 or CPTR_EL2, depending on the mode.
 
-> #define KVM_MEMORY_EXIT_FLAG_PRIVATE (1ULL << 3)
-> 
-> I remember some other attributes were introduced in v10 yet:
-> 
-> #define KVM_MEMORY_ATTRIBUTE_READ              (1ULL << 0)
-> #define KVM_MEMORY_ATTRIBUTE_WRITE             (1ULL << 1)
-> #define KVM_MEMORY_ATTRIBUTE_EXECUTE           (1ULL << 2)
-> #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
-> 
-> So KVM_MEMORY_EXIT_FLAG_PRIVATE changed to bit 3 due to above things,
-> or other reason ? (Sorry I didn't follow v10 too much before).
+Based on Linux 6.5-rc2.
 
-Yep, I want to reserve space for the RWX bits.
+Cheers,
+/fuad
+
+[*] https://lore.kernel.org/all/20230609162200.2024064-1-maz@kernel.org/
+
+Fuad Tabba (5):
+  KVM: arm64: Use the appropriate feature trap register for SVE at EL2
+    setup
+  KVM: arm64: Disable SME Traps for (h)VHE at setup
+  KVM: arm64: Use the appropriate feature trap register when activating
+    traps
+  KVM: arm64: Fix resetting SVE trap values on reset for hVHE
+  KVM: arm64: Fix resetting SME trap values on reset for (h)VHE
+
+ arch/arm64/include/asm/el2_setup.h   | 27 +++++++++++++++++++++------
+ arch/arm64/include/asm/kvm_emulate.h |  8 ++++++++
+ arch/arm64/kvm/hyp/nvhe/switch.c     |  6 +++++-
+ 3 files changed, 34 insertions(+), 7 deletions(-)
+
+
+base-commit: fdf0eaf11452d72945af31804e2a1048ee1b574c
+-- 
+2.41.0.255.g8b1d071c50-goog
+
