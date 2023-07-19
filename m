@@ -1,187 +1,144 @@
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E74D2EE
-	for <kvmarm@lists.linux.dev>; Wed, 19 Jul 2023 07:54:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689753290; x=1721289290;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=1N+W8cRNC9pUexWe7qJQhUtuOwgwVBF4LoLojnPzLGM=;
-  b=MixlU4/EWVcHlWqrt6Hw8mbKHeXxoeGFES3zm7xofvpXmrZrVumYhy+B
-   YqUYb46t+UKPkTsNgLiqajuhdJvXGF01ACu2lxkvSEIqS3vkU39IwbOJs
-   cHwft5ioO0Z9VFEVy5BKDPFQg7u5QxNtDoQwpGn99OI9OTXJ9n+0j/moX
-   uXd5hZexZet+n4BIlgZBEORiygVlEtqnNQmYt+PpsqasLpsS1arQqqjmf
-   lktJpa9sAGv+xfbQxQapRqWqAHLbSnF/Z4Zo9Ua6QRyNW53t/DyChJkqz
-   ypca3FEhhBZ+xs8TlSgoJgFCxngVKRKOg9iI26X6oTjGzaDBsC6amxwly
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="397250595"
-X-IronPort-AV: E=Sophos;i="6.01,216,1684825200"; 
-   d="scan'208";a="397250595"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2023 00:54:49 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="814045464"
-X-IronPort-AV: E=Sophos;i="6.01,216,1684825200"; 
-   d="scan'208";a="814045464"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by FMSMGA003.fm.intel.com with ESMTP; 19 Jul 2023 00:54:41 -0700
-Date: Wed, 19 Jul 2023 15:54:40 +0800
-From: Yuan Yao <yuan.yao@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
-	Yu Zhang <yu.c.zhang@linux.intel.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	Ackerley Tng <ackerleytng@google.com>,
-	Maciej Szmigiero <mail@maciej.szmigiero.name>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	David Hildenbrand <david@redhat.com>,
-	Quentin Perret <qperret@google.com>,
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
-	Liam Merwick <liam.merwick@oracle.com>,
-	Isaku Yamahata <isaku.yamahata@gmail.com>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [RFC PATCH v11 07/29] KVM: Add KVM_EXIT_MEMORY_FAULT exit
-Message-ID: <20230719075440.m3h653frqggaiusc@yy-desk-7060>
-References: <20230718234512.1690985-1-seanjc@google.com>
- <20230718234512.1690985-8-seanjc@google.com>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B899A101FD
+	for <kvmarm@lists.linux.dev>; Wed, 19 Jul 2023 08:49:01 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E44E42F4;
+	Wed, 19 Jul 2023 01:49:38 -0700 (PDT)
+Received: from [10.57.33.122] (unknown [10.57.33.122])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1281B3F67D;
+	Wed, 19 Jul 2023 01:48:52 -0700 (PDT)
+Message-ID: <4df25be4-d060-337e-f5b7-f7a13f0df85e@arm.com>
+Date: Wed, 19 Jul 2023 09:48:51 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230718234512.1690985-8-seanjc@google.com>
-User-Agent: NeoMutt/20171215
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.12.0
+Subject: Re: [PATCH 06/27] arm64: Add debug registers affected by HDFGxTR_EL2
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Eric Auger <eric.auger@redhat.com>, Mark Brown <broonie@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>,
+ Chase Conklin <chase.conklin@arm.com>,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Darren Hart <darren@os.amperecomputing.com>,
+ Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20230712145810.3864793-1-maz@kernel.org>
+ <20230712145810.3864793-7-maz@kernel.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20230712145810.3864793-7-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 18, 2023 at 04:44:50PM -0700, Sean Christopherson wrote:
-> From: Chao Peng <chao.p.peng@linux.intel.com>
->
-> This new KVM exit allows userspace to handle memory-related errors. It
-> indicates an error happens in KVM at guest memory range [gpa, gpa+size).
-> The flags includes additional information for userspace to handle the
-> error. Currently bit 0 is defined as 'private memory' where '1'
-> indicates error happens due to private memory access and '0' indicates
-> error happens due to shared memory access.
-
-Now it's bit 3:
-
-#define KVM_MEMORY_EXIT_FLAG_PRIVATE (1ULL << 3)
-
-I remember some other attributes were introduced in v10 yet:
-
-#define KVM_MEMORY_ATTRIBUTE_READ              (1ULL << 0)
-#define KVM_MEMORY_ATTRIBUTE_WRITE             (1ULL << 1)
-#define KVM_MEMORY_ATTRIBUTE_EXECUTE           (1ULL << 2)
-#define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
-
-So KVM_MEMORY_EXIT_FLAG_PRIVATE changed to bit 3 due to above things,
-or other reason ? (Sorry I didn't follow v10 too much before).
-
->
-> When private memory is enabled, this new exit will be used for KVM to
-> exit to userspace for shared <-> private memory conversion in memory
-> encryption usage. In such usage, typically there are two kind of memory
-> conversions:
->   - explicit conversion: happens when guest explicitly calls into KVM
->     to map a range (as private or shared), KVM then exits to userspace
->     to perform the map/unmap operations.
->   - implicit conversion: happens in KVM page fault handler where KVM
->     exits to userspace for an implicit conversion when the page is in a
->     different state than requested (private or shared).
->
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Co-developed-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> Reviewed-by: Fuad Tabba <tabba@google.com>
-> Tested-by: Fuad Tabba <tabba@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On 12/07/2023 15:57, Marc Zyngier wrote:
+> The HDFGxTR_EL2 registers trap a (huge) set of debug and trace
+> related registers. Add their encodings (and only that, because
+> we really don't care about what these registers actually do at
+> this stage).
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  Documentation/virt/kvm/api.rst | 22 ++++++++++++++++++++++
->  include/uapi/linux/kvm.h       |  8 ++++++++
->  2 files changed, 30 insertions(+)
->
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index c0ddd3035462..34d4ce66e0c8 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6700,6 +6700,28 @@ array field represents return values. The userspace should update the return
->  values of SBI call before resuming the VCPU. For more details on RISC-V SBI
->  spec refer, https://github.com/riscv/riscv-sbi-doc.
->
-> +::
+>   arch/arm64/include/asm/sysreg.h | 78 +++++++++++++++++++++++++++++++++
+>   1 file changed, 78 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 76289339b43b..9dfd127be55a 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -194,6 +194,84 @@
+>   #define SYS_DBGDTRTX_EL0		sys_reg(2, 3, 0, 5, 0)
+>   #define SYS_DBGVCR32_EL2		sys_reg(2, 4, 0, 7, 0)
+>   
+> +#define SYS_BRBINF_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 0))
+> +#define SYS_BRBINFINJ_EL1		sys_reg(2, 1, 9, 1, 0)
+> +#define SYS_BRBSRC_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 1))
+> +#define SYS_BRBSRCINJ_EL1		sys_reg(2, 1, 9, 1, 1)
+> +#define SYS_BRBTGT_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 2))
+> +#define SYS_BRBTGTINJ_EL1		sys_reg(2, 1, 9, 1, 2)
+> +#define SYS_BRBTS_EL1			sys_reg(2, 1, 9, 0, 2)
 > +
-> +		/* KVM_EXIT_MEMORY_FAULT */
-> +		struct {
-> +  #define KVM_MEMORY_EXIT_FLAG_PRIVATE	(1ULL << 3)
-> +			__u64 flags;
-> +			__u64 gpa;
-> +			__u64 size;
-> +		} memory;
+> +#define SYS_BRBCR_EL1			sys_reg(2, 1, 9, 0, 0)
+> +#define SYS_BRBFCR_EL1			sys_reg(2, 1, 9, 0, 1)
+> +#define SYS_BRBIDR0_EL1			sys_reg(2, 1, 9, 2, 0)
 > +
-> +If exit reason is KVM_EXIT_MEMORY_FAULT then it indicates that the VCPU has
-> +encountered a memory error which is not handled by KVM kernel module and
-> +userspace may choose to handle it. The 'flags' field indicates the memory
-> +properties of the exit.
+> +#define SYS_TRCITECR_EL1		sys_reg(3, 0, 1, 2, 3)
+> +#define SYS_TRCITECR_EL1		sys_reg(3, 0, 1, 2, 3)
+> +#define SYS_TRCACATR(m)			sys_reg(2, 1, 2, ((m & 7) << 1), (2 | (m >> 3)))
+> +#define SYS_TRCACVR(m)			sys_reg(2, 1, 2, ((m & 7) << 1), (0 | (m >> 3)))
+> +#define SYS_TRCAUTHSTATUS		sys_reg(2, 1, 7, 14, 6)
+> +#define SYS_TRCAUXCTLR			sys_reg(2, 1, 0, 6, 0)
+> +#define SYS_TRCBBCTLR			sys_reg(2, 1, 0, 15, 0)
+> +#define SYS_TRCCCCTLR			sys_reg(2, 1, 0, 14, 0)
+> +#define SYS_TRCCIDCCTLR0		sys_reg(2, 1, 3, 0, 2)
+> +#define SYS_TRCCIDCCTLR1		sys_reg(2, 1, 3, 1, 2)
+> +#define SYS_TRCCIDCVR(m)		sys_reg(2, 1, 3, ((m & 7) << 1), 0)
+> +#define SYS_TRCCLAIMCLR			sys_reg(2, 1, 7, 9, 6)
+> +#define SYS_TRCCLAIMSET			sys_reg(2, 1, 7, 8, 6)
+> +#define SYS_TRCCNTCTLR(m)		sys_reg(2, 1, 0, (4 | (m & 3)), 5)
+> +#define SYS_TRCCNTRLDVR(m)		sys_reg(2, 1, 0, (0 | (m & 3)), 5)
+> +#define SYS_TRCCNTVR(m)			sys_reg(2, 1, 0, (8 | (m & 3)), 5)
+> +#define SYS_TRCCONFIGR			sys_reg(2, 1, 0, 4, 0)
+> +#define SYS_TRCDEVARCH			sys_reg(2, 1, 7, 15, 6)
+> +#define SYS_TRCDEVID			sys_reg(2, 1, 7, 2, 7)
+> +#define SYS_TRCEVENTCTL0R		sys_reg(2, 1, 0, 8, 0)
+> +#define SYS_TRCEVENTCTL1R		sys_reg(2, 1, 0, 9, 0)
+> +#define SYS_TRCEXTINSELR(m)		sys_reg(2, 1, 0, (8 | (m & 3)), 4)
+> +#define SYS_TRCIDR0			sys_reg(2, 1, 0, 8, 7)
+> +#define SYS_TRCIDR10			sys_reg(2, 1, 0, 2, 6)
+> +#define SYS_TRCIDR11			sys_reg(2, 1, 0, 3, 6)
+> +#define SYS_TRCIDR12			sys_reg(2, 1, 0, 4, 6)
+> +#define SYS_TRCIDR13			sys_reg(2, 1, 0, 5, 6)
+> +#define SYS_TRCIDR1			sys_reg(2, 1, 0, 9, 7)
+> +#define SYS_TRCIDR2			sys_reg(2, 1, 0, 10, 7)
+> +#define SYS_TRCIDR3			sys_reg(2, 1, 0, 11, 7)
+> +#define SYS_TRCIDR4			sys_reg(2, 1, 0, 12, 7)
+> +#define SYS_TRCIDR5			sys_reg(2, 1, 0, 13, 7)
+> +#define SYS_TRCIDR6			sys_reg(2, 1, 0, 14, 7)
+> +#define SYS_TRCIDR7			sys_reg(2, 1, 0, 15, 7)
+> +#define SYS_TRCIDR8			sys_reg(2, 1, 0, 0, 6)
+> +#define SYS_TRCIDR9			sys_reg(2, 1, 0, 1, 6)
+> +#define SYS_TRCIMSPEC0			sys_reg(2, 1, 0, 0, 7)
+> +#define SYS_TRCIMSPEC(m)		sys_reg(2, 1, 0, (m & 7), 7)
+> +#define SYS_TRCITEEDCR			sys_reg(2, 1, 0, 2, 1)
+> +#define SYS_TRCOSLSR			sys_reg(2, 1, 1, 1, 4)
+> +#define SYS_TRCPRGCTLR			sys_reg(2, 1, 0, 1, 0)
+> +#define SYS_TRCQCTLR			sys_reg(2, 1, 0, 1, 1)
+> +#define SYS_TRCRSCTLR(m)		sys_reg(2, 1, 1, (m & 15), (0 | (m >> 4)))
+> +#define SYS_TRCRSR			sys_reg(2, 1, 0, 10, 0)
+> +#define SYS_TRCSEQEVR(m)		sys_reg(2, 1, 0, (m & 3), 4)
+> +#define SYS_TRCSEQRSTEVR		sys_reg(2, 1, 0, 6, 4)
+> +#define SYS_TRCSEQSTR			sys_reg(2, 1, 0, 7, 4)
+> +#define SYS_TRCSSCCR(m)			sys_reg(2, 1, 1, (m & 7), 2)
+> +#define SYS_TRCSSCSR(m)			sys_reg(2, 1, 1, (8 | (m & 7)), 2)
+> +#define SYS_TRCSSPCICR(m)		sys_reg(2, 1, 1, (m & 7), 3)
+> +#define SYS_TRCSTALLCTLR		sys_reg(2, 1, 0, 11, 0)
+> +#define SYS_TRCSTATR			sys_reg(2, 1, 0, 3, 0)
+> +#define SYS_TRCSYNCPR			sys_reg(2, 1, 0, 13, 0)
+> +#define SYS_TRCTRACEIDR			sys_reg(2, 1, 0, 0, 1)
+> +#define SYS_TRCTSCTLR			sys_reg(2, 1, 0, 12, 0)
+> +#define SYS_TRCVICTLR			sys_reg(2, 1, 0, 0, 2)
+> +#define SYS_TRCVIIECTLR			sys_reg(2, 1, 0, 1, 2)
+> +#define SYS_TRCVIPCSSCTLR		sys_reg(2, 1, 0, 3, 2)
+> +#define SYS_TRCVISSCTLR			sys_reg(2, 1, 0, 2, 2)
+> +#define SYS_TRCVMIDCCTLR0		sys_reg(2, 1, 3, 2, 2)
+> +#define SYS_TRCVMIDCCTLR1		sys_reg(2, 1, 3, 3, 2)
+> +#define SYS_TRCVMIDCVR(m)		sys_reg(2, 1, 3, ((m & 7) << 1), 1)
 > +
-> + - KVM_MEMORY_EXIT_FLAG_PRIVATE - indicates the memory error is caused by
-> +   private memory access when the bit is set. Otherwise the memory error is
-> +   caused by shared memory access when the bit is clear.
-> +
-> +'gpa' and 'size' indicate the memory range the error occurs at. The userspace
-> +may handle the error and return to KVM to retry the previous memory access.
-> +
->  ::
->
->      /* KVM_EXIT_NOTIFY */
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 4d4b3de8ac55..6c6ed214b6ac 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -274,6 +274,7 @@ struct kvm_xen_exit {
->  #define KVM_EXIT_RISCV_SBI        35
->  #define KVM_EXIT_RISCV_CSR        36
->  #define KVM_EXIT_NOTIFY           37
-> +#define KVM_EXIT_MEMORY_FAULT     38
->
->  /* For KVM_EXIT_INTERNAL_ERROR */
->  /* Emulate instruction failed. */
-> @@ -520,6 +521,13 @@ struct kvm_run {
->  #define KVM_NOTIFY_CONTEXT_INVALID	(1 << 0)
->  			__u32 flags;
->  		} notify;
-> +		/* KVM_EXIT_MEMORY_FAULT */
-> +		struct {
-> +#define KVM_MEMORY_EXIT_FLAG_PRIVATE	(1ULL << 3)
-> +			__u64 flags;
-> +			__u64 gpa;
-> +			__u64 size;
-> +		} memory;
->  		/* Fix the size of the union. */
->  		char padding[256];
->  	};
-> --
-> 2.41.0.255.g8b1d071c50-goog
->
+> +/* ETM */
+> +#define SYS_TRCOSLAR			sys_reg(2, 1, 1, 0, 4)
+
+For all ETM Trace related registers. I compared them with the list
+we have in ETM/ETE driver and used a script to generate sys_reg encoding
+from the macros we have (which consumes an MMIO offset). The list
+covers the registers accessible only via system instructions
+and the encodings match.
+
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+
