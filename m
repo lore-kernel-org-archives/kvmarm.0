@@ -1,89 +1,84 @@
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C964154BF
-	for <kvmarm@lists.linux.dev>; Wed, 19 Jul 2023 15:06:54 +0000 (UTC)
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-3143a431a01so3838701f8f.1
-        for <kvmarm@lists.linux.dev>; Wed, 19 Jul 2023 08:06:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689779213; x=1690384013;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oxUhPETpdlwBKSi5jZ4V6US8ie1o/QLW+MfvBIA7CqE=;
-        b=xqzWAQcI0wUNfGHLvJy79VCY2u59Mms7FpqcR60BzccvjCleBCfLE+rZQoIFLq4Qn7
-         sfK9OEZ7x0esx4MbDw0WuCWUvFAy/TQSSpHcZITDwg4d7RlWnua0Y+WBC+qPr/gcHfRx
-         nTp/TF/ivaM50Rd+Rj7dWZu63lcJrzwPcaNgbzv5TZw5+xv6N7vlovIguc/Tnf8lNLQF
-         /enYXRpJU0PNH8vO7iE9hxgo+W/UFRq21nzENMYsNto5EpLTlWMBqs9xSg6izy1SW3KI
-         IgYB6SQ0TK6hyy8eSjRS9yhaOF16JpudRMx1BS3q1wjMzkvVVEN5osnbzZCiNu8hH4t9
-         Dyvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689779213; x=1690384013;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oxUhPETpdlwBKSi5jZ4V6US8ie1o/QLW+MfvBIA7CqE=;
-        b=OsvoM4pcFz8JC//PxywqpzKXcVGlOncSZccALn6Oeg//ecyoXvYspnttPUf59+lEwF
-         AKpGUIKQiq70T3Q9hwL6/tT7nKQFseICaN+GjzZY/rm5aP9OmiDEWEN8lXZEG2rxPT16
-         0IyKNd7L6YZmrkOvFSfV4I/c6lo/HB5V7CxXFAE7tzFlJhPIvubKJDjAkbH5rTeAXFwf
-         KjtlZmn74tEGWqNGjsLQ+d1yAFQJOwMTN4/7c+G4nVMEMSJ7SBL0J21R+ZAueK7i2OYH
-         5UBS41HPnTndKimRaFKhbqWQ3ia7RsS+zxJH+4nFflbkbYmbmrwW66gmyuqOOaxRXWhY
-         7/ww==
-X-Gm-Message-State: ABy/qLYB7L1VzM8WaP8U4jWjP13vJLypkKkLaDMeVakOokNh7ofkv9sh
-	cJ5PT+BS40M/zNoUojo0LubI8juUdctowyQB5gjTwuU/sK/j6vnXQ/E9AChjvD8cxXBWxmLz7OM
-	9yW2UeVR41irxrA3DnVpAgFzWidSDMstEgiYP6QOwCZvTVxQkmClogJowDzw=
-X-Google-Smtp-Source: APBJJlHGDEUk5DTf4StFzLCB1nZXOxhMyDHBE7Ht2XW4RlQV+9w0QlLSNr8kFBLKhmzU7u3BAOJ5C5VTVw==
-X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a5d:4641:0:b0:313:f2bf:4c43 with SMTP id
- j1-20020a5d4641000000b00313f2bf4c43mr1032wrs.2.1689779212830; Wed, 19 Jul
- 2023 08:06:52 -0700 (PDT)
-Date: Wed, 19 Jul 2023 16:06:39 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 275F914A86
+	for <kvmarm@lists.linux.dev>; Wed, 19 Jul 2023 15:20:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3255C433C8;
+	Wed, 19 Jul 2023 15:20:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689780035;
+	bh=cQet6Vt0jQOV5Knc5ydF2lhZL6NPJ407TEb5B3QrwcI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=oaroyjGr5mldeJ/3/1xA31SWf6CkenbxNDpltemvoK2fomQspSiympmX762rrjejm
+	 oOx/EFZPxF6QemJtfj6Pdn9XsfH1rncwX78LOrkqqWV/ev/qBnptidDRMtsqNUIPGg
+	 7opJKiKrJb3DM7J5+Do4ZpKQ77B/z96LiCXWlHciRKhy+OlOo7HEK80fufkWYSJ7BO
+	 uiS2sCj7lkCYtArJtK4x83g4V0UIbrdjkTZB5WKjXSEK/ka908ftvqQwqpV2sRi1Dn
+	 GAnh6OH1eFhwxXOxfBi04pRcGPnVs1dillgjjACcm7+ONbrLLdosqifyoNMgTtKKbO
+	 AvGPXeOAQrCFQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qM8yf-00EPul-8Q;
+	Wed, 19 Jul 2023 16:20:33 +0100
+Date: Wed, 19 Jul 2023 16:20:33 +0100
+Message-ID: <86v8egszb2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	oliver.upton@linux.dev,
+	catalin.marinas@arm.com,
+	james.morse@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	will@kernel.org
+Subject: Re: [PATCH v1 0/5] Fix setting SVE and SME traps in (h)VHE
 In-Reply-To: <20230719150639.1968034-1-tabba@google.com>
+References: <20230719150639.1968034-1-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230719150639.1968034-1-tabba@google.com>
-X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
-Message-ID: <20230719150639.1968034-6-tabba@google.com>
-Subject: [PATCH v1 5/5] KVM: arm64: Fix resetting SME trap values on reset for (h)VHE
-From: Fuad Tabba <tabba@google.com>
-To: kvmarm@lists.linux.dev
-Cc: maz@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com, 
-	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	will@kernel.org, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, oliver.upton@linux.dev, catalin.marinas@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Ensure that SME traps are disabled for (h)VHE when getting the
-reset value for the architectural feature control register.
+Hey Fuad,
 
-Fixes: 75c76ab5a641 ("KVM: arm64: Rework CPTR_EL2 programming for HVHE configuration")
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/include/asm/kvm_emulate.h | 4 ++++
- 1 file changed, 4 insertions(+)
+Many thanks for looking into this, much appreciated. A passing comment
+below.
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 997c0ae72204..c37584f77f4f 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -578,12 +578,16 @@ static __always_inline u64 kvm_get_reset_cptr_el2(struct kvm_vcpu *vcpu)
- 	if (has_vhe()) {
- 		val = (CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |
- 		       CPACR_EL1_ZEN_EL1EN);
-+		if (cpus_have_final_cap(ARM64_SME))
-+			val |= CPACR_EL1_SMEN_EL1EN;
- 	} else if (has_hvhe()) {
- 		val = (CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN);
- 
- 		if (vcpu_has_sve(vcpu) &&
- 		    (vcpu->arch.fp_state != FP_STATE_GUEST_OWNED))
- 			val |= CPACR_EL1_ZEN_EL1EN | CPACR_EL1_ZEN_EL0EN;
-+		if (cpus_have_final_cap(ARM64_SME))
-+			val |= CPACR_EL1_SMEN_EL1EN | CPACR_EL1_SMEN_EL0EN;
- 	} else {
- 		val = CPTR_NVHE_EL2_RES1;
- 
+On Wed, 19 Jul 2023 16:06:34 +0100,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> The (re)setting and disabling of SVE/SME trap handling (mostly)
+> done for the hVHE work [*] misses a couple of cases.
+> 
+> This patch series ensures that these traps are disabled on setup
+> and reset. Moreover, it makes the code consistent in using
+> CPACR_EL1 or CPTR_EL2, depending on the mode.
+
+To provide context, this last point isn't really a correctness issue.
+It only ensures that:
+
+- we don't need to issue a synchronisation when alternating one or the
+  other accessor,
+
+- when running hVHE under NV, we don't trap unnecessarily on accessing
+  CPTR_EL2, while CPACR_EL1 can be used directly without any trap.
+
+I'll have a look at the actual patches shortly.
+
+Thanks again,
+
+	M.
+
 -- 
-2.41.0.255.g8b1d071c50-goog
-
+Without deviation from the norm, progress is not possible.
