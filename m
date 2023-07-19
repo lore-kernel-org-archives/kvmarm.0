@@ -1,101 +1,118 @@
-Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-50.mta1.migadu.com (out-50.mta1.migadu.com [95.215.58.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DFC1275A4
-	for <kvmarm@lists.linux.dev>; Wed, 19 Jul 2023 18:41:13 +0000 (UTC)
-Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-48137f8b118so769786e0c.0
-        for <kvmarm@lists.linux.dev>; Wed, 19 Jul 2023 11:41:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689792073; x=1690396873;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KBoCKwV9+yw5yEM2f9YXHvNElnWUATO81mW+x/3Putw=;
-        b=bufVZJwM1OlyCyiEwHt7Sv2C+PzUgWOJOonyUixehBdihStk3zFElamFU5TGF0ITN1
-         vzly1rT68+WUMJpRX+A3cMyXENHCjwrIFvlflflSLu7qhY+3RnghxiQIBOkadxqXVo+m
-         gb5XrhgCF4esJh7njnxijnq6gXFVoOcU1C1cgwOmF7IUxS1ZxaW93fk6gPBrGKslhR0s
-         I0Koe86t3YGV17q+UZ7TcMiUoenIaX7sgszozctU8dZPMyegtUDG7mVI/fIvKC5BOCpV
-         4YKinkYz8WYkh+aM0fy7l/4oDMuUz5QIMs22ArwvVIvQWJ/ZHVxhd7PHUhyYmJBrIaO+
-         68DA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689792073; x=1690396873;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KBoCKwV9+yw5yEM2f9YXHvNElnWUATO81mW+x/3Putw=;
-        b=WAwu5YQNzuLV622qpneqH4A1jUy2gzWcbBn3Q0hvjV5IyZvfoSEfqPsG1aX5BnSr3Q
-         XlMIf76EewOv7pUXRu67NXqUT4Z5rnD2HMsJH+gZ4INlUGW2XCwOjzxGjgj7FIVbWL2v
-         V78OWUAE3iHbIV1AFlrQK6UuTEBTNVPkHwgGxhUKyyJrFJ5Ll/o7ugULPBV3riHMwi7d
-         eXdQzUdhVRhoFAuKGuHJdXbNGAvwZQVq6EI2BAvj5WX8rNHi/P3RkQ5ZR9lbXwT0HUIg
-         DQ1vJyeGrGYGUIm2sQKicsm4IYgclkbVi07iGOQ9QDrlHKuvQSvEA+6lCyVMZFlx7/jM
-         0AjQ==
-X-Gm-Message-State: ABy/qLZq7juveQQ5dh3vEp4dbAV5kQ6brQDEp+VFG2pyhh4cfRVOpGPn
-	cbfwB03I19eq0bREO9es3b5AIsOQ6fgDUkbMFxTX0Q==
-X-Google-Smtp-Source: APBJJlEaFhuR7LxE3Zol8qn/Vo4SkP0z/sENVPmxOzW7kY4ywKmROzfccqY0mAsHXBSUSULqGzDwPYG9pzo8FtzNQEM=
-X-Received: by 2002:a05:6122:31a7:b0:47c:95d2:da25 with SMTP id
- ch39-20020a05612231a700b0047c95d2da25mr1408428vkb.2.1689792072611; Wed, 19
- Jul 2023 11:41:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E14C6156EC
+	for <kvmarm@lists.linux.dev>; Wed, 19 Jul 2023 20:48:19 +0000 (UTC)
+Date: Wed, 19 Jul 2023 20:48:13 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1689799697;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ABmm8ziz9w11JK63dBDo/JptwWWVO+Y+GrOZN7APQNo=;
+	b=QbYLN3KsKY0UMpUE5N0eq/DOFDyLXqbm3K+hyONSSXH3wZQHs8MT77tS5XJr3QJq+IP5pb
+	Z8SO/+JsRWBto74/wxwKIzmZoubj4AVb3sXX621eRLSyhaY4s1H7YaOlFv8SE9oVCYuxed
+	J7dOGvyYBSQgQoUZOa6NV5OgRwc0sF4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	Reiji Watanabe <reijiw@google.com>, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Fix CPUHP logic for protected KVM
+Message-ID: <ZLhMDapXa2djVzf0@linux.dev>
+References: <20230719175400.647154-1-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230719150639.1968034-1-tabba@google.com> <20230719150639.1968034-4-tabba@google.com>
- <ZLgh+rPYxTjmD6xR@linux.dev>
-In-Reply-To: <ZLgh+rPYxTjmD6xR@linux.dev>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 19 Jul 2023 19:40:35 +0100
-Message-ID: <CA+EHjTwX03MQeuFnWY6vpoWtKMd7OP-Z2=EdZKQaeYJ07WOfLw@mail.gmail.com>
-Subject: Re: [PATCH v1 3/5] KVM: arm64: Use the appropriate feature trap
- register when activating traps
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, maz@kernel.org, catalin.marinas@arm.com, 
-	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	will@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230719175400.647154-1-rananta@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Oliver,
+On Wed, Jul 19, 2023 at 05:54:00PM +0000, Raghavendra Rao Ananta wrote:
+> For protected kvm, the CPU hotplug 'down' logic currently brings
+> down the timer and vGIC, essentially disabling interrupts. However,
+> because of how the 'kvm_arm_hardware_enabled' flag is designed, it
+> never re-enables them back on the CPU hotplug 'up' path. Hence,
+> clean up the logic to maintain the CPU hotplug up/down symmetry.
 
-On Wed, Jul 19, 2023 at 6:48=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> On Wed, Jul 19, 2023 at 04:06:37PM +0100, Fuad Tabba wrote:
-> > Use the architectural feature trap/control register that
-> > corresponds to the current KVM mode, i.e., CPTR_EL2 or CPACR_EL1,
-> > when activating traps.
-> >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/switch.c | 6 +++++-
-> >  1 file changed, 5 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe=
-/switch.c
-> > index 0a6271052def..e5ea517bab9c 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> > @@ -63,7 +63,11 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
-> >               __activate_traps_fpsimd32(vcpu);
-> >       }
-> >
-> > -     write_sysreg(val, cptr_el2);
-> > +     if (has_hvhe())
-> > +             write_sysreg(val, cpacr_el1);
-> > +     else
-> > +             write_sysreg(val, cptr_el2);
-> > +
->
-> Does it make sense to have an accessor that's shared with
-> kvm_reset_cptr_el2()? Due to the lack of synchronization between the
-> aliases we really want to avoid inconsistently using one or the other.
+Correct me if I am wrong, but this issue exists outside of cpu hotplug,
+right? init_subsystems() calls _kvm_arch_hardware_enable() on all cores,
+which only sets up the hyp cpu context and not the percpu interrupts.
+Similar issue exists for the cpu that calls do_pkvm_init().
 
-I think that's a good idea. I'll add one when I respin.
+I'll also note kvm_arm_hardware_enabled is deceptively vague, as it only
+keeps track of whether or not the hyp cpu context has been initialized.
+May send a cleanup here in a bit.
 
-Cheers,
-/fuad
+Perhaps this for the changelog:
 
-> --
-> Thanks,
-> Oliver
+  KVM: arm64: Fix hardware enable/disable flows for pKVM
+
+  When running in protected mode, the hyp stub is disabled after pKVM is
+  initialized, meaning the host cannot enable/disable the hyp at
+  runtime. As such, kvm_arm_hardware_enabled is always 1 after
+  initialization, and kvm_arch_hardware_enable() never enables the vgic
+  maintenance irq or timer irqs.
+
+  Unconditionally enable/disable the vgic + timer irqs in the respective
+  calls, instead relying on the percpu bookkeeping in the generic code
+  to keep track of which cpus have the interrupts unmasked.
+
+> Fixes: 466d27e48d7c ("KVM: arm64: Simplify the CPUHP logic")
+> Reported-by: Oliver Upton <oliver.upton@linux.dev>
+> Suggested-by: Oliver Upton <oliver.upton@linux.dev>
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  arch/arm64/kvm/arm.c | 14 ++++----------
+>  1 file changed, 4 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index c2c14059f6a8..010ebfa69650 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1867,14 +1867,10 @@ static void _kvm_arch_hardware_enable(void *discard)
+>  
+>  int kvm_arch_hardware_enable(void)
+>  {
+> -	int was_enabled = __this_cpu_read(kvm_arm_hardware_enabled);
+> -
+>  	_kvm_arch_hardware_enable(NULL);
+>  
+> -	if (!was_enabled) {
+> -		kvm_vgic_cpu_up();
+> -		kvm_timer_cpu_up();
+> -	}
+> +	kvm_vgic_cpu_up();
+> +	kvm_timer_cpu_up();
+>  
+>  	return 0;
+>  }
+> @@ -1889,10 +1885,8 @@ static void _kvm_arch_hardware_disable(void *discard)
+>  
+>  void kvm_arch_hardware_disable(void)
+>  {
+> -	if (__this_cpu_read(kvm_arm_hardware_enabled)) {
+> -		kvm_timer_cpu_down();
+> -		kvm_vgic_cpu_down();
+> -	}
+> +	kvm_timer_cpu_down();
+> +	kvm_vgic_cpu_down();
+>  
+>  	if (!is_protected_kvm_enabled())
+>  		_kvm_arch_hardware_disable(NULL);
+> -- 
+> 2.41.0.487.g6d72f3e995-goog
+> 
+
+-- 
+Thanks,
+Oliver
