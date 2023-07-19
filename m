@@ -1,110 +1,183 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-48.mta1.migadu.com (out-48.mta1.migadu.com [95.215.58.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 682FF22EF1
-	for <kvmarm@lists.linux.dev>; Wed, 19 Jul 2023 21:57:29 +0000 (UTC)
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-c64ef5bde93so104327276.0
-        for <kvmarm@lists.linux.dev>; Wed, 19 Jul 2023 14:57:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689803848; x=1690408648;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=d3Ht7L7dsVm5KYjvx2fbdO1jyBq4m055oYZLq1pDnXs=;
-        b=Ra8+xJNP/sYgyLpaDBs1F288TIvL1tnzWLHFmnzM7/dQqrNn5YcbKDgTbFtPDZD/ha
-         K8MFOKEa+OQyC87XpoOeppzZtaRCkoHPRaR+wC1YoKWuo1BAl875kJyfty5HOfA/hD9+
-         DfLJhptuW65V2HY78jzcImh3piPxWnQw9n9gcwz97bbRazS7jcez6cAmtuqzFBjG12+w
-         mtv2cEj7lNF4fu2yhTlpdewK1595/OJ//S3L+ici78yhdckGjZky1+pC4CyEGkAidHWm
-         IBziZwUK+XXVoHgvync2hHaby+uusAd+25S0ybYENq7qI1Wh9pAbi7wcu7J7bvZIarxv
-         g/Fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689803848; x=1690408648;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=d3Ht7L7dsVm5KYjvx2fbdO1jyBq4m055oYZLq1pDnXs=;
-        b=llFr5+FAP9amE2bQef2Ec+voueqVRUg2oiXOPtXSiKeDrFN3pVXhw4chqWLU2Rdq6L
-         7FurhfUQD/CCgb5yfamIK7DLzafY4MLM5jntQaLGfJO0NYvtXkJtP/S9jjyD2eN/PA3p
-         ZJFUs0Ujg+aAS4lrT4Xq7gYips4Pfku+IjMS0ijybk4UZk1bDIpjk6p7/mQklOvMEZcn
-         BjY3YfFsq42LWzG1Z8vJbRzZsSro94s1qc886JAahj7yd4c8ps0mYmfvXqGefZJa2zCq
-         j4p0DegYjk/T7q9h4R1ufu8kbxR1w/MZyVaDIm24FlQVdkZl0hr08z4zUGPDF/rl3wb3
-         V2xw==
-X-Gm-Message-State: ABy/qLYdTJ2PWkU6Kl07SJz2ocyU7IV7caxjFF8jTEiAh9M+SmiFR8dJ
-	/bRpGb8adp22fmbzPfMS2viABWP2EHNX
-X-Google-Smtp-Source: APBJJlFhBf7IMPO6XHr8iP300gZpPf9iE5qcascfXqirJteE6s/G8oXQ/YGVmqERwG2BAFqqgzagvO/iZ6Qg
-X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
- (user=rananta job=sendgmr) by 2002:a5b:352:0:b0:cc7:b850:7f2 with SMTP id
- q18-20020a5b0352000000b00cc7b85007f2mr30000ybp.5.1689803848368; Wed, 19 Jul
- 2023 14:57:28 -0700 (PDT)
-Date: Wed, 19 Jul 2023 21:57:25 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B241BB27
+	for <kvmarm@lists.linux.dev>; Wed, 19 Jul 2023 23:19:07 +0000 (UTC)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1689808744;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=RInEWc3E9TaPTm8drtOMJ4+JYKQUruPRE5WAbSdwOs4=;
+	b=XLSKPpEVjzQbO2dlmWEmOAjmgx/JQaXd9ku4THGMbMiw8XFQ9Rnfw1fTz7GL6+Wh9ly0sw
+	ZnEZ0xUVqLItE3eMIHoMFxHU+Q05VI+RL9fSGtIxmyqvxw1kFzfs+5Zq8/ABwJy7fHaZ1M
+	0C1SMl7PUM+jzv3B39g+8P3jXE9AwDU=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH] KVM: arm64: Rephrase percpu enable/disable tracking in terms of hyp
+Date: Wed, 19 Jul 2023 23:18:55 +0000
+Message-ID: <20230719231855.262973-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230719215725.799162-1-rananta@google.com>
-Subject: [PATCH v2] KVM: arm64: Fix hardware enable/disable flows for pKVM
-From: Raghavendra Rao Ananta <rananta@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
-Cc: James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>, Jing Zhang <jingzhangos@google.com>, 
-	Colton Lewis <coltonlewis@google.com>, Reiji Watanabe <reijiw@google.com>, 
-	Raghavendra Rao Anata <rananta@google.com>, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-When running in protected mode, the hyp stub is disabled after pKVM is
-initialized, meaning the host cannot enable/disable the hyp at
-runtime. As such, kvm_arm_hardware_enabled is always 1 after
-initialization, and kvm_arch_hardware_enable() never enables the vgic
-maintenance irq or timer irqs.
+kvm_arm_hardware_enabled is rather misleading, since it doesn't track
+the state of all hardware resources needed for running a VM. What it
+actually tracks is whether or not the hyp cpu context has been
+initialized.
 
-Unconditionally enable/disable the vgic + timer irqs in the respective
-calls, instead relying on the percpu bookkeeping in the generic code
-to keep track of which cpus have the interrupts unmasked.
+Since we're now at the point where vgic + timer irq management has
+been separated from kvm_arm_hardware_enabled, rephrase it (and the
+associated helpers) to make it clear what state is being tracked.
 
-Fixes: 466d27e48d7c ("KVM: arm64: Simplify the CPUHP logic")
-Reported-by: Oliver Upton <oliver.upton@linux.dev>
-Suggested-by: Oliver Upton <oliver.upton@linux.dev>
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/arm.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+
+Applies to kvmarm/fixes, on top of Raghu's bugfix [*]
+
+[*] https://lore.kernel.org/kvmarm/20230719215725.799162-1-rananta@google.com/
+
+ arch/arm64/kvm/arm.c | 46 ++++++++++++++++++++++----------------------
+ 1 file changed, 23 insertions(+), 23 deletions(-)
 
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index c2c14059f6a8..010ebfa69650 100644
+index d8540563a623..d1cb298a58a0 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -1867,14 +1867,10 @@ static void _kvm_arch_hardware_enable(void *discard)
+@@ -55,7 +55,7 @@ DECLARE_KVM_NVHE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
  
- int kvm_arch_hardware_enable(void)
+ static bool vgic_present, kvm_arm_initialised;
+ 
+-static DEFINE_PER_CPU(unsigned char, kvm_arm_hardware_enabled);
++static DEFINE_PER_CPU(unsigned char, kvm_hyp_initialized);
+ DEFINE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+ 
+ bool is_kvm_arm_initialised(void)
+@@ -1864,11 +1864,19 @@ static void cpu_hyp_reinit(void)
+ 	cpu_hyp_init_features();
+ }
+ 
+-static void _kvm_arch_hardware_enable(void *discard)
++static void cpu_hyp_init(void *discard)
  {
--	int was_enabled = __this_cpu_read(kvm_arm_hardware_enabled);
--
- 	_kvm_arch_hardware_enable(NULL);
+-	if (!__this_cpu_read(kvm_arm_hardware_enabled)) {
++	if (!__this_cpu_read(kvm_hyp_initialized)) {
+ 		cpu_hyp_reinit();
+-		__this_cpu_write(kvm_arm_hardware_enabled, 1);
++		__this_cpu_write(kvm_hyp_initialized, 1);
++	}
++}
++
++static void cpu_hyp_uninit(void *discard)
++{
++	if (__this_cpu_read(kvm_hyp_initialized)) {
++		cpu_hyp_reset();
++		__this_cpu_write(kvm_hyp_initialized, 0);
+ 	}
+ }
  
--	if (!was_enabled) {
--		kvm_vgic_cpu_up();
--		kvm_timer_cpu_up();
--	}
-+	kvm_vgic_cpu_up();
-+	kvm_timer_cpu_up();
+@@ -1882,7 +1890,7 @@ int kvm_arch_hardware_enable(void)
+ 	 */
+ 	preempt_disable();
  
+-	_kvm_arch_hardware_enable(NULL);
++	cpu_hyp_init(NULL);
+ 
+ 	kvm_vgic_cpu_up();
+ 	kvm_timer_cpu_up();
+@@ -1892,21 +1900,13 @@ int kvm_arch_hardware_enable(void)
  	return 0;
  }
-@@ -1889,10 +1885,8 @@ static void _kvm_arch_hardware_disable(void *discard)
  
+-static void _kvm_arch_hardware_disable(void *discard)
+-{
+-	if (__this_cpu_read(kvm_arm_hardware_enabled)) {
+-		cpu_hyp_reset();
+-		__this_cpu_write(kvm_arm_hardware_enabled, 0);
+-	}
+-}
+-
  void kvm_arch_hardware_disable(void)
  {
--	if (__this_cpu_read(kvm_arm_hardware_enabled)) {
--		kvm_timer_cpu_down();
--		kvm_vgic_cpu_down();
--	}
-+	kvm_timer_cpu_down();
-+	kvm_vgic_cpu_down();
+ 	kvm_timer_cpu_down();
+ 	kvm_vgic_cpu_down();
  
  	if (!is_protected_kvm_enabled())
- 		_kvm_arch_hardware_disable(NULL);
+-		_kvm_arch_hardware_disable(NULL);
++		cpu_hyp_uninit(NULL);
+ }
+ 
+ #ifdef CONFIG_CPU_PM
+@@ -1915,16 +1915,16 @@ static int hyp_init_cpu_pm_notifier(struct notifier_block *self,
+ 				    void *v)
+ {
+ 	/*
+-	 * kvm_arm_hardware_enabled is left with its old value over
++	 * kvm_hyp_initialized is left with its old value over
+ 	 * PM_ENTER->PM_EXIT. It is used to indicate PM_EXIT should
+ 	 * re-enable hyp.
+ 	 */
+ 	switch (cmd) {
+ 	case CPU_PM_ENTER:
+-		if (__this_cpu_read(kvm_arm_hardware_enabled))
++		if (__this_cpu_read(kvm_hyp_initialized))
+ 			/*
+-			 * don't update kvm_arm_hardware_enabled here
+-			 * so that the hardware will be re-enabled
++			 * don't update kvm_hyp_initialized here
++			 * so that the hyp will be re-enabled
+ 			 * when we resume. See below.
+ 			 */
+ 			cpu_hyp_reset();
+@@ -1932,8 +1932,8 @@ static int hyp_init_cpu_pm_notifier(struct notifier_block *self,
+ 		return NOTIFY_OK;
+ 	case CPU_PM_ENTER_FAILED:
+ 	case CPU_PM_EXIT:
+-		if (__this_cpu_read(kvm_arm_hardware_enabled))
+-			/* The hardware was enabled before suspend. */
++		if (__this_cpu_read(kvm_hyp_initialized))
++			/* The hyp was enabled before suspend. */
+ 			cpu_hyp_reinit();
+ 
+ 		return NOTIFY_OK;
+@@ -2014,7 +2014,7 @@ static int __init init_subsystems(void)
+ 	/*
+ 	 * Enable hardware so that subsystem initialisation can access EL2.
+ 	 */
+-	on_each_cpu(_kvm_arch_hardware_enable, NULL, 1);
++	on_each_cpu(cpu_hyp_init, NULL, 1);
+ 
+ 	/*
+ 	 * Register CPU lower-power notifier
+@@ -2052,7 +2052,7 @@ static int __init init_subsystems(void)
+ 		hyp_cpu_pm_exit();
+ 
+ 	if (err || !is_protected_kvm_enabled())
+-		on_each_cpu(_kvm_arch_hardware_disable, NULL, 1);
++		on_each_cpu(cpu_hyp_uninit, NULL, 1);
+ 
+ 	return err;
+ }
+@@ -2090,7 +2090,7 @@ static int __init do_pkvm_init(u32 hyp_va_bits)
+ 	 * The stub hypercalls are now disabled, so set our local flag to
+ 	 * prevent a later re-init attempt in kvm_arch_hardware_enable().
+ 	 */
+-	__this_cpu_write(kvm_arm_hardware_enabled, 1);
++	__this_cpu_write(kvm_hyp_initialized, 1);
+ 	preempt_enable();
+ 
+ 	return ret;
 -- 
-2.41.0.487.g6d72f3e995-goog
+2.41.0.255.g8b1d071c50-goog
 
