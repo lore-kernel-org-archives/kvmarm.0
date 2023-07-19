@@ -1,41 +1,41 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6021A1FC1
-	for <kvmarm@lists.linux.dev>; Wed, 19 Jul 2023 15:06:48 +0000 (UTC)
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-3fc07d4c2f4so41619675e9.1
-        for <kvmarm@lists.linux.dev>; Wed, 19 Jul 2023 08:06:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 963191FC1
+	for <kvmarm@lists.linux.dev>; Wed, 19 Jul 2023 15:06:50 +0000 (UTC)
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-3143a431a01so3838664f8f.1
+        for <kvmarm@lists.linux.dev>; Wed, 19 Jul 2023 08:06:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689779206; x=1690384006;
+        d=google.com; s=20221208; t=1689779209; x=1690384009;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rdsRbC/vWAy/mXl/tSNZ6PpitB/mHX4dM44kTJKLWVw=;
-        b=AmVOSWTy7KW66mbG6zS3fUYMFDEFVik4BsldCMvKQFNQI2LuLfD83RIdI6FAxo0xrC
-         yFxLD9dyPVHitnU57yONKllFZ0bEjSkpjJtsBM7aaLR2O+SeBTREHT1jiXE5gL/Hq0bV
-         rjnXeIGRgJx9EbIwoIK9390mCVDmx/Yd9hnrrP+Bh9F9Zt2C+QbtCgFAfHeGFeXb2AaL
-         wf/PDL2cEemTmpWxeW6wSidyrEMgkJgJ3bM2atbvzNMRcaJjNl7P58KYh4LvvsSm5tuX
-         lAsg5K21QGLk3oYd5hTzQkTP5Q6kQqTW3GJke/V+4/je6ipj8b4yzZaY4V7cc/5k5by3
-         wZlg==
+        bh=cC/D17VR5OBfun43qTvIGnaHyJKx4hQdC42tIJHzoa8=;
+        b=doLDQEpKLrsyc/8/cLjPncO35yOqbyQe1S2MFPqRKrk8Z4uDzWgHfbs28T4nwW05EW
+         1iNmRCYUqrcheBh4pPjlH7fU+J0vqHL3a/bBB10M0F7do7ri7SEvAs1cmziNUYnEbRmd
+         bgrej7+SPiQagDHrOL4swX/TePYQJxD9HpQVIRlLX17Qyyt2VAtmh66Gt2dZld9OpKvL
+         z3FGiBASu+yrMt0fjqigBGk5DVs+UV0bO+uXi/jHaPYU+MupRI10ZciPqQ+Sdr6SHeF0
+         RfrBrUp5WvuOpx5jSahSPFaAi80NQueMoWGsGgubSLwQddsKHgyUGapdvxS/ryIXFFTi
+         1FDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689779206; x=1690384006;
+        d=1e100.net; s=20221208; t=1689779209; x=1690384009;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rdsRbC/vWAy/mXl/tSNZ6PpitB/mHX4dM44kTJKLWVw=;
-        b=aCEG1408VoK7Ne8k6QihcnKykpc/jjdYmZP8lJxpHianqqx4AEiwuzjj0D/PM8dveX
-         Z9NoxxV/kQA+NMW4tKDwVCWHguYiDX2bbfXGzOcaZUNVmNhE+kPmIQsDPY84fTEhJA9F
-         eFtBrPyI4FhvpvtHHer43wvbVFIs0//t8uA1rq38y3NBJCTAM79RoX68U7h7QIlXY2mo
-         wN8vL1awRE6+elpnKJoO4dOoxIEGy+flrpZLfpv6WkZLpNxu1HmAN3/crUuDtb2FJfdZ
-         GMZkT0ZAn7J5Ffqde9/70D0+iIBLBSIjEnOcaRhH2+8Fgp0kuuWJV7sXi8Q/x/jWYKuh
-         xNFg==
-X-Gm-Message-State: ABy/qLZSCX7odd60VYfZCzBx7INcztrgCpQhOhxlg94XmPsAsGpdv+/1
-	pl0BsXPF4bew0l0M/HNwIGAot4LoWMlN5EQOMMEMeZiNj6W9z75RZ3CTj79MRqhLmkTz7xnKV5r
-	96AunvD45JeNEVFim/ve3FWgZUKNbVhi719gtRQDi0e0VNFUBR34ib0+dyXw=
-X-Google-Smtp-Source: APBJJlEqC28qkw+gN0QE5vTKS0NR3aMMgAyfkQolmswgjDiPZ5uRO/HuT9yvWGW0xqy84Xh+nZXdz56jBg==
+        bh=cC/D17VR5OBfun43qTvIGnaHyJKx4hQdC42tIJHzoa8=;
+        b=CMu2BZEY8HBq54gKkNJT5l4rFPTKX2yAZp8U4WGOfdodd66xIemNBMBbc502fGasZp
+         AoDu2ezAZ7tv+UhbRCbwQk82Y3mxzGmQuSlCPuEPzMJJ7pN9x65kHzwziLjg/deVBNvw
+         IGk6K088AvlLhnQBZKZxvxDb5GCvCQUS8BlmOuQ9LdAun+0fGrNTTfBfN0VEZdCDrKYN
+         PDAk3mrhWAoaQONK8VC3laHQ4/Wh+VDFZwCStEkPLtmMRNi+HSQ6NvacWdXT99QYJfrO
+         x7U11HFzvc0klnu5+BO41f+IxeuCNIHN5OvqK81w6Q35pqxAGyNckzCfjhyuuoK2ZXJh
+         3UHQ==
+X-Gm-Message-State: ABy/qLZL8RQA5USaywF6Dqlw/lh4SlAYH2kLX0/LD0KMZUl3L98vj2uq
+	EbrjZp/wWp7rNxRa4r/NM5vAwwK1hwNby44HCvvUexMtAusRAH9hGL4C++gGRoZd+AYgM6USDA8
+	r7U+SYpPzy+KQYsfCCB43ivsSFZMARH1HUSfZE27Y/APhGJZLZdEU6xu6J1A=
+X-Google-Smtp-Source: APBJJlEghmKUrkgeK1fKHwyUnudk36ziD2/xWtwdpS6OSYQnktFng10GK0N3wDm6dYL6dF/k19UdhhDiOw==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a5d:6144:0:b0:313:ea8e:afe9 with SMTP id
- y4-20020a5d6144000000b00313ea8eafe9mr791wrt.9.1689779206359; Wed, 19 Jul 2023
- 08:06:46 -0700 (PDT)
-Date: Wed, 19 Jul 2023 16:06:36 +0100
+ (user=tabba job=sendgmr) by 2002:a5d:530b:0:b0:314:1238:ca17 with SMTP id
+ e11-20020a5d530b000000b003141238ca17mr784wrv.8.1689779208501; Wed, 19 Jul
+ 2023 08:06:48 -0700 (PDT)
+Date: Wed, 19 Jul 2023 16:06:37 +0100
 In-Reply-To: <20230719150639.1968034-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -45,8 +45,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230719150639.1968034-1-tabba@google.com>
 X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
-Message-ID: <20230719150639.1968034-3-tabba@google.com>
-Subject: [PATCH v1 2/5] KVM: arm64: Disable SME Traps for (h)VHE at setup
+Message-ID: <20230719150639.1968034-4-tabba@google.com>
+Subject: [PATCH v1 3/5] KVM: arm64: Use the appropriate feature trap register
+ when activating traps
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com, 
@@ -54,40 +55,32 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com,
 	will@kernel.org, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Ensure that SME traps are disabled for (h)VHE when setting up
-EL2, as they are for nVHE.
+Use the architectural feature trap/control register that
+corresponds to the current KVM mode, i.e., CPTR_EL2 or CPACR_EL1,
+when activating traps.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/el2_setup.h | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ arch/arm64/kvm/hyp/nvhe/switch.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-index c106b31d776c..7001b6db3ccc 100644
---- a/arch/arm64/include/asm/el2_setup.h
-+++ b/arch/arm64/include/asm/el2_setup.h
-@@ -292,9 +292,21 @@
- 	check_override id_aa64pfr1, ID_AA64PFR1_EL1_SME_SHIFT, .Linit_sme_\@, .Lskip_sme_\@, x1, x2
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 0a6271052def..e5ea517bab9c 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -63,7 +63,11 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 		__activate_traps_fpsimd32(vcpu);
+ 	}
  
- .Linit_sme_\@:	/* SME register access and priority mapping */
-+	mrs	x1, hcr_el2
-+	and	x1, x1, #HCR_E2H
-+	cbz	x1, .Lcptr_nvhe_sme_\@
+-	write_sysreg(val, cptr_el2);
++	if (has_hvhe())
++		write_sysreg(val, cpacr_el1);
++	else
++		write_sysreg(val, cptr_el2);
 +
-+	// (h)VHE case
-+	mrs	x0, cpacr_el1			// Disable SME traps
-+	orr	x0, x0, #(CPACR_EL1_SMEN_EL0EN | CPACR_EL1_SMEN_EL1EN)
-+	msr	cpacr_el1, x0
-+	b	.Lskip_set_cptr_sme_\@
-+
-+.Lcptr_nvhe_sme_\@: // nVHE case
- 	mrs	x0, cptr_el2			// Disable SME traps
- 	bic	x0, x0, #CPTR_EL2_TSM
- 	msr	cptr_el2, x0
-+.Lskip_set_cptr_sme_\@:
- 	isb
+ 	write_sysreg(__this_cpu_read(kvm_hyp_vector), vbar_el2);
  
- 	mrs	x1, sctlr_el2
+ 	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
 -- 
 2.41.0.255.g8b1d071c50-goog
 
