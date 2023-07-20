@@ -1,99 +1,94 @@
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4C7D199EF
-	for <kvmarm@lists.linux.dev>; Thu, 20 Jul 2023 08:42:44 +0000 (UTC)
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-635e107642fso2537006d6.1
-        for <kvmarm@lists.linux.dev>; Thu, 20 Jul 2023 01:42:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689842563; x=1690447363;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pWx7QFz1K/WRJqEHJXfuBLFpInCo7G0KjVdDqgKixaM=;
-        b=zO1yD2j8x09N4ZZ/FY0/P9m3J/t2KaHQ1GY/k8fFhwdwVR330YyhetNA7PWHh9oIYN
-         CxYjzLB8OaPH/1bBoQz3CegfinSg8YLItjX/qKvO9K6HhD+I9T1MNnV+EdOfKE0mmndf
-         IC8JkkBJrP51hCfhg+qu0Y2Rtb6F+VtfUdfCmSrILxZkRoZk2qiXI1TONZeqJhZ6+w85
-         iYTGLDrkempUSfqxAkRZufJkCQluTQq/Up/8r0PsTwzBzZassz41k0rdeEEqFlKJFAma
-         RGozFAW4g/EVx5dOMcTu+EM9FHdgeQUqTweMbirloKQ8iDNEAg2qTL83DgmODJ7rmhWv
-         yVVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689842563; x=1690447363;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pWx7QFz1K/WRJqEHJXfuBLFpInCo7G0KjVdDqgKixaM=;
-        b=Ct4zWH0xtKBfkjU7rLhz0P8SvGYbz7XPGu/ovBs2MdGE+3qtdv3YoqZq/eZgn/9xy2
-         +db9+oZTPkIevJaolPm5ZCFgxRntljqisIbCKNwiMLlGbAg/h5DKteTjP2KFYvB5C68V
-         d5sZsHE6RAX+rtSqf1JJgEmQDaDVfzb7uk1AMH4cmCBeF6xn8zMHQzNbIgiK6kgDKWAZ
-         b8YTMFtcZ6ISk0as/q8gU2dhUxlvg5QQeKfRztdygfPte+kJqXv4F0iyunOs+tGopOSr
-         ZuQ6g8lptWiHB4QG8GxXDXjOQKMw4ztggNsxNjNJoA2c1sbP1CwO2pDgM4G8zEPWI63H
-         6cYQ==
-X-Gm-Message-State: ABy/qLarK0eEOzCOsZZ1zM/JGAOFYKVx64nQWqfngK4fqtFTssVpTDvQ
-	EVeEoP/dnhBd+8oO3ajfqVWuB21vi6pC/wqnPpq7zw==
-X-Google-Smtp-Source: APBJJlE97Hy61kBiG4YCBfH7SBPT4Bob8UxajGKcpLbyB3mY/PWmqOpCQPybG4RbpZENVuO/3Mog2SNASQE6km5dk2I=
-X-Received: by 2002:a0c:e4cd:0:b0:635:899:946f with SMTP id
- g13-20020a0ce4cd000000b006350899946fmr5318530qvm.17.1689842563410; Thu, 20
- Jul 2023 01:42:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBB6E199EE
+	for <kvmarm@lists.linux.dev>; Thu, 20 Jul 2023 08:52:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689843172;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gwK8AXz7jkXfdRTnSd9jL9yJK/TtFs99GYswlm71JSI=;
+	b=CzCg82o5zPvU6S24XllaAilYOPKZE/Zu1ddRttTWhUTWr8y+nuRfdmxmnNjDLE9UveGwMp
+	FqXmVdlcdCy+QbkSZh1H94hdlvIwhqslWVgchkZtDJwI6z6nV+AAk4sJKmzkrG17pGD8eL
+	Cnc/ihFp22q7xafvn4jzxpqidC4wCFY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-546-3OwwNMXhMeira2AVwmr1UA-1; Thu, 20 Jul 2023 04:52:48 -0400
+X-MC-Unique: 3OwwNMXhMeira2AVwmr1UA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C67FD10504C1;
+	Thu, 20 Jul 2023 08:52:47 +0000 (UTC)
+Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 810D240C206F;
+	Thu, 20 Jul 2023 08:52:47 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>, KVMARM
+ <kvmarm@lists.linux.dev>, ARMLinux <linux-arm-kernel@lists.infradead.org>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ James Morse <james.morse@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>,
+ Raghavendra Rao Ananta <rananta@google.com>, Suraj Jitindar Singh
+ <surajjs@amazon.com>, Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v6 3/6] KVM: arm64: Enable writable for ID_AA64DFR0_EL1
+ and ID_DFR0_EL1
+In-Reply-To: <20230718164522.3498236-4-jingzhangos@google.com>
+Organization: Red Hat GmbH
+References: <20230718164522.3498236-1-jingzhangos@google.com>
+ <20230718164522.3498236-4-jingzhangos@google.com>
+User-Agent: Notmuch/0.37 (https://notmuchmail.org)
+Date: Thu, 20 Jul 2023 10:52:46 +0200
+Message-ID: <87o7k77yn5.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230719150639.1968034-1-tabba@google.com> <86v8egszb2.wl-maz@kernel.org>
-In-Reply-To: <86v8egszb2.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 20 Jul 2023 09:42:07 +0100
-Message-ID: <CA+EHjTx5vFX6zNP-2+mKT-auvtOsCtospj7xM83kOu_wv1R5bA@mail.gmail.com>
-Subject: Re: [PATCH v1 0/5] Fix setting SVE and SME traps in (h)VHE
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, oliver.upton@linux.dev, catalin.marinas@arm.com, 
-	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	will@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 
-Hi Marc,
+On Tue, Jul 18 2023, Jing Zhang <jingzhangos@google.com> wrote:
 
-On Wed, Jul 19, 2023 at 4:20=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
-:
->
-> Hey Fuad,
->
-> Many thanks for looking into this, much appreciated. A passing comment
-> below.
->
-> On Wed, 19 Jul 2023 16:06:34 +0100,
-> Fuad Tabba <tabba@google.com> wrote:
-> >
-> > The (re)setting and disabling of SVE/SME trap handling (mostly)
-> > done for the hVHE work [*] misses a couple of cases.
-> >
-> > This patch series ensures that these traps are disabled on setup
-> > and reset. Moreover, it makes the code consistent in using
-> > CPACR_EL1 or CPTR_EL2, depending on the mode.
->
-> To provide context, this last point isn't really a correctness issue.
-> It only ensures that:
->
-> - we don't need to issue a synchronisation when alternating one or the
->   other accessor,
->
-> - when running hVHE under NV, we don't trap unnecessarily on accessing
->   CPTR_EL2, while CPACR_EL1 can be used directly without any trap.
+> All valid fields in ID_AA64DFR0_EL1 and ID_DFR0_EL1 are writable
+> from usrespace with this change.
 
-Thanks for that. I'll include this in the cover letter when I respin
-to give more context.
+Typo: s/usrespace/userspace/
 
-Cheers,
-/fuad
 >
-> I'll have a look at the actual patches shortly.
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> Thanks again,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 053d8057ff1e..f33aec83f1b4 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2008,7 +2008,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	  .set_user = set_id_dfr0_el1,
+>  	  .visibility = aa32_id_visibility,
+>  	  .reset = read_sanitised_id_dfr0_el1,
+> -	  .val = ID_DFR0_EL1_PerfMon_MASK, },
+> +	  .val = GENMASK(63, 0), },
+>  	ID_HIDDEN(ID_AFR0_EL1),
+>  	AA32_ID_SANITISED(ID_MMFR0_EL1),
+>  	AA32_ID_SANITISED(ID_MMFR1_EL1),
+> @@ -2057,7 +2057,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	  .get_user = get_id_reg,
+>  	  .set_user = set_id_aa64dfr0_el1,
+>  	  .reset = read_sanitised_id_aa64dfr0_el1,
+> -	  .val = ID_AA64DFR0_EL1_PMUVer_MASK, },
+> +	  .val = GENMASK(63, 0), },
+>  	ID_SANITISED(ID_AA64DFR1_EL1),
+>  	ID_UNALLOCATED(5,2),
+>  	ID_UNALLOCATED(5,3),
+
+How does userspace find out whether a given id reg is actually writable,
+other than trying to write to it?
+
