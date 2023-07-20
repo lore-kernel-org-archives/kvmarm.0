@@ -1,183 +1,115 @@
-Received: from out-48.mta1.migadu.com (out-48.mta1.migadu.com [95.215.58.48])
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B241BB27
-	for <kvmarm@lists.linux.dev>; Wed, 19 Jul 2023 23:19:07 +0000 (UTC)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1689808744;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=RInEWc3E9TaPTm8drtOMJ4+JYKQUruPRE5WAbSdwOs4=;
-	b=XLSKPpEVjzQbO2dlmWEmOAjmgx/JQaXd9ku4THGMbMiw8XFQ9Rnfw1fTz7GL6+Wh9ly0sw
-	ZnEZ0xUVqLItE3eMIHoMFxHU+Q05VI+RL9fSGtIxmyqvxw1kFzfs+5Zq8/ABwJy7fHaZ1M
-	0C1SMl7PUM+jzv3B39g+8P3jXE9AwDU=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH] KVM: arm64: Rephrase percpu enable/disable tracking in terms of hyp
-Date: Wed, 19 Jul 2023 23:18:55 +0000
-Message-ID: <20230719231855.262973-1-oliver.upton@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ECDA39B
+	for <kvmarm@lists.linux.dev>; Thu, 20 Jul 2023 01:16:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689815773; x=1721351773;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=0X3B3RFBvIohiBDiMK6hMbRCxfxPASWhBjQpW8WFunc=;
+  b=hjAlQXaY6PLN1Sw9KT3wtmgXXHYNUSW1TwxtWU07nodBbjC542EuCTHL
+   ULK7RD/EfDPvZO6M22Ms9CLbzi7elbt2RFITGO7+eq+tjMPdLtW1VjKj+
+   9NC1+KHj733FkFILnifm7utLeWSH2szqLqAG3IEKXOifgILGNchW4oo6v
+   qwL2vkUs/6Qb1uv7/i0xUUFs7yIDSjDZPivOM3cCCLYPV1QhaZoddhNwi
+   GFmnsXaX6nsF6TEMVlKFqCHBDFoZj2JKzYPuw+7XAyI9Iu1iZY/ql8zK7
+   skOv4AslEsVmmYW7VPU6w/V13cDrM9Q6JHf+diHevAV2uEbbweanlR4Vq
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10776"; a="364065916"
+X-IronPort-AV: E=Sophos;i="6.01,216,1684825200"; 
+   d="scan'208";a="364065916"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2023 18:16:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10776"; a="674516361"
+X-IronPort-AV: E=Sophos;i="6.01,216,1684825200"; 
+   d="scan'208";a="674516361"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by orsmga003.jf.intel.com with ESMTP; 19 Jul 2023 18:15:44 -0700
+Date: Thu, 20 Jul 2023 09:15:41 +0800
+From: Yuan Yao <yuan.yao@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Chao Peng <chao.p.peng@linux.intel.com>,
+	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+	Yu Zhang <yu.c.zhang@linux.intel.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	Ackerley Tng <ackerleytng@google.com>,
+	Maciej Szmigiero <mail@maciej.szmigiero.name>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	David Hildenbrand <david@redhat.com>,
+	Quentin Perret <qperret@google.com>,
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
+	Liam Merwick <liam.merwick@oracle.com>,
+	Isaku Yamahata <isaku.yamahata@gmail.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [RFC PATCH v11 05/29] KVM: Convert KVM_ARCH_WANT_MMU_NOTIFIER to
+ CONFIG_KVM_GENERIC_MMU_NOTIFIER
+Message-ID: <20230720011541.6ti5sygwwfwko6ab@yy-desk-7060>
+References: <20230718234512.1690985-1-seanjc@google.com>
+ <20230718234512.1690985-6-seanjc@google.com>
+ <20230719073115.vuedo2cf3mp27xm4@yy-desk-7060>
+ <ZLfv7aRq5W52ezek@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZLfv7aRq5W52ezek@google.com>
+User-Agent: NeoMutt/20171215
 
-kvm_arm_hardware_enabled is rather misleading, since it doesn't track
-the state of all hardware resources needed for running a VM. What it
-actually tracks is whether or not the hyp cpu context has been
-initialized.
+On Wed, Jul 19, 2023 at 07:15:09AM -0700, Sean Christopherson wrote:
+> On Wed, Jul 19, 2023, Yuan Yao wrote:
+> > On Tue, Jul 18, 2023 at 04:44:48PM -0700, Sean Christopherson wrote:
+> > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > > index 90a0be261a5c..d2d3e083ec7f 100644
+> > > --- a/include/linux/kvm_host.h
+> > > +++ b/include/linux/kvm_host.h
+> > > @@ -255,7 +255,9 @@ bool kvm_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+> > >  int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu);
+> > >  #endif
+> > >
+> > > -#ifdef KVM_ARCH_WANT_MMU_NOTIFIER
+> > > +struct kvm_gfn_range;
+> >
+> > Not sure why a declaration here, it's defined for ARCHs which defined
+> > KVM_ARCH_WANT_MMU_NOTIFIER before.
+>
+> The forward declaration exists to handle cases where CONFIG_KVM=n, specifically
+> arch/powerpc/include/asm/kvm_ppc.h's declaration of hooks to forward calls to
+> uarch modules:
+>
+> 	bool (*unmap_gfn_range)(struct kvm *kvm, struct kvm_gfn_range *range);
+> 	bool (*age_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
+> 	bool (*test_age_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
+> 	bool (*set_spte_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
+>
+> Prior to using a Kconfig, a forward declaration wasn't necessary because
+> arch/powerpc/include/asm/kvm_host.h would #define KVM_ARCH_WANT_MMU_NOTIFIER even
+> if CONFIG_KVM=n.
+>
+> Alternatively, kvm_ppc.h could declare the struct.  I went this route mainly to
+> avoid the possibility of someone encountering the same problem on a different
+> architecture.
 
-Since we're now at the point where vgic + timer irq management has
-been separated from kvm_arm_hardware_enabled, rephrase it (and the
-associated helpers) to make it clear what state is being tracked.
-
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
-
-Applies to kvmarm/fixes, on top of Raghu's bugfix [*]
-
-[*] https://lore.kernel.org/kvmarm/20230719215725.799162-1-rananta@google.com/
-
- arch/arm64/kvm/arm.c | 46 ++++++++++++++++++++++----------------------
- 1 file changed, 23 insertions(+), 23 deletions(-)
-
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index d8540563a623..d1cb298a58a0 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -55,7 +55,7 @@ DECLARE_KVM_NVHE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
- 
- static bool vgic_present, kvm_arm_initialised;
- 
--static DEFINE_PER_CPU(unsigned char, kvm_arm_hardware_enabled);
-+static DEFINE_PER_CPU(unsigned char, kvm_hyp_initialized);
- DEFINE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
- 
- bool is_kvm_arm_initialised(void)
-@@ -1864,11 +1864,19 @@ static void cpu_hyp_reinit(void)
- 	cpu_hyp_init_features();
- }
- 
--static void _kvm_arch_hardware_enable(void *discard)
-+static void cpu_hyp_init(void *discard)
- {
--	if (!__this_cpu_read(kvm_arm_hardware_enabled)) {
-+	if (!__this_cpu_read(kvm_hyp_initialized)) {
- 		cpu_hyp_reinit();
--		__this_cpu_write(kvm_arm_hardware_enabled, 1);
-+		__this_cpu_write(kvm_hyp_initialized, 1);
-+	}
-+}
-+
-+static void cpu_hyp_uninit(void *discard)
-+{
-+	if (__this_cpu_read(kvm_hyp_initialized)) {
-+		cpu_hyp_reset();
-+		__this_cpu_write(kvm_hyp_initialized, 0);
- 	}
- }
- 
-@@ -1882,7 +1890,7 @@ int kvm_arch_hardware_enable(void)
- 	 */
- 	preempt_disable();
- 
--	_kvm_arch_hardware_enable(NULL);
-+	cpu_hyp_init(NULL);
- 
- 	kvm_vgic_cpu_up();
- 	kvm_timer_cpu_up();
-@@ -1892,21 +1900,13 @@ int kvm_arch_hardware_enable(void)
- 	return 0;
- }
- 
--static void _kvm_arch_hardware_disable(void *discard)
--{
--	if (__this_cpu_read(kvm_arm_hardware_enabled)) {
--		cpu_hyp_reset();
--		__this_cpu_write(kvm_arm_hardware_enabled, 0);
--	}
--}
--
- void kvm_arch_hardware_disable(void)
- {
- 	kvm_timer_cpu_down();
- 	kvm_vgic_cpu_down();
- 
- 	if (!is_protected_kvm_enabled())
--		_kvm_arch_hardware_disable(NULL);
-+		cpu_hyp_uninit(NULL);
- }
- 
- #ifdef CONFIG_CPU_PM
-@@ -1915,16 +1915,16 @@ static int hyp_init_cpu_pm_notifier(struct notifier_block *self,
- 				    void *v)
- {
- 	/*
--	 * kvm_arm_hardware_enabled is left with its old value over
-+	 * kvm_hyp_initialized is left with its old value over
- 	 * PM_ENTER->PM_EXIT. It is used to indicate PM_EXIT should
- 	 * re-enable hyp.
- 	 */
- 	switch (cmd) {
- 	case CPU_PM_ENTER:
--		if (__this_cpu_read(kvm_arm_hardware_enabled))
-+		if (__this_cpu_read(kvm_hyp_initialized))
- 			/*
--			 * don't update kvm_arm_hardware_enabled here
--			 * so that the hardware will be re-enabled
-+			 * don't update kvm_hyp_initialized here
-+			 * so that the hyp will be re-enabled
- 			 * when we resume. See below.
- 			 */
- 			cpu_hyp_reset();
-@@ -1932,8 +1932,8 @@ static int hyp_init_cpu_pm_notifier(struct notifier_block *self,
- 		return NOTIFY_OK;
- 	case CPU_PM_ENTER_FAILED:
- 	case CPU_PM_EXIT:
--		if (__this_cpu_read(kvm_arm_hardware_enabled))
--			/* The hardware was enabled before suspend. */
-+		if (__this_cpu_read(kvm_hyp_initialized))
-+			/* The hyp was enabled before suspend. */
- 			cpu_hyp_reinit();
- 
- 		return NOTIFY_OK;
-@@ -2014,7 +2014,7 @@ static int __init init_subsystems(void)
- 	/*
- 	 * Enable hardware so that subsystem initialisation can access EL2.
- 	 */
--	on_each_cpu(_kvm_arch_hardware_enable, NULL, 1);
-+	on_each_cpu(cpu_hyp_init, NULL, 1);
- 
- 	/*
- 	 * Register CPU lower-power notifier
-@@ -2052,7 +2052,7 @@ static int __init init_subsystems(void)
- 		hyp_cpu_pm_exit();
- 
- 	if (err || !is_protected_kvm_enabled())
--		on_each_cpu(_kvm_arch_hardware_disable, NULL, 1);
-+		on_each_cpu(cpu_hyp_uninit, NULL, 1);
- 
- 	return err;
- }
-@@ -2090,7 +2090,7 @@ static int __init do_pkvm_init(u32 hyp_va_bits)
- 	 * The stub hypercalls are now disabled, so set our local flag to
- 	 * prevent a later re-init attempt in kvm_arch_hardware_enable().
- 	 */
--	__this_cpu_write(kvm_arm_hardware_enabled, 1);
-+	__this_cpu_write(kvm_hyp_initialized, 1);
- 	preempt_enable();
- 
- 	return ret;
--- 
-2.41.0.255.g8b1d071c50-goog
-
+Ah I see, thanks for your explanation!
