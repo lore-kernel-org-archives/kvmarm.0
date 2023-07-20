@@ -1,504 +1,154 @@
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B321171D2
-	for <kvmarm@lists.linux.dev>; Thu, 20 Jul 2023 08:09:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689840563; x=1721376563;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=HoGJMT7oCI85ak61Mg9HoRFqzqvBYv45djiKzEt+3cI=;
-  b=FvyLNlbxWLGenh11Y32PapvnhfwVFlbtM/cGdfPPZUMfIxn2W6mIbiXV
-   F+E/eMjSY8doSNXM4iGEoSueSw38snMi71A6qRIpjVD73XlNsXXiNMNdf
-   wQMEzn1fOjYzBUdauRqC24Pu4BRKPEiGkYYN9KD7OODkmd98lMyj9MadK
-   HhM/9WbM0jBr6J/gC6wVjb13BVCWkbLVweRKNqoiYBRzafvKBltXBD5cB
-   44UtJE0JH5kLJCLDSEbyyGAycZZ4zvEZcSukCrzP6tq4DQkaDiMDFymry
-   DFi+Am5JHehj1JLxMt1rVObhVNx6T6ZCN5y4piXrF7BfiV2pKipVlhodp
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10776"; a="364125709"
-X-IronPort-AV: E=Sophos;i="6.01,218,1684825200"; 
-   d="scan'208";a="364125709"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2023 01:09:21 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10776"; a="970954155"
-X-IronPort-AV: E=Sophos;i="6.01,218,1684825200"; 
-   d="scan'208";a="970954155"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by fmsmga006.fm.intel.com with ESMTP; 20 Jul 2023 01:09:12 -0700
-Date: Thu, 20 Jul 2023 16:09:12 +0800
-From: Yuan Yao <yuan.yao@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
-	Yu Zhang <yu.c.zhang@linux.intel.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	Ackerley Tng <ackerleytng@google.com>,
-	Maciej Szmigiero <mail@maciej.szmigiero.name>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	David Hildenbrand <david@redhat.com>,
-	Quentin Perret <qperret@google.com>,
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
-	Liam Merwick <liam.merwick@oracle.com>,
-	Isaku Yamahata <isaku.yamahata@gmail.com>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [RFC PATCH v11 08/29] KVM: Introduce per-page memory attributes
-Message-ID: <20230720080912.g56zi5hywazrhnam@yy-desk-7060>
-References: <20230718234512.1690985-1-seanjc@google.com>
- <20230718234512.1690985-9-seanjc@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87841361
+	for <kvmarm@lists.linux.dev>; Thu, 20 Jul 2023 08:37:12 +0000 (UTC)
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-403c653d934so5026301cf.2
+        for <kvmarm@lists.linux.dev>; Thu, 20 Jul 2023 01:37:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689842231; x=1690447031;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bNJv2VqvNlJG6tzgbT923d6RlXIIeEmPs4E3rYYx25g=;
+        b=mUjMfllx2xLrK1oq/qNkNUb0wCDWKRwAAQ7euGqPsWIwC+UN4ojdTe9/zl0ZhWZhqM
+         sfZZ+EiqR/WQfUs5zGmX/pjtOq2/eG8kxRn1ieuzCnrAUUhdR3ErzXkxJtOnp0VtAOP4
+         oD0IjZ7WOcA9pbQ3T1gXuQa5ku3m6aCD13WzRbUy9MZ4ih61wWbA7qeyf+K67iE0IRtW
+         8O3hktb0S+vQxlS51sGBFaWMFFnlTnA819nUB6xiW9rHak57sUZ+EyH2BOsrYfiXt34y
+         3joHcUOwuoYDWTRcxlLwbP7W/6Cyzl/N+K90/WQVnrTskiJLeCv6KMVq49t5JD31stDC
+         uLvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689842231; x=1690447031;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bNJv2VqvNlJG6tzgbT923d6RlXIIeEmPs4E3rYYx25g=;
+        b=DoO4FIRDCcIKgcdxTG1v5XeCK7Dbj6vKy4oTIgPpAJ7QwAx9qlEaExjfD7RCX/aLNU
+         QEFJg/ia81lgzyzJFRWUZPiNsuGgz/KmaejkSPibz0KeDeQOVi42cDh6V61MfhJwTJGC
+         DX6ypA19MFtlwsGec/OCJ8TmJEdnl2gSlqFeRG4VLXGhfsC18csou1czsR6ymBX5vefD
+         tnnK51VA42gl/f/WodXMhHkeChzjxvhRu0nbGVlqUeHEcW5hTV5Vr4kDzg1fGExosA18
+         FuPklmymD7pGDpykBeIVOyzNYTwn/mhNf1kKyQnszAg8/EOqvGtvbdDj+rg19HQ0vRRs
+         O+Rw==
+X-Gm-Message-State: ABy/qLZOFZavW9yzBQz7IWmqzKaMGf/6rVyjFd/WixeoaKZ3q/Kt7h4f
+	4oc/ZptpePw17SNptcdrlT9J+kUAX96clmJGYBvTLQ==
+X-Google-Smtp-Source: APBJJlF8tzzwiK2OFajTdUSE/XRqTHpusGROyrZMHc1BlgYuBJb4Qat5CairXTZVHUqmzkrENpFKwSpw24IFJ417tBg=
+X-Received: by 2002:a05:622a:3c6:b0:402:8ecd:810f with SMTP id
+ k6-20020a05622a03c600b004028ecd810fmr6516653qtx.40.1689842231158; Thu, 20 Jul
+ 2023 01:37:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230718234512.1690985-9-seanjc@google.com>
-User-Agent: NeoMutt/20171215
+References: <20230719150639.1968034-1-tabba@google.com> <20230719150639.1968034-3-tabba@google.com>
+ <ZLgelCk3+W3YOpVx@linux.dev> <CA+EHjTx0O8H-59QJrTcuROtjwE1O0YgunsmHob32bEP2iSvEUw@mail.gmail.com>
+In-Reply-To: <CA+EHjTx0O8H-59QJrTcuROtjwE1O0YgunsmHob32bEP2iSvEUw@mail.gmail.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 20 Jul 2023 09:36:35 +0100
+Message-ID: <CA+EHjTzFOHgN1dsXw4+bL40FWn+eLV5V-9V0j-D+zzsC2QzCig@mail.gmail.com>
+Subject: Re: [PATCH v1 2/5] KVM: arm64: Disable SME Traps for (h)VHE at setup
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, maz@kernel.org, catalin.marinas@arm.com, 
+	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	will@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 18, 2023 at 04:44:51PM -0700, Sean Christopherson wrote:
-> From: Chao Peng <chao.p.peng@linux.intel.com>
->
-> In confidential computing usages, whether a page is private or shared is
-> necessary information for KVM to perform operations like page fault
-> handling, page zapping etc. There are other potential use cases for
-> per-page memory attributes, e.g. to make memory read-only (or no-exec,
-> or exec-only, etc.) without having to modify memslots.
->
-> Introduce two ioctls (advertised by KVM_CAP_MEMORY_ATTRIBUTES) to allow
-> userspace to operate on the per-page memory attributes.
->   - KVM_SET_MEMORY_ATTRIBUTES to set the per-page memory attributes to
->     a guest memory range.
->   - KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES to return the KVM supported
->     memory attributes.
->
-> Use an xarray to store the per-page attributes internally, with a naive,
-> not fully optimized implementation, i.e. prioritize correctness over
-> performance for the initial implementation.
->
-> Because setting memory attributes is roughly analogous to mprotect() on
-> memory that is mapped into the guest, zap existing mappings prior to
-> updating the memory attributes.  Opportunistically provide an arch hook
-> for the post-set path (needed to complete invalidation anyways) in
-> anticipation of x86 needing the hook to update metadata related to
-> determining whether or not a given gfn can be backed with various sizes
-> of hugepages.
->
-> It's possible that future usages may not require an invalidation, e.g.
-> if KVM ends up supporting RWX protections and userspace grants _more_
-> protections, but again opt for simplicity and punt optimizations to
-> if/when they are needed.
->
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Link: https://lore.kernel.org/all/Y2WB48kD0J4VGynX@google.com
-> Cc: Fuad Tabba <tabba@google.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> Co-developed-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  Documentation/virt/kvm/api.rst |  60 ++++++++++++
->  include/linux/kvm_host.h       |  14 +++
->  include/uapi/linux/kvm.h       |  14 +++
->  virt/kvm/Kconfig               |   4 +
->  virt/kvm/kvm_main.c            | 170 +++++++++++++++++++++++++++++++++
->  5 files changed, 262 insertions(+)
->
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 34d4ce66e0c8..0ca8561775ac 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6068,6 +6068,56 @@ writes to the CNTVCT_EL0 and CNTPCT_EL0 registers using the SET_ONE_REG
->  interface. No error will be returned, but the resulting offset will not be
->  applied.
->
-> +4.139 KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES
-> +-----------------------------------------
-> +
-> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
-> +:Architectures: x86
-> +:Type: vm ioctl
-> +:Parameters: u64 memory attributes bitmask(out)
-> +:Returns: 0 on success, <0 on error
-> +
-> +Returns supported memory attributes bitmask. Supported memory attributes will
-> +have the corresponding bits set in u64 memory attributes bitmask.
-> +
-> +The following memory attributes are defined::
-> +
-> +  #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
-> +
-> +4.140 KVM_SET_MEMORY_ATTRIBUTES
-> +-----------------------------------------
-> +
-> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
-> +:Architectures: x86
-> +:Type: vm ioctl
-> +:Parameters: struct kvm_memory_attributes(in/out)
-> +:Returns: 0 on success, <0 on error
-> +
-> +Sets memory attributes for pages in a guest memory range. Parameters are
-> +specified via the following structure::
-> +
-> +  struct kvm_memory_attributes {
-> +	__u64 address;
-> +	__u64 size;
-> +	__u64 attributes;
-> +	__u64 flags;
-> +  };
-> +
-> +The user sets the per-page memory attributes to a guest memory range indicated
-> +by address/size, and in return KVM adjusts address and size to reflect the
-> +actual pages of the memory range have been successfully set to the attributes.
-> +If the call returns 0, "address" is updated to the last successful address + 1
-> +and "size" is updated to the remaining address size that has not been set
-> +successfully. The user should check the return value as well as the size to
-> +decide if the operation succeeded for the whole range or not. The user may want
-> +to retry the operation with the returned address/size if the previous range was
-> +partially successful.
-> +
-> +Both address and size should be page aligned and the supported attributes can be
-> +retrieved with KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES.
-> +
-> +The "flags" field may be used for future extensions and should be set to 0s.
-> +
->  5. The kvm_run structure
->  ========================
->
-> @@ -8494,6 +8544,16 @@ block sizes is exposed in KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES as a
->  64-bit bitmap (each bit describing a block size). The default value is
->  0, to disable the eager page splitting.
->
-> +8.41 KVM_CAP_MEMORY_ATTRIBUTES
-> +------------------------------
-> +
-> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
-> +:Architectures: x86
-> +:Type: vm
-> +
-> +This capability indicates KVM supports per-page memory attributes and ioctls
-> +KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES/KVM_SET_MEMORY_ATTRIBUTES are available.
-> +
->  9. Known KVM API problems
->  =========================
->
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index e9ca49d451f3..97db63da6227 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -264,6 +264,7 @@ struct kvm_gfn_range {
->  	gfn_t end;
->  	union {
->  		pte_t pte;
-> +		unsigned long attributes;
->  		u64 raw;
->  	} arg;
->  	bool may_block;
-> @@ -809,6 +810,9 @@ struct kvm {
->
->  #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
->  	struct notifier_block pm_notifier;
-> +#endif
-> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> +	struct xarray mem_attr_array;
->  #endif
->  	char stats_id[KVM_STATS_NAME_SIZE];
->  };
-> @@ -2301,4 +2305,14 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
->  /* Max number of entries allowed for each kvm dirty ring */
->  #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
->
-> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> +static inline unsigned long kvm_get_memory_attributes(struct kvm *kvm, gfn_t gfn)
-> +{
-> +	return xa_to_value(xa_load(&kvm->mem_attr_array, gfn));
-> +}
-> +
-> +bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
-> +					 struct kvm_gfn_range *range);
+Hi Oliver,
 
-Used but no definition in this patch, it's defined in next patch 09.
-How about add weak version in this patch and let ARCHs to overide it ?
+On Thu, Jul 20, 2023 at 9:03=E2=80=AFAM Fuad Tabba <tabba@google.com> wrote=
+:
+>
+> Hi Oliver,
+>
+>
+> On Wed, Jul 19, 2023 at 6:34=E2=80=AFPM Oliver Upton <oliver.upton@linux.=
+dev> wrote:
+> >
+> > On Wed, Jul 19, 2023 at 04:06:36PM +0100, Fuad Tabba wrote:
+> > > Ensure that SME traps are disabled for (h)VHE when setting up
+> > > EL2, as they are for nVHE.
+> > >
+> > > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > > ---
+> > >  arch/arm64/include/asm/el2_setup.h | 12 ++++++++++++
+> > >  1 file changed, 12 insertions(+)
+> > >
+> > > diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/=
+asm/el2_setup.h
+> > > index c106b31d776c..7001b6db3ccc 100644
+> > > --- a/arch/arm64/include/asm/el2_setup.h
+> > > +++ b/arch/arm64/include/asm/el2_setup.h
+> > > @@ -292,9 +292,21 @@
+> > >       check_override id_aa64pfr1, ID_AA64PFR1_EL1_SME_SHIFT, .Linit_s=
+me_\@, .Lskip_sme_\@, x1, x2
+> > >
+> > >  .Linit_sme_\@:       /* SME register access and priority mapping */
+> > > +     mrs     x1, hcr_el2
+> > > +     and     x1, x1, #HCR_E2H
+> > > +     cbz     x1, .Lcptr_nvhe_sme_\@
+> >
+> > Hmm.. Our test for hVHE is repeated enough times, it might make sense
+> > for readability to wrap it up in a macro:
+> >
+> > .macro check_hvhe pass, fail, tmp
+> >         mrs     \tmp, hcr_el2
+> >         and     \tmp, \tmp, #HCR_E2H
+> >         cbnz    \tmp, \pass
+> >         b       \fail
+> > .endm
+> >
+> > So long as we tolerate the additional word of bloat for the extra branc=
+h
+> > :)
+>
+> I did consider that, but went for less bloat. I'll wrap it in a macro
+> for the respin though, and leave it up to the maintainers to decide
+> which one to pick :D
 
-> +#endif /* CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES */
-> +
->  #endif
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 6c6ed214b6ac..f065c57db327 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1211,6 +1211,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
->  #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
->  #define KVM_CAP_USER_MEMORY2 230
-> +#define KVM_CAP_MEMORY_ATTRIBUTES 231
+Actually, with this macro I get the same desired effect without
+affecting the emitted code:
+
+/* Check if running in host at EL2 mode, i.e., (h)VHE. Jumps to fail if not=
+. */
+.macro __check_e2h fail, tmp
+         mrs \tmp, hcr_el2
+         and \tmp, \tmp, #HCR_E2H
+         cbz \tmp, \fail
+.endm
+
+Unless someone disagrees, I will use this for the respin.
+
+Cheers,
+/fuad
+
+
+
+
 >
->  #ifdef KVM_CAP_IRQ_ROUTING
+> Cheers,
+> /fuad
 >
-> @@ -2270,4 +2271,17 @@ struct kvm_s390_zpci_op {
->  /* flags for kvm_s390_zpci_op->u.reg_aen.flags */
->  #define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
->
-> +/* Available with KVM_CAP_MEMORY_ATTRIBUTES */
-> +#define KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES    _IOR(KVMIO,  0xd2, __u64)
-> +#define KVM_SET_MEMORY_ATTRIBUTES              _IOW(KVMIO,  0xd3, struct kvm_memory_attributes)
-> +
-> +struct kvm_memory_attributes {
-> +	__u64 address;
-> +	__u64 size;
-> +	__u64 attributes;
-> +	__u64 flags;
-> +};
-> +
-> +#define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
-> +
->  #endif /* __LINUX_KVM_H */
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index 2fa11bd26cfc..8375bc49f97d 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -99,3 +99,7 @@ config KVM_GENERIC_HARDWARE_ENABLING
->  config KVM_GENERIC_MMU_NOTIFIER
->         select MMU_NOTIFIER
->         bool
-> +
-> +config KVM_GENERIC_MEMORY_ATTRIBUTES
-> +       select KVM_GENERIC_MMU_NOTIFIER
-> +       bool
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index c14adf93daec..1a31bfa025b0 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -530,6 +530,7 @@ struct kvm_mmu_notifier_range {
->  	u64 end;
->  	union {
->  		pte_t pte;
-> +		unsigned long attributes;
->  		u64 raw;
->  	} arg;
->  	gfn_handler_t handler;
-> @@ -1175,6 +1176,9 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
->  	spin_lock_init(&kvm->mn_invalidate_lock);
->  	rcuwait_init(&kvm->mn_memslots_update_rcuwait);
->  	xa_init(&kvm->vcpu_array);
-> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> +	xa_init(&kvm->mem_attr_array);
-> +#endif
->
->  	INIT_LIST_HEAD(&kvm->gpc_list);
->  	spin_lock_init(&kvm->gpc_lock);
-> @@ -1346,6 +1350,9 @@ static void kvm_destroy_vm(struct kvm *kvm)
->  		kvm_free_memslots(kvm, &kvm->__memslots[i][0]);
->  		kvm_free_memslots(kvm, &kvm->__memslots[i][1]);
->  	}
-> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> +	xa_destroy(&kvm->mem_attr_array);
-> +#endif
->  	cleanup_srcu_struct(&kvm->irq_srcu);
->  	cleanup_srcu_struct(&kvm->srcu);
->  	kvm_arch_free_vm(kvm);
-> @@ -2346,6 +2353,145 @@ static int kvm_vm_ioctl_clear_dirty_log(struct kvm *kvm,
->  }
->  #endif /* CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT */
->
-> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> +static u64 kvm_supported_mem_attributes(struct kvm *kvm)
-> +{
-> +	return 0;
-> +}
-> +
-> +static __always_inline void kvm_handle_gfn_range(struct kvm *kvm,
-> +						 struct kvm_mmu_notifier_range *range)
-> +{
-> +	struct kvm_gfn_range gfn_range;
-> +	struct kvm_memory_slot *slot;
-> +	struct kvm_memslots *slots;
-> +	struct kvm_memslot_iter iter;
-> +	bool locked = false;
-> +	bool ret = false;
-> +	int i;
-> +
-> +	gfn_range.arg.raw = range->arg.raw;
-> +	gfn_range.may_block = range->may_block;
-> +
-> +	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
-> +		slots = __kvm_memslots(kvm, i);
-> +
-> +		kvm_for_each_memslot_in_gfn_range(&iter, slots, range->start, range->end) {
-> +			slot = iter.slot;
-> +			gfn_range.slot = slot;
-> +
-> +			gfn_range.start = max(range->start, slot->base_gfn);
-> +			gfn_range.end = min(range->end, slot->base_gfn + slot->npages);
-> +			if (gfn_range.start >= gfn_range.end)
-> +				continue;
-> +
-> +			if (!locked) {
-> +				locked = true;
-> +				KVM_MMU_LOCK(kvm);
-> +				if (!IS_KVM_NULL_FN(range->on_lock))
-> +					range->on_lock(kvm);
-> +			}
-> +
-> +			ret |= range->handler(kvm, &gfn_range);
-> +		}
-> +	}
-> +
-> +	if (range->flush_on_ret && ret)
-> +		kvm_flush_remote_tlbs(kvm);
-> +
-> +	if (locked) {
-> +		KVM_MMU_UNLOCK(kvm);
-> +		if (!IS_KVM_NULL_FN(range->on_unlock))
-> +			range->on_unlock(kvm);
-> +	}
-> +}
-> +
-> +static int kvm_vm_set_mem_attributes(struct kvm *kvm, unsigned long attributes,
-> +				     gfn_t start, gfn_t end)
-> +{
-> +	struct kvm_mmu_notifier_range unmap_range = {
-> +		.start = start,
-> +		.end = end,
-> +		.handler = kvm_mmu_unmap_gfn_range,
-> +		.on_lock = kvm_mmu_invalidate_begin,
-> +		.on_unlock = (void *)kvm_null_fn,
-> +		.flush_on_ret = true,
-> +		.may_block = true,
-> +	};
-> +	struct kvm_mmu_notifier_range post_set_range = {
-> +		.start = start,
-> +		.end = end,
-> +		.arg.attributes = attributes,
-> +		.handler = kvm_arch_post_set_memory_attributes,
-> +		.on_lock = (void *)kvm_null_fn,
-> +		.on_unlock = kvm_mmu_invalidate_end,
-> +		.may_block = true,
-> +	};
-> +	unsigned long i;
-> +	void *entry;
-> +	int r;
-> +
-> +	entry = attributes ? xa_mk_value(attributes) : NULL;
-> +
-> +	mutex_lock(&kvm->slots_lock);
-> +
-> +	/*
-> +	 * Reserve memory ahead of time to avoid having to deal with failures
-> +	 * partway through setting the new attributes.
-> +	 */
-> +	for (i = start; i < end; i++) {
-> +		r = xa_reserve(&kvm->mem_attr_array, i, GFP_KERNEL_ACCOUNT);
-> +		if (r)
-> +			goto out_unlock;
-> +	}
-> +
-> +	kvm_handle_gfn_range(kvm, &unmap_range);
-> +
-> +	for (i = start; i < end; i++) {
-> +		r = xa_err(xa_store(&kvm->mem_attr_array, i, entry,
-> +				    GFP_KERNEL_ACCOUNT));
-> +		KVM_BUG_ON(r, kvm);
-> +	}
-> +
-> +	kvm_handle_gfn_range(kvm, &post_set_range);
-> +
-> +out_unlock:
-> +	mutex_unlock(&kvm->slots_lock);
-> +
-> +	return r;
-> +}
-> +static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
-> +					   struct kvm_memory_attributes *attrs)
-> +{
-> +	gfn_t start, end;
-> +
-> +	/* flags is currently not used. */
-> +	if (attrs->flags)
-> +		return -EINVAL;
-> +	if (attrs->attributes & ~kvm_supported_mem_attributes(kvm))
-> +		return -EINVAL;
-> +	if (attrs->size == 0 || attrs->address + attrs->size < attrs->address)
-> +		return -EINVAL;
-> +	if (!PAGE_ALIGNED(attrs->address) || !PAGE_ALIGNED(attrs->size))
-> +		return -EINVAL;
-> +
-> +	start = attrs->address >> PAGE_SHIFT;
-> +	end = (attrs->address + attrs->size - 1 + PAGE_SIZE) >> PAGE_SHIFT;
-> +
-> +	if (WARN_ON_ONCE(start == end))
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * xarray tracks data using "unsigned long", and as a result so does
-> +	 * KVM.  For simplicity, supports generic attributes only on 64-bit
-> +	 * architectures.
-> +	 */
-> +	BUILD_BUG_ON(sizeof(attrs->attributes) != sizeof(unsigned long));
-> +
-> +	return kvm_vm_set_mem_attributes(kvm, attrs->attributes, start, end);
-> +}
-> +#endif /* CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES */
-> +
->  struct kvm_memory_slot *gfn_to_memslot(struct kvm *kvm, gfn_t gfn)
->  {
->  	return __gfn_to_memslot(kvm_memslots(kvm), gfn);
-> @@ -4521,6 +4667,9 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
->  #ifdef CONFIG_HAVE_KVM_MSI
->  	case KVM_CAP_SIGNAL_MSI:
->  #endif
-> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> +	case KVM_CAP_MEMORY_ATTRIBUTES:
-> +#endif
->  #ifdef CONFIG_HAVE_KVM_IRQFD
->  	case KVM_CAP_IRQFD:
->  #endif
-> @@ -4937,6 +5086,27 @@ static long kvm_vm_ioctl(struct file *filp,
->  		break;
->  	}
->  #endif /* CONFIG_HAVE_KVM_IRQ_ROUTING */
-> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> +	case KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES: {
-> +		u64 attrs = kvm_supported_mem_attributes(kvm);
-> +
-> +		r = -EFAULT;
-> +		if (copy_to_user(argp, &attrs, sizeof(attrs)))
-> +			goto out;
-> +		r = 0;
-> +		break;
-> +	}
-> +	case KVM_SET_MEMORY_ATTRIBUTES: {
-> +		struct kvm_memory_attributes attrs;
-> +
-> +		r = -EFAULT;
-> +		if (copy_from_user(&attrs, argp, sizeof(attrs)))
-> +			goto out;
-> +
-> +		r = kvm_vm_ioctl_set_mem_attributes(kvm, &attrs);
-> +		break;
-> +	}
-> +#endif /* CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES */
->  	case KVM_CREATE_DEVICE: {
->  		struct kvm_create_device cd;
->
-> --
-> 2.41.0.255.g8b1d071c50-goog
->
+> >
+> > > +     // (h)VHE case
+> > > +     mrs     x0, cpacr_el1                   // Disable SME traps
+> > > +     orr     x0, x0, #(CPACR_EL1_SMEN_EL0EN | CPACR_EL1_SMEN_EL1EN)
+> > > +     msr     cpacr_el1, x0
+> > > +     b       .Lskip_set_cptr_sme_\@
+> > > +
+> > > +.Lcptr_nvhe_sme_\@: // nVHE case
+> > >       mrs     x0, cptr_el2                    // Disable SME traps
+> > >       bic     x0, x0, #CPTR_EL2_TSM
+> > >       msr     cptr_el2, x0
+> > > +.Lskip_set_cptr_sme_\@:
+> > >       isb
+> > >
+> > >       mrs     x1, sctlr_el2
+> > > --
+> > > 2.41.0.255.g8b1d071c50-goog
+> > >
+> >
+> > --
+> > Thanks,
+> > Oliver
