@@ -1,41 +1,41 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCB5E171AF
-	for <kvmarm@lists.linux.dev>; Fri, 21 Jul 2023 09:51:50 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5706641dda9so16931607b3.3
-        for <kvmarm@lists.linux.dev>; Fri, 21 Jul 2023 02:51:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9684714F98
+	for <kvmarm@lists.linux.dev>; Fri, 21 Jul 2023 09:51:52 +0000 (UTC)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5839e70f346so1493767b3.1
+        for <kvmarm@lists.linux.dev>; Fri, 21 Jul 2023 02:51:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689933109; x=1690537909;
+        d=google.com; s=20221208; t=1689933111; x=1690537911;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kvl5mWCugMTeJwJCOAtYLTMuVDAKNppca97JsT1vsOI=;
-        b=u+pCHEsyDHxYmFKkIiBayptMIS160RUlVMYxfKsHZ8RZIyMq+vqhp5XZtkL1uqnPw2
-         kYoXVIk4ACn3BQvoJfWaO5W2AcQEC1w30LQecroXW9Sz2W28mQUL9asp3tEWMDiSyN72
-         EjOf37cDMsydYFL0MQAVKxxssHC3s//CuVOW/7uYleClDDj35kpxtdXTXRObZAs5YH4g
-         XZvsp06RC/5rs2rDsgoebz8p0yxXQanV6NUSdmt1xvuWQDOypxPcs8V5i70BBi9jBA8/
-         RDtGaSV6xR35VG1S5N4sflQOlGJ9y7XQjcBh9Pt6rhrc1UUMlzd/j5Uwj7LzZqbWO6qr
-         utcA==
+        bh=47KrH2yP97uk7rkXw5nBWPM4SDB+WAXZCbrQjUob62g=;
+        b=cLUniL1DbxP4navWXPgbwP9O3z+pCdEQd2aNtiKLeiFGk3pZ0C/EVbN0D6O+Osy9od
+         jTtZeC9Vp9nI26ANDEg47cLwb8ZH6WfQziX6mvwRGsEWP2Eu7GTW1A1WLx7KmJJmjyb0
+         3iBx7fMiDxYjiUSN6t0whTlKrEXqXlDbBtntDhAPhuEkKG6ywfN7LgAkLnngTOElKLE4
+         uCdniu8Q3S4MQoWpH9urxW1gCqotuwvoEnLHJ6l0BH6nJz+NPZ2mtgWPxA+hgHz1TX5H
+         uX3EvkTIlpzKhG4j9XOFC5MdxfAaCWCkkipXTWzwAFgUsqrxgGNixMiT4GYGaKh+T60L
+         Eh3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689933109; x=1690537909;
+        d=1e100.net; s=20221208; t=1689933111; x=1690537911;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kvl5mWCugMTeJwJCOAtYLTMuVDAKNppca97JsT1vsOI=;
-        b=CfY8NtLQOACUMfcudY5rAax9SRZlPFwHgyyI+gOMblq34XZ8KuBNfgp1e6qoaDWsu8
-         HQUQ5oqT7ClNPUhkzrurvJx9X4gz3TtLJDRhZt39zjgAMFvBEyDEuG6wouuPejj7BR9z
-         mSeiMU5G9ynKbfpJknxlIhdFmnvAR8DwOrqxf953AG7XDq94hnZknM7+tSYSBeW7qIly
-         x4NwKy+E3Flp4vCo+jBMrCkFnHJxDv6oZNTMRr59Q4+LCcN7GCasapkcPpKfwWr6l3Rf
-         nUAN5ya9ol1e1oDbE6wlzE5qbOGJTi7a4CvdS0ReEjDjRxvcbxoncuRBPYuXJqSCW3WV
-         ikVQ==
-X-Gm-Message-State: ABy/qLYy2pe5jQMKIl06lE2Ry02TSZy7xWmBCeuXimcwSBmhwGMBPVHW
-	AwXrb4UM/Ji794vXpdaorbPfv2mcJssSn3A5vRSYZyYpTPn6FZ5nA9aD4hX7/5JaMmaMi9PAIC7
-	2NmcRNSuLy5ECVmrvCuHE3gW+Iu1nJw4S1cYVn70DGb9SCaeFBc1XAQGlVpk=
-X-Google-Smtp-Source: APBJJlFxxq0r6oXWxZourrRc7mntBlHVcLBDt3f+POAsyI3RD5U3utPLRcvPkx/1pasnmgcf0kvgT5Sq1g==
+        bh=47KrH2yP97uk7rkXw5nBWPM4SDB+WAXZCbrQjUob62g=;
+        b=BX8nS7xIWhIFORuj1bvcuxj0OauiyLuRU+Lfek82GuBRDhdrFV2eLPuqlPxs1PcRoA
+         I2U+SgILrHwNFG28RNoATW5fFMQ7gt6tKIUL66cecXEYruKLWtDlDDXt9pZSsbZRq5/o
+         qPv3fjeJ5j6jiZdGTp+3gibdDLP2+S6t8kC91W/ARuiBlP/eKN/AWmjqWW13l6H0FZKW
+         SIXl6x0/rB2v1nD/rUH6ZsQiK13u/ifTt2RHfkuRtS8dDrlXM9dMN28TZfR1XKKH6tQ1
+         kmBnklTQib3GFBw6Dyoz4p9Iq2bRbLp3tqjYjg8HTnqto2JOG5qX01zgiPNU7l4CnbNS
+         2B7A==
+X-Gm-Message-State: ABy/qLa2wjIrv4+NxHrn/vfLq1WAObSdSXFeDvXXHGVwf8Z4neT6G/QE
+	gCtxqnLo8D23yyGEaTAvVgBf0lfNuERDbQKDNrFc8WmmnvPL35ncEKxDmOhPv7ItCPjcj895WSG
+	DBRq8b8jmgv2a7CF7bBlQyWQG3JwHOUtVBtRWGAUF+rMRK4BV6+fDFrP6lLs=
+X-Google-Smtp-Source: APBJJlFxLm1gEEd/YHy9SDui1D1j9BbV17u5qlOP+ExE60jBWzeZV0EL65it/aJFmWi07a98jvv3KmEucA==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a81:b657:0:b0:580:8dfc:7f85 with SMTP id
- h23-20020a81b657000000b005808dfc7f85mr12118ywk.9.1689933109083; Fri, 21 Jul
- 2023 02:51:49 -0700 (PDT)
-Date: Fri, 21 Jul 2023 10:51:38 +0100
+ (user=tabba job=sendgmr) by 2002:a81:ad27:0:b0:573:54d8:e5be with SMTP id
+ l39-20020a81ad27000000b0057354d8e5bemr18195ywh.3.1689933111281; Fri, 21 Jul
+ 2023 02:51:51 -0700 (PDT)
+Date: Fri, 21 Jul 2023 10:51:39 +0100
 In-Reply-To: <20230721095144.306817-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -45,8 +45,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230721095144.306817-1-tabba@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230721095144.306817-2-tabba@google.com>
-Subject: [PATCH v2 1/7] KVM: arm64: Factor out code for checking E2H into a macro
+Message-ID: <20230721095144.306817-3-tabba@google.com>
+Subject: [PATCH v2 2/7] KVM: arm64: Use the appropriate feature trap register
+ for SVE at EL2 setup
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com, 
@@ -54,69 +55,58 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com,
 	will@kernel.org, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-The code for checking whether the kernel is in (h)VHE mode is
-repeated, and will be needed again in future patches. Factor it
-out in a macro.
-
-No functional change intended.
-No change in emitted assembly code intended.
+Use the architectural feature trap/control register that
+corresponds to the current KVM mode, i.e., CPTR_EL2 or CPACR_EL1,
+when setting up SVE feature traps.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/el2_setup.h | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+ arch/arm64/include/asm/el2_setup.h | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-index 8e5ffb58f83e..383f6be66ed6 100644
+index 383f6be66ed6..1f3d0aa6d5f5 100644
 --- a/arch/arm64/include/asm/el2_setup.h
 +++ b/arch/arm64/include/asm/el2_setup.h
-@@ -31,6 +31,13 @@
- .Lskip_hcrx_\@:
+@@ -146,11 +146,12 @@
+ .macro __init_el2_cptr
+ 	__check_e2h .LnVHE_\@, x1
+ 	mov	x0, #(CPACR_EL1_FPEN_EL1EN | CPACR_EL1_FPEN_EL0EN)
+-	b	.Lset_cptr_\@
++	msr	cpacr_el1, x0
++	b	.Lskip_set_cptr_\@
+ .LnVHE_\@:
+ 	mov	x0, #0x33ff
+-.Lset_cptr_\@:
+ 	msr	cptr_el2, x0			// Disable copro. traps to EL2
++.Lskip_set_cptr_\@:
  .endm
  
-+/* Check if running in host at EL2 mode, i.e., (h)VHE. Jumps to fail if not. */
-+.macro __check_e2h fail, tmp
-+	mrs	\tmp, hcr_el2
-+	and	\tmp, \tmp, #HCR_E2H
-+	cbz	\tmp, \fail
-+.endm
-+
- /*
-  * Allow Non-secure EL1 and EL0 to access physical timer and counter.
-  * This is not necessary for VHE, since the host kernel runs in EL2,
-@@ -43,9 +50,7 @@
-  */
- .macro __init_el2_timers
- 	mov	x0, #3				// Enable EL1 physical timers
--	mrs	x1, hcr_el2
--	and	x1, x1, #HCR_E2H
--	cbz	x1, .LnVHE_\@
-+	__check_e2h .LnVHE_\@, x1
- 	lsl	x0, x0, #10
- .LnVHE_\@:
- 	msr	cnthctl_el2, x0
-@@ -139,9 +144,7 @@
- 
- /* Coprocessor traps */
- .macro __init_el2_cptr
--	mrs	x1, hcr_el2
--	and	x1, x1, #HCR_E2H
--	cbz	x1, .LnVHE_\@
-+	__check_e2h .LnVHE_\@, x1
- 	mov	x0, #(CPACR_EL1_FPEN_EL1EN | CPACR_EL1_FPEN_EL0EN)
- 	b	.Lset_cptr_\@
- .LnVHE_\@:
-@@ -269,9 +272,7 @@
+ /* Disable any fine grained traps */
+@@ -271,17 +272,19 @@
+ 	check_override id_aa64pfr0, ID_AA64PFR0_EL1_SVE_SHIFT, .Linit_sve_\@, .Lskip_sve_\@, x1, x2
  
  .Linit_sve_\@:	/* SVE register access */
- 	mrs	x0, cptr_el2			// Disable SVE traps
--	mrs	x1, hcr_el2
--	and	x1, x1, #HCR_E2H
--	cbz	x1, .Lcptr_nvhe_\@
-+	__check_e2h .Lcptr_nvhe_\@, x1
+-	mrs	x0, cptr_el2			// Disable SVE traps
+ 	__check_e2h .Lcptr_nvhe_\@, x1
  
- 	// VHE case
+-	// VHE case
++	// (h)VHE case
++	mrs	x0, cpacr_el1			// Disable SVE traps
  	orr	x0, x0, #(CPACR_EL1_ZEN_EL1EN | CPACR_EL1_ZEN_EL0EN)
+-	b	.Lset_cptr_\@
++	msr	cpacr_el1, x0
++	b	.Lskip_set_cptr_\@
+ 
+ .Lcptr_nvhe_\@: // nVHE case
++	mrs	x0, cptr_el2			// Disable SVE traps
+ 	bic	x0, x0, #CPTR_EL2_TZ
+-.Lset_cptr_\@:
+ 	msr	cptr_el2, x0
++.Lskip_set_cptr_\@:
+ 	isb
+ 	mov	x1, #ZCR_ELx_LEN_MASK		// SVE: Enable full vector
+ 	msr_s	SYS_ZCR_EL2, x1			// length for EL1.
 -- 
 2.41.0.487.g6d72f3e995-goog
 
