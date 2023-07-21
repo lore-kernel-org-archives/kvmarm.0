@@ -1,124 +1,106 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F76C14F98
-	for <kvmarm@lists.linux.dev>; Fri, 21 Jul 2023 09:48:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689932917;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RjvyrEQM7aXCO6ILKRYhquPIXIYqhL2c7IVe9Axezuc=;
-	b=hUUF6ZpLFuLtLZve3oJVzVhXo5PPjnR9mZiiU2KU0Kcg+uHasK3r2bTdEGg0LXRh04y7Rx
-	uIvFibalmhPPWocbhOaVfHAcJkcVVoDvhiWHSOxllEGyfoK0GTVBo27SvKlRx63ebZBK0s
-	dDMXekaSnSnWAVc02sHu5bwsKDOSHHA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-262-4I0gsGDEPkWXs6vJjKvo3A-1; Fri, 21 Jul 2023 05:48:34 -0400
-X-MC-Unique: 4I0gsGDEPkWXs6vJjKvo3A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 326F5801CF8;
-	Fri, 21 Jul 2023 09:48:33 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.38])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id CEE7640C206F;
-	Fri, 21 Jul 2023 09:48:29 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>, KVMARM
- <kvmarm@lists.linux.dev>, ARMLinux <linux-arm-kernel@lists.infradead.org>,
- Oliver Upton <oliver.upton@linux.dev>, Will Deacon <will@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, Reiji Watanabe
- <reijiw@google.com>, Raghavendra Rao Ananta <rananta@google.com>, Suraj
- Jitindar Singh <surajjs@amazon.com>
-Subject: Re: [PATCH v6 3/6] KVM: arm64: Enable writable for ID_AA64DFR0_EL1
- and ID_DFR0_EL1
-In-Reply-To: <86r0p1txun.wl-maz@kernel.org>
-Organization: Red Hat GmbH
-References: <20230718164522.3498236-1-jingzhangos@google.com>
- <20230718164522.3498236-4-jingzhangos@google.com>
- <87o7k77yn5.fsf@redhat.com>
- <CAAdAUthM6JJ0tEqWELcW48E235EbcjZQSDLF9OQUZ_kUtqh3Ng@mail.gmail.com>
- <87sf9h8xs0.fsf@redhat.com> <86r0p1txun.wl-maz@kernel.org>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date: Fri, 21 Jul 2023 11:48:27 +0200
-Message-ID: <87pm4l8uj8.fsf@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E637F14F98
+	for <kvmarm@lists.linux.dev>; Fri, 21 Jul 2023 09:51:48 +0000 (UTC)
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-31443e13f9dso949373f8f.0
+        for <kvmarm@lists.linux.dev>; Fri, 21 Jul 2023 02:51:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689933107; x=1690537907;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=NaXLo/zDYfyK07ytwfnmz28uaau/n3v4DANqqhj2aBk=;
+        b=1OnrV2BSusRm8WkVl0YxJVXLGJrimZEnEyDUc6CazxXh+tXYNvsnmWltLobUX8YDy9
+         bmPjvHgdcMGB1tn+VySp4oOXq/3XtAP0jsOSMQHGWdNqPAJa+Ay3X47fv6ZDHsoHeW+i
+         oTOtwIZ6szM5F0rghLI8heMr3iSsf7V22lNDOscPrMdH48bEC0ILphHCSj3ngo1df9mg
+         Wc9JxWLxcbcJiAGkG7znyUTP9Fyk/Foc3AGrCxWjnH5FhHHbxcU6SxVoBioA1yjfkW/l
+         PVw6WJAYCvQf4BL+B7M78PZOKyVomnqNzWIdfTNKkbAT61pCSO4FQtgUJRKu14RPvcyV
+         Z9cA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689933107; x=1690537907;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NaXLo/zDYfyK07ytwfnmz28uaau/n3v4DANqqhj2aBk=;
+        b=AJoMGqQjjXTkOWskV2KaYHIknZgEvS2YUSQHUQp0gq3zKMseD1fEUQBqAMH+nFNq9H
+         ry0CfCkBuibFcu0US5p48XimSF3+zD3zxf7wi4fWQb4nx25UALdCYpWqHGb8Uguo7TE6
+         KFj6N5WQY4vR0EXsNbvdthlHUvv92IhCDS5QYbmtIMPMpv1tFTIhW1hq2LrIYBMJK5B3
+         oz9ruFtvasTIc5qD71Sg/oxAVVzZkiGg9SwSw2T17sjcRH/l+QihKkNSeGbzNkvsomAY
+         51rpmB56WWsFLH/Y7yY1a4rCVjInCNk8SNgltgs1mIMqlMGpNdUWl4zIgwBwhbdBMq73
+         xOvg==
+X-Gm-Message-State: ABy/qLY/wRhGGkkCmtaovaGEaDQ5ezA5a3rss0XkZ62UyohsDiBFsboM
+	dFYqgmziSoY2027Pbx4BG5zUtG+jfHzHuG27GjjgOdOC+WZwKT/4HO5wqrobqWA8R+KfJJOV4Rh
+	Jaw5Hx1LOOPf1/KT2klmpbqiaRvJ9v0Wi1V0lmytDkjGtlWF7HpNGUQmriXc=
+X-Google-Smtp-Source: APBJJlF+5cNUU2w8w9riyhquIfq94ZeyJerlmCPBz6VnvKzlSjhuJgm6tzbbHsM01Ok5rSyCT++1rznCwg==
+X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
+ (user=tabba job=sendgmr) by 2002:a5d:508e:0:b0:30f:d210:8c5a with SMTP id
+ a14-20020a5d508e000000b0030fd2108c5amr8650wrt.1.1689933106628; Fri, 21 Jul
+ 2023 02:51:46 -0700 (PDT)
+Date: Fri, 21 Jul 2023 10:51:37 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
+Message-ID: <20230721095144.306817-1-tabba@google.com>
+Subject: [PATCH v2 0/7] Fix setting SVE and SME traps in (h)VHE
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.linux.dev
+Cc: maz@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com, 
+	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	will@kernel.org, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Jul 21 2023, Marc Zyngier <maz@kernel.org> wrote:
+Hi,
 
-> On Fri, 21 Jul 2023 09:38:23 +0100,
-> Cornelia Huck <cohuck@redhat.com> wrote:
->> 
->> On Thu, Jul 20 2023, Jing Zhang <jingzhangos@google.com> wrote:
->> > No mechanism was provided to userspace to discover if a given idreg or
->> > any fields of a given idreg is writable. The write to a readonly idreg
->> > can also succeed (write ignored) without any error if what's written
->> > is exactly the same as what the idreg holds or if it is a write to
->> > AArch32 idregs on an AArch64-only system.
->> 
->> Hm, I'm not sure that's a good thing for the cases where we want to
->> support mix-and-match userspace and kernels. Userspace may want to know
->> upfront whether it can actually tweak the contents of an idreg or not
->> (for example, in the context of using CPU models for compatibility), so
->> that it can reject or warn about certain configurations that may not
->> turn out as the user expects.
->> 
->> > Not sure if it is worth adding an API to return the writable mask for
->> > idregs, since we want to enable the writable for all allocated
->> > unhidden idregs eventually.
->> 
->> We'd enable any new idregs for writing from the start in the future, I
->> guess?
->> 
->> I see two approaches here:
->> - add an API to get a list of idregs with their writable masks
->> - add a capability "you can write to all idregs whatever you'd expect to
->>   be able to write there architecture wise", which would require to add
->>   support for all idregs prior to exposing that cap
->> 
->> The second option would be the easier one (if we don't manage to break
->> it in the future :)
->
-> I'm not sure the last option is even possible. The architecture keeps
-> allocating new ID registers in the op0==3, op1=={0, 1, 3}, CRn==0,
-> CRm=={0-7}, op2=={0-7} space, so fields that were RES0 until then
-> start having a non-0 value.
->
-> This could lead to a situation where you move from a system that
-> didn't know about ID_AA64MMFR6_EL1.XYZ to a system that advertises it,
-> and for which the XYZ instruction has another behaviour. Bad things
-> follow.
+Changes from V1:
+- Expanded the cover letter to clarify the reasoning behind being
+consistent in writing to the architectural trap register based on
+the KVM mode (Marc)
+- Factored out the code for checking E2H into a macro (Oliver)
+- Factored out the code that selects which register to write to
+into a function (Oliver)
 
-Hrm :(
+The (re)setting and disabling of SVE/SME trap handling (mostly)
+done for the hVHE work [*] misses a couple of cases.
 
->
-> My preference would be a single ioctl that returns the full list of
-> writeable masks in the ID reg range. It is big, but not crazy big
-> (1536 bytes, if I haven't messed up), and includes the non ID_*_EL1
-> sysreg such as MPIDR_EL1, CTR_EL1, SMIDR_EL1.
->
-> It would allow the VMM to actively write zeroes to any writable ID
-> register it doesn't know about, or for which it doesn't have anything
-> to restore. It is also relatively future proof, as it covers
-> *everything* the architecture has provisioned for the future (by the
-> time that space is exhausted, I hope none of us will still be involved
-> with this crap).
+This patch series ensures that these traps are disabled on setup
+and reset. Moreover, it makes the code consistent in using
+CPACR_EL1 or CPTR_EL2, depending on the mode.
 
-Famous last words :)
+CPACR_EL1 aliases to CPTR_EL2 when HCR_EL2.E2H == 1, but by being
+consistent we don't need to issue a synchronisation when
+alternating between one or the other accessor. Moreover, when
+running hVHE under NV, we don't trap unnecessarily on accessing
+CPTR_EL2, while CPACR_EL1 can be used directly without any trap.
 
-But yes, that should work. This wouldn't be the first ioctl returning a
-long list, and the VMM would just call it once on VM startup to figure
-things out anyway.
+Based on Linux 6.5-rc2.
+
+Cheers,
+/fuad
+
+[*] https://lore.kernel.org/all/20230609162200.2024064-1-maz@kernel.org/
+
+Fuad Tabba (7):
+  KVM: arm64: Factor out code for checking E2H into a macro
+  KVM: arm64: Use the appropriate feature trap register for SVE at EL2
+    setup
+  KVM: arm64: Disable SME traps for (h)VHE at setup
+  KVM: arm64: Helper to write to appropriate feature trap register based
+    on mode
+  KVM: arm64: Use the appropriate feature trap register when activating
+    traps
+  KVM: arm64: Fix resetting SVE trap values on reset for hVHE
+  KVM: arm64: Fix resetting SME trap values on reset for (h)VHE
+
+ arch/arm64/include/asm/el2_setup.h   | 44 ++++++++++++++++++----------
+ arch/arm64/include/asm/kvm_emulate.h | 21 ++++++++++---
+ arch/arm64/kvm/hyp/nvhe/switch.c     |  2 +-
+ 3 files changed, 47 insertions(+), 20 deletions(-)
+
+
+base-commit: fdf0eaf11452d72945af31804e2a1048ee1b574c
+-- 
+2.41.0.487.g6d72f3e995-goog
 
