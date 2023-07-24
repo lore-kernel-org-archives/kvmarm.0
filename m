@@ -1,41 +1,41 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1E06AA2
-	for <kvmarm@lists.linux.dev>; Mon, 24 Jul 2023 12:38:47 +0000 (UTC)
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3142665f122so2598397f8f.0
-        for <kvmarm@lists.linux.dev>; Mon, 24 Jul 2023 05:38:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3925B6AA2
+	for <kvmarm@lists.linux.dev>; Mon, 24 Jul 2023 12:38:50 +0000 (UTC)
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-314275b653eso2035617f8f.1
+        for <kvmarm@lists.linux.dev>; Mon, 24 Jul 2023 05:38:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690202325; x=1690807125;
+        d=google.com; s=20221208; t=1690202328; x=1690807128;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fw/zi6S9TpUpn6bP4HvBi5LEnCrD1TR71KwU6RzN2og=;
-        b=jAh0BxryQQOWxhwKClvk/Doa3ABHFbwPDCZWcNT4ifn2PQHbnJUPvJ+BheM61XR4BD
-         p/A7Oh2GXcsr4opoZUPfCl5ubznUIpDVez30EgEAAEm9z4CvDDCEMHI86qmvAj5ErCsM
-         RbiOp+4qLv1GkTlcNVYCERb44c3GdL/DwzPTDfaEYBZb/HKbpDImbDm+NH0grBneqHY8
-         cxAlKK89NSZ/RWETgLnHTVrLan15x8fIRiVzmk0yHxi50cebcXkzGJxQgrJehYaEWyDy
-         3+qaOhj7VQQNKDN+y6wpg8YvdqnwnZK0pTKIqH8FnVXbu/19U2RbjJShKS8TRmHNOfwi
-         XepA==
+        bh=16iMKWf0z7WreQdZZ/3r+benf5UyGhC6ljZvClyrUfI=;
+        b=iEDRqLjjL6farTRl4XSlJdYmByh9z+Yel2EmGXGlwgooFgHzal2JmelsI2JiAKHGA+
+         9USEIR2+TxiQnnGKiDazEfdueLgc2R7xtGxs4qOnxvyN48IfTajkOAMF+forrac64oO9
+         8ZJaJ3IQILT6cX9kP7LWGBghHXTxQaB4LViuHsskTm71cda60curmZxXqF0An0AcBaxy
+         DJ0lc8D9CEC0A86iXvNcTaRgWCypp9PoIvmazCGwVyqozy4IiYUWaUQNjpMCLnczqyYn
+         H0u78dKn3tj4hl928AWjy5+HOKCTSeo3xNFoSN7cqyBVP6zMO81n1rN4w+6GoWbnzqP/
+         jqnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690202325; x=1690807125;
+        d=1e100.net; s=20221208; t=1690202328; x=1690807128;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fw/zi6S9TpUpn6bP4HvBi5LEnCrD1TR71KwU6RzN2og=;
-        b=iuea3O2hT7GmurptaGTzgxzfFdpAIdWCl//zMaFswxTfNJqKxuAHUGz8EWoiKQFcuJ
-         YzF2u1SkHleDL/3Y5CQZBKnqOldGzniyFhMkmdoMZHNYGmoSB7gincvvTW6cs046zDxZ
-         QoUimZ0vHXlHJQua03xIHOJONe2MOIErFJrbh4FMeJ7sdeWO8NQo3dAzxDkSW3OcS0dK
-         nYUR/IIBKge00N3zAQulIh06kaQ488aycc5rG1hsimbZiaRCGiyE+cT9zBO3ZebNrvsa
-         jRNY8DWrFAXw6mnQe9W8fIwblO+B2imSpMhxWOxyQ78udsqWYGMHzcZL2SLyiFu9/XjJ
-         WISA==
-X-Gm-Message-State: ABy/qLajS3F8eH4EP3RczqFua0mmBW6DcanQ3r6CPHKrU+NbKdHtnwWH
-	4VUV5J6HZSOCam6pBObnkuiq6G/1t5kdcRRvRk+LtrBzJ0yrmWPLTlBAd2At+5T/oVuxRv+Rzo5
-	Hih0h3a4punUAo8WIl762UFL2abme1C93f/vmHS4fqJnv1G8ipLRBe7U7Iok=
-X-Google-Smtp-Source: APBJJlGFKbcBIJLT2EwalLGUhE46kQUypxbiPWkfDYCF19OeP0VuyV3lxQ8R4wBXh712PjBTo8pPTR4TQA==
+        bh=16iMKWf0z7WreQdZZ/3r+benf5UyGhC6ljZvClyrUfI=;
+        b=dT0aY3Y/X/MK8PWm6f5aYsi/iDc50JtPxvajLfEuBK2Y/KSJYt/rwVDZBM0+uUl9tG
+         Oy6/JvNOBoYm+sNMFzDjw6iAv2fy8A4u7EY3cOUd06wjtl1OVzvigKJhTIIgN91yQW+d
+         UxfNXC+M1xF2Ld8v6CZCrqTwjsJ/9oc+tdD1oDs8Y+1+zNiOZ3w/oJqwkh9ERdXzVLnm
+         UuapTAXYBls8x8/4QizelXjgNFTmBe9jyj5hYZEBcGi24zJmk6nZIyA8j/a6VU2cEOn3
+         rKFqI9qYOqvBC5kwfguzPFF3IpCHuo1ZCMX7g6AAR/taBnBLboLidxczIXF7WRdCQrDi
+         x1sQ==
+X-Gm-Message-State: ABy/qLaWK9wGfNSv3yelDe4cANkL2nlMvypBZBNsbP0IelVsX+t8PNXW
+	B/TdnaCYQaYp33HxVGxDHG4AHa7p9UkDFTUsaTJr+RSunxV0MCJd/8Cbi0wrh6/qIRaMQBFSPZa
+	3RB4lEK7yNf2igp3YkymgPJjqe7xiTgxLK4KAHTSRhWknDR115b3j6BiE/P4=
+X-Google-Smtp-Source: APBJJlG9mEIQqKuVO0Bn8OeuD+f4ziboDLuWRhnbM5CjcfhqcRiuIN0erx5o2THtvR+NBQjz9dqUcePOjw==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:adf:e503:0:b0:314:4db:e0b7 with SMTP id
- j3-20020adfe503000000b0031404dbe0b7mr58317wrm.4.1690202325500; Mon, 24 Jul
- 2023 05:38:45 -0700 (PDT)
-Date: Mon, 24 Jul 2023 13:38:27 +0100
+ (user=tabba job=sendgmr) by 2002:adf:f249:0:b0:314:10e8:b01b with SMTP id
+ b9-20020adff249000000b0031410e8b01bmr56671wrp.12.1690202328250; Mon, 24 Jul
+ 2023 05:38:48 -0700 (PDT)
+Date: Mon, 24 Jul 2023 13:38:28 +0100
 In-Reply-To: <20230724123829.2929609-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -45,9 +45,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230724123829.2929609-1-tabba@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230724123829.2929609-7-tabba@google.com>
-Subject: [PATCH v3 5/7] KVM: arm64: Use the appropriate feature trap register
- when activating traps
+Message-ID: <20230724123829.2929609-8-tabba@google.com>
+Subject: [PATCH v3 6/7] KVM: arm64: Fix resetting SVE trap values on reset for hVHE
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com, 
@@ -55,29 +54,31 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com,
 	will@kernel.org, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Instead of writing directly to cptr_el2, use the helper that
-selects which feature trap register to write to based on the KVM
-mode.
+Ensure that SVE traps are disabled for hVHE, if the FPSIMD state
+isn't owned by the guest, when getting the reset value for the
+architectural feature control register.
 
 Fixes: 75c76ab5a641 ("KVM: arm64: Rework CPTR_EL2 programming for HVHE configuration")
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/switch.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_emulate.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 0a6271052def..e89a23153e85 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -63,7 +63,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 		__activate_traps_fpsimd32(vcpu);
- 	}
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index f5941f6dce49..adfb7d0ac55b 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -588,6 +588,10 @@ static __always_inline u64 kvm_get_reset_cptr_el2(struct kvm_vcpu *vcpu)
+ 		       CPACR_EL1_ZEN_EL1EN);
+ 	} else if (has_hvhe()) {
+ 		val = (CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN);
++
++		if (!vcpu_has_sve(vcpu) ||
++		    (vcpu->arch.fp_state != FP_STATE_GUEST_OWNED))
++			val |= CPACR_EL1_ZEN_EL1EN | CPACR_EL1_ZEN_EL0EN;
+ 	} else {
+ 		val = CPTR_NVHE_EL2_RES1;
  
--	write_sysreg(val, cptr_el2);
-+	kvm_write_cptr_el2(val);
- 	write_sysreg(__this_cpu_read(kvm_hyp_vector), vbar_el2);
- 
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
 -- 
 2.41.0.487.g6d72f3e995-goog
 
