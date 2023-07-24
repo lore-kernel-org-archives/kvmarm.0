@@ -1,53 +1,14 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD09566E
-	for <kvmarm@lists.linux.dev>; Mon, 24 Jul 2023 14:45:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690209942;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=P3cSu1CPZmkSkG2RrSPYOjkXMISXZKOQHcqgGwJVWls=;
-	b=Vx9IJ0X8np2tY2tX1y/RfrrNbNZOy9O91ElLKunk6Ax7XYxo6fdmCoXBhkvvQDkq4Cze1n
-	TKqqYnT5d+eT3UK84UIYSHi9+Aez3XBxACcSBziRx/lzvXZwyMwHpjMQgCiJaVgSJe9Oh1
-	aItFbBN1NlwzTjM8W43VUVvJ9Zan5HQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-423-kvXzpKzRO-q99YEZ0UZ2Eg-1; Mon, 24 Jul 2023 10:45:41 -0400
-X-MC-Unique: kvXzpKzRO-q99YEZ0UZ2Eg-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3f41a04a297so21442535e9.3
-        for <kvmarm@lists.linux.dev>; Mon, 24 Jul 2023 07:45:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690209940; x=1690814740;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=P3cSu1CPZmkSkG2RrSPYOjkXMISXZKOQHcqgGwJVWls=;
-        b=QaK2M8VsiDMxdDzdC2/EhIM+itfuaFV4ZXVhXy/AAcfUmabg6QqLnqKK4AlPRTqzSn
-         D0C5ZYKlMvALxl8mCwsWVkf9nv/ZMr6KcGMQNaZHwMmYg4v0QJWfa2Bhy1AIPwVtrkgh
-         eaAyXjIumKe8+1XMFx+uvf8h+SflZHh4T6ekMrZZP8uFBQ/7Q7FZ7uWMJDaiLCoQ6O0r
-         J+IdPozcuG+zAskNz34+2p9MCUUKm+UprvmLUeoYiMWaNFXBxdWhqrKI7+rO+ek0LjX3
-         KAeG8lv8ua5h6Bf6CWbBRAKDfrYXAhCtc3wCrdFTP5/QyUx8af1T1B3w3XV+oZzlDd3X
-         boVA==
-X-Gm-Message-State: ABy/qLZ5b77aARA7Te5J7UU2yN2YJxkdZEh2M37YnnejXCg8kMvc4gA1
-	VvL/YDuQL77dUU6hvSnDvFk6AavxoN7sbbh0YSDyL8wEbtKXRgqxDylKX999WrGx9O2Rv4NLa08
-	NAHGnnjI/lnnBDJyM
-X-Received: by 2002:a05:600c:ca:b0:3fc:8a:7c08 with SMTP id u10-20020a05600c00ca00b003fc008a7c08mr6189342wmm.35.1690209940352;
-        Mon, 24 Jul 2023 07:45:40 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFU13e7JgcAvxxCyZrO9RkA/paTPyvMP1hCPitlW4xzc1kx49CQ/0gLWOB7TPwUbHUV7KIsHg==
-X-Received: by 2002:a05:600c:ca:b0:3fc:8a:7c08 with SMTP id u10-20020a05600c00ca00b003fc008a7c08mr6189317wmm.35.1690209939969;
-        Mon, 24 Jul 2023 07:45:39 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:368:50e0:e390:42c6:ce16:9d04? ([2a01:e0a:368:50e0:e390:42c6:ce16:9d04])
-        by smtp.gmail.com with ESMTPSA id q14-20020a1cf30e000000b003fbe561f6a3sm13332762wmq.37.2023.07.24.07.45.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Jul 2023 07:45:39 -0700 (PDT)
-Message-ID: <7614f672-989e-6acf-651f-806a3d96846b@redhat.com>
-Date: Mon, 24 Jul 2023 16:45:37 +0200
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E4EBE549;
+	Mon, 24 Jul 2023 16:27:25 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 14C73FEC;
+	Mon, 24 Jul 2023 09:28:02 -0700 (PDT)
+Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 11E4F3F5A1;
+	Mon, 24 Jul 2023 09:27:15 -0700 (PDT)
+Message-ID: <0d268afa-c04b-7a4e-be5e-2362d3dfa64d@arm.com>
+Date: Mon, 24 Jul 2023 17:27:14 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -55,84 +16,128 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH 13/27] KVM: arm64: nv: Add FGT registers
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Mark Brown
- <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Will Deacon <will@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>,
- Andre Przywara <andre.przywara@arm.com>,
- Chase Conklin <chase.conklin@arm.com>,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Darren Hart <darren@os.amperecomputing.com>,
- Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
-References: <20230712145810.3864793-1-maz@kernel.org>
- <20230712145810.3864793-14-maz@kernel.org>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230712145810.3864793-14-maz@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+ Thunderbird/102.13.0
+Subject: Re: [Question - ARM CCA] vCPU Hotplug Support in ARM Realm world
+ might require ARM spec change?
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+To: Salil Mehta <salil.mehta@huawei.com>,
+ "steven.price@arm.com" <steven.price@arm.com>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ "james.morse@arm.com" <james.morse@arm.com>,
+ "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Jonathan Cameron <jonathan.cameron@huawei.com>, Marc Zyngier
+ <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ "mark.rutland@arm.com" <mark.rutland@arm.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ Salil Mehta <salil.mehta@opnsrc.net>,
+ "andrew.jones@linux.dev" <andrew.jones@linux.dev>,
+ yuzenghui <yuzenghui@huawei.com>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ Gareth Stockwell <Gareth.Stockwell@arm.com>
+References: <9cb24131a09a48e9a622e92bf8346c9d@huawei.com>
+ <7da93c6e-1cbf-8840-282e-f115197b80c4@arm.com>
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <7da93c6e-1cbf-8840-282e-f115197b80c4@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Marc,
+Hi Salil
 
-On 7/12/23 16:57, Marc Zyngier wrote:
-> Add the 5 registers covering FEAT_FGT. The AMU-related registers
-> are currently left out as we don't have a plan for them. Yet.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 5 +++++
->  arch/arm64/kvm/sys_regs.c         | 5 +++++
->  2 files changed, 10 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 8b6096753740..1200f29282ba 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -400,6 +400,11 @@ enum vcpu_sysreg {
->  	TPIDR_EL2,	/* EL2 Software Thread ID Register */
->  	CNTHCTL_EL2,	/* Counter-timer Hypervisor Control register */
->  	SP_EL2,		/* EL2 Stack Pointer */
-> +	HFGRTR_EL2,
-> +	HFGWTR_EL2,
-> +	HFGITR_EL2,
-> +	HDFGRTR_EL2,
-> +	HDFGWTR_EL2,
->  	CNTHP_CTL_EL2,
->  	CNTHP_CVAL_EL2,
->  	CNTHV_CTL_EL2,
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 3a6f678ca67d..f88cd1390998 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -2367,6 +2367,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	EL2_REG(MDCR_EL2, access_rw, reset_val, 0),
->  	EL2_REG(CPTR_EL2, access_rw, reset_val, CPTR_NVHE_EL2_RES1),
->  	EL2_REG(HSTR_EL2, access_rw, reset_val, 0),
-> +	EL2_REG(HFGRTR_EL2, access_rw, reset_val, 0),
-> +	EL2_REG(HFGWTR_EL2, access_rw, reset_val, 0),
-> +	EL2_REG(HFGITR_EL2, access_rw, reset_val, 0),
->  	EL2_REG(HACR_EL2, access_rw, reset_val, 0),
->  
->  	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
-> @@ -2376,6 +2379,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	EL2_REG(VTCR_EL2, access_rw, reset_val, 0),
->  
->  	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
-> +	EL2_REG(HDFGRTR_EL2, access_rw, reset_val, 0),
-> +	EL2_REG(HDFGWTR_EL2, access_rw, reset_val, 0),
->  	EL2_REG(SPSR_EL2, access_rw, reset_val, 0),
->  	EL2_REG(ELR_EL2, access_rw, reset_val, 0),
->  	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+On 19/07/2023 10:28, Suzuki K Poulose wrote:
+> Hi Salil
+> 
+> Thanks for raising this.
+> 
+> On 19/07/2023 03:35, Salil Mehta wrote:
+>> [Reposting it here from Linaro Open Discussion List for more eyes to 
+>> look at]
+>>
+>> Hello,
+>> I have recently started to dabble with ARM CCA stuff and check if our
+>> recent changes to support vCPU Hotplug in ARM64 can work in the realm
+>> world. I have realized that in the RMM specification[1] PSCI_CPU_ON
+>> command(B5.3.3) does not handles the PSCI_DENIED return code(B5.4.2),
+>> from the host. This might be required to support vCPU Hotplug feature
+>> in the realm world in future. vCPU Hotplug is an important feature to
+>> support kata-containers in realm world as it reduces the VM boot time
+>> and facilitates dynamic adjustment of vCPUs (which I think should be
+>> true even with Realm world as current implementation only makes use
+>> of the PSCI_ON/OFF to realize the Hotplug look-like effect?)
+>>
+>>
+>> As per our recent changes [2], [3] related to support vCPU Hotplug on
+>> ARM64, we handle the guest exits due to SMC/HVC Hypercall in the
+>> user-space i.e. VMM/Qemu. In realm world, REC Exits to host due to
+>> PSCI_CPU_ON should undergo similar policy checks and I think,
+>>
+>> 1. Host should *deny* to online the target vCPUs which are NOT plugged
+>> 2. This means target REC should be denied by host. Can host call
+>>     RMI_PSCI_COMPETE in such s case?
+>> 3. The *return* value (B5.3.3.1.3 Output values) should be PSCI_DENIED
+> 
+> The Realm exit with EXIT_PSCI already provides the parameters passed
+> onto the PSCI request. This happens for all PSCI calls except
+> (PSCI_VERSION and PSCI_FEAUTRES). The hyp could forward these exits to
+> the VMM and could invoke the RMI_PSCI_COMPLETE only when the VMM blesses 
+> the request (wherever applicable).
+> 
+> However, the RMM spec currently doesn't allow denying the request.
+> i.e., without RMI_PSCI_COMPLETE, the REC cannot be scheduled back in.
+> We will address this in the RMM spec and get back to you.
+
+This is now resolved in RMMv1.0-eac3 spec, available here [0].
+
+This allows the host to DENY a PSCI_CPU_ON request. The RMM ensures that
+the response doesn't violate the security guarantees by checking the
+state of the target REC.
+
+[0] https://developer.arm.com/documentation/den0137/latest/
+
+Kind regards
+Suzuki
 
 
-Eric
+
+
+> 
+> Kind regards
+> Suzuki
+> 
+> 
+>> 4. Failure condition (B5.3.3.2) should be amended with
+>>     runnable pre: target_rec.flags.runnable == NOT_RUNNABLE (?)
+>>              post: result == PSCI_DENIED (?)
+>> 5. Change would also be required in the flow (D1.4 PSCI flows) depicting
+>>     PSCI_CPU_ON flow (D1.4.1)
+>>
+>> I do understand that ARM CCA support is in its infancy stage and
+>> discussing about vCPU Hotplug in realm world seem to be a far-fetched
+>> idea right now. But specification changes require lot of time and if
+>> this change is really required then it should be further discussed
+>> within ARM.
+>>
+>> Many thanks!
+>>
+>>
+>> Bes regards
+>> Salil
+>>
+>>
+>> References:
+>>
+>> [1] https://developer.arm.com/documentation/den0137/latest/
+>> [2] https://github.com/salil-mehta/qemu.git 
+>> virt-cpuhp-armv8/rfc-v1-port11052023.dev-1
+>> [3] https://git.gitlab.arm.com/linux-arm/linux-jm.git 
+>> virtual_cpu_hotplug/rfc/v2
+>>
+> 
 
