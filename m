@@ -1,158 +1,117 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7646AAC
-	for <kvmarm@lists.linux.dev>; Mon, 24 Jul 2023 12:50:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE3EFC433D9;
-	Mon, 24 Jul 2023 12:50:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690203044;
-	bh=o3F0gqwirOzTh8gwGkZMmsXM7Yu/yi+gPnGo/AGnFQM=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=RKvbf5xFIOYmBfC9cHliD8dmfbRs+QpFurP/fbZe8s8WPczwbciazon6lfXd9pSXt
-	 rheOw+8XHarDOdaOF5ubRH8/iZsUGbGtNhSaDV1Qx4zDPLo6HFjKB6fCIj0yN2+zWj
-	 oCXS3GeKXc6x23k3PjdrPPXhENg2OPse9fbsyikKnvOksNaXle6MUIIkR7VJXplfqj
-	 D1aon++cZTfW+FDS9bsY+rkjpaFz1hWPZqy9btbsOm6ybbejCdq2gtNCgmx55APO6f
-	 wlr+K3ar2XUp+ugNJ5tb0YWCaAHRU1w0siIsTL98K1dL9appy8Gq6F1skQSUSNGDs4
-	 BhqTm6IVAw7Ng==
-From: Mark Brown <broonie@kernel.org>
-Date: Mon, 24 Jul 2023 13:46:22 +0100
-Subject: [PATCH v2 35/35] kselftest/arm64: Enable GCS for the FP stress
- tests
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CD57568C
+	for <kvmarm@lists.linux.dev>; Mon, 24 Jul 2023 13:46:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690206412;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6xn9gPQjRRb0V1QRm23HnyLiUiGqmHFZ2cvUJktxsWk=;
+	b=adNxMYI5mThzWxqK8oQvYCp8lq5VmIqAKadMPzKGnOCDMSaB5JJlEMJH2u3D4Kt5pftnNE
+	8pV7qatEmXNJ5nqBS0nWBax6auu8633utgkcEsKLe5FXxRqg6svttxiMO7B7CB+wsL9MZV
+	e73BosVa7Ampw+bDl7qNgDQhw1x+CMI=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-261-c_zMYn73Od-2CVB-8-ocSw-1; Mon, 24 Jul 2023 09:46:51 -0400
+X-MC-Unique: c_zMYn73Od-2CVB-8-ocSw-1
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-63cfe1c2d35so9812416d6.0
+        for <kvmarm@lists.linux.dev>; Mon, 24 Jul 2023 06:46:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690206411; x=1690811211;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6xn9gPQjRRb0V1QRm23HnyLiUiGqmHFZ2cvUJktxsWk=;
+        b=iV8OjitDIJaROuDOz8bc6REH0QfjqDoag58dsKSzzahV1J59342tn27/VkUMeiBSrO
+         9IKUFlDoCpRkngAPRt2kd3o9Cf4WPyOLtghcNbfBtFRCzW+rhh+Ulom9CLOx2Jgh29Hp
+         soFH4Yn+gzdniKygftsMJcunRENueGUtD5NGcMqzojeGFJBdi88BxkCpoJC+Js6q8CGq
+         7zHveaYA308M6tucXLiclTu4qiRX0cVAWNpCpyuy86CSZoMem5lcBcUGEd9h/melyYxj
+         toEywA0POGZjPZPixgUZgMKcN32n1D/jJGZ+C92+5kQOBQQ0T4g249kNbNxmrtkNXVUz
+         7NnQ==
+X-Gm-Message-State: ABy/qLZdVXMqGSDE51HPcnCGLgHHoNvr1vxAkWxjZZKBx82aSIZ1azwT
+	wKsSFaCviniwKoe4sMkTrCc/RSB10lmGV03bbU+uK9VojHKOuYp4+IchST7kHPO1LNPsW/T4swj
+	SVgEJ837jaagO+6Fo
+X-Received: by 2002:a0c:f4cf:0:b0:630:21a6:bb44 with SMTP id o15-20020a0cf4cf000000b0063021a6bb44mr7270324qvm.56.1690206411079;
+        Mon, 24 Jul 2023 06:46:51 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlG26No1QqlAVxxmnZeRTHRWyhZarVbTKQTqaWhvG6qsLSi8NvGKBb2EOxzJM6QcQZEwT16xWw==
+X-Received: by 2002:a0c:f4cf:0:b0:630:21a6:bb44 with SMTP id o15-20020a0cf4cf000000b0063021a6bb44mr7270310qvm.56.1690206410831;
+        Mon, 24 Jul 2023 06:46:50 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:368:50e0:e390:42c6:ce16:9d04? ([2a01:e0a:368:50e0:e390:42c6:ce16:9d04])
+        by smtp.gmail.com with ESMTPSA id n13-20020a0ce54d000000b00637873ff0f3sm3595004qvm.15.2023.07.24.06.46.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Jul 2023 06:46:50 -0700 (PDT)
+Message-ID: <236a8b03-673e-b242-88c3-4a97fbaf937a@redhat.com>
+Date: Mon, 24 Jul 2023 15:46:43 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH 07/27] arm64: Add missing BRB/CFP/DVP/CPP instructions
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Mark Brown
+ <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Will Deacon <will@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>,
+ Chase Conklin <chase.conklin@arm.com>,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Darren Hart <darren@os.amperecomputing.com>,
+ Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20230712145810.3864793-1-maz@kernel.org>
+ <20230712145810.3864793-8-maz@kernel.org>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230712145810.3864793-8-maz@kernel.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230724-arm64-gcs-v2-35-dc2c1d44c2eb@kernel.org>
-References: <20230724-arm64-gcs-v2-0-dc2c1d44c2eb@kernel.org>
-In-Reply-To: <20230724-arm64-gcs-v2-0-dc2c1d44c2eb@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Andrew Morton <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, 
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, 
- Oleg Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, 
- Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, 
- "Rick P. Edgecombe" <rick.p.edgecombe@intel.com>, 
- Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, 
- Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Cc: "H.J. Lu" <hjl.tools@gmail.com>, 
- Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
- linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
- kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
- linux-arch@vger.kernel.org, linux-mm@kvack.org, 
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-riscv@lists.infradead.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.13-dev-099c9
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3085; i=broonie@kernel.org;
- h=from:subject:message-id; bh=o3F0gqwirOzTh8gwGkZMmsXM7Yu/yi+gPnGo/AGnFQM=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBkvnK8hNPDwiHC0iaEDryG+Mu2O7MgY2oLGt69EQIf
- sVXvDwmJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZL5yvAAKCRAk1otyXVSH0HvdB/
- 48/ystdzGMlp9ZLcDce6kKIY6+miYLetihauHdnActGmdUw1giLgnaH6IqjXYWeEg4GQJpHOTRWlQ4
- /vQNIe9Yd0Db/nuJcsciW0gzge3Wx/rCLMOsEWZdmAbsilSwEHZtzbSYdq+aAhJhycf0ouOKX5MfAp
- 3mc1Ec0oRKmASjn/G3juxGiZMPk++J5C0pY5RIjCoG/0NFY7QLfeNZj+tbVKhkfqt0T+IFdzwMwmrN
- uUUWXBdHUuHPfUlZCvbhXeUx+jY6fDajjRvpjAf3Nt66rsHWzkokYRzk3hBNYOg/NMaM7g8XYQAWeY
- iJsXxNG0RU05traqr4buJj6xOOYhku
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-While it's a bit off topic for them the floating point stress tests do give
-us some coverage of context thrashing cases, and also of active signal
-delivery separate to the relatively complicated framework in the actual
-signals tests. Have the tests enable GCS on startup, ignoring failures so
-they continue to work as before on systems without GCS.
+Hi Marc,
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/arm64/fp/assembler.h   | 15 +++++++++++++++
- tools/testing/selftests/arm64/fp/fpsimd-test.S |  2 ++
- tools/testing/selftests/arm64/fp/sve-test.S    |  2 ++
- tools/testing/selftests/arm64/fp/za-test.S     |  2 ++
- tools/testing/selftests/arm64/fp/zt-test.S     |  2 ++
- 5 files changed, 23 insertions(+)
+On 7/12/23 16:57, Marc Zyngier wrote:
+> HFGITR_EL2 traps a bunch of instructions for which we don't have
+> encodings yet. Add them.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/sysreg.h | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 9dfd127be55a..e2357529c633 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -737,6 +737,13 @@
+>  #define OP_TLBI_VALE2NXS		sys_insn(1, 4, 9, 7, 5)
+>  #define OP_TLBI_VMALLS12E1NXS		sys_insn(1, 4, 9, 7, 6)
+>  
+> +/* Misc instructions */
+> +#define OP_BRB_IALL			sys_insn(1, 1, 7, 2, 4)
+> +#define OP_BRB_INJ			sys_insn(1, 1, 7, 2, 5)
+> +#define OP_CFP_RCTX			sys_insn(1, 3, 7, 3, 4)
+> +#define OP_DVP_RCTX			sys_insn(1, 3, 7, 3, 5)
+> +#define OP_CPP_RCTX			sys_insn(1, 3, 7, 3, 7)
+> +
+>  /* Common SCTLR_ELx flags. */
+>  #define SCTLR_ELx_ENTP2	(BIT(60))
+>  #define SCTLR_ELx_DSSBS	(BIT(44))
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-diff --git a/tools/testing/selftests/arm64/fp/assembler.h b/tools/testing/selftests/arm64/fp/assembler.h
-index 9b38a0da407d..7012f9f796de 100644
---- a/tools/testing/selftests/arm64/fp/assembler.h
-+++ b/tools/testing/selftests/arm64/fp/assembler.h
-@@ -65,4 +65,19 @@ endfunction
- 	bl	puts
- .endm
- 
-+#define PR_SET_SHADOW_STACK_STATUS      72
-+# define PR_SHADOW_STACK_ENABLE         (1UL << 0)
-+
-+.macro enable_gcs
-+	// Run with GCS
-+	mov	x0, PR_SET_SHADOW_STACK_STATUS
-+	mov	x1, PR_SHADOW_STACK_ENABLE
-+	mov	x2, xzr
-+	mov	x3, xzr
-+	mov	x4, xzr
-+	mov	x5, xzr
-+	mov	x8, #__NR_prctl
-+	svc	#0
-+.endm
-+
- #endif /* ! ASSEMBLER_H */
-diff --git a/tools/testing/selftests/arm64/fp/fpsimd-test.S b/tools/testing/selftests/arm64/fp/fpsimd-test.S
-index 8b960d01ed2e..b16fb7f42e3e 100644
---- a/tools/testing/selftests/arm64/fp/fpsimd-test.S
-+++ b/tools/testing/selftests/arm64/fp/fpsimd-test.S
-@@ -215,6 +215,8 @@ endfunction
- // Main program entry point
- .globl _start
- function _start
-+	enable_gcs
-+
- 	mov	x23, #0		// signal count
- 
- 	mov	w0, #SIGINT
-diff --git a/tools/testing/selftests/arm64/fp/sve-test.S b/tools/testing/selftests/arm64/fp/sve-test.S
-index 4328895dfc87..486634bc7def 100644
---- a/tools/testing/selftests/arm64/fp/sve-test.S
-+++ b/tools/testing/selftests/arm64/fp/sve-test.S
-@@ -378,6 +378,8 @@ endfunction
- // Main program entry point
- .globl _start
- function _start
-+	enable_gcs
-+
- 	mov	x23, #0		// Irritation signal count
- 
- 	mov	w0, #SIGINT
-diff --git a/tools/testing/selftests/arm64/fp/za-test.S b/tools/testing/selftests/arm64/fp/za-test.S
-index 9dcd70911397..f789694fa3ea 100644
---- a/tools/testing/selftests/arm64/fp/za-test.S
-+++ b/tools/testing/selftests/arm64/fp/za-test.S
-@@ -231,6 +231,8 @@ endfunction
- // Main program entry point
- .globl _start
- function _start
-+	enable_gcs
-+
- 	mov	x23, #0		// signal count
- 
- 	mov	w0, #SIGINT
-diff --git a/tools/testing/selftests/arm64/fp/zt-test.S b/tools/testing/selftests/arm64/fp/zt-test.S
-index d63286397638..ea5e55310705 100644
---- a/tools/testing/selftests/arm64/fp/zt-test.S
-+++ b/tools/testing/selftests/arm64/fp/zt-test.S
-@@ -200,6 +200,8 @@ endfunction
- // Main program entry point
- .globl _start
- function _start
-+	enable_gcs
-+
- 	mov	x23, #0		// signal count
- 
- 	mov	w0, #SIGINT
+Thanks
 
--- 
-2.30.2
+Eric
 
