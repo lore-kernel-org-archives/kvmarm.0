@@ -1,57 +1,138 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E90D505
-	for <kvmarm@lists.linux.dev>; Mon, 24 Jul 2023 14:23:58 +0000 (UTC)
-Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.56])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4R8j736JsFzrRrl;
-	Mon, 24 Jul 2023 22:22:55 +0800 (CST)
-Received: from DESKTOP-8RFUVS3.china.huawei.com (10.174.185.179) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 24 Jul 2023 22:23:46 +0800
-From: Zenghui Yu <yuzenghui@huawei.com>
-To: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>
-CC: <maz@kernel.org>, <oliver.upton@linux.dev>, <james.morse@arm.com>,
-	<suzuki.poulose@arm.com>, <wanghaibin.wang@huawei.com>, Zenghui Yu
-	<yuzenghui@huawei.com>
-Subject: [PATCH] KVM: arm64: Drop HCR_VIRT_EXCP_MASK
-Date: Mon, 24 Jul 2023 22:22:57 +0800
-Message-ID: <20230724142257.1551-1-yuzenghui@huawei.com>
-X-Mailer: git-send-email 2.23.0.windows.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD09566E
+	for <kvmarm@lists.linux.dev>; Mon, 24 Jul 2023 14:45:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690209942;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P3cSu1CPZmkSkG2RrSPYOjkXMISXZKOQHcqgGwJVWls=;
+	b=Vx9IJ0X8np2tY2tX1y/RfrrNbNZOy9O91ElLKunk6Ax7XYxo6fdmCoXBhkvvQDkq4Cze1n
+	TKqqYnT5d+eT3UK84UIYSHi9+Aez3XBxACcSBziRx/lzvXZwyMwHpjMQgCiJaVgSJe9Oh1
+	aItFbBN1NlwzTjM8W43VUVvJ9Zan5HQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-423-kvXzpKzRO-q99YEZ0UZ2Eg-1; Mon, 24 Jul 2023 10:45:41 -0400
+X-MC-Unique: kvXzpKzRO-q99YEZ0UZ2Eg-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3f41a04a297so21442535e9.3
+        for <kvmarm@lists.linux.dev>; Mon, 24 Jul 2023 07:45:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690209940; x=1690814740;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=P3cSu1CPZmkSkG2RrSPYOjkXMISXZKOQHcqgGwJVWls=;
+        b=QaK2M8VsiDMxdDzdC2/EhIM+itfuaFV4ZXVhXy/AAcfUmabg6QqLnqKK4AlPRTqzSn
+         D0C5ZYKlMvALxl8mCwsWVkf9nv/ZMr6KcGMQNaZHwMmYg4v0QJWfa2Bhy1AIPwVtrkgh
+         eaAyXjIumKe8+1XMFx+uvf8h+SflZHh4T6ekMrZZP8uFBQ/7Q7FZ7uWMJDaiLCoQ6O0r
+         J+IdPozcuG+zAskNz34+2p9MCUUKm+UprvmLUeoYiMWaNFXBxdWhqrKI7+rO+ek0LjX3
+         KAeG8lv8ua5h6Bf6CWbBRAKDfrYXAhCtc3wCrdFTP5/QyUx8af1T1B3w3XV+oZzlDd3X
+         boVA==
+X-Gm-Message-State: ABy/qLZ5b77aARA7Te5J7UU2yN2YJxkdZEh2M37YnnejXCg8kMvc4gA1
+	VvL/YDuQL77dUU6hvSnDvFk6AavxoN7sbbh0YSDyL8wEbtKXRgqxDylKX999WrGx9O2Rv4NLa08
+	NAHGnnjI/lnnBDJyM
+X-Received: by 2002:a05:600c:ca:b0:3fc:8a:7c08 with SMTP id u10-20020a05600c00ca00b003fc008a7c08mr6189342wmm.35.1690209940352;
+        Mon, 24 Jul 2023 07:45:40 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFU13e7JgcAvxxCyZrO9RkA/paTPyvMP1hCPitlW4xzc1kx49CQ/0gLWOB7TPwUbHUV7KIsHg==
+X-Received: by 2002:a05:600c:ca:b0:3fc:8a:7c08 with SMTP id u10-20020a05600c00ca00b003fc008a7c08mr6189317wmm.35.1690209939969;
+        Mon, 24 Jul 2023 07:45:39 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:368:50e0:e390:42c6:ce16:9d04? ([2a01:e0a:368:50e0:e390:42c6:ce16:9d04])
+        by smtp.gmail.com with ESMTPSA id q14-20020a1cf30e000000b003fbe561f6a3sm13332762wmq.37.2023.07.24.07.45.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Jul 2023 07:45:39 -0700 (PDT)
+Message-ID: <7614f672-989e-6acf-651f-806a3d96846b@redhat.com>
+Date: Mon, 24 Jul 2023 16:45:37 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.185.179]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600007.china.huawei.com (7.193.23.208)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH 13/27] KVM: arm64: nv: Add FGT registers
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Mark Brown
+ <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Will Deacon <will@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>,
+ Chase Conklin <chase.conklin@arm.com>,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Darren Hart <darren@os.amperecomputing.com>,
+ Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20230712145810.3864793-1-maz@kernel.org>
+ <20230712145810.3864793-14-maz@kernel.org>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230712145810.3864793-14-maz@kernel.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-This was introduced in commit 0369f6a34b9f ("arm64: KVM: EL2 register
-definitions") and for more than 10 years nobody used. Remove it.
+Hi Marc,
 
-Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
----
- arch/arm64/include/asm/kvm_arm.h | 1 -
- 1 file changed, 1 deletion(-)
+On 7/12/23 16:57, Marc Zyngier wrote:
+> Add the 5 registers covering FEAT_FGT. The AMU-related registers
+> are currently left out as we don't have a plan for them. Yet.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 5 +++++
+>  arch/arm64/kvm/sys_regs.c         | 5 +++++
+>  2 files changed, 10 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 8b6096753740..1200f29282ba 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -400,6 +400,11 @@ enum vcpu_sysreg {
+>  	TPIDR_EL2,	/* EL2 Software Thread ID Register */
+>  	CNTHCTL_EL2,	/* Counter-timer Hypervisor Control register */
+>  	SP_EL2,		/* EL2 Stack Pointer */
+> +	HFGRTR_EL2,
+> +	HFGWTR_EL2,
+> +	HFGITR_EL2,
+> +	HDFGRTR_EL2,
+> +	HDFGWTR_EL2,
+>  	CNTHP_CTL_EL2,
+>  	CNTHP_CVAL_EL2,
+>  	CNTHV_CTL_EL2,
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 3a6f678ca67d..f88cd1390998 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2367,6 +2367,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	EL2_REG(MDCR_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(CPTR_EL2, access_rw, reset_val, CPTR_NVHE_EL2_RES1),
+>  	EL2_REG(HSTR_EL2, access_rw, reset_val, 0),
+> +	EL2_REG(HFGRTR_EL2, access_rw, reset_val, 0),
+> +	EL2_REG(HFGWTR_EL2, access_rw, reset_val, 0),
+> +	EL2_REG(HFGITR_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(HACR_EL2, access_rw, reset_val, 0),
+>  
+>  	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
+> @@ -2376,6 +2379,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	EL2_REG(VTCR_EL2, access_rw, reset_val, 0),
+>  
+>  	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
+> +	EL2_REG(HDFGRTR_EL2, access_rw, reset_val, 0),
+> +	EL2_REG(HDFGWTR_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(SPSR_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(ELR_EL2, access_rw, reset_val, 0),
+>  	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 58e5eb27da68..d04ef89ca6a0 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -89,7 +89,6 @@
- 			 HCR_BSU_IS | HCR_FB | HCR_TACR | \
- 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
- 			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3)
--#define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
- #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
- #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
- #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
--- 
-2.33.0
+
+Eric
 
