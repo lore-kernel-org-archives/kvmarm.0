@@ -1,178 +1,203 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B4E6186C
-	for <kvmarm@lists.linux.dev>; Sun, 23 Jul 2023 16:53:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690131199;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K7Q6jB5+JjJCoMhkXTEgRxsVxQLYVK7nw0Y30rzdcso=;
-	b=bgX3hPY2mN4xFNL7OYRFvzVAhL6aMI/Y6l1FsGpRlk+rnAj8dW4M+FOJzeIdv/esYeh6XH
-	YaN53B02ywuKSpC46jbJLAy5I4JXRwMK5onVWmn1mDVdb5f502DFisxLAliOsYEotiKuxh
-	aPu4zxEgAykfiWIxcjzJi22A2Jp7AVI=
-Received: from mail-ua1-f72.google.com (mail-ua1-f72.google.com
- [209.85.222.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-423-A-r7JG2LNOK9yoihEft-Lg-1; Sun, 23 Jul 2023 12:53:18 -0400
-X-MC-Unique: A-r7JG2LNOK9yoihEft-Lg-1
-Received: by mail-ua1-f72.google.com with SMTP id a1e0cc1a2514c-796db7924e0so960717241.2
-        for <kvmarm@lists.linux.dev>; Sun, 23 Jul 2023 09:53:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690131197; x=1690735997;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=K7Q6jB5+JjJCoMhkXTEgRxsVxQLYVK7nw0Y30rzdcso=;
-        b=RHHGu9wgZlUN+dccSqlVdaFmV9cOPdlaHo2YRQvhB0Mb6RxGjd8yD5ku0xVGTA0QOt
-         BPbYX8DGBnV94Mn7lyeM0Y1/g1QlSc7b0bpkbx2uyvPM/S4dGElYRpWOpLvwc41It6MQ
-         sjto8q+yVXRW4EHIK5Hf3ntpwVVC+UoI0TW+gDOy9tbX2wdhca4+xw+wStE+WQAFFWCT
-         tjYXr0szfcLM36+ez7aRTpa88eLlSwkajYi0sALN36FjKZwU9vkqtu4yTf5jW/lpGuj1
-         P89fAywwwAjUPKaha/RhQgcDFnmWrYeOnk2nr3q9VnwhCPdKYIKk4vMQyTc2nyzegTfd
-         132Q==
-X-Gm-Message-State: ABy/qLa30VmV04jIE4o9TMcakYOZjdhFwH3Sa0vcDrYLUasQkSkv/f1J
-	bjrxsf/e/Oc6D3JicJrfw2kh4V9PPySDi4QBOjbQPuN8bI+Cv7fIS3PCiIPKie0DnjrWZuqWdNu
-	kXaDoWzL6RaPckdm8bCBi1tYybYDBDTNt
-X-Received: by 2002:a05:6102:3d6:b0:444:c2cb:d525 with SMTP id n22-20020a05610203d600b00444c2cbd525mr2140240vsq.31.1690131197562;
-        Sun, 23 Jul 2023 09:53:17 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHE7PFTbUUGsD4fJxXrXa4KpCiAW59I3ahU68nmE+/HLCmOCRZ11smJOZnJGNMvvyP98i3mAp5k/Co+1iNu4PY=
-X-Received: by 2002:a05:6102:3d6:b0:444:c2cb:d525 with SMTP id
- n22-20020a05610203d600b00444c2cbd525mr2140234vsq.31.1690131197316; Sun, 23
- Jul 2023 09:53:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 286527C
+	for <kvmarm@lists.linux.dev>; Mon, 24 Jul 2023 04:45:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690173950; x=1721709950;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=q9qzwcL7N7viHeki30qyeMCUuWnJ87fuGcM4hbUg7Mg=;
+  b=NtpaCJWf6JJa6XKHuLRhKK7pFYUMMQofEh2yTs7d9WA3ZIjgFpTCtoO8
+   Edq8KDCrQHBYbTHzNoEKucA3E/6cCWGpY+/cHVV3MX4ik/jHgQCEORqb7
+   wSvC3eAiwOb9mxxDhb2CFyIoMeZLOYM/+LtMn7OQ5nxM9W4wZ/sPTI1tK
+   rK2afDRyd8OL3KOXO4edKYiz4plKbrPXt9jP806iSOeAifT4wf4mrQrJT
+   P+1iFE9zVghp6PjgfNxT1AKG3HPWrObiD8mhr5u8bIAStC5OxIqIhqmVJ
+   9oPghZ7iu+7LX+G8RepHnjlob953+e312EqqjRnbgQpH2pS+GLieZdvYo
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10780"; a="352240348"
+X-IronPort-AV: E=Sophos;i="6.01,228,1684825200"; 
+   d="scan'208";a="352240348"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2023 21:45:49 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10780"; a="972119310"
+X-IronPort-AV: E=Sophos;i="6.01,228,1684825200"; 
+   d="scan'208";a="972119310"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by fmsmga006.fm.intel.com with ESMTP; 23 Jul 2023 21:45:40 -0700
+Date: Mon, 24 Jul 2023 12:43:53 +0800
+From: Xu Yilun <yilun.xu@intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Chao Peng <chao.p.peng@linux.intel.com>,
+	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+	Yu Zhang <yu.c.zhang@linux.intel.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	Ackerley Tng <ackerleytng@google.com>,
+	Maciej Szmigiero <mail@maciej.szmigiero.name>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	David Hildenbrand <david@redhat.com>,
+	Quentin Perret <qperret@google.com>,
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
+	Liam Merwick <liam.merwick@oracle.com>,
+	Isaku Yamahata <isaku.yamahata@gmail.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [RFC PATCH v11 08/29] KVM: Introduce per-page memory attributes
+Message-ID: <ZL4BiQWihfrD0TOJ@yilunxu-OptiPlex-7050>
+References: <20230718234512.1690985-1-seanjc@google.com>
+ <20230718234512.1690985-9-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <ZLYnolPWJubKLZY8@thinky-boi> <ZLYn/RAovUs+U0r+@thinky-boi>
-In-Reply-To: <ZLYn/RAovUs+U0r+@thinky-boi>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sun, 23 Jul 2023 18:53:05 +0200
-Message-ID: <CABgObfYC9UmCdnDryryPGPp_BOdOjH8bRK=e7f-R5CJXJ-Ae_Q@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.5, part #1
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Sudeep Holla <sudeep.holla@arm.com>, 
-	Mostafa Saleh <smostafa@google.com>, Xiang Chen <chenxiang66@hisilicon.com>, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230718234512.1690985-9-seanjc@google.com>
 
-On Tue, Jul 18, 2023 at 7:49=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> +cc lists, because I'm an idiot.
->
-> On Mon, Jul 17, 2023 at 10:48:23PM -0700, Oliver Upton wrote:
-> > Hi Paolo,
-> >
-> > Quite a pile of fixes for the first batch. The most noteworthy here is
-> > the BTI + pKVM finalization fixes, which address an early boot failure
-> > when using the split hypervisor on systems that support BTI and make th=
-e
-> > overall pKVM flow more robust to failures.
-> >
-> > Otherwise, we have a respectable collection of one-offs described in th=
-e
-> > tag message.
-> >
-> > Please pull.
-
-Pulled, thanks. Should be in time for -rc3.
-
-Paolo
-
-> >
-> > --
-> > Thanks,
-> > Oliver
-> >
-> > The following changes since commit 06c2afb862f9da8dc5efa4b6076a0e48c3fb=
-aaa5:
-> >
-> >   Linux 6.5-rc1 (2023-07-09 13:53:13 -0700)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/=
-kvmarm-fixes-6.5-1
-> >
-> > for you to fetch changes up to 9d2a55b403eea26cab7c831d8e1c00ef1e6a6850=
-:
-> >
-> >   KVM: arm64: Fix the name of sys_reg_desc related to PMU (2023-07-14 2=
-3:34:05 +0000)
-> >
-> > ----------------------------------------------------------------
-> > KVM/arm64 fixes for 6.5, part #1
-> >
-> >  - Avoid pKVM finalization if KVM initialization fails
-> >
-> >  - Add missing BTI instructions in the hypervisor, fixing an early boot
-> >    failure on BTI systems
-> >
-> >  - Handle MMU notifiers correctly for non hugepage-aligned memslots
-> >
-> >  - Work around a bug in the architecture where hypervisor timer control=
-s
-> >    have UNKNOWN behavior under nested virt.
-> >
-> >  - Disable preemption in kvm_arch_hardware_enable(), fixing a kernel BU=
-G
-> >    in cpu hotplug resulting from per-CPU accessor sanity checking.
-> >
-> >  - Make WFI emulation on GICv4 systems robust w.r.t. preemption,
-> >    consistently requesting a doorbell interrupt on vcpu_put()
-> >
-> >  - Uphold RES0 sysreg behavior when emulating older PMU versions
-> >
-> >  - Avoid macro expansion when initializing PMU register names, ensuring
-> >    the tracepoints pretty-print the sysreg.
-> >
-> > ----------------------------------------------------------------
-> > Marc Zyngier (3):
-> >       KVM: arm64: timers: Use CNTHCTL_EL2 when setting non-CNTKCTL_EL1 =
-bits
-> >       KVM: arm64: Disable preemption in kvm_arch_hardware_enable()
-> >       KVM: arm64: vgic-v4: Make the doorbell request robust w.r.t preem=
-ption
-> >
-> > Mostafa Saleh (1):
-> >       KVM: arm64: Add missing BTI instructions
-> >
-> > Oliver Upton (2):
-> >       KVM: arm64: Correctly handle page aging notifiers for unaligned m=
-emslot
-> >       KVM: arm64: Correctly handle RES0 bits PMEVTYPER<n>_EL0.evtCount
-> >
-> > Sudeep Holla (1):
-> >       KVM: arm64: Handle kvm_arm_init failure correctly in finalize_pkv=
-m
-> >
-> > Xiang Chen (1):
-> >       KVM: arm64: Fix the name of sys_reg_desc related to PMU
-> >
-> >  arch/arm64/include/asm/kvm_host.h    |  2 ++
-> >  arch/arm64/include/asm/kvm_pgtable.h | 26 +++++++-------------
-> >  arch/arm64/include/asm/virt.h        |  1 +
-> >  arch/arm64/kvm/arch_timer.c          |  6 ++---
-> >  arch/arm64/kvm/arm.c                 | 28 ++++++++++++++++++---
-> >  arch/arm64/kvm/hyp/hyp-entry.S       |  8 ++++++
-> >  arch/arm64/kvm/hyp/nvhe/host.S       | 10 ++++++++
-> >  arch/arm64/kvm/hyp/nvhe/psci-relay.c |  2 +-
-> >  arch/arm64/kvm/hyp/pgtable.c         | 47 ++++++++++++++++++++++++++++=
-+-------
-> >  arch/arm64/kvm/mmu.c                 | 18 ++++++--------
-> >  arch/arm64/kvm/pkvm.c                |  2 +-
-> >  arch/arm64/kvm/sys_regs.c            | 42 ++++++++++++++++------------=
-----
-> >  arch/arm64/kvm/vgic/vgic-v3.c        |  2 +-
-> >  arch/arm64/kvm/vgic/vgic-v4.c        |  7 ++++--
-> >  include/kvm/arm_vgic.h               |  2 +-
-> >  15 files changed, 133 insertions(+), 70 deletions(-)
+On 2023-07-18 at 16:44:51 -0700, Sean Christopherson wrote:
+> From: Chao Peng <chao.p.peng@linux.intel.com>
+> 
+> In confidential computing usages, whether a page is private or shared is
+> necessary information for KVM to perform operations like page fault
+> handling, page zapping etc. There are other potential use cases for
+> per-page memory attributes, e.g. to make memory read-only (or no-exec,
+> or exec-only, etc.) without having to modify memslots.
+> 
+> Introduce two ioctls (advertised by KVM_CAP_MEMORY_ATTRIBUTES) to allow
+> userspace to operate on the per-page memory attributes.
+>   - KVM_SET_MEMORY_ATTRIBUTES to set the per-page memory attributes to
+>     a guest memory range.
+>   - KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES to return the KVM supported
+>     memory attributes.
+> 
+> Use an xarray to store the per-page attributes internally, with a naive,
+> not fully optimized implementation, i.e. prioritize correctness over
+> performance for the initial implementation.
+> 
+> Because setting memory attributes is roughly analogous to mprotect() on
+> memory that is mapped into the guest, zap existing mappings prior to
+> updating the memory attributes.  Opportunistically provide an arch hook
+> for the post-set path (needed to complete invalidation anyways) in
+> anticipation of x86 needing the hook to update metadata related to
+> determining whether or not a given gfn can be backed with various sizes
+> of hugepages.
+> 
+> It's possible that future usages may not require an invalidation, e.g.
+> if KVM ends up supporting RWX protections and userspace grants _more_
+> protections, but again opt for simplicity and punt optimizations to
+> if/when they are needed.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Link: https://lore.kernel.org/all/Y2WB48kD0J4VGynX@google.com
+> Cc: Fuad Tabba <tabba@google.com>
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> Co-developed-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  Documentation/virt/kvm/api.rst |  60 ++++++++++++
+>  include/linux/kvm_host.h       |  14 +++
+>  include/uapi/linux/kvm.h       |  14 +++
+>  virt/kvm/Kconfig               |   4 +
+>  virt/kvm/kvm_main.c            | 170 +++++++++++++++++++++++++++++++++
+>  5 files changed, 262 insertions(+)
 >
 
+Only some trivial concerns below.
+
+[...]
+ 
+> @@ -1175,6 +1176,9 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
+>  	spin_lock_init(&kvm->mn_invalidate_lock);
+>  	rcuwait_init(&kvm->mn_memslots_update_rcuwait);
+>  	xa_init(&kvm->vcpu_array);
+> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+> +	xa_init(&kvm->mem_attr_array);
+> +#endif
+>  
+>  	INIT_LIST_HEAD(&kvm->gpc_list);
+>  	spin_lock_init(&kvm->gpc_lock);
+> @@ -1346,6 +1350,9 @@ static void kvm_destroy_vm(struct kvm *kvm)
+>  		kvm_free_memslots(kvm, &kvm->__memslots[i][0]);
+>  		kvm_free_memslots(kvm, &kvm->__memslots[i][1]);
+>  	}
+> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+> +	xa_destroy(&kvm->mem_attr_array);
+> +#endif
+
+Is it better to make the destruction in reverse order from the creation?
+To put xa_destroy(&kvm->mem_attr_array) after cleanup_srcu_struct(&kvm->srcu),
+or put xa_init(&kvm->mem_attr_array) after init_srcu_struct(&kvm->irq_srcu).
+
+>  	cleanup_srcu_struct(&kvm->irq_srcu);
+>  	cleanup_srcu_struct(&kvm->srcu);
+>  	kvm_arch_free_vm(kvm);
+> @@ -2346,6 +2353,145 @@ static int kvm_vm_ioctl_clear_dirty_log(struct kvm *kvm,
+>  }
+>  #endif /* CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT */
+
+[...]
+
+> +static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+> +					   struct kvm_memory_attributes *attrs)
+> +{
+> +	gfn_t start, end;
+> +
+> +	/* flags is currently not used. */
+> +	if (attrs->flags)
+> +		return -EINVAL;
+> +	if (attrs->attributes & ~kvm_supported_mem_attributes(kvm))
+> +		return -EINVAL;
+> +	if (attrs->size == 0 || attrs->address + attrs->size < attrs->address)
+> +		return -EINVAL;
+> +	if (!PAGE_ALIGNED(attrs->address) || !PAGE_ALIGNED(attrs->size))
+> +		return -EINVAL;
+> +
+> +	start = attrs->address >> PAGE_SHIFT;
+> +	end = (attrs->address + attrs->size - 1 + PAGE_SIZE) >> PAGE_SHIFT;
+
+As the attrs->address/size are both garanteed to be non-zero, non-wrap
+and page aligned in prevous check. Is it OK to simplify the calculation,
+like:
+
+  end = (attrs->address + attrs->size) >> PAGE_SHIFT;
+
+> +
+> +	if (WARN_ON_ONCE(start == end))
+> +		return -EINVAL;
+
+Also, is this check possible to be hit? Maybe remove it?
+
+Thanks,
+Yilun
+
+> +
+> +	/*
+> +	 * xarray tracks data using "unsigned long", and as a result so does
+> +	 * KVM.  For simplicity, supports generic attributes only on 64-bit
+> +	 * architectures.
+> +	 */
+> +	BUILD_BUG_ON(sizeof(attrs->attributes) != sizeof(unsigned long));
+> +
+> +	return kvm_vm_set_mem_attributes(kvm, attrs->attributes, start, end);
+> +}
+> +#endif /* CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES */
