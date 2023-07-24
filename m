@@ -1,143 +1,243 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E4EBE549;
-	Mon, 24 Jul 2023 16:27:25 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 14C73FEC;
-	Mon, 24 Jul 2023 09:28:02 -0700 (PDT)
-Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 11E4F3F5A1;
-	Mon, 24 Jul 2023 09:27:15 -0700 (PDT)
-Message-ID: <0d268afa-c04b-7a4e-be5e-2362d3dfa64d@arm.com>
-Date: Mon, 24 Jul 2023 17:27:14 +0100
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3080F747E
+	for <kvmarm@lists.linux.dev>; Mon, 24 Jul 2023 16:47:59 +0000 (UTC)
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3460770afe2so299685ab.1
+        for <kvmarm@lists.linux.dev>; Mon, 24 Jul 2023 09:47:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690217278; x=1690822078;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gK3B5wZw1OFgk2DT1iEhz+umMy+9ra8FX/pBQvU+W/w=;
+        b=xY3tx3WTK4KdOY0TvcsLtqmIECu15VlVbTEUqZLznKTrcEQ3qq9MZ8A73xGTPHFhur
+         A/0lC2YaasiB2qtLY96CMo7gEkIDOmPcUEvCDuOPhXiO41+3fvy2/Skq1jEll2CJZ4lB
+         wyvmFXGj4o8we+38ahIX0hi2cof+wdyVSxg0IuxH6YMIzNwMT6/bsiJ/gjrGwSSgyJjB
+         nLN8V8tWusmsM+7/fZZ4n+x9rbksRwiIno10akUtzIy+PPeQIuE7QuixtX1MDApQ0wfG
+         +Jl9ixl11ZsGp2pA/Fh2BIytERW9S4aYDU7b7oeTBewyBL4tWEcTlqqwi4vIUmQP0co3
+         8Khw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690217278; x=1690822078;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gK3B5wZw1OFgk2DT1iEhz+umMy+9ra8FX/pBQvU+W/w=;
+        b=Nb+zln5SJbWJ5x+gf1ANoIX40TDZdS4ouJ7hhEeOvP1u5rmblKVf48qfqwUiUfEoCj
+         C8HGi0DH6sR7mb/ToRlRGExWGwdIivfrOH3kYtZyQSVXjcBT0Yl91ysupcF8vHf+3Rv1
+         cyWsAr4Y078QJWIzDpABi5fg9PqbP9nNcYlWi4WH0SQOU4qUgWIi79XY9PryIwWY833Y
+         Ph0TLobkZR0sYBMPa3Ge9bD8+GfsnH439dl89JUbdvuEtIrBoaC2HwmEsUaDoMLUWOTB
+         2dbDpUJiKB56StAOxExoKA3Gc03lAzCxbE/KBcwGUBiEpM2xtg4Q/Ir6eAIPwJB035bh
+         RuHQ==
+X-Gm-Message-State: ABy/qLZ8Z5lMvbgxuSN7ljuomc1nIA9h4tEavtafeBWdCI4BrpoNgriL
+	ipKdzaiF9aKioWuQdfUPOXWRBkgEBLtIkBqP6gjBtA==
+X-Google-Smtp-Source: APBJJlFsPT/IwrE4lZVNtp/1e+lmtgN7VA69U7UflS8F9GMvZ0xsWoBJPqsBR24E0XAF1wZyOEEj+fEvQ3/vP7Be/nQ=
+X-Received: by 2002:a05:6e02:1a0d:b0:348:cfeb:f52 with SMTP id
+ s13-20020a056e021a0d00b00348cfeb0f52mr272705ild.7.1690217278012; Mon, 24 Jul
+ 2023 09:47:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [Question - ARM CCA] vCPU Hotplug Support in ARM Realm world
- might require ARM spec change?
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-To: Salil Mehta <salil.mehta@huawei.com>,
- "steven.price@arm.com" <steven.price@arm.com>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>,
- "james.morse@arm.com" <james.morse@arm.com>,
- "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>, Marc Zyngier
- <maz@kernel.org>, Will Deacon <will@kernel.org>,
- "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "mark.rutland@arm.com" <mark.rutland@arm.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- Salil Mehta <salil.mehta@opnsrc.net>,
- "andrew.jones@linux.dev" <andrew.jones@linux.dev>,
- yuzenghui <yuzenghui@huawei.com>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- Gareth Stockwell <Gareth.Stockwell@arm.com>
-References: <9cb24131a09a48e9a622e92bf8346c9d@huawei.com>
- <7da93c6e-1cbf-8840-282e-f115197b80c4@arm.com>
-Content-Language: en-US
-In-Reply-To: <7da93c6e-1cbf-8840-282e-f115197b80c4@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20230722022251.3446223-1-rananta@google.com> <20230722022251.3446223-13-rananta@google.com>
+ <0841aca6-2824-6a1b-a568-119f8bd220de@redhat.com>
+In-Reply-To: <0841aca6-2824-6a1b-a568-119f8bd220de@redhat.com>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Mon, 24 Jul 2023 09:47:46 -0700
+Message-ID: <CAJHc60znT5ThqKE3TgTW-0Us3oNv8+KF=81TSK0PbG3tTyJLFQ@mail.gmail.com>
+Subject: Re: [PATCH v7 12/12] KVM: arm64: Use TLBI range-based intructions for unmap
+To: Shaoqin Huang <shahuang@redhat.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Huacai Chen <chenhuacai@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Jing Zhang <jingzhangos@google.com>, Reiji Watanabe <reijiw@google.com>, 
+	Colton Lewis <coltonlewis@google.com>, David Matlack <dmatlack@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Salil
+On Mon, Jul 24, 2023 at 2:35=E2=80=AFAM Shaoqin Huang <shahuang@redhat.com>=
+ wrote:
+>
+> Hi Raghavendra,
+>
+> On 7/22/23 10:22, Raghavendra Rao Ananta wrote:
+> > The current implementation of the stage-2 unmap walker traverses
+> > the given range and, as a part of break-before-make, performs
+> > TLB invalidations with a DSB for every PTE. A multitude of this
+> > combination could cause a performance bottleneck on some systems.
+> >
+> > Hence, if the system supports FEAT_TLBIRANGE, defer the TLB
+> > invalidations until the entire walk is finished, and then
+> > use range-based instructions to invalidate the TLBs in one go.
+> > Condition deferred TLB invalidation on the system supporting FWB,
+> > as the optimization is entirely pointless when the unmap walker
+> > needs to perform CMOs.
+> >
+> > Rename stage2_put_pte() to stage2_unmap_put_pte() as the function
+> > now serves the stage-2 unmap walker specifically, rather than
+> > acting generic.
+> >
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > ---
+> >   arch/arm64/kvm/hyp/pgtable.c | 67 +++++++++++++++++++++++++++++++----=
+-
+> >   1 file changed, 58 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.=
+c
+> > index 5ef098af1736..cf88933a2ea0 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -831,16 +831,54 @@ static void stage2_make_pte(const struct kvm_pgta=
+ble_visit_ctx *ctx, kvm_pte_t n
+> >       smp_store_release(ctx->ptep, new);
+> >   }
+> >
+> > -static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, st=
+ruct kvm_s2_mmu *mmu,
+> > -                        struct kvm_pgtable_mm_ops *mm_ops)
+> > +struct stage2_unmap_data {
+> > +     struct kvm_pgtable *pgt;
+> > +     bool defer_tlb_flush_init;
+> > +};
+> > +
+> > +static bool __stage2_unmap_defer_tlb_flush(struct kvm_pgtable *pgt)
+> > +{
+> > +     /*
+> > +      * If FEAT_TLBIRANGE is implemented, defer the individual
+> > +      * TLB invalidations until the entire walk is finished, and
+> > +      * then use the range-based TLBI instructions to do the
+> > +      * invalidations. Condition deferred TLB invalidation on the
+> > +      * system supporting FWB, as the optimization is entirely
+> > +      * pointless when the unmap walker needs to perform CMOs.
+> > +      */
+> > +     return system_supports_tlb_range() && stage2_has_fwb(pgt);
+> > +}
+> > +
+> > +static bool stage2_unmap_defer_tlb_flush(struct stage2_unmap_data *unm=
+ap_data)
+> > +{
+> > +     bool defer_tlb_flush =3D __stage2_unmap_defer_tlb_flush(unmap_dat=
+a->pgt);
+> > +
+> > +     /*
+> > +      * Since __stage2_unmap_defer_tlb_flush() is based on alternative
+> > +      * patching and the TLBIs' operations behavior depend on this,
+> > +      * track if there's any change in the state during the unmap sequ=
+ence.
+> > +      */
+> > +     WARN_ON(unmap_data->defer_tlb_flush_init !=3D defer_tlb_flush);
+> > +     return defer_tlb_flush;
+> > +}
+> > +
+> > +static void stage2_unmap_put_pte(const struct kvm_pgtable_visit_ctx *c=
+tx,
+> > +                             struct kvm_s2_mmu *mmu,
+> > +                             struct kvm_pgtable_mm_ops *mm_ops)
+> >   {
+> > +     struct stage2_unmap_data *unmap_data =3D ctx->arg;
+> > +
+> >       /*
+> > -      * Clear the existing PTE, and perform break-before-make with
+> > -      * TLB maintenance if it was valid.
+> > +      * Clear the existing PTE, and perform break-before-make if it wa=
+s
+> > +      * valid. Depending on the system support, the TLB maintenance fo=
+r
+> > +      * the same can be deferred until the entire unmap is completed.
+> >        */
+> >       if (kvm_pte_valid(ctx->old)) {
+> >               kvm_clear_pte(ctx->ptep);
+> > -             kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ct=
+x->level);
+> > +
+> > +             if (!stage2_unmap_defer_tlb_flush(unmap_data))
+> Why not directly check (unmap_data->defer_tlb_flush_init) here?
+>
+(Re-sending the reply as the previous one was formatted as HTML and
+was blocked by many lists)
 
-On 19/07/2023 10:28, Suzuki K Poulose wrote:
-> Hi Salil
-> 
-> Thanks for raising this.
-> 
-> On 19/07/2023 03:35, Salil Mehta wrote:
->> [Reposting it here from Linaro Open Discussion List for more eyes to 
->> look at]
->>
->> Hello,
->> I have recently started to dabble with ARM CCA stuff and check if our
->> recent changes to support vCPU Hotplug in ARM64 can work in the realm
->> world. I have realized that in the RMM specification[1] PSCI_CPU_ON
->> command(B5.3.3) does not handles the PSCI_DENIED return code(B5.4.2),
->> from the host. This might be required to support vCPU Hotplug feature
->> in the realm world in future. vCPU Hotplug is an important feature to
->> support kata-containers in realm world as it reduces the VM boot time
->> and facilitates dynamic adjustment of vCPUs (which I think should be
->> true even with Realm world as current implementation only makes use
->> of the PSCI_ON/OFF to realize the Hotplug look-like effect?)
->>
->>
->> As per our recent changes [2], [3] related to support vCPU Hotplug on
->> ARM64, we handle the guest exits due to SMC/HVC Hypercall in the
->> user-space i.e. VMM/Qemu. In realm world, REC Exits to host due to
->> PSCI_CPU_ON should undergo similar policy checks and I think,
->>
->> 1. Host should *deny* to online the target vCPUs which are NOT plugged
->> 2. This means target REC should be denied by host. Can host call
->>     RMI_PSCI_COMPETE in such s case?
->> 3. The *return* value (B5.3.3.1.3 Output values) should be PSCI_DENIED
-> 
-> The Realm exit with EXIT_PSCI already provides the parameters passed
-> onto the PSCI request. This happens for all PSCI calls except
-> (PSCI_VERSION and PSCI_FEAUTRES). The hyp could forward these exits to
-> the VMM and could invoke the RMI_PSCI_COMPLETE only when the VMM blesses 
-> the request (wherever applicable).
-> 
-> However, the RMM spec currently doesn't allow denying the request.
-> i.e., without RMI_PSCI_COMPLETE, the REC cannot be scheduled back in.
-> We will address this in the RMM spec and get back to you.
+No particular reason per say, but I was just going with the logic of
+determining if we need to defer the flush and the WARN_ON() parts
+separate.
+Any advantage if we directly check in stage2_unmap_put_pte() that I
+missed or is this purely for readability?
 
-This is now resolved in RMMv1.0-eac3 spec, available here [0].
+> > +                     kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu,
+> > +                                     ctx->addr, ctx->level);
+> Small indent hint. The ctx->addr can align with __kvm_tlb_flush_vmid_ipa.
+>
+Ah, yes. I'll adjust this if I send out a v8.
 
-This allows the host to DENY a PSCI_CPU_ON request. The RMM ensures that
-the response doesn't violate the security guarantees by checking the
-state of the target REC.
-
-[0] https://developer.arm.com/documentation/den0137/latest/
-
-Kind regards
-Suzuki
-
-
-
-
-> 
-> Kind regards
-> Suzuki
-> 
-> 
->> 4. Failure condition (B5.3.3.2) should be amended with
->>     runnable pre: target_rec.flags.runnable == NOT_RUNNABLE (?)
->>              post: result == PSCI_DENIED (?)
->> 5. Change would also be required in the flow (D1.4 PSCI flows) depicting
->>     PSCI_CPU_ON flow (D1.4.1)
->>
->> I do understand that ARM CCA support is in its infancy stage and
->> discussing about vCPU Hotplug in realm world seem to be a far-fetched
->> idea right now. But specification changes require lot of time and if
->> this change is really required then it should be further discussed
->> within ARM.
->>
->> Many thanks!
->>
->>
->> Bes regards
->> Salil
->>
->>
->> References:
->>
->> [1] https://developer.arm.com/documentation/den0137/latest/
->> [2] https://github.com/salil-mehta/qemu.git 
->> virt-cpuhp-armv8/rfc-v1-port11052023.dev-1
->> [3] https://git.gitlab.arm.com/linux-arm/linux-jm.git 
->> virtual_cpu_hotplug/rfc/v2
->>
-> 
-
+Thank you.
+Raghavendra
+> Thanks,
+> Shaoqin
+> >       }
+> >
+> >       mm_ops->put_page(ctx->ptep);
+> > @@ -1070,7 +1108,8 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtab=
+le *pgt, u64 addr, u64 size,
+> >   static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ct=
+x,
+> >                              enum kvm_pgtable_walk_flags visit)
+> >   {
+> > -     struct kvm_pgtable *pgt =3D ctx->arg;
+> > +     struct stage2_unmap_data *unmap_data =3D ctx->arg;
+> > +     struct kvm_pgtable *pgt =3D unmap_data->pgt;
+> >       struct kvm_s2_mmu *mmu =3D pgt->mmu;
+> >       struct kvm_pgtable_mm_ops *mm_ops =3D ctx->mm_ops;
+> >       kvm_pte_t *childp =3D NULL;
+> > @@ -1098,7 +1137,7 @@ static int stage2_unmap_walker(const struct kvm_p=
+gtable_visit_ctx *ctx,
+> >        * block entry and rely on the remaining portions being faulted
+> >        * back lazily.
+> >        */
+> > -     stage2_put_pte(ctx, mmu, mm_ops);
+> > +     stage2_unmap_put_pte(ctx, mmu, mm_ops);
+> >
+> >       if (need_flush && mm_ops->dcache_clean_inval_poc)
+> >               mm_ops->dcache_clean_inval_poc(kvm_pte_follow(ctx->old, m=
+m_ops),
+> > @@ -1112,13 +1151,23 @@ static int stage2_unmap_walker(const struct kvm=
+_pgtable_visit_ctx *ctx,
+> >
+> >   int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 s=
+ize)
+> >   {
+> > +     int ret;
+> > +     struct stage2_unmap_data unmap_data =3D {
+> > +             .pgt =3D pgt,
+> > +             .defer_tlb_flush_init =3D __stage2_unmap_defer_tlb_flush(=
+pgt),
+> > +     };
+> >       struct kvm_pgtable_walker walker =3D {
+> >               .cb     =3D stage2_unmap_walker,
+> > -             .arg    =3D pgt,
+> > +             .arg    =3D &unmap_data,
+> >               .flags  =3D KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABL=
+E_POST,
+> >       };
+> >
+> > -     return kvm_pgtable_walk(pgt, addr, size, &walker);
+> > +     ret =3D kvm_pgtable_walk(pgt, addr, size, &walker);
+> > +     if (stage2_unmap_defer_tlb_flush(&unmap_data))
+> > +             /* Perform the deferred TLB invalidations */
+> > +             kvm_tlb_flush_vmid_range(pgt->mmu, addr, size);
+> > +
+> > +     return ret;
+> >   }
+> >
+> >   struct stage2_attr_data {
+>
+> --
+> Shaoqin
+>
