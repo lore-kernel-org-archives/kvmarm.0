@@ -1,41 +1,41 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 363CA53BA
-	for <kvmarm@lists.linux.dev>; Mon, 24 Jul 2023 12:38:34 +0000 (UTC)
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-577323ba3d5so89497287b3.0
-        for <kvmarm@lists.linux.dev>; Mon, 24 Jul 2023 05:38:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8E4A6AA2
+	for <kvmarm@lists.linux.dev>; Mon, 24 Jul 2023 12:38:37 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-c83284edf0eso4684755276.3
+        for <kvmarm@lists.linux.dev>; Mon, 24 Jul 2023 05:38:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690202314; x=1690807114;
+        d=google.com; s=20221208; t=1690202316; x=1690807116;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
         bh=psvsYVSFp54YZxDJhUls2ygk6CpJChJRGAPyn8rKvmI=;
-        b=ujGBcvf2MauSmQzO2bzT+4DCNU3irP1u2BaUZPTr/8Iert63Ea2nu5OmZXhjPwA4yZ
-         h9BPTeHwuztVBslW3vuf1wQF8PdLzZf5UMs3umrCFsSMzVW+UBCvNhwFb0hjIcjDUzSO
-         J/6W16VJUUUC/oBHPHVV+t+ls8ymJ3d4hO2e5GrbimQG9YbcejU8LQaolxF0Om6BbnE9
-         tQlhF3fgiBEKBb6VcOwjxjuSIb3uvQhqEO2UYrf79CQO4oNPtZmylchd9cHMkSIK8kJs
-         OjlLSmkJZxkx2WMeAo7Jmj1G+VOnvw7Pzi/ke7AZIZ1LEHdA3xXsj4jop0Ii9wF2lQCC
-         5fUQ==
+        b=MhTEtSAqfxc4+e20GES/Zun/i1kSmyiRXH5mmo/prDGxKaxTLX20kKOdjQ42GRfeca
+         bxB0nWrRrXxqCwH88Z3f1D+DPgyptr8OjbxufaPhUyC8KKXmUr/bePsYPXVrNkm4mtdN
+         pCXA516IeqYFBCZ1SuSLT+0+sONSOOcdBr4kzPFOy7LGJqjxE6+o0xdrCZjnkY91o+2w
+         00QTcGqDZdUWcaw8lzBxRFN9RPCqOXnTXULPFNXNzqPb52b78HtxFeOxdTQWI+Z71FBV
+         bGvhla5vv+abfhQU/uPaUseOZ1SdqBZ41perCbZbLk0kMMg1/noGPlNCKVxPhoB3JgE9
+         FX4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690202314; x=1690807114;
+        d=1e100.net; s=20221208; t=1690202316; x=1690807116;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
         bh=psvsYVSFp54YZxDJhUls2ygk6CpJChJRGAPyn8rKvmI=;
-        b=GSCu7VWqH/bwUHo9NSydLZNjVhPN60F3u+qLiP+nzozI4GfOn5cVZ3oIG4bD7ayXI6
-         ndXz91btOrwdGeE01zmrLLs5zTmxNS6BpNKSASBnrO8XYKJ7mb1iHxnBLMCfwdFvi+di
-         c3dRChhzD9Zr4sGYVL/5EEPnnDjAqY9Lq1ogy42oRCNT7/hj1IxzGpQZqxfj5LsMGfYC
-         FfsPRITxmMRnfpb2PfCnFbiWFKuKWmvhupzUF4/G6deBiPRsQi9mljXFlCcj/QtfszWh
-         yul/6TAGxZ1+1WdHM7eTrKQgrI06Xizju0+hkasNgHOWjjIukkoiW/fpYuaOnOnrYjZU
-         rnFQ==
-X-Gm-Message-State: ABy/qLa6ZMjBqUJHE4kyJSy7VulPPk+spc8KroXxRKfvHqWkm8mHEUKv
-	jE8gn2gX85BCVdqiHhi/Zk1pt8wzIOVCN9EqjRAp5zGld/+rQCsIjxHKAViKRprDdSZJkbnQuZd
-	l9hnoRrgDo7oXhERmmUUdYNq/JjAWbvfkaqpRQVEQxsc13wGBe8EQvTjaMgE=
-X-Google-Smtp-Source: APBJJlEK+qTJJtKp58a1/gru/G3QS3SEpo6HXhkIYJJ/O+5K9gkfdGNaQrhgQyi530MhOxpqq8L5pyB/8w==
+        b=fFTMq1YmBmuSnkWvmnFBpfMrjmVa5KYw8MsXpVdkVux9K8AliQPRJZ+dRIvV+CBCQG
+         ACs2GC2fmj481T5/K0nzFFEt6ZN7lXAeTFGwUA6xI8XCkFpHtQ/mvJzRpZTVdCl/STQW
+         KDGYuUc+LLy49XNGsoEJQ58mMbRkURV3rshYF0VQrgqGgZi/9BlXmwhyixDSoKzkbIKr
+         z6ISQDbH3FC0skkMhi3McNoOUyJX1SZUYR85x7ziYKLVXSCL6AxD1WeCStq/ItcFR5DC
+         5N/tD1Z8zuxFQl3aEksQgSbTX69tT/h1ZugFXa73Cjx2e4VjHP0AVV/5KPFoaxAj9oCV
+         mobA==
+X-Gm-Message-State: ABy/qLaFt1NGjIsjIWt3p2YWkP/XjcayvUk6q16klFHLjNxYJpbek0Zq
+	bQNllzdXhNT4Ti5jBWiZbtc8wdgF9fC9mD7V1CeM3hQvIzog5qD5lVhXXfJ6eWefumOXlt0vEZm
+	YMH8sO9zBJVv7vtl2/8BJKFQ1Yj4x34n4nHzEhkTUCeuffxdWZYx5aPR3sI4=
+X-Google-Smtp-Source: APBJJlEa6jgM1XvkjeuEG+qoqMTACGx/rBuBeQclJMjtOmiDQ6ZetrI06SLPXpbKulHujvpyIMzIdTcf5Q==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a25:c9c3:0:b0:d00:f564:509b with SMTP id
- z186-20020a25c9c3000000b00d00f564509bmr106888ybf.1.1690202313776; Mon, 24 Jul
- 2023 05:38:33 -0700 (PDT)
-Date: Mon, 24 Jul 2023 13:38:22 +0100
+ (user=tabba job=sendgmr) by 2002:a25:3354:0:b0:d0f:bcfe:bc74 with SMTP id
+ z81-20020a253354000000b00d0fbcfebc74mr19419ybz.9.1690202316205; Mon, 24 Jul
+ 2023 05:38:36 -0700 (PDT)
+Date: Mon, 24 Jul 2023 13:38:23 +0100
 In-Reply-To: <20230724123829.2929609-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -45,8 +45,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230724123829.2929609-1-tabba@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230724123829.2929609-2-tabba@google.com>
-Subject: [PATCH v3 1/7] KVM: arm64: Factor out code for checking E2H into a macro
+Message-ID: <20230724123829.2929609-3-tabba@google.com>
+Subject: [PATCH v3 1/7] KVM: arm64: Factor out code for checking (h)VHE mode
+ into a macro
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com, 
