@@ -1,109 +1,145 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8A19101C0
-	for <kvmarm@lists.linux.dev>; Mon, 24 Jul 2023 20:16:29 +0000 (UTC)
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d063bd0bae8so4344101276.0
-        for <kvmarm@lists.linux.dev>; Mon, 24 Jul 2023 13:16:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690229788; x=1690834588;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CpyeHlxyK/Wxza2B0XbnLOYUqgpeakiOlUVm3eRpM6Q=;
-        b=j6FiLWVW1BEQWGRGDCNKnMdB/uBrkbSbLa1K1EDw/LiBM7C6eVkoRkCUsQ09WI8/Mv
-         Fny2LhZv1neNQ3Jabn3zYbY6YAZITRpwrzXHx4zZI9u5ceWLtCDmcrZMemFoU3tDb+fK
-         QbZ10Y+HN6R5WqhLtydaZX/6MwLGX2RVH/oHsL6aYKs8GIgi9WZA1x9l1MEoJwLIL1vk
-         itEK9g3ya0QTjILKmAA+DLMdCsEqRbStG5n7GR6YMdTn19PRPfIIB/OUkoR8GuYkump5
-         Op2hTrJXwr4NruPzzDOUA9+Du2VRB5PlDnJFULu7iJPUU+tT8iGY+bsTsCFdJfYvGyo6
-         5PLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690229788; x=1690834588;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CpyeHlxyK/Wxza2B0XbnLOYUqgpeakiOlUVm3eRpM6Q=;
-        b=SMh2pBh0oGt1bflWEVyDF0JzItwbfWsE3ft33nnB5Ol//06q80xHSNke05hLZ2mYvh
-         +fYqbRdwfrethBEQ7ExRtRwhnG/614ozypRqL8x6ZIhhRXjJq4khw+L7HQ58xwcaLjKt
-         5xFbc9aUC6owSs35JZgElixtJ8bcfKLNhKoIZaHzg4Hm9vTuK3HoGbuFbxkWG/CL0BQi
-         eRH7S25yawY409eubq5Df3LybOedRICX6c5Yt9JnPz6i4WYdbr5m2mdY51EJY+ekZdvU
-         MDSEVEYXVO493O22N/xOwGHbvnDfxT0K4dBouShTWLDXUr4HgrT6MyF5vcBbkubUHn8A
-         IyDA==
-X-Gm-Message-State: ABy/qLZHD4uaMhYBc9vc+1vr5LaYHiaOrVQESgEu+VD7o4rWTBTOt27I
-	BW1v8FQM0vPJEkPrJC3WDUSyO/j4QOA=
-X-Google-Smtp-Source: APBJJlETEm+sUDMdwBxTQh+PqsroqqaXQ8T9Z3RbdwPygXWQyA0h4pdWgzZRNvYOpLPGkfrhzs9fYbXOMr8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:100f:b0:cf2:ad45:2084 with SMTP id
- w15-20020a056902100f00b00cf2ad452084mr67527ybt.12.1690229788310; Mon, 24 Jul
- 2023 13:16:28 -0700 (PDT)
-Date: Mon, 24 Jul 2023 13:16:26 -0700
-In-Reply-To: <20230718234512.1690985-1-seanjc@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BDC7161;
+	Tue, 25 Jul 2023 00:05:47 +0000 (UTC)
+Received: from lhrpeml500006.china.huawei.com (unknown [172.18.147.226])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4R8xzY3f0Wz67yc8;
+	Tue, 25 Jul 2023 08:02:17 +0800 (CST)
+Received: from lhrpeml500001.china.huawei.com (7.191.163.213) by
+ lhrpeml500006.china.huawei.com (7.191.161.198) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 25 Jul 2023 01:05:43 +0100
+Received: from lhrpeml500001.china.huawei.com ([7.191.163.213]) by
+ lhrpeml500001.china.huawei.com ([7.191.163.213]) with mapi id 15.01.2507.027;
+ Tue, 25 Jul 2023 01:05:43 +0100
+From: Salil Mehta <salil.mehta@huawei.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, "steven.price@arm.com"
+	<steven.price@arm.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	"james.morse@arm.com" <james.morse@arm.com>, "linux-coco@lists.linux.dev"
+	<linux-coco@lists.linux.dev>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>
+CC: Catalin Marinas <catalin.marinas@arm.com>, Jonathan Cameron
+	<jonathan.cameron@huawei.com>, Marc Zyngier <maz@kernel.org>, Will Deacon
+	<will@kernel.org>, "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "mark.rutland@arm.com"
+	<mark.rutland@arm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "Salil
+ Mehta" <salil.mehta@opnsrc.net>, "andrew.jones@linux.dev"
+	<andrew.jones@linux.dev>, yuzenghui <yuzenghui@huawei.com>,
+	"kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	Gareth Stockwell <Gareth.Stockwell@arm.com>
+Subject: RE: [Question - ARM CCA] vCPU Hotplug Support in ARM Realm world
+ might require ARM spec change?
+Thread-Topic: [Question - ARM CCA] vCPU Hotplug Support in ARM Realm world
+ might require ARM spec change?
+Thread-Index: Adm55YYLPryt1tEKR0alBn01xBiFBwANXi2AAQoU7gAAA+aEUA==
+Date: Tue, 25 Jul 2023 00:05:43 +0000
+Message-ID: <93c9c8356e444fb287393a935a8c7899@huawei.com>
+References: <9cb24131a09a48e9a622e92bf8346c9d@huawei.com>
+	<7da93c6e-1cbf-8840-282e-f115197b80c4@arm.com>
+ <0d268afa-c04b-7a4e-be5e-2362d3dfa64d@arm.com>
+In-Reply-To: <0d268afa-c04b-7a4e-be5e-2362d3dfa64d@arm.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-originating-ip: [10.126.173.65]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230718234512.1690985-1-seanjc@google.com>
-Message-ID: <ZL7cGrJNV3//wsXD@google.com>
-Subject: Re: [RFC PATCH v11 00/29]  KVM: guest_memfd() and per-page attributes
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Maciej Szmigiero <mail@maciej.szmigiero.name>, Vlastimil Babka <vbabka@suse.cz>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	Kirill Shutemov <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
 
-Dropped non-KVM folks from Cc: so as not to bother them too much.
-
-On Tue, Jul 18, 2023, Sean Christopherson wrote:
-> This is the next iteration of implementing fd-based (instead of vma-based)
-> memory for KVM guests.  If you want the full background of why we are doing
-> this, please go read the v10 cover letter[1].
-> 
-> The biggest change from v10 is to implement the backing storage in KVM
-> itself, and expose it via a KVM ioctl() instead of a "generic" sycall.
-> See link[2] for details on why we pivoted to a KVM-specific approach.
-> 
-> Key word is "biggest".  Relative to v10, there are many big changes.
-> Highlights below (I can't remember everything that got changed at
-> this point).
-> 
-> Tagged RFC as there are a lot of empty changelogs, and a lot of missing
-> documentation.  And ideally, we'll have even more tests before merging.
-> There are also several gaps/opens (to be discussed in tomorrow's PUCK).
-
-I've pushed this to
-
-  https://github.com/kvm-x86/linux/tree/guest_memfd
-
-along with Isaku's fix for the lock ordering bug on top.
-
-As discussed at PUCK, I'll apply fixes/tweaks/changes on top until development
-stabilizes, and will only squash/fixup when we're ready to post v12 for broad
-review.
-
-Please "formally" post patches just like you normally would do, i.e. don't *just*
-repond to the buggy mail (though that is also helpful).  Standalone patches make
-it easier for me to manage things via lore/b4.
-
-If you can, put gmem or guest_memfd inside the square braces, e.g.
-
-  [PATCH gmem] KVM: <shortlog>
-
-so that it's obvious the patch is intended for the guest_memfd branch.  For fixes,
-please also be sure to use Fixes: tags and split patches to fix exactly one base
-commit, again to make my life easier.
-
-I'll likely add my own annotations when applying, e.g. [FIXUP] and whatnot, but
-that's purely notes for myself for the future squash/rebase.
-
-Thanks!
+SGkgU3V6dWtpLA0KU29ycnkgZm9yIHJlcGx5aW5nIGxhdGUgYXMgSSB3YXMgb24vb2ZmIGxhc3Qg
+d2VlayB0byB1bmRlcmdvIHNvbWUgbWVkaWNhbCB0ZXN0Lg0KDQoNCj4gRnJvbTogU3V6dWtpIEsg
+UG91bG9zZSA8c3V6dWtpLnBvdWxvc2VAYXJtLmNvbT4NCj4gU2VudDogTW9uZGF5LCBKdWx5IDI0
+LCAyMDIzIDU6MjcgUE0NCj4gDQo+IEhpIFNhbGlsDQo+IA0KPiBPbiAxOS8wNy8yMDIzIDEwOjI4
+LCBTdXp1a2kgSyBQb3Vsb3NlIHdyb3RlOg0KPiA+IEhpIFNhbGlsDQo+ID4NCj4gPiBUaGFua3Mg
+Zm9yIHJhaXNpbmcgdGhpcy4NCj4gPg0KPiA+IE9uIDE5LzA3LzIwMjMgMDM6MzUsIFNhbGlsIE1l
+aHRhIHdyb3RlOg0KPiA+PiBbUmVwb3N0aW5nIGl0IGhlcmUgZnJvbSBMaW5hcm8gT3BlbiBEaXNj
+dXNzaW9uIExpc3QgZm9yIG1vcmUgZXllcyB0bw0KPiA+PiBsb29rIGF0XQ0KPiA+Pg0KPiA+PiBI
+ZWxsbywNCj4gPj4gSSBoYXZlIHJlY2VudGx5IHN0YXJ0ZWQgdG8gZGFiYmxlIHdpdGggQVJNIEND
+QSBzdHVmZiBhbmQgY2hlY2sgaWYgb3VyDQo+ID4+IHJlY2VudCBjaGFuZ2VzIHRvIHN1cHBvcnQg
+dkNQVSBIb3RwbHVnIGluIEFSTTY0IGNhbiB3b3JrIGluIHRoZSByZWFsbQ0KPiA+PiB3b3JsZC4g
+SSBoYXZlIHJlYWxpemVkIHRoYXQgaW4gdGhlIFJNTSBzcGVjaWZpY2F0aW9uWzFdIFBTQ0lfQ1BV
+X09ODQo+ID4+IGNvbW1hbmQoQjUuMy4zKSBkb2VzIG5vdCBoYW5kbGVzIHRoZSBQU0NJX0RFTklF
+RCByZXR1cm4gY29kZShCNS40LjIpLA0KPiA+PiBmcm9tIHRoZSBob3N0LiBUaGlzIG1pZ2h0IGJl
+IHJlcXVpcmVkIHRvIHN1cHBvcnQgdkNQVSBIb3RwbHVnIGZlYXR1cmUNCj4gPj4gaW4gdGhlIHJl
+YWxtIHdvcmxkIGluIGZ1dHVyZS4gdkNQVSBIb3RwbHVnIGlzIGFuIGltcG9ydGFudCBmZWF0dXJl
+IHRvDQo+ID4+IHN1cHBvcnQga2F0YS1jb250YWluZXJzIGluIHJlYWxtIHdvcmxkIGFzIGl0IHJl
+ZHVjZXMgdGhlIFZNIGJvb3QgdGltZQ0KPiA+PiBhbmQgZmFjaWxpdGF0ZXMgZHluYW1pYyBhZGp1
+c3RtZW50IG9mIHZDUFVzICh3aGljaCBJIHRoaW5rIHNob3VsZCBiZQ0KPiA+PiB0cnVlIGV2ZW4g
+d2l0aCBSZWFsbSB3b3JsZCBhcyBjdXJyZW50IGltcGxlbWVudGF0aW9uIG9ubHkgbWFrZXMgdXNl
+DQo+ID4+IG9mIHRoZSBQU0NJX09OL09GRiB0byByZWFsaXplIHRoZSBIb3RwbHVnIGxvb2stbGlr
+ZSBlZmZlY3Q/KQ0KPiA+Pg0KPiA+Pg0KPiA+PiBBcyBwZXIgb3VyIHJlY2VudCBjaGFuZ2VzIFsy
+XSwgWzNdIHJlbGF0ZWQgdG8gc3VwcG9ydCB2Q1BVIEhvdHBsdWcgb24NCj4gPj4gQVJNNjQsIHdl
+IGhhbmRsZSB0aGUgZ3Vlc3QgZXhpdHMgZHVlIHRvIFNNQy9IVkMgSHlwZXJjYWxsIGluIHRoZQ0K
+PiA+PiB1c2VyLXNwYWNlIGkuZS4gVk1NL1FlbXUuIEluIHJlYWxtIHdvcmxkLCBSRUMgRXhpdHMg
+dG8gaG9zdCBkdWUgdG8NCj4gPj4gUFNDSV9DUFVfT04gc2hvdWxkIHVuZGVyZ28gc2ltaWxhciBw
+b2xpY3kgY2hlY2tzIGFuZCBJIHRoaW5rLA0KPiA+Pg0KPiA+PiAxLiBIb3N0IHNob3VsZCAqZGVu
+eSogdG8gb25saW5lIHRoZSB0YXJnZXQgdkNQVXMgd2hpY2ggYXJlIE5PVCBwbHVnZ2VkDQo+ID4+
+IDIuIFRoaXMgbWVhbnMgdGFyZ2V0IFJFQyBzaG91bGQgYmUgZGVuaWVkIGJ5IGhvc3QuIENhbiBo
+b3N0IGNhbGwNCj4gPj4gwqDCoMKgIFJNSV9QU0NJX0NPTVBFVEUgaW4gc3VjaCBzIGNhc2U/DQo+
+ID4+IDMuIFRoZSAqcmV0dXJuKiB2YWx1ZSAoQjUuMy4zLjEuMyBPdXRwdXQgdmFsdWVzKSBzaG91
+bGQgYmUgUFNDSV9ERU5JRUQNCj4gPg0KPiA+IFRoZSBSZWFsbSBleGl0IHdpdGggRVhJVF9QU0NJ
+IGFscmVhZHkgcHJvdmlkZXMgdGhlIHBhcmFtZXRlcnMgcGFzc2VkDQo+ID4gb250byB0aGUgUFND
+SSByZXF1ZXN0LiBUaGlzIGhhcHBlbnMgZm9yIGFsbCBQU0NJIGNhbGxzIGV4Y2VwdA0KPiA+IChQ
+U0NJX1ZFUlNJT04gYW5kIFBTQ0lfRkVBVVRSRVMpLiBUaGUgaHlwIGNvdWxkIGZvcndhcmQgdGhl
+c2UgZXhpdHMgdG8NCj4gPiB0aGUgVk1NIGFuZCBjb3VsZCBpbnZva2UgdGhlIFJNSV9QU0NJX0NP
+TVBMRVRFIG9ubHkgd2hlbiB0aGUgVk1NIGJsZXNzZXMNCj4gPiB0aGUgcmVxdWVzdCAod2hlcmV2
+ZXIgYXBwbGljYWJsZSkuDQo+ID4NCj4gPiBIb3dldmVyLCB0aGUgUk1NIHNwZWMgY3VycmVudGx5
+IGRvZXNuJ3QgYWxsb3cgZGVueWluZyB0aGUgcmVxdWVzdC4NCj4gPiBpLmUuLCB3aXRob3V0IFJN
+SV9QU0NJX0NPTVBMRVRFLCB0aGUgUkVDIGNhbm5vdCBiZSBzY2hlZHVsZWQgYmFjayBpbi4NCj4g
+PiBXZSB3aWxsIGFkZHJlc3MgdGhpcyBpbiB0aGUgUk1NIHNwZWMgYW5kIGdldCBiYWNrIHRvIHlv
+dS4NCj4gDQo+IFRoaXMgaXMgbm93IHJlc29sdmVkIGluIFJNTXYxLjAtZWFjMyBzcGVjLCBhdmFp
+bGFibGUgaGVyZSBbMF0uDQo+IA0KPiBUaGlzIGFsbG93cyB0aGUgaG9zdCB0byBERU5ZIGEgUFND
+SV9DUFVfT04gcmVxdWVzdC4gVGhlIFJNTSBlbnN1cmVzIHRoYXQNCj4gdGhlIHJlc3BvbnNlIGRv
+ZXNuJ3QgdmlvbGF0ZSB0aGUgc2VjdXJpdHkgZ3VhcmFudGVlcyBieSBjaGVja2luZyB0aGUNCj4g
+c3RhdGUgb2YgdGhlIHRhcmdldCBSRUMuDQo+IA0KPiBbMF0gaHR0cHM6Ly9kZXZlbG9wZXIuYXJt
+LmNvbS9kb2N1bWVudGF0aW9uL2RlbjAxMzcvbGF0ZXN0Lw0KDQoNCk1hbnkgdGhhbmtzIGZvciB0
+YWtpbmcgdGhpcyB1cCBwcm9hY3RpdmVseSBhbmQgZ2V0dGluZyBpdCBkb25lIGFzIHdlbGwNCnZl
+cnkgZWZmaWNpZW50bHkuIFJlYWxseSBhcHByZWNpYXRlIHRoaXMhDQoNCkkgYWNrbm93bGVkZ2Ug
+YmVsb3cgbmV3IGNoYW5nZXMgcGFydCBvZiB0aGUgbmV3bHkgcmVsZWFzZWQgUk1NDQpTcGVjaWZp
+Y2F0aW9uIFszXSAoUGFnZS0yKSAoUmVsZWFzZSBJbmZvcm1hdGlvbiAxLjAtZWFjMyAyMC0wNy0y
+MDIzKToNCg0KMS4gQWRkaXRpb24gb2YgQjIuMTkgUHNjaVJldHVybkNvZGVQZXJtaXR0ZWQgZnVu
+Y3Rpb24gWzNdIChQYWdlLTEyNikNCjIuIEFkZGl0aW9uIG9mICdzdGF0dXMnIGluIEIzLjMuNy4y
+IEZhaWx1cmUgY29uZGl0aW9ucyBvZiB0aGUNCiAgIEIzLjMuNyBSTUlfUFNDSV9DT01QTEVURSBj
+b21tYW5kIFszXSAoUGFnZS0xNjApDQoNCg0KU29tZSBGdXJ0aGVyIFN1Z2dlc3Rpb25zOg0KMS4g
+SXQgd291bGQgYmUgcmVhbGx5IGhlbHBmdWwgaWYgUFNDSV9ERU5JRUQgY2FuIGJlIGFjY29tbW9k
+YXRlZCBzb21ld2hlcmUNCiAgIGluIHRoZSBmbG93IGRpYWdyYW0gKEQxLjQuMSBQU0NJX0NQVV9P
+TiBmbG93KSBbM10gKFBhZ2UtMjk3KSBhcyB3ZWxsLg0KMi4gWW91IHdvdWxkIG5lZWQgY2hhbmdl
+cyB0byBoYW5kbGUgdGhlIHJldHVybiB2YWx1ZSBvZiB0aGUgUFNDSV9ERU5JRUQNCiAgIGluIHRo
+aXMgYmVsb3cgcGF0Y2ggWzJdIGFzIHdlbGwgZnJvbSBBUk0gQ0NBIHNlcmllcyBbMV0gDQoNCg0K
+QEphbWVzLCBBbnkgZnVydGhlciB0aG91Z2h0cyBvbiB0aGlzPw0KDQoNClJlZmVyZW5jZXM6DQpb
+MV0gW1JGQyBQQVRDSCAwMC8yOF0gYXJtNjQ6IFN1cHBvcnQgZm9yIEFybSBDQ0EgaW4gS1ZNDQpb
+Ml0gW1JGQyBQQVRDSCAxOS8yOF0gS1ZNOiBhcm02NDogVmFsaWRhdGUgcmVnaXN0ZXIgYWNjZXNz
+IGZvciBhIFJlYWxtIFZNDQogICAgIGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xrbWwvMjAyMzAx
+MjcxMTIyNDguMTM2ODEwLTEtc3V6dWtpLnBvdWxvc2VAYXJtLmNvbS9ULyNtNmMxMGI5YTI3YzRh
+NzI0OTY3YzE4MDBmYWNhY2FhOTQ0M2IzOGI0Yw0KWzNdIEFSTSBSZWFsbSBNYW5hZ2VtZW50IE1v
+bml0b3Igc3BlY2lmaWNhdGlvbihERU4wMTM3IDEuMC1lYWMzKQ0KICAgIGh0dHBzOi8vZGV2ZWxv
+cGVyLmFybS5jb20vZG9jdW1lbnRhdGlvbi9kZW4wMTM3L2xhdGVzdC8NCiANCg0KVGhhbmtzDQpT
+YWxpbC4NCg0KDQo+ID4+IDQuIEZhaWx1cmUgY29uZGl0aW9uIChCNS4zLjMuMikgc2hvdWxkIGJl
+IGFtZW5kZWQgd2l0aA0KPiA+PiDCoMKgwqAgcnVubmFibGUgcHJlOiB0YXJnZXRfcmVjLmZsYWdz
+LnJ1bm5hYmxlID09IE5PVF9SVU5OQUJMRSAoPykNCj4gPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgIHBvc3Q6IHJlc3VsdCA9PSBQU0NJX0RFTklFRCAoPykNCj4gPj4gNS4gQ2hhbmdlIHdvdWxk
+IGFsc28gYmUgcmVxdWlyZWQgaW4gdGhlIGZsb3cgKEQxLjQgUFNDSSBmbG93cykgZGVwaWN0aW5n
+DQo+ID4+IMKgwqDCoCBQU0NJX0NQVV9PTiBmbG93IChEMS40LjEpDQo+ID4+DQo+ID4+IEkgZG8g
+dW5kZXJzdGFuZCB0aGF0IEFSTSBDQ0Egc3VwcG9ydCBpcyBpbiBpdHMgaW5mYW5jeSBzdGFnZSBh
+bmQNCj4gPj4gZGlzY3Vzc2luZyBhYm91dCB2Q1BVIEhvdHBsdWcgaW4gcmVhbG0gd29ybGQgc2Vl
+bSB0byBiZSBhIGZhci1mZXRjaGVkDQo+ID4+IGlkZWEgcmlnaHQgbm93LiBCdXQgc3BlY2lmaWNh
+dGlvbiBjaGFuZ2VzIHJlcXVpcmUgbG90IG9mIHRpbWUgYW5kIGlmDQo+ID4+IHRoaXMgY2hhbmdl
+IGlzIHJlYWxseSByZXF1aXJlZCB0aGVuIGl0IHNob3VsZCBiZSBmdXJ0aGVyIGRpc2N1c3NlZA0K
+PiA+PiB3aXRoaW4gQVJNLg0KPiA+Pg0KPiA+PiBNYW55IHRoYW5rcyENCj4gPj4NCj4gPj4NCj4g
+Pj4gQmVzIHJlZ2FyZHMNCj4gPj4gU2FsaWwNCj4gPj4NCj4gPj4NCj4gPj4gUmVmZXJlbmNlczoN
+Cj4gPj4NCj4gPj4gWzFdIGh0dHBzOi8vZGV2ZWxvcGVyLmFybS5jb20vZG9jdW1lbnRhdGlvbi9k
+ZW4wMTM3L2xhdGVzdC8NCj4gPj4gWzJdIGh0dHBzOi8vZ2l0aHViLmNvbS9zYWxpbC1tZWh0YS9x
+ZW11LmdpdCB2aXJ0LWNwdWhwLWFybXY4L3JmYy12MS1wb3J0MTEwNTIwMjMuZGV2LTENCj4gPj4g
+WzNdIGh0dHBzOi8vZ2l0LmdpdGxhYi5hcm0uY29tL2xpbnV4LWFybS9saW51eC1qbS5naXQgdmly
+dHVhbF9jcHVfaG90cGx1Zy9yZmMvdjINCg0K
