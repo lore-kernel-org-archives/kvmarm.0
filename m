@@ -1,187 +1,165 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3194D1ED38;
-	Tue, 25 Jul 2023 11:20:00 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 94A5615BF;
-	Tue, 25 Jul 2023 04:20:43 -0700 (PDT)
-Received: from [10.57.89.166] (unknown [10.57.89.166])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E7A7E3F67D;
-	Tue, 25 Jul 2023 04:19:56 -0700 (PDT)
-Message-ID: <8a828ef2-b09b-4322-26fa-eae6cc88753f@arm.com>
-Date: Tue, 25 Jul 2023 12:19:54 +0100
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10D86C8C3
+	for <kvmarm@lists.linux.dev>; Tue, 25 Jul 2023 12:44:59 +0000 (UTC)
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-98e39784a85so1388103966b.1
+        for <kvmarm@lists.linux.dev>; Tue, 25 Jul 2023 05:44:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1690289098; x=1690893898;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=DVe5kbgnFh2Y4eGHfjCzHKbLu04TQkYMB7dsKJm3Umo=;
+        b=GpcyljcjU7Qr5dRNNYfizZwrwBd4cnjkvyHTuvC/QsN3XiYBpHJim9y0Fwhwc12FfD
+         aXUdwC4S44xNeyqhfcrwKMKZn14++9A7dS881Sg+Nm6Rp55TRzJuABW3jgcxoetQ82KS
+         rdPHpg0b0w+Cu7zrIR6V80QMY49a17Up7GMpMri0hlbFbJ/e85dQN/8v9LUhnjzptMP2
+         I1rLEsN8NAbBHL6D2Z4ZsHzrPphtmuQjq1BmY4zHbzxWwUm57J72SMevDz7P6ChP9tkh
+         1bWV1k8SOuFyF7PNNO2I0iyrpY/3VczpraJ9h6dwsNUtCnP2hQGAMKzOgSjG1qKB+O+3
+         SQ1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690289098; x=1690893898;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DVe5kbgnFh2Y4eGHfjCzHKbLu04TQkYMB7dsKJm3Umo=;
+        b=k8hPx43u4T6xXkqCVr65c9jXqPqT9bPcjUunU2GiceRdH4zjoCb8NU0bt8ZQ82TYWO
+         kK9+2lGZdJ2Gsod/EJPuvZsMlMmUop3eI+otB/sACWkxDfADVXBo8MlbffJ/9g2XjUQn
+         nABV3zaGQcrJzw48QWJAme9JObxIhakGXbiShciy/XgtzStZAWaptyM9IwzWmDJob1zb
+         Rj6e+eYizofWgb/uG1mOhgnVLBkzptzXyxhMgroTuClPBGEtQAnMiz/XOEAQ/1uzebEW
+         qMscIy3gLmrBHazMjr09ia6mjIG2Mhtxahmn+B358LGaOGVuodIGO2sjdh12BWLitUbX
+         yZ4Q==
+X-Gm-Message-State: ABy/qLb9awPWwfGy/Azkn1WqJj3W3StL3Zd9AvApbrkTt6bu9TBMpK4z
+	cS5bhneXj7+AzBb+IkFtG2v3qw==
+X-Google-Smtp-Source: APBJJlGRSB+oOdzfbHk1XswFZQ6sXyZlhMpraB1keFiipvJqv7JZBaK38TlZAFpu/NEWGgF+T3sqfA==
+X-Received: by 2002:a17:906:5dd8:b0:99b:4d3d:c9b7 with SMTP id p24-20020a1709065dd800b0099b4d3dc9b7mr2464164ejv.31.1690289098120;
+        Tue, 25 Jul 2023 05:44:58 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id qp7-20020a170907206700b00992b66e54e9sm8134209ejb.214.2023.07.25.05.44.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jul 2023 05:44:57 -0700 (PDT)
+Date: Tue, 25 Jul 2023 14:44:56 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Haibo Xu <xiaobo55x@gmail.com>
+Cc: Haibo Xu <haibo1.xu@intel.com>, maz@kernel.org, oliver.upton@linux.dev, 
+	seanjc@google.com, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Shuah Khan <shuah@kernel.org>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Ricardo Koller <ricarkol@google.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Vipin Sharma <vipinsh@google.com>, 
+	David Matlack <dmatlack@google.com>, Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v6 06/13] KVM: arm64: selftests: Split get-reg-list test
+ code
+Message-ID: <20230725-f5cf47c63abd8673d22b4936@orel>
+References: <cover.1690273969.git.haibo1.xu@intel.com>
+ <1f25f27d1316bc91e1e31cd3d50a1d20f696759a.1690273969.git.haibo1.xu@intel.com>
+ <CAJve8okJ-HYpsOrqH4Zvn7OBtwXWa4JumC+ZsMfHKB-deVYd2A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [Question - ARM CCA] vCPU Hotplug Support in ARM Realm world
- might require ARM spec change?
-To: Salil Mehta <salil.mehta@huawei.com>,
- "steven.price@arm.com" <steven.price@arm.com>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>,
- "james.morse@arm.com" <james.morse@arm.com>,
- "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>, Marc Zyngier
- <maz@kernel.org>, Will Deacon <will@kernel.org>,
- "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "mark.rutland@arm.com" <mark.rutland@arm.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- Salil Mehta <salil.mehta@opnsrc.net>,
- "andrew.jones@linux.dev" <andrew.jones@linux.dev>,
- yuzenghui <yuzenghui@huawei.com>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- Gareth Stockwell <Gareth.Stockwell@arm.com>
-References: <9cb24131a09a48e9a622e92bf8346c9d@huawei.com>
- <7da93c6e-1cbf-8840-282e-f115197b80c4@arm.com>
- <0d268afa-c04b-7a4e-be5e-2362d3dfa64d@arm.com>
- <93c9c8356e444fb287393a935a8c7899@huawei.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <93c9c8356e444fb287393a935a8c7899@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJve8okJ-HYpsOrqH4Zvn7OBtwXWa4JumC+ZsMfHKB-deVYd2A@mail.gmail.com>
 
-Hi Salil
+On Tue, Jul 25, 2023 at 04:50:36PM +0800, Haibo Xu wrote:
+> On Tue, Jul 25, 2023 at 4:37 PM Haibo Xu <haibo1.xu@intel.com> wrote:
+> >
+> > From: Andrew Jones <ajones@ventanamicro.com>
+> >
+> > Split the arch-neutral test code out of aarch64/get-reg-list.c into
+> > get-reg-list.c. To do this we invent a new make variable
+> > $(SPLIT_TESTS) which expects common parts to be in the KVM selftests
+> > root and the counterparts to have the same name, but be in
+> > $(ARCH_DIR).
+> >
+> > There's still some work to be done to de-aarch64 the common
+> > get-reg-list.c, but we leave that to the next patch to avoid
+> > modifying too much code while moving it.
+> >
+> > Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
+> > Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
+> > ---
+> >  tools/testing/selftests/kvm/Makefile          |  12 +-
+> >  .../selftests/kvm/aarch64/get-reg-list.c      | 367 +----------------
+> >  tools/testing/selftests/kvm/get-reg-list.c    | 377 ++++++++++++++++++
+> >  3 files changed, 398 insertions(+), 358 deletions(-)
+> >  create mode 100644 tools/testing/selftests/kvm/get-reg-list.c
+> >
+> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> > index c692cc86e7da..95f180e711d5 100644
+> > --- a/tools/testing/selftests/kvm/Makefile
+> > +++ b/tools/testing/selftests/kvm/Makefile
+> > @@ -140,7 +140,6 @@ TEST_GEN_PROGS_EXTENDED_x86_64 += x86_64/nx_huge_pages_test
+> >  TEST_GEN_PROGS_aarch64 += aarch64/aarch32_id_regs
+> >  TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
+> >  TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
+> > -TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
+> >  TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
+> >  TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
+> >  TEST_GEN_PROGS_aarch64 += aarch64/psci_test
+> > @@ -152,6 +151,7 @@ TEST_GEN_PROGS_aarch64 += access_tracking_perf_test
+> >  TEST_GEN_PROGS_aarch64 += demand_paging_test
+> >  TEST_GEN_PROGS_aarch64 += dirty_log_test
+> >  TEST_GEN_PROGS_aarch64 += dirty_log_perf_test
+> > +TEST_GEN_PROGS_aarch64 += get-reg-list
+> >  TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
+> >  TEST_GEN_PROGS_aarch64 += kvm_page_table_test
+> >  TEST_GEN_PROGS_aarch64 += memslot_modification_stress_test
+> > @@ -181,6 +181,8 @@ TEST_GEN_PROGS_riscv += kvm_page_table_test
+> >  TEST_GEN_PROGS_riscv += set_memory_region_test
+> >  TEST_GEN_PROGS_riscv += kvm_binary_stats_test
+> >
+> > +SPLIT_TESTS += get-reg-list
+> > +
+> >  TEST_PROGS += $(TEST_PROGS_$(ARCH_DIR))
+> >  TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH_DIR))
+> >  TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH_DIR))
+> > @@ -228,11 +230,14 @@ LIBKVM_C_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_C))
+> >  LIBKVM_S_OBJ := $(patsubst %.S, $(OUTPUT)/%.o, $(LIBKVM_S))
+> >  LIBKVM_STRING_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_STRING))
+> >  LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(LIBKVM_STRING_OBJ)
+> > +SPLIT_TESTS_TARGETS := $(patsubst %, $(OUTPUT)/%, $(SPLIT_TESTS))
+> > +SPLIT_TESTS_OBJS := $(patsubst %, $(ARCH_DIR)/%.o, $(SPLIT_TESTS))
+> >
+> >  TEST_GEN_OBJ = $(patsubst %, %.o, $(TEST_GEN_PROGS))
+> >  TEST_GEN_OBJ += $(patsubst %, %.o, $(TEST_GEN_PROGS_EXTENDED))
+> >  TEST_DEP_FILES = $(patsubst %.o, %.d, $(TEST_GEN_OBJ))
+> >  TEST_DEP_FILES += $(patsubst %.o, %.d, $(LIBKVM_OBJS))
+> > +TEST_DEP_FILES += $(patsubst %.o, %.d, $(SPLIT_TESTS_OBJS))
+> >  -include $(TEST_DEP_FILES)
+> >
+> >  $(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED): %: %.o
+> > @@ -240,7 +245,10 @@ $(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED): %: %.o
+> >  $(TEST_GEN_OBJ): $(OUTPUT)/%.o: %.c
+> >         $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+> >
+> > -EXTRA_CLEAN += $(LIBKVM_OBJS) $(TEST_DEP_FILES) $(TEST_GEN_OBJ) cscope.*
+> > +$(SPLIT_TESTS_TARGETS): %: %.o $(SPLIT_TESTS_OBJS)
+> > +       $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
+> > +
+> > +EXTRA_CLEAN += $(LIBKVM_OBJS) $(TEST_DEP_FILES) $(TEST_GEN_OBJ) $(SPLIT_TESTS_OBJS) cscope.*
+> >
+> >  x := $(shell mkdir -p $(sort $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
+> >  $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c
+> 
+> Hi @Andrew Jones,
+> 
+> After rebasing to v6.5-rc3, some changes are needed to the SPLIT_TESTS
+> target, or the make would fail.
+> Please help have a look.
+>
 
-On 25/07/2023 01:05, Salil Mehta wrote:
-> Hi Suzuki,
-> Sorry for replying late as I was on/off last week to undergo some medical test.
-> 
-> 
->> From: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Sent: Monday, July 24, 2023 5:27 PM
->>
->> Hi Salil
->>
->> On 19/07/2023 10:28, Suzuki K Poulose wrote:
->>> Hi Salil
->>>
->>> Thanks for raising this.
->>>
->>> On 19/07/2023 03:35, Salil Mehta wrote:
->>>> [Reposting it here from Linaro Open Discussion List for more eyes to
->>>> look at]
->>>>
->>>> Hello,
->>>> I have recently started to dabble with ARM CCA stuff and check if our
->>>> recent changes to support vCPU Hotplug in ARM64 can work in the realm
->>>> world. I have realized that in the RMM specification[1] PSCI_CPU_ON
->>>> command(B5.3.3) does not handles the PSCI_DENIED return code(B5.4.2),
->>>> from the host. This might be required to support vCPU Hotplug feature
->>>> in the realm world in future. vCPU Hotplug is an important feature to
->>>> support kata-containers in realm world as it reduces the VM boot time
->>>> and facilitates dynamic adjustment of vCPUs (which I think should be
->>>> true even with Realm world as current implementation only makes use
->>>> of the PSCI_ON/OFF to realize the Hotplug look-like effect?)
->>>>
->>>>
->>>> As per our recent changes [2], [3] related to support vCPU Hotplug on
->>>> ARM64, we handle the guest exits due to SMC/HVC Hypercall in the
->>>> user-space i.e. VMM/Qemu. In realm world, REC Exits to host due to
->>>> PSCI_CPU_ON should undergo similar policy checks and I think,
->>>>
->>>> 1. Host should *deny* to online the target vCPUs which are NOT plugged
->>>> 2. This means target REC should be denied by host. Can host call
->>>>      RMI_PSCI_COMPETE in such s case?
->>>> 3. The *return* value (B5.3.3.1.3 Output values) should be PSCI_DENIED
->>>
->>> The Realm exit with EXIT_PSCI already provides the parameters passed
->>> onto the PSCI request. This happens for all PSCI calls except
->>> (PSCI_VERSION and PSCI_FEAUTRES). The hyp could forward these exits to
->>> the VMM and could invoke the RMI_PSCI_COMPLETE only when the VMM blesses
->>> the request (wherever applicable).
->>>
->>> However, the RMM spec currently doesn't allow denying the request.
->>> i.e., without RMI_PSCI_COMPLETE, the REC cannot be scheduled back in.
->>> We will address this in the RMM spec and get back to you.
->>
->> This is now resolved in RMMv1.0-eac3 spec, available here [0].
->>
->> This allows the host to DENY a PSCI_CPU_ON request. The RMM ensures that
->> the response doesn't violate the security guarantees by checking the
->> state of the target REC.
->>
->> [0] https://developer.arm.com/documentation/den0137/latest/
-> 
-> 
-> Many thanks for taking this up proactively and getting it done as well
-> very efficiently. Really appreciate this!
-> 
-> I acknowledge below new changes part of the newly released RMM
-> Specification [3] (Page-2) (Release Information 1.0-eac3 20-07-2023):
-> 
-> 1. Addition of B2.19 PsciReturnCodePermitted function [3] (Page-126)
-> 2. Addition of 'status' in B3.3.7.2 Failure conditions of the
->     B3.3.7 RMI_PSCI_COMPLETE command [3] (Page-160)
-> 
-> 
-> Some Further Suggestions:
-> 1. It would be really helpful if PSCI_DENIED can be accommodated somewhere
->     in the flow diagram (D1.4.1 PSCI_CPU_ON flow) [3] (Page-297) as well.
+I took a look and then remembered why I hate looking at Makefiles... I
+guess it's fine, but it's a pity we need to repeat the $(CC) line.
 
-Good point, yes, will get that added.
-
-> 2. You would need changes to handle the return value of the PSCI_DENIED
->     in this below patch [2] as well from ARM CCA series [1]
-> 
-
-Of course. Please note that the series [1] is based on RMMv1.0-beta0 and
-we are in the process of rebasing our changes to v1.0-eac3, which
-includes a lot of other changes. The updated series will have all the
-required changes.
-
-Kind regards
-Suzuki
-
-
-> 
-> @James, Any further thoughts on this?
-> 
-> 
-> References:
-> [1] [RFC PATCH 00/28] arm64: Support for Arm CCA in KVM
-> [2] [RFC PATCH 19/28] KVM: arm64: Validate register access for a Realm VM
->       https://lore.kernel.org/lkml/20230127112248.136810-1-suzuki.poulose@arm.com/T/#m6c10b9a27c4a724967c1800facacaa9443b38b4c
-> [3] ARM Realm Management Monitor specification(DEN0137 1.0-eac3)
->      https://developer.arm.com/documentation/den0137/latest/
->   
-> 
-> Thanks
-> Salil.
-> 
-> 
->>>> 4. Failure condition (B5.3.3.2) should be amended with
->>>>      runnable pre: target_rec.flags.runnable == NOT_RUNNABLE (?)
->>>>               post: result == PSCI_DENIED (?)
->>>> 5. Change would also be required in the flow (D1.4 PSCI flows) depicting
->>>>      PSCI_CPU_ON flow (D1.4.1)
->>>>
->>>> I do understand that ARM CCA support is in its infancy stage and
->>>> discussing about vCPU Hotplug in realm world seem to be a far-fetched
->>>> idea right now. But specification changes require lot of time and if
->>>> this change is really required then it should be further discussed
->>>> within ARM.
->>>>
->>>> Many thanks!
->>>>
->>>>
->>>> Bes regards
->>>> Salil
->>>>
->>>>
->>>> References:
->>>>
->>>> [1] https://developer.arm.com/documentation/den0137/latest/
->>>> [2] https://github.com/salil-mehta/qemu.git virt-cpuhp-armv8/rfc-v1-port11052023.dev-1
->>>> [3] https://git.gitlab.arm.com/linux-arm/linux-jm.git virtual_cpu_hotplug/rfc/v2
-> 
-
+Thanks,
+drew
