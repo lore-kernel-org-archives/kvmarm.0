@@ -1,165 +1,114 @@
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10D86C8C3
-	for <kvmarm@lists.linux.dev>; Tue, 25 Jul 2023 12:44:59 +0000 (UTC)
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-98e39784a85so1388103966b.1
-        for <kvmarm@lists.linux.dev>; Tue, 25 Jul 2023 05:44:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1690289098; x=1690893898;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=DVe5kbgnFh2Y4eGHfjCzHKbLu04TQkYMB7dsKJm3Umo=;
-        b=GpcyljcjU7Qr5dRNNYfizZwrwBd4cnjkvyHTuvC/QsN3XiYBpHJim9y0Fwhwc12FfD
-         aXUdwC4S44xNeyqhfcrwKMKZn14++9A7dS881Sg+Nm6Rp55TRzJuABW3jgcxoetQ82KS
-         rdPHpg0b0w+Cu7zrIR6V80QMY49a17Up7GMpMri0hlbFbJ/e85dQN/8v9LUhnjzptMP2
-         I1rLEsN8NAbBHL6D2Z4ZsHzrPphtmuQjq1BmY4zHbzxWwUm57J72SMevDz7P6ChP9tkh
-         1bWV1k8SOuFyF7PNNO2I0iyrpY/3VczpraJ9h6dwsNUtCnP2hQGAMKzOgSjG1qKB+O+3
-         SQ1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690289098; x=1690893898;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DVe5kbgnFh2Y4eGHfjCzHKbLu04TQkYMB7dsKJm3Umo=;
-        b=k8hPx43u4T6xXkqCVr65c9jXqPqT9bPcjUunU2GiceRdH4zjoCb8NU0bt8ZQ82TYWO
-         kK9+2lGZdJ2Gsod/EJPuvZsMlMmUop3eI+otB/sACWkxDfADVXBo8MlbffJ/9g2XjUQn
-         nABV3zaGQcrJzw48QWJAme9JObxIhakGXbiShciy/XgtzStZAWaptyM9IwzWmDJob1zb
-         Rj6e+eYizofWgb/uG1mOhgnVLBkzptzXyxhMgroTuClPBGEtQAnMiz/XOEAQ/1uzebEW
-         qMscIy3gLmrBHazMjr09ia6mjIG2Mhtxahmn+B358LGaOGVuodIGO2sjdh12BWLitUbX
-         yZ4Q==
-X-Gm-Message-State: ABy/qLb9awPWwfGy/Azkn1WqJj3W3StL3Zd9AvApbrkTt6bu9TBMpK4z
-	cS5bhneXj7+AzBb+IkFtG2v3qw==
-X-Google-Smtp-Source: APBJJlGRSB+oOdzfbHk1XswFZQ6sXyZlhMpraB1keFiipvJqv7JZBaK38TlZAFpu/NEWGgF+T3sqfA==
-X-Received: by 2002:a17:906:5dd8:b0:99b:4d3d:c9b7 with SMTP id p24-20020a1709065dd800b0099b4d3dc9b7mr2464164ejv.31.1690289098120;
-        Tue, 25 Jul 2023 05:44:58 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id qp7-20020a170907206700b00992b66e54e9sm8134209ejb.214.2023.07.25.05.44.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 05:44:57 -0700 (PDT)
-Date: Tue, 25 Jul 2023 14:44:56 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Haibo Xu <xiaobo55x@gmail.com>
-Cc: Haibo Xu <haibo1.xu@intel.com>, maz@kernel.org, oliver.upton@linux.dev, 
-	seanjc@google.com, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Shuah Khan <shuah@kernel.org>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Ricardo Koller <ricarkol@google.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Vipin Sharma <vipinsh@google.com>, 
-	David Matlack <dmatlack@google.com>, Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v6 06/13] KVM: arm64: selftests: Split get-reg-list test
- code
-Message-ID: <20230725-f5cf47c63abd8673d22b4936@orel>
-References: <cover.1690273969.git.haibo1.xu@intel.com>
- <1f25f27d1316bc91e1e31cd3d50a1d20f696759a.1690273969.git.haibo1.xu@intel.com>
- <CAJve8okJ-HYpsOrqH4Zvn7OBtwXWa4JumC+ZsMfHKB-deVYd2A@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB6881426D
+	for <kvmarm@lists.linux.dev>; Tue, 25 Jul 2023 12:52:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=cip1L4+WNN72lEdlEtgKKz6+Th/GNW6kyU+RnxFbZZ8=; b=UgAJBFRLO20d1Q4UeecSqlBQIs
+	PFHuz0NUmB/1Y+2cEVFvwqnHb1BSxWW4RhQ2P8kvsu3ACbwOqr57viJKTa7uG+qe1fdufl5rqF2qr
+	jHy5L3HlBpbKr1Vl5EefvCAyn8+oe9n/K+eN0UUCvHZ3OgwtPhyspcNh4yAoE49KOIUkQVp2v0HR9
+	+xKnn/gm3dSYH0IDK2KkKvdpo4YPQW6CLliHGifFEImfRxrevzUzbI0xJBT7SCfU6e7LIrXsQ1mlT
+	uc0IdyK39Z/Ut2VF+t8tpW9pm9g50y0Q3SwS/URKZyTPqyVYvUikuYgn7PDUb1oSxM38pOnLhiEyt
+	M5/wJdyg==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+	id 1qOHW7-005Tcv-AA; Tue, 25 Jul 2023 12:51:55 +0000
+Date: Tue, 25 Jul 2023 13:51:55 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Chao Peng <chao.p.peng@linux.intel.com>,
+	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+	Yu Zhang <yu.c.zhang@linux.intel.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	Ackerley Tng <ackerleytng@google.com>,
+	Maciej Szmigiero <mail@maciej.szmigiero.name>,
+	David Hildenbrand <david@redhat.com>,
+	Quentin Perret <qperret@google.com>,
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
+	Liam Merwick <liam.merwick@oracle.com>,
+	Isaku Yamahata <isaku.yamahata@gmail.com>
+Subject: Re: [RFC PATCH v11 10/29] mm: Add AS_UNMOVABLE to mark mapping as
+ completely unmovable
+Message-ID: <ZL/Fa4W2Ne9EVxoh@casper.infradead.org>
+References: <20230718234512.1690985-1-seanjc@google.com>
+ <20230718234512.1690985-11-seanjc@google.com>
+ <20230725102403.xywjqlhyqkrzjok6@box.shutemov.name>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJve8okJ-HYpsOrqH4Zvn7OBtwXWa4JumC+ZsMfHKB-deVYd2A@mail.gmail.com>
+In-Reply-To: <20230725102403.xywjqlhyqkrzjok6@box.shutemov.name>
 
-On Tue, Jul 25, 2023 at 04:50:36PM +0800, Haibo Xu wrote:
-> On Tue, Jul 25, 2023 at 4:37 PM Haibo Xu <haibo1.xu@intel.com> wrote:
-> >
-> > From: Andrew Jones <ajones@ventanamicro.com>
-> >
-> > Split the arch-neutral test code out of aarch64/get-reg-list.c into
-> > get-reg-list.c. To do this we invent a new make variable
-> > $(SPLIT_TESTS) which expects common parts to be in the KVM selftests
-> > root and the counterparts to have the same name, but be in
-> > $(ARCH_DIR).
-> >
-> > There's still some work to be done to de-aarch64 the common
-> > get-reg-list.c, but we leave that to the next patch to avoid
-> > modifying too much code while moving it.
-> >
-> > Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
-> > Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
-> > ---
-> >  tools/testing/selftests/kvm/Makefile          |  12 +-
-> >  .../selftests/kvm/aarch64/get-reg-list.c      | 367 +----------------
-> >  tools/testing/selftests/kvm/get-reg-list.c    | 377 ++++++++++++++++++
-> >  3 files changed, 398 insertions(+), 358 deletions(-)
-> >  create mode 100644 tools/testing/selftests/kvm/get-reg-list.c
-> >
-> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> > index c692cc86e7da..95f180e711d5 100644
-> > --- a/tools/testing/selftests/kvm/Makefile
-> > +++ b/tools/testing/selftests/kvm/Makefile
-> > @@ -140,7 +140,6 @@ TEST_GEN_PROGS_EXTENDED_x86_64 += x86_64/nx_huge_pages_test
-> >  TEST_GEN_PROGS_aarch64 += aarch64/aarch32_id_regs
-> >  TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
-> >  TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
-> > -TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
-> >  TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
-> >  TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
-> >  TEST_GEN_PROGS_aarch64 += aarch64/psci_test
-> > @@ -152,6 +151,7 @@ TEST_GEN_PROGS_aarch64 += access_tracking_perf_test
-> >  TEST_GEN_PROGS_aarch64 += demand_paging_test
-> >  TEST_GEN_PROGS_aarch64 += dirty_log_test
-> >  TEST_GEN_PROGS_aarch64 += dirty_log_perf_test
-> > +TEST_GEN_PROGS_aarch64 += get-reg-list
-> >  TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
-> >  TEST_GEN_PROGS_aarch64 += kvm_page_table_test
-> >  TEST_GEN_PROGS_aarch64 += memslot_modification_stress_test
-> > @@ -181,6 +181,8 @@ TEST_GEN_PROGS_riscv += kvm_page_table_test
-> >  TEST_GEN_PROGS_riscv += set_memory_region_test
-> >  TEST_GEN_PROGS_riscv += kvm_binary_stats_test
-> >
-> > +SPLIT_TESTS += get-reg-list
+On Tue, Jul 25, 2023 at 01:24:03PM +0300, Kirill A . Shutemov wrote:
+> On Tue, Jul 18, 2023 at 04:44:53PM -0700, Sean Christopherson wrote:
+> > diff --git a/mm/compaction.c b/mm/compaction.c
+> > index dbc9f86b1934..a3d2b132df52 100644
+> > --- a/mm/compaction.c
+> > +++ b/mm/compaction.c
+> > @@ -1047,6 +1047,10 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
+> >  		if (!mapping && (folio_ref_count(folio) - 1) > folio_mapcount(folio))
+> >  			goto isolate_fail_put;
+> >  
+> > +		/* The mapping truly isn't movable. */
+> > +		if (mapping && mapping_unmovable(mapping))
+> > +			goto isolate_fail_put;
 > > +
-> >  TEST_PROGS += $(TEST_PROGS_$(ARCH_DIR))
-> >  TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH_DIR))
-> >  TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH_DIR))
-> > @@ -228,11 +230,14 @@ LIBKVM_C_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_C))
-> >  LIBKVM_S_OBJ := $(patsubst %.S, $(OUTPUT)/%.o, $(LIBKVM_S))
-> >  LIBKVM_STRING_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_STRING))
-> >  LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(LIBKVM_STRING_OBJ)
-> > +SPLIT_TESTS_TARGETS := $(patsubst %, $(OUTPUT)/%, $(SPLIT_TESTS))
-> > +SPLIT_TESTS_OBJS := $(patsubst %, $(ARCH_DIR)/%.o, $(SPLIT_TESTS))
-> >
-> >  TEST_GEN_OBJ = $(patsubst %, %.o, $(TEST_GEN_PROGS))
-> >  TEST_GEN_OBJ += $(patsubst %, %.o, $(TEST_GEN_PROGS_EXTENDED))
-> >  TEST_DEP_FILES = $(patsubst %.o, %.d, $(TEST_GEN_OBJ))
-> >  TEST_DEP_FILES += $(patsubst %.o, %.d, $(LIBKVM_OBJS))
-> > +TEST_DEP_FILES += $(patsubst %.o, %.d, $(SPLIT_TESTS_OBJS))
-> >  -include $(TEST_DEP_FILES)
-> >
-> >  $(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED): %: %.o
-> > @@ -240,7 +245,10 @@ $(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED): %: %.o
-> >  $(TEST_GEN_OBJ): $(OUTPUT)/%.o: %.c
-> >         $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
-> >
-> > -EXTRA_CLEAN += $(LIBKVM_OBJS) $(TEST_DEP_FILES) $(TEST_GEN_OBJ) cscope.*
-> > +$(SPLIT_TESTS_TARGETS): %: %.o $(SPLIT_TESTS_OBJS)
-> > +       $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
-> > +
-> > +EXTRA_CLEAN += $(LIBKVM_OBJS) $(TEST_DEP_FILES) $(TEST_GEN_OBJ) $(SPLIT_TESTS_OBJS) cscope.*
-> >
-> >  x := $(shell mkdir -p $(sort $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
-> >  $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c
 > 
-> Hi @Andrew Jones,
+> I doubt that it is safe to dereference mapping here. I believe the folio
+> can be truncated from under us and the mapping freed with the inode.
 > 
-> After rebasing to v6.5-rc3, some changes are needed to the SPLIT_TESTS
-> target, or the make would fail.
-> Please help have a look.
->
+> The folio has to be locked to dereference mapping safely (given that the
+> mapping is still tied to the folio).
 
-I took a look and then remembered why I hate looking at Makefiles... I
-guess it's fine, but it's a pity we need to repeat the $(CC) line.
+There's even a comment to that effect later on in the function:
 
-Thanks,
-drew
+                        /*
+                         * Only pages without mappings or that have a
+                         * ->migrate_folio callback are possible to migrate
+                         * without blocking. However, we can be racing with
+                         * truncation so it's necessary to lock the page
+                         * to stabilise the mapping as truncation holds
+                         * the page lock until after the page is removed
+                         * from the page cache.
+                         */
+
+(that could be reworded to make it clear how dangerous dereferencing
+->mapping is without the lock ... and it does need to be changed to say
+"folio lock" instead of "page lock", so ...)
+
+How does this look?
+
+                        /*
+                         * Only folios without mappings or that have
+                         * a ->migrate_folio callback are possible to
+                         * migrate without blocking. However, we can
+                         * be racing with truncation, which can free
+                         * the mapping.  Truncation holds the folio lock
+                         * until after the folio is removed from the page
+                         * cache so holding it ourselves is sufficient.
+                         */
+
