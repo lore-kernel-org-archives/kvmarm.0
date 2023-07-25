@@ -1,178 +1,154 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCC3325154
-	for <kvmarm@lists.linux.dev>; Tue, 25 Jul 2023 17:37:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690306634;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5L2q7c9oU0+boxm9QA+HwbxhhMCIqRyTv6FR1XEv67U=;
-	b=R9s6cGmmmM+zvBfXcvm1UVQuRhJGPcaPgA0Vorv2l5YgaSfBBP1LPTuFY1P+i2hQZ75A3p
-	fqbydjkBzyInpfv2DQCNUOvTYpoIoQ0gTNFUil9t2Gw8H663Om6AedkKPo2EKSnK85mhOw
-	vnsQYKnqpAZx1mD4DzNsQqb7Z/vfNpY=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-679-yR0m_S6mM9yiBBKQ0tf3fQ-1; Tue, 25 Jul 2023 13:37:13 -0400
-X-MC-Unique: yR0m_S6mM9yiBBKQ0tf3fQ-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-63d062fc6f8so22822676d6.3
-        for <kvmarm@lists.linux.dev>; Tue, 25 Jul 2023 10:37:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B294F23BF5
+	for <kvmarm@lists.linux.dev>; Tue, 25 Jul 2023 18:05:32 +0000 (UTC)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-583c1903ad3so42302017b3.2
+        for <kvmarm@lists.linux.dev>; Tue, 25 Jul 2023 11:05:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690308331; x=1690913131;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BIo8qHauKdQX+T8FT8wbaojm6/JdQZAwM03PT/kIykI=;
+        b=7nXQcBRpxoTRBB3DVtfi1G3SLzO+8rbX0pZK3GqB/ZiRovVnhgEY5C+Gs70dPcpJKC
+         v8EbJPLKK/PtzLxWiGJ5qeO4LJqB7HN3pWAhYbANBnQSVYoMTUMzCaeCD3zEfSqoM+r2
+         fDpLY03C1R0xadVk8zh9oHGZMZqSmWV+dliNXRuRczTowFXc/oEsFJjHeqmHR0h/7zjV
+         1SaakHlCZawqmTagIefeOP2xnfIobskVh1rmXibU4Cwg3i96EQeqcAc0By/i+P6tJXi9
+         1AMdfmti0ZHyvBS0qJY6Ig052U8rUWQC7aHvZS0sxZXtvMY234BUecIw+5qK/UmUColq
+         VbWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690306633; x=1690911433;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5L2q7c9oU0+boxm9QA+HwbxhhMCIqRyTv6FR1XEv67U=;
-        b=fsMkt3rJJf0C839f8OTeerr+s8GT24JVQ6mEDWiil1rpTACHBb8FY7TF3eW3tSFnO4
-         ydYReEaaqxvBBCop/6ebrIFM6c/3DVt3A9hTPVm/9glG9OUdQTAhnFYm82fs+MMn/Wyv
-         cIlmjLBD/T3LYNbTlxGQ67XlDKIQaKFUu1zxflzHum1B6Fi/W7WACPlJR2vmCK1lTonC
-         HAfnKnEoSp0LEpmBLu7B782BS4+l7amIKhqj2l2Exxek3ZUJJ2Be6vXmAqmzxVXlJI3o
-         x4EK91nvVZLTVqBzuVHOYTpiXqJLV/saTOugiZlxUs1S+1maNrvXzFRjPqs1zx+6Srjt
-         TISg==
-X-Gm-Message-State: ABy/qLbBcP7G+yVSdIZYTnnbXZlGUYBLO6a9jLe3/pOU5K3D88D1btu5
-	Di3+um9i2llb8lAdTr9TCCv726FXSqj6C4lDai0vclZG0TbYUyxSj3YYeOjiBE9HwzOoK4nyysj
-	8/F1c7R4VmHDdF1ik
-X-Received: by 2002:a05:6214:1631:b0:626:1fe8:bba4 with SMTP id e17-20020a056214163100b006261fe8bba4mr2787860qvw.10.1690306632772;
-        Tue, 25 Jul 2023 10:37:12 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlElrjGoC9TMBus9hMJ9Xc8AYoEJxm5MhSIGHQadsTQRKyHVviSuNuhFx2v5MSJ/lSZHeq+CHA==
-X-Received: by 2002:a05:6214:1631:b0:626:1fe8:bba4 with SMTP id e17-20020a056214163100b006261fe8bba4mr2787848qvw.10.1690306632495;
-        Tue, 25 Jul 2023 10:37:12 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:368:50e0:e390:42c6:ce16:9d04? ([2a01:e0a:368:50e0:e390:42c6:ce16:9d04])
-        by smtp.gmail.com with ESMTPSA id e17-20020a0caa51000000b0063ce736180bsm3135199qvb.112.2023.07.25.10.37.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Jul 2023 10:37:11 -0700 (PDT)
-Message-ID: <9739cab9-c058-ec5f-ac15-7d708aef4e85@redhat.com>
-Date: Tue, 25 Jul 2023 19:37:05 +0200
+        d=1e100.net; s=20221208; t=1690308331; x=1690913131;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BIo8qHauKdQX+T8FT8wbaojm6/JdQZAwM03PT/kIykI=;
+        b=MN4pDsfA808r0JCcLEsa7rAgbPpO5vNRiLbJfBMyWvOct8uvfCTbTuFaWzUINKFjvY
+         jSM790R4T8wddYMngSVbtZeHPJXkgMCx/QAeBVZJDzOVoWMtFRWS7mW7ZpyX0j11vvu+
+         yVfyy8ZVj+wVsGJ4XBtEzGQ5Z79nUf86TN3fh6Fip1hInAMzEF6dDGT+PH6rLBS9q40w
+         +3iJLUi29sR7Or7E2pMxiL6EeGaweX6l0o9JMncpQlQ/2HOyx8Eyp9wTYwXuYpuFcoWL
+         SpVEFhojp/HKuuL+Xgl7RLm9S4LkjpfZaj239o3uPb6/pSToeH4oFvBIOf3S3TUHwpAp
+         snQg==
+X-Gm-Message-State: ABy/qLbe0aod4/Z29pFGQO72htJkfV03Zvl5Sk4eZBCERTN2b76Y66ch
+	/gPs8Z+ZL/0QM0dtv/ROsJsnuSTM9DY=
+X-Google-Smtp-Source: APBJJlG+f5K6Guu8BWDh2M0jvEhmql8458IaH+LCw2ABsy+ZDoDj1Vv7TcavygUx+nDEGvPQs1RCmsWjSr8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:4509:0:b0:573:5797:4b9e with SMTP id
+ s9-20020a814509000000b0057357974b9emr213ywa.1.1690308331572; Tue, 25 Jul 2023
+ 11:05:31 -0700 (PDT)
+Date: Tue, 25 Jul 2023 11:05:29 -0700
+In-Reply-To: <ZLphxpSTL9Fpn1ye@yilunxu-OptiPlex-7050>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH 19/27] KVM: arm64: nv: Add trap forwarding for CNTHCTL_EL2
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Mark Brown
- <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Will Deacon <will@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>,
- Andre Przywara <andre.przywara@arm.com>,
- Chase Conklin <chase.conklin@arm.com>,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Darren Hart <darren@os.amperecomputing.com>,
- Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
-References: <20230712145810.3864793-1-maz@kernel.org>
- <20230712145810.3864793-20-maz@kernel.org>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230712145810.3864793-20-maz@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-2-seanjc@google.com>
+ <ZLolA2U83tP75Qdd@yzhao56-desk.sh.intel.com> <ZLphxpSTL9Fpn1ye@yilunxu-OptiPlex-7050>
+Message-ID: <ZMAO6bhan9l6ybQM@google.com>
+Subject: Re: [RFC PATCH v11 01/29] KVM: Wrap kvm_gfn_range.pte in a per-action union
+From: Sean Christopherson <seanjc@google.com>
+To: Xu Yilun <yilun.xu@intel.com>
+Cc: Yan Zhao <yan.y.zhao@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Maciej Szmigiero <mail@maciej.szmigiero.name>, Vlastimil Babka <vbabka@suse.cz>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Marc,
+On Fri, Jul 21, 2023, Xu Yilun wrote:
+> On 2023-07-21 at 14:26:11 +0800, Yan Zhao wrote:
+> > On Tue, Jul 18, 2023 at 04:44:44PM -0700, Sean Christopherson wrote:
+> > 
+> > May I know why KVM now needs to register to callback .change_pte()?
+> 
+> I can see the original purpose is to "setting a pte in the shadow page
+> table directly, instead of flushing the shadow page table entry and then
+> getting vmexit to set it"[1].
+> 
+> IIUC, KVM is expected to directly make the new pte present for new
+> pages in this callback, like for COW.
 
-On 7/12/23 16:58, Marc Zyngier wrote:
-> Describe the CNTHCTL_EL2 register, and associate it with all the sysregs
-> it allows to trap.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/emulate-nested.c | 37 ++++++++++++++++++++++++++++++++-
->  1 file changed, 36 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index 25e4842ac334..c07c0f3361d7 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -98,9 +98,11 @@ enum coarse_grain_trap_id {
->  
->  	/*
->  	 * Anything after this point requires a callback evaluating a
-> -	 * complex trap condition. Hopefully we'll never need this...
-> +	 * complex trap condition. Ugly stuff.
->  	 */
->  	__COMPLEX_CONDITIONS__,
-> +	CGT_CNTHCTL_EL1PCTEN = __COMPLEX_CONDITIONS__,
-> +	CGT_CNTHCTL_EL1PTEN,
->  };
->  
->  static const struct trap_bits coarse_trap_bits[] = {
-> @@ -358,9 +360,37 @@ static const enum coarse_grain_trap_id *coarse_control_combo[] = {
->  
->  typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu *);
->  
-> +static u64 get_sanitized_cnthctl(struct kvm_vcpu *vcpu)
-> +{
-> +	u64 val = __vcpu_sys_reg(vcpu, CNTHCTL_EL2);
-> +
-> +	if (!vcpu_el2_e2h_is_set(vcpu))
-> +		val = (val & (CNTHCTL_EL1PCEN | CNTHCTL_EL1PCTEN)) << 10;
-> +
-> +	return val;
-don't you want to return only bits 10 & 11 to match the other condition?
+Yes.
 
-I would add a comment saying that When FEAT_VHE is implemented and
-HCR_EL2.E2H == 1:
+> > As also commented in kvm_mmu_notifier_change_pte(), .change_pte() must be
+> > surrounded by .invalidate_range_{start,end}().
+> > 
+> > While kvm_mmu_notifier_invalidate_range_start() has called kvm_unmap_gfn_range()
+> > to zap all leaf SPTEs, and page fault path will not install new SPTEs
+> > successfully before kvm_mmu_notifier_invalidate_range_end(),
+> > kvm_set_spte_gfn() should not be able to find any shadow present leaf entries to
+> > update PFN.
+> 
+> I also failed to figure out how the kvm_set_spte_gfn() could pass
+> several !is_shadow_present_pte(iter.old_spte) check then write the new
+> pte.
 
-sanitized_cnthctl[11:10] = [EL1PTEN, EL1PCTEN]
-otherwise
-sanitized_cnthctl[11:10] = [EL1PCEN, EL1PCTEN]
+It can't.  .change_pte() has been dead code on x86 for 10+ years at this point,
+and if my assessment from a few years back still holds true, it's dead code on
+all architectures.
 
-> +}
-> +
-> +static enum trap_behaviour check_cnthctl_el1pcten(struct kvm_vcpu *vcpu)
-> +{
-> +	if (get_sanitized_cnthctl(vcpu) & (CNTHCTL_EL1PCTEN << 10))
-> +		return BEHAVE_HANDLE_LOCALLY;
-> +
-> +	return BEHAVE_FORWARD_ANY;
-> +}
-> +
-> +static enum trap_behaviour check_cnthctl_el1pten(struct kvm_vcpu *vcpu)
-or pcen. This is a bit confusing to see EL1PCEN below. But this is due
-to above sanitized CNTHCTL. Worth a comment to me.
-> +{
-> +	if (get_sanitized_cnthctl(vcpu) & (CNTHCTL_EL1PCEN << 10))
-> +		return BEHAVE_HANDLE_LOCALLY;
-> +
-> +	return BEHAVE_FORWARD_ANY;
-> +}
-> +
->  #define CCC(id, fn)	[id - __COMPLEX_CONDITIONS__] = fn
->  
->  static const complex_condition_check ccc[] = {
-> +	CCC(CGT_CNTHCTL_EL1PCTEN, check_cnthctl_el1pcten),
-> +	CCC(CGT_CNTHCTL_EL1PTEN, check_cnthctl_el1pten),
->  };
->  
->  /*
-> @@ -855,6 +885,11 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initdata = {
->  	SR_TRAP(SYS_TRBPTR_EL1, 	CGT_MDCR_E2TB),
->  	SR_TRAP(SYS_TRBSR_EL1, 		CGT_MDCR_E2TB),
->  	SR_TRAP(SYS_TRBTRG_EL1,		CGT_MDCR_E2TB),
-> +	SR_TRAP(SYS_CNTP_TVAL_EL0,	CGT_CNTHCTL_EL1PTEN),
-> +	SR_TRAP(SYS_CNTP_CVAL_EL0,	CGT_CNTHCTL_EL1PTEN),
-> +	SR_TRAP(SYS_CNTP_CTL_EL0,	CGT_CNTHCTL_EL1PTEN),
-> +	SR_TRAP(SYS_CNTPCT_EL0,		CGT_CNTHCTL_EL1PCTEN),
-> +	SR_TRAP(SYS_CNTPCTSS_EL0,	CGT_CNTHCTL_EL1PCTEN),
->  };
->  
->  static DEFINE_XARRAY(sr_forward_xa);
-Otherwise looks good to me
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+The only reason I haven't formally proposed dropping the hook is that I don't want
+to risk the patch backfiring, i.e. I don't want to prompt someone to care enough
+to try and fix it.
 
+commit c13fda237f08a388ba8a0849785045944bf39834
+Author: Sean Christopherson <seanjc@google.com>
+Date:   Fri Apr 2 02:56:49 2021 +0200
 
-Eric
-
-
+    KVM: Assert that notifier count is elevated in .change_pte()
+    
+    In KVM's .change_pte() notification callback, replace the notifier
+    sequence bump with a WARN_ON assertion that the notifier count is
+    elevated.  An elevated count provides stricter protections than bumping
+    the sequence, and the sequence is guarnateed to be bumped before the
+    count hits zero.
+    
+    When .change_pte() was added by commit 828502d30073 ("ksm: add
+    mmu_notifier set_pte_at_notify()"), bumping the sequence was necessary
+    as .change_pte() would be invoked without any surrounding notifications.
+    
+    However, since commit 6bdb913f0a70 ("mm: wrap calls to set_pte_at_notify
+    with invalidate_range_start and invalidate_range_end"), all calls to
+    .change_pte() are guaranteed to be surrounded by start() and end(), and
+    so are guaranteed to run with an elevated notifier count.
+    
+    Note, wrapping .change_pte() with .invalidate_range_{start,end}() is a
+    bug of sorts, as invalidating the secondary MMU's (KVM's) PTE defeats
+    the purpose of .change_pte().  Every arch's kvm_set_spte_hva() assumes
+    .change_pte() is called when the relevant SPTE is present in KVM's MMU,
+    as the original goal was to accelerate Kernel Samepage Merging (KSM) by
+    updating KVM's SPTEs without requiring a VM-Exit (due to invalidating
+    the SPTE).  I.e. it means that .change_pte() is effectively dead code
+    on _all_ architectures.
+    
+    x86 and MIPS are clearcut nops if the old SPTE is not-present, and that
+    is guaranteed due to the prior invalidation.  PPC simply unmaps the SPTE,
+    which again should be a nop due to the invalidation.  arm64 is a bit
+    murky, but it's also likely a nop because kvm_pgtable_stage2_map() is
+    called without a cache pointer, which means it will map an entry if and
+    only if an existing PTE was found.
+    
+    For now, take advantage of the bug to simplify future consolidation of
+    KVMs's MMU notifier code.   Doing so will not greatly complicate fixing
+    .change_pte(), assuming it's even worth fixing.  .change_pte() has been
+    broken for 8+ years and no one has complained.  Even if there are
+    KSM+KVM users that care deeply about its performance, the benefits of
+    avoiding VM-Exits via .change_pte() need to be reevaluated to justify
+    the added complexity and testing burden.  Ripping out .change_pte()
+    entirely would be a lot easier.
