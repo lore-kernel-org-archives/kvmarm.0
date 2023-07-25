@@ -1,53 +1,53 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72DD1200D0
-	for <kvmarm@lists.linux.dev>; Tue, 25 Jul 2023 16:39:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 201F13C23
+	for <kvmarm@lists.linux.dev>; Tue, 25 Jul 2023 16:45:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690303198;
+	s=mimecast20190719; t=1690303504;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=S3FB+h5e6YkucqbOoiJ2ViB15WtEhvgZyklX5r4J3N4=;
-	b=gYD8Y/l9np95Eo6luSxBTXjZKDK+sQrApvfb9PKfa7LK2YbFJUvgnk2MAFwl5KKTCTYTFj
-	GGjtC81mkmbOonEzWrAMjsHzmvafLOIfmt5kVR7SaCmTCEVLWPXV2MDlmlWr2jGAk5iXYs
-	BkPmWh6niFbM3UM88Y3X5GRZG6uwbbs=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=wvn6KHlfQDuo3hpCXTqrMNakv6fvts1e1JRxx8Q4D20=;
+	b=U0nMqayUQesdVuI3k9w24kwrsIjIBWZuklLprJE0Km0DT+4SD553AyXP7YT/gOVlI/Qjy1
+	BtvjonaTRpdGjQ14FStg5QN+CCxo1CkMJcqo7RuVcj51/V0Ak8v9RyzeEMuJU1hUAY/fkH
+	TjBJyO5BLQC9rYGqIMayNxCqqxFenZg=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-57-rEEX1yjQM92GHWv5ysFd0Q-1; Tue, 25 Jul 2023 12:39:57 -0400
-X-MC-Unique: rEEX1yjQM92GHWv5ysFd0Q-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-4fb76659d37so5045902e87.2
-        for <kvmarm@lists.linux.dev>; Tue, 25 Jul 2023 09:39:57 -0700 (PDT)
+ us-mta-680-us19QqxAOgq6Likbx8fpGw-1; Tue, 25 Jul 2023 12:45:01 -0400
+X-MC-Unique: us19QqxAOgq6Likbx8fpGw-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-4fbcdca9082so4914503e87.3
+        for <kvmarm@lists.linux.dev>; Tue, 25 Jul 2023 09:45:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690303195; x=1690907995;
+        d=1e100.net; s=20221208; t=1690303500; x=1690908300;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=S3FB+h5e6YkucqbOoiJ2ViB15WtEhvgZyklX5r4J3N4=;
-        b=SFYFLqebaNetGMU4K+dusIoVoQPf2GxwC1oOOe8+qaeFJJXdoNvW4RdNRQ7BcJ+xfZ
-         o7aYcNHhvAHVOg5UrkGhtz/L4QiDWOW4JZn303FVKlwOdeNL8WhlBcvPu8shZce5quOr
-         ZFKvGb6TQ2XdQJ56ZwEwnSvG7kcBreQHk0rj2mr9MZTTVYDTm2QWSFBscqSt/WwafWOm
-         ByXiildvPVf2DJSifyah23bNzX0W5e9b+KlqqKo+ZULGqDqq3Ge7m9g28ZkZMvBMjAnl
-         UNr6pLldSFnglSSjSREeDAL4McfGXNWoBfy89LvQxlVwYXmPhdFaQN3u6WyS40pnHE89
-         dMhA==
-X-Gm-Message-State: ABy/qLZ0seJV5s432XpXjcUKf9JVTG4Rcwl6ugZUohC9Vh7dcNcn0kE5
-	Ff5hAkM4J9TLroZiAEwYvIoENghcv0MxPlcCHvXJlTVwuBo6CNVDbvvliAfxJn7Qyw8GpN+kVdK
-	s8W85h4yy0hdLnj3dozqYvuSN
-X-Received: by 2002:a05:6512:3485:b0:4fb:7b2a:78de with SMTP id v5-20020a056512348500b004fb7b2a78demr7178150lfr.45.1690303195349;
-        Tue, 25 Jul 2023 09:39:55 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlExor7KJajuF8KTAn615TMs/hCytqwWsIogzEkYtv64N79qqXVWIRu2F3xRAtwJjk/ilmu6dg==
-X-Received: by 2002:a05:6512:3485:b0:4fb:7b2a:78de with SMTP id v5-20020a056512348500b004fb7b2a78demr7178117lfr.45.1690303194950;
-        Tue, 25 Jul 2023 09:39:54 -0700 (PDT)
+        bh=wvn6KHlfQDuo3hpCXTqrMNakv6fvts1e1JRxx8Q4D20=;
+        b=KPFc3Trgyes3376YzE7dUgo+eXu3gE9XY24NwzdNwV7DclsnrbXjapL2SqJwwLow2L
+         D7YMHTwIXyMyn0Bn2cofvIAMO9S2vFZauz/uSa0lYt8GnOgbKtkjrvcKw2ZzNcR9BbYr
+         JI9gEMySCuIOY5Mh2HGkFPAvbuVHF1mvjl7/rsKIEDJm7lBZnRtSUikA+8LZXC4y6E6i
+         fpW16Uu2f0mWGTF+1m5EWM6bAFP4/5eYhFSPmXsXhGkAEaTWxuTBckirU1x4wkzzcBjB
+         0kkE72pkNQCaTLcALFDNBmRc9Qz+BZ8cpoHjZjnMEGYnkquGLRwpIiwOSjaZKIXXwkSx
+         D37g==
+X-Gm-Message-State: ABy/qLZKZTFxJv2DrM6DXStzcZ/vn9cUBkgXm6AYSE6Z/fkBD9u0z9n4
+	JMiS5lCtZ9uLGOSrO0Isj3dWFuWAsvpWMsHNFXKDTmHIndtfuTl6O2QkvBBtFOs/7rtwrhrMPno
+	f+VZv/2BJAViUy/Et
+X-Received: by 2002:ac2:5239:0:b0:4fc:6e21:ff50 with SMTP id i25-20020ac25239000000b004fc6e21ff50mr7111888lfl.55.1690303500073;
+        Tue, 25 Jul 2023 09:45:00 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlEby/vcaKSjGkDJ1lyXqDzRuHrqzwbjpqloRTr9TiHpIvTT/1kpST/4Zd3MSPrUL8HU9FBzgQ==
+X-Received: by 2002:ac2:5239:0:b0:4fc:6e21:ff50 with SMTP id i25-20020ac25239000000b004fc6e21ff50mr7111854lfl.55.1690303499680;
+        Tue, 25 Jul 2023 09:44:59 -0700 (PDT)
 Received: from ?IPV6:2a01:e0a:368:50e0:e390:42c6:ce16:9d04? ([2a01:e0a:368:50e0:e390:42c6:ce16:9d04])
-        by smtp.gmail.com with ESMTPSA id m9-20020a5d56c9000000b00313e2abfb8dsm17118254wrw.92.2023.07.25.09.39.53
+        by smtp.gmail.com with ESMTPSA id t2-20020adfeb82000000b0031759e6b43fsm9082752wrn.39.2023.07.25.09.44.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Jul 2023 09:39:54 -0700 (PDT)
-Message-ID: <fd0d93ae-1ae5-b53e-ccb7-04d78f7c31d9@redhat.com>
-Date: Tue, 25 Jul 2023 18:39:52 +0200
+        Tue, 25 Jul 2023 09:44:59 -0700 (PDT)
+Message-ID: <b8189658-4fa9-d3b9-8d24-bf04781ad0cd@redhat.com>
+Date: Tue, 25 Jul 2023 18:44:57 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,7 +57,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
 Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH 14/27] KVM: arm64: Restructure FGT register switching
+Subject: Re: [PATCH 17/27] KVM: arm64: nv: Expose FEAT_EVT to nested guests
 To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
  kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Mark Brown
@@ -71,168 +71,41 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Mark Brown
  Suzuki K Poulose <suzuki.poulose@arm.com>,
  Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
 References: <20230712145810.3864793-1-maz@kernel.org>
- <20230712145810.3864793-15-maz@kernel.org>
+ <20230712145810.3864793-18-maz@kernel.org>
 From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230712145810.3864793-15-maz@kernel.org>
+In-Reply-To: <20230712145810.3864793-18-maz@kernel.org>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi Marc,
 
-On 7/12/23 16:57, Marc Zyngier wrote:
-> As we're about to majorly extend the handling of FGT registers,
-> restructure the code to actually save/restore the registers
-> as required. This is made easy thanks to the previous addition
-> of the EL2 registers, allowing us to use the host context for
-> this purpose.
+
+On 7/12/23 16:58, Marc Zyngier wrote:
+> Now that we properly implement FEAT_EVT (as we correctly forward
+> traps), expose it to guests.
 >
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_arm.h        | 21 ++++++++++
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 55 +++++++++++++------------
->  2 files changed, 49 insertions(+), 27 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index 028049b147df..85908aa18908 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -333,6 +333,27 @@
->  				 BIT(18) |		\
->  				 GENMASK(16, 15))
->  
-> +/*
-> + * FGT register definitions
-> + *
-> + * RES0 and polarity masks as of DDI0487J.a, to be updated as needed.
-> + * We're not using the generated masks as they are usually ahead of
-> + * the published ARM ARM, which we use as a reference.
-> + *
-> + * Once we get to a point where the two describe the same thing, we'll
-> + * merge the definitions. One day.
-> + */
-> +#define __HFGRTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51))
-> +#define __HFGRTR_EL2_MASK	GENMASK(49, 0)
-> +#define __HFGRTR_EL2_nMASK	(GENMASK(55, 54) | BIT(50))
-> +
-> +#define __HFGWTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51) |	\
-> +				 BIT(46) | BIT(42) | BIT(40) | BIT(28) | \
-> +				 GENMASK(26, 25) | BIT(21) | BIT(18) |	\
-> +				 GENMASK(15, 14) | GENMASK(10, 9) | BIT(2))
-> +#define __HFGWTR_EL2_MASK	GENMASK(49, 0)
-> +#define __HFGWTR_EL2_nMASK	(GENMASK(55, 54) | BIT(50))
-> +
->  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
->  #define HPFAR_MASK	(~UL(0xf))
->  /*
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 4bddb8541bec..9781e79a5127 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -70,20 +70,19 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
->  	}
->  }
->  
-> -static inline bool __hfgxtr_traps_required(void)
-> -{
-> -	if (cpus_have_final_cap(ARM64_SME))
-> -		return true;
-> -
-> -	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
-> -		return true;
->  
-> -	return false;
-> -}
->  
-> -static inline void __activate_traps_hfgxtr(void)
-> +static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
->  {
-> +	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
->  	u64 r_clr = 0, w_clr = 0, r_set = 0, w_set = 0, tmp;
-> +	u64 r_val, w_val;
-> +
-> +	if (!cpus_have_final_cap(ARM64_HAS_FGT))
-> +		return;
-> +
-> +	ctxt_sys_reg(hctxt, HFGRTR_EL2) = read_sysreg_s(SYS_HFGRTR_EL2);
-> +	ctxt_sys_reg(hctxt, HFGWTR_EL2) = read_sysreg_s(SYS_HFGWTR_EL2);
->  
->  	if (cpus_have_final_cap(ARM64_SME)) {
->  		tmp = HFGxTR_EL2_nSMPRI_EL1_MASK | HFGxTR_EL2_nTPIDR2_EL0_MASK;
-> @@ -98,26 +97,30 @@ static inline void __activate_traps_hfgxtr(void)
->  	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
->  		w_set |= HFGxTR_EL2_TCR_EL1_MASK;
->  
-> -	sysreg_clear_set_s(SYS_HFGRTR_EL2, r_clr, r_set);
-> -	sysreg_clear_set_s(SYS_HFGWTR_EL2, w_clr, w_set);
-> +
-> +	r_val = __HFGRTR_EL2_nMASK & ~HFGxTR_EL2_nACCDATA_EL1;
-I don't get why you do
-
-& ~HFGxTR_EL2_nACCDATA_EL1 as this latter also has a negative polarity. 
-
-Please could you explain what is special with this bit/add a comment?
-
-Thanks
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Eric
-
-> +	r_val |= r_set;
-> +	r_val &= ~r_clr;
-> +
-> +	w_val = __HFGWTR_EL2_nMASK & ~HFGxTR_EL2_nACCDATA_EL1;
-> +	w_val |= w_set;
-> +	w_val &= ~w_clr;
-> +
-> +	write_sysreg_s(r_val, SYS_HFGRTR_EL2);
-> +	write_sysreg_s(w_val, SYS_HFGWTR_EL2);
->  }
+> ---
+>  arch/arm64/kvm/nested.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 315354d27978..7f80f385d9e8 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -124,8 +124,7 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+>  		break;
 >  
-> -static inline void __deactivate_traps_hfgxtr(void)
-> +static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
->  {
-> -	u64 r_clr = 0, w_clr = 0, r_set = 0, w_set = 0, tmp;
-> +	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
->  
-> -	if (cpus_have_final_cap(ARM64_SME)) {
-> -		tmp = HFGxTR_EL2_nSMPRI_EL1_MASK | HFGxTR_EL2_nTPIDR2_EL0_MASK;
-> +	if (!cpus_have_final_cap(ARM64_HAS_FGT))
-> +		return;
->  
-> -		r_set |= tmp;
-> -		w_set |= tmp;
-> -	}
-> +	write_sysreg_s(ctxt_sys_reg(hctxt, HFGRTR_EL2), SYS_HFGRTR_EL2);
-> +	write_sysreg_s(ctxt_sys_reg(hctxt, HFGWTR_EL2), SYS_HFGWTR_EL2);
->  
-> -	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
-> -		w_clr |= HFGxTR_EL2_TCR_EL1_MASK;
->  
-> -	sysreg_clear_set_s(SYS_HFGRTR_EL2, r_clr, r_set);
-> -	sysreg_clear_set_s(SYS_HFGWTR_EL2, w_clr, w_set);
->  }
->  
->  static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
-> @@ -145,8 +148,7 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
->  	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
->  	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
->  
-> -	if (__hfgxtr_traps_required())
-> -		__activate_traps_hfgxtr();
-> +	__activate_traps_hfgxtr(vcpu);
->  }
->  
->  static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
-> @@ -162,8 +164,7 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
->  		vcpu_clear_flag(vcpu, PMUSERENR_ON_CPU);
->  	}
->  
-> -	if (__hfgxtr_traps_required())
-> -		__deactivate_traps_hfgxtr();
-> +	__deactivate_traps_hfgxtr(vcpu);
->  }
->  
->  static inline void ___activate_traps(struct kvm_vcpu *vcpu)
+>  	case SYS_ID_AA64MMFR2_EL1:
+> -		val &= ~(NV_FTR(MMFR2, EVT)	|
+> -			 NV_FTR(MMFR2, BBM)	|
+> +		val &= ~(NV_FTR(MMFR2, BBM)	|
+>  			 NV_FTR(MMFR2, TTL)	|
+>  			 GENMASK_ULL(47, 44)	|
+>  			 NV_FTR(MMFR2, ST)	|
 
