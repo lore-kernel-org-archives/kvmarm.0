@@ -1,114 +1,92 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB6881426D
-	for <kvmarm@lists.linux.dev>; Tue, 25 Jul 2023 12:52:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=cip1L4+WNN72lEdlEtgKKz6+Th/GNW6kyU+RnxFbZZ8=; b=UgAJBFRLO20d1Q4UeecSqlBQIs
-	PFHuz0NUmB/1Y+2cEVFvwqnHb1BSxWW4RhQ2P8kvsu3ACbwOqr57viJKTa7uG+qe1fdufl5rqF2qr
-	jHy5L3HlBpbKr1Vl5EefvCAyn8+oe9n/K+eN0UUCvHZ3OgwtPhyspcNh4yAoE49KOIUkQVp2v0HR9
-	+xKnn/gm3dSYH0IDK2KkKvdpo4YPQW6CLliHGifFEImfRxrevzUzbI0xJBT7SCfU6e7LIrXsQ1mlT
-	uc0IdyK39Z/Ut2VF+t8tpW9pm9g50y0Q3SwS/URKZyTPqyVYvUikuYgn7PDUb1oSxM38pOnLhiEyt
-	M5/wJdyg==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1qOHW7-005Tcv-AA; Tue, 25 Jul 2023 12:51:55 +0000
-Date: Tue, 25 Jul 2023 13:51:55 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
-	Yu Zhang <yu.c.zhang@linux.intel.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	Ackerley Tng <ackerleytng@google.com>,
-	Maciej Szmigiero <mail@maciej.szmigiero.name>,
-	David Hildenbrand <david@redhat.com>,
-	Quentin Perret <qperret@google.com>,
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
-	Liam Merwick <liam.merwick@oracle.com>,
-	Isaku Yamahata <isaku.yamahata@gmail.com>
-Subject: Re: [RFC PATCH v11 10/29] mm: Add AS_UNMOVABLE to mark mapping as
- completely unmovable
-Message-ID: <ZL/Fa4W2Ne9EVxoh@casper.infradead.org>
-References: <20230718234512.1690985-1-seanjc@google.com>
- <20230718234512.1690985-11-seanjc@google.com>
- <20230725102403.xywjqlhyqkrzjok6@box.shutemov.name>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B0848BFF
+	for <kvmarm@lists.linux.dev>; Tue, 25 Jul 2023 14:00:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8EDAC433C7;
+	Tue, 25 Jul 2023 14:00:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690293644;
+	bh=a5y2oEWB0ubM+SnxTGmkE/ppS3cO6wgWAV731t5d8ag=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rn9/9NFf+AFUJyf8pOtS+eVNm8FvQ5/XUHuLNgNI8o02KUzAmjMhz9J5geGwvpx9o
+	 AOBjd8jEmuffIJxaRu9z/vSunTmFkmmy8BKDW0PjYdXSRSwvGxFsNC+XeuR84kITnT
+	 yHTFuZ04VWn8umMfg/Pg29uBYFESOco3DyHx1REt80mRR094ELW7V93GGNEuxWo0zO
+	 X3KWlycAugwsq6pxHAn4vnERPYe26c/VCNGpZcyFQ7p5tbMj6cikOrWBDesqVL7woS
+	 /riSD79e6sb6AfnR+Q3RK3QoPAs7198Q4kIA0YIsrQ2OZuAdNJZrOfQc4IG/USMeXN
+	 eLecPZQ6LM/Hg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qOIag-00Gimy-7d;
+	Tue, 25 Jul 2023 15:00:42 +0100
+Date: Tue, 25 Jul 2023 15:00:41 +0100
+Message-ID: <86lef4t7jq.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	oliver.upton@linux.dev,
+	catalin.marinas@arm.com,
+	james.morse@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	will@kernel.org
+Subject: Re: [PATCH v3 0/7] Fix setting SVE and SME traps in (h)VHE
+In-Reply-To: <20230724123829.2929609-1-tabba@google.com>
+References: <20230724123829.2929609-1-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230725102403.xywjqlhyqkrzjok6@box.shutemov.name>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, oliver.upton@linux.dev, catalin.marinas@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Jul 25, 2023 at 01:24:03PM +0300, Kirill A . Shutemov wrote:
-> On Tue, Jul 18, 2023 at 04:44:53PM -0700, Sean Christopherson wrote:
-> > diff --git a/mm/compaction.c b/mm/compaction.c
-> > index dbc9f86b1934..a3d2b132df52 100644
-> > --- a/mm/compaction.c
-> > +++ b/mm/compaction.c
-> > @@ -1047,6 +1047,10 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
-> >  		if (!mapping && (folio_ref_count(folio) - 1) > folio_mapcount(folio))
-> >  			goto isolate_fail_put;
-> >  
-> > +		/* The mapping truly isn't movable. */
-> > +		if (mapping && mapping_unmovable(mapping))
-> > +			goto isolate_fail_put;
-> > +
+On Mon, 24 Jul 2023 13:38:21 +0100,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> I doubt that it is safe to dereference mapping here. I believe the folio
-> can be truncated from under us and the mapping freed with the inode.
+> Hi,
 > 
-> The folio has to be locked to dereference mapping safely (given that the
-> mapping is still tied to the folio).
+> Changes from V2:
+> - Rebased onto Linux 6.5-rc3
+> - s/__check_e2h/__check_hvhe/g (Oliver)
+> - Fixed bug in calculating CPACR_EL1 reset value for hVHE in
+> trapping SVE
+> 
+> Changes from V1:
+> - Expanded the cover letter to clarify the reasoning behind being
+> consistent in writing to the architectural trap register based on
+> the KVM mode (Marc)
+> - Factored out the code for checking E2H into a macro (Oliver)
+> - Factored out the code that selects which register to write to
+> into a function (Oliver)
+> 
+> The (re)setting and disabling of SVE/SME trap handling (mostly)
+> done for the hVHE work [*] misses a couple of cases.
+> 
+> This patch series ensures that these traps are disabled on setup
+> and reset. Moreover, it makes the code consistent in using
+> CPACR_EL1 or CPTR_EL2, depending on the mode.
+> 
+> CPACR_EL1 aliases to CPTR_EL2 when HCR_EL2.E2H == 1, but by being
+> consistent we don't need to issue a synchronisation when
+> alternating between one or the other accessor. Moreover, when
+> running hVHE under NV, we don't trap unnecessarily on accessing
+> CPTR_EL2, while CPACR_EL1 can be used directly without any trap.
+> 
+> Based on Linux 6.5-rc3.
 
-There's even a comment to that effect later on in the function:
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
-                        /*
-                         * Only pages without mappings or that have a
-                         * ->migrate_folio callback are possible to migrate
-                         * without blocking. However, we can be racing with
-                         * truncation so it's necessary to lock the page
-                         * to stabilise the mapping as truncation holds
-                         * the page lock until after the page is removed
-                         * from the page cache.
-                         */
+	M.
 
-(that could be reworded to make it clear how dangerous dereferencing
-->mapping is without the lock ... and it does need to be changed to say
-"folio lock" instead of "page lock", so ...)
-
-How does this look?
-
-                        /*
-                         * Only folios without mappings or that have
-                         * a ->migrate_folio callback are possible to
-                         * migrate without blocking. However, we can
-                         * be racing with truncation, which can free
-                         * the mapping.  Truncation holds the folio lock
-                         * until after the folio is removed from the page
-                         * cache so holding it ourselves is sufficient.
-                         */
-
+-- 
+Without deviation from the norm, progress is not possible.
