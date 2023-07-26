@@ -1,53 +1,53 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62603CA51
-	for <kvmarm@lists.linux.dev>; Wed, 26 Jul 2023 14:25:02 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-583fe0f84a5so35465307b3.3
-        for <kvmarm@lists.linux.dev>; Wed, 26 Jul 2023 07:25:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58DF7E57F
+	for <kvmarm@lists.linux.dev>; Wed, 26 Jul 2023 15:59:56 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d064a458dd5so4628181276.1
+        for <kvmarm@lists.linux.dev>; Wed, 26 Jul 2023 08:59:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690381501; x=1690986301;
+        d=google.com; s=20221208; t=1690387195; x=1690991995;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mt8/YY3u8LjsBjr8d6/ke2ZW25YHueLUKLJjDJYMc8s=;
-        b=KwMaCkiB4xAqGBUh9OF2kV0ZTXZJ9t/BQNvELYTboh2nFXRCb/O6mzI5Rf4+JkOSUf
-         GbfKDvzjuzeoTYk+8UzFDnEFGCf4Xp/4j132VlBFiOap0dqwF0d+IWavL7GkLuWIPxaf
-         FtFh1NcigPTHGOQymzspNYZcGJWMeYjGrAKFBYQg3vkICZKAIWBqnifvNeqq77Udkh7Z
-         xGehHXpHV6lJVR2/PB6tUzMEDhiwA5lq38Ga3ndr8/43j3+UY7kRIeUxbAwefFFreB6b
-         OU07H0FnfDMXq+of8q/ygEkV9SZmVl7edMM6TzYoGxGd/1xqW6Xr5wUrtaTzZVCwe9dk
-         Dlpw==
+        bh=x1RCz9AGh0t/+COzjYLcha5fkSMq/GNrC4CuEfgGTfc=;
+        b=ypSxifbz+3xr2TyQi3H8IoM4jyz7RGQWDnGcHi1NC0Po8RTEHh8icWGPEeM5z47awl
+         loHCPZy4rtZMbUI9RqdI0QLfF+ad98/C7r2wxAa7ZpGCgkUVuuHTSwwJ1OUjNqHnXY8X
+         84BBat8mly4SBV0f6KqsOvHk8cSJA6wdZ1HsQOFr2IirR9RtsavVXkabaGLdXW2RSaSS
+         UJmT6LqQAsULk7Nz99DvDaEAqSJ5Xa6WPtogY6EBxsD6vOblRb8mRKx+BIAVyZOlnkaE
+         pEMJT5wcLP195pWDDcCypB4wv+dW/iWZkWl4YuLww/x6MLh6go/yMgsbLUu6B2dDA/yw
+         w4bA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690381501; x=1690986301;
+        d=1e100.net; s=20221208; t=1690387195; x=1690991995;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mt8/YY3u8LjsBjr8d6/ke2ZW25YHueLUKLJjDJYMc8s=;
-        b=B54jdcwQlEHeaJQtHO5VFue0MxrBspQ7dQFu/jaDiQ5AhdyV9ozq2slLMfkJDxJRIr
-         hN1qj//whjjL58jJbtE0JpYmd2y53t9pCChwq6eII1I3YijQKjIns4Lll1ZuLmu4eBi5
-         r++FJYDOWkQl8y2LB9akiMJ0b7BIf/0b/NwIdmvPNDKYJvCQD9EM3SjfDkZIkL//PZxo
-         tDZ48MGtb6a3gy9zOod0joJwgI/9cHi25GojPi27L7bAyvL3e5+WEc4+7coEJmIdu1Fz
-         1igf8DpksXRE1cin5OesvUrz1/xNlO77x66xEOnmd4KENYaPlKLO54VPd3nkXNaITNoT
-         NEYA==
-X-Gm-Message-State: ABy/qLZKSVICUu/G44XLmE3w0MxEekUAhhmTftfH3e4dueNQ8weV+zkV
-	smAxx+yVv3YuPKaIMbM/5SGUqu5FIvw=
-X-Google-Smtp-Source: APBJJlHpunM1lrfEfJpa6UtG2AaqQE17ubaKuYzputooU8ueGDVFO/y80053uMgFIUrJA+dTGv8yhoGEgv0=
+        bh=x1RCz9AGh0t/+COzjYLcha5fkSMq/GNrC4CuEfgGTfc=;
+        b=jtr+m6J0hTMxvx6fNjug10XBehB4SKGRdzIhEtySnuU7F/fGMR05pkjdWpMueIwNNh
+         u0/kOuqG3ua+rLewnByk/yEsP5QMu5+xQanxmxJ87QrQ+uy6HefS3MWSQ4qwNEaRgbQc
+         LNGwYuZaFxcZZoEWpZDe3s3GJgjT0SG+YG6lbfaBjUKYepnCAb8BNYG+D4ioeH1HM5t1
+         yZBQFgLm/E34swLDXKGe1u2ByXobPSPq8+TT5ZNbFWDy0XHNvDm8QwpDMqYahdExx9mD
+         3XuxTG1uA+Yjo9jkbkPoVC/BmDcExb+5lVhENdoezJK3dsitoTW+tL5SRh+c4Y+VHKT6
+         XLCQ==
+X-Gm-Message-State: ABy/qLbodSW/6N2fPwSR6V4QzVvDJZgpy3hpYR6RKYSkB53vZWPkRCUD
+	1xGQKNO2z2uV/CJ6MU9BkpcK6sJr7SI=
+X-Google-Smtp-Source: APBJJlE6mP/UcpH4lPNK9j4UUpMqMy7oSio4zbtJsZXhMStHU1Br/fIarHdKjyAaokfpTf45S20N2ryKLpo=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:ac60:0:b0:576:de5f:95e1 with SMTP id
- z32-20020a81ac60000000b00576de5f95e1mr20181ywj.1.1690381501073; Wed, 26 Jul
- 2023 07:25:01 -0700 (PDT)
-Date: Wed, 26 Jul 2023 07:24:59 -0700
-In-Reply-To: <2f98a32c-bd3d-4890-b757-4d2f67a3b1a7@amd.com>
+ (user=seanjc job=sendgmr) by 2002:a25:99c8:0:b0:d1c:e102:95a5 with SMTP id
+ q8-20020a2599c8000000b00d1ce10295a5mr15014ybo.7.1690387195164; Wed, 26 Jul
+ 2023 08:59:55 -0700 (PDT)
+Date: Wed, 26 Jul 2023 08:59:53 -0700
+In-Reply-To: <ZL4BiQWihfrD0TOJ@yilunxu-OptiPlex-7050>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230718234512.1690985-1-seanjc@google.com> <110f1aa0-7fcd-1287-701a-89c2203f0ac2@amd.com>
- <ZL6uMk/8UeuGj8CP@google.com> <2f98a32c-bd3d-4890-b757-4d2f67a3b1a7@amd.com>
-Message-ID: <ZMEsuyqHhp1DAVdR@google.com>
-Subject: Re: [RFC PATCH v11 00/29] KVM: guest_memfd() and per-page attributes
+References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-9-seanjc@google.com>
+ <ZL4BiQWihfrD0TOJ@yilunxu-OptiPlex-7050>
+Message-ID: <ZMFC+V6Llv1JWLEt@google.com>
+Subject: Re: [RFC PATCH v11 08/29] KVM: Introduce per-page memory attributes
 From: Sean Christopherson <seanjc@google.com>
-To: "Nikunj A. Dadhania" <nikunj@amd.com>
+To: Xu Yilun <yilun.xu@intel.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
 	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
@@ -70,49 +70,70 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
 	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Jul 26, 2023, Nikunj A. Dadhania wrote:
-> Hi Sean,
+On Mon, Jul 24, 2023, Xu Yilun wrote:
+> On 2023-07-18 at 16:44:51 -0700, Sean Christopherson wrote:
+> > @@ -1346,6 +1350,9 @@ static void kvm_destroy_vm(struct kvm *kvm)
+> >  		kvm_free_memslots(kvm, &kvm->__memslots[i][0]);
+> >  		kvm_free_memslots(kvm, &kvm->__memslots[i][1]);
+> >  	}
+> > +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+> > +	xa_destroy(&kvm->mem_attr_array);
+> > +#endif
 > 
-> On 7/24/2023 10:30 PM, Sean Christopherson wrote:
-> >>   Starting an SNP guest with 40G memory with memory interleave between
-> >>   Node2 and Node3
-> >>
-> >>   $ numactl -i 2,3 ./bootg_snp.sh
-> >>
-> >>     PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
-> >>  242179 root      20   0   40.4g  99580  51676 S  78.0   0.0   0:56.58 qemu-system-x86
-> >>
-> >>   -> Incorrect process resident memory and shared memory is reported
-> > 
-> > I don't know that I would call these "incorrect".  Shared memory definitely is
-> > correct, because by definition guest_memfd isn't shared.  RSS is less clear cut;
-> > gmem memory is resident in RAM, but if we show gmem in RSS then we'll end up with
-> > scenarios where RSS > VIRT, which will be quite confusing for unaware users (I'm
-> > assuming the 40g of VIRT here comes from QEMU mapping the shared half of gmem
-> > memslots).
+> Is it better to make the destruction in reverse order from the creation?
+
+Yeah.  It _shoudn't_ matter, but there's no reason not keep things tidy and
+consistent.
+
+> To put xa_destroy(&kvm->mem_attr_array) after cleanup_srcu_struct(&kvm->srcu),
+> or put xa_init(&kvm->mem_attr_array) after init_srcu_struct(&kvm->irq_srcu).
+
+The former, because init_srcu_struct() can fail (allocates memory), whereas
+xa_init() is a "pure" initialization routine.
+
+> >  	cleanup_srcu_struct(&kvm->irq_srcu);
+> >  	cleanup_srcu_struct(&kvm->srcu);
+> >  	kvm_arch_free_vm(kvm);
+> > @@ -2346,6 +2353,145 @@ static int kvm_vm_ioctl_clear_dirty_log(struct kvm *kvm,
+> >  }
+> >  #endif /* CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT */
 > 
-> I am not sure why will RSS exceed the VIRT, it should be at max 40G (assuming all the
-> memory is private)
+> [...]
+> 
+> > +static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+> > +					   struct kvm_memory_attributes *attrs)
+> > +{
+> > +	gfn_t start, end;
+> > +
+> > +	/* flags is currently not used. */
+> > +	if (attrs->flags)
+> > +		return -EINVAL;
+> > +	if (attrs->attributes & ~kvm_supported_mem_attributes(kvm))
+> > +		return -EINVAL;
+> > +	if (attrs->size == 0 || attrs->address + attrs->size < attrs->address)
+> > +		return -EINVAL;
+> > +	if (!PAGE_ALIGNED(attrs->address) || !PAGE_ALIGNED(attrs->size))
+> > +		return -EINVAL;
+> > +
+> > +	start = attrs->address >> PAGE_SHIFT;
+> > +	end = (attrs->address + attrs->size - 1 + PAGE_SIZE) >> PAGE_SHIFT;
+> 
+> As the attrs->address/size are both garanteed to be non-zero, non-wrap
+> and page aligned in prevous check. Is it OK to simplify the calculation,
+> like:
+> 
+>   end = (attrs->address + attrs->size) >> PAGE_SHIFT;
 
-And also assuming that (a) userspace mmap()'d the shared side of things 1:1 with
-private memory and (b) that the shared mappings have not been populated.   Those
-assumptions will mostly probably hold true for QEMU, but kernel correctness
-shouldn't depend on assumptions about one specific userspace application.
+Yes, that should work.
 
-> >>   /proc/<qemu pid>/smaps
-> >>   7f528be00000-7f5c8be00000 rw-p 00000000 00:01 26629                      /memfd:memory-backend-memfd-shared (deleted)
-> >>   7f5c90200000-7f5c90220000 rw-s 00000000 00:01 44033                      /memfd:rom-backend-memfd-shared (deleted)
-> >>   7f5c90400000-7f5c90420000 rw-s 00000000 00:01 44032                      /memfd:rom-backend-memfd-shared (deleted)
-> >>   7f5c90800000-7f5c90b7c000 rw-s 00000000 00:01 1025                       /memfd:rom-backend-memfd-shared (deleted)
-> > 
-> > This is all expected, and IMO correct.  There are no userspace mappings, and so
-> > not accounting anything is working as intended.
-> Doesn't sound that correct, if 10 SNP guests are running each using 10GB, how
-> would we know who is using 100GB of memory?
+Chao, am I missing something?  Or did we just end up with unnecessarly convoluted
+code as things evolved?
 
-It's correct with respect to what the interfaces show, which is how much memory
-is *mapped* into userspace.
+> > +
+> > +	if (WARN_ON_ONCE(start == end))
+> > +		return -EINVAL;
+> 
+> Also, is this check possible to be hit? Maybe remove it?
 
-As I said (or at least tried to say) in my first reply, I am not against exposing
-memory usage to userspace via stats, only that it's not obvious to me that the
-existing VMA-based stats are the most appropriate way to surface this information.
+It should be impossible to, hence the WARN.  I added the check for two reasons:
+(1) to help document that end is exclusive, and (2) to guard against future bugs.
