@@ -1,247 +1,293 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E7D1363
-	for <kvmarm@lists.linux.dev>; Wed, 26 Jul 2023 04:46:59 +0000 (UTC)
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d052f49702dso5700725276.3
-        for <kvmarm@lists.linux.dev>; Tue, 25 Jul 2023 21:46:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690346819; x=1690951619;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=bniQmOT6+pUxEBBH7wJ5coyJsGVM2Ob3pBVk8XP9Ing=;
-        b=pU/MtIinmz5YpR7qjSN+EeVI9m3ci066UUqt+30GVagerObnPWcvMkVrSKXYd3eVAf
-         0j6kAP1t9os/lbdcmey1rDtdSdnYKhysHLQwtt9+yic1BVkfeKFOnpZCVmSzkUfhg4O/
-         X13NmdtiKzvmaJw4hAB5irCBCZPNRDkN8A1fpb8loSqEq7YazCr7CCIzK25VCVf8W06B
-         riLtl6GQaW8lNhbn6QFIWB9cYlUL+g+q+A682spS7UyS0p2/tfmCC71Nd0Mq/DlSAlGw
-         zn7l5fnsVv5H9HloUaymtN9tUp2d5WWD9hwQLssG3lbD8uY+06ZT3C0twu7O5enlpdKT
-         MxCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690346819; x=1690951619;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bniQmOT6+pUxEBBH7wJ5coyJsGVM2Ob3pBVk8XP9Ing=;
-        b=g1eUeoaf3QOI8Ny9wHWwe19ChOWQWcygfQMHYeNFBQBKhosiDodkAqTAtxnDR5lJPi
-         Vluhtk+3MGCB1jQ9+QZpXcwNWr+At7gdgRAGiMhlJy03gDhWAsqAmZyGURbTjjHrQlxC
-         pB3KEynqcbNzlI2wCWLKrBujBjP93ivYhoyay35FQOkCI5LKkcc93FCHXf2zp84N3W1d
-         ZxxcMGGSOOgOnFPZ9nsU5MWdfLLt4q+x0Ql/aqsZaCWKQbjMxNhFBn3ftCBFRvAayRDC
-         UMuMz+wpxE+UxeTqGI//n5gV9UxjP2wSPQFjUTjYvn3yayy30fQgkaNTY6XfRb0zpRME
-         R0nA==
-X-Gm-Message-State: ABy/qLZOMUWvD5twPeXYiGcKzybteh+jOY+ANnAdHzKXYa/1Fo/r3Nar
-	BFekw6YnidRskKBAu3z76d4PcAKkYpmjmlxzdw==
-X-Google-Smtp-Source: APBJJlG3QyxvhSKb5KAeeSDK40iDT7Pjl2iIu6hEPeWKa9UZTlJb/qPCsHMWEE/O/1TF//5Z3Ay7z+0QuKJGkc7WPA==
-X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a25:abaf:0:b0:cab:9746:ef0e with SMTP
- id v44-20020a25abaf000000b00cab9746ef0emr7489ybi.12.1690346818803; Tue, 25
- Jul 2023 21:46:58 -0700 (PDT)
-Date: Tue, 25 Jul 2023 21:46:51 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C25631363
+	for <kvmarm@lists.linux.dev>; Wed, 26 Jul 2023 07:00:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33385C433C9;
+	Wed, 26 Jul 2023 07:00:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690354859;
+	bh=YHZ41OP3klczBVQd9o2RGDgX+SMfGIW7f4uwUo+09dU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PJndSFFWg4LT8MgOQCZ84a7bgZs/A0l3iyJXe5PiPRa80hh35QmLLBdJcMRySnB1T
+	 JBFf1bY7DBqfATzUGiYDSmths8Awl1YGZmmlYBZvXpklFypROBaDijivfQSpGkV+pq
+	 qMBPkXXs6K0H3xnbA4ng+tGCwfilUWJtonQrJW54lnZHkQ3S7GAIGVwV7fCvxpv2/t
+	 nFwcrwkRfiOZG764AYodX2nlfN7at/6jlxQ37tILgvab6DD1Uvz50RF9eCQDU8qZvb
+	 36nMfaAgOyYKn1M1q8nBgwOb80yn1qc/FZQrHdbGWpJHqicVZbZMgoSPQ+cO6CkoUa
+	 SU2+Rp8Dyhqrw==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qOYVz-00GwF9-J4;
+	Wed, 26 Jul 2023 08:00:56 +0100
+Date: Wed, 26 Jul 2023 08:00:49 +0100
+Message-ID: <871qgvrwbi.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jing Zhang <jingzhangos@google.com>
+Cc: KVM <kvm@vger.kernel.org>,
+	KVMARM <kvmarm@lists.linux.dev>,
+	ARMLinux <linux-arm-kernel@lists.infradead.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v1] KVM: arm64: selftests: Test pointer authentication support in KVM guest
+In-Reply-To: <20230726044652.2169513-1-jingzhangos@google.com>
+References: <20230726044652.2169513-1-jingzhangos@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230726044652.2169513-1-jingzhangos@google.com>
-Subject: [PATCH v1] KVM: arm64: selftests: Test pointer authentication support
- in KVM guest
-From: Jing Zhang <jingzhangos@google.com>
-To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Jing Zhang <jingzhangos@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, pbonzini@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add a selftest to verify the support for pointer authentication in KVM
-guest.
+Hi Jing,
 
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/aarch64/pauth_test.c        | 143 ++++++++++++++++++
- .../selftests/kvm/include/aarch64/processor.h |   2 +
- 3 files changed, 146 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/aarch64/pauth_test.c
+Thanks for getting the ball rolling on that front.
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index c692cc86e7da..9bac5aecd66d 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -143,6 +143,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
- TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
- TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
-+TEST_GEN_PROGS_aarch64 += aarch64/pauth_test
- TEST_GEN_PROGS_aarch64 += aarch64/psci_test
- TEST_GEN_PROGS_aarch64 += aarch64/smccc_filter
- TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
-diff --git a/tools/testing/selftests/kvm/aarch64/pauth_test.c b/tools/testing/selftests/kvm/aarch64/pauth_test.c
-new file mode 100644
-index 000000000000..d5f982da8891
---- /dev/null
-+++ b/tools/testing/selftests/kvm/aarch64/pauth_test.c
-@@ -0,0 +1,143 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * pauth_test - Test for KVM guest pointer authentication.
-+ *
-+ * Copyright (c) 2023 Google LLC.
-+ *
-+ */
-+
-+#define _GNU_SOURCE
-+
-+#include <sched.h>
-+
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+
-+enum uc_args {
-+	WAIT_MIGRATION,
-+	PASS,
-+	FAIL,
-+	FAIL_KVM,
-+	FAIL_INSTR,
-+};
-+
-+static noinline void pac_corruptor(void)
-+{
-+	__asm__ __volatile__(
-+		"paciasp\n"
-+		"eor lr, lr, #1 << 53\n"
-+	);
-+
-+	/* Migrate guest to another physical CPU before authentication */
-+	GUEST_SYNC(WAIT_MIGRATION);
-+	__asm__ __volatile__("autiasp\n");
-+}
-+
-+static void guest_code(void)
-+{
-+	uint64_t sctlr = read_sysreg(sctlr_el1);
-+
-+	/* Enable PAuth */
-+	sctlr |= SCTLR_ELx_ENIA | SCTLR_ELx_ENIB | SCTLR_ELx_ENDA | SCTLR_ELx_ENDB;
-+	write_sysreg(sctlr, sctlr_el1);
-+	isb();
-+
-+	pac_corruptor();
-+
-+	/* Shouldn't be here unless the pac_corruptor didn't do its work */
-+	GUEST_SYNC(FAIL);
-+	GUEST_DONE();
-+}
-+
-+/* Guest will get an unknown exception if KVM doesn't support guest PAuth */
-+static void guest_unknown_handler(struct ex_regs *regs)
-+{
-+	GUEST_SYNC(FAIL_KVM);
-+	GUEST_DONE();
-+}
-+
-+/* Guest will get a FPAC exception if KVM support guest PAuth */
-+static void guest_fpac_handler(struct ex_regs *regs)
-+{
-+	GUEST_SYNC(PASS);
-+	GUEST_DONE();
-+}
-+
-+/* Guest will get an instruction abort exception if the PAuth instructions have
-+ * no effect (or PAuth not enabled in guest), which would cause guest to fetch
-+ * an invalid instruction due to the corrupted LR.
-+ */
-+static void guest_iabt_handler(struct ex_regs *regs)
-+{
-+	GUEST_SYNC(FAIL_INSTR);
-+	GUEST_DONE();
-+}
-+
-+int main(void)
-+{
-+	struct kvm_vcpu_init init;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+	cpu_set_t cpu_mask;
-+
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PTRAUTH_ADDRESS));
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PTRAUTH_GENERIC));
-+
-+	vm = vm_create(1);
-+
-+	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
-+	init.features[0] |= ((1 << KVM_ARM_VCPU_PTRAUTH_ADDRESS) |
-+			     (1 << KVM_ARM_VCPU_PTRAUTH_GENERIC));
-+
-+	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
-+
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vcpu);
-+
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_EC_UNKNOWN, guest_unknown_handler);
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_EC_FPAC, guest_fpac_handler);
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_EC_IABT, guest_iabt_handler);
-+
-+	while (1) {
-+		vcpu_run(vcpu);
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			break;
-+		case UCALL_SYNC:
-+			switch (uc.args[1]) {
-+			case PASS:
-+				/* KVM guest PAuth works! */
-+				break;
-+			case WAIT_MIGRATION:
-+				sched_getaffinity(0, sizeof(cpu_mask), &cpu_mask);
-+				CPU_CLR(sched_getcpu(), &cpu_mask);
-+				sched_setaffinity(0, sizeof(cpu_mask), &cpu_mask);
-+				break;
-+			case FAIL:
-+				TEST_FAIL("Guest corruptor code doesn't work!\n");
-+				break;
-+			case FAIL_KVM:
-+				TEST_FAIL("KVM doesn't support guest PAuth!\n");
-+				break;
-+			case FAIL_INSTR:
-+				TEST_FAIL("Guest PAuth instructions don't work!\n");
-+				break;
-+			}
-+			break;
-+		case UCALL_DONE:
-+			goto done;
-+		default:
-+			TEST_FAIL("Unexpected ucall: %lu", uc.cmd);
-+		}
-+	}
-+
-+done:
-+	kvm_vm_free(vm);
-+}
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index cb537253a6b9..f8d541af9c06 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -104,7 +104,9 @@ enum {
- #define ESR_EC_SHIFT		26
- #define ESR_EC_MASK		(ESR_EC_NUM - 1)
- 
-+#define ESR_EC_UNKNOWN		0x00
- #define ESR_EC_SVC64		0x15
-+#define ESR_EC_FPAC		0x1c
- #define ESR_EC_IABT		0x21
- #define ESR_EC_DABT		0x25
- #define ESR_EC_HW_BP_CURRENT	0x31
+On Wed, 26 Jul 2023 05:46:51 +0100,
+Jing Zhang <jingzhangos@google.com> wrote:
+> 
+> Add a selftest to verify the support for pointer authentication in KVM
+> guest.
 
-base-commit: 6eaae198076080886b9e7d57f4ae06fa782f90ef
+I guess it'd be worth describing *what* you are testing.
+
+> 
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../selftests/kvm/aarch64/pauth_test.c        | 143 ++++++++++++++++++
+>  .../selftests/kvm/include/aarch64/processor.h |   2 +
+>  3 files changed, 146 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/aarch64/pauth_test.c
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index c692cc86e7da..9bac5aecd66d 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -143,6 +143,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
+>  TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
+>  TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
+>  TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
+> +TEST_GEN_PROGS_aarch64 += aarch64/pauth_test
+>  TEST_GEN_PROGS_aarch64 += aarch64/psci_test
+>  TEST_GEN_PROGS_aarch64 += aarch64/smccc_filter
+>  TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
+> diff --git a/tools/testing/selftests/kvm/aarch64/pauth_test.c b/tools/testing/selftests/kvm/aarch64/pauth_test.c
+> new file mode 100644
+> index 000000000000..d5f982da8891
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/aarch64/pauth_test.c
+> @@ -0,0 +1,143 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * pauth_test - Test for KVM guest pointer authentication.
+> + *
+> + * Copyright (c) 2023 Google LLC.
+> + *
+> + */
+> +
+> +#define _GNU_SOURCE
+> +
+> +#include <sched.h>
+> +
+> +#include "kvm_util.h"
+> +#include "processor.h"
+> +#include "test_util.h"
+> +
+> +enum uc_args {
+> +	WAIT_MIGRATION,
+> +	PASS,
+> +	FAIL,
+> +	FAIL_KVM,
+> +	FAIL_INSTR,
+> +};
+> +
+> +static noinline void pac_corruptor(void)
+> +{
+> +	__asm__ __volatile__(
+> +		"paciasp\n"
+> +		"eor lr, lr, #1 << 53\n"
+
+Why bit 53? This looks pretty odd. Given that you don't compute the
+size of the PAC field (think FEAT_D128...), this isn't a safe bet...
+
+> +	);
+> +
+> +	/* Migrate guest to another physical CPU before authentication */
+> +	GUEST_SYNC(WAIT_MIGRATION);
+> +	__asm__ __volatile__("autiasp\n");
+
+If the test was compiled with PAuth enabled, you shouldn't need to add
+the paciasp/authiasp instructions. On the other hand, the whole
+"corrupt LR" is extremely fragile -- the compiler doesn't know you've
+messed with it, and it is free to reuse it.
+
+If you want a reliable test, you must write this entirely in
+assembly.
+
+> +}
+> +
+> +static void guest_code(void)
+> +{
+> +	uint64_t sctlr = read_sysreg(sctlr_el1);
+> +
+> +	/* Enable PAuth */
+> +	sctlr |= SCTLR_ELx_ENIA | SCTLR_ELx_ENIB | SCTLR_ELx_ENDA | SCTLR_ELx_ENDB;
+> +	write_sysreg(sctlr, sctlr_el1);
+> +	isb();
+
+Out of curiosity, where are the keys set up? Because part of the
+validation would be that for a given set of keys and authentication
+algorithm, we obtain the same results.
+
+> +
+> +	pac_corruptor();
+> +
+> +	/* Shouldn't be here unless the pac_corruptor didn't do its work */
+> +	GUEST_SYNC(FAIL);
+> +	GUEST_DONE();
+> +}
+> +
+> +/* Guest will get an unknown exception if KVM doesn't support guest PAuth */
+> +static void guest_unknown_handler(struct ex_regs *regs)
+> +{
+> +	GUEST_SYNC(FAIL_KVM);
+> +	GUEST_DONE();
+> +}
+> +
+> +/* Guest will get a FPAC exception if KVM support guest PAuth */
+> +static void guest_fpac_handler(struct ex_regs *regs)
+> +{
+> +	GUEST_SYNC(PASS);
+> +	GUEST_DONE();
+> +}
+> +
+> +/* Guest will get an instruction abort exception if the PAuth instructions have
+> + * no effect (or PAuth not enabled in guest), which would cause guest to fetch
+> + * an invalid instruction due to the corrupted LR.
+> + */
+> +static void guest_iabt_handler(struct ex_regs *regs)
+> +{
+> +	GUEST_SYNC(FAIL_INSTR);
+> +	GUEST_DONE();
+> +}
+> +
+> +int main(void)
+> +{
+> +	struct kvm_vcpu_init init;
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_vm *vm;
+> +	struct ucall uc;
+> +	cpu_set_t cpu_mask;
+> +
+> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PTRAUTH_ADDRESS));
+> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PTRAUTH_GENERIC));
+> +
+> +	vm = vm_create(1);
+> +
+> +	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
+> +	init.features[0] |= ((1 << KVM_ARM_VCPU_PTRAUTH_ADDRESS) |
+> +			     (1 << KVM_ARM_VCPU_PTRAUTH_GENERIC));
+> +
+> +	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
+> +
+> +	vm_init_descriptor_tables(vm);
+> +	vcpu_init_descriptor_tables(vcpu);
+> +
+> +	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
+> +				ESR_EC_UNKNOWN, guest_unknown_handler);
+> +	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
+> +				ESR_EC_FPAC, guest_fpac_handler);
+> +	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
+> +				ESR_EC_IABT, guest_iabt_handler);
+> +
+> +	while (1) {
+> +		vcpu_run(vcpu);
+> +
+> +		switch (get_ucall(vcpu, &uc)) {
+> +		case UCALL_ABORT:
+> +			REPORT_GUEST_ASSERT(uc);
+> +			break;
+> +		case UCALL_SYNC:
+> +			switch (uc.args[1]) {
+> +			case PASS:
+> +				/* KVM guest PAuth works! */
+> +				break;
+> +			case WAIT_MIGRATION:
+> +				sched_getaffinity(0, sizeof(cpu_mask), &cpu_mask);
+> +				CPU_CLR(sched_getcpu(), &cpu_mask);
+> +				sched_setaffinity(0, sizeof(cpu_mask), &cpu_mask);
+> +				break;
+> +			case FAIL:
+> +				TEST_FAIL("Guest corruptor code doesn't work!\n");
+> +				break;
+> +			case FAIL_KVM:
+> +				TEST_FAIL("KVM doesn't support guest PAuth!\n");
+
+Why is that a hard failure? The vast majority of the HW out there
+doesn't support PAuth...
+
+> +				break;
+> +			case FAIL_INSTR:
+> +				TEST_FAIL("Guest PAuth instructions don't work!\n");
+> +				break;
+> +			}
+> +			break;
+> +		case UCALL_DONE:
+> +			goto done;
+
+Why a goto instead of a break?
+
+> +		default:
+> +			TEST_FAIL("Unexpected ucall: %lu", uc.cmd);
+> +		}
+> +	}
+> +
+> +done:
+> +	kvm_vm_free(vm);
+> +}
+> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> index cb537253a6b9..f8d541af9c06 100644
+> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> @@ -104,7 +104,9 @@ enum {
+>  #define ESR_EC_SHIFT		26
+>  #define ESR_EC_MASK		(ESR_EC_NUM - 1)
+>  
+> +#define ESR_EC_UNKNOWN		0x00
+>  #define ESR_EC_SVC64		0x15
+> +#define ESR_EC_FPAC		0x1c
+>  #define ESR_EC_IABT		0x21
+>  #define ESR_EC_DABT		0x25
+>  #define ESR_EC_HW_BP_CURRENT	0x31
+> 
+
+Although that's a good start, PAuth instructions that are in the NOP
+space are not that interesting, because we already have tons of code
+using it. What I'd really love to see is a test exercising some of the
+non-NOP stuff, including use of the generic auth keys and the
+PACGA/XPAC* instructions.
+
+As I mentioned above, another thing I'd like to see is a set of
+reference results for a given set of keys and architected algorithm
+(QARMA3, QARMA5) so that we can compare between implementations
+(excluding the IMPDEF implementations, of course).
+
+Thanks,
+
+	M.
+
 -- 
-2.41.0.487.g6d72f3e995-goog
-
+Without deviation from the norm, progress is not possible.
