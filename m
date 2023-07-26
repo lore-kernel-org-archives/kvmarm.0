@@ -1,135 +1,118 @@
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 966BCCA6A
-	for <kvmarm@lists.linux.dev>; Wed, 26 Jul 2023 11:36:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690371396; x=1721907396;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=SuZ1oLRGv+DogObqtc+f4FAjzMjj7hxAmbmabhNK8B0=;
-  b=YwqBcgsJcGwfBSXAHnFBe8hOQs8ODXjZM9yj8hfDNYOjWZvTDY0+h2Jc
-   Hrv5gkXkfQE6ytovplwZ9uCzhKgPqAyGvirSWrkB0j1rZ4aUvMLBgj9kj
-   LPqMig0JErSMbGNrUvktZSOm1bef5FydCzX9hGdpOxI6HrspAyfbyPZ5g
-   /bAi469mGKG0Bcus/TfMPVn8qsUL9QtN8T2Ht/rrCWA5fwLHERjcG0zoH
-   qJgSsG+KynZufzzwcVJXagVg3G5Sdqoff2+pJeYVSaLwjfNHDPpmy5MiK
-   L9MGin1+anEQIuTLEiJcfFEq5iHxLuoku5jOHH2TMHn9wdrMr23kvmGu6
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="371598748"
-X-IronPort-AV: E=Sophos;i="6.01,231,1684825200"; 
-   d="scan'208";a="371598748"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2023 04:36:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="729807753"
-X-IronPort-AV: E=Sophos;i="6.01,231,1684825200"; 
-   d="scan'208";a="729807753"
-Received: from mbrdon-mobl.ger.corp.intel.com (HELO box.shutemov.name) ([10.251.209.47])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2023 04:36:21 -0700
-Received: by box.shutemov.name (Postfix, from userid 1000)
-	id 8BCEB109503; Wed, 26 Jul 2023 14:36:17 +0300 (+03)
-Date: Wed, 26 Jul 2023 14:36:17 +0300
-From: "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
-	Yu Zhang <yu.c.zhang@linux.intel.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	Ackerley Tng <ackerleytng@google.com>,
-	Maciej Szmigiero <mail@maciej.szmigiero.name>,
-	David Hildenbrand <david@redhat.com>,
-	Quentin Perret <qperret@google.com>,
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
-	Liam Merwick <liam.merwick@oracle.com>,
-	Isaku Yamahata <isaku.yamahata@gmail.com>
-Subject: Re: [RFC PATCH v11 10/29] mm: Add AS_UNMOVABLE to mark mapping as
- completely unmovable
-Message-ID: <20230726113617.432nuovswn6odcmx@box>
-References: <20230718234512.1690985-1-seanjc@google.com>
- <20230718234512.1690985-11-seanjc@google.com>
- <20230725102403.xywjqlhyqkrzjok6@box.shutemov.name>
- <ZL/Fa4W2Ne9EVxoh@casper.infradead.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62603CA51
+	for <kvmarm@lists.linux.dev>; Wed, 26 Jul 2023 14:25:02 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-583fe0f84a5so35465307b3.3
+        for <kvmarm@lists.linux.dev>; Wed, 26 Jul 2023 07:25:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690381501; x=1690986301;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mt8/YY3u8LjsBjr8d6/ke2ZW25YHueLUKLJjDJYMc8s=;
+        b=KwMaCkiB4xAqGBUh9OF2kV0ZTXZJ9t/BQNvELYTboh2nFXRCb/O6mzI5Rf4+JkOSUf
+         GbfKDvzjuzeoTYk+8UzFDnEFGCf4Xp/4j132VlBFiOap0dqwF0d+IWavL7GkLuWIPxaf
+         FtFh1NcigPTHGOQymzspNYZcGJWMeYjGrAKFBYQg3vkICZKAIWBqnifvNeqq77Udkh7Z
+         xGehHXpHV6lJVR2/PB6tUzMEDhiwA5lq38Ga3ndr8/43j3+UY7kRIeUxbAwefFFreB6b
+         OU07H0FnfDMXq+of8q/ygEkV9SZmVl7edMM6TzYoGxGd/1xqW6Xr5wUrtaTzZVCwe9dk
+         Dlpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690381501; x=1690986301;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mt8/YY3u8LjsBjr8d6/ke2ZW25YHueLUKLJjDJYMc8s=;
+        b=B54jdcwQlEHeaJQtHO5VFue0MxrBspQ7dQFu/jaDiQ5AhdyV9ozq2slLMfkJDxJRIr
+         hN1qj//whjjL58jJbtE0JpYmd2y53t9pCChwq6eII1I3YijQKjIns4Lll1ZuLmu4eBi5
+         r++FJYDOWkQl8y2LB9akiMJ0b7BIf/0b/NwIdmvPNDKYJvCQD9EM3SjfDkZIkL//PZxo
+         tDZ48MGtb6a3gy9zOod0joJwgI/9cHi25GojPi27L7bAyvL3e5+WEc4+7coEJmIdu1Fz
+         1igf8DpksXRE1cin5OesvUrz1/xNlO77x66xEOnmd4KENYaPlKLO54VPd3nkXNaITNoT
+         NEYA==
+X-Gm-Message-State: ABy/qLZKSVICUu/G44XLmE3w0MxEekUAhhmTftfH3e4dueNQ8weV+zkV
+	smAxx+yVv3YuPKaIMbM/5SGUqu5FIvw=
+X-Google-Smtp-Source: APBJJlHpunM1lrfEfJpa6UtG2AaqQE17ubaKuYzputooU8ueGDVFO/y80053uMgFIUrJA+dTGv8yhoGEgv0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:ac60:0:b0:576:de5f:95e1 with SMTP id
+ z32-20020a81ac60000000b00576de5f95e1mr20181ywj.1.1690381501073; Wed, 26 Jul
+ 2023 07:25:01 -0700 (PDT)
+Date: Wed, 26 Jul 2023 07:24:59 -0700
+In-Reply-To: <2f98a32c-bd3d-4890-b757-4d2f67a3b1a7@amd.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZL/Fa4W2Ne9EVxoh@casper.infradead.org>
+Mime-Version: 1.0
+References: <20230718234512.1690985-1-seanjc@google.com> <110f1aa0-7fcd-1287-701a-89c2203f0ac2@amd.com>
+ <ZL6uMk/8UeuGj8CP@google.com> <2f98a32c-bd3d-4890-b757-4d2f67a3b1a7@amd.com>
+Message-ID: <ZMEsuyqHhp1DAVdR@google.com>
+Subject: Re: [RFC PATCH v11 00/29] KVM: guest_memfd() and per-page attributes
+From: Sean Christopherson <seanjc@google.com>
+To: "Nikunj A. Dadhania" <nikunj@amd.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Maciej Szmigiero <mail@maciej.szmigiero.name>, Vlastimil Babka <vbabka@suse.cz>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jul 25, 2023 at 01:51:55PM +0100, Matthew Wilcox wrote:
-> On Tue, Jul 25, 2023 at 01:24:03PM +0300, Kirill A . Shutemov wrote:
-> > On Tue, Jul 18, 2023 at 04:44:53PM -0700, Sean Christopherson wrote:
-> > > diff --git a/mm/compaction.c b/mm/compaction.c
-> > > index dbc9f86b1934..a3d2b132df52 100644
-> > > --- a/mm/compaction.c
-> > > +++ b/mm/compaction.c
-> > > @@ -1047,6 +1047,10 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
-> > >  		if (!mapping && (folio_ref_count(folio) - 1) > folio_mapcount(folio))
-> > >  			goto isolate_fail_put;
-> > >  
-> > > +		/* The mapping truly isn't movable. */
-> > > +		if (mapping && mapping_unmovable(mapping))
-> > > +			goto isolate_fail_put;
-> > > +
+On Wed, Jul 26, 2023, Nikunj A. Dadhania wrote:
+> Hi Sean,
+> 
+> On 7/24/2023 10:30 PM, Sean Christopherson wrote:
+> >>   Starting an SNP guest with 40G memory with memory interleave between
+> >>   Node2 and Node3
+> >>
+> >>   $ numactl -i 2,3 ./bootg_snp.sh
+> >>
+> >>     PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+> >>  242179 root      20   0   40.4g  99580  51676 S  78.0   0.0   0:56.58 qemu-system-x86
+> >>
+> >>   -> Incorrect process resident memory and shared memory is reported
 > > 
-> > I doubt that it is safe to dereference mapping here. I believe the folio
-> > can be truncated from under us and the mapping freed with the inode.
+> > I don't know that I would call these "incorrect".  Shared memory definitely is
+> > correct, because by definition guest_memfd isn't shared.  RSS is less clear cut;
+> > gmem memory is resident in RAM, but if we show gmem in RSS then we'll end up with
+> > scenarios where RSS > VIRT, which will be quite confusing for unaware users (I'm
+> > assuming the 40g of VIRT here comes from QEMU mapping the shared half of gmem
+> > memslots).
+> 
+> I am not sure why will RSS exceed the VIRT, it should be at max 40G (assuming all the
+> memory is private)
+
+And also assuming that (a) userspace mmap()'d the shared side of things 1:1 with
+private memory and (b) that the shared mappings have not been populated.   Those
+assumptions will mostly probably hold true for QEMU, but kernel correctness
+shouldn't depend on assumptions about one specific userspace application.
+
+> >>   /proc/<qemu pid>/smaps
+> >>   7f528be00000-7f5c8be00000 rw-p 00000000 00:01 26629                      /memfd:memory-backend-memfd-shared (deleted)
+> >>   7f5c90200000-7f5c90220000 rw-s 00000000 00:01 44033                      /memfd:rom-backend-memfd-shared (deleted)
+> >>   7f5c90400000-7f5c90420000 rw-s 00000000 00:01 44032                      /memfd:rom-backend-memfd-shared (deleted)
+> >>   7f5c90800000-7f5c90b7c000 rw-s 00000000 00:01 1025                       /memfd:rom-backend-memfd-shared (deleted)
 > > 
-> > The folio has to be locked to dereference mapping safely (given that the
-> > mapping is still tied to the folio).
-> 
-> There's even a comment to that effect later on in the function:
-> 
->                         /*
->                          * Only pages without mappings or that have a
->                          * ->migrate_folio callback are possible to migrate
->                          * without blocking. However, we can be racing with
->                          * truncation so it's necessary to lock the page
->                          * to stabilise the mapping as truncation holds
->                          * the page lock until after the page is removed
->                          * from the page cache.
->                          */
-> 
-> (that could be reworded to make it clear how dangerous dereferencing
-> ->mapping is without the lock ... and it does need to be changed to say
-> "folio lock" instead of "page lock", so ...)
-> 
-> How does this look?
-> 
->                         /*
->                          * Only folios without mappings or that have
->                          * a ->migrate_folio callback are possible to
->                          * migrate without blocking. However, we can
->                          * be racing with truncation, which can free
->                          * the mapping.  Truncation holds the folio lock
->                          * until after the folio is removed from the page
->                          * cache so holding it ourselves is sufficient.
->                          */
-> 
+> > This is all expected, and IMO correct.  There are no userspace mappings, and so
+> > not accounting anything is working as intended.
+> Doesn't sound that correct, if 10 SNP guests are running each using 10GB, how
+> would we know who is using 100GB of memory?
 
-Looks good to me.
+It's correct with respect to what the interfaces show, which is how much memory
+is *mapped* into userspace.
 
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+As I said (or at least tried to say) in my first reply, I am not against exposing
+memory usage to userspace via stats, only that it's not obvious to me that the
+existing VMA-based stats are the most appropriate way to surface this information.
