@@ -1,302 +1,247 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E275D1846
-	for <kvmarm@lists.linux.dev>; Wed, 26 Jul 2023 04:07:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690344432;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Jd3Ayh8DN133HPzYKMvS4hrOB9t+N5s98/iIQZ50pSY=;
-	b=DAhZ+vTsZL1nGTc51NxghZ11XvIAOZsoYkXttdbCoAN8MN/jST/W0b34Gj2Jqd6YlCYdhL
-	vgEfJPRL91cJcARMxHjIKGh2ZGckGYCJtvekX2wAG++vNXAPyMwsnI3J+SZdYttvk9ovWM
-	6r9PeEjXjC69WknWeg2wLIFndUruAL0=
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
- [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-278-0-_iL9xaPkuJr7vgSEKE7g-1; Wed, 26 Jul 2023 00:07:06 -0400
-X-MC-Unique: 0-_iL9xaPkuJr7vgSEKE7g-1
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-1b88d18c2c6so7217565ad.0
-        for <kvmarm@lists.linux.dev>; Tue, 25 Jul 2023 21:07:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E7D1363
+	for <kvmarm@lists.linux.dev>; Wed, 26 Jul 2023 04:46:59 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d052f49702dso5700725276.3
+        for <kvmarm@lists.linux.dev>; Tue, 25 Jul 2023 21:46:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690346819; x=1690951619;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bniQmOT6+pUxEBBH7wJ5coyJsGVM2Ob3pBVk8XP9Ing=;
+        b=pU/MtIinmz5YpR7qjSN+EeVI9m3ci066UUqt+30GVagerObnPWcvMkVrSKXYd3eVAf
+         0j6kAP1t9os/lbdcmey1rDtdSdnYKhysHLQwtt9+yic1BVkfeKFOnpZCVmSzkUfhg4O/
+         X13NmdtiKzvmaJw4hAB5irCBCZPNRDkN8A1fpb8loSqEq7YazCr7CCIzK25VCVf8W06B
+         riLtl6GQaW8lNhbn6QFIWB9cYlUL+g+q+A682spS7UyS0p2/tfmCC71Nd0Mq/DlSAlGw
+         zn7l5fnsVv5H9HloUaymtN9tUp2d5WWD9hwQLssG3lbD8uY+06ZT3C0twu7O5enlpdKT
+         MxCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690344425; x=1690949225;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jd3Ayh8DN133HPzYKMvS4hrOB9t+N5s98/iIQZ50pSY=;
-        b=WwaoI5N+yNBliPmk/nkXz4gsM33wQ7k+W57IzYsT4DvUavhzZvjgv2wMt3Vet0uPNs
-         TQjE96G40noslFX+OsCxNv/hxWa/l/+jrKawyZPk+rZe1Ru3M6oe887aBttK29P1McAw
-         uAkXwhgMCU17Mnxdl/9tJg4h6eVIVmnWE0MW9MKspsxA7yRivJv5pMtBIDJzL7XgbBDb
-         gS873loSc0KRd58JFFqajepvDOyA7bfWfTmnFfrH5dpKr2GNElwwXpUIIwcgDP690aKp
-         zv4yu5KgW+hp0925IW3R+Y7ZoJQJQfPoF1tMKXc923oDvv1twQn3DwgmNNhDA6GBbFA3
-         bqXg==
-X-Gm-Message-State: ABy/qLah2U8H2e3a4vuGPCbM1kq1hKIDDq/k+Y+AcMfnptEzjLyzEuBS
-	pTgblMDVCn17JGY4IY1SE/THGmsut1MkG4he5RXbeTjKZYjmwUagvseOLrc2tSddgb8IsPiyP/D
-	CMvl9wEuE6PL0NpDZ
-X-Received: by 2002:a05:6a21:998e:b0:13a:3649:dc1a with SMTP id ve14-20020a056a21998e00b0013a3649dc1amr1214740pzb.0.1690344425268;
-        Tue, 25 Jul 2023 21:07:05 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHleYbAwzuemeXRJ1zvnZsyP8kzTsFzjwsO8Pk5jpHvjhbkv06p3/Mm3PthC+5aKlT4RtEFvA==
-X-Received: by 2002:a05:6a21:998e:b0:13a:3649:dc1a with SMTP id ve14-20020a056a21998e00b0013a3649dc1amr1214709pzb.0.1690344424918;
-        Tue, 25 Jul 2023 21:07:04 -0700 (PDT)
-Received: from [10.72.112.95] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id a13-20020aa7864d000000b006862e7f4648sm10736311pfo.99.2023.07.25.21.06.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Jul 2023 21:07:04 -0700 (PDT)
-Message-ID: <bd054dfa-915d-e231-b480-06401622ebde@redhat.com>
-Date: Wed, 26 Jul 2023 12:06:57 +0800
+        d=1e100.net; s=20221208; t=1690346819; x=1690951619;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bniQmOT6+pUxEBBH7wJ5coyJsGVM2Ob3pBVk8XP9Ing=;
+        b=g1eUeoaf3QOI8Ny9wHWwe19ChOWQWcygfQMHYeNFBQBKhosiDodkAqTAtxnDR5lJPi
+         Vluhtk+3MGCB1jQ9+QZpXcwNWr+At7gdgRAGiMhlJy03gDhWAsqAmZyGURbTjjHrQlxC
+         pB3KEynqcbNzlI2wCWLKrBujBjP93ivYhoyay35FQOkCI5LKkcc93FCHXf2zp84N3W1d
+         ZxxcMGGSOOgOnFPZ9nsU5MWdfLLt4q+x0Ql/aqsZaCWKQbjMxNhFBn3ftCBFRvAayRDC
+         UMuMz+wpxE+UxeTqGI//n5gV9UxjP2wSPQFjUTjYvn3yayy30fQgkaNTY6XfRb0zpRME
+         R0nA==
+X-Gm-Message-State: ABy/qLZOMUWvD5twPeXYiGcKzybteh+jOY+ANnAdHzKXYa/1Fo/r3Nar
+	BFekw6YnidRskKBAu3z76d4PcAKkYpmjmlxzdw==
+X-Google-Smtp-Source: APBJJlG3QyxvhSKb5KAeeSDK40iDT7Pjl2iIu6hEPeWKa9UZTlJb/qPCsHMWEE/O/1TF//5Z3Ay7z+0QuKJGkc7WPA==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a25:abaf:0:b0:cab:9746:ef0e with SMTP
+ id v44-20020a25abaf000000b00cab9746ef0emr7489ybi.12.1690346818803; Tue, 25
+ Jul 2023 21:46:58 -0700 (PDT)
+Date: Tue, 25 Jul 2023 21:46:51 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v7 12/12] KVM: arm64: Use TLBI range-based intructions for
- unmap
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>, Huacai Chen
- <chenhuacai@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
- Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>,
- Jing Zhang <jingzhangos@google.com>, Reiji Watanabe <reijiw@google.com>,
- Colton Lewis <coltonlewis@google.com>, David Matlack <dmatlack@google.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-References: <20230722022251.3446223-1-rananta@google.com>
- <20230722022251.3446223-13-rananta@google.com>
- <0841aca6-2824-6a1b-a568-119f8bd220de@redhat.com>
- <CAJHc60znT5ThqKE3TgTW-0Us3oNv8+KF=81TSK0PbG3tTyJLFQ@mail.gmail.com>
- <7ea9e7a0-508d-0f00-09ae-ae468f111437@redhat.com>
- <CAJHc60xaygC8tX8yFnoFM9YqWg8iE6r5d+kugGwO5KZxDtG3rQ@mail.gmail.com>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <CAJHc60xaygC8tX8yFnoFM9YqWg8iE6r5d+kugGwO5KZxDtG3rQ@mail.gmail.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
+Message-ID: <20230726044652.2169513-1-jingzhangos@google.com>
+Subject: [PATCH v1] KVM: arm64: selftests: Test pointer authentication support
+ in KVM guest
+From: Jing Zhang <jingzhangos@google.com>
+To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Jing Zhang <jingzhangos@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Raghavendra,
+Add a selftest to verify the support for pointer authentication in KVM
+guest.
 
-On 7/26/23 01:23, Raghavendra Rao Ananta wrote:
-> Hi Shaoqin,
-> 
-> On Mon, Jul 24, 2023 at 7:32 PM Shaoqin Huang <shahuang@redhat.com> wrote:
->>
->>
->>
->> On 7/25/23 00:47, Raghavendra Rao Ananta wrote:
->>> On Mon, Jul 24, 2023 at 2:35 AM Shaoqin Huang <shahuang@redhat.com> wrote:
->>>>
->>>> Hi Raghavendra,
->>>>
->>>> On 7/22/23 10:22, Raghavendra Rao Ananta wrote:
->>>>> The current implementation of the stage-2 unmap walker traverses
->>>>> the given range and, as a part of break-before-make, performs
->>>>> TLB invalidations with a DSB for every PTE. A multitude of this
->>>>> combination could cause a performance bottleneck on some systems.
->>>>>
->>>>> Hence, if the system supports FEAT_TLBIRANGE, defer the TLB
->>>>> invalidations until the entire walk is finished, and then
->>>>> use range-based instructions to invalidate the TLBs in one go.
->>>>> Condition deferred TLB invalidation on the system supporting FWB,
->>>>> as the optimization is entirely pointless when the unmap walker
->>>>> needs to perform CMOs.
->>>>>
->>>>> Rename stage2_put_pte() to stage2_unmap_put_pte() as the function
->>>>> now serves the stage-2 unmap walker specifically, rather than
->>>>> acting generic.
->>>>>
->>>>> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
->>>>> ---
->>>>>     arch/arm64/kvm/hyp/pgtable.c | 67 +++++++++++++++++++++++++++++++-----
->>>>>     1 file changed, 58 insertions(+), 9 deletions(-)
->>>>>
->>>>> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
->>>>> index 5ef098af1736..cf88933a2ea0 100644
->>>>> --- a/arch/arm64/kvm/hyp/pgtable.c
->>>>> +++ b/arch/arm64/kvm/hyp/pgtable.c
->>>>> @@ -831,16 +831,54 @@ static void stage2_make_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t n
->>>>>         smp_store_release(ctx->ptep, new);
->>>>>     }
->>>>>
->>>>> -static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu,
->>>>> -                        struct kvm_pgtable_mm_ops *mm_ops)
->>>>> +struct stage2_unmap_data {
->>>>> +     struct kvm_pgtable *pgt;
->>>>> +     bool defer_tlb_flush_init;
->>>>> +};
->>>>> +
->>>>> +static bool __stage2_unmap_defer_tlb_flush(struct kvm_pgtable *pgt)
->>>>> +{
->>>>> +     /*
->>>>> +      * If FEAT_TLBIRANGE is implemented, defer the individual
->>>>> +      * TLB invalidations until the entire walk is finished, and
->>>>> +      * then use the range-based TLBI instructions to do the
->>>>> +      * invalidations. Condition deferred TLB invalidation on the
->>>>> +      * system supporting FWB, as the optimization is entirely
->>>>> +      * pointless when the unmap walker needs to perform CMOs.
->>>>> +      */
->>>>> +     return system_supports_tlb_range() && stage2_has_fwb(pgt);
->>>>> +}
->>>>> +
->>>>> +static bool stage2_unmap_defer_tlb_flush(struct stage2_unmap_data *unmap_data)
->>>>> +{
->>>>> +     bool defer_tlb_flush = __stage2_unmap_defer_tlb_flush(unmap_data->pgt);
->>>>> +
->>>>> +     /*
->>>>> +      * Since __stage2_unmap_defer_tlb_flush() is based on alternative
->>>>> +      * patching and the TLBIs' operations behavior depend on this,
->>>>> +      * track if there's any change in the state during the unmap sequence.
->>>>> +      */
->>>>> +     WARN_ON(unmap_data->defer_tlb_flush_init != defer_tlb_flush);
->>>>> +     return defer_tlb_flush;
->>>>> +}
->>>>> +
->>>>> +static void stage2_unmap_put_pte(const struct kvm_pgtable_visit_ctx *ctx,
->>>>> +                             struct kvm_s2_mmu *mmu,
->>>>> +                             struct kvm_pgtable_mm_ops *mm_ops)
->>>>>     {
->>>>> +     struct stage2_unmap_data *unmap_data = ctx->arg;
->>>>> +
->>>>>         /*
->>>>> -      * Clear the existing PTE, and perform break-before-make with
->>>>> -      * TLB maintenance if it was valid.
->>>>> +      * Clear the existing PTE, and perform break-before-make if it was
->>>>> +      * valid. Depending on the system support, the TLB maintenance for
->>>>> +      * the same can be deferred until the entire unmap is completed.
->>>>>          */
->>>>>         if (kvm_pte_valid(ctx->old)) {
->>>>>                 kvm_clear_pte(ctx->ptep);
->>>>> -             kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
->>>>> +
->>>>> +             if (!stage2_unmap_defer_tlb_flush(unmap_data))
->>>> Why not directly check (unmap_data->defer_tlb_flush_init) here?
->>>>
->>> (Re-sending the reply as the previous one was formatted as HTML and
->>> was blocked by many lists)
->>>
->>> No particular reason per say, but I was just going with the logic of
->>> determining if we need to defer the flush and the WARN_ON() parts
->>> separate.
->>> Any advantage if we directly check in stage2_unmap_put_pte() that I
->>> missed or is this purely for readability?
->>
->> Hi Raghavendra,
->>
->> I just wondering if before the stage2 walk, we want to defer the tlb
->> flush, but if when walk the stage2, the stage2_unmap_defer_tlb_flush()
->> trigger the WARN_ON() and return don't defer the tlb flush, it will
->> flush the ctx->addr's tlb. But before the WARN_ON() triggered, these tlb
->> will not be flushed, since when walk stage2 done in the
->> kvm_pgtable_stage2_unmap(), the stage2_unmap_defer_tlb_flush() still
->> trigger the WARN_ON() and don't use the tlb range-based flush. Thus some
->> of the tlb are not flushed.
->>
-> Excellent point!
->> If we directly check the (unmap_data->defer_tlb_flush_init), this isn't
->> change during walking the stage2, so the WARN_ON() should only trigger
->> in kvm_pgtable_stage2_unmap()->stage2_unmap_defer_tlb_flush().
->>
->> I'm not sure if it's right since I just think once we set up use the
->> TLBI range-based flush, the result of the
->> __stage2_unmap_defer_tlb_flush() shouldn't change. Otherwise there must
->> have some stale TLB entry.
->>
-> One solution that I can think of is, if the code triggers the
-> WARN_ON(), we flush the entire VM's TLB using
-> kvm_call_hyp(__kvm_tlb_flush_vmid) after the entire walk is finished.
-> In this special/rare situation, it'll be a little expensive, but we
-> will at least be correct, leaving no stale TLBs behind. WDYT?
-> 
+Signed-off-by: Jing Zhang <jingzhangos@google.com>
+---
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/pauth_test.c        | 143 ++++++++++++++++++
+ .../selftests/kvm/include/aarch64/processor.h |   2 +
+ 3 files changed, 146 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/pauth_test.c
 
-I think it will be good to have this handling.
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index c692cc86e7da..9bac5aecd66d 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -143,6 +143,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
+ TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
+ TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
+ TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
++TEST_GEN_PROGS_aarch64 += aarch64/pauth_test
+ TEST_GEN_PROGS_aarch64 += aarch64/psci_test
+ TEST_GEN_PROGS_aarch64 += aarch64/smccc_filter
+ TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
+diff --git a/tools/testing/selftests/kvm/aarch64/pauth_test.c b/tools/testing/selftests/kvm/aarch64/pauth_test.c
+new file mode 100644
+index 000000000000..d5f982da8891
+--- /dev/null
++++ b/tools/testing/selftests/kvm/aarch64/pauth_test.c
+@@ -0,0 +1,143 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * pauth_test - Test for KVM guest pointer authentication.
++ *
++ * Copyright (c) 2023 Google LLC.
++ *
++ */
++
++#define _GNU_SOURCE
++
++#include <sched.h>
++
++#include "kvm_util.h"
++#include "processor.h"
++#include "test_util.h"
++
++enum uc_args {
++	WAIT_MIGRATION,
++	PASS,
++	FAIL,
++	FAIL_KVM,
++	FAIL_INSTR,
++};
++
++static noinline void pac_corruptor(void)
++{
++	__asm__ __volatile__(
++		"paciasp\n"
++		"eor lr, lr, #1 << 53\n"
++	);
++
++	/* Migrate guest to another physical CPU before authentication */
++	GUEST_SYNC(WAIT_MIGRATION);
++	__asm__ __volatile__("autiasp\n");
++}
++
++static void guest_code(void)
++{
++	uint64_t sctlr = read_sysreg(sctlr_el1);
++
++	/* Enable PAuth */
++	sctlr |= SCTLR_ELx_ENIA | SCTLR_ELx_ENIB | SCTLR_ELx_ENDA | SCTLR_ELx_ENDB;
++	write_sysreg(sctlr, sctlr_el1);
++	isb();
++
++	pac_corruptor();
++
++	/* Shouldn't be here unless the pac_corruptor didn't do its work */
++	GUEST_SYNC(FAIL);
++	GUEST_DONE();
++}
++
++/* Guest will get an unknown exception if KVM doesn't support guest PAuth */
++static void guest_unknown_handler(struct ex_regs *regs)
++{
++	GUEST_SYNC(FAIL_KVM);
++	GUEST_DONE();
++}
++
++/* Guest will get a FPAC exception if KVM support guest PAuth */
++static void guest_fpac_handler(struct ex_regs *regs)
++{
++	GUEST_SYNC(PASS);
++	GUEST_DONE();
++}
++
++/* Guest will get an instruction abort exception if the PAuth instructions have
++ * no effect (or PAuth not enabled in guest), which would cause guest to fetch
++ * an invalid instruction due to the corrupted LR.
++ */
++static void guest_iabt_handler(struct ex_regs *regs)
++{
++	GUEST_SYNC(FAIL_INSTR);
++	GUEST_DONE();
++}
++
++int main(void)
++{
++	struct kvm_vcpu_init init;
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++	struct ucall uc;
++	cpu_set_t cpu_mask;
++
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PTRAUTH_ADDRESS));
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PTRAUTH_GENERIC));
++
++	vm = vm_create(1);
++
++	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
++	init.features[0] |= ((1 << KVM_ARM_VCPU_PTRAUTH_ADDRESS) |
++			     (1 << KVM_ARM_VCPU_PTRAUTH_GENERIC));
++
++	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
++
++	vm_init_descriptor_tables(vm);
++	vcpu_init_descriptor_tables(vcpu);
++
++	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
++				ESR_EC_UNKNOWN, guest_unknown_handler);
++	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
++				ESR_EC_FPAC, guest_fpac_handler);
++	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
++				ESR_EC_IABT, guest_iabt_handler);
++
++	while (1) {
++		vcpu_run(vcpu);
++
++		switch (get_ucall(vcpu, &uc)) {
++		case UCALL_ABORT:
++			REPORT_GUEST_ASSERT(uc);
++			break;
++		case UCALL_SYNC:
++			switch (uc.args[1]) {
++			case PASS:
++				/* KVM guest PAuth works! */
++				break;
++			case WAIT_MIGRATION:
++				sched_getaffinity(0, sizeof(cpu_mask), &cpu_mask);
++				CPU_CLR(sched_getcpu(), &cpu_mask);
++				sched_setaffinity(0, sizeof(cpu_mask), &cpu_mask);
++				break;
++			case FAIL:
++				TEST_FAIL("Guest corruptor code doesn't work!\n");
++				break;
++			case FAIL_KVM:
++				TEST_FAIL("KVM doesn't support guest PAuth!\n");
++				break;
++			case FAIL_INSTR:
++				TEST_FAIL("Guest PAuth instructions don't work!\n");
++				break;
++			}
++			break;
++		case UCALL_DONE:
++			goto done;
++		default:
++			TEST_FAIL("Unexpected ucall: %lu", uc.cmd);
++		}
++	}
++
++done:
++	kvm_vm_free(vm);
++}
+diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+index cb537253a6b9..f8d541af9c06 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/processor.h
++++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+@@ -104,7 +104,9 @@ enum {
+ #define ESR_EC_SHIFT		26
+ #define ESR_EC_MASK		(ESR_EC_NUM - 1)
+ 
++#define ESR_EC_UNKNOWN		0x00
+ #define ESR_EC_SVC64		0x15
++#define ESR_EC_FPAC		0x1c
+ #define ESR_EC_IABT		0x21
+ #define ESR_EC_DABT		0x25
+ #define ESR_EC_HW_BP_CURRENT	0x31
 
-Thanks,
-Shaoqin
-
-> Thank you.
-> Raghavendra
->> Thanks,
->> Shaoqin
->>
->>>
->>>>> +                     kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu,
->>>>> +                                     ctx->addr, ctx->level);
->>>> Small indent hint. The ctx->addr can align with __kvm_tlb_flush_vmid_ipa.
->>>>
->>> Ah, yes. I'll adjust this if I send out a v8.
->>>
->>> Thank you.
->>> Raghavendra
->>>> Thanks,
->>>> Shaoqin
->>>>>         }
->>>>>
->>>>>         mm_ops->put_page(ctx->ptep);
->>>>> @@ -1070,7 +1108,8 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
->>>>>     static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
->>>>>                                enum kvm_pgtable_walk_flags visit)
->>>>>     {
->>>>> -     struct kvm_pgtable *pgt = ctx->arg;
->>>>> +     struct stage2_unmap_data *unmap_data = ctx->arg;
->>>>> +     struct kvm_pgtable *pgt = unmap_data->pgt;
->>>>>         struct kvm_s2_mmu *mmu = pgt->mmu;
->>>>>         struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
->>>>>         kvm_pte_t *childp = NULL;
->>>>> @@ -1098,7 +1137,7 @@ static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
->>>>>          * block entry and rely on the remaining portions being faulted
->>>>>          * back lazily.
->>>>>          */
->>>>> -     stage2_put_pte(ctx, mmu, mm_ops);
->>>>> +     stage2_unmap_put_pte(ctx, mmu, mm_ops);
->>>>>
->>>>>         if (need_flush && mm_ops->dcache_clean_inval_poc)
->>>>>                 mm_ops->dcache_clean_inval_poc(kvm_pte_follow(ctx->old, mm_ops),
->>>>> @@ -1112,13 +1151,23 @@ static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
->>>>>
->>>>>     int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
->>>>>     {
->>>>> +     int ret;
->>>>> +     struct stage2_unmap_data unmap_data = {
->>>>> +             .pgt = pgt,
->>>>> +             .defer_tlb_flush_init = __stage2_unmap_defer_tlb_flush(pgt),
->>>>> +     };
->>>>>         struct kvm_pgtable_walker walker = {
->>>>>                 .cb     = stage2_unmap_walker,
->>>>> -             .arg    = pgt,
->>>>> +             .arg    = &unmap_data,
->>>>>                 .flags  = KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABLE_POST,
->>>>>         };
->>>>>
->>>>> -     return kvm_pgtable_walk(pgt, addr, size, &walker);
->>>>> +     ret = kvm_pgtable_walk(pgt, addr, size, &walker);
->>>>> +     if (stage2_unmap_defer_tlb_flush(&unmap_data))
->>>>> +             /* Perform the deferred TLB invalidations */
->>>>> +             kvm_tlb_flush_vmid_range(pgt->mmu, addr, size);
->>>>> +
->>>>> +     return ret;
->>>>>     }
->>>>>
->>>>>     struct stage2_attr_data {
->>>>
->>>> --
->>>> Shaoqin
->>>>
->>>
->>
->> --
->> Shaoqin
->>
-> 
-
+base-commit: 6eaae198076080886b9e7d57f4ae06fa782f90ef
 -- 
-Shaoqin
+2.41.0.487.g6d72f3e995-goog
 
