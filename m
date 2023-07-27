@@ -1,113 +1,120 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 078C8101E9
-	for <kvmarm@lists.linux.dev>; Thu, 27 Jul 2023 09:35:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690450505;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XF4EWqeO3utKlZb4GqfyDhkUV3gjNXvAr/jtDDNki8Y=;
-	b=bVw85koDbK2LgG4fsPWOsgZU5lHBwf+gKDZw6fNWAxLLsyKbqg/gA2EIQgRYWDERRr5wyf
-	Zsewbthun4WUyuRsQX471qncL0qjSaUJTFkAI0gZ1FVbm+2wN2EqQG+q1781WKpf6Ddwkm
-	ts3N92a4gEjZl487bG7r2mySvGJ7eaE=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-54-fEa3c2g0MEWOSi8fD0qHcw-1; Thu, 27 Jul 2023 05:35:01 -0400
-X-MC-Unique: fEa3c2g0MEWOSi8fD0qHcw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 084A91C2BD66;
-	Thu, 27 Jul 2023 09:35:01 +0000 (UTC)
-Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id AA940414A80D;
-	Thu, 27 Jul 2023 09:35:00 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Jing Zhang <jingzhangos@google.com>, Marc Zyngier <maz@kernel.org>, KVM
- <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, ARMLinux
- <linux-arm-kernel@lists.infradead.org>, Will Deacon <will@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, Reiji Watanabe
- <reijiw@google.com>, Raghavendra Rao Ananta <rananta@google.com>, Suraj
- Jitindar Singh <surajjs@amazon.com>
-Subject: Re: [PATCH v6 3/6] KVM: arm64: Enable writable for ID_AA64DFR0_EL1
- and ID_DFR0_EL1
-In-Reply-To: <ZMFWsvWzfkkz2VNB@thinky-boi>
-Organization: Red Hat GmbH
-References: <20230718164522.3498236-1-jingzhangos@google.com>
- <20230718164522.3498236-4-jingzhangos@google.com>
- <87o7k77yn5.fsf@redhat.com>
- <CAAdAUthM6JJ0tEqWELcW48E235EbcjZQSDLF9OQUZ_kUtqh3Ng@mail.gmail.com>
- <87sf9h8xs0.fsf@redhat.com> <86r0p1txun.wl-maz@kernel.org>
- <CAAdAUtjNW6Q+phGbc6jXWTERRhYo7E3H4Ws0iDSngc17Sac0uA@mail.gmail.com>
- <ZLr0LcQENZmIGMAt@linux.dev> <87edkxg0jr.fsf@redhat.com>
- <ZMFWsvWzfkkz2VNB@thinky-boi>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date: Thu, 27 Jul 2023 11:34:57 +0200
-Message-ID: <878rb166ke.fsf@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52DF414AA5
+	for <kvmarm@lists.linux.dev>; Thu, 27 Jul 2023 10:24:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AF45C433C7;
+	Thu, 27 Jul 2023 10:24:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690453484;
+	bh=4dJnTdxPpOs7yn6/yYmeAXblymyOHLLkN8KCdq9mBq8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=p/QjlPu21Qli95UDAiPYEux9bfi/bCv7dlTpizjIkk0xlBrhH9IQdL59/OqNGEwMs
+	 /Phd0+mL9qShJHtdNVoxdgFeiBMgt225WmcUUZYZuTexJb0wJQP8lTuyVFWsWZZEfT
+	 QtCuDtVSLScJWgBArzU/3bBcqw++uyt0av/ISu8ZbO0VRvhC5zLU3xlzFVYq2NgyLE
+	 7HUm9Gx5qBpoPF+DaJ6tV/mHONfGUn7uDiI0cBbgkQwqJRIH8x61oR3BrbfIg25/U1
+	 JZb+158uamEu5ywUmKeXuHrBV3Z5gZOmtHoSEBU68Kam5pVUYv7FmWFMBdRNtwgj/l
+	 UutD2auIY9BVw==
+Received: from [104.132.45.102] (helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qOyAj-00HK4x-J8;
+	Thu, 27 Jul 2023 11:24:41 +0100
+Date: Thu, 27 Jul 2023 11:24:41 +0100
+Message-ID: <87v8e5r6s6.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Jing Zhang <jingzhangos@google.com>,
+	Reiji Watanabe <reijiw@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	David Matlack <dmatlack@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-mips@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	Gavin Shan <gshan@redhat.com>,
+	"=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?=" <philmd@linaro.org>,
+	Shaoqin Huang <shahuang@redhat.com>
+Subject: Re: [PATCH v7 01/12] KVM: Rename kvm_arch_flush_remote_tlb() to kvm_arch_flush_remote_tlbs()
+In-Reply-To: <20230722022251.3446223-2-rananta@google.com>
+References: <20230722022251.3446223-1-rananta@google.com>
+	<20230722022251.3446223-2-rananta@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 104.132.45.102
+X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, seanjc@google.com, chenhuacai@kernel.org, yuzenghui@huawei.com, anup@brainfault.org, atishp@atishpatra.org, jingzhangos@google.com, reijiw@google.com, coltonlewis@google.com, dmatlack@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, gshan@redhat.com, philmd@linaro.org, shahuang@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Jul 26 2023, Oliver Upton <oliver.upton@linux.dev> wrote:
+On Sat, 22 Jul 2023 03:22:40 +0100,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
+>=20
+> From: David Matlack <dmatlack@google.com>
+>=20
+> Rename kvm_arch_flush_remote_tlb() and the associated macro
+> __KVM_HAVE_ARCH_FLUSH_REMOTE_TLB to kvm_arch_flush_remote_tlbs() and
+> __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS respectively.
+>=20
+> Making the name plural matches kvm_flush_remote_tlbs() and makes it more
+> clear that this function can affect more than one remote TLB.
+>=20
+> No functional change intended.
+>=20
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> ---
+>  arch/mips/include/asm/kvm_host.h | 4 ++--
+>  arch/mips/kvm/mips.c             | 2 +-
+>  arch/x86/include/asm/kvm_host.h  | 4 ++--
+>  include/linux/kvm_host.h         | 4 ++--
+>  virt/kvm/kvm_main.c              | 2 +-
+>  5 files changed, 8 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm=
+_host.h
+> index 04cedf9f8811..9b0ad8f3bf32 100644
+> --- a/arch/mips/include/asm/kvm_host.h
+> +++ b/arch/mips/include/asm/kvm_host.h
+> @@ -896,7 +896,7 @@ static inline void kvm_arch_sched_in(struct kvm_vcpu =
+*vcpu, int cpu) {}
+>  static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+> =20
+> -#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLB
+> -int kvm_arch_flush_remote_tlb(struct kvm *kvm);
+> +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
+> +int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
 
-> Hi Cornelia,
->
-> On Mon, Jul 24, 2023 at 10:45:44AM +0200, Cornelia Huck wrote:
->> On Fri, Jul 21 2023, Oliver Upton <oliver.upton@linux.dev> wrote:
->> > What I had in mind was something similar to the KVM_GET_ONE_REG ioctl,
->> > but instead of returning the register value it'd return the mask of the
->> > register. This would keep the kernel implementation dead simple (I'm
->> > lazy) and more easily allow for future expansion in case we want to
->> > start describing more registers this way. Userspace would iterate the ID
->> > register space and ask the kernel for the mask of registers it wants to
->> > change.
->> 
->> Hm... for userspace it might be easier to get one big list and then
->> parse it afterwards? Similar to what GET_REG_LIST does today.
->
-> Possibly, but I felt like it was a bit different from GET_REG_LIST since
-> this would actually be a list of key-value pairs (reg_id, mask) instead
-> of a pure enumeration of IDs. My worry is that if/when we wind up describing
-> more registers in this list-based ioctl then userspace is going to wind
-> up traversing that structure a lot to find the register masks it actually
-> cares about.
+How about making this prototype global? I don't see a point in having
+it per-architecture, specially as you are adding arm64 to that mix in
+the following patch.
 
-Depends on how userspace actually digests it, but point taken.
+	M.
 
->
->> Are you thinking more of a KVM_GET_REG_INFO or so ioctl, that could
->> support different kinds of extra info (and might also make sense for
->> other architectures?) If we end up with something more versatile, it
->> might make sense going that route.
->
-> TBH, I hadn't considered the extensibililty of a per-register ioctl, but
-> that does seem like a good point.
-
-Maybe smth like
-
-/* available with KVM_CAP_GET_REG_INFO */
-struct kvm_reg_info {
-	__u64 id;
-	__u32 op;
-	__u32 len;
-	__u8 data[];
-};
-
-/* operations for kvm_reg_info->op */
-#define KVM_REG_INFO_ARM_ID_REG 0
-
-#define KVM_GET_REG_INFO _IOW(KVMIO, 0xd2, struct kvm_reg_info)
-
-and returning sys_reg_desc->val in data if id points to a valid id reg.
-
+--=20
+Without deviation from the norm, progress is not possible.
