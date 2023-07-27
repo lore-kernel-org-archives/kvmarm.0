@@ -1,160 +1,147 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D39E027124;
-	Thu, 27 Jul 2023 16:40:36 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DD37CD75;
-	Thu, 27 Jul 2023 09:41:18 -0700 (PDT)
-Received: from [10.57.89.117] (unknown [10.57.89.117])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 716303F5A1;
-	Thu, 27 Jul 2023 09:40:32 -0700 (PDT)
-Message-ID: <1cb495f2-fb0d-5a93-5a7f-d717bf3ef97a@arm.com>
-Date: Thu, 27 Jul 2023 17:40:30 +0100
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A6CA27124
+	for <kvmarm@lists.linux.dev>; Thu, 27 Jul 2023 17:13:10 +0000 (UTC)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-563ab574cb5so784349a12.1
+        for <kvmarm@lists.linux.dev>; Thu, 27 Jul 2023 10:13:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690477989; x=1691082789;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=F7oDMpfc0bW6NSyfuHNNNYlN2HFPFEuCSHvjU51+NBs=;
+        b=uR617wLpg6qNB677nCTpj/mRcHCn7jeMQ6T975dwFWafb05LBOA5GXBHggNBovfIzX
+         O/7M392ccdTOGZqesE1qC7szLmXDUVbpTkdUSAnDKesUZGTHf6YrHw7iRdcLemcslWSD
+         KrRYixDmKkhke5BhBNDcGGoexHbctICnVSugeNNjkFTNcd3g+7vTx3m4xPX98nUwGt3/
+         mWhf+uFvINzhg7lFN3O3GR8jmx04AReHHh1Ek1sP09ZwG+oxGwlWe7n39MiREf5a36wi
+         QECqs1dJt2n4+euTMFmAQH0Oiz0RKLy4HgS6MVL8RVa78gxf6JRosPxL/mvaakJouVeF
+         ho3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690477989; x=1691082789;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=F7oDMpfc0bW6NSyfuHNNNYlN2HFPFEuCSHvjU51+NBs=;
+        b=BBYAgOh5wP3ZP/eAa/ITW3uhk20dfTZvr7wVi8afX2BWV+UAcb+GR2mOt0AVFlpFYe
+         oKeZf4VbBFUu2ZmwFEpK9HAL0OfaEvSUxNFHMIpoqDtH5NjPcdL9lWBonX0HphUaQj/T
+         S1J53jNzQOCyHbL5mK8uwvQ0jqq2PBsn89LUNfP+bSoC6uEz1X4jMbq61INT3mCXUq2U
+         cJJVT6hPOZY4f9g8sfoDTXIo3dei7XNAtDVUgQbsov1dKy92JjRej0Kmp6Zlu5qzrFHA
+         cCD12MKr2JBaz5t2n/tn4MMMq4j1DX7Qcy37JoE7DMeAD995heZcJlk5FP2T6xYIinDt
+         ma9w==
+X-Gm-Message-State: ABy/qLbtroOVnw5kHbVXz0ZprtPvY1x0YrBoUXV30KLk+PvoC1Qoo8Hz
+	86c9QbJ7P4DT01lDQkuzq/fYLIPVa4I=
+X-Google-Smtp-Source: APBJJlEiCX9DyxliShqr2xPxTiyej7fUi+PkS+4LO77eNeghg1Fiv4b0fvD5YH2w9mP2/cy4q9w9vNXHRRI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:22c6:b0:1b5:2b14:5f2c with SMTP id
+ y6-20020a17090322c600b001b52b145f2cmr24803plg.4.1690477989357; Thu, 27 Jul
+ 2023 10:13:09 -0700 (PDT)
+Date: Thu, 27 Jul 2023 10:13:07 -0700
+In-Reply-To: <CA+EHjTzP2fypgkJbRpSPrKaWytW7v8ANEifofMnQCkdvYaX6Eg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [Question - ARM CCA] vCPU Hotplug Support in ARM Realm world
- might require ARM spec change?
-To: Salil Mehta <salil.mehta@huawei.com>,
- "steven.price@arm.com" <steven.price@arm.com>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>,
- "james.morse@arm.com" <james.morse@arm.com>,
- "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>, Marc Zyngier
- <maz@kernel.org>, Will Deacon <will@kernel.org>,
- "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "mark.rutland@arm.com" <mark.rutland@arm.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- Salil Mehta <salil.mehta@opnsrc.net>,
- "andrew.jones@linux.dev" <andrew.jones@linux.dev>,
- yuzenghui <yuzenghui@huawei.com>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- Gareth Stockwell <Gareth.Stockwell@arm.com>
-References: <9cb24131a09a48e9a622e92bf8346c9d@huawei.com>
- <7da93c6e-1cbf-8840-282e-f115197b80c4@arm.com>
- <0d268afa-c04b-7a4e-be5e-2362d3dfa64d@arm.com>
- <93c9c8356e444fb287393a935a8c7899@huawei.com>
- <8a828ef2-b09b-4322-26fa-eae6cc88753f@arm.com>
- <ef506b02d6774a7d87f6b2d941427333@huawei.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <ef506b02d6774a7d87f6b2d941427333@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-13-seanjc@google.com>
+ <CA+EHjTzP2fypgkJbRpSPrKaWytW7v8ANEifofMnQCkdvYaX6Eg@mail.gmail.com>
+Message-ID: <ZMKlo+Fe8n/eLQ82@google.com>
+Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+From: Sean Christopherson <seanjc@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Yu Zhang <yu.c.zhang@linux.intel.com>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
+	Vlastimil Babka <vbabka@suse.cz>, David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 27/07/2023 15:24, Salil Mehta wrote:
-> Hi Suzuki,
+On Thu, Jul 27, 2023, Fuad Tabba wrote:
+> Hi Sean,
 > 
->> From: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Sent: Tuesday, July 25, 2023 12:20 PM
->>
->> Hi Salil
->>
->> On 25/07/2023 01:05, Salil Mehta wrote:
->>> Hi Suzuki,
->>> Sorry for replying late as I was on/off last week to undergo some medical test.
->>>
->>>> From: Suzuki K Poulose <suzuki.poulose@arm.com>
->>>> Sent: Monday, July 24, 2023 5:27 PM
->>>>
->>>> Hi Salil
->>>>
->>>> On 19/07/2023 10:28, Suzuki K Poulose wrote:
->>>>> Hi Salil
->>>>>
->>>>> Thanks for raising this.
->>>>>
->>>>> On 19/07/2023 03:35, Salil Mehta wrote:
->>>>>> [Reposting it here from Linaro Open Discussion List for more eyes to look at]
->>>>>>
->>>>>> Hello,
->>>>>> I have recently started to dabble with ARM CCA stuff and check if our
->>>>>> recent changes to support vCPU Hotplug in ARM64 can work in the realm
->>>>>> world. I have realized that in the RMM specification[1] PSCI_CPU_ON
->>>>>> command(B5.3.3) does not handles the PSCI_DENIED return code(B5.4.2),
->>>>>> from the host. This might be required to support vCPU Hotplug feature
->>>>>> in the realm world in future. vCPU Hotplug is an important feature to
->>>>>> support kata-containers in realm world as it reduces the VM boot time
->>>>>> and facilitates dynamic adjustment of vCPUs (which I think should be
->>>>>> true even with Realm world as current implementation only makes use
->>>>>> of the PSCI_ON/OFF to realize the Hotplug look-like effect?)
->>>>>>
->>>>>>
->>>>>> As per our recent changes [2], [3] related to support vCPU Hotplug on
->>>>>> ARM64, we handle the guest exits due to SMC/HVC Hypercall in the
->>>>>> user-space i.e. VMM/Qemu. In realm world, REC Exits to host due to
->>>>>> PSCI_CPU_ON should undergo similar policy checks and I think,
->>>>>>
->>>>>> 1. Host should *deny* to online the target vCPUs which are NOT plugged
->>>>>> 2. This means target REC should be denied by host. Can host call
->>>>>>       RMI_PSCI_COMPETE in such s case?
->>>>>> 3. The *return* value (B5.3.3.1.3 Output values) should be PSCI_DENIED
->>>>>
->>>>> The Realm exit with EXIT_PSCI already provides the parameters passed
->>>>> onto the PSCI request. This happens for all PSCI calls except
->>>>> (PSCI_VERSION and PSCI_FEAUTRES). The hyp could forward these exits to
->>>>> the VMM and could invoke the RMI_PSCI_COMPLETE only when the VMM blesses
->>>>> the request (wherever applicable).
->>>>>
->>>>> However, the RMM spec currently doesn't allow denying the request.
->>>>> i.e., without RMI_PSCI_COMPLETE, the REC cannot be scheduled back in.
->>>>> We will address this in the RMM spec and get back to you.
->>>>
->>>> This is now resolved in RMMv1.0-eac3 spec, available here [0].
->>>>
->>>> This allows the host to DENY a PSCI_CPU_ON request. The RMM ensures that
->>>> the response doesn't violate the security guarantees by checking the
->>>> state of the target REC.
->>>>
->>>> [0] https://developer.arm.com/documentation/den0137/latest/
->>>
->>>
->>> Many thanks for taking this up proactively and getting it done as well
->>> very efficiently. Really appreciate this!
->>>
->>> I acknowledge below new changes part of the newly released RMM
->>> Specification [3] (Page-2) (Release Information 1.0-eac3 20-07-2023):
->>>
->>> 1. Addition of B2.19 PsciReturnCodePermitted function [3] (Page-126)
->>> 2. Addition of 'status' in B3.3.7.2 Failure conditions of the
->>>      B3.3.7 RMI_PSCI_COMPLETE command [3] (Page-160)
->>>
->>>
->>> Some Further Suggestions:
->>> 1. It would be really helpful if PSCI_DENIED can be accommodated somewhere
->>>      in the flow diagram (D1.4.1 PSCI_CPU_ON flow) [3] (Page-297) as well.
->>
->> Good point, yes, will get that added.
+> <snip>
+> ...
 > 
+> > @@ -5134,6 +5167,16 @@ static long kvm_vm_ioctl(struct file *filp,
+> >         case KVM_GET_STATS_FD:
+> >                 r = kvm_vm_ioctl_get_stats_fd(kvm);
+> >                 break;
+> > +       case KVM_CREATE_GUEST_MEMFD: {
+> > +               struct kvm_create_guest_memfd guest_memfd;
+> > +
+> > +               r = -EFAULT;
+> > +               if (copy_from_user(&guest_memfd, argp, sizeof(guest_memfd)))
+> > +                       goto out;
+> > +
+> > +               r = kvm_gmem_create(kvm, &guest_memfd);
+> > +               break;
+> > +       }
 > 
-> Great. Thanks!
-> 
-> 
->>> 2. You would need changes to handle the return value of the PSCI_DENIED
->>>      in this below patch [2] as well from ARM CCA series [1]
->>>
->>
->> Of course. Please note that the series [1] is based on RMMv1.0-beta0 and
->> we are in the process of rebasing our changes to v1.0-eac3, which
->> includes a lot of other changes. The updated series will have all the
->> required changes.
-> 
-> 
-> Ok. When are you planning to post this new series with v1.0-eac3 changes?
+> I'm thinking line of sight here, by having this as a vm ioctl (rather
+> than a system iocl), would it complicate making it possible in the
+> future to share/donate memory between VMs?
 
-Please see :
+Maybe, but I hope not?
 
-https://lkml.kernel.org/r/42cbffac-05a8-a279-9bdb-f76354c1a1b1@arm.com
+There would still be a primary owner of the memory, i.e. the memory would still
+need to be allocated in the context of a specific VM.  And the primary owner should
+be able to restrict privileges, e.g. allow a different VM to read but not write
+memory.
 
-Suzuki
+My current thinking is to (a) tie the lifetime of the backing pages to the inode,
+i.e. allow allocations to outlive the original VM, and (b) create a new file each
+time memory is shared/donated with a different VM (or other entity in the kernel).
 
+That should make it fairly straightforward to provide different permissions, e.g.
+track them per-file, and I think should also avoid the need to change the memslot
+binding logic since each VM would have it's own view/bindings.
+
+Copy+pasting a relevant snippet from a lengthier response in a different thread[*]:
+
+  Conceptually, I think KVM should to bind to the file.  The inode is effectively
+  the raw underlying physical storage, while the file is the VM's view of that
+  storage. 
+  
+  Practically, I think that gives us a clean, intuitive way to handle intra-host
+  migration.  Rather than transfer ownership of the file, instantiate a new file
+  for the target VM, using the gmem inode from the source VM, i.e. create a hard
+  link.  That'd probably require new uAPI, but I don't think that will be hugely
+  problematic.  KVM would need to ensure the new VM's guest_memfd can't be mapped
+  until KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM (which would also need to verify the
+  memslots/bindings are identical), but that should be easy enough to enforce.
+  
+  That way, a VM, its memslots, and its SPTEs are tied to the file, while allowing
+  the memory and the *contents* of memory to outlive the VM, i.e. be effectively
+  transfered to the new target VM.  And we'll maintain the invariant that each
+  guest_memfd is bound 1:1 with a single VM.
+  
+  As above, that should also help us draw the line between mapping memory into a
+  VM (file), and freeing/reclaiming the memory (inode).
+  
+  There will be extra complexity/overhead as we'll have to play nice with the
+  possibility of multiple files per inode, e.g. to zap mappings across all files
+  when punching a hole, but the extra complexity is quite small, e.g. we can use
+  address_space.private_list to keep track of the guest_memfd instances associated
+  with the inode.
+  
+  Setting aside TDX and SNP for the moment, as it's not clear how they'll support
+  memory that is "private" but shared between multiple VMs, I think per-VM files
+  would work well for sharing gmem between two VMs.  E.g. would allow a give page
+  to be bound to a different gfn for each VM, would allow having different permissions
+  for each file (e.g. to allow fallocate() only from the original owner).
+
+[*] https://lore.kernel.org/all/ZLGiEfJZTyl7M8mS@google.com
