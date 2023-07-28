@@ -1,40 +1,40 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B46221641C
-	for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 18:19:35 +0000 (UTC)
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d2a392775c6so270914276.0
-        for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 11:19:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A88071641C
+	for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 18:19:43 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d087ffcc43cso2270752276.3
+        for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 11:19:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690568375; x=1691173175;
+        d=google.com; s=20221208; t=1690568382; x=1691173182;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=T7cMhi6W1QA72qy6OnVjmEOCding/R2p1klzAYF0ZSc=;
-        b=rF2yKEaY1+qGW4yqr/ZDga1hoWZYiI2p2zc8yQ9kHdT44KsPEvoMVekCxp8AfghkrW
-         rMjKjRvkxs+wiCzBI5lgToksGFROkVlXlN+SkQIjZniH8ytnyaxvtlQRlJn9Cj8kcvI3
-         KoFNL9T8OSKOnjnssPigziHXCqK1L3kE2iRASoTLF1OnyYkPMah8AsJk05j8hATC3ZZ2
-         C8bnTiwVpe5/KEZBZIzcExtKteckZN91xceRRLul0/fRz8xcWAGQJvr8FcCUVvOx9LpH
-         CBFXgWSA928eM+Yo7h1fWLEYXg24t9YcsTPZYlS7JEpAAXmcD3X0XI3V5Wi6vT6uSlm2
-         uZDg==
+        bh=H7xJDFLue/NvwsOlwF0hcWMCcGztcwcVHo0aL0oqpCk=;
+        b=MFangAmRBbh+y81QRDLHlnYWDvQam6hXRtl/9i9dvGTHWjQTWrcGvnSxU9nQj+bhLG
+         KRzv3Uowtaa75RT4RISVnvfwip8juIdbGophEv79/46AnMKYkzKWTLmfmSb9gPbKid6h
+         8Oini5a6yFzTlXor1VJxSgWUyPvlprvZwBtZPz1MUdZ57CLfM+BtzFhXwkC21T49fiVF
+         A+nu0DCxaly6SaU567uP7eaLYDtse4zpLotilYTpvJ6AKUHYJTxTOuqmNKajw70r18aV
+         6VN4k0AIJtA32vvNG2KjElxBrD4g+cVb19koF09jjMuPCmV4GVAmWnlzFJUOqw0GW2kw
+         DoLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690568375; x=1691173175;
+        d=1e100.net; s=20221208; t=1690568382; x=1691173182;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T7cMhi6W1QA72qy6OnVjmEOCding/R2p1klzAYF0ZSc=;
-        b=IXpGbZgLvoifU/t6+NaUovuLsmZFxBi1dcBRwJ6sgGqOQAGRtNfrDQ6nGOiTtFtxLX
-         v4FsELhMiXuyjQE7rh23c5/mboEJkTr84tkDxkFzrdZ8PHQDbQuloEh7uTy5r/yWBGEg
-         jb3p9/6sM4M8Wa/Fjhm+bwJph0zN+hGsRdRwRZ1sC5kVqg3GssKWthdMuY819LnbTDCa
-         dx3ErqcOuSsaiFCRq4lX7ILj6Ho4XbTgW2OV7m/vLL3hz9HYs5cMVVx/ZPiHINRrWJOI
-         VU/3pud8aYE3QwjPICM5Y+x6ml+EJK4VKYVJiem8/nEUdqxaawrIVnM/60bRWmaSSYg0
-         Cq+Q==
-X-Gm-Message-State: ABy/qLaOjj9dhIZ6iom8ARkPwdZzUORsCVy6rA2CtrMPD1lEmmFQgOW+
-	mXa3oVRQ2CKIdFHF1GPcJDOlhDbGbaw=
-X-Google-Smtp-Source: APBJJlHHrkbaWwlROgHKR6eB+lXZtSRXwpmBiCRMU364RcnA5ppYwL/doSe0Q2ZdQqFbWDIBBE84vPbLp04=
+        bh=H7xJDFLue/NvwsOlwF0hcWMCcGztcwcVHo0aL0oqpCk=;
+        b=cBlhNP2DhzpIu1k0R6zQh1lJT3h3/7j9tsmBVMcKfPZtpt34hT3kHWNtMZw120CLM/
+         YLHQu5ll8b9OHktQoYyEJneHDPs1s047qPlanpZzGw4woYqBwyefiKwjTbLsvX9M1Fpe
+         MAToukZBdBjzttEBh9e9AP4Yd0liQaPDSBiwO9So9rpaXUSlrpAcdVOcSrbMoiLiRf+k
+         ithXhRFg89P5ZqTpqtk2YR/wVNKaRhkT5R4navulCCAA/f9vobzKiO60iQATT60scXkW
+         0DJ+9aowvq992C4jM4RXydWoc3tht15U4oymAHnYRi7bY/tXouXBrGcWIbJQyHd1C+pQ
+         zvQA==
+X-Gm-Message-State: ABy/qLbgj042WoFrV0Ig7euV2ufhgOmgBn7TrQ9n5ZrWaYiXwidqzIzp
+	Oq3YRRjFF/alkJouiBDiO4yq1VEsnjI=
+X-Google-Smtp-Source: APBJJlHLtcHDyqcq9MQ6CU4noYTnxBVY9xSNarpOt7Z38zw5Zg3c+tHSZBL/SzA6OvcKskJwpb9P4Vgnm9I=
 X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a05:6902:100f:b0:cf9:3564:33cc with SMTP id
- w15-20020a056902100f00b00cf9356433ccmr18274ybt.13.1690568374733; Fri, 28 Jul
- 2023 11:19:34 -0700 (PDT)
-Date: Fri, 28 Jul 2023 11:19:03 -0700
+ (user=reijiw job=sendgmr) by 2002:a25:ae0c:0:b0:d05:38ba:b616 with SMTP id
+ a12-20020a25ae0c000000b00d0538bab616mr13044ybj.6.1690568382652; Fri, 28 Jul
+ 2023 11:19:42 -0700 (PDT)
+Date: Fri, 28 Jul 2023 11:19:04 -0700
 In-Reply-To: <20230728181907.1759513-1-reijiw@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,9 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230728181907.1759513-1-reijiw@google.com>
 X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
-Message-ID: <20230728181907.1759513-2-reijiw@google.com>
-Subject: [PATCH v2 1/5] KVM: arm64: PMU: Use of pmuv3_implemented() instead of
- open-coded version
+Message-ID: <20230728181907.1759513-3-reijiw@google.com>
+Subject: [PATCH v2 2/5] KVM: arm64: PMU: Disallow vPMU on non-uniform PMUVer systems
 From: Reiji Watanabe <reijiw@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
@@ -56,36 +55,78 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	Reiji Watanabe <reijiw@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Replace the open-coded PMU version check with pmuv3_implemented()
-to simplify the code.
+Disallow userspace from configuring vPMU for guests on systems
+where the PMUVer is not uniform across all PEs.
+KVM has not been advertising PMUv3 to the guests with vPMU on
+such systems anyway, and such systems would be extremely
+uncommon and unlikely to even use KVM.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/pmu-emul.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/arm.c      |  1 +
+ arch/arm64/kvm/pmu-emul.c | 11 ++++++++---
+ include/kvm/arm_pmu.h     |  3 +++
+ 3 files changed, 12 insertions(+), 3 deletions(-)
 
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 72dc53a75d1c..1d410dea21ac 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2053,6 +2053,7 @@ static int __init init_subsystems(void)
+ 		goto out;
+ 
+ 	kvm_register_perf_callbacks(NULL);
++	kvm_pmu_init();
+ 
+ out:
+ 	if (err)
 diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 560650972478..dee83119e112 100644
+index dee83119e112..6fb5c59948a8 100644
 --- a/arch/arm64/kvm/pmu-emul.c
 +++ b/arch/arm64/kvm/pmu-emul.c
-@@ -14,6 +14,7 @@
- #include <asm/kvm_emulate.h>
- #include <kvm/arm_pmu.h>
- #include <kvm/arm_vgic.h>
-+#include <asm/arm_pmuv3.h>
+@@ -685,9 +685,6 @@ void kvm_host_pmu_init(struct arm_pmu *pmu)
+ 	entry->arm_pmu = pmu;
+ 	list_add_tail(&entry->entry, &arm_pmus);
  
- #define PERF_ATTR_CFG1_COUNTER_64BIT	BIT(0)
+-	if (list_is_singular(&arm_pmus))
+-		static_branch_enable(&kvm_arm_pmu_available);
+-
+ out_unlock:
+ 	mutex_unlock(&arm_pmus_lock);
+ }
+@@ -1057,3 +1054,11 @@ u8 kvm_arm_pmu_get_pmuver_limit(void)
+ 					      ID_AA64DFR0_EL1_PMUVer_V3P5);
+ 	return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), tmp);
+ }
++
++void kvm_pmu_init(void)
++{
++	u8 pmuver = kvm_arm_pmu_get_pmuver_limit();
++
++	if (pmuv3_implemented(pmuver))
++		static_branch_enable(&kvm_arm_pmu_available);
++}
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 847da6fc2713..9cf50e16305a 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -74,6 +74,7 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu);
+ struct kvm_pmu_events *kvm_get_pmu_events(void);
+ void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
+ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
++void kvm_pmu_init(void);
  
-@@ -672,8 +673,7 @@ void kvm_host_pmu_init(struct arm_pmu *pmu)
- {
- 	struct arm_pmu_entry *entry;
+ #define kvm_vcpu_has_pmu(vcpu)					\
+ 	(test_bit(KVM_ARM_VCPU_PMU_V3, (vcpu)->arch.features))
+@@ -110,6 +111,8 @@ static inline bool kvm_arm_support_pmu_v3(void)
+ 	return false;
+ }
  
--	if (pmu->pmuver == ID_AA64DFR0_EL1_PMUVer_NI ||
--	    pmu->pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
-+	if (!pmuv3_implemented(pmu->pmuver))
- 		return;
- 
- 	mutex_lock(&arm_pmus_lock);
++static inline void kvm_pmu_init(void) {};
++
+ #define kvm_arm_pmu_irq_initialized(v)	(false)
+ static inline u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu,
+ 					    u64 select_idx)
 -- 
 2.41.0.585.gd2178a4bd4-goog
 
