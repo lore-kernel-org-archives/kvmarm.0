@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16B4C10954
-	for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 08:30:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E613AC433A9;
-	Fri, 28 Jul 2023 08:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AAB3111BD
+	for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 08:30:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E5C8C433C7;
+	Fri, 28 Jul 2023 08:30:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690533002;
-	bh=4Z7xfpQGRapnkpRGqfADARhe6QizmdksS59FY2lGOV0=;
+	s=k20201202; t=1690533003;
+	bh=NW9ugZQp6jdrc8K97jsONmyhCFN9uJpDBq39l2TMQpM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ObPBElsEuut8mOUSigw2k28FXcc4w7o3PQP6qobaiaBAOckMuKOa7o5zUdb/wlrsp
-	 RloxZvrKlwQH9UchtJ0eVqlMsR/ozBXDTC5N5ei3bRrMDFlC0IW+TH/TWjxXsD3x71
-	 GTtX/egxlet6rCESCyqKqxGZrJDK1t4P3n0GgyEnS93rk+XgyHqnImN53hDavLTgjT
-	 07qQALStgE40Z0/BUuc9+Q8RKE6Np/HewnmDLsVUDysnCAUjeI2HSY5mMJAeRO/peC
-	 7kbHC8YoFoB1XJAAJAcH2vgRSIGucHcvZvgS/DsWMm6h3uvH907wODbJKUK7jrio4A
-	 rZEVUiNPp8qdA==
+	b=LWTY2zJnI0HY1LS42DtVW84NsTlkTNXZU3lhSdC3q3CG5+MFWuwqemjqbIecs/GAV
+	 EHcQ02QM33yaKnv1dO8lS+0uezS/Kl6r3Uza85/8h+iqBHXqIsZCQ9FAcgF3qapx9A
+	 j/6y050Huv/uhU7qRpbdcfZ+mzX+0SRQ8HS268DoepM77jT9vbrHMslyUnoJBAZ9zn
+	 wFOo+R+Htir0IZIKh4DUQNZBh8jTkaUREZFuVxEOC52cZOlz2VfLdt4+4ecSfydNks
+	 F+OFWeye8Jy3vYXUOQFvzej2s3xPvDpWvBK6pSH3V9djzNtqil4elMql9gWtDK9ogO
+	 v+Qu/uhFaI2Ew==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qPIrH-0000EO-IX;
-	Fri, 28 Jul 2023 09:29:59 +0100
+	id 1qPIrJ-0000EO-9S;
+	Fri, 28 Jul 2023 09:30:01 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v2 04/26] arm64: Add TLBI operation encodings
-Date: Fri, 28 Jul 2023 09:29:30 +0100
-Message-Id: <20230728082952.959212-5-maz@kernel.org>
+Subject: [PATCH v2 09/26] arm64: Add feature detection for fine grained traps
+Date: Fri, 28 Jul 2023 09:29:35 +0100
+Message-Id: <20230728082952.959212-10-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230728082952.959212-1-maz@kernel.org>
 References: <20230728082952.959212-1-maz@kernel.org>
@@ -58,153 +58,53 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add all the TLBI encodings that are usable from Non-Secure.
+From: Mark Brown <broonie@kernel.org>
 
+In order to allow us to have shared code for managing fine grained traps
+for KVM guests add it as a detected feature rather than relying on it
+being a dependency of other features.
+
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Mark Brown <broonie@kernel.org>
+[maz: converted to ARM64_CPUID_FIELDS()]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/20230301-kvm-arm64-fgt-v4-1-1bf8d235ac1f@kernel.org
 ---
- arch/arm64/include/asm/sysreg.h | 128 ++++++++++++++++++++++++++++++++
- 1 file changed, 128 insertions(+)
+ arch/arm64/kernel/cpufeature.c | 7 +++++++
+ arch/arm64/tools/cpucaps       | 1 +
+ 2 files changed, 8 insertions(+)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 5084add86897..72e18480ce62 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -514,6 +514,134 @@
- 
- #define SYS_SP_EL2			sys_reg(3, 6,  4, 1, 0)
- 
-+/* TLBI instructions */
-+#define OP_TLBI_VMALLE1OS		sys_insn(1, 0, 8, 1, 0)
-+#define OP_TLBI_VAE1OS			sys_insn(1, 0, 8, 1, 1)
-+#define OP_TLBI_ASIDE1OS		sys_insn(1, 0, 8, 1, 2)
-+#define OP_TLBI_VAAE1OS			sys_insn(1, 0, 8, 1, 3)
-+#define OP_TLBI_VALE1OS			sys_insn(1, 0, 8, 1, 5)
-+#define OP_TLBI_VAALE1OS		sys_insn(1, 0, 8, 1, 7)
-+#define OP_TLBI_RVAE1IS			sys_insn(1, 0, 8, 2, 1)
-+#define OP_TLBI_RVAAE1IS		sys_insn(1, 0, 8, 2, 3)
-+#define OP_TLBI_RVALE1IS		sys_insn(1, 0, 8, 2, 5)
-+#define OP_TLBI_RVAALE1IS		sys_insn(1, 0, 8, 2, 7)
-+#define OP_TLBI_VMALLE1IS		sys_insn(1, 0, 8, 3, 0)
-+#define OP_TLBI_VAE1IS			sys_insn(1, 0, 8, 3, 1)
-+#define OP_TLBI_ASIDE1IS		sys_insn(1, 0, 8, 3, 2)
-+#define OP_TLBI_VAAE1IS			sys_insn(1, 0, 8, 3, 3)
-+#define OP_TLBI_VALE1IS			sys_insn(1, 0, 8, 3, 5)
-+#define OP_TLBI_VAALE1IS		sys_insn(1, 0, 8, 3, 7)
-+#define OP_TLBI_RVAE1OS			sys_insn(1, 0, 8, 5, 1)
-+#define OP_TLBI_RVAAE1OS		sys_insn(1, 0, 8, 5, 3)
-+#define OP_TLBI_RVALE1OS		sys_insn(1, 0, 8, 5, 5)
-+#define OP_TLBI_RVAALE1OS		sys_insn(1, 0, 8, 5, 7)
-+#define OP_TLBI_RVAE1			sys_insn(1, 0, 8, 6, 1)
-+#define OP_TLBI_RVAAE1			sys_insn(1, 0, 8, 6, 3)
-+#define OP_TLBI_RVALE1			sys_insn(1, 0, 8, 6, 5)
-+#define OP_TLBI_RVAALE1			sys_insn(1, 0, 8, 6, 7)
-+#define OP_TLBI_VMALLE1			sys_insn(1, 0, 8, 7, 0)
-+#define OP_TLBI_VAE1			sys_insn(1, 0, 8, 7, 1)
-+#define OP_TLBI_ASIDE1			sys_insn(1, 0, 8, 7, 2)
-+#define OP_TLBI_VAAE1			sys_insn(1, 0, 8, 7, 3)
-+#define OP_TLBI_VALE1			sys_insn(1, 0, 8, 7, 5)
-+#define OP_TLBI_VAALE1			sys_insn(1, 0, 8, 7, 7)
-+#define OP_TLBI_VMALLE1OSNXS		sys_insn(1, 0, 9, 1, 0)
-+#define OP_TLBI_VAE1OSNXS		sys_insn(1, 0, 9, 1, 1)
-+#define OP_TLBI_ASIDE1OSNXS		sys_insn(1, 0, 9, 1, 2)
-+#define OP_TLBI_VAAE1OSNXS		sys_insn(1, 0, 9, 1, 3)
-+#define OP_TLBI_VALE1OSNXS		sys_insn(1, 0, 9, 1, 5)
-+#define OP_TLBI_VAALE1OSNXS		sys_insn(1, 0, 9, 1, 7)
-+#define OP_TLBI_RVAE1ISNXS		sys_insn(1, 0, 9, 2, 1)
-+#define OP_TLBI_RVAAE1ISNXS		sys_insn(1, 0, 9, 2, 3)
-+#define OP_TLBI_RVALE1ISNXS		sys_insn(1, 0, 9, 2, 5)
-+#define OP_TLBI_RVAALE1ISNXS		sys_insn(1, 0, 9, 2, 7)
-+#define OP_TLBI_VMALLE1ISNXS		sys_insn(1, 0, 9, 3, 0)
-+#define OP_TLBI_VAE1ISNXS		sys_insn(1, 0, 9, 3, 1)
-+#define OP_TLBI_ASIDE1ISNXS		sys_insn(1, 0, 9, 3, 2)
-+#define OP_TLBI_VAAE1ISNXS		sys_insn(1, 0, 9, 3, 3)
-+#define OP_TLBI_VALE1ISNXS		sys_insn(1, 0, 9, 3, 5)
-+#define OP_TLBI_VAALE1ISNXS		sys_insn(1, 0, 9, 3, 7)
-+#define OP_TLBI_RVAE1OSNXS		sys_insn(1, 0, 9, 5, 1)
-+#define OP_TLBI_RVAAE1OSNXS		sys_insn(1, 0, 9, 5, 3)
-+#define OP_TLBI_RVALE1OSNXS		sys_insn(1, 0, 9, 5, 5)
-+#define OP_TLBI_RVAALE1OSNXS		sys_insn(1, 0, 9, 5, 7)
-+#define OP_TLBI_RVAE1NXS		sys_insn(1, 0, 9, 6, 1)
-+#define OP_TLBI_RVAAE1NXS		sys_insn(1, 0, 9, 6, 3)
-+#define OP_TLBI_RVALE1NXS		sys_insn(1, 0, 9, 6, 5)
-+#define OP_TLBI_RVAALE1NXS		sys_insn(1, 0, 9, 6, 7)
-+#define OP_TLBI_VMALLE1NXS		sys_insn(1, 0, 9, 7, 0)
-+#define OP_TLBI_VAE1NXS			sys_insn(1, 0, 9, 7, 1)
-+#define OP_TLBI_ASIDE1NXS		sys_insn(1, 0, 9, 7, 2)
-+#define OP_TLBI_VAAE1NXS		sys_insn(1, 0, 9, 7, 3)
-+#define OP_TLBI_VALE1NXS		sys_insn(1, 0, 9, 7, 5)
-+#define OP_TLBI_VAALE1NXS		sys_insn(1, 0, 9, 7, 7)
-+#define OP_TLBI_IPAS2E1IS		sys_insn(1, 4, 8, 0, 1)
-+#define OP_TLBI_RIPAS2E1IS		sys_insn(1, 4, 8, 0, 2)
-+#define OP_TLBI_IPAS2LE1IS		sys_insn(1, 4, 8, 0, 5)
-+#define OP_TLBI_RIPAS2LE1IS		sys_insn(1, 4, 8, 0, 6)
-+#define OP_TLBI_ALLE2OS			sys_insn(1, 4, 8, 1, 0)
-+#define OP_TLBI_VAE2OS			sys_insn(1, 4, 8, 1, 1)
-+#define OP_TLBI_ALLE1OS			sys_insn(1, 4, 8, 1, 4)
-+#define OP_TLBI_VALE2OS			sys_insn(1, 4, 8, 1, 5)
-+#define OP_TLBI_VMALLS12E1OS		sys_insn(1, 4, 8, 1, 6)
-+#define OP_TLBI_RVAE2IS			sys_insn(1, 4, 8, 2, 1)
-+#define OP_TLBI_RVALE2IS		sys_insn(1, 4, 8, 2, 5)
-+#define OP_TLBI_ALLE2IS			sys_insn(1, 4, 8, 3, 0)
-+#define OP_TLBI_VAE2IS			sys_insn(1, 4, 8, 3, 1)
-+#define OP_TLBI_ALLE1IS			sys_insn(1, 4, 8, 3, 4)
-+#define OP_TLBI_VALE2IS			sys_insn(1, 4, 8, 3, 5)
-+#define OP_TLBI_VMALLS12E1IS		sys_insn(1, 4, 8, 3, 6)
-+#define OP_TLBI_IPAS2E1OS		sys_insn(1, 4, 8, 4, 0)
-+#define OP_TLBI_IPAS2E1			sys_insn(1, 4, 8, 4, 1)
-+#define OP_TLBI_RIPAS2E1		sys_insn(1, 4, 8, 4, 2)
-+#define OP_TLBI_RIPAS2E1OS		sys_insn(1, 4, 8, 4, 3)
-+#define OP_TLBI_IPAS2LE1OS		sys_insn(1, 4, 8, 4, 4)
-+#define OP_TLBI_IPAS2LE1		sys_insn(1, 4, 8, 4, 5)
-+#define OP_TLBI_RIPAS2LE1		sys_insn(1, 4, 8, 4, 6)
-+#define OP_TLBI_RIPAS2LE1OS		sys_insn(1, 4, 8, 4, 7)
-+#define OP_TLBI_RVAE2OS			sys_insn(1, 4, 8, 5, 1)
-+#define OP_TLBI_RVALE2OS		sys_insn(1, 4, 8, 5, 5)
-+#define OP_TLBI_RVAE2			sys_insn(1, 4, 8, 6, 1)
-+#define OP_TLBI_RVALE2			sys_insn(1, 4, 8, 6, 5)
-+#define OP_TLBI_ALLE2			sys_insn(1, 4, 8, 7, 0)
-+#define OP_TLBI_VAE2			sys_insn(1, 4, 8, 7, 1)
-+#define OP_TLBI_ALLE1			sys_insn(1, 4, 8, 7, 4)
-+#define OP_TLBI_VALE2			sys_insn(1, 4, 8, 7, 5)
-+#define OP_TLBI_VMALLS12E1		sys_insn(1, 4, 8, 7, 6)
-+#define OP_TLBI_IPAS2E1ISNXS		sys_insn(1, 4, 9, 0, 1)
-+#define OP_TLBI_RIPAS2E1ISNXS		sys_insn(1, 4, 9, 0, 2)
-+#define OP_TLBI_IPAS2LE1ISNXS		sys_insn(1, 4, 9, 0, 5)
-+#define OP_TLBI_RIPAS2LE1ISNXS		sys_insn(1, 4, 9, 0, 6)
-+#define OP_TLBI_ALLE2OSNXS		sys_insn(1, 4, 9, 1, 0)
-+#define OP_TLBI_VAE2OSNXS		sys_insn(1, 4, 9, 1, 1)
-+#define OP_TLBI_ALLE1OSNXS		sys_insn(1, 4, 9, 1, 4)
-+#define OP_TLBI_VALE2OSNXS		sys_insn(1, 4, 9, 1, 5)
-+#define OP_TLBI_VMALLS12E1OSNXS		sys_insn(1, 4, 9, 1, 6)
-+#define OP_TLBI_RVAE2ISNXS		sys_insn(1, 4, 9, 2, 1)
-+#define OP_TLBI_RVALE2ISNXS		sys_insn(1, 4, 9, 2, 5)
-+#define OP_TLBI_ALLE2ISNXS		sys_insn(1, 4, 9, 3, 0)
-+#define OP_TLBI_VAE2ISNXS		sys_insn(1, 4, 9, 3, 1)
-+#define OP_TLBI_ALLE1ISNXS		sys_insn(1, 4, 9, 3, 4)
-+#define OP_TLBI_VALE2ISNXS		sys_insn(1, 4, 9, 3, 5)
-+#define OP_TLBI_VMALLS12E1ISNXS		sys_insn(1, 4, 9, 3, 6)
-+#define OP_TLBI_IPAS2E1OSNXS		sys_insn(1, 4, 9, 4, 0)
-+#define OP_TLBI_IPAS2E1NXS		sys_insn(1, 4, 9, 4, 1)
-+#define OP_TLBI_RIPAS2E1NXS		sys_insn(1, 4, 9, 4, 2)
-+#define OP_TLBI_RIPAS2E1OSNXS		sys_insn(1, 4, 9, 4, 3)
-+#define OP_TLBI_IPAS2LE1OSNXS		sys_insn(1, 4, 9, 4, 4)
-+#define OP_TLBI_IPAS2LE1NXS		sys_insn(1, 4, 9, 4, 5)
-+#define OP_TLBI_RIPAS2LE1NXS		sys_insn(1, 4, 9, 4, 6)
-+#define OP_TLBI_RIPAS2LE1OSNXS		sys_insn(1, 4, 9, 4, 7)
-+#define OP_TLBI_RVAE2OSNXS		sys_insn(1, 4, 9, 5, 1)
-+#define OP_TLBI_RVALE2OSNXS		sys_insn(1, 4, 9, 5, 5)
-+#define OP_TLBI_RVAE2NXS		sys_insn(1, 4, 9, 6, 1)
-+#define OP_TLBI_RVALE2NXS		sys_insn(1, 4, 9, 6, 5)
-+#define OP_TLBI_ALLE2NXS		sys_insn(1, 4, 9, 7, 0)
-+#define OP_TLBI_VAE2NXS			sys_insn(1, 4, 9, 7, 1)
-+#define OP_TLBI_ALLE1NXS		sys_insn(1, 4, 9, 7, 4)
-+#define OP_TLBI_VALE2NXS		sys_insn(1, 4, 9, 7, 5)
-+#define OP_TLBI_VMALLS12E1NXS		sys_insn(1, 4, 9, 7, 6)
-+
- /* Common SCTLR_ELx flags. */
- #define SCTLR_ELx_ENTP2	(BIT(60))
- #define SCTLR_ELx_DSSBS	(BIT(44))
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index f9d456fe132d..668e2872a086 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -2627,6 +2627,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.matches = has_cpuid_feature,
+ 		ARM64_CPUID_FIELDS(ID_AA64ISAR1_EL1, LRCPC, IMP)
+ 	},
++	{
++		.desc = "Fine Grained Traps",
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.capability = ARM64_HAS_FGT,
++		.matches = has_cpuid_feature,
++		ARM64_CPUID_FIELDS(ID_AA64MMFR0_EL1, FGT, IMP)
++	},
+ #ifdef CONFIG_ARM64_SME
+ 	{
+ 		.desc = "Scalable Matrix Extension",
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index c80ed4f3cbce..c3f06fdef609 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -26,6 +26,7 @@ HAS_ECV
+ HAS_ECV_CNTPOFF
+ HAS_EPAN
+ HAS_EVT
++HAS_FGT
+ HAS_GENERIC_AUTH
+ HAS_GENERIC_AUTH_ARCH_QARMA3
+ HAS_GENERIC_AUTH_ARCH_QARMA5
 -- 
 2.34.1
 
