@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E4A10784
-	for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 08:47:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D9E6C433C9;
-	Fri, 28 Jul 2023 08:47:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCACE10784
+	for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 08:47:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9342CC433C9;
+	Fri, 28 Jul 2023 08:47:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690534040;
-	bh=FbSPSNNWSOihCfp4f85pdtzQ4089i3bfDbJGaflMjww=;
+	s=k20201202; t=1690534042;
+	bh=kSNnNCTF1Vlc34QFSlspHpJNxx5c+AX25t2CHVAwJGU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QXTC2QyDXABj/c6aS56F2JuG+6NQl5O/GnXQICRkhzKxPmKhbL966yLGzBmP1L5b9
-	 hnWPNEnJ7KnWTatMvNKdYmfaOvU3yWkttSYKFOjiIqPSOPSyln1ogPhCUyjxYW+945
-	 ErcvaJfRgYL532B7LUp/pnxhN7WkMuK+A44NmiLcTu853JwbDnEUzXcjEBUk7X7dVq
-	 /8qcbUU+iB66sWfWKjCQ4vJ8q5RxXUyA+YutdNWxYNqaXlocPDv1cbunFLV66sZwye
-	 HhgqLAb2QVf5gkXcTE+cpmOLCJXlvgpUesNfpcCFlst/AS3O4Pb6G/TSv6Lg+kcbys
-	 bA53mi64xwrAw==
+	b=kOQGotzCoX6hZTkftd9IuszUnnZf1NMcNba7rmffViVBjztfI4QKMddUrFK+xN1yD
+	 qL0uaQtfQFpgtzTtZEY7xsIpQqthCoND80PlB2oEArezkR1qP/BbX3fW4qrPrBLU/y
+	 rmvoo7lYIu+YzOimOdQK+CW36XZBeakyQEEcGGiZ79ewINrFUask/95L2o7U5ZK34o
+	 HtBoRkvEr03PeKP+KShj/YTYDZ9ygm5wD+M8Vah2vK972JoR7PvGrr593OUDlqxrpZ
+	 rdJ7W4b8Cp7n6XiaPDu9mDDAmGC9IAxq+qB25HJGVeqoCbV47t+cWudZFJtfwAjrIm
+	 MgrGYf/9zblGQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qPIrN-0000EO-8W;
-	Fri, 28 Jul 2023 09:30:05 +0100
+	id 1qPIrJ-0000EO-H4;
+	Fri, 28 Jul 2023 09:30:01 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v2 22/26] KVM: arm64: nv: Add SVC trap forwarding
-Date: Fri, 28 Jul 2023 09:29:48 +0100
-Message-Id: <20230728082952.959212-23-maz@kernel.org>
+Subject: [PATCH v2 10/26] KVM: arm64: Correctly handle ACCDATA_EL1 traps
+Date: Fri, 28 Jul 2023 09:29:36 +0100
+Message-Id: <20230728082952.959212-11-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230728082952.959212-1-maz@kernel.org>
 References: <20230728082952.959212-1-maz@kernel.org>
@@ -58,68 +58,51 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-HFGITR_EL2 allows the trap of SVC instructions to EL2. Allow these
-traps to be forwarded. Take this opportunity to deny any 32bit activity
-when NV is enabled.
+As we blindly reset some HFGxTR_EL2 bits to 0, we also randomly trap
+unsuspecting sysregs that have their trap bits with a negative
+polarity.
 
+ACCDATA_EL1 is one such register that can be accessed by the guest,
+causing a splat on the host as we don't have a proper handler for
+it.
+
+Adding such handler addresses the issue, though there are a number
+of other registers missing as the current architecture documentation
+doesn't describe them yet.
+
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arm.c         |  4 ++++
- arch/arm64/kvm/handle_exit.c | 12 ++++++++++++
- 2 files changed, 16 insertions(+)
+ arch/arm64/include/asm/sysreg.h | 2 ++
+ arch/arm64/kvm/sys_regs.c       | 2 ++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 72dc53a75d1c..8b51570a76f8 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -36,6 +36,7 @@
- #include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/kvm_nested.h>
- #include <asm/kvm_pkvm.h>
- #include <asm/kvm_emulate.h>
- #include <asm/sections.h>
-@@ -818,6 +819,9 @@ static bool vcpu_mode_is_bad_32bit(struct kvm_vcpu *vcpu)
- 	if (likely(!vcpu_mode_is_32bit(vcpu)))
- 		return false;
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 6d3d16fac227..d528a79417a0 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -389,6 +389,8 @@
+ #define SYS_ICC_IGRPEN0_EL1		sys_reg(3, 0, 12, 12, 6)
+ #define SYS_ICC_IGRPEN1_EL1		sys_reg(3, 0, 12, 12, 7)
  
-+	if (vcpu_has_nv(vcpu))
-+		return true;
++#define SYS_ACCDATA_EL1			sys_reg(3, 0, 13, 0, 5)
 +
- 	return !kvm_supports_32bit_el0();
- }
+ #define SYS_CNTKCTL_EL1			sys_reg(3, 0, 14, 1, 0)
  
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 6dcd6604b6bc..3b86d534b995 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -226,6 +226,17 @@ static int kvm_handle_eret(struct kvm_vcpu *vcpu)
- 	return 1;
- }
+ #define SYS_AIDR_EL1			sys_reg(3, 1, 0, 0, 7)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 2ca2973abe66..38f221f9fc98 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2151,6 +2151,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_CONTEXTIDR_EL1), access_vm_reg, reset_val, CONTEXTIDR_EL1, 0 },
+ 	{ SYS_DESC(SYS_TPIDR_EL1), NULL, reset_unknown, TPIDR_EL1 },
  
-+static int handle_svc(struct kvm_vcpu *vcpu)
-+{
-+	/*
-+	 * So far, SVC traps only for NV via HFGITR_EL2. A SVC from a
-+	 * 32bit guest would be caught by vpcu_mode_is_bad_32bit(), so
-+	 * we should only have to deal with a 64 bit exception.
-+	 */
-+	kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-+	return 1;
-+}
++	{ SYS_DESC(SYS_ACCDATA_EL1), undef_access },
 +
- static exit_handle_fn arm_exit_handlers[] = {
- 	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
- 	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
-@@ -239,6 +250,7 @@ static exit_handle_fn arm_exit_handlers[] = {
- 	[ESR_ELx_EC_SMC32]	= handle_smc,
- 	[ESR_ELx_EC_HVC64]	= handle_hvc,
- 	[ESR_ELx_EC_SMC64]	= handle_smc,
-+	[ESR_ELx_EC_SVC64]	= handle_svc,
- 	[ESR_ELx_EC_SYS64]	= kvm_handle_sys_reg,
- 	[ESR_ELx_EC_SVE]	= handle_sve,
- 	[ESR_ELx_EC_ERET]	= kvm_handle_eret,
+ 	{ SYS_DESC(SYS_SCXTNUM_EL1), undef_access },
+ 
+ 	{ SYS_DESC(SYS_CNTKCTL_EL1), NULL, reset_val, CNTKCTL_EL1, 0},
 -- 
 2.34.1
 
