@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCACE10784
-	for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 08:47:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9342CC433C9;
-	Fri, 28 Jul 2023 08:47:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C372510784
+	for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 08:47:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CF39C433C9;
+	Fri, 28 Jul 2023 08:47:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690534042;
-	bh=kSNnNCTF1Vlc34QFSlspHpJNxx5c+AX25t2CHVAwJGU=;
+	s=k20201202; t=1690534044;
+	bh=FKqJa/1LDzz4T33UN2Pgoau6RqI0u1c5TBXidTj8/r8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kOQGotzCoX6hZTkftd9IuszUnnZf1NMcNba7rmffViVBjztfI4QKMddUrFK+xN1yD
-	 qL0uaQtfQFpgtzTtZEY7xsIpQqthCoND80PlB2oEArezkR1qP/BbX3fW4qrPrBLU/y
-	 rmvoo7lYIu+YzOimOdQK+CW36XZBeakyQEEcGGiZ79ewINrFUask/95L2o7U5ZK34o
-	 HtBoRkvEr03PeKP+KShj/YTYDZ9ygm5wD+M8Vah2vK972JoR7PvGrr593OUDlqxrpZ
-	 rdJ7W4b8Cp7n6XiaPDu9mDDAmGC9IAxq+qB25HJGVeqoCbV47t+cWudZFJtfwAjrIm
-	 MgrGYf/9zblGQ==
+	b=T09x+Av5yPZDq4ptjekid1Qtp/m9Ht5Bo8isl27Og6JnhdhbocJxH+58+CWUn/kXd
+	 avhy6Y9SFQACNPm2uxDnhUR236AoTPk6xp0NdBQ+HNTpuSY2owRwMVoV2fWn9c++Oh
+	 5BqlohO8n1om8V/o74lG5vVUBzkfAsUfXl5Phx/IfRzyv//lnBLYzUV6sSwhLJ4yDX
+	 zATkYYmxZpLfAWiPVMRQOgqP2lsbua+PDGmFNieGL6rHhZuDhPeDXuouWl8Xerrx8o
+	 2/NPXFN+JMVvKyp72beGA7sFwzdjJll5HeleWxTyd6ZjsmNT8a1Z/6FUa0v8TDa82o
+	 sahMTYovLykMg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qPIrJ-0000EO-H4;
-	Fri, 28 Jul 2023 09:30:01 +0100
+	id 1qPIrM-0000EO-CF;
+	Fri, 28 Jul 2023 09:30:04 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v2 10/26] KVM: arm64: Correctly handle ACCDATA_EL1 traps
-Date: Fri, 28 Jul 2023 09:29:36 +0100
-Message-Id: <20230728082952.959212-11-maz@kernel.org>
+Subject: [PATCH v2 19/26] KVM: arm64: nv: Add trap forwarding for HFGxTR_EL2
+Date: Fri, 28 Jul 2023 09:29:45 +0100
+Message-Id: <20230728082952.959212-20-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230728082952.959212-1-maz@kernel.org>
 References: <20230728082952.959212-1-maz@kernel.org>
@@ -58,51 +58,194 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-As we blindly reset some HFGxTR_EL2 bits to 0, we also randomly trap
-unsuspecting sysregs that have their trap bits with a negative
-polarity.
+Fine Grained Traps are fun. Not.
 
-ACCDATA_EL1 is one such register that can be accessed by the guest,
-causing a splat on the host as we don't have a proper handler for
-it.
+Implement the trap forwarding for traps describer by HFGxTR_EL2,
+reusing the Coarse Grained Traps infrastructure previously implemented.
 
-Adding such handler addresses the issue, though there are a number
-of other registers missing as the current architecture documentation
-doesn't describe them yet.
+Each sysreg/instruction inserted in the xarray gets a FGT group
+(vaguely equivalent to a register number), a bit number in that register,
+and a polarity.
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+It is then pretty easy to check the FGT state at handling time, just
+like we do for the coarse version (it is just faster).
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h | 2 ++
- arch/arm64/kvm/sys_regs.c       | 2 ++
- 2 files changed, 4 insertions(+)
+ arch/arm64/kvm/emulate-nested.c | 133 +++++++++++++++++++++++++++++++-
+ 1 file changed, 132 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 6d3d16fac227..d528a79417a0 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -389,6 +389,8 @@
- #define SYS_ICC_IGRPEN0_EL1		sys_reg(3, 0, 12, 12, 6)
- #define SYS_ICC_IGRPEN1_EL1		sys_reg(3, 0, 12, 12, 7)
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 74b67895c791..5f4cf824eadc 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -922,6 +922,88 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
  
-+#define SYS_ACCDATA_EL1			sys_reg(3, 0, 13, 0, 5)
+ static DEFINE_XARRAY(sr_forward_xa);
+ 
++enum fgt_group_id {
++	__NO_FGT_GROUP__,
++	HFGxTR_GROUP,
++};
 +
- #define SYS_CNTKCTL_EL1			sys_reg(3, 0, 14, 1, 0)
- 
- #define SYS_AIDR_EL1			sys_reg(3, 1, 0, 0, 7)
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 2ca2973abe66..38f221f9fc98 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2151,6 +2151,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_CONTEXTIDR_EL1), access_vm_reg, reset_val, CONTEXTIDR_EL1, 0 },
- 	{ SYS_DESC(SYS_TPIDR_EL1), NULL, reset_unknown, TPIDR_EL1 },
- 
-+	{ SYS_DESC(SYS_ACCDATA_EL1), undef_access },
++#define SR_FGT(sr, g, b, p)					\
++	{							\
++		.encoding	= sr,				\
++		.end		= sr,				\
++		.tc		= {				\
++			.fgt = g ## _GROUP,			\
++			.bit = g ## _EL2_ ## b ## _SHIFT,	\
++			.pol = p,				\
++		},						\
++	}
 +
- 	{ SYS_DESC(SYS_SCXTNUM_EL1), undef_access },
++static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
++	/* HFGTR_EL2, HFGWTR_EL2 */
++	SR_FGT(SYS_TPIDR2_EL0,		HFGxTR, nTPIDR2_EL0, 0),
++	SR_FGT(SYS_SMPRI_EL1,		HFGxTR, nSMPRI_EL1, 0),
++	SR_FGT(SYS_ACCDATA_EL1,		HFGxTR, nACCDATA_EL1, 0),
++	SR_FGT(SYS_ERXADDR_EL1,		HFGxTR, ERXADDR_EL1, 1),
++	SR_FGT(SYS_ERXPFGCDN_EL1,	HFGxTR, ERXPFGCDN_EL1, 1),
++	SR_FGT(SYS_ERXPFGCTL_EL1,	HFGxTR, ERXPFGCTL_EL1, 1),
++	SR_FGT(SYS_ERXPFGF_EL1,		HFGxTR, ERXPFGF_EL1, 1),
++	SR_FGT(SYS_ERXMISC0_EL1,	HFGxTR, ERXMISCn_EL1, 1),
++	SR_FGT(SYS_ERXMISC1_EL1,	HFGxTR, ERXMISCn_EL1, 1),
++	SR_FGT(SYS_ERXMISC2_EL1,	HFGxTR, ERXMISCn_EL1, 1),
++	SR_FGT(SYS_ERXMISC3_EL1,	HFGxTR, ERXMISCn_EL1, 1),
++	SR_FGT(SYS_ERXSTATUS_EL1,	HFGxTR, ERXSTATUS_EL1, 1),
++	SR_FGT(SYS_ERXCTLR_EL1,		HFGxTR, ERXCTLR_EL1, 1),
++	SR_FGT(SYS_ERXFR_EL1,		HFGxTR, ERXFR_EL1, 1),
++	SR_FGT(SYS_ERRSELR_EL1,		HFGxTR, ERRSELR_EL1, 1),
++	SR_FGT(SYS_ERRIDR_EL1,		HFGxTR, ERRIDR_EL1, 1),
++	SR_FGT(SYS_ICC_IGRPEN0_EL1,	HFGxTR, ICC_IGRPENn_EL1, 1),
++	SR_FGT(SYS_ICC_IGRPEN1_EL1,	HFGxTR, ICC_IGRPENn_EL1, 1),
++	SR_FGT(SYS_VBAR_EL1,		HFGxTR, VBAR_EL1, 1),
++	SR_FGT(SYS_TTBR1_EL1,		HFGxTR, TTBR1_EL1, 1),
++	SR_FGT(SYS_TTBR0_EL1,		HFGxTR, TTBR0_EL1, 1),
++	SR_FGT(SYS_TPIDR_EL0,		HFGxTR, TPIDR_EL0, 1),
++	SR_FGT(SYS_TPIDRRO_EL0,		HFGxTR, TPIDRRO_EL0, 1),
++	SR_FGT(SYS_TPIDR_EL1,		HFGxTR, TPIDR_EL1, 1),
++	SR_FGT(SYS_TCR_EL1,		HFGxTR, TCR_EL1, 1),
++	SR_FGT(SYS_SCXTNUM_EL0,		HFGxTR, SCXTNUM_EL0, 1),
++	SR_FGT(SYS_SCXTNUM_EL1, 	HFGxTR, SCXTNUM_EL1, 1),
++	SR_FGT(SYS_SCTLR_EL1, 		HFGxTR, SCTLR_EL1, 1),
++	SR_FGT(SYS_REVIDR_EL1, 		HFGxTR, REVIDR_EL1, 1),
++	SR_FGT(SYS_PAR_EL1, 		HFGxTR, PAR_EL1, 1),
++	SR_FGT(SYS_MPIDR_EL1, 		HFGxTR, MPIDR_EL1, 1),
++	SR_FGT(SYS_MIDR_EL1, 		HFGxTR, MIDR_EL1, 1),
++	SR_FGT(SYS_MAIR_EL1, 		HFGxTR, MAIR_EL1, 1),
++	SR_FGT(SYS_LORSA_EL1, 		HFGxTR, LORSA_EL1, 1),
++	SR_FGT(SYS_LORN_EL1, 		HFGxTR, LORN_EL1, 1),
++	SR_FGT(SYS_LORID_EL1, 		HFGxTR, LORID_EL1, 1),
++	SR_FGT(SYS_LOREA_EL1, 		HFGxTR, LOREA_EL1, 1),
++	SR_FGT(SYS_LORC_EL1, 		HFGxTR, LORC_EL1, 1),
++	SR_FGT(SYS_ISR_EL1, 		HFGxTR, ISR_EL1, 1),
++	SR_FGT(SYS_FAR_EL1, 		HFGxTR, FAR_EL1, 1),
++	SR_FGT(SYS_ESR_EL1, 		HFGxTR, ESR_EL1, 1),
++	SR_FGT(SYS_DCZID_EL0, 		HFGxTR, DCZID_EL0, 1),
++	SR_FGT(SYS_CTR_EL0, 		HFGxTR, CTR_EL0, 1),
++	SR_FGT(SYS_CSSELR_EL1, 		HFGxTR, CSSELR_EL1, 1),
++	SR_FGT(SYS_CPACR_EL1, 		HFGxTR, CPACR_EL1, 1),
++	SR_FGT(SYS_CONTEXTIDR_EL1, 	HFGxTR, CONTEXTIDR_EL1, 1),
++	SR_FGT(SYS_CLIDR_EL1, 		HFGxTR, CLIDR_EL1, 1),
++	SR_FGT(SYS_CCSIDR_EL1, 		HFGxTR, CCSIDR_EL1, 1),
++	SR_FGT(SYS_APIBKEYLO_EL1, 	HFGxTR, APIBKey, 1),
++	SR_FGT(SYS_APIBKEYHI_EL1, 	HFGxTR, APIBKey, 1),
++	SR_FGT(SYS_APIAKEYLO_EL1, 	HFGxTR, APIAKey, 1),
++	SR_FGT(SYS_APIAKEYHI_EL1, 	HFGxTR, APIAKey, 1),
++	SR_FGT(SYS_APGAKEYLO_EL1, 	HFGxTR, APGAKey, 1),
++	SR_FGT(SYS_APGAKEYHI_EL1, 	HFGxTR, APGAKey, 1),
++	SR_FGT(SYS_APDBKEYLO_EL1, 	HFGxTR, APDBKey, 1),
++	SR_FGT(SYS_APDBKEYHI_EL1, 	HFGxTR, APDBKey, 1),
++	SR_FGT(SYS_APDAKEYLO_EL1, 	HFGxTR, APDAKey, 1),
++	SR_FGT(SYS_APDAKEYHI_EL1, 	HFGxTR, APDAKey, 1),
++	SR_FGT(SYS_AMAIR_EL1, 		HFGxTR, AMAIR_EL1, 1),
++	SR_FGT(SYS_AIDR_EL1, 		HFGxTR, AIDR_EL1, 1),
++	SR_FGT(SYS_AFSR1_EL1, 		HFGxTR, AFSR1_EL1, 1),
++	SR_FGT(SYS_AFSR0_EL1, 		HFGxTR, AFSR0_EL1, 1),
++};
++
+ static union trap_config get_trap_config(u32 sysreg)
+ {
+ 	return (union trap_config) {
+@@ -943,6 +1025,27 @@ void __init populate_nv_trap_config(void)
+ 	kvm_info("nv: %ld coarse grained trap handlers\n",
+ 		 ARRAY_SIZE(encoding_to_cgt));
  
- 	{ SYS_DESC(SYS_CNTKCTL_EL1), NULL, reset_val, CNTKCTL_EL1, 0},
++	for (int i = 0; i < ARRAY_SIZE(encoding_to_fgt); i++) {
++		const struct encoding_to_trap_config *fgt = &encoding_to_fgt[i];
++		union trap_config tc;
++
++		tc = get_trap_config(fgt->encoding);
++
++		WARN(tc.fgt,
++		     "Duplicate FGT for sys_reg(%d, %d, %d, %d, %d)\n",
++		     sys_reg_Op0(fgt->encoding),
++		     sys_reg_Op1(fgt->encoding),
++		     sys_reg_CRn(fgt->encoding),
++		     sys_reg_CRm(fgt->encoding),
++		     sys_reg_Op2(fgt->encoding));
++
++		tc.val |= fgt->tc.val;
++		xa_store(&sr_forward_xa, fgt->encoding,
++			 xa_mk_value(tc.val), GFP_KERNEL);
++	}
++
++	kvm_info("nv: %ld fine grained trap handlers\n",
++		 ARRAY_SIZE(encoding_to_fgt));
+ }
+ 
+ static enum trap_behaviour get_behaviour(struct kvm_vcpu *vcpu,
+@@ -992,13 +1095,26 @@ static enum trap_behaviour compute_trap_behaviour(struct kvm_vcpu *vcpu,
+ 	return __do_compute_trap_behaviour(vcpu, tc.cgt, b);
+ }
+ 
++static bool check_fgt_bit(u64 val, const union trap_config tc)
++{
++	return ((val >> tc.bit) & 1) == tc.pol;
++}
++
++#define sanitised_sys_reg(vcpu, reg)			\
++	({						\
++		u64 __val;				\
++		__val = __vcpu_sys_reg(vcpu, reg);	\
++		__val &= ~__ ## reg ## _RES0;		\
++		(__val);				\
++	})
++
+ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+ {
+ 	union trap_config tc;
+ 	enum trap_behaviour b;
+ 	bool is_read;
+ 	u32 sysreg;
+-	u64 esr;
++	u64 esr, val;
+ 
+ 	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
+ 		return false;
+@@ -1009,6 +1125,21 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+ 
+ 	tc = get_trap_config(sysreg);
+ 
++	switch ((enum fgt_group_id)tc.fgt) {
++	case __NO_FGT_GROUP__:
++		break;
++
++	case HFGxTR_GROUP:
++		if (is_read)
++			val = sanitised_sys_reg(vcpu, HFGRTR_EL2);
++		else
++			val = sanitised_sys_reg(vcpu, HFGWTR_EL2);
++		break;
++	}
++
++	if (tc.fgt != __NO_FGT_GROUP__ && check_fgt_bit(val, tc))
++		goto inject;
++
+ 	b = compute_trap_behaviour(vcpu, tc);
+ 
+ 	if (((b & BEHAVE_FORWARD_READ) && is_read) ||
 -- 
 2.34.1
 
