@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723A3107B3
-	for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 08:30:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E885CC433CD;
-	Fri, 28 Jul 2023 08:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55833D2F8
+	for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 08:46:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAC96C433C8;
+	Fri, 28 Jul 2023 08:46:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690533002;
-	bh=GjW92eLPQB/b++Gprz2H0IZOgXi3BU2wMKh/iuL1bTY=;
+	s=k20201202; t=1690534012;
+	bh=z/Gz4yTqgIBBae0C04bTnFtXUegBkPgPUJ1g21Q6xjc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cwVBV/xn12xpWONn+ZQ/HwJj/3KmNXq1cUqESjnlATxkJaXRgGN9htVQ98rJQbgg+
-	 dHmFVRqJ/zwnGxWskK7IbXIzIdWGteT4ZX3tjhaENnPYf8W3r1jazatR8tU5vFSeF4
-	 zQJnAIARiSoKaMDf2hlPCRH7YihVJBwtt7JlVdJt99otGtIQHTS3k0RDd44r0EqA/A
-	 zJUHeFNJh67bEXJv3CcawvR6Jz449xi/47OSkdLsJvwDjQge15ybXVr57qNZiI1/D+
-	 vVt5Xxw0m0ccCAYFz92xbsSHFB1RJ7nKqijLlJ0LBG21Kq907VhSVUWVWIfyXCZPWO
-	 5+Au7pFntwF0g==
+	b=eHvzLXb3ucUIqaQWd0MBlQcIMD6RGy5irB7HzVzyTO2YQao6YnWWNh6zVgWV1CNIo
+	 4HDqbFt74/SPhrxpKiOvg4oqC6LrN4rVfv9DfTZGjX501adPO+MAsyCVxE4aKazFSh
+	 JawiFOIJcnohxlTPH4fjUw4wmAdBpPh6jtisIFP7WKSBs0pTn0z4hA44nTyBPrIOMK
+	 U93/CoElY3C3hpkhpts02p34ob2iwz6u9n956GdJfxk2eW5+N14e6OM6F+KFkWaVTS
+	 U++jaau3mXmXsExuUMDAPqIDnsBAs9+4svx6ro6MErWaU4UsQMWn3jzgH56jfq8SDT
+	 HlYqm8D9chuRw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qPIrH-0000EO-SD;
-	Fri, 28 Jul 2023 09:29:59 +0100
+	id 1qPIrK-0000EO-5O;
+	Fri, 28 Jul 2023 09:30:02 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v2 05/26] arm64: Add AT operation encodings
-Date: Fri, 28 Jul 2023 09:29:31 +0100
-Message-Id: <20230728082952.959212-6-maz@kernel.org>
+Subject: [PATCH v2 12/26] KVM: arm64: nv: Add FGT registers
+Date: Fri, 28 Jul 2023 09:29:38 +0100
+Message-Id: <20230728082952.959212-13-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230728082952.959212-1-maz@kernel.org>
 References: <20230728082952.959212-1-maz@kernel.org>
@@ -58,42 +58,55 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the encodings for the AT operation that are usable from NS.
+Add the 5 registers covering FEAT_FGT. The AMU-related registers
+are currently left out as we don't have a plan for them. Yet.
 
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ arch/arm64/include/asm/kvm_host.h | 5 +++++
+ arch/arm64/kvm/sys_regs.c         | 5 +++++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 72e18480ce62..76289339b43b 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -514,6 +514,23 @@
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index d3dd05bbfe23..721680da1011 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -400,6 +400,11 @@ enum vcpu_sysreg {
+ 	TPIDR_EL2,	/* EL2 Software Thread ID Register */
+ 	CNTHCTL_EL2,	/* Counter-timer Hypervisor Control register */
+ 	SP_EL2,		/* EL2 Stack Pointer */
++	HFGRTR_EL2,
++	HFGWTR_EL2,
++	HFGITR_EL2,
++	HDFGRTR_EL2,
++	HDFGWTR_EL2,
+ 	CNTHP_CTL_EL2,
+ 	CNTHP_CVAL_EL2,
+ 	CNTHV_CTL_EL2,
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 38f221f9fc98..f5baaa508926 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2367,6 +2367,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	EL2_REG(MDCR_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(CPTR_EL2, access_rw, reset_val, CPTR_NVHE_EL2_RES1),
+ 	EL2_REG(HSTR_EL2, access_rw, reset_val, 0),
++	EL2_REG(HFGRTR_EL2, access_rw, reset_val, 0),
++	EL2_REG(HFGWTR_EL2, access_rw, reset_val, 0),
++	EL2_REG(HFGITR_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(HACR_EL2, access_rw, reset_val, 0),
  
- #define SYS_SP_EL2			sys_reg(3, 6,  4, 1, 0)
+ 	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
+@@ -2376,6 +2379,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	EL2_REG(VTCR_EL2, access_rw, reset_val, 0),
  
-+/* AT instructions */
-+#define AT_Op0 1
-+#define AT_CRn 7
-+
-+#define OP_AT_S1E1R	sys_insn(AT_Op0, 0, AT_CRn, 8, 0)
-+#define OP_AT_S1E1W	sys_insn(AT_Op0, 0, AT_CRn, 8, 1)
-+#define OP_AT_S1E0R	sys_insn(AT_Op0, 0, AT_CRn, 8, 2)
-+#define OP_AT_S1E0W	sys_insn(AT_Op0, 0, AT_CRn, 8, 3)
-+#define OP_AT_S1E1RP	sys_insn(AT_Op0, 0, AT_CRn, 9, 0)
-+#define OP_AT_S1E1WP	sys_insn(AT_Op0, 0, AT_CRn, 9, 1)
-+#define OP_AT_S1E2R	sys_insn(AT_Op0, 4, AT_CRn, 8, 0)
-+#define OP_AT_S1E2W	sys_insn(AT_Op0, 4, AT_CRn, 8, 1)
-+#define OP_AT_S12E1R	sys_insn(AT_Op0, 4, AT_CRn, 8, 4)
-+#define OP_AT_S12E1W	sys_insn(AT_Op0, 4, AT_CRn, 8, 5)
-+#define OP_AT_S12E0R	sys_insn(AT_Op0, 4, AT_CRn, 8, 6)
-+#define OP_AT_S12E0W	sys_insn(AT_Op0, 4, AT_CRn, 8, 7)
-+
- /* TLBI instructions */
- #define OP_TLBI_VMALLE1OS		sys_insn(1, 0, 8, 1, 0)
- #define OP_TLBI_VAE1OS			sys_insn(1, 0, 8, 1, 1)
+ 	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
++	EL2_REG(HDFGRTR_EL2, access_rw, reset_val, 0),
++	EL2_REG(HDFGWTR_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(SPSR_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(ELR_EL2, access_rw, reset_val, 0),
+ 	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
 -- 
 2.34.1
 
