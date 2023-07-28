@@ -1,25 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03D951078B
-	for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 08:47:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0BA4C433C8;
-	Fri, 28 Jul 2023 08:47:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B307010784
+	for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 08:47:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3612AC433C8;
+	Fri, 28 Jul 2023 08:47:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690534027;
-	bh=uSD8eukeei3yZ55HiDmiImpPGzRnZvEuG0sdN+721Ig=;
+	s=k20201202; t=1690534030;
+	bh=6d4Kspg7nIaOGmD/4cchuF/PX4zqa/gLnUY8Tbj4CBU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KFOG3HwfBy1dOI+EyKOa1vyflfXqo92I9xaC6gkeunjm7K/GEQdwkefPwGckOBi6e
-	 65dTTXa4PBDvCrqr4fYuNTC278Bugat+Z96pj5qnmUqb5scO4Z3aEBKETulj839n3x
-	 uvbHUPLCkwNlb9XgF6bW85Z0WTNnW4a6I93jWZexkxPgd7l2fCjPLb38d0F2NBfFIk
-	 DPl2etIATvyrY0mOafxzBboRgNANDsQ6p3PlQa/4kAALetYncJizh6MasEG1BpQdCz
-	 CCh3QU0qZ+XXQJQeagvAdq2mTa7zllY5Zfx/EAJvXuNeWdezQrYzw829sEcSX3MfZs
-	 LYbqsWvaSDmHg==
+	b=kARfcDVFR+hyeh9MGYD7AEqXlz1kKaA2sQR+jYHNp2CvVWU2chvCGoZWiR2rrAqq0
+	 YQ8tVWK1+1SfTDUBOHSW2G7tuh3vhqLkYLpRVeZ5/YPt28eYEdPP29b3LOCf0zrkZC
+	 uE+4QB3IQ+kHnsCn22J4UW9sijJ+UgrG/mWUl91+OAhiuVHlX15UtbvvqJPg3REOPe
+	 vf9Zgce/XX/awzzzwZCEraWoktsTmgLEroitseYR0+xiCPY7ZI29fL7GVvSI0qeDiI
+	 GBmkGj1fNZ4mbIGA5lRKbEVDF6GQraW2spCiqhjFHROrDcFbbVC7IrtEJq/H8sQ9Ux
+	 z+7cQJWJUyQ8Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qPIrK-0000EO-Ve;
+	id 1qPIrL-0000EO-II;
 	Fri, 28 Jul 2023 09:30:03 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -40,9 +40,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v2 14/26] KVM: arm64: nv: Add trap forwarding infrastructure
-Date: Fri, 28 Jul 2023 09:29:40 +0100
-Message-Id: <20230728082952.959212-15-maz@kernel.org>
+Subject: [PATCH v2 16/26] KVM: arm64: nv: Expose FEAT_EVT to nested guests
+Date: Fri, 28 Jul 2023 09:29:42 +0100
+Message-Id: <20230728082952.959212-17-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230728082952.959212-1-maz@kernel.org>
 References: <20230728082952.959212-1-maz@kernel.org>
@@ -58,338 +58,29 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-A significant part of what a NV hypervisor needs to do is to decide
-whether a trap from a L2+ guest has to be forwarded to a L1 guest
-or handled locally. This is done by checking for the trap bits that
-the guest hypervisor has set and acting accordingly, as described by
-the architecture.
+Now that we properly implement FEAT_EVT (as we correctly forward
+traps), expose it to guests.
 
-A previous approach was to sprinkle a bunch of checks in all the
-system register accessors, but this is pretty error prone and doesn't
-help getting an overview of what is happening.
-
-Instead, implement a set of global tables that describe a trap bit,
-combinations of trap bits, behaviours on trap, and what bits must
-be evaluated on a system register trap.
-
-Although this is painful to describe, this allows to specify each
-and every control bit in a static manner. To make it efficient,
-the table is inserted in an xarray that is global to the system,
-and checked each time we trap a system register while running
-a L2 guest.
-
-Add the basic infrastructure for now, while additional patches will
-implement configuration registers.
-
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h   |   1 +
- arch/arm64/include/asm/kvm_nested.h |   2 +
- arch/arm64/kvm/emulate-nested.c     | 211 ++++++++++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c           |   6 +
- arch/arm64/kvm/trace_arm.h          |  19 +++
- 5 files changed, 239 insertions(+)
+ arch/arm64/kvm/nested.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 721680da1011..d44575604e7e 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -988,6 +988,7 @@ int kvm_handle_cp10_id(struct kvm_vcpu *vcpu);
- void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 315354d27978..7f80f385d9e8 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -124,8 +124,7 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+ 		break;
  
- int __init kvm_sys_reg_table_init(void);
-+void __init populate_nv_trap_config(void);
- 
- bool lock_all_vcpus(struct kvm *kvm);
- void unlock_all_vcpus(struct kvm *kvm);
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 8fb67f032fd1..fa23cc9c2adc 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -11,6 +11,8 @@ static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
- 		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
- }
- 
-+extern bool __check_nv_sr_forward(struct kvm_vcpu *vcpu);
-+
- struct sys_reg_params;
- struct sys_reg_desc;
- 
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index b96662029fb1..7d4288de1df6 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -14,6 +14,217 @@
- 
- #include "trace.h"
- 
-+enum trap_behaviour {
-+	BEHAVE_HANDLE_LOCALLY	= 0,
-+	BEHAVE_FORWARD_READ	= BIT(0),
-+	BEHAVE_FORWARD_WRITE	= BIT(1),
-+	BEHAVE_FORWARD_ANY	= BEHAVE_FORWARD_READ | BEHAVE_FORWARD_WRITE,
-+};
-+
-+struct trap_bits {
-+	const enum vcpu_sysreg		index;
-+	const enum trap_behaviour	behaviour;
-+	const u64			value;
-+	const u64			mask;
-+};
-+
-+enum trap_group {
-+	/* Indicates no coarse trap control */
-+	__RESERVED__,
-+
-+	/*
-+	 * The first batch of IDs denote coarse trapping that are used
-+	 * on their own instead of being part of a combination of
-+	 * trap controls.
-+	 */
-+
-+	/*
-+	 * Anything after this point is a combination of trap controls,
-+	 * which all must be evaluated to decide what to do.
-+	 */
-+	__MULTIPLE_CONTROL_BITS__,
-+
-+	/*
-+	 * Anything after this point requires a callback evaluating a
-+	 * complex trap condition. Hopefully we'll never need this...
-+	 */
-+	__COMPLEX_CONDITIONS__,
-+};
-+
-+static const struct trap_bits coarse_trap_bits[] = {
-+};
-+
-+#define MCB(id, ...)					\
-+	[id - __MULTIPLE_CONTROL_BITS__]	=	\
-+		(const enum trap_group []){		\
-+			__VA_ARGS__, __RESERVED__	\
-+		}
-+
-+static const enum trap_group *coarse_control_combo[] = {
-+};
-+
-+typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu *);
-+
-+#define CCC(id, fn)				\
-+	[id - __COMPLEX_CONDITIONS__] = fn
-+
-+static const complex_condition_check ccc[] = {
-+};
-+
-+/*
-+ * Bit assignment for the trap controls. We use a 64bit word with the
-+ * following layout for each trapped sysreg:
-+ *
-+ * [9:0]	enum trap_group (10 bits)
-+ * [13:10]	enum fgt_group_id (4 bits)
-+ * [19:14]	bit number in the FGT register (6 bits)
-+ * [20]		trap polarity (1 bit)
-+ * [62:21]	Unused (42 bits)
-+ * [63]		RES0 - Must be zero, as lost on insertion in the xarray
-+ */
-+union trap_config {
-+	u64	val;
-+	struct {
-+		unsigned long	cgt:10;	/* Coarse trap id */
-+		unsigned long	fgt:4;	/* Fing Grained Trap id */
-+		unsigned long	bit:6;	/* Bit number */
-+		unsigned long	pol:1;	/* Polarity */
-+		unsigned long	unk:42;	/* Unknown */
-+		unsigned long	mbz:1;	/* Must Be Zero */
-+	};
-+};
-+
-+struct encoding_to_trap_config {
-+	const u32			encoding;
-+	const u32			end;
-+	const union trap_config		tc;
-+};
-+
-+#define SR_RANGE_TRAP(sr_start, sr_end, trap_id)			\
-+	{								\
-+		.encoding	= sr_start,				\
-+		.end		= sr_end,				\
-+		.tc		= {					\
-+			.cgt		= trap_id,			\
-+		},							\
-+	}
-+
-+#define SR_TRAP(sr, trap_id)		SR_RANGE_TRAP(sr, sr, trap_id)
-+
-+/*
-+ * Map encoding to trap bits for exception reported with EC=0x18.
-+ * These must only be evaluated when running a nested hypervisor, but
-+ * that the current context is not a hypervisor context. When the
-+ * trapped access matches one of the trap controls, the exception is
-+ * re-injected in the nested hypervisor.
-+ */
-+static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
-+};
-+
-+static DEFINE_XARRAY(sr_forward_xa);
-+
-+static union trap_config get_trap_config(u32 sysreg)
-+{
-+	return (union trap_config) {
-+		.val = xa_to_value(xa_load(&sr_forward_xa, sysreg)),
-+	};
-+}
-+
-+void __init populate_nv_trap_config(void)
-+{
-+	for (int i = 0; i < ARRAY_SIZE(encoding_to_cgt); i++) {
-+		const struct encoding_to_trap_config *cgt = &encoding_to_cgt[i];
-+		void *prev;
-+
-+		prev = xa_store_range(&sr_forward_xa, cgt->encoding, cgt->end,
-+				      xa_mk_value(cgt->tc.val), GFP_KERNEL);
-+		WARN_ON(prev);
-+	}
-+
-+	kvm_info("nv: %ld coarse grained trap handlers\n",
-+		 ARRAY_SIZE(encoding_to_cgt));
-+
-+}
-+
-+static enum trap_behaviour get_behaviour(struct kvm_vcpu *vcpu,
-+					 const struct trap_bits *tb)
-+{
-+	enum trap_behaviour b = BEHAVE_HANDLE_LOCALLY;
-+	u64 val;
-+
-+	val = __vcpu_sys_reg(vcpu, tb->index);
-+	if ((val & tb->mask) == tb->value)
-+		b |= tb->behaviour;
-+
-+	return b;
-+}
-+
-+static enum trap_behaviour __do_compute_trap_behaviour(struct kvm_vcpu *vcpu,
-+						       const enum trap_group id,
-+						       enum trap_behaviour b)
-+{
-+	switch (id) {
-+		const enum trap_group *cgids;
-+
-+	case __RESERVED__ ... __MULTIPLE_CONTROL_BITS__ - 1:
-+		if (likely(id != __RESERVED__))
-+			b |= get_behaviour(vcpu, &coarse_trap_bits[id]);
-+		break;
-+	case __MULTIPLE_CONTROL_BITS__ ... __COMPLEX_CONDITIONS__ - 1:
-+		/* Yes, this is recursive. Don't do anything stupid. */
-+		cgids = coarse_control_combo[id - __MULTIPLE_CONTROL_BITS__];
-+		for (int i = 0; cgids[i] != __RESERVED__; i++)
-+			b |= __do_compute_trap_behaviour(vcpu, cgids[i], b);
-+		break;
-+	default:
-+		if (ARRAY_SIZE(ccc))
-+			b |= ccc[id -  __COMPLEX_CONDITIONS__](vcpu);
-+		break;
-+	}
-+
-+	return b;
-+}
-+
-+static enum trap_behaviour compute_trap_behaviour(struct kvm_vcpu *vcpu,
-+						  const union trap_config tc)
-+{
-+	enum trap_behaviour b = BEHAVE_HANDLE_LOCALLY;
-+
-+	return __do_compute_trap_behaviour(vcpu, tc.cgt, b);
-+}
-+
-+bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
-+{
-+	union trap_config tc;
-+	enum trap_behaviour b;
-+	bool is_read;
-+	u32 sysreg;
-+	u64 esr;
-+
-+	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
-+		return false;
-+
-+	esr = kvm_vcpu_get_esr(vcpu);
-+	sysreg = esr_sys64_to_sysreg(esr);
-+	is_read = (esr & ESR_ELx_SYS64_ISS_DIR_MASK) == ESR_ELx_SYS64_ISS_DIR_READ;
-+
-+	tc = get_trap_config(sysreg);
-+
-+	b = compute_trap_behaviour(vcpu, tc);
-+
-+	if (((b & BEHAVE_FORWARD_READ) && is_read) ||
-+	    ((b & BEHAVE_FORWARD_WRITE) && !is_read))
-+		goto inject;
-+
-+	return false;
-+
-+inject:
-+	trace_kvm_forward_sysreg_trap(vcpu, sysreg, is_read);
-+
-+	kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-+	return true;
-+}
-+
- static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
- {
- 	u64 mode = spsr & PSR_MODE_MASK;
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index f5baaa508926..dfd72b3a625f 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -3177,6 +3177,9 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
- 
- 	trace_kvm_handle_sys_reg(esr);
- 
-+	if (__check_nv_sr_forward(vcpu))
-+		return 1;
-+
- 	params = esr_sys64_to_params(esr);
- 	params.regval = vcpu_get_reg(vcpu, Rt);
- 
-@@ -3594,5 +3597,8 @@ int __init kvm_sys_reg_table_init(void)
- 	if (!first_idreg)
- 		return -EINVAL;
- 
-+	if (kvm_get_mode() == KVM_MODE_NV)
-+		populate_nv_trap_config();
-+
- 	return 0;
- }
-diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
-index 6ce5c025218d..1f0f3f653606 100644
---- a/arch/arm64/kvm/trace_arm.h
-+++ b/arch/arm64/kvm/trace_arm.h
-@@ -364,6 +364,25 @@ TRACE_EVENT(kvm_inject_nested_exception,
- 		  __entry->hcr_el2)
- );
- 
-+TRACE_EVENT(kvm_forward_sysreg_trap,
-+	    TP_PROTO(struct kvm_vcpu *vcpu, u32 sysreg, bool is_read),
-+	    TP_ARGS(vcpu, sysreg, is_read),
-+
-+	    TP_STRUCT__entry(
-+		__field(struct kvm_vcpu *, vcpu)
-+		__field(u32,		   sysreg)
-+		__field(bool,		   is_read)
-+	    ),
-+
-+	    TP_fast_assign(
-+		__entry->vcpu = vcpu;
-+		__entry->sysreg = sysreg;
-+		__entry->is_read = is_read;
-+	    ),
-+
-+	    TP_printk("%c %x", __entry->is_read ? 'R' : 'W', __entry->sysreg)
-+);
-+
- #endif /* _TRACE_ARM_ARM64_KVM_H */
- 
- #undef TRACE_INCLUDE_PATH
+ 	case SYS_ID_AA64MMFR2_EL1:
+-		val &= ~(NV_FTR(MMFR2, EVT)	|
+-			 NV_FTR(MMFR2, BBM)	|
++		val &= ~(NV_FTR(MMFR2, BBM)	|
+ 			 NV_FTR(MMFR2, TTL)	|
+ 			 GENMASK_ULL(47, 44)	|
+ 			 NV_FTR(MMFR2, ST)	|
 -- 
 2.34.1
 
