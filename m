@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 800C2D2F8
-	for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 08:46:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D3CFC433C7;
-	Fri, 28 Jul 2023 08:46:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96EDFD2F8
+	for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 08:46:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6524BC433C7;
+	Fri, 28 Jul 2023 08:46:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690534015;
-	bh=WRRv+qSwpzNGRCgU2fggWLV9IqJ4D8ueHkhbgoH9hg0=;
+	s=k20201202; t=1690534017;
+	bh=4UrYXcsIx+YIFHbsqrdqGmhQA/VImpgYJHEKNagKZRo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cFswE3/AjSFxOO1OUBlD9kTo5h17tNkFVEJpBZg+3O/kvzX/9BGU6AVROz79rQ+UZ
-	 jTwZbSMABOuDkQMF3dCwNvDvAqJclQrZSrAPO6MF0qnAm3Gxa88OQdZydwphDoY4tR
-	 HeBkjFkOgHt2yxsf+koXDD6WwMILdqYrjPGHNSx0VdwSe/EituBaxN8KIJ3v2tbGcm
-	 F5mULwsZv4s1g71doUEjfDQU7/goUslY5UxW6BEPqvnV/ohiWMO2CmX7tLFp9CwxQe
-	 tA6XhVqIW0O+sAi+g5FdD5wXHsKhLgPHKAKqMIH7eOJA2enHKeZ2YMw1T8AOvY61Ka
-	 acTvDWEDBvKxg==
+	b=t8a9vb7gIeG3OLAvgwKNA3HgA4Fjb4pwuYOySXvLIlBXiVToYejJVSMgREGy38S5w
+	 J1jecbf31tQClrp/eI6ZeY+D5mHnHO2uuznGITUh4wiCHcLBxh1ZPrXLHH7rwzeMR+
+	 2hlx3JCLx6qd3LYjKxHl9qrcmvL8Fou526Fmiqlfa5ypVLSpTLi3fXZ2ikMF+a2IhR
+	 4FTM/SLWsYCpMoRVQ8HQaWc9eezvujPWfBeejoZ4xhVonAq/TFhKwTpUcaqs2UpYXO
+	 nZYE/VSr6bWJsjjmaiZUoYiuP6n7WaeuPekBNyfUm6OsVR4zAObODPPeUZrv7xAxTv
+	 nj/rxVbpRQqOw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qPIrO-0000EO-H4;
-	Fri, 28 Jul 2023 09:30:06 +0100
+	id 1qPIrM-0000EO-4m;
+	Fri, 28 Jul 2023 09:30:04 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v2 25/26] KVM: arm64: Move HCRX_EL2 switch to load/put on VHE systems
-Date: Fri, 28 Jul 2023 09:29:51 +0100
-Message-Id: <20230728082952.959212-26-maz@kernel.org>
+Subject: [PATCH v2 18/26] KVM: arm64: nv: Add trap forwarding for CNTHCTL_EL2
+Date: Fri, 28 Jul 2023 09:29:44 +0100
+Message-Id: <20230728082952.959212-19-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230728082952.959212-1-maz@kernel.org>
 References: <20230728082952.959212-1-maz@kernel.org>
@@ -58,68 +58,96 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Although the nVHE behaviour requires HCRX_EL2 to be switched
-on each switch between host and guest, there is nothing in
-this register that would affect a VHE host.
+Describe the CNTHCTL_EL2 register, and associate it with all the sysregs
+it allows to trap.
 
-It is thus possible to save/restore this register on load/put
-on VHE systems, avoiding unnecessary sysreg access on the hot
-path. Additionally, it avoids unnecessary traps when running
-with NV.
-
-To achieve this, simply move the read/writes to the *_common()
-helpers, which are called on load/put on VHE, and more eagerly
-on nVHE.
-
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/hyp/switch.h | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ arch/arm64/kvm/emulate-nested.c | 50 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 49 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index ad9c730b7d1a..5bcffd1906ce 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -197,6 +197,9 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
- 	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
- 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 339976764ac5..74b67895c791 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -99,9 +99,11 @@ enum trap_group {
  
-+	if (cpus_have_final_cap(ARM64_HAS_HCX))
-+		write_sysreg_s(HCRX_GUEST_FLAGS, SYS_HCRX_EL2);
+ 	/*
+ 	 * Anything after this point requires a callback evaluating a
+-	 * complex trap condition. Hopefully we'll never need this...
++	 * complex trap condition. Ugly stuff.
+ 	 */
+ 	__COMPLEX_CONDITIONS__,
++	CGT_CNTHCTL_EL1PCTEN = __COMPLEX_CONDITIONS__,
++	CGT_CNTHCTL_EL1PTEN,
+ };
+ 
+ static const struct trap_bits coarse_trap_bits[] = {
+@@ -365,10 +367,51 @@ static const enum trap_group *coarse_control_combo[] = {
+ 
+ typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu *);
+ 
++/*
++ * Warning, maximum confusion ahead.
++ *
++ * When E2H=0, CNTHCTL_EL2[1:0] are defined as EL1PCEN:EL1PCTEN
++ * When E2H=1, CNTHCTL_EL2[11:10] are defined as EL1PTEN:EL1PCTEN
++ *
++ * Note the single letter difference? Yet, the bits have the same
++ * function despite a different layout and a different name.
++ *
++ * We don't try to reconcile this mess. We just use the E2H=0 bits
++ * to generate something that is in the E2H=1 format, and live with
++ * it. You're welcome.
++ */
++static u64 get_sanitized_cnthctl(struct kvm_vcpu *vcpu)
++{
++	u64 val = __vcpu_sys_reg(vcpu, CNTHCTL_EL2);
 +
- 	__activate_traps_hfgxtr(vcpu);
- }
- 
-@@ -213,6 +216,9 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
- 		vcpu_clear_flag(vcpu, PMUSERENR_ON_CPU);
- 	}
- 
-+	if (cpus_have_final_cap(ARM64_HAS_HCX))
-+		write_sysreg_s(HCRX_HOST_FLAGS, SYS_HCRX_EL2);
++	if (!vcpu_el2_e2h_is_set(vcpu))
++		val = (val & (CNTHCTL_EL1PCEN | CNTHCTL_EL1PCTEN)) << 10;
 +
- 	__deactivate_traps_hfgxtr(vcpu);
- }
++	return val & ((CNTHCTL_EL1PCEN | CNTHCTL_EL1PCTEN) << 10);
++}
++
++static enum trap_behaviour check_cnthctl_el1pcten(struct kvm_vcpu *vcpu)
++{
++	if (get_sanitized_cnthctl(vcpu) & (CNTHCTL_EL1PCTEN << 10))
++		return BEHAVE_HANDLE_LOCALLY;
++
++	return BEHAVE_FORWARD_ANY;
++}
++
++static enum trap_behaviour check_cnthctl_el1pten(struct kvm_vcpu *vcpu)
++{
++	if (get_sanitized_cnthctl(vcpu) & (CNTHCTL_EL1PCEN << 10))
++		return BEHAVE_HANDLE_LOCALLY;
++
++	return BEHAVE_FORWARD_ANY;
++}
++
+ #define CCC(id, fn)				\
+ 	[id - __COMPLEX_CONDITIONS__] = fn
  
-@@ -227,9 +233,6 @@ static inline void ___activate_traps(struct kvm_vcpu *vcpu)
+ static const complex_condition_check ccc[] = {
++	CCC(CGT_CNTHCTL_EL1PCTEN, check_cnthctl_el1pcten),
++	CCC(CGT_CNTHCTL_EL1PTEN, check_cnthctl_el1pten),
+ };
  
- 	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_VSE))
- 		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
--
--	if (cpus_have_final_cap(ARM64_HAS_HCX))
--		write_sysreg_s(HCRX_GUEST_FLAGS, SYS_HCRX_EL2);
- }
+ /*
+@@ -870,6 +913,11 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+ 	SR_TRAP(SYS_TRBPTR_EL1, 	CGT_MDCR_E2TB),
+ 	SR_TRAP(SYS_TRBSR_EL1, 		CGT_MDCR_E2TB),
+ 	SR_TRAP(SYS_TRBTRG_EL1,		CGT_MDCR_E2TB),
++	SR_TRAP(SYS_CNTP_TVAL_EL0,	CGT_CNTHCTL_EL1PTEN),
++	SR_TRAP(SYS_CNTP_CVAL_EL0,	CGT_CNTHCTL_EL1PTEN),
++	SR_TRAP(SYS_CNTP_CTL_EL0,	CGT_CNTHCTL_EL1PTEN),
++	SR_TRAP(SYS_CNTPCT_EL0,		CGT_CNTHCTL_EL1PCTEN),
++	SR_TRAP(SYS_CNTPCTSS_EL0,	CGT_CNTHCTL_EL1PCTEN),
+ };
  
- static inline void ___deactivate_traps(struct kvm_vcpu *vcpu)
-@@ -244,9 +247,6 @@ static inline void ___deactivate_traps(struct kvm_vcpu *vcpu)
- 		vcpu->arch.hcr_el2 &= ~HCR_VSE;
- 		vcpu->arch.hcr_el2 |= read_sysreg(hcr_el2) & HCR_VSE;
- 	}
--
--	if (cpus_have_final_cap(ARM64_HAS_HCX))
--		write_sysreg_s(HCRX_HOST_FLAGS, SYS_HCRX_EL2);
- }
- 
- static inline bool __populate_fault_info(struct kvm_vcpu *vcpu)
+ static DEFINE_XARRAY(sr_forward_xa);
 -- 
 2.34.1
 
