@@ -1,91 +1,112 @@
-Received: from out-107.mta1.migadu.com (out-107.mta1.migadu.com [95.215.58.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 161C5156D2
-	for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 17:26:59 +0000 (UTC)
-Date: Fri, 28 Jul 2023 17:26:52 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1690565218;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JjPRYfaaVZj6od9S4f1dY2TX29itGG1Kz5FzJSCjOZ4=;
-	b=QT7pSrGwqR6PrTh/VyyTZz7nb6f1yqTwnLpA49oeInTAAHgIiavo4rICblFVNaDOXfuvIN
-	Z11YQ8O4rp4BtWJ7iPS/J0Wm9jzgmsDaOggqou93l68zdvEgnaLG1JnakhJuk95dSpfFVO
-	hnVJf4ylsJ+DVLe4uAU0hPnDbh+51AI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Eric Auger <eric.auger@redhat.com>, Mark Brown <broonie@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Darren Hart <darren@os.amperecomputing.com>,
-	Miguel Luis <miguel.luis@oracle.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 13/26] KVM: arm64: Restructure FGT register switching
-Message-ID: <ZMP6XBfPrgKMQ/ik@linux.dev>
-References: <20230728082952.959212-1-maz@kernel.org>
- <20230728082952.959212-14-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95331641C
+	for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 18:19:20 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d06d36b49f9so2286826276.1
+        for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 11:19:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690568359; x=1691173159;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rBQV49SOR42QKJzPhh41wMJSTrzIZuQ00mtidD8N2XM=;
+        b=6opsBea8GRXD2We8vqmJWkRvqQH67+YaaVfYQUyvCA+puzndvhs0EI/ABVbhf/zf7w
+         qihaG0zKmWaKGIh5XxdWzAl6zRWgDmdN2/ArETbiDmdnfcpWo9RtIGG4he5D3ol0SgXI
+         IJa252lfqbfLczfYkvnWWiOebVg63oRkzURD70V74J0eXCiEv4EiB9LOcHdb8iC9h7Kj
+         DYvqDUZe2IerZx+0JDp6C+SvGZK342OQtkdeznEO4dp3j5XvKeTU3pcEIzCbada7WrKB
+         3tkzVb7SEc4KXKIba1OfiRyCsC+1iSLd4VR/srr4GfGI7pkSlAwotV7MqxU82qvNJZcw
+         xL1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690568359; x=1691173159;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rBQV49SOR42QKJzPhh41wMJSTrzIZuQ00mtidD8N2XM=;
+        b=GYYUFjAigldHhG71rJI8jdQWasVVwo35cWQg4cN8XP9UdjFYLcoVWwrRB3RDKpjPvl
+         D4SPJ/3RzCByv2WENC5ZXRhjTtvcbzG4kQgbFDmyEalvPgEQtcQ8yjjQ8Jyv0Wmm4Owh
+         T3uFiVohVUbbRirMAWNd2K1fW1FguBHsc6z/YMaYwwouvXbejPA+oo5w/qJ5rOMO0tj0
+         tS7XtJRIjahiBKl4HSXjXHgBs8Qg4llCB9XCt2K4nUIjLFb8UlWj/OFRCbkK5GlbkWuv
+         eZrws5LnF0Z4fcbSMnw5PMiGrfyQx6JUWliY8j4Vclgc6an4Azu5XKQVQ17MR56jHoso
+         0QVg==
+X-Gm-Message-State: ABy/qLb2E7Q5mAFc3CpqRoQRevI8g4qy5fQ5OuIq/B1dVdKmxHeRNi14
+	EznqFWc0C3MK4bRf34KI9Ue8doClDjo=
+X-Google-Smtp-Source: APBJJlHgy87ZIulzDCKRfOMr7SIddiJkpyFfJopQjGYNAQz1ySEW7Aq0RA9oddYeo/R8Mk0CnZ5/HTYiLsY=
+X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
+ (user=reijiw job=sendgmr) by 2002:a25:69c6:0:b0:d0f:cf5:3282 with SMTP id
+ e189-20020a2569c6000000b00d0f0cf53282mr14549ybc.1.1690568359638; Fri, 28 Jul
+ 2023 11:19:19 -0700 (PDT)
+Date: Fri, 28 Jul 2023 11:19:02 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230728082952.959212-14-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
+Message-ID: <20230728181907.1759513-1-reijiw@google.com>
+Subject: [PATCH v2 0/5] KVM: arm64: PMU: Fix PMUver related handling for vPMU support
+From: Reiji Watanabe <reijiw@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Jing Zhang <jingzhangos@google.com>, Raghavendra Rao Anata <rananta@google.com>, 
+	Reiji Watanabe <reijiw@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hey Marc,
+This is a consolidated v2 of two separate series, [1] and [2].
 
-Looks good, just a typo to fix.
+On systems where the PMUVer is not uniform across all PEs,
+KVM currently does not advertise PMUv3 to the guest,
+even if userspace successfully runs KVM_ARM_VCPU_INIT with
+KVM_ARM_VCPU_PMU_V3.
+The patch-1 and patch-2 will address this inconsistent
+behavior by disallowing userspace from configuring vPMU,
+as such systems would be extremely uncommon and unlikely
+to even use KVM (according to Marc [3]).
 
-On Fri, Jul 28, 2023 at 09:29:39AM +0100, Marc Zyngier wrote:
-> As we're about to majorly extend the handling of FGT registers,
-> restructure the code to actually save/restore the registers
-> as required. This is made easy thanks to the previous addition
-> of the EL2 registers, allowing us to use the host context for
-> this purpose.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+The patch-3 will fix improper use of the host's PMUver to
+determine a valid range of PMU events for the guest (the
+guest's PMUver should be used instead).
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+The patch-4 and patch-5 will try to hide the STALL_SLOT*
+events unconditionally per Oliver's suggestion [4].
 
-> -static inline void __activate_traps_hfgxtr(void)
-> +static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
->  {
-> +	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
->  	u64 r_clr = 0, w_clr = 0, r_set = 0, w_set = 0, tmp;
-> +	u64 r_val, w_val;
-> +
-> +	if (!cpus_have_final_cap(ARM64_HAS_FGT))
-> +		return;
-> +
-> +	ctxt_sys_reg(hctxt, HFGRTR_EL2) = read_sysreg_s(SYS_HFGRTR_EL2);
-> +	ctxt_sys_reg(hctxt, HFGWTR_EL2) = read_sysreg_s(SYS_HFGWTR_EL2);
->  
->  	if (cpus_have_final_cap(ARM64_SME)) {
->  		tmp = HFGxTR_EL2_nSMPRI_EL1_MASK | HFGxTR_EL2_nTPIDR2_EL0_MASK;
-> @@ -98,26 +97,31 @@ static inline void __activate_traps_hfgxtr(void)
->  	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
->  		w_set |= HFGxTR_EL2_TCR_EL1_MASK;
->  
-> -	sysreg_clear_set_s(SYS_HFGRTR_EL2, r_clr, r_set);
-> -	sysreg_clear_set_s(SYS_HFGWTR_EL2, w_clr, w_set);
-> +
-> +	/* The default is not to trap amything but ACCDATA_EL1 */
+Presently, KVM hides the STALL_SLOT event depending on the
+host PMU version, instead of the guest's PMU version, which
+doesn't seem to be accurate, as it appears that older PMU than
+PMUv3p4 could implement the event according to the Arm ARM.
+Exposing the STALL_SLOT event without PMMIR_EL1 (supported
+from PMUv3p4) for the guest won't be very useful though.
+The patch-4 stops advertising the event for guest unconditionally,
+rather than fixing or keeping the inaccurate checking to advertise
+the event for the case, where it is not very useful.
+The patch-5 stops advertising the STALL_SLOT_{FRONT,BACK}END
+events to the guest, similar to the STALL_SLOT event, as when any
+of these three events are implemented, all three of them should
+be implemented, according to the Arm ARM.
 
-typo: anything
+This series is based on 6.5-rc3.
 
+[1] https://lore.kernel.org/all/20230610061520.3026530-1-reijiw@google.com/
+[2] https://lore.kernel.org/all/20230610194510.4146549-1-reijiw@google.com/
+[3] https://lore.kernel.org/all/874jnqp73o.wl-maz@kernel.org/
+[4] https://lore.kernel.org/all/ZIm1kdFBfXYMdfbV@linux.dev/
+
+Reiji Watanabe (5):
+  KVM: arm64: PMU: Use of pmuv3_implemented() instead of open-coded
+    version
+  KVM: arm64: PMU: Disallow vPMU on non-uniform PMUVer systems
+  KVM: arm64: PMU: Avoid inappropriate use of host's PMUVer
+  KVM: arm64: PMU: Don't advertise the STALL_SLOT event
+  KVM: arm64: PMU: Don't advertise STALL_SLOT_{FRONTEND,BACKEND}
+
+ arch/arm64/kvm/arm.c      |  1 +
+ arch/arm64/kvm/pmu-emul.c | 44 ++++++++++++++++++++++++++-------------
+ include/kvm/arm_pmu.h     |  3 +++
+ 3 files changed, 34 insertions(+), 14 deletions(-)
+
+
+base-commit: 6eaae198076080886b9e7d57f4ae06fa782f90ef
 -- 
-Thanks,
-Oliver
+2.41.0.585.gd2178a4bd4-goog
+
