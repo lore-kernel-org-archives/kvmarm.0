@@ -1,144 +1,290 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8CCA38E
-	for <kvmarm@lists.linux.dev>; Sat, 29 Jul 2023 00:37:52 +0000 (UTC)
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d2a7ec86216so468998276.0
-        for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 17:37:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1B947C
+	for <kvmarm@lists.linux.dev>; Sat, 29 Jul 2023 00:41:49 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5844e92ee6bso26626957b3.3
+        for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 17:41:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690591072; x=1691195872;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Yb5xazjAjbiDk0o4gEkkEuwr9pc6IYfbApM8E9AAcm8=;
-        b=YO9ijSHOh5J1cVuChDXZrdsVMawU/dKC3CusW0Frvs07EOOTfINmzinv3GCCjT5pnx
-         rOBnaYJ1R1OxykK+OmmG9x2M32byq/ygaqkkxRor1oohX534+fRV0Fzb/g+Z9GJAAFnW
-         jexdmXQtuj7Yuu1Yap+4hcJXPNpYrAz7Y0Iw6sVCZTa347oPpKJaGpHJFiBeeTjF0raL
-         UHcE4kvGQCnvr0Q42EmvlTszcZBmYKHtuPzFuNbbVtZFsYxggy0fjjFWI9bye8ZychB7
-         V+Xqe9MeAa+YJY+J/TBov5lI1fOh7IPV6YbaCwxhJGiYJp20yNxXDngwT0t7StyBgLNo
-         R6Qw==
+        d=google.com; s=20221208; t=1690591308; x=1691196108;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pFylZ7MUbxwsfgnkCbIwukJjKcbZuVflXJcOt3ffCK4=;
+        b=0b9hKMxDqRwFQQnLMcqkv8PDDG/B+EGGKIIflyXXH1ZyfSndsboeXJ+TgsSS2iwWwD
+         mZK9za+90jiszGzd793UetnAs8xekTA2T4vD5AUxgo9V3HL6L2s22bi7IHqLJj4F6nD2
+         rCVTi2QOSa1y//QAMNR9pI55a5+voH5Q75OKbx+jiIKf+60l26WlJxC/Ge3hydIgerhS
+         uit7vPqeM5/JYzJwBgmRMtGvrlUQ++fcIaRDfp4/RFoTphs+Z9MfkMGcLscWr4oktRPN
+         mWg3Y7aOpahbc8mMonn0PhHsSyXhVyZJ3jKC6IlOJRcTpdIF2gNEz1894Cw3rt+1qqE9
+         qRqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690591072; x=1691195872;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Yb5xazjAjbiDk0o4gEkkEuwr9pc6IYfbApM8E9AAcm8=;
-        b=aPLkCE3X98OOZcsM3D09++fTl6axdj6YhogfUGF1KJG3bmgEHRySfmHlO/aRi92ARa
-         oli6LRrl2hxvoDjhQ+Mm/8oYolq4trI1o+KoTftj7VnBiExWG5bXQ0cu89LDuq5B0XsW
-         g6K9YAaCxfu+I490sUJPtVd0lGEyRm+26VYIUYde4cVeWNDNTM/DRz3xZWLohpZE2CF1
-         HDILrq/QkS7JPxfnwe28VdtjR8E9t2aRjP9MCkVsmQv5vzv9ysQtLrFqr93b06OQRgoV
-         gUYWlxxKqQElt1ULbWELNuqwLbIR+7DAkEs2+K1xjg+xyOM37l8Wp4AEdflu9dEL0OcW
-         E/wg==
-X-Gm-Message-State: ABy/qLaxO2iuLZ3RsRRFCDy/n02NPToMCwFfh4+Z9drccWl9hHGY3A21
-	M+uu+ER7rGzkvaOTwCwYhgH209UZlyI=
-X-Google-Smtp-Source: APBJJlHAddbDc2cMcbZUidB0HowWy2488J/QjMe6Knuj2J162JyE2GJ2xbHLQj0Pd31iUQBNjID5BYp2vlY=
+        d=1e100.net; s=20221208; t=1690591308; x=1691196108;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pFylZ7MUbxwsfgnkCbIwukJjKcbZuVflXJcOt3ffCK4=;
+        b=drtowqpNwJp6bVCR/3LsrOitIU+X7uVisMC/4V6QkB/Injf2cKOxl8s29FLtzXdnNx
+         /yqYk6Rk77mPRzNgn3eyhOUb5WDZYSnwFcfSUht9uUHGUpaFR5iGCc447MT7gVZ0AxlB
+         /R/H2hFlpwhjBbQ2gq8xZ8SrPnxs96DYEz5BpRsbUjE0mGrtXdOuyxASmjS/2PfILQan
+         u1S2b+bUdGVAo7i19z4Ecg75f3RbEiS7Zt+Tc/3z2xwhxBGu64MuILlc6gaNwlyT1fhB
+         DSSpA9kgs8jJ5gm87JrHPN0OkiE6CBbXAoPJH4AaK8y+nGTBZ20F9UERO8uTuyuzreHd
+         YsWw==
+X-Gm-Message-State: ABy/qLaPQop+nIawsVpfqPBjkVHPSnscgRD9Qx0V1uWoN3GOn0NRXiSr
+	yJbFRMp9WA7fvgyo0wFKs/X4itJ8Pmw=
+X-Google-Smtp-Source: APBJJlGYk/HASjtwEfhn9G1Ynkqr6kkqBYHzgw8GP9sqBMBlRYNDe9UG6jZXkz7Xk/58V5PqTY9JcKEc00E=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1582:b0:d0a:353b:b93b with SMTP id
- k2-20020a056902158200b00d0a353bb93bmr18375ybu.3.1690591071769; Fri, 28 Jul
- 2023 17:37:51 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:54f:0:b0:d16:1f54:75e1 with SMTP id
+ 76-20020a25054f000000b00d161f5475e1mr19267ybf.0.1690591308572; Fri, 28 Jul
+ 2023 17:41:48 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 28 Jul 2023 17:36:43 -0700
-In-Reply-To: <20230729003643.1053367-1-seanjc@google.com>
+Date: Fri, 28 Jul 2023 17:41:44 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230729003643.1053367-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230729003643.1053367-35-seanjc@google.com>
-Subject: [PATCH v4 34/34] KVM: selftests: Use GUEST_FAIL() in ARM's arch timer helpers
+Message-ID: <20230729004144.1054885-1-seanjc@google.com>
+Subject: [PATCH] KVM: Wrap kvm_{gfn,hva}_range.pte in a per-action union
 From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Sean Christopherson <seanjc@google.com>, Thomas Huth <thuth@redhat.com>, 
-	"=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?=" <philmd@linaro.org>, Aaron Lewis <aaronlewis@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Sean Christopherson <seanjc@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, Yu Zhao <yuzhao@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Use GUEST_FAIL() in ARM's arch timer helpers now that printf-based
-guest asserts are the default (and only) style of guest asserts, and
-say goodbye to the GUEST_ASSERT_1() alias.
+Wrap kvm_{gfn,hva}_range.pte in a union so that future notifier events can
+pass event specific information up and down the stack without needing to
+constantly expand and churn the APIs.  Lockless aging of SPTEs will pass
+around a bitmap, and support for memory attributes will pass around the
+new attributes for the range.
 
+Add a "KVM_NO_ARG" placeholder to simplify handling events without an
+argument (creating a dummy union variable is midly annoying).
+
+Opportunstically drop explicit zero-initialization of the "pte" field, as
+omitting the field (now a union) has the same effect.
+
+Cc: Yu Zhao <yuzhao@google.com>
+Link: https://lore.kernel.org/all/CAOUHufagkd2Jk3_HrVoFFptRXM=hX2CV8f+M-dka-hJU4bP8kw@mail.gmail.com
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/include/aarch64/arch_timer.h       | 12 ++++++------
- tools/testing/selftests/kvm/include/ucall_common.h   |  4 ----
- 2 files changed, 6 insertions(+), 10 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/aarch64/arch_timer.h b/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
-index cb7c03de3a21..b3e97525cb55 100644
---- a/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
-@@ -41,7 +41,7 @@ static inline uint64_t timer_get_cntct(enum arch_timer timer)
- 	case PHYSICAL:
- 		return read_sysreg(cntpct_el0);
- 	default:
--		GUEST_ASSERT_1(0, timer);
-+		GUEST_FAIL("Unexpected timer type = %u", timer);
+If this looks good, my thought is to squeeze it into 6.6 so that the MGLRU
+and guest_memfd() series can build on it.  Or those series could just
+include it?
+
+ arch/arm64/kvm/mmu.c       |  2 +-
+ arch/mips/kvm/mmu.c        |  2 +-
+ arch/riscv/kvm/mmu.c       |  2 +-
+ arch/x86/kvm/mmu/mmu.c     |  2 +-
+ arch/x86/kvm/mmu/tdp_mmu.c |  6 +++---
+ include/linux/kvm_host.h   |  6 +++++-
+ virt/kvm/kvm_main.c        | 18 +++++++++---------
+ 7 files changed, 21 insertions(+), 17 deletions(-)
+
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 6db9ef288ec3..55f03a68f1cd 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1721,7 +1721,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ 
+ bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+-	kvm_pfn_t pfn = pte_pfn(range->pte);
++	kvm_pfn_t pfn = pte_pfn(range->arg.pte);
+ 
+ 	if (!kvm->arch.mmu.pgt)
+ 		return false;
+diff --git a/arch/mips/kvm/mmu.c b/arch/mips/kvm/mmu.c
+index e8c08988ed37..7b2ac1319d70 100644
+--- a/arch/mips/kvm/mmu.c
++++ b/arch/mips/kvm/mmu.c
+@@ -447,7 +447,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	gpa_t gpa = range->start << PAGE_SHIFT;
+-	pte_t hva_pte = range->pte;
++	pte_t hva_pte = range->arg.pte;
+ 	pte_t *gpa_pte = kvm_mips_pte_for_gpa(kvm, NULL, gpa);
+ 	pte_t old_pte;
+ 
+diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+index f2eb47925806..857f4312b0f8 100644
+--- a/arch/riscv/kvm/mmu.c
++++ b/arch/riscv/kvm/mmu.c
+@@ -559,7 +559,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	int ret;
+-	kvm_pfn_t pfn = pte_pfn(range->pte);
++	kvm_pfn_t pfn = pte_pfn(range->arg.pte);
+ 
+ 	if (!kvm->arch.pgd)
+ 		return false;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index ec169f5c7dce..d72f2b20f430 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1588,7 +1588,7 @@ static __always_inline bool kvm_handle_gfn_range(struct kvm *kvm,
+ 	for_each_slot_rmap_range(range->slot, PG_LEVEL_4K, KVM_MAX_HUGEPAGE_LEVEL,
+ 				 range->start, range->end - 1, &iterator)
+ 		ret |= handler(kvm, iterator.rmap, range->slot, iterator.gfn,
+-			       iterator.level, range->pte);
++			       iterator.level, range->arg.pte);
+ 
+ 	return ret;
+ }
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 512163d52194..6250bd3d20c1 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1241,7 +1241,7 @@ static bool set_spte_gfn(struct kvm *kvm, struct tdp_iter *iter,
+ 	u64 new_spte;
+ 
+ 	/* Huge pages aren't expected to be modified without first being zapped. */
+-	WARN_ON(pte_huge(range->pte) || range->start + 1 != range->end);
++	WARN_ON(pte_huge(range->arg.pte) || range->start + 1 != range->end);
+ 
+ 	if (iter->level != PG_LEVEL_4K ||
+ 	    !is_shadow_present_pte(iter->old_spte))
+@@ -1255,9 +1255,9 @@ static bool set_spte_gfn(struct kvm *kvm, struct tdp_iter *iter,
+ 	 */
+ 	tdp_mmu_iter_set_spte(kvm, iter, 0);
+ 
+-	if (!pte_write(range->pte)) {
++	if (!pte_write(range->arg.pte)) {
+ 		new_spte = kvm_mmu_changed_pte_notifier_make_spte(iter->old_spte,
+-								  pte_pfn(range->pte));
++								  pte_pfn(range->arg.pte));
+ 
+ 		tdp_mmu_iter_set_spte(kvm, iter, new_spte);
  	}
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 9d3ac7720da9..9125d0ab642d 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -256,11 +256,15 @@ int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu);
+ #endif
  
- 	/* We should not reach here */
-@@ -58,7 +58,7 @@ static inline void timer_set_cval(enum arch_timer timer, uint64_t cval)
- 		write_sysreg(cval, cntp_cval_el0);
- 		break;
- 	default:
--		GUEST_ASSERT_1(0, timer);
-+		GUEST_FAIL("Unexpected timer type = %u", timer);
- 	}
+ #ifdef KVM_ARCH_WANT_MMU_NOTIFIER
++union kvm_mmu_notifier_arg {
++	pte_t pte;
++};
++
+ struct kvm_gfn_range {
+ 	struct kvm_memory_slot *slot;
+ 	gfn_t start;
+ 	gfn_t end;
+-	pte_t pte;
++	union kvm_mmu_notifier_arg arg;
+ 	bool may_block;
+ };
+ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index dfbaafbe3a00..f84ef9399aee 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -526,7 +526,7 @@ typedef void (*on_unlock_fn_t)(struct kvm *kvm);
+ struct kvm_hva_range {
+ 	unsigned long start;
+ 	unsigned long end;
+-	pte_t pte;
++	union kvm_mmu_notifier_arg arg;
+ 	hva_handler_t handler;
+ 	on_lock_fn_t on_lock;
+ 	on_unlock_fn_t on_unlock;
+@@ -547,6 +547,8 @@ static void kvm_null_fn(void)
+ }
+ #define IS_KVM_NULL_FN(fn) ((fn) == (void *)kvm_null_fn)
  
- 	isb();
-@@ -72,7 +72,7 @@ static inline uint64_t timer_get_cval(enum arch_timer timer)
- 	case PHYSICAL:
- 		return read_sysreg(cntp_cval_el0);
- 	default:
--		GUEST_ASSERT_1(0, timer);
-+		GUEST_FAIL("Unexpected timer type = %u", timer);
- 	}
++static const union kvm_mmu_notifier_arg KVM_NO_ARG;
++
+ /* Iterate over each memslot intersecting [start, last] (inclusive) range */
+ #define kvm_for_each_memslot_in_hva_range(node, slots, start, last)	     \
+ 	for (node = interval_tree_iter_first(&slots->hva_tree, start, last); \
+@@ -591,7 +593,7 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+ 			 * bother making these conditional (to avoid writes on
+ 			 * the second or later invocation of the handler).
+ 			 */
+-			gfn_range.pte = range->pte;
++			gfn_range.arg = range->arg;
+ 			gfn_range.may_block = range->may_block;
  
- 	/* We should not reach here */
-@@ -89,7 +89,7 @@ static inline void timer_set_tval(enum arch_timer timer, uint32_t tval)
- 		write_sysreg(tval, cntp_tval_el0);
- 		break;
- 	default:
--		GUEST_ASSERT_1(0, timer);
-+		GUEST_FAIL("Unexpected timer type = %u", timer);
- 	}
+ 			/*
+@@ -632,14 +634,14 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+ static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
+ 						unsigned long start,
+ 						unsigned long end,
+-						pte_t pte,
++						union kvm_mmu_notifier_arg arg,
+ 						hva_handler_t handler)
+ {
+ 	struct kvm *kvm = mmu_notifier_to_kvm(mn);
+ 	const struct kvm_hva_range range = {
+ 		.start		= start,
+ 		.end		= end,
+-		.pte		= pte,
++		.arg		= arg,
+ 		.handler	= handler,
+ 		.on_lock	= (void *)kvm_null_fn,
+ 		.on_unlock	= (void *)kvm_null_fn,
+@@ -659,7 +661,6 @@ static __always_inline int kvm_handle_hva_range_no_flush(struct mmu_notifier *mn
+ 	const struct kvm_hva_range range = {
+ 		.start		= start,
+ 		.end		= end,
+-		.pte		= __pte(0),
+ 		.handler	= handler,
+ 		.on_lock	= (void *)kvm_null_fn,
+ 		.on_unlock	= (void *)kvm_null_fn,
+@@ -693,6 +694,7 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
+ 					pte_t pte)
+ {
+ 	struct kvm *kvm = mmu_notifier_to_kvm(mn);
++	const union kvm_mmu_notifier_arg arg = { .pte = pte };
  
- 	isb();
-@@ -105,7 +105,7 @@ static inline void timer_set_ctl(enum arch_timer timer, uint32_t ctl)
- 		write_sysreg(ctl, cntp_ctl_el0);
- 		break;
- 	default:
--		GUEST_ASSERT_1(0, timer);
-+		GUEST_FAIL("Unexpected timer type = %u", timer);
- 	}
+ 	trace_kvm_set_spte_hva(address);
  
- 	isb();
-@@ -119,7 +119,7 @@ static inline uint32_t timer_get_ctl(enum arch_timer timer)
- 	case PHYSICAL:
- 		return read_sysreg(cntp_ctl_el0);
- 	default:
--		GUEST_ASSERT_1(0, timer);
-+		GUEST_FAIL("Unexpected timer type = %u", timer);
- 	}
+@@ -708,7 +710,7 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
+ 	if (!READ_ONCE(kvm->mmu_invalidate_in_progress))
+ 		return;
  
- 	/* We should not reach here */
-diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
-index b7e964b3182e..4cf69fa8bfba 100644
---- a/tools/testing/selftests/kvm/include/ucall_common.h
-+++ b/tools/testing/selftests/kvm/include/ucall_common.h
-@@ -102,8 +102,4 @@ do {										\
- 		    (const char *)(ucall).args[GUEST_FILE],			\
- 		    (ucall).args[GUEST_LINE], "%s", (ucall).buffer)
+-	kvm_handle_hva_range(mn, address, address + 1, pte, kvm_change_spte_gfn);
++	kvm_handle_hva_range(mn, address, address + 1, arg, kvm_change_spte_gfn);
+ }
  
--/* FIXME: Drop this alias once the param-based guest asserts are gone. */
--#define GUEST_ASSERT_1(_condition, arg1) \
--	__GUEST_ASSERT(_condition, "arg1 = 0x%lx", arg1)
--
- #endif /* SELFTEST_KVM_UCALL_COMMON_H */
+ void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
+@@ -747,7 +749,6 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+ 	const struct kvm_hva_range hva_range = {
+ 		.start		= range->start,
+ 		.end		= range->end,
+-		.pte		= __pte(0),
+ 		.handler	= kvm_unmap_gfn_range,
+ 		.on_lock	= kvm_mmu_invalidate_begin,
+ 		.on_unlock	= kvm_arch_guest_memory_reclaimed,
+@@ -812,7 +813,6 @@ static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
+ 	const struct kvm_hva_range hva_range = {
+ 		.start		= range->start,
+ 		.end		= range->end,
+-		.pte		= __pte(0),
+ 		.handler	= (void *)kvm_null_fn,
+ 		.on_lock	= kvm_mmu_invalidate_end,
+ 		.on_unlock	= (void *)kvm_null_fn,
+@@ -845,7 +845,7 @@ static int kvm_mmu_notifier_clear_flush_young(struct mmu_notifier *mn,
+ {
+ 	trace_kvm_age_hva(start, end);
+ 
+-	return kvm_handle_hva_range(mn, start, end, __pte(0), kvm_age_gfn);
++	return kvm_handle_hva_range(mn, start, end, KVM_NO_ARG, kvm_age_gfn);
+ }
+ 
+ static int kvm_mmu_notifier_clear_young(struct mmu_notifier *mn,
+
+base-commit: fdf0eaf11452d72945af31804e2a1048ee1b574c
 -- 
 2.41.0.487.g6d72f3e995-goog
 
