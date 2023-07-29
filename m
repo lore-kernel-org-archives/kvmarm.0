@@ -1,42 +1,42 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDBFB7C
-	for <kvmarm@lists.linux.dev>; Sat, 29 Jul 2023 00:37:46 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-583312344e7so26632447b3.1
-        for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 17:37:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FFDF7C
+	for <kvmarm@lists.linux.dev>; Sat, 29 Jul 2023 00:37:48 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d1ebc896bd7so2489930276.2
+        for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 17:37:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690591066; x=1691195866;
+        d=google.com; s=20221208; t=1690591068; x=1691195868;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=xqj9FFp3GbJzdxodUT2xF7JQwG5o4CpUta+kXT/J/Zc=;
-        b=6mRTmQ0sMBjNlnuCoCc0BasP9WSyh4U3UNy+I62mmSF7PQnu5S9L9TmW4nCeJc1yEc
-         NqvtlAqSC0Q516Jk1Y9Rkwxmg3AkjhBvkZaMC4+blSIxvv8aNAf4tDwiCWdS/mz3OFyS
-         484OUBkMcHObYZQp7hJuJGDR6C5dr7avJVyoJNKl8w3G72UdYYEPxOT+z9Svg5rGM0wS
-         ouYYaujR5212sPk4ldidMcjlqiJEBwgSW5vHQDioiBNoBbun5DWGQmKTJ76i9vFQfE+c
-         hei//58Ou40y1sKp/lzuKZ07tJ4APhkr7vVnixNLY3U8h3ZP2nDbOyvBDVAvcnxyn5kY
-         c1SQ==
+        bh=bzV5y3d2J271tDO3cv/gnkFEQwstYKr0nwihmUAyJSY=;
+        b=h7SJQurCGhPYwpD+wg62IUbUGUp23yiWPobApYYIliwELpF6vUz5D+1rfx4nBCxARL
+         9LidGzocsgFix1ZGwF2ESLX12gpqeaPDdxrluSS6fMo6+iKzvBo/5ROsKszEkdNvVSki
+         QDOhjDNkdpX5098Y03SYR5eTEg852lDKAfNQ/RoohCOuAM0rmQNXFBDYifJbonefSgaB
+         cNKE3joCx4yRHRszjmjOzjUY4mio4xxqzQ1ogVd3YykOSi7DjBgX7i63pC5pluDDlqjc
+         fRfg5UW4L7f0QIB8qDvakgKmrbf1tyiZ8zzp8idVqh1EJlJT97saQJBPAFeRW3dG8SJs
+         AWYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690591066; x=1691195866;
+        d=1e100.net; s=20221208; t=1690591068; x=1691195868;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=xqj9FFp3GbJzdxodUT2xF7JQwG5o4CpUta+kXT/J/Zc=;
-        b=bJjFbOMn2TVk5txs0yWbwpKHHdE7SUeNbNKw/3nEvwFdRnuaWswLSQMzfjPCA4ogZV
-         8LoDIw1DiFSg8o2/qISrWYkBKqRm2O3+JNiG7/jNqUx9LBF/K4fbbOkEXJwuRGVv3KUY
-         mTboxgTCPNzHixoPtO4O9WASZ7D5ikJKBM+pxq4EesV30KC8WyugG9lDezDMkjG10QkS
-         W/2Hwlu8DzSQgW8oDVINLt2/aTPQm4IioI933jsvwYGBS1uziGZkRd00ySSYBjyeP9VV
-         LHCJ+It5Sp1nzNpaplN7I7Hq2AwwsFGCPdTghlNMQM0tr6XXkMi7zRbsdZuhI3EH4pT6
-         m/zw==
-X-Gm-Message-State: ABy/qLbhgShI5Ag0Oxl0mBqqA8Q66ovlpQj8X6X2FGpGlG9ZSynkMeiw
-	WhsPXDMLCZhkHulMoudngzSCw6z/YgU=
-X-Google-Smtp-Source: APBJJlGUaaiUxSD6v+uHtzJn5Bok5HEB27UnUCHcnqVc3N6UWv+PT7JG5G0++htnoOGnrQBKyXgZZKI8MMA=
+        bh=bzV5y3d2J271tDO3cv/gnkFEQwstYKr0nwihmUAyJSY=;
+        b=BD8+sXDX5/KgrAM5lCb9/pU44HyDmiE5EkfF718VfiexzDvGbqLd1i9zQlDRx6icOA
+         gC/No/krqHPR6dCUWYBfawtQeQMirXa6Yxn00ZZ63bF/JFGTZ7flFe05mJk9l81hDrze
+         dwoGzXbP2ueVUzeJrZfpCSfXNrZaLwCbk02iOi+5hRGU6dWQ9BN+wAOu+TdZx3++Q0Ra
+         7mwzpNyVtnWC0GlMOHIVhQ5+aAKUg7tSm+gULndioBWxYF/LF4TxeH8Js9Z2gEDLpqq3
+         HKMbLMplSPPBZqbi3wJXg7S4DvQBL2oSYGDD4efa2sRnjufDLbuGEhus6LiVlylIvRv9
+         z5nw==
+X-Gm-Message-State: ABy/qLYovueX2OuglEsRzXHLbziAZEf1Q+PXXdMG0kvJF3BoHKoLYyqN
+	5tmk+cCHtlXui5wTox6gOpUyE3uK8t0=
+X-Google-Smtp-Source: APBJJlG6p9K+yey88/DBR1TFZ25eXVJ87JNFkIYYyKMjji15nsLzqRVtB0lYm7TGzJ7EKp4i9m456kSpb4c=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:eb14:0:b0:56c:e585:8b19 with SMTP id
- n20-20020a81eb14000000b0056ce5858b19mr22779ywm.2.1690591065884; Fri, 28 Jul
- 2023 17:37:45 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:d08:0:b0:d0d:c74a:a6c0 with SMTP id
+ 8-20020a250d08000000b00d0dc74aa6c0mr16400ybn.2.1690591067903; Fri, 28 Jul
+ 2023 17:37:47 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 28 Jul 2023 17:36:40 -0700
+Date: Fri, 28 Jul 2023 17:36:41 -0700
 In-Reply-To: <20230729003643.1053367-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -46,9 +46,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230729003643.1053367-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230729003643.1053367-32-seanjc@google.com>
-Subject: [PATCH v4 31/34] KVM: selftests: Convert x86's XCR0 test to use
- printf-based guest asserts
+Message-ID: <20230729003643.1053367-33-seanjc@google.com>
+Subject: [PATCH v4 32/34] KVM: selftests: Rip out old, param-based guest
+ assert macros
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
@@ -59,87 +59,415 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	"=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?=" <philmd@linaro.org>, Aaron Lewis <aaronlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Convert x86's XCR0 vs. CPUID test to use printf-based guest asserts.
+Drop the param-based guest assert macros and enable the printf versions
+for all selftests.  Note!  This change can affect tests even if they
+don't use directly use guest asserts!  E.g. via library code, or due to
+the compiler making different optimization decisions.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/x86_64/xcr0_cpuid_test.c    | 29 ++++++++++++-------
- 1 file changed, 18 insertions(+), 11 deletions(-)
+ .../selftests/kvm/aarch64/arch_timer.c        |  2 -
+ .../selftests/kvm/aarch64/debug-exceptions.c  |  2 -
+ .../selftests/kvm/aarch64/hypercalls.c        |  2 -
+ .../selftests/kvm/aarch64/page_fault_test.c   |  2 -
+ .../testing/selftests/kvm/aarch64/vgic_irq.c  |  2 -
+ .../testing/selftests/kvm/guest_print_test.c  |  2 -
+ .../selftests/kvm/include/ucall_common.h      | 71 -------------------
+ .../testing/selftests/kvm/memslot_perf_test.c |  2 -
+ tools/testing/selftests/kvm/s390x/memop.c     |  2 -
+ tools/testing/selftests/kvm/s390x/tprot.c     |  2 -
+ .../selftests/kvm/set_memory_region_test.c    |  2 -
+ tools/testing/selftests/kvm/steal_time.c      |  2 -
+ .../testing/selftests/kvm/x86_64/cpuid_test.c |  2 -
+ .../kvm/x86_64/hyperv_extended_hypercalls.c   |  2 -
+ .../selftests/kvm/x86_64/hyperv_features.c    |  2 -
+ .../selftests/kvm/x86_64/kvm_pv_test.c        |  2 -
+ .../selftests/kvm/x86_64/monitor_mwait_test.c |  2 -
+ .../kvm/x86_64/nested_exceptions_test.c       |  2 -
+ .../selftests/kvm/x86_64/set_boot_cpu_id.c    |  2 -
+ .../kvm/x86_64/svm_nested_soft_inject_test.c  |  2 -
+ .../selftests/kvm/x86_64/tsc_msrs_test.c      |  2 -
+ .../selftests/kvm/x86_64/userspace_io_test.c  |  2 -
+ .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  |  2 -
+ .../selftests/kvm/x86_64/xcr0_cpuid_test.c    |  2 -
+ 24 files changed, 117 deletions(-)
 
+diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+index b53bcf126e6a..274b8465b42a 100644
+--- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
++++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+@@ -19,8 +19,6 @@
+  *
+  * Copyright (c) 2021, Google LLC.
+  */
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
+ #define _GNU_SOURCE
+ 
+ #include <stdlib.h>
+diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+index fdd5b05e1b0e..f5b6cb3a0019 100644
+--- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
++++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+@@ -1,6 +1,4 @@
+ // SPDX-License-Identifier: GPL-2.0
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
+ #include <test_util.h>
+ #include <kvm_util.h>
+ #include <processor.h>
+diff --git a/tools/testing/selftests/kvm/aarch64/hypercalls.c b/tools/testing/selftests/kvm/aarch64/hypercalls.c
+index 94555a7d3c7e..31f66ba97228 100644
+--- a/tools/testing/selftests/kvm/aarch64/hypercalls.c
++++ b/tools/testing/selftests/kvm/aarch64/hypercalls.c
+@@ -8,8 +8,6 @@
+  * hypercalls are properly masked or unmasked to the guest when disabled or
+  * enabled from the KVM userspace, respectively.
+  */
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
+ #include <errno.h>
+ #include <linux/arm-smccc.h>
+ #include <asm/kvm.h>
+diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+index 0b0dd90feae5..47bb914ab2fa 100644
+--- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
++++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+@@ -7,8 +7,6 @@
+  * hugetlbfs with a hole). It checks that the expected handling method is
+  * called (e.g., uffd faults with the right address and write/read flag).
+  */
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
+ #define _GNU_SOURCE
+ #include <linux/bitmap.h>
+ #include <fcntl.h>
+diff --git a/tools/testing/selftests/kvm/aarch64/vgic_irq.c b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
+index 67da33aa6d17..2e64b4856e38 100644
+--- a/tools/testing/selftests/kvm/aarch64/vgic_irq.c
++++ b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
+@@ -7,8 +7,6 @@
+  * host to inject a specific intid via a GUEST_SYNC call, and then checks that
+  * it received it.
+  */
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
+ #include <asm/kvm.h>
+ #include <asm/kvm_para.h>
+ #include <sys/eventfd.h>
+diff --git a/tools/testing/selftests/kvm/guest_print_test.c b/tools/testing/selftests/kvm/guest_print_test.c
+index 777838d42427..3a9a5db9794e 100644
+--- a/tools/testing/selftests/kvm/guest_print_test.c
++++ b/tools/testing/selftests/kvm/guest_print_test.c
+@@ -4,8 +4,6 @@
+  *
+  * Copyright 2022, Google, Inc. and/or its affiliates.
+  */
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
+index 4ce11c15285a..b7e964b3182e 100644
+--- a/tools/testing/selftests/kvm/include/ucall_common.h
++++ b/tools/testing/selftests/kvm/include/ucall_common.h
+@@ -65,7 +65,6 @@ enum guest_assert_builtin_args {
+ 	GUEST_ASSERT_BUILTIN_NARGS
+ };
+ 
+-#ifdef USE_GUEST_ASSERT_PRINTF
+ #define ____GUEST_ASSERT(_condition, _exp, _fmt, _args...)				\
+ do {											\
+ 	if (!(_condition))								\
+@@ -107,74 +106,4 @@ do {										\
+ #define GUEST_ASSERT_1(_condition, arg1) \
+ 	__GUEST_ASSERT(_condition, "arg1 = 0x%lx", arg1)
+ 
+-#else
+-
+-#define __GUEST_ASSERT(_condition, _condstr, _nargs, _args...)		\
+-do {									\
+-	if (!(_condition))						\
+-		ucall(UCALL_ABORT, GUEST_ASSERT_BUILTIN_NARGS + _nargs,	\
+-		      "Failed guest assert: " _condstr,			\
+-		      __FILE__, __LINE__, ##_args);			\
+-} while (0)
+-
+-#define GUEST_ASSERT(_condition) \
+-	__GUEST_ASSERT(_condition, #_condition, 0, 0)
+-
+-#define GUEST_ASSERT_1(_condition, arg1) \
+-	__GUEST_ASSERT(_condition, #_condition, 1, (arg1))
+-
+-#define GUEST_ASSERT_2(_condition, arg1, arg2) \
+-	__GUEST_ASSERT(_condition, #_condition, 2, (arg1), (arg2))
+-
+-#define GUEST_ASSERT_3(_condition, arg1, arg2, arg3) \
+-	__GUEST_ASSERT(_condition, #_condition, 3, (arg1), (arg2), (arg3))
+-
+-#define GUEST_ASSERT_4(_condition, arg1, arg2, arg3, arg4) \
+-	__GUEST_ASSERT(_condition, #_condition, 4, (arg1), (arg2), (arg3), (arg4))
+-
+-#define GUEST_ASSERT_EQ(a, b) __GUEST_ASSERT((a) == (b), #a " == " #b, 2, a, b)
+-
+-#define __REPORT_GUEST_ASSERT(_ucall, fmt, _args...)			\
+-	TEST_FAIL("%s at %s:%ld\n" fmt,					\
+-		  (const char *)(_ucall).args[GUEST_ERROR_STRING],	\
+-		  (const char *)(_ucall).args[GUEST_FILE],		\
+-		  (_ucall).args[GUEST_LINE],				\
+-		  ##_args)
+-
+-#define GUEST_ASSERT_ARG(ucall, i) ((ucall).args[GUEST_ASSERT_BUILTIN_NARGS + i])
+-
+-#define REPORT_GUEST_ASSERT(ucall)		\
+-	__REPORT_GUEST_ASSERT((ucall), "")
+-
+-#define REPORT_GUEST_ASSERT_1(ucall, fmt)			\
+-	__REPORT_GUEST_ASSERT((ucall),				\
+-			      fmt,				\
+-			      GUEST_ASSERT_ARG((ucall), 0))
+-
+-#define REPORT_GUEST_ASSERT_2(ucall, fmt)			\
+-	__REPORT_GUEST_ASSERT((ucall),				\
+-			      fmt,				\
+-			      GUEST_ASSERT_ARG((ucall), 0),	\
+-			      GUEST_ASSERT_ARG((ucall), 1))
+-
+-#define REPORT_GUEST_ASSERT_3(ucall, fmt)			\
+-	__REPORT_GUEST_ASSERT((ucall),				\
+-			      fmt,				\
+-			      GUEST_ASSERT_ARG((ucall), 0),	\
+-			      GUEST_ASSERT_ARG((ucall), 1),	\
+-			      GUEST_ASSERT_ARG((ucall), 2))
+-
+-#define REPORT_GUEST_ASSERT_4(ucall, fmt)			\
+-	__REPORT_GUEST_ASSERT((ucall),				\
+-			      fmt,				\
+-			      GUEST_ASSERT_ARG((ucall), 0),	\
+-			      GUEST_ASSERT_ARG((ucall), 1),	\
+-			      GUEST_ASSERT_ARG((ucall), 2),	\
+-			      GUEST_ASSERT_ARG((ucall), 3))
+-
+-#define REPORT_GUEST_ASSERT_N(ucall, fmt, args...)	\
+-	__REPORT_GUEST_ASSERT((ucall), fmt, ##args)
+-
+-#endif /* USE_GUEST_ASSERT_PRINTF */
+-
+ #endif /* SELFTEST_KVM_UCALL_COMMON_H */
+diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
+index 55f1bc70e571..20eb2e730800 100644
+--- a/tools/testing/selftests/kvm/memslot_perf_test.c
++++ b/tools/testing/selftests/kvm/memslot_perf_test.c
+@@ -6,8 +6,6 @@
+  *
+  * Basic guest setup / host vCPU thread code lifted from set_memory_region_test.
+  */
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
+ #include <pthread.h>
+ #include <sched.h>
+ #include <semaphore.h>
+diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
+index a49173907cec..bb3ca9a5d731 100644
+--- a/tools/testing/selftests/kvm/s390x/memop.c
++++ b/tools/testing/selftests/kvm/s390x/memop.c
+@@ -4,8 +4,6 @@
+  *
+  * Copyright (C) 2019, Red Hat, Inc.
+  */
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/tools/testing/selftests/kvm/s390x/tprot.c b/tools/testing/selftests/kvm/s390x/tprot.c
+index c12c6824d963..c73f948c9b63 100644
+--- a/tools/testing/selftests/kvm/s390x/tprot.c
++++ b/tools/testing/selftests/kvm/s390x/tprot.c
+@@ -4,8 +4,6 @@
+  *
+  * Copyright IBM Corp. 2021
+  */
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
+ #include <sys/mman.h>
+ #include "test_util.h"
+ #include "kvm_util.h"
+diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
+index dd8f4bac9df8..b32960189f5f 100644
+--- a/tools/testing/selftests/kvm/set_memory_region_test.c
++++ b/tools/testing/selftests/kvm/set_memory_region_test.c
+@@ -1,6 +1,4 @@
+ // SPDX-License-Identifier: GPL-2.0
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
+ #define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <fcntl.h>
+ #include <pthread.h>
+diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
+index 8649c8545882..171adfb2a6cb 100644
+--- a/tools/testing/selftests/kvm/steal_time.c
++++ b/tools/testing/selftests/kvm/steal_time.c
+@@ -4,8 +4,6 @@
+  *
+  * Copyright (C) 2020, Red Hat, Inc.
+  */
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
+ #define _GNU_SOURCE
+ #include <stdio.h>
+ #include <time.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/cpuid_test.c b/tools/testing/selftests/kvm/x86_64/cpuid_test.c
+index eb1b65ffc0d5..3b34d8156d1c 100644
+--- a/tools/testing/selftests/kvm/x86_64/cpuid_test.c
++++ b/tools/testing/selftests/kvm/x86_64/cpuid_test.c
+@@ -4,8 +4,6 @@
+  *
+  * Generic tests for KVM CPUID set/get ioctls
+  */
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
+ #include <asm/kvm_para.h>
+ #include <linux/kvm_para.h>
+ #include <stdint.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
+index 0107d54a1a08..e036db1f32b9 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
+@@ -8,8 +8,6 @@
+  * Copyright 2022 Google LLC
+  * Author: Vipin Sharma <vipinsh@google.com>
+  */
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
+ #include "kvm_util.h"
+ #include "processor.h"
+ #include "hyperv.h"
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
+index 41a6beff78c4..9f28aa276c4e 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
+@@ -4,8 +4,6 @@
+  *
+  * Tests for Hyper-V features enablement
+  */
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
+ #include <asm/kvm_para.h>
+ #include <linux/kvm_para.h>
+ #include <stdint.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/kvm_pv_test.c b/tools/testing/selftests/kvm/x86_64/kvm_pv_test.c
+index 1c28b77ff3cd..9e2879af7c20 100644
+--- a/tools/testing/selftests/kvm/x86_64/kvm_pv_test.c
++++ b/tools/testing/selftests/kvm/x86_64/kvm_pv_test.c
+@@ -4,8 +4,6 @@
+  *
+  * Tests for KVM paravirtual feature disablement
+  */
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
+ #include <asm/kvm_para.h>
+ #include <linux/kvm_para.h>
+ #include <stdint.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/monitor_mwait_test.c b/tools/testing/selftests/kvm/x86_64/monitor_mwait_test.c
+index 960fecab3742..80aa3d8b18f8 100644
+--- a/tools/testing/selftests/kvm/x86_64/monitor_mwait_test.c
++++ b/tools/testing/selftests/kvm/x86_64/monitor_mwait_test.c
+@@ -1,6 +1,4 @@
+ // SPDX-License-Identifier: GPL-2.0
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c b/tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c
+index 4a29f59a76be..3670331adf21 100644
+--- a/tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c
++++ b/tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c
+@@ -1,6 +1,4 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
+ #define _GNU_SOURCE /* for program_invocation_short_name */
+ 
+ #include "test_util.h"
+diff --git a/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c b/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c
+index abb3f26d3ce0..366cf18600bc 100644
+--- a/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c
++++ b/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c
+@@ -4,8 +4,6 @@
+  *
+  * Copyright (C) 2020, Red Hat, Inc.
+  */
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
+ #define _GNU_SOURCE /* for program_invocation_name */
+ #include <fcntl.h>
+ #include <stdio.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/svm_nested_soft_inject_test.c b/tools/testing/selftests/kvm/x86_64/svm_nested_soft_inject_test.c
+index c908412c5754..7ee44496cf97 100644
+--- a/tools/testing/selftests/kvm/x86_64/svm_nested_soft_inject_test.c
++++ b/tools/testing/selftests/kvm/x86_64/svm_nested_soft_inject_test.c
+@@ -8,8 +8,6 @@
+  *   Copyright (C) 2021, Red Hat, Inc.
+  *
+  */
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
+ #include <stdatomic.h>
+ #include <stdio.h>
+ #include <unistd.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c b/tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c
+index cf9114f70e1c..12b0964f4f13 100644
+--- a/tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c
++++ b/tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c
+@@ -4,8 +4,6 @@
+  *
+  * Copyright (C) 2020, Red Hat, Inc.
+  */
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
+ #include <stdio.h>
+ #include <string.h>
+ #include "kvm_util.h"
+diff --git a/tools/testing/selftests/kvm/x86_64/userspace_io_test.c b/tools/testing/selftests/kvm/x86_64/userspace_io_test.c
+index 2c5d2a18d184..255c50b0dc32 100644
+--- a/tools/testing/selftests/kvm/x86_64/userspace_io_test.c
++++ b/tools/testing/selftests/kvm/x86_64/userspace_io_test.c
+@@ -1,6 +1,4 @@
+ // SPDX-License-Identifier: GPL-2.0
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
+index ba09d5a01c39..ebbcb0a3f743 100644
+--- a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
++++ b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
+@@ -10,8 +10,6 @@
+  * and check it can be retrieved with KVM_GET_MSR, also test
+  * the invalid LBR formats are rejected.
+  */
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
+ #define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <sys/ioctl.h>
+ 
 diff --git a/tools/testing/selftests/kvm/x86_64/xcr0_cpuid_test.c b/tools/testing/selftests/kvm/x86_64/xcr0_cpuid_test.c
-index 905bd5ae4431..5e8290797720 100644
+index 5e8290797720..77d04a7bdadd 100644
 --- a/tools/testing/selftests/kvm/x86_64/xcr0_cpuid_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/xcr0_cpuid_test.c
-@@ -4,6 +4,7 @@
+@@ -4,8 +4,6 @@
   *
   * Copyright (C) 2022, Google LLC.
   */
-+#define USE_GUEST_ASSERT_PRINTF 1
- 
+-#define USE_GUEST_ASSERT_PRINTF 1
+-
  #include <fcntl.h>
  #include <stdio.h>
-@@ -20,13 +21,14 @@
-  * Assert that architectural dependency rules are satisfied, e.g. that AVX is
-  * supported if and only if SSE is supported.
-  */
--#define ASSERT_XFEATURE_DEPENDENCIES(supported_xcr0, xfeatures, dependencies)	  \
--do {										  \
--	uint64_t __supported = (supported_xcr0) & ((xfeatures) | (dependencies)); \
--										  \
--	GUEST_ASSERT_3((__supported & (xfeatures)) != (xfeatures) ||		  \
--		       __supported == ((xfeatures) | (dependencies)),		  \
--		       __supported, (xfeatures), (dependencies));		  \
-+#define ASSERT_XFEATURE_DEPENDENCIES(supported_xcr0, xfeatures, dependencies)		\
-+do {											\
-+	uint64_t __supported = (supported_xcr0) & ((xfeatures) | (dependencies));	\
-+											\
-+	__GUEST_ASSERT((__supported & (xfeatures)) != (xfeatures) ||			\
-+		       __supported == ((xfeatures) | (dependencies)),			\
-+		       "supported = 0x%llx, xfeatures = 0x%llx, dependencies = 0x%llx",	\
-+		       __supported, (xfeatures), (dependencies));			\
- } while (0)
- 
- /*
-@@ -41,7 +43,8 @@ do {										  \
- do {									\
- 	uint64_t __supported = (supported_xcr0) & (xfeatures);		\
- 									\
--	GUEST_ASSERT_2(!__supported || __supported == (xfeatures),	\
-+	__GUEST_ASSERT(!__supported || __supported == (xfeatures),	\
-+		       "supported = 0x%llx, xfeatures = 0x%llx",	\
- 		       __supported, (xfeatures));			\
- } while (0)
- 
-@@ -79,14 +82,18 @@ static void guest_code(void)
- 				    XFEATURE_MASK_XTILE);
- 
- 	vector = xsetbv_safe(0, supported_xcr0);
--	GUEST_ASSERT_2(!vector, supported_xcr0, vector);
-+	__GUEST_ASSERT(!vector,
-+		       "Expected success on XSETBV(0x%llx), got vector '0x%x'",
-+		       supported_xcr0, vector);
- 
- 	for (i = 0; i < 64; i++) {
- 		if (supported_xcr0 & BIT_ULL(i))
- 			continue;
- 
- 		vector = xsetbv_safe(0, supported_xcr0 | BIT_ULL(i));
--		GUEST_ASSERT_3(vector == GP_VECTOR, supported_xcr0, vector, BIT_ULL(i));
-+		__GUEST_ASSERT(vector == GP_VECTOR,
-+			       "Expected #GP on XSETBV(0x%llx), supported XCR0 = %llx, got vector '0x%x'",
-+			       BIT_ULL(i), supported_xcr0, vector);
- 	}
- 
- 	GUEST_DONE();
-@@ -117,7 +124,7 @@ int main(int argc, char *argv[])
- 
- 		switch (get_ucall(vcpu, &uc)) {
- 		case UCALL_ABORT:
--			REPORT_GUEST_ASSERT_3(uc, "0x%lx 0x%lx 0x%lx");
-+			REPORT_GUEST_ASSERT(uc);
- 			break;
- 		case UCALL_DONE:
- 			goto done;
+ #include <stdlib.h>
 -- 
 2.41.0.487.g6d72f3e995-goog
 
