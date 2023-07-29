@@ -1,42 +1,42 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28D9738E
-	for <kvmarm@lists.linux.dev>; Sat, 29 Jul 2023 00:37:50 +0000 (UTC)
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1bbb97d27d6so18296255ad.1
-        for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 17:37:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8CCA38E
+	for <kvmarm@lists.linux.dev>; Sat, 29 Jul 2023 00:37:52 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d2a7ec86216so468998276.0
+        for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 17:37:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690591069; x=1691195869;
+        d=google.com; s=20221208; t=1690591072; x=1691195872;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=AB4nCzcJxxTKK97GCB6DmZjI2HiP51XBzwyfTirQyrI=;
-        b=IdcimLldL6SdT439oCWu8rz2dmrkYjv8ox3SUKWomnMiyiiFRRjDs66qRRW+FVKqrx
-         0i8l7UCEvYEgFtND3T2gbsKATBAqjj6umb2vG/JNBL0Mq5nZet9Wids8j4AWdk/JSW9/
-         JKTRfK4mCIXSn2n+AVw/lB8MDG+6y8r1BWFbxAHaWz3sWgeN3tc3CLBlVVmcA590V/pB
-         y4wgwQpigybr8lpsL1JOF+Q3E+fGX3fNVqw4rlA7l6EtvrlD5hrwC3UZnR0P48gEV9XH
-         gNkCLnErK0Q0pLqgIRTVaGjlOFf6bZIf8BVat9k7OjIOviPSk4Q4BvHQlNGefnt2lLFt
-         laWQ==
+        bh=Yb5xazjAjbiDk0o4gEkkEuwr9pc6IYfbApM8E9AAcm8=;
+        b=YO9ijSHOh5J1cVuChDXZrdsVMawU/dKC3CusW0Frvs07EOOTfINmzinv3GCCjT5pnx
+         rOBnaYJ1R1OxykK+OmmG9x2M32byq/ygaqkkxRor1oohX534+fRV0Fzb/g+Z9GJAAFnW
+         jexdmXQtuj7Yuu1Yap+4hcJXPNpYrAz7Y0Iw6sVCZTa347oPpKJaGpHJFiBeeTjF0raL
+         UHcE4kvGQCnvr0Q42EmvlTszcZBmYKHtuPzFuNbbVtZFsYxggy0fjjFWI9bye8ZychB7
+         V+Xqe9MeAa+YJY+J/TBov5lI1fOh7IPV6YbaCwxhJGiYJp20yNxXDngwT0t7StyBgLNo
+         R6Qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690591069; x=1691195869;
+        d=1e100.net; s=20221208; t=1690591072; x=1691195872;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=AB4nCzcJxxTKK97GCB6DmZjI2HiP51XBzwyfTirQyrI=;
-        b=gDW7NrF/YQ6clYIOIUfpnghBeRVjoUG4CWFnOLmZBJosZblLGMc74WwH5uyU87llum
-         4hYwGYfgrsGX4EpS98gxWMAo8ZSuKfLHJ68eh5uuOA1FM26czQaq5fBlrx9w4W24MOnC
-         KI+bti4htHxR5y36FxMdEgCPYiLz45gSbsmIdeQ9Lwh9BSRCVea51ojs5AKz0IR7Z3az
-         0EnTShFwHw2i5+MSvF2cayR+dwIWnl2GG0Ax5pYBgnCRBVd7LnnPW0Tk7zY+YgREjeif
-         SwR1pD9EyR7sYxbU7k6sPL50T87lnU8o8nogaoGobrxMbWiM3F1nSoRZk+rXHOGI6IYW
-         W2/A==
-X-Gm-Message-State: ABy/qLYPwSACi0IYckr9EdqZgWL83mNPzNc7ksjKiB+AbwEhDnHSvdpZ
-	whyj1AvBoTS/Re7yAZvaHs/R0kWCMWA=
-X-Google-Smtp-Source: APBJJlFqj3KGHz4ib/ws4V7ET96W9C6pQj8d9T5XgR4iicuixEf78OTjjLiyoxpq5Vayxs/ASyydtJHhDL0=
+        bh=Yb5xazjAjbiDk0o4gEkkEuwr9pc6IYfbApM8E9AAcm8=;
+        b=aPLkCE3X98OOZcsM3D09++fTl6axdj6YhogfUGF1KJG3bmgEHRySfmHlO/aRi92ARa
+         oli6LRrl2hxvoDjhQ+Mm/8oYolq4trI1o+KoTftj7VnBiExWG5bXQ0cu89LDuq5B0XsW
+         g6K9YAaCxfu+I490sUJPtVd0lGEyRm+26VYIUYde4cVeWNDNTM/DRz3xZWLohpZE2CF1
+         HDILrq/QkS7JPxfnwe28VdtjR8E9t2aRjP9MCkVsmQv5vzv9ysQtLrFqr93b06OQRgoV
+         gUYWlxxKqQElt1ULbWELNuqwLbIR+7DAkEs2+K1xjg+xyOM37l8Wp4AEdflu9dEL0OcW
+         E/wg==
+X-Gm-Message-State: ABy/qLaxO2iuLZ3RsRRFCDy/n02NPToMCwFfh4+Z9drccWl9hHGY3A21
+	M+uu+ER7rGzkvaOTwCwYhgH209UZlyI=
+X-Google-Smtp-Source: APBJJlHAddbDc2cMcbZUidB0HowWy2488J/QjMe6Knuj2J162JyE2GJ2xbHLQj0Pd31iUQBNjID5BYp2vlY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:ec92:b0:1b8:929f:199b with SMTP id
- x18-20020a170902ec9200b001b8929f199bmr12494plg.11.1690591069741; Fri, 28 Jul
- 2023 17:37:49 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1582:b0:d0a:353b:b93b with SMTP id
+ k2-20020a056902158200b00d0a353bb93bmr18375ybu.3.1690591071769; Fri, 28 Jul
+ 2023 17:37:51 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 28 Jul 2023 17:36:42 -0700
+Date: Fri, 28 Jul 2023 17:36:43 -0700
 In-Reply-To: <20230729003643.1053367-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -46,8 +46,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230729003643.1053367-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230729003643.1053367-34-seanjc@google.com>
-Subject: [PATCH v4 33/34] KVM: selftests: Print out guest RIP on unhandled exception
+Message-ID: <20230729003643.1053367-35-seanjc@google.com>
+Subject: [PATCH v4 34/34] KVM: selftests: Use GUEST_FAIL() in ARM's arch timer helpers
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
@@ -58,58 +58,87 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	"=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?=" <philmd@linaro.org>, Aaron Lewis <aaronlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Use the newfanged printf-based guest assert framework to spit out the
-guest RIP when an unhandled exception is detected, which makes debugging
-such failures *much* easier.
+Use GUEST_FAIL() in ARM's arch timer helpers now that printf-based
+guest asserts are the default (and only) style of guest asserts, and
+say goodbye to the GUEST_ASSERT_1() alias.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/lib/x86_64/processor.c       | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
+ .../selftests/kvm/include/aarch64/arch_timer.h       | 12 ++++++------
+ tools/testing/selftests/kvm/include/ucall_common.h   |  4 ----
+ 2 files changed, 6 insertions(+), 10 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index d4a0b504b1e0..d8288374078e 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -1074,11 +1074,6 @@ static bool kvm_fixup_exception(struct ex_regs *regs)
- 	return true;
- }
+diff --git a/tools/testing/selftests/kvm/include/aarch64/arch_timer.h b/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
+index cb7c03de3a21..b3e97525cb55 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
++++ b/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
+@@ -41,7 +41,7 @@ static inline uint64_t timer_get_cntct(enum arch_timer timer)
+ 	case PHYSICAL:
+ 		return read_sysreg(cntpct_el0);
+ 	default:
+-		GUEST_ASSERT_1(0, timer);
++		GUEST_FAIL("Unexpected timer type = %u", timer);
+ 	}
  
--void kvm_exit_unexpected_vector(uint32_t value)
--{
--	ucall(UCALL_UNHANDLED, 1, value);
--}
+ 	/* We should not reach here */
+@@ -58,7 +58,7 @@ static inline void timer_set_cval(enum arch_timer timer, uint64_t cval)
+ 		write_sysreg(cval, cntp_cval_el0);
+ 		break;
+ 	default:
+-		GUEST_ASSERT_1(0, timer);
++		GUEST_FAIL("Unexpected timer type = %u", timer);
+ 	}
+ 
+ 	isb();
+@@ -72,7 +72,7 @@ static inline uint64_t timer_get_cval(enum arch_timer timer)
+ 	case PHYSICAL:
+ 		return read_sysreg(cntp_cval_el0);
+ 	default:
+-		GUEST_ASSERT_1(0, timer);
++		GUEST_FAIL("Unexpected timer type = %u", timer);
+ 	}
+ 
+ 	/* We should not reach here */
+@@ -89,7 +89,7 @@ static inline void timer_set_tval(enum arch_timer timer, uint32_t tval)
+ 		write_sysreg(tval, cntp_tval_el0);
+ 		break;
+ 	default:
+-		GUEST_ASSERT_1(0, timer);
++		GUEST_FAIL("Unexpected timer type = %u", timer);
+ 	}
+ 
+ 	isb();
+@@ -105,7 +105,7 @@ static inline void timer_set_ctl(enum arch_timer timer, uint32_t ctl)
+ 		write_sysreg(ctl, cntp_ctl_el0);
+ 		break;
+ 	default:
+-		GUEST_ASSERT_1(0, timer);
++		GUEST_FAIL("Unexpected timer type = %u", timer);
+ 	}
+ 
+ 	isb();
+@@ -119,7 +119,7 @@ static inline uint32_t timer_get_ctl(enum arch_timer timer)
+ 	case PHYSICAL:
+ 		return read_sysreg(cntp_ctl_el0);
+ 	default:
+-		GUEST_ASSERT_1(0, timer);
++		GUEST_FAIL("Unexpected timer type = %u", timer);
+ 	}
+ 
+ 	/* We should not reach here */
+diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
+index b7e964b3182e..4cf69fa8bfba 100644
+--- a/tools/testing/selftests/kvm/include/ucall_common.h
++++ b/tools/testing/selftests/kvm/include/ucall_common.h
+@@ -102,8 +102,4 @@ do {										\
+ 		    (const char *)(ucall).args[GUEST_FILE],			\
+ 		    (ucall).args[GUEST_LINE], "%s", (ucall).buffer)
+ 
+-/* FIXME: Drop this alias once the param-based guest asserts are gone. */
+-#define GUEST_ASSERT_1(_condition, arg1) \
+-	__GUEST_ASSERT(_condition, "arg1 = 0x%lx", arg1)
 -
- void route_exception(struct ex_regs *regs)
- {
- 	typedef void(*handler)(struct ex_regs *);
-@@ -1092,7 +1087,10 @@ void route_exception(struct ex_regs *regs)
- 	if (kvm_fixup_exception(regs))
- 		return;
- 
--	kvm_exit_unexpected_vector(regs->vector);
-+	ucall_assert(UCALL_UNHANDLED,
-+		     "Unhandled exception in guest", __FILE__, __LINE__,
-+		     "Unhandled exception '0x%lx' at guest RIP '0x%lx'",
-+		     regs->vector, regs->rip);
- }
- 
- void vm_init_descriptor_tables(struct kvm_vm *vm)
-@@ -1135,12 +1133,8 @@ void assert_on_unhandled_exception(struct kvm_vcpu *vcpu)
- {
- 	struct ucall uc;
- 
--	if (get_ucall(vcpu, &uc) == UCALL_UNHANDLED) {
--		uint64_t vector = uc.args[0];
--
--		TEST_FAIL("Unexpected vectored event in guest (vector:0x%lx)",
--			  vector);
--	}
-+	if (get_ucall(vcpu, &uc) == UCALL_UNHANDLED)
-+		REPORT_GUEST_ASSERT(uc);
- }
- 
- const struct kvm_cpuid_entry2 *get_cpuid_entry(const struct kvm_cpuid2 *cpuid,
+ #endif /* SELFTEST_KVM_UCALL_COMMON_H */
 -- 
 2.41.0.487.g6d72f3e995-goog
 
