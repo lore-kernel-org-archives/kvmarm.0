@@ -1,290 +1,226 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1B947C
-	for <kvmarm@lists.linux.dev>; Sat, 29 Jul 2023 00:41:49 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5844e92ee6bso26626957b3.3
-        for <kvmarm@lists.linux.dev>; Fri, 28 Jul 2023 17:41:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690591308; x=1691196108;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pFylZ7MUbxwsfgnkCbIwukJjKcbZuVflXJcOt3ffCK4=;
-        b=0b9hKMxDqRwFQQnLMcqkv8PDDG/B+EGGKIIflyXXH1ZyfSndsboeXJ+TgsSS2iwWwD
-         mZK9za+90jiszGzd793UetnAs8xekTA2T4vD5AUxgo9V3HL6L2s22bi7IHqLJj4F6nD2
-         rCVTi2QOSa1y//QAMNR9pI55a5+voH5Q75OKbx+jiIKf+60l26WlJxC/Ge3hydIgerhS
-         uit7vPqeM5/JYzJwBgmRMtGvrlUQ++fcIaRDfp4/RFoTphs+Z9MfkMGcLscWr4oktRPN
-         mWg3Y7aOpahbc8mMonn0PhHsSyXhVyZJ3jKC6IlOJRcTpdIF2gNEz1894Cw3rt+1qqE9
-         qRqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690591308; x=1691196108;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pFylZ7MUbxwsfgnkCbIwukJjKcbZuVflXJcOt3ffCK4=;
-        b=drtowqpNwJp6bVCR/3LsrOitIU+X7uVisMC/4V6QkB/Injf2cKOxl8s29FLtzXdnNx
-         /yqYk6Rk77mPRzNgn3eyhOUb5WDZYSnwFcfSUht9uUHGUpaFR5iGCc447MT7gVZ0AxlB
-         /R/H2hFlpwhjBbQ2gq8xZ8SrPnxs96DYEz5BpRsbUjE0mGrtXdOuyxASmjS/2PfILQan
-         u1S2b+bUdGVAo7i19z4Ecg75f3RbEiS7Zt+Tc/3z2xwhxBGu64MuILlc6gaNwlyT1fhB
-         DSSpA9kgs8jJ5gm87JrHPN0OkiE6CBbXAoPJH4AaK8y+nGTBZ20F9UERO8uTuyuzreHd
-         YsWw==
-X-Gm-Message-State: ABy/qLaPQop+nIawsVpfqPBjkVHPSnscgRD9Qx0V1uWoN3GOn0NRXiSr
-	yJbFRMp9WA7fvgyo0wFKs/X4itJ8Pmw=
-X-Google-Smtp-Source: APBJJlGYk/HASjtwEfhn9G1Ynkqr6kkqBYHzgw8GP9sqBMBlRYNDe9UG6jZXkz7Xk/58V5PqTY9JcKEc00E=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:54f:0:b0:d16:1f54:75e1 with SMTP id
- 76-20020a25054f000000b00d161f5475e1mr19267ybf.0.1690591308572; Fri, 28 Jul
- 2023 17:41:48 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 28 Jul 2023 17:41:44 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D08B23D70
+	for <kvmarm@lists.linux.dev>; Sat, 29 Jul 2023 09:19:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E6E5C433C7;
+	Sat, 29 Jul 2023 09:19:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690622360;
+	bh=FX07c1aB+2Wb3InFYiIfVDpSZ+Ap+3iMqLoJ5Y9kWWE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TWfouKzodPdEEIVYeXt2c8ZjPKeIAK+FPc474vAhrzvUOBDLEO5APKiAF8WCtCEer
+	 ZqBRuD+YSBWZ45rOuxGxQ7NiPDBaMSLZaqn6vpcCSqFVndVGT4oLiXZZkQRfZ8pbuy
+	 3p1CShzwLoAabzOstDHx2rRnjE9lrySq5rJ3g0aiqzDtSEF+Tr5otoK4D5bHBrN853
+	 WIkDhgVaX4K56hdxC0U8q5TL2xBWn0IvJ3L8lmTHSJq37yGxAjt6iHMUBDJh5n9/Nk
+	 k7jXz12W3OF3iSr6KeRWCPDEKCYaNwSmwL7aUqIa3RJF9sOZPZxIcnhItg3Mk+VCOp
+	 ghfdQsyaZn4IQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qPg6X-000KMP-NK;
+	Sat, 29 Jul 2023 10:19:17 +0100
+Date: Sat, 29 Jul 2023 10:19:17 +0100
+Message-ID: <87fs57qdm2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Mark Brown <broonie@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Chase Conklin <chase.conklin@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Darren Hart <darren@os.amperecomputing.com>,
+	Miguel Luis <miguel.luis@oracle.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 14/26] KVM: arm64: nv: Add trap forwarding infrastructure
+In-Reply-To: <ZMQJ+7VPbGVnz0kP@linux.dev>
+References: <20230728082952.959212-1-maz@kernel.org>
+	<20230728082952.959212-15-maz@kernel.org>
+	<ZMQJ+7VPbGVnz0kP@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230729004144.1054885-1-seanjc@google.com>
-Subject: [PATCH] KVM: Wrap kvm_{gfn,hva}_range.pte in a per-action union
-From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Yu Zhao <yuzhao@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Wrap kvm_{gfn,hva}_range.pte in a union so that future notifier events can
-pass event specific information up and down the stack without needing to
-constantly expand and churn the APIs.  Lockless aging of SPTEs will pass
-around a bitmap, and support for memory attributes will pass around the
-new attributes for the range.
+On Fri, 28 Jul 2023 19:33:31 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Fri, Jul 28, 2023 at 09:29:40AM +0100, Marc Zyngier wrote:
+> 
+> [...]
+> 
+> > +/*
+> > + * Bit assignment for the trap controls. We use a 64bit word with the
+> > + * following layout for each trapped sysreg:
+> > + *
+> > + * [9:0]	enum trap_group (10 bits)
+> > + * [13:10]	enum fgt_group_id (4 bits)
+> > + * [19:14]	bit number in the FGT register (6 bits)
+> > + * [20]		trap polarity (1 bit)
+> > + * [62:21]	Unused (42 bits)
+> > + * [63]		RES0 - Must be zero, as lost on insertion in the xarray
+> > + */
+> > +union trap_config {
+> > +	u64	val;
+> > +	struct {
+> > +		unsigned long	cgt:10;	/* Coarse trap id */
+> > +		unsigned long	fgt:4;	/* Fing Grained Trap id */
+> > +		unsigned long	bit:6;	/* Bit number */
+> > +		unsigned long	pol:1;	/* Polarity */
+> > +		unsigned long	unk:42;	/* Unknown */
+> > +		unsigned long	mbz:1;	/* Must Be Zero */
+> > +	};
+> > +};
+> 
+> Correct me if I'm wrong, but I don't think the compiler is going to
+> whine if any of these bitfields are initialized with a larger value than
+> can be represented... Do you think some BUILD_BUG_ON() is in order to
+> ensure that trap_group fits in ::cgt?
+> 
+> 	BUILD_BUG_ON(__NR_TRAP_IDS__ >= BIT(10));
 
-Add a "KVM_NO_ARG" placeholder to simplify handling events without an
-argument (creating a dummy union variable is midly annoying).
+Indeed. This might also apply to ::fgt, and I want to add some sanity
+checks to verify that the whole union isn't larger than a 'void *', as
+we rely on that.
 
-Opportunstically drop explicit zero-initialization of the "pte" field, as
-omitting the field (now a union) has the same effect.
+> 
+> > +struct encoding_to_trap_config {
+> > +	const u32			encoding;
+> > +	const u32			end;
+> > +	const union trap_config		tc;
+> > +};
+> > +
+> > +#define SR_RANGE_TRAP(sr_start, sr_end, trap_id)			\
+> > +	{								\
+> > +		.encoding	= sr_start,				\
+> > +		.end		= sr_end,				\
+> > +		.tc		= {					\
+> > +			.cgt		= trap_id,			\
+> > +		},							\
+> > +	}
+> > +
+> > +#define SR_TRAP(sr, trap_id)		SR_RANGE_TRAP(sr, sr, trap_id)
+> > +
+> > +/*
+> > + * Map encoding to trap bits for exception reported with EC=0x18.
+> > + * These must only be evaluated when running a nested hypervisor, but
+> > + * that the current context is not a hypervisor context. When the
+> > + * trapped access matches one of the trap controls, the exception is
+> > + * re-injected in the nested hypervisor.
+> > + */
+> > +static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+> > +};
+> > +
+> > +static DEFINE_XARRAY(sr_forward_xa);
+> > +
+> > +static union trap_config get_trap_config(u32 sysreg)
+> > +{
+> > +	return (union trap_config) {
+> > +		.val = xa_to_value(xa_load(&sr_forward_xa, sysreg)),
+> > +	};
+> 
+> Should we be checking for NULL here? AFAICT, the use of sentinel values
+> in the trap_group enum would effectively guarantee each trap_config has
+> a nonzero value.
 
-Cc: Yu Zhao <yuzhao@google.com>
-Link: https://lore.kernel.org/all/CAOUHufagkd2Jk3_HrVoFFptRXM=hX2CV8f+M-dka-hJU4bP8kw@mail.gmail.com
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
+if xa_load() returns NULL, xa_to_value() will still give us a 0, which
+is an indication of a sysreg that isn't present in the trap
+configuration. This can happen if we trap something that isn't yet
+supported in NV, which is quite common. This allows us to use features
+on the host without having to immediately write the same support for
+NV guests.
 
-If this looks good, my thought is to squeeze it into 6.6 so that the MGLRU
-and guest_memfd() series can build on it.  Or those series could just
-include it?
+But this is obviously a temporary situation. At some point, I'll
+become a total bastard and demand that people treat NV as a first
+class citizen. One day ;-).
 
- arch/arm64/kvm/mmu.c       |  2 +-
- arch/mips/kvm/mmu.c        |  2 +-
- arch/riscv/kvm/mmu.c       |  2 +-
- arch/x86/kvm/mmu/mmu.c     |  2 +-
- arch/x86/kvm/mmu/tdp_mmu.c |  6 +++---
- include/linux/kvm_host.h   |  6 +++++-
- virt/kvm/kvm_main.c        | 18 +++++++++---------
- 7 files changed, 21 insertions(+), 17 deletions(-)
+> 
+> > +}
+> > +
+> > +void __init populate_nv_trap_config(void)
+> > +{
+> > +	for (int i = 0; i < ARRAY_SIZE(encoding_to_cgt); i++) {
+> > +		const struct encoding_to_trap_config *cgt = &encoding_to_cgt[i];
+> > +		void *prev;
+> > +
+> > +		prev = xa_store_range(&sr_forward_xa, cgt->encoding, cgt->end,
+> > +				      xa_mk_value(cgt->tc.val), GFP_KERNEL);
+> > +		WARN_ON(prev);
+> 
+> Returning the error here and failing the overall KVM initialization
+> seems to be the safest option. The WARN is still handy, though.
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 6db9ef288ec3..55f03a68f1cd 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1721,7 +1721,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
- 
- bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- {
--	kvm_pfn_t pfn = pte_pfn(range->pte);
-+	kvm_pfn_t pfn = pte_pfn(range->arg.pte);
- 
- 	if (!kvm->arch.mmu.pgt)
- 		return false;
-diff --git a/arch/mips/kvm/mmu.c b/arch/mips/kvm/mmu.c
-index e8c08988ed37..7b2ac1319d70 100644
---- a/arch/mips/kvm/mmu.c
-+++ b/arch/mips/kvm/mmu.c
-@@ -447,7 +447,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
- bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- {
- 	gpa_t gpa = range->start << PAGE_SHIFT;
--	pte_t hva_pte = range->pte;
-+	pte_t hva_pte = range->arg.pte;
- 	pte_t *gpa_pte = kvm_mips_pte_for_gpa(kvm, NULL, gpa);
- 	pte_t old_pte;
- 
-diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-index f2eb47925806..857f4312b0f8 100644
---- a/arch/riscv/kvm/mmu.c
-+++ b/arch/riscv/kvm/mmu.c
-@@ -559,7 +559,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
- bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- {
- 	int ret;
--	kvm_pfn_t pfn = pte_pfn(range->pte);
-+	kvm_pfn_t pfn = pte_pfn(range->arg.pte);
- 
- 	if (!kvm->arch.pgd)
- 		return false;
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index ec169f5c7dce..d72f2b20f430 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1588,7 +1588,7 @@ static __always_inline bool kvm_handle_gfn_range(struct kvm *kvm,
- 	for_each_slot_rmap_range(range->slot, PG_LEVEL_4K, KVM_MAX_HUGEPAGE_LEVEL,
- 				 range->start, range->end - 1, &iterator)
- 		ret |= handler(kvm, iterator.rmap, range->slot, iterator.gfn,
--			       iterator.level, range->pte);
-+			       iterator.level, range->arg.pte);
- 
- 	return ret;
- }
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 512163d52194..6250bd3d20c1 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1241,7 +1241,7 @@ static bool set_spte_gfn(struct kvm *kvm, struct tdp_iter *iter,
- 	u64 new_spte;
- 
- 	/* Huge pages aren't expected to be modified without first being zapped. */
--	WARN_ON(pte_huge(range->pte) || range->start + 1 != range->end);
-+	WARN_ON(pte_huge(range->arg.pte) || range->start + 1 != range->end);
- 
- 	if (iter->level != PG_LEVEL_4K ||
- 	    !is_shadow_present_pte(iter->old_spte))
-@@ -1255,9 +1255,9 @@ static bool set_spte_gfn(struct kvm *kvm, struct tdp_iter *iter,
- 	 */
- 	tdp_mmu_iter_set_spte(kvm, iter, 0);
- 
--	if (!pte_write(range->pte)) {
-+	if (!pte_write(range->arg.pte)) {
- 		new_spte = kvm_mmu_changed_pte_notifier_make_spte(iter->old_spte,
--								  pte_pfn(range->pte));
-+								  pte_pfn(range->arg.pte));
- 
- 		tdp_mmu_iter_set_spte(kvm, iter, new_spte);
- 	}
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 9d3ac7720da9..9125d0ab642d 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -256,11 +256,15 @@ int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu);
- #endif
- 
- #ifdef KVM_ARCH_WANT_MMU_NOTIFIER
-+union kvm_mmu_notifier_arg {
-+	pte_t pte;
-+};
-+
- struct kvm_gfn_range {
- 	struct kvm_memory_slot *slot;
- 	gfn_t start;
- 	gfn_t end;
--	pte_t pte;
-+	union kvm_mmu_notifier_arg arg;
- 	bool may_block;
- };
- bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index dfbaafbe3a00..f84ef9399aee 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -526,7 +526,7 @@ typedef void (*on_unlock_fn_t)(struct kvm *kvm);
- struct kvm_hva_range {
- 	unsigned long start;
- 	unsigned long end;
--	pte_t pte;
-+	union kvm_mmu_notifier_arg arg;
- 	hva_handler_t handler;
- 	on_lock_fn_t on_lock;
- 	on_unlock_fn_t on_unlock;
-@@ -547,6 +547,8 @@ static void kvm_null_fn(void)
- }
- #define IS_KVM_NULL_FN(fn) ((fn) == (void *)kvm_null_fn)
- 
-+static const union kvm_mmu_notifier_arg KVM_NO_ARG;
-+
- /* Iterate over each memslot intersecting [start, last] (inclusive) range */
- #define kvm_for_each_memslot_in_hva_range(node, slots, start, last)	     \
- 	for (node = interval_tree_iter_first(&slots->hva_tree, start, last); \
-@@ -591,7 +593,7 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
- 			 * bother making these conditional (to avoid writes on
- 			 * the second or later invocation of the handler).
- 			 */
--			gfn_range.pte = range->pte;
-+			gfn_range.arg = range->arg;
- 			gfn_range.may_block = range->may_block;
- 
- 			/*
-@@ -632,14 +634,14 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
- static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
- 						unsigned long start,
- 						unsigned long end,
--						pte_t pte,
-+						union kvm_mmu_notifier_arg arg,
- 						hva_handler_t handler)
- {
- 	struct kvm *kvm = mmu_notifier_to_kvm(mn);
- 	const struct kvm_hva_range range = {
- 		.start		= start,
- 		.end		= end,
--		.pte		= pte,
-+		.arg		= arg,
- 		.handler	= handler,
- 		.on_lock	= (void *)kvm_null_fn,
- 		.on_unlock	= (void *)kvm_null_fn,
-@@ -659,7 +661,6 @@ static __always_inline int kvm_handle_hva_range_no_flush(struct mmu_notifier *mn
- 	const struct kvm_hva_range range = {
- 		.start		= start,
- 		.end		= end,
--		.pte		= __pte(0),
- 		.handler	= handler,
- 		.on_lock	= (void *)kvm_null_fn,
- 		.on_unlock	= (void *)kvm_null_fn,
-@@ -693,6 +694,7 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
- 					pte_t pte)
- {
- 	struct kvm *kvm = mmu_notifier_to_kvm(mn);
-+	const union kvm_mmu_notifier_arg arg = { .pte = pte };
- 
- 	trace_kvm_set_spte_hva(address);
- 
-@@ -708,7 +710,7 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
- 	if (!READ_ONCE(kvm->mmu_invalidate_in_progress))
- 		return;
- 
--	kvm_handle_hva_range(mn, address, address + 1, pte, kvm_change_spte_gfn);
-+	kvm_handle_hva_range(mn, address, address + 1, arg, kvm_change_spte_gfn);
- }
- 
- void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
-@@ -747,7 +749,6 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
- 	const struct kvm_hva_range hva_range = {
- 		.start		= range->start,
- 		.end		= range->end,
--		.pte		= __pte(0),
- 		.handler	= kvm_unmap_gfn_range,
- 		.on_lock	= kvm_mmu_invalidate_begin,
- 		.on_unlock	= kvm_arch_guest_memory_reclaimed,
-@@ -812,7 +813,6 @@ static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
- 	const struct kvm_hva_range hva_range = {
- 		.start		= range->start,
- 		.end		= range->end,
--		.pte		= __pte(0),
- 		.handler	= (void *)kvm_null_fn,
- 		.on_lock	= kvm_mmu_invalidate_end,
- 		.on_unlock	= (void *)kvm_null_fn,
-@@ -845,7 +845,7 @@ static int kvm_mmu_notifier_clear_flush_young(struct mmu_notifier *mn,
- {
- 	trace_kvm_age_hva(start, end);
- 
--	return kvm_handle_hva_range(mn, start, end, __pte(0), kvm_age_gfn);
-+	return kvm_handle_hva_range(mn, start, end, KVM_NO_ARG, kvm_age_gfn);
- }
- 
- static int kvm_mmu_notifier_clear_young(struct mmu_notifier *mn,
+Yeah, this has found a number of bugs initially. Happy to fail the
+initialisation after we've iterated over all the array (nothing is
+more annoying than fixing a bunch of errors iteratively).
 
-base-commit: fdf0eaf11452d72945af31804e2a1048ee1b574c
+> 
+> > +	}
+> > +
+> > +	kvm_info("nv: %ld coarse grained trap handlers\n",
+> > +		 ARRAY_SIZE(encoding_to_cgt));
+> > +
+> > +}
+> > +
+> > +static enum trap_behaviour get_behaviour(struct kvm_vcpu *vcpu,
+> > +					 const struct trap_bits *tb)
+> > +{
+> > +	enum trap_behaviour b = BEHAVE_HANDLE_LOCALLY;
+> > +	u64 val;
+> > +
+> > +	val = __vcpu_sys_reg(vcpu, tb->index);
+> > +	if ((val & tb->mask) == tb->value)
+> > +		b |= tb->behaviour;
+> > +
+> > +	return b;
+> > +}
+> > +
+> > +static enum trap_behaviour __do_compute_trap_behaviour(struct kvm_vcpu *vcpu,
+> > +						       const enum trap_group id,
+> > +						       enum trap_behaviour b)
+> > +{
+> > +	switch (id) {
+> > +		const enum trap_group *cgids;
+> > +
+> > +	case __RESERVED__ ... __MULTIPLE_CONTROL_BITS__ - 1:
+> > +		if (likely(id != __RESERVED__))
+> > +			b |= get_behaviour(vcpu, &coarse_trap_bits[id]);
+> > +		break;
+> > +	case __MULTIPLE_CONTROL_BITS__ ... __COMPLEX_CONDITIONS__ - 1:
+> > +		/* Yes, this is recursive. Don't do anything stupid. */
+> > +		cgids = coarse_control_combo[id - __MULTIPLE_CONTROL_BITS__];
+> > +		for (int i = 0; cgids[i] != __RESERVED__; i++)
+> > +			b |= __do_compute_trap_behaviour(vcpu, cgids[i], b);
+> 
+> Would it make sense to WARN here if one of the child trap ids was in the
+> recursive range?
+
+This might be needed at some point, but we can probably tighten it for
+now.
+
+Thanks,
+
+	M.
+
 -- 
-2.41.0.487.g6d72f3e995-goog
-
+Without deviation from the norm, progress is not possible.
