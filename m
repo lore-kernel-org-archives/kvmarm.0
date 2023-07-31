@@ -1,110 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248E41D2F6
-	for <kvmarm@lists.linux.dev>; Mon, 31 Jul 2023 17:06:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1000CC433C8;
-	Mon, 31 Jul 2023 17:06:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690823198;
-	bh=FRZSQDS+XeV4uVWI+vRMHfLJQSlvsz3j8APAeSBXyRQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bjm4JuEER9ekFbVY94POgdKp2Wdg7qWVx6hscEfKciMqwhhw59FWXry9S2NvII1Xq
-	 W3KuimbOcMaS273TtbohajLtObRWhakR+zWHG4dJMdH+TUI359NBI6kFirlh7ptA8m
-	 xmis3n4ZlpVhtH/ApHSALFTqS1okKA2N6d41f3tKDzE3C9W2NUXGOrcBYsyTmday6X
-	 DyOom4vW6QZlu3XiBGJaGSb/r4uoRzm3B5gXFrWVM7A3M5ae9K2U5cyWu8R6soUdQS
-	 Qb226g+YzUYUbWXgF3ofLisOvmT1M2W2T9+GDWHr/KJVwgtnQU+2t53hf4JgrPKBz0
-	 pMpifqPOlQcIQ==
-Date: Mon, 31 Jul 2023 18:06:28 +0100
-From: Mark Brown <broonie@kernel.org>
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc: "corbet@lwn.net" <corbet@lwn.net>, "ardb@kernel.org" <ardb@kernel.org>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"shuah@kernel.org" <shuah@kernel.org>,
-	"Szabolcs.Nagy@arm.com" <Szabolcs.Nagy@arm.com>,
-	"keescook@chromium.org" <keescook@chromium.org>,
-	"james.morse@arm.com" <james.morse@arm.com>,
-	"debug@rivosinc.com" <debug@rivosinc.com>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"oleg@redhat.com" <oleg@redhat.com>,
-	"arnd@arndb.de" <arnd@arndb.de>,
-	"ebiederm@xmission.com" <ebiederm@xmission.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	"hjl.tools@gmail.com" <hjl.tools@gmail.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
-	"palmer@dabbelt.com" <palmer@dabbelt.com>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>
-Subject: Re: [PATCH v3 21/36] arm64/mm: Implement map_shadow_stack()
-Message-ID: <0a6c90d6-f790-4036-a364-d4761fdd0e95@sirena.org.uk>
-References: <20230731-arm64-gcs-v3-0-cddf9f980d98@kernel.org>
- <20230731-arm64-gcs-v3-21-cddf9f980d98@kernel.org>
- <5461c56cf4896f18bddaa66c3beec7b909fc8fb9.camel@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2609C18B18
+	for <kvmarm@lists.linux.dev>; Mon, 31 Jul 2023 17:19:49 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d10792c7582so3585266276.3
+        for <kvmarm@lists.linux.dev>; Mon, 31 Jul 2023 10:19:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690823989; x=1691428789;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gdb7QzlYcOc7UWmxcegrKrVqMfFsYHZFCwi2LL3my64=;
+        b=zBusOqyPc9Ltaaqmju2VylABq68z3gA0yH658LtIHqnM7muXRoiPK7Z+lJWtWm/VN7
+         8whOaU6x9OiXazWcYr8fAVYmvIyO6TYz06QaVHcaE8EQS9KLvJWFds1kXHPR5gfyol/T
+         hwExr3eIMCbASZqYoMXC5wv7UZF1Mp2U4BBszuz1saEchMHIrtLN7I0wmDOtomAyfGK4
+         Jb/4sUIrkAMy5yEhhybvRPtzSFoc+rBWIZvDZCJzlFd/cD+b3RLT1Lug7yCp0xC4QWhy
+         NI1FLe1nSeay7t1G8coFkWiO2qxxWysi0sKSxyJbI8pSaEUs+h67fGOJLF0xb0FIQUeT
+         6ssw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690823989; x=1691428789;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gdb7QzlYcOc7UWmxcegrKrVqMfFsYHZFCwi2LL3my64=;
+        b=gbVPwQKqBoXAiHiOsN0QTsYTdUnYS6TA8x71bFR12BdfamohovcDhWHmNf0ULs7u/q
+         jMPaI1xF6rE1rCTXm9CwRdL6dH/mFC39SHeQupVyBz/yaP6Ny27ary/KXZIcfge1gms4
+         cV4FDyyfbhDGGo0zpBzs0cTGzbrlxAI6kEQJID6WaePY1gNZhDhBP5TfooSQksnZWAHL
+         E5E8hl2V5UZZxcRhNjSWI7wIZBlwvF52hT6H9n/RoKmlPPAGSbZk0fcpjLKlFSQDzJi9
+         CRnvowGtcCMtXQu4rKg4Xegg3qPJIeF8v4hldgfNLO+oZxFACprKfJWk+nZ9I7IxTCle
+         BxMw==
+X-Gm-Message-State: ABy/qLZoDGZYEPkoi4+n2qEUNFEAFEoktQCC0hAzETd8cesRT7yjru5r
+	rTtlFzrd/Sa39xLHzkcBP2ofa4oXD2Q=
+X-Google-Smtp-Source: APBJJlGDPfFjSpxr1qlDSkpPLfZlx10bTCXz+EMu9wyIQgv1N0AgtgkGqemxSj6OVMzULEQvuuVcsCXfoZ4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:abe3:0:b0:d22:4059:b2bd with SMTP id
+ v90-20020a25abe3000000b00d224059b2bdmr62850ybi.1.1690823989036; Mon, 31 Jul
+ 2023 10:19:49 -0700 (PDT)
+Date: Mon, 31 Jul 2023 10:19:47 -0700
+In-Reply-To: <ZMfpgu8bHH0jA8Si@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="qSNeFAfZluwl23Q1"
-Content-Disposition: inline
-In-Reply-To: <5461c56cf4896f18bddaa66c3beec7b909fc8fb9.camel@intel.com>
-X-Cookie: Single tasking: Just Say No.
+Mime-Version: 1.0
+References: <20230729003643.1053367-1-seanjc@google.com> <20230729003643.1053367-10-seanjc@google.com>
+ <20230731-91b64a6b787ba7e23b285785@orel> <ZMfpgu8bHH0jA8Si@google.com>
+Message-ID: <ZMftM3qz/VqalbPg@google.com>
+Subject: Re: [PATCH v4 09/34] KVM: selftests: Add a selftest for guest prints
+ and formatted asserts
+From: Sean Christopherson <seanjc@google.com>
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Thomas Huth <thuth@redhat.com>, 
+	"Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?=" <philmd@linaro.org>, Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
+On Mon, Jul 31, 2023, Sean Christopherson wrote:
+> On Mon, Jul 31, 2023, Andrew Jones wrote:
+> > diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
+> > index 4cf69fa8bfba..4adf526dc378 100644
+> > --- a/tools/testing/selftests/kvm/include/ucall_common.h
+> > +++ b/tools/testing/selftests/kvm/include/ucall_common.h
+> > @@ -6,8 +6,19 @@
+> >   */
+> >  #ifndef SELFTEST_KVM_UCALL_COMMON_H
+> >  #define SELFTEST_KVM_UCALL_COMMON_H
+> > +#include <linux/kvm.h>
+> >  #include "test_util.h"
+> >  
+> > +#if defined(__aarch64__)
+> > +#define UCALL_EXIT_REASON      KVM_EXIT_MMIO
+> > +#elif defined(__x86_64__)
+> > +#define UCALL_EXIT_REASON      KVM_EXIT_IO
+> > +#elif defined(__s390x__)
+> > +#define UCALL_EXIT_REASON      KVM_EXIT_S390_SIEIC
+> > +#elif defined(__riscv)
+> > +#define UCALL_EXIT_REASON      KVM_EXIT_RISCV_SBI
+> > +#endif
+> > +
+> >  /* Common ucalls */
+> >  enum {
+> >         UCALL_NONE,
+> > 
+> > and then compiled the test for riscv and it passed. I also ran all other
+> > riscv tests successfully.
+> 
+> Can I have your SoB for the ucall_common.h patch?  I'll write a changelog and fold
+> in a separate prep patch for that change.
 
---qSNeFAfZluwl23Q1
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Mon, Jul 31, 2023 at 03:56:50PM +0000, Edgecombe, Rick P wrote:
-> On Mon, 2023-07-31 at 14:43 +0100, Mark Brown wrote:
-
-> Any thoughts on the questions at the end of this mail?
-
-> https://lore.kernel.org/lkml/7a4c97f68347d4188286c543cdccaa12577cdb9e.camel@intel.com/
-
-Those are:
-
-> Someday when the x86 side is finally upstream I have a manpage for
-> map_shadow_stack. Any differences on the arm side would need to be
-> documented, but I'm not sure why there should be any differences. Like,
-> why not use the same flags? Or have a new flag for token+end marker
-> that x86 can use as well?
-
-Ah, it wasn't clear to me that this was a question rather than just
-open decisions about the eventual manpage.  Looking again I think what
-you're asking about is that I see that at some point in development I
-lost the SHADOW_STACK_SET_TOKEN flag which x86 has.  I suspect that was
-a rebasing issue as it wasn't a deliberate decision, there's no reason
-we couldn't have that.  Other than that and the fact that we add both a
-stack swap token and a top of stack marker I'm not aware of any
-differences.
-
---qSNeFAfZluwl23Q1
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmTH6hMACgkQJNaLcl1U
-h9C+/gf/fsd2+OP2IaWypYsnLbn4+Z1/XZAFZ/PaT8xKzJcuY77+Lo6ndMnLLuOt
-lJFPNM7SLDezZnZg8F06EmCFpye2/RpYHqaT1bXNOoYwl4yTF/xA5G5etJ/I3h7G
-fjaivE8ywdwUVINFANweDX+K+sCPIrepHdmGTdpGhasbLKOUg632qN9NaEKc5anx
-xCI48CteSjjSMr4a1Fwk6PavgzpONlo6DkUl0vlHevKJazDzFCApCQvVAITtCVYm
-eX0DriUi0Leu4vALeh7sbw/a1P0YkzRNZ16ydPLPmyGlQHgA6wSJ9+Nb5BdPe4xv
-5gXikyjfTIEVFjyHFKfoj74bAtq0SA==
-=Wdxm
------END PGP SIGNATURE-----
-
---qSNeFAfZluwl23Q1--
+On second thought, I take that back.  I think it makes more sense to add a ucall.h
+for each arch and #define the exit type there.  All then move all of the
+ucall_arch_do_ucall() implementations to ucall.h (except maybe x86 while it has
+the horrific save/restore GPRs hack...).  That way the #define is colocated with
+the code that generates the exit reason.
