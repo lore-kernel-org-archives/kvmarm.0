@@ -1,106 +1,111 @@
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2222B17FEB
-	for <kvmarm@lists.linux.dev>; Mon, 31 Jul 2023 11:54:22 +0000 (UTC)
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-51e24210395so14491a12.0
-        for <kvmarm@lists.linux.dev>; Mon, 31 Jul 2023 04:54:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690804461; x=1691409261;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=gz0q8+TIeyvXDOgRq+KfnkJDaIgp0/SlphpP3zWMP/E=;
-        b=XRNsIN1avnppiien8YxCEWFle10nCOmQ+kwurgqaTXK0d2hjk8sJ+Ez1rQAOq3cAGX
-         b/Kd3eGu49FAfCui72UHxLWSCtAf6qJDx2di4Zfl60Y14XySIsSPy8mV+P76SFt+BpLa
-         eHR3EWbi1KvWolPrA9VVohRqCOM6koDVX1cOGBtK+4ThU6XoZW/v4FnWXP+OVQ25lfwI
-         DmErcvzFD3HDVpRQKPSzNEc+GltK8yySRKypZw9dKIx5BHmSu0cS9vqhQuG1LoLcpD06
-         TaZg0uTME4TA9uAedn2CS7DEBVPlsDhIgYO19YgP/80uUvbfqMV0RObGTudCVNhI7IwJ
-         1s4w==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D4768BE2
+	for <kvmarm@lists.linux.dev>; Mon, 31 Jul 2023 12:43:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690807430;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EJVOiifSKqg3nLbgg7S3p9Y1lh8OIZxrU3xoQ6MEvUQ=;
+	b=AGmQmlVh1E93n8EloUMKb2XsG6zREYvLWxhwt6AjcyYQ3rYLD1jOauU7UR96D5p+rnNKqy
+	5MgtTMHoon9/qPtjkA6fS6pxT3xLdUsiUCaAgA/e0mptqcGsYlJ0mzkQc/1Ghd5w0JRLbj
+	hSCHmlT2XLJvcIZzmkfF/sg5D//yFH8=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-515-MwQL3gfuNmujpYtcnmiAwg-1; Mon, 31 Jul 2023 08:43:49 -0400
+X-MC-Unique: MwQL3gfuNmujpYtcnmiAwg-1
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-51dcec9425bso751653a12.0
+        for <kvmarm@lists.linux.dev>; Mon, 31 Jul 2023 05:43:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690804461; x=1691409261;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gz0q8+TIeyvXDOgRq+KfnkJDaIgp0/SlphpP3zWMP/E=;
-        b=QwmPaBE6AUJGLL1/uOgi0kuzF9Q6qxOJFxel7zTWcEYSCx6sXGy8H3Vxfn48ACv9xd
-         EJSwx0hu6RiAjkutkU2HOMmEldjyxy2RX7uGNTFu6MwV5gwm4Afs+97YsbdySR16ToJB
-         i35CLvmoC2fLvSNfW6gczJBfGCrg0Esmh/OJfFQufSdUc4TfU1Mk6dXiMowduVPqywpK
-         trLVGdqcgbw5vql45xz7MrmZSxjsBFQxtM5RSJgI/HiGWVAtRumTFy4V0nDA/83vPxIU
-         AbM707GPx6izFvDkLsvISmGngz0MZvxA5XjZZTDIIlga1GIp1bY7hsOuwZvF0otUQ7Q5
-         BKsg==
-X-Gm-Message-State: ABy/qLb2Yi71x8mXTvENE+eFglG8d/YEPJKAJldofhPjfXa40rD0/02f
-	WCCA8wt/NG56n3G+WjG+U888BiJNorGXhlik+rZmHQ==
-X-Google-Smtp-Source: APBJJlH9ttptvP7TRn9A19ifvlq3YB7zBN0BwZYm9jpsOz2Ht0ztBRLCTPm1vh9MkDMgZpKHpde9CgVynyUPQZ/Yfsc=
-X-Received: by 2002:a50:f69e:0:b0:522:3c11:1780 with SMTP id
- d30-20020a50f69e000000b005223c111780mr155438edn.0.1690804460991; Mon, 31 Jul
- 2023 04:54:20 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1690807428; x=1691412228;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EJVOiifSKqg3nLbgg7S3p9Y1lh8OIZxrU3xoQ6MEvUQ=;
+        b=lZHiVwCma8L+JF5KGCyyAaMjdApjZqXExm+mF+GHgRiYmCd6oL9aTPkGNzbc8Wynkb
+         2JR3h2/irU/i4HxNBB7uGzKOZDVPyHqzVFT4cBQrz/7lBI4+EYrdqS9ukcGU3JGyOgHJ
+         5z7E44e4F5d3PlIPi+uC2oDWS4lo3tzZ51uGJK6LM+/+eFLA506c7TEbE+2aCMp1stYI
+         6dEzuur0mlMZGLquxXO8XIEDx9mlQcwfmr0q5wVG6em2s22e03S/Q1/EFG6kYq+mKILS
+         LqCgQyKIjsOhMb1HHupkYY1aupnFqdOBQGK7bOTk9Z4y42ghGLFBsRCPOADaUtGS674M
+         IYJw==
+X-Gm-Message-State: ABy/qLZ+F7dJgmdkzDePr/eZlXfZK8vNJjRCBmYFY0jYI2rB6S+lESGn
+	4srWO8+JUlNQkNnZkCII4Oyh6SrnKtBfm1zU6Jvca9mbiroRGGldpyIoI+ni0y9MOwMWCj7/Lte
+	oCFOqaFwsmg7CvesW
+X-Received: by 2002:a05:6a00:4397:b0:677:bb4c:c321 with SMTP id bt23-20020a056a00439700b00677bb4cc321mr8220450pfb.0.1690807428339;
+        Mon, 31 Jul 2023 05:43:48 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGLdC+KxPsvQvv44Qq7TtHjMJ6Pbcb5BXPBbR5vT3tQqosU/nNGKSPgWx015P2wu/g0nE7nDQ==
+X-Received: by 2002:a05:6a00:4397:b0:677:bb4c:c321 with SMTP id bt23-20020a056a00439700b00677bb4cc321mr8220432pfb.0.1690807428013;
+        Mon, 31 Jul 2023 05:43:48 -0700 (PDT)
+Received: from [10.72.12.26] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id c12-20020aa781cc000000b00679d3fb2f92sm7509701pfn.154.2023.07.31.05.43.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 31 Jul 2023 05:43:47 -0700 (PDT)
+Message-ID: <84e864b1-9b50-af18-1d1c-1021adb6cb92@redhat.com>
+Date: Mon, 31 Jul 2023 20:43:43 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230728181907.1759513-1-reijiw@google.com> <20230728181907.1759513-3-reijiw@google.com>
- <ZMQckrDB7tg9gPfw@linux.dev>
-In-Reply-To: <ZMQckrDB7tg9gPfw@linux.dev>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Mon, 31 Jul 2023 04:54:04 -0700
-Message-ID: <CAAeT=FyC42s=kcS3QTC6A-s6EZjhoQL7XJyxWCb5YyisJrQvdg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/5] KVM: arm64: PMU: Disallow vPMU on non-uniform
- PMUVer systems
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, James Morse <james.morse@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Jing Zhang <jingzhangos@google.com>, 
-	Raghavendra Rao Anata <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v1] KVM: arm64: Remove redundant kvm_set_pfn_accessed()
+ from user_mem_abort()
+To: Fuad Tabba <tabba@google.com>, kvmarm@lists.linux.dev
+Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org,
+ james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ catalin.marinas@arm.com
+References: <20230731114110.2673451-1-tabba@google.com>
+From: Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <20230731114110.2673451-1-tabba@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Oliver,
 
-> This doesn't actually disallow userspace from configuring a vPMU, it
-> only hides the KVM cap. kvm_host_pmu_init() will still insert the host
-> PMU instance in the list of valid PMUs, and there doesn't appear to be
-> any check against the static key anywhere on that path.
 
-In v6.5-rc3, which I used as the base, or even in v6.5-rc4,
-it appears kvm_reset_vcpu() checks against the static key.
-So, the initial KVM_ARM_VCPU_INIT with vPMU configured will
-fail on the systems.  Or am I missing something ? (Or is that
-going to be removed by other patches that are already queued?)
+On 7/31/23 19:40, Fuad Tabba wrote:
+> The function user_mem_abort() calls kvm_release_pfn_clean(),
+> which eventually calls kvm_set_page_accessed(). Therefore, remove
+> the redundant call to kvm_set_pfn_accessed().
+> 
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> 
+> ---
+> 
+> Based on 6.5-rc4
+> 
+> The call to kvm_set_pfn_accessed() was originally introduced in
+> 35307b9a5f7e ("arm/arm64: KVM: Implement Stage-2 page aging"). At
+> the time, kvm_release_pfn_clean() did not set accessed (neither
+> directly nor indirectly).
+> 
+>   arch/arm64/kvm/mmu.c | 1 -
+>   1 file changed, 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index d3b4feed460c..137b775d238b 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1541,7 +1541,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>   
+>   out_unlock:
+>   	read_unlock(&kvm->mmu_lock);
+> -	kvm_set_pfn_accessed(pfn);
+>   	kvm_release_pfn_clean(pfn);
+>   	return ret != -EAGAIN ? ret : 0;
+>   }
+> 
+> base-commit: 5d0c230f1de8c7515b6567d9afba1f196fb4e2f4
 
-But, right, it still insert the host PMU instance in the list,
-which is unnecessary.
+-- 
+Shaoqin
 
-> I actually prefer where we flip the static key, as PMU context switching
-> depends on both KVM support as well as the PMU driver coming up successfully.
-> Instead, you could hoist the check against the sanitised PMU version into
-> kvm_host_pmu_init(), maybe something like:
-
-Thank you, it looks better.  I will fix this in v3.
-
-Thank you,
-Reiji
-
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index 560650972478..f6a0e558472f 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -672,8 +672,11 @@ void kvm_host_pmu_init(struct arm_pmu *pmu)
->  {
->         struct arm_pmu_entry *entry;
->
-> -       if (pmu->pmuver == ID_AA64DFR0_EL1_PMUVer_NI ||
-> -           pmu->pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
-> +       /*
-> +        * Check the sanitised PMU version for the system, as KVM does not
-> +        * support implementations where PMUv3 exists on a subset of CPUs.
-> +        */
-> +       if (!pmuv3_implemented(kvm_arm_pmu_get_pmuver_limit()))
->                 return;
->
->         mutex_lock(&arm_pmus_lock);
->
-> --
-> Thanks,
-> Oliver
