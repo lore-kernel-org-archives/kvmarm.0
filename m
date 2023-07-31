@@ -1,24 +1,24 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAA1718AF0
-	for <kvmarm@lists.linux.dev>; Mon, 31 Jul 2023 13:53:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03A86C433C8;
-	Mon, 31 Jul 2023 13:53:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1216318AF0
+	for <kvmarm@lists.linux.dev>; Mon, 31 Jul 2023 13:53:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DD39C43397;
+	Mon, 31 Jul 2023 13:53:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690811622;
-	bh=DtrqsekNxnVEUxJ8rAESK/JTguJ8OvysbbylOwjoIT0=;
+	s=k20201202; t=1690811628;
+	bh=JCh6BoCIOxePO8zZIr/FO/CERnc7ZRYHEz9dpM/Qpg4=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=O9K8zuiNB4AX6jriKk+IKc8QqdSKHUHcFfrfwmc3ac6QbErQDo57U8FZvslXRTDVC
-	 VakvGu1gY5FavBmVshV4STYKEySuvYK2PhJzfRRtBFQwP73F20wQxDUjJCXfjS5Ul3
-	 IJR1QtLw0jt/Xpjl6fYKua+esGpsn79HEGA5TE0D+fgTyjDWQsoEp4hDsmJQhDArXL
-	 5HfjetwT9sjfk3O/bfLXbm3wYwKWbJ3FRGTtR+bY/GfRci3de9KisArHJ4Q9rGA/Mz
-	 cq3HJtkwUqzACrXHQYk15esmEhB68D+f7nlj6oTtn16rvtHQHFb2d9+WPc+f8PTT7U
-	 OtITS8mqcfIMA==
+	b=lKNxW4L2tfcDqraAr6F+eZmSso+52kd8zPLGqPLF7s7q7099ebmcfKMNRHP91iV/G
+	 xueonqLxvZa/pD9BkvH/MivJ5PcOeyUqPkI/ksqjIffYeV8WuSn4farpdW5PSSYU7f
+	 p5zADzGaQjJnXkFuAxqGeFcuSAql7LhS5Zt+K/NpxLBR0Ke8YJ5xmEPH7Hc3GTwIm0
+	 58EDdrSVQ6Z8ZibxBrl++4FeXu4Kdpf+z9URn3CvQsQDuGYhIdp1o8llmkLEU9l1Sr
+	 A6/gK15baetyOYG19ubBXBVfubyeInnRba5KFhaWsyho+0qmdRgrwORxtMJqE8Fwc1
+	 sNDOVQgyCwi8Q==
 From: Mark Brown <broonie@kernel.org>
-Date: Mon, 31 Jul 2023 14:43:37 +0100
-Subject: [PATCH v3 28/36] kselftest/arm64: Add framework support for GCS to
- signal handling tests
+Date: Mon, 31 Jul 2023 14:43:38 +0100
+Subject: [PATCH v3 29/36] kselftest/arm64: Allow signals tests to specify
+ an expected si_code
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,7 +27,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230731-arm64-gcs-v3-28-cddf9f980d98@kernel.org>
+Message-Id: <20230731-arm64-gcs-v3-29-cddf9f980d98@kernel.org>
 References: <20230731-arm64-gcs-v3-0-cddf9f980d98@kernel.org>
 In-Reply-To: <20230731-arm64-gcs-v3-0-cddf9f980d98@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>, 
@@ -49,57 +49,84 @@ Cc: "H.J. Lu" <hjl.tools@gmail.com>,
  linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
  linux-riscv@lists.infradead.org, Mark Brown <broonie@kernel.org>
 X-Mailer: b4 0.13-dev-099c9
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1590; i=broonie@kernel.org;
- h=from:subject:message-id; bh=DtrqsekNxnVEUxJ8rAESK/JTguJ8OvysbbylOwjoIT0=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBkx7wqgR9k9UmKVeYwbJCXK8DDVrg/O/vUKa8AJPNk
- 2cx3qISJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZMe8KgAKCRAk1otyXVSH0E5ACA
- CB3Cuwt9bhshDd1kAHz2FXtQ94bJICeYI6XIl030VoGhuTVoW3KYurlDA6diyyqgMMdF5rkd9sUkHV
- KrnDyP1YNHd1RypHUGYVydit6zCkjK2awBOF3QLDq3MQ6n8vcp7Pho0JNrRRVN8MTVmHtH3qCayMg5
- /rLJHuuwFHe6FuT/n0bfidwh82okjuLRxurloD/HR46gwf0MdSzvC+iREX4Cc03B0XHEQW5KJ9ikPP
- jpDi60CqWMgIQT5omDltBaFssfj3ig7DVamif2hfibyXwTMczsFbfxnoFZA2QlmqYGM1TPZtRMGkRd
- xmpYzpeB1OwkckX6g6lclBeDXikdBy
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2627; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=JCh6BoCIOxePO8zZIr/FO/CERnc7ZRYHEz9dpM/Qpg4=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBkx7wrJ2MMKCplHFo4w2qqAyy67RZ+wtID1tflTa1/
+ uaTYBWWJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZMe8KwAKCRAk1otyXVSH0IuOB/
+ oD/ulWvA32HthWh0oU1DvnYa32FuSCyjtSBAepaH6LfBjFMSA1fvx6PxD32vTTjAp5nVpTQiRrbAE1
+ 3X4LRViyLC1kgFSWgNvcY79EmKBJJZzxdbySSZZCrcakqc3KkAaEOoJQ8VMvN3e+69VXx+r7rxBBBt
+ IJZnORrlLDhDxb06Ae8LHHOf5rhQRZfQB90Iomm8X3gsOXZTqYtHDbZkaUhIhLjIrXtgsOH1pyWQIN
+ sTgLU2qRNBfwsCSPNr3gV8eczbcQD7AjJJIz/hQVu+OSmJkT4IemNRTzqg+lTtbytwoEFhoIz3ukLY
+ KZnYL18EEQc9x2gjy7OmhnjjF+Esr2
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-Teach the framework about the GCS signal context, avoiding warnings on
-the unknown context.
+Currently we ignore si_code unless the expected signal is a SIGSEGV, in
+which case we enforce it being SEGV_ACCERR. Allow test cases to specify
+exactly which si_code should be generated so we can validate this, and
+test for other segfault codes.
 
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- tools/testing/selftests/arm64/signal/testcases/testcases.c | 7 +++++++
- tools/testing/selftests/arm64/signal/testcases/testcases.h | 1 +
- 2 files changed, 8 insertions(+)
+ .../testing/selftests/arm64/signal/test_signals.h  |  4 +++
+ .../selftests/arm64/signal/test_signals_utils.c    | 29 ++++++++++++++--------
+ 2 files changed, 23 insertions(+), 10 deletions(-)
 
-diff --git a/tools/testing/selftests/arm64/signal/testcases/testcases.c b/tools/testing/selftests/arm64/signal/testcases/testcases.c
-index 9f580b55b388..1cd124732be4 100644
---- a/tools/testing/selftests/arm64/signal/testcases/testcases.c
-+++ b/tools/testing/selftests/arm64/signal/testcases/testcases.c
-@@ -209,6 +209,13 @@ bool validate_reserved(ucontext_t *uc, size_t resv_sz, char **err)
- 			zt = (struct zt_context *)head;
- 			new_flags |= ZT_CTX;
- 			break;
-+		case GCS_MAGIC:
-+			if (flags & GCS_CTX)
-+				*err = "Multiple GCS_MAGIC";
-+			if (head->size != sizeof(struct gcs_context))
-+				*err = "Bad size for gcs_context";
-+			new_flags |= GCS_CTX;
-+			break;
- 		case EXTRA_MAGIC:
- 			if (flags & EXTRA_CTX)
- 				*err = "Multiple EXTRA_MAGIC";
-diff --git a/tools/testing/selftests/arm64/signal/testcases/testcases.h b/tools/testing/selftests/arm64/signal/testcases/testcases.h
-index a08ab0d6207a..9b2599745c29 100644
---- a/tools/testing/selftests/arm64/signal/testcases/testcases.h
-+++ b/tools/testing/selftests/arm64/signal/testcases/testcases.h
-@@ -19,6 +19,7 @@
- #define ZA_CTX		(1 << 2)
- #define EXTRA_CTX	(1 << 3)
- #define ZT_CTX		(1 << 4)
-+#define GCS_CTX		(1 << 5)
- 
- #define KSFT_BAD_MAGIC	0xdeadbeef
- 
+diff --git a/tools/testing/selftests/arm64/signal/test_signals.h b/tools/testing/selftests/arm64/signal/test_signals.h
+index 7ada43688c02..ee75a2c25ce7 100644
+--- a/tools/testing/selftests/arm64/signal/test_signals.h
++++ b/tools/testing/selftests/arm64/signal/test_signals.h
+@@ -71,6 +71,10 @@ struct tdescr {
+ 	 * Zero when no signal is expected on success
+ 	 */
+ 	int			sig_ok;
++	/*
++	 * expected si_code for sig_ok, or 0 to not check
++	 */
++	int			sig_ok_code;
+ 	/* signum expected on unsupported CPU features. */
+ 	int			sig_unsupp;
+ 	/* a timeout in second for test completion */
+diff --git a/tools/testing/selftests/arm64/signal/test_signals_utils.c b/tools/testing/selftests/arm64/signal/test_signals_utils.c
+index 89ef95c1af0e..63deca32b0df 100644
+--- a/tools/testing/selftests/arm64/signal/test_signals_utils.c
++++ b/tools/testing/selftests/arm64/signal/test_signals_utils.c
+@@ -143,16 +143,25 @@ static bool handle_signal_ok(struct tdescr *td,
+ 			"current->token ZEROED...test is probably broken!\n");
+ 		abort();
+ 	}
+-	/*
+-	 * Trying to narrow down the SEGV to the ones generated by Kernel itself
+-	 * via arm64_notify_segfault(). This is a best-effort check anyway, and
+-	 * the si_code check may need to change if this aspect of the kernel
+-	 * ABI changes.
+-	 */
+-	if (td->sig_ok == SIGSEGV && si->si_code != SEGV_ACCERR) {
+-		fprintf(stdout,
+-			"si_code != SEGV_ACCERR...test is probably broken!\n");
+-		abort();
++	if (td->sig_ok_code) {
++		if (si->si_code != td->sig_ok_code) {
++			fprintf(stdout, "si_code is %d not %d\n",
++				si->si_code, td->sig_ok_code);
++			abort();
++		}
++	} else {
++		/*
++		 * Trying to narrow down the SEGV to the ones
++		 * generated by Kernel itself via
++		 * arm64_notify_segfault(). This is a best-effort
++		 * check anyway, and the si_code check may need to
++		 * change if this aspect of the kernel ABI changes.
++		 */
++		if (td->sig_ok == SIGSEGV && si->si_code != SEGV_ACCERR) {
++			fprintf(stdout,
++				"si_code != SEGV_ACCERR...test is probably broken!\n");
++			abort();
++		}
+ 	}
+ 	td->pass = 1;
+ 	/*
 
 -- 
 2.30.2
