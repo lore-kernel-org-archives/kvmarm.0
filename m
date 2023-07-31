@@ -1,114 +1,163 @@
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 702221D319
-	for <kvmarm@lists.linux.dev>; Mon, 31 Jul 2023 18:22:57 +0000 (UTC)
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-4fe426521adso217852e87.0
-        for <kvmarm@lists.linux.dev>; Mon, 31 Jul 2023 11:22:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 764571DDCA
+	for <kvmarm@lists.linux.dev>; Mon, 31 Jul 2023 18:26:22 +0000 (UTC)
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3490b737f9aso14095ab.0
+        for <kvmarm@lists.linux.dev>; Mon, 31 Jul 2023 11:26:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1690827775; x=1691432575;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q6BmQQ8xDHQ3qzVuwILJuAltF2TxUquAINpFxWwuR3w=;
-        b=RTUp1GcE9TWV1qTvNE1C02wFkvp/rEJhtk+51nISvyjgPTusv53crdnWdpbT2WDNpC
-         9czQGReCauWeNFu8mJtHkId8ASDjhvZWALHZh+SyhEMqoUTqhxssydzxa6uZBKj0qYrD
-         vcyzEEjHdxO76TNZyKc9O24YAUeb5rdAfQi7xglRc7Oz8U/VK20seE+TqLxPiIUEF2AF
-         p2ypuV+xtoforGGsa/Lt/KyL8w4KTS3XdMdpYfXyMrVCX/d56Us0p1xCWIGjqH506lyL
-         NZbaDWWhUfPFLWX9TmHQaEyEA1UmGoVZusjLFfEFIf7D4qJ0RegD+CSe3GcPeA3rkzoJ
-         xi6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690827775; x=1691432575;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20221208; t=1690827981; x=1691432781;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Q6BmQQ8xDHQ3qzVuwILJuAltF2TxUquAINpFxWwuR3w=;
-        b=dQw1O37BoYfMDr9qGJQnLfxPt2BlP71ADgq2Qlgl4p9k9bB1sjt8FeBW9QIBYd3SKP
-         SeQjfnF3CyUyzKXQRNqnoMfTt0CzqSmmeuHy7HaPOIcQMxM2UyYMkQsrysgpVJmMIkhx
-         H8hKbso0S6c59pvmjUOLMuNy1CjItHUln+6vFYYTD1R8MWL5ODicA7bFDFrmjnU6mCPy
-         mjF5yCTSoz5TCgvfP2oOuYyEjmfKUdySMwhNdwf0UzoPlETFQZtD9E8iD89XpWqeuI0X
-         Itf77H6TiSEsHU4HezEw7FgPbGSbSf+oeSiq13R+g80jxZ5cYWn0TjWnysQEtP5qYM8O
-         W70A==
-X-Gm-Message-State: ABy/qLb0aN5xq2RjZ4VqdAR2yCLfqrUNVAHURAyHqQmOSK/WW6Jc+igo
-	LoTUyzHh4t8NYU5eudVpPalnAQ==
-X-Google-Smtp-Source: APBJJlE51QtfiG+1ENPBZcz/MTN10/l7Xyhmr/3dD4Lp00ivZz+NffJEl0iYsoUxrdAsUIsDuqY10A==
-X-Received: by 2002:ac2:5e34:0:b0:4fe:3e89:fcb1 with SMTP id o20-20020ac25e34000000b004fe3e89fcb1mr383296lfg.68.1690827775288;
-        Mon, 31 Jul 2023 11:22:55 -0700 (PDT)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id u7-20020a170906408700b0098de7d28c34sm6476150ejj.193.2023.07.31.11.22.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 11:22:54 -0700 (PDT)
-Date: Mon, 31 Jul 2023 20:22:54 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Thomas Huth <thuth@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>, 
-	Aaron Lewis <aaronlewis@google.com>
-Subject: Re: [PATCH v4 09/34] KVM: selftests: Add a selftest for guest prints
- and formatted asserts
-Message-ID: <20230731-4335e61b2b2688a925025a9c@orel>
-References: <20230729003643.1053367-1-seanjc@google.com>
- <20230729003643.1053367-10-seanjc@google.com>
- <20230731-91b64a6b787ba7e23b285785@orel>
- <ZMfpgu8bHH0jA8Si@google.com>
- <ZMftM3qz/VqalbPg@google.com>
+        bh=6LZEdaDlAMdQP6JhmjsArIuxox1zxEtjjTY2SzD6PsU=;
+        b=5fgkkTfZTjvrkPsV2OAsWS7fGDKlkOo6NBkGxlUad6Djf9YF4mNXTcZwmQCCLJ1nBy
+         ytvPZa3KoE6pLMDaS1L4gdmZaOfNzKXtsa1fikLeZSNL0jSNWYpUTY8GHiEMpPSUIhEf
+         GKZr2wZjg6oExHWyVPblSGkoydBcnRJu278I6bHizaXll85ZaXfkAb9ISQ34veJLXVin
+         H4LgRU66ITkpG1C45xmAlPZe5ifFrojIcI163nCjGKu3BAHmTrdfA2g91PJ4XmMzNAwE
+         6qNdJbd/ZgVe0FTRRBae2q8TCC7NnJ6KmTDr6JnJgqJf5rkyLUFJCut3v7Lu9kIPHxwj
+         tGnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690827981; x=1691432781;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6LZEdaDlAMdQP6JhmjsArIuxox1zxEtjjTY2SzD6PsU=;
+        b=A4psQXNvJ7MAHtsxo/ljbKJCAa7vRi5y5ryNPrLznmDBqOBUu6r55qpSez4HOps7x4
+         VTw5847zfdPDtMH1WO+ALIpps0nKFbGK/cVxllgDmzEXOZCuemhMvlGtHrZFGL1Vzt2v
+         kkuQyV2isaLEidogVB7pRKHh4JF5ESNO61mBNvV5//5W5i7FQZMkximpgu16ZPXxZvWB
+         BFEU23rYQyf6eLlg7YuN5ghjxtdNLT4dTx/m8Ey/g0LUIBlIfF4B3Fx9pZGcPgus+lpn
+         pwHEYMKWSa7crQ3uQUcuZw65NKdUEoHsXqV5SYaGz84Byv7iTOh1VXFu5s1T0vU9s+gq
+         N6GQ==
+X-Gm-Message-State: ABy/qLbowXGsroR1ldB4Diu64qs6pV3Tl60sjW3TfE28T1NI0oFQSuSD
+	RN6F2MzVRgvtAuR1F7rQ55zvLhEaq/iUKz76vIhTaw==
+X-Google-Smtp-Source: APBJJlHJ2q+Ibhsyd21GC77gr96XZana1MhNnQDJBDO6Init3JyGxBHBc9FYe6705xtGHxT1vNNwqYdqSlhzUk4wwtA=
+X-Received: by 2002:a05:6e02:16c5:b0:345:dcdf:206b with SMTP id
+ 5-20020a056e0216c500b00345dcdf206bmr693992ilx.25.1690827981339; Mon, 31 Jul
+ 2023 11:26:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZMftM3qz/VqalbPg@google.com>
+References: <20230722022251.3446223-1-rananta@google.com> <20230722022251.3446223-13-rananta@google.com>
+ <87jzulqz0v.wl-maz@kernel.org>
+In-Reply-To: <87jzulqz0v.wl-maz@kernel.org>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Mon, 31 Jul 2023 11:26:09 -0700
+Message-ID: <CAJHc60zGzAqWw2iZwNEG_bWERXkz_io7ae-K_tf_kh6xcOBxLA@mail.gmail.com>
+Subject: Re: [PATCH v7 12/12] KVM: arm64: Use TLBI range-based intructions for unmap
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Sean Christopherson <seanjc@google.com>, Huacai Chen <chenhuacai@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Jing Zhang <jingzhangos@google.com>, 
+	Reiji Watanabe <reijiw@google.com>, Colton Lewis <coltonlewis@google.com>, 
+	David Matlack <dmatlack@google.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 31, 2023 at 10:19:47AM -0700, Sean Christopherson wrote:
-> On Mon, Jul 31, 2023, Sean Christopherson wrote:
-> > On Mon, Jul 31, 2023, Andrew Jones wrote:
-> > > diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
-> > > index 4cf69fa8bfba..4adf526dc378 100644
-> > > --- a/tools/testing/selftests/kvm/include/ucall_common.h
-> > > +++ b/tools/testing/selftests/kvm/include/ucall_common.h
-> > > @@ -6,8 +6,19 @@
-> > >   */
-> > >  #ifndef SELFTEST_KVM_UCALL_COMMON_H
-> > >  #define SELFTEST_KVM_UCALL_COMMON_H
-> > > +#include <linux/kvm.h>
-> > >  #include "test_util.h"
-> > >  
-> > > +#if defined(__aarch64__)
-> > > +#define UCALL_EXIT_REASON      KVM_EXIT_MMIO
-> > > +#elif defined(__x86_64__)
-> > > +#define UCALL_EXIT_REASON      KVM_EXIT_IO
-> > > +#elif defined(__s390x__)
-> > > +#define UCALL_EXIT_REASON      KVM_EXIT_S390_SIEIC
-> > > +#elif defined(__riscv)
-> > > +#define UCALL_EXIT_REASON      KVM_EXIT_RISCV_SBI
-> > > +#endif
-> > > +
-> > >  /* Common ucalls */
-> > >  enum {
-> > >         UCALL_NONE,
-> > > 
-> > > and then compiled the test for riscv and it passed. I also ran all other
-> > > riscv tests successfully.
-> > 
-> > Can I have your SoB for the ucall_common.h patch?  I'll write a changelog and fold
-> > in a separate prep patch for that change.
-> 
-> On second thought, I take that back.  I think it makes more sense to add a ucall.h
-> for each arch and #define the exit type there.  All then move all of the
-> ucall_arch_do_ucall() implementations to ucall.h (except maybe x86 while it has
-> the horrific save/restore GPRs hack...).  That way the #define is colocated with
-> the code that generates the exit reason.
+On Thu, Jul 27, 2023 at 6:12=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> On Sat, 22 Jul 2023 03:22:51 +0100,
+> Raghavendra Rao Ananta <rananta@google.com> wrote:
+> >
+> > The current implementation of the stage-2 unmap walker traverses
+> > the given range and, as a part of break-before-make, performs
+> > TLB invalidations with a DSB for every PTE. A multitude of this
+> > combination could cause a performance bottleneck on some systems.
+> >
+> > Hence, if the system supports FEAT_TLBIRANGE, defer the TLB
+> > invalidations until the entire walk is finished, and then
+> > use range-based instructions to invalidate the TLBs in one go.
+> > Condition deferred TLB invalidation on the system supporting FWB,
+> > as the optimization is entirely pointless when the unmap walker
+> > needs to perform CMOs.
+> >
+> > Rename stage2_put_pte() to stage2_unmap_put_pte() as the function
+> > now serves the stage-2 unmap walker specifically, rather than
+> > acting generic.
+> >
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/pgtable.c | 67 +++++++++++++++++++++++++++++++-----
+> >  1 file changed, 58 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.=
+c
+> > index 5ef098af1736..cf88933a2ea0 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -831,16 +831,54 @@ static void stage2_make_pte(const struct kvm_pgta=
+ble_visit_ctx *ctx, kvm_pte_t n
+> >       smp_store_release(ctx->ptep, new);
+> >  }
+> >
+> > -static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, st=
+ruct kvm_s2_mmu *mmu,
+> > -                        struct kvm_pgtable_mm_ops *mm_ops)
+> > +struct stage2_unmap_data {
+> > +     struct kvm_pgtable *pgt;
+> > +     bool defer_tlb_flush_init;
+> > +};
+> > +
+> > +static bool __stage2_unmap_defer_tlb_flush(struct kvm_pgtable *pgt)
+> > +{
+> > +     /*
+> > +      * If FEAT_TLBIRANGE is implemented, defer the individual
+> > +      * TLB invalidations until the entire walk is finished, and
+> > +      * then use the range-based TLBI instructions to do the
+> > +      * invalidations. Condition deferred TLB invalidation on the
+> > +      * system supporting FWB, as the optimization is entirely
+> > +      * pointless when the unmap walker needs to perform CMOs.
+> > +      */
+> > +     return system_supports_tlb_range() && stage2_has_fwb(pgt);
+> > +}
+> > +
+> > +static bool stage2_unmap_defer_tlb_flush(struct stage2_unmap_data *unm=
+ap_data)
+> > +{
+> > +     bool defer_tlb_flush =3D __stage2_unmap_defer_tlb_flush(unmap_dat=
+a->pgt);
+> > +
+> > +     /*
+> > +      * Since __stage2_unmap_defer_tlb_flush() is based on alternative
+> > +      * patching and the TLBIs' operations behavior depend on this,
+> > +      * track if there's any change in the state during the unmap sequ=
+ence.
+> > +      */
+> > +     WARN_ON(unmap_data->defer_tlb_flush_init !=3D defer_tlb_flush);
+> > +     return defer_tlb_flush;
+>
+> I really don't understand what you're testing here. The ability to
+> defer TLB invalidation is a function of the system capabilities
+> (range+FWB) and a single flag that is only set on the host for pKVM.
+>
+> How could that change in the middle of the life of the system? if
+> further begs the question about the need for the unmap_data data
+> structure.
+>
+> It looks to me that we could simply pass the pgt pointer around and be
+> done with it. Am I missing something obvious?
+>
+From one of the previous comments [1] (used in a different context),
+I'm given to understand that since these feature checks are governed
+by alternative patching, they can potentially change (at runtime?). Is
+that not the case and I have misunderstood the idea in comment [1]
+entirely? Is it solely used for optimization purposes and set only
+once?
+If that's the case, I can get rid of the WARN_ON() and unmap_data.
 
-Yup, feel free to just take the above as inspiration and create a
-different patch. If you decide you want an s-o-b for the above, though,
-then here's one
+- Raghavendra
 
-Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
-
-Thanks,
-drew
+[1]: https://lore.kernel.org/all/ZGPPj1AXS0Uah2Ug@linux.dev/
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
