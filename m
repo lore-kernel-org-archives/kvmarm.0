@@ -1,183 +1,122 @@
-Received: from mgamail.intel.com (unknown [192.55.52.120])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9520518C28
-	for <kvmarm@lists.linux.dev>; Mon, 31 Jul 2023 15:57:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690819034; x=1722355034;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=tK7bQD5eUTy/JNI9n7lX6f08A4aMl10FOfRouHBr7QQ=;
-  b=RtWAeAfrXHgOT6GNwJhoFZgWbbQBTOJV6hreq42iqXQVthX/frk/632W
-   ubVZfk19vlaHinC32adagIJJ1oPS5vyaYw9M8lj4DM5MSPB3VlJPJUA3a
-   dD8MgfRCz4LWUGcaTxlNdkihqhs5pLMMEU2ab6fEcrJjynbOXbF6HXTN3
-   3xh5Ev3sGBjGT26Kt3Gt6UlFvjexQiBTJylRuvvzIa3DYsdiok2LJWdcC
-   N7zJssiqN9rJX3Zd+YtHhd8jj6/B3BlcZKN+IeLHfLxtDjr1iHBcnI4xu
-   j0yr4cusgKJYD+SKZkL0nnsdT/kcHlf2UxptX0cgK7FkFGL3qBhMApkF+
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="367955875"
-X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="367955875"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 08:56:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="1059027232"
-X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="1059027232"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmsmga005.fm.intel.com with ESMTP; 31 Jul 2023 08:56:52 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 31 Jul 2023 08:56:52 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 31 Jul 2023 08:56:52 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Mon, 31 Jul 2023 08:56:52 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.40) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Mon, 31 Jul 2023 08:56:52 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=B7WBl2JEcPEZNvyVJhKUVvulYzS+rAf/iPnuP4OWpKHnmCAj9eSlHkoY2n8UKIGV+THwgM5760VXesUWG2yV5G3Gw3S8QZUwplGsckRe2D99xzGKl2OBEnmt4+BE7Ncu/VPB+IbCaWbh19ywCsNjhgHEvV30ByI63vH/xDyO0LwqvGt/+aYAjTf9ODHmzXrxh8UFGFAx/2EGCbL2xbbDvknDlvZ47YknNPfw92RcTBtD262Uv6eOoLO0pLjfG3Y5aNvYSGjWgGyFeO4zf8PaCiy4IKwr7DU4Nt80DLghlVl7qXx4k8Q4b9IOg6spvJSGsmwKj70awBSIAKClFBzA5w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tK7bQD5eUTy/JNI9n7lX6f08A4aMl10FOfRouHBr7QQ=;
- b=TLaGYnzerbeyErBh8z7h0aRDIN+PzxZDAxVMlB6MZMgsj1IyDvi/xw0be6tR29bcHfOJ1JiQXrGa7KAtDhO+aigD0TDySPE1jS9zS9XMnoR0yFcjSL9Jzr4XkaZYTFmoHpgxY3xHLCh+MlDpp7lzou8ibCKAl+EauXcXM7KKxm3ytbTLYKZ2ZrlTM02i8b4HaAb/Fr4rycIl1yNMM/6f+bbtchFpLEr6TFvcUwT0isg9wqVFQGFnfiwx+aGrknXhwOgfmpR8xEcYF/H5DVcpbTNcAZr59RWfmJmJieDW40wzfwPuXGvVRt3+m+mJWpukndiNAocf1qfXQvNpiEw/Rg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
- by BN9PR11MB5307.namprd11.prod.outlook.com (2603:10b6:408:118::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.43; Mon, 31 Jul
- 2023 15:56:50 +0000
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::abd2:f781:1433:259]) by MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::abd2:f781:1433:259%3]) with mapi id 15.20.6631.042; Mon, 31 Jul 2023
- 15:56:50 +0000
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To: "corbet@lwn.net" <corbet@lwn.net>, "ardb@kernel.org" <ardb@kernel.org>,
-	"maz@kernel.org" <maz@kernel.org>, "shuah@kernel.org" <shuah@kernel.org>,
-	"Szabolcs.Nagy@arm.com" <Szabolcs.Nagy@arm.com>, "keescook@chromium.org"
-	<keescook@chromium.org>, "james.morse@arm.com" <james.morse@arm.com>,
-	"debug@rivosinc.com" <debug@rivosinc.com>, "akpm@linux-foundation.org"
-	<akpm@linux-foundation.org>, "catalin.marinas@arm.com"
-	<catalin.marinas@arm.com>, "oleg@redhat.com" <oleg@redhat.com>,
-	"arnd@arndb.de" <arnd@arndb.de>, "ebiederm@xmission.com"
-	<ebiederm@xmission.com>, "will@kernel.org" <will@kernel.org>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, "broonie@kernel.org" <broonie@kernel.org>
-CC: "hjl.tools@gmail.com" <hjl.tools@gmail.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>, "paul.walmsley@sifive.com"
-	<paul.walmsley@sifive.com>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
-	"palmer@dabbelt.com" <palmer@dabbelt.com>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-arch@vger.kernel.org"
-	<linux-arch@vger.kernel.org>
-Subject: Re: [PATCH v3 21/36] arm64/mm: Implement map_shadow_stack()
-Thread-Topic: [PATCH v3 21/36] arm64/mm: Implement map_shadow_stack()
-Thread-Index: AQHZw7ZZVWMs6JZuI06/zv64SypFG6/UB86A
-Date: Mon, 31 Jul 2023 15:56:50 +0000
-Message-ID: <5461c56cf4896f18bddaa66c3beec7b909fc8fb9.camel@intel.com>
-References: <20230731-arm64-gcs-v3-0-cddf9f980d98@kernel.org>
-	 <20230731-arm64-gcs-v3-21-cddf9f980d98@kernel.org>
-In-Reply-To: <20230731-arm64-gcs-v3-21-cddf9f980d98@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.44.4-0ubuntu1 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|BN9PR11MB5307:EE_
-x-ms-office365-filtering-correlation-id: 0ed329f1-58c9-412d-31d7-08db91dec0a0
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ysicHXPiDE2MZTrvCCQNK+hWRlavnDQa7JKl7Zka9uXSriMkfxq9zO/m845ZNkHFLtbsjzTtQtlGgu7G52iE5FaPbOOl3in774iDKdMd9OJTWwdzlQBqsSmAXVPtRDBiO4s5bd/S0OHkPMfctUym5dlFKpUWLn8mkLwWT4AAMw41U4TvY9cng8B8tXKj0V8YvgG7wXG92xE7Pxi72JteO69SeqrjKe0tuNA0p+NIEs++3HIGXa+YSuo7X7ef4gDlaYhbbN/KmOZOD9ToW5dVIFRZN4PPYJoN1lI6V+goEJLzXRecKjHzp4g+uBaPGUe22B659wfPGAwUFZwDPIfBLfCvKyW57p4ChtDLJ82ASeD296rDqeE67inJ6JgXR28gfzkYli11cz3VxZ7Hl4h8YekMLg5V/pV9TEYvZjV8PsDZ7/DNi/Q1tzjcLEHSSmgBGai8Jc+NsVoMxQ2zulrCSmRSL9n2MILqKONQXeV779CJ0OSoAYppERoLiyRixxvTvOPXdJoOK9qNVFFHfVPWpPCBpob9CXk1Gf+6ECN9pn19z3rzLzrsPMuqLNygHvfcDukEhfrSQMXJ0yj6oF8VmJ/k+FidxAb5X/s8Da1tmg2vrCqb9ADaqp/kyR9KH0qXuCOZLaUwYBcjGTqOFxFAMgHWSLFbguCNaqY0lmr2atg=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(366004)(396003)(376002)(346002)(39860400002)(451199021)(5660300002)(2616005)(8936002)(186003)(8676002)(6506007)(7416002)(316002)(26005)(7406005)(478600001)(76116006)(4326008)(66446008)(110136005)(66946007)(66476007)(91956017)(54906003)(66556008)(64756008)(6486002)(71200400001)(6512007)(41300700001)(966005)(86362001)(38070700005)(4744005)(36756003)(2906002)(921005)(82960400001)(38100700002)(122000001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?eXJuRGhjWXZnYS9HUCs2T01PdHhhNDRUcjBrSVlCd3AvNmNDTExDL2F2QkRt?=
- =?utf-8?B?Y2dUVGIxKzYyYnE3Yks4WmxDMUtmR09UZmQzUWJXNllZUTNWMHdMSzhOWmFZ?=
- =?utf-8?B?RUFybnp5VlAwRjY4Zk9PeTlxZmtyVHZ4ZWlwQkZLWmdobWJsUEdOR2lmMU5G?=
- =?utf-8?B?VVF1aTJGaW9yYXF6TUg0ZVQ0Z0VZaEt6MUc3Rm9MdXVGZEN2Q2hZN1k3MndZ?=
- =?utf-8?B?ZlhuRXAwUFdxQzdUOWN2QlY2RTdGdU4yMVppaERIOU5FRlRSMklZd2d5Z3FJ?=
- =?utf-8?B?VWpubnQzc2k1c0xDSWxKTXVmQWVlWCtqazJ5ZTdRVDhHdUxpc3ZNZDZVTUhi?=
- =?utf-8?B?OWMvUnBDd3pvTFBxMGJhbktNQzdubDZZWkx5QWRaL2N2MjRMeTBtTWtHKyt1?=
- =?utf-8?B?cSt4V25Sc1UzQThBVTR4MmFUMHlpZGcrcTdtd0FmS1lGcDd0RTM0UkxmU3ZD?=
- =?utf-8?B?WUU1MjNPUUtubjY4eGFFOEdCMnhYNmNRam9uRHMrSWtsVmRrdUdreUtMdlBD?=
- =?utf-8?B?L2lkT3VWWmNVM0wxWWxWeXRMSlVvUG5xbWpLRFptdzJjWHdLQldkL28yV1dv?=
- =?utf-8?B?MG12cVU1c2FVa3ZNQm1sNWJGKzNpWjRRM1dtM1pMS3BMMUo0SzlCOWkzWkg5?=
- =?utf-8?B?U1JrWGsrY0JtclJrUCttSU1RQUxtVnIycVYyNUphRWFoaFhnVjkrbnU2Qzdw?=
- =?utf-8?B?S3c1U0cxaEVHNXNyZEtYajRHUjJNTXFBWTNyTk15emNMN1Q5M2VnTXBwRUVV?=
- =?utf-8?B?MWpudHFnNkpyUTh4TVNwQy9ZQmZlYkZOMU9Gb1d6cTB6RUdGNEh4cWlkM2FL?=
- =?utf-8?B?RkhTQS8wN2V1YmkzV1Z1aytLVE9hTzdPN0lrb3EyZGNjRlBrZlovN0FidUxH?=
- =?utf-8?B?WkxLaWRIVkdxSDgwMkozd044dEpONTFVZ051bHFwbSsrQlE4S1FhTkdDUlJJ?=
- =?utf-8?B?VmxLZmFMZmYxVzBNcmN4ZVVwcUJQQXltOGZYczE5VVFiMUJOY0VZTVlEMlg1?=
- =?utf-8?B?UXVaekZOTERUY0hIc3d2bFpXaS9HQThObFlscThUZGtHTzBsbFZoWTR2VUZx?=
- =?utf-8?B?cmk3NVp5eTJDQzJibEpYb084UmJaSFNVR0xCRU5lRUhPZTR5SzhKME0xWWkw?=
- =?utf-8?B?YTNkZjFrTlAxS3RVa3g2bEIwVDduNFlrSnhMeVZTenY3bEtORFJlRmF4OExP?=
- =?utf-8?B?akFEOFc1YWF1TThDaXBMWkNtR1Iyc1ZTaVd4a2NWck1YVmR6WU9rajZ4Sk5C?=
- =?utf-8?B?ZDBtRjNyWmF1NEk1ZTlUMlk1WHNhMWFPOFdSYjVFeWE2R1hUZ25NbjVxYW11?=
- =?utf-8?B?Mm9oeXRmQmszaHJJYnVMaGYwaHBvcDk2azNNbTZsZ2JIM2RZcnBZZGJRbnll?=
- =?utf-8?B?bDZTYXdPWnFKeGhPcnA0bCsxY253S3VOUW5nTW41dXQyaFNpcmtRNi9lbWhB?=
- =?utf-8?B?b1dMY1U5bm05dWhBaGQ4ZUdNYTJ0TnJlOFUzb0tUQzRlaUQzcXVMSk9QU3lS?=
- =?utf-8?B?NDFYb2VTTzlrU3RYRkVjcS9nMHFvNjNJamdGaFlUYTlUNnoxVmpwRWRkeGtD?=
- =?utf-8?B?VExoK3ZJSHdrNW8rWXBUcUl0TE5VTjRabkNzZlBLNWVZUFZVcm9pdG4zSHFX?=
- =?utf-8?B?YlVGaXFUc2dUVHVPQldzZWpSQ200M1U3VCttaDlBaXo0S3pxUkI2TjRTZjNM?=
- =?utf-8?B?eDRkRzBkblhpZEFDaGc3cVFtVld1QnNBQkdXRVNKRU1XWUdpTGp3UXd4aDdR?=
- =?utf-8?B?ZnpiQmJyUWRYcm55M3RkcXBSNDRReGZ3VFJEMHQ5NnpiTU8xMUxvREZDL2dz?=
- =?utf-8?B?T2tUeWhHN2ZKUXlxZldYWlA4S3BDQWxCd3pQSVhaVVdGUWVsOUlvazVHL21l?=
- =?utf-8?B?aWJNMlVVRmMzdnJ1V0pWbTNGWUNnUWJTNWxoVjh4QlFSNDV0MUVyLy9LZnlX?=
- =?utf-8?B?Wk5EOGJReXNueFlLbFFYVFNxTnc4Qy9OQXhSZlJ5MFdpdm5jaVlsUjdhdEli?=
- =?utf-8?B?R252b0RVSXpXMDJRK0NYVlkreUxkVEQ0MjlGUzhPYkNwZDBORytQcHZyb0VY?=
- =?utf-8?B?M1VTaVhpV3hzeVhqa0hYK3hsbDJMYUtOR2VLQlNDMFFibTlJNEtSUm12UmVI?=
- =?utf-8?B?Q1hlQVBYaDJQZUNQRXhnZWduLy9xT0lLNjY5MDl0V0JVUmlkSXJ6N1hFaXJ3?=
- =?utf-8?B?Smc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C877C60AE9E7884A8BC034F522377641@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E177918C28
+	for <kvmarm@lists.linux.dev>; Mon, 31 Jul 2023 15:58:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690819094;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4fe6hbS0UUlu2v7dj0yh2sFuv9miEav3h35iCM+LzrA=;
+	b=aUQq25fVqVWRGJcq14zax3WJWOdERpcRUDxaubSMjuwjb4gcPLAOGJbyxtCDwkniCKlJ3A
+	34Ri8Ndk4IgrJ6ACHR9Izl47SEjcAo7ESiNsQo6KC2L9xOGNOPqpvy7Vg35yslyEbhA5Ms
+	/snhZhML6Csfbsbcb9TXSuqmd5USAgY=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-487-ROu28CJ1Mua8zaalgcXqzQ-1; Mon, 31 Jul 2023 11:58:12 -0400
+X-MC-Unique: ROu28CJ1Mua8zaalgcXqzQ-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-99c0bd2ca23so110735966b.2
+        for <kvmarm@lists.linux.dev>; Mon, 31 Jul 2023 08:58:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690819091; x=1691423891;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4fe6hbS0UUlu2v7dj0yh2sFuv9miEav3h35iCM+LzrA=;
+        b=F/P82siDwIfi/Vr4eGdVPNyNzEyu3N8K5QZEH4shmqV0LBKLxgx2gu/LLskOoc5LQS
+         DMukUTrJthkeI83DAyGckCg6TPjgMJ4fsqOVtntKvzAWp55u3xEghu7ArBowEjOdHL0M
+         L+mXT45dwSOz7c64//NF0r6nDNJAuksT9DXRrJ3d2DmFRN2FOaWCmC+IXMg+JSRVdNW9
+         psI7m+FeqlDab0l0VyIkPm0I12bh43qACVWhOj1lXzL3vlgKKZk/ler71vNACO3SGSJ8
+         fvI1kT+CNEI7krnRkmmSK8GX8/thbhfu7HfQFADv9ODs58fgbCpSucodLOlToY9NFDCt
+         YKOA==
+X-Gm-Message-State: ABy/qLY0ta+40b4wGDVdXmQezYWfcUesces/vTzGvtr3yw7HcrpWbex9
+	IZkvf1Wj+HfoxEzpOexmjrtLEoR9xbOwBkyx2qYRXQOT8W5AIm5kJxiUwpJ6aI3MLWn5W6I0dYl
+	CyoIY+QWGri8+OTJq
+X-Received: by 2002:a17:906:11:b0:993:f744:d235 with SMTP id 17-20020a170906001100b00993f744d235mr164008eja.6.1690819091657;
+        Mon, 31 Jul 2023 08:58:11 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlE4qcb0DCH0D/UYAr1wihMNcJs7WXVHvdtoT78VyrDkWJveoJUy2CwgTeDnMx93k7Ts+Uy66g==
+X-Received: by 2002:a17:906:11:b0:993:f744:d235 with SMTP id 17-20020a170906001100b00993f744d235mr163994eja.6.1690819091362;
+        Mon, 31 Jul 2023 08:58:11 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id f21-20020a170906139500b00992dcae806bsm6371003ejc.5.2023.07.31.08.58.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 31 Jul 2023 08:58:10 -0700 (PDT)
+Message-ID: <eb356cf1-c661-930b-2175-427a59267d1f@redhat.com>
+Date: Mon, 31 Jul 2023 17:58:08 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0ed329f1-58c9-412d-31d7-08db91dec0a0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jul 2023 15:56:50.3297
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 5FxCg3PSovEDhq2cJAiAOP5kDhRcfZrjOCqgKMM5t+jmTe+8C8X5IhdJJvMN/Gd7utsKtJMqkCJUrxX+xZ5aE5iHawJvQ9VNyCSvkw3kcaY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5307
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+To: Sean Christopherson <seanjc@google.com>,
+ Quentin Perret <qperret@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
+ Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Andrew Morton <akpm@linux-foundation.org>, Paul Moore <paul@paul-moore.com>,
+ James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-security-module@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Chao Peng <chao.p.peng@linux.intel.com>,
+ Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+ Yu Zhang <yu.c.zhang@linux.intel.com>,
+ Vishal Annapurve <vannapurve@google.com>,
+ Ackerley Tng <ackerleytng@google.com>,
+ Maciej Szmigiero <mail@maciej.szmigiero.name>,
+ Vlastimil Babka <vbabka@suse.cz>, David Hildenbrand <david@redhat.com>,
+ Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
+ Liam Merwick <liam.merwick@oracle.com>,
+ Isaku Yamahata <isaku.yamahata@gmail.com>,
+ "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20230718234512.1690985-1-seanjc@google.com>
+ <20230718234512.1690985-7-seanjc@google.com> <ZMOJgnyzzUNIx+Tn@google.com>
+ <ZMRXVZYaJ9wojGtS@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [RFC PATCH v11 06/29] KVM: Introduce KVM_SET_USER_MEMORY_REGION2
+In-Reply-To: <ZMRXVZYaJ9wojGtS@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-T24gTW9uLCAyMDIzLTA3LTMxIGF0IDE0OjQzICswMTAwLCBNYXJrIEJyb3duIHdyb3RlOgo+ICtT
-WVNDQUxMX0RFRklORTMobWFwX3NoYWRvd19zdGFjaywgdW5zaWduZWQgbG9uZywgYWRkciwgdW5z
-aWduZWQKPiBsb25nLCBzaXplLCB1bnNpZ25lZCBpbnQsIGZsYWdzKQo+ICt7Cj4gK8KgwqDCoMKg
-wqDCoMKgdW5zaWduZWQgbG9uZyBhbGxvY19zaXplOwo+ICvCoMKgwqDCoMKgwqDCoHVuc2lnbmVk
-IGxvbmcgX191c2VyICpjYXBfcHRyOwo+ICvCoMKgwqDCoMKgwqDCoHVuc2lnbmVkIGxvbmcgY2Fw
-X3ZhbDsKPiArwqDCoMKgwqDCoMKgwqBpbnQgcmV0Owo+ICsKPiArwqDCoMKgwqDCoMKgwqBpZiAo
-IXN5c3RlbV9zdXBwb3J0c19nY3MoKSkKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-cmV0dXJuIC1FT1BOT1RTVVBQOwo+ICsKPiArwqDCoMKgwqDCoMKgwqBpZiAoZmxhZ3MpCj4gK8Kg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldHVybiAtRUlOVkFMOwoKQW55IHRob3VnaHRz
-IG9uIHRoZSBxdWVzdGlvbnMgYXQgdGhlIGVuZCBvZiB0aGlzIG1haWw/CgpodHRwczovL2xvcmUu
-a2VybmVsLm9yZy9sa21sLzdhNGM5N2Y2ODM0N2Q0MTg4Mjg2YzU0M2NkY2NhYTEyNTc3Y2RiOWUu
-Y2FtZWxAaW50ZWwuY29tLwo=
+On 7/29/23 02:03, Sean Christopherson wrote:
+> KVM would need to do multiple uaccess reads, but that's not a big
+> deal.  Am I missing something, or did past us just get too clever and
+> miss the obvious solution?
+
+You would have to introduce struct kvm_userspace_memory_region2 anyway, 
+though not a new ioctl, for two reasons:
+
+1) the current size of the struct is part of the userspace API via the 
+KVM_SET_USER_MEMORY_REGION #define, so introducing a new struct is the 
+easiest way to preserve this
+
+2) the struct can (at least theoretically) enter the ABI of a shared 
+library, and such mismatches are really hard to detect and resolve.  So 
+it's better to add the padding to a new struct, and keep struct 
+kvm_userspace_memory_region backwards-compatible.
+
+
+As to whether we should introduce a new ioctl: doing so makes 
+KVM_SET_USER_MEMORY_REGION's detection of bad flags a bit more robust; 
+it's not like we cannot introduce new flags at all, of course, but 
+having out-of-bounds reads as a side effect of new flags is a bit nasty. 
+  Protecting programs from their own bugs gets into diminishing returns 
+very quickly, but introducing a new ioctl can make exploits a bit harder 
+when struct kvm_userspace_memory_region is on the stack and adjacent to 
+an attacker-controlled location.
+
+Paolo
+
