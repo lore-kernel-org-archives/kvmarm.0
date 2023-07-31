@@ -1,138 +1,101 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-117.mta0.migadu.com (out-117.mta0.migadu.com [91.218.175.117])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B7218B18
-	for <kvmarm@lists.linux.dev>; Mon, 31 Jul 2023 17:36:59 +0000 (UTC)
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1bc0308d1e2so14865ad.0
-        for <kvmarm@lists.linux.dev>; Mon, 31 Jul 2023 10:36:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690825019; x=1691429819;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qqwUjf4srHS0GmV2PrhboWOP/pK2frD9PFN9eIO2JAw=;
-        b=PW7uXs8te+DjBD/konvGzLWP8g1fMK7bveuEGlOTMiFVF5fJOURsOxjYwDa4V8/7PN
-         GfxiTdGyn4gNxwwJEsgm5Sa3Z07XoIws8zOegDuEUNdgEakGsCpulFVJ68YDWRx8hG7J
-         pHEIHY9NNGcOKqt3EcY+H5XjDJYzQb9r6s9KF29xhh5Zs48JdBGHLJzvx9IIdfAb6DL2
-         uvolYf+4ofy8X/EQBFsrD9bL5wC/3Jo2GpoHAsbLgZmiKj7F/6zz+pRJOqtmGCUykUqb
-         cXxdJcVUj2aUL7x0X6KpmqFqe34XSu2p4AB041J8zGtZ22s2J/6FLShweArcanRRNTIu
-         x2gQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690825019; x=1691429819;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qqwUjf4srHS0GmV2PrhboWOP/pK2frD9PFN9eIO2JAw=;
-        b=UoJt+Qm+jwNQ0J9lZ6++d+bA/jCGXkxK4UyqRfYQTUKO0uU6Ugvdd51O6YtSJ0aSqX
-         lfsxh1UpoH/EiaWjNzuv2+jsIn+xCdIiUXApH16CTgEM29kCezs18zkL1l0D4ahs0llb
-         bENjefmB2J8L6RFsKGakQMYMSBR9XC47zLAhdECxXWlgZPIVFa/dgCmLCS2IV7/81RUC
-         68o60dmDF2+MhHLKKKPPTQohhXAWm4fQMYQHY77cB02OsVcQHb9P5eGYFKUlx3O6SFLs
-         qHeZ+xg66DwuEhdY1/PBOv3ALGS1ULeQNX6CYHh6GhIiLULlUFctNFmitFMPYK7C6chf
-         5agA==
-X-Gm-Message-State: ABy/qLagKB67V01QsAClzXJb1Uj5INT5TeKGaDjMau9dBRuMvkm9vocZ
-	yOelHU9qMeBwnGmLAmokRab8fs8nrJLNrttE3fsLLg==
-X-Google-Smtp-Source: APBJJlFkMuLyTHjACrkUI9ojOs57IF7oGguBdj8b71/dF8frxz4uOZLWejmA7Zhtt9x/0OUhO69yCloZOMPgYxPCZgE=
-X-Received: by 2002:a17:902:c410:b0:1b8:82c6:9e11 with SMTP id
- k16-20020a170902c41000b001b882c69e11mr381793plk.0.1690825018566; Mon, 31 Jul
- 2023 10:36:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1C1018B18
+	for <kvmarm@lists.linux.dev>; Mon, 31 Jul 2023 17:37:44 +0000 (UTC)
+Date: Mon, 31 Jul 2023 17:37:37 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1690825062;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8YdaDmAxh2tQ04c65R6HIInMSDgiFElU1rQyABOujGA=;
+	b=EX5P5RrbAyGLiUihHg1zPC7oGWSKDM/ElBWxcBqxOnEfqsICZbH2/AKd3VVoNKwHnOFruh
+	7NElv6WY+11J1OOCKqt98Yd2d6vWX/LMv7f7kzf3/02EtNU3neXRdqSxXfp5KfexlS5rP8
+	7iRednQbNTf1lNnkOTSMwB1k8yGXoT8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org, Yu Zhao <yuzhao@google.com>
+Subject: Re: [PATCH] KVM: Wrap kvm_{gfn,hva}_range.pte in a per-action union
+Message-ID: <ZMfxYR41K71UV/84@linux.dev>
+References: <20230729004144.1054885-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230722022251.3446223-1-rananta@google.com> <20230722022251.3446223-7-rananta@google.com>
- <87r0otr579.wl-maz@kernel.org>
-In-Reply-To: <87r0otr579.wl-maz@kernel.org>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Mon, 31 Jul 2023 10:36:47 -0700
-Message-ID: <CAJHc60zqOeWXf3kh5hKL6DL3g4znmHaH-TqC0QDcBrWPsHAEXQ@mail.gmail.com>
-Subject: Re: [PATCH v7 06/12] arm64: tlb: Refactor the core flush algorithm of __flush_tlb_range
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Sean Christopherson <seanjc@google.com>, Huacai Chen <chenhuacai@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Jing Zhang <jingzhangos@google.com>, 
-	Reiji Watanabe <reijiw@google.com>, Colton Lewis <coltonlewis@google.com>, 
-	David Matlack <dmatlack@google.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Catalin Marinas <catalin.marinas@arm.com>, Gavin Shan <gshan@redhat.com>, 
-	Shaoqin Huang <shahuang@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230729004144.1054885-1-seanjc@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Jul 27, 2023 at 3:58=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
-:
->
-> On Sat, 22 Jul 2023 03:22:45 +0100,
-> Raghavendra Rao Ananta <rananta@google.com> wrote:
-> >
-> > Currently, the core TLB flush functionality of __flush_tlb_range()
-> > hardcodes vae1is (and variants) for the flush operation. In the
-> > upcoming patches, the KVM code reuses this core algorithm with
-> > ipas2e1is for range based TLB invalidations based on the IPA.
-> > Hence, extract the core flush functionality of __flush_tlb_range()
-> > into its own macro that accepts an 'op' argument to pass any
-> > TLBI operation, such that other callers (KVM) can benefit.
-> >
-> > No functional changes intended.
-> >
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> > Reviewed-by: Gavin Shan <gshan@redhat.com>
-> > Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> > ---
-> >  arch/arm64/include/asm/tlbflush.h | 109 +++++++++++++++---------------
-> >  1 file changed, 56 insertions(+), 53 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm=
-/tlbflush.h
-> > index 412a3b9a3c25..f7fafba25add 100644
-> > --- a/arch/arm64/include/asm/tlbflush.h
-> > +++ b/arch/arm64/include/asm/tlbflush.h
-> > @@ -278,14 +278,62 @@ static inline void flush_tlb_page(struct vm_area_=
-struct *vma,
-> >   */
-> >  #define MAX_TLBI_OPS PTRS_PER_PTE
-> >
-> > +/* When the CPU does not support TLB range operations, flush the TLB
-> > + * entries one by one at the granularity of 'stride'. If the TLB
-> > + * range ops are supported, then:
->
-> Comment format (the original was correct).
->
-Isn't the format the same as original? Or are you referring to the
-fact that it needs to be placed inside the macro definition?
-> > + *
-> > + * 1. If 'pages' is odd, flush the first page through non-range
-> > + *    operations;
-> > + *
-> > + * 2. For remaining pages: the minimum range granularity is decided
-> > + *    by 'scale', so multiple range TLBI operations may be required.
-> > + *    Start from scale =3D 0, flush the corresponding number of pages
-> > + *    ((num+1)*2^(5*scale+1) starting from 'addr'), then increase it
-> > + *    until no pages left.
-> > + *
-> > + * Note that certain ranges can be represented by either num =3D 31 an=
-d
-> > + * scale or num =3D 0 and scale + 1. The loop below favours the latter
-> > + * since num is limited to 30 by the __TLBI_RANGE_NUM() macro.
-> > + */
-> > +#define __flush_tlb_range_op(op, start, pages, stride,                =
-       \
-> > +                             asid, tlb_level, tlbi_user)             \
->
-> If you make this a common macro, please document the parameters, and
-> what the constraints are. For example, what does tlbi_user mean for an
-> IPA invalidation?
->
-Sure, I'll document the parameters. That'll be helpful.
+On Fri, Jul 28, 2023 at 05:41:44PM -0700, Sean Christopherson wrote:
+> Wrap kvm_{gfn,hva}_range.pte in a union so that future notifier events can
+> pass event specific information up and down the stack without needing to
+> constantly expand and churn the APIs.  Lockless aging of SPTEs will pass
+> around a bitmap, and support for memory attributes will pass around the
+> new attributes for the range.
+> 
+> Add a "KVM_NO_ARG" placeholder to simplify handling events without an
+> argument (creating a dummy union variable is midly annoying).
+> 
+> Opportunstically drop explicit zero-initialization of the "pte" field, as
+> omitting the field (now a union) has the same effect.
+> 
+> Cc: Yu Zhao <yuzhao@google.com>
+> Link: https://lore.kernel.org/all/CAOUHufagkd2Jk3_HrVoFFptRXM=hX2CV8f+M-dka-hJU4bP8kw@mail.gmail.com
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-- Raghavendra
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+Looks good, and I don't think it'll conflict with anything on the arm64
+side.
+
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+
+> ---
+> 
+> If this looks good, my thought is to squeeze it into 6.6 so that the MGLRU
+> and guest_memfd() series can build on it.  Or those series could just
+> include it?
+
+Eh, I'm not a huge fan of having two series independently reposting a
+common base. It can be a bit annoying when the two authors have slightly
+different interpretations on how to improve it...
+
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index dfbaafbe3a00..f84ef9399aee 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -526,7 +526,7 @@ typedef void (*on_unlock_fn_t)(struct kvm *kvm);
+>  struct kvm_hva_range {
+>  	unsigned long start;
+>  	unsigned long end;
+> -	pte_t pte;
+> +	union kvm_mmu_notifier_arg arg;
+>  	hva_handler_t handler;
+>  	on_lock_fn_t on_lock;
+>  	on_unlock_fn_t on_unlock;
+> @@ -547,6 +547,8 @@ static void kvm_null_fn(void)
+>  }
+>  #define IS_KVM_NULL_FN(fn) ((fn) == (void *)kvm_null_fn)
+>  
+> +static const union kvm_mmu_notifier_arg KVM_NO_ARG;
+> +
+
+I'm guessing you were trying to keep this short, but it might be nice to
+use MMU_NOTIFIER_ (or similar) as the prefix to make the scope
+immediately obvious.
+
+-- 
+Thanks,
+Oliver
