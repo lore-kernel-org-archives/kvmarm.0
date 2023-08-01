@@ -1,24 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F3D22EF0
-	for <kvmarm@lists.linux.dev>; Tue,  1 Aug 2023 17:57:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A047AC433C8;
-	Tue,  1 Aug 2023 17:57:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4240222EF0
+	for <kvmarm@lists.linux.dev>; Tue,  1 Aug 2023 18:03:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA578C433C7;
+	Tue,  1 Aug 2023 18:03:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690912639;
-	bh=F8CAARuNUeaGEa3yA1waQoVFs2zc6rvh3zubyIWd+RI=;
+	s=k20201202; t=1690913020;
+	bh=t4H5U4PdS9V7b/INAz2Uy/vEVIT0Xt3TQ516E4LoedE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JZJMaAT42SQFAM85RnUbpnm4my8uLLOgrzrpv9ey5F7iOsTiCZBEwwsQMLRUS80/H
-	 gICFBbZERF2JfuNbCyCasY1N2jUMSPr8iIihwDf950iYsquKfhXkKiL5b+msCXfHuc
-	 B0hu58CMAQA41AZ35HEN4GzCtnJS9SRnAzeUVfmqmxuG8PriXB+8iNnYQ9IBFlhh0g
-	 5LHahWPZHyPVmmgOLHdeR6Ip9wxGlCVC4KZ6u6/MqfCxXMrpYZItw3hBiaTqg1xfTN
-	 tUOKRiTjydZGF6wuuwu94EdSvPU1tYZYsAoggPLjahr6Dr1QtlFVqW2D4lr8QT0Spn
-	 skZg6nLYjJM5w==
-Date: Tue, 1 Aug 2023 18:57:08 +0100
+	b=eb+N0V+12cPD0i8TS0jZxiFvWkwxmipgCkdOFw6ouNtBI/NQVs2BFc7sHUmrpwyCh
+	 VuoPO7d74PzyBkkFiDMg3YcFzKCgYOEr01eQHqzHDI9cESZlowMv4HcxuyUscedv6w
+	 S1CAHXieY6gOG3NZLDdYRyuIxU6uHN5a1douIJAOmXNjepUt5/KdUwH1d/CL2758rE
+	 dQeE/68pY2slNKM6bss4odlurVY3vXKs4+gbUXXzYCpz4QGJBcUcjx9ChA26G6Tgm3
+	 MNL8f8jAH07J0XewHxoZ5jsLgMq+M+ewSxv/p30AaJ5aQACGjnfruGfm5XA0k+CruF
+	 cD3DmFo0iCa3g==
+Date: Tue, 1 Aug 2023 19:03:31 +0100
 From: Mark Brown <broonie@kernel.org>
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc: "corbet@lwn.net" <corbet@lwn.net>, "ardb@kernel.org" <ardb@kernel.org>,
+To: Mike Rapoport <rppt@kernel.org>
+Cc: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+	"corbet@lwn.net" <corbet@lwn.net>,
+	"ardb@kernel.org" <ardb@kernel.org>,
 	"keescook@chromium.org" <keescook@chromium.org>,
 	"Szabolcs.Nagy@arm.com" <Szabolcs.Nagy@arm.com>,
 	"shuah@kernel.org" <shuah@kernel.org>,
@@ -47,7 +49,7 @@ Cc: "corbet@lwn.net" <corbet@lwn.net>, "ardb@kernel.org" <ardb@kernel.org>,
 	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
 	"palmer@dabbelt.com" <palmer@dabbelt.com>
 Subject: Re: [PATCH v3 21/36] arm64/mm: Implement map_shadow_stack()
-Message-ID: <55c629cc-0545-460b-91cb-2ebdb8ae9051@sirena.org.uk>
+Message-ID: <1237441e-3e1a-4682-b3bf-face931640d3@sirena.org.uk>
 References: <20230731-arm64-gcs-v3-0-cddf9f980d98@kernel.org>
  <20230731-arm64-gcs-v3-21-cddf9f980d98@kernel.org>
  <5461c56cf4896f18bddaa66c3beec7b909fc8fb9.camel@intel.com>
@@ -55,6 +57,7 @@ References: <20230731-arm64-gcs-v3-0-cddf9f980d98@kernel.org>
  <e827138f9d8800e3db158831bca88d1ea8b559af.camel@intel.com>
  <21d7e814-8608-40ce-b5d3-401f2110ad91@sirena.org.uk>
  <a9ea33d31aad0c45eab41b0dcbd4913d863cc930.camel@intel.com>
+ <20230801172814.GD2607694@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -62,84 +65,42 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="WYhsHyqynSPadbUB"
+	protocol="application/pgp-signature"; boundary="p8glKsiXtjodSLAk"
 Content-Disposition: inline
-In-Reply-To: <a9ea33d31aad0c45eab41b0dcbd4913d863cc930.camel@intel.com>
+In-Reply-To: <20230801172814.GD2607694@kernel.org>
 X-Cookie: I thought YOU silenced the guard!
 
 
---WYhsHyqynSPadbUB
-Content-Type: text/plain; charset=iso-8859-1
+--p8glKsiXtjodSLAk
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 01, 2023 at 05:07:00PM +0000, Edgecombe, Rick P wrote:
-> On Tue, 2023-08-01 at 15:01 +0100, Mark Brown wrote:
+On Tue, Aug 01, 2023 at 08:28:14PM +0300, Mike Rapoport wrote:
+> On Tue, Aug 01, 2023 at 05:07:00PM +0000, Edgecombe, Rick P wrote:
 
-> > > It could be a different flag, like SHADOW_STACK_SET_TOKEN_MARKER,
-> > > or it
-> > > could be SHADOW_STACK_SET_MARKER, and callers could pass
-> > > (SHADOW_STACK_SET_TOKEN | SHADOW_STACK_SET_MARKER) to get what you
-> > > have
-> > > implemented here. What do you think?
+> > So the question is not what mode should arm support, but should we have
+> > the flags match between x86 and ARM?
 
-> > For arm64 code this would mean that it would be possible (and fairly
-> > easy) to create stacks which don't have a termination record which
-> > would
-> > make life harder for unwinders to rely on.=A0 I don't think this is
-> > insurmountable, creating manually shouldn't be the standard and it'll
-> > already be an issue on x86 anyway.
+> What if the flag will be called, say, SHADOW_STACK_DEFAULT_INIT?
+> Then each arch can push whatever it likes to and from the userspace
+> perspective the shadow stack will have some basic init state, no matter
+> what architecture it is.
 
-> If you are going to support optionally writing to shadow stacks (which
-> x86 needed for CRIU, and also seems like a nice thing for several other
-> reasons), you are already at that point. Can't you also do a bunch of
-> gcspopm's to the top of the GCS stack, and have no marker to hit before
-> the end of the stack? (maybe not in GCS, I don't know...)
+x86 might have some fun with that and the existing userspace binaries...
 
-It's definitely possible to use writes or pops to achive the same
-effect, it's just that it's less likely to be something that happens
-through simple oversight than missing a flag off the initial map call
-would be.
-
-> > The other minor issue is that the current arm64 marker is all bits 0
-> > so by itself for arm64 _MARKER would have no perceptible impact, it
-> > would only serve to push the token down a slot in the stack (I'm
-> > guessing that's the intended meaning?).
-
-> Pushing the token down a frame is what flags=3D=3D0 does in this patch,
-> right?
-
-Yes, exactly - if we make the top of stack record optional then if that
-flag is omitted we'd not do that.
-
-> You don't have to support all the flags actually, you could just
-> support the one mode you already have and reject all other
-> combinations... Then it matches between arch's, and you still have the
-> guaranteed-ish end marker.
-
-Sure, though if we're going to the trouble of checking for the flag we
-probably may as well implement it.  I guess x86 is locked in at this
-point by existing userspace.  I guess I'll implement it assuming nobody
-=66rom userspace complains, it's trivial for a kernel.
-
-> So the question is not what mode should arm support, but should we have
-> the flags match between x86 and ARM?
-
-The flags should definitely match, no disagreement there.
-
---WYhsHyqynSPadbUB
+--p8glKsiXtjodSLAk
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmTJR3QACgkQJNaLcl1U
-h9D+HQf/dMO4oPMfSYgpJfSkqjyeMhvngNszJ/vg3XKaq4EJAEMgOh+p9YWNYPyv
-uBQnGou+Mr2N+ymg2pLC4+WNybCoXsyaVeF/84elK+awSuCxD9GhjtrjqnteBAWg
-Cjy3FqvlmXwV2AHcXeYANCjGN6BJhmbUKcJp+jwyEU+PNxMrGY4Fyos1o7DlgcDo
-udN5QQnR8fZ4Xjyv5ZcHWeUX0e5TsB+1e9MK8AOIRkpI52cfHU8u/HSNfOHs5an7
-Ugb2wl/4tUWdslzaD4LLg+znjSCYjZ2c0uuIuigxAeFfSDhsFG9C2CiIEaa13iCj
-rrMq656MkRtw4gwfJ7HGsycFpraatg==
-=HHRV
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmTJSPIACgkQJNaLcl1U
+h9BcMwf+KLcNdiJZ3DEJDS8jRNNMVfxtKYOXlc4QIY6Iix9aZ5E6QB8ZJoOmkK4Y
+qzBMySqHh+SYZsz1IZrt/AhsMcuw1HiwbzI+Y53c+2QIMGd+u5Zfc+mSWY9chJwB
+DCahxNQc58D+byBBjeLqKGO4v+/3LNP/Nd/EaTGd0zUHqlAS7oR6akGoHXOJy7or
+5ZdHWcz7zRa3UazK6OiMaZYx8SifMmktj3HWTWgAapS+8ChVCEGkfSGgb4gvY80w
+zz2JPXJH2eXtVtUQGw4kzcc8pSO6kV/PPQPKeNLuA5py1yTRZrGGF4O8r7xNmr6r
+Qlx6pESKFYL7k0n9AKbLsqetNG4l7w==
+=b0mD
 -----END PGP SIGNATURE-----
 
---WYhsHyqynSPadbUB--
+--p8glKsiXtjodSLAk--
