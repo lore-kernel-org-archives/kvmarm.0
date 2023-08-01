@@ -1,27 +1,58 @@
-Received: from out-108.mta0.migadu.com (out-108.mta0.migadu.com [91.218.175.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E8319BBC
-	for <kvmarm@lists.linux.dev>; Tue,  1 Aug 2023 08:15:23 +0000 (UTC)
-Date: Tue, 1 Aug 2023 01:15:14 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1690877721;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=NJXyz71UWN5dEwNYPmqB5WKFGNITeZh3IOXfm4I58G8=;
-	b=LKm9NtDDL7/mKj+tI/Q7boBV8oKLR2SJK+3i/cYV17JrtOSZxLDRVSIytuqRGkt05Qo22D
-	dawkO6zHH5lLzJ0sfdxIh90ctEexT1l2Ho84xGlyUhYKOIB/OrIVO9p52tAdaFm/duJdC4
-	TOHnvPQA+oZCwtRzYaZ6nknghqN5tA8=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, rananta@google.com, tabba@google.com,
-	arnd@arndb.de, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [GIT PULL] KVM/arm64 fixes for 6.5, part #2
-Message-ID: <ZMi/EkSLgRymQZzN@thinky-boi>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 121511110
+	for <kvmarm@lists.linux.dev>; Tue,  1 Aug 2023 09:21:51 +0000 (UTC)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-98dfb3f9af6so860580366b.2
+        for <kvmarm@lists.linux.dev>; Tue, 01 Aug 2023 02:21:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1690881710; x=1691486510;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Gm17gZxC0/vm/Jdu3xQH50fn0wnKiSVhKMApv17FsGQ=;
+        b=dq5CAvhQQ+vveH4MSteCM4KpxWqvSjfMuOapn0LnoQqDOErjMIbbWNheVH/uLc2KIf
+         UdBwINkexXsFRjBN8poea9hv+4sXzWagYJkGf39toFnDnN3gA3fyjhZTQCaYda/GblQa
+         pkw6dcECiAkZW/+Wy1xwLXzUC7d0jC/4tRCVUhI1fyGS501AuV0YVethzHboQgI7CbyL
+         M5k4ZKy5NVWRN6++5pgESXlnIknAxtut14Hcvq275w4blo8RZfULkrUqc81+6hPmItwP
+         3fxQ350OyrMQNDnLyh3ELg4ylCq9dGO2couVM6uXKHIXQCaUruaeC2pK2fs6kliqSArs
+         ZedQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690881710; x=1691486510;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Gm17gZxC0/vm/Jdu3xQH50fn0wnKiSVhKMApv17FsGQ=;
+        b=IEb6wO7G4sSemqsTkAWhl2e8Bh1oI1UjMd0m/tb6IAfECFaVLDW0OKCESo5chixRqI
+         uy3/jjcxlBRqUcloNSrvUJgxnKPZcuTKq/xUrWBOxdkHYMdKE0jSxrJOrgBeAfu93JPG
+         uC5c5B3l9KmNN/5233qF3hZ8mzR5+Ww/rz6svVgLukP/n9aXiycIstJbZ3RCAKUgH0wi
+         DI6pndpAKJ5adxG6xW8ot4S6TcQwAwMj4geQkIspVc1vCwPLwibZJ2V2abHq9XRY+THL
+         LfwAGOi5xAdutfh8XmIatsGH5VK53aNu6ZGfMktt9ze3S3FclD70LgKh/Fa0mW0c3oPU
+         Ecrg==
+X-Gm-Message-State: ABy/qLYYB7C26SFwv1AE/556g2+E2cOShVlgLoDcqcsh/mmvKSCvxFH1
+	PSoZQ1LQ1DBlp1x8kYOeNXeGCQ==
+X-Google-Smtp-Source: APBJJlGhr0BuIoveysf7HtzpSl2Jm+kRbIcFJ2Y03OXcder2XbQzIJjvsXJoXuSOYODVVZsM7UAnIg==
+X-Received: by 2002:a17:906:518a:b0:99b:fdbb:31f1 with SMTP id y10-20020a170906518a00b0099bfdbb31f1mr2052678ejk.16.1690881710061;
+        Tue, 01 Aug 2023 02:21:50 -0700 (PDT)
+Received: from localhost (212-5-140-29.ip.btc-net.bg. [212.5.140.29])
+        by smtp.gmail.com with ESMTPSA id m10-20020a17090607ca00b009931a3adf64sm7529760ejc.17.2023.08.01.02.21.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Aug 2023 02:21:49 -0700 (PDT)
+Date: Tue, 1 Aug 2023 11:21:48 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Aaron Lewis <aaronlewis@google.com>
+Subject: Re: [PATCH v4.1 1/3] KVM: selftests: Add arch ucall.h and inline
+ simple arch hooks
+Message-ID: <20230801-3ab43c432cbaafcadbffb092@orel>
+References: <20230731203026.1192091-1-seanjc@google.com>
+ <20230731203026.1192091-2-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -30,74 +61,34 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20230731203026.1192091-2-seanjc@google.com>
 
-Hi Paolo,
+On Mon, Jul 31, 2023 at 01:30:24PM -0700, Sean Christopherson wrote:
+> Add an architecture specific ucall.h and inline the simple arch hooks,
+> e.g. the init hook for everything except ARM, and the actual "do ucall"
+> hook for everything except x86 (which should be simple, but temporarily
+> isn't due to carrying a workaround).
+> 
+> Having a per-arch ucall header will allow adding a #define for the
+> expected KVM exit reason for a ucall that is colocated (for everything
+> except x86) with the ucall itself.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  .../selftests/kvm/include/aarch64/ucall.h      | 18 ++++++++++++++++++
+>  .../selftests/kvm/include/riscv/ucall.h        | 18 ++++++++++++++++++
+>  .../selftests/kvm/include/s390x/ucall.h        | 17 +++++++++++++++++
+>  .../selftests/kvm/include/ucall_common.h       |  1 +
+>  .../selftests/kvm/include/x86_64/ucall.h       | 11 +++++++++++
+>  .../testing/selftests/kvm/lib/aarch64/ucall.c  | 11 +----------
+>  tools/testing/selftests/kvm/lib/riscv/ucall.c  | 11 -----------
+>  tools/testing/selftests/kvm/lib/s390x/ucall.c  | 10 ----------
+>  tools/testing/selftests/kvm/lib/x86_64/ucall.c |  4 ----
+>  9 files changed, 66 insertions(+), 35 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/include/aarch64/ucall.h
+>  create mode 100644 tools/testing/selftests/kvm/include/riscv/ucall.h
+>  create mode 100644 tools/testing/selftests/kvm/include/s390x/ucall.h
+>  create mode 100644 tools/testing/selftests/kvm/include/x86_64/ucall.h
+>
 
-Second batch of fixes for 6.5 here. As usual, details are in the tag but
-of particular interest is the fix for AmpereOne systems, as VMs fail to
-boot when setting up the MMU (yikes).
-
-Please pull.
-
--- 
-Thanks,
-Oliver
-
-The following changes since commit 9d2a55b403eea26cab7c831d8e1c00ef1e6a6850:
-
-  KVM: arm64: Fix the name of sys_reg_desc related to PMU (2023-07-14 23:34:05 +0000)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.5-2
-
-for you to fetch changes up to 74158a8cad79d2f5dcf71508993664c5cfcbfa3c:
-
-  KVM: arm64: Skip instruction after emulating write to TCR_EL1 (2023-07-28 17:11:23 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.5, part #2
-
- - Fixes for the configuration of SVE/SME traps when hVHE mode is in use
-
- - Allow use of pKVM on systems with FF-A implementations that are v1.0
-   compatible
-
- - Request/release percpu IRQs (arch timer, vGIC maintenance) correctly
-   when pKVM is in use
-
- - Fix function prototype after __kvm_host_psci_cpu_entry() rename
-
- - Skip to the next instruction when emulating writes to TCR_EL1 on
-   AmpereOne systems
-
-----------------------------------------------------------------
-Arnd Bergmann (1):
-      KVM: arm64: fix __kvm_host_psci_cpu_entry() prototype
-
-Fuad Tabba (7):
-      KVM: arm64: Factor out code for checking (h)VHE mode into a macro
-      KVM: arm64: Use the appropriate feature trap register for SVE at EL2 setup
-      KVM: arm64: Disable SME traps for (h)VHE at setup
-      KVM: arm64: Helper to write to appropriate feature trap register based on mode
-      KVM: arm64: Use the appropriate feature trap register when activating traps
-      KVM: arm64: Fix resetting SVE trap values on reset for hVHE
-      KVM: arm64: Fix resetting SME trap values on reset for (h)VHE
-
-Oliver Upton (3):
-      KVM: arm64: Allow pKVM on v1.0 compatible FF-A implementations
-      KVM: arm64: Rephrase percpu enable/disable tracking in terms of hyp
-      KVM: arm64: Skip instruction after emulating write to TCR_EL1
-
-Raghavendra Rao Ananta (1):
-      KVM: arm64: Fix hardware enable/disable flows for pKVM
-
- arch/arm64/include/asm/el2_setup.h      | 44 ++++++++++++++++--------
- arch/arm64/include/asm/kvm_asm.h        |  2 +-
- arch/arm64/include/asm/kvm_emulate.h    | 21 +++++++++---
- arch/arm64/kvm/arm.c                    | 61 +++++++++++++++------------------
- arch/arm64/kvm/hyp/include/hyp/switch.h |  1 +
- arch/arm64/kvm/hyp/nvhe/ffa.c           | 15 +++++++-
- arch/arm64/kvm/hyp/nvhe/switch.c        |  2 +-
- 7 files changed, 90 insertions(+), 56 deletions(-)
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
