@@ -1,121 +1,142 @@
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55330DF58
-	for <kvmarm@lists.linux.dev>; Wed,  2 Aug 2023 17:49:13 +0000 (UTC)
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-1bb571ea965so5559435fac.0
-        for <kvmarm@lists.linux.dev>; Wed, 02 Aug 2023 10:49:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690998552; x=1691603352;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jkqdJMsvnVrRBo60+NUWMzNrzTaghjxAkAcp9NTjI7U=;
-        b=qYZLszf+G832APU0iLQ9SDhHuPTE3ItqB1h1SOE36kWmrQQh/dmguNVkGU45Hq9yf8
-         5Js/rXDP2hz8lYlp/9XADzFOJco2hlateqHcVjgHvYC4GYJf0t8UwSqdjPywq3+AycOG
-         DLfaBn4hqTCglB9+hqaHj82XmSBWOK9qQy7g0rsnvV8MmKA9ddPuNhmHC1zRbfrv7eXd
-         Tl3vbF0u8sTrlLURWVKPy9WenP7SMBeciiCChg/IuMi68UstzQEuAv1tqf7zvQ6jkoaS
-         qIBqUxNkywVThWo0kz0nOjX4udk2CB6WnKuY7oDVs9biFODpN2r212df2uGyWVwLI6NH
-         B4Xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690998552; x=1691603352;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jkqdJMsvnVrRBo60+NUWMzNrzTaghjxAkAcp9NTjI7U=;
-        b=WYRYnLA3MAFvl48BV0vVomNRDvOeE3ifhIRXmB1JVtCxbU8dMq66+y2PahOWrttg5X
-         NBbHRZH3ulRGz314X0LVVfg9PFPABeJ2QkiCgaVlB56yNg1HqXxVQSBGdUPuCUM9ht6X
-         uP24zlHo3o1iFBChOkd2cT7XDW2vAivpsxCDeVVjKccdnKicDCoEbPpwA48OXEUPscaL
-         twAmCZnOgcHCFap8pI/2Vp/ok3AALzaTtXsNGyU/LRgt9WonH9wf8kVOPAzw2mi6Q1Fq
-         VlmMiT0X+q8Cye7pfFOA/ZsW7B1qBratudKHRqC6Ax4MHPRw0uIvas0l8LlbPyTRrgvF
-         og1Q==
-X-Gm-Message-State: ABy/qLaBzeL04Dj/qLbZl7D119G3PAVswPwSZ1q7WWojQ27pxtFCPaR1
-	Jy4ytm1ZMOP3NTQv/9EteER2tXIpIwUgevnyxcwj1B56lSnBsm8D1Vw=
-X-Google-Smtp-Source: APBJJlF+hW45L4zt+hV6v1CvORUlP0mnh2MB6RDtiOS9QHnRZhAqJKTZsof6tHpAhnXoQnSabSlwJi5om+C3bOdNWqI=
-X-Received: by 2002:a05:6870:f102:b0:1ba:63b2:899d with SMTP id
- k2-20020a056870f10200b001ba63b2899dmr18481008oac.32.1690998552110; Wed, 02
- Aug 2023 10:49:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B987DF58
+	for <kvmarm@lists.linux.dev>; Wed,  2 Aug 2023 17:52:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8EC9C433C8;
+	Wed,  2 Aug 2023 17:52:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690998778;
+	bh=uRYtG8q0OMNIrkxz12A1TeaVWvX+CXQ+DHeCh+Zma2Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gZCs6EzXdrjn6ib1NtkAeFaf71VC84zl6lF1iqVCC2QxjXPpjJVqXjRsRkKrVz7UI
+	 G1ch6I/jZ14rH5vM/zYo9at60YPjUv3F9P0LXmXjR83gRLjUAwUuX0ayltPxImQeqz
+	 gdjz7dv234YslN5myKZtyELjWtX7f6ZJQoAl0tmd9qlOMmOunc4ahb4hGRb7W+I352
+	 S6GNIH3UwM/fBBZd4lOQOLKLyko1aA0vYFbJ+YYoslhdeZ0yekE8QwRqBebbF1+H70
+	 QEUruCGMptHaFYyhjAZc5yOybW7toswJvhFhRZDM8XGtHxq5gCPZvDTLmQu4BkjQoF
+	 +FgpQBaVCUDmg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qRG1o-001Rzi-Ad;
+	Wed, 02 Aug 2023 18:52:56 +0100
+Date: Wed, 02 Aug 2023 18:52:55 +0100
+Message-ID: <86leet5o20.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Miguel Luis <miguel.luis@oracle.com>
+Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	Catalin Marinas
+	<catalin.marinas@arm.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Mark Brown
+	<broonie@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Will Deacon
+	<will@kernel.org>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Andre
+ Przywara <andre.przywara@arm.com>,
+	Chase Conklin <chase.conklin@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Darren Hart
+	<darren@os.amperecomputing.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K
+ Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 06/26] arm64: Add debug registers affected by HDFGxTR_EL2
+In-Reply-To: <61B845D3-A42B-451F-B74D-51B4A1FD28C6@oracle.com>
+References: <20230728082952.959212-1-maz@kernel.org>
+	<20230728082952.959212-7-maz@kernel.org>
+	<61B845D3-A42B-451F-B74D-51B4A1FD28C6@oracle.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230801152007.337272-1-jingzhangos@google.com>
- <20230801152007.337272-2-jingzhangos@google.com> <ZMmdnou5Pk/9V1Gs@linux.dev>
- <CAAdAUtj-6tk53TE6p0TYBfmFghj94g+Sg2KK_80Gar18kJ=5OA@mail.gmail.com> <ZMqMofRCmB14XUZr@linux.dev>
-In-Reply-To: <ZMqMofRCmB14XUZr@linux.dev>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Wed, 2 Aug 2023 10:48:59 -0700
-Message-ID: <CAAdAUtiemHnLK-y4AmEa53bw4ZhvRsebQWAMjV5dTSxEG0BUJA@mail.gmail.com>
-Subject: Re: [PATCH v7 01/10] KVM: arm64: Allow userspace to get the writable
- masks for feature ID registers
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>, 
-	Raghavendra Rao Ananta <rananta@google.com>, Suraj Jitindar Singh <surajjs@amazon.com>, 
-	Cornelia Huck <cohuck@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Aug 2, 2023 at 10:04=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> On Wed, Aug 02, 2023 at 08:55:43AM -0700, Jing Zhang wrote:
-> > > > +#define ARM64_FEATURE_ID_SPACE_SIZE  (3 * 8 * 8)
-> > > > +
-> > > > +struct feature_id_writable_masks {
-> > > > +     __u64 mask[ARM64_FEATURE_ID_SPACE_SIZE];
-> > > > +};
-> > >
-> > > This UAPI is rather difficult to extend in the future. We may need to
-> > > support describing the masks of multiple ranges of registers in the
-> > > future. I was thinking something along the lines of:
-> > >
-> > >         enum reg_mask_range_idx {
-> > >                 FEATURE_ID,
-> > >         };
-> > >
-> > >         struct reg_mask_range {
-> > >                 __u64 idx;
-> > >                 __u64 *masks;
-> > >                 __u64 rsvd[6];
-> > >         };
-> > >
-> > Since have the way to map sysregs encoding to the index in the mask
-> > array, we can extend the UAPI by just adding a size field in struct
-> > feature_id_writable_masks like below:
-> > struct feature_id_writable_masks {
-> >          __u64 size;
-> >          __u64 mask[ARM64_FEATURE_ID_SPACE_SIZE];
-> > };
-> > The 'size' field can be used as input for the size of 'mask' array and
-> > output for the number of masks actually read in.
-> > This way, we can freely add more ranges without breaking anything in us=
-erspace.
-> > WDYT?
->
-> Sorry, 'index' is a bit overloaded in this context. The point I was
-> trying to get across is that we might want to describe a completely
-> different range of registers than the feature ID registers in the
-> future. Nonetheless, we shouldn't even presume the shape of future
-> extensions to the ioctl.
->
->         struct reg_mask_range {
->                 __u64 addr;     /* pointer to mask array */
->                 __u64 rsvd[7];
->         };
->
-> Then in KVM we should require ::rsvd be zero and fail the ioctl
-> otherwise.
-Got it. Will add the ::rsvd for future expansion.
+On Mon, 31 Jul 2023 17:41:41 +0100,
+Miguel Luis <miguel.luis@oracle.com> wrote:
+>=20
+> Hi Marc,
+>=20
+> A few comments on this one, please see below.
+>=20
+> > On 28 Jul 2023, at 08:29, Marc Zyngier <maz@kernel.org> wrote:
+> >=20
+> > The HDFGxTR_EL2 registers trap a (huge) set of debug and trace
+> > related registers. Add their encodings (and only that, because
+> > we really don't care about what these registers actually do at
+> > this stage).
+> >=20
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> > arch/arm64/include/asm/sysreg.h | 78 +++++++++++++++++++++++++++++++++
+> > 1 file changed, 78 insertions(+)
+> >=20
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/s=
+ysreg.h
+> > index 76289339b43b..9dfd127be55a 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -194,6 +194,84 @@
+> > #define SYS_DBGDTRTX_EL0 sys_reg(2, 3, 0, 5, 0)
+> > #define SYS_DBGVCR32_EL2 sys_reg(2, 4, 0, 7, 0)
+> >=20
+> > +#define SYS_BRBINF_EL1(n) sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) =
+| 0))
+> > +#define SYS_BRBINFINJ_EL1 sys_reg(2, 1, 9, 1, 0)
+> > +#define SYS_BRBSRC_EL1(n) sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) =
+| 1))
+> > +#define SYS_BRBSRCINJ_EL1 sys_reg(2, 1, 9, 1, 1)
+> > +#define SYS_BRBTGT_EL1(n) sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) =
+| 2))
+> > +#define SYS_BRBTGTINJ_EL1 sys_reg(2, 1, 9, 1, 2)
+> > +#define SYS_BRBTS_EL1 sys_reg(2, 1, 9, 0, 2)
+> > +
+> > +#define SYS_BRBCR_EL1 sys_reg(2, 1, 9, 0, 0)
+> > +#define SYS_BRBFCR_EL1 sys_reg(2, 1, 9, 0, 1)
+> > +#define SYS_BRBIDR0_EL1 sys_reg(2, 1, 9, 2, 0)
+> > +
+> > +#define SYS_TRCITECR_EL1 sys_reg(3, 0, 1, 2, 3)
+> > +#define SYS_TRCITECR_EL1 sys_reg(3, 0, 1, 2, 3)
+>=20
+> SYS_TRCITECR_EL1 shows up twice.
+
+Ah, nice one. Too many registers.
+
+>=20
+> > +#define SYS_TRCACATR(m) sys_reg(2, 1, 2, ((m & 7) << 1), (2 | (m >> 3)=
+))
+>=20
+> Besides m=E2=80=99s restrictions it could be sanitised in op2 to consider=
+ only bit m[3].
+> Suggestion for op2: (2 | ((m & 8) >> 3)))
+
+It is fully expected that 'm' will be in the 0-15 range, as per the
+architecture (D19.4.8), and the tables only use that exact range.
+
+Do you see an actual bug, or is this defensive programming?
 
 Thanks,
-Jing
->
-> --
-> Thanks,
-> Oliver
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
