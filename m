@@ -1,73 +1,181 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B2D812B84
-	for <kvmarm@lists.linux.dev>; Wed,  2 Aug 2023 22:13:27 +0000 (UTC)
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1bba5563cd6so4906675ad.3
-        for <kvmarm@lists.linux.dev>; Wed, 02 Aug 2023 15:13:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691014407; x=1691619207;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oNrunTw9g/scAXlACL1Yy6BuHYu8UXiywBffDHO0ySM=;
-        b=oRnUg49TyqQtCpG9mB1+Zt8T8V0fo6eI5r3czuLbiC4L4rdWaAvVrHBVtqTeJ90E9Y
-         B5mZ5FxEswdpGVKmbD8pwI9bFz4V/mbheFZjzkgcOl/c5u2L4vsnneSqeIgWAP8/lQI3
-         K34qOuv/PzRLXUwq2elOGYB7F92GhrDe+DtfEWHBkMakUjcspHZ8f6JEMNK1zQ9wuHBz
-         e1B2WnP1p9aoj/wxzD9TsVHQB621qb0zo19xWV98Sv2YUL8E4eyA30M5eo4U916dAc/p
-         X3aJpDamXtAC63JzSAXYnBsVQdUH92Yy4Se4/Lf7hhcWQoOgRWe+WrTk8vAfPtRpUjwE
-         +ONw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691014407; x=1691619207;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oNrunTw9g/scAXlACL1Yy6BuHYu8UXiywBffDHO0ySM=;
-        b=lUZvoBauMhqmApWjFbD1kXYopDM9wX2ljoO9m3gC3K34IiSZZzZtCz/AvpwvCawHAc
-         eNuxnai+0QRpUFiCo+8oQy6w7leCRCRLdh1NMuDQz3vT/1mdF0KZvr2bweJEdr70wZ+A
-         za1Z89q6OjhlSDQ0/VX4HyT9MKyltakcORt4ar4jM2cdBSJv4cj8aLtKMbcViHAXbGmI
-         c8z2GStnSkWos0OUHatUtyjcHGVtCrb6Pgra5bkym61IvEYq5Om0oAXAQLawAZ8WcUfX
-         FYNjJ3nBW8DtIfDO/yhfii67FwDZo2NDZKsEwZ3sE3knDDn6D7Q1jGO32+ZMnVAawhFP
-         wksA==
-X-Gm-Message-State: ABy/qLZ1cJEtSMlIEIdxvwNwY5KZAUAFaVPTaZI8k46/f9Ye+3z6e66S
-	48C+tSG9/suKLnF2RCOstZJ2yntUkJ0=
-X-Google-Smtp-Source: APBJJlHYYJG7D9hZiA9amsdCWObbBIYwdulg2VqDtGhU7hg3L7bAfjSx7kf9waosJHPo/esHNLPSDeRdLuI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:e5c1:b0:1b7:edcd:8dcf with SMTP id
- u1-20020a170902e5c100b001b7edcd8dcfmr104418plf.4.1691014406820; Wed, 02 Aug
- 2023 15:13:26 -0700 (PDT)
-Date: Wed, 2 Aug 2023 15:13:25 -0700
-In-Reply-To: <20230726044652.2169513-1-jingzhangos@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B380F134B6
+	for <kvmarm@lists.linux.dev>; Wed,  2 Aug 2023 23:25:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 053E6C433C8;
+	Wed,  2 Aug 2023 23:25:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691018738;
+	bh=Zx3cU1AZGQaxXPGcCJrj5p1vHuj6co3/D60PUthhRSM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=vKnBfzTb81DgZpoziNV0oB22VyDwO1WFiZhXntDBeusTiG8UdC5Z2OBiQnbAP1ShY
+	 qcuVlWga2yTSL9HcGToI/faLHDLtyqdkcwgrnVTv0MeEqPqiEBtXPKl6+Eukjy7qty
+	 c9qlVnmi43y4FVC5mIhwmWAGEPylLQWbxx21TFKR2ZfzElIbR5PnIVSf3qFhbGyqlN
+	 JZ2zTwgl97buvmko9yGDiH2GvZFPoFmBLQ6Senku43wvuASp8IQU/sNScOMUfc75dv
+	 QbQjPqFkxNRUe4FslUdhHpAR2Qr2cVW0rUL2ZigJTMP5rHkKx6JfytnjvMFSE6X3gc
+	 GjBlx97VwG1XQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qRLDj-001Vp2-FV;
+	Thu, 03 Aug 2023 00:25:35 +0100
+Date: Thu, 03 Aug 2023 00:25:35 +0100
+Message-ID: <86h6ph58nk.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Jing Zhang <jingzhangos@google.com>,
+	Reiji Watanabe <reijiw@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	David Matlack <dmatlack@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-mips@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	Gavin Shan <gshan@redhat.com>,
+	Shaoqin Huang <shahuang@redhat.com>
+Subject: Re: [PATCH v7 08/12] KVM: arm64: Define kvm_tlb_flush_vmid_range()
+In-Reply-To: <CAJHc60xC-Bs-0uoqkytDVcwHTxVnW7eyVxfHhO0mRrupVbdaYg@mail.gmail.com>
+References: <20230722022251.3446223-1-rananta@google.com>
+	<20230722022251.3446223-9-rananta@google.com>
+	<87o7jxr06t.wl-maz@kernel.org>
+	<87lef1qzim.wl-maz@kernel.org>
+	<CAJHc60xC-Bs-0uoqkytDVcwHTxVnW7eyVxfHhO0mRrupVbdaYg@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230726044652.2169513-1-jingzhangos@google.com>
-Message-ID: <ZMrVBWg+c3PSUilR@google.com>
-Subject: Re: [PATCH v1] KVM: arm64: selftests: Test pointer authentication
- support in KVM guest
-From: Sean Christopherson <seanjc@google.com>
-To: Jing Zhang <jingzhangos@google.com>
-Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, seanjc@google.com, chenhuacai@kernel.org, yuzenghui@huawei.com, anup@brainfault.org, atishp@atishpatra.org, jingzhangos@google.com, reijiw@google.com, coltonlewis@google.com, dmatlack@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, gshan@redhat.com, shahuang@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Jul 25, 2023, Jing Zhang wrote:
-> Add a selftest to verify the support for pointer authentication in KVM
-> guest.
-> 
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+On Mon, 31 Jul 2023 19:01:53 +0100,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
+>=20
+> On Thu, Jul 27, 2023 at 6:01=E2=80=AFAM Marc Zyngier <maz@kernel.org> wro=
+te:
+> >
+> > On Thu, 27 Jul 2023 13:47:06 +0100,
+> > Marc Zyngier <maz@kernel.org> wrote:
+> > >
+> > > On Sat, 22 Jul 2023 03:22:47 +0100,
+> > > Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > > >
+> > > > Implement the helper kvm_tlb_flush_vmid_range() that acts
+> > > > as a wrapper for range-based TLB invalidations. For the
+> > > > given VMID, use the range-based TLBI instructions to do
+> > > > the job or fallback to invalidating all the TLB entries.
+> > > >
+> > > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > > > Reviewed-by: Gavin Shan <gshan@redhat.com>
+> > > > Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> > > > ---
+> > > >  arch/arm64/include/asm/kvm_pgtable.h | 10 ++++++++++
+> > > >  arch/arm64/kvm/hyp/pgtable.c         | 20 ++++++++++++++++++++
+> > > >  2 files changed, 30 insertions(+)
+> > > >
+> > > > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/incl=
+ude/asm/kvm_pgtable.h
+> > > > index 8294a9a7e566..5e8b1ff07854 100644
+> > > > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > > > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > > > @@ -754,4 +754,14 @@ enum kvm_pgtable_prot kvm_pgtable_stage2_pte_p=
+rot(kvm_pte_t pte);
+> > > >   *    kvm_pgtable_prot format.
+> > > >   */
+> > > >  enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte);
+> > > > +
+> > > > +/**
+> > > > + * kvm_tlb_flush_vmid_range() - Invalidate/flush a range of TLB en=
+tries
+> > > > + *
+> > > > + * @mmu:   Stage-2 KVM MMU struct
+> > > > + * @addr:  The base Intermediate physical address from which to in=
+validate
+> > > > + * @size:  Size of the range from the base to invalidate
+> > > > + */
+> > > > +void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+> > > > +                           phys_addr_t addr, size_t size);
+> > > >  #endif     /* __ARM64_KVM_PGTABLE_H__ */
+> > > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgta=
+ble.c
+> > > > index aa740a974e02..5d14d5d5819a 100644
+> > > > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > > > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > > > @@ -670,6 +670,26 @@ static bool stage2_has_fwb(struct kvm_pgtable =
+*pgt)
+> > > >     return !(pgt->flags & KVM_PGTABLE_S2_NOFWB);
+> > > >  }
+> > > >
+> > > > +void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+> > > > +                           phys_addr_t addr, size_t size)
+> > > > +{
+> > > > +   unsigned long pages, inval_pages;
+> > > > +
+> > > > +   if (!system_supports_tlb_range()) {
+> > > > +           kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
+> > > > +           return;
+> > > > +   }
+> > > > +
+> > > > +   pages =3D size >> PAGE_SHIFT;
+> > > > +   while (pages > 0) {
+> > > > +           inval_pages =3D min(pages, MAX_TLBI_RANGE_PAGES);
+> > > > +           kvm_call_hyp(__kvm_tlb_flush_vmid_range, mmu, addr, inv=
+al_pages);
+> > > > +
+> > > > +           addr +=3D inval_pages << PAGE_SHIFT;
+> > > > +           pages -=3D inval_pages;
+> > > > +   }
+> > > > +}
+> > > > +
+> > >
+> > > This really shouldn't live in pgtable.c. This code gets linked into
+> > > the EL2 object. What do you think happens if, for some reason, this
+> > > gets called *from EL2*?
+> >
+> > Ah, actually, nothing too bad would happen, as we convert the
+> > kvm_call_hyp() into a function call.
+> >
+> > But still, we don't need two copies of this stuff, and it can live in
+> > mmu.c.
+> >
+> But since we have a couple of references in pgtable.c to
+> kvm_tlb_flush_vmid_range(), wouldn't that be an (linking) issue if we
+> moved the definition to mmu.c?
+>=20
+> ld: error: undefined symbol: __kvm_nvhe_kvm_tlb_flush_vmid_range
+> >>> referenced by pgtable.c:1148 (./arch/arm64/kvm/hyp/nvhe/../pgtable.c:=
+1148)
+> >>>               arch/arm64/kvm/hyp/nvhe/kvm_nvhe.o:(__kvm_nvhe_kvm_pgta=
+ble_stage2_unmap) in archive vmlinux.a
+> ...
 
-...
+Ah crap, I missed that. What a mess. Forget it then. It really is a
+shame that all the neat separation between mmu.c and pgtable.c that we
+were aiming for is ultimately lost.
 
-> +	/* Shouldn't be here unless the pac_corruptor didn't do its work */
-> +	GUEST_SYNC(FAIL);
+	M.
 
-FYI, I'm fast tracking guest printf support along with a pile of GUEST_ASSERT()
-changes through kvm-x86/selftests[*].  At a glance, this test can probably use
-e.g. GUEST_FAIL() to make things easier to debug.
-
-[*] https://lore.kernel.org/all/20230729003643.1053367-1-seanjc@google.com
+--=20
+Without deviation from the norm, progress is not possible.
