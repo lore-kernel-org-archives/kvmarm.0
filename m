@@ -1,51 +1,56 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51D57C8F2
-	for <kvmarm@lists.linux.dev>; Wed,  2 Aug 2023 15:54:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4222C433C7;
-	Wed,  2 Aug 2023 15:54:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9350D505
+	for <kvmarm@lists.linux.dev>; Wed,  2 Aug 2023 15:55:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 371B5C433C8;
+	Wed,  2 Aug 2023 15:55:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690991658;
-	bh=CG7zRefX3vIt6QnpDyTwXaNQXmqFTUj9YMbM/HH75A0=;
+	s=k20201202; t=1690991713;
+	bh=vmS3y3vEprt4Ee9EVdT/KBotedRLV0L1wK1C8giiJQ0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=d8goIOTrUwi6bz/hFXw/xgAPyKfedzSYI+8GscwiW+tk8X1vQfN9RoaEx7Wd+cZ3t
-	 8T3UVktGFblRsP6mQnD6+knUpp4KO/+zZfDwZmD0RhvemS/YDOQayojvRsnELfXQ0T
-	 /pfE3VxAvD/pOCC/dudtI6dA5vx31U68ofpyFoPJX3M5xG98QEjJLQABi2DSZvu8yW
-	 h8n3JiQhSLptcmtD9seypjNp0fXMIiDboCwxMo5q44zQ1se/GfJLnrqG2o2XBmLTj0
-	 vFZfkTIhUeI1xWJ6335xw0GNFy9x+eYeDkeoTXFKAq+ptse9HMlvDiUaX+8V4a8TW1
-	 HBrpcfxcWbpog==
+	b=WeiXGksNCeqBY0D4Z/8Ow3J9XqjC9OJyQu+88uQz8TQaiKoIgPzO9Yl9TRNFTlF3D
+	 N39NOOXy/Mz33yVrblUjCuLOvbkllNtHrbplC8Lqq3XEZb+5b6hwCMns6zjmiGDiR5
+	 WyKju8MvL8RFMV0pD03r+FySvZn1XdniQk0Eq3w2KYJ+neD3VaPmcPNIxN2Y2gg+sv
+	 DUsm6xoKz5G2XuJa48wmKk8Acu4wfo23otwQde0jhhtejTCMbDPpc0JiEX4uvF0xoL
+	 oztN3yS/UAXRXhwX7BD0euPVgBUKmEnA+m7EZc5otPguhtVvE1+tJsa8wHuWBmvo03
+	 IzWfXQNHWVpaQ==
 Received: from [104.132.1.99] (helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qREAx-001Prr-LD;
-	Wed, 02 Aug 2023 16:54:16 +0100
-Date: Wed, 02 Aug 2023 16:54:10 +0100
-Message-ID: <878ratqw2l.wl-maz@kernel.org>
+	id 1qREBq-001PtL-B3;
+	Wed, 02 Aug 2023 16:55:10 +0100
+Date: Wed, 02 Aug 2023 16:55:05 +0100
+Message-ID: <877cqdqw12.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Sean Christopherson <seanjc@google.com>,	Oliver Upton
- <oliver.upton@linux.dev>,	James Morse <james.morse@arm.com>,	Suzuki K
- Poulose <suzuki.poulose@arm.com>,	Paolo Bonzini <pbonzini@redhat.com>,
-	Huacai Chen <chenhuacai@kernel.org>,	Zenghui Yu <yuzenghui@huawei.com>,
-	Anup Patel <anup@brainfault.org>,	Atish Patra <atishp@atishpatra.org>,	Jing
- Zhang <jingzhangos@google.com>,	Reiji Watanabe <reijiw@google.com>,	Colton
- Lewis <coltonlewis@google.com>,	David Matlack <dmatlack@google.com>,
-	linux-arm-kernel@lists.infradead.org,	kvmarm@lists.linux.dev,
-	linux-mips@vger.kernel.org,	kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org,	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,	Gavin Shan <gshan@redhat.com>,	Philippe
- =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>,	Shaoqin Huang
- <shahuang@redhat.com>
-Subject: Re: [PATCH v7 01/12] KVM: Rename kvm_arch_flush_remote_tlb() to kvm_arch_flush_remote_tlbs()
-In-Reply-To: <CAJHc60xM+KsUKxtoqORnpzrRke4T-sob2uLJRMvBKwruipxnpw@mail.gmail.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Raghavendra Rao Ananta <rananta@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Jing Zhang <jingzhangos@google.com>,
+	Reiji Watanabe <reijiw@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	David Matlack <dmatlack@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-mips@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v7 02/12] KVM: arm64: Use kvm_arch_flush_remote_tlbs()
+In-Reply-To: <ZMgsjx8dwKd4xBGe@google.com>
 References: <20230722022251.3446223-1-rananta@google.com>
-	<20230722022251.3446223-2-rananta@google.com>
-	<87v8e5r6s6.wl-maz@kernel.org>
-	<CAJHc60wtc2Usei3hKj1ykVRvBZFFCBOHMi9HCxnNvGK2dPFApA@mail.gmail.com>
-	<ZMgqueePlmKvgUId@google.com>
-	<CAJHc60xM+KsUKxtoqORnpzrRke4T-sob2uLJRMvBKwruipxnpw@mail.gmail.com>
+	<20230722022251.3446223-3-rananta@google.com>
+	<87tttpr6qy.wl-maz@kernel.org>
+	<ZMgsjx8dwKd4xBGe@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,115 +60,41 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 104.132.1.99
-X-SA-Exim-Rcpt-To: rananta@google.com, seanjc@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, chenhuacai@kernel.org, yuzenghui@huawei.com, anup@brainfault.org, atishp@atishpatra.org, jingzhangos@google.com, reijiw@google.com, coltonlewis@google.com, dmatlack@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, gshan@redhat.com, philmd@linaro.org, shahuang@redhat.com
+X-SA-Exim-Rcpt-To: seanjc@google.com, rananta@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, chenhuacai@kernel.org, yuzenghui@huawei.com, anup@brainfault.org, atishp@atishpatra.org, jingzhangos@google.com, reijiw@google.com, coltonlewis@google.com, dmatlack@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 01 Aug 2023 01:42:54 +0100,
-Raghavendra Rao Ananta <rananta@google.com> wrote:
->=20
-> On Mon, Jul 31, 2023 at 2:42=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >
-> > On Mon, Jul 31, 2023, Raghavendra Rao Ananta wrote:
-> > > On Thu, Jul 27, 2023 at 3:24=E2=80=AFAM Marc Zyngier <maz@kernel.org>=
- wrote:
-> > > >
-> > > > On Sat, 22 Jul 2023 03:22:40 +0100,
-> > > > Raghavendra Rao Ananta <rananta@google.com> wrote:
-> > > > >
-> > > > > From: David Matlack <dmatlack@google.com>
-> > > > >
-> > > > > Rename kvm_arch_flush_remote_tlb() and the associated macro
-> > > > > __KVM_HAVE_ARCH_FLUSH_REMOTE_TLB to kvm_arch_flush_remote_tlbs() =
-and
-> > > > > __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS respectively.
-> > > > >
-> > > > > Making the name plural matches kvm_flush_remote_tlbs() and makes =
-it more
-> > > > > clear that this function can affect more than one remote TLB.
-> > > > >
-> > > > > No functional change intended.
-> > > > >
-> > > > > Signed-off-by: David Matlack <dmatlack@google.com>
-> > > > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > > > > Reviewed-by: Gavin Shan <gshan@redhat.com>
-> > > > > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
-> > > > > Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> > > > > ---
-> > > > >  arch/mips/include/asm/kvm_host.h | 4 ++--
-> > > > >  arch/mips/kvm/mips.c             | 2 +-
-> > > > >  arch/x86/include/asm/kvm_host.h  | 4 ++--
-> > > > >  include/linux/kvm_host.h         | 4 ++--
-> > > > >  virt/kvm/kvm_main.c              | 2 +-
-> > > > >  5 files changed, 8 insertions(+), 8 deletions(-)
-> > > > >
-> > > > > diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include=
-/asm/kvm_host.h
-> > > > > index 04cedf9f8811..9b0ad8f3bf32 100644
-> > > > > --- a/arch/mips/include/asm/kvm_host.h
-> > > > > +++ b/arch/mips/include/asm/kvm_host.h
-> > > > > @@ -896,7 +896,7 @@ static inline void kvm_arch_sched_in(struct k=
-vm_vcpu *vcpu, int cpu) {}
-> > > > >  static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)=
- {}
-> > > > >  static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcp=
-u) {}
-> > > > >
-> > > > > -#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLB
-> > > > > -int kvm_arch_flush_remote_tlb(struct kvm *kvm);
-> > > > > +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
-> > > > > +int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
-> > > >
-> > > > How about making this prototype global? I don't see a point in havi=
-ng
-> > > > it per-architecture, specially as you are adding arm64 to that mix =
-in
-> > > > the following patch.
-> > > >
-> > > We can make it global, but I'm not sure what was the intention of the
-> > > original author. My guess is that he was following the same style that
-> > > we have for some of the other kvm_arch_*() functions
-> > > (kvm_arch_free_vm() for example)?
-> >
-> > Heh, KVM has a *lot* of code that was written with questionable style. =
- I agree
-> > with Marc, I can't think of a single reason not to have the definition =
-in common
-> > code.  Declaring the function doesn't preclude a "static inline" implem=
-entation,
-> > and we could even keep the prototype under an #ifdef, e.g.
-> >
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index 9d3ac7720da9..5ac64f933547 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -1484,6 +1484,8 @@ static inline int kvm_arch_flush_remote_tlb(struc=
-t kvm *kvm)
-> >  {
-> >         return -ENOTSUPP;
-> >  }
-> > +#else
-> > +int kvm_arch_flush_remote_tlb(struct kvm *kvm);
-> >  #endif
-> >
-> >  #ifdef __KVM_HAVE_ARCH_NONCOHERENT_DMA
-> >
-> Thanks for the suggestions; I can go with a common declaration. Along
-> with that, do we want to keep defining
-> __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS in the arch code that supports it or
-> convert it into a CONFIG_?
+On Mon, 31 Jul 2023 22:50:07 +0100,
+Sean Christopherson <seanjc@google.com> wrote:
+> 
+> On Thu, Jul 27, 2023, Marc Zyngier wrote:
+> > On Sat, 22 Jul 2023 03:22:41 +0100,
+> > Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > > 
+> > > Stop depending on CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL and opt to
+> > > standardize on kvm_arch_flush_remote_tlbs() since it avoids
+> > > duplicating the generic TLB stats across architectures that implement
+> > > their own remote TLB flush.
+> > > 
+> > > This adds an extra function call to the ARM64 kvm_flush_remote_tlbs()
+> > > path, but that is a small cost in comparison to flushing remote TLBs.
+> > 
+> > Well, there is no such thing as a "remote TLB" anyway. We either have
+> > a non-shareable or inner-shareable invalidation. The notion of remote
+> > would imply that we track who potentially has a TLB, which we
+> > obviously don't.
+> 
+> Maybe kvm_arch_flush_vm_tlbs()?  The "remote" part is misleading even on x86 when
+> running on Hyper-V, as the flush may be done via a single hypercall and by kicking
+> "remote" vCPUs.
 
-This isn't something that a user can select, more something that is an
-architectural decision. Maybe in a later patch if there is a consensus
-around that, but probably not as part of this series.
+Yup, this would be much better.
 
 Thanks,
 
 	M.
 
---=20
+-- 
 Without deviation from the norm, progress is not possible.
