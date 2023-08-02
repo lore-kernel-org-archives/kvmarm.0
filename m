@@ -1,187 +1,101 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-107.mta1.migadu.com (out-107.mta1.migadu.com [95.215.58.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8BD15AF1
-	for <kvmarm@lists.linux.dev>; Wed,  2 Aug 2023 23:34:00 +0000 (UTC)
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1bc0308d1e2so68585ad.0
-        for <kvmarm@lists.linux.dev>; Wed, 02 Aug 2023 16:34:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691019240; x=1691624040;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Vc6C3YLRbpQi2AL32H49CSJKRRKMAivDlEx5K2+EnSw=;
-        b=xf/IJNr/83ysKxnLoIpURXqtW5k4S78Gh5tHb3m0g2cM656O5cPNqbgVhIX2RxNi81
-         rwN3s+1UASkz3bkOQsKt/jfKJPUdzGRFa2ffYFtxNksgXsGw9O+9OKdHnIY5qvM4LBWh
-         SO1LP5+sgpcVIpZxoTkUG2YUN21gRCZKcROF8+jYm9Oz49kUtlbb/rvbWBZj7GBNX8w0
-         4wDDyENbZdXj4phELOLafcq19/Iy+WmF5GW/WIxs4naY1ZHw9AH8dTs/Xqsb0FZL+KGI
-         5+YVJJNiMt5dFlAPlHT/6ZhE+J9D0mljI4Zs6eq8RwKcYhSzORWMDh2dDSPiSsB1zI2l
-         W0ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691019240; x=1691624040;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Vc6C3YLRbpQi2AL32H49CSJKRRKMAivDlEx5K2+EnSw=;
-        b=OOOV+lwFVduNXXpERqJ3YqhZPBoVPu+i88K+potCvWbEsIF7c4Y0dSN6xLIdCpe6tj
-         J7BCtfCpYubxuR9bbvVJS6SW93rjQ6YU7Y9HvCi5d3sv7zRNvA5KghD5n3ceW20FlLYZ
-         omv6XRNFbfIqoO2+uGzTI6ArP8GWtOVUK9eW7F0X5aXD+Z6ZOv6psJDW+ycl037Wqwlh
-         tznlcK1axhk2/9h3P6Xxn8ZoXrA7EEvnSV6cfuv7goqunIRf8pgwn+7NhMFriOlXch6a
-         J+nPGHRrmsmtf8OmsBaWx9hIU44Sc5e21y+U15PL+G7zb2YbZWCKZcttXluKqysXvGfc
-         rdyg==
-X-Gm-Message-State: AOJu0Yy6fc9Gx8oh0hOp4K8hsB/4Kk46eoE2Q33v3xHJGVG8AEpCa+vY
-	L2lAoktyLSLB1rtLxYrWi8+ecxCKBX8LHxQMvTh0kA==
-X-Google-Smtp-Source: AGHT+IHW4A1mLYKXPi0AX+HzRbUtlH1BLHQ/AL7bLTbxnxnSwM+iSVI/MQBnIBN/qF4PUit3MoTRa1yu+rP1rkdZcH0=
-X-Received: by 2002:a17:903:5ce:b0:1bc:3321:4105 with SMTP id
- kf14-20020a17090305ce00b001bc33214105mr289379plb.2.1691019240198; Wed, 02 Aug
- 2023 16:34:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7ECDDF62
+	for <kvmarm@lists.linux.dev>; Wed,  2 Aug 2023 23:43:12 +0000 (UTC)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1691019791;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=R2RlCwZNfKPoBl/YBp1ZtAc2eI49tDe7LZAUDFCIQzA=;
+	b=DgNKCrXTQk7jLiZt4kP72kZ4GOZT2dS1skmtHQgStGJLaV7nLOzkcdvzxmpkt0XGKCPvHQ
+	0EHH4VV3ckR+vd7clyCfiNcDesNn2WXfoIwOiusztgs3jYepYc19jLaRKwBBCH2JKu+6bi
+	T5bVOSxDcNw7b8BZPPkrcx2LPgt7bi4=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Julien Thierry <julien.thierry.kdev@gmail.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH kvmtool v3 00/17] aarch64: Handle PSCI calls in userspace
+Date: Wed,  2 Aug 2023 23:42:38 +0000
+Message-ID: <20230802234255.466782-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230722022251.3446223-1-rananta@google.com> <20230722022251.3446223-13-rananta@google.com>
- <87jzulqz0v.wl-maz@kernel.org> <CAJHc60zGzAqWw2iZwNEG_bWERXkz_io7ae-K_tf_kh6xcOBxLA@mail.gmail.com>
- <86fs5158j7.wl-maz@kernel.org>
-In-Reply-To: <86fs5158j7.wl-maz@kernel.org>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Wed, 2 Aug 2023 16:33:48 -0700
-Message-ID: <CAJHc60ww4X89SU+ttddjZUjOFS+D_s9Z+2xE1WaVCR-w7hEF9g@mail.gmail.com>
-Subject: Re: [PATCH v7 12/12] KVM: arm64: Use TLBI range-based intructions for unmap
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Sean Christopherson <seanjc@google.com>, Huacai Chen <chenhuacai@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Jing Zhang <jingzhangos@google.com>, 
-	Reiji Watanabe <reijiw@google.com>, Colton Lewis <coltonlewis@google.com>, 
-	David Matlack <dmatlack@google.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Aug 2, 2023 at 4:28=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Mon, 31 Jul 2023 19:26:09 +0100,
-> Raghavendra Rao Ananta <rananta@google.com> wrote:
-> >
-> > On Thu, Jul 27, 2023 at 6:12=E2=80=AFAM Marc Zyngier <maz@kernel.org> w=
-rote:
-> > >
-> > > On Sat, 22 Jul 2023 03:22:51 +0100,
-> > > Raghavendra Rao Ananta <rananta@google.com> wrote:
-> > > >
-> > > > The current implementation of the stage-2 unmap walker traverses
-> > > > the given range and, as a part of break-before-make, performs
-> > > > TLB invalidations with a DSB for every PTE. A multitude of this
-> > > > combination could cause a performance bottleneck on some systems.
-> > > >
-> > > > Hence, if the system supports FEAT_TLBIRANGE, defer the TLB
-> > > > invalidations until the entire walk is finished, and then
-> > > > use range-based instructions to invalidate the TLBs in one go.
-> > > > Condition deferred TLB invalidation on the system supporting FWB,
-> > > > as the optimization is entirely pointless when the unmap walker
-> > > > needs to perform CMOs.
-> > > >
-> > > > Rename stage2_put_pte() to stage2_unmap_put_pte() as the function
-> > > > now serves the stage-2 unmap walker specifically, rather than
-> > > > acting generic.
-> > > >
-> > > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > > > ---
-> > > >  arch/arm64/kvm/hyp/pgtable.c | 67 +++++++++++++++++++++++++++++++-=
-----
-> > > >  1 file changed, 58 insertions(+), 9 deletions(-)
-> > > >
-> > > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgta=
-ble.c
-> > > > index 5ef098af1736..cf88933a2ea0 100644
-> > > > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > > > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > > > @@ -831,16 +831,54 @@ static void stage2_make_pte(const struct kvm_=
-pgtable_visit_ctx *ctx, kvm_pte_t n
-> > > >       smp_store_release(ctx->ptep, new);
-> > > >  }
-> > > >
-> > > > -static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx=
-, struct kvm_s2_mmu *mmu,
-> > > > -                        struct kvm_pgtable_mm_ops *mm_ops)
-> > > > +struct stage2_unmap_data {
-> > > > +     struct kvm_pgtable *pgt;
-> > > > +     bool defer_tlb_flush_init;
-> > > > +};
-> > > > +
-> > > > +static bool __stage2_unmap_defer_tlb_flush(struct kvm_pgtable *pgt=
-)
-> > > > +{
-> > > > +     /*
-> > > > +      * If FEAT_TLBIRANGE is implemented, defer the individual
-> > > > +      * TLB invalidations until the entire walk is finished, and
-> > > > +      * then use the range-based TLBI instructions to do the
-> > > > +      * invalidations. Condition deferred TLB invalidation on the
-> > > > +      * system supporting FWB, as the optimization is entirely
-> > > > +      * pointless when the unmap walker needs to perform CMOs.
-> > > > +      */
-> > > > +     return system_supports_tlb_range() && stage2_has_fwb(pgt);
-> > > > +}
-> > > > +
-> > > > +static bool stage2_unmap_defer_tlb_flush(struct stage2_unmap_data =
-*unmap_data)
-> > > > +{
-> > > > +     bool defer_tlb_flush =3D __stage2_unmap_defer_tlb_flush(unmap=
-_data->pgt);
-> > > > +
-> > > > +     /*
-> > > > +      * Since __stage2_unmap_defer_tlb_flush() is based on alterna=
-tive
-> > > > +      * patching and the TLBIs' operations behavior depend on this=
-,
-> > > > +      * track if there's any change in the state during the unmap =
-sequence.
-> > > > +      */
-> > > > +     WARN_ON(unmap_data->defer_tlb_flush_init !=3D defer_tlb_flush=
-);
-> > > > +     return defer_tlb_flush;
-> > >
-> > > I really don't understand what you're testing here. The ability to
-> > > defer TLB invalidation is a function of the system capabilities
-> > > (range+FWB) and a single flag that is only set on the host for pKVM.
-> > >
-> > > How could that change in the middle of the life of the system? if
-> > > further begs the question about the need for the unmap_data data
-> > > structure.
-> > >
-> > > It looks to me that we could simply pass the pgt pointer around and b=
-e
-> > > done with it. Am I missing something obvious?
-> > >
-> > From one of the previous comments [1] (used in a different context),
-> > I'm given to understand that since these feature checks are governed
-> > by alternative patching, they can potentially change (at runtime?). Is
-> > that not the case and I have misunderstood the idea in comment [1]
-> > entirely? Is it solely used for optimization purposes and set only
-> > once?
->
-> Alternative patching, just like the static branches used to implement
-> the capability stuff, is a one way street. At the point where KVM is
-> initialised, these configurations are set in stone, and there is no
-> going back.
->
-Understood.
-> > If that's the case, I can get rid of the WARN_ON() and unmap_data.
->
-> yes, please.
->
-Sure, I'll get rid of the WARN_ON and 'struct stage2_unmap_data' in v8.
+v3 of the series to do PSCI calls in userspace, as an example for using
+the SMCCC filtering API added to KVM in 6.4.
 
-Thanks,
-Raghavendra
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+v2 -> v3:
+ - Dropped some of the headers patches since they've already been
+   updated
+ - Redo header imports on top of 6.5-rc1
+ - Actually use the right subject prefix...
+
+v2: https://lore.kernel.org/kvmarm/20230620163353.2688567-1-oliver.upton@linux.dev/
+
+Oliver Upton (17):
+  Import arm-smccc.h from Linux 6.5-rc1
+  aarch64: Copy cputype.h from Linux 6.5-rc1
+  Update psci.h to Linux 6.5-rc1
+  arm: Stash kvm_vcpu_init for later use
+  arm: Use KVM_SET_MP_STATE ioctl to power off non-boot vCPUs
+  aarch64: Expose ARM64_CORE_REG() for general use
+  arm: Generalize execution state specific VM initialization
+  Add helpers to pause the VM from vCPU thread
+  aarch64: Add support for finding vCPU for given MPIDR
+  aarch64: Add skeleton implementation for PSCI
+  aarch64: psci: Implement CPU_SUSPEND
+  aarch64: psci: Implement CPU_OFF
+  aarch64: psci: Implement CPU_ON
+  aarch64: psci: Implement AFFINITY_INFO
+  aarch64: psci: Implement MIGRATE_INFO_TYPE
+  aarch64: psci: Implement SYSTEM_{OFF,RESET}
+  aarch64: smccc: Start sending PSCI to userspace
+
+ Makefile                                  |   4 +-
+ arm/aarch32/include/kvm/kvm-arch.h        |   2 +-
+ arm/aarch32/kvm-cpu.c                     |   5 +
+ arm/aarch64/include/asm/cputype.h         | 186 +++++++++++++++++
+ arm/aarch64/include/asm/smccc.h           |  65 ++++++
+ arm/aarch64/include/kvm/kvm-arch.h        |   2 +-
+ arm/aarch64/include/kvm/kvm-config-arch.h |   6 +-
+ arm/aarch64/include/kvm/kvm-cpu-arch.h    |  28 ++-
+ arm/aarch64/kvm-cpu.c                     |  48 +++--
+ arm/aarch64/kvm.c                         |  25 ++-
+ arm/aarch64/psci.c                        | 207 +++++++++++++++++++
+ arm/aarch64/smccc.c                       |  81 ++++++++
+ arm/include/arm-common/kvm-arch.h         |   2 +
+ arm/include/arm-common/kvm-config-arch.h  |   1 +
+ arm/include/arm-common/kvm-cpu-arch.h     |   2 +-
+ arm/kvm-cpu.c                             |  21 +-
+ arm/kvm.c                                 |   2 +-
+ include/kvm/kvm-cpu.h                     |   3 +
+ include/linux/arm-smccc.h                 | 240 ++++++++++++++++++++++
+ include/linux/psci.h                      |  47 +++++
+ kvm-cpu.c                                 |  16 ++
+ 21 files changed, 959 insertions(+), 34 deletions(-)
+ create mode 100644 arm/aarch64/include/asm/cputype.h
+ create mode 100644 arm/aarch64/include/asm/smccc.h
+ create mode 100644 arm/aarch64/psci.c
+ create mode 100644 arm/aarch64/smccc.c
+ create mode 100644 include/linux/arm-smccc.h
+
+
+base-commit: 106e2ea7756d980454d68631b87d5e25ba4e4881
+-- 
+2.41.0.585.gd2178a4bd4-goog
+
