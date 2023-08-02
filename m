@@ -1,530 +1,161 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0904A329A7
-	for <kvmarm@lists.linux.dev>; Wed,  2 Aug 2023 20:31:22 +0000 (UTC)
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1bbf3da0ea9so2129835ad.2
-        for <kvmarm@lists.linux.dev>; Wed, 02 Aug 2023 13:31:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3167BD51F
+	for <kvmarm@lists.linux.dev>; Wed,  2 Aug 2023 22:04:47 +0000 (UTC)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1bb962ada0dso4815705ad.2
+        for <kvmarm@lists.linux.dev>; Wed, 02 Aug 2023 15:04:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691008282; x=1691613082;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cVig7nVxAJnz5d000l87J4rtopwFhxXB+8Ok4r23Ka4=;
-        b=s0Oex2eG7H06LbU+BJqKNRoDqdq6SwVlGg4mAPjExi760G3nVDGKHuQFwhOJMnirV1
-         OKLik+MpcS8+IwYl3s3OejRgjqA6HtoV3QPNm1DEUoL3SzgMjQ00TPFsndCxIr3QW0RC
-         WMDpGULuovGmqc69bhPGdXoIqbkhph2K3YUyE2dv1mhYnFSkQTtUqrpUma604U38aYr8
-         9D7AXW+fVMz7xVm7jYpK10dbpi3cq8a3mFqPaCSb6NPtySxN/EUHo7wfBVJFWm+nWHlq
-         kM91bY5x3tn/x/mUvpEp/WaK2AzxKcjD7XsK+rbwt0j14lHtrq8Pfrb4rvf3q+69F+Ed
-         fwOw==
+        d=google.com; s=20221208; t=1691013887; x=1691618687;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=s4pG+0ROPLN5wFPTceCIK9yMxb584BXYEH3MDjAMHUI=;
+        b=5IThkL7mCuko/iZIqR7UMcifDGS27vvyStr3c+LzjuZVQG91qOky9lKg+zrOiZTMpU
+         OwwWPgG4cke3/T3XBolLw2Cx3WUuGyiif6ZowjDo07N0l7srbZJ6chbQoBVzIZBAk36f
+         vOsJLqY8XbXpAV4lcysaz5w2Q7x8+E2jcr4xl4PoVSbEfMXaCQYRcBOftfG+xqOa9+A1
+         7wD40U6lLvSLC2KpqHnU2BJ36ecpDnhMawcETwGiYTqZ6YZVuaKEKYzU6SDT2fW6vWk5
+         kd4mjyDCuLytL9hJoedPQORuBvRjh15HoKTWlu0MrSrLcGPDhhGsnL2+Rh40VubQgp28
+         KP6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691008282; x=1691613082;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cVig7nVxAJnz5d000l87J4rtopwFhxXB+8Ok4r23Ka4=;
-        b=QQKKVKu8/srYv59VwPXc8GHx+WImZ7KO0ho25w8iW57O+OpXgdE82+k7+XKpbj83Rf
-         DWOKScD4cRD4uKwOQwqDrZyyIgVi6AwqkP1B0m/TMUhAUV7traGiOtF9y/jn/XMQIs5c
-         4cCviGWiQV7Pa0Dnrn728mTGbTJzS7zRA9lNADlzcfgS7F8oy5aIm/YiklnSe4Tnig4v
-         twj7ocmaVgDwnQ+v/Rip5pO8tmPF5Dg8X1PyzGTn85GaGFFvxa7g1F2Ru7HZZND8dpLs
-         ulcif9HVdOzPBH41eExez4xMTVjYhcNwrNrItb3/cyNon18JHEZ2bOu6KNruwvckDIfh
-         7rVA==
-X-Gm-Message-State: ABy/qLZn/a/ozQdRY8XWPTXLF+sDN+5rqM7gv9AokMpDRcswRRVBgq7t
-	24L0oYKP7NbLvXcDd3VwGsQ=
-X-Google-Smtp-Source: APBJJlH5VQArJpLE0EyDQ3184KjZD6X3n94sC4DtbCtW1G2/IJAuWETgKgCABnbhQeEGgLwzvu5Ecw==
-X-Received: by 2002:a17:903:485:b0:1b6:649b:92cc with SMTP id jj5-20020a170903048500b001b6649b92ccmr12847995plb.69.1691008281960;
-        Wed, 02 Aug 2023 13:31:21 -0700 (PDT)
-Received: from localhost ([192.55.55.51])
-        by smtp.gmail.com with ESMTPSA id iy7-20020a170903130700b001b898595be7sm12815534plb.291.2023.08.02.13.31.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Aug 2023 13:31:21 -0700 (PDT)
-Date: Wed, 2 Aug 2023 13:31:19 -0700
-From: Isaku Yamahata <isaku.yamahata@gmail.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
-	Yu Zhang <yu.c.zhang@linux.intel.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	Ackerley Tng <ackerleytng@google.com>,
-	Maciej Szmigiero <mail@maciej.szmigiero.name>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	David Hildenbrand <david@redhat.com>,
-	Quentin Perret <qperret@google.com>,
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
-	Liam Merwick <liam.merwick@oracle.com>,
-	Isaku Yamahata <isaku.yamahata@gmail.com>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [RFC PATCH v11 08/29] KVM: Introduce per-page memory attributes
-Message-ID: <20230802203119.GB2021422@ls.amr.corp.intel.com>
-References: <20230718234512.1690985-1-seanjc@google.com>
- <20230718234512.1690985-9-seanjc@google.com>
+        d=1e100.net; s=20221208; t=1691013887; x=1691618687;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=s4pG+0ROPLN5wFPTceCIK9yMxb584BXYEH3MDjAMHUI=;
+        b=XgTcNcYZrsEe3zJ4+o5vQb2uPryqsqs/EtYmyV1vv78yrZPPL6NMr78EtaFaLKGptO
+         4XOA9Jnn6dY4Sud/WApOVUKO4gwSDEiRWC6fd029gY7qOU1OKT9n1z5o+OzKHTXk/rpF
+         HpKJmk+cwz/+cvHkk4X0HGmaGVQnCOgDuOD1S1qfs5f0PBGxzw0aIOd/GrlXUYE6BvR2
+         0qs3nLTIFDqRLgtPd0V1e0AFZ5nCKskLryoBtYg8rXbZuSah60mfLM5cMLTwHv1Pcq3f
+         nzKTmU8sSgkdozXJ6Nq6WAtqOcjHvmYVINkke4TVkhWhMUASIj8SNV3amQS4E6qK5A40
+         GgiQ==
+X-Gm-Message-State: ABy/qLZxS0UcGnzje7A073Fsi0WGIwp5pCpV4hgQ9Fz7L3NoYmfFkFHJ
+	r0aZD2gYDxhLsiAcD5ijurntco/st0g=
+X-Google-Smtp-Source: APBJJlF5RdyRksKOEIlR2G5Z4RvCvNZ4hcQlx656VIxEW0DE1DwYcEzBQVuH42ayiSXyOKOjkSa++KcJmYM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:2309:b0:1b3:bfa6:d064 with SMTP id
+ d9-20020a170903230900b001b3bfa6d064mr104865plh.1.1691013887511; Wed, 02 Aug
+ 2023 15:04:47 -0700 (PDT)
+Date: Wed,  2 Aug 2023 15:01:41 -0700
+In-Reply-To: <20230729003643.1053367-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230718234512.1690985-9-seanjc@google.com>
+Mime-Version: 1.0
+References: <20230729003643.1053367-1-seanjc@google.com>
+X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
+Message-ID: <169101267140.1755771.17089576255751273053.b4-ty@google.com>
+Subject: Re: [PATCH v4 00/34] KVM: selftests: Guest printf and asserts overhaul
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Thomas Huth <thuth@redhat.com>, 
+	"=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?=" <philmd@linaro.org>, Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="utf-8"
 
-On Tue, Jul 18, 2023 at 04:44:51PM -0700,
-Sean Christopherson <seanjc@google.com> wrote:
-
-> From: Chao Peng <chao.p.peng@linux.intel.com>
+On Fri, 28 Jul 2023 17:36:09 -0700, Sean Christopherson wrote:
+> This is effectively v4 of Aaron's series to add printf capabilities to
+> the guest[*].  I also pulled in Thomas' patch to rename ASSERT_EQ() to
+> TEST_ASSERT_EQ(), mainly so that we can decide on a common output format
+> for both host and guest asserts in a single series, but also so that all
+> these basically treewide patches are contained in a single series.
 > 
-> In confidential computing usages, whether a page is private or shared is
-> necessary information for KVM to perform operations like page fault
-> handling, page zapping etc. There are other potential use cases for
-> per-page memory attributes, e.g. to make memory read-only (or no-exec,
-> or exec-only, etc.) without having to modify memslots.
+> Note, Aaron did all of the heavy lifting, I just mopped up.  The core code
+> is pretty much unchanged from Aaron's v3, v4 massages the assert code a
+> bit and converts all the tests.
 > 
-> Introduce two ioctls (advertised by KVM_CAP_MEMORY_ATTRIBUTES) to allow
-> userspace to operate on the per-page memory attributes.
->   - KVM_SET_MEMORY_ATTRIBUTES to set the per-page memory attributes to
->     a guest memory range.
->   - KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES to return the KVM supported
->     memory attributes.
-> 
-> Use an xarray to store the per-page attributes internally, with a naive,
-> not fully optimized implementation, i.e. prioritize correctness over
-> performance for the initial implementation.
-> 
-> Because setting memory attributes is roughly analogous to mprotect() on
-> memory that is mapped into the guest, zap existing mappings prior to
-> updating the memory attributes.  Opportunistically provide an arch hook
-> for the post-set path (needed to complete invalidation anyways) in
-> anticipation of x86 needing the hook to update metadata related to
-> determining whether or not a given gfn can be backed with various sizes
-> of hugepages.
-> 
-> It's possible that future usages may not require an invalidation, e.g.
-> if KVM ends up supporting RWX protections and userspace grants _more_
-> protections, but again opt for simplicity and punt optimizations to
-> if/when they are needed.
-> 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Link: https://lore.kernel.org/all/Y2WB48kD0J4VGynX@google.com
-> Cc: Fuad Tabba <tabba@google.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> Co-developed-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  Documentation/virt/kvm/api.rst |  60 ++++++++++++
->  include/linux/kvm_host.h       |  14 +++
->  include/uapi/linux/kvm.h       |  14 +++
->  virt/kvm/Kconfig               |   4 +
->  virt/kvm/kvm_main.c            | 170 +++++++++++++++++++++++++++++++++
->  5 files changed, 262 insertions(+)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 34d4ce66e0c8..0ca8561775ac 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6068,6 +6068,56 @@ writes to the CNTVCT_EL0 and CNTPCT_EL0 registers using the SET_ONE_REG
->  interface. No error will be returned, but the resulting offset will not be
->  applied.
->  
-> +4.139 KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES
-> +-----------------------------------------
-> +
-> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
-> +:Architectures: x86
-> +:Type: vm ioctl
-> +:Parameters: u64 memory attributes bitmask(out)
-> +:Returns: 0 on success, <0 on error
-> +
-> +Returns supported memory attributes bitmask. Supported memory attributes will
-> +have the corresponding bits set in u64 memory attributes bitmask.
-> +
-> +The following memory attributes are defined::
-> +
-> +  #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
-> +
-> +4.140 KVM_SET_MEMORY_ATTRIBUTES
-> +-----------------------------------------
-> +
-> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
-> +:Architectures: x86
-> +:Type: vm ioctl
-> +:Parameters: struct kvm_memory_attributes(in/out)
-> +:Returns: 0 on success, <0 on error
-> +
-> +Sets memory attributes for pages in a guest memory range. Parameters are
-> +specified via the following structure::
-> +
-> +  struct kvm_memory_attributes {
-> +	__u64 address;
-> +	__u64 size;
-> +	__u64 attributes;
-> +	__u64 flags;
-> +  };
-> +
-> +The user sets the per-page memory attributes to a guest memory range indicated
-> +by address/size, and in return KVM adjusts address and size to reflect the
-> +actual pages of the memory range have been successfully set to the attributes.
-> +If the call returns 0, "address" is updated to the last successful address + 1
-> +and "size" is updated to the remaining address size that has not been set
-> +successfully. The user should check the return value as well as the size to
-> +decide if the operation succeeded for the whole range or not. The user may want
-> +to retry the operation with the returned address/size if the previous range was
-> +partially successful.
-> +
-> +Both address and size should be page aligned and the supported attributes can be
-> +retrieved with KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES.
-> +
-> +The "flags" field may be used for future extensions and should be set to 0s.
-> +
->  5. The kvm_run structure
->  ========================
->  
-> @@ -8494,6 +8544,16 @@ block sizes is exposed in KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES as a
->  64-bit bitmap (each bit describing a block size). The default value is
->  0, to disable the eager page splitting.
->  
-> +8.41 KVM_CAP_MEMORY_ATTRIBUTES
-> +------------------------------
-> +
-> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
-> +:Architectures: x86
-> +:Type: vm
-> +
-> +This capability indicates KVM supports per-page memory attributes and ioctls
-> +KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES/KVM_SET_MEMORY_ATTRIBUTES are available.
-> +
->  9. Known KVM API problems
->  =========================
->  
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index e9ca49d451f3..97db63da6227 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -264,6 +264,7 @@ struct kvm_gfn_range {
->  	gfn_t end;
->  	union {
->  		pte_t pte;
-> +		unsigned long attributes;
->  		u64 raw;
->  	} arg;
->  	bool may_block;
-> @@ -809,6 +810,9 @@ struct kvm {
->  
->  #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
->  	struct notifier_block pm_notifier;
-> +#endif
-> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> +	struct xarray mem_attr_array;
->  #endif
->  	char stats_id[KVM_STATS_NAME_SIZE];
->  };
-> @@ -2301,4 +2305,14 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
->  /* Max number of entries allowed for each kvm dirty ring */
->  #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
->  
-> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> +static inline unsigned long kvm_get_memory_attributes(struct kvm *kvm, gfn_t gfn)
-> +{
-> +	return xa_to_value(xa_load(&kvm->mem_attr_array, gfn));
-> +}
-> +
-> +bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
-> +					 struct kvm_gfn_range *range);
-> +#endif /* CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES */
-> +
->  #endif
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 6c6ed214b6ac..f065c57db327 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1211,6 +1211,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
->  #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
->  #define KVM_CAP_USER_MEMORY2 230
-> +#define KVM_CAP_MEMORY_ATTRIBUTES 231
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
-> @@ -2270,4 +2271,17 @@ struct kvm_s390_zpci_op {
->  /* flags for kvm_s390_zpci_op->u.reg_aen.flags */
->  #define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
->  
-> +/* Available with KVM_CAP_MEMORY_ATTRIBUTES */
-> +#define KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES    _IOR(KVMIO,  0xd2, __u64)
-> +#define KVM_SET_MEMORY_ATTRIBUTES              _IOW(KVMIO,  0xd3, struct kvm_memory_attributes)
-> +
-> +struct kvm_memory_attributes {
-> +	__u64 address;
-> +	__u64 size;
-> +	__u64 attributes;
-> +	__u64 flags;
-> +};
-> +
-> +#define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
-> +
->  #endif /* __LINUX_KVM_H */
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index 2fa11bd26cfc..8375bc49f97d 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -99,3 +99,7 @@ config KVM_GENERIC_HARDWARE_ENABLING
->  config KVM_GENERIC_MMU_NOTIFIER
->         select MMU_NOTIFIER
->         bool
-> +
-> +config KVM_GENERIC_MEMORY_ATTRIBUTES
-> +       select KVM_GENERIC_MMU_NOTIFIER
-> +       bool
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index c14adf93daec..1a31bfa025b0 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -530,6 +530,7 @@ struct kvm_mmu_notifier_range {
->  	u64 end;
->  	union {
->  		pte_t pte;
-> +		unsigned long attributes;
->  		u64 raw;
->  	} arg;
->  	gfn_handler_t handler;
-> @@ -1175,6 +1176,9 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
->  	spin_lock_init(&kvm->mn_invalidate_lock);
->  	rcuwait_init(&kvm->mn_memslots_update_rcuwait);
->  	xa_init(&kvm->vcpu_array);
-> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> +	xa_init(&kvm->mem_attr_array);
-> +#endif
->  
->  	INIT_LIST_HEAD(&kvm->gpc_list);
->  	spin_lock_init(&kvm->gpc_lock);
-> @@ -1346,6 +1350,9 @@ static void kvm_destroy_vm(struct kvm *kvm)
->  		kvm_free_memslots(kvm, &kvm->__memslots[i][0]);
->  		kvm_free_memslots(kvm, &kvm->__memslots[i][1]);
->  	}
-> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> +	xa_destroy(&kvm->mem_attr_array);
-> +#endif
->  	cleanup_srcu_struct(&kvm->irq_srcu);
->  	cleanup_srcu_struct(&kvm->srcu);
->  	kvm_arch_free_vm(kvm);
-> @@ -2346,6 +2353,145 @@ static int kvm_vm_ioctl_clear_dirty_log(struct kvm *kvm,
->  }
->  #endif /* CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT */
->  
-> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> +static u64 kvm_supported_mem_attributes(struct kvm *kvm)
-> +{
-> +	return 0;
-> +}
-> +
-> +static __always_inline void kvm_handle_gfn_range(struct kvm *kvm,
-> +						 struct kvm_mmu_notifier_range *range)
-> +{
-> +	struct kvm_gfn_range gfn_range;
-> +	struct kvm_memory_slot *slot;
-> +	struct kvm_memslots *slots;
-> +	struct kvm_memslot_iter iter;
-> +	bool locked = false;
-> +	bool ret = false;
-> +	int i;
-> +
-> +	gfn_range.arg.raw = range->arg.raw;
-> +	gfn_range.may_block = range->may_block;
-> +
-> +	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
-> +		slots = __kvm_memslots(kvm, i);
-> +
-> +		kvm_for_each_memslot_in_gfn_range(&iter, slots, range->start, range->end) {
-> +			slot = iter.slot;
-> +			gfn_range.slot = slot;
-> +
-> +			gfn_range.start = max(range->start, slot->base_gfn);
-> +			gfn_range.end = min(range->end, slot->base_gfn + slot->npages);
-> +			if (gfn_range.start >= gfn_range.end)
-> +				continue;
-> +
-> +			if (!locked) {
-> +				locked = true;
-> +				KVM_MMU_LOCK(kvm);
-> +				if (!IS_KVM_NULL_FN(range->on_lock))
-> +					range->on_lock(kvm);
-> +			}
-> +
-> +			ret |= range->handler(kvm, &gfn_range);
-> +		}
-> +	}
-> +
-> +	if (range->flush_on_ret && ret)
-> +		kvm_flush_remote_tlbs(kvm);
-> +
-> +	if (locked) {
-> +		KVM_MMU_UNLOCK(kvm);
-> +		if (!IS_KVM_NULL_FN(range->on_unlock))
-> +			range->on_unlock(kvm);
-> +	}
-> +}
-> +
-> +static int kvm_vm_set_mem_attributes(struct kvm *kvm, unsigned long attributes,
-> +				     gfn_t start, gfn_t end)
-> +{
-> +	struct kvm_mmu_notifier_range unmap_range = {
-> +		.start = start,
-> +		.end = end,
-> +		.handler = kvm_mmu_unmap_gfn_range,
-> +		.on_lock = kvm_mmu_invalidate_begin,
-> +		.on_unlock = (void *)kvm_null_fn,
-> +		.flush_on_ret = true,
-> +		.may_block = true,
-> +	};
-> +	struct kvm_mmu_notifier_range post_set_range = {
-> +		.start = start,
-> +		.end = end,
-> +		.arg.attributes = attributes,
-> +		.handler = kvm_arch_post_set_memory_attributes,
-> +		.on_lock = (void *)kvm_null_fn,
-> +		.on_unlock = kvm_mmu_invalidate_end,
+> [...]
 
+Applied to kvm-x86 selftests and officially started this runaway train.  I'll
+give this a few days to stew in linux-next, and assuming no fireworks, will
+create a tag and make everything up to that point immutable.
 
-on_unlock is called after unlocking mmu_lock. So kvm::mmu_invalidate_in_progress
-is touched out side of it.  Here is a quick fix.
+I will follow-up with all the in-flight selftests series I can find to
+coordinate, though I'm hoping we'll get lucky and just not have any major
+conflitcs.
 
- WARNING: CPU: 108 PID: 62218 at arch/x86/kvm/../../../virt/kvm/kvm_main.c:757 kvm_mmu_unmap_gfn_range+0x32/0x70 [kvm]
-  ...
- RIP: 0010:kvm_mmu_unmap_gfn_range+0x32/0x70 [kvm]
-  ...
- Call Trace:
-  <TASK>
-  kvm_gmem_invalidate_begin+0xd0/0x130 [kvm]
-  kvm_gmem_fallocate+0x134/0x290 [kvm]
-  vfs_fallocate+0x151/0x380
-  __x64_sys_fallocate+0x3c/0x70
-  do_syscall_64+0x40/0x90
-  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-
-
-From c06084048271278d3508f534479b356f49f619ce Mon Sep 17 00:00:00 2001
-Message-Id: <c06084048271278d3508f534479b356f49f619ce.1690873712.git.isaku.yamahata@intel.com>
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-Date: Mon, 31 Jul 2023 22:58:15 -0700
-Subject: [PATCH] KVM: guest_memfd(): protect kvm_mmu_invalidate_end()
-
-kvm_mmu_invalidate_end() updates struct kvm::mmu_invalidate_in_progress
-and it's protected by kvm::mmu_lock.  call kvm_mmu_invalidate_end() before
-unlocking it. Not after the unlock.
-
-Fixes: edd048ffeaf6 ("KVM: Introduce per-page memory attributes")
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
----
- virt/kvm/kvm_main.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 9b4759b6dd87..6947f776851b 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -548,6 +548,7 @@ struct kvm_mmu_notifier_range {
- 	} arg;
- 	gfn_handler_t handler;
- 	on_lock_fn_t on_lock;
-+	on_unlock_fn_t before_unlock;
- 	on_unlock_fn_t on_unlock;
- 	bool flush_on_ret;
- 	bool may_block;
-@@ -644,6 +645,8 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
- 		kvm_flush_remote_tlbs(kvm);
+Please yell asap if you encounter issues and/or object to any of this.
  
- 	if (locked) {
-+		if (!IS_KVM_NULL_FN(range->before_unlock))
-+			range->before_unlock(kvm);
- 		KVM_MMU_UNLOCK(kvm);
- 		if (!IS_KVM_NULL_FN(range->on_unlock))
- 			range->on_unlock(kvm);
-@@ -668,6 +671,7 @@ static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
- 		.arg.pte	= pte,
- 		.handler	= handler,
- 		.on_lock	= (void *)kvm_null_fn,
-+		.before_unlock	= (void *)kvm_null_fn,
- 		.on_unlock	= (void *)kvm_null_fn,
- 		.flush_on_ret	= true,
- 		.may_block	= false,
-@@ -687,6 +691,7 @@ static __always_inline int kvm_handle_hva_range_no_flush(struct mmu_notifier *mn
- 		.end		= end,
- 		.handler	= handler,
- 		.on_lock	= (void *)kvm_null_fn,
-+		.before_unlock	= (void *)kvm_null_fn,
- 		.on_unlock	= (void *)kvm_null_fn,
- 		.flush_on_ret	= false,
- 		.may_block	= false,
-@@ -791,6 +796,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
- 		.end		= range->end,
- 		.handler	= kvm_mmu_unmap_gfn_range,
- 		.on_lock	= kvm_mmu_invalidate_begin,
-+		.before_unlock	= (void *)kvm_null_fn,
- 		.on_unlock	= kvm_arch_guest_memory_reclaimed,
- 		.flush_on_ret	= true,
- 		.may_block	= mmu_notifier_range_blockable(range),
-@@ -830,6 +836,8 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
- 
- void kvm_mmu_invalidate_end(struct kvm *kvm)
- {
-+	lockdep_assert_held_write(&kvm->mmu_lock);
-+
- 	/*
- 	 * This sequence increase will notify the kvm page fault that
- 	 * the page that is going to be mapped in the spte could have
-@@ -861,6 +869,7 @@ static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
- 		.end		= range->end,
- 		.handler	= (void *)kvm_null_fn,
- 		.on_lock	= kvm_mmu_invalidate_end,
-+		.before_unlock	= (void *)kvm_null_fn,
- 		.on_unlock	= (void *)kvm_null_fn,
- 		.flush_on_ret	= false,
- 		.may_block	= mmu_notifier_range_blockable(range),
-@@ -2466,6 +2475,8 @@ static __always_inline void kvm_handle_gfn_range(struct kvm *kvm,
- 		kvm_flush_remote_tlbs(kvm);
- 
- 	if (locked) {
-+		if (!IS_KVM_NULL_FN(range->before_unlock))
-+			range->before_unlock(kvm);
- 		KVM_MMU_UNLOCK(kvm);
- 		if (!IS_KVM_NULL_FN(range->on_unlock))
- 			range->on_unlock(kvm);
-@@ -2480,6 +2491,7 @@ static int kvm_vm_set_mem_attributes(struct kvm *kvm, unsigned long attributes,
- 		.end = end,
- 		.handler = kvm_mmu_unmap_gfn_range,
- 		.on_lock = kvm_mmu_invalidate_begin,
-+		.before_unlock	= (void *)kvm_null_fn,
- 		.on_unlock = (void *)kvm_null_fn,
- 		.flush_on_ret = true,
- 		.may_block = true,
-@@ -2490,7 +2502,8 @@ static int kvm_vm_set_mem_attributes(struct kvm *kvm, unsigned long attributes,
- 		.arg.attributes = attributes,
- 		.handler = kvm_arch_post_set_memory_attributes,
- 		.on_lock = (void *)kvm_null_fn,
--		.on_unlock = kvm_mmu_invalidate_end,
-+		.before_unlock = kvm_mmu_invalidate_end,
-+		.on_unlock = (void *)kvm_null_fn,
- 		.may_block = true,
- 	};
- 	unsigned long i;
--- 
-2.25.1
+Note, I technically applied patch 1 from Thomas' original posting, but captured
+it here too as I figured that'd be the least confusing thing.
 
+[1/36] KVM: selftests: Rename the ASSERT_EQ macro
+      https://github.com/kvm-x86/linux/commit/6d85f51a1f08
+[2/36] KVM: selftests: Make TEST_ASSERT_EQ() output look like normal TEST_ASSERT()
+      https://github.com/kvm-x86/linux/commit/b145c58d95ff
+[3/36] KVM: selftests: Add a shameful hack to preserve/clobber GPRs across ucall
+      https://github.com/kvm-x86/linux/commit/6783ca4105a7
+[4/36] KVM: selftests: Add strnlen() to the string overrides
+      https://github.com/kvm-x86/linux/commit/a1c1b55e116c
+[5/36] KVM: selftests: Add guest_snprintf() to KVM selftests
+      https://github.com/kvm-x86/linux/commit/e5119382499c
+[6/36] KVM: selftests: Add additional pages to the guest to accommodate ucall
+      https://github.com/kvm-x86/linux/commit/215a681710a5
+[7/36] KVM: selftests: Add string formatting options to ucall
+      https://github.com/kvm-x86/linux/commit/57e5c1fef5ec
+[8/36] KVM: selftests: Add formatted guest assert support in ucall framework
+      https://github.com/kvm-x86/linux/commit/289c2b4db8f3
+[9/36] KVM: selftests: Add arch ucall.h and inline simple arch hooks
+      https://github.com/kvm-x86/linux/commit/b35f4c73d389
+[10/36] KVM: selftests: Add #define of expected KVM exit reason for ucall
+      https://github.com/kvm-x86/linux/commit/edb5b700f9f8
+[11/36] KVM: selftests: Add a selftest for guest prints and formatted asserts
+      https://github.com/kvm-x86/linux/commit/5d1d46f9d56f
+[12/36] KVM: selftests: Convert aarch_timer to printf style GUEST_ASSERT
+      https://github.com/kvm-x86/linux/commit/db44e1c871bc
+[13/36] KVM: selftests: Convert debug-exceptions to printf style GUEST_ASSERT
+      https://github.com/kvm-x86/linux/commit/bac9aeecc387
+[14/36] KVM: selftests: Convert ARM's hypercalls test to printf style GUEST_ASSERT
+      https://github.com/kvm-x86/linux/commit/af5b41b97f1c
+[15/36] KVM: selftests: Convert ARM's page fault test to printf style GUEST_ASSERT
+      https://github.com/kvm-x86/linux/commit/df27f6b45454
+[16/36] KVM: selftests: Convert ARM's vGIC IRQ test to printf style GUEST_ASSERT
+      https://github.com/kvm-x86/linux/commit/d0ad3bacc523
+[17/36] KVM: selftests: Convert the memslot performance test to printf guest asserts
+      https://github.com/kvm-x86/linux/commit/c55a475d5fc4
+[18/36] KVM: selftests: Convert s390's memop test to printf style GUEST_ASSERT
+      https://github.com/kvm-x86/linux/commit/428c76c769fa
+[19/36] KVM: selftests: Convert s390's tprot test to printf style GUEST_ASSERT
+      https://github.com/kvm-x86/linux/commit/5f82bbab84ad
+[20/36] KVM: selftests: Convert set_memory_region_test to printf-based GUEST_ASSERT
+      https://github.com/kvm-x86/linux/commit/9291c9cef5b5
+[21/36] KVM: selftests: Convert steal_time test to printf style GUEST_ASSERT
+      https://github.com/kvm-x86/linux/commit/3d9bd831175e
+[22/36] KVM: selftests: Convert x86's CPUID test to printf style GUEST_ASSERT
+      https://github.com/kvm-x86/linux/commit/06b651d250e5
+[23/36] KVM: selftests: Convert the Hyper-V extended hypercalls test to printf asserts
+      https://github.com/kvm-x86/linux/commit/82cb0ed66d4e
+[24/36] KVM: selftests: Convert the Hyper-V feature test to printf style GUEST_ASSERT
+      https://github.com/kvm-x86/linux/commit/8d1d3ce604e5
+[25/36] KVM: selftests: Convert x86's KVM paravirt test to printf style GUEST_ASSERT
+      https://github.com/kvm-x86/linux/commit/bf6c760b9df3
+[26/36] KVM: selftests: Convert the MONITOR/MWAIT test to use printf guest asserts
+      https://github.com/kvm-x86/linux/commit/0f52e4aaa614
+[27/36] KVM: selftests: Convert x86's nested exceptions test to printf guest asserts
+      https://github.com/kvm-x86/linux/commit/b13a307ce3c6
+[28/36] KVM: selftests: Convert x86's set BSP ID test to printf style guest asserts
+      https://github.com/kvm-x86/linux/commit/40b319d6b4e1
+[29/36] KVM: selftests: Convert the nSVM software interrupt test to printf guest asserts
+      https://github.com/kvm-x86/linux/commit/a925f7994281
+[30/36] KVM: selftests: Convert x86's TSC MSRs test to use printf guest asserts
+      https://github.com/kvm-x86/linux/commit/847ae0795514
+[31/36] KVM: selftests: Convert the x86 userspace I/O test to printf guest assert
+      https://github.com/kvm-x86/linux/commit/417bfd0c820f
+[32/36] KVM: selftests: Convert VMX's PMU capabilities test to printf guest asserts
+      https://github.com/kvm-x86/linux/commit/30a6e0b4553d
+[33/36] KVM: selftests: Convert x86's XCR0 test to use printf-based guest asserts
+      https://github.com/kvm-x86/linux/commit/4e15c38a1aca
+[34/36] KVM: selftests: Rip out old, param-based guest assert macros
+      https://github.com/kvm-x86/linux/commit/7ce7f8e75418
+[35/36] KVM: selftests: Print out guest RIP on unhandled exception
+      https://github.com/kvm-x86/linux/commit/6f321017c84b
+[36/36] KVM: selftests: Use GUEST_FAIL() in ARM's arch timer helpers
+      https://github.com/kvm-x86/linux/commit/a05c4c2bd8b5
 
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+--
+https://github.com/kvm-x86/linux/tree/next
+https://github.com/kvm-x86/linux/tree/fixes
