@@ -1,119 +1,114 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EDB58BFB
-	for <kvmarm@lists.linux.dev>; Wed,  2 Aug 2023 16:27:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F6D2C433C8;
-	Wed,  2 Aug 2023 16:27:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690993674;
-	bh=IypduYRdhJJTtTi/vdjRUEIIDyW7f/veSqGdfghGaM4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oOEm7306/htJKG4CId0R41FGls9huoRDB8SC5RAspSExEJWc+HyVpGhFGv4Wg+PCF
-	 DNKER8c6sgtmUjA+ZIyHRtYIYq7s1L8BFIQctpG47gXwN8Vk7wWF9EhSMrNWfwBrKa
-	 xvHTe4Pf4ZHfn6zJaolp23r8l3t+iwOVtR8qQQwVdEQ3yiLL1IIdDsYkwudrO92YiE
-	 FYGqNhGsI2AB015N0akL8QNC7MUhH864UCZeGRUpoIjIcQa5QkuuS1mcndY8IYStIr
-	 JLUyc346bw68jZ6ki7rhKVwxWbLrfo45Bl68nj4Ylkf3MXxPTk91QSuMRGtzpudBB6
-	 QKxmNsVU4IKRg==
-Date: Wed, 2 Aug 2023 17:27:44 +0100
-From: Mark Brown <broonie@kernel.org>
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc: "corbet@lwn.net" <corbet@lwn.net>, "ardb@kernel.org" <ardb@kernel.org>,
-	"keescook@chromium.org" <keescook@chromium.org>,
-	"Szabolcs.Nagy@arm.com" <Szabolcs.Nagy@arm.com>,
-	"shuah@kernel.org" <shuah@kernel.org>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"james.morse@arm.com" <james.morse@arm.com>,
-	"debug@rivosinc.com" <debug@rivosinc.com>,
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"hjl.tools@gmail.com" <hjl.tools@gmail.com>,
-	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"palmer@dabbelt.com" <palmer@dabbelt.com>,
-	"oleg@redhat.com" <oleg@redhat.com>,
-	"arnd@arndb.de" <arnd@arndb.de>,
-	"ebiederm@xmission.com" <ebiederm@xmission.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
-Subject: Re: [PATCH v3 21/36] arm64/mm: Implement map_shadow_stack()
-Message-ID: <475f31e1-0f6f-44a9-b93a-540c1d43e1bb@sirena.org.uk>
-References: <20230731-arm64-gcs-v3-0-cddf9f980d98@kernel.org>
- <20230731-arm64-gcs-v3-21-cddf9f980d98@kernel.org>
- <5461c56cf4896f18bddaa66c3beec7b909fc8fb9.camel@intel.com>
- <0a6c90d6-f790-4036-a364-d4761fdd0e95@sirena.org.uk>
- <e827138f9d8800e3db158831bca88d1ea8b559af.camel@intel.com>
- <21d7e814-8608-40ce-b5d3-401f2110ad91@sirena.org.uk>
- <a9ea33d31aad0c45eab41b0dcbd4913d863cc930.camel@intel.com>
- <55c629cc-0545-460b-91cb-2ebdb8ae9051@sirena.org.uk>
- <7d03be1277a5f4be23df35ca96f4d6cd77735e2b.camel@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2CD6C2D3
+	for <kvmarm@lists.linux.dev>; Wed,  2 Aug 2023 16:51:18 +0000 (UTC)
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-31792ac0fefso15016f8f.2
+        for <kvmarm@lists.linux.dev>; Wed, 02 Aug 2023 09:51:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690995077; x=1691599877;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=LrJLBG38n+Wiyfmv9S4MGg4xgt3i7BNwPWJDTs2HMj8=;
+        b=Yr2vtAOieZy3/74CDEAGC2Gnt8sgnypV0sH1nFYDYE+Z9U73wi72vRoBj9mOPgJwjv
+         99wZ+YY4Rl0iV4S7hY5jTJtBu9E+Wq+0WPHsLe7dYzPVxIQ7tL3K9N9EEAXWyXptkr4R
+         ias3QXAFYMwvc666cOayPBqLwNU+Kv7rga8bPxnBbLZRg9CrOcJ+FBK+rP2suecmhpuK
+         73IMHyBKaqHCKBxo5PMwGaIBZKNj+nCrhhmAYIbNw5hpKlBf+9T+TnMkonjeqbOS1kee
+         h/worVBInk2I1mObvjC5ogsA2iH6t0VXQGFlLd+k2vwihb2JKETOekCztRRPYmPBl9O/
+         EQ7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690995077; x=1691599877;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LrJLBG38n+Wiyfmv9S4MGg4xgt3i7BNwPWJDTs2HMj8=;
+        b=Qr4H5fEQq97rKYUY+KBlujtmf+B6J8Sg8ZVAr7tBr+jMWXTaarEBg9R9OFFvJN1o7f
+         AnJ53adf3Jc9E2WQYyvdzbb4MNycncZ2Hsa266i3X2SMXSRdX58uSAV9gvg68SNa9Xep
+         +9F8HxGBicn/ZF9PQUGX1rYXjXtJRmOANntdCHdKYp/9XA5MHQ1sywWHLUM2fNkPgVns
+         D4rOiSTx21N/lghSl9rNELcjgVFtRKCqZ7xKVVoMhe5Pzt3OpZ0Wa8SaoR0RMqQ8etRC
+         qY4P4jnyvr3zt/4e/mytFPvTKGWVnA/wNWJwIsWbQ3k9z8aW/FEOHKWsfqZN3NyWV6ev
+         UDEw==
+X-Gm-Message-State: ABy/qLZ4w7bY7aP/d0f1y1I1Fx62cBqZ2NBOpmNJJZFoa+jVF6rw8se6
+	q2X4VchdDiyOArUIO8u/MprN5fvpDtPGErasEDSXZw==
+X-Google-Smtp-Source: APBJJlEF0ih0QHv1ekEfW69+6kAWN0K+fahB0BVsKiKPMI+3V3I/aF86Y1eNpJYuOPhD4pxG0Cgwhi1Awcn8a9ebJvM=
+X-Received: by 2002:adf:facc:0:b0:317:49a2:1f89 with SMTP id
+ a12-20020adffacc000000b0031749a21f89mr5196369wrs.1.1690995076610; Wed, 02 Aug
+ 2023 09:51:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="QS3kL7vV2OH5bUkc"
-Content-Disposition: inline
-In-Reply-To: <7d03be1277a5f4be23df35ca96f4d6cd77735e2b.camel@intel.com>
-X-Cookie: Humpty Dumpty was pushed.
+References: <20230802150712.3583252-1-elver@google.com>
+In-Reply-To: <20230802150712.3583252-1-elver@google.com>
+From: Marco Elver <elver@google.com>
+Date: Wed, 2 Aug 2023 18:50:39 +0200
+Message-ID: <CANpmjNPVO_t058c6Wcwr9TBwxeoH7Ba0ECsf6Wapn60br8EtkQ@mail.gmail.com>
+Subject: Re: [PATCH 1/3] Compiler attributes: Introduce the __preserve_most
+ function attribute
+To: elver@google.com, Andrew Morton <akpm@linux-foundation.org>, 
+	Kees Cook <keescook@chromium.org>
+Cc: Guenter Roeck <linux@roeck-us.net>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Miguel Ojeda <ojeda@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
+	Nathan Chancellor <nathan@kernel.org>, Tom Rix <trix@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
+	Dmitry Vyukov <dvyukov@google.com>, Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com, 
+	linux-toolchains@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, 
+	Peter Zijlstra <peterz@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 
+On Wed, 2 Aug 2023 at 17:07, Marco Elver <elver@google.com> wrote:
+>
+> [1]: "On X86-64 and AArch64 targets, this attribute changes the calling
+> convention of a function. The preserve_most calling convention attempts
+> to make the code in the caller as unintrusive as possible. This
+> convention behaves identically to the C calling convention on how
+> arguments and return values are passed, but it uses a different set of
+> caller/callee-saved registers. This alleviates the burden of saving and
+> recovering a large register set before and after the call in the
+> caller."
+>
+> [1] https://clang.llvm.org/docs/AttributeReference.html#preserve-most
+>
+> Use of this attribute results in better code generation for calls to
+> very rarely called functions, such as error-reporting functions, or
+> rarely executed slow paths.
+>
+> Introduce the attribute to compiler_attributes.h.
+>
+> Signed-off-by: Marco Elver <elver@google.com>
+> ---
+>  include/linux/compiler_attributes.h | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>
+> diff --git a/include/linux/compiler_attributes.h b/include/linux/compiler_attributes.h
+> index 00efa35c350f..615a63ecfcf6 100644
+> --- a/include/linux/compiler_attributes.h
+> +++ b/include/linux/compiler_attributes.h
+> @@ -321,6 +321,17 @@
+>  # define __pass_object_size(type)
+>  #endif
+>
+> +/*
+> + * Optional: not supported by gcc.
+> + *
+> + * clang: https://clang.llvm.org/docs/AttributeReference.html#preserve-most
+> + */
+> +#if __has_attribute(__preserve_most__)
+> +# define __preserve_most __attribute__((__preserve_most__))
+> +#else
+> +# define __preserve_most
+> +#endif
 
---QS3kL7vV2OH5bUkc
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Mark says that there may be an issue with using this in combination
+with ftrace because arm64 tracing relies on AAPCS. Probably not just
+arm64, but also other architectures (x86?).
 
-On Tue, Aug 01, 2023 at 08:57:59PM +0000, Edgecombe, Rick P wrote:
-> On Tue, 2023-08-01 at 18:57 +0100, Mark Brown wrote:
-
-> > Sure, though if we're going to the trouble of checking for the flag
-> > we
-> > probably may as well implement it.=A0 I guess x86 is locked in at this
-> > point by existing userspace.=A0 I guess I'll implement it assuming
-> > nobody
-> > from userspace complains, it's trivial for a kernel.
-
-> To make sure we are on the same page: What I'm saying is say we do
-> something like add another flag SHADOW_STACK_SET_MARKER that means add
-> a marker at the end (making the token off by one frame). Then you can
-> just reject any flags !=3D (SHADOW_STACK_SET_MARKER |
-> SHADOW_STACK_SET_TOKEN) value, and leave the rest of the code as is. So
-> not really implementing anything new.=A0
-
-> Then x86 could use the same flag meanings if/when it implements end
-> markers. If it doesn't seem worth it, it's not a big deal on my end.
-> Just seemed that they were needlessly diverging.
-
-Yes, my understanding of the flags is the same.  I'll definitely
-implement omitting the cap since there's an actual use case for that
-(extending an existing stack, it's marginally safer to not have any
-opportunity to pivot into the newly allocated region).
-
---QS3kL7vV2OH5bUkc
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmTKhAAACgkQJNaLcl1U
-h9AuNwf/eOsxbj3CCh77urZ2bbcgtkDnG2gOY0uK7lM+wipr3GCiDM6ySyjpMrSm
-8tfpAV/QhsCNxV2mHJIbUdNW1v+94GUDf7fzu9+pHKrjZpAfWfo6X7KOPFiJaGgB
-hHeQd7CNvTJNIwSPjgjHEvjsnp39rstVvNFaonSi/9GXlnt3HSqXPr/awnfCoArZ
-eC+NqtyAQ3x/cc8oW9e5cvylNTjXAWg+2QNNXnVVsX6KQkbPXMI6VnQocQBHNCRo
-V25MLEEvRVtpXVUihvLkRuA5ILxM/k6sDHhRjaqgIHDyDIAKplJXwIjSLoMEroq3
-gZY23CL6NCYvjjFyc6XZbpALl9hrUg==
-=/CYh
------END PGP SIGNATURE-----
-
---QS3kL7vV2OH5bUkc--
+To make this safe, I'm going to move __preserve_most to
+compiler_types.h and always pair it with notrace and some comments in
+v2.
