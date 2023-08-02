@@ -1,55 +1,57 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D55134B6
-	for <kvmarm@lists.linux.dev>; Wed,  2 Aug 2023 23:29:04 +0000 (UTC)
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1b52875b8d9so68055ad.0
-        for <kvmarm@lists.linux.dev>; Wed, 02 Aug 2023 16:29:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A2317FE8
+	for <kvmarm@lists.linux.dev>; Wed,  2 Aug 2023 23:30:51 +0000 (UTC)
+Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3490b737f9aso58245ab.0
+        for <kvmarm@lists.linux.dev>; Wed, 02 Aug 2023 16:30:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691018944; x=1691623744;
+        d=google.com; s=20221208; t=1691019051; x=1691623851;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=V4Cpxp6Pku565KQX/OGtqaeqvGA0IKhVwq6ynNOZ9r0=;
-        b=fFTplzOAgW5+YW0+6iv4fkiN86H6j11X1pwoSxH+UbZ6p7iYCmpU0kuNqQBfel9T5G
-         TeHCwy18VTn4JwR0FocGU0dkHDSQ01w0aCShr72E11WRUJ0CH751ArFGzoZUkTYgcDou
-         gpT/KoBW3YaVs/k6v5HBuDGdwQ8fJdnUpJjdrS7LEtN9Uwz7yeQN9HB4kn1GVc0KUKqc
-         DmlFiExHRsSljlkGVAJKSI7bbzKb2/ECq55k51gfA8LRkuFLjGvgB4kOf7KBZm79RD0a
-         40vexDUVr9QAtQr7cD7Kllq93RNs7LMjDkavplv45/IYcQbfxyQND1D7JcDZaz5TIdZ5
-         l/ag==
+        bh=Y9p/r3/7OOEeGD98k45cJqzqj6mNEuBO34pHN8nni+M=;
+        b=fFKN5nHbyv551/4W30i+xv9zwo+3QEZKGkdrHoMkNbWnp7D69/RlaUhp/eF6/2v5F3
+         PY4ootJGDhDcUwe+92UvbjD4/1toXHiTlmtImD9LT/8YQiZYo1yq/3Gd4/VDg79/Fjr+
+         6pmjunqIV0Ca8hZsxV+aVu04NE60qfC1zia2pWkVAMNlEmBowfsdO+ZCG2YoM1jl/JLo
+         g0hFzMkrepyVv2HBAO+grYkMtS7Ff2jFJXIxiFQF080W3PmgZFJzBwbn5Io3N8oYuy6R
+         Dxbqqy14GybNEz0zpdK7tsmDcO74eEg1QwBJKVXI6nZoxgpf0g/I8paf+i1lAj70Gw7g
+         RYxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691018944; x=1691623744;
+        d=1e100.net; s=20221208; t=1691019051; x=1691623851;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=V4Cpxp6Pku565KQX/OGtqaeqvGA0IKhVwq6ynNOZ9r0=;
-        b=I8dWoQFkewzlfqLcb0+jUGD3YrgMGMMwOJMakjf58gGsw6LeJ7WVMTW5z44Of+8a22
-         4PzEeI3p+vNqlsxhRwqMvniGySRNEg3XpmIwXbH5kwDrKBUTkaMqSka+5wCVba2gbQUf
-         gxTV9tomfFGw8Rs9USgsHkaF7mlyzpiDWFrO+pTZ1jHuy8jtdnnL39QqopR2eB8jzS8o
-         f3x08BEc4RoIZCBQf2pjQZmR9+R3P2mNK/3ZJqjnL4M/nhZOjl+iimtXXJvihkBjn+Gf
-         vr/6DGB41ZWo+lsqxAJGzVNgQb0A7jkXsnNxsKNlxLQx65qVoCpabwGxh77ugOZ5YW0s
-         aFCQ==
-X-Gm-Message-State: ABy/qLY85be+oBBxGDXiQYAEG6ueCwmobgM3y1oFkFDxT+R2Rih7kUel
-	u1h6vTqDoEbf+K5tyex9LnyJMMqzHj6vBS8wdZY9tQ==
-X-Google-Smtp-Source: APBJJlG1dr/uy6dgVj2w+3yAHutiDqre/zphK0p3aHVqG2DYCooyBFbGflKhgzehlkYIwCQRRRLEXuzHej99+96ASLI=
-X-Received: by 2002:a17:902:c40f:b0:1b0:53dc:1f78 with SMTP id
- k15-20020a170902c40f00b001b053dc1f78mr966525plk.28.1691018944272; Wed, 02 Aug
- 2023 16:29:04 -0700 (PDT)
+        bh=Y9p/r3/7OOEeGD98k45cJqzqj6mNEuBO34pHN8nni+M=;
+        b=aweMTmkc/D6sVbLzw2UbFhfAV9YwXkN9A5cmetYWL7CyeFtOUpuzeZkuMBfIoIUlOW
+         LdWf9mAqddFokHY2LquLEyJprXpAy7j+jHo/+9qIb8DDcyNxzRbQUYBxedcThVz7v8oL
+         tOcM2LBlAE+Jfppy9v97nh/wTarYC/eAMM2dQStvOahQC8HVlECvQ4fjGKtosFGJIzhE
+         FD1f1/RiNfupJHV714gjt9ycB+JyjklGlZ1vvY93XhaHpWiTGxFd3LFVEacZDc6bCbhh
+         jekucw15YOLRlVhFMvzBqBLMDrRhbVbXOV27/IaFWylKRpXv21U2Uw21Hr6zNMwsKhhJ
+         gOZQ==
+X-Gm-Message-State: ABy/qLaivO7sG6+wmIXT2tMp9nlS+JtBNrSGpz2AD9w5UimIMEkQbRUc
+	WdwlRikVZE7zVKpaINYs3FfScoWIXHvqIJSMwhmhYw==
+X-Google-Smtp-Source: APBJJlELAYNKKPfecK64fKx5Ci1HyUNKE08JkQGkdOgzq5gUkMmu0eZ6vl6aaIwqTlVQfSan7JpwYd6tPF2vIZQ+LNM=
+X-Received: by 2002:a92:c54a:0:b0:340:502b:1487 with SMTP id
+ a10-20020a92c54a000000b00340502b1487mr1178689ilj.12.1691019050973; Wed, 02
+ Aug 2023 16:30:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230722022251.3446223-1-rananta@google.com> <20230722022251.3446223-3-rananta@google.com>
- <87tttpr6qy.wl-maz@kernel.org> <ZMgsjx8dwKd4xBGe@google.com> <877cqdqw12.wl-maz@kernel.org>
-In-Reply-To: <877cqdqw12.wl-maz@kernel.org>
+References: <20230722022251.3446223-1-rananta@google.com> <20230722022251.3446223-2-rananta@google.com>
+ <87v8e5r6s6.wl-maz@kernel.org> <CAJHc60wtc2Usei3hKj1ykVRvBZFFCBOHMi9HCxnNvGK2dPFApA@mail.gmail.com>
+ <ZMgqueePlmKvgUId@google.com> <CAJHc60xM+KsUKxtoqORnpzrRke4T-sob2uLJRMvBKwruipxnpw@mail.gmail.com>
+ <878ratqw2l.wl-maz@kernel.org> <ZMqABp6OdrgOtsum@google.com>
+In-Reply-To: <ZMqABp6OdrgOtsum@google.com>
 From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Wed, 2 Aug 2023 16:28:52 -0700
-Message-ID: <CAJHc60xAUVt5fbhEkOqeC-VF8SWVOt3si=1yxVVAUW=+Hu_wNg@mail.gmail.com>
-Subject: Re: [PATCH v7 02/12] KVM: arm64: Use kvm_arch_flush_remote_tlbs()
-To: Marc Zyngier <maz@kernel.org>
-Cc: Sean Christopherson <seanjc@google.com>, Oliver Upton <oliver.upton@linux.dev>, 
+Date: Wed, 2 Aug 2023 16:30:39 -0700
+Message-ID: <CAJHc60zvKSoPU6uTzZQCY2ZAeVj18qmu3=U-rUt5er0zGLQ33Q@mail.gmail.com>
+Subject: Re: [PATCH v7 01/12] KVM: Rename kvm_arch_flush_remote_tlb() to kvm_arch_flush_remote_tlbs()
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
 	Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhuacai@kernel.org>, 
 	Zenghui Yu <yuzenghui@huawei.com>, Anup Patel <anup@brainfault.org>, 
@@ -58,51 +60,36 @@ Cc: Sean Christopherson <seanjc@google.com>, Oliver Upton <oliver.upton@linux.de
 	David Matlack <dmatlack@google.com>, linux-arm-kernel@lists.infradead.org, 
 	kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, 
 	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	Gavin Shan <gshan@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
+	Shaoqin Huang <shahuang@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Sure, I'll change it to kvm_arch_flush_vm_tlbs() in v8.
+Okay, so just the #define in the respective arch header with a global
+declaration. I'll consider this in v8.
 
 Thanks,
 Raghavendra
 
-On Wed, Aug 2, 2023 at 8:55=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
+On Wed, Aug 2, 2023 at 9:10=E2=80=AFAM Sean Christopherson <seanjc@google.c=
+om> wrote:
 >
-> On Mon, 31 Jul 2023 22:50:07 +0100,
-> Sean Christopherson <seanjc@google.com> wrote:
+> On Wed, Aug 02, 2023, Marc Zyngier wrote:
+> > On Tue, 01 Aug 2023 01:42:54 +0100,
+> > Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > > Thanks for the suggestions; I can go with a common declaration. Along
+> > > with that, do we want to keep defining
+> > > __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS in the arch code that supports it o=
+r
+> > > convert it into a CONFIG_?
 > >
-> > On Thu, Jul 27, 2023, Marc Zyngier wrote:
-> > > On Sat, 22 Jul 2023 03:22:41 +0100,
-> > > Raghavendra Rao Ananta <rananta@google.com> wrote:
-> > > >
-> > > > Stop depending on CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL and opt to
-> > > > standardize on kvm_arch_flush_remote_tlbs() since it avoids
-> > > > duplicating the generic TLB stats across architectures that impleme=
-nt
-> > > > their own remote TLB flush.
-> > > >
-> > > > This adds an extra function call to the ARM64 kvm_flush_remote_tlbs=
-()
-> > > > path, but that is a small cost in comparison to flushing remote TLB=
-s.
-> > >
-> > > Well, there is no such thing as a "remote TLB" anyway. We either have
-> > > a non-shareable or inner-shareable invalidation. The notion of remote
-> > > would imply that we track who potentially has a TLB, which we
-> > > obviously don't.
-> >
-> > Maybe kvm_arch_flush_vm_tlbs()?  The "remote" part is misleading even o=
-n x86 when
-> > running on Hyper-V, as the flush may be done via a single hypercall and=
- by kicking
-> > "remote" vCPUs.
+> > This isn't something that a user can select, more something that is an
+> > architectural decision. Maybe in a later patch if there is a consensus
+> > around that, but probably not as part of this series.
 >
-> Yup, this would be much better.
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+> +1.  I agree it's annoying that KVM uses a mix of Kconfigs and manual #de=
+fines
+> for the various "KVM_HAVE" knobs, but we have so many of both that one-of=
+f
+> conversions without a real need don't make much sense.
