@@ -1,252 +1,169 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C919C8BE3
-	for <kvmarm@lists.linux.dev>; Wed,  2 Aug 2023 15:07:35 +0000 (UTC)
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5847479b559so81356287b3.1
-        for <kvmarm@lists.linux.dev>; Wed, 02 Aug 2023 08:07:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690988854; x=1691593654;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QsQzCCvgsUc29iN0t+r4OrRLxcOlAg596pNmSZ7559A=;
-        b=4ZYamtVu7c5DBlxohGCGmrb3sFLfmn9HVQ5Wg0u74wgUuS9HmeqzsIbgmvxx4vbynp
-         G5rhNqMQc/y5nAAokrb8biNfvQGEp8VjT02HxfGGmCTT5wPDSvxvnVw8kiA6iPjuGFVD
-         LA+s86W47CrKMLOaDF3oTsFV1irTVQ90npxdXPTIsyYRRVrnjksYD/YOpvA5gcb/NJON
-         1/DNjlxIfTxKKGGO7EWAXeVsoT9Ba6/DtSkaghydahqdF14skDb3T2FlkiHoREdye/Wn
-         PP4uXHlG/PZ7eozLUn1Qs2nxG2z0Y5gSqG2d0rJKhv4XdK6rQ2bU5XD8YUaBIrlQg13L
-         ZuFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690988854; x=1691593654;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QsQzCCvgsUc29iN0t+r4OrRLxcOlAg596pNmSZ7559A=;
-        b=MZWvqmmZQ9vpObNYJQEAlAV8LZ7Jfank5YDg4Kcryp1OzaBItR65ZKDnRh6pFK+zPO
-         APVOnbM7Qc/sLDLOvcwnnQY+oFCb8KsUH4EBWF5tru1dmJv9I932gwLFY1l+V06gqX15
-         k/4CJ4fdXTz4LxsbCZsAezGmDwU8cBz/Sov47eyuNyVGl3qBKlq3mcxo+VlOjnDlRfnz
-         a0pbH2bhBDaQKK3uvXeNqbqY0laa+o2KlgOccHali48nEldKTaJR9qo6h9c1hXzF4poV
-         S3cjPp06f0KEgOm53ApLE7J2IvPMgNjGWXFc6UcrDyWHapSCkMzeC/mKBwREWxR/WU4A
-         BDKA==
-X-Gm-Message-State: ABy/qLaCOlPldPLEUtO3tDnpZ9qCAYci5b5ybJE/Ojpwjwh3dqywJvQU
-	U797ERbDF0r+CA7X6qUfnKHuWXxvzQ==
-X-Google-Smtp-Source: APBJJlF2dxbHCNlW4tE69srWZHv4LNf1FBrEIP73vEfLojj7ssYK9cpF/2NfJOSE1k3fWGXBcvsb8SmIjQ==
-X-Received: from elver.muc.corp.google.com ([2a00:79e0:9c:201:5f73:1fc0:c9fd:f203])
- (user=elver job=sendgmr) by 2002:a81:b50d:0:b0:586:4e84:26d2 with SMTP id
- t13-20020a81b50d000000b005864e8426d2mr79140ywh.3.1690988854773; Wed, 02 Aug
- 2023 08:07:34 -0700 (PDT)
-Date: Wed,  2 Aug 2023 17:06:39 +0200
-In-Reply-To: <20230802150712.3583252-1-elver@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51D57C8F2
+	for <kvmarm@lists.linux.dev>; Wed,  2 Aug 2023 15:54:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4222C433C7;
+	Wed,  2 Aug 2023 15:54:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690991658;
+	bh=CG7zRefX3vIt6QnpDyTwXaNQXmqFTUj9YMbM/HH75A0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=d8goIOTrUwi6bz/hFXw/xgAPyKfedzSYI+8GscwiW+tk8X1vQfN9RoaEx7Wd+cZ3t
+	 8T3UVktGFblRsP6mQnD6+knUpp4KO/+zZfDwZmD0RhvemS/YDOQayojvRsnELfXQ0T
+	 /pfE3VxAvD/pOCC/dudtI6dA5vx31U68ofpyFoPJX3M5xG98QEjJLQABi2DSZvu8yW
+	 h8n3JiQhSLptcmtD9seypjNp0fXMIiDboCwxMo5q44zQ1se/GfJLnrqG2o2XBmLTj0
+	 vFZfkTIhUeI1xWJ6335xw0GNFy9x+eYeDkeoTXFKAq+ptse9HMlvDiUaX+8V4a8TW1
+	 HBrpcfxcWbpog==
+Received: from [104.132.1.99] (helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qREAx-001Prr-LD;
+	Wed, 02 Aug 2023 16:54:16 +0100
+Date: Wed, 02 Aug 2023 16:54:10 +0100
+Message-ID: <878ratqw2l.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Sean Christopherson <seanjc@google.com>,	Oliver Upton
+ <oliver.upton@linux.dev>,	James Morse <james.morse@arm.com>,	Suzuki K
+ Poulose <suzuki.poulose@arm.com>,	Paolo Bonzini <pbonzini@redhat.com>,
+	Huacai Chen <chenhuacai@kernel.org>,	Zenghui Yu <yuzenghui@huawei.com>,
+	Anup Patel <anup@brainfault.org>,	Atish Patra <atishp@atishpatra.org>,	Jing
+ Zhang <jingzhangos@google.com>,	Reiji Watanabe <reijiw@google.com>,	Colton
+ Lewis <coltonlewis@google.com>,	David Matlack <dmatlack@google.com>,
+	linux-arm-kernel@lists.infradead.org,	kvmarm@lists.linux.dev,
+	linux-mips@vger.kernel.org,	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org,	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,	Gavin Shan <gshan@redhat.com>,	Philippe
+ =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>,	Shaoqin Huang
+ <shahuang@redhat.com>
+Subject: Re: [PATCH v7 01/12] KVM: Rename kvm_arch_flush_remote_tlb() to kvm_arch_flush_remote_tlbs()
+In-Reply-To: <CAJHc60xM+KsUKxtoqORnpzrRke4T-sob2uLJRMvBKwruipxnpw@mail.gmail.com>
+References: <20230722022251.3446223-1-rananta@google.com>
+	<20230722022251.3446223-2-rananta@google.com>
+	<87v8e5r6s6.wl-maz@kernel.org>
+	<CAJHc60wtc2Usei3hKj1ykVRvBZFFCBOHMi9HCxnNvGK2dPFApA@mail.gmail.com>
+	<ZMgqueePlmKvgUId@google.com>
+	<CAJHc60xM+KsUKxtoqORnpzrRke4T-sob2uLJRMvBKwruipxnpw@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230802150712.3583252-1-elver@google.com>
-X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
-Message-ID: <20230802150712.3583252-3-elver@google.com>
-Subject: [PATCH 3/3] list_debug: Introduce CONFIG_DEBUG_LIST_MINIMAL
-From: Marco Elver <elver@google.com>
-To: elver@google.com, Andrew Morton <akpm@linux-foundation.org>, 
-	Kees Cook <keescook@chromium.org>
-Cc: Guenter Roeck <linux@roeck-us.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Miguel Ojeda <ojeda@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Tom Rix <trix@redhat.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
-	Dmitry Vyukov <dvyukov@google.com>, Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com, 
-	linux-toolchains@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 104.132.1.99
+X-SA-Exim-Rcpt-To: rananta@google.com, seanjc@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, chenhuacai@kernel.org, yuzenghui@huawei.com, anup@brainfault.org, atishp@atishpatra.org, jingzhangos@google.com, reijiw@google.com, coltonlewis@google.com, dmatlack@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, gshan@redhat.com, philmd@linaro.org, shahuang@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Numerous production kernel configs (see [1, 2]) are choosing to enable
-CONFIG_DEBUG_LIST, which is also being recommended by KSPP for hardened
-configs [3]. The feature has never been designed with performance in
-mind, yet common list manipulation is happening across hot paths all
-over the kernel.
+On Tue, 01 Aug 2023 01:42:54 +0100,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
+>=20
+> On Mon, Jul 31, 2023 at 2:42=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > On Mon, Jul 31, 2023, Raghavendra Rao Ananta wrote:
+> > > On Thu, Jul 27, 2023 at 3:24=E2=80=AFAM Marc Zyngier <maz@kernel.org>=
+ wrote:
+> > > >
+> > > > On Sat, 22 Jul 2023 03:22:40 +0100,
+> > > > Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > > > >
+> > > > > From: David Matlack <dmatlack@google.com>
+> > > > >
+> > > > > Rename kvm_arch_flush_remote_tlb() and the associated macro
+> > > > > __KVM_HAVE_ARCH_FLUSH_REMOTE_TLB to kvm_arch_flush_remote_tlbs() =
+and
+> > > > > __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS respectively.
+> > > > >
+> > > > > Making the name plural matches kvm_flush_remote_tlbs() and makes =
+it more
+> > > > > clear that this function can affect more than one remote TLB.
+> > > > >
+> > > > > No functional change intended.
+> > > > >
+> > > > > Signed-off-by: David Matlack <dmatlack@google.com>
+> > > > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > > > > Reviewed-by: Gavin Shan <gshan@redhat.com>
+> > > > > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+> > > > > Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> > > > > ---
+> > > > >  arch/mips/include/asm/kvm_host.h | 4 ++--
+> > > > >  arch/mips/kvm/mips.c             | 2 +-
+> > > > >  arch/x86/include/asm/kvm_host.h  | 4 ++--
+> > > > >  include/linux/kvm_host.h         | 4 ++--
+> > > > >  virt/kvm/kvm_main.c              | 2 +-
+> > > > >  5 files changed, 8 insertions(+), 8 deletions(-)
+> > > > >
+> > > > > diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include=
+/asm/kvm_host.h
+> > > > > index 04cedf9f8811..9b0ad8f3bf32 100644
+> > > > > --- a/arch/mips/include/asm/kvm_host.h
+> > > > > +++ b/arch/mips/include/asm/kvm_host.h
+> > > > > @@ -896,7 +896,7 @@ static inline void kvm_arch_sched_in(struct k=
+vm_vcpu *vcpu, int cpu) {}
+> > > > >  static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)=
+ {}
+> > > > >  static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcp=
+u) {}
+> > > > >
+> > > > > -#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLB
+> > > > > -int kvm_arch_flush_remote_tlb(struct kvm *kvm);
+> > > > > +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
+> > > > > +int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
+> > > >
+> > > > How about making this prototype global? I don't see a point in havi=
+ng
+> > > > it per-architecture, specially as you are adding arm64 to that mix =
+in
+> > > > the following patch.
+> > > >
+> > > We can make it global, but I'm not sure what was the intention of the
+> > > original author. My guess is that he was following the same style that
+> > > we have for some of the other kvm_arch_*() functions
+> > > (kvm_arch_free_vm() for example)?
+> >
+> > Heh, KVM has a *lot* of code that was written with questionable style. =
+ I agree
+> > with Marc, I can't think of a single reason not to have the definition =
+in common
+> > code.  Declaring the function doesn't preclude a "static inline" implem=
+entation,
+> > and we could even keep the prototype under an #ifdef, e.g.
+> >
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 9d3ac7720da9..5ac64f933547 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -1484,6 +1484,8 @@ static inline int kvm_arch_flush_remote_tlb(struc=
+t kvm *kvm)
+> >  {
+> >         return -ENOTSUPP;
+> >  }
+> > +#else
+> > +int kvm_arch_flush_remote_tlb(struct kvm *kvm);
+> >  #endif
+> >
+> >  #ifdef __KVM_HAVE_ARCH_NONCOHERENT_DMA
+> >
+> Thanks for the suggestions; I can go with a common declaration. Along
+> with that, do we want to keep defining
+> __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS in the arch code that supports it or
+> convert it into a CONFIG_?
 
-Introduce CONFIG_DEBUG_LIST_MINIMAL, which performs list pointer
-checking inline, and only upon list corruption delegates to the
-reporting slow path.
+This isn't something that a user can select, more something that is an
+architectural decision. Maybe in a later patch if there is a consensus
+around that, but probably not as part of this series.
 
-To generate optimal machine code with CONFIG_DEBUG_LIST_MINIMAL:
+Thanks,
 
-  1. Elide checking for pointer values which upon dereference would
-     result in an immediate access fault -- therefore "minimal" checks.
-     The trade-off is lower-quality error reports.
+	M.
 
-  2. Use the newly introduced __preserve_most function attribute
-     (available with Clang, but not yet with GCC) to minimize the code
-     footprint for calling the reporting slow path. As a result,
-     function size of callers is reduced by avoiding saving registers
-     before calling the rarely called reporting slow path.
-
-  3. Because the inline checks are a subset of the full set of checks in
-     ___list_*_valid(), always return false if the inline checks failed.
-     This avoids redundant compare and conditional branch right after
-     return from the slow path.
-
-As a side-effect of the checks being inline, if the compiler can prove
-some condition to always be true, it can completely elide some checks.
-
-Running netperf with CONFIG_DEBUG_LIST_MINIMAL (using a Clang compiler
-with "preserve_most") shows throughput improvements, in my case of ~7%
-on average (up to 20-30% on some test cases).
-
-Link: https://r.android.com/1266735 [1]
-Link: https://gitlab.archlinux.org/archlinux/packaging/packages/linux/-/blob/main/config [2]
-Link: https://kernsec.org/wiki/index.php/Kernel_Self_Protection_Project/Recommended_Settings [3]
-Signed-off-by: Marco Elver <elver@google.com>
----
- arch/arm64/kvm/hyp/nvhe/list_debug.c |  2 +
- include/linux/list.h                 | 56 +++++++++++++++++++++++++---
- lib/Kconfig.debug                    | 15 ++++++++
- lib/list_debug.c                     |  2 +
- 4 files changed, 69 insertions(+), 6 deletions(-)
-
-diff --git a/arch/arm64/kvm/hyp/nvhe/list_debug.c b/arch/arm64/kvm/hyp/nvhe/list_debug.c
-index 589284496ac5..df718e29f6d4 100644
---- a/arch/arm64/kvm/hyp/nvhe/list_debug.c
-+++ b/arch/arm64/kvm/hyp/nvhe/list_debug.c
-@@ -26,6 +26,7 @@ static inline __must_check bool nvhe_check_data_corruption(bool v)
- 
- /* The predicates checked here are taken from lib/list_debug.c. */
- 
-+__list_valid_slowpath
- bool ___list_add_valid(struct list_head *new, struct list_head *prev,
- 		       struct list_head *next)
- {
-@@ -37,6 +38,7 @@ bool ___list_add_valid(struct list_head *new, struct list_head *prev,
- 	return true;
- }
- 
-+__list_valid_slowpath
- bool ___list_del_entry_valid(struct list_head *entry)
- {
- 	struct list_head *prev, *next;
-diff --git a/include/linux/list.h b/include/linux/list.h
-index e0b2cf904409..a28a215a3eb1 100644
---- a/include/linux/list.h
-+++ b/include/linux/list.h
-@@ -39,20 +39,64 @@ static inline void INIT_LIST_HEAD(struct list_head *list)
- }
- 
- #ifdef CONFIG_DEBUG_LIST
--extern bool ___list_add_valid(struct list_head *new,
--			      struct list_head *prev,
--			      struct list_head *next);
-+
-+#ifdef CONFIG_DEBUG_LIST_MINIMAL
-+# define __list_valid_slowpath __cold __preserve_most
-+#else
-+# define __list_valid_slowpath
-+#endif
-+
-+extern bool __list_valid_slowpath ___list_add_valid(struct list_head *new,
-+						    struct list_head *prev,
-+						    struct list_head *next);
- static __always_inline bool __list_add_valid(struct list_head *new,
- 					     struct list_head *prev,
- 					     struct list_head *next)
- {
--	return ___list_add_valid(new, prev, next);
-+	bool ret = true;
-+
-+	if (IS_ENABLED(CONFIG_DEBUG_LIST_MINIMAL)) {
-+		/*
-+		 * In the minimal config, elide checking if next and prev are
-+		 * NULL, since the immediate dereference of them below would
-+		 * result in a fault if NULL.
-+		 *
-+		 * With the minimal config we can afford to inline the checks,
-+		 * which also gives the compiler a chance to elide some of them
-+		 * completely if they can be proven at compile-time. If one of
-+		 * the pre-conditions does not hold, the slow-path will show a
-+		 * report which pre-condition failed.
-+		 */
-+		if (likely(next->prev == prev && prev->next == next && new != prev && new != next))
-+			return true;
-+		ret = false;
-+	}
-+
-+	ret &= ___list_add_valid(new, prev, next);
-+	return ret;
- }
- 
--extern bool ___list_del_entry_valid(struct list_head *entry);
-+extern bool __list_valid_slowpath ___list_del_entry_valid(struct list_head *entry);
- static __always_inline bool __list_del_entry_valid(struct list_head *entry)
- {
--	return ___list_del_entry_valid(entry);
-+	bool ret = true;
-+
-+	if (IS_ENABLED(CONFIG_DEBUG_LIST_MINIMAL)) {
-+		struct list_head *prev = entry->prev;
-+		struct list_head *next = entry->next;
-+
-+		/*
-+		 * In the minimal config, elide checking if next and prev are
-+		 * NULL, LIST_POISON1 or LIST_POISON2, since the immediate
-+		 * dereference of them below would result in a fault.
-+		 */
-+		if (likely(prev->next == entry && next->prev == entry))
-+			return true;
-+		ret = false;
-+	}
-+
-+	ret &= ___list_del_entry_valid(entry);
-+	return ret;
- }
- #else
- static inline bool __list_add_valid(struct list_head *new,
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index fbc89baf7de6..e72cf08af0fa 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -1680,6 +1680,21 @@ config DEBUG_LIST
- 
- 	  If unsure, say N.
- 
-+config DEBUG_LIST_MINIMAL
-+	bool "Minimal linked list debug checks"
-+	default !DEBUG_KERNEL
-+	depends on DEBUG_LIST
-+	help
-+	  Only perform the minimal set of checks in the linked-list walking
-+	  routines to catch corruptions that are not guaranteed to result in an
-+	  immediate access fault.
-+
-+	  This trades lower quality error reports for improved performance: the
-+	  generated code should be more optimal and provide trade-offs that may
-+	  better serve safety- and performance- critical environments.
-+
-+	  If unsure, say Y.
-+
- config DEBUG_PLIST
- 	bool "Debug priority linked list manipulation"
- 	depends on DEBUG_KERNEL
-diff --git a/lib/list_debug.c b/lib/list_debug.c
-index fd69009cc696..daad32855f0d 100644
---- a/lib/list_debug.c
-+++ b/lib/list_debug.c
-@@ -17,6 +17,7 @@
-  * attempt).
-  */
- 
-+__list_valid_slowpath
- bool ___list_add_valid(struct list_head *new, struct list_head *prev,
- 		       struct list_head *next)
- {
-@@ -39,6 +40,7 @@ bool ___list_add_valid(struct list_head *new, struct list_head *prev,
- }
- EXPORT_SYMBOL(___list_add_valid);
- 
-+__list_valid_slowpath
- bool ___list_del_entry_valid(struct list_head *entry)
- {
- 	struct list_head *prev, *next;
--- 
-2.41.0.585.gd2178a4bd4-goog
-
+--=20
+Without deviation from the norm, progress is not possible.
