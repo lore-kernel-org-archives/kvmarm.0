@@ -1,97 +1,87 @@
-Received: from out-126.mta0.migadu.com (out-126.mta0.migadu.com [91.218.175.126])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF83479FF
-	for <kvmarm@lists.linux.dev>; Wed,  2 Aug 2023 17:04:40 +0000 (UTC)
-Date: Wed, 2 Aug 2023 17:04:33 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1690995878;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WJgiPi3z5fgU4lTzUcaeihvoVV4/arRmDPqFGrxctos=;
-	b=fkFkihM77h5zK99tash/Nlp41RcOozNnYYf++vLojGZDRyhHUYuWTDI7P5D79nJdokZhbq
-	ZKcshmP9FPi6MpXqE6SJ4MyX+U8ZZawvQbvkh3bH5uacL3SUvpPWaMJTsSlHQy9Le9cSxl
-	fYGgLtGp6N2nBXN+lITPi+y6pHfmvyA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Jing Zhang <jingzhangos@google.com>
-Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-	ARMLinux <linux-arm-kernel@lists.infradead.org>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Suraj Jitindar Singh <surajjs@amazon.com>,
-	Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH v7 01/10] KVM: arm64: Allow userspace to get the writable
- masks for feature ID registers
-Message-ID: <ZMqMofRCmB14XUZr@linux.dev>
-References: <20230801152007.337272-1-jingzhangos@google.com>
- <20230801152007.337272-2-jingzhangos@google.com>
- <ZMmdnou5Pk/9V1Gs@linux.dev>
- <CAAdAUtj-6tk53TE6p0TYBfmFghj94g+Sg2KK_80Gar18kJ=5OA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77FC479FF;
+	Wed,  2 Aug 2023 17:09:04 +0000 (UTC)
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-6b9cf7e6ab2so83288a34.1;
+        Wed, 02 Aug 2023 10:09:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690996143; x=1691600943;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VzgOK7S/nDkSxIWVLP6Niz2nC5TbUp6AvvmSTjYDoz0=;
+        b=fPw/kdvfhtWEf4UBlljKxHTeCnXzAczix4g5kutrq7CH0rJnQKdQVspzYFHMZDDs/T
+         G/JNOATOQJoDlFrS7qbXFyw97Sar/IhQAYWdjudC/9i0EmPT/+spzXX9oaLLM++MaELe
+         s+HfTuVyDtdxU4dU3ngRnCLrjDPUyPH4TtLUuB9tVg0SSLVtb4EyLyRyuAbnpKBGzUol
+         PxpK86twd7NPi9GzrENjM4dy5nTMYz06aj3adfEymnxYaBxlEWUj3LpiJUyMrESIKBVi
+         dMM/u7xvWZQlPRKFDqFayN7aTgTy5DCS2vs0lYi/a1MgFmntRe+Fe0kJaVRT8CMYkS/J
+         FNGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690996143; x=1691600943;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VzgOK7S/nDkSxIWVLP6Niz2nC5TbUp6AvvmSTjYDoz0=;
+        b=AfEIzThTExykNpu3FQLKjAzRY5FDTAgII1c3VIasuTBEJrQFWruoMT8uaiiUHHEokA
+         RxqXLYd0I9xJ6k9z7bOTcKdGmVApMlcA3fKs2zkk1KC3bYHELtFQ52l2puMJ5CwO4n3C
+         gncEkqyB3n+7xDsqRkpoJ6J2Gdc830xByeqD/Zf9Qlh7aRJ1CvviBbiNgOB1oPzHZO2r
+         31t8hx9dlRdgFOA0RGx2iKzb0mELAiKGTCEuspTABrc2O1uLLtEmTW4d0rAt5ybTb4WQ
+         MRIQkPynHRN03u97m0UuSpAfCpDKbWDQTjXTagILv9TJ5E2ytwaQkUbf5ZlxRS4ky/IQ
+         IT/A==
+X-Gm-Message-State: ABy/qLYzz/YjDNXIsQQ1QIba5q8rJj7Oe79DaoJ34xR7Tw8tFkJ7KzlH
+	PAGJXy6JxD+U73zuWbX/mPERS8dis/m/l8uIiio=
+X-Google-Smtp-Source: APBJJlEunU1vMsI7Ba5iPzVifoTkFdqWTVRlsIl1b3LmpG0allJXwK4ZcEhL9CUMO+GM4B+HRL4Vd9l6rafbjWpjMjs=
+X-Received: by 2002:a9d:7a41:0:b0:6b9:482e:ed10 with SMTP id
+ z1-20020a9d7a41000000b006b9482eed10mr18099228otm.21.1690996143376; Wed, 02
+ Aug 2023 10:09:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAdAUtj-6tk53TE6p0TYBfmFghj94g+Sg2KK_80Gar18kJ=5OA@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+References: <20230802150712.3583252-1-elver@google.com> <CANpmjNPVO_t058c6Wcwr9TBwxeoH7Ba0ECsf6Wapn60br8EtkQ@mail.gmail.com>
+In-Reply-To: <CANpmjNPVO_t058c6Wcwr9TBwxeoH7Ba0ECsf6Wapn60br8EtkQ@mail.gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Wed, 2 Aug 2023 19:08:51 +0200
+Message-ID: <CANiq72k7_Ujg31UHfivv8zyog-6Vs7YehTpk2y-qRiuT-KMmAw@mail.gmail.com>
+Subject: Re: [PATCH 1/3] Compiler attributes: Introduce the __preserve_most
+ function attribute
+To: Marco Elver <elver@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Kees Cook <keescook@chromium.org>, 
+	Guenter Roeck <linux@roeck-us.net>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Miguel Ojeda <ojeda@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
+	Nathan Chancellor <nathan@kernel.org>, Tom Rix <trix@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
+	Dmitry Vyukov <dvyukov@google.com>, Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com, 
+	linux-toolchains@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, 
+	Peter Zijlstra <peterz@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 02, 2023 at 08:55:43AM -0700, Jing Zhang wrote:
-> > > +#define ARM64_FEATURE_ID_SPACE_SIZE  (3 * 8 * 8)
-> > > +
-> > > +struct feature_id_writable_masks {
-> > > +     __u64 mask[ARM64_FEATURE_ID_SPACE_SIZE];
-> > > +};
-> >
-> > This UAPI is rather difficult to extend in the future. We may need to
-> > support describing the masks of multiple ranges of registers in the
-> > future. I was thinking something along the lines of:
-> >
-> >         enum reg_mask_range_idx {
-> >                 FEATURE_ID,
-> >         };
-> >
-> >         struct reg_mask_range {
-> >                 __u64 idx;
-> >                 __u64 *masks;
-> >                 __u64 rsvd[6];
-> >         };
-> >
-> Since have the way to map sysregs encoding to the index in the mask
-> array, we can extend the UAPI by just adding a size field in struct
-> feature_id_writable_masks like below:
-> struct feature_id_writable_masks {
->          __u64 size;
->          __u64 mask[ARM64_FEATURE_ID_SPACE_SIZE];
-> };
-> The 'size' field can be used as input for the size of 'mask' array and
-> output for the number of masks actually read in.
-> This way, we can freely add more ranges without breaking anything in userspace.
-> WDYT?
+On Wed, Aug 2, 2023 at 6:51=E2=80=AFPM Marco Elver <elver@google.com> wrote=
+:
+>
+> Mark says that there may be an issue with using this in combination
+> with ftrace because arm64 tracing relies on AAPCS. Probably not just
+> arm64, but also other architectures (x86?).
+>
+> To make this safe, I'm going to move __preserve_most to
+> compiler_types.h and always pair it with notrace and some comments in
+> v2.
 
-Sorry, 'index' is a bit overloaded in this context. The point I was
-trying to get across is that we might want to describe a completely
-different range of registers than the feature ID registers in the
-future. Nonetheless, we shouldn't even presume the shape of future
-extensions to the ioctl.
+Sounds good, thanks! The patch here was otherwise good in terms of
+`compiler_attributes.h`.
 
-	struct reg_mask_range {
-		__u64 addr;	/* pointer to mask array */
-		__u64 rsvd[7];
-	};
+I was also thinking about the implications for Rust. I guess if we
+need to call them, we will go through a C helper for the moment, and
+later on if we get cross-language LTO (or the LLVM IR hacks), it will
+hopefully not be a performance penalty.
 
-Then in KVM we should require ::rsvd be zero and fail the ioctl
-otherwise.
-
--- 
-Thanks,
-Oliver
+Cheers,
+Miguel
