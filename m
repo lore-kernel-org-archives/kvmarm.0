@@ -1,199 +1,186 @@
-Received: from mgamail.intel.com (unknown [192.55.52.120])
+Received: from out-73.mta0.migadu.com (out-73.mta0.migadu.com [91.218.175.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5744DC77
-	for <kvmarm@lists.linux.dev>; Tue,  1 Aug 2023 20:58:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690923484; x=1722459484;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=YC5JtNaoq8Ec/WrS4nz16CChgowf5YBvj0tOigYpL/M=;
-  b=RBS/t+5iOBa2mT/Dt4PwioilM7vfQJ25QTn13c9Q1v8veGorwqnHxSjb
-   woHxa0LMTW5vtT/e+aY2K2HSYwAwIvGrO009svaHRIrzdirHN3zRlWJbj
-   zXaCsjCGMhTqRSRkhE+wU4MC+VgpGn0GGaovZ45yBY+G6u0NH//KYKIqP
-   tq22r71G4eG22sH7thr0SKAspYOM+FLTZDhPSbppGR0pYhXDwjFh2eKhL
-   f7lv23CJG2IRerVDXyQU2CUx9OXKmpunxEZUXuIOdFo00qVTeM2nj0gBL
-   5WGPIpbqPCotrZN64+IkY6ZS9j4/LCjEwJogOjxt42LWJPEuaFHg/P3+V
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="368310492"
-X-IronPort-AV: E=Sophos;i="6.01,248,1684825200"; 
-   d="scan'208";a="368310492"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 13:58:03 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="852617657"
-X-IronPort-AV: E=Sophos;i="6.01,248,1684825200"; 
-   d="scan'208";a="852617657"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orsmga004.jf.intel.com with ESMTP; 01 Aug 2023 13:58:02 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 1 Aug 2023 13:58:01 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 1 Aug 2023 13:58:01 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Tue, 1 Aug 2023 13:58:01 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.103)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Tue, 1 Aug 2023 13:58:01 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HRblaN5Y+qf8SyMdI//xvGMqVJH3wocT885bkEdAq6VMB8jpc+KPQOiWBZHPKmJrw+ZnOO33zoudQtJbOnmaA0Yp/TdUZXGMH/7XqPMTWVbvgdMr9D5cvxDn9jLMW0TxWc+KaR+eWLrujUrJj8TjVE00nozKTzQhqD/AIrYcW1s+eELmv7JVMsGRz2lZrNWs09xKnJ4Ah9HhfCcMqftm8Zdq2nHXvQ86EWTYhMshwm/JSDTQU1fzERsPqb/kqvlvdtq4s2APIh0YaMou0AJc0dESMWdlLDB0fb5YINPfHSgYbCTwk96513jYL+S5pF4yI+pGFv4fqeDmZdeNYwOGGg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YC5JtNaoq8Ec/WrS4nz16CChgowf5YBvj0tOigYpL/M=;
- b=M8ThfuRDqt0LI5I2VwuohCCXKrwYm+/KXLVDrDdu5gYwT1yenM6jxNLR1Bp4C6W5U4AwX58ztbQZkNNeG335XHAQKHfNjBTH9WGrn7G3rkVvGclwjz7/RRrhI3ZYsOFWeXDGicxIvLCmSlJFPvP6lPmSGOL/UOVHBnc1RsGFYlydbh97IUylitRPAZe8Xqx4t0MogQAzskP7VLqBP20qVJDSGdwLdTugEV3zeAjn4jTyI6Ii6FeWUvkUcQRjMe9Xh/DPpb19/m7BlPSPLnXo7+e25/JPMNIs4yOgmG274cNFcp6yMbpwfUFIBMJnzvEel3NxAaTdBvu0yhn9slOoNw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
- by BL1PR11MB6025.namprd11.prod.outlook.com (2603:10b6:208:390::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.45; Tue, 1 Aug
- 2023 20:57:59 +0000
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::abd2:f781:1433:259]) by MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::abd2:f781:1433:259%3]) with mapi id 15.20.6631.043; Tue, 1 Aug 2023
- 20:57:59 +0000
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To: "broonie@kernel.org" <broonie@kernel.org>
-CC: "corbet@lwn.net" <corbet@lwn.net>, "ardb@kernel.org" <ardb@kernel.org>,
-	"keescook@chromium.org" <keescook@chromium.org>, "Szabolcs.Nagy@arm.com"
-	<Szabolcs.Nagy@arm.com>, "shuah@kernel.org" <shuah@kernel.org>,
-	"maz@kernel.org" <maz@kernel.org>, "james.morse@arm.com"
-	<james.morse@arm.com>, "debug@rivosinc.com" <debug@rivosinc.com>,
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "akpm@linux-foundation.org"
-	<akpm@linux-foundation.org>, "catalin.marinas@arm.com"
-	<catalin.marinas@arm.com>, "hjl.tools@gmail.com" <hjl.tools@gmail.com>,
-	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, "linux-mm@kvack.org"
-	<linux-mm@kvack.org>, "palmer@dabbelt.com" <palmer@dabbelt.com>,
-	"oleg@redhat.com" <oleg@redhat.com>, "arnd@arndb.de" <arnd@arndb.de>,
-	"ebiederm@xmission.com" <ebiederm@xmission.com>, "will@kernel.org"
-	<will@kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "suzuki.poulose@arm.com"
-	<suzuki.poulose@arm.com>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kselftest@vger.kernel.org"
-	<linux-kselftest@vger.kernel.org>, "linux-arch@vger.kernel.org"
-	<linux-arch@vger.kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, "linux-riscv@lists.infradead.org"
-	<linux-riscv@lists.infradead.org>
-Subject: Re: [PATCH v3 21/36] arm64/mm: Implement map_shadow_stack()
-Thread-Topic: [PATCH v3 21/36] arm64/mm: Implement map_shadow_stack()
-Thread-Index: AQHZw7ZZVWMs6JZuI06/zv64SypFG6/UB86AgAATdQCAAGg9gIAA9o2AgAAzsICAAA4DAIAAMoYA
-Date: Tue, 1 Aug 2023 20:57:59 +0000
-Message-ID: <7d03be1277a5f4be23df35ca96f4d6cd77735e2b.camel@intel.com>
-References: <20230731-arm64-gcs-v3-0-cddf9f980d98@kernel.org>
-	 <20230731-arm64-gcs-v3-21-cddf9f980d98@kernel.org>
-	 <5461c56cf4896f18bddaa66c3beec7b909fc8fb9.camel@intel.com>
-	 <0a6c90d6-f790-4036-a364-d4761fdd0e95@sirena.org.uk>
-	 <e827138f9d8800e3db158831bca88d1ea8b559af.camel@intel.com>
-	 <21d7e814-8608-40ce-b5d3-401f2110ad91@sirena.org.uk>
-	 <a9ea33d31aad0c45eab41b0dcbd4913d863cc930.camel@intel.com>
-	 <55c629cc-0545-460b-91cb-2ebdb8ae9051@sirena.org.uk>
-In-Reply-To: <55c629cc-0545-460b-91cb-2ebdb8ae9051@sirena.org.uk>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.44.4-0ubuntu1 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|BL1PR11MB6025:EE_
-x-ms-office365-filtering-correlation-id: 7059ad1c-0ed2-4830-78ed-08db92d1fcee
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: xRSaUgVdkLJfHYWHMbwycmzpHkDF7jAVMIjGaq3rzVv67QN3FPkHnbyvjNAyRWu78Fhuf4qge0cu7sX+kQpBnh6EThEcTkCdqf0cMCKOnfHY6E7HxlVdwC+Sqg3VKFK92PwvJ5cxEpnGBMqDcIfLc/Xh1lSK/La4bmOL1m+3g4Frg5QH1lLa5J4pp47XDKF6mQbJQe25pd7BVX1eFoBGyiy0/94EpbVWLpdfGCBCZFGCwjLX4BCPV0XgmVcs3LJoRqlvINSpnW7gq6gQnKTqbk8xIuKvhxnmgetyVqDwIw3hxYSH91QjNV0a37zvnd1uQwasBf1YzYVbjfza5yB0tpg9ZGyUeayfggtXU7TXGR3jHUOCUGPwVP5qR/GpH4Z1KyuEwHKp/dLYiCHHsaIUqK2SaQ0YP+hIqt3AU0rbnes5Zffn8gWXJc6AIg4l8a7+UxJQXeB6dyyIrv5fym7fxTwh3BNSARHhhvP+x4yxUqgI2vrxLVUhSy7f4g7ViwzMA0BMSmHCw60KN1IPKfdHCTF0nUMH0Nmt9vqoCt+6pcGlg6B/I4Zp/AN87h9RA14XJ5fkphRJSNXFkSYGnXgFAA1j/6ip8eu+QUuKuO4QrHNkvKCOZryJxVGERcCOsA77
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(396003)(376002)(346002)(136003)(366004)(451199021)(66899021)(2616005)(6506007)(26005)(36756003)(38070700005)(122000001)(38100700002)(82960400001)(7406005)(83380400001)(54906003)(2906002)(186003)(7416002)(91956017)(6486002)(478600001)(8936002)(8676002)(5660300002)(86362001)(71200400001)(66556008)(66476007)(66446008)(64756008)(6916009)(4326008)(66946007)(316002)(41300700001)(76116006)(6512007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ekFZSnZkeUtBajFteXRXZ3o0cFZsQlA5T3NmcHRoZnJUUS9UWVBKMk45eUlU?=
- =?utf-8?B?NnhuOUc1M3ZWRWo3anN0VnhYaWRVVnFOUTZIQmVhd2pYbEYrZkVsWTV0eFdJ?=
- =?utf-8?B?ZGNZNmlraThlVEU2Zkc5ZTVRaEhpckNIRndHZGtsQmFCSnhFVU0xR2ZkVnpJ?=
- =?utf-8?B?NWtnOE1ISXdjY3VHeVNYbTlQNEwyUTI0UUlya0pJd3ZxNHpLOFpadWdMM2s1?=
- =?utf-8?B?MHl0b0hZRmpncTFtWHhRQlp4dHZMcElhYVowTnhQaW1sdksyUTRsUTZ5Q05Y?=
- =?utf-8?B?SnFiL1F3U00rL3J4ZWlVaERDRUY0bkQrZkUxUms4cmpReU5ubVF1cjVYNUJz?=
- =?utf-8?B?TkVabGRPeEFROGxFakd6L0NyWXBWZjNXTnNUUkxrN09rMmJCTkJybnFMcnBH?=
- =?utf-8?B?UlFhL2hTckJjZ2pBZ1NGNmdZb0xzZ0NkMnBQemFLOW9RNjlTMkN2dVVzZTMy?=
- =?utf-8?B?VVhhWVhhcTk1c0pnbElSTUlMZWFUbFQzOG9FVFNHYk9hbUNOMlBCdG55ZCt4?=
- =?utf-8?B?WWh5L2tUcDhKVzlHVWZzQjFnSW4xYkVGMS9iblY5Q1FrR2FaOG81ZklnTStB?=
- =?utf-8?B?RjBRV3lIRk0zeXpsSUdzL1ovNlhJUjVLUEx6NFhwQjlpc3VSQjEyV0M5d2NR?=
- =?utf-8?B?alpOajFRWW8wcVV2TGU5dnlTSzVQVG9PbHhDampOQmNlOEd0WkZObVNMVU1W?=
- =?utf-8?B?Wk1hcXU1SjhrUFVLN3g3cjZ4Rmx2Y0pCN09ROTZjMDZ0VEJKYW1Yc3phM0dS?=
- =?utf-8?B?SW0wUG43WU1LKzgvNUlJSElyQ01Gd3BGWHN3dEFJVFBzckdEYWZOUDFzcm9J?=
- =?utf-8?B?RFdSMXhFdEhqY29kcThkQ1BrL25CQ0J6TUMwalpqOVNCekdZbzIxMmIzOVR6?=
- =?utf-8?B?cWhlTnpvcGk0dDVYUmVmMUJkakpMSTN4a2txY0JVY3NNOVJFVHp4UklUMHF5?=
- =?utf-8?B?akRqekRFZVRPQm9TbzUxa25HZ3luSXhUSTY1U1Q1QzVJNjY4MUJKcy92V2dD?=
- =?utf-8?B?aHNDcWlqVGJjTGNRK0JKUE9Xb3VKQ1VZTDFwWE1xa2YxUkFkamtna09mNGhQ?=
- =?utf-8?B?aUt6Y3k4S3BlTzlJTjJDLy9jYTJINlRkMDViQkRNQUVqS1l6MjJDZGJNVzg5?=
- =?utf-8?B?ZWVCL1lWVktEcFhjQ2lpbHAwSXBEY0VBNkpHcVQ4T3hJZm5PdVFHNG9TZ3pL?=
- =?utf-8?B?NWNCSnR1clVUQVBKUHVvQzZmWHhnUTJlQnV2ZVNKL0xoV25TRTVUTWg0RTZJ?=
- =?utf-8?B?SUtWZTlUZHY4ZzBzVU45VXpjdXFyN2dvRGNXV2cwUXRkNlRSOTVZUUl5ZFQv?=
- =?utf-8?B?ZE5ha2V5M01CNnFHeFhEejFIcWNFbnhzL0hKbzlVdVZ3MkVEeE1yeWFZa3dr?=
- =?utf-8?B?dm5PaFVOK3MxQWxvaDR3cEVzK1ljUjZvbm9tTjVHRG1MRFdhZmRzL0VPaWNs?=
- =?utf-8?B?b3FQVVgwdGk0ZzRKeUc0UTRzNHBYK05HVTdIVG8yR0dselEvb3RaM0hCZ2ht?=
- =?utf-8?B?UlNnaDB1MG9XbmVYWTkybmJYYys5eDcrVG5vNnZmaUp0ZGZzRW5OMHRtUVU4?=
- =?utf-8?B?NVROdEovOW5GTFQyWFFnQm9obzlPY1VsKzFKTVlvU1pET1BJYjJRM3hEbW5w?=
- =?utf-8?B?ZXNudnBra2djSnRtNE9yNnNra3JXbThsdHVMa0VURnUwV1hPcVBmS2NicnZh?=
- =?utf-8?B?em9ZQzFKNmRTZi8vdW01K0I0UHFXVldyOFpYRFN2cDdyditMUGZ3cDE4NEo3?=
- =?utf-8?B?OCtDS2hxSjdkcmQvTW5wT2oySEdZb1NJNVEzcldyT0RDWU9xTlMxK2JzeFFY?=
- =?utf-8?B?L091aUtnSVZCY0pFSGZvbDdWVFRKQU5hMXBpMm1xd3M0b1hobHNuS280OGFv?=
- =?utf-8?B?V3BZckZCUjFrSk1KbXBLNGU4VVh0c2NFWHpkMmpMdlBpYTZ0UXJoNEJlNEJw?=
- =?utf-8?B?c2RnSmNuOXRDQU1Ea2N0YjZLVHpzVk9udHBrN0kzSUVmU2E3NGtIMU5CU25q?=
- =?utf-8?B?WE1JUkJNQk1kbVppOGVuVjhldVY0TXVwWGRFUWRuL0dHOXh1NEllSjhjSHk5?=
- =?utf-8?B?WnF6Ui85djlBb0dacmJXd2xSajgremhaQlNCcWpKa2pQQWhGaWk3YytCVE9L?=
- =?utf-8?B?cEowenRQWEtuajU5MUgwbWtYUXVkUTMwaFFxQ0JldTFzY1Nyc3Bzb1RQbWFw?=
- =?utf-8?B?OUE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C01773FE4960B04D83C367382FA13904@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38FF17F
+	for <kvmarm@lists.linux.dev>; Wed,  2 Aug 2023 00:04:53 +0000 (UTC)
+Date: Wed, 2 Aug 2023 00:04:46 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1690934692;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=26qSacuL0lICDBEf7YFF7T5Q6WzFo+qYPN2JykShS/o=;
+	b=PDCJcZoXfOvTGnKPyf7CjSQfENjjsPZUiSmvcn8KXPU+zxxqDFzbTiUyLXIYuMhOZUq3tv
+	cjd76jHgj2LBTWdzKdZnQ9vq4Sis2kZvTnejovGjAPYkZSNkgwSBGnYF25xI0z7WKPUTn5
+	OUe1k22KHT9d2IBdPIVLb+EsELDm194=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Jing Zhang <jingzhangos@google.com>
+Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+	ARMLinux <linux-arm-kernel@lists.infradead.org>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Suraj Jitindar Singh <surajjs@amazon.com>,
+	Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH v7 01/10] KVM: arm64: Allow userspace to get the writable
+ masks for feature ID registers
+Message-ID: <ZMmdnou5Pk/9V1Gs@linux.dev>
+References: <20230801152007.337272-1-jingzhangos@google.com>
+ <20230801152007.337272-2-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7059ad1c-0ed2-4830-78ed-08db92d1fcee
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Aug 2023 20:57:59.1884
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: NnnL1FG9d5WSNM8pgj8V26UfYRktG+KK8bdjlQv86dHXbpEuXOqS1jGrzNYGytt75xEuMoWE1GenVXLTNdqP22EJYzrC+D9y3N2SxPTcD2A=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB6025
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230801152007.337272-2-jingzhangos@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-T24gVHVlLCAyMDIzLTA4LTAxIGF0IDE4OjU3ICswMTAwLCBNYXJrIEJyb3duIHdyb3RlOg0KPiA+
-IFlvdSBkb24ndCBoYXZlIHRvIHN1cHBvcnQgYWxsIHRoZSBmbGFncyBhY3R1YWxseSwgeW91IGNv
-dWxkIGp1c3QNCj4gPiBzdXBwb3J0IHRoZSBvbmUgbW9kZSB5b3UgYWxyZWFkeSBoYXZlIGFuZCBy
-ZWplY3QgYWxsIG90aGVyDQo+ID4gY29tYmluYXRpb25zLi4uIFRoZW4gaXQgbWF0Y2hlcyBiZXR3
-ZWVuIGFyY2gncywgYW5kIHlvdSBzdGlsbCBoYXZlDQo+ID4gdGhlDQo+ID4gZ3VhcmFudGVlZC1p
-c2ggZW5kIG1hcmtlci4NCj4gDQo+IFN1cmUsIHRob3VnaCBpZiB3ZSdyZSBnb2luZyB0byB0aGUg
-dHJvdWJsZSBvZiBjaGVja2luZyBmb3IgdGhlIGZsYWcNCj4gd2UNCj4gcHJvYmFibHkgbWF5IGFz
-IHdlbGwgaW1wbGVtZW50IGl0LsKgIEkgZ3Vlc3MgeDg2IGlzIGxvY2tlZCBpbiBhdCB0aGlzDQo+
-IHBvaW50IGJ5IGV4aXN0aW5nIHVzZXJzcGFjZS7CoCBJIGd1ZXNzIEknbGwgaW1wbGVtZW50IGl0
-IGFzc3VtaW5nDQo+IG5vYm9keQ0KPiBmcm9tIHVzZXJzcGFjZSBjb21wbGFpbnMsIGl0J3MgdHJp
-dmlhbCBmb3IgYSBrZXJuZWwuDQoNClRvIG1ha2Ugc3VyZSB3ZSBhcmUgb24gdGhlIHNhbWUgcGFn
-ZTogV2hhdCBJJ20gc2F5aW5nIGlzIHNheSB3ZSBkbw0Kc29tZXRoaW5nIGxpa2UgYWRkIGFub3Ro
-ZXIgZmxhZyBTSEFET1dfU1RBQ0tfU0VUX01BUktFUiB0aGF0IG1lYW5zIGFkZA0KYSBtYXJrZXIg
-YXQgdGhlIGVuZCAobWFraW5nIHRoZSB0b2tlbiBvZmYgYnkgb25lIGZyYW1lKS4gVGhlbiB5b3Ug
-Y2FuDQpqdXN0IHJlamVjdCBhbnkgZmxhZ3MgIT0gKFNIQURPV19TVEFDS19TRVRfTUFSS0VSIHwN
-ClNIQURPV19TVEFDS19TRVRfVE9LRU4pIHZhbHVlLCBhbmQgbGVhdmUgdGhlIHJlc3Qgb2YgdGhl
-IGNvZGUgYXMgaXMuIFNvDQpub3QgcmVhbGx5IGltcGxlbWVudGluZyBhbnl0aGluZyBuZXcuwqAN
-Cg0KVGhlbiB4ODYgY291bGQgdXNlIHRoZSBzYW1lIGZsYWcgbWVhbmluZ3MgaWYvd2hlbiBpdCBp
-bXBsZW1lbnRzIGVuZA0KbWFya2Vycy4gSWYgaXQgZG9lc24ndCBzZWVtIHdvcnRoIGl0LCBpdCdz
-IG5vdCBhIGJpZyBkZWFsIG9uIG15IGVuZC4NCkp1c3Qgc2VlbWVkIHRoYXQgdGhleSB3ZXJlIG5l
-ZWRsZXNzbHkgZGl2ZXJnaW5nLg0K
+Hi Jing,
+
+On Tue, Aug 01, 2023 at 08:19:57AM -0700, Jing Zhang wrote:
+> Add a VM ioctl to allow userspace to get writable masks for feature ID
+> registers in below system register space:
+> op0 = 3, op1 = {0, 1, 3}, CRn = 0, CRm = {0 - 7}, op2 = {0 - 7}
+> This is used to support mix-and-match userspace and kernels for writable
+> ID registers, where userspace may want to know upfront whether it can
+> actually tweak the contents of an idreg or not.
+> 
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Suggested-by: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  2 ++
+>  arch/arm64/include/uapi/asm/kvm.h | 25 +++++++++++++++
+>  arch/arm64/kvm/arm.c              |  3 ++
+>  arch/arm64/kvm/sys_regs.c         | 51 +++++++++++++++++++++++++++++++
+>  include/uapi/linux/kvm.h          |  2 ++
+>  5 files changed, 83 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index d3dd05bbfe23..3996a3707f4e 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1074,6 +1074,8 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+>  			       struct kvm_arm_copy_mte_tags *copy_tags);
+>  int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
+>  				    struct kvm_arm_counter_offset *offset);
+> +int kvm_vm_ioctl_get_feature_id_writable_masks(struct kvm *kvm,
+> +					       u64 __user *masks);
+>  
+>  /* Guest/host FPSIMD coordination helpers */
+>  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index f7ddd73a8c0f..2970c0d792ee 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -505,6 +505,31 @@ struct kvm_smccc_filter {
+>  #define KVM_HYPERCALL_EXIT_SMC		(1U << 0)
+>  #define KVM_HYPERCALL_EXIT_16BIT	(1U << 1)
+>  
+> +/* Get feature ID registers userspace writable mask. */
+> +/*
+> + * From DDI0487J.a, D19.2.66 ("ID_AA64MMFR2_EL1, AArch64 Memory Model
+> + * Feature Register 2"):
+> + *
+> + * "The Feature ID space is defined as the System register space in
+> + * AArch64 with op0==3, op1=={0, 1, 3}, CRn==0, CRm=={0-7},
+> + * op2=={0-7}."
+> + *
+> + * This covers all R/O registers that indicate anything useful feature
+> + * wise, including the ID registers.
+> + */
+> +#define ARM64_FEATURE_ID_SPACE_IDX(op0, op1, crn, crm, op2)		\
+> +	({								\
+> +		__u64 __op1 = (op1) & 3;				\
+> +		__op1 -= (__op1 == 3);					\
+> +		(__op1 << 6 | ((crm) & 7) << 3 | (op2));		\
+> +	})
+> +
+> +#define ARM64_FEATURE_ID_SPACE_SIZE	(3 * 8 * 8)
+> +
+> +struct feature_id_writable_masks {
+> +	__u64 mask[ARM64_FEATURE_ID_SPACE_SIZE];
+> +};
+
+This UAPI is rather difficult to extend in the future. We may need to
+support describing the masks of multiple ranges of registers in the
+future. I was thinking something along the lines of:
+
+	enum reg_mask_range_idx {
+		FEATURE_ID,
+	};
+
+	struct reg_mask_range {
+		__u64 idx;
+		__u64 *masks;
+		__u64 rsvd[6];
+	};
+
+>  #endif
+>  
+>  #endif /* __ARM_KVM_H__ */
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 72dc53a75d1c..c9cd14057c58 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1630,6 +1630,9 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+>  
+>  		return kvm_vm_set_attr(kvm, &attr);
+>  	}
+> +	case KVM_ARM_GET_FEATURE_ID_WRITABLE_MASKS: {
+> +		return kvm_vm_ioctl_get_feature_id_writable_masks(kvm, argp);
+> +	}
+>  	default:
+>  		return -EINVAL;
+>  	}
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 2ca2973abe66..d9317b640ba5 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -3560,6 +3560,57 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+>  	return write_demux_regids(uindices);
+>  }
+>  
+> +#define ARM64_FEATURE_ID_SPACE_INDEX(r)			\
+> +	ARM64_FEATURE_ID_SPACE_IDX(sys_reg_Op0(r),	\
+> +		sys_reg_Op1(r),				\
+> +		sys_reg_CRn(r),				\
+> +		sys_reg_CRm(r),				\
+> +		sys_reg_Op2(r))
+> +
+> +static bool is_feature_id_reg(u32 encoding)
+> +{
+> +	return (sys_reg_Op0(encoding) == 3 &&
+> +		(sys_reg_Op1(encoding) < 2 || sys_reg_Op1(encoding) == 3) &&
+> +		sys_reg_CRn(encoding) == 0 &&
+> +		sys_reg_CRm(encoding) <= 7);
+> +}
+> +
+> +int kvm_vm_ioctl_get_feature_id_writable_masks(struct kvm *kvm, u64 __user *masks)
+> +{
+
+Use the correct type for the user pointer (it's a struct pointer).
+
+> +	/* Wipe the whole thing first */
+> +	for (int i = 0; i < ARM64_FEATURE_ID_SPACE_SIZE; i++)
+> +		if (put_user(0, masks + i))
+> +			return -EFAULT;
+
+Why not:
+
+	if (clear_user(masks, ARM64_FEATURE_ID_SPACE_SIZE * sizeof(__u64)))
+		return -EFAULT;
+
+Of course, this may need to be adapted if the UAPI struct changes.
+
+-- 
+Thanks,
+Oliver
