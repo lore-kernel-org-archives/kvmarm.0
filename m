@@ -1,370 +1,115 @@
-Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
+Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFA3EA0
-	for <kvmarm@lists.linux.dev>; Thu,  3 Aug 2023 23:43:01 +0000 (UTC)
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-1bb782974f4so1115211fac.3
-        for <kvmarm@lists.linux.dev>; Thu, 03 Aug 2023 16:43:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8DF7EA0
+	for <kvmarm@lists.linux.dev>; Thu,  3 Aug 2023 23:43:10 +0000 (UTC)
+Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-55e1a9ff9d4so1644479eaf.1
+        for <kvmarm@lists.linux.dev>; Thu, 03 Aug 2023 16:43:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691106180; x=1691710980;
+        d=google.com; s=20221208; t=1691106189; x=1691710989;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6XhTATf7/1RB+zplPqP6wYl1J1IWawU9DRK/kARaQxY=;
-        b=nSuC/+XSqdQ1YanUgq545MskEaAHukgNoBOlmSZVKmod6vOZDdpipaKGH268pE5Fal
-         hfaRb5vRY1a8Tmidm5evHBN+kkH9Dh+LN/VZ9AWnUOjUcN0RxVPMJbzYZZR2cPrykgC6
-         f+pMZW3M5xY6ba4f21UTDj3Oq6s+bh1FdT7zJXGDVDHAESQ8ob85OguaaXq3PODLog/P
-         lnQEyTD/a4poZLFBlgDiGwdIJ2H458aoQg+V8dJLpLpNTioQfMNKQtW7yJ1dI+i8wiyj
-         KGGd8DunZkccZ3YgDVPhKwqWuYLiTklfkK8843SfPL6ZjyRvbd2q/x9T++8krCCTIqh/
-         6ujA==
+        bh=O7+T5OtzOt0JkmxCZ3JKOD3dXL81QvqZ18on5E407Iw=;
+        b=WXz/PEsrmzilAWytxUhX96+gxnGeQR72NpzCfxl6OC1hYZfRci7qNy+zPfmKITnuVA
+         9MrlQ879zobsOls+slxsR4lPU7xVLeiXE3DH+TKIIPNnqcUxHi7EM9yZ4hoR3SU5kN8+
+         OXHA7IOWJNPNwhsnDAJ3xpZNarLgZpQrxTe9GRsGmA0zS48Ftb2EDTFalLJA0vdIX4zc
+         +Iqp0ufUPWufB7HCOUHcnlSYh8B5BPvUlcu0uNeUODoJaYr25Q2Xn6WKRKVWnuuCPiBV
+         waFmkCo2HUFd0YxXiIwGdQwrXJ2v8ZVlvfAnIqLLADGd/SWEA41AscJopxhnx5gUb5LK
+         UiSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691106180; x=1691710980;
+        d=1e100.net; s=20221208; t=1691106189; x=1691710989;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6XhTATf7/1RB+zplPqP6wYl1J1IWawU9DRK/kARaQxY=;
-        b=htMWDm0pDnUX5xJD35NIUt2oZ3R8rlhuO4d7yS9qGBRzcGcnx8yAkoA8Za6Ye56C35
-         Paxw4puaggiVfzKnDy8IToL7gl0YhS79g3IT8z+I4ziEivhISo6NewJ/KYFFdwcqe6ek
-         5CKu1Oqx2KofuNQcq0KjIW0vb5um9rckej6JKuuDy00o4ppSVFtQ2FLR6g3OOUV0drYe
-         hTUh06xsyDCsExfFa/+TFMABUjdzQQvBSCph8fZoJKTXA4gGLBWlpe9MI5wFjjizHrUw
-         /UFklkpFbq5hexiNJwKFDHwX5lPuPDszIfv7CS2Mp6KLK4Xk73gwZLWJndTWC3Az+XJZ
-         BQ2A==
-X-Gm-Message-State: AOJu0Yyr152ohtBQ8FuaGtc++Tp8iS4lqFTiK2eMZ+XLW5Z46JWpNXEL
-	PqQzu3Y3LJS3auiyCOsMKvofR5ERVaHywCI2XodHtA==
-X-Google-Smtp-Source: AGHT+IGiNFCs933FN6xk1z8jcKeMJbMUb7tAjiA7cZo6uk7R9idxCMPus1HWhwBUE3PnfysY6z7FdewYJsKqxjbqlyM=
-X-Received: by 2002:a05:6870:65ac:b0:1b3:f1f7:999e with SMTP id
- fp44-20020a05687065ac00b001b3f1f7999emr89539oab.45.1691106180192; Thu, 03 Aug
- 2023 16:43:00 -0700 (PDT)
+        bh=O7+T5OtzOt0JkmxCZ3JKOD3dXL81QvqZ18on5E407Iw=;
+        b=AATPczSW2x74KcPKpn6sqbkjo+B12XXf7oFhhqw7SZ5uZH/HZkSnT4MRLu3g5pbUuo
+         4Y7K03lCildYrjIQPN3XUuNgdDig3nVS7qV5cSS8bfTnuYY68HTPoI8BhTf3EOZrg1pm
+         RmU5ef20ObEbsTWB929BneHm9Jb2WeiVi2p+Pxl8acDITYtIYSL2lv5Nnavxnmv9cJZ7
+         OthaZku5fyUbRTD8arzcEBHzbLBZIobRuHjrX5T230D0Gz+4yxBtRNPy24jF448FcI70
+         obHdbf3ngQWxkOaRhwr6KwbQh/z712cmrmYPYLn38NkrUyQQHg+nxDDZzeRRIZCC1ITM
+         ABqg==
+X-Gm-Message-State: AOJu0YwW7N3aeVw07UKFVzqthzCEE8ftSZ0KJFSoFkdei8amBjv7odDM
+	hdsEhD95Bq6wBokFCisMaFR+jnHexVchRdgVIQk11w==
+X-Google-Smtp-Source: AGHT+IE8EFiGXpLyt+I/OTRAPgx9UftqLbrYi//2dfgHbp2F0UderK+0htYSrMFvcH7I82ud9+Ruoa3h/aZ+lWV/A6Y=
+X-Received: by 2002:a05:6871:58d:b0:1bb:860d:8106 with SMTP id
+ u13-20020a056871058d00b001bb860d8106mr165777oan.22.1691106189458; Thu, 03 Aug
+ 2023 16:43:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230801152007.337272-1-jingzhangos@google.com>
- <20230801152007.337272-11-jingzhangos@google.com> <ZMqSHhFe/4nSN4US@linux.dev>
-In-Reply-To: <ZMqSHhFe/4nSN4US@linux.dev>
+References: <20230726044652.2169513-1-jingzhangos@google.com>
+ <871qgvrwbi.wl-maz@kernel.org> <CAAdAUthi6oZ6oRQDFLeOFVwm2dtcTK2ERJm316x0bdn5TQObYw@mail.gmail.com>
+ <ZMq5zDJ16xav7NPa@linux.dev>
+In-Reply-To: <ZMq5zDJ16xav7NPa@linux.dev>
 From: Jing Zhang <jingzhangos@google.com>
-Date: Thu, 3 Aug 2023 16:42:47 -0700
-Message-ID: <CAAdAUtjSfHR0FUMv48K9F0WVCMFDeP_i7FdcQz5LMV+1-y=v5A@mail.gmail.com>
-Subject: Re: [PATCH v7 10/10] KVM: arm64: selftests: Test for setting ID
- register from usersapce
+Date: Thu, 3 Aug 2023 16:42:57 -0700
+Message-ID: <CAAdAUtgjZEbp_uwT2WuNVn3Ko7d0yty1hpkUyYfhotk-f0a1Wg@mail.gmail.com>
+Subject: Re: [PATCH v1] KVM: arm64: selftests: Test pointer authentication
+ support in KVM guest
 To: Oliver Upton <oliver.upton@linux.dev>
-Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>, 
-	Raghavendra Rao Ananta <rananta@google.com>, Suraj Jitindar Singh <surajjs@amazon.com>, 
-	Cornelia Huck <cohuck@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 Hi Oliver,
 
-On Wed, Aug 2, 2023 at 10:28=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
+On Wed, Aug 2, 2023 at 1:17=E2=80=AFPM Oliver Upton <oliver.upton@linux.dev=
+> wrote:
 >
 > Hi Jing,
 >
-> On Tue, Aug 01, 2023 at 08:20:06AM -0700, Jing Zhang wrote:
-> > Add tests to verify setting ID registers from userapce is handled
-> > correctly by KVM. Also add a test case to use ioctl
-> > KVM_ARM_GET_FEATURE_ID_WRITABLE_MASKS to get writable masks.
-> >
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >  tools/arch/arm64/include/uapi/asm/kvm.h       |  25 +++
-> >  tools/include/uapi/linux/kvm.h                |   2 +
->
-> Why is this diff needed? I thought we wound up using the latest headers
-> from the kernel.
+> Nothing serious, but when you're replying on a thread can you add a
+> leading and trailing line of whitespace between the quotation and your
+> reply? Otherwise threads get really dense and hard to read.
 
-You are right. These changes are not needed. Will drop them.
+Will do. Thanks for the suggestion.
 
 >
-> >  tools/testing/selftests/kvm/Makefile          |   1 +
+> On Wed, Aug 02, 2023 at 10:19:30AM -0700, Jing Zhang wrote:
+> > > > +                     case FAIL_KVM:
+> > > > +                             TEST_FAIL("KVM doesn't support guest =
+PAuth!\n");
+> > >
+> > > Why is that a hard failure? The vast majority of the HW out there
+> > > doesn't support PAuth...
+> > Since previous TEST_REQUIRES have passed, KVM should be able to
+> > support guest PAuth. The test will be skipped on those HW without
+> > PAuth.
 >
-> Need to add your file to .gitignore too.
+> So then what is the purpose of this failure mode? The only case where
+> this would happen is if KVM is if KVM screwed up the emulation somehow,
+> took a trap on a PAC instruction or register and reflected that back
+> into the guest as an UNDEF.
 
-Will do.
-
->
-> >  .../selftests/kvm/aarch64/set_id_regs.c       | 191 ++++++++++++++++++
-> >  4 files changed, 219 insertions(+)
-> >  create mode 100644 tools/testing/selftests/kvm/aarch64/set_id_regs.c
->
-> [...]
->
-> > diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/=
-testing/selftests/kvm/aarch64/set_id_regs.c
-> > new file mode 100644
-> > index 000000000000..9c8f439ac7b3
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-> > @@ -0,0 +1,191 @@
-> > +// SPDX-License-Identifier: GPL-2.0-only
-> > +/*
-> > + * set_id_regs - Test for setting ID register from usersapce.
-> > + *
-> > + * Copyright (c) 2023 Google LLC.
-> > + *
-> > + *
-> > + * Test that KVM supports setting ID registers from userspace and hand=
-les the
-> > + * feature set correctly.
-> > + */
-> > +
-> > +#include <stdint.h>
-> > +#include "kvm_util.h"
-> > +#include "processor.h"
-> > +#include "test_util.h"
-> > +#include <linux/bitfield.h>
-> > +
-> > +#define field_get(_mask, _reg) (((_reg) & (_mask)) >> (ffsl(_mask) - 1=
-))
-> > +#define field_prep(_mask, _val) (((_val) << (ffsl(_mask) - 1)) & (_mas=
-k))
-> > +
->
-> Shadowing the naming of the kernel's own FIELD_{GET,PREP}() is a bit
-> awkward. I'm guessing that you're working around @_mask not being a
-> compile-time constant?
-
-Yes, they are used to work around @_mask not being a compile-time constant.
-As we discussed offline, I'll port automatic system registers
-definition generation in selftests and use those definition instead.
+You are right about the purpose of this test case.
 
 >
-> > +struct reg_feature {
-> > +     uint64_t reg;
-> > +     uint64_t ftr_mask;
-> > +};
-> > +
-> > +static void guest_code(void)
-> > +{
-> > +     for (;;)
-> > +             GUEST_SYNC(0);
-> > +}
->
-> The test should check that the written values are visible both from the
-> guest as well as userspace.
+> That's a perfectly valid thing to test for, but the naming and failure
+> messages should indicate what actually happened.
 
-Sure. Will add checks in guest too.
+Sure. Will use more sensible messages.
 
 >
-> > +static struct reg_feature lower_safe_reg_ftrs[] =3D {
-> > +     { KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), ARM64_FEATURE_MASK(ID_A=
-A64DFR0_WRPS) },
-> > +     { KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), ARM64_FEATURE_MASK(ID_A=
-A64PFR0_EL3) },
-> > +     { KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR0_EL1), ARM64_FEATURE_MASK(ID_=
-AA64MMFR0_FGT) },
-> > +     { KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR1_EL1), ARM64_FEATURE_MASK(ID_=
-AA64MMFR1_PAN) },
-> > +     { KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR2_EL1), ARM64_FEATURE_MASK(ID_=
-AA64MMFR2_FWB) },
-> > +};
+> > > As I mentioned above, another thing I'd like to see is a set of
+> > > reference results for a given set of keys and architected algorithm
+> > > (QARMA3, QARMA5) so that we can compare between implementations
+> > > (excluding the IMPDEF implementations, of course).
+> > Sure. Will do.
 >
-> My preference would be to organize the field descriptors by register
-> rather than the policy. This matches what the kernel does in cpufeature.c
-> quite closely and allows us to easily reason about which fields are/aren'=
-t
-> tested.
-
-Sure. Will do.
-
+> I was initially hesitant towards testing PAC like this since it is
+> entirely a hardware issue besides KVM context switching, but you could
+> spin this off as a way to test if vCPU save/restore works correctly by
+> priming the vCPU from userspace.
 >
-> > +static void test_user_set_lower_safe(struct kvm_vcpu *vcpu)
-> > +{
-> > +     int i;
-> > +
-> > +     for (i =3D 0; i < ARRAY_SIZE(lower_safe_reg_ftrs); i++) {
-> > +             struct reg_feature *reg_ftr =3D lower_safe_reg_ftrs + i;
-> > +             uint64_t val, new_val, ftr;
-> > +
-> > +             vcpu_get_reg(vcpu, reg_ftr->reg, &val);
-> > +             ftr =3D field_get(reg_ftr->ftr_mask, val);
-> > +
-> > +             /* Set a safe value for the feature */
-> > +             if (ftr > 0)
-> > +                     ftr--;
-> > +
-> > +             val &=3D ~reg_ftr->ftr_mask;
-> > +             val |=3D field_prep(reg_ftr->ftr_mask, ftr);
-> > +
-> > +             vcpu_set_reg(vcpu, reg_ftr->reg, val);
-> > +             vcpu_get_reg(vcpu, reg_ftr->reg, &new_val);
-> > +             ASSERT_EQ(new_val, val);
-> > +     }
-> > +}
-> > +
-> > +static void test_user_set_fail(struct kvm_vcpu *vcpu)
-> > +{
-> > +     int i, r;
-> > +
-> > +     for (i =3D 0; i < ARRAY_SIZE(lower_safe_reg_ftrs); i++) {
-> > +             struct reg_feature *reg_ftr =3D lower_safe_reg_ftrs + i;
-> > +             uint64_t val, old_val, ftr;
-> > +
-> > +             vcpu_get_reg(vcpu, reg_ftr->reg, &val);
-> > +             ftr =3D field_get(reg_ftr->ftr_mask, val);
-> > +
-> > +             /* Set a invalid value (too big) for the feature */
-> > +             if (ftr >=3D GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0)=
-)
-> > +                     continue;
->
-> This assumes that the fields in the register are unsigned, but there are
-> several which are not.
-
-This is based on the reg/fields which are defined previously. Those
-are carefully chosen without unsigned ones.
-
->
-> > +             ftr++;
-> > +
-> > +             old_val =3D val;
-> > +             val &=3D ~reg_ftr->ftr_mask;
-> > +             val |=3D field_prep(reg_ftr->ftr_mask, ftr);
-> > +
-> > +             r =3D __vcpu_set_reg(vcpu, reg_ftr->reg, val);
-> > +             TEST_ASSERT(r < 0 && errno =3D=3D EINVAL,
-> > +                         "Unexpected KVM_SET_ONE_REG error: r=3D%d, er=
-rno=3D%d", r, errno);
-> > +
-> > +             vcpu_get_reg(vcpu, reg_ftr->reg, &val);
-> > +             ASSERT_EQ(val, old_val);
-> > +     }
-> > +}
-> > +
-> > +static struct reg_feature exact_reg_ftrs[] =3D {
-> > +     /* Items will be added when there is appropriate field of type
-> > +      * FTR_EXACT enabled writing from userspace later.
-> > +      */
-> > +};
-> > +
-> > +static void test_user_set_exact(struct kvm_vcpu *vcpu)
-> > +{
-> > +     int i, r;
-> > +
-> > +     for (i =3D 0; i < ARRAY_SIZE(exact_reg_ftrs); i++) {
-> > +             struct reg_feature *reg_ftr =3D exact_reg_ftrs + i;
-> > +             uint64_t val, old_val, ftr;
-> > +
-> > +             vcpu_get_reg(vcpu, reg_ftr->reg, &val);
-> > +             ftr =3D field_get(reg_ftr->ftr_mask, val);
-> > +             old_val =3D val;
-> > +
-> > +             /* Exact match */
-> > +             vcpu_set_reg(vcpu, reg_ftr->reg, val);
-> > +             vcpu_get_reg(vcpu, reg_ftr->reg, &val);
-> > +             ASSERT_EQ(val, old_val);
-> > +
-> > +             /* Smaller value */
-> > +             if (ftr > 0) {
-> > +                     ftr--;
-> > +                     val &=3D ~reg_ftr->ftr_mask;
-> > +                     val |=3D field_prep(reg_ftr->ftr_mask, ftr);
-> > +                     r =3D __vcpu_set_reg(vcpu, reg_ftr->reg, val);
-> > +                     TEST_ASSERT(r < 0 && errno =3D=3D EINVAL,
-> > +                                 "Unexpected KVM_SET_ONE_REG error: r=
-=3D%d, errno=3D%d", r, errno);
-> > +                     vcpu_get_reg(vcpu, reg_ftr->reg, &val);
-> > +                     ASSERT_EQ(val, old_val);
-> > +                     ftr++;
-> > +             }
-> > +
-> > +             /* Bigger value */
-> > +             ftr++;
-> > +             val &=3D ~reg_ftr->ftr_mask;
-> > +             val |=3D field_prep(reg_ftr->ftr_mask, ftr);
-> > +             r =3D __vcpu_set_reg(vcpu, reg_ftr->reg, val);
-> > +             TEST_ASSERT(r < 0 && errno =3D=3D EINVAL,
-> > +                         "Unexpected KVM_SET_ONE_REG error: r=3D%d, er=
-rno=3D%d", r, errno);
-> > +             vcpu_get_reg(vcpu, reg_ftr->reg, &val);
-> > +             ASSERT_EQ(val, old_val);
-> > +     }
-> > +}
->
-> Don't add dead code, this can be added when we actually test FTR_EXACT
-> fields. Are there not any in the registers exposed by this series?
-
-Nope, there is no in the registers exposed by this series.
-Anyway, I'll drop this code in this series.
-
->
-> > +static uint32_t writable_regs[] =3D {
-> > +     SYS_ID_DFR0_EL1,
-> > +     SYS_ID_AA64DFR0_EL1,
-> > +     SYS_ID_AA64PFR0_EL1,
-> > +     SYS_ID_AA64MMFR0_EL1,
-> > +     SYS_ID_AA64MMFR1_EL1,
-> > +     SYS_ID_AA64MMFR2_EL1,
-> > +};
-> > +
-> > +void test_user_get_writable_masks(struct kvm_vm *vm)
-> > +{
-> > +     struct feature_id_writable_masks masks;
-> > +
-> > +     vm_ioctl(vm, KVM_ARM_GET_FEATURE_ID_WRITABLE_MASKS, &masks);
-> > +
-> > +     for (int i =3D 0; i < ARRAY_SIZE(writable_regs); i++) {
-> > +             uint32_t reg =3D writable_regs[i];
-> > +             int idx =3D ARM64_FEATURE_ID_SPACE_IDX(sys_reg_Op0(reg),
-> > +                             sys_reg_Op1(reg), sys_reg_CRn(reg),
-> > +                             sys_reg_CRm(reg), sys_reg_Op2(reg));
-> > +
-> > +             ASSERT_EQ(masks.mask[idx], GENMASK_ULL(63, 0));
-> > +     }
-> > +}
->
-> The more robust test would be to check that every field this test knows
-> is writable is actually advertised as such in the ioctl. So you could
-> fetch this array at the start of the entire test and pass it through to
-> the routines that do granular checks against the fields of every
-> register.
-
-Makes sense. Will do.
-
->
-> It'd also be good to see basic sanity tests on the ioctl (i.e. call
-> fails if ::rsvd is nonzero), since KVM has screwed that up on several
-> occasions in past.
-
-Sure. Will add some basic sanity tests on the ioctl.
-
->
-> > +int main(void)
-> > +{
-> > +     struct kvm_vcpu *vcpu;
-> > +     struct kvm_vm *vm;
-> > +
-> > +     vm =3D vm_create_with_one_vcpu(&vcpu, guest_code);
-> > +
-> > +     ksft_print_header();
-> > +     ksft_set_plan(4);
-> > +
-> > +     test_user_get_writable_masks(vm);
-> > +     ksft_test_result_pass("test_user_get_writable_masks\n");
-> > +
-> > +     test_user_set_exact(vcpu);
-> > +     ksft_test_result_pass("test_user_set_exact\n");
-> > +
-> > +     test_user_set_fail(vcpu);
-> > +     ksft_test_result_pass("test_user_set_fail\n");
-> > +
-> > +     test_user_set_lower_safe(vcpu);
-> > +     ksft_test_result_pass("test_user_set_lower_safe\n");
-> > +
-> > +     kvm_vm_free(vm);
-> > +
-> > +     ksft_finished();
-> > +}
-> > --
-> > 2.41.0.585.gd2178a4bd4-goog
-> >
+> Marc, is there something else here you're interested in exercising I
+> may've missed?
 >
 > --
 > Thanks,
