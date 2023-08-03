@@ -1,79 +1,374 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8DC1F934
-	for <kvmarm@lists.linux.dev>; Thu,  3 Aug 2023 19:15:58 +0000 (UTC)
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-564656d952aso873081a12.3
-        for <kvmarm@lists.linux.dev>; Thu, 03 Aug 2023 12:15:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFA3EA0
+	for <kvmarm@lists.linux.dev>; Thu,  3 Aug 2023 23:43:01 +0000 (UTC)
+Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-1bb782974f4so1115211fac.3
+        for <kvmarm@lists.linux.dev>; Thu, 03 Aug 2023 16:43:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691090157; x=1691694957;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1QAbc+4fCOMN1wq3LOwJ4k1bsXl9R1Q+x4bhgj3rFIg=;
-        b=DSNF3uKlxbN1/j9sGPdV4RLbiLmTPzUp9Zu3X+X+jI/CXp8qoKO4kiLFxh0eWH4ras
-         3UHMbP1YaoUXHaU6RKc0xiD6OqP0/G8GaXsxhmkMXaXcobPCXbuINlBumVapPQ9eL9WI
-         SQMF6MIyr2Twu3rQpgN63Ty4xEmvWMdFcq1qk0s/bO53R4WtT4D6mxqEq84CrHbE24tW
-         R+R0wb7QBQEWXSd0EQn3phD4GyYVVYig+DH6wM230PxAw/bTqhOS8nPt+LaY5XqmbBEo
-         2lNVu9E2Fm9D/OSL8FvXxR34+QmBLtfkxeWiU2TVRkIK5+koZ6XE0PUmvWk9wsqvFkyB
-         PpQQ==
+        d=google.com; s=20221208; t=1691106180; x=1691710980;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6XhTATf7/1RB+zplPqP6wYl1J1IWawU9DRK/kARaQxY=;
+        b=nSuC/+XSqdQ1YanUgq545MskEaAHukgNoBOlmSZVKmod6vOZDdpipaKGH268pE5Fal
+         hfaRb5vRY1a8Tmidm5evHBN+kkH9Dh+LN/VZ9AWnUOjUcN0RxVPMJbzYZZR2cPrykgC6
+         f+pMZW3M5xY6ba4f21UTDj3Oq6s+bh1FdT7zJXGDVDHAESQ8ob85OguaaXq3PODLog/P
+         lnQEyTD/a4poZLFBlgDiGwdIJ2H458aoQg+V8dJLpLpNTioQfMNKQtW7yJ1dI+i8wiyj
+         KGGd8DunZkccZ3YgDVPhKwqWuYLiTklfkK8843SfPL6ZjyRvbd2q/x9T++8krCCTIqh/
+         6ujA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691090157; x=1691694957;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1QAbc+4fCOMN1wq3LOwJ4k1bsXl9R1Q+x4bhgj3rFIg=;
-        b=BKxmEoSH1TdJvGYezJTfik8P9yYEfHlzU085lLqor5KwP3oQZUXfXays8a8VV59DQC
-         k+n/fmRSbo3juSFmJvFzb4rYlN7iw6E//idYKE0oZ+HDoekDYFes2sM16YApmmGupuct
-         27gR/IktNNdgdh3iJwn6JRPGYMGzTO9/LoZm3O9U7y5t/MAqK6qrixTnt1V+bVuphukM
-         b1WOZFmUgQnqnNf9eUlirrAcEoLToY7J9m82aGp5kRP0bPEBgX3irLo4WJoJh8CoHqou
-         Y39Xq66neC9/snUzLTPFA97dvwp9XIsGnJPscqUkd4AVfWhbc0uRhnzbzFTlAr39oZoL
-         StqA==
-X-Gm-Message-State: ABy/qLa8lCpz91Q4ZwGQEv4Z6/NgvKiw0AFP0Khai2uC0R9bqxJwU9fO
-	jpSuqLSw0fqnvmxAOoQKPE8r0cfC8G4g
-X-Google-Smtp-Source: APBJJlHtGvcJEMYqDDCqDrlA6FqIV7ZBvnc2RG3ctaXexB6pNXaY+PGUAOnc1N44cMVGOG5WgF6ZzIYHZzSS
-X-Received: from afranji.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:47f1])
- (user=afranji job=sendgmr) by 2002:a63:295a:0:b0:563:5065:9d40 with SMTP id
- bu26-20020a63295a000000b0056350659d40mr129290pgb.5.1691090157410; Thu, 03 Aug
- 2023 12:15:57 -0700 (PDT)
-Date: Thu,  3 Aug 2023 19:15:54 +0000
-In-Reply-To: <20230718234512.1690985-13-seanjc@google.com>
+        d=1e100.net; s=20221208; t=1691106180; x=1691710980;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6XhTATf7/1RB+zplPqP6wYl1J1IWawU9DRK/kARaQxY=;
+        b=htMWDm0pDnUX5xJD35NIUt2oZ3R8rlhuO4d7yS9qGBRzcGcnx8yAkoA8Za6Ye56C35
+         Paxw4puaggiVfzKnDy8IToL7gl0YhS79g3IT8z+I4ziEivhISo6NewJ/KYFFdwcqe6ek
+         5CKu1Oqx2KofuNQcq0KjIW0vb5um9rckej6JKuuDy00o4ppSVFtQ2FLR6g3OOUV0drYe
+         hTUh06xsyDCsExfFa/+TFMABUjdzQQvBSCph8fZoJKTXA4gGLBWlpe9MI5wFjjizHrUw
+         /UFklkpFbq5hexiNJwKFDHwX5lPuPDszIfv7CS2Mp6KLK4Xk73gwZLWJndTWC3Az+XJZ
+         BQ2A==
+X-Gm-Message-State: AOJu0Yyr152ohtBQ8FuaGtc++Tp8iS4lqFTiK2eMZ+XLW5Z46JWpNXEL
+	PqQzu3Y3LJS3auiyCOsMKvofR5ERVaHywCI2XodHtA==
+X-Google-Smtp-Source: AGHT+IGiNFCs933FN6xk1z8jcKeMJbMUb7tAjiA7cZo6uk7R9idxCMPus1HWhwBUE3PnfysY6z7FdewYJsKqxjbqlyM=
+X-Received: by 2002:a05:6870:65ac:b0:1b3:f1f7:999e with SMTP id
+ fp44-20020a05687065ac00b001b3f1f7999emr89539oab.45.1691106180192; Thu, 03 Aug
+ 2023 16:43:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230718234512.1690985-13-seanjc@google.com>
-X-Mailer: git-send-email 2.41.0.640.ga95def55d0-goog
-Message-ID: <20230803191554.205599-1-afranji@google.com>
-Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
-From: Ryan Afranji <afranji@google.com>
-To: seanjc@google.com
-Cc: ackerleytng@google.com, akpm@linux-foundation.org, anup@brainfault.org, 
-	aou@eecs.berkeley.edu, chao.p.peng@linux.intel.com, chenhuacai@kernel.org, 
-	david@redhat.com, isaku.yamahata@gmail.com, jarkko@kernel.org, 
-	jmorris@namei.org, kirill.shutemov@linux.intel.com, 
-	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	liam.merwick@oracle.com, linux-arm-kernel@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-mm@kvack.org, 
-	linux-riscv@lists.infradead.org, linux-security-module@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, mail@maciej.szmigiero.name, maz@kernel.org, 
-	michael.roth@amd.com, mpe@ellerman.id.au, oliver.upton@linux.dev, 
-	palmer@dabbelt.com, paul.walmsley@sifive.com, paul@paul-moore.com, 
-	pbonzini@redhat.com, qperret@google.com, serge@hallyn.com, tabba@google.com, 
-	vannapurve@google.com, vbabka@suse.cz, wei.w.wang@intel.com, 
-	willy@infradead.org, yu.c.zhang@linux.intel.com
+MIME-Version: 1.0
+References: <20230801152007.337272-1-jingzhangos@google.com>
+ <20230801152007.337272-11-jingzhangos@google.com> <ZMqSHhFe/4nSN4US@linux.dev>
+In-Reply-To: <ZMqSHhFe/4nSN4US@linux.dev>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Thu, 3 Aug 2023 16:42:47 -0700
+Message-ID: <CAAdAUtjSfHR0FUMv48K9F0WVCMFDeP_i7FdcQz5LMV+1-y=v5A@mail.gmail.com>
+Subject: Re: [PATCH v7 10/10] KVM: arm64: selftests: Test for setting ID
+ register from usersapce
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>, 
+	Raghavendra Rao Ananta <rananta@google.com>, Suraj Jitindar Singh <surajjs@amazon.com>, 
+	Cornelia Huck <cohuck@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> +static struct folio *kvm_gmem_get_folio(struct file *file, pgoff_t index)
-> +{
-> +	struct folio *folio;
-> +
-> +	/* TODO: Support huge pages. */
-> +	folio = filemap_grab_folio(file->f_mapping, index);
-> +	if (!folio)
-> +		return NULL;
+Hi Oliver,
 
-In Linux 6.4, filemap_grab_folio() may also return an error value.
-Instead of just checking for NULL, "IS_ERR_OR_NULL(folio)" will be needed.
+On Wed, Aug 2, 2023 at 10:28=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
+>
+> Hi Jing,
+>
+> On Tue, Aug 01, 2023 at 08:20:06AM -0700, Jing Zhang wrote:
+> > Add tests to verify setting ID registers from userapce is handled
+> > correctly by KVM. Also add a test case to use ioctl
+> > KVM_ARM_GET_FEATURE_ID_WRITABLE_MASKS to get writable masks.
+> >
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  tools/arch/arm64/include/uapi/asm/kvm.h       |  25 +++
+> >  tools/include/uapi/linux/kvm.h                |   2 +
+>
+> Why is this diff needed? I thought we wound up using the latest headers
+> from the kernel.
+
+You are right. These changes are not needed. Will drop them.
+
+>
+> >  tools/testing/selftests/kvm/Makefile          |   1 +
+>
+> Need to add your file to .gitignore too.
+
+Will do.
+
+>
+> >  .../selftests/kvm/aarch64/set_id_regs.c       | 191 ++++++++++++++++++
+> >  4 files changed, 219 insertions(+)
+> >  create mode 100644 tools/testing/selftests/kvm/aarch64/set_id_regs.c
+>
+> [...]
+>
+> > diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/=
+testing/selftests/kvm/aarch64/set_id_regs.c
+> > new file mode 100644
+> > index 000000000000..9c8f439ac7b3
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+> > @@ -0,0 +1,191 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +/*
+> > + * set_id_regs - Test for setting ID register from usersapce.
+> > + *
+> > + * Copyright (c) 2023 Google LLC.
+> > + *
+> > + *
+> > + * Test that KVM supports setting ID registers from userspace and hand=
+les the
+> > + * feature set correctly.
+> > + */
+> > +
+> > +#include <stdint.h>
+> > +#include "kvm_util.h"
+> > +#include "processor.h"
+> > +#include "test_util.h"
+> > +#include <linux/bitfield.h>
+> > +
+> > +#define field_get(_mask, _reg) (((_reg) & (_mask)) >> (ffsl(_mask) - 1=
+))
+> > +#define field_prep(_mask, _val) (((_val) << (ffsl(_mask) - 1)) & (_mas=
+k))
+> > +
+>
+> Shadowing the naming of the kernel's own FIELD_{GET,PREP}() is a bit
+> awkward. I'm guessing that you're working around @_mask not being a
+> compile-time constant?
+
+Yes, they are used to work around @_mask not being a compile-time constant.
+As we discussed offline, I'll port automatic system registers
+definition generation in selftests and use those definition instead.
+
+>
+> > +struct reg_feature {
+> > +     uint64_t reg;
+> > +     uint64_t ftr_mask;
+> > +};
+> > +
+> > +static void guest_code(void)
+> > +{
+> > +     for (;;)
+> > +             GUEST_SYNC(0);
+> > +}
+>
+> The test should check that the written values are visible both from the
+> guest as well as userspace.
+
+Sure. Will add checks in guest too.
+
+>
+> > +static struct reg_feature lower_safe_reg_ftrs[] =3D {
+> > +     { KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), ARM64_FEATURE_MASK(ID_A=
+A64DFR0_WRPS) },
+> > +     { KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), ARM64_FEATURE_MASK(ID_A=
+A64PFR0_EL3) },
+> > +     { KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR0_EL1), ARM64_FEATURE_MASK(ID_=
+AA64MMFR0_FGT) },
+> > +     { KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR1_EL1), ARM64_FEATURE_MASK(ID_=
+AA64MMFR1_PAN) },
+> > +     { KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR2_EL1), ARM64_FEATURE_MASK(ID_=
+AA64MMFR2_FWB) },
+> > +};
+>
+> My preference would be to organize the field descriptors by register
+> rather than the policy. This matches what the kernel does in cpufeature.c
+> quite closely and allows us to easily reason about which fields are/aren'=
+t
+> tested.
+
+Sure. Will do.
+
+>
+> > +static void test_user_set_lower_safe(struct kvm_vcpu *vcpu)
+> > +{
+> > +     int i;
+> > +
+> > +     for (i =3D 0; i < ARRAY_SIZE(lower_safe_reg_ftrs); i++) {
+> > +             struct reg_feature *reg_ftr =3D lower_safe_reg_ftrs + i;
+> > +             uint64_t val, new_val, ftr;
+> > +
+> > +             vcpu_get_reg(vcpu, reg_ftr->reg, &val);
+> > +             ftr =3D field_get(reg_ftr->ftr_mask, val);
+> > +
+> > +             /* Set a safe value for the feature */
+> > +             if (ftr > 0)
+> > +                     ftr--;
+> > +
+> > +             val &=3D ~reg_ftr->ftr_mask;
+> > +             val |=3D field_prep(reg_ftr->ftr_mask, ftr);
+> > +
+> > +             vcpu_set_reg(vcpu, reg_ftr->reg, val);
+> > +             vcpu_get_reg(vcpu, reg_ftr->reg, &new_val);
+> > +             ASSERT_EQ(new_val, val);
+> > +     }
+> > +}
+> > +
+> > +static void test_user_set_fail(struct kvm_vcpu *vcpu)
+> > +{
+> > +     int i, r;
+> > +
+> > +     for (i =3D 0; i < ARRAY_SIZE(lower_safe_reg_ftrs); i++) {
+> > +             struct reg_feature *reg_ftr =3D lower_safe_reg_ftrs + i;
+> > +             uint64_t val, old_val, ftr;
+> > +
+> > +             vcpu_get_reg(vcpu, reg_ftr->reg, &val);
+> > +             ftr =3D field_get(reg_ftr->ftr_mask, val);
+> > +
+> > +             /* Set a invalid value (too big) for the feature */
+> > +             if (ftr >=3D GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0)=
+)
+> > +                     continue;
+>
+> This assumes that the fields in the register are unsigned, but there are
+> several which are not.
+
+This is based on the reg/fields which are defined previously. Those
+are carefully chosen without unsigned ones.
+
+>
+> > +             ftr++;
+> > +
+> > +             old_val =3D val;
+> > +             val &=3D ~reg_ftr->ftr_mask;
+> > +             val |=3D field_prep(reg_ftr->ftr_mask, ftr);
+> > +
+> > +             r =3D __vcpu_set_reg(vcpu, reg_ftr->reg, val);
+> > +             TEST_ASSERT(r < 0 && errno =3D=3D EINVAL,
+> > +                         "Unexpected KVM_SET_ONE_REG error: r=3D%d, er=
+rno=3D%d", r, errno);
+> > +
+> > +             vcpu_get_reg(vcpu, reg_ftr->reg, &val);
+> > +             ASSERT_EQ(val, old_val);
+> > +     }
+> > +}
+> > +
+> > +static struct reg_feature exact_reg_ftrs[] =3D {
+> > +     /* Items will be added when there is appropriate field of type
+> > +      * FTR_EXACT enabled writing from userspace later.
+> > +      */
+> > +};
+> > +
+> > +static void test_user_set_exact(struct kvm_vcpu *vcpu)
+> > +{
+> > +     int i, r;
+> > +
+> > +     for (i =3D 0; i < ARRAY_SIZE(exact_reg_ftrs); i++) {
+> > +             struct reg_feature *reg_ftr =3D exact_reg_ftrs + i;
+> > +             uint64_t val, old_val, ftr;
+> > +
+> > +             vcpu_get_reg(vcpu, reg_ftr->reg, &val);
+> > +             ftr =3D field_get(reg_ftr->ftr_mask, val);
+> > +             old_val =3D val;
+> > +
+> > +             /* Exact match */
+> > +             vcpu_set_reg(vcpu, reg_ftr->reg, val);
+> > +             vcpu_get_reg(vcpu, reg_ftr->reg, &val);
+> > +             ASSERT_EQ(val, old_val);
+> > +
+> > +             /* Smaller value */
+> > +             if (ftr > 0) {
+> > +                     ftr--;
+> > +                     val &=3D ~reg_ftr->ftr_mask;
+> > +                     val |=3D field_prep(reg_ftr->ftr_mask, ftr);
+> > +                     r =3D __vcpu_set_reg(vcpu, reg_ftr->reg, val);
+> > +                     TEST_ASSERT(r < 0 && errno =3D=3D EINVAL,
+> > +                                 "Unexpected KVM_SET_ONE_REG error: r=
+=3D%d, errno=3D%d", r, errno);
+> > +                     vcpu_get_reg(vcpu, reg_ftr->reg, &val);
+> > +                     ASSERT_EQ(val, old_val);
+> > +                     ftr++;
+> > +             }
+> > +
+> > +             /* Bigger value */
+> > +             ftr++;
+> > +             val &=3D ~reg_ftr->ftr_mask;
+> > +             val |=3D field_prep(reg_ftr->ftr_mask, ftr);
+> > +             r =3D __vcpu_set_reg(vcpu, reg_ftr->reg, val);
+> > +             TEST_ASSERT(r < 0 && errno =3D=3D EINVAL,
+> > +                         "Unexpected KVM_SET_ONE_REG error: r=3D%d, er=
+rno=3D%d", r, errno);
+> > +             vcpu_get_reg(vcpu, reg_ftr->reg, &val);
+> > +             ASSERT_EQ(val, old_val);
+> > +     }
+> > +}
+>
+> Don't add dead code, this can be added when we actually test FTR_EXACT
+> fields. Are there not any in the registers exposed by this series?
+
+Nope, there is no in the registers exposed by this series.
+Anyway, I'll drop this code in this series.
+
+>
+> > +static uint32_t writable_regs[] =3D {
+> > +     SYS_ID_DFR0_EL1,
+> > +     SYS_ID_AA64DFR0_EL1,
+> > +     SYS_ID_AA64PFR0_EL1,
+> > +     SYS_ID_AA64MMFR0_EL1,
+> > +     SYS_ID_AA64MMFR1_EL1,
+> > +     SYS_ID_AA64MMFR2_EL1,
+> > +};
+> > +
+> > +void test_user_get_writable_masks(struct kvm_vm *vm)
+> > +{
+> > +     struct feature_id_writable_masks masks;
+> > +
+> > +     vm_ioctl(vm, KVM_ARM_GET_FEATURE_ID_WRITABLE_MASKS, &masks);
+> > +
+> > +     for (int i =3D 0; i < ARRAY_SIZE(writable_regs); i++) {
+> > +             uint32_t reg =3D writable_regs[i];
+> > +             int idx =3D ARM64_FEATURE_ID_SPACE_IDX(sys_reg_Op0(reg),
+> > +                             sys_reg_Op1(reg), sys_reg_CRn(reg),
+> > +                             sys_reg_CRm(reg), sys_reg_Op2(reg));
+> > +
+> > +             ASSERT_EQ(masks.mask[idx], GENMASK_ULL(63, 0));
+> > +     }
+> > +}
+>
+> The more robust test would be to check that every field this test knows
+> is writable is actually advertised as such in the ioctl. So you could
+> fetch this array at the start of the entire test and pass it through to
+> the routines that do granular checks against the fields of every
+> register.
+
+Makes sense. Will do.
+
+>
+> It'd also be good to see basic sanity tests on the ioctl (i.e. call
+> fails if ::rsvd is nonzero), since KVM has screwed that up on several
+> occasions in past.
+
+Sure. Will add some basic sanity tests on the ioctl.
+
+>
+> > +int main(void)
+> > +{
+> > +     struct kvm_vcpu *vcpu;
+> > +     struct kvm_vm *vm;
+> > +
+> > +     vm =3D vm_create_with_one_vcpu(&vcpu, guest_code);
+> > +
+> > +     ksft_print_header();
+> > +     ksft_set_plan(4);
+> > +
+> > +     test_user_get_writable_masks(vm);
+> > +     ksft_test_result_pass("test_user_get_writable_masks\n");
+> > +
+> > +     test_user_set_exact(vcpu);
+> > +     ksft_test_result_pass("test_user_set_exact\n");
+> > +
+> > +     test_user_set_fail(vcpu);
+> > +     ksft_test_result_pass("test_user_set_fail\n");
+> > +
+> > +     test_user_set_lower_safe(vcpu);
+> > +     ksft_test_result_pass("test_user_set_lower_safe\n");
+> > +
+> > +     kvm_vm_free(vm);
+> > +
+> > +     ksft_finished();
+> > +}
+> > --
+> > 2.41.0.585.gd2178a4bd4-goog
+> >
+>
+> --
+> Thanks,
+> Oliver
+
+Thanks,
+Jing
