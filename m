@@ -1,11 +1,11 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94AF1C2CA;
-	Fri,  4 Aug 2023 17:58:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75C9EC433C7;
-	Fri,  4 Aug 2023 17:57:59 +0000 (UTC)
-Date: Fri, 4 Aug 2023 13:57:57 -0400
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 419141BEEE;
+	Fri,  4 Aug 2023 17:59:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58A00C433CA;
+	Fri,  4 Aug 2023 17:59:04 +0000 (UTC)
+Date: Fri, 4 Aug 2023 13:59:02 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
 To: Marco Elver <elver@google.com>
 Cc: Andrew Morton <akpm@linux-foundation.org>, Kees Cook
@@ -23,12 +23,13 @@ Cc: Andrew Morton <akpm@linux-foundation.org>, Kees Cook
  linux-toolchains@vger.kernel.org
 Subject: Re: [PATCH v2 2/3] list_debug: Introduce inline wrappers for debug
  checks
-Message-ID: <20230804135757.400eab72@gandalf.local.home>
-In-Reply-To: <CANpmjNNN6b9L72DoLzu5usGGjLw5Li8rnfu0VuaCsL-p2iKTgg@mail.gmail.com>
+Message-ID: <20230804135902.7925ebb6@gandalf.local.home>
+In-Reply-To: <20230804135757.400eab72@gandalf.local.home>
 References: <20230804090621.400-1-elver@google.com>
 	<20230804090621.400-2-elver@google.com>
 	<20230804120308.253c5521@gandalf.local.home>
 	<CANpmjNNN6b9L72DoLzu5usGGjLw5Li8rnfu0VuaCsL-p2iKTgg@mail.gmail.com>
+	<20230804135757.400eab72@gandalf.local.home>
 X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -39,15 +40,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 4 Aug 2023 19:49:48 +0200
-Marco Elver <elver@google.com> wrote:
+On Fri, 4 Aug 2023 13:57:57 -0400
+Steven Rostedt <rostedt@goodmis.org> wrote:
 
-> > I've been guilty of this madness myself, but I have learned the errors of
-> > my ways, and have been avoiding doing so in any new code I write.  
+> On Fri, 4 Aug 2023 19:49:48 +0200
+> Marco Elver <elver@google.com> wrote:
 > 
-> That's fair. We can call them __list_*_valid() (inline), and
-> __list_*_valid_or_report() ?
+> > > I've been guilty of this madness myself, but I have learned the errors of
+> > > my ways, and have been avoiding doing so in any new code I write.    
+> > 
+> > That's fair. We can call them __list_*_valid() (inline), and
+> > __list_*_valid_or_report() ?  
+> 
+> __list_*_valid_check() ?
+> 
 
-__list_*_valid_check() ?
+I have to admit, I think the main reason kernel developers default to using
+these useless underscores is because kernel developers are notoriously
+lousy at naming. ;-)
 
 -- Steve
+
