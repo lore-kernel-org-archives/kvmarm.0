@@ -1,125 +1,120 @@
-Received: from mail-oo1-f73.google.com (mail-oo1-f73.google.com [209.85.161.73])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE17253A8
-	for <kvmarm@lists.linux.dev>; Fri,  4 Aug 2023 22:30:27 +0000 (UTC)
-Received: by mail-oo1-f73.google.com with SMTP id 006d021491bc7-56ccda6b0dfso3669820eaf.2
-        for <kvmarm@lists.linux.dev>; Fri, 04 Aug 2023 15:30:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B400BA2C
+	for <kvmarm@lists.linux.dev>; Fri,  4 Aug 2023 22:45:37 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d1851c52f3dso2557600276.1
+        for <kvmarm@lists.linux.dev>; Fri, 04 Aug 2023 15:45:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691188226; x=1691793026;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bFzzUD1s8YBHblwI04VOeCdWAbdee3I5YnQWnVOxvpo=;
-        b=TFcn4WhuF59CuOFW+nA/rZmm0UJ9lmliU/kzI0ZppRYE7sDBYkerAuHzzRxdX3d7+X
-         4kzLTKYNiq3+tnYZLXIkLwujJLcAX9xlXFF7P6HucTbVVv4htw7jc7Fx1odjOorNhcMK
-         dodd2vDxN7Iv863IP8Ul0VCeKTSNeqWflaPt3PPJv7+5ayDRQWhkgJ+D3K75dcAoYxtZ
-         WPhu6CqDtddYxxH4dTGFYTkyLBsWJw8IjQxufeXxzFdyCgNiKmvISMu1mHITGEKHgkkb
-         HhwXF5timTSNjIo6jS4S4vsYjZPe1ZaATLPhRP8kRuAhbSLipOJg1Qe8hXm34hNZJUIk
-         0cUg==
+        d=google.com; s=20221208; t=1691189136; x=1691793936;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qzzGQVsyCKQuIHhNuvYJJsNQNLnIEOy51Xxy7T0276E=;
+        b=vyT9iRvBkAPxrhUM4loOuXv0ZWxpARTSozCHpx4ia9Cea9tMKrN/2RonnEmIi/91Y6
+         D9/kIxa3brvZlRc6QGKk01Hyt0jEboWVl3Z8oGFhLtizQUeXWjYBQlLJ3hEkbES8ojIp
+         xRHERUnWaRuKMo9qbYUtw33JY4PImnq6niFxGhMqp8fDR7KFDwcJ/mK4TqIKH6HSmO9R
+         Cw2H5HztJsHwRfX7RoC4cz33QJ8+8AwE8bdX3ip787drt5sStO7eeTcFQcC2vu6O5EC1
+         Jrv3s4q/GFzOUfGTyRixDp4N8PQ6wNQ7wlh9jGLouPYEjbTRIjnzGQFCnlolt9BIg96Q
+         MmWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691188226; x=1691793026;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bFzzUD1s8YBHblwI04VOeCdWAbdee3I5YnQWnVOxvpo=;
-        b=N/3H6ORMu5yEZCJTtPVwEXDl8VfPg4dQ8Q4d0UskniEUALETRjuDSk0nC2AkqLP3fL
-         Xt6CxMNXxlh+Jl5fbZD1aFCgzY5dVRKuBX7Z2UW9/QXGcRbFwjglgWmcq8zTKHgXcxam
-         R3JaMzUWKp4ClPPf5M2460p8kPGQNeTjNpXQf1xRDQwD1BujuKWUwXzavLNCAGge+9P+
-         KO9FJ0rbW4ce/g6FJOL61u4jwFFh5zpkWuT+5teo3YJR13wVTt2vxBRkFA6TERwCAR6u
-         la2py/nY1suVlNoVRZ1iR6rZO63wdRxkj4Z8pdNoA5x8AvAW05Hzv9roqOwQ+HrpWTt8
-         1FsQ==
-X-Gm-Message-State: AOJu0YwNWvTJArtqzVbTjlJydOuPj2HrDBAkJBeMJSeZOL+9IeYWEwFx
-	3mxvvWlojHqRA9euMwqDT6Hq8u9miFw=
-X-Google-Smtp-Source: AGHT+IG/f7h4NBFD7Fzz9VqAMwBIHPfIp5Oxxm2+KkdFX36TNY82jUIYr8jbB4mGvNrT4WJJhTCK/9o3DZg=
+        d=1e100.net; s=20221208; t=1691189136; x=1691793936;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=qzzGQVsyCKQuIHhNuvYJJsNQNLnIEOy51Xxy7T0276E=;
+        b=bmJTSBozk3a/F0Ufg9lTCwzAkyLQoUuQiPZvB6q+MDawkRh8oXfi62IBmf9Q9Mm+Nx
+         onRDCSpWpoWJNrUt6aFgn6L6InFV/NXcYZsH3q4XsLY82YpnI28mqug5YVpY1z+9hzxk
+         fw2KsHe3ANGNi7xbwicr4YyDzspQTvlBXLEnpcBibrIzUk6xeg8pjaOlwZ1yRR6UTLFU
+         Waj7tdLQ+7G07GYl+f5zWmufVyBBRZk1gnCXtMQ5uBBn8nZG+zrIScIuj3Z+B1mekits
+         V+vrwInmsT/0dSXnNhiqtEioZ7troeb2a2KYRKkWdnze6dP20OEoexcTVqaHFSFsTsby
+         ZENQ==
+X-Gm-Message-State: AOJu0YxY7vs10AsDl6qQyt8fe/tzOnVUBIDQIILC2t54tJDnq0fpExDI
+	8DabpLuA3boAUS4udnRTGxnS+ex/J4c=
+X-Google-Smtp-Source: AGHT+IEWfwtnQQ08PS920/iWYAxu1snSlSkt7kEi/UPqLCtV3oacTE1j6eL7G0tfMsosYlmzaiDwjq+gcnQ=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6808:198b:b0:3a7:75cd:df61 with SMTP id
- bj11-20020a056808198b00b003a775cddf61mr4531539oib.5.1691188226241; Fri, 04
- Aug 2023 15:30:26 -0700 (PDT)
-Date: Fri, 4 Aug 2023 15:30:24 -0700
-In-Reply-To: <20230705080756.xv7fm3jxewipunvn@linux.intel.com>
+ (user=seanjc job=sendgmr) by 2002:a25:6b4a:0:b0:cb6:6c22:d0f8 with SMTP id
+ o10-20020a256b4a000000b00cb66c22d0f8mr16070ybm.4.1691189136427; Fri, 04 Aug
+ 2023 15:45:36 -0700 (PDT)
+Date: Fri, 4 Aug 2023 15:45:34 -0700
+In-Reply-To: <CAD=HUj41PAKC0x+c3zWAr-aCm59K7hs2zRh1uWs9778_Mai4UA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-5-stevensd@google.com>
- <20230705080756.xv7fm3jxewipunvn@linux.intel.com>
-Message-ID: <ZM18AAFj21Fo36hg@google.com>
-Subject: Re: [PATCH v7 4/8] KVM: x86/mmu: Migrate to __kvm_follow_pfn
+References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-6-stevensd@google.com>
+ <20230705101800.ut4c6topn6ylwczs@linux.intel.com> <CAD=HUj41PAKC0x+c3zWAr-aCm59K7hs2zRh1uWs9778_Mai4UA@mail.gmail.com>
+Message-ID: <ZM1/jhJXu8OGUrkb@google.com>
+Subject: Re: [PATCH v7 5/8] KVM: x86/mmu: Don't pass FOLL_GET to __kvm_follow_pfn
 From: Sean Christopherson <seanjc@google.com>
-To: Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc: David Stevens <stevensd@chromium.org>, Marc Zyngier <maz@kernel.org>, 
+To: David Stevens <stevensd@chromium.org>
+Cc: Yu Zhang <yu.c.zhang@linux.intel.com>, Marc Zyngier <maz@kernel.org>, 
 	Michael Ellerman <mpe@ellerman.id.au>, Peter Xu <peterx@redhat.com>, 
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
 	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
 	kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 05, 2023, Yu Zhang wrote:
-> On Tue, Jul 04, 2023 at 04:50:49PM +0900, David Stevens wrote:
-> > From: David Stevens <stevensd@chromium.org>
-> > 
-> > Migrate from __gfn_to_pfn_memslot to __kvm_follow_pfn.
+On Thu, Jul 06, 2023, David Stevens wrote:
+> On Wed, Jul 5, 2023 at 7:17=E2=80=AFPM Yu Zhang <yu.c.zhang@linux.intel.c=
+om> wrote:
+> >
+> > On Tue, Jul 04, 2023 at 04:50:50PM +0900, David Stevens wrote:
+> > > From: David Stevens <stevensd@chromium.org>
+> > >
+> > > Stop passing FOLL_GET to __kvm_follow_pfn. This allows the host to ma=
+p
+> > > memory into the guest that is backed by un-refcounted struct pages - =
+for
+> > > example, higher order non-compound pages allocated by the amdgpu driv=
+er
+> > > via ttm_pool_alloc_page.
+> >
+> > I guess you mean the tail pages of the higher order non-compound pages?
+> > And as to the head page, it is said to be set to one coincidentally[*],
+> > and shall not be considered as refcounted.  IIUC, refcount of this head
+> > page will be increased and decreased soon in hva_to_pfn_remapped(), so
+> > this may not be a problem(?). But treating this head page differently,
+> > as a refcounted one(e.g., to set the A/D flags), is weired.
+> >
+> > Or maybe I missed some context, e.g., can the head page be allocted to
+> > guest at all?
+>=20
+> Yes, this is to allow mapping the tail pages of higher order
+> non-compound pages - I should have been more precise in my wording.
+> The head pages can already be mapped into the guest.
 
-Please turn up your changelog verbosity from ~2 to ~8.  E.g. explain the transition
-from async => FOLL_NOWAIT+KVM_PFN_ERR_NEEDS_IO, there's no reason to force readers
-to suss that out on their own.
+Recording for posterity (or to make an incorrect statment and get corrected=
+),
+because I recently had a conversation about the head page not actually bein=
+g
+refcounted.  (I can't remember with whom I had the conversation, but I'm pr=
+etty
+sure it wasn't an imaginary friend).
 
-> > Signed-off-by: David Stevens <stevensd@chromium.org>
-> > ---
-> >  arch/x86/kvm/mmu/mmu.c | 35 +++++++++++++++++++++++++----------
-> >  1 file changed, 25 insertions(+), 10 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index ec169f5c7dce..e44ab512c3a1 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -4296,7 +4296,12 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
-> >  static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> >  {
-> >  	struct kvm_memory_slot *slot = fault->slot;
-> > -	bool async;
-> > +	struct kvm_follow_pfn foll = {
-> > +		.slot = slot,
-> > +		.gfn = fault->gfn,
-> > +		.flags = FOLL_GET | (fault->write ? FOLL_WRITE : 0),
-> > +		.allow_write_mapping = true,
-> > +	};
-> >  
-> >  	/*
-> >  	 * Retry the page fault if the gfn hit a memslot that is being deleted
-> > @@ -4325,12 +4330,14 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
-> >  			return RET_PF_EMULATE;
-> >  	}
-> >  
-> > -	async = false;
-> > -	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, false, &async,
-> > -					  fault->write, &fault->map_writable,
-> > -					  &fault->hva);
-> > -	if (!async)
-> > -		return RET_PF_CONTINUE; /* *pfn has correct page already */
-> > +	foll.flags |= FOLL_NOWAIT;
-> > +	fault->pfn = __kvm_follow_pfn(&foll);
-> > +
-> > +	if (!is_error_noslot_pfn(fault->pfn))
-> > +		goto success;
-> > +
-> > +	if (fault->pfn != KVM_PFN_ERR_NEEDS_IO)
-> > +		return RET_PF_CONTINUE;
-> 
-> IIUC, FOLL_NOWAIT is set only when we wanna an async fault. So
-> KVM_PFN_ERR_NEEDS_IO may not be necessary? 
+Even though whatever allocates the page doesn't explicit refcount the head =
+page,
+__free_pages() will still do the right thing and (a) keep the head page aro=
+und
+until its last reference is put.  And my understanding is that even though =
+it's
+a "head" page, it's not a PG_head page, i.e. not a compound page and so is =
+treated
+as an order-0 page when KVM invoke put_page().
 
-But FOLL_NOWAIT is set above.  This logic is essentially saying "bail immediately
-if __gfn_to_pfn_memslot() returned a fatal error".
+void __free_pages(struct page *page, unsigned int order)
+{
+	/* get PageHead before we drop reference */
+	int head =3D PageHead(page);
 
-A commented would definitely be helpful though.  How about?
-
-	/*
-	 * If __kvm_follow_pfn() failed because I/O is needed to fault in the
-	 * page, then either set up an asynchronous #PF to do the I/O, or if
-	 * doing an async #PF isn't possible, retry __kvm_follow_pfn() with
-	  I/O allowed. All other failures are fatal, i.e. retrying won't help.
-	 */
-	if (fault->pfn != KVM_PFN_ERR_NEEDS_IO)
-		return RET_PF_CONTINUE;
+	if (put_page_testzero(page))  <=3D=3D=3D will evaluate false if KVM holds =
+a ref
+		free_the_page(page, order);
+	else if (!head)  <=3D=3D=3D will be false for non-compound pages
+		while (order-- > 0)
+			free_the_page(page + (1 << order), order);
+}
+EXPORT_SYMBOL(__free_pages);
