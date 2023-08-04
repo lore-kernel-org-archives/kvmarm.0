@@ -1,88 +1,88 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50581440E;
-	Fri,  4 Aug 2023 18:19:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=98qOA2hy/eGle7yAA5GlRvkVWWpa8WdU1Y+K5iryPA0=; b=PnNUDq2PSjSDtK8+kcZ5YTA5uf
-	apCqSPjXpn1RgT3/6WRhgG7ykJw/bB8q1375z6sbZIS2TvZVQjaLKU4edBI1b9/3Ye5nJKEaQ6Hyv
-	lIc09SVlq7f4kxrLF5yNORL6ft8PRI91e2jwBfbbGefmjzXGubCU9xtzNTPes0g48fK3fmMxGPR3q
-	5PtsNA0nu28tO57agCKHP7aJqd8wER1pSdXGusQrNx/lXpnkLmHiL1kof/uq7qYMWAfsZUTahQh2H
-	PPxCJHA7jXZzSrP8MdGFJ2/cmEKVC7/FXwjO5TPlPu7UF/uNuF/0LZaDI37Qo5mPomVdhQuygpp1A
-	xNh5kZEw==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1qRzOM-00BKBq-3m; Fri, 04 Aug 2023 18:19:14 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(Client did not present a certificate)
-	by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id EF129300235;
-	Fri,  4 Aug 2023 20:19:12 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-	id CB5C92130B4DC; Fri,  4 Aug 2023 20:19:12 +0200 (CEST)
-Date: Fri, 4 Aug 2023 20:19:12 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Marco Elver <elver@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Kees Cook <keescook@chromium.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Tom Rix <trix@redhat.com>, Miguel Ojeda <ojeda@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com,
-	linux-toolchains@vger.kernel.org
-Subject: Re: [PATCH v2 2/3] list_debug: Introduce inline wrappers for debug
- checks
-Message-ID: <20230804181912.GN212435@hirez.programming.kicks-ass.net>
-References: <20230804090621.400-1-elver@google.com>
- <20230804090621.400-2-elver@google.com>
- <20230804120308.253c5521@gandalf.local.home>
- <CANpmjNNN6b9L72DoLzu5usGGjLw5Li8rnfu0VuaCsL-p2iKTgg@mail.gmail.com>
- <20230804135757.400eab72@gandalf.local.home>
- <20230804135902.7925ebb6@gandalf.local.home>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7405CA55
+	for <kvmarm@lists.linux.dev>; Fri,  4 Aug 2023 18:33:55 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d07cb52a768so2564816276.1
+        for <kvmarm@lists.linux.dev>; Fri, 04 Aug 2023 11:33:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691174034; x=1691778834;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SzgCQZrREJ8wwDiX6siz2qHa1/7eISD6QAlgSdu5Knw=;
+        b=dafKDsAUIw0Ie3fHqOzQMKvbKji+TOslqxd+53S8Ae1ULDmkeB/ua1YPOdYXPbSr0W
+         n0B0znsGS31LPviJM1SZCFmESkuTcUMny2hya9DL0xdvpWCSxSHRJCfVCbNxLfYyeFRv
+         EIycdVeNgQRE7OZLu04A+9r6jEyZbrSMa/ojO+QiKtGQ5lFCv7kKrPSc1rHckvDKMSWE
+         Py9HduHTpVfSHRrXxUOhd0+x82M2xiEsF5OLWY4E2sB+9UWBaFq9En3wnmE643RVcCta
+         tFFvd4rXgtsTJi80YNeW/3oG4StJ9Y06uzrmvVFVFIhnYu0yb5aHuCS39qa1aL/NYiUV
+         FCOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691174034; x=1691778834;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SzgCQZrREJ8wwDiX6siz2qHa1/7eISD6QAlgSdu5Knw=;
+        b=IC6iVMxVE+S0Ok5RvlXRlDNSZPScze7YpYuzXyh71ZsFppNch1lIddvTsfYXhOcxhD
+         /Qj2ZJqQgnB0z4k9neLLzjW/1yNqAtRLwkZas2PuDNTRN8aI0ZpWFvzI+qVkIyrVi5VL
+         IK0Wj/9zmILf69ea/oX13Sw/vZNIPdTUsBJqlZCmyJ9fowh6Dm3UNckDrMhTHNidZx1J
+         zlCUXFeMgvGJ70QWE3CAIc/AAUHze3Ax97O2j1EWinDM0Qmo8XLi0+2kb3xOcx7/DSmQ
+         x95/XWiUUM9sTi0Fpe+xCCmNqUoTDDda/liI2vvEY4xKS0Tf4JVUmqEc3Bpe5tlzOjTP
+         ikHw==
+X-Gm-Message-State: AOJu0Yy1XHNPmPGXKC2DCkYZZ8KzCB61E22i7WBgQPFu9Vr9G7HhLpEV
+	T584uayvBEPNrRtBbgXH7CuRe83uTiY=
+X-Google-Smtp-Source: AGHT+IEu3d94rrVmJ78RS29lOywQDiyzD14VCrwEVoVIDv3RxrRH95F0M9gwGQrPVV9YwLdxoui14M8wTbI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:42ca:0:b0:d07:16db:6f8f with SMTP id
+ p193-20020a2542ca000000b00d0716db6f8fmr13913yba.6.1691174034726; Fri, 04 Aug
+ 2023 11:33:54 -0700 (PDT)
+Date: Fri, 4 Aug 2023 11:33:53 -0700
+In-Reply-To: <gsnto7jm8zbu.fsf@coltonlewis-kvm.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230804135902.7925ebb6@gandalf.local.home>
+Mime-Version: 1.0
+References: <ZM0rXgKvb912k5BE@linux.dev> <gsnto7jm8zbu.fsf@coltonlewis-kvm.c.googlers.com>
+Message-ID: <ZM1EkRMf23e2YUBs@google.com>
+Subject: Re: [PATCH 2/4] KVM: selftests: Add helper macros for ioctl()s that
+ return file descriptors
+From: Sean Christopherson <seanjc@google.com>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>, maz@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, mhal@rbox.co
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Aug 04, 2023 at 01:59:02PM -0400, Steven Rostedt wrote:
-> On Fri, 4 Aug 2023 13:57:57 -0400
-> Steven Rostedt <rostedt@goodmis.org> wrote:
+On Fri, Aug 04, 2023, Colton Lewis wrote:
+> Oliver Upton <oliver.upton@linux.dev> writes:
 > 
-> > On Fri, 4 Aug 2023 19:49:48 +0200
-> > Marco Elver <elver@google.com> wrote:
-> > 
-> > > > I've been guilty of this madness myself, but I have learned the errors of
-> > > > my ways, and have been avoiding doing so in any new code I write.    
-> > > 
-> > > That's fair. We can call them __list_*_valid() (inline), and
-> > > __list_*_valid_or_report() ?  
-> > 
-> > __list_*_valid_check() ?
-> > 
+> > Hi Sean,
 > 
-> I have to admit, I think the main reason kernel developers default to using
-> these useless underscores is because kernel developers are notoriously
-> lousy at naming. ;-)
+> > On Thu, Aug 03, 2023 at 05:42:24PM -0700, Sean Christopherson wrote:
+> > > Add KVM, VM, and vCPU scoped helpers for ioctl()s that return file
+> > > descriptors, i.e. deduplicate code for asserting success on ioctls() for
+> > > which a positive return value, not just zero, is considered success.
+> 
+> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> 
+> > I appreciate the desire to eliminate duplicate code, but I think the
+> > naming just muddies the waters. TBH, when I first read the diff w/o the
+> > changelog, I thought you were describing the input fd (i.e. 'kvm_fd',
+> > 'vm_fd', 'vcpu_fd'). I don't think explicitly spelling out the condition
+> > each time (i.e. ret >= 0) is all that difficult.
+> 
+> Couldn't ret >= 0 be the assert condition for everything? Don't see why
+> there needs to be different helpers to check == 0 and >= 0.
+> 
+> Unless I'm missing something, error returns are only ever negative.
 
-Well, that and I detest novella length identifiers.
+Using "ret >= 0" would work in the sense that the tests wouldn't fail, but it
+would degrade our test coverage, e.g. selftests wouldn't detect KVM bugs where
+an ioctl() unexpectedly returns a non-zero, positive value.
+
+The other wrinkle is that selftests need to actually consume the return value for
+ioctl()s that return a positive value, i.e. the fd (or whatever it is) needs to
+propagated up the stack.  I.e. all of the generic ioctl() macros would need to
+"return" the value, which I really don't want to do because that would (re)open
+the gates for having helpers that return an int, even though the only possible
+return value is '0'.
