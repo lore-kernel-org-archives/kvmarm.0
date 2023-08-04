@@ -1,119 +1,86 @@
-Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8DF7EA0
-	for <kvmarm@lists.linux.dev>; Thu,  3 Aug 2023 23:43:10 +0000 (UTC)
-Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-55e1a9ff9d4so1644479eaf.1
-        for <kvmarm@lists.linux.dev>; Thu, 03 Aug 2023 16:43:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5083F161
+	for <kvmarm@lists.linux.dev>; Fri,  4 Aug 2023 00:42:29 +0000 (UTC)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-56477c00ef8so1281458a12.3
+        for <kvmarm@lists.linux.dev>; Thu, 03 Aug 2023 17:42:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691106189; x=1691710989;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O7+T5OtzOt0JkmxCZ3JKOD3dXL81QvqZ18on5E407Iw=;
-        b=WXz/PEsrmzilAWytxUhX96+gxnGeQR72NpzCfxl6OC1hYZfRci7qNy+zPfmKITnuVA
-         9MrlQ879zobsOls+slxsR4lPU7xVLeiXE3DH+TKIIPNnqcUxHi7EM9yZ4hoR3SU5kN8+
-         OXHA7IOWJNPNwhsnDAJ3xpZNarLgZpQrxTe9GRsGmA0zS48Ftb2EDTFalLJA0vdIX4zc
-         +Iqp0ufUPWufB7HCOUHcnlSYh8B5BPvUlcu0uNeUODoJaYr25Q2Xn6WKRKVWnuuCPiBV
-         waFmkCo2HUFd0YxXiIwGdQwrXJ2v8ZVlvfAnIqLLADGd/SWEA41AscJopxhnx5gUb5LK
-         UiSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691106189; x=1691710989;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=google.com; s=20221208; t=1691109748; x=1691714548;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=O7+T5OtzOt0JkmxCZ3JKOD3dXL81QvqZ18on5E407Iw=;
-        b=AATPczSW2x74KcPKpn6sqbkjo+B12XXf7oFhhqw7SZ5uZH/HZkSnT4MRLu3g5pbUuo
-         4Y7K03lCildYrjIQPN3XUuNgdDig3nVS7qV5cSS8bfTnuYY68HTPoI8BhTf3EOZrg1pm
-         RmU5ef20ObEbsTWB929BneHm9Jb2WeiVi2p+Pxl8acDITYtIYSL2lv5Nnavxnmv9cJZ7
-         OthaZku5fyUbRTD8arzcEBHzbLBZIobRuHjrX5T230D0Gz+4yxBtRNPy24jF448FcI70
-         obHdbf3ngQWxkOaRhwr6KwbQh/z712cmrmYPYLn38NkrUyQQHg+nxDDZzeRRIZCC1ITM
-         ABqg==
-X-Gm-Message-State: AOJu0YwW7N3aeVw07UKFVzqthzCEE8ftSZ0KJFSoFkdei8amBjv7odDM
-	hdsEhD95Bq6wBokFCisMaFR+jnHexVchRdgVIQk11w==
-X-Google-Smtp-Source: AGHT+IE8EFiGXpLyt+I/OTRAPgx9UftqLbrYi//2dfgHbp2F0UderK+0htYSrMFvcH7I82ud9+Ruoa3h/aZ+lWV/A6Y=
-X-Received: by 2002:a05:6871:58d:b0:1bb:860d:8106 with SMTP id
- u13-20020a056871058d00b001bb860d8106mr165777oan.22.1691106189458; Thu, 03 Aug
- 2023 16:43:09 -0700 (PDT)
+        bh=vujMrPLoi5NFJy2gDTZldPvTGUeu9cCAa9LViNvzt/o=;
+        b=XpCFpMvQd4gQvh5gquWQ2ZftAaXrBB47AdVh0lLXrYmERl4lD3tY2Oi2S5FLElr5kD
+         criOJo8gVbtB4NFndShfIfXdRyq3hnbrsejCWk0QGXOzcK75QYhrXoPTI3JLxnKLsYtr
+         twzk19agPK7WenGVGKqUaiqYW963b5aEsEAadUrL+1G5/6aeheEHuC3KoixXoqFlgZ+n
+         LhOpmawTNHJuzxuxo5tH1UygVMDE5unyPCqT25hnvArOLk7TdoaMyK24G/6Zhd53jdxM
+         l2h2/SNBHXg1gLP1ignbuQE8H/XS+yIxT8uRZbkocTzCvQ/YWzcy4KoPpD4d/xyARQj8
+         h03g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691109748; x=1691714548;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vujMrPLoi5NFJy2gDTZldPvTGUeu9cCAa9LViNvzt/o=;
+        b=S2ZKX5d9/rXfLIkTk8DlonBHdQeCmG24jg0sCUX1E12PM8clLTa0phYOxe9PBiOnGG
+         l9WgcXrO6ULx5K5pzOg56lODfqPF4ImKQviHhidlVZrfo3zVAhDQoyRhjf4BQktK0zqB
+         hMMSMo0n2ffWAyTk9ljVIOKBI+Aa1gVhsp6NZ834mV3buAIVce/ytoyE5qU+KJmDUGKH
+         QNFmSP/whQMisd21j9rZA9rk0su/eqbKiwUhF3IG5FcpL4RqmQg1HcrtTIMEL32zLH5M
+         Q6fp4goGvEYDtu8GkiUktTT+rGW5BnzBXWIVOr2l67vi+k5hX6pQbaDBi6MHy8EXABoC
+         zGgw==
+X-Gm-Message-State: AOJu0Yw00lyFd7G49vy7st0VQ9wjnK4b9hBqI8A4UCXDKUgKGZIC5Hea
+	9doDMsrjeSpCOlQRAG5eAOYa5k/8zZA=
+X-Google-Smtp-Source: AGHT+IEQjsVrWEka9KrysAVqongS+7aQWrT2bXGIhy4ffbBau7Yhoew+SCgRy4QDDK8SjLRgYnzvVZ01CJk=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:2349:b0:1bc:4c3d:eb08 with SMTP id
+ c9-20020a170903234900b001bc4c3deb08mr1147plh.8.1691109748457; Thu, 03 Aug
+ 2023 17:42:28 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu,  3 Aug 2023 17:42:22 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230726044652.2169513-1-jingzhangos@google.com>
- <871qgvrwbi.wl-maz@kernel.org> <CAAdAUthi6oZ6oRQDFLeOFVwm2dtcTK2ERJm316x0bdn5TQObYw@mail.gmail.com>
- <ZMq5zDJ16xav7NPa@linux.dev>
-In-Reply-To: <ZMq5zDJ16xav7NPa@linux.dev>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Thu, 3 Aug 2023 16:42:57 -0700
-Message-ID: <CAAdAUtgjZEbp_uwT2WuNVn3Ko7d0yty1hpkUyYfhotk-f0a1Wg@mail.gmail.com>
-Subject: Re: [PATCH v1] KVM: arm64: selftests: Test pointer authentication
- support in KVM guest
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	ARMLinux <linux-arm-kernel@lists.infradead.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
+Message-ID: <20230804004226.1984505-1-seanjc@google.com>
+Subject: [PATCH 0/4] KVM: selftests: ioctl() macro cleanups
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Sean Christopherson <seanjc@google.com>, 
+	Michal Luczaj <mhal@rbox.co>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Oliver,
+Do some minor housekeeping on the ioctl() macros, and then teach them
+to detect and report when an ioctl() unexpectedly fails because KVM has
+killed and/or bugged the VM.
 
-On Wed, Aug 2, 2023 at 1:17=E2=80=AFPM Oliver Upton <oliver.upton@linux.dev=
-> wrote:
->
-> Hi Jing,
->
-> Nothing serious, but when you're replying on a thread can you add a
-> leading and trailing line of whitespace between the quotation and your
-> reply? Otherwise threads get really dense and hard to read.
+Note, I'm 50/50 on whether or not the ARM patch is worthwhile, though I
+spent a stupid amount of time on it (don't ask), so darn it I'm at least
+posting it.
 
-Will do. Thanks for the suggestion.
+Oh, and the To: will probably show up funky, but I'd like to take this
+through kvm-x86/selftests, not the ARM tree.
 
->
-> On Wed, Aug 02, 2023 at 10:19:30AM -0700, Jing Zhang wrote:
-> > > > +                     case FAIL_KVM:
-> > > > +                             TEST_FAIL("KVM doesn't support guest =
-PAuth!\n");
-> > >
-> > > Why is that a hard failure? The vast majority of the HW out there
-> > > doesn't support PAuth...
-> > Since previous TEST_REQUIRES have passed, KVM should be able to
-> > support guest PAuth. The test will be skipped on those HW without
-> > PAuth.
->
-> So then what is the purpose of this failure mode? The only case where
-> this would happen is if KVM is if KVM screwed up the emulation somehow,
-> took a trap on a PAC instruction or register and reflected that back
-> into the guest as an UNDEF.
+Thanks!
 
-You are right about the purpose of this test case.
+Sean Christopherson (4):
+  KVM: selftests: Drop the single-underscore ioctl() helpers
+  KVM: selftests: Add helper macros for ioctl()s that return file
+    descriptors
+  KVM: selftests: Use asserting kvm_ioctl() macros when getting ARM page
+    sizes
+  KVM: selftests: Add logic to detect if ioctl() failed because VM was
+    killed
 
->
-> That's a perfectly valid thing to test for, but the naming and failure
-> messages should indicate what actually happened.
+ .../selftests/kvm/include/kvm_util_base.h     | 101 ++++++++++++------
+ .../selftests/kvm/lib/aarch64/processor.c     |  18 ++--
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  17 +--
+ 3 files changed, 84 insertions(+), 52 deletions(-)
 
-Sure. Will use more sensible messages.
 
->
-> > > As I mentioned above, another thing I'd like to see is a set of
-> > > reference results for a given set of keys and architected algorithm
-> > > (QARMA3, QARMA5) so that we can compare between implementations
-> > > (excluding the IMPDEF implementations, of course).
-> > Sure. Will do.
->
-> I was initially hesitant towards testing PAC like this since it is
-> entirely a hardware issue besides KVM context switching, but you could
-> spin this off as a way to test if vCPU save/restore works correctly by
-> priming the vCPU from userspace.
->
-> Marc, is there something else here you're interested in exercising I
-> may've missed?
->
-> --
-> Thanks,
-> Oliver
+base-commit: 240f736891887939571854bd6d734b6c9291f22e
+-- 
+2.41.0.585.gd2178a4bd4-goog
 
-Thanks,
-Jing
