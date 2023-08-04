@@ -1,100 +1,175 @@
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A81A1BEEB
-	for <kvmarm@lists.linux.dev>; Fri,  4 Aug 2023 18:08:50 +0000 (UTC)
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-4fe28e4671dso4157516e87.0
-        for <kvmarm@lists.linux.dev>; Fri, 04 Aug 2023 11:08:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691172528; x=1691777328;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=fsI9PvVRlWWAw6F53JK6JF21HssLhBf6Wzr398dkifg=;
-        b=X23tQDKFZHZXw8vPF2onfJSiUk154utWV6xqv1kCTYlgpZUjj2KkNegETxF601fdJl
-         dm76y8nVjeePT6jAyycp3SiPMxChFEicabp4u8TD9JeI3W6a6rpO3ZlaW3E3vq94Q+dv
-         LWQocPYMMJy3D4WpvEKTD4ZKOlZ82sgBoGZFgOdmPo+tkJMxdIlUOCi5SSfDJpDRGxQi
-         A8p+IdoK61KVNPKWg049Z+sXkrRoPFq0G1UJintkhqNdDNbBqGH53DDuNAoL0VO/pLdt
-         SSQvOr4+k6UDpjEZMBERx82yG7cSmjPhdqT32mxaXm/q3NpJAeX7MwZIbVeMYvXnUMH6
-         XGqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691172528; x=1691777328;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fsI9PvVRlWWAw6F53JK6JF21HssLhBf6Wzr398dkifg=;
-        b=LSQWIoWrFLIC1JKs/OAMDKc8xPxWgh51QZrR/VxMW/CRFshNBrWHyrSi6UAaZu2cz/
-         GAHmdgcWqVy2Os3IwjjRSgIcmlAI8tAVmLu5WpsirHHGzPLMrbyw2abokBtC3vwyXieJ
-         8kfcdpcPIklCj/T2hFiUbf80Z/OnMud68pqcIzQD96tuMToBtsMqlb4zpvdfwkfsqZBP
-         CuamnbcJZnVd5TLf3YWiurMzmd3eHuJfgBhxU0dHAoY0J4q3YXdzs4+qu69dwsFo2W+E
-         xNTq2fgN6ZcpFfvEAHYo3cxtnyvlgmNgPaiGygnz+WT/DNivwlcc9ADONA8aWYZJCtPJ
-         vypg==
-X-Gm-Message-State: AOJu0YzOQYfnLwAc5Iw363iZecuUlvT78Yq2J6HyfuW6LRnF794DcVM+
-	IjHrZXtatMbD7jjHjQBcAOrCrY+YDHls4CVQtVm+xw==
-X-Google-Smtp-Source: AGHT+IGyzN84161ZVHwtE2F/keTNz/u1GwxFBnzoFsr0eNmQ2zjl00SMrwlc9THZutNzTKjC7toTVi0zxPqJSe8t74o=
-X-Received: by 2002:a05:6512:3297:b0:4fb:9446:598b with SMTP id
- p23-20020a056512329700b004fb9446598bmr1882858lfe.27.1691172528068; Fri, 04
- Aug 2023 11:08:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 439181AA6B;
+	Fri,  4 Aug 2023 18:15:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=YnOa/6fvU8ss9SgEPYf5nmoqAHQ4nJbGjVNgPXhtNF8=; b=f1vfHE4LOsBk/kJDL0KtcEta9F
+	nqzJcfT4NAgaWZQEUymYvdpHddU18BqjRduXfVSAUl1IuFi7j328jMeYJ825K1HGucnmoZWKEzVi4
+	lvG3y4179RFoxwmgvwXiahbNwCMbzLozENn+v43ZAFgh/pHHmVXu1OHITOgYG+l1S4fbIYeudqmFg
+	th2KzGm+kZN4adHbUP1qR6cfoK+mOmtdEE2BfZbRYW1W8qmJ9Pr1edAbsunLMpp8Ls3SoSk2bvlai
+	Xs33K0bWT8lNsJLYxGYmx7E0XY80dQ5k+vy7yoqbMan23AFpiZUVqH9MeC/6VpJMmNFLvJGcOwAt6
+	lNb3lYcQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+	id 1qRzK0-00BK0t-UW; Fri, 04 Aug 2023 18:14:45 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id AE059300235;
+	Fri,  4 Aug 2023 20:14:43 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 79E6127436E16; Fri,  4 Aug 2023 20:14:43 +0200 (CEST)
+Date: Fri, 4 Aug 2023 20:14:43 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Marco Elver <elver@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Kees Cook <keescook@chromium.org>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Steven Rostedt <rostedt@goodmis.org>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Tom Rix <trix@redhat.com>, Miguel Ojeda <ojeda@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com,
+	linux-toolchains@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] compiler_types: Introduce the Clang
+ __preserve_most function attribute
+Message-ID: <20230804181443.GJ214207@hirez.programming.kicks-ass.net>
+References: <20230804090621.400-1-elver@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230804090621.400-1-elver@google.com> <20230804090621.400-2-elver@google.com>
- <20230804120308.253c5521@gandalf.local.home> <CANpmjNNN6b9L72DoLzu5usGGjLw5Li8rnfu0VuaCsL-p2iKTgg@mail.gmail.com>
- <20230804135757.400eab72@gandalf.local.home> <20230804135902.7925ebb6@gandalf.local.home>
-In-Reply-To: <20230804135902.7925ebb6@gandalf.local.home>
-From: Marco Elver <elver@google.com>
-Date: Fri, 4 Aug 2023 20:08:10 +0200
-Message-ID: <CANpmjNPqfucNx7NdPOGSjjYgiZHntaBozGY1_rOSC4Wn4YCF1Q@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] list_debug: Introduce inline wrappers for debug checks
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Kees Cook <keescook@chromium.org>, 
-	Guenter Roeck <linux@roeck-us.net>, Peter Zijlstra <peterz@infradead.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Tom Rix <trix@redhat.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
-	Dmitry Vyukov <dvyukov@google.com>, Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com, 
-	linux-toolchains@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230804090621.400-1-elver@google.com>
 
-On Fri, 4 Aug 2023 at 19:59, Steven Rostedt <rostedt@goodmis.org> wrote:
->
-> On Fri, 4 Aug 2023 13:57:57 -0400
-> Steven Rostedt <rostedt@goodmis.org> wrote:
->
-> > On Fri, 4 Aug 2023 19:49:48 +0200
-> > Marco Elver <elver@google.com> wrote:
-> >
-> > > > I've been guilty of this madness myself, but I have learned the errors of
-> > > > my ways, and have been avoiding doing so in any new code I write.
-> > >
-> > > That's fair. We can call them __list_*_valid() (inline), and
-> > > __list_*_valid_or_report() ?
-> >
-> > __list_*_valid_check() ?
+On Fri, Aug 04, 2023 at 11:02:56AM +0200, Marco Elver wrote:
+> diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
+> index 547ea1ff806e..12c4540335b7 100644
+> --- a/include/linux/compiler_types.h
+> +++ b/include/linux/compiler_types.h
+> @@ -106,6 +106,33 @@ static inline void __chk_io_ptr(const volatile void __iomem *ptr) { }
+>  #define __cold
+>  #endif
+>  
+> +/*
+> + * On x86-64 and arm64 targets, __preserve_most changes the calling convention
+> + * of a function to make the code in the caller as unintrusive as possible. This
+> + * convention behaves identically to the C calling convention on how arguments
+> + * and return values are passed, but uses a different set of caller- and callee-
+> + * saved registers.
+> + *
+> + * The purpose is to alleviates the burden of saving and recovering a large
+> + * register set before and after the call in the caller.  This is beneficial for
+> + * rarely taken slow paths, such as error-reporting functions that may be called
+> + * from hot paths.
+> + *
+> + * Note: This may conflict with instrumentation inserted on function entry which
+> + * does not use __preserve_most or equivalent convention (if in assembly). Since
+> + * function tracing assumes the normal C calling convention, where the attribute
+> + * is supported, __preserve_most implies notrace.
+> + *
+> + * Optional: not supported by gcc.
+> + *
+> + * clang: https://clang.llvm.org/docs/AttributeReference.html#preserve-most
+> + */
+> +#if __has_attribute(__preserve_most__)
+> +# define __preserve_most notrace __attribute__((__preserve_most__))
+> +#else
+> +# define __preserve_most
+> +#endif
 
-Well, in patch 3/3, the inline function will also do a reduced set of
-checking, so "valid_check" is also misleading because both will do
-checks.
+This seems to shrink the ARM64 vmlinux just a little and mirrors what we
+do on x86 in asm. I'll leave it to the arm64 people to judge if this is
+worth the hassle.
 
-The key distinguishing thing between the inline and non-inline version
-is that the non-inline version will check more things, and also
-produce reports.
-
-So I can see
-
- 1. __list_*_valid_or_report()
- 2. __list_*_full_valid()
-
-To be appropriate. Preference?
-
-> I have to admit, I think the main reason kernel developers default to using
-> these useless underscores is because kernel developers are notoriously
-> lousy at naming. ;-)
-
-Heh, naming is hard. ;-)
+Index: linux-2.6/arch/arm64/include/asm/preempt.h
+===================================================================
+--- linux-2.6.orig/arch/arm64/include/asm/preempt.h
++++ linux-2.6/arch/arm64/include/asm/preempt.h
+@@ -88,15 +88,18 @@ void preempt_schedule_notrace(void);
+ #ifdef CONFIG_PREEMPT_DYNAMIC
+ 
+ DECLARE_STATIC_KEY_TRUE(sk_dynamic_irqentry_exit_cond_resched);
+-void dynamic_preempt_schedule(void);
++void __preserve_most dynamic_preempt_schedule(void);
+ #define __preempt_schedule()		dynamic_preempt_schedule()
+-void dynamic_preempt_schedule_notrace(void);
++void __preserve_most dynamic_preempt_schedule_notrace(void);
+ #define __preempt_schedule_notrace()	dynamic_preempt_schedule_notrace()
+ 
+ #else /* CONFIG_PREEMPT_DYNAMIC */
+ 
+-#define __preempt_schedule()		preempt_schedule()
+-#define __preempt_schedule_notrace()	preempt_schedule_notrace()
++void __preserve_most preserve_preempt_schedule(void);
++void __preserve_most preserve_preempt_schedule_notrace(void);
++
++#define __preempt_schedule()		preserve_preempt_schedule()
++#define __preempt_schedule_notrace()	preserve_preempt_schedule_notrace()
+ 
+ #endif /* CONFIG_PREEMPT_DYNAMIC */
+ #endif /* CONFIG_PREEMPTION */
+Index: linux-2.6/kernel/sched/core.c
+===================================================================
+--- linux-2.6.orig/kernel/sched/core.c
++++ linux-2.6/kernel/sched/core.c
+@@ -6915,7 +6915,7 @@ DEFINE_STATIC_CALL(preempt_schedule, pre
+ EXPORT_STATIC_CALL_TRAMP(preempt_schedule);
+ #elif defined(CONFIG_HAVE_PREEMPT_DYNAMIC_KEY)
+ static DEFINE_STATIC_KEY_TRUE(sk_dynamic_preempt_schedule);
+-void __sched notrace dynamic_preempt_schedule(void)
++void __sched __preserve_most dynamic_preempt_schedule(void)
+ {
+ 	if (!static_branch_unlikely(&sk_dynamic_preempt_schedule))
+ 		return;
+@@ -6924,6 +6924,11 @@ void __sched notrace dynamic_preempt_sch
+ NOKPROBE_SYMBOL(dynamic_preempt_schedule);
+ EXPORT_SYMBOL(dynamic_preempt_schedule);
+ #endif
++#else
++void __sched __preserve_most preserve_preempt_schedule(void)
++{
++	preempt_schedule();
++}
+ #endif
+ 
+ /**
+@@ -6988,7 +6993,7 @@ DEFINE_STATIC_CALL(preempt_schedule_notr
+ EXPORT_STATIC_CALL_TRAMP(preempt_schedule_notrace);
+ #elif defined(CONFIG_HAVE_PREEMPT_DYNAMIC_KEY)
+ static DEFINE_STATIC_KEY_TRUE(sk_dynamic_preempt_schedule_notrace);
+-void __sched notrace dynamic_preempt_schedule_notrace(void)
++void __sched __preserve_most dynamic_preempt_schedule_notrace(void)
+ {
+ 	if (!static_branch_unlikely(&sk_dynamic_preempt_schedule_notrace))
+ 		return;
+@@ -6997,6 +7002,11 @@ void __sched notrace dynamic_preempt_sch
+ NOKPROBE_SYMBOL(dynamic_preempt_schedule_notrace);
+ EXPORT_SYMBOL(dynamic_preempt_schedule_notrace);
+ #endif
++#else
++void __sched __preserve_most preserve_preempt_schedule_notrace(void)
++{
++	preempt_schedule_notrace();
++}
+ #endif
+ 
+ #endif /* CONFIG_PREEMPTION */
