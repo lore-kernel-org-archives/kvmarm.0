@@ -1,78 +1,90 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 962E8BE7C
-	for <kvmarm@lists.linux.dev>; Fri,  4 Aug 2023 17:39:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1691170762;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6weKQD+ozqNv4G1UIrG5/+1TB5PpQPCo1dFnfE0/XVA=;
-	b=P2xgtiJVhUiJAG5ZhKfuwkNVlEl7hj5aZTWIERghhkpvBeJ0j2Unt92zpV+HoO913ts0WG
-	i6pGDslegnMMUKdFaB8GN1SVEm8kkFM0SEgvmqtrpVfePiISD0vVcR0rMimh5vXVin6Xm8
-	lPxilSO0o/VLO6D0QxCDYycw799pMUg=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-274-FgleTTbPOmW_7u-o0k7aFw-1; Fri, 04 Aug 2023 13:39:21 -0400
-X-MC-Unique: FgleTTbPOmW_7u-o0k7aFw-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5226eaba9e9so1494195a12.2
-        for <kvmarm@lists.linux.dev>; Fri, 04 Aug 2023 10:39:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D61EE1AA6B
+	for <kvmarm@lists.linux.dev>; Fri,  4 Aug 2023 17:50:27 +0000 (UTC)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-3fe426b86a8so15361655e9.3
+        for <kvmarm@lists.linux.dev>; Fri, 04 Aug 2023 10:50:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691171426; x=1691776226;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Im4dcEZwNsAe1Y2oMqCTaJQsYwxClHXtIW7/6pymoyo=;
+        b=UphmCrMdpkSP7a4kk/vE3lUOeIiuyB34qLRvc1hVE1UR5N24Pb2doPpops1e0fJZO3
+         l7+Bk3H7d5jOmKNeKhcDLsMZJNuIyHqNmGr75RUO5jWp2HPE5ptjfRqhQ0IrbU7mEv97
+         MuSxSto9os2ONR7Oe9dcetZWP8f9vvHSvb+t8rF4ZYgDh27z2ODAr7TqttRRHIADws9s
+         Ae5OPXRm1TlbOsahEMKzhYUMk1sQ9dGAdCwA0kmpXEK+3dKfbfK4mxVDVwPW58H6cw05
+         yLRe304WmuDsKIOPh9865os6tl4CxYMAVH/YKDrjCu9dUNU4OoRCLk4W+tWKgRLfg3Nw
+         KRtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691170760; x=1691775560;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6weKQD+ozqNv4G1UIrG5/+1TB5PpQPCo1dFnfE0/XVA=;
-        b=XwgX/pTyL1oKdq7jBlO+s9kX9UaPB4w672fhLRykykDcFCXMeEDn0wHC6Ehfyia7f3
-         6Zu8Yr1mfbUqAgo++eOrGt3K4GA5FP0MyPKpA/Pqst7bwyqDikS4ZDxi5axK12n/r0kD
-         hAqtNPBzCG7DYzYQjv6cluoNVNgdFIEeqm7mff8+fhgM+6ngZXqCbNB3W8SXmshaEXge
-         zcngjHi2x2mDPCAwaqQ1RgL1GRXitwfvOp5iuShuVxJ6dgYJGjZGDzt54drhr4Nbf2FP
-         AwhkTOe3a49Oi+OnZwE8M2segcrzLjiyuEPVdOqAVbZlAIQj/cJ2tV1Rrh7WfyJhFub5
-         NfNw==
-X-Gm-Message-State: AOJu0YzilOdY2MKwOuQMSHbVG0iwyYGCy9BTMx2Cjq3oSuJTLA6omM8U
-	bCJGI4Z3UWaaumuhmD3Rje6eBNbH4xVe/IYELcsmBUba84Yt9/wQaak82HKEWqKRvSNon7mu4Lf
-	HVzTDNvQpiSvIdDcA
-X-Received: by 2002:aa7:dc0a:0:b0:522:79e8:e51b with SMTP id b10-20020aa7dc0a000000b0052279e8e51bmr2125747edu.32.1691170760213;
-        Fri, 04 Aug 2023 10:39:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFaZEd7/x6GR64ZWOyj478PsDoZMJscVQ1zgnGO6VSfQ5aurf8cwVNnAso80Blhq7blvq+CHg==
-X-Received: by 2002:aa7:dc0a:0:b0:522:79e8:e51b with SMTP id b10-20020aa7dc0a000000b0052279e8e51bmr2125736edu.32.1691170759962;
-        Fri, 04 Aug 2023 10:39:19 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.googlemail.com with ESMTPSA id i22-20020a50fc16000000b0051d9de03516sm1516807edr.52.2023.08.04.10.39.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Aug 2023 10:39:19 -0700 (PDT)
-Message-ID: <4d97b4bf-26a4-1222-a1e4-04c3f33a8170@redhat.com>
-Date: Fri, 4 Aug 2023 19:39:18 +0200
+        d=1e100.net; s=20221208; t=1691171426; x=1691776226;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Im4dcEZwNsAe1Y2oMqCTaJQsYwxClHXtIW7/6pymoyo=;
+        b=Y01oo63n+sOd6TAMMzft6V4/V3/bMP5mYYs1UqesqGTq2bMw61CIOOcM/L0RfOEh7X
+         b58eHThtsFAlcyJcX5avx7h9g2IXuYpfPop07Zt1KmvcKz83aIiRsPuIpoxmTEm/ZQ45
+         OTuzobic+oWzk7vHkuN9UIkjNTfwEjr6ZBVtDgzowNCywppZq5jOy8UY+PS/gzDzOR2F
+         EDU69aEkFociaGx+3Uudcev2H8LnNMyTkg01NAXZLd6xlqNhYg2HQ7JqefGdwdHMgn8Z
+         XNYg4DhVuFPEtELU0eMeNL/cosc2Zd28g2oDLymlqVu2vFRP8Ar+6RkHV9RY0BhPSGE7
+         ZXKg==
+X-Gm-Message-State: AOJu0YyJxUqOhvnlq1UNbGo/YqCyNs78xgGv7Y77UZmsY0B5/gnEq3VR
+	zuDYv8dTDf5Rbbl+889lU3qKw7LN5gja14s3ePA8kg==
+X-Google-Smtp-Source: AGHT+IFCpKdw5xT0hmDqmMcqVOJlFAgL0wRRdu5YxGtWnPb4KKrgp8kcqaD2UASnRwTjmhmQD6u7JjQJgAG5sZzFLQo=
+X-Received: by 2002:a1c:cc08:0:b0:3fe:485f:ed13 with SMTP id
+ h8-20020a1ccc08000000b003fe485fed13mr2162276wmb.29.1691171425779; Fri, 04 Aug
+ 2023 10:50:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.5, part #2
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, rananta@google.com, tabba@google.com, arnd@arndb.de,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
-References: <ZMi/EkSLgRymQZzN@thinky-boi>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <ZMi/EkSLgRymQZzN@thinky-boi>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20230804090621.400-1-elver@google.com> <20230804090621.400-2-elver@google.com>
+ <20230804120308.253c5521@gandalf.local.home>
+In-Reply-To: <20230804120308.253c5521@gandalf.local.home>
+From: Marco Elver <elver@google.com>
+Date: Fri, 4 Aug 2023 19:49:48 +0200
+Message-ID: <CANpmjNNN6b9L72DoLzu5usGGjLw5Li8rnfu0VuaCsL-p2iKTgg@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] list_debug: Introduce inline wrappers for debug checks
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Kees Cook <keescook@chromium.org>, 
+	Guenter Roeck <linux@roeck-us.net>, Peter Zijlstra <peterz@infradead.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Tom Rix <trix@redhat.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
+	Dmitry Vyukov <dvyukov@google.com>, Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com, 
+	linux-toolchains@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 8/1/23 10:15, Oliver Upton wrote:
->    git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.5-2
+On Fri, 4 Aug 2023 at 18:03, Steven Rostedt <rostedt@goodmis.org> wrote:
+>
+> On Fri,  4 Aug 2023 11:02:57 +0200
+> Marco Elver <elver@google.com> wrote:
+>
+> > Turn the list debug checking functions __list_*_valid() into inline
+> > functions that wrap the out-of-line functions. Care is taken to ensure
+> > the inline wrappers are always inlined, so that additional compiler
+> > instrumentation (such as sanitizers) does not result in redundant
+> > outlining.
+> >
+> > This change is preparation for performing checks in the inline wrappers.
+> >
+> > No functional change intended.
+>
+> I think the entire underscoring functions calling more underscoring
+> functions in the kernel is an abomination. Yes, there's lots of precedence
+> to this craziness, but let's not extend it.
+>
+> Can we give actual real names to why the function is "special" besides that
+> it now has another underscore added to it?
+>
+> I've been guilty of this madness myself, but I have learned the errors of
+> my ways, and have been avoiding doing so in any new code I write.
 
-Pulled (but not pushed yet), thanks.
-
-Paolo
-
+That's fair. We can call them __list_*_valid() (inline), and
+__list_*_valid_or_report() ?
