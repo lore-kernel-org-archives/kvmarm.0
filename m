@@ -1,121 +1,77 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2796F1AA6B
-	for <kvmarm@lists.linux.dev>; Fri,  4 Aug 2023 17:10:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC834C433C8;
-	Fri,  4 Aug 2023 17:10:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691169024;
-	bh=LpOa1+W78YUI0pP3gtmRJrUFbY+NCvdbjWtUDqJpXsA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=odzz0itV4ygxP67SjWWwGwJbZ+soQiIp2Nu9jCWBEfj3D/H4s4Cg42NjQayVI/v/c
-	 rfl4CMrAL55C4xBuns5HH6CDsDSXjVTmzVGpLcWKAFNdqfZF/+OKsunzRoTDsPEALm
-	 8zjEvR35b/L0bUGT4PmP21opHbOasTDlAzGoxEVmIZLgks52lxfeHAJ7ifnscRW0f9
-	 Ep0jlMvgK9OsmEZsX9+EC8AUw9TC16+TinjXMtxRPiZtJ5+y1G5SWMD+tapWERVh5m
-	 ofBJ+gLeyTi06fNQf2F8DGj1KxkD3yTdRk8Ar/CdNjYmDkxgDMUxWNBfTyXAJd+WUd
-	 +mrVR0T+A5zYg==
-Date: Fri, 4 Aug 2023 18:10:15 +0100
-From: Mark Brown <broonie@kernel.org>
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc: "corbet@lwn.net" <corbet@lwn.net>, "ardb@kernel.org" <ardb@kernel.org>,
-	"keescook@chromium.org" <keescook@chromium.org>,
-	"Szabolcs.Nagy@arm.com" <Szabolcs.Nagy@arm.com>,
-	"shuah@kernel.org" <shuah@kernel.org>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"james.morse@arm.com" <james.morse@arm.com>,
-	"debug@rivosinc.com" <debug@rivosinc.com>,
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"hjl.tools@gmail.com" <hjl.tools@gmail.com>,
-	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"palmer@dabbelt.com" <palmer@dabbelt.com>,
-	"oleg@redhat.com" <oleg@redhat.com>,
-	"arnd@arndb.de" <arnd@arndb.de>,
-	"ebiederm@xmission.com" <ebiederm@xmission.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
-Subject: Re: [PATCH v3 21/36] arm64/mm: Implement map_shadow_stack()
-Message-ID: <21a7b7ab-acbc-4778-bf2c-f4e7346c3dd9@sirena.org.uk>
-References: <5461c56cf4896f18bddaa66c3beec7b909fc8fb9.camel@intel.com>
- <0a6c90d6-f790-4036-a364-d4761fdd0e95@sirena.org.uk>
- <e827138f9d8800e3db158831bca88d1ea8b559af.camel@intel.com>
- <21d7e814-8608-40ce-b5d3-401f2110ad91@sirena.org.uk>
- <a9ea33d31aad0c45eab41b0dcbd4913d863cc930.camel@intel.com>
- <55c629cc-0545-460b-91cb-2ebdb8ae9051@sirena.org.uk>
- <7d03be1277a5f4be23df35ca96f4d6cd77735e2b.camel@intel.com>
- <475f31e1-0f6f-44a9-b93a-540c1d43e1bb@sirena.org.uk>
- <9902dd7e-1427-4c7e-b602-c1fbf6512f10@sirena.org.uk>
- <a21ab778704d02b8539e5c459750f8a2f771bede.camel@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE9F1AA87
+	for <kvmarm@lists.linux.dev>; Fri,  4 Aug 2023 17:27:10 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-585fb08172bso25882617b3.2
+        for <kvmarm@lists.linux.dev>; Fri, 04 Aug 2023 10:27:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691170029; x=1691774829;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0XNCE0THmMSplRGDYFiIYwKZfHJYXKQUWjyM6yzp218=;
+        b=ioU7Xhc/g9qgs9gG71lCacbcGZecZKnk09it5Wjzn2tVrX3fgSS2tCjX0UJGYNzPJl
+         eXFA165dQDgVzSZPWS4dcgb+pPYBrcGh026AEPvE4uNbDgNrYZqkNSkaPZKHcTUKmwBm
+         dxsmh7ephRFh1G8wQbMJXhfximF2cj4DhGKNHDjqaT8r9l6r0sL1PI0zouj9bI3atq/d
+         IJ/yKmmEQrpgHKveDl5xLOedKR4ibfnJ5dvcOMP6fyU5qYsTyKBHRxxsn9JabxZo6zog
+         RWwC/HqKx9pD1TcDTr3AH+U/YQ8ltr1Mrt0ZsbH+vNJ84ZndKhmF1NaKGmBGEAxeCDzw
+         LOUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691170029; x=1691774829;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0XNCE0THmMSplRGDYFiIYwKZfHJYXKQUWjyM6yzp218=;
+        b=HZc5Z9/9JmRX2js214/h/8JqYagyvWhLFS1ZDhaHGl6B47dJs5VcJG4il8rWFDNoJK
+         YS+xINWBjYeA9Wfr/5weBEA5Q5n1SRNvgoGRgU50EOLJZLpxuCBaScAER+PR5GbACzc9
+         z2bfG6Sbkb9e6UyaCraIQnuQikxSMMG4QiVnhcq+hIZtxKyQWzPHdIiEhA2gmPa1HHTT
+         pR8efciAm8dfZ0fpTTETIJc5RvTu9g+j5pXR0xNX/G5HgNBRn331R/XRIUAs0us1vW11
+         drGB7eWv2BHHQQ4WbEZNQgtUaZj8eXG6EfJLp0PXBnDe7Sfk+uK8sK/CwoGV+DusQyUj
+         r+wA==
+X-Gm-Message-State: AOJu0YzKR0+qQ2/iT6g6q5++33ikBZ/PoXj/444iqmgL4sBXszH9+Ipq
+	Ya5zvSPy4kDRtoij80mXBitx0p9lj3s=
+X-Google-Smtp-Source: AGHT+IHY1jyESYvdqjtEUOWN5kpmBlG2/bzs9/bKSXZUMXovofE5m64qKwapLGFKQLq4x4vgTmvsT5rlOJ0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:ef12:0:b0:583:491b:53d3 with SMTP id
+ o18-20020a81ef12000000b00583491b53d3mr15983ywm.9.1691170029578; Fri, 04 Aug
+ 2023 10:27:09 -0700 (PDT)
+Date: Fri, 4 Aug 2023 10:27:07 -0700
+In-Reply-To: <ZM0rXgKvb912k5BE@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="pNJflhZYfBsbzGQE"
-Content-Disposition: inline
-In-Reply-To: <a21ab778704d02b8539e5c459750f8a2f771bede.camel@intel.com>
-X-Cookie: I'm hungry, time to eat lunch.
+Mime-Version: 1.0
+References: <20230804004226.1984505-1-seanjc@google.com> <20230804004226.1984505-3-seanjc@google.com>
+ <ZM0rXgKvb912k5BE@linux.dev>
+Message-ID: <ZM006zd4bpsGBtWF@google.com>
+Subject: Re: [PATCH 2/4] KVM: selftests: Add helper macros for ioctl()s that
+ return file descriptors
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Michal Luczaj <mhal@rbox.co>
+Content-Type: text/plain; charset="us-ascii"
 
+On Fri, Aug 04, 2023, Oliver Upton wrote:
+> Hi Sean,
+> 
+> On Thu, Aug 03, 2023 at 05:42:24PM -0700, Sean Christopherson wrote:
+> > Add KVM, VM, and vCPU scoped helpers for ioctl()s that return file
+> > descriptors, i.e. deduplicate code for asserting success on ioctls() for
+> > which a positive return value, not just zero, is considered success.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> 
+> I appreciate the desire to eliminate duplicate code, but I think the
+> naming just muddies the waters. TBH, when I first read the diff w/o the
+> changelog, I thought you were describing the input fd (i.e. 'kvm_fd',
+> 'vm_fd', 'vcpu_fd'). I don't think explicitly spelling out the condition
+> each time (i.e. ret >= 0) is all that difficult.
 
---pNJflhZYfBsbzGQE
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yeah, but it's not just a desire to dedup code, I also am trying to funnel as
+many "ioctl() succeeded" asserts as possible into common code so that they naturally
+benefit from things like patch 4 (detecting dead/bugged VMs).
 
-On Fri, Aug 04, 2023 at 04:43:45PM +0000, Edgecombe, Rick P wrote:
-> On Fri, 2023-08-04 at 14:38 +0100, Mark Brown wrote:
-
-> > BTW are you planning to repost the series for this release?=A0 We're
-> > almost at -rc5 which is pretty late and I didn't see anything yet.=A0
-
-> There were a few patches I posted on top of the last series after your
-> comments, but I wasn't planning on reposting the whole thing. Why do
-> you ask? Just trying to figure out the best version to base off of?
-
-> > It
-> > looks like there's a branch in tip that's getting some updates but
-> > it's
-> > not getting merged for -next.
-
-> Hmm, not sure why it's not in -next anymore. I'll look into that.
-> Thanks for pointing it out.
-
-Mainly it was the inclusion in -next with a view to it getting merged
-that prompted me to ask, for the last release cycle had seemed to be
-gated on it being posted on the list (which is a standard workflow).
-
-Due to issues in mainline I really need a -rc3, and ideally -rc4, base
-but other than occasionally having to pull new bits out of your series
-it's not causing me any serious issues and I don't anticipate the arm64
-stuff getting in this time round.
-
---pNJflhZYfBsbzGQE
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmTNMPYACgkQJNaLcl1U
-h9Df8wf/TEg2LpbxxUNsAzZ3/r+uWmICEGa9AkGhiRS5KriCkO6ASDIEBMN4m//n
-1axQnkGLfUqNjHbkHyhegN5yGxXY7LSsrb6xVyWTRJTQ6zYOlzoDFYmvvhsezc7r
-qZrwqduFAB2BNGSDJVO+ni/ceEZ7/bmioIjhTd1anN7C0Ps9JFnZN8AnhW+s/hNd
-iceyRHZm/Z9goHQARi1RWwCMum3cOYsJT6YBpTxdVPnIZlb9M3QDLA5IMyVPHZG+
-MfibKT1HEeLWqo4w6ZjIluc/yqMrQEBfYq8ghZfa9F1IcB48w+5q6+iPl8LZBmVy
-OCOMl1GumMBem4Q8UZ/yo4ImOaRNHw==
-=N/z3
------END PGP SIGNATURE-----
-
---pNJflhZYfBsbzGQE--
+I agree the naming sucks.
