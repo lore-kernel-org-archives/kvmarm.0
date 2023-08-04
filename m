@@ -1,77 +1,78 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE9F1AA87
-	for <kvmarm@lists.linux.dev>; Fri,  4 Aug 2023 17:27:10 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-585fb08172bso25882617b3.2
-        for <kvmarm@lists.linux.dev>; Fri, 04 Aug 2023 10:27:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691170029; x=1691774829;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0XNCE0THmMSplRGDYFiIYwKZfHJYXKQUWjyM6yzp218=;
-        b=ioU7Xhc/g9qgs9gG71lCacbcGZecZKnk09it5Wjzn2tVrX3fgSS2tCjX0UJGYNzPJl
-         eXFA165dQDgVzSZPWS4dcgb+pPYBrcGh026AEPvE4uNbDgNrYZqkNSkaPZKHcTUKmwBm
-         dxsmh7ephRFh1G8wQbMJXhfximF2cj4DhGKNHDjqaT8r9l6r0sL1PI0zouj9bI3atq/d
-         IJ/yKmmEQrpgHKveDl5xLOedKR4ibfnJ5dvcOMP6fyU5qYsTyKBHRxxsn9JabxZo6zog
-         RWwC/HqKx9pD1TcDTr3AH+U/YQ8ltr1Mrt0ZsbH+vNJ84ZndKhmF1NaKGmBGEAxeCDzw
-         LOUw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 962E8BE7C
+	for <kvmarm@lists.linux.dev>; Fri,  4 Aug 2023 17:39:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691170762;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6weKQD+ozqNv4G1UIrG5/+1TB5PpQPCo1dFnfE0/XVA=;
+	b=P2xgtiJVhUiJAG5ZhKfuwkNVlEl7hj5aZTWIERghhkpvBeJ0j2Unt92zpV+HoO913ts0WG
+	i6pGDslegnMMUKdFaB8GN1SVEm8kkFM0SEgvmqtrpVfePiISD0vVcR0rMimh5vXVin6Xm8
+	lPxilSO0o/VLO6D0QxCDYycw799pMUg=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-274-FgleTTbPOmW_7u-o0k7aFw-1; Fri, 04 Aug 2023 13:39:21 -0400
+X-MC-Unique: FgleTTbPOmW_7u-o0k7aFw-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5226eaba9e9so1494195a12.2
+        for <kvmarm@lists.linux.dev>; Fri, 04 Aug 2023 10:39:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691170029; x=1691774829;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0XNCE0THmMSplRGDYFiIYwKZfHJYXKQUWjyM6yzp218=;
-        b=HZc5Z9/9JmRX2js214/h/8JqYagyvWhLFS1ZDhaHGl6B47dJs5VcJG4il8rWFDNoJK
-         YS+xINWBjYeA9Wfr/5weBEA5Q5n1SRNvgoGRgU50EOLJZLpxuCBaScAER+PR5GbACzc9
-         z2bfG6Sbkb9e6UyaCraIQnuQikxSMMG4QiVnhcq+hIZtxKyQWzPHdIiEhA2gmPa1HHTT
-         pR8efciAm8dfZ0fpTTETIJc5RvTu9g+j5pXR0xNX/G5HgNBRn331R/XRIUAs0us1vW11
-         drGB7eWv2BHHQQ4WbEZNQgtUaZj8eXG6EfJLp0PXBnDe7Sfk+uK8sK/CwoGV+DusQyUj
-         r+wA==
-X-Gm-Message-State: AOJu0YzKR0+qQ2/iT6g6q5++33ikBZ/PoXj/444iqmgL4sBXszH9+Ipq
-	Ya5zvSPy4kDRtoij80mXBitx0p9lj3s=
-X-Google-Smtp-Source: AGHT+IHY1jyESYvdqjtEUOWN5kpmBlG2/bzs9/bKSXZUMXovofE5m64qKwapLGFKQLq4x4vgTmvsT5rlOJ0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:ef12:0:b0:583:491b:53d3 with SMTP id
- o18-20020a81ef12000000b00583491b53d3mr15983ywm.9.1691170029578; Fri, 04 Aug
- 2023 10:27:09 -0700 (PDT)
-Date: Fri, 4 Aug 2023 10:27:07 -0700
-In-Reply-To: <ZM0rXgKvb912k5BE@linux.dev>
+        d=1e100.net; s=20221208; t=1691170760; x=1691775560;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6weKQD+ozqNv4G1UIrG5/+1TB5PpQPCo1dFnfE0/XVA=;
+        b=XwgX/pTyL1oKdq7jBlO+s9kX9UaPB4w672fhLRykykDcFCXMeEDn0wHC6Ehfyia7f3
+         6Zu8Yr1mfbUqAgo++eOrGt3K4GA5FP0MyPKpA/Pqst7bwyqDikS4ZDxi5axK12n/r0kD
+         hAqtNPBzCG7DYzYQjv6cluoNVNgdFIEeqm7mff8+fhgM+6ngZXqCbNB3W8SXmshaEXge
+         zcngjHi2x2mDPCAwaqQ1RgL1GRXitwfvOp5iuShuVxJ6dgYJGjZGDzt54drhr4Nbf2FP
+         AwhkTOe3a49Oi+OnZwE8M2segcrzLjiyuEPVdOqAVbZlAIQj/cJ2tV1Rrh7WfyJhFub5
+         NfNw==
+X-Gm-Message-State: AOJu0YzilOdY2MKwOuQMSHbVG0iwyYGCy9BTMx2Cjq3oSuJTLA6omM8U
+	bCJGI4Z3UWaaumuhmD3Rje6eBNbH4xVe/IYELcsmBUba84Yt9/wQaak82HKEWqKRvSNon7mu4Lf
+	HVzTDNvQpiSvIdDcA
+X-Received: by 2002:aa7:dc0a:0:b0:522:79e8:e51b with SMTP id b10-20020aa7dc0a000000b0052279e8e51bmr2125747edu.32.1691170760213;
+        Fri, 04 Aug 2023 10:39:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFaZEd7/x6GR64ZWOyj478PsDoZMJscVQ1zgnGO6VSfQ5aurf8cwVNnAso80Blhq7blvq+CHg==
+X-Received: by 2002:aa7:dc0a:0:b0:522:79e8:e51b with SMTP id b10-20020aa7dc0a000000b0052279e8e51bmr2125736edu.32.1691170759962;
+        Fri, 04 Aug 2023 10:39:19 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id i22-20020a50fc16000000b0051d9de03516sm1516807edr.52.2023.08.04.10.39.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Aug 2023 10:39:19 -0700 (PDT)
+Message-ID: <4d97b4bf-26a4-1222-a1e4-04c3f33a8170@redhat.com>
+Date: Fri, 4 Aug 2023 19:39:18 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230804004226.1984505-1-seanjc@google.com> <20230804004226.1984505-3-seanjc@google.com>
- <ZM0rXgKvb912k5BE@linux.dev>
-Message-ID: <ZM006zd4bpsGBtWF@google.com>
-Subject: Re: [PATCH 2/4] KVM: selftests: Add helper macros for ioctl()s that
- return file descriptors
-From: Sean Christopherson <seanjc@google.com>
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.5, part #2
 To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Michal Luczaj <mhal@rbox.co>
-Content-Type: text/plain; charset="us-ascii"
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, rananta@google.com, tabba@google.com, arnd@arndb.de,
+ James Morse <james.morse@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
+References: <ZMi/EkSLgRymQZzN@thinky-boi>
+From: Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <ZMi/EkSLgRymQZzN@thinky-boi>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 04, 2023, Oliver Upton wrote:
-> Hi Sean,
-> 
-> On Thu, Aug 03, 2023 at 05:42:24PM -0700, Sean Christopherson wrote:
-> > Add KVM, VM, and vCPU scoped helpers for ioctl()s that return file
-> > descriptors, i.e. deduplicate code for asserting success on ioctls() for
-> > which a positive return value, not just zero, is considered success.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> 
-> I appreciate the desire to eliminate duplicate code, but I think the
-> naming just muddies the waters. TBH, when I first read the diff w/o the
-> changelog, I thought you were describing the input fd (i.e. 'kvm_fd',
-> 'vm_fd', 'vcpu_fd'). I don't think explicitly spelling out the condition
-> each time (i.e. ret >= 0) is all that difficult.
+On 8/1/23 10:15, Oliver Upton wrote:
+>    git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.5-2
 
-Yeah, but it's not just a desire to dedup code, I also am trying to funnel as
-many "ioctl() succeeded" asserts as possible into common code so that they naturally
-benefit from things like patch 4 (detecting dead/bugged VMs).
+Pulled (but not pushed yet), thanks.
 
-I agree the naming sucks.
+Paolo
+
