@@ -1,175 +1,125 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 439181AA6B;
-	Fri,  4 Aug 2023 18:15:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=YnOa/6fvU8ss9SgEPYf5nmoqAHQ4nJbGjVNgPXhtNF8=; b=f1vfHE4LOsBk/kJDL0KtcEta9F
-	nqzJcfT4NAgaWZQEUymYvdpHddU18BqjRduXfVSAUl1IuFi7j328jMeYJ825K1HGucnmoZWKEzVi4
-	lvG3y4179RFoxwmgvwXiahbNwCMbzLozENn+v43ZAFgh/pHHmVXu1OHITOgYG+l1S4fbIYeudqmFg
-	th2KzGm+kZN4adHbUP1qR6cfoK+mOmtdEE2BfZbRYW1W8qmJ9Pr1edAbsunLMpp8Ls3SoSk2bvlai
-	Xs33K0bWT8lNsJLYxGYmx7E0XY80dQ5k+vy7yoqbMan23AFpiZUVqH9MeC/6VpJMmNFLvJGcOwAt6
-	lNb3lYcQ==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1qRzK0-00BK0t-UW; Fri, 04 Aug 2023 18:14:45 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id AE059300235;
-	Fri,  4 Aug 2023 20:14:43 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 79E6127436E16; Fri,  4 Aug 2023 20:14:43 +0200 (CEST)
-Date: Fri, 4 Aug 2023 20:14:43 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Marco Elver <elver@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Kees Cook <keescook@chromium.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Steven Rostedt <rostedt@goodmis.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Tom Rix <trix@redhat.com>, Miguel Ojeda <ojeda@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com,
-	linux-toolchains@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] compiler_types: Introduce the Clang
- __preserve_most function attribute
-Message-ID: <20230804181443.GJ214207@hirez.programming.kicks-ass.net>
-References: <20230804090621.400-1-elver@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 239EF440E
+	for <kvmarm@lists.linux.dev>; Fri,  4 Aug 2023 18:19:14 +0000 (UTC)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1bc0075ab7aso18175ad.1
+        for <kvmarm@lists.linux.dev>; Fri, 04 Aug 2023 11:19:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691173154; x=1691777954;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Mfl7UJxUbxuUeTFoCKSsO/YqaEDE5S858pqTp5fgS00=;
+        b=uCBp75tLHriee//ikoqX2p7GjimbkirtfpIc8u1w4o4rJ5LjqEB3KYoXAiKiKEJ1MF
+         DotbslqYm5Nhe3DYQsDTksQT7Her1ubNthHRWCzWT4FlTQfKRzfdCp6TYxeevDR31fvW
+         0zyetWbMhkUr7qGOnjI6KiEqxCz6dPc2GmSHje5ATyYxqrTq6lSL+WS1dI0HHL++kfX8
+         D+v4noCZoArF+1sIIwVhIBcDOTPnV5jsidMUaZYjedfSrLAc1z5UsqyKSi4/1p+Jm50S
+         Tm2k90LzEhrYGbndJU95LHQSily8ML2kCFE6HRvTt1LMGvaeA2yRRJSEA2PA7YMzA0vp
+         Y3SA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691173154; x=1691777954;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Mfl7UJxUbxuUeTFoCKSsO/YqaEDE5S858pqTp5fgS00=;
+        b=YvUhtAtOITTrG+7enFBbKq2yBC/U8ZTbvVwPrqZ3TmypVhWB6vdNmoXdolFoRMWlxH
+         aO9cb8WAFBadfTdceOIJ6RAJX3xcsHhb2Gx+5TS/2UDU9SgH3uoMWqgqqGNfF1XndbqY
+         Fb1y91GnAK0siKPV7N5xQQN8zPXYwaWsIojWTRFkTgda+U/naoHoB1uXN89vW0jJWFBv
+         NOkY1LB2Sm3rsXIz6aGt2LLBcR/yIMMtnsyz9W5Lg1c6CsBzBgGrXmJkaA9zxFNKlLZ9
+         OVEgf8ZUbFK9UB9f2GohIeK9sTd+eRYnOoj4kJILw6ejGTKqjb042bvXm3IAK1KCCLa2
+         qpdw==
+X-Gm-Message-State: AOJu0YxpSvMOPSxRIEg04Ne7g7Z1v7MIJPMZGvUrhcAwyVdy7CE7s2gn
+	jB01Wjubme8Jl9K/MeMKdHlq94U0NDezYV2L+KaIdw==
+X-Google-Smtp-Source: AGHT+IFFuspIZOGK/w9Z6kR37S5PKecewC+tAEgC1N9zpe8mnYVma9ptD/pOi27s4N+BxyB/wElI7D/qTwtc1r+Abqc=
+X-Received: by 2002:a17:902:c409:b0:1a9:bb1d:64e with SMTP id
+ k9-20020a170902c40900b001a9bb1d064emr24172plk.15.1691173154182; Fri, 04 Aug
+ 2023 11:19:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230804090621.400-1-elver@google.com>
+References: <20230722022251.3446223-1-rananta@google.com> <20230722022251.3446223-3-rananta@google.com>
+ <87tttpr6qy.wl-maz@kernel.org> <ZMgsjx8dwKd4xBGe@google.com>
+ <877cqdqw12.wl-maz@kernel.org> <CAJHc60xAUVt5fbhEkOqeC-VF8SWVOt3si=1yxVVAUW=+Hu_wNg@mail.gmail.com>
+In-Reply-To: <CAJHc60xAUVt5fbhEkOqeC-VF8SWVOt3si=1yxVVAUW=+Hu_wNg@mail.gmail.com>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Fri, 4 Aug 2023 11:19:02 -0700
+Message-ID: <CAJHc60zN-dc2E-fS7fuXgkrfGD9bqW6tMy2GRZxbHOeZv0ZOBw@mail.gmail.com>
+Subject: Re: [PATCH v7 02/12] KVM: arm64: Use kvm_arch_flush_remote_tlbs()
+To: Marc Zyngier <maz@kernel.org>
+Cc: Sean Christopherson <seanjc@google.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhuacai@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Jing Zhang <jingzhangos@google.com>, 
+	Reiji Watanabe <reijiw@google.com>, Colton Lewis <coltonlewis@google.com>, 
+	David Matlack <dmatlack@google.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 04, 2023 at 11:02:56AM +0200, Marco Elver wrote:
-> diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
-> index 547ea1ff806e..12c4540335b7 100644
-> --- a/include/linux/compiler_types.h
-> +++ b/include/linux/compiler_types.h
-> @@ -106,6 +106,33 @@ static inline void __chk_io_ptr(const volatile void __iomem *ptr) { }
->  #define __cold
->  #endif
->  
-> +/*
-> + * On x86-64 and arm64 targets, __preserve_most changes the calling convention
-> + * of a function to make the code in the caller as unintrusive as possible. This
-> + * convention behaves identically to the C calling convention on how arguments
-> + * and return values are passed, but uses a different set of caller- and callee-
-> + * saved registers.
-> + *
-> + * The purpose is to alleviates the burden of saving and recovering a large
-> + * register set before and after the call in the caller.  This is beneficial for
-> + * rarely taken slow paths, such as error-reporting functions that may be called
-> + * from hot paths.
-> + *
-> + * Note: This may conflict with instrumentation inserted on function entry which
-> + * does not use __preserve_most or equivalent convention (if in assembly). Since
-> + * function tracing assumes the normal C calling convention, where the attribute
-> + * is supported, __preserve_most implies notrace.
-> + *
-> + * Optional: not supported by gcc.
-> + *
-> + * clang: https://clang.llvm.org/docs/AttributeReference.html#preserve-most
-> + */
-> +#if __has_attribute(__preserve_most__)
-> +# define __preserve_most notrace __attribute__((__preserve_most__))
-> +#else
-> +# define __preserve_most
-> +#endif
+On Wed, Aug 2, 2023 at 4:28=E2=80=AFPM Raghavendra Rao Ananta
+<rananta@google.com> wrote:
+>
+> Sure, I'll change it to kvm_arch_flush_vm_tlbs() in v8.
+>
+While working on the renaming, I realized that since this function is
+called from kvm_main.c's kvm_flush_remote_tlbs(). Do we want to rename
+this and the other kvm_flush_*() functions that the series introduces
+to match their kvm_arch_flush_*() counterparts?  (spiraling more into
+this, we also have the 'remote_tlb_flush_requests' and
+'remote_tlb_flush' stats)
 
-This seems to shrink the ARM64 vmlinux just a little and mirrors what we
-do on x86 in asm. I'll leave it to the arm64 people to judge if this is
-worth the hassle.
+Thank you.
+Raghavendra
 
-Index: linux-2.6/arch/arm64/include/asm/preempt.h
-===================================================================
---- linux-2.6.orig/arch/arm64/include/asm/preempt.h
-+++ linux-2.6/arch/arm64/include/asm/preempt.h
-@@ -88,15 +88,18 @@ void preempt_schedule_notrace(void);
- #ifdef CONFIG_PREEMPT_DYNAMIC
- 
- DECLARE_STATIC_KEY_TRUE(sk_dynamic_irqentry_exit_cond_resched);
--void dynamic_preempt_schedule(void);
-+void __preserve_most dynamic_preempt_schedule(void);
- #define __preempt_schedule()		dynamic_preempt_schedule()
--void dynamic_preempt_schedule_notrace(void);
-+void __preserve_most dynamic_preempt_schedule_notrace(void);
- #define __preempt_schedule_notrace()	dynamic_preempt_schedule_notrace()
- 
- #else /* CONFIG_PREEMPT_DYNAMIC */
- 
--#define __preempt_schedule()		preempt_schedule()
--#define __preempt_schedule_notrace()	preempt_schedule_notrace()
-+void __preserve_most preserve_preempt_schedule(void);
-+void __preserve_most preserve_preempt_schedule_notrace(void);
-+
-+#define __preempt_schedule()		preserve_preempt_schedule()
-+#define __preempt_schedule_notrace()	preserve_preempt_schedule_notrace()
- 
- #endif /* CONFIG_PREEMPT_DYNAMIC */
- #endif /* CONFIG_PREEMPTION */
-Index: linux-2.6/kernel/sched/core.c
-===================================================================
---- linux-2.6.orig/kernel/sched/core.c
-+++ linux-2.6/kernel/sched/core.c
-@@ -6915,7 +6915,7 @@ DEFINE_STATIC_CALL(preempt_schedule, pre
- EXPORT_STATIC_CALL_TRAMP(preempt_schedule);
- #elif defined(CONFIG_HAVE_PREEMPT_DYNAMIC_KEY)
- static DEFINE_STATIC_KEY_TRUE(sk_dynamic_preempt_schedule);
--void __sched notrace dynamic_preempt_schedule(void)
-+void __sched __preserve_most dynamic_preempt_schedule(void)
- {
- 	if (!static_branch_unlikely(&sk_dynamic_preempt_schedule))
- 		return;
-@@ -6924,6 +6924,11 @@ void __sched notrace dynamic_preempt_sch
- NOKPROBE_SYMBOL(dynamic_preempt_schedule);
- EXPORT_SYMBOL(dynamic_preempt_schedule);
- #endif
-+#else
-+void __sched __preserve_most preserve_preempt_schedule(void)
-+{
-+	preempt_schedule();
-+}
- #endif
- 
- /**
-@@ -6988,7 +6993,7 @@ DEFINE_STATIC_CALL(preempt_schedule_notr
- EXPORT_STATIC_CALL_TRAMP(preempt_schedule_notrace);
- #elif defined(CONFIG_HAVE_PREEMPT_DYNAMIC_KEY)
- static DEFINE_STATIC_KEY_TRUE(sk_dynamic_preempt_schedule_notrace);
--void __sched notrace dynamic_preempt_schedule_notrace(void)
-+void __sched __preserve_most dynamic_preempt_schedule_notrace(void)
- {
- 	if (!static_branch_unlikely(&sk_dynamic_preempt_schedule_notrace))
- 		return;
-@@ -6997,6 +7002,11 @@ void __sched notrace dynamic_preempt_sch
- NOKPROBE_SYMBOL(dynamic_preempt_schedule_notrace);
- EXPORT_SYMBOL(dynamic_preempt_schedule_notrace);
- #endif
-+#else
-+void __sched __preserve_most preserve_preempt_schedule_notrace(void)
-+{
-+	preempt_schedule_notrace();
-+}
- #endif
- 
- #endif /* CONFIG_PREEMPTION */
+> Thanks,
+> Raghavendra
+>
+> On Wed, Aug 2, 2023 at 8:55=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
+e:
+> >
+> > On Mon, 31 Jul 2023 22:50:07 +0100,
+> > Sean Christopherson <seanjc@google.com> wrote:
+> > >
+> > > On Thu, Jul 27, 2023, Marc Zyngier wrote:
+> > > > On Sat, 22 Jul 2023 03:22:41 +0100,
+> > > > Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > > > >
+> > > > > Stop depending on CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL and opt to
+> > > > > standardize on kvm_arch_flush_remote_tlbs() since it avoids
+> > > > > duplicating the generic TLB stats across architectures that imple=
+ment
+> > > > > their own remote TLB flush.
+> > > > >
+> > > > > This adds an extra function call to the ARM64 kvm_flush_remote_tl=
+bs()
+> > > > > path, but that is a small cost in comparison to flushing remote T=
+LBs.
+> > > >
+> > > > Well, there is no such thing as a "remote TLB" anyway. We either ha=
+ve
+> > > > a non-shareable or inner-shareable invalidation. The notion of remo=
+te
+> > > > would imply that we track who potentially has a TLB, which we
+> > > > obviously don't.
+> > >
+> > > Maybe kvm_arch_flush_vm_tlbs()?  The "remote" part is misleading even=
+ on x86 when
+> > > running on Hyper-V, as the flush may be done via a single hypercall a=
+nd by kicking
+> > > "remote" vCPUs.
+> >
+> > Yup, this would be much better.
+> >
+> > Thanks,
+> >
+> >         M.
+> >
+> > --
+> > Without deviation from the norm, progress is not possible.
