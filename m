@@ -1,42 +1,42 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7A2DA4E
-	for <kvmarm@lists.linux.dev>; Fri,  4 Aug 2023 00:42:34 +0000 (UTC)
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1bbf8cb6143so13302175ad.1
-        for <kvmarm@lists.linux.dev>; Thu, 03 Aug 2023 17:42:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE4C10E7
+	for <kvmarm@lists.linux.dev>; Fri,  4 Aug 2023 00:42:36 +0000 (UTC)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-686b9ab0174so973472b3a.2
+        for <kvmarm@lists.linux.dev>; Thu, 03 Aug 2023 17:42:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691109754; x=1691714554;
+        d=google.com; s=20221208; t=1691109756; x=1691714556;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=J+mxzLyo3KvL1X1/io+X1OzBSufdvdiiGzpaJwRMhFQ=;
-        b=SOX0LmZ7M/i5Xu6IShPkO2I+BxiwZ7/tKfFw/OszRJyMzjeA8srrxfMqCj4Z29VgNn
-         T0538ljVhrlqi2oWqsf8SDO/oV45EgP4x4oPafLtiFcA3cCpGCSnbWPlD7O1UBhgOJNe
-         iWOEAZPpkZuEI+dl8Vup28taKKrYkoe9EEkFDZdVyWlSSumkRefUTDG/veJy2F6RniEr
-         D4CN9ItmtE3GLQpzTfzusmxS7gLu+J3zXqOmaxg3BFTHOgLSHC5+aOpOePxVzXkX7y+j
-         40aPvclyhw23NLYArpVti1fhnKJ/y5UqJGdMWPnW2w3RzepQtSrazDZXeGyOlRrMC0eG
-         uSAg==
+        bh=2CsV9BMCbijce3IEX7syYt6oaSf9HBzVzUSeSJTTl/c=;
+        b=DNaTTcvyymaqWv5JS/b+Ul58o6UASX5Gzy58D8OgNUL3QP3segv+8o1Nz+GizNekfv
+         rFDM+9jgVrY2UJtz2kl/i/L6udW4AVtdgPGyAjht4ak4W3jUQVvvpj9GFbt2AV7cn4l+
+         38Kkl5Ze1Wn9JzG07hlvDqExeNIGqBvSHZmT6nAMyQFB+uihzhtqKN/XrVFhOHZxwJoJ
+         bJ97KvFNHowNRmq00dAMx7hg868GXdY6QdJJAIPSVa5n1tK2uB8ro5zAKxUnv0XJe787
+         vRwGsDf3w10BvuLmfXZQHbQLUlzVsbY9ElYEmKScB7sxzF9olsQfyFnqpZRmKvxrB54P
+         7c9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691109754; x=1691714554;
+        d=1e100.net; s=20221208; t=1691109756; x=1691714556;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=J+mxzLyo3KvL1X1/io+X1OzBSufdvdiiGzpaJwRMhFQ=;
-        b=DPRs+nHeb8L+lRoYF2v07nHpuTyoIQQBmct10pIU+dpsBcNo0m54A/j+Re09ysETL6
-         EUnKuK0GoMvqFTCfAdgYIrSVGBpkB+IBncPdbs9aPEwEtjr4rrrzSSZQuNCqfRZUB4RY
-         Dsw25V0SYZ9Oy0GA2czkCOb8BG1DtQL32Gbaanpk/r6BQiGmk+iW/KOSfMszf/u+6/bM
-         P1vQH3pRXSO3lwVJmWqtnbuX/p4E2QxluviSR52n3D10FXTbO4AfE9jbvyOt1rN30uk5
-         XZs0Wd2CMhrfmTv4FuGzG4P46/Q9ONZZFE7S0/lhKAVs/6ULYYcqXb/vXxpEPC6N8f3I
-         ytLg==
-X-Gm-Message-State: AOJu0YyW+aCIhXGRlbgxosHjQU4E2bF8NCYlkKx5laMrPqRyaQ4+CvM1
-	vr2rXlqdAG87WCshpZdpcOLMAZlopW4=
-X-Google-Smtp-Source: AGHT+IHgxmGXjdzVwOxMuN7YUlHLd0HAzkRoLNDux7bwtM6itZt1UHKYVf8WxlurAEE0Phc3A5aSSAIz63w=
+        bh=2CsV9BMCbijce3IEX7syYt6oaSf9HBzVzUSeSJTTl/c=;
+        b=JJ2d6F6yev9wET3DYDOBZ5qi0IirqBavkFzAbLsKkLaorXFBlQh1jE5tkRr85Rxpk/
+         qG4NXRPhGU0aUg+t8XWHYL1ajfY15+GPdUH39baMY1yDPHkoU2fqVRfOJc/FOUg/wPpw
+         86WmGU029HD3KidIyvwL9iRsOXM1J+iVRHalPejB3k5s69uLPRoxJ3XA0NbKNSazkHt8
+         X6aC4kW7+chsfM2YqCqrzBK/JXCrHXa9wr5AZwcADDrCYv7HJSsyQN4Pk/CLWZMxivPD
+         OM1CWkC8L5oXSnmYIIPckbXoNopPR6z/wfISMwdVD3Po1mVJDLxMsmNVa6SboEb9Bdy7
+         i7FA==
+X-Gm-Message-State: AOJu0Yy/sTy/33rx2nJ6AgZjBPqllJh/b6gOlWjQNNeKH2B8IiNQlIgy
+	Lw846WMwbCuqTZz/5WFzuWgjDqiJHGw=
+X-Google-Smtp-Source: AGHT+IGuCrgdNKO1/9Fk3u0Zo/Reh2Y3zb5ohylW7eg4Swp9EAXsJiPsGMrXKVJst+F5prtcttfq9x81VV0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:dad1:b0:1b8:a555:385d with SMTP id
- q17-20020a170902dad100b001b8a555385dmr1165plx.9.1691109754176; Thu, 03 Aug
- 2023 17:42:34 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:124c:b0:687:926f:e62f with SMTP id
+ u12-20020a056a00124c00b00687926fe62fmr1573pfi.2.1691109756391; Thu, 03 Aug
+ 2023 17:42:36 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu,  3 Aug 2023 17:42:25 -0700
+Date: Thu,  3 Aug 2023 17:42:26 -0700
 In-Reply-To: <20230804004226.1984505-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -46,9 +46,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230804004226.1984505-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
-Message-ID: <20230804004226.1984505-4-seanjc@google.com>
-Subject: [PATCH 3/4] KVM: selftests: Use asserting kvm_ioctl() macros when
- getting ARM page sizes
+Message-ID: <20230804004226.1984505-5-seanjc@google.com>
+Subject: [PATCH 4/4] KVM: selftests: Add logic to detect if ioctl() failed
+ because VM was killed
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
@@ -56,60 +56,122 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Michal Luczaj <mhal@rbox.co>
 Content-Type: text/plain; charset="UTF-8"
 
-Use kvm_ioctl() instead of open coding equivalent ioctl()+TEST_ASSERT()
-calls when getting the support page sizes on ARM.  The macro usage is a
-little funky since the "kvm_fd" parameter implies an actual /dev/kvm fd,
-but on the other hand the code is invoking KVM ioctl()s.
+Add yet another macro to the VM/vCPU ioctl() framework to detect when an
+ioctl() failed because KVM killed/bugged the VM, i.e. when there was
+nothing wrong with the ioctl() itself.  If KVM kills a VM, e.g. by way of
+a failed KVM_BUG_ON(), all subsequent VM and vCPU ioctl()s will fail with
+-EIO, which can be quite misleading and ultimately waste user/developer
+time.
 
-Alternatively, the core utilities could expose a vm_open()+vm_close()
-pair so that the ARM code could create a dummy, on-stack VM+vCPU pair and
-use {vm,vcpu}_ioctl() as appropriate.  But the odds of something breaking
-due to oddball, partial usage of kvm_vm and kvm_vcpu structures is much
-higher than realizing meaningful benefit from using {vm,vcpu}_ioctl().
+Use KVM_CHECK_EXTENSION on KVM_CAP_USER_MEMORY to detect if the VM is
+dead and/or bug, as KVM doesn't provide a dedicated ioctl().  Using a
+heuristic is obviously less than ideal, but practically speaking the logic
+is bulletproof barring a KVM change, and any such change would arguably
+break userspace, e.g. if KVM returns something other than -EIO.
 
+Without the detection, tearing down a bugged VM yields a cryptic failure
+when deleting memslots:
+
+  ==== Test Assertion Failure ====
+  lib/kvm_util.c:689: !ret
+  pid=45131 tid=45131 errno=5 - Input/output error
+     1	0x00000000004036c3: __vm_mem_region_delete at kvm_util.c:689
+     2	0x00000000004042f0: kvm_vm_free at kvm_util.c:724 (discriminator 12)
+     3	0x0000000000402929: race_sync_regs at sync_regs_test.c:193
+     4	0x0000000000401cab: main at sync_regs_test.c:334 (discriminator 6)
+     5	0x0000000000416f13: __libc_start_call_main at libc-start.o:?
+     6	0x000000000041855f: __libc_start_main_impl at ??:?
+     7	0x0000000000401d40: _start at ??:?
+  KVM_SET_USER_MEMORY_REGION failed, rc: -1 errno: 5 (Input/output error)
+
+Which morphs into a more pointed error message with the detection:
+
+  ==== Test Assertion Failure ====
+  lib/kvm_util.c:689: false
+  pid=80347 tid=80347 errno=5 - Input/output error
+     1	0x00000000004039ab: __vm_mem_region_delete at kvm_util.c:689 (discriminator 5)
+     2	0x0000000000404660: kvm_vm_free at kvm_util.c:724 (discriminator 12)
+     3	0x0000000000402ac9: race_sync_regs at sync_regs_test.c:193
+     4	0x0000000000401cb7: main at sync_regs_test.c:334 (discriminator 6)
+     5	0x0000000000418263: __libc_start_call_main at libc-start.o:?
+     6	0x00000000004198af: __libc_start_main_impl at ??:?
+     7	0x0000000000401d90: _start at ??:?
+  KVM killed/bugged the VM, check the kernel log for clues
+
+Suggested-by: Michal Luczaj <mhal@rbox.co>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/lib/aarch64/processor.c      | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
+ .../selftests/kvm/include/kvm_util_base.h     | 34 ++++++++++++++++---
+ 1 file changed, 30 insertions(+), 4 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index 3a0259e25335..afec1a30916f 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -496,7 +496,7 @@ void aarch64_get_supported_page_sizes(uint32_t ipa,
- 				      bool *ps4k, bool *ps16k, bool *ps64k)
- {
- 	struct kvm_vcpu_init preferred_init;
--	int kvm_fd, vm_fd, vcpu_fd, err;
-+	int kvm_fd, vm_fd, vcpu_fd;
- 	uint64_t val;
- 	struct kvm_one_reg reg = {
- 		.id	= KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR0_EL1),
-@@ -504,19 +504,13 @@ void aarch64_get_supported_page_sizes(uint32_t ipa,
- 	};
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+index b35b0bd23683..49ad681d2161 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -269,18 +269,44 @@ static __always_inline void static_assert_is_vm(struct kvm_vm *vm) { }
+ 	kvm_do_ioctl((vm)->fd, cmd, arg);			\
+ })
  
- 	kvm_fd = open_kvm_dev_path_or_exit();
--	vm_fd = __kvm_ioctl(kvm_fd, KVM_CREATE_VM, (void *)(unsigned long)ipa);
--	TEST_ASSERT(vm_fd >= 0, KVM_IOCTL_ERROR(KVM_CREATE_VM, vm_fd));
-+	vm_fd = kvm_fd_ioctl(kvm_fd, KVM_CREATE_VM, (void *)(unsigned long)ipa);
-+	vcpu_fd = kvm_fd_ioctl(vm_fd, KVM_CREATE_VCPU, (void *)0ul);
++/*
++ * Assert that a VM or vCPU ioctl() succeeded, with extra magic to detect if
++ * the ioctl() failed because KVM killed/bugged the VM.  To detect a dead VM,
++ * probe KVM_CAP_USER_MEMORY, which (a) has been supported by KVM since before
++ * selftests existed and (b) should never outright fail, i.e. is supposed to
++ * return 0 or 1.  If KVM kills a VM, KVM returns -EIO for all ioctl()s for the
++ * VM and its vCPUs, including KVM_CHECK_EXTENSION.
++ */
++#define TEST_ASSERT_VM_VCPU_IOCTL(cond, name, ret, vm)					\
++do {											\
++	int __errno = errno;								\
++											\
++	static_assert_is_vm(vm);							\
++											\
++	if (cond)									\
++		break;									\
++											\
++	if (errno == EIO &&								\
++	    __vm_ioctl(vm, KVM_CHECK_EXTENSION, (void *)KVM_CAP_USER_MEMORY) < 0) {	\
++		TEST_ASSERT(errno == EIO, "KVM killed the VM, should return -EIO");	\
++		TEST_FAIL("KVM killed/bugged the VM, check the kernel log for clues");	\
++	}										\
++	errno = __errno;								\
++	TEST_ASSERT(cond, __KVM_IOCTL_ERROR(name, ret));				\
++} while (0)
++
+ #define vm_ioctl(vm, cmd, arg)					\
+ ({								\
+ 	int ret = __vm_ioctl(vm, cmd, arg);			\
+ 								\
+-	TEST_ASSERT(!ret, __KVM_IOCTL_ERROR(#cmd, ret));	\
++	TEST_ASSERT_VM_VCPU_IOCTL(!ret, #cmd, ret, vm);		\
+ })
  
--	vcpu_fd = ioctl(vm_fd, KVM_CREATE_VCPU, 0);
--	TEST_ASSERT(vcpu_fd >= 0, KVM_IOCTL_ERROR(KVM_CREATE_VCPU, vcpu_fd));
-+	kvm_ioctl(vm_fd, KVM_ARM_PREFERRED_TARGET, &preferred_init);
-+	kvm_ioctl(vcpu_fd, KVM_ARM_VCPU_INIT, &preferred_init);
+ #define vm_fd_ioctl(vm, cmd, arg)				\
+ ({								\
+ 	int fd = __vm_ioctl(vm, cmd, arg);			\
+ 								\
+-	TEST_ASSERT(fd >= 0, __KVM_IOCTL_ERROR(#cmd, fd));	\
++	TEST_ASSERT_VM_VCPU_IOCTL(fd >= 0, #cmd, fd, vm);	\
+ 	fd;							\
+ })
  
--	err = ioctl(vm_fd, KVM_ARM_PREFERRED_TARGET, &preferred_init);
--	TEST_ASSERT(err == 0, KVM_IOCTL_ERROR(KVM_ARM_PREFERRED_TARGET, err));
--	err = ioctl(vcpu_fd, KVM_ARM_VCPU_INIT, &preferred_init);
--	TEST_ASSERT(err == 0, KVM_IOCTL_ERROR(KVM_ARM_VCPU_INIT, err));
--
--	err = ioctl(vcpu_fd, KVM_GET_ONE_REG, &reg);
--	TEST_ASSERT(err == 0, KVM_IOCTL_ERROR(KVM_GET_ONE_REG, vcpu_fd));
-+	kvm_ioctl(vcpu_fd, KVM_GET_ONE_REG, &reg);
+@@ -296,14 +322,14 @@ static __always_inline void static_assert_is_vcpu(struct kvm_vcpu *vcpu) { }
+ ({								\
+ 	int ret = __vcpu_ioctl(vcpu, cmd, arg);			\
+ 								\
+-	TEST_ASSERT(!ret, __KVM_IOCTL_ERROR(#cmd, ret));	\
++	TEST_ASSERT_VM_VCPU_IOCTL(!ret, #cmd, ret, (vcpu)->vm);	\
+ })
  
- 	*ps4k = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_TGRAN4), val) != 0xf;
- 	*ps64k = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_TGRAN64), val) == 0;
+ #define vcpu_fd_ioctl(vcpu, cmd, arg)				\
+ ({								\
+ 	int fd = __vcpu_ioctl(vcpu, cmd, arg);			\
+ 								\
+-	TEST_ASSERT(fd >= 0, __KVM_IOCTL_ERROR(#cmd, fd));	\
++	TEST_ASSERT_VM_VCPU_IOCTL(fd >= 0, #cmd, fd, (vcpu)->vm);\
+ 	fd;							\
+ })
+ 
 -- 
 2.41.0.585.gd2178a4bd4-goog
 
