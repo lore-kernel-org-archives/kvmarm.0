@@ -1,162 +1,125 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-oo1-f73.google.com (mail-oo1-f73.google.com [209.85.161.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453711AA8B
-	for <kvmarm@lists.linux.dev>; Fri,  4 Aug 2023 22:13:30 +0000 (UTC)
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1bb982d2572so22438295ad.0
-        for <kvmarm@lists.linux.dev>; Fri, 04 Aug 2023 15:13:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE17253A8
+	for <kvmarm@lists.linux.dev>; Fri,  4 Aug 2023 22:30:27 +0000 (UTC)
+Received: by mail-oo1-f73.google.com with SMTP id 006d021491bc7-56ccda6b0dfso3669820eaf.2
+        for <kvmarm@lists.linux.dev>; Fri, 04 Aug 2023 15:30:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691187209; x=1691792009;
+        d=google.com; s=20221208; t=1691188226; x=1691793026;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bLXEZoOUsnNHXqyjOtZVO1kviAvs7+VEh7RjIbw2pVY=;
-        b=JGKdP0TBOoAh4OTz3MaM2IVM7DNxpwffVrtvvm9L1o79RXyJJAtpHpBOvSgcwNdZX2
-         vHXD6HINgJiiuqhmdNnnwrsvRAC5uXwbr4/yFPm5W55eHiXmAAQ+azo922WuaMeEHnwD
-         GcFXe8chvE/OJA1hk3iiLxhDb/q7nW0Opovw9JghaSBACG/CIL++au9Wf+Sy6uFggGsS
-         74vZWjiO8jTtvZQNWHk13gz+ww0O0agOHpetcqnEEQg/505syvmAKoAo9UvZQ01kgz/A
-         ieoG4BvFz3Fl52WQpDm7sIF/AxiRpURNb8XYluL3Y4LD+4Ket+eZh1V3em5Ru9tcVeVD
-         Cscg==
+        bh=bFzzUD1s8YBHblwI04VOeCdWAbdee3I5YnQWnVOxvpo=;
+        b=TFcn4WhuF59CuOFW+nA/rZmm0UJ9lmliU/kzI0ZppRYE7sDBYkerAuHzzRxdX3d7+X
+         4kzLTKYNiq3+tnYZLXIkLwujJLcAX9xlXFF7P6HucTbVVv4htw7jc7Fx1odjOorNhcMK
+         dodd2vDxN7Iv863IP8Ul0VCeKTSNeqWflaPt3PPJv7+5ayDRQWhkgJ+D3K75dcAoYxtZ
+         WPhu6CqDtddYxxH4dTGFYTkyLBsWJw8IjQxufeXxzFdyCgNiKmvISMu1mHITGEKHgkkb
+         HhwXF5timTSNjIo6jS4S4vsYjZPe1ZaATLPhRP8kRuAhbSLipOJg1Qe8hXm34hNZJUIk
+         0cUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691187209; x=1691792009;
+        d=1e100.net; s=20221208; t=1691188226; x=1691793026;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bLXEZoOUsnNHXqyjOtZVO1kviAvs7+VEh7RjIbw2pVY=;
-        b=e1Pby6lUrs29GIjEtqGcZryDHqGmpxsddHC0uwqjyM1WNPb+AXdtpPtKCG1qy1B/fB
-         nPDRb2S8psd7RrnUHtiy2SKnPzSrpVdWTxPh5smsQCRl48wkQEUJXk+eCKI0jSe3yFQE
-         XXK4qradjWyXZpSSgbH1p+Dg0BadVV/HUDYUxJlznzVckXrj6DyjQPvORmhCFkTvsJXW
-         zeAHCjdsGJNGnavFIg+UWyW3dCHzHvrHMnWBa32zNyFkFRDtk6AmZWlLkxVS66lvCuO7
-         n1WFgsHEYZ01DD0f46U1aia2I6ulGcx0peCyMn4AZFWjc7Dbd/9tTHtHmGLZUn3fV2ss
-         rAUg==
-X-Gm-Message-State: AOJu0Yxtfnj2BEYWQvm+MC/HTSSc3+bsJ/IAva8Z92M8mUD2a67zrw/t
-	4MteXZ1SqbHu9XnVv9WdmHgWJjLqfR8=
-X-Google-Smtp-Source: AGHT+IFFa6OQWPgXCVghPOvFrLXoLg027dv5kKy0zEJuMmkaxG1AU5Kgm6Ipp0dVxLufrqFjcx7hU8Umd6E=
+        bh=bFzzUD1s8YBHblwI04VOeCdWAbdee3I5YnQWnVOxvpo=;
+        b=N/3H6ORMu5yEZCJTtPVwEXDl8VfPg4dQ8Q4d0UskniEUALETRjuDSk0nC2AkqLP3fL
+         Xt6CxMNXxlh+Jl5fbZD1aFCgzY5dVRKuBX7Z2UW9/QXGcRbFwjglgWmcq8zTKHgXcxam
+         R3JaMzUWKp4ClPPf5M2460p8kPGQNeTjNpXQf1xRDQwD1BujuKWUwXzavLNCAGge+9P+
+         KO9FJ0rbW4ce/g6FJOL61u4jwFFh5zpkWuT+5teo3YJR13wVTt2vxBRkFA6TERwCAR6u
+         la2py/nY1suVlNoVRZ1iR6rZO63wdRxkj4Z8pdNoA5x8AvAW05Hzv9roqOwQ+HrpWTt8
+         1FsQ==
+X-Gm-Message-State: AOJu0YwNWvTJArtqzVbTjlJydOuPj2HrDBAkJBeMJSeZOL+9IeYWEwFx
+	3mxvvWlojHqRA9euMwqDT6Hq8u9miFw=
+X-Google-Smtp-Source: AGHT+IG/f7h4NBFD7Fzz9VqAMwBIHPfIp5Oxxm2+KkdFX36TNY82jUIYr8jbB4mGvNrT4WJJhTCK/9o3DZg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:2448:b0:1b8:3c5e:2289 with SMTP id
- l8-20020a170903244800b001b83c5e2289mr9543pls.2.1691187209565; Fri, 04 Aug
- 2023 15:13:29 -0700 (PDT)
-Date: Fri, 4 Aug 2023 15:13:28 -0700
-In-Reply-To: <20230704075054.3344915-3-stevensd@google.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6808:198b:b0:3a7:75cd:df61 with SMTP id
+ bj11-20020a056808198b00b003a775cddf61mr4531539oib.5.1691188226241; Fri, 04
+ Aug 2023 15:30:26 -0700 (PDT)
+Date: Fri, 4 Aug 2023 15:30:24 -0700
+In-Reply-To: <20230705080756.xv7fm3jxewipunvn@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-3-stevensd@google.com>
-Message-ID: <ZM14CHeY4DvjAlqG@google.com>
-Subject: Re: [PATCH v7 2/8] KVM: Introduce __kvm_follow_pfn function
+References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-5-stevensd@google.com>
+ <20230705080756.xv7fm3jxewipunvn@linux.intel.com>
+Message-ID: <ZM18AAFj21Fo36hg@google.com>
+Subject: Re: [PATCH v7 4/8] KVM: x86/mmu: Migrate to __kvm_follow_pfn
 From: Sean Christopherson <seanjc@google.com>
-To: David Stevens <stevensd@chromium.org>
-Cc: Marc Zyngier <maz@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, Peter Xu <peterx@redhat.com>, 
+To: Yu Zhang <yu.c.zhang@linux.intel.com>
+Cc: David Stevens <stevensd@chromium.org>, Marc Zyngier <maz@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Peter Xu <peterx@redhat.com>, 
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
 	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
 	kvm@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jul 04, 2023, David Stevens wrote:
-> From: David Stevens <stevensd@chromium.org>
+On Wed, Jul 05, 2023, Yu Zhang wrote:
+> On Tue, Jul 04, 2023 at 04:50:49PM +0900, David Stevens wrote:
+> > From: David Stevens <stevensd@chromium.org>
+> > 
+> > Migrate from __gfn_to_pfn_memslot to __kvm_follow_pfn.
+
+Please turn up your changelog verbosity from ~2 to ~8.  E.g. explain the transition
+from async => FOLL_NOWAIT+KVM_PFN_ERR_NEEDS_IO, there's no reason to force readers
+to suss that out on their own.
+
+> > Signed-off-by: David Stevens <stevensd@chromium.org>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c | 35 +++++++++++++++++++++++++----------
+> >  1 file changed, 25 insertions(+), 10 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index ec169f5c7dce..e44ab512c3a1 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -4296,7 +4296,12 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+> >  static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> >  {
+> >  	struct kvm_memory_slot *slot = fault->slot;
+> > -	bool async;
+> > +	struct kvm_follow_pfn foll = {
+> > +		.slot = slot,
+> > +		.gfn = fault->gfn,
+> > +		.flags = FOLL_GET | (fault->write ? FOLL_WRITE : 0),
+> > +		.allow_write_mapping = true,
+> > +	};
+> >  
+> >  	/*
+> >  	 * Retry the page fault if the gfn hit a memslot that is being deleted
+> > @@ -4325,12 +4330,14 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+> >  			return RET_PF_EMULATE;
+> >  	}
+> >  
+> > -	async = false;
+> > -	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, false, &async,
+> > -					  fault->write, &fault->map_writable,
+> > -					  &fault->hva);
+> > -	if (!async)
+> > -		return RET_PF_CONTINUE; /* *pfn has correct page already */
+> > +	foll.flags |= FOLL_NOWAIT;
+> > +	fault->pfn = __kvm_follow_pfn(&foll);
+> > +
+> > +	if (!is_error_noslot_pfn(fault->pfn))
+> > +		goto success;
+> > +
+> > +	if (fault->pfn != KVM_PFN_ERR_NEEDS_IO)
+> > +		return RET_PF_CONTINUE;
 > 
-> Introduce __kvm_follow_pfn, which will replace __gfn_to_pfn_memslot.
-> __kvm_follow_pfn refactors the old API's arguments into a struct and,
-> where possible, combines the boolean arguments into a single flags
-> argument.
-> 
-> Signed-off-by: David Stevens <stevensd@chromium.org>
-> ---
->  include/linux/kvm_host.h |  16 ++++
->  virt/kvm/kvm_main.c      | 171 ++++++++++++++++++++++-----------------
->  virt/kvm/kvm_mm.h        |   3 +-
->  virt/kvm/pfncache.c      |   8 +-
->  4 files changed, 122 insertions(+), 76 deletions(-)
-> 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 9d3ac7720da9..ef2763c2b12e 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -97,6 +97,7 @@
->  #define KVM_PFN_ERR_HWPOISON	(KVM_PFN_ERR_MASK + 1)
->  #define KVM_PFN_ERR_RO_FAULT	(KVM_PFN_ERR_MASK + 2)
->  #define KVM_PFN_ERR_SIGPENDING	(KVM_PFN_ERR_MASK + 3)
-> +#define KVM_PFN_ERR_NEEDS_IO	(KVM_PFN_ERR_MASK + 4)
+> IIUC, FOLL_NOWAIT is set only when we wanna an async fault. So
+> KVM_PFN_ERR_NEEDS_IO may not be necessary? 
 
-Hmm, ideally KVM_PFN_ERR_NEEDS_IO would be introduced in a separate prep patch,
-e.g. by changing "bool *async" to "bool no_wait".  At a glance, I can't tell if
-that's feasible though, so consider it more of a "wish" than a request.
+But FOLL_NOWAIT is set above.  This logic is essentially saying "bail immediately
+if __gfn_to_pfn_memslot() returned a fatal error".
 
-> @@ -2572,23 +2561,23 @@ static int kvm_try_get_pfn(kvm_pfn_t pfn)
->  	return get_page_unless_zero(page);
->  }
->  
-> -static int hva_to_pfn_remapped(struct vm_area_struct *vma,
-> -			       unsigned long addr, bool write_fault,
-> -			       bool *writable, kvm_pfn_t *p_pfn)
-> +static int hva_to_pfn_remapped(struct vm_area_struct *vma, struct kvm_follow_pfn *foll,
-> +			       kvm_pfn_t *p_pfn)
+A commented would definitely be helpful though.  How about?
 
-Please wrap.  KVM still honors the 80 char soft limit unless there's a reason not
-to, and in this case it's already wrapping
-
-static int hva_to_pfn_remapped(struct vm_area_struct *vma,
-			       struct kvm_follow_pfn *foll, kvm_pfn_t *p_pfn)
-
-> @@ -2606,8 +2595,7 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
->  		goto out;
->  	}
->  
-> -	if (writable)
-> -		*writable = pte_write(*ptep);
-> +	foll->writable = pte_write(*ptep) && foll->allow_write_mapping;
-
-Similar to feedback in my other response, don't condition this on try_map_writable,
-i.e. just do:
-
-	foll->writable = pte_write(...);
-
->  	pfn = pte_pfn(*ptep);
->  
->  	/*
-> @@ -2652,24 +2640,22 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
->   * 2): @write_fault = false && @writable, @writable will tell the caller
->   *     whether the mapping is writable.
->   */
-> -kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool interruptible,
-> -		     bool *async, bool write_fault, bool *writable)
-> +kvm_pfn_t hva_to_pfn(struct kvm_follow_pfn *foll)
->  {
->  	struct vm_area_struct *vma;
->  	kvm_pfn_t pfn;
->  	int npages, r;
->  
->  	/* we can do it either atomically or asynchronously, not both */
-> -	BUG_ON(atomic && async);
-> +	BUG_ON(foll->atomic && (foll->flags & FOLL_NOWAIT));
->  
-> -	if (hva_to_pfn_fast(addr, write_fault, writable, &pfn))
-> +	if (hva_to_pfn_fast(foll, &pfn))
->  		return pfn;
->  
-> -	if (atomic)
-> +	if (foll->atomic)
->  		return KVM_PFN_ERR_FAULT;
->  
-> -	npages = hva_to_pfn_slow(addr, async, write_fault, interruptible,
-> -				 writable, &pfn);
-> +	npages = hva_to_pfn_slow(foll, &pfn);
->  	if (npages == 1)
->  		return pfn;
->  	if (npages == -EINTR)
-> @@ -2677,83 +2663,122 @@ kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool interruptible,
->  
->  	mmap_read_lock(current->mm);
->  	if (npages == -EHWPOISON ||
-> -	      (!async && check_user_page_hwpoison(addr))) {
-> +	      (!(foll->flags & FOLL_NOWAIT) && check_user_page_hwpoison(foll->hva))) {
-
-Opportunistically align the indentation, as an added bonus that makes the line
-length a few chars shorter, i.e.
-
-	if (npages == -EHWPOISON ||
-	    (!(foll->flags & FOLL_NOWAIT) && check_user_page_hwpoison(foll->hva))) {
-		pfn = KVM_PFN_ERR_HWPOISON;
-		goto exit;
-	}
+	/*
+	 * If __kvm_follow_pfn() failed because I/O is needed to fault in the
+	 * page, then either set up an asynchronous #PF to do the I/O, or if
+	 * doing an async #PF isn't possible, retry __kvm_follow_pfn() with
+	  I/O allowed. All other failures are fatal, i.e. retrying won't help.
+	 */
+	if (fault->pfn != KVM_PFN_ERR_NEEDS_IO)
+		return RET_PF_CONTINUE;
