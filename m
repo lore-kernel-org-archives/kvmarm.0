@@ -1,72 +1,121 @@
-Received: from out-124.mta0.migadu.com (out-124.mta0.migadu.com [91.218.175.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805D1BE7C
-	for <kvmarm@lists.linux.dev>; Fri,  4 Aug 2023 16:46:28 +0000 (UTC)
-Date: Fri, 4 Aug 2023 16:46:22 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1691167586;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qaR2G5Chx/VcUIaTYRuVF0uwhqVmW9NgGj+Bf+hZY7o=;
-	b=r+7WDHTAnuE6UxfVFf9fmVXWZrmioqVjtqh2KCn/L35YcmjQRsSJVd/v1z+Ks6eJx8J4jA
-	LS+cxW2YC2JZ/gzgc8G8izhmj/IUaH3i22/t7+ES3S7mAYiT5/wal8BUgHjTB9cBHWagSe
-	11Un/V39kIbT2E0Q/LNoUv+MPvnz+qU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-	Michal Luczaj <mhal@rbox.co>
-Subject: Re: [PATCH 2/4] KVM: selftests: Add helper macros for ioctl()s that
- return file descriptors
-Message-ID: <ZM0rXgKvb912k5BE@linux.dev>
-References: <20230804004226.1984505-1-seanjc@google.com>
- <20230804004226.1984505-3-seanjc@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2796F1AA6B
+	for <kvmarm@lists.linux.dev>; Fri,  4 Aug 2023 17:10:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC834C433C8;
+	Fri,  4 Aug 2023 17:10:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691169024;
+	bh=LpOa1+W78YUI0pP3gtmRJrUFbY+NCvdbjWtUDqJpXsA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=odzz0itV4ygxP67SjWWwGwJbZ+soQiIp2Nu9jCWBEfj3D/H4s4Cg42NjQayVI/v/c
+	 rfl4CMrAL55C4xBuns5HH6CDsDSXjVTmzVGpLcWKAFNdqfZF/+OKsunzRoTDsPEALm
+	 8zjEvR35b/L0bUGT4PmP21opHbOasTDlAzGoxEVmIZLgks52lxfeHAJ7ifnscRW0f9
+	 Ep0jlMvgK9OsmEZsX9+EC8AUw9TC16+TinjXMtxRPiZtJ5+y1G5SWMD+tapWERVh5m
+	 ofBJ+gLeyTi06fNQf2F8DGj1KxkD3yTdRk8Ar/CdNjYmDkxgDMUxWNBfTyXAJd+WUd
+	 +mrVR0T+A5zYg==
+Date: Fri, 4 Aug 2023 18:10:15 +0100
+From: Mark Brown <broonie@kernel.org>
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc: "corbet@lwn.net" <corbet@lwn.net>, "ardb@kernel.org" <ardb@kernel.org>,
+	"keescook@chromium.org" <keescook@chromium.org>,
+	"Szabolcs.Nagy@arm.com" <Szabolcs.Nagy@arm.com>,
+	"shuah@kernel.org" <shuah@kernel.org>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"james.morse@arm.com" <james.morse@arm.com>,
+	"debug@rivosinc.com" <debug@rivosinc.com>,
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"hjl.tools@gmail.com" <hjl.tools@gmail.com>,
+	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"palmer@dabbelt.com" <palmer@dabbelt.com>,
+	"oleg@redhat.com" <oleg@redhat.com>,
+	"arnd@arndb.de" <arnd@arndb.de>,
+	"ebiederm@xmission.com" <ebiederm@xmission.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
+Subject: Re: [PATCH v3 21/36] arm64/mm: Implement map_shadow_stack()
+Message-ID: <21a7b7ab-acbc-4778-bf2c-f4e7346c3dd9@sirena.org.uk>
+References: <5461c56cf4896f18bddaa66c3beec7b909fc8fb9.camel@intel.com>
+ <0a6c90d6-f790-4036-a364-d4761fdd0e95@sirena.org.uk>
+ <e827138f9d8800e3db158831bca88d1ea8b559af.camel@intel.com>
+ <21d7e814-8608-40ce-b5d3-401f2110ad91@sirena.org.uk>
+ <a9ea33d31aad0c45eab41b0dcbd4913d863cc930.camel@intel.com>
+ <55c629cc-0545-460b-91cb-2ebdb8ae9051@sirena.org.uk>
+ <7d03be1277a5f4be23df35ca96f4d6cd77735e2b.camel@intel.com>
+ <475f31e1-0f6f-44a9-b93a-540c1d43e1bb@sirena.org.uk>
+ <9902dd7e-1427-4c7e-b602-c1fbf6512f10@sirena.org.uk>
+ <a21ab778704d02b8539e5c459750f8a2f771bede.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="pNJflhZYfBsbzGQE"
 Content-Disposition: inline
-In-Reply-To: <20230804004226.1984505-3-seanjc@google.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <a21ab778704d02b8539e5c459750f8a2f771bede.camel@intel.com>
+X-Cookie: I'm hungry, time to eat lunch.
 
-Hi Sean,
 
-On Thu, Aug 03, 2023 at 05:42:24PM -0700, Sean Christopherson wrote:
-> Add KVM, VM, and vCPU scoped helpers for ioctl()s that return file
-> descriptors, i.e. deduplicate code for asserting success on ioctls() for
-> which a positive return value, not just zero, is considered success.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+--pNJflhZYfBsbzGQE
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I appreciate the desire to eliminate duplicate code, but I think the
-naming just muddies the waters. TBH, when I first read the diff w/o the
-changelog, I thought you were describing the input fd (i.e. 'kvm_fd',
-'vm_fd', 'vcpu_fd'). I don't think explicitly spelling out the condition
-each time (i.e. ret >= 0) is all that difficult.
+On Fri, Aug 04, 2023 at 04:43:45PM +0000, Edgecombe, Rick P wrote:
+> On Fri, 2023-08-04 at 14:38 +0100, Mark Brown wrote:
 
-[...]
+> > BTW are you planning to repost the series for this release?=A0 We're
+> > almost at -rc5 which is pretty late and I didn't see anything yet.=A0
 
->  /*
->   * Looks up and returns the value corresponding to the capability
->   * (KVM_CAP_*) given by cap.
->   */
->  static inline int vm_check_cap(struct kvm_vm *vm, long cap)
->  {
-> -	int ret =  __vm_ioctl(vm, KVM_CHECK_EXTENSION, (void *)cap);
-> -
-> -	TEST_ASSERT(ret >= 0, KVM_IOCTL_ERROR(KVM_CHECK_EXTENSION, ret));
-> -	return ret;
-> +	return vm_fd_ioctl(vm, KVM_CHECK_EXTENSION, (void *)cap);
->  }
+> There were a few patches I posted on top of the last series after your
+> comments, but I wasn't planning on reposting the whole thing. Why do
+> you ask? Just trying to figure out the best version to base off of?
 
-Though the same error condition, this isn't returning an fd.
+> > It
+> > looks like there's a branch in tip that's getting some updates but
+> > it's
+> > not getting merged for -next.
 
--- 
-Thanks,
-Oliver
+> Hmm, not sure why it's not in -next anymore. I'll look into that.
+> Thanks for pointing it out.
+
+Mainly it was the inclusion in -next with a view to it getting merged
+that prompted me to ask, for the last release cycle had seemed to be
+gated on it being posted on the list (which is a standard workflow).
+
+Due to issues in mainline I really need a -rc3, and ideally -rc4, base
+but other than occasionally having to pull new bits out of your series
+it's not causing me any serious issues and I don't anticipate the arm64
+stuff getting in this time round.
+
+--pNJflhZYfBsbzGQE
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmTNMPYACgkQJNaLcl1U
+h9Df8wf/TEg2LpbxxUNsAzZ3/r+uWmICEGa9AkGhiRS5KriCkO6ASDIEBMN4m//n
+1axQnkGLfUqNjHbkHyhegN5yGxXY7LSsrb6xVyWTRJTQ6zYOlzoDFYmvvhsezc7r
+qZrwqduFAB2BNGSDJVO+ni/ceEZ7/bmioIjhTd1anN7C0Ps9JFnZN8AnhW+s/hNd
+iceyRHZm/Z9goHQARi1RWwCMum3cOYsJT6YBpTxdVPnIZlb9M3QDLA5IMyVPHZG+
+MfibKT1HEeLWqo4w6ZjIluc/yqMrQEBfYq8ghZfa9F1IcB48w+5q6+iPl8LZBmVy
+OCOMl1GumMBem4Q8UZ/yo4ImOaRNHw==
+=N/z3
+-----END PGP SIGNATURE-----
+
+--pNJflhZYfBsbzGQE--
