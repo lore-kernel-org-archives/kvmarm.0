@@ -1,88 +1,95 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7405CA55
-	for <kvmarm@lists.linux.dev>; Fri,  4 Aug 2023 18:33:55 +0000 (UTC)
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d07cb52a768so2564816276.1
-        for <kvmarm@lists.linux.dev>; Fri, 04 Aug 2023 11:33:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691174034; x=1691778834;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SzgCQZrREJ8wwDiX6siz2qHa1/7eISD6QAlgSdu5Knw=;
-        b=dafKDsAUIw0Ie3fHqOzQMKvbKji+TOslqxd+53S8Ae1ULDmkeB/ua1YPOdYXPbSr0W
-         n0B0znsGS31LPviJM1SZCFmESkuTcUMny2hya9DL0xdvpWCSxSHRJCfVCbNxLfYyeFRv
-         EIycdVeNgQRE7OZLu04A+9r6jEyZbrSMa/ojO+QiKtGQ5lFCv7kKrPSc1rHckvDKMSWE
-         Py9HduHTpVfSHRrXxUOhd0+x82M2xiEsF5OLWY4E2sB+9UWBaFq9En3wnmE643RVcCta
-         tFFvd4rXgtsTJi80YNeW/3oG4StJ9Y06uzrmvVFVFIhnYu0yb5aHuCS39qa1aL/NYiUV
-         FCOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691174034; x=1691778834;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SzgCQZrREJ8wwDiX6siz2qHa1/7eISD6QAlgSdu5Knw=;
-        b=IC6iVMxVE+S0Ok5RvlXRlDNSZPScze7YpYuzXyh71ZsFppNch1lIddvTsfYXhOcxhD
-         /Qj2ZJqQgnB0z4k9neLLzjW/1yNqAtRLwkZas2PuDNTRN8aI0ZpWFvzI+qVkIyrVi5VL
-         IK0Wj/9zmILf69ea/oX13Sw/vZNIPdTUsBJqlZCmyJ9fowh6Dm3UNckDrMhTHNidZx1J
-         zlCUXFeMgvGJ70QWE3CAIc/AAUHze3Ax97O2j1EWinDM0Qmo8XLi0+2kb3xOcx7/DSmQ
-         x95/XWiUUM9sTi0Fpe+xCCmNqUoTDDda/liI2vvEY4xKS0Tf4JVUmqEc3Bpe5tlzOjTP
-         ikHw==
-X-Gm-Message-State: AOJu0Yy1XHNPmPGXKC2DCkYZZ8KzCB61E22i7WBgQPFu9Vr9G7HhLpEV
-	T584uayvBEPNrRtBbgXH7CuRe83uTiY=
-X-Google-Smtp-Source: AGHT+IEu3d94rrVmJ78RS29lOywQDiyzD14VCrwEVoVIDv3RxrRH95F0M9gwGQrPVV9YwLdxoui14M8wTbI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:42ca:0:b0:d07:16db:6f8f with SMTP id
- p193-20020a2542ca000000b00d0716db6f8fmr13913yba.6.1691174034726; Fri, 04 Aug
- 2023 11:33:54 -0700 (PDT)
-Date: Fri, 4 Aug 2023 11:33:53 -0700
-In-Reply-To: <gsnto7jm8zbu.fsf@coltonlewis-kvm.c.googlers.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398AF440E
+	for <kvmarm@lists.linux.dev>; Fri,  4 Aug 2023 19:09:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85432C433C8;
+	Fri,  4 Aug 2023 19:09:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691176163;
+	bh=lk24LQwqcp4JYldlbIjLD9mH818no3tmdB7V9ZxAaK4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EpxIKBvTXu6P6iDxz7oVD4I6GbXeSkcHqARLqmeYlJO5zjKKmyh4DuY1v0kDwtGwc
+	 zHfbJnrf+LEVkX+jeRQhI1fQxIYy3aUexfTBb6vIKERTVhigHj3HIQwMNFzsXDvENb
+	 7/ADSbncCqIion780Y3gIHRY20rUYISOWiqmhF3/3PhAR4qar3dgNt9ChSj7RVziZ8
+	 0zNdAr+FlR1CY2X/sZEcP6UU7PZLtM1Y7IbvmTfxo81pRvKZOBszrvOyQNEifd1eL/
+	 jvYvPstpwHIF/cX2pM6QpPhYURzKK4ZXBdTGVEl50Nmke12B/2uJ2xc9LS72Y8mNlu
+	 j+HMrtUVWxPDA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qS0Ar-002KST-5U;
+	Fri, 04 Aug 2023 20:09:21 +0100
+Date: Fri, 04 Aug 2023 20:09:20 +0100
+Message-ID: <86edki62vz.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: James Clark <james.clark@arm.com>
+Cc: coresight@lists.linaro.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mike Leach <mike.leach@linaro.org>,
+	Leo Yan <leo.yan@linaro.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Rob Herring <robh@kernel.org>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/3] coresight: Support exclude_guest with Feat_TRF and nVHE
+In-Reply-To: <20230804101317.460697-1-james.clark@arm.com>
+References: <20230804101317.460697-1-james.clark@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <ZM0rXgKvb912k5BE@linux.dev> <gsnto7jm8zbu.fsf@coltonlewis-kvm.c.googlers.com>
-Message-ID: <ZM1EkRMf23e2YUBs@google.com>
-Subject: Re: [PATCH 2/4] KVM: selftests: Add helper macros for ioctl()s that
- return file descriptors
-From: Sean Christopherson <seanjc@google.com>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, maz@kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, mhal@rbox.co
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: james.clark@arm.com, coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mike.leach@linaro.org, leo.yan@linaro.org, alexander.shishkin@linux.intel.com, anshuman.khandual@arm.com, robh@kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Aug 04, 2023, Colton Lewis wrote:
-> Oliver Upton <oliver.upton@linux.dev> writes:
+On Fri, 04 Aug 2023 11:13:10 +0100,
+James Clark <james.clark@arm.com> wrote:
 > 
-> > Hi Sean,
+> Hi,
 > 
-> > On Thu, Aug 03, 2023 at 05:42:24PM -0700, Sean Christopherson wrote:
-> > > Add KVM, VM, and vCPU scoped helpers for ioctl()s that return file
-> > > descriptors, i.e. deduplicate code for asserting success on ioctls() for
-> > > which a positive return value, not just zero, is considered success.
+> I'm looking for help in testing this and for feedback on whether it's
+> useful to anyone. Testing it requires hardware that has Feat_TRF (v8.4)
+> but no TRBE. This is because TRBE usage is disabled in nVHE guests.
+>
+> I don't currently have any access to any hardware, and the FVP model
+> can only do self hosted trace using TRBE.
 > 
-> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> 
-> > I appreciate the desire to eliminate duplicate code, but I think the
-> > naming just muddies the waters. TBH, when I first read the diff w/o the
-> > changelog, I thought you were describing the input fd (i.e. 'kvm_fd',
-> > 'vm_fd', 'vcpu_fd'). I don't think explicitly spelling out the condition
-> > each time (i.e. ret >= 0) is all that difficult.
-> 
-> Couldn't ret >= 0 be the assert condition for everything? Don't see why
-> there needs to be different helpers to check == 0 and >= 0.
-> 
-> Unless I'm missing something, error returns are only ever negative.
+> Currently with nVHE you would always get trace from guests, and
+> filtering out isn't possible without this patchset. In comparison, with
+> VHE guests, they never generate guest trace without [1]. I think the
+> existence of trace rather than lack of could suggest that this change is
+> less useful than [1]. Also the restricted set of hardware that it works
+> on supports that too.
 
-Using "ret >= 0" would work in the sense that the tests wouldn't fail, but it
-would degrade our test coverage, e.g. selftests wouldn't detect KVM bugs where
-an ioctl() unexpectedly returns a non-zero, positive value.
+It'd be nice to have some sort of feature parity, but it seems like a
+vanishingly small target of users having access to an ETM sink.
 
-The other wrinkle is that selftests need to actually consume the return value for
-ioctl()s that return a positive value, i.e. the fd (or whatever it is) needs to
-propagated up the stack.  I.e. all of the generic ioctl() macros would need to
-"return" the value, which I really don't want to do because that would (re)open
-the gates for having helpers that return an int, even though the only possible
-return value is '0'.
+> 
+> Apart from compilation and checking that the exclude guest settings
+> are correctly programmed on guest switch, this is untested by me.
+
+I'll have a look at the series, but none of my HW fits in this
+description (my ARMv8.4+ boxes don't have any form of tracing).
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
