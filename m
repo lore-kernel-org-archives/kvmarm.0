@@ -1,177 +1,137 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE4C10E7
-	for <kvmarm@lists.linux.dev>; Fri,  4 Aug 2023 00:42:36 +0000 (UTC)
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-686b9ab0174so973472b3a.2
-        for <kvmarm@lists.linux.dev>; Thu, 03 Aug 2023 17:42:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3554C8F62
+	for <kvmarm@lists.linux.dev>; Fri,  4 Aug 2023 09:06:51 +0000 (UTC)
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-314275b653eso1026680f8f.1
+        for <kvmarm@lists.linux.dev>; Fri, 04 Aug 2023 02:06:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691109756; x=1691714556;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=2CsV9BMCbijce3IEX7syYt6oaSf9HBzVzUSeSJTTl/c=;
-        b=DNaTTcvyymaqWv5JS/b+Ul58o6UASX5Gzy58D8OgNUL3QP3segv+8o1Nz+GizNekfv
-         rFDM+9jgVrY2UJtz2kl/i/L6udW4AVtdgPGyAjht4ak4W3jUQVvvpj9GFbt2AV7cn4l+
-         38Kkl5Ze1Wn9JzG07hlvDqExeNIGqBvSHZmT6nAMyQFB+uihzhtqKN/XrVFhOHZxwJoJ
-         bJ97KvFNHowNRmq00dAMx7hg868GXdY6QdJJAIPSVa5n1tK2uB8ro5zAKxUnv0XJe787
-         vRwGsDf3w10BvuLmfXZQHbQLUlzVsbY9ElYEmKScB7sxzF9olsQfyFnqpZRmKvxrB54P
-         7c9Q==
+        d=google.com; s=20221208; t=1691140010; x=1691744810;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=mbDuRBO1V21kY8Ln+XMGj8tah/dM0ZngOK9DCSez6Ds=;
+        b=5+NdHYLigl8F6LR7td6fJwq4mY9o+g31biS6M/x67uOl9aEZNMw4T8nENGruiRPiRB
+         +Gw5NEcsPnW4zysL4GKnQBPK9MO8u0Fsh1G5fWlgkmiENC1pguO3W0zZ0X/9KVUs9XYc
+         Tobr1N4uOqLruYOpHjKAtJJ2mDS90eZzDY6tlw9DthEFZ7ugqCsD5LBgD4MRn1hh6V3W
+         c6lem7rrbgF4amzGiob51SzurdoFT2U3i2F0AvVFAwCHWg57HOfRNXyQL4/kaXiOsTGY
+         Q4BSyO6jSC8eDLVGZOooU1CA1YZfiIB3t/WuaZY5AlYApLPEZnbtXoouz1qw8nB4BnEV
+         78og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691109756; x=1691714556;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2CsV9BMCbijce3IEX7syYt6oaSf9HBzVzUSeSJTTl/c=;
-        b=JJ2d6F6yev9wET3DYDOBZ5qi0IirqBavkFzAbLsKkLaorXFBlQh1jE5tkRr85Rxpk/
-         qG4NXRPhGU0aUg+t8XWHYL1ajfY15+GPdUH39baMY1yDPHkoU2fqVRfOJc/FOUg/wPpw
-         86WmGU029HD3KidIyvwL9iRsOXM1J+iVRHalPejB3k5s69uLPRoxJ3XA0NbKNSazkHt8
-         X6aC4kW7+chsfM2YqCqrzBK/JXCrHXa9wr5AZwcADDrCYv7HJSsyQN4Pk/CLWZMxivPD
-         OM1CWkC8L5oXSnmYIIPckbXoNopPR6z/wfISMwdVD3Po1mVJDLxMsmNVa6SboEb9Bdy7
-         i7FA==
-X-Gm-Message-State: AOJu0Yy/sTy/33rx2nJ6AgZjBPqllJh/b6gOlWjQNNeKH2B8IiNQlIgy
-	Lw846WMwbCuqTZz/5WFzuWgjDqiJHGw=
-X-Google-Smtp-Source: AGHT+IGuCrgdNKO1/9Fk3u0Zo/Reh2Y3zb5ohylW7eg4Swp9EAXsJiPsGMrXKVJst+F5prtcttfq9x81VV0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:124c:b0:687:926f:e62f with SMTP id
- u12-20020a056a00124c00b00687926fe62fmr1573pfi.2.1691109756391; Thu, 03 Aug
- 2023 17:42:36 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu,  3 Aug 2023 17:42:26 -0700
-In-Reply-To: <20230804004226.1984505-1-seanjc@google.com>
+        d=1e100.net; s=20221208; t=1691140010; x=1691744810;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mbDuRBO1V21kY8Ln+XMGj8tah/dM0ZngOK9DCSez6Ds=;
+        b=lulUWgoHbc1rHOUr0Su4ZTQh0jYd7SGi+mcZ+dgNEj0idxsSFCOQrCBFlqXFqUSZaH
+         JEetVly7fRj8s5jJl0ibto5Bl4rTvXZVNIe1M7Tj8W9sj+SCUwp68Nql8x+oa0ZcLeq1
+         m1w9x7dKT9CwUhB5/zWFzkzbAUP8YGsK8nCoBH54ex+qTHLCy9dmrYyQd/Jh/ctg83b4
+         1R7lSlczgSxbYACQQc48LvNWrgZ6sqUWMjBzDPyZNnQJglYmKYJhIr0S/qFfcadX/TQv
+         6Pg5ZezU3aiS5B00WLlw3h1Vm6P9WVdb/jnfgptj/ICBfznZlJOFohaP8ddXIdSnIDNP
+         JTdA==
+X-Gm-Message-State: AOJu0YznhxPJ6YCQZky92sBiQbJ8wBIIVfb7YT1BnR9aPOz1xMixyoWB
+	s3BIo4l8XwDon2JnO2+IlB4L9UKdgg==
+X-Google-Smtp-Source: AGHT+IEPvozwf23yi22U6OKa9kIgIghSUiAWRzblYbPC2JjxGfCAqNsiEHfVbqNraFFYkBMktGuoEKz+Fw==
+X-Received: from elver.muc.corp.google.com ([2a00:79e0:9c:201:2ebf:f3ea:4841:53b6])
+ (user=elver job=sendgmr) by 2002:adf:f587:0:b0:313:e68e:885d with SMTP id
+ f7-20020adff587000000b00313e68e885dmr6006wro.13.1691140009920; Fri, 04 Aug
+ 2023 02:06:49 -0700 (PDT)
+Date: Fri,  4 Aug 2023 11:02:56 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230804004226.1984505-1-seanjc@google.com>
-X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
-Message-ID: <20230804004226.1984505-5-seanjc@google.com>
-Subject: [PATCH 4/4] KVM: selftests: Add logic to detect if ioctl() failed
- because VM was killed
-From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Sean Christopherson <seanjc@google.com>, 
-	Michal Luczaj <mhal@rbox.co>
+X-Mailer: git-send-email 2.41.0.640.ga95def55d0-goog
+Message-ID: <20230804090621.400-1-elver@google.com>
+Subject: [PATCH v2 1/3] compiler_types: Introduce the Clang __preserve_most
+ function attribute
+From: Marco Elver <elver@google.com>
+To: elver@google.com, Andrew Morton <akpm@linux-foundation.org>, 
+	Kees Cook <keescook@chromium.org>
+Cc: Guenter Roeck <linux@roeck-us.net>, Peter Zijlstra <peterz@infradead.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Tom Rix <trix@redhat.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
+	Dmitry Vyukov <dvyukov@google.com>, Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com, 
+	linux-toolchains@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Add yet another macro to the VM/vCPU ioctl() framework to detect when an
-ioctl() failed because KVM killed/bugged the VM, i.e. when there was
-nothing wrong with the ioctl() itself.  If KVM kills a VM, e.g. by way of
-a failed KVM_BUG_ON(), all subsequent VM and vCPU ioctl()s will fail with
--EIO, which can be quite misleading and ultimately waste user/developer
-time.
+[1]: "On X86-64 and AArch64 targets, this attribute changes the calling
+convention of a function. The preserve_most calling convention attempts
+to make the code in the caller as unintrusive as possible. This
+convention behaves identically to the C calling convention on how
+arguments and return values are passed, but it uses a different set of
+caller/callee-saved registers. This alleviates the burden of saving and
+recovering a large register set before and after the call in the
+caller."
 
-Use KVM_CHECK_EXTENSION on KVM_CAP_USER_MEMORY to detect if the VM is
-dead and/or bug, as KVM doesn't provide a dedicated ioctl().  Using a
-heuristic is obviously less than ideal, but practically speaking the logic
-is bulletproof barring a KVM change, and any such change would arguably
-break userspace, e.g. if KVM returns something other than -EIO.
+[1] https://clang.llvm.org/docs/AttributeReference.html#preserve-most
 
-Without the detection, tearing down a bugged VM yields a cryptic failure
-when deleting memslots:
+Introduce the attribute to compiler_types.h as __preserve_most.
 
-  ==== Test Assertion Failure ====
-  lib/kvm_util.c:689: !ret
-  pid=45131 tid=45131 errno=5 - Input/output error
-     1	0x00000000004036c3: __vm_mem_region_delete at kvm_util.c:689
-     2	0x00000000004042f0: kvm_vm_free at kvm_util.c:724 (discriminator 12)
-     3	0x0000000000402929: race_sync_regs at sync_regs_test.c:193
-     4	0x0000000000401cab: main at sync_regs_test.c:334 (discriminator 6)
-     5	0x0000000000416f13: __libc_start_call_main at libc-start.o:?
-     6	0x000000000041855f: __libc_start_main_impl at ??:?
-     7	0x0000000000401d40: _start at ??:?
-  KVM_SET_USER_MEMORY_REGION failed, rc: -1 errno: 5 (Input/output error)
+Use of this attribute results in better code generation for calls to
+very rarely called functions, such as error-reporting functions, or
+rarely executed slow paths.
 
-Which morphs into a more pointed error message with the detection:
+Beware that the attribute conflicts with instrumentation calls inserted
+on function entry which do not use __preserve_most themselves. Notably,
+function tracing which assumes the normal C calling convention for the
+given architecture.  Where the attribute is supported, __preserve_most
+will imply notrace. It is recommended to restrict use of the attribute
+to functions that should or already disable tracing.
 
-  ==== Test Assertion Failure ====
-  lib/kvm_util.c:689: false
-  pid=80347 tid=80347 errno=5 - Input/output error
-     1	0x00000000004039ab: __vm_mem_region_delete at kvm_util.c:689 (discriminator 5)
-     2	0x0000000000404660: kvm_vm_free at kvm_util.c:724 (discriminator 12)
-     3	0x0000000000402ac9: race_sync_regs at sync_regs_test.c:193
-     4	0x0000000000401cb7: main at sync_regs_test.c:334 (discriminator 6)
-     5	0x0000000000418263: __libc_start_call_main at libc-start.o:?
-     6	0x00000000004198af: __libc_start_main_impl at ??:?
-     7	0x0000000000401d90: _start at ??:?
-  KVM killed/bugged the VM, check the kernel log for clues
-
-Suggested-by: Michal Luczaj <mhal@rbox.co>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Marco Elver <elver@google.com>
 ---
- .../selftests/kvm/include/kvm_util_base.h     | 34 ++++++++++++++++---
- 1 file changed, 30 insertions(+), 4 deletions(-)
+v2:
+* Imply notrace, to avoid any conflicts with tracing which is inserted
+  on function entry. See added comments.
+---
+ include/linux/compiler_types.h | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index b35b0bd23683..49ad681d2161 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -269,18 +269,44 @@ static __always_inline void static_assert_is_vm(struct kvm_vm *vm) { }
- 	kvm_do_ioctl((vm)->fd, cmd, arg);			\
- })
+diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
+index 547ea1ff806e..12c4540335b7 100644
+--- a/include/linux/compiler_types.h
++++ b/include/linux/compiler_types.h
+@@ -106,6 +106,33 @@ static inline void __chk_io_ptr(const volatile void __iomem *ptr) { }
+ #define __cold
+ #endif
  
 +/*
-+ * Assert that a VM or vCPU ioctl() succeeded, with extra magic to detect if
-+ * the ioctl() failed because KVM killed/bugged the VM.  To detect a dead VM,
-+ * probe KVM_CAP_USER_MEMORY, which (a) has been supported by KVM since before
-+ * selftests existed and (b) should never outright fail, i.e. is supposed to
-+ * return 0 or 1.  If KVM kills a VM, KVM returns -EIO for all ioctl()s for the
-+ * VM and its vCPUs, including KVM_CHECK_EXTENSION.
++ * On x86-64 and arm64 targets, __preserve_most changes the calling convention
++ * of a function to make the code in the caller as unintrusive as possible. This
++ * convention behaves identically to the C calling convention on how arguments
++ * and return values are passed, but uses a different set of caller- and callee-
++ * saved registers.
++ *
++ * The purpose is to alleviates the burden of saving and recovering a large
++ * register set before and after the call in the caller.  This is beneficial for
++ * rarely taken slow paths, such as error-reporting functions that may be called
++ * from hot paths.
++ *
++ * Note: This may conflict with instrumentation inserted on function entry which
++ * does not use __preserve_most or equivalent convention (if in assembly). Since
++ * function tracing assumes the normal C calling convention, where the attribute
++ * is supported, __preserve_most implies notrace.
++ *
++ * Optional: not supported by gcc.
++ *
++ * clang: https://clang.llvm.org/docs/AttributeReference.html#preserve-most
 + */
-+#define TEST_ASSERT_VM_VCPU_IOCTL(cond, name, ret, vm)					\
-+do {											\
-+	int __errno = errno;								\
-+											\
-+	static_assert_is_vm(vm);							\
-+											\
-+	if (cond)									\
-+		break;									\
-+											\
-+	if (errno == EIO &&								\
-+	    __vm_ioctl(vm, KVM_CHECK_EXTENSION, (void *)KVM_CAP_USER_MEMORY) < 0) {	\
-+		TEST_ASSERT(errno == EIO, "KVM killed the VM, should return -EIO");	\
-+		TEST_FAIL("KVM killed/bugged the VM, check the kernel log for clues");	\
-+	}										\
-+	errno = __errno;								\
-+	TEST_ASSERT(cond, __KVM_IOCTL_ERROR(name, ret));				\
-+} while (0)
++#if __has_attribute(__preserve_most__)
++# define __preserve_most notrace __attribute__((__preserve_most__))
++#else
++# define __preserve_most
++#endif
 +
- #define vm_ioctl(vm, cmd, arg)					\
- ({								\
- 	int ret = __vm_ioctl(vm, cmd, arg);			\
- 								\
--	TEST_ASSERT(!ret, __KVM_IOCTL_ERROR(#cmd, ret));	\
-+	TEST_ASSERT_VM_VCPU_IOCTL(!ret, #cmd, ret, vm);		\
- })
+ /* Builtins */
  
- #define vm_fd_ioctl(vm, cmd, arg)				\
- ({								\
- 	int fd = __vm_ioctl(vm, cmd, arg);			\
- 								\
--	TEST_ASSERT(fd >= 0, __KVM_IOCTL_ERROR(#cmd, fd));	\
-+	TEST_ASSERT_VM_VCPU_IOCTL(fd >= 0, #cmd, fd, vm);	\
- 	fd;							\
- })
- 
-@@ -296,14 +322,14 @@ static __always_inline void static_assert_is_vcpu(struct kvm_vcpu *vcpu) { }
- ({								\
- 	int ret = __vcpu_ioctl(vcpu, cmd, arg);			\
- 								\
--	TEST_ASSERT(!ret, __KVM_IOCTL_ERROR(#cmd, ret));	\
-+	TEST_ASSERT_VM_VCPU_IOCTL(!ret, #cmd, ret, (vcpu)->vm);	\
- })
- 
- #define vcpu_fd_ioctl(vcpu, cmd, arg)				\
- ({								\
- 	int fd = __vcpu_ioctl(vcpu, cmd, arg);			\
- 								\
--	TEST_ASSERT(fd >= 0, __KVM_IOCTL_ERROR(#cmd, fd));	\
-+	TEST_ASSERT_VM_VCPU_IOCTL(fd >= 0, #cmd, fd, (vcpu)->vm);\
- 	fd;							\
- })
- 
+ /*
 -- 
-2.41.0.585.gd2178a4bd4-goog
+2.41.0.640.ga95def55d0-goog
 
