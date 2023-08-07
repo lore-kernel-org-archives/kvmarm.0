@@ -1,115 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FE9ADDC3
-	for <kvmarm@lists.linux.dev>; Mon,  7 Aug 2023 13:00:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31608C433C7;
-	Mon,  7 Aug 2023 13:00:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691413252;
-	bh=VIywjKfIQjCBtdbDPXYlia2uvZPXVd/riPHCXoskQic=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rvvDU8srIyUZqSC/AZn5tENk73e6b7lcMD0bggv0OZy+kdMv1wzrdao14Ek53Iiyx
-	 IRdeP2i7dHvG05GYveqesPRozZBWvPkPzVgLAPzRKehV8FG4dTBFTlwNmq6W9aAmXd
-	 TOJ2NMgyqruEmA77u2ERYj64yfya3426m3ZWoUGeog++a6pvx66c8pChwY38vz523S
-	 ChaYFX40JW+pa2BW1vXmOmq45J6hBtdc88n5UAJdNuTfAiy2eP80JJIFmiP356Yg99
-	 NUF9YdSDWmi87A0gAAG2I/js0A4x5VYEjSB7V464D9htKF6RuocFXxnBcwe4+5gtev
-	 Hkzg/2TxLfPZA==
-Date: Mon, 7 Aug 2023 14:00:42 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v3 21/36] arm64/mm: Implement map_shadow_stack()
-Message-ID: <3a077ff3-8627-4337-9b4a-6a8828eda0e7@sirena.org.uk>
-References: <20230731-arm64-gcs-v3-0-cddf9f980d98@kernel.org>
- <20230731-arm64-gcs-v3-21-cddf9f980d98@kernel.org>
- <ZNDFioFIM34VcsuV@arm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEAE1101FE
+	for <kvmarm@lists.linux.dev>; Mon,  7 Aug 2023 13:07:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691413626;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wTw5UGHZz4e2SdP2OePYtf5FEiTOr08NgMVHrTIjIdY=;
+	b=i+YSWZcQBfhBd4CvvrH4LD7YfWtDSORKDQOfndvnuDxSNNMKwis5+IQD2M0eNxRIjzfxyk
+	g1KupK6F7mque85VW3/BViuNq51hmu4gNqAfarU2dwvVjOjLtwk5Q6tt0gk9kfe0YdqvsK
+	/Vx5QlfnCsULFpzouzC96LbUvthsfTg=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-684-8FRjDLUHNAWmNwU-04hwKw-1; Mon, 07 Aug 2023 09:07:01 -0400
+X-MC-Unique: 8FRjDLUHNAWmNwU-04hwKw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6B69B3C108CB;
+	Mon,  7 Aug 2023 13:07:00 +0000 (UTC)
+Received: from tucnak.zalov.cz (unknown [10.45.224.18])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A81C2026D4B;
+	Mon,  7 Aug 2023 13:06:59 +0000 (UTC)
+Received: from tucnak.zalov.cz (localhost [127.0.0.1])
+	by tucnak.zalov.cz (8.17.1/8.17.1) with ESMTPS id 377D6th33645769
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 7 Aug 2023 15:06:55 +0200
+Received: (from jakub@localhost)
+	by tucnak.zalov.cz (8.17.1/8.17.1/Submit) id 377D6pvb3645768;
+	Mon, 7 Aug 2023 15:06:51 +0200
+Date: Mon, 7 Aug 2023 15:06:51 +0200
+From: Jakub Jelinek <jakub@redhat.com>
+To: Florian Weimer <fweimer@redhat.com>
+Cc: Marco Elver <elver@google.com>, Andrew Morton <akpm@linux-foundation.org>,
+        Kees Cook <keescook@chromium.org>, Guenter Roeck <linux@roeck-us.net>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>, Tom Rix <trix@redhat.com>,
+        Miguel Ojeda <ojeda@kernel.org>, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+        llvm@lists.linux.dev, Dmitry Vyukov <dvyukov@google.com>,
+        Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com,
+        linux-toolchains@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] compiler_types: Introduce the Clang
+ __preserve_most function attribute
+Message-ID: <ZNDsa3AyR6EvIDeq@tucnak>
+Reply-To: Jakub Jelinek <jakub@redhat.com>
+References: <20230804090621.400-1-elver@google.com>
+ <87il9rgjvw.fsf@oldenburg.str.redhat.com>
+ <CANpmjNN4h2+i3LUG__GHha849PZ3jK=mBoFQWpSz4jffXB4wrw@mail.gmail.com>
+ <ZNDlrRrUS2AWTCiw@tucnak>
+ <87h6pbf2f8.fsf@oldenburg.str.redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="zuyh0JKERt9z219h"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZNDFioFIM34VcsuV@arm.com>
-X-Cookie: idleness, n.:
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87h6pbf2f8.fsf@oldenburg.str.redhat.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 
+On Mon, Aug 07, 2023 at 02:43:39PM +0200, Florian Weimer wrote:
+> > On Mon, Aug 07, 2023 at 02:24:26PM +0200, Marco Elver wrote:
+> >> > | If the arguments are passed in callee-saved registers, then they will
+> >> > | be preserved by the callee across the call. This doesn’t apply for
+> >> > | values returned in callee-saved registers.
+> >> > |
+> >> > |  ·  On X86-64 the callee preserves all general purpose registers, except
+> >> > |     for R11. R11 can be used as a scratch register. Floating-point
+> >> > |     registers (XMMs/YMMs) are not preserved and need to be saved by the
+> >> > |     caller.
+> >> > |
+> >> > |  ·  On AArch64 the callee preserve all general purpose registers, except
+> >> > |     X0-X8 and X16-X18.
+> >> >
+> >> > Ideally, this would be documented in the respective psABI supplement.
+> >> > I filled in some gaps and filed:
+> >> >
+> >> >   Document the ABI for __preserve_most__ function calls
+> >> >   <https://gitlab.com/x86-psABIs/x86-64-ABI/-/merge_requests/45>
+> >> 
+> >> Good idea. I had already created
+> >> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=110899, and we need
+> >> better spec to proceed for GCC anyway.
+> >
+> > "Registers used for passing arguments
+> > are preserved by the called function, but registers used for
+> > returning results are not."
+> >
+> > You mean just GPRs or also vector SSE or MMX registers?
+> 
+> I think this is pretty clear for x86-64:
+> 
+> | Floating-point registers (XMMs/YMMs) are not preserved and need to be
+> | saved by the caller.
 
---zuyh0JKERt9z219h
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+The above wording conflicts with that, so it should be clarified.
 
-On Mon, Aug 07, 2023 at 11:20:58AM +0100, Szabolcs Nagy wrote:
-> The 07/31/2023 14:43, Mark Brown wrote:
-> > +SYSCALL_DEFINE3(map_shadow_stack, unsigned long, addr, unsigned long, size, unsigned int, flags)
-> > +{
-> > +	unsigned long alloc_size;
-> > +	unsigned long __user *cap_ptr;
-> > +	unsigned long cap_val;
-> > +	int ret;
-> > +
-> > +	if (!system_supports_gcs())
-> > +		return -EOPNOTSUPP;
-> > +
-> > +	if (flags)
-> > +		return -EINVAL;
-> > +
-> > +	if (addr % 16)
-> > +		return -EINVAL;
+	Jakub
 
-> mmap addr must be page aligned (and there is no align req on size).
-
-> i'd expect similar api here.
-
-That's not what the manual page or a quick check of the code suggest
-that mmap() does, they say that the kernel just takes it as a hint and
-chooses a nearby page boundary, though I didn't test.  I'm not sure why
-I have that alignment check at all TBH, and to the extent it's needed I
-could just be 8 - this level of code doesn't really care.
-
-> > +	if (size == 16 || size % 16)
-> > +		return -EINVAL;
-
-> why %16 and not %8 ?
-
-I don't think that's needed any more - there was some stuff in an
-earlier version of the code but no longer.
-
---zuyh0JKERt9z219h
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmTQ6voACgkQJNaLcl1U
-h9ADtwf9Hi+3Tmw6lo4OcpVr7n1Zx4xMLurjUWXhlQulr3E2yaNH/LoJepX0V/Hy
-cYyeMDXfa9itHkAmxF+PWpfByFW2ak1NvN+VB1ywgbz4kJFiAK11hsjQzWuiJw+s
-e1it4mLwr1FXHqL0ewxN4pWvkFHmoyVTtKmtIlYrR4K9Xq8KEWrEDi6x5LHrI6tk
-HXZ6HBESzDzzrctdnfG91f3YdpxLKuvuE1l+HEVfKlh5EqEHtTxzLT1BCDHy4ebI
-URGjT1qEAOxoNDbYkJaaPcVnDkFfcXuSC07xv57tktihM+MnQCtZd0b+IH9lf6Ry
-E10gfnUnsEkptjykMZVkmRiHM0iWvQ==
-=jbyG
------END PGP SIGNATURE-----
-
---zuyh0JKERt9z219h--
