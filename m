@@ -1,174 +1,111 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F0B9C8E2
-	for <kvmarm@lists.linux.dev>; Mon,  7 Aug 2023 12:40:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA53EC433C7;
-	Mon,  7 Aug 2023 12:40:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691412044;
-	bh=RsAY8F/KSwqORT8NHwkg0CSFj0ZY5rAKG23RDmdDLzY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jRd9+oTOceOVTrrj62l+cpv5OGndVY4+EeBfYYSdMf9yzbc/uK8Q/roDA+nktJT99
-	 dFwkYbhHozVgsGwjuWpz0kG70pKRv6zo4kYDNpuHOB+ZSRdEdr99jayUz0pcKXWrVq
-	 MtiGqtNAN/pxxqh0+ya7/Wcv6uSZIaLgboracqBonKUTOYbsQZA/6VaxH0kqUHTAbm
-	 OvnVvErTUwOg8kPIr0yL6kLrhfwKRN9hCBXPvWfRg8eDIzn71f3I8WvwxiQR+meLT6
-	 f1OV1Dy7ivYWD3+aM8lj+cHomUmj2jqghsvcM5mQsazmYc63H5gsYDsb0/EFpS1uvD
-	 /Z+iiVREW9bYQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qSzXO-002pS2-5r;
-	Mon, 07 Aug 2023 13:40:42 +0100
-Date: Mon, 07 Aug 2023 13:40:34 +0100
-Message-ID: <868ran58l9.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Miguel Luis <miguel.luis@oracle.com>
-Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	Catalin Marinas
-	<catalin.marinas@arm.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Mark Brown
-	<broonie@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Will Deacon
-	<will@kernel.org>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andre
- Przywara <andre.przywara@arm.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Darren Hart
-	<darren@os.amperecomputing.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K
- Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 06/26] arm64: Add debug registers affected by HDFGxTR_EL2
-In-Reply-To: <C4009786-DAF1-4BB7-8DF1-B249205B7F9A@oracle.com>
-References: <20230728082952.959212-1-maz@kernel.org>
-	<20230728082952.959212-7-maz@kernel.org>
-	<61B845D3-A42B-451F-B74D-51B4A1FD28C6@oracle.com>
-	<86leet5o20.wl-maz@kernel.org>
-	<C4009786-DAF1-4BB7-8DF1-B249205B7F9A@oracle.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A220ED52D
+	for <kvmarm@lists.linux.dev>; Mon,  7 Aug 2023 12:43:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691412232;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pgN6ITNOX4XAghEqnE7rc109x2dPHO2XXLtjfGMGEBw=;
+	b=LSz023+IQo4sXMIH2KlDyORQsIuvRahWymjImd8r3DhPfmUb8Tih+r8bV4f1hh2wuLze3t
+	gWeNgMx2zr/3Nz/Ep4TGFcGpwMPnBKUqbPSFvtiE8iZsDMqmY7GYsa3kT0cZGjRvqJrMoB
+	dHgcSVw7sMoXZesJMaH+qLycQS5j/KU=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-558-VkhQ3GWqNk66vZeVUGT2Qw-1; Mon, 07 Aug 2023 08:43:49 -0400
+X-MC-Unique: VkhQ3GWqNk66vZeVUGT2Qw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BD5F6381AE49;
+	Mon,  7 Aug 2023 12:43:43 +0000 (UTC)
+Received: from oldenburg.str.redhat.com (unknown [10.2.16.12])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6342E40C2076;
+	Mon,  7 Aug 2023 12:43:40 +0000 (UTC)
+From: Florian Weimer <fweimer@redhat.com>
+To: Jakub Jelinek <jakub@redhat.com>
+Cc: Marco Elver <elver@google.com>,  Andrew Morton
+ <akpm@linux-foundation.org>,  Kees Cook <keescook@chromium.org>,  Guenter
+ Roeck <linux@roeck-us.net>,  Peter Zijlstra <peterz@infradead.org>,  Mark
+ Rutland <mark.rutland@arm.com>,  Steven Rostedt <rostedt@goodmis.org>,
+  Marc Zyngier <maz@kernel.org>,  Oliver Upton <oliver.upton@linux.dev>,
+  James Morse <james.morse@arm.com>,  Suzuki K Poulose
+ <suzuki.poulose@arm.com>,  Zenghui Yu <yuzenghui@huawei.com>,  Catalin
+ Marinas <catalin.marinas@arm.com>,  Will Deacon <will@kernel.org>,  Nathan
+ Chancellor <nathan@kernel.org>,  Nick Desaulniers
+ <ndesaulniers@google.com>,  Tom Rix <trix@redhat.com>,  Miguel Ojeda
+ <ojeda@kernel.org>,  linux-arm-kernel@lists.infradead.org,
+  kvmarm@lists.linux.dev,  linux-kernel@vger.kernel.org,
+  llvm@lists.linux.dev,  Dmitry Vyukov <dvyukov@google.com>,  Alexander
+ Potapenko <glider@google.com>,  kasan-dev@googlegroups.com,
+  linux-toolchains@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] compiler_types: Introduce the Clang
+ __preserve_most function attribute
+References: <20230804090621.400-1-elver@google.com>
+	<87il9rgjvw.fsf@oldenburg.str.redhat.com>
+	<CANpmjNN4h2+i3LUG__GHha849PZ3jK=mBoFQWpSz4jffXB4wrw@mail.gmail.com>
+	<ZNDlrRrUS2AWTCiw@tucnak>
+Date: Mon, 07 Aug 2023 14:43:39 +0200
+In-Reply-To: <ZNDlrRrUS2AWTCiw@tucnak> (Jakub Jelinek's message of "Mon, 7 Aug
+	2023 14:38:05 +0200")
+Message-ID: <87h6pbf2f8.fsf@oldenburg.str.redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 
-On Thu, 03 Aug 2023 01:00:52 +0100,
-Miguel Luis <miguel.luis@oracle.com> wrote:
->=20
-> Hi Marc,
->=20
-> > On 2 Aug 2023, at 17:52, Marc Zyngier <maz@kernel.org> wrote:
-> >=20
-> > On Mon, 31 Jul 2023 17:41:41 +0100,
-> > Miguel Luis <miguel.luis@oracle.com> wrote:
-> >>=20
-> >> Hi Marc,
-> >>=20
-> >> A few comments on this one, please see below.
-> >>=20
-> >>> On 28 Jul 2023, at 08:29, Marc Zyngier <maz@kernel.org> wrote:
-> >>>=20
-> >>> The HDFGxTR_EL2 registers trap a (huge) set of debug and trace
-> >>> related registers. Add their encodings (and only that, because
-> >>> we really don't care about what these registers actually do at
-> >>> this stage).
-> >>>=20
-> >>> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> >>> ---
-> >>> arch/arm64/include/asm/sysreg.h | 78 +++++++++++++++++++++++++++++++++
-> >>> 1 file changed, 78 insertions(+)
-> >>>=20
-> >>> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm=
-/sysreg.h
-> >>> index 76289339b43b..9dfd127be55a 100644
-> >>> --- a/arch/arm64/include/asm/sysreg.h
-> >>> +++ b/arch/arm64/include/asm/sysreg.h
-> >>> @@ -194,6 +194,84 @@
-> >>> #define SYS_DBGDTRTX_EL0 sys_reg(2, 3, 0, 5, 0)
-> >>> #define SYS_DBGVCR32_EL2 sys_reg(2, 4, 0, 7, 0)
-> >>>=20
-> >>> +#define SYS_BRBINF_EL1(n) sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2=
-) | 0))
-> >>> +#define SYS_BRBINFINJ_EL1 sys_reg(2, 1, 9, 1, 0)
-> >>> +#define SYS_BRBSRC_EL1(n) sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2=
-) | 1))
-> >>> +#define SYS_BRBSRCINJ_EL1 sys_reg(2, 1, 9, 1, 1)
-> >>> +#define SYS_BRBTGT_EL1(n) sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2=
-) | 2))
-> >>> +#define SYS_BRBTGTINJ_EL1 sys_reg(2, 1, 9, 1, 2)
-> >>> +#define SYS_BRBTS_EL1 sys_reg(2, 1, 9, 0, 2)
-> >>> +
-> >>> +#define SYS_BRBCR_EL1 sys_reg(2, 1, 9, 0, 0)
-> >>> +#define SYS_BRBFCR_EL1 sys_reg(2, 1, 9, 0, 1)
-> >>> +#define SYS_BRBIDR0_EL1 sys_reg(2, 1, 9, 2, 0)
-> >>> +
-> >>> +#define SYS_TRCITECR_EL1 sys_reg(3, 0, 1, 2, 3)
-> >>> +#define SYS_TRCITECR_EL1 sys_reg(3, 0, 1, 2, 3)
-> >>=20
-> >> SYS_TRCITECR_EL1 shows up twice.
-> >=20
-> > Ah, nice one. Too many registers.
-> >=20
-> >>=20
-> >>> +#define SYS_TRCACATR(m) sys_reg(2, 1, 2, ((m & 7) << 1), (2 | (m >> =
-3)))
-> >>=20
-> >> Besides m=E2=80=99s restrictions it could be sanitised in op2 to consi=
-der only bit m[3].
-> >> Suggestion for op2: (2 | ((m & 8) >> 3)))
-> >=20
-> > It is fully expected that 'm' will be in the 0-15 range, as per the
-> > architecture (D19.4.8), and the tables only use that exact range.
-> >=20
-> > Do you see an actual bug, or is this defensive programming?
-> >=20
->=20
-> I was seeing a problem when m[5]=3D1 then Op2 of 0b01:m[3] isn=E2=80=99t =
-guaranteed
-> anymore overridden with 0b11:m[3].
+* Jakub Jelinek:
 
-But that'd be wrong anyway. Now, we'd have an encoding that possibly
-aliases to something else, and we don't know about it.
+> On Mon, Aug 07, 2023 at 02:24:26PM +0200, Marco Elver wrote:
+>> > | If the arguments are passed in callee-saved registers, then they will
+>> > | be preserved by the callee across the call. This doesn=E2=80=99t app=
+ly for
+>> > | values returned in callee-saved registers.
+>> > |
+>> > |  =C2=B7  On X86-64 the callee preserves all general purpose register=
+s, except
+>> > |     for R11. R11 can be used as a scratch register. Floating-point
+>> > |     registers (XMMs/YMMs) are not preserved and need to be saved by =
+the
+>> > |     caller.
+>> > |
+>> > |  =C2=B7  On AArch64 the callee preserve all general purpose register=
+s, except
+>> > |     X0-X8 and X16-X18.
+>> >
+>> > Ideally, this would be documented in the respective psABI supplement.
+>> > I filled in some gaps and filed:
+>> >
+>> >   Document the ABI for __preserve_most__ function calls
+>> >   <https://gitlab.com/x86-psABIs/x86-64-ABI/-/merge_requests/45>
+>>=20
+>> Good idea. I had already created
+>> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D110899, and we need
+>> better spec to proceed for GCC anyway.
+>
+> "Registers used for passing arguments
+> are preserved by the called function, but registers used for
+> returning results are not."
+>
+> You mean just GPRs or also vector SSE or MMX registers?
 
-> Clearly =E2=80=98m=E2=80=99 would be outside the range but not messing wi=
-th Op2 fixed bits 0b01.
-> Not a problem for patch 21 though.
+I think this is pretty clear for x86-64:
 
-All these macros have as the basis for their use that you use *valid*
-input.
+| Floating-point registers (XMMs/YMMs) are not preserved and need to be
+| saved by the caller.
 
-> Due to the uncertainty if this can bite later, hence the suggestion and a=
-lso
-> open to advices.
-
-If you really want some defensive programming on that front, then you
-should make sure we detect the issue at compile time, rather than
-silently changing the encoding.
+The issue is more with future GPR extensions like APX.
 
 Thanks,
+Florian
 
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
