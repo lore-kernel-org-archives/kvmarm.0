@@ -1,344 +1,172 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from EUR01-DB5-obe.outbound.protection.outlook.com (mail-db5eur01on2053.outbound.protection.outlook.com [40.107.15.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6777C8DF
-	for <kvmarm@lists.linux.dev>; Mon,  7 Aug 2023 10:15:40 +0000 (UTC)
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 376NA0QH026780;
-	Mon, 7 Aug 2023 10:15:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version; s=corp-2023-03-30;
- bh=yC6rLj84Npd7RQWP0u5s+dnIP33HhUtW39cEfm93L5k=;
- b=SIzRBK1SA6p1uscuXEoGJrvCUJUTB7yuXvrV8+wNlMT5X7KGfx0TFdvV5rQjoaFnDc+y
- IGSJqEtVtv0gY1QmhwlvS/o2cxojiOfZaIwMoRYe9jLbVDdxRQNT04guy6jzp/R8+bEd
- qcFRUJY9HZmSneSRvOfqqfr1l0UKoC0kmbxknG3zmxUfw3T1vk3IRAsLR0s1L3CC3VMD
- RFf3alTQIMlR3G8Uo2mILWyJLkIRePVI5z38vF8EfLnF/uvMNe01IC+RNtLAUuCJwQxD
- N+yK6+4tatI1Agg6lbRokZaadi79xgGj9+eqLDQdP4XOGV3H5gtNrYS/ewD4L/BDXIiH HA== 
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3s9d12adqv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 07 Aug 2023 10:15:09 +0000
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 377A3h2R031197;
-	Mon, 7 Aug 2023 10:15:08 GMT
-Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2101.outbound.protection.outlook.com [104.47.58.101])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3s9cvab7q1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 07 Aug 2023 10:15:08 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21009C8DF
+	for <kvmarm@lists.linux.dev>; Mon,  7 Aug 2023 10:21:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Mrs6y9Ptah9WPIEcrIb0ZeASDoxywYFtpPwtKfqhMWE=;
+ b=oQyNepHlSzcZkHsVl1gWTKObuR6WipAgDDDyaUwJjBOR5TvLMEJzz0NHus7CsbcjMobDo62Wi1+X58GzYj/qVIek0EQKSgLSIQxi5D3pS8Gtl997RYuBnTyyNQ/dBPybVU/12SuNTphNaWHyc3/6RB34oJwKGVqb8K4TtEJDAU8=
+Received: from DU2PR04CA0315.eurprd04.prod.outlook.com (2603:10a6:10:2b5::20)
+ by DB9PR08MB8721.eurprd08.prod.outlook.com (2603:10a6:10:3d3::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.26; Mon, 7 Aug
+ 2023 10:21:26 +0000
+Received: from DBAEUR03FT008.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:10:2b5:cafe::68) by DU2PR04CA0315.outlook.office365.com
+ (2603:10a6:10:2b5::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27 via Frontend
+ Transport; Mon, 7 Aug 2023 10:21:25 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
+ smtp.mailfrom=arm.com; dkim=pass (signature was verified)
+ header.d=armh.onmicrosoft.com;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
+ client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
+ pr=C
+Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
+ DBAEUR03FT008.mail.protection.outlook.com (100.127.142.107) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6678.16 via Frontend Transport; Mon, 7 Aug 2023 10:21:25 +0000
+Received: ("Tessian outbound f9124736ff4f:v145"); Mon, 07 Aug 2023 10:21:25 +0000
+X-CheckRecipientChecked: true
+X-CR-MTA-CID: d6abb263343ff9e9
+X-CR-MTA-TID: 64aa7808
+Received: from 7876b55f53d8.2
+	by 64aa7808-outbound-1.mta.getcheckrecipient.com id 9065A3D3-B4AC-44BB-8CEB-3887A004694F.1;
+	Mon, 07 Aug 2023 10:21:15 +0000
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com
+    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 7876b55f53d8.2
+    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
+    Mon, 07 Aug 2023 10:21:15 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Fsc1fnfX+g6i6YskY57Jtd0CptvU/33ESKVa77b3l4lpkh00KomQRMh01oH66+cWd6zlITC10R2X2OA/w06KP4NhMO1mgtlEAREuhriYD45wRysWlr0Da4lc/y2AAzTA5fdWAC51knNwNuV8H8foHC2/c06R/Er8KMCFj4PDlQEiM2RVUuUCu7k8tAGDSa/N6lx2cOq/u7ejUSewM8bMNFJ78i4Um+pog2y0mj2DtszLyHUVfguWWMCJxQROURBduPTHD66pqmqVqH8NhxIwKChBR9Qkwk68IG8nmOJgnHefAS/4Dvg0bwRSIsVKW3TGa/DljczkzJ0p0hVjA1R8jQ==
+ b=WDVtEsOp0ZspyDEtXDuyt2lDuf5M3rqll2Hidi63YbB2TTEh4Vb/wasdd4uwIuPYy2q//Zf5O2L8DksZmVVpaN3VYLpZ5y54Z6Z4tXVZWReNB3xqmVnj0WVmW5Pw0Ubd5/o8DM+V9k7DFXiucOx9FpiSJTvjakD7vWRpUAMKMwkuaKJXRJjuj6T9OzKHZKy4h47bRrmOaykvGUCcI36hDW7A9QnjAPzzNXvF26QG/J+JI1zoXaWVTnkO7mEaKN/4NX2E5JfewoF94wtTtiIGgm3YYZTtuYCDWTo1+Hb+xYdCGcFKNJYVRJt0ZF6leXny8pNevr0kVY6BWAKXbukVyg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yC6rLj84Npd7RQWP0u5s+dnIP33HhUtW39cEfm93L5k=;
- b=VEwi2Dp7CJbDQq2Vel1CJ0winDaVM/e3Y8rDJuWcn07DOy8CxWqwRmMZHKZugFrHoFlxxpXbRpfBKWoKqry7qF6Z6RKhSEgDH23ouOL6s/aGk6cJtuDOGxKYrnayHPyIJxoXaiKkyvJ+Mp6Jtsc56Unh5VHNu38bonKTwputOohluFUVKcgvTfRlYaDZXD0Mcy0FT7hwHCYuBgZOkDq/1yfDadeB1UogeTsyz1RWrUltxYu7gubZe/6X7f9AZWRAEtvkzpQSy5psRQvFWNzsuTcmuj0hvd0wJAroXF22Tc8Jzj0ulV8u7RjU6UVwOe/ROOXimImMhpRwYR70nk1dug==
+ bh=Mrs6y9Ptah9WPIEcrIb0ZeASDoxywYFtpPwtKfqhMWE=;
+ b=cMABMlLUSQEgcDRC48dwh12XE/QqL/SgrUWPWlNMDnISJYswVit6whfTZo4umx96pGT1DLzJxydfn9MrgyqmtXjNIm38FSbcQ86VNuxYuLHO2cXumpMRTO9tsbeiRE7DVFiE0AwkpF79HAeLS+vY846I2qltkFbwiX+OK8DMdNsTYw2/VCfjGzOp2I9NuHaYI+kHClPUtqmwqax9dgeFXGXahuBCFtCqvGnlK2kYbZbSWnJmedvXcvRWCXLmUwbXBDs/F3B41JLf1Q58FZoMyJfT8pQTu7pMQPaoSwkIavJOD4Dzht3PMVWC+/F1LyifYl9c3Nd0aKluTzOsZuKphw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yC6rLj84Npd7RQWP0u5s+dnIP33HhUtW39cEfm93L5k=;
- b=f1H+lPWxgZyWEIcXACAI8r5mlMqMkH1T7MBA67anPX+iSRtjfnsymIKBHamvgwUgjUxj05mfh4VZbsuaIo9wS1L9asmLpdfUcmQzBMv5KDtmofaSeXbNxrI/VemxFKGiQ0+CVUKXI5+MNiBuxsZP69CBWaUqQJFXS2o5xqe1HLo=
-Received: from PH0PR10MB5433.namprd10.prod.outlook.com (2603:10b6:510:e0::9)
- by BLAPR10MB5219.namprd10.prod.outlook.com (2603:10b6:208:321::22) with
+ bh=Mrs6y9Ptah9WPIEcrIb0ZeASDoxywYFtpPwtKfqhMWE=;
+ b=oQyNepHlSzcZkHsVl1gWTKObuR6WipAgDDDyaUwJjBOR5TvLMEJzz0NHus7CsbcjMobDo62Wi1+X58GzYj/qVIek0EQKSgLSIQxi5D3pS8Gtl997RYuBnTyyNQ/dBPybVU/12SuNTphNaWHyc3/6RB34oJwKGVqb8K4TtEJDAU8=
+Authentication-Results-Original: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+Received: from DB9PR08MB7179.eurprd08.prod.outlook.com (2603:10a6:10:2cc::19)
+ by AS8PR08MB10151.eurprd08.prod.outlook.com (2603:10a6:20b:628::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27; Mon, 7 Aug
- 2023 10:15:05 +0000
-Received: from PH0PR10MB5433.namprd10.prod.outlook.com
- ([fe80::76c:cb31:2005:d10c]) by PH0PR10MB5433.namprd10.prod.outlook.com
- ([fe80::76c:cb31:2005:d10c%5]) with mapi id 15.20.6652.026; Mon, 7 Aug 2023
- 10:15:05 +0000
-From: Miguel Luis <miguel.luis@oracle.com>
-To: Marc Zyngier <maz@kernel.org>
-CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-        "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-        Catalin Marinas
-	<catalin.marinas@arm.com>,
-        Eric Auger <eric.auger@redhat.com>, Mark Brown
-	<broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>, Will Deacon
-	<will@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre
- Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart
-	<darren@os.amperecomputing.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K
- Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 13/26] KVM: arm64: Restructure FGT register switching
-Thread-Topic: [PATCH v2 13/26] KVM: arm64: Restructure FGT register switching
-Thread-Index: AQHZwTAl2LrSXDadl0aOaoTrk5jKEK/erZ6A
-Date: Mon, 7 Aug 2023 10:15:05 +0000
-Message-ID: <02048256-C2AC-4B51-82D7-CA490232CBF3@oracle.com>
-References: <20230728082952.959212-1-maz@kernel.org>
- <20230728082952.959212-14-maz@kernel.org>
-In-Reply-To: <20230728082952.959212-14-maz@kernel.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR10MB5433:EE_|BLAPR10MB5219:EE_
-x-ms-office365-filtering-correlation-id: 844d2615-12cf-48c6-b5c0-08db972f2bd0
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 
- rHBoGIxMHbyqp/A7HTftzYsTf8JOt+Xj2MhbHr4tjOJLXxHWPTjooPdnBKOtQoKR7Y3ou/qd9p91f6SDRYLcONhzLghPj/LFbDmzcwgyG6XmfnrsIK1f8rBXwf2WncpmI4w9LiRi9o201Nm/Y+2kmJ2L2sfdCdm7ppRqVKwhmZT06HV1uvivQ9bqn920DeqmhElJ3u9bPuOhlyE3QEIh8kjfj+ex3W0L1WAN6xf4tAQ8yVw3cCBp5V5Pu7W7Zt2y/YZhWJ2j5izyHUYy8GxIEHz1fjcdJy3uNnnA6R8VQDeMMVdGGi3qD7Os3T/ytOZgL9WnAV4NDhF8QNAGtGH1cPQk+FFgeNFxCNzt9avq4Os4+B9IAunWTXgRZvcMgvMxZVkDgln4McfV/7Y00pREaTfViijaoL4pUajwqbPs5aFI9908tFAffUxg6dCRwRMP40OQ0bl3g72W392I4TxVnJm7GSbGaEXvOcaqncdEytXV+Oq/m2Iq3gq9Y9wjZMF1UyofaM59QBq1LX6hHvMiN4ZvESYD7KjaRvc0WIsT82LZwxS/KKBpFEHi1x0NKu/6oUq11Xn3Cze/1TqpFGLqZEXbMYSEYJxi/qqqHBGIvLdXgB2sVEpSIpCkxDmJvpcN61y2tys5wk13gKStdSMMyw==
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB5433.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(376002)(39860400002)(346002)(396003)(366004)(451199021)(1800799003)(186006)(71200400001)(2616005)(6486002)(6512007)(86362001)(478600001)(33656002)(122000001)(26005)(36756003)(6506007)(53546011)(41300700001)(316002)(5660300002)(7416002)(44832011)(8676002)(8936002)(38070700005)(54906003)(19627235002)(4326008)(38100700002)(6916009)(2906002)(66446008)(91956017)(64756008)(76116006)(66556008)(66476007)(66946007)(83380400001)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?us-ascii?Q?PVmdl9cRZ087o+N8+Fp7juxlMhePWlrdQzWT5w4DEvD22li46Qmhgvnu0QLU?=
- =?us-ascii?Q?MOezpvYMmVJfHOJSjngmiulhGJOpH1Jryl1OYNfPxpWQgejivHCFzjsU2jzX?=
- =?us-ascii?Q?maeVmG/TILKmRJMbQBfUJpN+2EGFr7QA8OtigZfqJYLOTu07QaCiRcTxPRMB?=
- =?us-ascii?Q?tINMrqZ4nkHoQzc35e/dViPOkRQnDGyhcOKZph2yjAkZsxzddbnznGbXQg38?=
- =?us-ascii?Q?6/8ldFRQ/lMT7L+BXX2zLmS5bokoZjWX02kyiyO+b/Q+B9iNtnd6M+alWRht?=
- =?us-ascii?Q?HXkbekwf0SYacEXqUOh6iJ9LSb5Ui1qF5f4fEcsSE+5u0/i4XOr/CKA9QPFh?=
- =?us-ascii?Q?kRSpWWkztETMEKLAL0CVJAfFW1rdOQv9+HP57el0x41zHAtex4aY3KyhBgmb?=
- =?us-ascii?Q?u6ZbB+IW2wnnkN+Yed+qFBvJnT450+8SMfvnMuWmXRJvIbIiVjwGPq8l2opL?=
- =?us-ascii?Q?zu07ETTNWqtxkYCg7qElXtc99cnZMdzmnCDwHNm6kMSrqjNIpOrKHhTSOiAe?=
- =?us-ascii?Q?2YWKFaeaEyEVBDn/mXhzFM80JmpHD0vi63a8YkWmeTMg487sy053iIdY/v3W?=
- =?us-ascii?Q?kxVljTKRn4TTQSedHbEJgmoMTgubz223k4Ow1yMbyPz8jiWbksV/tGSwneKs?=
- =?us-ascii?Q?sVaRAEmDFPCL0b99wsXizCcL7GL2KO8kP8/wpA6O15FVoM0ZSw8kVG7yAzsa?=
- =?us-ascii?Q?im8lxWeQ/8M8OHEbe2KAcc7zaWo3vInx0TAnzFhMAY2IhKxy1sYa+JPYnpcM?=
- =?us-ascii?Q?hvjXvpLpN76B8+oXo6kr0XyUYEHmDcxCc/8O7Ehj5NjAvIyrOqxdFwLuekIw?=
- =?us-ascii?Q?F7ooCKCRTt+Lgxr8BjTXpXWYi/MBF0IpNWP9HBq7vk+DfY9AMs0BbbBmBq4L?=
- =?us-ascii?Q?AYHcx0Ru1wyPf1bXs9x/5GY39+d3otjIRScEmlN6Ijqg0RsrzhyRSO043Fdg?=
- =?us-ascii?Q?cys+mHQQcP94xFPQEfCDBDqo2p7I9k8OKQsvDFEj1so/uZ99x3wwtNS7STT1?=
- =?us-ascii?Q?q3teVsYYaiMaYebiScfhEmES1u2GyUtROxL7PYhfiuSJQY82vs2Xt0tdO6tR?=
- =?us-ascii?Q?1HTr2tfoVf2kZ08Wj4Hh9PfY93W/1kWI2YxA388cgawOOJok6tHlscCXecgc?=
- =?us-ascii?Q?RfPHYBxmUwUpB7FQ9NSQe5bxRYNnE8Mu77jHW6oElaYO3jl0VJR3hB8Rpuq8?=
- =?us-ascii?Q?mjbqVAqM7H1PtoR+mV5WF625pxyGH6YL7axhIneUeF06or8w3G27Ta+/6aZP?=
- =?us-ascii?Q?72nG8mh/b6Co+MrEwtKk0W7S9rkrCntTLihTSilS44xdjy36Zh2zpoXmq0mu?=
- =?us-ascii?Q?pLUmIVVLNhGhnyeLA6VRJdkb3yuxrpBbj8F4sEsDPqmoVLROFPwlNmkpVF06?=
- =?us-ascii?Q?XahjT0Fd5J76BCR2AqpGk2ekVohkofz/TZ5D0ehcPf29QnFZ2DZl3p53X8WS?=
- =?us-ascii?Q?EWKdIZKxupyQeqaZ8F+UY9gtfHD0zjojsqLwUfTYf9OJMnwdupRQcbaQ1GPJ?=
- =?us-ascii?Q?+GOnyN8fcgJdqhOBYNncDBGELprQTZuhqrt5Jk+YU2iyORsvH3ZW0QoTaczT?=
- =?us-ascii?Q?LGlVxLEgCip/VJCCIekRZqZ8uSnwKD499TEPuYutlLK05mhkaokv4hRILWxh?=
- =?us-ascii?Q?9w=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <7F0850CE1E38CD4F9AA2F931A736155B@namprd10.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.26; Mon, 7 Aug
+ 2023 10:21:12 +0000
+Received: from DB9PR08MB7179.eurprd08.prod.outlook.com
+ ([fe80::adb0:61cb:8733:6db2]) by DB9PR08MB7179.eurprd08.prod.outlook.com
+ ([fe80::adb0:61cb:8733:6db2%7]) with mapi id 15.20.6652.026; Mon, 7 Aug 2023
+ 10:21:12 +0000
+Date: Mon, 7 Aug 2023 11:20:58 +0100
+From: Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+To: Mark Brown <broonie@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>
+Cc: "H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v3 21/36] arm64/mm: Implement map_shadow_stack()
+Message-ID: <ZNDFioFIM34VcsuV@arm.com>
+References: <20230731-arm64-gcs-v3-0-cddf9f980d98@kernel.org>
+ <20230731-arm64-gcs-v3-21-cddf9f980d98@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230731-arm64-gcs-v3-21-cddf9f980d98@kernel.org>
+X-ClientProxiedBy: LO6P123CA0017.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:313::7) To DB9PR08MB7179.eurprd08.prod.outlook.com
+ (2603:10a6:10:2cc::19)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	=?us-ascii?Q?BjxQcVFNNeIVwr5UO7kjQYZaab/YI9aEjjfXpl3I7IK5JjnDiJ5UcZndHhwh?=
- =?us-ascii?Q?Nvco6FsZh5KQSnLM6eOKcTC94638LKZCLyn/QVbFx1PSfVGlOvJk5uAKx9Qp?=
- =?us-ascii?Q?OAglXkLf8kFG1pMPFc9Ukvpp+cEJQoqhgI6KIvn94lHvk9AWobfiqomJeeV+?=
- =?us-ascii?Q?BEACzwXvL+qZo7umto532NAIoDGRy+ozrPMh8JWBwsN1RkL1m36IyZO6zl9f?=
- =?us-ascii?Q?K/Yx4SyEdZnxAtcEPmJq87vQov4w+M536TIzLPLPIXbuGeGMMN2n6DsmckO0?=
- =?us-ascii?Q?t+pZJOdLA+nUqJXgzmUDwUbSwA11wQY6mEvQ0UhWbFhuN18++2k7VUYUeOek?=
- =?us-ascii?Q?pQSGPhSrUs9+62/mTNhg8ft7isPzfdrsglP/q//Fs9SO1UwiHFvqBOrfvBfW?=
- =?us-ascii?Q?OgVVRHpvZyIR+W60HuUMSeEBWLLwCJfzhQuHFE+D5eSpLTqn5vesQrhyoIa3?=
- =?us-ascii?Q?0WOpZWwsEVLk6IAbHKRrMsjJig7ifxGbo+5yheaBaOGukBOZAkolC9vkwEAh?=
- =?us-ascii?Q?w/49F7bbhZvwG7EfQkOIzX8YBV2EPhEurI8eHbR0Wqc1mQ2s/CY4QM4Qu/Co?=
- =?us-ascii?Q?pMZut0a+orq6M5lOtArtwouV39Hsj3dhEFcpyrOO/A7KAFOB/4Ragbom1mfo?=
- =?us-ascii?Q?EZ+JVvBEGilfrYDkrmRtie0mlTe3aP0Uq1t4fBWXWJA8r4uheR+nH7l9OJ58?=
- =?us-ascii?Q?Fmk2sThuHpHZri6Rg+SrSqZ8nAXwI3aqgQ+N4zFEDVVl7N5SL7y1RkYTmTZG?=
- =?us-ascii?Q?RO8LDbrLTm3+w0tWzAmQ5clTtMtNm/GdJdWXQMSrzjXHerByTqccmDKE7aqX?=
- =?us-ascii?Q?1QZkwsIvDrSxSnlLC0RjOWxmmFJPmn5Ku7/NMLh8JIGgL6yBEO//AIEqz63+?=
- =?us-ascii?Q?lpSaCFiHirKeBQ2EQYMlYwceSzVxlI5nEqqdWlbfuegh/+4HxGzggx5VTSVF?=
- =?us-ascii?Q?S4WhQW8SLseA3j+z96vbr5xMmxT3md4fYgp2VjII2pOfZMWt9JM8KEmlIzGQ?=
- =?us-ascii?Q?hgshXusBK7BQdfor0pWI9hJZ2qCt80y2ArINwvdHk3pUQuQ=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB5433.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 844d2615-12cf-48c6-b5c0-08db972f2bd0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Aug 2023 10:15:05.6958
+X-MS-TrafficTypeDiagnostic:
+	DB9PR08MB7179:EE_|AS8PR08MB10151:EE_|DBAEUR03FT008:EE_|DB9PR08MB8721:EE_
+X-MS-Office365-Filtering-Correlation-Id: c1de012d-bff6-4f1b-dc60-08db97300e61
+x-checkrecipientrouted: true
+NoDisclaimer: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted: BCL:0;
+X-Microsoft-Antispam-Message-Info-Original:
+ CTRobn5o9nqHHhogJ7n8JBCHnbaaCwFAgnJ1NMXylevQ6J4xtiPtYYyAvqQCiRG/rMlJ5OGosHgNx6zVzMwOE46qZ6ysELCvpfVTxVKI1xYrVYjM0IjDYfsk6TgFFehNoHe/t03778ZtffFy70hdIXk24wXL+PjrFtjJ3LowlG4JD/wySKmJEJVAKC98NbAh453Eibky/SExOELBrzoGxTMT+XVxAbd02vXqLgI5+tsYi3uFU0BRQb7ZSPZvdnRI4dtqKL9+o2uuSLJUgRCDAJL0h4+3c+M+7pNhdxAVhRgU9yVxRCFLa2uIMJCHgqeKrxwqfqIS2Mu3zGMjkvOA3K6t91e/JDGg8wMRn+Kv2nf0KnOp6hu/WDAy0d4wASwNbeeGZyQpFEVYjQrLwD0U7heWx8BRW1wYJh4Z9RWpXMhlvskb8YMl6zabT/a8WF7kOSwHpD3T55kjTUbnbogY+Ly3nKfeigmXV8nLWBAeC0I0gBaTk4pbdxXkHfZ4lFfpkdjzK6KRyuGI8pt6altuAOvwyl6w/FHbUmeF8WgNdp+JlfSFwdYFG8kILSugIySaEpx71QCDaSX4CZoZeM3U9KIzZdTbB2XIZT2ceyeX4W0=
+X-Forefront-Antispam-Report-Untrusted:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR08MB7179.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(346002)(366004)(39860400002)(376002)(136003)(451199021)(1800799003)(186006)(6512007)(26005)(6506007)(36756003)(110136005)(54906003)(38100700002)(5660300002)(7416002)(86362001)(4744005)(4326008)(2906002)(66476007)(66556008)(66946007)(41300700001)(316002)(8936002)(8676002)(6666004)(478600001)(921005)(2616005)(6486002);DIR:OUT;SFP:1101;
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB10151
+Original-Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ DBAEUR03FT008.eop-EUR03.prod.protection.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+	fbe038b5-8ae4-4c9f-ce87-08db973005e5
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	583rfD8zNBxa9nzrPH4nJ64DFNgtTbqiOZPaKoDGkJo9Q+b8VzKAeZQ0XxcIww2Nxksarn24dCYrpdhugEfnGmkP7eNCt4KYiMep5VcEeo4UA6wbE9sYs9oS36y0TTvpzXhce6usU4OQUsjBHjzCN3W1H3L2n+jnMGmn2Mbk8n0aGBPS+iINGqRIAcfl3Qq096blfxf7vqjEjNxjhKtl2+qDJohayFMoD+1ZIcABTF3e2dLuwcm51H/7JkgRKK+ncjDquZdT8gqjrcEk8AVGpfVFtc3vQFtDalTxiydaOrmcIdHH8Yx1t6ifXN0CG243+NL9iVCmksmA3QeJZTMze0sM0qA4milMkeKSgw6V7Q7nPcZXkRUxlYIwu+EJvdwnVRdfByMKuXF5gNQqw4gEDG8I+Qcexhhofillj5ESkq4DTiI66UWiKwH5fb3OaV+PiEFD9lc0ldcIdLnMVlap1w9PWCABCHksWg60gGRKQC0FcTDJNZPrxf0xVXICHVEuCM/RwKWMIvEmxbgSYEsBcvAZE+89uCFvvHa9ifeZ4UzbwQhWocYuoq7pTgjxjvOZMKyuLNKLJd17SaDO/mGyB/7BDdnx5YxQao0SVr2SSsMJUCTVHE/WHE+IcVwxlvcTYeLFFM+UKvQNrkbTbMq0WaO9b2/aJVl29v9qIaira5l5u3ibO4LO63JfVlZS2/kS7uPx/Z/5eTIqnE/NjDixN99u8EzWvteIwbJHjCHtiY2iF1YilmJgu9gM5L+RjmZD
+X-Forefront-Antispam-Report:
+	CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(136003)(346002)(39860400002)(451199021)(186006)(1800799003)(82310400008)(40470700004)(46966006)(36840700001)(40480700001)(336012)(40460700003)(2616005)(36756003)(6512007)(4326008)(316002)(86362001)(81166007)(921005)(478600001)(54906003)(110136005)(356005)(70206006)(6666004)(70586007)(6486002)(6506007)(82740400003)(41300700001)(26005)(107886003)(8676002)(8936002)(47076005)(4744005)(36860700001)(2906002)(5660300002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2023 10:21:25.7326
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Fy1op1+yI2LwfKYP7BqUi4V5dJPvh1McY37xljbgrImLyEEknb2TjmisYqkW1/1qDDNEq+N1dr+3v7x3eP6wzg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BLAPR10MB5219
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-08-07_09,2023-08-03_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=0 spamscore=0
- mlxscore=0 bulkscore=0 phishscore=0 malwarescore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
- definitions=main-2308070095
-X-Proofpoint-GUID: q-UT0c15YSWEFYSfmyDYli_sNKjbmnCN
-X-Proofpoint-ORIG-GUID: q-UT0c15YSWEFYSfmyDYli_sNKjbmnCN
+X-MS-Exchange-CrossTenant-Network-Message-Id: c1de012d-bff6-4f1b-dc60-08db97300e61
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DBAEUR03FT008.eop-EUR03.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR08MB8721
 
-Hi Marc,
+The 07/31/2023 14:43, Mark Brown wrote:
+> +SYSCALL_DEFINE3(map_shadow_stack, unsigned long, addr, unsigned long, size, unsigned int, flags)
+> +{
+> +	unsigned long alloc_size;
+> +	unsigned long __user *cap_ptr;
+> +	unsigned long cap_val;
+> +	int ret;
+> +
+> +	if (!system_supports_gcs())
+> +		return -EOPNOTSUPP;
+> +
+> +	if (flags)
+> +		return -EINVAL;
+> +
+> +	if (addr % 16)
+> +		return -EINVAL;
 
-> On 28 Jul 2023, at 08:29, Marc Zyngier <maz@kernel.org> wrote:
->=20
-> As we're about to majorly extend the handling of FGT registers,
-> restructure the code to actually save/restore the registers
-> as required. This is made easy thanks to the previous addition
-> of the EL2 registers, allowing us to use the host context for
-> this purpose.
->=20
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
-> arch/arm64/include/asm/kvm_arm.h        | 21 ++++++++++
-> arch/arm64/kvm/hyp/include/hyp/switch.h | 56 +++++++++++++------------
-> 2 files changed, 50 insertions(+), 27 deletions(-)
->=20
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kv=
-m_arm.h
-> index 028049b147df..85908aa18908 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -333,6 +333,27 @@
-> BIT(18) | \
-> GENMASK(16, 15))
->=20
-> +/*
-> + * FGT register definitions
-> + *
-> + * RES0 and polarity masks as of DDI0487J.a, to be updated as needed.
-> + * We're not using the generated masks as they are usually ahead of
-> + * the published ARM ARM, which we use as a reference.
-> + *
-> + * Once we get to a point where the two describe the same thing, we'll
-> + * merge the definitions. One day.
-> + */
-> +#define __HFGRTR_EL2_RES0 (GENMASK(63, 56) | GENMASK(53, 51))
-> +#define __HFGRTR_EL2_MASK GENMASK(49, 0)
-> +#define __HFGRTR_EL2_nMASK (GENMASK(55, 54) | BIT(50))
-> +
-> +#define __HFGWTR_EL2_RES0 (GENMASK(63, 56) | GENMASK(53, 51) | \
-> + BIT(46) | BIT(42) | BIT(40) | BIT(28) | \
-> + GENMASK(26, 25) | BIT(21) | BIT(18) | \
-> + GENMASK(15, 14) | GENMASK(10, 9) | BIT(2))
-> +#define __HFGWTR_EL2_MASK GENMASK(49, 0)
-> +#define __HFGWTR_EL2_nMASK (GENMASK(55, 54) | BIT(50))
-> +
-> /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
-> #define HPFAR_MASK (~UL(0xf))
-> /*
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp=
-/include/hyp/switch.h
-> index 4bddb8541bec..966295178aee 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -70,20 +70,19 @@ static inline void __activate_traps_fpsimd32(struct k=
-vm_vcpu *vcpu)
-> }
-> }
->=20
-> -static inline bool __hfgxtr_traps_required(void)
-> -{
-> - if (cpus_have_final_cap(ARM64_SME))
-> - return true;
-> -
-> - if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
-> - return true;
->=20
-> - return false;
-> -}
->=20
-> -static inline void __activate_traps_hfgxtr(void)
-> +static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
-> {
-> + struct kvm_cpu_context *hctxt =3D &this_cpu_ptr(&kvm_host_data)->host_c=
-txt;
-> u64 r_clr =3D 0, w_clr =3D 0, r_set =3D 0, w_set =3D 0, tmp;
-> + u64 r_val, w_val;
-> +
-> + if (!cpus_have_final_cap(ARM64_HAS_FGT))
-> + return;
-> +
-> + ctxt_sys_reg(hctxt, HFGRTR_EL2) =3D read_sysreg_s(SYS_HFGRTR_EL2);
-> + ctxt_sys_reg(hctxt, HFGWTR_EL2) =3D read_sysreg_s(SYS_HFGWTR_EL2);
->=20
-> if (cpus_have_final_cap(ARM64_SME)) {
-> tmp =3D HFGxTR_EL2_nSMPRI_EL1_MASK | HFGxTR_EL2_nTPIDR2_EL0_MASK;
-> @@ -98,26 +97,31 @@ static inline void __activate_traps_hfgxtr(void)
-> if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
-> w_set |=3D HFGxTR_EL2_TCR_EL1_MASK;
->=20
-> - sysreg_clear_set_s(SYS_HFGRTR_EL2, r_clr, r_set);
-> - sysreg_clear_set_s(SYS_HFGWTR_EL2, w_clr, w_set);
-> +
-> + /* The default is not to trap amything but ACCDATA_EL1 */
-> + r_val =3D __HFGRTR_EL2_nMASK & ~HFGxTR_EL2_nACCDATA_EL1;
-> + r_val |=3D r_set;
-> + r_val &=3D ~r_clr;
-> +
-> + w_val =3D __HFGWTR_EL2_nMASK & ~HFGxTR_EL2_nACCDATA_EL1;
-> + w_val |=3D w_set;
-> + w_val &=3D ~w_clr;
-> +
-> + write_sysreg_s(r_val, SYS_HFGRTR_EL2);
-> + write_sysreg_s(w_val, SYS_HFGWTR_EL2);
-> }
->=20
-> -static inline void __deactivate_traps_hfgxtr(void)
-> +static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
-> {
-> - u64 r_clr =3D 0, w_clr =3D 0, r_set =3D 0, w_set =3D 0, tmp;
-> + struct kvm_cpu_context *hctxt =3D &this_cpu_ptr(&kvm_host_data)->host_c=
-txt;
->=20
-> - if (cpus_have_final_cap(ARM64_SME)) {
-> - tmp =3D HFGxTR_EL2_nSMPRI_EL1_MASK | HFGxTR_EL2_nTPIDR2_EL0_MASK;
-> + if (!cpus_have_final_cap(ARM64_HAS_FGT))
-> + return;
->=20
-> - r_set |=3D tmp;
-> - w_set |=3D tmp;
-> - }
-> + write_sysreg_s(ctxt_sys_reg(hctxt, HFGRTR_EL2), SYS_HFGRTR_EL2);
-> + write_sysreg_s(ctxt_sys_reg(hctxt, HFGWTR_EL2), SYS_HFGWTR_EL2);
->=20
-> - if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
-> - w_clr |=3D HFGxTR_EL2_TCR_EL1_MASK;
->=20
-> - sysreg_clear_set_s(SYS_HFGRTR_EL2, r_clr, r_set);
-> - sysreg_clear_set_s(SYS_HFGWTR_EL2, w_clr, w_set);
-> }
->=20
-> static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
-> @@ -145,8 +149,7 @@ static inline void __activate_traps_common(struct kvm=
-_vcpu *vcpu)
-> vcpu->arch.mdcr_el2_host =3D read_sysreg(mdcr_el2);
-> write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
->=20
-> - if (__hfgxtr_traps_required())
-> - __activate_traps_hfgxtr();
-> + __activate_traps_hfgxtr(vcpu);
-> }
->=20
-> static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
-> @@ -162,8 +165,7 @@ static inline void __deactivate_traps_common(struct k=
-vm_vcpu *vcpu)
-> vcpu_clear_flag(vcpu, PMUSERENR_ON_CPU);
-> }
->=20
-> - if (__hfgxtr_traps_required())
-> - __deactivate_traps_hfgxtr();
-> + __deactivate_traps_hfgxtr(vcpu);
+mmap addr must be page aligned (and there is no align req on size).
 
-Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
+i'd expect similar api here.
 
-Thanks
+> +
+> +	if (size == 16 || size % 16)
+> +		return -EINVAL;
 
-Miguel
-
-> }
->=20
-> static inline void ___activate_traps(struct kvm_vcpu *vcpu)
-> --=20
-> 2.34.1
->=20
-
+why %16 and not %8 ?
