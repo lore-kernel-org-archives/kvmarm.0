@@ -1,89 +1,132 @@
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFBB4DDBA;
-	Mon,  7 Aug 2023 15:06:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=zOz2Sl6sETEspUjEfHGN0Doq9IKMqDh9com1ZKQ2ccQ=; b=L84dIEOGbchqXHanFmF61ALhon
-	HTWLrRNFiG+i4OH+sZd6IzaTjVs+X08wTRaG4WbHVcPFUkStJ0VR4FmmWq3yvmQrDyiDSu7t8tALr
-	exouGMBNLEgZ/RkcFRxuAgG0xD3zMAPNH33IuJHyyZ1AMUkM74PWftDLKPgQJdBaWtARbr/k+jncm
-	61WcqynycYOSanAel3SSyem+JxNGHNErJu5tPC6tLnrhAH0AtnGZ3OVSTZyRM/ZqW7pFALUCczdMN
-	TLr6fnqW213OqECH5Z8FjGXOEYmfuFb0j+yJKe+QdQRho8yrtPhLfOk5fjTrtp5WfbXpmuwO669i4
-	EP0Y5+zA==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qT1oI-003w69-37;
-	Mon, 07 Aug 2023 15:06:19 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(Client did not present a certificate)
-	by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 6B7E7300473;
-	Mon,  7 Aug 2023 17:06:17 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 4840C2028F056; Mon,  7 Aug 2023 17:06:17 +0200 (CEST)
-Date: Mon, 7 Aug 2023 17:06:17 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Florian Weimer <fweimer@redhat.com>
-Cc: Marco Elver <elver@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Kees Cook <keescook@chromium.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Steven Rostedt <rostedt@goodmis.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Tom Rix <trix@redhat.com>, Miguel Ojeda <ojeda@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com,
-	linux-toolchains@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] compiler_types: Introduce the Clang
- __preserve_most function attribute
-Message-ID: <20230807150617.GB569857@hirez.programming.kicks-ass.net>
-References: <20230804090621.400-1-elver@google.com>
- <87il9rgjvw.fsf@oldenburg.str.redhat.com>
- <CANpmjNN4h2+i3LUG__GHha849PZ3jK=mBoFQWpSz4jffXB4wrw@mail.gmail.com>
- <87pm3zf2qi.fsf@oldenburg.str.redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 860E9FC15
+	for <kvmarm@lists.linux.dev>; Mon,  7 Aug 2023 15:27:40 +0000 (UTC)
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-76571dae5feso367153585a.1
+        for <kvmarm@lists.linux.dev>; Mon, 07 Aug 2023 08:27:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691422059; x=1692026859;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dUwZAwY3w/DCovXOhpFaYpG5BJu/scVYyvQE2nkhLjk=;
+        b=ZWONZDbN4DLl+GxuPDPb/kn5iUAK3wkJvTpyZc/I7t8nLVCDHq2ZUaCzaEQuUmk0Z3
+         FFH5Jy/FCYU7NiHCsaWnsZTfgKzvSEgCW+jdZI978Hx3OIc+KK8BVtHtOAvxkmqsMAO+
+         +BvlMicPvzgF/8u7YljscTAnlgLUHcQ8qY9ar/ixqFNLXc7BiPGedFRdgbGnXtY8aTOU
+         sQ83vU/dSwG3USoQSXU6I1e4FCZvhGpYR3DDEGMJ00z1P8XCjSc5JZa00wGMNlQlKttO
+         o2PoISTP8orIkHdyWKCib5MXsvGIo5oY8KQTKPPsPNLyS6LIxu8K+GCS4Qf45pyp750u
+         VxLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691422059; x=1692026859;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dUwZAwY3w/DCovXOhpFaYpG5BJu/scVYyvQE2nkhLjk=;
+        b=awnsI++yn6U2sOgluR7ih5NOvmgjj3fvWLfjYJMNc2ibfOOo9OlrGX0a0b6qqxhW1R
+         iEjuE6zGI6fhEctKCv+rKofIMqWV/AYluGIoMgsklxQ1LPGuXxEqTG4InMlQOD2hsq1I
+         G+sPFBs51mIzUwDsmH7HklQqD4l6SnoM+HtXXAiK7Ml8iEjaIwubcfeZDAEBpZwaohPs
+         iaSDYXe4ZWHHF2XGhPOgHn1iCPg0JSU5r7M08V8V/tGZN9jkGJfj53ou4n2kWlRnA1q3
+         wjUR8ARlpWZADxItiTXPZ0aPGrHTtu2aOP7HJfFVaEi2xnIPnfLqyzzOQpjEXZohtrja
+         9Mtg==
+X-Gm-Message-State: AOJu0Yxi7ufl2gyHkCq4qLrv1vsmbrl/WEixU5c15Maed2vczskNw/e6
+	vhxJPZskG8BNHgtYbETadX3cIhewK6pUL8VTuO68tw==
+X-Google-Smtp-Source: AGHT+IGoaH+s4R0EmOFvCPGZkJiL5/BBp3MuHbjbOs5J/ajqWaKGRjUz2hwympLNGjtDR6ahbq+YlO+vvxuAv1fnkUU=
+X-Received: by 2002:a05:6214:580b:b0:63d:36ab:93e6 with SMTP id
+ mk11-20020a056214580b00b0063d36ab93e6mr9060294qvb.65.1691422059150; Mon, 07
+ Aug 2023 08:27:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87pm3zf2qi.fsf@oldenburg.str.redhat.com>
+References: <20230804090621.400-1-elver@google.com> <87il9rgjvw.fsf@oldenburg.str.redhat.com>
+In-Reply-To: <87il9rgjvw.fsf@oldenburg.str.redhat.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Mon, 7 Aug 2023 08:27:27 -0700
+Message-ID: <CAKwvOdm7cTWmp-wAgePBQpa19=PLaYWh6WxJbNUcasSn87ecnw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] compiler_types: Introduce the Clang
+ __preserve_most function attribute
+To: Florian Weimer <fweimer@redhat.com>
+Cc: Marco Elver <elver@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Kees Cook <keescook@chromium.org>, Guenter Roeck <linux@roeck-us.net>, 
+	Peter Zijlstra <peterz@infradead.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Tom Rix <trix@redhat.com>, Miguel Ojeda <ojeda@kernel.org>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
+	Dmitry Vyukov <dvyukov@google.com>, Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com, 
+	linux-toolchains@vger.kernel.org, Jakub Jelinek <jakub@redhat.com>, 
+	Greg KH <gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 07, 2023 at 02:36:53PM +0200, Florian Weimer wrote:
+On Mon, Aug 7, 2023 at 4:41=E2=80=AFAM Florian Weimer <fweimer@redhat.com> =
+wrote:
+>
+> * Marco Elver:
+>
+> > [1]: "On X86-64 and AArch64 targets, this attribute changes the calling
+> > convention of a function. The preserve_most calling convention attempts
+> > to make the code in the caller as unintrusive as possible. This
+> > convention behaves identically to the C calling convention on how
+> > arguments and return values are passed, but it uses a different set of
+> > caller/callee-saved registers. This alleviates the burden of saving and
+> > recovering a large register set before and after the call in the
+> > caller."
+> >
+> > [1] https://clang.llvm.org/docs/AttributeReference.html#preserve-most
+>
+> You dropped the interesting part:
+>
+> | If the arguments are passed in callee-saved registers, then they will
+> | be preserved by the callee across the call. This doesn=E2=80=99t apply =
+for
+> | values returned in callee-saved registers.
+> |
+> |  =C2=B7  On X86-64 the callee preserves all general purpose registers, =
+except
+> |     for R11. R11 can be used as a scratch register. Floating-point
+> |     registers (XMMs/YMMs) are not preserved and need to be saved by the
+> |     caller.
+> |
+> |  =C2=B7  On AArch64 the callee preserve all general purpose registers, =
+except
+> |     X0-X8 and X16-X18.
+>
+> Ideally, this would be documented in the respective psABI supplement.
+> I filled in some gaps and filed:
+>
+>   Document the ABI for __preserve_most__ function calls
+>   <https://gitlab.com/x86-psABIs/x86-64-ABI/-/merge_requests/45>
+>
+> Doesn't this change impact the kernel module ABI?
+>
+> I would really expect a check here
+>
+> > +#if __has_attribute(__preserve_most__)
+> > +# define __preserve_most notrace __attribute__((__preserve_most__))
+> > +#else
+> > +# define __preserve_most
+> > +#endif
+>
+> that this is not a compilation for a module.  Otherwise modules built
+> with a compiler with __preserve_most__ attribute support are
+> incompatible with kernels built with a compiler without that attribute.
 
-> I think the GCC vs Clang thing is expected to work today, isn't it?
-> Using the Clang-based BPF tools with a GCC-compiled kernel requires a
-> matching ABI.
+Surely the Linux kernel has a stable ABI for modules right? Nah.
+https://www.kernel.org/doc/Documentation/process/stable-api-nonsense.rst
 
-Nope, all bets are off. There is no module ABI, in the widest possible
-sense.
-
-There's all sorts of subtle breakage, I don't remember the exact
-details, but IIRC building the kernel with a compiler that has
-asm-goto-output and modules with a compiler that doesn't have it gets
-you fireworks.
-
-We absolutely do even bother tracking any of this.
-
-There's also things like GCC plugins, they can randomly (literally in
-the case of struct randomization) change things around that isn't
-compatible with what the other compiler does -- or perhaps even a later
-version of the same compiler.
+>
+> Thanks,
+> Florian
+>
 
 
+--=20
+Thanks,
+~Nick Desaulniers
