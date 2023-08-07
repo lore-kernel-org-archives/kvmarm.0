@@ -1,172 +1,115 @@
-Received: from EUR01-DB5-obe.outbound.protection.outlook.com (mail-db5eur01on2053.outbound.protection.outlook.com [40.107.15.53])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21009C8DF
-	for <kvmarm@lists.linux.dev>; Mon,  7 Aug 2023 10:21:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Mrs6y9Ptah9WPIEcrIb0ZeASDoxywYFtpPwtKfqhMWE=;
- b=oQyNepHlSzcZkHsVl1gWTKObuR6WipAgDDDyaUwJjBOR5TvLMEJzz0NHus7CsbcjMobDo62Wi1+X58GzYj/qVIek0EQKSgLSIQxi5D3pS8Gtl997RYuBnTyyNQ/dBPybVU/12SuNTphNaWHyc3/6RB34oJwKGVqb8K4TtEJDAU8=
-Received: from DU2PR04CA0315.eurprd04.prod.outlook.com (2603:10a6:10:2b5::20)
- by DB9PR08MB8721.eurprd08.prod.outlook.com (2603:10a6:10:3d3::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.26; Mon, 7 Aug
- 2023 10:21:26 +0000
-Received: from DBAEUR03FT008.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:10:2b5:cafe::68) by DU2PR04CA0315.outlook.office365.com
- (2603:10a6:10:2b5::20) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27 via Frontend
- Transport; Mon, 7 Aug 2023 10:21:25 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=armh.onmicrosoft.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
- client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
- pr=C
-Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- DBAEUR03FT008.mail.protection.outlook.com (100.127.142.107) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6678.16 via Frontend Transport; Mon, 7 Aug 2023 10:21:25 +0000
-Received: ("Tessian outbound f9124736ff4f:v145"); Mon, 07 Aug 2023 10:21:25 +0000
-X-CheckRecipientChecked: true
-X-CR-MTA-CID: d6abb263343ff9e9
-X-CR-MTA-TID: 64aa7808
-Received: from 7876b55f53d8.2
-	by 64aa7808-outbound-1.mta.getcheckrecipient.com id 9065A3D3-B4AC-44BB-8CEB-3887A004694F.1;
-	Mon, 07 Aug 2023 10:21:15 +0000
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com
-    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 7876b55f53d8.2
-    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
-    Mon, 07 Aug 2023 10:21:15 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WDVtEsOp0ZspyDEtXDuyt2lDuf5M3rqll2Hidi63YbB2TTEh4Vb/wasdd4uwIuPYy2q//Zf5O2L8DksZmVVpaN3VYLpZ5y54Z6Z4tXVZWReNB3xqmVnj0WVmW5Pw0Ubd5/o8DM+V9k7DFXiucOx9FpiSJTvjakD7vWRpUAMKMwkuaKJXRJjuj6T9OzKHZKy4h47bRrmOaykvGUCcI36hDW7A9QnjAPzzNXvF26QG/J+JI1zoXaWVTnkO7mEaKN/4NX2E5JfewoF94wtTtiIGgm3YYZTtuYCDWTo1+Hb+xYdCGcFKNJYVRJt0ZF6leXny8pNevr0kVY6BWAKXbukVyg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Mrs6y9Ptah9WPIEcrIb0ZeASDoxywYFtpPwtKfqhMWE=;
- b=cMABMlLUSQEgcDRC48dwh12XE/QqL/SgrUWPWlNMDnISJYswVit6whfTZo4umx96pGT1DLzJxydfn9MrgyqmtXjNIm38FSbcQ86VNuxYuLHO2cXumpMRTO9tsbeiRE7DVFiE0AwkpF79HAeLS+vY846I2qltkFbwiX+OK8DMdNsTYw2/VCfjGzOp2I9NuHaYI+kHClPUtqmwqax9dgeFXGXahuBCFtCqvGnlK2kYbZbSWnJmedvXcvRWCXLmUwbXBDs/F3B41JLf1Q58FZoMyJfT8pQTu7pMQPaoSwkIavJOD4Dzht3PMVWC+/F1LyifYl9c3Nd0aKluTzOsZuKphw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Mrs6y9Ptah9WPIEcrIb0ZeASDoxywYFtpPwtKfqhMWE=;
- b=oQyNepHlSzcZkHsVl1gWTKObuR6WipAgDDDyaUwJjBOR5TvLMEJzz0NHus7CsbcjMobDo62Wi1+X58GzYj/qVIek0EQKSgLSIQxi5D3pS8Gtl997RYuBnTyyNQ/dBPybVU/12SuNTphNaWHyc3/6RB34oJwKGVqb8K4TtEJDAU8=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from DB9PR08MB7179.eurprd08.prod.outlook.com (2603:10a6:10:2cc::19)
- by AS8PR08MB10151.eurprd08.prod.outlook.com (2603:10a6:20b:628::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.26; Mon, 7 Aug
- 2023 10:21:12 +0000
-Received: from DB9PR08MB7179.eurprd08.prod.outlook.com
- ([fe80::adb0:61cb:8733:6db2]) by DB9PR08MB7179.eurprd08.prod.outlook.com
- ([fe80::adb0:61cb:8733:6db2%7]) with mapi id 15.20.6652.026; Mon, 7 Aug 2023
- 10:21:12 +0000
-Date: Mon, 7 Aug 2023 11:20:58 +0100
-From: Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-To: Mark Brown <broonie@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>
-Cc: "H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v3 21/36] arm64/mm: Implement map_shadow_stack()
-Message-ID: <ZNDFioFIM34VcsuV@arm.com>
-References: <20230731-arm64-gcs-v3-0-cddf9f980d98@kernel.org>
- <20230731-arm64-gcs-v3-21-cddf9f980d98@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230731-arm64-gcs-v3-21-cddf9f980d98@kernel.org>
-X-ClientProxiedBy: LO6P123CA0017.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:313::7) To DB9PR08MB7179.eurprd08.prod.outlook.com
- (2603:10a6:10:2cc::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04360FC00
+	for <kvmarm@lists.linux.dev>; Mon,  7 Aug 2023 11:41:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691408477;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WmODk+CdskyMtYG8TdUz/Cv201lmsUcEqfPEQkGIYLY=;
+	b=G+kX1ODjU9xbFOZYfOo4hYtnSaB8wLwhgmr7/5RrQ7+tmAdEc9g9dbYUZW1035SnXjRucI
+	bihnZhLYn2NawdRPzPBGscq0xR9x0oXwURcTFrbak6iZdu0Sc305A3oIcbSVp6egBeIOC9
+	NkPUFbSTVCJfuzTjG3BzZMFF5o1NcO0=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-74-2LnRN-WnO9Klk1-rMuLD1w-1; Mon, 07 Aug 2023 07:41:14 -0400
+X-MC-Unique: 2LnRN-WnO9Klk1-rMuLD1w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F38281C0690C;
+	Mon,  7 Aug 2023 11:41:12 +0000 (UTC)
+Received: from oldenburg.str.redhat.com (unknown [10.2.16.12])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 72335140E962;
+	Mon,  7 Aug 2023 11:41:08 +0000 (UTC)
+From: Florian Weimer <fweimer@redhat.com>
+To: Marco Elver <elver@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,  Kees Cook
+ <keescook@chromium.org>,  Guenter Roeck <linux@roeck-us.net>,  Peter
+ Zijlstra <peterz@infradead.org>,  Mark Rutland <mark.rutland@arm.com>,
+  Steven Rostedt <rostedt@goodmis.org>,  Marc Zyngier <maz@kernel.org>,
+  Oliver Upton <oliver.upton@linux.dev>,  James Morse
+ <james.morse@arm.com>,  Suzuki K Poulose <suzuki.poulose@arm.com>,
+  Zenghui Yu <yuzenghui@huawei.com>,  Catalin Marinas
+ <catalin.marinas@arm.com>,  Will Deacon <will@kernel.org>,  Nathan
+ Chancellor <nathan@kernel.org>,  Nick Desaulniers
+ <ndesaulniers@google.com>,  Tom Rix <trix@redhat.com>,  Miguel Ojeda
+ <ojeda@kernel.org>,  linux-arm-kernel@lists.infradead.org,
+  kvmarm@lists.linux.dev,  linux-kernel@vger.kernel.org,
+  llvm@lists.linux.dev,  Dmitry Vyukov <dvyukov@google.com>,  Alexander
+ Potapenko <glider@google.com>,  kasan-dev@googlegroups.com,
+  linux-toolchains@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] compiler_types: Introduce the Clang
+ __preserve_most function attribute
+References: <20230804090621.400-1-elver@google.com>
+Date: Mon, 07 Aug 2023 13:41:07 +0200
+In-Reply-To: <20230804090621.400-1-elver@google.com> (Marco Elver's message of
+	"Fri, 4 Aug 2023 11:02:56 +0200")
+Message-ID: <87il9rgjvw.fsf@oldenburg.str.redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	DB9PR08MB7179:EE_|AS8PR08MB10151:EE_|DBAEUR03FT008:EE_|DB9PR08MB8721:EE_
-X-MS-Office365-Filtering-Correlation-Id: c1de012d-bff6-4f1b-dc60-08db97300e61
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted: BCL:0;
-X-Microsoft-Antispam-Message-Info-Original:
- CTRobn5o9nqHHhogJ7n8JBCHnbaaCwFAgnJ1NMXylevQ6J4xtiPtYYyAvqQCiRG/rMlJ5OGosHgNx6zVzMwOE46qZ6ysELCvpfVTxVKI1xYrVYjM0IjDYfsk6TgFFehNoHe/t03778ZtffFy70hdIXk24wXL+PjrFtjJ3LowlG4JD/wySKmJEJVAKC98NbAh453Eibky/SExOELBrzoGxTMT+XVxAbd02vXqLgI5+tsYi3uFU0BRQb7ZSPZvdnRI4dtqKL9+o2uuSLJUgRCDAJL0h4+3c+M+7pNhdxAVhRgU9yVxRCFLa2uIMJCHgqeKrxwqfqIS2Mu3zGMjkvOA3K6t91e/JDGg8wMRn+Kv2nf0KnOp6hu/WDAy0d4wASwNbeeGZyQpFEVYjQrLwD0U7heWx8BRW1wYJh4Z9RWpXMhlvskb8YMl6zabT/a8WF7kOSwHpD3T55kjTUbnbogY+Ly3nKfeigmXV8nLWBAeC0I0gBaTk4pbdxXkHfZ4lFfpkdjzK6KRyuGI8pt6altuAOvwyl6w/FHbUmeF8WgNdp+JlfSFwdYFG8kILSugIySaEpx71QCDaSX4CZoZeM3U9KIzZdTbB2XIZT2ceyeX4W0=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR08MB7179.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(346002)(366004)(39860400002)(376002)(136003)(451199021)(1800799003)(186006)(6512007)(26005)(6506007)(36756003)(110136005)(54906003)(38100700002)(5660300002)(7416002)(86362001)(4744005)(4326008)(2906002)(66476007)(66556008)(66946007)(41300700001)(316002)(8936002)(8676002)(6666004)(478600001)(921005)(2616005)(6486002);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB10151
-Original-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DBAEUR03FT008.eop-EUR03.prod.protection.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	fbe038b5-8ae4-4c9f-ce87-08db973005e5
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	583rfD8zNBxa9nzrPH4nJ64DFNgtTbqiOZPaKoDGkJo9Q+b8VzKAeZQ0XxcIww2Nxksarn24dCYrpdhugEfnGmkP7eNCt4KYiMep5VcEeo4UA6wbE9sYs9oS36y0TTvpzXhce6usU4OQUsjBHjzCN3W1H3L2n+jnMGmn2Mbk8n0aGBPS+iINGqRIAcfl3Qq096blfxf7vqjEjNxjhKtl2+qDJohayFMoD+1ZIcABTF3e2dLuwcm51H/7JkgRKK+ncjDquZdT8gqjrcEk8AVGpfVFtc3vQFtDalTxiydaOrmcIdHH8Yx1t6ifXN0CG243+NL9iVCmksmA3QeJZTMze0sM0qA4milMkeKSgw6V7Q7nPcZXkRUxlYIwu+EJvdwnVRdfByMKuXF5gNQqw4gEDG8I+Qcexhhofillj5ESkq4DTiI66UWiKwH5fb3OaV+PiEFD9lc0ldcIdLnMVlap1w9PWCABCHksWg60gGRKQC0FcTDJNZPrxf0xVXICHVEuCM/RwKWMIvEmxbgSYEsBcvAZE+89uCFvvHa9ifeZ4UzbwQhWocYuoq7pTgjxjvOZMKyuLNKLJd17SaDO/mGyB/7BDdnx5YxQao0SVr2SSsMJUCTVHE/WHE+IcVwxlvcTYeLFFM+UKvQNrkbTbMq0WaO9b2/aJVl29v9qIaira5l5u3ibO4LO63JfVlZS2/kS7uPx/Z/5eTIqnE/NjDixN99u8EzWvteIwbJHjCHtiY2iF1YilmJgu9gM5L+RjmZD
-X-Forefront-Antispam-Report:
-	CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(136003)(346002)(39860400002)(451199021)(186006)(1800799003)(82310400008)(40470700004)(46966006)(36840700001)(40480700001)(336012)(40460700003)(2616005)(36756003)(6512007)(4326008)(316002)(86362001)(81166007)(921005)(478600001)(54906003)(110136005)(356005)(70206006)(6666004)(70586007)(6486002)(6506007)(82740400003)(41300700001)(26005)(107886003)(8676002)(8936002)(47076005)(4744005)(36860700001)(2906002)(5660300002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2023 10:21:25.7326
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c1de012d-bff6-4f1b-dc60-08db97300e61
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DBAEUR03FT008.eop-EUR03.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR08MB8721
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 
-The 07/31/2023 14:43, Mark Brown wrote:
-> +SYSCALL_DEFINE3(map_shadow_stack, unsigned long, addr, unsigned long, size, unsigned int, flags)
-> +{
-> +	unsigned long alloc_size;
-> +	unsigned long __user *cap_ptr;
-> +	unsigned long cap_val;
-> +	int ret;
-> +
-> +	if (!system_supports_gcs())
-> +		return -EOPNOTSUPP;
-> +
-> +	if (flags)
-> +		return -EINVAL;
-> +
-> +	if (addr % 16)
-> +		return -EINVAL;
+* Marco Elver:
 
-mmap addr must be page aligned (and there is no align req on size).
+> [1]: "On X86-64 and AArch64 targets, this attribute changes the calling
+> convention of a function. The preserve_most calling convention attempts
+> to make the code in the caller as unintrusive as possible. This
+> convention behaves identically to the C calling convention on how
+> arguments and return values are passed, but it uses a different set of
+> caller/callee-saved registers. This alleviates the burden of saving and
+> recovering a large register set before and after the call in the
+> caller."
+>
+> [1] https://clang.llvm.org/docs/AttributeReference.html#preserve-most
 
-i'd expect similar api here.
+You dropped the interesting part:
 
-> +
-> +	if (size == 16 || size % 16)
-> +		return -EINVAL;
+| If the arguments are passed in callee-saved registers, then they will
+| be preserved by the callee across the call. This doesn=E2=80=99t apply for
+| values returned in callee-saved registers.
+|=20
+|  =C2=B7  On X86-64 the callee preserves all general purpose registers, ex=
+cept
+|     for R11. R11 can be used as a scratch register. Floating-point
+|     registers (XMMs/YMMs) are not preserved and need to be saved by the
+|     caller.
+|=20=20=20=20=20
+|  =C2=B7  On AArch64 the callee preserve all general purpose registers, ex=
+cept
+|     X0-X8 and X16-X18.
 
-why %16 and not %8 ?
+Ideally, this would be documented in the respective psABI supplement.
+I filled in some gaps and filed:
+
+  Document the ABI for __preserve_most__ function calls
+  <https://gitlab.com/x86-psABIs/x86-64-ABI/-/merge_requests/45>
+
+Doesn't this change impact the kernel module ABI?
+
+I would really expect a check here
+
+> +#if __has_attribute(__preserve_most__)
+> +# define __preserve_most notrace __attribute__((__preserve_most__))
+> +#else
+> +# define __preserve_most
+> +#endif
+
+that this is not a compilation for a module.  Otherwise modules built
+with a compiler with __preserve_most__ attribute support are
+incompatible with kernels built with a compiler without that attribute.
+
+Thanks,
+Florian
+
