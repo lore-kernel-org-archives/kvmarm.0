@@ -1,40 +1,40 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25FA011C8F
-	for <kvmarm@lists.linux.dev>; Mon,  7 Aug 2023 16:22:26 +0000 (UTC)
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-563ab574cb5so2640313a12.1
-        for <kvmarm@lists.linux.dev>; Mon, 07 Aug 2023 09:22:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C736311C8F
+	for <kvmarm@lists.linux.dev>; Mon,  7 Aug 2023 16:22:27 +0000 (UTC)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-564b8c529bfso2069487a12.0
+        for <kvmarm@lists.linux.dev>; Mon, 07 Aug 2023 09:22:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691425345; x=1692030145;
+        d=google.com; s=20221208; t=1691425347; x=1692030147;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zvko96XhFtpYYidvZOJTCgoG3opZmvwlh1PYr9fTkkI=;
-        b=jaMmpyvd6ihZ06+wE8AlrhnE1qPFQoCnq+e0opFsICAtC3WVl+O4TUJ+k01tMVQm5z
-         L8YyZk2p1e1UUxT5Ir40iF256pReWqm38iiNRDL5vLoukvqOiR9GrVum8fK4WfahG8f5
-         QWZ6HRbnpFx6UQUaxWMTKdcfV1qrLBQf10u9merYlRbtmrgforr4lnVp0/W7w7sCnAbt
-         9jax0nr7qlx8M+YJpbXqQsWa6+eqJ4jwyCgLG3q5+Cg5CAohUn/bYnUgi+/IR3LIcsk8
-         KTUBLJcc3Rslkj61Lrur7GagaijK8lASUHDDnw5QCAOYnPcD5hX1Jux2aeuGmk83vat+
-         xy8Q==
+        bh=zsRHDCZY2W1L20MGQ1R2mKjwnOTJ8T3owj8sO8mRlH0=;
+        b=ul3/+AA3mfZTCSzCXHXqKJo+qoz6rCkjTR/ECKE9Rc5xOZKwgZ63NQYLu44YoP2btC
+         peNlkHtCxfI/lHiqdULMPrppDLDhaIcckXUkJhkwN+trV71OjvS5UY55OCjc7nghCXGg
+         GmgTl4SjlSvJx/lzbT4Mh990rclXx1i0mXn4L2Om+nnn86bsbcIQVkDM7X9hb9fvFgdD
+         a+Moj19kZRedoANRQmjX4vEc1bqOxpWkcVvk0bmW4XFcIhmu+BFAkbY0LrOKXRjgsjc4
+         E6a8X2wlVeBmMML85hq+Ugg8hnaJwd/Hu0bZJ6wJm2tM36jTW05ackjsJ41Zn6H5endJ
+         +QDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691425345; x=1692030145;
+        d=1e100.net; s=20221208; t=1691425347; x=1692030147;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zvko96XhFtpYYidvZOJTCgoG3opZmvwlh1PYr9fTkkI=;
-        b=VXCtfcUZO9dO6+4iObV2FhrxfFx5BoMsbFEDb5n2nUPrtGLc+H8dYbNBBUoCEp1ce8
-         D2RRplykdIhBnvWPz73Ynwn7sxGhSn7nXCTesY5cblH5hG2lmXaiwNWZFsWB0G/HBMmc
-         HI6AlMIP1B6k6wrIGqHYmvnJoeZWgCQCXgSajRqsxe6W70DDBZPQVupLfX52umGEn4sE
-         VaDS9xA8vhdt6DFo/8mijGJtYEu3DygjAmCAA9yEoNFeV0PGXOffo7Ir9HVm6eM2W97c
-         Y6KQSdMS+xatY5Mcg7tU3ulkCXU8XeQzfGwJ3ePTUDqv0x1VXB6R0bWg0JI+zDR3rvxF
-         hcTw==
-X-Gm-Message-State: AOJu0YyypatMAejz9p70T1czxT6aALKt2lqc8TIj5AIaDxpmY44e7y1g
-	zU4rfdDdehv4a4gWmC1zu5uXB7NitxAsvFX2RQ==
-X-Google-Smtp-Source: AGHT+IF0luikMERZ5n3CMp2yFSmVcfgwmELbpWdGVUJ7uHnLdJhIRB6jZe3Nzpwz9XCDsQ4vNxF9J7MobIwiMfhDew==
+        bh=zsRHDCZY2W1L20MGQ1R2mKjwnOTJ8T3owj8sO8mRlH0=;
+        b=hzxwKbxsKv/Qr2rQddDqjNPpvfx5hTuDGTkr5tQ4giO06+HJo3kO3piZxUBe9OLDcp
+         GcKpiaUNjiq77yIpj/HQhY6+rH1GZocA8vf+1UIFyQ/3PSbhCWIzHBH7T+pwpn8fsgEE
+         5IjnGnlEZSGqO6k5yNmywOhk9Crz2Ilsr/qSse3eE6riiRta6oMRoKeDwZOMOY+gW64t
+         GMDOz+ADAcz0OjC/W6igyOx19TIryj2LfNaJ2p3/6hjVG+iFHsIiTAlYBCt0MN9S7H9T
+         tLWWcAZGZZOfydCLo/v1yCFq0F3DvotOGsbKYGxfRcRh2pmzRtpNM0z0535u+Y105rgM
+         au5Q==
+X-Gm-Message-State: AOJu0YyuJIDOyqksGhniC4tnMQcheTHC5L7wRD1gCIrg9itK/zMGky45
+	Semh/72SvtOH6Y5/LIotyTWKAWMabvlJIFKiRQ==
+X-Google-Smtp-Source: AGHT+IG3XnLIiKJ/NUMDcWl6umTr9qjJJRjx5yVZZ6JF18BZmo4OJCxIDtWTWTVmYGcfj/jYasJjX0lUk38VyXqTvg==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a63:790e:0:b0:55b:c42d:e454 with SMTP
- id u14-20020a63790e000000b0055bc42de454mr44303pgc.11.1691425345621; Mon, 07
- Aug 2023 09:22:25 -0700 (PDT)
-Date: Mon,  7 Aug 2023 09:22:04 -0700
+ (user=jingzhangos job=sendgmr) by 2002:a63:b504:0:b0:564:9d36:f3e7 with SMTP
+ id y4-20020a63b504000000b005649d36f3e7mr49888pge.0.1691425347349; Mon, 07 Aug
+ 2023 09:22:27 -0700 (PDT)
+Date: Mon,  7 Aug 2023 09:22:05 -0700
 In-Reply-To: <20230807162210.2528230-1-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,9 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230807162210.2528230-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
-Message-ID: <20230807162210.2528230-7-jingzhangos@google.com>
-Subject: [PATCH v8 06/11] KVM: arm64: Bump up the default KVM sanitised debug
- version to v8p8
+Message-ID: <20230807162210.2528230-8-jingzhangos@google.com>
+Subject: [PATCH v8 07/11] KVM: arm64: Enable writable for ID_AA64PFR0_EL1
 From: Jing Zhang <jingzhangos@google.com>
 To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
 	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
@@ -59,40 +58,27 @@ Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
 	Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Oliver Upton <oliver.upton@linux.dev>
+All valid fields in ID_AA64PFR0_EL1 are writable from usrespace
+with this change.
 
-Since ID_AA64DFR0_EL1 and ID_DFR0_EL1 are now writable from userspace,
-it is safe to bump up the default KVM sanitised debug version to v8p8.
-
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 5f6c2be12e44..879004fd37e5 100644
+index 879004fd37e5..392613bec560 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1489,8 +1489,7 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
- {
- 	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
- 
--	/* Limit debug to ARMv8.0 */
--	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, IMP);
-+	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, V8P8);
- 
- 	/*
- 	 * Only initialize the PMU version if the vCPU was configured with one.
-@@ -1550,6 +1549,8 @@ static u64 read_sanitised_id_dfr0_el1(struct kvm_vcpu *vcpu,
- 	if (kvm_vcpu_has_pmu(vcpu))
- 		val |= SYS_FIELD_PREP(ID_DFR0_EL1, PerfMon, perfmon);
- 
-+	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_DFR0_EL1, CopDbg, Debugv8p8);
-+
- 	return val;
- }
- 
+@@ -2041,7 +2041,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  .get_user = get_id_reg,
+ 	  .set_user = set_id_reg,
+ 	  .reset = read_sanitised_id_aa64pfr0_el1,
+-	  .val = ID_AA64PFR0_EL1_CSV2_MASK | ID_AA64PFR0_EL1_CSV3_MASK, },
++	  .val = GENMASK(63, 0), },
+ 	ID_SANITISED(ID_AA64PFR1_EL1),
+ 	ID_UNALLOCATED(4,2),
+ 	ID_UNALLOCATED(4,3),
 -- 
 2.41.0.585.gd2178a4bd4-goog
 
