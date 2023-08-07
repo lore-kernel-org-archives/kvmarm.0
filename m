@@ -1,87 +1,137 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCAFD8820
-	for <kvmarm@lists.linux.dev>; Sat,  5 Aug 2023 10:28:43 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B78DD1FB;
-	Sat,  5 Aug 2023 03:29:25 -0700 (PDT)
-Received: from [10.57.90.200] (unknown [10.57.90.200])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AF54B3F5A1;
-	Sat,  5 Aug 2023 03:28:40 -0700 (PDT)
-Message-ID: <a80bdc12-96f9-bdf4-8253-bf0ea305e00d@arm.com>
-Date: Sat, 5 Aug 2023 11:28:39 +0100
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 481BA80F
+	for <kvmarm@lists.linux.dev>; Mon,  7 Aug 2023 03:48:46 +0000 (UTC)
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5231410ab27so4177167a12.0
+        for <kvmarm@lists.linux.dev>; Sun, 06 Aug 2023 20:48:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20221208.gappssmtp.com; s=20221208; t=1691380125; x=1691984925;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Bns5NuOnFHjf4+AhxK6OdiLKU/uYDW/dYLyqP2UAOt4=;
+        b=5LEnuLe6+rBNX3zvpPKPIdTqqnxWUz738hsVOkmEBZH2bi40Ti+h6hJSvGjAVK7k+t
+         dHk25/OASOQPlDXjFWyNqGEqFz98nybJEnn4a8eiZ9+so87/6fNBzBq+1+UGOPOFuESW
+         zAGuk1oq4XTKNeSdOrWID5h2t2Bbm9qH8ECfTAYsya9MP9jF3oRSFnqymLvshliQupLU
+         aVBtHihjRnYkd0HekrClm6sQL02NknOm832ejQQIYLXrNtyGUdFoo3K1Sqy1bpjMVR4k
+         KQh2jUGOBKILi2W/cvrlXAfAEASLdhBNpmKZF7ceGWfp50NovnwspgLkg75Rn7fGcYu/
+         ljeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691380125; x=1691984925;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Bns5NuOnFHjf4+AhxK6OdiLKU/uYDW/dYLyqP2UAOt4=;
+        b=P+eTwOt7zFO5yGY44ZNHRQAtW5oqzeL7PxmLJMxBM+QnKFeYFH9nZLx10x0O6hDXZk
+         hkSwT+18L0WW2Wzr7yVSeuyvOhzyuBNPljDvJeODtUoy4oYFMUObdJ/qpaVC+XOeB094
+         S6EMH728jrSnHQQKdPHg7aqLG5D1hYwG1BSguiXCY6gn+3on7laMstqB6ZKBIgAVRTmq
+         3tDUnor5FBB0onB9B9FqABI/YXDTuysdQrHd8fbiwpf+N+ZjiUk1uLTkikepHlPB11Gh
+         LOba2lN6Rcm8MWWMBG2r7NA/lv+fw5+XSW+yEA4pbC0oj0ne958J3EAoF7Z9W5MLCI/1
+         2BRg==
+X-Gm-Message-State: AOJu0Yz1KxoU53I2ZlvyyCIvG29ofY2nU69VzGYOh6muNJNnU4EiPr6s
+	ZfUT+DEHOQXk63XNe0G5IxzIYu00gdU4N01pSNQJmA==
+X-Google-Smtp-Source: AGHT+IFA4Pcl20GhvvrZF32CrVlsSTz8804Kwavv3GghPlUogdRMps2PmuTBdGKwOlui5rGci5M5f/LYq0TGzIIAZN4=
+X-Received: by 2002:a17:906:2250:b0:993:eddd:6df9 with SMTP id
+ 16-20020a170906225000b00993eddd6df9mr7298478ejr.2.1691380124601; Sun, 06 Aug
+ 2023 20:48:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [RFC PATCH 0/3] coresight: Support exclude_guest with Feat_TRF
- and nVHE
-To: Marc Zyngier <maz@kernel.org>, James Clark <james.clark@arm.com>
-Cc: coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mike Leach <mike.leach@linaro.org>, Leo Yan <leo.yan@linaro.org>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>, Rob Herring
- <robh@kernel.org>, linux-kernel@vger.kernel.org
-References: <20230804101317.460697-1-james.clark@arm.com>
- <86edki62vz.wl-maz@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <86edki62vz.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <cover.1690273969.git.haibo1.xu@intel.com>
+In-Reply-To: <cover.1690273969.git.haibo1.xu@intel.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Mon, 7 Aug 2023 09:18:33 +0530
+Message-ID: <CAAhSdy0yug=J0nxnnPoLYL=0MiT0w6qgPYOcv0QwMRe+fsQn8Q@mail.gmail.com>
+Subject: Re: [PATCH v6 00/13] RISCV: Add KVM_GET_REG_LIST API
+To: maz@kernel.org, oliver.upton@linux.dev
+Cc: xiaobo55x@gmail.com, ajones@ventanamicro.com, seanjc@google.com, 
+	Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Shuah Khan <shuah@kernel.org>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Ricardo Koller <ricarkol@google.com>, Vishal Annapurve <vannapurve@google.com>, 
+	Like Xu <likexu@tencent.com>, Vipin Sharma <vipinsh@google.com>, 
+	David Matlack <dmatlack@google.com>, Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org, 
+	Haibo Xu <haibo1.xu@intel.com>, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Marc
+Hi Marc, Hi Oliver,
 
-On 04/08/2023 20:09, Marc Zyngier wrote:
-> On Fri, 04 Aug 2023 11:13:10 +0100,
-> James Clark <james.clark@arm.com> wrote:
->>
->> Hi,
->>
->> I'm looking for help in testing this and for feedback on whether it's
->> useful to anyone. Testing it requires hardware that has Feat_TRF (v8.4)
->> but no TRBE. This is because TRBE usage is disabled in nVHE guests.
->>
->> I don't currently have any access to any hardware, and the FVP model
->> can only do self hosted trace using TRBE.
->>
->> Currently with nVHE you would always get trace from guests, and
->> filtering out isn't possible without this patchset. In comparison, with
->> VHE guests, they never generate guest trace without [1]. I think the
->> existence of trace rather than lack of could suggest that this change is
->> less useful than [1]. Also the restricted set of hardware that it works
->> on supports that too.
-> 
-> It'd be nice to have some sort of feature parity, but it seems like a
-> vanishingly small target of users having access to an ETM sink.
-> 
->>
->> Apart from compilation and checking that the exclude guest settings
->> are correctly programmed on guest switch, this is untested by me.
-> 
-> I'll have a look at the series, but none of my HW fits in this
-> description (my ARMv8.4+ boxes don't have any form of tracing).
+On Tue, Jul 25, 2023 at 2:05=E2=80=AFPM Haibo Xu <haibo1.xu@intel.com> wrot=
+e:
+>
+> KVM_GET_REG_LIST will dump all register IDs that are available to
+> KVM_GET/SET_ONE_REG and It's very useful to identify some platform
+> regression issue during VM migration.
+>
+> Patch 1-7 re-structured the get-reg-list test in aarch64 to make some
+> of the code as common test framework that can be shared by riscv.
+>
+> Patch 8 move reject_set check logic to a function so as to check for
+> different errno for different registers.
+> Patch 9 move finalize_vcpu back to run_test so that riscv can implement
+> its specific operation.
+> Patch 10 change to do the get/set operation only on present-blessed list.
+> Patch 11 add the skip_set facilities so that riscv can skip set operation
+> on some registers.
+> Patch 12 enabled the KVM_GET_REG_LIST API in riscv.
+> patch 13 added the corresponding kselftest for checking possible
+> register regressions.
+>
+> The get-reg-list kvm selftest was ported from aarch64 and tested with
+> Linux v6.5-rc3 on a Qemu riscv64 virt machine.
+>
+> ---
+> Changed since v5:
+>   * Rebase to v6.5-rc3
+>   * Minor fix for Andrew's comments
+>
+> Andrew Jones (7):
+>   KVM: arm64: selftests: Replace str_with_index with strdup_printf
+>   KVM: arm64: selftests: Drop SVE cap check in print_reg
+>   KVM: arm64: selftests: Remove print_reg's dependency on vcpu_config
+>   KVM: arm64: selftests: Rename vcpu_config and add to kvm_util.h
+>   KVM: arm64: selftests: Delete core_reg_fixup
+>   KVM: arm64: selftests: Split get-reg-list test code
+>   KVM: arm64: selftests: Finish generalizing get-reg-list
+>
+> Haibo Xu (6):
+>   KVM: arm64: selftests: Move reject_set check logic to a function
+>   KVM: arm64: selftests: Move finalize_vcpu back to run_test
+>   KVM: selftests: Only do get/set tests on present blessed list
+>   KVM: selftests: Add skip_set facility to get_reg_list test
+>   KVM: riscv: Add KVM_GET_REG_LIST API support
+>   KVM: riscv: selftests: Add get-reg-list test
 
-While I have your attention, we have another series that manages the
-trace filtering for Guests on VHE, completely within the Coresight etm4x
-driver here [0]. I personally think, it is good to have the guest
-filtering for both nVHE and VHE under the KVM control, like we do
-in this series. I would like your opinion on this.
+Are you okay for this series to go through the KVM RISC-V tree ?
 
-[0] https://lkml.kernel.org/r/20230804085219.260790-1-james.clark@arm.com
+Regards,
+Anup
 
-
-Suzuki
-
-
-> 
-> Thanks,
-> 
-> 	M.
-> 
-
+>
+>  Documentation/virt/kvm/api.rst                |   2 +-
+>  arch/riscv/kvm/vcpu.c                         | 375 +++++++++
+>  tools/testing/selftests/kvm/Makefile          |  13 +-
+>  .../selftests/kvm/aarch64/get-reg-list.c      | 554 ++-----------
+>  tools/testing/selftests/kvm/get-reg-list.c    | 401 +++++++++
+>  .../selftests/kvm/include/kvm_util_base.h     |  21 +
+>  .../selftests/kvm/include/riscv/processor.h   |   3 +
+>  .../testing/selftests/kvm/include/test_util.h |   2 +
+>  tools/testing/selftests/kvm/lib/test_util.c   |  15 +
+>  .../selftests/kvm/riscv/get-reg-list.c        | 780 ++++++++++++++++++
+>  10 files changed, 1670 insertions(+), 496 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/get-reg-list.c
+>  create mode 100644 tools/testing/selftests/kvm/riscv/get-reg-list.c
+>
+> --
+> 2.34.1
+>
