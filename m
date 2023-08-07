@@ -1,616 +1,167 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0036811181
-	for <kvmarm@lists.linux.dev>; Mon,  7 Aug 2023 17:19:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1691428764;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BKLARmM0DSmIwECDY6ckEh73qSW/fY/MRa8y0tsoqcY=;
-	b=cPYEo8UUpbYCFh/A7G+ivKDZkdfYenLOKOVnrGsiNr3AhOHjUmWHiTxIIDvhalRZE6oAN+
-	HUGU4Wf8RWeAAqaieUob7kICVo/zDuaXUO+eC9jgxEJ/vppRZFJ/gnVEEEWpF2NndX7pP/
-	XOBTBFbobBjRn6daUUxIO6t6YCjgxt8=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-310-0Hb7X5qcOaOPGhbCYEAZZQ-1; Mon, 07 Aug 2023 13:19:23 -0400
-X-MC-Unique: 0Hb7X5qcOaOPGhbCYEAZZQ-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-76843c4b0f3so380919085a.2
-        for <kvmarm@lists.linux.dev>; Mon, 07 Aug 2023 10:19:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691428762; x=1692033562;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BKLARmM0DSmIwECDY6ckEh73qSW/fY/MRa8y0tsoqcY=;
-        b=bOSHVDDwle4ZwgJ1KF79bZteLBEQ4dC5ynkUIkc687pl8wntJAqRDnE2XgQPOpBZP9
-         CPvHr8eRiJay50ZJqxLOBQKsXnXbP0POmNJS7uBXVN8euArcFWHem8aDxysLV8MSGc2P
-         wdbM6DVNO4wgBFZYD9kc1qekRAWA1SEhwLwdgZ3sDZjdo5Qy0S8glm5XjoJ6lLuR9FId
-         1cMIoRFMI4Pfz+rIjYrgMcGnze4uQz7jUe1fRjEsRhcNRo3S6AXD1+CZMW22ZQEuPMPs
-         CuPGjakpIGDOj6Cod7SRciJv4JJJoETd1lQ7OP2SsdsFHpXCu+g5vk+Rh0e5GSr+bKBY
-         fmEg==
-X-Gm-Message-State: AOJu0YyfHoGGLCzgbZMNef1NCAtZBj7rQClkjAF21Q+Lid1MaK7SiXSr
-	GPDYe8hemXili5Izzf4PxmU31G23F2uNsiUJUYhE5jZR02YpTRBHwu5CtfDSOdZ/0MAPFttJ43m
-	wI9wIursXhs3Abr7t
-X-Received: by 2002:a05:620a:7ea:b0:76c:ab4f:e9a4 with SMTP id k10-20020a05620a07ea00b0076cab4fe9a4mr6151916qkk.34.1691428762573;
-        Mon, 07 Aug 2023 10:19:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEmmktCRc+/tcmZKhRlNtG6kc0ovng7EHfD11bqMilwq82GWLXo9XCa3F6d3r83qKRlDxE0rg==
-X-Received: by 2002:a05:620a:7ea:b0:76c:ab4f:e9a4 with SMTP id k10-20020a05620a07ea00b0076cab4fe9a4mr6151886qkk.34.1691428762169;
-        Mon, 07 Aug 2023 10:19:22 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id d13-20020a05620a140d00b00763b94432ebsm2724039qkj.18.2023.08.07.10.19.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Aug 2023 10:19:21 -0700 (PDT)
-Message-ID: <e9f78d51-e463-6adb-4ae6-96d14950bd25@redhat.com>
-Date: Mon, 7 Aug 2023 19:19:16 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96DBFBFD
+	for <kvmarm@lists.linux.dev>; Mon,  7 Aug 2023 19:00:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FF2DC433C7;
+	Mon,  7 Aug 2023 19:00:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691434816;
+	bh=5m/STA9PtNQsOcqTfXz0N1bOmLM90be5DraJdYGbRX4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=aOC3wppc54KI8adDp8a0TfI+Ua3xrybFZ7ENmAnEPnSFWRdS270ST/9Iy0bhDJ0GQ
+	 dx8gC86tIg3b5yL59IZCjyXTafgwgzsVw8HPW5k3ks/ldxlcMeH2EBTnSFMlNsxowo
+	 5rH8VzVOSgyarSD1KEAqa8nOL8xteML3/v831i/U4K7MARff2ikE/NRadQSfYToPmU
+	 x0nLfpd9f4BkUJciflDdQD8FEeh+D+Uco1CM1tIPoWy6iiTTDS+NqczGuhXf6hVHOn
+	 Kn9Ww2UscOPdiTU50DDxw1J/Ou6Pw3IemgTso1Tzi2L2aEo+8Wr4WEVjGaZqwZlqEf
+	 20JiDIqxqnp6A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qT5Sf-002vSP-M7;
+	Mon, 07 Aug 2023 20:00:13 +0100
+Date: Mon, 07 Aug 2023 20:00:12 +0100
+Message-ID: <867cq665kz.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: eric.auger@redhat.com
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Brown
+ <broonie@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Chase Conklin <chase.conklin@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Darren Hart <darren@os.amperecomputing.com>,
+	Miguel Luis <miguel.luis@oracle.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 21/26] KVM: arm64: nv: Add trap forwarding for HDFGxTR_EL2
+In-Reply-To: <e9f78d51-e463-6adb-4ae6-96d14950bd25@redhat.com>
+References: <20230728082952.959212-1-maz@kernel.org>
+	<20230728082952.959212-22-maz@kernel.org>
+	<e9f78d51-e463-6adb-4ae6-96d14950bd25@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v2 21/26] KVM: arm64: nv: Add trap forwarding for
- HDFGxTR_EL2
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Mark Brown
- <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Will Deacon <will@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>,
- Andre Przywara <andre.przywara@arm.com>,
- Chase Conklin <chase.conklin@arm.com>,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Darren Hart <darren@os.amperecomputing.com>,
- Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
-References: <20230728082952.959212-1-maz@kernel.org>
- <20230728082952.959212-22-maz@kernel.org>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230728082952.959212-22-maz@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Marc,
-On 7/28/23 10:29, Marc Zyngier wrote:
-> ... and finally, the Debug version of FGT, with its *enormous*
-> list of trapped registers.
->
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Hi Marc, I think you mixed up with the R-b's sent on
-[PATCH v2 06/26] arm64: Add debug registers affected by HDFGxTR_EL2
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_arm.h |  11 +
->  arch/arm64/kvm/emulate-nested.c  | 460 +++++++++++++++++++++++++++++++
->  2 files changed, 471 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index 809bc86acefd..d229f238c3b6 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -358,6 +358,17 @@
->  #define __HFGITR_EL2_MASK	GENMASK(54, 0)
->  #define __HFGITR_EL2_nMASK	GENMASK(56, 55)
->  
-> +#define __HDFGRTR_EL2_RES0	(BIT(49) | BIT(42) | GENMASK(39, 38) |	\
-> +				 GENMASK(21, 20) | BIT(8))
-> +#define __HDFGRTR_EL2_MASK	~__HDFGRTR_EL2_nMASK
-> +#define __HDFGRTR_EL2_nMASK	GENMASK(62, 59)
-> +
-> +#define __HDFGWTR_EL2_RES0	(BIT(63) | GENMASK(59, 58) | BIT(51) | BIT(47) | \
-> +				 BIT(43) | GENMASK(40, 38) | BIT(34) | BIT(30) | \
-> +				 BIT(22) | BIT(9) | BIT(6))
-> +#define __HDFGWTR_EL2_MASK	~__HDFGWTR_EL2_nMASK
-> +#define __HDFGWTR_EL2_nMASK	GENMASK(62, 60)
-> +
->  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
->  #define HPFAR_MASK	(~UL(0xf))
->  /*
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index 72619d845cc8..e3bfb2440801 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -925,6 +925,8 @@ static DEFINE_XARRAY(sr_forward_xa);
->  enum fgt_group_id {
->  	__NO_FGT_GROUP__,
->  	HFGxTR_GROUP,
-> +	HDFGRTR_GROUP,
-> +	HDFGWTR_GROUP,
->  	HFGITR_GROUP,
->  };
->  
-> @@ -1107,6 +1109,456 @@ static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
->  	SR_FGT(SYS_IC_IVAU, 		HFGITR, ICIVAU, 1),
->  	SR_FGT(SYS_IC_IALLU, 		HFGITR, ICIALLU, 1),
->  	SR_FGT(SYS_IC_IALLUIS, 		HFGITR, ICIALLUIS, 1),
-> +	/* HDFGRTR_EL2 */
-> +	SR_FGT(SYS_PMBIDR_EL1, 		HDFGRTR, PMBIDR_EL1, 1),y
-> +	SR_FGT(SYS_PMSNEVFR_EL1, 	HDFGRTR, nPMSNEVFR_EL1, 0),y
-> +	SR_FGT(SYS_BRBINF_EL1(0), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(1), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(2), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(3), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(4), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(5), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(6), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(7), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(8), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(9), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(10), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(11), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(12), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(13), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(14), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(15), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(16), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(17), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(18), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(19), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(20), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(21), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(22), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(23), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(24), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(25), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(26), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(27), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(28), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(29), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(30), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(31), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINFINJ_EL1, 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(0), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(1), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(2), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(3), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(4), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(5), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(6), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(7), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(8), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(9), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(10), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(11), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(12), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(13), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(14), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(15), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(16), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(17), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(18), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(19), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(20), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(21), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(22), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(23), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(24), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(25), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(26), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(27), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(28), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(29), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(30), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(31), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRCINJ_EL1, 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(0), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(1), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(2), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(3), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(4), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(5), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(6), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(7), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(8), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(9), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(10), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(11), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(12), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(13), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(14), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(15), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(16), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(17), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(18), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(19), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(20), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(21), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(22), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(23), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(24), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(25), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(26), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(27), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(28), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(29), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(30), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(31), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGTINJ_EL1, 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTS_EL1, 		HDFGRTR, nBRBDATA, 0),y
-> +	SR_FGT(SYS_BRBCR_EL1, 		HDFGRTR, nBRBCTL, 0),
-> +	SR_FGT(SYS_BRBFCR_EL1, 		HDFGRTR, nBRBCTL, 0),
-> +	SR_FGT(SYS_BRBIDR0_EL1, 	HDFGRTR, nBRBIDR, 0),
-> +	SR_FGT(SYS_PMCEID0_EL0, 	HDFGRTR, PMCEIDn_EL0, 1),y
-> +	SR_FGT(SYS_PMCEID1_EL0, 	HDFGRTR, PMCEIDn_EL0, 1),y
-> +	SR_FGT(SYS_PMUSERENR_EL0, 	HDFGRTR, PMUSERENR_EL0, 1),y
-> +	SR_FGT(SYS_TRBTRG_EL1, 		HDFGRTR, TRBTRG_EL1, 1),y
-> +	SR_FGT(SYS_TRBSR_EL1, 		HDFGRTR, TRBSR_EL1, 1),y
-> +	SR_FGT(SYS_TRBPTR_EL1, 		HDFGRTR, TRBPTR_EL1, 1),y
-> +	SR_FGT(SYS_TRBMAR_EL1, 		HDFGRTR, TRBMAR_EL1, 1),y
-> +	SR_FGT(SYS_TRBLIMITR_EL1, 	HDFGRTR, TRBLIMITR_EL1, 1),y
-> +	SR_FGT(SYS_TRBIDR_EL1, 		HDFGRTR, TRBIDR_EL1, 1),y
-> +	SR_FGT(SYS_TRBBASER_EL1, 	HDFGRTR, TRBBASER_EL1, 1),y
-> +	SR_FGT(SYS_TRCVICTLR, 		HDFGRTR, TRCVICTLR, 1),y
-> +	SR_FGT(SYS_TRCSTATR, 		HDFGRTR, TRCSTATR, 1),y
-> +	SR_FGT(SYS_TRCSSCSR(0), 	HDFGRTR, TRCSSCSRn, 1),y
-> +	SR_FGT(SYS_TRCSSCSR(1), 	HDFGRTR, TRCSSCSRn, 1),
-> +	SR_FGT(SYS_TRCSSCSR(2), 	HDFGRTR, TRCSSCSRn, 1),
-> +	SR_FGT(SYS_TRCSSCSR(3), 	HDFGRTR, TRCSSCSRn, 1),
-> +	SR_FGT(SYS_TRCSSCSR(4), 	HDFGRTR, TRCSSCSRn, 1),
-> +	SR_FGT(SYS_TRCSSCSR(5), 	HDFGRTR, TRCSSCSRn, 1),
-> +	SR_FGT(SYS_TRCSSCSR(6), 	HDFGRTR, TRCSSCSRn, 1),
-> +	SR_FGT(SYS_TRCSSCSR(7), 	HDFGRTR, TRCSSCSRn, 1),y
-> +	SR_FGT(SYS_TRCSEQSTR, 		HDFGRTR, TRCSEQSTR, 1),y
-> +	SR_FGT(SYS_TRCPRGCTLR, 		HDFGRTR, TRCPRGCTLR, 1),y
-> +	SR_FGT(SYS_TRCOSLSR, 		HDFGRTR, TRCOSLSR, 1),y
-> +	SR_FGT(SYS_TRCIMSPEC0, 		HDFGRTR, TRCIMSPECn, 1),
-why not SYS_TRCIMSPEC(0)?
-> +	SR_FGT(SYS_TRCIMSPEC(1), 	HDFGRTR, TRCIMSPECn, 1),
-> +	SR_FGT(SYS_TRCIMSPEC(2), 	HDFGRTR, TRCIMSPECn, 1),
-> +	SR_FGT(SYS_TRCIMSPEC(3), 	HDFGRTR, TRCIMSPECn, 1),
-> +	SR_FGT(SYS_TRCIMSPEC(4), 	HDFGRTR, TRCIMSPECn, 1),
-> +	SR_FGT(SYS_TRCIMSPEC(5), 	HDFGRTR, TRCIMSPECn, 1),
-> +	SR_FGT(SYS_TRCIMSPEC(6), 	HDFGRTR, TRCIMSPECn, 1),
-> +	SR_FGT(SYS_TRCIMSPEC(7), 	HDFGRTR, TRCIMSPECn, 1),
-> +	SR_FGT(SYS_TRCDEVARCH, 		HDFGRTR, TRCID, 1),
-> +	SR_FGT(SYS_TRCDEVID, 		HDFGRTR, TRCID, 1),
-what about all of the TRCIDR regs refered to in the spec?
-> +	SR_FGT(SYS_TRCCNTVR(0), 	HDFGRTR, TRCCNTVRn, 1),
-> +	SR_FGT(SYS_TRCCNTVR(1), 	HDFGRTR, TRCCNTVRn, 1),
-> +	SR_FGT(SYS_TRCCNTVR(2), 	HDFGRTR, TRCCNTVRn, 1),
-> +	SR_FGT(SYS_TRCCNTVR(3), 	HDFGRTR, TRCCNTVRn, 1),y
-> +	SR_FGT(SYS_TRCCLAIMCLR, 	HDFGRTR, TRCCLAIM, 1),y
-> +	SR_FGT(SYS_TRCCLAIMSET, 	HDFGRTR, TRCCLAIM, 1),y
-> +	SR_FGT(SYS_TRCAUXCTLR, 		HDFGRTR, TRCAUXCTLR, 1),y
-> +	SR_FGT(SYS_TRCAUTHSTATUS, 	HDFGRTR, TRCAUTHSTATUS, 1),y
-> +	SR_FGT(SYS_TRCACATR(0), 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCACATR(1), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(2), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(3), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(4), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(5), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(6), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(7), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(8), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(9), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(10), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(11), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(12), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(13), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(14), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(15), 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCACVR(0), 		HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCACVR(1), 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(2), 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(3), 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(4), 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(5), 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(6), 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(7), 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(8), 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(9), 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(10), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(11), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(12), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(13), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(14), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(15), 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCBBCTLR, 		HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCCCCTLR, 		HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCCIDCCTLR0, 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCCIDCCTLR1, 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCCIDCVR(0), 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCCIDCVR(1), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCIDCVR(2), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCIDCVR(3), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCIDCVR(4), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCIDCVR(5), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCIDCVR(6), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCIDCVR(7), 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCCNTCTLR(0), 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCCNTCTLR(1), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCNTCTLR(2), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCNTCTLR(3), 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCCNTRLDVR(0), 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCCNTRLDVR(1), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCNTRLDVR(2), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCNTRLDVR(3), 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCCONFIGR, 		HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCEVENTCTL0R, 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCEVENTCTL1R, 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCEXTINSELR(0), 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCEXTINSELR(1), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCEXTINSELR(2), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCEXTINSELR(3), 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCRSCTLR(2), 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCRSCTLR(3), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(4), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(5), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(6), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(7), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(8), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(9), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(10), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(11), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(12), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(13), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(14), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(15), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(16), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(17), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(18), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(19), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(20), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(21), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(22), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(23), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(24), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(25), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(26), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(27), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(28), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(29), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(30), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(31), 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCQCTLR, 		HDFGRTR, TRC, 1),
-nit: maybe put this one before the
+Hi Eric,
 
-SYS_TRCRSCTLR(n) series to follow the spec order 
+On Mon, 07 Aug 2023 18:19:16 +0100,
+Eric Auger <eric.auger@redhat.com> wrote:
+> 
+> Hi Marc,
+> On 7/28/23 10:29, Marc Zyngier wrote:
+> > ... and finally, the Debug version of FGT, with its *enormous*
+> > list of trapped registers.
+> >
+> > Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Hi Marc, I think you mixed up with the R-b's sent on
+> [PATCH v2 06/26] arm64: Add debug registers affected by HDFGxTR_EL2
 
-> +	SR_FGT(SYS_TRCRSR, 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSEQEVR(0), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSEQEVR(1), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSEQEVR(2), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSEQRSTEVR, 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCSSCCR(0), 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCSSCCR(1), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSCCR(2), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSCCR(3), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSCCR(4), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSCCR(5), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSCCR(6), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSCCR(7), 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCSSPCICR(0), 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCSSPCICR(1), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSPCICR(2), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSPCICR(3), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSPCICR(4), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSPCICR(5), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSPCICR(6), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSPCICR(7), 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCSTALLCTLR, 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCSYNCPR, 		HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCTRACEIDR, 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCTSCTLR, 		HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCVIIECTLR, 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCVIPCSSCTLR, 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCVISSCTLR, 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCVMIDCCTLR0, 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCVMIDCCTLR1, 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCVMIDCVR(0), 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_TRCVMIDCVR(1), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCVMIDCVR(2), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCVMIDCVR(3), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCVMIDCVR(4), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCVMIDCVR(5), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCVMIDCVR(6), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCVMIDCVR(7), 	HDFGRTR, TRC, 1),y
-> +	SR_FGT(SYS_PMSLATFR_EL1, 	HDFGRTR, PMSLATFR_EL1, 1),y
-> +	SR_FGT(SYS_PMSIRR_EL1, 		HDFGRTR, PMSIRR_EL1, 1),y
-> +	SR_FGT(SYS_PMSIDR_EL1, 		HDFGRTR, PMSIDR_EL1, 1),y
-> +	SR_FGT(SYS_PMSICR_EL1, 		HDFGRTR, PMSICR_EL1, 1),y
-> +	SR_FGT(SYS_PMSFCR_EL1, 		HDFGRTR, PMSFCR_EL1, 1),y
-> +	SR_FGT(SYS_PMSEVFR_EL1, 	HDFGRTR, PMSEVFR_EL1, 1),y
-> +	SR_FGT(SYS_PMSCR_EL1, 		HDFGRTR, PMSCR_EL1, 1),y
-> +	SR_FGT(SYS_PMBSR_EL1, 		HDFGRTR, PMBSR_EL1, 1),y
-> +	SR_FGT(SYS_PMBPTR_EL1, 		HDFGRTR, PMBPTR_EL1, 1),y
-> +	SR_FGT(SYS_PMBLIMITR_EL1, 	HDFGRTR, PMBLIMITR_EL1, 1),y
-> +	SR_FGT(SYS_PMMIR_EL1, 		HDFGRTR, PMMIR_EL1, 1),y
-> +	SR_FGT(SYS_PMSELR_EL0, 		HDFGRTR, PMSELR_EL0, 1),y
-> +	SR_FGT(SYS_PMOVSCLR_EL0, 	HDFGRTR, PMOVS, 1),y
-> +	SR_FGT(SYS_PMOVSSET_EL0, 	HDFGRTR, PMOVS, 1),y
-> +	SR_FGT(SYS_PMINTENCLR_EL1, 	HDFGRTR, PMINTEN, 1),y
-> +	SR_FGT(SYS_PMINTENSET_EL1, 	HDFGRTR, PMINTEN, 1),y
-> +	SR_FGT(SYS_PMCNTENCLR_EL0, 	HDFGRTR, PMCNTEN, 1),y
-> +	SR_FGT(SYS_PMCNTENSET_EL0, 	HDFGRTR, PMCNTEN, 1),y
-> +	SR_FGT(SYS_PMCCNTR_EL0, 	HDFGRTR, PMCCNTR_EL0, 1),y
-> +	SR_FGT(SYS_PMCCFILTR_EL0, 	HDFGRTR, PMCCFILTR_EL0, 1),y
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(0), 	HDFGRTR, PMEVTYPERn_EL0, 1),y
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(1), 	HDFGRTR, PMEVTYPERn_EL0, 1),y
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(2), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(3), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(4), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(5), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(6), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(7), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(8), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(9), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(10), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(11), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(12), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(13), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(14), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(15), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(16), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(17), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(18), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(19), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(20), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(21), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(22), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(23), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(24), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(25), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(26), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(27), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(28), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(29), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(30), 	HDFGRTR, PMEVTYPERn_EL0, 1),y
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(0), 	HDFGRTR, PMEVCNTRn_EL0, 1),y
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(1), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(2), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(3), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(4), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(5), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(6), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(7), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(8), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(9), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(10), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(11), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(12), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(13), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(14), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(15), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(16), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(17), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(18), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(19), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(20), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(21), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(22), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(23), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(24), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(25), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(26), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(27), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(28), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(29), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(30), 	HDFGRTR, PMEVCNTRn_EL0, 1),y
-> +	SR_FGT(SYS_OSDLR_EL1, 		HDFGRTR, OSDLR_EL1, 1),y
-> +	SR_FGT(SYS_OSECCR_EL1, 		HDFGRTR, OSECCR_EL1, 1),y
-> +	SR_FGT(SYS_OSLSR_EL1, 		HDFGRTR, OSLSR_EL1, 1),y
-> +	SR_FGT(SYS_DBGPRCR_EL1, 	HDFGRTR, DBGPRCR_EL1, 1),y
-> +	SR_FGT(SYS_DBGAUTHSTATUS_EL1, 	HDFGRTR, DBGAUTHSTATUS_EL1, 1),y
-> +	SR_FGT(SYS_DBGCLAIMSET_EL1, 	HDFGRTR, DBGCLAIM, 1),y
-> +	SR_FGT(SYS_DBGCLAIMCLR_EL1, 	HDFGRTR, DBGCLAIM, 1),y
-> +	SR_FGT(SYS_MDSCR_EL1, 		HDFGRTR, MDSCR_EL1, 1),y
-> +	/*
-> +	 * The trap bits capture *64* debug registers per bit, but the
-> +	 * ARM ARM only describes the encoding for the first 16, and
-> +	 * we don't really support more than that anyway.
-> +	 */
-> +	SR_FGT(SYS_DBGWVRn_EL1(0), 	HDFGRTR, DBGWVRn_EL1, 1),y
-> +	SR_FGT(SYS_DBGWVRn_EL1(1), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(2), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(3), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(4), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(5), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(6), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(7), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(8), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(9), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(10), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(11), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(12), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(13), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(14), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(15), 	HDFGRTR, DBGWVRn_EL1, 1),y
-> +	SR_FGT(SYS_DBGWCRn_EL1(0), 	HDFGRTR, DBGWCRn_EL1, 1),y
-> +	SR_FGT(SYS_DBGWCRn_EL1(1), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(2), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(3), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(4), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(5), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(6), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(7), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(8), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(9), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(10), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(11), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(12), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(13), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(14), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(15), 	HDFGRTR, DBGWCRn_EL1, 1),y
-> +	SR_FGT(SYS_DBGBVRn_EL1(0), 	HDFGRTR, DBGBVRn_EL1, 1),y
-> +	SR_FGT(SYS_DBGBVRn_EL1(1), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(2), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(3), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(4), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(5), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(6), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(7), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(8), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(9), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(10), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(11), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(12), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(13), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(14), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(15), 	HDFGRTR, DBGBVRn_EL1, 1),y
-> +	SR_FGT(SYS_DBGBCRn_EL1(0), 	HDFGRTR, DBGBCRn_EL1, 1),y
-> +	SR_FGT(SYS_DBGBCRn_EL1(1), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(2), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(3), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(4), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(5), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(6), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(7), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(8), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(9), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(10), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(11), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(12), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(13), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(14), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(15), 	HDFGRTR, DBGBCRn_EL1, 1),y
-> +	/*
-> +	 * HDFGWTR_EL2
-> +	 *
-> +	 * Although HDFGRTR_EL2 and HDFGWTR_EL2 registers largely
-> +	 * overlap in their bit assignment, there are a number of bits
-> +	 * that are RES0 on one side, and an actual trap bit on the
-> +	 * other.  The policy chosen here is to describe all the
-> +	 * read-side mappings, and only the write-side mappings that
-> +	 * differ from the write side, and the trap handler will pick
-differ from the read side?
-> +	 * the correct shadow register based on the access type.
-> +	 */
-> +	SR_FGT(SYS_TRFCR_EL1,		HDFGWTR, TRFCR_EL1, 1),
-> +	SR_FGT(SYS_TRCOSLAR,		HDFGWTR, TRCOSLAR, 1),
-> +	SR_FGT(SYS_PMCR_EL0,		HDFGWTR, PMCR_EL0, 1),
-> +	SR_FGT(SYS_PMSWINC_EL0,		HDFGWTR, PMSWINC_EL0, 1),
-> +	SR_FGT(SYS_OSLAR_EL1,		HDFGWTR, OSLAR_EL1, 1),
->  };
->  
->  static union trap_config get_trap_config(u32 sysreg)
-> @@ -1241,6 +1693,14 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
->  			val = sanitised_sys_reg(vcpu, HFGWTR_EL2);
->  		break;
->  
-> +	case HDFGRTR_GROUP:
-> +	case HDFGWTR_GROUP:
-> +		if (is_read)
-> +			val = sanitised_sys_reg(vcpu, HDFGRTR_EL2);
-> +		else
-> +			val = sanitised_sys_reg(vcpu, HDFGWTR_EL2);
-> +		break;
-> +
->  	case HFGITR_GROUP:
->  		val = sanitised_sys_reg(vcpu, HFGITR_EL2);
->  		break;
-Thanks
+Most probably. Really sorry about that. I'll fix that right away.
 
-Eric
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_arm.h |  11 +
+> >  arch/arm64/kvm/emulate-nested.c  | 460 +++++++++++++++++++++++++++++++
 
+[...]
+
+> > +	SR_FGT(SYS_TRCIMSPEC0, 		HDFGRTR, TRCIMSPECn, 1),
+> why not SYS_TRCIMSPEC(0)?
+
+Yup, it's been mentioned a couple of time already, now fixed.
+
+> > +	SR_FGT(SYS_TRCIMSPEC(1), 	HDFGRTR, TRCIMSPECn, 1),
+> > +	SR_FGT(SYS_TRCIMSPEC(2), 	HDFGRTR, TRCIMSPECn, 1),
+> > +	SR_FGT(SYS_TRCIMSPEC(3), 	HDFGRTR, TRCIMSPECn, 1),
+> > +	SR_FGT(SYS_TRCIMSPEC(4), 	HDFGRTR, TRCIMSPECn, 1),
+> > +	SR_FGT(SYS_TRCIMSPEC(5), 	HDFGRTR, TRCIMSPECn, 1),
+> > +	SR_FGT(SYS_TRCIMSPEC(6), 	HDFGRTR, TRCIMSPECn, 1),
+> > +	SR_FGT(SYS_TRCIMSPEC(7), 	HDFGRTR, TRCIMSPECn, 1),
+> > +	SR_FGT(SYS_TRCDEVARCH, 		HDFGRTR, TRCID, 1),
+> > +	SR_FGT(SYS_TRCDEVID, 		HDFGRTR, TRCID, 1),
+> what about all of the TRCIDR regs refered to in the spec?
+
+Ah, nothing escapes you! Yup totally missed it, now added.
+
+[...]
+
+> > +	SR_FGT(SYS_TRCRSCTLR(2), 	HDFGRTR, TRC, 1),y
+> > +	SR_FGT(SYS_TRCRSCTLR(3), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(4), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(5), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(6), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(7), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(8), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(9), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(10), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(11), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(12), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(13), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(14), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(15), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(16), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(17), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(18), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(19), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(20), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(21), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(22), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(23), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(24), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(25), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(26), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(27), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(28), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(29), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(30), 	HDFGRTR, TRC, 1),
+> > +	SR_FGT(SYS_TRCRSCTLR(31), 	HDFGRTR, TRC, 1),y
+> > +	SR_FGT(SYS_TRCQCTLR, 		HDFGRTR, TRC, 1),
+> nit: maybe put this one before the
+> 
+> SYS_TRCRSCTLR(n) series to follow the spec order
+
+Done.
+
+[...]
+
+> > +	/*
+> > +	 * HDFGWTR_EL2
+> > +	 *
+> > +	 * Although HDFGRTR_EL2 and HDFGWTR_EL2 registers largely
+> > +	 * overlap in their bit assignment, there are a number of bits
+> > +	 * that are RES0 on one side, and an actual trap bit on the
+> > +	 * other.  The policy chosen here is to describe all the
+> > +	 * read-side mappings, and only the write-side mappings that
+> > +	 * differ from the write side, and the trap handler will pick
+> differ from the read side?
+
+Well spotted! Now fixed.
+
+Thanks again!
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
