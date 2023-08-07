@@ -1,49 +1,52 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 184E3111B7
-	for <kvmarm@lists.linux.dev>; Mon,  7 Aug 2023 16:22:14 +0000 (UTC)
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1bb8f751372so50397805ad.0
-        for <kvmarm@lists.linux.dev>; Mon, 07 Aug 2023 09:22:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4788511CBA
+	for <kvmarm@lists.linux.dev>; Mon,  7 Aug 2023 16:22:17 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5896bdb0b18so3204427b3.1
+        for <kvmarm@lists.linux.dev>; Mon, 07 Aug 2023 09:22:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691425334; x=1692030134;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=CYFU6bv8pwt4NvkXXCWK7C5GIbxtGOwXTh1972qGl6s=;
-        b=xY/I46rWtwWBTdOGDb6K0HFam0Khyb1W4Yxt8yTMDImzn3KOUVs5daYYyTKd1fgJgS
-         VXdRS3/UYVT6ipQGXfpf/2FHypwUC8hmy9eVsc3XSmO9Nioifmo9h5LQ5yg+KOhnw3yN
-         mq1S8p879UpfgtXLRLpFp2Q8fsiN0PBxphQ4n4grzevcuBrldykJSSU0bb5UUDWRLEwk
-         vTH6CZAVEVEgeHMSujWjB/ce8qyPQ60UwQIe2frLCYdZnmk1H0oC6x+6SskTlFk+/6oh
-         oomcqg87rsXsg+RXjefUTuC/x6ION5xeEaqvrxZFx31Sx6xIauIcli8gOMP9Sn+qAMJN
-         BPqA==
+        d=google.com; s=20221208; t=1691425336; x=1692030136;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zlLU+JeUl/Zf+3o39E/XFPrzvVSk+tnArimfCDUBqW8=;
+        b=UkFvteN894W5UnGIue9oKBH78DjIGJpGcBSqDjOzOBBJizdsVt9mWnIufshzxxe5BL
+         FPmlbQwD5+8xEfqzi8hBvfiwGapLuM2Z06mSsAwFKpVPHNKfVWJ8HKz0ZTUKN7Eyexag
+         6xH1Mgw09gl9AQuRb0xrDJLuFobP+DQe+hv6PeMAb3LyxjFwXdAPbKAmijBH2P4UK+b3
+         LEwtGqSBqjKg1poukfK1KCxMDWHYEQQNPn/zcoWfauc/0uVtjk5nD+Hv3bkdwYVC4bjF
+         H+LE8Yqru2ZO1ZrmF9izPjT7AVfbS3w7MEsst/5s16vSFvtTGJjNYBLCvdL5+gar8fo/
+         LBkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691425334; x=1692030134;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CYFU6bv8pwt4NvkXXCWK7C5GIbxtGOwXTh1972qGl6s=;
-        b=QnFlFxRsE2bCfqYaP0kdxNYWHDRX96aG9JLB4rd5Nfzm9RlNh5eZ6Z1VAOC93/cRnq
-         rJNbl293AmVPH5f2bP0Zr+hgII/E1SWRM9m0aCmuz26L3e1tHi24gvnIFA7foR1vhJR5
-         H/kqxudWAK4+uWlQWMSZyhV4KfEcf3qmFrg/HtJN6uPSvBriI1nK2radGcYj8UD4Ovor
-         Pb4qJlNi1E6UdAC8knCJBBfMvn1cHxgxp4FUpJAsZFV6Gf7PkQa5YjIWJxDLLQb39B3B
-         d/ebDxbFOgYeuq79dGBWh/PDVAu4EfZCQGjt7wukEgfEWncu4r8jgQOMwTgXuieKwsM9
-         ShNw==
-X-Gm-Message-State: AOJu0YxBjLJXszRUaZ1Lu5erz66MnboIhXeInp5BNmpKD2dXNCyCBiOF
-	9Na7V2Wng00Px5k3ygkJsR5AQ33BMScOjH0Ytw==
-X-Google-Smtp-Source: AGHT+IEChF1DtnHpie76mYHzLSLfp5pnGrRuLzshpX224Lbsn5+SW8ivD0hye+cneqOPBmu5PVzvcF9PEw6k1apBtg==
+        d=1e100.net; s=20221208; t=1691425336; x=1692030136;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zlLU+JeUl/Zf+3o39E/XFPrzvVSk+tnArimfCDUBqW8=;
+        b=QUlzIpTADEHVmnS+yeXMrc6aA7VjLBNKCuK5Ojtz/YwPg/H/ELZ9ZJWtbDEYFIjsLR
+         le58I4FHMcOkqd+eLV6FVDmtn3zucFJbCY5dizSNGu1yZcUwxagML0h3AaYiDdr3vpFS
+         BwPJvJAI2LSvsWodfGzqlMmv1UtS/O9WIvfjLyWD5iTW+TMImBtQzBr1fHf2jafSG7Mk
+         zkNn7R2MZJ0cWvV+xKYfZDr1qwc3Qoo8DOEyaYrGh+JOXx8l13OQRG0HoYP7M+wuyKHD
+         Glx0cB2QYFseXEkUGOgYe/VYOnIBUWipNdeXDe78YRSeQ3zRiEImBRx5AgkIGiVuCSpD
+         4WZA==
+X-Gm-Message-State: AOJu0YwssA2xPUOBl8xIbPsfGtK67qAOwWlAXVLgoATKst0xleBKZfg3
+	9GsJpiNQRt/3SmJN6N5DFnUBzhcO5iQeRMRs/Q==
+X-Google-Smtp-Source: AGHT+IFkL+mOtutYXASQHrxOiXM+gXLe2GsRknVDZ4dktWJ1APGTxIlzC3QJS1qEFfu2OsR68WQoqiGPUe3fMMlF6w==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a17:903:2349:b0:1bc:4c3d:eb08 with
- SMTP id c9-20020a170903234900b001bc4c3deb08mr40231plh.8.1691425334254; Mon,
- 07 Aug 2023 09:22:14 -0700 (PDT)
-Date: Mon,  7 Aug 2023 09:21:58 -0700
+ (user=jingzhangos job=sendgmr) by 2002:a81:1787:0:b0:589:6c60:f4a0 with SMTP
+ id 129-20020a811787000000b005896c60f4a0mr6150ywx.0.1691425336153; Mon, 07 Aug
+ 2023 09:22:16 -0700 (PDT)
+Date: Mon,  7 Aug 2023 09:21:59 -0700
+In-Reply-To: <20230807162210.2528230-1-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20230807162210.2528230-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
-Message-ID: <20230807162210.2528230-1-jingzhangos@google.com>
-Subject: [PATCH v8 00/11] Enable writable for idregs DFR0,PFR0, MMFR{0,1,2,3}
+Message-ID: <20230807162210.2528230-2-jingzhangos@google.com>
+Subject: [PATCH v8 01/11] KVM: arm64: Allow userspace to get the writable
+ masks for feature ID registers
 From: Jing Zhang <jingzhangos@google.com>
 To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
 	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
@@ -56,105 +59,172 @@ Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
 	Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This patch series enable userspace writable for below idregs:
-ID_AA64DFR0_EL1, ID_DFR0_EL1, ID_AA64PFR0_EL1, ID_AA64MMFR{0, 1, 2, 3}_EL1.
-A vm ioctl is added to get feature ID register writable masks from userspace.
-A selftest is added to verify that KVM handles the writings from user space
-correctly.
-A relevant patch from Oliver is picked from [3].
+Add a VM ioctl to allow userspace to get writable masks for feature ID
+registers in below system register space:
+op0 = 3, op1 = {0, 1, 3}, CRn = 0, CRm = {0 - 7}, op2 = {0 - 7}
+This is used to support mix-and-match userspace and kernels for writable
+ID registers, where userspace may want to know upfront whether it can
+actually tweak the contents of an idreg or not.
 
+Suggested-by: Marc Zyngier <maz@kernel.org>
+Suggested-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
+ arch/arm64/include/asm/kvm_host.h |  2 ++
+ arch/arm64/include/uapi/asm/kvm.h | 26 ++++++++++++++
+ arch/arm64/kvm/arm.c              |  7 ++++
+ arch/arm64/kvm/sys_regs.c         | 57 +++++++++++++++++++++++++++++++
+ include/uapi/linux/kvm.h          |  1 +
+ 5 files changed, 93 insertions(+)
 
-* v7 -> v8
-  - Rebase on v6.5-rc5.
-  - Add reserved parameters to UAPI to get writable masks for future expansion.
-  - Import system regiesters definition automatic generation from kernel to
-    selftests.
-  - Refactor the selftest for verifying ID register writable from userspace to
-    cover all writable ID register fields.
-
-* v6 -> v7
-  - Rebase on v6.5-rc4.
-  - Add a vm ioctl to get feature ID register writable masks from userspace.
-  - Split the change for debug version in ID_{AA64}DFR0_EL1.
-  - Addressed some bugs in selftest.
-
-* v5 -> v6
-  - Override the type of field AA64DFR0_EL1_DebugVer to be FTR_LOWER_SAFE by the
-    discussion of Oliver and Suraj.
-
-* v4 -> v5
-  - Rebase on v6.5-rc1 which contains infrastructure for writable idregs.
-  - Use guest ID registers values for the sake of emulation.
-  - Added a selftest to verify idreg userspace writing.
-
-* v3 -> v4
-  - Rebase on v11 of writable idregs series at [2].
-
-* v2 -> v3
-  - Rebase on v6 of writable idregs series.
-  - Enable writable for ID_AA64PFR0_EL1 and ID_AA64MMFR{0, 1, 2}_EL1.
-
-* v1 -> v2
-  - Rebase on latest patch series [1] of enabling writable ID register.
-
-[1] https://lore.kernel.org/all/20230402183735.3011540-1-jingzhangos@google.com
-[2] https://lore.kernel.org/all/20230602005118.2899664-1-jingzhangos@google.com
-[3] https://lore.kernel.org/kvmarm/20230623205232.2837077-1-oliver.upton@linux.dev
-
-[v1] https://lore.kernel.org/all/20230326011950.405749-1-jingzhangos@google.com
-[v2] https://lore.kernel.org/all/20230403003723.3199828-1-jingzhangos@google.com
-[v3] https://lore.kernel.org/all/20230405172146.297208-1-jingzhangos@google.com
-[v4] https://lore.kernel.org/all/20230607194554.87359-1-jingzhangos@google.com
-[v5] https://lore.kernel.org/all/20230710192430.1992246-1-jingzhangos@google.com
-[v6] https://lore.kernel.org/all/20230718164522.3498236-1-jingzhangos@google.com
-[v7] https://lore.kernel.org/all/20230801152007.337272-1-jingzhangos@google.com
-
----
-
-Jing Zhang (9):
-  KVM: arm64: Allow userspace to get the writable masks for feature ID
-    registers
-  KVM: arm64: Document KVM_ARM_GET_REG_WRITABLE_MASKS
-  KVM: arm64: Use guest ID register values for the sake of emulation
-  KVM: arm64: Enable writable for ID_AA64DFR0_EL1 and ID_DFR0_EL1
-  KVM: arm64: Enable writable for ID_AA64PFR0_EL1
-  KVM: arm64: Refactor helper Macros for idreg desc
-  KVM: arm64: Enable writable for ID_AA64MMFR{0, 1, 2, 3}_EL1
-  KVM: arm64: selftests: Import automatic system register definition
-    generation from kernel
-  KVM: arm64: selftests: Test for setting ID register from usersapce
-
-Oliver Upton (2):
-  KVM: arm64: Reject attempts to set invalid debug arch version
-  KVM: arm64: Bump up the default KVM sanitised debug version to v8p8
-
- Documentation/virt/kvm/api.rst                |   29 +
- arch/arm64/include/asm/kvm_host.h             |    2 +
- arch/arm64/include/uapi/asm/kvm.h             |   26 +
- arch/arm64/kvm/arm.c                          |    7 +
- arch/arm64/kvm/sys_regs.c                     |  197 +-
- include/uapi/linux/kvm.h                      |    1 +
- tools/arch/arm64/include/.gitignore           |    1 +
- tools/arch/arm64/include/asm/gpr-num.h        |   26 +
- tools/arch/arm64/include/asm/sysreg.h         |  839 ++----
- tools/arch/arm64/tools/gen-sysreg.awk         |  336 +++
- tools/arch/arm64/tools/sysreg                 | 2497 +++++++++++++++++
- tools/testing/selftests/kvm/Makefile          |   16 +-
- .../selftests/kvm/aarch64/aarch32_id_regs.c   |    4 +-
- .../selftests/kvm/aarch64/debug-exceptions.c  |   12 +-
- .../selftests/kvm/aarch64/page_fault_test.c   |    6 +-
- .../selftests/kvm/aarch64/set_id_regs.c       |  453 +++
- .../selftests/kvm/lib/aarch64/processor.c     |    6 +-
- 17 files changed, 3734 insertions(+), 724 deletions(-)
- create mode 100644 tools/arch/arm64/include/.gitignore
- create mode 100644 tools/arch/arm64/include/asm/gpr-num.h
- create mode 100755 tools/arch/arm64/tools/gen-sysreg.awk
- create mode 100644 tools/arch/arm64/tools/sysreg
- create mode 100644 tools/testing/selftests/kvm/aarch64/set_id_regs.c
-
-
-base-commit: 52a93d39b17dc7eb98b6aa3edb93943248e03b2f
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index d3dd05bbfe23..a328d362df5a 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1074,6 +1074,8 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+ 			       struct kvm_arm_copy_mte_tags *copy_tags);
+ int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
+ 				    struct kvm_arm_counter_offset *offset);
++int kvm_vm_ioctl_get_reg_writable_masks(struct kvm *kvm,
++					struct reg_mask_range *range);
+ 
+ /* Guest/host FPSIMD coordination helpers */
+ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index f7ddd73a8c0f..7a21bbb8a0f7 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -505,6 +505,32 @@ struct kvm_smccc_filter {
+ #define KVM_HYPERCALL_EXIT_SMC		(1U << 0)
+ #define KVM_HYPERCALL_EXIT_16BIT	(1U << 1)
+ 
++/* Get feature ID registers userspace writable mask. */
++/*
++ * From DDI0487J.a, D19.2.66 ("ID_AA64MMFR2_EL1, AArch64 Memory Model
++ * Feature Register 2"):
++ *
++ * "The Feature ID space is defined as the System register space in
++ * AArch64 with op0==3, op1=={0, 1, 3}, CRn==0, CRm=={0-7},
++ * op2=={0-7}."
++ *
++ * This covers all R/O registers that indicate anything useful feature
++ * wise, including the ID registers.
++ */
++#define ARM64_FEATURE_ID_SPACE_IDX(op0, op1, crn, crm, op2)		\
++	({								\
++		__u64 __op1 = (op1) & 3;				\
++		__op1 -= (__op1 == 3);					\
++		(__op1 << 6 | ((crm) & 7) << 3 | (op2));		\
++	})
++
++#define ARM64_FEATURE_ID_SPACE_SIZE	(3 * 8 * 8)
++
++struct reg_mask_range {
++	__u64 addr;		/* Pointer to mask array */
++	__u64 reserved[7];
++};
++
+ #endif
+ 
+ #endif /* __ARM_KVM_H__ */
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 72dc53a75d1c..e08894692829 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1630,6 +1630,13 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+ 
+ 		return kvm_vm_set_attr(kvm, &attr);
+ 	}
++	case KVM_ARM_GET_REG_WRITABLE_MASKS: {
++		struct reg_mask_range range;
++
++		if (copy_from_user(&range, argp, sizeof(range)))
++			return -EFAULT;
++		return kvm_vm_ioctl_get_reg_writable_masks(kvm, &range);
++	}
+ 	default:
+ 		return -EINVAL;
+ 	}
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 2ca2973abe66..216905840c92 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3560,6 +3560,63 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+ 	return write_demux_regids(uindices);
+ }
+ 
++#define ARM64_FEATURE_ID_SPACE_INDEX(r)			\
++	ARM64_FEATURE_ID_SPACE_IDX(sys_reg_Op0(r),	\
++		sys_reg_Op1(r),				\
++		sys_reg_CRn(r),				\
++		sys_reg_CRm(r),				\
++		sys_reg_Op2(r))
++
++static bool is_feature_id_reg(u32 encoding)
++{
++	return (sys_reg_Op0(encoding) == 3 &&
++		(sys_reg_Op1(encoding) < 2 || sys_reg_Op1(encoding) == 3) &&
++		sys_reg_CRn(encoding) == 0 &&
++		sys_reg_CRm(encoding) <= 7);
++}
++
++int kvm_vm_ioctl_get_reg_writable_masks(struct kvm *kvm, struct reg_mask_range *range)
++{
++	const void *zero_page = page_to_virt(ZERO_PAGE(0));
++	u64 __user *masks = (u64 __user *)range->addr;
++
++	/* Only feature id range is supported, reserved[7] must be zero. */
++	if (memcmp(range->reserved, zero_page, sizeof(range->reserved)))
++		return -EINVAL;
++
++	/* Wipe the whole thing first */
++	if (clear_user(masks, ARM64_FEATURE_ID_SPACE_SIZE * sizeof(__u64)))
++		return -EFAULT;
++
++	for (int i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
++		const struct sys_reg_desc *reg = &sys_reg_descs[i];
++		u32 encoding = reg_to_encoding(reg);
++		u64 val;
++
++		if (!is_feature_id_reg(encoding) || !reg->set_user)
++			continue;
++
++		/*
++		 * For ID registers, we return the writable mask. Other feature
++		 * registers return a full 64bit mask. That's not necessary
++		 * compliant with a given revision of the architecture, but the
++		 * RES0/RES1 definitions allow us to do that.
++		 */
++		if (is_id_reg(encoding)) {
++			if (!reg->val)
++				continue;
++			val = reg->val;
++		} else {
++			val = ~0UL;
++		}
++
++		if (put_user(val, (masks + ARM64_FEATURE_ID_SPACE_INDEX(encoding))))
++			return -EFAULT;
++	}
++
++	return 0;
++}
++
+ int __init kvm_sys_reg_table_init(void)
+ {
+ 	struct sys_reg_params params;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index f089ab290978..424b6d00440b 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1555,6 +1555,7 @@ struct kvm_s390_ucas_mapping {
+ #define KVM_ARM_MTE_COPY_TAGS	  _IOR(KVMIO,  0xb4, struct kvm_arm_copy_mte_tags)
+ /* Available with KVM_CAP_COUNTER_OFFSET */
+ #define KVM_ARM_SET_COUNTER_OFFSET _IOW(KVMIO,  0xb5, struct kvm_arm_counter_offset)
++#define KVM_ARM_GET_REG_WRITABLE_MASKS _IOR(KVMIO,  0xb6, struct reg_mask_range)
+ 
+ /* ioctl for vm fd */
+ #define KVM_CREATE_DEVICE	  _IOWR(KVMIO,  0xe0, struct kvm_create_device)
 -- 
 2.41.0.585.gd2178a4bd4-goog
 
