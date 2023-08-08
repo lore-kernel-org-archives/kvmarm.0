@@ -1,195 +1,295 @@
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2081.outbound.protection.outlook.com [40.107.22.81])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C0D617C9
-	for <kvmarm@lists.linux.dev>; Tue,  8 Aug 2023 08:21:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WhR8nzJDi67Jj8GJ6kQuQ/Dk3+OOFzE7ipPT91oq0YY=;
- b=RgX4rGtKfTMK3etolpqPr4/tFK/CapLJEqPkb2J5n52ZtSvlnig7vFKHqqkcxl7gYR8CyYGBcPoXMAtDOff/3IHRnhwPhi++yGGXSX4hOREFmpO/rV4Lkzl/UQ1E05FZewzrSg+bsaK3fpMBuYFlAmVSMpuP77BqWMLocCoPYTA=
-Received: from AM6P191CA0018.EURP191.PROD.OUTLOOK.COM (2603:10a6:209:8b::31)
- by AS8PR08MB9314.eurprd08.prod.outlook.com (2603:10a6:20b:5a5::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27; Tue, 8 Aug
- 2023 08:21:29 +0000
-Received: from AM7EUR03FT053.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:209:8b:cafe::31) by AM6P191CA0018.outlook.office365.com
- (2603:10a6:209:8b::31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27 via Frontend
- Transport; Tue, 8 Aug 2023 08:21:29 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=armh.onmicrosoft.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
- client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
- pr=C
-Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- AM7EUR03FT053.mail.protection.outlook.com (100.127.140.202) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6678.16 via Frontend Transport; Tue, 8 Aug 2023 08:21:28 +0000
-Received: ("Tessian outbound f9124736ff4f:v145"); Tue, 08 Aug 2023 08:21:28 +0000
-X-CheckRecipientChecked: true
-X-CR-MTA-CID: ff87e41f44a6bd0b
-X-CR-MTA-TID: 64aa7808
-Received: from ea06c7611131.2
-	by 64aa7808-outbound-1.mta.getcheckrecipient.com id E6AD5EB6-09D2-41A7-AF28-C91632198147.1;
-	Tue, 08 Aug 2023 08:21:22 +0000
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com
-    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id ea06c7611131.2
-    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
-    Tue, 08 Aug 2023 08:21:22 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=deQQipEitUkSFn+qABM+3WJnKbOU5xLfA4rGltgF06WPzotVuxQb0b6vfbMkE2lbaWmVn0HGAuL6KS+/gIwBENpL4GSJfG0Oy21Y/tPI5sqPunTzp+QblZmSvmF5EjkPzHEDe1LFCoVQoSV5DqzvaelVFq2z6kXNMM/gGiY91IStpya+IOE4GS2iN3waf1bvo0X2Mga0N27OIofr9YbIX0AoL0lHoy8ZIyVA3Sb3KawEdTJJEqtnKbp+Vj0mXX0GaZgx/1avFfP/f3UYTA4AxazDiysZEWb0FU78wxvqp8xEdld1QVTPoEBN6j/4i7OelpwV5irduEbbYAU833185A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WhR8nzJDi67Jj8GJ6kQuQ/Dk3+OOFzE7ipPT91oq0YY=;
- b=VdxkacirVL0JeQf/5A/MwPGoZjXZczXN/eDtyAa4beLBgsg+JNtmuBxDx4Ioih1KhUJQl3qgI2IspDKbFeqxPGVP5ml30q+iC+9CvwTbSf4oRCiHNaYwgE6Kyrf1zO8tS4bR31P+T/Ph0t0FM8HxWhTLKageiezMGXyoIP+78CaYiYTsnm/FVbVP6/PhYcM36EpYzL/OMSu0DGKWAvyC9dMekbkQDWpTGx+Bp2Yieid8fedT615urcJ06YRdOuFYF9OK2LISj95rC7vNzWqoSFgIc9L6lMc/iKuMOxr2pPeTdweC8WKHMbbK7XMzXG6pTKso4IkRWCPKLThMvGhKHA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WhR8nzJDi67Jj8GJ6kQuQ/Dk3+OOFzE7ipPT91oq0YY=;
- b=RgX4rGtKfTMK3etolpqPr4/tFK/CapLJEqPkb2J5n52ZtSvlnig7vFKHqqkcxl7gYR8CyYGBcPoXMAtDOff/3IHRnhwPhi++yGGXSX4hOREFmpO/rV4Lkzl/UQ1E05FZewzrSg+bsaK3fpMBuYFlAmVSMpuP77BqWMLocCoPYTA=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from DB9PR08MB7179.eurprd08.prod.outlook.com (2603:10a6:10:2cc::19)
- by AS8PR08MB8468.eurprd08.prod.outlook.com (2603:10a6:20b:566::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27; Tue, 8 Aug
- 2023 08:21:19 +0000
-Received: from DB9PR08MB7179.eurprd08.prod.outlook.com
- ([fe80::adb0:61cb:8733:6db2]) by DB9PR08MB7179.eurprd08.prod.outlook.com
- ([fe80::adb0:61cb:8733:6db2%7]) with mapi id 15.20.6652.026; Tue, 8 Aug 2023
- 08:21:19 +0000
-Date: Tue, 8 Aug 2023 09:21:03 +0100
-From: Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 882A92104
+	for <kvmarm@lists.linux.dev>; Tue,  8 Aug 2023 08:27:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAAF9C433C7;
+	Tue,  8 Aug 2023 08:27:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691483239;
+	bh=8vZjx++7vc/gL3iItvttMwpeYTizvuwArhclxzBwQt8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Q63cCxaxLP7BLXtt+k92+Za9fDEGw5P76MDkKXbe5kzu9Nn4NKj7bevIgqdXTT9Bm
+	 GnX/iKMSYi1jTtZ3ecGXZtdm/FLFU17S8d2c4IXYYJzJkUqLaSAqzK8ViLThDVOfwt
+	 cRHaEzRGP+UbhLEYHaPn/4eZdG/aBOdBslSFr7YQacpyU9spnI3ERPE9VOlzv8u7Cb
+	 H3I2MQgc5q0OzUJI2lmtym0uxOxwPaDNAzGIx/1RhHwRc+PEoHpATQMROm35ez7qod
+	 M/S5utYzPQRmgt5UYdICpWxHRrv0XsUH7t2oi1A2jzM0gIj/yAeq5BAEb+e+lMhaoi
+	 PQGAIiw05BPqg==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qTI3g-00365O-4h;
+	Tue, 08 Aug 2023 09:27:16 +0100
+Date: Tue, 08 Aug 2023 09:27:20 +0100
+Message-ID: <87350uq6qf.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: James Clark <james.clark@arm.com>
+Cc: coresight@lists.linaro.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
 	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v3 21/36] arm64/mm: Implement map_shadow_stack()
-Message-ID: <ZNH679dDPtvotp5j@arm.com>
-References: <20230731-arm64-gcs-v3-0-cddf9f980d98@kernel.org>
- <20230731-arm64-gcs-v3-21-cddf9f980d98@kernel.org>
- <ZNDFioFIM34VcsuV@arm.com>
- <3a077ff3-8627-4337-9b4a-6a8828eda0e7@sirena.org.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <3a077ff3-8627-4337-9b4a-6a8828eda0e7@sirena.org.uk>
-X-ClientProxiedBy: LO4P265CA0197.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:318::13) To DB9PR08MB7179.eurprd08.prod.outlook.com
- (2603:10a6:10:2cc::19)
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mike Leach <mike.leach@linaro.org>,
+	Leo Yan <leo.yan@linaro.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Rob Herring <robh@kernel.org>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 1/3] arm64: KVM: Add support for exclude_guest and exclude_host for ETM
+In-Reply-To: <20230804101317.460697-2-james.clark@arm.com>
+References: <20230804101317.460697-1-james.clark@arm.com>
+	<20230804101317.460697-2-james.clark@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	DB9PR08MB7179:EE_|AS8PR08MB8468:EE_|AM7EUR03FT053:EE_|AS8PR08MB9314:EE_
-X-MS-Office365-Filtering-Correlation-Id: e7ff4f52-0848-4964-9ad2-08db97e87719
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted: BCL:0;
-X-Microsoft-Antispam-Message-Info-Original:
- Ft622fNMGkEQ6+U1Ce0LU6Aq4negHwuHPibsTTSdzyK+Biad/755YGKa6pq5qUSdpsqDafb6SVQuq6m2l8mMxammMVF15MqfMb20Nxehvrbijcx1bvFbWh6OW2HZn7dXVHozhsE3mUV49GJO1p7rSRGs6n7X4Oh2f4XiR/7agqAYyuRGajGpCMCsJTCaXed3m32sy3+gRTxkYZ4XdcIokUZoBL6c4EKdXlxPqK7LbLjCgL4IWsgzUZV+lOaLjhlxITZGXui0Ol+AcPS4mU+VEFwtvA5KLBQgsvDeTEyHCJWv21CG75G8tnlc0vMdlTBmBR9/iwLlGE40Tudyy2UonNpWVIjhnEbDK6esI9cYiWBBfeQrkA1kGjE4MMm0SujeI9qeHLrdGyeKOk9SVaalSF1DGh+JVWcdNDZXR+eCL91C3/CeCcCa2skQ9v30dgN162PgVDR87srpDLNiV+WIkZeOygyGwvRevGp4KUf7uQOGvzg5zLR25zrCDYgRYIhZpaNcvw2oWsxFFt9niZPBNdggshVvnaKYILWXR9ABo/AMsYoXn0IXCMuHccgzHO0xP6SUrClzkpHHrHMVJ6nWAFsHm8e1ZQMpnPL8sYMRDtZUux8pImG1zrbKxKrKCHRnw9IA6Sn+35V6vQxyzJHEpQ==
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR08MB7179.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(346002)(396003)(39860400002)(366004)(376002)(186006)(1800799003)(90021799007)(90011799007)(451199021)(2616005)(26005)(6506007)(6512007)(6486002)(6666004)(478600001)(54906003)(38100700002)(36756003)(66476007)(66556008)(66946007)(4326008)(6916009)(316002)(41300700001)(8936002)(8676002)(5660300002)(7416002)(2906002)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB8468
-Original-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AM7EUR03FT053.eop-EUR03.prod.protection.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	d408608a-4334-4b70-2817-08db97e87015
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	BcUtJRULqeVU4j8HvkNt5sncoz4SWy83Wn/5XiRwLlbrrsuTHK1GQxK33jFvi5GwfWQ7RVV0P/nHWvrGdH6YXPQ192GAenBFRO9f4Plh8TJY7xEj1LygDrI4RuBQQwc1z1FjBjKwb2GNhTy76Ul+BmqkeP7GDcrraAXjKbFgbzrP5Ejw2q3hlNg8gMlmc+YEz/zd/SDB+TNMDuegbCfZUB5foggQ8CdrEcKbV2Un7nx8cGPICJCcEjOd2ecHneFH5q8Vzjx16+/yor0FZiy7z8lShD18TvzItg/XGGAJNrfvMNCDTalDUGzShDQ8ReBmWxIfNjJq3yguUu0jbW7tVKpWkiZ9uQ/EM/AQ6ef5PSbfl9NGSsyoWSyAX66ksVHxxDUvF7FIr4Dw7ExQKGsW2O/XWGcvCxDfUjKOJmqlRDoQkzIccfZpG6JNXLeqW5KI0K84ImRWuUkJHLfko3zW6VJcU3Fa93D1d/xnysyPliK7HESpSv7p0iXkhv9OD2c8InQROJcQOVl0deBGTpYXS1hqKPS8+6zM4JRk44IMHWIBZxWgYfjEFrAQj7iiOf1XDpwH8FKNH5YMDIqiFGpEl0TcN+LJ5WPDg4/JJKydMKycMkcaX2PgwI0XR5P6gJiMexm8qO9BZ3gY7F+anpP56jHmnfdo+mpt6tWR6I2eN1Gs98+IFwh/AqBVF8Q0J31LdoBNeQbtnD9UTFi22ZxzgqEUPrIpA2ZNZhsZEu9Rx4do1RN2TrK8gDPkvh4nGy7CuoCcOd2Op86YDWaqVI7Zg3W8RyuZb4zBCBIrh7En8/ICJXrVI/mkNEj8/k+ktRB4
-X-Forefront-Antispam-Report:
-	CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(39860400002)(376002)(346002)(451199021)(82310400008)(90011799007)(90021799007)(186006)(1800799003)(40470700004)(36840700001)(46966006)(6862004)(8936002)(8676002)(5660300002)(4326008)(41300700001)(316002)(47076005)(86362001)(40480700001)(40460700003)(2906002)(36860700001)(107886003)(6512007)(6666004)(6486002)(2616005)(6506007)(26005)(36756003)(336012)(70586007)(70206006)(356005)(478600001)(81166007)(82740400003)(54906003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2023 08:21:28.8805
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e7ff4f52-0848-4964-9ad2-08db97e87719
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM7EUR03FT053.eop-EUR03.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB9314
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: james.clark@arm.com, coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mike.leach@linaro.org, leo.yan@linaro.org, alexander.shishkin@linux.intel.com, anshuman.khandual@arm.com, robh@kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The 08/07/2023 14:00, Mark Brown wrote:
-> On Mon, Aug 07, 2023 at 11:20:58AM +0100, Szabolcs Nagy wrote:
-> > The 07/31/2023 14:43, Mark Brown wrote:
-> > > +SYSCALL_DEFINE3(map_shadow_stack, unsigned long, addr, unsigned long, size, unsigned int, flags)
-> > > +{
-> > > +	unsigned long alloc_size;
-> > > +	unsigned long __user *cap_ptr;
-> > > +	unsigned long cap_val;
-> > > +	int ret;
-> > > +
-> > > +	if (!system_supports_gcs())
-> > > +		return -EOPNOTSUPP;
-> > > +
-> > > +	if (flags)
-> > > +		return -EINVAL;
-> > > +
-> > > +	if (addr % 16)
-> > > +		return -EINVAL;
+On Fri, 04 Aug 2023 11:13:11 +0100,
+James Clark <james.clark@arm.com> wrote:
 > 
-> > mmap addr must be page aligned (and there is no align req on size).
-> 
-> > i'd expect similar api here.
-> 
-> That's not what the manual page or a quick check of the code suggest
-> that mmap() does, they say that the kernel just takes it as a hint and
+> Add an interface for the Coresight driver to use to set the current
+> exclude settings for the current CPU. This will be used to configure
+> TRFCR_EL1.
 
-i should have said that i expect MAP_FIXED_NOREPLACE semantics
-(since the x86 code seemed to use that) and then the mapped
-address must match exactly thus page aligned.
+Can you start by stating the problem? There is *some* rationale in the
+cover letter, but not enough to get the full picture. Specially if you
+haven't looked at the trace subsystem in the past... 7 years or so.
 
-> chooses a nearby page boundary, though I didn't test.  I'm not sure why
-> I have that alignment check at all TBH, and to the extent it's needed I
-> could just be 8 - this level of code doesn't really care.
 > 
-> > > +	if (size == 16 || size % 16)
-> > > +		return -EINVAL;
-> 
-> > why %16 and not %8 ?
-> 
-> I don't think that's needed any more - there was some stuff in an
-> earlier version of the code but no longer.
+> The settings must be copied to the vCPU before each run in the same
+> way that PMU events are because the per-cpu struct isn't accessible in
+> protected mode.
 
-it's kind of important to know the exact logic so the cap token
-location can be computed in userspace for arbitrary size.
+I'm pretty sure that for protected guests, we'd like to disable
+tracing altogether (debug mode excepted).
 
-(this is why i wanted to see the map_shadow_stack man page first
-but i was told that comes separately on linux..)
+>
+> This is only needed for nVHE, otherwise it works automatically with
+
+How about hVHE, which uses VHE at EL2 only? Doesn't it require the
+same treatment?
+
+> TRFCR_EL{1,2}. Unfortunately it can't be gated on CONFIG_CORESIGHT
+> because Coresight can be built as a module. It can however be gated on
+> CONFIG_PERF_EVENTS because that is required by Coresight.
+
+Why does it need to be gated *at all*? We need this for the PMU
+because of the way we call into the perf subsystem, but I don't see
+anything like that here. In general, conditional compilation sucks,
+and I'd like to avoid it as much as possible.
+
+> 
+> Signed-off-by: James Clark <james.clark@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 10 ++++++-
+>  arch/arm64/kvm/Makefile           |  1 +
+>  arch/arm64/kvm/arm.c              |  1 +
+>  arch/arm64/kvm/etm.c              | 48 +++++++++++++++++++++++++++++++
+>  include/kvm/etm.h                 | 43 +++++++++++++++++++++++++++
+>  5 files changed, 102 insertions(+), 1 deletion(-)
+>  create mode 100644 arch/arm64/kvm/etm.c
+>  create mode 100644 include/kvm/etm.h
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index d7b1403a3fb2..f33262217c84 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -35,6 +35,7 @@
+>  #include <kvm/arm_vgic.h>
+>  #include <kvm/arm_arch_timer.h>
+>  #include <kvm/arm_pmu.h>
+> +#include <kvm/etm.h>
+>  
+>  #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
+>  
+> @@ -500,7 +501,7 @@ struct kvm_vcpu_arch {
+>  	u8 cflags;
+>  
+>  	/* Input flags to the hypervisor code, potentially cleared after use */
+> -	u8 iflags;
+> +	u16 iflags;
+
+If you make the iflags bigger, what ripple effect does it have on the
+alignment of the other data structures? Consider reordering things if
+it helps filling holes.
+
+>  
+>  	/* State flags for kernel bookkeeping, unused by the hypervisor code */
+>  	u8 sflags;
+> @@ -541,6 +542,9 @@ struct kvm_vcpu_arch {
+>  		u64 pmscr_el1;
+>  		/* Self-hosted trace */
+>  		u64 trfcr_el1;
+> +		/* exclude_guest settings for nVHE */
+> +		struct kvm_etm_event etm_event;
+> +
+
+Spurious blank line. More importantly, how is that related to the
+trfcr_el1 field just above?
+
+>  	} host_debug_state;
+>  
+>  	/* VGIC state */
+> @@ -713,6 +717,8 @@ struct kvm_vcpu_arch {
+>  #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
+>  /* vcpu running in HYP context */
+>  #define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
+> +/* Save TRFCR and apply exclude_guest rules */
+> +#define DEBUG_STATE_SAVE_TRFCR	__vcpu_single_flag(iflags, BIT(8))
+>  
+>  /* SVE enabled for host EL0 */
+>  #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
+> @@ -1096,6 +1102,8 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu);
+>  void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
+>  void kvm_clr_pmu_events(u32 clr);
+>  bool kvm_set_pmuserenr(u64 val);
+> +void kvm_set_etm_events(struct perf_event_attr *attr);
+> +void kvm_clr_etm_events(void);
+>  #else
+>  static inline void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr) {}
+>  static inline void kvm_clr_pmu_events(u32 clr) {}
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index c0c050e53157..0faff57423c4 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -23,6 +23,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+>  	 vgic/vgic-its.o vgic/vgic-debug.o
+>  
+>  kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
+> +kvm-$(CONFIG_PERF_EVENTS) += etm.o
+>
+>  always-y := hyp_constants.h hyp-constants.s
+>  
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index b1a9d47fb2f3..7bd5975328a3 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -952,6 +952,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  		kvm_vgic_flush_hwstate(vcpu);
+>  
+>  		kvm_pmu_update_vcpu_events(vcpu);
+> +		kvm_etm_update_vcpu_events(vcpu);
+>  
+>  		/*
+>  		 * Ensure we set mode to IN_GUEST_MODE after we disable
+> diff --git a/arch/arm64/kvm/etm.c b/arch/arm64/kvm/etm.c
+> new file mode 100644
+> index 000000000000..359c37745de2
+> --- /dev/null
+> +++ b/arch/arm64/kvm/etm.c
+> @@ -0,0 +1,48 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +
+> +#include <linux/kvm_host.h>
+> +
+> +#include <kvm/etm.h>
+> +
+> +static DEFINE_PER_CPU(struct kvm_etm_event, kvm_etm_events);
+> +
+> +struct kvm_etm_event *kvm_get_etm_event(void)
+> +{
+> +	return this_cpu_ptr(&kvm_etm_events);
+> +}
+> +
+> +void kvm_etm_set_events(struct perf_event_attr *attr)
+> +{
+> +	struct kvm_etm_event *etm_event;
+> +
+> +	/*
+> +	 * Exclude guest option only requires extra work with nVHE.
+> +	 * Otherwise it works automatically with TRFCR_EL{1,2}
+> +	 */
+> +	if (has_vhe())
+> +		return;
+> +
+> +	etm_event = kvm_get_etm_event();
+> +
+> +	etm_event->exclude_guest = attr->exclude_guest;
+> +	etm_event->exclude_host = attr->exclude_host;
+> +	etm_event->exclude_kernel = attr->exclude_kernel;
+> +	etm_event->exclude_user = attr->exclude_user;
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_etm_set_events);
+> +
+> +void kvm_etm_clr_events(void)
+> +{
+> +	struct kvm_etm_event *etm_event;
+> +
+> +	if (has_vhe())
+> +		return;
+> +
+> +	etm_event = kvm_get_etm_event();
+> +
+> +	etm_event->exclude_guest = false;
+> +	etm_event->exclude_host = false;
+> +	etm_event->exclude_kernel = false;
+> +	etm_event->exclude_user = false;
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_etm_clr_events);
+
+Does it really need its own compilation unit if we were to build it at
+all times?
+
+> diff --git a/include/kvm/etm.h b/include/kvm/etm.h
+> new file mode 100644
+> index 000000000000..95c4809fa2b0
+> --- /dev/null
+> +++ b/include/kvm/etm.h
+> @@ -0,0 +1,43 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +
+> +#ifndef __KVM_DEBUG_H
+> +#define __KVM_DEBUG_H
+> +
+> +struct perf_event_attr;
+> +struct kvm_vcpu;
+> +
+> +#if IS_ENABLED(CONFIG_KVM) && IS_ENABLED(CONFIG_PERF_EVENTS)
+> +
+> +struct kvm_etm_event {
+> +	bool exclude_host;
+> +	bool exclude_guest;
+> +	bool exclude_kernel;
+> +	bool exclude_user;
+> +};
+> +
+> +struct kvm_etm_event *kvm_get_etm_event(void);
+> +void kvm_etm_clr_events(void);
+> +void kvm_etm_set_events(struct perf_event_attr *attr);
+> +
+> +/*
+> + * Updates the vcpu's view of the etm events for this cpu. Must be
+> + * called before every vcpu run after disabling interrupts, to ensure
+> + * that an interrupt cannot fire and update the structure.
+> + */
+> +#define kvm_etm_update_vcpu_events(vcpu)						\
+> +	do {										\
+> +		if (!has_vhe() && vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRFCR))		\
+> +			vcpu->arch.host_debug_state.etm_event = *kvm_get_etm_event();	\
+> +	} while (0)
+> +
+
+Why is it a macro and not a function, which would avoid exposing
+kvm_get_etm_event?
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
