@@ -1,295 +1,159 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 882A92104
-	for <kvmarm@lists.linux.dev>; Tue,  8 Aug 2023 08:27:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAAF9C433C7;
-	Tue,  8 Aug 2023 08:27:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691483239;
-	bh=8vZjx++7vc/gL3iItvttMwpeYTizvuwArhclxzBwQt8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Q63cCxaxLP7BLXtt+k92+Za9fDEGw5P76MDkKXbe5kzu9Nn4NKj7bevIgqdXTT9Bm
-	 GnX/iKMSYi1jTtZ3ecGXZtdm/FLFU17S8d2c4IXYYJzJkUqLaSAqzK8ViLThDVOfwt
-	 cRHaEzRGP+UbhLEYHaPn/4eZdG/aBOdBslSFr7YQacpyU9spnI3ERPE9VOlzv8u7Cb
-	 H3I2MQgc5q0OzUJI2lmtym0uxOxwPaDNAzGIx/1RhHwRc+PEoHpATQMROm35ez7qod
-	 M/S5utYzPQRmgt5UYdICpWxHRrv0XsUH7t2oi1A2jzM0gIj/yAeq5BAEb+e+lMhaoi
-	 PQGAIiw05BPqg==
-Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qTI3g-00365O-4h;
-	Tue, 08 Aug 2023 09:27:16 +0100
-Date: Tue, 08 Aug 2023 09:27:20 +0100
-Message-ID: <87350uq6qf.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: James Clark <james.clark@arm.com>
-Cc: coresight@lists.linaro.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mike Leach <mike.leach@linaro.org>,
-	Leo Yan <leo.yan@linaro.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Rob Herring <robh@kernel.org>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 1/3] arm64: KVM: Add support for exclude_guest and exclude_host for ETM
-In-Reply-To: <20230804101317.460697-2-james.clark@arm.com>
-References: <20230804101317.460697-1-james.clark@arm.com>
-	<20230804101317.460697-2-james.clark@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA36DDBF
+	for <kvmarm@lists.linux.dev>; Tue,  8 Aug 2023 10:21:28 +0000 (UTC)
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-3178e3f46b1so2546890f8f.2
+        for <kvmarm@lists.linux.dev>; Tue, 08 Aug 2023 03:21:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691490087; x=1692094887;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=hmnOfvRNRbQKO2Fig5tO7oMJZvMK80sR98XXmZHYIOg=;
+        b=UcRiSP5zMkafefDkpMy4ag+CqrreExj50BgcvvqUxENJG1/lpohTMUGaMRE6dQWAe+
+         dc0KSS4bJtSXBo6u8B2TD1qebHcDd5nh7/wEMRUvQktCQ4V/bMLKV0b1xtucMQ2ElFsD
+         ND4RxmLFCJwArzcfgz12LoyG/eZo31pUrpRu20Td78p+BpbDSmOfCjj+Z+IC7HAW0UJI
+         wNAjAblR9P5aB6un9d6Wp0XUwVazJc3Q87ZThxQIRdmvgDi/7Bg1jdLM7HiLjR2VXgNZ
+         T2SsfgyBgPh1IFQrdE4pgKb+j8xLGZwt6QAMfltBDv+DaBw14Bc1t2LIR4Vp0fXHemjD
+         QpoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691490087; x=1692094887;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hmnOfvRNRbQKO2Fig5tO7oMJZvMK80sR98XXmZHYIOg=;
+        b=H72t5s0epvXAeO+6ptj48Ga9AfCfGI6w1KKcIkzBF9ZvSsgs5WwvA27qBlP93gVUeZ
+         IlVkSh/+xikWRsBDsFmi2mLAonD0voh4yXI0ZGTKFAFu55jkt2aO/bGh5zwxWNlo0sG6
+         LiiBieOpDt+7KvuZ4hMzQWV1TiA619ipoNhct2C+mZn2d1yWy8vesTuJ7TRTU5HpL2yc
+         y76kVMEE2a1RaQt9g1SdbH15YP9QE6pMBaWhU82d3BpGbas+K0Df3dgBJqWHnJuvykOS
+         kZfQ15I/iVelLl+UcLpjNk1U0VrUxtmKpmEHO7Z341cK1wvhrIEGqBWddcPvKQSOQh8E
+         0ELA==
+X-Gm-Message-State: AOJu0YwwpMS/m/qnX035TNKp4wi77pJcEX43k/d/j2X4Q+bv8FOH3Nf0
+	KQNH9zcZ+2v9uoJG15OYIkfrbRgUfQ==
+X-Google-Smtp-Source: AGHT+IFO91+Sq0a4bROaXXMkpleB+MNLqFDhhb5O1iR8Zhdu/8OTj2ivFrTXYjJox8ukr1691thj7vV+Eg==
+X-Received: from elver.muc.corp.google.com ([2a00:79e0:9c:201:39c0:833d:c267:7f64])
+ (user=elver job=sendgmr) by 2002:adf:f0cb:0:b0:317:5e4f:9097 with SMTP id
+ x11-20020adff0cb000000b003175e4f9097mr74564wro.7.1691490086705; Tue, 08 Aug
+ 2023 03:21:26 -0700 (PDT)
+Date: Tue,  8 Aug 2023 12:17:25 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: james.clark@arm.com, coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mike.leach@linaro.org, leo.yan@linaro.org, alexander.shishkin@linux.intel.com, anshuman.khandual@arm.com, robh@kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.640.ga95def55d0-goog
+Message-ID: <20230808102049.465864-1-elver@google.com>
+Subject: [PATCH v3 1/3] compiler_types: Introduce the Clang __preserve_most
+ function attribute
+From: Marco Elver <elver@google.com>
+To: elver@google.com, Andrew Morton <akpm@linux-foundation.org>, 
+	Kees Cook <keescook@chromium.org>
+Cc: Guenter Roeck <linux@roeck-us.net>, Peter Zijlstra <peterz@infradead.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Tom Rix <trix@redhat.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
+	Dmitry Vyukov <dvyukov@google.com>, Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com, 
+	linux-toolchains@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 04 Aug 2023 11:13:11 +0100,
-James Clark <james.clark@arm.com> wrote:
-> 
-> Add an interface for the Coresight driver to use to set the current
-> exclude settings for the current CPU. This will be used to configure
-> TRFCR_EL1.
+[1]: "On X86-64 and AArch64 targets, this attribute changes the calling
+convention of a function. The preserve_most calling convention attempts
+to make the code in the caller as unintrusive as possible. This
+convention behaves identically to the C calling convention on how
+arguments and return values are passed, but it uses a different set of
+caller/callee-saved registers. This alleviates the burden of saving and
+recovering a large register set before and after the call in the caller.
+If the arguments are passed in callee-saved registers, then they will be
+preserved by the callee across the call. This doesn't apply for values
+returned in callee-saved registers.
 
-Can you start by stating the problem? There is *some* rationale in the
-cover letter, but not enough to get the full picture. Specially if you
-haven't looked at the trace subsystem in the past... 7 years or so.
+ * On X86-64 the callee preserves all general purpose registers, except
+   for R11. R11 can be used as a scratch register. Floating-point
+   registers (XMMs/YMMs) are not preserved and need to be saved by the
+   caller.
 
-> 
-> The settings must be copied to the vCPU before each run in the same
-> way that PMU events are because the per-cpu struct isn't accessible in
-> protected mode.
+ * On AArch64 the callee preserve all general purpose registers, except
+   x0-X8 and X16-X18."
 
-I'm pretty sure that for protected guests, we'd like to disable
-tracing altogether (debug mode excepted).
+[1] https://clang.llvm.org/docs/AttributeReference.html#preserve-most
 
->
-> This is only needed for nVHE, otherwise it works automatically with
+Introduce the attribute to compiler_types.h as __preserve_most.
 
-How about hVHE, which uses VHE at EL2 only? Doesn't it require the
-same treatment?
+Use of this attribute results in better code generation for calls to
+very rarely called functions, such as error-reporting functions, or
+rarely executed slow paths.
 
-> TRFCR_EL{1,2}. Unfortunately it can't be gated on CONFIG_CORESIGHT
-> because Coresight can be built as a module. It can however be gated on
-> CONFIG_PERF_EVENTS because that is required by Coresight.
+Beware that the attribute conflicts with instrumentation calls inserted
+on function entry which do not use __preserve_most themselves. Notably,
+function tracing which assumes the normal C calling convention for the
+given architecture.  Where the attribute is supported, __preserve_most
+will imply notrace. It is recommended to restrict use of the attribute
+to functions that should or already disable tracing.
 
-Why does it need to be gated *at all*? We need this for the PMU
-because of the way we call into the perf subsystem, but I don't see
-anything like that here. In general, conditional compilation sucks,
-and I'd like to avoid it as much as possible.
+The attribute may be supported by a future GCC version (see
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=110899).
 
-> 
-> Signed-off-by: James Clark <james.clark@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 10 ++++++-
->  arch/arm64/kvm/Makefile           |  1 +
->  arch/arm64/kvm/arm.c              |  1 +
->  arch/arm64/kvm/etm.c              | 48 +++++++++++++++++++++++++++++++
->  include/kvm/etm.h                 | 43 +++++++++++++++++++++++++++
->  5 files changed, 102 insertions(+), 1 deletion(-)
->  create mode 100644 arch/arm64/kvm/etm.c
->  create mode 100644 include/kvm/etm.h
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index d7b1403a3fb2..f33262217c84 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -35,6 +35,7 @@
->  #include <kvm/arm_vgic.h>
->  #include <kvm/arm_arch_timer.h>
->  #include <kvm/arm_pmu.h>
-> +#include <kvm/etm.h>
->  
->  #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
->  
-> @@ -500,7 +501,7 @@ struct kvm_vcpu_arch {
->  	u8 cflags;
->  
->  	/* Input flags to the hypervisor code, potentially cleared after use */
-> -	u8 iflags;
-> +	u16 iflags;
+Signed-off-by: Marco Elver <elver@google.com>
+Reviewed-by: Miguel Ojeda <ojeda@kernel.org>
+Acked-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+---
+v3:
+* Quote more from LLVM documentation about which registers are
+  callee/caller with preserve_most.
+* Code comment to restrict use where tracing is meant to be disabled.
 
-If you make the iflags bigger, what ripple effect does it have on the
-alignment of the other data structures? Consider reordering things if
-it helps filling holes.
+v2:
+* Imply notrace, to avoid any conflicts with tracing which is inserted
+  on function entry. See added comments.
+---
+ include/linux/compiler_types.h | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
->  
->  	/* State flags for kernel bookkeeping, unused by the hypervisor code */
->  	u8 sflags;
-> @@ -541,6 +542,9 @@ struct kvm_vcpu_arch {
->  		u64 pmscr_el1;
->  		/* Self-hosted trace */
->  		u64 trfcr_el1;
-> +		/* exclude_guest settings for nVHE */
-> +		struct kvm_etm_event etm_event;
-> +
-
-Spurious blank line. More importantly, how is that related to the
-trfcr_el1 field just above?
-
->  	} host_debug_state;
->  
->  	/* VGIC state */
-> @@ -713,6 +717,8 @@ struct kvm_vcpu_arch {
->  #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
->  /* vcpu running in HYP context */
->  #define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
-> +/* Save TRFCR and apply exclude_guest rules */
-> +#define DEBUG_STATE_SAVE_TRFCR	__vcpu_single_flag(iflags, BIT(8))
->  
->  /* SVE enabled for host EL0 */
->  #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
-> @@ -1096,6 +1102,8 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu);
->  void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
->  void kvm_clr_pmu_events(u32 clr);
->  bool kvm_set_pmuserenr(u64 val);
-> +void kvm_set_etm_events(struct perf_event_attr *attr);
-> +void kvm_clr_etm_events(void);
->  #else
->  static inline void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr) {}
->  static inline void kvm_clr_pmu_events(u32 clr) {}
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index c0c050e53157..0faff57423c4 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -23,6 +23,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
->  	 vgic/vgic-its.o vgic/vgic-debug.o
->  
->  kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
-> +kvm-$(CONFIG_PERF_EVENTS) += etm.o
->
->  always-y := hyp_constants.h hyp-constants.s
->  
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index b1a9d47fb2f3..7bd5975328a3 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -952,6 +952,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  		kvm_vgic_flush_hwstate(vcpu);
->  
->  		kvm_pmu_update_vcpu_events(vcpu);
-> +		kvm_etm_update_vcpu_events(vcpu);
->  
->  		/*
->  		 * Ensure we set mode to IN_GUEST_MODE after we disable
-> diff --git a/arch/arm64/kvm/etm.c b/arch/arm64/kvm/etm.c
-> new file mode 100644
-> index 000000000000..359c37745de2
-> --- /dev/null
-> +++ b/arch/arm64/kvm/etm.c
-> @@ -0,0 +1,48 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +
-> +#include <linux/kvm_host.h>
-> +
-> +#include <kvm/etm.h>
-> +
-> +static DEFINE_PER_CPU(struct kvm_etm_event, kvm_etm_events);
-> +
-> +struct kvm_etm_event *kvm_get_etm_event(void)
-> +{
-> +	return this_cpu_ptr(&kvm_etm_events);
-> +}
-> +
-> +void kvm_etm_set_events(struct perf_event_attr *attr)
-> +{
-> +	struct kvm_etm_event *etm_event;
-> +
-> +	/*
-> +	 * Exclude guest option only requires extra work with nVHE.
-> +	 * Otherwise it works automatically with TRFCR_EL{1,2}
-> +	 */
-> +	if (has_vhe())
-> +		return;
-> +
-> +	etm_event = kvm_get_etm_event();
-> +
-> +	etm_event->exclude_guest = attr->exclude_guest;
-> +	etm_event->exclude_host = attr->exclude_host;
-> +	etm_event->exclude_kernel = attr->exclude_kernel;
-> +	etm_event->exclude_user = attr->exclude_user;
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_etm_set_events);
-> +
-> +void kvm_etm_clr_events(void)
-> +{
-> +	struct kvm_etm_event *etm_event;
-> +
-> +	if (has_vhe())
-> +		return;
-> +
-> +	etm_event = kvm_get_etm_event();
-> +
-> +	etm_event->exclude_guest = false;
-> +	etm_event->exclude_host = false;
-> +	etm_event->exclude_kernel = false;
-> +	etm_event->exclude_user = false;
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_etm_clr_events);
-
-Does it really need its own compilation unit if we were to build it at
-all times?
-
-> diff --git a/include/kvm/etm.h b/include/kvm/etm.h
-> new file mode 100644
-> index 000000000000..95c4809fa2b0
-> --- /dev/null
-> +++ b/include/kvm/etm.h
-> @@ -0,0 +1,43 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +
-> +#ifndef __KVM_DEBUG_H
-> +#define __KVM_DEBUG_H
-> +
-> +struct perf_event_attr;
-> +struct kvm_vcpu;
-> +
-> +#if IS_ENABLED(CONFIG_KVM) && IS_ENABLED(CONFIG_PERF_EVENTS)
-> +
-> +struct kvm_etm_event {
-> +	bool exclude_host;
-> +	bool exclude_guest;
-> +	bool exclude_kernel;
-> +	bool exclude_user;
-> +};
-> +
-> +struct kvm_etm_event *kvm_get_etm_event(void);
-> +void kvm_etm_clr_events(void);
-> +void kvm_etm_set_events(struct perf_event_attr *attr);
-> +
-> +/*
-> + * Updates the vcpu's view of the etm events for this cpu. Must be
-> + * called before every vcpu run after disabling interrupts, to ensure
-> + * that an interrupt cannot fire and update the structure.
-> + */
-> +#define kvm_etm_update_vcpu_events(vcpu)						\
-> +	do {										\
-> +		if (!has_vhe() && vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRFCR))		\
-> +			vcpu->arch.host_debug_state.etm_event = *kvm_get_etm_event();	\
-> +	} while (0)
-> +
-
-Why is it a macro and not a function, which would avoid exposing
-kvm_get_etm_event?
-
-Thanks,
-
-	M.
-
+diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
+index 547ea1ff806e..c88488715a39 100644
+--- a/include/linux/compiler_types.h
++++ b/include/linux/compiler_types.h
+@@ -106,6 +106,34 @@ static inline void __chk_io_ptr(const volatile void __iomem *ptr) { }
+ #define __cold
+ #endif
+ 
++/*
++ * On x86-64 and arm64 targets, __preserve_most changes the calling convention
++ * of a function to make the code in the caller as unintrusive as possible. This
++ * convention behaves identically to the C calling convention on how arguments
++ * and return values are passed, but uses a different set of caller- and callee-
++ * saved registers.
++ *
++ * The purpose is to alleviates the burden of saving and recovering a large
++ * register set before and after the call in the caller.  This is beneficial for
++ * rarely taken slow paths, such as error-reporting functions that may be called
++ * from hot paths.
++ *
++ * Note: This may conflict with instrumentation inserted on function entry which
++ * does not use __preserve_most or equivalent convention (if in assembly). Since
++ * function tracing assumes the normal C calling convention, where the attribute
++ * is supported, __preserve_most implies notrace.  It is recommended to restrict
++ * use of the attribute to functions that should or already disable tracing.
++ *
++ * Optional: not supported by gcc.
++ *
++ * clang: https://clang.llvm.org/docs/AttributeReference.html#preserve-most
++ */
++#if __has_attribute(__preserve_most__)
++# define __preserve_most notrace __attribute__((__preserve_most__))
++#else
++# define __preserve_most
++#endif
++
+ /* Builtins */
+ 
+ /*
 -- 
-Without deviation from the norm, progress is not possible.
+2.41.0.640.ga95def55d0-goog
+
