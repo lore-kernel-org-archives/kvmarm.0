@@ -1,139 +1,174 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F7E5E57E;
-	Tue,  8 Aug 2023 10:57:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=jW2Ev2fEU+tZ64hL5Q4L57WV2mLp60uuQxKGj9Nz61U=; b=s+uSHykrxwdxki2XCrclKevIAH
-	MJoGCh+i9DNbxuy9Na53KErR8H7nbUXpSigO/op8OE+3RGXWM5LaOzqfPIthDkpvgo1IsA+UJWAug
-	87p0DNMySA2R+5nZ3uiFvMP5cE4bwxhgTwDQrVmO+OC0jG7S8m5NGVRY7mznI+kpPXdonsFX9kKum
-	ZyJWgvFc8DA8QCKbRB+9E9x+B2+G4jq+7yYx2l0dXXwYR5inUcYTFGnq6Lv06a9G4kFdfupLt/JEZ
-	v03/4eWvx2RNhBTrh2qRDOLfTyCHtSMFDQ2BdNWh/3mnGKGlTleqEwPZrTKoT9chs6NQnAzXRleV7
-	yRcWrn3Q==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1qTKOh-00H2dm-Bd; Tue, 08 Aug 2023 10:57:07 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id C876430010B;
-	Tue,  8 Aug 2023 12:57:05 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 8B9BE2038C087; Tue,  8 Aug 2023 12:57:05 +0200 (CEST)
-Date: Tue, 8 Aug 2023 12:57:05 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Florian Weimer <fweimer@redhat.com>
-Cc: Marco Elver <elver@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Kees Cook <keescook@chromium.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Steven Rostedt <rostedt@goodmis.org>, Marc Zyngier <maz@kernel.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 592CAF9C7
+	for <kvmarm@lists.linux.dev>; Tue,  8 Aug 2023 11:04:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB25BC433C7;
+	Tue,  8 Aug 2023 11:04:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691492654;
+	bh=DvFRtMOY4iagkM51r9J4zb/PTZkURRwsD+PlGC3bhCQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=f0PqxTwgl8WsCHtX6Gsfios7cRzmexMQGyXxFqIvsasO6WhgwyKOsQIGNYUWy9Q0Q
+	 WFWIZp7AoBkeuetrWWQDu3JhDAkHH+HweDSyEZWwuhKMdVJq4Nlri8/e/QvyxpLiIG
+	 RTWQHAwHatWRR4/8g+/ImbUYL0euknmk67PiPnhag8u/Q988jiwJd1uCae2ysYBOR1
+	 kYd2BUtnUq4ElPR8ONnIxo13uYX/dMyyV4l8vVDWu1dJV6hDkWM1bTB/JBTKdnaI82
+	 tgjlVVtO7V2UeOLm/93dm00MtjQNGvwE2LW9HrzE1Zwbq8nQnYAAHYTAqWnOkBTsOQ
+	 I7B40TIGjvj2Q==
+Received: from [104.132.45.110] (helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qTKVY-00372P-FV;
+	Tue, 08 Aug 2023 12:04:12 +0100
+Date: Tue, 08 Aug 2023 12:04:19 +0100
+Message-ID: <871qgdre18.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: James Clark <james.clark@arm.com>
+Cc: coresight@lists.linaro.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
 	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Tom Rix <trix@redhat.com>, Miguel Ojeda <ojeda@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com,
-	linux-toolchains@vger.kernel.org,
-	Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: [PATCH v2 1/3] compiler_types: Introduce the Clang
- __preserve_most function attribute
-Message-ID: <20230808105705.GB212435@hirez.programming.kicks-ass.net>
-References: <20230804090621.400-1-elver@google.com>
- <87il9rgjvw.fsf@oldenburg.str.redhat.com>
+	Mike Leach <mike.leach@linaro.org>,
+	Leo Yan <leo.yan@linaro.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Rob Herring <robh@kernel.org>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/3] arm64: KVM: Support exclude_guest for Coresight trace in nVHE
+In-Reply-To: <20230804101317.460697-3-james.clark@arm.com>
+References: <20230804101317.460697-1-james.clark@arm.com>
+	<20230804101317.460697-3-james.clark@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87il9rgjvw.fsf@oldenburg.str.redhat.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 104.132.45.110
+X-SA-Exim-Rcpt-To: james.clark@arm.com, coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mike.leach@linaro.org, leo.yan@linaro.org, alexander.shishkin@linux.intel.com, anshuman.khandual@arm.com, robh@kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Aug 07, 2023 at 01:41:07PM +0200, Florian Weimer wrote:
-> * Marco Elver:
+On Fri, 04 Aug 2023 11:13:12 +0100,
+James Clark <james.clark@arm.com> wrote:
 > 
-> > [1]: "On X86-64 and AArch64 targets, this attribute changes the calling
-> > convention of a function. The preserve_most calling convention attempts
-> > to make the code in the caller as unintrusive as possible. This
-> > convention behaves identically to the C calling convention on how
-> > arguments and return values are passed, but it uses a different set of
-> > caller/callee-saved registers. This alleviates the burden of saving and
-> > recovering a large register set before and after the call in the
-> > caller."
-> >
-> > [1] https://clang.llvm.org/docs/AttributeReference.html#preserve-most
+> Currently trace will always be generated in nVHE as long as TRBE isn't
+> being used. To allow filtering out guest trace, re-apply the filter
+> rules before switching to the guest.
 > 
-> You dropped the interesting part:
+> The TRFCR restore function remains the same.
 > 
-> | If the arguments are passed in callee-saved registers, then they will
-> | be preserved by the callee across the call. This doesn’t apply for
-> | values returned in callee-saved registers.
-> | 
-> |  ·  On X86-64 the callee preserves all general purpose registers, except
-> |     for R11. R11 can be used as a scratch register. Floating-point
-> |     registers (XMMs/YMMs) are not preserved and need to be saved by the
-> |     caller.
-> |     
-> |  ·  On AArch64 the callee preserve all general purpose registers, except
-> |     X0-X8 and X16-X18.
+> Signed-off-by: James Clark <james.clark@arm.com>
+> ---
+>  arch/arm64/kvm/debug.c             |  7 ++++
+>  arch/arm64/kvm/hyp/nvhe/debug-sr.c | 56 +++++++++++++++++++++++++++---
+>  2 files changed, 59 insertions(+), 4 deletions(-)
 > 
-> Ideally, this would be documented in the respective psABI supplement.
-> I filled in some gaps and filed:
-> 
->   Document the ABI for __preserve_most__ function calls
->   <https://gitlab.com/x86-psABIs/x86-64-ABI/-/merge_requests/45>
-> 
-> Doesn't this change impact the kernel module ABI?
-> 
-> I would really expect a check here
+> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> index 8725291cb00a..ebb4db20a859 100644
+> --- a/arch/arm64/kvm/debug.c
+> +++ b/arch/arm64/kvm/debug.c
+> @@ -335,10 +335,17 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
+>  	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
+>  	    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
+>  		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+> +	/*
+> +	 * Save TRFCR on nVHE if FEAT_TRF exists. This will be done in cases
+> +	 * where DEBUG_STATE_SAVE_TRBE doesn't completely disable trace.
+> +	 */
+> +	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceFilt_SHIFT))
+> +		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
+>  }
+>  
+>  void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
+>  {
+>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
+>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+> +	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
+>  }
+> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> index 4558c02eb352..0e8c85b29b92 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> @@ -51,13 +51,17 @@ static void __debug_restore_spe(u64 pmscr_el1)
+>  	write_sysreg_s(pmscr_el1, SYS_PMSCR_EL1);
+>  }
+>  
+> -static void __debug_save_trace(u64 *trfcr_el1)
+> +/*
+> + * Save TRFCR and disable trace completely if TRBE is being used. Return true
+> + * if trace was disabled.
+> + */
+> +static bool __debug_save_trace(u64 *trfcr_el1)
+>  {
+>  	*trfcr_el1 = 0;
+>  
+>  	/* Check if the TRBE is enabled */
+>  	if (!(read_sysreg_s(SYS_TRBLIMITR_EL1) & TRBLIMITR_EL1_E))
+> -		return;
+> +		return false;
 
-So in the GCC bugzilla you raise the point of unwinding.
+While you're refactoring this code, please move the zeroing of
+*trfcr_el1 under the if statement.
 
-So in arch/x86 we've beeing doing what this attribute proposes (except
-without that weird r11 exception) for a long while.
+>  	/*
+>  	 * Prohibit trace generation while we are in guest.
+>  	 * Since access to TRFCR_EL1 is trapped, the guest can't
+> @@ -68,6 +72,8 @@ static void __debug_save_trace(u64 *trfcr_el1)
+>  	isb();
+>  	/* Drain the trace buffer to memory */
+>  	tsb_csync();
+> +
+> +	return true;
+>  }
+>  
+>  static void __debug_restore_trace(u64 trfcr_el1)
+> @@ -79,14 +85,55 @@ static void __debug_restore_trace(u64 trfcr_el1)
+>  	write_sysreg_s(trfcr_el1, SYS_TRFCR_EL1);
+>  }
+>  
+> +#if IS_ENABLED(CONFIG_PERF_EVENTS)
 
-We simply do: asm("call foo_thunk"); instead of a C call, and then
-have the 'thunk' thing PUSH/POP all the registers around a regular C
-function.
+As previously stated, just always compile this. There shouldn't be
+anything here that's so large that it becomes a candidate for
+exclusion. Hell, even the whole of NV+pKVM are permanent features,
+even of most people won't use *any* of that.
 
-Paravirt does quite a lot of that as well.
+> +static inline void __debug_save_trfcr(struct kvm_vcpu *vcpu)
+> +{
+> +	u64 trfcr;
+> +	struct kvm_etm_event etm_event = vcpu->arch.host_debug_state.etm_event;
+> +
+> +	/* No change if neither are excluded */
+> +	if (!etm_event.exclude_guest && !etm_event.exclude_host) {
+> +		/* Zeroing prevents restoring a stale value */
+> +		vcpu->arch.host_debug_state.trfcr_el1 = 0;
 
-In a very few cases we implement a function specifically to avoid all
-the PUSH/POP nonsense because it's so small the stack overhead kills it.
+I find this "zero means do nothing" part very odd. I can see it is
+already done, but I really dislike this sort of assumption to avoid
+writing to a register.
 
-For unwinding this means that the 'thunk' becomes invisible when IP is
-not inside it. But since the thunk is purely 'uninteresting' PUSH/POP
-around a real C call, this is not an issue.
+I'd really prefer we track another version of TRFCR_EL1, compare host
+and guest, and decide to avoid writing if they are equal. At least, it
+would be readable.
 
-[[ tail calls leaving their sibling invisible is a far more annoying
-   issue ]]
+And in the end, expressing *everything* in terms of the register would
+really help, instead of the exclude_* stuff that has no place in the
+low-level arch code.
 
-If the function is one of those special things, then it will be a leaf
-function and we get to see it throught he IP.
+Thanks,
 
+	M.
 
-Now, the problem with __preserve_most is that it makes it really easy to
-deviate from this pattern, you can trivially write a function that is
-not a trivial wrapper and then does not show up on unwind. This might
-indeed be a problem.
-
-Ofc. the kernel doesn't longjmp much, and we also don't throw many
-exxceptions, but the live-patch people might care (although ORC unwinder
-should be able to deal with all this perfectly fine).
-
-In userspace, would not .eh_frame still be able to unwind this?
+-- 
+Without deviation from the norm, progress is not possible.
