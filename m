@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A559F101C7
-	for <kvmarm@lists.linux.dev>; Tue,  8 Aug 2023 11:48:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A476C433C7;
-	Tue,  8 Aug 2023 11:48:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1724101C7
+	for <kvmarm@lists.linux.dev>; Tue,  8 Aug 2023 11:48:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78EAFC433C8;
+	Tue,  8 Aug 2023 11:48:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691495285;
-	bh=wPhod5Peg0BcU9eGJCAQdNgMOfMqpCFVOnHFnmu3guw=;
+	s=k20201202; t=1691495287;
+	bh=6d4Kspg7nIaOGmD/4cchuF/PX4zqa/gLnUY8Tbj4CBU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Qt/4tmIzBPy0tPh29h8gQ6/umtxHfxo1i99WPzQJrl1oAeCALla7dj51jvm9L12A9
-	 xowndrPa1lQyux+zJhKN9FAnM+aLWqWRQVPWYej4MMPxSGy1mtoQQfnAbljwT105d9
-	 hm2zx9YcEvhSunzkH48RcmjCEbRJARHgjW89IImeDH9ZLFb9nRh//l3/M5Ikiu61Z2
-	 6ALgIChbSEDflQVm01SZcP0aP8eM4ExrnXm/KUkGWDDoxTf+2t7wmrE7eCQW0C1OzX
-	 mSvUuBxjACr3kb6uMmeZff6CWY64A7YuEEYJWEDisEGGLKDic2UbOxfJ7S83edbS9f
-	 +aTyDz850LQng==
+	b=j9gzvEy5h0wHMZ8SZpNRT1eyRILkMft/UQN8MGsDoxBBNYLTkCc4RUiZc64Tjr3ws
+	 u8CEy9NFl5EhjiaTAWriCYWjIrbuxlo8Lh0cIX08VWhGH7HsorYx2+zGv5CdE2N58e
+	 dqpSoDTQ394CpIl+kTHty5kcXYzXsuLtPLSLh9q/4G2lDktyRsmCqXd+ZVfxEWs748
+	 sLnoKDSxME0d0FKZvXHaifriEyR9wNUNykkTCha+HfDDmmjimeN1P1cxDVlU7/fLYe
+	 eL/v89cTsIEYKm8s9jLVqhUg1IcDA10ImbAkaZoxSqqbNcP1Jb+GNYNmtuyMEiLSKy
+	 1MbosYmPmXukA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qTLBG-0037Ph-Aw;
-	Tue, 08 Aug 2023 12:47:18 +0100
+	id 1qTLBI-0037Ph-7e;
+	Tue, 08 Aug 2023 12:47:20 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v3 11/27] KVM: arm64: Add missing HCR_EL2 trap bits
-Date: Tue,  8 Aug 2023 12:46:55 +0100
-Message-Id: <20230808114711.2013842-12-maz@kernel.org>
+Subject: [PATCH v3 16/27] KVM: arm64: nv: Expose FEAT_EVT to nested guests
+Date: Tue,  8 Aug 2023 12:47:00 +0100
+Message-Id: <20230808114711.2013842-17-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230808114711.2013842-1-maz@kernel.org>
 References: <20230808114711.2013842-1-maz@kernel.org>
@@ -58,39 +58,29 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We're still missing a handfull of HCR_EL2 trap bits. Add them.
+Now that we properly implement FEAT_EVT (as we correctly forward
+traps), expose it to guests.
 
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
 ---
- arch/arm64/include/asm/kvm_arm.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ arch/arm64/kvm/nested.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 58e5eb27da68..028049b147df 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -18,10 +18,19 @@
- #define HCR_DCT		(UL(1) << 57)
- #define HCR_ATA_SHIFT	56
- #define HCR_ATA		(UL(1) << HCR_ATA_SHIFT)
-+#define HCR_TTLBOS	(UL(1) << 55)
-+#define HCR_TTLBIS	(UL(1) << 54)
-+#define HCR_ENSCXT	(UL(1) << 53)
-+#define HCR_TOCU	(UL(1) << 52)
- #define HCR_AMVOFFEN	(UL(1) << 51)
-+#define HCR_TICAB	(UL(1) << 50)
- #define HCR_TID4	(UL(1) << 49)
- #define HCR_FIEN	(UL(1) << 47)
- #define HCR_FWB		(UL(1) << 46)
-+#define HCR_NV2		(UL(1) << 45)
-+#define HCR_AT		(UL(1) << 44)
-+#define HCR_NV1		(UL(1) << 43)
-+#define HCR_NV		(UL(1) << 42)
- #define HCR_API		(UL(1) << 41)
- #define HCR_APK		(UL(1) << 40)
- #define HCR_TEA		(UL(1) << 37)
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 315354d27978..7f80f385d9e8 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -124,8 +124,7 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+ 		break;
+ 
+ 	case SYS_ID_AA64MMFR2_EL1:
+-		val &= ~(NV_FTR(MMFR2, EVT)	|
+-			 NV_FTR(MMFR2, BBM)	|
++		val &= ~(NV_FTR(MMFR2, BBM)	|
+ 			 NV_FTR(MMFR2, TTL)	|
+ 			 GENMASK_ULL(47, 44)	|
+ 			 NV_FTR(MMFR2, ST)	|
 -- 
 2.34.1
 
