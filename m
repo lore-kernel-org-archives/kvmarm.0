@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C8FF101C7
-	for <kvmarm@lists.linux.dev>; Tue,  8 Aug 2023 11:47:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 667A1C43391;
-	Tue,  8 Aug 2023 11:47:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE19F101C7
+	for <kvmarm@lists.linux.dev>; Tue,  8 Aug 2023 11:47:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EE06C433CD;
+	Tue,  8 Aug 2023 11:47:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691495273;
-	bh=E7EfyLyZQV58kos+RRoOBuTQq3eMGoMuJaAqA7RmAmY=;
+	s=k20201202; t=1691495275;
+	bh=Y+sCX9NjKo50qL0UVZVq/hehTymL/TV6ZrGWTgDRqM0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CHWe1Yo2fK+uxBnwGai9xbOcO6Je68qZpEneRX/3AJ380miaHhzhuyNVBXMLFu8Cv
-	 qd8PMf5WXIr0YmicU73LLn6cc4wB6GXmi7pAIjXxewDqYdY0Hpmomp/8JbcmQ54s2S
-	 9bylpUmQL6Pyy63A76GtOAAvlIBZ1cruEV6rSU1gLE1ZOIW9ZT+S/ULzPj1PGLHi+O
-	 9fW/ZmZ6s4A816x1QtXhQhhFxbdbrh6TVe8l/IcvrT+N8nzvXR+tyT0kvmaVvuoraJ
-	 eiQe+gkyFUXDNRGijc5HFx6ERLTZYC+Bc94aJQEeW2LR1gFj6DHMKRdXZySY4NFDds
-	 D8FLmPXvvLZGQ==
+	b=SBZ3+bkQyXhsDuGeReXx9NyuG1CQqJxW33C0s+necZx0EeKJO3e6/JMxLcCTZM7Vl
+	 kT28vGPEnsdpN/jKfCDJg5aA0dz123Utm+g6Pe8gY0ytLOWk97MeVd103g+Nf1PuTE
+	 XAy7u0WqapiFkmSso06wHHYc7+RUOiLAvazB7ZMA1ckAg+LFz0KBcx5N5XD9Bs23I9
+	 kOCMA5lbBmFNxW88F3B4VCOw2YaBfru7xqYLTE57MIYsHydWvzyU7R340NZgnqS8OW
+	 PBgRc2UVvxX9pYarXLfsUYKtyesRoE6+MyRVpWbDCsVq2tY4oNM4Urkmybyhdjj7mD
+	 pbVE6RiSbv1cg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qTLBJ-0037Ph-BU;
-	Tue, 08 Aug 2023 12:47:21 +0100
+	id 1qTLBN-0037Ph-3p;
+	Tue, 08 Aug 2023 12:47:26 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v3 19/27] KVM: arm64: nv: Add fine grained trap forwarding infrastructure
-Date: Tue,  8 Aug 2023 12:47:03 +0100
-Message-Id: <20230808114711.2013842-20-maz@kernel.org>
+Subject: [PATCH v3 26/27] KVM: arm64: Move HCRX_EL2 switch to load/put on VHE systems
+Date: Tue,  8 Aug 2023 12:47:10 +0100
+Message-Id: <20230808114711.2013842-27-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230808114711.2013842-1-maz@kernel.org>
 References: <20230808114711.2013842-1-maz@kernel.org>
@@ -58,147 +58,68 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Fine Grained Traps are fun. Not.
+Although the nVHE behaviour requires HCRX_EL2 to be switched
+on each switch between host and guest, there is nothing in
+this register that would affect a VHE host.
 
-Implement the fine grained trap forwarding, reusing the Coarse Grained
-Traps infrastructure previously implemented.
+It is thus possible to save/restore this register on load/put
+on VHE systems, avoiding unnecessary sysreg access on the hot
+path. Additionally, it avoids unnecessary traps when running
+with NV.
 
-Each sysreg/instruction inserted in the xarray gets a FGT group
-(vaguely equivalent to a register number), a bit number in that register,
-and a polarity.
+To achieve this, simply move the read/writes to the *_common()
+helpers, which are called on load/put on VHE, and more eagerly
+on nVHE.
 
-It is then pretty easy to check the FGT state at handling time, just
-like we do for the coarse version (it is just faster).
-
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/emulate-nested.c | 78 ++++++++++++++++++++++++++++++++-
- 1 file changed, 77 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index cd0544c3577e..af75c2775638 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -928,6 +928,27 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index a4750070563f..060c5a0409e5 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -197,6 +197,9 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
+ 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
  
- static DEFINE_XARRAY(sr_forward_xa);
- 
-+enum fgt_group_id {
-+	__NO_FGT_GROUP__,
++	if (cpus_have_final_cap(ARM64_HAS_HCX))
++		write_sysreg_s(HCRX_GUEST_FLAGS, SYS_HCRX_EL2);
 +
-+	/* Must be last */
-+	__NR_FGT_GROUP_IDS__
-+};
-+
-+#define SR_FGT(sr, g, b, p)					\
-+	{							\
-+		.encoding	= sr,				\
-+		.end		= sr,				\
-+		.tc		= {				\
-+			.fgt = g ## _GROUP,			\
-+			.bit = g ## _EL2_ ## b ## _SHIFT,	\
-+			.pol = p,				\
-+		},						\
-+	}
-+
-+static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
-+};
-+
- static union trap_config get_trap_config(u32 sysreg)
- {
- 	return (union trap_config) {
-@@ -941,6 +962,7 @@ int __init populate_nv_trap_config(void)
- 
- 	BUILD_BUG_ON(sizeof(union trap_config) != sizeof(void *));
- 	BUILD_BUG_ON(__NR_TRAP_GROUP_IDS__ > BIT(TC_CGT_BITS));
-+	BUILD_BUG_ON(__NR_FGT_GROUP_IDS__ > BIT(TC_FGT_BITS));
- 
- 	for (int i = 0; i < ARRAY_SIZE(encoding_to_cgt); i++) {
- 		const struct encoding_to_trap_config *cgt = &encoding_to_cgt[i];
-@@ -963,6 +985,34 @@ int __init populate_nv_trap_config(void)
- 	kvm_info("nv: %ld coarse grained trap handlers\n",
- 		 ARRAY_SIZE(encoding_to_cgt));
- 
-+	if (!cpus_have_final_cap(ARM64_HAS_FGT))
-+		goto check_mcb;
-+
-+	for (int i = 0; i < ARRAY_SIZE(encoding_to_fgt); i++) {
-+		const struct encoding_to_trap_config *fgt = &encoding_to_fgt[i];
-+		union trap_config tc;
-+
-+		tc = get_trap_config(fgt->encoding);
-+
-+		if (tc.fgt) {
-+			kvm_err("Duplicate FGT for (%d, %d, %d, %d, %d)\n",
-+				sys_reg_Op0(fgt->encoding),
-+				sys_reg_Op1(fgt->encoding),
-+				sys_reg_CRn(fgt->encoding),
-+				sys_reg_CRm(fgt->encoding),
-+				sys_reg_Op2(fgt->encoding));
-+			ret = -EINVAL;
-+		}
-+
-+		tc.val |= fgt->tc.val;
-+		xa_store(&sr_forward_xa, fgt->encoding,
-+			 xa_mk_value(tc.val), GFP_KERNEL);
-+	}
-+
-+	kvm_info("nv: %ld fine grained trap handlers\n",
-+		 ARRAY_SIZE(encoding_to_fgt));
-+
-+check_mcb:
- 	for (int id = __MULTIPLE_CONTROL_BITS__;
- 	     id < (__COMPLEX_CONDITIONS__ - 1);
- 	     id++) {
-@@ -1031,13 +1081,26 @@ static enum trap_behaviour compute_trap_behaviour(struct kvm_vcpu *vcpu,
- 	return __do_compute_trap_behaviour(vcpu, tc.cgt, b);
+ 	__activate_traps_hfgxtr(vcpu);
  }
  
-+static bool check_fgt_bit(u64 val, const union trap_config tc)
-+{
-+	return ((val >> tc.bit) & 1) == tc.pol;
-+}
-+
-+#define sanitised_sys_reg(vcpu, reg)			\
-+	({						\
-+		u64 __val;				\
-+		__val = __vcpu_sys_reg(vcpu, reg);	\
-+		__val &= ~__ ## reg ## _RES0;		\
-+		(__val);				\
-+	})
-+
- bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
- {
- 	union trap_config tc;
- 	enum trap_behaviour b;
- 	bool is_read;
- 	u32 sysreg;
--	u64 esr;
-+	u64 esr, val;
+@@ -213,6 +216,9 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+ 		vcpu_clear_flag(vcpu, PMUSERENR_ON_CPU);
+ 	}
  
- 	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
- 		return false;
-@@ -1060,6 +1123,19 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
- 	if (!tc.val)
- 		return false;
++	if (cpus_have_final_cap(ARM64_HAS_HCX))
++		write_sysreg_s(HCRX_HOST_FLAGS, SYS_HCRX_EL2);
++
+ 	__deactivate_traps_hfgxtr(vcpu);
+ }
  
-+	switch ((enum fgt_group_id)tc.fgt) {
-+	case __NO_FGT_GROUP__:
-+		break;
-+
-+	case __NR_FGT_GROUP_IDS__:
-+		/* Something is really wrong, bail out */
-+		WARN_ONCE(1, "__NR_FGT_GROUP_IDS__");
-+		return false;
-+	}
-+
-+	if (tc.fgt != __NO_FGT_GROUP__ && check_fgt_bit(val, tc))
-+		goto inject;
-+
- 	b = compute_trap_behaviour(vcpu, tc);
+@@ -227,9 +233,6 @@ static inline void ___activate_traps(struct kvm_vcpu *vcpu)
  
- 	if (((b & BEHAVE_FORWARD_READ) && is_read) ||
+ 	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_VSE))
+ 		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
+-
+-	if (cpus_have_final_cap(ARM64_HAS_HCX))
+-		write_sysreg_s(HCRX_GUEST_FLAGS, SYS_HCRX_EL2);
+ }
+ 
+ static inline void ___deactivate_traps(struct kvm_vcpu *vcpu)
+@@ -244,9 +247,6 @@ static inline void ___deactivate_traps(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.hcr_el2 &= ~HCR_VSE;
+ 		vcpu->arch.hcr_el2 |= read_sysreg(hcr_el2) & HCR_VSE;
+ 	}
+-
+-	if (cpus_have_final_cap(ARM64_HAS_HCX))
+-		write_sysreg_s(HCRX_HOST_FLAGS, SYS_HCRX_EL2);
+ }
+ 
+ static inline bool __populate_fault_info(struct kvm_vcpu *vcpu)
 -- 
 2.34.1
 
