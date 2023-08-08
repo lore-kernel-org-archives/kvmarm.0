@@ -1,39 +1,50 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCC93EED1;
-	Tue,  8 Aug 2023 12:35:39 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 681661576;
-	Tue,  8 Aug 2023 05:36:21 -0700 (PDT)
-Received: from FVFF77S0Q05N.cambridge.arm.com (FVFF77S0Q05N.cambridge.arm.com [10.1.35.148])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 36E633F59C;
-	Tue,  8 Aug 2023 05:35:35 -0700 (PDT)
-Date: Tue, 8 Aug 2023 13:35:29 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Marco Elver <elver@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Kees Cook <keescook@chromium.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Steven Rostedt <rostedt@goodmis.org>, Marc Zyngier <maz@kernel.org>,
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A1631097B
+	for <kvmarm@lists.linux.dev>; Tue,  8 Aug 2023 13:39:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B716DC433C8;
+	Tue,  8 Aug 2023 13:39:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691501946;
+	bh=RnXjxseYsnFe6Wnck1M4XbqKJfcYUVsYZpbGiHCNKCw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dOsRv8DPnz3szlVVqAIekC0oAa1YWjq756EOBKQHNrWkdjOHTpZrdXFvoiy0dPstL
+	 zHVpr1V7MDywHBGGU4vstj24/ddQ2YUijhLOHhv21OptJRcyHiqH4PCaeITgRuOsQP
+	 xhcNw4WURUix63jdw9L0KUAaoaYuVRg6y2L3/+0DCRQV91VgQjhNmhSn7gmTUld4CN
+	 PukbIQT3kIDYfuJo8nq7Ezq5aseMpKv9N4/sMDanxbzcf38L9HyofcxB5+sD0FXxB4
+	 LdhMsPJhZIcf39N6w/S5fgwPEA8bYg9AZCO455XBxu4iag2rRXSA1EHP7TfDTdQEgX
+	 lr0A4nNsxMLIQ==
+Date: Tue, 8 Aug 2023 14:38:58 +0100
+From: Will Deacon <will@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Tom Rix <trix@redhat.com>, Miguel Ojeda <ojeda@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com,
-	linux-toolchains@vger.kernel.org
-Subject: Re: [PATCH v3 1/3] compiler_types: Introduce the Clang
- __preserve_most function attribute
-Message-ID: <ZNI2kStGIPInDYIK@FVFF77S0Q05N.cambridge.arm.com>
-References: <20230808102049.465864-1-elver@google.com>
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v3 00/36] arm64/gcs: Provide support for GCS in userspace
+Message-ID: <20230808133857.GC2369@willie-the-truck>
+References: <20230731-arm64-gcs-v3-0-cddf9f980d98@kernel.org>
+ <20230801141319.GC26253@willie-the-truck>
+ <09b7a94d-cc88-4372-85de-52db26bc2daf@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -42,108 +53,42 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230808102049.465864-1-elver@google.com>
+In-Reply-To: <09b7a94d-cc88-4372-85de-52db26bc2daf@sirena.org.uk>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Tue, Aug 08, 2023 at 12:17:25PM +0200, Marco Elver wrote:
-> [1]: "On X86-64 and AArch64 targets, this attribute changes the calling
-> convention of a function. The preserve_most calling convention attempts
-> to make the code in the caller as unintrusive as possible. This
-> convention behaves identically to the C calling convention on how
-> arguments and return values are passed, but it uses a different set of
-> caller/callee-saved registers. This alleviates the burden of saving and
-> recovering a large register set before and after the call in the caller.
-> If the arguments are passed in callee-saved registers, then they will be
-> preserved by the callee across the call. This doesn't apply for values
-> returned in callee-saved registers.
+On Tue, Aug 01, 2023 at 04:09:58PM +0100, Mark Brown wrote:
+> On Tue, Aug 01, 2023 at 03:13:20PM +0100, Will Deacon wrote:
+> > On Mon, Jul 31, 2023 at 02:43:09PM +0100, Mark Brown wrote:
 > 
->  * On X86-64 the callee preserves all general purpose registers, except
->    for R11. R11 can be used as a scratch register. Floating-point
->    registers (XMMs/YMMs) are not preserved and need to be saved by the
->    caller.
+> > > The arm64 Guarded Control Stack (GCS) feature provides support for
+> > > hardware protected stacks of return addresses, intended to provide
+> > > hardening against return oriented programming (ROP) attacks and to make
+> > > it easier to gather call stacks for applications such as profiling.
 > 
->  * On AArch64 the callee preserve all general purpose registers, except
->    x0-X8 and X16-X18."
+> > Why is this better than Clang's software shadow stack implementation? It
+> > would be nice to see some justification behind adding all this, rather
+> > than it being an architectural tick-box exercise.
 > 
-> [1] https://clang.llvm.org/docs/AttributeReference.html#preserve-most
-> 
-> Introduce the attribute to compiler_types.h as __preserve_most.
-> 
-> Use of this attribute results in better code generation for calls to
-> very rarely called functions, such as error-reporting functions, or
-> rarely executed slow paths.
-> 
-> Beware that the attribute conflicts with instrumentation calls inserted
-> on function entry which do not use __preserve_most themselves. Notably,
-> function tracing which assumes the normal C calling convention for the
-> given architecture.  Where the attribute is supported, __preserve_most
-> will imply notrace. It is recommended to restrict use of the attribute
-> to functions that should or already disable tracing.
-> 
-> The attribute may be supported by a future GCC version (see
-> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=110899).
-> 
-> Signed-off-by: Marco Elver <elver@google.com>
-> Reviewed-by: Miguel Ojeda <ojeda@kernel.org>
-> Acked-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+> Mainly that it's hardware enforced (as the quoted paragraph says).  This
+> makes it harder to attack, and hopefully it's also a bit faster (how
+> measurable that might be will be an open question, but even NOPs in
+> function entry/exit tend to get noticed).
 
-So long as this implies notrace I believe it is safe, so:
+I dunno, "hardware enforced" can also mean worse security nowadays ;)
 
-Acked-by: Mark Rutland <mark.rutland@arm.com>
+But seriously, I think the question is more about what this brings us
+*on top of* SCS, since for the forseeable future folks that care about
+this stuff (like Android) will be using SCS. GCS on its own doesn't make
+sense to me, given the recompilation effort to remove SCS and the lack
+of hardware, so then you have to look at what it brings in addition to
+GCS and balance that against the performance cost.
 
-Mark.
+Given that, is anybody planning to ship a distribution with this enabled?
+If not, why are we bothering? If so, how much of that distribution has
+been brought up and how does the "dynamic linker or other startup code"
+decide what to do?
 
-> ---
-> v3:
-> * Quote more from LLVM documentation about which registers are
->   callee/caller with preserve_most.
-> * Code comment to restrict use where tracing is meant to be disabled.
-> 
-> v2:
-> * Imply notrace, to avoid any conflicts with tracing which is inserted
->   on function entry. See added comments.
-> ---
->  include/linux/compiler_types.h | 28 ++++++++++++++++++++++++++++
->  1 file changed, 28 insertions(+)
-> 
-> diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
-> index 547ea1ff806e..c88488715a39 100644
-> --- a/include/linux/compiler_types.h
-> +++ b/include/linux/compiler_types.h
-> @@ -106,6 +106,34 @@ static inline void __chk_io_ptr(const volatile void __iomem *ptr) { }
->  #define __cold
->  #endif
->  
-> +/*
-> + * On x86-64 and arm64 targets, __preserve_most changes the calling convention
-> + * of a function to make the code in the caller as unintrusive as possible. This
-> + * convention behaves identically to the C calling convention on how arguments
-> + * and return values are passed, but uses a different set of caller- and callee-
-> + * saved registers.
-> + *
-> + * The purpose is to alleviates the burden of saving and recovering a large
-> + * register set before and after the call in the caller.  This is beneficial for
-> + * rarely taken slow paths, such as error-reporting functions that may be called
-> + * from hot paths.
-> + *
-> + * Note: This may conflict with instrumentation inserted on function entry which
-> + * does not use __preserve_most or equivalent convention (if in assembly). Since
-> + * function tracing assumes the normal C calling convention, where the attribute
-> + * is supported, __preserve_most implies notrace.  It is recommended to restrict
-> + * use of the attribute to functions that should or already disable tracing.
-> + *
-> + * Optional: not supported by gcc.
-> + *
-> + * clang: https://clang.llvm.org/docs/AttributeReference.html#preserve-most
-> + */
-> +#if __has_attribute(__preserve_most__)
-> +# define __preserve_most notrace __attribute__((__preserve_most__))
-> +#else
-> +# define __preserve_most
-> +#endif
-> +
->  /* Builtins */
->  
->  /*
-> -- 
-> 2.41.0.640.ga95def55d0-goog
-> 
+After the mess we had with BTI and mprotect(), I'm hesitant to merge
+features like this without knowing that the ABI can stand real code.
+
+Will
