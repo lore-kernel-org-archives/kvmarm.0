@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4BEA101C7
-	for <kvmarm@lists.linux.dev>; Tue,  8 Aug 2023 11:47:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B784C433C8;
-	Tue,  8 Aug 2023 11:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3CEE101C7
+	for <kvmarm@lists.linux.dev>; Tue,  8 Aug 2023 11:47:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4343C433C7;
+	Tue,  8 Aug 2023 11:47:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691495277;
-	bh=FbSPSNNWSOihCfp4f85pdtzQ4089i3bfDbJGaflMjww=;
+	s=k20201202; t=1691495279;
+	bh=wxocUCw9UXZABS62au2oXQEt+hOWznw5U/tSAAqxwXQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hGA3FxLRkItG1DSCdHbi+22bQOBp3nWmjj2D4cWhcbloGVUeSjm2kQXNwALHYRwlL
-	 zDPbPKrB6v5CRAsutJrMgRVXliC8KleaSOG/VMfuAUSI5Ln4wGMWSvb2wpXcjbh/47
-	 KJjFvsuDIao3KKdtkFN0kF9YPcIgpdMyqSfIx1JRRk/k0FBQMmu93kZZDhF3z7VXtZ
-	 0StKfdn828UKu8QwT2YGHmwmEMGpfG5kQZ0vMPBk59FSGffK/1lGZD71RG0tu6+dtg
-	 7dAhv0N3IBF+ulc1qk5xYnyGaPlCsTn6QCP0M5sObbcU4H7dUvCgcrfOe/IrdhL1Ya
-	 fLF/ef3jPiphQ==
+	b=mOJEO5wfb7oyHA8zjbKGDB+k6ZfnFiF5mmC6MkK2aOwIwdB1IGf6/VuhmxN6hl6XM
+	 rjyxGR2YbTZJTKe0npYrGYWeYyHoEp5amwnH8g8mkentsdoAuXWq5Nbjv2rOKdN/rH
+	 lNj/2IYXdXhHjkc1jif/beweY7JeUVmec7tvZyenDpo6eduNUlUDPtUm2TAaLGI90F
+	 pdzIrXh3cqJzkaMP8rCnkbRnxSayGu2Cqqd4u5bCsjtCuE78RexLxKv87AkfhHLmWi
+	 VpACLHOKOxyrLQJ/OzmRcmvPqeVrDDUoK7fJNenecfInwp0WOw1mYuAjCX5qwoV/mW
+	 JNQhGqAa3frvA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qTLBK-0037Ph-Ok;
-	Tue, 08 Aug 2023 12:47:22 +0100
+	id 1qTLBG-0037Ph-NY;
+	Tue, 08 Aug 2023 12:47:18 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v3 23/27] KVM: arm64: nv: Add SVC trap forwarding
-Date: Tue,  8 Aug 2023 12:47:07 +0100
-Message-Id: <20230808114711.2013842-24-maz@kernel.org>
+Subject: [PATCH v3 12/27] KVM: arm64: nv: Add FGT registers
+Date: Tue,  8 Aug 2023 12:46:56 +0100
+Message-Id: <20230808114711.2013842-13-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230808114711.2013842-1-maz@kernel.org>
 References: <20230808114711.2013842-1-maz@kernel.org>
@@ -58,68 +58,56 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-HFGITR_EL2 allows the trap of SVC instructions to EL2. Allow these
-traps to be forwarded. Take this opportunity to deny any 32bit activity
-when NV is enabled.
+Add the 5 registers covering FEAT_FGT. The AMU-related registers
+are currently left out as we don't have a plan for them. Yet.
 
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
 ---
- arch/arm64/kvm/arm.c         |  4 ++++
- arch/arm64/kvm/handle_exit.c | 12 ++++++++++++
- 2 files changed, 16 insertions(+)
+ arch/arm64/include/asm/kvm_host.h | 5 +++++
+ arch/arm64/kvm/sys_regs.c         | 5 +++++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 72dc53a75d1c..8b51570a76f8 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -36,6 +36,7 @@
- #include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/kvm_nested.h>
- #include <asm/kvm_pkvm.h>
- #include <asm/kvm_emulate.h>
- #include <asm/sections.h>
-@@ -818,6 +819,9 @@ static bool vcpu_mode_is_bad_32bit(struct kvm_vcpu *vcpu)
- 	if (likely(!vcpu_mode_is_32bit(vcpu)))
- 		return false;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index d3dd05bbfe23..721680da1011 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -400,6 +400,11 @@ enum vcpu_sysreg {
+ 	TPIDR_EL2,	/* EL2 Software Thread ID Register */
+ 	CNTHCTL_EL2,	/* Counter-timer Hypervisor Control register */
+ 	SP_EL2,		/* EL2 Stack Pointer */
++	HFGRTR_EL2,
++	HFGWTR_EL2,
++	HFGITR_EL2,
++	HDFGRTR_EL2,
++	HDFGWTR_EL2,
+ 	CNTHP_CTL_EL2,
+ 	CNTHP_CVAL_EL2,
+ 	CNTHV_CTL_EL2,
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 38f221f9fc98..f5baaa508926 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2367,6 +2367,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	EL2_REG(MDCR_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(CPTR_EL2, access_rw, reset_val, CPTR_NVHE_EL2_RES1),
+ 	EL2_REG(HSTR_EL2, access_rw, reset_val, 0),
++	EL2_REG(HFGRTR_EL2, access_rw, reset_val, 0),
++	EL2_REG(HFGWTR_EL2, access_rw, reset_val, 0),
++	EL2_REG(HFGITR_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(HACR_EL2, access_rw, reset_val, 0),
  
-+	if (vcpu_has_nv(vcpu))
-+		return true;
-+
- 	return !kvm_supports_32bit_el0();
- }
+ 	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
+@@ -2376,6 +2379,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	EL2_REG(VTCR_EL2, access_rw, reset_val, 0),
  
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 6dcd6604b6bc..3b86d534b995 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -226,6 +226,17 @@ static int kvm_handle_eret(struct kvm_vcpu *vcpu)
- 	return 1;
- }
- 
-+static int handle_svc(struct kvm_vcpu *vcpu)
-+{
-+	/*
-+	 * So far, SVC traps only for NV via HFGITR_EL2. A SVC from a
-+	 * 32bit guest would be caught by vpcu_mode_is_bad_32bit(), so
-+	 * we should only have to deal with a 64 bit exception.
-+	 */
-+	kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-+	return 1;
-+}
-+
- static exit_handle_fn arm_exit_handlers[] = {
- 	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
- 	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
-@@ -239,6 +250,7 @@ static exit_handle_fn arm_exit_handlers[] = {
- 	[ESR_ELx_EC_SMC32]	= handle_smc,
- 	[ESR_ELx_EC_HVC64]	= handle_hvc,
- 	[ESR_ELx_EC_SMC64]	= handle_smc,
-+	[ESR_ELx_EC_SVC64]	= handle_svc,
- 	[ESR_ELx_EC_SYS64]	= kvm_handle_sys_reg,
- 	[ESR_ELx_EC_SVE]	= handle_sve,
- 	[ESR_ELx_EC_ERET]	= kvm_handle_eret,
+ 	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
++	EL2_REG(HDFGRTR_EL2, access_rw, reset_val, 0),
++	EL2_REG(HDFGWTR_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(SPSR_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(ELR_EL2, access_rw, reset_val, 0),
+ 	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
 -- 
 2.34.1
 
