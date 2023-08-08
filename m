@@ -1,25 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40CA0100A5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E9B100A4
 	for <kvmarm@lists.linux.dev>; Tue,  8 Aug 2023 11:47:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA68EC433CA;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55D2CC433D9;
 	Tue,  8 Aug 2023 11:47:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1691495237;
-	bh=k70vbGyqtpFHqhcl5LnkNzDTDcL16PBph+LK/kmFZ1A=;
+	bh=v5iH5FTyEpyHMdqXE1ha5bdSz0FgSx4VbyMF9ixrvDE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fWlemGLL9nKR9YW4eyEYFjneYgBex87iSIMrSL6aBXcwZ//GVkkqmiwezRn3VLqw+
-	 9HA3pa6Or8/zHx6AGFNuoDPjoLeWKNFoV8h4+96xLRgPixrQXasjYHwmRt4bIB30vi
-	 OPAKD6XmzzhynLwFnuS31nD0E6fAqySygG7Ya49tWcdF6rnP24sfYyFGpYuJM9DHlM
-	 Qk8MIwZvdl1LYR0NQoG7dy9KodialIclvsTgtiO0UUhqVf+taeBjtHP9qUXg0T8RSy
-	 d9SczPUVrLVwNAfCCdnJ25Rm2hf5SCZEFBBXjfO+DlyOH+0pvYKYUrAoTkx30ksMq3
-	 1vAxNviv7kYSQ==
+	b=OgRFK0ptG1ERD1TX77TFDwKBpe+d7jZu0ORf3YmnB3geXyhu9ThMCoq8Bc8aGOw0D
+	 3JDvolzRUCGqyNSJx4eyTesWoSWhBw33GONu+ETJeMLxDUYF4xRpNVxdnAOTd84DdG
+	 9XAcgVMvR16R0tL4oqurSnPXcYtcQET94QYP/8OZW6/8Ae+cpMopSfQSF++2GBqwSp
+	 zZ8D9lQeHAF/e8FZt930Gey3s7kXiAzeZXvYnQev4H2x9qO+Db15i2exPXPYAdWjqS
+	 sn7u3sgFENZK3rKJrzVS6pguHD8J8g8Go9zo4T4fmgvlxuYXUoG9Nt6aNLj98KOExC
+	 qqwlZoeOC5KBA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qTLBD-0037Ph-MY;
+	id 1qTLBD-0037Ph-BW;
 	Tue, 08 Aug 2023 12:47:15 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -40,9 +40,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v3 03/27] arm64: Add missing DC ZVA/GVA/GZVA encodings
-Date: Tue,  8 Aug 2023 12:46:47 +0100
-Message-Id: <20230808114711.2013842-4-maz@kernel.org>
+Subject: [PATCH v3 02/27] arm64: Add missing ERX*_EL1 encodings
+Date: Tue,  8 Aug 2023 12:46:46 +0100
+Message-Id: <20230808114711.2013842-3-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230808114711.2013842-1-maz@kernel.org>
 References: <20230808114711.2013842-1-maz@kernel.org>
@@ -58,7 +58,9 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the missing DC *VA encodings.
+We only describe a few of the ERX*_EL1 registers. Add the missing
+ones (ERXPFGF_EL1, ERXPFGCTL_EL1, ERXPFGCDN_EL1, ERXMISC2_EL1 and
+ERXMISC3_EL1).
 
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
@@ -70,21 +72,23 @@ Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
  1 file changed, 5 insertions(+)
 
 diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index ed2739897859..5084add86897 100644
+index 85447e68951a..ed2739897859 100644
 --- a/arch/arm64/include/asm/sysreg.h
 +++ b/arch/arm64/include/asm/sysreg.h
-@@ -150,6 +150,11 @@
- #define SYS_DC_CIGVAC			sys_insn(1, 3, 7, 14, 3)
- #define SYS_DC_CIGDVAC			sys_insn(1, 3, 7, 14, 5)
+@@ -229,8 +229,13 @@
+ #define SYS_ERXCTLR_EL1			sys_reg(3, 0, 5, 4, 1)
+ #define SYS_ERXSTATUS_EL1		sys_reg(3, 0, 5, 4, 2)
+ #define SYS_ERXADDR_EL1			sys_reg(3, 0, 5, 4, 3)
++#define SYS_ERXPFGF_EL1			sys_reg(3, 0, 5, 4, 4)
++#define SYS_ERXPFGCTL_EL1		sys_reg(3, 0, 5, 4, 5)
++#define SYS_ERXPFGCDN_EL1		sys_reg(3, 0, 5, 4, 6)
+ #define SYS_ERXMISC0_EL1		sys_reg(3, 0, 5, 5, 0)
+ #define SYS_ERXMISC1_EL1		sys_reg(3, 0, 5, 5, 1)
++#define SYS_ERXMISC2_EL1		sys_reg(3, 0, 5, 5, 2)
++#define SYS_ERXMISC3_EL1		sys_reg(3, 0, 5, 5, 3)
+ #define SYS_TFSR_EL1			sys_reg(3, 0, 5, 6, 0)
+ #define SYS_TFSRE0_EL1			sys_reg(3, 0, 5, 6, 1)
  
-+/* Data cache zero operations */
-+#define SYS_DC_ZVA			sys_insn(1, 3, 7, 4, 1)
-+#define SYS_DC_GVA			sys_insn(1, 3, 7, 4, 3)
-+#define SYS_DC_GZVA			sys_insn(1, 3, 7, 4, 4)
-+
- /*
-  * Automatically generated definitions for system registers, the
-  * manual encodings below are in the process of being converted to
 -- 
 2.34.1
 
