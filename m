@@ -1,25 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E1AB100A3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40CA0100A5
 	for <kvmarm@lists.linux.dev>; Tue,  8 Aug 2023 11:47:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 133FCC433C7;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA68EC433CA;
 	Tue,  8 Aug 2023 11:47:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1691495237;
-	bh=cu2D7ikJFM4v+GYc0cYMdC5k5ULK1UbR6NVjKOtsu4Q=;
+	bh=k70vbGyqtpFHqhcl5LnkNzDTDcL16PBph+LK/kmFZ1A=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DLc1ZWEhUh9l3kKajj4iM3PqFeVaiBrIwk6mgMasD2qKb8sxWVhqsYNKcYYKFcehS
-	 OEMakfLbRBYlIgF76kkvej1BXR6UW9CAs1i7AlPmnyQvfYjS2SQkyQXeBDsBRPJepI
-	 viq4D+ulhmYT+tK2EVWABZmafqybgIQ9hdFEhkwxxdW9c9v67NKDk+SmE+VPg5D1yl
-	 ZQbjbHYidU0UJUuHeIVl+SdPRIOj5Tu6gk/q88lGg8hbwo/jxmPJNvNghu0M5JrywB
-	 9zuS9Q9Cnzwvfo6pi7rVp92j8vVfQwSOzROw1jByPtUyA3Bhhc+6eCqzmmsw/f1Qge
-	 jdXiMV5LVmWWg==
+	b=fWlemGLL9nKR9YW4eyEYFjneYgBex87iSIMrSL6aBXcwZ//GVkkqmiwezRn3VLqw+
+	 9HA3pa6Or8/zHx6AGFNuoDPjoLeWKNFoV8h4+96xLRgPixrQXasjYHwmRt4bIB30vi
+	 OPAKD6XmzzhynLwFnuS31nD0E6fAqySygG7Ya49tWcdF6rnP24sfYyFGpYuJM9DHlM
+	 Qk8MIwZvdl1LYR0NQoG7dy9KodialIclvsTgtiO0UUhqVf+taeBjtHP9qUXg0T8RSy
+	 d9SczPUVrLVwNAfCCdnJ25Rm2hf5SCZEFBBXjfO+DlyOH+0pvYKYUrAoTkx30ksMq3
+	 1vAxNviv7kYSQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qTLBD-0037Ph-0E;
+	id 1qTLBD-0037Ph-MY;
 	Tue, 08 Aug 2023 12:47:15 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -40,9 +40,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v3 01/27] arm64: Add missing VA CMO encodings
-Date: Tue,  8 Aug 2023 12:46:45 +0100
-Message-Id: <20230808114711.2013842-2-maz@kernel.org>
+Subject: [PATCH v3 03/27] arm64: Add missing DC ZVA/GVA/GZVA encodings
+Date: Tue,  8 Aug 2023 12:46:47 +0100
+Message-Id: <20230808114711.2013842-4-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230808114711.2013842-1-maz@kernel.org>
 References: <20230808114711.2013842-1-maz@kernel.org>
@@ -58,7 +58,7 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the missing VA-based CMOs encodings.
+Add the missing DC *VA encodings.
 
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
@@ -66,42 +66,21 @@ Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 ---
- arch/arm64/include/asm/sysreg.h | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ arch/arm64/include/asm/sysreg.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index b481935e9314..85447e68951a 100644
+index ed2739897859..5084add86897 100644
 --- a/arch/arm64/include/asm/sysreg.h
 +++ b/arch/arm64/include/asm/sysreg.h
-@@ -124,6 +124,32 @@
- #define SYS_DC_CIGSW			sys_insn(1, 0, 7, 14, 4)
- #define SYS_DC_CIGDSW			sys_insn(1, 0, 7, 14, 6)
+@@ -150,6 +150,11 @@
+ #define SYS_DC_CIGVAC			sys_insn(1, 3, 7, 14, 3)
+ #define SYS_DC_CIGDVAC			sys_insn(1, 3, 7, 14, 5)
  
-+#define SYS_IC_IALLUIS			sys_insn(1, 0, 7, 1, 0)
-+#define SYS_IC_IALLU			sys_insn(1, 0, 7, 5, 0)
-+#define SYS_IC_IVAU			sys_insn(1, 3, 7, 5, 1)
-+
-+#define SYS_DC_IVAC			sys_insn(1, 0, 7, 6, 1)
-+#define SYS_DC_IGVAC			sys_insn(1, 0, 7, 6, 3)
-+#define SYS_DC_IGDVAC			sys_insn(1, 0, 7, 6, 5)
-+
-+#define SYS_DC_CVAC			sys_insn(1, 3, 7, 10, 1)
-+#define SYS_DC_CGVAC			sys_insn(1, 3, 7, 10, 3)
-+#define SYS_DC_CGDVAC			sys_insn(1, 3, 7, 10, 5)
-+
-+#define SYS_DC_CVAU			sys_insn(1, 3, 7, 11, 1)
-+
-+#define SYS_DC_CVAP			sys_insn(1, 3, 7, 12, 1)
-+#define SYS_DC_CGVAP			sys_insn(1, 3, 7, 12, 3)
-+#define SYS_DC_CGDVAP			sys_insn(1, 3, 7, 12, 5)
-+
-+#define SYS_DC_CVADP			sys_insn(1, 3, 7, 13, 1)
-+#define SYS_DC_CGVADP			sys_insn(1, 3, 7, 13, 3)
-+#define SYS_DC_CGDVADP			sys_insn(1, 3, 7, 13, 5)
-+
-+#define SYS_DC_CIVAC			sys_insn(1, 3, 7, 14, 1)
-+#define SYS_DC_CIGVAC			sys_insn(1, 3, 7, 14, 3)
-+#define SYS_DC_CIGDVAC			sys_insn(1, 3, 7, 14, 5)
++/* Data cache zero operations */
++#define SYS_DC_ZVA			sys_insn(1, 3, 7, 4, 1)
++#define SYS_DC_GVA			sys_insn(1, 3, 7, 4, 3)
++#define SYS_DC_GZVA			sys_insn(1, 3, 7, 4, 4)
 +
  /*
   * Automatically generated definitions for system registers, the
