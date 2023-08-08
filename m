@@ -1,114 +1,206 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E1772FB2
-	for <kvmarm@lists.linux.dev>; Tue,  8 Aug 2023 20:42:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCD7CC433C8;
-	Tue,  8 Aug 2023 20:42:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691527350;
-	bh=KLqUngF3vFNjZyVU1zCXyvfBsVeYIJBflOdj05tEw0A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Hkx8tFHEcSmSd/pdVhIsTiCpPGZ8uPf9NEXvhA7T1JE0q+KFDzDda7u74mkgkO92P
-	 D6BrXqWbCduifpG00gPnMKsZMBCqDXpp1kSKJ9YwnTBNfINsZ/X4bV2vVtFJ0BuW4I
-	 DzywDtHXbqsAHFmmOaUr+A66TeVuRUsMnJOV5LKFRw6aylWaQEdokWI2Ho+l/Jgo9p
-	 VECTFyGkyg5IJ9/WB3x07RywFKIrHg4+3wffsKp1r8oys5VpCJBVALKOqSWjyTVJpe
-	 QLSrnevT8KKCV6CCbD8vucQ4bjl5w0l+9tsB8i/nTaItUBRxtIG9ynqlNvE8ald88c
-	 RSgTwpjk3e9wA==
-Date: Tue, 8 Aug 2023 21:42:20 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v3 21/36] arm64/mm: Implement map_shadow_stack()
-Message-ID: <0cf8f1fd-f4d4-45b3-ad49-5ec5ebc5a24f@sirena.org.uk>
-References: <20230731-arm64-gcs-v3-0-cddf9f980d98@kernel.org>
- <20230731-arm64-gcs-v3-21-cddf9f980d98@kernel.org>
- <ZNDFioFIM34VcsuV@arm.com>
- <3a077ff3-8627-4337-9b4a-6a8828eda0e7@sirena.org.uk>
- <ZNH679dDPtvotp5j@arm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3035171BF
+	for <kvmarm@lists.linux.dev>; Tue,  8 Aug 2023 21:13:28 +0000 (UTC)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-563379fe16aso6292905a12.3
+        for <kvmarm@lists.linux.dev>; Tue, 08 Aug 2023 14:13:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691529208; x=1692134008;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2U8op5NWCZxGer1aWuXuZ1d6J73Ge5+Hk7EgkvJJLAs=;
+        b=EiApR7LgfgrJOIT4RH8vwTp7YvtN3WX8F65amcCZ5tUQpyv/ZsbnzElbxtLH3YiRAr
+         Xco5OB//pxBTUJ1Hz9I9wbK8VFMOtBI25Tou7znxlR4xLwF5hwG16hAzm3VNuOm7qNVv
+         RXaphvZexnvsjJwdUedz4miwZlrHjyPKGJ4tg41nXpc1Cr1tDeUR45j+cXRmHY2zeNeJ
+         aD2FSNHH9s2X0AH/332mpiw5dSfBYPcqgRab/m5d5fFkQb+ZWPzwvwukMvExFid52TaS
+         W3qOIOCRBt/UK+p15DAoWro/GC9Q6ni0EalNj49A0OSEsHwDkeyMMKxa0prAwizF/XXF
+         JV1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691529208; x=1692134008;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2U8op5NWCZxGer1aWuXuZ1d6J73Ge5+Hk7EgkvJJLAs=;
+        b=jBy9PgiiM++J6Nj/hIyWnjYkfrK0oUWajRcQyVhyFQl/m8KEbmOMbGQv7q2FF0a7Lx
+         k5kYSpx+JhnumtdSV4ZS+pxWyDstV2ybncngav6wXSgR94q09tY4z/gqc86NX8FmHEBi
+         MYLex/poPQJgCTOtrgWLLQEDAh4+jGKMsipJ9J7Mb++x5HZM7CdlUB70wJe67+Loo8F7
+         76AtrYOsbgh3MeHhL9u3hKHkExZ3JZaji/uo1qsricHTMEoGuDx8viGaqtVBe6QfQoN0
+         Ovf08PYNewtvD2EDpnUAVih8+1v/U/vDIms1CbsgKB9aQSfFFjs7iUcmLZ1A0Q3Bl6Uv
+         Qzkw==
+X-Gm-Message-State: AOJu0YyQeFblvyul+DylfZjhSRd010Q379sVqsRp+mLNAb/X24k4sE7/
+	1fYN13tKFwPUSuYHqyaZg1bjGDbkMiA=
+X-Google-Smtp-Source: AGHT+IF3VhVvM3seA6Kd3G1yrwf0aF3MmO0cqr5SVZX1MHXlsabrjEav/SHlO1qK0PHGPVCVUrfGthX1EsA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:b242:0:b0:563:e937:5e87 with SMTP id
+ t2-20020a63b242000000b00563e9375e87mr12735pgo.5.1691529208021; Tue, 08 Aug
+ 2023 14:13:28 -0700 (PDT)
+Date: Tue, 8 Aug 2023 14:13:26 -0700
+In-Reply-To: <diqzv8dq3116.fsf@ackerleytng-ctop.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="75LSeCYWaZU9+5nJ"
-Content-Disposition: inline
-In-Reply-To: <ZNH679dDPtvotp5j@arm.com>
-X-Cookie: You need not be present to win.
+Mime-Version: 1.0
+References: <20230718234512.1690985-13-seanjc@google.com> <diqzv8dq3116.fsf@ackerleytng-ctop.c.googlers.com>
+Message-ID: <ZNKv9ul2I7A4V7IF@google.com>
+Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+From: Sean Christopherson <seanjc@google.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	willy@infradead.org, akpm@linux-foundation.org, paul@paul-moore.com, 
+	jmorris@namei.org, serge@hallyn.com, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	chao.p.peng@linux.intel.com, tabba@google.com, jarkko@kernel.org, 
+	yu.c.zhang@linux.intel.com, vannapurve@google.com, mail@maciej.szmigiero.name, 
+	vbabka@suse.cz, david@redhat.com, qperret@google.com, michael.roth@amd.com, 
+	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Aug 07, 2023, Ackerley Tng wrote:
+> I=E2=80=99d like to propose an alternative to the refcounting approach be=
+tween
+> the gmem file and associated kvm, where we think of KVM=E2=80=99s memslot=
+s as
+> users of the gmem file.
+>=20
+> Instead of having the gmem file pin the VM (i.e. take a refcount on
+> kvm), we could let memslot take a refcount on the gmem file when the
+> memslots are configured.
+>=20
+> Here=E2=80=99s a POC patch that flips the refcounting (and modified selft=
+ests in
+> the next commit):
+> https://github.com/googleprodkernel/linux-cc/commit/7f487b029b89b9f3e9b09=
+4a721bc0772f3c8c797
+>=20
+> One side effect of having the gmem file pin the VM is that now the gmem
+> file becomes sort of a false handle on the VM:
+>=20
+> + Closing the file destroys the file pointers in the VM and invalidates
+>   the pointers
 
---75LSeCYWaZU9+5nJ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Yeah, this is less than ideal.  But, it's also how things operate today.  K=
+VM
+doesn't hold references to VMAs or files, e.g. if userspace munmap()s memor=
+y,
+any and all SPTEs pointing at the memory are zapped.  The only difference w=
+ith
+gmem is that KVM needs to explicitly invalidate file pointers, instead of t=
+hat
+happening behind the scenes (no more VMAs to find).  Again, I agree the res=
+ulting
+code is more complex than I would prefer, but from a userspace perspective =
+I
+don't see this as problematic.
 
-On Tue, Aug 08, 2023 at 09:21:03AM +0100, Szabolcs Nagy wrote:
-> The 08/07/2023 14:00, Mark Brown wrote:
+> + Keeping the file open keeps the VM around in the kernel even though
+>   the VM fd may already be closed.
 
-> > That's not what the manual page or a quick check of the code suggest
-> > that mmap() does, they say that the kernel just takes it as a hint and
+That is perfectly ok.  There is plenty of prior art, as well as plenty of w=
+ays
+for userspace to shoot itself in the foot.  E.g. open a stats fd for a vCPU=
+ and
+the VM and all its vCPUs will be kept alive.  And conceptually it's sound,
+anything created in the scope of a VM _should_ pin the VM.
 
-> i should have said that i expect MAP_FIXED_NOREPLACE semantics
-> (since the x86 code seemed to use that) and then the mapped
-> address must match exactly thus page aligned.
+> I feel that memslots form a natural way of managing usage of the gmem
+> file. When a memslot is created, it is using the file; hence we take a
+> refcount on the gmem file, and as memslots are removed, we drop
+> refcounts on the gmem file.
 
-Ah, I see.  We do pass MAP_FIXED_NOREPLACE when allocating the stack if
-an address was specified but currently leave it up to the VM subsystem
-to figure out what to do with the address.  I don't immediately see
-where mmap() enforces this requirement, but I have to admit I didn't
-look overly hard.  I don't see a problem with enforcing a PAGE_SIZE
-constraint here.
+Yes and no.  It's definitely more natural *if* the goal is to allow guest_m=
+emfd
+memory to exist without being attached to a VM.  But I'm not at all convinc=
+ed
+that we want to allow that, or that it has desirable properties.  With TDX =
+and
+SNP in particuarly, I'm pretty sure that allowing memory to outlive the VM =
+is
+very underisable (more below).
 
-> > > > +	if (size == 16 || size % 16)
-> > > > +		return -EINVAL;
+> The KVM pointer is shared among all the bindings in gmem=E2=80=99s xarray=
+, and we can
+> enforce that a gmem file is used only with one VM:
+>=20
+> + When binding a memslot to the file, if a kvm pointer exists, it must
+>   be the same kvm as the one in this binding
+> + When the binding to the last memslot is removed from a file, NULL the
+>   kvm pointer.
 
-> > > why %16 and not %8 ?
+Nullifying the KVM pointer isn't sufficient, because without additional act=
+ions
+userspace could extract data from a VM by deleting its memslots and then bi=
+nding
+the guest_memfd to an attacker controlled VM.  Or more likely with TDX and =
+SNP,
+induce badness by coercing KVM into mapping memory into a guest with the wr=
+ong
+ASID/HKID.
 
-> > I don't think that's needed any more - there was some stuff in an
-> > earlier version of the code but no longer.
+I can think of three ways to handle that:
 
-> it's kind of important to know the exact logic so the cap token
-> location can be computed in userspace for arbitrary size.
+  (a) prevent a different VM from *ever* binding to the gmem instance
+  (b) free/zero physical pages when unbinding
+  (c) free/zero when binding to a different VM
 
-> (this is why i wanted to see the map_shadow_stack man page first
-> but i was told that comes separately on linux..)
+Option (a) is easy, but that pretty much defeats the purpose of decopuling
+guest_memfd from a VM.
 
-Right, I'd already changed it to % 8 in the version I posted yesterday.
+Option (b) isn't hard to implement, but it screws up the lifecycle of the m=
+emory,
+e.g. would require memory when a memslot is deleted.  That isn't necessaril=
+y a
+deal-breaker, but it runs counter to how KVM memlots currently operate.  Me=
+mslots
+are basically just weird page tables, e.g. deleting a memslot doesn't have =
+any
+impact on the underlying data in memory.  TDX throws a wrench in this as re=
+moving
+a page from the Secure EPT is effectively destructive to the data (can't be=
+ mapped
+back in to the VM without zeroing the data), but IMO that's an oddity with =
+TDX and
+not necessarily something we want to carry over to other VM types.
 
---75LSeCYWaZU9+5nJ
-Content-Type: application/pgp-signature; name="signature.asc"
+There would also be performance implications (probably a non-issue in pract=
+ice),
+and weirdness if/when we get to sharing, linking and/or mmap()ing gmem.  E.=
+g. what
+should happen if the last memslot (binding) is deleted, but there outstandi=
+ng userspace
+mappings?
 
------BEGIN PGP SIGNATURE-----
+Option (c) is better from a lifecycle perspective, but it adds its own flav=
+or of
+complexity, e.g. the performant way to reclaim TDX memory requires the TDMR
+(effectively the VM pointer), and so a deferred relcaim doesn't really work=
+ for
+TDX.  And I'm pretty sure it *can't* work for SNP, because RMP entries must=
+ not
+outlive the VM; KVM can't reuse an ASID if there are pages assigned to that=
+ ASID
+in the RMP, i.e. until all memory belonging to the VM has been fully freed.
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmTSqKsACgkQJNaLcl1U
-h9AuoAf+O+IZyJ2WsrUsv2iiyK/bNfKz6UPd4mztZDvaNs7eb/cJv2LxftttubUm
-ylVCfdJZ50MxIN96kAREHXqiG51v7ab8riEFK1puVDbbnCQzP+qPb67HnyeJA+eP
-y/G51VNYUA+n9mnB1hQgqwtqkRTCLfgE2uX+rXQj+yoQMO9eqwx7hJU32LaT7ReN
-82F1d4g+o08IJR4pqL41OnfuoXtSswkeN+W4ODix90Im31z8oXU+KhOdlg2FPOwf
-eYLnaE+2b0TySQGqjik3cLjGTQZySBerzjLi/2SpdzJx+OHzus/8kWzGWsiZOvEg
-CyJ1jHyJf+ImWGDIY22GGPPmIHRyQw==
-=DrsG
------END PGP SIGNATURE-----
+> Could binding gmem files not on creation, but at memslot configuration
+> time be sufficient and simpler?
 
---75LSeCYWaZU9+5nJ--
+After working through the flows, I think binding on-demand would simplify t=
+he
+refcounting (stating the obvious), but complicate the lifecycle of the memo=
+ry as
+well as the contract between KVM and userspace, and would break the separat=
+ion of
+concerns between the inode (physical memory / data) and file (VM's view / m=
+appings).
