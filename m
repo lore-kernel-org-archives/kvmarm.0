@@ -1,157 +1,118 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B32612D
-	for <kvmarm@lists.linux.dev>; Wed,  9 Aug 2023 14:24:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEDFEC433CA;
-	Wed,  9 Aug 2023 14:24:16 +0000 (UTC)
-Date: Wed, 9 Aug 2023 15:24:14 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v4 03/36] arm64/gcs: Document the ABI for Guarded Control
- Stacks
-Message-ID: <ZNOhjrYleGBR6Pbs@arm.com>
-References: <20230807-arm64-gcs-v4-0-68cfa37f9069@kernel.org>
- <20230807-arm64-gcs-v4-3-68cfa37f9069@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55317612D;
+	Wed,  9 Aug 2023 15:30:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 753E4C433C8;
+	Wed,  9 Aug 2023 15:30:23 +0000 (UTC)
+Date: Wed, 9 Aug 2023 11:30:21 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Marco Elver <elver@google.com>
+Cc: Kees Cook <keescook@chromium.org>, Andrew Morton
+ <akpm@linux-foundation.org>, Guenter Roeck <linux@roeck-us.net>, Peter
+ Zijlstra <peterz@infradead.org>, Mark Rutland <mark.rutland@arm.com>, Marc
+ Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, James
+ Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Nathan Chancellor
+ <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Tom Rix
+ <trix@redhat.com>, Miguel Ojeda <ojeda@kernel.org>, Sami Tolvanen
+ <samitolvanen@google.com>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+ Dmitry Vyukov <dvyukov@google.com>, Alexander Potapenko
+ <glider@google.com>, kasan-dev@googlegroups.com,
+ linux-toolchains@vger.kernel.org
+Subject: Re: [PATCH v3 3/3] list_debug: Introduce CONFIG_DEBUG_LIST_MINIMAL
+Message-ID: <20230809113021.63e5ef66@gandalf.local.home>
+In-Reply-To: <ZNNi/4L1mD8XPNix@elver.google.com>
+References: <20230808102049.465864-1-elver@google.com>
+	<20230808102049.465864-3-elver@google.com>
+	<202308081424.1DC7AA4AE3@keescook>
+	<CANpmjNM3rc8ih7wvFc2GLuMDLpWcdA8uWfut-5tOajqtVG952A@mail.gmail.com>
+	<ZNNi/4L1mD8XPNix@elver.google.com>
+X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230807-arm64-gcs-v4-3-68cfa37f9069@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Aug 07, 2023 at 11:00:08PM +0100, Mark Brown wrote:
-> +2.  Enabling and disabling Guarded Control Stacks
-> +-------------------------------------------------
+On Wed, 9 Aug 2023 11:57:19 +0200
+Marco Elver <elver@google.com> wrote:
+
+>  static __always_inline bool __list_add_valid(struct list_head *new,
+>  					     struct list_head *prev,
+>  					     struct list_head *next)
+>  {
+> -	return __list_add_valid_or_report(new, prev, next);
+> +	bool ret = true;
 > +
-> +* GCS is enabled and disabled for a thread via the PR_SET_SHADOW_STACK_STATUS
-> +  prctl(), this takes a single flags argument specifying which GCS features
-> +  should be used.
+> +	if (IS_ENABLED(CONFIG_HARDEN_LIST)) {
+> +		/*
+> +		 * With the hardening version, elide checking if next and prev
+> +		 * are NULL, since the immediate dereference of them below would
+> +		 * result in a fault if NULL.
+> +		 *
+> +		 * With the reduced set of checks, we can afford to inline the
+> +		 * checks, which also gives the compiler a chance to elide some
+> +		 * of them completely if they can be proven at compile-time. If
+> +		 * one of the pre-conditions does not hold, the slow-path will
+> +		 * show a report which pre-condition failed.
+> +		 */
+> +		if (likely(next->prev == prev && prev->next == next && new != prev && new != next))
+> +			return true;
+> +		ret = false;
+> +	}
 > +
-> +* When set PR_SHADOW_STACK_ENABLE flag allocates a Guarded Control Stack for
+> +	ret &= __list_add_valid_or_report(new, prev, next);
+> +	return ret;
+>  }
 
-The 'for' at the end of the line above is not needed.
+I would actually prefer DEBUG_LIST to select HARDEN_LIST and not the other
+way around. It logically doesn't make sense that HARDEN_LIST would select
+DEBUG_LIST. That is, I could by default want HARDEN_LIST always on, but not
+DEBUG_LIST (because who knows, it may add other features I don't want). But
+then, I may have stumbled over something and want more info, and enable
+DEBUG_LIST (while still having HARDEN_LIST) enabled.
 
-> +  and enables GCS for the thread, enabling the functionality controlled by
-> +  GCSPRE0_EL1.{nTR, RVCHKEN, PCRSEL}.
+I think you are looking at this from an implementation perspective and not
+the normal developer one.
 
-This should be GCSCRE0_EL1.
+This would mean the above function should get enabled by CONFIG_HARDEN_LIST
+(and CONFIG_DEBUG would select CONFIG_HARDEN) and would look more like:
 
-> +* When set the PR_SHADOW_STACK_PUSH flag enables the functionality controlled
-> +  by GCSCRE0_EL1.PUSHMEn, allowing explicit GCS pushes.
-> +
-> +* When set the PR_SHADOW_STACK_WRITE flag enables the functionality controlled
-> +  by GCSCRE0_EL1.STREn, allowing explicit stores to the Guarded Control Stack.
-> +
-> +* Any unknown flags will cause PR_SET_SHADOW_STACK_STATUS to return -EINVAL.
-> +
-> +* PR_LOCK_SHADOW_STACK_STATUS is passed a bitmask of features with the same
-> +  values as used for PR_SET_SHADOW_STACK_STATUS.  Any future changes to the
-> +  status of the specified GCS mode bits will be rejected.
-> +
-> +* PR_LOCK_SHADOW_STACK_STATUS allows any bit to be locked, this allows
-> +  userspace to prevent changes to any future features.
+static __always_inline bool __list_add_valid(struct list_head *new,
+					     struct list_head *prev,
+					     struct list_head *next)
+{
+	bool ret = true;
 
-I presume a new lock prctl() won't allow unlocking but can only extend
-the lock. I haven't looked at the patches yet but it may be worth
-spelling this out.
+	if (!IS_ENABLED(CONFIG_DEBUG_LIST)) {
+		/*
+		 * With the hardening version, elide checking if next and prev
+		 * are NULL, since the immediate dereference of them below would
+		 * result in a fault if NULL.
+		 *
+		 * With the reduced set of checks, we can afford to inline the
+		 * checks, which also gives the compiler a chance to elide some
+		 * of them completely if they can be proven at compile-time. If
+		 * one of the pre-conditions does not hold, the slow-path will
+		 * show a report which pre-condition failed.
+		 */
+		if (likely(next->prev == prev && prev->next == next && new != prev && new != next))
+			return true;
+		ret = false;
+	}
 
-> +* PR_SET_SHADOW_STACK_STATUS and PR_LOCK_SHADOW_STACK_STATUS affect only the
-> +  thread the called them, any other running threads will be unaffected.
+	ret &= __list_add_valid_or_report(new, prev, next);
+	return ret;
+}
 
-s/the called/that called/
+That is, if DEBUG_LIST is enabled, we always call the
+__list_add_valid_or_report(), but if only HARDEN_LIST is enabled, then we
+do the shortcut.
 
-> +* New threads inherit the GCS configuration of the thread that created them.
-> +
-> +* GCS is disabled on exec().
-> +
-> +* The current GCS configuration for a thread may be read with the
-> +  PR_GET_SHADOW_STACK_STATUS prctl(), this returns the same flags that
-> +  are passed to PR_SET_SHADOW_STACK_STATUS.
-> +
-> +* If GCS is disabled for a thread after having previously been enabled then
-> +  the stack will remain allocated for the lifetime of the thread.
-
-Sorry if this has been discussed in other threads. What is the issue
-with unmapping/freeing of the shadow stack?
-
-> At present
-> +  any attempt to reenable GCS for the thread will be rejected, this may be
-> +  revisited in future.
-
-What's the rationale here? Is it that function returns won't work?
-
-> +3.  Allocation of Guarded Control Stacks
-> +----------------------------------------
-> +
-> +* When GCS is enabled for a thread a new Guarded Control Stack will be
-> +  allocated for it of size RLIMIT_STACK / 2 or 2 gigabytes, whichever is
-> +  smaller.
-
-Is this number based on the fact that a function call would only push
-the LR to GCS while standard function prologue pushes at least two
-registers?
-
-> +* When GCS is disabled for a thread the Guarded Control Stack initially
-> +  allocated for that thread will be freed.  Note carefully that if the
-> +  stack has been switched this may not be the stack currently in use by
-> +  the thread.
-
-Does this not contradict an earlier statement that the GCS is not freed
-for a thread when disabled?
-
-> +4.  Signal handling
-> +--------------------
-> +
-> +* A new signal frame record gcs_context encodes the current GCS mode and
-> +  pointer for the interrupted context on signal delivery.  This will always
-> +  be present on systems that support GCS.
-> +
-> +* The record contains a flag field which reports the current GCS configuration
-> +  for the interrupted context as PR_GET_SHADOW_STACK_STATUS would.
-> +
-> +* The signal handler is run with the same GCS configuration as the interrupted
-> +  context.
-> +
-> +* When GCS is enabled for the interrupted thread a signal handling specific
-> +  GCS cap token will be written to the GCS, this is an architectural GCS cap
-> +  token with bit 63 set.  The GCSPR_EL0 reported in the signal frame will
-> +  point to this cap token.
-
-I lost track of the GCS spec versions. Has the valid cap token format
-been updated? What I have in my spec (though most likely old) is:
-
-  An entry in the Guarded control stack is defined as a Valid cap entry,
-  if bits [63:12] of the value are same as bits [63:12] of the address
-  where the entry is stored and bits [11:0] contain a Valid cap token.
-
-
-The other bits in the code look fine to me so far but I haven't looked
-at the code yet.
-
--- 
-Catalin
+-- Steve
