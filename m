@@ -1,139 +1,499 @@
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D905517AB8
-	for <kvmarm@lists.linux.dev>; Wed,  9 Aug 2023 12:21:55 +0000 (UTC)
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-522ab301692so9217518a12.2
-        for <kvmarm@lists.linux.dev>; Wed, 09 Aug 2023 05:21:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20221208.gappssmtp.com; s=20221208; t=1691583714; x=1692188514;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gse4lQ89R/swNYJYWFRKmfEvRYWCgDAQeQk+i+FC3Qc=;
-        b=z4Z49MED7B2iO1P22Sflcd12HqFoBF5yfCPEmSnPuw92T8YnUDH2KmdmqK/zmm3Hsv
-         Y1A4Myz/vjPMCMyAiAMJtrC215szsuavogK4ztLxqkGSQO7aPAZzUkD1Ozkyv7H3dSaL
-         qsE22vwvMjFkqhjUQQdHhf2t+Y2yF2VZL5Bid1o6X2mZ0zwKa1F0dMm02EOtwX7YI8oZ
-         kQr4IP0wXNHwqQREssTv7kAUZWMAwp8PYn9E03Y7mqOyy+xa2JAZIQ2g56zk0jeEXZhW
-         kRD0s2bF7FjY+mFqcKXFd8fyuF9dqKo3ka5wJ+o55aO6bmVU6NblI+YE2iiYmI3rXl30
-         +XNg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7B918008
+	for <kvmarm@lists.linux.dev>; Wed,  9 Aug 2023 13:27:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691587657;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OwCX0lUEuIP9ATmkSZdYEZDYGtv8hnFdu00DnuutpMg=;
+	b=UB0ZbiS32X93PivkvxwlLymCsc6Nd1xSB+S3KO+xScoA/zobWe0jJgEAZHySx2feujxTVz
+	h0xvLAIF1aoNsJxrcC/J+TC+E8tRyKUnAG0IsrI2mV1GcxbfNOU6j2WUYovsa2dhZ+EoPm
+	rD/RYrN6LsIq53okcMJSwKa2xuoIRLs=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-346-cHosNF6pNfC3dsuZpu9g4Q-1; Wed, 09 Aug 2023 09:27:33 -0400
+X-MC-Unique: cHosNF6pNfC3dsuZpu9g4Q-1
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-76ce6d007ccso541042685a.1
+        for <kvmarm@lists.linux.dev>; Wed, 09 Aug 2023 06:27:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691583714; x=1692188514;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gse4lQ89R/swNYJYWFRKmfEvRYWCgDAQeQk+i+FC3Qc=;
-        b=XDdgApRvp+1MlFkyXykg/2v9oXEQM0UwQtAGBijyAR3v4snAhoxZ9xfbgEhsUbC36e
-         KkCR/S5cS2TpxffIuL3ImWLaR+dhGJukbamuq+Kclh7aLHY+4Sunm/KxZIABwzjJA85a
-         kc5XzEeb+ebzaCDWP7zw8TaA+QsBBAQQ6wtpl3f/nsMnwxdZ8lC2LQYi4EYIPvys1HCz
-         vxtQkPpvUnFxxlcvAKFdtucW2zy6drGdAyxCi3JYV3Cnrg9n1oflG0tcTXMHqdZyfTOs
-         QdyK0pBoEvXJOJi7OC98+a0Ox88LSRMJoQQGi2smc8IZmNigzPrm4c8RJOyoCer0qOWN
-         /t4w==
-X-Gm-Message-State: AOJu0Yz+KG2bJZOiVf+bjrT3qy/8TjI9bXnx95Lo2wPgj22imqV6cqp9
-	bGD08hRIUG2rAFR4q9DYzi1LDNicfU0iIPvUS2GSbA==
-X-Google-Smtp-Source: AGHT+IEllS//Vo5DIeilEm06so+oXBAZVZjqk1bluFXrO7jOq/QKmFdOTXQUqzX5tkMzooCga5rA10uXjLIWp+wEMZQ=
-X-Received: by 2002:aa7:d912:0:b0:522:1e2f:99db with SMTP id
- a18-20020aa7d912000000b005221e2f99dbmr2557441edr.5.1691583713714; Wed, 09 Aug
- 2023 05:21:53 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691587653; x=1692192453;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OwCX0lUEuIP9ATmkSZdYEZDYGtv8hnFdu00DnuutpMg=;
+        b=Ewyp6MWjVEwRFtwZGTLvXQBV7IbXJo9TQTACKDNNnEtFrAg8XyAR44Z3xpaqrOfHkB
+         M/pjU+oKMReH7Qam1XLjNGcsp/NHhy08mjn5Vy0/ZGtai6KUNc+gLfPtMNSD6lifR46X
+         bELk9PVzDerdf17b1QiTZaNRIZeqqqLpvuGAww6UjDbVw2CngZ3Dgi89AGs/yNGaU+ru
+         MTASJrfkvaPhnS1ynj3HvudbvsK1jf/2bh82MJTjKL5g6SjBojQ9vK08iexH9AP81S9W
+         9I5fYhVoH3PFKcH7epNbYz2HbDXOpDTLnFSIq8t91VoTEyX40sNoN20/d5htegNfLGss
+         Sw5w==
+X-Gm-Message-State: AOJu0YxlL1HfcGfZbPeaCh59KKxuYfnyPwvx0acTALXhf0lGxWuRGJGl
+	PodGGY7SWFThCDL2Ytvc2ysoO/qnzzAftK2wCr3Lfl2A6bwX8H8XkVzlFfhCykNbuGduyRPwjgm
+	7kXd+v7exVsi1ayOh
+X-Received: by 2002:a05:620a:21ce:b0:76c:e764:5085 with SMTP id h14-20020a05620a21ce00b0076ce7645085mr2800508qka.54.1691587653331;
+        Wed, 09 Aug 2023 06:27:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF+SQ9WfFzAqfpUvqvscz2ikVYbRM8AneWn/3KMenV7omEUI3H0Cpp8LKkpnDpiC2tMdfLF2A==
+X-Received: by 2002:a05:620a:21ce:b0:76c:e764:5085 with SMTP id h14-20020a05620a21ce00b0076ce7645085mr2800479qka.54.1691587652968;
+        Wed, 09 Aug 2023 06:27:32 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id d17-20020a05620a159100b00767d05117fesm3980198qkk.36.2023.08.09.06.27.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Aug 2023 06:27:32 -0700 (PDT)
+Message-ID: <18eae581-500b-9c9e-2cce-e2f5fb007071@redhat.com>
+Date: Wed, 9 Aug 2023 15:27:27 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <cover.1690273969.git.haibo1.xu@intel.com> <CAAhSdy0yug=J0nxnnPoLYL=0MiT0w6qgPYOcv0QwMRe+fsQn8Q@mail.gmail.com>
- <87y1ilpz3m.wl-maz@kernel.org>
-In-Reply-To: <87y1ilpz3m.wl-maz@kernel.org>
-From: Anup Patel <anup@brainfault.org>
-Date: Wed, 9 Aug 2023 17:51:41 +0530
-Message-ID: <CAAhSdy3f9cyh_b9Z9ah9QOdqWUMzhMV39hxUqVCStOc2FWRYDQ@mail.gmail.com>
-Subject: Re: [PATCH v6 00/13] RISCV: Add KVM_GET_REG_LIST API
-To: Marc Zyngier <maz@kernel.org>
-Cc: oliver.upton@linux.dev, xiaobo55x@gmail.com, ajones@ventanamicro.com, 
-	seanjc@google.com, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Shuah Khan <shuah@kernel.org>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Ricardo Koller <ricarkol@google.com>, Vishal Annapurve <vannapurve@google.com>, 
-	Like Xu <likexu@tencent.com>, Vipin Sharma <vipinsh@google.com>, 
-	David Matlack <dmatlack@google.com>, Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org, 
-	Haibo Xu <haibo1.xu@intel.com>, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v3 14/27] KVM: arm64: nv: Add trap forwarding
+ infrastructure
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Mark Brown
+ <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Will Deacon <will@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>,
+ Chase Conklin <chase.conklin@arm.com>,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Darren Hart <darren@os.amperecomputing.com>,
+ Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20230808114711.2013842-1-maz@kernel.org>
+ <20230808114711.2013842-15-maz@kernel.org>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230808114711.2013842-15-maz@kernel.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 Hi Marc,
 
-On Tue, Aug 8, 2023 at 4:42=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote:
+On 8/8/23 13:46, Marc Zyngier wrote:
+> A significant part of what a NV hypervisor needs to do is to decide
+> whether a trap from a L2+ guest has to be forwarded to a L1 guest
+> or handled locally. This is done by checking for the trap bits that
+> the guest hypervisor has set and acting accordingly, as described by
+> the architecture.
 >
-> On Mon, 07 Aug 2023 04:48:33 +0100,
-> Anup Patel <anup@brainfault.org> wrote:
-> >
-> > Hi Marc, Hi Oliver,
-> >
-> > On Tue, Jul 25, 2023 at 2:05=E2=80=AFPM Haibo Xu <haibo1.xu@intel.com> =
-wrote:
-> > >
-> > > KVM_GET_REG_LIST will dump all register IDs that are available to
-> > > KVM_GET/SET_ONE_REG and It's very useful to identify some platform
-> > > regression issue during VM migration.
-> > >
-> > > Patch 1-7 re-structured the get-reg-list test in aarch64 to make some
-> > > of the code as common test framework that can be shared by riscv.
-> > >
-> > > Patch 8 move reject_set check logic to a function so as to check for
-> > > different errno for different registers.
-> > > Patch 9 move finalize_vcpu back to run_test so that riscv can impleme=
-nt
-> > > its specific operation.
-> > > Patch 10 change to do the get/set operation only on present-blessed l=
-ist.
-> > > Patch 11 add the skip_set facilities so that riscv can skip set opera=
-tion
-> > > on some registers.
-> > > Patch 12 enabled the KVM_GET_REG_LIST API in riscv.
-> > > patch 13 added the corresponding kselftest for checking possible
-> > > register regressions.
-> > >
-> > > The get-reg-list kvm selftest was ported from aarch64 and tested with
-> > > Linux v6.5-rc3 on a Qemu riscv64 virt machine.
-> > >
-> > > ---
-> > > Changed since v5:
-> > >   * Rebase to v6.5-rc3
-> > >   * Minor fix for Andrew's comments
-> > >
-> > > Andrew Jones (7):
-> > >   KVM: arm64: selftests: Replace str_with_index with strdup_printf
-> > >   KVM: arm64: selftests: Drop SVE cap check in print_reg
-> > >   KVM: arm64: selftests: Remove print_reg's dependency on vcpu_config
-> > >   KVM: arm64: selftests: Rename vcpu_config and add to kvm_util.h
-> > >   KVM: arm64: selftests: Delete core_reg_fixup
-> > >   KVM: arm64: selftests: Split get-reg-list test code
-> > >   KVM: arm64: selftests: Finish generalizing get-reg-list
-> > >
-> > > Haibo Xu (6):
-> > >   KVM: arm64: selftests: Move reject_set check logic to a function
-> > >   KVM: arm64: selftests: Move finalize_vcpu back to run_test
-> > >   KVM: selftests: Only do get/set tests on present blessed list
-> > >   KVM: selftests: Add skip_set facility to get_reg_list test
-> > >   KVM: riscv: Add KVM_GET_REG_LIST API support
-> > >   KVM: riscv: selftests: Add get-reg-list test
-> >
-> > Are you okay for this series to go through the KVM RISC-V tree ?
+> A previous approach was to sprinkle a bunch of checks in all the
+> system register accessors, but this is pretty error prone and doesn't
+> help getting an overview of what is happening.
 >
-> Sure, seems fine from my point of view. But please put it on an
-> immutable topic branch so that we can also merge it in the arm64 tree,
-> should we need to resolve any conflicts.
+> Instead, implement a set of global tables that describe a trap bit,
+> combinations of trap bits, behaviours on trap, and what bits must
+> be evaluated on a system register trap.
+>
+> Although this is painful to describe, this allows to specify each
+> and every control bit in a static manner. To make it efficient,
+> the table is inserted in an xarray that is global to the system,
+> and checked each time we trap a system register while running
+> a L2 guest.
+>
+> Add the basic infrastructure for now, while additional patches will
+> implement configuration registers.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h   |   1 +
+>  arch/arm64/include/asm/kvm_nested.h |   2 +
+>  arch/arm64/kvm/emulate-nested.c     | 262 ++++++++++++++++++++++++++++
+>  arch/arm64/kvm/sys_regs.c           |   6 +
+>  arch/arm64/kvm/trace_arm.h          |  26 +++
+>  5 files changed, 297 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 721680da1011..cb1c5c54cedd 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -988,6 +988,7 @@ int kvm_handle_cp10_id(struct kvm_vcpu *vcpu);
+>  void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
+>  
+>  int __init kvm_sys_reg_table_init(void);
+> +int __init populate_nv_trap_config(void);
+>  
+>  bool lock_all_vcpus(struct kvm *kvm);
+>  void unlock_all_vcpus(struct kvm *kvm);
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index 8fb67f032fd1..fa23cc9c2adc 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -11,6 +11,8 @@ static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
+>  		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
+>  }
+>  
+> +extern bool __check_nv_sr_forward(struct kvm_vcpu *vcpu);
+> +
+>  struct sys_reg_params;
+>  struct sys_reg_desc;
+>  
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index b96662029fb1..1b1148770d45 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -14,6 +14,268 @@
+>  
+>  #include "trace.h"
+>  
+> +enum trap_behaviour {
+> +	BEHAVE_HANDLE_LOCALLY	= 0,
+> +	BEHAVE_FORWARD_READ	= BIT(0),
+> +	BEHAVE_FORWARD_WRITE	= BIT(1),
+> +	BEHAVE_FORWARD_ANY	= BEHAVE_FORWARD_READ | BEHAVE_FORWARD_WRITE,
+> +};
+> +
+> +struct trap_bits {
+> +	const enum vcpu_sysreg		index;
+> +	const enum trap_behaviour	behaviour;
+> +	const u64			value;
+> +	const u64			mask;
+> +};
+> +
+> +enum trap_group {
+nit: Maybe add a comment saying that it relates to *coarse* trapping as
+opposed to the other enum which is named fgt_group_id. cgt_group_id may
+have been better but well ;-)
 
-I have created topic branch riscv_kvm_get_reg_list in the KVM RISC-V
-repo https://github.com/kvm-riscv/linux.git.
+> +	/* Indicates no coarse trap control */
+> +	__RESERVED__,
+> +
+> +	/*
+> +	 * The first batch of IDs denote coarse trapping that are used
+> +	 * on their own instead of being part of a combination of
+> +	 * trap controls.
+> +	 */
+> +
+> +	/*
+> +	 * Anything after this point is a combination of trap controls,
+coarse trap controls
+> +	 * which all must be evaluated to decide what to do.
+> +	 */
+> +	__MULTIPLE_CONTROL_BITS__,
+> +
+> +	/*
+> +	 * Anything after this point requires a callback evaluating a
+> +	 * complex trap condition. Hopefully we'll never need this...
+> +	 */
+> +	__COMPLEX_CONDITIONS__,
+> +
+> +	/* Must be last */
+> +	__NR_TRAP_GROUP_IDS__
+> +};
+> +
+> +static const struct trap_bits coarse_trap_bits[] = {
+> +};
+> +
+> +#define MCB(id, ...)					\
+> +	[id - __MULTIPLE_CONTROL_BITS__]	=	\
+> +		(const enum trap_group []){		\
+> +			__VA_ARGS__, __RESERVED__	\
+> +		}
+> +
+> +static const enum trap_group *coarse_control_combo[] = {
+> +};
+> +
+> +typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu *);
+> +
+> +#define CCC(id, fn)				\
+> +	[id - __COMPLEX_CONDITIONS__] = fn
+> +
+> +static const complex_condition_check ccc[] = {
+> +};
+> +
+> +/*
+> + * Bit assignment for the trap controls. We use a 64bit word with the
+> + * following layout for each trapped sysreg:
+> + *
+> + * [9:0]	enum trap_group (10 bits)
+> + * [13:10]	enum fgt_group_id (4 bits)
+> + * [19:14]	bit number in the FGT register (6 bits)
+> + * [20]		trap polarity (1 bit)
+> + * [62:21]	Unused (42 bits)
+> + * [63]		RES0 - Must be zero, as lost on insertion in the xarray
+what do you mean by "as lost"
+> + */
+> +#define TC_CGT_BITS	10
+> +#define TC_FGT_BITS	4
+> +
+> +union trap_config {
+> +	u64	val;
+> +	struct {
+> +		unsigned long	cgt:TC_CGT_BITS; /* Coarse trap id */
+> +		unsigned long	fgt:TC_FGT_BITS; /* Fing Grained Trap id */
+Fine & align capital letter in Trap for both comments
+> +		unsigned long	bit:6;		 /* Bit number */
+> +		unsigned long	pol:1;		 /* Polarity */
+> +		unsigned long	unk:42;		 /* Unknown */
+s//Unknown/Unused?
+> +		unsigned long	mbz:1;		 /* Must Be Zero */
+> +	};
+> +};
+> +
+> +struct encoding_to_trap_config {
+> +	const u32			encoding;
+> +	const u32			end;
+> +	const union trap_config		tc;
+> +};
+> +
+> +#define SR_RANGE_TRAP(sr_start, sr_end, trap_id)			\
+> +	{								\
+> +		.encoding	= sr_start,				\
+> +		.end		= sr_end,				\
+> +		.tc		= {					\
+> +			.cgt		= trap_id,			\
+> +		},							\
+> +	}
+> +
+> +#define SR_TRAP(sr, trap_id)		SR_RANGE_TRAP(sr, sr, trap_id)
+> +
+> +/*
+> + * Map encoding to trap bits for exception reported with EC=0x18.
+> + * These must only be evaluated when running a nested hypervisor, but
+> + * that the current context is not a hypervisor context. When the
+> + * trapped access matches one of the trap controls, the exception is
+> + * re-injected in the nested hypervisor.
+I must confess I was confused by the "forwarding" terminology versus
+"re-injection into the nested hyp" 
 
-This branch is based upon Linux-6.5-rc5 and also merged into the
-riscv_kvm_next branch for the upcoming merge window.
+cf.
 
-Regards,
-Anup
+"decide whether a trap from a L2+ guest has to be forwarded to a L1 guest
+or handled locally"
+
+"re-injection into the nested hyp" sounds clearer to me.
+
+> + */
+> +static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+> +};
+> +
+> +static DEFINE_XARRAY(sr_forward_xa);
+> +
+> +static union trap_config get_trap_config(u32 sysreg)
+> +{
+> +	return (union trap_config) {
+> +		.val = xa_to_value(xa_load(&sr_forward_xa, sysreg)),
+> +	};
+> +}
+> +
+> +int __init populate_nv_trap_config(void)
+> +{
+> +	int ret = 0;
+> +
+> +	BUILD_BUG_ON(sizeof(union trap_config) != sizeof(void *));
+> +	BUILD_BUG_ON(__NR_TRAP_GROUP_IDS__ > BIT(TC_CGT_BITS));
+> +
+> +	for (int i = 0; i < ARRAY_SIZE(encoding_to_cgt); i++) {
+> +		const struct encoding_to_trap_config *cgt = &encoding_to_cgt[i];
+> +		void *prev;
+> +
+> +		prev = xa_store_range(&sr_forward_xa, cgt->encoding, cgt->end,
+> +				      xa_mk_value(cgt->tc.val), GFP_KERNEL);
+> +
+> +		if (prev) {
+> +			kvm_err("Duplicate CGT for (%d, %d, %d, %d, %d)\n",
+> +				sys_reg_Op0(cgt->encoding),
+> +				sys_reg_Op1(cgt->encoding),
+> +				sys_reg_CRn(cgt->encoding),
+> +				sys_reg_CRm(cgt->encoding),
+> +				sys_reg_Op2(cgt->encoding));
+> +			ret = -EINVAL;
+> +		}
+> +	}
+> +
+> +	kvm_info("nv: %ld coarse grained trap handlers\n",
+> +		 ARRAY_SIZE(encoding_to_cgt));
+> +
+> +	for (int id = __MULTIPLE_CONTROL_BITS__;
+> +	     id < (__COMPLEX_CONDITIONS__ - 1);
+> +	     id++) {
+> +		const enum trap_group *cgids;
+> +
+> +		cgids = coarse_control_combo[id - __MULTIPLE_CONTROL_BITS__];
+> +
+> +		for (int i = 0; cgids[i] != __RESERVED__; i++) {
+> +			if (cgids[i] >= __MULTIPLE_CONTROL_BITS__) {
+> +				kvm_err("Recursive MCB %d/%d\n", id, cgids[i]);
+> +				ret = -EINVAL;
+> +			}
+> +		}
+> +	}
+> +
+> +	if (ret)
+> +		xa_destroy(&sr_forward_xa);
+> +
+> +	return ret;
+> +}
+> +
+> +static enum trap_behaviour get_behaviour(struct kvm_vcpu *vcpu,
+> +					 const struct trap_bits *tb)
+> +{
+> +	enum trap_behaviour b = BEHAVE_HANDLE_LOCALLY;
+> +	u64 val;
+> +
+> +	val = __vcpu_sys_reg(vcpu, tb->index);
+> +	if ((val & tb->mask) == tb->value)
+> +		b |= tb->behaviour;
+> +
+> +	return b;
+> +}
+> +
+> +static enum trap_behaviour __do_compute_trap_behaviour(struct kvm_vcpu *vcpu,
+> +						       const enum trap_group id,
+> +						       enum trap_behaviour b)
+> +{
+> +	switch (id) {
+> +		const enum trap_group *cgids;
+> +
+> +	case __RESERVED__ ... __MULTIPLE_CONTROL_BITS__ - 1:
+> +		if (likely(id != __RESERVED__))
+> +			b |= get_behaviour(vcpu, &coarse_trap_bits[id]);
+> +		break;
+> +	case __MULTIPLE_CONTROL_BITS__ ... __COMPLEX_CONDITIONS__ - 1:
+> +		/* Yes, this is recursive. Don't do anything stupid. */
+> +		cgids = coarse_control_combo[id - __MULTIPLE_CONTROL_BITS__];
+> +		for (int i = 0; cgids[i] != __RESERVED__; i++)
+> +			b |= __do_compute_trap_behaviour(vcpu, cgids[i], b);
+> +		break;
+> +	default:
+> +		if (ARRAY_SIZE(ccc))
+> +			b |= ccc[id -  __COMPLEX_CONDITIONS__](vcpu);
+> +		break;
+> +	}
+> +
+> +	return b;
+> +}
+> +
+> +static enum trap_behaviour compute_trap_behaviour(struct kvm_vcpu *vcpu,
+> +						  const union trap_config tc)
+> +{
+> +	enum trap_behaviour b = BEHAVE_HANDLE_LOCALLY;
+> +
+> +	return __do_compute_trap_behaviour(vcpu, tc.cgt, b);
+> +}
+> +
+> +bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+> +{
+> +	union trap_config tc;
+> +	enum trap_behaviour b;
+> +	bool is_read;
+> +	u32 sysreg;
+> +	u64 esr;
+> +
+> +	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
+> +		return false;
+> +
+> +	esr = kvm_vcpu_get_esr(vcpu);
+> +	sysreg = esr_sys64_to_sysreg(esr);
+> +	is_read = (esr & ESR_ELx_SYS64_ISS_DIR_MASK) == ESR_ELx_SYS64_ISS_DIR_READ;
+> +
+> +	tc = get_trap_config(sysreg);
+> +
+> +	/*
+> +	 * A value of 0 for the whole entry means that we know nothing
+> +	 * for this sysreg, and that it cannot be forwareded. In this
+forwarded
+> +	 * situation, let's cut it short.
+> +	 *
+> +	 * Note that ultimately, we could also make use of the xarray
+> +	 * to store the index of the sysreg in the local descriptor
+> +	 * array, avoiding another search... Hint, hint...
+> +	 */
+> +	if (!tc.val)
+> +		return false;
+> +
+> +	b = compute_trap_behaviour(vcpu, tc);
+> +
+> +	if (((b & BEHAVE_FORWARD_READ) && is_read) ||
+> +	    ((b & BEHAVE_FORWARD_WRITE) && !is_read))
+> +		goto inject;
+> +
+> +	return false;
+> +
+> +inject:
+> +	trace_kvm_forward_sysreg_trap(vcpu, sysreg, is_read);
+> +
+> +	kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
+> +	return true;
+> +}
+> +
+>  static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
+>  {
+>  	u64 mode = spsr & PSR_MODE_MASK;
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index f5baaa508926..dfd72b3a625f 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -3177,6 +3177,9 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
+>  
+>  	trace_kvm_handle_sys_reg(esr);
+>  
+> +	if (__check_nv_sr_forward(vcpu))
+> +		return 1;
+> +
+>  	params = esr_sys64_to_params(esr);
+>  	params.regval = vcpu_get_reg(vcpu, Rt);
+>  
+> @@ -3594,5 +3597,8 @@ int __init kvm_sys_reg_table_init(void)
+>  	if (!first_idreg)
+>  		return -EINVAL;
+>  
+> +	if (kvm_get_mode() == KVM_MODE_NV)
+> +		populate_nv_trap_config();
+> +
+>  	return 0;
+>  }
+> diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
+> index 6ce5c025218d..8ad53104934d 100644
+> --- a/arch/arm64/kvm/trace_arm.h
+> +++ b/arch/arm64/kvm/trace_arm.h
+> @@ -364,6 +364,32 @@ TRACE_EVENT(kvm_inject_nested_exception,
+>  		  __entry->hcr_el2)
+>  );
+>  
+> +TRACE_EVENT(kvm_forward_sysreg_trap,
+> +	    TP_PROTO(struct kvm_vcpu *vcpu, u32 sysreg, bool is_read),
+> +	    TP_ARGS(vcpu, sysreg, is_read),
+> +
+> +	    TP_STRUCT__entry(
+> +		__field(u64,	pc)
+> +		__field(u32,	sysreg)
+> +		__field(bool,	is_read)
+> +	    ),
+> +
+> +	    TP_fast_assign(
+> +		__entry->pc = *vcpu_pc(vcpu);
+> +		__entry->sysreg = sysreg;
+> +		__entry->is_read = is_read;
+> +	    ),
+> +
+> +	    TP_printk("%llx %c (%d,%d,%d,%d,%d)",
+> +		      __entry->pc,
+> +		      __entry->is_read ? 'R' : 'W',
+> +		      sys_reg_Op0(__entry->sysreg),
+> +		      sys_reg_Op1(__entry->sysreg),
+> +		      sys_reg_CRn(__entry->sysreg),
+> +		      sys_reg_CRm(__entry->sysreg),
+> +		      sys_reg_Op2(__entry->sysreg))
+> +);
+> +
+>  #endif /* _TRACE_ARM_ARM64_KVM_H */
+>  
+>  #undef TRACE_INCLUDE_PATH
+Thanks
+
+Eric
+
