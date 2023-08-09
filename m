@@ -1,194 +1,377 @@
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2096.outbound.protection.outlook.com [40.107.93.96])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAB96613F
-	for <kvmarm@lists.linux.dev>; Wed,  9 Aug 2023 09:38:06 +0000 (UTC)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=B5+bZH6drXII8/DsZP6c0AKJgB4UVrRtoNhsNEpmzmRpcCe/2DdP9XbeM13hxruXqygBzd+wc1uI0J8pfzexn43PUPFJUFBSxgt62ykf7NLg0LAND3gxrgguOA3rUmQveqp0vBRZUYlbwrdwfCrVo3J+E1wOlfNQRl18bFs7WffOBUzclL2l2Tcp7n0z2DrlvTDxT5RPquDAWxJxZdnc3jVtuIpyBAcTJ4dwyatAEZIcauPcRz94suJ2924OK+I3/kDmrfjOK09d6bDMLk5Xvaw4e4nebLS5AEZJu27vmiJJRz9LIR3BpHd87O3d9t9h/d/PiFT6z+eElFaLycZqPA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VO3A0T6YXPBiOJxaagHYwhcmBj+2fqcr1nAF4wNnPWw=;
- b=i2GcHhH6ltptk9Dsxvt5ja6hZNtiQaiZxjP+YOtvlQgy9NHvNZo043JfAaHS4jANh5wmc+iiU9AHoJrBAGGRcKFMdoqGU2D2Ldzefy48tvJSpGJZLcyPTDnF+tl19quSOI2U6/5/c5mDrbl6unHtfHLT1nByEzHW7gCiG6zs0ILXO+pxb4OMQ9agPPMGBbYuRmVtBv98xYw6H4gl73ZFQ3segtYUM0taSUb+tupvhUVaJRgCpN6RhQ0VC2D5A5l95j8GfnAxlaNITP8/2S6AuFrMkglmCKxxCiD8ZqSuAo+Lvz/yiOxAnb2UzRniJ52yvto2IRQav4v56iW/c3ozgQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=amperemail.onmicrosoft.com; dkim=pass
- header.d=amperemail.onmicrosoft.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 191FC14F69
+	for <kvmarm@lists.linux.dev>; Wed,  9 Aug 2023 09:57:28 +0000 (UTC)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-3fe5c0e587eso28066935e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 09 Aug 2023 02:57:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amperemail.onmicrosoft.com; s=selector1-amperemail-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VO3A0T6YXPBiOJxaagHYwhcmBj+2fqcr1nAF4wNnPWw=;
- b=C6tB1fOSg5oKmnueSAq+NMhlow1Q6UJKvrMP7feT2vUpExKULvgB+zlctCcgo7ibeMMhc4aXCbpdMkmL25Xs+cKDAX7vQgO2Fd7jFDHBb1js5+A45mb1NOohQ5svZryz2a7On4NaQWOidA/KXiPeE+Ip7zHwpE9qbG+6aidHf8I=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amperemail.onmicrosoft.com;
-Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
- PH0PR01MB6199.prod.exchangelabs.com (2603:10b6:510:1b::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6652.28; Wed, 9 Aug 2023 09:38:01 +0000
-Received: from DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::d62f:d774:15b0:4a40]) by DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::d62f:d774:15b0:4a40%4]) with mapi id 15.20.6652.026; Wed, 9 Aug 2023
- 09:38:00 +0000
-Message-ID: <b57b1852-9245-d539-c254-28d1834a64dc@amperemail.onmicrosoft.com>
-Date: Wed, 9 Aug 2023 17:37:51 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH] perf/core: fix the bug in the event multiplexing
-To: Mark Rutland <mark.rutland@arm.com>, Oliver Upton <oliver.upton@linux.dev>
-Cc: Huang Shijie <shijie@os.amperecomputing.com>, maz@kernel.org,
- james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
- catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com,
- peterz@infradead.org, ingo@redhat.com, acme@kernel.org,
- alexander.shishkin@linux.intel.com, jolsa@kernel.org, namhyung@kernel.org,
- irogers@google.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-perf-users@vger.kernel.org, patches@amperecomputing.com,
- zwang@amperecomputing.com
-References: <20230809013953.7692-1-shijie@os.amperecomputing.com>
- <ZNNNY3MlokEIj4y8@linux.dev> <ZNNa0abhS53cMNcK@FVFF77S0Q05N>
-From: Shijie Huang <shijie@amperemail.onmicrosoft.com>
-In-Reply-To: <ZNNa0abhS53cMNcK@FVFF77S0Q05N>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: CH0PR13CA0048.namprd13.prod.outlook.com
- (2603:10b6:610:b2::23) To DM8PR01MB6824.prod.exchangelabs.com
- (2603:10b6:8:23::24)
+        d=google.com; s=20221208; t=1691575047; x=1692179847;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/rmEnk1g8Unm9TjBDd1nYGxjvPpnWaZtUFtYH71EmO0=;
+        b=zrFX/lyuS1Z8xnbtzpce6hDvet9q21gy05mTvo4dzgluuV4jCIVRZIwM8DpAqVr0je
+         SpPAtnaNykmtJAJskcZE1CjzOBYUYMDZ4MPRS0Mpph+AF3KqGHKMcljIjwkmtyXpgac/
+         qbfOnGiT2TIUCvLuGutLmvJSBHRHdDBrWmIZIg0067XZT0qzwS/luicPD1WTBZzYLK09
+         OmJww5lDhce1XMbLUtQfPE67fvA7nvDB938XQm5cXu8jkz3BJaCoIrt+FPTK/bSeFgXh
+         iYyN0BSUyxlTNCJrYNUrkJ9H9vnqvb9Blzx7BBJVUyomhmeDTTGbUu66BxxipYS/U7w+
+         dbbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691575047; x=1692179847;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/rmEnk1g8Unm9TjBDd1nYGxjvPpnWaZtUFtYH71EmO0=;
+        b=KgipPNSKgKQBDqPiH922lIh4AMPHWEamhtSCVYciCkrykCCpuSyI+PNlD4yX5XrNBa
+         ITKaPerp8ByvJQSHLeoov5EaS/zVKTSpx2y9p9uSHsLlBxUwG4PTw7kIyrJK6UdjW/Pr
+         fuM2bnTBTmQf0zI0XBn+YpiTGG3cLONf3pq+eQpliEjozSYpXhHtP2t0N4cwJBGmJIGa
+         MKMXrHayUNMUZj7j8pjH3NsQbktq/m/TuEXsKxvUosAcdln21n+vQsijeN2WGMCzjRlJ
+         Z3edrhquJATKDfK6qGtiDiSGpDoLaGrlUWNQbSIv3H9LxL4fwiVbrUKNe6qwklE3qqa5
+         Q7PQ==
+X-Gm-Message-State: AOJu0Yy+dSx9gefqxcxUdQm44TTHLlZxqYX4wKLcyyCsomuodTnO+ekr
+	3Upqhf4noIj77hdDpKWj4k+eCg==
+X-Google-Smtp-Source: AGHT+IHn+CGz9CoURGc+L1iYofdZgIMRwp6uPgN5OhPNo0J4iMMDCIEPm6uBtj2a9yAjeaEWUXS37g==
+X-Received: by 2002:a05:600c:210:b0:3fe:ad3:b066 with SMTP id 16-20020a05600c021000b003fe0ad3b066mr1884370wmi.41.1691575046903;
+        Wed, 09 Aug 2023 02:57:26 -0700 (PDT)
+Received: from elver.google.com ([2a00:79e0:9c:201:9ce0:327a:6e5a:3533])
+        by smtp.gmail.com with ESMTPSA id h18-20020a1ccc12000000b003fbd9e390e1sm1479988wmb.47.2023.08.09.02.57.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Aug 2023 02:57:25 -0700 (PDT)
+Date: Wed, 9 Aug 2023 11:57:19 +0200
+From: Marco Elver <elver@google.com>
+To: Kees Cook <keescook@chromium.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Steven Rostedt <rostedt@goodmis.org>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Tom Rix <trix@redhat.com>, Miguel Ojeda <ojeda@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com,
+	linux-toolchains@vger.kernel.org
+Subject: Re: [PATCH v3 3/3] list_debug: Introduce CONFIG_DEBUG_LIST_MINIMAL
+Message-ID: <ZNNi/4L1mD8XPNix@elver.google.com>
+References: <20230808102049.465864-1-elver@google.com>
+ <20230808102049.465864-3-elver@google.com>
+ <202308081424.1DC7AA4AE3@keescook>
+ <CANpmjNM3rc8ih7wvFc2GLuMDLpWcdA8uWfut-5tOajqtVG952A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM8PR01MB6824:EE_|PH0PR01MB6199:EE_
-X-MS-Office365-Filtering-Correlation-Id: 160eee96-7ea7-4944-0634-08db98bc524f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	9/O//dE58QJemE8K0ohmr9h7OwyEs5aM7sRoelgRNgwzm5cSwF0JRrEYrFU7j6znFcfWjnRG+wplCHA0ESkqKsAUq1SkUEaI7HxQo2lX/ypW2BVKZEQOl7jKl1peYPfX1PCBRxu6qIGwHdckbsOaUxfl01dLncy0MCzWmGJYGBh8q2b+hiTdsCfAV9z+YG+rxlxna6njQIlhwY+WhuL67fIcnPw/V/xCpwKQXQKot83bDqVmxemC8GHUCueNZN0CQVvaUa3m47RVuEwXeu6aA0IVfR0Q4XuZvV0rM+cbbbvEsXRnUcwrWzBj+jOVTN4CHdGrZl/NT3qd23rnUT6Ptx5gltdnrWXriYLqzUVuxxEHBYd234MRPNLWwLAhRdCZZYLXcc6M9GY/nFF1PncTl40lf2r613k6DQusBNg9ecUDF1c1EW0iumd8s8Hgqd2VSxHyKJFpRRgeqMtT3AKOVV14lNOJQykxxdubqbpmutnAICpoDf4d5l66fEK5OcpZmNoKVPLOSGwrt27Gj6xSHkQ9s5ixgbFh4MJQwUHkiD1pVlgDK0G6SoHRtw7QpLsAaevpODTcpbyCkpX6WIEu3eZmr7GkMoITYottDJNzqOHcn1b9k30OkCLt+lb8R6SC3019mlPhQ/aUtlZ3B21NRQ==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR01MB6824.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(39850400004)(376002)(366004)(136003)(396003)(1800799006)(186006)(451199021)(110136005)(478600001)(4326008)(66946007)(66556008)(107886003)(66476007)(6506007)(26005)(6486002)(6666004)(6512007)(2906002)(8676002)(316002)(41300700001)(7416002)(5660300002)(83170400001)(8936002)(31696002)(38350700002)(38100700002)(2616005)(83380400001)(42882007)(52116002)(31686004)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?R1V2UDNqbVFacEcxbFUxYVFQdnJXQnF0b1ZLSWhLYUVlSC9vVmZxVDZXa1FW?=
- =?utf-8?B?R0xaN0tpbFJDU2xvckdaYkpyUjdaTFVoOEt6QmVwVEUrWng5QjhwSGt3SlZP?=
- =?utf-8?B?cThpaGpBZUZoVVV3TVN4bnF6YjNkd1pReFJCdm9aNHJRYks2SW90YWMxZWZL?=
- =?utf-8?B?cTFFaW9uc0xDL2ZWaGphWGplTTlObjJDLzZyT1NGVElvbDcyVkhKM3dib3pw?=
- =?utf-8?B?TzZZZGgwdWVPVEdBSHNUSmlYUVpOa1R0ZTY0VUVROWZqYXlKbE5pMzExWHcy?=
- =?utf-8?B?aGZBWkdjWm5NY0RUbUJpM2NlU3ZMU0k1TktjNFpFbDV2UDBldGtxT1p6VDZ0?=
- =?utf-8?B?TDRHN2pNaEVqUmZqRG9XUXBuT2hOcWQyTHZwdHRYWWRlUzlqREQxYTM1eVVL?=
- =?utf-8?B?T1E1bGozMlMxUHhGMkhiTm1pc2JrZEwwTVBMOWJPcnRrODA1Ym1FVm1xMHdz?=
- =?utf-8?B?UDhEVll2WDJ2QU8zM1EyYTNmTUxteVR2Nm53TERDckIzTkVad3NqUUhYNFl4?=
- =?utf-8?B?S01DL2VvSEdrR3hqSTRvMUZ5THl2NHZsbytmQ2ZxUEdycVQ5aythTXJaL0Q2?=
- =?utf-8?B?QktzdmVrTHloazlmUFpTU05wcExtZ0ZkMlZJb3pNemlpc1VHYnY5Wk5TRjht?=
- =?utf-8?B?dWJJTjFHbkFPd3FyNExYWHV4UEJyOVN3cklodmhGRnpDaW1mM2MvdmhkN1Rh?=
- =?utf-8?B?UGFjVzA5dW1PenFaU1ZYRVJxenNqUmY4YVJoaDdhWjdZS3JBYXBpdHFBMlll?=
- =?utf-8?B?YXZOUzVKNDA1SVVZMnNQK2dPK2daN2NId2MwZTI3OEYyR0VBNm8zOXExamQv?=
- =?utf-8?B?OFFHNFFhbVFkdGxyVCtZRlRQeU9kVk9XditZdWhlT0RORkwzck1nR2ZwK016?=
- =?utf-8?B?RmI2Yng5RlgyWTlvenNpQ3pwRE14RVlEUWFyTFdWMDB6Z0VPaUh6VmUzeW9Q?=
- =?utf-8?B?bFR1TVZsOFhBNGZ5NmhkZngrMmhUWGxVcUR2WTY3VTVwUURQUnROQlVBWFNF?=
- =?utf-8?B?ckx3ZVdBaW91dHFDYmwrQm1wVEFrZVp5YmhPbDBhalpOV2Q3WTNpWW1XcGtz?=
- =?utf-8?B?aHRmWXNRYTBkeFVRYkVtYUFCTVBQNlMxUFcycndKeU93TE5sbnBLY3JGWVFH?=
- =?utf-8?B?QlhjbUNuK0RHS2VoMVUrWFZmZXI3YmxGY3RLU1FEUEU4RDB1bFZYRGFjbFVE?=
- =?utf-8?B?SS9ORnp3VUhzT3JEYW10QWEvNnA3K1dmK3k0cnNCUi94cmJEUFp6M0pzZWJP?=
- =?utf-8?B?SysvZnBuNTBqcHQ0LzhBdnlrVlhYc3Q1NHBqeDVXMTlSbTljQXJQUVBZL3Zr?=
- =?utf-8?B?ak1kaXFleXRQUHZyYVJiWHZIRmhlUWEwSGJSMVpYWng4eVB6T2hVeHd0SzJk?=
- =?utf-8?B?MmFTdFVKNWJERkloYU01dCt1bFhCc3Zycm1wQkx1SHVSYnFld0c0cTAzSVBO?=
- =?utf-8?B?Y253MG9lRk5McjVOWnhlbzFqL0l5WVZXWFFaNFdGdkp4N3RxT3h0ZCtRb1lH?=
- =?utf-8?B?cE9BUnZHWnpyUmFzL0VQY21Yam9lVHBCWnVtREIvYlQxYUNHSXM1OW5qSkdC?=
- =?utf-8?B?emFRSHdNcXdjNGYwYzMyMFI3OFFpdzFGVHcwMWhmS2RxSmx2OUU1SG0zOWQ2?=
- =?utf-8?B?N0hlNHpjSVl3Y09vZnc1YmFiR1hpUTNFbTN3NU9Fc3lOcGdnaHJTc1NOQ1A3?=
- =?utf-8?B?aUQzN0FRMzI4YVlvV3BYeXh5aFNGbW1ZeFUwNmIrbGZ6aFVnN3ArRk1TSkln?=
- =?utf-8?B?V1VMT2FNclhYRkUrMitEQkdOQzN2YXNKcFZNTHVRR0wyMWVYMjZWRU5FSURB?=
- =?utf-8?B?cjdIamNzWjN2UGYvbWVWZzcxREhnVEhsTkxOSzZnWE5rRUxPcW9NeGM1YUpU?=
- =?utf-8?B?ZHRqdHFjN0FLcnBBUnVzNHRrYkFzQ3lFYjkyaE1VYkMydVh6cWdEalBEOFZo?=
- =?utf-8?B?d0hYWmN6MW9zK2RDdTZSazZMOGpPSUZ0OEYwUnJ3RDk3a0NlYnBLZmpYRzNy?=
- =?utf-8?B?S3lSWDB2T0E2UmZ6KzVYM3M2RXdFMmRxenY4Y296cWpMWW9mMFJJZ2VEN3J0?=
- =?utf-8?B?RG9KS0EzV3RrZzVBZFhlcmRXZjdqalIrRStqQUJsa3J2NmhSamZ0cTI5RDRE?=
- =?utf-8?B?NisyTm01QXN0WTlTSnlud2JpUnJvTlRVV3dGYkZiaVBmalh3TjVoUmMwZEY2?=
- =?utf-8?Q?IFY7bs2mhnemDGYkWnf6JE8=3D?=
-X-OriginatorOrg: amperemail.onmicrosoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 160eee96-7ea7-4944-0634-08db98bc524f
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Aug 2023 09:38:00.7271
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PWm/LHbhhp+cCwYwrMubagV9SaUiGJztWI/S3oeiV9k8o+tqVUp3gZgoPTSgu4AEuhQcIi68dABXLhGNwIwlNbAM6fwmy3vdq4gI5u+nxJ/ydK9l5k9sm0rEhwBJMfyz
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR01MB6199
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANpmjNM3rc8ih7wvFc2GLuMDLpWcdA8uWfut-5tOajqtVG952A@mail.gmail.com>
+User-Agent: Mutt/2.2.9 (2022-11-12)
 
-Hi Mark,
+On Wed, Aug 09, 2023 at 09:35AM +0200, Marco Elver wrote:
 
-在 2023/8/9 17:22, Mark Rutland 写道:
-> On Wed, Aug 09, 2023 at 08:25:07AM +0000, Oliver Upton wrote:
->> Hi Huang,
->>
->> On Wed, Aug 09, 2023 at 09:39:53AM +0800, Huang Shijie wrote:
->>> 2.) Root cause.
->>> 	There is only 7 counters in my arm64 platform:
->>> 	  (one cycle counter) + (6 normal counters)
->>>
->>> 	In 1.3 above, we will use 10 event counters.
->>> 	Since we only have 7 counters, the perf core will trigger
->>>         	event multiplexing in hrtimer:
->>> 	     merge_sched_in() -->perf_mux_hrtimer_restart() -->
->>> 	     perf_rotate_context().
->>>
->>>         In the perf_rotate_context(), it does not restore some PMU registers
->>>         as context_switch() does.  In context_switch():
->>>               kvm_sched_in()  --> kvm_vcpu_pmu_restore_guest()
->>>               kvm_sched_out() --> kvm_vcpu_pmu_restore_host()
->>>
->>>         So we got wrong result.
->> This is a rather vague description of the problem. AFAICT, the
->> issue here is on VHE systems we wind up getting the EL0 count
->> enable/disable bits backwards when entering the guest, which is
->> corroborated by the data you have below.
-> Yep; IIUC the issue here is that when we take an IRQ from a guest and reprogram
-> the PMU in the IRQ handler, the IRQ handler will program the PMU with
-> appropriate host/guest/user/etc filters for a *host* context, and then we'll
-> return back into the guest without reconfigurign the event filtering for a
-> *guest* context.
-Yes.
->
-> That can happen for perf_rotate_context(), or when we install an event into a
-> running context, as that'll happen via an IPI.
->
->>> +void arch_perf_rotate_pmu_set(void)
->>> +{
->>> +	if (is_guest())
->>> +		kvm_vcpu_pmu_restore_guest(NULL);
->>> +	else
->>> +		kvm_vcpu_pmu_restore_host(NULL);
->>> +}
->>> +
->> This sort of hook is rather nasty, and I'd strongly prefer a solution
->> that's confined to KVM. I don't think the !is_guest() branch is
->> necessary at all. Regardless of how the pmu context is changed, we need
->> to go through vcpu_put() before getting back out to userspace.
->>
->> We can check for a running vCPU (ick) from kvm_set_pmu_events() and either
->> do the EL0 bit flip there or make a request on the vCPU to call
->> kvm_vcpu_pmu_restore_guest() immediately before reentering the guest.
->> I'm slightly leaning towards the latter, unless anyone has a better idea
->> here.
-> The latter sounds reasonable to me.
+> > I'd really like to get away from calling this "DEBUG", since it's used
+> > more for hardening (CONFIG_LIST_HARDENED?). Will Deacon spent some time
+> > making this better a while back, but the series never landed. Do you
+> > have a bit of time to look through it?
+> >
+> > https://github.com/KSPP/linux/issues/10
+> > https://lore.kernel.org/lkml/20200324153643.15527-1-will@kernel.org/
+> 
+> I'm fine renaming this one. But there are other issues that Will's
+> series solves, which I don't want this series to depend on. We can try
+> to sort them out separately.
+> 
+> The main problem here is that DEBUG_LIST has been designed to be
+> friendly for debugging (incl. checking poison values and NULL). Some
+> kernel devs may still want that, but for production use is pointless
+> and wasteful.
+> 
+> So what I can propose is to introduce CONFIG_LIST_HARDENED that
+> doesn't depend on CONFIG_DEBUG_LIST, but instead selects it, because
+> we still use that code to produce a report.
 
-okay. I prefer the latter one now. :)
+How about the below?
 
+We'll add CONFIG_HARDEN_LIST (in Kconfig.hardening), which is
+independent of CONFIG_DEBUG_LIST. For the implementation it selects
+DEBUG_LIST, but irrelevant for users.
 
-Thanks
+This will get us the best of both worlds: a version for hardening that
+should remain as fast as possible, and one for debugging with better
+reports.
 
-Huang Shijie
+------ >8 ------
 
->
-> I suspect we need to take special care here to make sure we leave *all* events
-> in a good state when re-entering the guest or if we get to kvm_sched_out()
-> after *removing* an event via an IPI -- it'd be easy to mess either case up and
-> leave some events in a bad state.
->
-> Thanks,
-> Mark.
+From: Marco Elver <elver@google.com>
+Date: Thu, 27 Jul 2023 22:19:02 +0200
+Subject: [PATCH v4 3/3] list: Introduce CONFIG_HARDEN_LIST
+
+Numerous production kernel configs (see [1, 2]) are choosing to enable
+CONFIG_DEBUG_LIST, which is also being recommended by KSPP for hardened
+configs [3]. The motivation behind this is that the option can be used
+as a security hardening feature (e.g. CVE-2019-2215 and CVE-2019-2025
+are mitigated by the option [4]).
+
+The feature has never been designed with performance in mind, yet common
+list manipulation is happening across hot paths all over the kernel.
+
+Introduce CONFIG_HARDEN_LIST, which performs list pointer checking
+inline, and only upon list corruption calls the reporting slow path.
+
+To generate optimal machine code with CONFIG_HARDEN_LIST:
+
+  1. Elide checking for pointer values which upon dereference would
+     result in an immediate access fault -- therefore "minimal" checks.
+     The trade-off is lower-quality error reports.
+
+  2. Use the newly introduced __preserve_most function attribute
+     (available with Clang, but not yet with GCC) to minimize the code
+     footprint for calling the reporting slow path. As a result,
+     function size of callers is reduced by avoiding saving registers
+     before calling the rarely called reporting slow path.
+
+     Note that all TUs in lib/Makefile already disable function tracing,
+     including list_debug.c, and __preserve_most's implied notrace has
+     no effect in this case.
+
+  3. Because the inline checks are a subset of the full set of checks in
+     __list_*_valid_or_report(), always return false if the inline
+     checks failed.  This avoids redundant compare and conditional
+     branch right after return from the slow path.
+
+As a side-effect of the checks being inline, if the compiler can prove
+some condition to always be true, it can completely elide some checks.
+
+Running netperf with CONFIG_HARDEN_LIST (using a Clang compiler with
+"preserve_most") shows throughput improvements, in my case of ~7% on
+average (up to 20-30% on some test cases).
+
+Link: https://r.android.com/1266735 [1]
+Link: https://gitlab.archlinux.org/archlinux/packaging/packages/linux/-/blob/main/config [2]
+Link: https://kernsec.org/wiki/index.php/Kernel_Self_Protection_Project/Recommended_Settings [3]
+Link: https://googleprojectzero.blogspot.com/2019/11/bad-binder-android-in-wild-exploit.html [4]
+Signed-off-by: Marco Elver <elver@google.com>
+---
+v4:
+* Rename to CONFIG_HARDEN_LIST, which can independently be selected from
+  CONFIG_DEBUG_LIST.
+
+v3:
+* Rename ___list_*_valid() to __list_*_valid_or_report().
+* More comments.
+
+v2:
+* Note that lib/Makefile disables function tracing for everything and
+  __preserve_most's implied notrace is a noop here.
+---
+ arch/arm64/kvm/hyp/nvhe/list_debug.c |  2 +
+ include/linux/list.h                 | 64 +++++++++++++++++++++++++---
+ lib/Kconfig.debug                    | 12 ++++--
+ lib/list_debug.c                     |  2 +
+ security/Kconfig.hardening           | 14 ++++++
+ 5 files changed, 84 insertions(+), 10 deletions(-)
+
+diff --git a/arch/arm64/kvm/hyp/nvhe/list_debug.c b/arch/arm64/kvm/hyp/nvhe/list_debug.c
+index 16266a939a4c..46a2d4f2b3c6 100644
+--- a/arch/arm64/kvm/hyp/nvhe/list_debug.c
++++ b/arch/arm64/kvm/hyp/nvhe/list_debug.c
+@@ -26,6 +26,7 @@ static inline __must_check bool nvhe_check_data_corruption(bool v)
+ 
+ /* The predicates checked here are taken from lib/list_debug.c. */
+ 
++__list_valid_slowpath
+ bool __list_add_valid_or_report(struct list_head *new, struct list_head *prev,
+ 				struct list_head *next)
+ {
+@@ -37,6 +38,7 @@ bool __list_add_valid_or_report(struct list_head *new, struct list_head *prev,
+ 	return true;
+ }
+ 
++__list_valid_slowpath
+ bool __list_del_entry_valid_or_report(struct list_head *entry)
+ {
+ 	struct list_head *prev, *next;
+diff --git a/include/linux/list.h b/include/linux/list.h
+index 130c6a1bb45c..1c7f70b7cc7a 100644
+--- a/include/linux/list.h
++++ b/include/linux/list.h
+@@ -39,38 +39,90 @@ static inline void INIT_LIST_HEAD(struct list_head *list)
+ }
+ 
+ #ifdef CONFIG_DEBUG_LIST
++
++#ifdef CONFIG_HARDEN_LIST
++# define __list_valid_slowpath __cold __preserve_most
++#else
++# define __list_valid_slowpath
++#endif
++
+ /*
+  * Performs the full set of list corruption checks before __list_add().
+  * On list corruption reports a warning, and returns false.
+  */
+-extern bool __list_add_valid_or_report(struct list_head *new,
+-				       struct list_head *prev,
+-				       struct list_head *next);
++extern bool __list_valid_slowpath __list_add_valid_or_report(struct list_head *new,
++							     struct list_head *prev,
++							     struct list_head *next);
+ 
+ /*
+  * Performs list corruption checks before __list_add(). Returns false if a
+  * corruption is detected, true otherwise.
++ *
++ * With CONFIG_HARDEN_LIST set, performs minimal list integrity checking (that
++ * do not result in a fault) inline, and only if a corruption is detected calls
++ * the reporting function __list_add_valid_or_report().
+  */
+ static __always_inline bool __list_add_valid(struct list_head *new,
+ 					     struct list_head *prev,
+ 					     struct list_head *next)
+ {
+-	return __list_add_valid_or_report(new, prev, next);
++	bool ret = true;
++
++	if (IS_ENABLED(CONFIG_HARDEN_LIST)) {
++		/*
++		 * With the hardening version, elide checking if next and prev
++		 * are NULL, since the immediate dereference of them below would
++		 * result in a fault if NULL.
++		 *
++		 * With the reduced set of checks, we can afford to inline the
++		 * checks, which also gives the compiler a chance to elide some
++		 * of them completely if they can be proven at compile-time. If
++		 * one of the pre-conditions does not hold, the slow-path will
++		 * show a report which pre-condition failed.
++		 */
++		if (likely(next->prev == prev && prev->next == next && new != prev && new != next))
++			return true;
++		ret = false;
++	}
++
++	ret &= __list_add_valid_or_report(new, prev, next);
++	return ret;
+ }
+ 
+ /*
+  * Performs the full set of list corruption checks before __list_del_entry().
+  * On list corruption reports a warning, and returns false.
+  */
+-extern bool __list_del_entry_valid_or_report(struct list_head *entry);
++extern bool __list_valid_slowpath __list_del_entry_valid_or_report(struct list_head *entry);
+ 
+ /*
+  * Performs list corruption checks before __list_del_entry(). Returns false if a
+  * corruption is detected, true otherwise.
++ *
++ * With CONFIG_HARDEN_LIST set, performs minimal list integrity checking (that
++ * do not result in a fault) inline, and only if a corruption is detected calls
++ * the reporting function __list_del_entry_valid_or_report().
+  */
+ static __always_inline bool __list_del_entry_valid(struct list_head *entry)
+ {
+-	return __list_del_entry_valid_or_report(entry);
++	bool ret = true;
++
++	if (IS_ENABLED(CONFIG_HARDEN_LIST)) {
++		struct list_head *prev = entry->prev;
++		struct list_head *next = entry->next;
++
++		/*
++		 * With the hardening version, elide checking if next and prev
++		 * are NULL, LIST_POISON1 or LIST_POISON2, since the immediate
++		 * dereference of them below would result in a fault.
++		 */
++		if (likely(prev->next == entry && next->prev == entry))
++			return true;
++		ret = false;
++	}
++
++	ret &= __list_del_entry_valid_or_report(entry);
++	return ret;
+ }
+ #else
+ static inline bool __list_add_valid(struct list_head *new,
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index fbc89baf7de6..6b0de78fb2da 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -1672,11 +1672,15 @@ config HAVE_DEBUG_BUGVERBOSE
+ menu "Debug kernel data structures"
+ 
+ config DEBUG_LIST
+-	bool "Debug linked list manipulation"
+-	depends on DEBUG_KERNEL || BUG_ON_DATA_CORRUPTION
++	bool "Debug linked list manipulation" if !HARDEN_LIST
++	depends on DEBUG_KERNEL || BUG_ON_DATA_CORRUPTION || HARDEN_LIST
+ 	help
+-	  Enable this to turn on extended checks in the linked-list
+-	  walking routines.
++	  Enable this to turn on extended checks in the linked-list walking
++	  routines.
++
++	  If you care about performance, you should enable CONFIG_HARDEN_LIST
++	  instead.  This option alone trades better quality error reports for
++	  worse performance, and is more suitable for debugging.
+ 
+ 	  If unsure, say N.
+ 
+diff --git a/lib/list_debug.c b/lib/list_debug.c
+index 2def33b1491f..0ff547910dd0 100644
+--- a/lib/list_debug.c
++++ b/lib/list_debug.c
+@@ -17,6 +17,7 @@
+  * attempt).
+  */
+ 
++__list_valid_slowpath
+ bool __list_add_valid_or_report(struct list_head *new, struct list_head *prev,
+ 				struct list_head *next)
+ {
+@@ -39,6 +40,7 @@ bool __list_add_valid_or_report(struct list_head *new, struct list_head *prev,
+ }
+ EXPORT_SYMBOL(__list_add_valid_or_report);
+ 
++__list_valid_slowpath
+ bool __list_del_entry_valid_or_report(struct list_head *entry)
+ {
+ 	struct list_head *prev, *next;
+diff --git a/security/Kconfig.hardening b/security/Kconfig.hardening
+index 0f295961e773..a8aef895f13d 100644
+--- a/security/Kconfig.hardening
++++ b/security/Kconfig.hardening
+@@ -279,6 +279,20 @@ config ZERO_CALL_USED_REGS
+ 
+ endmenu
+ 
++menu "Hardening of kernel data structures"
++
++config HARDEN_LIST
++	bool "Check integrity of linked list manipulation"
++	select DEBUG_LIST
++	help
++	  Minimal integrity checking in the linked-list manipulation routines
++	  to catch memory corruptions that are not guaranteed to result in an
++	  immediate access fault.
++
++	  If unsure, say N.
++
++endmenu
++
+ config CC_HAS_RANDSTRUCT
+ 	def_bool $(cc-option,-frandomize-layout-seed-file=/dev/null)
+ 	# Randstruct was first added in Clang 15, but it isn't safe to use until
+-- 
+2.41.0.640.ga95def55d0-goog
+
