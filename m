@@ -1,53 +1,14 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7B918008
-	for <kvmarm@lists.linux.dev>; Wed,  9 Aug 2023 13:27:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1691587657;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OwCX0lUEuIP9ATmkSZdYEZDYGtv8hnFdu00DnuutpMg=;
-	b=UB0ZbiS32X93PivkvxwlLymCsc6Nd1xSB+S3KO+xScoA/zobWe0jJgEAZHySx2feujxTVz
-	h0xvLAIF1aoNsJxrcC/J+TC+E8tRyKUnAG0IsrI2mV1GcxbfNOU6j2WUYovsa2dhZ+EoPm
-	rD/RYrN6LsIq53okcMJSwKa2xuoIRLs=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-346-cHosNF6pNfC3dsuZpu9g4Q-1; Wed, 09 Aug 2023 09:27:33 -0400
-X-MC-Unique: cHosNF6pNfC3dsuZpu9g4Q-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-76ce6d007ccso541042685a.1
-        for <kvmarm@lists.linux.dev>; Wed, 09 Aug 2023 06:27:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691587653; x=1692192453;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OwCX0lUEuIP9ATmkSZdYEZDYGtv8hnFdu00DnuutpMg=;
-        b=Ewyp6MWjVEwRFtwZGTLvXQBV7IbXJo9TQTACKDNNnEtFrAg8XyAR44Z3xpaqrOfHkB
-         M/pjU+oKMReH7Qam1XLjNGcsp/NHhy08mjn5Vy0/ZGtai6KUNc+gLfPtMNSD6lifR46X
-         bELk9PVzDerdf17b1QiTZaNRIZeqqqLpvuGAww6UjDbVw2CngZ3Dgi89AGs/yNGaU+ru
-         MTASJrfkvaPhnS1ynj3HvudbvsK1jf/2bh82MJTjKL5g6SjBojQ9vK08iexH9AP81S9W
-         9I5fYhVoH3PFKcH7epNbYz2HbDXOpDTLnFSIq8t91VoTEyX40sNoN20/d5htegNfLGss
-         Sw5w==
-X-Gm-Message-State: AOJu0YxlL1HfcGfZbPeaCh59KKxuYfnyPwvx0acTALXhf0lGxWuRGJGl
-	PodGGY7SWFThCDL2Ytvc2ysoO/qnzzAftK2wCr3Lfl2A6bwX8H8XkVzlFfhCykNbuGduyRPwjgm
-	7kXd+v7exVsi1ayOh
-X-Received: by 2002:a05:620a:21ce:b0:76c:e764:5085 with SMTP id h14-20020a05620a21ce00b0076ce7645085mr2800508qka.54.1691587653331;
-        Wed, 09 Aug 2023 06:27:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF+SQ9WfFzAqfpUvqvscz2ikVYbRM8AneWn/3KMenV7omEUI3H0Cpp8LKkpnDpiC2tMdfLF2A==
-X-Received: by 2002:a05:620a:21ce:b0:76c:e764:5085 with SMTP id h14-20020a05620a21ce00b0076ce7645085mr2800479qka.54.1691587652968;
-        Wed, 09 Aug 2023 06:27:32 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id d17-20020a05620a159100b00767d05117fesm3980198qkk.36.2023.08.09.06.27.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Aug 2023 06:27:32 -0700 (PDT)
-Message-ID: <18eae581-500b-9c9e-2cce-e2f5fb007071@redhat.com>
-Date: Wed, 9 Aug 2023 15:27:27 +0200
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88DAB612D
+	for <kvmarm@lists.linux.dev>; Wed,  9 Aug 2023 14:17:55 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 26932D75;
+	Wed,  9 Aug 2023 07:18:37 -0700 (PDT)
+Received: from [10.57.1.30] (unknown [10.57.1.30])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 58FD33F59C;
+	Wed,  9 Aug 2023 07:17:52 -0700 (PDT)
+Message-ID: <b0581b86-a0b4-45cd-ac62-a7de45f8cc90@arm.com>
+Date: Wed, 9 Aug 2023 15:17:50 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -55,445 +16,324 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v3 14/27] KVM: arm64: nv: Add trap forwarding
- infrastructure
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Mark Brown
- <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Will Deacon <will@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>,
- Andre Przywara <andre.przywara@arm.com>,
- Chase Conklin <chase.conklin@arm.com>,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Darren Hart <darren@os.amperecomputing.com>,
- Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
-References: <20230808114711.2013842-1-maz@kernel.org>
- <20230808114711.2013842-15-maz@kernel.org>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230808114711.2013842-15-maz@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+ Thunderbird/102.9.0
+Subject: Re: [RFC PATCH 1/3] arm64: KVM: Add support for exclude_guest and
+ exclude_host for ETM
 Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>
+Cc: coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mike Leach <mike.leach@linaro.org>, Leo Yan <leo.yan@linaro.org>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Anshuman Khandual <anshuman.khandual@arm.com>, Rob Herring
+ <robh@kernel.org>, linux-kernel@vger.kernel.org
+References: <20230804101317.460697-1-james.clark@arm.com>
+ <20230804101317.460697-2-james.clark@arm.com> <87350uq6qf.wl-maz@kernel.org>
+From: James Clark <james.clark@arm.com>
+In-Reply-To: <87350uq6qf.wl-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Hi Marc,
 
-On 8/8/23 13:46, Marc Zyngier wrote:
-> A significant part of what a NV hypervisor needs to do is to decide
-> whether a trap from a L2+ guest has to be forwarded to a L1 guest
-> or handled locally. This is done by checking for the trap bits that
-> the guest hypervisor has set and acting accordingly, as described by
-> the architecture.
->
-> A previous approach was to sprinkle a bunch of checks in all the
-> system register accessors, but this is pretty error prone and doesn't
-> help getting an overview of what is happening.
->
-> Instead, implement a set of global tables that describe a trap bit,
-> combinations of trap bits, behaviours on trap, and what bits must
-> be evaluated on a system register trap.
->
-> Although this is painful to describe, this allows to specify each
-> and every control bit in a static manner. To make it efficient,
-> the table is inserted in an xarray that is global to the system,
-> and checked each time we trap a system register while running
-> a L2 guest.
->
-> Add the basic infrastructure for now, while additional patches will
-> implement configuration registers.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h   |   1 +
->  arch/arm64/include/asm/kvm_nested.h |   2 +
->  arch/arm64/kvm/emulate-nested.c     | 262 ++++++++++++++++++++++++++++
->  arch/arm64/kvm/sys_regs.c           |   6 +
->  arch/arm64/kvm/trace_arm.h          |  26 +++
->  5 files changed, 297 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 721680da1011..cb1c5c54cedd 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -988,6 +988,7 @@ int kvm_handle_cp10_id(struct kvm_vcpu *vcpu);
->  void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
->  
->  int __init kvm_sys_reg_table_init(void);
-> +int __init populate_nv_trap_config(void);
->  
->  bool lock_all_vcpus(struct kvm *kvm);
->  void unlock_all_vcpus(struct kvm *kvm);
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index 8fb67f032fd1..fa23cc9c2adc 100644
-> --- a/arch/arm64/include/asm/kvm_nested.h
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -11,6 +11,8 @@ static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
->  		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
->  }
->  
-> +extern bool __check_nv_sr_forward(struct kvm_vcpu *vcpu);
-> +
->  struct sys_reg_params;
->  struct sys_reg_desc;
->  
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index b96662029fb1..1b1148770d45 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -14,6 +14,268 @@
->  
->  #include "trace.h"
->  
-> +enum trap_behaviour {
-> +	BEHAVE_HANDLE_LOCALLY	= 0,
-> +	BEHAVE_FORWARD_READ	= BIT(0),
-> +	BEHAVE_FORWARD_WRITE	= BIT(1),
-> +	BEHAVE_FORWARD_ANY	= BEHAVE_FORWARD_READ | BEHAVE_FORWARD_WRITE,
-> +};
-> +
-> +struct trap_bits {
-> +	const enum vcpu_sysreg		index;
-> +	const enum trap_behaviour	behaviour;
-> +	const u64			value;
-> +	const u64			mask;
-> +};
-> +
-> +enum trap_group {
-nit: Maybe add a comment saying that it relates to *coarse* trapping as
-opposed to the other enum which is named fgt_group_id. cgt_group_id may
-have been better but well ;-)
 
-> +	/* Indicates no coarse trap control */
-> +	__RESERVED__,
-> +
-> +	/*
-> +	 * The first batch of IDs denote coarse trapping that are used
-> +	 * on their own instead of being part of a combination of
-> +	 * trap controls.
-> +	 */
-> +
-> +	/*
-> +	 * Anything after this point is a combination of trap controls,
-coarse trap controls
-> +	 * which all must be evaluated to decide what to do.
-> +	 */
-> +	__MULTIPLE_CONTROL_BITS__,
-> +
-> +	/*
-> +	 * Anything after this point requires a callback evaluating a
-> +	 * complex trap condition. Hopefully we'll never need this...
-> +	 */
-> +	__COMPLEX_CONDITIONS__,
-> +
-> +	/* Must be last */
-> +	__NR_TRAP_GROUP_IDS__
-> +};
-> +
-> +static const struct trap_bits coarse_trap_bits[] = {
-> +};
-> +
-> +#define MCB(id, ...)					\
-> +	[id - __MULTIPLE_CONTROL_BITS__]	=	\
-> +		(const enum trap_group []){		\
-> +			__VA_ARGS__, __RESERVED__	\
-> +		}
-> +
-> +static const enum trap_group *coarse_control_combo[] = {
-> +};
-> +
-> +typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu *);
-> +
-> +#define CCC(id, fn)				\
-> +	[id - __COMPLEX_CONDITIONS__] = fn
-> +
-> +static const complex_condition_check ccc[] = {
-> +};
-> +
-> +/*
-> + * Bit assignment for the trap controls. We use a 64bit word with the
-> + * following layout for each trapped sysreg:
-> + *
-> + * [9:0]	enum trap_group (10 bits)
-> + * [13:10]	enum fgt_group_id (4 bits)
-> + * [19:14]	bit number in the FGT register (6 bits)
-> + * [20]		trap polarity (1 bit)
-> + * [62:21]	Unused (42 bits)
-> + * [63]		RES0 - Must be zero, as lost on insertion in the xarray
-what do you mean by "as lost"
-> + */
-> +#define TC_CGT_BITS	10
-> +#define TC_FGT_BITS	4
-> +
-> +union trap_config {
-> +	u64	val;
-> +	struct {
-> +		unsigned long	cgt:TC_CGT_BITS; /* Coarse trap id */
-> +		unsigned long	fgt:TC_FGT_BITS; /* Fing Grained Trap id */
-Fine & align capital letter in Trap for both comments
-> +		unsigned long	bit:6;		 /* Bit number */
-> +		unsigned long	pol:1;		 /* Polarity */
-> +		unsigned long	unk:42;		 /* Unknown */
-s//Unknown/Unused?
-> +		unsigned long	mbz:1;		 /* Must Be Zero */
-> +	};
-> +};
-> +
-> +struct encoding_to_trap_config {
-> +	const u32			encoding;
-> +	const u32			end;
-> +	const union trap_config		tc;
-> +};
-> +
-> +#define SR_RANGE_TRAP(sr_start, sr_end, trap_id)			\
-> +	{								\
-> +		.encoding	= sr_start,				\
-> +		.end		= sr_end,				\
-> +		.tc		= {					\
-> +			.cgt		= trap_id,			\
-> +		},							\
-> +	}
-> +
-> +#define SR_TRAP(sr, trap_id)		SR_RANGE_TRAP(sr, sr, trap_id)
-> +
-> +/*
-> + * Map encoding to trap bits for exception reported with EC=0x18.
-> + * These must only be evaluated when running a nested hypervisor, but
-> + * that the current context is not a hypervisor context. When the
-> + * trapped access matches one of the trap controls, the exception is
-> + * re-injected in the nested hypervisor.
-I must confess I was confused by the "forwarding" terminology versus
-"re-injection into the nested hyp" 
+On 08/08/2023 09:27, Marc Zyngier wrote:
+> On Fri, 04 Aug 2023 11:13:11 +0100,
+> James Clark <james.clark@arm.com> wrote:
+>>
+>> Add an interface for the Coresight driver to use to set the current
+>> exclude settings for the current CPU. This will be used to configure
+>> TRFCR_EL1.
+> 
+> Can you start by stating the problem? There is *some* rationale in the
+> cover letter, but not enough to get the full picture. Specially if you
+> haven't looked at the trace subsystem in the past... 7 years or so.
+> 
 
-cf.
+Yeah I will expand on it a bit.
 
-"decide whether a trap from a L2+ guest has to be forwarded to a L1 guest
-or handled locally"
+>>
+>> The settings must be copied to the vCPU before each run in the same
+>> way that PMU events are because the per-cpu struct isn't accessible in
+>> protected mode.
+> 
+> I'm pretty sure that for protected guests, we'd like to disable
+> tracing altogether (debug mode excepted).
+> 
 
-"re-injection into the nested hyp" sounds clearer to me.
+Do you mean disable the ability to trace guests from the host? Or to
+disable generation of any trace altogether when in the guest, even if
+the guest started the session?
 
-> + */
-> +static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
-> +};
-> +
-> +static DEFINE_XARRAY(sr_forward_xa);
-> +
-> +static union trap_config get_trap_config(u32 sysreg)
-> +{
-> +	return (union trap_config) {
-> +		.val = xa_to_value(xa_load(&sr_forward_xa, sysreg)),
-> +	};
-> +}
-> +
-> +int __init populate_nv_trap_config(void)
-> +{
-> +	int ret = 0;
-> +
-> +	BUILD_BUG_ON(sizeof(union trap_config) != sizeof(void *));
-> +	BUILD_BUG_ON(__NR_TRAP_GROUP_IDS__ > BIT(TC_CGT_BITS));
-> +
-> +	for (int i = 0; i < ARRAY_SIZE(encoding_to_cgt); i++) {
-> +		const struct encoding_to_trap_config *cgt = &encoding_to_cgt[i];
-> +		void *prev;
-> +
-> +		prev = xa_store_range(&sr_forward_xa, cgt->encoding, cgt->end,
-> +				      xa_mk_value(cgt->tc.val), GFP_KERNEL);
-> +
-> +		if (prev) {
-> +			kvm_err("Duplicate CGT for (%d, %d, %d, %d, %d)\n",
-> +				sys_reg_Op0(cgt->encoding),
-> +				sys_reg_Op1(cgt->encoding),
-> +				sys_reg_CRn(cgt->encoding),
-> +				sys_reg_CRm(cgt->encoding),
-> +				sys_reg_Op2(cgt->encoding));
-> +			ret = -EINVAL;
-> +		}
-> +	}
-> +
-> +	kvm_info("nv: %ld coarse grained trap handlers\n",
-> +		 ARRAY_SIZE(encoding_to_cgt));
-> +
-> +	for (int id = __MULTIPLE_CONTROL_BITS__;
-> +	     id < (__COMPLEX_CONDITIONS__ - 1);
-> +	     id++) {
-> +		const enum trap_group *cgids;
-> +
-> +		cgids = coarse_control_combo[id - __MULTIPLE_CONTROL_BITS__];
-> +
-> +		for (int i = 0; cgids[i] != __RESERVED__; i++) {
-> +			if (cgids[i] >= __MULTIPLE_CONTROL_BITS__) {
-> +				kvm_err("Recursive MCB %d/%d\n", id, cgids[i]);
-> +				ret = -EINVAL;
-> +			}
-> +		}
-> +	}
-> +
-> +	if (ret)
-> +		xa_destroy(&sr_forward_xa);
-> +
-> +	return ret;
-> +}
-> +
-> +static enum trap_behaviour get_behaviour(struct kvm_vcpu *vcpu,
-> +					 const struct trap_bits *tb)
-> +{
-> +	enum trap_behaviour b = BEHAVE_HANDLE_LOCALLY;
-> +	u64 val;
-> +
-> +	val = __vcpu_sys_reg(vcpu, tb->index);
-> +	if ((val & tb->mask) == tb->value)
-> +		b |= tb->behaviour;
-> +
-> +	return b;
-> +}
-> +
-> +static enum trap_behaviour __do_compute_trap_behaviour(struct kvm_vcpu *vcpu,
-> +						       const enum trap_group id,
-> +						       enum trap_behaviour b)
-> +{
-> +	switch (id) {
-> +		const enum trap_group *cgids;
-> +
-> +	case __RESERVED__ ... __MULTIPLE_CONTROL_BITS__ - 1:
-> +		if (likely(id != __RESERVED__))
-> +			b |= get_behaviour(vcpu, &coarse_trap_bits[id]);
-> +		break;
-> +	case __MULTIPLE_CONTROL_BITS__ ... __COMPLEX_CONDITIONS__ - 1:
-> +		/* Yes, this is recursive. Don't do anything stupid. */
-> +		cgids = coarse_control_combo[id - __MULTIPLE_CONTROL_BITS__];
-> +		for (int i = 0; cgids[i] != __RESERVED__; i++)
-> +			b |= __do_compute_trap_behaviour(vcpu, cgids[i], b);
-> +		break;
-> +	default:
-> +		if (ARRAY_SIZE(ccc))
-> +			b |= ccc[id -  __COMPLEX_CONDITIONS__](vcpu);
-> +		break;
-> +	}
-> +
-> +	return b;
-> +}
-> +
-> +static enum trap_behaviour compute_trap_behaviour(struct kvm_vcpu *vcpu,
-> +						  const union trap_config tc)
-> +{
-> +	enum trap_behaviour b = BEHAVE_HANDLE_LOCALLY;
-> +
-> +	return __do_compute_trap_behaviour(vcpu, tc.cgt, b);
-> +}
-> +
-> +bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
-> +{
-> +	union trap_config tc;
-> +	enum trap_behaviour b;
-> +	bool is_read;
-> +	u32 sysreg;
-> +	u64 esr;
-> +
-> +	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
-> +		return false;
-> +
-> +	esr = kvm_vcpu_get_esr(vcpu);
-> +	sysreg = esr_sys64_to_sysreg(esr);
-> +	is_read = (esr & ESR_ELx_SYS64_ISS_DIR_MASK) == ESR_ELx_SYS64_ISS_DIR_READ;
-> +
-> +	tc = get_trap_config(sysreg);
-> +
-> +	/*
-> +	 * A value of 0 for the whole entry means that we know nothing
-> +	 * for this sysreg, and that it cannot be forwareded. In this
-forwarded
-> +	 * situation, let's cut it short.
-> +	 *
-> +	 * Note that ultimately, we could also make use of the xarray
-> +	 * to store the index of the sysreg in the local descriptor
-> +	 * array, avoiding another search... Hint, hint...
-> +	 */
-> +	if (!tc.val)
-> +		return false;
-> +
-> +	b = compute_trap_behaviour(vcpu, tc);
-> +
-> +	if (((b & BEHAVE_FORWARD_READ) && is_read) ||
-> +	    ((b & BEHAVE_FORWARD_WRITE) && !is_read))
-> +		goto inject;
-> +
-> +	return false;
-> +
-> +inject:
-> +	trace_kvm_forward_sysreg_trap(vcpu, sysreg, is_read);
-> +
-> +	kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-> +	return true;
-> +}
-> +
->  static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
->  {
->  	u64 mode = spsr & PSR_MODE_MASK;
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index f5baaa508926..dfd72b3a625f 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -3177,6 +3177,9 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
->  
->  	trace_kvm_handle_sys_reg(esr);
->  
-> +	if (__check_nv_sr_forward(vcpu))
-> +		return 1;
-> +
->  	params = esr_sys64_to_params(esr);
->  	params.regval = vcpu_get_reg(vcpu, Rt);
->  
-> @@ -3594,5 +3597,8 @@ int __init kvm_sys_reg_table_init(void)
->  	if (!first_idreg)
->  		return -EINVAL;
->  
-> +	if (kvm_get_mode() == KVM_MODE_NV)
-> +		populate_nv_trap_config();
-> +
->  	return 0;
->  }
-> diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
-> index 6ce5c025218d..8ad53104934d 100644
-> --- a/arch/arm64/kvm/trace_arm.h
-> +++ b/arch/arm64/kvm/trace_arm.h
-> @@ -364,6 +364,32 @@ TRACE_EVENT(kvm_inject_nested_exception,
->  		  __entry->hcr_el2)
->  );
->  
-> +TRACE_EVENT(kvm_forward_sysreg_trap,
-> +	    TP_PROTO(struct kvm_vcpu *vcpu, u32 sysreg, bool is_read),
-> +	    TP_ARGS(vcpu, sysreg, is_read),
-> +
-> +	    TP_STRUCT__entry(
-> +		__field(u64,	pc)
-> +		__field(u32,	sysreg)
-> +		__field(bool,	is_read)
-> +	    ),
-> +
-> +	    TP_fast_assign(
-> +		__entry->pc = *vcpu_pc(vcpu);
-> +		__entry->sysreg = sysreg;
-> +		__entry->is_read = is_read;
-> +	    ),
-> +
-> +	    TP_printk("%llx %c (%d,%d,%d,%d,%d)",
-> +		      __entry->pc,
-> +		      __entry->is_read ? 'R' : 'W',
-> +		      sys_reg_Op0(__entry->sysreg),
-> +		      sys_reg_Op1(__entry->sysreg),
-> +		      sys_reg_CRn(__entry->sysreg),
-> +		      sys_reg_CRm(__entry->sysreg),
-> +		      sys_reg_Op2(__entry->sysreg))
-> +);
-> +
->  #endif /* _TRACE_ARM_ARM64_KVM_H */
->  
->  #undef TRACE_INCLUDE_PATH
-Thanks
+Currently the ETM driver isn't exposed to guests, so it's not possible
+for the guest to start a session. That leaves only the host being able
+to trace the guest. If you think that shouldn't happen outside of debug
+mode then maybe we need another change to prevent that.
 
-Eric
+Another issue is that this only works with Feat_TRF, without that we'd
+have to do something else again to prevent protected guests from being
+traced, as currently there is nothing to stop it.
 
+I'm not sure about debug mode though? Is that a kernel config or some
+kvm option? I suppose this could be disabled for users by not loading
+the Coresight driver, but there's currently nothing a guest can do to
+stop its self from being traced.
+
+>>
+>> This is only needed for nVHE, otherwise it works automatically with
+> 
+> How about hVHE, which uses VHE at EL2 only? Doesn't it require the
+> same treatment?
+> 
+
+Yes it sounds like it would. Does it use the same code as nVHE in
+arch/arm64/kvm/hyp/nvhe? I think it might already work in that case, but
+I need to read a bit about hVHE.
+
+>> TRFCR_EL{1,2}. Unfortunately it can't be gated on CONFIG_CORESIGHT
+>> because Coresight can be built as a module. It can however be gated on
+>> CONFIG_PERF_EVENTS because that is required by Coresight.
+> 
+> Why does it need to be gated *at all*? We need this for the PMU
+> because of the way we call into the perf subsystem, but I don't see
+> anything like that here. In general, conditional compilation sucks,
+> and I'd like to avoid it as much as possible.
+> 
+
+No real reason really, I was probably trying to minimise the impact
+because it added a few bytes here and there, but it's tiny. If you're ok
+with it I can quite easily remove the conditional compilation and it
+should simplify it a bit.
+
+>>
+>> Signed-off-by: James Clark <james.clark@arm.com>
+>> ---
+>>  arch/arm64/include/asm/kvm_host.h | 10 ++++++-
+>>  arch/arm64/kvm/Makefile           |  1 +
+>>  arch/arm64/kvm/arm.c              |  1 +
+>>  arch/arm64/kvm/etm.c              | 48 +++++++++++++++++++++++++++++++
+>>  include/kvm/etm.h                 | 43 +++++++++++++++++++++++++++
+>>  5 files changed, 102 insertions(+), 1 deletion(-)
+>>  create mode 100644 arch/arm64/kvm/etm.c
+>>  create mode 100644 include/kvm/etm.h
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index d7b1403a3fb2..f33262217c84 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -35,6 +35,7 @@
+>>  #include <kvm/arm_vgic.h>
+>>  #include <kvm/arm_arch_timer.h>
+>>  #include <kvm/arm_pmu.h>
+>> +#include <kvm/etm.h>
+>>  
+>>  #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
+>>  
+>> @@ -500,7 +501,7 @@ struct kvm_vcpu_arch {
+>>  	u8 cflags;
+>>  
+>>  	/* Input flags to the hypervisor code, potentially cleared after use */
+>> -	u8 iflags;
+>> +	u16 iflags;
+> 
+> If you make the iflags bigger, what ripple effect does it have on the
+> alignment of the other data structures? Consider reordering things if
+> it helps filling holes.
+> 
+
+I think you might be right. Possibly flipping iflags and sflags will be
+enough but will have to check the exact alignment up to that point.
+
+>>  
+>>  	/* State flags for kernel bookkeeping, unused by the hypervisor code */
+>>  	u8 sflags;
+>> @@ -541,6 +542,9 @@ struct kvm_vcpu_arch {
+>>  		u64 pmscr_el1;
+>>  		/* Self-hosted trace */
+>>  		u64 trfcr_el1;
+>> +		/* exclude_guest settings for nVHE */
+>> +		struct kvm_etm_event etm_event;
+>> +
+> 
+> Spurious blank line. More importantly, how is that related to the
+> trfcr_el1 field just above?
+> 
+
+It's not really related, it's just the same place that the code that
+runs at a similar time and does a similar thing has its data stored.
+
+Something that you mentioned in another comment might be relevant here.
+If I do it only in terms of registers that are saved and restored then I
+don't need to save the etm event settings and the low level code doesn't
+need to know anything about it.
+
+>>  	} host_debug_state;
+>>  
+>>  	/* VGIC state */
+>> @@ -713,6 +717,8 @@ struct kvm_vcpu_arch {
+>>  #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
+>>  /* vcpu running in HYP context */
+>>  #define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
+>> +/* Save TRFCR and apply exclude_guest rules */
+>> +#define DEBUG_STATE_SAVE_TRFCR	__vcpu_single_flag(iflags, BIT(8))
+>>  
+>>  /* SVE enabled for host EL0 */
+>>  #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
+>> @@ -1096,6 +1102,8 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu);
+>>  void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
+>>  void kvm_clr_pmu_events(u32 clr);
+>>  bool kvm_set_pmuserenr(u64 val);
+>> +void kvm_set_etm_events(struct perf_event_attr *attr);
+>> +void kvm_clr_etm_events(void);
+>>  #else
+>>  static inline void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr) {}
+>>  static inline void kvm_clr_pmu_events(u32 clr) {}
+>> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+>> index c0c050e53157..0faff57423c4 100644
+>> --- a/arch/arm64/kvm/Makefile
+>> +++ b/arch/arm64/kvm/Makefile
+>> @@ -23,6 +23,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+>>  	 vgic/vgic-its.o vgic/vgic-debug.o
+>>  
+>>  kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
+>> +kvm-$(CONFIG_PERF_EVENTS) += etm.o
+>>
+>>  always-y := hyp_constants.h hyp-constants.s
+>>  
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index b1a9d47fb2f3..7bd5975328a3 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -952,6 +952,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>>  		kvm_vgic_flush_hwstate(vcpu);
+>>  
+>>  		kvm_pmu_update_vcpu_events(vcpu);
+>> +		kvm_etm_update_vcpu_events(vcpu);
+>>  
+>>  		/*
+>>  		 * Ensure we set mode to IN_GUEST_MODE after we disable
+>> diff --git a/arch/arm64/kvm/etm.c b/arch/arm64/kvm/etm.c
+>> new file mode 100644
+>> index 000000000000..359c37745de2
+>> --- /dev/null
+>> +++ b/arch/arm64/kvm/etm.c
+>> @@ -0,0 +1,48 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +
+>> +#include <linux/kvm_host.h>
+>> +
+>> +#include <kvm/etm.h>
+>> +
+>> +static DEFINE_PER_CPU(struct kvm_etm_event, kvm_etm_events);
+>> +
+>> +struct kvm_etm_event *kvm_get_etm_event(void)
+>> +{
+>> +	return this_cpu_ptr(&kvm_etm_events);
+>> +}
+>> +
+>> +void kvm_etm_set_events(struct perf_event_attr *attr)
+>> +{
+>> +	struct kvm_etm_event *etm_event;
+>> +
+>> +	/*
+>> +	 * Exclude guest option only requires extra work with nVHE.
+>> +	 * Otherwise it works automatically with TRFCR_EL{1,2}
+>> +	 */
+>> +	if (has_vhe())
+>> +		return;
+>> +
+>> +	etm_event = kvm_get_etm_event();
+>> +
+>> +	etm_event->exclude_guest = attr->exclude_guest;
+>> +	etm_event->exclude_host = attr->exclude_host;
+>> +	etm_event->exclude_kernel = attr->exclude_kernel;
+>> +	etm_event->exclude_user = attr->exclude_user;
+>> +}
+>> +EXPORT_SYMBOL_GPL(kvm_etm_set_events);
+>> +
+>> +void kvm_etm_clr_events(void)
+>> +{
+>> +	struct kvm_etm_event *etm_event;
+>> +
+>> +	if (has_vhe())
+>> +		return;
+>> +
+>> +	etm_event = kvm_get_etm_event();
+>> +
+>> +	etm_event->exclude_guest = false;
+>> +	etm_event->exclude_host = false;
+>> +	etm_event->exclude_kernel = false;
+>> +	etm_event->exclude_user = false;
+>> +}
+>> +EXPORT_SYMBOL_GPL(kvm_etm_clr_events);
+> 
+> Does it really need its own compilation unit if we were to build it at
+> all times?
+> 
+
+I can probably throw it in arch/arm64/kvm/debug.c. I think I did that
+originally but it had the conditional stuff around it so I made the new
+file instead.
+
+But yeah if I remove the conditional stuff it's probably cleaner to put
+somewhere else.
+
+>> diff --git a/include/kvm/etm.h b/include/kvm/etm.h
+>> new file mode 100644
+>> index 000000000000..95c4809fa2b0
+>> --- /dev/null
+>> +++ b/include/kvm/etm.h
+>> @@ -0,0 +1,43 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>> +
+>> +#ifndef __KVM_DEBUG_H
+>> +#define __KVM_DEBUG_H
+>> +
+>> +struct perf_event_attr;
+>> +struct kvm_vcpu;
+>> +
+>> +#if IS_ENABLED(CONFIG_KVM) && IS_ENABLED(CONFIG_PERF_EVENTS)
+>> +
+>> +struct kvm_etm_event {
+>> +	bool exclude_host;
+>> +	bool exclude_guest;
+>> +	bool exclude_kernel;
+>> +	bool exclude_user;
+>> +};
+>> +
+>> +struct kvm_etm_event *kvm_get_etm_event(void);
+>> +void kvm_etm_clr_events(void);
+>> +void kvm_etm_set_events(struct perf_event_attr *attr);
+>> +
+>> +/*
+>> + * Updates the vcpu's view of the etm events for this cpu. Must be
+>> + * called before every vcpu run after disabling interrupts, to ensure
+>> + * that an interrupt cannot fire and update the structure.
+>> + */
+>> +#define kvm_etm_update_vcpu_events(vcpu)						\
+>> +	do {										\
+>> +		if (!has_vhe() && vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRFCR))		\
+>> +			vcpu->arch.host_debug_state.etm_event = *kvm_get_etm_event();	\
+>> +	} while (0)
+>> +
+> 
+> Why is it a macro and not a function, which would avoid exposing
+> kvm_get_etm_event?
+> 
+
+I think I saw that kvm_pmu_update_vcpu_events() was done that way, and I
+couldn't inline it without some circular header issue so I made it a macro.
+
+But yes a non inlined function works fine and then kvm_get_etm_event can
+be hidden so I'll do that.
+
+> Thanks,
+> 
+> 	M.
+> 
+
+Thanks for the review.
+
+James
