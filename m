@@ -1,159 +1,157 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53573612D
-	for <kvmarm@lists.linux.dev>; Wed,  9 Aug 2023 14:21:02 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8D5DFD75;
-	Wed,  9 Aug 2023 07:21:44 -0700 (PDT)
-Received: from [10.57.1.30] (unknown [10.57.1.30])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E15FB3F59C;
-	Wed,  9 Aug 2023 07:20:59 -0700 (PDT)
-Message-ID: <f80b7a56-8d7d-f960-307b-98fa89f97695@arm.com>
-Date: Wed, 9 Aug 2023 15:20:58 +0100
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B32612D
+	for <kvmarm@lists.linux.dev>; Wed,  9 Aug 2023 14:24:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEDFEC433CA;
+	Wed,  9 Aug 2023 14:24:16 +0000 (UTC)
+Date: Wed, 9 Aug 2023 15:24:14 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v4 03/36] arm64/gcs: Document the ABI for Guarded Control
+ Stacks
+Message-ID: <ZNOhjrYleGBR6Pbs@arm.com>
+References: <20230807-arm64-gcs-v4-0-68cfa37f9069@kernel.org>
+ <20230807-arm64-gcs-v4-3-68cfa37f9069@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [RFC PATCH 2/3] arm64: KVM: Support exclude_guest for Coresight
- trace in nVHE
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>
-Cc: coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mike Leach <mike.leach@linaro.org>, Leo Yan <leo.yan@linaro.org>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>, Rob Herring
- <robh@kernel.org>, linux-kernel@vger.kernel.org
-References: <20230804101317.460697-1-james.clark@arm.com>
- <20230804101317.460697-3-james.clark@arm.com> <871qgdre18.wl-maz@kernel.org>
-From: James Clark <james.clark@arm.com>
-In-Reply-To: <871qgdre18.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230807-arm64-gcs-v4-3-68cfa37f9069@kernel.org>
+
+On Mon, Aug 07, 2023 at 11:00:08PM +0100, Mark Brown wrote:
+> +2.  Enabling and disabling Guarded Control Stacks
+> +-------------------------------------------------
+> +
+> +* GCS is enabled and disabled for a thread via the PR_SET_SHADOW_STACK_STATUS
+> +  prctl(), this takes a single flags argument specifying which GCS features
+> +  should be used.
+> +
+> +* When set PR_SHADOW_STACK_ENABLE flag allocates a Guarded Control Stack for
+
+The 'for' at the end of the line above is not needed.
+
+> +  and enables GCS for the thread, enabling the functionality controlled by
+> +  GCSPRE0_EL1.{nTR, RVCHKEN, PCRSEL}.
+
+This should be GCSCRE0_EL1.
+
+> +* When set the PR_SHADOW_STACK_PUSH flag enables the functionality controlled
+> +  by GCSCRE0_EL1.PUSHMEn, allowing explicit GCS pushes.
+> +
+> +* When set the PR_SHADOW_STACK_WRITE flag enables the functionality controlled
+> +  by GCSCRE0_EL1.STREn, allowing explicit stores to the Guarded Control Stack.
+> +
+> +* Any unknown flags will cause PR_SET_SHADOW_STACK_STATUS to return -EINVAL.
+> +
+> +* PR_LOCK_SHADOW_STACK_STATUS is passed a bitmask of features with the same
+> +  values as used for PR_SET_SHADOW_STACK_STATUS.  Any future changes to the
+> +  status of the specified GCS mode bits will be rejected.
+> +
+> +* PR_LOCK_SHADOW_STACK_STATUS allows any bit to be locked, this allows
+> +  userspace to prevent changes to any future features.
+
+I presume a new lock prctl() won't allow unlocking but can only extend
+the lock. I haven't looked at the patches yet but it may be worth
+spelling this out.
+
+> +* PR_SET_SHADOW_STACK_STATUS and PR_LOCK_SHADOW_STACK_STATUS affect only the
+> +  thread the called them, any other running threads will be unaffected.
+
+s/the called/that called/
+
+> +* New threads inherit the GCS configuration of the thread that created them.
+> +
+> +* GCS is disabled on exec().
+> +
+> +* The current GCS configuration for a thread may be read with the
+> +  PR_GET_SHADOW_STACK_STATUS prctl(), this returns the same flags that
+> +  are passed to PR_SET_SHADOW_STACK_STATUS.
+> +
+> +* If GCS is disabled for a thread after having previously been enabled then
+> +  the stack will remain allocated for the lifetime of the thread.
+
+Sorry if this has been discussed in other threads. What is the issue
+with unmapping/freeing of the shadow stack?
+
+> At present
+> +  any attempt to reenable GCS for the thread will be rejected, this may be
+> +  revisited in future.
+
+What's the rationale here? Is it that function returns won't work?
+
+> +3.  Allocation of Guarded Control Stacks
+> +----------------------------------------
+> +
+> +* When GCS is enabled for a thread a new Guarded Control Stack will be
+> +  allocated for it of size RLIMIT_STACK / 2 or 2 gigabytes, whichever is
+> +  smaller.
+
+Is this number based on the fact that a function call would only push
+the LR to GCS while standard function prologue pushes at least two
+registers?
+
+> +* When GCS is disabled for a thread the Guarded Control Stack initially
+> +  allocated for that thread will be freed.  Note carefully that if the
+> +  stack has been switched this may not be the stack currently in use by
+> +  the thread.
+
+Does this not contradict an earlier statement that the GCS is not freed
+for a thread when disabled?
+
+> +4.  Signal handling
+> +--------------------
+> +
+> +* A new signal frame record gcs_context encodes the current GCS mode and
+> +  pointer for the interrupted context on signal delivery.  This will always
+> +  be present on systems that support GCS.
+> +
+> +* The record contains a flag field which reports the current GCS configuration
+> +  for the interrupted context as PR_GET_SHADOW_STACK_STATUS would.
+> +
+> +* The signal handler is run with the same GCS configuration as the interrupted
+> +  context.
+> +
+> +* When GCS is enabled for the interrupted thread a signal handling specific
+> +  GCS cap token will be written to the GCS, this is an architectural GCS cap
+> +  token with bit 63 set.  The GCSPR_EL0 reported in the signal frame will
+> +  point to this cap token.
+
+I lost track of the GCS spec versions. Has the valid cap token format
+been updated? What I have in my spec (though most likely old) is:
+
+  An entry in the Guarded control stack is defined as a Valid cap entry,
+  if bits [63:12] of the value are same as bits [63:12] of the address
+  where the entry is stored and bits [11:0] contain a Valid cap token.
 
 
+The other bits in the code look fine to me so far but I haven't looked
+at the code yet.
 
-On 08/08/2023 12:04, Marc Zyngier wrote:
-> On Fri, 04 Aug 2023 11:13:12 +0100,
-> James Clark <james.clark@arm.com> wrote:
->>
->> Currently trace will always be generated in nVHE as long as TRBE isn't
->> being used. To allow filtering out guest trace, re-apply the filter
->> rules before switching to the guest.
->>
->> The TRFCR restore function remains the same.
->>
->> Signed-off-by: James Clark <james.clark@arm.com>
->> ---
->>  arch/arm64/kvm/debug.c             |  7 ++++
->>  arch/arm64/kvm/hyp/nvhe/debug-sr.c | 56 +++++++++++++++++++++++++++---
->>  2 files changed, 59 insertions(+), 4 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
->> index 8725291cb00a..ebb4db20a859 100644
->> --- a/arch/arm64/kvm/debug.c
->> +++ b/arch/arm64/kvm/debug.c
->> @@ -335,10 +335,17 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
->>  	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
->>  	    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
->>  		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
->> +	/*
->> +	 * Save TRFCR on nVHE if FEAT_TRF exists. This will be done in cases
->> +	 * where DEBUG_STATE_SAVE_TRBE doesn't completely disable trace.
->> +	 */
->> +	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceFilt_SHIFT))
->> +		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
->>  }
->>  
->>  void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
->>  {
->>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
->>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
->> +	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
->>  }
->> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
->> index 4558c02eb352..0e8c85b29b92 100644
->> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
->> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
->> @@ -51,13 +51,17 @@ static void __debug_restore_spe(u64 pmscr_el1)
->>  	write_sysreg_s(pmscr_el1, SYS_PMSCR_EL1);
->>  }
->>  
->> -static void __debug_save_trace(u64 *trfcr_el1)
->> +/*
->> + * Save TRFCR and disable trace completely if TRBE is being used. Return true
->> + * if trace was disabled.
->> + */
->> +static bool __debug_save_trace(u64 *trfcr_el1)
->>  {
->>  	*trfcr_el1 = 0;
->>  
->>  	/* Check if the TRBE is enabled */
->>  	if (!(read_sysreg_s(SYS_TRBLIMITR_EL1) & TRBLIMITR_EL1_E))
->> -		return;
->> +		return false;
-> 
-> While you're refactoring this code, please move the zeroing of
-> *trfcr_el1 under the if statement.
-> 
->>  	/*
->>  	 * Prohibit trace generation while we are in guest.
->>  	 * Since access to TRFCR_EL1 is trapped, the guest can't
->> @@ -68,6 +72,8 @@ static void __debug_save_trace(u64 *trfcr_el1)
->>  	isb();
->>  	/* Drain the trace buffer to memory */
->>  	tsb_csync();
->> +
->> +	return true;
->>  }
->>  
->>  static void __debug_restore_trace(u64 trfcr_el1)
->> @@ -79,14 +85,55 @@ static void __debug_restore_trace(u64 trfcr_el1)
->>  	write_sysreg_s(trfcr_el1, SYS_TRFCR_EL1);
->>  }
->>  
->> +#if IS_ENABLED(CONFIG_PERF_EVENTS)
-> 
-> As previously stated, just always compile this. There shouldn't be
-> anything here that's so large that it becomes a candidate for
-> exclusion. Hell, even the whole of NV+pKVM are permanent features,
-> even of most people won't use *any* of that.
-> 
->> +static inline void __debug_save_trfcr(struct kvm_vcpu *vcpu)
->> +{
->> +	u64 trfcr;
->> +	struct kvm_etm_event etm_event = vcpu->arch.host_debug_state.etm_event;
->> +
->> +	/* No change if neither are excluded */
->> +	if (!etm_event.exclude_guest && !etm_event.exclude_host) {
->> +		/* Zeroing prevents restoring a stale value */
->> +		vcpu->arch.host_debug_state.trfcr_el1 = 0;
-> 
-> I find this "zero means do nothing" part very odd. I can see it is
-> already done, but I really dislike this sort of assumption to avoid
-> writing to a register.
-> 
-> I'd really prefer we track another version of TRFCR_EL1, compare host
-> and guest, and decide to avoid writing if they are equal. At least, it
-> would be readable.
-> 
-> And in the end, expressing *everything* in terms of the register would
-> really help, instead of the exclude_* stuff that has no place in the
-> low-level arch code.
-> 
-
-Yep, I agree with all of the above, I can make these changes for the
-next version. I just want to clarify your point about disabling trace
-for protected guests when not in debug mode that I asked about in the
-review on patch 1.
-
-> Thanks,
-> 
-> 	M.
-> 
+-- 
+Catalin
