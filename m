@@ -1,118 +1,195 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55317612D;
-	Wed,  9 Aug 2023 15:30:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 753E4C433C8;
-	Wed,  9 Aug 2023 15:30:23 +0000 (UTC)
-Date: Wed, 9 Aug 2023 11:30:21 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Marco Elver <elver@google.com>
-Cc: Kees Cook <keescook@chromium.org>, Andrew Morton
- <akpm@linux-foundation.org>, Guenter Roeck <linux@roeck-us.net>, Peter
- Zijlstra <peterz@infradead.org>, Mark Rutland <mark.rutland@arm.com>, Marc
- Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, James
- Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Nathan Chancellor
- <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Tom Rix
- <trix@redhat.com>, Miguel Ojeda <ojeda@kernel.org>, Sami Tolvanen
- <samitolvanen@google.com>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
- Dmitry Vyukov <dvyukov@google.com>, Alexander Potapenko
- <glider@google.com>, kasan-dev@googlegroups.com,
- linux-toolchains@vger.kernel.org
-Subject: Re: [PATCH v3 3/3] list_debug: Introduce CONFIG_DEBUG_LIST_MINIMAL
-Message-ID: <20230809113021.63e5ef66@gandalf.local.home>
-In-Reply-To: <ZNNi/4L1mD8XPNix@elver.google.com>
-References: <20230808102049.465864-1-elver@google.com>
-	<20230808102049.465864-3-elver@google.com>
-	<202308081424.1DC7AA4AE3@keescook>
-	<CANpmjNM3rc8ih7wvFc2GLuMDLpWcdA8uWfut-5tOajqtVG952A@mail.gmail.com>
-	<ZNNi/4L1mD8XPNix@elver.google.com>
-X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4DD919BB4
+	for <kvmarm@lists.linux.dev>; Wed,  9 Aug 2023 15:34:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CAB4C433B8;
+	Wed,  9 Aug 2023 15:34:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691595287;
+	bh=dKpu3DrXlm0fcz/rfbAZnwwY50NvEJw3wKrHilJuxpw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=F+F3tEWJa1ouT3AAeoGwCGDIPVHr8mvewuF9Wv6D3my1b3McT3/boQUwB/4TbUk0B
+	 kNoEtkqrlkQGWOLC+eAHPeWdquspwCEu1jOP2DLJPyKtjBxqre7G5Gt6s4ZyA+8FUj
+	 ksjRNloIJXzwHov4xxKk0bR+odlEBkyc9WWw+8Q7LwINdLKAlMo8eHt7sgp2mo0zSP
+	 6yf4N/N5mQgfkKZNTyeTdpVV8jY50VyORSbm56bg69m/U7esSLYFGhLNopS1fXoXH6
+	 pZPiq1xcaVBJo5pvOVIcoNTdFhmai7aajMmEDmFbfAJtYhs4C5iTw2HYO9neLymlEh
+	 iUgc170PfSA4g==
+Date: Wed, 9 Aug 2023 16:34:38 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v4 03/36] arm64/gcs: Document the ABI for Guarded Control
+ Stacks
+Message-ID: <f4cec4b3-c386-4873-aa1d-90528e062f2a@sirena.org.uk>
+References: <20230807-arm64-gcs-v4-0-68cfa37f9069@kernel.org>
+ <20230807-arm64-gcs-v4-3-68cfa37f9069@kernel.org>
+ <ZNOhjrYleGBR6Pbs@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="k90euu3QCpA7JsXx"
+Content-Disposition: inline
+In-Reply-To: <ZNOhjrYleGBR6Pbs@arm.com>
+X-Cookie: Necessity is a mother.
 
-On Wed, 9 Aug 2023 11:57:19 +0200
-Marco Elver <elver@google.com> wrote:
 
->  static __always_inline bool __list_add_valid(struct list_head *new,
->  					     struct list_head *prev,
->  					     struct list_head *next)
->  {
-> -	return __list_add_valid_or_report(new, prev, next);
-> +	bool ret = true;
-> +
-> +	if (IS_ENABLED(CONFIG_HARDEN_LIST)) {
-> +		/*
-> +		 * With the hardening version, elide checking if next and prev
-> +		 * are NULL, since the immediate dereference of them below would
-> +		 * result in a fault if NULL.
-> +		 *
-> +		 * With the reduced set of checks, we can afford to inline the
-> +		 * checks, which also gives the compiler a chance to elide some
-> +		 * of them completely if they can be proven at compile-time. If
-> +		 * one of the pre-conditions does not hold, the slow-path will
-> +		 * show a report which pre-condition failed.
-> +		 */
-> +		if (likely(next->prev == prev && prev->next == next && new != prev && new != next))
-> +			return true;
-> +		ret = false;
-> +	}
-> +
-> +	ret &= __list_add_valid_or_report(new, prev, next);
-> +	return ret;
->  }
+--k90euu3QCpA7JsXx
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I would actually prefer DEBUG_LIST to select HARDEN_LIST and not the other
-way around. It logically doesn't make sense that HARDEN_LIST would select
-DEBUG_LIST. That is, I could by default want HARDEN_LIST always on, but not
-DEBUG_LIST (because who knows, it may add other features I don't want). But
-then, I may have stumbled over something and want more info, and enable
-DEBUG_LIST (while still having HARDEN_LIST) enabled.
+On Wed, Aug 09, 2023 at 03:24:14PM +0100, Catalin Marinas wrote:
+> On Mon, Aug 07, 2023 at 11:00:08PM +0100, Mark Brown wrote:
 
-I think you are looking at this from an implementation perspective and not
-the normal developer one.
+> > +* When set PR_SHADOW_STACK_ENABLE flag allocates a Guarded Control Sta=
+ck for
+>=20
+> The 'for' at the end of the line above is not needed.
+>=20
+> > +  and enables GCS for the thread, enabling the functionality controlle=
+d by
 
-This would mean the above function should get enabled by CONFIG_HARDEN_LIST
-(and CONFIG_DEBUG would select CONFIG_HARDEN) and would look more like:
+I find it a little clearer that it's a per thread stack here but sure.
 
-static __always_inline bool __list_add_valid(struct list_head *new,
-					     struct list_head *prev,
-					     struct list_head *next)
-{
-	bool ret = true;
+> > +* PR_LOCK_SHADOW_STACK_STATUS allows any bit to be locked, this allows
+> > +  userspace to prevent changes to any future features.
 
-	if (!IS_ENABLED(CONFIG_DEBUG_LIST)) {
-		/*
-		 * With the hardening version, elide checking if next and prev
-		 * are NULL, since the immediate dereference of them below would
-		 * result in a fault if NULL.
-		 *
-		 * With the reduced set of checks, we can afford to inline the
-		 * checks, which also gives the compiler a chance to elide some
-		 * of them completely if they can be proven at compile-time. If
-		 * one of the pre-conditions does not hold, the slow-path will
-		 * show a report which pre-condition failed.
-		 */
-		if (likely(next->prev == prev && prev->next == next && new != prev && new != next))
-			return true;
-		ret = false;
-	}
+> I presume a new lock prctl() won't allow unlocking but can only extend
+> the lock. I haven't looked at the patches yet but it may be worth
+> spelling this out.
 
-	ret &= __list_add_valid_or_report(new, prev, next);
-	return ret;
-}
+Yes, there is no unlock prctl() - the lock prctl() just lets you set
+locks.
 
-That is, if DEBUG_LIST is enabled, we always call the
-__list_add_valid_or_report(), but if only HARDEN_LIST is enabled, then we
-do the shortcut.
+> > +* If GCS is disabled for a thread after having previously been enabled=
+ then
+> > +  the stack will remain allocated for the lifetime of the thread.
 
--- Steve
+> Sorry if this has been discussed in other threads. What is the issue
+> with unmapping/freeing of the shadow stack?
+
+If something was in the middle of looking the GCS (eg, you're trying to
+disable GCS during signal handling that preempted something that is
+logging the call stack) and you pull the GCS storage from underneath it
+then things will go badly.
+
+> > At present
+> > +  any attempt to reenable GCS for the thread will be rejected, this ma=
+y be
+> > +  revisited in future.
+
+> What's the rationale here? Is it that function returns won't work?
+
+We have to work out where to point GCSPR_EL0 when reenabling - at the
+top of the old stack, where it was before, on a new stack?  It was
+easier to just not support reenabling than to work out what the sensible
+answer is when it's not clear that any real use case exists to inform
+what makes sense.  We can add support for that later (you can probe by
+starting a thread, disabling and trying to reenable) if someone does
+come up with a use case.
+
+The use case for disabling is a non-enforcing mode which logs GCS faults
+and then disables GCS.
+
+> > +3.  Allocation of Guarded Control Stacks
+> > +----------------------------------------
+
+> > +* When GCS is enabled for a thread a new Guarded Control Stack will be
+> > +  allocated for it of size RLIMIT_STACK / 2 or 2 gigabytes, whichever =
+is
+> > +  smaller.
+
+> Is this number based on the fact that a function call would only push
+> the LR to GCS while standard function prologue pushes at least two
+> registers?
+
+It's actually based on bitrot that I'd initially chosen a smaller value
+since it's likely that functions will push at least something as you
+suggest, the patches now just use RLIMIT_STACK.  I'll fix.
+
+> > +* When GCS is disabled for a thread the Guarded Control Stack initially
+> > +  allocated for that thread will be freed.  Note carefully that if the
+> > +  stack has been switched this may not be the stack currently in use by
+> > +  the thread.
+
+> Does this not contradict an earlier statement that the GCS is not freed
+> for a thread when disabled?
+
+Yes, it was meant to say when the thread is freed rather than when GCS
+is disabled.
+
+> > +* When GCS is enabled for the interrupted thread a signal handling spe=
+cific
+> > +  GCS cap token will be written to the GCS, this is an architectural G=
+CS cap
+> > +  token with bit 63 set.  The GCSPR_EL0 reported in the signal frame w=
+ill
+> > +  point to this cap token.
+
+> I lost track of the GCS spec versions. Has the valid cap token format
+> been updated? What I have in my spec (though most likely old) is:
+
+>   An entry in the Guarded control stack is defined as a Valid cap entry,
+>   if bits [63:12] of the value are same as bits [63:12] of the address
+>   where the entry is stored and bits [11:0] contain a Valid cap token.
+
+You have a draft version of the spec, this was changed and now there is
+now a token field reserved in the low 12 bits of the register:
+
+#define GCS_CAP_ADDR_MASK		GENMASK(63, 12)
+#define GCS_CAP_ADDR_SHIFT		12
+#define GCS_CAP_ADDR_WIDTH		52
+#define GCS_CAP_ADDR(x)			FIELD_GET(GCS_CAP_ADDR_MASK, x)
+
+#define GCS_CAP_TOKEN_MASK		GENMASK(11, 0)
+#define GCS_CAP_TOKEN_SHIFT		0
+#define GCS_CAP_TOKEN_WIDTH		12
+#define GCS_CAP_TOKEN(x)		FIELD_GET(GCS_CAP_TOKEN_MASK, x)
+
+#define GCS_CAP_VALID_TOKEN		0x1
+#define GCS_CAP_IN_PROGRESS_TOKEN	0x5
+
+#define GCS_CAP(x)	((((unsigned long)x) & GCS_CAP_ADDR_MASK) | \
+					       GCS_CAP_VALID_TOKEN)
+
+--k90euu3QCpA7JsXx
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmTTsg0ACgkQJNaLcl1U
+h9AEfQf+Ka4G6z9Nm1kf+b/l5pKI+rrhbAQGaG8LsctIW9PfOqcL34gYTSwCEcFC
+yc7FLvXwOykuy/dMOwhEPvohyCsS/fvouc1WLRs/T1Ur11kjMYjJaMnrLIafdJRC
+AH7esh4KGfFfzcq6O2WaLjk/wSLVMF7ZemDSQJwb1zC8tACwL/ycJNx3xi/LgCjn
+uegBSqenG7Ehp7OuPFBeZmfL1yMQ5g5GGrF3ga5swfXgxDmne+0X0pXCqoqyQURH
+B/4075gZXjwuMcraFsVPFQEdlk4nZNl4BEEdV9IGHXKIBWe1qKOTIFc14Jvt3U5/
+AhfIuxGumWGmrTlP/ZBjaZUJaMuFlA==
+=LF8s
+-----END PGP SIGNATURE-----
+
+--k90euu3QCpA7JsXx--
