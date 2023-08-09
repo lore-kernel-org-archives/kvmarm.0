@@ -1,411 +1,127 @@
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C311E521
-	for <kvmarm@lists.linux.dev>; Wed,  9 Aug 2023 16:32:45 +0000 (UTC)
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-31781e15a0cso49045f8f.3
-        for <kvmarm@lists.linux.dev>; Wed, 09 Aug 2023 09:32:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E827018C0B
+	for <kvmarm@lists.linux.dev>; Wed,  9 Aug 2023 16:39:02 +0000 (UTC)
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-407db3e9669so311631cf.1
+        for <kvmarm@lists.linux.dev>; Wed, 09 Aug 2023 09:39:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691598763; x=1692203563;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=google.com; s=20221208; t=1691599141; x=1692203941;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fUKdVS5/N5qQkJwAZJURTrzizTk+EoulthkFub9h71Q=;
-        b=LbvtTy/FLD0wzImORvHKE16saLu0nwLV93T+6LbYf8pYhsLhS5zapolbw8ClDY4ku0
-         FAGVzYJzteO97NgGOnBEEPDlI4o/J0VY5PvCMCvJKa3qSoUVEqUyO+7Q86tk3pQerMtk
-         JYLxe3o3CIAUkcm/XPb5fAit9O3p/gAVNqqJ83JYfxg1p+5abXG9yl53yQlkafUu2qiR
-         sCg5G24XshN+TJCHRtJvtOomCKnERp03MBMIma5jqNawRjea5gGz+6SPtv5yFWqOvaHJ
-         z3DutLswTotTQXmdM5xOUh+6FaQie+rGM8K3wHUcNgwnmr1bhUXGT6BjG5wCwjj28VUp
-         0cBQ==
+        bh=rAabttuUSlISLQ9kur95AJErnuBmKPlF1t5IPI4xLW8=;
+        b=QK/Md6pLtQcnNYaG7FaNR8YGO5V1BDDGTN1QNcb5t4M8hyK/g2UzsOCkQFbfYrRiBB
+         G0kclZmDhOUC4jPYSDgzil3jq7z68Wq4Y/XsBYF1MGe9Iir+sC7RphbJoMfImBbhq2T/
+         pEhwFheHJqKkE6YRXMAxkXUnF8lSNA2TqIGy9iPTw7Y7ze+v2ZO6wVbfvsq9lZ13AZGe
+         qcvfeTRsEBx541O+obhMMtIFxCFLknFX2bE3VoAPa0QB2Ao3Loe9vbjMaWTez52X0ZNb
+         c1pWu8dZp76+bEISHoUz6Gcb1Dks1IYF1WyX0qZyE1sqGI1eUsOyDxlWzYy0GZ7RrbKU
+         pVQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691598763; x=1692203563;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1691599141; x=1692203941;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fUKdVS5/N5qQkJwAZJURTrzizTk+EoulthkFub9h71Q=;
-        b=KPFuXu25ffZkjGdOfYiR9X4z2aBWVqPtvcGu/JqNxSFpkP5/ZiNKz2sAq5YhcJ6uqT
-         pZVEVBULiIfl0w/JrZqdzB2nUrhFfcFxks2GxkK4/MEqRfLg/BxcC2TJrgzefSqPNYaM
-         kUnAGPRnLTWYZp6Yg9Aln1SzwyYXs2D7OJV98ZqIEfWDwjQQDflW3W2fvNyIaTvUlcMx
-         Rco+EPOXttJtZGfjcAZ38h+6R2tcNeAO1xnCA2hOkeApiBAgWd6j6KQL2sYaWFA0g9Vl
-         a2uKWUqdgPLpZezdQtF011TvHPILQj5Jbb9M78ftoKg5dYD4kQk80oA4CmzjiCvEVqEG
-         yF7A==
-X-Gm-Message-State: AOJu0YwSZmB9pdHPQDPf91bJLJQDCMmfUPEAhnc9rCnpdDZezFcy0T/j
-	i6QP1zjtJtGjeFEXY3cqzN7ciQ==
-X-Google-Smtp-Source: AGHT+IGdswAaush01nujfKLZz/6i7q9b1IdjA+301m8PBrxWscy8pmA9yLp4Rst9KIrsmBjxos6XvA==
-X-Received: by 2002:adf:ea4d:0:b0:317:9537:d73f with SMTP id j13-20020adfea4d000000b003179537d73fmr2324254wrn.30.1691598763235;
-        Wed, 09 Aug 2023 09:32:43 -0700 (PDT)
-Received: from elver.google.com ([2a00:79e0:9c:201:9ce0:327a:6e5a:3533])
-        by smtp.gmail.com with ESMTPSA id d10-20020adffd8a000000b003143ba62cf4sm17138365wrr.86.2023.08.09.09.32.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Aug 2023 09:32:42 -0700 (PDT)
-Date: Wed, 9 Aug 2023 18:32:37 +0200
-From: Marco Elver <elver@google.com>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Kees Cook <keescook@chromium.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Tom Rix <trix@redhat.com>, Miguel Ojeda <ojeda@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com,
-	linux-toolchains@vger.kernel.org
-Subject: Re: [PATCH v3 3/3] list_debug: Introduce CONFIG_DEBUG_LIST_MINIMAL
-Message-ID: <ZNO/pf/pH5jJAZI0@elver.google.com>
-References: <20230808102049.465864-1-elver@google.com>
- <20230808102049.465864-3-elver@google.com>
- <202308081424.1DC7AA4AE3@keescook>
- <CANpmjNM3rc8ih7wvFc2GLuMDLpWcdA8uWfut-5tOajqtVG952A@mail.gmail.com>
- <ZNNi/4L1mD8XPNix@elver.google.com>
- <20230809113021.63e5ef66@gandalf.local.home>
+        bh=rAabttuUSlISLQ9kur95AJErnuBmKPlF1t5IPI4xLW8=;
+        b=EthPLYtZqXunVRD8vRncXtntheD3v/7vsIpJc/WHw6qwxtloosAFjXqR2IgKcHO0tG
+         M80DdaDt+7WoetG4oz6G7BJl9g27hsCQenEhexVrp+PlHDlLO6w37itdIC2kLGAgLsfv
+         JphYxhOtT3+KTmyZn7CL1KW2ZweAkWhMMHCNAYxS0JWs+61V/wePMu/5WqiF3Qq6QQxa
+         BCwyOFgQACyRUJMabMCiWxDVVlLSPheZL5lWSGtSBLhBrn09Up0hAP5t6HwOTJRUIaCK
+         gFAJfV1JX6uj1oY0r2h53pn2aAcFMY3KFcME5B2BoQaOFCeSMrKWbBEyAUK4xEW7HHi7
+         KnHg==
+X-Gm-Message-State: AOJu0Yx0gW3oSS9dpc3J5frbKGJ9o/nWsnG4tGtNSv9oBWdXqTkmzz0Y
+	J2uNLBHPhM84amHH/t7WsAGfikKIVCBFukK/q9RCQA==
+X-Google-Smtp-Source: AGHT+IFIKXrr2ilFq3pewZHyAMJbe1zJNw2R6kC9Ag8lwIUUWtSfseAhG7bbTMLUN+5Rf6sXibPKOvlrXvIKI8OeOqU=
+X-Received: by 2002:a05:622a:206:b0:3ef:302c:319e with SMTP id
+ b6-20020a05622a020600b003ef302c319emr161886qtx.8.1691599141628; Wed, 09 Aug
+ 2023 09:39:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230809113021.63e5ef66@gandalf.local.home>
-User-Agent: Mutt/2.2.9 (2022-11-12)
+References: <20230808231330.3855936-1-rananta@google.com> <20230808231330.3855936-3-rananta@google.com>
+ <c33b0518-6e64-7acf-efa8-f404fce1ccac@redhat.com>
+In-Reply-To: <c33b0518-6e64-7acf-efa8-f404fce1ccac@redhat.com>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Wed, 9 Aug 2023 09:38:49 -0700
+Message-ID: <CAJHc60yCJANBQOizaoSPhEJH9e8a9C6n68x4qdVkOhVZiiWqkw@mail.gmail.com>
+Subject: Re: [PATCH v8 02/14] KVM: Declare kvm_arch_flush_remote_tlbs() globally
+To: Gavin Shan <gshan@redhat.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Huacai Chen <chenhuacai@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Jing Zhang <jingzhangos@google.com>, Reiji Watanabe <reijiw@google.com>, 
+	Colton Lewis <coltonlewis@google.com>, David Matlack <dmatlack@google.com>, 
+	Fuad Tabba <tabba@google.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 09, 2023 at 11:30AM -0400, Steven Rostedt wrote:
-[...]
-> 
-> I would actually prefer DEBUG_LIST to select HARDEN_LIST and not the other
-> way around. It logically doesn't make sense that HARDEN_LIST would select
-> DEBUG_LIST. That is, I could by default want HARDEN_LIST always on, but not
-> DEBUG_LIST (because who knows, it may add other features I don't want). But
-> then, I may have stumbled over something and want more info, and enable
-> DEBUG_LIST (while still having HARDEN_LIST) enabled.
-> 
-> I think you are looking at this from an implementation perspective and not
-> the normal developer one.
-> 
-[...]
-> 
-> That is, if DEBUG_LIST is enabled, we always call the
-> __list_add_valid_or_report(), but if only HARDEN_LIST is enabled, then we
-> do the shortcut.
+Hi Gavin,
 
-Good point - I think this is better. See below tentative v4.
+On Tue, Aug 8, 2023 at 9:00=E2=80=AFPM Gavin Shan <gshan@redhat.com> wrote:
+>
+>
+> On 8/9/23 09:13, Raghavendra Rao Ananta wrote:
+> > There's no reason for the architectures to declare
+> > kvm_arch_flush_remote_tlbs() in their own headers. Hence to
+> > avoid this duplication, make the declaration global, leaving
+> > the architectures to define only __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
+> > as needed.
+> >
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > ---
+> >   arch/mips/include/asm/kvm_host.h | 1 -
+> >   include/linux/kvm_host.h         | 2 ++
+> >   2 files changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/k=
+vm_host.h
+> > index 9b0ad8f3bf327..54a85f1d4f2c8 100644
+> > --- a/arch/mips/include/asm/kvm_host.h
+> > +++ b/arch/mips/include/asm/kvm_host.h
+> > @@ -897,6 +897,5 @@ static inline void kvm_arch_vcpu_blocking(struct kv=
+m_vcpu *vcpu) {}
+> >   static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+> >
+> >   #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
+> > -int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
+> >
+> >   #endif /* __MIPS_KVM_HOST_H__ */
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index e3f968b38ae97..ade5d4500c2ce 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -1484,6 +1484,8 @@ static inline int kvm_arch_flush_remote_tlbs(stru=
+ct kvm *kvm)
+> >   {
+> >       return -ENOTSUPP;
+> >   }
+> > +#else
+> > +int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
+> >   #endif
+> >
+> >   #ifdef __KVM_HAVE_ARCH_NONCOHERENT_DMA
+>
+> Is the declaration inconsistent to that in arch/x86/include/asm/kvm_host.=
+h?
+> In order to keep them consistent, I guess we need move kvm_arch_flush_rem=
+ote_tlbs()
+> from x86's header file to arch/x86/kvm/mmu/mmu.c and 'inline' needs to be=
+ dropped.
+>
+Unsure of the original intentions, I didn't want to disturb any
+existing arrangements. If more people agree to this refactoring, I'm
+happy to move.
 
-Kees: Does that also look more like what you had in mind?
-
-Thanks,
--- Marco
-
------- >8 ------
-
-From: Marco Elver <elver@google.com>
-Date: Thu, 27 Jul 2023 22:19:02 +0200
-Subject: [PATCH] list: Introduce CONFIG_HARDEN_LIST
-
-Numerous production kernel configs (see [1, 2]) are choosing to enable
-CONFIG_DEBUG_LIST, which is also being recommended by KSPP for hardened
-configs [3]. The motivation behind this is that the option can be used
-as a security hardening feature (e.g. CVE-2019-2215 and CVE-2019-2025
-are mitigated by the option [4]).
-
-The feature has never been designed with performance in mind, yet common
-list manipulation is happening across hot paths all over the kernel.
-
-Introduce CONFIG_HARDEN_LIST, which performs list pointer checking
-inline, and only upon list corruption calls the reporting slow path.
-
-Since DEBUG_LIST is functionally a superset of HARDEN_LIST, the Kconfig
-variables are designed to reflect that: DEBUG_LIST selects HARDEN_LIST,
-whereas HARDEN_LIST itself has no dependency on DEBUG_LIST.
-
-To generate optimal machine code with CONFIG_HARDEN_LIST:
-
-  1. Elide checking for pointer values which upon dereference would
-     result in an immediate access fault -- therefore "minimal" checks.
-     The trade-off is lower-quality error reports.
-
-  2. Use the newly introduced __preserve_most function attribute
-     (available with Clang, but not yet with GCC) to minimize the code
-     footprint for calling the reporting slow path. As a result,
-     function size of callers is reduced by avoiding saving registers
-     before calling the rarely called reporting slow path.
-
-     Note that all TUs in lib/Makefile already disable function tracing,
-     including list_debug.c, and __preserve_most's implied notrace has
-     no effect in this case.
-
-  3. Because the inline checks are a subset of the full set of checks in
-     __list_*_valid_or_report(), always return false if the inline
-     checks failed.  This avoids redundant compare and conditional
-     branch right after return from the slow path.
-
-As a side-effect of the checks being inline, if the compiler can prove
-some condition to always be true, it can completely elide some checks.
-
-Running netperf with CONFIG_HARDEN_LIST (using a Clang compiler with
-"preserve_most") shows throughput improvements, in my case of ~7% on
-average (up to 20-30% on some test cases).
-
-Link: https://r.android.com/1266735 [1]
-Link: https://gitlab.archlinux.org/archlinux/packaging/packages/linux/-/blob/main/config [2]
-Link: https://kernsec.org/wiki/index.php/Kernel_Self_Protection_Project/Recommended_Settings [3]
-Link: https://googleprojectzero.blogspot.com/2019/11/bad-binder-android-in-wild-exploit.html [4]
-Signed-off-by: Marco Elver <elver@google.com>
----
-v4:
-* Rename to CONFIG_HARDEN_LIST, which can independently be selected from
-  CONFIG_DEBUG_LIST.
-
-v3:
-* Rename ___list_*_valid() to __list_*_valid_or_report().
-* More comments.
-
-v2:
-* Note that lib/Makefile disables function tracing for everything and
-  __preserve_most's implied notrace is a noop here.
----
- arch/arm64/kvm/hyp/nvhe/Makefile     |  2 +-
- arch/arm64/kvm/hyp/nvhe/list_debug.c |  2 +
- include/linux/list.h                 | 64 +++++++++++++++++++++++++---
- lib/Kconfig.debug                    |  9 +++-
- lib/Makefile                         |  2 +-
- lib/list_debug.c                     |  5 ++-
- security/Kconfig.hardening           | 13 ++++++
- 7 files changed, 86 insertions(+), 11 deletions(-)
-
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index 9ddc025e4b86..c89c85a41ac4 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -25,7 +25,7 @@ hyp-obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o
- 	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o stacktrace.o ffa.o
- hyp-obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
- 	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
--hyp-obj-$(CONFIG_DEBUG_LIST) += list_debug.o
-+hyp-obj-$(CONFIG_HARDEN_LIST) += list_debug.o
- hyp-obj-y += $(lib-objs)
- 
- ##
-diff --git a/arch/arm64/kvm/hyp/nvhe/list_debug.c b/arch/arm64/kvm/hyp/nvhe/list_debug.c
-index 16266a939a4c..46a2d4f2b3c6 100644
---- a/arch/arm64/kvm/hyp/nvhe/list_debug.c
-+++ b/arch/arm64/kvm/hyp/nvhe/list_debug.c
-@@ -26,6 +26,7 @@ static inline __must_check bool nvhe_check_data_corruption(bool v)
- 
- /* The predicates checked here are taken from lib/list_debug.c. */
- 
-+__list_valid_slowpath
- bool __list_add_valid_or_report(struct list_head *new, struct list_head *prev,
- 				struct list_head *next)
- {
-@@ -37,6 +38,7 @@ bool __list_add_valid_or_report(struct list_head *new, struct list_head *prev,
- 	return true;
- }
- 
-+__list_valid_slowpath
- bool __list_del_entry_valid_or_report(struct list_head *entry)
- {
- 	struct list_head *prev, *next;
-diff --git a/include/linux/list.h b/include/linux/list.h
-index 130c6a1bb45c..ef899c27c68b 100644
---- a/include/linux/list.h
-+++ b/include/linux/list.h
-@@ -38,39 +38,91 @@ static inline void INIT_LIST_HEAD(struct list_head *list)
- 	WRITE_ONCE(list->prev, list);
- }
- 
-+#ifdef CONFIG_HARDEN_LIST
-+
- #ifdef CONFIG_DEBUG_LIST
-+# define __list_valid_slowpath
-+#else
-+# define __list_valid_slowpath __cold __preserve_most
-+#endif
-+
- /*
-  * Performs the full set of list corruption checks before __list_add().
-  * On list corruption reports a warning, and returns false.
-  */
--extern bool __list_add_valid_or_report(struct list_head *new,
--				       struct list_head *prev,
--				       struct list_head *next);
-+extern bool __list_valid_slowpath __list_add_valid_or_report(struct list_head *new,
-+							     struct list_head *prev,
-+							     struct list_head *next);
- 
- /*
-  * Performs list corruption checks before __list_add(). Returns false if a
-  * corruption is detected, true otherwise.
-+ *
-+ * With CONFIG_HARDEN_LIST only, performs minimal list integrity checking (that
-+ * do not result in a fault) inline, and only if a corruption is detected calls
-+ * the reporting function __list_add_valid_or_report().
-  */
- static __always_inline bool __list_add_valid(struct list_head *new,
- 					     struct list_head *prev,
- 					     struct list_head *next)
- {
--	return __list_add_valid_or_report(new, prev, next);
-+	bool ret = true;
-+
-+	if (!IS_ENABLED(CONFIG_DEBUG_LIST)) {
-+		/*
-+		 * With the hardening version, elide checking if next and prev
-+		 * are NULL, since the immediate dereference of them below would
-+		 * result in a fault if NULL.
-+		 *
-+		 * With the reduced set of checks, we can afford to inline the
-+		 * checks, which also gives the compiler a chance to elide some
-+		 * of them completely if they can be proven at compile-time. If
-+		 * one of the pre-conditions does not hold, the slow-path will
-+		 * show a report which pre-condition failed.
-+		 */
-+		if (likely(next->prev == prev && prev->next == next && new != prev && new != next))
-+			return true;
-+		ret = false;
-+	}
-+
-+	ret &= __list_add_valid_or_report(new, prev, next);
-+	return ret;
- }
- 
- /*
-  * Performs the full set of list corruption checks before __list_del_entry().
-  * On list corruption reports a warning, and returns false.
-  */
--extern bool __list_del_entry_valid_or_report(struct list_head *entry);
-+extern bool __list_valid_slowpath __list_del_entry_valid_or_report(struct list_head *entry);
- 
- /*
-  * Performs list corruption checks before __list_del_entry(). Returns false if a
-  * corruption is detected, true otherwise.
-+ *
-+ * With CONFIG_HARDEN_LIST only, performs minimal list integrity checking (that
-+ * do not result in a fault) inline, and only if a corruption is detected calls
-+ * the reporting function __list_del_entry_valid_or_report().
-  */
- static __always_inline bool __list_del_entry_valid(struct list_head *entry)
- {
--	return __list_del_entry_valid_or_report(entry);
-+	bool ret = true;
-+
-+	if (!IS_ENABLED(CONFIG_DEBUG_LIST)) {
-+		struct list_head *prev = entry->prev;
-+		struct list_head *next = entry->next;
-+
-+		/*
-+		 * With the hardening version, elide checking if next and prev
-+		 * are NULL, LIST_POISON1 or LIST_POISON2, since the immediate
-+		 * dereference of them below would result in a fault.
-+		 */
-+		if (likely(prev->next == entry && next->prev == entry))
-+			return true;
-+		ret = false;
-+	}
-+
-+	ret &= __list_del_entry_valid_or_report(entry);
-+	return ret;
- }
- #else
- static inline bool __list_add_valid(struct list_head *new,
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index fbc89baf7de6..9e38956d6f50 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -1674,9 +1674,14 @@ menu "Debug kernel data structures"
- config DEBUG_LIST
- 	bool "Debug linked list manipulation"
- 	depends on DEBUG_KERNEL || BUG_ON_DATA_CORRUPTION
-+	select HARDEN_LIST
- 	help
--	  Enable this to turn on extended checks in the linked-list
--	  walking routines.
-+	  Enable this to turn on extended checks in the linked-list walking
-+	  routines.
-+
-+	  This option trades better quality error reports for performance, and
-+	  is more suitable for kernel debugging. If you care about performance,
-+	  you should only enable CONFIG_HARDEN_LIST instead.
- 
- 	  If unsure, say N.
- 
-diff --git a/lib/Makefile b/lib/Makefile
-index 42d307ade225..a7ebc9090f04 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -161,7 +161,7 @@ obj-$(CONFIG_BTREE) += btree.o
- obj-$(CONFIG_INTERVAL_TREE) += interval_tree.o
- obj-$(CONFIG_ASSOCIATIVE_ARRAY) += assoc_array.o
- obj-$(CONFIG_DEBUG_PREEMPT) += smp_processor_id.o
--obj-$(CONFIG_DEBUG_LIST) += list_debug.o
-+obj-$(CONFIG_HARDEN_LIST) += list_debug.o
- obj-$(CONFIG_DEBUG_OBJECTS) += debugobjects.o
- 
- obj-$(CONFIG_BITREVERSE) += bitrev.o
-diff --git a/lib/list_debug.c b/lib/list_debug.c
-index 2def33b1491f..38ddc7c01eab 100644
---- a/lib/list_debug.c
-+++ b/lib/list_debug.c
-@@ -2,7 +2,8 @@
-  * Copyright 2006, Red Hat, Inc., Dave Jones
-  * Released under the General Public License (GPL).
-  *
-- * This file contains the linked list validation for DEBUG_LIST.
-+ * This file contains the linked list validation and error reporting for
-+ * HARDEN_LIST and DEBUG_LIST.
-  */
- 
- #include <linux/export.h>
-@@ -17,6 +18,7 @@
-  * attempt).
-  */
- 
-+__list_valid_slowpath
- bool __list_add_valid_or_report(struct list_head *new, struct list_head *prev,
- 				struct list_head *next)
- {
-@@ -39,6 +41,7 @@ bool __list_add_valid_or_report(struct list_head *new, struct list_head *prev,
- }
- EXPORT_SYMBOL(__list_add_valid_or_report);
- 
-+__list_valid_slowpath
- bool __list_del_entry_valid_or_report(struct list_head *entry)
- {
- 	struct list_head *prev, *next;
-diff --git a/security/Kconfig.hardening b/security/Kconfig.hardening
-index 0f295961e773..19aa2b7d2f64 100644
---- a/security/Kconfig.hardening
-+++ b/security/Kconfig.hardening
-@@ -279,6 +279,19 @@ config ZERO_CALL_USED_REGS
- 
- endmenu
- 
-+menu "Hardening of kernel data structures"
-+
-+config HARDEN_LIST
-+	bool "Check integrity of linked list manipulation"
-+	help
-+	  Minimal integrity checking in the linked-list manipulation routines
-+	  to catch memory corruptions that are not guaranteed to result in an
-+	  immediate access fault.
-+
-+	  If unsure, say N.
-+
-+endmenu
-+
- config CC_HAS_RANDSTRUCT
- 	def_bool $(cc-option,-frandomize-layout-seed-file=/dev/null)
- 	# Randstruct was first added in Clang 15, but it isn't safe to use until
--- 
-2.41.0.640.ga95def55d0-goog
-
+Thank you.
+Raghavendra
+> Thanks,
+> Gavin
+>
