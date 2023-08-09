@@ -1,172 +1,223 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36DD7FC
-	for <kvmarm@lists.linux.dev>; Wed,  9 Aug 2023 05:03:11 +0000 (UTC)
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2b72161c6e9so6238491fa.0
-        for <kvmarm@lists.linux.dev>; Tue, 08 Aug 2023 22:03:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691557389; x=1692162189;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=j6b8QaOxHHxr0nsnmybM/OZmFkMm6krciNhVPEUkLHM=;
-        b=fhVs64I4ddYpd00JLct4M5DXmmqZVvjx/PM5IA0btlXqhs7iDUEO3VxkEF91BxP6Dz
-         WJgiF9XR5y4uvxG6IWoY7NHCRglOoZAYWJVo6VGrKhNNaTIDWbKOUU3WRiGAXIqGsDSE
-         DK44YS7nhYYxRjSy2NhsWwdbvYRxD6x/XguExxEaFacDNw496QL+DfrN0JlS0HPz1ZLI
-         UOLAUlPdagmdXrFv1r2hojgA2g+RVPCvAV8BiMueulCJhnlfNSHOo6YBR6FliCSnwNe5
-         XJuhSf8r3sDdpjILN7XbNSBRB+K08tZWxAyUsK9+h6eNtxkVWvNujrFcPD6CM4BfmhGi
-         8/Iw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27BD33C3F
+	for <kvmarm@lists.linux.dev>; Wed,  9 Aug 2023 06:09:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691561368;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gjOdGDWIQkT0phMReVz2eflzO/ETttLoRuiht6Bh+vs=;
+	b=Ed9vRJ8uLWLmm4uWaIW/w4+TgxMNGICHw9C3jAXwK2rZLZ3UwlRIBmIypRA8N7hpLUoJFQ
+	lEHi24Swr2+tCzU56GdtzOeaRR/bxfZOQvtmyC4mgEOwCCXfiMe33MKWCoqjao3Eb6qprh
+	XFKlIxL+sWncEuA7baLosqdATP0IbUQ=
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
+ [209.85.167.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-296-f0j7gwYmOmGHhPkAhodadw-1; Wed, 09 Aug 2023 02:09:27 -0400
+X-MC-Unique: f0j7gwYmOmGHhPkAhodadw-1
+Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-3a5aa4a8fd6so12013021b6e.1
+        for <kvmarm@lists.linux.dev>; Tue, 08 Aug 2023 23:09:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691557389; x=1692162189;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=j6b8QaOxHHxr0nsnmybM/OZmFkMm6krciNhVPEUkLHM=;
-        b=dulzfLf4zvtqewpqlmKt+z+RJ/SKaN4q0AfJ8UPAkgtMtduU/Jo2xE2onfnS90nO+v
-         JT8v/J3XmVuRcqoFZwm0gWJ7sz5OCSvhHvYFLPfId/q5OYPNZCVlw1mNzu7uvMAQrRBD
-         xKiyHbI9lU+BsKYb5WArZULyuq/yjtdVLKvyXb1tDblXEohKwltAIaBjo9R94Yjfev2f
-         1+ZHfpnCR6xPcV8aN4H4Iv4+AaVqFw0WJtGRsVZKKOYimRqyVBaCnC+l2RDb13mJizZr
-         7c2mbljCRbd+Umz6/XM1IBtg4UCeQo3aeLe3HYl/e2wbCnHTfNq1By58PAqDdBYRPFLN
-         /QiA==
-X-Gm-Message-State: AOJu0YzK7Y5Or4Myuy/glWtoQIFiDXZda5/Cx23DHn/ABkhetk7V35xp
-	kC5FSZxPHYWHHOmUUPdj0Eg9+jI5bDXL6jCPfyc=
-X-Google-Smtp-Source: AGHT+IHPj+fZ7S49PElSE5yx8scu586CwNUbYIc0xj64aUe7m/JpkHYOW0tpcJm9OPelp5Q2V/0HR3Dr50Nj19k+svo=
-X-Received: by 2002:a05:651c:1713:b0:2b9:d0bf:a3c5 with SMTP id
- be19-20020a05651c171300b002b9d0bfa3c5mr3997983ljb.14.1691557389258; Tue, 08
- Aug 2023 22:03:09 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691561366; x=1692166166;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gjOdGDWIQkT0phMReVz2eflzO/ETttLoRuiht6Bh+vs=;
+        b=ItPeJlZYtYspVZkdsp6p5u6vSOVl+JhK5If1tMBMJCVi3FFrKhnx6fbhQRkdGWDZdE
+         QENAjZdQjkPmKM+LkgVLs5YH+/EEab2Zrc4BP79F4gUlL5JDKECk7RfbDkJEVGO6/vrC
+         yI/lYTspspZ3SIa31HBqi1l1Sw80DVbpLYSB4PwG96nHfw6ZtEq0gbzXMRSW1iNvBaQL
+         3/vQsHXFxt/HETRaYLYZ870EwRaK+C9eGaQ+tm/tvzxue2ASi6f3ufI1xc6g9bah5rjX
+         HHYhpDe6VJuatkxedVo3kjBcKM1a3HdGuV03lhIdWOXszZzAkMOKp/Bj2kcOy5kAEzN4
+         zp+w==
+X-Gm-Message-State: AOJu0Yyz15AAj5C/HcrIvR3EdjbqqU7VZ4yK/kYS9SSu3LMRmiTuUtv/
+	EBrauh6vLCQ3BpueYH0irMLXQ4t4XMJTATUL0LD2ZDgLEKRfTX87WObenbhiR3+iNLPOYPwAE1x
+	WPkPg1mNdsfwvfc3w
+X-Received: by 2002:a05:6808:193:b0:3a6:f7d7:4cfe with SMTP id w19-20020a056808019300b003a6f7d74cfemr1751349oic.50.1691561366665;
+        Tue, 08 Aug 2023 23:09:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IESJGy9tTZJCmzlL28vXdcHkH4ZB7FxhBPbIFweRaehSBbS0wZP4I9BPTRIjsuacKEsONJhQQ==
+X-Received: by 2002:a05:6808:193:b0:3a6:f7d7:4cfe with SMTP id w19-20020a056808019300b003a6f7d74cfemr1751333oic.50.1691561366353;
+        Tue, 08 Aug 2023 23:09:26 -0700 (PDT)
+Received: from ?IPV6:2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5? ([2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5])
+        by smtp.gmail.com with ESMTPSA id 30-20020a17090a001e00b002630bfd35b0sm621062pja.7.2023.08.08.23.09.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Aug 2023 23:09:25 -0700 (PDT)
+Message-ID: <15975205-6161-d54b-fe40-805a16b0cb27@redhat.com>
+Date: Wed, 9 Aug 2023 16:09:15 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <cover.1690273969.git.haibo1.xu@intel.com> <CAAhSdy0yug=J0nxnnPoLYL=0MiT0w6qgPYOcv0QwMRe+fsQn8Q@mail.gmail.com>
- <87y1ilpz3m.wl-maz@kernel.org> <CAJve8onZuOHkAUVY3=QeBPMx5n2F1fGgn57rPp7MB1Q5=vXasA@mail.gmail.com>
- <CAAhSdy277PEBZ4wyUHxQPyN2TugGfhBmC5jUoFTAqMU8vwbt5w@mail.gmail.com>
-In-Reply-To: <CAAhSdy277PEBZ4wyUHxQPyN2TugGfhBmC5jUoFTAqMU8vwbt5w@mail.gmail.com>
-From: Haibo Xu <xiaobo55x@gmail.com>
-Date: Wed, 9 Aug 2023 13:02:57 +0800
-Message-ID: <CAJve8o=6ukbqc_8RvgRxpss2c=q8Ltzf=cNdJ2B85fhNSvNgMQ@mail.gmail.com>
-Subject: Re: [PATCH v6 00/13] RISCV: Add KVM_GET_REG_LIST API
-To: Anup Patel <anup@brainfault.org>
-Cc: Marc Zyngier <maz@kernel.org>, oliver.upton@linux.dev, ajones@ventanamicro.com, 
-	seanjc@google.com, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Shuah Khan <shuah@kernel.org>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Ricardo Koller <ricarkol@google.com>, Vishal Annapurve <vannapurve@google.com>, 
-	Like Xu <likexu@tencent.com>, Vipin Sharma <vipinsh@google.com>, 
-	David Matlack <dmatlack@google.com>, Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org, 
-	Haibo Xu <haibo1.xu@intel.com>, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v8 05/14] KVM: Allow range-based TLB invalidation from
+ common code
+To: Raghavendra Rao Ananta <rananta@google.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
+ James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Sean Christopherson <seanjc@google.com>, Huacai Chen
+ <chenhuacai@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+ Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>,
+ Jing Zhang <jingzhangos@google.com>, Reiji Watanabe <reijiw@google.com>,
+ Colton Lewis <coltonlewis@google.com>, David Matlack <dmatlack@google.com>,
+ Fuad Tabba <tabba@google.com>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ Shaoqin Huang <shahuang@redhat.com>
+References: <20230808231330.3855936-1-rananta@google.com>
+ <20230808231330.3855936-6-rananta@google.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20230808231330.3855936-6-rananta@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 9, 2023 at 11:48=E2=80=AFAM Anup Patel <anup@brainfault.org> wr=
-ote:
->
-> On Wed, Aug 9, 2023 at 8:56=E2=80=AFAM Haibo Xu <xiaobo55x@gmail.com> wro=
-te:
-> >
-> > On Tue, Aug 8, 2023 at 7:12=E2=80=AFPM Marc Zyngier <maz@kernel.org> wr=
-ote:
-> > >
-> > > On Mon, 07 Aug 2023 04:48:33 +0100,
-> > > Anup Patel <anup@brainfault.org> wrote:
-> > > >
-> > > > Hi Marc, Hi Oliver,
-> > > >
-> > > > On Tue, Jul 25, 2023 at 2:05=E2=80=AFPM Haibo Xu <haibo1.xu@intel.c=
-om> wrote:
-> > > > >
-> > > > > KVM_GET_REG_LIST will dump all register IDs that are available to
-> > > > > KVM_GET/SET_ONE_REG and It's very useful to identify some platfor=
-m
-> > > > > regression issue during VM migration.
-> > > > >
-> > > > > Patch 1-7 re-structured the get-reg-list test in aarch64 to make =
-some
-> > > > > of the code as common test framework that can be shared by riscv.
-> > > > >
-> > > > > Patch 8 move reject_set check logic to a function so as to check =
-for
-> > > > > different errno for different registers.
-> > > > > Patch 9 move finalize_vcpu back to run_test so that riscv can imp=
-lement
-> > > > > its specific operation.
-> > > > > Patch 10 change to do the get/set operation only on present-bless=
-ed list.
-> > > > > Patch 11 add the skip_set facilities so that riscv can skip set o=
-peration
-> > > > > on some registers.
-> > > > > Patch 12 enabled the KVM_GET_REG_LIST API in riscv.
-> > > > > patch 13 added the corresponding kselftest for checking possible
-> > > > > register regressions.
-> > > > >
-> > > > > The get-reg-list kvm selftest was ported from aarch64 and tested =
-with
-> > > > > Linux v6.5-rc3 on a Qemu riscv64 virt machine.
-> > > > >
-> > > > > ---
-> > > > > Changed since v5:
-> > > > >   * Rebase to v6.5-rc3
-> > > > >   * Minor fix for Andrew's comments
-> > > > >
-> > > > > Andrew Jones (7):
-> > > > >   KVM: arm64: selftests: Replace str_with_index with strdup_print=
-f
-> > > > >   KVM: arm64: selftests: Drop SVE cap check in print_reg
-> > > > >   KVM: arm64: selftests: Remove print_reg's dependency on vcpu_co=
-nfig
-> > > > >   KVM: arm64: selftests: Rename vcpu_config and add to kvm_util.h
-> > > > >   KVM: arm64: selftests: Delete core_reg_fixup
-> > > > >   KVM: arm64: selftests: Split get-reg-list test code
-> > > > >   KVM: arm64: selftests: Finish generalizing get-reg-list
-> > > > >
-> > > > > Haibo Xu (6):
-> > > > >   KVM: arm64: selftests: Move reject_set check logic to a functio=
-n
-> > > > >   KVM: arm64: selftests: Move finalize_vcpu back to run_test
-> > > > >   KVM: selftests: Only do get/set tests on present blessed list
-> > > > >   KVM: selftests: Add skip_set facility to get_reg_list test
-> > > > >   KVM: riscv: Add KVM_GET_REG_LIST API support
-> > > > >   KVM: riscv: selftests: Add get-reg-list test
-> > > >
-> > > > Are you okay for this series to go through the KVM RISC-V tree ?
-> > >
-> > > Sure, seems fine from my point of view. But please put it on an
-> > > immutable topic branch so that we can also merge it in the arm64 tree=
-,
-> > > should we need to resolve any conflicts.
-> > >
-> >
-> > Hi Marc,
-> >
-> > Thanks for your review!
-> >
-> > Which topic branch do you prefer or suggest to use?
-> > I can do a rebase on it and fix any potential conflicts.
->
-> I will share a branch with a stable commit history.
-> I have already resolved conflicts at my end.
->
+On 8/9/23 09:13, Raghavendra Rao Ananta wrote:
+> From: David Matlack <dmatlack@google.com>
+> 
+> Make kvm_flush_remote_tlbs_range() visible in common code and create a
+> default implementation that just invalidates the whole TLB.
+> 
+> This paves the way for several future features/cleanups:
+> 
+>   - Introduction of range-based TLBI on ARM.
+>   - Eliminating kvm_arch_flush_remote_tlbs_memslot()
+>   - Moving the KVM/x86 TDP MMU to common code.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> Reviewed-by: Anup Patel <anup@brainfault.org>
+> ---
+>   arch/x86/include/asm/kvm_host.h |  2 ++
+>   arch/x86/kvm/mmu/mmu.c          |  8 ++++----
+>   arch/x86/kvm/mmu/mmu_internal.h |  3 ---
+>   include/linux/kvm_host.h        | 12 ++++++++++++
+>   virt/kvm/kvm_main.c             | 13 +++++++++++++
+>   5 files changed, 31 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index a2d3cfc2eb75c..b547d17c58f63 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1804,6 +1804,8 @@ static inline int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
+>   		return -ENOTSUPP;
+>   }
+>   
+> +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
+> +
+>   #define kvm_arch_pmi_in_guest(vcpu) \
+>   	((vcpu) && (vcpu)->arch.handling_intr_from_guest)
+>   
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index ec169f5c7dce2..6adbe6c870982 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -278,16 +278,16 @@ static inline bool kvm_available_flush_remote_tlbs_range(void)
+>   	return kvm_x86_ops.flush_remote_tlbs_range;
+>   }
+>   
+> -void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
+> -				 gfn_t nr_pages)
+> +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
+> +				      u64 nr_pages)
+>   {
+>   	int ret = -EOPNOTSUPP;
+>   
+>   	if (kvm_x86_ops.flush_remote_tlbs_range)
+>   		ret = static_call(kvm_x86_flush_remote_tlbs_range)(kvm, start_gfn,
+>   								   nr_pages);
+> -	if (ret)
+> -		kvm_flush_remote_tlbs(kvm);
+> +
+> +	return ret;
+>   }
+>   
 
-Cool! Thanks for your help!
+I guess @start_gfn can be renamed to @gfn, to be consistent with its declaration
+in include/linux/kvm_host.h and struct kvm_x86_ops::flush_remote_tlbs_range()
 
-> Regards,
-> Anup
->
-> >
-> > Regards,
-> > Haibo
-> >
-> > > Thanks,
-> > >
-> > >         M.
-> > >
-> > > --
-> > > Without deviation from the norm, progress is not possible.
+>   static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index);
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> index d39af5639ce97..86cb83bb34804 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -170,9 +170,6 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
+>   				    struct kvm_memory_slot *slot, u64 gfn,
+>   				    int min_level);
+>   
+> -void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
+> -				 gfn_t nr_pages);
+> -
+>   /* Flush the given page (huge or not) of guest memory. */
+>   static inline void kvm_flush_remote_tlbs_gfn(struct kvm *kvm, gfn_t gfn, int level)
+>   {
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index ade5d4500c2ce..f0be5d9c37dd1 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1359,6 +1359,7 @@ int kvm_vcpu_yield_to(struct kvm_vcpu *target);
+>   void kvm_vcpu_on_spin(struct kvm_vcpu *vcpu, bool yield_to_kernel_mode);
+>   
+>   void kvm_flush_remote_tlbs(struct kvm *kvm);
+> +void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 nr_pages);
+>   
+>   #ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
+>   int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min);
+> @@ -1488,6 +1489,17 @@ static inline int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
+>   int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
+>   #endif
+>   
+> +#ifndef __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
+> +static inline int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm,
+> +						    gfn_t gfn, u64 nr_pages)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +#else
+> +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm,
+> +				      gfn_t gfn, u64 nr_pages);
+> +#endif
+> +
+>   #ifdef __KVM_HAVE_ARCH_NONCOHERENT_DMA
+>   void kvm_arch_register_noncoherent_dma(struct kvm *kvm);
+>   void kvm_arch_unregister_noncoherent_dma(struct kvm *kvm);
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index d6b0507861550..26e91000f579d 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -366,6 +366,19 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
+>   }
+>   EXPORT_SYMBOL_GPL(kvm_flush_remote_tlbs);
+>   
+> +void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 nr_pages)
+> +{
+> +	if (!kvm_arch_flush_remote_tlbs_range(kvm, gfn, nr_pages))
+> +		return;
+> +
+> +	/*
+> +	 * Fall back to a flushing entire TLBs if the architecture range-based
+> +	 * TLB invalidation is unsupported or can't be performed for whatever
+> +	 * reason.
+> +	 */
+> +	kvm_flush_remote_tlbs(kvm);
+> +}
+> +
+>   static void kvm_flush_shadow_all(struct kvm *kvm)
+>   {
+>   	kvm_arch_flush_shadow_all(kvm);
+
+Thanks,
+Gavin
+
