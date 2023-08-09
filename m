@@ -1,53 +1,54 @@
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E827018C0B
-	for <kvmarm@lists.linux.dev>; Wed,  9 Aug 2023 16:39:02 +0000 (UTC)
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-407db3e9669so311631cf.1
-        for <kvmarm@lists.linux.dev>; Wed, 09 Aug 2023 09:39:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33ACC18AF3
+	for <kvmarm@lists.linux.dev>; Wed,  9 Aug 2023 16:41:57 +0000 (UTC)
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-40a47e8e38dso309721cf.1
+        for <kvmarm@lists.linux.dev>; Wed, 09 Aug 2023 09:41:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691599141; x=1692203941;
+        d=google.com; s=20221208; t=1691599317; x=1692204117;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rAabttuUSlISLQ9kur95AJErnuBmKPlF1t5IPI4xLW8=;
-        b=QK/Md6pLtQcnNYaG7FaNR8YGO5V1BDDGTN1QNcb5t4M8hyK/g2UzsOCkQFbfYrRiBB
-         G0kclZmDhOUC4jPYSDgzil3jq7z68Wq4Y/XsBYF1MGe9Iir+sC7RphbJoMfImBbhq2T/
-         pEhwFheHJqKkE6YRXMAxkXUnF8lSNA2TqIGy9iPTw7Y7ze+v2ZO6wVbfvsq9lZ13AZGe
-         qcvfeTRsEBx541O+obhMMtIFxCFLknFX2bE3VoAPa0QB2Ao3Loe9vbjMaWTez52X0ZNb
-         c1pWu8dZp76+bEISHoUz6Gcb1Dks1IYF1WyX0qZyE1sqGI1eUsOyDxlWzYy0GZ7RrbKU
-         pVQg==
+        bh=lPf4XGOX6Yz3caGFLI4HNiFX/4urner6v/ltX/ESS/0=;
+        b=M8NqHm95x4nGnCdrVnscaqRXS4zv1xJk+mKi6qhzpoV0xAgedW8xKK1WrktthW+/qX
+         b79Rjw1HWdoTj0bfrzxyYngD13WhEXYtTDNUTB4Nwp3syn4yn8vOXHVKklDeZcJZpc9o
+         GDICgnZbUUQ4VwPvxkozg6ZrzrsWy820TbFiNBjvXSnVlLga3PusimdxiUHWSrjmgq9M
+         YMKKBcxudeH5NygCy+Ei5czOibqi8SOG3nDIHx+h0cIT0Z9F1Ff0QOjnl3TwU7bKPVG3
+         fESF+gvCoCtyd47weuYbH5uFlwg9LfCAVKAGmtq8i8np6ERRNhFQ4wt4KpNnlYCunDKT
+         NTyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691599141; x=1692203941;
+        d=1e100.net; s=20221208; t=1691599317; x=1692204117;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rAabttuUSlISLQ9kur95AJErnuBmKPlF1t5IPI4xLW8=;
-        b=EthPLYtZqXunVRD8vRncXtntheD3v/7vsIpJc/WHw6qwxtloosAFjXqR2IgKcHO0tG
-         M80DdaDt+7WoetG4oz6G7BJl9g27hsCQenEhexVrp+PlHDlLO6w37itdIC2kLGAgLsfv
-         JphYxhOtT3+KTmyZn7CL1KW2ZweAkWhMMHCNAYxS0JWs+61V/wePMu/5WqiF3Qq6QQxa
-         BCwyOFgQACyRUJMabMCiWxDVVlLSPheZL5lWSGtSBLhBrn09Up0hAP5t6HwOTJRUIaCK
-         gFAJfV1JX6uj1oY0r2h53pn2aAcFMY3KFcME5B2BoQaOFCeSMrKWbBEyAUK4xEW7HHi7
-         KnHg==
-X-Gm-Message-State: AOJu0Yx0gW3oSS9dpc3J5frbKGJ9o/nWsnG4tGtNSv9oBWdXqTkmzz0Y
-	J2uNLBHPhM84amHH/t7WsAGfikKIVCBFukK/q9RCQA==
-X-Google-Smtp-Source: AGHT+IFIKXrr2ilFq3pewZHyAMJbe1zJNw2R6kC9Ag8lwIUUWtSfseAhG7bbTMLUN+5Rf6sXibPKOvlrXvIKI8OeOqU=
-X-Received: by 2002:a05:622a:206:b0:3ef:302c:319e with SMTP id
- b6-20020a05622a020600b003ef302c319emr161886qtx.8.1691599141628; Wed, 09 Aug
- 2023 09:39:01 -0700 (PDT)
+        bh=lPf4XGOX6Yz3caGFLI4HNiFX/4urner6v/ltX/ESS/0=;
+        b=cB4RvTHxsuURQJsa+A0nii9krsXhUTO2uecAAuVL3X0/Pb9SVNfHlRiLroy9fP6Ixe
+         WY24VIATKhuB6Mccpg8C+I5Czkc8ImdHvPNnI9kNjy53IAf3EQddhVq6RXWBu6+NGFRn
+         9KPxtFrxsKcdLIb7tliA/tvKG/YbYWQrBWmeGZjtvsERAPCx1ivjYTYYq971w/Rq2+l0
+         8LfiJxJbmCQ5rWhoM4qcRgdn3ADsodPN5WnKxO+O5FFouhZZxe/zdVVVi5td4l8vwnT9
+         hy/Duk0gVfBCdlKJnOu3CQf8x1wZoUPEtxQFv4CC9YHccmD7HNvt3SU4UPlsl1l5t7ki
+         I3IA==
+X-Gm-Message-State: AOJu0YzojV0S7kxUtoWO7dTBrebXJhK4uE8KEwZw0wb5NAcofBnus+Mj
+	8WgnwAq8M8EoWl1k41ZV6W2DjUmpN9To7ZyKPeeUXg==
+X-Google-Smtp-Source: AGHT+IEasKjYjirTCPg/lhza9bQPF4rYp5ejx4/QKjY7XilhifZ9KFaFlpeH95SrDC1XV+HGwPF+ASFIZPAlqAB/AME=
+X-Received: by 2002:ac8:5dc9:0:b0:3f5:2006:50f1 with SMTP id
+ e9-20020ac85dc9000000b003f5200650f1mr133814qtx.12.1691599316808; Wed, 09 Aug
+ 2023 09:41:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230808231330.3855936-1-rananta@google.com> <20230808231330.3855936-3-rananta@google.com>
- <c33b0518-6e64-7acf-efa8-f404fce1ccac@redhat.com>
-In-Reply-To: <c33b0518-6e64-7acf-efa8-f404fce1ccac@redhat.com>
+References: <20230808231330.3855936-1-rananta@google.com> <20230808231330.3855936-6-rananta@google.com>
+ <15975205-6161-d54b-fe40-805a16b0cb27@redhat.com>
+In-Reply-To: <15975205-6161-d54b-fe40-805a16b0cb27@redhat.com>
 From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Wed, 9 Aug 2023 09:38:49 -0700
-Message-ID: <CAJHc60yCJANBQOizaoSPhEJH9e8a9C6n68x4qdVkOhVZiiWqkw@mail.gmail.com>
-Subject: Re: [PATCH v8 02/14] KVM: Declare kvm_arch_flush_remote_tlbs() globally
+Date: Wed, 9 Aug 2023 09:41:44 -0700
+Message-ID: <CAJHc60xk1ZAw-44FG7CDbAGPMUSnAmZ3LxMPGcQ0RPBcenHrig@mail.gmail.com>
+Subject: Re: [PATCH v8 05/14] KVM: Allow range-based TLB invalidation from
+ common code
 To: Gavin Shan <gshan@redhat.com>
 Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
 	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
@@ -59,69 +60,178 @@ Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
 	Fuad Tabba <tabba@google.com>, linux-arm-kernel@lists.infradead.org, 
 	kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, 
 	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	Shaoqin Huang <shahuang@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Gavin,
-
-On Tue, Aug 8, 2023 at 9:00=E2=80=AFPM Gavin Shan <gshan@redhat.com> wrote:
->
+On Tue, Aug 8, 2023 at 11:09=E2=80=AFPM Gavin Shan <gshan@redhat.com> wrote=
+:
 >
 > On 8/9/23 09:13, Raghavendra Rao Ananta wrote:
-> > There's no reason for the architectures to declare
-> > kvm_arch_flush_remote_tlbs() in their own headers. Hence to
-> > avoid this duplication, make the declaration global, leaving
-> > the architectures to define only __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
-> > as needed.
+> > From: David Matlack <dmatlack@google.com>
 > >
+> > Make kvm_flush_remote_tlbs_range() visible in common code and create a
+> > default implementation that just invalidates the whole TLB.
+> >
+> > This paves the way for several future features/cleanups:
+> >
+> >   - Introduction of range-based TLBI on ARM.
+> >   - Eliminating kvm_arch_flush_remote_tlbs_memslot()
+> >   - Moving the KVM/x86 TDP MMU to common code.
+> >
+> > No functional change intended.
+> >
+> > Signed-off-by: David Matlack <dmatlack@google.com>
 > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > Reviewed-by: Gavin Shan <gshan@redhat.com>
+> > Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> > Reviewed-by: Anup Patel <anup@brainfault.org>
 > > ---
-> >   arch/mips/include/asm/kvm_host.h | 1 -
-> >   include/linux/kvm_host.h         | 2 ++
-> >   2 files changed, 2 insertions(+), 1 deletion(-)
+> >   arch/x86/include/asm/kvm_host.h |  2 ++
+> >   arch/x86/kvm/mmu/mmu.c          |  8 ++++----
+> >   arch/x86/kvm/mmu/mmu_internal.h |  3 ---
+> >   include/linux/kvm_host.h        | 12 ++++++++++++
+> >   virt/kvm/kvm_main.c             | 13 +++++++++++++
+> >   5 files changed, 31 insertions(+), 7 deletions(-)
 > >
-> > diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/k=
-vm_host.h
-> > index 9b0ad8f3bf327..54a85f1d4f2c8 100644
-> > --- a/arch/mips/include/asm/kvm_host.h
-> > +++ b/arch/mips/include/asm/kvm_host.h
-> > @@ -897,6 +897,5 @@ static inline void kvm_arch_vcpu_blocking(struct kv=
-m_vcpu *vcpu) {}
-> >   static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
-> >
-> >   #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
-> > -int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
-> >
-> >   #endif /* __MIPS_KVM_HOST_H__ */
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index e3f968b38ae97..ade5d4500c2ce 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -1484,6 +1484,8 @@ static inline int kvm_arch_flush_remote_tlbs(stru=
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm=
+_host.h
+> > index a2d3cfc2eb75c..b547d17c58f63 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1804,6 +1804,8 @@ static inline int kvm_arch_flush_remote_tlbs(stru=
 ct kvm *kvm)
-> >   {
-> >       return -ENOTSUPP;
+> >               return -ENOTSUPP;
 > >   }
-> > +#else
-> > +int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
-> >   #endif
 > >
-> >   #ifdef __KVM_HAVE_ARCH_NONCOHERENT_DMA
+> > +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
+> > +
+> >   #define kvm_arch_pmi_in_guest(vcpu) \
+> >       ((vcpu) && (vcpu)->arch.handling_intr_from_guest)
+> >
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index ec169f5c7dce2..6adbe6c870982 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -278,16 +278,16 @@ static inline bool kvm_available_flush_remote_tlb=
+s_range(void)
+> >       return kvm_x86_ops.flush_remote_tlbs_range;
+> >   }
+> >
+> > -void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
+> > -                              gfn_t nr_pages)
+> > +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
+> > +                                   u64 nr_pages)
+> >   {
+> >       int ret =3D -EOPNOTSUPP;
+> >
+> >       if (kvm_x86_ops.flush_remote_tlbs_range)
+> >               ret =3D static_call(kvm_x86_flush_remote_tlbs_range)(kvm,=
+ start_gfn,
+> >                                                                  nr_pag=
+es);
+> > -     if (ret)
+> > -             kvm_flush_remote_tlbs(kvm);
+> > +
+> > +     return ret;
+> >   }
+> >
 >
-> Is the declaration inconsistent to that in arch/x86/include/asm/kvm_host.=
-h?
-> In order to keep them consistent, I guess we need move kvm_arch_flush_rem=
-ote_tlbs()
-> from x86's header file to arch/x86/kvm/mmu/mmu.c and 'inline' needs to be=
- dropped.
+> I guess @start_gfn can be renamed to @gfn, to be consistent with its decl=
+aration
+> in include/linux/kvm_host.h and struct kvm_x86_ops::flush_remote_tlbs_ran=
+ge()
 >
-Unsure of the original intentions, I didn't want to disturb any
-existing arrangements. If more people agree to this refactoring, I'm
-happy to move.
+Oh, yes. I'll consider this change for v9 (if there are enough changes
+and we plan to push one).
 
 Thank you.
 Raghavendra
+
+> >   static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)=
+;
+> > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_int=
+ernal.h
+> > index d39af5639ce97..86cb83bb34804 100644
+> > --- a/arch/x86/kvm/mmu/mmu_internal.h
+> > +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> > @@ -170,9 +170,6 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm=
+,
+> >                                   struct kvm_memory_slot *slot, u64 gfn=
+,
+> >                                   int min_level);
+> >
+> > -void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
+> > -                              gfn_t nr_pages);
+> > -
+> >   /* Flush the given page (huge or not) of guest memory. */
+> >   static inline void kvm_flush_remote_tlbs_gfn(struct kvm *kvm, gfn_t g=
+fn, int level)
+> >   {
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index ade5d4500c2ce..f0be5d9c37dd1 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -1359,6 +1359,7 @@ int kvm_vcpu_yield_to(struct kvm_vcpu *target);
+> >   void kvm_vcpu_on_spin(struct kvm_vcpu *vcpu, bool yield_to_kernel_mod=
+e);
+> >
+> >   void kvm_flush_remote_tlbs(struct kvm *kvm);
+> > +void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 nr_pa=
+ges);
+> >
+> >   #ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
+> >   int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int m=
+in);
+> > @@ -1488,6 +1489,17 @@ static inline int kvm_arch_flush_remote_tlbs(str=
+uct kvm *kvm)
+> >   int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
+> >   #endif
+> >
+> > +#ifndef __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
+> > +static inline int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm,
+> > +                                                 gfn_t gfn, u64 nr_pag=
+es)
+> > +{
+> > +     return -EOPNOTSUPP;
+> > +}
+> > +#else
+> > +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm,
+> > +                                   gfn_t gfn, u64 nr_pages);
+> > +#endif
+> > +
+> >   #ifdef __KVM_HAVE_ARCH_NONCOHERENT_DMA
+> >   void kvm_arch_register_noncoherent_dma(struct kvm *kvm);
+> >   void kvm_arch_unregister_noncoherent_dma(struct kvm *kvm);
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index d6b0507861550..26e91000f579d 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -366,6 +366,19 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
+> >   }
+> >   EXPORT_SYMBOL_GPL(kvm_flush_remote_tlbs);
+> >
+> > +void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 nr_pa=
+ges)
+> > +{
+> > +     if (!kvm_arch_flush_remote_tlbs_range(kvm, gfn, nr_pages))
+> > +             return;
+> > +
+> > +     /*
+> > +      * Fall back to a flushing entire TLBs if the architecture range-=
+based
+> > +      * TLB invalidation is unsupported or can't be performed for what=
+ever
+> > +      * reason.
+> > +      */
+> > +     kvm_flush_remote_tlbs(kvm);
+> > +}
+> > +
+> >   static void kvm_flush_shadow_all(struct kvm *kvm)
+> >   {
+> >       kvm_arch_flush_shadow_all(kvm);
+>
 > Thanks,
 > Gavin
 >
