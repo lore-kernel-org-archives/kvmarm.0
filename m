@@ -1,137 +1,172 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0E43ECE
-	for <kvmarm@lists.linux.dev>; Wed,  9 Aug 2023 04:11:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1691554285;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Jc2RrwZUDP/ZLfqGAQFdphKEXcWYocBgrdrh4msM7SQ=;
-	b=MOy4Y2puhh9rxJ+wE7myLqtWLPaHgcrIglMMmq70Ip5eqN6U4WGh13drMSr5EUUgV4BD3v
-	imrv6q2fbgd2oiFBjRMTQDDlNufrKLK1+R8GgRk8v2eMBK4V4BQl6rU3Xtc5MRVGIyJqou
-	ZwiGt7HgPy6gjn4RlaB6U+DXTt0F+NM=
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
- [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-21-z1N8TvnnMhyM6mUbfQ6q4Q-1; Wed, 09 Aug 2023 00:11:23 -0400
-X-MC-Unique: z1N8TvnnMhyM6mUbfQ6q4Q-1
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-55c04f5827eso4519345a12.1
-        for <kvmarm@lists.linux.dev>; Tue, 08 Aug 2023 21:11:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36DD7FC
+	for <kvmarm@lists.linux.dev>; Wed,  9 Aug 2023 05:03:11 +0000 (UTC)
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2b72161c6e9so6238491fa.0
+        for <kvmarm@lists.linux.dev>; Tue, 08 Aug 2023 22:03:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691557389; x=1692162189;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j6b8QaOxHHxr0nsnmybM/OZmFkMm6krciNhVPEUkLHM=;
+        b=fhVs64I4ddYpd00JLct4M5DXmmqZVvjx/PM5IA0btlXqhs7iDUEO3VxkEF91BxP6Dz
+         WJgiF9XR5y4uvxG6IWoY7NHCRglOoZAYWJVo6VGrKhNNaTIDWbKOUU3WRiGAXIqGsDSE
+         DK44YS7nhYYxRjSy2NhsWwdbvYRxD6x/XguExxEaFacDNw496QL+DfrN0JlS0HPz1ZLI
+         UOLAUlPdagmdXrFv1r2hojgA2g+RVPCvAV8BiMueulCJhnlfNSHOo6YBR6FliCSnwNe5
+         XJuhSf8r3sDdpjILN7XbNSBRB+K08tZWxAyUsK9+h6eNtxkVWvNujrFcPD6CM4BfmhGi
+         8/Iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691554283; x=1692159083;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jc2RrwZUDP/ZLfqGAQFdphKEXcWYocBgrdrh4msM7SQ=;
-        b=JRNNajUejCryaoLlJ51Xg2bm0TYS5j+WKRAdx7MrVNVaRJRp/qwLFsDmJ9sHspxWMd
-         GXdNR5fvlZpoA0aBvKYt5ddT35EPjtF2qOllrcFgWYoUAN3y6SGmEDeSdSGWu31qdx4z
-         2y1JiAae6X1ozEe/WkR6wFqkhNvp674P4g4NkJ2bI/sJ52+QU1NCqcUR3NDSEWiVY6tK
-         KCPiT4MSKRcS+GDkKwspKpJDlzaH6q6v1MmmCBsylLEBxzNB4+VuwwZPBgufBkzpDsrS
-         UQXJZ2VrcRZSKyTer9D8CGH3czmj99D000XyYRQ0m1Ji3ZUmY/TGW2xIabHCrptacEPv
-         zjOA==
-X-Gm-Message-State: AOJu0YyOed1T6PoMnogz+qLOlxXXkWpO7mXbknzCtBHTpMVD3tICfHvC
-	DjjE6qbYTZtUAXG72aHQO/dHL2ZKp+1korZoikRF/0nr1fd49mB6FTv2UIr1RJHHQnZmGFG6hE2
-	pnmeyinRgC+vJnkWr
-X-Received: by 2002:a05:6a21:328b:b0:121:ca90:df01 with SMTP id yt11-20020a056a21328b00b00121ca90df01mr1394019pzb.40.1691554282923;
-        Tue, 08 Aug 2023 21:11:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFuTcKraAGNvme4rsh9nauIBvvaQvIf9BEXJr92oZnpUAljzMU4HrA4zieEd0juLoJJfRohRg==
-X-Received: by 2002:a05:6a21:328b:b0:121:ca90:df01 with SMTP id yt11-20020a056a21328b00b00121ca90df01mr1394005pzb.40.1691554282647;
-        Tue, 08 Aug 2023 21:11:22 -0700 (PDT)
-Received: from ?IPV6:2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5? ([2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5])
-        by smtp.gmail.com with ESMTPSA id y9-20020a17090322c900b001b2069072ccsm9850474plg.18.2023.08.08.21.11.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Aug 2023 21:11:22 -0700 (PDT)
-Message-ID: <79b8548e-715a-85ee-aad6-cb0b97753df6@redhat.com>
-Date: Wed, 9 Aug 2023 14:11:09 +1000
+        d=1e100.net; s=20221208; t=1691557389; x=1692162189;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=j6b8QaOxHHxr0nsnmybM/OZmFkMm6krciNhVPEUkLHM=;
+        b=dulzfLf4zvtqewpqlmKt+z+RJ/SKaN4q0AfJ8UPAkgtMtduU/Jo2xE2onfnS90nO+v
+         JT8v/J3XmVuRcqoFZwm0gWJ7sz5OCSvhHvYFLPfId/q5OYPNZCVlw1mNzu7uvMAQrRBD
+         xKiyHbI9lU+BsKYb5WArZULyuq/yjtdVLKvyXb1tDblXEohKwltAIaBjo9R94Yjfev2f
+         1+ZHfpnCR6xPcV8aN4H4Iv4+AaVqFw0WJtGRsVZKKOYimRqyVBaCnC+l2RDb13mJizZr
+         7c2mbljCRbd+Umz6/XM1IBtg4UCeQo3aeLe3HYl/e2wbCnHTfNq1By58PAqDdBYRPFLN
+         /QiA==
+X-Gm-Message-State: AOJu0YzK7Y5Or4Myuy/glWtoQIFiDXZda5/Cx23DHn/ABkhetk7V35xp
+	kC5FSZxPHYWHHOmUUPdj0Eg9+jI5bDXL6jCPfyc=
+X-Google-Smtp-Source: AGHT+IHPj+fZ7S49PElSE5yx8scu586CwNUbYIc0xj64aUe7m/JpkHYOW0tpcJm9OPelp5Q2V/0HR3Dr50Nj19k+svo=
+X-Received: by 2002:a05:651c:1713:b0:2b9:d0bf:a3c5 with SMTP id
+ be19-20020a05651c171300b002b9d0bfa3c5mr3997983ljb.14.1691557389258; Tue, 08
+ Aug 2023 22:03:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v8 04/14] KVM: Remove CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL
-To: Raghavendra Rao Ananta <rananta@google.com>,
- Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>, Huacai Chen
- <chenhuacai@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
- Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>,
- Jing Zhang <jingzhangos@google.com>, Reiji Watanabe <reijiw@google.com>,
- Colton Lewis <coltonlewis@google.com>, David Matlack <dmatlack@google.com>,
- Fuad Tabba <tabba@google.com>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- Shaoqin Huang <shahuang@redhat.com>
-References: <20230808231330.3855936-1-rananta@google.com>
- <20230808231330.3855936-5-rananta@google.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20230808231330.3855936-5-rananta@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <cover.1690273969.git.haibo1.xu@intel.com> <CAAhSdy0yug=J0nxnnPoLYL=0MiT0w6qgPYOcv0QwMRe+fsQn8Q@mail.gmail.com>
+ <87y1ilpz3m.wl-maz@kernel.org> <CAJve8onZuOHkAUVY3=QeBPMx5n2F1fGgn57rPp7MB1Q5=vXasA@mail.gmail.com>
+ <CAAhSdy277PEBZ4wyUHxQPyN2TugGfhBmC5jUoFTAqMU8vwbt5w@mail.gmail.com>
+In-Reply-To: <CAAhSdy277PEBZ4wyUHxQPyN2TugGfhBmC5jUoFTAqMU8vwbt5w@mail.gmail.com>
+From: Haibo Xu <xiaobo55x@gmail.com>
+Date: Wed, 9 Aug 2023 13:02:57 +0800
+Message-ID: <CAJve8o=6ukbqc_8RvgRxpss2c=q8Ltzf=cNdJ2B85fhNSvNgMQ@mail.gmail.com>
+Subject: Re: [PATCH v6 00/13] RISCV: Add KVM_GET_REG_LIST API
+To: Anup Patel <anup@brainfault.org>
+Cc: Marc Zyngier <maz@kernel.org>, oliver.upton@linux.dev, ajones@ventanamicro.com, 
+	seanjc@google.com, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Shuah Khan <shuah@kernel.org>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Ricardo Koller <ricarkol@google.com>, Vishal Annapurve <vannapurve@google.com>, 
+	Like Xu <likexu@tencent.com>, Vipin Sharma <vipinsh@google.com>, 
+	David Matlack <dmatlack@google.com>, Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org, 
+	Haibo Xu <haibo1.xu@intel.com>, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Aug 9, 2023 at 11:48=E2=80=AFAM Anup Patel <anup@brainfault.org> wr=
+ote:
+>
+> On Wed, Aug 9, 2023 at 8:56=E2=80=AFAM Haibo Xu <xiaobo55x@gmail.com> wro=
+te:
+> >
+> > On Tue, Aug 8, 2023 at 7:12=E2=80=AFPM Marc Zyngier <maz@kernel.org> wr=
+ote:
+> > >
+> > > On Mon, 07 Aug 2023 04:48:33 +0100,
+> > > Anup Patel <anup@brainfault.org> wrote:
+> > > >
+> > > > Hi Marc, Hi Oliver,
+> > > >
+> > > > On Tue, Jul 25, 2023 at 2:05=E2=80=AFPM Haibo Xu <haibo1.xu@intel.c=
+om> wrote:
+> > > > >
+> > > > > KVM_GET_REG_LIST will dump all register IDs that are available to
+> > > > > KVM_GET/SET_ONE_REG and It's very useful to identify some platfor=
+m
+> > > > > regression issue during VM migration.
+> > > > >
+> > > > > Patch 1-7 re-structured the get-reg-list test in aarch64 to make =
+some
+> > > > > of the code as common test framework that can be shared by riscv.
+> > > > >
+> > > > > Patch 8 move reject_set check logic to a function so as to check =
+for
+> > > > > different errno for different registers.
+> > > > > Patch 9 move finalize_vcpu back to run_test so that riscv can imp=
+lement
+> > > > > its specific operation.
+> > > > > Patch 10 change to do the get/set operation only on present-bless=
+ed list.
+> > > > > Patch 11 add the skip_set facilities so that riscv can skip set o=
+peration
+> > > > > on some registers.
+> > > > > Patch 12 enabled the KVM_GET_REG_LIST API in riscv.
+> > > > > patch 13 added the corresponding kselftest for checking possible
+> > > > > register regressions.
+> > > > >
+> > > > > The get-reg-list kvm selftest was ported from aarch64 and tested =
+with
+> > > > > Linux v6.5-rc3 on a Qemu riscv64 virt machine.
+> > > > >
+> > > > > ---
+> > > > > Changed since v5:
+> > > > >   * Rebase to v6.5-rc3
+> > > > >   * Minor fix for Andrew's comments
+> > > > >
+> > > > > Andrew Jones (7):
+> > > > >   KVM: arm64: selftests: Replace str_with_index with strdup_print=
+f
+> > > > >   KVM: arm64: selftests: Drop SVE cap check in print_reg
+> > > > >   KVM: arm64: selftests: Remove print_reg's dependency on vcpu_co=
+nfig
+> > > > >   KVM: arm64: selftests: Rename vcpu_config and add to kvm_util.h
+> > > > >   KVM: arm64: selftests: Delete core_reg_fixup
+> > > > >   KVM: arm64: selftests: Split get-reg-list test code
+> > > > >   KVM: arm64: selftests: Finish generalizing get-reg-list
+> > > > >
+> > > > > Haibo Xu (6):
+> > > > >   KVM: arm64: selftests: Move reject_set check logic to a functio=
+n
+> > > > >   KVM: arm64: selftests: Move finalize_vcpu back to run_test
+> > > > >   KVM: selftests: Only do get/set tests on present blessed list
+> > > > >   KVM: selftests: Add skip_set facility to get_reg_list test
+> > > > >   KVM: riscv: Add KVM_GET_REG_LIST API support
+> > > > >   KVM: riscv: selftests: Add get-reg-list test
+> > > >
+> > > > Are you okay for this series to go through the KVM RISC-V tree ?
+> > >
+> > > Sure, seems fine from my point of view. But please put it on an
+> > > immutable topic branch so that we can also merge it in the arm64 tree=
+,
+> > > should we need to resolve any conflicts.
+> > >
+> >
+> > Hi Marc,
+> >
+> > Thanks for your review!
+> >
+> > Which topic branch do you prefer or suggest to use?
+> > I can do a rebase on it and fix any potential conflicts.
+>
+> I will share a branch with a stable commit history.
+> I have already resolved conflicts at my end.
+>
 
-On 8/9/23 09:13, Raghavendra Rao Ananta wrote:
-> kvm_arch_flush_remote_tlbs() or CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL
-> are two mechanisms to solve the same problem, allowing
-> architecture-specific code to provide a non-IPI implementation of
-> remote TLB flushing.
-> 
-> Dropping CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL allows KVM to standardize
-> all architectures on kvm_arch_flush_remote_tlbs() instead of
-> maintaining two mechanisms.
-> 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> ---
->   virt/kvm/Kconfig    | 3 ---
->   virt/kvm/kvm_main.c | 2 --
->   2 files changed, 5 deletions(-)
-> 
+Cool! Thanks for your help!
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index b74916de5183a..484d0873061ca 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -62,9 +62,6 @@ config HAVE_KVM_CPU_RELAX_INTERCEPT
->   config KVM_VFIO
->          bool
->   
-> -config HAVE_KVM_ARCH_TLB_FLUSH_ALL
-> -       bool
-> -
->   config HAVE_KVM_INVALID_WAKEUPS
->          bool
->   
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 70e5479797ac3..d6b0507861550 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -345,7 +345,6 @@ bool kvm_make_all_cpus_request(struct kvm *kvm, unsigned int req)
->   }
->   EXPORT_SYMBOL_GPL(kvm_make_all_cpus_request);
->   
-> -#ifndef CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL
->   void kvm_flush_remote_tlbs(struct kvm *kvm)
->   {
->   	++kvm->stat.generic.remote_tlb_flush_requests;
-> @@ -366,7 +365,6 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
->   		++kvm->stat.generic.remote_tlb_flush;
->   }
->   EXPORT_SYMBOL_GPL(kvm_flush_remote_tlbs);
-> -#endif
->   
->   static void kvm_flush_shadow_all(struct kvm *kvm)
->   {
-
+> Regards,
+> Anup
+>
+> >
+> > Regards,
+> > Haibo
+> >
+> > > Thanks,
+> > >
+> > >         M.
+> > >
+> > > --
+> > > Without deviation from the norm, progress is not possible.
