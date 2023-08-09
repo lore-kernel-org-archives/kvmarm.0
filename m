@@ -1,195 +1,411 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4DD919BB4
-	for <kvmarm@lists.linux.dev>; Wed,  9 Aug 2023 15:34:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CAB4C433B8;
-	Wed,  9 Aug 2023 15:34:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691595287;
-	bh=dKpu3DrXlm0fcz/rfbAZnwwY50NvEJw3wKrHilJuxpw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F+F3tEWJa1ouT3AAeoGwCGDIPVHr8mvewuF9Wv6D3my1b3McT3/boQUwB/4TbUk0B
-	 kNoEtkqrlkQGWOLC+eAHPeWdquspwCEu1jOP2DLJPyKtjBxqre7G5Gt6s4ZyA+8FUj
-	 ksjRNloIJXzwHov4xxKk0bR+odlEBkyc9WWw+8Q7LwINdLKAlMo8eHt7sgp2mo0zSP
-	 6yf4N/N5mQgfkKZNTyeTdpVV8jY50VyORSbm56bg69m/U7esSLYFGhLNopS1fXoXH6
-	 pZPiq1xcaVBJo5pvOVIcoNTdFhmai7aajMmEDmFbfAJtYhs4C5iTw2HYO9neLymlEh
-	 iUgc170PfSA4g==
-Date: Wed, 9 Aug 2023 16:34:38 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C311E521
+	for <kvmarm@lists.linux.dev>; Wed,  9 Aug 2023 16:32:45 +0000 (UTC)
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-31781e15a0cso49045f8f.3
+        for <kvmarm@lists.linux.dev>; Wed, 09 Aug 2023 09:32:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691598763; x=1692203563;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fUKdVS5/N5qQkJwAZJURTrzizTk+EoulthkFub9h71Q=;
+        b=LbvtTy/FLD0wzImORvHKE16saLu0nwLV93T+6LbYf8pYhsLhS5zapolbw8ClDY4ku0
+         FAGVzYJzteO97NgGOnBEEPDlI4o/J0VY5PvCMCvJKa3qSoUVEqUyO+7Q86tk3pQerMtk
+         JYLxe3o3CIAUkcm/XPb5fAit9O3p/gAVNqqJ83JYfxg1p+5abXG9yl53yQlkafUu2qiR
+         sCg5G24XshN+TJCHRtJvtOomCKnERp03MBMIma5jqNawRjea5gGz+6SPtv5yFWqOvaHJ
+         z3DutLswTotTQXmdM5xOUh+6FaQie+rGM8K3wHUcNgwnmr1bhUXGT6BjG5wCwjj28VUp
+         0cBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691598763; x=1692203563;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fUKdVS5/N5qQkJwAZJURTrzizTk+EoulthkFub9h71Q=;
+        b=KPFuXu25ffZkjGdOfYiR9X4z2aBWVqPtvcGu/JqNxSFpkP5/ZiNKz2sAq5YhcJ6uqT
+         pZVEVBULiIfl0w/JrZqdzB2nUrhFfcFxks2GxkK4/MEqRfLg/BxcC2TJrgzefSqPNYaM
+         kUnAGPRnLTWYZp6Yg9Aln1SzwyYXs2D7OJV98ZqIEfWDwjQQDflW3W2fvNyIaTvUlcMx
+         Rco+EPOXttJtZGfjcAZ38h+6R2tcNeAO1xnCA2hOkeApiBAgWd6j6KQL2sYaWFA0g9Vl
+         a2uKWUqdgPLpZezdQtF011TvHPILQj5Jbb9M78ftoKg5dYD4kQk80oA4CmzjiCvEVqEG
+         yF7A==
+X-Gm-Message-State: AOJu0YwSZmB9pdHPQDPf91bJLJQDCMmfUPEAhnc9rCnpdDZezFcy0T/j
+	i6QP1zjtJtGjeFEXY3cqzN7ciQ==
+X-Google-Smtp-Source: AGHT+IGdswAaush01nujfKLZz/6i7q9b1IdjA+301m8PBrxWscy8pmA9yLp4Rst9KIrsmBjxos6XvA==
+X-Received: by 2002:adf:ea4d:0:b0:317:9537:d73f with SMTP id j13-20020adfea4d000000b003179537d73fmr2324254wrn.30.1691598763235;
+        Wed, 09 Aug 2023 09:32:43 -0700 (PDT)
+Received: from elver.google.com ([2a00:79e0:9c:201:9ce0:327a:6e5a:3533])
+        by smtp.gmail.com with ESMTPSA id d10-20020adffd8a000000b003143ba62cf4sm17138365wrr.86.2023.08.09.09.32.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Aug 2023 09:32:42 -0700 (PDT)
+Date: Wed, 9 Aug 2023 18:32:37 +0200
+From: Marco Elver <elver@google.com>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: Kees Cook <keescook@chromium.org>,
 	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v4 03/36] arm64/gcs: Document the ABI for Guarded Control
- Stacks
-Message-ID: <f4cec4b3-c386-4873-aa1d-90528e062f2a@sirena.org.uk>
-References: <20230807-arm64-gcs-v4-0-68cfa37f9069@kernel.org>
- <20230807-arm64-gcs-v4-3-68cfa37f9069@kernel.org>
- <ZNOhjrYleGBR6Pbs@arm.com>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Tom Rix <trix@redhat.com>, Miguel Ojeda <ojeda@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com,
+	linux-toolchains@vger.kernel.org
+Subject: Re: [PATCH v3 3/3] list_debug: Introduce CONFIG_DEBUG_LIST_MINIMAL
+Message-ID: <ZNO/pf/pH5jJAZI0@elver.google.com>
+References: <20230808102049.465864-1-elver@google.com>
+ <20230808102049.465864-3-elver@google.com>
+ <202308081424.1DC7AA4AE3@keescook>
+ <CANpmjNM3rc8ih7wvFc2GLuMDLpWcdA8uWfut-5tOajqtVG952A@mail.gmail.com>
+ <ZNNi/4L1mD8XPNix@elver.google.com>
+ <20230809113021.63e5ef66@gandalf.local.home>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="k90euu3QCpA7JsXx"
-Content-Disposition: inline
-In-Reply-To: <ZNOhjrYleGBR6Pbs@arm.com>
-X-Cookie: Necessity is a mother.
-
-
---k90euu3QCpA7JsXx
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20230809113021.63e5ef66@gandalf.local.home>
+User-Agent: Mutt/2.2.9 (2022-11-12)
 
-On Wed, Aug 09, 2023 at 03:24:14PM +0100, Catalin Marinas wrote:
-> On Mon, Aug 07, 2023 at 11:00:08PM +0100, Mark Brown wrote:
+On Wed, Aug 09, 2023 at 11:30AM -0400, Steven Rostedt wrote:
+[...]
+> 
+> I would actually prefer DEBUG_LIST to select HARDEN_LIST and not the other
+> way around. It logically doesn't make sense that HARDEN_LIST would select
+> DEBUG_LIST. That is, I could by default want HARDEN_LIST always on, but not
+> DEBUG_LIST (because who knows, it may add other features I don't want). But
+> then, I may have stumbled over something and want more info, and enable
+> DEBUG_LIST (while still having HARDEN_LIST) enabled.
+> 
+> I think you are looking at this from an implementation perspective and not
+> the normal developer one.
+> 
+[...]
+> 
+> That is, if DEBUG_LIST is enabled, we always call the
+> __list_add_valid_or_report(), but if only HARDEN_LIST is enabled, then we
+> do the shortcut.
 
-> > +* When set PR_SHADOW_STACK_ENABLE flag allocates a Guarded Control Sta=
-ck for
->=20
-> The 'for' at the end of the line above is not needed.
->=20
-> > +  and enables GCS for the thread, enabling the functionality controlle=
-d by
+Good point - I think this is better. See below tentative v4.
 
-I find it a little clearer that it's a per thread stack here but sure.
+Kees: Does that also look more like what you had in mind?
 
-> > +* PR_LOCK_SHADOW_STACK_STATUS allows any bit to be locked, this allows
-> > +  userspace to prevent changes to any future features.
+Thanks,
+-- Marco
 
-> I presume a new lock prctl() won't allow unlocking but can only extend
-> the lock. I haven't looked at the patches yet but it may be worth
-> spelling this out.
+------ >8 ------
 
-Yes, there is no unlock prctl() - the lock prctl() just lets you set
-locks.
+From: Marco Elver <elver@google.com>
+Date: Thu, 27 Jul 2023 22:19:02 +0200
+Subject: [PATCH] list: Introduce CONFIG_HARDEN_LIST
 
-> > +* If GCS is disabled for a thread after having previously been enabled=
- then
-> > +  the stack will remain allocated for the lifetime of the thread.
+Numerous production kernel configs (see [1, 2]) are choosing to enable
+CONFIG_DEBUG_LIST, which is also being recommended by KSPP for hardened
+configs [3]. The motivation behind this is that the option can be used
+as a security hardening feature (e.g. CVE-2019-2215 and CVE-2019-2025
+are mitigated by the option [4]).
 
-> Sorry if this has been discussed in other threads. What is the issue
-> with unmapping/freeing of the shadow stack?
+The feature has never been designed with performance in mind, yet common
+list manipulation is happening across hot paths all over the kernel.
 
-If something was in the middle of looking the GCS (eg, you're trying to
-disable GCS during signal handling that preempted something that is
-logging the call stack) and you pull the GCS storage from underneath it
-then things will go badly.
+Introduce CONFIG_HARDEN_LIST, which performs list pointer checking
+inline, and only upon list corruption calls the reporting slow path.
 
-> > At present
-> > +  any attempt to reenable GCS for the thread will be rejected, this ma=
-y be
-> > +  revisited in future.
+Since DEBUG_LIST is functionally a superset of HARDEN_LIST, the Kconfig
+variables are designed to reflect that: DEBUG_LIST selects HARDEN_LIST,
+whereas HARDEN_LIST itself has no dependency on DEBUG_LIST.
 
-> What's the rationale here? Is it that function returns won't work?
+To generate optimal machine code with CONFIG_HARDEN_LIST:
 
-We have to work out where to point GCSPR_EL0 when reenabling - at the
-top of the old stack, where it was before, on a new stack?  It was
-easier to just not support reenabling than to work out what the sensible
-answer is when it's not clear that any real use case exists to inform
-what makes sense.  We can add support for that later (you can probe by
-starting a thread, disabling and trying to reenable) if someone does
-come up with a use case.
+  1. Elide checking for pointer values which upon dereference would
+     result in an immediate access fault -- therefore "minimal" checks.
+     The trade-off is lower-quality error reports.
 
-The use case for disabling is a non-enforcing mode which logs GCS faults
-and then disables GCS.
+  2. Use the newly introduced __preserve_most function attribute
+     (available with Clang, but not yet with GCC) to minimize the code
+     footprint for calling the reporting slow path. As a result,
+     function size of callers is reduced by avoiding saving registers
+     before calling the rarely called reporting slow path.
 
-> > +3.  Allocation of Guarded Control Stacks
-> > +----------------------------------------
+     Note that all TUs in lib/Makefile already disable function tracing,
+     including list_debug.c, and __preserve_most's implied notrace has
+     no effect in this case.
 
-> > +* When GCS is enabled for a thread a new Guarded Control Stack will be
-> > +  allocated for it of size RLIMIT_STACK / 2 or 2 gigabytes, whichever =
-is
-> > +  smaller.
+  3. Because the inline checks are a subset of the full set of checks in
+     __list_*_valid_or_report(), always return false if the inline
+     checks failed.  This avoids redundant compare and conditional
+     branch right after return from the slow path.
 
-> Is this number based on the fact that a function call would only push
-> the LR to GCS while standard function prologue pushes at least two
-> registers?
+As a side-effect of the checks being inline, if the compiler can prove
+some condition to always be true, it can completely elide some checks.
 
-It's actually based on bitrot that I'd initially chosen a smaller value
-since it's likely that functions will push at least something as you
-suggest, the patches now just use RLIMIT_STACK.  I'll fix.
+Running netperf with CONFIG_HARDEN_LIST (using a Clang compiler with
+"preserve_most") shows throughput improvements, in my case of ~7% on
+average (up to 20-30% on some test cases).
 
-> > +* When GCS is disabled for a thread the Guarded Control Stack initially
-> > +  allocated for that thread will be freed.  Note carefully that if the
-> > +  stack has been switched this may not be the stack currently in use by
-> > +  the thread.
+Link: https://r.android.com/1266735 [1]
+Link: https://gitlab.archlinux.org/archlinux/packaging/packages/linux/-/blob/main/config [2]
+Link: https://kernsec.org/wiki/index.php/Kernel_Self_Protection_Project/Recommended_Settings [3]
+Link: https://googleprojectzero.blogspot.com/2019/11/bad-binder-android-in-wild-exploit.html [4]
+Signed-off-by: Marco Elver <elver@google.com>
+---
+v4:
+* Rename to CONFIG_HARDEN_LIST, which can independently be selected from
+  CONFIG_DEBUG_LIST.
 
-> Does this not contradict an earlier statement that the GCS is not freed
-> for a thread when disabled?
+v3:
+* Rename ___list_*_valid() to __list_*_valid_or_report().
+* More comments.
 
-Yes, it was meant to say when the thread is freed rather than when GCS
-is disabled.
+v2:
+* Note that lib/Makefile disables function tracing for everything and
+  __preserve_most's implied notrace is a noop here.
+---
+ arch/arm64/kvm/hyp/nvhe/Makefile     |  2 +-
+ arch/arm64/kvm/hyp/nvhe/list_debug.c |  2 +
+ include/linux/list.h                 | 64 +++++++++++++++++++++++++---
+ lib/Kconfig.debug                    |  9 +++-
+ lib/Makefile                         |  2 +-
+ lib/list_debug.c                     |  5 ++-
+ security/Kconfig.hardening           | 13 ++++++
+ 7 files changed, 86 insertions(+), 11 deletions(-)
 
-> > +* When GCS is enabled for the interrupted thread a signal handling spe=
-cific
-> > +  GCS cap token will be written to the GCS, this is an architectural G=
-CS cap
-> > +  token with bit 63 set.  The GCSPR_EL0 reported in the signal frame w=
-ill
-> > +  point to this cap token.
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index 9ddc025e4b86..c89c85a41ac4 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -25,7 +25,7 @@ hyp-obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o
+ 	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o stacktrace.o ffa.o
+ hyp-obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
+ 	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
+-hyp-obj-$(CONFIG_DEBUG_LIST) += list_debug.o
++hyp-obj-$(CONFIG_HARDEN_LIST) += list_debug.o
+ hyp-obj-y += $(lib-objs)
+ 
+ ##
+diff --git a/arch/arm64/kvm/hyp/nvhe/list_debug.c b/arch/arm64/kvm/hyp/nvhe/list_debug.c
+index 16266a939a4c..46a2d4f2b3c6 100644
+--- a/arch/arm64/kvm/hyp/nvhe/list_debug.c
++++ b/arch/arm64/kvm/hyp/nvhe/list_debug.c
+@@ -26,6 +26,7 @@ static inline __must_check bool nvhe_check_data_corruption(bool v)
+ 
+ /* The predicates checked here are taken from lib/list_debug.c. */
+ 
++__list_valid_slowpath
+ bool __list_add_valid_or_report(struct list_head *new, struct list_head *prev,
+ 				struct list_head *next)
+ {
+@@ -37,6 +38,7 @@ bool __list_add_valid_or_report(struct list_head *new, struct list_head *prev,
+ 	return true;
+ }
+ 
++__list_valid_slowpath
+ bool __list_del_entry_valid_or_report(struct list_head *entry)
+ {
+ 	struct list_head *prev, *next;
+diff --git a/include/linux/list.h b/include/linux/list.h
+index 130c6a1bb45c..ef899c27c68b 100644
+--- a/include/linux/list.h
++++ b/include/linux/list.h
+@@ -38,39 +38,91 @@ static inline void INIT_LIST_HEAD(struct list_head *list)
+ 	WRITE_ONCE(list->prev, list);
+ }
+ 
++#ifdef CONFIG_HARDEN_LIST
++
+ #ifdef CONFIG_DEBUG_LIST
++# define __list_valid_slowpath
++#else
++# define __list_valid_slowpath __cold __preserve_most
++#endif
++
+ /*
+  * Performs the full set of list corruption checks before __list_add().
+  * On list corruption reports a warning, and returns false.
+  */
+-extern bool __list_add_valid_or_report(struct list_head *new,
+-				       struct list_head *prev,
+-				       struct list_head *next);
++extern bool __list_valid_slowpath __list_add_valid_or_report(struct list_head *new,
++							     struct list_head *prev,
++							     struct list_head *next);
+ 
+ /*
+  * Performs list corruption checks before __list_add(). Returns false if a
+  * corruption is detected, true otherwise.
++ *
++ * With CONFIG_HARDEN_LIST only, performs minimal list integrity checking (that
++ * do not result in a fault) inline, and only if a corruption is detected calls
++ * the reporting function __list_add_valid_or_report().
+  */
+ static __always_inline bool __list_add_valid(struct list_head *new,
+ 					     struct list_head *prev,
+ 					     struct list_head *next)
+ {
+-	return __list_add_valid_or_report(new, prev, next);
++	bool ret = true;
++
++	if (!IS_ENABLED(CONFIG_DEBUG_LIST)) {
++		/*
++		 * With the hardening version, elide checking if next and prev
++		 * are NULL, since the immediate dereference of them below would
++		 * result in a fault if NULL.
++		 *
++		 * With the reduced set of checks, we can afford to inline the
++		 * checks, which also gives the compiler a chance to elide some
++		 * of them completely if they can be proven at compile-time. If
++		 * one of the pre-conditions does not hold, the slow-path will
++		 * show a report which pre-condition failed.
++		 */
++		if (likely(next->prev == prev && prev->next == next && new != prev && new != next))
++			return true;
++		ret = false;
++	}
++
++	ret &= __list_add_valid_or_report(new, prev, next);
++	return ret;
+ }
+ 
+ /*
+  * Performs the full set of list corruption checks before __list_del_entry().
+  * On list corruption reports a warning, and returns false.
+  */
+-extern bool __list_del_entry_valid_or_report(struct list_head *entry);
++extern bool __list_valid_slowpath __list_del_entry_valid_or_report(struct list_head *entry);
+ 
+ /*
+  * Performs list corruption checks before __list_del_entry(). Returns false if a
+  * corruption is detected, true otherwise.
++ *
++ * With CONFIG_HARDEN_LIST only, performs minimal list integrity checking (that
++ * do not result in a fault) inline, and only if a corruption is detected calls
++ * the reporting function __list_del_entry_valid_or_report().
+  */
+ static __always_inline bool __list_del_entry_valid(struct list_head *entry)
+ {
+-	return __list_del_entry_valid_or_report(entry);
++	bool ret = true;
++
++	if (!IS_ENABLED(CONFIG_DEBUG_LIST)) {
++		struct list_head *prev = entry->prev;
++		struct list_head *next = entry->next;
++
++		/*
++		 * With the hardening version, elide checking if next and prev
++		 * are NULL, LIST_POISON1 or LIST_POISON2, since the immediate
++		 * dereference of them below would result in a fault.
++		 */
++		if (likely(prev->next == entry && next->prev == entry))
++			return true;
++		ret = false;
++	}
++
++	ret &= __list_del_entry_valid_or_report(entry);
++	return ret;
+ }
+ #else
+ static inline bool __list_add_valid(struct list_head *new,
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index fbc89baf7de6..9e38956d6f50 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -1674,9 +1674,14 @@ menu "Debug kernel data structures"
+ config DEBUG_LIST
+ 	bool "Debug linked list manipulation"
+ 	depends on DEBUG_KERNEL || BUG_ON_DATA_CORRUPTION
++	select HARDEN_LIST
+ 	help
+-	  Enable this to turn on extended checks in the linked-list
+-	  walking routines.
++	  Enable this to turn on extended checks in the linked-list walking
++	  routines.
++
++	  This option trades better quality error reports for performance, and
++	  is more suitable for kernel debugging. If you care about performance,
++	  you should only enable CONFIG_HARDEN_LIST instead.
+ 
+ 	  If unsure, say N.
+ 
+diff --git a/lib/Makefile b/lib/Makefile
+index 42d307ade225..a7ebc9090f04 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -161,7 +161,7 @@ obj-$(CONFIG_BTREE) += btree.o
+ obj-$(CONFIG_INTERVAL_TREE) += interval_tree.o
+ obj-$(CONFIG_ASSOCIATIVE_ARRAY) += assoc_array.o
+ obj-$(CONFIG_DEBUG_PREEMPT) += smp_processor_id.o
+-obj-$(CONFIG_DEBUG_LIST) += list_debug.o
++obj-$(CONFIG_HARDEN_LIST) += list_debug.o
+ obj-$(CONFIG_DEBUG_OBJECTS) += debugobjects.o
+ 
+ obj-$(CONFIG_BITREVERSE) += bitrev.o
+diff --git a/lib/list_debug.c b/lib/list_debug.c
+index 2def33b1491f..38ddc7c01eab 100644
+--- a/lib/list_debug.c
++++ b/lib/list_debug.c
+@@ -2,7 +2,8 @@
+  * Copyright 2006, Red Hat, Inc., Dave Jones
+  * Released under the General Public License (GPL).
+  *
+- * This file contains the linked list validation for DEBUG_LIST.
++ * This file contains the linked list validation and error reporting for
++ * HARDEN_LIST and DEBUG_LIST.
+  */
+ 
+ #include <linux/export.h>
+@@ -17,6 +18,7 @@
+  * attempt).
+  */
+ 
++__list_valid_slowpath
+ bool __list_add_valid_or_report(struct list_head *new, struct list_head *prev,
+ 				struct list_head *next)
+ {
+@@ -39,6 +41,7 @@ bool __list_add_valid_or_report(struct list_head *new, struct list_head *prev,
+ }
+ EXPORT_SYMBOL(__list_add_valid_or_report);
+ 
++__list_valid_slowpath
+ bool __list_del_entry_valid_or_report(struct list_head *entry)
+ {
+ 	struct list_head *prev, *next;
+diff --git a/security/Kconfig.hardening b/security/Kconfig.hardening
+index 0f295961e773..19aa2b7d2f64 100644
+--- a/security/Kconfig.hardening
++++ b/security/Kconfig.hardening
+@@ -279,6 +279,19 @@ config ZERO_CALL_USED_REGS
+ 
+ endmenu
+ 
++menu "Hardening of kernel data structures"
++
++config HARDEN_LIST
++	bool "Check integrity of linked list manipulation"
++	help
++	  Minimal integrity checking in the linked-list manipulation routines
++	  to catch memory corruptions that are not guaranteed to result in an
++	  immediate access fault.
++
++	  If unsure, say N.
++
++endmenu
++
+ config CC_HAS_RANDSTRUCT
+ 	def_bool $(cc-option,-frandomize-layout-seed-file=/dev/null)
+ 	# Randstruct was first added in Clang 15, but it isn't safe to use until
+-- 
+2.41.0.640.ga95def55d0-goog
 
-> I lost track of the GCS spec versions. Has the valid cap token format
-> been updated? What I have in my spec (though most likely old) is:
-
->   An entry in the Guarded control stack is defined as a Valid cap entry,
->   if bits [63:12] of the value are same as bits [63:12] of the address
->   where the entry is stored and bits [11:0] contain a Valid cap token.
-
-You have a draft version of the spec, this was changed and now there is
-now a token field reserved in the low 12 bits of the register:
-
-#define GCS_CAP_ADDR_MASK		GENMASK(63, 12)
-#define GCS_CAP_ADDR_SHIFT		12
-#define GCS_CAP_ADDR_WIDTH		52
-#define GCS_CAP_ADDR(x)			FIELD_GET(GCS_CAP_ADDR_MASK, x)
-
-#define GCS_CAP_TOKEN_MASK		GENMASK(11, 0)
-#define GCS_CAP_TOKEN_SHIFT		0
-#define GCS_CAP_TOKEN_WIDTH		12
-#define GCS_CAP_TOKEN(x)		FIELD_GET(GCS_CAP_TOKEN_MASK, x)
-
-#define GCS_CAP_VALID_TOKEN		0x1
-#define GCS_CAP_IN_PROGRESS_TOKEN	0x5
-
-#define GCS_CAP(x)	((((unsigned long)x) & GCS_CAP_ADDR_MASK) | \
-					       GCS_CAP_VALID_TOKEN)
-
---k90euu3QCpA7JsXx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmTTsg0ACgkQJNaLcl1U
-h9AEfQf+Ka4G6z9Nm1kf+b/l5pKI+rrhbAQGaG8LsctIW9PfOqcL34gYTSwCEcFC
-yc7FLvXwOykuy/dMOwhEPvohyCsS/fvouc1WLRs/T1Ur11kjMYjJaMnrLIafdJRC
-AH7esh4KGfFfzcq6O2WaLjk/wSLVMF7ZemDSQJwb1zC8tACwL/ycJNx3xi/LgCjn
-uegBSqenG7Ehp7OuPFBeZmfL1yMQ5g5GGrF3ga5swfXgxDmne+0X0pXCqoqyQURH
-B/4075gZXjwuMcraFsVPFQEdlk4nZNl4BEEdV9IGHXKIBWe1qKOTIFc14Jvt3U5/
-AhfIuxGumWGmrTlP/ZBjaZUJaMuFlA==
-=LF8s
------END PGP SIGNATURE-----
-
---k90euu3QCpA7JsXx--
