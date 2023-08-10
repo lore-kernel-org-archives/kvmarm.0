@@ -1,112 +1,130 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60EB83D71
-	for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 09:44:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1691660666;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lf+g7H8c+D8XIdvK87t5LbaETche7IdF7H8+sxCRQxo=;
-	b=e2jlKN1Wib8eVdDn7s9VzJg/5KvnLETHAlAL5GsFp8nGZxUHYHt8dl9oVH9a2cUGC3WqLg
-	a4hK64v72j1HKsahYaf1478eEQ6KtYJLBoVrztnTrRClbXdgshDIjqxSQkTtEOZfbMjk5m
-	CHNFec8rx2BQ9VJdor4MRQ7AZv0WZ2Y=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-302-MbNvD1iRMdejvWuwm_gWbw-1; Thu, 10 Aug 2023 05:44:24 -0400
-X-MC-Unique: MbNvD1iRMdejvWuwm_gWbw-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3fe232ba9e5so4367085e9.2
-        for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 02:44:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691660663; x=1692265463;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lf+g7H8c+D8XIdvK87t5LbaETche7IdF7H8+sxCRQxo=;
-        b=iSS+iZn5kzdrU4r0AydUGAHArbG4BVlv5N3G/tsp2jYNumV3bI7yWYI/b07BPsJaDf
-         EAbrTrGSVliJBbiQM7Mzei7pBY9JH/m84baS5ixt6KTXQWGatgJ5EFKYvTI3cCnpcgT/
-         IfyVsEoWd4Sq2dUqIyaSDQ5ZIGSdy5nYgrCqHvMLtLGn22dy22Fi5KJ4Ynqq4RnJyOE2
-         EBa2azjDuMyApjWbbm0dEY54hK0c5+byNTI5SiFkaMSCRWfPooxAZ28NpZuL3tHqNXc5
-         p7liH3wEbE2LKiL5FXuiAg5ykMZeVA5aarsShSU7b2TElOrLSEPXowU0lfG7r3igg2Is
-         yTOA==
-X-Gm-Message-State: AOJu0YxFEeCJa9OEpGniCy7+S/m2iW+4T1RkfHsnpLFHkrsNqoacggCC
-	f3xn9jtoS7Sl/xB/dW7IKE2czbFSmAhtJiro11VoGv4c7Q7N7uBngePqcOXXqTXZoIyabZ1IhRX
-	yAUqMNA9u7IBFzaeN
-X-Received: by 2002:a05:600c:213:b0:3fa:934c:8356 with SMTP id 19-20020a05600c021300b003fa934c8356mr1511176wmi.10.1691660663604;
-        Thu, 10 Aug 2023 02:44:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHETQi0vth3YGZzAHlU+FHSXk47nzzZTe9HU1FXKIvTwI+udFnJZFW42tqkZkyIGRj6hC56qA==
-X-Received: by 2002:a05:600c:213:b0:3fa:934c:8356 with SMTP id 19-20020a05600c021300b003fa934c8356mr1511152wmi.10.1691660663318;
-        Thu, 10 Aug 2023 02:44:23 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id y24-20020a05600c365800b003fe2b081661sm4429254wmq.30.2023.08.10.02.44.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Aug 2023 02:44:22 -0700 (PDT)
-Message-ID: <367481f1-e1ee-9a2d-8822-2653c73ec746@redhat.com>
-Date: Thu, 10 Aug 2023 11:44:20 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 167C81E52F
+	for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 10:42:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75D3DC433C8;
+	Thu, 10 Aug 2023 10:42:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691664134;
+	bh=rrp6egUzhCSa8LB4UJXtnPAZrjrtZeHOWdqGHCsqluk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=t6qhRVWyE5x6ITeOhf9/PxysjQOKZagU8QhWv+3yyXYtylVd9PdAyoGaHFePMLH8R
+	 innN86AF7/9DBVtFW8YFDGcHxVDy4FkPYQffNPs+Zxd/vSSZPaTqIeBpl3dupA4mSR
+	 y+bZEk04ovsKeFWACp64EQhP/ogIVRfEdY0jrJ9J6QF7fj/Cfj04a+aKcHhBMEXbwT
+	 lIg9twdHPN0yXRsfl27gAUH7atabe8lggvyhCiVBc36bjp5UKX2A5eJrJipoziTFnw
+	 otfK7NVGOBx9KcP44PovncC/3m3J8oglS+Gk6GbB2dClqjMtOd4YpEvwCxAY5m9Dzj
+	 mFbyWLJrogUaQ==
+Received: from [195.11.108.100] (helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qU37M-003nbt-0F;
+	Thu, 10 Aug 2023 11:42:12 +0100
+Date: Thu, 10 Aug 2023 11:42:19 +0100
+Message-ID: <87wmy3p4ac.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: eric.auger@redhat.com
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Brown
+ <broonie@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Chase Conklin <chase.conklin@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Darren Hart <darren@os.amperecomputing.com>,
+	Miguel Luis <miguel.luis@oracle.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v3 23/27] KVM: arm64: nv: Add SVC trap forwarding
+In-Reply-To: <2a751a64-559e-cb17-4359-7f368c1b42ca@redhat.com>
+References: <20230808114711.2013842-1-maz@kernel.org>
+	<20230808114711.2013842-24-maz@kernel.org>
+	<2a751a64-559e-cb17-4359-7f368c1b42ca@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v3 25/27] KVM: arm64: nv: Expose FGT to nested guests
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Mark Brown
- <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Will Deacon <will@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>,
- Andre Przywara <andre.przywara@arm.com>,
- Chase Conklin <chase.conklin@arm.com>,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Darren Hart <darren@os.amperecomputing.com>,
- Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
-References: <20230808114711.2013842-1-maz@kernel.org>
- <20230808114711.2013842-26-maz@kernel.org>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230808114711.2013842-26-maz@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 195.11.108.100
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+Hi Eric,
 
+On Thu, 10 Aug 2023 09:35:41 +0100,
+Eric Auger <eric.auger@redhat.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 8/8/23 13:47, Marc Zyngier wrote:
+> > HFGITR_EL2 allows the trap of SVC instructions to EL2. Allow these
+> > traps to be forwarded. Take this opportunity to deny any 32bit activity
+> > when NV is enabled.
+> 
+> I can't figure out how HFGITR_EL2.{SVC_EL1, SVC_EL0 and ERET} are
+> handled. Please could you explain.
 
-On 8/8/23 13:47, Marc Zyngier wrote:
-> Now that we have FGT support, expose the feature to NV guests.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/nested.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 7f80f385d9e8..3facd8918ae3 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -71,8 +71,9 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
->  		break;
->  
->  	case SYS_ID_AA64MMFR0_EL1:
-> -		/* Hide ECV, FGT, ExS, Secure Memory */
-> -		val &= ~(GENMASK_ULL(63, 43)		|
-> +		/* Hide ECV, ExS, Secure Memory */
-> +		val &= ~(NV_FTR(MMFR0, ECV)		|
-> +			 NV_FTR(MMFR0, EXS)		|
->  			 NV_FTR(MMFR0, TGRAN4_2)	|
->  			 NV_FTR(MMFR0, TGRAN16_2)	|
->  			 NV_FTR(MMFR0, TGRAN64_2)	|
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+- SVC: KVM itself never traps it, so any trap of SVC must be the
+  result of a guest trap -- we don't need to do any demultiplexing. We
+  thus directly inject the trap back. This is what the comment in
+  handle_svc() tries to capture, but obviously fails to convey the
+  point.
 
-Eric
+- ERET: This is already handled since 6898a55ce38c ("KVM: arm64: nv:
+  Handle trapped ERET from virtual EL2"). Similarly to SVC, KVM never
+  traps it unless we run NV.
 
+Now, looking into it, I think I'm missing the additional case where
+the L2 guest runs at vEL1. I'm about to add the following patchlet:
+
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 3b86d534b995..617ae6dea5d5 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -222,7 +222,22 @@ static int kvm_handle_eret(struct kvm_vcpu *vcpu)
+ 	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_ERET_ISS_ERET)
+ 		return kvm_handle_ptrauth(vcpu);
+ 
+-	kvm_emulate_nested_eret(vcpu);
++	/*
++	 * If we got here, two possibilities:
++	 *
++	 * - the guest is in EL2, and we need to fully emulate ERET
++	 *
++	 * - the guest is in EL1, and we need to reinject the
++         *   exception into the L1 hypervisor.
++	 *
++	 * If KVM ever traps ERET for its own use, we'll have to
++	 * revisit this.
++	 */
++	if (is_hyp_ctxt(vcpu))
++		kvm_emulate_nested_eret(vcpu);
++	else
++		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
++
+ 	return 1;
+ }
+ 
+
+Does the above help?
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
