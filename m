@@ -1,130 +1,99 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 167C81E52F
-	for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 10:42:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75D3DC433C8;
-	Thu, 10 Aug 2023 10:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 650DA1DDF0
+	for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 11:41:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3391FC433C9;
+	Thu, 10 Aug 2023 11:41:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691664134;
-	bh=rrp6egUzhCSa8LB4UJXtnPAZrjrtZeHOWdqGHCsqluk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=t6qhRVWyE5x6ITeOhf9/PxysjQOKZagU8QhWv+3yyXYtylVd9PdAyoGaHFePMLH8R
-	 innN86AF7/9DBVtFW8YFDGcHxVDy4FkPYQffNPs+Zxd/vSSZPaTqIeBpl3dupA4mSR
-	 y+bZEk04ovsKeFWACp64EQhP/ogIVRfEdY0jrJ9J6QF7fj/Cfj04a+aKcHhBMEXbwT
-	 lIg9twdHPN0yXRsfl27gAUH7atabe8lggvyhCiVBc36bjp5UKX2A5eJrJipoziTFnw
-	 otfK7NVGOBx9KcP44PovncC/3m3J8oglS+Gk6GbB2dClqjMtOd4YpEvwCxAY5m9Dzj
-	 mFbyWLJrogUaQ==
-Received: from [195.11.108.100] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qU37M-003nbt-0F;
-	Thu, 10 Aug 2023 11:42:12 +0100
-Date: Thu, 10 Aug 2023 11:42:19 +0100
-Message-ID: <87wmy3p4ac.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: eric.auger@redhat.com
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Mark Brown
- <broonie@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Darren Hart <darren@os.amperecomputing.com>,
-	Miguel Luis <miguel.luis@oracle.com>,
+	s=k20201202; t=1691667677;
+	bh=SjY6cOlS50SecqcUH+vtDGVI75FsC2Isz7CGfrRn3Vg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YBTItZUv0G89tFiv0O0B8TEhjWNjnoNEmZi8nt6DuvO/scAwoxRs7XA6BiURuHLnb
+	 4Aq2cDA2bbWglZvwEXyOfnCjN38AzLwQwsZN4mG6gfoGXUaFw0f/4i09YWO4gcWvo9
+	 ooMH/iYINXNk9s5xHIZ/l8yPA4RolpVcnCfTpJUEFbuMe7IwbvQa/cAOEn0/WIwLxX
+	 Jma2PMvPtsFsaIMl7jjQYY0kzKwqaua6ViLBFNC+1zlvZ81ZtUeCKnh7WBGsyWT0AJ
+	 0q7MPoQEpgwIXfUQ8+CODBM5Jhp17HRovOb1/sPzqGLFa82MDNsHsLUj71MptXKTqp
+	 kA8rBQ2dsmgng==
+Date: Thu, 10 Aug 2023 12:41:09 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v3 23/27] KVM: arm64: nv: Add SVC trap forwarding
-In-Reply-To: <2a751a64-559e-cb17-4359-7f368c1b42ca@redhat.com>
-References: <20230808114711.2013842-1-maz@kernel.org>
-	<20230808114711.2013842-24-maz@kernel.org>
-	<2a751a64-559e-cb17-4359-7f368c1b42ca@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v4 03/36] arm64/gcs: Document the ABI for Guarded Control
+ Stacks
+Message-ID: <4e215e53-c7d1-4338-8df9-3f9bf783ced9@sirena.org.uk>
+References: <20230807-arm64-gcs-v4-0-68cfa37f9069@kernel.org>
+ <20230807-arm64-gcs-v4-3-68cfa37f9069@kernel.org>
+ <ZNOhjrYleGBR6Pbs@arm.com>
+ <f4cec4b3-c386-4873-aa1d-90528e062f2a@sirena.org.uk>
+ <ZNSmFmYFHDw3NvvP@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 195.11.108.100
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="HX3zqelcmaABHbLq"
+Content-Disposition: inline
+In-Reply-To: <ZNSmFmYFHDw3NvvP@arm.com>
+X-Cookie: Reunite Gondwondaland!
 
-Hi Eric,
 
-On Thu, 10 Aug 2023 09:35:41 +0100,
-Eric Auger <eric.auger@redhat.com> wrote:
-> 
-> Hi Marc,
-> 
-> On 8/8/23 13:47, Marc Zyngier wrote:
-> > HFGITR_EL2 allows the trap of SVC instructions to EL2. Allow these
-> > traps to be forwarded. Take this opportunity to deny any 32bit activity
-> > when NV is enabled.
-> 
-> I can't figure out how HFGITR_EL2.{SVC_EL1, SVC_EL0 and ERET} are
-> handled. Please could you explain.
+--HX3zqelcmaABHbLq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-- SVC: KVM itself never traps it, so any trap of SVC must be the
-  result of a guest trap -- we don't need to do any demultiplexing. We
-  thus directly inject the trap back. This is what the comment in
-  handle_svc() tries to capture, but obviously fails to convey the
-  point.
+On Thu, Aug 10, 2023 at 09:55:50AM +0100, Szabolcs Nagy wrote:
+> The 08/09/2023 16:34, Mark Brown wrote:
 
-- ERET: This is already handled since 6898a55ce38c ("KVM: arm64: nv:
-  Handle trapped ERET from virtual EL2"). Similarly to SVC, KVM never
-  traps it unless we run NV.
+> > It's actually based on bitrot that I'd initially chosen a smaller value
+> > since it's likely that functions will push at least something as you
+> > suggest, the patches now just use RLIMIT_STACK.  I'll fix.
 
-Now, looking into it, I think I'm missing the additional case where
-the L2 guest runs at vEL1. I'm about to add the following patchlet:
+> the pcs requires 16byte aligned stack frames, with 8byte per gcs entry
+> there is no need for same gcs size as stack size in userspace.
 
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 3b86d534b995..617ae6dea5d5 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -222,7 +222,22 @@ static int kvm_handle_eret(struct kvm_vcpu *vcpu)
- 	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_ERET_ISS_ERET)
- 		return kvm_handle_ptrauth(vcpu);
- 
--	kvm_emulate_nested_eret(vcpu);
-+	/*
-+	 * If we got here, two possibilities:
-+	 *
-+	 * - the guest is in EL2, and we need to fully emulate ERET
-+	 *
-+	 * - the guest is in EL1, and we need to reinject the
-+         *   exception into the L1 hypervisor.
-+	 *
-+	 * If KVM ever traps ERET for its own use, we'll have to
-+	 * revisit this.
-+	 */
-+	if (is_hyp_ctxt(vcpu))
-+		kvm_emulate_nested_eret(vcpu);
-+	else
-+		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-+
- 	return 1;
- }
- 
+I agree that it's going to be excessive for pretty much all
+applications, I adjusted it to match x86 as part of the general effort
+to avoid divergence and because I was a bit concerned about non-PCS
+cases (eg, JITed code) potentially running into trouble, especially with
+smaller stack limits.  It's not an issue I have super strong opinions on
+though, as you can see I had implemented it both ways at various times.
 
-Does the above help?
+--HX3zqelcmaABHbLq
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Thanks,
+-----BEGIN PGP SIGNATURE-----
 
-	M.
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmTUzNQACgkQJNaLcl1U
+h9CX2Af/ZivuFjFTpJA8oad5auH8pxkhXVEAIPD0ff/7T6abVR9+lSwBwNj9fu7u
+QzV10fINsZecsGZed5ZdpIR3HeeSZW2rAVaF2fIu1u7L6gXy0UwG1jPkOB21G4Ca
+LApqqi+p4OfTtZtySK1optntQ4+DJRFrhFESNYwt/UyKffuB9bbr5xaIB/23ghe+
+ZLmOWBXMpL4NaZMPdi9Tm43gAvVlDnXsANCWTZfq0uRGZBJBggQIM7Mwrz9JwmVy
+3633R9GviRxPWQm83UqZI7n51wspiOfjdhYYtsqqo7jYwawpnfb4Jj89/3j6QmJO
+WdrDN78D2wpFLApdojZDDftk6sXHkg==
+=m3b4
+-----END PGP SIGNATURE-----
 
--- 
-Without deviation from the norm, progress is not possible.
+--HX3zqelcmaABHbLq--
