@@ -1,182 +1,233 @@
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2080.outbound.protection.outlook.com [40.107.104.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27F131E1D8
-	for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 13:34:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1+P9sNH71xdSnZ55Qo8IbTCdoxxs3507AZMmWWiXwUw=;
- b=F4+wkQUcBHKCO/A4R1XJta6zjFmSKXiFu9mKNvAJXJD+5dYMfB52TEBZ6ra5Ez+33wCxefCVHGH+N5kqq43Ng9LYKyP+/70CiPEjGLqjCj4xveTZ2nX2lLT6IRVkeIRlEsHWE+SWY18qp7tr56vtklxG8WFt2XAlTTjCQmELJ3I=
-Received: from DB8PR06CA0065.eurprd06.prod.outlook.com (2603:10a6:10:120::39)
- by PA4PR08MB6095.eurprd08.prod.outlook.com (2603:10a6:102:ec::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30; Thu, 10 Aug
- 2023 13:34:32 +0000
-Received: from DBAEUR03FT031.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:10:120:cafe::70) by DB8PR06CA0065.outlook.office365.com
- (2603:10a6:10:120::39) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.28 via Frontend
- Transport; Thu, 10 Aug 2023 13:34:32 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=armh.onmicrosoft.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
- client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
- pr=C
-Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- DBAEUR03FT031.mail.protection.outlook.com (100.127.142.173) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6631.44 via Frontend Transport; Thu, 10 Aug 2023 13:34:32 +0000
-Received: ("Tessian outbound 169aaa6bf2b7:v175"); Thu, 10 Aug 2023 13:34:31 +0000
-X-CheckRecipientChecked: true
-X-CR-MTA-CID: 6232d1537c072f4d
-X-CR-MTA-TID: 64aa7808
-Received: from 4f57aa4cdd8d.2
-	by 64aa7808-outbound-1.mta.getcheckrecipient.com id F6073716-51A2-4679-AE41-BE0783E28F7A.1;
-	Thu, 10 Aug 2023 13:34:23 +0000
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com
-    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 4f57aa4cdd8d.2
-    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
-    Thu, 10 Aug 2023 13:34:23 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CatSmqqjzAZCflAR1k5JOY+OJ96XDQulOzQC1575kYhYLTj4QTFtfQas4aOilIt+pqQbF/b/rc3l5jMFeOsfh0Mrkulmx8zBKX+AZGSuVu/oCb0pgCh95J0SW3kULmNoqE0BcZ2SH2MTH9hy3VLukE09xHAUZduu59tlOqSqkoqcwH7A1P+97mNDSBw90t3ASrYGLaQYha8mb4qeVxTlvYZ3XJFXviYprmyXhSypKhC6HL9yAjIKPi8uWcqAkGh/Mgoska5RFt9AGiKoH6CsbukU9FkmrTylA+bFH+DYp/FQxjWV0+8qNTGWBy1EGwGQTe1u1GqLgCx7PzI2t6CiAw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1+P9sNH71xdSnZ55Qo8IbTCdoxxs3507AZMmWWiXwUw=;
- b=MEFpRYa0KQ/mEvv2vLSq+IH4Sn2FzsHR/Ks7ajfKrUGQVjj5kiXInFwhZ7cUoBbpvFC/6J56et8gQ0r1UP71DnfnFPJH5fqfOoxTVsIaSB1dMQfZneXgrBZ+h2x/Va+YQZXhuNZ6JXVEODF9QI7mGZ2eH+JfIJW1vnGoMZjpFlU/5a9f4oUY6z4/6bQfTo6ZvG+msVVI9AjXgm6mbBvWRqLdaysevDjAdbb6dhMXtxQksO0R2GYV1DqK/Q2XDbmSI0G7+1aJjZsye+3eF4V416Ax6SPTtPstIMwU/1GQNWn69kOqlo5oxECrffJ2+i7YmzBTWmOdRcwcaCDfIba1GQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1+P9sNH71xdSnZ55Qo8IbTCdoxxs3507AZMmWWiXwUw=;
- b=F4+wkQUcBHKCO/A4R1XJta6zjFmSKXiFu9mKNvAJXJD+5dYMfB52TEBZ6ra5Ez+33wCxefCVHGH+N5kqq43Ng9LYKyP+/70CiPEjGLqjCj4xveTZ2nX2lLT6IRVkeIRlEsHWE+SWY18qp7tr56vtklxG8WFt2XAlTTjCQmELJ3I=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from PAXPR08MB7172.eurprd08.prod.outlook.com (2603:10a6:102:20a::19)
- by DU0PR08MB9251.eurprd08.prod.outlook.com (2603:10a6:10:41a::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30; Thu, 10 Aug
- 2023 13:34:18 +0000
-Received: from PAXPR08MB7172.eurprd08.prod.outlook.com
- ([fe80::5a76:5272:2887:31cb]) by PAXPR08MB7172.eurprd08.prod.outlook.com
- ([fe80::5a76:5272:2887:31cb%3]) with mapi id 15.20.6652.029; Thu, 10 Aug 2023
- 13:34:18 +0000
-Date: Thu, 10 Aug 2023 14:34:04 +0100
-From: Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v4 03/36] arm64/gcs: Document the ABI for Guarded Control
- Stacks
-Message-ID: <ZNTnTGb341TSMuvA@arm.com>
-References: <20230807-arm64-gcs-v4-0-68cfa37f9069@kernel.org>
- <20230807-arm64-gcs-v4-3-68cfa37f9069@kernel.org>
- <ZNOhjrYleGBR6Pbs@arm.com>
- <f4cec4b3-c386-4873-aa1d-90528e062f2a@sirena.org.uk>
- <ZNSmFmYFHDw3NvvP@arm.com>
- <4e215e53-c7d1-4338-8df9-3f9bf783ced9@sirena.org.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4e215e53-c7d1-4338-8df9-3f9bf783ced9@sirena.org.uk>
-X-ClientProxiedBy: LO4P123CA0359.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:18d::22) To PAXPR08MB7172.eurprd08.prod.outlook.com
- (2603:10a6:102:20a::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75FCC1E1D8
+	for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 13:34:40 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-58960b53007so12572597b3.3
+        for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 06:34:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691674479; x=1692279279;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=5KJK/NVH/i/qG6PHa4eldkwVnz7+20TuRWmoOP1g65o=;
+        b=zlYPWO1qS/NuNRjh9db4/GxFZb+QMkOrWHx84kkMzxO+d7LRS66Zfyd0Gv46MUmzQf
+         mLvS9wPWm2z3J+esFXCwQSA84Ti0ZyyCHaqsmJMkkbFHz0Up4GsC0Y6KAFKPWyI0wYjD
+         8FJgMevKm5SSbG9ZE3oFu7rGoLmMWaXgoDAofLT7sDmxydLEyfAtI7e3UuY7z7OQWPCp
+         6AjA3hKTg77o/l5cSb2W3rRh6TZMbuKU1m2NDrdv5wHYGXNdk26bpsi8bIYYw7s8xptg
+         M8ZbOU/8Zvf4GjTU6jil2X0LjOMI7mRAgPmcX6o/nsnsfu1FGg3CaSoA8P2OKP3nQ9Dh
+         nKHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691674479; x=1692279279;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5KJK/NVH/i/qG6PHa4eldkwVnz7+20TuRWmoOP1g65o=;
+        b=H2XEGyplOxXOSQT5xJQA+a+XIyblPv2dgQTDwd2f/EsFvwvhy37fco+dtkMJ2TvPp7
+         V3Wdry9J3sNWPhmnfWSWCTzagaXjZor7npyc7tNeN+34fzWbA912A4ckR7+/rLsfTla0
+         ziQwld9tf0k4/23JfdjBsZLSW35oPl5asNMnE004R/+HOmafUyE99mnv1NVKrf1ebu91
+         FR6v+KrW+ZTX0tDHrrLhpvGXogYW5ubi3rLoow31IRVip3Rlhxj/eCgWZWsJ5ZrrKdz7
+         DxMcVYi4VaiWAz50D+VNSbnp9Res7TDNQfnDn9hd5DwBg3HMF5yPK8A1Cw13VkkDtK1h
+         opgw==
+X-Gm-Message-State: AOJu0YzAbA9LOdfXhrJbqRgVZpWK5wbfRO0rtfAp/iXc5uWgMnz5GRin
+	/9AfC0TikVxFeIvp6n1NQrqRgAA849NmEOgz
+X-Google-Smtp-Source: AGHT+IFmOS9ixtEf3/4fj8/YozUQ5to/4izmvFbQqfHfnxsKKsbicOnwJdI9iWdQ/a8LAnEeF3Ujm7M5laM0WiIg
+X-Received: from vdonnefort.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:2eea])
+ (user=vdonnefort job=sendgmr) by 2002:a81:ac45:0:b0:568:c4ea:ce66 with SMTP
+ id z5-20020a81ac45000000b00568c4eace66mr45126ywj.5.1691674479300; Thu, 10 Aug
+ 2023 06:34:39 -0700 (PDT)
+Date: Thu, 10 Aug 2023 14:34:32 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	PAXPR08MB7172:EE_|DU0PR08MB9251:EE_|DBAEUR03FT031:EE_|PA4PR08MB6095:EE_
-X-MS-Office365-Filtering-Correlation-Id: cf114416-caa5-44f6-cea0-08db99a68788
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted: BCL:0;
-X-Microsoft-Antispam-Message-Info-Original:
- 1u+TtOmUJAeU4mMlYJ++WwKp0ZjgMJfsb2Oh+2S4sGn9ZcSvZU638r2FbTdRMQwmBe5G/jZi1Fx/3iIpOqgmOgYHR+96qrID5w2MoPvWPKFhgxfC0jdItUrjnDomx+Yr35LLYvbtxthEcGZS7oPOdJKlxhG9QXld4XWHyusWOgA/IacC84b53xiiwCVUJGWPg7zp4iQkBUIM9ZdT74G4i0OOn//oqUPJEhC6H5Ail1RGCpa1FoEZjC8rBWOmB6gpg7GmgWNjqeqnHke9IJCBmOFd7nTYDhROopD/6GKTudqEbTcYmfWwsthg3EIPSBU3uECP80JzZVST8mt00FMpySLk27f01ojn5sdIDQkczIWizzTSDvnAV3nn85SRc1jX2V+uQc2vo02vQILlPaG0WWVkpjntYBf1WpmYuNv+IMCn3ooNR39QJFg7io0zbckytpnOJs+dCrkOcslFJT6Fg6py/qncFbsk58jEp8BCrypuoctfil+TLlgbfr0c8140QdP1o3XoIynwPGxoCfLie4j9CpFePYXpbupkulDSf8h+RmkWpEC+VAUNCiRL4qTD
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR08MB7172.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(39860400002)(376002)(396003)(366004)(136003)(451199021)(1800799006)(186006)(8676002)(8936002)(6506007)(26005)(41300700001)(36756003)(83380400001)(2906002)(2616005)(38100700002)(86362001)(7416002)(66556008)(6916009)(66476007)(66946007)(6512007)(4326008)(54906003)(6486002)(478600001)(5660300002)(6666004)(316002);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR08MB9251
-Original-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DBAEUR03FT031.eop-EUR03.prod.protection.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	f616eb5a-34c7-49ec-379e-08db99a67f62
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	H6ipxYsrPBZapqb80WKD0EUYvM6LKusPkyeAOA1XO5viHhtouNoZMb0lFOZFhJW7XemAlxb1MsE7ZbgYCnCST0A3Ql8CsAb4rsWy2LqkyDLkXMcLXVxx/wQmOHd/t43LXo2cafnWYnQI9Ies+Ih1Vu1dn8K0L9ucneKCpQbn91MXadddKBeKrYgAsxMinF0ZN9vCDoAoXwmRN5nq5vAdbbUY9k8i9DM107SoK0VOhvrN9F02u1dLRvX35eq1EaNEcJHaWAKCDhl8aPXvE+TSWudClj12m/h9DLRAlQwe/VYQUU+Wx8fsRSjXBGvd53dRVhiXPPGDTCIhj9BDecR8Gx59jq+CJ42FSZccqo+ipNDZ+tsa5f2c47FRjZL8cFJEUs4yV8U49MTQZ62/PiIxKQvTCcSKImyAAddeM4fERdMQqOWxxzZjjIQkt5V5fzGpK82u2RLX/RGHLoVM+2AsuR1jxO416soiNtijwIAPYywPL7T/mh7rTFWCVhA5404nom7nKnq+kaNdr5NGold0Lm1QAyT1IJgO8QkH02XWjNmbfybkPfRaI7iURu7zoStkItP77Hj5s0TAyarHs3nNIbKXaHd9mpFhBKZYnM32xRJyOv3ehlkT2/IXIZEDwNJuHsU/XT3OpBtNsWkhtiulsfurarCKa/QOMTdQcpCfg5Thm5Dz3idV0J694sHuJeS7vMEPBMtD8Z/89XgeucBSaxSKBcKQJg1ZA2EzZ+wxpQE=
-X-Forefront-Antispam-Report:
-	CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(346002)(376002)(396003)(136003)(1800799006)(186006)(451199021)(82310400008)(46966006)(40470700004)(36840700001)(40460700003)(40480700001)(107886003)(336012)(6506007)(26005)(478600001)(6666004)(70206006)(70586007)(54906003)(36756003)(83380400001)(47076005)(36860700001)(2616005)(41300700001)(316002)(4326008)(6512007)(6486002)(2906002)(86362001)(6862004)(356005)(81166007)(5660300002)(8936002)(82740400003)(8676002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2023 13:34:32.0567
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: cf114416-caa5-44f6-cea0-08db99a68788
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DBAEUR03FT031.eop-EUR03.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR08MB6095
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.640.ga95def55d0-goog
+Message-ID: <20230810133432.680392-1-vdonnefort@google.com>
+Subject: [PATCH] KVM: arm64: Do not size-order align pkvm_alloc_private_va_range()
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oliver.upton@linux.dev
+Cc: kvmarm@lists.linux.dev, qperret@google.com, smostafa@google.com, 
+	kaleshsingh@google.com, linux-arm-kernel@lists.infradead.org, 
+	kernel-team@android.com, will@kernel.org, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-The 08/10/2023 12:41, Mark Brown wrote:
-> On Thu, Aug 10, 2023 at 09:55:50AM +0100, Szabolcs Nagy wrote:
-> > The 08/09/2023 16:34, Mark Brown wrote:
-> 
-> > > It's actually based on bitrot that I'd initially chosen a smaller value
-> > > since it's likely that functions will push at least something as you
-> > > suggest, the patches now just use RLIMIT_STACK.  I'll fix.
-> 
-> > the pcs requires 16byte aligned stack frames, with 8byte per gcs entry
-> > there is no need for same gcs size as stack size in userspace.
-> 
-> I agree that it's going to be excessive for pretty much all
-> applications, I adjusted it to match x86 as part of the general effort
-> to avoid divergence and because I was a bit concerned about non-PCS
-> cases (eg, JITed code) potentially running into trouble, especially with
+commit f922c13e778d ("KVM: arm64: Introduce pkvm_alloc_private_va_range()")
+added an alignment for the start address of any allocation into the nVHE
+protected hypervisor private VA range.
 
-is that even possible?
+This alignment (order of the size of the allocation) intends to enable
+efficient stack guard verification (if the PAGE_SHIFT bit is zero, the
+stack pointer is on the stack guard page, a stack overflow occurred).
 
-16byte alignment is not a convention but architectural:
-access via unaligned sp traps (at least in userspace).
+But a such alignment only makes sense for stack allocation and can waste
+a lot of VA space. So instead make a stack specific allocation function
+(hyp_create_stack()) handling the stack guard page requirements, while
+other users (e.g. fixmap) will only get page alignment.
 
-it is possible to use bl such that the stack is not involved
-e.g. if there is no bl/ret pairing, but if we base the gcs
-size on the stack size then i'd expect one stack frame per
-bl/ret pair with 16byte alignment, or is there a programming
-model possible that uses 8byte stack per bl?
+Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-> smaller stack limits.  It's not an issue I have super strong opinions on
-> though, as you can see I had implemented it both ways at various times.
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
+index d5ec972b5c1e..71d17ddb562f 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/mm.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
+@@ -18,6 +18,7 @@ void *hyp_fixmap_map(phys_addr_t phys);
+ void hyp_fixmap_unmap(void);
+ 
+ int hyp_create_idmap(u32 hyp_va_bits);
++int hyp_create_stack(unsigned long stack_pa, unsigned long *stack_va);
+ int hyp_map_vectors(void);
+ int hyp_back_vmemmap(phys_addr_t back);
+ int pkvm_cpu_set_vector(enum arm64_hyp_spectre_vector slot);
+diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
+index 318298eb3d6b..275e33a8be9a 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mm.c
++++ b/arch/arm64/kvm/hyp/nvhe/mm.c
+@@ -44,6 +44,28 @@ static int __pkvm_create_mappings(unsigned long start, unsigned long size,
+ 	return err;
+ }
+ 
++static int __pkvm_alloc_private_va_range(unsigned long start, size_t size)
++{
++	unsigned long cur;
++	int ret = 0;
++
++	hyp_assert_lock_held(&pkvm_pgd_lock);
++
++	if (!start || start < __io_map_base)
++		return -EINVAL;
++
++	/* The allocated size is always a multiple of PAGE_SIZE */
++	cur = start + PAGE_ALIGN(size);
++
++	/* Are we overflowing on the vmemmap ? */
++	if (cur > __hyp_vmemmap)
++		ret = -ENOMEM;
++	else
++		__io_map_base = cur;
++
++	return ret;
++}
++
+ /**
+  * pkvm_alloc_private_va_range - Allocates a private VA range.
+  * @size:	The size of the VA range to reserve.
+@@ -56,27 +78,16 @@ static int __pkvm_create_mappings(unsigned long start, unsigned long size,
+  */
+ int pkvm_alloc_private_va_range(size_t size, unsigned long *haddr)
+ {
+-	unsigned long base, addr;
+-	int ret = 0;
++	unsigned long addr;
++	int ret;
+ 
+ 	hyp_spin_lock(&pkvm_pgd_lock);
+-
+-	/* Align the allocation based on the order of its size */
+-	addr = ALIGN(__io_map_base, PAGE_SIZE << get_order(size));
+-
+-	/* The allocated size is always a multiple of PAGE_SIZE */
+-	base = addr + PAGE_ALIGN(size);
+-
+-	/* Are we overflowing on the vmemmap ? */
+-	if (!addr || base > __hyp_vmemmap)
+-		ret = -ENOMEM;
+-	else {
+-		__io_map_base = base;
+-		*haddr = addr;
+-	}
+-
++	addr = __io_map_base;
++	ret = __pkvm_alloc_private_va_range(addr, size);
+ 	hyp_spin_unlock(&pkvm_pgd_lock);
+ 
++	*haddr = addr;
++
+ 	return ret;
+ }
+ 
+@@ -340,6 +351,39 @@ int hyp_create_idmap(u32 hyp_va_bits)
+ 	return __pkvm_create_mappings(start, end - start, start, PAGE_HYP_EXEC);
+ }
+ 
++int hyp_create_stack(unsigned long stack_pa, unsigned long *stack_va)
++{
++	unsigned long addr;
++	size_t size;
++	int ret;
++
++	hyp_spin_lock(&pkvm_pgd_lock);
++
++	/* Make room for the guard page */
++	size = PAGE_SIZE * 2;
++	addr = ALIGN(__io_map_base, size);
++
++	ret = __pkvm_alloc_private_va_range(addr, size);
++	if (!ret) {
++		/*
++		 * Since the stack grows downwards, map the stack to the page
++		 * at the higher address and leave the lower guard page
++		 * unbacked.
++		 *
++		 * Any valid stack address now has the PAGE_SHIFT bit as 1
++		 * and addresses corresponding to the guard page have the
++		 * PAGE_SHIFT bit as 0 - this is used for overflow detection.
++		 */
++		ret = kvm_pgtable_hyp_map(&pkvm_pgtable, addr + PAGE_SIZE,
++					  PAGE_SIZE, stack_pa, PAGE_HYP);
++	}
++	hyp_spin_unlock(&pkvm_pgd_lock);
++
++	*stack_va = addr + size;
++
++	return ret;
++}
++
+ static void *admit_host_page(void *arg)
+ {
+ 	struct kvm_hyp_memcache *host_mc = arg;
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index bb98630dfeaf..782c8d0fb905 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -121,33 +121,11 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
+ 		if (ret)
+ 			return ret;
+ 
+-		/*
+-		 * Allocate a contiguous HYP private VA range for the stack
+-		 * and guard page. The allocation is also aligned based on
+-		 * the order of its size.
+-		 */
+-		ret = pkvm_alloc_private_va_range(PAGE_SIZE * 2, &hyp_addr);
++		ret = hyp_create_stack(params->stack_pa, &hyp_addr);
+ 		if (ret)
+ 			return ret;
+ 
+-		/*
+-		 * Since the stack grows downwards, map the stack to the page
+-		 * at the higher address and leave the lower guard page
+-		 * unbacked.
+-		 *
+-		 * Any valid stack address now has the PAGE_SHIFT bit as 1
+-		 * and addresses corresponding to the guard page have the
+-		 * PAGE_SHIFT bit as 0 - this is used for overflow detection.
+-		 */
+-		hyp_spin_lock(&pkvm_pgd_lock);
+-		ret = kvm_pgtable_hyp_map(&pkvm_pgtable, hyp_addr + PAGE_SIZE,
+-					PAGE_SIZE, params->stack_pa, PAGE_HYP);
+-		hyp_spin_unlock(&pkvm_pgd_lock);
+-		if (ret)
+-			return ret;
+-
+-		/* Update stack_hyp_va to end of the stack's private VA range */
+-		params->stack_hyp_va = hyp_addr + (2 * PAGE_SIZE);
++		params->stack_hyp_va = hyp_addr;
+ 	}
+ 
+ 	/*
 
+base-commit: 52a93d39b17dc7eb98b6aa3edb93943248e03b2f
+-- 
+2.41.0.640.ga95def55d0-goog
 
