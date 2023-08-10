@@ -1,244 +1,73 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E4A1877
-	for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 23:04:39 +0000 (UTC)
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-53ff4f39c0fso1850990a12.0
-        for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 16:04:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C60EC6FB3
+	for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 23:48:16 +0000 (UTC)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-268b931c2ceso1917561a91.3
+        for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 16:48:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691708679; x=1692313479;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=A2HZ014dOId2hDwWOJ0bOX1N/o8JyjLLT0vxMFHcIcY=;
-        b=zqOmZeBt8A5vjDuDwTJVhKh+bNGRe0VjF6JK/9WevOGuyks4aQUZjmMGT5jewTOPGO
-         QNNXbfaZjRGIDjJbXqGA5uvVKLbd540bLxINUf9bbP2sR/lzKTDuuSAu9UifxFDBeqgw
-         8ZCiTzCGbRSUDsV75zN5fg0b0bdDHBltXflB0Y1pDN9A5qroN68wOB8helk8tdcXtg/S
-         q88I+xcuk/1Hru4Xlm8DyP4ZA0D6FgWJclfTevtUclAlc0FNNmY9CKGjRd5rB8k2w2Km
-         rwPhsysDgjBGkQFjFRsB8HVLPOPutaEu3ax6kOraJ9EBeew1A6TDf7gnL772qKiuaqJg
-         g37A==
+        d=google.com; s=20221208; t=1691711296; x=1692316096;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZV/Ct/Ds/CxS4v6ir6EHRWsoOhvufSz0INvujsP8hqY=;
+        b=vSrGdjpvDxTK/XL3At5KxkEi3BN7xLVQpPmnORZMhNG6jd39wJsns/R42KS5xfvvXi
+         yWOf3T02bs2cFYxM2Bhrzrfj0k6Po0wWmcQm6G/LaTfmxV81Ct/0B2yvJpQ1Ac5przBM
+         YI/COf8QXx2m5sSQcKF+l2LSoIpkzb5A89S15N5HYQ3pppUclgQ+9/xmB/68xZHvAKfB
+         JSU6pgtHKdHo4h0gV0hA/MMNZT85qAuZCuamTpFwYhHNi9iSZMFI/PgHP9+N4m/gs0vU
+         jiL9rOS/C5ipEbZb8SH5IHTEyqot9sQ8y5Uv8dfoZAg4iBI1zrE098pJmeiz2Px/Socu
+         EZ0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691708679; x=1692313479;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=A2HZ014dOId2hDwWOJ0bOX1N/o8JyjLLT0vxMFHcIcY=;
-        b=b1K3vCT3pythiyAN9sXMG0AONq+6X4iFEOSZVaWzYV1VOusRPN0ppTwc8uvYiRVQTS
-         MjUmL2+kR0oJqNyetSDFAd55MjOWxbZvYavrRTbDN8o0PS/clOxyfIUVUk+/2lG/AKn/
-         x/bBtX//bUS+Sza/zxH/vzz7Eswshsbj6rNtsQDegwUmDRDKYbJyOj8voke5mNZ0AqRr
-         ZqhMXQkMTPXiuThQ6+K00iP8jTUh8wgruqmEhU4/UgP0QAlbe66HrxFkCiaRgXd3Drvb
-         N79V1F378Wc0gTrqHwWZ/R/cMTDSBNxhpCTf200qH6SEQ8QSvNtZcBCndxlnuRksJUXE
-         Sygg==
-X-Gm-Message-State: AOJu0Yzdp9k1VtT96I3cCA8hJdmJO7l3NNoj9rkkIgAH0KuAn5CMF1og
-	H/XfYU7RetwtDSb7IvjmqfXECXfpDIc=
-X-Google-Smtp-Source: AGHT+IEllgdOFrNBSktZ3B9czod0DT40RFdbG9IKB+P9/wA8Lbl3UGUkI/mcLGmHPzlm/kyI0BgShEUaX90=
+        d=1e100.net; s=20221208; t=1691711296; x=1692316096;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZV/Ct/Ds/CxS4v6ir6EHRWsoOhvufSz0INvujsP8hqY=;
+        b=PtIT5u7wwkrDqXiqvIdEOFUjkE6B+nut5h9WtVPA2egcntncWwawSMEWlp/nUCegZ5
+         9K6aGwLLCO1EkKTNnEBSAmtioE1PSy4X8koFl7YS9EhbPsuwB6X70z431JEFSEHuPZeM
+         05CVWWHeA8Bo/4F6Tfd1AFN2Px0rlsNwJ3yCOwYwAua5XplDALiWe8aQ1KYRsF3CVgcr
+         6MmTl74LGEW7s8po66G+i/Vl+o2EdON4dTMVUpZhamBKuSONzpZPpeF1SIa/Uqj9JKbs
+         wicyder/ydnZpx3xeCM7IR6KbEBJcM/mxXfliVvWztk8mELW7ZPsYv0slmRQwr4Z66Wl
+         mlDw==
+X-Gm-Message-State: AOJu0YxoevW7zavWnHbC5jCt6mlZCkiHBvQD3Q4V4bUS+a0VFiLafbSu
+	1zMc7z6YmK3TgRaeGblWEdge2hAvjjU=
+X-Google-Smtp-Source: AGHT+IFvQV9B4i2e4uuA2RI0E1Gm8UGPYDS/BYnwMbmvrRmW8AeG2hCnUB9az9bEpN0laGy/rlEDrxMOA1g=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:7e10:0:b0:563:e825:7f3a with SMTP id
- z16-20020a637e10000000b00563e8257f3amr14811pgc.11.1691708678622; Thu, 10 Aug
- 2023 16:04:38 -0700 (PDT)
-Date: Thu, 10 Aug 2023 16:04:37 -0700
-In-Reply-To: <CAJHc60w0By2Q+PCsfwReGXsN5zf5k1ww3Ov4m9Eb-pFH-UKBDg@mail.gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a17:90b:811:b0:262:ffae:56cf with SMTP id
+ bk17-20020a17090b081100b00262ffae56cfmr9678pjb.8.1691711296149; Thu, 10 Aug
+ 2023 16:48:16 -0700 (PDT)
+Date: Thu, 10 Aug 2023 16:48:14 -0700
+In-Reply-To: <CAF7b7mqczaqwFhFaoicOtWHGEf50f-14cuCXSPj36eZsuCoGUg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230808231330.3855936-1-rananta@google.com> <20230808231330.3855936-3-rananta@google.com>
- <c33b0518-6e64-7acf-efa8-f404fce1ccac@redhat.com> <CAJHc60yCJANBQOizaoSPhEJH9e8a9C6n68x4qdVkOhVZiiWqkw@mail.gmail.com>
- <30e45ef3-309a-63de-e085-be1645c1be79@redhat.com> <CAJHc60x=bhXS3PahuRPwRVdqN4LeX-PBdjdEeCEomhf2YAJ1mw@mail.gmail.com>
- <ZNVfsxdYKu9Nt+j+@google.com> <CAJHc60w0By2Q+PCsfwReGXsN5zf5k1ww3Ov4m9Eb-pFH-UKBDg@mail.gmail.com>
-Message-ID: <ZNVtBQvjM45tmbce@google.com>
-Subject: Re: [PATCH v8 02/14] KVM: Declare kvm_arch_flush_remote_tlbs() globally
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-2-amoorthy@google.com>
+ <ZInRNigDyzeuf79e@google.com> <CAF7b7moOw5irHbZmjj=40H3wJ0uWK5qRhQXpxAk3k4MBg3cH3Q@mail.gmail.com>
+ <CAF7b7mqczaqwFhFaoicOtWHGEf50f-14cuCXSPj36eZsuCoGUg@mail.gmail.com>
+Message-ID: <ZNV3Pnqczf6PrNrs@google.com>
+Subject: Re: [PATCH v4 01/16] KVM: Allow hva_pfn_fast() to resolve read-only faults.
 From: Sean Christopherson <seanjc@google.com>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Shaoqin Huang <shahuang@redhat.com>, Gavin Shan <gshan@redhat.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhuacai@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Jing Zhang <jingzhangos@google.com>, 
-	Reiji Watanabe <reijiw@google.com>, Colton Lewis <coltonlewis@google.com>, 
-	David Matlack <dmatlack@google.com>, Fuad Tabba <tabba@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Anish Moorthy <amoorthy@google.com>
+Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
+	jthoughton@google.com, bgardon@google.com, dmatlack@google.com, 
+	ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com, 
+	nadav.amit@gmail.com, isaku.yamahata@gmail.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Aug 10, 2023, Raghavendra Rao Ananta wrote:
-> On Thu, Aug 10, 2023 at 3:20=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> > On Thu, Aug 10, 2023, Raghavendra Rao Ananta wrote:
-> > > After doing some experiments, I think it works because of the order i=
-n
-> > > which the inline-definition and the declaration are laid out. If the
-> > > 'inline' part of the function comes first and then the declaration, w=
-e
-> > > don't see any error. However if the positions were reversed, we would
-> > > see an error. (I'm not sure what the technical reason for this is).
-> > >
-> > > Just to be safe, I can move the definition to arch/x86/kvm/mmu/mmu.c
-> > > as a non-inline function.
-> >
-> > No need, asm/kvm_host.h _must_ be included before the declaration, othe=
-rwise the
-> > declaration wouldn't be made because __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS =
-wouldn't
-> > be defined.  I.e. we won't run into issues where the non-static declara=
-tion comes
-> > before the static inline definition.
-> >
-> > C99 explicitly covers this case:
-> >
-> >   6.2.2 Linkages of identifiers
-> >
-> >   ...
-> >
-> >   If the declaration of a file scope identifier for an object or a func=
-tion contains the storage-
-> >   class specifier static, the identifier has internal linkage.
-> >
-> >   For an identifier declared with the storage-class specifier extern in=
- a scope in which a
-> >   prior declaration of that identifier is visible if the prior declarat=
-ion specifies internal or
-> >   external linkage, the linkage of the identifier at the later declarat=
-ion is the same as the
-> >   linkage specified at the prior declaration. If no prior declaration i=
-s visible, or if the prior
-> >   declaration specifies no linkage, then the identifier has external li=
-nkage.
-> >
-> > In short, because the "static inline" declared internal linkage first, =
-it wins.
-> Thanks for sharing this! I can keep the 'static inline' definition as
-> is then. However, since a later patch (patch-05/14) defines
-> kvm_arch_flush_remote_tlbs_range() in arch/x86/kvm/mmu/mmu.c, do you
-> think we can move this definition to the .c file as well for
-> consistency?
+On Thu, Aug 10, 2023, Anish Moorthy wrote:
+> I figured I'd start double checking my documentation changes before
+> sending out the next version, since those have been a persistent
+> issue. So, here's what I've currently got for the commit message here
+> 
+> > hva_to_pfn_fast() currently just fails for read faults where
+> > establishing writable mappings is forbidden, which is unnecessary.
+> > Instead, try getting the page without passing FOLL_WRITE. This allows
+> > the aforementioned faults to (potentially) be resolved without falling
+> > back to slow GUP.
 
-We "can", but I don't see any reason to do so.  Trying to make helpers cons=
-istently
-inline or not is usually a fools errand.  And in this case, I'd actually ra=
-ther go
-the opposite direction and make the range variant an inline.
-
-Ha!  And I can justify that with minimal effort.  The below makes the helpe=
-r a
-straight passthrough for CONFIG_HYPERV=3Dn builds, at which point I think i=
-t makes
-sense for it to be inline.
-
-If it won't slow your series down even more, any objection to sliding the b=
-elow
-patch in somewhere before patch 5?  And then add a patch to inline the rang=
-e-based
-helper?
-
-Disclaimer: compile tested only.
-
----
-From: Sean Christopherson <seanjc@google.com>
-Date: Thu, 10 Aug 2023 15:58:53 -0700
-Subject: [PATCH] KVM: x86/mmu: Declare flush_remote_tlbs{_range}() hooks if=
-f
- HYPERV!=3Dn
-
-Declare the kvm_x86_ops hooks used to wire up paravirt TLB flushes when
-running under Hyper-V if and only if CONFIG_HYPERV!=3Dn.  Wrapping yet more
-code with IS_ENABLED(CONFIG_HYPERV) eliminates a handful of conditional
-branches, and makes it super obvious why the hooks *might* be valid.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/include/asm/kvm-x86-ops.h | 2 ++
- arch/x86/include/asm/kvm_host.h    | 4 ++++
- arch/x86/kvm/mmu/mmu.c             | 6 ++++++
- 3 files changed, 12 insertions(+)
-
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-=
-x86-ops.h
-index 13bc212cd4bc..6bc1ab0627b7 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -54,8 +54,10 @@ KVM_X86_OP(set_rflags)
- KVM_X86_OP(get_if_flag)
- KVM_X86_OP(flush_tlb_all)
- KVM_X86_OP(flush_tlb_current)
-+#if IS_ENABLED(CONFIG_HYPERV)
- KVM_X86_OP_OPTIONAL(flush_remote_tlbs)
- KVM_X86_OP_OPTIONAL(flush_remote_tlbs_range)
-+#endif
- KVM_X86_OP(flush_tlb_gva)
- KVM_X86_OP(flush_tlb_guest)
- KVM_X86_OP(vcpu_pre_run)
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_hos=
-t.h
-index 60d430b4650f..04fc80112dfe 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1604,9 +1604,11 @@ struct kvm_x86_ops {
-=20
- 	void (*flush_tlb_all)(struct kvm_vcpu *vcpu);
- 	void (*flush_tlb_current)(struct kvm_vcpu *vcpu);
-+#if IS_ENABLED(CONFIG_HYPERV)
- 	int  (*flush_remote_tlbs)(struct kvm *kvm);
- 	int  (*flush_remote_tlbs_range)(struct kvm *kvm, gfn_t gfn,
- 					gfn_t nr_pages);
-+#endif
-=20
- 	/*
- 	 * Flush any TLB entries associated with the given GVA.
-@@ -1814,6 +1816,7 @@ static inline struct kvm *kvm_arch_alloc_vm(void)
- #define __KVM_HAVE_ARCH_VM_FREE
- void kvm_arch_free_vm(struct kvm *kvm);
-=20
-+#if IS_ENABLED(CONFIG_HYPERV)
- #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLB
- static inline int kvm_arch_flush_remote_tlb(struct kvm *kvm)
- {
-@@ -1823,6 +1826,7 @@ static inline int kvm_arch_flush_remote_tlb(struct kv=
-m *kvm)
- 	else
- 		return -ENOTSUPP;
- }
-+#endif
-=20
- #define kvm_arch_pmi_in_guest(vcpu) \
- 	((vcpu) && (vcpu)->arch.handling_intr_from_guest)
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 9e4cd8b4a202..0189dfecce1f 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -271,18 +271,24 @@ static inline unsigned long kvm_mmu_get_guest_pgd(str=
-uct kvm_vcpu *vcpu,
-=20
- static inline bool kvm_available_flush_remote_tlbs_range(void)
- {
-+#if IS_ENABLED(CONFIG_HYPERV)
- 	return kvm_x86_ops.flush_remote_tlbs_range;
-+#else
-+	return false;
-+#endif
- }
-=20
- void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
- 				 gfn_t nr_pages)
- {
-+#if IS_ENABLED(CONFIG_HYPERV)
- 	int ret =3D -EOPNOTSUPP;
-=20
- 	if (kvm_x86_ops.flush_remote_tlbs_range)
- 		ret =3D static_call(kvm_x86_flush_remote_tlbs_range)(kvm, start_gfn,
- 								   nr_pages);
- 	if (ret)
-+#endif
- 		kvm_flush_remote_tlbs(kvm);
- }
-=20
-
-base-commit: bc9e68820274c025840d3056d63f938d74ca35bb
---=20
-
+Looks good!  One nit, I would drop the "read" part of "read faults".  This behavior
+also applies to executable faults.  You captured the key part well (writable mappings
+forbidden), so I don't think there's any need to further clarify what types of
+faults this applies to.
