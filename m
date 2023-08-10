@@ -1,133 +1,163 @@
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6057123BC6
-	for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 20:12:01 +0000 (UTC)
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-53fa455cd94so884271a12.2
-        for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 13:12:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F45620F92
+	for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 20:55:07 +0000 (UTC)
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-40a47e8e38dso19041cf.1
+        for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 13:55:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1691698320; x=1692303120;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YgXTJGJNIG5brUNilbYvmAufJFTfjCt86nj6wBgTVtw=;
-        b=fyUQ4xBfwdZ9Y1ncwPWe8KTy87SugAY04QbysuNfCKESxljSeA//xKB0ll7SV9MfBn
-         Qolk9WYlCPFGiQVFIlruea5ANAIMyj2MFfbdlKAdMKJ07nVHWugx38DTOanRdd2Cvm89
-         JEkZdTPYMsehHWh3x07+sxbrflynbDh3hIrFU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691698320; x=1692303120;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20221208; t=1691700907; x=1692305707;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YgXTJGJNIG5brUNilbYvmAufJFTfjCt86nj6wBgTVtw=;
-        b=FjUAsRGUszDVe7g7MZSErkJP0AUfTbD5uHvUosu/zBcugyyxQvHz9txrCfPzn013LQ
-         42KagNGC/Icdt0GElDehzWFcM9qnIPh8FgKSGWjCF3I6cMYXNQTH7AFwJ3eqJTONdZSp
-         vOh5RwSegW6L3b6F7Np1aF53Miyd4p6j6kc5G4s7/IUQ32tGID0F/oxaNagEYbbBy2hw
-         VQ8iUPreLqYAX3z6zJSkLac4jwA49tzx/WNPqOxFLW0wWdQ/VS2dW0osVxO0ovXLE5k4
-         jzs3KbwUPEB8aBuwjhKn98Dzi4NIbaIa48vgPJJwvMPTKZjJFw3od2dDI/nnB/iP90nG
-         8xKg==
-X-Gm-Message-State: AOJu0Yz9KT9P/wW/UYbgY4MfPcGIabo7Lc/13/js5Zs9tcaypH+oeqan
-	zMsJWnsoMfnkC10OGncoV/Fbxw==
-X-Google-Smtp-Source: AGHT+IFPUbfQ62us+66kx+c9LMghiGBoteLeh6oMSfQPptLuZm4cxwBZSfUhKnCZaZrURJ2FlP0dLA==
-X-Received: by 2002:a17:90a:5d91:b0:262:f09c:e73d with SMTP id t17-20020a17090a5d9100b00262f09ce73dmr2794613pji.34.1691698320688;
-        Thu, 10 Aug 2023 13:12:00 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id 5-20020a17090a1a4500b00263f446d432sm4004127pjl.43.2023.08.10.13.11.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Aug 2023 13:11:59 -0700 (PDT)
-Date: Thu, 10 Aug 2023 13:11:58 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Marco Elver <elver@google.com>
-Cc: Steven Rostedt <rostedt@goodmis.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Tom Rix <trix@redhat.com>, Miguel Ojeda <ojeda@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com,
-	linux-toolchains@vger.kernel.org
-Subject: Re: [PATCH v3 3/3] list_debug: Introduce CONFIG_DEBUG_LIST_MINIMAL
-Message-ID: <202308101259.D2C4C72F8@keescook>
-References: <20230808102049.465864-1-elver@google.com>
- <20230808102049.465864-3-elver@google.com>
- <202308081424.1DC7AA4AE3@keescook>
- <CANpmjNM3rc8ih7wvFc2GLuMDLpWcdA8uWfut-5tOajqtVG952A@mail.gmail.com>
- <ZNNi/4L1mD8XPNix@elver.google.com>
- <20230809113021.63e5ef66@gandalf.local.home>
- <ZNO/pf/pH5jJAZI0@elver.google.com>
+        bh=Fbz6nfirzOItWcULJrhy76vEH5UntBJ+zAdtRqxrtIs=;
+        b=mkXquOWImM+ipsQFpSuV6HphXWcMu0DYJyCRbKA/Dq79yQhHG6TR+uE6DNBjdtFfKW
+         9Ou/urveYZ4pdU9VR2letW3AyzwHrPpup+XFQvg0vonxJ42AGrE0ltKx1/f55708OXYf
+         vRUx09Hzn0lW4KrJOE9nmWrwtUjt3v4ixV/ExTTUVlINSh80tyHy1p6Y/nwisurUxSg3
+         Wmv9YQlCHLhD3Pnz+PxZu242lj8GKSajSa1rIlgV/+M9oPmy8Wnkw4+ChJ0Lg9d6ijtw
+         nCaMDID/yxucfw6q1AGYHCMLPpDCnZU/dtO0FRBlOqagop7dekdu3rV5nFgzRGnaj5/N
+         zDEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691700907; x=1692305707;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Fbz6nfirzOItWcULJrhy76vEH5UntBJ+zAdtRqxrtIs=;
+        b=P1kEXSOtDC2smhpVt+h9WFXPNgQ9Ox7QmpEl/U4tIu9tgztfvIHfk0t3qkPNKYTNF8
+         ck4c69h5snTCYKR2a/FXevmTN68qOWtUvIhfFKm7h2blfLoRj/IWdtpUzx2Cq20VAHUo
+         EAoGNffeTVXo7o8f24wh5c0uZ5ZGIIfcMdKuABuEZTHr3vLXanR9mfN8jeki925wtmuV
+         3GxfYUG7osu3PIGyrbTGWNuMFyuGv/1/9ZZNAEsMMwujsw1nctDwAdaEXLmHx3NUT16L
+         wZk5NhHbvoiWxbMnrHo0tQubtOuHBh67GWsttUTrghRdUnV8nMpPAH6IpbSrRnuZixMX
+         L/Yw==
+X-Gm-Message-State: AOJu0Yz0NuNCGz9YkLiw+ktHGLRV+shd/D95j+KSZJoftlxC4ysCnuUw
+	jsFfIGktQZXENaz2FhX3UEWnsk+NedAdBlM7gBresQ==
+X-Google-Smtp-Source: AGHT+IETRvm1u0c2tw6CwIcy/y+qdG7C9yLn61u49rI1SxhvjvsG0R6dfHP+vWIwnY34cSPU455isRrBYsnfx2fRx9Y=
+X-Received: by 2002:ac8:7f86:0:b0:403:96e3:4745 with SMTP id
+ z6-20020ac87f86000000b0040396e34745mr69781qtj.20.1691700906744; Thu, 10 Aug
+ 2023 13:55:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZNO/pf/pH5jJAZI0@elver.google.com>
+References: <20230808231330.3855936-1-rananta@google.com> <20230808231330.3855936-3-rananta@google.com>
+ <c33b0518-6e64-7acf-efa8-f404fce1ccac@redhat.com> <CAJHc60yCJANBQOizaoSPhEJH9e8a9C6n68x4qdVkOhVZiiWqkw@mail.gmail.com>
+ <30e45ef3-309a-63de-e085-be1645c1be79@redhat.com>
+In-Reply-To: <30e45ef3-309a-63de-e085-be1645c1be79@redhat.com>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Thu, 10 Aug 2023 13:54:55 -0700
+Message-ID: <CAJHc60x=bhXS3PahuRPwRVdqN4LeX-PBdjdEeCEomhf2YAJ1mw@mail.gmail.com>
+Subject: Re: [PATCH v8 02/14] KVM: Declare kvm_arch_flush_remote_tlbs() globally
+To: Shaoqin Huang <shahuang@redhat.com>
+Cc: Gavin Shan <gshan@redhat.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Sean Christopherson <seanjc@google.com>, Huacai Chen <chenhuacai@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Jing Zhang <jingzhangos@google.com>, 
+	Reiji Watanabe <reijiw@google.com>, Colton Lewis <coltonlewis@google.com>, 
+	David Matlack <dmatlack@google.com>, Fuad Tabba <tabba@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 09, 2023 at 06:32:37PM +0200, Marco Elver wrote:
-> On Wed, Aug 09, 2023 at 11:30AM -0400, Steven Rostedt wrote:
-> [...]
-> > 
-> > I would actually prefer DEBUG_LIST to select HARDEN_LIST and not the other
-> > way around. It logically doesn't make sense that HARDEN_LIST would select
-> > DEBUG_LIST. That is, I could by default want HARDEN_LIST always on, but not
-> > DEBUG_LIST (because who knows, it may add other features I don't want). But
-> > then, I may have stumbled over something and want more info, and enable
-> > DEBUG_LIST (while still having HARDEN_LIST) enabled.
-> > 
-> > I think you are looking at this from an implementation perspective and not
-> > the normal developer one.
-> > 
-> [...]
-> > 
-> > That is, if DEBUG_LIST is enabled, we always call the
-> > __list_add_valid_or_report(), but if only HARDEN_LIST is enabled, then we
-> > do the shortcut.
-> 
-> Good point - I think this is better. See below tentative v4.
-> 
-> Kees: Does that also look more like what you had in mind?
+On Thu, Aug 10, 2023 at 5:26=E2=80=AFAM Shaoqin Huang <shahuang@redhat.com>=
+ wrote:
+>
+>
+>
+> On 8/10/23 00:38, Raghavendra Rao Ananta wrote:
+> > Hi Gavin,
+> >
+> > On Tue, Aug 8, 2023 at 9:00=E2=80=AFPM Gavin Shan <gshan@redhat.com> wr=
+ote:
+> >>
+> >>
+> >> On 8/9/23 09:13, Raghavendra Rao Ananta wrote:
+> >>> There's no reason for the architectures to declare
+> >>> kvm_arch_flush_remote_tlbs() in their own headers. Hence to
+> >>> avoid this duplication, make the declaration global, leaving
+> >>> the architectures to define only __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
+> >>> as needed.
+> >>>
+> >>> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> >>> ---
+> >>>    arch/mips/include/asm/kvm_host.h | 1 -
+> >>>    include/linux/kvm_host.h         | 2 ++
+> >>>    2 files changed, 2 insertions(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm=
+/kvm_host.h
+> >>> index 9b0ad8f3bf327..54a85f1d4f2c8 100644
+> >>> --- a/arch/mips/include/asm/kvm_host.h
+> >>> +++ b/arch/mips/include/asm/kvm_host.h
+> >>> @@ -897,6 +897,5 @@ static inline void kvm_arch_vcpu_blocking(struct =
+kvm_vcpu *vcpu) {}
+> >>>    static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)=
+ {}
+> >>>
+> >>>    #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
+> >>> -int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
+> >>>
+> >>>    #endif /* __MIPS_KVM_HOST_H__ */
+> >>> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> >>> index e3f968b38ae97..ade5d4500c2ce 100644
+> >>> --- a/include/linux/kvm_host.h
+> >>> +++ b/include/linux/kvm_host.h
+> >>> @@ -1484,6 +1484,8 @@ static inline int kvm_arch_flush_remote_tlbs(st=
+ruct kvm *kvm)
+> >>>    {
+> >>>        return -ENOTSUPP;
+> >>>    }
+> >>> +#else
+> >>> +int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
+> >>>    #endif
+> >>>
+> >>>    #ifdef __KVM_HAVE_ARCH_NONCOHERENT_DMA
+> >>
+> >> Is the declaration inconsistent to that in arch/x86/include/asm/kvm_ho=
+st.h?
+> >> In order to keep them consistent, I guess we need move kvm_arch_flush_=
+remote_tlbs()
+> >> from x86's header file to arch/x86/kvm/mmu/mmu.c and 'inline' needs to=
+ be dropped.
+> >>
+> > Unsure of the original intentions, I didn't want to disturb any
+> > existing arrangements. If more people agree to this refactoring, I'm
+> > happy to move.
+>
+> This is amazing to me. This change can be compiled without any error
+> even if the declaration inconsistent between the kvm_host.h and x86's
+> header file.
+>
+> I'm curious which option make it possible?
+>
+After doing some experiments, I think it works because of the order in
+which the inline-definition and the declaration are laid out. If the
+'inline' part of the function comes first and then the declaration, we
+don't see any error. However if the positions were reversed, we would
+see an error. (I'm not sure what the technical reason for this is).
 
-Yeah, this looks good. My only nit would be a naming one. All the
-other hardening features are named "HARDENED", but perhaps the "ED"
-is redundant in the others. Still, consistency seems nicer. What do you
-think of CONFIG_LIST_HARDENED ? (The modern trend for Kconfig naming tends
-to keep the subsystem name first and then apply optional elements after.)
+Just to be safe, I can move the definition to arch/x86/kvm/mmu/mmu.c
+as a non-inline function.
 
-One note: do the LKDTM list hardening tests still pass? i.e.
-CORRUPT_LIST_ADD
-CORRUPT_LIST_DEL
-
-> [...]
-> +		/*
-> +		 * With the hardening version, elide checking if next and prev
-> +		 * are NULL, LIST_POISON1 or LIST_POISON2, since the immediate
-> +		 * dereference of them below would result in a fault.
-> +		 */
-> +		if (likely(prev->next == entry && next->prev == entry))
-> +			return true;
-
-I'm not super excited about skipping those checks, since they are
-values that can be reached through kernel list management confusion. If
-an attacker is using a system where the zero-page has been mapped
-and is accessible (i.e. lacking SMAP etc), then attacks could still
-be constructed. However, I do recognize this chain of exploitation
-prerequisites is getting rather long, so probably this is a reasonable
-trade off on modern systems.
-
--Kees
-
--- 
-Kees Cook
+Thank you.
+Raghavendra
+> Thanks,
+> Shaoqin
+>
+> >
+> > Thank you.
+> > Raghavendra
+> >> Thanks,
+> >> Gavin
+> >>
+> >
+>
+> --
+> Shaoqin
+>
