@@ -1,204 +1,112 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1268F3D71
-	for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 09:40:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DD45C433C7;
-	Thu, 10 Aug 2023 09:40:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691660425;
-	bh=sIPt3F3NESEzK1OvlyyFT5VyVQ7tE7yPYubqQGStCqg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IP8wHcn150hnKrZvepWZRu/bnQUdsnKp47dRm/aFoEOE+zmmb5oelBi/0ntmITG0C
-	 GxnEh1vJB+bmqUgUZKCZWFGgq0598Qp8ItPgtUCT4ebSzjj73B7qiveA8tSUG6bUIu
-	 X/zQebJJjEdNCt3iFsoJV3655xdL6Fznj/O9YYQHvX5KTm0sh/0EwK6DahGuoDdcfa
-	 r+qksmi5gW/78J957YpZKYdhGAZe0GI/talrbTnfFLtOQIC+iOS5UQS8oTWDkGFm0a
-	 XZlgficEyzqu70VQik1EX2X8tFZCvnFML8NGJHla/35zm9SYh9XelgwUQ7xVTiRz1S
-	 QcqAzpTWxhy5Q==
-Date: Thu, 10 Aug 2023 10:40:16 +0100
-From: Will Deacon <will@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v3 00/36] arm64/gcs: Provide support for GCS in userspace
-Message-ID: <20230810094016.GA5365@willie-the-truck>
-References: <20230731-arm64-gcs-v3-0-cddf9f980d98@kernel.org>
- <20230801141319.GC26253@willie-the-truck>
- <09b7a94d-cc88-4372-85de-52db26bc2daf@sirena.org.uk>
- <20230808133857.GC2369@willie-the-truck>
- <f279ec25-e1c7-48e6-bd9d-5c753e829aad@sirena.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60EB83D71
+	for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 09:44:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691660666;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lf+g7H8c+D8XIdvK87t5LbaETche7IdF7H8+sxCRQxo=;
+	b=e2jlKN1Wib8eVdDn7s9VzJg/5KvnLETHAlAL5GsFp8nGZxUHYHt8dl9oVH9a2cUGC3WqLg
+	a4hK64v72j1HKsahYaf1478eEQ6KtYJLBoVrztnTrRClbXdgshDIjqxSQkTtEOZfbMjk5m
+	CHNFec8rx2BQ9VJdor4MRQ7AZv0WZ2Y=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-302-MbNvD1iRMdejvWuwm_gWbw-1; Thu, 10 Aug 2023 05:44:24 -0400
+X-MC-Unique: MbNvD1iRMdejvWuwm_gWbw-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3fe232ba9e5so4367085e9.2
+        for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 02:44:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691660663; x=1692265463;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lf+g7H8c+D8XIdvK87t5LbaETche7IdF7H8+sxCRQxo=;
+        b=iSS+iZn5kzdrU4r0AydUGAHArbG4BVlv5N3G/tsp2jYNumV3bI7yWYI/b07BPsJaDf
+         EAbrTrGSVliJBbiQM7Mzei7pBY9JH/m84baS5ixt6KTXQWGatgJ5EFKYvTI3cCnpcgT/
+         IfyVsEoWd4Sq2dUqIyaSDQ5ZIGSdy5nYgrCqHvMLtLGn22dy22Fi5KJ4Ynqq4RnJyOE2
+         EBa2azjDuMyApjWbbm0dEY54hK0c5+byNTI5SiFkaMSCRWfPooxAZ28NpZuL3tHqNXc5
+         p7liH3wEbE2LKiL5FXuiAg5ykMZeVA5aarsShSU7b2TElOrLSEPXowU0lfG7r3igg2Is
+         yTOA==
+X-Gm-Message-State: AOJu0YxFEeCJa9OEpGniCy7+S/m2iW+4T1RkfHsnpLFHkrsNqoacggCC
+	f3xn9jtoS7Sl/xB/dW7IKE2czbFSmAhtJiro11VoGv4c7Q7N7uBngePqcOXXqTXZoIyabZ1IhRX
+	yAUqMNA9u7IBFzaeN
+X-Received: by 2002:a05:600c:213:b0:3fa:934c:8356 with SMTP id 19-20020a05600c021300b003fa934c8356mr1511176wmi.10.1691660663604;
+        Thu, 10 Aug 2023 02:44:23 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHETQi0vth3YGZzAHlU+FHSXk47nzzZTe9HU1FXKIvTwI+udFnJZFW42tqkZkyIGRj6hC56qA==
+X-Received: by 2002:a05:600c:213:b0:3fa:934c:8356 with SMTP id 19-20020a05600c021300b003fa934c8356mr1511152wmi.10.1691660663318;
+        Thu, 10 Aug 2023 02:44:23 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id y24-20020a05600c365800b003fe2b081661sm4429254wmq.30.2023.08.10.02.44.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Aug 2023 02:44:22 -0700 (PDT)
+Message-ID: <367481f1-e1ee-9a2d-8822-2653c73ec746@redhat.com>
+Date: Thu, 10 Aug 2023 11:44:20 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f279ec25-e1c7-48e6-bd9d-5c753e829aad@sirena.org.uk>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v3 25/27] KVM: arm64: nv: Expose FGT to nested guests
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Mark Brown
+ <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Will Deacon <will@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>,
+ Chase Conklin <chase.conklin@arm.com>,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Darren Hart <darren@os.amperecomputing.com>,
+ Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20230808114711.2013842-1-maz@kernel.org>
+ <20230808114711.2013842-26-maz@kernel.org>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230808114711.2013842-26-maz@kernel.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 08, 2023 at 09:25:11PM +0100, Mark Brown wrote:
-> On Tue, Aug 08, 2023 at 02:38:58PM +0100, Will Deacon wrote:
-> 
-> > But seriously, I think the question is more about what this brings us
-> > *on top of* SCS, since for the forseeable future folks that care about
-> > this stuff (like Android) will be using SCS. GCS on its own doesn't make
-> > sense to me, given the recompilation effort to remove SCS and the lack
-> > of hardware, so then you have to look at what it brings in addition to
-> > GCS and balance that against the performance cost.
-> 
-> > Given that, is anybody planning to ship a distribution with this enabled?
-> 
-> I'm not sure that your assumption that the only people would would
-> consider deploying this are those who have deployed SCS is a valid one,
-> SCS users are definitely part of the mix but GCS is expected to be much
-> more broadly applicable.  As you say SCS is very invasive, requires a
-> rebuild of everything with different code generated and as Szabolcs
-> outlined has ABI challenges for general distros.  Any code built (or
-> JITed) with anything other than clang is going to require some explicit
-> support to do SCS (eg, the kernel's SCS support does nothing for
-> assembly code) and there's a bunch of runtime support.  It's very much a
-> specialist feature, mainly practical in well controlled somewhat
-> vertical systems - I've not seen any suggestion that general purpose
-> distros are considering using it.
 
-I've also seen no suggestion that general purpose distros are considering
-GCS -- that's what I'm asking about here, and also saying that we shouldn't
-rush in an ABI without confidence that it actually works beyond unit tests
-(although it's great that you wrote selftests!).
 
-> In contrast in the case of GCS one of the nice features is that for most
-> code it's very much non-invasive, much less so than things like PAC/BTI
-> and SCS, which means that the audience is much wider than it is for SCS
-> - it's a *much* easier sell for general purpose distros to enable GCS
-> than to enable SCS.
-
-This sounds compelling, but has anybody tried running significant parts of a
-distribution (e.g. running Debian source package tests, booting Android,
-using a browser, running QEMU) with GCS enabled? I can well imagine
-non-trivial applications violating both assumptions of the architecture and
-the ABI.
-
-> For the majority of programs all the support that is needed is in the
-> kernel and libgcc/libc, there's no impact on the code generation.  There
-> are no extra instructions in the normal flow which will impact systems
-> without the feature, and there are no extra registers in use, so even if
-> the binaries are run on a system without GCS or for some reason someone
-> decides that it's best to turn the feature off on a system that is capable
-> of using it the fact that it's just using the existing bl/ret pairs means
-> that there is minimal overhead.  This all means that it's much more
-> practical to deploy in general purpose distros.  On the other hand when
-> active it affects all code, this improves coverage but the improved
-> coverage can be a worry.
-> 
-> I can see that systems that have gone through all the effort of enabling
-> SCS might not rush to implement GCS, though there should be no harm in
-> having the two features running side by side beyond the doubled memory
-> requirements so you can at least have a transition plan (GCS does have
-> some allowances which enable hardware to mitigate some of the memory
-> bandwidth requirements at least).  You do still get the benefit of the
-> additional hardware protections GCS offers, and the coverage of all
-> branch and ret instructions will be of interest both for security and
-> for unwinders.  It's definitely offers less of an incremental
-> improvement on top of SCS than it is without SCS though.
-> 
-> GCS and SCS are comparable features in terms of the protection they aim
-> to add but their system integration impacts are different.
-
-Again, this sounds plausible but I don't see any data to back it up so I
-don't really have a feeling as to how true it is.
-
-> > If not, why are we bothering? If so, how much of that distribution has
-> > been brought up and how does the "dynamic linker or other startup code"
-> > decide what to do?
-> 
-> There is active interest in the x86 shadow stack support from distros,
-> GCS is a lot earlier on in the process but isn't fundamentally different
-> so it is expected that this will translate.  There is also a chicken and
-> egg thing where upstream support gates a lot of people's interest, what
-> people will consider carrying out of tree is different to what they'll
-> enable. 
-
-I'm not saying we should wait until distros are committed, but Arm should
-be able to do that work on a fork, exactly like we did for the arm64
-bringup. We have the fastmodel, so running interesting stuff with GCS
-enabled should be dead easy, no?
-
-> Architecture specific feedback on the implementation can also be fed back
-> into the still ongoing review of the ABI that is being established for
-> x86, there will doubtless be pushback about variations between
-> architectures from userspace people.
-> 
-> The userspace decision about enablement will primarily be driven by an
-> ELF marking which the dynamic linker looks at to determine if the
-> binaries it is loading can support GCS, a later dlopen() can either
-> refuse to load an additional library if the process currently has GCS
-> enabled, ignore the issue and hope things work out (there's a good
-> chance they will but obviously that's not safe) or (more complicatedly)
-> go round all the threads and disable GCS before proceeding.  The main
-> reason any sort of rebuild is required for most code is to add the ELF
-> marking, there will be a compiler option to select it.  Static binaries
-> should know if everything linked into them is GCS compatible and enable
-> GCS if appropriate in their startup code.
-> 
-> The majority of the full distro work at this point is on the x86 side
-> given the hardware availability, we are looking at that within Arm of
-> course.  I'm not aware of any huge blockers we have encountered thus
-> far.
-
-Ok, so it sounds like you've started something then? How far have you got?
-
-> It is fair to say that there's less active interest on the arm64 side
-> since as you say the feature is quite a way off making it's way into
-> hardware, though there are also long lead times on getting the full
-> software stack to end users and kernel support becomes a blocker for
-> the userspace stack.
+On 8/8/23 13:47, Marc Zyngier wrote:
+> Now that we have FGT support, expose the feature to NV guests.
 >
-> 
-> > After the mess we had with BTI and mprotect(), I'm hesitant to merge
-> > features like this without knowing that the ABI can stand real code.
-> 
-> The equivalent x86 feature is in current hardware[1], there has been
-> some distro work (I believe one of the issues x86 has had is coping with
-> a distro which shipped an early out of tree ABI, that experience has
-> informed the current ABI which as the cover letter says we are following
-> closely).  AIUI the biggest blocker on userspace work for x86 right now
-> is landing the kernel side of things so that everyone else has a stable
-> ABI to work from and don't need to carry out of tree patches, I've heard
-> frustration expressed at the deployment being held up.  IIRC Fedora were
-> on the leading edge in terms of active interest, they tend to be given
-> that they're one of the most quickly iterating distros.  
-> 
-> This definitely does rely fairly heavily on the x86 experience for
-> confidence in the ABI, and to be honest one of the big unknowns at this
-> point is if you or Catalin will have opinions on how things are being
-> done.
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/nested.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 7f80f385d9e8..3facd8918ae3 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -71,8 +71,9 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+>  		break;
+>  
+>  	case SYS_ID_AA64MMFR0_EL1:
+> -		/* Hide ECV, FGT, ExS, Secure Memory */
+> -		val &= ~(GENMASK_ULL(63, 43)		|
+> +		/* Hide ECV, ExS, Secure Memory */
+> +		val &= ~(NV_FTR(MMFR0, ECV)		|
+> +			 NV_FTR(MMFR0, EXS)		|
+>  			 NV_FTR(MMFR0, TGRAN4_2)	|
+>  			 NV_FTR(MMFR0, TGRAN16_2)	|
+>  			 NV_FTR(MMFR0, TGRAN64_2)	|
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-While we'd be daft not to look at what the x86 folks are doing, I don't
-think we should rely solely on them to inform the design for arm64 when
-it should be relatively straightforward to prototype the distro work on
-the model. There's also no rush to land the kernel changes given that
-GCS hardware doesn't exist.
+Eric
 
-Will
