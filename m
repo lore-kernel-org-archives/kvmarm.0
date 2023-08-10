@@ -1,233 +1,153 @@
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2095.outbound.protection.outlook.com [40.107.92.95])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F16429A8
-	for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 07:33:51 +0000 (UTC)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Qe/XZj0cUnrz88Ahkx/LgFMIBfpXIlGOZCDJ2YUrhsNmWwI/qYB5D/LpDFh4bUuzJ+HHS8jcrMxNzMroyZ+NjIf3j4UdFYKQol38oDmPDi/LXiraj0emFO+nxDchtwrDYcoZYHbt0WKuNuBK9lftQq+Jz4cYlNAi6JEEtRIqlKvgGk38nciE8RkJNsQMjqvRw5K3UECfBtxdZwCskYrrNgVadh/QAadWPWL5WNoGpI2nd9keLCvFWAp4rYFYn+HfoMRXPImzdxNiufQngi0cpp4g6Rwts3Uju6BTaNisWmWR3bqfMBPq42K65zTmDuDFt+PJu4s4CHpTipq0aan2kw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tNw7ZTEIocFoEz1W8mKWD53lYWloBxmGmGHJHRQx1G0=;
- b=hwACAqElGf+Zqd5UhSp8zQJUJemgxspedxAqCiuLajHN2Io7/5rEhgkRJuooSwfS/2fgPu2nVIiUu/+FwDU8qw683RRkPQg2TpOlMGt/NS6rg/HcVHImPk6ErekDfqW0MSnVtvA4kNRiYiEjUoaIAJP6wEndrfGiM2rvW7ZjKQzmr5QZLtE17QSX7tGOxgCOXY2zyjSmAvLo5t4chHcWjfEJnFUwfrnfS0FBAZMVl/Ll/hJKF+m1ZO2WSc5F6LePLIVDbmscUWJV467714zdE+nKyxcvEpL5OfggAKZPEAhGhK97Ge2RXRPjqtpYZjtS7H6vfzdboIhTYhxc2cn1BQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tNw7ZTEIocFoEz1W8mKWD53lYWloBxmGmGHJHRQx1G0=;
- b=C/e5jHDbH/2PBICWV+hQOyOGZ830dt6+csZPgVOlaxCCfW3NFWROr1Atw2FA8MKPITqI0kM/2+Z6v/IPP+H8P/zCGCz6wcvQVr1c5ya4XtrGM4JYZ1T7R0qBDOTqWqanXVRHwpkHl48XUeIC97ztGMT87WjvG/makstxsEcvqIs=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
- PH0PR01MB6780.prod.exchangelabs.com (2603:10b6:510:76::16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6652.30; Thu, 10 Aug 2023 07:33:46 +0000
-Received: from DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::d62f:d774:15b0:4a40]) by DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::d62f:d774:15b0:4a40%4]) with mapi id 15.20.6652.029; Thu, 10 Aug 2023
- 07:33:45 +0000
-From: Huang Shijie <shijie@os.amperecomputing.com>
-To: maz@kernel.org
-Cc: oliver.upton@linux.dev,
-	james.morse@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	patches@amperecomputing.com,
-	zwang@amperecomputing.com,
-	Huang Shijie <shijie@os.amperecomputing.com>
-Subject: [PATCH v2] KVM/arm64: reconfigurate the event filters for guest context
-Date: Thu, 10 Aug 2023 15:29:06 +0800
-Message-Id: <20230810072906.4007-1-shijie@os.amperecomputing.com>
-X-Mailer: git-send-email 2.39.2
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: CH2PR10CA0003.namprd10.prod.outlook.com
- (2603:10b6:610:4c::13) To DM8PR01MB6824.prod.exchangelabs.com
- (2603:10b6:8:23::24)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9097946BC
+	for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 08:35:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691656549;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Jk538eFMrHIWa3w11rqlSGvFFMXijrmVWJBtVe7uM/A=;
+	b=Bul/72VQKZiqcFu+fcMYbUUvS9N+AtwEwhLqH++73Mc24+7T8c8prHfkx3M2F4q93wgNYu
+	Ofb/J5BzMqkrHg2sHbOo69/ipXDpKhYtX5/HXToWDTA39dItugN+MNtFLQ6MhTXhlN3eY4
+	YjY1bYJIQlvXcJ8IdujuNvp8jSqIBBA=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-205-fHjElUZEO6-jBn9vVlKmRQ-1; Thu, 10 Aug 2023 04:35:45 -0400
+X-MC-Unique: fHjElUZEO6-jBn9vVlKmRQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-3f42bcef2acso3742325e9.2
+        for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 01:35:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691656544; x=1692261344;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Jk538eFMrHIWa3w11rqlSGvFFMXijrmVWJBtVe7uM/A=;
+        b=NwCOx95h5VaQSkl7z5pV0Ul5XYhWPBvoRrfIhT3vQiVN9OnVzsgYIfqwttVXymM3NV
+         HVnzlAF/vXJ7/8V9Elgq+rmI6dG+TWlMw1OVAZcml656N4iw18gTgUe70UhpOAoARXpO
+         DbX1wVMz9F4gNiFl8CsjGSrq8Dtf8l1GPLkyZn3v3blsxzcFT2XvltdV8cuVsY9mNZXc
+         pkl/yHostWH/B2XyxJz9FaSFR+HW4u5IsFcavjcPy7dr7/nPVE3u8o3l5KRCuRIYqaXF
+         g5SMvwUyR7HoPlZX9ymwaTv43soHrufl115QEsTRMUx2ihtLriaMNqecmuiVMZHp2k2n
+         xUWQ==
+X-Gm-Message-State: AOJu0Yz2VChksM9cnUVDd1lR3Tnnb5kofZbtxT9ctGjU1M3DHoJlrlYU
+	z85OxRNosZjrsbja/b2yZigP4ann28CbpnwdrzLYDqkXf2Myxlea9Jg+X44cOK4FkbedOdPOVyd
+	RB8Zt+kgZGqwNCU02
+X-Received: by 2002:a05:600c:2295:b0:3fb:e356:b60d with SMTP id 21-20020a05600c229500b003fbe356b60dmr1385053wmf.38.1691656544717;
+        Thu, 10 Aug 2023 01:35:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEKj1rJEmsV9LAdJXON8lV0H8i55xE2G2qoBc8w5J7RMLtkQJBRrLaKFMG6nBkIeF2lX3uNwA==
+X-Received: by 2002:a05:600c:2295:b0:3fb:e356:b60d with SMTP id 21-20020a05600c229500b003fbe356b60dmr1385038wmf.38.1691656544383;
+        Thu, 10 Aug 2023 01:35:44 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id n20-20020a7bc5d4000000b003fe2a40d287sm1413364wmk.1.2023.08.10.01.35.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Aug 2023 01:35:43 -0700 (PDT)
+Message-ID: <2a751a64-559e-cb17-4359-7f368c1b42ca@redhat.com>
+Date: Thu, 10 Aug 2023 10:35:41 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM8PR01MB6824:EE_|PH0PR01MB6780:EE_
-X-MS-Office365-Filtering-Correlation-Id: 06d1d45d-6c8b-4b32-616e-08db99742081
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	cUoSa6h2zNi1vVbTURTX7lNzmnBaYK3eLvqilyE5ZCcp2yi/OAUBamtBWcbmARjGqOogxJSTSYH/vFokfzaVCj57+WkXhgAek+XegPX45nyO8fGkMfTBm0u2UuVxgCzS8VVmaAP0Lch2yWytaHX8UxcMLHz21xTS5Yd2Ue8JCPFFx/tJ7hcLqVtUnc/2ViKkEZ4NJrYJt/L50djFrfIZGWmvFTyYpM8w4fm7pLsj6+XNktL39tz0AhN1G0obwd+gVcBIIj2vINd4iA+ctNnlZOta5tLpQ9ZtOwlYOGMhkbEEq6XF41A9roS4skTzsIDB0JXsc7V11Gs22A23fcssRkMEA80JXCrNLdvtZ1MwLOyR294nN1loB6gKXRtn+uxcr9bU2cP6VgIrLShZ1nnI8EDMpwpyCB9YZ0VH7pXjJpkbnYKkTtVDPWRdj4UE009P9VMhs/qdglmtg2hsUJpppL9+xAi24BrxY8Ui41NE9YP2guSpNIq9Am3oc3DZf8hsa2nl8G9ZTc2lVaQP4viUMfjpqqnzw9r1ZVjY9aP2MtouZ3ixpn3k1JTtQZ5OF4ZeZZGXC2RG8j4IwJBXbkgEUjq8PRWDGHWMBiEVlwX+zuA=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR01MB6824.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39850400004)(376002)(366004)(346002)(396003)(136003)(186006)(1800799006)(451199021)(66556008)(6916009)(66476007)(6506007)(66946007)(1076003)(26005)(107886003)(478600001)(6666004)(83380400001)(2616005)(52116002)(7416002)(41300700001)(316002)(4326008)(6512007)(6486002)(2906002)(966005)(38100700002)(8676002)(5660300002)(8936002)(38350700002)(86362001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?uHmxR/qS5mIovXvH5AbSbED1EmCyPMjDwaJoRHFN/O5/CJmivBEcdRJiyzxA?=
- =?us-ascii?Q?m2jaFY1+7WscpmWiYiWf+AfrxW1DMV/mTYqGUiZ+O8tVcEG7OUN9DLjgMJMX?=
- =?us-ascii?Q?dFpWFE4IbM1JYGLVq2U/xAKrHEJI3Sizcd60g1KN2NDpmxI36tJDeqK7+QF5?=
- =?us-ascii?Q?Q+HzvJGbIcy+EWVqyYuM55/QDYrivBEO8/p5OgQ3plzwG9zApZ0YKsbeu9sQ?=
- =?us-ascii?Q?EGG1eqAPSOF6D9P85VU6zG/mtr1S5sqjm84KpVMk/8BMqLLPkIO0Jg4mmKcp?=
- =?us-ascii?Q?R233hh11IEm6OaCxOozO7QbviWiim8k/8YDbzrSih/XeG/H2eTmjtH4UdONy?=
- =?us-ascii?Q?CuFhMXmE5oHYNevmKEc4uRtAL7lvaMdrlNr6TQ7PKMvtEodx8IVj/D9FLstV?=
- =?us-ascii?Q?324ZjkNHmxutRC2keBw1NF75SJ8VJ9/KY+K8ysL7jJrq6AdyMM6QVCha8AMu?=
- =?us-ascii?Q?lxGrMI0MjFtP+FbtEeijBJzdehInwpefyZJ5k7jiJAemc/YAAr3UP+TrDKWZ?=
- =?us-ascii?Q?zVn0XzelILjz4yMmaimRnpSQ4rVOgX/DbAiJi3fuZ/SOECIcBrK8/rNufp2v?=
- =?us-ascii?Q?+fE5ipJyVMDf4pY2EYp8L0QUeum2cBgsbqsHzpTvpQadWElSAP9v1BUs/7h6?=
- =?us-ascii?Q?4xnaQrrJVKRRtY/i00L2hgzRkVuUKd9+alhJ4lI+KXiAq8YtIZo+B/Nuoikj?=
- =?us-ascii?Q?iesFNhnij1UG6mppMBzFGSRaOXn4Ycu79xm4fo8laPUau6lgqKrAEfJHr5uT?=
- =?us-ascii?Q?+Me/sGtzQD8ri3iuluG/qcfvVZSWhD/YtQjI8GhUOX3LoMaY6vSO4Uayygoh?=
- =?us-ascii?Q?JuvLVQgwZX3hetTLRtrSroZeOP+WG8TIPStc472x5Po9MKgkU2uVv7dsegtx?=
- =?us-ascii?Q?riv8tzwcldkXPkS7/3yMuKN+Tfh6Vp5ejbont3s4Q56MPsMqvtBuKquseXKZ?=
- =?us-ascii?Q?ZsVuWj9UE44bI+ZT9J5TlkPE1gF1/7OF+eoehyjB6jB/MZfG2JU/phqCyPvx?=
- =?us-ascii?Q?3dfr/bGu+E+qAopToAAJiKBt+bF2Piqq1lNSdVdqO0TVg5sbSVH2W1k8/nT3?=
- =?us-ascii?Q?Atq5Wu5ijU/w7kQXWZNlDI84Xa+1DEcuN+lg4OEpIL6n60JlQiS8/0DxXDnr?=
- =?us-ascii?Q?SwzW4sqZWJgIwL8T9LKTxJLuW5npGR3c/sjJ8bsY3oySLXvsYlg7/HAiy4m6?=
- =?us-ascii?Q?aLuE5196UGZ6ucBzN8njCroChMX8d1/xOHyJo8IKMVDwXu9dLkypFP9zNc8N?=
- =?us-ascii?Q?d4fZZoqB0kxq3tPSafkJQjq1cZ7a3zLdbvTPOZsepjAffrZrElBlNLu9cG3y?=
- =?us-ascii?Q?fu3j/KteAZhaeveF7Q81uazjPTRKo0Cl7Qb9Z23khEM4bTS8mUwK9R1bZgaB?=
- =?us-ascii?Q?+JWAdZW74a+01hQQRi12QlseDq4oP4Sqai+MsETVP6iIDZ2wPS+Z7B0v8OfT?=
- =?us-ascii?Q?ldoUrh1/F49vYJ44g3mDI9GgnUqbZBLcvNwQhrJT9w/mvyq/nRyXPrO4HLPK?=
- =?us-ascii?Q?ijeKsK4BNgvZsS12HqMQavsPaYEECMvp343uJl0vmNru7ueMCJJTKObCSTSM?=
- =?us-ascii?Q?61FheghoRyVsnNG24otG0zjkPQuRj2hqzG/wmH24fDAGXbmrodAf2GERL/8S?=
- =?us-ascii?Q?NdH9ORoZOSRhkBAqYr/nGmg=3D?=
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 06d1d45d-6c8b-4b32-616e-08db99742081
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2023 07:33:45.2980
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: h0r3+COfroINorBHKKn8vcYwvb0kZsgPMoJZU8alDITGaWlkAYMOhFmvc4XcNrSCcMWUrfrI7YiULlt1/DljKceJwrNuDrUDQOr9GijmxoH+D9KoFyDiyUPpJxGQS2xf
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR01MB6780
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v3 23/27] KVM: arm64: nv: Add SVC trap forwarding
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Mark Brown
+ <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Will Deacon <will@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>,
+ Chase Conklin <chase.conklin@arm.com>,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Darren Hart <darren@os.amperecomputing.com>,
+ Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20230808114711.2013842-1-maz@kernel.org>
+ <20230808114711.2013842-24-maz@kernel.org>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230808114711.2013842-24-maz@kernel.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-1.) Background.
-   1.1) In arm64, start a guest with Qemu which is running as a VMM of KVM,
-        and bind the guest to core 33 and run program "a" in guest.
-        The code of "a" shows below:
-   	----------------------------------------------------------
-		#include <stdio.h>
+Hi Marc,
 
-		int main()
-		{
-			unsigned long i = 0;
+On 8/8/23 13:47, Marc Zyngier wrote:
+> HFGITR_EL2 allows the trap of SVC instructions to EL2. Allow these
+> traps to be forwarded. Take this opportunity to deny any 32bit activity
+> when NV is enabled.
 
-			for (;;) {
-				i++;
-			}
+I can't figure out how HFGITR_EL2.{SVC_EL1, SVC_EL0 and ERET} are
+handled. Please could you explain.
 
-			printf("i:%ld\n", i);
-			return 0;
-		}
-   	----------------------------------------------------------
-
-   1.2) Use the following perf command in host:
-      #perf stat -e cycles:G,cycles:H -C 33 -I 1000 sleep 1
-          #           time             counts unit events
-               1.000817400      3,299,471,572      cycles:G
-               1.000817400          3,240,586      cycles:H
-
-       This result is correct, my cpu's frequency is 3.3G.
-
-   1.3) Use the following perf command in host:
-      #perf stat -e cycles:G,cycles:H -C 33 -d -d  -I 1000 sleep 1
-            time             counts unit events
-     1.000831480        153,634,097      cycles:G                                                                (70.03%)
-     1.000831480      3,147,940,599      cycles:H                                                                (70.03%)
-     1.000831480      1,143,598,527      L1-dcache-loads                                                         (70.03%)
-     1.000831480              9,986      L1-dcache-load-misses            #    0.00% of all L1-dcache accesses   (70.03%)
-     1.000831480    <not supported>      LLC-loads
-     1.000831480    <not supported>      LLC-load-misses
-     1.000831480        580,887,696      L1-icache-loads                                                         (70.03%)
-     1.000831480             77,855      L1-icache-load-misses            #    0.01% of all L1-icache accesses   (70.03%)
-     1.000831480      6,112,224,612      dTLB-loads                                                              (70.03%)
-     1.000831480             16,222      dTLB-load-misses                 #    0.00% of all dTLB cache accesses  (69.94%)
-     1.000831480        590,015,996      iTLB-loads                                                              (59.95%)
-     1.000831480                505      iTLB-load-misses                 #    0.00% of all iTLB cache accesses  (59.95%)
-
-       This result is wrong. The "cycle:G" should be nearly 3.3G.
-
-2.) Root cause.
-	There is only 7 counters in my arm64 platform:
-	  (one cycle counter) + (6 normal counters)
-
-	In 1.3 above, we will use 10 event counters.
-	Since we only have 7 counters, the perf core will trigger
-       	multiplexing in hrtimer:
-	     perf_mux_hrtimer_restart() --> perf_rotate_context().
-
-       If the hrtimer occurs when the host is running, it's fine.
-       If the hrtimer occurs when the guest is running,
-       the perf_rotate_context() will program the PMU with filters for
-       host context. The KVM does not have a chance to restore
-       PMU registers with kvm_vcpu_pmu_restore_guest().
-       The PMU does not work correctly, so we got wrong result.
-
-3.) About this patch.
-	Make a KVM_REQ_RELOAD_PMU request before reentering the
-	guest. The request will call kvm_vcpu_pmu_restore_guest()
-	to reconfigurate the filters for guest context.
-
-4.) Test result of this patch:
-      #perf stat -e cycles:G,cycles:H -C 33 -d -d  -I 1000 sleep 1
-            time             counts unit events
-     1.001006400      3,298,348,656      cycles:G                                                                (70.03%)
-     1.001006400          3,144,532      cycles:H                                                                (70.03%)
-     1.001006400            941,149      L1-dcache-loads                                                         (70.03%)
-     1.001006400             17,937      L1-dcache-load-misses            #    1.91% of all L1-dcache accesses   (70.03%)
-     1.001006400    <not supported>      LLC-loads
-     1.001006400    <not supported>      LLC-load-misses
-     1.001006400          1,101,889      L1-icache-loads                                                         (70.03%)
-     1.001006400            121,638      L1-icache-load-misses            #   11.04% of all L1-icache accesses   (70.03%)
-     1.001006400          1,031,228      dTLB-loads                                                              (70.03%)
-     1.001006400             26,952      dTLB-load-misses                 #    2.61% of all dTLB cache accesses  (69.93%)
-     1.001006400          1,030,678      iTLB-loads                                                              (59.94%)
-     1.001006400                338      iTLB-load-misses                 #    0.03% of all iTLB cache accesses  (59.94%)
-
-    The result is correct. The "cycle:G" is nearly 3.3G now.
-
-Signed-off-by: Huang Shijie <shijie@os.amperecomputing.com>
----
-v1 --> v2:
-	Do not change perf/core code, only change the ARM64 kvm code.
-	v1: https://lkml.org/lkml/2023/8/8/1465
-
----
- arch/arm64/kvm/arm.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index c2c14059f6a8..475a2f0e0e40 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -919,8 +919,17 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		if (!ret)
- 			ret = 1;
- 
--		if (ret > 0)
-+		if (ret > 0) {
-+			/*
-+			 * The perf_rotate_context() may rotate the events and
-+			 * reprogram PMU with filters for host context.
-+			 * So make a request before reentering the guest to
-+			 * reconfigurate the event filters for guest context.
-+			 */
-+			kvm_make_request(KVM_REQ_RELOAD_PMU, vcpu);
-+
- 			ret = check_vcpu_requests(vcpu);
-+		}
- 
- 		/*
- 		 * Preparing the interrupts to be injected also
--- 
-2.39.2
+Eric
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/arm.c         |  4 ++++
+>  arch/arm64/kvm/handle_exit.c | 12 ++++++++++++
+>  2 files changed, 16 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 72dc53a75d1c..8b51570a76f8 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -36,6 +36,7 @@
+>  #include <asm/kvm_arm.h>
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_mmu.h>
+> +#include <asm/kvm_nested.h>
+>  #include <asm/kvm_pkvm.h>
+>  #include <asm/kvm_emulate.h>
+>  #include <asm/sections.h>
+> @@ -818,6 +819,9 @@ static bool vcpu_mode_is_bad_32bit(struct kvm_vcpu *vcpu)
+>  	if (likely(!vcpu_mode_is_32bit(vcpu)))
+>  		return false;
+>  
+> +	if (vcpu_has_nv(vcpu))
+> +		return true;
+> +
+>  	return !kvm_supports_32bit_el0();
+>  }
+>  
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 6dcd6604b6bc..3b86d534b995 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -226,6 +226,17 @@ static int kvm_handle_eret(struct kvm_vcpu *vcpu)
+>  	return 1;
+>  }
+>  
+> +static int handle_svc(struct kvm_vcpu *vcpu)
+> +{
+> +	/*
+> +	 * So far, SVC traps only for NV via HFGITR_EL2. A SVC from a
+> +	 * 32bit guest would be caught by vpcu_mode_is_bad_32bit(), so
+> +	 * we should only have to deal with a 64 bit exception.
+> +	 */
+> +	kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
+> +	return 1;
+> +}
+> +
+>  static exit_handle_fn arm_exit_handlers[] = {
+>  	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
+>  	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
+> @@ -239,6 +250,7 @@ static exit_handle_fn arm_exit_handlers[] = {
+>  	[ESR_ELx_EC_SMC32]	= handle_smc,
+>  	[ESR_ELx_EC_HVC64]	= handle_hvc,
+>  	[ESR_ELx_EC_SMC64]	= handle_smc,
+> +	[ESR_ELx_EC_SVC64]	= handle_svc,
+>  	[ESR_ELx_EC_SYS64]	= kvm_handle_sys_reg,
+>  	[ESR_ELx_EC_SVE]	= handle_sve,
+>  	[ESR_ELx_EC_ERET]	= kvm_handle_eret,
 
