@@ -1,144 +1,125 @@
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81DE6125AC
-	for <kvmarm@lists.linux.dev>; Fri, 11 Aug 2023 15:20:08 +0000 (UTC)
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-3176fe7b67bso1214870f8f.2
-        for <kvmarm@lists.linux.dev>; Fri, 11 Aug 2023 08:20:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A4DE63B6
+	for <kvmarm@lists.linux.dev>; Fri, 11 Aug 2023 15:26:16 +0000 (UTC)
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-1ba5cda3530so1748380fac.3
+        for <kvmarm@lists.linux.dev>; Fri, 11 Aug 2023 08:26:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691767206; x=1692372006;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qzePDYsycDhwr+IPrP4iKR8Awa/mk+LR9zGcfd9N2nE=;
-        b=10PLZEHNHZ/ExNrV42MYDUP99UuAAVIdy55Hd7YOK/eHnLYUUyD7ve7NVrw3aO7CdM
-         vWBMzbvzxgWLvhVnsphCgW8uohRzzBKAodzg63mpNv0kfIkeiZhzoClaIzj97HkkS2Lk
-         iWbjWQuFhnLq9DvRa0wtjNDCeDyfnyv3WoXyhIp3GxwuB1sI2t8kz0UMxWfEap/n9djV
-         /2cFEaEyzZxFkmBILF8aLsRKpkWrBu5Qa7Kzirz5w+TLtlCFMR/ay5oYyb0D9TOYaB/e
-         ChrcClwsZwB85k4HDOSrHQdLnMpxjk/mslXOBnCi9KYIp7Vyxg9rq0If0NYuQ7ExjM+8
-         kQqg==
+        d=google.com; s=20221208; t=1691767575; x=1692372375;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gpoA+kB5Y3LohYYmJ2jZQQwWYFTkmc71zbP7gd9ynAU=;
+        b=I2f1SipTdhlztcE6kE0k5cqLVM1vZmFqwcUp9a08U28pRGdIS2Pjgq6af/5gXIBcnb
+         tQv6lnLZ9SxuYL3egbnuv8flrAgthQwfUDGS3xY/SABJj9CD6/3tasFvBmECHWYs/aBO
+         DPPpk5Vf7uiM+PzvIhyKyuXht3MMWzVmeJ34CCCEcrxw4Nc5wZ7SeIeGX2HNgzTWexED
+         AGH3hCBfkb96r798DFFuGbTp4y76Mg/ZdhY+UpZzu64Gcp6HPKihoscap6K2sNWC/xNo
+         4EGs//HfAvXGns+AwpVF3q4lvHo5LnQ2y4VsH1BhRNyI1lxwlN3H7CJtbyOA9RojZs7f
+         o9hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691767206; x=1692372006;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qzePDYsycDhwr+IPrP4iKR8Awa/mk+LR9zGcfd9N2nE=;
-        b=CVHBO4AVZHSgbDgj8T4fXctfcjPGNISJ7oZrV3ULRh3lCLgpZth3yDAnKXpnhgZ7V/
-         a80XvSY5CF9/ImGZ7FHRLANhZViw6jYUlGSSOUN6tTVNFmkAPO9QCsS0US3+aXLJtl/X
-         7DrtNA7PRInFHQdD6t+WPxY0Mcn05KC8Ce9iunjdjE4GYdo/vF4XEB3Xx99/2wJ2AHBL
-         q0k0hOoz0y40UIlGoTBeswmdwCuCUmWX1SH07N4gvK+7f7jtX6I2Kidw9RMmLMvD9F8m
-         bWRWi8jvA2uK9hSLFxMNP/NcRlr5WAz08FCazsBX0ptI4dU+HDbGpMU8Yc0gegPyLuc8
-         9eDQ==
-X-Gm-Message-State: AOJu0Yw9caOeAwc4lk3yDkzeD+WhwTT/OD+1N0LnIhPnMYPvoCs3T4mY
-	c4T9oYoUC7BKtd+pCfHo9cRW8eGlkw==
-X-Google-Smtp-Source: AGHT+IEGl+QWst925OBey2b/n22pg/pEC+s7Iu4Jwd9U6CEcZriGyM4oqqfEappi55i2VjBAWfl0++It4g==
-X-Received: from elver.muc.corp.google.com ([2a00:79e0:9c:201:8dc0:5176:6fda:46a0])
- (user=elver job=sendgmr) by 2002:a05:6000:1819:b0:317:41be:d871 with SMTP id
- m25-20020a056000181900b0031741bed871mr16440wrh.14.1691767206297; Fri, 11 Aug
- 2023 08:20:06 -0700 (PDT)
-Date: Fri, 11 Aug 2023 17:18:41 +0200
-In-Reply-To: <20230811151847.1594958-1-elver@google.com>
+        d=1e100.net; s=20221208; t=1691767575; x=1692372375;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gpoA+kB5Y3LohYYmJ2jZQQwWYFTkmc71zbP7gd9ynAU=;
+        b=Ql/gxEx2WL1BJ55a04Gw7FEwaXpWTrqfmGB+gaEmodxwXcz09GtVPwUWP+SqxQ/hDD
+         UyrK1h7e+JtuPApBpGt1zu+4EcZQ+xzXUAmG8yRYR7tLVC50HqdxKE/JAQJFfk4+cTTB
+         luMf6N09ghUsP710E1avWEKc9KGG3OHfHXF7ZJIhwn4RwGMBfwyWS+299LtrSZoh/EeR
+         8Yg3KN5/VKUe3HQmN01h4g1XViInZlMev0XYRQkMeWqr/+AA1U7C0WyxGmYsSsAhkoiP
+         tiRnWd8h7wKZGwh4ZVlftMfieiTFDHI/P7PRSW41BrPUpYwKTdZWRz78XQlajhVFD/qZ
+         K4CA==
+X-Gm-Message-State: AOJu0Yw3gxDJ8CYc/Fru45AKn1UOKfeD4HcBzXdL5OrZocSNA51jbEmz
+	Ga2KDvUf+esD6bEgvejnIuDq7IVYNExMuCZ/AEO/1g==
+X-Google-Smtp-Source: AGHT+IHwmUHFuGP6d1T0ZviFc0eLJU8HYh8L5e4xCBXWnjha11RA2HDj3jQefsVWy1uMHw4cfnFJkM8Lr0MsLFSDGoE=
+X-Received: by 2002:a05:6870:65a9:b0:1be:d522:fdf with SMTP id
+ fp41-20020a05687065a900b001bed5220fdfmr2446876oab.12.1691767575411; Fri, 11
+ Aug 2023 08:26:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230811151847.1594958-1-elver@google.com>
-X-Mailer: git-send-email 2.41.0.694.ge786442a9b-goog
-Message-ID: <20230811151847.1594958-4-elver@google.com>
-Subject: [PATCH v4 4/4] hardening: Move BUG_ON_DATA_CORRUPTION to hardening options
-From: Marco Elver <elver@google.com>
-To: elver@google.com, Andrew Morton <akpm@linux-foundation.org>, 
-	Kees Cook <keescook@chromium.org>
-Cc: Guenter Roeck <linux@roeck-us.net>, Peter Zijlstra <peterz@infradead.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+MIME-Version: 1.0
+References: <20230808114711.2013842-1-maz@kernel.org> <20230808114711.2013842-10-maz@kernel.org>
+In-Reply-To: <20230808114711.2013842-10-maz@kernel.org>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Fri, 11 Aug 2023 08:26:02 -0700
+Message-ID: <CAAdAUthoZwX5k1b9AJAA2yB1wuAAaeXiFDimv5Y6N_QrS1P10A@mail.gmail.com>
+Subject: Re: [PATCH v3 09/27] arm64: Add feature detection for fine grained traps
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, 
+	Catalin Marinas <catalin.marinas@arm.com>, Eric Auger <eric.auger@redhat.com>, 
+	Mark Brown <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Andre Przywara <andre.przywara@arm.com>, 
+	Chase Conklin <chase.conklin@arm.com>, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, 
+	Darren Hart <darren@os.amperecomputing.com>, Miguel Luis <miguel.luis@oracle.com>, 
 	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Paul Moore <paul@paul-moore.com>, 
-	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Tom Rix <trix@redhat.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	llvm@lists.linux.dev, Dmitry Vyukov <dvyukov@google.com>, 
-	Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com, 
-	linux-toolchains@vger.kernel.org
+	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-BUG_ON_DATA_CORRUPTION is turning detected corruptions of list data
-structures from WARNings into BUGs. This can be useful to stop further
-corruptions or even exploitation attempts.
+Hi Marc,
 
-However, the option has less to do with debugging than with hardening.
-With the introduction of LIST_HARDENED, it makes more sense to move it
-to the hardening options, where it selects LIST_HARDENED instead.
+On Tue, Aug 8, 2023 at 4:47=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
+>
+> From: Mark Brown <broonie@kernel.org>
+>
+> In order to allow us to have shared code for managing fine grained traps
+> for KVM guests add it as a detected feature rather than relying on it
+> being a dependency of other features.
+>
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> [maz: converted to ARM64_CPUID_FIELDS()]
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Link: https://lore.kernel.org/r/20230301-kvm-arm64-fgt-v4-1-1bf8d235ac1f@=
+kernel.org
+> Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+> Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
+> ---
+>  arch/arm64/kernel/cpufeature.c | 7 +++++++
+>  arch/arm64/tools/cpucaps       | 1 +
+>  2 files changed, 8 insertions(+)
+>
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeatur=
+e.c
+> index f9d456fe132d..668e2872a086 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -2627,6 +2627,13 @@ static const struct arm64_cpu_capabilities arm64_f=
+eatures[] =3D {
+>                 .matches =3D has_cpuid_feature,
+>                 ARM64_CPUID_FIELDS(ID_AA64ISAR1_EL1, LRCPC, IMP)
+>         },
+> +       {
+> +               .desc =3D "Fine Grained Traps",
+> +               .type =3D ARM64_CPUCAP_SYSTEM_FEATURE,
+> +               .capability =3D ARM64_HAS_FGT,
+> +               .matches =3D has_cpuid_feature,
+> +               ARM64_CPUID_FIELDS(ID_AA64MMFR0_EL1, FGT, IMP)
+> +       },
+>  #ifdef CONFIG_ARM64_SME
+>         {
+>                 .desc =3D "Scalable Matrix Extension",
+> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+> index c80ed4f3cbce..c3f06fdef609 100644
+> --- a/arch/arm64/tools/cpucaps
+> +++ b/arch/arm64/tools/cpucaps
+> @@ -26,6 +26,7 @@ HAS_ECV
+>  HAS_ECV_CNTPOFF
+>  HAS_EPAN
+>  HAS_EVT
+> +HAS_FGT
+>  HAS_GENERIC_AUTH
+>  HAS_GENERIC_AUTH_ARCH_QARMA3
+>  HAS_GENERIC_AUTH_ARCH_QARMA5
+> --
+> 2.34.1
+>
+>
 
-Without this change, combining BUG_ON_DATA_CORRUPTION with LIST_HARDENED
-alone wouldn't be possible, because DEBUG_LIST would always be selected
-by BUG_ON_DATA_CORRUPTION.
-
-Signed-off-by: Marco Elver <elver@google.com>
----
-v4:
-* New patch, after LIST_HARDENED was made independent of DEBUG_LIST, and
-  now DEBUG_LIST depends on LIST_HARDENED.
----
- lib/Kconfig.debug          | 12 +-----------
- security/Kconfig.hardening | 10 ++++++++++
- 2 files changed, 11 insertions(+), 11 deletions(-)
-
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index c38745ad46eb..c7348d1fabe5 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -1673,7 +1673,7 @@ menu "Debug kernel data structures"
- 
- config DEBUG_LIST
- 	bool "Debug linked list manipulation"
--	depends on DEBUG_KERNEL || BUG_ON_DATA_CORRUPTION
-+	depends on DEBUG_KERNEL
- 	select LIST_HARDENED
- 	help
- 	  Enable this to turn on extended checks in the linked-list walking
-@@ -1715,16 +1715,6 @@ config DEBUG_NOTIFIERS
- 	  This is a relatively cheap check but if you care about maximum
- 	  performance, say N.
- 
--config BUG_ON_DATA_CORRUPTION
--	bool "Trigger a BUG when data corruption is detected"
--	select DEBUG_LIST
--	help
--	  Select this option if the kernel should BUG when it encounters
--	  data corruption in kernel memory structures when they get checked
--	  for validity.
--
--	  If unsure, say N.
--
- config DEBUG_MAPLE_TREE
- 	bool "Debug maple trees"
- 	depends on DEBUG_KERNEL
-diff --git a/security/Kconfig.hardening b/security/Kconfig.hardening
-index ffc3c702b461..2cff851ebfd7 100644
---- a/security/Kconfig.hardening
-+++ b/security/Kconfig.hardening
-@@ -290,6 +290,16 @@ config LIST_HARDENED
- 
- 	  If unsure, say N.
- 
-+config BUG_ON_DATA_CORRUPTION
-+	bool "Trigger a BUG when data corruption is detected"
-+	select LIST_HARDENED
-+	help
-+	  Select this option if the kernel should BUG when it encounters
-+	  data corruption in kernel memory structures when they get checked
-+	  for validity.
-+
-+	  If unsure, say N.
-+
- endmenu
- 
- config CC_HAS_RANDSTRUCT
--- 
-2.41.0.694.ge786442a9b-goog
-
+Reviewed-by: Jing Zhang <jingzhangos@google.com>
