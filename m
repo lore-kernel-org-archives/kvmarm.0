@@ -1,73 +1,128 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCCF063B6
-	for <kvmarm@lists.linux.dev>; Fri, 11 Aug 2023 16:36:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80FC3C433C8;
-	Fri, 11 Aug 2023 16:36:07 +0000 (UTC)
-Date: Fri, 11 Aug 2023 17:36:05 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v4 07/36] arm64/gcs: Provide copy_to_user_gcs()
-Message-ID: <ZNZjdXTJw2p5vh7C@arm.com>
-References: <20230807-arm64-gcs-v4-0-68cfa37f9069@kernel.org>
- <20230807-arm64-gcs-v4-7-68cfa37f9069@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AB7063B6
+	for <kvmarm@lists.linux.dev>; Fri, 11 Aug 2023 16:36:25 +0000 (UTC)
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-6bd0a0a675dso1983617a34.2
+        for <kvmarm@lists.linux.dev>; Fri, 11 Aug 2023 09:36:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691771784; x=1692376584;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pjqXtzMOXLdQHe6ZvZ1Y6Hz/xBtyYiNeyOsO2Cr/en4=;
+        b=z+HMwQN3565AfGE/19hcGAOM2hX0FwRfs+LDYzIL1Pr/MRqMAeFsBQZAAwicFn7AZN
+         p1L4oQn0fMELODXgvbDt5qno1sJJHxf+UXTppWWRiwKyugZSDahi0Ip+CWAdNmcWUF5R
+         6/ijZ8rm/gW5BqLaclrOLp6z2uGUtRQqVuH2VETpB97vG5U/m9ZIixlP+1DB2jJAmsbZ
+         kJg27MH5s+13/uAQbUr9VwdWp/HJ3/TtVJBhTW8peWv9M5pFo3l6ph9LTMcmGcfL+xsO
+         ZM64Z4fOmH74qZ+zFBsaXvbWJpFG0fsJ/NA16petQboqI+iLR7QNrc3MmkTLBAu3ecDe
+         ahqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691771784; x=1692376584;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pjqXtzMOXLdQHe6ZvZ1Y6Hz/xBtyYiNeyOsO2Cr/en4=;
+        b=LN9L9NuVSUtCdrl5I7FU6lGsIFa8WbIb2LTIIgwaRjazLa+qWSjNRtbfT/ii9/N+DJ
+         hCtPy/odbZ2hi+QbWVkUdjH4wpW8j9PY2bbDCRdEtE511NRjq4XJE91FLrRHslucU5m4
+         +Nr5LSu9yfbTmnRMPT6OHED6QbW8wNQkMUrxz2UNxIMXAIJiWF8sk2sWKAq2e3JJ4bMy
+         Bfw5kk8m4muURj8aqJTaNW1wuyTuR1bbGDbuvGHegN9pDiEywubFfnzVZWCNK63P1Hu7
+         M9976Oa8DWBSntE103L+WdMFY+hStkHBVgXIvcAj6MG38wAOrAb95EgI/AY84psfLwJ9
+         7RLQ==
+X-Gm-Message-State: AOJu0YzmdAEz4mCkMEhDg2VVPC/w0rEf2KqziLnaHXuZtX2I7yb0l4VH
+	FRv4kZmurIM2GgDHgqCIKed/pkOMK5FOdBPHPikNXA==
+X-Google-Smtp-Source: AGHT+IGUZUZB4PjbogoCw8S4V6nWl6xBKy15coDJtyCGvtLJYLUCFvRV/u2xNx3M5Y/jVV+EyAdqo7cb7iHDLW6Jqv8=
+X-Received: by 2002:a05:6870:e3cc:b0:1be:fe7c:d0a6 with SMTP id
+ y12-20020a056870e3cc00b001befe7cd0a6mr2516010oad.2.1691771784092; Fri, 11 Aug
+ 2023 09:36:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230807-arm64-gcs-v4-7-68cfa37f9069@kernel.org>
+References: <20230808114711.2013842-1-maz@kernel.org> <20230808114711.2013842-13-maz@kernel.org>
+In-Reply-To: <20230808114711.2013842-13-maz@kernel.org>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Fri, 11 Aug 2023 09:36:12 -0700
+Message-ID: <CAAdAUtgv2vsGq-w39APwWM3CB4XO+oMX1WQzozF3SNGBKHSRSQ@mail.gmail.com>
+Subject: Re: [PATCH v3 12/27] KVM: arm64: nv: Add FGT registers
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, 
+	Catalin Marinas <catalin.marinas@arm.com>, Eric Auger <eric.auger@redhat.com>, 
+	Mark Brown <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Andre Przywara <andre.przywara@arm.com>, 
+	Chase Conklin <chase.conklin@arm.com>, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, 
+	Darren Hart <darren@os.amperecomputing.com>, Miguel Luis <miguel.luis@oracle.com>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 07, 2023 at 11:00:12PM +0100, Mark Brown wrote:
-> +static inline int copy_to_user_gcs(unsigned long __user *addr,
-> +				   unsigned long *val,
-> +				   int count)
-> +{
-> +	int ret = -EFAULT;
-> +	int i;
-> +
-> +	if (access_ok((char __user *)addr, count * sizeof(u64))) {
-> +		uaccess_ttbr0_enable();
-> +		for (i = 0; i < count; i++) {
-> +			ret = gcssttr(addr++, *val++);
-> +			if (ret != 0)
-> +				break;
-> +		}
-> +		uaccess_ttbr0_disable();
-> +	}
-> +
-> +	return ret;
-> +}
+Hi Marc,
 
-I think it makes more sense to have a put_user_gcs() of a single
-element. I've only seen it used with 2 elements in the signal code but
-we could as well do two put_user_gcs() calls (as we do for other stuff
-that we push to the signal frame).
+On Tue, Aug 8, 2023 at 4:48=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Add the 5 registers covering FEAT_FGT. The AMU-related registers
+> are currently left out as we don't have a plan for them. Yet.
+>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 5 +++++
+>  arch/arm64/kvm/sys_regs.c         | 5 +++++
+>  2 files changed, 10 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/k=
+vm_host.h
+> index d3dd05bbfe23..721680da1011 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -400,6 +400,11 @@ enum vcpu_sysreg {
+>         TPIDR_EL2,      /* EL2 Software Thread ID Register */
+>         CNTHCTL_EL2,    /* Counter-timer Hypervisor Control register */
+>         SP_EL2,         /* EL2 Stack Pointer */
+> +       HFGRTR_EL2,
+> +       HFGWTR_EL2,
+> +       HFGITR_EL2,
+> +       HDFGRTR_EL2,
+> +       HDFGWTR_EL2,
+>         CNTHP_CTL_EL2,
+>         CNTHP_CVAL_EL2,
+>         CNTHV_CTL_EL2,
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 38f221f9fc98..f5baaa508926 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2367,6 +2367,9 @@ static const struct sys_reg_desc sys_reg_descs[] =
+=3D {
+>         EL2_REG(MDCR_EL2, access_rw, reset_val, 0),
+>         EL2_REG(CPTR_EL2, access_rw, reset_val, CPTR_NVHE_EL2_RES1),
+>         EL2_REG(HSTR_EL2, access_rw, reset_val, 0),
+> +       EL2_REG(HFGRTR_EL2, access_rw, reset_val, 0),
+> +       EL2_REG(HFGWTR_EL2, access_rw, reset_val, 0),
+> +       EL2_REG(HFGITR_EL2, access_rw, reset_val, 0),
+>         EL2_REG(HACR_EL2, access_rw, reset_val, 0),
+>
+>         EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
+> @@ -2376,6 +2379,8 @@ static const struct sys_reg_desc sys_reg_descs[] =
+=3D {
+>         EL2_REG(VTCR_EL2, access_rw, reset_val, 0),
+>
+>         { SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
+> +       EL2_REG(HDFGRTR_EL2, access_rw, reset_val, 0),
+> +       EL2_REG(HDFGWTR_EL2, access_rw, reset_val, 0),
+>         EL2_REG(SPSR_EL2, access_rw, reset_val, 0),
+>         EL2_REG(ELR_EL2, access_rw, reset_val, 0),
+>         { SYS_DESC(SYS_SP_EL1), access_sp_el1},
+> --
+> 2.34.1
+>
+>
 
--- 
-Catalin
+Reviewed-by: Jing Zhang <jingzhangos@google.com>
+
+Jing
