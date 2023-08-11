@@ -1,164 +1,312 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ADFB10F1
-	for <kvmarm@lists.linux.dev>; Fri, 11 Aug 2023 04:51:51 +0000 (UTC)
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-c647150c254so3174938276.1
-        for <kvmarm@lists.linux.dev>; Thu, 10 Aug 2023 21:51:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691729510; x=1692334310;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=G001bKqgoFEW2hLjB7/836JCEIDwO1wziDEr7SkyYCE=;
-        b=W3WTn+szTpGRYJ4Nrsk4rxOWrftcekNscs22xwqlhuJB93Ar0BfqRGdEWyk/Q+jqhP
-         ri5qHyFNgBLpKKH06LH+HsWb1MpZhFmzfXxeF/ORAT07Zun/zgnJLSX6I3leqAoY8QXR
-         Cn/et64Ad2ndHQvQUM0T7mioUm2x1aprIMcTE/Orm1a2GcZucR8dO9nfLrJGDH4DDtBH
-         Zqv+GVr8tvgyxrI1x+huGGPPptiOeQdCMsGwnp+KGtkceCK4aB9KNjMvLKxJMtaqApLO
-         0pB9A/SZQYJ4zNbgL0iGKFGckcIBEfW0AiexbMyF7GNuqQ22QUyKuY/29OVGxcSI10vu
-         hGpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691729510; x=1692334310;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=G001bKqgoFEW2hLjB7/836JCEIDwO1wziDEr7SkyYCE=;
-        b=kdXhPHysYwAVg0bL0VPsKWv+IWwgD5kKcJ4i2Nk3dKeaeZulfRDYDb0Vr7cvIlF4Sw
-         0i01ihLFCDf3nLa9e45hfNgDBBsaFJ21TL3i62wN217+8mAYO32mQqy+E9bk1ypFM3g9
-         1MbTzG7q5q+J4bByYLwXAZi2sgog7R2vmfwQqUKUQ5KZbXjBHB4jH66RKeAn87/bNSiV
-         Ka4SP2W7qtbu+PFKL2un6k5RTnWivIYSuZ4OL9GzI8owj1yLUNh0V+pIEs1bt/Zg0zON
-         99JCeCBesiQlRLRckbZBPd6cbHQZznqztBaZJjyauuBljoV4NlUqbz49EXAC3OifT1KL
-         RJ5Q==
-X-Gm-Message-State: AOJu0Yxc8ov6RAhgqH8nAV42h9x3Inz1hbFJmVXJe0SN0RAGcI/sVCh5
-	qHJaIHxIDpN/R/K6Jsqds3xhjAJORZIQ
-X-Google-Smtp-Source: AGHT+IGp8zLlvGKgsKPT+euh9i0KtpqBPibbJyYiSM4xY/zJavK9m1k0FyNfqcnUQJamiQjlUlH81wBUvAac
-X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
- (user=rananta job=sendgmr) by 2002:a05:6902:91b:b0:d15:53b5:509f with SMTP id
- bu27-20020a056902091b00b00d1553b5509fmr80327ybb.2.1691729510277; Thu, 10 Aug
- 2023 21:51:50 -0700 (PDT)
-Date: Fri, 11 Aug 2023 04:51:27 +0000
-In-Reply-To: <20230811045127.3308641-1-rananta@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F7F0EC6
+	for <kvmarm@lists.linux.dev>; Fri, 11 Aug 2023 06:10:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90E8EC433C8;
+	Fri, 11 Aug 2023 06:10:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691734213;
+	bh=c0rV1rg3Ui5WM4U60sJPoJIhowA0M6WjUQJlEqcHJSA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Ufz0+sBUo97tz5b/iWlZj5ytUlVzgRueW0LGHRrxQgr+lm37HYNI6UXMP07qeHP5D
+	 oyd4ljFMNHPSclLc1brQ9Ptt+QepmYXn0jotdhvV4TOrqGNPGTupMOSgvfxH4rPdfQ
+	 DWGMOmRzB548Vm03OAZuRFzGy5X0PFsk44rBc6gdBgO6jwmvzNir4f411e0MbbORmQ
+	 06U9maRzUlYv6LtFzsSZD7rL1+o3a4yyxfesNn16eMImRCWTzL80Dt2GFbuNf+Gl32
+	 3RA56fP9b714UnQIEBVRrFQuCtso+XVox4SKsW5kq4or58YKYTDNMxhGpDRN4tc9Ib
+	 GPyyIyOZWring==
+Received: from c-xd4ed8728.customers.hiper-net.dk ([212.237.135.40] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qULLf-0043SF-42;
+	Fri, 11 Aug 2023 07:10:11 +0100
+Date: Fri, 11 Aug 2023 07:10:19 +0100
+Message-ID: <87r0oap0s4.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Shijie Huang <shijie@amperemail.onmicrosoft.com>
+Cc: Huang Shijie <shijie@os.amperecomputing.com>,
+	oliver.upton@linux.dev,
+	james.morse@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	patches@amperecomputing.com,
+	zwang@amperecomputing.com,
+	Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH v2] KVM/arm64: reconfigurate the event filters for guest context
+In-Reply-To: <95726705-765d-020b-8c85-62fb917f2c14@amperemail.onmicrosoft.com>
+References: <20230810072906.4007-1-shijie@os.amperecomputing.com>
+	<87sf8qq5o0.wl-maz@kernel.org>
+	<95726705-765d-020b-8c85-62fb917f2c14@amperemail.onmicrosoft.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230811045127.3308641-1-rananta@google.com>
-X-Mailer: git-send-email 2.41.0.640.ga95def55d0-goog
-Message-ID: <20230811045127.3308641-15-rananta@google.com>
-Subject: [PATCH v9 14/14] KVM: arm64: Use TLBI range-based instructions for unmap
-From: Raghavendra Rao Ananta <rananta@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
-	Huacai Chen <chenhuacai@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Jing Zhang <jingzhangos@google.com>, Reiji Watanabe <reijiw@google.com>, 
-	Colton Lewis <coltonlewis@google.com>, Raghavendra Rao Anata <rananta@google.com>, 
-	David Matlack <dmatlack@google.com>, Fuad Tabba <tabba@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, Shaoqin Huang <shahuang@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 212.237.135.40
+X-SA-Exim-Rcpt-To: shijie@amperemail.onmicrosoft.com, shijie@os.amperecomputing.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, patches@amperecomputing.com, zwang@amperecomputing.com, mark.rutland@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The current implementation of the stage-2 unmap walker traverses
-the given range and, as a part of break-before-make, performs
-TLB invalidations with a DSB for every PTE. A multitude of this
-combination could cause a performance bottleneck on some systems.
+On Fri, 11 Aug 2023 02:46:49 +0100,
+Shijie Huang <shijie@amperemail.onmicrosoft.com> wrote:
+>=20
+> Hi Marc,
+>=20
+> =E5=9C=A8 2023/8/10 23:27, Marc Zyngier =E5=86=99=E9=81=93:
+> > Huang,
+> >=20
+> > Please make sure you add everyone who commented on v1 (I've Cc'd Mark
+> > so that he can shime need as needed).
+> thanks.
+> >=20
+> > On Thu, 10 Aug 2023 08:29:06 +0100,
+> > Huang Shijie <shijie@os.amperecomputing.com> wrote:
+> >> 1.) Background.
+> >>     1.1) In arm64, start a guest with Qemu which is running as a VMM o=
+f KVM,
+> >>          and bind the guest to core 33 and run program "a" in guest.
+> >>          The code of "a" shows below:
+> >>     	----------------------------------------------------------
+> >> 		#include <stdio.h>
+> >>=20
+> >> 		int main()
+> >> 		{
+> >> 			unsigned long i =3D 0;
+> >>=20
+> >> 			for (;;) {
+> >> 				i++;
+> >> 			}
+> >>=20
+> >> 			printf("i:%ld\n", i);
+> >> 			return 0;
+> >> 		}
+> >>     	----------------------------------------------------------
+> >>=20
+> >>     1.2) Use the following perf command in host:
+> >>        #perf stat -e cycles:G,cycles:H -C 33 -I 1000 sleep 1
+> >>            #           time             counts unit events
+> >>                 1.000817400      3,299,471,572      cycles:G
+> >>                 1.000817400          3,240,586      cycles:H
+> >>=20
+> >>         This result is correct, my cpu's frequency is 3.3G.
+> >>=20
+> >>     1.3) Use the following perf command in host:
+> >>        #perf stat -e cycles:G,cycles:H -C 33 -d -d  -I 1000 sleep 1
+> >>              time             counts unit events
+> >>       1.000831480        153,634,097      cycles:G                    =
+                                            (70.03%)
+> >>       1.000831480      3,147,940,599      cycles:H                    =
+                                            (70.03%)
+> >>       1.000831480      1,143,598,527      L1-dcache-loads             =
+                                            (70.03%)
+> >>       1.000831480              9,986      L1-dcache-load-misses       =
+     #    0.00% of all L1-dcache accesses   (70.03%)
+> >>       1.000831480    <not supported>      LLC-loads
+> >>       1.000831480    <not supported>      LLC-load-misses
+> >>       1.000831480        580,887,696      L1-icache-loads             =
+                                            (70.03%)
+> >>       1.000831480             77,855      L1-icache-load-misses       =
+     #    0.01% of all L1-icache accesses   (70.03%)
+> >>       1.000831480      6,112,224,612      dTLB-loads                  =
+                                            (70.03%)
+> >>       1.000831480             16,222      dTLB-load-misses            =
+     #    0.00% of all dTLB cache accesses  (69.94%)
+> >>       1.000831480        590,015,996      iTLB-loads                  =
+                                            (59.95%)
+> >>       1.000831480                505      iTLB-load-misses            =
+     #    0.00% of all iTLB cache accesses  (59.95%)
+> >>=20
+> >>         This result is wrong. The "cycle:G" should be nearly 3.3G.
+> >>=20
+> >> 2.) Root cause.
+> >> 	There is only 7 counters in my arm64 platform:
+> >> 	  (one cycle counter) + (6 normal counters)
+> >>=20
+> >> 	In 1.3 above, we will use 10 event counters.
+> >> 	Since we only have 7 counters, the perf core will trigger
+> >>         	multiplexing in hrtimer:
+> >> 	     perf_mux_hrtimer_restart() --> perf_rotate_context().
+> >>=20
+> >>         If the hrtimer occurs when the host is running, it's fine.
+> >>         If the hrtimer occurs when the guest is running,
+> >>         the perf_rotate_context() will program the PMU with filters for
+> >>         host context. The KVM does not have a chance to restore
+> >>         PMU registers with kvm_vcpu_pmu_restore_guest().
+> >>         The PMU does not work correctly, so we got wrong result.
+> >>=20
+> >> 3.) About this patch.
+> >> 	Make a KVM_REQ_RELOAD_PMU request before reentering the
+> >> 	guest. The request will call kvm_vcpu_pmu_restore_guest()
+> >> 	to reconfigurate the filters for guest context.
+> >>=20
+> >> 4.) Test result of this patch:
+> >>        #perf stat -e cycles:G,cycles:H -C 33 -d -d  -I 1000 sleep 1
+> >>              time             counts unit events
+> >>       1.001006400      3,298,348,656      cycles:G                    =
+                                            (70.03%)
+> >>       1.001006400          3,144,532      cycles:H                    =
+                                            (70.03%)
+> >>       1.001006400            941,149      L1-dcache-loads             =
+                                            (70.03%)
+> >>       1.001006400             17,937      L1-dcache-load-misses       =
+     #    1.91% of all L1-dcache accesses   (70.03%)
+> >>       1.001006400    <not supported>      LLC-loads
+> >>       1.001006400    <not supported>      LLC-load-misses
+> >>       1.001006400          1,101,889      L1-icache-loads             =
+                                            (70.03%)
+> >>       1.001006400            121,638      L1-icache-load-misses       =
+     #   11.04% of all L1-icache accesses   (70.03%)
+> >>       1.001006400          1,031,228      dTLB-loads                  =
+                                            (70.03%)
+> >>       1.001006400             26,952      dTLB-load-misses            =
+     #    2.61% of all dTLB cache accesses  (69.93%)
+> >>       1.001006400          1,030,678      iTLB-loads                  =
+                                            (59.94%)
+> >>       1.001006400                338      iTLB-load-misses            =
+     #    0.03% of all iTLB cache accesses  (59.94%)
+> >>=20
+> >>      The result is correct. The "cycle:G" is nearly 3.3G now.
+> >>=20
+> >> Signed-off-by: Huang Shijie <shijie@os.amperecomputing.com>
+> >> ---
+> >> v1 --> v2:
+> >> 	Do not change perf/core code, only change the ARM64 kvm code.
+> >> 	v1: https://lkml.org/lkml/2023/8/8/1465
+> >>=20
+> >> ---
+> >>   arch/arm64/kvm/arm.c | 11 ++++++++++-
+> >>   1 file changed, 10 insertions(+), 1 deletion(-)
+> >>=20
+> >> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> >> index c2c14059f6a8..475a2f0e0e40 100644
+> >> --- a/arch/arm64/kvm/arm.c
+> >> +++ b/arch/arm64/kvm/arm.c
+> >> @@ -919,8 +919,17 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+> >>   		if (!ret)
+> >>   			ret =3D 1;
+> >>   -		if (ret > 0)
+> >> +		if (ret > 0) {
+> >> +			/*
+> >> +			 * The perf_rotate_context() may rotate the events and
+> >> +			 * reprogram PMU with filters for host context.
+> >> +			 * So make a request before reentering the guest to
+> >> +			 * reconfigurate the event filters for guest context.
+> >> +			 */
+> >> +			kvm_make_request(KVM_REQ_RELOAD_PMU, vcpu);
+> >> +
+> >>   			ret =3D check_vcpu_requests(vcpu);
+> >> +		}
+> > This looks extremely heavy handed. You're performing the reload on
+> > *every* entry, and I don't think this is right (exit-heavy workloads
+> > will suffer from it)
+> >=20
+> > Furthermore, you're also reloading the virtual state of the PMU
+> > (recreating guest events and other things), all of which looks pretty
+> > pointless, as all we're interested in is what is being counted on the
+> > *host*.
+>=20
+> okay. What about to add a _new_ request, such as KVM_REQ_RESTROE_PMU_GUES=
+T?
+>=20
+>=20
+> > Instead, we can restrict the reload of the host state (and only that)
+> > to situations where:
+> >=20
+> > - we're running on a VHE system
+> >=20
+> > - we have a host PMUv3 (not everybody does), as that's the only way we
+> >    can profile a guest
+>=20
+> okay. No problem.
+>=20
+>=20
+> >=20
+> > and ideally we would have a way to detect that a rotation happened
+> > (which may requires some help from the low-level PMU code).
+>=20
+> I will check it, hope we can find a better way.
 
-Hence, if the system supports FEAT_TLBIRANGE, defer the TLB
-invalidations until the entire walk is finished, and then
-use range-based instructions to invalidate the TLBs in one go.
-Condition deferred TLB invalidation on the system supporting FWB,
-as the optimization is entirely pointless when the unmap walker
-needs to perform CMOs.
+I came up with the following patch, completely untested. Let me know
+how that fares for you.
 
-Rename stage2_put_pte() to stage2_unmap_put_pte() as the function
-now serves the stage-2 unmap walker specifically, rather than
-acting generic.
+Thanks,
 
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
----
- arch/arm64/kvm/hyp/pgtable.c | 40 +++++++++++++++++++++++++++++-------
- 1 file changed, 33 insertions(+), 7 deletions(-)
+	M.
 
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 5ef098af17362..eaaae76481fa9 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -831,16 +831,36 @@ static void stage2_make_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t n
- 	smp_store_release(ctx->ptep, new);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm=
+_host.h
+index 93c541111dea..fb875c5c0347 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -49,6 +49,7 @@
+ #define KVM_REQ_RELOAD_GICv4	KVM_ARCH_REQ(4)
+ #define KVM_REQ_RELOAD_PMU	KVM_ARCH_REQ(5)
+ #define KVM_REQ_SUSPEND		KVM_ARCH_REQ(6)
++#define KVM_REQ_RELOAD_GUEST_PMU_EVENTS	KVM_ARCH_REQ(7)
+=20
+ #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE |=
+ \
+ 				     KVM_DIRTY_LOG_INITIALLY_SET)
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 8b51570a76f8..b40db24f1f0b 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -804,6 +804,9 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+ 			kvm_pmu_handle_pmcr(vcpu,
+ 					    __vcpu_sys_reg(vcpu, PMCR_EL0));
+=20
++		if (kvm_check_request(KVM_REQ_RELOAD_GUEST_PMU_EVENTS, vcpu))
++			kvm_vcpu_pmu_restore_guest(vcpu);
++
+ 		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
+ 			return kvm_vcpu_suspend(vcpu);
+=20
+diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
+index 08b3a1bf0ef6..7012de417092 100644
+--- a/drivers/perf/arm_pmuv3.c
++++ b/drivers/perf/arm_pmuv3.c
+@@ -772,6 +772,9 @@ static void armv8pmu_start(struct arm_pmu *cpu_pmu)
+=20
+ 	/* Enable all counters */
+ 	armv8pmu_pmcr_write(armv8pmu_pmcr_read() | ARMV8_PMU_PMCR_E);
++
++	if (in_interrupt())
++		kvm_resync_guest_context();
  }
- 
--static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu,
--			   struct kvm_pgtable_mm_ops *mm_ops)
-+static bool stage2_unmap_defer_tlb_flush(struct kvm_pgtable *pgt)
+=20
+ static void armv8pmu_stop(struct arm_pmu *cpu_pmu)
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 847da6fc2713..d66f7216b5a9 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -74,6 +74,7 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu);
+ struct kvm_pmu_events *kvm_get_pmu_events(void);
+ void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
+ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
++void kvm_resync_guest_context(void);
+=20
+ #define kvm_vcpu_has_pmu(vcpu)					\
+ 	(test_bit(KVM_ARM_VCPU_PMU_V3, (vcpu)->arch.features))
+@@ -171,6 +172,7 @@ static inline u8 kvm_arm_pmu_get_pmuver_limit(void)
  {
- 	/*
--	 * Clear the existing PTE, and perform break-before-make with
--	 * TLB maintenance if it was valid.
-+	 * If FEAT_TLBIRANGE is implemented, defer the individual
-+	 * TLB invalidations until the entire walk is finished, and
-+	 * then use the range-based TLBI instructions to do the
-+	 * invalidations. Condition deferred TLB invalidation on the
-+	 * system supporting FWB as the optimization is entirely
-+	 * pointless when the unmap walker needs to perform CMOs.
-+	 */
-+	return system_supports_tlb_range() && stage2_has_fwb(pgt);
-+}
-+
-+static void stage2_unmap_put_pte(const struct kvm_pgtable_visit_ctx *ctx,
-+				struct kvm_s2_mmu *mmu,
-+				struct kvm_pgtable_mm_ops *mm_ops)
-+{
-+	struct kvm_pgtable *pgt = ctx->arg;
-+
-+	/*
-+	 * Clear the existing PTE, and perform break-before-make if it was
-+	 * valid. Depending on the system support, defer the TLB maintenance
-+	 * for the same until the entire unmap walk is completed.
- 	 */
- 	if (kvm_pte_valid(ctx->old)) {
- 		kvm_clear_pte(ctx->ptep);
--		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
-+
-+		if (!stage2_unmap_defer_tlb_flush(pgt))
-+			kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu,
-+					ctx->addr, ctx->level);
- 	}
- 
- 	mm_ops->put_page(ctx->ptep);
-@@ -1098,7 +1118,7 @@ static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 	 * block entry and rely on the remaining portions being faulted
- 	 * back lazily.
- 	 */
--	stage2_put_pte(ctx, mmu, mm_ops);
-+	stage2_unmap_put_pte(ctx, mmu, mm_ops);
- 
- 	if (need_flush && mm_ops->dcache_clean_inval_poc)
- 		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(ctx->old, mm_ops),
-@@ -1112,13 +1132,19 @@ static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 
- int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
- {
-+	int ret;
- 	struct kvm_pgtable_walker walker = {
- 		.cb	= stage2_unmap_walker,
- 		.arg	= pgt,
- 		.flags	= KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABLE_POST,
- 	};
- 
--	return kvm_pgtable_walk(pgt, addr, size, &walker);
-+	ret = kvm_pgtable_walk(pgt, addr, size, &walker);
-+	if (stage2_unmap_defer_tlb_flush(pgt))
-+		/* Perform the deferred TLB invalidations */
-+		kvm_tlb_flush_vmid_range(pgt->mmu, addr, size);
-+
-+	return ret;
+ 	return 0;
  }
- 
- struct stage2_attr_data {
--- 
-2.41.0.640.ga95def55d0-goog
++static inline void kvm_resync_guest_context(void) {}
+=20
+ #endif
+=20
 
+--=20
+Without deviation from the norm, progress is not possible.
