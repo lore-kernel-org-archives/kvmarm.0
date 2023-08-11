@@ -1,52 +1,52 @@
-Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
+Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A4DE63B6
-	for <kvmarm@lists.linux.dev>; Fri, 11 Aug 2023 15:26:16 +0000 (UTC)
-Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-1ba5cda3530so1748380fac.3
-        for <kvmarm@lists.linux.dev>; Fri, 11 Aug 2023 08:26:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A77F663B6
+	for <kvmarm@lists.linux.dev>; Fri, 11 Aug 2023 15:31:26 +0000 (UTC)
+Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-1a28de15c8aso1783716fac.2
+        for <kvmarm@lists.linux.dev>; Fri, 11 Aug 2023 08:31:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691767575; x=1692372375;
+        d=google.com; s=20221208; t=1691767885; x=1692372685;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gpoA+kB5Y3LohYYmJ2jZQQwWYFTkmc71zbP7gd9ynAU=;
-        b=I2f1SipTdhlztcE6kE0k5cqLVM1vZmFqwcUp9a08U28pRGdIS2Pjgq6af/5gXIBcnb
-         tQv6lnLZ9SxuYL3egbnuv8flrAgthQwfUDGS3xY/SABJj9CD6/3tasFvBmECHWYs/aBO
-         DPPpk5Vf7uiM+PzvIhyKyuXht3MMWzVmeJ34CCCEcrxw4Nc5wZ7SeIeGX2HNgzTWexED
-         AGH3hCBfkb96r798DFFuGbTp4y76Mg/ZdhY+UpZzu64Gcp6HPKihoscap6K2sNWC/xNo
-         4EGs//HfAvXGns+AwpVF3q4lvHo5LnQ2y4VsH1BhRNyI1lxwlN3H7CJtbyOA9RojZs7f
-         o9hg==
+        bh=MkHxuuUE1racnF7AqWkiPAPBMqIdT5jrsMuLVcWQoXY=;
+        b=IkHeT5HL72sVQg87oKLKAWG2T8oyxYgOdRcRjayYES9J4+s9MiAFDfKXWU2VL4jnIw
+         GcV4Vh+5PTwAV2cDuSOsLMW9B/1wrUcaj0a3K+lgKia+k6aDlZCauxBq7Kwh2tqTwB6n
+         ymfnNRLB6fN8YahjGhAW6XA+0paKNUnK8l4T1whS3XOlxtTdvSkLEm7CR8Gr4PixYNqC
+         Fkw5g2Nk0XpQzI6DAXueDlaYo27bz8ICjkl424bv+kp9LS/piJIKrpmC0LFQ1mRKqH5C
+         OV2ais3ra5DO+1B+PCaVEn+qSHhxghrqliF0r4aiDx+izf0qKK3BQVbLe8Rgd9PVIxyP
+         F1Eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691767575; x=1692372375;
+        d=1e100.net; s=20221208; t=1691767885; x=1692372685;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gpoA+kB5Y3LohYYmJ2jZQQwWYFTkmc71zbP7gd9ynAU=;
-        b=Ql/gxEx2WL1BJ55a04Gw7FEwaXpWTrqfmGB+gaEmodxwXcz09GtVPwUWP+SqxQ/hDD
-         UyrK1h7e+JtuPApBpGt1zu+4EcZQ+xzXUAmG8yRYR7tLVC50HqdxKE/JAQJFfk4+cTTB
-         luMf6N09ghUsP710E1avWEKc9KGG3OHfHXF7ZJIhwn4RwGMBfwyWS+299LtrSZoh/EeR
-         8Yg3KN5/VKUe3HQmN01h4g1XViInZlMev0XYRQkMeWqr/+AA1U7C0WyxGmYsSsAhkoiP
-         tiRnWd8h7wKZGwh4ZVlftMfieiTFDHI/P7PRSW41BrPUpYwKTdZWRz78XQlajhVFD/qZ
-         K4CA==
-X-Gm-Message-State: AOJu0Yw3gxDJ8CYc/Fru45AKn1UOKfeD4HcBzXdL5OrZocSNA51jbEmz
-	Ga2KDvUf+esD6bEgvejnIuDq7IVYNExMuCZ/AEO/1g==
-X-Google-Smtp-Source: AGHT+IHwmUHFuGP6d1T0ZviFc0eLJU8HYh8L5e4xCBXWnjha11RA2HDj3jQefsVWy1uMHw4cfnFJkM8Lr0MsLFSDGoE=
-X-Received: by 2002:a05:6870:65a9:b0:1be:d522:fdf with SMTP id
- fp41-20020a05687065a900b001bed5220fdfmr2446876oab.12.1691767575411; Fri, 11
- Aug 2023 08:26:15 -0700 (PDT)
+        bh=MkHxuuUE1racnF7AqWkiPAPBMqIdT5jrsMuLVcWQoXY=;
+        b=W6vJKKNC9vVnUG52imgvn6szh6dfNCA/cTSJGBjZPxqlKL24KHeijSnm8EZgW1gryt
+         6IOilL2eH0+2fhkoEbTDL1lBxHealGUJ5J8IEQ6WJCKMBmSDa8nSGpadcAU1ue0JstQb
+         BUW1r8Qto1OaLfCnFu+EN9G9iSUpbJLRiCsdncJIWWzdJgxyK4nN7qg77R8xUK757FR1
+         oxpc75UG6RViuf3dWpWBHEhzcGBOExfCm4L5DCoXMA6N4Nii3XAvLo7df42/s+yDbnw/
+         1B34saMwXofQfvkjHYRSWwwIRNNquotHFSESusYsEC+ok2q+sV62BTPrqRdLogAd1TSs
+         osiw==
+X-Gm-Message-State: AOJu0YxBq1oT0sZ0rDXNNdvN0pkmKXnb+XbZ5nH7FsTX4+xU+jERpy0j
+	fW/NIMyDQJz8nfOBAXptPbIVNR2hdSrJSfiwIHJ5BQ==
+X-Google-Smtp-Source: AGHT+IFuU0i4ssk4mXymypXRlN8YzctH8Of+BhP+Z9PlFvCANq23FxDZvhz42dJQbPZ6dyi0OSaExylXwPX2H0Vqzw4=
+X-Received: by 2002:a05:6870:9687:b0:1bf:ce5b:436 with SMTP id
+ o7-20020a056870968700b001bfce5b0436mr2760098oaq.58.1691767885480; Fri, 11 Aug
+ 2023 08:31:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230808114711.2013842-1-maz@kernel.org> <20230808114711.2013842-10-maz@kernel.org>
-In-Reply-To: <20230808114711.2013842-10-maz@kernel.org>
+References: <20230808114711.2013842-1-maz@kernel.org> <20230808114711.2013842-11-maz@kernel.org>
+In-Reply-To: <20230808114711.2013842-11-maz@kernel.org>
 From: Jing Zhang <jingzhangos@google.com>
-Date: Fri, 11 Aug 2023 08:26:02 -0700
-Message-ID: <CAAdAUthoZwX5k1b9AJAA2yB1wuAAaeXiFDimv5Y6N_QrS1P10A@mail.gmail.com>
-Subject: Re: [PATCH v3 09/27] arm64: Add feature detection for fine grained traps
+Date: Fri, 11 Aug 2023 08:31:13 -0700
+Message-ID: <CAAdAUtjOo_Bhpy2hvmVTEeG4vTmdHF9uoqnphdKBBW8jKRAndA@mail.gmail.com>
+Subject: Re: [PATCH v3 10/27] KVM: arm64: Correctly handle ACCDATA_EL1 traps
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
 	linux-arm-kernel@lists.infradead.org, 
@@ -63,60 +63,57 @@ Content-Transfer-Encoding: quoted-printable
 
 Hi Marc,
 
-On Tue, Aug 8, 2023 at 4:47=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
+On Tue, Aug 8, 2023 at 4:48=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
 >
-> From: Mark Brown <broonie@kernel.org>
+> As we blindly reset some HFGxTR_EL2 bits to 0, we also randomly trap
+> unsuspecting sysregs that have their trap bits with a negative
+> polarity.
 >
-> In order to allow us to have shared code for managing fine grained traps
-> for KVM guests add it as a detected feature rather than relying on it
-> being a dependency of other features.
+> ACCDATA_EL1 is one such register that can be accessed by the guest,
+> causing a splat on the host as we don't have a proper handler for
+> it.
 >
-> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> Adding such handler addresses the issue, though there are a number
+> of other registers missing as the current architecture documentation
+> doesn't describe them yet.
+>
 > Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> [maz: converted to ARM64_CPUID_FIELDS()]
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Link: https://lore.kernel.org/r/20230301-kvm-arm64-fgt-v4-1-1bf8d235ac1f@=
-kernel.org
-> Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 > Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
 > ---
->  arch/arm64/kernel/cpufeature.c | 7 +++++++
->  arch/arm64/tools/cpucaps       | 1 +
->  2 files changed, 8 insertions(+)
+>  arch/arm64/include/asm/sysreg.h | 2 ++
+>  arch/arm64/kvm/sys_regs.c       | 2 ++
+>  2 files changed, 4 insertions(+)
 >
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeatur=
-e.c
-> index f9d456fe132d..668e2872a086 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -2627,6 +2627,13 @@ static const struct arm64_cpu_capabilities arm64_f=
-eatures[] =3D {
->                 .matches =3D has_cpuid_feature,
->                 ARM64_CPUID_FIELDS(ID_AA64ISAR1_EL1, LRCPC, IMP)
->         },
-> +       {
-> +               .desc =3D "Fine Grained Traps",
-> +               .type =3D ARM64_CPUCAP_SYSTEM_FEATURE,
-> +               .capability =3D ARM64_HAS_FGT,
-> +               .matches =3D has_cpuid_feature,
-> +               ARM64_CPUID_FIELDS(ID_AA64MMFR0_EL1, FGT, IMP)
-> +       },
->  #ifdef CONFIG_ARM64_SME
->         {
->                 .desc =3D "Scalable Matrix Extension",
-> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-> index c80ed4f3cbce..c3f06fdef609 100644
-> --- a/arch/arm64/tools/cpucaps
-> +++ b/arch/arm64/tools/cpucaps
-> @@ -26,6 +26,7 @@ HAS_ECV
->  HAS_ECV_CNTPOFF
->  HAS_EPAN
->  HAS_EVT
-> +HAS_FGT
->  HAS_GENERIC_AUTH
->  HAS_GENERIC_AUTH_ARCH_QARMA3
->  HAS_GENERIC_AUTH_ARCH_QARMA5
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sys=
+reg.h
+> index 043c677e9f04..818c111009ca 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -387,6 +387,8 @@
+>  #define SYS_ICC_IGRPEN0_EL1            sys_reg(3, 0, 12, 12, 6)
+>  #define SYS_ICC_IGRPEN1_EL1            sys_reg(3, 0, 12, 12, 7)
+>
+> +#define SYS_ACCDATA_EL1                        sys_reg(3, 0, 13, 0, 5)
+> +
+>  #define SYS_CNTKCTL_EL1                        sys_reg(3, 0, 14, 1, 0)
+>
+>  #define SYS_AIDR_EL1                   sys_reg(3, 1, 0, 0, 7)
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 2ca2973abe66..38f221f9fc98 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2151,6 +2151,8 @@ static const struct sys_reg_desc sys_reg_descs[] =
+=3D {
+>         { SYS_DESC(SYS_CONTEXTIDR_EL1), access_vm_reg, reset_val, CONTEXT=
+IDR_EL1, 0 },
+>         { SYS_DESC(SYS_TPIDR_EL1), NULL, reset_unknown, TPIDR_EL1 },
+>
+> +       { SYS_DESC(SYS_ACCDATA_EL1), undef_access },
+> +
+>         { SYS_DESC(SYS_SCXTNUM_EL1), undef_access },
+>
+>         { SYS_DESC(SYS_CNTKCTL_EL1), NULL, reset_val, CNTKCTL_EL1, 0},
 > --
 > 2.34.1
 >
