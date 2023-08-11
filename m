@@ -1,63 +1,234 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B39163B6
-	for <kvmarm@lists.linux.dev>; Fri, 11 Aug 2023 16:38:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73644C433C7;
-	Fri, 11 Aug 2023 16:38:26 +0000 (UTC)
-Date: Fri, 11 Aug 2023 17:38:24 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v4 21/36] arm64/mm: Implement map_shadow_stack()
-Message-ID: <ZNZkADhSnodXuH5F@arm.com>
-References: <20230807-arm64-gcs-v4-0-68cfa37f9069@kernel.org>
- <20230807-arm64-gcs-v4-21-68cfa37f9069@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1919F1172E
+	for <kvmarm@lists.linux.dev>; Fri, 11 Aug 2023 17:40:32 +0000 (UTC)
+Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-5607cdb0959so1518429eaf.2
+        for <kvmarm@lists.linux.dev>; Fri, 11 Aug 2023 10:40:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691775632; x=1692380432;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dOtlYSZgeiijyItPMeigs6OhNr2NGQsx1KFHsLqIaG8=;
+        b=27O3stW8bCTVVB2vY0F+yB33b4/PAyJkPwBMgjCfVCsH7OkVsdlXWAPV+RVKqyL8fm
+         qOYghNr3xuGXJQ534skcPYijnybI2FR4cp3uP3RlS6jt0Q9jZZqrMXVOiDwyhrxgiElG
+         EpUTrYZ6ZQf0PtJpZMsMV3OqmxnZbyaE35mb2qIUY95ACmhNEt0j/fofKOqXuY7H5DJp
+         yX6gmfSeDXTf6Vu+UMQW2R1d3smSZFhd6mDhCUcr1aFEBuqU8Rgm0y9vfvm0xWm4hkb2
+         wme+/i16iR686y8jWiQHq9qHYOyNJp9x+SlUgwoqomCnJsQRzxAcBVJj1IxwT2X1Jg6l
+         qrSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691775632; x=1692380432;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dOtlYSZgeiijyItPMeigs6OhNr2NGQsx1KFHsLqIaG8=;
+        b=k/nzdrB5xchStDj1oZh1bzYa0/UpokP1VD0EEBypQOVGymuqB6+jmG2Wxk1Z5I019x
+         2or5CyzI3rFLiiZIf0+w3XDRElqMKpTfOHqGu6eW2P60Abi2/WmUbbZQnvViEW6jlu1u
+         CBLkyVJAX5lPUDvv7TasAf2lpPZgDZa2K3HEqJbxeCMHq/7uzGdNCsmwA8/ch9obonYT
+         O4w0suYUQ4VnGyT5/bZkPDq2h7ePUhJt/qlWPeoVUmLOAKyJ/nynotOQdeHxBkoEERKm
+         mHsVeyQvYKgAOSZpk5BcdRx6TOvhz70umDmRZTp9QWM1evG+zUNXHTneP8jftP9h6ks3
+         EYzw==
+X-Gm-Message-State: AOJu0Yy59Sf2r1p3jpRT4SehO8klXvduWsx2WBzIOfmySEyHM7S7cLho
+	nVQYpb8A16UNqa2DDQeOglJa7fZZzNStrGPGim1VOw==
+X-Google-Smtp-Source: AGHT+IGrPdqjjmuzKKjgmseqrlaiV6HLzrmiZwW4eAv/hrhZ5H8Pg3Oq2tlW75x2GsrvU4lQHJTwZcgbfu7rWqAH+vc=
+X-Received: by 2002:a4a:8002:0:b0:566:fd3b:4329 with SMTP id
+ x2-20020a4a8002000000b00566fd3b4329mr1441317oof.7.1691775631786; Fri, 11 Aug
+ 2023 10:40:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230807-arm64-gcs-v4-21-68cfa37f9069@kernel.org>
+References: <20230808114711.2013842-1-maz@kernel.org> <20230808114711.2013842-14-maz@kernel.org>
+In-Reply-To: <20230808114711.2013842-14-maz@kernel.org>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Fri, 11 Aug 2023 10:40:20 -0700
+Message-ID: <CAAdAUtgpd=nBz41Ug8Z-bt2riehBa3R=THop0vjXpc0oAzQntw@mail.gmail.com>
+Subject: Re: [PATCH v3 13/27] KVM: arm64: Restructure FGT register switching
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, 
+	Catalin Marinas <catalin.marinas@arm.com>, Eric Auger <eric.auger@redhat.com>, 
+	Mark Brown <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Andre Przywara <andre.przywara@arm.com>, 
+	Chase Conklin <chase.conklin@arm.com>, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, 
+	Darren Hart <darren@os.amperecomputing.com>, Miguel Luis <miguel.luis@oracle.com>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 07, 2023 at 11:00:26PM +0100, Mark Brown wrote:
-> As discussed extensively in the changelog for the addition of this
-> syscall on x86 ("x86/shstk: Introduce map_shadow_stack syscall") the
-> existing mmap() and madvise() syscalls do not map entirely well onto the
-> security requirements for guarded control stacks since they lead to
-> windows where memory is allocated but not yet protected or stacks which
-> are not properly and safely initialised. Instead a new syscall
-> map_shadow_stack() has been defined which allocates and initialises a
-> shadow stack page.
+Hi Marc,
 
-I guess I need to read the x86 discussion after all ;).
+On Tue, Aug 8, 2023 at 4:48=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
+>
+> As we're about to majorly extend the handling of FGT registers,
+> restructure the code to actually save/restore the registers
+> as required. This is made easy thanks to the previous addition
+> of the EL2 registers, allowing us to use the host context for
+> this purpose.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+> Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
+> ---
+>  arch/arm64/include/asm/kvm_arm.h        | 21 ++++++++++
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 56 +++++++++++++------------
+>  2 files changed, 50 insertions(+), 27 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kv=
+m_arm.h
+> index 028049b147df..85908aa18908 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -333,6 +333,27 @@
+>                                  BIT(18) |              \
+>                                  GENMASK(16, 15))
+>
+> +/*
+> + * FGT register definitions
+> + *
+> + * RES0 and polarity masks as of DDI0487J.a, to be updated as needed.
+> + * We're not using the generated masks as they are usually ahead of
+> + * the published ARM ARM, which we use as a reference.
+> + *
+> + * Once we get to a point where the two describe the same thing, we'll
+> + * merge the definitions. One day.
+> + */
+> +#define __HFGRTR_EL2_RES0      (GENMASK(63, 56) | GENMASK(53, 51))
+> +#define __HFGRTR_EL2_MASK      GENMASK(49, 0)
+> +#define __HFGRTR_EL2_nMASK     (GENMASK(55, 54) | BIT(50))
+> +
+> +#define __HFGWTR_EL2_RES0      (GENMASK(63, 56) | GENMASK(53, 51) |    \
+> +                                BIT(46) | BIT(42) | BIT(40) | BIT(28) | =
+\
+> +                                GENMASK(26, 25) | BIT(21) | BIT(18) |  \
+> +                                GENMASK(15, 14) | GENMASK(10, 9) | BIT(2=
+))
+> +#define __HFGWTR_EL2_MASK      GENMASK(49, 0)
+> +#define __HFGWTR_EL2_nMASK     (GENMASK(55, 54) | BIT(50))
+> +
+>  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+>  #define HPFAR_MASK     (~UL(0xf))
+>  /*
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp=
+/include/hyp/switch.h
+> index 4bddb8541bec..e096b16e85fd 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -70,20 +70,19 @@ static inline void __activate_traps_fpsimd32(struct k=
+vm_vcpu *vcpu)
+>         }
+>  }
+>
+> -static inline bool __hfgxtr_traps_required(void)
+> -{
+> -       if (cpus_have_final_cap(ARM64_SME))
+> -               return true;
+> -
+> -       if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
+> -               return true;
+>
+> -       return false;
+> -}
+>
+> -static inline void __activate_traps_hfgxtr(void)
+> +static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>  {
+> +       struct kvm_cpu_context *hctxt =3D &this_cpu_ptr(&kvm_host_data)->=
+host_ctxt;
+>         u64 r_clr =3D 0, w_clr =3D 0, r_set =3D 0, w_set =3D 0, tmp;
+> +       u64 r_val, w_val;
+> +
+> +       if (!cpus_have_final_cap(ARM64_HAS_FGT))
+> +               return;
+> +
+> +       ctxt_sys_reg(hctxt, HFGRTR_EL2) =3D read_sysreg_s(SYS_HFGRTR_EL2)=
+;
+> +       ctxt_sys_reg(hctxt, HFGWTR_EL2) =3D read_sysreg_s(SYS_HFGWTR_EL2)=
+;
+>
+>         if (cpus_have_final_cap(ARM64_SME)) {
+>                 tmp =3D HFGxTR_EL2_nSMPRI_EL1_MASK | HFGxTR_EL2_nTPIDR2_E=
+L0_MASK;
+> @@ -98,26 +97,31 @@ static inline void __activate_traps_hfgxtr(void)
+>         if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
+>                 w_set |=3D HFGxTR_EL2_TCR_EL1_MASK;
+>
+> -       sysreg_clear_set_s(SYS_HFGRTR_EL2, r_clr, r_set);
+> -       sysreg_clear_set_s(SYS_HFGWTR_EL2, w_clr, w_set);
+> +
+> +       /* The default is not to trap anything but ACCDATA_EL1 */
+> +       r_val =3D __HFGRTR_EL2_nMASK & ~HFGxTR_EL2_nACCDATA_EL1;
+> +       r_val |=3D r_set;
+> +       r_val &=3D ~r_clr;
+> +
+> +       w_val =3D __HFGWTR_EL2_nMASK & ~HFGxTR_EL2_nACCDATA_EL1;
+> +       w_val |=3D w_set;
+> +       w_val &=3D ~w_clr;
+> +
+> +       write_sysreg_s(r_val, SYS_HFGRTR_EL2);
+> +       write_sysreg_s(w_val, SYS_HFGWTR_EL2);
+>  }
+>
+> -static inline void __deactivate_traps_hfgxtr(void)
+> +static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>  {
+> -       u64 r_clr =3D 0, w_clr =3D 0, r_set =3D 0, w_set =3D 0, tmp;
+> +       struct kvm_cpu_context *hctxt =3D &this_cpu_ptr(&kvm_host_data)->=
+host_ctxt;
+>
+> -       if (cpus_have_final_cap(ARM64_SME)) {
+> -               tmp =3D HFGxTR_EL2_nSMPRI_EL1_MASK | HFGxTR_EL2_nTPIDR2_E=
+L0_MASK;
+> +       if (!cpus_have_final_cap(ARM64_HAS_FGT))
+> +               return;
+>
+> -               r_set |=3D tmp;
+> -               w_set |=3D tmp;
+> -       }
+> +       write_sysreg_s(ctxt_sys_reg(hctxt, HFGRTR_EL2), SYS_HFGRTR_EL2);
+> +       write_sysreg_s(ctxt_sys_reg(hctxt, HFGWTR_EL2), SYS_HFGWTR_EL2);
+>
+> -       if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
+> -               w_clr |=3D HFGxTR_EL2_TCR_EL1_MASK;
+>
+> -       sysreg_clear_set_s(SYS_HFGRTR_EL2, r_clr, r_set);
+> -       sysreg_clear_set_s(SYS_HFGWTR_EL2, w_clr, w_set);
+>  }
+>
+>  static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+> @@ -145,8 +149,7 @@ static inline void __activate_traps_common(struct kvm=
+_vcpu *vcpu)
+>         vcpu->arch.mdcr_el2_host =3D read_sysreg(mdcr_el2);
+>         write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+>
+> -       if (__hfgxtr_traps_required())
+> -               __activate_traps_hfgxtr();
+> +       __activate_traps_hfgxtr(vcpu);
+>  }
+>
+>  static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+> @@ -162,8 +165,7 @@ static inline void __deactivate_traps_common(struct k=
+vm_vcpu *vcpu)
+>                 vcpu_clear_flag(vcpu, PMUSERENR_ON_CPU);
+>         }
+>
+> -       if (__hfgxtr_traps_required())
+> -               __deactivate_traps_hfgxtr();
+> +       __deactivate_traps_hfgxtr(vcpu);
+>  }
+>
+>  static inline void ___activate_traps(struct kvm_vcpu *vcpu)
+> --
+> 2.34.1
+>
+>
 
-Given that we won't have an mmap(PROT_SHADOW_STACK), are we going to
-have restrictions on mprotect()? E.g. it would be useful to reject a
-PROT_EXEC on the shadow stack.
+Reviewed-by: Jing Zhang <jingzhangos@google.com>
 
--- 
-Catalin
+Jing
