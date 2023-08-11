@@ -1,109 +1,125 @@
-Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 317AC11730
-	for <kvmarm@lists.linux.dev>; Fri, 11 Aug 2023 16:21:51 +0000 (UTC)
-Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-1bfca0ec8b9so1872314fac.2
-        for <kvmarm@lists.linux.dev>; Fri, 11 Aug 2023 09:21:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691770911; x=1692375711;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8jKg5N5hbfx4G4nkzdYxZRRyiyKKwYaqTNfjWvIZvAs=;
-        b=zc0817VRKQzK7Y4+3Am75b8whnYU7udMNvGIpoU3Z8J2LZooos78Pf0S7KAzda0Lbl
-         RG/GkzpkzGwbakOyRZgdZXaZ2vQBMGuzWhbw5nNv/UY86xwVjSd3jU+3mS0fh3k8bGcW
-         nzpItkgM6eqfr5PnZgX3guWO+mj+MUJRBGfneMpMQ7qzP54RiJVSYgHk7cpm/G/1rZS6
-         gcSonm2agGtfO50G7iuyLBha4zeQOek8O4Zd1sCVenxENz7qicCc7mnNJm/9cP3OiFZL
-         HQrM9N2GgkkdmgrXcOwrNpFnxDCZlrPrx3sHkqIbKeWq1bPlzqNeFqcli3sJJgTXp/UB
-         2H6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691770911; x=1692375711;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8jKg5N5hbfx4G4nkzdYxZRRyiyKKwYaqTNfjWvIZvAs=;
-        b=M/oChZqM1uOfvhhHfK9aOMc2un2mOiJt8hrhc9kZJmX+q8izoh743FoyDAg7IkO4k/
-         tzuVvGiK0U7oDOxuWknIoQ8e0sVWq2tl42q3Y+DVE2JTB8FcdEHCqPUyySJ1fb4cwq15
-         wcmOn9M1W+4qNo/fT0rahyr/r88hRf2MThuvvkNmJua81wsqz+Xiq/8xvOfVkF66k6CB
-         FcseGj7IaaZ1mymXro7A+Q+TTG1IsXNA0YCK4jyAB63hr0wTYr4xjhG47Ib59yLxpQrF
-         nu1s7DGExua/JmgtlKEjdI+GxLNaK8WVmq+j37jr6MSLWIP0W07hIQRm8m+3trGQ9AjS
-         sWiw==
-X-Gm-Message-State: AOJu0YzeE69jQflvRmG/hND+NxErU26F9MCrCcNjX1e07MWSGKRgesge
-	+FUJPgrDiKkfsk4Pd+AWx59vH82iibp3avLgCUMSdQ==
-X-Google-Smtp-Source: AGHT+IFmKhXLjuhqGamOxB2zZ0eLH2ZXhspjGba8e6gZO1qouLQ+iinPZIolJfdLMgZLIbhkI3norwAebs/9sotSWVs=
-X-Received: by 2002:a05:6870:d782:b0:1bb:83ae:1512 with SMTP id
- bd2-20020a056870d78200b001bb83ae1512mr2750088oab.24.1691770910745; Fri, 11
- Aug 2023 09:21:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69BA61171A
+	for <kvmarm@lists.linux.dev>; Fri, 11 Aug 2023 16:26:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AFF3C433C7;
+	Fri, 11 Aug 2023 16:26:05 +0000 (UTC)
+Date: Fri, 11 Aug 2023 17:26:03 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v4 19/36] arm64/gcs: Allocate a new GCS for threads with
+ GCS enabled
+Message-ID: <ZNZhG/4rBpTenYVH@arm.com>
+References: <20230807-arm64-gcs-v4-0-68cfa37f9069@kernel.org>
+ <20230807-arm64-gcs-v4-19-68cfa37f9069@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230808114711.2013842-1-maz@kernel.org> <20230808114711.2013842-12-maz@kernel.org>
-In-Reply-To: <20230808114711.2013842-12-maz@kernel.org>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Fri, 11 Aug 2023 09:21:39 -0700
-Message-ID: <CAAdAUtj-5PeXCH3tzdFYogg94aBRd4k7sr8x9SWD793XeFBS9Q@mail.gmail.com>
-Subject: Re: [PATCH v3 11/27] KVM: arm64: Add missing HCR_EL2 trap bits
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, 
-	Catalin Marinas <catalin.marinas@arm.com>, Eric Auger <eric.auger@redhat.com>, 
-	Mark Brown <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Andre Przywara <andre.przywara@arm.com>, 
-	Chase Conklin <chase.conklin@arm.com>, 
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, 
-	Darren Hart <darren@os.amperecomputing.com>, Miguel Luis <miguel.luis@oracle.com>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230807-arm64-gcs-v4-19-68cfa37f9069@kernel.org>
 
-Hi Marc,
+On Mon, Aug 07, 2023 at 11:00:24PM +0100, Mark Brown wrote:
+> diff --git a/arch/arm64/mm/gcs.c b/arch/arm64/mm/gcs.c
+> index b0a67efc522b..1e059c37088d 100644
+> --- a/arch/arm64/mm/gcs.c
+> +++ b/arch/arm64/mm/gcs.c
+> @@ -8,6 +8,62 @@
+>  #include <asm/cpufeature.h>
+>  #include <asm/page.h>
+>  
+> +static unsigned long alloc_gcs(unsigned long addr, unsigned long size,
+> +			       unsigned long token_offset, bool set_res_tok)
+> +{
+> +	int flags = MAP_ANONYMOUS | MAP_PRIVATE;
+> +	struct mm_struct *mm = current->mm;
+> +	unsigned long mapped_addr, unused;
+> +
+> +	if (addr)
+> +		flags |= MAP_FIXED_NOREPLACE;
+> +
+> +	mmap_write_lock(mm);
+> +	mapped_addr = do_mmap(NULL, addr, size, PROT_READ, flags,
+> +			      VM_SHADOW_STACK | VM_WRITE, 0, &unused, NULL);
 
-On Tue, Aug 8, 2023 at 4:48=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
->
-> We're still missing a handfull of HCR_EL2 trap bits. Add them.
->
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
-> ---
->  arch/arm64/include/asm/kvm_arm.h | 9 +++++++++
->  1 file changed, 9 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kv=
-m_arm.h
-> index 58e5eb27da68..028049b147df 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -18,10 +18,19 @@
->  #define HCR_DCT                (UL(1) << 57)
->  #define HCR_ATA_SHIFT  56
->  #define HCR_ATA                (UL(1) << HCR_ATA_SHIFT)
-> +#define HCR_TTLBOS     (UL(1) << 55)
-> +#define HCR_TTLBIS     (UL(1) << 54)
-> +#define HCR_ENSCXT     (UL(1) << 53)
-> +#define HCR_TOCU       (UL(1) << 52)
->  #define HCR_AMVOFFEN   (UL(1) << 51)
-> +#define HCR_TICAB      (UL(1) << 50)
->  #define HCR_TID4       (UL(1) << 49)
->  #define HCR_FIEN       (UL(1) << 47)
->  #define HCR_FWB                (UL(1) << 46)
-> +#define HCR_NV2                (UL(1) << 45)
-> +#define HCR_AT         (UL(1) << 44)
-> +#define HCR_NV1                (UL(1) << 43)
-> +#define HCR_NV         (UL(1) << 42)
->  #define HCR_API                (UL(1) << 41)
->  #define HCR_APK                (UL(1) << 40)
->  #define HCR_TEA                (UL(1) << 37)
-> --
-> 2.34.1
->
->
+Why not PROT_WRITE as well? I guess I need to check the x86 patches
+since the do_mmap() called here has a different prototype than what's in
+mainline.
 
-Reviewed-by: Jing Zhang <jingzhangos@google.com>
+This gets confusing since currently the VM_* flags are derived from the
+PROT_* flags passed to mmap(). But you skip the PROT_WRITE in favour of
+adding VM_WRITE directly.
 
-Jing
+I haven't followed the x86 discussion but did we run out of PROT_* bits
+for a PROT_SHADOW_STACK?
+
+> +	mmap_write_unlock(mm);
+> +
+> +	return mapped_addr;
+> +}
+> +
+> +static unsigned long gcs_size(unsigned long size)
+> +{
+> +	if (size)
+> +		return PAGE_ALIGN(size);
+> +
+> +	/* Allocate RLIMIT_STACK with limits of PAGE_SIZE..4G */
+> +	size = PAGE_ALIGN(min_t(unsigned long long,
+> +				rlimit(RLIMIT_STACK), SZ_4G));
+> +	return max(PAGE_SIZE, size);
+> +}
+
+I saw Szabolcs commenting on the default size as well. Maybe we should
+go for RLIMIT_STACK/2 but let's see how the other sub-thread is going.
+
+> +
+> +unsigned long gcs_alloc_thread_stack(struct task_struct *tsk,
+> +				     unsigned long clone_flags, size_t size)
+> +{
+> +	unsigned long addr;
+> +
+> +	if (!system_supports_gcs())
+> +		return 0;
+> +
+> +	if (!task_gcs_el0_enabled(tsk))
+> +		return 0;
+> +
+> +	if ((clone_flags & (CLONE_VFORK | CLONE_VM)) != CLONE_VM)
+> +		return 0;
+
+Is it safe for CLONE_VFORK not to get a new shadow stack? A syscall for
+exec could push something to the stack. I guess the GCS pointer in the
+parent stays the same, so it wouldn't matter.
+
+That said, I think this check should be somewhere higher up in the
+caller of gcs_alloc_thread_stack(). The copy_thread_gcs() function
+already does most of the above checks. Is the GCS allocation called from
+elsewhere as well?
+
+-- 
+Catalin
