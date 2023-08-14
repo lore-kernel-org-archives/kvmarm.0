@@ -1,510 +1,508 @@
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2FC07E
-	for <kvmarm@lists.linux.dev>; Sun, 13 Aug 2023 02:24:33 +0000 (UTC)
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2b9c0391749so51045741fa.0
-        for <kvmarm@lists.linux.dev>; Sat, 12 Aug 2023 19:24:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691893471; x=1692498271;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SuYbk7NxBbnqEZN+HqilzfXpT2oPpONXvOl1AkVEhCU=;
-        b=W5MUYOxKmmbcDCqzYtWHAi6zLdfBGEabxhDOx01g2PK/KrqW6MlXBGMILH60vcckpq
-         rL/BmPovnLXCemKrQfj3eqnZhdChPyLnlOOQwyB9fw8HgANVSiqsWCZgDIgWROYuqbyZ
-         7hhFni1CzEM37DrVBhA/Ejh/wHhY8jeC/qgkUPKtoPmsLbsF5bnAxcaGhNpqx32jdSWl
-         z3BHOWTGAnWjCfqQwLZjgFqUSUoh4BZVVQIdtZaSSM98iy8Z876U3xvNCVOEvYDu9cLr
-         c7h0BvIa6vhTxKxWhT/YB2w5uuEN9G/Pdz3pohbFYqeNueoVO2mmYKJ9dlXBLCB2WBQK
-         r7iQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691893471; x=1692498271;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SuYbk7NxBbnqEZN+HqilzfXpT2oPpONXvOl1AkVEhCU=;
-        b=RiEH2/d2UgHkXW7m4/iPf/Y1k9KaKwIKljYMCfYImS0ujIlBuWSUDgfcYZ9G0g8R9S
-         K3nAj+djDSdeAd8kdXZM5h+kPKACvdouDDpncNfj1hmIIABFgXKE9pAkROVzZRpF746x
-         L/4czertuf3UZUUgeA6Zz7Pq7UDqWcg+lDHpbmN8nG6JREOC5xI5RNReuSOidPwFP6Rl
-         p26Vi6ceBurn0ziVdFiCYxKJaqU6IRi3fFa9AQAG6it30U1g11iruH2+i1Xc/6qduXRb
-         3GWBW9tDCwXhGSdT5Mqe3Sc0/393nfwBPcBliP+5Kzq8RE3vQ8+xwfnptUIKmS1kPWaZ
-         DJBA==
-X-Gm-Message-State: AOJu0YzbjCRf0qGNO/aRwe88NWZnKTTv3p7RsJUv0UdNdSPOG0T1ckny
-	ukOPGL+DPyatReWEBNjyiY70ebgJf7TNDvv+VtUzqg==
-X-Google-Smtp-Source: AGHT+IGnwAci+zoYp17T7DjsAXa0Tonukwztw5tvsXr3FLtHNOvFYosEVtaggGuRi2e7IdrYzMH8stYEgDqCoAXxo0E=
-X-Received: by 2002:a2e:8791:0:b0:2b7:7c:d5a1 with SMTP id n17-20020a2e8791000000b002b7007cd5a1mr4215967lji.23.1691893471437;
- Sat, 12 Aug 2023 19:24:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A522239D
+	for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 00:44:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691973881; x=1723509881;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=nMU49OuQhjBlkIzqgMW98CVzYEzF72LYsmoFN/6bUfs=;
+  b=dN0VINvcrQdwXB15kwQh69mJefY4MGXekCovXRir9Fg0BJRBQ9E9PikB
+   oeqSFKMbhNq3k72eMbmXPxihCxntbD1z9MGvB8bZsugdZFgZNE4hWUdb4
+   S9DcZONDolyH+OcZqaaRzBzH1gq0rYFu7ik9sj43jbNmkyTO9D+OcUloh
+   F4ctBnK3a7HQGeS5ZPlRLyTbiVAqG44uLmPkVTKK/vDATjlOWy5mUkZ8J
+   tFGroKUaHt5vi5NoFgcDHLxqSxN2jkgTgg6cT+eRZ/YBhoYX74Ba5GQYI
+   eriQupS3rbmUGocSF2QJzBEefxdECVZlSiwDd2H3NCtWsEZYlXI7E5JpB
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10801"; a="356899051"
+X-IronPort-AV: E=Sophos;i="6.01,171,1684825200"; 
+   d="scan'208";a="356899051"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2023 17:44:40 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10801"; a="710134766"
+X-IronPort-AV: E=Sophos;i="6.01,171,1684825200"; 
+   d="scan'208";a="710134766"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.93.8.79]) ([10.93.8.79])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2023 17:44:30 -0700
+Message-ID: <02239d95-0253-a223-28c2-016cca3ab4d2@linux.intel.com>
+Date: Mon, 14 Aug 2023 08:44:28 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230808114711.2013842-1-maz@kernel.org> <20230808114711.2013842-15-maz@kernel.org>
-In-Reply-To: <20230808114711.2013842-15-maz@kernel.org>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Sat, 12 Aug 2023 19:24:19 -0700
-Message-ID: <CAAdAUtjpUwgChEJCsEBnMFEKPW+hDhU-73Kp=NJ9f7=gA8SJyQ@mail.gmail.com>
-Subject: Re: [PATCH v3 14/27] KVM: arm64: nv: Add trap forwarding infrastructure
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, 
-	Catalin Marinas <catalin.marinas@arm.com>, Eric Auger <eric.auger@redhat.com>, 
-	Mark Brown <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Andre Przywara <andre.przywara@arm.com>, 
-	Chase Conklin <chase.conklin@arm.com>, 
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, 
-	Darren Hart <darren@os.amperecomputing.com>, Miguel Luis <miguel.luis@oracle.com>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [RFC PATCH v11 08/29] KVM: Introduce per-page memory attributes
+To: Sean Christopherson <seanjc@google.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
+ Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Andrew Morton <akpm@linux-foundation.org>, Paul Moore <paul@paul-moore.com>,
+ James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-security-module@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Fuad Tabba <tabba@google.com>,
+ Jarkko Sakkinen <jarkko@kernel.org>, Yu Zhang <yu.c.zhang@linux.intel.com>,
+ Vishal Annapurve <vannapurve@google.com>,
+ Ackerley Tng <ackerleytng@google.com>,
+ Maciej Szmigiero <mail@maciej.szmigiero.name>,
+ Vlastimil Babka <vbabka@suse.cz>, David Hildenbrand <david@redhat.com>,
+ Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>,
+ Wang <wei.w.wang@intel.com>, Liam Merwick <liam.merwick@oracle.com>,
+ Isaku Yamahata <isaku.yamahata@gmail.com>,
+ "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20230718234512.1690985-1-seanjc@google.com>
+ <20230718234512.1690985-9-seanjc@google.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20230718234512.1690985-9-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Marc,
 
-On Tue, Aug 8, 2023 at 4:48=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
+
+On 7/19/2023 7:44 AM, Sean Christopherson wrote:
+> From: Chao Peng <chao.p.peng@linux.intel.com>
 >
-> A significant part of what a NV hypervisor needs to do is to decide
-> whether a trap from a L2+ guest has to be forwarded to a L1 guest
-> or handled locally. This is done by checking for the trap bits that
-> the guest hypervisor has set and acting accordingly, as described by
-> the architecture.
+> In confidential computing usages, whether a page is private or shared is
+> necessary information for KVM to perform operations like page fault
+> handling, page zapping etc. There are other potential use cases for
+> per-page memory attributes, e.g. to make memory read-only (or no-exec,
+> or exec-only, etc.) without having to modify memslots.
 >
-> A previous approach was to sprinkle a bunch of checks in all the
-> system register accessors, but this is pretty error prone and doesn't
-> help getting an overview of what is happening.
+> Introduce two ioctls (advertised by KVM_CAP_MEMORY_ATTRIBUTES) to allow
+> userspace to operate on the per-page memory attributes.
+>    - KVM_SET_MEMORY_ATTRIBUTES to set the per-page memory attributes to
+>      a guest memory range.
+>    - KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES to return the KVM supported
+>      memory attributes.
 >
-> Instead, implement a set of global tables that describe a trap bit,
-> combinations of trap bits, behaviours on trap, and what bits must
-> be evaluated on a system register trap.
+> Use an xarray to store the per-page attributes internally, with a naive,
+> not fully optimized implementation, i.e. prioritize correctness over
+> performance for the initial implementation.
 >
-> Although this is painful to describe, this allows to specify each
-> and every control bit in a static manner. To make it efficient,
-> the table is inserted in an xarray that is global to the system,
-> and checked each time we trap a system register while running
-> a L2 guest.
+> Because setting memory attributes is roughly analogous to mprotect() on
+> memory that is mapped into the guest, zap existing mappings prior to
+> updating the memory attributes.  Opportunistically provide an arch hook
+> for the post-set path (needed to complete invalidation anyways) in
+s/anyways/anyway
+
+> anticipation of x86 needing the hook to update metadata related to
+> determining whether or not a given gfn can be backed with various sizes
+> of hugepages.
 >
-> Add the basic infrastructure for now, while additional patches will
-> implement configuration registers.
+> It's possible that future usages may not require an invalidation, e.g.
+> if KVM ends up supporting RWX protections and userspace grants _more_
+> protections, but again opt for simplicity and punt optimizations to
+> if/when they are needed.
 >
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Link: https://lore.kernel.org/all/Y2WB48kD0J4VGynX@google.com
+> Cc: Fuad Tabba <tabba@google.com>
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> Co-developed-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/arm64/include/asm/kvm_host.h   |   1 +
->  arch/arm64/include/asm/kvm_nested.h |   2 +
->  arch/arm64/kvm/emulate-nested.c     | 262 ++++++++++++++++++++++++++++
->  arch/arm64/kvm/sys_regs.c           |   6 +
->  arch/arm64/kvm/trace_arm.h          |  26 +++
->  5 files changed, 297 insertions(+)
+>   Documentation/virt/kvm/api.rst |  60 ++++++++++++
+>   include/linux/kvm_host.h       |  14 +++
+>   include/uapi/linux/kvm.h       |  14 +++
+>   virt/kvm/Kconfig               |   4 +
+>   virt/kvm/kvm_main.c            | 170 +++++++++++++++++++++++++++++++++
+>   5 files changed, 262 insertions(+)
 >
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/k=
-vm_host.h
-> index 721680da1011..cb1c5c54cedd 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -988,6 +988,7 @@ int kvm_handle_cp10_id(struct kvm_vcpu *vcpu);
->  void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
->
->  int __init kvm_sys_reg_table_init(void);
-> +int __init populate_nv_trap_config(void);
->
->  bool lock_all_vcpus(struct kvm *kvm);
->  void unlock_all_vcpus(struct kvm *kvm);
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm=
-/kvm_nested.h
-> index 8fb67f032fd1..fa23cc9c2adc 100644
-> --- a/arch/arm64/include/asm/kvm_nested.h
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -11,6 +11,8 @@ static inline bool vcpu_has_nv(const struct kvm_vcpu *v=
-cpu)
->                 test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
->  }
->
-> +extern bool __check_nv_sr_forward(struct kvm_vcpu *vcpu);
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 34d4ce66e0c8..0ca8561775ac 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6068,6 +6068,56 @@ writes to the CNTVCT_EL0 and CNTPCT_EL0 registers using the SET_ONE_REG
+>   interface. No error will be returned, but the resulting offset will not be
+>   applied.
+>   
+> +4.139 KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES
+> +-----------------------------------------
 > +
->  struct sys_reg_params;
->  struct sys_reg_desc;
->
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nes=
-ted.c
-> index b96662029fb1..1b1148770d45 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -14,6 +14,268 @@
->
->  #include "trace.h"
->
-> +enum trap_behaviour {
-> +       BEHAVE_HANDLE_LOCALLY   =3D 0,
-> +       BEHAVE_FORWARD_READ     =3D BIT(0),
-> +       BEHAVE_FORWARD_WRITE    =3D BIT(1),
-> +       BEHAVE_FORWARD_ANY      =3D BEHAVE_FORWARD_READ | BEHAVE_FORWARD_=
-WRITE,
-> +};
+> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
+> +:Architectures: x86
+> +:Type: vm ioctl
+> +:Parameters: u64 memory attributes bitmask(out)
+> +:Returns: 0 on success, <0 on error
 > +
-> +struct trap_bits {
-> +       const enum vcpu_sysreg          index;
-> +       const enum trap_behaviour       behaviour;
-> +       const u64                       value;
-> +       const u64                       mask;
-> +};
+> +Returns supported memory attributes bitmask. Supported memory attributes will
+> +have the corresponding bits set in u64 memory attributes bitmask.
 > +
-> +enum trap_group {
-> +       /* Indicates no coarse trap control */
-> +       __RESERVED__,
+> +The following memory attributes are defined::
 > +
-> +       /*
-> +        * The first batch of IDs denote coarse trapping that are used
-> +        * on their own instead of being part of a combination of
-> +        * trap controls.
-> +        */
+> +  #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
 > +
-> +       /*
-> +        * Anything after this point is a combination of trap controls,
-> +        * which all must be evaluated to decide what to do.
-> +        */
-> +       __MULTIPLE_CONTROL_BITS__,
+> +4.140 KVM_SET_MEMORY_ATTRIBUTES
+> +-----------------------------------------
 > +
-> +       /*
-> +        * Anything after this point requires a callback evaluating a
-> +        * complex trap condition. Hopefully we'll never need this...
-> +        */
-> +       __COMPLEX_CONDITIONS__,
+> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
+> +:Architectures: x86
+> +:Type: vm ioctl
+> +:Parameters: struct kvm_memory_attributes(in/out)
+> +:Returns: 0 on success, <0 on error
 > +
-> +       /* Must be last */
-> +       __NR_TRAP_GROUP_IDS__
-> +};
+> +Sets memory attributes for pages in a guest memory range. Parameters are
+> +specified via the following structure::
 > +
-> +static const struct trap_bits coarse_trap_bits[] =3D {
-> +};
+> +  struct kvm_memory_attributes {
+> +	__u64 address;
+> +	__u64 size;
+> +	__u64 attributes;
+> +	__u64 flags;
+> +  };
 > +
-> +#define MCB(id, ...)                                   \
-> +       [id - __MULTIPLE_CONTROL_BITS__]        =3D       \
-> +               (const enum trap_group []){             \
-> +                       __VA_ARGS__, __RESERVED__       \
-> +               }
+> +The user sets the per-page memory attributes to a guest memory range indicated
+> +by address/size, and in return KVM adjusts address and size to reflect the
+> +actual pages of the memory range have been successfully set to the attributes.
+> +If the call returns 0, "address" is updated to the last successful address + 1
+> +and "size" is updated to the remaining address size that has not been set
+> +successfully. The user should check the return value as well as the size to
+> +decide if the operation succeeded for the whole range or not. The user may want
+> +to retry the operation with the returned address/size if the previous range was
+> +partially successful.
 > +
-> +static const enum trap_group *coarse_control_combo[] =3D {
-> +};
+> +Both address and size should be page aligned and the supported attributes can be
+> +retrieved with KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES.
 > +
-> +typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu *=
-);
+> +The "flags" field may be used for future extensions and should be set to 0s.
 > +
-> +#define CCC(id, fn)                            \
-> +       [id - __COMPLEX_CONDITIONS__] =3D fn
+>   5. The kvm_run structure
+>   ========================
+>   
+> @@ -8494,6 +8544,16 @@ block sizes is exposed in KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES as a
+>   64-bit bitmap (each bit describing a block size). The default value is
+>   0, to disable the eager page splitting.
+>   
+> +8.41 KVM_CAP_MEMORY_ATTRIBUTES
+> +------------------------------
 > +
-> +static const complex_condition_check ccc[] =3D {
-> +};
+> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
+> +:Architectures: x86
+> +:Type: vm
 > +
-> +/*
-> + * Bit assignment for the trap controls. We use a 64bit word with the
-> + * following layout for each trapped sysreg:
-> + *
-> + * [9:0]       enum trap_group (10 bits)
-> + * [13:10]     enum fgt_group_id (4 bits)
-> + * [19:14]     bit number in the FGT register (6 bits)
-> + * [20]                trap polarity (1 bit)
-> + * [62:21]     Unused (42 bits)
-> + * [63]                RES0 - Must be zero, as lost on insertion in the =
-xarray
-> + */
-> +#define TC_CGT_BITS    10
-> +#define TC_FGT_BITS    4
+> +This capability indicates KVM supports per-page memory attributes and ioctls
+> +KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES/KVM_SET_MEMORY_ATTRIBUTES are available.
 > +
-> +union trap_config {
-> +       u64     val;
-> +       struct {
-> +               unsigned long   cgt:TC_CGT_BITS; /* Coarse trap id */
-> +               unsigned long   fgt:TC_FGT_BITS; /* Fing Grained Trap id =
-*/
-
-Would it be better to leave the definition of FGT field to patch 19/27
-which adds the infrastructure for FGT forwarding?
-
-> +               unsigned long   bit:6;           /* Bit number */
-> +               unsigned long   pol:1;           /* Polarity */
-> +               unsigned long   unk:42;          /* Unknown */
-> +               unsigned long   mbz:1;           /* Must Be Zero */
-> +       };
-> +};
-> +
-> +struct encoding_to_trap_config {
-> +       const u32                       encoding;
-> +       const u32                       end;
-> +       const union trap_config         tc;
-> +};
-> +
-> +#define SR_RANGE_TRAP(sr_start, sr_end, trap_id)                       \
-> +       {                                                               \
-> +               .encoding       =3D sr_start,                            =
- \
-> +               .end            =3D sr_end,                              =
- \
-> +               .tc             =3D {                                    =
- \
-> +                       .cgt            =3D trap_id,                     =
- \
-> +               },                                                      \
-> +       }
-> +
-> +#define SR_TRAP(sr, trap_id)           SR_RANGE_TRAP(sr, sr, trap_id)
-> +
-> +/*
-> + * Map encoding to trap bits for exception reported with EC=3D0x18.
-> + * These must only be evaluated when running a nested hypervisor, but
-> + * that the current context is not a hypervisor context. When the
-> + * trapped access matches one of the trap controls, the exception is
-> + * re-injected in the nested hypervisor.
-> + */
-> +static const struct encoding_to_trap_config encoding_to_cgt[] __initcons=
-t =3D {
-> +};
-> +
-> +static DEFINE_XARRAY(sr_forward_xa);
-> +
-> +static union trap_config get_trap_config(u32 sysreg)
+>   9. Known KVM API problems
+>   =========================
+>   
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index e9ca49d451f3..97db63da6227 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -264,6 +264,7 @@ struct kvm_gfn_range {
+>   	gfn_t end;
+>   	union {
+>   		pte_t pte;
+> +		unsigned long attributes;
+>   		u64 raw;
+>   	} arg;
+>   	bool may_block;
+> @@ -809,6 +810,9 @@ struct kvm {
+>   
+>   #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
+>   	struct notifier_block pm_notifier;
+> +#endif
+> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+> +	struct xarray mem_attr_array;
+>   #endif
+>   	char stats_id[KVM_STATS_NAME_SIZE];
+>   };
+> @@ -2301,4 +2305,14 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
+>   /* Max number of entries allowed for each kvm dirty ring */
+>   #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
+>   
+> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+> +static inline unsigned long kvm_get_memory_attributes(struct kvm *kvm, gfn_t gfn)
 > +{
-> +       return (union trap_config) {
-> +               .val =3D xa_to_value(xa_load(&sr_forward_xa, sysreg)),
-> +       };
+> +	return xa_to_value(xa_load(&kvm->mem_attr_array, gfn));
 > +}
 > +
-> +int __init populate_nv_trap_config(void)
+> +bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+> +					 struct kvm_gfn_range *range);
+> +#endif /* CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES */
+> +
+>   #endif
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 6c6ed214b6ac..f065c57db327 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1211,6 +1211,7 @@ struct kvm_ppc_resize_hpt {
+>   #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
+>   #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
+>   #define KVM_CAP_USER_MEMORY2 230
+> +#define KVM_CAP_MEMORY_ATTRIBUTES 231
+>   
+>   #ifdef KVM_CAP_IRQ_ROUTING
+>   
+> @@ -2270,4 +2271,17 @@ struct kvm_s390_zpci_op {
+>   /* flags for kvm_s390_zpci_op->u.reg_aen.flags */
+>   #define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
+>   
+> +/* Available with KVM_CAP_MEMORY_ATTRIBUTES */
+> +#define KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES    _IOR(KVMIO,  0xd2, __u64)
+> +#define KVM_SET_MEMORY_ATTRIBUTES              _IOW(KVMIO,  0xd3, struct kvm_memory_attributes)
+> +
+> +struct kvm_memory_attributes {
+> +	__u64 address;
+> +	__u64 size;
+> +	__u64 attributes;
+> +	__u64 flags;
+> +};
+> +
+> +#define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
+> +
+>   #endif /* __LINUX_KVM_H */
+> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> index 2fa11bd26cfc..8375bc49f97d 100644
+> --- a/virt/kvm/Kconfig
+> +++ b/virt/kvm/Kconfig
+> @@ -99,3 +99,7 @@ config KVM_GENERIC_HARDWARE_ENABLING
+>   config KVM_GENERIC_MMU_NOTIFIER
+>          select MMU_NOTIFIER
+>          bool
+> +
+> +config KVM_GENERIC_MEMORY_ATTRIBUTES
+> +       select KVM_GENERIC_MMU_NOTIFIER
+> +       bool
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index c14adf93daec..1a31bfa025b0 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -530,6 +530,7 @@ struct kvm_mmu_notifier_range {
+>   	u64 end;
+>   	union {
+>   		pte_t pte;
+> +		unsigned long attributes;
+>   		u64 raw;
+>   	} arg;
+>   	gfn_handler_t handler;
+> @@ -1175,6 +1176,9 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
+>   	spin_lock_init(&kvm->mn_invalidate_lock);
+>   	rcuwait_init(&kvm->mn_memslots_update_rcuwait);
+>   	xa_init(&kvm->vcpu_array);
+> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+> +	xa_init(&kvm->mem_attr_array);
+> +#endif
+>   
+>   	INIT_LIST_HEAD(&kvm->gpc_list);
+>   	spin_lock_init(&kvm->gpc_lock);
+> @@ -1346,6 +1350,9 @@ static void kvm_destroy_vm(struct kvm *kvm)
+>   		kvm_free_memslots(kvm, &kvm->__memslots[i][0]);
+>   		kvm_free_memslots(kvm, &kvm->__memslots[i][1]);
+>   	}
+> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+> +	xa_destroy(&kvm->mem_attr_array);
+> +#endif
+>   	cleanup_srcu_struct(&kvm->irq_srcu);
+>   	cleanup_srcu_struct(&kvm->srcu);
+>   	kvm_arch_free_vm(kvm);
+> @@ -2346,6 +2353,145 @@ static int kvm_vm_ioctl_clear_dirty_log(struct kvm *kvm,
+>   }
+>   #endif /* CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT */
+>   
+> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+> +static u64 kvm_supported_mem_attributes(struct kvm *kvm)
 > +{
-> +       int ret =3D 0;
-> +
-> +       BUILD_BUG_ON(sizeof(union trap_config) !=3D sizeof(void *));
-> +       BUILD_BUG_ON(__NR_TRAP_GROUP_IDS__ > BIT(TC_CGT_BITS));
-> +
-> +       for (int i =3D 0; i < ARRAY_SIZE(encoding_to_cgt); i++) {
-> +               const struct encoding_to_trap_config *cgt =3D &encoding_t=
-o_cgt[i];
-> +               void *prev;
-> +
-> +               prev =3D xa_store_range(&sr_forward_xa, cgt->encoding, cg=
-t->end,
-> +                                     xa_mk_value(cgt->tc.val), GFP_KERNE=
-L);
-> +
-> +               if (prev) {
-> +                       kvm_err("Duplicate CGT for (%d, %d, %d, %d, %d)\n=
-",
-> +                               sys_reg_Op0(cgt->encoding),
-> +                               sys_reg_Op1(cgt->encoding),
-> +                               sys_reg_CRn(cgt->encoding),
-> +                               sys_reg_CRm(cgt->encoding),
-> +                               sys_reg_Op2(cgt->encoding));
-> +                       ret =3D -EINVAL;
-> +               }
-
-The xa_store_range would only return non-NULL when the entry cannot be
-stored (XA_ERROR(-EINVAL)) or memory allocation failed
-(XA_ERROR(-ENOMEM)).
-Another way may be needed to detect duplicate CGT.
-
-> +       }
-> +
-> +       kvm_info("nv: %ld coarse grained trap handlers\n",
-> +                ARRAY_SIZE(encoding_to_cgt));
-> +
-> +       for (int id =3D __MULTIPLE_CONTROL_BITS__;
-> +            id < (__COMPLEX_CONDITIONS__ - 1);
-> +            id++) {
-> +               const enum trap_group *cgids;
-> +
-> +               cgids =3D coarse_control_combo[id - __MULTIPLE_CONTROL_BI=
-TS__];
-> +
-> +               for (int i =3D 0; cgids[i] !=3D __RESERVED__; i++) {
-> +                       if (cgids[i] >=3D __MULTIPLE_CONTROL_BITS__) {
-> +                               kvm_err("Recursive MCB %d/%d\n", id, cgid=
-s[i]);
-> +                               ret =3D -EINVAL;
-
-I am confused about the above check for recursive MCB. In patch 17/29,
-a recursive MCD is added and looks like recursive MCB is allowed as
-shown in __do_compute_trap_behaviour().
-
-> +                       }
-> +               }
-> +       }
-> +
-> +       if (ret)
-> +               xa_destroy(&sr_forward_xa);
-> +
-> +       return ret;
+> +	return 0;
 > +}
 > +
-> +static enum trap_behaviour get_behaviour(struct kvm_vcpu *vcpu,
-> +                                        const struct trap_bits *tb)
+> +static __always_inline void kvm_handle_gfn_range(struct kvm *kvm,
+> +						 struct kvm_mmu_notifier_range *range)
 > +{
-> +       enum trap_behaviour b =3D BEHAVE_HANDLE_LOCALLY;
-> +       u64 val;
+> +	struct kvm_gfn_range gfn_range;
+> +	struct kvm_memory_slot *slot;
+> +	struct kvm_memslots *slots;
+> +	struct kvm_memslot_iter iter;
+> +	bool locked = false;
+> +	bool ret = false;
+> +	int i;
 > +
-> +       val =3D __vcpu_sys_reg(vcpu, tb->index);
-> +       if ((val & tb->mask) =3D=3D tb->value)
-> +               b |=3D tb->behaviour;
+> +	gfn_range.arg.raw = range->arg.raw;
+> +	gfn_range.may_block = range->may_block;
 > +
-> +       return b;
+> +	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
+> +		slots = __kvm_memslots(kvm, i);
+> +
+> +		kvm_for_each_memslot_in_gfn_range(&iter, slots, range->start, range->end) {
+> +			slot = iter.slot;
+> +			gfn_range.slot = slot;
+> +
+> +			gfn_range.start = max(range->start, slot->base_gfn);
+> +			gfn_range.end = min(range->end, slot->base_gfn + slot->npages);
+> +			if (gfn_range.start >= gfn_range.end)
+> +				continue;
+> +
+> +			if (!locked) {
+> +				locked = true;
+> +				KVM_MMU_LOCK(kvm);
+> +				if (!IS_KVM_NULL_FN(range->on_lock))
+> +					range->on_lock(kvm);
+> +			}
+> +
+> +			ret |= range->handler(kvm, &gfn_range);
+> +		}
+> +	}
+> +
+> +	if (range->flush_on_ret && ret)
+> +		kvm_flush_remote_tlbs(kvm);
+> +
+> +	if (locked) {
+> +		KVM_MMU_UNLOCK(kvm);
+> +		if (!IS_KVM_NULL_FN(range->on_unlock))
+> +			range->on_unlock(kvm);
+> +	}
 > +}
 > +
-> +static enum trap_behaviour __do_compute_trap_behaviour(struct kvm_vcpu *=
-vcpu,
-> +                                                      const enum trap_gr=
-oup id,
-> +                                                      enum trap_behaviou=
-r b)
+> +static int kvm_vm_set_mem_attributes(struct kvm *kvm, unsigned long attributes,
+> +				     gfn_t start, gfn_t end)
 > +{
-> +       switch (id) {
-> +               const enum trap_group *cgids;
+> +	struct kvm_mmu_notifier_range unmap_range = {
+> +		.start = start,
+> +		.end = end,
+> +		.handler = kvm_mmu_unmap_gfn_range,
+> +		.on_lock = kvm_mmu_invalidate_begin,
+> +		.on_unlock = (void *)kvm_null_fn,
+> +		.flush_on_ret = true,
+> +		.may_block = true,
+> +	};
+> +	struct kvm_mmu_notifier_range post_set_range = {
+> +		.start = start,
+> +		.end = end,
+> +		.arg.attributes = attributes,
+> +		.handler = kvm_arch_post_set_memory_attributes,
+> +		.on_lock = (void *)kvm_null_fn,
+> +		.on_unlock = kvm_mmu_invalidate_end,
+> +		.may_block = true,
+> +	};
+> +	unsigned long i;
+> +	void *entry;
+> +	int r;
 > +
-> +       case __RESERVED__ ... __MULTIPLE_CONTROL_BITS__ - 1:
-> +               if (likely(id !=3D __RESERVED__))
-> +                       b |=3D get_behaviour(vcpu, &coarse_trap_bits[id])=
-;
-> +               break;
-> +       case __MULTIPLE_CONTROL_BITS__ ... __COMPLEX_CONDITIONS__ - 1:
-> +               /* Yes, this is recursive. Don't do anything stupid. */
-> +               cgids =3D coarse_control_combo[id - __MULTIPLE_CONTROL_BI=
-TS__];
-> +               for (int i =3D 0; cgids[i] !=3D __RESERVED__; i++)
-> +                       b |=3D __do_compute_trap_behaviour(vcpu, cgids[i]=
-, b);
-> +               break;
-> +       default:
-> +               if (ARRAY_SIZE(ccc))
-> +                       b |=3D ccc[id -  __COMPLEX_CONDITIONS__](vcpu);
-> +               break;
-> +       }
-> +
-> +       return b;
-> +}
-> +
-> +static enum trap_behaviour compute_trap_behaviour(struct kvm_vcpu *vcpu,
-> +                                                 const union trap_config=
- tc)
-> +{
-> +       enum trap_behaviour b =3D BEHAVE_HANDLE_LOCALLY;
-> +
-> +       return __do_compute_trap_behaviour(vcpu, tc.cgt, b);
-> +}
-> +
-> +bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
-> +{
-> +       union trap_config tc;
-> +       enum trap_behaviour b;
-> +       bool is_read;
-> +       u32 sysreg;
-> +       u64 esr;
-> +
-> +       if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
-> +               return false;
-> +
-> +       esr =3D kvm_vcpu_get_esr(vcpu);
-> +       sysreg =3D esr_sys64_to_sysreg(esr);
-> +       is_read =3D (esr & ESR_ELx_SYS64_ISS_DIR_MASK) =3D=3D ESR_ELx_SYS=
-64_ISS_DIR_READ;
-> +
-> +       tc =3D get_trap_config(sysreg);
-> +
-> +       /*
-> +        * A value of 0 for the whole entry means that we know nothing
-> +        * for this sysreg, and that it cannot be forwareded. In this
-> +        * situation, let's cut it short.
-> +        *
-> +        * Note that ultimately, we could also make use of the xarray
-> +        * to store the index of the sysreg in the local descriptor
-> +        * array, avoiding another search... Hint, hint...
-> +        */
-> +       if (!tc.val)
-> +               return false;
-> +
-> +       b =3D compute_trap_behaviour(vcpu, tc);
-> +
-> +       if (((b & BEHAVE_FORWARD_READ) && is_read) ||
-> +           ((b & BEHAVE_FORWARD_WRITE) && !is_read))
-> +               goto inject;
-> +
-> +       return false;
-> +
-> +inject:
-> +       trace_kvm_forward_sysreg_trap(vcpu, sysreg, is_read);
-> +
-> +       kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-> +       return true;
-> +}
-> +
->  static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64=
- spsr)
->  {
->         u64 mode =3D spsr & PSR_MODE_MASK;
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index f5baaa508926..dfd72b3a625f 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -3177,6 +3177,9 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
->
->         trace_kvm_handle_sys_reg(esr);
->
-> +       if (__check_nv_sr_forward(vcpu))
-> +               return 1;
-> +
->         params =3D esr_sys64_to_params(esr);
->         params.regval =3D vcpu_get_reg(vcpu, Rt);
->
-> @@ -3594,5 +3597,8 @@ int __init kvm_sys_reg_table_init(void)
->         if (!first_idreg)
->                 return -EINVAL;
->
-> +       if (kvm_get_mode() =3D=3D KVM_MODE_NV)
-> +               populate_nv_trap_config();
-
-Do we need to check the return value of populate_nv_trap_config() and
-fail the initialization if the return value is non-zero?
+> +	entry = attributes ? xa_mk_value(attributes) : NULL;
+Why attributes of value 0 is considered not a value? Is it because 0 is 
+not a valid value when RWX is considered in the future?
 
 > +
->         return 0;
->  }
-> diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
-> index 6ce5c025218d..8ad53104934d 100644
-> --- a/arch/arm64/kvm/trace_arm.h
-> +++ b/arch/arm64/kvm/trace_arm.h
-> @@ -364,6 +364,32 @@ TRACE_EVENT(kvm_inject_nested_exception,
->                   __entry->hcr_el2)
->  );
->
-> +TRACE_EVENT(kvm_forward_sysreg_trap,
-> +           TP_PROTO(struct kvm_vcpu *vcpu, u32 sysreg, bool is_read),
-> +           TP_ARGS(vcpu, sysreg, is_read),
+> +	mutex_lock(&kvm->slots_lock);
 > +
-> +           TP_STRUCT__entry(
-> +               __field(u64,    pc)
-> +               __field(u32,    sysreg)
-> +               __field(bool,   is_read)
-> +           ),
+> +	/*
+> +	 * Reserve memory ahead of time to avoid having to deal with failures
+> +	 * partway through setting the new attributes.
+> +	 */
+> +	for (i = start; i < end; i++) {
+> +		r = xa_reserve(&kvm->mem_attr_array, i, GFP_KERNEL_ACCOUNT);
+> +		if (r)
+> +			goto out_unlock;
+> +	}
 > +
-> +           TP_fast_assign(
-> +               __entry->pc =3D *vcpu_pc(vcpu);
-> +               __entry->sysreg =3D sysreg;
-> +               __entry->is_read =3D is_read;
-> +           ),
+> +	kvm_handle_gfn_range(kvm, &unmap_range);
 > +
-> +           TP_printk("%llx %c (%d,%d,%d,%d,%d)",
-> +                     __entry->pc,
-> +                     __entry->is_read ? 'R' : 'W',
-> +                     sys_reg_Op0(__entry->sysreg),
-> +                     sys_reg_Op1(__entry->sysreg),
-> +                     sys_reg_CRn(__entry->sysreg),
-> +                     sys_reg_CRm(__entry->sysreg),
-> +                     sys_reg_Op2(__entry->sysreg))
-> +);
+> +	for (i = start; i < end; i++) {
+> +		r = xa_err(xa_store(&kvm->mem_attr_array, i, entry,
+> +				    GFP_KERNEL_ACCOUNT));
+> +		KVM_BUG_ON(r, kvm);
+> +	}
 > +
->  #endif /* _TRACE_ARM_ARM64_KVM_H */
->
->  #undef TRACE_INCLUDE_PATH
-> --
-> 2.34.1
->
->
+> +	kvm_handle_gfn_range(kvm, &post_set_range);
+> +
+> +out_unlock:
+> +	mutex_unlock(&kvm->slots_lock);
+> +
+> +	return r;
+> +}
+> +static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+> +					   struct kvm_memory_attributes *attrs)
+> +{
+> +	gfn_t start, end;
+> +
+> +	/* flags is currently not used. */
+> +	if (attrs->flags)
+> +		return -EINVAL;
+> +	if (attrs->attributes & ~kvm_supported_mem_attributes(kvm))
+> +		return -EINVAL;
+> +	if (attrs->size == 0 || attrs->address + attrs->size < attrs->address)
+> +		return -EINVAL;
+> +	if (!PAGE_ALIGNED(attrs->address) || !PAGE_ALIGNED(attrs->size))
+> +		return -EINVAL;
+> +
+> +	start = attrs->address >> PAGE_SHIFT;
+> +	end = (attrs->address + attrs->size - 1 + PAGE_SIZE) >> PAGE_SHIFT;
+No need to handle the alignment again since both address and size are 
+page aligned.
 
-Thanks,
-Jing
+> +
+> +	if (WARN_ON_ONCE(start == end))
+> +		return -EINVAL;
+> +
+> +	/*
+> +	 * xarray tracks data using "unsigned long", and as a result so does
+> +	 * KVM.  For simplicity, supports generic attributes only on 64-bit
+> +	 * architectures.
+> +	 */
+> +	BUILD_BUG_ON(sizeof(attrs->attributes) != sizeof(unsigned long));
+> +
+> +	return kvm_vm_set_mem_attributes(kvm, attrs->attributes, start, end);
+> +}
+> +#endif /* CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES */
+> +
+>   struct kvm_memory_slot *gfn_to_memslot(struct kvm *kvm, gfn_t gfn)
+>   {
+>   	return __gfn_to_memslot(kvm_memslots(kvm), gfn);
+> @@ -4521,6 +4667,9 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+>   #ifdef CONFIG_HAVE_KVM_MSI
+>   	case KVM_CAP_SIGNAL_MSI:
+>   #endif
+> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+> +	case KVM_CAP_MEMORY_ATTRIBUTES:
+> +#endif
+>   #ifdef CONFIG_HAVE_KVM_IRQFD
+>   	case KVM_CAP_IRQFD:
+>   #endif
+> @@ -4937,6 +5086,27 @@ static long kvm_vm_ioctl(struct file *filp,
+>   		break;
+>   	}
+>   #endif /* CONFIG_HAVE_KVM_IRQ_ROUTING */
+> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+> +	case KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES: {
+> +		u64 attrs = kvm_supported_mem_attributes(kvm);
+> +
+> +		r = -EFAULT;
+> +		if (copy_to_user(argp, &attrs, sizeof(attrs)))
+> +			goto out;
+> +		r = 0;
+> +		break;
+> +	}
+> +	case KVM_SET_MEMORY_ATTRIBUTES: {
+> +		struct kvm_memory_attributes attrs;
+> +
+> +		r = -EFAULT;
+> +		if (copy_from_user(&attrs, argp, sizeof(attrs)))
+> +			goto out;
+> +
+> +		r = kvm_vm_ioctl_set_mem_attributes(kvm, &attrs);
+> +		break;
+Both the changelog and the document added mention that the address and 
+size of attrs will be updated to
+"reflect the actual pages of the memory range have been successfully set 
+to the attributes", but it doesn't.
+
+> +	}
+> +#endif /* CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES */
+>   	case KVM_CREATE_DEVICE: {
+>   		struct kvm_create_device cd;
+>   
+
