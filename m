@@ -1,103 +1,83 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10256DF51
-	for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 21:54:34 +0000 (UTC)
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-55c964d031aso8936769a12.1
-        for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 14:54:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FECC8828
+	for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 22:52:20 +0000 (UTC)
+Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-48713d11531so3155504e0c.1
+        for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 15:52:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692050074; x=1692654874;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WLV8cwl+q0+MgeCaKnjEbSXBm+ijn/cuT9eg2QvMQy8=;
-        b=WyQ6Tn/5h37xMsEIDmbWcY+nQiTqqFoftlXVBTiztMb2A7vinkou0FyJxT5Tj+pa31
-         3y4mktmY47itqZcGsKCOeUubQi9MQwPyYS/ntrx9oV/jIdUAoZkwRuGY0yw403B+hUV5
-         PyUzYrySs29/O30p+yDsELGRzby+1aqFcxoBBJ6omQFPygNitIVTJAp2Hnd4R0/QcY2H
-         EgizfgVBfhm/BlB4owWFjSnqlPuhKRjVS+MvDjPpwOsN8USa7haRJjhrCn+/9m5M/b9b
-         HnVauoeuLnwYhNy2SBnjlv/xkJdMMlVKqHESswng1uUarqPNC4oB5B1VogZQC9cpA3Kv
-         gLzA==
+        d=google.com; s=20221208; t=1692053539; x=1692658339;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jUxtb4YcEahALEPzkewfUVlfVRSRxTtCx1V6b30IuOk=;
+        b=M2gZPj3hUNjjGTYRuuz+l20p4fc6MnM6kZ2Abp8ZLMXqfIeWjk2eowsijdKzm1RvJ0
+         W+XJG2Bh9oveiyhYPVXgGAP6SlN7hqyNW24dCy4CcITleCNYaL5gpaNLn1GY4NumXHYB
+         M6j95HfVYuGuFB8wo+cAeunyax1nHyuFevnBSZ/RCLoNaWA8dV9nlRB+LHLr6f8mR98A
+         oXazUil6qim5dY1/Pjwe9/8UY40LVunC7/KwGDdF0DHs0GRIa4xNEE3zX+wBPMrh+HET
+         7NLvAK3YieZgbq3UZkwHxaZ2jDYjIrNpxcxlvkt7BimiXe+DclF8hZkBUcAbFCu/JsTk
+         4K/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692050074; x=1692654874;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WLV8cwl+q0+MgeCaKnjEbSXBm+ijn/cuT9eg2QvMQy8=;
-        b=CURi/WGYBSwYN1mptTCgb6IC381/anDr2CBP5uHdo+LyP9ir2gsvLvhAT/FEyIurk4
-         JR/eTC7Ah7jYSq2XenPSsh6tHlN9D8vUnlA3pay9W4tcU386LVe1YiWauSl+EiicYFxs
-         XPnmvWDjswKpCG4jtKVUwXJ1rvr+756pCWV9D3hChrg4ZIfxYok5v5Kcz7Lwd+btirdE
-         znTD7Y8fff+YOObUdOO/vtuPJ/iXSBtUDUCgGnQTF/0A61rmuR/VgnoLoR0CsoU6TtaF
-         U1aIq9awOCE7jVn5YqMA4l2YaRKXHnAYKV6rMg6oq5Tzoh6E3JsYsOAqMKcUoxBMQcrL
-         /0eA==
-X-Gm-Message-State: AOJu0Yw6FR0rvG5CuPyZequDSqTOwW5K4ClV+LF8nIvXU8kKpBMLDjwR
-	9m+phnEk/L/paHo5CMadYNCefnyGiww=
-X-Google-Smtp-Source: AGHT+IGPzyG2ye2a1feyqcG86dyCHC82qzx5i2/p6ALHRmr0rfFoFMM8MlFz9jxGz9wjwtqC3ppaRbddXVE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:9f12:0:b0:565:3355:87b0 with SMTP id
- g18-20020a639f12000000b00565335587b0mr2044577pge.5.1692050074189; Mon, 14 Aug
- 2023 14:54:34 -0700 (PDT)
-Date: Mon, 14 Aug 2023 14:54:32 -0700
-In-Reply-To: <02239d95-0253-a223-28c2-016cca3ab4d2@linux.intel.com>
+        d=1e100.net; s=20221208; t=1692053539; x=1692658339;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jUxtb4YcEahALEPzkewfUVlfVRSRxTtCx1V6b30IuOk=;
+        b=RbrOSAlf60uXzz89DJlgQrKOXTB34L4P7l6A6PmEeLqoU6qf/q2kjWh+42OSv3g+lO
+         WzPPxk1y3kg7qVMtzPEafOqMDVjvB5K1y1dSmqVkiLKSv5rfNb4SVjhYnLEgqonCvDCv
+         mjRGAfjJsLrl19tk3fGToPRMqiPXeQv6pT5DiCl888epP0afYB0N0K2MhoGVHkuYaRbe
+         6cYIdlNz5EITsUgtzzpdURO7TxZQmUbR5wKXXRm01pCb3pKgpQ2Oa4jVqnkpGTURSK8i
+         VDSvp08Pk1OtzPIJCa/gH816rT9wmfaz1JREcZR79mzi8xKNuBDu2CvPACF454bJfWW2
+         d+tQ==
+X-Gm-Message-State: AOJu0Yya6YOnFtdhSJzc1YcRl6pW+xpIisPd9Gq6S+et3XPe9DUUX1vX
+	2XOspjzdFBzsdrWxE6Ke4AYDIFR+g7UIlK4Mx38lVA==
+X-Google-Smtp-Source: AGHT+IEBlezrcdJgN+kx2LoFv3RPdtEDtUnoizkwRg6/nCDXUKk/DIw1owQilkE6tQ8UuBt9YzqGXi+WEg47isn22Rg=
+X-Received: by 2002:a05:6122:d02:b0:487:e3da:f096 with SMTP id
+ az2-20020a0561220d0200b00487e3daf096mr378821vkb.0.1692053539010; Mon, 14 Aug
+ 2023 15:52:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-9-seanjc@google.com>
- <02239d95-0253-a223-28c2-016cca3ab4d2@linux.intel.com>
-Message-ID: <ZNqimGhCD+70q/lG@google.com>
-Subject: Re: [RFC PATCH v11 08/29] KVM: Introduce per-page memory attributes
-From: Sean Christopherson <seanjc@google.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: Chao Peng <chao.p.peng@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Yu Zhang <yu.c.zhang@linux.intel.com>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	Vlastimil Babka <vbabka@suse.cz>, David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-5-amoorthy@google.com>
+ <d5ebb72d-393d-f61b-6a6f-760c6a5d7469@gmail.com>
+In-Reply-To: <d5ebb72d-393d-f61b-6a6f-760c6a5d7469@gmail.com>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Mon, 14 Aug 2023 15:51:42 -0700
+Message-ID: <CAF7b7mrOc+kxJsGE-M0EnbJfUD+xx9vohspZ+cZzzG5mzv6L6w@mail.gmail.com>
+Subject: Re: [PATCH v4 04/16] KVM: Add docstrings to __kvm_write_guest_page()
+ and __kvm_read_guest_page()
+To: Robert Hoo <robert.hoo.linux@gmail.com>
+Cc: seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org, 
+	jthoughton@google.com, bgardon@google.com, dmatlack@google.com, 
+	ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com, 
+	nadav.amit@gmail.com, isaku.yamahata@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 14, 2023, Binbin Wu wrote:
-> 
-> On 7/19/2023 7:44 AM, Sean Christopherson wrote:
-> > +	struct kvm_mmu_notifier_range post_set_range = {
-> > +		.start = start,
-> > +		.end = end,
-> > +		.arg.attributes = attributes,
-> > +		.handler = kvm_arch_post_set_memory_attributes,
-> > +		.on_lock = (void *)kvm_null_fn,
-> > +		.on_unlock = kvm_mmu_invalidate_end,
-> > +		.may_block = true,
-> > +	};
-> > +	unsigned long i;
-> > +	void *entry;
-> > +	int r;
-> > +
-> > +	entry = attributes ? xa_mk_value(attributes) : NULL;
-> Why attributes of value 0 is considered not a value? Is it because 0 is not
-> a valid value when RWX is considered in the future?
+On Wed, Jun 14, 2023 at 7:41=E2=80=AFPM Robert Hoo <robert.hoo.linux@gmail.=
+com> wrote:
+>
+> Agree, and how about one step further, i.e. adjust the param's sequence.
+>
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 2c276d4d0821..db2bc5d3e2c2 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2992,7 +2992,7 @@ static int next_segment(unsigned long len, int offs=
+et)
+>    */
+>   static int __kvm_read_guest_page(struct kvm_memory_slot *slot,
+>                                   struct kvm_vcpu *vcpu,
+> -                                gfn_t gfn, void *data, int offset, int l=
+en)
+> +                                gfn_t gfn, int offset, void *data, int l=
+en)
 
-0 values don't require an entry in the xarray, i.e. don't need to be stored and
-so don't consume memory.  The potential conflict with a RWX=0 entry has already
-been noted, but we'll cross that bridge when we get to it, e.g. KVM can easily
-support RWX=0 by using an internal "valid" flag.
-
-> Both the changelog and the document added mention that the address and size
-> of attrs will be updated to
-> "reflect the actual pages of the memory range have been successfully set to
-> the attributes", but it doesn't.
-
-Yeah, on the todo list, all of the changelogs are horribly stale.
+There are a lot of functions/callsites in kvm_main.c which use the
+"offset, data, len" convention. I'd prefer to switch them all at the
+same time for consistency, but I think that's too large of a change to
+splice in here: so I'll leave it as is for now.
