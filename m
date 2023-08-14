@@ -1,51 +1,53 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D8B8F77
-	for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 10:15:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BCEBA58
+	for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 12:17:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1692008114;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	s=mimecast20190719; t=1692015477;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=yO4ixNcrplGZ+NAzDMsq0PAPN989Nujk0uRoLq5dtlU=;
-	b=HCTt2eB5xa5DZZtp2K46ZL/MAIy52cc+mueTNYvq8q9jKkXtP01Ri/Ob/8T0cZm1K+1NiX
-	3jD6ZmPcas3pOQncX0lp/C40OqI4s3QPX7VSCtjY2YT/P1SBrL+8oUjgJQKaUBQLTgzyr0
-	aVagz5hjTeS5UTW0Y6qCpTqvvTU27wo=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=aXChxHQ1/Bi6hu4HBpoNe1d5uOB9c+b+DjWb1LSg1rU=;
+	b=D1Tv3ERbXNn2OaFLHWU1nPe9H4qoWxfebR1uzG97KRAZqHTMF3hVuwbC+EUXg12edpEe3b
+	lfA0kAhQRlHv6aUnR3n68ERKOkR/3/jGv0Wj/LqGnHPnSfX/IXRwhprcsMCbuPZMl0oo5W
+	s4Qqidc1ACENsOAAaDoI/LdUsJCX2LI=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-606-GNzsiJhYNSiZ1HPLHSdHjQ-1; Mon, 14 Aug 2023 06:15:13 -0400
-X-MC-Unique: GNzsiJhYNSiZ1HPLHSdHjQ-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-4fe52cd625aso3697320e87.0
-        for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 03:15:12 -0700 (PDT)
+ us-mta-380-NIi2pKaMN8q4cRnxYr2mWw-1; Mon, 14 Aug 2023 08:17:53 -0400
+X-MC-Unique: NIi2pKaMN8q4cRnxYr2mWw-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3178532c6c8so2486800f8f.1
+        for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 05:17:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692008111; x=1692612911;
+        d=1e100.net; s=20221208; t=1692015472; x=1692620272;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yO4ixNcrplGZ+NAzDMsq0PAPN989Nujk0uRoLq5dtlU=;
-        b=H3SScbheJLos5h3zVT1ftiFNJDQyzw8Stg8xiu9z/5NWCBDk4CI+bnlz4sATBaekjd
-         0da1gZ/BcpPM4budXtykDq0tVeDzqV148qwZmngXS1y5Qe5vvOEfINlCQFJYaeJaRFq/
-         b29Q7K1XP3eYn+kbJW0Lzyn9LrhEHkY8qhJbBti0etN2dIVgTAsMD1cqOdxDfzbypjCL
-         TUtIn4xP2bmd6W7aKqvkigzAXP9fhwEsoU2zUqPraYpC7Vyzn5fx6WuLWFOkxwQe6mfe
-         XtKuwBPQc738yzHbKyQVXpfDkNMzilboFWr3GUgr8m4RVTLw3jya82kpbC57MW9nteRT
-         psog==
-X-Gm-Message-State: AOJu0YyelAz2Hbj0YdW7BOE3R4CZisXjaHg/uO8+DyBWCPa5m/UUvhqX
-	uF3FsZ0OJ01pZyEHo0j0AZZctUD2DILhTY+v0AZsCWSDCH/7r7+V1WyR2zu9HzUBtyjva7CU6nC
-	e2lVzGlU7H9oBbDu2
-X-Received: by 2002:a05:6512:e82:b0:4fe:536f:4b12 with SMTP id bi2-20020a0565120e8200b004fe536f4b12mr5593167lfb.53.1692008111724;
-        Mon, 14 Aug 2023 03:15:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEEca0li3s2cCXU3KqOsIHIl+enh83DStfRjmgDfbqbNRd44kTmw2r9zOvatsjVNqOxQyJB2A==
-X-Received: by 2002:a05:6512:e82:b0:4fe:536f:4b12 with SMTP id bi2-20020a0565120e8200b004fe536f4b12mr5593146lfb.53.1692008111297;
-        Mon, 14 Aug 2023 03:15:11 -0700 (PDT)
-Received: from [192.168.8.105] (dynamic-046-114-244-033.46.114.pool.telefonica.de. [46.114.244.33])
-        by smtp.gmail.com with ESMTPSA id p16-20020a05600c205000b003fe26bf65e7sm13778145wmg.13.2023.08.14.03.15.09
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aXChxHQ1/Bi6hu4HBpoNe1d5uOB9c+b+DjWb1LSg1rU=;
+        b=MAPnCuLwRrVwyVRj6EkpUNfACG39ekh3wh+K6pDPiJR5CsiQVp1ytH/nEPGXR7zV7O
+         EyiCUj0yMd6/FizaFnvi5/unnEJpSB+qZSDEMgEehX90yxDmTIlSY/zr7Xdcw4+d2Oqm
+         hq+7AE0tEHaX787S+OINUVrG9OaWhvMnB/CjLK/qofAg6ZAK/3fzI4LKmgV1qMpotMtg
+         XgkrfUuSWsHXwMFKtDKGnJiIOXBCgvAJqHKlPLBBZyB1FkCZU6nmednQ7Kl0v4dANNL0
+         GNPfXcGXzLtmo54MogvKwCYyD3BiKiMK/4VK/CtK//9y9YfHKeJnhN8OWxHYlJ3bfrFk
+         qtgw==
+X-Gm-Message-State: AOJu0YxT2Au1RQ+mGHYQL8vo3ObmTHnYjcIus4pcekds8cDPuI//FntP
+	p1LvVvrlWuh9Kj65wkB6Icg2NiBxmlG6NfssZcFDpsA0I1ql3Vj2QxkcQ+bo0OCkrHHysLSJzGk
+	wPAkN+vtYYvM3b1zN
+X-Received: by 2002:adf:dcc3:0:b0:319:735c:73e1 with SMTP id x3-20020adfdcc3000000b00319735c73e1mr3249037wrm.4.1692015472621;
+        Mon, 14 Aug 2023 05:17:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG/IKihKd7BxzA/CCF3CBxVyGLYCDXKh91VoCNk14O4oY/rxNI9ShzAU/QZmZzWvgneSWo+pA==
+X-Received: by 2002:adf:dcc3:0:b0:319:735c:73e1 with SMTP id x3-20020adfdcc3000000b00319735c73e1mr3249009wrm.4.1692015472254;
+        Mon, 14 Aug 2023 05:17:52 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id k13-20020a5d428d000000b0030ada01ca78sm14327977wrq.10.2023.08.14.05.17.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Aug 2023 03:15:10 -0700 (PDT)
-Message-ID: <ff259694-eb1b-771a-faaf-b8119b899615@redhat.com>
-Date: Mon, 14 Aug 2023 12:15:08 +0200
+        Mon, 14 Aug 2023 05:17:51 -0700 (PDT)
+Message-ID: <1324af1b-f8ca-c316-4a7c-2ea75a602ffb@redhat.com>
+Date: Mon, 14 Aug 2023 14:17:49 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -53,80 +55,287 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [kvm-unit-tests PATCH 2/2] Link with "-z noexecstack" to avoid
- warning from newer versions of ld
-To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Nico_B=c3=b6hr?=
- <nrb@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>, Andrew Jones
- <andrew.jones@linux.dev>, kvmarm@lists.linux.dev,
- linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Nico Boehr <nrb@linux.ibm.com>
-References: <20230623125416.481755-1-thuth@redhat.com>
- <20230623125416.481755-3-thuth@redhat.com> <ZJWrKtnflTrskPkX@google.com>
- <fc70263c-b7af-d8e0-14f4-4ffcde67aa3e@redhat.com>
- <ZJoSYnZGYrAj11RN@google.com>
-From: Thomas Huth <thuth@redhat.com>
-In-Reply-To: <ZJoSYnZGYrAj11RN@google.com>
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v3 27/27] KVM: arm64: nv: Add support for HCRX_EL2
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Mark Brown
+ <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Will Deacon <will@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>,
+ Chase Conklin <chase.conklin@arm.com>,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Darren Hart <darren@os.amperecomputing.com>,
+ Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20230808114711.2013842-1-maz@kernel.org>
+ <20230808114711.2013842-28-maz@kernel.org>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230808114711.2013842-28-maz@kernel.org>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 27/06/2023 00.34, Sean Christopherson wrote:
-> On Fri, Jun 23, 2023, Thomas Huth wrote:
->> On 23/06/2023 16.24, Sean Christopherson wrote:
->>> On Fri, Jun 23, 2023, Thomas Huth wrote:
->>>> Newer versions of ld (from binutils 2.40) complain on s390x and x86:
->>>>
->>>>    ld: warning: s390x/cpu.o: missing .note.GNU-stack section implies
->>>>                 executable stack
->>>>    ld: NOTE: This behaviour is deprecated and will be removed in a
->>>>              future version of the linker
->>>>
->>>> We can silence these warnings by using "-z noexecstack" for linking
->>>> (which should not have any real influence on the kvm-unit-tests since
->>>> the information from the ELF header is not used here anyway, so it's
->>>> just cosmetics).
->>>>
->>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>> ---
->>>>    Makefile | 2 +-
->>>>    1 file changed, 1 insertion(+), 1 deletion(-)
->>>>
->>>> diff --git a/Makefile b/Makefile
->>>> index 0e5d85a1..20f7137c 100644
->>>> --- a/Makefile
->>>> +++ b/Makefile
->>>> @@ -96,7 +96,7 @@ CFLAGS += -Woverride-init -Wmissing-prototypes -Wstrict-prototypes
->>>>    autodepend-flags = -MMD -MF $(dir $*).$(notdir $*).d
->>>> -LDFLAGS += -nostdlib
->>>> +LDFLAGS += -nostdlib -z noexecstack
->>>
->>> Drat, the pull request[1] I sent to Paolo yesterday only fixes x86[2].
-...
->>> Paolo, want me to redo the pull request to drop the x86-specific patch?
->>
->> I can also respin my patch on top of your series later ... the problem
->> currently also only seems to happen on x86 and s390x, on ppc64 and aarch64,
->> the linker does not complain ... so maybe it's even better to do it
->> per-architecture only anyway? Opinions?
-> 
-> I don't think it makes sense to do this per-arch, other architectures likely aren't
-> problematic purely because of linker specific behavior, e.g. see
-> 
-> https://patches.linaro.org/project/binutils/patch/1506025575-1559-1-git-send-email-jim.wilson@linaro.org
+Hi Marc,
 
-Ok, I've pushed now my patches since other people were running into this 
-issue, too (see 
-https://lore.kernel.org/kvm/20230809091717.1549-1-nrb@linux.ibm.com/ ).
+On 8/8/23 13:47, Marc Zyngier wrote:
+> HCRX_EL2 has an interesting effect on HFGITR_EL2, as it conditions
+> the traps of TLBI*nXS.
+>
+> Expand the FGT support to add a new Fine Grained Filter that will
+> get checked when the instruction gets trapped, allowing the shadow
+> register to override the trap as needed.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_arm.h        |  5 ++
+>  arch/arm64/include/asm/kvm_host.h       |  1 +
+>  arch/arm64/kvm/emulate-nested.c         | 94 ++++++++++++++++---------
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 15 +++-
+>  arch/arm64/kvm/nested.c                 |  3 +-
+>  arch/arm64/kvm/sys_regs.c               |  2 +
+>  6 files changed, 83 insertions(+), 37 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index d229f238c3b6..137f732789c9 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -369,6 +369,11 @@
+>  #define __HDFGWTR_EL2_MASK	~__HDFGWTR_EL2_nMASK
+>  #define __HDFGWTR_EL2_nMASK	GENMASK(62, 60)
+>  
+> +/* Similar definitions for HCRX_EL2 */
+> +#define __HCRX_EL2_RES0		(GENMASK(63, 16) | GENMASK(13, 12))
+> +#define __HCRX_EL2_MASK		(0)
+> +#define __HCRX_EL2_nMASK	(GENMASK(15, 14) | GENMASK(4, 0))
+> +
+>  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+>  #define HPFAR_MASK	(~UL(0xf))
+>  /*
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index cb1c5c54cedd..93c541111dea 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -380,6 +380,7 @@ enum vcpu_sysreg {
+>  	CPTR_EL2,	/* Architectural Feature Trap Register (EL2) */
+>  	HSTR_EL2,	/* Hypervisor System Trap Register */
+>  	HACR_EL2,	/* Hypervisor Auxiliary Control Register */
+> +	HCRX_EL2,	/* Extended Hypervisor Configuration Register */
+>  	TTBR0_EL2,	/* Translation Table Base Register 0 (EL2) */
+>  	TTBR1_EL2,	/* Translation Table Base Register 1 (EL2) */
+>  	TCR_EL2,	/* Translation Control Register (EL2) */
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index 4497666db45d..35f2f051af97 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -425,11 +425,13 @@ static const complex_condition_check ccc[] = {
+>   * [13:10]	enum fgt_group_id (4 bits)
+>   * [19:14]	bit number in the FGT register (6 bits)
+>   * [20]		trap polarity (1 bit)
+> - * [62:21]	Unused (42 bits)
+> + * [25:21]	FG filter (5 bits)
+> + * [62:26]	Unused (37 bits)
+>   * [63]		RES0 - Must be zero, as lost on insertion in the xarray
+>   */
+>  #define TC_CGT_BITS	10
+>  #define TC_FGT_BITS	4
+> +#define TC_FGF_BITS	5
+>  
+>  union trap_config {
+>  	u64	val;
+> @@ -438,7 +440,8 @@ union trap_config {
+>  		unsigned long	fgt:TC_FGT_BITS; /* Fing Grained Trap id */
+>  		unsigned long	bit:6;		 /* Bit number */
+>  		unsigned long	pol:1;		 /* Polarity */
+> -		unsigned long	unk:42;		 /* Unknown */
+> +		unsigned long	fgf:TC_FGF_BITS; /* Fine Grained Filter */
+> +		unsigned long	unk:37;		 /* Unknown */
+>  		unsigned long	mbz:1;		 /* Must Be Zero */
+>  	};
+>  };
+> @@ -939,7 +942,15 @@ enum fgt_group_id {
+>  	__NR_FGT_GROUP_IDS__
+>  };
+>  
+> -#define SR_FGT(sr, g, b, p)					\
+> +enum fg_filter_id {
+> +	__NO_FGF__,
+> +	HCRX_FGTnXS,
+> +
+> +	/* Must be last */
+> +	__NR_FG_FILTER_IDS__
+> +};
+> +
+> +#define SR_FGF(sr, g, b, p, f)					\
+>  	{							\
+>  		.encoding	= sr,				\
+>  		.end		= sr,				\
+> @@ -947,9 +958,12 @@ enum fgt_group_id {
+>  			.fgt = g ## _GROUP,			\
+>  			.bit = g ## _EL2_ ## b ## _SHIFT,	\
+>  			.pol = p,				\
+> +			.fgf = f,				\
+>  		},						\
+>  	}
+>  
+> +#define SR_FGT(sr, g, b, p)	SR_FGF(sr, g, b, p, __NO_FGF__)
+> +
+>  static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
+>  	/* HFGRTR_EL2, HFGWTR_EL2 */
+>  	SR_FGT(SYS_TPIDR2_EL0,		HFGxTR, nTPIDR2_EL0, 0),
+> @@ -1053,37 +1067,37 @@ static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
+>  	SR_FGT(OP_TLBI_ASIDE1OS, 	HFGITR, TLBIASIDE1OS, 1),
+>  	SR_FGT(OP_TLBI_VAE1OS, 		HFGITR, TLBIVAE1OS, 1),
+>  	SR_FGT(OP_TLBI_VMALLE1OS, 	HFGITR, TLBIVMALLE1OS, 1),
+> -	/* FIXME: nXS variants must be checked against HCRX_EL2.FGTnXS */
+> -	SR_FGT(OP_TLBI_VAALE1NXS, 	HFGITR, TLBIVAALE1, 1),
+> -	SR_FGT(OP_TLBI_VALE1NXS, 	HFGITR, TLBIVALE1, 1),
+> -	SR_FGT(OP_TLBI_VAAE1NXS, 	HFGITR, TLBIVAAE1, 1),
+> -	SR_FGT(OP_TLBI_ASIDE1NXS, 	HFGITR, TLBIASIDE1, 1),
+> -	SR_FGT(OP_TLBI_VAE1NXS, 	HFGITR, TLBIVAE1, 1),
+> -	SR_FGT(OP_TLBI_VMALLE1NXS, 	HFGITR, TLBIVMALLE1, 1),
+> -	SR_FGT(OP_TLBI_RVAALE1NXS, 	HFGITR, TLBIRVAALE1, 1),
+> -	SR_FGT(OP_TLBI_RVALE1NXS, 	HFGITR, TLBIRVALE1, 1),
+> -	SR_FGT(OP_TLBI_RVAAE1NXS, 	HFGITR, TLBIRVAAE1, 1),
+> -	SR_FGT(OP_TLBI_RVAE1NXS, 	HFGITR, TLBIRVAE1, 1),
+> -	SR_FGT(OP_TLBI_RVAALE1ISNXS, 	HFGITR, TLBIRVAALE1IS, 1),
+> -	SR_FGT(OP_TLBI_RVALE1ISNXS, 	HFGITR, TLBIRVALE1IS, 1),
+> -	SR_FGT(OP_TLBI_RVAAE1ISNXS, 	HFGITR, TLBIRVAAE1IS, 1),
+> -	SR_FGT(OP_TLBI_RVAE1ISNXS, 	HFGITR, TLBIRVAE1IS, 1),
+> -	SR_FGT(OP_TLBI_VAALE1ISNXS, 	HFGITR, TLBIVAALE1IS, 1),
+> -	SR_FGT(OP_TLBI_VALE1ISNXS, 	HFGITR, TLBIVALE1IS, 1),
+> -	SR_FGT(OP_TLBI_VAAE1ISNXS, 	HFGITR, TLBIVAAE1IS, 1),
+> -	SR_FGT(OP_TLBI_ASIDE1ISNXS, 	HFGITR, TLBIASIDE1IS, 1),
+> -	SR_FGT(OP_TLBI_VAE1ISNXS, 	HFGITR, TLBIVAE1IS, 1),
+> -	SR_FGT(OP_TLBI_VMALLE1ISNXS, 	HFGITR, TLBIVMALLE1IS, 1),
+> -	SR_FGT(OP_TLBI_RVAALE1OSNXS, 	HFGITR, TLBIRVAALE1OS, 1),
+> -	SR_FGT(OP_TLBI_RVALE1OSNXS, 	HFGITR, TLBIRVALE1OS, 1),
+> -	SR_FGT(OP_TLBI_RVAAE1OSNXS, 	HFGITR, TLBIRVAAE1OS, 1),
+> -	SR_FGT(OP_TLBI_RVAE1OSNXS, 	HFGITR, TLBIRVAE1OS, 1),
+> -	SR_FGT(OP_TLBI_VAALE1OSNXS, 	HFGITR, TLBIVAALE1OS, 1),
+> -	SR_FGT(OP_TLBI_VALE1OSNXS, 	HFGITR, TLBIVALE1OS, 1),
+> -	SR_FGT(OP_TLBI_VAAE1OSNXS, 	HFGITR, TLBIVAAE1OS, 1),
+> -	SR_FGT(OP_TLBI_ASIDE1OSNXS, 	HFGITR, TLBIASIDE1OS, 1),
+> -	SR_FGT(OP_TLBI_VAE1OSNXS, 	HFGITR, TLBIVAE1OS, 1),
+> -	SR_FGT(OP_TLBI_VMALLE1OSNXS, 	HFGITR, TLBIVMALLE1OS, 1),
+> +	/* nXS variants must be checked against HCRX_EL2.FGTnXS */
+> +	SR_FGF(OP_TLBI_VAALE1NXS, 	HFGITR, TLBIVAALE1, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VALE1NXS, 	HFGITR, TLBIVALE1, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VAAE1NXS, 	HFGITR, TLBIVAAE1, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_ASIDE1NXS, 	HFGITR, TLBIASIDE1, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VAE1NXS, 	HFGITR, TLBIVAE1, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VMALLE1NXS, 	HFGITR, TLBIVMALLE1, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVAALE1NXS, 	HFGITR, TLBIRVAALE1, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVALE1NXS, 	HFGITR, TLBIRVALE1, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVAAE1NXS, 	HFGITR, TLBIRVAAE1, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVAE1NXS, 	HFGITR, TLBIRVAE1, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVAALE1ISNXS, 	HFGITR, TLBIRVAALE1IS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVALE1ISNXS, 	HFGITR, TLBIRVALE1IS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVAAE1ISNXS, 	HFGITR, TLBIRVAAE1IS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVAE1ISNXS, 	HFGITR, TLBIRVAE1IS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VAALE1ISNXS, 	HFGITR, TLBIVAALE1IS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VALE1ISNXS, 	HFGITR, TLBIVALE1IS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VAAE1ISNXS, 	HFGITR, TLBIVAAE1IS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_ASIDE1ISNXS, 	HFGITR, TLBIASIDE1IS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VAE1ISNXS, 	HFGITR, TLBIVAE1IS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VMALLE1ISNXS, 	HFGITR, TLBIVMALLE1IS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVAALE1OSNXS, 	HFGITR, TLBIRVAALE1OS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVALE1OSNXS, 	HFGITR, TLBIRVALE1OS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVAAE1OSNXS, 	HFGITR, TLBIRVAAE1OS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVAE1OSNXS, 	HFGITR, TLBIRVAE1OS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VAALE1OSNXS, 	HFGITR, TLBIVAALE1OS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VALE1OSNXS, 	HFGITR, TLBIVALE1OS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VAAE1OSNXS, 	HFGITR, TLBIVAAE1OS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_ASIDE1OSNXS, 	HFGITR, TLBIASIDE1OS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VAE1OSNXS, 	HFGITR, TLBIVAE1OS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VMALLE1OSNXS, 	HFGITR, TLBIVMALLE1OS, 1, HCRX_FGTnXS),
+>  	SR_FGT(OP_AT_S1E1WP, 		HFGITR, ATS1E1WP, 1),
+>  	SR_FGT(OP_AT_S1E1RP, 		HFGITR, ATS1E1RP, 1),
+>  	SR_FGT(OP_AT_S1E0W, 		HFGITR, ATS1E0W, 1),
+> @@ -1598,6 +1612,7 @@ int __init populate_nv_trap_config(void)
+>  	BUILD_BUG_ON(sizeof(union trap_config) != sizeof(void *));
+>  	BUILD_BUG_ON(__NR_TRAP_GROUP_IDS__ > BIT(TC_CGT_BITS));
+>  	BUILD_BUG_ON(__NR_FGT_GROUP_IDS__ > BIT(TC_FGT_BITS));
+> +	BUILD_BUG_ON(__NR_FG_FILTER_IDS__ > BIT(TC_FGF_BITS));
+>  
+>  	for (int i = 0; i < ARRAY_SIZE(encoding_to_cgt); i++) {
+>  		const struct encoding_to_trap_config *cgt = &encoding_to_cgt[i];
+> @@ -1779,6 +1794,17 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+>  
+>  	case HFGITR_GROUP:
+>  		val = sanitised_sys_reg(vcpu, HFGITR_EL2);
+> +		switch (tc.fgf) {
+> +			u64 tmp;
+> +
+> +		case __NO_FGF__:
+> +			break;
+> +
+> +		case HCRX_FGTnXS:
+> +			tmp = sanitised_sys_reg(vcpu, HCRX_EL2);
+> +			if (tmp & HCRX_EL2_FGTnXS)
+> +				tc.fgt = __NO_FGT_GROUP__;
+> +		}
+>  		break;
+>  
+>  	case __NR_FGT_GROUP_IDS__:
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 060c5a0409e5..3acf6d77e324 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -197,8 +197,19 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
+>  	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+>  
+> -	if (cpus_have_final_cap(ARM64_HAS_HCX))
+> -		write_sysreg_s(HCRX_GUEST_FLAGS, SYS_HCRX_EL2);
+> +	if (cpus_have_final_cap(ARM64_HAS_HCX)) {
+> +		u64 hcrx = HCRX_GUEST_FLAGS;
+> +		if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
+> +			u64 clr = 0, set = 0;
+> +
+> +			compute_clr_set(vcpu, HCRX_EL2, clr, set);
+> +
+> +			hcrx |= set;
+> +			hcrx &= ~clr;
+> +		}
+> +
+> +		write_sysreg_s(hcrx, SYS_HCRX_EL2);
+> +	}
+>  
+>  	__activate_traps_hfgxtr(vcpu);
+>  }
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 3facd8918ae3..042695a210ce 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -117,7 +117,8 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+>  		break;
+>  
+>  	case SYS_ID_AA64MMFR1_EL1:
+> -		val &= (NV_FTR(MMFR1, PAN)	|
+> +		val &= (NV_FTR(MMFR1, HCX)	|
+> +			NV_FTR(MMFR1, PAN)	|
+>  			NV_FTR(MMFR1, LO)	|
+>  			NV_FTR(MMFR1, HPDS)	|
+>  			NV_FTR(MMFR1, VH)	|
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index dfd72b3a625f..374b21f08fc3 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2372,6 +2372,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	EL2_REG(HFGITR_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(HACR_EL2, access_rw, reset_val, 0),
+>  
+> +	EL2_REG(HCRX_EL2, access_rw, reset_val, 0),
+> +
+>  	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(TTBR1_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(TCR_EL2, access_rw, reset_val, TCR_EL2_RES1),
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Sean, could you please rebase your series now?
-
-  Thanks,
-   Thomas
-
+Eric
 
