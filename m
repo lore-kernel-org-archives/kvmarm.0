@@ -1,109 +1,225 @@
-Received: from out-66.mta1.migadu.com (out-66.mta1.migadu.com [95.215.58.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C242BA48
-	for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 15:33:47 +0000 (UTC)
-Message-ID: <b0d83c9d-01f4-2432-c685-6b81379bbbe5@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1692027225;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2z83Z7AAlfg2aJmhEVCpilSC/vkY0HO8xW/4lgpjv/I=;
-	b=bh26xqCJH4JPI1/0xJSRsrxA7Gf/Pg06czxpzN3s/CEZoikKcOtNazjG6s0RK6ZQj/K+Hg
-	7F1evmLOI7wpOcnW5Ok+eO4ohp1c9hER8Sb+o+o+ThQsMcUA4g9OzLP4iHSBIUElQDS9Dq
-	7h4S5M7ecM3YvCCjR3RYg8qQfgOJ/+o=
-Date: Mon, 14 Aug 2023 23:33:14 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA642C2FC
+	for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 17:19:11 +0000 (UTC)
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2b9bf52cd08so67216801fa.2
+        for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 10:19:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692033550; x=1692638350;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VkOCc1UnVqEdtYIvDZQGF3UZeTk4v9/essnibGCTT3k=;
+        b=ye7/GP/1AAUJE6h+ADrqtIXItl89N9ZQO6L69KSwjAc+A0GK+VWbzfX7DuC8w82pX0
+         7sYzN5soH7ESFuJMRbpBd+2c20o/2JBuec1OSMBn76f+vxpK9iU04CFNuQuXlkACYSx7
+         7yZoVeYymbxUMfMBr+B9mHXNBuad61ur+sbO5gd3vOLnCrJegk1Vc8796u6CEXUGv0/o
+         lYRZo3ZEqCbGukPcfh1fULGwISZsXbyxfjFIqeSzZ6Ex7qVzcy70xaqdZyoTJbF98nM2
+         ITbUnVvqKvbPW8oKhzVncD5dQhr/fddvYh+gl4sa0GcXYmadwyPEusmFema4KJWhH2hm
+         ERHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692033550; x=1692638350;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VkOCc1UnVqEdtYIvDZQGF3UZeTk4v9/essnibGCTT3k=;
+        b=gVaWNfdZrj3EE0FbCWvw6H28/EgpKevAU2Z3x6KKu5Z2lX02lQDRExGBW/s/4tQZS9
+         BHoyMRL9cgnhS5eWTvVdkDQDIzmqADvbEaLKqGjUdsJ2FplfpvwOqEkvCpk8AiUlEqBr
+         /44k3HK1AEg7evC2Y2IifsJ4+NbuCYN/5wk6tF+9RPXYZtlM9cdCfg6rb/6VOxeqUrbr
+         /S+bCVBuo8KU+TNBJeJ5cQWCXOSCo/6+C7TuMsZSaKp7EiEseJQ/Y4PWb6N0YDsmZbSv
+         ACdYYpG3AdS51pxCaoqxwlC/+DLCm3Ct7E3s4sqJKBtfJrW0AE46yZColNbHuA4XuwUM
+         elgw==
+X-Gm-Message-State: AOJu0Yy1dtDmmdy4ndyzSu4tcs3n5N3wmNJov/aDFdyKQObDJLfWkDCg
+	qzH4bWFJSMkYKt+JK7/pDu0E6GpbDnEXqiMKJ/XHaQ==
+X-Google-Smtp-Source: AGHT+IHMBlcXyCB0LLH7DNuuz96NEnTLRmp9fpUbSgLkji1mDQhaGBice4ewAvqhzRVYlrpUQbK8QFPcRdBsTqYYb5w=
+X-Received: by 2002:a2e:860e:0:b0:2b6:e12f:267 with SMTP id
+ a14-20020a2e860e000000b002b6e12f0267mr7212014lji.5.1692033549538; Mon, 14 Aug
+ 2023 10:19:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Subject: Re: [PATCH -next] KVM: arm64: Remove unused declarations
-Content-Language: en-US
-To: Yue Haibing <yuehaibing@huawei.com>, maz@kernel.org,
- oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com,
- yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
- gshan@redhat.com
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-References: <20230814140636.45988-1-yuehaibing@huawei.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zenghui Yu <zenghui.yu@linux.dev>
-In-Reply-To: <20230814140636.45988-1-yuehaibing@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20230808114711.2013842-1-maz@kernel.org> <20230808114711.2013842-20-maz@kernel.org>
+In-Reply-To: <20230808114711.2013842-20-maz@kernel.org>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Mon, 14 Aug 2023 10:18:57 -0700
+Message-ID: <CAAdAUtiaewy_xAnS2gm-6YhOq=ednvj0_VO=Ld4+UY+9E5BF8w@mail.gmail.com>
+Subject: Re: [PATCH v3 19/27] KVM: arm64: nv: Add fine grained trap forwarding infrastructure
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, 
+	Catalin Marinas <catalin.marinas@arm.com>, Eric Auger <eric.auger@redhat.com>, 
+	Mark Brown <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Andre Przywara <andre.przywara@arm.com>, 
+	Chase Conklin <chase.conklin@arm.com>, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, 
+	Darren Hart <darren@os.amperecomputing.com>, Miguel Luis <miguel.luis@oracle.com>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2023/8/14 22:06, Yue Haibing wrote:
-> Commit 53692908b0f5 ("KVM: arm/arm64: vgic: Fix source vcpu issues for GICv2 SGI")
-> removed vgic_v2_set_npie()/vgic_v3_set_npie() but not the declarations.
-> Commit 29eb5a3c57f7 ("KVM: arm64: Handle PtrAuth traps early") left behind
-> kvm_arm_vcpu_ptrauth_trap(), remove it.
-> Commit 2a0c343386ae ("KVM: arm64: Initialize trap registers for protected VMs")
-> declared but never implemented kvm_init_protected_traps() and
-> commit cf5d318865e2 ("arm/arm64: KVM: Turn off vcpus on PSCI shutdown/reboot")
-> declared but never implemented force_vm_exit().
-> 
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+Hi Marc,
+
+On Tue, Aug 8, 2023 at 4:47=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Fine Grained Traps are fun. Not.
+>
+> Implement the fine grained trap forwarding, reusing the Coarse Grained
+> Traps infrastructure previously implemented.
+>
+> Each sysreg/instruction inserted in the xarray gets a FGT group
+> (vaguely equivalent to a register number), a bit number in that register,
+> and a polarity.
+>
+> It is then pretty easy to check the FGT state at handling time, just
+> like we do for the coarse version (it is just faster).
+>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/arm64/include/asm/kvm_host.h | 6 ------
->  arch/arm64/kvm/vgic/vgic.h        | 2 --
->  2 files changed, 8 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index d7b1403a3fb2..7dbcee57f565 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -967,8 +967,6 @@ void kvm_arm_resume_guest(struct kvm *kvm);
->  #define kvm_call_hyp_nvhe(f, ...) f(__VA_ARGS__)
->  #endif /* __KVM_NVHE_HYPERVISOR__ */
->  
-> -void force_vm_exit(const cpumask_t *mask);
-> -
->  int handle_exit(struct kvm_vcpu *vcpu, int exception_index);
->  void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index);
->  
-> @@ -1049,8 +1047,6 @@ static inline bool kvm_system_needs_idmapped_vectors(void)
->  	return cpus_have_const_cap(ARM64_SPECTRE_V3A);
+>  arch/arm64/kvm/emulate-nested.c | 78 ++++++++++++++++++++++++++++++++-
+>  1 file changed, 77 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nes=
+ted.c
+> index cd0544c3577e..af75c2775638 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -928,6 +928,27 @@ static const struct encoding_to_trap_config encoding=
+_to_cgt[] __initconst =3D {
+>
+>  static DEFINE_XARRAY(sr_forward_xa);
+>
+> +enum fgt_group_id {
+> +       __NO_FGT_GROUP__,
+> +
+> +       /* Must be last */
+> +       __NR_FGT_GROUP_IDS__
+> +};
+> +
+> +#define SR_FGT(sr, g, b, p)                                    \
+> +       {                                                       \
+> +               .encoding       =3D sr,                           \
+> +               .end            =3D sr,                           \
+> +               .tc             =3D {                             \
+> +                       .fgt =3D g ## _GROUP,                     \
+> +                       .bit =3D g ## _EL2_ ## b ## _SHIFT,       \
+> +                       .pol =3D p,                               \
+> +               },                                              \
+> +       }
+> +
+> +static const struct encoding_to_trap_config encoding_to_fgt[] __initcons=
+t =3D {
+> +};
+> +
+>  static union trap_config get_trap_config(u32 sysreg)
+>  {
+>         return (union trap_config) {
+> @@ -941,6 +962,7 @@ int __init populate_nv_trap_config(void)
+>
+>         BUILD_BUG_ON(sizeof(union trap_config) !=3D sizeof(void *));
+>         BUILD_BUG_ON(__NR_TRAP_GROUP_IDS__ > BIT(TC_CGT_BITS));
+> +       BUILD_BUG_ON(__NR_FGT_GROUP_IDS__ > BIT(TC_FGT_BITS));
+>
+>         for (int i =3D 0; i < ARRAY_SIZE(encoding_to_cgt); i++) {
+>                 const struct encoding_to_trap_config *cgt =3D &encoding_t=
+o_cgt[i];
+> @@ -963,6 +985,34 @@ int __init populate_nv_trap_config(void)
+>         kvm_info("nv: %ld coarse grained trap handlers\n",
+>                  ARRAY_SIZE(encoding_to_cgt));
+>
+> +       if (!cpus_have_final_cap(ARM64_HAS_FGT))
+> +               goto check_mcb;
+> +
+> +       for (int i =3D 0; i < ARRAY_SIZE(encoding_to_fgt); i++) {
+> +               const struct encoding_to_trap_config *fgt =3D &encoding_t=
+o_fgt[i];
+> +               union trap_config tc;
+> +
+> +               tc =3D get_trap_config(fgt->encoding);
+> +
+> +               if (tc.fgt) {
+> +                       kvm_err("Duplicate FGT for (%d, %d, %d, %d, %d)\n=
+",
+> +                               sys_reg_Op0(fgt->encoding),
+> +                               sys_reg_Op1(fgt->encoding),
+> +                               sys_reg_CRn(fgt->encoding),
+> +                               sys_reg_CRm(fgt->encoding),
+> +                               sys_reg_Op2(fgt->encoding));
+> +                       ret =3D -EINVAL;
+> +               }
+> +
+> +               tc.val |=3D fgt->tc.val;
+> +               xa_store(&sr_forward_xa, fgt->encoding,
+> +                        xa_mk_value(tc.val), GFP_KERNEL);
+> +       }
+> +
+> +       kvm_info("nv: %ld fine grained trap handlers\n",
+> +                ARRAY_SIZE(encoding_to_fgt));
+> +
+> +check_mcb:
+>         for (int id =3D __MULTIPLE_CONTROL_BITS__;
+>              id < (__COMPLEX_CONDITIONS__ - 1);
+>              id++) {
+> @@ -1031,13 +1081,26 @@ static enum trap_behaviour compute_trap_behaviour=
+(struct kvm_vcpu *vcpu,
+>         return __do_compute_trap_behaviour(vcpu, tc.cgt, b);
 >  }
->  
-> -void kvm_arm_vcpu_ptrauth_trap(struct kvm_vcpu *vcpu);
-> -
->  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
->  static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
->  
-> @@ -1118,8 +1114,6 @@ static inline bool kvm_vm_is_protected(struct kvm *kvm)
->  	return false;
->  }
->  
-> -void kvm_init_protected_traps(struct kvm_vcpu *vcpu);
-> -
->  int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
->  bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
->  
-> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-> index f9923beedd27..0ab09b0d4440 100644
-> --- a/arch/arm64/kvm/vgic/vgic.h
-> +++ b/arch/arm64/kvm/vgic/vgic.h
-> @@ -199,7 +199,6 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu);
->  void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
->  void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr);
->  void vgic_v2_set_underflow(struct kvm_vcpu *vcpu);
-> -void vgic_v2_set_npie(struct kvm_vcpu *vcpu);
->  int vgic_v2_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr);
->  int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
->  			 int offset, u32 *val);
-> @@ -233,7 +232,6 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu);
->  void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
->  void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr);
->  void vgic_v3_set_underflow(struct kvm_vcpu *vcpu);
-> -void vgic_v3_set_npie(struct kvm_vcpu *vcpu);
->  void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
->  void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
->  void vgic_v3_enable(struct kvm_vcpu *vcpu);
+>
+> +static bool check_fgt_bit(u64 val, const union trap_config tc)
+> +{
+> +       return ((val >> tc.bit) & 1) =3D=3D tc.pol;
+> +}
+> +
+> +#define sanitised_sys_reg(vcpu, reg)                   \
+> +       ({                                              \
+> +               u64 __val;                              \
+> +               __val =3D __vcpu_sys_reg(vcpu, reg);      \
+> +               __val &=3D ~__ ## reg ## _RES0;           \
+> +               (__val);                                \
+> +       })
+> +
+>  bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+>  {
+>         union trap_config tc;
+>         enum trap_behaviour b;
+>         bool is_read;
+>         u32 sysreg;
+> -       u64 esr;
+> +       u64 esr, val;
+>
+>         if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
+>                 return false;
+> @@ -1060,6 +1123,19 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+>         if (!tc.val)
+>                 return false;
+>
+> +       switch ((enum fgt_group_id)tc.fgt) {
+> +       case __NO_FGT_GROUP__:
+> +               break;
+> +
+> +       case __NR_FGT_GROUP_IDS__:
+> +               /* Something is really wrong, bail out */
+> +               WARN_ONCE(1, "__NR_FGT_GROUP_IDS__");
+> +               return false;
 
-Looks good,
+Do we need a default clause here to catch unexpected tc.fgt values?
 
-Reviewed-by: Zenghui Yu <zenghui.yu@linux.dev>
+> +       }
+> +
+> +       if (tc.fgt !=3D __NO_FGT_GROUP__ && check_fgt_bit(val, tc))
+> +               goto inject;
+> +
+>         b =3D compute_trap_behaviour(vcpu, tc);
+>
+>         if (((b & BEHAVE_FORWARD_READ) && is_read) ||
+> --
+> 2.34.1
+>
+>
+
+Thanks,
+Jing
