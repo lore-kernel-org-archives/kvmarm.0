@@ -1,314 +1,215 @@
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2107.outbound.protection.outlook.com [40.107.237.107])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 633981C3E
-	for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 03:11:27 +0000 (UTC)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=j2jE3e3MdBKY+o4xbnV/CKGp+tKhUWF3+/AHOaO66Fe6/GCbUEnCVk8G4/6ZFsLBW5sDMhSkOUD2TJ3azcbayJrk0pSzYELe2bpnsWqVYfKHTGdyAr75k364cN/S/L1SJPsegTUiR5i2ieUlEUtGw92VQ5Rhh+A5UJnEvT8bz5wuzdOJ65ayd/w5C76Re5a641eXeEgMH1UQx6vwofrR3uEyy2ZeP01VmSzEtWTzoqrUmWpXatJoSZMYR2nBRSIAtLlykXm0QBxEYN9k1WHTSpSRVN+Y2TcOnZABPETk6R8sZr/YbJ1/2CM/GrOCcaWbeX+UcgzHDwWl73e0rppVQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mRDzB3aExq86YiQZ0pvp3QAv6QJHLKcJnBjY+XMJ5cE=;
- b=fOXM8rW/sPQdVbwqFmkSG85NgiZOvxYb1gdkX/PrrqaxZ5I5K7rwsiCEVxh+0vBa2g4G7LKIwJbYjtHVuExuDEjF/PIxGwgApVtuqqtbJs3vydrIaleneD/4YQ2fonJY6+hL517s4oicKP/1N6WePIiipCE3q/vNwb4Pdw3FpYQOqqaU7RINA+x+j4as7pFeVizRv2THmwjuH5n1qliFx5MqJW4Y2SHbZNbVDSmftRDgRnCmNdP6sBV/nMwA68b/evRt12dI0Mi0wfFrCcBcIyEqykq2jo1e576NoulXC+jYPscHmCHwKLNgY+OgMkhosBC606LI436Uq7lWcEKm+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mRDzB3aExq86YiQZ0pvp3QAv6QJHLKcJnBjY+XMJ5cE=;
- b=U8DbK9eRYcXVl5hLxROjhzdWF/t7tc34p4QPCjti10/tHUVAe082r2wWwZl74ujufFIrEfa1zA8AcbKNke79oWzjK25n1wkCIGoaqRoCSR5StGstStWjdI2bWd4lEy4SYlULM1V8Vldtrggxz4R6rpYvP0lMxbQ+3dd20agMXXc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
- PH0PR01MB6501.prod.exchangelabs.com (2603:10b6:510:15::23) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6678.24; Mon, 14 Aug 2023 03:11:21 +0000
-Received: from DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::d62f:d774:15b0:4a40]) by DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::d62f:d774:15b0:4a40%4]) with mapi id 15.20.6678.022; Mon, 14 Aug 2023
- 03:11:21 +0000
-From: Huang Shijie <shijie@os.amperecomputing.com>
-To: maz@kernel.org
-Cc: oliver.upton@linux.dev,
-	james.morse@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	pbonzini@redhat.com,
-	peterz@infradead.org,
-	ingo@redhat.com,
-	acme@kernel.org,
-	mark.rutland@arm.com,
-	alexander.shishkin@linux.intel.com,
-	jolsa@kernel.org,
-	namhyung@kernel.org,
-	irogers@google.com,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-perf-users@vger.kernel.org,
-	patches@amperecomputing.com,
-	zwang@amperecomputing.com,
-	Huang Shijie <shijie@os.amperecomputing.com>
-Subject: [PATCH v3] KVM:arm64: reconfigurate the event filters for guest context
-Date: Mon, 14 Aug 2023 11:06:45 +0800
-Message-Id: <20230814030645.11632-1-shijie@os.amperecomputing.com>
-X-Mailer: git-send-email 2.39.2
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: CH0PR04CA0118.namprd04.prod.outlook.com
- (2603:10b6:610:75::33) To DM8PR01MB6824.prod.exchangelabs.com
- (2603:10b6:8:23::24)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4330D3D72;
+	Mon, 14 Aug 2023 05:03:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691989428; x=1723525428;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=n730I7LnsBMTzO0hIu0jhr/OVU3wcQTCIKg62HLGcJY=;
+  b=H1hI6Quop8WbCnyICOrnZu47sbGZrFPh3omon/J5st0dgkJDmFnq5YA9
+   x/X0y33waP44DprWGP3E+2g+pXuHbgNFuXye3m+E2fzZK40FkK448GEM8
+   hHkAZAvmvHmrMSPxgPXxNPsg5z+V3hGACKjHjGwBANL2xqloNj6Df3jjA
+   if26xSFag9r9mkEQUO2kgmcm7xBFGvFh68JDZkm46hnCIWwJlI0kwJukf
+   mdIcy8jFjHHCC9irm2J/8oOTxtOvuP3qwI2Q6FCrURloixk98w3DD5rZ2
+   BQ5luoUfHYC9A4KAU4ahcKHCsormG9cMZYWiWGiJV/fX0lOXhsgxlqerd
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10801"; a="402945957"
+X-IronPort-AV: E=Sophos;i="6.01,171,1684825200"; 
+   d="scan'208";a="402945957"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2023 22:03:46 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10801"; a="1063930391"
+X-IronPort-AV: E=Sophos;i="6.01,171,1684825200"; 
+   d="scan'208";a="1063930391"
+Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
+  by fmsmga005.fm.intel.com with ESMTP; 13 Aug 2023 22:03:43 -0700
+Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qVPjy-0009NC-19;
+	Mon, 14 Aug 2023 05:03:42 +0000
+Date: Mon, 14 Aug 2023 13:03:02 +0800
+From: kernel test robot <lkp@intel.com>
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Huang Shijie <shijie@os.amperecomputing.com>,
+	Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: pmu: Resync EL0 state on counter rotation
+Message-ID: <202308141209.Xtm2r0tL-lkp@intel.com>
+References: <20230811180520.131727-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM8PR01MB6824:EE_|PH0PR01MB6501:EE_
-X-MS-Office365-Filtering-Correlation-Id: a5f92c55-15d5-4890-c9be-08db9c742233
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	46UedWsdpBUlkwlLw0OWEa0VsFiQaerf8H9r1t8/zzriQpACKAGV/rg7wGrkQ8DbawoV9ybqObzBPqJr8HQGDP/BFsK+yZCF2TQLa3fqbmihcqJctBq48628mvzsTsvT1sTHypJ+/lD3Ocj7oqfGRHeA2D/3hyPnToS3YEpc84GAhKa8nrEK/uoV3ml7mALdYIYugVg5cHJUhgTrx6iZOjNwoo48iDflxenHbS662ih2Gc/A4unD4RbJoomAhma2+pwu2X4AKggPd0dAhO3gtddCvOi70e2KrtdoZLyn/F48rTowh3qO62DMPc4T8EQeo+LaeDEzqK39BHLsgIam8b8sHkn3a78KOlKKd2h0kpxI1mHBpxEWQutg16jm0qUnTRBz/cuzv4gbEtRYNzX/ITXd8GV/MkfeMWP+RpfuYGPxwQYjWdsyvbnlZKrxRwYCqOZm3kds+gy07kShQFn3UrUpmyLNQA/JYbzg4TH3cZScA6jgpIawjjbEOckNaKWJlTHpknLaDXaEQ1/2RkzGaMXfhqXBwpOZsW/zOz+iFK/ZA9cP8J/3KgcHHEwGRLfEbDpVCF3jnG1Hi74dNTElaemIMW8J6dkJhdXmkVisPm4=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR01MB6824.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230028)(39840400004)(346002)(376002)(136003)(396003)(366004)(186006)(1800799006)(451199021)(6512007)(6486002)(6666004)(52116002)(966005)(86362001)(38350700002)(38100700002)(83380400001)(26005)(6506007)(107886003)(1076003)(2906002)(478600001)(2616005)(8676002)(66556008)(66476007)(8936002)(5660300002)(7416002)(41300700001)(66946007)(316002)(4326008)(6916009);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?MSUAMzOsYMA2frSXAk91pODPzEBTPYbpRoBQi46UwbstKFQnOGORqDUw1ryJ?=
- =?us-ascii?Q?5Rp6LFz/0O3IsdvTPfPhxrpHrXH3JYjYkD0VIg+ffo3RGT3CSA/3VegcnCiQ?=
- =?us-ascii?Q?+aPlLotyEAA5KH/vf5KMIPyTJ0LYwGpEd7ReoDAKgQhHpSDlljhbXkIjGy2J?=
- =?us-ascii?Q?F704xtEIqF11EG6CO7etAbIsvlhYkfJYgtgFtz2TQSm2VvdSyJ6FkPzkMP80?=
- =?us-ascii?Q?Lfongfibx2dCdiCV084sae8B6qc1ko1RFID47Y37epDuQ3/ftPIi2KoOYKoz?=
- =?us-ascii?Q?VQ80d0OJz1GmthZdx5xSoue8zB4NijjOR4CusYFLrk9tNupdaVtIcdXYkg5C?=
- =?us-ascii?Q?8d5s7XieHdlAmdl8B9caOCWRELNopZrGGvECAAgwkvIQZ83xbEN2BQ+27cmY?=
- =?us-ascii?Q?LlCsuIWtikJoZJHAxKLnJblkMFEuMes2iRFWt0Ym3ULEwlNEpr/mYS7+QdmS?=
- =?us-ascii?Q?HSc8B4OTQ2UoxQ6xslZRIBvzSKGJlZQQdcn0ZXF7REg65OIgr4szCfhgSWHP?=
- =?us-ascii?Q?r45MeD+aQ3O3euqQ00pFiRJn/8ZUucWGy5vxw8CFyqXEc4J12pdElb5MXBkG?=
- =?us-ascii?Q?QURK9+JPRzfZ9c70XhDMhAirNWJdxx9UwTomEsRizZuszPCmf049q27r7vZS?=
- =?us-ascii?Q?3ZBlc2Crpk2a2qBzBCT4aywinEzvt6mFAChLffUKUHhSJ7wiykdQv1InANWI?=
- =?us-ascii?Q?LH3jXydIOKA7tcojh3bfCE54d2iqNZm4FG32PAAhB8XlZjAveWBsNxLlwKbg?=
- =?us-ascii?Q?icWHBbk4Odwf8eUdPHHS5zGE9MiWip9iHhdzhAf8yHs3JN0EgQkN1KZKtFdR?=
- =?us-ascii?Q?tmceJb7KYq25nWmrDwzMKxPBPAJF8dm8L1j2sDdm5lCHSrtPgo8MnoJvwdzA?=
- =?us-ascii?Q?LIkTCrpcH4ghzfCFHbbaOaoqYdr4vwaGR/Sx7kpHjIbiOq1ozCLPkh4LafOO?=
- =?us-ascii?Q?Nn5/y27gh5ijtkjN5adGko7wlvWGBFCag9fcyDia2wXZij+4rSVMt2CLKmaa?=
- =?us-ascii?Q?Zbsnqfe03zCWkB/WpZMiMfYS8WpwPzAqe5pto+EH/jnX6WnlOS+Hvu3M/0oh?=
- =?us-ascii?Q?613ztd9WgMaCo9H8ybGDYQUTJbsCpWdw2n75f6TYi6mnBjZcn6WaNuBLnCIJ?=
- =?us-ascii?Q?ybdDzOrzChySsIp2DKcc4AL7BIkKyaE+dbRd14HEPW6LLBDmgo2gb83Q5CED?=
- =?us-ascii?Q?qYSnuUG+llYpXeJzzom8F3JtRyyBvwF/0U8l3kSiS0LQu+NZUzgF/yKrvKyL?=
- =?us-ascii?Q?mTR+9ViiKZhdHRDENiCFLf6GV80FDd6tQpWAT/sU/pH2bGvYdK0N9SfjPatW?=
- =?us-ascii?Q?A0gkhLnY5Oqv2ImaDQE1nn/KvfTIQsBwDB9WIS9n7SuoX57u0/iLo0MomOa/?=
- =?us-ascii?Q?E+eAa+Hc0tnlcIF9QRAXYCp6VqyrwxPdQLC1gJyREHbcExdeqH8UC6T0kOMT?=
- =?us-ascii?Q?4wckoDEV7yKgLqDx55QXUQjMzu2Y6ggz/Iv/hts/w85j7tZv8m7WeMRMbqu5?=
- =?us-ascii?Q?51QJPujJHXvCVezjT/3cJZkokR7njazxigfjij07AKSLkNdqxdiClfnxurqw?=
- =?us-ascii?Q?UxleNf7WcDEOsAktpFBVInEuv8eCCmfYOKC2TZVVe64mBVW3R9doWr8MTKVH?=
- =?us-ascii?Q?3KnxtdfiOrYOkpyh5SAe8Sc=3D?=
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a5f92c55-15d5-4890-c9be-08db9c742233
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Aug 2023 03:11:21.5751
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pC5O0TbSpMjRlha7tR6Q/l8R+eyN/XCPb4yT7k0V1ZZWk+acNaoj3lJpBplLk0G8OApDXYH+EMR4xpmvbexEtyRaAZIU9/Ghg95lx7QCeNv7oJZKjS8NSRLfQjirrtFJ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR01MB6501
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230811180520.131727-1-maz@kernel.org>
 
-1.) Background.
-   1.1) In arm64, start a guest with Qemu which is running as a VMM of KVM,
-        and bind the guest to core 33 and run program "a" in guest.
-        The code of "a" shows below:
-   	----------------------------------------------------------
-		#include <stdio.h>
+Hi Marc,
 
-		int main()
-		{
-			unsigned long i = 0;
+kernel test robot noticed the following build errors:
 
-			for (;;) {
-				i++;
-			}
+[auto build test ERROR on kvmarm/next]
+[also build test ERROR on arm64/for-next/core soc/for-next linus/master v6.5-rc6 next-20230809]
+[cannot apply to arm/for-next arm/fixes]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-			printf("i:%ld\n", i);
-			return 0;
-		}
-   	----------------------------------------------------------
+url:    https://github.com/intel-lab-lkp/linux/commits/Marc-Zyngier/KVM-arm64-pmu-Resync-EL0-state-on-counter-rotation/20230812-020712
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
+patch link:    https://lore.kernel.org/r/20230811180520.131727-1-maz%40kernel.org
+patch subject: [PATCH] KVM: arm64: pmu: Resync EL0 state on counter rotation
+config: arm-allmodconfig (https://download.01.org/0day-ci/archive/20230814/202308141209.Xtm2r0tL-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 12.3.0
+reproduce: (https://download.01.org/0day-ci/archive/20230814/202308141209.Xtm2r0tL-lkp@intel.com/reproduce)
 
-   1.2) Use the following perf command in host:
-      #perf stat -e cycles:G,cycles:H -C 33 -I 1000 sleep 1
-          #           time             counts unit events
-               1.000817400      3,299,471,572      cycles:G
-               1.000817400          3,240,586      cycles:H
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308141209.Xtm2r0tL-lkp@intel.com/
 
-       This result is correct, my cpu's frequency is 3.3G.
+All errors (new ones prefixed by >>):
 
-   1.3) Use the following perf command in host:
-      #perf stat -e cycles:G,cycles:H -C 33 -d -d  -I 1000 sleep 1
-            time             counts unit events
-     1.000831480        153,634,097      cycles:G                                                                (70.03%)
-     1.000831480      3,147,940,599      cycles:H                                                                (70.03%)
-     1.000831480      1,143,598,527      L1-dcache-loads                                                         (70.03%)
-     1.000831480              9,986      L1-dcache-load-misses            #    0.00% of all L1-dcache accesses   (70.03%)
-     1.000831480    <not supported>      LLC-loads
-     1.000831480    <not supported>      LLC-load-misses
-     1.000831480        580,887,696      L1-icache-loads                                                         (70.03%)
-     1.000831480             77,855      L1-icache-load-misses            #    0.01% of all L1-icache accesses   (70.03%)
-     1.000831480      6,112,224,612      dTLB-loads                                                              (70.03%)
-     1.000831480             16,222      dTLB-load-misses                 #    0.00% of all dTLB cache accesses  (69.94%)
-     1.000831480        590,015,996      iTLB-loads                                                              (59.95%)
-     1.000831480                505      iTLB-load-misses                 #    0.00% of all iTLB cache accesses  (59.95%)
+   drivers/perf/arm_pmuv3.c:144:51: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_RD'
+     144 |         [C(L1D)][C(OP_READ)][C(RESULT_MISS)]    = ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_RD,
+         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmuv3.h:122:65: warning: initialized field overwritten [-Woverride-init]
+     122 | #define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_WR                       0x0041
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:145:51: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_CACHE_WR'
+     145 |         [C(L1D)][C(OP_WRITE)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_L1D_CACHE_WR,
+         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmuv3.h:122:65: note: (near initialization for 'armv8_vulcan_perf_cache_map[0][1][0]')
+     122 | #define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_WR                       0x0041
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:145:51: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_CACHE_WR'
+     145 |         [C(L1D)][C(OP_WRITE)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_L1D_CACHE_WR,
+         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmuv3.h:124:65: warning: initialized field overwritten [-Woverride-init]
+     124 | #define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_WR                0x0043
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:146:51: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_WR'
+     146 |         [C(L1D)][C(OP_WRITE)][C(RESULT_MISS)]   = ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_WR,
+         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmuv3.h:124:65: note: (near initialization for 'armv8_vulcan_perf_cache_map[0][1][1]')
+     124 | #define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_WR                0x0043
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:146:51: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_WR'
+     146 |         [C(L1D)][C(OP_WRITE)][C(RESULT_MISS)]   = ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_WR,
+         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmuv3.h:133:65: warning: initialized field overwritten [-Woverride-init]
+     133 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD                         0x004E
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:148:51: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD'
+     148 |         [C(DTLB)][C(OP_READ)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD,
+         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmuv3.h:133:65: note: (near initialization for 'armv8_vulcan_perf_cache_map[3][0][0]')
+     133 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD                         0x004E
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:148:51: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD'
+     148 |         [C(DTLB)][C(OP_READ)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD,
+         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmuv3.h:134:65: warning: initialized field overwritten [-Woverride-init]
+     134 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR                         0x004F
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:149:52: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR'
+     149 |         [C(DTLB)][C(OP_WRITE)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR,
+         |                                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmuv3.h:134:65: note: (near initialization for 'armv8_vulcan_perf_cache_map[3][1][0]')
+     134 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR                         0x004F
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:149:52: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR'
+     149 |         [C(DTLB)][C(OP_WRITE)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR,
+         |                                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmuv3.h:131:65: warning: initialized field overwritten [-Woverride-init]
+     131 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD                  0x004C
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:150:51: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD'
+     150 |         [C(DTLB)][C(OP_READ)][C(RESULT_MISS)]   = ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD,
+         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmuv3.h:131:65: note: (near initialization for 'armv8_vulcan_perf_cache_map[3][0][1]')
+     131 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD                  0x004C
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:150:51: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD'
+     150 |         [C(DTLB)][C(OP_READ)][C(RESULT_MISS)]   = ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD,
+         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmuv3.h:132:65: warning: initialized field overwritten [-Woverride-init]
+     132 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR                  0x004D
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:151:51: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR'
+     151 |         [C(DTLB)][C(OP_WRITE)][C(RESULT_MISS)]  = ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR,
+         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmuv3.h:132:65: note: (near initialization for 'armv8_vulcan_perf_cache_map[3][1][1]')
+     132 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR                  0x004D
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:151:51: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR'
+     151 |         [C(DTLB)][C(OP_WRITE)][C(RESULT_MISS)]  = ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR,
+         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmuv3.h:148:65: warning: initialized field overwritten [-Woverride-init]
+     148 | #define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD                      0x0060
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:153:51: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD'
+     153 |         [C(NODE)][C(OP_READ)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD,
+         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmuv3.h:148:65: note: (near initialization for 'armv8_vulcan_perf_cache_map[6][0][0]')
+     148 | #define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD                      0x0060
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:153:51: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD'
+     153 |         [C(NODE)][C(OP_READ)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD,
+         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmuv3.h:149:65: warning: initialized field overwritten [-Woverride-init]
+     149 | #define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR                      0x0061
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:154:52: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR'
+     154 |         [C(NODE)][C(OP_WRITE)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR,
+         |                                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmuv3.h:149:65: note: (near initialization for 'armv8_vulcan_perf_cache_map[6][1][0]')
+     149 | #define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR                      0x0061
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:154:52: note: in expansion of macro 'ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR'
+     154 |         [C(NODE)][C(OP_WRITE)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR,
+         |                                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/perf/arm_pmuv3.c: In function 'armv8pmu_start':
+>> drivers/perf/arm_pmuv3.c:776:9: error: implicit declaration of function 'kvm_vcpu_pmu_resync_el0' [-Werror=implicit-function-declaration]
+     776 |         kvm_vcpu_pmu_resync_el0();
+         |         ^~~~~~~~~~~~~~~~~~~~~~~
+   cc1: some warnings being treated as errors
 
-       This result is wrong. The "cycle:G" should be nearly 3.3G.
 
-2.) Root cause.
-	There is only 7 counters in my arm64 platform:
-	  (one cycle counter) + (6 normal counters)
+vim +/kvm_vcpu_pmu_resync_el0 +776 drivers/perf/arm_pmuv3.c
 
-	In 1.3 above, we will use 10 event counters.
-	Since we only have 7 counters, the perf core will trigger
-       	multiplexing in hrtimer:
-	     perf_mux_hrtimer_restart() --> perf_rotate_context().
+   758	
+   759	static void armv8pmu_start(struct arm_pmu *cpu_pmu)
+   760	{
+   761		struct perf_event_context *ctx;
+   762		int nr_user = 0;
+   763	
+   764		ctx = perf_cpu_task_ctx();
+   765		if (ctx)
+   766			nr_user = ctx->nr_user;
+   767	
+   768		if (sysctl_perf_user_access && nr_user)
+   769			armv8pmu_enable_user_access(cpu_pmu);
+   770		else
+   771			armv8pmu_disable_user_access();
+   772	
+   773		/* Enable all counters */
+   774		armv8pmu_pmcr_write(armv8pmu_pmcr_read() | ARMV8_PMU_PMCR_E);
+   775	
+ > 776		kvm_vcpu_pmu_resync_el0();
+   777	}
+   778	
 
-       If the hrtimer occurs when the host is running, it's fine.
-       If the hrtimer occurs when the guest is running,
-       the perf_rotate_context() will program the PMU with filters for
-       host context. The KVM does not have a chance to restore
-       PMU registers with kvm_vcpu_pmu_restore_guest().
-       The PMU does not work correctly, so we got wrong result.
-
-3.) About this patch.
-	3.1) Add a week arch_perf_mux() for perf_mux_hrtimer_handler().
-        3.2) In the arm64, implement the arch_perf_mux().
-		Make a KVM_REQ_PMU_RESTORE_GUEST request if the
-		perf multiplexing occurs in the guest context.
-
-4.) Test result of this patch:
-      #perf stat -e cycles:G,cycles:H -C 33 -d -d  -I 1000 sleep 1
-            time             counts unit events
-     1.001006400      3,298,348,656      cycles:G                                                                (70.03%)
-     1.001006400          3,144,532      cycles:H                                                                (70.03%)
-     1.001006400            941,149      L1-dcache-loads                                                         (70.03%)
-     1.001006400             17,937      L1-dcache-load-misses            #    1.91% of all L1-dcache accesses   (70.03%)
-     1.001006400    <not supported>      LLC-loads
-     1.001006400    <not supported>      LLC-load-misses
-     1.001006400          1,101,889      L1-icache-loads                                                         (70.03%)
-     1.001006400            121,638      L1-icache-load-misses            #   11.04% of all L1-icache accesses   (70.03%)
-     1.001006400          1,031,228      dTLB-loads                                                              (70.03%)
-     1.001006400             26,952      dTLB-load-misses                 #    2.61% of all dTLB cache accesses  (69.93%)
-     1.001006400          1,030,678      iTLB-loads                                                              (59.94%)
-     1.001006400                338      iTLB-load-misses                 #    0.03% of all iTLB cache accesses  (59.94%)
-
-    The result is correct. The "cycle:G" is nearly 3.3G now.
-
-Signed-off-by: Huang Shijie <shijie@os.amperecomputing.com>
----
-
-v1 --> v2:
-	Do not change perf/core code, only change the ARM64 kvm code.
-	v1: https://lkml.org/lkml/2023/8/8/1465
-
-v2 --> v3:
-	Disdurb the perf/core again.
-	v2:http://lists.infradead.org/pipermail/linux-arm-kernel/2023-August/858427.html
-
----
- arch/arm64/include/asm/kvm_host.h |  1 +
- arch/arm64/kvm/arm.c              | 18 ++++++++++++++++++
- include/linux/perf_event.h        |  2 ++
- kernel/events/core.c              |  5 +++++
- 4 files changed, 26 insertions(+)
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 8b6096753740..151810445d79 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -49,6 +49,7 @@
- #define KVM_REQ_RELOAD_GICv4	KVM_ARCH_REQ(4)
- #define KVM_REQ_RELOAD_PMU	KVM_ARCH_REQ(5)
- #define KVM_REQ_SUSPEND		KVM_ARCH_REQ(6)
-+#define KVM_REQ_PMU_RESTORE_GUEST	KVM_ARCH_REQ(7)
- 
- #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
- 				     KVM_DIRTY_LOG_INITIALLY_SET)
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index c2c14059f6a8..53d6555912d1 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -792,6 +792,9 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
- 			preempt_enable();
- 		}
- 
-+		if (kvm_check_request(KVM_REQ_PMU_RESTORE_GUEST, vcpu))
-+			kvm_vcpu_pmu_restore_guest(vcpu);
-+
- 		if (kvm_check_request(KVM_REQ_RELOAD_PMU, vcpu))
- 			kvm_pmu_handle_pmcr(vcpu,
- 					    __vcpu_sys_reg(vcpu, PMCR_EL0));
-@@ -878,6 +881,21 @@ static int noinstr kvm_arm_vcpu_enter_exit(struct kvm_vcpu *vcpu)
- 	return ret;
- }
- 
-+void arch_perf_mux(bool rotations)
-+{
-+	struct kvm_vcpu *vcpu;
-+
-+	if (!kvm_arm_support_pmu_v3() || !has_vhe())
-+		return;
-+
-+	vcpu = kvm_get_running_vcpu();
-+	if (!vcpu)
-+		return;
-+
-+	if (rotations)
-+		kvm_make_request(KVM_REQ_PMU_RESTORE_GUEST, vcpu);
-+}
-+
- /**
-  * kvm_arch_vcpu_ioctl_run - the main VCPU run function to execute guest code
-  * @vcpu:	The VCPU pointer
-diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
-index 2166a69e3bf2..07ef1aa00226 100644
---- a/include/linux/perf_event.h
-+++ b/include/linux/perf_event.h
-@@ -1860,6 +1860,8 @@ extern void arch_perf_update_userpage(struct perf_event *event,
- 				      struct perf_event_mmap_page *userpg,
- 				      u64 now);
- 
-+extern void arch_perf_mux(bool rotations);
-+
- #ifdef CONFIG_MMU
- extern __weak u64 arch_perf_get_page_size(struct mm_struct *mm, unsigned long addr);
- #endif
-diff --git a/kernel/events/core.c b/kernel/events/core.c
-index 6fd9272eec6e..eefb28198dd1 100644
---- a/kernel/events/core.c
-+++ b/kernel/events/core.c
-@@ -1059,6 +1059,10 @@ static void perf_cgroup_switch(struct task_struct *task)
- }
- #endif
- 
-+void __weak arch_perf_mux(bool rotations)
-+{
-+}
-+
- /*
-  * set default to be dependent on timer tick just
-  * like original code
-@@ -1076,6 +1080,7 @@ static enum hrtimer_restart perf_mux_hrtimer_handler(struct hrtimer *hr)
- 
- 	cpc = container_of(hr, struct perf_cpu_pmu_context, hrtimer);
- 	rotations = perf_rotate_context(cpc);
-+	arch_perf_mux(rotations);
- 
- 	raw_spin_lock(&cpc->hrtimer_lock);
- 	if (rotations)
 -- 
-2.39.2
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
