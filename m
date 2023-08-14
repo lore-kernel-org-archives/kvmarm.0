@@ -1,80 +1,133 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83C21A925
-	for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 23:16:56 +0000 (UTC)
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-589e3ac6d76so32207507b3.1
-        for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 16:16:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EE6CA93A
+	for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 23:21:44 +0000 (UTC)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1bc3d94d40fso42004445ad.3
+        for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 16:21:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692055015; x=1692659815;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XJ2VqA/vSflBac203Z0ZgYzciS8CSN/YrZrCQZvgAqE=;
-        b=OxYYoyUAQaeaCm0MRnDlT6YpDWZ0eDciFaHbssoRAoYyzjd2o0WDI1UOBCOxL+kMJc
-         5YD0NK8r1uDf6e0Jatvt+d6P+BWzIhvUYoQQhLjByYnja3UBlbXrGoFe9hBNCSmd3Por
-         77GbZptlqN3qID9Yi7OuuYNKro+YD6l9Q6jj3+sUYzoK08H9wS69cXzUBziAMKx3xld/
-         w96wxOhnL73JzIXq2lGp1mV73XNcE7Ps2NUvuAohRziILKeBly43Y5qUc7dLaviqameq
-         hE+kTcQyTkgYI/ntVGdkCqeR0EWDhGYDk0kgtw+nvGshr7JSpUCtOXj/qFAa5uoFZbVm
-         YkSw==
+        d=chromium.org; s=google; t=1692055304; x=1692660104;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zDgteNssk7bldWg1S9G58zrFCCsMMUu+wXIpurB+HOk=;
+        b=f0Ak5IcltrDFdkQCDY8pIN2Q+ApDStplykSnlDyPTlJ5hOzrqc9PWJCJjuzY2a8RJ+
+         g8xVrAL3nMB+kfcdXe60p9qKEe3GlaSBVzwWcARsfm76j54TnQAq99JEPb1dmu6zAVNx
+         W/EJPZgrIcJBBWdgJxFVqDLwjpYw5EdzIukns=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692055015; x=1692659815;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XJ2VqA/vSflBac203Z0ZgYzciS8CSN/YrZrCQZvgAqE=;
-        b=A5OJu82rpWoFO3C0i/YfCbZFzZoHplEumZQTMhGSUkYv1uUHdyqpuCbfRSD7lMgbOd
-         8dvn/Jy6qK9q+2BUIVrI3czutLl5vhvh9I+lsd87JOuyvFHJ6RGwA+xMczbTNteB7GqM
-         Vdx5nrtRZkGaU13dqvBAPMCis6tkPeXP9DLeYkkkF9lF61SkZc07AABbD9x3aoy7/diq
-         q7PmwshFSlmHeWJj53HiLDF1jImuXIlN+kXyqtg+8BCeexPIBVPjBYUwfoMNx2I2QTe9
-         MBH6gihVAuR04sKjA7ZSFegIb8L+5iF0jWccO8GZy6VlYKMY95aUZBCqZM+T95UMdp60
-         RP9g==
-X-Gm-Message-State: AOJu0YzTud7jW7y++XLCgvpxJ1enmiOcVsojdMTpt1XTe3YxVurw0M64
-	lKIWPRpRel9MfaTk3UoFRW4i/nj8I8k=
-X-Google-Smtp-Source: AGHT+IGO0AL45xRymm0BjDJln3deMA/9LFqjImi7JInSUnl69k7Qer+RG4sudzofLCbCQa+Rdgz1TuaGB1A=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:709:b0:57a:118a:f31 with SMTP id
- bs9-20020a05690c070900b0057a118a0f31mr180335ywb.7.1692055015309; Mon, 14 Aug
- 2023 16:16:55 -0700 (PDT)
-Date: Mon, 14 Aug 2023 16:16:53 -0700
-In-Reply-To: <20230811045127.3308641-1-rananta@google.com>
+        d=1e100.net; s=20221208; t=1692055304; x=1692660104;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zDgteNssk7bldWg1S9G58zrFCCsMMUu+wXIpurB+HOk=;
+        b=MtWdxfWY+Pa7rQe1WR/Yr8eQxJPsy7tTiIBTaOeLUhkqiXquVE3qlqlU/IcqwD+gbC
+         v15iYGbJ+AShk2Kl2Iw7B53DwsWrQ6Tk81jEaDMmBL6ssUMKHCsOcWLvUOX2aHfTR61X
+         WEE1zHET5hB7RDyj7eI76ogyRZ1KmchCI7omBb23ftV37zQVMVEFodbGZTdd1JQHrKU2
+         FW4BWoreyLWBQt1eG+CejojOjxhl9nyF0jsQWRxN4juRafzq7TGcIVtutSdRE6LNxh2w
+         7Mo8mxCgaxAJQd5AqSKqD/KGbkRdUEvabaLK3Zji756qfjRL/fwnz+geQkAah3zNKpo1
+         MabA==
+X-Gm-Message-State: AOJu0YxSa0uJ2lhh+A+R+nRbegy7FQyT/CUZNV4U/uYrSsZSDAwTOs3I
+	mnxLQYqxsMe0wipV+4degraNUQ==
+X-Google-Smtp-Source: AGHT+IHSGL8C59m4WskNFhunf6W+tABRL2W8v1BYu6fmf1+j7vX3+mrOp1twYX7SxuE7dHDeO2B60Q==
+X-Received: by 2002:a17:902:e802:b0:1bc:422a:b9fd with SMTP id u2-20020a170902e80200b001bc422ab9fdmr13245083plg.13.1692055304507;
+        Mon, 14 Aug 2023 16:21:44 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id c13-20020a170902d48d00b001bdcd4b1616sm5310621plg.260.2023.08.14.16.21.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Aug 2023 16:21:43 -0700 (PDT)
+Date: Mon, 14 Aug 2023 16:21:43 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Marco Elver <elver@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Steven Rostedt <rostedt@goodmis.org>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Tom Rix <trix@redhat.com>, Miguel Ojeda <ojeda@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org,
+	llvm@lists.linux.dev, Dmitry Vyukov <dvyukov@google.com>,
+	Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com,
+	linux-toolchains@vger.kernel.org
+Subject: Re: [PATCH v4 1/4] compiler_types: Introduce the Clang
+ __preserve_most function attribute
+Message-ID: <202308141620.E16B93279@keescook>
+References: <20230811151847.1594958-1-elver@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230811045127.3308641-1-rananta@google.com>
-Message-ID: <ZNq15SZ+53umvOfx@google.com>
-Subject: Re: [PATCH v9 00/14] KVM: arm64: Add support for FEAT_TLBIRANGE
-From: Sean Christopherson <seanjc@google.com>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhuacai@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Jing Zhang <jingzhangos@google.com>, 
-	Reiji Watanabe <reijiw@google.com>, Colton Lewis <coltonlewis@google.com>, 
-	David Matlack <dmatlack@google.com>, Fuad Tabba <tabba@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230811151847.1594958-1-elver@google.com>
 
-On Fri, Aug 11, 2023, Raghavendra Rao Ananta wrote:
-> The series is based off of upstream v6.5-rc1.
+On Fri, Aug 11, 2023 at 05:18:38PM +0200, Marco Elver wrote:
+> [1]: "On X86-64 and AArch64 targets, this attribute changes the calling
+> convention of a function. The preserve_most calling convention attempts
+> to make the code in the caller as unintrusive as possible. This
+> convention behaves identically to the C calling convention on how
+> arguments and return values are passed, but it uses a different set of
+> caller/callee-saved registers. This alleviates the burden of saving and
+> recovering a large register set before and after the call in the caller.
+> If the arguments are passed in callee-saved registers, then they will be
+> preserved by the callee across the call. This doesn't apply for values
+> returned in callee-saved registers.
+> 
+>  * On X86-64 the callee preserves all general purpose registers, except
+>    for R11. R11 can be used as a scratch register. Floating-point
+>    registers (XMMs/YMMs) are not preserved and need to be saved by the
+>    caller.
+> 
+>  * On AArch64 the callee preserve all general purpose registers, except
+>    x0-X8 and X16-X18."
+> 
+> [1] https://clang.llvm.org/docs/AttributeReference.html#preserve-most
+> 
+> Introduce the attribute to compiler_types.h as __preserve_most.
+> 
+> Use of this attribute results in better code generation for calls to
+> very rarely called functions, such as error-reporting functions, or
+> rarely executed slow paths.
+> 
+> Beware that the attribute conflicts with instrumentation calls inserted
+> on function entry which do not use __preserve_most themselves. Notably,
+> function tracing which assumes the normal C calling convention for the
+> given architecture.  Where the attribute is supported, __preserve_most
+> will imply notrace. It is recommended to restrict use of the attribute
+> to functions that should or already disable tracing.
+> 
+> Note: The additional preprocessor check against architecture should not
+> be necessary if __has_attribute() only returns true where supported;
+> also see https://github.com/ClangBuiltLinux/linux/issues/1908. But until
+> __has_attribute() does the right thing, we also guard by known-supported
+> architectures to avoid build warnings on other architectures.
+> 
+> The attribute may be supported by a future GCC version (see
+> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=110899).
+> 
+> Signed-off-by: Marco Elver <elver@google.com>
+> Reviewed-by: Miguel Ojeda <ojeda@kernel.org>
+> Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+> Acked-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+> Acked-by: Mark Rutland <mark.rutland@arm.com>
 
-Lies!  :-)
+Should this go via -mm, the hardening tree, or something else? I'm happy
+to carry it if no one else wants it?
 
-This is based off one of the kvmarm.git topic branches (I didn't bother to figure
-out which one), not v6.5-rc1.
+-Kees
 
-Please try to incorporate git format-patch's "--base" option into your workflow,
-e.g. I do "git format-patch --base=HEAD~$nr" where $nr is the number of patches
-I am posting.
-
-It's not foolproof, e.g. my approach doesn't help if I have a local patch that
-I'm not posting, but 99% of the time it Just Works and eliminates any ambuitity.
-
-You can also do "--base=auto", but that only does the right thing if your series
-has its upstream branch set to the base/tree that you want your patches applied
-to (I use the upstream branch for a completely different purpose for my dev branches).
+-- 
+Kees Cook
