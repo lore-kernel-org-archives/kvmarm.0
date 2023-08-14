@@ -1,225 +1,138 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA642C2FC
-	for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 17:19:11 +0000 (UTC)
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2b9bf52cd08so67216801fa.2
-        for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 10:19:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50A05C2FF
+	for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 17:26:05 +0000 (UTC)
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2b9aa1d3029so70985471fa.2
+        for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 10:26:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692033550; x=1692638350;
+        d=google.com; s=20221208; t=1692033963; x=1692638763;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VkOCc1UnVqEdtYIvDZQGF3UZeTk4v9/essnibGCTT3k=;
-        b=ye7/GP/1AAUJE6h+ADrqtIXItl89N9ZQO6L69KSwjAc+A0GK+VWbzfX7DuC8w82pX0
-         7sYzN5soH7ESFuJMRbpBd+2c20o/2JBuec1OSMBn76f+vxpK9iU04CFNuQuXlkACYSx7
-         7yZoVeYymbxUMfMBr+B9mHXNBuad61ur+sbO5gd3vOLnCrJegk1Vc8796u6CEXUGv0/o
-         lYRZo3ZEqCbGukPcfh1fULGwISZsXbyxfjFIqeSzZ6Ex7qVzcy70xaqdZyoTJbF98nM2
-         ITbUnVvqKvbPW8oKhzVncD5dQhr/fddvYh+gl4sa0GcXYmadwyPEusmFema4KJWhH2hm
-         ERHw==
+        bh=dHxmrdCePoUqIzSXCIXwM34KYJsPYFh6NJ6Wh+gnmsI=;
+        b=r2uHFOiA5ciFaude5QhUyCx0VtHHjcB1mo9ATxg+zSnWITEBxwppqBk7UT3gmL2Scg
+         p6hvgxAv9KZ6AxvaPk3uTHhRJdptHZaR8bs8s4BCsTd7ZCnt7A4mwI9haoGf2WOvfeag
+         2CBX4YgX4MPBR57j7dPd9V6dqVszlmXx26DjqopwRoBMyUfAvodxo7LsGtZKSkC5CT2J
+         BT+qENyOSpoVpiBrWz5b5VZkWZaVgTZuOcm/CE++8uTcC/8OVedx44j4NioXr8p139WF
+         bHzFIVqPGC/36ITOKcuSs7fItQL1qP65GxyZ2f7rNtv/yvaUWgG/BlK0t1RB2dlEJTVc
+         5uTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692033550; x=1692638350;
+        d=1e100.net; s=20221208; t=1692033963; x=1692638763;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VkOCc1UnVqEdtYIvDZQGF3UZeTk4v9/essnibGCTT3k=;
-        b=gVaWNfdZrj3EE0FbCWvw6H28/EgpKevAU2Z3x6KKu5Z2lX02lQDRExGBW/s/4tQZS9
-         BHoyMRL9cgnhS5eWTvVdkDQDIzmqADvbEaLKqGjUdsJ2FplfpvwOqEkvCpk8AiUlEqBr
-         /44k3HK1AEg7evC2Y2IifsJ4+NbuCYN/5wk6tF+9RPXYZtlM9cdCfg6rb/6VOxeqUrbr
-         /S+bCVBuo8KU+TNBJeJ5cQWCXOSCo/6+C7TuMsZSaKp7EiEseJQ/Y4PWb6N0YDsmZbSv
-         ACdYYpG3AdS51pxCaoqxwlC/+DLCm3Ct7E3s4sqJKBtfJrW0AE46yZColNbHuA4XuwUM
-         elgw==
-X-Gm-Message-State: AOJu0Yy1dtDmmdy4ndyzSu4tcs3n5N3wmNJov/aDFdyKQObDJLfWkDCg
-	qzH4bWFJSMkYKt+JK7/pDu0E6GpbDnEXqiMKJ/XHaQ==
-X-Google-Smtp-Source: AGHT+IHMBlcXyCB0LLH7DNuuz96NEnTLRmp9fpUbSgLkji1mDQhaGBice4ewAvqhzRVYlrpUQbK8QFPcRdBsTqYYb5w=
-X-Received: by 2002:a2e:860e:0:b0:2b6:e12f:267 with SMTP id
- a14-20020a2e860e000000b002b6e12f0267mr7212014lji.5.1692033549538; Mon, 14 Aug
- 2023 10:19:09 -0700 (PDT)
+        bh=dHxmrdCePoUqIzSXCIXwM34KYJsPYFh6NJ6Wh+gnmsI=;
+        b=L200mTRHkMr/1qGRptb5X38+4UdJ77lWmGC/cdI41td3FeQVQiQpI8sgqKupNjG9mP
+         Tkghx294eei/tgPCaXMLVbBlalpBX1H+Bi73XJC7/8vlbQS9vx6FLsHxCgCdWjEtwbiR
+         hiQN+jcwGGzqo6Pcyv2fKLfSXwgqj+fLyQUcC3be9aCwUnW35jl0iyD6RvFhrHzc3wnC
+         0Sqo70behUMyI0t7hRB+9ClPYHDPDLB1wMb/2CEECYBoRqkc+48KKQvrA9dnqcAD5mXL
+         r0s6Xt2AzgvYUg6qo4wYCUYDg5VNO/N0Z2F+wedY5+3dBa5LrrxsFlYMseXvbALrRqxL
+         F+SA==
+X-Gm-Message-State: AOJu0YxT9FUM+2U+KH0eaPSDeWfqbjKwep4wgBBRn7HhThjNtfLQEuZi
+	5SshQ4d4jzGhROpqPMFC5TFcKALFGJYMDSrbdWjagQ==
+X-Google-Smtp-Source: AGHT+IEvx93qXFm31EQx1g9kLgdZVLbmq0ikWNBsU81HycBg7bjfUMdmtwNMJShtvqZaEdMGjKolTwK33HGQ1mTqrkc=
+X-Received: by 2002:a2e:87cc:0:b0:2b5:80e0:f18e with SMTP id
+ v12-20020a2e87cc000000b002b580e0f18emr7319550ljj.3.1692033963034; Mon, 14 Aug
+ 2023 10:26:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230808114711.2013842-1-maz@kernel.org> <20230808114711.2013842-20-maz@kernel.org>
-In-Reply-To: <20230808114711.2013842-20-maz@kernel.org>
+References: <20230807162210.2528230-1-jingzhangos@google.com>
+ <20230807162210.2528230-3-jingzhangos@google.com> <878raex8g0.fsf@redhat.com>
+In-Reply-To: <878raex8g0.fsf@redhat.com>
 From: Jing Zhang <jingzhangos@google.com>
-Date: Mon, 14 Aug 2023 10:18:57 -0700
-Message-ID: <CAAdAUtiaewy_xAnS2gm-6YhOq=ednvj0_VO=Ld4+UY+9E5BF8w@mail.gmail.com>
-Subject: Re: [PATCH v3 19/27] KVM: arm64: nv: Add fine grained trap forwarding infrastructure
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, 
-	Catalin Marinas <catalin.marinas@arm.com>, Eric Auger <eric.auger@redhat.com>, 
-	Mark Brown <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Andre Przywara <andre.przywara@arm.com>, 
-	Chase Conklin <chase.conklin@arm.com>, 
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, 
-	Darren Hart <darren@os.amperecomputing.com>, Miguel Luis <miguel.luis@oracle.com>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+Date: Mon, 14 Aug 2023 10:25:51 -0700
+Message-ID: <CAAdAUtivsxqpSE_0BL_OftxzwR=e5Rnugb69Ln841ooJqVXgmA@mail.gmail.com>
+Subject: Re: [PATCH v8 02/11] KVM: arm64: Document KVM_ARM_GET_REG_WRITABLE_MASKS
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Will Deacon <will@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>, 
+	Raghavendra Rao Ananta <rananta@google.com>, Suraj Jitindar Singh <surajjs@amazon.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Marc,
-
-On Tue, Aug 8, 2023 at 4:47=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
+On Mon, Aug 14, 2023 at 2:46=E2=80=AFAM Cornelia Huck <cohuck@redhat.com> w=
+rote:
 >
-> Fine Grained Traps are fun. Not.
+> On Mon, Aug 07 2023, Jing Zhang <jingzhangos@google.com> wrote:
 >
-> Implement the fine grained trap forwarding, reusing the Coarse Grained
-> Traps infrastructure previously implemented.
+> > Add some basic documentation on how to get feature ID register writable
+> > masks from userspace.
+> >
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  Documentation/virt/kvm/api.rst | 29 +++++++++++++++++++++++++++++
+> >  1 file changed, 29 insertions(+)
+> >
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/ap=
+i.rst
+> > index c0ddd3035462..92a9b20f970e 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -6068,6 +6068,35 @@ writes to the CNTVCT_EL0 and CNTPCT_EL0 register=
+s using the SET_ONE_REG
+> >  interface. No error will be returned, but the resulting offset will no=
+t be
+> >  applied.
+> >
+> > +4.139 KVM_ARM_GET_REG_WRITABLE_MASKS
+> > +-------------------------------------------
+> > +
+> > +:Capability: none
+> > +:Architectures: arm64
+> > +:Type: vm ioctl
+> > +:Parameters: struct reg_mask_range (in/out)
+> > +:Returns: 0 on success, < 0 on error
+> > +
+> > +
+> > +::
+> > +
+> > +        #define ARM64_FEATURE_ID_SPACE_SIZE  (3 * 8 * 8)
+> > +
+> > +        struct reg_mask_range {
+> > +                __u64 addr;             /* Pointer to mask array */
+> > +                __u64 reserved[7];
+> > +        };
+> > +
+> > +This ioctl would copy the writable masks for feature ID registers to u=
+serspace.
+> > +The Feature ID space is defined as the System register space in AArch6=
+4 with
+> > +op0=3D=3D3, op1=3D=3D{0, 1, 3}, CRn=3D=3D0, CRm=3D=3D{0-7}, op2=3D=3D{=
+0-7}.
+> > +To get the index in the mask array pointed by ``addr`` for a specified=
+ feature
+> > +ID register, use the macro ``ARM64_FEATURE_ID_SPACE_IDX(op0, op1, crn,=
+ crm, op2)``.
+> > +This allows the userspace to know upfront whether it can actually twea=
+k the
+> > +contents of a feature ID register or not.
+> > +The ``reserved[7]`` is reserved for future use to add other register s=
+pace. For
+> > +feature ID registers, it should be 0, otherwise, KVM may return error.
 >
-> Each sysreg/instruction inserted in the xarray gets a FGT group
-> (vaguely equivalent to a register number), a bit number in that register,
-> and a polarity.
+> In case of future extensions, this means that userspace needs to figure
+> out what the kernel supports via different content in reg_mask_range
+> (i.e. try with a value in one of the currently reserved fields and fall
+> back to using addr only if that doesn't work.) Can we do better?
 >
-> It is then pretty easy to check the FGT state at handling time, just
-> like we do for the coarse version (it is just faster).
->
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/emulate-nested.c | 78 ++++++++++++++++++++++++++++++++-
->  1 file changed, 77 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nes=
-ted.c
-> index cd0544c3577e..af75c2775638 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -928,6 +928,27 @@ static const struct encoding_to_trap_config encoding=
-_to_cgt[] __initconst =3D {
->
->  static DEFINE_XARRAY(sr_forward_xa);
->
-> +enum fgt_group_id {
-> +       __NO_FGT_GROUP__,
-> +
-> +       /* Must be last */
-> +       __NR_FGT_GROUP_IDS__
-> +};
-> +
-> +#define SR_FGT(sr, g, b, p)                                    \
-> +       {                                                       \
-> +               .encoding       =3D sr,                           \
-> +               .end            =3D sr,                           \
-> +               .tc             =3D {                             \
-> +                       .fgt =3D g ## _GROUP,                     \
-> +                       .bit =3D g ## _EL2_ ## b ## _SHIFT,       \
-> +                       .pol =3D p,                               \
-> +               },                                              \
-> +       }
-> +
-> +static const struct encoding_to_trap_config encoding_to_fgt[] __initcons=
-t =3D {
-> +};
-> +
->  static union trap_config get_trap_config(u32 sysreg)
->  {
->         return (union trap_config) {
-> @@ -941,6 +962,7 @@ int __init populate_nv_trap_config(void)
->
->         BUILD_BUG_ON(sizeof(union trap_config) !=3D sizeof(void *));
->         BUILD_BUG_ON(__NR_TRAP_GROUP_IDS__ > BIT(TC_CGT_BITS));
-> +       BUILD_BUG_ON(__NR_FGT_GROUP_IDS__ > BIT(TC_FGT_BITS));
->
->         for (int i =3D 0; i < ARRAY_SIZE(encoding_to_cgt); i++) {
->                 const struct encoding_to_trap_config *cgt =3D &encoding_t=
-o_cgt[i];
-> @@ -963,6 +985,34 @@ int __init populate_nv_trap_config(void)
->         kvm_info("nv: %ld coarse grained trap handlers\n",
->                  ARRAY_SIZE(encoding_to_cgt));
->
-> +       if (!cpus_have_final_cap(ARM64_HAS_FGT))
-> +               goto check_mcb;
-> +
-> +       for (int i =3D 0; i < ARRAY_SIZE(encoding_to_fgt); i++) {
-> +               const struct encoding_to_trap_config *fgt =3D &encoding_t=
-o_fgt[i];
-> +               union trap_config tc;
-> +
-> +               tc =3D get_trap_config(fgt->encoding);
-> +
-> +               if (tc.fgt) {
-> +                       kvm_err("Duplicate FGT for (%d, %d, %d, %d, %d)\n=
-",
-> +                               sys_reg_Op0(fgt->encoding),
-> +                               sys_reg_Op1(fgt->encoding),
-> +                               sys_reg_CRn(fgt->encoding),
-> +                               sys_reg_CRm(fgt->encoding),
-> +                               sys_reg_Op2(fgt->encoding));
-> +                       ret =3D -EINVAL;
-> +               }
-> +
-> +               tc.val |=3D fgt->tc.val;
-> +               xa_store(&sr_forward_xa, fgt->encoding,
-> +                        xa_mk_value(tc.val), GFP_KERNEL);
-> +       }
-> +
-> +       kvm_info("nv: %ld fine grained trap handlers\n",
-> +                ARRAY_SIZE(encoding_to_fgt));
-> +
-> +check_mcb:
->         for (int id =3D __MULTIPLE_CONTROL_BITS__;
->              id < (__COMPLEX_CONDITIONS__ - 1);
->              id++) {
-> @@ -1031,13 +1081,26 @@ static enum trap_behaviour compute_trap_behaviour=
-(struct kvm_vcpu *vcpu,
->         return __do_compute_trap_behaviour(vcpu, tc.cgt, b);
->  }
->
-> +static bool check_fgt_bit(u64 val, const union trap_config tc)
-> +{
-> +       return ((val >> tc.bit) & 1) =3D=3D tc.pol;
-> +}
-> +
-> +#define sanitised_sys_reg(vcpu, reg)                   \
-> +       ({                                              \
-> +               u64 __val;                              \
-> +               __val =3D __vcpu_sys_reg(vcpu, reg);      \
-> +               __val &=3D ~__ ## reg ## _RES0;           \
-> +               (__val);                                \
-> +       })
-> +
->  bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
->  {
->         union trap_config tc;
->         enum trap_behaviour b;
->         bool is_read;
->         u32 sysreg;
-> -       u64 esr;
-> +       u64 esr, val;
->
->         if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
->                 return false;
-> @@ -1060,6 +1123,19 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
->         if (!tc.val)
->                 return false;
->
-> +       switch ((enum fgt_group_id)tc.fgt) {
-> +       case __NO_FGT_GROUP__:
-> +               break;
-> +
-> +       case __NR_FGT_GROUP_IDS__:
-> +               /* Something is really wrong, bail out */
-> +               WARN_ONCE(1, "__NR_FGT_GROUP_IDS__");
-> +               return false;
-
-Do we need a default clause here to catch unexpected tc.fgt values?
-
-> +       }
-> +
-> +       if (tc.fgt !=3D __NO_FGT_GROUP__ && check_fgt_bit(val, tc))
-> +               goto inject;
-> +
->         b =3D compute_trap_behaviour(vcpu, tc);
->
->         if (((b & BEHAVE_FORWARD_READ) && is_read) ||
-> --
-> 2.34.1
->
+> Maybe we could introduce a capability that returns the supported ranges
+> as flags, i.e. now we would return 1 for id regs masks, and for the
+> future case where we have some values in the next reserved field we
+> could return 1 & 2 etc. Would make life easier for userspace that needs
+> to work with different kernels, but might be overkill if reserved[] is
+> more like an insurance without any concrete plans for extensions.
 >
 
-Thanks,
+Maybe it'd be better to leave this to whenever we do need to add other
+range support?
+
 Jing
