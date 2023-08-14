@@ -1,99 +1,103 @@
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1025D528
-	for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 21:08:43 +0000 (UTC)
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2b9b904bb04so76239031fa.1
-        for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 14:08:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10256DF51
+	for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 21:54:34 +0000 (UTC)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-55c964d031aso8936769a12.1
+        for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 14:54:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692047321; x=1692652121;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HSp/PBgFuqjU5FU2wSVwIwvbq+BUoL+z7yaXrbjmk7E=;
-        b=OS9OcTyyhb0MI7YCPjUC8NTPZAqUrVrUllRWSw1QWEtcLSMWO1aXtrg0HUBCj9yqDf
-         qkMl0AjE4N+YwB1uBuRRlsVs1zgxiNdzIROOb0TNV25Fuz5HkyI8Hyv6muEiV9T8Ggzr
-         7NTuZsmwSHxBicLIgMgzvrMnVtcrn1f56FqfQSKaOIplzWK4g6pP48WIbHB5PpMCngzk
-         Yje2kX4dEXTa1+/0oE3kJ6dlBEBApyN4t5zuZ9vJ3tnWeN7PM86YPbgLH01k2wlzYwj0
-         UPL27kWoVw+NW6v7aOqySigoX1koIA0C5FV8OgFovFsK9tzGThAR94nPxD1lEYvi+pCY
-         0Fxw==
+        d=google.com; s=20221208; t=1692050074; x=1692654874;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WLV8cwl+q0+MgeCaKnjEbSXBm+ijn/cuT9eg2QvMQy8=;
+        b=WyQ6Tn/5h37xMsEIDmbWcY+nQiTqqFoftlXVBTiztMb2A7vinkou0FyJxT5Tj+pa31
+         3y4mktmY47itqZcGsKCOeUubQi9MQwPyYS/ntrx9oV/jIdUAoZkwRuGY0yw403B+hUV5
+         PyUzYrySs29/O30p+yDsELGRzby+1aqFcxoBBJ6omQFPygNitIVTJAp2Hnd4R0/QcY2H
+         EgizfgVBfhm/BlB4owWFjSnqlPuhKRjVS+MvDjPpwOsN8USa7haRJjhrCn+/9m5M/b9b
+         HnVauoeuLnwYhNy2SBnjlv/xkJdMMlVKqHESswng1uUarqPNC4oB5B1VogZQC9cpA3Kv
+         gLzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692047321; x=1692652121;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HSp/PBgFuqjU5FU2wSVwIwvbq+BUoL+z7yaXrbjmk7E=;
-        b=Ooyy20RqsvbWQpY2E0/b8ptC22CYDzMyxCbXxrNovP5zvWXHNDL3UOmcEQd6U/7is9
-         iMCp/nl9gQsEy1uoigF93lUS6plKb0J9z7yeUULdRgEzCYSsXv+QNrXh2M51dGsoAdsk
-         /WFZs3W9JDzOElHIE9EW3Qmysri1isVF+81eClHD/17poGLxTmrNLYuoAh76KtV30mHg
-         1LI0IibqQTltIfmr7O6JvMd86zUwdILTz8xY12vMw0HXQNG2d9q52q2H1guQaE5ZytcX
-         tWUPLIVV6EWC+mICvlYXibpLQaaQuK+HRb2Dajzt8Eb0QqY/DRcvxPu9/lqkIDeQm7El
-         C4zQ==
-X-Gm-Message-State: AOJu0YzxuRATlW/+xN8c38y2MWHQuWBk59tBsl39yhpkPeVfKXhJaHs3
-	ckIy/z3hOMbsxFucFA6XJbMnsQiluBDTvBAck6zgRA==
-X-Google-Smtp-Source: AGHT+IEmydD7Vg63lIM0FBUIs9+BBEzh+aAHaZt+2h9ySTyHScdO/ox2c3DfLJT1FXQenxJY8qkzoCaqPavs81FI74Y=
-X-Received: by 2002:a2e:8752:0:b0:2b6:c61c:745b with SMTP id
- q18-20020a2e8752000000b002b6c61c745bmr7782564ljj.3.1692047321419; Mon, 14 Aug
- 2023 14:08:41 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692050074; x=1692654874;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WLV8cwl+q0+MgeCaKnjEbSXBm+ijn/cuT9eg2QvMQy8=;
+        b=CURi/WGYBSwYN1mptTCgb6IC381/anDr2CBP5uHdo+LyP9ir2gsvLvhAT/FEyIurk4
+         JR/eTC7Ah7jYSq2XenPSsh6tHlN9D8vUnlA3pay9W4tcU386LVe1YiWauSl+EiicYFxs
+         XPnmvWDjswKpCG4jtKVUwXJ1rvr+756pCWV9D3hChrg4ZIfxYok5v5Kcz7Lwd+btirdE
+         znTD7Y8fff+YOObUdOO/vtuPJ/iXSBtUDUCgGnQTF/0A61rmuR/VgnoLoR0CsoU6TtaF
+         U1aIq9awOCE7jVn5YqMA4l2YaRKXHnAYKV6rMg6oq5Tzoh6E3JsYsOAqMKcUoxBMQcrL
+         /0eA==
+X-Gm-Message-State: AOJu0Yw6FR0rvG5CuPyZequDSqTOwW5K4ClV+LF8nIvXU8kKpBMLDjwR
+	9m+phnEk/L/paHo5CMadYNCefnyGiww=
+X-Google-Smtp-Source: AGHT+IGPzyG2ye2a1feyqcG86dyCHC82qzx5i2/p6ALHRmr0rfFoFMM8MlFz9jxGz9wjwtqC3ppaRbddXVE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:9f12:0:b0:565:3355:87b0 with SMTP id
+ g18-20020a639f12000000b00565335587b0mr2044577pge.5.1692050074189; Mon, 14 Aug
+ 2023 14:54:34 -0700 (PDT)
+Date: Mon, 14 Aug 2023 14:54:32 -0700
+In-Reply-To: <02239d95-0253-a223-28c2-016cca3ab4d2@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230808114711.2013842-1-maz@kernel.org> <20230808114711.2013842-17-maz@kernel.org>
-In-Reply-To: <20230808114711.2013842-17-maz@kernel.org>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Mon, 14 Aug 2023 14:08:29 -0700
-Message-ID: <CAAdAUtjvnbdr==SyKz+8UC-ZDPOc9W-Rp-3JjtMjfbVeB=zuPA@mail.gmail.com>
-Subject: Re: [PATCH v3 16/27] KVM: arm64: nv: Expose FEAT_EVT to nested guests
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, 
-	Catalin Marinas <catalin.marinas@arm.com>, Eric Auger <eric.auger@redhat.com>, 
-	Mark Brown <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Andre Przywara <andre.przywara@arm.com>, 
-	Chase Conklin <chase.conklin@arm.com>, 
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, 
-	Darren Hart <darren@os.amperecomputing.com>, Miguel Luis <miguel.luis@oracle.com>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-9-seanjc@google.com>
+ <02239d95-0253-a223-28c2-016cca3ab4d2@linux.intel.com>
+Message-ID: <ZNqimGhCD+70q/lG@google.com>
+Subject: Re: [RFC PATCH v11 08/29] KVM: Introduce per-page memory attributes
+From: Sean Christopherson <seanjc@google.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Chao Peng <chao.p.peng@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Yu Zhang <yu.c.zhang@linux.intel.com>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
+	Vlastimil Babka <vbabka@suse.cz>, David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Marc,
+On Mon, Aug 14, 2023, Binbin Wu wrote:
+> 
+> On 7/19/2023 7:44 AM, Sean Christopherson wrote:
+> > +	struct kvm_mmu_notifier_range post_set_range = {
+> > +		.start = start,
+> > +		.end = end,
+> > +		.arg.attributes = attributes,
+> > +		.handler = kvm_arch_post_set_memory_attributes,
+> > +		.on_lock = (void *)kvm_null_fn,
+> > +		.on_unlock = kvm_mmu_invalidate_end,
+> > +		.may_block = true,
+> > +	};
+> > +	unsigned long i;
+> > +	void *entry;
+> > +	int r;
+> > +
+> > +	entry = attributes ? xa_mk_value(attributes) : NULL;
+> Why attributes of value 0 is considered not a value? Is it because 0 is not
+> a valid value when RWX is considered in the future?
 
-On Tue, Aug 8, 2023 at 4:48=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
->
-> Now that we properly implement FEAT_EVT (as we correctly forward
-> traps), expose it to guests.
->
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/nested.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 315354d27978..7f80f385d9e8 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -124,8 +124,7 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct =
-sys_reg_params *p,
->                 break;
->
->         case SYS_ID_AA64MMFR2_EL1:
-> -               val &=3D ~(NV_FTR(MMFR2, EVT)     |
-> -                        NV_FTR(MMFR2, BBM)     |
-> +               val &=3D ~(NV_FTR(MMFR2, BBM)     |
->                          NV_FTR(MMFR2, TTL)     |
->                          GENMASK_ULL(47, 44)    |
->                          NV_FTR(MMFR2, ST)      |
-> --
-> 2.34.1
->
->
+0 values don't require an entry in the xarray, i.e. don't need to be stored and
+so don't consume memory.  The potential conflict with a RWX=0 entry has already
+been noted, but we'll cross that bridge when we get to it, e.g. KVM can easily
+support RWX=0 by using an internal "valid" flag.
 
-Reviewed-by: Jing Zhang <jingzhangos@google.com>
+> Both the changelog and the document added mention that the address and size
+> of attrs will be updated to
+> "reflect the actual pages of the memory range have been successfully set to
+> the attributes", but it doesn't.
 
-Jing
+Yeah, on the todo list, all of the changelogs are horribly stale.
