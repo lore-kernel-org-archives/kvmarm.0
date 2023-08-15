@@ -1,142 +1,197 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2116.outbound.protection.outlook.com [40.107.100.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02355625
-	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 00:52:32 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-583d1d0de65so65390067b3.0
-        for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 17:52:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFF18622
+	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 02:59:20 +0000 (UTC)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GEkFM5pbdM/IFF1XkqtxC+ck4qr1VzXkG76DimHI7gtVE0Ci6y9ottCyst9d9Rh8qLaDsBlpPk7MHkf7XYt7IA0kMrfaLKx/jCUcPQhsKi7aScnpEGtojqZ2K1PVvc5C6mV/1LsKRPya1TOtYUZP15uoSB8O7UuVWmsA/A51q1uQwn9S+O5U3Os/ENo5bCwVwuoC3KlNKybSxvZ67Ck2Z2SqirTbgc+poKj2Lblk3S0j+8FEW5gaq7Bda7q3N0Pnl/AfGqINugTn2Z2fNXiFOhRCou0UT/8r+uMEFXielfES2PTOlesDGDI9eK16m0daAz5iqW8XXxgSXnLygayz1A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=K5VEz6pChcEd3Df3qwj7h2FJIfHjESyWeEIQOXYJ7qU=;
+ b=Z8l/hFvBKfF24Ck3SPNSbLge8qB2t7vqBiIMH8eEycDjvYedFq7xZamQgJrajHa223Mf5jXv0cgWkiK6UxKtSwikRL0fLNJaXUFW0tdJtE/4SMKHGINSHozDU86rImu3/TI4ZMpdiCwWeXIVAeRFd1rCKDvP7BbPMadW7lAcDMjgbwe/UGDkj+RDwSybIIKkCBCQXBJ9zw0XOcf+sigU0vlc57ZvTCWGgNyuos8v8W5Orcoj7hqFtRGVikK6NweI5xVbiYHsZWM/kUfGP1kDvaeQu7CiiG/AIbvGA+kgTUWNRiu2nT+i0yGN8Y0Divp33AvaKOp/LOh+S2Ub+XDO9Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=amperemail.onmicrosoft.com; dkim=pass
+ header.d=amperemail.onmicrosoft.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692060752; x=1692665552;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hk15mUEG36mYzoWqdyXNILxXbUGFuZdN5ezEkvLZ3iM=;
-        b=SUKnvazqj9CVjAezsoD2+y+B/lascXFbPfh2BmPWUTPhsp2ltMrajsTckozDu9ifdm
-         uRoTdnCgOM98B7Rnb91Ve9c/MBRF5IHK3nGacQ54NRHNp4jfWACljRlSNeWuoRdL+3na
-         CtHqlJoC59YHPayYcYzVEhCEfMbZsPVJQIkTDsx0J6ehfskI+bg3C/TTqGB4GfV7K9Vn
-         rRDM2yi+re6usECld7Z4U2WK/2ghsl54KPV4Ycl6v1kRxR+u2a297eNSVYm3jPrYQCL2
-         cXFmXO9Zt4S3exCCMfQ/QP9nNjQaIR5tBPHnG0PDbMprpJdiffEDLgQQkSHFXTPIaHgD
-         6rOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692060752; x=1692665552;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=hk15mUEG36mYzoWqdyXNILxXbUGFuZdN5ezEkvLZ3iM=;
-        b=bj9xqMS44/LJ9iGhlE0vjSHIVQWMToFERj5q3datLdamPxD6AgGvtHaDZFEGFWyUBH
-         2WvRIRbaYzChb2KAoSWzBbJ4EgCg1r7RufiJnV5oIVIFbVDrQlSkkWTHGou0OdnRwRdy
-         888fzLLfNIsUcP4vod9l+INhS72qTHTEeCjzc9m5vROFCj3xtFHXZHs61ME1Xbjaulmv
-         8AiUT/17uqdtyFZSqnrUyDb+NDCd0a70Z2SPiVoBHyAfsktqj7f3cgdbsihaS1w2yvXv
-         mG9ZSMfXgcw7vB36LAWoy2JFjSlj+v4H0IUBg3osDLyFTUHf01m72R3D8dDMCJ/tZBlH
-         Z9bQ==
-X-Gm-Message-State: AOJu0Yxcx8y+8vvZlqOZG3087Mji4k3FlyfkOVMypCavX6Ant5tJXK5f
-	TtZLS30+GVQkNx6vuLO4tN1cSBXKWOI=
-X-Google-Smtp-Source: AGHT+IEm/gyjzby2m0z7Th7h1NzS+zVz9W6iAdmwDKQNzO5UYu/Tw93ovcYoaLNJ0fJilJkbmSYm3tW9J7c=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:7443:0:b0:d20:7752:e384 with SMTP id
- p64-20020a257443000000b00d207752e384mr148317ybc.3.1692060751838; Mon, 14 Aug
- 2023 17:52:31 -0700 (PDT)
-Date: Mon, 14 Aug 2023 17:52:30 -0700
-In-Reply-To: <CAJHc60wMueazp3Wm=b6-tnFPAyX0zeYuVQe9uPEJrpAm0azw2A@mail.gmail.com>
+ d=amperemail.onmicrosoft.com; s=selector1-amperemail-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=K5VEz6pChcEd3Df3qwj7h2FJIfHjESyWeEIQOXYJ7qU=;
+ b=w7sWtOiqGfAUVM1eeoPN2LY2jGKRslGkdUcpFbY6/uizP2LLY8YUAC+3MKWFutDZlhsTpIGkL57HbRnvB9HYl9jFTh6Km5DGIdwqXKcb2iKUURxg/1Z1P7wCUgG++DzA2hdtiCGF5yK7Pb/qKLv/wK6IXwElVVlFRP+Of+Uo8xY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amperemail.onmicrosoft.com;
+Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
+ SJ2PR01MB8660.prod.exchangelabs.com (2603:10b6:a03:574::16) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6678.24; Tue, 15 Aug 2023 02:59:15 +0000
+Received: from DM8PR01MB6824.prod.exchangelabs.com
+ ([fe80::d62f:d774:15b0:4a40]) by DM8PR01MB6824.prod.exchangelabs.com
+ ([fe80::d62f:d774:15b0:4a40%4]) with mapi id 15.20.6678.025; Tue, 15 Aug 2023
+ 02:59:14 +0000
+Message-ID: <3285dd21-a1cc-7df0-b2f6-999ed4669901@amperemail.onmicrosoft.com>
+Date: Tue, 15 Aug 2023 10:59:03 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH] KVM: arm64: pmu: Resync EL0 state on counter rotation
+To: Leo Yan <leo.yan@linaro.org>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ James Morse <james.morse@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>,
+ Huang Shijie <shijie@os.amperecomputing.com>,
+ Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>
+References: <20230811180520.131727-1-maz@kernel.org>
+ <20230814071627.GA3963214@leoy-huanghe>
+ <5608d22d-47c3-2a03-a3d9-ba8ec51679a3@amperemail.onmicrosoft.com>
+ <20230814084710.GA69080@leoy-huanghe.lan>
+ <8640c3c7-b117-5754-6ac4-910988e5374f@amperemail.onmicrosoft.com>
+ <20230814100154.GB69080@leoy-huanghe.lan>
+From: Shijie Huang <shijie@amperemail.onmicrosoft.com>
+In-Reply-To: <20230814100154.GB69080@leoy-huanghe.lan>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: CH0PR03CA0400.namprd03.prod.outlook.com
+ (2603:10b6:610:11b::20) To DM8PR01MB6824.prod.exchangelabs.com
+ (2603:10b6:8:23::24)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230811045127.3308641-1-rananta@google.com> <ZNq15SZ+53umvOfx@google.com>
- <CAJHc60wMueazp3Wm=b6-tnFPAyX0zeYuVQe9uPEJrpAm0azw2A@mail.gmail.com>
-Message-ID: <ZNrMTmppUfQhdsyY@google.com>
-Subject: Re: [PATCH v9 00/14] KVM: arm64: Add support for FEAT_TLBIRANGE
-From: Sean Christopherson <seanjc@google.com>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhuacai@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Jing Zhang <jingzhangos@google.com>, 
-	Reiji Watanabe <reijiw@google.com>, Colton Lewis <coltonlewis@google.com>, 
-	David Matlack <dmatlack@google.com>, Fuad Tabba <tabba@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM8PR01MB6824:EE_|SJ2PR01MB8660:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0f43ff65-4fb5-4772-896a-08db9d3b9b68
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	CqhROsmMVbK0MJQwk3T/ITImxuxihGBB9G1DqOHOFM1UGq0HTmIiLHMWsLZewa8que+PRMx9ExzdFO+vFSnStGqKf5OvWR36rHdcEf4LQozBZXcxvmVq4YbXFkZObI87pD5whgvbWUbs8u323kPeH8gZ/1SX3rTVb68mfRGojn6XuJIiaIVATMHhIpiv8C7hKx1l24RuF0G15UcQbm4iYok8UP47VKIsiAaZTQC8yhs/6YirKx6vvcl59jCP7wdjBSOO/p3YSeTSF3gzIaTq3PTJ1FQpwu7y8eP7FW3cgNAVGOFVxilkErbNUDWOP7yFwgsq0XRz3OmYmFIAoRUFAvlG8c8833uUCV77OlVrC1lEn1nZApA6opPU+Y4j9mxzhj3ohRR0q+y2UqnDLHHHAisHbvInu60BIMGPPy8EvTJ7SfQvS/bc00wEDAaRIOgx9PsMbJv00eRD5FJhJ/p8k8+rq8JHjWihQdJ3TbpJEzR3Q3OZumhAgjOK/7xRSbyJTcma9yWkURYxXYbr9fLYxAzrMftMz/VR462hdp5D6LU8zkdWp8kGfaoFVi9eSxYg3N1MIQ+KHy48oqdgIDx8xsl1PyVO+HZ1guA9LmRg9pMNxWhAn2/WP55zUeQNCuhr8CipBpyJXPk8b8//F8ZwIA==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR01MB6824.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230028)(39850400004)(376002)(346002)(366004)(136003)(396003)(186006)(1800799006)(451199021)(83380400001)(42882007)(31686004)(31696002)(41300700001)(38100700002)(478600001)(38350700002)(66946007)(54906003)(6512007)(66556008)(66476007)(6916009)(316002)(8676002)(8936002)(5660300002)(83170400001)(4326008)(2616005)(26005)(6486002)(6506007)(6666004)(2906002)(7416002)(52116002)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?d0E5SUtEaXlIdFUxc3p3SUdTUGwvTmdVTC9qWVR6WVRNTW5aVHhyaGJNNnZ6?=
+ =?utf-8?B?T2dkM1B1N1U1QWhBKzJLL1pvYVdndWd4MkJCdVdBbVdXazR0Z3FTMDJGcyt2?=
+ =?utf-8?B?aWZkeklHTHd6VU1BaGFmVWJIOUpMN0kvTUJ1aUdxRTBHUFdzS3dxQ3V4cnNN?=
+ =?utf-8?B?SWN1V29pcnhvTU93Z2xjYVhZRkpPVEZJNW5IQkJKS2tMa0M2dVlCUVNjV0ND?=
+ =?utf-8?B?MHpYbkJhdWVPSkRYaU5kMXBXQnRlbjhmemFyUDJ1M0ltZkJUdndXeXdkVURV?=
+ =?utf-8?B?UzJHc3JkdzVacER6SEdvRWZaSUxvOFhoSDRiZzgzZG96QmQrMXFVRXhrNDd0?=
+ =?utf-8?B?a1ZLb1dlTkI2R2ZzOGNTVTU4UHhlN2FmNFVwdnAxWEdKaWxxbklaaDFSUDVn?=
+ =?utf-8?B?dGhuR3VndDZRQnNuQWdOUUR6dnN0MlJVVzZHdnhrdzVBa01UcUFtdjc1eDNO?=
+ =?utf-8?B?d3BsWTljZlUyUGZGMXhqV21JbEZnd09iZWZvQUtxR0JHcDFoeDlydzNzcXQ1?=
+ =?utf-8?B?TWRuczhnRFZiVDJwMFpQeUpLTHlmS1o2dXcrS1lYV1R5UTIvbGNsQkY3SHpk?=
+ =?utf-8?B?bVErenVSTkkrdWlOa1Qxd0syYjU3TFJDcU56Z2tVQnJtRnRiWnVrYUk0d05Q?=
+ =?utf-8?B?Rm9EV0p2T2J4RWtEY2pyWWg2U1VwV3hwT2NId2VPdEtqc0FRNzZKN1RGYzVC?=
+ =?utf-8?B?cUNheEpOK2JqTGdpb2EyT1FOdloyalBJczZTdHFaenp4OUFmMmhQVWdHQlVi?=
+ =?utf-8?B?dGFMVEJ6WDhhcG1zNW43OTBvMVYveU5Tc09DdmQvMWswRlRNWHFmMmFnbits?=
+ =?utf-8?B?UDdSUFZvK0ZvdFJZRTQrOWF2TUNXYk40TC9zRU5SeXJOajY3VlVxUmprY1lp?=
+ =?utf-8?B?RlpLVkcwVTV1V1hQY3ZKZ0M5SXZvNVh4RXdtOWgyWWxlUWdmLythTnBOU0Ns?=
+ =?utf-8?B?Tkc2QkRtWFZ1cTNvMHVRbHRvMkFhMEhlZ0pwd2VYbXlsMSt5alB1Y1pJNmxR?=
+ =?utf-8?B?QkNPTTBtNkphdXZsMHZyb2hKMHRVRTkxMFF0VzdtRzBzTTh4TGdtcEdyRzQ3?=
+ =?utf-8?B?d2ZGK05TVEVqM2xUYTRsRXJ3ajF6b3BObGJ1c3VMaTZZMlNkWUlsQTMzbFVm?=
+ =?utf-8?B?aks2TDBNbVhHS3k1QzY4eE5Dc3NEcm5lZWhZSFhETCtMb0RxQ1VXSkVkR2tk?=
+ =?utf-8?B?MXQwVGgvdTJ5elNsV0tjenRUK3pGMjJQZTBlRmJZWExOYzE2T1FjU2Jjc1Nt?=
+ =?utf-8?B?MW5rVnZhTWVmY2tqZWZSdWRvZ1h3RUpYYnBibmcvN0crODgrTzZKOS9KU2tX?=
+ =?utf-8?B?KzhPSW92Y3JlTzVXakRTL0srd2x0RmEvNmxoSVp4eUM3UVlqYWtWTzhETU5V?=
+ =?utf-8?B?S3pUamN4a3MycURvNm40SFBFc2hRNXFTZUY1R0hSTVREWW1kY2hFcHRtdHJO?=
+ =?utf-8?B?SFA4UmRqKzVXTC9DSGRlWlZRRUlCRXg5Y0tmWmxLVkNZQ2JYaGgyclFuV0NE?=
+ =?utf-8?B?eXNkVk5Hb0ROaHUrQ3ZZeElFYUR1YmNpMktzbHFUVDRQaDgySm1pVys2ZXJj?=
+ =?utf-8?B?VU9iWmZCNUdScnJUQTBNd0JhMnNKNHhCN215QjZQMkhPWW4rNVl4YmxIcXJ2?=
+ =?utf-8?B?SHZKUDRZVTc5MXF5OURWRTRCNkZkZVBRdnFqenFxeUhFbERzWlBHV0JYbXBW?=
+ =?utf-8?B?WkMzNlpjclZVbGoxRk8xSjY4MStYQzJzdytKNVZxaVZYVC9yT01iYnBocU0z?=
+ =?utf-8?B?Y1BMUzZsMTE3cmpRSXlOSUpMRmZNcjllN09mR3hBcDVxZElSelJRWmYyTzcy?=
+ =?utf-8?B?T20yeDFDV2hjYmNxay9UTzVneEdlUmJVallHNDBJOVNraEVKUjVuN0NvZWkx?=
+ =?utf-8?B?bzVQLyt0ZDROL2xYWXJickF5RGVpWDQvWnA0NTZLanV6UUdOQ204R0pQZktN?=
+ =?utf-8?B?M2dmT285dnNCMGdHR3JWeGVMMWQ2WVVBZ1ZGTUFUdHhVeWIxVTI4M2UzUHhX?=
+ =?utf-8?B?YTBaejBGeE5uUHpsWTFTblJHaytuMWZFcHp4VjFJYWJQbXlZZnhrWWJLK2kw?=
+ =?utf-8?B?RExYS251QXBiNUZqcERjUmV5R1dkQ1BXcnhJSVRLSDkvWHFlc3NLTy8rUGd2?=
+ =?utf-8?B?K0pzeXA4MSt2dm0xQ2R1eU5KSXl0cDZWcG03cWlycHVGcFlka051OS9hMCsv?=
+ =?utf-8?Q?Gpgq6OeJS61IlebNqTozEXM=3D?=
+X-OriginatorOrg: amperemail.onmicrosoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0f43ff65-4fb5-4772-896a-08db9d3b9b68
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Aug 2023 02:59:14.5907
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7Hy+22YNwJkT/KHZKhDmm+Tg08PKuxwJe2s3zXPJHrNFuLDXtEjiN8bStzstRs6Du3wPVb6WRMfG8YxaTWDdMqoTumdf0o+Ki3R2qVw7VGCgb8JTEYGFCx8/aUJsJ0Q4
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR01MB8660
 
-On Mon, Aug 14, 2023, Raghavendra Rao Ananta wrote:
-> On Mon, Aug 14, 2023 at 4:16=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >
-> > On Fri, Aug 11, 2023, Raghavendra Rao Ananta wrote:
-> > > The series is based off of upstream v6.5-rc1.
-> >
-> > Lies!  :-)
-> >
-> > This is based off one of the kvmarm.git topic branches (I didn't bother=
- to figure
-> > out which one), not v6.5-rc1.
-> >
-> Sorry, what am I missing here? My git log is as follows:
+Hi Leo,
 
-Hmm, not sure what's going on.  Maybe I misinterpreted why `git am` was fai=
-ling?
-I assumed it was because there were objects in kvmarm that I didn't have lo=
-cally,
-and fetching kvmarm allowed am to complete, though with 3-way merges, which=
- IIUC
-shouldn't have been necessary if I was using the exact same base.  Or maybe=
- I
-messed up and didn't actually reset to 6.5-rc1.
+在 2023/8/14 18:01, Leo Yan 写道:
+> Hi Shijie,
+>
+> On Mon, Aug 14, 2023 at 05:29:54PM +0800, Shijie Huang wrote:
+>
+>
+> [...]
+>
+>>> Seems to me, based on Marc's patch, we need to apply below change.  In
+>>> below code, we don't need to change the perf core code and we can
+>>> resolve it as a common issue for Arm PMU drivers.
+>>>
+>>>
+>>> diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
+>>> index 121f1a14c829..8f9673cdadec 100644
+>>> --- a/arch/arm64/kvm/pmu.c
+>>> +++ b/arch/arm64/kvm/pmu.c
+>>> @@ -38,14 +38,20 @@ struct kvm_pmu_events *kvm_get_pmu_events(void)
+>>>    void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr)
+>>>    {
+>>>    	struct kvm_pmu_events *pmu = kvm_get_pmu_events();
+>>> +	int resync;
+>>>    	if (!kvm_arm_support_pmu_v3() || !pmu || !kvm_pmu_switch_needed(attr))
+>>>    		return;
+>>> +	resync = pmu->events_guest != set;
+>> If we set two events in guest, the resync will set
+>>
+>> For example:
+>>
+>>             perf stat -e cycles:Gu, cycles:Gk
+>>
+>>
+>> If so, this is not reasonble...
+> You mean if set two guest events, the kvm_vcpu_pmu_resync_el0() will
+> be invoked twice, and the second calling is not reasonable, right?
 
-> $ git log --oneline upstream_tlbi_range_v9
-> 5025857507abe (upstream_tlbi_range_v9) KVM: arm64: Use TLBI
-> range-based instructions for unmap
-> 5c0291b99a8fc KVM: arm64: Invalidate the table entries upon a range
-> 8c46b54d4aaec KVM: arm64: Flush only the memslot after write-protect
-> 231abaeb7ffc2 KVM: arm64: Implement kvm_arch_flush_remote_tlbs_range()
-> 5ec291b863309 KVM: arm64: Define kvm_tlb_flush_vmid_range()
-> 5bcd7a085c34e KVM: arm64: Implement  __kvm_tlb_flush_vmid_range()
-> ea08f9dff7e5b arm64: tlb: Implement __flush_s2_tlb_range_op()
-> b3178687947c9 arm64: tlb: Refactor the core flush algorithm of __flush_tl=
-b_range
-> a4850fa988eef KVM: Move kvm_arch_flush_remote_tlbs_memslot() to common co=
-de
-> 306dc4e6afd37 KVM: Allow range-based TLB invalidation from common code
-> d02785a0a1e01 KVM: Remove CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL
-> 136fa2d254537 KVM: arm64: Use kvm_arch_flush_remote_tlbs()
-> e35c68a75170d KVM: Declare kvm_arch_flush_remote_tlbs() globally
-> 5d592777b9bba KVM: Rename kvm_arch_flush_remote_tlb() to
-> kvm_arch_flush_remote_tlbs()
-> 06c2afb862f9d (tag: v6.5-rc1, tag: linux/v6.5-rc1) Linux 6.5-rc1
-> c192ac7357683 MAINTAINERS 2: Electric Boogaloo
-> f71f64210d698 Merge tag 'dma-mapping-6.5-2023-07-09' of
-> git://git.infradead.org/users/hch/dma-mapping
-> ...
->=20
-> Isn't the commit, 06c2afb862f9d (06c2afb862f9d (tag: v6.5-rc1, tag:
-> linux/v6.5-rc1) Linux 6.5-rc1) the 'base' commit?
+IMHO, even the first time is not reasonable. why call 
+kvm_vcpu_pmu_resync_el0() when event rotation
 
-Ya, should be.
+does not happen?
 
-Either way, even if this is PEBKAC on my end, using --base would be nice, e=
-.g.
-then you can definitely say it's my fault ;-)
 
-> > Please try to incorporate git format-patch's "--base" option into your =
-workflow,
-> > e.g. I do "git format-patch --base=3DHEAD~$nr" where $nr is the number =
-of patches
-> > I am posting.
-> >
-> > It's not foolproof, e.g. my approach doesn't help if I have a local pat=
-ch that
-> > I'm not posting, but 99% of the time it Just Works and eliminates any a=
-mbuitity.
-> >
-> > You can also do "--base=3Dauto", but that only does the right thing if =
-your series
-> > has its upstream branch set to the base/tree that you want your patches=
- applied
-> > to (I use the upstream branch for a completely different purpose for my=
- dev branches).
+
+> I can accept this since I personally think this should not introduce
+> much performance penalty.
+>
+> I understand your preference to call kvm_vcpu_pmu_resync_el0() from
+> perf core layer, but this is not a common issue for all PMU events and
+> crossing arches.  Furthermore, even perf core rotates events, it's not
+
+If we can find a better way to fix it in PMU code, I am okay too. :)
+
+I tried to fix it in PMU code, but I am not satified with it.
+
+
+> necessarily mean we must restore events for guest in the case there
+> have no event is enabled for guest.
+
+Not only for events in guest, but also for the events in the host too.
+
+In the kvm_vcpu_pmu_restore_guest(), it also disable the EL0 for host 
+events.
+
+
+Thanks
+
+Huang Shijie
+
+>
+> Thanks,
+> Leo
