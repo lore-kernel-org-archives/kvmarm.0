@@ -1,116 +1,125 @@
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D69119880
-	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 21:58:36 +0000 (UTC)
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-517ab9a4a13so4498263a12.1
-        for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 14:58:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D3A31AA64
+	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 22:30:11 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d65201b777dso10327433276.0
+        for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 15:30:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1692136716; x=1692741516;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7Z8K31bkMTbdIni3NCgyAAMv9oewxKBq0qkaddr2kYE=;
-        b=P5OEd4Nl1vFHMOZX0kiCCsg+ALdbM3Jq7SfXh8p09T5kt+BwT3N3A+WU/8d7eCFd2O
-         LhOZTvl4ubIun+RbYT+844ggRTfu97S+QvSvLYZmQxkd8QzSViGI+4eiZUxpV4gS+ntY
-         ZYn+0xq6abTK4+oIdkRuBdtGRoW6CGc4TDtu0=
+        d=google.com; s=20221208; t=1692138610; x=1692743410;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1sZ2KVcNcsekfiyOLDchFCWiNwVhcB+6K151wSFXsRU=;
+        b=Sdk8hg1CZo0UZyPRUXVdkK75UBWBJbL5ssV4qfSNcJ0yLv5eoBjQS4ikTylrgvjRg5
+         fAMh6d0O8KCRFHTNCYjLyKwda9Worh9IOHwLdjyjr43jpwYw1T/I0j2MIMowNRlDO5I8
+         seJUbGeGRi1534R52LzEYYDDd5ijl0Ycakp7SKP7ACJxBKwO5q+1sd6EI3OyWGK24CgX
+         jnL6doBdY30gIbx8RPMUELSJ79bpzsOBy12TJfrWjd52P0gtLnjQyB6B7osJCqozOqtW
+         mlUSNNG5Lq0KPPvS7OkMRg41GasfSw3x8Ne19ql/oMstCF4KKqyTw1HO8U30XcK6asyE
+         9NgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692136716; x=1692741516;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7Z8K31bkMTbdIni3NCgyAAMv9oewxKBq0qkaddr2kYE=;
-        b=GmDBI/5MWomlPYnsBxy3zP/kYsVpDlrdxXtAAV1+yayzlbnbq3mVTDyvrSW2hD3x6u
-         Y8ELe5Ea0YnNmchxrr2spvvLxHHCBYpP1vwtPt/DQgslJ8LLOehUzWnoyHmVXrqqz2Ng
-         wz7ZwrjO2iJ48CRelnWliN1hiZG12zz2D8lmOMeTa/hNaA2SbDrZ+NhJAcbsE2Za5/Eq
-         IDuWwx/q8uWjBcVz1n7WH9YBUBxz5gzO9jJA248tB5gRiri0XIioNzaQyTj1bofqz3f6
-         e4iQElq8ihZiNlB1XSdxihIitFVBFK/4QhHgEn6Fs4nT0ifW/gA+6dYIVcatosWrYJFf
-         tFgQ==
-X-Gm-Message-State: AOJu0YzjfNYWhKi6ef3yNa7qmPPeWNT/UgQPfTZGTfERSGYdU/E2furX
-	4MYMRvyh8vaXzxcuKsNuJIOCkg==
-X-Google-Smtp-Source: AGHT+IGIGJcDqcADsYQ9H0lWCBGqrfD4exL5cuoWWqNOlf/hsRbDS674HVOPC9PdGLNB8RfKgc3Qug==
-X-Received: by 2002:a05:6a20:938b:b0:141:69d:8041 with SMTP id x11-20020a056a20938b00b00141069d8041mr158650pzh.48.1692136716284;
-        Tue, 15 Aug 2023 14:58:36 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id z17-20020a637e11000000b0056129129ef8sm10583401pgc.18.2023.08.15.14.58.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Aug 2023 14:58:35 -0700 (PDT)
-From: Kees Cook <keescook@chromium.org>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Marco Elver <elver@google.com>
-Cc: Kees Cook <keescook@chromium.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Paul Moore <paul@paul-moore.com>,
-	James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Tom Rix <trix@redhat.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	llvm@lists.linux.dev,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Alexander Potapenko <glider@google.com>,
-	kasan-dev@googlegroups.com,
-	linux-toolchains@vger.kernel.org
-Subject: Re: [PATCH v4 1/4] compiler_types: Introduce the Clang __preserve_most function attribute
-Date: Tue, 15 Aug 2023 14:58:29 -0700
-Message-Id: <169213670578.656151.9756083800563304743.b4-ty@chromium.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230811151847.1594958-1-elver@google.com>
-References: <20230811151847.1594958-1-elver@google.com>
+        d=1e100.net; s=20221208; t=1692138610; x=1692743410;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1sZ2KVcNcsekfiyOLDchFCWiNwVhcB+6K151wSFXsRU=;
+        b=HmVW16FxUorQa3wDd4Be/dFA+8+MSvKbeXTl43JCrvmvSxnjrGCyopRG0HTG3SpCgc
+         PeNRbaNlwTjy3a1r5eF+HwPWd/eWJ+KO8M59+xwiuRB1NO0UHjg6paP6pdfuD698geLR
+         LfcA+VlA40IpPueYSvizId384mWF/wniwuuvPAhFTnvV4TuUKPV/omrppqU3RcLUlzTX
+         tFkqJieB1sPonjLB+DUhbU7TwLOi5snZzjLEtB2VU5VeeUi330xbA0F/It71kT/Y/1Qx
+         5ErMAb5rAVX3CR17NPzenXN4vquo0UkVQUS3njD86NaWOlDXKOA1MlbdMeNVkXhsGKoG
+         JLnA==
+X-Gm-Message-State: AOJu0YwZKZFZFw/2d9DcviSoA1MrlPAU285bGLs0n1wypnLOvxzylsFp
+	F4KauIqvuQlorXvbgLm+mSGHRjtkQRY=
+X-Google-Smtp-Source: AGHT+IG84S1z3EOk6278E7swEnxMzcYiiiMN3uMBAf/Zzr7Ij9WLl4fIHdZlEc+ZYkT7nZQXafm39o4AAu0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:24cc:0:b0:d10:a33d:36b6 with SMTP id
+ k195-20020a2524cc000000b00d10a33d36b6mr55769ybk.0.1692138610358; Tue, 15 Aug
+ 2023 15:30:10 -0700 (PDT)
+Date: Tue, 15 Aug 2023 15:30:08 -0700
+In-Reply-To: <20230811045127.3308641-6-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20230811045127.3308641-1-rananta@google.com> <20230811045127.3308641-6-rananta@google.com>
+Message-ID: <ZNv8cCzI9fMWkGWT@google.com>
+Subject: Re: [PATCH v9 05/14] KVM: Allow range-based TLB invalidation from
+ common code
+From: Sean Christopherson <seanjc@google.com>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhuacai@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Jing Zhang <jingzhangos@google.com>, 
+	Reiji Watanabe <reijiw@google.com>, Colton Lewis <coltonlewis@google.com>, 
+	David Matlack <dmatlack@google.com>, Fuad Tabba <tabba@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, Gavin Shan <gshan@redhat.com>, Shaoqin Huang <shahuang@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, 11 Aug 2023 17:18:38 +0200, Marco Elver wrote:
-> [1]: "On X86-64 and AArch64 targets, this attribute changes the calling
-> convention of a function. The preserve_most calling convention attempts
-> to make the code in the caller as unintrusive as possible. This
-> convention behaves identically to the C calling convention on how
-> arguments and return values are passed, but it uses a different set of
-> caller/callee-saved registers. This alleviates the burden of saving and
-> recovering a large register set before and after the call in the caller.
-> If the arguments are passed in callee-saved registers, then they will be
-> preserved by the callee across the call. This doesn't apply for values
-> returned in callee-saved registers.
-> 
-> [...]
+On Fri, Aug 11, 2023, Raghavendra Rao Ananta wrote:
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index ec169f5c7dce2..00f7bda9202f2 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -278,16 +278,14 @@ static inline bool kvm_available_flush_remote_tlbs_range(void)
+>  	return kvm_x86_ops.flush_remote_tlbs_range;
+>  }
+>  
+> -void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
+> -				 gfn_t nr_pages)
+> +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 nr_pages)
+>  {
+>  	int ret = -EOPNOTSUPP;
+>  
+>  	if (kvm_x86_ops.flush_remote_tlbs_range)
+> -		ret = static_call(kvm_x86_flush_remote_tlbs_range)(kvm, start_gfn,
+> -								   nr_pages);
+> -	if (ret)
+> -		kvm_flush_remote_tlbs(kvm);
+> +		ret = static_call(kvm_x86_flush_remote_tlbs_range)(kvm, gfn, nr_pages);
+> +
+> +	return ret;
 
-Applied to for-next/hardening, thanks!
+Please write this as
 
-[1/4] compiler_types: Introduce the Clang __preserve_most function attribute
-      https://git.kernel.org/kees/c/7a0fd5e16785
-[2/4] list_debug: Introduce inline wrappers for debug checks
-      https://git.kernel.org/kees/c/b16c42c8fde8
-[3/4] list: Introduce CONFIG_LIST_HARDENED
-      https://git.kernel.org/kees/c/aebc7b0d8d91
-[4/4] hardening: Move BUG_ON_DATA_CORRUPTION to hardening options
-      https://git.kernel.org/kees/c/aa9f10d57056
+	if (kvm_x86_ops.flush_remote_tlbs_range)
+		return static_call(kvm_x86_flush_remote_tlbs_range)(kvm, gfn, nr_pages);
 
-Take care,
+	return -EOPNOTSUPP;
 
--- 
-Kees Cook
+or alternatively
 
+	if (!kvm_x86_ops.flush_remote_tlbs_range)
+		return -EOPNOTSUPP;
+
+	return static_call(kvm_x86_flush_remote_tlbs_range)(kvm, gfn, nr_pages);
+
+Hmm, I'll throw my official vote for the second version.
+
+The local "ret" is unnecessary and is suprisingly dangerous.  I screwed up the
+conflict resolution when cherry-picking my CONFIG_HYPERV change to see what the
+conflict looked like and ended up with a double flush:
+
+	int ret = -EOPNOTSUPP;
+
+	if (kvm_x86_ops.flush_remote_tlbs_range)
+		ret = static_call(kvm_x86_flush_remote_tlbs_range)(kvm, gfn, nr_pages);
+
+	if (ret)
+		kvm_flush_remote_tlbs(kvm);
+
+	return ret;
+
+Dropping "ret" makes it much harder to get trigger happy when resolving conflicts.
+
+No need for a new version to fix the above, assuming Marc/Oliver is ok doing
+fixup when applying.
+
+Nit aside, looks good for x86, and I know of no conflicts, so take 'er away!
+
+Acked-by: Sean Christopherson <seanjc@google.com>
