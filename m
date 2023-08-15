@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A7E51803D
-	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 18:39:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E616C433C7;
-	Tue, 15 Aug 2023 18:39:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A3617FE8
+	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 18:39:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5885DC433B6;
+	Tue, 15 Aug 2023 18:39:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692124759;
-	bh=je3e0ZBK/CYrP+OnwG3vx0E8FfjGCXOLqb8t9dVc5S4=;
+	s=k20201202; t=1692124758;
+	bh=+1mSrDCrdoO+cqTPBPGRCfHi68Y0gWanHUR791COJAI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LwL1yxbhF0yV1p8DOAEh69oFvAQm+Jgxo8x6dBOb4Is4UwRIp9w3wYVt6TnKdv5Ya
-	 Mw2cbi3stQI1s0UjJbs5+NEqocMttm/8EczylzhNVxpw52LArKbwwJ2iUpHlaCunzA
-	 h32Wzx/1obOGNyjIcLBHsQcB7LGw+J8selTPnUkSput9wFfIqZxLeDYTekWcfvOZcD
-	 A9XtAgTHWtYGWm29uMCcMQ7wrt1ZbpmiL6KGBOFbIAqZAogD1MzDBV+fR8nQ7zpIn4
-	 Bua80UpPw3fZ8KksnX2GGhof0dfD4gRWm04SaRPbpZGb87XDUCkSU4UTpXS+lE3r6t
-	 bqYSjR1qfCXeA==
+	b=o+AzVsFklPO1y9165Wy8/F3xFYv3SPW4gDOGpIR3kVYt9HQKi+/3KnizUr9cpVACw
+	 /mBy1tnEwm2R4CNAYYPpl1tb/R8P0GWZQ0JdnK6rWrSo3E6WXwnJBsI9OgRnyfXkYl
+	 leErSk2qedYiKro0QOGb2v4aV28SwJPAKLfyE9jVYuyB4db2t9dsignO0nxxjUORk9
+	 ZxZhCl7uIvTK7p2sKjJ8gpvXCScCXLJymbNqjLsgP/P8KUZqsERgNv2SIKP97bm9R5
+	 A9R7MfBiPynKi2wcOXQZnNv6cj30o0+Cx7gwWV22hD7R5dKsTSqevHXdPa4tT6SurB
+	 McCY7vySOdpTA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qVywn-0055Sd-DL;
-	Tue, 15 Aug 2023 19:39:17 +0100
+	id 1qVywm-0055Sd-Gh;
+	Tue, 15 Aug 2023 19:39:16 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -41,9 +41,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v4 08/28] arm64: Add HDFGRTR_EL2 and HDFGWTR_EL2 layouts
-Date: Tue, 15 Aug 2023 19:38:42 +0100
-Message-Id: <20230815183903.2735724-9-maz@kernel.org>
+Subject: [PATCH v4 05/28] arm64: Add AT operation encodings
+Date: Tue, 15 Aug 2023 19:38:39 +0100
+Message-Id: <20230815183903.2735724-6-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230815183903.2735724-1-maz@kernel.org>
 References: <20230815183903.2735724-1-maz@kernel.org>
@@ -59,173 +59,46 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-As we're about to implement full support for FEAT_FGT, add the
-full HDFGRTR_EL2 and HDFGWTR_EL2 layouts.
+Add the encodings for the AT operation that are usable from NS.
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
+Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 Reviewed-by: Jing Zhang <jingzhangos@google.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h |   2 -
- arch/arm64/tools/sysreg         | 129 ++++++++++++++++++++++++++++++++
- 2 files changed, 129 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/sysreg.h | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
 diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 6d9d7ac4b31c..043c677e9f04 100644
+index 72e18480ce62..76289339b43b 100644
 --- a/arch/arm64/include/asm/sysreg.h
 +++ b/arch/arm64/include/asm/sysreg.h
-@@ -495,8 +495,6 @@
- #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
+@@ -514,6 +514,23 @@
  
- #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
--#define SYS_HDFGRTR_EL2			sys_reg(3, 4, 3, 1, 4)
--#define SYS_HDFGWTR_EL2			sys_reg(3, 4, 3, 1, 5)
- #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
- #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
- #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 65866bf819c3..2517ef7c21cf 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -2156,6 +2156,135 @@ Field	1	ICIALLU
- Field	0	ICIALLUIS
- EndSysreg
+ #define SYS_SP_EL2			sys_reg(3, 6,  4, 1, 0)
  
-+Sysreg HDFGRTR_EL2	3	4	3	1	4
-+Field	63	PMBIDR_EL1
-+Field	62	nPMSNEVFR_EL1
-+Field	61	nBRBDATA
-+Field	60	nBRBCTL
-+Field	59	nBRBIDR
-+Field	58	PMCEIDn_EL0
-+Field	57	PMUSERENR_EL0
-+Field	56	TRBTRG_EL1
-+Field	55	TRBSR_EL1
-+Field	54	TRBPTR_EL1
-+Field	53	TRBMAR_EL1
-+Field	52	TRBLIMITR_EL1
-+Field	51	TRBIDR_EL1
-+Field	50	TRBBASER_EL1
-+Res0	49
-+Field	48	TRCVICTLR
-+Field	47	TRCSTATR
-+Field	46	TRCSSCSRn
-+Field	45	TRCSEQSTR
-+Field	44	TRCPRGCTLR
-+Field	43	TRCOSLSR
-+Res0	42
-+Field	41	TRCIMSPECn
-+Field	40	TRCID
-+Res0	39:38
-+Field	37	TRCCNTVRn
-+Field	36	TRCCLAIM
-+Field	35	TRCAUXCTLR
-+Field	34	TRCAUTHSTATUS
-+Field	33	TRC
-+Field	32	PMSLATFR_EL1
-+Field	31	PMSIRR_EL1
-+Field	30	PMSIDR_EL1
-+Field	29	PMSICR_EL1
-+Field	28	PMSFCR_EL1
-+Field	27	PMSEVFR_EL1
-+Field	26	PMSCR_EL1
-+Field	25	PMBSR_EL1
-+Field	24	PMBPTR_EL1
-+Field	23	PMBLIMITR_EL1
-+Field	22	PMMIR_EL1
-+Res0	21:20
-+Field	19	PMSELR_EL0
-+Field	18	PMOVS
-+Field	17	PMINTEN
-+Field	16	PMCNTEN
-+Field	15	PMCCNTR_EL0
-+Field	14	PMCCFILTR_EL0
-+Field	13	PMEVTYPERn_EL0
-+Field	12	PMEVCNTRn_EL0
-+Field	11	OSDLR_EL1
-+Field	10	OSECCR_EL1
-+Field	9	OSLSR_EL1
-+Res0	8
-+Field	7	DBGPRCR_EL1
-+Field	6	DBGAUTHSTATUS_EL1
-+Field	5	DBGCLAIM
-+Field	4	MDSCR_EL1
-+Field	3	DBGWVRn_EL1
-+Field	2	DBGWCRn_EL1
-+Field	1	DBGBVRn_EL1
-+Field	0	DBGBCRn_EL1
-+EndSysreg
++/* AT instructions */
++#define AT_Op0 1
++#define AT_CRn 7
 +
-+Sysreg HDFGWTR_EL2	3	4	3	1	5
-+Res0	63
-+Field	62	nPMSNEVFR_EL1
-+Field	61	nBRBDATA
-+Field	60	nBRBCTL
-+Res0	59:58
-+Field	57	PMUSERENR_EL0
-+Field	56	TRBTRG_EL1
-+Field	55	TRBSR_EL1
-+Field	54	TRBPTR_EL1
-+Field	53	TRBMAR_EL1
-+Field	52	TRBLIMITR_EL1
-+Res0	51
-+Field	50	TRBBASER_EL1
-+Field	49	TRFCR_EL1
-+Field	48	TRCVICTLR
-+Res0	47
-+Field	46	TRCSSCSRn
-+Field	45	TRCSEQSTR
-+Field	44	TRCPRGCTLR
-+Res0	43
-+Field	42	TRCOSLAR
-+Field	41	TRCIMSPECn
-+Res0	40:38
-+Field	37	TRCCNTVRn
-+Field	36	TRCCLAIM
-+Field	35	TRCAUXCTLR
-+Res0	34
-+Field	33	TRC
-+Field	32	PMSLATFR_EL1
-+Field	31	PMSIRR_EL1
-+Res0	30
-+Field	29	PMSICR_EL1
-+Field	28	PMSFCR_EL1
-+Field	27	PMSEVFR_EL1
-+Field	26	PMSCR_EL1
-+Field	25	PMBSR_EL1
-+Field	24	PMBPTR_EL1
-+Field	23	PMBLIMITR_EL1
-+Res0	22
-+Field	21	PMCR_EL0
-+Field	20	PMSWINC_EL0
-+Field	19	PMSELR_EL0
-+Field	18	PMOVS
-+Field	17	PMINTEN
-+Field	16	PMCNTEN
-+Field	15	PMCCNTR_EL0
-+Field	14	PMCCFILTR_EL0
-+Field	13	PMEVTYPERn_EL0
-+Field	12	PMEVCNTRn_EL0
-+Field	11	OSDLR_EL1
-+Field	10	OSECCR_EL1
-+Res0	9
-+Field	8	OSLAR_EL1
-+Field	7	DBGPRCR_EL1
-+Res0	6
-+Field	5	DBGCLAIM
-+Field	4	MDSCR_EL1
-+Field	3	DBGWVRn_EL1
-+Field	2	DBGWCRn_EL1
-+Field	1	DBGBVRn_EL1
-+Field	0	DBGBCRn_EL1
-+EndSysreg
++#define OP_AT_S1E1R	sys_insn(AT_Op0, 0, AT_CRn, 8, 0)
++#define OP_AT_S1E1W	sys_insn(AT_Op0, 0, AT_CRn, 8, 1)
++#define OP_AT_S1E0R	sys_insn(AT_Op0, 0, AT_CRn, 8, 2)
++#define OP_AT_S1E0W	sys_insn(AT_Op0, 0, AT_CRn, 8, 3)
++#define OP_AT_S1E1RP	sys_insn(AT_Op0, 0, AT_CRn, 9, 0)
++#define OP_AT_S1E1WP	sys_insn(AT_Op0, 0, AT_CRn, 9, 1)
++#define OP_AT_S1E2R	sys_insn(AT_Op0, 4, AT_CRn, 8, 0)
++#define OP_AT_S1E2W	sys_insn(AT_Op0, 4, AT_CRn, 8, 1)
++#define OP_AT_S12E1R	sys_insn(AT_Op0, 4, AT_CRn, 8, 4)
++#define OP_AT_S12E1W	sys_insn(AT_Op0, 4, AT_CRn, 8, 5)
++#define OP_AT_S12E0R	sys_insn(AT_Op0, 4, AT_CRn, 8, 6)
++#define OP_AT_S12E0W	sys_insn(AT_Op0, 4, AT_CRn, 8, 7)
 +
- Sysreg	ZCR_EL2	3	4	1	2	0
- Fields	ZCR_ELx
- EndSysreg
+ /* TLBI instructions */
+ #define OP_TLBI_VMALLE1OS		sys_insn(1, 0, 8, 1, 0)
+ #define OP_TLBI_VAE1OS			sys_insn(1, 0, 8, 1, 1)
 -- 
 2.34.1
 
