@@ -1,173 +1,104 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DDF817ACA
-	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 20:43:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692132235; x=1723668235;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=oeWYHSOvclEVydp658W8/v0Al5TEePlYRA/7mUXeLyg=;
-  b=F92OnuH++GE2/eqp27m6Krzdues2lMS7OmwXB9HX0tjGGmoTID4WDzKD
-   ebtW+/mIjpv1f5yxQ3U6/iSkT6ZU43C9onLoI7ZY9AHdzuuGAEBpf9Jw7
-   g37xF4ZfbOdiez8ezaP+dpW6otUl1PzcpO6k69Zrd3Zpx4O5z5/wKrwZb
-   zrT2rReiPUTDtKMijMPcB0kcyyHPyjsFAKyD2kMivyYf9MuZPvR5Tg/2k
-   Stx+xmHGipUcg7n61Aur/LnbuAf3GnRc+nfD7eJZC1caBanwk8HJvef3w
-   59mB93mPr/ORqY2z36SowZt0iw198b5NjzrxkOnrMK139dtjuG9HRrxeV
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="351960316"
-X-IronPort-AV: E=Sophos;i="6.01,175,1684825200"; 
-   d="scan'208";a="351960316"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2023 13:43:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="823973631"
-X-IronPort-AV: E=Sophos;i="6.01,175,1684825200"; 
-   d="scan'208";a="823973631"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by FMSMGA003.fm.intel.com with ESMTP; 15 Aug 2023 13:43:00 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 15 Aug 2023 13:42:59 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Tue, 15 Aug 2023 13:42:59 -0700
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.45) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Tue, 15 Aug 2023 13:42:59 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YAJpBj3NOvDzVk5bTrmeNcXWkecR6l4INw1bdC5a232t2EgtQZA5Peddwvv+ir3LFJ1vY0e1qGqCw4zszebiAkHoZaHs2E/r+7VhwcXff8HswMMHzE52KYv02wL2Wpx+cmNPlD4XSNfHDv/HJnr9KkGS1gu+3sYxDFXAXWp0dxSW47I+Dwt4Idkwb5L6kbHb+QVhsvmvP38lCUGLQWm/FP7OR3wvXd2xQVitmLDYYHifr4I+vCKOo9Wsz7UlE/sIiNCBFoHjWSpcelMXi9NNT4D5M/NIpg2bETzmNlu2EQugCW+MGjgzDY0MO5PUi0B/CIBsib1XzXewD1htg0omVg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oeWYHSOvclEVydp658W8/v0Al5TEePlYRA/7mUXeLyg=;
- b=Hx0rEd3+r0Hj+cnHsbm1dNzs3AuQnSCRYFHXSoBYs7lXR0yPw8ERVrSt0gEUzhnr6XS+8adlJj+YSNn83DZthvSUH2jhkG8AAd0KJenFsdLBUjM4Jw10jvivVaHpGvE+x4L7iSNZY7N6PnDpEFVZ2kwXEzRuRp8CUPXBgTTfnw074bjJgaeoe6KWd/gvsbDeqc39bJAju++1750JaNadhrdm7fSnHgDbI3jhgs7nos/t9ac0znWTIeV9oY/9r/MUF7NBRbgYiVdOxHk8eDLTP3zowo6Y9YPMHq2NVo2FYXWEUzWIBmATw3tuVsqaHx6uf/NL69Y82VtfXMI4g0XYGA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
- by CH3PR11MB7251.namprd11.prod.outlook.com (2603:10b6:610:147::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.26; Tue, 15 Aug
- 2023 20:42:52 +0000
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::abd2:f781:1433:259]) by MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::abd2:f781:1433:259%3]) with mapi id 15.20.6652.029; Tue, 15 Aug 2023
- 20:42:52 +0000
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To: "corbet@lwn.net" <corbet@lwn.net>, "ardb@kernel.org" <ardb@kernel.org>,
-	"maz@kernel.org" <maz@kernel.org>, "shuah@kernel.org" <shuah@kernel.org>,
-	"Szabolcs.Nagy@arm.com" <Szabolcs.Nagy@arm.com>, "keescook@chromium.org"
-	<keescook@chromium.org>, "james.morse@arm.com" <james.morse@arm.com>,
-	"debug@rivosinc.com" <debug@rivosinc.com>, "akpm@linux-foundation.org"
-	<akpm@linux-foundation.org>, "catalin.marinas@arm.com"
-	<catalin.marinas@arm.com>, "oleg@redhat.com" <oleg@redhat.com>,
-	"arnd@arndb.de" <arnd@arndb.de>, "ebiederm@xmission.com"
-	<ebiederm@xmission.com>, "will@kernel.org" <will@kernel.org>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, "broonie@kernel.org" <broonie@kernel.org>
-CC: "hjl.tools@gmail.com" <hjl.tools@gmail.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D36517FEA
+	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 21:02:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFEC6C433C9;
+	Tue, 15 Aug 2023 21:02:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692133326;
+	bh=cyy9dMmZpCKf0kwV7gSnc6iwwZGFtG1+94Uv3PmsMU4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bqt6Z6qZREPwPFwBqdMZB2kGJkkZypRmE9bwxc/FX8l6pnZwrXqDF3bNuPrbnNof+
+	 Zbk1pTJchswaB67AS8Nj1Fds9Y0G2RQA9I45EqR3l7nWywG7yppNaZroed7qaeEEAZ
+	 33mA8BkQ+gc93Br35uBf/91KWeipdjt2HZOsVUK2Ux2Vxd9ZCygGsOHP3hrhNO5jUy
+	 2VYsEWdiWM2RoeaISTVoMt6DhY/pcivI+RFTbrq8SXdIqqMaMX6HRMevIxKwi4XifW
+	 48vwEdEv9oFNrQbuyJP6Pq9qrvMreh/m17TY8MRUHS9jLxuBTcpwnJXfg4G673G6/2
+	 25g2vLFO2qOfA==
+Date: Tue, 15 Aug 2023 22:01:57 +0100
+From: Mark Brown <broonie@kernel.org>
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc: "corbet@lwn.net" <corbet@lwn.net>, "ardb@kernel.org" <ardb@kernel.org>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"shuah@kernel.org" <shuah@kernel.org>,
+	"Szabolcs.Nagy@arm.com" <Szabolcs.Nagy@arm.com>,
+	"keescook@chromium.org" <keescook@chromium.org>,
+	"james.morse@arm.com" <james.morse@arm.com>,
+	"debug@rivosinc.com" <debug@rivosinc.com>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"oleg@redhat.com" <oleg@redhat.com>,
+	"arnd@arndb.de" <arnd@arndb.de>,
+	"ebiederm@xmission.com" <ebiederm@xmission.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"hjl.tools@gmail.com" <hjl.tools@gmail.com>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
 	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
 	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>, "paul.walmsley@sifive.com"
-	<paul.walmsley@sifive.com>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
-	"palmer@dabbelt.com" <palmer@dabbelt.com>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-arch@vger.kernel.org"
-	<linux-arch@vger.kernel.org>
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+	"palmer@dabbelt.com" <palmer@dabbelt.com>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>
 Subject: Re: [PATCH v4 21/36] arm64/mm: Implement map_shadow_stack()
-Thread-Topic: [PATCH v4 21/36] arm64/mm: Implement map_shadow_stack()
-Thread-Index: AQHZyXsMNVNM7/zTI0u1rug712WAyq/r3yeA
-Date: Tue, 15 Aug 2023 20:42:52 +0000
-Message-ID: <8a7bb14f808ab9da413c11f281041375d9a54b01.camel@intel.com>
+Message-ID: <496b9d81-c4c8-471d-9be0-3a0c8fbab436@sirena.org.uk>
 References: <20230807-arm64-gcs-v4-0-68cfa37f9069@kernel.org>
-	 <20230807-arm64-gcs-v4-21-68cfa37f9069@kernel.org>
-In-Reply-To: <20230807-arm64-gcs-v4-21-68cfa37f9069@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.44.4-0ubuntu2 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|CH3PR11MB7251:EE_
-x-ms-office365-filtering-correlation-id: 20b106f0-c809-4448-9a55-08db9dd03235
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: yG6YuG678LecjS07qkY4HBoGggCtN+fNjCAEFQDs/lKUCfn+7WAfNdyqxsMk1Drw4q6V93ppHT7mjQlLEgX968236L6ix71RjJOp7twd1O7NmM4dCe9S6CBILiAX/NsYENY7axSOpLmpKnk1zKE2NjofGVQL/Ip8daYgpWY5ZnCeUVvc+QUgQeq7bI3adH8zTGSTT55a25f1rEYu1MKVp6Ke5bhJlzYyM+5HmeGev+O8zjFIor7WC5zCYtp0MG0Qjojw5y+TkxBGoxR9IsJvDWQV7T6Yv41Bh63hgyVh/aClPhLlEKbk3X6Dzxj7CYIv+wQ4xz03y2YaWduLnsJkO2eEi+BtF/aZKXqs/kE1dsCuDsOoXIHkgPVsWtBQ1E47c8xsWJgXM5AkMT1fbTprxzEaPLSdvQ3scG0SiP3vpeK6e1Hd3hQ3hoobO7H8jAWHkLR2uw3qfOLVq1KpEaAf8DVoccPDs8Xh86xCctTjIXLVBN1+7rZgNxKPxmO8eF7Z5pOaDZDzba9z69x33WJpISdCYKZDkYcoLk5K1Km3IV/G0DrvdFgZS5iwRcoQgnYvpZjqfQs/B7PAb0QdeErlCjIbUGSuedmxJCE3Z9/VIv4qipAoWUt5iJm1UVEvb1v/
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(376002)(366004)(136003)(346002)(1800799009)(186009)(451199024)(26005)(54906003)(316002)(5660300002)(8676002)(110136005)(66446008)(66476007)(38070700005)(82960400001)(122000001)(38100700002)(6512007)(921005)(6486002)(2906002)(2616005)(478600001)(71200400001)(7406005)(7416002)(6506007)(41300700001)(66946007)(64756008)(86362001)(76116006)(91956017)(66556008)(558084003)(8936002)(36756003)(4326008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?eG10ZGhJellXRzhPUXdQZVpTUC9CNGN5WUZWbFpiT3B2VVZ2T1dRRE5UNE9k?=
- =?utf-8?B?TGxrcDNSWUtlYWdraUQvamNEcFYrdWIrdVVFT25tOFdFVzBaOGVXTGtjRkNV?=
- =?utf-8?B?ellsNk8yc0JjTUxVOWt0UEpBTGkva2xxSzl1b3JTZEdCWjBDdnRUMVc0L1dp?=
- =?utf-8?B?SkhvSHFxbU9tbDBscForak9ld0tudUFSTmRFM0kxT3hpZlJVMHREcFZGNlZ4?=
- =?utf-8?B?M1dOaDQ4eFRqUks2a3NUZjNnNmV1RURNM051enErbHVpR1dLMVovd3BGNmdU?=
- =?utf-8?B?eDF1YnhLYUtWRktxb1kyS25saUw2V1B1SkhXMnp2YjduZFBjWTFKWCtOSTZ4?=
- =?utf-8?B?SW9ZdXMxcFlXQTNKZnBRT1JOTkdpZzN2bGJqRmszNWZmY2xhTGxwaXdyVktj?=
- =?utf-8?B?OVlEQmFNWkZPZUNLZ3F6dmZTUFZRdFYvRVZ4TGZOOE9KejRMU0JBVVlSc1Zi?=
- =?utf-8?B?dE8rbG1lMzIrem8xTUpTcE1Rak1rbzVlTmNPVkV5ZkZ2ejc0TjRXU01xRVJI?=
- =?utf-8?B?Tk9NZ1g5b2s3M1BucFBkbGF4ZXR6Z1RqWnVqeC9kRE05YmJ5WHN5UHMxQXZU?=
- =?utf-8?B?VGN4elA5SytNOG1EQmc4MCtPc2dDVHc2QUZjTlJZV0hsV3orV0VIckcwZU9I?=
- =?utf-8?B?V1pLYkVsM0NyNG8vUG9iYzc0OWpLY0h0aDMyVjZNQTRRUksvSUd0UHZDM1ZT?=
- =?utf-8?B?MEpXaU5ibjZSTmM4S2I3T21raDZWa3IxcUVQWnpCMTBadHpPcGxhbnlOMHdS?=
- =?utf-8?B?L0dCL3BmZysrSWNHQ1VUcWh0RThVU3dTKzdIRzNERnBlQzRlMHpjV2NUazBt?=
- =?utf-8?B?RmVzZll5WVJuZmZ6N0h6dDUzc25PeFVxWGhMR0dtTWw4UkdxakNWeGVsNjdo?=
- =?utf-8?B?QXhZd3llOTJHQUs1N0hTYUlOanhla3A5ejZEWGhKZS9CS3hTajlzVnNDRW5C?=
- =?utf-8?B?NVJQbndmY3VVRml4ZndLRW5UZGZ2K1VFYTIxajBQa0daOXk2c1dYdlRjcmI3?=
- =?utf-8?B?TkhiWlFMR2VtMEhjZjRUNWZDM0ViMUlmZ09VWi9yOEJFcVNrQ0t4ZklpY2tq?=
- =?utf-8?B?UHY0TzA2MlJtNmNEdnZ0Z2JvUHRDL0Rlay9WOWdUR1pyN0twTCs3N01OWGJn?=
- =?utf-8?B?dmhUMmFZTnlrajd1ODM3b3E0WHh4STRvM25neWRJZm5CMUM5d3BsNk9kMGM2?=
- =?utf-8?B?YmZGT3Vjc1pZbjViY25IbUJBMXhkMzh5WWM4bEF5LzVwNnNWUWErbGFTRTFl?=
- =?utf-8?B?L2JxVk91T2F0YkJ5eEliSVNPRVcxdWxVM2xQZXkyUDNicDU4QjBZSFNnZlBZ?=
- =?utf-8?B?SndqMHA4VUYrUGtFZXBLNWhlNWQrWVM5eitTM2xTWG5ZUEtUVlRvZ1cyMWJG?=
- =?utf-8?B?QlZQM2tBbnR4U3A2ZlRuNUdXcFB3NGJjUm5pUUhxK0F4SE52UGk2MEFPdVll?=
- =?utf-8?B?MkVJY3B4eVZCanVNS3JIUkZyVGJUSkFuU2x2RHh1RUFHWm1qUWlnQ085MXZk?=
- =?utf-8?B?QmxkQWFWREpIQWFvQ3BTK01EbTl5cUVsdzNDZTJ3aEMyeFhvN0hwcFFXVUN4?=
- =?utf-8?B?WG82UmxMQitRZkJMdnRZZTNBUTBjUjVWNG52U01VdCtRaHZJUUU4bGxDSFVr?=
- =?utf-8?B?VzdjT25UK1VKOTlFVEQyeXEvbkVtMXZUTGF3ZHd2RmlXSXdSa1dlbFRQUVRD?=
- =?utf-8?B?SlpSVjl2UVhGR3FnRzZlK1dNUUluTnBTR2gxVWlpQnZ4OHNGdG9WdXNHOVpu?=
- =?utf-8?B?alY5d2lBNEZHcHV1NW16Z1FQSjVjeHJQTlhhRDFuN3NVV2VyOVRzY3l5dEdR?=
- =?utf-8?B?akVjcXJjMnFOWVl5OW80M1VNcVBRdHk1dFAxbkVIaFdLeDY5RG96NDNiNTVP?=
- =?utf-8?B?eThQS25jQW1meUM2NjhIRTNPSkNsNlZTaDJkZGxUa05IK0pTSFFKLzF1T0Ey?=
- =?utf-8?B?c2NTM3draThhZXpna1lVcmovZGppOVRxd2ltK094Mm0vY05RUGt5Rm9nVEh1?=
- =?utf-8?B?eWR2L2hkVzBlNUlaMkV2eVFUNjFJOGJwd0IyeUc4YnpGRG43d3pGUGhsNTVv?=
- =?utf-8?B?WUt6c3FadmcyTlZ1dTZnU09aVDB6ckRrQkNmaU5FaEM2MTN1bm9nT0tTNDhK?=
- =?utf-8?B?VDRzVDJ1SHJQbGRXVUt1cEFyVm9tVTBpYjc4Nmg0SXh4YzNJTUQyQkxKeEdj?=
- =?utf-8?B?L0E9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <48B7EC3EB6B4C94F9F1E08A522826245@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ <20230807-arm64-gcs-v4-21-68cfa37f9069@kernel.org>
+ <8a7bb14f808ab9da413c11f281041375d9a54b01.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 20b106f0-c809-4448-9a55-08db9dd03235
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Aug 2023 20:42:52.3969
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: qls2o4Z7ISXtkdUeqjoQfo7r71OwvIE8290Ct9q2RQVDCgGVaae1+oei+ckgLPp8IXsJ1DcXMdcA7nxgMHHcRMYy9QLJK50RLykOdD8FpUI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7251
-X-OriginatorOrg: intel.com
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="dU1pnpOPTrUAVGE+"
+Content-Disposition: inline
+In-Reply-To: <8a7bb14f808ab9da413c11f281041375d9a54b01.camel@intel.com>
+X-Cookie: Darth Vader sleeps with a Teddywookie.
 
-T24gTW9uLCAyMDIzLTA4LTA3IGF0IDIzOjAwICswMTAwLCBNYXJrIEJyb3duIHdyb3RlOg0KPiAr
-wqDCoMKgwqDCoMKgwqBpZiAoZmxhZ3MgJiB+KFNIQURPV19TVEFDS19TRVRfVE9LRU4gfA0KPiBT
-SEFET1dfU1RBQ0tfU0VUX01BUktFUikpDQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqByZXR1cm4gLUVJTlZBTDsNCj4gKw0KDQpUaGFua3MgZm9yIGFkZGluZyBTSEFET1dfU1RBQ0tf
-U0VUX01BUktFUi4gSSBkb24ndCBzZWUgd2hlcmUgaXQgaXMNCmRlZmluZWQgaW4gdGhlc2UgcGF0
-Y2hlcyB0aG91Z2guIE1pZ2h0IGhhdmUgYmVlbiBsZWZ0IG91dCBvbiBhY2NpZGVudD8NCg==
+
+--dU1pnpOPTrUAVGE+
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Aug 15, 2023 at 08:42:52PM +0000, Edgecombe, Rick P wrote:
+> On Mon, 2023-08-07 at 23:00 +0100, Mark Brown wrote:
+> > +=A0=A0=A0=A0=A0=A0=A0if (flags & ~(SHADOW_STACK_SET_TOKEN |
+> > SHADOW_STACK_SET_MARKER))
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0return -EINVAL;
+
+> Thanks for adding SHADOW_STACK_SET_MARKER. I don't see where it is
+> defined in these patches though. Might have been left out on accident?
+
+I added it to the dependency patches I've got which pull bits out of the
+x86 series prior to you having rebased it, the ABI bits are mixed in
+with the x86 architecture changes which I didn't feel like dealing with
+the rebasing for so I pulled out the ABI portions.  I'll resolve this
+properly when I rebase back onto the x86 series (ideally after the next
+merge window it'll be in mainline!).  For these that'll probably boil
+down to adding defines to prctl.h for the generic prctl API.
+
+--dU1pnpOPTrUAVGE+
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmTb58UACgkQJNaLcl1U
+h9Bc4Af/Xi/XuQ8BuGwUsA64+0G15WTAgvnaEr6smr1t4oyMFuQMUHjd7iBjOThm
+PV/FOTfozLwcOPBbBklofnYUDiI04WMQKwGbdr7Zi1+GFR6+EN7hirIWkuuvQlL5
+NKBQjm5eyQL/yYYt4BJ6hRDbRNoCsRtT6zZHwZJpMXiv+nVQBOZlasA6cZ0TgBO3
+HkA5PardmuhDrB+yavSIm9rV91v8lOpnDP5q3yF8ShV6Il1n6n8cY4FsnTaXQfpk
+dYkB1QCKNAiqGdIWRgeV11iWfrslrXztH2Z94tOjqgbLti1lmf9XEIoX4Wk9Juu8
+JF1NdrdhL8X0X+5VS1Mt4bHie2rizQ==
+=r3Gb
+-----END PGP SIGNATURE-----
+
+--dU1pnpOPTrUAVGE+--
