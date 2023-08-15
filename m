@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A3617FE8
-	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 18:39:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5885DC433B6;
-	Tue, 15 Aug 2023 18:39:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19D751804A
+	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 18:39:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A3F4C433CD;
+	Tue, 15 Aug 2023 18:39:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692124758;
-	bh=+1mSrDCrdoO+cqTPBPGRCfHi68Y0gWanHUR791COJAI=;
+	s=k20201202; t=1692124759;
+	bh=JOHupBxtKpx4MBBI2/Mdq83BzIsk3C3EsVAJ96L6pp0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=o+AzVsFklPO1y9165Wy8/F3xFYv3SPW4gDOGpIR3kVYt9HQKi+/3KnizUr9cpVACw
-	 /mBy1tnEwm2R4CNAYYPpl1tb/R8P0GWZQ0JdnK6rWrSo3E6WXwnJBsI9OgRnyfXkYl
-	 leErSk2qedYiKro0QOGb2v4aV28SwJPAKLfyE9jVYuyB4db2t9dsignO0nxxjUORk9
-	 ZxZhCl7uIvTK7p2sKjJ8gpvXCScCXLJymbNqjLsgP/P8KUZqsERgNv2SIKP97bm9R5
-	 A9R7MfBiPynKi2wcOXQZnNv6cj30o0+Cx7gwWV22hD7R5dKsTSqevHXdPa4tT6SurB
-	 McCY7vySOdpTA==
+	b=DQIppp5HQOwOENNlmhnpDitUo8d0aHHI+avLttjzIvVw64oczFexH5Y5s21uyHnjK
+	 Giyyo1OVhvMBPrb555RLsn2SfOooFVBQxth8nB62uuSLXTY4nd8VfvcisQQFrNUSGw
+	 DYf/uIZgwTQLalbhym47GAt8hcPxBCvKFw3+Xi0SULO6VJgyLZVQglX9ixvRrfZ3/h
+	 p/AuWk9Q++6AwLIkEF3+DEjaiQ9wuhRYct3GvInHq++yaKOk+0k0AMpshtUeqa+THc
+	 OwlXnSOKgAobatSkJ+7w3YX+wR+tvrrSJK3+Xmvn5JiHNuCY5vagS92679ZxMT0YPz
+	 74/DBbs3E3Tvg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qVywm-0055Sd-Gh;
-	Tue, 15 Aug 2023 19:39:16 +0100
+	id 1qVywn-0055Sd-Mk;
+	Tue, 15 Aug 2023 19:39:17 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -41,9 +41,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v4 05/28] arm64: Add AT operation encodings
-Date: Tue, 15 Aug 2023 19:38:39 +0100
-Message-Id: <20230815183903.2735724-6-maz@kernel.org>
+Subject: [PATCH v4 09/28] arm64: Add feature detection for fine grained traps
+Date: Tue, 15 Aug 2023 19:38:43 +0100
+Message-Id: <20230815183903.2735724-10-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230815183903.2735724-1-maz@kernel.org>
 References: <20230815183903.2735724-1-maz@kernel.org>
@@ -59,46 +59,56 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the encodings for the AT operation that are usable from NS.
+From: Mark Brown <broonie@kernel.org>
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+In order to allow us to have shared code for managing fine grained traps
+for KVM guests add it as a detected feature rather than relying on it
+being a dependency of other features.
+
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Mark Brown <broonie@kernel.org>
+[maz: converted to ARM64_CPUID_FIELDS()]
+Link: https://lore.kernel.org/r/20230301-kvm-arm64-fgt-v4-1-1bf8d235ac1f@kernel.org
 Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
 Reviewed-by: Jing Zhang <jingzhangos@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ arch/arm64/kernel/cpufeature.c | 7 +++++++
+ arch/arm64/tools/cpucaps       | 1 +
+ 2 files changed, 8 insertions(+)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 72e18480ce62..76289339b43b 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -514,6 +514,23 @@
- 
- #define SYS_SP_EL2			sys_reg(3, 6,  4, 1, 0)
- 
-+/* AT instructions */
-+#define AT_Op0 1
-+#define AT_CRn 7
-+
-+#define OP_AT_S1E1R	sys_insn(AT_Op0, 0, AT_CRn, 8, 0)
-+#define OP_AT_S1E1W	sys_insn(AT_Op0, 0, AT_CRn, 8, 1)
-+#define OP_AT_S1E0R	sys_insn(AT_Op0, 0, AT_CRn, 8, 2)
-+#define OP_AT_S1E0W	sys_insn(AT_Op0, 0, AT_CRn, 8, 3)
-+#define OP_AT_S1E1RP	sys_insn(AT_Op0, 0, AT_CRn, 9, 0)
-+#define OP_AT_S1E1WP	sys_insn(AT_Op0, 0, AT_CRn, 9, 1)
-+#define OP_AT_S1E2R	sys_insn(AT_Op0, 4, AT_CRn, 8, 0)
-+#define OP_AT_S1E2W	sys_insn(AT_Op0, 4, AT_CRn, 8, 1)
-+#define OP_AT_S12E1R	sys_insn(AT_Op0, 4, AT_CRn, 8, 4)
-+#define OP_AT_S12E1W	sys_insn(AT_Op0, 4, AT_CRn, 8, 5)
-+#define OP_AT_S12E0R	sys_insn(AT_Op0, 4, AT_CRn, 8, 6)
-+#define OP_AT_S12E0W	sys_insn(AT_Op0, 4, AT_CRn, 8, 7)
-+
- /* TLBI instructions */
- #define OP_TLBI_VMALLE1OS		sys_insn(1, 0, 8, 1, 0)
- #define OP_TLBI_VAE1OS			sys_insn(1, 0, 8, 1, 1)
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index f9d456fe132d..668e2872a086 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -2627,6 +2627,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.matches = has_cpuid_feature,
+ 		ARM64_CPUID_FIELDS(ID_AA64ISAR1_EL1, LRCPC, IMP)
+ 	},
++	{
++		.desc = "Fine Grained Traps",
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.capability = ARM64_HAS_FGT,
++		.matches = has_cpuid_feature,
++		ARM64_CPUID_FIELDS(ID_AA64MMFR0_EL1, FGT, IMP)
++	},
+ #ifdef CONFIG_ARM64_SME
+ 	{
+ 		.desc = "Scalable Matrix Extension",
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index c80ed4f3cbce..c3f06fdef609 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -26,6 +26,7 @@ HAS_ECV
+ HAS_ECV_CNTPOFF
+ HAS_EPAN
+ HAS_EVT
++HAS_FGT
+ HAS_GENERIC_AUTH
+ HAS_GENERIC_AUTH_ARCH_QARMA3
+ HAS_GENERIC_AUTH_ARCH_QARMA5
 -- 
 2.34.1
 
