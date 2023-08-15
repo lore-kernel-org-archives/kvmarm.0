@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B4C418026
-	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 18:47:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F909C433CA;
-	Tue, 15 Aug 2023 18:47:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C37ED18026
+	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 18:47:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FEA8C433C7;
+	Tue, 15 Aug 2023 18:47:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692125244;
-	bh=Z++k16JmZHizsACr+O/98fpQOHUIigAeSJVEHAo5I3A=;
+	s=k20201202; t=1692125246;
+	bh=v14IojDp6AXMlyxigixKTDbkS10hBLsvxT+YL2CxH+0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CdbW+RgDH51z3BV1G0Gu1p/sttAAZPPVEg0yJwYDS6xZO64NOII/+jb+MjWDip1Nt
-	 leSrV3wKKDVtWFr8h21qVbdrRsJlGgE//dohae8Yc8pge+Yvu99Nbbzk2HxsZvYRAc
-	 PAStuw8AnNoYqJCRAXWJ0eZNeMu7vO60HysaTAtkvTC0YpKVRzfQEbYSRD73DQz+JF
-	 JlAz9tglfePURkyAqNPNS+oCjfZJ345oo89hfwBe+pFeK+AzCCT73WaH60Blzrci/m
-	 lfCFZzpFa81icgEM1FfsnN/zGilZJXFol2nNlNtoUJwVaOAOVZ4RYHmwM8XIAyaygs
-	 MUfC3vA9RNPTQ==
+	b=qDghxZs4koXx7ry+ilWYnZMhGNyAeAiUsdk1dKO2dPuUuSoKYMb/ZMAA0qJ6cRkOC
+	 10iOScIX/uIXzrOPHgaLRX7eR9KnDkoYnA9w+/fWqA+VWaV9y+hDsOqMIo3MpPlS0B
+	 jOH7kM3JavT+GNKI9xPJeq4zmep65L4oMEZKeclnSz+N/vSaH6aAxldb7WXIrmtIyk
+	 sx5k6cK8B02L+fDpLsri+pv2rfb8/ps0bI6+Yigo2mQABMHX9lIDvpcEdFIFryahYf
+	 M0b8ANRATdO1NXORWel2fUJrfiV76eLgwVUE2TnMGkeENa4ZY3IvXjTVZsb0NJfppO
+	 ivpXUJAf/+6EQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qVywo-0055Sd-GJ;
-	Tue, 15 Aug 2023 19:39:18 +0100
+	id 1qVyws-0055Sd-8g;
+	Tue, 15 Aug 2023 19:39:22 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -41,9 +41,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v4 12/28] KVM: arm64: nv: Add FGT registers
-Date: Tue, 15 Aug 2023 19:38:46 +0100
-Message-Id: <20230815183903.2735724-13-maz@kernel.org>
+Subject: [PATCH v4 26/28] KVM: arm64: nv: Expose FGT to nested guests
+Date: Tue, 15 Aug 2023 19:39:00 +0100
+Message-Id: <20230815183903.2735724-27-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230815183903.2735724-1-maz@kernel.org>
 References: <20230815183903.2735724-1-maz@kernel.org>
@@ -59,57 +59,30 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the 5 registers covering FEAT_FGT. The AMU-related registers
-are currently left out as we don't have a plan for them. Yet.
+Now that we have FGT support, expose the feature to NV guests.
 
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
-Reviewed-by: Jing Zhang <jingzhangos@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 5 +++++
- arch/arm64/kvm/sys_regs.c         | 5 +++++
- 2 files changed, 10 insertions(+)
+ arch/arm64/kvm/nested.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index d3dd05bbfe23..721680da1011 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -400,6 +400,11 @@ enum vcpu_sysreg {
- 	TPIDR_EL2,	/* EL2 Software Thread ID Register */
- 	CNTHCTL_EL2,	/* Counter-timer Hypervisor Control register */
- 	SP_EL2,		/* EL2 Stack Pointer */
-+	HFGRTR_EL2,
-+	HFGWTR_EL2,
-+	HFGITR_EL2,
-+	HDFGRTR_EL2,
-+	HDFGWTR_EL2,
- 	CNTHP_CTL_EL2,
- 	CNTHP_CVAL_EL2,
- 	CNTHV_CTL_EL2,
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 38f221f9fc98..f5baaa508926 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2367,6 +2367,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG(MDCR_EL2, access_rw, reset_val, 0),
- 	EL2_REG(CPTR_EL2, access_rw, reset_val, CPTR_NVHE_EL2_RES1),
- 	EL2_REG(HSTR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(HFGRTR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(HFGWTR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(HFGITR_EL2, access_rw, reset_val, 0),
- 	EL2_REG(HACR_EL2, access_rw, reset_val, 0),
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 7f80f385d9e8..3facd8918ae3 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -71,8 +71,9 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+ 		break;
  
- 	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
-@@ -2376,6 +2379,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG(VTCR_EL2, access_rw, reset_val, 0),
- 
- 	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
-+	EL2_REG(HDFGRTR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(HDFGWTR_EL2, access_rw, reset_val, 0),
- 	EL2_REG(SPSR_EL2, access_rw, reset_val, 0),
- 	EL2_REG(ELR_EL2, access_rw, reset_val, 0),
- 	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
+ 	case SYS_ID_AA64MMFR0_EL1:
+-		/* Hide ECV, FGT, ExS, Secure Memory */
+-		val &= ~(GENMASK_ULL(63, 43)		|
++		/* Hide ECV, ExS, Secure Memory */
++		val &= ~(NV_FTR(MMFR0, ECV)		|
++			 NV_FTR(MMFR0, EXS)		|
+ 			 NV_FTR(MMFR0, TGRAN4_2)	|
+ 			 NV_FTR(MMFR0, TGRAN16_2)	|
+ 			 NV_FTR(MMFR0, TGRAN64_2)	|
 -- 
 2.34.1
 
