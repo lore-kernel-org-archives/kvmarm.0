@@ -1,133 +1,90 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EE6CA93A
-	for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 23:21:44 +0000 (UTC)
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1bc3d94d40fso42004445ad.3
-        for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 16:21:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A091179
+	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 00:07:04 +0000 (UTC)
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-4881ac152b5so3853e0c.2
+        for <kvmarm@lists.linux.dev>; Mon, 14 Aug 2023 17:07:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1692055304; x=1692660104;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zDgteNssk7bldWg1S9G58zrFCCsMMUu+wXIpurB+HOk=;
-        b=f0Ak5IcltrDFdkQCDY8pIN2Q+ApDStplykSnlDyPTlJ5hOzrqc9PWJCJjuzY2a8RJ+
-         g8xVrAL3nMB+kfcdXe60p9qKEe3GlaSBVzwWcARsfm76j54TnQAq99JEPb1dmu6zAVNx
-         W/EJPZgrIcJBBWdgJxFVqDLwjpYw5EdzIukns=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692055304; x=1692660104;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20221208; t=1692058024; x=1692662824;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zDgteNssk7bldWg1S9G58zrFCCsMMUu+wXIpurB+HOk=;
-        b=MtWdxfWY+Pa7rQe1WR/Yr8eQxJPsy7tTiIBTaOeLUhkqiXquVE3qlqlU/IcqwD+gbC
-         v15iYGbJ+AShk2Kl2Iw7B53DwsWrQ6Tk81jEaDMmBL6ssUMKHCsOcWLvUOX2aHfTR61X
-         WEE1zHET5hB7RDyj7eI76ogyRZ1KmchCI7omBb23ftV37zQVMVEFodbGZTdd1JQHrKU2
-         FW4BWoreyLWBQt1eG+CejojOjxhl9nyF0jsQWRxN4juRafzq7TGcIVtutSdRE6LNxh2w
-         7Mo8mxCgaxAJQd5AqSKqD/KGbkRdUEvabaLK3Zji756qfjRL/fwnz+geQkAah3zNKpo1
-         MabA==
-X-Gm-Message-State: AOJu0YxSa0uJ2lhh+A+R+nRbegy7FQyT/CUZNV4U/uYrSsZSDAwTOs3I
-	mnxLQYqxsMe0wipV+4degraNUQ==
-X-Google-Smtp-Source: AGHT+IHSGL8C59m4WskNFhunf6W+tABRL2W8v1BYu6fmf1+j7vX3+mrOp1twYX7SxuE7dHDeO2B60Q==
-X-Received: by 2002:a17:902:e802:b0:1bc:422a:b9fd with SMTP id u2-20020a170902e80200b001bc422ab9fdmr13245083plg.13.1692055304507;
-        Mon, 14 Aug 2023 16:21:44 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id c13-20020a170902d48d00b001bdcd4b1616sm5310621plg.260.2023.08.14.16.21.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Aug 2023 16:21:43 -0700 (PDT)
-Date: Mon, 14 Aug 2023 16:21:43 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Marco Elver <elver@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Steven Rostedt <rostedt@goodmis.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Tom Rix <trix@redhat.com>, Miguel Ojeda <ojeda@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org,
-	llvm@lists.linux.dev, Dmitry Vyukov <dvyukov@google.com>,
-	Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com,
-	linux-toolchains@vger.kernel.org
-Subject: Re: [PATCH v4 1/4] compiler_types: Introduce the Clang
- __preserve_most function attribute
-Message-ID: <202308141620.E16B93279@keescook>
-References: <20230811151847.1594958-1-elver@google.com>
+        bh=NEb/LALV6ac5FnGK5WrJgICv/9PyQoMajfPza96VUQo=;
+        b=DwuVEz4JSsZHVlYPo5/0uGw0vF6PVEoFMndDCjy7Xze8LDueMPDF9Pp7ZkZnY/d0CT
+         JCtfkLzUhpnNNou4G69uaoUoIb19o5DY40LlyrM8fuPvMOt2qhnyo8hlc3N+E6tUJ835
+         M+KQxYv3ww1vSZ1tzHs9to2SbY4kkNJN54lDZtJxmnZcBCOWw9g/JhJOvh943aLBWEyF
+         ZaobUvc2lF/zTSryWfeglBni8Sz0fsOis7UtmZlKZdgFIGuy6cBhJmP9v/BuVPS+I4Zk
+         1OB5Y2dW/33DPFw709/6rLrZihjpghiic6AXuWItBj/bRxVNey63LhJHcOayLG5nUyzo
+         IHsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692058024; x=1692662824;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NEb/LALV6ac5FnGK5WrJgICv/9PyQoMajfPza96VUQo=;
+        b=ivSpTCp/huRlHcML6N9z3EyyyjngCO/mZ1NTBe/MZbfNmIbdFOul1PmmlGyR7AT0u8
+         +ZVhGqkEMOX8zrw6/+omthR0ZGZbTyEqj2vTpXZvpq70EXshdtlwBlr6/Re+kY8Luj+0
+         kpxLvijOnUBbiQXPhnY9nGbA/jMoCHYs57jU0jIFpeJg9J2XQebZM26spMLW8dN6w8ud
+         MNmfHMcRzIqKZLlLx/DbduFw5w2dDvDfNMTYAk55XZ3sEe0q5fFX6IciYOKXKc5jkBx7
+         i06R8g0Gmef3kjotFwNYODByemQSneYSVKfi7JKK9zDKyuhfe6GwpWEjYfBmGm++umNs
+         cLQA==
+X-Gm-Message-State: AOJu0YxDMfcKG79u23ahDaX6tZwdStJecJ3TTwnTXJ7H6asOqqaKugu3
+	q8Nehz8RdWjPaaMp0LeSqkz4jEMFqstfqAnypa5Ghw==
+X-Google-Smtp-Source: AGHT+IHsIHwWXyqKbw7AFdpj6pk0PdEeqqURN+HPrG/ZUKB6E/6g9lCm3ByHYeozRrG1lCRfMQ1nz8sfwhXku6E9G68=
+X-Received: by 2002:a1f:ea44:0:b0:487:e8f1:a2c1 with SMTP id
+ i65-20020a1fea44000000b00487e8f1a2c1mr7836670vkh.8.1692058023805; Mon, 14 Aug
+ 2023 17:07:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230811151847.1594958-1-elver@google.com>
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-4-amoorthy@google.com>
+ <ZIn6VQSebTRN1jtX@google.com> <CAF7b7mqfkLYtWBJ=u0MK7hhARHrahQXHza9VnaughyNz5_tNug@mail.gmail.com>
+ <ZNpsCngiSjISMG5j@google.com>
+In-Reply-To: <ZNpsCngiSjISMG5j@google.com>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Mon, 14 Aug 2023 17:06:27 -0700
+Message-ID: <CAF7b7mo0gGGhv9dSFV70md1fNqMvPCfZ05VawPOB=xFkaax8AA@mail.gmail.com>
+Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+To: Sean Christopherson <seanjc@google.com>
+Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
+	jthoughton@google.com, bgardon@google.com, dmatlack@google.com, 
+	ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com, 
+	nadav.amit@gmail.com, isaku.yamahata@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 11, 2023 at 05:18:38PM +0200, Marco Elver wrote:
-> [1]: "On X86-64 and AArch64 targets, this attribute changes the calling
-> convention of a function. The preserve_most calling convention attempts
-> to make the code in the caller as unintrusive as possible. This
-> convention behaves identically to the C calling convention on how
-> arguments and return values are passed, but it uses a different set of
-> caller/callee-saved registers. This alleviates the burden of saving and
-> recovering a large register set before and after the call in the caller.
-> If the arguments are passed in callee-saved registers, then they will be
-> preserved by the callee across the call. This doesn't apply for values
-> returned in callee-saved registers.
-> 
->  * On X86-64 the callee preserves all general purpose registers, except
->    for R11. R11 can be used as a scratch register. Floating-point
->    registers (XMMs/YMMs) are not preserved and need to be saved by the
->    caller.
-> 
->  * On AArch64 the callee preserve all general purpose registers, except
->    x0-X8 and X16-X18."
-> 
-> [1] https://clang.llvm.org/docs/AttributeReference.html#preserve-most
-> 
-> Introduce the attribute to compiler_types.h as __preserve_most.
-> 
-> Use of this attribute results in better code generation for calls to
-> very rarely called functions, such as error-reporting functions, or
-> rarely executed slow paths.
-> 
-> Beware that the attribute conflicts with instrumentation calls inserted
-> on function entry which do not use __preserve_most themselves. Notably,
-> function tracing which assumes the normal C calling convention for the
-> given architecture.  Where the attribute is supported, __preserve_most
-> will imply notrace. It is recommended to restrict use of the attribute
-> to functions that should or already disable tracing.
-> 
-> Note: The additional preprocessor check against architecture should not
-> be necessary if __has_attribute() only returns true where supported;
-> also see https://github.com/ClangBuiltLinux/linux/issues/1908. But until
-> __has_attribute() does the right thing, we also guard by known-supported
-> architectures to avoid build warnings on other architectures.
-> 
-> The attribute may be supported by a future GCC version (see
-> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=110899).
-> 
-> Signed-off-by: Marco Elver <elver@google.com>
-> Reviewed-by: Miguel Ojeda <ojeda@kernel.org>
-> Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-> Acked-by: Steven Rostedt (Google) <rostedt@goodmis.org>
-> Acked-by: Mark Rutland <mark.rutland@arm.com>
+On Mon, Aug 14, 2023 at 11:01=E2=80=AFAM Sean Christopherson <seanjc@google=
+.com> wrote:
+>
+> What is/was the error?  It's probably worth digging into; "static inline"=
+ should
+> work just fine, so there might be something funky elsewhere that you're p=
+apering
+> over.
 
-Should this go via -mm, the hardening tree, or something else? I'm happy
-to carry it if no one else wants it?
+What I get is
 
--Kees
+> ./include/linux/kvm_host.h:2298:20: error: function 'kvm_handle_guest_uac=
+cess_fault' has internal linkage but is not defined [-Werror,-Wundefined-in=
+ternal]
+> static inline void kvm_handle_guest_uaccess_fault(struct kvm_vcpu *vcpu,
+>                    ^
+> arch/x86/kvm/mmu/mmu.c:3323:2: note: used here
+>         kvm_handle_guest_uaccess_fault(vcpu, gfn_to_gpa(fault->gfn), PAGE=
+_SIZE,
+>         ^
+> 1 error generated.
 
--- 
-Kees Cook
+(mmu.c:3323 is in kvm_handle_error_pfn()). I tried shoving the
+definition of the function from kvm_main.c to kvm_host.h so that I
+could make it "static inline": but then the same "internal linkage"
+error pops up in the kvm_vcpu_read/write_guest_page() functions.
+
+Btw, do you actually know the size of the union in the run struct? I
+started checking it but stopped when I realized that it includes
+arch-dependent structs.
