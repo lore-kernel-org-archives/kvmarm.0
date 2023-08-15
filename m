@@ -1,90 +1,398 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 199131988D
-	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 22:31:31 +0000 (UTC)
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-565ece76be4so757674a12.2
-        for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 15:31:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 566DB17733
+	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 22:33:33 +0000 (UTC)
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-4fe11652b64so9285947e87.0
+        for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 15:33:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692138691; x=1692743491;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=c05rm68PGHctHfBOW0BB2Jo3SVzvE3TlPm3JKZSv5Mw=;
-        b=zSFF7IvUGxfd6gkBF8F4GxNIfCZDaje81HGokT4kVqC0KU5MBZZfnSNOssjA6mgPAN
-         cRsGYufjjTrofJ5vumrJHSKBn+aQkdbQm8SJ6Tg7pe3uSFLBt5uqtw3fpFPHIwqCLQwl
-         XcScAy71RtNQVglvUX71pW9VDOezt9WeMjdzJpB8j6xCtBMrW64e4RqjVsEAATOLSY+2
-         Kc0mkrDGoXj1Uxkmf3RdCa1iiwYYcPfTD1tlmgV7Y1a7fsQcwwVcxfXNnu1VMojtXQVU
-         cWzhmvK9BEtXIJT8SQyPj67km+M1Y0mj0c3KYu6zoMpRyt7aoFrrEFWzb2h44tTJG4MZ
-         Z3EQ==
+        d=google.com; s=20221208; t=1692138811; x=1692743611;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7OKZ0FVv3oMQAku3AZaR+FM9KCHIwuzbz5I8y+PZno8=;
+        b=JgM4cAiCMOGSmNKjuwAdMuHJnX4w7+kq0nyhuHvNusxpP8AJa0MERWFQBTl02k5LjO
+         JKbZW1w2jcKbuSBEgnifNB8kkdWBkHTqRc1O4jAN4A0njltVJvKEqq/9N7QiC66yhWed
+         IVk73Kf8O8DdGJvywNrmGqo3/7EfQsXsCrE/0plA+t3w/hsHBF/G9gJOnhk1HAuVRrvI
+         kyVfEz1Vz0oPXTY6SSoFfmfj/TXKrgfk6lkO2/bbO4nJlP3j6jR2sr5fxdsowh3e+Vnk
+         ML3Q+AIoJfFQk61zSoPaZ+kF5cSHz4xle7ZrDZl/J4qqsp5vptFULVmLAoGgu1nJgJVQ
+         nDkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692138691; x=1692743491;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=c05rm68PGHctHfBOW0BB2Jo3SVzvE3TlPm3JKZSv5Mw=;
-        b=UNu9QHGJdWsEB/T9jnNDL55VTxxy39F90AviaQtuL2JVW/lRYTAfP3Iug2NKDXp3e9
-         lXU19yBHJZtWSa2yoJBUX9NFGRy0LJ/Y4n0JXdf54sOXcST8kJOAagWgNg5C0qa7hi5I
-         /MA4ocrxfI4E5x3Z+mgwvwp244ZS41VIuhxxEJJYcnWkt6u7gUfKLdkpAH3NLUaajdFk
-         ODh8jiDQ9cloQXGrQZmNrJ2ufUru0kO4mTyVDZ3+qmCsklS415CfpiQcsIfJvwBGF2C9
-         /PKSMW5r175TyaJ5QxL4u/zQzXnBM9e5Y+ovPw10WAUP8nhp4RQq/vCl7IHgGKlH/Y8u
-         tKrQ==
-X-Gm-Message-State: AOJu0Yzcy9J8K4qoZx/veXJFKoYn0yHgIJAZZJuxgNvCvZD0AdZARtT0
-	AC/wOyEYRJmJYy9NAdStOI/xQpC6sUY=
-X-Google-Smtp-Source: AGHT+IFdD7miISJ5FT27quR/P7x6Ii7fo9teB2QXXhYX+gchH8nb3ttm0pZzM2e0YrayRrW5/0n1JDm2xpA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:3e4c:0:b0:563:dced:3f35 with SMTP id
- l73-20020a633e4c000000b00563dced3f35mr36925pga.4.1692138691431; Tue, 15 Aug
- 2023 15:31:31 -0700 (PDT)
-Date: Tue, 15 Aug 2023 15:31:29 -0700
-In-Reply-To: <20230811045127.3308641-7-rananta@google.com>
+        d=1e100.net; s=20221208; t=1692138811; x=1692743611;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7OKZ0FVv3oMQAku3AZaR+FM9KCHIwuzbz5I8y+PZno8=;
+        b=PtL0vGUPvIwY0WoYlY2ujUjyjLClax4aRLmFSrhsBKdLFxOSXL6zj2hwiqMCGQ9+2r
+         0u/0/gbPvd75iOCRmfblpjzxjDlLQrtu4Hv4glKlM0U6ltbWvmk7X7eF/LJCML1TfxNC
+         n0/d38x1xISy+/myVK6s8P4GAD7kht5TciX+r9NdRq3DT+LWybOUejH+O65pVG37yQfs
+         Vqx5qvBWgD+Zoxxc6ZpcSjTvYQveOFMOabnpUCpl40AlQgRVUsiJqWIcsrBHXxSPS0cK
+         WnadsRVErHT0JlK1tfEgiMzACkygoAFDJuS4awoY83cVHV5+VEo5CcC8y8rlb61GOEBS
+         7b9Q==
+X-Gm-Message-State: AOJu0YxipoQ6Y06OQAB95FmwWnCK1kTQ+l78ZraNjixxTB8OxJhc3kXY
+	YbuUsMl0PRxDSs5MBmD+RxOHndZfsbGnqIMeHsuIaqIiMHNFci1biMvjKA==
+X-Google-Smtp-Source: AGHT+IHZy4ogD7V7F6r8bJEphlXqd6ZbNeWRKcNlJZ2qtHwCPnPD2bRwVmDRJHE++Uzghe3diNIueuBw1ArBBD2rwQA=
+X-Received: by 2002:a2e:9450:0:b0:2b6:a804:4cc with SMTP id
+ o16-20020a2e9450000000b002b6a80404ccmr64245ljh.53.1692138810993; Tue, 15 Aug
+ 2023 15:33:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230811045127.3308641-1-rananta@google.com> <20230811045127.3308641-7-rananta@google.com>
-Message-ID: <ZNv8weRKhSeLYWIc@google.com>
-Subject: Re: [PATCH v9 06/14] KVM: Move kvm_arch_flush_remote_tlbs_memslot()
- to common code
-From: Sean Christopherson <seanjc@google.com>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
+MIME-Version: 1.0
+References: <20230815183903.2735724-1-maz@kernel.org> <20230815183903.2735724-18-maz@kernel.org>
+In-Reply-To: <20230815183903.2735724-18-maz@kernel.org>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Tue, 15 Aug 2023 15:33:18 -0700
+Message-ID: <CAAdAUtjG3aR9EFu05Zk9wGUzAsJyH5-8Q-G3+n13Q17NcXLyGg@mail.gmail.com>
+Subject: Re: [PATCH v4 17/28] KVM: arm64: nv: Add trap forwarding for MDCR_EL2
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, 
+	Catalin Marinas <catalin.marinas@arm.com>, Eric Auger <eric.auger@redhat.com>, 
+	Mark Brown <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Andre Przywara <andre.przywara@arm.com>, 
+	Chase Conklin <chase.conklin@arm.com>, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, 
+	Darren Hart <darren@os.amperecomputing.com>, Miguel Luis <miguel.luis@oracle.com>, 
 	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhuacai@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Jing Zhang <jingzhangos@google.com>, 
-	Reiji Watanabe <reijiw@google.com>, Colton Lewis <coltonlewis@google.com>, 
-	David Matlack <dmatlack@google.com>, Fuad Tabba <tabba@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, Gavin Shan <gshan@redhat.com>, Shaoqin Huang <shahuang@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 11, 2023, Raghavendra Rao Ananta wrote:
-> From: David Matlack <dmatlack@google.com>
-> 
-> Move kvm_arch_flush_remote_tlbs_memslot() to common code and drop
-> "arch_" from the name. kvm_arch_flush_remote_tlbs_memslot() is just a
-> range-based TLB invalidation where the range is defined by the memslot.
-> Now that kvm_flush_remote_tlbs_range() can be called from common code we
-> can just use that and drop a bunch of duplicate code from the arch
-> directories.
-> 
-> Note this adds a lockdep assertion for slots_lock being held when
-> calling kvm_flush_remote_tlbs_memslot(), which was previously only
-> asserted on x86. MIPS has calls to kvm_flush_remote_tlbs_memslot(),
-> but they all hold the slots_lock, so the lockdep assertion continues to
-> hold true.
-> 
-> Also drop the CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT ifdef gating
-> kvm_flush_remote_tlbs_memslot(), since it is no longer necessary.
-> 
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> Acked-by: Anup Patel <anup@brainfault.org>
+Hi Marc,
+
+On Tue, Aug 15, 2023 at 11:46=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
+e:
+>
+> Describe the MDCR_EL2 register, and associate it with all the sysregs
+> it allows to trap.
+>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
+>  arch/arm64/kvm/emulate-nested.c | 268 ++++++++++++++++++++++++++++++++
+>  1 file changed, 268 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nes=
+ted.c
+> index 975a30ef874a..241e44eeed6d 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -67,6 +67,18 @@ enum cgt_group_id {
+>         CGT_HCR_TTLBIS,
+>         CGT_HCR_TTLBOS,
+>
+> +       CGT_MDCR_TPMCR,
+> +       CGT_MDCR_TPM,
+> +       CGT_MDCR_TDE,
+> +       CGT_MDCR_TDA,
+> +       CGT_MDCR_TDOSA,
+> +       CGT_MDCR_TDRA,
+> +       CGT_MDCR_E2PB,
+> +       CGT_MDCR_TPMS,
+> +       CGT_MDCR_TTRF,
+> +       CGT_MDCR_E2TB,
+> +       CGT_MDCR_TDCC,
+> +
+>         /*
+>          * Anything after this point is a combination of coarse trap
+>          * controls, which must all be evaluated to decide what to do.
+> @@ -80,6 +92,11 @@ enum cgt_group_id {
+>         CGT_HCR_TPU_TICAB,
+>         CGT_HCR_TPU_TOCU,
+>         CGT_HCR_NV1_nNV2_ENSCXT,
+> +       CGT_MDCR_TPM_TPMCR,
+> +       CGT_MDCR_TDE_TDA,
+> +       CGT_MDCR_TDE_TDOSA,
+> +       CGT_MDCR_TDE_TDRA,
+> +       CGT_MDCR_TDCC_TDE_TDA,
+>
+>         /*
+>          * Anything after this point requires a callback evaluating a
+> @@ -260,6 +277,72 @@ static const struct trap_bits coarse_trap_bits[] =3D=
+ {
+>                 .mask           =3D HCR_TTLBOS,
+>                 .behaviour      =3D BEHAVE_FORWARD_ANY,
+>         },
+> +       [CGT_MDCR_TPMCR] =3D {
+> +               .index          =3D MDCR_EL2,
+> +               .value          =3D MDCR_EL2_TPMCR,
+> +               .mask           =3D MDCR_EL2_TPMCR,
+> +               .behaviour      =3D BEHAVE_FORWARD_ANY,
+> +       },
+> +       [CGT_MDCR_TPM] =3D {
+> +               .index          =3D MDCR_EL2,
+> +               .value          =3D MDCR_EL2_TPM,
+> +               .mask           =3D MDCR_EL2_TPM,
+> +               .behaviour      =3D BEHAVE_FORWARD_ANY,
+> +       },
+> +       [CGT_MDCR_TDE] =3D {
+> +               .index          =3D MDCR_EL2,
+> +               .value          =3D MDCR_EL2_TDE,
+> +               .mask           =3D MDCR_EL2_TDE,
+> +               .behaviour      =3D BEHAVE_FORWARD_ANY,
+> +       },
+> +       [CGT_MDCR_TDA] =3D {
+> +               .index          =3D MDCR_EL2,
+> +               .value          =3D MDCR_EL2_TDA,
+> +               .mask           =3D MDCR_EL2_TDA,
+> +               .behaviour      =3D BEHAVE_FORWARD_ANY,
+> +       },
+> +       [CGT_MDCR_TDOSA] =3D {
+> +               .index          =3D MDCR_EL2,
+> +               .value          =3D MDCR_EL2_TDOSA,
+> +               .mask           =3D MDCR_EL2_TDOSA,
+> +               .behaviour      =3D BEHAVE_FORWARD_ANY,
+> +       },
+> +       [CGT_MDCR_TDRA] =3D {
+> +               .index          =3D MDCR_EL2,
+> +               .value          =3D MDCR_EL2_TDRA,
+> +               .mask           =3D MDCR_EL2_TDRA,
+> +               .behaviour      =3D BEHAVE_FORWARD_ANY,
+> +       },
+> +       [CGT_MDCR_E2PB] =3D {
+> +               .index          =3D MDCR_EL2,
+> +               .value          =3D 0,
+> +               .mask           =3D BIT(MDCR_EL2_E2PB_SHIFT),
+> +               .behaviour      =3D BEHAVE_FORWARD_ANY,
+> +       },
+> +       [CGT_MDCR_TPMS] =3D {
+> +               .index          =3D MDCR_EL2,
+> +               .value          =3D MDCR_EL2_TPMS,
+> +               .mask           =3D MDCR_EL2_TPMS,
+> +               .behaviour      =3D BEHAVE_FORWARD_ANY,
+> +       },
+> +       [CGT_MDCR_TTRF] =3D {
+> +               .index          =3D MDCR_EL2,
+> +               .value          =3D MDCR_EL2_TTRF,
+> +               .mask           =3D MDCR_EL2_TTRF,
+> +               .behaviour      =3D BEHAVE_FORWARD_ANY,
+> +       },
+> +       [CGT_MDCR_E2TB] =3D {
+> +               .index          =3D MDCR_EL2,
+> +               .value          =3D 0,
+> +               .mask           =3D BIT(MDCR_EL2_E2TB_SHIFT),
+> +               .behaviour      =3D BEHAVE_FORWARD_ANY,
+> +       },
+> +       [CGT_MDCR_TDCC] =3D {
+> +               .index          =3D MDCR_EL2,
+> +               .value          =3D MDCR_EL2_TDCC,
+> +               .mask           =3D MDCR_EL2_TDCC,
+> +               .behaviour      =3D BEHAVE_FORWARD_ANY,
+> +       },
+>  };
+>
+>  #define MCB(id, ...)                                           \
+> @@ -277,6 +360,11 @@ static const enum cgt_group_id *coarse_control_combo=
+[] =3D {
+>         MCB(CGT_HCR_TPU_TICAB,          CGT_HCR_TPU, CGT_HCR_TICAB),
+>         MCB(CGT_HCR_TPU_TOCU,           CGT_HCR_TPU, CGT_HCR_TOCU),
+>         MCB(CGT_HCR_NV1_nNV2_ENSCXT,    CGT_HCR_NV1_nNV2, CGT_HCR_ENSCXT)=
+,
+> +       MCB(CGT_MDCR_TPM_TPMCR,         CGT_MDCR_TPM, CGT_MDCR_TPMCR),
+> +       MCB(CGT_MDCR_TDE_TDA,           CGT_MDCR_TDE, CGT_MDCR_TDA),
+> +       MCB(CGT_MDCR_TDE_TDOSA,         CGT_MDCR_TDE, CGT_MDCR_TDOSA),
+> +       MCB(CGT_MDCR_TDE_TDRA,          CGT_MDCR_TDE, CGT_MDCR_TDRA),
+> +       MCB(CGT_MDCR_TDCC_TDE_TDA,      CGT_MDCR_TDCC, CGT_MDCR_TDE, CGT_=
+MDCR_TDA),
+>  };
+>
+>  typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu *=
+);
+> @@ -609,6 +697,186 @@ static const struct encoding_to_trap_config encodin=
+g_to_cgt[] __initconst =3D {
+>         SR_TRAP(SYS_ERXPFGF_EL1,        CGT_HCR_nFIEN),
+>         SR_TRAP(SYS_ERXPFGCTL_EL1,      CGT_HCR_nFIEN),
+>         SR_TRAP(SYS_ERXPFGCDN_EL1,      CGT_HCR_nFIEN),
+> +       SR_TRAP(SYS_PMCR_EL0,           CGT_MDCR_TPM_TPMCR),
+> +       SR_TRAP(SYS_PMCNTENSET_EL0,     CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMCNTENCLR_EL0,     CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMOVSSET_EL0,       CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMOVSCLR_EL0,       CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMCEID0_EL0,        CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMCEID1_EL0,        CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMXEVTYPER_EL0,     CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMSWINC_EL0,        CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMSELR_EL0,         CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMXEVCNTR_EL0,      CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMCCNTR_EL0,        CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMUSERENR_EL0,      CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMINTENSET_EL1,     CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMINTENCLR_EL1,     CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMMIR_EL1,          CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(0),   CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(1),   CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(2),   CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(3),   CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(4),   CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(5),   CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(6),   CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(7),   CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(8),   CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(9),   CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(10),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(11),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(12),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(13),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(14),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(15),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(16),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(17),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(18),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(19),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(20),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(21),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(22),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(23),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(24),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(25),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(26),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(27),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(28),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(29),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVCNTRn_EL0(30),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(0),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(1),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(2),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(3),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(4),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(5),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(6),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(7),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(8),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(9),  CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(10), CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(11), CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(12), CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(13), CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(14), CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(15), CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(16), CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(17), CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(18), CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(19), CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(20), CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(21), CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(22), CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(23), CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(24), CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(25), CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(26), CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(27), CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(28), CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(29), CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMEVTYPERn_EL0(30), CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_PMCCFILTR_EL0,      CGT_MDCR_TPM),
+> +       SR_TRAP(SYS_MDCCSR_EL0,         CGT_MDCR_TDCC_TDE_TDA),
+> +       SR_TRAP(SYS_MDCCINT_EL1,        CGT_MDCR_TDCC_TDE_TDA),
+> +       SR_TRAP(SYS_OSDTRRX_EL1,        CGT_MDCR_TDCC_TDE_TDA),
+> +       SR_TRAP(SYS_OSDTRTX_EL1,        CGT_MDCR_TDCC_TDE_TDA),
+> +       SR_TRAP(SYS_DBGDTR_EL0,         CGT_MDCR_TDCC_TDE_TDA),
+> +       /*
+> +        * Also covers DBGDTRRX_EL0, which has the same encoding as
+> +        * SYS_DBGDTRTX_EL0...
+> +        */
+> +       SR_TRAP(SYS_DBGDTRTX_EL0,       CGT_MDCR_TDCC_TDE_TDA),
+> +       SR_TRAP(SYS_MDSCR_EL1,          CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_OSECCR_EL1,         CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBVRn_EL1(0),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBVRn_EL1(1),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBVRn_EL1(2),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBVRn_EL1(3),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBVRn_EL1(4),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBVRn_EL1(5),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBVRn_EL1(6),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBVRn_EL1(7),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBVRn_EL1(8),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBVRn_EL1(9),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBVRn_EL1(10),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBVRn_EL1(11),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBVRn_EL1(12),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBVRn_EL1(13),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBVRn_EL1(14),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBVRn_EL1(15),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBCRn_EL1(0),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBCRn_EL1(1),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBCRn_EL1(2),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBCRn_EL1(3),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBCRn_EL1(4),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBCRn_EL1(5),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBCRn_EL1(6),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBCRn_EL1(7),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBCRn_EL1(8),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBCRn_EL1(9),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBCRn_EL1(10),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBCRn_EL1(11),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBCRn_EL1(12),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBCRn_EL1(13),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBCRn_EL1(14),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGBCRn_EL1(15),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWVRn_EL1(0),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWVRn_EL1(1),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWVRn_EL1(2),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWVRn_EL1(3),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWVRn_EL1(4),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWVRn_EL1(5),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWVRn_EL1(6),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWVRn_EL1(7),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWVRn_EL1(8),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWVRn_EL1(9),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWVRn_EL1(10),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWVRn_EL1(11),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWVRn_EL1(12),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWVRn_EL1(13),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWVRn_EL1(14),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWVRn_EL1(15),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWCRn_EL1(0),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWCRn_EL1(1),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWCRn_EL1(2),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWCRn_EL1(3),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWCRn_EL1(4),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWCRn_EL1(5),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWCRn_EL1(6),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWCRn_EL1(7),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWCRn_EL1(8),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWCRn_EL1(9),     CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWCRn_EL1(10),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWCRn_EL1(11),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWCRn_EL1(12),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWCRn_EL1(13),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGWCRn_EL1(14),    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGCLAIMSET_EL1,    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGCLAIMCLR_EL1,    CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_DBGAUTHSTATUS_EL1,  CGT_MDCR_TDE_TDA),
+> +       SR_TRAP(SYS_OSLAR_EL1,          CGT_MDCR_TDE_TDOSA),
+> +       SR_TRAP(SYS_OSLSR_EL1,          CGT_MDCR_TDE_TDOSA),
+> +       SR_TRAP(SYS_OSDLR_EL1,          CGT_MDCR_TDE_TDOSA),
+> +       SR_TRAP(SYS_DBGPRCR_EL1,        CGT_MDCR_TDE_TDOSA),
+> +       SR_TRAP(SYS_MDRAR_EL1,          CGT_MDCR_TDE_TDRA),
+> +       SR_TRAP(SYS_PMBLIMITR_EL1,      CGT_MDCR_E2PB),
+> +       SR_TRAP(SYS_PMBPTR_EL1,         CGT_MDCR_E2PB),
+> +       SR_TRAP(SYS_PMBSR_EL1,          CGT_MDCR_E2PB),
+> +       SR_TRAP(SYS_PMSCR_EL1,          CGT_MDCR_TPMS),
+> +       SR_TRAP(SYS_PMSEVFR_EL1,        CGT_MDCR_TPMS),
+> +       SR_TRAP(SYS_PMSFCR_EL1,         CGT_MDCR_TPMS),
+> +       SR_TRAP(SYS_PMSICR_EL1,         CGT_MDCR_TPMS),
+> +       SR_TRAP(SYS_PMSIDR_EL1,         CGT_MDCR_TPMS),
+> +       SR_TRAP(SYS_PMSIRR_EL1,         CGT_MDCR_TPMS),
+> +       SR_TRAP(SYS_PMSLATFR_EL1,       CGT_MDCR_TPMS),
+> +       SR_TRAP(SYS_PMSNEVFR_EL1,       CGT_MDCR_TPMS),
+> +       SR_TRAP(SYS_TRFCR_EL1,          CGT_MDCR_TTRF),
+> +       SR_TRAP(SYS_TRBBASER_EL1,       CGT_MDCR_E2TB),
+> +       SR_TRAP(SYS_TRBLIMITR_EL1,      CGT_MDCR_E2TB),
+> +       SR_TRAP(SYS_TRBMAR_EL1,         CGT_MDCR_E2TB),
+> +       SR_TRAP(SYS_TRBPTR_EL1,         CGT_MDCR_E2TB),
+> +       SR_TRAP(SYS_TRBSR_EL1,          CGT_MDCR_E2TB),
+> +       SR_TRAP(SYS_TRBTRG_EL1,         CGT_MDCR_E2TB),
+>  };
+>
+>  static DEFINE_XARRAY(sr_forward_xa);
+> --
+> 2.34.1
+>
 
-Acked-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Jing Zhang <jingzhangos@google.com>
+
+Jing
