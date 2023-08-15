@@ -1,55 +1,55 @@
 Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5227911CB7
-	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 15:35:31 +0000 (UTC)
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37FAvGDf015286;
-	Tue, 15 Aug 2023 15:35:14 GMT
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70DD211CB7
+	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 15:46:50 +0000 (UTC)
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37FBInC3031592;
+	Tue, 15 Aug 2023 15:46:27 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : references : in-reply-to : content-type :
  content-id : content-transfer-encoding : mime-version; s=corp-2023-03-30;
- bh=87nhYWQhSWjeBaIAz0uwqXy3EeZGkQVDtlWZ/1c2w/E=;
- b=lEv0fGgsiDelHAFW1a8ZWkDsIG9AyW8j8hFWlD9eJWKNh+GLkgVHjHtm8SLtxFwWnZh3
- hxZtz15uAGRT1y0Cu/eRIquYBtTtOBxxprq4NRG2t3wEs+WGYNVbsGWp3kfolIo2LLEr
- tyny8Jsjs6sRy9jVHuABx0vf0yB9xFPL1V2KbBc1FnbjxV1LuY96aGFGe5k30q/4GL66
- RPBG8jIp7T9gbI+CwRcTNtTlrLn5f5R6U+ZRYzb2V0I77n3QYPE8pB1IsFvtbiskoe5M
- xNVKPcXjiQ6IhSKxkuWKNEzb2dCcgNxlB9Ej9lOZmAmRX7kEBHRQ9TtoNxubfD03/3XH PQ== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3se2xwn1bm-1
+ bh=Z1txaAX7PF1akZGNVdYd2SRD9BVkjrZXjvTGnm/bWBM=;
+ b=PnhuzyxJdGBFCay7fqmF27BIotZP/OO25wXXgICTFY7Wqf9H5OR9/OLpMajff1t4mU2M
+ ImWbmtlIf/+FBWMJ/PVfv5j6TiK36dQNsRfjjaj7uSEcf+77s2aZyMTPF05lVCdeKcPw
+ gkO1JrwUOB58h571N3V/F0hBLY7U6Fl3AV2cPty1OdV+ercbIpd037kmEeuNBZXl8/YN
+ BdXmE/oyhtGrufp3Qg3qTO62/nAhIxgOomY/7ncdkPB2R1tHdzo/pG/JiLN7uZDnHZVx
+ 7QETAbw0fAkewQdE0mHFmAI4P/Xx1KFU6QTmH8YBwq0XywCO0j5d7TFMqXxR0T9OwcHW eg== 
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3se31451ma-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 15 Aug 2023 15:35:14 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 37FEJSna006641;
-	Tue, 15 Aug 2023 15:35:12 GMT
-Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2109.outbound.protection.outlook.com [104.47.55.109])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3sey2d7jm8-1
+	Tue, 15 Aug 2023 15:46:26 +0000
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 37FFiHFl003799;
+	Tue, 15 Aug 2023 15:46:25 GMT
+Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2043.outbound.protection.outlook.com [104.47.66.43])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3sexyj0fdq-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 15 Aug 2023 15:35:12 +0000
+	Tue, 15 Aug 2023 15:46:25 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SghqPdlEvER7Wftkyqj7v5RWER+H/L7kFh8+S7zFrd3NgJ6pVnbEv0zqcM4bKP/nEUdw11VQ1eP6hEaL9aiaCVpUR88xTDRJQMcTIRKE7RYWoNNdsMZFGfus0lSFU0sJSIEvsykLLUSEfNBD7bVbEGwWhijgpleTEIfLvVlu7FMxsbRV8LpgDVO4dbB3l32z59gheNbcqgkoqfjYqGsHdvHeeWMp8WhbhHl35aAdtK0c3kQTzKPFhNmYY8Z+BdueJGIWfa1H2sbCgdeR6dEBPdMcHaa9Qped+lo+1WoZgWCUPsetAsg5KbywDYbOZI1LEW8eglhpjp6d2LHxXYXRvQ==
+ b=D2SfKw5TudoK8sAsqWhGJKf3wOX2koFxTZJF6hRuw22Vn0EMkjjy0THGu3Hy0rcty19z4ln9j7PHvX6syAKdjJywOxL7uGGUPyovk5hkRhhFLbWYdB+BBa3pNmJZZsMLMrrXjbrzwbYvLbLG51LQ0OIyCcCVuEY64r4sZRz8sWq6sNTRbfbehXGvYoYkH7ZmNtAZInRzQGVf7E6SGFWFm9gNALE7pLILee/sIYWsL5KtYykxxzFemziPEzM2Mb3pE/NM/euItEJ9mgxnRVeb4NFUYcdUWEFAi5doEMk4X5qS/TxTUDzkXRljM6PTc8vo2EQl5jopY8dgxObSleZK3A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=87nhYWQhSWjeBaIAz0uwqXy3EeZGkQVDtlWZ/1c2w/E=;
- b=NWc8tlrXic4J1BvtkeN+/eWbLrc56FkHOo7sR146TfpkwyEJmjpJ1Ch9KuPPnynt9XdygswPFRQC5v/K79n6BX37BJczSaiiVHYPgLgZG6cB6dZIcYiJ1GCr4+XyiKqNYivigA4ADZQ7D76CAgInZDgM2WfEvoc2pfRQrrCZt+5l/SB64Iocg/k1HuRXTZO0+WGHB4CuLc8Rxe8LTIKwOON1t0Y4oUA1dPjCHEo58SbbnU4VZyB8Lz4euCqwD0Tkp0sU4zzjWEQwont3sHf4GgFXF0wTB3Zy85M+0S5Y0L6QD8hUwRVYz/lhEk+ewi1MET4mZE/FSrAm3r4B96yz6w==
+ bh=Z1txaAX7PF1akZGNVdYd2SRD9BVkjrZXjvTGnm/bWBM=;
+ b=DkRDKzpiiKOigBJvgJ/UDlSidUx7jzt9xGoldfwfAeADSLOsRNkZeiJdCZWTtfgq3vv65zVBZvWvn6kqv8a3GneVqkzamn5kxydnSJ4Xj9AkncmZ2AX3OPB37X1e3Uhbdb1kwRUDp5YJdWVBxsVhitEQ9u4Q/wnKEIy+zqSWUZ1G8pPJy87rceNJ9uTtEqpdwhA+BTj5STyf/elTu4O/DWU/NFdu5Q+KersjbRb3YyCJFuBcHkPPX9ojWMAgIwgrP5TQKMZNOSQr3tyAiMgkDpPaAbJDS2iRmHIKOqec8E7ltlw3Z2kcAChvdQjOVjS8mj8qLXWlvZeyRrvyugPl8A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=87nhYWQhSWjeBaIAz0uwqXy3EeZGkQVDtlWZ/1c2w/E=;
- b=bVf3gOw77yifTPBli2Ewlz/u4APs+/KSyiF+jkS0K8STfH8rV3IwTztz+dcelVmjhOC6TYnR5j78Kh3YnvwxbrhSwtOnezrgQGAydWTygt5t29RHBJzvA0r2zID/pGSDTFLZR2PP/SlXmDttNAJSvMuL5B/CH+rFjYx6b+owsS4=
+ bh=Z1txaAX7PF1akZGNVdYd2SRD9BVkjrZXjvTGnm/bWBM=;
+ b=kOx27JyHjazu8qq9hJ+kUM/V5avsDPuEVgOF3hO4c2pGC5PhTiFoBX/gjf9OcKoAu+58SK0tkqpF1fhnWIFV6gsMGf4lmhwPdlT6bnFF585LLN/BblZ71eU1Gi4r3wFOHZGu3P0GmsElQfJiSnAE6K808elFUliTgKJX6r/Vzgc=
 Received: from PH0PR10MB5433.namprd10.prod.outlook.com (2603:10b6:510:e0::9)
- by SN7PR10MB6547.namprd10.prod.outlook.com (2603:10b6:806:2aa::7) with
+ by DS0PR10MB6975.namprd10.prod.outlook.com (2603:10b6:8:146::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.24; Tue, 15 Aug
- 2023 15:35:09 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.26; Tue, 15 Aug
+ 2023 15:46:22 +0000
 Received: from PH0PR10MB5433.namprd10.prod.outlook.com
  ([fe80::76c:cb31:2005:d10c]) by PH0PR10MB5433.namprd10.prod.outlook.com
  ([fe80::76c:cb31:2005:d10c%5]) with mapi id 15.20.6678.025; Tue, 15 Aug 2023
- 15:35:09 +0000
+ 15:46:21 +0000
 From: Miguel Luis <miguel.luis@oracle.com>
 To: Marc Zyngier <maz@kernel.org>
 CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
@@ -77,70 +77,59 @@ CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
 Subject: Re: [PATCH v3 15/27] KVM: arm64: nv: Add trap forwarding for HCR_EL2
 Thread-Topic: [PATCH v3 15/27] KVM: arm64: nv: Add trap forwarding for HCR_EL2
-Thread-Index: AQHZye43LjWt3BICTk+WXyaA4d4s1a/mAJSAgAU0/oCAAFKpAA==
-Date: Tue, 15 Aug 2023 15:35:09 +0000
-Message-ID: <E8293123-063A-40FF-A83F-D9DE0E4121B0@oracle.com>
+Thread-Index: AQHZye43LjWt3BICTk+WXyaA4d4s1a/ri1wA
+Date: Tue, 15 Aug 2023 15:46:21 +0000
+Message-ID: <0A8ED162-EF6C-44F4-836B-7421183EA9A0@oracle.com>
 References: <20230808114711.2013842-1-maz@kernel.org>
  <20230808114711.2013842-16-maz@kernel.org>
- <85C2D540-7AD7-49BB-9EFB-7F950D08AC15@oracle.com>
- <87il9gpp2s.wl-maz@kernel.org>
-In-Reply-To: <87il9gpp2s.wl-maz@kernel.org>
+In-Reply-To: <20230808114711.2013842-16-maz@kernel.org>
 Accept-Language: en-GB, en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR10MB5433:EE_|SN7PR10MB6547:EE_
-x-ms-office365-filtering-correlation-id: 8946bf68-df29-4e05-9045-08db9da5353e
+x-ms-traffictypediagnostic: PH0PR10MB5433:EE_|DS0PR10MB6975:EE_
+x-ms-office365-filtering-correlation-id: ddfbc74b-e954-421c-7d71-08db9da6c613
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
 x-microsoft-antispam-message-info: 
- uFaJj2ZvXNl6wpt+9ct0sTsbtGBYyIARq8vav/A5qtFri62YFc9JpeBeJD6M4KCmw2r6npg9whsj584jMqNMyvZtcGAXXox+qhiD7d2KeM1kIrEAMzwSALaK8Qfl0t1fVT5opHRHlW1u+Y83RAh+fcAupQHuVHx/3lQMc1rWgJumsYSEmHs5VHSPm8EOHSaT0fmWYW4cCK94R0U+3Msh0la9VFBEp65RRKgCnRV5ZXGsKlvDWtnRt0FFr+JpWtkqN4bD+y3VFp8zs1KiE3EhFE3Ecq/JusR13WIdfIlGZD3h3acPoYnIVGSYx5j+rgjcCHt/GyBz+dFb0ZQkhBBPzkYRUBXIaRXV8ADnoxavQPlYRs4uAvo6PwramFQXHVka9d+lXCPcUOK9T2uDbehQFDWeLToPZ13ZAD1Ma7QWDRtD+I8CN/NXO1dri7jnhhBnqU+vrRPQlnUTW7KCEGohZge6cD4HaOFDNp0ppNEFsA370qRB+ZhiBtB02y6ImsiS3qhmPAvCg1lfLoIsEZWg18F0kVtBvNL4g4YnNwbb9GiPRnFVPJU+aHDwvb8Ifdlqd/260tvTHAhO8jevkA6t3LDZnAmjVti8LirpsXRYp9tJm+rJyM11S0QdTRA80ViyOzgBsFQs59feyCh04wdEMg==
+ DhDB4kto8mMQJMvcOfJEFaFpCdKq0ymD5eU9P45YbkwuV/VBLZOoint9Z4vPrwKJBprBhXC2wo9UKYZqC/ZrfaYXamRieKNAC5U3cGXDIEvpmaLEoKIYPyeTfCJSB12eBg5EYGNAU/3Q8fMmuHFLXeBND71c6onPNiDrHvrgBn9WeDzqqvgBNax5CPmBNFJGBJox2Auk58Zu17HVoIQnceW+HNDIxJ7GsHWuD+sJIbsDsdMHcO84xslaEdK5xBr4co5VmbbnTswyxg8lFTLXjYLqWMmh3kULr5nHV2RoNX/aGk9iOJpro4yg4tovNuNXp21Bw3lM+MeP1ZNLI9X+rli47k38Lhl/KyLvKX5RMUmgjczdukiOntkgR66TZrLb9WC762D8nJoE0cR6LkGpqh3+CvRNp9DpaW2BQvLiJhZTSqoSERB+eKrneXayvrLNRxOfMeQLvmt2l/Yjj/AiFlW7LYvXNOnXBfleQr6m7mJZT5Lvdl4tEf9tWzQqeN1a2ARi8FLR1ECYGUQYutKcAO7GcRxYqapGXixYRiqbV6Bgvh+sca0Bf26TyPDPffI9/hYb8iOzdQTcYPRny9K1Bu7GhRVBDUkiocjxMfTtIy4v8dF1DydE8k8P66LpW5bl0rtl7E6qoYDxIK8wCpy6EA==
 x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB5433.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(396003)(346002)(376002)(39860400002)(451199024)(1800799009)(186009)(5660300002)(66446008)(71200400001)(53546011)(7416002)(66476007)(2906002)(66556008)(6506007)(38100700002)(478600001)(41300700001)(38070700005)(86362001)(54906003)(2616005)(316002)(26005)(122000001)(6512007)(8676002)(6486002)(33656002)(66946007)(91956017)(36756003)(76116006)(64756008)(6916009)(8936002)(44832011)(4326008)(45980500001);DIR:OUT;SFP:1101;
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB5433.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(136003)(366004)(396003)(376002)(346002)(451199024)(1800799009)(186009)(38070700005)(64756008)(5660300002)(4326008)(30864003)(26005)(7416002)(66446008)(66556008)(54906003)(41300700001)(6916009)(478600001)(8936002)(66946007)(8676002)(91956017)(86362001)(122000001)(2906002)(33656002)(2616005)(6486002)(71200400001)(53546011)(6512007)(36756003)(6506007)(44832011)(76116006)(66476007)(38100700002)(316002)(45980500001);DIR:OUT;SFP:1101;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
 x-ms-exchange-antispam-messagedata-0: 
- =?utf-8?B?YTJqZUFuRjRMVFpIUy9RZzVOTHZ0NFJ3bFBnb3lURTdzYnJNdEI1NWU4dDdM?=
- =?utf-8?B?N2dhLy9sYkFhZUttanRkeDNrUCtSa3UrOVZXaktTR2k5V1dkakxWQXZhZlJy?=
- =?utf-8?B?ZzFkT3ZEeHNHbTl5OWJOaHFzcnhyMkhMN1ExdnR1eHl6cXdJYzd2WWxZNjVG?=
- =?utf-8?B?RjFRMzFwRG9VMm9LY0JQUTd5QkgzRkVMcWJ2Z2lhSVNnckg5SFRMRmowSTNh?=
- =?utf-8?B?cXFVdS92ODU5czlLRXZhcUpPNjE5MjAra0xJcnV0QXBrS1plOFdIVG1Sa2R6?=
- =?utf-8?B?RDQ2TzlSejE3eGQxd0ZNWGdhUGN3UlVvSzVRNzI3MWt1ck5CN0VEalZVY3My?=
- =?utf-8?B?aXR4b05lNVJQTm5TL3dYajFxYVRzWWRheXpvZ0ZQTEhFVkRBTDNraVVjUEwv?=
- =?utf-8?B?c0VnanlQTUpYYjJzR2hZZjBkbGhadC83TTJ1b1B4ZDZHdlNuMGVjSThjK1Q0?=
- =?utf-8?B?UTI4c3RtMTdyNFR6MFRvWGU1U2JMV0hyaTRNcmNzVGp4Zk5aL1FkanVjK1ND?=
- =?utf-8?B?eitHZGppcjJLcGNGQTF6K1FuODFkdVFYL2I3OHBKNHkrTjNaSEpiYVEzMC81?=
- =?utf-8?B?ZjRUdlRrNzQvS1hiYms5VEpWS29nVi9UWFI4ZmJURWUzTlFvYVBqaDFOWm1F?=
- =?utf-8?B?UU1hZFVXYy8vOEhha3NIekJTUnRSNURFMm5TdXAyZWRuRjZabTQyTDdSMnRL?=
- =?utf-8?B?Y2dHT1FaTGtmZ0FDRjU3T3VUSVpqZ2VYV3JmYi9rajh1Z3ZYdkVTY29sKzR3?=
- =?utf-8?B?RHVJLzhNV2NPZzBxUkNDMENqMmF0d3NXeWlKN2drOTQ2QTJUWE9BdTYrNVpW?=
- =?utf-8?B?TisrM0xkVHI3bGNPWHdPNC9sWjFFN0hXVFRvVlZoaU1HRmhqYzZTYTBubmtB?=
- =?utf-8?B?MThCZnVZeWpZeWo5U2JJNHhFVTA2cUxlZ1V6OTlXVE1xcGZCYUFTYStJcEpv?=
- =?utf-8?B?RDBRaEpPL0xYZGRKWU10MEg2ZmJuL3BjR3hHYWQySzlxQ21pUDZmTDd1MVFI?=
- =?utf-8?B?TG9lUDl6b09UbzcvTVE3ZWsrSGxMbWdMMWpvYS9yZGg3eWpyS29Sb3FnRzlI?=
- =?utf-8?B?RGxacjRYM2xKYW9LVVEweDUxeGpLdGtOb1dMREJ1aXR2cGVTYmRrbHJqbVZ2?=
- =?utf-8?B?R2tDd1F3TjRsVlc3Q0pjcEZpOTl0Wk5MNlZQMlJxWFdCQkNQc3BuUysyYSs5?=
- =?utf-8?B?VVVxVzhyaUszSnZsdytYRnF6eFZobjdlMkE2MjdtRnByTlBPN1JhNzF1K2NC?=
- =?utf-8?B?UHZBSDNMYmFuZlRUZHRCcTZXSTE3NFpUS0dOd2FGS2F5VjBRTDZUbGVKNXpC?=
- =?utf-8?B?ZzdUMitnQmduS0FzY2xPU0ZpMHNkMVYranUvZTk0ZXI1OTZDYWNjQ2dkWGZF?=
- =?utf-8?B?YjdYQ2Q3NjRlYXVsSkVwWi8yS2gzbnlaOGM0S0o4VDljUlFwODVNczVkRkFz?=
- =?utf-8?B?cGhsZmJDMW1zc29zaTFYcktqU2V4OFBROXp6THJNVzc2S0N4MFF2elBxQkhN?=
- =?utf-8?B?MTUrWHZwWk9SZUk0Slo3TnhCODBId0FtMHVyRkhYbXpuaTFHTzlxZFhCeVVV?=
- =?utf-8?B?cWF4RlNFRlpYWml0a3pJOXNua0JJRlBLdVZUajB3Zk1mUVlDRDF1YnB3T1JF?=
- =?utf-8?B?ZTZYbnNZYXRKUnh2MDJYNEVld0xWVENUc1RSbGFhREFxUDBGN3luRmIvNXhP?=
- =?utf-8?B?dVNYSTYwc2c3UmErb0Q1WlIycVlVeEgzZUdyOFF2dXVNcjkvWnBPY1luSnQy?=
- =?utf-8?B?d0RWM25kWjVobWxFSzVENWg1U056T1h0TDZDcUdoOUJOWWprUVllaGhjL1hK?=
- =?utf-8?B?V0JuOGdDTkFudHJDMlZGUi84Z0FYcTNJSEI1ZTdoOG5Ha0RTSE5qNk5FUHc1?=
- =?utf-8?B?Tm5XdlBWR2tMK28yZGc2Sk9ueWowR1NvSU1tNDFvVW5FcXBzSmx5NzhOK2du?=
- =?utf-8?B?RmlndEhLZlR6cUhEOXZLSGFGaXUxRGN3YVJKQVU0SXI2NjU4cmJ5Tk03SFNm?=
- =?utf-8?B?OTE5VG1MWDV0SUZBVThDaEs0Uk43eTBqdTBxZFN5dEY4Nm9zTDNYbUFmRGZQ?=
- =?utf-8?B?WGlNakVtTGFSYlU4bjZrZjVKNVU2bVBzdWdOWkpFVEk5OENWWlNiTStGZWQ4?=
- =?utf-8?B?L05mdWdKZDdYSlJJSHRHY28vZTlwU0ZRUUppRFoxdFNqMGIzOGlEVCtUNU50?=
- =?utf-8?B?L0E9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <25109EA789404C41B2494C1F08FC04A1@namprd10.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ =?us-ascii?Q?slK6taZ7AyL4zomjpw//EtXQfLyFhunuAUQRM2uCLb68OGcoLTIwasu3qlI+?=
+ =?us-ascii?Q?l9LIeLeshZ9ULJFb3X1LZeNVybq4UOG1o/xGciXaYTSLo7Tkc5v+2Zkc/5eq?=
+ =?us-ascii?Q?YzRVESiQ/UqJur1NWJJ07XHLGtRlBybw/3FHdew40yzI4aTqXHSHi8nEI1gb?=
+ =?us-ascii?Q?C1Oz+sPXFxce7cYRvbv+7EvJFPR8iQdcdH3IWzxpRFXaZzXbJoe7drLs7ct8?=
+ =?us-ascii?Q?+5OxDeeHbD2Y2lyjsuaqqOrJ53Kf5HihMKC0gLkpiq2bHH8ntWoKVxZ1fbwE?=
+ =?us-ascii?Q?DBbuS5splYreLynCilvxw5sQbL6JJ+QTpjf/b1KrTb733fU9ATqkUQY/fl4c?=
+ =?us-ascii?Q?mLsvG9rfrZGezINg5UfmOMxS6ks8A1jPBnN5PN/oL8uqL7TilXqUJkKhdUEm?=
+ =?us-ascii?Q?8sHEEGD7n6fgpXf/ehGIS2YNRXmgvHVB+xAYlpW/tFs9SRw0/lwGKZ6Deg2b?=
+ =?us-ascii?Q?WZLcOvRxoVfe858qwI9dqNRvekZzeN4zT46ObpU6LxiufrT71d51oGkRLmNs?=
+ =?us-ascii?Q?TxJyB3oj+/EqHaagwXbuTH/JTWlwPdrMbZr2pQXQc5h1Oz9RNZqO+dBSpOrv?=
+ =?us-ascii?Q?wMF+iyHawT0FnW0HyGduxrqBzpd6HNZRNyJTivHHR7wD0389kLFo4A298yyO?=
+ =?us-ascii?Q?6I5GFulcGTa2sL1Ah59USTYf8WTsvbOnVY3bOe6NKLAVRmdfBpo1jmF46OIw?=
+ =?us-ascii?Q?4T3/hcrrgU2Fi6G3HLWmoXoKdWJvVyfjr+pDfFyezTzSDoqQVmZYipj/qXD9?=
+ =?us-ascii?Q?TzqKqZSj2WVQF40frM8uAd6gTc+luAiKz26bF8IpyzghCSEC5ZTLulzMxSiS?=
+ =?us-ascii?Q?HjWxvOQK6d+L19TPq7+PaAivIwUdhteh0mHBYUiN5QYG8AGsFLVREkJdVgAM?=
+ =?us-ascii?Q?hEstx6O6AFcCfXYgYcIROobtAg/VTdYIcWNtU/mAbMU6u7dtTb6Bddoq8Agm?=
+ =?us-ascii?Q?CgHixVGIx4AejtsbR3bKxbq7Putx3jO8PaQXcUL1Y4PEgZg4Vp/p6yVx4WIk?=
+ =?us-ascii?Q?vuY0Ckt0i+TpDay6xpRH3nf5GYxKzZd5vox1TP1BfcH89IGwj1a3kfsA75hq?=
+ =?us-ascii?Q?ONGGvDtDRVr1H3g2Gs+/3f5O46iqAgMKGBSDZF/U9F5d/r4t/usuqybWkcpJ?=
+ =?us-ascii?Q?FMpB6EuqcF7EPawBnDOzxlmi9GVt7Uuy0YpiKQQapqxDgcZc9S8VBMN+m3De?=
+ =?us-ascii?Q?e5xdy9lSx7u0YZe88+u3iicwD2MSbIDwuc8jkngDWb6tQePltHnLweRutk4L?=
+ =?us-ascii?Q?nyEJt/Sd7Aesr9zhB1+3shRjf/T795aKDrQ7gWPuRAtZG1WM9SDujW5frNYM?=
+ =?us-ascii?Q?SG4CEnneK4Lgap93HdjAmCC2QoG2pyru/ifZf/EnPQcHaoGEXGYk86zBcjal?=
+ =?us-ascii?Q?hqXedjosBnJ8Mdwb9Ia1HaX/ueuyRKxdo7S4ZqokbqShz7sY0dpa5V3/cLGw?=
+ =?us-ascii?Q?ucLggHY2VQZI3ZN/8a34eWposavzBNhv3d5jgCaF4qyFO6MjsyOKQH2M8TrM?=
+ =?us-ascii?Q?FDu6tsf9x7E5AQt2f/I/43JrTu6yBmTV58EphGZdzraPYAJ0EpNWSl6rnWit?=
+ =?us-ascii?Q?yWCi0DgjXYjxGA4gPAcBQkYpDrugiqvcJT6bJJS3oRo3P+td2kF55slxLTMk?=
+ =?us-ascii?Q?HA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <ACEE7042121499458D6E8F784B529670@namprd10.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -149,175 +138,593 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	=?utf-8?B?MUhYWFRkejdPNDgydVc3WXBQdjNkTCtjYVJuNkMxNmVodE9Hc2NtaUxnV1Y5?=
- =?utf-8?B?L1gzSzhISXZqNWZiQUFUQ1JKRmpSWEd4VmNBUy9KMjAwQmxTZjVYdjF1ZS9F?=
- =?utf-8?B?dDdCbTdHSUZTdG1zempEMmFtZzZaYXlNdlJVcXF4ZDdtVzBDSjZQWnMvSHhN?=
- =?utf-8?B?WFNTRHlPVkRIaktPZWZYcTJFUHovYUFoSEQrSGwyWjA0Y1pqT1kzbnVDb3lG?=
- =?utf-8?B?anI2L2VOTW9EYndJMkMxcE96TWJkYXhpaXd5eFFodnZJTTNhNGlRSTByQnZW?=
- =?utf-8?B?ZkQ1WG1vaGMrd1hBMm5qOTZJaWd2czhGclRDVmFFNFU2WVJCWmo1eTdkZXdR?=
- =?utf-8?B?MFIxVWR5V2FzQUgwbXMxL1AvQjFCTWplZE5oK1p5ZmVmdmIyQmxWcm5aRVJG?=
- =?utf-8?B?Vzl0aWxnRGM5Vy9hcFl3Y3JCRGMzLy9SYnhqL3pFelhKZm1TTmloUkpSVlpR?=
- =?utf-8?B?S2V3Rk5DU1o3cjhtcm1DWVlkMXhsZHpXMVZZZEFSZ2l5MjhaaS96Q3pZaXQ5?=
- =?utf-8?B?ODJreTJBVmZ2TkRkTzQvaW1rNVRTYy9ncDRLOGoxcjJWTW5vTUFmK3RBbFhF?=
- =?utf-8?B?bm9SdWxpc0ZZcTJ5bzRIN2NIYU1hN1FVQU1GUHkyTEsvb0NBUktUd3lkZ3py?=
- =?utf-8?B?eXVqa2VRN00yRUtJV2dDb1dXb05zek8zVHVud1E2Y1FTcWxxWlJqV0lXRVFy?=
- =?utf-8?B?M3c3YlJSVjV1b3ZBSDc3VU1yNTVmb0ROR3BlV1JUbURyNGhTcThCZy9YNmNq?=
- =?utf-8?B?Z1lwMlBIbU9aMkZhMGw0RHhtQXFqWG1BZVJZR3pWOUQ3TmFuZnNZZW9TUmdi?=
- =?utf-8?B?dGFPa05SVElZY3BiVEpNanNNa0xSbERWZ1BkM0NyWm00dFlyMEZJa2Z1Sjh0?=
- =?utf-8?B?RVdSbExHa29kU2RqRCtaVmF5NkdsL3RLQzAvUUE0MHpFRVBka3lBM3AvVFJL?=
- =?utf-8?B?TW02V1BvNGRaeEQvNGZ0M01LME5HUnhSNnpodWRkS0RwS1ExQzJ4YUQvN1Y5?=
- =?utf-8?B?RWZnWDZyNEVEcWFNczQ2RTE5ZVB6KzBYY3l4OWRSMTRndFRLQ09ROHFKMll2?=
- =?utf-8?B?dkNKbnZ5NHE4Wm53UGpTaWNFbmNHNUFBY1V0WjhmQjcrc0J4ZTNDVDhrMzFi?=
- =?utf-8?B?WmhaY3k4amxHeEt2UHFpUTFxUnBHQU1oaEYzN28rSTlrWlY4cXVaRFRjWGxs?=
- =?utf-8?B?K3ZCUktGeWZiMVpsVjViQTB4OWV5NmV3ekF6UVduenJIVGlCWEVMcmlRR1Fx?=
- =?utf-8?B?a295aFV0WXV6WWFzOTlrUlNnSGpYdnljUUxyYVFxQjBtaUZsajVkcUhrQ3M4?=
- =?utf-8?B?akh4eWRyVzdEZHNudm9CbERzNjc4OWtTVTJOMXltOVFIZWtZNUxCY0tSazVj?=
- =?utf-8?Q?GZ0OTLW4vvcVQpLbP4E5TxldtQj/R8GQ=3D?=
+	=?us-ascii?Q?c5jEcfiYZ+dqylx/CD2V9bn+te5OyictWI4l+A2D7tpK1JoDuIhNeAJok4Us?=
+ =?us-ascii?Q?irhe7n+2dfLWuiTEV4CWjPWYJ2jWuBidpr7djNVi2JD9qSNrvflIbOFcSwXp?=
+ =?us-ascii?Q?RhVrsyw77tCWu/gWQl/Amj94ml6XlseepHxUeOckETwa7HV3mTFywzRs9YWU?=
+ =?us-ascii?Q?zP3NODofYId0YQ5Dj700EDuxUsHwAPEx66b5PfXetvcgCdXcdM4cPMeEGcJZ?=
+ =?us-ascii?Q?DORbtHE8oqtJhQd9zIv8h7Cqgb/0qxlfgBMZUW8Kxj2VmUkZ6Av2YJhLspqS?=
+ =?us-ascii?Q?le3rl32R9Fh3t1g5UXnpdph8APg/brGdxB7wm38kyTMSGCQlcph9nb12ARjL?=
+ =?us-ascii?Q?YRRJnozyCqIzh6b5tjUVMjYV22JgsUyAifNhdVuW2OgmcnC7ZXH5O7tU9en3?=
+ =?us-ascii?Q?rMBqa92ddVi3PcEU8lrh/kkudGfzsKVRhBYaUNJ3aiPGApzpQDpQB52LzTLs?=
+ =?us-ascii?Q?fyL/QGkCatsKEMo2bqnPpNyaFMUlS8EcHrcgxkaqgvJ59D4ZacbaiC3wp5m9?=
+ =?us-ascii?Q?yttKP5weebJ3HWQW6hkNMtnXii+XIXYfNxe9jLDgq0fTwBNtLxVMbWh51F0v?=
+ =?us-ascii?Q?xkU/kcVJqHr3JlI91qENfHNHF1cccMGs2v/K0SRE+y1sIsgLvJC/NZzpSswG?=
+ =?us-ascii?Q?AdB6rKHBz6LhmCjq7wf2cU5OQyYPXr8dGpQIqzLN9an+l9sDTaBK9w8PyEJh?=
+ =?us-ascii?Q?gSW409DHU3I8cYWBOvztSkUKqxOqpoXFWeCPeuCdRH+QLQ/QG1YaoPOBxKZs?=
+ =?us-ascii?Q?7evlCDCB9wffVhZeQbXLotDdlz0JXJzE2azdxh5ibSTA3zYUd5qRZfhRq+AH?=
+ =?us-ascii?Q?lzU3j2JUCb2hHeaLz3YS+bYLSI29TNeW0MPyXOb7KWUghuzEf1AlqhZJaMfi?=
+ =?us-ascii?Q?XmGKEUI5NSP/EDOkUf4FUk7t8P42ZurYS9kfe0ABuvxO5j5jgDtVv2wXEzlC?=
+ =?us-ascii?Q?do+FPQYN8NYIzujGTuDIevaTla+OnNqb+GxEPeWFAjJkMoTmUaoLbnwr6s27?=
+ =?us-ascii?Q?Wmf77ecKV+Mf71pgVNxyOwYOkcouz5WFdQnHERyNc0Btj+U=3D?=
 X-OriginatorOrg: oracle.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB5433.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8946bf68-df29-4e05-9045-08db9da5353e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Aug 2023 15:35:09.0953
+X-MS-Exchange-CrossTenant-Network-Message-Id: ddfbc74b-e954-421c-7d71-08db9da6c613
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Aug 2023 15:46:21.5833
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: gd4B9h90wDWWuVMQ2pGH2gq8bu++cmc4r28heMc47jA+kjk12z7mDWwzYf320t0N+cXWiA3RV9Nw5KMhXxdh7Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR10MB6547
+X-MS-Exchange-CrossTenant-userprincipalname: 8MiBbA6XGeAhhB6QWR1SN6kj2Y9gRUoLsB08Kp6+kAw78EFjp9BfKerawm539JtfpFl7aVu6T8kDJk0Fvja7KA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB6975
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
  definitions=2023-08-15_16,2023-08-15_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 phishscore=0
- mlxlogscore=999 bulkscore=0 adultscore=0 spamscore=0 malwarescore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2308150139
-X-Proofpoint-ORIG-GUID: R_ZveA13j3iraEgTv820T-TiuRG8jAml
-X-Proofpoint-GUID: R_ZveA13j3iraEgTv820T-TiuRG8jAml
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0
+ mlxlogscore=999 bulkscore=0 phishscore=0 suspectscore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2308150141
+X-Proofpoint-GUID: BJxHndOpdssmG5odwmKE4lIha-cbSVb8
+X-Proofpoint-ORIG-GUID: BJxHndOpdssmG5odwmKE4lIha-cbSVb8
 
-SGkgTWFyYywNCg0KPiBPbiAxNSBBdWcgMjAyMywgYXQgMTA6MzksIE1hcmMgWnluZ2llciA8bWF6
-QGtlcm5lbC5vcmc+IHdyb3RlOg0KPiANCj4gTWlndWVsLA0KPiANCj4gT24gU2F0LCAxMiBBdWcg
-MjAyMyAwNDowODoyMiArMDEwMCwNCj4gTWlndWVsIEx1aXMgPG1pZ3VlbC5sdWlzQG9yYWNsZS5j
-b20+IHdyb3RlOg0KPj4gDQo+PiBIaSBNYXJjLA0KPj4gDQo+Pj4gT24gOCBBdWcgMjAyMywgYXQg
-MTE6NDYsIE1hcmMgWnluZ2llciA8bWF6QGtlcm5lbC5vcmc+IHdyb3RlOg0KPj4+IA0KPj4+IERl
-c2NyaWJlIHRoZSBIQ1JfRUwyIHJlZ2lzdGVyLCBhbmQgYXNzb2NpYXRlIGl0IHdpdGggYWxsIHRo
-ZSBzeXNyZWdzDQo+Pj4gaXQgYWxsb3dzIHRvIHRyYXAuDQo+Pj4gDQo+Pj4gUmV2aWV3ZWQtYnk6
-IEVyaWMgQXVnZXIgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT4NCj4+PiBTaWduZWQtb2ZmLWJ5OiBN
-YXJjIFp5bmdpZXIgPG1hekBrZXJuZWwub3JnPg0KPj4+IC0tLQ0KPj4+IGFyY2gvYXJtNjQva3Zt
-L2VtdWxhdGUtbmVzdGVkLmMgfCA0ODYgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysN
-Cj4+PiAxIGZpbGUgY2hhbmdlZCwgNDg2IGluc2VydGlvbnMoKykNCj4+PiANCj4+PiBkaWZmIC0t
-Z2l0IGEvYXJjaC9hcm02NC9rdm0vZW11bGF0ZS1uZXN0ZWQuYyBiL2FyY2gvYXJtNjQva3ZtL2Vt
-dWxhdGUtbmVzdGVkLmMNCj4+PiBpbmRleCAxYjExNDg3NzBkNDUuLjIxMjJkMTZiZGVlYiAxMDA2
-NDQNCj4+PiAtLS0gYS9hcmNoL2FybTY0L2t2bS9lbXVsYXRlLW5lc3RlZC5jDQo+Pj4gKysrIGIv
-YXJjaC9hcm02NC9rdm0vZW11bGF0ZS1uZXN0ZWQuYw0KPj4+IEBAIC0zNywxMiArMzcsNDggQEAg
-ZW51bSB0cmFwX2dyb3VwIHsNCj4+PiAqIG9uIHRoZWlyIG93biBpbnN0ZWFkIG9mIGJlaW5nIHBh
-cnQgb2YgYSBjb21iaW5hdGlvbiBvZg0KPj4+ICogdHJhcCBjb250cm9scy4NCj4+PiAqLw0KPj4+
-ICsgQ0dUX0hDUl9USUQxLA0KPj4+ICsgQ0dUX0hDUl9USUQyLA0KPj4+ICsgQ0dUX0hDUl9USUQz
-LA0KPj4+ICsgQ0dUX0hDUl9JTU8sDQo+Pj4gKyBDR1RfSENSX0ZNTywNCj4+PiArIENHVF9IQ1Jf
-VElEQ1AsDQo+Pj4gKyBDR1RfSENSX1RBQ1IsDQo+Pj4gKyBDR1RfSENSX1RTVywNCj4+PiArIENH
-VF9IQ1JfVFBDLA0KPj4+ICsgQ0dUX0hDUl9UUFUsDQo+Pj4gKyBDR1RfSENSX1RUTEIsDQo+Pj4g
-KyBDR1RfSENSX1RWTSwNCj4+PiArIENHVF9IQ1JfVERaLA0KPj4+ICsgQ0dUX0hDUl9UUlZNLA0K
-Pj4+ICsgQ0dUX0hDUl9UTE9SLA0KPj4+ICsgQ0dUX0hDUl9URVJSLA0KPj4+ICsgQ0dUX0hDUl9B
-UEssDQo+Pj4gKyBDR1RfSENSX05WLA0KPj4+ICsgQ0dUX0hDUl9OVl9uTlYyLA0KPj4+ICsgQ0dU
-X0hDUl9OVjFfbk5WMiwNCj4+PiArIENHVF9IQ1JfQVQsDQo+Pj4gKyBDR1RfSENSX0ZJRU4sDQo+
-Pj4gKyBDR1RfSENSX1RJRDQsDQo+Pj4gKyBDR1RfSENSX1RJQ0FCLA0KPj4+ICsgQ0dUX0hDUl9U
-T0NVLA0KPj4+ICsgQ0dUX0hDUl9FTlNDWFQsDQo+Pj4gKyBDR1RfSENSX1RUTEJJUywNCj4+PiAr
-IENHVF9IQ1JfVFRMQk9TLA0KPj4+IA0KPj4+IC8qDQo+Pj4gKiBBbnl0aGluZyBhZnRlciB0aGlz
-IHBvaW50IGlzIGEgY29tYmluYXRpb24gb2YgdHJhcCBjb250cm9scywNCj4+PiAqIHdoaWNoIGFs
-bCBtdXN0IGJlIGV2YWx1YXRlZCB0byBkZWNpZGUgd2hhdCB0byBkby4NCj4+PiAqLw0KPj4+IF9f
-TVVMVElQTEVfQ09OVFJPTF9CSVRTX18sDQo+Pj4gKyBDR1RfSENSX0lNT19GTU8gPSBfX01VTFRJ
-UExFX0NPTlRST0xfQklUU19fLA0KPj4+ICsgQ0dUX0hDUl9USUQyX1RJRDQsDQo+Pj4gKyBDR1Rf
-SENSX1RUTEJfVFRMQklTLA0KPj4+ICsgQ0dUX0hDUl9UVExCX1RUTEJPUywNCj4+PiArIENHVF9I
-Q1JfVFZNX1RSVk0sDQo+Pj4gKyBDR1RfSENSX1RQVV9USUNBQiwNCj4+PiArIENHVF9IQ1JfVFBV
-X1RPQ1UsDQo+Pj4gKyBDR1RfSENSX05WMV9uTlYyX0VOU0NYVCwNCj4+PiANCj4+PiAvKg0KPj4+
-ICogQW55dGhpbmcgYWZ0ZXIgdGhpcyBwb2ludCByZXF1aXJlcyBhIGNhbGxiYWNrIGV2YWx1YXRp
-bmcgYQ0KPj4+IEBAIC01NSw2ICs5MSwxNzQgQEAgZW51bSB0cmFwX2dyb3VwIHsNCj4+PiB9Ow0K
-Pj4+IA0KPj4+IHN0YXRpYyBjb25zdCBzdHJ1Y3QgdHJhcF9iaXRzIGNvYXJzZV90cmFwX2JpdHNb
-XSA9IHsNCj4+PiArIFtDR1RfSENSX1RJRDFdID0gew0KPj4+ICsgLmluZGV4ID0gSENSX0VMMiwN
-Cj4+PiArIC52YWx1ZSA9IEhDUl9USUQxLA0KPj4+ICsgLm1hc2sgPSBIQ1JfVElEMSwNCj4+PiAr
-IC5iZWhhdmlvdXIgPSBCRUhBVkVfRk9SV0FSRF9SRUFELA0KPj4+ICsgfSwNCj4+PiArIFtDR1Rf
-SENSX1RJRDJdID0gew0KPj4+ICsgLmluZGV4ID0gSENSX0VMMiwNCj4+PiArIC52YWx1ZSA9IEhD
-Ul9USUQyLA0KPj4+ICsgLm1hc2sgPSBIQ1JfVElEMiwNCj4+PiArIC5iZWhhdmlvdXIgPSBCRUhB
-VkVfRk9SV0FSRF9BTlksDQo+Pj4gKyB9LA0KPj4+ICsgW0NHVF9IQ1JfVElEM10gPSB7DQo+Pj4g
-KyAuaW5kZXggPSBIQ1JfRUwyLA0KPj4+ICsgLnZhbHVlID0gSENSX1RJRDMsDQo+Pj4gKyAubWFz
-ayA9IEhDUl9USUQzLA0KPj4+ICsgLmJlaGF2aW91ciA9IEJFSEFWRV9GT1JXQVJEX1JFQUQsDQo+
-Pj4gKyB9LA0KPj4+ICsgW0NHVF9IQ1JfSU1PXSA9IHsNCj4+PiArIC5pbmRleCA9IEhDUl9FTDIs
-DQo+Pj4gKyAudmFsdWUgPSBIQ1JfSU1PLA0KPj4+ICsgLm1hc2sgPSBIQ1JfSU1PLA0KPj4+ICsg
-LmJlaGF2aW91ciA9IEJFSEFWRV9GT1JXQVJEX1dSSVRFLA0KPj4+ICsgfSwNCj4+PiArIFtDR1Rf
-SENSX0ZNT10gPSB7DQo+Pj4gKyAuaW5kZXggPSBIQ1JfRUwyLA0KPj4+ICsgLnZhbHVlID0gSENS
-X0ZNTywNCj4+PiArIC5tYXNrID0gSENSX0ZNTywNCj4+PiArIC5iZWhhdmlvdXIgPSBCRUhBVkVf
-Rk9SV0FSRF9XUklURSwNCj4+PiArIH0sDQo+Pj4gKyBbQ0dUX0hDUl9USURDUF0gPSB7DQo+Pj4g
-KyAuaW5kZXggPSBIQ1JfRUwyLA0KPj4+ICsgLnZhbHVlID0gSENSX1RJRENQLA0KPj4+ICsgLm1h
-c2sgPSBIQ1JfVElEQ1AsDQo+Pj4gKyAuYmVoYXZpb3VyID0gQkVIQVZFX0ZPUldBUkRfQU5ZLA0K
-Pj4+ICsgfSwNCj4+PiArIFtDR1RfSENSX1RBQ1JdID0gew0KPj4+ICsgLmluZGV4ID0gSENSX0VM
-MiwNCj4+PiArIC52YWx1ZSA9IEhDUl9UQUNSLA0KPj4+ICsgLm1hc2sgPSBIQ1JfVEFDUiwNCj4+
-PiArIC5iZWhhdmlvdXIgPSBCRUhBVkVfRk9SV0FSRF9BTlksDQo+Pj4gKyB9LA0KPj4+ICsgW0NH
-VF9IQ1JfVFNXXSA9IHsNCj4+PiArIC5pbmRleCA9IEhDUl9FTDIsDQo+Pj4gKyAudmFsdWUgPSBI
-Q1JfVFNXLA0KPj4+ICsgLm1hc2sgPSBIQ1JfVFNXLA0KPj4+ICsgLmJlaGF2aW91ciA9IEJFSEFW
-RV9GT1JXQVJEX0FOWSwNCj4+PiArIH0sDQo+Pj4gKyBbQ0dUX0hDUl9UUENdID0geyAvKiBBbHNv
-IGNhbGxlZCBUQ1BDIHdoZW4gRkVBVF9EUEIgaXMgaW1wbGVtZW50ZWQgKi8NCj4+PiArIC5pbmRl
-eCA9IEhDUl9FTDIsDQo+Pj4gKyAudmFsdWUgPSBIQ1JfVFBDLA0KPj4+ICsgLm1hc2sgPSBIQ1Jf
-VFBDLA0KPj4+ICsgLmJlaGF2aW91ciA9IEJFSEFWRV9GT1JXQVJEX0FOWSwNCj4+PiArIH0sDQo+
-Pj4gKyBbQ0dUX0hDUl9UUFVdID0gew0KPj4+ICsgLmluZGV4ID0gSENSX0VMMiwNCj4+PiArIC52
-YWx1ZSA9IEhDUl9UUFUsDQo+Pj4gKyAubWFzayA9IEhDUl9UUFUsDQo+Pj4gKyAuYmVoYXZpb3Vy
-ID0gQkVIQVZFX0ZPUldBUkRfQU5ZLA0KPj4+ICsgfSwNCj4+PiArIFtDR1RfSENSX1RUTEJdID0g
-ew0KPj4+ICsgLmluZGV4ID0gSENSX0VMMiwNCj4+PiArIC52YWx1ZSA9IEhDUl9UVExCLA0KPj4+
-ICsgLm1hc2sgPSBIQ1JfVFRMQiwNCj4+PiArIC5iZWhhdmlvdXIgPSBCRUhBVkVfRk9SV0FSRF9B
-TlksDQo+Pj4gKyB9LA0KPj4+ICsgW0NHVF9IQ1JfVFZNXSA9IHsNCj4+PiArIC5pbmRleCA9IEhD
-Ul9FTDIsDQo+Pj4gKyAudmFsdWUgPSBIQ1JfVFZNLA0KPj4+ICsgLm1hc2sgPSBIQ1JfVFZNLA0K
-Pj4+ICsgLmJlaGF2aW91ciA9IEJFSEFWRV9GT1JXQVJEX1dSSVRFLA0KPj4+ICsgfSwNCj4+PiAr
-IFtDR1RfSENSX1REWl0gPSB7DQo+Pj4gKyAuaW5kZXggPSBIQ1JfRUwyLA0KPj4+ICsgLnZhbHVl
-ID0gSENSX1REWiwNCj4+PiArIC5tYXNrID0gSENSX1REWiwNCj4+PiArIC5iZWhhdmlvdXIgPSBC
-RUhBVkVfRk9SV0FSRF9BTlksDQo+Pj4gKyB9LA0KPj4+ICsgW0NHVF9IQ1JfVFJWTV0gPSB7DQo+
-Pj4gKyAuaW5kZXggPSBIQ1JfRUwyLA0KPj4+ICsgLnZhbHVlID0gSENSX1RSVk0sDQo+Pj4gKyAu
-bWFzayA9IEhDUl9UUlZNLA0KPj4+ICsgLmJlaGF2aW91ciA9IEJFSEFWRV9GT1JXQVJEX1JFQUQs
-DQo+Pj4gKyB9LA0KPj4+ICsgW0NHVF9IQ1JfVExPUl0gPSB7DQo+Pj4gKyAuaW5kZXggPSBIQ1Jf
-RUwyLA0KPj4+ICsgLnZhbHVlID0gSENSX1RMT1IsDQo+Pj4gKyAubWFzayA9IEhDUl9UTE9SLA0K
-Pj4+ICsgLmJlaGF2aW91ciA9IEJFSEFWRV9GT1JXQVJEX0FOWSwNCj4+PiArIH0sDQo+Pj4gKyBb
-Q0dUX0hDUl9URVJSXSA9IHsNCj4+PiArIC5pbmRleCA9IEhDUl9FTDIsDQo+Pj4gKyAudmFsdWUg
-PSBIQ1JfVEVSUiwNCj4+PiArIC5tYXNrID0gSENSX1RFUlIsDQo+Pj4gKyAuYmVoYXZpb3VyID0g
-QkVIQVZFX0ZPUldBUkRfQU5ZLA0KPj4+ICsgfSwNCj4+PiArIFtDR1RfSENSX0FQS10gPSB7DQo+
-Pj4gKyAuaW5kZXggPSBIQ1JfRUwyLA0KPj4+ICsgLnZhbHVlID0gMCwNCj4+PiArIC5tYXNrID0g
-SENSX0FQSywNCj4+PiArIC5iZWhhdmlvdXIgPSBCRUhBVkVfRk9SV0FSRF9BTlksDQo+Pj4gKyB9
-LA0KPj4+ICsgW0NHVF9IQ1JfTlZdID0gew0KPj4+ICsgLmluZGV4ID0gSENSX0VMMiwNCj4+PiAr
-IC52YWx1ZSA9IEhDUl9OViwNCj4+PiArIC5tYXNrID0gSENSX05WLA0KPj4+ICsgLmJlaGF2aW91
-ciA9IEJFSEFWRV9GT1JXQVJEX0FOWSwNCj4+PiArIH0sDQo+Pj4gKyBbQ0dUX0hDUl9OVl9uTlYy
-XSA9IHsNCj4+PiArIC5pbmRleCA9IEhDUl9FTDIsDQo+Pj4gKyAudmFsdWUgPSBIQ1JfTlYsDQo+
-Pj4gKyAubWFzayA9IEhDUl9OViB8IEhDUl9OVjIsDQo+Pj4gKyAuYmVoYXZpb3VyID0gQkVIQVZF
-X0ZPUldBUkRfQU5ZLA0KPj4+ICsgfSwNCj4+PiArIFtDR1RfSENSX05WMV9uTlYyXSA9IHsNCj4+
-PiArIC5pbmRleCA9IEhDUl9FTDIsDQo+Pj4gKyAudmFsdWUgPSBIQ1JfTlYgfCBIQ1JfTlYxLA0K
-Pj4+ICsgLm1hc2sgPSBIQ1JfTlYgfCBIQ1JfTlYxIHwgSENSX05WMiwNCj4+PiArIC5iZWhhdmlv
-dXIgPSBCRUhBVkVfRk9SV0FSRF9BTlksDQo+Pj4gKyB9LA0KPj4gDQo+PiBUaGUgZGVjbGFyYXRp
-b24gYWJvdmUgc2VlbXMgdG8gYmUgYSBjb2Fyc2UgY29udHJvbCBjb21iaW5hdGlvbiB0aGF0IGNv
-dWxkIGJlDQo+PiBkZWNvbXBvc2VkIGluIHRoZSBmb2xsb3dpbmcsIG1vcmUgcmVhZGFibGUsIGVx
-dWl2YWxlbnQgYnkgYWRkaW5nIGENCj4+IGNvbWJpbmF0aW9uIG9mIHR3byBNQ0JzDQo+PiAoZWcu
-IENHVF9IQ1JfTlZfTlYxLCBDR1RfSENSX05WX05WMV9uTlYyKQ0KPj4gDQo+PiAgICAgICBbQ0dU
-X0hDUl9OVjFdID0gew0KPj4gICAgICAgICAgICAgICAuaW5kZXggICAgICAgICAgPSBIQ1JfRUwy
-LA0KPj4gICAgICAgICAgICAgICAudmFsdWUgICAgICAgICAgPSBIQ1JfTlYxLA0KPj4gICAgICAg
-ICAgICAgICAubWFzayAgICAgICAgICAgPSBIQ1JfTlYxLA0KPj4gICAgICAgICAgICAgICAuYmVo
-YXZpb3VyICAgICAgPSBCRUhBVkVfRk9SV0FSRF9BTlksDQo+PiAgICAgICB9LA0KPj4gICAgICAg
-W0NHVF9IQ1JfTlYxX25OVjJdID0gew0KPj4gICAgICAgICAgICAgICAuaW5kZXggICAgICAgICAg
-PSBIQ1JfRUwyLA0KPj4gICAgICAgICAgICAgICAudmFsdWUgICAgICAgICAgPSBIQ1JfTlYxLA0K
-Pj4gICAgICAgICAgICAgICAubWFzayAgICAgICAgICAgPSBIQ1JfTlYxIHwgSENSX05WMiwNCj4+
-ICAgICAgICAgICAgICAgLmJlaGF2aW91ciAgICAgID0gQkVIQVZFX0ZPUldBUkRfQU5ZLA0KPj4g
-ICAgICAgfSwNCj4+IA0KPj4gLyogRkVBVF9OViBhbmQgRkVBVF9OVjIgKi8NCj4+IE1DQihDR1Rf
-SENSX05WX05WMSwgQ0dUX0hDUl9OViwgQ0dUX0hDUl9OVjEpIA0KPj4gDQo+PiAvKiBGRUFUX05W
-MiBhbmQgSENSX0VMMi5OVjIgaXMgMCBiZWhhdmVzIGFzIEZFQVRfTlYgKi8NCj4+IE1DQihDR1Rf
-SENSX05WX05WMV9uTlYyLCBDR1RfSENSX05WX25OVjIsIENHVF9IQ1JfTlYxX25OVjIgKQ0KPiAN
-Cj4gVGhpcyBpcyBub3QgZXF1aXZhbGVudCBhdCBhbGwsIGFzIGEgTUNCIGlzIGEgbG9naWNhbCBP
-Uiwgbm90IGFuIEFORC4NCj4gDQoNCkEgbG9naWNhbCBPUiBhcyBJIHdvdWxkIGV4cGVjdCwgd2hp
-Y2ggY2FuIGJlIHVzZWQgcmVjdXJzaXZlbHksIG1lYW5pbmcNCklJVUMgdGhhdCBhbiBNQ0IgY2Fu
-IGNvbnRhaW4gb3RoZXIgTUNCIGlkcywgaXMgdGhpcyBjb3JyZWN0Pw0KDQpUaGVyZWZvcmUsIHRo
-ZSBlcXVpdmFsZW50IGZvciB0aGUgZGVjbGFyZWQg4oCYQ0dUX0hDUl9OVjFfbk5WMuKAmSB3b3Vs
-ZCBiZQ0KDQpNQ0IoQ0dUX0hDUl9OVjFfbk5WMiwgQ0dUX0hDUl9OVl9OVjEsIENHVF9IQ1JfTlZf
-TlYxX25OVjIpID8NCg0KSSBkbyBub3Qga25vdyB3aGF0IEkgbWlzc2VkLg0KDQo+PiBPbiB0aGUg
-YWJvdmUgYWxsIHRoZSBjb2Fyc2UgSENSX0VMMi57TlYsTlYxfSB0cmFwcyBhcmUgY292ZXJlZCBi
-dXQgbm90IHRoZQ0KPj4gY29uc3RyYWluZWQgdW5wcmVkaWN0YWJsZSBvbmUgd2hlbiBIQ1JfRUwy
-LntOVixOVjF9IGlzIHswLDF9IHdoaWNoIHRyYXBzIGluDQo+PiB0d28gb2YgaXRzIGJlaGF2aW91
-cnMgYW5kIGRvZXNuJ3QgdHJhcCBvbiBvbmUuDQo+IA0KPiBUaGUgY3VycmVudCBhcHByb2FjaCBt
-YWtlcyBpdCBwbGFpbiB0aGF0IEhDUl9FTDIuTlY9PTAgZG9lc24ndCByZXN1bHQNCj4gaW4gYW55
-IHRyYXAgZm9yd2FyZGluZywgY29uc2lzdGVudCB3aXRoIHRoZSBjdXJyZW50IHdvcmRpbmcgb2YN
-Cj4gYXJjaGl0ZWN0dXJlLg0KPiANCg0KSW5kZWVkIGJ1dCBpdCBjb3VsZCByZXN1bHQgaW4gdHJh
-cCBmb3J3YXJkaW5nIGFzIGFuIGV4cGVjdGVkIGJlaGF2aW91cg0KaW4gRDguMTEuNCBvZiBEREkw
-NDg3Si5hLg0KDQpUaGFua3MsDQpNaWd1ZWwNCg0KPiBUaGFua3MsDQo+IA0KPiBNLg0KPiANCj4g
-LS0gDQo+IFdpdGhvdXQgZGV2aWF0aW9uIGZyb20gdGhlIG5vcm0sIHByb2dyZXNzIGlzIG5vdCBw
-b3NzaWJsZS4NCj4gDQoNCg==
+Hi Marc,
+
+> On 8 Aug 2023, at 11:46, Marc Zyngier <maz@kernel.org> wrote:
+>=20
+> Describe the HCR_EL2 register, and associate it with all the sysregs
+> it allows to trap.
+>=20
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+> arch/arm64/kvm/emulate-nested.c | 486 ++++++++++++++++++++++++++++++++
+> 1 file changed, 486 insertions(+)
+>=20
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nes=
+ted.c
+> index 1b1148770d45..2122d16bdeeb 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -37,12 +37,48 @@ enum trap_group {
+> * on their own instead of being part of a combination of
+> * trap controls.
+> */
+> + CGT_HCR_TID1,
+> + CGT_HCR_TID2,
+> + CGT_HCR_TID3,
+> + CGT_HCR_IMO,
+> + CGT_HCR_FMO,
+> + CGT_HCR_TIDCP,
+> + CGT_HCR_TACR,
+> + CGT_HCR_TSW,
+> + CGT_HCR_TPC,
+> + CGT_HCR_TPU,
+> + CGT_HCR_TTLB,
+> + CGT_HCR_TVM,
+> + CGT_HCR_TDZ,
+> + CGT_HCR_TRVM,
+> + CGT_HCR_TLOR,
+> + CGT_HCR_TERR,
+> + CGT_HCR_APK,
+> + CGT_HCR_NV,
+> + CGT_HCR_NV_nNV2,
+> + CGT_HCR_NV1_nNV2,
+> + CGT_HCR_AT,
+> + CGT_HCR_FIEN,
+> + CGT_HCR_TID4,
+> + CGT_HCR_TICAB,
+> + CGT_HCR_TOCU,
+> + CGT_HCR_ENSCXT,
+> + CGT_HCR_TTLBIS,
+> + CGT_HCR_TTLBOS,
+>=20
+> /*
+> * Anything after this point is a combination of trap controls,
+> * which all must be evaluated to decide what to do.
+> */
+> __MULTIPLE_CONTROL_BITS__,
+> + CGT_HCR_IMO_FMO =3D __MULTIPLE_CONTROL_BITS__,
+> + CGT_HCR_TID2_TID4,
+> + CGT_HCR_TTLB_TTLBIS,
+> + CGT_HCR_TTLB_TTLBOS,
+> + CGT_HCR_TVM_TRVM,
+> + CGT_HCR_TPU_TICAB,
+> + CGT_HCR_TPU_TOCU,
+> + CGT_HCR_NV1_nNV2_ENSCXT,
+>=20
+> /*
+> * Anything after this point requires a callback evaluating a
+> @@ -55,6 +91,174 @@ enum trap_group {
+> };
+>=20
+> static const struct trap_bits coarse_trap_bits[] =3D {
+> + [CGT_HCR_TID1] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_TID1,
+> + .mask =3D HCR_TID1,
+> + .behaviour =3D BEHAVE_FORWARD_READ,
+> + },
+> + [CGT_HCR_TID2] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_TID2,
+> + .mask =3D HCR_TID2,
+> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> + },
+> + [CGT_HCR_TID3] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_TID3,
+> + .mask =3D HCR_TID3,
+> + .behaviour =3D BEHAVE_FORWARD_READ,
+> + },
+> + [CGT_HCR_IMO] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_IMO,
+> + .mask =3D HCR_IMO,
+> + .behaviour =3D BEHAVE_FORWARD_WRITE,
+> + },
+> + [CGT_HCR_FMO] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_FMO,
+> + .mask =3D HCR_FMO,
+> + .behaviour =3D BEHAVE_FORWARD_WRITE,
+> + },
+> + [CGT_HCR_TIDCP] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_TIDCP,
+> + .mask =3D HCR_TIDCP,
+> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> + },
+> + [CGT_HCR_TACR] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_TACR,
+> + .mask =3D HCR_TACR,
+> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> + },
+> + [CGT_HCR_TSW] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_TSW,
+> + .mask =3D HCR_TSW,
+> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> + },
+> + [CGT_HCR_TPC] =3D { /* Also called TCPC when FEAT_DPB is implemented */
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_TPC,
+> + .mask =3D HCR_TPC,
+> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> + },
+> + [CGT_HCR_TPU] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_TPU,
+> + .mask =3D HCR_TPU,
+> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> + },
+> + [CGT_HCR_TTLB] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_TTLB,
+> + .mask =3D HCR_TTLB,
+> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> + },
+> + [CGT_HCR_TVM] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_TVM,
+> + .mask =3D HCR_TVM,
+> + .behaviour =3D BEHAVE_FORWARD_WRITE,
+> + },
+> + [CGT_HCR_TDZ] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_TDZ,
+> + .mask =3D HCR_TDZ,
+> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> + },
+> + [CGT_HCR_TRVM] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_TRVM,
+> + .mask =3D HCR_TRVM,
+> + .behaviour =3D BEHAVE_FORWARD_READ,
+> + },
+> + [CGT_HCR_TLOR] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_TLOR,
+> + .mask =3D HCR_TLOR,
+> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> + },
+> + [CGT_HCR_TERR] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_TERR,
+> + .mask =3D HCR_TERR,
+> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> + },
+> + [CGT_HCR_APK] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D 0,
+> + .mask =3D HCR_APK,
+> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> + },
+> + [CGT_HCR_NV] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_NV,
+> + .mask =3D HCR_NV,
+> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> + },
+> + [CGT_HCR_NV_nNV2] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_NV,
+> + .mask =3D HCR_NV | HCR_NV2,
+> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> + },
+> + [CGT_HCR_NV1_nNV2] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_NV | HCR_NV1,
+> + .mask =3D HCR_NV | HCR_NV1 | HCR_NV2,
+> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> + },
+> + [CGT_HCR_AT] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_AT,
+> + .mask =3D HCR_AT,
+> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> + },
+> + [CGT_HCR_FIEN] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_FIEN,
+
+Should this value be 0 ?
+
+Thanks,
+Miguel
+
+> + .mask =3D HCR_FIEN,
+> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> + },
+> + [CGT_HCR_TID4] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_TID4,
+> + .mask =3D HCR_TID4,
+> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> + },
+> + [CGT_HCR_TICAB] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_TICAB,
+> + .mask =3D HCR_TICAB,
+> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> + },
+> + [CGT_HCR_TOCU] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_TOCU,
+> + .mask =3D HCR_TOCU,
+> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> + },
+> + [CGT_HCR_ENSCXT] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D 0,
+> + .mask =3D HCR_ENSCXT,
+> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> + },
+> + [CGT_HCR_TTLBIS] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_TTLBIS,
+> + .mask =3D HCR_TTLBIS,
+> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> + },
+> + [CGT_HCR_TTLBOS] =3D {
+> + .index =3D HCR_EL2,
+> + .value =3D HCR_TTLBOS,
+> + .mask =3D HCR_TTLBOS,
+> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> + },
+> };
+>=20
+> #define MCB(id, ...) \
+> @@ -64,6 +268,14 @@ static const struct trap_bits coarse_trap_bits[] =3D =
+{
+> }
+>=20
+> static const enum trap_group *coarse_control_combo[] =3D {
+> + MCB(CGT_HCR_IMO_FMO, CGT_HCR_IMO, CGT_HCR_FMO),
+> + MCB(CGT_HCR_TID2_TID4, CGT_HCR_TID2, CGT_HCR_TID4),
+> + MCB(CGT_HCR_TTLB_TTLBIS, CGT_HCR_TTLB, CGT_HCR_TTLBIS),
+> + MCB(CGT_HCR_TTLB_TTLBOS, CGT_HCR_TTLB, CGT_HCR_TTLBOS),
+> + MCB(CGT_HCR_TVM_TRVM, CGT_HCR_TVM, CGT_HCR_TRVM),
+> + MCB(CGT_HCR_TPU_TICAB, CGT_HCR_TPU, CGT_HCR_TICAB),
+> + MCB(CGT_HCR_TPU_TOCU, CGT_HCR_TPU, CGT_HCR_TOCU),
+> + MCB(CGT_HCR_NV1_nNV2_ENSCXT, CGT_HCR_NV1_nNV2, CGT_HCR_ENSCXT),
+> };
+>=20
+> typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu *)=
+;
+> @@ -125,6 +337,280 @@ struct encoding_to_trap_config {
+>  * re-injected in the nested hypervisor.
+>  */
+> static const struct encoding_to_trap_config encoding_to_cgt[] __initconst=
+ =3D {
+> + SR_TRAP(SYS_REVIDR_EL1, CGT_HCR_TID1),
+> + SR_TRAP(SYS_AIDR_EL1, CGT_HCR_TID1),
+> + SR_TRAP(SYS_SMIDR_EL1, CGT_HCR_TID1),
+> + SR_TRAP(SYS_CTR_EL0, CGT_HCR_TID2),
+> + SR_TRAP(SYS_CCSIDR_EL1, CGT_HCR_TID2_TID4),
+> + SR_TRAP(SYS_CCSIDR2_EL1, CGT_HCR_TID2_TID4),
+> + SR_TRAP(SYS_CLIDR_EL1, CGT_HCR_TID2_TID4),
+> + SR_TRAP(SYS_CSSELR_EL1, CGT_HCR_TID2_TID4),
+> + SR_RANGE_TRAP(SYS_ID_PFR0_EL1,
+> +      sys_reg(3, 0, 0, 7, 7), CGT_HCR_TID3),
+> + SR_TRAP(SYS_ICC_SGI0R_EL1, CGT_HCR_IMO_FMO),
+> + SR_TRAP(SYS_ICC_ASGI1R_EL1, CGT_HCR_IMO_FMO),
+> + SR_TRAP(SYS_ICC_SGI1R_EL1, CGT_HCR_IMO_FMO),
+> + SR_RANGE_TRAP(sys_reg(3, 0, 11, 0, 0),
+> +      sys_reg(3, 0, 11, 15, 7), CGT_HCR_TIDCP),
+> + SR_RANGE_TRAP(sys_reg(3, 1, 11, 0, 0),
+> +      sys_reg(3, 1, 11, 15, 7), CGT_HCR_TIDCP),
+> + SR_RANGE_TRAP(sys_reg(3, 2, 11, 0, 0),
+> +      sys_reg(3, 2, 11, 15, 7), CGT_HCR_TIDCP),
+> + SR_RANGE_TRAP(sys_reg(3, 3, 11, 0, 0),
+> +      sys_reg(3, 3, 11, 15, 7), CGT_HCR_TIDCP),
+> + SR_RANGE_TRAP(sys_reg(3, 4, 11, 0, 0),
+> +      sys_reg(3, 4, 11, 15, 7), CGT_HCR_TIDCP),
+> + SR_RANGE_TRAP(sys_reg(3, 5, 11, 0, 0),
+> +      sys_reg(3, 5, 11, 15, 7), CGT_HCR_TIDCP),
+> + SR_RANGE_TRAP(sys_reg(3, 6, 11, 0, 0),
+> +      sys_reg(3, 6, 11, 15, 7), CGT_HCR_TIDCP),
+> + SR_RANGE_TRAP(sys_reg(3, 7, 11, 0, 0),
+> +      sys_reg(3, 7, 11, 15, 7), CGT_HCR_TIDCP),
+> + SR_RANGE_TRAP(sys_reg(3, 0, 15, 0, 0),
+> +      sys_reg(3, 0, 15, 15, 7), CGT_HCR_TIDCP),
+> + SR_RANGE_TRAP(sys_reg(3, 1, 15, 0, 0),
+> +      sys_reg(3, 1, 15, 15, 7), CGT_HCR_TIDCP),
+> + SR_RANGE_TRAP(sys_reg(3, 2, 15, 0, 0),
+> +      sys_reg(3, 2, 15, 15, 7), CGT_HCR_TIDCP),
+> + SR_RANGE_TRAP(sys_reg(3, 3, 15, 0, 0),
+> +      sys_reg(3, 3, 15, 15, 7), CGT_HCR_TIDCP),
+> + SR_RANGE_TRAP(sys_reg(3, 4, 15, 0, 0),
+> +      sys_reg(3, 4, 15, 15, 7), CGT_HCR_TIDCP),
+> + SR_RANGE_TRAP(sys_reg(3, 5, 15, 0, 0),
+> +      sys_reg(3, 5, 15, 15, 7), CGT_HCR_TIDCP),
+> + SR_RANGE_TRAP(sys_reg(3, 6, 15, 0, 0),
+> +      sys_reg(3, 6, 15, 15, 7), CGT_HCR_TIDCP),
+> + SR_RANGE_TRAP(sys_reg(3, 7, 15, 0, 0),
+> +      sys_reg(3, 7, 15, 15, 7), CGT_HCR_TIDCP),
+> + SR_TRAP(SYS_ACTLR_EL1, CGT_HCR_TACR),
+> + SR_TRAP(SYS_DC_ISW, CGT_HCR_TSW),
+> + SR_TRAP(SYS_DC_CSW, CGT_HCR_TSW),
+> + SR_TRAP(SYS_DC_CISW, CGT_HCR_TSW),
+> + SR_TRAP(SYS_DC_IGSW, CGT_HCR_TSW),
+> + SR_TRAP(SYS_DC_IGDSW, CGT_HCR_TSW),
+> + SR_TRAP(SYS_DC_CGSW, CGT_HCR_TSW),
+> + SR_TRAP(SYS_DC_CGDSW, CGT_HCR_TSW),
+> + SR_TRAP(SYS_DC_CIGSW, CGT_HCR_TSW),
+> + SR_TRAP(SYS_DC_CIGDSW, CGT_HCR_TSW),
+> + SR_TRAP(SYS_DC_CIVAC, CGT_HCR_TPC),
+> + SR_TRAP(SYS_DC_CVAC, CGT_HCR_TPC),
+> + SR_TRAP(SYS_DC_CVAP, CGT_HCR_TPC),
+> + SR_TRAP(SYS_DC_CVADP, CGT_HCR_TPC),
+> + SR_TRAP(SYS_DC_IVAC, CGT_HCR_TPC),
+> + SR_TRAP(SYS_DC_CIGVAC, CGT_HCR_TPC),
+> + SR_TRAP(SYS_DC_CIGDVAC, CGT_HCR_TPC),
+> + SR_TRAP(SYS_DC_IGVAC, CGT_HCR_TPC),
+> + SR_TRAP(SYS_DC_IGDVAC, CGT_HCR_TPC),
+> + SR_TRAP(SYS_DC_CGVAC, CGT_HCR_TPC),
+> + SR_TRAP(SYS_DC_CGDVAC, CGT_HCR_TPC),
+> + SR_TRAP(SYS_DC_CGVAP, CGT_HCR_TPC),
+> + SR_TRAP(SYS_DC_CGDVAP, CGT_HCR_TPC),
+> + SR_TRAP(SYS_DC_CGVADP, CGT_HCR_TPC),
+> + SR_TRAP(SYS_DC_CGDVADP, CGT_HCR_TPC),
+> + SR_TRAP(SYS_IC_IVAU, CGT_HCR_TPU_TOCU),
+> + SR_TRAP(SYS_IC_IALLU, CGT_HCR_TPU_TOCU),
+> + SR_TRAP(SYS_IC_IALLUIS, CGT_HCR_TPU_TICAB),
+> + SR_TRAP(SYS_DC_CVAU, CGT_HCR_TPU_TOCU),
+> + SR_TRAP(OP_TLBI_RVAE1, CGT_HCR_TTLB),
+> + SR_TRAP(OP_TLBI_RVAAE1, CGT_HCR_TTLB),
+> + SR_TRAP(OP_TLBI_RVALE1, CGT_HCR_TTLB),
+> + SR_TRAP(OP_TLBI_RVAALE1, CGT_HCR_TTLB),
+> + SR_TRAP(OP_TLBI_VMALLE1, CGT_HCR_TTLB),
+> + SR_TRAP(OP_TLBI_VAE1, CGT_HCR_TTLB),
+> + SR_TRAP(OP_TLBI_ASIDE1, CGT_HCR_TTLB),
+> + SR_TRAP(OP_TLBI_VAAE1, CGT_HCR_TTLB),
+> + SR_TRAP(OP_TLBI_VALE1, CGT_HCR_TTLB),
+> + SR_TRAP(OP_TLBI_VAALE1, CGT_HCR_TTLB),
+> + SR_TRAP(OP_TLBI_RVAE1NXS, CGT_HCR_TTLB),
+> + SR_TRAP(OP_TLBI_RVAAE1NXS, CGT_HCR_TTLB),
+> + SR_TRAP(OP_TLBI_RVALE1NXS, CGT_HCR_TTLB),
+> + SR_TRAP(OP_TLBI_RVAALE1NXS, CGT_HCR_TTLB),
+> + SR_TRAP(OP_TLBI_VMALLE1NXS, CGT_HCR_TTLB),
+> + SR_TRAP(OP_TLBI_VAE1NXS, CGT_HCR_TTLB),
+> + SR_TRAP(OP_TLBI_ASIDE1NXS, CGT_HCR_TTLB),
+> + SR_TRAP(OP_TLBI_VAAE1NXS, CGT_HCR_TTLB),
+> + SR_TRAP(OP_TLBI_VALE1NXS, CGT_HCR_TTLB),
+> + SR_TRAP(OP_TLBI_VAALE1NXS, CGT_HCR_TTLB),
+> + SR_TRAP(OP_TLBI_RVAE1IS, CGT_HCR_TTLB_TTLBIS),
+> + SR_TRAP(OP_TLBI_RVAAE1IS, CGT_HCR_TTLB_TTLBIS),
+> + SR_TRAP(OP_TLBI_RVALE1IS, CGT_HCR_TTLB_TTLBIS),
+> + SR_TRAP(OP_TLBI_RVAALE1IS, CGT_HCR_TTLB_TTLBIS),
+> + SR_TRAP(OP_TLBI_VMALLE1IS, CGT_HCR_TTLB_TTLBIS),
+> + SR_TRAP(OP_TLBI_VAE1IS, CGT_HCR_TTLB_TTLBIS),
+> + SR_TRAP(OP_TLBI_ASIDE1IS, CGT_HCR_TTLB_TTLBIS),
+> + SR_TRAP(OP_TLBI_VAAE1IS, CGT_HCR_TTLB_TTLBIS),
+> + SR_TRAP(OP_TLBI_VALE1IS, CGT_HCR_TTLB_TTLBIS),
+> + SR_TRAP(OP_TLBI_VAALE1IS, CGT_HCR_TTLB_TTLBIS),
+> + SR_TRAP(OP_TLBI_RVAE1ISNXS, CGT_HCR_TTLB_TTLBIS),
+> + SR_TRAP(OP_TLBI_RVAAE1ISNXS, CGT_HCR_TTLB_TTLBIS),
+> + SR_TRAP(OP_TLBI_RVALE1ISNXS, CGT_HCR_TTLB_TTLBIS),
+> + SR_TRAP(OP_TLBI_RVAALE1ISNXS, CGT_HCR_TTLB_TTLBIS),
+> + SR_TRAP(OP_TLBI_VMALLE1ISNXS, CGT_HCR_TTLB_TTLBIS),
+> + SR_TRAP(OP_TLBI_VAE1ISNXS, CGT_HCR_TTLB_TTLBIS),
+> + SR_TRAP(OP_TLBI_ASIDE1ISNXS, CGT_HCR_TTLB_TTLBIS),
+> + SR_TRAP(OP_TLBI_VAAE1ISNXS, CGT_HCR_TTLB_TTLBIS),
+> + SR_TRAP(OP_TLBI_VALE1ISNXS, CGT_HCR_TTLB_TTLBIS),
+> + SR_TRAP(OP_TLBI_VAALE1ISNXS, CGT_HCR_TTLB_TTLBIS),
+> + SR_TRAP(OP_TLBI_VMALLE1OS, CGT_HCR_TTLB_TTLBOS),
+> + SR_TRAP(OP_TLBI_VAE1OS, CGT_HCR_TTLB_TTLBOS),
+> + SR_TRAP(OP_TLBI_ASIDE1OS, CGT_HCR_TTLB_TTLBOS),
+> + SR_TRAP(OP_TLBI_VAAE1OS, CGT_HCR_TTLB_TTLBOS),
+> + SR_TRAP(OP_TLBI_VALE1OS, CGT_HCR_TTLB_TTLBOS),
+> + SR_TRAP(OP_TLBI_VAALE1OS, CGT_HCR_TTLB_TTLBOS),
+> + SR_TRAP(OP_TLBI_RVAE1OS, CGT_HCR_TTLB_TTLBOS),
+> + SR_TRAP(OP_TLBI_RVAAE1OS, CGT_HCR_TTLB_TTLBOS),
+> + SR_TRAP(OP_TLBI_RVALE1OS, CGT_HCR_TTLB_TTLBOS),
+> + SR_TRAP(OP_TLBI_RVAALE1OS, CGT_HCR_TTLB_TTLBOS),
+> + SR_TRAP(OP_TLBI_VMALLE1OSNXS, CGT_HCR_TTLB_TTLBOS),
+> + SR_TRAP(OP_TLBI_VAE1OSNXS, CGT_HCR_TTLB_TTLBOS),
+> + SR_TRAP(OP_TLBI_ASIDE1OSNXS, CGT_HCR_TTLB_TTLBOS),
+> + SR_TRAP(OP_TLBI_VAAE1OSNXS, CGT_HCR_TTLB_TTLBOS),
+> + SR_TRAP(OP_TLBI_VALE1OSNXS, CGT_HCR_TTLB_TTLBOS),
+> + SR_TRAP(OP_TLBI_VAALE1OSNXS, CGT_HCR_TTLB_TTLBOS),
+> + SR_TRAP(OP_TLBI_RVAE1OSNXS, CGT_HCR_TTLB_TTLBOS),
+> + SR_TRAP(OP_TLBI_RVAAE1OSNXS, CGT_HCR_TTLB_TTLBOS),
+> + SR_TRAP(OP_TLBI_RVALE1OSNXS, CGT_HCR_TTLB_TTLBOS),
+> + SR_TRAP(OP_TLBI_RVAALE1OSNXS, CGT_HCR_TTLB_TTLBOS),
+> + SR_TRAP(SYS_SCTLR_EL1, CGT_HCR_TVM_TRVM),
+> + SR_TRAP(SYS_TTBR0_EL1, CGT_HCR_TVM_TRVM),
+> + SR_TRAP(SYS_TTBR1_EL1, CGT_HCR_TVM_TRVM),
+> + SR_TRAP(SYS_TCR_EL1, CGT_HCR_TVM_TRVM),
+> + SR_TRAP(SYS_ESR_EL1, CGT_HCR_TVM_TRVM),
+> + SR_TRAP(SYS_FAR_EL1, CGT_HCR_TVM_TRVM),
+> + SR_TRAP(SYS_AFSR0_EL1, CGT_HCR_TVM_TRVM),
+> + SR_TRAP(SYS_AFSR1_EL1, CGT_HCR_TVM_TRVM),
+> + SR_TRAP(SYS_MAIR_EL1, CGT_HCR_TVM_TRVM),
+> + SR_TRAP(SYS_AMAIR_EL1, CGT_HCR_TVM_TRVM),
+> + SR_TRAP(SYS_CONTEXTIDR_EL1, CGT_HCR_TVM_TRVM),
+> + SR_TRAP(SYS_DC_ZVA, CGT_HCR_TDZ),
+> + SR_TRAP(SYS_DC_GVA, CGT_HCR_TDZ),
+> + SR_TRAP(SYS_DC_GZVA, CGT_HCR_TDZ),
+> + SR_TRAP(SYS_LORSA_EL1, CGT_HCR_TLOR),
+> + SR_TRAP(SYS_LOREA_EL1, CGT_HCR_TLOR),
+> + SR_TRAP(SYS_LORN_EL1, CGT_HCR_TLOR),
+> + SR_TRAP(SYS_LORC_EL1, CGT_HCR_TLOR),
+> + SR_TRAP(SYS_LORID_EL1, CGT_HCR_TLOR),
+> + SR_TRAP(SYS_ERRIDR_EL1, CGT_HCR_TERR),
+> + SR_TRAP(SYS_ERRSELR_EL1, CGT_HCR_TERR),
+> + SR_TRAP(SYS_ERXADDR_EL1, CGT_HCR_TERR),
+> + SR_TRAP(SYS_ERXCTLR_EL1, CGT_HCR_TERR),
+> + SR_TRAP(SYS_ERXFR_EL1, CGT_HCR_TERR),
+> + SR_TRAP(SYS_ERXMISC0_EL1, CGT_HCR_TERR),
+> + SR_TRAP(SYS_ERXMISC1_EL1, CGT_HCR_TERR),
+> + SR_TRAP(SYS_ERXMISC2_EL1, CGT_HCR_TERR),
+> + SR_TRAP(SYS_ERXMISC3_EL1, CGT_HCR_TERR),
+> + SR_TRAP(SYS_ERXSTATUS_EL1, CGT_HCR_TERR),
+> + SR_TRAP(SYS_APIAKEYLO_EL1, CGT_HCR_APK),
+> + SR_TRAP(SYS_APIAKEYHI_EL1, CGT_HCR_APK),
+> + SR_TRAP(SYS_APIBKEYLO_EL1, CGT_HCR_APK),
+> + SR_TRAP(SYS_APIBKEYHI_EL1, CGT_HCR_APK),
+> + SR_TRAP(SYS_APDAKEYLO_EL1, CGT_HCR_APK),
+> + SR_TRAP(SYS_APDAKEYHI_EL1, CGT_HCR_APK),
+> + SR_TRAP(SYS_APDBKEYLO_EL1, CGT_HCR_APK),
+> + SR_TRAP(SYS_APDBKEYHI_EL1, CGT_HCR_APK),
+> + SR_TRAP(SYS_APGAKEYLO_EL1, CGT_HCR_APK),
+> + SR_TRAP(SYS_APGAKEYHI_EL1, CGT_HCR_APK),
+> + /* All _EL2 registers */
+> + SR_RANGE_TRAP(sys_reg(3, 4, 0, 0, 0),
+> +      sys_reg(3, 4, 10, 15, 7), CGT_HCR_NV),
+> + SR_RANGE_TRAP(sys_reg(3, 4, 12, 0, 0),
+> +      sys_reg(3, 4, 14, 15, 7), CGT_HCR_NV),
+> + /* All _EL02, _EL12 registers */
+> + SR_RANGE_TRAP(sys_reg(3, 5, 0, 0, 0),
+> +      sys_reg(3, 5, 10, 15, 7), CGT_HCR_NV),
+> + SR_RANGE_TRAP(sys_reg(3, 5, 12, 0, 0),
+> +      sys_reg(3, 5, 14, 15, 7), CGT_HCR_NV),
+> + SR_TRAP(OP_AT_S1E2R, CGT_HCR_NV),
+> + SR_TRAP(OP_AT_S1E2W, CGT_HCR_NV),
+> + SR_TRAP(OP_AT_S12E1R, CGT_HCR_NV),
+> + SR_TRAP(OP_AT_S12E1W, CGT_HCR_NV),
+> + SR_TRAP(OP_AT_S12E0R, CGT_HCR_NV),
+> + SR_TRAP(OP_AT_S12E0W, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_IPAS2E1, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RIPAS2E1, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_IPAS2LE1, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RIPAS2LE1, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RVAE2, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RVALE2, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_ALLE2, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_VAE2, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_ALLE1, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_VALE2, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_VMALLS12E1, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_IPAS2E1NXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RIPAS2E1NXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_IPAS2LE1NXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RIPAS2LE1NXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RVAE2NXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RVALE2NXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_ALLE2NXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_VAE2NXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_ALLE1NXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_VALE2NXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_VMALLS12E1NXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_IPAS2E1IS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RIPAS2E1IS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_IPAS2LE1IS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RIPAS2LE1IS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RVAE2IS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RVALE2IS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_ALLE2IS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_VAE2IS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_ALLE1IS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_VALE2IS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_VMALLS12E1IS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_IPAS2E1ISNXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RIPAS2E1ISNXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_IPAS2LE1ISNXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RIPAS2LE1ISNXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RVAE2ISNXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RVALE2ISNXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_ALLE2ISNXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_VAE2ISNXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_ALLE1ISNXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_VALE2ISNXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_VMALLS12E1ISNXS,CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_ALLE2OS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_VAE2OS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_ALLE1OS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_VALE2OS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_VMALLS12E1OS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_IPAS2E1OS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RIPAS2E1OS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_IPAS2LE1OS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RIPAS2LE1OS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RVAE2OS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RVALE2OS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_ALLE2OSNXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_VAE2OSNXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_ALLE1OSNXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_VALE2OSNXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_VMALLS12E1OSNXS,CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_IPAS2E1OSNXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RIPAS2E1OSNXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_IPAS2LE1OSNXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RIPAS2LE1OSNXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RVAE2OSNXS, CGT_HCR_NV),
+> + SR_TRAP(OP_TLBI_RVALE2OSNXS, CGT_HCR_NV),
+> + SR_TRAP(OP_CPP_RCTX, CGT_HCR_NV),
+> + SR_TRAP(OP_DVP_RCTX, CGT_HCR_NV),
+> + SR_TRAP(OP_CFP_RCTX, CGT_HCR_NV),
+> + SR_TRAP(SYS_SP_EL1, CGT_HCR_NV_nNV2),
+> + SR_TRAP(SYS_VBAR_EL1, CGT_HCR_NV1_nNV2),
+> + SR_TRAP(SYS_ELR_EL1, CGT_HCR_NV1_nNV2),
+> + SR_TRAP(SYS_SPSR_EL1, CGT_HCR_NV1_nNV2),
+> + SR_TRAP(SYS_SCXTNUM_EL1, CGT_HCR_NV1_nNV2_ENSCXT),
+> + SR_TRAP(SYS_SCXTNUM_EL0, CGT_HCR_ENSCXT),
+> + SR_TRAP(OP_AT_S1E1R, CGT_HCR_AT),
+> + SR_TRAP(OP_AT_S1E1W, CGT_HCR_AT),
+> + SR_TRAP(OP_AT_S1E0R, CGT_HCR_AT),
+> + SR_TRAP(OP_AT_S1E0W, CGT_HCR_AT),
+> + SR_TRAP(OP_AT_S1E1RP, CGT_HCR_AT),
+> + SR_TRAP(OP_AT_S1E1WP, CGT_HCR_AT),
+> + SR_TRAP(SYS_ERXPFGF_EL1, CGT_HCR_FIEN),
+> + SR_TRAP(SYS_ERXPFGCTL_EL1, CGT_HCR_FIEN),
+> + SR_TRAP(SYS_ERXPFGCDN_EL1, CGT_HCR_FIEN),
+> + SR_TRAP(SYS_SCXTNUM_EL0, CGT_HCR_ENSCXT),
+> };
+>=20
+> static DEFINE_XARRAY(sr_forward_xa);
+> --=20
+> 2.34.1
+>=20
+
