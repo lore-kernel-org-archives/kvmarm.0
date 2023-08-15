@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A64C318026
-	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 18:47:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 260C7C433C8;
-	Tue, 15 Aug 2023 18:47:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1177C18026
+	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 18:47:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D485CC433C8;
+	Tue, 15 Aug 2023 18:47:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692125231;
-	bh=liPIWJrsaZpZ+LSyTtRogJZZkvVPnG34u65GKptRtkw=;
+	s=k20201202; t=1692125234;
+	bh=Lefa0PQIq+vwhSa0X5V5we3jlWqXU+ytjLeGhSHxMHQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RXAid3ekKoy1ySkQTVFtq2vHmtXstc4TmlBOqc+OqJfqM/veCeYtaRA/eMhzkb7p5
-	 5w4+PrvIRd6ff5C8mCVE9wGNHW9KNSVqJMDKwMp9sn8fjeXrLHRYU8yF2odVUY12fq
-	 Dss+/hDEf+4G1vbQZ7/i/24Qekr/aiTdrMQ940PrOUYhUpPsAstfcGOlzCSfwRvEQV
-	 CnRhJ+coMk6OKjLNIgMDV1qqwcZlwpNrDZkDRjFscWEqs627qWuZgH3K47PGhOkNVd
-	 /uZFmxKFrP3T+8BxFQ3hENTA32z2HR8E70aLPpygIsE5nQT9JYOodehZCbcNg9wYGu
-	 i+rnFG4y3HvIA==
+	b=sN+lPJdHP70fwqxelCzuYKvDxdnG437p+ue73rSQ6v9ENk5056PDNrGAj22Bt2psh
+	 AhfHEeY7VyMV5hPi02sTXVlVQ6NHYVbizRt+W3pl8w6nNFVDTD6wednfbIFCzWNsDk
+	 VN+X/2vhgR6at0wACE7OyU+qXOZN4QVFgx4Bd7j78aiTHc7nTsFPCjL/naA/qGu1Ql
+	 EneAbI5h/2fc1xO7cq8ac5QOIQ4jcbI1084P84NmVVUDBmVn2B7pdqblRVzj49r2po
+	 74goLuXuy2FflQEHZ0KS6CsC2DZh687SXTs+PD9Tnim/cJn6zrLkLqvzLbVCWEdoBv
+	 WYB2ekCpytEjw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qVywo-0055Sd-PS;
-	Tue, 15 Aug 2023 19:39:18 +0100
+	id 1qVywq-0055Sd-3S;
+	Tue, 15 Aug 2023 19:39:20 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -41,9 +41,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v4 13/28] KVM: arm64: Restructure FGT register switching
-Date: Tue, 15 Aug 2023 19:38:47 +0100
-Message-Id: <20230815183903.2735724-14-maz@kernel.org>
+Subject: [PATCH v4 18/28] KVM: arm64: nv: Add trap forwarding for CNTHCTL_EL2
+Date: Tue, 15 Aug 2023 19:38:52 +0100
+Message-Id: <20230815183903.2735724-19-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230815183903.2735724-1-maz@kernel.org>
 References: <20230815183903.2735724-1-maz@kernel.org>
@@ -59,152 +59,96 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-As we're about to majorly extend the handling of FGT registers,
-restructure the code to actually save/restore the registers
-as required. This is made easy thanks to the previous addition
-of the EL2 registers, allowing us to use the host context for
-this purpose.
+Describe the CNTHCTL_EL2 register, and associate it with all the sysregs
+it allows to trap.
 
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_arm.h        | 21 ++++++++++
- arch/arm64/kvm/hyp/include/hyp/switch.h | 56 +++++++++++++------------
- 2 files changed, 50 insertions(+), 27 deletions(-)
+ arch/arm64/kvm/emulate-nested.c | 50 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 49 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 028049b147df..85908aa18908 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -333,6 +333,27 @@
- 				 BIT(18) |		\
- 				 GENMASK(16, 15))
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 241e44eeed6d..860910386b5b 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -100,9 +100,11 @@ enum cgt_group_id {
+ 
+ 	/*
+ 	 * Anything after this point requires a callback evaluating a
+-	 * complex trap condition. Hopefully we'll never need this...
++	 * complex trap condition. Ugly stuff.
+ 	 */
+ 	__COMPLEX_CONDITIONS__,
++	CGT_CNTHCTL_EL1PCTEN = __COMPLEX_CONDITIONS__,
++	CGT_CNTHCTL_EL1PTEN,
+ 
+ 	/* Must be last */
+ 	__NR_CGT_GROUP_IDS__
+@@ -369,10 +371,51 @@ static const enum cgt_group_id *coarse_control_combo[] = {
+ 
+ typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu *);
  
 +/*
-+ * FGT register definitions
++ * Warning, maximum confusion ahead.
 + *
-+ * RES0 and polarity masks as of DDI0487J.a, to be updated as needed.
-+ * We're not using the generated masks as they are usually ahead of
-+ * the published ARM ARM, which we use as a reference.
++ * When E2H=0, CNTHCTL_EL2[1:0] are defined as EL1PCEN:EL1PCTEN
++ * When E2H=1, CNTHCTL_EL2[11:10] are defined as EL1PTEN:EL1PCTEN
 + *
-+ * Once we get to a point where the two describe the same thing, we'll
-+ * merge the definitions. One day.
++ * Note the single letter difference? Yet, the bits have the same
++ * function despite a different layout and a different name.
++ *
++ * We don't try to reconcile this mess. We just use the E2H=0 bits
++ * to generate something that is in the E2H=1 format, and live with
++ * it. You're welcome.
 + */
-+#define __HFGRTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51))
-+#define __HFGRTR_EL2_MASK	GENMASK(49, 0)
-+#define __HFGRTR_EL2_nMASK	(GENMASK(55, 54) | BIT(50))
++static u64 get_sanitized_cnthctl(struct kvm_vcpu *vcpu)
++{
++	u64 val = __vcpu_sys_reg(vcpu, CNTHCTL_EL2);
 +
-+#define __HFGWTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51) |	\
-+				 BIT(46) | BIT(42) | BIT(40) | BIT(28) | \
-+				 GENMASK(26, 25) | BIT(21) | BIT(18) |	\
-+				 GENMASK(15, 14) | GENMASK(10, 9) | BIT(2))
-+#define __HFGWTR_EL2_MASK	GENMASK(49, 0)
-+#define __HFGWTR_EL2_nMASK	(GENMASK(55, 54) | BIT(50))
++	if (!vcpu_el2_e2h_is_set(vcpu))
++		val = (val & (CNTHCTL_EL1PCEN | CNTHCTL_EL1PCTEN)) << 10;
 +
- /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
- #define HPFAR_MASK	(~UL(0xf))
++	return val & ((CNTHCTL_EL1PCEN | CNTHCTL_EL1PCTEN) << 10);
++}
++
++static enum trap_behaviour check_cnthctl_el1pcten(struct kvm_vcpu *vcpu)
++{
++	if (get_sanitized_cnthctl(vcpu) & (CNTHCTL_EL1PCTEN << 10))
++		return BEHAVE_HANDLE_LOCALLY;
++
++	return BEHAVE_FORWARD_ANY;
++}
++
++static enum trap_behaviour check_cnthctl_el1pten(struct kvm_vcpu *vcpu)
++{
++	if (get_sanitized_cnthctl(vcpu) & (CNTHCTL_EL1PCEN << 10))
++		return BEHAVE_HANDLE_LOCALLY;
++
++	return BEHAVE_FORWARD_ANY;
++}
++
+ #define CCC(id, fn)				\
+ 	[id - __COMPLEX_CONDITIONS__] = fn
+ 
+ static const complex_condition_check ccc[] = {
++	CCC(CGT_CNTHCTL_EL1PCTEN, check_cnthctl_el1pcten),
++	CCC(CGT_CNTHCTL_EL1PTEN, check_cnthctl_el1pten),
+ };
+ 
  /*
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 4bddb8541bec..e096b16e85fd 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -70,20 +70,19 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
- 	}
- }
+@@ -877,6 +920,11 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+ 	SR_TRAP(SYS_TRBPTR_EL1, 	CGT_MDCR_E2TB),
+ 	SR_TRAP(SYS_TRBSR_EL1, 		CGT_MDCR_E2TB),
+ 	SR_TRAP(SYS_TRBTRG_EL1,		CGT_MDCR_E2TB),
++	SR_TRAP(SYS_CNTP_TVAL_EL0,	CGT_CNTHCTL_EL1PTEN),
++	SR_TRAP(SYS_CNTP_CVAL_EL0,	CGT_CNTHCTL_EL1PTEN),
++	SR_TRAP(SYS_CNTP_CTL_EL0,	CGT_CNTHCTL_EL1PTEN),
++	SR_TRAP(SYS_CNTPCT_EL0,		CGT_CNTHCTL_EL1PCTEN),
++	SR_TRAP(SYS_CNTPCTSS_EL0,	CGT_CNTHCTL_EL1PCTEN),
+ };
  
--static inline bool __hfgxtr_traps_required(void)
--{
--	if (cpus_have_final_cap(ARM64_SME))
--		return true;
--
--	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
--		return true;
- 
--	return false;
--}
- 
--static inline void __activate_traps_hfgxtr(void)
-+static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
- {
-+	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
- 	u64 r_clr = 0, w_clr = 0, r_set = 0, w_set = 0, tmp;
-+	u64 r_val, w_val;
-+
-+	if (!cpus_have_final_cap(ARM64_HAS_FGT))
-+		return;
-+
-+	ctxt_sys_reg(hctxt, HFGRTR_EL2) = read_sysreg_s(SYS_HFGRTR_EL2);
-+	ctxt_sys_reg(hctxt, HFGWTR_EL2) = read_sysreg_s(SYS_HFGWTR_EL2);
- 
- 	if (cpus_have_final_cap(ARM64_SME)) {
- 		tmp = HFGxTR_EL2_nSMPRI_EL1_MASK | HFGxTR_EL2_nTPIDR2_EL0_MASK;
-@@ -98,26 +97,31 @@ static inline void __activate_traps_hfgxtr(void)
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
- 		w_set |= HFGxTR_EL2_TCR_EL1_MASK;
- 
--	sysreg_clear_set_s(SYS_HFGRTR_EL2, r_clr, r_set);
--	sysreg_clear_set_s(SYS_HFGWTR_EL2, w_clr, w_set);
-+
-+	/* The default is not to trap anything but ACCDATA_EL1 */
-+	r_val = __HFGRTR_EL2_nMASK & ~HFGxTR_EL2_nACCDATA_EL1;
-+	r_val |= r_set;
-+	r_val &= ~r_clr;
-+
-+	w_val = __HFGWTR_EL2_nMASK & ~HFGxTR_EL2_nACCDATA_EL1;
-+	w_val |= w_set;
-+	w_val &= ~w_clr;
-+
-+	write_sysreg_s(r_val, SYS_HFGRTR_EL2);
-+	write_sysreg_s(w_val, SYS_HFGWTR_EL2);
- }
- 
--static inline void __deactivate_traps_hfgxtr(void)
-+static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
- {
--	u64 r_clr = 0, w_clr = 0, r_set = 0, w_set = 0, tmp;
-+	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
- 
--	if (cpus_have_final_cap(ARM64_SME)) {
--		tmp = HFGxTR_EL2_nSMPRI_EL1_MASK | HFGxTR_EL2_nTPIDR2_EL0_MASK;
-+	if (!cpus_have_final_cap(ARM64_HAS_FGT))
-+		return;
- 
--		r_set |= tmp;
--		w_set |= tmp;
--	}
-+	write_sysreg_s(ctxt_sys_reg(hctxt, HFGRTR_EL2), SYS_HFGRTR_EL2);
-+	write_sysreg_s(ctxt_sys_reg(hctxt, HFGWTR_EL2), SYS_HFGWTR_EL2);
- 
--	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
--		w_clr |= HFGxTR_EL2_TCR_EL1_MASK;
- 
--	sysreg_clear_set_s(SYS_HFGRTR_EL2, r_clr, r_set);
--	sysreg_clear_set_s(SYS_HFGWTR_EL2, w_clr, w_set);
- }
- 
- static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
-@@ -145,8 +149,7 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
- 	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
- 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
- 
--	if (__hfgxtr_traps_required())
--		__activate_traps_hfgxtr();
-+	__activate_traps_hfgxtr(vcpu);
- }
- 
- static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
-@@ -162,8 +165,7 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
- 		vcpu_clear_flag(vcpu, PMUSERENR_ON_CPU);
- 	}
- 
--	if (__hfgxtr_traps_required())
--		__deactivate_traps_hfgxtr();
-+	__deactivate_traps_hfgxtr(vcpu);
- }
- 
- static inline void ___activate_traps(struct kvm_vcpu *vcpu)
+ static DEFINE_XARRAY(sr_forward_xa);
 -- 
 2.34.1
 
