@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD3E2C9E
-	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 18:46:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73A1FC43397;
-	Tue, 15 Aug 2023 18:46:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7909C1802C
+	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 18:46:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE895C433C9;
+	Tue, 15 Aug 2023 18:46:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692125216;
-	bh=M5ur1yOezQPg2ZDbwLihFfqMKwUxIyGScvJphV2dVlM=;
+	s=k20201202; t=1692125219;
+	bh=NKl2AsWl/f6YX4AYEMPaJzwCzancHeoU3mXHnkcdBzk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OFUQiSCqP5126NVjKk6/hiYAXneIt6Vwkkzd6pUFdx7/gHmo8t/u7WyBybe7o5AEB
-	 ZWYRqo6W6+VIjrMvyQwxG7bKAqnGdcO8H8TaCXnZG0e8026bxQgnF3iMko/M34FI+T
-	 g2gaBSFtinvoGU/yLlyXc3L6SIEXxbMIvspOt6ErD/8e8JY6yKyzFIz7l+kLAraTsZ
-	 eLyfEpBEhVVOCagFgORMSXzO03eqQw2tIrxlA2gTeAZqzfbUvE9l0tkLolqMNx8oZt
-	 I/O1wtttZUi3A35VAaf1intH24uKU+3kuvV7FW5AZ8ohdKlSZUqzKSgGSagwIT9jDC
-	 QJWZFyC/PZ/9A==
+	b=kyBPHKzHYlBJJ3fn48tUIqlJVMH3uZRGpeZBk47pTkf6jDNumR37P8UCSbIuthfaj
+	 Lkk7KLsBi9H77xjwir8YoU2jRZZM9ai4+/b5XhjhEMeMzur8Hzqne4k6Ik8Jyl89og
+	 7XbNSmJlr6XV6I3gSXro08H8sPJ9Ow2jEwn9dn7YouHxkJ+A0tAgO3kLeSjvFDDd0y
+	 6V69N3U3RPVvS7Ad8dC0krrjxvBsQ7osvEslJudTGBsXoQEGKVJJflsnzXpPaav3M5
+	 UM929LpKWl+wXdSp/2iR63CqQxTEah82b9YUiXVMOOGeVT6SquLu66EzKOTkv/vskt
+	 U0jkl9u/16Obw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qVywp-0055Sd-IT;
-	Tue, 15 Aug 2023 19:39:19 +0100
+	id 1qVyws-0055Sd-Gw;
+	Tue, 15 Aug 2023 19:39:22 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -41,9 +41,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v4 16/28] KVM: arm64: nv: Expose FEAT_EVT to nested guests
-Date: Tue, 15 Aug 2023 19:38:50 +0100
-Message-Id: <20230815183903.2735724-17-maz@kernel.org>
+Subject: [PATCH v4 27/28] KVM: arm64: Move HCRX_EL2 switch to load/put on VHE systems
+Date: Tue, 15 Aug 2023 19:39:01 +0100
+Message-Id: <20230815183903.2735724-28-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230815183903.2735724-1-maz@kernel.org>
 References: <20230815183903.2735724-1-maz@kernel.org>
@@ -59,30 +59,69 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Now that we properly implement FEAT_EVT (as we correctly forward
-traps), expose it to guests.
+Although the nVHE behaviour requires HCRX_EL2 to be switched
+on each switch between host and guest, there is nothing in
+this register that would affect a VHE host.
+
+It is thus possible to save/restore this register on load/put
+on VHE systems, avoiding unnecessary sysreg access on the hot
+path. Additionally, it avoids unnecessary traps when running
+with NV.
+
+To achieve this, simply move the read/writes to the *_common()
+helpers, which are called on load/put on VHE, and more eagerly
+on nVHE.
 
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Jing Zhang <jingzhangos@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/nested.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 315354d27978..7f80f385d9e8 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -124,8 +124,7 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
- 		break;
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index a4750070563f..060c5a0409e5 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -197,6 +197,9 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
+ 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
  
- 	case SYS_ID_AA64MMFR2_EL1:
--		val &= ~(NV_FTR(MMFR2, EVT)	|
--			 NV_FTR(MMFR2, BBM)	|
-+		val &= ~(NV_FTR(MMFR2, BBM)	|
- 			 NV_FTR(MMFR2, TTL)	|
- 			 GENMASK_ULL(47, 44)	|
- 			 NV_FTR(MMFR2, ST)	|
++	if (cpus_have_final_cap(ARM64_HAS_HCX))
++		write_sysreg_s(HCRX_GUEST_FLAGS, SYS_HCRX_EL2);
++
+ 	__activate_traps_hfgxtr(vcpu);
+ }
+ 
+@@ -213,6 +216,9 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+ 		vcpu_clear_flag(vcpu, PMUSERENR_ON_CPU);
+ 	}
+ 
++	if (cpus_have_final_cap(ARM64_HAS_HCX))
++		write_sysreg_s(HCRX_HOST_FLAGS, SYS_HCRX_EL2);
++
+ 	__deactivate_traps_hfgxtr(vcpu);
+ }
+ 
+@@ -227,9 +233,6 @@ static inline void ___activate_traps(struct kvm_vcpu *vcpu)
+ 
+ 	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_VSE))
+ 		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
+-
+-	if (cpus_have_final_cap(ARM64_HAS_HCX))
+-		write_sysreg_s(HCRX_GUEST_FLAGS, SYS_HCRX_EL2);
+ }
+ 
+ static inline void ___deactivate_traps(struct kvm_vcpu *vcpu)
+@@ -244,9 +247,6 @@ static inline void ___deactivate_traps(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.hcr_el2 &= ~HCR_VSE;
+ 		vcpu->arch.hcr_el2 |= read_sysreg(hcr_el2) & HCR_VSE;
+ 	}
+-
+-	if (cpus_have_final_cap(ARM64_HAS_HCX))
+-		write_sysreg_s(HCRX_HOST_FLAGS, SYS_HCRX_EL2);
+ }
+ 
+ static inline bool __populate_fault_info(struct kvm_vcpu *vcpu)
 -- 
 2.34.1
 
