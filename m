@@ -1,197 +1,212 @@
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2116.outbound.protection.outlook.com [40.107.100.116])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFF18622
-	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 02:59:20 +0000 (UTC)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GEkFM5pbdM/IFF1XkqtxC+ck4qr1VzXkG76DimHI7gtVE0Ci6y9ottCyst9d9Rh8qLaDsBlpPk7MHkf7XYt7IA0kMrfaLKx/jCUcPQhsKi7aScnpEGtojqZ2K1PVvc5C6mV/1LsKRPya1TOtYUZP15uoSB8O7UuVWmsA/A51q1uQwn9S+O5U3Os/ENo5bCwVwuoC3KlNKybSxvZ67Ck2Z2SqirTbgc+poKj2Lblk3S0j+8FEW5gaq7Bda7q3N0Pnl/AfGqINugTn2Z2fNXiFOhRCou0UT/8r+uMEFXielfES2PTOlesDGDI9eK16m0daAz5iqW8XXxgSXnLygayz1A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=K5VEz6pChcEd3Df3qwj7h2FJIfHjESyWeEIQOXYJ7qU=;
- b=Z8l/hFvBKfF24Ck3SPNSbLge8qB2t7vqBiIMH8eEycDjvYedFq7xZamQgJrajHa223Mf5jXv0cgWkiK6UxKtSwikRL0fLNJaXUFW0tdJtE/4SMKHGINSHozDU86rImu3/TI4ZMpdiCwWeXIVAeRFd1rCKDvP7BbPMadW7lAcDMjgbwe/UGDkj+RDwSybIIKkCBCQXBJ9zw0XOcf+sigU0vlc57ZvTCWGgNyuos8v8W5Orcoj7hqFtRGVikK6NweI5xVbiYHsZWM/kUfGP1kDvaeQu7CiiG/AIbvGA+kgTUWNRiu2nT+i0yGN8Y0Divp33AvaKOp/LOh+S2Ub+XDO9Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=amperemail.onmicrosoft.com; dkim=pass
- header.d=amperemail.onmicrosoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amperemail.onmicrosoft.com; s=selector1-amperemail-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=K5VEz6pChcEd3Df3qwj7h2FJIfHjESyWeEIQOXYJ7qU=;
- b=w7sWtOiqGfAUVM1eeoPN2LY2jGKRslGkdUcpFbY6/uizP2LLY8YUAC+3MKWFutDZlhsTpIGkL57HbRnvB9HYl9jFTh6Km5DGIdwqXKcb2iKUURxg/1Z1P7wCUgG++DzA2hdtiCGF5yK7Pb/qKLv/wK6IXwElVVlFRP+Of+Uo8xY=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amperemail.onmicrosoft.com;
-Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
- SJ2PR01MB8660.prod.exchangelabs.com (2603:10b6:a03:574::16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6678.24; Tue, 15 Aug 2023 02:59:15 +0000
-Received: from DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::d62f:d774:15b0:4a40]) by DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::d62f:d774:15b0:4a40%4]) with mapi id 15.20.6678.025; Tue, 15 Aug 2023
- 02:59:14 +0000
-Message-ID: <3285dd21-a1cc-7df0-b2f6-999ed4669901@amperemail.onmicrosoft.com>
-Date: Tue, 15 Aug 2023 10:59:03 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0BF9525A
+	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 06:27:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A65DC433C7;
+	Tue, 15 Aug 2023 06:27:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692080833;
+	bh=AodI7zIGu1RaCkc0AQzN+Yz5PQHEep5hiT9BLg/KHro=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CDf5IRfBB1eW1wXf7GRdC0qxK3sY+Yu9bLNhbA5WKKxbQc1IxIbmmvHuZLY3fW8dd
+	 BdxZxPgL/0+Rd72V4sq7tCVPX+vJHUTYtjIjAD1hPYfFzN3m6dpLAuB5KETOVXurjg
+	 IppA8nG9DU+H3kmhjCoHaxnEwUNcSP6WJPNPUAr5hXic4Eow+9hMaFwxRTzCF5AFa4
+	 87sGQaFe7NDKk+gl08LBXp6E/qvhYwY5F5fgmt6ZqkUEo+4tSSsoBqVNUBZePmTxIE
+	 XvAL3PK0D8WAcl7+geJMVIr3ebXq2ukpX2GImxOnNPeIdMITVgxMmXmmdAhjsM7X79
+	 VJyvg8jg+r++g==
+Received: from [194.182.8.86] (helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qVnWI-004u14-PS;
+	Tue, 15 Aug 2023 07:27:10 +0100
+Date: Tue, 15 Aug 2023 07:27:21 +0100
+Message-ID: <87msysq0qe.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Shijie Huang <shijie@amperemail.onmicrosoft.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Huang Shijie <shijie@os.amperecomputing.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Frank Wang <zwang@amperecomputing.com>
 Subject: Re: [PATCH] KVM: arm64: pmu: Resync EL0 state on counter rotation
-To: Leo Yan <leo.yan@linaro.org>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>,
- Huang Shijie <shijie@os.amperecomputing.com>,
- Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>
+In-Reply-To: <1ce05000-264e-1fda-d193-8b27c3c293d8@amperemail.onmicrosoft.com>
 References: <20230811180520.131727-1-maz@kernel.org>
- <20230814071627.GA3963214@leoy-huanghe>
- <5608d22d-47c3-2a03-a3d9-ba8ec51679a3@amperemail.onmicrosoft.com>
- <20230814084710.GA69080@leoy-huanghe.lan>
- <8640c3c7-b117-5754-6ac4-910988e5374f@amperemail.onmicrosoft.com>
- <20230814100154.GB69080@leoy-huanghe.lan>
-From: Shijie Huang <shijie@amperemail.onmicrosoft.com>
-In-Reply-To: <20230814100154.GB69080@leoy-huanghe.lan>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: CH0PR03CA0400.namprd03.prod.outlook.com
- (2603:10b6:610:11b::20) To DM8PR01MB6824.prod.exchangelabs.com
- (2603:10b6:8:23::24)
+	<1ce05000-264e-1fda-d193-8b27c3c293d8@amperemail.onmicrosoft.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM8PR01MB6824:EE_|SJ2PR01MB8660:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0f43ff65-4fb5-4772-896a-08db9d3b9b68
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	CqhROsmMVbK0MJQwk3T/ITImxuxihGBB9G1DqOHOFM1UGq0HTmIiLHMWsLZewa8que+PRMx9ExzdFO+vFSnStGqKf5OvWR36rHdcEf4LQozBZXcxvmVq4YbXFkZObI87pD5whgvbWUbs8u323kPeH8gZ/1SX3rTVb68mfRGojn6XuJIiaIVATMHhIpiv8C7hKx1l24RuF0G15UcQbm4iYok8UP47VKIsiAaZTQC8yhs/6YirKx6vvcl59jCP7wdjBSOO/p3YSeTSF3gzIaTq3PTJ1FQpwu7y8eP7FW3cgNAVGOFVxilkErbNUDWOP7yFwgsq0XRz3OmYmFIAoRUFAvlG8c8833uUCV77OlVrC1lEn1nZApA6opPU+Y4j9mxzhj3ohRR0q+y2UqnDLHHHAisHbvInu60BIMGPPy8EvTJ7SfQvS/bc00wEDAaRIOgx9PsMbJv00eRD5FJhJ/p8k8+rq8JHjWihQdJ3TbpJEzR3Q3OZumhAgjOK/7xRSbyJTcma9yWkURYxXYbr9fLYxAzrMftMz/VR462hdp5D6LU8zkdWp8kGfaoFVi9eSxYg3N1MIQ+KHy48oqdgIDx8xsl1PyVO+HZ1guA9LmRg9pMNxWhAn2/WP55zUeQNCuhr8CipBpyJXPk8b8//F8ZwIA==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR01MB6824.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230028)(39850400004)(376002)(346002)(366004)(136003)(396003)(186006)(1800799006)(451199021)(83380400001)(42882007)(31686004)(31696002)(41300700001)(38100700002)(478600001)(38350700002)(66946007)(54906003)(6512007)(66556008)(66476007)(6916009)(316002)(8676002)(8936002)(5660300002)(83170400001)(4326008)(2616005)(26005)(6486002)(6506007)(6666004)(2906002)(7416002)(52116002)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?d0E5SUtEaXlIdFUxc3p3SUdTUGwvTmdVTC9qWVR6WVRNTW5aVHhyaGJNNnZ6?=
- =?utf-8?B?T2dkM1B1N1U1QWhBKzJLL1pvYVdndWd4MkJCdVdBbVdXazR0Z3FTMDJGcyt2?=
- =?utf-8?B?aWZkeklHTHd6VU1BaGFmVWJIOUpMN0kvTUJ1aUdxRTBHUFdzS3dxQ3V4cnNN?=
- =?utf-8?B?SWN1V29pcnhvTU93Z2xjYVhZRkpPVEZJNW5IQkJKS2tMa0M2dVlCUVNjV0ND?=
- =?utf-8?B?MHpYbkJhdWVPSkRYaU5kMXBXQnRlbjhmemFyUDJ1M0ltZkJUdndXeXdkVURV?=
- =?utf-8?B?UzJHc3JkdzVacER6SEdvRWZaSUxvOFhoSDRiZzgzZG96QmQrMXFVRXhrNDd0?=
- =?utf-8?B?a1ZLb1dlTkI2R2ZzOGNTVTU4UHhlN2FmNFVwdnAxWEdKaWxxbklaaDFSUDVn?=
- =?utf-8?B?dGhuR3VndDZRQnNuQWdOUUR6dnN0MlJVVzZHdnhrdzVBa01UcUFtdjc1eDNO?=
- =?utf-8?B?d3BsWTljZlUyUGZGMXhqV21JbEZnd09iZWZvQUtxR0JHcDFoeDlydzNzcXQ1?=
- =?utf-8?B?TWRuczhnRFZiVDJwMFpQeUpLTHlmS1o2dXcrS1lYV1R5UTIvbGNsQkY3SHpk?=
- =?utf-8?B?bVErenVSTkkrdWlOa1Qxd0syYjU3TFJDcU56Z2tVQnJtRnRiWnVrYUk0d05Q?=
- =?utf-8?B?Rm9EV0p2T2J4RWtEY2pyWWg2U1VwV3hwT2NId2VPdEtqc0FRNzZKN1RGYzVC?=
- =?utf-8?B?cUNheEpOK2JqTGdpb2EyT1FOdloyalBJczZTdHFaenp4OUFmMmhQVWdHQlVi?=
- =?utf-8?B?dGFMVEJ6WDhhcG1zNW43OTBvMVYveU5Tc09DdmQvMWswRlRNWHFmMmFnbits?=
- =?utf-8?B?UDdSUFZvK0ZvdFJZRTQrOWF2TUNXYk40TC9zRU5SeXJOajY3VlVxUmprY1lp?=
- =?utf-8?B?RlpLVkcwVTV1V1hQY3ZKZ0M5SXZvNVh4RXdtOWgyWWxlUWdmLythTnBOU0Ns?=
- =?utf-8?B?Tkc2QkRtWFZ1cTNvMHVRbHRvMkFhMEhlZ0pwd2VYbXlsMSt5alB1Y1pJNmxR?=
- =?utf-8?B?QkNPTTBtNkphdXZsMHZyb2hKMHRVRTkxMFF0VzdtRzBzTTh4TGdtcEdyRzQ3?=
- =?utf-8?B?d2ZGK05TVEVqM2xUYTRsRXJ3ajF6b3BObGJ1c3VMaTZZMlNkWUlsQTMzbFVm?=
- =?utf-8?B?aks2TDBNbVhHS3k1QzY4eE5Dc3NEcm5lZWhZSFhETCtMb0RxQ1VXSkVkR2tk?=
- =?utf-8?B?MXQwVGgvdTJ5elNsV0tjenRUK3pGMjJQZTBlRmJZWExOYzE2T1FjU2Jjc1Nt?=
- =?utf-8?B?MW5rVnZhTWVmY2tqZWZSdWRvZ1h3RUpYYnBibmcvN0crODgrTzZKOS9KU2tX?=
- =?utf-8?B?KzhPSW92Y3JlTzVXakRTL0srd2x0RmEvNmxoSVp4eUM3UVlqYWtWTzhETU5V?=
- =?utf-8?B?S3pUamN4a3MycURvNm40SFBFc2hRNXFTZUY1R0hSTVREWW1kY2hFcHRtdHJO?=
- =?utf-8?B?SFA4UmRqKzVXTC9DSGRlWlZRRUlCRXg5Y0tmWmxLVkNZQ2JYaGgyclFuV0NE?=
- =?utf-8?B?eXNkVk5Hb0ROaHUrQ3ZZeElFYUR1YmNpMktzbHFUVDRQaDgySm1pVys2ZXJj?=
- =?utf-8?B?VU9iWmZCNUdScnJUQTBNd0JhMnNKNHhCN215QjZQMkhPWW4rNVl4YmxIcXJ2?=
- =?utf-8?B?SHZKUDRZVTc5MXF5OURWRTRCNkZkZVBRdnFqenFxeUhFbERzWlBHV0JYbXBW?=
- =?utf-8?B?WkMzNlpjclZVbGoxRk8xSjY4MStYQzJzdytKNVZxaVZYVC9yT01iYnBocU0z?=
- =?utf-8?B?Y1BMUzZsMTE3cmpRSXlOSUpMRmZNcjllN09mR3hBcDVxZElSelJRWmYyTzcy?=
- =?utf-8?B?T20yeDFDV2hjYmNxay9UTzVneEdlUmJVallHNDBJOVNraEVKUjVuN0NvZWkx?=
- =?utf-8?B?bzVQLyt0ZDROL2xYWXJickF5RGVpWDQvWnA0NTZLanV6UUdOQ204R0pQZktN?=
- =?utf-8?B?M2dmT285dnNCMGdHR3JWeGVMMWQ2WVVBZ1ZGTUFUdHhVeWIxVTI4M2UzUHhX?=
- =?utf-8?B?YTBaejBGeE5uUHpsWTFTblJHaytuMWZFcHp4VjFJYWJQbXlZZnhrWWJLK2kw?=
- =?utf-8?B?RExYS251QXBiNUZqcERjUmV5R1dkQ1BXcnhJSVRLSDkvWHFlc3NLTy8rUGd2?=
- =?utf-8?B?K0pzeXA4MSt2dm0xQ2R1eU5KSXl0cDZWcG03cWlycHVGcFlka051OS9hMCsv?=
- =?utf-8?Q?Gpgq6OeJS61IlebNqTozEXM=3D?=
-X-OriginatorOrg: amperemail.onmicrosoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0f43ff65-4fb5-4772-896a-08db9d3b9b68
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Aug 2023 02:59:14.5907
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7Hy+22YNwJkT/KHZKhDmm+Tg08PKuxwJe2s3zXPJHrNFuLDXtEjiN8bStzstRs6Du3wPVb6WRMfG8YxaTWDdMqoTumdf0o+Ki3R2qVw7VGCgb8JTEYGFCx8/aUJsJ0Q4
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR01MB8660
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 194.182.8.86
+X-SA-Exim-Rcpt-To: shijie@amperemail.onmicrosoft.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, shijie@os.amperecomputing.com, mark.rutland@arm.com, will@kernel.org, zwang@amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Leo,
+On Mon, 14 Aug 2023 03:58:32 +0100,
+Shijie Huang <shijie@amperemail.onmicrosoft.com> wrote:
+>=20
+> Hi Marc,
+>=20
+> =E5=9C=A8 2023/8/12 2:05, Marc Zyngier =E5=86=99=E9=81=93:
+> > Huang Shijie reports that, when profiling a guest from the host
+> > with a number of events that exceeds the number of available
+> > counters, the reported counts are wildly inaccurate. Without
+> > the counter oversubscription, the reported counts are correct.
+> >=20
+> > Their investigation indicates that upon counter rotation (which
+> > takes place on the back of a timer interrupt), we fail to
+> > re-apply the guest EL0 enabling, leading to the counting of host
+> > events instead of guest events.
+> >=20
+> > In order to solve this, add yet another hook between the host PMU
+> > driver and KVM, re-applying the guest EL0 configuration if the
+> > right conditions apply (the host is VHE, we are in interrupt
+> > context, and we interrupted a running vcpu). This triggers a new
+> > vcpu request which will apply the correct configuration on guest
+> > reentry.
+> >=20
+> > With this, we have the correct counts, even when the counters are
+> > oversubscribed.
+> >=20
+> > Reported-by: Huang Shijie <shijie@os.amperecomputing.com>
+> > Suggested-by: Oliver Upton <oliver.upton@linux.dev>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Cc: Mark Rutland <mark.rutland@arm.com>
+> > Cc: Will Deacon <will@kernel.org>
+> > Link: https://lore.kernel.org/r/20230809013953.7692-1-shijie@os.amperec=
+omputing.com
+> > ---
+> >   arch/arm64/include/asm/kvm_host.h |  1 +
+> >   arch/arm64/kvm/arm.c              |  3 +++
+> >   arch/arm64/kvm/pmu.c              | 18 ++++++++++++++++++
+> >   drivers/perf/arm_pmuv3.c          |  2 ++
+> >   include/kvm/arm_pmu.h             |  2 ++
+> >   5 files changed, 26 insertions(+)
+> >=20
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm=
+/kvm_host.h
+> > index d3dd05bbfe23..553040e0e375 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -49,6 +49,7 @@
+> >   #define KVM_REQ_RELOAD_GICv4	KVM_ARCH_REQ(4)
+> >   #define KVM_REQ_RELOAD_PMU	KVM_ARCH_REQ(5)
+> >   #define KVM_REQ_SUSPEND		KVM_ARCH_REQ(6)
+> > +#define KVM_REQ_RESYNC_PMU_EL0	KVM_ARCH_REQ(7)
+> >     #define KVM_DIRTY_LOG_MANUAL_CAPS
+> > (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
+> >   				     KVM_DIRTY_LOG_INITIALLY_SET)
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 72dc53a75d1c..978b0411082f 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -803,6 +803,9 @@ static int check_vcpu_requests(struct kvm_vcpu *vcp=
+u)
+> >   			kvm_pmu_handle_pmcr(vcpu,
+> >   					    __vcpu_sys_reg(vcpu, PMCR_EL0));
+> >   +		if (kvm_check_request(KVM_REQ_RESYNC_PMU_EL0, vcpu))
+> > +			kvm_vcpu_pmu_restore_guest(vcpu);
+> > +
+> >   		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
+> >   			return kvm_vcpu_suspend(vcpu);
+> >   diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
+> > index 121f1a14c829..0eea225fd09a 100644
+> > --- a/arch/arm64/kvm/pmu.c
+> > +++ b/arch/arm64/kvm/pmu.c
+> > @@ -236,3 +236,21 @@ bool kvm_set_pmuserenr(u64 val)
+> >   	ctxt_sys_reg(hctxt, PMUSERENR_EL0) =3D val;
+> >   	return true;
+> >   }
+> > +
+> > +/*
+> > + * If we interrupted the guest to update the host PMU context, make
+> > + * sure we re-apply the guest EL0 state.
+> > + */
+> > +void kvm_vcpu_pmu_resync_el0(void)
+> > +{
+> > +	struct kvm_vcpu *vcpu;
+> > +
+> > +	if (!has_vhe() || !in_interrupt())
+> > +		return;
+> > +
+> > +	vcpu =3D kvm_get_running_vcpu();
+> > +	if (!vcpu)
+> > +		return;
+> > +
+> > +	kvm_make_request(KVM_REQ_RESYNC_PMU_EL0, vcpu);
+> > +}
+> > diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
+> > index 08b3a1bf0ef6..6a3d8176f54a 100644
+> > --- a/drivers/perf/arm_pmuv3.c
+> > +++ b/drivers/perf/arm_pmuv3.c
+> > @@ -772,6 +772,8 @@ static void armv8pmu_start(struct arm_pmu *cpu_pmu)
+> >     	/* Enable all counters */
+> >   	armv8pmu_pmcr_write(armv8pmu_pmcr_read() | ARMV8_PMU_PMCR_E);
+> > +
+> > +	kvm_vcpu_pmu_resync_el0();
+> >   }
+>=20
+> I read the perf code again, and find it maybe not good to do it in
+> armv8pmu_start.
+>=20
+> =C2=A0=C2=A0 Assume we install a new perf event to a CPU "x" from CPU 0,=
+=C2=A0 a VM
+> guest is running on CPU "x":
+>=20
+> =C2=A0=C2=A0=C2=A0 perf_event_open() --> perf_install_in_context() -->
+>=20
+> =C2=A0=C2=A0=C2=A0 call this function in=C2=A0 IPI interrupt: ___perf_ins=
+tall_in_context().
+>=20
+> =C2=A0=C2=A0 armv8pmu_start() will be called in ___perf_install_in_contex=
+t() in IPI.
+>=20
+> =C2=A0=C2=A0 so kvm_vcpu_pmu_resync_el0() will _make_ a request by meetin=
+g the
+> conditions:
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+1.) in interrupt context.
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+2.) a guest is running on this CPU.
+>=20
+>=20
+> But in actually, the request should not send out.
 
-在 2023/8/14 18:01, Leo Yan 写道:
-> Hi Shijie,
->
-> On Mon, Aug 14, 2023 at 05:29:54PM +0800, Shijie Huang wrote:
->
->
-> [...]
->
->>> Seems to me, based on Marc's patch, we need to apply below change.  In
->>> below code, we don't need to change the perf core code and we can
->>> resolve it as a common issue for Arm PMU drivers.
->>>
->>>
->>> diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
->>> index 121f1a14c829..8f9673cdadec 100644
->>> --- a/arch/arm64/kvm/pmu.c
->>> +++ b/arch/arm64/kvm/pmu.c
->>> @@ -38,14 +38,20 @@ struct kvm_pmu_events *kvm_get_pmu_events(void)
->>>    void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr)
->>>    {
->>>    	struct kvm_pmu_events *pmu = kvm_get_pmu_events();
->>> +	int resync;
->>>    	if (!kvm_arm_support_pmu_v3() || !pmu || !kvm_pmu_switch_needed(attr))
->>>    		return;
->>> +	resync = pmu->events_guest != set;
->> If we set two events in guest, the resync will set
->>
->> For example:
->>
->>             perf stat -e cycles:Gu, cycles:Gk
->>
->>
->> If so, this is not reasonble...
-> You mean if set two guest events, the kvm_vcpu_pmu_resync_el0() will
-> be invoked twice, and the second calling is not reasonable, right?
+Why shouldn't it be applied? This isn't supposed to be always
+necessary, but it needs to be applied whenever there is a possibility
+for counters to be updated behind our back, something that is a pretty
+event anyway.
 
-IMHO, even the first time is not reasonable. why call 
-kvm_vcpu_pmu_resync_el0() when event rotation
+> Please correct me if I am wrong.
+>=20
+> IMHO, the best solution is add=C2=A0 a hook in the perf/core code, and ma=
+ke
+> the request there.
 
-does not happen?
+I disagree. I'm still completely opposed to anything that will add
+such a hook in the core perf code, specially as a weak symbol. The
+interactions must be strictly between the PMUv3 driver and KVM,
+because they are the only parties involved here.
 
+I will *not* take such a patch.
 
+	M.
 
-> I can accept this since I personally think this should not introduce
-> much performance penalty.
->
-> I understand your preference to call kvm_vcpu_pmu_resync_el0() from
-> perf core layer, but this is not a common issue for all PMU events and
-> crossing arches.  Furthermore, even perf core rotates events, it's not
-
-If we can find a better way to fix it in PMU code, I am okay too. :)
-
-I tried to fix it in PMU code, but I am not satified with it.
-
-
-> necessarily mean we must restore events for guest in the case there
-> have no event is enabled for guest.
-
-Not only for events in guest, but also for the events in the host too.
-
-In the kvm_vcpu_pmu_restore_guest(), it also disable the EL0 for host 
-events.
-
-
-Thanks
-
-Huang Shijie
-
->
-> Thanks,
-> Leo
+--=20
+Without deviation from the norm, progress is not possible.
