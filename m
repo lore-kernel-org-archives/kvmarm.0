@@ -1,51 +1,51 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C65891840
-	for <kvmarm@lists.linux.dev>; Wed, 16 Aug 2023 06:54:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0B721840
+	for <kvmarm@lists.linux.dev>; Wed, 16 Aug 2023 06:58:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1692168861;
+	s=mimecast20190719; t=1692169099;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VgxVBCPXJnsNLI+46xSarM00ICOkVY08GNNNdoBDjSY=;
-	b=EU7OUBkFv/mdgYOzep8HRi9BXNUVVwcqiwe8MdSIualAjZXNq9Y8xiF8SNzMAGRY6NtPVe
-	PwV+fulbF94hAHYXwSBx1QuGzReunuE+b+nrNs0jVGehvCHh+NNYOsxa0+L4y9+HPEyyvM
-	m2vCCankaejbi9Ogd9GGeaLV7Oa2Lyc=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=coMx+qrk3+nAFJq/8MLLAKSoS+skVzUmoa64bBG+3v8=;
+	b=DK1bTv5j0PmS/Z/f3eitGYNzUnW6Gb7+dHVxM3oYmJUPFwGwmeJ7u0NpuYGSf3LV3kKGrN
+	0n4QcoygYKp0I040nShANji/dzWL/1tEcpmFf9Yr2lkFlYkYYeIe+WPxuapzQ52cBBJgA3
+	2FIG4XbdbMe+WHB47xB7FkXyxmg6DWU=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-312-mnr8J3f0NluoG2uuf38fDg-1; Wed, 16 Aug 2023 02:54:20 -0400
-X-MC-Unique: mnr8J3f0NluoG2uuf38fDg-1
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-26b5bd44ae5so680059a91.1
-        for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 23:54:19 -0700 (PDT)
+ us-mta-74-Pa9lsJWsMEGGcKuZi2P0FQ-1; Wed, 16 Aug 2023 02:58:18 -0400
+X-MC-Unique: Pa9lsJWsMEGGcKuZi2P0FQ-1
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-1bd9e1c9575so11563855ad.0
+        for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 23:58:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692168859; x=1692773659;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20221208; t=1692169097; x=1692773897;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VgxVBCPXJnsNLI+46xSarM00ICOkVY08GNNNdoBDjSY=;
-        b=Vn/svesQbMZ4HPKJIAk1oP77TDIGpUAippFyHH5XGVmt2LHFcoGxfIz5R1nlPj2vrp
-         Mezo81VONCwHA/UA7L/gPBvk/eSNPc5hDz+N+u2EbBF0TFaN2e8KFqI95Nshw3xo4JxO
-         n07Nvx7l2xWJff77mJOxhd7d9dVFAh9Foc5IDjd4GxboGDu/M+pDr9ZgbPCn8+CBm1mZ
-         Ew4yZJJQUA06FL3gmpMDEV3aD9K+LUyfx2cADuEZgUmQ6DW1pKTl1IrEj4kIhLDT/pCV
-         CPWpV+SF7dWQU6pouwJF7uIQKZ16ewjXsMboYrv0A4nbOYuuJur8MhZTEPRVivOukiDl
-         3vIg==
-X-Gm-Message-State: AOJu0YwOsgF+pLTmX8RQYP+22Y6pG6cgBdQHftJL/1RHpV67rCqcAVn/
-	w/z0voUt/SaSoY2xQ06LmP1Ph90ZihuXBi6SmUob6/fpOdHo5xvKzuJ9vUdszOg4Y5IsNV7sKJP
-	2UH06YEuPFq8FT5zv
-X-Received: by 2002:a17:90a:3ee5:b0:26b:27f6:90cc with SMTP id k92-20020a17090a3ee500b0026b27f690ccmr770928pjc.2.1692168859071;
-        Tue, 15 Aug 2023 23:54:19 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEd1P04owTF2cdwpf0pccpR9NLO2ED6eD6S+SvhMYjVhqIN6dPlHq32ucBOvg9alBVH6mrqyw==
-X-Received: by 2002:a17:90a:3ee5:b0:26b:27f6:90cc with SMTP id k92-20020a17090a3ee500b0026b27f690ccmr770914pjc.2.1692168858740;
-        Tue, 15 Aug 2023 23:54:18 -0700 (PDT)
+        bh=coMx+qrk3+nAFJq/8MLLAKSoS+skVzUmoa64bBG+3v8=;
+        b=SaZs6Ar3dlc+jvik/w2ZRzkQ6wkqNS6w6DMaLEvfWrcDArYy/emZxxY/2cN6ZZ1k64
+         APTl2fxyrm8Au5RdV93WakIPAAbd2lxOFlLLukunTn8iFd9fmgBxupNZRv8C029gzvqh
+         oHtnO+I+DWH/PsNu6OwvVkyPVIH4PQv3n5TzKmGzcRLAmmkGiZ3fJ4HKgV6hBCD15zh9
+         51El9CIKqhsDmD1qYeUGwKzmy3AX2iJUFuFbeBb6QkOVSKc5fS1niieO+DuYG0GS4vUq
+         A4JcORJAucx5+vAFmW42YAmzkVvTrxr2geMC+VUOmGxL88A8sqhCsgBviJZkfusOIWA/
+         LkAQ==
+X-Gm-Message-State: AOJu0YxE9q+Y+S3ZUu29G4+Q6ZUbtN1ISm9LXvEz3EG5srPeX5tLXlu8
+	+PjafrYK3MmvtFCGu2mLYctxycU/ieEoia3d02/BHGiRMGxzfXikGXZub6Bu05+dQRsDNFggYAe
+	a6OAgmXySXEMXb5IU
+X-Received: by 2002:a17:902:d2c1:b0:1bb:9e6e:a9f3 with SMTP id n1-20020a170902d2c100b001bb9e6ea9f3mr1275661plc.4.1692169097047;
+        Tue, 15 Aug 2023 23:58:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEkQ6TEk2n+Vw3400DfBNV4tQEKHqCod2o55k2tbJS/5J/3qoq6lE5clV2Y5xNar/cYRPaAng==
+X-Received: by 2002:a17:902:d2c1:b0:1bb:9e6e:a9f3 with SMTP id n1-20020a170902d2c100b001bb9e6ea9f3mr1275646plc.4.1692169096760;
+        Tue, 15 Aug 2023 23:58:16 -0700 (PDT)
 Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id gk18-20020a17090b119200b00263ba6a248bsm12594305pjb.1.2023.08.15.23.54.15
+        by smtp.gmail.com with ESMTPSA id o5-20020a170902d4c500b001bb9bc8d232sm12229560plg.61.2023.08.15.23.58.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Aug 2023 23:54:18 -0700 (PDT)
-Message-ID: <eaa2519e-15b3-2fd4-199e-8e3368df7e0d@redhat.com>
-Date: Wed, 16 Aug 2023 14:54:13 +0800
+        Tue, 15 Aug 2023 23:58:16 -0700 (PDT)
+Message-ID: <268054f7-e2f5-37fb-187c-3b2cca41b31a@redhat.com>
+Date: Wed, 16 Aug 2023 14:58:11 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,8 +54,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.10.0
-Subject: Re: [PATCH v8 10/11] KVM: arm64: selftests: Import automatic system
- register definition generation from kernel
+Subject: Re: [PATCH v8 11/11] KVM: arm64: selftests: Test for setting ID
+ register from usersapce
 To: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
  KVMARM <kvmarm@lists.linux.dev>,
  ARMLinux <linux-arm-kernel@lists.infradead.org>,
@@ -68,9 +68,9 @@ Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
  Raghavendra Rao Ananta <rananta@google.com>,
  Suraj Jitindar Singh <surajjs@amazon.com>, Cornelia Huck <cohuck@redhat.com>
 References: <20230807162210.2528230-1-jingzhangos@google.com>
- <20230807162210.2528230-11-jingzhangos@google.com>
+ <20230807162210.2528230-12-jingzhangos@google.com>
 From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230807162210.2528230-11-jingzhangos@google.com>
+In-Reply-To: <20230807162210.2528230-12-jingzhangos@google.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -80,73 +80,87 @@ Content-Transfer-Encoding: 7bit
 Hi Jing,
 
 On 8/8/23 00:22, Jing Zhang wrote:
-> Import automatic system register definition generation from kernel and
-> update system register usage accordingly.
+> Add tests to verify setting ID registers from userapce is handled
+> correctly by KVM. Also add a test case to use ioctl
+> KVM_ARM_GET_REG_WRITABLE_MASKS to get writable masks.
 > 
 > Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > ---
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index c692cc86e7da..a8cf0cb04db7 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -200,14 +200,15 @@ ifeq ($(ARCH),x86_64)
->   LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/x86/include
->   else
->   LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH)/include
-> +ARCH_GENERATED_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH)/include/generated
->   endif
->   CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
-> -	-Wno-gnu-variable-sized-type-not-at-end -MD\
-> +	-Wno-gnu-variable-sized-type-not-at-end -MD \
->   	-fno-builtin-memcmp -fno-builtin-memcpy -fno-builtin-memset \
->   	-fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
->   	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
->   	-I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. $(EXTRA_CFLAGS) \
-> -	$(KHDR_INCLUDES)
-> +	-I$(ARCH_GENERATED_INCLUDE) $(KHDR_INCLUDES)
->   ifeq ($(ARCH),s390)
->   	CFLAGS += -march=z10
->   endif
-> @@ -255,8 +256,16 @@ $(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S
->   $(LIBKVM_STRING_OBJ): $(OUTPUT)/%.o: %.c
->   	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c -ffreestanding $< -o $@
->   
-> +ifeq ($(ARCH),arm64)
-> +GEN_SYSREGS := $(ARCH_GENERATED_INCLUDE)/asm/sysreg-defs.h
-> +ARCH_TOOLS := $(top_srcdir)/tools/arch/$(ARCH)/tools/
+>   tools/testing/selftests/kvm/Makefile          |   1 +
+>   .../selftests/kvm/aarch64/set_id_regs.c       | 453 ++++++++++++++++++
+>   2 files changed, 454 insertions(+)
+>   create mode 100644 tools/testing/selftests/kvm/aarch64/set_id_regs.c
+> 
 > +
-> +$(GEN_SYSREGS): $(ARCH_TOOLS)/gen-sysreg.awk $(ARCH_TOOLS)/sysreg
-> +	mkdir -p $(dir $@); awk -f $(ARCH_TOOLS)/gen-sysreg.awk $(ARCH_TOOLS)/sysreg > $@
-> +endif
+> +static void test_guest_reg_read(struct kvm_vcpu *vcpu)
+> +{
+> +	struct ucall uc;
+> +	bool done = false;
 > +
->   x := $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
-> -$(TEST_GEN_PROGS): $(LIBKVM_OBJS)
-> +$(TEST_GEN_PROGS): $(LIBKVM_OBJS) $(GEN_SYSREGS)
+> +	while (!done) {
+> +		vcpu_run(vcpu);
+> +
+> +		switch (get_ucall(vcpu, &uc)) {
+> +		case UCALL_ABORT:
+> +			REPORT_GUEST_ASSERT(uc);
+> +			break;
+> +		case UCALL_SYNC:
+> +			uint64_t val;
+aarch64/set_id_regs.c:408:4: error: a label can only be part of a 
+statement and a declaration is not a statement.
 
-I don't this this really works. Since the $(GEN_SYSREG) is the 
-prerequisites of $(TEST_GEN_PROGS). Only when $(TEST_GEN_PROGS) being 
-compiled, the $(GEN_SYSREG) can be generated.
-
-But the fact is, the $(TEST_GEN_PROGS) is relies on $(TEST_GEN_OBJ), 
-which means $(TEST_GEN_OBJ) will be compiled before $(TEST_GEN_PROGS), 
-but $(TEST_GEN_OBJ) depends on $(GEN_SYSREG) again, at the time, the 
-$(GEN_SYSREG) hasn't been generated, so it will has error:
-
-No such file or directory.
-
-#include "asm/sysreg-defs.h"
-
-I think the correct way to generate $(GEN_SYSREGS) is add a prerequisite 
-for $(TEST_GEN_OBJ), like:
-
-$(TEST_GEN_OBJ): $(GEN_SYSREGS)
+I can encounter a compiler error at this line. Why not just put the 
+uint64_t at the beginning of the function.
 
 Thanks,
 Shaoqin
 
->   $(TEST_GEN_PROGS_EXTENDED): $(LIBKVM_OBJS)
->   
->   cscope: include_paths = $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) include lib ..
+> +
+> +			/* Make sure the written values are seen by guest */
+> +			vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(uc.args[2]), &val);
+> +			ASSERT_EQ(val, uc.args[3]);
+> +			break;
+> +		case UCALL_DONE:
+> +			done = true;
+> +			break;
+> +		default:
+> +			TEST_FAIL("Unexpected ucall: %lu", uc.cmd);
+> +		}
+> +	}
+> +}
+> +
+> +int main(void)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_vm *vm;
+> +	bool aarch64_only;
+> +	uint64_t val, el0;
+> +	int ftr_cnt;
+> +
+> +	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+> +
+> +	/* Check for AARCH64 only system */
+> +	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), &val);
+> +	el0 = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL0), val);
+> +	aarch64_only = (el0 == ID_AA64PFR0_EL1_ELx_64BIT_ONLY);
+> +
+> +	ksft_print_header();
+> +
+> +	ftr_cnt = ARRAY_SIZE(ftr_id_aa64dfr0_el1) + ARRAY_SIZE(ftr_id_dfr0_el1)
+> +		  + ARRAY_SIZE(ftr_id_aa64pfr0_el1) + ARRAY_SIZE(ftr_id_aa64mmfr0_el1)
+> +		  + ARRAY_SIZE(ftr_id_aa64mmfr1_el1) + ARRAY_SIZE(ftr_id_aa64mmfr2_el1)
+> +		  + ARRAY_SIZE(ftr_id_aa64mmfr3_el1) - ARRAY_SIZE(test_regs);
+> +
+> +	ksft_set_plan(ftr_cnt);
+> +
+> +	test_user_set_reg(vcpu, aarch64_only);
+> +	test_guest_reg_read(vcpu);
+> +
+> +	kvm_vm_free(vm);
+> +
+> +	ksft_finished();
+> +}
+
 -- 
 Shaoqin
 
