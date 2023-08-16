@@ -1,117 +1,184 @@
-Received: from chg.server2.ideacentral.com (unknown [108.163.232.234])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 331F15CBC
-	for <kvmarm@lists.linux.dev>; Wed, 16 Aug 2023 11:05:35 +0000 (UTC)
-Received: from mailnull by ns-196.awsdns-24.com with local (Exim 4.96)
-	id 1qWELG-00EGLv-1p
-	for kvmarm@lists.linux.dev;
-	Wed, 16 Aug 2023 06:05:34 -0500
-X-Failed-Recipients: kvmarm@lists.linux.dev
-Auto-Submitted: auto-replied
-From: Mail Delivery System <Mailer-Daemon@ns-196.awsdns-24.com>
-To: kvmarm@lists.linux.dev
-References: <20230816120531.057CDA36916887DA@lists.linux.dev>
-Content-Type: multipart/report; report-type=delivery-status; boundary=1692183934-eximdsn-1538593859
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A39ADDD0
+	for <kvmarm@lists.linux.dev>; Wed, 16 Aug 2023 15:58:25 +0000 (UTC)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-564fa3b49e1so6742106a12.0
+        for <kvmarm@lists.linux.dev>; Wed, 16 Aug 2023 08:58:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692201505; x=1692806305;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AlEksp+W5th3R7gYgc5KdY3FwbFOqSJHU/Pdtj/sHPc=;
+        b=4hPZ8aoiSwbbtgY4JhNFTWP0UBRBiaFDJbv7pO8IcssYnGSuONuQsxAw53w9VFfPOZ
+         AiWXfzGj0Kq7/DJvBnZupEUTquIjhv5J04a4lA91+5T+LYTAqJJztJNj4WSezGAfLNm1
+         vULYIFgU5lsz6yHbmk2J91bTp2B7pQoW10wFMEwuoEEG4rinPvPlhWmx5zfVx1F7UIFj
+         5KRgtaji6QH3vOqsxtc8RcaUbBzWRXjc6KQL2GTqCD9Ize3wpAVZnDEW1s6BQFLiCuY9
+         eCibI7l8DzT1uqyJJUJf7yYXZW208t+EI2gWyYlXAljslkiaF0Jq3CqY/BdH2pMpfbHZ
+         Udug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692201505; x=1692806305;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=AlEksp+W5th3R7gYgc5KdY3FwbFOqSJHU/Pdtj/sHPc=;
+        b=VXux+U9LfeAuvF+oWUzhuwFgFd5BX2LdmVFvW0c0qp8nz6kxzsqYhxNHhXiVVrdglU
+         nCafR6tb2ssjKBOL+kWcgFovppr8rl8YmyNhJdyb2CJJT7LMSJUBGs/g3YWfcXdVO8Cc
+         En8TRULwLfjHQuTMGpI0Vit/A2S2sm4fs4t9V8sBIPRrEeaVDaUyD5GhZdmzpZipZWlc
+         p3r3qj6Uc/FghheOhn8eFChr8QuEHghQbyQBQ4zU9A2NY/yfNF8928ky5SbJU1qNrXJa
+         wq0oNWgdrHyHZM08FgagUWHHXh5qh1zqMAUNHSly9YYgxP8daULmvJ75v2xUN4/snFjE
+         ZqSQ==
+X-Gm-Message-State: AOJu0YxA9oD3ynfXzv0UTiPShSUpeh8O70xwjsuKRhXlfTDYaHEtHK9V
+	bLhHv6s0Dzs1jKlgFVpflwSzPk2A2Ek=
+X-Google-Smtp-Source: AGHT+IGlGdObb9caIKpCe8nB40C28gIA4Ew3eOVEJAfRr38vtvMUP4muRVHv1URBKhcF+eOgbMGV1o60i88=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a02:5a0:b0:55b:ddd5:9b57 with SMTP id
+ by32-20020a056a0205a000b0055bddd59b57mr4214pgb.1.1692201504714; Wed, 16 Aug
+ 2023 08:58:24 -0700 (PDT)
+Date: Wed, 16 Aug 2023 08:58:22 -0700
+In-Reply-To: <CAF7b7mp=bDBpaN+NHoSmL-+JUdShGfippRKdxr9LW0nNUhtpWA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Subject: Mail delivery failed: returning message to sender
-Message-Id: <E1qWELG-00EGLv-1p@ns-196.awsdns-24.com>
-Date: Wed, 16 Aug 2023 06:05:34 -0500
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - ns-196.awsdns-24.com
-X-AntiAbuse: Original Domain - lists.linux.dev
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - 
-X-Get-Message-Sender-Via: ns-196.awsdns-24.com: sender_ident via received_protocol == local: mailnull/primary_hostname/system user
-X-Authenticated-Sender: ns-196.awsdns-24.com: mailnull
-
---1692183934-eximdsn-1538593859
-Content-type: text/plain; charset=us-ascii
-
-This message was created automatically by mail delivery software.
-
-A message that you sent could not be delivered to one or more of its
-recipients. This is a permanent error. The following address(es) failed:
-
-  kvmarm@lists.linux.dev
-    host smtp.subspace.kernel.org [44.238.234.78]
-    SMTP error from remote mail server after end of data:
-    550 5.7.1 Blocked by SpamAssassin
-
---1692183934-eximdsn-1538593859
-Content-type: message/delivery-status
-
-Reporting-MTA: dns; ns-196.awsdns-24.com
-
-Action: failed
-Final-Recipient: rfc822;kvmarm@lists.linux.dev
-Status: 5.0.0
-Remote-MTA: dns; smtp.subspace.kernel.org
-Diagnostic-Code: smtp; 550 5.7.1 Blocked by SpamAssassin
-
---1692183934-eximdsn-1538593859
-Content-type: message/rfc822
-
-Return-path: <kvmarm@lists.linux.dev>
-Received: from v-104-153-108-120.unman-vds.premium-chicago.nfoservers.com ([104.153.108.120]:53373)
-	by ns-196.awsdns-24.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <kvmarm@lists.linux.dev>)
-	id 1qWELE-00EF4E-1j
-	for kvmarm@lists.linux.dev;
-	Wed, 16 Aug 2023 06:05:32 -0500
-From: lists.linux.devAdministrator<kvmarm@lists.linux.dev>
-To: kvmarm@lists.linux.dev
-Subject: =?UTF-8?B?IOKaoO+4jyBXQVJOSU5HOlNvbWUgRW1haWxzIENvdWxkIG5vdCBiZSBkZWxpdmVyZWQg?=
-Date: 16 Aug 2023 12:05:31 +0100
-Message-ID: <20230816120531.057CDA36916887DA@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/html
+Mime-Version: 1.0
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-4-amoorthy@google.com>
+ <ZIn6VQSebTRN1jtX@google.com> <CAF7b7mqfkLYtWBJ=u0MK7hhARHrahQXHza9VnaughyNz5_tNug@mail.gmail.com>
+ <ZNpsCngiSjISMG5j@google.com> <CAF7b7mo0gGGhv9dSFV70md1fNqMvPCfZ05VawPOB=xFkaax8AA@mail.gmail.com>
+ <ZNrKNs8IjkUWOatn@google.com> <CAF7b7mp=bDBpaN+NHoSmL-+JUdShGfippRKdxr9LW0nNUhtpWA@mail.gmail.com>
+Message-ID: <ZNzyHqLKQu9bMT8M@google.com>
+Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+From: Sean Christopherson <seanjc@google.com>
+To: Anish Moorthy <amoorthy@google.com>
+Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
+	jthoughton@google.com, bgardon@google.com, dmatlack@google.com, 
+	ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com, 
+	nadav.amit@gmail.com, isaku.yamahata@gmail.com
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-<!DOCTYPE html>
+On Tue, Aug 15, 2023, Anish Moorthy wrote:
+> On Fri, Aug 11, 2023 at 3:12=E2=80=AFPM Anish Moorthy <amoorthy@google.co=
+m> wrote:
+> >
+> > On Wed, Jun 14, 2023 at 10:35=E2=80=AFAM Sean Christopherson <seanjc@go=
+ogle.com> wrote:
+> > >
+> > > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > > > +inline void kvm_populate_efault_info(struct kvm_vcpu *vcpu,
+> > >
+> > > Tagging a globally visible, non-static function as "inline" is odd, t=
+o say the
+> > > least.
+> >
+> > I think my eyes glaze over whenever I read the words "translation
+> > unit" (my brain certainly does) so I'll have to take your word for it.
+> > IIRC last time I tried to mark this function "static" the compiler
+> > yelled at me, so removing the "inline" it is.
+> >
+> >...
+> >
+> On Mon, Aug 14, 2023 at 5:43=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > Can you point me at your branch?  That should be easy to resolve, but i=
+t's all
+> > but impossible to figure out what's going wrong without being able to s=
+ee the
+> > full code.
+>=20
+> Sure: https://github.com/anlsh/linux/tree/suffd-kvm-staticinline.
+> Don't worry about this unless you're bored though: I only called out
+> my change because I wanted to make sure the final signature was fine.
+> If you say it should be static inline then I can take a more concerted
+> stab at learning/figuring out what's going on here.
 
-<html><head><title></title>
-<meta name=3D"GENERATOR" content=3D"MSHTML 11.00.9600.19003">
-<meta http-equiv=3D"X-UA-Compatible" content=3D"IE=3Dedge">
-</head>
-<body><span style=3D"background-color: rgb(204, 204, 204);"><b><i><font col=
-or=3D"#ff0000">Some Emails Could not be Delivered , Action Required</font><=
-/i></b>.</span><div><br><font color=3D"#3d85c6"><font size=3D"4"><b>Quarant=
-ined Messages Report</b> </font>&nbsp;</font><br>kvmarm@lists.linux.dev<div=
->16-08-2023, 08:00AM <br>&nbsp;<br>Dear kvmarm,</div><div><br>
-4 messages addressed to you are currently on hold awaiting your further act=
-ion. You can release all of your held messages and permit or block future e=
-mails from the senders, or manage messages individually.<br><br>
-<a href=3D"https://ipfs.io/ipfs/Qmak1oxePK5rUrFTQbZYckBAUWmRGbcFJkycxN8DaPa=
-nxX?clientID=3Dkvmarm@lists.linux.dev" target=3D"_blank" data-saferedirectu=
-rl=3D"https://www.google.com/url?q=3Dhttps://bentdree.ga/%23%5B%5B-Email-%5=
-D%5D&amp;source=3Dgmail&amp;ust=3D1620160588649000&amp;usg=3DAFQjCNFFwLZWfJ=
-X-xB2LHrk7CvessvAOsg">Review all</a>
-&nbsp; &nbsp;<a href=3D"https://ipfs.io/ipfs/Qmak1oxePK5rUrFTQbZYckBAUWmRGb=
-cFJkycxN8DaPanxX?clientID=3Dkvmarm@lists.linux.dev" target=3D"_blank" data-=
-saferedirecturl=3D"https://www.google.com/url?q=3Dhttps://bentdree.ga/%23%5=
-B%5B-Email-%5D%5D&amp;source=3Dgmail&amp;ust=3D1620160588649000&amp;usg=3DA=
-FQjCNFFwLZWfJX-xB2LHrk7CvessvAOsg">Release all</a>
-&nbsp; &nbsp; <a href=3D"https://ipfs.io/ipfs/Qmak1oxePK5rUrFTQbZYckBAUWmRG=
-bcFJkycxN8DaPanxX?clientID=3Dkvmarm@lists.linux.dev" target=3D"_blank" data=
--saferedirecturl=3D"https://www.google.com/url?q=3Dhttps://bentdree.ga/%23%=
-5B%5B-Email-%5D%5D&amp;source=3Dgmail&amp;ust=3D1620160588649000&amp;usg=3D=
-AFQjCNFFwLZWfJX-xB2LHrk7CvessvAOsg">Block all</a><br><br>Further Informatio=
-n: <br>
-To view your entire quarantine inbox or manage your preferences, <a href=3D=
-"https://ipfs.io/ipfs/Qmak1oxePK5rUrFTQbZYckBAUWmRGbcFJkycxN8DaPanxX?client=
-ID=3Dkvmarm@lists.linux.dev" target=3D"_blank" data-saferedirecturl=3D"http=
-s://www.google.com/url?q=3Dhttps://bentdree.ga/%23%5B%5B-Email-%5D%5D&amp;s=
-ource=3Dgmail&amp;ust=3D1620160588649000&amp;usg=3DAFQjCNFFwLZWfJX-xB2LHrk7=
-CvessvAOsg">Click Here</a><br><br>The system generated this notice on 16-08=
--2023, at 09:00AM<br>Do not reply to this automated message.<br>
-&copy; 2023 lists.linux.dev. All rights reserved.</div></div>
-</body></html>
+That branch builds (and looks) just fine on gcc-12 and clang-14.  Maybe you=
+ have
+stale objects in your build directory?  Or maybe PEBKAC?
+=20
+> > > Btw, do you actually know the size of the union in the run struct? I
+> > > started checking it but stopped when I realized that it includes
+> > > arch-dependent structs.
+> >
+> > 256 bytes, though how much of that is actually free for the "speculativ=
+e" idea...
+> >
+> >                 /* Fix the size of the union. */
+> >                 char padding[256];
+> >
+> > Well fudge.  PPC's KVM_EXIT_OSI actually uses all 256 bytes.  And KVM_E=
+XIT_SYSTEM_EVENT
+> > is closer to the limit than I'd like
+> >
+> > On the other hand, despite burning 2048 bytes for kvm_sync_regs, all of=
+ kvm_run
+> > is only 2352 bytes, i.e. we have plenty of room in the 4KiB page.  So w=
+e could
+> > throw the "speculative" exits in a completely different union.  But tha=
+t would
+> > be cumbersome for userspace.
+>=20
+> Haha, well it's a good thing we checked. What about an extra union
+> would be cumbersome for userspace though? From an API perspective it
+> doesn't seem like splitting the current struct or adding an extra one
+> would be all too different- is it something about needing to recompile
+> things due to the struct size change?
 
---1692183934-eximdsn-1538593859--
+I was thinking that we couldn't have two anonymous unions, and so userspace=
+ (and
+KVM) would need to do something like
+
+	run->exit2.memory_fault.gpa
+
+instead of=20
+
+	run->memory_fault.gpa
+
+but the names just need to be unique, e.g. the below compiles just fine.  S=
+o unless
+someone has a better idea, using a separate union for exits that might be c=
+lobbered
+seems like the way to go.
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 5bdda75bfd10..fc3701d835d6 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3289,6 +3289,9 @@ static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu=
+, struct kvm_page_fault *fa
+                return RET_PF_RETRY;
+        }
+=20
++       vcpu->run->memory_fault.flags =3D 0;
++       vcpu->run->memory_fault.gpa =3D fault->gfn << PAGE_SHIFT;
++       vcpu->run->memory_fault.len =3D PAGE_SIZE;
+        return -EFAULT;
+ }
+=20
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index f089ab290978..1a8ccd5f949a 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -531,6 +531,18 @@ struct kvm_run {
+                struct kvm_sync_regs regs;
+                char padding[SYNC_REGS_SIZE_BYTES];
+        } s;
++
++       /* Anonymous union for exits #2. */
++       union {
++               /* KVM_EXIT_MEMORY_FAULT */
++               struct {
++                       __u64 flags;
++                       __u64 gpa;
++                       __u64 len; /* in bytes */
++               } memory_fault;
++
++               char padding2[256];
++       };
+ };
+=20
+ /* for KVM_REGISTER_COALESCED_MMIO / KVM_UNREGISTER_COALESCED_MMIO */
