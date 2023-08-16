@@ -1,166 +1,618 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0B721840
-	for <kvmarm@lists.linux.dev>; Wed, 16 Aug 2023 06:58:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1692169099;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=coMx+qrk3+nAFJq/8MLLAKSoS+skVzUmoa64bBG+3v8=;
-	b=DK1bTv5j0PmS/Z/f3eitGYNzUnW6Gb7+dHVxM3oYmJUPFwGwmeJ7u0NpuYGSf3LV3kKGrN
-	0n4QcoygYKp0I040nShANji/dzWL/1tEcpmFf9Yr2lkFlYkYYeIe+WPxuapzQ52cBBJgA3
-	2FIG4XbdbMe+WHB47xB7FkXyxmg6DWU=
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
- [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-74-Pa9lsJWsMEGGcKuZi2P0FQ-1; Wed, 16 Aug 2023 02:58:18 -0400
-X-MC-Unique: Pa9lsJWsMEGGcKuZi2P0FQ-1
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-1bd9e1c9575so11563855ad.0
-        for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 23:58:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692169097; x=1692773897;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=coMx+qrk3+nAFJq/8MLLAKSoS+skVzUmoa64bBG+3v8=;
-        b=SaZs6Ar3dlc+jvik/w2ZRzkQ6wkqNS6w6DMaLEvfWrcDArYy/emZxxY/2cN6ZZ1k64
-         APTl2fxyrm8Au5RdV93WakIPAAbd2lxOFlLLukunTn8iFd9fmgBxupNZRv8C029gzvqh
-         oHtnO+I+DWH/PsNu6OwvVkyPVIH4PQv3n5TzKmGzcRLAmmkGiZ3fJ4HKgV6hBCD15zh9
-         51El9CIKqhsDmD1qYeUGwKzmy3AX2iJUFuFbeBb6QkOVSKc5fS1niieO+DuYG0GS4vUq
-         A4JcORJAucx5+vAFmW42YAmzkVvTrxr2geMC+VUOmGxL88A8sqhCsgBviJZkfusOIWA/
-         LkAQ==
-X-Gm-Message-State: AOJu0YxE9q+Y+S3ZUu29G4+Q6ZUbtN1ISm9LXvEz3EG5srPeX5tLXlu8
-	+PjafrYK3MmvtFCGu2mLYctxycU/ieEoia3d02/BHGiRMGxzfXikGXZub6Bu05+dQRsDNFggYAe
-	a6OAgmXySXEMXb5IU
-X-Received: by 2002:a17:902:d2c1:b0:1bb:9e6e:a9f3 with SMTP id n1-20020a170902d2c100b001bb9e6ea9f3mr1275661plc.4.1692169097047;
-        Tue, 15 Aug 2023 23:58:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEkQ6TEk2n+Vw3400DfBNV4tQEKHqCod2o55k2tbJS/5J/3qoq6lE5clV2Y5xNar/cYRPaAng==
-X-Received: by 2002:a17:902:d2c1:b0:1bb:9e6e:a9f3 with SMTP id n1-20020a170902d2c100b001bb9e6ea9f3mr1275646plc.4.1692169096760;
-        Tue, 15 Aug 2023 23:58:16 -0700 (PDT)
-Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id o5-20020a170902d4c500b001bb9bc8d232sm12229560plg.61.2023.08.15.23.58.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Aug 2023 23:58:16 -0700 (PDT)
-Message-ID: <268054f7-e2f5-37fb-187c-3b2cca41b31a@redhat.com>
-Date: Wed, 16 Aug 2023 14:58:11 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D06A1F9EA
+	for <kvmarm@lists.linux.dev>; Wed, 16 Aug 2023 09:35:15 +0000 (UTC)
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37FNOeEm020082;
+	Wed, 16 Aug 2023 09:34:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version; s=corp-2023-03-30;
+ bh=Ma4Q/Masgsh3etiKF2eCgqgvPG42TXuedmwq2uGy1CU=;
+ b=jtQZx4qlupBInPUCXTZqELcKbMoMxIn41GfvgpQ6JF2wgDcKcpjd+gcE8y7KA/8ytelh
+ hHg0tf2dFCzSh0AEnE8kni6Zxf/+MW+K5GVDSd+ke2r6aUI0/I+cbNr5ozTain5I4nBb
+ AiLkk4E3JGekKjMYSEja6dLbM1g7Pls93z6ta6AH+6wd2/UCW9qIzkVr4VCxDzhmNFky
+ 1mM+EiVQoVfsugNs4J1m/+M/b1gEo+oJs6jKDemx9Sxk2v7UjKRNBeOdyrJxhOIyj5wJ
+ evVfm1JPwpt5sAIytdiCBhCpzejokotXotcCZXKQd3ht4Fp/Wwejqba1eZEsbnEx9RYc MA== 
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3se2w5xn1p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 16 Aug 2023 09:34:33 +0000
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 37G98H3b003697;
+	Wed, 16 Aug 2023 09:34:31 GMT
+Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2176.outbound.protection.outlook.com [104.47.55.176])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3sexyjyy23-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 16 Aug 2023 09:34:31 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BLxIUOhFpIt6LlO89jdOH40ADhaAgKt7zoxVVP8KyPL4u7lYzjxWa9D9v/WVP6jUiPLHaqVcbCw6KXCl2QwOal+XpxhukLBd07yCqjrZ5Pz89xsAUJEh3YT2p2TnECPcyOoFuS9Fx6kRMMxr70u6ngOMkP3RIfXIgL5VR+Vu/VXxRUhXpoml4OM0+rW9Zhh6I/8ENHIpB207Qhls79ls1iOd+U9dQftYAXVHbFvUTkQ+FaYzo/TRlmOdqBfhBKn9GjpUC1BDFRKIiOntlKdE8Sabr+iIXfuxYC8w50m1egF+YSsW0EEPUaA3dJonWQPHuQ42/3D+tOVdOJAqxR2GPA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Ma4Q/Masgsh3etiKF2eCgqgvPG42TXuedmwq2uGy1CU=;
+ b=O1/qjCOGnCMm45T5eUszypb4t/cY/8wVPp/Xo+DJ9vAd38B3o+/Y2gPil5Q3PJ5Ec72Hvwr+vBjGWKExCvGE8rLafXhvLJPc4NtTxU231ByVi1qmcrHttXNUDtt9Qz9XmbrKFaIOH7CbU1i2NCNDyYXWWHi8Olb3rE1k/yyeOShUfa6TkgSSOnNEzJ5VMkHjkjpkX5E1LGcyJNBXA+EVr7otWZJ7DrRn8rgxoFNSgv4OOcOUQww+ptIC+tYXgEMFq9rXKMPRVa7TdyH6G0zLQdEhU0EFQfKDQ10QlVLxIniM51cKuT7rWSSMBoixNPVYY8CcqwtQo/OuhHQAglSJqw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ma4Q/Masgsh3etiKF2eCgqgvPG42TXuedmwq2uGy1CU=;
+ b=zc2+7q9BVIeJNirkpGAlghL6oeq1B2ODz6S0a6W7rrhGjjkclRpAVFlcukUHGSTg7iquDnfeXzsQMV9krmzOPJvck4B9a9iInLihk540Sy7tQBZKUZKJjrPRSf92SKxzo9Sxhl7U2xXAr44kdE6ntqSvEvmf680QQP5BQynNDb0=
+Received: from PH0PR10MB5433.namprd10.prod.outlook.com (2603:10b6:510:e0::9)
+ by DS0PR10MB7935.namprd10.prod.outlook.com (2603:10b6:8:1b3::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.26; Wed, 16 Aug
+ 2023 09:34:29 +0000
+Received: from PH0PR10MB5433.namprd10.prod.outlook.com
+ ([fe80::76c:cb31:2005:d10c]) by PH0PR10MB5433.namprd10.prod.outlook.com
+ ([fe80::76c:cb31:2005:d10c%5]) with mapi id 15.20.6678.029; Wed, 16 Aug 2023
+ 09:34:29 +0000
+From: Miguel Luis <miguel.luis@oracle.com>
+To: Marc Zyngier <maz@kernel.org>
+CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+        Catalin Marinas
+	<catalin.marinas@arm.com>,
+        Eric Auger <eric.auger@redhat.com>, Mark Brown
+	<broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>, Will Deacon
+	<will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre
+ Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart
+	<darren@os.amperecomputing.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        James
+ Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v4 14/28] KVM: arm64: nv: Add trap forwarding
+ infrastructure
+Thread-Topic: [PATCH v4 14/28] KVM: arm64: nv: Add trap forwarding
+ infrastructure
+Thread-Index: AQHZz6j5LTOWX/ON70iSNKabHLvnSK/sqlYA
+Date: Wed, 16 Aug 2023 09:34:29 +0000
+Message-ID: <A7165A2C-1673-45AA-8FE6-73E4B436B891@oracle.com>
+References: <20230815183903.2735724-1-maz@kernel.org>
+ <20230815183903.2735724-15-maz@kernel.org>
+In-Reply-To: <20230815183903.2735724-15-maz@kernel.org>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR10MB5433:EE_|DS0PR10MB7935:EE_
+x-ms-office365-filtering-correlation-id: 933bb705-3fef-46bc-f7af-08db9e3bfd5f
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ G0CtIP3Y6zsH9TCNofxmnrC3GTivy6URU63ZUcgU32GX65K23AYXtpdUDe0l7LHTXtKdCjYlJRi8Z8epZHMirsnERRqPJ1EPMX6vWp80KhI3O2kmHfKdpkPxLn3Fo00haPaKWGcPXucrGChzsaWNX37rYrNdrT0+fTx+lLEFfoZfX8YYAqyZuCiLFoei7xTks5GmNcWHjdReOg2bYvizBF/EZxKYNg81oHWP0FGyDd1A8Hk6Y37z46YMhbwfSPb7OQx697isOX/GbukCIyysYBXK1h3scE3/RrizVV/ICfPoMvJpaV/vgfbF7pgvnhvqJaPDUgmYkvnkKOBlEbjbvM9MXaZccwXnO5PKEAfqcvFDM7bJvkSPGE18aWRZlomIs2R4hujI5ZLBDOLI84j4b0VZrNDi5vnNwwtnuK6cUDrX15mFojl4ptgeNLPdPn4jY48kI5NcmHTICoqXB/B96et56KCHvCGWzTvnRTeFq5yv88mC8FPYoHKShFW15S4SGinYI0mrDwGUSbHyyigCZaxWIPxK+zTnq8AyYS2Bh2VLh09xaKaAk63MXCvXsOAFpTTqaCZYeymsh2KDUnju11EmR3qjOI0oetiVA5NzWpr0XV2n+Qr3mmoprd8avZz1bZm7EBKSqVY8/g2iVmN+ng==
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB5433.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(366004)(396003)(136003)(376002)(39860400002)(1800799009)(451199024)(186009)(2906002)(83380400001)(30864003)(7416002)(86362001)(478600001)(36756003)(2616005)(6486002)(6506007)(71200400001)(33656002)(6512007)(53546011)(5660300002)(44832011)(41300700001)(122000001)(6916009)(316002)(54906003)(66946007)(66556008)(66476007)(66446008)(64756008)(91956017)(76116006)(4326008)(8676002)(8936002)(38100700002)(38070700005)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?us-ascii?Q?fiZbhO02bImiKUEU6BMzKge7Iz+Iq3CeqPul8cSpcei9MFpGTWbcZCxbWAQq?=
+ =?us-ascii?Q?X4BivUOmQPtoouVM1gabB0FpmE4fPWtpQhdr9mAGW/39VzqUtcx0Ov2rs9Lv?=
+ =?us-ascii?Q?7bFFTVY5ueId7FQV+KHg0y/UIBU0pMqAtLLFusrHtSQMjkyeHP/ouongCGZW?=
+ =?us-ascii?Q?RKCPVteidx+bLYTHlZUwenNCgYQd/htAT6jKIPZqh5xEYfgZm0asd7anekCz?=
+ =?us-ascii?Q?yL4XybLHpzXAxZBGXEpDFlUYYPZaC+Etmcry5GnTAYjPaRpQgEB1gIgfxnMH?=
+ =?us-ascii?Q?lO9nqqaD5KZxjRhaVDZ0tAdGaYJdBjjCBHG2tyfLrNm8a+lmT5MApr9nYbWF?=
+ =?us-ascii?Q?kJ+3G8Rd3ChMNA1pR2omQyvtFWd2jUF+PDddgjY9HRckz0hhtpg+dce7X31m?=
+ =?us-ascii?Q?dTq3t4woP3r3BCAEbjgYwpcAPGxQADx9OJPp+i48cFESnYPiRDNisnZJIJ+m?=
+ =?us-ascii?Q?YCBK5AUpL1Dx6gp9Leu2g1uVylKgpGK1lWPNv4Nc0cFs1UVpmJs7RtDBmwrk?=
+ =?us-ascii?Q?EjClWkSxyBeYHYOWnPEKIEAbi7SgDklu5R6E24QTeJMEbGLJO/NlOs7XEnNx?=
+ =?us-ascii?Q?oHG5adw7LUnUV1OZwgWtsoE705nVtNP2gNtZageSnzdoY6+Vg71SZlSQgEaD?=
+ =?us-ascii?Q?km1Ic+aSA1kXI4w7X8qwPtJ/D2H4Hc1b3LZajZr/G+g77lqI8fR+8856SXX/?=
+ =?us-ascii?Q?TIRa9/qUjE/b+ZX3gzA5xNAratHnkjkGUb2PYB5HUZie0d8n+3CiixX2H3ej?=
+ =?us-ascii?Q?L+1Fr0+p4m6JYvp0xFM7NMnQpquFWPAwkPrnHTa8DAUmbU1zJy2A0IekJfTZ?=
+ =?us-ascii?Q?ebVbioOM9AN5Fb+m8X9JDQyqEBugSrbvHp5w56C9JaLT9Plkd4us7v6CIma8?=
+ =?us-ascii?Q?o4XFmGRTCe5z53KblDsl72IowcRjbCCkN0XGgyr2iZll/rwYmHBBt11AD0kZ?=
+ =?us-ascii?Q?Uel33m7P8Sk6yGkIRaowapjGCl/T4Dl9/EYPTKoqZZdpDBO5l3Lgy/jC53kk?=
+ =?us-ascii?Q?t2eM1tnSnMS8iLyriVqv9k9N4rugxCXmToJlbxSq5gq2xkQOzWgjoPIE1f6n?=
+ =?us-ascii?Q?nHenZpEmGRU3ljdUD6SA2O4NVD3O541eJTVXHsFzQVz6VQQoglxi4EJLeiqE?=
+ =?us-ascii?Q?Tag81Xntkjzk96Wpuf2s3RgmGyashsae8Aq2FDk6Lee2ykxrZ9cCWn5ZrtII?=
+ =?us-ascii?Q?WijfLdDBbbdCmsa0w8JIXAl1XIdFLuiZLhkamdl82zeJRI59k3agPYAtPZEG?=
+ =?us-ascii?Q?wzwwizIqd2dP7I9CUhK9Szkq4El6OInYFTqtlWflFvUJkSsJbYNvH9RorbT7?=
+ =?us-ascii?Q?LPtkPhR/KXP4fGE4dulMDq+LhqCWl7HxFhOyOgqzR/lxD/bgwRPrt4MxuIRN?=
+ =?us-ascii?Q?VPo76iRvHCQLyyiDscWqyYVbEL40q4cRmex3H/yeFIZZf1/aWUX52LdyqWJp?=
+ =?us-ascii?Q?Jk4o9rI71RTWFVYSndeJ9Crk6ZaOVVg6N2iK68dnEHFSb6BLfL/3ZPLEYH0C?=
+ =?us-ascii?Q?omJZI5/lR9tQF/p/eJJWGmY1ONvMytSzNJ6SqlxerfK1uqHSg+wBAOxKvIuX?=
+ =?us-ascii?Q?CwTX+9tmNYjfgxPfctNfPCkUj+NL1dBT5M+CKLQblmGmSgpePONaiIuP+dSM?=
+ =?us-ascii?Q?Rgm3r7Deu0nnwMi0cd/sS4s=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <192CB0BE10A1084EA8C20D203745D47A@namprd10.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v8 11/11] KVM: arm64: selftests: Test for setting ID
- register from usersapce
-To: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
- KVMARM <kvmarm@lists.linux.dev>,
- ARMLinux <linux-arm-kernel@lists.infradead.org>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>,
- Reiji Watanabe <reijiw@google.com>,
- Raghavendra Rao Ananta <rananta@google.com>,
- Suraj Jitindar Singh <surajjs@amazon.com>, Cornelia Huck <cohuck@redhat.com>
-References: <20230807162210.2528230-1-jingzhangos@google.com>
- <20230807162210.2528230-12-jingzhangos@google.com>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230807162210.2528230-12-jingzhangos@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	=?us-ascii?Q?9uCmD4m8uxh3MJayojJN2UHT6RT8ACN9+Sml0UHPF6QQZmDfZsXPFY2vgCfk?=
+ =?us-ascii?Q?imdmNu5OP6t2ZtdEp5Hg0U9x0xGL/meLpQfbJh99z6h++lZoL+8VoPpPLjHt?=
+ =?us-ascii?Q?9sSF6BSsKpF6+zNbNDB4zAaiBOgAMIPeQo5onIh6ekExPAQbu3V0xIEthpg/?=
+ =?us-ascii?Q?bpaxFy0OnGKxzA5dn6Nm9Mqff/lHf4klFt1b8BnhexEUuoiS9Sk7epf8G09N?=
+ =?us-ascii?Q?BTSib2I2SEoHf892P5flK0tKaPUEh0K2ChvTslz8ZCmx9b+CyeWdF03D1VO3?=
+ =?us-ascii?Q?1OO6YrxJ8b5s+9iyVJrWRtnE5F2FdU0N9x4U7oVECTu9ZvLQkg9th5uR13CM?=
+ =?us-ascii?Q?3vaLwG3DCbyEV8dEBjU8Olh7No8qpso7xSqg4fCt3IL9Zydr5waDNvISFsuN?=
+ =?us-ascii?Q?tDNz5Ptk0R7DYkS2EQSliJHBRKLpbM6UNk89Mww2rtYGYIGfx/uUksjTTskP?=
+ =?us-ascii?Q?fqIpLMXbO0KC++fUDLRVi2I2Hcak4OabVk1nBOvbnG1yibyNYkSmErNJKF5z?=
+ =?us-ascii?Q?lxmNCD3WWZ4fsuuDlRdKpYgux3R/ykxRz50XNW4y1BP5RA2ZN8LBs6BLKOxH?=
+ =?us-ascii?Q?aLyO/n1R+uHxsf5858RFBuVXCGXPjP8lYBHpkvGlNVCOk+0ORL4l+UGLYMtP?=
+ =?us-ascii?Q?mtUvydifH3raaR/IEJrQvcqATQ0vQCXWXIaiEvS+bnbhdWV3P2qp9P+Hxz76?=
+ =?us-ascii?Q?5pEF+z0vvboj8JSWVud6Dpjf+Bl171/jioCt2VQujJ/0CEO5sbPGVOwB+/WL?=
+ =?us-ascii?Q?SxlMmT50u960OQlT4N6VhqxL7KEssmme2yE5Fxb0c13fvGhracs2jVr69VJA?=
+ =?us-ascii?Q?RtFlvuwOMOHuKfKdvcAA/GA9qRM1UsgAuOg46XOq25OktVW13NUDnkNX21yi?=
+ =?us-ascii?Q?NscyPUx6FTFQ3QkmCLBntaezlLOly2BK8F4ZgdtfhscgUqavLBRPhGusTK0h?=
+ =?us-ascii?Q?0BLTvcxO51TgBrIRIGpGWLB4n5OPOLcbYLvPjax8Q8/mQ9PVVwes11jugkKQ?=
+ =?us-ascii?Q?JTuCJgEaGqgz65od8ulUP7dJuqFfAJgA3DfYYfAfk64lgjH42ULuvcwUjQtX?=
+ =?us-ascii?Q?rzN159gzc8YH51NtqRANzy+rfMpFPA=3D=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB5433.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 933bb705-3fef-46bc-f7af-08db9e3bfd5f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Aug 2023 09:34:29.3752
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: eAzHwRdn3gr/547/MbzNGNuqZa1WEBaCGf/sK4Ku7eBUBNo4ar7p8HbKR9Afcn4l5CY+BVIIIicekV5gXg6UYg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB7935
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-16_07,2023-08-15_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0
+ mlxlogscore=999 bulkscore=0 phishscore=0 suspectscore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2308160085
+X-Proofpoint-ORIG-GUID: 2u_VyNtyToN6K0fQEw0jdhQ__J_75Tbl
+X-Proofpoint-GUID: 2u_VyNtyToN6K0fQEw0jdhQ__J_75Tbl
 
-Hi Jing,
+Hi Marc,
 
-On 8/8/23 00:22, Jing Zhang wrote:
-> Add tests to verify setting ID registers from userapce is handled
-> correctly by KVM. Also add a test case to use ioctl
-> KVM_ARM_GET_REG_WRITABLE_MASKS to get writable masks.
-> 
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> On 15 Aug 2023, at 18:38, Marc Zyngier <maz@kernel.org> wrote:
+>=20
+> A significant part of what a NV hypervisor needs to do is to decide
+> whether a trap from a L2+ guest has to be forwarded to a L1 guest
+> or handled locally. This is done by checking for the trap bits that
+> the guest hypervisor has set and acting accordingly, as described by
+> the architecture.
+>=20
+> A previous approach was to sprinkle a bunch of checks in all the
+> system register accessors, but this is pretty error prone and doesn't
+> help getting an overview of what is happening.
+>=20
+> Instead, implement a set of global tables that describe a trap bit,
+> combinations of trap bits, behaviours on trap, and what bits must
+> be evaluated on a system register trap.
+>=20
+> Although this is painful to describe, this allows to specify each
+> and every control bit in a static manner. To make it efficient,
+> the table is inserted in an xarray that is global to the system,
+> and checked each time we trap a system register while running
+> a L2 guest.
+>=20
+> Add the basic infrastructure for now, while additional patches will
+> implement configuration registers.
+>=20
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->   tools/testing/selftests/kvm/Makefile          |   1 +
->   .../selftests/kvm/aarch64/set_id_regs.c       | 453 ++++++++++++++++++
->   2 files changed, 454 insertions(+)
->   create mode 100644 tools/testing/selftests/kvm/aarch64/set_id_regs.c
-> 
+> arch/arm64/include/asm/kvm_host.h   |   1 +
+> arch/arm64/include/asm/kvm_nested.h |   2 +
+> arch/arm64/kvm/emulate-nested.c     | 282 ++++++++++++++++++++++++++++
+> arch/arm64/kvm/sys_regs.c           |   6 +
+> arch/arm64/kvm/trace_arm.h          |  26 +++
+> 5 files changed, 317 insertions(+)
+>=20
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/k=
+vm_host.h
+> index 721680da1011..cb1c5c54cedd 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -988,6 +988,7 @@ int kvm_handle_cp10_id(struct kvm_vcpu *vcpu);
+> void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
+>=20
+> int __init kvm_sys_reg_table_init(void);
+> +int __init populate_nv_trap_config(void);
+>=20
+> bool lock_all_vcpus(struct kvm *kvm);
+> void unlock_all_vcpus(struct kvm *kvm);
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm=
+/kvm_nested.h
+> index 8fb67f032fd1..fa23cc9c2adc 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -11,6 +11,8 @@ static inline bool vcpu_has_nv(const struct kvm_vcpu *v=
+cpu)
+> test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
+> }
+>=20
+> +extern bool __check_nv_sr_forward(struct kvm_vcpu *vcpu);
 > +
-> +static void test_guest_reg_read(struct kvm_vcpu *vcpu)
+> struct sys_reg_params;
+> struct sys_reg_desc;
+>=20
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nes=
+ted.c
+> index b96662029fb1..d5837ed0077c 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -14,6 +14,288 @@
+>=20
+> #include "trace.h"
+>=20
+> +enum trap_behaviour {
+> + BEHAVE_HANDLE_LOCALLY =3D 0,
+> + BEHAVE_FORWARD_READ =3D BIT(0),
+> + BEHAVE_FORWARD_WRITE =3D BIT(1),
+> + BEHAVE_FORWARD_ANY =3D BEHAVE_FORWARD_READ | BEHAVE_FORWARD_WRITE,
+> +};
+> +
+> +struct trap_bits {
+> + const enum vcpu_sysreg index;
+> + const enum trap_behaviour behaviour;
+> + const u64 value;
+> + const u64 mask;
+> +};
+> +
+> +/* Coarse Grained Trap definitions */
+> +enum cgt_group_id {
+> + /* Indicates no coarse trap control */
+> + __RESERVED__,
+> +
+> + /*
+> + * The first batch of IDs denote coarse trapping that are used
+> + * on their own instead of being part of a combination of
+> + * trap controls.
+> + */
+> +
+> + /*
+> + * Anything after this point is a combination of coarse trap
+> + * controls, which must all be evaluated to decide what to do.
+> + */
+> + __MULTIPLE_CONTROL_BITS__,
+> +
+> + /*
+> + * Anything after this point requires a callback evaluating a
+> + * complex trap condition. Hopefully we'll never need this...
+> + */
+> + __COMPLEX_CONDITIONS__,
+> +
+> + /* Must be last */
+> + __NR_CGT_GROUP_IDS__
+> +};
+> +
+> +static const struct trap_bits coarse_trap_bits[] =3D {
+> +};
+> +
+> +#define MCB(id, ...) \
+> + [id - __MULTIPLE_CONTROL_BITS__] =3D \
+> + (const enum cgt_group_id[]){ \
+> + __VA_ARGS__, __RESERVED__ \
+> + }
+> +
+> +static const enum cgt_group_id *coarse_control_combo[] =3D {
+> +};
+> +
+> +typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu *=
+);
+> +
+> +#define CCC(id, fn) \
+> + [id - __COMPLEX_CONDITIONS__] =3D fn
+> +
+> +static const complex_condition_check ccc[] =3D {
+> +};
+> +
+> +/*
+> + * Bit assignment for the trap controls. We use a 64bit word with the
+> + * following layout for each trapped sysreg:
+> + *
+> + * [9:0] enum cgt_group_id (10 bits)
+> + * [62:10] Unused (53 bits)
+> + * [63] RES0 - Must be zero, as lost on insertion in the xarray
+> + */
+> +#define TC_CGT_BITS 10
+> +
+> +union trap_config {
+> + u64 val;
+> + struct {
+> + unsigned long cgt:TC_CGT_BITS; /* Coarse Grained Trap id */
+> + unsigned long unused:53; /* Unused, should be zero */
+> + unsigned long mbz:1; /* Must Be Zero */
+> + };
+> +};
+> +
+> +struct encoding_to_trap_config {
+> + const u32 encoding;
+> + const u32 end;
+> + const union trap_config tc;
+> + const unsigned int line;
+> +};
+> +
+> +#define SR_RANGE_TRAP(sr_start, sr_end, trap_id) \
+> + { \
+> + .encoding =3D sr_start, \
+> + .end =3D sr_end, \
+> + .tc =3D { \
+> + .cgt =3D trap_id, \
+> + }, \
+> + .line =3D __LINE__, \
+> + }
+> +
+> +#define SR_TRAP(sr, trap_id) SR_RANGE_TRAP(sr, sr, trap_id)
+> +
+> +/*
+> + * Map encoding to trap bits for exception reported with EC=3D0x18.
+> + * These must only be evaluated when running a nested hypervisor, but
+> + * that the current context is not a hypervisor context. When the
+> + * trapped access matches one of the trap controls, the exception is
+> + * re-injected in the nested hypervisor.
+> + */
+> +static const struct encoding_to_trap_config encoding_to_cgt[] __initcons=
+t =3D {
+> +};
+> +
+> +static DEFINE_XARRAY(sr_forward_xa);
+> +
+> +static union trap_config get_trap_config(u32 sysreg)
 > +{
-> +	struct ucall uc;
-> +	bool done = false;
-> +
-> +	while (!done) {
-> +		vcpu_run(vcpu);
-> +
-> +		switch (get_ucall(vcpu, &uc)) {
-> +		case UCALL_ABORT:
-> +			REPORT_GUEST_ASSERT(uc);
-> +			break;
-> +		case UCALL_SYNC:
-> +			uint64_t val;
-aarch64/set_id_regs.c:408:4: error: a label can only be part of a 
-statement and a declaration is not a statement.
-
-I can encounter a compiler error at this line. Why not just put the 
-uint64_t at the beginning of the function.
-
-Thanks,
-Shaoqin
-
-> +
-> +			/* Make sure the written values are seen by guest */
-> +			vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(uc.args[2]), &val);
-> +			ASSERT_EQ(val, uc.args[3]);
-> +			break;
-> +		case UCALL_DONE:
-> +			done = true;
-> +			break;
-> +		default:
-> +			TEST_FAIL("Unexpected ucall: %lu", uc.cmd);
-> +		}
-> +	}
+> + return (union trap_config) {
+> + .val =3D xa_to_value(xa_load(&sr_forward_xa, sysreg)),
+> + };
 > +}
 > +
-> +int main(void)
+> +static __init void print_nv_trap_error(const struct encoding_to_trap_con=
+fig *tc,
+> +       const char *type, int err)
 > +{
-> +	struct kvm_vcpu *vcpu;
-> +	struct kvm_vm *vm;
-> +	bool aarch64_only;
-> +	uint64_t val, el0;
-> +	int ftr_cnt;
-> +
-> +	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-> +
-> +	/* Check for AARCH64 only system */
-> +	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), &val);
-> +	el0 = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL0), val);
-> +	aarch64_only = (el0 == ID_AA64PFR0_EL1_ELx_64BIT_ONLY);
-> +
-> +	ksft_print_header();
-> +
-> +	ftr_cnt = ARRAY_SIZE(ftr_id_aa64dfr0_el1) + ARRAY_SIZE(ftr_id_dfr0_el1)
-> +		  + ARRAY_SIZE(ftr_id_aa64pfr0_el1) + ARRAY_SIZE(ftr_id_aa64mmfr0_el1)
-> +		  + ARRAY_SIZE(ftr_id_aa64mmfr1_el1) + ARRAY_SIZE(ftr_id_aa64mmfr2_el1)
-> +		  + ARRAY_SIZE(ftr_id_aa64mmfr3_el1) - ARRAY_SIZE(test_regs);
-> +
-> +	ksft_set_plan(ftr_cnt);
-> +
-> +	test_user_set_reg(vcpu, aarch64_only);
-> +	test_guest_reg_read(vcpu);
-> +
-> +	kvm_vm_free(vm);
-> +
-> +	ksft_finished();
+> + kvm_err("%s line %d encoding range "
+> + "(%d, %d, %d, %d, %d) - (%d, %d, %d, %d, %d) (err=3D%d)\n",
+> + type, tc->line,
+> + sys_reg_Op0(tc->encoding), sys_reg_Op1(tc->encoding),
+> + sys_reg_CRn(tc->encoding), sys_reg_CRm(tc->encoding),
+> + sys_reg_Op2(tc->encoding),
+> + sys_reg_Op0(tc->end), sys_reg_Op1(tc->end),
+> + sys_reg_CRn(tc->end), sys_reg_CRm(tc->end),
+> + sys_reg_Op2(tc->end),
+> + err);
 > +}
+> +
+> +int __init populate_nv_trap_config(void)
+> +{
+> + int ret =3D 0;
+> +
+> + BUILD_BUG_ON(sizeof(union trap_config) !=3D sizeof(void *));
+> + BUILD_BUG_ON(__NR_CGT_GROUP_IDS__ > BIT(TC_CGT_BITS));
+> +
+> + for (int i =3D 0; i < ARRAY_SIZE(encoding_to_cgt); i++) {
+> + const struct encoding_to_trap_config *cgt =3D &encoding_to_cgt[i];
+> + void *prev;
+> +
+> + if (cgt->tc.val & BIT(63)) {
+> + kvm_err("CGT[%d] has MBZ bit set\n", i);
+> + ret =3D -EINVAL;
+> + }
+> +
+> + if (cgt->encoding !=3D cgt->end) {
+> + prev =3D xa_store_range(&sr_forward_xa,
+> +      cgt->encoding, cgt->end,
+> +      xa_mk_value(cgt->tc.val),
+> +      GFP_KERNEL);
+> + } else {
+> + prev =3D xa_store(&sr_forward_xa, cgt->encoding,
+> + xa_mk_value(cgt->tc.val), GFP_KERNEL);
+> + if (prev && !xa_is_err(prev)) {
+> + ret =3D -EINVAL;
+> + print_nv_trap_error(cgt, "Duplicate CGT", ret);
+> + }
+> + }
+> +
+> + if (xa_is_err(prev)) {
+> + ret =3D xa_err(prev);
+> + print_nv_trap_error(cgt, "Failed CGT insertion", ret);
+> + }
+> + }
+> +
+> + kvm_info("nv: %ld coarse grained trap handlers\n",
+> + ARRAY_SIZE(encoding_to_cgt));
+> +
+> + for (int id =3D __MULTIPLE_CONTROL_BITS__; id < __COMPLEX_CONDITIONS__;=
+ id++) {
+> + const enum cgt_group_id *cgids;
+> +
+> + cgids =3D coarse_control_combo[id - __MULTIPLE_CONTROL_BITS__];
+> +
+> + for (int i =3D 0; cgids[i] !=3D __RESERVED__; i++) {
+> + if (cgids[i] >=3D __MULTIPLE_CONTROL_BITS__) {
+> + kvm_err("Recursive MCB %d/%d\n", id, cgids[i]);
+> + ret =3D -EINVAL;
+> + }
+> + }
+> + }
+> +
+> + if (ret)
+> + xa_destroy(&sr_forward_xa);
+> +
+> + return ret;
+> +}
+> +
+> +static enum trap_behaviour get_behaviour(struct kvm_vcpu *vcpu,
+> + const struct trap_bits *tb)
+> +{
+> + enum trap_behaviour b =3D BEHAVE_HANDLE_LOCALLY;
+> + u64 val;
+> +
+> + val =3D __vcpu_sys_reg(vcpu, tb->index);
+> + if ((val & tb->mask) =3D=3D tb->value)
+> + b |=3D tb->behaviour;
+> +
+> + return b;
+> +}
+> +
+> +static enum trap_behaviour __compute_trap_behaviour(struct kvm_vcpu *vcp=
+u,
+> +    const enum cgt_group_id id,
+> +    enum trap_behaviour b)
+> +{
+> + switch (id) {
+> + const enum cgt_group_id *cgids;
+> +
+> + case __RESERVED__ ... __MULTIPLE_CONTROL_BITS__ - 1:
+> + if (likely(id !=3D __RESERVED__))
+> + b |=3D get_behaviour(vcpu, &coarse_trap_bits[id]);
+> + break;
+> + case __MULTIPLE_CONTROL_BITS__ ... __COMPLEX_CONDITIONS__ - 1:
+> + /* Yes, this is recursive. Don't do anything stupid. */
+> + cgids =3D coarse_control_combo[id - __MULTIPLE_CONTROL_BITS__];
+> + for (int i =3D 0; cgids[i] !=3D __RESERVED__; i++)
+> + b |=3D __compute_trap_behaviour(vcpu, cgids[i], b);
+> + break;
+> + default:
+> + if (ARRAY_SIZE(ccc))
+> + b |=3D ccc[id -  __COMPLEX_CONDITIONS__](vcpu);
+> + break;
+> + }
+> +
+> + return b;
+> +}
+> +
+> +static enum trap_behaviour compute_trap_behaviour(struct kvm_vcpu *vcpu,
+> +  const union trap_config tc)
+> +{
+> + enum trap_behaviour b =3D BEHAVE_HANDLE_LOCALLY;
+> +
+> + return __compute_trap_behaviour(vcpu, tc.cgt, b);
+> +}
+> +
+> +bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+> +{
+> + union trap_config tc;
+> + enum trap_behaviour b;
+> + bool is_read;
+> + u32 sysreg;
+> + u64 esr;
+> +
+> + if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
+> + return false;
+> +
+> + esr =3D kvm_vcpu_get_esr(vcpu);
+> + sysreg =3D esr_sys64_to_sysreg(esr);
+> + is_read =3D (esr & ESR_ELx_SYS64_ISS_DIR_MASK) =3D=3D ESR_ELx_SYS64_ISS=
+_DIR_READ;
+> +
+> + tc =3D get_trap_config(sysreg);
+> +
+> + /*
+> + * A value of 0 for the whole entry means that we know nothing
+> + * for this sysreg, and that it cannot be re-injected into the
+> + * nested hypervisor. In this situation, let's cut it short.
+> + *
+> + * Note that ultimately, we could also make use of the xarray
+> + * to store the index of the sysreg in the local descriptor
+> + * array, avoiding another search... Hint, hint...
+> + */
+> + if (!tc.val)
+> + return false;
+> +
+> + b =3D compute_trap_behaviour(vcpu, tc);
+> +
+> + if (((b & BEHAVE_FORWARD_READ) && is_read) ||
+> +    ((b & BEHAVE_FORWARD_WRITE) && !is_read))
+> + goto inject;
+> +
+> + return false;
+> +
+> +inject:
+> + trace_kvm_forward_sysreg_trap(vcpu, sysreg, is_read);
+> +
+> + kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
+> + return true;
+> +}
+> +
+> static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 =
+spsr)
+> {
+> u64 mode =3D spsr & PSR_MODE_MASK;
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index f5baaa508926..9556896311db 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -3177,6 +3177,9 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
+>=20
+> trace_kvm_handle_sys_reg(esr);
+>=20
+> + if (__check_nv_sr_forward(vcpu))
+> + return 1;
+> +
+> params =3D esr_sys64_to_params(esr);
+> params.regval =3D vcpu_get_reg(vcpu, Rt);
+>=20
+> @@ -3594,5 +3597,8 @@ int __init kvm_sys_reg_table_init(void)
+> if (!first_idreg)
+> return -EINVAL;
+>=20
+> + if (kvm_get_mode() =3D=3D KVM_MODE_NV)
+> + return populate_nv_trap_config();
+> +
+> return 0;
+> }
+> diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
+> index 6ce5c025218d..8ad53104934d 100644
+> --- a/arch/arm64/kvm/trace_arm.h
+> +++ b/arch/arm64/kvm/trace_arm.h
+> @@ -364,6 +364,32 @@ TRACE_EVENT(kvm_inject_nested_exception,
+>  __entry->hcr_el2)
+> );
+>=20
+> +TRACE_EVENT(kvm_forward_sysreg_trap,
+> +    TP_PROTO(struct kvm_vcpu *vcpu, u32 sysreg, bool is_read),
+> +    TP_ARGS(vcpu, sysreg, is_read),
+> +
+> +    TP_STRUCT__entry(
+> + __field(u64, pc)
+> + __field(u32, sysreg)
+> + __field(bool, is_read)
+> +    ),
+> +
+> +    TP_fast_assign(
+> + __entry->pc =3D *vcpu_pc(vcpu);
+> + __entry->sysreg =3D sysreg;
+> + __entry->is_read =3D is_read;
+> +    ),
+> +
+> +    TP_printk("%llx %c (%d,%d,%d,%d,%d)",
+> +      __entry->pc,
+> +      __entry->is_read ? 'R' : 'W',
+> +      sys_reg_Op0(__entry->sysreg),
+> +      sys_reg_Op1(__entry->sysreg),
+> +      sys_reg_CRn(__entry->sysreg),
+> +      sys_reg_CRm(__entry->sysreg),
+> +      sys_reg_Op2(__entry->sysreg))
+> +);
+> +
 
--- 
-Shaoqin
+Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
+
+Thanks
+Miguel
+
+> #endif /* _TRACE_ARM_ARM64_KVM_H */
+>=20
+> #undef TRACE_INCLUDE_PATH
+> --=20
+> 2.34.1
+>=20
 
