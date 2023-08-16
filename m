@@ -1,40 +1,40 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A21EF20E7
-	for <kvmarm@lists.linux.dev>; Wed, 16 Aug 2023 17:15:41 +0000 (UTC)
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2b9dc1bff38so100609551fa.1
-        for <kvmarm@lists.linux.dev>; Wed, 16 Aug 2023 10:15:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E66010949
+	for <kvmarm@lists.linux.dev>; Wed, 16 Aug 2023 17:23:57 +0000 (UTC)
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2b962535808so103509271fa.0
+        for <kvmarm@lists.linux.dev>; Wed, 16 Aug 2023 10:23:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692206139; x=1692810939;
+        d=google.com; s=20221208; t=1692206635; x=1692811435;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KHzwP25lc2+5c3C6UwJkbP07p9JjcSoaHXyiPwCJzpU=;
-        b=fQXxAGiQN4dFyoOtWD4APY/yIxHdbFpIum5aPTDTxm+FvcXEsBlLCL3pp8mM/q77jE
-         c9F0FGauolC0CF9Nj7pTa+V8w4z3OmbLrheu8LNqRDULZ5ZcA9RvtIJqRB07jqTjaRwg
-         U+UpkPk/oH1zpY8XavV5RIAAhI42yzxQBoxOyp22+pci8pLhir5SQIeri2sq+gvCNAkH
-         9yHgb5IZt2KpLhFoxyFUM3uGj/IWm+9hpKnlLFfQ3TkXGhYKtCh7djaSyKxQqsvIA98l
-         93Z+MIp28orCRiEzJdR+fWZ1Wc+Fa3+bxv6/P76Sv4gdRJaXIqppjVcnPOM/3wQ3NDaU
-         Nj2g==
+        bh=PN9U96sXQ/WhiZQpYWPMVe4BliphD8Rxbde/Icx+5GY=;
+        b=3vCMtSNBvuTAdBXCc6sG59/G95pF+bcwRLTaLl0+A+RoE7y5JkvVhWXuV+2msQYTW5
+         fT/ueq2vahIb4KQqCzkJcQSbgxUZa8KO6JGgJ2kguacmllPqRLJGgQjutWURVSgGK9Zq
+         adCBaucGEX6BhAR3CYJ1d4rQkS7YtZcUlEl1y6RkpGaWhSUiG5+m2jZuSrE1JlrdZBjQ
+         TGe2J90BeKNRJAuvnFC50HVKmN5xHhx7qvJZzwx39u/G4AHpRxSHCeZUWIivNZKx6Kma
+         o52/6KfMnnxyR5CzNMGPXDtXzK9ThW8nWV5phFFqyPmxwORO2u0xTMFK20et7EGloK72
+         oDQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692206139; x=1692810939;
+        d=1e100.net; s=20221208; t=1692206635; x=1692811435;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KHzwP25lc2+5c3C6UwJkbP07p9JjcSoaHXyiPwCJzpU=;
-        b=O19z8o0sOvHBBVCBsP5A8exVFC2nhRj3LGbeoHcYZ1L8fQn27ZmEJqe0wuQ4/G2LoP
-         bNpLFHE3u1jSd8YVZbaI8+DdVVdtgL9FqPcWGxG3AZvi//osdHkQSshMsxeXOVFPPuxL
-         EwhUwCZBlwEd5LfrSxQ7nYD7wTy4QlE8YYRxwrBPC1psJoGGa6lOPxTdjmLTnMjgWguL
-         WwtQDEcNauWjrjZbiS2mOPNFxiLyImADs7kR8IxauiO8/ndHiP4gbXGsrMedbhjKglm/
-         SGmQbT5XqhMKVB7fwKFzHWOEdl8UPxcoTYHNeh84A5BqKt5a7fCLgkrPLFIY+nPJEs8t
-         hOoQ==
-X-Gm-Message-State: AOJu0YzCtmf4zBsR04qMQpBWtGUIIjKutJ7EjaLasFTi4PXi4kdyCQU5
-	JlOwaPf+13yeyScbd2GgS+PTHnYMh07yx1dogsKRrQ==
-X-Google-Smtp-Source: AGHT+IGLSaJ3/O+Pfy5Uz0nILdeFwQS4LZ9hdXZc4YhdJvRYKlDuwaIsK6a1aIppt4bzPTuIfQMIrpF3hvU89A6BsQc=
-X-Received: by 2002:a2e:7013:0:b0:2b6:a763:5d13 with SMTP id
- l19-20020a2e7013000000b002b6a7635d13mr1934137ljc.27.1692206139312; Wed, 16
- Aug 2023 10:15:39 -0700 (PDT)
+        bh=PN9U96sXQ/WhiZQpYWPMVe4BliphD8Rxbde/Icx+5GY=;
+        b=Qf36FBeyoUOEMNpmZ9/LUkVkQIVmUf1YZbNw97s9x5MVS51XqBIVrzxfA04Z7m+bba
+         L6bcs/mkM0wgzdJm9z9Y61fTJkgfkRG/c1rEsy/AvsAaMSb4kPBPIdZyh1k/LQJzUiJK
+         AftiHk6xyxAVBkVYVYcj/ixfOKWKvx/MS/ZTY0TKzfIlHc65JXN9MPZNFpqR8kvxSxLE
+         MxArHebVPN99kHW4fPwVzF0M72I3J36J3mRGkU7g0YDn7zjE1ZzkLaHzZDQA4Nqm+TlU
+         SGcHA6WOUt+IHAYN/3BKZqYW+80YKk9bY3sV+UrrSMxj4h/F8Jx14b82FAg3rsNiqTsN
+         F2aQ==
+X-Gm-Message-State: AOJu0Yyr/Dm5MeTagi0Mzq5/WHHiFFS/at1YRHxDMVMfrVn52Si00gKq
+	bWXmFSqcEwmX+W2Oa55hHJBjfYVyH5zoN3y1denLXA==
+X-Google-Smtp-Source: AGHT+IF4RUG2j9sLmcTd2hL11fGmibz3EFlXCoe4A3lVSlT8nFACvdbT546I78Gp4RBecCTFJVE21OgKXGhMdNQjWY0=
+X-Received: by 2002:a2e:90cb:0:b0:2b8:3a1e:eec9 with SMTP id
+ o11-20020a2e90cb000000b002b83a1eeec9mr1955969ljg.36.1692206635158; Wed, 16
+ Aug 2023 10:23:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -42,13 +42,13 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 References: <20230807162210.2528230-1-jingzhangos@google.com>
- <20230807162210.2528230-11-jingzhangos@google.com> <eaa2519e-15b3-2fd4-199e-8e3368df7e0d@redhat.com>
-In-Reply-To: <eaa2519e-15b3-2fd4-199e-8e3368df7e0d@redhat.com>
+ <20230807162210.2528230-12-jingzhangos@google.com> <268054f7-e2f5-37fb-187c-3b2cca41b31a@redhat.com>
+In-Reply-To: <268054f7-e2f5-37fb-187c-3b2cca41b31a@redhat.com>
 From: Jing Zhang <jingzhangos@google.com>
-Date: Wed, 16 Aug 2023 10:15:26 -0700
-Message-ID: <CAAdAUtj0zUqpjm1L+7-D5eeEK85f0jiqDyjoQm47tpzDGxhaLw@mail.gmail.com>
-Subject: Re: [PATCH v8 10/11] KVM: arm64: selftests: Import automatic system
- register definition generation from kernel
+Date: Wed, 16 Aug 2023 10:23:43 -0700
+Message-ID: <CAAdAUthLunQxN+q+PQxLp1cB=cSn5q_y5DM8av+GTKgkZw+sbQ@mail.gmail.com>
+Subject: Re: [PATCH v8 11/11] KVM: arm64: selftests: Test for setting ID
+ register from usersapce
 To: Shaoqin Huang <shahuang@redhat.com>
 Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
 	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
@@ -63,88 +63,103 @@ Content-Transfer-Encoding: quoted-printable
 
 Hi Shaoqin,
 
-On Tue, Aug 15, 2023 at 11:54=E2=80=AFPM Shaoqin Huang <shahuang@redhat.com=
+On Tue, Aug 15, 2023 at 11:58=E2=80=AFPM Shaoqin Huang <shahuang@redhat.com=
 > wrote:
 >
 > Hi Jing,
 >
 > On 8/8/23 00:22, Jing Zhang wrote:
-> > Import automatic system register definition generation from kernel and
-> > update system register usage accordingly.
+> > Add tests to verify setting ID registers from userapce is handled
+> > correctly by KVM. Also add a test case to use ioctl
+> > KVM_ARM_GET_REG_WRITABLE_MASKS to get writable masks.
 > >
 > > Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > > ---
-> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selft=
-ests/kvm/Makefile
-> > index c692cc86e7da..a8cf0cb04db7 100644
-> > --- a/tools/testing/selftests/kvm/Makefile
-> > +++ b/tools/testing/selftests/kvm/Makefile
-> > @@ -200,14 +200,15 @@ ifeq ($(ARCH),x86_64)
-> >   LINUX_TOOL_ARCH_INCLUDE =3D $(top_srcdir)/tools/arch/x86/include
-> >   else
-> >   LINUX_TOOL_ARCH_INCLUDE =3D $(top_srcdir)/tools/arch/$(ARCH)/include
-> > +ARCH_GENERATED_INCLUDE =3D $(top_srcdir)/tools/arch/$(ARCH)/include/ge=
-nerated
-> >   endif
-> >   CFLAGS +=3D -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=3Dg=
-nu99 \
-> > -     -Wno-gnu-variable-sized-type-not-at-end -MD\
-> > +     -Wno-gnu-variable-sized-type-not-at-end -MD \
-> >       -fno-builtin-memcmp -fno-builtin-memcpy -fno-builtin-memset \
-> >       -fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
-> >       -I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
-> >       -I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. $(EXTRA_CFLAGS) \
-> > -     $(KHDR_INCLUDES)
-> > +     -I$(ARCH_GENERATED_INCLUDE) $(KHDR_INCLUDES)
-> >   ifeq ($(ARCH),s390)
-> >       CFLAGS +=3D -march=3Dz10
-> >   endif
-> > @@ -255,8 +256,16 @@ $(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S
-> >   $(LIBKVM_STRING_OBJ): $(OUTPUT)/%.o: %.c
-> >       $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c -ffreestanding $< -=
-o $@
+> >   tools/testing/selftests/kvm/Makefile          |   1 +
+> >   .../selftests/kvm/aarch64/set_id_regs.c       | 453 +++++++++++++++++=
++
+> >   2 files changed, 454 insertions(+)
+> >   create mode 100644 tools/testing/selftests/kvm/aarch64/set_id_regs.c
 > >
-> > +ifeq ($(ARCH),arm64)
-> > +GEN_SYSREGS :=3D $(ARCH_GENERATED_INCLUDE)/asm/sysreg-defs.h
-> > +ARCH_TOOLS :=3D $(top_srcdir)/tools/arch/$(ARCH)/tools/
 > > +
-> > +$(GEN_SYSREGS): $(ARCH_TOOLS)/gen-sysreg.awk $(ARCH_TOOLS)/sysreg
-> > +     mkdir -p $(dir $@); awk -f $(ARCH_TOOLS)/gen-sysreg.awk $(ARCH_TO=
-OLS)/sysreg > $@
-> > +endif
+> > +static void test_guest_reg_read(struct kvm_vcpu *vcpu)
+> > +{
+> > +     struct ucall uc;
+> > +     bool done =3D false;
 > > +
-> >   x :=3D $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
-> > -$(TEST_GEN_PROGS): $(LIBKVM_OBJS)
-> > +$(TEST_GEN_PROGS): $(LIBKVM_OBJS) $(GEN_SYSREGS)
+> > +     while (!done) {
+> > +             vcpu_run(vcpu);
+> > +
+> > +             switch (get_ucall(vcpu, &uc)) {
+> > +             case UCALL_ABORT:
+> > +                     REPORT_GUEST_ASSERT(uc);
+> > +                     break;
+> > +             case UCALL_SYNC:
+> > +                     uint64_t val;
+> aarch64/set_id_regs.c:408:4: error: a label can only be part of a
+> statement and a declaration is not a statement.
 >
-> I don't this this really works. Since the $(GEN_SYSREG) is the
-> prerequisites of $(TEST_GEN_PROGS). Only when $(TEST_GEN_PROGS) being
-> compiled, the $(GEN_SYSREG) can be generated.
->
-> But the fact is, the $(TEST_GEN_PROGS) is relies on $(TEST_GEN_OBJ),
-> which means $(TEST_GEN_OBJ) will be compiled before $(TEST_GEN_PROGS),
-> but $(TEST_GEN_OBJ) depends on $(GEN_SYSREG) again, at the time, the
-> $(GEN_SYSREG) hasn't been generated, so it will has error:
->
-> No such file or directory.
->
-> #include "asm/sysreg-defs.h"
->
-> I think the correct way to generate $(GEN_SYSREGS) is add a prerequisite
-> for $(TEST_GEN_OBJ), like:
->
-> $(TEST_GEN_OBJ): $(GEN_SYSREGS)
+> I can encounter a compiler error at this line. Why not just put the
+> uint64_t at the beginning of the function.
 
-You're right. Fixed.
+Sure. Will move it to the beginning of the function.
 
 >
 > Thanks,
 > Shaoqin
 >
-> >   $(TEST_GEN_PROGS_EXTENDED): $(LIBKVM_OBJS)
-> >
-> >   cscope: include_paths =3D $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) inc=
-lude lib ..
+> > +
+> > +                     /* Make sure the written values are seen by guest=
+ */
+> > +                     vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(uc.args[2]),=
+ &val);
+> > +                     ASSERT_EQ(val, uc.args[3]);
+> > +                     break;
+> > +             case UCALL_DONE:
+> > +                     done =3D true;
+> > +                     break;
+> > +             default:
+> > +                     TEST_FAIL("Unexpected ucall: %lu", uc.cmd);
+> > +             }
+> > +     }
+> > +}
+> > +
+> > +int main(void)
+> > +{
+> > +     struct kvm_vcpu *vcpu;
+> > +     struct kvm_vm *vm;
+> > +     bool aarch64_only;
+> > +     uint64_t val, el0;
+> > +     int ftr_cnt;
+> > +
+> > +     vm =3D vm_create_with_one_vcpu(&vcpu, guest_code);
+> > +
+> > +     /* Check for AARCH64 only system */
+> > +     vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), &val);
+> > +     el0 =3D FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL0), val);
+> > +     aarch64_only =3D (el0 =3D=3D ID_AA64PFR0_EL1_ELx_64BIT_ONLY);
+> > +
+> > +     ksft_print_header();
+> > +
+> > +     ftr_cnt =3D ARRAY_SIZE(ftr_id_aa64dfr0_el1) + ARRAY_SIZE(ftr_id_d=
+fr0_el1)
+> > +               + ARRAY_SIZE(ftr_id_aa64pfr0_el1) + ARRAY_SIZE(ftr_id_a=
+a64mmfr0_el1)
+> > +               + ARRAY_SIZE(ftr_id_aa64mmfr1_el1) + ARRAY_SIZE(ftr_id_=
+aa64mmfr2_el1)
+> > +               + ARRAY_SIZE(ftr_id_aa64mmfr3_el1) - ARRAY_SIZE(test_re=
+gs);
+> > +
+> > +     ksft_set_plan(ftr_cnt);
+> > +
+> > +     test_user_set_reg(vcpu, aarch64_only);
+> > +     test_guest_reg_read(vcpu);
+> > +
+> > +     kvm_vm_free(vm);
+> > +
+> > +     ksft_finished();
+> > +}
+>
 > --
 > Shaoqin
 >
