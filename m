@@ -1,128 +1,100 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEA6D17AD9
-	for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 23:54:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47CCBC433C8;
-	Tue, 15 Aug 2023 23:54:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692143680;
-	bh=n6eEACiqimpPB7PLvfd+oUPFPVhzIcPuBLC1dr7dvkk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DxIy5vbUapbtWP3sld3mWYjZBRmjMrNODKGFDnO97nPi0kw+utGl7YhSUxRcSA55j
-	 bgF8O8udbd4TU+m5lMdm4Tq8mz2Iji+2duH30c7Uih+GPjDtxMtERbEdC1HkZkRbV1
-	 vhFKi5KpL9sjgdjBtwcn8MOqnv66AJbhzBkjh1oYLzW8TtTXJwoSBhyLhul3VdRwcO
-	 1WhbPKDlq0Tm06lqfY+xHm0muT2Lor4Y/lV59laZCZRREuOI6SYgQstfXcPOumpgOw
-	 HGCLOk+Rs8gWd4G0xWygKex2ny89KElnHHwFax3NDVcmPkRCbi5eOwwkFR7OjQVK7e
-	 9jsYzSH7oiqSw==
-Date: Wed, 16 Aug 2023 00:54:30 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v4 17/36] arm64/mm: Handle GCS data aborts
-Message-ID: <752f9f06-69e3-4e60-94ca-49cacb1122ff@sirena.org.uk>
-References: <20230807-arm64-gcs-v4-0-68cfa37f9069@kernel.org>
- <20230807-arm64-gcs-v4-17-68cfa37f9069@kernel.org>
- <ZNZPLTky6IZ47n4l@arm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AF3717E
+	for <kvmarm@lists.linux.dev>; Wed, 16 Aug 2023 00:03:01 +0000 (UTC)
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2b9dc1bff38so88515891fa.1
+        for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 17:03:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692144180; x=1692748980;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I8FmgQMS4+VEtN3YWaf3XTC6qJSdTgKCK/OCtZRJ2AM=;
+        b=uDD3wZbsa1FJm4jgmPqfC89zpb19U+Ch5I0RBSK6mIPi5HCVTnAUbXQGdlx+efArze
+         KlKn/V+eLitTXMrjQLDP5xE5psTDnuzGO35YnDvUN1MQcj2Yv3X+WqOQMOBGJm+8iNs6
+         qtN6nxZrIL23UulabY5gv7o0CFvQS9aK3X3mcTXhNyRgm+PnpcH8x6WWk6F79Gq8PSzf
+         5bMBuB9SoBfWraZb07MoX41IZcjbZMSuA6TnUIJFxt8wFJso72YGkHKw4+Vv4UuLligy
+         bXwZRahs3NOkWD1WK16+JCV+QgbZDc8GGmQdvyJhrmZenZULW8Wb7+Et2LTmgoPXyQNQ
+         6w2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692144180; x=1692748980;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=I8FmgQMS4+VEtN3YWaf3XTC6qJSdTgKCK/OCtZRJ2AM=;
+        b=HOyF/mlPzXD5nUcx23IKj95fjlTV9+ofSB1+RItqynqzWEKdJEPnkn+sJaj4LedYT0
+         qOxRdG4H6XkK27i14BvFEQDy1RlojVsA2ZZyx17XBIoq6/lNCvCvmZGGJvkN9EKJntiY
+         DDmw1wOr0fcbs47uLrtdato5dHhBdosZnoqeJ9VTWrMMw3HR6mNeVx8COy/4/JSAbmNr
+         41NkmqAPn1KYAjJJ4CAZjxMumroTCagr4V3/vu7qzoA4J5l96pHLYaLzWr0PqoixsWB7
+         YPAIoIZU61Wzo1sU0VwcyEcx32RjItQvu6jvXDJR6HACi2BOxIVG1Iu/tNhr+gmLwOkM
+         XTJQ==
+X-Gm-Message-State: AOJu0Yw2hwGfk8ZEtYEd/XUJjprpO9C79eOLLpEAlEA5/4MJAxe0jvj8
+	acZz7Pa8DsijH1mBS6L5NKFSMRHArX+eJt7uZhTD3w==
+X-Google-Smtp-Source: AGHT+IGzXSHI262nd8TAHecg5+PE5eyEfT/q71qRXLJuGAUfyX/wyH8dQPUrUJHQzlDTntpzBLv8+QSiDCIv/ZhlXYw=
+X-Received: by 2002:a2e:a17b:0:b0:2b9:da28:c508 with SMTP id
+ u27-20020a2ea17b000000b002b9da28c508mr199586ljl.31.1692144179945; Tue, 15 Aug
+ 2023 17:02:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="bU0eg43A83FLgDHm"
-Content-Disposition: inline
-In-Reply-To: <ZNZPLTky6IZ47n4l@arm.com>
-X-Cookie: Darth Vader sleeps with a Teddywookie.
-
-
---bU0eg43A83FLgDHm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20230815183903.2735724-1-maz@kernel.org> <20230815183903.2735724-27-maz@kernel.org>
+In-Reply-To: <20230815183903.2735724-27-maz@kernel.org>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Tue, 15 Aug 2023 17:02:47 -0700
+Message-ID: <CAAdAUtiQwwSjZ_LHmRP+sW2VWSoe_cSQ5Rrh92f7-o5C2x_s7g@mail.gmail.com>
+Subject: Re: [PATCH v4 26/28] KVM: arm64: nv: Expose FGT to nested guests
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, 
+	Catalin Marinas <catalin.marinas@arm.com>, Eric Auger <eric.auger@redhat.com>, 
+	Mark Brown <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Andre Przywara <andre.przywara@arm.com>, 
+	Chase Conklin <chase.conklin@arm.com>, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, 
+	Darren Hart <darren@os.amperecomputing.com>, Miguel Luis <miguel.luis@oracle.com>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 11, 2023 at 04:09:33PM +0100, Catalin Marinas wrote:
-> On Mon, Aug 07, 2023 at 11:00:22PM +0100, Mark Brown wrote:
+Hi Marc,
 
-> > +		if (is_write_abort(esr) &&
-> > +		    !(is_gcs_fault(esr) || is_el1_data_abort(esr)))
-> > +			return VM_FAULT_BADACCESS;
+On Tue, Aug 15, 2023 at 11:47=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
+e:
+>
+> Now that we have FGT support, expose the feature to NV guests.
+>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/nested.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 7f80f385d9e8..3facd8918ae3 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -71,8 +71,9 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sy=
+s_reg_params *p,
+>                 break;
+>
+>         case SYS_ID_AA64MMFR0_EL1:
+> -               /* Hide ECV, FGT, ExS, Secure Memory */
+> -               val &=3D ~(GENMASK_ULL(63, 43)            |
+> +               /* Hide ECV, ExS, Secure Memory */
+> +               val &=3D ~(NV_FTR(MMFR0, ECV)             |
+> +                        NV_FTR(MMFR0, EXS)             |
+>                          NV_FTR(MMFR0, TGRAN4_2)        |
+>                          NV_FTR(MMFR0, TGRAN16_2)       |
+>                          NV_FTR(MMFR0, TGRAN64_2)       |
+> --
+> 2.34.1
+>
 
-> Related to my PIE permissions comment: when do we have a valid EL1 data
-> write abort that's not a GCS fault? Does a faulting GCSSTTR set the
-> ESR_ELx_GCS bit?
+Reviewed-by: Jing Zhang <jingzhangos@google.com>
 
-Yes, it should do.  The GCS instructions have access descriptors created
-with CreateAccDescGCS() which results in the access being flagged as a
-GCS access.
-
-> > +	} else {
-> > +		/*
-> > +		 * GCS faults should never happen for pages that are
-> > +		 * not part of a GCS and the operation being attempted
-> > +		 * can never succeed.
-> > +		 */
-> > +		if (is_gcs_fault(esr))
-> > +			return VM_FAULT_BADACCESS;
-
-> If one does a GCS push/store to a non-GCS page, do we get a GCS fault or
-> something else? I couldn't figure out from the engineering spec. If the
-> hardware doesn't generate such exceptions, we might as well remove this
-> 'else' branch. But maybe it does generate a GCS-specific fault as you
-> added a similar check in is_invalid_el0_gcs_access().
-
-Yes, see AddGCSRecord() and LoadCheckGCSRecord() - all GCS initiated
-accesses need to be AccDescGCS so appropriate permissions enforcement
-can happen and that's what causes the fault to be flagged as GCS.
-
-> > @@ -595,6 +644,19 @@ static int __kprobes do_page_fault(unsigned long f=
-ar, unsigned long esr,
-> >  	if (!vma)
-> >  		goto lock_mmap;
-> > =20
-> > +	/*
-> > +	 * We get legitimate write faults for GCS pages from GCS
-> > +	 * operations and from EL1 writes to EL0 pages but just plain
-
-> What are the EL1 writes to the shadow stack? Would it not use
-> copy_to_user_gcs()?
-
-They should, yes - I'll reword the comment.
-
---bU0eg43A83FLgDHm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmTcEDYACgkQJNaLcl1U
-h9A2rAgAhd1tNqwsfCv0ZnuQlRFZyTwPwFCn76BeqIuV3TYu4Nymed/YLhOECsZ9
-H6Fni+Igkf4ckDfRhk742+N6QqLOBZz4ddBTJDV74NJk7EgWWv9srbi10k/thyIT
-O/Wz8nVnuUHHXN3dkJIZJQ/l6GjLrzoiskqkrh9ft7HskvTTe1DOL8gFS8Qa5DjS
-ut+XhC5VI7HX7iBwhhqw1tEjsQM3ldnl0r/rSd37tFbJbDX6ujuMlgpBKReSH8qV
-kfrNbgpcBoxaKvE/rytuAXTIS2oqh/1yHuWi8ujBlZgGf8Vo7OK0alzL8T+oIEaQ
-92UJwq3fW51GVCMDxbeaCh1vD7hrKg==
-=cuH7
------END PGP SIGNATURE-----
-
---bU0eg43A83FLgDHm--
+Jing
