@@ -1,21 +1,21 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C08F20E7
-	for <kvmarm@lists.linux.dev>; Wed, 16 Aug 2023 18:16:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C596DC433C7;
-	Wed, 16 Aug 2023 18:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E83168B9
+	for <kvmarm@lists.linux.dev>; Wed, 16 Aug 2023 18:26:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3A3AC433C9;
+	Wed, 16 Aug 2023 18:26:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692209762;
-	bh=TgK016C/w5t6JQKrQP4E8mcD6V8oPi/S+UCWzSu2Rbc=;
+	s=k20201202; t=1692210381;
+	bh=3lwZH0aCkN4fuwrTeQAhsYruTaew5rtoMeyWR8imUko=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=djQMSkkoGjtLgUNe6JiG+uUbjTG+u7ie7eym1Qc/s0ITrVmBOvMdk78mSJmK4ub/N
-	 BH/UchLawIzBNwHe6rSkOxpgF+9ayCmXUe+Jm7bBi6IIIFDF2HmzCsSA8IKIPjtzYy
-	 vqUXL/PRWiYVHhJKMQDXe+LpZ7bDavgxVmYjSYwsV4NqVBdnLJnwgUEnP9jySYJcMj
-	 UlvkUii28ef0E+WUplhkuFmFDfhE+PqklMByDsCChsqfuljh2qr6ywU/K+qtnnWyZy
-	 aaaXhGNFfTCa6SGlKE6Cz/VqFo4RwngUUKGxQ6a30H5DdMlCF9ksxaqQXcnOfoRwXX
-	 NWfU0nIwFHXfw==
-Date: Wed, 16 Aug 2023 19:15:53 +0100
+	b=QK3Ss4gYQANpF0kfjVDMhwPaCBnN7jcXmU+ud+rNTZoFKIrBrSXEwPGVGIBxSuBVa
+	 WPNXG6eJZ3FhK9KAyp3GfSYJ/zb+pE+4rCQknlaNheucXLhnJ67mh3RWIhFfKZTGL8
+	 uXPBJpIcABURnESDC2XbooGsuC9LHy75ijzMgREdvGtpEQg9D9hhP7mVnrfKs6wg5o
+	 GOpKTl8nyoHQ5Shobze8RiECk2mqQteHONzc9PyVM6x2gHC7QohvJDw2aydMjS7K0r
+	 di+cOUZk4aPspJCVQsxXx0I5aMt2LWQ+6+xgwfkyKddkNk49YFt7sLHwaNqVbtpCJJ
+	 jeHDFcRu2mgxQ==
+Date: Wed, 16 Aug 2023 19:26:12 +0100
 From: Mark Brown <broonie@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
@@ -39,11 +39,11 @@ Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
 	linux-arch@vger.kernel.org, linux-mm@kvack.org,
 	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v4 18/36] arm64/gcs: Context switch GCS state for EL0
-Message-ID: <28a61b5f-db65-427e-8e92-60dd61549da5@sirena.org.uk>
+Subject: Re: [PATCH v4 07/36] arm64/gcs: Provide copy_to_user_gcs()
+Message-ID: <60eeefc9-96db-4d4a-b0e4-751cba540471@sirena.org.uk>
 References: <20230807-arm64-gcs-v4-0-68cfa37f9069@kernel.org>
- <20230807-arm64-gcs-v4-18-68cfa37f9069@kernel.org>
- <ZNZUerbrJmzqZzJw@arm.com>
+ <20230807-arm64-gcs-v4-7-68cfa37f9069@kernel.org>
+ <ZNZjdXTJw2p5vh7C@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -51,67 +51,47 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="w/BKAb+ClmJrMdeD"
+	protocol="application/pgp-signature"; boundary="tm7DmRva30JRxCzT"
 Content-Disposition: inline
-In-Reply-To: <ZNZUerbrJmzqZzJw@arm.com>
+In-Reply-To: <ZNZjdXTJw2p5vh7C@arm.com>
 X-Cookie: Old soldiers never die.  Young ones do.
 
 
---w/BKAb+ClmJrMdeD
+--tm7DmRva30JRxCzT
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Fri, Aug 11, 2023 at 04:32:10PM +0100, Catalin Marinas wrote:
-> On Mon, Aug 07, 2023 at 11:00:23PM +0100, Mark Brown wrote:
+On Fri, Aug 11, 2023 at 05:36:05PM +0100, Catalin Marinas wrote:
+> On Mon, Aug 07, 2023 at 11:00:12PM +0100, Mark Brown wrote:
+> > +static inline int copy_to_user_gcs(unsigned long __user *addr,
+> > +				   unsigned long *val,
+> > +				   int count)
 
-> > +		gcs_free(current);
-> > +		current->thread.gcs_el0_mode = 0;
-> > +		write_sysreg_s(0, SYS_GCSCRE0_EL1);
-> > +		write_sysreg_s(0, SYS_GCSPR_EL0);
-> > +	}
-> > +}
+> I think it makes more sense to have a put_user_gcs() of a single
+> element. I've only seen it used with 2 elements in the signal code but
+> we could as well do two put_user_gcs() calls (as we do for other stuff
+> that we push to the signal frame).
 
-> Do we need and isb() or there's one on this path? If it's only EL0
-> making use of this register, we should be fine with the ERET before
-> returning to user. Not sure whether the kernel uses this, GCSSTTR
-> doesn't need it.
+Right, it's just the two element array in the signals code and the one
+element for the context token in map_shadow_stack().  I can refactor to
+a single read/write operation, I'd originally written it that way but I
+wasn't thrilled with either writing a load of fun macros to mirror the
+way vanilla put_user() is written or having code that looked very
+different to the other similarly named functions were done.
 
-They're only used by EL0, at EL1 we do read GCSPR for signal handling
-but AIUI that shouldn't be any more of an issue than it is for the
-TPIDRs which we don't have a barrier for.  It's possible I'm
-misunderstanding though.
-
-> > +	/*
-> > +	 * Ensure that GCS changes are observable by/from other PEs in
-> > +	 * case of migration.
-> > +	 */
-> > +	if (task_gcs_el0_enabled(current) || task_gcs_el0_enabled(next))
-> > +		gcsb_dsync();
-
-> What's this barrier for? The spec (at least the version I have) only
-> talks about accesses, nothing to do with the registers that we context
-> switch here.
-
-Right, it's for the GCS memory rather than the registers.  I'm fairly
-sure it's excessive but but was erring on the side of caution until I
-have convinced myself that the interactions between GCS barriers and
-regular barriers were doing the right thing, until we have physical
-implementations to contend with I'd guess the practical impact will be
-minimal.
-
---w/BKAb+ClmJrMdeD
+--tm7DmRva30JRxCzT
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmTdElkACgkQJNaLcl1U
-h9AWogf/YEdfvtUHD2e4VQoupNYTIQwE4lzBKY5h7rikxnt03b6khOwEnmScy/XC
-1TB3W5zmAGwyJdWCumepeAk5BTRzsKZWV9cdvP0YvcmTlzMqj/1ueNfpHfEu0NQs
-Udxb7QLhxyd8wdlIZn+ycumv7YnckO8stcBNRbenMRsLqKpTsXlM3zcsul9zvSPK
-zWPmyj/57XvYpeEmXgL+2zyLRmGfWEQB97ImfCgO0EkoAxFA6TUugdIAa6g0DWoO
-hZKEu0+mqQUN0RTXOLAqYQXJLGD2lVzT5G3L8HTPyR2GNZIruqNzD+8ZkhSSMm51
-QjFuF+aVfUlZwpNuSsl7bhqHNJmB5w==
-=8c8E
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmTdFMMACgkQJNaLcl1U
+h9DYQQf+Nxve6dTX12KVeA30x+OuPZrZ9604olhrpuQpYtFjAW9Y1s1V/zuJQfpi
+m2RUZwNwL8KLj0HHROEn6zCjxEWEgWDmYL0jocaZPRXfaXYATOaeKq/4ZNuZPTz0
+T8WOwgOm1V+Oojr0s9tTF3eeU+TbqH2Pjn54/5nAm3/ZO3A3K/NA3aG1qVRgUg30
+KC4cwnyO6b+WqMiy4HglvqDJiCFZXFEw8yTpaLuznzdX/t6qZ+XIkuiqDKn/ek2M
+Gzey1zWBfgdiqCsZDxAb+7rOoEnnyLh8qxMRQWzZCCEb2y/qihOUuFcyPsimZ8mU
+avhuox/i9muYxS6uDyrWVVaaN2t4bg==
+=OnPi
 -----END PGP SIGNATURE-----
 
---w/BKAb+ClmJrMdeD--
+--tm7DmRva30JRxCzT--
