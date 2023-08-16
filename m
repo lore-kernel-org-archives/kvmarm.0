@@ -1,181 +1,152 @@
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2114.outbound.protection.outlook.com [40.107.220.114])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 959DE322A
-	for <kvmarm@lists.linux.dev>; Wed, 16 Aug 2023 03:31:27 +0000 (UTC)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EHvq2hpkn/wHeEHsoFMy2ShuV/K2gH7aoA+7RI7cxkZEQny3sRdLpxO32vtpuIC9kKG6LODkEB4eVr0JgNkUJ02OKprz8U154NMU1gfdH5nhKLbPb3vJzwiTR4QI52OsTpztqpdhpPKhQcH5WkOqj2j1VoQWiEEXTE8xR8/b+q/ZBPjsEswBGfb03JHT19OFfBPI6nKcHfaf9CD48b13ecWgc/DaiwCfUNETj4LH9dCnNKCRu3N5bMuFs73cRtV9GWZoq/66d2TP46xqQgJUE+wZWttxWfgZ0DdOHbHu5HSmDtiCwxwIP2Z0QFc64qDbYnQ9/nNypDymIJtSmsc7VA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MUX68QX/R4Qpazayrgd2WmfL9cMWPrKWZO7pmGEdogg=;
- b=Zm2V6pXNW9yfhT0aCLEEHJauJ1uvgphf+ZJCx8n4ghHN6O6LnmVLOWNjKwo4n9+bci5C1pWL2GeCfJtKx3n1LIadM5OPUMJW2+tfxYz4TSonFLD/DNSU/MCX+BR9uJtRk6k+FgOMkaePeyZzQNmANc+Ar+HKrLoB0o8hbxnJREhO8uLPHfpMG0CkG0olbLGkoT4Ss1rV7/fd538Cf/phZLjoflMWQ7neBuqOz8xc5mRyBngcZHh6P27lFO7SKvCXiZJts54UzDv67jczlPbvXAuiqNznAOULKdDC/YDC6xAiubtPUwgtJupm4pT/N7fzMKqSGm41cA85p9bAQ3v08A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=amperemail.onmicrosoft.com; dkim=pass
- header.d=amperemail.onmicrosoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amperemail.onmicrosoft.com; s=selector1-amperemail-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MUX68QX/R4Qpazayrgd2WmfL9cMWPrKWZO7pmGEdogg=;
- b=hH8MQ6qi9nupPUk9SOll9CENm7NhIhmWrhNPCSDWrupTrp5K2tx/Js1s1KBJje2fV7JEybGVIElaeyT36yeUEaTRq8GRKuQF7UmZqW3BycSZ/KwByGEXIx8QDr6NOYUG8PLMqTrrZoP/qvTsBY3IdmQhz+e8xEzYhPRUXLMMuio=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amperemail.onmicrosoft.com;
-Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
- PH0PR01MB6358.prod.exchangelabs.com (2603:10b6:510:12::18) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6678.26; Wed, 16 Aug 2023 03:31:23 +0000
-Received: from DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::d62f:d774:15b0:4a40]) by DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::d62f:d774:15b0:4a40%4]) with mapi id 15.20.6678.025; Wed, 16 Aug 2023
- 03:31:22 +0000
-Message-ID: <71a7f15f-e81e-a529-b7fe-fb020ebeca91@amperemail.onmicrosoft.com>
-Date: Wed, 16 Aug 2023 11:31:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH] KVM: arm64: pmu: Resync EL0 state on counter rotation
-To: Leo Yan <leo.yan@linaro.org>, Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- Huang Shijie <shijie@os.amperecomputing.com>,
- Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>
-References: <20230811180520.131727-1-maz@kernel.org>
- <20230814071627.GA3963214@leoy-huanghe> <87leecq0hj.wl-maz@kernel.org>
- <20230816030412.GB135657@leoy-huanghe.lan>
-From: Shijie Huang <shijie@amperemail.onmicrosoft.com>
-In-Reply-To: <20230816030412.GB135657@leoy-huanghe.lan>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: CH0PR04CA0089.namprd04.prod.outlook.com
- (2603:10b6:610:74::34) To DM8PR01MB6824.prod.exchangelabs.com
- (2603:10b6:8:23::24)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C65891840
+	for <kvmarm@lists.linux.dev>; Wed, 16 Aug 2023 06:54:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1692168861;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VgxVBCPXJnsNLI+46xSarM00ICOkVY08GNNNdoBDjSY=;
+	b=EU7OUBkFv/mdgYOzep8HRi9BXNUVVwcqiwe8MdSIualAjZXNq9Y8xiF8SNzMAGRY6NtPVe
+	PwV+fulbF94hAHYXwSBx1QuGzReunuE+b+nrNs0jVGehvCHh+NNYOsxa0+L4y9+HPEyyvM
+	m2vCCankaejbi9Ogd9GGeaLV7Oa2Lyc=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-312-mnr8J3f0NluoG2uuf38fDg-1; Wed, 16 Aug 2023 02:54:20 -0400
+X-MC-Unique: mnr8J3f0NluoG2uuf38fDg-1
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-26b5bd44ae5so680059a91.1
+        for <kvmarm@lists.linux.dev>; Tue, 15 Aug 2023 23:54:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692168859; x=1692773659;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VgxVBCPXJnsNLI+46xSarM00ICOkVY08GNNNdoBDjSY=;
+        b=Vn/svesQbMZ4HPKJIAk1oP77TDIGpUAippFyHH5XGVmt2LHFcoGxfIz5R1nlPj2vrp
+         Mezo81VONCwHA/UA7L/gPBvk/eSNPc5hDz+N+u2EbBF0TFaN2e8KFqI95Nshw3xo4JxO
+         n07Nvx7l2xWJff77mJOxhd7d9dVFAh9Foc5IDjd4GxboGDu/M+pDr9ZgbPCn8+CBm1mZ
+         Ew4yZJJQUA06FL3gmpMDEV3aD9K+LUyfx2cADuEZgUmQ6DW1pKTl1IrEj4kIhLDT/pCV
+         CPWpV+SF7dWQU6pouwJF7uIQKZ16ewjXsMboYrv0A4nbOYuuJur8MhZTEPRVivOukiDl
+         3vIg==
+X-Gm-Message-State: AOJu0YwOsgF+pLTmX8RQYP+22Y6pG6cgBdQHftJL/1RHpV67rCqcAVn/
+	w/z0voUt/SaSoY2xQ06LmP1Ph90ZihuXBi6SmUob6/fpOdHo5xvKzuJ9vUdszOg4Y5IsNV7sKJP
+	2UH06YEuPFq8FT5zv
+X-Received: by 2002:a17:90a:3ee5:b0:26b:27f6:90cc with SMTP id k92-20020a17090a3ee500b0026b27f690ccmr770928pjc.2.1692168859071;
+        Tue, 15 Aug 2023 23:54:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEd1P04owTF2cdwpf0pccpR9NLO2ED6eD6S+SvhMYjVhqIN6dPlHq32ucBOvg9alBVH6mrqyw==
+X-Received: by 2002:a17:90a:3ee5:b0:26b:27f6:90cc with SMTP id k92-20020a17090a3ee500b0026b27f690ccmr770914pjc.2.1692168858740;
+        Tue, 15 Aug 2023 23:54:18 -0700 (PDT)
+Received: from [10.66.61.39] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id gk18-20020a17090b119200b00263ba6a248bsm12594305pjb.1.2023.08.15.23.54.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Aug 2023 23:54:18 -0700 (PDT)
+Message-ID: <eaa2519e-15b3-2fd4-199e-8e3368df7e0d@redhat.com>
+Date: Wed, 16 Aug 2023 14:54:13 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM8PR01MB6824:EE_|PH0PR01MB6358:EE_
-X-MS-Office365-Filtering-Correlation-Id: 41c3bde3-bb64-442e-a5c3-08db9e094359
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	jahPFgXNu7EGUSwfQiwD/Ku/iX8WW4DEwVJJv2KUBnaPL+ts1YvUtJoCKjiWnRoZHKq0dYyucQjNXmIQE/ns5zLG2jKGCm3OJPAFPv2BOiu/ASObeqvaUuM6Wg45TribWJ7gDz/VwDIhwGm3OYJhXEd574NtjHgs7/w4y85aMcYIQukLFJG6rC3YVAM074U52W8GyfkFOwZJjTAwY4aQO92ZrjhFOAe1LJxK7gr41jEqC/va3jNEhgnuA4udDxMuW2Z5dynX2i2kBMiis+mZbEwJQ3PocT8B1ED1DxMiff5W54XPf4nACeTi0ue+H3UyZLkpfmOVW4wdtHagXPBs+l9rkPAxtjGODZmjVFpbTeD+ivHWmzozYkr3EsikyNQ2AO3os09B90PfLYsLZgURsCojpm+bRMqhkWQIff7Yj2sSH4qewARlU3767KTQ7s8qYlCyoB/nXdXCSqU5oNTTWlFgCX7qkVBRmWeCK0kQa/t8SdCpJiZfs/L9zpRIAUKKJDq8jg+kwM6F3HxU4PWWtD+DhXMPyntdwnKzADzB+aIZ1uqaGEpKyGGYHxdNsQCLZieihDGvDajBpthTzOQuE0hNv3Nd4CSIXdqrvztvqpgpW0i8UbuB88pMKPxfPuRxjj27ACTfMV6v8PYm9Y7eXA==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR01MB6824.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(396003)(39850400004)(346002)(136003)(1800799009)(451199024)(186009)(6666004)(54906003)(31686004)(42882007)(66476007)(66556008)(66946007)(6512007)(6486002)(6506007)(2906002)(478600001)(26005)(110136005)(7416002)(5660300002)(2616005)(83380400001)(41300700001)(316002)(52116002)(8936002)(4326008)(83170400001)(8676002)(38350700002)(38100700002)(31696002)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?a0tmcWFpMVpRbEltdzV6YXVZQUR4akR0UDNna2NaOFZ3TVN5QnBBYURGVDI0?=
- =?utf-8?B?amJ2Qkc5c2Q5ZXc1SVJyWi9iSElaQ0N5U1hMcHdUOGhQNFYyakJtRDI4dVY3?=
- =?utf-8?B?dE9hamhiNkpjZjR0RXluTk1qL2ZndzFhN2tGa3NEbzUwSWxjYXFlMEgyRWFq?=
- =?utf-8?B?cXYzUFJ1R2c2RXNUWkZxbksycmdUQndXejlDOEpERkptZnRFMFg4QkJhY0hj?=
- =?utf-8?B?WURrb2tGVDUzYmRBc3FibDFrd0FzWjJTZ0lVYSsxUVpSbjJ3UWw2S0c1Q2Vs?=
- =?utf-8?B?aDFCbVJFdzZKYmVqT0pVZysxYXhiNy94QVF4R3NnTGhIeUZNbjRJZWRac1hU?=
- =?utf-8?B?U1dSTTAwUk9rRmlkUUJ1ZXdTeXFJV2h4RjZwdzhLcWpoUDUySldxYzZQUEgv?=
- =?utf-8?B?aGl3Z2hzRDNka29HWFpCdXRZVEdLSEFHd21XZGQxMEFUZFc1K2tnekJwZ2Jw?=
- =?utf-8?B?V0ViN29YYzFDbS84bXFkR2tHMGg4a0JubS9zSC9Wb00zY1d6b2ltWDRBY1k5?=
- =?utf-8?B?ZVJMZU1tOXI1S1FMVXBOUHlzZ2RXTDJYR2tzOTVwNjZvSVJlMlUwMTBRNVNa?=
- =?utf-8?B?M3JXT3AvaitvcDVsMUFSR3JQSVFOK1RLVGt0S29WTlFKbkFGR1dVODZabFNk?=
- =?utf-8?B?cnhmVnl6allyc2Q1dTRtVDBiVjVMVUIxN0huTk41eUFTcmJDbE1ad3hXOUNE?=
- =?utf-8?B?TnZtYUUvdTI0YS9neDFHdHhRY2JNa2tQSEprU09IeWplU21iWnhyTFM1aGVz?=
- =?utf-8?B?RU5hVzB1SGxzUWswY2M0OHNEMGlBOWFlcUtrY1Z2OUdpQkFHV2RuWklDWnZs?=
- =?utf-8?B?SnRpemtzKzZjR0lwN2VaNytwQ3Uxa2pLZEwxNnZoSDZ2aWZNUW5JSzY3bWlR?=
- =?utf-8?B?VFNEUmw3QUFSeTdPU2FIVGpqWFJSTmY1ZmRBN0FiUXIrQkZMRXBYUzAweHNO?=
- =?utf-8?B?Z1JMNHAwK0FCYjQ1ZjBOYW1WTFR3YTA1QUlTRDU4RjdnNzVzeXZGK01QWFkx?=
- =?utf-8?B?ZzhNVVR2OW9hMXcwRU03eXBqb3pDUnhPaUlMejhqdUJrQTF4TDNUOG95TENw?=
- =?utf-8?B?T1lNZXVnTGhWbmJrUms3ZWNFc0ZlOEg4NzhvOTRiVWtFbnVsNE1XTXZ5Y0hR?=
- =?utf-8?B?a3RiUmoxOG5kN0ZSWVR6QUg1RE1FMGY4YUNrT0lwdVZNVXd6M3V6OGJnY0sx?=
- =?utf-8?B?VkZ1dGZTN1ZHRFEvUTFKN1Q0bjNlU0dnVVFycHNnUnpjR2JaWmhvc1BoRVVX?=
- =?utf-8?B?cjRxdnJpTEQ0M2E0bWFxWXYzNm1RUXZDejZSaC9KSnQvdFNSVmtwV3FYTzF5?=
- =?utf-8?B?WUR1aXU1UlVLUnQzdzJWKzErV1FDNU1QcVVWYjJSdTVXL0VhRWJxVE5odzV6?=
- =?utf-8?B?UmdTdm1ZRE5hZE81UEFTRzBuUHlCWlhjeXNKM2JPTURUSlUxRUVBZnNiUzdM?=
- =?utf-8?B?SDNuMitEeFdHSjVNSUQ5SDR2YlBOK21ldW12V2pMY1BTbHNqRVh3Z0EwSCtB?=
- =?utf-8?B?Y0RGUHNoZzJLbGsxS3plNGpMNm45NHFsMHl0UXJHWnZ5TXlYdGQ3bmJ2NmRS?=
- =?utf-8?B?Mm5Xd3ErZ0tVQ0phbnlIa3gzbE0vWWFzT2NIWXNxRGVIMXByK2JXR3Ewenpw?=
- =?utf-8?B?NzNiYVF2RVBnRVZ2UlpFS0pxUXgvb3pRdUxnTWRzRGU4emdENkJIdzM4amNv?=
- =?utf-8?B?RWpKd081WUNPUXVjVG1zMnkzbG9DKzV1d2dDenhiNHJHV0I2ODZ1b0NKMVZs?=
- =?utf-8?B?UmFYa1RvRHBVUnQwd0ZhZG9vV29MMXlET2p6bnpNZ0NBS2VwVXc0bTdqVW1W?=
- =?utf-8?B?MkxBM2VlT09WdkpGSlNLVktPd09PM2l0N2dEWDJhdWlHQXVGcXhQT2dOVjhN?=
- =?utf-8?B?Tk5rUFFtQTlWSlNXZFVHQ2JXVDgzaENYU0NWYVllRU5rbmhocHpWYlhDN0tr?=
- =?utf-8?B?UkZBaFppbGpKM25zME9HU3hScUg0dVVMZzJ6c0NlZ0xkMy85SC9OTTZTN0xw?=
- =?utf-8?B?Z21LS1JydEdIdUdaODNkU0NTUG45dHk4enlkd0plMXM0S1Q3UTdMcFdES1lU?=
- =?utf-8?B?WjlmVEVoVmdWVmNWZ1B6dmRrRXFHYXYvRE1oNXBhS0ZDMXg4Y1BDS3hEaWRa?=
- =?utf-8?B?c2pMTjBwYm85SEVyL09HVDlGc3lTMWhVTEVwUHZlS1F2VDdHWlJmYmxmTU92?=
- =?utf-8?Q?qRAa5NJdPzREP4vET91Hi/0=3D?=
-X-OriginatorOrg: amperemail.onmicrosoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 41c3bde3-bb64-442e-a5c3-08db9e094359
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Aug 2023 03:31:22.6683
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NnJNEqJ2Vj/iUxj1GFepStwNpn/Euotcytu+Sm+SivtS9EChFvDHC05Zf8zdAhvQQ3gOILsDtO9pL9Mfi2SqaJdBledDFxemcSc+SilhsR9Iz0q6C05pTpgF2aYVfmtA
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR01MB6358
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v8 10/11] KVM: arm64: selftests: Import automatic system
+ register definition generation from kernel
+To: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+ KVMARM <kvmarm@lists.linux.dev>,
+ ARMLinux <linux-arm-kernel@lists.infradead.org>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ James Morse <james.morse@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>,
+ Reiji Watanabe <reijiw@google.com>,
+ Raghavendra Rao Ananta <rananta@google.com>,
+ Suraj Jitindar Singh <surajjs@amazon.com>, Cornelia Huck <cohuck@redhat.com>
+References: <20230807162210.2528230-1-jingzhangos@google.com>
+ <20230807162210.2528230-11-jingzhangos@google.com>
+From: Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <20230807162210.2528230-11-jingzhangos@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Leo,
+Hi Jing,
 
-在 2023/8/16 11:04, Leo Yan 写道:
-> On Tue, Aug 15, 2023 at 07:32:40AM +0100, Marc Zyngier wrote:
->> On Mon, 14 Aug 2023 08:16:27 +0100,
->> Leo Yan <leo.yan@linaro.org> wrote:
->>> On Fri, Aug 11, 2023 at 07:05:20PM +0100, Marc Zyngier wrote:
->>>> Huang Shijie reports that, when profiling a guest from the host
->>>> with a number of events that exceeds the number of available
->>>> counters, the reported counts are wildly inaccurate. Without
->>>> the counter oversubscription, the reported counts are correct.
->>>>
->>>> Their investigation indicates that upon counter rotation (which
->>>> takes place on the back of a timer interrupt), we fail to
->>>> re-apply the guest EL0 enabling, leading to the counting of host
->>>> events instead of guest events.
->>> Seems to me, it's not clear for why the counter rotation will cause
->>> the issue.
->> Maybe unclear to you, but rather clear to me (and most people else on
->> Cc).
-> I have to admit this it true.
->
->>> In the example shared by Shijie in [1], the cycle counter is enabled
->>> for both host and guest
->> No. You're misreading the example. We're profiling the guest from the
->> host, and the guest has no PMU access.
->>
->>> and cycle counter is a dedicated event
->>> which does not share counter with other events.  Even there have
->>> counter rotation, it should not impact the cycle counter.
->> Who says that we're counting cycles using the cycle counter? This is
->> an event like any other, and it can be counted on any counter.
-> Sorry for noise.
->
->>> I mean if we cannot explain clearly for this part, we don't find the
->>> root cause, and this patch (and Shijie's patch) just walks around the
->>> issue.
->> We have the root cause. You just need to think a bit harder.
-> Let me elaborate a bit more for my concern.  The question is how we can
-> know the exactly the host and the guest have the different counter
-> enabling?
->
-> Shijie's patch relies on perf event rotation to trigger syncing for
-> PMU PMEVTYPER and PMCCFILTR registers.  The perf event rotation will
-> enable and disable some events, but it doesn't mean the host and the
-> guest enable different counters.  If we use the perf event rotation to
+On 8/8/23 00:22, Jing Zhang wrote:
+> Import automatic system register definition generation from kernel and
+> update system register usage accordingly.
+> 
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index c692cc86e7da..a8cf0cb04db7 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -200,14 +200,15 @@ ifeq ($(ARCH),x86_64)
+>   LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/x86/include
+>   else
+>   LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH)/include
+> +ARCH_GENERATED_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH)/include/generated
+>   endif
+>   CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
+> -	-Wno-gnu-variable-sized-type-not-at-end -MD\
+> +	-Wno-gnu-variable-sized-type-not-at-end -MD \
+>   	-fno-builtin-memcmp -fno-builtin-memcpy -fno-builtin-memset \
+>   	-fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
+>   	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
+>   	-I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. $(EXTRA_CFLAGS) \
+> -	$(KHDR_INCLUDES)
+> +	-I$(ARCH_GENERATED_INCLUDE) $(KHDR_INCLUDES)
+>   ifeq ($(ARCH),s390)
+>   	CFLAGS += -march=z10
+>   endif
+> @@ -255,8 +256,16 @@ $(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S
+>   $(LIBKVM_STRING_OBJ): $(OUTPUT)/%.o: %.c
+>   	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c -ffreestanding $< -o $@
+>   
+> +ifeq ($(ARCH),arm64)
+> +GEN_SYSREGS := $(ARCH_GENERATED_INCLUDE)/asm/sysreg-defs.h
+> +ARCH_TOOLS := $(top_srcdir)/tools/arch/$(ARCH)/tools/
+> +
+> +$(GEN_SYSREGS): $(ARCH_TOOLS)/gen-sysreg.awk $(ARCH_TOOLS)/sysreg
+> +	mkdir -p $(dir $@); awk -f $(ARCH_TOOLS)/gen-sysreg.awk $(ARCH_TOOLS)/sysreg > $@
+> +endif
+> +
+>   x := $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
+> -$(TEST_GEN_PROGS): $(LIBKVM_OBJS)
+> +$(TEST_GEN_PROGS): $(LIBKVM_OBJS) $(GEN_SYSREGS)
 
-In the event rotation, it does mean the host and guest use different 
-counters.
+I don't this this really works. Since the $(GEN_SYSREG) is the 
+prerequisites of $(TEST_GEN_PROGS). Only when $(TEST_GEN_PROGS) being 
+compiled, the $(GEN_SYSREG) can be generated.
 
-Please read my previoust email which shows an example. :)
+But the fact is, the $(TEST_GEN_PROGS) is relies on $(TEST_GEN_OBJ), 
+which means $(TEST_GEN_OBJ) will be compiled before $(TEST_GEN_PROGS), 
+but $(TEST_GEN_OBJ) depends on $(GEN_SYSREG) again, at the time, the 
+$(GEN_SYSREG) hasn't been generated, so it will has error:
 
+No such file or directory.
 
-Thanks
+#include "asm/sysreg-defs.h"
 
-Huang Shijie
+I think the correct way to generate $(GEN_SYSREGS) is add a prerequisite 
+for $(TEST_GEN_OBJ), like:
 
+$(TEST_GEN_OBJ): $(GEN_SYSREGS)
 
-> trigger syncing, there must introduce redundant operations.
->
->
+Thanks,
+Shaoqin
+
+>   $(TEST_GEN_PROGS_EXTENDED): $(LIBKVM_OBJS)
+>   
+>   cscope: include_paths = $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) include lib ..
+-- 
+Shaoqin
+
