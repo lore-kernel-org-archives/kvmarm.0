@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24DAA14274
-	for <kvmarm@lists.linux.dev>; Thu, 17 Aug 2023 15:43:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0AA1C433C8;
-	Thu, 17 Aug 2023 15:43:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4606B1549E
+	for <kvmarm@lists.linux.dev>; Thu, 17 Aug 2023 15:53:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6A9BC433C8;
+	Thu, 17 Aug 2023 15:53:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692287016;
-	bh=ENSBmFTwAkmLWRSPDWXacvhCmkoWqWKBl83e4JjNB0g=;
+	s=k20201202; t=1692287589;
+	bh=ePXnfxRXUddVzI3u0tJHF8AuA23aR9K0higvYkyBCvQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Whf9CQf5w/JqP75xeV5sFKVekukqAQb4oKu36Ppo7n1Bpb+oWmc+2x+YYYhSrefbi
-	 jIaAF6dlggiE5szzkLNXzZASE4PSmupbZWZNYyywTf42ltabFnDWp/MXejy0CNS3In
-	 2qdZL4OBKZQQhZfsJWzTXWf58FasP8Bz0GG/KDnvaqACMdVu+UWyz+DcnbRFYQzJd1
-	 Cq+ggCibb73NqumzWvpRweyNf2OZ4SKPmOGJcdiDZmruOLhPzlKfZUxF74Nn/nKyu/
-	 9tGOqa9SA0SwR/bF80DfUyvMaU9DKAgaLnhneq6X9TaRxnMlUTl72GL69r/UdRpqyg
-	 OVy+zAZ3I4NxA==
+	b=UQtZQAlJ4JGiz4IhxhQb5YLJwnWQHCzW0Rl159gwLZNzqAGw7OCbZg0ZaEjdbr5mE
+	 leUuNax9c9s55u1mkv91DXirYSyuZbq4w8ezDYYThf8LEH4gc/oIeYFTLCVaoDLgSG
+	 stkVYgf3PiQnKUvJgm6FsEvomy0GZxHD+DpCyLCLizE0AzLL6VGt+xhSwLTvJkqzIS
+	 egP7xl9qEaueEzT7Q1jSleh97QSbJgrHNtRZMWhV29aN+Dm55ciQtbGgZB9L1t9OuR
+	 6eiZiIZ8MubHbZrBbfyBhpuxoX858pFVLtxRifxoN0GakjGykGta+xYRUZiV05AXGJ
+	 mCZWB0Jhn6UFA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qWf9p-005izV-FM;
-	Thu, 17 Aug 2023 16:43:33 +0100
-Date: Thu, 17 Aug 2023 16:43:33 +0100
-Message-ID: <86r0o1fzdm.wl-maz@kernel.org>
+	id 1qWfJ5-005j6p-FM;
+	Thu, 17 Aug 2023 16:53:07 +0100
+Date: Thu, 17 Aug 2023 16:53:07 +0100
+Message-ID: <86pm3lfyxo.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Jing Zhang <jingzhangos@google.com>
 Cc: KVM <kvm@vger.kernel.org>,
@@ -39,10 +39,10 @@ Cc: KVM <kvm@vger.kernel.org>,
 	Raghavendra Rao Ananta <rananta@google.com>,
 	Suraj Jitindar Singh <surajjs@amazon.com>,
 	Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH v8 05/11] KVM: arm64: Enable writable for ID_AA64DFR0_EL1 and ID_DFR0_EL1
-In-Reply-To: <20230807162210.2528230-6-jingzhangos@google.com>
+Subject: Re: [PATCH v8 07/11] KVM: arm64: Enable writable for ID_AA64PFR0_EL1
+In-Reply-To: <20230807162210.2528230-8-jingzhangos@google.com>
 References: <20230807162210.2528230-1-jingzhangos@google.com>
-	<20230807162210.2528230-6-jingzhangos@google.com>
+	<20230807162210.2528230-8-jingzhangos@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -58,49 +58,43 @@ X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.lin
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 07 Aug 2023 17:22:03 +0100,
+On Mon, 07 Aug 2023 17:22:05 +0100,
 Jing Zhang <jingzhangos@google.com> wrote:
 > 
-> All valid fields in ID_AA64DFR0_EL1 and ID_DFR0_EL1 are writable
-> from usrespace with this change.
+> All valid fields in ID_AA64PFR0_EL1 are writable from usrespace
+> with this change.
 
-nit: userspace
+userspace
 
 > 
 > Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > ---
->  arch/arm64/kvm/sys_regs.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  arch/arm64/kvm/sys_regs.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index afade7186675..5f6c2be12e44 100644
+> index 879004fd37e5..392613bec560 100644
 > --- a/arch/arm64/kvm/sys_regs.c
 > +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -2006,7 +2006,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	  .set_user = set_id_dfr0_el1,
->  	  .visibility = aa32_id_visibility,
->  	  .reset = read_sanitised_id_dfr0_el1,
-> -	  .val = ID_DFR0_EL1_PerfMon_MASK, },
-> +	  .val = GENMASK(63, 0), },
-
-For obvious reasons, this cannot be a 64 bit mask...
-
->  	ID_HIDDEN(ID_AFR0_EL1),
->  	AA32_ID_SANITISED(ID_MMFR0_EL1),
->  	AA32_ID_SANITISED(ID_MMFR1_EL1),
-> @@ -2055,7 +2055,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+> @@ -2041,7 +2041,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
 >  	  .get_user = get_id_reg,
->  	  .set_user = set_id_aa64dfr0_el1,
->  	  .reset = read_sanitised_id_aa64dfr0_el1,
-> -	  .val = ID_AA64DFR0_EL1_PMUVer_MASK, },
+>  	  .set_user = set_id_reg,
+>  	  .reset = read_sanitised_id_aa64pfr0_el1,
+> -	  .val = ID_AA64PFR0_EL1_CSV2_MASK | ID_AA64PFR0_EL1_CSV3_MASK, },
 > +	  .val = GENMASK(63, 0), },
+>  	ID_SANITISED(ID_AA64PFR1_EL1),
+>  	ID_UNALLOCATED(4,2),
+>  	ID_UNALLOCATED(4,3),
 
-What is the actual justification to go from "only the PMU version is
-writable" to "everything is writable"?
+Same remark as the previous patch. What makes it legal to make
+*everything* writable? For example, we don't expose the AMU. And yet
+you are telling userspace "sure, go ahead".
 
-Also, what about the RES0 fields?
+Userspace will then try and restore *something*, and will eventually
+crap itself because the kernel won't allow it.
 
-Thanks,
+Why do we bother describing the writable fields if userspace can't
+write to them?
 
 	M.
 
