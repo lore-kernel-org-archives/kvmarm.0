@@ -1,102 +1,94 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4606B1549E
-	for <kvmarm@lists.linux.dev>; Thu, 17 Aug 2023 15:53:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6A9BC433C8;
-	Thu, 17 Aug 2023 15:53:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692287589;
-	bh=ePXnfxRXUddVzI3u0tJHF8AuA23aR9K0higvYkyBCvQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UQtZQAlJ4JGiz4IhxhQb5YLJwnWQHCzW0Rl159gwLZNzqAGw7OCbZg0ZaEjdbr5mE
-	 leUuNax9c9s55u1mkv91DXirYSyuZbq4w8ezDYYThf8LEH4gc/oIeYFTLCVaoDLgSG
-	 stkVYgf3PiQnKUvJgm6FsEvomy0GZxHD+DpCyLCLizE0AzLL6VGt+xhSwLTvJkqzIS
-	 egP7xl9qEaueEzT7Q1jSleh97QSbJgrHNtRZMWhV29aN+Dm55ciQtbGgZB9L1t9OuR
-	 6eiZiIZ8MubHbZrBbfyBhpuxoX858pFVLtxRifxoN0GakjGykGta+xYRUZiV05AXGJ
-	 mCZWB0Jhn6UFA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qWfJ5-005j6p-FM;
-	Thu, 17 Aug 2023 16:53:07 +0100
-Date: Thu, 17 Aug 2023 16:53:07 +0100
-Message-ID: <86pm3lfyxo.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jing Zhang <jingzhangos@google.com>
-Cc: KVM <kvm@vger.kernel.org>,
-	KVMARM <kvmarm@lists.linux.dev>,
-	ARMLinux <linux-arm-kernel@lists.infradead.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Reiji Watanabe <reijiw@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Suraj Jitindar Singh <surajjs@amazon.com>,
-	Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH v8 07/11] KVM: arm64: Enable writable for ID_AA64PFR0_EL1
-In-Reply-To: <20230807162210.2528230-8-jingzhangos@google.com>
-References: <20230807162210.2528230-1-jingzhangos@google.com>
-	<20230807162210.2528230-8-jingzhangos@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51405F9D5
+	for <kvmarm@lists.linux.dev>; Thu, 17 Aug 2023 22:56:35 +0000 (UTC)
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-48c3033dd5dso102083e0c.1
+        for <kvmarm@lists.linux.dev>; Thu, 17 Aug 2023 15:56:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692312994; x=1692917794;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BSLdEl6y6GOOfZPMbAm1X61Kn+8pfMiX9JSO1SZgo7o=;
+        b=5NoykWtFZs/nE4I3lBUnYiw8vG/Lxi4lpTCwIXP9Vd9/i771DnYRDS2os0ZNipnaWb
+         J/bV+lTxxD5zZ0tcihzv2ldNIqhf7I8rkyG8vB/xIdERHohsp4qlpS3Zg4OulgeAOkUY
+         H1k4LA6D5Ik210rfMxa+bS/Ra9Wb2m81pwx1XoDYnPe0eMiF/Lvc4Y3PQl5OYEgEPkQp
+         uNItNwqxL0QwwI0yS9YInv5XwOICS6srvCZH9HM1clWul02Rn0Dm7NkMQrnw8s1LW4d6
+         HP9hdSNEuitv717sxOba6a4ZvRRH/74xm+2YPwWIHhAORW6Fdpspo69HaUCS21Hbf+9P
+         kxzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692312994; x=1692917794;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BSLdEl6y6GOOfZPMbAm1X61Kn+8pfMiX9JSO1SZgo7o=;
+        b=LUBxCd8vj9GL6MiSlFXaHLDX5OpR1VCSiETzIY6zO7bPlcSiifQhrNLOOxMvWC5NpQ
+         y3ibH3CxC7NdsK58dvYowjBmJVwwIqL9RLCYqIjr+ilW8/xk2o81LkhetbdtAXZQcpWP
+         eXDLy9Byx2MDcSC/HWzF5pYTgXSp/epRZEulx2vfnVKf5x5PSVM/euYd+zICRRJuvksk
+         l+CQzuhhm9FFIQ7XuBnVqnlII7P2faYyQCNp21DEaXp2ZUztOqzeLvgeegGag4Qlbt3v
+         GEAL1FkSxXpuLG4pm74RbqmMmNbAW1tvFbampG4U4yJtZXwDaxdM0JOtszuVPCdti3lH
+         Ar+A==
+X-Gm-Message-State: AOJu0Yx9a1uRLEvVXm0bc6L119Z+7hBgO/2cxV19y3weqNuNi0TktfVD
+	KrLZfCDr0iiKmPWgFZCMqsBtOvTcaY2wCSpMN7srrQ==
+X-Google-Smtp-Source: AGHT+IGkWl3rmU94+T9hxKzfbEmuqRQAzMVxf+uGv14pXl2VnZW9ME0ok1IGyiWl2bNae6I1GG4wPagS3SshCxRT+nY=
+X-Received: by 2002:a1f:5f05:0:b0:487:1774:405e with SMTP id
+ t5-20020a1f5f05000000b004871774405emr1366806vkb.11.1692312993986; Thu, 17 Aug
+ 2023 15:56:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, reijiw@google.com, rananta@google.com, surajjs@amazon.com, cohuck@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-4-amoorthy@google.com>
+ <ZIn6VQSebTRN1jtX@google.com>
+In-Reply-To: <ZIn6VQSebTRN1jtX@google.com>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Thu, 17 Aug 2023 15:55:58 -0700
+Message-ID: <CAF7b7mrDt6sPQiTenSiqTOHORo1TSPhjSC-tt8fJtuq55B86kg@mail.gmail.com>
+Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 07 Aug 2023 17:22:05 +0100,
-Jing Zhang <jingzhangos@google.com> wrote:
-> 
-> All valid fields in ID_AA64PFR0_EL1 are writable from usrespace
-> with this change.
+Documentation update for KVM_CAP_MEMORY_FAULT_INFO
 
-userspace
+> KVM_CAP_MEMORY_FAULT_INFO
+> -------------------------------------------
 
-> 
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 879004fd37e5..392613bec560 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -2041,7 +2041,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	  .get_user = get_id_reg,
->  	  .set_user = set_id_reg,
->  	  .reset = read_sanitised_id_aa64pfr0_el1,
-> -	  .val = ID_AA64PFR0_EL1_CSV2_MASK | ID_AA64PFR0_EL1_CSV3_MASK, },
-> +	  .val = GENMASK(63, 0), },
->  	ID_SANITISED(ID_AA64PFR1_EL1),
->  	ID_UNALLOCATED(4,2),
->  	ID_UNALLOCATED(4,3),
+Old:
+> -The presence of this capability indicates that KVM_RUN may annotate EFAU=
+LTs
+> -returned by KVM_RUN in response to failed vCPU guest memory accesses whi=
+ch
+> -userspace may be able to resolve.
 
-Same remark as the previous patch. What makes it legal to make
-*everything* writable? For example, we don't expose the AMU. And yet
-you are telling userspace "sure, go ahead".
+New:
+> +The presence of this capability indicates that KVM_RUN may fill
+> +kvm_run.memory_fault in response to failed guest memory accesses in a vC=
+PU
+> +context.
 
-Userspace will then try and restore *something*, and will eventually
-crap itself because the kernel won't allow it.
+On Wed, Jun 14, 2023 at 10:35=E2=80=AFAM Sean Christopherson <seanjc@google=
+.com> wrote:
+>
+> (B) is the trickiest to defend against in the kernel, but as I mentioned =
+in earlier
+> versions of this series, userspace needs to guard against a vCPU getting =
+stuck in
+> an infinite fault anyways, so I'm not _that_ concerned with figuring out =
+a way to
+> address this in the kernel.  KVM's documentation should strongly encourag=
+e userspace
+> to take action if KVM repeatedly exits with the same info over and over, =
+but beyond
+> that I think anything else is nice to have, not mandatory.
 
-Why do we bother describing the writable fields if userspace can't
-write to them?
+In response to that, I've added the following bit as well:
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
++Note: Userspaces which attempt to resolve memory faults so that they can r=
+etry
++KVM_RUN are encouraged to guard against repeatedly receiving the same
++error/annotated fault.
