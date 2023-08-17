@@ -1,115 +1,155 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2130.outbound.protection.outlook.com [40.107.244.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F5E803;
-	Thu, 17 Aug 2023 05:04:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692248664; x=1723784664;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=eGAo3CKDuFdSelabgpUj3MV0KM14lEa4HJoAlNa67+w=;
-  b=ZkPPeJZu5A3e5LlSGW8Tr3Y2NxswKtJadDXBRzH7fuqfVtfJ16x+Bm6/
-   5wD9Dde60XGcFspKMIsGUuE/9rNyJDdzwnJf5c4X/E+fzxkT1W192ZOBM
-   9NZXH5zIC9OBmZDWvHWdvTY0WxaZOp4x/JeHUtQuNAWKpieBlRtT0sO+j
-   uyKrHP2RJXTtXDVh0iONHq2PAWqOrYe7fiwuAYaQojRWNib08DgvkBFZy
-   RZl3RZx+6iSlpsDdX2OABxNmNT/d6nC6HkU+ahGkDdxCWY24vjThMSovo
-   cyg34PIk6mi506Bks0BobuKmk7eEzzQZgwH3sgJ4NKVErv+r2Xc9YAFBx
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="372712793"
-X-IronPort-AV: E=Sophos;i="6.01,179,1684825200"; 
-   d="scan'208";a="372712793"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2023 22:04:22 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="763895792"
-X-IronPort-AV: E=Sophos;i="6.01,179,1684825200"; 
-   d="scan'208";a="763895792"
-Received: from lkp-server02.sh.intel.com (HELO a9caf1a0cf30) ([10.239.97.151])
-  by orsmga008.jf.intel.com with ESMTP; 16 Aug 2023 22:04:17 -0700
-Received: from kbuild by a9caf1a0cf30 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qWVBB-0000o6-0C;
-	Thu, 17 Aug 2023 05:04:17 +0000
-Date: Thu, 17 Aug 2023 13:03:28 +0800
-From: kernel test robot <lkp@intel.com>
-To: Raghavendra Rao Ananta <rananta@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Marc Zyngier <maz@kernel.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Shaoqin Huang <shahuang@redhat.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Reiji Watanabe <reijiw@google.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	Raghavendra Rao Anata <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v5 02/12] KVM: arm64: PMU: Set the default PMU for the
- guest on vCPU reset
-Message-ID: <202308171212.KW8LnRRC-lkp@intel.com>
-References: <20230817003029.3073210-3-rananta@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64AC5395
+	for <kvmarm@lists.linux.dev>; Thu, 17 Aug 2023 06:03:37 +0000 (UTC)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JulC2HBUDFXOOlRmXUrsqZK9IQ5hvus4mmskRAWUZnGEubO5yQ42CtEwUFxiupCf7iz0BK3Q2QkXvKsW+eCIA4wSDylB7uU5lY7xpNtzk+5ygD0IGeshVFbroFmtkc43wS3wUCrqSc6LI2XFZ+UII9mj2g3P5LfQOHQX/VVf2tzfWknT1GqG+ybnIs3qP/+3bHMobyPuBbzod/GmRNYr6cFTDpCcvNN6kL13PyZIxfqTsJMjHU6m+1A6twxgbbhOrNK8GnsELBaDJ0Ug9tIvEfBCnT/P3UTPT0N8SDA7vwiFeeJiCHvYow/BD5wFtpOm5njOIyfmDXL8lvucsympXw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cOZw2EURdLDxgbCFLA4cIfp5eTLsDkKifig5lfBXwNI=;
+ b=YMxFpSv8luoj1jMg0jmLalUJ0QRFF9anLhKOH1ffNyw2IJnzMymGLoJvCvo+w8ki5sbhOL8a+vnY7GKKFKWzLwKoQ2Y/zIysMDCCvC+UPGHW+o32/XV990BsiI9G+S+aeXybFnQXyLtoY7v8mKXbDM3AQRESz08XrbedeMzkXYl+zrt5dM7E+VuA5lvMDwuON4w8GsDc4dRaHCK6s3KhqUG1w6Og4dAH/rz/QrHjiehVBH74o5g2djCKJZqY2/OaUptmIHePz7jtPzsICc4IS7dALxHVwntv0XUrCKO4lA8ea/tfbMDyQnox7Ik/j3LL8yXkEgH5DmBaTc8ghMDOQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cOZw2EURdLDxgbCFLA4cIfp5eTLsDkKifig5lfBXwNI=;
+ b=f/WgRTxHA4M7ZyoQ3dSckLUyN88M2KO30vAtODYV01fjTjBVtQ8u0CasY6H4bDHiw+HbbvDZeUk1lk2h+FmCMLYG2dGtfCXKSN/ZMIQBhs8e37dQqCBrnFc5cUrx95iK71/gTo9OIjr9MoH37ktwIEHEw1EvdfO3TUilripkARw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
+ SA1PR01MB6592.prod.exchangelabs.com (2603:10b6:806:185::20) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6678.31; Thu, 17 Aug 2023 06:03:35 +0000
+Received: from DM8PR01MB6824.prod.exchangelabs.com
+ ([fe80::d62f:d774:15b0:4a40]) by DM8PR01MB6824.prod.exchangelabs.com
+ ([fe80::d62f:d774:15b0:4a40%4]) with mapi id 15.20.6678.029; Thu, 17 Aug 2023
+ 06:03:35 +0000
+From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+To: linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	maz@kernel.org
+Cc: christoffer.dall@linaro.org,
+	eauger@redhat.com,
+	miguel.luis@oracle.com,
+	darren@os.amperecomputing.com,
+	scott@os.amperecomputing.com,
+	gankulkarni@os.amperecomputing.com
+Subject: [PATCH 1/2] KVM: arm64: timers: Move helper has_cntpoff to a header file
+Date: Wed, 16 Aug 2023 23:03:13 -0700
+Message-Id: <20230817060314.535987-2-gankulkarni@os.amperecomputing.com>
+X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20230817060314.535987-1-gankulkarni@os.amperecomputing.com>
+References: <20230817060314.535987-1-gankulkarni@os.amperecomputing.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: CH2PR03CA0018.namprd03.prod.outlook.com
+ (2603:10b6:610:59::28) To DM8PR01MB6824.prod.exchangelabs.com
+ (2603:10b6:8:23::24)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230817003029.3073210-3-rananta@google.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM8PR01MB6824:EE_|SA1PR01MB6592:EE_
+X-MS-Office365-Filtering-Correlation-Id: fa03734f-ecd0-4406-1664-08db9ee7b139
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	jABkziO/VFX7cwmIas7CFX6VHx5XsHxZee/zhnjqoyUKgiYppa/B/X4BMG36K+IS+Zky+8T6D0Ffy61vJ/PpG/4FzGjR3pKQGmDaZaGkgFzETdqNlL8rBlAKTYdFBc1gKogkQ4oGH7J4zGYADaD1byMU5m4tdvitwnW2f6v2UggLCJylqx2K7wb9YgctvVUmHfwfXFULbLQ8Vd3sFc2KRu0cDSdSWT9Jrj+iutjiiFRZiDkJ+qcXweHMbzQlRAUn3iSOcnGRPYSIKrSM7lfPSp1mHbPb4k1WBoUZwWAVZHGkKPYz3gIoy/RFFdJqopnz0wCvG6fqKjlRrHQNVKFQV6YUTrRyuqLx9yPXAShuQyw76HA/tzAgAgGCvTrRSEWDM/3U7J/PgLuy5yqbVajq+5ZFYl6ubGSlnt5yGX1V9r/fL24XXhsNGJreHPLiek7nMb7sBlmfTPkwqR5HSM66QqVzwtVmFbgWxeu9p+LsQYqddQ9jVHOT43T69O7TCZfGhh/JeZYaByhjibIWTKGeTKHTcWrCTPU/7GGw0Egt73ebGW7Wuf0G6x/bK4jOgvSUDWBwd2zVOCrjm/aSMJZE9BiKaaJwhSeUKklszY2g+oJPg+mqrRHB945Lm2AiXQzu
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR01MB6824.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(39850400004)(136003)(396003)(346002)(1800799009)(186009)(451199024)(83380400001)(2906002)(478600001)(66946007)(66556008)(66476007)(6666004)(6506007)(6486002)(52116002)(316002)(107886003)(2616005)(5660300002)(26005)(1076003)(6512007)(4326008)(8936002)(8676002)(41300700001)(86362001)(38100700002)(38350700002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?NlxIoS+wOPoPLHIt/APzMGQ5zoL69/7YvKf+wIMWqlkoghLOGhQxK3KpGZLm?=
+ =?us-ascii?Q?HPQ1jlZjlc0GoEL5HkOvdStc/ovq+iqEGXMIaKpzrH5h0QZxiP6uNLT4f4go?=
+ =?us-ascii?Q?XNkkzFX9d9aiNSYrRlOizY6VkwO1CZwd300CZsAvbGLMT98QhXouKLn2Ots4?=
+ =?us-ascii?Q?07CM22pSgUr/qB09/LdrfC7Hf+6oEOe8zMS1jCMZD/MHygrEMPTcXK2wcwrK?=
+ =?us-ascii?Q?xiBVS/XnfL/ZLG3l7SorG9MG/q9XzyBJcy973X6O4zAuwVDKfbc3ZJaRuhgG?=
+ =?us-ascii?Q?yf+5erTT+gfibpmU2LmxyLlIUuC/LZwGwpro1cpf+vpchTIecMXhOaDnZsIN?=
+ =?us-ascii?Q?iBrmcClNngtBVZgvpjtotB64FjE8cMbbXkkwE3aYGGrn3KJq9gynyDqpD8KN?=
+ =?us-ascii?Q?SqsTftEj2ccqE4chgQ/TSCSx16nsJb10/rFSlek6bhSqo/7f4JfqYIzSpKe4?=
+ =?us-ascii?Q?HyhmrZr0/8eYn/RuCPJfqY/gyqXVUJIr/8OURLT0vkTp6XXiBSrxFKqxoGxN?=
+ =?us-ascii?Q?+Ce8PIaVdzjg0+ZYL5HJbS6hq4KKWQ+hwww/07zIEiC05Y8uQdUrdpw5WPeN?=
+ =?us-ascii?Q?YjxXtIwUElAodQmi7o3R/4syT0fA0iEJabuftm5vttiK0sHXVdmT/0KxAXh5?=
+ =?us-ascii?Q?RKH2nDfVOBXGM1yq0xpxOitqrOcwFsYWIqCKBB+uGqkHcD6CQCJmzblwhncw?=
+ =?us-ascii?Q?adF2bGRyfIlsz8lyzd2+zks+pwYr0KErIXvq4XtTkFVnoaTR1weHWj9YY4dC?=
+ =?us-ascii?Q?BaUKHz1z3Rm1Dg588uQSzFEtBGW0DRcCtLweQBuzVyl0Sz5tgfyudK0+Roe8?=
+ =?us-ascii?Q?sLn4zGo9nmix4eZLPKGOcuAT+HWcnMHNE8KXrQnLgWVfxQ1zClwDf+E833YN?=
+ =?us-ascii?Q?Q+MBheUKyXL6UBRR7BPGwx75XNamPBZlqpyZ7DJzpwem4shXDE9AF7S8V+Wb?=
+ =?us-ascii?Q?PR+KEu3eOyv8+D3zl9sI9acv1OhZ3ndRPeyYzitnImvv9AUiVQwgKhIk+VHs?=
+ =?us-ascii?Q?DYlvDYpMIc3IXeYKgu2b2NvB60frXp9AwgGLB61cN4dPk9ABM4nBhx2tPSZ5?=
+ =?us-ascii?Q?S6tZyLRnPuivJxipISyUXT/sS0waL9VE9Htzt51a2Sqbv2m+OkISCAAuf7t0?=
+ =?us-ascii?Q?Ro8W0uDU/tkHaaCr5zn4Yy9qllEES+aS2j8G8xoCsU7Lq+aSdc+HQZIYfPJJ?=
+ =?us-ascii?Q?+Sjdj45QC9qYzaAce5PVBnqZPshH10SB8/7IHwOQELU6HoS+yRy8B/+p+Qz3?=
+ =?us-ascii?Q?hkKTd4dkOeZpMNKBGGMJiOacYbqrySiOhd5X5WTyaIkMEWrcrsD4rg/Eth+F?=
+ =?us-ascii?Q?FHp6cDO7wFzov/ZhzIoEsOclHysDbD6e99WVOvHvidEuztlmnMXYL0EOF07u?=
+ =?us-ascii?Q?Y0Iz3FJY7xjNdR/QdUzMFz1+1ZEq59WBTv3GWBmV3e8WAC/Z2nE6S/zgJWSp?=
+ =?us-ascii?Q?+typj2hKbHq1UVesNJ8ZELwYYGbJ0/G/ferYQxdQ2ebGnAmgbJIJZcXYZ1id?=
+ =?us-ascii?Q?Mkc6EyWw1McwimTF7nSOfGaStLqHlWN0xcLrYr2ATg5jbXvunF8sn46otKXr?=
+ =?us-ascii?Q?32SGvryiJPJ8XT/LMojH/hKZzB98/hPU9Oy81p/EmeEPGQbGFcLIQAPvaj6o?=
+ =?us-ascii?Q?IEEeSzCOOm3yFOn4ZsnOBVc=3D?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fa03734f-ecd0-4406-1664-08db9ee7b139
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Aug 2023 06:03:35.2759
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Lr6/jPNTFua6VZrL+CLRg/LCvsib0UTRHPEWOd1N2fqsPoXIrxJpc5sAl8ZQr3ZKxWyXjqSxTfCrOvffB3Sp3jptgmzenAqPSrzkriYx6XkHyq0Q+0gWo3NpD7+Nyky9
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR01MB6592
 
-Hi Raghavendra,
+Move helper function has_cntpoff() to header file as an inline
+function to make it available to other functions as well.
 
-kernel test robot noticed the following build warnings:
+Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+---
+ arch/arm64/include/asm/virt.h | 5 +++++
+ arch/arm64/kvm/arch_timer.c   | 5 -----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-[auto build test WARNING on 2ccdd1b13c591d306f0401d98dedc4bdcd02b421]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Raghavendra-Rao-Ananta/KVM-arm64-PMU-Introduce-a-helper-to-set-the-guest-s-PMU/20230817-083353
-base:   2ccdd1b13c591d306f0401d98dedc4bdcd02b421
-patch link:    https://lore.kernel.org/r/20230817003029.3073210-3-rananta%40google.com
-patch subject: [PATCH v5 02/12] KVM: arm64: PMU: Set the default PMU for the guest on vCPU reset
-config: arm64-randconfig-r032-20230817 (https://download.01.org/0day-ci/archive/20230817/202308171212.KW8LnRRC-lkp@intel.com/config)
-compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
-reproduce: (https://download.01.org/0day-ci/archive/20230817/202308171212.KW8LnRRC-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308171212.KW8LnRRC-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   In file included from arch/arm64/kernel/asm-offsets.c:16:
-   In file included from include/linux/kvm_host.h:45:
-   In file included from arch/arm64/include/asm/kvm_host.h:37:
->> include/kvm/arm_pmu.h:176:62: warning: declaration of 'struct arm_pmu' will not be visible outside of this function [-Wvisibility]
-     176 | static inline int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
-         |                                                              ^
-   1 warning generated.
---
-   In file included from arch/arm64/kernel/asm-offsets.c:16:
-   In file included from include/linux/kvm_host.h:45:
-   In file included from arch/arm64/include/asm/kvm_host.h:37:
->> include/kvm/arm_pmu.h:176:62: warning: declaration of 'struct arm_pmu' will not be visible outside of this function [-Wvisibility]
-     176 | static inline int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
-         |                                                              ^
-   1 warning generated.
-
-
-vim +176 include/kvm/arm_pmu.h
-
-   175	
- > 176	static inline int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
-   177	{
-   178		return -ENODEV;
-   179	}
-   180	
-
+diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+index 4eb601e7de50..f22cc733efb1 100644
+--- a/arch/arm64/include/asm/virt.h
++++ b/arch/arm64/include/asm/virt.h
+@@ -132,6 +132,11 @@ static __always_inline bool has_vhe(void)
+ 		return cpus_have_final_cap(ARM64_HAS_VIRT_HOST_EXTN);
+ }
+ 
++static __always_inline bool has_cntpoff(void)
++{
++	return (has_vhe() && cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF));
++}
++
+ static __always_inline bool is_protected_kvm_enabled(void)
+ {
+ 	if (is_vhe_hyp_code())
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 75bddab3224f..98b0e8ac02ae 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -55,11 +55,6 @@ static struct irq_ops arch_timer_irq_ops = {
+ 	.get_input_level = kvm_arch_timer_get_input_level,
+ };
+ 
+-static bool has_cntpoff(void)
+-{
+-	return (has_vhe() && cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF));
+-}
+-
+ static int nr_timers(struct kvm_vcpu *vcpu)
+ {
+ 	if (!vcpu_has_nv(vcpu))
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.41.0
+
