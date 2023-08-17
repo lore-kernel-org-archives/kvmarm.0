@@ -1,149 +1,87 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97C3CD2F1
-	for <kvmarm@lists.linux.dev>; Thu, 17 Aug 2023 08:17:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1692260225;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QOolyAIrKdePCuvcf3d2mbyCsBtqXn7nucEha9KLm/Y=;
-	b=LnMgo9cpTDMhmzBmW5ktXv7EfYNwWvcUHhSdhK4WfY55IdH4tVkewjiMrmKOMXxqA6hOJ6
-	eFaURtJZF0G1dN4v3v9/TY4sZC8SLbAyXLyhswpfZA8GkJClj8PTou7aEPlSgSwW5EBHzU
-	UPN1ynZioHXJpfjLg2Sbt65rKz7p0yY=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-266-rtujf1jXPdWVOplIqO1E_A-1; Thu, 17 Aug 2023 04:17:01 -0400
-X-MC-Unique: rtujf1jXPdWVOplIqO1E_A-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D18261C06EE0;
-	Thu, 17 Aug 2023 08:16:59 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.36])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 44BB7492C14;
-	Thu, 17 Aug 2023 08:16:59 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Jing Zhang <jingzhangos@google.com>
-Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, ARMLinux
- <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, Will Deacon <will@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, Reiji Watanabe
- <reijiw@google.com>, Raghavendra Rao Ananta <rananta@google.com>, Suraj
- Jitindar Singh <surajjs@amazon.com>
-Subject: Re: [PATCH v8 02/11] KVM: arm64: Document
- KVM_ARM_GET_REG_WRITABLE_MASKS
-In-Reply-To: <CAAdAUtivsxqpSE_0BL_OftxzwR=e5Rnugb69Ln841ooJqVXgmA@mail.gmail.com>
-Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
- Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
- 153243,
- =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
- Michael O'Neill, Amy
- Ross"
-References: <20230807162210.2528230-1-jingzhangos@google.com>
- <20230807162210.2528230-3-jingzhangos@google.com>
- <878raex8g0.fsf@redhat.com>
- <CAAdAUtivsxqpSE_0BL_OftxzwR=e5Rnugb69Ln841ooJqVXgmA@mail.gmail.com>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date: Thu, 17 Aug 2023 10:16:56 +0200
-Message-ID: <874jkyqe13.fsf@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB20DF56
+	for <kvmarm@lists.linux.dev>; Thu, 17 Aug 2023 08:27:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53FAFC433C7;
+	Thu, 17 Aug 2023 08:27:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692260863;
+	bh=p/0DYIT5ytk/yeTl/K301RDUBvQtBHXWLb7M8QUZPP0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OnxVjs0pTyk2aoIqU3J3O4uFUy8UnL6mnOSTIySnHCqtt9coMqcdFuhHMeZEfjpjW
+	 154dVeAfjzIrlMWrLpmpBGDo6Lt3WkpuMCXLwAvfEltzbkVrq8jF3NSjQPt4dyqZEw
+	 w8nayRdkr1NOWactALA9Qjor0mdevJxv7NeAXmHN8gJ2Q9pc8qYqrMGKr1nyJUSsYz
+	 tiBwjdvoVBsaSlACorBsVvKgSg9lj585zQ36TIGwtaD3cECYhwFJC/N2IzUxqgGZGy
+	 rUQ9RzHwxx5g6M2DjE+lTkzUO6SaQEodDEYZZGsTuKO1pthD57VX+boukv5fyiGF4R
+	 Ry9Tfs4E2pj5A==
+Received: from 82-132-234-11.dab.02.net ([82.132.234.11] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qWYM0-005cc8-Ps;
+	Thu, 17 Aug 2023 09:27:41 +0100
+Date: Thu, 17 Aug 2023 09:27:38 +0100
+Message-ID: <87bkf6oyyt.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+  linux-arm-kernel@lists.infradead.org, eauger@redhat.com,
+  miguel.luis@oracle.com, darren@os.amperecomputing.com,
+  scott@os.amperecomputing.com,
+  Christoffer Dall <Christoffer.Dall@arm.com>
+Subject: Re: [PATCH 2/2] KVM: arm64: timers: Adjust CVAL of a ptimer across guest entry and exits
+In-Reply-To: <20230817060314.535987-3-gankulkarni@os.amperecomputing.com>
+References: <20230817060314.535987-1-gankulkarni@os.amperecomputing.com>
+	<20230817060314.535987-3-gankulkarni@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.234.11
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, eauger@redhat.com, miguel.luis@oracle.com, darren@os.amperecomputing.com, scott@os.amperecomputing.com, Christoffer.Dall@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Aug 14 2023, Jing Zhang <jingzhangos@google.com> wrote:
+[Fixing Christoffer's email address]
 
-> On Mon, Aug 14, 2023 at 2:46=E2=80=AFAM Cornelia Huck <cohuck@redhat.com>=
- wrote:
->>
->> On Mon, Aug 07 2023, Jing Zhang <jingzhangos@google.com> wrote:
->>
->> > Add some basic documentation on how to get feature ID register writable
->> > masks from userspace.
->> >
->> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
->> > ---
->> >  Documentation/virt/kvm/api.rst | 29 +++++++++++++++++++++++++++++
->> >  1 file changed, 29 insertions(+)
->> >
->> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/a=
-pi.rst
->> > index c0ddd3035462..92a9b20f970e 100644
->> > --- a/Documentation/virt/kvm/api.rst
->> > +++ b/Documentation/virt/kvm/api.rst
->> > @@ -6068,6 +6068,35 @@ writes to the CNTVCT_EL0 and CNTPCT_EL0 registe=
-rs using the SET_ONE_REG
->> >  interface. No error will be returned, but the resulting offset will n=
-ot be
->> >  applied.
->> >
->> > +4.139 KVM_ARM_GET_REG_WRITABLE_MASKS
->> > +-------------------------------------------
->> > +
->> > +:Capability: none
->> > +:Architectures: arm64
->> > +:Type: vm ioctl
->> > +:Parameters: struct reg_mask_range (in/out)
->> > +:Returns: 0 on success, < 0 on error
->> > +
->> > +
->> > +::
->> > +
->> > +        #define ARM64_FEATURE_ID_SPACE_SIZE  (3 * 8 * 8)
->> > +
->> > +        struct reg_mask_range {
->> > +                __u64 addr;             /* Pointer to mask array */
->> > +                __u64 reserved[7];
->> > +        };
->> > +
->> > +This ioctl would copy the writable masks for feature ID registers to =
-userspace.
->> > +The Feature ID space is defined as the System register space in AArch=
-64 with
->> > +op0=3D=3D3, op1=3D=3D{0, 1, 3}, CRn=3D=3D0, CRm=3D=3D{0-7}, op2=3D=3D=
-{0-7}.
->> > +To get the index in the mask array pointed by ``addr`` for a specifie=
-d feature
->> > +ID register, use the macro ``ARM64_FEATURE_ID_SPACE_IDX(op0, op1, crn=
-, crm, op2)``.
->> > +This allows the userspace to know upfront whether it can actually twe=
-ak the
->> > +contents of a feature ID register or not.
->> > +The ``reserved[7]`` is reserved for future use to add other register =
-space. For
->> > +feature ID registers, it should be 0, otherwise, KVM may return error.
->>
->> In case of future extensions, this means that userspace needs to figure
->> out what the kernel supports via different content in reg_mask_range
->> (i.e. try with a value in one of the currently reserved fields and fall
->> back to using addr only if that doesn't work.) Can we do better?
->>
->> Maybe we could introduce a capability that returns the supported ranges
->> as flags, i.e. now we would return 1 for id regs masks, and for the
->> future case where we have some values in the next reserved field we
->> could return 1 & 2 etc. Would make life easier for userspace that needs
->> to work with different kernels, but might be overkill if reserved[] is
->> more like an insurance without any concrete plans for extensions.
->>
->
-> Maybe it'd be better to leave this to whenever we do need to add other
-> range support?
+On Thu, 17 Aug 2023 07:03:14 +0100,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> 
+> As per FEAT_ECV, when HCR_EL2.{E2H, TGE} == {1, 1}, Enhanced Counter
+> Virtualization functionality is disabled and CNTPOFF_EL2 value is treated
+> as zero. On VHE host, E2H and TGE are set, hence it is required
+> to adjust CVAL by incrementing it by CNTPOFF_EL2 after guest
+> exit to avoid false physical timer interrupts and also
+> decrement/restore CVAL before the guest entry.
 
-My point is: How does userspace figure out if the kernel that is running
-supports ranges other than id regs? If this is just an insurance against
-changes that might arrive or not, we can live with the awkward "just try
-it out" approach; if we think it's likely that we'll need to extend it,
-we need to add the mechanism for userspace to find out about it now, or
-it would need to probe for presence of the mechanism...
+No, this is wrong. Neither E2H nor TGE have any impact on writing to
+CNTPOFF_EL2, nor does it have an impact on CNTP_CVAL_EL0. Just read
+the pseudocode to convince yourself.
 
+CNTPOFF_EL2 is applied at exactly two points: when SW is reading
+CNTPCT_EL0 from EL1 while {E2H,TGE}=={1, 0} and when the HW is
+comparing CNTPCT_EL0 with the CNTP_CVAL_EL0. In both cases the offset
+is subtracted from the counter. And that's the point where the running
+EL matters. Which means that CNTPOFF_EL2 behaves exactly like
+CNTVOFF_EL2. No ifs, no buts.
+
+The behaviour you are describing tends to indicate that your HW is
+applying CNTPOFF_EL2 to CVAL, which would be a gold plated bug.
+
+It doesn't mean that the KVM code is correct either. I'm seeing pretty
+bad behaviours on a machine without CNTPOFF_EL2. But what you are
+suggesting is IMO a misunderstanding of the architecture.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
