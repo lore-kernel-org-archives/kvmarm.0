@@ -1,148 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AA8B1BB2E
-	for <kvmarm@lists.linux.dev>; Fri, 18 Aug 2023 20:15:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4FBFC433C7;
-	Fri, 18 Aug 2023 20:15:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692389724;
-	bh=WCt+HTyPqpQoM8uuU7vN+x57RA6ZJu12mqg0CzvfAKw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UWpnqpi65SH3/qdqWBn6Zd1Ci2gAJDST/B3oTk2b0QqR4KzLEHujl/2sXAp34aaQz
-	 rYf/Hxv4pGdxI4XtXA71/BlwdSjOlALBF8+7Nh/txVG1Pr0etLTfoxWGUJ+zGSMQ13
-	 12qmiSM3fn6coLaVe6HKubfVBJb5Z/QsLDUtopgpRJBemR/BlWB0eyjCHm7pxUeA6y
-	 yvGiBvlRhhmOnJmtqJKBgyLZHzlJhtJfhzvqoLPqNP+U1RPimemgLmIq2et3p1jWan
-	 qRLwKdKD5hl3mrqoXMp+UCe8E/WSmGnN+WQpVc/+3X3jhGCfNqyeGGCMUIAzmPI1DF
-	 i74Qa8ekO6c+g==
-Date: Fri, 18 Aug 2023 21:15:15 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v4 19/36] arm64/gcs: Allocate a new GCS for threads with
- GCS enabled
-Message-ID: <3a01ce20-3365-421b-95ff-211946808174@sirena.org.uk>
-References: <20230807-arm64-gcs-v4-0-68cfa37f9069@kernel.org>
- <20230807-arm64-gcs-v4-19-68cfa37f9069@kernel.org>
- <ZNZhG/4rBpTenYVH@arm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EDC7174DA
+	for <kvmarm@lists.linux.dev>; Fri, 18 Aug 2023 23:01:29 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d745094c496so1166719276.1
+        for <kvmarm@lists.linux.dev>; Fri, 18 Aug 2023 16:01:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692399688; x=1693004488;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=usNReEG1yhZ2OoI1bkcsHZxi8vJT2uNEbLMV9P1BADc=;
+        b=gS9arkhq2BQM5wyG90faWG4pywmMu5sfjHEWd04bKy84agcqatheT6YSVqsnMAhJXs
+         7Ey6R/IsFpbuJAgflRTfCsGQSeE7z8aCnsHRbxEkKBK/PAH7FMZgZEavx3BeBXM+3P+2
+         Plq9VhZaRy5PbOx8EDNA03ytcClkYRB9Plt+OD+UltS53ZO5IOuVPHa/Yt8AOkDtjpGf
+         J0ReekJEPtY7ifZaoOCUWVj24ZOCPfNYabKI/jnVy+VGWVTelTn6BvdxHdiQrBc+k/kc
+         BoETN+5H+qyvqSzJ4nWEMxKRREF2ybV9p6gaBfB8lx1V/iAPfjWa3WjZDIbTKQp0bm0Z
+         IJkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692399688; x=1693004488;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=usNReEG1yhZ2OoI1bkcsHZxi8vJT2uNEbLMV9P1BADc=;
+        b=LUx9k0lx+Z2Wc/n/fM9hkGmbawwAqKxpfahg6oNJKqopQ8ZjsOaPgplMCi2/nGRP5R
+         p68mI1aViSnjTxh83L/m9vSgREWN+Pzvc9L7jxDwNFslB3+FiPbHyx87f6nyJTMQ7kgn
+         qj8Ol2Uc15swp0Gpf6JnGlPU7nBBrEE2nnH5zEs1JZW3d8KgbyjL1qqQbmi1ElYzj2WO
+         x+4PYYF/ZgTQoRoJ/bU97Zi+SB3zMJNiIZBAlmu0Yg4IYmNF6d1WFpAfpYlTgmxf0boF
+         TZj4tSS1tCIWx45jh23IUclDCduI5RmqA1wsYoR+gN1PGtaRqVXscUf5VfNYMwAwRf3m
+         f20w==
+X-Gm-Message-State: AOJu0YyAxIn3SiDKTTkHl3qBoZCbUMw/PFiMpBe/SjjdlT9dAmP1yRKm
+	+sv9DuneFVnoW47zDmJ7+Y9xa9gghpc=
+X-Google-Smtp-Source: AGHT+IHoaUgHi5iMS/0Xt5cvUarFzMCVBDWHJfa8lAvVIAai8wyXyMLBOgyLMJxxiXlZfzlnoz9PoDeIZVI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:a8a:b0:d74:347:1e3 with SMTP id
+ cd10-20020a0569020a8a00b00d74034701e3mr5755ybb.9.1692399688376; Fri, 18 Aug
+ 2023 16:01:28 -0700 (PDT)
+Date: Fri, 18 Aug 2023 16:01:26 -0700
+In-Reply-To: <diqzleem306p.fsf@ackerleytng-ctop.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="45mwPxvFeqYyCSA9"
-Content-Disposition: inline
-In-Reply-To: <ZNZhG/4rBpTenYVH@arm.com>
-X-Cookie: Your aim is high and to the right.
+Mime-Version: 1.0
+References: <20230718234512.1690985-29-seanjc@google.com> <diqzleem306p.fsf@ackerleytng-ctop.c.googlers.com>
+Message-ID: <ZN/4RjDsBLf0FB98@google.com>
+Subject: Re: [RFC PATCH v11 28/29] KVM: selftests: Add basic selftest for guest_memfd()
+From: Sean Christopherson <seanjc@google.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	willy@infradead.org, akpm@linux-foundation.org, paul@paul-moore.com, 
+	jmorris@namei.org, serge@hallyn.com, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	chao.p.peng@linux.intel.com, tabba@google.com, jarkko@kernel.org, 
+	yu.c.zhang@linux.intel.com, vannapurve@google.com, mail@maciej.szmigiero.name, 
+	vbabka@suse.cz, david@redhat.com, qperret@google.com, michael.roth@amd.com, 
+	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com
+Content-Type: text/plain; charset="us-ascii"
 
+On Mon, Aug 07, 2023, Ackerley Tng wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> 
+> > Add a selftest to verify the basic functionality of guest_memfd():
+> >
+> > <snip>
+> 
+> Here's one more test:
 
---45mwPxvFeqYyCSA9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+First off, thank you!  I greatly appreciate all the selftests work you (and
+others!) have been doing.
 
-On Fri, Aug 11, 2023 at 05:26:03PM +0100, Catalin Marinas wrote:
-> On Mon, Aug 07, 2023 at 11:00:24PM +0100, Mark Brown wrote:
+For v2, can you please post a standalone patch?  My workflow barfs on unrelated,
+inlined patches.  I'm guessing I can get b4 to play nice, but it's easier to just
+yell at people :-)
 
-> > +	mmap_write_lock(mm);
-> > +	mapped_addr = do_mmap(NULL, addr, size, PROT_READ, flags,
-> > +			      VM_SHADOW_STACK | VM_WRITE, 0, &unused, NULL);
+> >From 72dc6836f01bdd613d64d4c6a4f2af8f2b777ba2 Mon Sep 17 00:00:00 2001
+> From: Ackerley Tng <ackerleytng@google.com>
+> Date: Tue, 1 Aug 2023 18:02:50 +0000
+> Subject: [PATCH] KVM: selftests: Add tests - invalid inputs for
+>  KVM_CREATE_GUEST_MEMFD
+> 
+> Test that invalid inputs for KVM_CREATE_GUEST_MEMFD, such as
+> non-page-aligned page size and invalid flags, are rejected by the
+> KVM_CREATE_GUEST_MEMFD with EINVAL
+> 
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> ---
+>  tools/testing/selftests/kvm/guest_memfd_test.c  | 17 +++++++++++++++++
+>  .../selftests/kvm/include/kvm_util_base.h       | 11 +++++++++--
+>  2 files changed, 26 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
+> index eb93c608a7e0..ad20f11b2d2c 100644
+> --- a/tools/testing/selftests/kvm/guest_memfd_test.c
+> +++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+> @@ -90,6 +90,21 @@ static void test_fallocate(int fd, size_t page_size, size_t total_size)
+>  	TEST_ASSERT(!ret, "fallocate to restore punched hole should succeed");
+>  }
+>  
+> +static void test_create_guest_memfd_invalid(struct kvm_vm *vm, size_t page_size)
+> +{
+> +	int fd;
+> +
+> +	/* Non-page-aligned page_size */
 
-> Why not PROT_WRITE as well? I guess I need to check the x86 patches
-> since the do_mmap() called here has a different prototype than what's in
-> mainline.
+Instead of adding a comment, use the message from TEST_ASSERT() to communicate
+that information to the reader *and* to anyone that encounters failures.
 
-> This gets confusing since currently the VM_* flags are derived from the
-> PROT_* flags passed to mmap(). But you skip the PROT_WRITE in favour of
-> adding VM_WRITE directly.
+> +	fd = __vm_create_guest_memfd(vm, 1, 0);
 
-I have to confess that I inherited this from the x86 code and never
-thought too hard about it.  I've got a horrible feeling the reasoning is
-simply the way in which x86 fits shadow stack into the page tables
-without having a mechanism like permission indirection, these don't
-apply for us.
+ioctls() are fast.  Rather than hardcode one value, iterate over a range of
+values, e.g.
 
-> I haven't followed the x86 discussion but did we run out of PROT_* bits
-> for a PROT_SHADOW_STACK?
+	for (size = 0; size < page_size; size++) {
+		r = __vm_create_guest_memfd(vm, size, 0);
+		TEST_ASSERT(r && errno == EINVAL,
+			    "Informative error message...);
+	}
+		
+> +	ASSERT_EQ(errno, EINVAL);
+> +
+> +	/* Invalid flags */
+> +	fd = __vm_create_guest_memfd(vm, page_size, 99);
+> +	ASSERT_EQ(fd, -1);
+> +	ASSERT_EQ(errno, EINVAL);
 
-It's more that there are security concerns with having PROT_, especially
-in conjunction with needing to provide a token for stack pivot - we not
-only need to map pages for the GCS, we also need to write a cap token
-into it so that we can pivot to the new stack.  If the GCS can ever be
-written to by userspace via normal means then that's an issue for the
-basic protection model that the feature is trying to implement.  If we
-have the PROT_ but try to check for bad uses of it that makes everything
-messy and complicated which is especially non-ideal for a feature with a
-security focus.  Having a more packaged system call is easier for
-everyone.
-
-More detail in the x86 patch that's currently in -next:
-
-   https://lore.kernel.org/all/20230319001535.23210-34-rick.p.edgecombe@intel.com/
-
-> > +	/* Allocate RLIMIT_STACK with limits of PAGE_SIZE..4G */
-> > +	size = PAGE_ALIGN(min_t(unsigned long long,
-> > +				rlimit(RLIMIT_STACK), SZ_4G));
-> > +	return max(PAGE_SIZE, size);
-> > +}
-
-> I saw Szabolcs commenting on the default size as well. Maybe we should
-> go for RLIMIT_STACK/2 but let's see how the other sub-thread is going.
-
-I've updated it.
-
-> > +	if ((clone_flags & (CLONE_VFORK | CLONE_VM)) != CLONE_VM)
-> > +		return 0;
-
-> Is it safe for CLONE_VFORK not to get a new shadow stack? A syscall for
-> exec could push something to the stack. I guess the GCS pointer in the
-> parent stays the same, so it wouldn't matter.
-
-Yes, pushing should be fine just as for the regular stack.
-
-> That said, I think this check should be somewhere higher up in the
-> caller of gcs_alloc_thread_stack(). The copy_thread_gcs() function
-> already does most of the above checks. Is the GCS allocation called from
-> elsewhere as well?
-
-That's the only place.  I've moved the above check into copy_thread_gcs(),
-you're right that the other checks are redundant as they're done in the
-caller already.
-
---45mwPxvFeqYyCSA9
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmTf0VIACgkQJNaLcl1U
-h9AK7Af8DxBPnoklDhEt6uL9Qzwyg5iHuvMMz45iQs74RTv9fEM/vR1B1L0U0vxL
-LjcRxv98KB+GM2DQ+YOoQK84V2okcpKSNu9l/0CY+hvT8JChP5Ljn/b3azVF3FGY
-QYftbzRipJONW9pKxIZ7Svx8+iZIg03PmcwJTtLRsi36gyykxlFbYhzZm/0VbWH6
-HDuDWH8yMX1/BQGizf3FM7CxbBmhcI/zzi2eUslQ3EPOoSKywy4JXRc49XAvrxbT
-Bu8EbBX7Oapi96h+KlZEAWSiTuD4plJ6pJQsjMdMcELiI//3sTIzNRNqmFxBIgWS
-O2Sp933Ku1aQm9TW9TcOY3MVq5dYiQ==
-=X4OS
------END PGP SIGNATURE-----
-
---45mwPxvFeqYyCSA9--
+And then same thing here.  Then you can use the legal flags to determine what is
+and isn't valid, instead of using a completely arbitrary magic number.
