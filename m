@@ -1,49 +1,51 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79C18641
-	for <kvmarm@lists.linux.dev>; Sat, 19 Aug 2023 04:39:58 +0000 (UTC)
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-589f986ab8aso33880457b3.1
-        for <kvmarm@lists.linux.dev>; Fri, 18 Aug 2023 21:39:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ABC781D
+	for <kvmarm@lists.linux.dev>; Sat, 19 Aug 2023 04:39:59 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-58fb9323a27so3546237b3.1
+        for <kvmarm@lists.linux.dev>; Fri, 18 Aug 2023 21:39:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692419997; x=1693024797;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=NAca2i6UT+kRpNiNFqciMgXTaQn9Xpc8llxW6p9qkeo=;
-        b=wmIKDueAzDkg5mxJ5ZNP7/6f52f0rR1DEpWv1vDg7bdBkBfkOgRv05OXQ/KKza9duU
-         uDwvjRW87K84Qhy4J8KTfnh0b6jdbRXjmGzp4u2pGu9K8tQjC94kna1KZJx20pnvRyup
-         mrxBr0kSUBIfwpcvAsdB6PuIBMcwoMVQRGcAIZ5y0u7+zq8BnBGvoY2w6XUZQOR3yxE4
-         EJUqIfKniCMX0CdUcKBHQ1izczUuoqhi8wfBszr9HvGfmys3idkABS4tN+oplISb8Gxm
-         z6CrkDrgL5xBld6lDyfrzeH9jB3Lw15Jys03dUw/g1G4cYc5E5OsPwRa3NloehhPOrmn
-         VAhg==
+        d=google.com; s=20221208; t=1692419999; x=1693024799;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Seh1pUJAoJeQMsb3DjbA2692WgZC2RtCPmgGThvub30=;
+        b=DwkJD32BekuBCy2U4IGt+GsAXbEeNlO8nqmNBNRYSJRYAuGurqXGOPFa84zQOJUG6B
+         LNX++XExakKbrpEEtpeXFwLrXMqQNp6nJ7PgVb9YR2MT1ig76IumJt0+ofKZIrV3yULh
+         yRVADfXjNzU1NlxKdGULlj+buFsONnxtCUK14eD5NRvOz3hCTltJ/Hz89hHQ0QDm1LNu
+         b5zLZjuAV72if7vS438j5l1gDhM7Eb+jUFyBy+xk/4v1QNP09pY6tL2zIdftUFzWFDqJ
+         HGDtcaUnBhLuUXFvefYPtalWuV4aMkM8zuZRykC/3owI3r3scalOmigyXxpLegc0wNN8
+         H89Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692419997; x=1693024797;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NAca2i6UT+kRpNiNFqciMgXTaQn9Xpc8llxW6p9qkeo=;
-        b=Qp/W2SLyR3upiLeuVYFma+DfNRrP/767WFNdIgff0N36SqQ4A84EfRzjENAWxOvdwM
-         xibX9RM1x+EwFr8LqfhQFmWoZ7EEV6CtgZMXvdKaqhg7TZMmSSm7VEYOX1eWIldggPHK
-         HFNz4MMdvAZx6FHeIQI8qf4Fnl+5Co0qpVjjxqDua702J5F035Y3CY26WmYkcFq3kNx2
-         FLov4N6zbAZ8Z2SNdKHMHjruelv3ReKHaw8bZd++LBYlTfbB+NttnEQ/qem9wZa5ZBLJ
-         ZY1PL7VD37nMNmMu1DoFdamG+mvf8SkL0Gd3+JYit73RgSEKOmS9B43ushKUppGcmWwy
-         pdCg==
-X-Gm-Message-State: AOJu0YweWNwUxq/5b3kXqXtjarONRT2XWCefv+l61qp4exPx5Fl+x0HU
-	TXeGrOWpOrGMyL8uneAn7ENr3ivT1lI=
-X-Google-Smtp-Source: AGHT+IGLkxH4sNOcvfoAui6Ma2VTVQiLV5xCvAMws96y7VjkfHFnbrmf7s5kJj1FZo4uuGY9VtISRDLFkkM=
+        d=1e100.net; s=20221208; t=1692419999; x=1693024799;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Seh1pUJAoJeQMsb3DjbA2692WgZC2RtCPmgGThvub30=;
+        b=FjYaolzfbJMLHpxT6e1tbI0lTjke7M/Wh6OquCc8i9oXELLVXTp6rSEDDLzSLTbo9V
+         rfdxZBlDreGNmNdD9kBkXJGUSv3E61xc7S6/fvxfV0IVa4ROk2Cxge2/kjqs15qhU8PC
+         WfBWFjxDwyhzZabkGWQH+PVkCYqBCfF6d8efIlZ9w++T6UlqkAPEao5SeTxV+/I8+3qU
+         jnwagl/G2yf91nQb10oIs8ZnlLDrLZgkueMQQF1JTOQnV7yoIyA4xQfJiYsT6n+i6zWA
+         57c96HemyFu4vynCuU8JutYg6ecBG2Xl1c1X2Fwpr/FRmna7Hn8Gzw0GUfUcdLP7HITf
+         KpFQ==
+X-Gm-Message-State: AOJu0YxjUtprfM6XYM+em9WesDz8JZqC6bHQQSdgwBg1DVSqWy8lyktO
+	larpamqEez7NXmZmyqAnZKiYECuG204=
+X-Google-Smtp-Source: AGHT+IHb42+dcZ0kfTh6jwPD34e2/SSiy6aoKrRAB1WAoCDxylqcANHFl34q+BzSpUcEkGGuqaQWd6kWUhU=
 X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a05:690c:3588:b0:58d:4ff2:58c with SMTP id
- fr8-20020a05690c358800b0058d4ff2058cmr22549ywb.1.1692419997257; Fri, 18 Aug
- 2023 21:39:57 -0700 (PDT)
-Date: Fri, 18 Aug 2023 21:39:43 -0700
+ (user=reijiw job=sendgmr) by 2002:a81:764e:0:b0:584:3d8f:a425 with SMTP id
+ j14-20020a81764e000000b005843d8fa425mr10578ywk.10.1692419998770; Fri, 18 Aug
+ 2023 21:39:58 -0700 (PDT)
+Date: Fri, 18 Aug 2023 21:39:44 -0700
+In-Reply-To: <20230819043947.4100985-1-reijiw@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20230819043947.4100985-1-reijiw@google.com>
 X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
-Message-ID: <20230819043947.4100985-1-reijiw@google.com>
-Subject: [PATCH v3 0/4] KVM: arm64: PMU: Fix PMUver related handling of vPMU support
+Message-ID: <20230819043947.4100985-2-reijiw@google.com>
+Subject: [PATCH v3 1/4] KVM: arm64: PMU: Disallow vPMU on non-uniform PMUVer
 From: Reiji Watanabe <reijiw@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
@@ -53,66 +55,43 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	Reiji Watanabe <reijiw@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This series fixes a couple of PMUver related handling of
-vPMU support.
+Disallow userspace from configuring vPMU for guests on systems
+where the PMUVer is not uniform across all PEs.
+KVM has not been advertising PMUv3 to the guests with vPMU on
+such systems anyway, and such systems would be extremely
+uncommon and unlikely to even use KVM.
 
-On systems where the PMUVer is not uniform across all PEs,
-KVM currently does not advertise PMUv3 to the guest,
-even if userspace successfully runs KVM_ARM_VCPU_INIT with
-KVM_ARM_VCPU_PMU_V3.
+Signed-off-by: Reiji Watanabe <reijiw@google.com>
+---
+ arch/arm64/kvm/pmu-emul.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-The patch-1 will address this inconsistent behavior by
-disallowing userspace from configuring vPMU,
-as such systems would be extremely uncommon and unlikely
-to even use KVM (according to Marc [1]).
-
-The patch-2 will fix improper use of the host's PMUver to
-determine a valid range of PMU events for the guest (the
-guest's PMUver should be used instead).
-
-The patch-3 and patch-4 will try to hide the STALL_SLOT*
-events unconditionally per Oliver's suggestion [2].
-Presently, KVM hides the STALL_SLOT event depending on the
-host PMU version, instead of the guest's PMU version, which
-doesn't seem to be accurate, as it appears that older PMU than
-PMUv3p4 could implement the event according to the Arm ARM.
-Exposing the STALL_SLOT event without PMMIR_EL1 (supported
-from PMUv3p4) for the guest won't be very useful though.
-The patch-3 stops advertising the event for guest unconditionally,
-rather than fixing or keeping the inaccurate checking to advertise
-the event for the case, where it is not very useful.
-The patch-4 stops advertising the STALL_SLOT_{FRONT,BACK}END
-events to the guest, similar to the STALL_SLOT event, as when any
-of these three events are implemented, all three of them should
-be implemented, according to the Arm ARM.
-
-This series is based on 6.5-rc6.
-
-v3:
- - Fixed to not insert the host PMU instance in the list of valid
-   PMUs [Oliver]
-
-v2: https://lore.kernel.org/all/20230728181907.1759513-1-reijiw@google.com/
- - Combined a two separate v1 series
- - Disallow STALL_SLOT* event unconditionally [Oliver]
-
-v1: https://lore.kernel.org/all/20230610061520.3026530-1-reijiw@google.com/
-    https://lore.kernel.org/all/20230610194510.4146549-1-reijiw@google.com/
-
-[1] https://lore.kernel.org/all/874jnqp73o.wl-maz@kernel.org/
-[2] https://lore.kernel.org/all/ZIm1kdFBfXYMdfbV@linux.dev/
-
-Reiji Watanabe (4):
-  KVM: arm64: PMU: Disallow vPMU on non-uniform PMUVer
-  KVM: arm64: PMU: Avoid inappropriate use of host's PMUVer
-  KVM: arm64: PMU: Don't advertise the STALL_SLOT event
-  KVM: arm64: PMU: Don't advertise STALL_SLOT_{FRONTEND,BACKEND}
-
- arch/arm64/kvm/pmu-emul.c | 37 ++++++++++++++++++++++++++-----------
- 1 file changed, 26 insertions(+), 11 deletions(-)
-
-
-base-commit: 2ccdd1b13c591d306f0401d98dedc4bdcd02b421
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index 560650972478..689bbd88fd69 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -14,6 +14,7 @@
+ #include <asm/kvm_emulate.h>
+ #include <kvm/arm_pmu.h>
+ #include <kvm/arm_vgic.h>
++#include <asm/arm_pmuv3.h>
+ 
+ #define PERF_ATTR_CFG1_COUNTER_64BIT	BIT(0)
+ 
+@@ -672,8 +673,11 @@ void kvm_host_pmu_init(struct arm_pmu *pmu)
+ {
+ 	struct arm_pmu_entry *entry;
+ 
+-	if (pmu->pmuver == ID_AA64DFR0_EL1_PMUVer_NI ||
+-	    pmu->pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
++	/*
++	 * Check the sanitised PMU version for the system, as KVM does not
++	 * support implementations where PMUv3 exists on a subset of CPUs.
++	 */
++	if (!pmuv3_implemented(kvm_arm_pmu_get_pmuver_limit()))
+ 		return;
+ 
+ 	mutex_lock(&arm_pmus_lock);
 -- 
 2.42.0.rc1.204.g551eb34607-goog
 
