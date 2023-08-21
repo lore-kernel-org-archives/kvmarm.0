@@ -1,40 +1,40 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCEA7125C1
-	for <kvmarm@lists.linux.dev>; Mon, 21 Aug 2023 21:23:00 +0000 (UTC)
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-26d52dc97e3so3425053a91.2
-        for <kvmarm@lists.linux.dev>; Mon, 21 Aug 2023 14:23:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E58A125C0
+	for <kvmarm@lists.linux.dev>; Mon, 21 Aug 2023 21:23:02 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-c647150c254so7464895276.1
+        for <kvmarm@lists.linux.dev>; Mon, 21 Aug 2023 14:23:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692652980; x=1693257780;
+        d=google.com; s=20221208; t=1692652982; x=1693257782;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hGowuOdlgc/g3u8U9EhceRoch6MKJG6leI2ZQ+fj9oY=;
-        b=03bvAlvTUehe1uNIygFjSACoQV5XNjS+eQzJfURH/Y0uyMFVuiLMbXKLjkwJv+5c2y
-         wO6ojiA3clpunb2gqxUvlqlsCSexjofZ/Eyspj/EnKYXhP5Ma4lHumDpsDRNxnnpQlkI
-         lt7Tg4JU7TYDwCJPTiUatOnoVNZqNRnGgFVSJm4dWtkyQOpTqHxQa/FFhmoqQo85Y4Xq
-         udROwtOJlZWZ3tfB5vAYhbPCRzypEQRSHtiBB6SNL4T2gt0cobUvf3KCC5UdtX6AM1Nm
-         ghYVmJ3bglWMB0njGTHNPz6RQO2iWWyfQIVCbU49tN/fmZPPDffPoOwUbtWR/MZQ6blm
-         549A==
+        bh=ZZNW6XiNIf4mfjw9nbhS/bawdb727WcU0dp8aEgn/JY=;
+        b=mfZ8T+vJQqkinKwOsLzTgieqjlDTtmMJPhiIg1UCejUhjc9rHbi12nHrBX1P8R+La1
+         On1VG+8ZZPt9lU0WEOUK6Hhqm7oUHN3uX9k7gKeoKcYZqRQarrkaKugZ+N3u0zR1NqeF
+         qKUJdOWiOl7c1ntFEpmGr0DZ4k3fUFFTwFJ7AwFIjMbyNNsPqdCcMezkrnEzRErgVfwk
+         vrAeVlG3W9apImp2c4JOGe0cjEog9XiPDnb0fCQ5GiDtCb4wob39UHoE7iFPG+Vo19sS
+         ULFHcNVrjQgS3eIQQq+qWnfIuvrkUaYPkW+Y5RPIC0SbNZHS8AWRIqwMP7EgiznJNWSd
+         mqOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692652980; x=1693257780;
+        d=1e100.net; s=20221208; t=1692652982; x=1693257782;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hGowuOdlgc/g3u8U9EhceRoch6MKJG6leI2ZQ+fj9oY=;
-        b=YqFgnVEKkpTL3OW3wz+9IxwV2eSt8CozXWRaYeqI5RHRh0Xqe2+KBTI7T7MhM0V7lY
-         tMe82h1UoP10KXtbyOc0psOZJ6NqRsPKGhYDYHRrNuTzGD2VbPOUD0RHXPZA4X5PDPGm
-         B2OVZ3dhoqQxfZfiwu17bYkw5YSDY1xydfOIkDRQxQGlkMryy+AmrVrTZzoJ0eGniJpy
-         7l4GJhOw9pm3tx9MejKx8Vf2sCINB4VG13r0x2cBejw13MdNzNSgFPMh4sql9+C0f6tG
-         qWFjQrkmrZb9Yl/iBFF+Vz/SbzdE4Bh4yuPJW0tQkeO5e7vODyKqJNu0FEBMuxAkQ7YU
-         c+cw==
-X-Gm-Message-State: AOJu0YwUbinh7VzTE8OMG8UuWVZeMs+eXgw+qIHxYaI/u0MEGLhqR+Y+
-	gVPfrgo8mJXb+4S79ZzJPGN5StLDjZ2cOoDQyQ==
-X-Google-Smtp-Source: AGHT+IHWAYCWcuqlky3Jlh/tA/tztTBvpOQ6Ky5fN+7+GItW2NvM/yxfZvHjSk78Kd9MgfkgDAvMSeqcrtbGplRwbQ==
+        bh=ZZNW6XiNIf4mfjw9nbhS/bawdb727WcU0dp8aEgn/JY=;
+        b=IKhuB1IaaHfV3PRA9R3efoDsYd++eldw5FoGSnBlBG/lfxxhsB+I8DtPV8Wuo8RJsf
+         PgRVYxYWa9+4M6NAmIeypa3KcSghZ+PgY6Y0QlTdxBr0uOZ4yvvZhTdh6EtdogbPnmxN
+         TkSrhBwZkbsNLzMVBU0FD3z/vN8ixolCqsV24Ck6UU/iwMPnRyXYimKJ9rJ2zhCkUGEo
+         u7o7/bf1XHl22Vjso5wPLUpWCXtxsne7jj1/EajHFNjrY/N2nud6fJH2kQ7AIyinEH2o
+         8+znEOq8xuNCKhO8GPSsQX1FvplL7nGAfT60+q+qWk01t8qnWKJbHf2tScRMRNrdq1y3
+         SmHw==
+X-Gm-Message-State: AOJu0Yx+S+1rf7Kbfq3MDRsaxNMoT4lHjzceVJEDspZuWVEhw3CYvnoE
+	Dz+NNq5/G6mpU5xOh0CmmnLkXKDXCLzlga9EvA==
+X-Google-Smtp-Source: AGHT+IFcZHBQjtL3hf7b721U36jM/7oR8Bwys7GsW5mF8z+GNPV4bnU+CLhfQcjsqC+23yxApD2ljTpBXI1NF/Etiw==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a17:90a:c690:b0:268:1dd8:33f0 with
- SMTP id n16-20020a17090ac69000b002681dd833f0mr1930362pjt.1.1692652980138;
- Mon, 21 Aug 2023 14:23:00 -0700 (PDT)
-Date: Mon, 21 Aug 2023 14:22:39 -0700
+ (user=jingzhangos job=sendgmr) by 2002:a25:d3cd:0:b0:d64:9e2c:5c0d with SMTP
+ id e196-20020a25d3cd000000b00d649e2c5c0dmr98945ybf.5.1692652981963; Mon, 21
+ Aug 2023 14:23:01 -0700 (PDT)
+Date: Mon, 21 Aug 2023 14:22:40 -0700
 In-Reply-To: <20230821212243.491660-1-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230821212243.491660-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
-Message-ID: <20230821212243.491660-8-jingzhangos@google.com>
-Subject: [PATCH v9 07/11] KVM: arm64: Enable writable for ID_AA64PFR0_EL1
+Message-ID: <20230821212243.491660-9-jingzhangos@google.com>
+Subject: [PATCH v9 08/11] KVM: arm64: Refactor helper Macros for idreg desc
 From: Jing Zhang <jingzhangos@google.com>
 To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
 	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
@@ -58,27 +58,139 @@ Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
 	Shaoqin Huang <shahuang@redhat.com>, Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-All valid fields in ID_AA64PFR0_EL1 are writable from userspace
-with this change except AMU field which isn't exposed by KVM.
+Add some helpers to ease the declaration for idreg desc.
+These Macros will be heavily used for future commits enabling writable
+for idregs.
 
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/kvm/sys_regs.c | 82 +++++++++++++++++----------------------
+ 1 file changed, 36 insertions(+), 46 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index cee5f879df19..bf716f646872 100644
+index bf716f646872..44d164d47756 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -2043,7 +2043,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  .get_user = get_id_reg,
- 	  .set_user = set_id_reg,
- 	  .reset = read_sanitised_id_aa64pfr0_el1,
--	  .val = ID_AA64PFR0_EL1_CSV2_MASK | ID_AA64PFR0_EL1_CSV3_MASK, },
-+	  .val = ~ID_AA64PFR0_EL1_AMU_MASK, },
+@@ -1844,27 +1844,37 @@ static unsigned int elx2_visibility(const struct kvm_vcpu *vcpu,
+  * from userspace.
+  */
+ 
+-/* sys_reg_desc initialiser for known cpufeature ID registers */
+-#define ID_SANITISED(name) {			\
+-	SYS_DESC(SYS_##name),			\
+-	.access	= access_id_reg,		\
+-	.get_user = get_id_reg,			\
+-	.set_user = set_id_reg,			\
+-	.visibility = id_visibility,		\
+-	.reset = kvm_read_sanitised_id_reg,	\
+-	.val = 0,				\
++#define ID_DESC(name, _set_user, _visibility, _reset, mask) {	\
++	SYS_DESC(SYS_##name),					\
++	.access	= access_id_reg,				\
++	.get_user = get_id_reg,					\
++	.set_user = _set_user,					\
++	.visibility = _visibility,				\
++	.reset = _reset,					\
++	.val = mask,						\
+ }
+ 
+ /* sys_reg_desc initialiser for known cpufeature ID registers */
+-#define AA32_ID_SANITISED(name) {		\
+-	SYS_DESC(SYS_##name),			\
+-	.access	= access_id_reg,		\
+-	.get_user = get_id_reg,			\
+-	.set_user = set_id_reg,			\
+-	.visibility = aa32_id_visibility,	\
+-	.reset = kvm_read_sanitised_id_reg,	\
+-	.val = 0,				\
+-}
++#define _ID_SANITISED(name, _set_user, _reset) \
++	ID_DESC(name, _set_user, id_visibility, _reset, 0)
++#define ID_SANITISED(name) \
++	_ID_SANITISED(name, set_id_reg, kvm_read_sanitised_id_reg)
++
++#define _ID_SANITISED_W(name, _set_user, _reset, mask) \
++	ID_DESC(name, _set_user, id_visibility, _reset, mask)
++#define ID_SANITISED_W(name, mask) \
++	_ID_SANITISED_W(name, set_id_reg, kvm_read_sanitised_id_reg, mask)
++
++/* sys_reg_desc initialiser for known cpufeature ID registers */
++#define _AA32_ID_SANITISED(name, _set_user, _reset) \
++	ID_DESC(name, _set_user, aa32_id_visibility, _reset, 0)
++#define AA32_ID_SANITISED(name) \
++	_AA32_ID_SANITISED(name, set_id_reg, kvm_read_sanitised_id_reg)
++
++#define _AA32_ID_SANITISED_W(name, _set_user, _reset, mask) \
++	ID_DESC(name, _set_user, aa32_id_visibility, _reset, mask)
++#define AA32_ID_SANITISED_W(name, mask) \
++	_AA32_ID_SANITISED_W(name, set_id_reg, kvm_read_sanitised_id_reg, mask)
+ 
+ /*
+  * sys_reg_desc initialiser for architecturally unallocated cpufeature ID
+@@ -1886,15 +1896,8 @@ static unsigned int elx2_visibility(const struct kvm_vcpu *vcpu,
+  * For now, these are exposed just like unallocated ID regs: they appear
+  * RAZ for the guest.
+  */
+-#define ID_HIDDEN(name) {			\
+-	SYS_DESC(SYS_##name),			\
+-	.access = access_id_reg,		\
+-	.get_user = get_id_reg,			\
+-	.set_user = set_id_reg,			\
+-	.visibility = raz_visibility,		\
+-	.reset = kvm_read_sanitised_id_reg,	\
+-	.val = 0,				\
+-}
++#define ID_HIDDEN(name) \
++	ID_DESC(name, set_id_reg, raz_visibility, kvm_read_sanitised_id_reg, 0)
+ 
+ static bool access_sp_el1(struct kvm_vcpu *vcpu,
+ 			  struct sys_reg_params *p,
+@@ -2003,13 +2006,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	/* CRm=1 */
+ 	AA32_ID_SANITISED(ID_PFR0_EL1),
+ 	AA32_ID_SANITISED(ID_PFR1_EL1),
+-	{ SYS_DESC(SYS_ID_DFR0_EL1),
+-	  .access = access_id_reg,
+-	  .get_user = get_id_reg,
+-	  .set_user = set_id_dfr0_el1,
+-	  .visibility = aa32_id_visibility,
+-	  .reset = read_sanitised_id_dfr0_el1,
+-	  .val = GENMASK(31, 0), },
++	_AA32_ID_SANITISED_W(ID_DFR0_EL1, set_id_dfr0_el1,
++			     read_sanitised_id_dfr0_el1, GENMASK(31, 0)),
+ 	ID_HIDDEN(ID_AFR0_EL1),
+ 	AA32_ID_SANITISED(ID_MMFR0_EL1),
+ 	AA32_ID_SANITISED(ID_MMFR1_EL1),
+@@ -2038,12 +2036,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 
+ 	/* AArch64 ID registers */
+ 	/* CRm=4 */
+-	{ SYS_DESC(SYS_ID_AA64PFR0_EL1),
+-	  .access = access_id_reg,
+-	  .get_user = get_id_reg,
+-	  .set_user = set_id_reg,
+-	  .reset = read_sanitised_id_aa64pfr0_el1,
+-	  .val = ~ID_AA64PFR0_EL1_AMU_MASK, },
++	_ID_SANITISED_W(ID_AA64PFR0_EL1, set_id_reg,
++			read_sanitised_id_aa64pfr0_el1, ~ID_AA64PFR0_EL1_AMU_MASK),
  	ID_SANITISED(ID_AA64PFR1_EL1),
  	ID_UNALLOCATED(4,2),
  	ID_UNALLOCATED(4,3),
+@@ -2053,12 +2047,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	ID_UNALLOCATED(4,7),
+ 
+ 	/* CRm=5 */
+-	{ SYS_DESC(SYS_ID_AA64DFR0_EL1),
+-	  .access = access_id_reg,
+-	  .get_user = get_id_reg,
+-	  .set_user = set_id_aa64dfr0_el1,
+-	  .reset = read_sanitised_id_aa64dfr0_el1,
+-	  .val = ~(ID_AA64DFR0_EL1_PMSVer_MASK | ID_AA64DFR0_EL1_RES0_MASK), },
++	_ID_SANITISED_W(ID_AA64DFR0_EL1, set_id_aa64dfr0_el1, read_sanitised_id_aa64dfr0_el1,
++			~(ID_AA64DFR0_EL1_PMSVer_MASK | ID_AA64DFR0_EL1_RES0_MASK)),
+ 	ID_SANITISED(ID_AA64DFR1_EL1),
+ 	ID_UNALLOCATED(5,2),
+ 	ID_UNALLOCATED(5,3),
 -- 
 2.42.0.rc1.204.g551eb34607-goog
 
