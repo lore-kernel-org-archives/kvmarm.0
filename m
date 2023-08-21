@@ -1,40 +1,40 @@
 Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C88B125C1
-	for <kvmarm@lists.linux.dev>; Mon, 21 Aug 2023 21:22:54 +0000 (UTC)
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5659b9ae3ebso4010896a12.1
-        for <kvmarm@lists.linux.dev>; Mon, 21 Aug 2023 14:22:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29CF125C1
+	for <kvmarm@lists.linux.dev>; Mon, 21 Aug 2023 21:22:56 +0000 (UTC)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-564656d952aso3997112a12.3
+        for <kvmarm@lists.linux.dev>; Mon, 21 Aug 2023 14:22:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692652974; x=1693257774;
+        d=google.com; s=20221208; t=1692652976; x=1693257776;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MXfGcvHnrV8S9zRO9Bsrfmw8dC1LaW1sFLJCfI+pK2A=;
-        b=jtoqkcm66LalS3kbEpe2aa1AzZH6iqnCu3v79V3VYfzejtR8C1xS5a+JygUMBrXTfP
-         3vd5aOrV7YJ1LD2prB477eBuLLFsM3TMW8jFp67NJ4FTJB63ui1vH9ZiL2gGTPomUmbt
-         q1fj1qUMSO0KoCusjxrIWL6/WW6BbYqqf3I3kEfUKDeUWzAvxhWPt4MBCV1CbvjtC1fx
-         qnCzRC/sZgyHP6lFWSbHfsgkPIFP0pDYKPeevvdVfBW6y1wLysfEYLe/qMAKtH3T/sxR
-         6yH4NhAiddBBTax+LP8j5eYqBE4+xkrS0qom+bA1Ij3mf4Hu/8LF64hNMDhj4PQl3ZDN
-         FitA==
+        bh=dCgM+uWZENhfXGRSSt7pNwhlX4F4zmpaI/T3IJmgu5o=;
+        b=ME+OOxRo2wdRa9p4+icKYcj/ax6VdiNcN4Ngg7bJBna4Tq/iZNml5vlDHc7/LBxLVH
+         3JLVDXMCicie0QbeU9TMQNUHqMc6HrS9vGVA2Bhlxxb+JTEBon5AQeIKjYyKGaTuAnzk
+         g90dm7F92eU6VFVPVpq2jc+yOP4k4HE+ah1WPpE+lL/I6pmbt5oummmE2cR7K9I63pUy
+         2kVuK1c5vaaPcEvq+eq6X/XpUllvZwGjrFacNR2JwfFCz8wT7NvOVXhn3uln8qTvM/b9
+         4eqjrDBxdUHZ+Nb/DMJHqnhj+QxCmrBgbH1SAyRH6vqQAvrbABNabTPxme4PpoV6+4H9
+         Gykg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692652974; x=1693257774;
+        d=1e100.net; s=20221208; t=1692652976; x=1693257776;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MXfGcvHnrV8S9zRO9Bsrfmw8dC1LaW1sFLJCfI+pK2A=;
-        b=NnNwLePVdrt3Jwc+a9r0C4+wnsfhyYRIlcnLMByqH5IC1Ae9HElVO9d+URBw1pC5rN
-         InrI/L03d+WZyByeAy+YCoDSrjF60zpVzRkyFSgPDlKWgrpo5ZZxFfeXL4qu3O+NNaYv
-         /w6qlCmqLKdGDMulxng63RBnt2lwywU9mK6ZMyTisJNQNheMFB32DCFoJ7Ae4Wo/PmJP
-         Pwl2BAkLOKVEVnw/OAV1Acj69Ka6wA3FrFHETdfcR1Vz76sufmSzpWcnUEhbfu0R+sfS
-         heAMEG/Ik/YWgA6f1++TKU0fuJm0K0puIubBLUJJHLregjK5XDFDX281bYBPTAv+7pgf
-         Qxew==
-X-Gm-Message-State: AOJu0Yzyra1qO5bXo49ZpFBKLFr5s49E19gGtS08O+ZOfD5y4WtmwxP2
-	xVh7wDIyNWRILHFs9hfg/rgj6eeuedRC7KJHdQ==
-X-Google-Smtp-Source: AGHT+IGcMeKikR30UgqAPn7XnN7bWajJTeQ74B+zyCETF1yUbUuLnyIdcf6/vCoZva7LorprnBBEYmtK7U29axiYoA==
+        bh=dCgM+uWZENhfXGRSSt7pNwhlX4F4zmpaI/T3IJmgu5o=;
+        b=WzJKJSO4kpm9OOulfqbnRsENWfDhYtQugVc+5KAggpIAj7A7LD3xOSmcig3ReMNeIv
+         +RgWSRGZ6gEv5YcAUEPkd+taAxvzvS7qMFhiG9IPI9raMTD0gC8vr7KpTkho5JzjQG8R
+         G6Uz5AZw/D6LM7jOm/DvLUYL303n1htiOPj0J3hQT4dLMI+Xa+6aatVLrUnEqUoajATb
+         808hzzLO6DpZEoymXQe3Cj8JlJ4I/zU+mS90MGKBmnQczQ9Syo5/f0ryakcc3PRxTvdo
+         //fpQps28wxtfKRHuP9ZJ9bNW2I1oziPQXIi094q7DEuypNCyAtScZ4ZOtWHDH3JqWsc
+         ZMjg==
+X-Gm-Message-State: AOJu0YxmArjjJbMXOCJ8Qk4EurvPH42qdYjn+FsZswtUBNvrzlbE40+Y
+	ImLSXwV3XdtGu/wt+MQorAMZc02jg2QGqJ+8CA==
+X-Google-Smtp-Source: AGHT+IFEbSMkpzW4xRUg9/lecmYCKElY3+Z/nNrWGKno3Wd6qYB/hxIPVKLuWctd4B12O8psBSsfZbG8NCfYHLsFjw==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a63:7b02:0:b0:56b:b9b1:34e2 with SMTP
- id w2-20020a637b02000000b0056bb9b134e2mr753451pgc.11.1692652974552; Mon, 21
- Aug 2023 14:22:54 -0700 (PDT)
-Date: Mon, 21 Aug 2023 14:22:36 -0700
+ (user=jingzhangos job=sendgmr) by 2002:a63:3488:0:b0:566:1c6:139b with SMTP
+ id b130-20020a633488000000b0056601c6139bmr1238435pga.8.1692652976241; Mon, 21
+ Aug 2023 14:22:56 -0700 (PDT)
+Date: Mon, 21 Aug 2023 14:22:37 -0700
 In-Reply-To: <20230821212243.491660-1-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,9 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230821212243.491660-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
-Message-ID: <20230821212243.491660-5-jingzhangos@google.com>
-Subject: [PATCH v9 04/11] KVM: arm64: Reject attempts to set invalid debug
- arch version
+Message-ID: <20230821212243.491660-6-jingzhangos@google.com>
+Subject: [PATCH v9 05/11] KVM: arm64: Enable writable for ID_AA64DFR0_EL1 and ID_DFR0_EL1
 From: Jing Zhang <jingzhangos@google.com>
 To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
 	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
@@ -59,107 +58,46 @@ Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
 	Shaoqin Huang <shahuang@redhat.com>, Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Oliver Upton <oliver.upton@linux.dev>
+All valid fields in ID_AA64DFR0_EL1 and ID_DFR0_EL1 are writable
+from userspace with this change.
+RES0 fields and those fields hidden by KVM are not writable.
 
-The debug architecture is mandatory in ARMv8, so KVM should not allow
-userspace to configure a vCPU with less than that. Of course, this isn't
-handled elegantly by the generic ID register plumbing, as the respective
-ID register fields have a nonzero starting value.
-
-Add an explicit check for debug versions less than v8 of the
-architecture.
-
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 32 +++++++++++++++++++++++++++++---
- 1 file changed, 29 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 42c4d71f40f3..afade7186675 100644
+index afade7186675..20fc38bad4e8 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1216,8 +1216,14 @@ static s64 kvm_arm64_ftr_safe_value(u32 id, const struct arm64_ftr_bits *ftrp,
- 	/* Some features have different safe value type in KVM than host features */
- 	switch (id) {
- 	case SYS_ID_AA64DFR0_EL1:
--		if (kvm_ftr.shift == ID_AA64DFR0_EL1_PMUVer_SHIFT)
-+		switch (kvm_ftr.shift) {
-+		case ID_AA64DFR0_EL1_PMUVer_SHIFT:
- 			kvm_ftr.type = FTR_LOWER_SAFE;
-+			break;
-+		case ID_AA64DFR0_EL1_DebugVer_SHIFT:
-+			kvm_ftr.type = FTR_LOWER_SAFE;
-+			break;
-+		}
- 		break;
- 	case SYS_ID_DFR0_EL1:
- 		if (kvm_ftr.shift == ID_DFR0_EL1_PerfMon_SHIFT)
-@@ -1469,14 +1475,22 @@ static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
- 	return val;
+@@ -1931,6 +1931,8 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
+ 	return true;
  }
  
-+#define ID_REG_LIMIT_FIELD_ENUM(val, reg, field, limit)			       \
-+({									       \
-+	u64 __f_val = FIELD_GET(reg##_##field##_MASK, val);		       \
-+	(val) &= ~reg##_##field##_MASK;					       \
-+	(val) |= FIELD_PREP(reg##_##field##_MASK,			       \
-+			min(__f_val, (u64)reg##_##field##_##limit));	       \
-+	(val);								       \
-+})
++#define ID_AA64DFR0_EL1_RES0_MASK (GENMASK(59, 56) | GENMASK(27, 24) | GENMASK(19, 16))
 +
- static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
- 					  const struct sys_reg_desc *rd)
- {
- 	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
- 
- 	/* Limit debug to ARMv8.0 */
--	val &= ~ID_AA64DFR0_EL1_DebugVer_MASK;
--	val |= SYS_FIELD_PREP_ENUM(ID_AA64DFR0_EL1, DebugVer, IMP);
-+	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, IMP);
- 
- 	/*
- 	 * Only initialize the PMU version if the vCPU was configured with one.
-@@ -1496,6 +1510,7 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
- 			       const struct sys_reg_desc *rd,
- 			       u64 val)
- {
-+	u8 debugver = SYS_FIELD_GET(ID_AA64DFR0_EL1, DebugVer, val);
- 	u8 pmuver = SYS_FIELD_GET(ID_AA64DFR0_EL1, PMUVer, val);
- 
- 	/*
-@@ -1515,6 +1530,13 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
- 	if (pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
- 		val &= ~ID_AA64DFR0_EL1_PMUVer_MASK;
- 
-+	/*
-+	 * ID_AA64DFR0_EL1.DebugVer is one of those awkward fields with a
-+	 * nonzero minimum safe value.
-+	 */
-+	if (debugver < ID_AA64DFR0_EL1_DebugVer_IMP)
-+		return -EINVAL;
-+
- 	return set_id_reg(vcpu, rd, val);
- }
- 
-@@ -1536,6 +1558,7 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
- 			   u64 val)
- {
- 	u8 perfmon = SYS_FIELD_GET(ID_DFR0_EL1, PerfMon, val);
-+	u8 copdbg = SYS_FIELD_GET(ID_DFR0_EL1, CopDbg, val);
- 
- 	if (perfmon == ID_DFR0_EL1_PerfMon_IMPDEF) {
- 		val &= ~ID_DFR0_EL1_PerfMon_MASK;
-@@ -1551,6 +1574,9 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
- 	if (perfmon != 0 && perfmon < ID_DFR0_EL1_PerfMon_PMUv3)
- 		return -EINVAL;
- 
-+	if (copdbg < ID_DFR0_EL1_CopDbg_Armv8)
-+		return -EINVAL;
-+
- 	return set_id_reg(vcpu, rd, val);
- }
- 
+ /*
+  * Architected system registers.
+  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+@@ -2006,7 +2008,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  .set_user = set_id_dfr0_el1,
+ 	  .visibility = aa32_id_visibility,
+ 	  .reset = read_sanitised_id_dfr0_el1,
+-	  .val = ID_DFR0_EL1_PerfMon_MASK, },
++	  .val = GENMASK(31, 0), },
+ 	ID_HIDDEN(ID_AFR0_EL1),
+ 	AA32_ID_SANITISED(ID_MMFR0_EL1),
+ 	AA32_ID_SANITISED(ID_MMFR1_EL1),
+@@ -2055,7 +2057,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  .get_user = get_id_reg,
+ 	  .set_user = set_id_aa64dfr0_el1,
+ 	  .reset = read_sanitised_id_aa64dfr0_el1,
+-	  .val = ID_AA64DFR0_EL1_PMUVer_MASK, },
++	  .val = ~(ID_AA64DFR0_EL1_PMSVer_MASK | ID_AA64DFR0_EL1_RES0_MASK), },
+ 	ID_SANITISED(ID_AA64DFR1_EL1),
+ 	ID_UNALLOCATED(5,2),
+ 	ID_UNALLOCATED(5,3),
 -- 
 2.42.0.rc1.204.g551eb34607-goog
 
