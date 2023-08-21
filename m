@@ -1,89 +1,167 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173B24A10
-	for <kvmarm@lists.linux.dev>; Mon, 21 Aug 2023 19:49:07 +0000 (UTC)
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d72403b9e03so4974688276.0
-        for <kvmarm@lists.linux.dev>; Mon, 21 Aug 2023 12:49:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD15B4C9E
+	for <kvmarm@lists.linux.dev>; Mon, 21 Aug 2023 21:22:47 +0000 (UTC)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-56438e966baso3995702a12.2
+        for <kvmarm@lists.linux.dev>; Mon, 21 Aug 2023 14:22:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692647347; x=1693252147;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=cJZGEQtf1VL3HQEXak5eCjnl1mSbYK2LpINf2Y7mWuc=;
-        b=RZl6OjBiLyxrlN7m8yUzSzxx4s8l6y5XQtCqoL2DKa9CznCEyAG8OEzPqxiGWWfNJU
-         DP58nwM09rHRg7Se9vncvUgBs+EoatdB0oIHiYis/CY/mK8bpz5tBW/wF/N/V/N/8FcH
-         u/rMp5FZpxMI+ASR8w8FwZSKb5yUKy8z1UKPp14XAoTBk3vwb+9KvbuE4eIugJspN8RX
-         snR6LHbvF/g0TCDHMTgr7kn44jTj6A+c9BdOOfnITVAKCoxj2XXqVMiBuH5zs1EhWFJ1
-         LASBEZFLbEqzA+6VnHUNymrGUBh6X+GLDf47Xj3E2vNSql4sDsL+0xZSb2rnh4OE9Sf8
-         LLXQ==
+        d=google.com; s=20221208; t=1692652967; x=1693257767;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=7W2Zs0/pm7I7OHogR/tSUzcr/GJKDVTJTJBw8czH204=;
+        b=p3zT+it1diA8XrOL4pxuaxQWqBQCA6sbz/0wUWEj44sZuMzpL7NzWP+kXYjUffQHJo
+         kstYgT1CskbgAuGyy4kZMfKUIXlxk+tnL29GRBwKxVgEGpk3P6z5UK1Tr3mNHuUFRtbl
+         4Zj+cxp2lu3MR/7wgiJeloEi+J6xd8Q5jyciEb6kU3vlV5vuzIJ6vTD/vQOmaEAfU+g0
+         d8KO5ZP5NnhbnOlGO3D9wQqZuLTg1hcqeVxEEH1Z+V9tWp8Y1w+Q+ElKMBajg0VflFC3
+         pmVbJeqFYaVuQe5vvKwO9uA7SZxaST3ZNMtNHTlmoGmBN12dY2CO3R2u+VeRNCM4OYYG
+         J6XQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692647347; x=1693252147;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cJZGEQtf1VL3HQEXak5eCjnl1mSbYK2LpINf2Y7mWuc=;
-        b=WyN016NXDavoUz0Gqv5lV9F1I2gHlWm3yesl6P8Ets1EoiaYRYczrDgv0ZnT1aMXav
-         JAU7A2xeDg6STGqt3mYPoT7qrLV5wKVAjZS8AftwCUo9GC8RPNmZEB1s6TOl25OGiZdD
-         Eaq3YgdeFZf2fXEm9HydRRtavWWzd7hFUJvIINS2bQ38sFfWsE50UxK0q+/URMyS95GC
-         Wru+9fesEZ7MCSkppFB4gz/fiSuGE4CH2LjurR2jGCvjgBwJlYcuCUFEj10HhOb7NhIs
-         7TQOG9kKS7PCgFIBZZuAzQ2h9j4PoqqVKH5F2pkMm0ftwVps5BIvWH+2RRDp9LkeUNFJ
-         2eFw==
-X-Gm-Message-State: AOJu0YzRbMT/D3QUQ090xK9ewsSRtKeyHQSQg2tVIpmAY4qe4Z+S1MQR
-	UV30EP2jj8Qwcq7nU8p9eUyllM1SthU4h9IqZw==
-X-Google-Smtp-Source: AGHT+IHM9bfoMlIQRP0Zhx06e/5qWh61CmNcgWIzhDyB//MY5jBFnNMVKsg1bGSAIpor6rGkYRANDK9cShM4uv9gKA==
-X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:13f8])
- (user=ackerleytng job=sendgmr) by 2002:a25:fc0d:0:b0:d07:e80c:412e with SMTP
- id v13-20020a25fc0d000000b00d07e80c412emr56346ybd.12.1692647346791; Mon, 21
- Aug 2023 12:49:06 -0700 (PDT)
-Date: Mon, 21 Aug 2023 19:49:05 +0000
-In-Reply-To: <ZN/4RjDsBLf0FB98@google.com> (message from Sean Christopherson
- on Fri, 18 Aug 2023 16:01:26 -0700)
+        d=1e100.net; s=20221208; t=1692652967; x=1693257767;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7W2Zs0/pm7I7OHogR/tSUzcr/GJKDVTJTJBw8czH204=;
+        b=YBYzfd3AfIIQyaYcUR/Lt3yii7mRLcZIAUNTrKBTMkJcSZ8gRqLEx/gT+mXBgar4Ur
+         CftG9nZsdO2D4mFlf5y7MSqbMmodYZSUh/5TirFEXP4pIAH0Q0b89C3YOzDUGDlsQvs/
+         gvLaheo5n6MVkziVeJE9Fzlv1HDIXCVCnZcU3C9ZUOPAdB1zxxbef6VqqdSGpTOx4srK
+         C+IYHxPJdu8gnO1vc6hiL1T/0jRz6H+e5y7Y9SDWbcJL3Sej9XD/5oRNwAA7qJoq6uq3
+         FJyz2xjGnwCmd0zeI84fEWNiBp0CDnJHtJLHUwtikPj+ilA02DkgfvU8+biBXoMY7lEh
+         Siww==
+X-Gm-Message-State: AOJu0Yxh963q9Te/O5sXAxVgvGATtJ76UJKWDlugw6Vu4azLjHxKvbwf
+	PA4RxqUGmnp74W+OkifxvwrXcqTugt3rZthiLg==
+X-Google-Smtp-Source: AGHT+IEVzZXRt8y+Ma6R9WjGxt5eCIhgyL+3uY7/hqkASZkb9M84mnZETxus4J6hL7V+d5xXL8bw+PHEff/qJQhSmQ==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a17:903:1c4:b0:1bc:7c69:925c with SMTP
+ id e4-20020a17090301c400b001bc7c69925cmr3776051plh.10.1692652967025; Mon, 21
+ Aug 2023 14:22:47 -0700 (PDT)
+Date: Mon, 21 Aug 2023 14:22:32 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-Message-ID: <diqzwmxotbv2.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [RFC PATCH v11 28/29] KVM: selftests: Add basic selftest for guest_memfd()
-From: Ackerley Tng <ackerleytng@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev, 
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	willy@infradead.org, akpm@linux-foundation.org, paul@paul-moore.com, 
-	jmorris@namei.org, serge@hallyn.com, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	chao.p.peng@linux.intel.com, tabba@google.com, jarkko@kernel.org, 
-	yu.c.zhang@linux.intel.com, vannapurve@google.com, mail@maciej.szmigiero.name, 
-	vbabka@suse.cz, david@redhat.com, qperret@google.com, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com
+X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
+Message-ID: <20230821212243.491660-1-jingzhangos@google.com>
+Subject: [PATCH v9 00/11] Enable writable for idregs DFR0,PFR0, MMFR{0,1,2,3}
+From: Jing Zhang <jingzhangos@google.com>
+To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, 
+	Reiji Watanabe <reijiw@google.com>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Suraj Jitindar Singh <surajjs@amazon.com>, Cornelia Huck <cohuck@redhat.com>, 
+	Shaoqin Huang <shahuang@redhat.com>, Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Sean Christopherson <seanjc@google.com> writes:
+This patch series enable userspace writable for below idregs:
+ID_AA64DFR0_EL1, ID_DFR0_EL1, ID_AA64PFR0_EL1, ID_AA64MMFR{0, 1, 2, 3}_EL1.
+A vm ioctl is added to get feature ID register writable masks from userspace.
+A selftest is added to verify that KVM handles the writings from user space
+correctly.
+A relevant patch from Oliver is picked from [3].
 
-> On Mon, Aug 07, 2023, Ackerley Tng wrote:
->> Sean Christopherson <seanjc@google.com> writes:
->> 
->> > Add a selftest to verify the basic functionality of guest_memfd():
->> >
->> > <snip>
->> 
->> Here's one more test:
->
-> First off, thank you!  I greatly appreciate all the selftests work you (and
-> others!) have been doing.
->
-> For v2, can you please post a standalone patch?  My workflow barfs on unrelated,
-> inlined patches.  I'm guessing I can get b4 to play nice, but it's easier to just
-> yell at people :-)
->
+---
 
-Here's a standalone patch :)
-https://lore.kernel.org/lkml/20230821194411.2165757-1-ackerleytng@google.com/
+* v8 -> v9
+  - Rebase on v6.5-rc7.
+  - Don't allow writable on RES0 fields and those fields not exposed by KVM.
+  - Fixed build dependency issue for system register definition generation in
+    selftest.
 
-> <snip>
+* v7 -> v8
+  - Rebase on v6.5-rc5.
+  - Add reserved parameters to UAPI to get writable masks for future expansion.
+  - Import system regiesters definition automatic generation from kernel to
+    selftests.
+  - Refactor the selftest for verifying ID register writable from userspace to
+    cover all writable ID register fields.
+
+* v6 -> v7
+  - Rebase on v6.5-rc4.
+  - Add a vm ioctl to get feature ID register writable masks from userspace.
+  - Split the change for debug version in ID_{AA64}DFR0_EL1.
+  - Addressed some bugs in selftest.
+
+* v5 -> v6
+  - Override the type of field AA64DFR0_EL1_DebugVer to be FTR_LOWER_SAFE by the
+    discussion of Oliver and Suraj.
+
+* v4 -> v5
+  - Rebase on v6.5-rc1 which contains infrastructure for writable idregs.
+  - Use guest ID registers values for the sake of emulation.
+  - Added a selftest to verify idreg userspace writing.
+
+* v3 -> v4
+  - Rebase on v11 of writable idregs series at [2].
+
+* v2 -> v3
+  - Rebase on v6 of writable idregs series.
+  - Enable writable for ID_AA64PFR0_EL1 and ID_AA64MMFR{0, 1, 2}_EL1.
+
+* v1 -> v2
+  - Rebase on latest patch series [1] of enabling writable ID register.
+
+[1] https://lore.kernel.org/all/20230402183735.3011540-1-jingzhangos@google.com
+[2] https://lore.kernel.org/all/20230602005118.2899664-1-jingzhangos@google.com
+[3] https://lore.kernel.org/kvmarm/20230623205232.2837077-1-oliver.upton@linux.dev
+
+[v1] https://lore.kernel.org/all/20230326011950.405749-1-jingzhangos@google.com
+[v2] https://lore.kernel.org/all/20230403003723.3199828-1-jingzhangos@google.com
+[v3] https://lore.kernel.org/all/20230405172146.297208-1-jingzhangos@google.com
+[v4] https://lore.kernel.org/all/20230607194554.87359-1-jingzhangos@google.com
+[v5] https://lore.kernel.org/all/20230710192430.1992246-1-jingzhangos@google.com
+[v6] https://lore.kernel.org/all/20230718164522.3498236-1-jingzhangos@google.com
+[v7] https://lore.kernel.org/all/20230801152007.337272-1-jingzhangos@google.com
+[v8] https://lore.kernel.org/all/20230807162210.2528230-1-jingzhangos@google.com
+
+---
+
+Jing Zhang (9):
+  KVM: arm64: Allow userspace to get the writable masks for feature ID
+    registers
+  KVM: arm64: Document KVM_ARM_GET_REG_WRITABLE_MASKS
+  KVM: arm64: Use guest ID register values for the sake of emulation
+  KVM: arm64: Enable writable for ID_AA64DFR0_EL1 and ID_DFR0_EL1
+  KVM: arm64: Enable writable for ID_AA64PFR0_EL1
+  KVM: arm64: Refactor helper Macros for idreg desc
+  KVM: arm64: Enable writable for ID_AA64MMFR{0, 1, 2, 3}_EL1
+  KVM: arm64: selftests: Import automatic system register definition
+    generation from kernel
+  KVM: arm64: selftests: Test for setting ID register from usersapce
+
+Oliver Upton (2):
+  KVM: arm64: Reject attempts to set invalid debug arch version
+  KVM: arm64: Bump up the default KVM sanitised debug version to v8p8
+
+ Documentation/virt/kvm/api.rst                |   29 +
+ arch/arm64/include/asm/kvm_host.h             |    2 +
+ arch/arm64/include/uapi/asm/kvm.h             |   26 +
+ arch/arm64/kvm/arm.c                          |    7 +
+ arch/arm64/kvm/sys_regs.c                     |  207 +-
+ include/uapi/linux/kvm.h                      |    1 +
+ tools/arch/arm64/include/.gitignore           |    1 +
+ tools/arch/arm64/include/asm/gpr-num.h        |   26 +
+ tools/arch/arm64/include/asm/sysreg.h         |  839 ++----
+ tools/arch/arm64/tools/gen-sysreg.awk         |  336 +++
+ tools/arch/arm64/tools/sysreg                 | 2497 +++++++++++++++++
+ tools/testing/selftests/kvm/Makefile          |   15 +-
+ .../selftests/kvm/aarch64/aarch32_id_regs.c   |    4 +-
+ .../selftests/kvm/aarch64/debug-exceptions.c  |   12 +-
+ .../selftests/kvm/aarch64/page_fault_test.c   |    6 +-
+ .../selftests/kvm/aarch64/set_id_regs.c       |  448 +++
+ .../selftests/kvm/lib/aarch64/processor.c     |    6 +-
+ 17 files changed, 3739 insertions(+), 723 deletions(-)
+ create mode 100644 tools/arch/arm64/include/.gitignore
+ create mode 100644 tools/arch/arm64/include/asm/gpr-num.h
+ create mode 100755 tools/arch/arm64/tools/gen-sysreg.awk
+ create mode 100644 tools/arch/arm64/tools/sysreg
+ create mode 100644 tools/testing/selftests/kvm/aarch64/set_id_regs.c
+
+
+base-commit: 706a741595047797872e669b3101429ab8d378ef
+-- 
+2.42.0.rc1.204.g551eb34607-goog
+
