@@ -1,576 +1,170 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 789F48C16
-	for <kvmarm@lists.linux.dev>; Mon, 21 Aug 2023 17:47:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CE88C433C7;
-	Mon, 21 Aug 2023 17:47:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692640051;
-	bh=8/w1vppuAPt0QtE6wEXEuGfp6fCmiBq3UFXV27o7K1Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=afS9AK652EAzGos+YRajbsGORXbfu9wWbqRJXVKVYqHGxLyWa5aecPfq/qxL2MkY5
-	 rWqhE/+29YhjAeQL4tLnFH9craYh5eiztSrEnEJ+t30zBcBgZM9t+ETSBo/ddh9HnE
-	 DCKmEsMfK6VH8fYEG/rF5TSAAygTeaVyCrD57p2iSO0avPstJptepK1P+lmy/OvE5e
-	 k8qW89g/ptrlN5TnE/lzgOT+i9IiQdLSyXwNZ5vJzRrqm9H1PwbH66SuXB+NgfXPR2
-	 n3JLpadXBKFVPLwGJ1GkpubvKS+0BcE+SshSR291xHRQ7X4s4MJfx00YnHqdwcniev
-	 CJUDMAY+rMclw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qY8zx-006nCa-2F;
-	Mon, 21 Aug 2023 18:47:29 +0100
-Date: Mon, 21 Aug 2023 18:47:28 +0100
-Message-ID: <86lee4fftb.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Miguel Luis <miguel.luis@oracle.com>
-Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	Catalin Marinas
-	<catalin.marinas@arm.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Mark Brown
-	<broonie@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Will Deacon
-	<will@kernel.org>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andre
- Przywara <andre.przywara@arm.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Darren Hart
-	<darren@os.amperecomputing.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	James
- Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v4 15/28] KVM: arm64: nv: Add trap forwarding for HCR_EL2
-In-Reply-To: <7B337015-DEB4-4E04-9A7A-AEDA0ECED71B@oracle.com>
-References: <20230815183903.2735724-1-maz@kernel.org>
-	<20230815183903.2735724-16-maz@kernel.org>
-	<7B337015-DEB4-4E04-9A7A-AEDA0ECED71B@oracle.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D79C5684
+	for <kvmarm@lists.linux.dev>; Mon, 21 Aug 2023 19:33:09 +0000 (UTC)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-26d1ec91c8aso3888868a91.2
+        for <kvmarm@lists.linux.dev>; Mon, 21 Aug 2023 12:33:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692646389; x=1693251189;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lTUf23UWw1SkKKJ2TYgJ195zKcBZk+aHzDWYw0jOr4Q=;
+        b=qpKSqx5ICliXSxPjZu0tOZy7xlqIAe6qVNImHFeHE99jDfjJ0rkalTo5f1yiylL8Zp
+         zW/oM/ylnbuxciYR4prkKI8mJaHp2WuQufXKGB2RG8EjyX49+7sODEpJkoODIpJFN+WQ
+         d92P7dg0Kdt0AwxXyEzQoriMz6/KeQrNijacO4IuCJVKS1YJTlTz834blo5E9EKqcgWL
+         PEM2JeCl6oJE3F68JjqgLe5PECwZdFSwKXlISOg41aNDBtfUtUCqAE2x2tOPTF0xf31f
+         3SefiEREMJ5D9AnExP5D9BLT2XJ6ZGgC24sHacNuUQH7uTJzB0bBXanlC1qACw6pUjbt
+         /CMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692646389; x=1693251189;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lTUf23UWw1SkKKJ2TYgJ195zKcBZk+aHzDWYw0jOr4Q=;
+        b=jTp0ienNIepAC2rA5ZKkzqOQHrFAl+63GEnZR9QvswbLAqrG/3GIqR8w4VVtpM2088
+         XZ6XxZ8/BYXNQgLW+TUcHL1Lw18HAPzH+wUsUO9nGUhNMPf2opgotUlMO37lpePat+ud
+         3gWDN/nlCA4jNzcsd0Lcg2Alkqz7VNo8CpbmzWoCtSDlwqpq8qbkaNUSDr7xvQ5pXyGa
+         Y5Mmq/TJkuWjXZguXf7f8hk3JvvaZwi7w45oFEFQTIlT7blnVu54Vl9ZsI3oVWLUwj9f
+         Zl3MIfhxP/vKQ54xowmEjHABjQQy1NhRBd4eksFsJ5u3xMAIkqnV8Ne4cBeZytDlSiUR
+         kSPg==
+X-Gm-Message-State: AOJu0Yy4IZhPTBBHkTZt/AUVYxm93i1gXztpAArE2bISU8eyept5jjev
+	QlINFXeDHPpd0fzrictFC+0SwsliAew=
+X-Google-Smtp-Source: AGHT+IHapYFA1E8erMKTCUk5o1Pg5iPJ1NuCQ0fs2o2CFjrEymp3AKNMxkfs6EIdF0eDdCPrJxgkHXuIM1g=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:d90b:b0:26d:1212:7924 with SMTP id
+ c11-20020a17090ad90b00b0026d12127924mr1918689pjv.4.1692646388708; Mon, 21 Aug
+ 2023 12:33:08 -0700 (PDT)
+Date: Mon, 21 Aug 2023 12:33:07 -0700
+In-Reply-To: <diqzzg2ktiao.fsf@ackerleytng-ctop.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, jingzhangos@google.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <ZNvaJ3igvcvTZ/8k@google.com> <diqzzg2ktiao.fsf@ackerleytng-ctop.c.googlers.com>
+Message-ID: <ZOO782YGRY0YMuPu@google.com>
+Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+From: Sean Christopherson <seanjc@google.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	willy@infradead.org, akpm@linux-foundation.org, paul@paul-moore.com, 
+	jmorris@namei.org, serge@hallyn.com, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	chao.p.peng@linux.intel.com, tabba@google.com, jarkko@kernel.org, 
+	yu.c.zhang@linux.intel.com, vannapurve@google.com, mail@maciej.szmigiero.name, 
+	vbabka@suse.cz, david@redhat.com, qperret@google.com, michael.roth@amd.com, 
+	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, 17 Aug 2023 12:05:49 +0100,
-Miguel Luis <miguel.luis@oracle.com> wrote:
->=20
-> Hi Marc,
->=20
-> > On 15 Aug 2023, at 18:38, Marc Zyngier <maz@kernel.org> wrote:
-> >=20
-> > Describe the HCR_EL2 register, and associate it with all the sysregs
-> > it allows to trap.
-> >=20
-> > Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> > arch/arm64/kvm/emulate-nested.c | 488 ++++++++++++++++++++++++++++++++
-> > 1 file changed, 488 insertions(+)
-> >=20
-> > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-n=
-ested.c
-> > index d5837ed0077c..975a30ef874a 100644
-> > --- a/arch/arm64/kvm/emulate-nested.c
-> > +++ b/arch/arm64/kvm/emulate-nested.c
-> > @@ -38,12 +38,48 @@ enum cgt_group_id {
-> > * on their own instead of being part of a combination of
-> > * trap controls.
-> > */
-> > + CGT_HCR_TID1,
-> > + CGT_HCR_TID2,
-> > + CGT_HCR_TID3,
-> > + CGT_HCR_IMO,
-> > + CGT_HCR_FMO,
-> > + CGT_HCR_TIDCP,
-> > + CGT_HCR_TACR,
-> > + CGT_HCR_TSW,
-> > + CGT_HCR_TPC,
-> > + CGT_HCR_TPU,
-> > + CGT_HCR_TTLB,
-> > + CGT_HCR_TVM,
-> > + CGT_HCR_TDZ,
-> > + CGT_HCR_TRVM,
-> > + CGT_HCR_TLOR,
-> > + CGT_HCR_TERR,
-> > + CGT_HCR_APK,
-> > + CGT_HCR_NV,
-> > + CGT_HCR_NV_nNV2,
-> > + CGT_HCR_NV1_nNV2,
-> > + CGT_HCR_AT,
-> > + CGT_HCR_nFIEN,
-> > + CGT_HCR_TID4,
-> > + CGT_HCR_TICAB,
-> > + CGT_HCR_TOCU,
-> > + CGT_HCR_ENSCXT,
-> > + CGT_HCR_TTLBIS,
-> > + CGT_HCR_TTLBOS,
-> >=20
-> > /*
-> > * Anything after this point is a combination of coarse trap
-> > * controls, which must all be evaluated to decide what to do.
-> > */
-> > __MULTIPLE_CONTROL_BITS__,
-> > + CGT_HCR_IMO_FMO =3D __MULTIPLE_CONTROL_BITS__,
-> > + CGT_HCR_TID2_TID4,
-> > + CGT_HCR_TTLB_TTLBIS,
-> > + CGT_HCR_TTLB_TTLBOS,
-> > + CGT_HCR_TVM_TRVM,
-> > + CGT_HCR_TPU_TICAB,
-> > + CGT_HCR_TPU_TOCU,
-> > + CGT_HCR_NV1_nNV2_ENSCXT,
-> >=20
-> > /*
-> > * Anything after this point requires a callback evaluating a
-> > @@ -56,6 +92,174 @@ enum cgt_group_id {
-> > };
-> >=20
-> > static const struct trap_bits coarse_trap_bits[] =3D {
-> > + [CGT_HCR_TID1] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_TID1,
-> > + .mask =3D HCR_TID1,
-> > + .behaviour =3D BEHAVE_FORWARD_READ,
-> > + },
-> > + [CGT_HCR_TID2] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_TID2,
-> > + .mask =3D HCR_TID2,
-> > + .behaviour =3D BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TID3] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_TID3,
-> > + .mask =3D HCR_TID3,
-> > + .behaviour =3D BEHAVE_FORWARD_READ,
-> > + },
-> > + [CGT_HCR_IMO] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_IMO,
-> > + .mask =3D HCR_IMO,
-> > + .behaviour =3D BEHAVE_FORWARD_WRITE,
-> > + },
-> > + [CGT_HCR_FMO] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_FMO,
-> > + .mask =3D HCR_FMO,
-> > + .behaviour =3D BEHAVE_FORWARD_WRITE,
-> > + },
-> > + [CGT_HCR_TIDCP] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_TIDCP,
-> > + .mask =3D HCR_TIDCP,
-> > + .behaviour =3D BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TACR] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_TACR,
-> > + .mask =3D HCR_TACR,
-> > + .behaviour =3D BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TSW] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_TSW,
-> > + .mask =3D HCR_TSW,
-> > + .behaviour =3D BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TPC] =3D { /* Also called TCPC when FEAT_DPB is implemented =
-*/
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_TPC,
-> > + .mask =3D HCR_TPC,
-> > + .behaviour =3D BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TPU] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_TPU,
-> > + .mask =3D HCR_TPU,
-> > + .behaviour =3D BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TTLB] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_TTLB,
-> > + .mask =3D HCR_TTLB,
-> > + .behaviour =3D BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TVM] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_TVM,
-> > + .mask =3D HCR_TVM,
-> > + .behaviour =3D BEHAVE_FORWARD_WRITE,
-> > + },
-> > + [CGT_HCR_TDZ] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_TDZ,
-> > + .mask =3D HCR_TDZ,
-> > + .behaviour =3D BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TRVM] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_TRVM,
-> > + .mask =3D HCR_TRVM,
-> > + .behaviour =3D BEHAVE_FORWARD_READ,
-> > + },
-> > + [CGT_HCR_TLOR] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_TLOR,
-> > + .mask =3D HCR_TLOR,
-> > + .behaviour =3D BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TERR] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_TERR,
-> > + .mask =3D HCR_TERR,
-> > + .behaviour =3D BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_APK] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D 0,
-> > + .mask =3D HCR_APK,
-> > + .behaviour =3D BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_NV] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_NV,
-> > + .mask =3D HCR_NV,
-> > + .behaviour =3D BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_NV_nNV2] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_NV,
-> > + .mask =3D HCR_NV | HCR_NV2,
-> > + .behaviour =3D BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_NV1_nNV2] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_NV | HCR_NV1,
-> > + .mask =3D HCR_NV | HCR_NV1 | HCR_NV2,
-> > + .behaviour =3D BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_AT] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_AT,
-> > + .mask =3D HCR_AT,
-> > + .behaviour =3D BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_nFIEN] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D 0,
-> > + .mask =3D HCR_FIEN,
-> > + .behaviour =3D BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TID4] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_TID4,
-> > + .mask =3D HCR_TID4,
-> > + .behaviour =3D BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TICAB] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_TICAB,
-> > + .mask =3D HCR_TICAB,
-> > + .behaviour =3D BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TOCU] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_TOCU,
-> > + .mask =3D HCR_TOCU,
-> > + .behaviour =3D BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_ENSCXT] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D 0,
-> > + .mask =3D HCR_ENSCXT,
-> > + .behaviour =3D BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TTLBIS] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_TTLBIS,
-> > + .mask =3D HCR_TTLBIS,
-> > + .behaviour =3D BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TTLBOS] =3D {
-> > + .index =3D HCR_EL2,
-> > + .value =3D HCR_TTLBOS,
-> > + .mask =3D HCR_TTLBOS,
-> > + .behaviour =3D BEHAVE_FORWARD_ANY,
-> > + },
-> > };
-> >=20
-> > #define MCB(id, ...) \
-> > @@ -65,6 +269,14 @@ static const struct trap_bits coarse_trap_bits[] =
-=3D {
-> > }
-> >=20
-> > static const enum cgt_group_id *coarse_control_combo[] =3D {
-> > + MCB(CGT_HCR_IMO_FMO, CGT_HCR_IMO, CGT_HCR_FMO),
-> > + MCB(CGT_HCR_TID2_TID4, CGT_HCR_TID2, CGT_HCR_TID4),
-> > + MCB(CGT_HCR_TTLB_TTLBIS, CGT_HCR_TTLB, CGT_HCR_TTLBIS),
-> > + MCB(CGT_HCR_TTLB_TTLBOS, CGT_HCR_TTLB, CGT_HCR_TTLBOS),
-> > + MCB(CGT_HCR_TVM_TRVM, CGT_HCR_TVM, CGT_HCR_TRVM),
-> > + MCB(CGT_HCR_TPU_TICAB, CGT_HCR_TPU, CGT_HCR_TICAB),
-> > + MCB(CGT_HCR_TPU_TOCU, CGT_HCR_TPU, CGT_HCR_TOCU),
-> > + MCB(CGT_HCR_NV1_nNV2_ENSCXT, CGT_HCR_NV1_nNV2, CGT_HCR_ENSCXT),
-> > };
-> >=20
-> > typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu =
-*);
-> > @@ -121,6 +333,282 @@ struct encoding_to_trap_config {
-> >  * re-injected in the nested hypervisor.
-> >  */
-> > static const struct encoding_to_trap_config encoding_to_cgt[] __initcon=
-st =3D {
-> > + SR_TRAP(SYS_REVIDR_EL1, CGT_HCR_TID1),
-> > + SR_TRAP(SYS_AIDR_EL1, CGT_HCR_TID1),
-> > + SR_TRAP(SYS_SMIDR_EL1, CGT_HCR_TID1),
-> > + SR_TRAP(SYS_CTR_EL0, CGT_HCR_TID2),
-> > + SR_TRAP(SYS_CCSIDR_EL1, CGT_HCR_TID2_TID4),
-> > + SR_TRAP(SYS_CCSIDR2_EL1, CGT_HCR_TID2_TID4),
-> > + SR_TRAP(SYS_CLIDR_EL1, CGT_HCR_TID2_TID4),
-> > + SR_TRAP(SYS_CSSELR_EL1, CGT_HCR_TID2_TID4),
-> > + SR_RANGE_TRAP(SYS_ID_PFR0_EL1,
-> > +      sys_reg(3, 0, 0, 7, 7), CGT_HCR_TID3),
-> > + SR_TRAP(SYS_ICC_SGI0R_EL1, CGT_HCR_IMO_FMO),
-> > + SR_TRAP(SYS_ICC_ASGI1R_EL1, CGT_HCR_IMO_FMO),
-> > + SR_TRAP(SYS_ICC_SGI1R_EL1, CGT_HCR_IMO_FMO),
-> > + SR_RANGE_TRAP(sys_reg(3, 0, 11, 0, 0),
-> > +      sys_reg(3, 0, 11, 15, 7), CGT_HCR_TIDCP),
-> > + SR_RANGE_TRAP(sys_reg(3, 1, 11, 0, 0),
-> > +      sys_reg(3, 1, 11, 15, 7), CGT_HCR_TIDCP),
-> > + SR_RANGE_TRAP(sys_reg(3, 2, 11, 0, 0),
-> > +      sys_reg(3, 2, 11, 15, 7), CGT_HCR_TIDCP),
-> > + SR_RANGE_TRAP(sys_reg(3, 3, 11, 0, 0),
-> > +      sys_reg(3, 3, 11, 15, 7), CGT_HCR_TIDCP),
-> > + SR_RANGE_TRAP(sys_reg(3, 4, 11, 0, 0),
-> > +      sys_reg(3, 4, 11, 15, 7), CGT_HCR_TIDCP),
-> > + SR_RANGE_TRAP(sys_reg(3, 5, 11, 0, 0),
-> > +      sys_reg(3, 5, 11, 15, 7), CGT_HCR_TIDCP),
-> > + SR_RANGE_TRAP(sys_reg(3, 6, 11, 0, 0),
-> > +      sys_reg(3, 6, 11, 15, 7), CGT_HCR_TIDCP),
-> > + SR_RANGE_TRAP(sys_reg(3, 7, 11, 0, 0),
-> > +      sys_reg(3, 7, 11, 15, 7), CGT_HCR_TIDCP),
-> > + SR_RANGE_TRAP(sys_reg(3, 0, 15, 0, 0),
-> > +      sys_reg(3, 0, 15, 15, 7), CGT_HCR_TIDCP),
-> > + SR_RANGE_TRAP(sys_reg(3, 1, 15, 0, 0),
-> > +      sys_reg(3, 1, 15, 15, 7), CGT_HCR_TIDCP),
-> > + SR_RANGE_TRAP(sys_reg(3, 2, 15, 0, 0),
-> > +      sys_reg(3, 2, 15, 15, 7), CGT_HCR_TIDCP),
-> > + SR_RANGE_TRAP(sys_reg(3, 3, 15, 0, 0),
-> > +      sys_reg(3, 3, 15, 15, 7), CGT_HCR_TIDCP),
-> > + SR_RANGE_TRAP(sys_reg(3, 4, 15, 0, 0),
-> > +      sys_reg(3, 4, 15, 15, 7), CGT_HCR_TIDCP),
-> > + SR_RANGE_TRAP(sys_reg(3, 5, 15, 0, 0),
-> > +      sys_reg(3, 5, 15, 15, 7), CGT_HCR_TIDCP),
-> > + SR_RANGE_TRAP(sys_reg(3, 6, 15, 0, 0),
-> > +      sys_reg(3, 6, 15, 15, 7), CGT_HCR_TIDCP),
-> > + SR_RANGE_TRAP(sys_reg(3, 7, 15, 0, 0),
-> > +      sys_reg(3, 7, 15, 15, 7), CGT_HCR_TIDCP),
-> > + SR_TRAP(SYS_ACTLR_EL1, CGT_HCR_TACR),
-> > + SR_TRAP(SYS_DC_ISW, CGT_HCR_TSW),
-> > + SR_TRAP(SYS_DC_CSW, CGT_HCR_TSW),
-> > + SR_TRAP(SYS_DC_CISW, CGT_HCR_TSW),
-> > + SR_TRAP(SYS_DC_IGSW, CGT_HCR_TSW),
-> > + SR_TRAP(SYS_DC_IGDSW, CGT_HCR_TSW),
-> > + SR_TRAP(SYS_DC_CGSW, CGT_HCR_TSW),
-> > + SR_TRAP(SYS_DC_CGDSW, CGT_HCR_TSW),
-> > + SR_TRAP(SYS_DC_CIGSW, CGT_HCR_TSW),
-> > + SR_TRAP(SYS_DC_CIGDSW, CGT_HCR_TSW),
-> > + SR_TRAP(SYS_DC_CIVAC, CGT_HCR_TPC),
-> > + SR_TRAP(SYS_DC_CVAC, CGT_HCR_TPC),
-> > + SR_TRAP(SYS_DC_CVAP, CGT_HCR_TPC),
-> > + SR_TRAP(SYS_DC_CVADP, CGT_HCR_TPC),
-> > + SR_TRAP(SYS_DC_IVAC, CGT_HCR_TPC),
-> > + SR_TRAP(SYS_DC_CIGVAC, CGT_HCR_TPC),
-> > + SR_TRAP(SYS_DC_CIGDVAC, CGT_HCR_TPC),
-> > + SR_TRAP(SYS_DC_IGVAC, CGT_HCR_TPC),
-> > + SR_TRAP(SYS_DC_IGDVAC, CGT_HCR_TPC),
-> > + SR_TRAP(SYS_DC_CGVAC, CGT_HCR_TPC),
-> > + SR_TRAP(SYS_DC_CGDVAC, CGT_HCR_TPC),
-> > + SR_TRAP(SYS_DC_CGVAP, CGT_HCR_TPC),
-> > + SR_TRAP(SYS_DC_CGDVAP, CGT_HCR_TPC),
-> > + SR_TRAP(SYS_DC_CGVADP, CGT_HCR_TPC),
-> > + SR_TRAP(SYS_DC_CGDVADP, CGT_HCR_TPC),
-> > + SR_TRAP(SYS_IC_IVAU, CGT_HCR_TPU_TOCU),
-> > + SR_TRAP(SYS_IC_IALLU, CGT_HCR_TPU_TOCU),
-> > + SR_TRAP(SYS_IC_IALLUIS, CGT_HCR_TPU_TICAB),
-> > + SR_TRAP(SYS_DC_CVAU, CGT_HCR_TPU_TOCU),
-> > + SR_TRAP(OP_TLBI_RVAE1, CGT_HCR_TTLB),
-> > + SR_TRAP(OP_TLBI_RVAAE1, CGT_HCR_TTLB),
-> > + SR_TRAP(OP_TLBI_RVALE1, CGT_HCR_TTLB),
-> > + SR_TRAP(OP_TLBI_RVAALE1, CGT_HCR_TTLB),
-> > + SR_TRAP(OP_TLBI_VMALLE1, CGT_HCR_TTLB),
-> > + SR_TRAP(OP_TLBI_VAE1, CGT_HCR_TTLB),
-> > + SR_TRAP(OP_TLBI_ASIDE1, CGT_HCR_TTLB),
-> > + SR_TRAP(OP_TLBI_VAAE1, CGT_HCR_TTLB),
-> > + SR_TRAP(OP_TLBI_VALE1, CGT_HCR_TTLB),
-> > + SR_TRAP(OP_TLBI_VAALE1, CGT_HCR_TTLB),
-> > + SR_TRAP(OP_TLBI_RVAE1NXS, CGT_HCR_TTLB),
-> > + SR_TRAP(OP_TLBI_RVAAE1NXS, CGT_HCR_TTLB),
-> > + SR_TRAP(OP_TLBI_RVALE1NXS, CGT_HCR_TTLB),
-> > + SR_TRAP(OP_TLBI_RVAALE1NXS, CGT_HCR_TTLB),
-> > + SR_TRAP(OP_TLBI_VMALLE1NXS, CGT_HCR_TTLB),
-> > + SR_TRAP(OP_TLBI_VAE1NXS, CGT_HCR_TTLB),
-> > + SR_TRAP(OP_TLBI_ASIDE1NXS, CGT_HCR_TTLB),
-> > + SR_TRAP(OP_TLBI_VAAE1NXS, CGT_HCR_TTLB),
-> > + SR_TRAP(OP_TLBI_VALE1NXS, CGT_HCR_TTLB),
-> > + SR_TRAP(OP_TLBI_VAALE1NXS, CGT_HCR_TTLB),
-> > + SR_TRAP(OP_TLBI_RVAE1IS, CGT_HCR_TTLB_TTLBIS),
-> > + SR_TRAP(OP_TLBI_RVAAE1IS, CGT_HCR_TTLB_TTLBIS),
-> > + SR_TRAP(OP_TLBI_RVALE1IS, CGT_HCR_TTLB_TTLBIS),
-> > + SR_TRAP(OP_TLBI_RVAALE1IS, CGT_HCR_TTLB_TTLBIS),
-> > + SR_TRAP(OP_TLBI_VMALLE1IS, CGT_HCR_TTLB_TTLBIS),
-> > + SR_TRAP(OP_TLBI_VAE1IS, CGT_HCR_TTLB_TTLBIS),
-> > + SR_TRAP(OP_TLBI_ASIDE1IS, CGT_HCR_TTLB_TTLBIS),
-> > + SR_TRAP(OP_TLBI_VAAE1IS, CGT_HCR_TTLB_TTLBIS),
-> > + SR_TRAP(OP_TLBI_VALE1IS, CGT_HCR_TTLB_TTLBIS),
-> > + SR_TRAP(OP_TLBI_VAALE1IS, CGT_HCR_TTLB_TTLBIS),
-> > + SR_TRAP(OP_TLBI_RVAE1ISNXS, CGT_HCR_TTLB_TTLBIS),
-> > + SR_TRAP(OP_TLBI_RVAAE1ISNXS, CGT_HCR_TTLB_TTLBIS),
-> > + SR_TRAP(OP_TLBI_RVALE1ISNXS, CGT_HCR_TTLB_TTLBIS),
-> > + SR_TRAP(OP_TLBI_RVAALE1ISNXS, CGT_HCR_TTLB_TTLBIS),
-> > + SR_TRAP(OP_TLBI_VMALLE1ISNXS, CGT_HCR_TTLB_TTLBIS),
-> > + SR_TRAP(OP_TLBI_VAE1ISNXS, CGT_HCR_TTLB_TTLBIS),
-> > + SR_TRAP(OP_TLBI_ASIDE1ISNXS, CGT_HCR_TTLB_TTLBIS),
-> > + SR_TRAP(OP_TLBI_VAAE1ISNXS, CGT_HCR_TTLB_TTLBIS),
-> > + SR_TRAP(OP_TLBI_VALE1ISNXS, CGT_HCR_TTLB_TTLBIS),
-> > + SR_TRAP(OP_TLBI_VAALE1ISNXS, CGT_HCR_TTLB_TTLBIS),
-> > + SR_TRAP(OP_TLBI_VMALLE1OS, CGT_HCR_TTLB_TTLBOS),
-> > + SR_TRAP(OP_TLBI_VAE1OS, CGT_HCR_TTLB_TTLBOS),
-> > + SR_TRAP(OP_TLBI_ASIDE1OS, CGT_HCR_TTLB_TTLBOS),
-> > + SR_TRAP(OP_TLBI_VAAE1OS, CGT_HCR_TTLB_TTLBOS),
-> > + SR_TRAP(OP_TLBI_VALE1OS, CGT_HCR_TTLB_TTLBOS),
-> > + SR_TRAP(OP_TLBI_VAALE1OS, CGT_HCR_TTLB_TTLBOS),
-> > + SR_TRAP(OP_TLBI_RVAE1OS, CGT_HCR_TTLB_TTLBOS),
-> > + SR_TRAP(OP_TLBI_RVAAE1OS, CGT_HCR_TTLB_TTLBOS),
-> > + SR_TRAP(OP_TLBI_RVALE1OS, CGT_HCR_TTLB_TTLBOS),
-> > + SR_TRAP(OP_TLBI_RVAALE1OS, CGT_HCR_TTLB_TTLBOS),
-> > + SR_TRAP(OP_TLBI_VMALLE1OSNXS, CGT_HCR_TTLB_TTLBOS),
-> > + SR_TRAP(OP_TLBI_VAE1OSNXS, CGT_HCR_TTLB_TTLBOS),
-> > + SR_TRAP(OP_TLBI_ASIDE1OSNXS, CGT_HCR_TTLB_TTLBOS),
-> > + SR_TRAP(OP_TLBI_VAAE1OSNXS, CGT_HCR_TTLB_TTLBOS),
-> > + SR_TRAP(OP_TLBI_VALE1OSNXS, CGT_HCR_TTLB_TTLBOS),
-> > + SR_TRAP(OP_TLBI_VAALE1OSNXS, CGT_HCR_TTLB_TTLBOS),
-> > + SR_TRAP(OP_TLBI_RVAE1OSNXS, CGT_HCR_TTLB_TTLBOS),
-> > + SR_TRAP(OP_TLBI_RVAAE1OSNXS, CGT_HCR_TTLB_TTLBOS),
-> > + SR_TRAP(OP_TLBI_RVALE1OSNXS, CGT_HCR_TTLB_TTLBOS),
-> > + SR_TRAP(OP_TLBI_RVAALE1OSNXS, CGT_HCR_TTLB_TTLBOS),
-> > + SR_TRAP(SYS_SCTLR_EL1, CGT_HCR_TVM_TRVM),
-> > + SR_TRAP(SYS_TTBR0_EL1, CGT_HCR_TVM_TRVM),
-> > + SR_TRAP(SYS_TTBR1_EL1, CGT_HCR_TVM_TRVM),
-> > + SR_TRAP(SYS_TCR_EL1, CGT_HCR_TVM_TRVM),
-> > + SR_TRAP(SYS_ESR_EL1, CGT_HCR_TVM_TRVM),
-> > + SR_TRAP(SYS_FAR_EL1, CGT_HCR_TVM_TRVM),
-> > + SR_TRAP(SYS_AFSR0_EL1, CGT_HCR_TVM_TRVM),
-> > + SR_TRAP(SYS_AFSR1_EL1, CGT_HCR_TVM_TRVM),
-> > + SR_TRAP(SYS_MAIR_EL1, CGT_HCR_TVM_TRVM),
-> > + SR_TRAP(SYS_AMAIR_EL1, CGT_HCR_TVM_TRVM),
-> > + SR_TRAP(SYS_CONTEXTIDR_EL1, CGT_HCR_TVM_TRVM),
-> > + SR_TRAP(SYS_DC_ZVA, CGT_HCR_TDZ),
-> > + SR_TRAP(SYS_DC_GVA, CGT_HCR_TDZ),
-> > + SR_TRAP(SYS_DC_GZVA, CGT_HCR_TDZ),
-> > + SR_TRAP(SYS_LORSA_EL1, CGT_HCR_TLOR),
-> > + SR_TRAP(SYS_LOREA_EL1, CGT_HCR_TLOR),
-> > + SR_TRAP(SYS_LORN_EL1, CGT_HCR_TLOR),
-> > + SR_TRAP(SYS_LORC_EL1, CGT_HCR_TLOR),
-> > + SR_TRAP(SYS_LORID_EL1, CGT_HCR_TLOR),
-> > + SR_TRAP(SYS_ERRIDR_EL1, CGT_HCR_TERR),
-> > + SR_TRAP(SYS_ERRSELR_EL1, CGT_HCR_TERR),
-> > + SR_TRAP(SYS_ERXADDR_EL1, CGT_HCR_TERR),
-> > + SR_TRAP(SYS_ERXCTLR_EL1, CGT_HCR_TERR),
-> > + SR_TRAP(SYS_ERXFR_EL1, CGT_HCR_TERR),
-> > + SR_TRAP(SYS_ERXMISC0_EL1, CGT_HCR_TERR),
-> > + SR_TRAP(SYS_ERXMISC1_EL1, CGT_HCR_TERR),
-> > + SR_TRAP(SYS_ERXMISC2_EL1, CGT_HCR_TERR),
-> > + SR_TRAP(SYS_ERXMISC3_EL1, CGT_HCR_TERR),
-> > + SR_TRAP(SYS_ERXSTATUS_EL1, CGT_HCR_TERR),
-> > + SR_TRAP(SYS_APIAKEYLO_EL1, CGT_HCR_APK),
-> > + SR_TRAP(SYS_APIAKEYHI_EL1, CGT_HCR_APK),
-> > + SR_TRAP(SYS_APIBKEYLO_EL1, CGT_HCR_APK),
-> > + SR_TRAP(SYS_APIBKEYHI_EL1, CGT_HCR_APK),
-> > + SR_TRAP(SYS_APDAKEYLO_EL1, CGT_HCR_APK),
-> > + SR_TRAP(SYS_APDAKEYHI_EL1, CGT_HCR_APK),
-> > + SR_TRAP(SYS_APDBKEYLO_EL1, CGT_HCR_APK),
-> > + SR_TRAP(SYS_APDBKEYHI_EL1, CGT_HCR_APK),
-> > + SR_TRAP(SYS_APGAKEYLO_EL1, CGT_HCR_APK),
-> > + SR_TRAP(SYS_APGAKEYHI_EL1, CGT_HCR_APK),
-> > + /* All _EL2 registers */
-> > + SR_RANGE_TRAP(sys_reg(3, 4, 0, 0, 0),
-> > +      sys_reg(3, 4, 3, 15, 7), CGT_HCR_NV),
-> > + /* Skip the SP_EL1 encoding... */
-> > + SR_RANGE_TRAP(sys_reg(3, 4, 4, 1, 1),
-> > +      sys_reg(3, 4, 10, 15, 7), CGT_HCR_NV),
-> > + SR_RANGE_TRAP(sys_reg(3, 4, 12, 0, 0),
-> > +      sys_reg(3, 4, 14, 15, 7), CGT_HCR_NV),
->=20
-> Should SPSR_EL2 and ELR_EL2 be considered also?
+On Mon, Aug 21, 2023, Ackerley Tng wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> 
+> > On Tue, Aug 15, 2023, Ackerley Tng wrote:
+> >> Sean Christopherson <seanjc@google.com> writes:
+> >> > Nullifying the KVM pointer isn't sufficient, because without additional actions
+> >> > userspace could extract data from a VM by deleting its memslots and then binding
+> >> > the guest_memfd to an attacker controlled VM.  Or more likely with TDX and SNP,
+> >> > induce badness by coercing KVM into mapping memory into a guest with the wrong
+> >> > ASID/HKID.
+> >> >
+> >> > I can think of three ways to handle that:
+> >> >
+> >> >   (a) prevent a different VM from *ever* binding to the gmem instance
+> >> >   (b) free/zero physical pages when unbinding
+> >> >   (c) free/zero when binding to a different VM
+> >> >
+> >> > Option (a) is easy, but that pretty much defeats the purpose of decopuling
+> >> > guest_memfd from a VM.
+> >> >
+> >> > Option (b) isn't hard to implement, but it screws up the lifecycle of the memory,
+> >> > e.g. would require memory when a memslot is deleted.  That isn't necessarily a
+> >> > deal-breaker, but it runs counter to how KVM memlots currently operate.  Memslots
+> >> > are basically just weird page tables, e.g. deleting a memslot doesn't have any
+> >> > impact on the underlying data in memory.  TDX throws a wrench in this as removing
+> >> > a page from the Secure EPT is effectively destructive to the data (can't be mapped
+> >> > back in to the VM without zeroing the data), but IMO that's an oddity with TDX and
+> >> > not necessarily something we want to carry over to other VM types.
+> >> >
+> >> > There would also be performance implications (probably a non-issue in practice),
+> >> > and weirdness if/when we get to sharing, linking and/or mmap()ing gmem.  E.g. what
+> >> > should happen if the last memslot (binding) is deleted, but there outstanding userspace
+> >> > mappings?
+> >> >
+> >> > Option (c) is better from a lifecycle perspective, but it adds its own flavor of
+> >> > complexity, e.g. the performant way to reclaim TDX memory requires the TDMR
+> >> > (effectively the VM pointer), and so a deferred relcaim doesn't really work for
+> >> > TDX.  And I'm pretty sure it *can't* work for SNP, because RMP entries must not
+> >> > outlive the VM; KVM can't reuse an ASID if there are pages assigned to that ASID
+> >> > in the RMP, i.e. until all memory belonging to the VM has been fully freed.
 
-Ah crap, these are outside of the expected range. It doesn't really
-matter yet as we are still a long way away from recursive
-virtualisation, but we might as well address that now.
+...
 
-I may also eventually have a more fine grained approach to these
-registers, as the ranges tend to bleed over a number of EL1 registers
-that aren't affected by NV.
+> I agree with you that nulling the KVM pointer is insufficient to keep
+> host userspace out of the TCB. Among the three options (a) preventing a
+> different VM (HKID/ASID) from binding to the gmem instance, or zeroing
+> the memory either (b) on unbinding, or (c) on binding to another VM
+> (HKID/ASID),
+> 
+> (a) sounds like adding a check issued to TDX/SNP upon binding and this
+>     check would just return OK for software-protected VMs (line of sight
+>     to removing host userspace from TCB).
+> 
+> Or, we could go further for software-protected VMs and add tracking in
+> the inode to prevent the same inode from being bound to different
+> "HKID/ASID"s, perhaps like this:
+> 
+> + On first binding, store the KVM pointer in the inode - not file (but
+>   not hold a refcount)
+> + On rebinding, check that the KVM matches the pointer in the inode
+> + On intra-host migration, update the KVM pointer in the inode to allow
+>   binding to the new struct kvm
+> 
+> I think you meant associating the file with a struct kvm at creation
+> time as an implementation for (a), but technically since the inode is
+> the representation of memory, tracking of struct kvm should be with the
+> inode instead of the file.
+> 
+> (b) You're right that this messes up the lifecycle of the memory and
+>     wouldn't work with intra-host migration.
+> 
+> (c) sounds like doing the clearing on a check similar to that of (a)
 
-In the meantime, I'll add the patch below to the patch stack.
+Sort of, though it's much nastier, because it requires the "old" KVM instance to
+be alive enough to support various operations.  I.e. we'd have to make stronger
+guarantees about exactly when the handoff/transition could happen.
 
-Thanks,
+> If we track struct kvm with the inode, then I think (a), (b) and (c) can
+> be independent of the refcounting method. What do you think?
 
-	M.
+No go.  Because again, the inode (physical memory) is coupled to the virtual machine
+as a thing, not to a "struct kvm".  Or more concretely, the inode is coupled to an
+ASID or an HKID, and there can be multiple "struct kvm" objects associated with a
+single ASID.  And at some point in the future, I suspect we'll have multiple KVM
+objects per HKID too.
 
-=46rom 9b650e785e3e59ef23a5dcb8f58be45cdd97b1f2 Mon Sep 17 00:00:00 2001
-From: Marc Zyngier <maz@kernel.org>
-Date: Mon, 21 Aug 2023 18:44:15 +0100
-Subject: [PATCH] KVM: arm64: nv: Add trap description for SPSR_EL2 and ELR_=
-EL2
+The current SEV use case is for the migration helper, where two KVM objects share
+a single ASID (the "real" VM and the helper).  I suspect TDX will end up with
+similar behavior where helper "VMs" can use the HKID of the "real" VM.  For KVM,
+that means multiple struct kvm objects being associated with a single HKID.
 
-Having carved a hole for SP_EL1, we are now missing the entries
-for SPSR_EL2 and ELR_EL2. Add them back.
+To prevent use-after-free, KVM "just" needs to ensure the helper instances can't
+outlive the real instance, i.e. can't use the HKID/ASID after the owning virtual
+machine has been destroyed.
 
-Reported-by: Miguel Luis <miguel.luis@oracle.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/emulate-nested.c | 2 ++
- 1 file changed, 2 insertions(+)
+To put it differently, "struct kvm" is a KVM software construct that _usually_,
+but not always, is associated 1:1 with a virtual machine.
 
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-neste=
-d.c
-index 44d9300e95f5..b5637ae4149f 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -651,6 +651,8 @@ static const struct encoding_to_trap_config encoding_to=
-_cgt[] __initconst =3D {
- 	SR_RANGE_TRAP(sys_reg(3, 4, 0, 0, 0),
- 		      sys_reg(3, 4, 3, 15, 7), CGT_HCR_NV),
- 	/* Skip the SP_EL1 encoding... */
-+	SR_TRAP(SYS_SPSR_EL2,		CGT_HCR_NV),
-+	SR_TRAP(SYS_ELR_EL2,		CGT_HCR_NV),
- 	SR_RANGE_TRAP(sys_reg(3, 4, 4, 1, 1),
- 		      sys_reg(3, 4, 10, 15, 7), CGT_HCR_NV),
- 	SR_RANGE_TRAP(sys_reg(3, 4, 12, 0, 0),
---=20
-2.34.1
-
-
---=20
-Without deviation from the norm, progress is not possible.
+And FWIW, stashing the pointer without holding a reference would not be a complete
+solution, because it couldn't guard against KVM reusing a pointer.  E.g. if a
+struct kvm was unbound and then freed, KVM could reuse the same memory for a new
+struct kvm, with a different ASID/HKID, and get a false negative on the rebinding
+check.
