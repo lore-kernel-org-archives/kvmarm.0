@@ -1,40 +1,40 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29CF125C1
-	for <kvmarm@lists.linux.dev>; Mon, 21 Aug 2023 21:22:56 +0000 (UTC)
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-564656d952aso3997112a12.3
-        for <kvmarm@lists.linux.dev>; Mon, 21 Aug 2023 14:22:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C130A125C1
+	for <kvmarm@lists.linux.dev>; Mon, 21 Aug 2023 21:22:58 +0000 (UTC)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1bef53ee9a8so42514495ad.0
+        for <kvmarm@lists.linux.dev>; Mon, 21 Aug 2023 14:22:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692652976; x=1693257776;
+        d=google.com; s=20221208; t=1692652978; x=1693257778;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dCgM+uWZENhfXGRSSt7pNwhlX4F4zmpaI/T3IJmgu5o=;
-        b=ME+OOxRo2wdRa9p4+icKYcj/ax6VdiNcN4Ngg7bJBna4Tq/iZNml5vlDHc7/LBxLVH
-         3JLVDXMCicie0QbeU9TMQNUHqMc6HrS9vGVA2Bhlxxb+JTEBon5AQeIKjYyKGaTuAnzk
-         g90dm7F92eU6VFVPVpq2jc+yOP4k4HE+ah1WPpE+lL/I6pmbt5oummmE2cR7K9I63pUy
-         2kVuK1c5vaaPcEvq+eq6X/XpUllvZwGjrFacNR2JwfFCz8wT7NvOVXhn3uln8qTvM/b9
-         4eqjrDBxdUHZ+Nb/DMJHqnhj+QxCmrBgbH1SAyRH6vqQAvrbABNabTPxme4PpoV6+4H9
-         Gykg==
+        bh=0Gl7xTSJXiv4/axuMn6kp2mV+4Fk1KiUUIgvbh7eheo=;
+        b=K3Pwq0bXvrKKoxq17uKY6PPEy//Kahe1n6Kr2lkLQP0YejL8SYoTG+LL2ToHaaOzD3
+         5/iaDGVN1sWGM48ozuRhey0SXURdcbdrZuB9mvXdtHAawWbjw56KAFNIDDoE6TulFdHt
+         Kvy6nakQh8f4YV3k2MqPK3nDtSnbsLnNr1cdkrDZbMgUc/L/s+fVl/NfAkZfmQI1N1G4
+         kBLL8To++3JN811vCM7jRuR3/SJdoPJ2vfi/pDICuViL8SGSkDiT4UBX7QZj755h6Zzg
+         Cx8bZQKE7clKxDIVCEjjVLIwxqJij61DSDL/qMQAiobSjl08atjsyw1R5SypNcZBFvR6
+         yq3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692652976; x=1693257776;
+        d=1e100.net; s=20221208; t=1692652978; x=1693257778;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dCgM+uWZENhfXGRSSt7pNwhlX4F4zmpaI/T3IJmgu5o=;
-        b=WzJKJSO4kpm9OOulfqbnRsENWfDhYtQugVc+5KAggpIAj7A7LD3xOSmcig3ReMNeIv
-         +RgWSRGZ6gEv5YcAUEPkd+taAxvzvS7qMFhiG9IPI9raMTD0gC8vr7KpTkho5JzjQG8R
-         G6Uz5AZw/D6LM7jOm/DvLUYL303n1htiOPj0J3hQT4dLMI+Xa+6aatVLrUnEqUoajATb
-         808hzzLO6DpZEoymXQe3Cj8JlJ4I/zU+mS90MGKBmnQczQ9Syo5/f0ryakcc3PRxTvdo
-         //fpQps28wxtfKRHuP9ZJ9bNW2I1oziPQXIi094q7DEuypNCyAtScZ4ZOtWHDH3JqWsc
-         ZMjg==
-X-Gm-Message-State: AOJu0YxmArjjJbMXOCJ8Qk4EurvPH42qdYjn+FsZswtUBNvrzlbE40+Y
-	ImLSXwV3XdtGu/wt+MQorAMZc02jg2QGqJ+8CA==
-X-Google-Smtp-Source: AGHT+IFEbSMkpzW4xRUg9/lecmYCKElY3+Z/nNrWGKno3Wd6qYB/hxIPVKLuWctd4B12O8psBSsfZbG8NCfYHLsFjw==
+        bh=0Gl7xTSJXiv4/axuMn6kp2mV+4Fk1KiUUIgvbh7eheo=;
+        b=MmxbxZCGKrFcH602leIgekeanIIovSf2MyUe/jVTRDS/wMqt8Qinf7OwA9+5rbdUwF
+         kD8VI0aOoTe2aMfIBI/ruB5U2Sui5o4CMWszrfLdOErDN4DK1xsw00fUHwBUuznVuBvD
+         9tgaZJzDXsXw6j/eHjflJsI6orJNUNcRh+u7VmCPAJLjse6vNA0nA3E64ROoMiYkMACp
+         7+ByTYaP628MDl58odoL1ee2opDYbzg/ZoLZRFKpDGYyS+MWUuqScG4KXN3lwQi9wpak
+         Uh5ib+9t0AEVxers1O4ql918E0JYnDiALrQ8KFtl0i8OzoxVgCTfUkGt12WRH61AIrCW
+         hYZg==
+X-Gm-Message-State: AOJu0Yx0bztMbqcpCVvjXB+FPq3ytdZZaMoycg9MHOf7NLRG9lDGd4WZ
+	Y7/2aend6a4jjFH2osaMrCRVoGytC6nnD1by3g==
+X-Google-Smtp-Source: AGHT+IF9FbTQRPdiHLCbnz33sY6UbDj9S6Y26IR0MYTkI5YWtozk6eb4WUf0X+aSfF3eceyT5iizkkBpkhREQrbrwA==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a63:3488:0:b0:566:1c6:139b with SMTP
- id b130-20020a633488000000b0056601c6139bmr1238435pga.8.1692652976241; Mon, 21
- Aug 2023 14:22:56 -0700 (PDT)
-Date: Mon, 21 Aug 2023 14:22:37 -0700
+ (user=jingzhangos job=sendgmr) by 2002:a17:903:41d0:b0:1bb:c7c6:3462 with
+ SMTP id u16-20020a17090341d000b001bbc7c63462mr3891383ple.8.1692652978227;
+ Mon, 21 Aug 2023 14:22:58 -0700 (PDT)
+Date: Mon, 21 Aug 2023 14:22:38 -0700
 In-Reply-To: <20230821212243.491660-1-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230821212243.491660-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
-Message-ID: <20230821212243.491660-6-jingzhangos@google.com>
-Subject: [PATCH v9 05/11] KVM: arm64: Enable writable for ID_AA64DFR0_EL1 and ID_DFR0_EL1
+Message-ID: <20230821212243.491660-7-jingzhangos@google.com>
+Subject: [PATCH v9 06/11] KVM: arm64: Bump up the default KVM sanitised debug
+ version to v8p8
 From: Jing Zhang <jingzhangos@google.com>
 To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
 	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
@@ -58,46 +59,40 @@ Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
 	Shaoqin Huang <shahuang@redhat.com>, Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-All valid fields in ID_AA64DFR0_EL1 and ID_DFR0_EL1 are writable
-from userspace with this change.
-RES0 fields and those fields hidden by KVM are not writable.
+From: Oliver Upton <oliver.upton@linux.dev>
 
+Since ID_AA64DFR0_EL1 and ID_DFR0_EL1 are now writable from userspace,
+it is safe to bump up the default KVM sanitised debug version to v8p8.
+
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index afade7186675..20fc38bad4e8 100644
+index 20fc38bad4e8..cee5f879df19 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1931,6 +1931,8 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
- 	return true;
+@@ -1489,8 +1489,7 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ {
+ 	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
+ 
+-	/* Limit debug to ARMv8.0 */
+-	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, IMP);
++	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, V8P8);
+ 
+ 	/*
+ 	 * Only initialize the PMU version if the vCPU was configured with one.
+@@ -1550,6 +1549,8 @@ static u64 read_sanitised_id_dfr0_el1(struct kvm_vcpu *vcpu,
+ 	if (kvm_vcpu_has_pmu(vcpu))
+ 		val |= SYS_FIELD_PREP(ID_DFR0_EL1, PerfMon, perfmon);
+ 
++	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_DFR0_EL1, CopDbg, Debugv8p8);
++
+ 	return val;
  }
  
-+#define ID_AA64DFR0_EL1_RES0_MASK (GENMASK(59, 56) | GENMASK(27, 24) | GENMASK(19, 16))
-+
- /*
-  * Architected system registers.
-  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-@@ -2006,7 +2008,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  .set_user = set_id_dfr0_el1,
- 	  .visibility = aa32_id_visibility,
- 	  .reset = read_sanitised_id_dfr0_el1,
--	  .val = ID_DFR0_EL1_PerfMon_MASK, },
-+	  .val = GENMASK(31, 0), },
- 	ID_HIDDEN(ID_AFR0_EL1),
- 	AA32_ID_SANITISED(ID_MMFR0_EL1),
- 	AA32_ID_SANITISED(ID_MMFR1_EL1),
-@@ -2055,7 +2057,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  .get_user = get_id_reg,
- 	  .set_user = set_id_aa64dfr0_el1,
- 	  .reset = read_sanitised_id_aa64dfr0_el1,
--	  .val = ID_AA64DFR0_EL1_PMUVer_MASK, },
-+	  .val = ~(ID_AA64DFR0_EL1_PMSVer_MASK | ID_AA64DFR0_EL1_RES0_MASK), },
- 	ID_SANITISED(ID_AA64DFR1_EL1),
- 	ID_UNALLOCATED(5,2),
- 	ID_UNALLOCATED(5,3),
 -- 
 2.42.0.rc1.204.g551eb34607-goog
 
