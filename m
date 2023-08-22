@@ -1,130 +1,185 @@
-Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com [209.85.214.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5FF6ED5
-	for <kvmarm@lists.linux.dev>; Tue, 22 Aug 2023 05:52:05 +0000 (UTC)
-Received: by mail-pl1-f194.google.com with SMTP id d9443c01a7336-1bf1935f6c2so27509905ad.1
-        for <kvmarm@lists.linux.dev>; Mon, 21 Aug 2023 22:52:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1692683525; x=1693288325;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pX6r3WX3NvSr18ZoSAOxDmvOMvYtId2NY9DB6/FvmJw=;
-        b=A5/+3Q3Hyn/lH9dYFfXb928gLVZSQE6OlxNPDiZQhprTlxgVutY1N2jFlGCAOzK3IQ
-         AOFrdh1kgz4mDfmBe5QcNK4x2A0zw2bs3z7yQTSMnxpajPU2DNxu9yaaqhnaeU/Yub22
-         qcqwOOQ41zMiHtW21Vy/cxX8jojKejbQoxNNS/8oUfpGpqy33SS0C21imrUR4girrMy5
-         dcv03Rns271ypsH8Fb1aoEjLZCsY3Z2Xt1JTeOMl9m6QhDX/5pCrsImxxwBuxco4UX7U
-         PemA/SoCWe/uhjsGYpi2g/ncwn91JOIccizpXz3WuSNr8KzN+8eN7A5HWS7DvS5HwE1e
-         FOqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692683525; x=1693288325;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=pX6r3WX3NvSr18ZoSAOxDmvOMvYtId2NY9DB6/FvmJw=;
-        b=ae3Fhhpu36rEsQVDrOMTg8F48xKxO1TYzUyB6kpvAzJDPxzO34NBczMhnZHWTl2KO9
-         E9o7nMi51lBHhhNf6jKGzPXauni2LOfrNDQIYqUrrw8sel/pUXradXa82pqbuB+x2axy
-         2E7PlyGoT5oK15MvW6M8TyljmwQif8JHXu74TAuJEDNLRnm8UEeoYj5FC9YlkTH45Kxo
-         Fo8qu6mTYbQTwadFbom3SCU4e/WF08QU89Ek6N5WVTdnv2q9zOZ9eHpfDL/3hK7hGCdw
-         XbWIWJKfpc6qxyXoQ3bgyFokyOJckkTqmutlQ0Laew5fyhXKOXliyF3FB1t2dPRPGXRD
-         F3mA==
-X-Gm-Message-State: AOJu0YxeVc1UNTBPcttGmT4CwV1V6rGqR7RXUiBN87D1Y/2oIk1r6Ztj
-	fyCYS9bCUB+a+n7ns5Qow28hhQ==
-X-Google-Smtp-Source: AGHT+IHoStOkuAAck1PdJ7uJtA2xFxVwA0h3uFvR/EarNEv49cmAKimiDq0JXFxErYjSOQNtqhqqFA==
-X-Received: by 2002:a17:903:2304:b0:1b8:8682:62fb with SMTP id d4-20020a170903230400b001b8868262fbmr12007273plh.4.1692683525104;
-        Mon, 21 Aug 2023 22:52:05 -0700 (PDT)
-Received: from [10.3.220.88] ([61.213.176.9])
-        by smtp.gmail.com with ESMTPSA id q6-20020a170902a3c600b001bbd8cf6b57sm8210654plb.230.2023.08.21.22.52.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Aug 2023 22:52:04 -0700 (PDT)
-Message-ID: <b3e716ee-988a-49cd-996d-a27517aa8e91@bytedance.com>
-Date: Tue, 22 Aug 2023 11:51:30 +0800
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D324515B4
+	for <kvmarm@lists.linux.dev>; Tue, 22 Aug 2023 06:48:33 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B64A32F4;
+	Mon, 21 Aug 2023 23:49:13 -0700 (PDT)
+Received: from FVFF77S0Q05N (unknown [10.57.3.221])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 492343F64C;
+	Mon, 21 Aug 2023 23:48:31 -0700 (PDT)
+Date: Tue, 22 Aug 2023 07:48:28 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Huang Shijie <shijie@os.amperecomputing.com>,
+	Leo Yan <leo.yan@linaro.org>
+Subject: Re: [PATCH v2] KVM: arm64: pmu: Resync EL0 state on counter rotation
+Message-ID: <ZORaPAzHpFn_-aRP@FVFF77S0Q05N>
+References: <20230820090108.177817-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] KVM: arm/arm64: optimize vSGI injection performance
-To: Marc Zyngier <maz@kernel.org>
-Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- zhouyibo@bytedance.com, zhouliang.001@bytedance.com,
- Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
- Mark Rutland <mark.rutland@arm.com>
-References: <20230818104704.7651-1-zhaoxu.35@bytedance.com>
- <ZOMnZY_w83vTYnTo@FVFF77S0Q05N> <86msykg0ox.wl-maz@kernel.org>
-From: zhaoxu <zhaoxu.35@bytedance.com>
-In-Reply-To: <86msykg0ox.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230820090108.177817-1-maz@kernel.org>
 
-hi marc, thanks for reviewing.
+On Sun, Aug 20, 2023 at 10:01:08AM +0100, Marc Zyngier wrote:
+> Huang Shijie reports that, when profiling a guest from the host
+> with a number of events that exceeds the number of available
+> counters, the reported counts are wildly inaccurate. Without
+> the counter oversubscription, the reported counts are correct.
+> 
+> Their investigation indicates that upon counter rotation (which
+> takes place on the back of a timer interrupt), we fail to
+> re-apply the guest EL0 enabling, leading to the counting of host
+> events instead of guest events.
+> 
+> In order to solve this, add yet another hook between the host PMU
+> driver and KVM, re-applying the guest EL0 configuration if the
+> right conditions apply (the host is VHE, we are in interrupt
+> context, and we interrupted a running vcpu). This triggers a new
+> vcpu request which will apply the correct configuration on guest
+> reentry.
+> 
+> With this, we have the correct counts, even when the counters are
+> oversubscribed.
+> 
+> Reported-by: Huang Shijie <shijie@os.amperecomputing.com>
+> Suggested-by: Oliver Upton <oliver.upton@linux.dev>
+> Tested_by: Huang Shijie <shijie@os.amperecomputing.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: Leo Yan <leo.yan@linaro.org>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Link: https://lore.kernel.org/r/20230809013953.7692-1-shijie@os.amperecomputing.com
 
-On 2023/8/21 18:16, Marc Zyngier wrote:
->>> This work is based on v5.4, and here is test data:
-> 
-> This is a 4 year old kernel. I'm afraid you'll have to provide
-> something that is relevant to a current (e.i. v6.5) kernel.
-> 
-In fact, the core vCPU search algorithm remains the same in the latest 
-kernel: iterate all vCPUs, if mpidr matches, inject. next version will 
-based on latest kernel.
+This looks sane to me so:
 
->>> Based on the test results, the performance of vm  with less than 16 cores remains almost the same,
->>> while significant improvement can be observed with more than 16
->>> cores.
+Acked-by: Mark Rutland <mark.rutland@arm.com>
+
+It doesn't look like we have any PMU patches queued that would conflict, so if
+Will's happy I reckon this should go through the KVM/arm64 tree.
+
+Mark.
+
+> ---
 > 
-> This triggers multiple questions:
+> Notes:
+>     V2: Fixed 32bit compilation
 > 
-> - what is the test being used? on what hardware? how can I reproduce
->    this data?
+>  arch/arm/include/asm/arm_pmuv3.h  |  2 ++
+>  arch/arm64/include/asm/kvm_host.h |  1 +
+>  arch/arm64/kvm/arm.c              |  3 +++
+>  arch/arm64/kvm/pmu.c              | 18 ++++++++++++++++++
+>  drivers/perf/arm_pmuv3.c          |  2 ++
+>  include/kvm/arm_pmu.h             |  2 ++
+>  6 files changed, 28 insertions(+)
 > 
-1. I utilized the ipi_benchmark 
-(https://patchwork.kernel.org/project/linux-arm-kernel/patch/20171211141600.24401-1-ynorov@caviumnetworks.com/) 
-with a modification to the Normal IPI target in the following manner: 
-smp_call_function_single(31, handle_ipi, &time, 1).
-2. On kunpeng 920 platform.
-3. Using ipi_benchmark but change the target cpu in Normal IPI case, and 
-use bcc or bpftrace to measuret the execution time of vgic_v3_dispatch_sgi.
-> - which current guest OS *currently* make use of broadcast or 1:N
->    SGIs? Linux doesn't and overall SGI multicasting is pretty useless
->    to an OS.
+> diff --git a/arch/arm/include/asm/arm_pmuv3.h b/arch/arm/include/asm/arm_pmuv3.h
+> index f3cd04ff022d..72529f5e2bed 100644
+> --- a/arch/arm/include/asm/arm_pmuv3.h
+> +++ b/arch/arm/include/asm/arm_pmuv3.h
+> @@ -227,6 +227,8 @@ static inline bool kvm_set_pmuserenr(u64 val)
+>  	return false;
+>  }
+>  
+> +static inline void kvm_vcpu_pmu_resync_el0(void) {}
+> +
+>  /* PMU Version in DFR Register */
+>  #define ARMV8_PMU_DFR_VER_NI        0
+>  #define ARMV8_PMU_DFR_VER_V3P4      0x5
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index d3dd05bbfe23..553040e0e375 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -49,6 +49,7 @@
+>  #define KVM_REQ_RELOAD_GICv4	KVM_ARCH_REQ(4)
+>  #define KVM_REQ_RELOAD_PMU	KVM_ARCH_REQ(5)
+>  #define KVM_REQ_SUSPEND		KVM_ARCH_REQ(6)
+> +#define KVM_REQ_RESYNC_PMU_EL0	KVM_ARCH_REQ(7)
+>  
+>  #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
+>  				     KVM_DIRTY_LOG_INITIALLY_SET)
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 72dc53a75d1c..978b0411082f 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -803,6 +803,9 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+>  			kvm_pmu_handle_pmcr(vcpu,
+>  					    __vcpu_sys_reg(vcpu, PMCR_EL0));
+>  
+> +		if (kvm_check_request(KVM_REQ_RESYNC_PMU_EL0, vcpu))
+> +			kvm_vcpu_pmu_restore_guest(vcpu);
+> +
+>  		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
+>  			return kvm_vcpu_suspend(vcpu);
+>  
+> diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
+> index 121f1a14c829..0eea225fd09a 100644
+> --- a/arch/arm64/kvm/pmu.c
+> +++ b/arch/arm64/kvm/pmu.c
+> @@ -236,3 +236,21 @@ bool kvm_set_pmuserenr(u64 val)
+>  	ctxt_sys_reg(hctxt, PMUSERENR_EL0) = val;
+>  	return true;
+>  }
+> +
+> +/*
+> + * If we interrupted the guest to update the host PMU context, make
+> + * sure we re-apply the guest EL0 state.
+> + */
+> +void kvm_vcpu_pmu_resync_el0(void)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	if (!has_vhe() || !in_interrupt())
+> +		return;
+> +
+> +	vcpu = kvm_get_running_vcpu();
+> +	if (!vcpu)
+> +		return;
+> +
+> +	kvm_make_request(KVM_REQ_RESYNC_PMU_EL0, vcpu);
+> +}
+> diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
+> index 08b3a1bf0ef6..6a3d8176f54a 100644
+> --- a/drivers/perf/arm_pmuv3.c
+> +++ b/drivers/perf/arm_pmuv3.c
+> @@ -772,6 +772,8 @@ static void armv8pmu_start(struct arm_pmu *cpu_pmu)
+>  
+>  	/* Enable all counters */
+>  	armv8pmu_pmcr_write(armv8pmu_pmcr_read() | ARMV8_PMU_PMCR_E);
+> +
+> +	kvm_vcpu_pmu_resync_el0();
+>  }
+>  
+>  static void armv8pmu_stop(struct arm_pmu *cpu_pmu)
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index 847da6fc2713..3a8a70a60794 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -74,6 +74,7 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu);
+>  struct kvm_pmu_events *kvm_get_pmu_events(void);
+>  void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
+>  void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
+> +void kvm_vcpu_pmu_resync_el0(void);
+>  
+>  #define kvm_vcpu_has_pmu(vcpu)					\
+>  	(test_bit(KVM_ARM_VCPU_PMU_V3, (vcpu)->arch.features))
+> @@ -171,6 +172,7 @@ static inline u8 kvm_arm_pmu_get_pmuver_limit(void)
+>  {
+>  	return 0;
+>  }
+> +static inline void kvm_vcpu_pmu_resync_el0(void) {}
+>  
+>  #endif
+>  
+> -- 
+> 2.39.2
 > 
-> [...]
-Yes, arm64 linux almost never send broadcast ipi. I will use another 
-test data to prove performence improvement
-> 
->>>   /*
->>> - * Compare a given affinity (level 1-3 and a level 0 mask, from the SGI
->>> - * generation register ICC_SGI1R_EL1) with a given VCPU.
->>> - * If the VCPU's MPIDR matches, return the level0 affinity, otherwise
->>> - * return -1.
->>> + * Get affinity routing index from ICC_SGI_* register
->>> + * format:
->>> + *     aff3       aff2       aff1            aff0
->>> + * |- 8 bits -|- 8 bits -|- 8 bits -|- 4 bits or 8bits -|
-> 
-> OK, so you are implementing RSS support:
-> 
-> - Why isn't that mentioned anywhere in the commit log?
-> 
-> - Given that KVM actively limits the MPIDR to 4 bits at Aff0, how does
->    it even work the first place?
-> 
-> - How is that advertised to the guest?
-> 
-> - How can the guest enable RSS support?
-> 
-thanks to mention that, I also checked the relevant code, guest can't 
-enable RSS, it was my oversight. This part has removed in next version.
-> This is not following the GICv3 architecture, and I'm sceptical that
-> it actually works as is (I strongly suspect that you have additional
-> patches...).
-there are nothing left, all the patchs are here
-> 
-> 	M.
-> 
-With regards
-Xu
