@@ -1,123 +1,297 @@
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE4907F
-	for <kvmarm@lists.linux.dev>; Tue, 22 Aug 2023 13:49:20 +0000 (UTC)
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-5654051b27fso2896775a12.0
-        for <kvmarm@lists.linux.dev>; Tue, 22 Aug 2023 06:49:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692712160; x=1693316960;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=b5h7+qUO0omnn5FGFlX6GxD/r2siYs9YlF+eLfFrmYU=;
-        b=e6GkpzOu/lNcFEoI+f/yDK1Y7h/zRWksZa3DoLx9g9/wbXT/BcLwC6Qb5RBkiKH0j1
-         X5RRCK5nU8DCd8LXr9lFIFNakvfdwhgBvHaQasKYBMyGLnTmTLM7+qBoeUjP+OgcH8Qe
-         tFTMCmFEeSXnxi/LzI279HMGu7gViPXFMx00DsmMS+zwXihGtbZF5afZMwraesDqVWs0
-         fPjTxue7MEb/Hkgg87O+gI9Qt7vr6a0zySkyaHDzWY/K6tEJWzvkmNca/Tq0AY0AJzW0
-         T59nMvtFs8K9cZr2J+lpFPS1aMQ4pZ6/zlhzSASiOTrBgtdp7CWcyowkzyu4eQid6OCz
-         GzMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692712160; x=1693316960;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b5h7+qUO0omnn5FGFlX6GxD/r2siYs9YlF+eLfFrmYU=;
-        b=Wo58ZYCXbXIWngZju8ptJzhq+oxYLBQ/tpInLcx+RNRYuBiJjVDfXmMfnlH1vUKPo4
-         ScnkmM6Orp/XbEI2ns6MvLIjrUe16E0IGfxLVcvNdBALjh0D3C4bwRBOiSBzZxEtwfgW
-         Skzt8AlxlQ8BMgYuZC688Fjf6IeUPWHWM+nOBhqq8RYrJElcOj7cj3rP3YQ9Yff4k8ym
-         YQ75yicN9oqLDxO8eNhcvBz0rSU2I9ay7qr+Kq+r6TuZ+SBndA9gUHyeS2l5tMKkLcWB
-         kygvwwF+TBJwKImOzHtbSnu/6vijcCXlEWlAo30HAGkEJeVnJdB9pomMPHylSK3f/mx8
-         52Aw==
-X-Gm-Message-State: AOJu0YwJ8aD0V1KmeqTlZdUl47E4B78aCHLwucfetuDDdTEG7E3oorg5
-	KyBlWDw34a86++GKydzkOx9c+Q==
-X-Google-Smtp-Source: AGHT+IEBMrd+myE8dEIe+4eFc+Nie0XvCrz3oRIZL8U+J8LpndkUKhfUH50RweUtGX6Acl/RLdowVQ==
-X-Received: by 2002:a05:6a20:429f:b0:140:fd3b:5d4c with SMTP id o31-20020a056a20429f00b00140fd3b5d4cmr12537889pzj.38.1692712159880;
-        Tue, 22 Aug 2023 06:49:19 -0700 (PDT)
-Received: from leoy-huanghe.lan ([94.177.131.100])
-        by smtp.gmail.com with ESMTPSA id d190-20020a6336c7000000b00563da87a52dsm2116862pga.40.2023.08.22.06.49.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Aug 2023 06:49:19 -0700 (PDT)
-Date: Tue, 22 Aug 2023 21:49:12 +0800
-From: Leo Yan <leo.yan@linaro.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Huang Shijie <shijie@os.amperecomputing.com>,
-	Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v2] KVM: arm64: pmu: Resync EL0 state on counter rotation
-Message-ID: <20230822134912.GD57731@leoy-huanghe.lan>
-References: <20230820090108.177817-1-maz@kernel.org>
- <20230822134516.GC57731@leoy-huanghe.lan>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B4D9443
+	for <kvmarm@lists.linux.dev>; Tue, 22 Aug 2023 14:03:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3312BC433C7;
+	Tue, 22 Aug 2023 14:02:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692712980;
+	bh=0gvkuKR41LGGCd8avLTCcB5z1Ttp9harJ3mALBvT3Gw=;
+	h=From:Subject:Date:To:Cc:From;
+	b=gxEtJXOL1Hgyne57ipBABSTFa6QgcPoxLtH4o+/gaqp9R8cBMbILKQQHppJCVeqNd
+	 GbLzFzBrJt2g1yZtqaAiKAq3oBuFQOOIZ0QBrFFqKmhPDfX5ZFjGZ2NeNoIfKSkBEV
+	 V8UtWU0wG6g5rCxDfMwL5B6PR2qzrvs9FcbIaj+F2j1sSXv8qw4rrxUMM9lnn7CIwd
+	 6pLwxiUHlvhMJEWaDdLq9+ak+XRE2B8Ru6ztsawq4IRsiqlASahr4SNsXx5WCAc50C
+	 2wOvuNa6m6HUSXroXkpDmQVCOl6uNobz+xm6ezDIV3a7DbDlTKoKHy0v9daa+5k/Km
+	 xCGH3/Zugc95g==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH v5 00/37] arm64/gcs: Provide support for GCS in userspace
+Date: Tue, 22 Aug 2023 14:56:33 +0100
+Message-Id: <20230822-arm64-gcs-v5-0-9ef181dd6324@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230822134516.GC57731@leoy-huanghe.lan>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJK+5GQC/2XOy27DIBAF0F+JWJeKVzBklf+osuAx2CiNHUFkN
+ bL87x27ixJFrO6Ic2cWUqFkqOR0WEiBOdc8jRiOHwcSBjf2QHPETAQTkuGjrty0on2oFCTnzrN
+ oOmEJ/veuAvXFjWHYxON236b3Ain/7Bu+LpiHXB9Tee4LZ75N/7o7rpvumVNGfTrqLlnpvdPnK
+ 5QRvj+n0pOtZhYNFaqlAmkMIvCoVBDg36hsqOQtlUhDjMkma1i05o2qf2pY11KFVJuQnMSTmbY
+ vdF3XX2N1C0dqAQAA
+To: Catalin Marinas <catalin.marinas@arm.com>, 
+ Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+ Andrew Morton <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, 
+ Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, 
+ Oleg Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, 
+ Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, 
+ "Rick P. Edgecombe" <rick.p.edgecombe@intel.com>, 
+ Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, 
+ Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+Cc: "H.J. Lu" <hjl.tools@gmail.com>, 
+ Paul Walmsley <paul.walmsley@sifive.com>, 
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+ linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+ kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
+ linux-arch@vger.kernel.org, linux-mm@kvack.org, 
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-riscv@lists.infradead.org, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.13-dev-034f2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=12491; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=0gvkuKR41LGGCd8avLTCcB5z1Ttp9harJ3mALBvT3Gw=;
+ b=owGbwMvMwMWocq27KDak/QLjabUkhpQn+98/yF7BKauw0dr7UGezhMA5o6LOH8He2RybFGIqpS78
+ v3+0k9GYhYGRi0FWTJFl7bOMVenhElvnP5r/CmYQKxPIFAYuTgGYSBkr+x+OcIv/lzac/+IuxsucfW
+ Zb4fSXOk8m7potuq733mnfLW5fV6ZqCUc/LZ5/0PXvRAbdLUqHFx3pYbnIYmXc+sMu1/DainS50v6S
+ /8/41qYezJRddtJieu16IChVenArI1WwUHo5j7xYn1bxvHcZdzgVvhx8KPFH58SqmLtuOUd5H9kHxJ
+ 5OnbTh8ffYg3Z7/pes8bnU/6KiasKb+H4WZo9fPaGRvfn/bbrimv5Y5y2MfzSl4kV38Yz6E3LbHnZa
+ PbrhWhycveTFYVbDH5Ybf6az8n3zmvRwQRvTxh8Z5X//Rgkd+l+4rGOqgN4ahcAnqTYc5Ux3hCqFA0
+ 9ZvH3U7D5X0+mxn7XU28kxnzl9AQ==
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-On Tue, Aug 22, 2023 at 09:45:16PM +0800, Leo Yan wrote:
-> Hi,
-> 
-> On Sun, Aug 20, 2023 at 10:01:08AM +0100, Marc Zyngier wrote:
-> > Huang Shijie reports that, when profiling a guest from the host
-> > with a number of events that exceeds the number of available
-> > counters, the reported counts are wildly inaccurate. Without
-> > the counter oversubscription, the reported counts are correct.
-> > 
-> > Their investigation indicates that upon counter rotation (which
-> > takes place on the back of a timer interrupt), we fail to
-> > re-apply the guest EL0 enabling, leading to the counting of host
-> > events instead of guest events.
-> > 
-> > In order to solve this, add yet another hook between the host PMU
-> > driver and KVM, re-applying the guest EL0 configuration if the
-> > right conditions apply (the host is VHE, we are in interrupt
-> > context, and we interrupted a running vcpu). This triggers a new
-> > vcpu request which will apply the correct configuration on guest
-> > reentry.
-> > 
-> > With this, we have the correct counts, even when the counters are
-> > oversubscribed.
-> 
-> I gave a test for this patch, It works well.
-> 
-> However, I do see this patch can introduce huge amount invoking
-> kvm_vcpu_pmu_restore_guest() when using 'perf record' command.
-> 
-> As I mentioned in the patch v2, we can call kvm_vcpu_pmu_resync_el0()
-> in the function kvm_set_pmu_events() rather than in armv8pmu_start().
-> With this change, the kernel only syncs PMU context when the host and
-> the guest have different traceing for EL0.  Just paste the suggested
-> code for reference:
-> 
-> @@ -46,6 +48,8 @@ void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr)
->                 pmu->events_host |= set;
->         if (!attr->exclude_guest)
->                 pmu->events_guest |= set;
-> +
-> +       kvm_vcpu_pmu_resync_el0();
->  }
-> 
-> Below is the comparison result for counting resync, the result is for
-> counting how many times kvm_vcpu_pmu_restore_guest() is called for
-> 'perf stat' and 'perf record' commands.
-> 
->                   |  perf stat(*)    |  perf record(**)
->  -----------------+------------------+-----------------
->  Patch v3:        |  2506            |  47325
+The arm64 Guarded Control Stack (GCS) feature provides support for
+hardware protected stacks of return addresses, intended to provide
+hardening against return oriented programming (ROP) attacks and to make
+it easier to gather call stacks for applications such as profiling.
 
-Here should be "Patch v2", sorry for typo.
+When GCS is active a secondary stack called the Guarded Control Stack is
+maintained, protected with a memory attribute which means that it can
+only be written with specific GCS operations.  The current GCS pointer
+can not be directly written to by userspace.  When a BL is executed the
+value stored in LR is also pushed onto the GCS, and when a RET is
+executed the top of the GCS is popped and compared to LR with a fault
+being raised if the values do not match.  GCS operations may only be
+performed on GCS pages, a data abort is generated if they are not.
 
->  Proposed change: |  2514            |  2504
-> 
-> (*): sudo ./perf stat -a -e cycles:G,cycles:H -d -d -d sleep 10
-> (**): sudo ./perf record -a -e cycles:G,cycles:H -d -d -d sleep 10
-> 
-> Thanks,
-> Leo
+The combination of hardware enforcement and lack of extra instructions
+in the function entry and exit paths should result in something which
+has less overhead and is more difficult to attack than a purely software
+implementation like clang's shadow stacks.
+
+This series implements support for use of GCS by userspace, along with
+support for use of GCS within KVM guests.  It does not enable use of GCS
+by either EL1 or EL2, this will be implemented separately.  Executables
+are started without GCS and must use a prctl() to enable it, it is
+expected that this will be done very early in application execution by
+the dynamic linker or other startup code.  For dynamic linking this will
+be done by checking that everything in the executable is marked as GCS
+compatible.
+
+x86 has an equivalent feature called shadow stacks, this series depends
+on the x86 patches for generic memory management support for the new
+guarded/shadow stack page type and shares APIs as much as possible.  As
+there has been extensive discussion with the wider community around the
+ABI for shadow stacks I have as far as practical kept implementation
+decisions close to those for x86, anticipating that review would lead to
+similar conclusions in the absence of strong reasoning for divergence.
+
+The main divergence I am concious of is that x86 allows shadow stack to
+be enabled and disabled repeatedly, freeing the shadow stack for the
+thread whenever disabled, while this implementation keeps the GCS
+allocated after disable but refuses to reenable it.  This is to avoid
+races with things actively walking the GCS during a disable, we do
+anticipate that some systems will wish to disable GCS at runtime but are
+not aware of any demand for subsequently reenabling it.
+
+x86 uses an arch_prctl() to manage enable and disable, since only x86
+and S/390 use arch_prctl() a generic prctl() was proposed[1] as part of a
+patch set for the equivalent RISC-V zisslpcfi feature which I initially
+adopted fairly directly but following review feedback has been revised
+quite a bit.
+
+There is an open issue with support for CRIU, on x86 this required the
+ability to set the GCS mode via ptrace.  This series supports
+configuring mode bits other than enable/disable via ptrace but it needs
+to be confirmed if this is sufficient.
+
+There's a few bits where I'm not convinced with where I've placed
+things, in particular the GCS write operation is in the GCS header not
+in uaccess.h, I wasn't sure what was clearest there and am probably too
+close to the code to have a clear opinion.  The reporting of GCS in
+/proc/PID/smaps is also a bit awkward.
+
+The series depends on the x86 shadow stack support:
+
+   https://lore.kernel.org/lkml/20230227222957.24501-1-rick.p.edgecombe@intel.com/
+
+I've rebased this onto v6.5-rc4 but not included it in the series in
+order to avoid confusion with Rick's work and cut down the size of the
+series, you can see the branch at:
+
+   https://git.kernel.org/pub/scm/linux/kernel/git/broonie/misc.git arm64-gcs
+
+[1] https://lore.kernel.org/lkml/20230213045351.3945824-1-debug@rivosinc.com/
+
+Pending feedback from Catalin:
+ - Switch copy_to_user_gcs() to be put_user_gcs().
+
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Changes in v5:
+- Don't map any permissions for user GCSs, we always use EL0 accessors
+  or use a separate mapping of the page.
+- Reduce the standard size of the GCS to RLIMIT_STACK/2.
+- Enforce a PAGE_SIZE alignment requirement on map_shadow_stack().
+- Clarifications and fixes to documentation.
+- More tests.
+- Link to v4: https://lore.kernel.org/r/20230807-arm64-gcs-v4-0-68cfa37f9069@kernel.org
+
+Changes in v4:
+- Implement flags for map_shadow_stack() allowing the cap and end of
+  stack marker to be enabled independently or not at all.
+- Relax size and alignment requirements for map_shadow_stack().
+- Add more blurb explaining the advantages of hardware enforcement.
+- Link to v3: https://lore.kernel.org/r/20230731-arm64-gcs-v3-0-cddf9f980d98@kernel.org
+
+Changes in v3:
+- Rebase onto v6.5-rc4.
+- Add a GCS barrier on context switch.
+- Add a GCS stress test.
+- Link to v2: https://lore.kernel.org/r/20230724-arm64-gcs-v2-0-dc2c1d44c2eb@kernel.org
+
+Changes in v2:
+- Rebase onto v6.5-rc3.
+- Rework prctl() interface to allow each bit to be locked independently.
+- map_shadow_stack() now places the cap token based on the size
+  requested by the caller not the actual space allocated.
+- Mode changes other than enable via ptrace are now supported.
+- Expand test coverage.
+- Various smaller fixes and adjustments.
+- Link to v1: https://lore.kernel.org/r/20230716-arm64-gcs-v1-0-bf567f93bba6@kernel.org
+
+---
+Mark Brown (37):
+      arm64/mm: Restructure arch_validate_flags() for extensibility
+      prctl: arch-agnostic prctl for shadow stack
+      arm64: Document boot requirements for Guarded Control Stacks
+      arm64/gcs: Document the ABI for Guarded Control Stacks
+      arm64/sysreg: Add new system registers for GCS
+      arm64/sysreg: Add definitions for architected GCS caps
+      arm64/gcs: Add manual encodings of GCS instructions
+      arm64/gcs: Provide copy_to_user_gcs()
+      arm64/cpufeature: Runtime detection of Guarded Control Stack (GCS)
+      arm64/mm: Allocate PIE slots for EL0 guarded control stack
+      mm: Define VM_SHADOW_STACK for arm64 when we support GCS
+      arm64/mm: Map pages for guarded control stack
+      KVM: arm64: Manage GCS registers for guests
+      arm64/gcs: Allow GCS usage at EL0 and EL1
+      arm64/idreg: Add overrride for GCS
+      arm64/hwcap: Add hwcap for GCS
+      arm64/traps: Handle GCS exceptions
+      arm64/mm: Handle GCS data aborts
+      arm64/gcs: Context switch GCS state for EL0
+      arm64/gcs: Allocate a new GCS for threads with GCS enabled
+      arm64/gcs: Implement shadow stack prctl() interface
+      arm64/mm: Implement map_shadow_stack()
+      arm64/signal: Set up and restore the GCS context for signal handlers
+      arm64/signal: Expose GCS state in signal frames
+      arm64/ptrace: Expose GCS via ptrace and core files
+      arm64: Add Kconfig for Guarded Control Stack (GCS)
+      kselftest/arm64: Verify the GCS hwcap
+      kselftest/arm64: Add GCS as a detected feature in the signal tests
+      kselftest/arm64: Add framework support for GCS to signal handling tests
+      kselftest/arm64: Allow signals tests to specify an expected si_code
+      kselftest/arm64: Always run signals tests with GCS enabled
+      kselftest/arm64: Add very basic GCS test program
+      kselftest/arm64: Add a GCS test program built with the system libc
+      kselftest/arm64: Add test coverage for GCS mode locking
+      selftests/arm64: Add GCS signal tests
+      kselftest/arm64: Add a GCS stress test
+      kselftest/arm64: Enable GCS for the FP stress tests
+
+ Documentation/admin-guide/kernel-parameters.txt    |   3 +
+ Documentation/arch/arm64/booting.rst               |  22 +
+ Documentation/arch/arm64/elf_hwcaps.rst            |   3 +
+ Documentation/arch/arm64/gcs.rst                   | 233 +++++++
+ Documentation/arch/arm64/index.rst                 |   1 +
+ Documentation/filesystems/proc.rst                 |   2 +-
+ arch/arm64/Kconfig                                 |  19 +
+ arch/arm64/include/asm/cpufeature.h                |   6 +
+ arch/arm64/include/asm/el2_setup.h                 |  17 +
+ arch/arm64/include/asm/esr.h                       |  28 +-
+ arch/arm64/include/asm/exception.h                 |   2 +
+ arch/arm64/include/asm/gcs.h                       | 106 +++
+ arch/arm64/include/asm/hwcap.h                     |   1 +
+ arch/arm64/include/asm/kvm_arm.h                   |   4 +-
+ arch/arm64/include/asm/kvm_host.h                  |  12 +
+ arch/arm64/include/asm/mman.h                      |  20 +-
+ arch/arm64/include/asm/pgtable-prot.h              |  14 +-
+ arch/arm64/include/asm/processor.h                 |   7 +
+ arch/arm64/include/asm/sysreg.h                    |  20 +
+ arch/arm64/include/asm/uaccess.h                   |  42 ++
+ arch/arm64/include/uapi/asm/hwcap.h                |   1 +
+ arch/arm64/include/uapi/asm/ptrace.h               |   8 +
+ arch/arm64/include/uapi/asm/sigcontext.h           |   9 +
+ arch/arm64/kernel/cpufeature.c                     |  19 +
+ arch/arm64/kernel/cpuinfo.c                        |   1 +
+ arch/arm64/kernel/entry-common.c                   |  23 +
+ arch/arm64/kernel/idreg-override.c                 |   2 +
+ arch/arm64/kernel/process.c                        |  89 +++
+ arch/arm64/kernel/ptrace.c                         |  59 ++
+ arch/arm64/kernel/signal.c                         | 237 ++++++-
+ arch/arm64/kernel/traps.c                          |  11 +
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h         |  17 +
+ arch/arm64/kvm/sys_regs.c                          |  22 +
+ arch/arm64/mm/Makefile                             |   1 +
+ arch/arm64/mm/fault.c                              |  79 ++-
+ arch/arm64/mm/gcs.c                                | 225 +++++++
+ arch/arm64/mm/mmap.c                               |  13 +-
+ arch/arm64/tools/cpucaps                           |   1 +
+ arch/arm64/tools/sysreg                            |  55 ++
+ fs/proc/task_mmu.c                                 |   3 +
+ include/linux/mm.h                                 |  16 +-
+ include/linux/syscalls.h                           |   1 +
+ include/uapi/asm-generic/unistd.h                  |   5 +-
+ include/uapi/linux/elf.h                           |   1 +
+ include/uapi/linux/prctl.h                         |  22 +
+ kernel/sys.c                                       |  30 +
+ kernel/sys_ni.c                                    |   1 +
+ tools/testing/selftests/arm64/Makefile             |   2 +-
+ tools/testing/selftests/arm64/abi/hwcap.c          |  19 +
+ tools/testing/selftests/arm64/fp/assembler.h       |  15 +
+ tools/testing/selftests/arm64/fp/fpsimd-test.S     |   2 +
+ tools/testing/selftests/arm64/fp/sve-test.S        |   2 +
+ tools/testing/selftests/arm64/fp/za-test.S         |   2 +
+ tools/testing/selftests/arm64/fp/zt-test.S         |   2 +
+ tools/testing/selftests/arm64/gcs/.gitignore       |   5 +
+ tools/testing/selftests/arm64/gcs/Makefile         |  24 +
+ tools/testing/selftests/arm64/gcs/asm-offsets.h    |   0
+ tools/testing/selftests/arm64/gcs/basic-gcs.c      | 356 ++++++++++
+ tools/testing/selftests/arm64/gcs/gcs-locking.c    | 200 ++++++
+ .../selftests/arm64/gcs/gcs-stress-thread.S        | 311 +++++++++
+ tools/testing/selftests/arm64/gcs/gcs-stress.c     | 532 +++++++++++++++
+ tools/testing/selftests/arm64/gcs/gcs-util.h       | 100 +++
+ tools/testing/selftests/arm64/gcs/libc-gcs.c       | 742 +++++++++++++++++++++
+ tools/testing/selftests/arm64/signal/.gitignore    |   1 +
+ .../testing/selftests/arm64/signal/test_signals.c  |  17 +-
+ .../testing/selftests/arm64/signal/test_signals.h  |   6 +
+ .../selftests/arm64/signal/test_signals_utils.c    |  32 +-
+ .../selftests/arm64/signal/test_signals_utils.h    |  39 ++
+ .../arm64/signal/testcases/gcs_exception_fault.c   |  59 ++
+ .../selftests/arm64/signal/testcases/gcs_frame.c   |  78 +++
+ .../arm64/signal/testcases/gcs_write_fault.c       |  67 ++
+ .../selftests/arm64/signal/testcases/testcases.c   |   7 +
+ .../selftests/arm64/signal/testcases/testcases.h   |   1 +
+ 73 files changed, 4096 insertions(+), 38 deletions(-)
+---
+base-commit: e514f673179ed8af6c64d79f8d43e2569ad6cb9f
+change-id: 20230303-arm64-gcs-e311ab0d8729
+
+Best regards,
+-- 
+Mark Brown <broonie@kernel.org>
+
