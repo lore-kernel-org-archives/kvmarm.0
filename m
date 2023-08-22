@@ -1,111 +1,147 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C71D2B544
-	for <kvmarm@lists.linux.dev>; Tue, 22 Aug 2023 17:55:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02761C433C7;
-	Tue, 22 Aug 2023 17:55:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692726934;
-	bh=nRhOqPrA5BuPwRcvI7MlHlUwPN6wyHo9eKiXJKZmvt4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=myEcl1WQzsR8pyBO5c97oqf72AeVeGXqJVloLwBX8iLiTVv8X7Ia5vxoJdiPn9i+Y
-	 VjQOYYmvKvjZbfOh6E8xc61ay9ODF00wOGJfXl/c1vGl0Y6OYChvzjcdwufld/IScF
-	 1UGlm7KFs7gyhSRfsTyEylIum6Z+RkaBDfABGffR9V76JaIS9JY5hMmlmS0q/9LklM
-	 ePT2X4GvVlJEVV0h+Oer2GtY4Hxhd4pfL+5zEq8l0XyzfybeFF7tgxUXVLmquGqvQ1
-	 TZIES52DEgXIUwTk2PsKGVvUBdwYPMTgBnyG4aO6gC+pZlhQLIK4t/O11L17SOC7Vu
-	 mGZAJ84Zodf5Q==
-Date: Tue, 22 Aug 2023 18:55:24 +0100
-From: Mark Brown <broonie@kernel.org>
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc: "david@redhat.com" <david@redhat.com>,
-	"corbet@lwn.net" <corbet@lwn.net>,
-	"ardb@kernel.org" <ardb@kernel.org>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"shuah@kernel.org" <shuah@kernel.org>,
-	"Szabolcs.Nagy@arm.com" <Szabolcs.Nagy@arm.com>,
-	"keescook@chromium.org" <keescook@chromium.org>,
-	"james.morse@arm.com" <james.morse@arm.com>,
-	"debug@rivosinc.com" <debug@rivosinc.com>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"palmer@dabbelt.com" <palmer@dabbelt.com>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"hjl.tools@gmail.com" <hjl.tools@gmail.com>,
-	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
-	"oleg@redhat.com" <oleg@redhat.com>,
-	"arnd@arndb.de" <arnd@arndb.de>,
-	"ebiederm@xmission.com" <ebiederm@xmission.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
-Subject: Re: [PATCH v5 11/37] mm: Define VM_SHADOW_STACK for arm64 when we
- support GCS
-Message-ID: <c9d0881d-e26b-4680-8f8e-0d5e1c82655c@sirena.org.uk>
-References: <20230822-arm64-gcs-v5-0-9ef181dd6324@kernel.org>
- <20230822-arm64-gcs-v5-11-9ef181dd6324@kernel.org>
- <8f2cf5af-cad7-a69c-e8ec-39f48deae1cb@redhat.com>
- <54b2c1e5-a99d-42c0-b686-1b5cbb849581@sirena.org.uk>
- <e10e729392c5fa421baf08b4ea7aaac6ffada0f5.camel@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53E692B55A
+	for <kvmarm@lists.linux.dev>; Tue, 22 Aug 2023 18:35:25 +0000 (UTC)
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2bcc331f942so23280781fa.0
+        for <kvmarm@lists.linux.dev>; Tue, 22 Aug 2023 11:35:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692729323; x=1693334123;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZG8/FKpT+5ZMPFMf3XneVJf41+qrLWykYFB8Mroi2p0=;
+        b=hBOpE32r3X0stLup3zJ47ajL9A3rBNXNiV3E6065k2zRuMHXcc2qeRBznkkK9jaVlb
+         mXHE0QjQdww7Behkc6OxdFIf79q2MJ4L7RsubvntRwLmQnrrTg1cT9d8pyUw8qEi7p+M
+         yAzFTIwy12LM9c0cAPQfJVXbFSoRjKC+wdHLqGUpWgRWR+CCZMQ1BNAeqK2Tt+qbp7mo
+         LWTevvOk3ZEX9tUbJCPVTITMasMl/xdUVcqC1wnYRdfb62QxaOAMrlIbz+0/JUHLmN83
+         4Fb0fNRNj2UgpPrcZpJ5BzlF8o1ZEyoC+NWiug6323PwBztsFF7/er0oLVx2e8iLR3uF
+         zg8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692729323; x=1693334123;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZG8/FKpT+5ZMPFMf3XneVJf41+qrLWykYFB8Mroi2p0=;
+        b=XgsrLrFLQMTY+B4h/8ujLxj+aATZq9McXUAjwbSztuiPpBqd6aB7QcAjJnI9m9H+n2
+         w2L5zKzc7fyiMzJ+MkmOFsy8CJZZC98WtRAMdnIKpaN5HtBPwftHWqEC7TjdKmoLE6eP
+         e72ccNrKAQjvKjtoMB89OXdYCc2cgBRfpGxoTPOI1/uCXlo5DItywzvok0sCs+pOLser
+         z4U4Mfcwh33QrC1uau1Rg0DF0gQWWqXBsSGFqC1eJMybUajFflhZRc5aPD65VbAJRu6f
+         aLzwEp4y2tQB35RMMbgyrDo0jwfLnbWNnhmT4b1x6rTzX7HLxz8nDY2zmAa99FwVYO/U
+         BzmA==
+X-Gm-Message-State: AOJu0Yyq0PdfqyZvOn5kvrHMfC/RaApm2F/I+aZE4p2EogFVIhwYiI4t
+	HSnpCjZI1agm+KAUaW66hQorHXa5LwKpFGOCKDG0ag==
+X-Google-Smtp-Source: AGHT+IHLjbjdpPtuGDgzItCHCjngA7+Qq5HGzx0ZodQ01Ijp53K1+QI7cmm5rC7QJqm8zCwp9G/pj+yHfDMxXCsrv2g=
+X-Received: by 2002:a2e:2e06:0:b0:2b6:d0fa:7023 with SMTP id
+ u6-20020a2e2e06000000b002b6d0fa7023mr3893380lju.24.1692729322972; Tue, 22 Aug
+ 2023 11:35:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="M/5Lioh+7qcaKBw4"
-Content-Disposition: inline
-In-Reply-To: <e10e729392c5fa421baf08b4ea7aaac6ffada0f5.camel@intel.com>
-X-Cookie: MIT:
-
-
---M/5Lioh+7qcaKBw4
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+References: <20230821212243.491660-1-jingzhangos@google.com>
+ <20230821212243.491660-6-jingzhangos@google.com> <878ra3pndw.wl-maz@kernel.org>
+In-Reply-To: <878ra3pndw.wl-maz@kernel.org>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Tue, 22 Aug 2023 11:35:12 -0700
+Message-ID: <CAAdAUti8qSf0PVnWkp4Jua-te6i0cjQKJm=8dt5vWqT0Q6w4iQ@mail.gmail.com>
+Subject: Re: [PATCH v9 05/11] KVM: arm64: Enable writable for ID_AA64DFR0_EL1
+ and ID_DFR0_EL1
+To: Marc Zyngier <maz@kernel.org>
+Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Will Deacon <will@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>, 
+	Raghavendra Rao Ananta <rananta@google.com>, Suraj Jitindar Singh <surajjs@amazon.com>, 
+	Cornelia Huck <cohuck@redhat.com>, Shaoqin Huang <shahuang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 22, 2023 at 04:47:26PM +0000, Edgecombe, Rick P wrote:
-> On Tue, 2023-08-22 at 16:41 +0100, Mark Brown wrote:
+Hi Marc,
 
-> > I can certainly update it to do that, I was just trying to fit in
-> > with
-> > how the code was written on the basis that there was probably a good
-> > reason for it that had been discussed somewhere.=A0 I can send an
-> > incremental patch for this on top of the x86 patches assuming they go
-> > in
-> > during the merge window.
+On Tue, Aug 22, 2023 at 12:06=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
+e:
+>
+> On Mon, 21 Aug 2023 22:22:37 +0100,
+> Jing Zhang <jingzhangos@google.com> wrote:
+> >
+> > All valid fields in ID_AA64DFR0_EL1 and ID_DFR0_EL1 are writable
+> > from userspace with this change.
+> > RES0 fields and those fields hidden by KVM are not writable.
+> >
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 6 ++++--
+> >  1 file changed, 4 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index afade7186675..20fc38bad4e8 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -1931,6 +1931,8 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
+> >       return true;
+> >  }
+> >
+> > +#define ID_AA64DFR0_EL1_RES0_MASK (GENMASK(59, 56) | GENMASK(27, 24) |=
+ GENMASK(19, 16))
+> > +
+> >  /*
+> >   * Architected system registers.
+> >   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+> > @@ -2006,7 +2008,7 @@ static const struct sys_reg_desc sys_reg_descs[] =
+=3D {
+> >         .set_user =3D set_id_dfr0_el1,
+> >         .visibility =3D aa32_id_visibility,
+> >         .reset =3D read_sanitised_id_dfr0_el1,
+> > -       .val =3D ID_DFR0_EL1_PerfMon_MASK, },
+> > +       .val =3D GENMASK(31, 0), },
+>
+> Can you *please* look at the register and realise that we *don't*
+> support writing to the whole of the low 32 bits? What does it mean to
+> allow selecting the M-profile debug? Or the memory-mapped trace?
+>
+> You are advertising a lot of crap to userspace, and that's definitely
+> not on.
+>
+> >       ID_HIDDEN(ID_AFR0_EL1),
+> >       AA32_ID_SANITISED(ID_MMFR0_EL1),
+> >       AA32_ID_SANITISED(ID_MMFR1_EL1),
+> > @@ -2055,7 +2057,7 @@ static const struct sys_reg_desc sys_reg_descs[] =
+=3D {
+> >         .get_user =3D get_id_reg,
+> >         .set_user =3D set_id_aa64dfr0_el1,
+> >         .reset =3D read_sanitised_id_aa64dfr0_el1,
+> > -       .val =3D ID_AA64DFR0_EL1_PMUVer_MASK, },
+> > +       .val =3D ~(ID_AA64DFR0_EL1_PMSVer_MASK | ID_AA64DFR0_EL1_RES0_M=
+ASK), },
+>
+> And it is the same thing here. Where is the handling code to deal with
+> variable breakpoint numbers? Oh wait, there is none. Really, the only
+> thing we support writing to are the PMU and Debug versions. And
+> nothing else.
+>
+> What does it mean for userspace? Either the write will be denied
+> despite being advertised a writable field (remember the first patch of
+> the series???), or we'll blindly accept the write and further ignore
+> the requested values. Do you really think any of this is acceptable?
+>
+> This is the *9th* version of this series, and we're still battling
+> over some extremely basic userspace issues... I don't think we can
+> merge this series as is stands.
 
-> There was something like that on the x86 series way back, but it was
-> dropped[0]. IIRC risc-v was going to try to do something other than
-> VM_SHADOW_STACK, so they may conflict some day. But in the meantime,
-> adding a CONFIG_HAVE_ARCH_SHADOW_STACK here in the arm series makes
-> sense to me.
+I removed sanity checks across multiple fields after the discussion
+here: https://lore.kernel.org/all/ZKRC80hb4hXwW8WK@thinky-boi/
+I might have misunderstood the discussion. I thought we'd let VMM do
+more complete sanity checks.
 
-OK, I'll do that.
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
 
---M/5Lioh+7qcaKBw4
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmTk9owACgkQJNaLcl1U
-h9BzkQf/R6al2pexuFT7yjh/QmDQ605ZLN9i97Je0LSd5PuT5nU6GF3W5a54fMib
-6W/3nsCaMStJXsvd+VW79higHGjkzwpJF2gPeI94UCLBgKYqU8qB4MR/adY9Ff1r
-1sA4RWSjuxtC8NBEoIYomxAXMpW05vpD0eruSLYjUnEnTf0NrXtxZmwZQjcVHeeS
-f47zzzB9vzZ1wei7YyAcO+oju9JjWVkD2jTdQJjddCKNIuR+qB98g/qO4BvHp86+
-OPVeSsY4Ko7Kqh4JKdTddAYte0KvQ0SaRh59Zmo6tcorDOv6yVJOfTOEQ8v2SdFD
-daJaRcq070YEVByUMToJ3C0wq/P7+w==
-=2kJA
------END PGP SIGNATURE-----
-
---M/5Lioh+7qcaKBw4--
+Jing
