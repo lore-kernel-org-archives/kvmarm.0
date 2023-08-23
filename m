@@ -1,80 +1,134 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A10BB846D
-	for <kvmarm@lists.linux.dev>; Wed, 23 Aug 2023 07:37:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1692776239;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=u62nPwHcShighjmVk2GZlC7k3Viptp+NNP/1gOvS9nc=;
-	b=XD2xKlwnBjZg8WhoWpnQhUtpx2dyKfR3VPCg5aymeX0jN03zX45q6e6NOJs6Xhst0tEZWc
-	J2MECK9HEJ7DjR12f0PeLUdRLkWndAoUXVYyQ2qukLbdqpiAI5eK6p1ySM0k2BHJKiWLx4
-	JDUDzzLhW9LwqiNl8PaDLyCTaqRIdUM=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-441-YXYYzJ0YM6WOHWJi_fVesQ-1; Wed, 23 Aug 2023 03:37:16 -0400
-X-MC-Unique: YXYYzJ0YM6WOHWJi_fVesQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 407CB381AE57;
-	Wed, 23 Aug 2023 07:37:15 +0000 (UTC)
-Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E4311492C18;
-	Wed, 23 Aug 2023 07:37:14 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>, KVMARM
- <kvmarm@lists.linux.dev>, ARMLinux <linux-arm-kernel@lists.infradead.org>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- James Morse <james.morse@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>,
- Raghavendra Rao Ananta <rananta@google.com>, Suraj Jitindar Singh
- <surajjs@amazon.com>, Shaoqin Huang <shahuang@redhat.com>, Jing Zhang
- <jingzhangos@google.com>
-Subject: Re: [PATCH v9 00/11] Enable writable for idregs DFR0,PFR0,
- MMFR{0,1,2,3}
-In-Reply-To: <20230821212243.491660-1-jingzhangos@google.com>
-Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
- Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
- 153243,
- =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
- Michael O'Neill, Amy
- Ross"
-References: <20230821212243.491660-1-jingzhangos@google.com>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date: Wed, 23 Aug 2023 09:37:13 +0200
-Message-ID: <878ra28b12.fsf@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1786A947B
+	for <kvmarm@lists.linux.dev>; Wed, 23 Aug 2023 09:21:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 975B9C433C8;
+	Wed, 23 Aug 2023 09:21:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692782513;
+	bh=GUJ9LT53od9VGXSMNu8wMPk9QIcxIcQ/QlIzbgxYftA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mpjJD6eXphpiL6+X+PzIXdKXqyGcSISVk2SQFrdtggdJFtloI33XaLB2Z9LhB4udV
+	 qsJaZj7WpsWFKZOgdj/FdV8tr9NVfJnnm7ktEHeXKuFWZ6dqKTb2Ei+tN6UVDwk5cP
+	 W0+a7Q9N7jRqInauXNINbCxcKK4yhy3+THssJexCea5ll/0TwX8RYpbiCUQ5lXKZfg
+	 BWOqx0AVSB+/oDaO4+aY0nwejeYk1YnB5a3vf7FFHOlHEJRQRDCDRk8La/aHNr1D48
+	 vAOjo1k5l7xt4eXcpfrXSAMbpDMvTYOjSKlkQxcdf2MepQZrtIMcgvwPaVORcSD30C
+	 qfSsvNL3l+PVg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qYk3d-007Hp8-UZ;
+	Wed, 23 Aug 2023 10:21:46 +0100
+Date: Wed, 23 Aug 2023 10:21:45 +0100
+Message-ID: <86h6oqf712.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexander Stein <alexander.stein@ew.tq-group.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Huang Shijie <shijie@os.amperecomputing.com>,
+	Leo Yan <leo.yan@linaro.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2] KVM: arm64: pmu: Resync EL0 state on counter rotation
+In-Reply-To: <14141350.uLZWGnKmhe@steina-w>
+References: <20230820090108.177817-1-maz@kernel.org>
+	<14141350.uLZWGnKmhe@steina-w>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexander.stein@ew.tq-group.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, shijie@os.amperecomputing.com, leo.yan@linaro.org, mark.rutland@arm.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Aug 21 2023, Jing Zhang <jingzhangos@google.com> wrote:
+On Wed, 23 Aug 2023 08:15:38 +0100,
+Alexander Stein <alexander.stein@ew.tq-group.com> wrote:
+>=20
+> Hi,
+>=20
+> > diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
+> > index 08b3a1bf0ef6..6a3d8176f54a 100644
+> > --- a/drivers/perf/arm_pmuv3.c
+> > +++ b/drivers/perf/arm_pmuv3.c
+> > @@ -772,6 +772,8 @@ static void armv8pmu_start(struct arm_pmu *cpu_pmu)
+> >=20
+> >  	/* Enable all counters */
+> >  	armv8pmu_pmcr_write(armv8pmu_pmcr_read() | ARMV8_PMU_PMCR_E);
+> > +
+> > +	kvm_vcpu_pmu_resync_el0();
+>=20
+> This breaks if CONFIG_HW_PERF_EVENTS is enabled but CONFIG_KVM is not. As=
+ in=20
+> this case arch/arm64/kvm/pmu.c is never compiled, but the dummy inline in=
+=20
+> include/kvm/arm_pmu.h for kvm_vcpu_pmu_resync_el0() only depends on=20
+> CONFIG_HW_PERF_EVENTS.
+> This results in this error:
+>=20
+> aarch64-v8a-linux-gnu-ld: Unexpected GOT/PLT entries detected!
+> aarch64-v8a-linux-gnu-ld: Unexpected run-time procedure linkages detected!
+> aarch64-v8a-linux-gnu-ld: drivers/perf/arm_pmuv3.o: in function=20
+> `armv8pmu_start':
+> drivers/perf/arm_pmuv3.c:753: undefined reference to `kvm_vcpu_pmu_resync=
+_el0'
 
-> This patch series enable userspace writable for below idregs:
-> ID_AA64DFR0_EL1, ID_DFR0_EL1, ID_AA64PFR0_EL1, ID_AA64MMFR{0, 1, 2, 3}_EL1.
-> A vm ioctl is added to get feature ID register writable masks from userspace.
-> A selftest is added to verify that KVM handles the writings from user space
-> correctly.
-> A relevant patch from Oliver is picked from [3].
->
-> ---
->
-> * v8 -> v9
->   - Rebase on v6.5-rc7.
->   - Don't allow writable on RES0 fields and those fields not exposed by KVM.
->   - Fixed build dependency issue for system register definition generation in
->     selftest.
+Huh, that's unexpected. Let's fix it with an adequately sized hammer.
+Does the patch below work for you?
 
-What about the changes to the userspace interface as proposed by Marc in
-<86sf8hg45k.wl-maz@kernel.org>?
+Thanks,
 
+	M.
+
+=46rom 2446f15d355ab7e766291eccf5b670a2060b4c3a Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Wed, 23 Aug 2023 10:14:48 +0100
+Subject: [PATCH] KVM: arm64: pmu: Guard PMU emulation definitions with
+ CONFIG_KVM
+
+Most of the internal definitions for PMU emulation are guarded with
+CONFIG_HW_PERF_EVENTS. However, this isn't enough, and leads to
+these definitions leaking if CONFIG_KVM isn't enabled.
+
+This leads to some compilation breakage in this exact configuration.
+Fix it by falling back to the dummy stubs if either perf or KVM
+isn't selected.
+
+Reported-by: Alexander Stein <alexander.stein@ew.tq-group.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ include/kvm/arm_pmu.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 3a8a70a60794..31029f4f7be8 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -12,7 +12,7 @@
+=20
+ #define ARMV8_PMU_CYCLE_IDX		(ARMV8_PMU_MAX_COUNTERS - 1)
+=20
+-#ifdef CONFIG_HW_PERF_EVENTS
++#if IS_ENABLED(CONFIG_HW_PERF_EVENTS) && IS_ENABLED(CONFIG_KVM)
+=20
+ struct kvm_pmc {
+ 	u8 idx;	/* index into the pmu->pmc array */
+--=20
+2.34.1
+
+
+--=20
+Without deviation from the norm, progress is not possible.
