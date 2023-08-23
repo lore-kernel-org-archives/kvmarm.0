@@ -1,12 +1,12 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2218BE64
-	for <kvmarm@lists.linux.dev>; Wed, 23 Aug 2023 13:16:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53932BE64
+	for <kvmarm@lists.linux.dev>; Wed, 23 Aug 2023 13:16:36 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CC2FD169C;
-	Wed, 23 Aug 2023 06:17:09 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6F7C11655;
+	Wed, 23 Aug 2023 06:17:16 -0700 (PDT)
 Received: from e121798.cable.virginm.net (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 866CD3F740;
-	Wed, 23 Aug 2023 06:16:23 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 880023F740;
+	Wed, 23 Aug 2023 06:16:29 -0700 (PDT)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: catalin.marinas@arm.com,
 	will@kernel.org,
@@ -45,9 +45,9 @@ Cc: pcc@google.com,
 	linux-arch@vger.kernel.org,
 	linux-mm@kvack.org,
 	linux-trace-kernel@vger.kernel.org
-Subject: [PATCH RFC 22/37] mm: shmem: Allocate metadata storage for in-memory filesystems
-Date: Wed, 23 Aug 2023 14:13:35 +0100
-Message-Id: <20230823131350.114942-23-alexandru.elisei@arm.com>
+Subject: [PATCH RFC 23/37] mm: Teach vma_alloc_folio() about metadata-enabled VMAs
+Date: Wed, 23 Aug 2023 14:13:36 +0100
+Message-Id: <20230823131350.114942-24-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230823131350.114942-1-alexandru.elisei@arm.com>
 References: <20230823131350.114942-1-alexandru.elisei@arm.com>
@@ -59,56 +59,85 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Set __GFP_TAGGED when a new page is faulted in, so the page allocator
-reserves the corresponding metadata storage.
+When an anonymous page is mapped into the user address space as a result of
+a write fault, that page is zeroed. On arm64, when the VMA has metadata
+enabled, the tags are zeroed at the same time as the page contents, with
+the combination of gfp flags __GFP_ZERO | __GFP_TAGGED (which used be
+called __GFP_ZEROTAGS for this reason). For this use case, it is enough to
+set the __GFP_TAGGED flag in vma_alloc_zeroed_movable_folio().
+
+But with dynamic tag storage reuse, it becomes necessary to have the
+__GFP_TAGGED flag set when allocating a page to be mapped in a VMA with
+metadata enabled in order reserve the corresponding metadata storage.
+Change vma_alloc_folio() to take into account VMAs with metadata enabled.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- mm/shmem.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/page.h |  5 ++---
+ arch/arm64/mm/fault.c         | 19 -------------------
+ mm/mempolicy.c                |  3 +++
+ 3 files changed, 5 insertions(+), 22 deletions(-)
 
-diff --git a/mm/shmem.c b/mm/shmem.c
-index 2f2e0e618072..0b772ec34caa 100644
---- a/mm/shmem.c
-+++ b/mm/shmem.c
-@@ -81,6 +81,8 @@ static struct vfsmount *shm_mnt;
+diff --git a/arch/arm64/include/asm/page.h b/arch/arm64/include/asm/page.h
+index 2312e6ee595f..88bab032a493 100644
+--- a/arch/arm64/include/asm/page.h
++++ b/arch/arm64/include/asm/page.h
+@@ -29,9 +29,8 @@ void copy_user_highpage(struct page *to, struct page *from,
+ void copy_highpage(struct page *to, struct page *from);
+ #define __HAVE_ARCH_COPY_HIGHPAGE
  
- #include <linux/uaccess.h>
+-struct folio *vma_alloc_zeroed_movable_folio(struct vm_area_struct *vma,
+-						unsigned long vaddr);
+-#define vma_alloc_zeroed_movable_folio vma_alloc_zeroed_movable_folio
++#define vma_alloc_zeroed_movable_folio(vma, vaddr) \
++	vma_alloc_folio(GFP_HIGHUSER_MOVABLE | __GFP_ZERO, 0, vma, vaddr, false)
  
-+#include <asm/memory_metadata.h>
-+
- #include "internal.h"
+ void tag_clear_highpage(struct page *to);
+ #define __HAVE_ARCH_TAG_CLEAR_HIGHPAGE
+diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+index 1ca421c11ebc..7e2dcf5e3baf 100644
+--- a/arch/arm64/mm/fault.c
++++ b/arch/arm64/mm/fault.c
+@@ -936,25 +936,6 @@ void do_debug_exception(unsigned long addr_if_watchpoint, unsigned long esr,
+ }
+ NOKPROBE_SYMBOL(do_debug_exception);
  
- #define BLOCKS_PER_PAGE  (PAGE_SIZE/512)
-@@ -1530,7 +1532,7 @@ static struct folio *shmem_swapin(swp_entry_t swap, gfp_t gfp,
-  */
- static gfp_t limit_gfp_mask(gfp_t huge_gfp, gfp_t limit_gfp)
+-/*
+- * Used during anonymous page fault handling.
+- */
+-struct folio *vma_alloc_zeroed_movable_folio(struct vm_area_struct *vma,
+-						unsigned long vaddr)
+-{
+-	gfp_t flags = GFP_HIGHUSER_MOVABLE | __GFP_ZERO;
+-
+-	/*
+-	 * If the page is mapped with PROT_MTE, initialise the tags at the
+-	 * point of allocation and page zeroing as this is usually faster than
+-	 * separate DC ZVA and STGM.
+-	 */
+-	if (vma->vm_flags & VM_MTE)
+-		flags |= __GFP_TAGGED;
+-
+-	return vma_alloc_folio(flags, 0, vma, vaddr, false);
+-}
+-
+ void tag_clear_highpage(struct page *page)
  {
--	gfp_t allowflags = __GFP_IO | __GFP_FS | __GFP_RECLAIM;
-+	gfp_t allowflags = __GFP_IO | __GFP_FS | __GFP_RECLAIM | __GFP_TAGGED;
- 	gfp_t denyflags = __GFP_NOWARN | __GFP_NORETRY;
- 	gfp_t zoneflags = limit_gfp & GFP_ZONEMASK;
- 	gfp_t result = huge_gfp & ~(allowflags | GFP_ZONEMASK);
-@@ -1941,6 +1943,8 @@ static int shmem_get_folio_gfp(struct inode *inode, pgoff_t index,
- 		goto alloc_nohuge;
+ 	/* Tag storage pages cannot be tagged. */
+diff --git a/mm/mempolicy.c b/mm/mempolicy.c
+index d164b5c50243..782e0771cabd 100644
+--- a/mm/mempolicy.c
++++ b/mm/mempolicy.c
+@@ -2170,6 +2170,9 @@ struct folio *vma_alloc_folio(gfp_t gfp, int order, struct vm_area_struct *vma,
+ 	int preferred_nid;
+ 	nodemask_t *nmask;
  
- 	huge_gfp = vma_thp_gfp_mask(vma);
-+	if (vma_has_metadata(vma))
-+		huge_gfp |= __GFP_TAGGED;
- 	huge_gfp = limit_gfp_mask(huge_gfp, gfp);
- 	folio = shmem_alloc_and_acct_folio(huge_gfp, inode, index, true);
- 	if (IS_ERR(folio)) {
-@@ -2101,6 +2105,10 @@ static vm_fault_t shmem_fault(struct vm_fault *vmf)
- 	int err;
- 	vm_fault_t ret = VM_FAULT_LOCKED;
- 
-+	/* Fixup gfp flags for metadata enabled VMAs. */
-+	if (vma_has_metadata(vma))
++	if (vma->vm_flags & VM_MTE)
 +		gfp |= __GFP_TAGGED;
 +
- 	/*
- 	 * Trinity finds that probing a hole which tmpfs is punching can
- 	 * prevent the hole-punch from ever completing: which in turn
+ 	pol = get_vma_policy(vma, addr);
+ 
+ 	if (pol->mode == MPOL_INTERLEAVE) {
 -- 
 2.41.0
 
