@@ -1,137 +1,141 @@
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC9C24C75
-	for <kvmarm@lists.linux.dev>; Wed, 23 Aug 2023 11:15:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1692789352; x=1724325352;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=J1ClHpixZj7fuU2joNIT//doEwehogJ3lrBUfMEBCzk=;
-  b=LwqQ/6FnhpO2q2maaOrZSuSI1Kky/ZiOEiPxoO8+OhqlWoHnQS0YaGrc
-   oibSQOEVxXOAkg8Y70Tsm6wle5dHtJeXqWxNgP5bq+7+eBtNjeBM3envy
-   KckFdGpdXQ9M1rGA3QoSvRI7J4F/Ob8NeEeq10eoqhPm6naQvKuMAPp+b
-   y8PVRlqX744PB+NoBJnMg4HaUzUYU9qUE6HR1snF0qupHDHBkLIeA/UJW
-   kG6fQBpnV5muBpg+GoyN+8LRerndqwqJ4UdxlvJvYM977JG2ANhElTg6e
-   FRVMf0PE0snTKllkuHVu6fpVSrvCCEXtVsPmdiej7Xe2RIFpIElPJbLD7
-   A==;
-X-IronPort-AV: E=Sophos;i="6.01,195,1684792800"; 
-   d="scan'208";a="32585053"
-Received: from vtuxmail01.tq-net.de ([10.115.0.20])
-  by mx1.tq-group.com with ESMTP; 23 Aug 2023 13:15:48 +0200
-Received: from steina-w.localnet (steina-w.tq-net.de [10.123.53.21])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by vtuxmail01.tq-net.de (Postfix) with ESMTPSA id 3ABDB280075;
-	Wed, 23 Aug 2023 13:15:48 +0200 (CEST)
-From: Alexander Stein <alexander.stein@ew.tq-group.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>, Huang Shijie <shijie@os.amperecomputing.com>, Leo Yan <leo.yan@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v2] KVM: arm64: pmu: Resync EL0 state on counter rotation
-Date: Wed, 23 Aug 2023 13:15:47 +0200
-Message-ID: <4055305.aeNJFYEL58@steina-w>
-Organization: TQ-Systems GmbH
-In-Reply-To: <86h6oqf712.wl-maz@kernel.org>
-References: <20230820090108.177817-1-maz@kernel.org> <14141350.uLZWGnKmhe@steina-w> <86h6oqf712.wl-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB46110B
+	for <kvmarm@lists.linux.dev>; Wed, 23 Aug 2023 12:51:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4984C433C8;
+	Wed, 23 Aug 2023 12:51:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692795104;
+	bh=aIGZdAZfibpwOhOBqgFa8nf151J9Hk7d7fWvjMeY4zc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=khDVpCaQdQhHesYs9RGRpVlvH8eWo3qrAoJKrfl6rCMMNb3+VNdzi5pk2+Le8Y9ph
+	 pjjFWBvFAjVLuMOHcw6ky5TwIBqzGIeijbo2SRxr602ZcPxbmBg0NBa4El+5f1jRbr
+	 uQ8Gdwk7KGPF1ZuROilSORtcM8Q8jen2QoY/J5xt8KrtGhe6i09i87Gj80vGx+LwzA
+	 Y4GMrP0i8eRT/b1xndfov0OxmF2Cz4oGiGH00guo7/YhFkDyuUKDLBQ8t5uExGCnkM
+	 CfV0NIyavGSn7UdSBpuE5djPSMDymoFZn4E8QzB6e0N2EDt8dObvj+9ZSIZtzI6gMq
+	 dbRiW9VbzcTqQ==
+Date: Wed, 23 Aug 2023 13:51:35 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v4 03/36] arm64/gcs: Document the ABI for Guarded Control
+ Stacks
+Message-ID: <227e6552-353c-40a9-86c1-280587a40e3c@sirena.org.uk>
+References: <20230807-arm64-gcs-v4-0-68cfa37f9069@kernel.org>
+ <20230807-arm64-gcs-v4-3-68cfa37f9069@kernel.org>
+ <ZNOhjrYleGBR6Pbs@arm.com>
+ <f4cec4b3-c386-4873-aa1d-90528e062f2a@sirena.org.uk>
+ <ZN+qki9EaZ6f9XNi@arm.com>
+ <aaea542c-929c-4c9b-8caa-ca67e0eb9c1e@sirena.org.uk>
+ <ZOTnL1SDJWZjHPUW@arm.com>
+ <43ec219d-bf20-47b8-a5f8-32bc3b64d487@sirena.org.uk>
+ <ZOXa98SqwYPwxzNP@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="UdmTiHBngnlr6cvp"
+Content-Disposition: inline
+In-Reply-To: <ZOXa98SqwYPwxzNP@arm.com>
+X-Cookie: Some optional equipment shown.
+
+
+--UdmTiHBngnlr6cvp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
 
-Hi Marc,
+On Wed, Aug 23, 2023 at 11:09:59AM +0100, Szabolcs Nagy wrote:
+> The 08/22/2023 18:53, Mark Brown wrote:
+> > On Tue, Aug 22, 2023 at 05:49:51PM +0100, Catalin Marinas wrote:
 
-Am Mittwoch, 23. August 2023, 11:21:45 CEST schrieb Marc Zyngier:
-> On Wed, 23 Aug 2023 08:15:38 +0100,
->=20
-> Alexander Stein <alexander.stein@ew.tq-group.com> wrote:
-> > Hi,
-> >=20
-> > > diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
-> > > index 08b3a1bf0ef6..6a3d8176f54a 100644
-> > > --- a/drivers/perf/arm_pmuv3.c
-> > > +++ b/drivers/perf/arm_pmuv3.c
-> > > @@ -772,6 +772,8 @@ static void armv8pmu_start(struct arm_pmu *cpu_pm=
-u)
-> > >=20
-> > >  	/* Enable all counters */
-> > >  	armv8pmu_pmcr_write(armv8pmu_pmcr_read() | ARMV8_PMU_PMCR_E);
-> > >=20
-> > > +
-> > > +	kvm_vcpu_pmu_resync_el0();
-> >=20
-> > This breaks if CONFIG_HW_PERF_EVENTS is enabled but CONFIG_KVM is not. =
-As
-> > in this case arch/arm64/kvm/pmu.c is never compiled, but the dummy inli=
-ne
-> > in include/kvm/arm_pmu.h for kvm_vcpu_pmu_resync_el0() only depends on
-> > CONFIG_HW_PERF_EVENTS.
-> > This results in this error:
-> >=20
-> > aarch64-v8a-linux-gnu-ld: Unexpected GOT/PLT entries detected!
-> > aarch64-v8a-linux-gnu-ld: Unexpected run-time procedure linkages detect=
-ed!
-> > aarch64-v8a-linux-gnu-ld: drivers/perf/arm_pmuv3.o: in function
-> > `armv8pmu_start':
-> > drivers/perf/arm_pmuv3.c:753: undefined reference to
-> > `kvm_vcpu_pmu_resync_el0'
-> Huh, that's unexpected. Let's fix it with an adequately sized hammer.
-> Does the patch below work for you?
+> > the what but not the why.  For example roughly the current behaviour was
+> > already in place in v10 of the original series:
 
-Yes, the patch below does work for me. Thanks.
-Tested-by: Alexander Stein <alexander.stein@ew.tq-group.com>
+> well the original shstk patches predate clone3 so no surprise there.
+> e.g. v6 is from 2018 and clone3 is 2019 linux 5.3
+> https://lore.kernel.org/lkml/20181119214809.6086-1-yu-cheng.yu@intel.com/
 
-Best regards,
-Alexander
+Ah, that'd do it.  People weren't excited enough on about clone3() when
+reviewing the shadow stack patches, I hadn't realised clone3() was so
+new.
 
-> Thanks,
->=20
-> 	M.
->=20
-> From 2446f15d355ab7e766291eccf5b670a2060b4c3a Mon Sep 17 00:00:00 2001
-> From: Marc Zyngier <maz@kernel.org>
-> Date: Wed, 23 Aug 2023 10:14:48 +0100
-> Subject: [PATCH] KVM: arm64: pmu: Guard PMU emulation definitions with
->  CONFIG_KVM
->=20
-> Most of the internal definitions for PMU emulation are guarded with
-> CONFIG_HW_PERF_EVENTS. However, this isn't enough, and leads to
-> these definitions leaking if CONFIG_KVM isn't enabled.
->=20
-> This leads to some compilation breakage in this exact configuration.
-> Fix it by falling back to the dummy stubs if either perf or KVM
-> isn't selected.
->=20
-> Reported-by: Alexander Stein <alexander.stein@ew.tq-group.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  include/kvm/arm_pmu.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index 3a8a70a60794..31029f4f7be8 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -12,7 +12,7 @@
->=20
->  #define ARMV8_PMU_CYCLE_IDX		(ARMV8_PMU_MAX_COUNTERS - 1)
->=20
-> -#ifdef CONFIG_HW_PERF_EVENTS
-> +#if IS_ENABLED(CONFIG_HW_PERF_EVENTS) && IS_ENABLED(CONFIG_KVM)
->=20
->  struct kvm_pmc {
->  	u8 idx;	/* index into the pmu->pmc array */
+> > I do worry about the story for users calling the underlying clone3() API
+> > (or legacy clone() for that matter) directly, and we would also need to
+> > handle the initial GCS enable via prctl() - that's not insurmountable,
+> > we could add a size argument there that only gets interpreted during the
+> > initial enable for example.
 
+> musl and bionic currently use plain clone for threads.
 
-=2D-=20
-TQ-Systems GmbH | M=FChlstra=DFe 2, Gut Delling | 82229 Seefeld, Germany
-Amtsgericht M=FCnchen, HRB 105018
-Gesch=E4ftsf=FChrer: Detlef Schneider, R=FCdiger Stahl, Stefan Schneider
-http://www.tq-group.com/
+> and there is user code doing raw clone threads (such threads are
+> technically not allowed to call into libc) it's not immediately
+> clear to me if having gcs in those threads is better or worse.
 
+Right, that's my big worry - I hadn't realised it was extending as far
+as musl/bionic.
 
+> one difference is that userspace can then set gcspr of a new thread
+> and e.g. two threads can have overlapping gcs, however i don't think
+> this impacts security much since if clone3 is attacker controlled
+> then likely all bets are off.
+
+Yeah, I think that's a "you broke it, you get all the pieces" thing. =20
+
+> > My sense is that they deployment story is going to be smoother with
+> > defaults being provided since it avoids dealing with the issue of what
+> > to do if userspace creates a thread without a GCS in a GCS enabled
+> > process but like I say I'd be totally happy to extend clone3().  I will
+> > put some patches together for that (probably once the x86 stuff lands).
+> > Given the size of this series it might be better split out for
+> > manageability if nothing else.
+
+> i would make thread without gcs to implicitly disable gcs, since
+> that's what's bw compat with clones outside of libc (the libc can
+> guarantee gcs allocation when gcs is enabled).
+
+That'd create a pretty substantial divergence with the x86 patches if
+they land this time around, there's not enough time to rework them now -
+I suppose it'd mainly bite people implementing libc type stuff but
+still, doesn't feel great.
+
+--UdmTiHBngnlr6cvp
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmTmANcACgkQJNaLcl1U
+h9CieQf+MMgnojrsBIaDJI83Wq0C8xk7vAXbThpL0v56u9wjmEZMDh7EcY2ddq/2
+JABAkm2liE7SLPjWQBEUUN0/IeeUmkf96mYK4WQlULgjiwfY47oi3jWUhZ6k9LhM
+8pjyl1KON9bRNIrulNLtQVYAPXm7vhGBmR0BjziAHJsdoaxh/mFuY24eV8GU6M+g
+3y8nYYgKNOAjB6E6//Acfg4jVvxYJGMdmVlJl4REhmre1EGrE2R3NAiKDJZ/sKGz
+3F4rR/Opy2Sa/VQFqR1eyjhZEjZxVgbrBukhZV+ExyMSjPfagV2qok97yi7jIIXg
+lRrBa8MwILXz0GiOAj9Xz5WDbjUsRQ==
+=F2xx
+-----END PGP SIGNATURE-----
+
+--UdmTiHBngnlr6cvp--
