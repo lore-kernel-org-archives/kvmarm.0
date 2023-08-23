@@ -1,100 +1,222 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F98DAD42
-	for <kvmarm@lists.linux.dev>; Wed, 23 Aug 2023 15:50:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1268FC433C7;
-	Wed, 23 Aug 2023 15:50:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692805820;
-	bh=LfSPyFOC3BjWg0Lc12kxGpYZXTpAJDmnKm0+E48fsYA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JXxYB3+fT0UVF4Njt8TKpmeByoZkbsjd3n/9P3Snic8g9RaQqf8z9/1pAOMPSfemQ
-	 Y9j9vhDsu5y69cyAbfuDB83yGakcbvooWW6sYOU+Rpn6rnfgd6jhycZmd5MwPkAey9
-	 R/8WjmfnlXliw9apZxQ4dXU84G0pXh4oScGsRUdqq/NLv5BvG+lDtanGz3Qii+HgqF
-	 AdTJ6+Yywsuf55Jjh+2jDj/MQPRZoAJorkwc4Da/nqn+B25d4cDvqEJmH+OSk9x917
-	 +rI2H7D87DCVOHmkcb8R18WVGIDXoCwWYwvwnOpIIGT5cEuC8VMxE5zVxbsUFeak9i
-	 fekkLTSaiJdxg==
-Date: Wed, 23 Aug 2023 16:50:10 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Will Deacon <will@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v4 03/36] arm64/gcs: Document the ABI for Guarded Control
- Stacks
-Message-ID: <b6b654d6-9f77-463e-bbe9-58e8135536ff@sirena.org.uk>
-References: <20230807-arm64-gcs-v4-0-68cfa37f9069@kernel.org>
- <20230807-arm64-gcs-v4-3-68cfa37f9069@kernel.org>
- <ZNOhjrYleGBR6Pbs@arm.com>
- <f4cec4b3-c386-4873-aa1d-90528e062f2a@sirena.org.uk>
- <ZN+qki9EaZ6f9XNi@arm.com>
- <aaea542c-929c-4c9b-8caa-ca67e0eb9c1e@sirena.org.uk>
- <ZOTnL1SDJWZjHPUW@arm.com>
- <43ec219d-bf20-47b8-a5f8-32bc3b64d487@sirena.org.uk>
- <ZOXa98SqwYPwxzNP@arm.com>
- <ZOYFazB1gYjzDRdA@arm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93CAC8ED
+	for <kvmarm@lists.linux.dev>; Wed, 23 Aug 2023 16:06:14 +0000 (UTC)
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-40c72caec5cso375501cf.0
+        for <kvmarm@lists.linux.dev>; Wed, 23 Aug 2023 09:06:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692806773; x=1693411573;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C7pbYc3cWzUuemTPAl/D1nSHc5zEIFeD9puZanDYIGs=;
+        b=2TTKoEKSSROueBqUfTiWRuUIf/t+jJXyxLv+JoXQUYIMNvA3U7woiSez1H6yLxFb/u
+         Uvmww63a5/ZjqeUquvgFAEMNlKEcNISwGHjWKNeMLWUEXn2dQH7DjhNaEKg1iNNa6zro
+         drI9+sV5Yyolacc5wequgp+RkcMYzvGrgglnnF4hX35gpl6rwFDWDdWclZOyYns17ZO+
+         qKD1Qbkv4+gL0n4ObjzKb/S3PloaVEMGFu7m6HWQiUtamYwzIXtiW2zpagZqwqPBBcK7
+         k25sBpTKMklbEpQAXAwNCcCBf/hmOFLXhlRt8rFqr7RJ+MBN/Hf7Py5FBd6mC/BCnY84
+         A+zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692806773; x=1693411573;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=C7pbYc3cWzUuemTPAl/D1nSHc5zEIFeD9puZanDYIGs=;
+        b=cioP0F9jaJIM5bIhCtSeLw2THjY9+BMVHbmAUd4mslQKHRTqvGPNWJAgSgm1VD2K0E
+         AM7OkYsaXZmrxwPhMrRLtGRQ/QiJ0Bf7wxAOTo+JrvD+fCf7/pNIXXUKBYb1mUKRfX3R
+         QFvz0v3fr2Ui0xKuWg6WOzD+5leuZLHet3HcHlBCdSdV70xPze5iyi1+0xSSalXvsL/L
+         K/OG6a2vojNXliclBHWKYz12tTHryNId5Lf3IZ6eHmvvCcSxp/FE4g73nE7e4Y8/pTHc
+         FD6wa4PBI8uKaFSKVmLJEte79+laB4rg76NsLxT9eU+XAT3ED5GBKGM03NlI2/DXg39a
+         J2oQ==
+X-Gm-Message-State: AOJu0YwPq2Eq9WrXRZJf26BsE5dVt5pzR72Rq0LBUn3Hq+YdcA7rcPeX
+	YOum/f8nHAHzzVoZkGRmAzamBWuLdOcQ/jlBpYwVuw==
+X-Google-Smtp-Source: AGHT+IGV1CYyxAdrvhOhjVX5heWnvD4h1VweRqaPWtGenmweevOV0fIK1K68madw/WFYQPk3NLfqn/Vo6ILUVZh/DSE=
+X-Received: by 2002:a05:622a:38f:b0:40f:d1f4:aa58 with SMTP id
+ j15-20020a05622a038f00b0040fd1f4aa58mr505066qtx.8.1692806773226; Wed, 23 Aug
+ 2023 09:06:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="xcjBCIAjiMPyRAnv"
-Content-Disposition: inline
-In-Reply-To: <ZOYFazB1gYjzDRdA@arm.com>
-X-Cookie: Some optional equipment shown.
+References: <20230817003029.3073210-1-rananta@google.com> <20230817003029.3073210-9-rananta@google.com>
+ <1c6c07af-f6d0-89a6-1b7d-164ca100ac88@redhat.com>
+In-Reply-To: <1c6c07af-f6d0-89a6-1b7d-164ca100ac88@redhat.com>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Wed, 23 Aug 2023 09:06:02 -0700
+Message-ID: <CAJHc60x=rZTpeJ3PDUWmc08Aziow6S+2nndcL90vHfru5GhXtA@mail.gmail.com>
+Subject: Re: [PATCH v5 08/12] KVM: arm64: PMU: Allow userspace to limit
+ PMCR_EL0.N for the guest
+To: Shaoqin Huang <shahuang@redhat.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Jing Zhang <jingzhangos@google.com>, 
+	Reiji Watanabe <reijiw@google.com>, Colton Lewis <coltonlewis@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Aug 22, 2023 at 3:06=E2=80=AFAM Shaoqin Huang <shahuang@redhat.com>=
+ wrote:
+>
+> Hi Raghavendra,
+>
+> On 8/17/23 08:30, Raghavendra Rao Ananta wrote:
+> > From: Reiji Watanabe <reijiw@google.com>
+> >
+> > KVM does not yet support userspace modifying PMCR_EL0.N (With
+> > the previous patch, KVM ignores what is written by upserspace).
+> > Add support userspace limiting PMCR_EL0.N.
+> >
+> > Disallow userspace to set PMCR_EL0.N to a value that is greater
+> > than the host value (KVM_SET_ONE_REG will fail), as KVM doesn't
+> > support more event counters than the host HW implements.
+> > Although this is an ABI change, this change only affects
+> > userspace setting PMCR_EL0.N to a larger value than the host.
+> > As accesses to unadvertised event counters indices is CONSTRAINED
+> > UNPREDICTABLE behavior, and PMCR_EL0.N was reset to the host value
+> > on every vCPU reset before this series, I can't think of any
+> > use case where a user space would do that.
+> >
+> > Also, ignore writes to read-only bits that are cleared on vCPU reset,
+> > and RES{0,1} bits (including writable bits that KVM doesn't support
+> > yet), as those bits shouldn't be modified (at least with
+> > the current KVM).
+> >
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > ---
+> >   arch/arm64/include/asm/kvm_host.h |  3 ++
+> >   arch/arm64/kvm/pmu-emul.c         |  1 +
+> >   arch/arm64/kvm/sys_regs.c         | 49 +++++++++++++++++++++++++++++-=
+-
+> >   3 files changed, 51 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm=
+/kvm_host.h
+> > index 0f2dbbe8f6a7e..c15ec365283d1 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -259,6 +259,9 @@ struct kvm_arch {
+> >       /* PMCR_EL0.N value for the guest */
+> >       u8 pmcr_n;
+> >
+> > +     /* Limit value of PMCR_EL0.N for the guest */
+> > +     u8 pmcr_n_limit;
+> > +
+> >       /* Hypercall features firmware registers' descriptor */
+> >       struct kvm_smccc_features smccc_feat;
+> >       struct maple_tree smccc_filter;
+> > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> > index ce7de6bbdc967..39ad56a71ad20 100644
+> > --- a/arch/arm64/kvm/pmu-emul.c
+> > +++ b/arch/arm64/kvm/pmu-emul.c
+> > @@ -896,6 +896,7 @@ int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_=
+pmu *arm_pmu)
+> >        * while the latter does not.
+> >        */
+> >       kvm->arch.pmcr_n =3D arm_pmu->num_events - 1;
+> > +     kvm->arch.pmcr_n_limit =3D arm_pmu->num_events - 1;
+> >
+> >       return 0;
+> >   }
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 2075901356c5b..c01d62afa7db4 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -1086,6 +1086,51 @@ static int get_pmcr(struct kvm_vcpu *vcpu, const=
+ struct sys_reg_desc *r,
+> >       return 0;
+> >   }
+> >
+> > +static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *=
+r,
+> > +                 u64 val)
+> > +{
+> > +     struct kvm *kvm =3D vcpu->kvm;
+> > +     u64 new_n, mutable_mask;
+> > +     int ret =3D 0;
+> > +
+> > +     new_n =3D FIELD_GET(ARMV8_PMU_PMCR_N, val);
+> > +
+> > +     mutex_lock(&kvm->arch.config_lock);
+> > +     if (unlikely(new_n !=3D kvm->arch.pmcr_n)) {
+> > +             /*
+> > +              * The vCPU can't have more counters than the PMU
+> > +              * hardware implements.
+> > +              */
+> > +             if (new_n <=3D kvm->arch.pmcr_n_limit)
+> > +                     kvm->arch.pmcr_n =3D new_n;
+> > +             else
+> > +                     ret =3D -EINVAL;
+> > +     }
+> > +     mutex_unlock(&kvm->arch.config_lock);
+>
+> Another thing I am just wonder is that should we block any modification
+> to the pmcr_n after vm start to run? Like add one more checking
+> kvm_vm_has_ran_once() at the beginning of the set_pmcr() function.
+>
+Thanks for bringing it up. Reiji and I discussed about this. Checking
+for kvm_vm_has_ran_once() will be a good move, however, it will go
+against the ABI expectations of setting the PMCR. I'd like others to
+weigh in on this as well. What do you think?
 
---xcjBCIAjiMPyRAnv
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Wed, Aug 23, 2023 at 02:11:07PM +0100, Catalin Marinas wrote:
-
-> Yes, this should work. Any invocation of clone() or clone3() without a
-> shadow stack would disable GCS. What about the reverse, should GCS be
-> enabled for a thread even if the clone3() caller has GCS disabled? I
-> guess we shouldn't since GCS enabling depends on the prctl() state set
-> previously.
-
-It has a fairly obvious intended meaning so we could do it easily enough
-but OTOH allowing it opens up the idea of people wanting to specify GCS
-flags which starts to seem like more trouble than it's worth compared to
-just having them do the prctl() in the new thread.
-
---xcjBCIAjiMPyRAnv
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmTmKrIACgkQJNaLcl1U
-h9Drbgf/ZBUIo14hOU/3qkdtGyzuQHFus+mYzjU/uobIdprMeuTN+xOA0/oVAhlk
-taPZwtMKHYyCkcXbZYxy6jKqDlM4zT3mz9WnCHkYtdQdCkyue/ftcKMF1SaZS4nk
-Bzily68XoSg2VhZJTZQie/MqOXcwCDJcDHfBX42qmEhLXJZAblCcvtnu2KLwgSFp
-nFmK1EGeH/+y6nXB/zoUYMDrWrzdpnZ4LJB8lwXMQHctPGJDyJIkZ+exBKubOR6H
-ebKadj+npJxy9L4oLx2VRZ5AOjzR34+qZlQIuTPf8WokNrmtz4xQwPz7F1xBjcgN
-jd3C7SSBR98L0uw+V3/L3WK8PKh2Lw==
-=CE8H
------END PGP SIGNATURE-----
-
---xcjBCIAjiMPyRAnv--
+Thank you.
+Raghavendra
+> Thanks,
+> Shaoqin
+>
+> > +     if (ret)
+> > +             return ret;
+> > +
+> > +     /*
+> > +      * Ignore writes to RES0 bits, read only bits that are cleared on
+> > +      * vCPU reset, and writable bits that KVM doesn't support yet.
+> > +      * (i.e. only PMCR.N and bits [7:0] are mutable from userspace)
+> > +      * The LP bit is RES0 when FEAT_PMUv3p5 is not supported on the v=
+CPU.
+> > +      * But, we leave the bit as it is here, as the vCPU's PMUver migh=
+t
+> > +      * be changed later (NOTE: the bit will be cleared on first vCPU =
+run
+> > +      * if necessary).
+> > +      */
+> > +     mutable_mask =3D (ARMV8_PMU_PMCR_MASK | ARMV8_PMU_PMCR_N);
+> > +     val &=3D mutable_mask;
+> > +     val |=3D (__vcpu_sys_reg(vcpu, r->reg) & ~mutable_mask);
+> > +
+> > +     /* The LC bit is RES1 when AArch32 is not supported */
+> > +     if (!kvm_supports_32bit_el0())
+> > +             val |=3D ARMV8_PMU_PMCR_LC;
+> > +
+> > +     __vcpu_sys_reg(vcpu, r->reg) =3D val;
+> > +     return 0;
+> > +}
+> > +
+> >   /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in o=
+ne go */
+> >   #define DBG_BCR_BVR_WCR_WVR_EL1(n)                                  \
+> >       { SYS_DESC(SYS_DBGBVRn_EL1(n)),                                 \
+> > @@ -2147,8 +2192,8 @@ static const struct sys_reg_desc sys_reg_descs[] =
+=3D {
+> >       { SYS_DESC(SYS_CTR_EL0), access_ctr },
+> >       { SYS_DESC(SYS_SVCR), undef_access },
+> >
+> > -     { PMU_SYS_REG(PMCR_EL0), .access =3D access_pmcr,
+> > -       .reset =3D reset_pmcr, .reg =3D PMCR_EL0, .get_user =3D get_pmc=
+r },
+> > +     { PMU_SYS_REG(PMCR_EL0), .access =3D access_pmcr, .reset =3D rese=
+t_pmcr,
+> > +       .reg =3D PMCR_EL0, .get_user =3D get_pmcr, .set_user =3D set_pm=
+cr },
+> >       { PMU_SYS_REG(PMCNTENSET_EL0),
+> >         .access =3D access_pmcnten, .reg =3D PMCNTENSET_EL0 },
+> >       { PMU_SYS_REG(PMCNTENCLR_EL0),
+>
+> --
+> Shaoqin
+>
