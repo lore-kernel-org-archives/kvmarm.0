@@ -1,111 +1,133 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C2710979
-	for <kvmarm@lists.linux.dev>; Thu, 24 Aug 2023 15:15:46 +0000 (UTC)
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d72b76f202bso7809131276.1
-        for <kvmarm@lists.linux.dev>; Thu, 24 Aug 2023 08:15:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692890145; x=1693494945;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BCC0wwp7wWSIy0MrdACmgS4Vp0ye9VEhwI7wuPMec4A=;
-        b=FtVfL5Tf+6L+aGO+3VLVFfVEdfsELAv/SkE1PTKpiAC3gFVBjTzmjrn/G6noL3tCwT
-         nY/EAJeRp1nUZ1X8yuA3Jxf69ZaoSNHuvOQh3ULPUAYpMu4LVrXdZw1h4nH2PAlfwGQ5
-         HGQOfNLw0wvbAHb80uzDgzcI3HY8lXjzMoOoHDVH4Pz8HXQOOW7DfntGjjOL04U2gBH5
-         ZxYs546ol999Lp9xjtgeFXwtR0AaARSkkT0m/gVyhfqtUMb/pTpVMTXHfDw9wPW17NyP
-         1E6e3/AVVS3EyluWhAt1DasCBBld/p7NdQ0UhAyRFy01f8SCDMvj/nvu0ZKPtEv3L+Gt
-         UNqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692890145; x=1693494945;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=BCC0wwp7wWSIy0MrdACmgS4Vp0ye9VEhwI7wuPMec4A=;
-        b=Z79lgqGakv4EihLesq3WpzgQ/669/yEPhd/sVjnmyieunxIYBRBzNVIMzLhDV25WfK
-         s9N70x1zYgKBCMT4UZWMA1CDreZNhR+U4FrlWo6r7kNEhCH78VL4WLCTPCxTecZ2+Z14
-         gIjVSf40Es2sD9KYsl/qmaVOZrNnfyS/B49Np4Z612B4ALDsuT/Wu1asdE6MsMLYGYO9
-         4MnymT1jv8+8eYsryQDodz+JGppaBaGKerQ6syP3Qh8XwRfjUuMfRcEzE+2FP6nPTFiS
-         nAvNIGATH/rLSpTotwsHffp/syVt0Is0K16Yllop7Qc8MgDJ6U9lS2+K3W+Xlx712wsB
-         6P2w==
-X-Gm-Message-State: AOJu0Yzvg66dCPQak/Ntc6/aBWg/11hiteJBSB3h5fzN9APgHMcUw1r2
-	f442zG9xZmRNq6Azmp9Ll859q4BctZs=
-X-Google-Smtp-Source: AGHT+IEE5MT+OR26AI25mjbMCPL/tYmhkhOKeyxLgW2HJM/WWK+y8/HYNn2t4mxnVIC7aAY/Rh8OZ4/3wmA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:2484:0:b0:d74:cdd7:d491 with SMTP id
- k126-20020a252484000000b00d74cdd7d491mr186602ybk.5.1692890145678; Thu, 24 Aug
- 2023 08:15:45 -0700 (PDT)
-Date: Thu, 24 Aug 2023 08:15:44 -0700
-In-Reply-To: <CAD=HUj7F6CUNt_9txEu0upB=PBwJzkL5dBhNs_BVHX1cicqBgw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EAF1125B4
+	for <kvmarm@lists.linux.dev>; Thu, 24 Aug 2023 15:24:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E56EC433C8;
+	Thu, 24 Aug 2023 15:24:34 +0000 (UTC)
+Date: Thu, 24 Aug 2023 16:24:30 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>, will@kernel.org,
+	oliver.upton@linux.dev, maz@kernel.org, james.morse@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, arnd@arndb.de,
+	akpm@linux-foundation.org, mingo@redhat.com, peterz@infradead.org,
+	juri.lelli@redhat.com, vincent.guittot@linaro.org,
+	dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
+	mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com,
+	mhiramat@kernel.org, rppt@kernel.org, hughd@google.com,
+	pcc@google.com, steven.price@arm.com, anshuman.khandual@arm.com,
+	vincenzo.frascino@arm.com, eugenis@google.com, kcc@google.com,
+	hyesoo.yu@samsung.com, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC 00/37] Add support for arm64 MTE dynamic tag storage
+ reuse
+Message-ID: <ZOd2LvUKMguWdlgq@arm.com>
+References: <20230823131350.114942-1-alexandru.elisei@arm.com>
+ <33def4fe-fdb8-6388-1151-fabd2adc8220@redhat.com>
+ <ZOc0fehF02MohuWr@arm.com>
+ <ebd3f142-43cc-dc92-7512-8f1c99073fce@redhat.com>
+ <0b9c122a-c05a-b3df-c69f-85f520294adc@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-6-stevensd@google.com>
- <20230705102547.hr2zxkdkecdxp5tf@linux.intel.com> <CAD=HUj7F6CUNt_9txEu0upB=PBwJzkL5dBhNs_BVHX1cicqBgw@mail.gmail.com>
-Message-ID: <ZOd0IMeKSkBwGIer@google.com>
-Subject: Re: [PATCH v7 5/8] KVM: x86/mmu: Don't pass FOLL_GET to __kvm_follow_pfn
-From: Sean Christopherson <seanjc@google.com>
-To: David Stevens <stevensd@chromium.org>
-Cc: Yu Zhang <yu.c.zhang@linux.intel.com>, Marc Zyngier <maz@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Peter Xu <peterx@redhat.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0b9c122a-c05a-b3df-c69f-85f520294adc@redhat.com>
 
-On Thu, Aug 24, 2023, David Stevens wrote:
-> On Wed, Jul 5, 2023 at 7:25=E2=80=AFPM Yu Zhang <yu.c.zhang@linux.intel.c=
-om> wrote:
-> >
-> > On Tue, Jul 04, 2023 at 04:50:50PM +0900, David Stevens wrote:
-> > > @@ -4529,7 +4540,8 @@ static int kvm_tdp_mmu_page_fault(struct kvm_vc=
-pu *vcpu,
-> > >
-> > >  out_unlock:
-> > >       read_unlock(&vcpu->kvm->mmu_lock);
-> > > -     kvm_release_pfn_clean(fault->pfn);
-> >
-> > Yet kvm_release_pfn() can still be triggered for the kvm_vcpu_maped gfn=
-s.
-> > What if guest uses a non-referenced page(e.g., as a vmcs12)? Although I
-> > believe this is not gonna happen in real world...
->=20
-> kvm_vcpu_map still uses gfn_to_pfn, which eventually passes FOLL_GET
-> to __kvm_follow_pfn. So if a guest tries to use a non-refcounted page
-> like that, then kvm_vcpu_map will fail and the guest will probably
-> crash. It won't trigger any bugs in the host, though.
->=20
-> It is unfortunate that the guest will be able to use certain types of
-> memory for some purposes but not for others. However, while it is
-> theoretically fixable, it's an unreasonable amount of work for
-> something that, as you say, nobody really cares about in practice [1].
->=20
-> [1] https://lore.kernel.org/all/ZBEEQtmtNPaEqU1i@google.com/
+On Thu, Aug 24, 2023 at 01:25:41PM +0200, David Hildenbrand wrote:
+> On 24.08.23 13:06, David Hildenbrand wrote:
+> > On 24.08.23 12:44, Catalin Marinas wrote:
+> > > The way MTE is implemented currently is to have a static carve-out of
+> > > the DRAM to store the allocation tags (a.k.a. memory colour). This is
+> > > what we call the tag storage. Each 16 bytes have 4 bits of tags, so this
+> > > means 1/32 of the DRAM, roughly 3% used for the tag storage. This is
+> > > done transparently by the hardware/interconnect (with firmware setup)
+> > > and normally hidden from the OS. So a checked memory access to location
+> > > X generates a tag fetch from location Y in the carve-out and this tag is
+> > > compared with the bits 59:56 in the pointer. The correspondence from X
+> > > to Y is linear (subject to a minimum block size to deal with some
+> > > address interleaving). The software doesn't need to know about this
+> > > correspondence as we have specific instructions like STG/LDG to location
+> > > X that lead to a tag store/load to Y.
+> > > 
+> > > Now, not all memory used by applications is tagged (mmap(PROT_MTE)).
+> > > For example, some large allocations may not use PROT_MTE at all or only
+> > > for the first and last page since initialising the tags takes time. The
+> > > side-effect is that of these 3% DRAM, only part, say 1% is effectively
+> > > used. Some people want the unused tag storage to be released for normal
+> > > data usage (i.e. give it to the kernel page allocator).
+[...]
+> > So it sounds like you might want to provide that tag memory using CMA.
+> > 
+> > That way, only movable allocations can end up on that CMA memory area,
+> > and you can allocate selected tag pages on demand (similar to the
+> > alloc_contig_range() use case).
+> > 
+> > That also solves the issue that such tag memory must not be longterm-pinned.
+> > 
+> > Regarding one complication: "The kernel needs to know where to allocate
+> > a PROT_MTE page from or migrate a current page if it becomes PROT_MTE
+> > (mprotect()) and the range it is in does not support tagging.",
+> > simplified handling would be if it's in a MIGRATE_CMA pageblock, it
+> > doesn't support tagging. You have to migrate to a !CMA page (for
+> > example, not specifying GFP_MOVABLE as a quick way to achieve that).
+> 
+> Okay, I now realize that this patch set effectively duplicates some CMA
+> behavior using a new migrate-type.
 
-There are use cases that care, which is why I suggested allow_unsafe_kmap.
-Specifically, AWS manages their pool of guest memory in userspace and maps =
-it all
-via /dev/mem.  Without that module param to let userspace opt-in, this seri=
-es will
-break such setups.  It still arguably is a breaking change since it require=
-s
-userspace to opt-in, but allowing such behavior by default is simply not a =
-viable
-option, and I don't have much sympathy since so much of this mess has its o=
-rigins
-in commit e45adf665a53 ("KVM: Introduce a new guest mapping API").
+Yes, pretty much, with some additional hooks to trigger migration. The
+CMA mechanism was a great source of inspiration.
 
-The use cases that no one cares about (AFAIK) is allowing _untrusted_ users=
-pace
-to back guest RAM with arbitrary memory.  In other words, I want KVM to all=
-ow
-(by default) mapping device memory into the guest for things like vGPUs, wi=
-thout
-having to do the massive and invasive overhaul needed to safely allow backi=
-ng guest
-RAM with completely arbitrary memory.
+In addition, there are some races that are addressed mostly around page
+migration/copying: the source page is untagged, the destination
+allocated as untagged but before the copy an mprotect() makes the source
+tagged (PG_mte_tagged set) and the copy_highpage() mechanism not having
+anywhere to store the tags.
+
+> Yeah, that's probably not what we want just to identify if memory is
+> taggable or not.
+> 
+> Maybe there is a way to just keep reusing most of CMA instead.
+
+A potential issue is that devices (mobile phones) may need a different
+CMA range as well for DMA (and not necessarily in ZONE_DMA). Can
+free_area[MIGRATE_CMA] handle multiple disjoint ranges? I don't see why
+not as it's just a list.
+
+We (Google and Arm) went through a few rounds of discussions and
+prototyping trying to find the best approach: (1) a separate free_area[]
+array in each zone (early proof of concept from Peter C and Evgenii S,
+https://github.com/google/sanitizers/tree/master/mte-dynamic-carveout),
+(2) a new ZONE_METADATA, (3) a separate CPU-less NUMA node just for the
+tag storage, (4) a new MIGRATE_METADATA type.
+
+We settled on the latter as it closely resembles CMA without interfering
+with it. I don't remember why we did not just go for MIGRATE_CMA, it may
+have been the heterogeneous memory aspect and the fact that we don't
+want PROT_MTE (VM_MTE) allocations from this range. If the hardware
+allowed this, I think the patches would have been a bit simpler.
+
+Alex can comment more next week on how we ended up with this choice but
+if we find a way to avoid VM_MTE allocations from certain areas, I think
+we can reuse the CMA infrastructure. A bigger hammer would be no VM_MTE
+allocations from any CMA range but it seems too restrictive.
+
+> Another simpler idea to get started would be to just intercept the first
+> PROT_MTE, and allocate all CMA memory. In that case, systems that don't ever
+> use PROT_MTE can have that additional 3% of memory.
+
+We had this on the table as well but the most likely deployment, at
+least initially, is only some secure services enabling MTE with various
+apps gradually moving towards this in time. So that's why the main
+pushback from vendors is having this 3% reserved permanently. Even if
+all apps use MTE, only the anonymous mappings are PROT_MTE, so still not
+fully using the tag storage.
+
+-- 
+Catalin
