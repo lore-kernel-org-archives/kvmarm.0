@@ -1,97 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFDA2134CC
-	for <kvmarm@lists.linux.dev>; Thu, 24 Aug 2023 17:38:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E96AC433C8;
-	Thu, 24 Aug 2023 17:38:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692898692;
-	bh=U5Ix9ciY5zbF8VwoY15Xy5FGw2K8jCp22zgnZb9yn1s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nRAf83wpRSrvvYRPjONqLVZzwBYmDLrH/GH1ltQcXP7W3rjLVJZ/rbQnnpP21RlTy
-	 5KGjtMJZipbDFqU5ETzp7GJ73tNtF5dpUnwDDr93+DtvZb1jyLeSl+LmE0BY19DfG0
-	 uPlvnfS6yIMSrxs7lb43NF/UkwEC8ZmgXZgoYupKjMkqQCJK1NAHDv0zxo/7o/ajIN
-	 CJ4lU3O5C10vTHb2rCfGlpE4YUHksa4/+mNGWqC5ATCYJhHg+b7spIRVwe9uCdGewY
-	 1zpdUkfatB50xUtoUYaupimxaODWpNmJKwGlIdZFKqfVQ56ebQsHXIQR2BFnB9oovK
-	 2AzqDCkwAPsKA==
-Date: Thu, 24 Aug 2023 18:38:02 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Will Deacon <will@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v4 03/36] arm64/gcs: Document the ABI for Guarded Control
- Stacks
-Message-ID: <ZOeVeujEVmoJ1eOR@finisterre.sirena.org.uk>
-References: <ZN+qki9EaZ6f9XNi@arm.com>
- <aaea542c-929c-4c9b-8caa-ca67e0eb9c1e@sirena.org.uk>
- <ZOTnL1SDJWZjHPUW@arm.com>
- <43ec219d-bf20-47b8-a5f8-32bc3b64d487@sirena.org.uk>
- <ZOXa98SqwYPwxzNP@arm.com>
- <227e6552-353c-40a9-86c1-280587a40e3c@sirena.org.uk>
- <ZOY3lz+Zyhd5ZyQ9@arm.com>
- <ZOZEmO6WGyVAcOqK@arm.com>
- <ef7272d2-d807-428f-9915-6fc9febadb5c@sirena.org.uk>
- <ZOd6lzj29VksAp7L@arm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B45ACA76
+	for <kvmarm@lists.linux.dev>; Thu, 24 Aug 2023 18:46:04 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d74b711ec0dso193364276.0
+        for <kvmarm@lists.linux.dev>; Thu, 24 Aug 2023 11:46:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692902763; x=1693507563;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=jxvSonwCPl7HzvAeeiStfZghiC+PCdMyvX2s7XAS0qg=;
+        b=NVzIkEv1YN/fNfmOUW8+mCw4FGt9HP7CdvoVunxChDSreigmd4y8LfpytQe/AqNyk6
+         SwtnQuX90QpPGaLd6tImxYVQyNzKUv8yN83q39jElkG6uSHjlKz6kU2oPBtRB5gAMh6o
+         aMpmuTuXTnRULhbBAQ4vAMBl9b0WrIvPS+km14SYltNvzy4lWKgOetCmSN1OhEgpzdry
+         ewT5BOv0btzFrSk0bYtrPvxTYNpRLFSWbdonYryyUQL/0fqlkg3f6ZjQK9urPIgCKVVr
+         UjF/beO0p+u0oXMoXOaco7kmoUYr0lZoCXyO3/23am30ZXFVu4BsB394CHWzmvtIuc3m
+         zhDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692902763; x=1693507563;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jxvSonwCPl7HzvAeeiStfZghiC+PCdMyvX2s7XAS0qg=;
+        b=ipD3z/Fe+3RA4TGnAnmfWKCZmWfISY0O9w3o0W2zmGUStr0sMxIGVhyjNe+aO5sfG5
+         Mj0BD6CLmrGsU64bzxv1WLphzvPmqFXYtcnFi1Y+5/XXos5aaNhmmIF6h+/CSCvcHaWM
+         P4yBQVf09EqgnG4yY3r308Rm7FvgMn9JakdwqeNbOE6/HvkHBLXorD+o4hk5LJ7WFaHn
+         WKyYW+BYdcQTOF8BeD0xZ/Wn1QEJwMXJlCkyMggTLiKUVhY/HWW9jdxkAqC54zm46j5X
+         C6oteKV34Zqj09LHGJOWc8vcffLmXg9urQvtc/BHGCE/Xiq7KLel3vIS8pQ1H8Dp8vqK
+         e+vw==
+X-Gm-Message-State: AOJu0Yyrd+AwyogzDzcj4oC8wfevkIgRZ5kWspLDEobeGxnqW+oueB2V
+	OwYooZ56I1Xw+tV6id9bf7AjL2LHhxxj21B7QQ==
+X-Google-Smtp-Source: AGHT+IHoz5xvutY055FyMb5A0+qKLbY91XiIs6jQGzBhrR+guKJhhRsG+9n92YHGqxDntUt9XeD1fRmg2IQaszGJIw==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a25:aba2:0:b0:d77:f6f9:159 with SMTP
+ id v31-20020a25aba2000000b00d77f6f90159mr62888ybi.9.1692902763449; Thu, 24
+ Aug 2023 11:46:03 -0700 (PDT)
+Date: Thu, 24 Aug 2023 18:46:02 +0000
+In-Reply-To: <20230824-0c7416fcdabc1f5f04a53560@orel> (message from Andrew
+ Jones on Thu, 24 Aug 2023 09:47:59 +0200)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="cR3/e0in3CDt790L"
-Content-Disposition: inline
-In-Reply-To: <ZOd6lzj29VksAp7L@arm.com>
-X-Cookie: Give him an evasive answer.
+Mime-Version: 1.0
+Message-ID: <gsntttsonus5.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [kvm-unit-tests PATCH] arm64: microbench: Benchmark with virtual
+ instead of physical timer
+From: Colton Lewis <coltonlewis@google.com>
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: kvm@vger.kernel.org, alexandru.elisei@arm.com, eric.auger@redhat.com, 
+	oliver.upton@linux.dev, kvmarm@lists.linux.dev, peter.maydell@linaro.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
+Andrew Jones <andrew.jones@linux.dev> writes:
 
---cR3/e0in3CDt790L
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> On Thu, Aug 24, 2023 at 09:29:33AM +0200, Andrew Jones wrote:
+>> No need to speculate, QEMU is open source :-)  QEMU is setting on offset,
+>> but not because it explicitly wants to.  Simply reading the CNT register
+>> and writing back the same value is enough to set an offset, since the
+>> timer will have certainly moved past whatever value was read by the time
+>> it's written.  QEMU frequently saves and restores all registers in the
+>> get-reg-list array, unless they've been explicitly filtered out (with
+>> Linux commit 680232a94c12, KVM_REG_ARM_PTIMER_CNT is now in the array).
+>> So, to restore trapless ptimer accesses, we need a QEMU patch like below
+>> to filter out the register.
 
-On Thu, Aug 24, 2023 at 04:43:19PM +0100, Catalin Marinas wrote:
+>> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+>> index 94bbd9661fd3..f89ea31f170d 100644
+>> --- a/target/arm/kvm64.c
+>> +++ b/target/arm/kvm64.c
+>> @@ -674,6 +674,7 @@ typedef struct CPRegStateLevel {
+>>    */
+>>   static const CPRegStateLevel non_runtime_cpregs[] = {
+>>       { KVM_REG_ARM_TIMER_CNT, KVM_PUT_FULL_STATE },
+>> +    { KVM_REG_ARM_PTIMER_CNT, KVM_PUT_FULL_STATE },
+>>   };
 
-> If we go for extending clone3, I wonder whether we should also introduce
-> a sigaltstack2/3 ;). I haven't checked what the current patches do and
-> won't have time until early September (on holiday from the end of today).
+>>   int kvm_arm_cpreg_level(uint64_t regidx)
 
-The current patches (and the x86 stuff that's in -next) punt on
-sigaltstack for now, the discussions around that are unresolved.  My
-hope is that whatever we come up with there can be cross platform.
+> Actually, the QEMU fix above is necessary for more than just trap
+> avoidance. The ptimer will lag more and more with respect to other time
+> sources, even with respect to the vtimer (QEMU only updates the vtimer
+> offset when the VM is "paused".)
 
---cR3/e0in3CDt790L
-Content-Type: application/pgp-signature; name="signature.asc"
+> I'm not sure when I'll have time to test and post the QEMU patch. It may
+> be better if somebody else picks it up.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmTnlXkACgkQJNaLcl1U
-h9BzXwf+PogdlHq+hcG6MNbhOXLdqIdv9ZRGclIgCMqiPry95Dchnj/AqAm6c1KW
-hIYF7JwBhdQ+4zYjGG9gBcEs8zpbQepJziTh8cVrno1O9hL573b/rHrspYwVR+7K
-SPEa3v+HfOhG2JG1jeX9p7IHLIxR8XjbRTOIjnH0y2H5Mi5GRIdblDl0MFwss65Q
-yy4A9M+MErwOLa61qAJVBAXHrPefexcp6OJDaExkFCKA4AUkAEMkx8ewKfn7zep+
-8cVT/fpy8yqtFSE9W2tJEp4Cm7tuoUGCvj6wuO8nUTnCRhu7L91iFnXr6jI2NXjq
-4lpRD2wGj+qk2c/2UpLnuyaJZC11dg==
-=4Dj+
------END PGP SIGNATURE-----
-
---cR3/e0in3CDt790L--
+I haven't posted any QEMU patches before, but I think I can handle this.
