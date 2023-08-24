@@ -1,124 +1,236 @@
-Received: from out-15.mta1.migadu.com (out-15.mta1.migadu.com [95.215.58.15])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB37E1FB4
-	for <kvmarm@lists.linux.dev>; Thu, 24 Aug 2023 07:48:02 +0000 (UTC)
-Date: Thu, 24 Aug 2023 09:47:59 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1692863280;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C4AE1FB4
+	for <kvmarm@lists.linux.dev>; Thu, 24 Aug 2023 07:50:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1692863438;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Cc/1O7n1fFl8/KxMy4Sf6yQlJZmBeEBSqfRC/7scbyo=;
-	b=o4DgG7v0lTe4g4SAUN0W8V0n/3GTu5kTOuH081RtjtnOeMYpvnsdXRuHX86digcOutCbnB
-	jxeCu1eieRTUG3xN5yerzPcB0lpQIgBDKovAHjR9v4I8Fwr6emVq/bAxXwlyj7N9drgHrm
-	nD0vR7ya0ZRlwj1+VpcgHZi4vKSa6QY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Eric Auger <eric.auger@redhat.com>, Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev, 
-	peter.maydell@linaro.org
-Subject: Re: [kvm-unit-tests PATCH] arm64: microbench: Benchmark with virtual
- instead of physical timer
-Message-ID: <20230824-0c7416fcdabc1f5f04a53560@orel>
-References: <20230823200408.1214332-1-coltonlewis@google.com>
- <20230824-1756f41111a789804fb7d049@orel>
+	bh=9VEiwM/469XoxPkv00kiY2u9t4qVyJoCjGxKGq/80WA=;
+	b=bXj0eTn16vSh2KzmI7uPM8zkiBpDPJN+E9wQbnQ+fiXttwTW7duQXxoNJjBDRjsLCy2GUU
+	8yVs53Gn+h1O15hxuMeKtu+a7U1uTLFBJqoFBUQGXbFPUQfBNQvsvjymfBaMUV/LIl5yyl
+	4NlTjK3zCJ36KHVsOFnn8BrEwtujQ0k=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-385-3qOGi_32Ng-LBY_pZUbTqA-1; Thu, 24 Aug 2023 03:50:37 -0400
+X-MC-Unique: 3qOGi_32Ng-LBY_pZUbTqA-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-50084bf5da1so4291787e87.0
+        for <kvmarm@lists.linux.dev>; Thu, 24 Aug 2023 00:50:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692863436; x=1693468236;
+        h=content-transfer-encoding:in-reply-to:subject:organization:from
+         :references:cc:to:content-language:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9VEiwM/469XoxPkv00kiY2u9t4qVyJoCjGxKGq/80WA=;
+        b=hgBDCNPadw2XCZ+4uFfQ+1cdmCLimx1qJWJtznRhiwjC3CwqIKAt3HqglbbH0R+3M/
+         BTLhFix0/NizU9RUQzy0JBXmg7XtgFvFIXTHMyYzTniZl3c2r/A7avy0ARFBoia9Sz8q
+         ZDhGBPQXhLvpfRI5/z6x+YEFjHTqGuAzxnc8LF3aPq50zzZXO3Tjyp5FSppLNCID+XzP
+         MVXHArbl+ltc23eu9vNPgHpG2uFCESJXiFQR4HVki2n2LOXp8ncVU4kUAZob+8kw3IxL
+         Ox3vo37PjmxJ/ZJulxPXl2IpgFh1gTh0RMDBdS7QvweWS4Gg/dwa/Pt/guelJhiUasMH
+         6qHg==
+X-Gm-Message-State: AOJu0YxxzGpa4eEUYs+i1e5zcQm4SEfAaox7h92M1x3bpNdif45DYVvK
+	rnIFRTDtp0pcLxzHfzcieLjfT9hU5rSRiY1+/jygqRVAemhwIWaKD4bHlxXxsPGLUlnu6bWJPHX
+	QwGnpgmC1OAzLnmKJ
+X-Received: by 2002:a05:6512:1296:b0:4fe:993:2218 with SMTP id u22-20020a056512129600b004fe09932218mr13520792lfs.31.1692863435833;
+        Thu, 24 Aug 2023 00:50:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFWxb3vEOPi9oDLO474PCk5smXiK4t0flJpP1QfkBeZvkQd0769Sd7lavC4bQKKWkbdbP5Q0A==
+X-Received: by 2002:a05:6512:1296:b0:4fe:993:2218 with SMTP id u22-20020a056512129600b004fe09932218mr13520754lfs.31.1692863435397;
+        Thu, 24 Aug 2023 00:50:35 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c709:6200:16ba:af70:999d:6a1a? (p200300cbc709620016baaf70999d6a1a.dip0.t-ipconnect.de. [2003:cb:c709:6200:16ba:af70:999d:6a1a])
+        by smtp.gmail.com with ESMTPSA id w7-20020adfcd07000000b00313de682eb3sm21614062wrm.65.2023.08.24.00.50.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Aug 2023 00:50:34 -0700 (PDT)
+Message-ID: <33def4fe-fdb8-6388-1151-fabd2adc8220@redhat.com>
+Date: Thu, 24 Aug 2023 09:50:32 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230824-1756f41111a789804fb7d049@orel>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+To: Alexandru Elisei <alexandru.elisei@arm.com>, catalin.marinas@arm.com,
+ will@kernel.org, oliver.upton@linux.dev, maz@kernel.org,
+ james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ arnd@arndb.de, akpm@linux-foundation.org, mingo@redhat.com,
+ peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
+ dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
+ mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com,
+ mhiramat@kernel.org, rppt@kernel.org, hughd@google.com
+Cc: pcc@google.com, steven.price@arm.com, anshuman.khandual@arm.com,
+ vincenzo.frascino@arm.com, eugenis@google.com, kcc@google.com,
+ hyesoo.yu@samsung.com, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+ linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org
+References: <20230823131350.114942-1-alexandru.elisei@arm.com>
+From: David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Subject: Re: [PATCH RFC 00/37] Add support for arm64 MTE dynamic tag storage
+ reuse
+In-Reply-To: <20230823131350.114942-1-alexandru.elisei@arm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 24, 2023 at 09:29:33AM +0200, Andrew Jones wrote:
-> On Wed, Aug 23, 2023 at 08:04:08PM +0000, Colton Lewis wrote:
-> > Use the virtual instead of the physical timer for measuring the time
-> > taken to execute the microbenchmark.
-> > 
-> > Internal testing discovered a performance regression on this test
-> > starting with Linux commit 680232a94c12 "KVM: arm64: timers: Allow
-> > save/restoring of the physical timer". Oliver Upton speculates QEMU is
-> > changing the guest physical counter to have a nonzero offset since it
-> > gained the ability as of that commit. As a consequence KVM is
-> > trap-and-emulating here on architectures without FEAT_ECV.
+On 23.08.23 15:13, Alexandru Elisei wrote:
+> Introduction
+> ============
 > 
-> No need to speculate, QEMU is open source :-)  QEMU is setting on offset,
-> but not because it explicitly wants to.  Simply reading the CNT register
-> and writing back the same value is enough to set an offset, since the
-> timer will have certainly moved past whatever value was read by the time
-> it's written.  QEMU frequently saves and restores all registers in the
-> get-reg-list array, unless they've been explicitly filtered out (with
-> Linux commit 680232a94c12, KVM_REG_ARM_PTIMER_CNT is now in the array).
-> So, to restore trapless ptimer accesses, we need a QEMU patch like below
-> to filter out the register.
+> Arm has implemented memory coloring in hardware, and the feature is called
+> Memory Tagging Extensions (MTE). It works by embedding a 4 bit tag in bits
+> 59..56 of a pointer, and storing this tag to a reserved memory location.
+> When the pointer is dereferenced, the hardware compares the tag embedded in
+> the pointer (logical tag) with the tag stored in memory (allocation tag).
 > 
-> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index 94bbd9661fd3..f89ea31f170d 100644
-> --- a/target/arm/kvm64.c
-> +++ b/target/arm/kvm64.c
-> @@ -674,6 +674,7 @@ typedef struct CPRegStateLevel {
->   */
->  static const CPRegStateLevel non_runtime_cpregs[] = {
->      { KVM_REG_ARM_TIMER_CNT, KVM_PUT_FULL_STATE },
-> +    { KVM_REG_ARM_PTIMER_CNT, KVM_PUT_FULL_STATE },
->  };
+> The relation between memory and where the tag for that memory is stored is
+> static.
 > 
->  int kvm_arm_cpreg_level(uint64_t regidx)
+> The memory where the tags are stored have been so far unaccessible to Linux.
+> This series aims to change that, by adding support for using the tag storage
+> memory only as data memory; tag storage memory cannot be itself tagged.
 > 
 > 
-> > 
-> > While this isn't a correctness issue, the trap-and-emulate overhead of
+> Implementation
+> ==============
+> 
+> The series is based on v6.5-rc3 with these two patches cherry picked:
+> 
+> - mm: Call arch_swap_restore() from unuse_pte():
+> 
+>      https://lore.kernel.org/all/20230523004312.1807357-3-pcc@google.com/
+> 
+> - arm64: mte: Simplify swap tag restoration logic:
+> 
+>      https://lore.kernel.org/all/20230523004312.1807357-4-pcc@google.com/
+> 
+> The above two patches are queued for the v6.6 merge window:
+> 
+>      https://lore.kernel.org/all/20230702123821.04e64ea2c04dd0fdc947bda3@linux-foundation.org/
+> 
+> The entire series, including the above patches, can be cloned with:
+> 
+> $ git clone https://gitlab.arm.com/linux-arm/linux-ae.git \
+> 	-b arm-mte-dynamic-carveout-rfc-v1
+> 
+> On the arm64 architecture side, an extension is being worked on that will
+> clarify how MTE tag storage reuse should behave. The extension will be
+> made public soon.
+> 
+> On the Linux side, MTE tag storage reuse is accomplished with the
+> following changes:
+> 
+> 1. The tag storage memory is exposed to the memory allocator as a new
+> migratetype, MIGRATE_METADATA. It behaves similarly to MIGRATE_CMA, with
+> the restriction that it cannot be used to allocate tagged memory (tag
+> storage memory cannot be tagged). On tagged page allocation, the
+> corresponding tag storage is reserved via alloc_contig_range().
+> 
+> 2. mprotect(PROT_MTE) is implemented by changing the pte prot to
+> PAGE_METADATA_NONE. When the page is next accessed, a fault is taken and
+> the corresponding tag storage is reserved.
+> 
+> 3. When the code tries to copy tags to a page which doesn't have the tag
+> storage reserved, the tags are copied to an xarray and restored in
+> set_pte_at(), when the page is eventually mapped with the tag storage
+> reserved.
 
-Actually, the QEMU fix above is necessary for more than just trap
-avoidance. The ptimer will lag more and more with respect to other time
-sources, even with respect to the vtimer (QEMU only updates the vtimer
-offset when the VM is "paused".)
+Hi!
 
-I'm not sure when I'll have time to test and post the QEMU patch. It may
-be better if somebody else picks it up.
+after re-reading it 2 times, I still have no clue what your patch set is 
+actually trying to achieve. Probably there is a way to describe how user 
+space intents to interact with this feature, so to see which value this 
+actually has for user space -- and if we are using the right APIs and 
+allocators.
 
-Thanks,
-drew
+So some dummy questions / statements
 
-> > physical counter emulation on systems without ECV leads to surprising
-> > microbenchmark results.
-> > 
-> > Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> > ---
-> >  arm/micro-bench.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-> > index bfd181dc..fbe59d03 100644
-> > --- a/arm/micro-bench.c
-> > +++ b/arm/micro-bench.c
-> > @@ -348,10 +348,10 @@ static void loop_test(struct exit_test *test)
-> > 
-> >  	while (ntimes < test->times && total_ns.ns < NS_5_SECONDS) {
-> >  		isb();
-> > -		start = read_sysreg(cntpct_el0);
-> > +		start = read_sysreg(cntvct_el0);
-> >  		test->exec();
-> >  		isb();
-> > -		end = read_sysreg(cntpct_el0);
-> > +		end = read_sysreg(cntvct_el0);
-> 
-> This patch should be merged too, though, to avoid hitting the issue on
-> certain versions of QEMU. And, it's pretty clear that the original
-> authors just picked the ptimer arbitrarily.
-> 
-> > 
-> >  		ntimes++;
-> >  		total_ticks += (end - start);
-> > --
-> > 2.42.0.rc1.204.g551eb34607-goog
-> 
-> Queued.
-> 
-> Thanks,
-> drew
+1) Is this about re-propusing the memory used to hold tags for different 
+purpose? Or what exactly is user space going to do with the PROT_MTE 
+memory? The whole mprotect(PROT_MTE) approach might not eb the right 
+thing to do.
+
+2) Why do we even have to involve the page allocator if this is some 
+special-purpose memory? Re-porpusing the buddy when later using 
+alloc_contig_range() either way feels wrong.
+
+
+[...]
+
+>   arch/arm64/Kconfig                       |  13 +
+>   arch/arm64/include/asm/assembler.h       |  10 +
+>   arch/arm64/include/asm/memory_metadata.h |  49 ++
+>   arch/arm64/include/asm/mte-def.h         |  16 +-
+>   arch/arm64/include/asm/mte.h             |  40 +-
+>   arch/arm64/include/asm/mte_tag_storage.h |  36 ++
+>   arch/arm64/include/asm/page.h            |   5 +-
+>   arch/arm64/include/asm/pgtable-prot.h    |   2 +
+>   arch/arm64/include/asm/pgtable.h         |  33 +-
+>   arch/arm64/kernel/Makefile               |   1 +
+>   arch/arm64/kernel/elfcore.c              |  14 +-
+>   arch/arm64/kernel/hibernate.c            |  46 +-
+>   arch/arm64/kernel/mte.c                  |  31 +-
+>   arch/arm64/kernel/mte_tag_storage.c      | 667 +++++++++++++++++++++++
+>   arch/arm64/kernel/setup.c                |   7 +
+>   arch/arm64/kvm/arm.c                     |   6 +-
+>   arch/arm64/lib/mte.S                     |  30 +-
+>   arch/arm64/mm/copypage.c                 |  26 +
+>   arch/arm64/mm/fault.c                    |  35 +-
+>   arch/arm64/mm/mteswap.c                  | 113 +++-
+>   fs/proc/meminfo.c                        |   8 +
+>   fs/proc/page.c                           |   1 +
+>   include/asm-generic/Kbuild               |   1 +
+>   include/asm-generic/memory_metadata.h    |  50 ++
+>   include/linux/gfp.h                      |  10 +
+>   include/linux/gfp_types.h                |  14 +-
+>   include/linux/huge_mm.h                  |   6 +
+>   include/linux/kernel-page-flags.h        |   1 +
+>   include/linux/migrate_mode.h             |   1 +
+>   include/linux/mm.h                       |  12 +-
+>   include/linux/mmzone.h                   |  26 +-
+>   include/linux/page-flags.h               |   1 +
+>   include/linux/pgtable.h                  |  19 +
+>   include/linux/sched.h                    |   2 +-
+>   include/linux/sched/mm.h                 |  13 +
+>   include/linux/vm_event_item.h            |   5 +
+>   include/linux/vmstat.h                   |   2 +
+>   include/trace/events/mmflags.h           |   5 +-
+>   mm/Kconfig                               |   5 +
+>   mm/compaction.c                          |  52 +-
+>   mm/huge_memory.c                         | 109 ++++
+>   mm/internal.h                            |   7 +
+>   mm/khugepaged.c                          |   7 +
+>   mm/memory.c                              | 180 +++++-
+>   mm/mempolicy.c                           |   7 +
+>   mm/migrate.c                             |   6 +
+>   mm/mm_init.c                             |  23 +-
+>   mm/mprotect.c                            |  46 ++
+>   mm/page_alloc.c                          | 136 ++++-
+>   mm/page_isolation.c                      |  19 +-
+>   mm/page_owner.c                          |   3 +-
+>   mm/shmem.c                               |  14 +-
+>   mm/show_mem.c                            |   4 +
+>   mm/swapfile.c                            |   4 +
+>   mm/vmscan.c                              |   3 +
+>   mm/vmstat.c                              |  13 +-
+>   56 files changed, 1834 insertions(+), 161 deletions(-)
+>   create mode 100644 arch/arm64/include/asm/memory_metadata.h
+>   create mode 100644 arch/arm64/include/asm/mte_tag_storage.h
+>   create mode 100644 arch/arm64/kernel/mte_tag_storage.c
+>   create mode 100644 include/asm-generic/memory_metadata.h
+
+The core-mm changes don't look particularly appealing :)
+
+-- 
+Cheers,
+
+David / dhildenb
+
