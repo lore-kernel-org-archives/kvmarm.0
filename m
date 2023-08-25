@@ -1,141 +1,335 @@
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+Received: from mail-oo1-f66.google.com (mail-oo1-f66.google.com [209.85.161.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE03621
-	for <kvmarm@lists.linux.dev>; Fri, 25 Aug 2023 01:38:30 +0000 (UTC)
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2b9f0b7af65so5720311fa.1
-        for <kvmarm@lists.linux.dev>; Thu, 24 Aug 2023 18:38:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 427F1621
+	for <kvmarm@lists.linux.dev>; Fri, 25 Aug 2023 01:58:33 +0000 (UTC)
+Received: by mail-oo1-f66.google.com with SMTP id 006d021491bc7-5731fe1d2bfso295823eaf.3
+        for <kvmarm@lists.linux.dev>; Thu, 24 Aug 2023 18:58:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1692927509; x=1693532309;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fx/POYl+u/ox9UBAT+N6R1uU7BmWBN58mACbgT4dbFc=;
-        b=IgPNwnoQIoD5IFTHzHLJz0qkmTF6foQ1FIQ62ITShWop0XDaO5uRO/v0uibtIENJS0
-         2SBIf9p4SHzS4qqx2chE38HNU3dMHWprGSAnTY+TxxMtLQEmpmtEbC29zUe2R9PG6wLT
-         apY1AkjwA3u189+jpZcqTrovSkNK+4bZPHMxM=
+        d=bytedance.com; s=google; t=1692928712; x=1693533512;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ruDEdGF6thZk2mcTIP3xCS1ljQPI4op9YI2FgBKug94=;
+        b=kkRw7sl9geHK0ITXL+hdZUjcIW2cln5iPPPyDeBP0zsXiuU15Y9srDxgZOVUSJVaMA
+         /IeLwqY1c7EMDpzhGgCr3Q4OyEoZRTpNYQgWk2uQkJ8iMoqhn6jSJ5ZiHe1sihmxs8P4
+         pntAkQPLa0hSu3cp8+MchlcaYGUW0GG/cGGqxN1pwRwH2aN24qGAoT5Z2VN9Udev3GpB
+         aBzQgtiL5+QviX2r88kSDhv2D6vnlYarsug5AWbaLBJrjjZvxVQFFN0hDPWhricm46TY
+         Wz04u55qSf5HGJtd3yk52CAXVu8pWXKBehbrx+BiKBiwpQN0lI7+XJ7W0241T5GnSSce
+         BXTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692927509; x=1693532309;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fx/POYl+u/ox9UBAT+N6R1uU7BmWBN58mACbgT4dbFc=;
-        b=h+JuBgp3pETQMdPJpKt4YU6ufEji6o/b2kLY6JxK8a+oOkkrWIExO6kjxqAt7uEOVk
-         wgHAKm/vNNxVBTeo59mz2ZlLx7NF559UXBLRQHaNKuyI9iP1kf9/3nsbCyoVaoFDfCuc
-         eT5DdGRxUNwmlfjJB0MNIKLECysIdZGoxla37+bVp38O9DzAUS4v1dB+t1bJIk7MeeKw
-         CexrWY50igmlXM44DEe297fcwii5vuev97ClqCFsC1+nH236TboEFC24f8bNNb5HqdYT
-         jhAGheYEC9TXK/dYDF8ti2Hfwid01517bCQmblZ0p1EpR6VCohW/QqXzetFusFUAV9kL
-         Xs1A==
-X-Gm-Message-State: AOJu0YwCEyzosgJxRp9S2a2pi+7JefEF5O9qFlVNkaX4gHf+umzx5AVg
-	jv9k/eRZXn8NGAw+0LukFxSAPTqwQ8/VOqMg9B7DcQ==
-X-Google-Smtp-Source: AGHT+IF8QkAKLg8cep3jWhzZ7Zzi5xuNU5cJIX6a5jEG1gfJzUIcb4l4LSvVNLituoBfF0v4OtnD2a6Ppxn9JvE4iZM=
-X-Received: by 2002:a2e:9591:0:b0:2bc:b448:b8b2 with SMTP id
- w17-20020a2e9591000000b002bcb448b8b2mr11272065ljh.19.1692927508183; Thu, 24
- Aug 2023 18:38:28 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692928712; x=1693533512;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ruDEdGF6thZk2mcTIP3xCS1ljQPI4op9YI2FgBKug94=;
+        b=eanOPbuHgMDcajAIYp92NHGVVrf4dUXRV6yICL2d8gGET1UPdDM4kV7Z3/Y3QzrIKk
+         qXUblNt2kpifmfmKRCDxGVYKYC14/hwD+twegTa5Zb0fDYhTu8L7ghbwFzWTuBqqhoSH
+         +PFofPOE1e3L6A0+OkUn2cBGKI/0o+u5MOri6/kClxeEFMCx0G1SkcKGiINkj3eJGLbR
+         zaOr8mODW1aEnO3WGPeC8DKtBTBKv504Szf1jMUJ8xigSeYuT9sGhHLaW64Fixpez9Xx
+         3EiOdQ4SHCAepCia9hPfIM0s9R9QOWvC6Q5HlmUTz0jArPJ31kERY8zap8cRGMxb+M8O
+         1mWg==
+X-Gm-Message-State: AOJu0YyifuDejkZgrGq/2y+NzLc0F3W6mGyjJ8TBdy7gIIeWckyg1Kcx
+	sgX01Xv9DrrtCEZO3ZJ5eTVtMQ==
+X-Google-Smtp-Source: AGHT+IFKjYg67WWgMahVAYejNR9bJkWDWmOjy8i9DB2w6tNxCHeHQ6DClpswFML76gPvcfJQ314fLQ==
+X-Received: by 2002:a05:6870:e242:b0:1be:e6d6:15c4 with SMTP id d2-20020a056870e24200b001bee6d615c4mr1565726oac.9.1692928711896;
+        Thu, 24 Aug 2023 18:58:31 -0700 (PDT)
+Received: from C02D83NFML85.bytedance.net ([139.177.225.229])
+        by smtp.gmail.com with ESMTPSA id pq8-20020a17090b3d8800b00263dfe9b972sm2299502pjb.0.2023.08.24.18.58.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Aug 2023 18:58:31 -0700 (PDT)
+From: Xu Zhao <zhaoxu.35@bytedance.com>
+To: maz@kernel.org,
+	oliver.upton@linux.dev,
+	james.morse@arm.com
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	Xu Zhao <zhaoxu.35@bytedance.com>
+Subject: [RFC v2] KVM: arm/arm64: optimize vSGI injection performance
+Date: Fri, 25 Aug 2023 09:58:11 +0800
+Message-Id: <20230825015811.5292-1-zhaoxu.35@bytedance.com>
+X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-6-stevensd@google.com>
- <20230705102547.hr2zxkdkecdxp5tf@linux.intel.com> <CAD=HUj7F6CUNt_9txEu0upB=PBwJzkL5dBhNs_BVHX1cicqBgw@mail.gmail.com>
- <ZOd0IMeKSkBwGIer@google.com>
-In-Reply-To: <ZOd0IMeKSkBwGIer@google.com>
-From: David Stevens <stevensd@chromium.org>
-Date: Fri, 25 Aug 2023 10:38:16 +0900
-Message-ID: <CAD=HUj6XYKGgRLb2VWBnYEEH9YQUMROBf2YBXaTOvWZS5ejhmg@mail.gmail.com>
-Subject: Re: [PATCH v7 5/8] KVM: x86/mmu: Don't pass FOLL_GET to __kvm_follow_pfn
-To: Sean Christopherson <seanjc@google.com>
-Cc: Yu Zhang <yu.c.zhang@linux.intel.com>, Marc Zyngier <maz@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Peter Xu <peterx@redhat.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Aug 25, 2023 at 12:15=E2=80=AFAM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> On Thu, Aug 24, 2023, David Stevens wrote:
-> > On Wed, Jul 5, 2023 at 7:25=E2=80=AFPM Yu Zhang <yu.c.zhang@linux.intel=
-.com> wrote:
-> > >
-> > > On Tue, Jul 04, 2023 at 04:50:50PM +0900, David Stevens wrote:
-> > > > @@ -4529,7 +4540,8 @@ static int kvm_tdp_mmu_page_fault(struct kvm_=
-vcpu *vcpu,
-> > > >
-> > > >  out_unlock:
-> > > >       read_unlock(&vcpu->kvm->mmu_lock);
-> > > > -     kvm_release_pfn_clean(fault->pfn);
-> > >
-> > > Yet kvm_release_pfn() can still be triggered for the kvm_vcpu_maped g=
-fns.
-> > > What if guest uses a non-referenced page(e.g., as a vmcs12)? Although=
- I
-> > > believe this is not gonna happen in real world...
-> >
-> > kvm_vcpu_map still uses gfn_to_pfn, which eventually passes FOLL_GET
-> > to __kvm_follow_pfn. So if a guest tries to use a non-refcounted page
-> > like that, then kvm_vcpu_map will fail and the guest will probably
-> > crash. It won't trigger any bugs in the host, though.
-> >
-> > It is unfortunate that the guest will be able to use certain types of
-> > memory for some purposes but not for others. However, while it is
-> > theoretically fixable, it's an unreasonable amount of work for
-> > something that, as you say, nobody really cares about in practice [1].
-> >
-> > [1] https://lore.kernel.org/all/ZBEEQtmtNPaEqU1i@google.com/
->
-> There are use cases that care, which is why I suggested allow_unsafe_kmap=
-.
-> Specifically, AWS manages their pool of guest memory in userspace and map=
-s it all
-> via /dev/mem.  Without that module param to let userspace opt-in, this se=
-ries will
-> break such setups.  It still arguably is a breaking change since it requi=
-res
-> userspace to opt-in, but allowing such behavior by default is simply not =
-a viable
-> option, and I don't have much sympathy since so much of this mess has its=
- origins
-> in commit e45adf665a53 ("KVM: Introduce a new guest mapping API").
->
-> The use cases that no one cares about (AFAIK) is allowing _untrusted_ use=
-rspace
-> to back guest RAM with arbitrary memory.  In other words, I want KVM to a=
-llow
-> (by default) mapping device memory into the guest for things like vGPUs, =
-without
-> having to do the massive and invasive overhaul needed to safely allow bac=
-king guest
-> RAM with completely arbitrary memory.
+In a VM with more than 16 vCPUs (with multiple aff0 groups), if the target 
+vCPU of a vSGI exceeds 16th vCPU, kvm needs to iterate from vCPU0 until 
+the target vCPU is found. However, affinity routing information is provided 
+by the ICC_SGI* register, which allows kvm to bypass other aff0 groups, 
+iterating only on the aff0 group that the target vCPU located. It reduces 
+the maximum iteration times from the total number of vCPUs to 16, or even 
+8 times.
 
-Do you specifically want the allow_unsafe_kmap breaking change? v7 of
-this series should have supported everything that is currently
-supported by KVM, but you're right that the v8 version of
-hva_to_pfn_remapped doesn't support mapping
-!kvm_pfn_to_refcounted_page() pages. That could be supported
-explicitly with allow_unsafe_kmap as you suggested, or it could be
-supported implicitly with this implementation:
+This patch aims to optimize the vSGI injecting performance of injecting 
+target exceeds 16th vCPU in vm with more than 16 vCPUs.
 
-@@ -2774,8 +2771,14 @@ static int hva_to_pfn_remapped(struct
-vm_area_struct *vma,
-         * would then underflow the refcount when the caller does the
-         * required put_page. Don't allow those pages here.
-         */
--       if (!kvm_try_get_pfn(pfn))
--               r =3D -EFAULT;
-+       page =3D kvm_pfn_to_refcounted_page(pfn);
-+       if (page) {
-+               if (get_page_unless_zero(page))
-+                       WARN_ON_ONCE(kvm_follow_refcounted_pfn(foll,
-page) !=3D pfn);
+Here comes the test data.
+
+Test environment
+	Host kernel: v6.5
+	Guest kernel: v5.4.143
+	Benchmark: ipi_benchmark, https://patchwork.kernel.org/project/linux-arm-kernel/patch/2017121
+1141600.24401-1-ynorov@caviumnetworks.com.
+	run times: each case runs for 5*100000 times
+
+4 cores with vcpu pinning:
+	  	      |               ipi benchmark           |	      vgic_v3_dispatch_sgi      |
+| No |		      |    original  |  with patch  | impoved | original | with patch | impoved |
+| 0  | vcpu0 -> vcpu1 | 222994694 ns | 208198673 ns |  +6.6%  |  1505 ns |   1215 ns  |  +19.3% |
+| 1  | vcpu0 -> vcpu3 | 216790218 ns | 198613251 ns |  +8.4%  |  1266 ns |   1174 ns  |  +7.3%  |
+
+32 cores with vcpu pinning:
+                       |               ipi benchmark             |        vgic_v3_dispatch_sgi      |
+| No |                 |    original   |   with patch  | impoved | original | with patch | impoved  |
+| 2  | vcpu0 -> vcpu1  |  205954986 ns |  208735352 ns |  -1.3%  |  1655 ns |   1258 ns  |  +24.0%  |
+| 3  | vcpu0 -> vcpu15 |  327822710 ns |  268791736 ns | +18.0%  |  2053 ns |   1591 ns  |  +22.5%  |
+| 4  | vcpu0 -> vcpu16 |  319203289 ns |  265857795 ns | +16.7%  |  2080 ns |   1612 ns  |  +22.5%  |
+| 5  | vcpu0 -> vcpu31 |  399790803 ns |  316207724 ns | +20.9%  |  2426 ns |   1511 ns  |  +37.7%  |
+
+The test results indicate that VM with less than 16 vcpus have similar 
+performance to the original.
+
+The performance of VM witch 32 cores improvement can be observed. When 
+injecting SGI into the first vCPU of the first aff0 group, the performance 
+remains the same as before (because the number of iteration is also 1), 
+but there is an improvement in performance when injecting interrupts into 
+the last vCPU. When injecting vSGI into the first and last vCPU of the 
+second aff0 group, the performance improvement is significant because 
+compared to the original algorithm, it skipped iterates the first aff0 
+group.
+
+BTW, performance improvement can also be observed by microbench in 
+kvm-unit-test with little modification :add 32 cores initialization, 
+then change IPI target CPU in function ipi_exec.
+
+The more vcpu a VM has, the greater the performance improvement of injecting 
+vSGI into the vCPU in the last aff0 group.
+
+Signed-off-by: Xu Zhao <zhaoxu.35@bytedance.com>
+---
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c | 152 ++++++++++++++---------------
+ include/linux/kvm_host.h           |   5 +
+ 2 files changed, 78 insertions(+), 79 deletions(-)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+index 188d2187eede..af8f2d6b18c3 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+@@ -1013,44 +1013,64 @@ int vgic_v3_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
+ 
+ 	return 0;
+ }
 +
-+               if (!foll->is_refcounted_page && !foll->guarded_by_mmu_noti=
-fier)
-+                       r =3D -EFAULT;
-+       }
+ /*
+- * Compare a given affinity (level 1-3 and a level 0 mask, from the SGI
+- * generation register ICC_SGI1R_EL1) with a given VCPU.
+- * If the VCPU's MPIDR matches, return the level0 affinity, otherwise
+- * return -1.
++ * Get affinity routing index from ICC_SGI_* register
++ * format:
++ *     aff3       aff2       aff1	aff0
++ * |- 8 bits -|- 8 bits -|- 8 bits -|- 4 bits -|
+  */
+-static int match_mpidr(u64 sgi_aff, u16 sgi_cpu_mask, struct kvm_vcpu *vcpu)
++static unsigned long sgi_to_affinity(unsigned long reg)
+ {
+-	unsigned long affinity;
+-	int level0;
++	u64 aff;
+ 
+-	/*
+-	 * Split the current VCPU's MPIDR into affinity level 0 and the
+-	 * rest as this is what we have to compare against.
+-	 */
+-	affinity = kvm_vcpu_get_mpidr_aff(vcpu);
+-	level0 = MPIDR_AFFINITY_LEVEL(affinity, 0);
+-	affinity &= ~MPIDR_LEVEL_MASK;
++	/* aff3 - aff1 */
++	aff = (((reg) & ICC_SGI1R_AFFINITY_3_MASK) >> ICC_SGI1R_AFFINITY_3_SHIFT) << 16 |
++		(((reg) & ICC_SGI1R_AFFINITY_2_MASK) >> ICC_SGI1R_AFFINITY_2_SHIFT) << 8 |
++		(((reg) & ICC_SGI1R_AFFINITY_1_MASK) >> ICC_SGI1R_AFFINITY_1_SHIFT);
+ 
+-	/* bail out if the upper three levels don't match */
+-	if (sgi_aff != affinity)
+-		return -1;
++	/* aff0, the length of targetlist in sgi register is 16, which is 4bit  */
++	aff <<= 4;
+ 
+-	/* Is this VCPU's bit set in the mask ? */
+-	if (!(sgi_cpu_mask & BIT(level0)))
+-		return -1;
+-
+-	return level0;
++	return aff;
+ }
+ 
+ /*
+- * The ICC_SGI* registers encode the affinity differently from the MPIDR,
+- * so provide a wrapper to use the existing defines to isolate a certain
+- * affinity level.
++ * inject a vsgi to vcpu
+  */
+-#define SGI_AFFINITY_LEVEL(reg, level) \
+-	((((reg) & ICC_SGI1R_AFFINITY_## level ##_MASK) \
+-	>> ICC_SGI1R_AFFINITY_## level ##_SHIFT) << MPIDR_LEVEL_SHIFT(level))
++static inline void vgic_v3_inject_sgi(struct kvm_vcpu *vcpu, int sgi, bool allow_group1)
++{
++	struct vgic_irq *irq;
++	unsigned long flags;
++
++	irq = vgic_get_irq(vcpu->kvm, vcpu, sgi);
++
++	raw_spin_lock_irqsave(&irq->irq_lock, flags);
++
++	/*
++	 * An access targeting Group0 SGIs can only generate
++	 * those, while an access targeting Group1 SGIs can
++	 * generate interrupts of either group.
++	 */
++	if (!irq->group || allow_group1) {
++		if (!irq->hw) {
++			irq->pending_latch = true;
++			vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
++		} else {
++			/* HW SGI? Ask the GIC to inject it */
++			int err;
++			err = irq_set_irqchip_state(irq->host_irq,
++						    IRQCHIP_STATE_PENDING,
++						     true);
++			WARN_RATELIMIT(err, "IRQ %d", irq->host_irq);
++			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
++		}
++	} else {
++		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
++	}
++
++	vgic_put_irq(vcpu->kvm, irq);
++}
+ 
+ /**
+  * vgic_v3_dispatch_sgi - handle SGI requests from VCPUs
+@@ -1071,74 +1091,48 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
+ 	struct kvm *kvm = vcpu->kvm;
+ 	struct kvm_vcpu *c_vcpu;
+ 	u16 target_cpus;
+-	u64 mpidr;
+ 	int sgi;
+ 	int vcpu_id = vcpu->vcpu_id;
+ 	bool broadcast;
+-	unsigned long c, flags;
++	unsigned long c, aff_index;
+ 
+ 	sgi = (reg & ICC_SGI1R_SGI_ID_MASK) >> ICC_SGI1R_SGI_ID_SHIFT;
+ 	broadcast = reg & BIT_ULL(ICC_SGI1R_IRQ_ROUTING_MODE_BIT);
+ 	target_cpus = (reg & ICC_SGI1R_TARGET_LIST_MASK) >> ICC_SGI1R_TARGET_LIST_SHIFT;
+-	mpidr = SGI_AFFINITY_LEVEL(reg, 3);
+-	mpidr |= SGI_AFFINITY_LEVEL(reg, 2);
+-	mpidr |= SGI_AFFINITY_LEVEL(reg, 1);
+ 
+ 	/*
+-	 * We iterate over all VCPUs to find the MPIDRs matching the request.
+-	 * If we have handled one CPU, we clear its bit to detect early
+-	 * if we are already finished. This avoids iterating through all
+-	 * VCPUs when most of the times we just signal a single VCPU.
++	 * Writing IRM bit is not a frequent behavior, so separate SGI injection into two parts.
++	 * If it is not broadcast, compute the affinity routing index first,
++	 * then iterate targetlist to find the target VCPU.
++	 * Or, inject sgi to all VCPUs but the calling one.
+ 	 */
+-	kvm_for_each_vcpu(c, c_vcpu, kvm) {
+-		struct vgic_irq *irq;
+-
+-		/* Exit early if we have dealt with all requested CPUs */
+-		if (!broadcast && target_cpus == 0)
+-			break;
++	if (likely(!broadcast)) {
++		/* compute affinity routing index */
++		aff_index = sgi_to_affinity(reg);
+ 
+-		/* Don't signal the calling VCPU */
+-		if (broadcast && c == vcpu_id)
+-			continue;
+-
+-		if (!broadcast) {
+-			int level0;
++		/* exit if meet a wrong affinity value */
++		if (aff_index >= atomic_read(&kvm->online_vcpus))
++			return;
+ 
+-			level0 = match_mpidr(mpidr, target_cpus, c_vcpu);
+-			if (level0 == -1)
++		/* Iterate target list */
++		kvm_for_each_target_list(c, target_cpus) {
++			if (!(target_cpus & (1 << c)))
+ 				continue;
+ 
+-			/* remove this matching VCPU from the mask */
+-			target_cpus &= ~BIT(level0);
+-		}
++			c_vcpu = kvm_get_vcpu_by_id(kvm, aff_index+c);
++			if (!c_vcpu)
++				break;
+ 
+-		irq = vgic_get_irq(vcpu->kvm, c_vcpu, sgi);
+-
+-		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+-
+-		/*
+-		 * An access targeting Group0 SGIs can only generate
+-		 * those, while an access targeting Group1 SGIs can
+-		 * generate interrupts of either group.
+-		 */
+-		if (!irq->group || allow_group1) {
+-			if (!irq->hw) {
+-				irq->pending_latch = true;
+-				vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
+-			} else {
+-				/* HW SGI? Ask the GIC to inject it */
+-				int err;
+-				err = irq_set_irqchip_state(irq->host_irq,
+-							    IRQCHIP_STATE_PENDING,
+-							    true);
+-				WARN_RATELIMIT(err, "IRQ %d", irq->host_irq);
+-				raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+-			}
+-		} else {
+-			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
++			vgic_v3_inject_sgi(c_vcpu, sgi, allow_group1);
+ 		}
++	} else {
++		kvm_for_each_vcpu(c, c_vcpu, kvm) {
++			/* don't signal the calling vcpu  */
++			if (c_vcpu->vcpu_id == vcpu_id)
++				continue;
+ 
+-		vgic_put_irq(vcpu->kvm, irq);
++			vgic_v3_inject_sgi(c_vcpu, sgi, allow_group1);
++		}
+ 	}
+ }
+ 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 9d3ac7720da9..9b4afea7a1ee 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -910,6 +910,11 @@ static inline struct kvm_vcpu *kvm_get_vcpu(struct kvm *kvm, int i)
+ 	xa_for_each_range(&kvm->vcpu_array, idx, vcpup, 0, \
+ 			  (atomic_read(&kvm->online_vcpus) - 1))
+ 
++#define kvm_for_each_target_list(idx, target_cpus) \
++	for (idx = target_cpus & 0xff ? 0 : (ICC_SGI1R_AFFINITY_1_SHIFT>>1); \
++		(1 << idx) <= target_cpus; \
++		idx++)
++
+ static inline struct kvm_vcpu *kvm_get_vcpu_by_id(struct kvm *kvm, int id)
+ {
+ 	struct kvm_vcpu *vcpu = NULL;
+-- 
+2.20.1
 
--David
