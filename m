@@ -1,269 +1,164 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832C27E
-	for <kvmarm@lists.linux.dev>; Sat, 26 Aug 2023 02:40:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1693017635;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6J2d/6ucs55iHF4wv09A97r3+xoxjcihY+TOMGOHcY4=;
-	b=Z37sW+rlNgJKHcLO/w8NYlzvE47d++Odeq25mASrFPuR60Gmjn9GCdB10esXzb+DzpfaHh
-	Q/l/ntR/qqv5JFHf7tpj9i6Ep0SBT7d/onTiEp2XZJGycRe0I2x//JCRm+2lozNv0NhvdW
-	sEbNPhG5sFj5BideTfMurQPd777C/+k=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-628-gPB7W12yMDyfkZbSHvSQ9Q-1; Fri, 25 Aug 2023 22:40:33 -0400
-X-MC-Unique: gPB7W12yMDyfkZbSHvSQ9Q-1
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-1bf43b0131cso3962225ad.0
-        for <kvmarm@lists.linux.dev>; Fri, 25 Aug 2023 19:40:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693017632; x=1693622432;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6J2d/6ucs55iHF4wv09A97r3+xoxjcihY+TOMGOHcY4=;
-        b=JtejxRVGCOsS7UQYvZXwDt0MD9yv9Kyd1CJLlD7Hfd8k7Bv79dtqt3/fbh2pODxywz
-         wC5+Tp5aigh/nBrCAwX/qb0RExqF4Eg0+pH3kxx+vQ8yqFcU4NUWYQNfLYomYLeGY4XL
-         pffEYDVTUI4ZnH7mDYHMt3rlMH/BB/kgy4RPQfF4p7xNhXEScQPBEel+HBYPczG9D1zx
-         0iUrSA+9WOX+WIzxAf7DvnHwZGv8bOabDrOer7GWAh74uz5ajQbtS3R59/6XcgEX/Czb
-         FhZjyTfWnHbqwhWuCXzqJbOZ+Cfs6YELiDQXQchIKDqsud1VaY1u8VIyHYWZ/0QU6k+B
-         66Qw==
-X-Gm-Message-State: AOJu0Yxi7wKiEuiJ9BBJ3JfX4+UL0hmGTPsnQ/5cOkSZuTDzVG0YFjKJ
-	VQaFKSRybG5bKy2Xmi/HLvuGuRfXunTsqfV4GxUjdwTNvIHiWxCcwW+7m27C46zE72+QCooehtw
-	m9cEDMM0sf+XYKaUF
-X-Received: by 2002:a17:903:230c:b0:1bb:ac37:384b with SMTP id d12-20020a170903230c00b001bbac37384bmr22549058plh.6.1693017632501;
-        Fri, 25 Aug 2023 19:40:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH0ABPCrrzcKML1YBEVGaqQK6gmek61xmaO7dOSVK58UrEmzdH9+LLcPYV32k6jneAwL8fHkA==
-X-Received: by 2002:a17:903:230c:b0:1bb:ac37:384b with SMTP id d12-20020a170903230c00b001bbac37384bmr22549037plh.6.1693017632090;
-        Fri, 25 Aug 2023 19:40:32 -0700 (PDT)
-Received: from [10.72.112.57] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id iz15-20020a170902ef8f00b001bc6fe1b9absm2472399plb.276.2023.08.25.19.40.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Aug 2023 19:40:31 -0700 (PDT)
-Message-ID: <82689ad4-5e68-b882-4fbe-aaf564e1e358@redhat.com>
-Date: Sat, 26 Aug 2023 10:40:26 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97DB67E
+	for <kvmarm@lists.linux.dev>; Sat, 26 Aug 2023 10:51:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 092A9C433C7;
+	Sat, 26 Aug 2023 10:51:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693047079;
+	bh=P71fNEsmNmi49zzw500omXgcWHcNUIdoP9+jGwHPSqA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HDmV/4maL6U2JYHEsHR3WIRw62Y6M4IxKBBmC2HnG/Det88Do+zccdytuXHqk7Hvc
+	 YMa8BBrjunxEi8Rtky45H13sN1lIjp8wO4X4uNWgLqo2v5VSlm0E73IToQjSG6/Sy/
+	 9SVpks5gr9gy64+HQ5Lad2H+Rb6ORwNWHJto3/nnYTEQtnQhpeZY43FBfhPSOW4Xu5
+	 7QcNifJBG/nJze2BEzaTMvn3i9ToDwHZFpKs/xJi3wSGXyDo8n7du6+p92on0Ql5/P
+	 +bsadfPVzhmSQ7KQKr+r5TKeFq5fArXzC8s+X80r96RfBOoObF5pQ9fmxsgxJmnFrZ
+	 do3IFJX3BAy/g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qZqsu-008Gvp-Ej;
+	Sat, 26 Aug 2023 11:51:16 +0100
+Date: Sat, 26 Aug 2023 11:51:16 +0100
+Message-ID: <86a5uef55n.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jing Zhang <jingzhangos@google.com>
+Cc: KVM <kvm@vger.kernel.org>,
+	KVMARM <kvmarm@lists.linux.dev>,
+	ARMLinux <linux-arm-kernel@lists.infradead.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Reiji Watanabe <reijiw@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Suraj Jitindar Singh <surajjs@amazon.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Shaoqin Huang <shahuang@redhat.com>
+Subject: Re: [PATCH v9 05/11] KVM: arm64: Enable writable for ID_AA64DFR0_EL1 and ID_DFR0_EL1
+In-Reply-To: <CAAdAUti8qSf0PVnWkp4Jua-te6i0cjQKJm=8dt5vWqT0Q6w4iQ@mail.gmail.com>
+References: <20230821212243.491660-1-jingzhangos@google.com>
+	<20230821212243.491660-6-jingzhangos@google.com>
+	<878ra3pndw.wl-maz@kernel.org>
+	<CAAdAUti8qSf0PVnWkp4Jua-te6i0cjQKJm=8dt5vWqT0Q6w4iQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v5 08/12] KVM: arm64: PMU: Allow userspace to limit
- PMCR_EL0.N for the guest
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Jing Zhang <jingzhangos@google.com>,
- Reiji Watanabe <reijiw@google.com>, Colton Lewis <coltonlewis@google.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20230817003029.3073210-1-rananta@google.com>
- <20230817003029.3073210-9-rananta@google.com>
- <1c6c07af-f6d0-89a6-1b7d-164ca100ac88@redhat.com>
- <CAJHc60x=rZTpeJ3PDUWmc08Aziow6S+2nndcL90vHfru5GhXtA@mail.gmail.com>
- <a0543866-1fac-6a3f-20cd-43b6d1263c0e@redhat.com>
- <CAJHc60z=+LG8kayRzYEZ6rCZuov7zC-nLMmzAabPiPKY5OhSEg@mail.gmail.com>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <CAJHc60z=+LG8kayRzYEZ6rCZuov7zC-nLMmzAabPiPKY5OhSEg@mail.gmail.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, reijiw@google.com, rananta@google.com, surajjs@amazon.com, cohuck@redhat.com, shahuang@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Tue, 22 Aug 2023 19:35:12 +0100,
+Jing Zhang <jingzhangos@google.com> wrote:
+>=20
+> Hi Marc,
+>=20
+> On Tue, Aug 22, 2023 at 12:06=E2=80=AFAM Marc Zyngier <maz@kernel.org> wr=
+ote:
+> >
+> > On Mon, 21 Aug 2023 22:22:37 +0100,
+> > Jing Zhang <jingzhangos@google.com> wrote:
+> > >
+> > > All valid fields in ID_AA64DFR0_EL1 and ID_DFR0_EL1 are writable
+> > > from userspace with this change.
+> > > RES0 fields and those fields hidden by KVM are not writable.
+> > >
+> > > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > > ---
+> > >  arch/arm64/kvm/sys_regs.c | 6 ++++--
+> > >  1 file changed, 4 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > > index afade7186675..20fc38bad4e8 100644
+> > > --- a/arch/arm64/kvm/sys_regs.c
+> > > +++ b/arch/arm64/kvm/sys_regs.c
+> > > @@ -1931,6 +1931,8 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
+> > >       return true;
+> > >  }
+> > >
+> > > +#define ID_AA64DFR0_EL1_RES0_MASK (GENMASK(59, 56) | GENMASK(27, 24)=
+ | GENMASK(19, 16))
+> > > +
+> > >  /*
+> > >   * Architected system registers.
+> > >   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+> > > @@ -2006,7 +2008,7 @@ static const struct sys_reg_desc sys_reg_descs[=
+] =3D {
+> > >         .set_user =3D set_id_dfr0_el1,
+> > >         .visibility =3D aa32_id_visibility,
+> > >         .reset =3D read_sanitised_id_dfr0_el1,
+> > > -       .val =3D ID_DFR0_EL1_PerfMon_MASK, },
+> > > +       .val =3D GENMASK(31, 0), },
+> >
+> > Can you *please* look at the register and realise that we *don't*
+> > support writing to the whole of the low 32 bits? What does it mean to
+> > allow selecting the M-profile debug? Or the memory-mapped trace?
+> >
+> > You are advertising a lot of crap to userspace, and that's definitely
+> > not on.
+> >
+> > >       ID_HIDDEN(ID_AFR0_EL1),
+> > >       AA32_ID_SANITISED(ID_MMFR0_EL1),
+> > >       AA32_ID_SANITISED(ID_MMFR1_EL1),
+> > > @@ -2055,7 +2057,7 @@ static const struct sys_reg_desc sys_reg_descs[=
+] =3D {
+> > >         .get_user =3D get_id_reg,
+> > >         .set_user =3D set_id_aa64dfr0_el1,
+> > >         .reset =3D read_sanitised_id_aa64dfr0_el1,
+> > > -       .val =3D ID_AA64DFR0_EL1_PMUVer_MASK, },
+> > > +       .val =3D ~(ID_AA64DFR0_EL1_PMSVer_MASK | ID_AA64DFR0_EL1_RES0=
+_MASK), },
+> >
+> > And it is the same thing here. Where is the handling code to deal with
+> > variable breakpoint numbers? Oh wait, there is none. Really, the only
+> > thing we support writing to are the PMU and Debug versions. And
+> > nothing else.
+> >
+> > What does it mean for userspace? Either the write will be denied
+> > despite being advertised a writable field (remember the first patch of
+> > the series???), or we'll blindly accept the write and further ignore
+> > the requested values. Do you really think any of this is acceptable?
+> >
+> > This is the *9th* version of this series, and we're still battling
+> > over some extremely basic userspace issues... I don't think we can
+> > merge this series as is stands.
+>=20
+> I removed sanity checks across multiple fields after the discussion
+> here: https://lore.kernel.org/all/ZKRC80hb4hXwW8WK@thinky-boi/
+> I might have misunderstood the discussion. I thought we'd let VMM do
+> more complete sanity checks.
 
+The problem is that you don't even have a statement about how this is
+supposed to be handled. What are the rules? How can the VMM author
+*know*?
 
-On 8/26/23 06:34, Raghavendra Rao Ananta wrote:
-> On Thu, Aug 24, 2023 at 1:50 AM Shaoqin Huang <shahuang@redhat.com> wrote:
->>
->>
->>
->> On 8/24/23 00:06, Raghavendra Rao Ananta wrote:
->>> On Tue, Aug 22, 2023 at 3:06 AM Shaoqin Huang <shahuang@redhat.com> wrote:
->>>>
->>>> Hi Raghavendra,
->>>>
->>>> On 8/17/23 08:30, Raghavendra Rao Ananta wrote:
->>>>> From: Reiji Watanabe <reijiw@google.com>
->>>>>
->>>>> KVM does not yet support userspace modifying PMCR_EL0.N (With
->>>>> the previous patch, KVM ignores what is written by upserspace).
->>>>> Add support userspace limiting PMCR_EL0.N.
->>>>>
->>>>> Disallow userspace to set PMCR_EL0.N to a value that is greater
->>>>> than the host value (KVM_SET_ONE_REG will fail), as KVM doesn't
->>>>> support more event counters than the host HW implements.
->>>>> Although this is an ABI change, this change only affects
->>>>> userspace setting PMCR_EL0.N to a larger value than the host.
->>>>> As accesses to unadvertised event counters indices is CONSTRAINED
->>>>> UNPREDICTABLE behavior, and PMCR_EL0.N was reset to the host value
->>>>> on every vCPU reset before this series, I can't think of any
->>>>> use case where a user space would do that.
->>>>>
->>>>> Also, ignore writes to read-only bits that are cleared on vCPU reset,
->>>>> and RES{0,1} bits (including writable bits that KVM doesn't support
->>>>> yet), as those bits shouldn't be modified (at least with
->>>>> the current KVM).
->>>>>
->>>>> Signed-off-by: Reiji Watanabe <reijiw@google.com>
->>>>> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
->>>>> ---
->>>>>     arch/arm64/include/asm/kvm_host.h |  3 ++
->>>>>     arch/arm64/kvm/pmu-emul.c         |  1 +
->>>>>     arch/arm64/kvm/sys_regs.c         | 49 +++++++++++++++++++++++++++++--
->>>>>     3 files changed, 51 insertions(+), 2 deletions(-)
->>>>>
->>>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->>>>> index 0f2dbbe8f6a7e..c15ec365283d1 100644
->>>>> --- a/arch/arm64/include/asm/kvm_host.h
->>>>> +++ b/arch/arm64/include/asm/kvm_host.h
->>>>> @@ -259,6 +259,9 @@ struct kvm_arch {
->>>>>         /* PMCR_EL0.N value for the guest */
->>>>>         u8 pmcr_n;
->>>>>
->>>>> +     /* Limit value of PMCR_EL0.N for the guest */
->>>>> +     u8 pmcr_n_limit;
->>>>> +
->>>>>         /* Hypercall features firmware registers' descriptor */
->>>>>         struct kvm_smccc_features smccc_feat;
->>>>>         struct maple_tree smccc_filter;
->>>>> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
->>>>> index ce7de6bbdc967..39ad56a71ad20 100644
->>>>> --- a/arch/arm64/kvm/pmu-emul.c
->>>>> +++ b/arch/arm64/kvm/pmu-emul.c
->>>>> @@ -896,6 +896,7 @@ int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
->>>>>          * while the latter does not.
->>>>>          */
->>>>>         kvm->arch.pmcr_n = arm_pmu->num_events - 1;
->>>>> +     kvm->arch.pmcr_n_limit = arm_pmu->num_events - 1;
->>>>>
->>>>>         return 0;
->>>>>     }
->>>>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->>>>> index 2075901356c5b..c01d62afa7db4 100644
->>>>> --- a/arch/arm64/kvm/sys_regs.c
->>>>> +++ b/arch/arm64/kvm/sys_regs.c
->>>>> @@ -1086,6 +1086,51 @@ static int get_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
->>>>>         return 0;
->>>>>     }
->>>>>
->>>>> +static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
->>>>> +                 u64 val)
->>>>> +{
->>>>> +     struct kvm *kvm = vcpu->kvm;
->>>>> +     u64 new_n, mutable_mask;
->>>>> +     int ret = 0;
->>>>> +
->>>>> +     new_n = FIELD_GET(ARMV8_PMU_PMCR_N, val);
->>>>> +
->>>>> +     mutex_lock(&kvm->arch.config_lock);
->>>>> +     if (unlikely(new_n != kvm->arch.pmcr_n)) {
->>>>> +             /*
->>>>> +              * The vCPU can't have more counters than the PMU
->>>>> +              * hardware implements.
->>>>> +              */
->>>>> +             if (new_n <= kvm->arch.pmcr_n_limit)
->>>>> +                     kvm->arch.pmcr_n = new_n;
->>>>> +             else
->>>>> +                     ret = -EINVAL;
->>>>> +     }
->>>>> +     mutex_unlock(&kvm->arch.config_lock);
->>>>
->>>> Another thing I am just wonder is that should we block any modification
->>>> to the pmcr_n after vm start to run? Like add one more checking
->>>> kvm_vm_has_ran_once() at the beginning of the set_pmcr() function.
->>>>
->>> Thanks for bringing it up. Reiji and I discussed about this. Checking
->>> for kvm_vm_has_ran_once() will be a good move, however, it will go
->>> against the ABI expectations of setting the PMCR. I'd like others to
->>> weigh in on this as well. What do you think?
->>>
->>> Thank you.
->>> Raghavendra
->>
->> Before this change, kvm not allowed userspace to change the pmcr_n, but
->> allowed to change the lower ARMV8_PMU_PMCR_MASK bits. With this change,
->> we now allow to change the pmcr_n, we should not block the change to
->> ARMV8_PMU_PMCR_MASK after vm start to run, but how about we just block
->> the change to ARMV8_PMU_PMCR_N after vm start to run?
->>
-> I believe you are referring to the guest trap access part of it
-> (access_pmcr()). This patch focuses on the userspace access of PMCR
-> via the KVM_SET_ONE_REG ioctl. Before this patch, KVM did not control
-> the writes to the reg and userspace was free to write to any bits at
-> any time.
-> 
+That's my real issue with this series: at no point do we state when an
+ID register can be written, what are the rules that must be followed,
+where is the split in responsibility between KVM and the VMM, and what
+is the expected behaviour when the VMM exposes something that is
+completely outlandish to the guest (such as the M-profile debug).
 
-Oh yeah. Thanks for your explanation. My head sometimes broken down.
+Do you see the issue? We can always fix the code. But once we've
+exposed that to userspace, there is no going back. And I really want
+everybody's buy-in on that front, including the VMM people.
 
 Thanks,
-Shaoqin
 
-> Thank you.
-> Raghavendra
->> Thanks,
->> Shaoqin
->>
->>>> Thanks,
->>>> Shaoqin
->>>>
->>>>> +     if (ret)
->>>>> +             return ret;
->>>>> +
->>>>> +     /*
->>>>> +      * Ignore writes to RES0 bits, read only bits that are cleared on
->>>>> +      * vCPU reset, and writable bits that KVM doesn't support yet.
->>>>> +      * (i.e. only PMCR.N and bits [7:0] are mutable from userspace)
->>>>> +      * The LP bit is RES0 when FEAT_PMUv3p5 is not supported on the vCPU.
->>>>> +      * But, we leave the bit as it is here, as the vCPU's PMUver might
->>>>> +      * be changed later (NOTE: the bit will be cleared on first vCPU run
->>>>> +      * if necessary).
->>>>> +      */
->>>>> +     mutable_mask = (ARMV8_PMU_PMCR_MASK | ARMV8_PMU_PMCR_N);
->>>>> +     val &= mutable_mask;
->>>>> +     val |= (__vcpu_sys_reg(vcpu, r->reg) & ~mutable_mask);
->>>>> +
->>>>> +     /* The LC bit is RES1 when AArch32 is not supported */
->>>>> +     if (!kvm_supports_32bit_el0())
->>>>> +             val |= ARMV8_PMU_PMCR_LC;
->>>>> +
->>>>> +     __vcpu_sys_reg(vcpu, r->reg) = val;
->>>>> +     return 0;
->>>>> +}
->>>>> +
->>>>>     /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
->>>>>     #define DBG_BCR_BVR_WCR_WVR_EL1(n)                                  \
->>>>>         { SYS_DESC(SYS_DBGBVRn_EL1(n)),                                 \
->>>>> @@ -2147,8 +2192,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->>>>>         { SYS_DESC(SYS_CTR_EL0), access_ctr },
->>>>>         { SYS_DESC(SYS_SVCR), undef_access },
->>>>>
->>>>> -     { PMU_SYS_REG(PMCR_EL0), .access = access_pmcr,
->>>>> -       .reset = reset_pmcr, .reg = PMCR_EL0, .get_user = get_pmcr },
->>>>> +     { PMU_SYS_REG(PMCR_EL0), .access = access_pmcr, .reset = reset_pmcr,
->>>>> +       .reg = PMCR_EL0, .get_user = get_pmcr, .set_user = set_pmcr },
->>>>>         { PMU_SYS_REG(PMCNTENSET_EL0),
->>>>>           .access = access_pmcnten, .reg = PMCNTENSET_EL0 },
->>>>>         { PMU_SYS_REG(PMCNTENCLR_EL0),
->>>>
->>>> --
->>>> Shaoqin
->>>>
->>>
->>
->> --
->> Shaoqin
->>
-> 
+	M.
 
--- 
-Shaoqin
-
+--=20
+Without deviation from the norm, progress is not possible.
