@@ -1,88 +1,100 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379F36116
-	for <kvmarm@lists.linux.dev>; Mon, 28 Aug 2023 15:31:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9725AC433C8;
-	Mon, 28 Aug 2023 15:31:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693236691;
-	bh=WbdMRQdkcx1ONaBVtblf9wKZeJC6ZyaT1n0rlYDKwbo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=d6zhSu0yHVrrHilCP+SGHNNSABzOQsBLTkGx1gbNX/eCQf+UNZ2AFx8GkJpsW0YVz
-	 wEjSLPR8WCcHdYFsEIF86qmOhpKSOrLj64i1YQm2tDZ52N/jRTQJF6LrI82axrwBPH
-	 9N4ZH6O4k2PKCygcWPzUiFswaL9D5I5oAE8h1setsFLZrYbP7C3SlNUg4Te/+17SOl
-	 XXLAeQp0cIzULDLikZUTxlLZveACDOb/eIZQNIw0hbtbB3NV4R5+y65hMA9B93D2Ud
-	 O5SHmoi+U7UxB4/4pBaFO6ZlOBvj9nKj5SPOE4IVS7kOVAQpFOFaJf/46lY66KUOhw
-	 PT4lYiSvUdnUg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qaeDB-008lkQ-1B;
-	Mon, 28 Aug 2023 16:31:29 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>
-Subject: [PATCH] KVM: arm64: Properly return allocated EL2 VA from hyp_alloc_private_va_range()
-Date: Mon, 28 Aug 2023 16:31:21 +0100
-Message-Id: <20230828153121.4179627-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD25D13AD3
+	for <kvmarm@lists.linux.dev>; Mon, 28 Aug 2023 17:00:59 +0000 (UTC)
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-31c8a710545so1739466f8f.3
+        for <kvmarm@lists.linux.dev>; Mon, 28 Aug 2023 10:00:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1693242058; x=1693846858;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GokrXOWNEUqXD64nchMPQGzEDuFLKl5Dqa2/yFnbBww=;
+        b=s8BtQF+lfMTEsJms1HXnf1Pdb+9+UIVGXtCZ0fx3/WGiZlAmMPKp13Os1jtulpK7Es
+         vGOVaeQSHCJsjRuVO0P8EliqaiJtC+fL9vtZCpfe9XGceYl7AoX+WwCwHTeWd38bRJLJ
+         71POrwPhvlIL5aYZ/cDc3U3e03OJn9QYMp+8rEINudYB73xEy9CgTtu1p2AviJKPa7i1
+         /BS2SAu2QUYvgrrVOvgahykTvMSHIDwj1XgpJyMCVib87npI4SKD+thMnwT9ulytg4uC
+         yxU91IiuVob4zejOmuulYiAJlQtH9WKcOKSSKkESGDqb6x3BpPuDg97h59RovFpW39t0
+         aniQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693242058; x=1693846858;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GokrXOWNEUqXD64nchMPQGzEDuFLKl5Dqa2/yFnbBww=;
+        b=VO8FCMnGW+Hjz+Jl97uKVFfHUgln5wwsWSRxP+j1wsjdhjnTKFt9IwUd5IG0XbtCmW
+         VOV6EstvlANT2Cd49afYbLEEaEy7pt9IMG8hNESR6Xj/mN0e0/x70IS1woYga4AJcVsU
+         BDNwS6XetvC5OCHo9gr344Ramig3FMuW42bovUw16H1OFp4IrPHJzB93m0gLfbzGxAKy
+         uqZRlzQKS5vWpsgMD+qTCeEuZhIPURCXW/q9zkpZGp+dI5JLzqrb+ksfNJ0ymKKAJnpG
+         sIoQ3nVH0n10vjud9q0cbPebPY8L1YfkMCOCRIilw05xdvfdXIrm4y2YSpoU3vdyB1Ld
+         lB0Q==
+X-Gm-Message-State: AOJu0YxRoJFigkjUuNvk4/1oholjlaes3/kTuFubdMKSqWOHXI5IDJbN
+	tlyPf/UJFb9sLQcoYEzrPLQeLQ==
+X-Google-Smtp-Source: AGHT+IHD555+gPDMJ9guL2r8d1VjtScpc+cB9KPnHKSUktF+ggy8S1ZDZW7qfNuGMVgrV7mBEVkdyQ==
+X-Received: by 2002:a5d:4d02:0:b0:317:5a9b:fcec with SMTP id z2-20020a5d4d02000000b003175a9bfcecmr19432674wrt.14.1693242057737;
+        Mon, 28 Aug 2023 10:00:57 -0700 (PDT)
+Received: from [192.168.69.115] ([176.164.201.64])
+        by smtp.gmail.com with ESMTPSA id y7-20020adff147000000b00317df42e91dsm11188859wro.4.2023.08.28.10.00.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 28 Aug 2023 10:00:57 -0700 (PDT)
+Message-ID: <e311ac4b-48e6-ea8f-3157-6f78bc5b9ad9@linaro.org>
+Date: Mon, 28 Aug 2023 19:00:54 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.14.0
+Subject: Re: [PATCH] KVM: arm64: Properly return allocated EL2 VA from
+ hyp_alloc_private_va_range()
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ Vincent Donnefort <vdonnefort@google.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>
+References: <20230828153121.4179627-1-maz@kernel.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
+In-Reply-To: <20230828153121.4179627-1-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, vdonnefort@google.com, m.szyprowski@samsung.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Marek reports that his RPi4 spits out a warning at boot time,
-right at the point where the GICv2 virtual CPU interface gets
-mapped.
+Hi Marc,
 
-Upon investigation, it seems that we never return the allocated
-VA and use whatever was on the stack at this point. Yes, this
-is good stuff, and Marek was pretty lucky that he ended-up with
-a VA that intersected with something that was already mapped.
+On 28/8/23 17:31, Marc Zyngier wrote:
+> Marek reports that his RPi4 spits out a warning at boot time,
+> right at the point where the GICv2 virtual CPU interface gets
+> mapped.
+> 
+> Upon investigation, it seems that we never return the allocated
+> VA and use whatever was on the stack at this point. Yes, this
+> is good stuff, and Marek was pretty lucky that he ended-up with
+> a VA that intersected with something that was already mapped.
+> 
+> On my setup, this random value is plausible enough for the mapping
+> to take place. Who knows what happens...
+> 
+> Cc: Vincent Donnefort <vdonnefort@google.com>
+> Fixes: f156a7d13fc3 ("KVM: arm64: Remove size-order align in the nVHE hyp private VA range")
 
-On my setup, this random value is plausible enough for the mapping
-to take place. Who knows what happens...
+I don't see your kvmarm-6.6 merged by Paolo, is it too late to squash
+and send a new PR? Anyhow:
 
-Cc: Vincent Donnefort <vdonnefort@google.com>
-Fixes: f156a7d13fc3 ("KVM: arm64: Remove size-order align in the nVHE hyp private VA range")
-Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
-Tested-by: Marek Szyprowski <m.szyprowski@samsung.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/79b0ad6e-0c2a-f777-d504-e40e8123d81d@samsung.com
----
- arch/arm64/kvm/mmu.c | 3 +++
- 1 file changed, 3 insertions(+)
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 11c1d786c506..50be51cc40cc 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -652,6 +652,9 @@ int hyp_alloc_private_va_range(size_t size, unsigned long *haddr)
- 
- 	mutex_unlock(&kvm_hyp_pgd_mutex);
- 
-+	if (!ret)
-+		*haddr = base;
-+
- 	return ret;
- }
- 
--- 
-2.34.1
+Regards,
 
+Phil.
+
+> Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
+> Tested-by: Marek Szyprowski <m.szyprowski@samsung.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Link: https://lore.kernel.org/r/79b0ad6e-0c2a-f777-d504-e40e8123d81d@samsung.com
+> ---
+>   arch/arm64/kvm/mmu.c | 3 +++
+>   1 file changed, 3 insertions(+)
