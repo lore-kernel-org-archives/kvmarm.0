@@ -1,184 +1,262 @@
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B08D111D
-	for <kvmarm@lists.linux.dev>; Sun, 27 Aug 2023 19:32:13 +0000 (UTC)
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-4ff882397ecso3792668e87.3
-        for <kvmarm@lists.linux.dev>; Sun, 27 Aug 2023 12:32:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693164731; x=1693769531;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z/MBlS5jJ6jjoZlLcPQIEqYt3hZ2JHvlatx9SMUr0Ps=;
-        b=J2OSsLR1nwmfWDm2tmxvo5xPT7PeLWCNEEYKdEyt7NLpZhzFXgjC/0TWbzJLkdd+dA
-         kaHq0nRhKhExyscn2m2XDPBrh5I/GSMo+Tmq50grhNkDsQ2xzZAig7R/nqzDSulxtQoe
-         5swtcoEHEnClRf2SmAotbK35z9drsUaxnLWs0UXNXBWVsfGGWAP0MtDZUuyze4bk15NF
-         tpMfIVy7/3/4D93Wunqdr/lQWtPrVp/f5kZ31/1SAvLh8BFRR7Ha6ZAUYWhoVjcYf1Vg
-         TYfyhdnPIiU1o/jveuIfQ/NLtNuqEbEwzHJT5wKDMRnTd3FUHmUst+tGhpXmykJ40we4
-         iO3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693164731; x=1693769531;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=z/MBlS5jJ6jjoZlLcPQIEqYt3hZ2JHvlatx9SMUr0Ps=;
-        b=cNfjWc/mPpwJ+plz8WsSptvuyZm0ECy5evueRdUM6Rt3s7ZNicPdWtYj99o5hVWQ4e
-         sKrDApzd3AnJskcR2ZR51RzE6LHeWe3tupqonCcNIbp330uX762SBrSHHUMo75lik5Yi
-         KYnOBtTAtTVjRzKvJR3lCFmoLHhlRdJGi1nT6QYOCCb0dH/MnD94cNfvAjDc0GFxc7lJ
-         xcoBIvdi4iIUlL7yrlJby8gb2E6yY6Lwbz2r27kWC1plqC7qTNIWjcu21pt5PZMTXBMH
-         uUc8YhyFb52S0u9th14Y3aHvAO0LpoKpPbHDrOO6uUjhaB95+3KwQcoiuzBpdnAg+kNg
-         x8Wg==
-X-Gm-Message-State: AOJu0YxC8T8GQo+4Dw31UFZulFFsQvK2DEpJ94SKl5glkhcXPFCohn9c
-	NOugkxAKdwaVLbgJy60gqHirTjZrlcmxideAYCXwvg==
-X-Google-Smtp-Source: AGHT+IEk8IVz7X20eoWgRs8RfBcId72R1Gk0/oK298rH6tojKEkA0RmVaOhWFz7sv42H1xdb6aTjSM76rQJI1s/ODrs=
-X-Received: by 2002:ac2:5e35:0:b0:500:94c3:8e3b with SMTP id
- o21-20020ac25e35000000b0050094c38e3bmr9043804lfg.57.1693164731128; Sun, 27
- Aug 2023 12:32:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C8463C0A
+	for <kvmarm@lists.linux.dev>; Mon, 28 Aug 2023 08:57:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E064FC433C8;
+	Mon, 28 Aug 2023 08:57:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693213042;
+	bh=oq7lotxiOG6rp/fU9NGgOcEsPBS3rd1oTL/ij/e1qnM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=BfGnjVeKoLWZ7sFj+HJSKAir3gL46tRoz7ilIV4r/mOpR6bXduBVck7yk1/KkdARa
+	 pVBGl29NWv7B122P7uaOBiCD3ddSsyB2/H3qmsxhXMmg7bdwO8pyER95++NnSiux1a
+	 7QDNydm//98VNz1Rl50Iab+y2z8EogO9Jpz9qFxz5xahexVbUrD1tOdJJSy+mWJRgB
+	 q548VLyG0L9T4FjyUXEPm3g/ek39TbPy2Hiz2iaox3DD9AqTJFVXbhzCVAME1ayZ7Q
+	 JrU7IQ2gV5qJESnW2lKG6zbjl6wsZLucKeewLzGKLXGC3tNEAEAgjwtWWCYOxeEs6J
+	 /83s2ewaECk3g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qaY3i-008fYE-RE;
+	Mon, 28 Aug 2023 09:57:19 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alexander Stein <alexander.stein@ew.tq-group.com>,
+	Anup Patel <anup@brainfault.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	David Matlack <dmatlack@google.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Fuad Tabba <tabba@google.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Huang Shijie <shijie@os.amperecomputing.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Kalesh Singh <kaleshsingh@google.com>,
+	Leo Yan <leo.yan@linaro.org>,
+	Mark Brown <broonie@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Miguel Luis <miguel.luis@oracle.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Reiji Watanabe <reijiw@google.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Will Deacon <will@kernel.org>,
+	Yue Haibing <yuehaibing@huawei.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Zenghui Yu <zenghui.yu@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: [GIT PULL] KVM/arm64 updates for Linux v6.6
+Date: Mon, 28 Aug 2023 09:57:11 +0100
+Message-Id: <20230828085711.4000711-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230821212243.491660-1-jingzhangos@google.com>
- <20230821212243.491660-6-jingzhangos@google.com> <878ra3pndw.wl-maz@kernel.org>
- <CAAdAUti8qSf0PVnWkp4Jua-te6i0cjQKJm=8dt5vWqT0Q6w4iQ@mail.gmail.com> <86a5uef55n.wl-maz@kernel.org>
-In-Reply-To: <86a5uef55n.wl-maz@kernel.org>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Sun, 27 Aug 2023 12:31:59 -0700
-Message-ID: <CAAdAUtiNeVrPxThddhFPNNWjyf1hebYkXugdfV2K8LNnT0yaQg@mail.gmail.com>
-Subject: Re: [PATCH v9 05/11] KVM: arm64: Enable writable for ID_AA64DFR0_EL1
- and ID_DFR0_EL1
-To: Marc Zyngier <maz@kernel.org>
-Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	ARMLinux <linux-arm-kernel@lists.infradead.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Will Deacon <will@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>, 
-	Raghavendra Rao Ananta <rananta@google.com>, Suraj Jitindar Singh <surajjs@amazon.com>, 
-	Cornelia Huck <cohuck@redhat.com>, Shaoqin Huang <shahuang@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexander.stein@ew.tq-group.com, anup@brainfault.org, catalin.marinas@arm.com, dmatlack@google.com, eric.auger@redhat.com, tabba@google.com, gshan@redhat.com, shijie@os.amperecomputing.com, jingzhangos@google.com, kaleshsingh@google.com, leo.yan@linaro.org, broonie@kernel.org, mark.rutland@arm.com, miguel.luis@oracle.com, oliver.upton@linux.dev, philmd@linaro.org, rananta@google.com, rdunlap@infradead.org, reijiw@google.com, seanjc@google.com, shahuang@redhat.com, suzuki.poulose@arm.com, vdonnefort@google.com, will@kernel.org, yuehaibing@huawei.com, yuzenghui@huawei.com, zenghui.yu@linux.dev, james.morse@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Marc,
+Paolo,
 
-On Sat, Aug 26, 2023 at 3:51=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
-:
->
-> On Tue, 22 Aug 2023 19:35:12 +0100,
-> Jing Zhang <jingzhangos@google.com> wrote:
-> >
-> > Hi Marc,
-> >
-> > On Tue, Aug 22, 2023 at 12:06=E2=80=AFAM Marc Zyngier <maz@kernel.org> =
-wrote:
-> > >
-> > > On Mon, 21 Aug 2023 22:22:37 +0100,
-> > > Jing Zhang <jingzhangos@google.com> wrote:
-> > > >
-> > > > All valid fields in ID_AA64DFR0_EL1 and ID_DFR0_EL1 are writable
-> > > > from userspace with this change.
-> > > > RES0 fields and those fields hidden by KVM are not writable.
-> > > >
-> > > > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > > > ---
-> > > >  arch/arm64/kvm/sys_regs.c | 6 ++++--
-> > > >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > > > index afade7186675..20fc38bad4e8 100644
-> > > > --- a/arch/arm64/kvm/sys_regs.c
-> > > > +++ b/arch/arm64/kvm/sys_regs.c
-> > > > @@ -1931,6 +1931,8 @@ static bool access_spsr(struct kvm_vcpu *vcpu=
-,
-> > > >       return true;
-> > > >  }
-> > > >
-> > > > +#define ID_AA64DFR0_EL1_RES0_MASK (GENMASK(59, 56) | GENMASK(27, 2=
-4) | GENMASK(19, 16))
-> > > > +
-> > > >  /*
-> > > >   * Architected system registers.
-> > > >   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-> > > > @@ -2006,7 +2008,7 @@ static const struct sys_reg_desc sys_reg_desc=
-s[] =3D {
-> > > >         .set_user =3D set_id_dfr0_el1,
-> > > >         .visibility =3D aa32_id_visibility,
-> > > >         .reset =3D read_sanitised_id_dfr0_el1,
-> > > > -       .val =3D ID_DFR0_EL1_PerfMon_MASK, },
-> > > > +       .val =3D GENMASK(31, 0), },
-> > >
-> > > Can you *please* look at the register and realise that we *don't*
-> > > support writing to the whole of the low 32 bits? What does it mean to
-> > > allow selecting the M-profile debug? Or the memory-mapped trace?
-> > >
-> > > You are advertising a lot of crap to userspace, and that's definitely
-> > > not on.
-> > >
-> > > >       ID_HIDDEN(ID_AFR0_EL1),
-> > > >       AA32_ID_SANITISED(ID_MMFR0_EL1),
-> > > >       AA32_ID_SANITISED(ID_MMFR1_EL1),
-> > > > @@ -2055,7 +2057,7 @@ static const struct sys_reg_desc sys_reg_desc=
-s[] =3D {
-> > > >         .get_user =3D get_id_reg,
-> > > >         .set_user =3D set_id_aa64dfr0_el1,
-> > > >         .reset =3D read_sanitised_id_aa64dfr0_el1,
-> > > > -       .val =3D ID_AA64DFR0_EL1_PMUVer_MASK, },
-> > > > +       .val =3D ~(ID_AA64DFR0_EL1_PMSVer_MASK | ID_AA64DFR0_EL1_RE=
-S0_MASK), },
-> > >
-> > > And it is the same thing here. Where is the handling code to deal wit=
-h
-> > > variable breakpoint numbers? Oh wait, there is none. Really, the only
-> > > thing we support writing to are the PMU and Debug versions. And
-> > > nothing else.
-> > >
-> > > What does it mean for userspace? Either the write will be denied
-> > > despite being advertised a writable field (remember the first patch o=
-f
-> > > the series???), or we'll blindly accept the write and further ignore
-> > > the requested values. Do you really think any of this is acceptable?
-> > >
-> > > This is the *9th* version of this series, and we're still battling
-> > > over some extremely basic userspace issues... I don't think we can
-> > > merge this series as is stands.
-> >
-> > I removed sanity checks across multiple fields after the discussion
-> > here: https://lore.kernel.org/all/ZKRC80hb4hXwW8WK@thinky-boi/
-> > I might have misunderstood the discussion. I thought we'd let VMM do
-> > more complete sanity checks.
->
-> The problem is that you don't even have a statement about how this is
-> supposed to be handled. What are the rules? How can the VMM author
-> *know*?
->
-> That's my real issue with this series: at no point do we state when an
-> ID register can be written, what are the rules that must be followed,
-> where is the split in responsibility between KVM and the VMM, and what
-> is the expected behaviour when the VMM exposes something that is
-> completely outlandish to the guest (such as the M-profile debug).
->
-> Do you see the issue? We can always fix the code. But once we've
-> exposed that to userspace, there is no going back. And I really want
-> everybody's buy-in on that front, including the VMM people.
+Here's the set of KVM/arm64 updates for 6.6. The highlight is the
+support for range-based TLB invalidation, something that should help
+cloud-type workloads, which are basically limited to moving the VMs
+around rather than running guest code... ;-)
 
-Understood.
-Looks like it would be less complicated to have KVM do all the sanity
-checks to determine if a feature field is configured correctly.
-The determination can be done by following rules:
-1. Architecture constraints from ARM ARM.
-2. KVM constraints. (Those features not exposed by KVM should be read-only)
-3. VCPU features. (The write mask needs to be determined on-the-fly)
+We also have a pretty large nested virtualisation update, with the
+description of a zillion trap bits. The rest is the usual mix of
+cleanups, bug fixes, and minor improvements (details in the tag
+below).
 
-Thanks,
-Jing
+Please pull,
 
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+	M.
+
+The following changes since commit 6eaae198076080886b9e7d57f4ae06fa782f90ef:
+
+  Linux 6.5-rc3 (2023-07-23 15:24:10 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-6.6
+
+for you to fetch changes up to 1f66f1246bfa08aaf13db897736de49cbeaf72a1:
+
+  Merge branch kvm-arm64/6.6/misc into kvmarm-master/next (2023-08-28 09:30:32 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 updates for Linux 6.6
+
+- Add support for TLB range invalidation of Stage-2 page tables,
+  avoiding unnecessary invalidations. Systems that do not implement
+  range invalidation still rely on a full invalidation when dealing
+  with large ranges.
+
+- Add infrastructure for forwarding traps taken from a L2 guest to
+  the L1 guest, with L0 acting as the dispatcher, another baby step
+  towards the full nested support.
+
+- Simplify the way we deal with the (long deprecated) 'CPU target',
+  resulting in a much needed cleanup.
+
+- Fix another set of PMU bugs, both on the guest and host sides,
+  as we seem to never have any shortage of those...
+
+- Relax the alignment requirements of EL2 VA allocations for
+  non-stack allocations, as we were otherwise wasting a lot of that
+  precious VA space.
+
+- The usual set of non-functional cleanups, although I note the lack
+  of spelling fixes...
+
+----------------------------------------------------------------
+David Matlack (3):
+      KVM: Rename kvm_arch_flush_remote_tlb() to kvm_arch_flush_remote_tlbs()
+      KVM: Allow range-based TLB invalidation from common code
+      KVM: Move kvm_arch_flush_remote_tlbs_memslot() to common code
+
+Fuad Tabba (1):
+      KVM: arm64: Remove redundant kvm_set_pfn_accessed() from user_mem_abort()
+
+Marc Zyngier (35):
+      Merge branch kvm-arm64/6.6/generic-vcpu into kvmarm-master/next
+      arm64: Add missing VA CMO encodings
+      arm64: Add missing ERX*_EL1 encodings
+      arm64: Add missing DC ZVA/GVA/GZVA encodings
+      arm64: Add TLBI operation encodings
+      arm64: Add AT operation encodings
+      arm64: Add debug registers affected by HDFGxTR_EL2
+      arm64: Add missing BRB/CFP/DVP/CPP instructions
+      arm64: Add HDFGRTR_EL2 and HDFGWTR_EL2 layouts
+      KVM: arm64: Correctly handle ACCDATA_EL1 traps
+      KVM: arm64: Add missing HCR_EL2 trap bits
+      KVM: arm64: nv: Add FGT registers
+      KVM: arm64: Restructure FGT register switching
+      KVM: arm64: nv: Add trap forwarding infrastructure
+      KVM: arm64: nv: Add trap forwarding for HCR_EL2
+      KVM: arm64: nv: Expose FEAT_EVT to nested guests
+      KVM: arm64: nv: Add trap forwarding for MDCR_EL2
+      KVM: arm64: nv: Add trap forwarding for CNTHCTL_EL2
+      KVM: arm64: nv: Add fine grained trap forwarding infrastructure
+      KVM: arm64: nv: Add trap forwarding for HFGxTR_EL2
+      KVM: arm64: nv: Add trap forwarding for HFGITR_EL2
+      KVM: arm64: nv: Add trap forwarding for HDFGxTR_EL2
+      KVM: arm64: nv: Add SVC trap forwarding
+      KVM: arm64: nv: Expand ERET trap forwarding to handle FGT
+      KVM: arm64: nv: Add switching support for HFGxTR/HDFGxTR
+      KVM: arm64: nv: Expose FGT to nested guests
+      KVM: arm64: Move HCRX_EL2 switch to load/put on VHE systems
+      KVM: arm64: nv: Add support for HCRX_EL2
+      KVM: arm64: pmu: Resync EL0 state on counter rotation
+      KVM: arm64: pmu: Guard PMU emulation definitions with CONFIG_KVM
+      KVM: arm64: nv: Add trap description for SPSR_EL2 and ELR_EL2
+      Merge branch kvm-arm64/nv-trap-forwarding into kvmarm-master/next
+      Merge branch kvm-arm64/tlbi-range into kvmarm-master/next
+      Merge branch kvm-arm64/6.6/pmu-fixes into kvmarm-master/next
+      Merge branch kvm-arm64/6.6/misc into kvmarm-master/next
+
+Mark Brown (1):
+      arm64: Add feature detection for fine grained traps
+
+Oliver Upton (4):
+      KVM: arm64: Delete pointless switch statement in kvm_reset_vcpu()
+      KVM: arm64: Remove pointless check for changed init target
+      KVM: arm64: Replace vCPU target with a configuration flag
+      KVM: arm64: Always return generic v8 as the preferred target
+
+Raghavendra Rao Ananta (11):
+      KVM: Declare kvm_arch_flush_remote_tlbs() globally
+      KVM: arm64: Use kvm_arch_flush_remote_tlbs()
+      KVM: Remove CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL
+      arm64: tlb: Refactor the core flush algorithm of __flush_tlb_range
+      arm64: tlb: Implement __flush_s2_tlb_range_op()
+      KVM: arm64: Implement __kvm_tlb_flush_vmid_range()
+      KVM: arm64: Define kvm_tlb_flush_vmid_range()
+      KVM: arm64: Implement kvm_arch_flush_remote_tlbs_range()
+      KVM: arm64: Flush only the memslot after write-protect
+      KVM: arm64: Invalidate the table entries upon a range
+      KVM: arm64: Use TLBI range-based instructions for unmap
+
+Randy Dunlap (1):
+      KVM: arm64: nv: Select XARRAY_MULTI to fix build error
+
+Reiji Watanabe (4):
+      KVM: arm64: PMU: Disallow vPMU on non-uniform PMUVer
+      KVM: arm64: PMU: Avoid inappropriate use of host's PMUVer
+      KVM: arm64: PMU: Don't advertise the STALL_SLOT event
+      KVM: arm64: PMU: Don't advertise STALL_SLOT_{FRONTEND,BACKEND}
+
+Shaoqin Huang (1):
+      KVM: arm64: Use the known cpu id instead of smp_processor_id()
+
+Vincent Donnefort (1):
+      KVM: arm64: Remove size-order align in the nVHE hyp private VA range
+
+Yue Haibing (1):
+      KVM: arm64: Remove unused declarations
+
+Zenghui Yu (1):
+      KVM: arm64: Drop HCR_VIRT_EXCP_MASK
+
+ arch/arm/include/asm/arm_pmuv3.h        |    2 +
+ arch/arm64/include/asm/kvm_arm.h        |   51 +-
+ arch/arm64/include/asm/kvm_asm.h        |    3 +
+ arch/arm64/include/asm/kvm_host.h       |   24 +-
+ arch/arm64/include/asm/kvm_mmu.h        |    1 +
+ arch/arm64/include/asm/kvm_nested.h     |    2 +
+ arch/arm64/include/asm/kvm_pgtable.h    |   10 +
+ arch/arm64/include/asm/sysreg.h         |  268 ++++-
+ arch/arm64/include/asm/tlbflush.h       |  124 ++-
+ arch/arm64/kernel/cpufeature.c          |    7 +
+ arch/arm64/kvm/Kconfig                  |    2 +-
+ arch/arm64/kvm/arm.c                    |   65 +-
+ arch/arm64/kvm/emulate-nested.c         | 1852 +++++++++++++++++++++++++++++++
+ arch/arm64/kvm/guest.c                  |   15 -
+ arch/arm64/kvm/handle_exit.c            |   29 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  127 ++-
+ arch/arm64/kvm/hyp/include/nvhe/mm.h    |    1 +
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      |   11 +
+ arch/arm64/kvm/hyp/nvhe/mm.c            |   83 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c         |   27 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c        |    2 +-
+ arch/arm64/kvm/hyp/nvhe/tlb.c           |   30 +
+ arch/arm64/kvm/hyp/pgtable.c            |   63 +-
+ arch/arm64/kvm/hyp/vhe/tlb.c            |   28 +
+ arch/arm64/kvm/mmu.c                    |  102 +-
+ arch/arm64/kvm/nested.c                 |   11 +-
+ arch/arm64/kvm/pmu-emul.c               |   37 +-
+ arch/arm64/kvm/pmu.c                    |   18 +
+ arch/arm64/kvm/reset.c                  |   25 +-
+ arch/arm64/kvm/sys_regs.c               |   15 +
+ arch/arm64/kvm/trace_arm.h              |   26 +
+ arch/arm64/kvm/vgic/vgic.h              |    2 -
+ arch/arm64/tools/cpucaps                |    1 +
+ arch/arm64/tools/sysreg                 |  129 +++
+ arch/mips/include/asm/kvm_host.h        |    3 +-
+ arch/mips/kvm/mips.c                    |   12 +-
+ arch/riscv/kvm/mmu.c                    |    6 -
+ arch/x86/include/asm/kvm_host.h         |    6 +-
+ arch/x86/kvm/mmu/mmu.c                  |   28 +-
+ arch/x86/kvm/mmu/mmu_internal.h         |    3 -
+ arch/x86/kvm/x86.c                      |    2 +-
+ drivers/perf/arm_pmuv3.c                |    2 +
+ include/kvm/arm_pmu.h                   |    4 +-
+ include/linux/kvm_host.h                |   24 +-
+ virt/kvm/Kconfig                        |    3 -
+ virt/kvm/kvm_main.c                     |   35 +-
+ 46 files changed, 2993 insertions(+), 328 deletions(-)
