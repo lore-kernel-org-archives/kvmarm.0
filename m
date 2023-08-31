@@ -1,281 +1,130 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F22CB11CB6
-	for <kvmarm@lists.linux.dev>; Thu, 31 Aug 2023 17:19:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1693502371;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IepLTXhzhOWGgTI71cTBUfveWFnOIHupkjrx/gdmCak=;
-	b=VAEbS/EGtVBsBGq7mKcDKpdyQ/eqMnnr5LDxZqk8OZIJ+0MiKV/DyFh3ZYvOv3L5vWA2D8
-	FpaXUv2nGlz+LjGjRjgER8PGCOFBKBFI2MJIQdogUo86ESWtvjWdm1lmvtxhFOBaCxhSdN
-	Itq5iyJbCaIr2MPW8BBhtEmOSa79uuc=
-Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com
- [209.85.222.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-192-WTFk6YokMa2ARQ9SaM2ibw-1; Thu, 31 Aug 2023 13:19:30 -0400
-X-MC-Unique: WTFk6YokMa2ARQ9SaM2ibw-1
-Received: by mail-ua1-f69.google.com with SMTP id a1e0cc1a2514c-7a2a701e990so431664241.1
-        for <kvmarm@lists.linux.dev>; Thu, 31 Aug 2023 10:19:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53E8B5399
+	for <kvmarm@lists.linux.dev>; Thu, 31 Aug 2023 21:18:21 +0000 (UTC)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-594e1154756so15210037b3.2
+        for <kvmarm@lists.linux.dev>; Thu, 31 Aug 2023 14:18:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1693516700; x=1694121500; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YO6r55IA8eElX5w/+X8zOZmT73jh5i8DqE52ZxJWYQc=;
+        b=guXnkcDNIx1XMysszhmhJL6plHIPzL6SW7QHZxEbAQGuDfgO5T4dxQzggbuRVn3rYg
+         ODxtVEaMS5SG5XuAF0I+wETnGGpKpEZVuzu2kcrCXQvcjUge/cuE2Yn431SHOmzHdt1Y
+         f7EhgQf5dKTU2UbS5j3tROjjLrBvwVzePpyn6Xx5d7hPgN0bojtmhNWGrXeDXDITF78V
+         U0b/609DkUAxEdUMkY9Zl6JsSqw2/hbSmE5fghb5Ly2eWuuqDLy+8Rs6QS+wARKiRcRR
+         LjkmlrIED9h1F+a9ztB+CJoilu44iHWDoa5d8FCI8aET+kr8+aHipghudlkK+lXZASDX
+         i67A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693502369; x=1694107169;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IepLTXhzhOWGgTI71cTBUfveWFnOIHupkjrx/gdmCak=;
-        b=RoT9MkzUiWG5OZGVL6bT5ECGrDqMqkV54idUnDxxjjWclPdf/AwXnrVjk8jXd1jHpN
-         l4q/JM5NMxT/C9PbVg/33B5JcjpBQllCsQmbYDE/mykEtsPeV8tJkK5W8iDtXsTzuGwy
-         +3AQCK0tBRxn5hYt7k48N61dvpFC904bymUU5kC30PljEzjAL6TcCWnJJgggqAwzfTMv
-         WGa0TewokO3QXTHXD13srWBLJcpkw25GtcIXyotY4Z3YwIgsVBLFO4lEE88Et+GD2fO5
-         qTkzom2U/fqrUSyMVYVbAepEnnALvLmdPEG8ddus8hB+cES6UT5agcdykNRr+IIdQhbz
-         cWfQ==
-X-Gm-Message-State: AOJu0YxRfEJOYkK8dJG8YRtDVuobq3C8CYPOJkHPchiQrTGTJxpav5iN
-	BxcMOvaopfX3MKgKsrdg1sQwN0COLzuQMXcNdZFFx+VbgltZu+1IrsNfzKwjH+PcjchQ9Ld+Z+k
-	u66AelpddvgxVC5gJkDmTBtIaFTBZtiQW
-X-Received: by 2002:a67:ce91:0:b0:44d:590d:28a4 with SMTP id c17-20020a67ce91000000b0044d590d28a4mr294676vse.20.1693502369509;
-        Thu, 31 Aug 2023 10:19:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH0k79+G90ciXeTRdkBQS2GP1rzRbLUfNrJODR8eVNNWd4EKjdrkdXC9BHV7Owqr6gYrGHdzfZJSc1Alo8T10s=
-X-Received: by 2002:a67:ce91:0:b0:44d:590d:28a4 with SMTP id
- c17-20020a67ce91000000b0044d590d28a4mr294631vse.20.1693502369202; Thu, 31 Aug
- 2023 10:19:29 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1693516700; x=1694121500;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YO6r55IA8eElX5w/+X8zOZmT73jh5i8DqE52ZxJWYQc=;
+        b=LJyKQHnNymMsAwrD31FW9r7Oq0gwOCrdJo+ZWa0sjvVxfGmZn61jHw2fKUJybYSK4b
+         RDgJQ7qVx/mu4XFzeyiZYdW+dAOn+luwhlD9+yOCK/r5+pDBDzDsL2rYsqSYF/tBoHfn
+         QaUHTku9KhiF7irs3UYeCEX5nFtd5RR8Tl0OH+rHc+E5gmb8ShbSsT65DEKUQEbUxGiI
+         Dj6IekvSKLFRpzRjkt51OlsYc0aYa+tFVUn0bbuegd8I4UHxOhmyiLpwWEaPKKjVfj4/
+         3zSzDryq1YYwfHayBOopYMXvi7xVg4SkaWHAbUMXruTUu66CN1ltK7wRErN9u54jL3dT
+         WooQ==
+X-Gm-Message-State: AOJu0Yy9A/31plTTuvchdMNJZT9WcuMCuNuF8Z/CrbHwnzwrmznTvgSP
+	qG3fMqHFXKmTcvYJPXzYb4q8472ohnY=
+X-Google-Smtp-Source: AGHT+IEZwzQUuTI7C6FFX7BSq8V52BjhaRfu7MbpFPM/CoSsWVx5jFl7L8T8aMfs6TbWHc+jUHpp1k/u52U=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:721:b0:586:5d03:67c8 with SMTP id
+ bt1-20020a05690c072100b005865d0367c8mr16211ywb.3.1693516700041; Thu, 31 Aug
+ 2023 14:18:20 -0700 (PDT)
+Date: Thu, 31 Aug 2023 14:18:18 -0700
+In-Reply-To: <CAD=HUj6XYKGgRLb2VWBnYEEH9YQUMROBf2YBXaTOvWZS5ejhmg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230828085711.4000711-1-maz@kernel.org>
-In-Reply-To: <20230828085711.4000711-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 31 Aug 2023 19:19:17 +0200
-Message-ID: <CABgObfYQUnmPfBmo6KZys4mrQaXRAtowTx830kOdd090+xdqbQ@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 updates for Linux v6.6
-To: Marc Zyngier <maz@kernel.org>
-Cc: Alexander Stein <alexander.stein@ew.tq-group.com>, Anup Patel <anup@brainfault.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, David Matlack <dmatlack@google.com>, 
-	Eric Auger <eric.auger@redhat.com>, Fuad Tabba <tabba@google.com>, Gavin Shan <gshan@redhat.com>, 
-	Huang Shijie <shijie@os.amperecomputing.com>, Jing Zhang <jingzhangos@google.com>, 
-	Kalesh Singh <kaleshsingh@google.com>, Leo Yan <leo.yan@linaro.org>, 
-	Mark Brown <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Miguel Luis <miguel.luis@oracle.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
-	Raghavendra Rao Ananta <rananta@google.com>, Randy Dunlap <rdunlap@infradead.org>, 
-	Reiji Watanabe <reijiw@google.com>, Sean Christopherson <seanjc@google.com>, 
-	Shaoqin Huang <shahuang@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Vincent Donnefort <vdonnefort@google.com>, Will Deacon <will@kernel.org>, 
-	Yue Haibing <yuehaibing@huawei.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Zenghui Yu <zenghui.yu@linux.dev>, James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-6-stevensd@google.com>
+ <20230705102547.hr2zxkdkecdxp5tf@linux.intel.com> <CAD=HUj7F6CUNt_9txEu0upB=PBwJzkL5dBhNs_BVHX1cicqBgw@mail.gmail.com>
+ <ZOd0IMeKSkBwGIer@google.com> <CAD=HUj6XYKGgRLb2VWBnYEEH9YQUMROBf2YBXaTOvWZS5ejhmg@mail.gmail.com>
+Message-ID: <ZPEDmnloiOs/HNr+@google.com>
+Subject: Re: [PATCH v7 5/8] KVM: x86/mmu: Don't pass FOLL_GET to __kvm_follow_pfn
+From: Sean Christopherson <seanjc@google.com>
+To: David Stevens <stevensd@chromium.org>
+Cc: Yu Zhang <yu.c.zhang@linux.intel.com>, Marc Zyngier <maz@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Peter Xu <peterx@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 28, 2023 at 10:57=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
-e:
->
-> Paolo,
->
-> Here's the set of KVM/arm64 updates for 6.6. The highlight is the
-> support for range-based TLB invalidation, something that should help
-> cloud-type workloads, which are basically limited to moving the VMs
-> around rather than running guest code... ;-)
->
-> We also have a pretty large nested virtualisation update, with the
-> description of a zillion trap bits. The rest is the usual mix of
-> cleanups, bug fixes, and minor improvements (details in the tag
-> below).
->
-> Please pull,
+On Fri, Aug 25, 2023, David Stevens wrote:
+> On Fri, Aug 25, 2023 at 12:15=E2=80=AFAM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> >
+> > On Thu, Aug 24, 2023, David Stevens wrote:
+> > > On Wed, Jul 5, 2023 at 7:25=E2=80=AFPM Yu Zhang <yu.c.zhang@linux.int=
+el.com> wrote:
+> > > >
+> > > > On Tue, Jul 04, 2023 at 04:50:50PM +0900, David Stevens wrote:
+> > > > > @@ -4529,7 +4540,8 @@ static int kvm_tdp_mmu_page_fault(struct kv=
+m_vcpu *vcpu,
+> > > > >
+> > > > >  out_unlock:
+> > > > >       read_unlock(&vcpu->kvm->mmu_lock);
+> > > > > -     kvm_release_pfn_clean(fault->pfn);
+> > > >
+> > > > Yet kvm_release_pfn() can still be triggered for the kvm_vcpu_maped=
+ gfns.
+> > > > What if guest uses a non-referenced page(e.g., as a vmcs12)? Althou=
+gh I
+> > > > believe this is not gonna happen in real world...
+> > >
+> > > kvm_vcpu_map still uses gfn_to_pfn, which eventually passes FOLL_GET
+> > > to __kvm_follow_pfn. So if a guest tries to use a non-refcounted page
+> > > like that, then kvm_vcpu_map will fail and the guest will probably
+> > > crash. It won't trigger any bugs in the host, though.
+> > >
+> > > It is unfortunate that the guest will be able to use certain types of
+> > > memory for some purposes but not for others. However, while it is
+> > > theoretically fixable, it's an unreasonable amount of work for
+> > > something that, as you say, nobody really cares about in practice [1]=
+.
+> > >
+> > > [1] https://lore.kernel.org/all/ZBEEQtmtNPaEqU1i@google.com/
+> >
+> > There are use cases that care, which is why I suggested allow_unsafe_km=
+ap.
+> > Specifically, AWS manages their pool of guest memory in userspace and m=
+aps it all
+> > via /dev/mem.  Without that module param to let userspace opt-in, this =
+series will
+> > break such setups.  It still arguably is a breaking change since it req=
+uires
+> > userspace to opt-in, but allowing such behavior by default is simply no=
+t a viable
+> > option, and I don't have much sympathy since so much of this mess has i=
+ts origins
+> > in commit e45adf665a53 ("KVM: Introduce a new guest mapping API").
+> >
+> > The use cases that no one cares about (AFAIK) is allowing _untrusted_ u=
+serspace
+> > to back guest RAM with arbitrary memory.  In other words, I want KVM to=
+ allow
+> > (by default) mapping device memory into the guest for things like vGPUs=
+, without
+> > having to do the massive and invasive overhaul needed to safely allow b=
+acking guest
+> > RAM with completely arbitrary memory.
+>=20
+> Do you specifically want the allow_unsafe_kmap breaking change? v7 of
+> this series should have supported everything that is currently
+> supported by KVM, but you're right that the v8 version of
+> hva_to_pfn_remapped doesn't support mapping
+> !kvm_pfn_to_refcounted_page() pages. That could be supported
+> explicitly with allow_unsafe_kmap as you suggested,
 
-Pulled, thanks.
-
-Paolo
-
->         M.
->
-> The following changes since commit 6eaae198076080886b9e7d57f4ae06fa782f90=
-ef:
->
->   Linux 6.5-rc3 (2023-07-23 15:24:10 -0700)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
-marm-6.6
->
-> for you to fetch changes up to 1f66f1246bfa08aaf13db897736de49cbeaf72a1:
->
->   Merge branch kvm-arm64/6.6/misc into kvmarm-master/next (2023-08-28 09:=
-30:32 +0100)
->
-> ----------------------------------------------------------------
-> KVM/arm64 updates for Linux 6.6
->
-> - Add support for TLB range invalidation of Stage-2 page tables,
->   avoiding unnecessary invalidations. Systems that do not implement
->   range invalidation still rely on a full invalidation when dealing
->   with large ranges.
->
-> - Add infrastructure for forwarding traps taken from a L2 guest to
->   the L1 guest, with L0 acting as the dispatcher, another baby step
->   towards the full nested support.
->
-> - Simplify the way we deal with the (long deprecated) 'CPU target',
->   resulting in a much needed cleanup.
->
-> - Fix another set of PMU bugs, both on the guest and host sides,
->   as we seem to never have any shortage of those...
->
-> - Relax the alignment requirements of EL2 VA allocations for
->   non-stack allocations, as we were otherwise wasting a lot of that
->   precious VA space.
->
-> - The usual set of non-functional cleanups, although I note the lack
->   of spelling fixes...
->
-> ----------------------------------------------------------------
-> David Matlack (3):
->       KVM: Rename kvm_arch_flush_remote_tlb() to kvm_arch_flush_remote_tl=
-bs()
->       KVM: Allow range-based TLB invalidation from common code
->       KVM: Move kvm_arch_flush_remote_tlbs_memslot() to common code
->
-> Fuad Tabba (1):
->       KVM: arm64: Remove redundant kvm_set_pfn_accessed() from user_mem_a=
-bort()
->
-> Marc Zyngier (35):
->       Merge branch kvm-arm64/6.6/generic-vcpu into kvmarm-master/next
->       arm64: Add missing VA CMO encodings
->       arm64: Add missing ERX*_EL1 encodings
->       arm64: Add missing DC ZVA/GVA/GZVA encodings
->       arm64: Add TLBI operation encodings
->       arm64: Add AT operation encodings
->       arm64: Add debug registers affected by HDFGxTR_EL2
->       arm64: Add missing BRB/CFP/DVP/CPP instructions
->       arm64: Add HDFGRTR_EL2 and HDFGWTR_EL2 layouts
->       KVM: arm64: Correctly handle ACCDATA_EL1 traps
->       KVM: arm64: Add missing HCR_EL2 trap bits
->       KVM: arm64: nv: Add FGT registers
->       KVM: arm64: Restructure FGT register switching
->       KVM: arm64: nv: Add trap forwarding infrastructure
->       KVM: arm64: nv: Add trap forwarding for HCR_EL2
->       KVM: arm64: nv: Expose FEAT_EVT to nested guests
->       KVM: arm64: nv: Add trap forwarding for MDCR_EL2
->       KVM: arm64: nv: Add trap forwarding for CNTHCTL_EL2
->       KVM: arm64: nv: Add fine grained trap forwarding infrastructure
->       KVM: arm64: nv: Add trap forwarding for HFGxTR_EL2
->       KVM: arm64: nv: Add trap forwarding for HFGITR_EL2
->       KVM: arm64: nv: Add trap forwarding for HDFGxTR_EL2
->       KVM: arm64: nv: Add SVC trap forwarding
->       KVM: arm64: nv: Expand ERET trap forwarding to handle FGT
->       KVM: arm64: nv: Add switching support for HFGxTR/HDFGxTR
->       KVM: arm64: nv: Expose FGT to nested guests
->       KVM: arm64: Move HCRX_EL2 switch to load/put on VHE systems
->       KVM: arm64: nv: Add support for HCRX_EL2
->       KVM: arm64: pmu: Resync EL0 state on counter rotation
->       KVM: arm64: pmu: Guard PMU emulation definitions with CONFIG_KVM
->       KVM: arm64: nv: Add trap description for SPSR_EL2 and ELR_EL2
->       Merge branch kvm-arm64/nv-trap-forwarding into kvmarm-master/next
->       Merge branch kvm-arm64/tlbi-range into kvmarm-master/next
->       Merge branch kvm-arm64/6.6/pmu-fixes into kvmarm-master/next
->       Merge branch kvm-arm64/6.6/misc into kvmarm-master/next
->
-> Mark Brown (1):
->       arm64: Add feature detection for fine grained traps
->
-> Oliver Upton (4):
->       KVM: arm64: Delete pointless switch statement in kvm_reset_vcpu()
->       KVM: arm64: Remove pointless check for changed init target
->       KVM: arm64: Replace vCPU target with a configuration flag
->       KVM: arm64: Always return generic v8 as the preferred target
->
-> Raghavendra Rao Ananta (11):
->       KVM: Declare kvm_arch_flush_remote_tlbs() globally
->       KVM: arm64: Use kvm_arch_flush_remote_tlbs()
->       KVM: Remove CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL
->       arm64: tlb: Refactor the core flush algorithm of __flush_tlb_range
->       arm64: tlb: Implement __flush_s2_tlb_range_op()
->       KVM: arm64: Implement __kvm_tlb_flush_vmid_range()
->       KVM: arm64: Define kvm_tlb_flush_vmid_range()
->       KVM: arm64: Implement kvm_arch_flush_remote_tlbs_range()
->       KVM: arm64: Flush only the memslot after write-protect
->       KVM: arm64: Invalidate the table entries upon a range
->       KVM: arm64: Use TLBI range-based instructions for unmap
->
-> Randy Dunlap (1):
->       KVM: arm64: nv: Select XARRAY_MULTI to fix build error
->
-> Reiji Watanabe (4):
->       KVM: arm64: PMU: Disallow vPMU on non-uniform PMUVer
->       KVM: arm64: PMU: Avoid inappropriate use of host's PMUVer
->       KVM: arm64: PMU: Don't advertise the STALL_SLOT event
->       KVM: arm64: PMU: Don't advertise STALL_SLOT_{FRONTEND,BACKEND}
->
-> Shaoqin Huang (1):
->       KVM: arm64: Use the known cpu id instead of smp_processor_id()
->
-> Vincent Donnefort (1):
->       KVM: arm64: Remove size-order align in the nVHE hyp private VA rang=
-e
->
-> Yue Haibing (1):
->       KVM: arm64: Remove unused declarations
->
-> Zenghui Yu (1):
->       KVM: arm64: Drop HCR_VIRT_EXCP_MASK
->
->  arch/arm/include/asm/arm_pmuv3.h        |    2 +
->  arch/arm64/include/asm/kvm_arm.h        |   51 +-
->  arch/arm64/include/asm/kvm_asm.h        |    3 +
->  arch/arm64/include/asm/kvm_host.h       |   24 +-
->  arch/arm64/include/asm/kvm_mmu.h        |    1 +
->  arch/arm64/include/asm/kvm_nested.h     |    2 +
->  arch/arm64/include/asm/kvm_pgtable.h    |   10 +
->  arch/arm64/include/asm/sysreg.h         |  268 ++++-
->  arch/arm64/include/asm/tlbflush.h       |  124 ++-
->  arch/arm64/kernel/cpufeature.c          |    7 +
->  arch/arm64/kvm/Kconfig                  |    2 +-
->  arch/arm64/kvm/arm.c                    |   65 +-
->  arch/arm64/kvm/emulate-nested.c         | 1852 +++++++++++++++++++++++++=
-++++++
->  arch/arm64/kvm/guest.c                  |   15 -
->  arch/arm64/kvm/handle_exit.c            |   29 +-
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  127 ++-
->  arch/arm64/kvm/hyp/include/nvhe/mm.h    |    1 +
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c      |   11 +
->  arch/arm64/kvm/hyp/nvhe/mm.c            |   83 +-
->  arch/arm64/kvm/hyp/nvhe/setup.c         |   27 +-
->  arch/arm64/kvm/hyp/nvhe/switch.c        |    2 +-
->  arch/arm64/kvm/hyp/nvhe/tlb.c           |   30 +
->  arch/arm64/kvm/hyp/pgtable.c            |   63 +-
->  arch/arm64/kvm/hyp/vhe/tlb.c            |   28 +
->  arch/arm64/kvm/mmu.c                    |  102 +-
->  arch/arm64/kvm/nested.c                 |   11 +-
->  arch/arm64/kvm/pmu-emul.c               |   37 +-
->  arch/arm64/kvm/pmu.c                    |   18 +
->  arch/arm64/kvm/reset.c                  |   25 +-
->  arch/arm64/kvm/sys_regs.c               |   15 +
->  arch/arm64/kvm/trace_arm.h              |   26 +
->  arch/arm64/kvm/vgic/vgic.h              |    2 -
->  arch/arm64/tools/cpucaps                |    1 +
->  arch/arm64/tools/sysreg                 |  129 +++
->  arch/mips/include/asm/kvm_host.h        |    3 +-
->  arch/mips/kvm/mips.c                    |   12 +-
->  arch/riscv/kvm/mmu.c                    |    6 -
->  arch/x86/include/asm/kvm_host.h         |    6 +-
->  arch/x86/kvm/mmu/mmu.c                  |   28 +-
->  arch/x86/kvm/mmu/mmu_internal.h         |    3 -
->  arch/x86/kvm/x86.c                      |    2 +-
->  drivers/perf/arm_pmuv3.c                |    2 +
->  include/kvm/arm_pmu.h                   |    4 +-
->  include/linux/kvm_host.h                |   24 +-
->  virt/kvm/Kconfig                        |    3 -
->  virt/kvm/kvm_main.c                     |   35 +-
->  46 files changed, 2993 insertions(+), 328 deletions(-)
->
-
+I think it needs to be explicit, i.e. needs the admin to opt-in to the unsa=
+fe
+behavior.
