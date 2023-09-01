@@ -1,176 +1,199 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B1E8187C
-	for <kvmarm@lists.linux.dev>; Fri,  1 Sep 2023 03:45:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693539955; x=1725075955;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=dQBtg8NKz/pLl187/eYnyafMQC+Yh2bQyqEr25y1Bps=;
-  b=YohkZfL/VAzFFK4DnQgPAOhLhLKGcEGkSsltUkZoqX6ps4L1oo/n/OlH
-   MfU1vWVDkc0DzwD3vOh3SlOYlvK/2rP0qrvyilkweAPDQoy+b+0mv6FgB
-   UVIZsqaYLSL1NdxJKKacODvufJN3BAQWTSKAmNJApvdsD4wgqwa+GRQ1n
-   Rg0iCPE6y/XwoO6pykO0wSVTZ8tmHr+LM0f4Iz8sJ4PiGOe22oqAFaYZR
-   QkQhUiDLoKkz+5m2TWByGmqko6ngu+2JYHyosMjHmRvgxuElgoo7bDGoU
-   7srBZZJchfebDtsUE0PMpRYTUonR/OBSN65g3XjwOV8ZjqFb7QW/I9rrf
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10819"; a="356441892"
-X-IronPort-AV: E=Sophos;i="6.02,218,1688454000"; 
-   d="scan'208";a="356441892"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2023 20:45:54 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10819"; a="742962743"
-X-IronPort-AV: E=Sophos;i="6.02,218,1688454000"; 
-   d="scan'208";a="742962743"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.93.2.44]) ([10.93.2.44])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2023 20:45:45 -0700
-Message-ID: <f7aaf097-6f83-0ee9-e16d-713d392b2299@linux.intel.com>
-Date: Fri, 1 Sep 2023 11:45:43 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4BBC946B
+	for <kvmarm@lists.linux.dev>; Fri,  1 Sep 2023 08:20:38 +0000 (UTC)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id B16B32185C;
+	Fri,  1 Sep 2023 08:20:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1693556430; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=0WI96qvBSKjcD8skIYDzJyfhIXrX2VNlBg1bDAXSO7w=;
+	b=r4AvfguvEQvHBhS4L8lDsEaveieeJTkNCYi5f+9IRURkHs9QHXGXU55bgZKYP/UIN96eLm
+	Su7gVEZFmwF5EXNaNlCErp7Hgj8GQqdQewKT6RBq+dcvYVgxoLUZe9WovHMiX8iQwt+NsA
+	NGR32KTwfyM1j9J07mti1C+WlqZc3DM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1693556430;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=0WI96qvBSKjcD8skIYDzJyfhIXrX2VNlBg1bDAXSO7w=;
+	b=LDBeIJn7DjHmpeWPe/JUiDen1A1u3hmJEXiXvjRyh5pbOBnd20g14NvrGZHMhmcFppSIaI
+	jb3axaR9hQtT2aCA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 27C7D1358B;
+	Fri,  1 Sep 2023 08:20:30 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id M/8FCc6e8WSYGwAAMHmgww
+	(envelope-from <vbabka@suse.cz>); Fri, 01 Sep 2023 08:20:30 +0000
+From: Vlastimil Babka <vbabka@suse.cz>
+To: seanjc@google.com
+Cc: ackerleytng@google.com,
+	akpm@linux-foundation.org,
+	anup@brainfault.org,
+	aou@eecs.berkeley.edu,
+	chao.p.peng@linux.intel.com,
+	chenhuacai@kernel.org,
+	david@redhat.com,
+	isaku.yamahata@gmail.com,
+	jarkko@kernel.org,
+	jmorris@namei.org,
+	kirill.shutemov@linux.intel.com,
+	kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	liam.merwick@oracle.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mips@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-riscv@lists.infradead.org,
+	linux-security-module@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	mail@maciej.szmigiero.name,
+	maz@kernel.org,
+	michael.roth@amd.com,
+	mpe@ellerman.id.au,
+	oliver.upton@linux.dev,
+	palmer@dabbelt.com,
+	paul.walmsley@sifive.com,
+	paul@paul-moore.com,
+	pbonzini@redhat.com,
+	qperret@google.com,
+	serge@hallyn.com,
+	tabba@google.com,
+	vannapurve@google.com,
+	vbabka@suse.cz,
+	wei.w.wang@intel.com,
+	willy@infradead.org,
+	yu.c.zhang@linux.intel.com
+Subject: [PATCH gmem FIXUP] mm, compaction: make testing mapping_unmovable() safe
+Date: Fri,  1 Sep 2023 10:20:26 +0200
+Message-ID: <20230901082025.20548-2-vbabka@suse.cz>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: seanjc@google.com, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
- linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
- pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev,
- chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
- paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
- willy@infradead.org, akpm@linux-foundation.org, paul@paul-moore.com,
- jmorris@namei.org, serge@hallyn.com, chao.p.peng@linux.intel.com,
- tabba@google.com, jarkko@kernel.org, yu.c.zhang@linux.intel.com,
- vannapurve@google.com, mail@maciej.szmigiero.name, vbabka@suse.cz,
- david@redhat.com, qperret@google.com, michael.roth@amd.com,
- wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com,
- kirill.shutemov@linux.intel.com
-References: <diqz5y4wfpj0.fsf@ackerleytng-ctop.c.googlers.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <diqz5y4wfpj0.fsf@ackerleytng-ctop.c.googlers.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+As Kirill pointed out, mapping can be removed under us due to
+truncation. Test it under folio lock as already done for the async
+compaction / dirty folio case. To prevent locking every folio with
+mapping to do the test, do it only for unevictable folios, as we can
+expect the unmovable mapping folios are also unevictable - it is the
+case for guest memfd folios.
 
+Also incorporate comment update suggested by Matthew.
 
-On 8/31/2023 12:44 AM, Ackerley Tng wrote:
-> Binbin Wu <binbin.wu@linux.intel.com> writes:
->
->>> <snip>
->>>
->>> +static long kvm_gmem_allocate(struct inode *inode, loff_t offset, loff_t len)
->>> +{
->>> +	struct address_space *mapping = inode->i_mapping;
->>> +	pgoff_t start, index, end;
->>> +	int r;
->>> +
->>> +	/* Dedicated guest is immutable by default. */
->>> +	if (offset + len > i_size_read(inode))
->>> +		return -EINVAL;
->>> +
->>> +	filemap_invalidate_lock_shared(mapping);
->>> +
->>> +	start = offset >> PAGE_SHIFT;
->>> +	end = (offset + len) >> PAGE_SHIFT;
->>> +
->>> +	r = 0;
->>> +	for (index = start; index < end; ) {
->>> +		struct folio *folio;
->>> +
->>> +		if (signal_pending(current)) {
->>> +			r = -EINTR;
->>> +			break;
->>> +		}
->>> +
->>> +		folio = kvm_gmem_get_folio(inode, index);
->>> +		if (!folio) {
->>> +			r = -ENOMEM;
->>> +			break;
->>> +		}
->>> +
->>> +		index = folio_next_index(folio);
->>> +
->>> +		folio_unlock(folio);
->>> +		folio_put(folio);
->> May be a dumb question, why we get the folio and then put it immediately?
->> Will it make the folio be released back to the page allocator?
->>
-> I was wondering this too, but it is correct.
->
-> In filemap_grab_folio(), the refcount is incremented in three places:
->
-> + When the folio is created in filemap_alloc_folio(), it is given a
->    refcount of 1 in
->
->      filemap_alloc_folio() -> folio_alloc() -> __folio_alloc_node() ->
->      __folio_alloc() -> __alloc_pages() -> get_page_from_freelist() ->
->      prep_new_page() -> post_alloc_hook() -> set_page_refcounted()
->
-> + Then, in filemap_add_folio(), the refcount is incremented twice:
->
->      + The first is from the filemap (1 refcount per page if this is a
->        hugepage):
->
->          filemap_add_folio() -> __filemap_add_folio() -> folio_ref_add()
->
->      + The second is a refcount from the lru list
->
->          filemap_add_folio() -> folio_add_lru() -> folio_get() ->
->          folio_ref_inc()
->
-> In the other path, if the folio exists in the page cache (filemap), the
-> refcount is also incremented through
->
->      filemap_grab_folio() -> __filemap_get_folio() -> filemap_get_entry()
->      -> folio_try_get_rcu()
->
-> I believe all the branches in kvm_gmem_get_folio() are taking a refcount
-> on the folio while the kernel does some work on the folio like clearing
-> the folio in clear_highpage() or getting the next index, and then when
-> done, the kernel does folio_put().
->
-> This pattern is also used in shmem and hugetlb. :)
+Fixes: 3424873596ce ("mm: Add AS_UNMOVABLE to mark mapping as completely unmovable")
+Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+---
+Feel free to squash into 3424873596ce.
 
-Thanks for your explanation. It helps a lot.
+ mm/compaction.c | 49 ++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 32 insertions(+), 17 deletions(-)
 
->
-> I'm not sure whose refcount the folio_put() in kvm_gmem_allocate() is
-> dropping though:
->
-> + The refcount for the filemap depends on whether this is a hugepage or
->    not, but folio_put() strictly drops a refcount of 1.
-> + The refcount for the lru list is just 1, but doesn't the page still
->    remain in the lru list?
-
-I guess the refcount drop here is the one get on the fresh allocation.
-Now the filemap has grabbed the folio, so the lifecycle of the folio now 
-is decided by the filemap/inode?
-
->
->>> +
->>> +		/* 64-bit only, wrapping the index should be impossible. */
->>> +		if (WARN_ON_ONCE(!index))
->>> +			break;
->>> +
->>> +		cond_resched();
->>> +	}
->>> +
->>> +	filemap_invalidate_unlock_shared(mapping);
->>> +
->>> +	return r;
->>> +}
->>> +
->>>
->>> <snip>
+diff --git a/mm/compaction.c b/mm/compaction.c
+index a3d2b132df52..e0e439b105b5 100644
+--- a/mm/compaction.c
++++ b/mm/compaction.c
+@@ -862,6 +862,7 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
+ 
+ 	/* Time to isolate some pages for migration */
+ 	for (; low_pfn < end_pfn; low_pfn++) {
++		bool is_dirty, is_unevictable;
+ 
+ 		if (skip_on_failure && low_pfn >= next_skip_pfn) {
+ 			/*
+@@ -1047,10 +1048,6 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
+ 		if (!mapping && (folio_ref_count(folio) - 1) > folio_mapcount(folio))
+ 			goto isolate_fail_put;
+ 
+-		/* The mapping truly isn't movable. */
+-		if (mapping && mapping_unmovable(mapping))
+-			goto isolate_fail_put;
+-
+ 		/*
+ 		 * Only allow to migrate anonymous pages in GFP_NOFS context
+ 		 * because those do not depend on fs locks.
+@@ -1062,8 +1059,10 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
+ 		if (!folio_test_lru(folio))
+ 			goto isolate_fail_put;
+ 
++		is_unevictable = folio_test_unevictable(folio);
++
+ 		/* Compaction might skip unevictable pages but CMA takes them */
+-		if (!(mode & ISOLATE_UNEVICTABLE) && folio_test_unevictable(folio))
++		if (!(mode & ISOLATE_UNEVICTABLE) && is_unevictable)
+ 			goto isolate_fail_put;
+ 
+ 		/*
+@@ -1075,26 +1074,42 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
+ 		if ((mode & ISOLATE_ASYNC_MIGRATE) && folio_test_writeback(folio))
+ 			goto isolate_fail_put;
+ 
+-		if ((mode & ISOLATE_ASYNC_MIGRATE) && folio_test_dirty(folio)) {
+-			bool migrate_dirty;
++		is_dirty = folio_test_dirty(folio);
++
++		if (((mode & ISOLATE_ASYNC_MIGRATE) && is_dirty)
++		    || (mapping && is_unevictable)) {
++			bool migrate_dirty = true;
++			bool is_unmovable;
+ 
+ 			/*
+-			 * Only pages without mappings or that have a
+-			 * ->migrate_folio callback are possible to migrate
+-			 * without blocking. However, we can be racing with
+-			 * truncation so it's necessary to lock the page
+-			 * to stabilise the mapping as truncation holds
+-			 * the page lock until after the page is removed
+-			 * from the page cache.
++			 * Only folios without mappings or that have
++			 * a ->migrate_folio callback are possible to migrate
++			 * without blocking.
++			 *
++			 * Folios from unmovable mappings are not migratable.
++			 *
++			 * However, we can be racing with truncation, which can
++			 * free the mapping that we need to check. Truncation
++			 * holds the folio lock until after the folio is removed
++			 * from the page so holding it ourselves is sufficient.
++			 *
++			 * To avoid this folio locking to inspect every folio
++			 * with mapping for being unmovable, we assume every
++			 * such folio is also unevictable, which is a cheaper
++			 * test. If our assumption goes wrong, it's not a bug,
++			 * just potentially wasted cycles.
+ 			 */
+ 			if (!folio_trylock(folio))
+ 				goto isolate_fail_put;
+ 
+ 			mapping = folio_mapping(folio);
+-			migrate_dirty = !mapping ||
+-					mapping->a_ops->migrate_folio;
++			if ((mode & ISOLATE_ASYNC_MIGRATE) && is_dirty) {
++				migrate_dirty = !mapping ||
++						mapping->a_ops->migrate_folio;
++			}
++			is_unmovable = mapping && mapping_unmovable(mapping);
+ 			folio_unlock(folio);
+-			if (!migrate_dirty)
++			if (!migrate_dirty || is_unmovable)
+ 				goto isolate_fail_put;
+ 		}
+ 
+-- 
+2.41.0
 
