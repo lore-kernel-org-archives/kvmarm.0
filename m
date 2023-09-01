@@ -1,158 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9787AD3F
-	for <kvmarm@lists.linux.dev>; Fri,  1 Sep 2023 13:04:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2463C433C8;
-	Fri,  1 Sep 2023 13:04:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693573472;
-	bh=ianlJYs3YdSH85UBoj+wspIhbGLauzc+UZvcFAKV3M0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AuDK154A5mN38XmZcqBSsdt7b45OCeP/L7FMPgXrQ2FJr8v8DrDZ+wtPSDG0e/7mo
-	 DHbexUmbSjjiD6EzwTJld7lOwk0OdS8oqtvH02Z9Ei9ydEMi1QaGGNr7dDR0FmLEb0
-	 xwr3JwJjmOgbdryrcv5laspvHyIdVF++NqAKNCzOnq4CzgcT4oCrFOpduGVxCcZIiG
-	 eXF4H/OshyOQoeClRFpE9Vm/GsrqVnwelPulZehbpXDwQ3eKF1Y8dzsnUnzxgZ+nXy
-	 W0S2znRA9gAQn9rlR6kzbC7ak5ssSE8yIEqEL1rWP5AC9ETIN8qNVM5OzBnryiVO8p
-	 Z+0gqfx1fKD3w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qc3p8-009xKP-6M;
-	Fri, 01 Sep 2023 14:04:30 +0100
-Date: Fri, 01 Sep 2023 14:04:29 +0100
-Message-ID: <86ttsedoyq.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mostafa Saleh <smostafa@google.com>, 	justinstitt@google.com
-Cc: catalin.marinas@arm.com,
-	will@kernel.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	oliver.upton@linux.dev,
-	kristina.martsenko@arm.com,
-	broonie@kernel.org,
-	quic_pkondeti@quicinc.com
-Subject: Re: [PATCH] Revert "arm64/sysreg: refactor deprecated strncpy"
-In-Reply-To: <ZPHRlmBHZnFAeBeI@google.com>
-References: <20230831162227.2307863-1-smostafa@google.com>
-	<86v8cudtky.wl-maz@kernel.org>
-	<ZPHRlmBHZnFAeBeI@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970CFC15A
+	for <kvmarm@lists.linux.dev>; Fri,  1 Sep 2023 16:46:33 +0000 (UTC)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-26f9107479bso2482615a91.1
+        for <kvmarm@lists.linux.dev>; Fri, 01 Sep 2023 09:46:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1693586793; x=1694191593; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xCon5474F9WwphxhfgFhUzbwn0ALvK9xFv6P5Xz3AWM=;
+        b=5Rj+G73Gd6P8uZJxphuODvPgl/9GSG7AOAVrH+5BG2dtu6dqDbVRFzj24WYZwwq5Em
+         WXmJCegM3TwfeHVeuyxE+NIdw54ltVeecU4enr/AOWQmCA9kZBpp7bNuhhQq0xlhliSy
+         2FwTlUP2xQQTFCuAWJbdKXH2MCRPTRDr/rtKUa2os+FZYXaOZuKPah8PslOfAjmroouP
+         8a7mgEI2AHtl7SfmpJgHRiSL00sgKleA+AbbSVs8R3E8u0x/oAGBXd4sprVu9zhU044y
+         oSIMLddG0MTQT2HWoSFZjf0fFHMoz3RTlDwH3JPkis6EHWwWF52kfy+OewO+eBCurh9s
+         6MhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693586793; x=1694191593;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xCon5474F9WwphxhfgFhUzbwn0ALvK9xFv6P5Xz3AWM=;
+        b=BZgqcHIDo6OBQhX5AEQbF+yJKbUFHfPp5RNvdJPTBi+J0mTNEETXUd+EWlzESKMaOV
+         1AZAzP4Nz+r/ZgVtcgzjfv0Y+owLac/b/ZIt5z08ldCrSK3Nej0oReaWh+dS7kEcXbqv
+         Y2JyZ9Yu+/19OD/qr2ATkWlk/dS7H9d2PKfY/4q2Mxf37T37p+3BJe8qrIrsjomXFQ32
+         lTrTdJ1yxjm/CUQmfB3XxCKdcYHUs1nukWZaQ5qlS/776o5kt/FpfqzSvx/BuFzvIYRT
+         5iseOVwNN1iW+0cEsFgGqUDT3fsLeetIwT1x6g2yGz9ujaVI1EyHWzICeHjQk1RnevH7
+         mVCw==
+X-Gm-Message-State: AOJu0YwLL3+E0s02bH9jNUUcuERLLTv+Mt/MSRVUfQCwKrbjjyzzgyQx
+	kj+ZCVdpElBuP55EjEE/ugXOQFrW5nlx1kmu7Q==
+X-Google-Smtp-Source: AGHT+IE7IWuztjp33Ush39YmsLck94qkQHf2UcyeDE5trFHuf5V0W6HBwaqY0C7q2Vl17GPr3mAIvAb6tklgxvjU0g==
+X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:13f8])
+ (user=ackerleytng job=sendgmr) by 2002:a17:902:e887:b0:1bc:e6a:205e with SMTP
+ id w7-20020a170902e88700b001bc0e6a205emr1066486plg.5.1693586792693; Fri, 01
+ Sep 2023 09:46:32 -0700 (PDT)
+Date: Fri, 01 Sep 2023 16:46:31 +0000
+In-Reply-To: <f7aaf097-6f83-0ee9-e16d-713d392b2299@linux.intel.com> (message
+ from Binbin Wu on Fri, 1 Sep 2023 11:45:43 +0800)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: smostafa@google.com, justinstitt@google.com, catalin.marinas@arm.com, will@kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, kristina.martsenko@arm.com, broonie@kernel.org, quic_pkondeti@quicinc.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+Message-ID: <diqz34zxg7tk.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+From: Ackerley Tng <ackerleytng@google.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: kvm@vger.kernel.org, david@redhat.com, yu.c.zhang@linux.intel.com, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, chao.p.peng@linux.intel.com, 
+	linux-riscv@lists.infradead.org, isaku.yamahata@gmail.com, maz@kernel.org, 
+	paul@paul-moore.com, anup@brainfault.org, chenhuacai@kernel.org, 
+	jmorris@namei.org, willy@infradead.org, wei.w.wang@intel.com, 
+	tabba@google.com, jarkko@kernel.org, serge@hallyn.com, 
+	mail@maciej.szmigiero.name, aou@eecs.berkeley.edu, vbabka@suse.cz, 
+	michael.roth@amd.com, paul.walmsley@sifive.com, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, qperret@google.com, seanjc@google.com, 
+	liam.merwick@oracle.com, linux-mips@vger.kernel.org, oliver.upton@linux.dev, 
+	linux-security-module@vger.kernel.org, palmer@dabbelt.com, 
+	kvm-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org, 
+	pbonzini@redhat.com, akpm@linux-foundation.org, vannapurve@google.com, 
+	linuxppc-dev@lists.ozlabs.org, kirill.shutemov@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 01 Sep 2023 12:57:10 +0100,
-Mostafa Saleh <smostafa@google.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Fri, Sep 01, 2023 at 12:24:45PM +0100, Marc Zyngier wrote:
-> > Hi Mostafa,
-> > 
-> > On Thu, 31 Aug 2023 17:22:27 +0100,
-> > Mostafa Saleh <smostafa@google.com> wrote:
-> > > 
-> > > This reverts commit d232606773a0b09ec7f1ffc25f63abe801d011fd.
-> > > 
-> > > Using strscpy is not correct in this context and the commit
-> > > assumption is not right "strncpy is deprecated for use on
-> > > NUL-terminated destination strings".
-> > > 
-> > > strncpy is used here to copy parts of the string(cmdline) separated
-> > > by spaces into the buffer and not a NULL terminated string.
-> > > 
-> > > This breaks the arm options "kvm-arm.mode=protected, arm64.nobti ..."
-> > > 
-> > > Signed-off-by: Mostafa Saleh <smostafa@google.com>
-> > > ---
-> > >  arch/arm64/kernel/idreg-override.c | 6 +++---
-> > >  1 file changed, 3 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
-> > > index aee12c75b738..2fe2491b692c 100644
-> > > --- a/arch/arm64/kernel/idreg-override.c
-> > > +++ b/arch/arm64/kernel/idreg-override.c
-> > > @@ -262,9 +262,9 @@ static __init void __parse_cmdline(const char *cmdline, bool parse_aliases)
-> > >  		if (!len)
-> > >  			return;
-> > >  
-> > > -		len = strscpy(buf, cmdline, ARRAY_SIZE(buf));
-> > > -		if (len == -E2BIG)
-> > > -			len = ARRAY_SIZE(buf) - 1;
-> > > +		len = min(len, ARRAY_SIZE(buf) - 1);
-> > > +		strncpy(buf, cmdline, len);
-> > > +		buf[len] = 0;
-> > >  
-> > >  		if (strcmp(buf, "--") == 0)
-> > >  			return;
-> > 
-> > Instead of completely reverting the patch, maybe something like the
-> > hack below (completely untested), so that we can still get rid of
-> > another instance of strncpy(), and yet bring back some sanity in the
-> > logic?
-> I was thinking of something similar, but I see we limit the len anyway
-> by the buffer size - 1 and force the NUL at the end so it should be
-> safe, unless the goal is to get rid of strncpy all the way, in this
-> case we can do it as you proposed.
-> 
-> There is also a V3 of the original patch which uses memcpy instead.
-> https://lore.kernel.org/all/20230831-strncpy-arch-arm64-v3-1-cdbb1e7ea5e1@google.com/
+Binbin Wu <binbin.wu@linux.intel.com> writes:
 
-Ah, that one would actually get my vote, because it does exactly what
-I actually intended this piece of code to do.
-
-Justin, do you mind rebasing your v3 on top of to restore the
-currently broken functionality?
+> <snip>
 >
-> > Thanks,
-> > 
-> > 	M.
-> > 
-> > diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
-> > index aee12c75b738..be5c778a3f14 100644
-> > --- a/arch/arm64/kernel/idreg-override.c
-> > +++ b/arch/arm64/kernel/idreg-override.c
-> > @@ -262,9 +262,8 @@ static __init void __parse_cmdline(const char *cmdline, bool parse_aliases)
-> >  		if (!len)
-> >  			return;
-> >  
-> > -		len = strscpy(buf, cmdline, ARRAY_SIZE(buf));
-> > -		if (len == -E2BIG)
-> > -			len = ARRAY_SIZE(buf) - 1;
-> > +		len = min(len, ARRAY_SIZE(buf) - 1);
-> > +		strscpy(buf, cmdline, len);
-> >  
-> >  		if (strcmp(buf, "--") == 0)
-> >  			return;
-> > 
-> > 
-> > -- 
-> >
-> 
-> Tested-by: Mostafa Saleh <smostafa@google.com>
+>>
+>> I'm not sure whose refcount the folio_put() in kvm_gmem_allocate() is
+>> dropping though:
+>>
+>> + The refcount for the filemap depends on whether this is a hugepage or
+>>    not, but folio_put() strictly drops a refcount of 1.
+>> + The refcount for the lru list is just 1, but doesn't the page still
+>>    remain in the lru list?
+>
+> I guess the refcount drop here is the one get on the fresh allocation.
+> Now the filemap has grabbed the folio, so the lifecycle of the folio now 
+> is decided by the filemap/inode?
+>
 
-Cheers Mostafa.
+This makes sense! So folio_put() here is saying, I'm not using this
+folio anymore, but the filemap and the lru list are stil using the
+folio.
 
-You could also just pick it, and repost it as a v2 (I really don't
-mind). It should give Will and Catalin a choice of implementations
-(and an opportunity for some additional bike-shedding ;-)).
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> <snip>
