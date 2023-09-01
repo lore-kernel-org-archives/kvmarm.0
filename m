@@ -1,140 +1,123 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF658BF8
-	for <kvmarm@lists.linux.dev>; Fri,  1 Sep 2023 08:23:32 +0000 (UTC)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id CBCAF1F45E;
-	Fri,  1 Sep 2023 08:23:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1693556604; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lM2jFMiCbU/7Z0Wt66YsVsUtlY4aIj0FUbivaBixA/c=;
-	b=zT4zGINVx2k3wPqz3jcmE9bmJBpBcsDBUwenKzhLerIp+oH2aCkG4+EXh39zRNryjQv5Db
-	syu8c53NOsHAVW9SIMV7rmXaawFxBmlGIS7oN+eGtRpy7NQAkXpdI57c9wkvRp8eiDiXja
-	uA4epJ/r7clJCygmuQc278PsV8l56iM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1693556604;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lM2jFMiCbU/7Z0Wt66YsVsUtlY4aIj0FUbivaBixA/c=;
-	b=ZsrMXAmASwR20bAW12DsiBEXD871qEuKP0anx4duKH2O41WOTWfcG8WLKUJiaYTSgmrfs1
-	lQlapOLm5eLYniDg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3A66A1358B;
-	Fri,  1 Sep 2023 08:23:24 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id BOk4DXyf8WREHQAAMHmgww
-	(envelope-from <vbabka@suse.cz>); Fri, 01 Sep 2023 08:23:24 +0000
-Message-ID: <2d9312bf-a5ad-0427-c197-fef6ea5cfe0a@suse.cz>
-Date: Fri, 1 Sep 2023 10:23:23 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02736A943
+	for <kvmarm@lists.linux.dev>; Fri,  1 Sep 2023 11:24:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40438C433C8;
+	Fri,  1 Sep 2023 11:24:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693567488;
+	bh=ISlbIFDzUSUgg9q15hbTTknP8Yy5t0vmuvU3sSDJ3z4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fQdJjKHl0OU1E81MEcl1CatFCNww7Ku8s37FGuhALWAOJVAycEzyRmDWnZKo+nBCA
+	 IlScbaGvU7SgexkowRFnBizO62vVfjtqMlQaUCZeRvaZbcb6MUWrRGsum6lSC9Jx3A
+	 Seq87tiv0NVnMLWb2t+5MQcoXeq6GabXJeNyolcsg2tD9exQk3ugk9g41iHh9kvvGm
+	 84U0kL7kQFkGkbr0tiLVR7ADbD9BUI7Vv8kASlyPGdbIAuNDEfL7ro0UM3rikvG96J
+	 97GaIDK6vDsNCgXeoaYVnDUhg19OgxPWTvm41chErXJXIleGad6DQRHPgZv44NFmBk
+	 TWjq9zxUgAPuA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qc2Gb-009vXb-FT;
+	Fri, 01 Sep 2023 12:24:45 +0100
+Date: Fri, 01 Sep 2023 12:24:45 +0100
+Message-ID: <86v8cudtky.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: catalin.marinas@arm.com,
+	will@kernel.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	oliver.upton@linux.dev,
+	kristina.martsenko@arm.com,
+	broonie@kernel.org,
+	quic_pkondeti@quicinc.com,
+	justinstitt@google.com
+Subject: Re: [PATCH] Revert "arm64/sysreg: refactor deprecated strncpy"
+In-Reply-To: <20230831162227.2307863-1-smostafa@google.com>
+References: <20230831162227.2307863-1-smostafa@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [RFC PATCH v11 10/29] mm: Add AS_UNMOVABLE to mark mapping as
- completely unmovable
-To: Matthew Wilcox <willy@infradead.org>,
- "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
- Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Andrew Morton <akpm@linux-foundation.org>, Paul Moore <paul@paul-moore.com>,
- James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linux-security-module@vger.kernel.org,
- linux-kernel@vger.kernel.org, Chao Peng <chao.p.peng@linux.intel.com>,
- Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
- Yu Zhang <yu.c.zhang@linux.intel.com>,
- Vishal Annapurve <vannapurve@google.com>,
- Ackerley Tng <ackerleytng@google.com>,
- Maciej Szmigiero <mail@maciej.szmigiero.name>,
- David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
- Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
- Liam Merwick <liam.merwick@oracle.com>,
- Isaku Yamahata <isaku.yamahata@gmail.com>
-References: <20230718234512.1690985-1-seanjc@google.com>
- <20230718234512.1690985-11-seanjc@google.com>
- <20230725102403.xywjqlhyqkrzjok6@box.shutemov.name>
- <ZL/Fa4W2Ne9EVxoh@casper.infradead.org>
-Content-Language: en-US
-From: Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <ZL/Fa4W2Ne9EVxoh@casper.infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: smostafa@google.com, catalin.marinas@arm.com, will@kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, kristina.martsenko@arm.com, broonie@kernel.org, quic_pkondeti@quicinc.com, justinstitt@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 7/25/23 14:51, Matthew Wilcox wrote:
-> On Tue, Jul 25, 2023 at 01:24:03PM +0300, Kirill A . Shutemov wrote:
->> On Tue, Jul 18, 2023 at 04:44:53PM -0700, Sean Christopherson wrote:
->> > diff --git a/mm/compaction.c b/mm/compaction.c
->> > index dbc9f86b1934..a3d2b132df52 100644
->> > --- a/mm/compaction.c
->> > +++ b/mm/compaction.c
->> > @@ -1047,6 +1047,10 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
->> >  		if (!mapping && (folio_ref_count(folio) - 1) > folio_mapcount(folio))
->> >  			goto isolate_fail_put;
->> >  
->> > +		/* The mapping truly isn't movable. */
->> > +		if (mapping && mapping_unmovable(mapping))
->> > +			goto isolate_fail_put;
->> > +
->> 
->> I doubt that it is safe to dereference mapping here. I believe the folio
->> can be truncated from under us and the mapping freed with the inode.
->> 
->> The folio has to be locked to dereference mapping safely (given that the
->> mapping is still tied to the folio).
-> 
-> There's even a comment to that effect later on in the function:
-> 
->                         /*
->                          * Only pages without mappings or that have a
->                          * ->migrate_folio callback are possible to migrate
->                          * without blocking. However, we can be racing with
->                          * truncation so it's necessary to lock the page
->                          * to stabilise the mapping as truncation holds
->                          * the page lock until after the page is removed
->                          * from the page cache.
->                          */
-> 
-> (that could be reworded to make it clear how dangerous dereferencing
-> ->mapping is without the lock ... and it does need to be changed to say
-> "folio lock" instead of "page lock", so ...)
-> 
-> How does this look?
-> 
->                         /*
->                          * Only folios without mappings or that have
->                          * a ->migrate_folio callback are possible to
->                          * migrate without blocking. However, we can
->                          * be racing with truncation, which can free
->                          * the mapping.  Truncation holds the folio lock
->                          * until after the folio is removed from the page
->                          * cache so holding it ourselves is sufficient.
->                          */
+Hi Mostafa,
 
-Incorporated to my attempt at a fix (posted separately per the requested
-process):
+On Thu, 31 Aug 2023 17:22:27 +0100,
+Mostafa Saleh <smostafa@google.com> wrote:
+> 
+> This reverts commit d232606773a0b09ec7f1ffc25f63abe801d011fd.
+> 
+> Using strscpy is not correct in this context and the commit
+> assumption is not right "strncpy is deprecated for use on
+> NUL-terminated destination strings".
+> 
+> strncpy is used here to copy parts of the string(cmdline) separated
+> by spaces into the buffer and not a NULL terminated string.
+> 
+> This breaks the arm options "kvm-arm.mode=protected, arm64.nobti ..."
+> 
+> Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> ---
+>  arch/arm64/kernel/idreg-override.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
+> index aee12c75b738..2fe2491b692c 100644
+> --- a/arch/arm64/kernel/idreg-override.c
+> +++ b/arch/arm64/kernel/idreg-override.c
+> @@ -262,9 +262,9 @@ static __init void __parse_cmdline(const char *cmdline, bool parse_aliases)
+>  		if (!len)
+>  			return;
+>  
+> -		len = strscpy(buf, cmdline, ARRAY_SIZE(buf));
+> -		if (len == -E2BIG)
+> -			len = ARRAY_SIZE(buf) - 1;
+> +		len = min(len, ARRAY_SIZE(buf) - 1);
+> +		strncpy(buf, cmdline, len);
+> +		buf[len] = 0;
+>  
+>  		if (strcmp(buf, "--") == 0)
+>  			return;
 
-https://lore.kernel.org/all/20230901082025.20548-2-vbabka@suse.cz/
+Instead of completely reverting the patch, maybe something like the
+hack below (completely untested), so that we can still get rid of
+another instance of strncpy(), and yet bring back some sanity in the
+logic?
+
+Thanks,
+
+	M.
+
+diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
+index aee12c75b738..be5c778a3f14 100644
+--- a/arch/arm64/kernel/idreg-override.c
++++ b/arch/arm64/kernel/idreg-override.c
+@@ -262,9 +262,8 @@ static __init void __parse_cmdline(const char *cmdline, bool parse_aliases)
+ 		if (!len)
+ 			return;
+ 
+-		len = strscpy(buf, cmdline, ARRAY_SIZE(buf));
+-		if (len == -E2BIG)
+-			len = ARRAY_SIZE(buf) - 1;
++		len = min(len, ARRAY_SIZE(buf) - 1);
++		strscpy(buf, cmdline, len);
+ 
+ 		if (strcmp(buf, "--") == 0)
+ 			return;
+
+
+-- 
+Without deviation from the norm, progress is not possible.
