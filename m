@@ -1,142 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BB7D7E
-	for <kvmarm@lists.linux.dev>; Mon,  4 Sep 2023 09:57:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F895C433C8;
-	Mon,  4 Sep 2023 09:57:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693821448;
-	bh=KCgrMSpReKkomAvjrgAyI+M74AruhN3j2aeC3Jx7Y+g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MpQRi+AyB0glohPHvUIs5L0PJBy56ywLS/W3DOBlGZczOTro6uLRuZXW19unGTcYD
-	 Tp4cFFCkpNKYDGLzLltFyVr2zlrSidWZKX6Jqo5OA9+0G9uNbKE8HTBm7V4QF+XZAZ
-	 FsQmWEAin7RKf/Se/pjD6v3Dj17PeDCTchxVwQaYjPJE6j4y+W+K1oM8xFi6VZQjT9
-	 Qg4mHRo6TW7ULwrjc7A5lLZ+H3Q2BIdodMI++Tv30dspoBcLn03g9iKl+gQsYoPU2p
-	 Iju5S1r3VUsVfsYFQY/8rv22rkS4a4ekB77raDYFciJl30Rh3Ca2KZOEHJ1umIhBvF
-	 w+VvKYzOmRa4Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qd6Kj-00ANAe-VB;
-	Mon, 04 Sep 2023 10:57:26 +0100
-Date: Mon, 04 Sep 2023 10:57:24 +0100
-Message-ID: <86o7iidzwb.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Xu Zhao <zhaoxu.35@bytedance.com>
-Cc: oliver.upton@linux.dev,
-	james.morse@arm.com,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: Re: [RFC v2] KVM: arm/arm64: optimize vSGI injection performance
-In-Reply-To: <20230825015811.5292-1-zhaoxu.35@bytedance.com>
-References: <20230825015811.5292-1-zhaoxu.35@bytedance.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A7992100
+	for <kvmarm@lists.linux.dev>; Mon,  4 Sep 2023 11:16:02 +0000 (UTC)
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-31c6cd238e0so1331280f8f.0
+        for <kvmarm@lists.linux.dev>; Mon, 04 Sep 2023 04:16:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1693826161; x=1694430961; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=I9GCAlEvdvaQhIuQIQlH6uZieVhDq0JG0Q/Lab40q3Y=;
+        b=C2DiJEgo+izRqXXCIvea2GOKj2r73lCF+zHtd+837opPJcGZGXGHMsxOIsMwZ2wY/2
+         qyprdwEmfFRjIYnzB2dFI5EdC9JDRo2LVCXquUCW5PnBYeihf/wYOkQIfcw9j1iuo98V
+         IV3XhIunTMy1vEcRiqOtyDcbhFUS0hSBfnQR2FX2kNGM2dvRW+Lf0QN25D0fAAVa2kTR
+         778R6Nw2vzBRBwlV5pUn0epdIs7D5xYMNUkQF4gUFswGaJLDyteoDuM9QuYSKiScIBRY
+         DxXVvOhktAOX3YG+UH20DIsSPMRMvqwxhSyulOmVyO0s5tXp/TFO/uLE9pVHwV+KYeru
+         LOWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693826161; x=1694430961;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I9GCAlEvdvaQhIuQIQlH6uZieVhDq0JG0Q/Lab40q3Y=;
+        b=SshKymfNr7Us2WTHG4SXtUjDNyLFC/0k0tQNhWdEvZ55eHSPTZXkB3ViOKIc9q1WuH
+         +s2v2QOrR57ssYSnMqLblvhoX5NEUa0UjiGlZ6A1kH6cAAtN7DM06hFGegD4DgkZkMsu
+         5HRoCacfdmIjni7cxkdqkV3dBXAp7cs+kbYmCWTkGc2X1SQoLChC0ve74z7VvmKKosCf
+         fn/VNBetpIwfTstNQcPkV7ElyhZZqVc1TrTpJCk/GUzUStV2Hv4W4LUQbrZAeBAg2Rxd
+         UoEYWo4OlIuXpTFBCKRIiROP1II1wKZTffJR9h4ygdRkwI0er4EDBBknfwoZgH0kfmLZ
+         rtoA==
+X-Gm-Message-State: AOJu0Yy1Ajb9cTusv+etNnMReHVFMQ1wukFk1ccbIjA+jIqAT3SrU8CS
+	UyGATGVY4sesTQpZm07UC9sbkQ==
+X-Google-Smtp-Source: AGHT+IHR3qJF/WADy7jFXe6yIqtW0lGNRVyiw5VlYSS4H2pPf8Rp4EorJnHY9mZBl7rKv7MV9xXpWQ==
+X-Received: by 2002:adf:ee90:0:b0:319:6b56:94d9 with SMTP id b16-20020adfee90000000b003196b5694d9mr8511545wro.2.1693826161050;
+        Mon, 04 Sep 2023 04:16:01 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id x18-20020adfec12000000b0031989784d96sm14281097wrn.76.2023.09.04.04.15.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Sep 2023 04:15:59 -0700 (PDT)
+Date: Mon, 4 Sep 2023 13:15:56 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Haibo Xu <haibo1.xu@intel.com>
+Cc: xiaobo55x@gmail.com, Sean Christopherson <seanjc@google.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
+	Greentime Hu <greentime.hu@sifive.com>, wchen <waylingii@gmail.com>, 
+	Daniel Henrique Barboza <dbarboza@ventanamicro.com>, Ricardo Koller <ricarkol@google.com>, 
+	Vishal Annapurve <vannapurve@google.com>, David Matlack <dmatlack@google.com>, 
+	Aaron Lewis <aaronlewis@google.com>, Mingwei Zhang <mizhang@google.com>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Lei Wang <lei4.wang@intel.com>, Vipin Sharma <vipinsh@google.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, Like Xu <likexu@tencent.com>, Peter Gonda <pgonda@google.com>, 
+	Thomas Huth <thuth@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>, 
+	David Woodhouse <dwmw@amazon.co.uk>, Michal Luczaj <mhal@rbox.co>, 
+	zhang songyi <zhang.songyi@zte.com.cn>, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v2 1/8] KVM: selftests: Unify the codes for guest
+ exception handling
+Message-ID: <20230904-ba5051a5bf17d17f2711d7dc@orel>
+References: <cover.1693659382.git.haibo1.xu@intel.com>
+ <7affb0387d7272573f7093de7887872e1fb5979b.1693659382.git.haibo1.xu@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: zhaoxu.35@bytedance.com, oliver.upton@linux.dev, james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7affb0387d7272573f7093de7887872e1fb5979b.1693659382.git.haibo1.xu@intel.com>
 
-On Fri, 25 Aug 2023 02:58:11 +0100,
-Xu Zhao <zhaoxu.35@bytedance.com> wrote:
-> 
-> In a VM with more than 16 vCPUs (with multiple aff0 groups), if the target 
-> vCPU of a vSGI exceeds 16th vCPU, kvm needs to iterate from vCPU0 until 
-> the target vCPU is found. However, affinity routing information is provided 
-> by the ICC_SGI* register, which allows kvm to bypass other aff0 groups, 
-> iterating only on the aff0 group that the target vCPU located. It reduces 
-> the maximum iteration times from the total number of vCPUs to 16, or even 
-> 8 times.
-> 
-> This patch aims to optimize the vSGI injecting performance of injecting 
-> target exceeds 16th vCPU in vm with more than 16 vCPUs.
+On Sat, Sep 02, 2023 at 08:59:23PM +0800, Haibo Xu wrote:
+> Rename the vm_init_descriptor_tables() and vcpu_init_vector_tables()
+                                             ^ vcpu_init_descriptor_tables()
 
-The problem is that you optimise it for the default case, and break it
-for *everything* else.
-
-[...]
-
-> The performance of VM witch 32 cores improvement can be observed. When
-> injecting SGI into the first vCPU of the first aff0 group, the performance 
-> remains the same as before (because the number of iteration is also 1), 
-> but there is an improvement in performance when injecting interrupts into 
-> the last vCPU. When injecting vSGI into the first and last vCPU of the 
-> second aff0 group, the performance improvement is significant because 
-> compared to the original algorithm, it skipped iterates the first aff0 
-> group.
+> prototypes to vm_init_vector_tables() and vcpu_init_vector_tables()
+> respectively, so that we can use common names for the architectures
+> (x86/aarch64/riscv) and then put them in a common header.
 > 
-> BTW, performance improvement can also be observed by microbench in 
-> kvm-unit-test with little modification :add 32 cores initialization, 
-> then change IPI target CPU in function ipi_exec.
+> By the way, vm_install_exception_handler() prototype were also moved to
+> the common header since they are commonly used across the architectures.
 > 
-> The more vcpu a VM has, the greater the performance improvement of injecting 
-> vSGI into the vCPU in the last aff0 group.
+> The patch is a preparation to share the guest exception handling codes
+> in riscv.
 > 
-> Signed-off-by: Xu Zhao <zhaoxu.35@bytedance.com>
+> Suggested-by: Andrew Jones <ajones@ventanamicro.com>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
 > ---
->  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 152 ++++++++++++++---------------
->  include/linux/kvm_host.h           |   5 +
->  2 files changed, 78 insertions(+), 79 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> index 188d2187eede..af8f2d6b18c3 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> @@ -1013,44 +1013,64 @@ int vgic_v3_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
->  
->  	return 0;
->  }
-> +
->  /*
-> - * Compare a given affinity (level 1-3 and a level 0 mask, from the SGI
-> - * generation register ICC_SGI1R_EL1) with a given VCPU.
-> - * If the VCPU's MPIDR matches, return the level0 affinity, otherwise
-> - * return -1.
-> + * Get affinity routing index from ICC_SGI_* register
-> + * format:
-> + *     aff3       aff2       aff1	aff0
-> + * |- 8 bits -|- 8 bits -|- 8 bits -|- 4 bits -|
->   */
-> -static int match_mpidr(u64 sgi_aff, u16 sgi_cpu_mask, struct kvm_vcpu *vcpu)
-> +static unsigned long sgi_to_affinity(unsigned long reg)
->  {
-> -	unsigned long affinity;
-> -	int level0;
-> +	u64 aff;
->  
-> -	/*
-> -	 * Split the current VCPU's MPIDR into affinity level 0 and the
-> -	 * rest as this is what we have to compare against.
-> -	 */
-> -	affinity = kvm_vcpu_get_mpidr_aff(vcpu);
-> -	level0 = MPIDR_AFFINITY_LEVEL(affinity, 0);
-> -	affinity &= ~MPIDR_LEVEL_MASK;
-> +	/* aff3 - aff1 */
-> +	aff = (((reg) & ICC_SGI1R_AFFINITY_3_MASK) >> ICC_SGI1R_AFFINITY_3_SHIFT) << 16 |
-> +		(((reg) & ICC_SGI1R_AFFINITY_2_MASK) >> ICC_SGI1R_AFFINITY_2_SHIFT) << 8 |
-> +		(((reg) & ICC_SGI1R_AFFINITY_1_MASK) >> ICC_SGI1R_AFFINITY_1_SHIFT);
+>  tools/testing/selftests/kvm/aarch64/arch_timer.c          | 4 ++--
+>  tools/testing/selftests/kvm/aarch64/debug-exceptions.c    | 4 ++--
+>  tools/testing/selftests/kvm/aarch64/page_fault_test.c     | 4 ++--
+>  tools/testing/selftests/kvm/aarch64/vgic_irq.c            | 4 ++--
+>  tools/testing/selftests/kvm/include/aarch64/processor.h   | 8 +-------
+>  tools/testing/selftests/kvm/include/kvm_util_base.h       | 7 +++++++
+>  tools/testing/selftests/kvm/include/x86_64/processor.h    | 5 -----
+>  tools/testing/selftests/kvm/lib/aarch64/processor.c       | 6 +++---
+>  tools/testing/selftests/kvm/lib/x86_64/processor.c        | 4 ++--
+>  tools/testing/selftests/kvm/x86_64/amx_test.c             | 4 ++--
+>  tools/testing/selftests/kvm/x86_64/fix_hypercall_test.c   | 4 ++--
+>  tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c         | 4 ++--
+>  tools/testing/selftests/kvm/x86_64/hyperv_features.c      | 8 ++++----
+>  tools/testing/selftests/kvm/x86_64/hyperv_ipi.c           | 6 +++---
+>  tools/testing/selftests/kvm/x86_64/kvm_pv_test.c          | 4 ++--
+>  tools/testing/selftests/kvm/x86_64/monitor_mwait_test.c   | 4 ++--
+>  .../testing/selftests/kvm/x86_64/pmu_event_filter_test.c  | 8 ++++----
+>  .../kvm/x86_64/smaller_maxphyaddr_emulation_test.c        | 4 ++--
+>  tools/testing/selftests/kvm/x86_64/svm_int_ctl_test.c     | 4 ++--
+>  .../selftests/kvm/x86_64/svm_nested_shutdown_test.c       | 4 ++--
+>  .../selftests/kvm/x86_64/svm_nested_soft_inject_test.c    | 4 ++--
+>  tools/testing/selftests/kvm/x86_64/ucna_injection_test.c  | 8 ++++----
+>  .../selftests/kvm/x86_64/userspace_msr_exit_test.c        | 4 ++--
+>  .../kvm/x86_64/vmx_exception_with_invalid_guest_state.c   | 4 ++--
+>  tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c    | 4 ++--
+>  tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c       | 4 ++--
+>  tools/testing/selftests/kvm/x86_64/xcr0_cpuid_test.c      | 4 ++--
+>  tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c      | 4 ++--
+>  28 files changed, 66 insertions(+), 70 deletions(-)
+>
 
-Here, you assume that you can directly map a vcpu index to an
-affinity. It would be awesome if that was the case. However, this is
-only valid at reset time, and userspace is perfectly allowed to change
-this mapping by writing to the vcpu's MPIDR_EL1.
-
-So this won't work at all if userspace wants to set its own specific
-CPU numbering.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
