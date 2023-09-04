@@ -1,126 +1,142 @@
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2100.outbound.protection.outlook.com [40.107.93.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A7992100
-	for <kvmarm@lists.linux.dev>; Mon,  4 Sep 2023 11:16:02 +0000 (UTC)
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-31c6cd238e0so1331280f8f.0
-        for <kvmarm@lists.linux.dev>; Mon, 04 Sep 2023 04:16:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D972B1FAC
+	for <kvmarm@lists.linux.dev>; Mon,  4 Sep 2023 11:42:47 +0000 (UTC)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SNF7NVqDvD4ZtHqdqvKNi27a6xmr1giK+KGpRQeTa6+SBQi41PaMnQUEZoqN7nsQSRdODrkQGvM3d4pJWtEYxCEC9I3mvpj7UWXpNmVFK18tyP95wlC4GqrX7pj/O/uVGxcyp782ykvk7OZcG7II8oosVVfYq4kCgA7NUphst13zCOBixLPZLX0nlHpmp3zgbjsooPP4id+8Qvu9B6HHcJ53wInmKPX5yL+wPOfJBbm6MlU+TQ83VlC0jlBWgecEUMTr5MO1Cm3hWEOyaCkauNGrGNKvJLnh2k+uMty8YbbaYoCAvAqAcvZMc5iluAxSGvbhyfiHo/suXXsF8ZebzQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eAWHa3Rzkfi0jSRL4txY+3k0+qOfPGWEp0Mmjerpemg=;
+ b=lxzyYniWbBCBUi4HHvhC0GZuNED6d5tr6hkHyk8qDlVZ7Y+kFb8wan0MII/hJMeqejfTDS4aFQHM/yZu+c4FS1W1CVLV2SKEmw3jt7ZPEyH6zFOIBhlbyU0uFfpO+bBj7e1hBeIN+qBzq800/GxOvHTY5RFvOuZBpzQGYbirnoD8p0B+WF1cjy9fuRBvoDPgx63ZCx6PDqPjCHh1d00lX5RUYWb+FxFhzce0X04UAZjYxlE5RPHT9ill6XYlxFz9GLg7olmspE4sHSrbdvU5XrUZwfBySqAdU0PsvNKoXxyIMcak8e3BUkzjGunBgIdY/H2PENrAwfI3l1/UbFfP6Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1693826161; x=1694430961; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=I9GCAlEvdvaQhIuQIQlH6uZieVhDq0JG0Q/Lab40q3Y=;
-        b=C2DiJEgo+izRqXXCIvea2GOKj2r73lCF+zHtd+837opPJcGZGXGHMsxOIsMwZ2wY/2
-         qyprdwEmfFRjIYnzB2dFI5EdC9JDRo2LVCXquUCW5PnBYeihf/wYOkQIfcw9j1iuo98V
-         IV3XhIunTMy1vEcRiqOtyDcbhFUS0hSBfnQR2FX2kNGM2dvRW+Lf0QN25D0fAAVa2kTR
-         778R6Nw2vzBRBwlV5pUn0epdIs7D5xYMNUkQF4gUFswGaJLDyteoDuM9QuYSKiScIBRY
-         DxXVvOhktAOX3YG+UH20DIsSPMRMvqwxhSyulOmVyO0s5tXp/TFO/uLE9pVHwV+KYeru
-         LOWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693826161; x=1694430961;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=I9GCAlEvdvaQhIuQIQlH6uZieVhDq0JG0Q/Lab40q3Y=;
-        b=SshKymfNr7Us2WTHG4SXtUjDNyLFC/0k0tQNhWdEvZ55eHSPTZXkB3ViOKIc9q1WuH
-         +s2v2QOrR57ssYSnMqLblvhoX5NEUa0UjiGlZ6A1kH6cAAtN7DM06hFGegD4DgkZkMsu
-         5HRoCacfdmIjni7cxkdqkV3dBXAp7cs+kbYmCWTkGc2X1SQoLChC0ve74z7VvmKKosCf
-         fn/VNBetpIwfTstNQcPkV7ElyhZZqVc1TrTpJCk/GUzUStV2Hv4W4LUQbrZAeBAg2Rxd
-         UoEYWo4OlIuXpTFBCKRIiROP1II1wKZTffJR9h4ygdRkwI0er4EDBBknfwoZgH0kfmLZ
-         rtoA==
-X-Gm-Message-State: AOJu0Yy1Ajb9cTusv+etNnMReHVFMQ1wukFk1ccbIjA+jIqAT3SrU8CS
-	UyGATGVY4sesTQpZm07UC9sbkQ==
-X-Google-Smtp-Source: AGHT+IHR3qJF/WADy7jFXe6yIqtW0lGNRVyiw5VlYSS4H2pPf8Rp4EorJnHY9mZBl7rKv7MV9xXpWQ==
-X-Received: by 2002:adf:ee90:0:b0:319:6b56:94d9 with SMTP id b16-20020adfee90000000b003196b5694d9mr8511545wro.2.1693826161050;
-        Mon, 04 Sep 2023 04:16:01 -0700 (PDT)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id x18-20020adfec12000000b0031989784d96sm14281097wrn.76.2023.09.04.04.15.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Sep 2023 04:15:59 -0700 (PDT)
-Date: Mon, 4 Sep 2023 13:15:56 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Haibo Xu <haibo1.xu@intel.com>
-Cc: xiaobo55x@gmail.com, Sean Christopherson <seanjc@google.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
-	Greentime Hu <greentime.hu@sifive.com>, wchen <waylingii@gmail.com>, 
-	Daniel Henrique Barboza <dbarboza@ventanamicro.com>, Ricardo Koller <ricarkol@google.com>, 
-	Vishal Annapurve <vannapurve@google.com>, David Matlack <dmatlack@google.com>, 
-	Aaron Lewis <aaronlewis@google.com>, Mingwei Zhang <mizhang@google.com>, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Lei Wang <lei4.wang@intel.com>, Vipin Sharma <vipinsh@google.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, Like Xu <likexu@tencent.com>, Peter Gonda <pgonda@google.com>, 
-	Thomas Huth <thuth@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>, 
-	David Woodhouse <dwmw@amazon.co.uk>, Michal Luczaj <mhal@rbox.co>, 
-	zhang songyi <zhang.songyi@zte.com.cn>, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 1/8] KVM: selftests: Unify the codes for guest
- exception handling
-Message-ID: <20230904-ba5051a5bf17d17f2711d7dc@orel>
-References: <cover.1693659382.git.haibo1.xu@intel.com>
- <7affb0387d7272573f7093de7887872e1fb5979b.1693659382.git.haibo1.xu@intel.com>
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eAWHa3Rzkfi0jSRL4txY+3k0+qOfPGWEp0Mmjerpemg=;
+ b=qrU9ShS2pwbn84D+tRkOjSQafbIdheyqf4s2/PmC8t1oS2/8SWEK31nTrXlGY6NR/JnKPMpDKxfcKhRe9+IedjkkQFLujXL5jfPF6GzPxCahuBz3MiljN5kKGgoxaNYJOzjFnZbxzf6HZqr4sKRlXTG15HG4GGyPJFQ22ybUjVA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from SJ2PR01MB8101.prod.exchangelabs.com (2603:10b6:a03:4f6::10) by
+ SJ2PR01MB8008.prod.exchangelabs.com (2603:10b6:a03:4cb::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6745.30; Mon, 4 Sep 2023 11:42:43 +0000
+Received: from SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::460c:bded:60ff:3254]) by SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::460c:bded:60ff:3254%7]) with mapi id 15.20.6745.030; Mon, 4 Sep 2023
+ 11:42:42 +0000
+From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+To: linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	maz@kernel.org
+Cc: Christoffer.Dall@arm.com,
+	eauger@redhat.com,
+	miguel.luis@oracle.com,
+	darren@os.amperecomputing.com,
+	scott@os.amperecomputing.com,
+	gankulkarni@os.amperecomputing.com
+Subject: [PATCH v2 0/2] Avoid spurious ptimer interrupts for non-zero cntpoff
+Date: Mon,  4 Sep 2023 04:42:16 -0700
+Message-Id: <20230904114218.590304-1-gankulkarni@os.amperecomputing.com>
+X-Mailer: git-send-email 2.38.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: CH2PR16CA0024.namprd16.prod.outlook.com
+ (2603:10b6:610:50::34) To SJ2PR01MB8101.prod.exchangelabs.com
+ (2603:10b6:a03:4f6::10)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7affb0387d7272573f7093de7887872e1fb5979b.1693659382.git.haibo1.xu@intel.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|SJ2PR01MB8008:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1423fa02-af62-4153-7d20-08dbad3c0c74
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	9qI2L1+SoqSVQl2DpHwV93d6w7vYxN+0xiwCcaVSJzbgGkk4gETPRv9B4VBvvcqz6elOO4m4It8u7qsk5OhRYbCk9A1Egcm14xBca2qC5bPHaJD+hyz+envLVqrhghNLmrRXMrJU+/3lsMZZ3S/D+BrWNK4iYlp8RsOFWrGpz7dO4c3sJ3pc/Pe5FYC95w4Uc1+kKNWNaASfQLGqALxBFC16MBLNgeHCXeMFF79PtkNmKDM1V/sFOoiwsxkNidrgGhpvB1qwT83fcslgPRe/PaRJ6cfnjx7rxCvHaYspOdfyuLdNt2FpLtg7okqvFsHsmgeXlXyXOWOW0UI8YxCStuaoH9JSbvbdFeIyellHLgqqXh0LjLbCDjY2ITzprbqQ2kueYad1MV6LIDHGqS7bkzKlAMJF59knSUhtP4+URX8Kp7BeK2JliLl6E3avIUzCRqLdAvrKITm88Uxb+V9RLBbvUgMcF8lds8s86ZAoUPGosWQXq7N/phUErhhsQac9Rs3YSpWWpD2cQ9Bb0CSKJKrSN99KqO372gDVCv6WSHX2fSbRQDN6ck9XAgDwGgwGBsO5SBJY58TOCY3fqq1oXo8IU+4wreh+xiNKq1jvUwCP9YgjanyqKHtzdquVXR+JgwTy3Fl3uCcQQLi01kk4yQ==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(346002)(136003)(39850400004)(396003)(451199024)(186009)(1800799009)(38100700002)(38350700002)(41300700001)(5660300002)(86362001)(83380400001)(66476007)(66556008)(66946007)(26005)(1076003)(107886003)(2616005)(478600001)(6666004)(966005)(8676002)(4326008)(316002)(8936002)(6512007)(52116002)(6486002)(2906002)(6506007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?OYzWxSy0Afh/1qqnEujkCNjNlQqLPbe8Lr/nCkTvIEgJ+FgW7CIUtM7UQl7w?=
+ =?us-ascii?Q?vxZEvClpnCjZ4UYsElHWuDVtq1zWT+KbPs0fLUqASxReBp39PSE1EOrfD1Ro?=
+ =?us-ascii?Q?MIl9v8rcFZ+h1sW4n74tHDEIUqyFzY5taAdgoBKtQyAK3jD4rIOs49UGVtn/?=
+ =?us-ascii?Q?YAe1MctyHmAIMVd5Te+xyVRtj6LP8vRe1d44cXeKkc3LHDpfUOjVXb0Wm15n?=
+ =?us-ascii?Q?XOHoy9YvFx3n6EiJIYSQT990GZbm6qYPjz07ZepTB8qLT84mCdde2i02clJ/?=
+ =?us-ascii?Q?4otkt5/dQMK3XMHDP358nH1qjyvq601Zo1P6mLUmFPnW4Mhsl0C6u6MTX/r0?=
+ =?us-ascii?Q?2CbQBvsyCwBf6e/xBKOwiTlJcf2JGG3blvg7caSh7vzT9SPhkR7fKZIpSobv?=
+ =?us-ascii?Q?0X6FOVHj8WOUUeDN+KPnMRXyoiBw5o7gcZSiGsG7TzVqljlp4MRtW4+llU6v?=
+ =?us-ascii?Q?dOBrSgGMVseq2ehZ39QFsY1a6Q5TypqohjkdIr/KgQS9efxoI7TtH5wPkNh3?=
+ =?us-ascii?Q?ghWQna2/CtX0KUCd5Pf5rmtIFjHq+IZ2Q/cI+0lyQv9gsAlW2wqT6p3e/kU9?=
+ =?us-ascii?Q?zTdf5tL0qxVP79M2yZ+9IwiVgLBCXptZabkXHouGNRnd3HOPnvncq67OESV/?=
+ =?us-ascii?Q?zV1HuUvpf8ORl2Arli8eYRw03g1ooSTUgEK6a+lUPHVmtv+tJquJVm6mdXke?=
+ =?us-ascii?Q?cpXAwXjcDsjQj4ebkN5i7aC3Ff3qjNgNWNEB1aICzycwo0/pa1oACA/fKa0q?=
+ =?us-ascii?Q?nxDz0OWRlofoRts7hknJF2t42dT6jGJJRBbMVWo81d+Gud5dFGoyqtoi6hBb?=
+ =?us-ascii?Q?Oo9mSaVOBRiq5P4gMzr/n7ApNOVUoblHywZOoQjp5EE/dAYW6QLLI51S6kwD?=
+ =?us-ascii?Q?OTuw7Ha1yLgYy+4kSUKZL5l0HpkhxaFlbEi+9xU+hAUchk/zEtZp4L/WzEPt?=
+ =?us-ascii?Q?FWLxdvtALi+qEV+pG1G9Zq4o6gEXraPmOuuJqe0wFSOd3VEa3pcKYITrtzHK?=
+ =?us-ascii?Q?GfazxCHcps+E6HUCU4dBmLpq5UrxZByWlSvTqWH5yAWrSk2U2yH8SKq8Sbnx?=
+ =?us-ascii?Q?8roy9gYur6GFtmHdKHAlMHEOSDE/zrI7+9hjBT54eJMa3WDJZGonyTCQze6O?=
+ =?us-ascii?Q?vm4gzrriygFRlI+QAnmQn2kMHe5wunzqN0MkIUExwQsAHulPxMUl6OIU82O5?=
+ =?us-ascii?Q?MCQDodwytYcNo/B5LCHL+JvigbI66CiJ+EgBWzGh3jR3Q6boOSv06IwC0tl6?=
+ =?us-ascii?Q?+I6GtQ36jiVJbVppIt1UohgHw+upzbW7xTPp03+5DC8YDUDACwKwwFco9tBS?=
+ =?us-ascii?Q?I3o9e6S6iBituOxT7X2xtj3ZJnW76pA2Sh3v1PfJ69t9tkmFq4pf6URC2+WJ?=
+ =?us-ascii?Q?rOdVr+ecVHIxTLBnvs842cyyJg/lRc4HLZVTtgCimTYQ4ni1FtjpFRJ+cmJ1?=
+ =?us-ascii?Q?Zhh+hJUw4G4jjk5Vla4LECpkGWud7KN9a9GPZb+BvX7b6gNqtKiI2Au9G9mq?=
+ =?us-ascii?Q?wvSL/bRZTSrMsI9dFaSxKetrMxRGin34VjNC6f0vGrdOKNtCtFAgpIFdUq1b?=
+ =?us-ascii?Q?7IGTDOArJBOKXFzhCyv3AtcXnxxnrP7XBi8DPxF4TqknkKcOO/K3haAANt40?=
+ =?us-ascii?Q?q7UPpRqU9aiYvlECrfVjkRRbA/gR5Ysc6pbcKGLwndps?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1423fa02-af62-4153-7d20-08dbad3c0c74
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR01MB8101.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2023 11:42:42.4810
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vx6o4VpzQDXGdWhTCjrYE2uz8i9AvkhSKQONrdIFhRObXF7HeHcVP13uqa+mgGwuLmzblSV6p2R6tVp3hjP7FZpeXDjdcG80NAF8LWt09hdosnvnHWN7cs1WTbpHC3wC
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR01MB8008
 
-On Sat, Sep 02, 2023 at 08:59:23PM +0800, Haibo Xu wrote:
-> Rename the vm_init_descriptor_tables() and vcpu_init_vector_tables()
-                                             ^ vcpu_init_descriptor_tables()
+Guest-Hypervisor(NV use-case) uses ptimer as an arch_timer.
+While running Guest-Hypervisor from a VHE host on a platform which
+supports FEAT_ECV/CNTPOFF_EL2, burst of spurious ptimer interrupts
+were generated for a non-zero offset, causing the boot to hang.
 
-> prototypes to vm_init_vector_tables() and vcpu_init_vector_tables()
-> respectively, so that we can use common names for the architectures
-> (x86/aarch64/riscv) and then put them in a common header.
-> 
-> By the way, vm_install_exception_handler() prototype were also moved to
-> the common header since they are commonly used across the architectures.
-> 
-> The patch is a preparation to share the guest exception handling codes
-> in riscv.
-> 
-> Suggested-by: Andrew Jones <ajones@ventanamicro.com>
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
-> ---
->  tools/testing/selftests/kvm/aarch64/arch_timer.c          | 4 ++--
->  tools/testing/selftests/kvm/aarch64/debug-exceptions.c    | 4 ++--
->  tools/testing/selftests/kvm/aarch64/page_fault_test.c     | 4 ++--
->  tools/testing/selftests/kvm/aarch64/vgic_irq.c            | 4 ++--
->  tools/testing/selftests/kvm/include/aarch64/processor.h   | 8 +-------
->  tools/testing/selftests/kvm/include/kvm_util_base.h       | 7 +++++++
->  tools/testing/selftests/kvm/include/x86_64/processor.h    | 5 -----
->  tools/testing/selftests/kvm/lib/aarch64/processor.c       | 6 +++---
->  tools/testing/selftests/kvm/lib/x86_64/processor.c        | 4 ++--
->  tools/testing/selftests/kvm/x86_64/amx_test.c             | 4 ++--
->  tools/testing/selftests/kvm/x86_64/fix_hypercall_test.c   | 4 ++--
->  tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c         | 4 ++--
->  tools/testing/selftests/kvm/x86_64/hyperv_features.c      | 8 ++++----
->  tools/testing/selftests/kvm/x86_64/hyperv_ipi.c           | 6 +++---
->  tools/testing/selftests/kvm/x86_64/kvm_pv_test.c          | 4 ++--
->  tools/testing/selftests/kvm/x86_64/monitor_mwait_test.c   | 4 ++--
->  .../testing/selftests/kvm/x86_64/pmu_event_filter_test.c  | 8 ++++----
->  .../kvm/x86_64/smaller_maxphyaddr_emulation_test.c        | 4 ++--
->  tools/testing/selftests/kvm/x86_64/svm_int_ctl_test.c     | 4 ++--
->  .../selftests/kvm/x86_64/svm_nested_shutdown_test.c       | 4 ++--
->  .../selftests/kvm/x86_64/svm_nested_soft_inject_test.c    | 4 ++--
->  tools/testing/selftests/kvm/x86_64/ucna_injection_test.c  | 8 ++++----
->  .../selftests/kvm/x86_64/userspace_msr_exit_test.c        | 4 ++--
->  .../kvm/x86_64/vmx_exception_with_invalid_guest_state.c   | 4 ++--
->  tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c    | 4 ++--
->  tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c       | 4 ++--
->  tools/testing/selftests/kvm/x86_64/xcr0_cpuid_test.c      | 4 ++--
->  tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c      | 4 ++--
->  28 files changed, 66 insertions(+), 70 deletions(-)
->
+The issue is due to the value of CNTPOFF_EL2 is treated as zero while
+on VHE host. This patch fixes the issue by adjusting the CVAL of a
+loaded ptimer across the entry and exit of a guest.
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+v2:
+     Updated as per review comment [1].
+[1] https://lore.kernel.org/lkml/a4dac5af-44e2-0485-446f-fae09fa66a3c@os.amperecomputing.com/
+
+
+This patchset is rebased on NV-V10[2][3].
+
+[2] https://lore.kernel.org/linux-arm-kernel/19c775ad-9573-b4d4-886d-c631b468856f@redhat.com/T/
+[3] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-6.5-WIP-6.4
+
+Ganapatrao Kulkarni (2):
+  KVM: arm64: timers: Move helper has_cntpoff to a header file
+  KVM: arm64: timers: Adjust CVAL of a ptimer across guest entry and
+    exits
+
+ arch/arm64/include/asm/virt.h   |  5 +++
+ arch/arm64/kvm/arch_timer.c     | 65 ++++++++++++++++++++++++++++-----
+ arch/arm64/kvm/hyp/vhe/switch.c | 13 +++++++
+ include/kvm/arm_arch_timer.h    |  1 +
+ 4 files changed, 74 insertions(+), 10 deletions(-)
+
+-- 
+2.41.0
+
