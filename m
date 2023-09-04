@@ -1,155 +1,95 @@
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D62BA42
-	for <kvmarm@lists.linux.dev>; Mon,  4 Sep 2023 14:04:29 +0000 (UTC)
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-4ff09632194so2534372e87.2
-        for <kvmarm@lists.linux.dev>; Mon, 04 Sep 2023 07:04:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1693836267; x=1694441067; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=O9tH83s7KCzR3FLIzIaXHcz20Hx2Sr3w2Og6WosJQfY=;
-        b=C4CJjuH1aGaL2QYjf6lWq7MUtW1iApFmbhYqO01+Gx3mOndiFk4RVtaM3HkjTPIPM8
-         sgukQvf/f3mVYCXEkZ+fJNHa4kxhxrU7pxMy15Hx0OZSlUJm5ppFEQ+Z2J3re+ZoDzVe
-         bwD+d2cfAf1emYPxBsZGtWIfbJtmZ/b7ARBoxr4zRamWC6CsnX14k5pyrhPH8ObEtyDr
-         I9t8YdqTwz3S1Z4FdOpMSo1MJkxU6nCdvYwdvwbPtJ2HoJW1tNVoF/TcijpT2LT/U7Fc
-         7Mm6TPl0JtcY2XAvVvEuYFjm+ak2tUoyl05uQr9FG/kuFnHbGa5BOXfnMSQovAZIvnrH
-         OM2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693836267; x=1694441067;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O9tH83s7KCzR3FLIzIaXHcz20Hx2Sr3w2Og6WosJQfY=;
-        b=CCU613814w+j9uWTsRbcHOe//xXXJ/z6wYyt46wUOhAL/7WUd1stHW0RbNBmKwh7rM
-         sOep4KG/19lgaRhZ8RHTd6EQSUfGJFH7GYhr0W5z5M3wJsKFRutEXED6RwLb2uwiwEJb
-         ZfVB/2BGZCjjwgZKkOA0KUJfXz91EZqkhgkOfHkDqyLMvrGqvPl0gbLpwJgGgcq8Ecec
-         heGFf3ZIopu5MGR4nxapK89CB5gYqVykP7zDP6EEsENTjZLzKPp9bWlIYGaBG82OJg9U
-         AzNI+Xm1rcVMlhiZUFzlGua8uakeoMOQhcgmn4LwM6R36Myox++IiJ0LeBZPf4Ld4Zzm
-         I8RA==
-X-Gm-Message-State: AOJu0YxBc0MfWlUd4RIS7OthHHKjSGUcfFEYMaOwS7lbzbIYtXaUhJk9
-	08zkeakOP6nM9V6ADOBFTyy3gA==
-X-Google-Smtp-Source: AGHT+IFF/9PKy4T0NHsglzBux4yLOD/vizZwx8Nlo/Ot5FXCeYE3JH7zKOg8I6O1HYXtVBq3ndfieA==
-X-Received: by 2002:a19:5e11:0:b0:500:c566:1797 with SMTP id s17-20020a195e11000000b00500c5661797mr5671974lfb.3.1693836266646;
-        Mon, 04 Sep 2023 07:04:26 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id j8-20020a50ed08000000b0052333d7e320sm5801086eds.27.2023.09.04.07.04.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Sep 2023 07:04:25 -0700 (PDT)
-Date: Mon, 4 Sep 2023 16:04:24 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Haibo Xu <haibo1.xu@intel.com>
-Cc: xiaobo55x@gmail.com, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
-	Daniel Henrique Barboza <dbarboza@ventanamicro.com>, wchen <waylingii@gmail.com>, 
-	Sean Christopherson <seanjc@google.com>, Ricardo Koller <ricarkol@google.com>, 
-	Vishal Annapurve <vannapurve@google.com>, David Matlack <dmatlack@google.com>, 
-	Aaron Lewis <aaronlewis@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Mingwei Zhang <mizhang@google.com>, 
-	Jim Mattson <jmattson@google.com>, Lei Wang <lei4.wang@intel.com>, 
-	Vipin Sharma <vipinsh@google.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
-	Like Xu <likexu@tencent.com>, Peter Gonda <pgonda@google.com>, Thomas Huth <thuth@redhat.com>, 
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>, David Woodhouse <dwmw@amazon.co.uk>, 
-	Michal Luczaj <mhal@rbox.co>, Paul Durrant <paul@xen.org>, linux-kernel@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 7/8] KVM: riscv: selftest: Change vcpu_has_ext to a
- common function
-Message-ID: <20230904-aa8b0d8d23d391586686038a@orel>
-References: <cover.1693659382.git.haibo1.xu@intel.com>
- <b6ef1b031e3a581f481cf19a26623388163444b4.1693659382.git.haibo1.xu@intel.com>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B13273D9F
+	for <kvmarm@lists.linux.dev>; Mon,  4 Sep 2023 14:07:23 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 039A11474;
+	Mon,  4 Sep 2023 07:08:01 -0700 (PDT)
+Received: from localhost.localdomain (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 7D2353F766;
+	Mon,  4 Sep 2023 07:07:15 -0700 (PDT)
+From: James Clark <james.clark@arm.com>
+To: coresight@lists.linaro.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	broonie@kernel.org
+Cc: maz@kernel.org,
+	James Clark <james.clark@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Mike Leach <mike.leach@linaro.org>,
+	Leo Yan <leo.yan@linaro.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	James Morse <james.morse@arm.com>,
+	Kristina Martsenko <kristina.martsenko@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Rob Herring <robh@kernel.org>,
+	Jintack Lim <jintack.lim@linaro.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/2] coresight: Allow guests to be traced when FEAT_TRF and VHE are present
+Date: Mon,  4 Sep 2023 15:07:01 +0100
+Message-Id: <20230904140705.1620708-1-james.clark@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b6ef1b031e3a581f481cf19a26623388163444b4.1693659382.git.haibo1.xu@intel.com>
+Content-Transfer-Encoding: 8bit
 
-On Sat, Sep 02, 2023 at 08:59:29PM +0800, Haibo Xu wrote:
-> Move vcpu_has_ext to the processor.c so that other test cases
-> can use it for vCPU extension check.
-> 
-> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
-> ---
->  .../selftests/kvm/include/riscv/processor.h        |  2 ++
->  tools/testing/selftests/kvm/lib/riscv/processor.c  |  9 +++++++++
->  tools/testing/selftests/kvm/riscv/get-reg-list.c   | 14 --------------
->  3 files changed, 11 insertions(+), 14 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/tools/testing/selftests/kvm/include/riscv/processor.h
-> index d1e5d9f7ad45..6087c8fc263a 100644
-> --- a/tools/testing/selftests/kvm/include/riscv/processor.h
-> +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
-> @@ -42,6 +42,8 @@ static inline uint64_t __kvm_reg_id(uint64_t type, uint64_t idx,
->  #define RISCV_ISA_EXT_REG(idx)	__kvm_reg_id(KVM_REG_RISCV_ISA_EXT, \
->  					     idx, KVM_REG_SIZE_ULONG)
->  
-> +bool vcpu_has_ext(struct kvm_vcpu *vcpu, int ext);
-> +
->  struct ex_regs {
->  	unsigned long ra;
->  	unsigned long sp;
-> diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> index 39a1e9902dec..5ececa566f24 100644
-> --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> @@ -15,6 +15,15 @@
->  
->  static vm_vaddr_t exception_handlers;
->  
-> +bool vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
-> +{
-> +	unsigned long value = 0;
-> +
-> +	vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
-> +
-> +	return !!value;
-> +}
-> +
->  static uint64_t page_align(struct kvm_vm *vm, uint64_t v)
->  {
->  	return (v + vm->page_size) & ~(vm->page_size - 1);
-> diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> index d8ecacd03ecf..c4028bf32e3f 100644
-> --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> @@ -44,20 +44,6 @@ bool check_reject_set(int err)
->  	return err == EINVAL;
->  }
->  
-> -static inline bool vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
-> -{
-> -	int ret;
-> -	unsigned long value;
-> -
-> -	ret = __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
-> -	if (ret) {
-> -		printf("Failed to get ext %d", ext);
-> -		return false;
-> -	}
-> -
-> -	return !!value;
+FEAT_TRF is a Coresight feature that allows trace capture to be
+completely filtered at different exception levels, unlike the existing
+TRCVICTLR controls which may still emit target addresses of branches,
+even if the following trace is filtered.
 
-get-reg-list will now assert on get-reg when an extension isn't present,
-rather than failing the __TEST_REQUIRE(), which would do a skip instead.
-We need both the return false version and the assert version.
+Without FEAT_TRF, it was possible to start a trace session on a host and
+also collect trace from the guest as TRCVICTLR was never programmed to
+exclude guests (and it could still emit target addresses even if it
+was). Now when FEAT_TRF is present, because we don't write to
+TRFCR_EL1, guest trace will be completely disabled.
 
-> -}
-> -
->  void finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu_reg_list *c)
->  {
->  	struct vcpu_reg_sublist *s;
-> -- 
-> 2.34.1
->
+This change fixes this issue, and also adds the ability to control it
+with the Perf exclude_host and exclude_guest flags.
 
-Thanks,
-drew
+The first commit moves the register to sysreg because I add the EL12
+version in the second commit.
+
+The test results have some single spurious EL2 addresses, but I don't
+think this is an issue with this patchset because it happens in the
+host-userspace case which maintains the existing programming of
+TRFCR. It's likely an issue with the model but I will follow it up
+separately.
+
+The corresponding change for nVHE is here [1]. With nVHE the behaviour
+is reversed, currently guest trace is always generated because the host
+already writes to TRFCR_EL1. This is the same both with and without
+FEAT_TRF.
+
+[1]: https://lore.kernel.org/kvmarm/20230804101317.460697-1-james.clark@arm.com/
+
+---
+
+Changes since v1:
+
+ * Split new sysreg definitions into TRFCR_EL2 and TRFCR_ELx so that
+   TRFCR_ELx doesn't include CX which TRFCR_EL1 doesn't have.
+ * Mask out TS and CX before writing to TRFCR_EL1 because it doesn't
+   have CX and TS has no effect.
+ * Expand cover letter
+
+James Clark (2):
+  arm64/sysreg: Move TRFCR definitions to sysreg
+  coresight: Allow guests to be traced when FEAT_TRF and VHE are present
+
+ arch/arm64/include/asm/sysreg.h               | 12 -----
+ arch/arm64/tools/sysreg                       | 40 +++++++++++++++
+ .../coresight/coresight-etm4x-core.c          | 51 ++++++++++++++++---
+ drivers/hwtracing/coresight/coresight-etm4x.h |  2 +-
+ drivers/hwtracing/coresight/coresight-priv.h  |  3 ++
+ 5 files changed, 89 insertions(+), 19 deletions(-)
+
+-- 
+2.34.1
+
