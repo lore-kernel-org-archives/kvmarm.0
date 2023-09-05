@@ -1,77 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-216.mta1.migadu.com (out-216.mta1.migadu.com [95.215.58.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A67D2E4
-	for <kvmarm@lists.linux.dev>; Tue,  5 Sep 2023 12:16:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9FCEC433C7;
-	Tue,  5 Sep 2023 12:16:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693916213;
-	bh=z3FvD646feiqjVMf9SuHNB5V1He3cLtJqtYnrcddmpQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pTbwzHwALq3lKJ58J+ZoptPRYvEX8cTd+zk0IPY3COPakM8YKZWc/38AYqdgNDKlv
-	 OR1198eoYVJqJUutamKFk3h7jy3rQGGlWEQZQ37f0hM9D3n4P9HA5jwd/fqTHkaSym
-	 20vLyRRRUBs4H94Zvlt87Zox8Yq2/0pJb+pR8jBbfaoFm7pCflt+8PS7P5kAZ74EaS
-	 7NsBkdE3vpD1MB0aRYGP/r6XIZidA3G3S6nQaZX29gMamIQx39HukWQ8oJpuyIFPp3
-	 fBMbGTDEEG6VLVBfSPEXknPSAUill/o+xl9y8ZoENQmaB0gj7/wms9hOWbG7MT2hAK
-	 E3EWSqRBSCc5A==
-Date: Tue, 5 Sep 2023 13:16:46 +0100
-From: Mark Brown <broonie@kernel.org>
-To: James Clark <james.clark@arm.com>
-Cc: coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, maz@kernel.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Mike Leach <mike.leach@linaro.org>, Leo Yan <leo.yan@linaro.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	James Morse <james.morse@arm.com>,
-	Kristina Martsenko <kristina.martsenko@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Rob Herring <robh@kernel.org>, Jintack Lim <jintack.lim@linaro.org>,
-	Joey Gouly <joey.gouly@arm.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 1/2] arm64/sysreg: Move TRFCR definitions to sysreg
-Message-ID: <5c75e612-121e-42e9-b8f1-99d286562b74@sirena.org.uk>
-References: <20230905102117.2011094-1-james.clark@arm.com>
- <20230905102117.2011094-2-james.clark@arm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05DCBDDA8
+	for <kvmarm@lists.linux.dev>; Tue,  5 Sep 2023 18:06:39 +0000 (UTC)
+Date: Tue, 5 Sep 2023 11:06:31 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1693937197;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZWf0V7LgHDPNADTCt39gF6q3V8XNc51DCpIR5HUJ2EQ=;
+	b=ODIOaaUBR3t/W03PG+9H+gBeI+TrdOywWQpdhaKwCOOxad7Ag2kSxA4N2VdiGsqu9exO9r
+	lU91KCwMDpqgqfAx12ewwtc7maZB0BSg49J5U1mN5gPq8bcdwlrmZ+y1CFtusZ1uk9hL1p
+	qdMtVvcEa9c+Uhdw3Pes+im1iBJkjeM=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Gavin Shan <gshan@redhat.com>
+Cc: kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, maz@kernel.org,
+	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, qperret@google.com,
+	ricarkol@google.com, tabba@google.com, bgardon@google.com,
+	zhenyzha@redhat.com, yihyu@redhat.com, shan.gavin@gmail.com
+Subject: Re: [PATCH] KVM: arm64: Fix soft-lockup on relaxing PTE permission
+Message-ID: <ZPduJ08GKaKXwIhM@linux.dev>
+References: <20230904072826.1468907-1-gshan@redhat.com>
+ <ZPWPoEgBETeI1um1@linux.dev>
+ <0f93a015-4f10-b53e-f67f-a84db43ca533@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="KH+svxDlGVspbVSW"
-Content-Disposition: inline
-In-Reply-To: <20230905102117.2011094-2-james.clark@arm.com>
-X-Cookie: I can't drive 55.
-
-
---KH+svxDlGVspbVSW
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <0f93a015-4f10-b53e-f67f-a84db43ca533@redhat.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Sep 05, 2023 at 11:21:14AM +0100, James Clark wrote:
-> Add separate definitions for ELx and EL2 as TRFCR_EL1 doesn't have CX.
-> This also mirrors the previous definition so no code change is required.
+On Tue, Sep 05, 2023 at 10:06:14AM +1000, Gavin Shan wrote:
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+[...]
 
-Matches DDI0601 2023-06.
+> >   static inline void __invalidate_icache_guest_page(void *va, size_t size)
+> >   {
+> > +	size_t nr_lines = size / __icache_line_size();
+> > +
+> >   	if (icache_is_aliasing()) {
+> >   		/* any kind of VIPT cache */
+> >   		icache_inval_all_pou();
+> >   	} else if (read_sysreg(CurrentEL) != CurrentEL_EL1 ||
+> >   		   !icache_is_vpipt()) {
+> >   		/* PIPT or VPIPT at EL2 (see comment in __kvm_tlb_flush_vmid_ipa) */
+> > -		icache_inval_pou((unsigned long)va, (unsigned long)va + size);
+> > +		if (nr_lines > MAX_TLBI_OPS)
+> > +			icache_inval_all_pou();
+> > +		else
+> > +			icache_inval_pou((unsigned long)va,
+> > +					 (unsigned long)va + size);
+> >   	}
+> >   }
+> 
+> I'm not sure if it's worthy to pull the @iminline from CTR_EL0 since it's almost
+> fixed to 64-bytes. 
 
---KH+svxDlGVspbVSW
-Content-Type: application/pgp-signature; name="signature.asc"
+I firmly disagree. The architecture allows implementers to select a
+different minimum line size, and non-64b systems _do_ exist in the wild.
+Furthermore, some implementers have decided to glue together cores with
+mismatched line sizes too...
 
------BEGIN PGP SIGNATURE-----
+Though we could avoid some headache by normalizing on 64b, the cold
+reality of the ecosystem requires that we go out of our way to
+accomodate ~any design choice allowed by the architecture.
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmT3HC0ACgkQJNaLcl1U
-h9CFzAf+MG6Rt9HmgZ1gptS0a7UHw9uVM2T99NLNfVSxID6n4PFcgc0cZgVNucsn
-ZP5YDx6aMMO922oOJeFXKQxOxPASZ7ESk5oSOJOe95p9FfOje2sLAA7+HW39AX2W
-IqWrI/52BrdNkK6MRcI/Tb8hgyT3ARXyRQoSWh7vmmMSCuvnljjEnPD0S+tozJ4z
-R4ssDiOcrVMRUF7uD1JLNfF5VkjItjxX/0kwWqJ14nyyAT6d0u9NSx85gnghzgZf
-GdGH4B0iC8aJ5t5P3yP85vLevAj1q8ltou4CaaGgOWjifYHmfqRNOzxVQzTEsJdn
-qIB5IY8llT+mou603I/GdhDFungnXw==
-=o9pu
------END PGP SIGNATURE-----
+> @size is guranteed to be PAGE_SIZE or PMD_SIZE aligned. Maybe
+> we can just aggressively do something like below, disregarding the icache thrashing.
+> In this way, the code is further simplified.
+> 
+>     if (size > PAGE_SIZE) {
+>         icache_inval_all_pou();
+>     } else {
+>         icache_inval_pou((unsigned long)va,
+>                          (unsigned long)va + size);
+>     }                                                          // parantheses is still needed
 
---KH+svxDlGVspbVSW--
+This could work too but we already have a kernel heuristic for limiting
+the amount of broadcast invalidations, which is MAX_TLBI_OPS. I don't
+want to introduce a second, KVM-specific hack to address the exact same
+thing.
+
+> I'm leveraging the chance to ask one question, which isn't related to the issue.
+> It seems we're doing the icache/dcache coherence differently for stage1 and stage-2
+> page table entries. The question is why we needn't to clean the dcache for stage-2,
+> as we're doing for the stage-1 case?
+
+KVM always does its required dcache maintenance (if any) on the first
+translation abort to a given IPA. On systems w/o FEAT_DIC, we lazily
+grant execute permissions as an optimization to avoid unnecessary icache
+invalidations, which as you've seen tends to be a bit of a sore spot.
+
+Between the two faults, we've effectively guaranteed that any
+host-initiated writes to the PA are visible to the guest on both the I
+and D side. Any CMOs for making guest-initiated writes coherent after
+the translation fault are the sole responsibility of the guest.
+
+-- 
+Thanks,
+Oliver
