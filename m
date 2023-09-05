@@ -1,341 +1,99 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37C4A38
-	for <kvmarm@lists.linux.dev>; Tue,  5 Sep 2023 08:26:15 +0000 (UTC)
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2b9338e4695so33338471fa.2
-        for <kvmarm@lists.linux.dev>; Tue, 05 Sep 2023 01:26:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1693902374; x=1694507174; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5n5ruSFNuK5CxYqMeEwP7ecIfdzxFhXM7vJLRvhTfw4=;
-        b=fz1BfdFZnq5/QrSvtiNfjW7D/htgFiCMNBZyrte1e4qdzS/mSiO36YXifrm7A4MRsP
-         qnCzxu+I7+damNC1oPn6+/WBZ8vXGRtCsH3zmZzRUM7mCr+4YE1iptNmXA07W1kQ4z9g
-         EJ0YThxPhjcNSSKv07mSNTKhC6Pnt4UrGh7Xw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693902374; x=1694507174;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5n5ruSFNuK5CxYqMeEwP7ecIfdzxFhXM7vJLRvhTfw4=;
-        b=Ym3+htqz78JGWxwOseXBY0GOMrZFLKZGOI+DLq2nSDJtH2prDI/5vXjmNKEGEO5dRL
-         DmI/1lNn14Lz8qwILQEISfFAeptkNLXyoGOdr2ncw0FYLkmxhv2LOKMfAl2geG7W5qLO
-         it9MhxZZDaMQP99DGv+SQm/bX+ASGXWaSdJtEHuzLzBXsV0axMm8egkWBRfH3fnG9tck
-         oOVIooeoicX27Gea7PRRLlVFvK/zy2g5aJ4aXi0HDVW3YJPlW1KrrRLnmxIV4ptjLUwE
-         az3h0PzmvjJmtQFbv8r57yCLfGVR7G2aH17ECF7b/ONR2NLNxz4lQmL8D3WhW3twYZ11
-         ae2A==
-X-Gm-Message-State: AOJu0YwI8Xj6hlvhu8d7sGQm1US2m9HA386z0O/uvRTvgZsZKxiQcKby
-	gPNMgT3bWaXhJbd3yPsbMRp9JpbuuSgiC73u+F0hSA==
-X-Google-Smtp-Source: AGHT+IHDlxTRFgmQ08wXHgqZdXNOfl99nQoHivT/t8dExKAB8pvPibCZjX5M09pSI8iVFmUU/Ki6BmGfN0amLFEXqdY=
-X-Received: by 2002:a2e:9e0c:0:b0:2bc:daa2:7838 with SMTP id
- e12-20020a2e9e0c000000b002bcdaa27838mr7538400ljk.19.1693902373475; Tue, 05
- Sep 2023 01:26:13 -0700 (PDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65DFF613E
+	for <kvmarm@lists.linux.dev>; Tue,  5 Sep 2023 10:21:26 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7D70411FB;
+	Tue,  5 Sep 2023 03:22:03 -0700 (PDT)
+Received: from localhost.localdomain (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 1B4373F738;
+	Tue,  5 Sep 2023 03:21:22 -0700 (PDT)
+From: James Clark <james.clark@arm.com>
+To: coresight@lists.linaro.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	broonie@kernel.org
+Cc: maz@kernel.org,
+	James Clark <james.clark@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Mike Leach <mike.leach@linaro.org>,
+	Leo Yan <leo.yan@linaro.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	James Morse <james.morse@arm.com>,
+	Kristina Martsenko <kristina.martsenko@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Rob Herring <robh@kernel.org>,
+	Jintack Lim <jintack.lim@linaro.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 0/2] coresight: Allow guests to be traced when FEAT_TRF and VHE are present
+Date: Tue,  5 Sep 2023 11:21:13 +0100
+Message-Id: <20230905102117.2011094-1-james.clark@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-4-stevensd@google.com>
- <20230705161914.00004070.zhi.wang.linux@gmail.com> <CAD=HUj5cbzjrc0KD7xcibtRMRCzoJRJAzt7jTHSXUSpzyAYbdg@mail.gmail.com>
- <20230711203348.00000fb8.zhi.wang.linux@gmail.com> <ZK3Q34WNLjGVQQw+@google.com>
-In-Reply-To: <ZK3Q34WNLjGVQQw+@google.com>
-From: David Stevens <stevensd@chromium.org>
-Date: Tue, 5 Sep 2023 17:26:02 +0900
-Message-ID: <CAD=HUj6SoKHhA02oNpCt--ofE_n1wjdY1ddBURXDiS5Rwu=Q-g@mail.gmail.com>
-Subject: Re: [PATCH v7 3/8] KVM: Make __kvm_follow_pfn not imply FOLL_GET
-To: Sean Christopherson <seanjc@google.com>
-Cc: Zhi Wang <zhi.wang.linux@gmail.com>, Marc Zyngier <maz@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Peter Xu <peterx@redhat.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jul 12, 2023 at 7:00=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Tue, Jul 11, 2023, Zhi Wang wrote:
-> > On Thu, 6 Jul 2023 15:49:39 +0900
-> > David Stevens <stevensd@chromium.org> wrote:
-> >
-> > > On Wed, Jul 5, 2023 at 10:19___PM Zhi Wang <zhi.wang.linux@gmail.com>=
- wrote:
-> > > >
-> > > > On Tue,  4 Jul 2023 16:50:48 +0900
-> > > > David Stevens <stevensd@chromium.org> wrote:
-> > > > If yes, do we have to use FOLL_GET to resolve GFN associated with a=
- tail page?
-> > > > It seems gup can tolerate gup_flags without FOLL_GET, but it is mor=
-e like a
-> > > > temporary solution. I don't think it is a good idea to play tricks =
-with
-> > > > a temporary solution, more like we are abusing the toleration.
-> > >
-> > > I'm not sure I understand what you're getting at. This series never
-> > > calls gup without FOLL_GET.
-> > >
-> > > This series aims to provide kvm_follow_pfn as a unified API on top of
-> > > gup+follow_pte. Since one of the major clients of this API uses an mm=
-u
-> > > notifier, it makes sense to support returning a pfn without taking a
-> > > reference. And we indeed need to do that for certain types of memory.
-> > >
-> >
-> > I am not having prob with taking a pfn without taking a ref. I am
-> > questioning if using !FOLL_GET in struct kvm_follow_pfn to indicate tak=
-ing
-> > a pfn without a ref is a good idea or not, while there is another flag
-> > actually showing it.
-> >
-> > I can understand that using FOLL_XXX in kvm_follow_pfn saves some
-> > translation between struct kvm_follow_pfn.{write, async, xxxx} and GUP
-> > flags. However FOLL_XXX is for GUP. Using FOLL_XXX for reflecting the
-> > requirements of GUP in the code path that going to call GUP is reasonab=
-le.
-> >
-> > But using FOLL_XXX with purposes that are not related to GUP call reall=
-y
-> > feels off.
->
-> I agree, assuming you're talking specifically about the logic in hva_to_p=
-fn_remapped()
-> that handles non-refcounted pages, i.e. this
->
->         if (get_page_unless_zero(page)) {
->                 foll->is_refcounted_page =3D true;
->                 if (!(foll->flags & FOLL_GET))
->                         put_page(page);
->         } else if (foll->flags & FOLL_GET) {
->                 r =3D -EFAULT;
->         }
->
-> should be
->
->         if (get_page_unless_zero(page)) {
->                 foll->is_refcounted_page =3D true;
->                 if (!(foll->flags & FOLL_GET))
->                         put_page(page);
->         else if (!foll->guarded_by_mmu_notifier)
->                 r =3D -EFAULT;
->
-> because it's not the desire to grab a reference that makes getting non-re=
-fcounted
-> pfns "safe", it's whether or not the caller is plugged into the MMU notif=
-iers.
->
-> Though that highlights that checking guarded_by_mmu_notifier should be do=
-ne for
-> *all* non-refcounted pfns, not just non-refcounted struct page memory.
+FEAT_TRF is a Coresight feature that allows trace capture to be
+completely filtered at different exception levels, unlike the existing
+TRCVICTLR controls which may still emit target addresses of branches,
+even if the following trace is filtered.
 
-I think things are getting confused here because there are multiple
-things which "safe" refers to. There are three different definitions
-that I think are relevant here:
+Without FEAT_TRF, it was possible to start a trace session on a host and
+also collect trace from the guest as TRCVICTLR was never programmed to
+exclude guests (and it could still emit target addresses even if it
+was). Now when FEAT_TRF is present, because we don't write to
+TRFCR_EL1, guest trace will be completely disabled.
 
-1) "safe" in the sense that KVM doesn't corrupt page reference counts
-2) "safe" in the sense that KVM doesn't access pfns after they have been fr=
-eed
-3) "safe" in the sense that KVM doesn't use stale hva -> pfn translations
+This change fixes this issue, and also adds the ability to control it
+with the Perf exclude_host and exclude_guest flags.
 
-For property 1, FOLL_GET is important. If the caller passes FOLL_GET,
-then they expect to be able to pass the returned pfn to
-kvm_release_pfn. This means that when FOLL_GET is set, if
-kvm_pfn_to_refcounted_page returns a page, then hva_to_pfn_remapped
-must take a reference count to avoid eventually corrupting the page
-ref count. I guess replacing the FOLL_GET check with
-!guarded_by_mmu_notifier is logically equivalent because
-__kvm_follow_pfn requires that at least one of guarded_by_mmu_notifier
-and FOLL_GET is set. But since we're concerned about a property of the
-refcount, I think that checking FOLL_GET is clearer.
+The first commit moves the register to sysreg because I add the EL12
+version in the second commit.
 
-For property 2, FOLL_GET is also important. If guarded_by_mmu_notifier
-is set, then we're all good here. If guarded_by_mmu_notifier is not
-set, then the check in __kvm_follow_pfn guarantees that FOLL_GET is
-set. For struct page memory, we're safe because KVM will hold a
-reference as long as it's still using the page. For non struct page
-memory, we're not safe - this is where the breaking change of
-allow_unsafe_mappings would go. Note that for non-refcounted struct
-page, we can't use the allow_unsafe_mappings escape hatch. Since
-FOLL_GET was requested, if we returned such a page, then the caller
-would eventually corrupt the page refcount via kvm_release_pfn.
+The test results have some single spurious EL2 addresses, but I don't
+think this is an issue with this patchset because it happens in the
+host-userspace case which maintains the existing programming of
+TRFCR. It's likely an issue with the model but I will follow it up
+separately.
 
-Property 3 would be nice, but we've already concluded that guarding
-all translations with mmu notifiers is infeasible. So maintaining
-property 2 is the best we can hope for.
+The corresponding change for nVHE is here [1]. The nVHE behaviour is
+is reversed, currently guest trace is always generated because the host
+already writes to TRFCR_EL1. This is the same both with and without
+FEAT_TRF.
 
-> As for the other usage of FOLL_GET in this series (using it to conditiona=
-lly do
-> put_page()), IMO that's very much related to the GUP call.  Invoking put_=
-page()
-> is a hack to workaround the fact that GUP doesn't provide a way to get th=
-e pfn
-> without grabbing a reference to the page.  In an ideal world, KVM would N=
-OT pass
-> FOLL_GET to the various GUP helpers, i.e. FOLL_GET would be passed as-is =
-and KVM
-> wouldn't "need" to kinda sorta overload FOLL_GET to manually drop the ref=
-erence.
->
-> I do think it's worth providing a helper to consolidate and document that=
- hacky
-> code, e.g. add a kvm_follow_refcounted_pfn() helper.
->
-> All in all, I think the below (completely untested) is what we want?
->
-> David (and others), I am planning on doing a full review of this series "=
-soon",
-> but it will likely be a few weeks until that happens.  I jumped in on thi=
-s
-> specific thread because this caught my eye and I really don't want to thr=
-ow out
-> *all* of the FOLL_GET usage.
->
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 5b5afd70f239..90d424990e0a 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2481,6 +2481,25 @@ static inline int check_user_page_hwpoison(unsigne=
-d long addr)
->         return rc =3D=3D -EHWPOISON;
->  }
->
-> +static kvm_pfn_t kvm_follow_refcounted_pfn(struct kvm_follow_pfn *foll,
-> +                                          struct page *page)
-> +{
-> +       kvm_pfn_t pfn =3D page_to_pfn(page);
-> +
-> +       foll->is_refcounted_page =3D true;
-> +
-> +       /*
-> +        * FIXME: Ideally, KVM wouldn't pass FOLL_GET to gup() when the c=
-aller
-> +        * doesn't want to grab a reference, but gup() doesn't support ge=
-tting
-> +        * just the pfn, i.e. FOLL_GET is effectively mandatory.  If that=
- ever
-> +        * changes, drop this and simply don't pass FOLL_GET to gup().
-> +        */
-> +       if (!(foll->flags & FOLL_GET))
-> +               put_page(page);
-> +
-> +       return pfn;
-> +}
-> +
->  /*
->   * The fast path to get the writable pfn which will be stored in @pfn,
->   * true indicates success, otherwise false is returned.  It's also the
-> @@ -2500,11 +2519,9 @@ static bool hva_to_pfn_fast(struct kvm_follow_pfn =
-*foll, kvm_pfn_t *pfn)
->                 return false;
->
->         if (get_user_page_fast_only(foll->hva, FOLL_WRITE, page)) {
-> -               *pfn =3D page_to_pfn(page[0]);
->                 foll->writable =3D foll->allow_write_mapping;
-> -               foll->is_refcounted_page =3D true;
-> -               if (!(foll->flags & FOLL_GET))
-> -                       put_page(page[0]);
-> +
-> +               *pfn =3D kvm_follow_refcounted_pfn(foll, page[0]);
->                 return true;
->         }
->
-> @@ -2528,7 +2545,6 @@ static int hva_to_pfn_slow(struct kvm_follow_pfn *f=
-oll, kvm_pfn_t *pfn)
->                 return npages;
->
->         foll->writable =3D (foll->flags & FOLL_WRITE) && foll->allow_writ=
-e_mapping;
-> -       foll->is_refcounted_page =3D true;
->
->         /* map read fault as writable if possible */
->         if (unlikely(!foll->writable) && foll->allow_write_mapping) {
-> @@ -2540,9 +2556,8 @@ static int hva_to_pfn_slow(struct kvm_follow_pfn *f=
-oll, kvm_pfn_t *pfn)
->                         page =3D wpage;
->                 }
->         }
-> -       *pfn =3D page_to_pfn(page);
-> -       if (!(foll->flags & FOLL_GET))
-> -               put_page(page);
-> +
-> +       *pfn =3D kvm_follow_refcounted_pfn(foll, page);
->         return npages;
->  }
->
-> @@ -2610,17 +2625,16 @@ static int hva_to_pfn_remapped(struct vm_area_str=
-uct *vma, struct kvm_follow_pfn
->         if (!page)
->                 goto out;
->
-> -       if (get_page_unless_zero(page)) {
-> -               foll->is_refcounted_page =3D true;
-> -               if (!(foll->flags & FOLL_GET))
-> -                       put_page(page);
-> -       } else if (foll->flags & FOLL_GET) {
-> -               r =3D -EFAULT;
-> -       }
-> -
-> +       if (get_page_unless_zero(page))
-> +               WARN_ON_ONCE(kvm_follow_refcounted_pfn(foll, page) !=3D p=
-fn);
->  out:
->         pte_unmap_unlock(ptep, ptl);
-> -       *p_pfn =3D pfn;
-> +
-> +       if (!foll->is_refcounted_page && !foll->guarded_by_mmu_notifier &=
-&
-> +           !allow_unsafe_mappings)
-> +               r =3D -EFAULT;
-> +       else
-> +               *p_pfn =3D pfn;
->
->         return r;
->  }
->
+[1]: https://lore.kernel.org/kvmarm/20230804101317.460697-1-james.clark@arm.com/
 
-As I pointed out above, this suggestion is broken because a FOLL_GET
-&& !guarded_by_mmu_notifier request (e.g. kvm_vcpu_map) for a
-non-refcounted page will result in the refcount eventually being
-corrupted.
+---
 
-What do you think of this implementation? If it makes sense, I can
-send out an updated patch series.
+Changes since v2:
 
-/*
- * If FOLL_GET is set, then the caller wants us to take a reference to
- * keep the pfn alive. If FOLL_GET isn't set, then __kvm_follow_pfn
- * guarantees that guarded_by_mmu_notifier is set, so there aren't any
- * use-after-free concerns.
- */
-page =3D kvm_pfn_to_refcounted_page(pfn);
-if (page) {
-        if (get_page_unless_zero(page)) {
-                WARN_ON_ONCE(kvm_follow_refcounted_pfn(foll, page) !=3D pfn=
-);
-        } else if (foll->flags & FOLL_GET) {
-                /*
-                 * Certain IO or PFNMAP mappings can be backed with
-                 * valid struct pages but be allocated without
-                 * refcounting e.g., tail pages of non-compound higher
-                 * order allocations. The caller asked for a ref, but
-                 * we can't take one, since releasing such a ref would
-                 * free the page.
-                 */
-                r =3D -EFAULT;
-        }
-} else if (foll->flags & FOLL_GET) {
-        /*
-         * When there's no struct page to refcount and no MMU notifier,
-         * then KVM can't be guarantee to avoid use-after-free. However,
-         * there are valid reasons to set up such mappings. If userspace
-         * is trusted and willing to forego kernel safety guarantees,
-         * allow this check to be bypassed.
-         */
-        if (foll->guarded_by_mmu_notifier && !allow_unsafe_mappings)
-                r =3D -EFAULT;
-}
+ * E0TRE -> E0HTRE in TRFCR_EL2 to match Arm ARM
+ * Add missing USE_TRFCR_EL1_TS enum value
 
--David
+Changes since v1:
+
+ * Split new sysreg definitions into TRFCR_EL2 and TRFCR_ELx so that
+   TRFCR_ELx doesn't include CX which TRFCR_EL1 doesn't have.
+ * Mask out TS and CX before writing to TRFCR_EL1 because it doesn't
+   have CX and TS has no effect.
+ * Expand cover letter
+
+James Clark (2):
+  arm64/sysreg: Move TRFCR definitions to sysreg
+  coresight: Allow guests to be traced when FEAT_TRF and VHE are present
+
+ arch/arm64/include/asm/sysreg.h               | 12 -----
+ arch/arm64/tools/sysreg                       | 41 +++++++++++++++
+ .../coresight/coresight-etm4x-core.c          | 51 ++++++++++++++++---
+ drivers/hwtracing/coresight/coresight-etm4x.h |  2 +-
+ drivers/hwtracing/coresight/coresight-priv.h  |  3 ++
+ 5 files changed, 90 insertions(+), 19 deletions(-)
+
+-- 
+2.34.1
