@@ -1,216 +1,160 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF0C8883E
-	for <kvmarm@lists.linux.dev>; Tue,  5 Sep 2023 10:21:34 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 68ED711FB;
-	Tue,  5 Sep 2023 03:22:12 -0700 (PDT)
-Received: from localhost.localdomain (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 068553F738;
-	Tue,  5 Sep 2023 03:21:31 -0700 (PDT)
-From: James Clark <james.clark@arm.com>
-To: coresight@lists.linaro.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	broonie@kernel.org
-Cc: maz@kernel.org,
-	James Clark <james.clark@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Mike Leach <mike.leach@linaro.org>,
-	Leo Yan <leo.yan@linaro.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	James Morse <james.morse@arm.com>,
-	Kristina Martsenko <kristina.martsenko@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Rob Herring <robh@kernel.org>,
-	Jintack Lim <jintack.lim@linaro.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 2/2] coresight: Allow guests to be traced when FEAT_TRF and VHE are present
-Date: Tue,  5 Sep 2023 11:21:15 +0100
-Message-Id: <20230905102117.2011094-3-james.clark@arm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230905102117.2011094-1-james.clark@arm.com>
-References: <20230905102117.2011094-1-james.clark@arm.com>
+Received: from mail-ej1-f68.google.com (mail-ej1-f68.google.com [209.85.218.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43163ED9
+	for <kvmarm@lists.linux.dev>; Tue,  5 Sep 2023 10:36:19 +0000 (UTC)
+Received: by mail-ej1-f68.google.com with SMTP id a640c23a62f3a-99357737980so356495666b.2
+        for <kvmarm@lists.linux.dev>; Tue, 05 Sep 2023 03:36:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1693910178; x=1694514978; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Nfqw6iJ4ruL8BEmtuLRWIN/7uvJd+Y/QPLQc2ETsH8Q=;
+        b=gfpZz4BQnaox5bPoT6wvtO4oJ6M0evk5RdicngdJ36iC6P/Xu6hBgGxAXr6HmeZnd6
+         p9niaTQAYTiz/rS3jL3MZJwBEK+OISMXRCuay1+AL5FgLBkZhwTl+zjrQYW7SxNnptYP
+         nPlHirRKcgOz4kzLaeBJ1qU2bms3+/PpeiWZ2on+eSQIYiKM8i7cioS4u1/26wuoIft8
+         ahfdFqv1iJ8uaQ6ysQcoknRu3dIU4zwsWfjGIe08cVFlUMGwhp0xkJz2BzXNO5nrLLas
+         cWYp6NR+gjnj9wPqDhoC7x8vfzzr5xIa6p8UksQUdJdQnzsz3beo+4CeggpIrnl2dTxo
+         TcUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693910178; x=1694514978;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Nfqw6iJ4ruL8BEmtuLRWIN/7uvJd+Y/QPLQc2ETsH8Q=;
+        b=GYD8d6no1OQtL2YJHtpnf4nqHPgIgJyI7LTfDzVahB/Q7tZjeoDZ/6NIAiW+x0UiPu
+         /OSTfjyXA2KBA1ZoFHoBpNX7icLNrnTIGim79RmeR7F8f4BNH9z0tG0+4legc+s8m/u5
+         8el9yCXSk3en8eTDZ7/mEezAMorIH++KUCd8V69BRRzvHz0sKAp/IqHy+Y/9SWe4fc0X
+         IyxZZMn6x839i5HN4y8y18zxNjq1Nrnnv8mmzoID+ZZecOSZYjZjKdvBz5RluYYYG7tI
+         Xe4evM7mPdplAmLzMna4VhLtqoF8JDq3O4eokrl3x0XyeDSvq2g15u791ImjJjlGj7E3
+         9wZA==
+X-Gm-Message-State: AOJu0Yx2PIhA0gpScCNpzLxVe6q8fJ6NDk3lh1HKSeAN3JQv5jAFLxdx
+	eHu+sNeueo6T5pcokvdp9ov8CQ==
+X-Google-Smtp-Source: AGHT+IHkRyEbp0w5QIZbj1GlQvlGuscWTdMpQO8f95QsDXvDTy2lmlAWjOWJLe7UTlpwG3PDaD3ODQ==
+X-Received: by 2002:a17:906:10db:b0:9a1:e395:2d10 with SMTP id v27-20020a17090610db00b009a1e3952d10mr9165785ejv.75.1693910178039;
+        Tue, 05 Sep 2023 03:36:18 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id l13-20020a170906a40d00b0099bc0daf3d7sm7484299ejz.182.2023.09.05.03.36.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Sep 2023 03:36:17 -0700 (PDT)
+Date: Tue, 5 Sep 2023 12:36:16 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Haibo Xu <haibo1.xu@intel.com>
+Cc: xiaobo55x@gmail.com, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
+	wchen <waylingii@gmail.com>, Greentime Hu <greentime.hu@sifive.com>, 
+	Sean Christopherson <seanjc@google.com>, Ricardo Koller <ricarkol@google.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Vipin Sharma <vipinsh@google.com>, 
+	Aaron Lewis <aaronlewis@google.com>, David Matlack <dmatlack@google.com>, 
+	Mingwei Zhang <mizhang@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Lei Wang <lei4.wang@intel.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, Peter Gonda <pgonda@google.com>, Thomas Huth <thuth@redhat.com>, 
+	Like Xu <likexu@tencent.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>, 
+	David Woodhouse <dwmw@amazon.co.uk>, Michal Luczaj <mhal@rbox.co>, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v2 0/8] RISCV: Add kvm Sstc timer selftest
+Message-ID: <20230905-eb7998dbd945ed9dd12659ea@orel>
+References: <cover.1693659382.git.haibo1.xu@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1693659382.git.haibo1.xu@intel.com>
 
-Currently the userspace and kernel filters for guests are never set, so
-no trace will be generated for them. Add it by writing to the guest
-filters when exclude_guest isn't set. By writing either E1TRE or E0TRE,
-filtering on either guest kernel or guest userspace is also supported.
+Hi Haibo,
 
-Since TRFCR_EL1 access is trapped, this can't be  modified by the guest.
+Some of your patch summaries say 'selftest' instead of 'selftests'. Please
+correct those for the next version.
 
-This change also brings exclude_host support which is difficult to add
-as a separate commit without excess churn and resulting in no trace at
-all.
+Thanks,
+drew
 
-Testing
-=======
-
-The addresses were counted with the following:
-
-  $ perf report -D | grep -Eo 'EL2|EL1|EL0' | sort | uniq -c
-
-Guest kernel only:
-
-  $ perf record -e cs_etm//Gk -a -- true
-    535 EL1
-      1 EL2
-
-Guest user only (0 addresses expected because the guest OS hasn't reached
-userspace yet):
-
-  $ perf record -e cs_etm//Gu -a -- true
-
-Host kernel only:
-
-  $  perf record -e cs_etm//Hk -a -- true
-   3501 EL2
-
-Host userspace only:
-
-  $  perf record -e cs_etm//Hu -a -- true
-    408 EL0
-      1 EL2
-
-Reviewed-by: Mark Brown <broonie@kernel.org> (sysreg)
-Signed-off-by: James Clark <james.clark@arm.com>
----
- arch/arm64/tools/sysreg                       |  4 ++
- .../coresight/coresight-etm4x-core.c          | 51 ++++++++++++++++---
- drivers/hwtracing/coresight/coresight-etm4x.h |  2 +-
- drivers/hwtracing/coresight/coresight-priv.h  |  3 ++
- 4 files changed, 53 insertions(+), 7 deletions(-)
-
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 757d41db0aed..6a3aab04192f 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -2532,3 +2532,7 @@ EndSysreg
- Sysreg	TRFCR_EL2	3	4	1	2	1
- Fields	TRFCR_EL2
- EndSysreg
-+
-+Sysreg TRFCR_EL12	3	5	1	2	1
-+Fields	TRFCR_ELx
-+EndSysreg
-diff --git a/drivers/hwtracing/coresight/coresight-etm4x-core.c b/drivers/hwtracing/coresight/coresight-etm4x-core.c
-index 77b0271ce6eb..6c16a14d6fbe 100644
---- a/drivers/hwtracing/coresight/coresight-etm4x-core.c
-+++ b/drivers/hwtracing/coresight/coresight-etm4x-core.c
-@@ -274,6 +274,18 @@ static void etm4x_prohibit_trace(struct etmv4_drvdata *drvdata)
- 	cpu_prohibit_trace();
- }
- 
-+static u64 etm4x_get_kern_user_filter(struct etmv4_drvdata *drvdata)
-+{
-+	u64 trfcr = drvdata->trfcr;
-+
-+	if (drvdata->config.mode & ETM_MODE_EXCL_KERN)
-+		trfcr &= ~TRFCR_ELx_ExTRE;
-+	if (drvdata->config.mode & ETM_MODE_EXCL_USER)
-+		trfcr &= ~TRFCR_ELx_E0TRE;
-+
-+	return trfcr;
-+}
-+
- /*
-  * etm4x_allow_trace - Allow CPU tracing in the respective ELs,
-  * as configured by the drvdata->config.mode for the current
-@@ -286,18 +298,39 @@ static void etm4x_prohibit_trace(struct etmv4_drvdata *drvdata)
-  */
- static void etm4x_allow_trace(struct etmv4_drvdata *drvdata)
- {
--	u64 trfcr = drvdata->trfcr;
-+	u64 trfcr;
- 
- 	/* If the CPU doesn't support FEAT_TRF, nothing to do */
--	if (!trfcr)
-+	if (!drvdata->trfcr)
- 		return;
- 
--	if (drvdata->config.mode & ETM_MODE_EXCL_KERN)
--		trfcr &= ~TRFCR_ELx_ExTRE;
--	if (drvdata->config.mode & ETM_MODE_EXCL_USER)
--		trfcr &= ~TRFCR_ELx_E0TRE;
-+	if (drvdata->config.mode & ETM_MODE_EXCL_HOST)
-+		trfcr = drvdata->trfcr & ~(TRFCR_ELx_ExTRE | TRFCR_ELx_E0TRE);
-+	else
-+		trfcr = etm4x_get_kern_user_filter(drvdata);
- 
- 	write_trfcr(trfcr);
-+
-+	/*
-+	 * Filters for EL1 and EL0 (when running a guest) are stored in
-+	 * TRFCR_EL1 so write it there for VHE. For nVHE, the filters in
-+	 * have to be re-applied when switching to the guest instead.
-+	 */
-+	if (!is_kernel_in_hyp_mode())
-+		return;
-+
-+	if (drvdata->config.mode & ETM_MODE_EXCL_GUEST)
-+		trfcr = drvdata->trfcr & ~(TRFCR_ELx_ExTRE | TRFCR_ELx_E0TRE);
-+	else
-+		trfcr = etm4x_get_kern_user_filter(drvdata);
-+
-+	/*
-+	 * TRFCR_EL1 doesn't have CX and TRFCR_EL1.TS has no effect when TS is
-+	 * set in EL2 so mask them out.
-+	 */
-+	trfcr &= ~(TRFCR_ELx_TS_MASK | TRFCR_EL2_CX);
-+
-+	write_sysreg_s(trfcr, SYS_TRFCR_EL12);
- }
- 
- #ifdef CONFIG_ETM4X_IMPDEF_FEATURE
-@@ -655,6 +688,12 @@ static int etm4_parse_event_config(struct coresight_device *csdev,
- 	if (attr->exclude_user)
- 		config->mode = ETM_MODE_EXCL_USER;
- 
-+	if (attr->exclude_host)
-+		config->mode |= ETM_MODE_EXCL_HOST;
-+
-+	if (attr->exclude_guest)
-+		config->mode |= ETM_MODE_EXCL_GUEST;
-+
- 	/* Always start from the default config */
- 	etm4_set_default_config(config);
- 
-diff --git a/drivers/hwtracing/coresight/coresight-etm4x.h b/drivers/hwtracing/coresight/coresight-etm4x.h
-index 20e2e4cb7614..3f170599822f 100644
---- a/drivers/hwtracing/coresight/coresight-etm4x.h
-+++ b/drivers/hwtracing/coresight/coresight-etm4x.h
-@@ -841,7 +841,7 @@ enum etm_impdef_type {
-  * @s_ex_level: Secure ELs where tracing is supported.
-  */
- struct etmv4_config {
--	u32				mode;
-+	u64				mode;
- 	u32				pe_sel;
- 	u32				cfg;
- 	u32				eventctrl0;
-diff --git a/drivers/hwtracing/coresight/coresight-priv.h b/drivers/hwtracing/coresight/coresight-priv.h
-index 767076e07970..727dd27ba800 100644
---- a/drivers/hwtracing/coresight/coresight-priv.h
-+++ b/drivers/hwtracing/coresight/coresight-priv.h
-@@ -39,6 +39,9 @@
- 
- #define ETM_MODE_EXCL_KERN	BIT(30)
- #define ETM_MODE_EXCL_USER	BIT(31)
-+#define ETM_MODE_EXCL_HOST	BIT(32)
-+#define ETM_MODE_EXCL_GUEST	BIT(33)
-+
- struct cs_pair_attribute {
- 	struct device_attribute attr;
- 	u32 lo_off;
--- 
-2.34.1
-
+On Sat, Sep 02, 2023 at 08:59:22PM +0800, Haibo Xu wrote:
+> The RISC-V arch_timer selftest is used to validate Sstc timer
+> functionality in a guest, which sets up periodic timer interrupts
+> and check the basic interrupt status upon its receipt.
+> 
+> This KVM selftest was ported from aarch64 arch_timer and tested
+> with Linux v6.5-rc5 on a Qemu riscv64 virt machine.
+> 
+> ---
+> Changed since v1:
+>   * Rebase to kvm-riscv/riscv_kvm_next
+>   * Cherry-pick Sean's kselftest guest printf patch set
+>     https://lore.kernel.org/all/20230729003643.1053367-1-seanjc@google.com/
+>   * Copy the entire csr.h verbatim
+>   * Unified the function names for exception vector table setup
+>     void vm_init_vector_tables(struct kvm_vm *vm);
+>     void vcpu_init_vector_tables(struct kvm_vcpu *vcpu);
+>   * Format the handler.S asm file per Andrew's comments
+>   * Consolidate the timer test code for arm64 and riscv
+>     based on Andrew's and Sean's suggestion
+> 
+> Haibo Xu (8):
+>   KVM: selftests: Unify the codes for guest exception handling
+>   KVM: arm64: selftest: Split arch_timer test code
+>   tools: riscv: Add header file csr.h
+>   KVM: riscv: selftests: Switch to use macro from csr.h
+>   KVM: riscv: selftests: Add exception handling support
+>   KVM: riscv: selftests: Add guest helper to get vcpu id
+>   KVM: riscv: selftest: Change vcpu_has_ext to a common function
+>   KVM: riscv: selftests: Add sstc timer test
+> 
+>  tools/arch/riscv/include/asm/csr.h            | 521 ++++++++++++++++++
+>  tools/testing/selftests/kvm/Makefile          |  11 +-
+>  .../selftests/kvm/aarch64/arch_timer.c        | 292 +---------
+>  .../selftests/kvm/aarch64/debug-exceptions.c  |   4 +-
+>  .../selftests/kvm/aarch64/page_fault_test.c   |   4 +-
+>  .../testing/selftests/kvm/aarch64/vgic_irq.c  |   4 +-
+>  tools/testing/selftests/kvm/arch_timer.c      | 261 +++++++++
+>  .../selftests/kvm/include/aarch64/processor.h |  12 +-
+>  .../selftests/kvm/include/kvm_util_base.h     |   9 +
+>  .../selftests/kvm/include/riscv/arch_timer.h  |  80 +++
+>  .../selftests/kvm/include/riscv/processor.h   |  60 +-
+>  .../selftests/kvm/include/timer_test.h        |  58 ++
+>  .../selftests/kvm/include/x86_64/processor.h  |   5 -
+>  .../selftests/kvm/lib/aarch64/processor.c     |   6 +-
+>  .../selftests/kvm/lib/riscv/handlers.S        | 101 ++++
+>  .../selftests/kvm/lib/riscv/processor.c       |  86 +++
+>  .../selftests/kvm/lib/x86_64/processor.c      |   4 +-
+>  .../testing/selftests/kvm/riscv/arch_timer.c  | 130 +++++
+>  .../selftests/kvm/riscv/get-reg-list.c        |  14 -
+>  tools/testing/selftests/kvm/x86_64/amx_test.c |   4 +-
+>  .../selftests/kvm/x86_64/fix_hypercall_test.c |   4 +-
+>  .../selftests/kvm/x86_64/hyperv_evmcs.c       |   4 +-
+>  .../selftests/kvm/x86_64/hyperv_features.c    |   8 +-
+>  .../testing/selftests/kvm/x86_64/hyperv_ipi.c |   6 +-
+>  .../selftests/kvm/x86_64/kvm_pv_test.c        |   4 +-
+>  .../selftests/kvm/x86_64/monitor_mwait_test.c |   4 +-
+>  .../kvm/x86_64/pmu_event_filter_test.c        |   8 +-
+>  .../smaller_maxphyaddr_emulation_test.c       |   4 +-
+>  .../selftests/kvm/x86_64/svm_int_ctl_test.c   |   4 +-
+>  .../kvm/x86_64/svm_nested_shutdown_test.c     |   4 +-
+>  .../kvm/x86_64/svm_nested_soft_inject_test.c  |   4 +-
+>  .../kvm/x86_64/ucna_injection_test.c          |   8 +-
+>  .../kvm/x86_64/userspace_msr_exit_test.c      |   4 +-
+>  .../vmx_exception_with_invalid_guest_state.c  |   4 +-
+>  .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  |   4 +-
+>  .../selftests/kvm/x86_64/xapic_ipi_test.c     |   4 +-
+>  .../selftests/kvm/x86_64/xcr0_cpuid_test.c    |   4 +-
+>  .../selftests/kvm/x86_64/xen_shinfo_test.c    |   4 +-
+>  38 files changed, 1376 insertions(+), 376 deletions(-)
+>  create mode 100644 tools/arch/riscv/include/asm/csr.h
+>  create mode 100644 tools/testing/selftests/kvm/arch_timer.c
+>  create mode 100644 tools/testing/selftests/kvm/include/riscv/arch_timer.h
+>  create mode 100644 tools/testing/selftests/kvm/include/timer_test.h
+>  create mode 100644 tools/testing/selftests/kvm/lib/riscv/handlers.S
+>  create mode 100644 tools/testing/selftests/kvm/riscv/arch_timer.c
+> 
+> -- 
+> 2.34.1
+> 
