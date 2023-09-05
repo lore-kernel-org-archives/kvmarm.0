@@ -1,51 +1,41 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DC5F190
-	for <kvmarm@lists.linux.dev>; Tue,  5 Sep 2023 00:06:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1693872385;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ctjGCSVV1Mw0Mkmv3OOE9v0dAfdBcP8EwbosiY07fHI=;
-	b=aNblCPg2ngGyorZzrJBmeJLMoYsGVpNoqgLejXgJsgyvFgk35C9OT0zm4mAUpENVQCq8y2
-	XRo6dhvHK19LB7OvU2UWvtnh3Q88zr7w4vqeOAKApPEo89n4PljGP34I2tBgC75B3UBYOy
-	H22anG0m+nPAWLpw0n05m4NLri+kC7A=
-Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com
- [209.85.160.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABCD7375
+	for <kvmarm@lists.linux.dev>; Tue,  5 Sep 2023 01:44:26 +0000 (UTC)
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
+ [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-569-GoBMCn2nO2SlhqoHO76QVQ-1; Mon, 04 Sep 2023 20:06:23 -0400
-X-MC-Unique: GoBMCn2nO2SlhqoHO76QVQ-1
-Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-1befca4fdfaso2324362fac.2
-        for <kvmarm@lists.linux.dev>; Mon, 04 Sep 2023 17:06:23 -0700 (PDT)
+ us-mta-197-12gYs3hfNHmKLUjHSAyKhg-1; Mon, 04 Sep 2023 21:44:24 -0400
+X-MC-Unique: 12gYs3hfNHmKLUjHSAyKhg-1
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1c0e39e669cso19252735ad.0
+        for <kvmarm@lists.linux.dev>; Mon, 04 Sep 2023 18:44:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693872383; x=1694477183;
+        d=1e100.net; s=20221208; t=1693878263; x=1694483063;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ctjGCSVV1Mw0Mkmv3OOE9v0dAfdBcP8EwbosiY07fHI=;
-        b=UCH2qnBGmv4OZ2hf00gat/sEsNuKuhHn/JWHZyt/cuc3M2gkrT1yuGJ4cGCLYXITy2
-         MQ8FX1IlphD06QuHAdByz6EAJ9xt1rOVH/5VcC04Cb/wF/hInM8C5sa3BzlNgMWkUesM
-         3CJ/VuEf1Bo/oM+ZGqDDzqi2aNszz71D+Hg7wBEUqZUym+6/npow9iECA/50VVEVrG9+
-         giE7VDlGctpsNtgIRWqJ1imQH5IbtOVrQFG20DSShMO63hwzAW0N371nh6otmwaC7wN6
-         I/pGdRwN6dL9Tp/XJAdaptwBejfFNqTu7uKUGvWsf+QQ67bAdu2lLlY3N/y4rNO/uO1m
-         /q9Q==
-X-Gm-Message-State: AOJu0Yx1lSTWM7wTCjQs0oQ17L3Szm0JTfTjFCkHE1VOhc77z0O3hFLV
-	f+OLihqE4O64t5I/wIffMYpRsmAjTTII6MwMVTgGWHwS7h39gUR/ipPQghMmljmlSQzTkjjWy6e
-	g72Xbv8f8L8V+FkKw
-X-Received: by 2002:a05:6870:42c3:b0:1b7:8836:95c9 with SMTP id z3-20020a05687042c300b001b7883695c9mr16424693oah.42.1693872382847;
-        Mon, 04 Sep 2023 17:06:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHKsvmSGD3Nc/pB6nmmEd98OMHA91yexnlCd3hiRC4uYGgFBz9gXrj6pmZGiVOBquHcuVkzkg==
-X-Received: by 2002:a05:6870:42c3:b0:1b7:8836:95c9 with SMTP id z3-20020a05687042c300b001b7883695c9mr16424669oah.42.1693872382484;
-        Mon, 04 Sep 2023 17:06:22 -0700 (PDT)
+        bh=VQW2KndfwtP2I1AjKed8tFR+5QRfGki+EjdaWAewRO8=;
+        b=PmmEfBr2qNonc/7crthuZvlkKNO8uP4pZaSnf5bUZ7VArV+jYmtY+iSDlqbzytUX5u
+         5qkCLljpwQBpe3f+E90jszXjhvuQ6Sehu+PbVRtxH8RCo/blVFwDfeMtkKccjRIpFoQ6
+         HLQjV2jyEGxykbMhWYNXQ3P3Wxy+mPnLmbSg6qTVUXFwbO2g2fs8LUlTqADe87fFku2v
+         QboHM3NmMHBTG8j2wceGU9Zv2N5F9x04Mk/+ytfx5rgnDLrRXvEA1mHQlwlwCZ+6qBs9
+         W/4blBeqiMkJFF1jNppoa2qQDt6Xok2OTDrwfUiV0+/uAKN3YiA+WdVFFB7LhoKt8qIv
+         h7Uw==
+X-Gm-Message-State: AOJu0YwfPpq1jqNPjlxORMVsl1Oi8eRhQLNc27VG+8nYAlubL4ivvXRP
+	LbBQXSm7VEt6+L+oXr4MwB2ud4I2J2l5skNRL6FE0L8JemBQdZSbPQQkIP8dA3aaXO7TXptaiQ4
+	Hg7pwYcS6nnCndJSv
+X-Received: by 2002:a17:903:1109:b0:1bb:d280:5e0b with SMTP id n9-20020a170903110900b001bbd2805e0bmr10398653plh.18.1693878262909;
+        Mon, 04 Sep 2023 18:44:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFEKZzcW+A3cuAAhqNgpfv304pASYRfHBd9EplUbPImawEVwKwMcSnY/3qBgX8KadUCJk/fqg==
+X-Received: by 2002:a17:903:1109:b0:1bb:d280:5e0b with SMTP id n9-20020a170903110900b001bbd2805e0bmr10398637plh.18.1693878262482;
+        Mon, 04 Sep 2023 18:44:22 -0700 (PDT)
 Received: from ?IPV6:2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5? ([2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5])
-        by smtp.gmail.com with ESMTPSA id l19-20020a639853000000b00565a0e66c79sm8077164pgo.72.2023.09.04.17.06.16
+        by smtp.gmail.com with ESMTPSA id e4-20020a170902d38400b001adf6b21c77sm8126024pld.107.2023.09.04.18.44.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Sep 2023 17:06:21 -0700 (PDT)
-Message-ID: <0f93a015-4f10-b53e-f67f-a84db43ca533@redhat.com>
-Date: Tue, 5 Sep 2023 10:06:14 +1000
+        Mon, 04 Sep 2023 18:44:22 -0700 (PDT)
+Message-ID: <726d291b-ba18-da36-088d-0f0f2ea5a8b4@redhat.com>
+Date: Tue, 5 Sep 2023 11:44:14 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -55,26 +45,29 @@ MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
 Subject: Re: [PATCH] KVM: arm64: Fix soft-lockup on relaxing PTE permission
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, maz@kernel.org,
- james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
- catalin.marinas@arm.com, will@kernel.org, qperret@google.com,
- ricarkol@google.com, tabba@google.com, bgardon@google.com,
- zhenyzha@redhat.com, yihyu@redhat.com, shan.gavin@gmail.com
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+ oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com,
+ yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+ qperret@google.com, ricarkol@google.com, tabba@google.com,
+ bgardon@google.com, zhenyzha@redhat.com, yihyu@redhat.com,
+ shan.gavin@gmail.com
 References: <20230904072826.1468907-1-gshan@redhat.com>
- <ZPWPoEgBETeI1um1@linux.dev>
+ <86r0nee4a9.wl-maz@kernel.org>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <ZPWPoEgBETeI1um1@linux.dev>
+In-Reply-To: <86r0nee4a9.wl-maz@kernel.org>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Oliver,
+Hi Marc,
 
-On 9/4/23 18:04, Oliver Upton wrote:
-> On Mon, Sep 04, 2023 at 05:28:26PM +1000, Gavin Shan wrote:
+On 9/4/23 18:22, Marc Zyngier wrote:
+> On Mon, 04 Sep 2023 08:28:26 +0100,
+> Gavin Shan <gshan@redhat.com> wrote:
+>>
 >> We observed soft-lockup on the host in a specific scenario where
 >> the host on Ampere's Altra Max CPU has 64KB base page size and the
 >> guest has 4KB base page size, 64 vCPUs and 13GB memory. The guest's
@@ -88,138 +81,357 @@ On 9/4/23 18:04, Oliver Upton wrote:
 >> on one CPU interfere with that on another CPU in the hardware level.
 >> It takes 37 seconds for mm_ops->icache_inval_pou() to finish in the
 >> worst case.
+> 
+> What really annoys me is that we keep piling all sort of hacks just to
+> paper over the fact that this HW is absolutely terrible (cue Russell's
+> text replication patches). Why stick so many CPUs in a single system
+> if the interconnect is unable to scale?
+> 
+> We already have added non-shareable invalidation to cope with similar
+> issues, and this is only adding insult to injury. What does Ampere
+> say about this?
+> 
+
+Could you please provide a linker to Russell's text replication patches?
+Another intention of posting this patch is to seek Ampere folks' advices.
+Maybe it's a known issue to them.
+
 >>
->> So we can't scale out to handle the permission faults at will. They
+>> So we can't scale out to handle the permission faults at will.
+> 
+> The *HW* cannot scale. Bad HW.
+> 
+
+Ok.
+
+>> They
 >> need to be serialized to some extent with the help of a interval tree,
+>> to track IPA ranges, currently under service. For the incoming permission
+>> faults, the vCPU is asked to bail for a retry if its IPA range is being
+>> served since the vCPU can't proceed its execution.
+>>
+>> Fixes: 1577cb5823ce ("KVM: arm64: Handle stage-2 faults in parallel")
+>> Cc: stable@vger.kernel.org # v6.2+
 > 
-> Parallel permission faults is not the cause of the soft lockups
-> you observe. The real issue is the volume of invalidations that are
-> happening under the hood.
-> 
-> Take a look at __invalidate_icache_guest_page() -- we invalidate the
-> icache by VA regardless of the size of the range. 512M / 64b = 8388608
-> invalidation operations. Yes, multiple threads doing these invalidations
-> in parallel makes the issue more pronounced as they bottleneck at the
-> Miscellaneous node in the interconnect, but we should really do
-> something about our invalidation strategy instead.
-> 
-> The approach you propose adds a fairly complex serialization mechanic
-> _and_ unfairly penalizes systems that do not require explicit icache
-> invalidation (i.e. FEAT_DIC).
-> 
-> I have a patch for the invalidation issue that I've been needing to
-> send out for a while, could you please give this a go and see if it
-> addresses the soft lockups you observe? If so, I can clean it up and
-> send it as a patch. At minimum, MAX_TLBI_OPS needs to be renamed to hint
-> at the common thread (DVM) between I$ and TLB invalidations.
+> Please drop these two tags. There is no correctness problem in what
+> you describe, only HW that does not scale.
 > 
 
-I generally agree with you that the issue is caused by hardware limitation
-where too much time is needed to invalidate the instruction cache for a 512MB
-huge page. The parallel invalidation on multiple CPUs make it worse. Actually,
-the issue was reported from our downstream kernel, after the feature to support
-the parallel page fault handling is included. It's to say, we didn't see the
-issue (soft-lock on the host) when the page fault handlers are serialized.
+Ok.
 
-Yeah, my patch has too much complex and FEAT_DIC is disregarded. FEAT_DIC isn't
-available on Ampere's Alter and Alter-Max CPU. FEAT_IDC is supported on these
-two CPU models though.
-
-Thanks a lot for your patch, which looks much simplified. With it, I don't see
-the soft-lockup issue again. However, we potentially have icache thrashing issue
-since all icache lines are invalidated by icache_inval_all_pou(). So I think it's
-critical to choose a sensible threshold (MAX_TLBI_OPS). I measured the consumed
-time for various operations on Ampere's Altra and Altra-max models like below, which
-may be helpful for you to choose a sensible threshold (MAX_TLBI_OPS).
-
-   Operation               Altra           Altra Max
-   -------------------------------------------------
-   icache_inval_all_pou        153us          71us
-   icache_inval_pou(64KB)       18us           8us
-   icache_inval_pou(512MB) 1130744us       579132us
-
-> --
+>> Reported-by: Yihuang Yu <yihyu@redhat.com>
+>> Reported-by: Zhenyu Zhang <zhenyzha@redhat.com>
+>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>> ---
+>>   arch/arm64/include/asm/kvm_host.h     |  4 ++
+>>   arch/arm64/include/asm/kvm_pgtable.h  |  3 +-
+>>   arch/arm64/kvm/hyp/nvhe/mem_protect.c |  4 +-
+>>   arch/arm64/kvm/hyp/pgtable.c          | 25 +++++++++---
+>>   arch/arm64/kvm/mmu.c                  | 55 ++++++++++++++++++++++++++-
+>>   5 files changed, 83 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index d3dd05bbfe23..a457720b5caf 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -175,6 +175,10 @@ struct kvm_s2_mmu {
+>>   	struct kvm_mmu_memory_cache split_page_cache;
+>>   	uint64_t split_page_chunk_size;
+>>   
+>> +	/* Page fault ranges */
+>> +	struct mutex		fault_ranges_mutex;
+>> +	struct rb_root_cached	fault_ranges;
+>> +
 > 
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index 96a80e8f6226..fd23644c9988 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -117,6 +117,7 @@ alternative_cb_end
->   #include <asm/cache.h>
->   #include <asm/cacheflush.h>
->   #include <asm/mmu_context.h>
-> +#include <asm/tlbflush.h>
->   #include <asm/kvm_emulate.h>
->   #include <asm/kvm_host.h>
->   
-> @@ -224,15 +225,38 @@ static inline void __clean_dcache_guest_page(void *va, size_t size)
->   	kvm_flush_dcache_to_poc(va, size);
->   }
->   
-> +static inline u32 __icache_line_size(void)
-> +{
-> +	u8 iminline;
-> +	u64 ctr;
-> +
-> +	asm volatile(ALTERNATIVE_CB("movz %0, #0\n"
-> +				    "movk %0, #0, lsl #16\n"
-> +				    "movk %0, #0, lsl #32\n"
-> +				    "movk %0, #0, lsl #48\n",
-> +				    ARM64_ALWAYS_SYSTEM,
-> +				    kvm_compute_final_ctr_el0)
-> +		     : "=r" (ctr));
-> +
-> +	iminline = SYS_FIELD_GET(CTR_EL0, IminLine, ctr);
-> +	return 4 << iminline;
-> +}
-> +
->   static inline void __invalidate_icache_guest_page(void *va, size_t size)
->   {
-> +	size_t nr_lines = size / __icache_line_size();
-> +
->   	if (icache_is_aliasing()) {
->   		/* any kind of VIPT cache */
->   		icache_inval_all_pou();
->   	} else if (read_sysreg(CurrentEL) != CurrentEL_EL1 ||
->   		   !icache_is_vpipt()) {
->   		/* PIPT or VPIPT at EL2 (see comment in __kvm_tlb_flush_vmid_ipa) */
-> -		icache_inval_pou((unsigned long)va, (unsigned long)va + size);
-> +		if (nr_lines > MAX_TLBI_OPS)
-> +			icache_inval_all_pou();
-> +		else
-> +			icache_inval_pou((unsigned long)va,
-> +					 (unsigned long)va + size);
->   	}
->   }
->   
+> How is that going to work for NV, where we have multiple concurrent
+> IPA spaces for the same VM, each with its own stage-2?
+> 
+> And this begs another question: what happens when *another* VM does
+> the same thing? If the HW gets wedged by concurrent vcpus in the same
+> VM, it may get just as wedged by a concurrent VM...
+> 
+> What happens if the vcpus perform icache invalidation *in the guest*?
+> 
 
-I'm not sure if it's worthy to pull the @iminline from CTR_EL0 since it's almost
-fixed to 64-bytes. @size is guranteed to be PAGE_SIZE or PMD_SIZE aligned. Maybe
-we can just aggressively do something like below, disregarding the icache thrashing.
-In this way, the code is further simplified.
+Right, I forgot the NV case when the patch was posted. Frankly, I'm still
+learning the spec to understand how NV is working. I spent some time on
+the NV patches, posted a while ago. If I understood the code correctly,
+those multiple concurent IPA spaces (struct kvm_s2_mmu) are multiplexed to
+create the shadow stage-2 page table. Since the fault ranges and the serialization
+imposed by it is only sensible to host hypervisor, I don't think it's going
+to work for the NV case.
 
-     if (size > PAGE_SIZE) {
-         icache_inval_all_pou();
-     } else {
-         icache_inval_pou((unsigned long)va,
-                          (unsigned long)va + size);
-     }                                                          // parantheses is still needed
+   https://lore.kernel.org/kvmarm/20230515173103.1017669-28-maz@kernel.org/
 
----
+>>   	struct kvm_arch *arch;
+>>   };
+>>   
+>> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+>> index 929d355eae0a..dca0bf81616f 100644
+>> --- a/arch/arm64/include/asm/kvm_pgtable.h
+>> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+>> @@ -149,7 +149,8 @@ struct kvm_pgtable_mm_ops {
+>>   	void*		(*phys_to_virt)(phys_addr_t phys);
+>>   	phys_addr_t	(*virt_to_phys)(void *addr);
+>>   	void		(*dcache_clean_inval_poc)(void *addr, size_t size);
+>> -	void		(*icache_inval_pou)(void *addr, size_t size);
+>> +	int		(*icache_inval_pou)(struct kvm_s2_mmu *mmu,
+>> +					    void *addr, u64 ipa, size_t size);
+>>   };
+>>   
+>>   /**
+>> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+>> index 9d703441278b..9bbe7c641770 100644
+>> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+>> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+>> @@ -223,10 +223,12 @@ static void clean_dcache_guest_page(void *va, size_t size)
+>>   	hyp_fixmap_unmap();
+>>   }
+>>   
+>> -static void invalidate_icache_guest_page(void *va, size_t size)
+>> +static int invalidate_icache_guest_page(struct kvm_s2_mmu *mmu,
+>> +					void *va, u64 ipa, size_t size)
+>>   {
+>>   	__invalidate_icache_guest_page(hyp_fixmap_map(__hyp_pa(va)), size);
+>>   	hyp_fixmap_unmap();
+>> +	return 0;
+>>   }
+>>   
+>>   int kvm_guest_prepare_stage2(struct pkvm_hyp_vm *vm, void *pgd)
+>> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+>> index f7a93ef29250..fabfdb4d1e00 100644
+>> --- a/arch/arm64/kvm/hyp/pgtable.c
+>> +++ b/arch/arm64/kvm/hyp/pgtable.c
+>> @@ -875,6 +875,7 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+>>   	u64 granule = kvm_granule_size(ctx->level);
+>>   	struct kvm_pgtable *pgt = data->mmu->pgt;
+>>   	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+>> +	int ret;
+>>   
+>>   	if (!stage2_leaf_mapping_allowed(ctx, data))
+>>   		return -E2BIG;
+>> @@ -903,8 +904,14 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+>>   					       granule);
+>>   
+>>   	if (!kvm_pgtable_walk_skip_cmo(ctx) && mm_ops->icache_inval_pou &&
+>> -	    stage2_pte_executable(new))
+>> -		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
+>> +	    stage2_pte_executable(new)) {
+>> +		ret = mm_ops->icache_inval_pou(data->mmu,
+>> +					       kvm_pte_follow(new, mm_ops),
+>> +					       ALIGN_DOWN(ctx->addr, granule),
+>> +					       granule);
+>> +		if (ret)
+>> +			return ret;
+>> +	}
+>>   
+>>   	stage2_make_pte(ctx, new);
+>>   
+>> @@ -1101,6 +1108,7 @@ int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
+>>   }
+>>   
+>>   struct stage2_attr_data {
+>> +	struct kvm_s2_mmu		*mmu;
+>>   	kvm_pte_t			attr_set;
+>>   	kvm_pte_t			attr_clr;
+>>   	kvm_pte_t			pte;
+>> @@ -1113,6 +1121,8 @@ static int stage2_attr_walker(const struct kvm_pgtable_visit_ctx *ctx,
+>>   	kvm_pte_t pte = ctx->old;
+>>   	struct stage2_attr_data *data = ctx->arg;
+>>   	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+>> +	u64 granule = kvm_granule_size(ctx->level);
+>> +	int ret;
+>>   
+>>   	if (!kvm_pte_valid(ctx->old))
+>>   		return -EAGAIN;
+>> @@ -1133,9 +1143,13 @@ static int stage2_attr_walker(const struct kvm_pgtable_visit_ctx *ctx,
+>>   		 * stage-2 PTE if we are going to add executable permission.
+>>   		 */
+>>   		if (mm_ops->icache_inval_pou &&
+>> -		    stage2_pte_executable(pte) && !stage2_pte_executable(ctx->old))
+>> -			mm_ops->icache_inval_pou(kvm_pte_follow(pte, mm_ops),
+>> -						  kvm_granule_size(ctx->level));
+>> +		    stage2_pte_executable(pte) && !stage2_pte_executable(ctx->old)) {
+>> +			ret = mm_ops->icache_inval_pou(data->mmu,
+>> +					kvm_pte_follow(pte, mm_ops),
+>> +					ALIGN_DOWN(ctx->addr, granule), granule);
+>> +			if (ret)
+>> +				return ret;
+>> +		}
+>>   
+>>   		if (!stage2_try_set_pte(ctx, pte))
+>>   			return -EAGAIN;
+>> @@ -1152,6 +1166,7 @@ static int stage2_update_leaf_attrs(struct kvm_pgtable *pgt, u64 addr,
+>>   	int ret;
+>>   	kvm_pte_t attr_mask = KVM_PTE_LEAF_ATTR_LO | KVM_PTE_LEAF_ATTR_HI;
+>>   	struct stage2_attr_data data = {
+>> +		.mmu		= pgt->mmu,
+>>   		.attr_set	= attr_set & attr_mask,
+>>   		.attr_clr	= attr_clr & attr_mask,
+>>   	};
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index d3b4feed460c..a778f48beb56 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -267,9 +267,58 @@ static void clean_dcache_guest_page(void *va, size_t size)
+>>   	__clean_dcache_guest_page(va, size);
+>>   }
+>>   
+>> -static void invalidate_icache_guest_page(void *va, size_t size)
+>> +static struct interval_tree_node *add_fault_range(struct kvm_s2_mmu *mmu,
+>> +						  u64 ipa, size_t size)
+>>   {
+>> +	struct interval_tree_node *node;
+>> +	unsigned long start = ipa, end = start + size - 1; /* inclusive */
+> 
+> Maybe just rename 'ipa' to 'start'?
+> 
 
-I'm leveraging the chance to ask one question, which isn't related to the issue.
-It seems we're doing the icache/dcache coherence differently for stage1 and stage-2
-page table entries. The question is why we needn't to clean the dcache for stage-2,
-as we're doing for the stage-1 case?
+Yes.
 
-   // stage-1 page table                                       // stage-2 page table
-   __set_pte_at                                                invalidate_icache_guest_page
-   __sync_icache_dcache                                        __invalidate_icache_guest_page
-   sync_icache_aliases                                         icache_inval_pou
-   caches_clean_inval_pou                                        invalidate_icache_by_line  // !ARM64_HAS_CACHE_DIC
-   caches_clean_inval_pou_macro
-     dcache_by_line_op          // !ARM64_HAS_CACHE_IDC
-     invalidate_icache_by_line  // !ARM64_HAS_CACHE_DIC
+>> +
+>> +	mutex_lock(&mmu->fault_ranges_mutex);
+> 
+> Don't we hold the rwlock at this at this stage, which actively
+> prevents things like taking a mutex? Have you tested this with
+> lockdep?
+> 
+
+The rwlock (kvm->mmu_lock) has been held by readers or writers, depending on
+the function call path, and you're right a lockdep issue exists:
+
+[  161.600875] =============================
+[  161.604872] [ BUG: Invalid wait context ]
+[  161.608870] 6.5.0-gavin+ #11 Not tainted
+[  161.612781] -----------------------------
+[  161.616778] qemu-system-aar/3598 is trying to lock:
+[  161.621644] ffff8000b0947dd0 (&mmu->fault_ranges_mutex){....}-{3:3}, at: invalidate_icache_guest_page+0x48/0x160
+[  161.631813] other info that might help us debug this:
+[  161.636852] context-{4:4}
+[  161.639460] 4 locks held by qemu-system-aar/3598:
+[  161.644151]  #0: ffff3fff93b1b1e8 (&vcpu->mutex){+.+.}-{3:3}, at: kvm_vcpu_ioctl+0x88/0xa08
+[  161.652494]  #1: ffff8000b0948660 (&kvm->srcu){.+.+}-{0:0}, at: kvm_handle_guest_abort+0xf0/0x4f8
+[  161.661357]  #2: ffff8000b0947018 (&(kvm)->mmu_lock){++++}-{2:2}, at: user_mem_abort+0x1b4/0x7d8
+[  161.670132]  #3: ffffc23c11b09230 (rcu_read_lock){....}-{1:2}, at: kvm_pgtable_walk+0x114/0x228
+[  161.678821] stack backtrace:
+[  161.681690] CPU: 133 PID: 3598 Comm: qemu-system-aar Not tainted 6.5.0-gavin+ #11
+[  161.689160] Hardware name: FOXCONN Mt. Collins/Mt. Collins, BIOS 0ACOC017 (SCP: 1.08.20210825) 10/22/2021
+[  161.698713] Call trace:
+[  161.701148]  dump_backtrace+0x9c/0x120
+[  161.704886]  show_stack+0x1c/0x30
+[  161.708189]  dump_stack_lvl+0xe0/0x168
+[  161.711927]  dump_stack+0x14/0x20
+[  161.715230]  __lock_acquire+0x828/0x968
+[  161.719056]  lock_acquire.part.0+0xec/0x268
+[  161.723227]  lock_acquire+0x94/0x150
+[  161.726791]  __mutex_lock+0x98/0x830
+[  161.730355]  mutex_lock_nested+0x28/0x38
+[  161.734266]  invalidate_icache_guest_page+0x48/0x160
+[  161.739219]  stage2_map_walker_try_leaf+0x140/0x1e8
+[  161.744085]  stage2_map_walker+0xf8/0x1a0
+[  161.748082]  kvm_pgtable_visitor_cb.isra.0+0x3c/0x78
+[  161.753035]  __kvm_pgtable_visit+0x188/0x268
+[  161.757292]  __kvm_pgtable_walk+0x90/0xc8
+[  161.761290]  __kvm_pgtable_visit+0xb4/0x268
+[  161.765461]  __kvm_pgtable_walk+0x90/0xc8
+[  161.769458]  kvm_pgtable_walk+0xd4/0x228
+[  161.773369]  kvm_pgtable_stage2_map+0x110/0x130
+[  161.777888]  user_mem_abort+0x67c/0x7d8
+[  161.781712]  kvm_handle_guest_abort+0x3e4/0x4f8
+[  161.786231]  handle_exit+0x70/0x1c8
+[  161.789709]  kvm_arch_vcpu_ioctl_run+0x29c/0x668
+[  161.794315]  kvm_vcpu_ioctl+0x300/0xa08
+[  161.798139]  __arm64_sys_ioctl+0xa8/0xf0
+[  161.802051]  invoke_syscall.constprop.0+0x7c/0xd0
+[  161.806745]  do_el0_svc+0xb4/0xd0
+[  161.810049]  el0_svc+0x68/0x278
+[  161.813179]  el0t_64_sync_handler+0x134/0x150
+[  161.817524]  el0t_64_sync+0x17c/0x180
+
+
+>> +
+>> +	node = interval_tree_iter_first(&mmu->fault_ranges, start, end);
+>> +	if (node) {
+>> +		node = NULL;
+>> +		goto unlock;
+>> +	}
+>> +
+>> +	node = kzalloc(sizeof(*node), GFP_KERNEL_ACCOUNT);
+>> +	if (!node)
+>> +		goto unlock;
+> 
+> That's not going to work -- why do you think we avoid all dynamic
+> allocation on this path?
+> 
+
+Right, dynamic allocation should be avoided in this path and it can be
+put into the stack as you suggested later.
+
+>> +
+>> +	node->start = start;
+>> +	node->last = end;
+>> +	interval_tree_insert(node, &mmu->fault_ranges);
+>> +
+>> +unlock:
+>> +	mutex_unlock(&mmu->fault_ranges_mutex);
+>> +	return node;
+>> +}
+>> +
+>> +static void remove_fault_range(struct kvm_s2_mmu *mmu,
+>> +			       struct interval_tree_node *node)
+>> +{
+>> +	mutex_lock(&mmu->fault_ranges_mutex);
+>> +
+>> +	interval_tree_remove(node, &mmu->fault_ranges);
+>> +	kfree(node);
+>> +
+>> +	mutex_unlock(&mmu->fault_ranges_mutex);
+>> +}
+>> +
+>> +
+>> +static int invalidate_icache_guest_page(struct kvm_s2_mmu *mmu,
+>> +					void *va, u64 ipa, size_t size)
+>> +{
+>> +	struct interval_tree_node *node;
+>> +
+>> +	node = add_fault_range(mmu, ipa, size);
+>> +	if (!node)
+>> +		return -EAGAIN;
+>> +
+>>   	__invalidate_icache_guest_page(va, size);
+>> +	remove_fault_range(mmu, node);
+> 
+> Given that we add and remove the node in the same function, why can't
+> we allocate the node on the stack instead?
+> 
+
+Yes, definitely.
+
+>> +
+>> +	return 0;
+>>   }
+>>   
+>>   /*
+>> @@ -859,6 +908,10 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+>>   	mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
+>>   	mmu->split_page_cache.gfp_zero = __GFP_ZERO;
+>>   
+>> +	/* Initialize the page fault ranges */
+>> +	mutex_init(&mmu->fault_ranges_mutex);
+>> +	mmu->fault_ranges = RB_ROOT_CACHED;
+>> +
+>>   	mmu->pgt = pgt;
+>>   	mmu->pgd_phys = __pa(pgt->pgd);
+>>   	return 0;
+> 
+> I really wonder why we should add this complexity, rather than doing a
+> full i-cache invalidation instead. Given what you describe, I don't
+> think it would be worse.
+> 
+
+Yes, Oliver already shared the patch and it worked for me. So please ignore
+this patch since the code suggested by Oliver is more sensible and robust,
+especially for the NV case.
 
 Thanks,
 Gavin
