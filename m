@@ -1,438 +1,341 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABCD7375
-	for <kvmarm@lists.linux.dev>; Tue,  5 Sep 2023 01:44:26 +0000 (UTC)
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-197-12gYs3hfNHmKLUjHSAyKhg-1; Mon, 04 Sep 2023 21:44:24 -0400
-X-MC-Unique: 12gYs3hfNHmKLUjHSAyKhg-1
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1c0e39e669cso19252735ad.0
-        for <kvmarm@lists.linux.dev>; Mon, 04 Sep 2023 18:44:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37C4A38
+	for <kvmarm@lists.linux.dev>; Tue,  5 Sep 2023 08:26:15 +0000 (UTC)
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2b9338e4695so33338471fa.2
+        for <kvmarm@lists.linux.dev>; Tue, 05 Sep 2023 01:26:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1693902374; x=1694507174; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5n5ruSFNuK5CxYqMeEwP7ecIfdzxFhXM7vJLRvhTfw4=;
+        b=fz1BfdFZnq5/QrSvtiNfjW7D/htgFiCMNBZyrte1e4qdzS/mSiO36YXifrm7A4MRsP
+         qnCzxu+I7+damNC1oPn6+/WBZ8vXGRtCsH3zmZzRUM7mCr+4YE1iptNmXA07W1kQ4z9g
+         EJ0YThxPhjcNSSKv07mSNTKhC6Pnt4UrGh7Xw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693878263; x=1694483063;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VQW2KndfwtP2I1AjKed8tFR+5QRfGki+EjdaWAewRO8=;
-        b=PmmEfBr2qNonc/7crthuZvlkKNO8uP4pZaSnf5bUZ7VArV+jYmtY+iSDlqbzytUX5u
-         5qkCLljpwQBpe3f+E90jszXjhvuQ6Sehu+PbVRtxH8RCo/blVFwDfeMtkKccjRIpFoQ6
-         HLQjV2jyEGxykbMhWYNXQ3P3Wxy+mPnLmbSg6qTVUXFwbO2g2fs8LUlTqADe87fFku2v
-         QboHM3NmMHBTG8j2wceGU9Zv2N5F9x04Mk/+ytfx5rgnDLrRXvEA1mHQlwlwCZ+6qBs9
-         W/4blBeqiMkJFF1jNppoa2qQDt6Xok2OTDrwfUiV0+/uAKN3YiA+WdVFFB7LhoKt8qIv
-         h7Uw==
-X-Gm-Message-State: AOJu0YwfPpq1jqNPjlxORMVsl1Oi8eRhQLNc27VG+8nYAlubL4ivvXRP
-	LbBQXSm7VEt6+L+oXr4MwB2ud4I2J2l5skNRL6FE0L8JemBQdZSbPQQkIP8dA3aaXO7TXptaiQ4
-	Hg7pwYcS6nnCndJSv
-X-Received: by 2002:a17:903:1109:b0:1bb:d280:5e0b with SMTP id n9-20020a170903110900b001bbd2805e0bmr10398653plh.18.1693878262909;
-        Mon, 04 Sep 2023 18:44:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFEKZzcW+A3cuAAhqNgpfv304pASYRfHBd9EplUbPImawEVwKwMcSnY/3qBgX8KadUCJk/fqg==
-X-Received: by 2002:a17:903:1109:b0:1bb:d280:5e0b with SMTP id n9-20020a170903110900b001bbd2805e0bmr10398637plh.18.1693878262482;
-        Mon, 04 Sep 2023 18:44:22 -0700 (PDT)
-Received: from ?IPV6:2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5? ([2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5])
-        by smtp.gmail.com with ESMTPSA id e4-20020a170902d38400b001adf6b21c77sm8126024pld.107.2023.09.04.18.44.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Sep 2023 18:44:22 -0700 (PDT)
-Message-ID: <726d291b-ba18-da36-088d-0f0f2ea5a8b4@redhat.com>
-Date: Tue, 5 Sep 2023 11:44:14 +1000
+        d=1e100.net; s=20221208; t=1693902374; x=1694507174;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5n5ruSFNuK5CxYqMeEwP7ecIfdzxFhXM7vJLRvhTfw4=;
+        b=Ym3+htqz78JGWxwOseXBY0GOMrZFLKZGOI+DLq2nSDJtH2prDI/5vXjmNKEGEO5dRL
+         DmI/1lNn14Lz8qwILQEISfFAeptkNLXyoGOdr2ncw0FYLkmxhv2LOKMfAl2geG7W5qLO
+         it9MhxZZDaMQP99DGv+SQm/bX+ASGXWaSdJtEHuzLzBXsV0axMm8egkWBRfH3fnG9tck
+         oOVIooeoicX27Gea7PRRLlVFvK/zy2g5aJ4aXi0HDVW3YJPlW1KrrRLnmxIV4ptjLUwE
+         az3h0PzmvjJmtQFbv8r57yCLfGVR7G2aH17ECF7b/ONR2NLNxz4lQmL8D3WhW3twYZ11
+         ae2A==
+X-Gm-Message-State: AOJu0YwI8Xj6hlvhu8d7sGQm1US2m9HA386z0O/uvRTvgZsZKxiQcKby
+	gPNMgT3bWaXhJbd3yPsbMRp9JpbuuSgiC73u+F0hSA==
+X-Google-Smtp-Source: AGHT+IHDlxTRFgmQ08wXHgqZdXNOfl99nQoHivT/t8dExKAB8pvPibCZjX5M09pSI8iVFmUU/Ki6BmGfN0amLFEXqdY=
+X-Received: by 2002:a2e:9e0c:0:b0:2bc:daa2:7838 with SMTP id
+ e12-20020a2e9e0c000000b002bcdaa27838mr7538400ljk.19.1693902373475; Tue, 05
+ Sep 2023 01:26:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH] KVM: arm64: Fix soft-lockup on relaxing PTE permission
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
- oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com,
- yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
- qperret@google.com, ricarkol@google.com, tabba@google.com,
- bgardon@google.com, zhenyzha@redhat.com, yihyu@redhat.com,
- shan.gavin@gmail.com
-References: <20230904072826.1468907-1-gshan@redhat.com>
- <86r0nee4a9.wl-maz@kernel.org>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <86r0nee4a9.wl-maz@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-4-stevensd@google.com>
+ <20230705161914.00004070.zhi.wang.linux@gmail.com> <CAD=HUj5cbzjrc0KD7xcibtRMRCzoJRJAzt7jTHSXUSpzyAYbdg@mail.gmail.com>
+ <20230711203348.00000fb8.zhi.wang.linux@gmail.com> <ZK3Q34WNLjGVQQw+@google.com>
+In-Reply-To: <ZK3Q34WNLjGVQQw+@google.com>
+From: David Stevens <stevensd@chromium.org>
+Date: Tue, 5 Sep 2023 17:26:02 +0900
+Message-ID: <CAD=HUj6SoKHhA02oNpCt--ofE_n1wjdY1ddBURXDiS5Rwu=Q-g@mail.gmail.com>
+Subject: Re: [PATCH v7 3/8] KVM: Make __kvm_follow_pfn not imply FOLL_GET
+To: Sean Christopherson <seanjc@google.com>
+Cc: Zhi Wang <zhi.wang.linux@gmail.com>, Marc Zyngier <maz@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Peter Xu <peterx@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Marc,
+On Wed, Jul 12, 2023 at 7:00=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Tue, Jul 11, 2023, Zhi Wang wrote:
+> > On Thu, 6 Jul 2023 15:49:39 +0900
+> > David Stevens <stevensd@chromium.org> wrote:
+> >
+> > > On Wed, Jul 5, 2023 at 10:19___PM Zhi Wang <zhi.wang.linux@gmail.com>=
+ wrote:
+> > > >
+> > > > On Tue,  4 Jul 2023 16:50:48 +0900
+> > > > David Stevens <stevensd@chromium.org> wrote:
+> > > > If yes, do we have to use FOLL_GET to resolve GFN associated with a=
+ tail page?
+> > > > It seems gup can tolerate gup_flags without FOLL_GET, but it is mor=
+e like a
+> > > > temporary solution. I don't think it is a good idea to play tricks =
+with
+> > > > a temporary solution, more like we are abusing the toleration.
+> > >
+> > > I'm not sure I understand what you're getting at. This series never
+> > > calls gup without FOLL_GET.
+> > >
+> > > This series aims to provide kvm_follow_pfn as a unified API on top of
+> > > gup+follow_pte. Since one of the major clients of this API uses an mm=
+u
+> > > notifier, it makes sense to support returning a pfn without taking a
+> > > reference. And we indeed need to do that for certain types of memory.
+> > >
+> >
+> > I am not having prob with taking a pfn without taking a ref. I am
+> > questioning if using !FOLL_GET in struct kvm_follow_pfn to indicate tak=
+ing
+> > a pfn without a ref is a good idea or not, while there is another flag
+> > actually showing it.
+> >
+> > I can understand that using FOLL_XXX in kvm_follow_pfn saves some
+> > translation between struct kvm_follow_pfn.{write, async, xxxx} and GUP
+> > flags. However FOLL_XXX is for GUP. Using FOLL_XXX for reflecting the
+> > requirements of GUP in the code path that going to call GUP is reasonab=
+le.
+> >
+> > But using FOLL_XXX with purposes that are not related to GUP call reall=
+y
+> > feels off.
+>
+> I agree, assuming you're talking specifically about the logic in hva_to_p=
+fn_remapped()
+> that handles non-refcounted pages, i.e. this
+>
+>         if (get_page_unless_zero(page)) {
+>                 foll->is_refcounted_page =3D true;
+>                 if (!(foll->flags & FOLL_GET))
+>                         put_page(page);
+>         } else if (foll->flags & FOLL_GET) {
+>                 r =3D -EFAULT;
+>         }
+>
+> should be
+>
+>         if (get_page_unless_zero(page)) {
+>                 foll->is_refcounted_page =3D true;
+>                 if (!(foll->flags & FOLL_GET))
+>                         put_page(page);
+>         else if (!foll->guarded_by_mmu_notifier)
+>                 r =3D -EFAULT;
+>
+> because it's not the desire to grab a reference that makes getting non-re=
+fcounted
+> pfns "safe", it's whether or not the caller is plugged into the MMU notif=
+iers.
+>
+> Though that highlights that checking guarded_by_mmu_notifier should be do=
+ne for
+> *all* non-refcounted pfns, not just non-refcounted struct page memory.
 
-On 9/4/23 18:22, Marc Zyngier wrote:
-> On Mon, 04 Sep 2023 08:28:26 +0100,
-> Gavin Shan <gshan@redhat.com> wrote:
->>
->> We observed soft-lockup on the host in a specific scenario where
->> the host on Ampere's Altra Max CPU has 64KB base page size and the
->> guest has 4KB base page size, 64 vCPUs and 13GB memory. The guest's
->> memory is backed by 512MB huge pages via hugetlbfs. All the 64 vCPUs
->> are simultaneously trapped into the host due to permission page faults,
->> to request adding the execution permission to the corresponding PMD
->> entry, before the soft-lockup is raised on the host. On handling the
->> parallel requests, the instruction cache for the 512MB huge page is
->> invalidated by mm_ops->icache_inval_pou() in stage2_attr_walker() on
->> 64 hardware CPUs. Unfortunately, the instruction cache invalidation
->> on one CPU interfere with that on another CPU in the hardware level.
->> It takes 37 seconds for mm_ops->icache_inval_pou() to finish in the
->> worst case.
-> 
-> What really annoys me is that we keep piling all sort of hacks just to
-> paper over the fact that this HW is absolutely terrible (cue Russell's
-> text replication patches). Why stick so many CPUs in a single system
-> if the interconnect is unable to scale?
-> 
-> We already have added non-shareable invalidation to cope with similar
-> issues, and this is only adding insult to injury. What does Ampere
-> say about this?
-> 
+I think things are getting confused here because there are multiple
+things which "safe" refers to. There are three different definitions
+that I think are relevant here:
 
-Could you please provide a linker to Russell's text replication patches?
-Another intention of posting this patch is to seek Ampere folks' advices.
-Maybe it's a known issue to them.
+1) "safe" in the sense that KVM doesn't corrupt page reference counts
+2) "safe" in the sense that KVM doesn't access pfns after they have been fr=
+eed
+3) "safe" in the sense that KVM doesn't use stale hva -> pfn translations
 
->>
->> So we can't scale out to handle the permission faults at will.
-> 
-> The *HW* cannot scale. Bad HW.
-> 
+For property 1, FOLL_GET is important. If the caller passes FOLL_GET,
+then they expect to be able to pass the returned pfn to
+kvm_release_pfn. This means that when FOLL_GET is set, if
+kvm_pfn_to_refcounted_page returns a page, then hva_to_pfn_remapped
+must take a reference count to avoid eventually corrupting the page
+ref count. I guess replacing the FOLL_GET check with
+!guarded_by_mmu_notifier is logically equivalent because
+__kvm_follow_pfn requires that at least one of guarded_by_mmu_notifier
+and FOLL_GET is set. But since we're concerned about a property of the
+refcount, I think that checking FOLL_GET is clearer.
 
-Ok.
+For property 2, FOLL_GET is also important. If guarded_by_mmu_notifier
+is set, then we're all good here. If guarded_by_mmu_notifier is not
+set, then the check in __kvm_follow_pfn guarantees that FOLL_GET is
+set. For struct page memory, we're safe because KVM will hold a
+reference as long as it's still using the page. For non struct page
+memory, we're not safe - this is where the breaking change of
+allow_unsafe_mappings would go. Note that for non-refcounted struct
+page, we can't use the allow_unsafe_mappings escape hatch. Since
+FOLL_GET was requested, if we returned such a page, then the caller
+would eventually corrupt the page refcount via kvm_release_pfn.
 
->> They
->> need to be serialized to some extent with the help of a interval tree,
->> to track IPA ranges, currently under service. For the incoming permission
->> faults, the vCPU is asked to bail for a retry if its IPA range is being
->> served since the vCPU can't proceed its execution.
->>
->> Fixes: 1577cb5823ce ("KVM: arm64: Handle stage-2 faults in parallel")
->> Cc: stable@vger.kernel.org # v6.2+
-> 
-> Please drop these two tags. There is no correctness problem in what
-> you describe, only HW that does not scale.
-> 
+Property 3 would be nice, but we've already concluded that guarding
+all translations with mmu notifiers is infeasible. So maintaining
+property 2 is the best we can hope for.
 
-Ok.
+> As for the other usage of FOLL_GET in this series (using it to conditiona=
+lly do
+> put_page()), IMO that's very much related to the GUP call.  Invoking put_=
+page()
+> is a hack to workaround the fact that GUP doesn't provide a way to get th=
+e pfn
+> without grabbing a reference to the page.  In an ideal world, KVM would N=
+OT pass
+> FOLL_GET to the various GUP helpers, i.e. FOLL_GET would be passed as-is =
+and KVM
+> wouldn't "need" to kinda sorta overload FOLL_GET to manually drop the ref=
+erence.
+>
+> I do think it's worth providing a helper to consolidate and document that=
+ hacky
+> code, e.g. add a kvm_follow_refcounted_pfn() helper.
+>
+> All in all, I think the below (completely untested) is what we want?
+>
+> David (and others), I am planning on doing a full review of this series "=
+soon",
+> but it will likely be a few weeks until that happens.  I jumped in on thi=
+s
+> specific thread because this caught my eye and I really don't want to thr=
+ow out
+> *all* of the FOLL_GET usage.
+>
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 5b5afd70f239..90d424990e0a 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2481,6 +2481,25 @@ static inline int check_user_page_hwpoison(unsigne=
+d long addr)
+>         return rc =3D=3D -EHWPOISON;
+>  }
+>
+> +static kvm_pfn_t kvm_follow_refcounted_pfn(struct kvm_follow_pfn *foll,
+> +                                          struct page *page)
+> +{
+> +       kvm_pfn_t pfn =3D page_to_pfn(page);
+> +
+> +       foll->is_refcounted_page =3D true;
+> +
+> +       /*
+> +        * FIXME: Ideally, KVM wouldn't pass FOLL_GET to gup() when the c=
+aller
+> +        * doesn't want to grab a reference, but gup() doesn't support ge=
+tting
+> +        * just the pfn, i.e. FOLL_GET is effectively mandatory.  If that=
+ ever
+> +        * changes, drop this and simply don't pass FOLL_GET to gup().
+> +        */
+> +       if (!(foll->flags & FOLL_GET))
+> +               put_page(page);
+> +
+> +       return pfn;
+> +}
+> +
+>  /*
+>   * The fast path to get the writable pfn which will be stored in @pfn,
+>   * true indicates success, otherwise false is returned.  It's also the
+> @@ -2500,11 +2519,9 @@ static bool hva_to_pfn_fast(struct kvm_follow_pfn =
+*foll, kvm_pfn_t *pfn)
+>                 return false;
+>
+>         if (get_user_page_fast_only(foll->hva, FOLL_WRITE, page)) {
+> -               *pfn =3D page_to_pfn(page[0]);
+>                 foll->writable =3D foll->allow_write_mapping;
+> -               foll->is_refcounted_page =3D true;
+> -               if (!(foll->flags & FOLL_GET))
+> -                       put_page(page[0]);
+> +
+> +               *pfn =3D kvm_follow_refcounted_pfn(foll, page[0]);
+>                 return true;
+>         }
+>
+> @@ -2528,7 +2545,6 @@ static int hva_to_pfn_slow(struct kvm_follow_pfn *f=
+oll, kvm_pfn_t *pfn)
+>                 return npages;
+>
+>         foll->writable =3D (foll->flags & FOLL_WRITE) && foll->allow_writ=
+e_mapping;
+> -       foll->is_refcounted_page =3D true;
+>
+>         /* map read fault as writable if possible */
+>         if (unlikely(!foll->writable) && foll->allow_write_mapping) {
+> @@ -2540,9 +2556,8 @@ static int hva_to_pfn_slow(struct kvm_follow_pfn *f=
+oll, kvm_pfn_t *pfn)
+>                         page =3D wpage;
+>                 }
+>         }
+> -       *pfn =3D page_to_pfn(page);
+> -       if (!(foll->flags & FOLL_GET))
+> -               put_page(page);
+> +
+> +       *pfn =3D kvm_follow_refcounted_pfn(foll, page);
+>         return npages;
+>  }
+>
+> @@ -2610,17 +2625,16 @@ static int hva_to_pfn_remapped(struct vm_area_str=
+uct *vma, struct kvm_follow_pfn
+>         if (!page)
+>                 goto out;
+>
+> -       if (get_page_unless_zero(page)) {
+> -               foll->is_refcounted_page =3D true;
+> -               if (!(foll->flags & FOLL_GET))
+> -                       put_page(page);
+> -       } else if (foll->flags & FOLL_GET) {
+> -               r =3D -EFAULT;
+> -       }
+> -
+> +       if (get_page_unless_zero(page))
+> +               WARN_ON_ONCE(kvm_follow_refcounted_pfn(foll, page) !=3D p=
+fn);
+>  out:
+>         pte_unmap_unlock(ptep, ptl);
+> -       *p_pfn =3D pfn;
+> +
+> +       if (!foll->is_refcounted_page && !foll->guarded_by_mmu_notifier &=
+&
+> +           !allow_unsafe_mappings)
+> +               r =3D -EFAULT;
+> +       else
+> +               *p_pfn =3D pfn;
+>
+>         return r;
+>  }
+>
 
->> Reported-by: Yihuang Yu <yihyu@redhat.com>
->> Reported-by: Zhenyu Zhang <zhenyzha@redhat.com>
->> Signed-off-by: Gavin Shan <gshan@redhat.com>
->> ---
->>   arch/arm64/include/asm/kvm_host.h     |  4 ++
->>   arch/arm64/include/asm/kvm_pgtable.h  |  3 +-
->>   arch/arm64/kvm/hyp/nvhe/mem_protect.c |  4 +-
->>   arch/arm64/kvm/hyp/pgtable.c          | 25 +++++++++---
->>   arch/arm64/kvm/mmu.c                  | 55 ++++++++++++++++++++++++++-
->>   5 files changed, 83 insertions(+), 8 deletions(-)
->>
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index d3dd05bbfe23..a457720b5caf 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -175,6 +175,10 @@ struct kvm_s2_mmu {
->>   	struct kvm_mmu_memory_cache split_page_cache;
->>   	uint64_t split_page_chunk_size;
->>   
->> +	/* Page fault ranges */
->> +	struct mutex		fault_ranges_mutex;
->> +	struct rb_root_cached	fault_ranges;
->> +
-> 
-> How is that going to work for NV, where we have multiple concurrent
-> IPA spaces for the same VM, each with its own stage-2?
-> 
-> And this begs another question: what happens when *another* VM does
-> the same thing? If the HW gets wedged by concurrent vcpus in the same
-> VM, it may get just as wedged by a concurrent VM...
-> 
-> What happens if the vcpus perform icache invalidation *in the guest*?
-> 
+As I pointed out above, this suggestion is broken because a FOLL_GET
+&& !guarded_by_mmu_notifier request (e.g. kvm_vcpu_map) for a
+non-refcounted page will result in the refcount eventually being
+corrupted.
 
-Right, I forgot the NV case when the patch was posted. Frankly, I'm still
-learning the spec to understand how NV is working. I spent some time on
-the NV patches, posted a while ago. If I understood the code correctly,
-those multiple concurent IPA spaces (struct kvm_s2_mmu) are multiplexed to
-create the shadow stage-2 page table. Since the fault ranges and the serialization
-imposed by it is only sensible to host hypervisor, I don't think it's going
-to work for the NV case.
+What do you think of this implementation? If it makes sense, I can
+send out an updated patch series.
 
-   https://lore.kernel.org/kvmarm/20230515173103.1017669-28-maz@kernel.org/
+/*
+ * If FOLL_GET is set, then the caller wants us to take a reference to
+ * keep the pfn alive. If FOLL_GET isn't set, then __kvm_follow_pfn
+ * guarantees that guarded_by_mmu_notifier is set, so there aren't any
+ * use-after-free concerns.
+ */
+page =3D kvm_pfn_to_refcounted_page(pfn);
+if (page) {
+        if (get_page_unless_zero(page)) {
+                WARN_ON_ONCE(kvm_follow_refcounted_pfn(foll, page) !=3D pfn=
+);
+        } else if (foll->flags & FOLL_GET) {
+                /*
+                 * Certain IO or PFNMAP mappings can be backed with
+                 * valid struct pages but be allocated without
+                 * refcounting e.g., tail pages of non-compound higher
+                 * order allocations. The caller asked for a ref, but
+                 * we can't take one, since releasing such a ref would
+                 * free the page.
+                 */
+                r =3D -EFAULT;
+        }
+} else if (foll->flags & FOLL_GET) {
+        /*
+         * When there's no struct page to refcount and no MMU notifier,
+         * then KVM can't be guarantee to avoid use-after-free. However,
+         * there are valid reasons to set up such mappings. If userspace
+         * is trusted and willing to forego kernel safety guarantees,
+         * allow this check to be bypassed.
+         */
+        if (foll->guarded_by_mmu_notifier && !allow_unsafe_mappings)
+                r =3D -EFAULT;
+}
 
->>   	struct kvm_arch *arch;
->>   };
->>   
->> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
->> index 929d355eae0a..dca0bf81616f 100644
->> --- a/arch/arm64/include/asm/kvm_pgtable.h
->> +++ b/arch/arm64/include/asm/kvm_pgtable.h
->> @@ -149,7 +149,8 @@ struct kvm_pgtable_mm_ops {
->>   	void*		(*phys_to_virt)(phys_addr_t phys);
->>   	phys_addr_t	(*virt_to_phys)(void *addr);
->>   	void		(*dcache_clean_inval_poc)(void *addr, size_t size);
->> -	void		(*icache_inval_pou)(void *addr, size_t size);
->> +	int		(*icache_inval_pou)(struct kvm_s2_mmu *mmu,
->> +					    void *addr, u64 ipa, size_t size);
->>   };
->>   
->>   /**
->> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
->> index 9d703441278b..9bbe7c641770 100644
->> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
->> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
->> @@ -223,10 +223,12 @@ static void clean_dcache_guest_page(void *va, size_t size)
->>   	hyp_fixmap_unmap();
->>   }
->>   
->> -static void invalidate_icache_guest_page(void *va, size_t size)
->> +static int invalidate_icache_guest_page(struct kvm_s2_mmu *mmu,
->> +					void *va, u64 ipa, size_t size)
->>   {
->>   	__invalidate_icache_guest_page(hyp_fixmap_map(__hyp_pa(va)), size);
->>   	hyp_fixmap_unmap();
->> +	return 0;
->>   }
->>   
->>   int kvm_guest_prepare_stage2(struct pkvm_hyp_vm *vm, void *pgd)
->> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
->> index f7a93ef29250..fabfdb4d1e00 100644
->> --- a/arch/arm64/kvm/hyp/pgtable.c
->> +++ b/arch/arm64/kvm/hyp/pgtable.c
->> @@ -875,6 +875,7 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
->>   	u64 granule = kvm_granule_size(ctx->level);
->>   	struct kvm_pgtable *pgt = data->mmu->pgt;
->>   	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
->> +	int ret;
->>   
->>   	if (!stage2_leaf_mapping_allowed(ctx, data))
->>   		return -E2BIG;
->> @@ -903,8 +904,14 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
->>   					       granule);
->>   
->>   	if (!kvm_pgtable_walk_skip_cmo(ctx) && mm_ops->icache_inval_pou &&
->> -	    stage2_pte_executable(new))
->> -		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
->> +	    stage2_pte_executable(new)) {
->> +		ret = mm_ops->icache_inval_pou(data->mmu,
->> +					       kvm_pte_follow(new, mm_ops),
->> +					       ALIGN_DOWN(ctx->addr, granule),
->> +					       granule);
->> +		if (ret)
->> +			return ret;
->> +	}
->>   
->>   	stage2_make_pte(ctx, new);
->>   
->> @@ -1101,6 +1108,7 @@ int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
->>   }
->>   
->>   struct stage2_attr_data {
->> +	struct kvm_s2_mmu		*mmu;
->>   	kvm_pte_t			attr_set;
->>   	kvm_pte_t			attr_clr;
->>   	kvm_pte_t			pte;
->> @@ -1113,6 +1121,8 @@ static int stage2_attr_walker(const struct kvm_pgtable_visit_ctx *ctx,
->>   	kvm_pte_t pte = ctx->old;
->>   	struct stage2_attr_data *data = ctx->arg;
->>   	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
->> +	u64 granule = kvm_granule_size(ctx->level);
->> +	int ret;
->>   
->>   	if (!kvm_pte_valid(ctx->old))
->>   		return -EAGAIN;
->> @@ -1133,9 +1143,13 @@ static int stage2_attr_walker(const struct kvm_pgtable_visit_ctx *ctx,
->>   		 * stage-2 PTE if we are going to add executable permission.
->>   		 */
->>   		if (mm_ops->icache_inval_pou &&
->> -		    stage2_pte_executable(pte) && !stage2_pte_executable(ctx->old))
->> -			mm_ops->icache_inval_pou(kvm_pte_follow(pte, mm_ops),
->> -						  kvm_granule_size(ctx->level));
->> +		    stage2_pte_executable(pte) && !stage2_pte_executable(ctx->old)) {
->> +			ret = mm_ops->icache_inval_pou(data->mmu,
->> +					kvm_pte_follow(pte, mm_ops),
->> +					ALIGN_DOWN(ctx->addr, granule), granule);
->> +			if (ret)
->> +				return ret;
->> +		}
->>   
->>   		if (!stage2_try_set_pte(ctx, pte))
->>   			return -EAGAIN;
->> @@ -1152,6 +1166,7 @@ static int stage2_update_leaf_attrs(struct kvm_pgtable *pgt, u64 addr,
->>   	int ret;
->>   	kvm_pte_t attr_mask = KVM_PTE_LEAF_ATTR_LO | KVM_PTE_LEAF_ATTR_HI;
->>   	struct stage2_attr_data data = {
->> +		.mmu		= pgt->mmu,
->>   		.attr_set	= attr_set & attr_mask,
->>   		.attr_clr	= attr_clr & attr_mask,
->>   	};
->> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> index d3b4feed460c..a778f48beb56 100644
->> --- a/arch/arm64/kvm/mmu.c
->> +++ b/arch/arm64/kvm/mmu.c
->> @@ -267,9 +267,58 @@ static void clean_dcache_guest_page(void *va, size_t size)
->>   	__clean_dcache_guest_page(va, size);
->>   }
->>   
->> -static void invalidate_icache_guest_page(void *va, size_t size)
->> +static struct interval_tree_node *add_fault_range(struct kvm_s2_mmu *mmu,
->> +						  u64 ipa, size_t size)
->>   {
->> +	struct interval_tree_node *node;
->> +	unsigned long start = ipa, end = start + size - 1; /* inclusive */
-> 
-> Maybe just rename 'ipa' to 'start'?
-> 
-
-Yes.
-
->> +
->> +	mutex_lock(&mmu->fault_ranges_mutex);
-> 
-> Don't we hold the rwlock at this at this stage, which actively
-> prevents things like taking a mutex? Have you tested this with
-> lockdep?
-> 
-
-The rwlock (kvm->mmu_lock) has been held by readers or writers, depending on
-the function call path, and you're right a lockdep issue exists:
-
-[  161.600875] =============================
-[  161.604872] [ BUG: Invalid wait context ]
-[  161.608870] 6.5.0-gavin+ #11 Not tainted
-[  161.612781] -----------------------------
-[  161.616778] qemu-system-aar/3598 is trying to lock:
-[  161.621644] ffff8000b0947dd0 (&mmu->fault_ranges_mutex){....}-{3:3}, at: invalidate_icache_guest_page+0x48/0x160
-[  161.631813] other info that might help us debug this:
-[  161.636852] context-{4:4}
-[  161.639460] 4 locks held by qemu-system-aar/3598:
-[  161.644151]  #0: ffff3fff93b1b1e8 (&vcpu->mutex){+.+.}-{3:3}, at: kvm_vcpu_ioctl+0x88/0xa08
-[  161.652494]  #1: ffff8000b0948660 (&kvm->srcu){.+.+}-{0:0}, at: kvm_handle_guest_abort+0xf0/0x4f8
-[  161.661357]  #2: ffff8000b0947018 (&(kvm)->mmu_lock){++++}-{2:2}, at: user_mem_abort+0x1b4/0x7d8
-[  161.670132]  #3: ffffc23c11b09230 (rcu_read_lock){....}-{1:2}, at: kvm_pgtable_walk+0x114/0x228
-[  161.678821] stack backtrace:
-[  161.681690] CPU: 133 PID: 3598 Comm: qemu-system-aar Not tainted 6.5.0-gavin+ #11
-[  161.689160] Hardware name: FOXCONN Mt. Collins/Mt. Collins, BIOS 0ACOC017 (SCP: 1.08.20210825) 10/22/2021
-[  161.698713] Call trace:
-[  161.701148]  dump_backtrace+0x9c/0x120
-[  161.704886]  show_stack+0x1c/0x30
-[  161.708189]  dump_stack_lvl+0xe0/0x168
-[  161.711927]  dump_stack+0x14/0x20
-[  161.715230]  __lock_acquire+0x828/0x968
-[  161.719056]  lock_acquire.part.0+0xec/0x268
-[  161.723227]  lock_acquire+0x94/0x150
-[  161.726791]  __mutex_lock+0x98/0x830
-[  161.730355]  mutex_lock_nested+0x28/0x38
-[  161.734266]  invalidate_icache_guest_page+0x48/0x160
-[  161.739219]  stage2_map_walker_try_leaf+0x140/0x1e8
-[  161.744085]  stage2_map_walker+0xf8/0x1a0
-[  161.748082]  kvm_pgtable_visitor_cb.isra.0+0x3c/0x78
-[  161.753035]  __kvm_pgtable_visit+0x188/0x268
-[  161.757292]  __kvm_pgtable_walk+0x90/0xc8
-[  161.761290]  __kvm_pgtable_visit+0xb4/0x268
-[  161.765461]  __kvm_pgtable_walk+0x90/0xc8
-[  161.769458]  kvm_pgtable_walk+0xd4/0x228
-[  161.773369]  kvm_pgtable_stage2_map+0x110/0x130
-[  161.777888]  user_mem_abort+0x67c/0x7d8
-[  161.781712]  kvm_handle_guest_abort+0x3e4/0x4f8
-[  161.786231]  handle_exit+0x70/0x1c8
-[  161.789709]  kvm_arch_vcpu_ioctl_run+0x29c/0x668
-[  161.794315]  kvm_vcpu_ioctl+0x300/0xa08
-[  161.798139]  __arm64_sys_ioctl+0xa8/0xf0
-[  161.802051]  invoke_syscall.constprop.0+0x7c/0xd0
-[  161.806745]  do_el0_svc+0xb4/0xd0
-[  161.810049]  el0_svc+0x68/0x278
-[  161.813179]  el0t_64_sync_handler+0x134/0x150
-[  161.817524]  el0t_64_sync+0x17c/0x180
-
-
->> +
->> +	node = interval_tree_iter_first(&mmu->fault_ranges, start, end);
->> +	if (node) {
->> +		node = NULL;
->> +		goto unlock;
->> +	}
->> +
->> +	node = kzalloc(sizeof(*node), GFP_KERNEL_ACCOUNT);
->> +	if (!node)
->> +		goto unlock;
-> 
-> That's not going to work -- why do you think we avoid all dynamic
-> allocation on this path?
-> 
-
-Right, dynamic allocation should be avoided in this path and it can be
-put into the stack as you suggested later.
-
->> +
->> +	node->start = start;
->> +	node->last = end;
->> +	interval_tree_insert(node, &mmu->fault_ranges);
->> +
->> +unlock:
->> +	mutex_unlock(&mmu->fault_ranges_mutex);
->> +	return node;
->> +}
->> +
->> +static void remove_fault_range(struct kvm_s2_mmu *mmu,
->> +			       struct interval_tree_node *node)
->> +{
->> +	mutex_lock(&mmu->fault_ranges_mutex);
->> +
->> +	interval_tree_remove(node, &mmu->fault_ranges);
->> +	kfree(node);
->> +
->> +	mutex_unlock(&mmu->fault_ranges_mutex);
->> +}
->> +
->> +
->> +static int invalidate_icache_guest_page(struct kvm_s2_mmu *mmu,
->> +					void *va, u64 ipa, size_t size)
->> +{
->> +	struct interval_tree_node *node;
->> +
->> +	node = add_fault_range(mmu, ipa, size);
->> +	if (!node)
->> +		return -EAGAIN;
->> +
->>   	__invalidate_icache_guest_page(va, size);
->> +	remove_fault_range(mmu, node);
-> 
-> Given that we add and remove the node in the same function, why can't
-> we allocate the node on the stack instead?
-> 
-
-Yes, definitely.
-
->> +
->> +	return 0;
->>   }
->>   
->>   /*
->> @@ -859,6 +908,10 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
->>   	mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
->>   	mmu->split_page_cache.gfp_zero = __GFP_ZERO;
->>   
->> +	/* Initialize the page fault ranges */
->> +	mutex_init(&mmu->fault_ranges_mutex);
->> +	mmu->fault_ranges = RB_ROOT_CACHED;
->> +
->>   	mmu->pgt = pgt;
->>   	mmu->pgd_phys = __pa(pgt->pgd);
->>   	return 0;
-> 
-> I really wonder why we should add this complexity, rather than doing a
-> full i-cache invalidation instead. Given what you describe, I don't
-> think it would be worse.
-> 
-
-Yes, Oliver already shared the patch and it worked for me. So please ignore
-this patch since the code suggested by Oliver is more sensible and robust,
-especially for the NV case.
-
-Thanks,
-Gavin
-
+-David
