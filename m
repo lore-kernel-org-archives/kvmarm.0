@@ -1,168 +1,204 @@
 Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DAA962B
-	for <kvmarm@lists.linux.dev>; Wed,  6 Sep 2023 01:24:10 +0000 (UTC)
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2bd6611873aso48400091fa.1
-        for <kvmarm@lists.linux.dev>; Tue, 05 Sep 2023 18:24:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F9162B
+	for <kvmarm@lists.linux.dev>; Wed,  6 Sep 2023 02:13:49 +0000 (UTC)
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2bcfd3220d3so47296951fa.2
+        for <kvmarm@lists.linux.dev>; Tue, 05 Sep 2023 19:13:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693963448; x=1694568248; darn=lists.linux.dev;
+        d=google.com; s=20221208; t=1693966427; x=1694571227; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1xfJSGXD8vBLM08q729zBD/9glpH/PWMQ0GciStqljw=;
-        b=m1U34WmmP2BxEc1dbY8yAetSUe4D4pDQmG5fpDwbXjvzMpMVRYTjULPjUT/96ZHQ7d
-         UiD90Yx7nXNIIleLhhg2vSaaElO6oHSkD2/KO9adqxp5sNDKx4SeSk42mjna1xshjQdY
-         JDOJJg4tl9jdfJur25BcV4oxt8JvkPHtKbuebmSIJfTlM06G7qcLY35aSz8NZ/tmI5fN
-         3EY5qswOA1W5Rrnr78Yt3D9nWP+AnptyhpUvKdzRF1F5wZsKy2e1vpBQI8D/hs67jX67
-         1wKvGsnVtWajAVtCtf+8qoRVodyKNdBwO3c0O58Fju76xuLCoowhr/OTNhPgI82OYAmI
-         Cw0Q==
+        bh=9Q4jcgCF7ftimzz25g+kmUfJSzk3mh2KbzYLL9jx8Tk=;
+        b=m28Y1Kc6BgTfnU6MnVqh8oq06YHTe0AMvRgo6VW+cWtiEefef7awQ7CmQcsZ2WL8cU
+         oAyrjUm+P1qb3RRex6om1GJwAhrQp7QnowsVgw7P6F2CS5qzTWV8nrMVn4VEJDX88hXl
+         pv/pu3kr+LQYn/7xea+vrELBo13YksOTHf5RJfGySjodX5bQ8DNqOFoT6MD5F/YrjfEw
+         1zd8ziWEz0ewFX8kSLXWMnBjYcuHmM1PfiYsL9bkbYBTB2OSxENM5dQX5Qww3oMy6diH
+         X/0X77RAzdWzcz83gS2K4O89pRZqZZxVkDFpJU43qRzwDy7FsUWEZ8VIhBOvXyCy6HF7
+         KkZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693963448; x=1694568248;
+        d=1e100.net; s=20221208; t=1693966427; x=1694571227;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=1xfJSGXD8vBLM08q729zBD/9glpH/PWMQ0GciStqljw=;
-        b=f3Z5X/6ChFcjDwm8bjWsQZtntgusMGoQ/Haz73xrIWSMDBeAlUHEJ0bZt6oqk6uHMb
-         8t5dVg2TICuwdNxpDPGOiGDdVRxjUfL3xvJBc3oVxx2kNCiJkrRWLnh8XRI0fLbC+mYY
-         y3gB7nxYPx6BwrBg7EGrI1KAHYL/anePfmOKHSdw463y/PQulAH7/4ZIFiQxIP+F/9/S
-         30Vej8wOxFE3pUQh0jvwwcgUcnij4OZQxNlDLaayookH9z5BPSqYIkYUf05XtHyLsGj4
-         aeJ0akbLuuXA1FxbA/KB4FUoNe7/oBnM+hyItLQPZmU1aZ8u/Z4uGjhryv0DxZC8IYSF
-         axVg==
-X-Gm-Message-State: AOJu0YxdIOSpZLMtzExgHfeytxuEwo2rOrVxMqQGesNy5mP916PxwBnr
-	80ddrPceP6P8acN4hYiCutYde5xQHRp1kiKJ7Vc=
-X-Google-Smtp-Source: AGHT+IEZAtSdfv2O9kOnOodcd6ZENRRHvHNIg7rIlF/apuuxioXnbEufFM1mW11nwPy+FUp/gWhTnrfWfFZLNg5iXcI=
-X-Received: by 2002:a2e:7204:0:b0:2bc:fb79:d165 with SMTP id
- n4-20020a2e7204000000b002bcfb79d165mr1109276ljc.39.1693963447866; Tue, 05 Sep
- 2023 18:24:07 -0700 (PDT)
+        bh=9Q4jcgCF7ftimzz25g+kmUfJSzk3mh2KbzYLL9jx8Tk=;
+        b=OsKE76sUNDEWaC2vPe9XCKb41AjCGiOcI6Q7D1/sntVvJexq+6AFotRJI7djDJdsHN
+         mgPFVfk61HAzpa2zl4f1Jh+7kYvIGPH4Uc8i8SlTNncB4rmGdQatzep7/XQlFd9m4QvQ
+         HeZqRIY3B7GUMHIJue+OBuPld8a0eZssmPW2C+TMBakWc7TbdQX6SmP2OrSDC6jTTtb/
+         G8XCZgNFk2JXcqzGkKR+HBO4qj6pu7h6u5nRdu2wRZWL25JL/6eVizNarG9urWrc7AFe
+         wHeesLyrjqCfo9MTmTz0bwMjOyzti5KhBLwRIOjyIAijRBjPXFpboPbff8C3WHBinZw0
+         +C4A==
+X-Gm-Message-State: AOJu0YwzhTeOABf+v1Jq4ALjwxejfxlWKmsnSAH92SIvyvouP98PCnoq
+	g7cbPVzgNZqb0g/TIVDsNVHH/67cF4jfouAYXGGbFA==
+X-Google-Smtp-Source: AGHT+IGFwNjv/ZMr8vBZsHgoHcuJi3gsGToAZdjZjs//eJMz6WPWhT7WHmBCHRgewVNQuYU4Usnm1YB78ZoVR9rcExQ=
+X-Received: by 2002:a2e:8890:0:b0:2bc:e470:1412 with SMTP id
+ k16-20020a2e8890000000b002bce4701412mr1193707lji.43.1693966427422; Tue, 05
+ Sep 2023 19:13:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <cover.1693659382.git.haibo1.xu@intel.com> <20230905-eb7998dbd945ed9dd12659ea@orel>
-In-Reply-To: <20230905-eb7998dbd945ed9dd12659ea@orel>
-From: Haibo Xu <xiaobo55x@gmail.com>
-Date: Wed, 6 Sep 2023 09:23:56 +0800
-Message-ID: <CAJve8o=Oz9m_t3tZOFgxo41Ss+dz-kLHU5Y44ov=JjZs3Jyaew@mail.gmail.com>
-Subject: Re: [PATCH v2 0/8] RISCV: Add kvm Sstc timer selftest
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: Haibo Xu <haibo1.xu@intel.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
-	wchen <waylingii@gmail.com>, Greentime Hu <greentime.hu@sifive.com>, 
-	Sean Christopherson <seanjc@google.com>, Ricardo Koller <ricarkol@google.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Vipin Sharma <vipinsh@google.com>, 
-	Aaron Lewis <aaronlewis@google.com>, David Matlack <dmatlack@google.com>, 
-	Mingwei Zhang <mizhang@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Lei Wang <lei4.wang@intel.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, Peter Gonda <pgonda@google.com>, Thomas Huth <thuth@redhat.com>, 
-	Like Xu <likexu@tencent.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
-	David Woodhouse <dwmw@amazon.co.uk>, Michal Luczaj <mhal@rbox.co>, linux-kernel@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+References: <20230821212243.491660-1-jingzhangos@google.com>
+ <20230821212243.491660-6-jingzhangos@google.com> <878ra3pndw.wl-maz@kernel.org>
+ <CAAdAUti8qSf0PVnWkp4Jua-te6i0cjQKJm=8dt5vWqT0Q6w4iQ@mail.gmail.com>
+ <86a5uef55n.wl-maz@kernel.org> <CAAdAUtiNeVrPxThddhFPNNWjyf1hebYkXugdfV2K8LNnT0yaQg@mail.gmail.com>
+In-Reply-To: <CAAdAUtiNeVrPxThddhFPNNWjyf1hebYkXugdfV2K8LNnT0yaQg@mail.gmail.com>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Tue, 5 Sep 2023 19:13:35 -0700
+Message-ID: <CAAdAUtj386UcK+BBJDf+_00yYd1cbiQigSdAbssaJBmb+v32ng@mail.gmail.com>
+Subject: Re: [PATCH v9 05/11] KVM: arm64: Enable writable for ID_AA64DFR0_EL1
+ and ID_DFR0_EL1
+To: Marc Zyngier <maz@kernel.org>
+Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Will Deacon <will@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>, 
+	Raghavendra Rao Ananta <rananta@google.com>, Suraj Jitindar Singh <surajjs@amazon.com>, 
+	Cornelia Huck <cohuck@redhat.com>, Shaoqin Huang <shahuang@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 5, 2023 at 6:36=E2=80=AFPM Andrew Jones <ajones@ventanamicro.co=
-m> wrote:
+Hi Marc,
+
+On Sun, Aug 27, 2023 at 12:31=E2=80=AFPM Jing Zhang <jingzhangos@google.com=
+> wrote:
 >
-> Hi Haibo,
+> Hi Marc,
 >
-> Some of your patch summaries say 'selftest' instead of 'selftests'. Pleas=
+> On Sat, Aug 26, 2023 at 3:51=E2=80=AFAM Marc Zyngier <maz@kernel.org> wro=
+te:
+> >
+> > On Tue, 22 Aug 2023 19:35:12 +0100,
+> > Jing Zhang <jingzhangos@google.com> wrote:
+> > >
+> > > Hi Marc,
+> > >
+> > > On Tue, Aug 22, 2023 at 12:06=E2=80=AFAM Marc Zyngier <maz@kernel.org=
+> wrote:
+> > > >
+> > > > On Mon, 21 Aug 2023 22:22:37 +0100,
+> > > > Jing Zhang <jingzhangos@google.com> wrote:
+> > > > >
+> > > > > All valid fields in ID_AA64DFR0_EL1 and ID_DFR0_EL1 are writable
+> > > > > from userspace with this change.
+> > > > > RES0 fields and those fields hidden by KVM are not writable.
+> > > > >
+> > > > > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > > > > ---
+> > > > >  arch/arm64/kvm/sys_regs.c | 6 ++++--
+> > > > >  1 file changed, 4 insertions(+), 2 deletions(-)
+> > > > >
+> > > > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.=
+c
+> > > > > index afade7186675..20fc38bad4e8 100644
+> > > > > --- a/arch/arm64/kvm/sys_regs.c
+> > > > > +++ b/arch/arm64/kvm/sys_regs.c
+> > > > > @@ -1931,6 +1931,8 @@ static bool access_spsr(struct kvm_vcpu *vc=
+pu,
+> > > > >       return true;
+> > > > >  }
+> > > > >
+> > > > > +#define ID_AA64DFR0_EL1_RES0_MASK (GENMASK(59, 56) | GENMASK(27,=
+ 24) | GENMASK(19, 16))
+> > > > > +
+> > > > >  /*
+> > > > >   * Architected system registers.
+> > > > >   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op=
+2
+> > > > > @@ -2006,7 +2008,7 @@ static const struct sys_reg_desc sys_reg_de=
+scs[] =3D {
+> > > > >         .set_user =3D set_id_dfr0_el1,
+> > > > >         .visibility =3D aa32_id_visibility,
+> > > > >         .reset =3D read_sanitised_id_dfr0_el1,
+> > > > > -       .val =3D ID_DFR0_EL1_PerfMon_MASK, },
+> > > > > +       .val =3D GENMASK(31, 0), },
+> > > >
+> > > > Can you *please* look at the register and realise that we *don't*
+> > > > support writing to the whole of the low 32 bits? What does it mean =
+to
+> > > > allow selecting the M-profile debug? Or the memory-mapped trace?
+> > > >
+> > > > You are advertising a lot of crap to userspace, and that's definite=
+ly
+> > > > not on.
+> > > >
+> > > > >       ID_HIDDEN(ID_AFR0_EL1),
+> > > > >       AA32_ID_SANITISED(ID_MMFR0_EL1),
+> > > > >       AA32_ID_SANITISED(ID_MMFR1_EL1),
+> > > > > @@ -2055,7 +2057,7 @@ static const struct sys_reg_desc sys_reg_de=
+scs[] =3D {
+> > > > >         .get_user =3D get_id_reg,
+> > > > >         .set_user =3D set_id_aa64dfr0_el1,
+> > > > >         .reset =3D read_sanitised_id_aa64dfr0_el1,
+> > > > > -       .val =3D ID_AA64DFR0_EL1_PMUVer_MASK, },
+> > > > > +       .val =3D ~(ID_AA64DFR0_EL1_PMSVer_MASK | ID_AA64DFR0_EL1_=
+RES0_MASK), },
+> > > >
+> > > > And it is the same thing here. Where is the handling code to deal w=
+ith
+> > > > variable breakpoint numbers? Oh wait, there is none. Really, the on=
+ly
+> > > > thing we support writing to are the PMU and Debug versions. And
+> > > > nothing else.
+> > > >
+> > > > What does it mean for userspace? Either the write will be denied
+> > > > despite being advertised a writable field (remember the first patch=
+ of
+> > > > the series???), or we'll blindly accept the write and further ignor=
 e
-> correct those for the next version.
+> > > > the requested values. Do you really think any of this is acceptable=
+?
+> > > >
+> > > > This is the *9th* version of this series, and we're still battling
+> > > > over some extremely basic userspace issues... I don't think we can
+> > > > merge this series as is stands.
+> > >
+> > > I removed sanity checks across multiple fields after the discussion
+> > > here: https://lore.kernel.org/all/ZKRC80hb4hXwW8WK@thinky-boi/
+> > > I might have misunderstood the discussion. I thought we'd let VMM do
+> > > more complete sanity checks.
+> >
+> > The problem is that you don't even have a statement about how this is
+> > supposed to be handled. What are the rules? How can the VMM author
+> > *know*?
+> >
+> > That's my real issue with this series: at no point do we state when an
+> > ID register can be written, what are the rules that must be followed,
+> > where is the split in responsibility between KVM and the VMM, and what
+> > is the expected behaviour when the VMM exposes something that is
+> > completely outlandish to the guest (such as the M-profile debug).
+> >
+> > Do you see the issue? We can always fix the code. But once we've
+> > exposed that to userspace, there is no going back. And I really want
+> > everybody's buy-in on that front, including the VMM people.
 >
+> Understood.
+> Looks like it would be less complicated to have KVM do all the sanity
+> checks to determine if a feature field is configured correctly.
+> The determination can be done by following rules:
+> 1. Architecture constraints from ARM ARM.
+> 2. KVM constraints. (Those features not exposed by KVM should be read-onl=
+y)
+> 3. VCPU features. (The write mask needs to be determined on-the-fly)
 
-Sure, thanks for pointing that out!
+Does this sound good to you to have all sanity checks in KVM?
 
+Thanks,
+Jing
+
+>
 > Thanks,
-> drew
+> Jing
 >
-> On Sat, Sep 02, 2023 at 08:59:22PM +0800, Haibo Xu wrote:
-> > The RISC-V arch_timer selftest is used to validate Sstc timer
-> > functionality in a guest, which sets up periodic timer interrupts
-> > and check the basic interrupt status upon its receipt.
 > >
-> > This KVM selftest was ported from aarch64 arch_timer and tested
-> > with Linux v6.5-rc5 on a Qemu riscv64 virt machine.
+> > Thanks,
 > >
-> > ---
-> > Changed since v1:
-> >   * Rebase to kvm-riscv/riscv_kvm_next
-> >   * Cherry-pick Sean's kselftest guest printf patch set
-> >     https://lore.kernel.org/all/20230729003643.1053367-1-seanjc@google.=
-com/
-> >   * Copy the entire csr.h verbatim
-> >   * Unified the function names for exception vector table setup
-> >     void vm_init_vector_tables(struct kvm_vm *vm);
-> >     void vcpu_init_vector_tables(struct kvm_vcpu *vcpu);
-> >   * Format the handler.S asm file per Andrew's comments
-> >   * Consolidate the timer test code for arm64 and riscv
-> >     based on Andrew's and Sean's suggestion
-> >
-> > Haibo Xu (8):
-> >   KVM: selftests: Unify the codes for guest exception handling
-> >   KVM: arm64: selftest: Split arch_timer test code
-> >   tools: riscv: Add header file csr.h
-> >   KVM: riscv: selftests: Switch to use macro from csr.h
-> >   KVM: riscv: selftests: Add exception handling support
-> >   KVM: riscv: selftests: Add guest helper to get vcpu id
-> >   KVM: riscv: selftest: Change vcpu_has_ext to a common function
-> >   KVM: riscv: selftests: Add sstc timer test
-> >
-> >  tools/arch/riscv/include/asm/csr.h            | 521 ++++++++++++++++++
-> >  tools/testing/selftests/kvm/Makefile          |  11 +-
-> >  .../selftests/kvm/aarch64/arch_timer.c        | 292 +---------
-> >  .../selftests/kvm/aarch64/debug-exceptions.c  |   4 +-
-> >  .../selftests/kvm/aarch64/page_fault_test.c   |   4 +-
-> >  .../testing/selftests/kvm/aarch64/vgic_irq.c  |   4 +-
-> >  tools/testing/selftests/kvm/arch_timer.c      | 261 +++++++++
-> >  .../selftests/kvm/include/aarch64/processor.h |  12 +-
-> >  .../selftests/kvm/include/kvm_util_base.h     |   9 +
-> >  .../selftests/kvm/include/riscv/arch_timer.h  |  80 +++
-> >  .../selftests/kvm/include/riscv/processor.h   |  60 +-
-> >  .../selftests/kvm/include/timer_test.h        |  58 ++
-> >  .../selftests/kvm/include/x86_64/processor.h  |   5 -
-> >  .../selftests/kvm/lib/aarch64/processor.c     |   6 +-
-> >  .../selftests/kvm/lib/riscv/handlers.S        | 101 ++++
-> >  .../selftests/kvm/lib/riscv/processor.c       |  86 +++
-> >  .../selftests/kvm/lib/x86_64/processor.c      |   4 +-
-> >  .../testing/selftests/kvm/riscv/arch_timer.c  | 130 +++++
-> >  .../selftests/kvm/riscv/get-reg-list.c        |  14 -
-> >  tools/testing/selftests/kvm/x86_64/amx_test.c |   4 +-
-> >  .../selftests/kvm/x86_64/fix_hypercall_test.c |   4 +-
-> >  .../selftests/kvm/x86_64/hyperv_evmcs.c       |   4 +-
-> >  .../selftests/kvm/x86_64/hyperv_features.c    |   8 +-
-> >  .../testing/selftests/kvm/x86_64/hyperv_ipi.c |   6 +-
-> >  .../selftests/kvm/x86_64/kvm_pv_test.c        |   4 +-
-> >  .../selftests/kvm/x86_64/monitor_mwait_test.c |   4 +-
-> >  .../kvm/x86_64/pmu_event_filter_test.c        |   8 +-
-> >  .../smaller_maxphyaddr_emulation_test.c       |   4 +-
-> >  .../selftests/kvm/x86_64/svm_int_ctl_test.c   |   4 +-
-> >  .../kvm/x86_64/svm_nested_shutdown_test.c     |   4 +-
-> >  .../kvm/x86_64/svm_nested_soft_inject_test.c  |   4 +-
-> >  .../kvm/x86_64/ucna_injection_test.c          |   8 +-
-> >  .../kvm/x86_64/userspace_msr_exit_test.c      |   4 +-
-> >  .../vmx_exception_with_invalid_guest_state.c  |   4 +-
-> >  .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  |   4 +-
-> >  .../selftests/kvm/x86_64/xapic_ipi_test.c     |   4 +-
-> >  .../selftests/kvm/x86_64/xcr0_cpuid_test.c    |   4 +-
-> >  .../selftests/kvm/x86_64/xen_shinfo_test.c    |   4 +-
-> >  38 files changed, 1376 insertions(+), 376 deletions(-)
-> >  create mode 100644 tools/arch/riscv/include/asm/csr.h
-> >  create mode 100644 tools/testing/selftests/kvm/arch_timer.c
-> >  create mode 100644 tools/testing/selftests/kvm/include/riscv/arch_time=
-r.h
-> >  create mode 100644 tools/testing/selftests/kvm/include/timer_test.h
-> >  create mode 100644 tools/testing/selftests/kvm/lib/riscv/handlers.S
-> >  create mode 100644 tools/testing/selftests/kvm/riscv/arch_timer.c
+> >         M.
 > >
 > > --
-> > 2.34.1
-> >
+> > Without deviation from the norm, progress is not possible.
