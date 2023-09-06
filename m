@@ -1,120 +1,200 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73DA31C3A
-	for <kvmarm@lists.linux.dev>; Wed,  6 Sep 2023 10:10:38 +0000 (UTC)
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2bceca8a41aso53487361fa.0
-        for <kvmarm@lists.linux.dev>; Wed, 06 Sep 2023 03:10:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693995036; x=1694599836; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EfOqaeV+KknayCO8Oeiwloxt+zMetEN9D2laP149Llc=;
-        b=qfCgpTE1skiOCzgjSKe7nhYFsqPebFi7rMKPillgUN54PaBiYzmn/xeueEwrWkh2Z9
-         z7EdLaI5O6Mq/7bY45unYXjSzTmS0JCezjZLUKtItZQ2jOVvkaF1bOqvjX4HA4MMdn8u
-         BnKkiKH794wsw5uITkopBIW3nBuNYdnU4Ao5rE6pWjpwhgAgZWNWT63/3xBU8T360W2G
-         ZDnGSMPLVhsVHwMTzsZinixOsTCsGr/h6S944yw4CY458ZDuVyiXZkRqhP9fL18cpMNS
-         6vWeSiFJQAgXWdAg4JTe3hm0dZ5v6ExU/AytriJyaYnOoQHKDJfjw2c3iv9VseQ8nb9d
-         PwEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693995036; x=1694599836;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EfOqaeV+KknayCO8Oeiwloxt+zMetEN9D2laP149Llc=;
-        b=fdqF9xVTrcaZU+lXGVPp2zQsvxZmR0VV8V/mAuQkksJPH5F7eB/nth75lK9o8QJ22/
-         aABYWd0yZbhOpHs1GzuRpQrdK9gnomZnLZJQw5iIrxwYDBnn/1UMDQjkJwMoRcDasFrQ
-         5eaWwm0hNevoxJQuAV6TNeTslTaTtoaNf8rYn7VRIixcQWzTGMlDOtbCSmaEpimMeEkk
-         fdFv+B3h8chGWt/lf+O3OE/iKjxlSWN1MVqdTrss+B0TIbneRbZbINH0h0EhBvwGf+tM
-         8KDJe1jAwFrnubNf3D2+S6+XtUwNuCiQlNCcBBTOO8gYIvnFuQNVPvD8OMB1CMjz+DdW
-         z/Fg==
-X-Gm-Message-State: AOJu0YxtELyeGNMjDMORaNiItqvNo3dnTTedHhn3NswTo0MqHc3dw1ET
-	FOXFwLeGXeaLLDhaHH20UvuOU8vY2kYHx0Let8c=
-X-Google-Smtp-Source: AGHT+IFgpGZUTmfvyaicrKry99f2uX/eh3DtKB8c/qKcmnkcHz7uwZYtn0qD9L1QTcGEetIJKq9wCp8WNJgZPbJB/RM=
-X-Received: by 2002:a05:651c:104a:b0:2bd:180d:67b1 with SMTP id
- x10-20020a05651c104a00b002bd180d67b1mr1816321ljm.51.1693995035890; Wed, 06
- Sep 2023 03:10:35 -0700 (PDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A6EF6AAD
+	for <kvmarm@lists.linux.dev>; Wed,  6 Sep 2023 11:23:24 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 40E8F1063;
+	Wed,  6 Sep 2023 04:24:01 -0700 (PDT)
+Received: from monolith (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E44573F7C5;
+	Wed,  6 Sep 2023 04:23:13 -0700 (PDT)
+Date: Wed, 6 Sep 2023 12:23:21 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: David Hildenbrand <david@redhat.com>, will@kernel.org,
+	oliver.upton@linux.dev, maz@kernel.org, james.morse@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, arnd@arndb.de,
+	akpm@linux-foundation.org, mingo@redhat.com, peterz@infradead.org,
+	juri.lelli@redhat.com, vincent.guittot@linaro.org,
+	dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
+	mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com,
+	mhiramat@kernel.org, rppt@kernel.org, hughd@google.com,
+	pcc@google.com, steven.price@arm.com, anshuman.khandual@arm.com,
+	vincenzo.frascino@arm.com, eugenis@google.com, kcc@google.com,
+	hyesoo.yu@samsung.com, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC 00/37] Add support for arm64 MTE dynamic tag storage
+ reuse
+Message-ID: <ZPhfNVWXhabqnknK@monolith>
+References: <20230823131350.114942-1-alexandru.elisei@arm.com>
+ <33def4fe-fdb8-6388-1151-fabd2adc8220@redhat.com>
+ <ZOc0fehF02MohuWr@arm.com>
+ <ebd3f142-43cc-dc92-7512-8f1c99073fce@redhat.com>
+ <0b9c122a-c05a-b3df-c69f-85f520294adc@redhat.com>
+ <ZOd2LvUKMguWdlgq@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <cover.1693659382.git.haibo1.xu@intel.com> <b6ef1b031e3a581f481cf19a26623388163444b4.1693659382.git.haibo1.xu@intel.com>
- <20230904-aa8b0d8d23d391586686038a@orel>
-In-Reply-To: <20230904-aa8b0d8d23d391586686038a@orel>
-From: Haibo Xu <xiaobo55x@gmail.com>
-Date: Wed, 6 Sep 2023 18:10:24 +0800
-Message-ID: <CAJve8ok5cU+h1K+WJ+aDpB+u+PBo8XosUyyVbMGy-xR0XiWFdw@mail.gmail.com>
-Subject: Re: [PATCH v2 7/8] KVM: riscv: selftest: Change vcpu_has_ext to a
- common function
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: Haibo Xu <haibo1.xu@intel.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
-	Daniel Henrique Barboza <dbarboza@ventanamicro.com>, wchen <waylingii@gmail.com>, 
-	Sean Christopherson <seanjc@google.com>, Ricardo Koller <ricarkol@google.com>, 
-	Vishal Annapurve <vannapurve@google.com>, David Matlack <dmatlack@google.com>, 
-	Aaron Lewis <aaronlewis@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Mingwei Zhang <mizhang@google.com>, 
-	Jim Mattson <jmattson@google.com>, Lei Wang <lei4.wang@intel.com>, 
-	Vipin Sharma <vipinsh@google.com>, Maxim Levitsky <mlevitsk@redhat.com>, Like Xu <likexu@tencent.com>, 
-	Peter Gonda <pgonda@google.com>, Thomas Huth <thuth@redhat.com>, 
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
-	David Woodhouse <dwmw@amazon.co.uk>, Michal Luczaj <mhal@rbox.co>, Paul Durrant <paul@xen.org>, 
-	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZOd2LvUKMguWdlgq@arm.com>
 
-On Mon, Sep 4, 2023 at 10:04=E2=80=AFPM Andrew Jones <ajones@ventanamicro.c=
-om> wrote:
->
-> On Sat, Sep 02, 2023 at 08:59:29PM +0800, Haibo Xu wrote:
-> > diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/t=
-esting/selftests/kvm/riscv/get-reg-list.c
-> > index d8ecacd03ecf..c4028bf32e3f 100644
-> > --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> > +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> > @@ -44,20 +44,6 @@ bool check_reject_set(int err)
-> >       return err =3D=3D EINVAL;
-> >  }
-> >
-> > -static inline bool vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
-> > -{
-> > -     int ret;
-> > -     unsigned long value;
-> > -
-> > -     ret =3D __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
-> > -     if (ret) {
-> > -             printf("Failed to get ext %d", ext);
-> > -             return false;
-> > -     }
-> > -
-> > -     return !!value;
->
-> get-reg-list will now assert on get-reg when an extension isn't present,
-> rather than failing the __TEST_REQUIRE(), which would do a skip instead.
-> We need both the return false version and the assert version.
->
+Hi,
 
-Ok, Will keep this one for get-reg-list and add another one for
-arch-timer specific usage.
+Thank you for the feedback!
 
-> > -}
-> > -
-> >  void finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu_reg_list *c)
-> >  {
-> >       struct vcpu_reg_sublist *s;
-> > --
-> > 2.34.1
-> >
->
-> Thanks,
-> drew
+Catalin did a great job explaining what this patch series does, I'll add my
+own comments on top of his.
+
+On Thu, Aug 24, 2023 at 04:24:30PM +0100, Catalin Marinas wrote:
+> On Thu, Aug 24, 2023 at 01:25:41PM +0200, David Hildenbrand wrote:
+> > On 24.08.23 13:06, David Hildenbrand wrote:
+> > > On 24.08.23 12:44, Catalin Marinas wrote:
+> > > > The way MTE is implemented currently is to have a static carve-out of
+> > > > the DRAM to store the allocation tags (a.k.a. memory colour). This is
+> > > > what we call the tag storage. Each 16 bytes have 4 bits of tags, so this
+> > > > means 1/32 of the DRAM, roughly 3% used for the tag storage. This is
+> > > > done transparently by the hardware/interconnect (with firmware setup)
+> > > > and normally hidden from the OS. So a checked memory access to location
+> > > > X generates a tag fetch from location Y in the carve-out and this tag is
+> > > > compared with the bits 59:56 in the pointer. The correspondence from X
+> > > > to Y is linear (subject to a minimum block size to deal with some
+> > > > address interleaving). The software doesn't need to know about this
+> > > > correspondence as we have specific instructions like STG/LDG to location
+> > > > X that lead to a tag store/load to Y.
+> > > > 
+> > > > Now, not all memory used by applications is tagged (mmap(PROT_MTE)).
+> > > > For example, some large allocations may not use PROT_MTE at all or only
+> > > > for the first and last page since initialising the tags takes time. The
+> > > > side-effect is that of these 3% DRAM, only part, say 1% is effectively
+> > > > used. Some people want the unused tag storage to be released for normal
+> > > > data usage (i.e. give it to the kernel page allocator).
+> [...]
+> > > So it sounds like you might want to provide that tag memory using CMA.
+> > > 
+> > > That way, only movable allocations can end up on that CMA memory area,
+> > > and you can allocate selected tag pages on demand (similar to the
+> > > alloc_contig_range() use case).
+> > > 
+> > > That also solves the issue that such tag memory must not be longterm-pinned.
+> > > 
+> > > Regarding one complication: "The kernel needs to know where to allocate
+> > > a PROT_MTE page from or migrate a current page if it becomes PROT_MTE
+> > > (mprotect()) and the range it is in does not support tagging.",
+> > > simplified handling would be if it's in a MIGRATE_CMA pageblock, it
+> > > doesn't support tagging. You have to migrate to a !CMA page (for
+> > > example, not specifying GFP_MOVABLE as a quick way to achieve that).
+> > 
+> > Okay, I now realize that this patch set effectively duplicates some CMA
+> > behavior using a new migrate-type.
+> 
+> Yes, pretty much, with some additional hooks to trigger migration. The
+> CMA mechanism was a great source of inspiration.
+> 
+> In addition, there are some races that are addressed mostly around page
+> migration/copying: the source page is untagged, the destination
+> allocated as untagged but before the copy an mprotect() makes the source
+> tagged (PG_mte_tagged set) and the copy_highpage() mechanism not having
+> anywhere to store the tags.
+> 
+> > Yeah, that's probably not what we want just to identify if memory is
+> > taggable or not.
+> > 
+> > Maybe there is a way to just keep reusing most of CMA instead.
+> 
+> A potential issue is that devices (mobile phones) may need a different
+> CMA range as well for DMA (and not necessarily in ZONE_DMA). Can
+> free_area[MIGRATE_CMA] handle multiple disjoint ranges? I don't see why
+> not as it's just a list.
+
+I don't think that's a problem either, today the user can specify multiple
+CMA ranges on the kernel command line (via "cma", "hugetlb_cma", etc). CMA
+already has the mechanism to keep track of multiple regions - it stores in
+the cma_areas array.
+
+> 
+> We (Google and Arm) went through a few rounds of discussions and
+> prototyping trying to find the best approach: (1) a separate free_area[]
+> array in each zone (early proof of concept from Peter C and Evgenii S,
+> https://github.com/google/sanitizers/tree/master/mte-dynamic-carveout),
+> (2) a new ZONE_METADATA, (3) a separate CPU-less NUMA node just for the
+> tag storage, (4) a new MIGRATE_METADATA type.
+> 
+> We settled on the latter as it closely resembles CMA without interfering
+> with it. I don't remember why we did not just go for MIGRATE_CMA, it may
+> have been the heterogeneous memory aspect and the fact that we don't
+> want PROT_MTE (VM_MTE) allocations from this range. If the hardware
+> allowed this, I think the patches would have been a bit simpler.
+
+You are correct, we settled on a new migrate type because the tag storage
+memory is fundamentally a different memory type with different properties
+than the rest of the memory in the system: tag storage memory cannot be
+tagged, MIGRATE_CMA memory can be tagged.
+
+> 
+> Alex can comment more next week on how we ended up with this choice but
+> if we find a way to avoid VM_MTE allocations from certain areas, I think
+> we can reuse the CMA infrastructure. A bigger hammer would be no VM_MTE
+> allocations from any CMA range but it seems too restrictive.
+
+I considered mixing the tag storage memory memory with normal memory and
+adding it to MIGRATE_CMA. But since tag storage memory cannot be tagged,
+this means that it's not enough anymore to have a __GFP_MOVABLE allocation
+request to use MIGRATE_CMA.
+
+I considered two solutions to this problem:
+
+1. Only allocate from MIGRATE_CMA is the requested memory is not tagged =>
+this effectively means transforming all memory from MIGRATE_CMA into the
+MIGRATE_METADATA migratetype that the series introduces. Not very
+appealing, because that means treating normal memory that is also on the
+MIGRATE_CMA lists as tagged memory.
+
+2. Keep track of which pages are tag storage at page granularity (either by
+a page flag, or by checking that the pfn falls in one of the tag storage
+region, or by some other mechanism). When the page allocator takes free
+pages from the MIGRATE_METADATA list to satisfy an allocation, compare the
+gfp mask with the page type, and if the allocation is tagged and the page
+is a tag storage page, put it back at the tail of the free list and choose
+the next page. Repeat until the page allocator finds a normal memory page
+that can be tagged (some refinements obviously needed to need to avoid
+infinite loops).
+
+I considered solution 2 to be more complicated than keeping track of tag
+storage page at the migratetype level. Conceptually, keeping two distinct
+memory type on separate migrate types looked to me like the cleaner and
+simpler solution.
+
+Maybe I missed something, I'm definitely open to suggestions regarding
+putting the tag storage pages on MIGRATE_CMA (or another migratetype) if
+that's a better approach.
+
+Might be worth pointing out that putting the tag storage memory on the
+MIGRATE_CMA migratetype only changes how the page allocator allocates
+pages; all the other changes to migration/compaction/mprotect/etc will
+still be there, because they are needed not because of how the tag storage
+memory is represented by the page allocator, but because tag storage memory
+cannot be tagged, and regular memory can.
+
+Thanks,
+Alex
+
+> 
+> > Another simpler idea to get started would be to just intercept the first
+> > PROT_MTE, and allocate all CMA memory. In that case, systems that don't ever
+> > use PROT_MTE can have that additional 3% of memory.
+> 
+> We had this on the table as well but the most likely deployment, at
+> least initially, is only some secure services enabling MTE with various
+> apps gradually moving towards this in time. So that's why the main
+> pushback from vendors is having this 3% reserved permanently. Even if
+> all apps use MTE, only the anonymous mappings are PROT_MTE, so still not
+> fully using the tag storage.
+> 
+> -- 
+> Catalin
+> 
