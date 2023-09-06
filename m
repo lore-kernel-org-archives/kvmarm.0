@@ -1,406 +1,168 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A933762B
-	for <kvmarm@lists.linux.dev>; Wed,  6 Sep 2023 00:45:04 +0000 (UTC)
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-68a628f923dso3562698b3a.2
-        for <kvmarm@lists.linux.dev>; Tue, 05 Sep 2023 17:45:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DAA962B
+	for <kvmarm@lists.linux.dev>; Wed,  6 Sep 2023 01:24:10 +0000 (UTC)
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2bd6611873aso48400091fa.1
+        for <kvmarm@lists.linux.dev>; Tue, 05 Sep 2023 18:24:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693961104; x=1694565904; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HUA9usxNgwB6YytBqtV+1OLueYqIkCgXy7MnO3qXqNQ=;
-        b=q7pGVSS+8Hm1Dz6deh5U7PY3vQDZ+oF/8ZCa8JA99595NOA3/ANXmdSMMNYk/HJ1U8
-         nQk5CvGnCWoTIcqzjM+Z/hDJxOQTNxvNlSsNOQeSGwW7bRJrk3DRpa3sjISO6yF+W55P
-         PRcXLurdTSJIjWTGqKvueT3ykP+YAHIbZojSztUllDqHfI8MmTVyV1HU0MSNKeFYlCRW
-         PnRasshf7PEzuBmm6JeKLGW0SVge24rbwD6Nq+xOFBXE9tBMSR0WnFpTCUPNJfcIw5GT
-         /J+NmrMoXewI5QoGRwhHJmv6urXsC+QTMrikzLAjWc7uym43P3E9WqqNJjqDDzRO+zS/
-         7FqA==
+        d=gmail.com; s=20221208; t=1693963448; x=1694568248; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1xfJSGXD8vBLM08q729zBD/9glpH/PWMQ0GciStqljw=;
+        b=m1U34WmmP2BxEc1dbY8yAetSUe4D4pDQmG5fpDwbXjvzMpMVRYTjULPjUT/96ZHQ7d
+         UiD90Yx7nXNIIleLhhg2vSaaElO6oHSkD2/KO9adqxp5sNDKx4SeSk42mjna1xshjQdY
+         JDOJJg4tl9jdfJur25BcV4oxt8JvkPHtKbuebmSIJfTlM06G7qcLY35aSz8NZ/tmI5fN
+         3EY5qswOA1W5Rrnr78Yt3D9nWP+AnptyhpUvKdzRF1F5wZsKy2e1vpBQI8D/hs67jX67
+         1wKvGsnVtWajAVtCtf+8qoRVodyKNdBwO3c0O58Fju76xuLCoowhr/OTNhPgI82OYAmI
+         Cw0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693961104; x=1694565904;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=HUA9usxNgwB6YytBqtV+1OLueYqIkCgXy7MnO3qXqNQ=;
-        b=GxFchHR5ocJwyqMAZIvvHthdSetPNK1BqThJ+ldCZMbn/cNAT0VGTtXYltKFPpCM/R
-         fvk4XwfoXHOAhLkzaGfzwxBp0yZGOmKxuIDZrWpHsVpgXqZGTPRSGlz7/0bWmF99p7BX
-         bI0f8WgS8xukdvzxtkdUxGI8hCAUoVjuhTRE4VYwtLQih7+Tfccr8EKuiuKTFIAC/2n0
-         kBthjXrYCK+bDnfxtvfndT516dnsBfYBjODDzBNNCjYcYG+G7zVdFZLAkrjRVETPxoJK
-         71njdnFrIVUdZTaLfuTjVUyDwcT80sr+tK+Y4kiTh72ZelBzr7NxBktq0iE4EjlVhfL/
-         5ZoQ==
-X-Gm-Message-State: AOJu0YwEnxHQzgZsKuPpXPBzAM/XtdE28VH53tn91aQcTD2Dx4tmXb0H
-	o1ucIsulMsMCfkdbqwdRj/K6ZCvgtA4=
-X-Google-Smtp-Source: AGHT+IEjMoa55UXF5kyTyYfYfW3WHpsvfUj4SXpf2Xux5fwvpnUOg3He95RZW7oJ1ZZo3y681Y0APv8WxlY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:3982:b0:68c:33a9:e564 with SMTP id
- fi2-20020a056a00398200b0068c33a9e564mr5874174pfb.5.1693961103860; Tue, 05 Sep
- 2023 17:45:03 -0700 (PDT)
-Date: Tue, 5 Sep 2023 17:45:02 -0700
-In-Reply-To: <CAD=HUj6SoKHhA02oNpCt--ofE_n1wjdY1ddBURXDiS5Rwu=Q-g@mail.gmail.com>
+        d=1e100.net; s=20221208; t=1693963448; x=1694568248;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1xfJSGXD8vBLM08q729zBD/9glpH/PWMQ0GciStqljw=;
+        b=f3Z5X/6ChFcjDwm8bjWsQZtntgusMGoQ/Haz73xrIWSMDBeAlUHEJ0bZt6oqk6uHMb
+         8t5dVg2TICuwdNxpDPGOiGDdVRxjUfL3xvJBc3oVxx2kNCiJkrRWLnh8XRI0fLbC+mYY
+         y3gB7nxYPx6BwrBg7EGrI1KAHYL/anePfmOKHSdw463y/PQulAH7/4ZIFiQxIP+F/9/S
+         30Vej8wOxFE3pUQh0jvwwcgUcnij4OZQxNlDLaayookH9z5BPSqYIkYUf05XtHyLsGj4
+         aeJ0akbLuuXA1FxbA/KB4FUoNe7/oBnM+hyItLQPZmU1aZ8u/Z4uGjhryv0DxZC8IYSF
+         axVg==
+X-Gm-Message-State: AOJu0YxdIOSpZLMtzExgHfeytxuEwo2rOrVxMqQGesNy5mP916PxwBnr
+	80ddrPceP6P8acN4hYiCutYde5xQHRp1kiKJ7Vc=
+X-Google-Smtp-Source: AGHT+IEZAtSdfv2O9kOnOodcd6ZENRRHvHNIg7rIlF/apuuxioXnbEufFM1mW11nwPy+FUp/gWhTnrfWfFZLNg5iXcI=
+X-Received: by 2002:a2e:7204:0:b0:2bc:fb79:d165 with SMTP id
+ n4-20020a2e7204000000b002bcfb79d165mr1109276ljc.39.1693963447866; Tue, 05 Sep
+ 2023 18:24:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-4-stevensd@google.com>
- <20230705161914.00004070.zhi.wang.linux@gmail.com> <CAD=HUj5cbzjrc0KD7xcibtRMRCzoJRJAzt7jTHSXUSpzyAYbdg@mail.gmail.com>
- <20230711203348.00000fb8.zhi.wang.linux@gmail.com> <ZK3Q34WNLjGVQQw+@google.com>
- <CAD=HUj6SoKHhA02oNpCt--ofE_n1wjdY1ddBURXDiS5Rwu=Q-g@mail.gmail.com>
-Message-ID: <ZPfLjnG8b9LJV4p7@google.com>
-Subject: Re: [PATCH v7 3/8] KVM: Make __kvm_follow_pfn not imply FOLL_GET
-From: Sean Christopherson <seanjc@google.com>
-To: David Stevens <stevensd@chromium.org>
-Cc: Zhi Wang <zhi.wang.linux@gmail.com>, Marc Zyngier <maz@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Peter Xu <peterx@redhat.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+References: <cover.1693659382.git.haibo1.xu@intel.com> <20230905-eb7998dbd945ed9dd12659ea@orel>
+In-Reply-To: <20230905-eb7998dbd945ed9dd12659ea@orel>
+From: Haibo Xu <xiaobo55x@gmail.com>
+Date: Wed, 6 Sep 2023 09:23:56 +0800
+Message-ID: <CAJve8o=Oz9m_t3tZOFgxo41Ss+dz-kLHU5Y44ov=JjZs3Jyaew@mail.gmail.com>
+Subject: Re: [PATCH v2 0/8] RISCV: Add kvm Sstc timer selftest
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: Haibo Xu <haibo1.xu@intel.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
+	wchen <waylingii@gmail.com>, Greentime Hu <greentime.hu@sifive.com>, 
+	Sean Christopherson <seanjc@google.com>, Ricardo Koller <ricarkol@google.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Vipin Sharma <vipinsh@google.com>, 
+	Aaron Lewis <aaronlewis@google.com>, David Matlack <dmatlack@google.com>, 
+	Mingwei Zhang <mizhang@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Lei Wang <lei4.wang@intel.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, Peter Gonda <pgonda@google.com>, Thomas Huth <thuth@redhat.com>, 
+	Like Xu <likexu@tencent.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
+	David Woodhouse <dwmw@amazon.co.uk>, Michal Luczaj <mhal@rbox.co>, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 05, 2023, David Stevens wrote:
-> On Wed, Jul 12, 2023 at 7:00=E2=80=AFAM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >
-> > On Tue, Jul 11, 2023, Zhi Wang wrote:
-> > > On Thu, 6 Jul 2023 15:49:39 +0900
-> > > David Stevens <stevensd@chromium.org> wrote:
-> > >
-> > > > On Wed, Jul 5, 2023 at 10:19___PM Zhi Wang <zhi.wang.linux@gmail.co=
+On Tue, Sep 5, 2023 at 6:36=E2=80=AFPM Andrew Jones <ajones@ventanamicro.co=
 m> wrote:
-> > > > >
-> > > > > On Tue,  4 Jul 2023 16:50:48 +0900
-> > > > > David Stevens <stevensd@chromium.org> wrote:
-> > > > > If yes, do we have to use FOLL_GET to resolve GFN associated with=
- a tail page?
-> > > > > It seems gup can tolerate gup_flags without FOLL_GET, but it is m=
-ore like a
-> > > > > temporary solution. I don't think it is a good idea to play trick=
-s with
-> > > > > a temporary solution, more like we are abusing the toleration.
-> > > >
-> > > > I'm not sure I understand what you're getting at. This series never
-> > > > calls gup without FOLL_GET.
-> > > >
-> > > > This series aims to provide kvm_follow_pfn as a unified API on top =
-of
-> > > > gup+follow_pte. Since one of the major clients of this API uses an =
-mmu
-> > > > notifier, it makes sense to support returning a pfn without taking =
-a
-> > > > reference. And we indeed need to do that for certain types of memor=
-y.
-> > > >
-> > >
-> > > I am not having prob with taking a pfn without taking a ref. I am
-> > > questioning if using !FOLL_GET in struct kvm_follow_pfn to indicate t=
-aking
-> > > a pfn without a ref is a good idea or not, while there is another fla=
-g
-> > > actually showing it.
-> > >
-> > > I can understand that using FOLL_XXX in kvm_follow_pfn saves some
-> > > translation between struct kvm_follow_pfn.{write, async, xxxx} and GU=
-P
-> > > flags. However FOLL_XXX is for GUP. Using FOLL_XXX for reflecting the
-> > > requirements of GUP in the code path that going to call GUP is reason=
-able.
-> > >
-> > > But using FOLL_XXX with purposes that are not related to GUP call rea=
-lly
-> > > feels off.
-> >
-> > I agree, assuming you're talking specifically about the logic in hva_to=
-_pfn_remapped()
-> > that handles non-refcounted pages, i.e. this
-> >
-> >         if (get_page_unless_zero(page)) {
-> >                 foll->is_refcounted_page =3D true;
-> >                 if (!(foll->flags & FOLL_GET))
-> >                         put_page(page);
-> >         } else if (foll->flags & FOLL_GET) {
-> >                 r =3D -EFAULT;
-> >         }
-> >
-> > should be
-> >
-> >         if (get_page_unless_zero(page)) {
-> >                 foll->is_refcounted_page =3D true;
-> >                 if (!(foll->flags & FOLL_GET))
-> >                         put_page(page);
-> >         else if (!foll->guarded_by_mmu_notifier)
-> >                 r =3D -EFAULT;
-> >
-> > because it's not the desire to grab a reference that makes getting non-=
-refcounted
-> > pfns "safe", it's whether or not the caller is plugged into the MMU not=
-ifiers.
-> >
-> > Though that highlights that checking guarded_by_mmu_notifier should be =
-done for
-> > *all* non-refcounted pfns, not just non-refcounted struct page memory.
->=20
-> I think things are getting confused here because there are multiple
-> things which "safe" refers to. There are three different definitions
-> that I think are relevant here:
->=20
-> 1) "safe" in the sense that KVM doesn't corrupt page reference counts
-> 2) "safe" in the sense that KVM doesn't access pfns after they have been =
-freed
-> 3) "safe" in the sense that KVM doesn't use stale hva -> pfn translations
 >
-> For property 1, FOLL_GET is important. If the caller passes FOLL_GET,
-> then they expect to be able to pass the returned pfn to
-> kvm_release_pfn. This means that when FOLL_GET is set, if
-> kvm_pfn_to_refcounted_page returns a page, then hva_to_pfn_remapped
-> must take a reference count to avoid eventually corrupting the page
-> ref count. I guess replacing the FOLL_GET check with
-> !guarded_by_mmu_notifier is logically equivalent because
-> __kvm_follow_pfn requires that at least one of guarded_by_mmu_notifier
-> and FOLL_GET is set. But since we're concerned about a property of the
-> refcount, I think that checking FOLL_GET is clearer.
->=20
-> For property 2, FOLL_GET is also important. If guarded_by_mmu_notifier
-> is set, then we're all good here. If guarded_by_mmu_notifier is not
-> set, then the check in __kvm_follow_pfn guarantees that FOLL_GET is
-> set. For struct page memory, we're safe because KVM will hold a
-> reference as long as it's still using the page. For non struct page
-> memory, we're not safe - this is where the breaking change of
-> allow_unsafe_mappings would go. Note that for non-refcounted struct
-> page, we can't use the allow_unsafe_mappings escape hatch. Since
-> FOLL_GET was requested, if we returned such a page, then the caller
-> would eventually corrupt the page refcount via kvm_release_pfn.
-
-Yes we can.  The caller simply needs to be made aware of is_refcounted_page=
-.   I
-didn't include that in the snippet below because I didn't want to write the=
- entire
-patch.  The whole point of adding is_refcounted_page is so that callers can
-identify exactly what type of page was at the end of the trail that was fol=
-lowed.
-
-> Property 3 would be nice, but we've already concluded that guarding
-> all translations with mmu notifiers is infeasible. So maintaining
-> property 2 is the best we can hope for.
-
-No, #3 is just a variant of #2.  Unless you're talking about not making gua=
-rantees
-about guest accesses being ordered with respect to VMA/memslot updates, but=
- I
-don't think that's the case.
-
-> > As for the other usage of FOLL_GET in this series (using it to conditio=
-nally do
-> > put_page()), IMO that's very much related to the GUP call.  Invoking pu=
-t_page()
-> > is a hack to workaround the fact that GUP doesn't provide a way to get =
-the pfn
-> > without grabbing a reference to the page.  In an ideal world, KVM would=
- NOT pass
-> > FOLL_GET to the various GUP helpers, i.e. FOLL_GET would be passed as-i=
-s and KVM
-> > wouldn't "need" to kinda sorta overload FOLL_GET to manually drop the r=
-eference.
-> >
-> > I do think it's worth providing a helper to consolidate and document th=
-at hacky
-> > code, e.g. add a kvm_follow_refcounted_pfn() helper.
-> >
-> > All in all, I think the below (completely untested) is what we want?
-> >
-> > David (and others), I am planning on doing a full review of this series=
- "soon",
-> > but it will likely be a few weeks until that happens.  I jumped in on t=
-his
-> > specific thread because this caught my eye and I really don't want to t=
-hrow out
-> > *all* of the FOLL_GET usage.
-> >
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 5b5afd70f239..90d424990e0a 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -2481,6 +2481,25 @@ static inline int check_user_page_hwpoison(unsig=
-ned long addr)
-> >         return rc =3D=3D -EHWPOISON;
-> >  }
-> >
-> > +static kvm_pfn_t kvm_follow_refcounted_pfn(struct kvm_follow_pfn *foll=
-,
-> > +                                          struct page *page)
-> > +{
-> > +       kvm_pfn_t pfn =3D page_to_pfn(page);
-> > +
-> > +       foll->is_refcounted_page =3D true;
-> > +
-> > +       /*
-> > +        * FIXME: Ideally, KVM wouldn't pass FOLL_GET to gup() when the=
- caller
-> > +        * doesn't want to grab a reference, but gup() doesn't support =
-getting
-> > +        * just the pfn, i.e. FOLL_GET is effectively mandatory.  If th=
-at ever
-> > +        * changes, drop this and simply don't pass FOLL_GET to gup().
-> > +        */
-> > +       if (!(foll->flags & FOLL_GET))
-> > +               put_page(page);
-> > +
-> > +       return pfn;
-> > +}
-> > +
-> >  /*
-> >   * The fast path to get the writable pfn which will be stored in @pfn,
-> >   * true indicates success, otherwise false is returned.  It's also the
-> > @@ -2500,11 +2519,9 @@ static bool hva_to_pfn_fast(struct kvm_follow_pf=
-n *foll, kvm_pfn_t *pfn)
-> >                 return false;
-> >
-> >         if (get_user_page_fast_only(foll->hva, FOLL_WRITE, page)) {
-> > -               *pfn =3D page_to_pfn(page[0]);
-> >                 foll->writable =3D foll->allow_write_mapping;
-> > -               foll->is_refcounted_page =3D true;
-> > -               if (!(foll->flags & FOLL_GET))
-> > -                       put_page(page[0]);
-> > +
-> > +               *pfn =3D kvm_follow_refcounted_pfn(foll, page[0]);
-> >                 return true;
-> >         }
-> >
-> > @@ -2528,7 +2545,6 @@ static int hva_to_pfn_slow(struct kvm_follow_pfn =
-*foll, kvm_pfn_t *pfn)
-> >                 return npages;
-> >
-> >         foll->writable =3D (foll->flags & FOLL_WRITE) && foll->allow_wr=
-ite_mapping;
-> > -       foll->is_refcounted_page =3D true;
-> >
-> >         /* map read fault as writable if possible */
-> >         if (unlikely(!foll->writable) && foll->allow_write_mapping) {
-> > @@ -2540,9 +2556,8 @@ static int hva_to_pfn_slow(struct kvm_follow_pfn =
-*foll, kvm_pfn_t *pfn)
-> >                         page =3D wpage;
-> >                 }
-> >         }
-> > -       *pfn =3D page_to_pfn(page);
-> > -       if (!(foll->flags & FOLL_GET))
-> > -               put_page(page);
-> > +
-> > +       *pfn =3D kvm_follow_refcounted_pfn(foll, page);
-> >         return npages;
-> >  }
-> >
-> > @@ -2610,17 +2625,16 @@ static int hva_to_pfn_remapped(struct vm_area_s=
-truct *vma, struct kvm_follow_pfn
-> >         if (!page)
-> >                 goto out;
-> >
-> > -       if (get_page_unless_zero(page)) {
-> > -               foll->is_refcounted_page =3D true;
-> > -               if (!(foll->flags & FOLL_GET))
-> > -                       put_page(page);
-> > -       } else if (foll->flags & FOLL_GET) {
-> > -               r =3D -EFAULT;
-> > -       }
-> > -
-> > +       if (get_page_unless_zero(page))
-> > +               WARN_ON_ONCE(kvm_follow_refcounted_pfn(foll, page) !=3D=
- pfn);
-> >  out:
-> >         pte_unmap_unlock(ptep, ptl);
-> > -       *p_pfn =3D pfn;
-> > +
-> > +       if (!foll->is_refcounted_page && !foll->guarded_by_mmu_notifier=
- &&
-> > +           !allow_unsafe_mappings)
-> > +               r =3D -EFAULT;
-> > +       else
-> > +               *p_pfn =3D pfn;
-> >
-> >         return r;
-> >  }
-> >
->=20
-> As I pointed out above, this suggestion is broken because a FOLL_GET
-> && !guarded_by_mmu_notifier request (e.g. kvm_vcpu_map) for a
-> non-refcounted page will result in the refcount eventually being
-> corrupted.
-
-I don't think so, unless I'm misunderstanding the concern.  It just wasn't =
-a
-complete patch, and wasn't intended to be.
-
-> What do you think of this implementation? If it makes sense, I can
-> send out an updated patch series.
+> Hi Haibo,
 >
-> /*
->  * If FOLL_GET is set, then the caller wants us to take a reference to
->  * keep the pfn alive. If FOLL_GET isn't set, then __kvm_follow_pfn
->  * guarantees that guarded_by_mmu_notifier is set, so there aren't any
->  * use-after-free concerns.
->  */
-> page =3D kvm_pfn_to_refcounted_page(pfn);
-> if (page) {
->         if (get_page_unless_zero(page)) {
->                 WARN_ON_ONCE(kvm_follow_refcounted_pfn(foll, page) !=3D p=
-fn);
->         } else if (foll->flags & FOLL_GET) {
->                 /*
->                  * Certain IO or PFNMAP mappings can be backed with
->                  * valid struct pages but be allocated without
->                  * refcounting e.g., tail pages of non-compound higher
->                  * order allocations. The caller asked for a ref, but
->                  * we can't take one, since releasing such a ref would
->                  * free the page.
->                  */
->                 r =3D -EFAULT;
->         }
-> } else if (foll->flags & FOLL_GET) {
->         /*
->          * When there's no struct page to refcount and no MMU notifier,
->          * then KVM can't be guarantee to avoid use-after-free. However,
->          * there are valid reasons to set up such mappings. If userspace
->          * is trusted and willing to forego kernel safety guarantees,
->          * allow this check to be bypassed.
->          */
->         if (foll->guarded_by_mmu_notifier && !allow_unsafe_mappings)
+> Some of your patch summaries say 'selftest' instead of 'selftests'. Pleas=
+e
+> correct those for the next version.
+>
 
-I assume you mean:
+Sure, thanks for pointing that out!
 
-	if (!foll->guarded_by_mmu_notifier && !allow_unsafe_mappings)
-
->                 r =3D -EFAULT;
-> }
-
-Please no.  I don't want to overload FOLL_GET or have dependencies between
-FOLL_GET and guarded_by_mmu_notifier.  The guest page fault path should be =
-able
-to omit FOLL_GET, and it obviously should set guarded_by_mmu_notifier.  And
-kvm_vcpu_map() should be able to set FOLL_GET, omit guarded_by_mmu_notifier=
-, _and_
-play nice with "unsafe", non-refcounted memory when allow_unsafe_mappings i=
-s true.
-
-The above fits your use case because nothing in KVM needs to do kvm_vcpu_ma=
-p()
-on the GPU's buffer, but as a general solution the semantics are very odd. =
- E.g.
-in long form, they are:
-
-  Get get a reference if a there's a refcounted page, fail with -EFAULT if =
-there's
-  a struct page but it's not refcounted, and fail with -EFAULT if there's n=
-ot struct
-  page unless the caller is protected by mmu_notifiers or unsafe mappings a=
-re allowed.
-
-That's rather bonkers.  What I instead want is FOLL_GET to be:
-
-  Get a reference if there's a refcounted page.
-
-And then allow_unsafe_mappings is simply:
-
-  Allow mapping non-refcounted memory into the guest even if the mapping is=
-n't
-  guarded by mmu_notifier events.
+> Thanks,
+> drew
+>
+> On Sat, Sep 02, 2023 at 08:59:22PM +0800, Haibo Xu wrote:
+> > The RISC-V arch_timer selftest is used to validate Sstc timer
+> > functionality in a guest, which sets up periodic timer interrupts
+> > and check the basic interrupt status upon its receipt.
+> >
+> > This KVM selftest was ported from aarch64 arch_timer and tested
+> > with Linux v6.5-rc5 on a Qemu riscv64 virt machine.
+> >
+> > ---
+> > Changed since v1:
+> >   * Rebase to kvm-riscv/riscv_kvm_next
+> >   * Cherry-pick Sean's kselftest guest printf patch set
+> >     https://lore.kernel.org/all/20230729003643.1053367-1-seanjc@google.=
+com/
+> >   * Copy the entire csr.h verbatim
+> >   * Unified the function names for exception vector table setup
+> >     void vm_init_vector_tables(struct kvm_vm *vm);
+> >     void vcpu_init_vector_tables(struct kvm_vcpu *vcpu);
+> >   * Format the handler.S asm file per Andrew's comments
+> >   * Consolidate the timer test code for arm64 and riscv
+> >     based on Andrew's and Sean's suggestion
+> >
+> > Haibo Xu (8):
+> >   KVM: selftests: Unify the codes for guest exception handling
+> >   KVM: arm64: selftest: Split arch_timer test code
+> >   tools: riscv: Add header file csr.h
+> >   KVM: riscv: selftests: Switch to use macro from csr.h
+> >   KVM: riscv: selftests: Add exception handling support
+> >   KVM: riscv: selftests: Add guest helper to get vcpu id
+> >   KVM: riscv: selftest: Change vcpu_has_ext to a common function
+> >   KVM: riscv: selftests: Add sstc timer test
+> >
+> >  tools/arch/riscv/include/asm/csr.h            | 521 ++++++++++++++++++
+> >  tools/testing/selftests/kvm/Makefile          |  11 +-
+> >  .../selftests/kvm/aarch64/arch_timer.c        | 292 +---------
+> >  .../selftests/kvm/aarch64/debug-exceptions.c  |   4 +-
+> >  .../selftests/kvm/aarch64/page_fault_test.c   |   4 +-
+> >  .../testing/selftests/kvm/aarch64/vgic_irq.c  |   4 +-
+> >  tools/testing/selftests/kvm/arch_timer.c      | 261 +++++++++
+> >  .../selftests/kvm/include/aarch64/processor.h |  12 +-
+> >  .../selftests/kvm/include/kvm_util_base.h     |   9 +
+> >  .../selftests/kvm/include/riscv/arch_timer.h  |  80 +++
+> >  .../selftests/kvm/include/riscv/processor.h   |  60 +-
+> >  .../selftests/kvm/include/timer_test.h        |  58 ++
+> >  .../selftests/kvm/include/x86_64/processor.h  |   5 -
+> >  .../selftests/kvm/lib/aarch64/processor.c     |   6 +-
+> >  .../selftests/kvm/lib/riscv/handlers.S        | 101 ++++
+> >  .../selftests/kvm/lib/riscv/processor.c       |  86 +++
+> >  .../selftests/kvm/lib/x86_64/processor.c      |   4 +-
+> >  .../testing/selftests/kvm/riscv/arch_timer.c  | 130 +++++
+> >  .../selftests/kvm/riscv/get-reg-list.c        |  14 -
+> >  tools/testing/selftests/kvm/x86_64/amx_test.c |   4 +-
+> >  .../selftests/kvm/x86_64/fix_hypercall_test.c |   4 +-
+> >  .../selftests/kvm/x86_64/hyperv_evmcs.c       |   4 +-
+> >  .../selftests/kvm/x86_64/hyperv_features.c    |   8 +-
+> >  .../testing/selftests/kvm/x86_64/hyperv_ipi.c |   6 +-
+> >  .../selftests/kvm/x86_64/kvm_pv_test.c        |   4 +-
+> >  .../selftests/kvm/x86_64/monitor_mwait_test.c |   4 +-
+> >  .../kvm/x86_64/pmu_event_filter_test.c        |   8 +-
+> >  .../smaller_maxphyaddr_emulation_test.c       |   4 +-
+> >  .../selftests/kvm/x86_64/svm_int_ctl_test.c   |   4 +-
+> >  .../kvm/x86_64/svm_nested_shutdown_test.c     |   4 +-
+> >  .../kvm/x86_64/svm_nested_soft_inject_test.c  |   4 +-
+> >  .../kvm/x86_64/ucna_injection_test.c          |   8 +-
+> >  .../kvm/x86_64/userspace_msr_exit_test.c      |   4 +-
+> >  .../vmx_exception_with_invalid_guest_state.c  |   4 +-
+> >  .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  |   4 +-
+> >  .../selftests/kvm/x86_64/xapic_ipi_test.c     |   4 +-
+> >  .../selftests/kvm/x86_64/xcr0_cpuid_test.c    |   4 +-
+> >  .../selftests/kvm/x86_64/xen_shinfo_test.c    |   4 +-
+> >  38 files changed, 1376 insertions(+), 376 deletions(-)
+> >  create mode 100644 tools/arch/riscv/include/asm/csr.h
+> >  create mode 100644 tools/testing/selftests/kvm/arch_timer.c
+> >  create mode 100644 tools/testing/selftests/kvm/include/riscv/arch_time=
+r.h
+> >  create mode 100644 tools/testing/selftests/kvm/include/timer_test.h
+> >  create mode 100644 tools/testing/selftests/kvm/lib/riscv/handlers.S
+> >  create mode 100644 tools/testing/selftests/kvm/riscv/arch_timer.c
+> >
+> > --
+> > 2.34.1
+> >
