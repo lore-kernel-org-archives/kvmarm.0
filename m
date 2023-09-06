@@ -1,92 +1,133 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11228EC7
-	for <kvmarm@lists.linux.dev>; Wed,  6 Sep 2023 08:01:06 +0000 (UTC)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 9201222407;
-	Wed,  6 Sep 2023 08:00:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1693987258; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Th6i3Ci6XMV5czHwHHRQpy4WXZpYK1vSc4mKPzvASOU=;
-	b=Pb4lNhvGotAuMduqcxpX1veGfBW2fSsxbs9Pu7MCDvZuKYqbhIBY10E+hTUliKOLBUS8xT
-	IScFwkZq92rxWtvku6iqGuFuVgR5lDAVbkoOihu7XH0KTBnfaYqyy4A7lldnkADZSSK6sy
-	waSNnkdND+zVot6yoT1DyeMpgGyp2zc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1693987258;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Th6i3Ci6XMV5czHwHHRQpy4WXZpYK1vSc4mKPzvASOU=;
-	b=8aX8Ngai6ZtyQlD2914oRoaCD9456/pp3O+p6YtiEHc05I1uh8Iu/T2mBUnSMDxI5k/fIo
-	p/VLTw2WkzUAHvBQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8ACD11346C;
-	Wed,  6 Sep 2023 08:00:57 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id 2QG0ILkx+GRiVwAAMHmgww
-	(envelope-from <vbabka@suse.cz>); Wed, 06 Sep 2023 08:00:57 +0000
-Message-ID: <bcefb739-b45c-8349-8010-ac137ab61c29@suse.cz>
-Date: Wed, 6 Sep 2023 10:00:56 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA45EC2
+	for <kvmarm@lists.linux.dev>; Wed,  6 Sep 2023 09:01:14 +0000 (UTC)
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2bd0d135ca3so57734761fa.3
+        for <kvmarm@lists.linux.dev>; Wed, 06 Sep 2023 02:01:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693990872; x=1694595672; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pGBcwbFPU/bGY4zSYaJ1ifEXL5+F/gokQ5BwkUen+qA=;
+        b=oxGSvQtW4ec0+ziumVXwlkafiuG4zBL5j+xy4xPp4wpEo4JLZ2SuKTrO3Ih+Wr8WuK
+         6hTzy9Ip+ulGPhnKyRfu4NDVn338XmvN0UKCw2EJsr3BaOYjFs60f9+cbWIxWaeWcYDU
+         LniLJjwTTbxnWPHyPloiNcemmJSG76aRoDQL9WEqIz+QpghjMuZT4aRrwW/0l+vIgNSX
+         7S7Cmy2zxrtKaHaDeFUY3fSB7Pu4tWqGbjNRLWYOtExOf/BUw1GZ4MZaIZ4wodq7WQ76
+         uYq2UoUVzrqKX1BEcS0H0D9exYWYkRvTTIkwtMdGYdnzWVuUviIO13Tjiz+lK9fYB2Ra
+         KDPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693990872; x=1694595672;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pGBcwbFPU/bGY4zSYaJ1ifEXL5+F/gokQ5BwkUen+qA=;
+        b=YJdL57Y2c+bZPxSPhElXIxXlSUs/tiDSTTEZuoyK7v1jetbAeRmnUbPj/CE7Kw2ytT
+         804aUoZkRgyDJ+ag6FxJMruC2nNhvrsvhDF2ej2+o7Jvdle7OMn2tlqJAll94Aw4FuG3
+         oTWUk284AOyFGFPc9OSXk8I0DWQkjcgTtZAPKEhFI0SA1wiiN8s48mUT3jLlYGtiCzAA
+         Hq72PvK+AwpVeY2oNM7nsSEVB+AwuCge+Y2nLwN4NICT8s7DGMYLauDys2cxGDEKYbm9
+         bDickUlR0HTxEWwYuriw3GYNvV18QSvpIAShmTFBRsT9D9nlo/HJSY9Tk9CcN7vUgEqG
+         L6/g==
+X-Gm-Message-State: AOJu0Yzr6O10ICCHuZ87mFvj8PNTctxDVVMjXpeaVHtr02c4R2Q9eMf9
+	gq0nI+jFfX6vyK9iBaHfUvG0mcNai8wbl8/TPFw=
+X-Google-Smtp-Source: AGHT+IFEeFdFaGaTLQBI687uLLemZurhXtmM5YDshrwY9B8n6Jsr0TB3y/S2wMiOM3uqcoQPE8js1WezowOosvA6ZU4=
+X-Received: by 2002:a2e:3603:0:b0:2b9:e53f:e201 with SMTP id
+ d3-20020a2e3603000000b002b9e53fe201mr1722458lja.31.1693990872213; Wed, 06 Sep
+ 2023 02:01:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH gmem FIXUP] mm, compaction: make testing
- mapping_unmovable() safe
-To: Sean Christopherson <seanjc@google.com>
-Cc: ackerleytng@google.com, akpm@linux-foundation.org, anup@brainfault.org,
- aou@eecs.berkeley.edu, chao.p.peng@linux.intel.com, chenhuacai@kernel.org,
- david@redhat.com, isaku.yamahata@gmail.com, jarkko@kernel.org,
- jmorris@namei.org, kirill.shutemov@linux.intel.com,
- kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- liam.merwick@oracle.com, linux-arm-kernel@lists.infradead.org,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mm@kvack.org,
- linux-riscv@lists.infradead.org, linux-security-module@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, mail@maciej.szmigiero.name, maz@kernel.org,
- michael.roth@amd.com, mpe@ellerman.id.au, oliver.upton@linux.dev,
- palmer@dabbelt.com, paul.walmsley@sifive.com, paul@paul-moore.com,
- pbonzini@redhat.com, qperret@google.com, serge@hallyn.com, tabba@google.com,
- vannapurve@google.com, wei.w.wang@intel.com, willy@infradead.org,
- yu.c.zhang@linux.intel.com
-References: <20230901082025.20548-2-vbabka@suse.cz>
- <ZPfAL0D95AwXD9tg@google.com>
-Content-Language: en-US
-From: Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <ZPfAL0D95AwXD9tg@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <cover.1693659382.git.haibo1.xu@intel.com> <c87337cfd7fb135e2efed589360a78c26a402eac.1693659382.git.haibo1.xu@intel.com>
+ <20230904-11e853ffe3d8e9cf9ec6079d@orel> <CAJve8onwjBQcbVy75qyOF3A51-T0WyBkmeCV_wOZvzaPcrBVFg@mail.gmail.com>
+ <CAJve8ok-zZAG7T3t5XD-CtJn47tTE867Xaaw_YHYy1XmUL41rw@mail.gmail.com> <20230906-3f0318fa20365f9211998bae@orel>
+In-Reply-To: <20230906-3f0318fa20365f9211998bae@orel>
+From: Haibo Xu <xiaobo55x@gmail.com>
+Date: Wed, 6 Sep 2023 17:01:00 +0800
+Message-ID: <CAJve8omsTQB04dZDCtK=0Fz3ExTuPFVQKvxz9Du5WyfqOwnuSg@mail.gmail.com>
+Subject: Re: [PATCH v2 2/8] KVM: arm64: selftest: Split arch_timer test code
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: Haibo Xu <haibo1.xu@intel.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
+	Conor Dooley <conor.dooley@microchip.com>, 
+	Daniel Henrique Barboza <dbarboza@ventanamicro.com>, Greentime Hu <greentime.hu@sifive.com>, 
+	Sean Christopherson <seanjc@google.com>, Ricardo Koller <ricarkol@google.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Aaron Lewis <aaronlewis@google.com>, 
+	David Matlack <dmatlack@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Mingwei Zhang <mizhang@google.com>, 
+	Vipin Sharma <vipinsh@google.com>, Lei Wang <lei4.wang@intel.com>, Like Xu <likexu@tencent.com>, 
+	Peter Gonda <pgonda@google.com>, Maxim Levitsky <mlevitsk@redhat.com>, Thomas Huth <thuth@redhat.com>, 
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
+	David Woodhouse <dwmw@amazon.co.uk>, Michal Luczaj <mhal@rbox.co>, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 9/6/23 01:56, Sean Christopherson wrote:
-> On Fri, Sep 01, 2023, Vlastimil Babka wrote:
->> As Kirill pointed out, mapping can be removed under us due to
->> truncation. Test it under folio lock as already done for the async
->> compaction / dirty folio case. To prevent locking every folio with
->> mapping to do the test, do it only for unevictable folios, as we can
->> expect the unmovable mapping folios are also unevictable - it is the
->> case for guest memfd folios.
-> 
-> Rather than expect/assume that unmovable mappings are always unevictable, how about
-> requiring that?  E.g. either through a VM_WARN_ON in mapping_set_unmovable(), or by
-> simply having that helper forcefully set AS_UNEVICTABLE as well.
+On Wed, Sep 6, 2023 at 3:01=E2=80=AFPM Andrew Jones <ajones@ventanamicro.co=
+m> wrote:
+>
+> On Wed, Sep 06, 2023 at 11:44:26AM +0800, Haibo Xu wrote:
+> > On Wed, Sep 6, 2023 at 10:14=E2=80=AFAM Haibo Xu <xiaobo55x@gmail.com> =
+wrote:
+> > >
+> > > On Mon, Sep 4, 2023 at 9:24=E2=80=AFPM Andrew Jones <ajones@ventanami=
+cro.com> wrote:
+> ...
+> > > > > +
+> > > > > +enum guest_stage {
+> > > > > +     GUEST_STAGE_VTIMER_CVAL=3D1,
+> > > > > +     GUEST_STAGE_VTIMER_TVAL,
+> > > > > +     GUEST_STAGE_PTIMER_CVAL,
+> > > > > +     GUEST_STAGE_PTIMER_TVAL,
+> > > > > +     GUEST_STAGE_MAX,
+> > > > > +};
+> > > >
+> > > > This enum also belongs in aarch64/arch_timer.c
+> > > >
+> > >
+> > > Yes, it should be in aarch64/arch_timer.c
+> > >
+> >
+> > After moving the above enum definition to aarch64/arch_timer.c, the
+> > below errors was reported
+> > while compiling kvm/arch_timer.o
+> >
+> > include/timer_test.h:37:26: error: field =E2=80=98guest_stage=E2=80=99 =
+has incomplete type
+> >    37 |         enum guest_stage guest_stage;
+> >         |                                        ^~~~~~~~~~~
+> >
+> > Since kvm/arch_timer.c was independent of kvm/aarch64/arch_timer.c
+> > during OBJ compiling,
+> > I think it may be not possible to move the enum definition to
+> > aarch64/arch_timer.c
+> >
+> > If we keep the definition in this header file, we can enclose it with
+> > #ifdef __aarch64__ for aarch64 only.
+> >
+>
+> Let's change struct test_vcpu_shared_data to
+>
+>  struct test_vcpu_shared_data {
+>         int nr_iter;
+>         int guest_stage;
+>         uint64_t xcnt;
+>  };
+>
+> and then let the aarch64 code treat guest_stage as an enum and the riscv
+> code can completely ignore it (no need to create an unused enum).
+>
 
-Yeah I guess we could make the helper do that, with a comment, as gmem is
-the only user right now. And if in the future somebody has case where it
-makes sense to have unmovable without unevictable, we can discuss what to do
-about it then.
+Good idea! Will fix it in v3.
+
+> Thanks,
+> drew
