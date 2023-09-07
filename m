@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 826505672
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8605677
 	for <kvmarm@lists.linux.dev>; Thu,  7 Sep 2023 10:09:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19F7EC43140;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5249FC4167D;
 	Thu,  7 Sep 2023 10:09:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1694081396;
-	bh=3Vmer+vt9TaDYWU1ffLHL/Gm8OkwhzUBZ3xFEnjAZJU=;
+	bh=Z5VRK+NSxTrhMHHku6uoMsMAIjJCOCaDaJrUj/5Uvy8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bXkX4nTL5eXCjxyXkZN0k7VBBjp74QIpONrwifHzu+aBAyJ4dv3ZnAbvD5L0Yr7DA
-	 0/GAo8JIzWHmKI+pDlp/0ZsZrif6kzWb4QmUf2m2Wkqi0vtFhgoTYPKeEtZZ5sJ8ce
-	 TDqM6FfXfc6Nu5SscoMszLZ1Njw7FzKzZsB9PnJl8sgR9obg+fscjwqvcebLYOyYbY
-	 JYLeARgH7qKU51jd2vCQffr6zU5GRZ/cl3BE/Dw2x0vqHT/+7dXhwu9tBjQ967eR4c
-	 9oh9q7Ar4b4xA9udP0Y64fUj3Bu13PcYa8HP8j+LngkcgqdZ5opZYhbS9iNMbHIebA
-	 CfvI/3UfhY9ig==
+	b=mdRMBI0q6FcRsdBHZ3FGyBDblhiVvM3lnS/97jPjDFM6P71bEHdNQWTLDTRMDWpSN
+	 xy+7EXEdQFMUdhrq4cMZqSZCCNHGUzmtceOa2e9mpDRtTpd57uJE6qSQWsL8ZQ4N+p
+	 7gtkQdcpSKuGzJhgojhIhRGT/wd/Ynx72Sfp7AD2inLzUb91WDV2GA3jlVOKVDwBZ0
+	 xzeE7cVGSAgmPzPs5o5KwqasDmrZilxM0FipGltarr/MtfXyYgOdhzQ69852zn0wlJ
+	 KsZW/YcH7DnmsG/cEMm8tJ6l8DGGhxQJYjgXszLSnF70n0IY5gBcBJtbyXEG108+zy
+	 r1Rjgg8VAmeyQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qeBxR-00B37Y-Rp;
-	Thu, 07 Sep 2023 11:09:53 +0100
+	id 1qeBxS-00B37Y-7r;
+	Thu, 07 Sep 2023 11:09:54 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -30,9 +30,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Xu Zhao <zhaoxu.35@bytedance.com>
-Subject: [PATCH 2/5] KVM: arm64: Build MPIDR to vcpu index cache at runtime
-Date: Thu,  7 Sep 2023 11:09:28 +0100
-Message-Id: <20230907100931.1186690-3-maz@kernel.org>
+Subject: [PATCH 4/5] KVM: arm64: vgic-v3: Refactor GICv3 SGI generation
+Date: Thu,  7 Sep 2023 11:09:30 +0100
+Message-Id: <20230907100931.1186690-5-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230907100931.1186690-1-maz@kernel.org>
 References: <20230907100931.1186690-1-maz@kernel.org>
@@ -48,163 +48,168 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The MPIDR_EL1 register contains a unique value that identifies
-the CPU. The only problem with it is that it is stupidly large
-(32 bits, once the useless stuff is removed).
+As we're about to change the way SGIs are sent, start by splitting
+out some of the basic functionnality: instead of intermingling
+the broadcast and non-broadcast cases with the actual SGI generation,
+perform the following cleanups:
 
-Trying to obtain a vcpu from an MPIDR value is a fairly common,
-yet costly operation: we iterate over all the vcpus until we
-find the correct one. While this is cheap for small VMs, it is
-pretty expensive on large ones, specially if you are trying to
-get to the one that's at the end of the list...
+- move the SGI queuing into its own helper
+- split the broadcast code from the affinity-driven code
+- replace the mask/shift combinations with FIELD_GET()
 
-In order to help with this, it is important to realise that
-the MPIDR values are actually structured, and that implementations
-tend to use a small number of significant bits in the 32bit space.
-
-We can use this fact to our advantage by computing a small hash
-table that uses the "compression" of the significant MPIDR bits
-as an index, giving us the vcpu index as a result.
-
-Given that the MPIDR values can be supplied by userspace, and
-that an evil VMM could decide to make *all* bits significant,
-resulting in a 4G-entry table, we only use this method if the
-resulting table fits in a single page. Otherwise, we fallback
-to the good old iterative method.
-
-Nothing uses that table just yet, but keep your eyes peeled.
+The result is much more readable, and paves the way for further
+optimisations.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 28 ++++++++++++++++
- arch/arm64/kvm/arm.c              | 54 +++++++++++++++++++++++++++++++
- 2 files changed, 82 insertions(+)
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c | 110 ++++++++++++++++-------------
+ 1 file changed, 59 insertions(+), 51 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index af06ccb7ee34..361aaf66ac32 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -202,6 +202,31 @@ struct kvm_protected_vm {
- 	struct kvm_hyp_memcache teardown_mc;
- };
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+index 188d2187eede..88b8d4524854 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+@@ -1052,6 +1052,38 @@ static int match_mpidr(u64 sgi_aff, u16 sgi_cpu_mask, struct kvm_vcpu *vcpu)
+ 	((((reg) & ICC_SGI1R_AFFINITY_## level ##_MASK) \
+ 	>> ICC_SGI1R_AFFINITY_## level ##_SHIFT) << MPIDR_LEVEL_SHIFT(level))
  
-+struct kvm_mpidr_data {
-+	u64			mpidr_mask;
-+	DECLARE_FLEX_ARRAY(u16, cmpidr_to_idx);
-+};
-+
-+static inline u16 kvm_mpidr_index(struct kvm_mpidr_data *data, u64 mpidr)
++static void vgic_v3_queue_sgi(struct kvm_vcpu *vcpu, u32 sgi, bool allow_group1)
 +{
-+	unsigned long mask = data->mpidr_mask;
-+	u64 aff = mpidr & MPIDR_HWID_BITMASK;
-+	int nbits, bit, bit_idx = 0;
-+	u16 vcpu_idx = 0;
++	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, sgi);
++	unsigned long flags;
++
++	raw_spin_lock_irqsave(&irq->irq_lock, flags);
 +
 +	/*
-+	 * If this looks like RISC-V's BEXT or x86's PEXT
-+	 * instructions, it isn't by accident.
++	 * An access targeting Group0 SGIs can only generate
++	 * those, while an access targeting Group1 SGIs can
++	 * generate interrupts of either group.
 +	 */
-+	nbits = fls(mask);
-+	for_each_set_bit(bit, &mask, nbits) {
-+		vcpu_idx |= (aff & BIT(bit)) >> (bit - bit_idx);
-+		bit_idx++;
++	if (!irq->group || allow_group1) {
++		if (!irq->hw) {
++			irq->pending_latch = true;
++			vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
++		} else {
++			/* HW SGI? Ask the GIC to inject it */
++			int err;
++			err = irq_set_irqchip_state(irq->host_irq,
++						    IRQCHIP_STATE_PENDING,
++						    true);
++			WARN_RATELIMIT(err, "IRQ %d", irq->host_irq);
++			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
++		}
++	} else {
++		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
 +	}
 +
-+	return vcpu_idx;
++	vgic_put_irq(vcpu->kvm, irq);
 +}
 +
- struct kvm_arch {
- 	struct kvm_s2_mmu mmu;
- 
-@@ -248,6 +273,9 @@ struct kvm_arch {
- 	/* VM-wide vCPU feature set */
- 	DECLARE_BITMAP(vcpu_features, KVM_VCPU_MAX_FEATURES);
- 
-+	/* MPIDR to vcpu index mapping, optional */
-+	struct kvm_mpidr_data *mpidr_data;
+ /**
+  * vgic_v3_dispatch_sgi - handle SGI requests from VCPUs
+  * @vcpu: The VCPU requesting a SGI
+@@ -1070,19 +1102,30 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
+ 	struct kvm_vcpu *c_vcpu;
+-	u16 target_cpus;
++	unsigned long target_cpus;
+ 	u64 mpidr;
+-	int sgi;
+-	int vcpu_id = vcpu->vcpu_id;
+-	bool broadcast;
+-	unsigned long c, flags;
+-
+-	sgi = (reg & ICC_SGI1R_SGI_ID_MASK) >> ICC_SGI1R_SGI_ID_SHIFT;
+-	broadcast = reg & BIT_ULL(ICC_SGI1R_IRQ_ROUTING_MODE_BIT);
+-	target_cpus = (reg & ICC_SGI1R_TARGET_LIST_MASK) >> ICC_SGI1R_TARGET_LIST_SHIFT;
++	u32 sgi;
++	unsigned long c;
 +
++	sgi = FIELD_GET(ICC_SGI1R_SGI_ID_MASK, reg);
++
++	/* Broadcast */
++	if (unlikely(reg & BIT_ULL(ICC_SGI1R_IRQ_ROUTING_MODE_BIT))) {
++		kvm_for_each_vcpu(c, c_vcpu, kvm) {
++			/* Don't signal the calling VCPU */
++			if (c_vcpu == vcpu)
++				continue;
++
++			vgic_v3_queue_sgi(c_vcpu, sgi, allow_group1);
++		}
++
++		return;
++	}
++
+ 	mpidr = SGI_AFFINITY_LEVEL(reg, 3);
+ 	mpidr |= SGI_AFFINITY_LEVEL(reg, 2);
+ 	mpidr |= SGI_AFFINITY_LEVEL(reg, 1);
++	target_cpus = FIELD_GET(ICC_SGI1R_TARGET_LIST_MASK, reg);
+ 
  	/*
- 	 * VM-wide PMU filter, implemented as a bitmap and big enough for
- 	 * up to 2^10 events (ARMv8.0) or 2^16 events (ARMv8.1+).
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 4866b3f7b4ea..30ce394c09d4 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -205,6 +205,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
- 	if (is_protected_kvm_enabled())
- 		pkvm_destroy_hyp_vm(kvm);
+ 	 * We iterate over all VCPUs to find the MPIDRs matching the request.
+@@ -1091,54 +1134,19 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
+ 	 * VCPUs when most of the times we just signal a single VCPU.
+ 	 */
+ 	kvm_for_each_vcpu(c, c_vcpu, kvm) {
+-		struct vgic_irq *irq;
++		int level0;
  
-+	kfree(kvm->arch.mpidr_data);
- 	kvm_destroy_vcpus(kvm);
+ 		/* Exit early if we have dealt with all requested CPUs */
+-		if (!broadcast && target_cpus == 0)
++		if (target_cpus == 0)
+ 			break;
+-
+-		/* Don't signal the calling VCPU */
+-		if (broadcast && c == vcpu_id)
++		level0 = match_mpidr(mpidr, target_cpus, c_vcpu);
++		if (level0 == -1)
+ 			continue;
  
- 	kvm_unshare_hyp(kvm, kvm + 1);
-@@ -578,6 +579,57 @@ static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
- 	return vcpu_get_flag(vcpu, VCPU_INITIALIZED);
+-		if (!broadcast) {
+-			int level0;
+-
+-			level0 = match_mpidr(mpidr, target_cpus, c_vcpu);
+-			if (level0 == -1)
+-				continue;
+-
+-			/* remove this matching VCPU from the mask */
+-			target_cpus &= ~BIT(level0);
+-		}
++		/* remove this matching VCPU from the mask */
++		target_cpus &= ~BIT(level0);
+ 
+-		irq = vgic_get_irq(vcpu->kvm, c_vcpu, sgi);
+-
+-		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+-
+-		/*
+-		 * An access targeting Group0 SGIs can only generate
+-		 * those, while an access targeting Group1 SGIs can
+-		 * generate interrupts of either group.
+-		 */
+-		if (!irq->group || allow_group1) {
+-			if (!irq->hw) {
+-				irq->pending_latch = true;
+-				vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
+-			} else {
+-				/* HW SGI? Ask the GIC to inject it */
+-				int err;
+-				err = irq_set_irqchip_state(irq->host_irq,
+-							    IRQCHIP_STATE_PENDING,
+-							    true);
+-				WARN_RATELIMIT(err, "IRQ %d", irq->host_irq);
+-				raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+-			}
+-		} else {
+-			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+-		}
+-
+-		vgic_put_irq(vcpu->kvm, irq);
++		vgic_v3_queue_sgi(c_vcpu, sgi, allow_group1);
+ 	}
  }
  
-+static void kvm_init_mpidr_data(struct kvm *kvm)
-+{
-+	struct kvm_mpidr_data *data = NULL;
-+	unsigned long c, mask, nr_entries;
-+	u64 aff_set = 0, aff_clr = ~0UL;
-+	struct kvm_vcpu *vcpu;
-+
-+	mutex_lock(&kvm->arch.config_lock);
-+
-+	if (kvm->arch.mpidr_data || atomic_read(&kvm->online_vcpus) == 1)
-+		goto out;
-+
-+	kvm_for_each_vcpu(c, vcpu, kvm) {
-+		u64 aff = kvm_vcpu_get_mpidr_aff(vcpu);
-+		aff_set |= aff;
-+		aff_clr &= aff;
-+	}
-+
-+	/*
-+	 * A significant bit can be either 0 or 1, and will only appear in
-+	 * aff_set. Use aff_clr to weed out the useless stuff.
-+	 */
-+	mask = aff_set ^ aff_clr;
-+	nr_entries = BIT_ULL(hweight_long(mask));
-+
-+	/*
-+	 * Don't let userspace fool us. If we need more than a single page
-+	 * to describe the compressed MPIDR array, just fall back to the
-+	 * iterative method. Single vcpu VMs do not need this either.
-+	 */
-+	if (struct_size(data, cmpidr_to_idx, nr_entries) <= PAGE_SIZE)
-+		data = kzalloc(struct_size(data, cmpidr_to_idx, nr_entries),
-+			       GFP_KERNEL_ACCOUNT);
-+
-+	if (!data)
-+		goto out;
-+
-+	data->mpidr_mask = mask;
-+
-+	kvm_for_each_vcpu(c, vcpu, kvm) {
-+		u64 aff = kvm_vcpu_get_mpidr_aff(vcpu);
-+		u16 vcpu_idx = kvm_mpidr_index(data, aff);
-+
-+		data->cmpidr_to_idx[vcpu_idx] = c;
-+	}
-+
-+	kvm->arch.mpidr_data = data;
-+out:
-+	mutex_unlock(&kvm->arch.config_lock);
-+}
-+
- /*
-  * Handle both the initialisation that is being done when the vcpu is
-  * run for the first time, as well as the updates that must be
-@@ -601,6 +653,8 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
- 	if (likely(vcpu_has_run_once(vcpu)))
- 		return 0;
- 
-+	kvm_init_mpidr_data(kvm);
-+
- 	kvm_arm_vcpu_init_debug(vcpu);
- 
- 	if (likely(irqchip_in_kernel(kvm))) {
 -- 
 2.34.1
 
