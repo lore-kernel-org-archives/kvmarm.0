@@ -1,110 +1,140 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C20511CB8
-	for <kvmarm@lists.linux.dev>; Wed,  6 Sep 2023 22:10:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1694038227;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2sW5n0U9nqfDRjI4qbYKErrgizSRaxysFjpyGkvRHBg=;
-	b=Pg99Aw0dhrjssfj+plRZ73iAzmz80+t6FzoooYMo5YOjDFkLKZv62XF4FxljMbibakqOrb
-	gWlugmjp43pbB5CdnXYoQls8seJQWvdY++J14P9i7h5PP0X9VcuRGlwMkKJAy4kV+FVodZ
-	XQCAdiOokbHqs1rtsWQOjmjv9FyPDWo=
-Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com
- [209.85.217.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-645-nM8dsyvTOCCbrhkHI6Qp9Q-1; Wed, 06 Sep 2023 18:10:25 -0400
-X-MC-Unique: nM8dsyvTOCCbrhkHI6Qp9Q-1
-Received: by mail-vs1-f70.google.com with SMTP id ada2fe7eead31-44d3abd5031so113726137.0
-        for <kvmarm@lists.linux.dev>; Wed, 06 Sep 2023 15:10:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75CA4EA9
+	for <kvmarm@lists.linux.dev>; Thu,  7 Sep 2023 03:57:14 +0000 (UTC)
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2bd0d19a304so9304161fa.1
+        for <kvmarm@lists.linux.dev>; Wed, 06 Sep 2023 20:57:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694059032; x=1694663832; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3UQs6noN/LuXhMaxtbcJru+m5+v+IlSKIcqynK+aM9Y=;
+        b=A5TZQObb9Hs31U/3rV9PJPDpGWshGPnvasyFIzfvvzN73prdJcShUGbCj7RgmFt4+O
+         vz8krOr0ma/r4IlYtc2GhHxxOdurd08klDLP2iZ/qmbPro0KaB3Uikwwq4K5XyYhm7FU
+         MIBWuxKBSS1y0tZvy1l7NbmuvOtX+XaVu/1Ax8/4qCyYYeTlaJ31XabMVXg19f0eOfbj
+         1hOp17XkK0TaHgCSTqF1JNr3l7spAYtkzIcOidW2OVq8Mem73rannefTF0yElm1WoQFo
+         dyLzcmdxELaQdlAoxF9klHPHDMKTMrhP6OoUEzo8QO8n8I34Ff7u8/VCoVCWWvBcMGK9
+         xcyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1694038225; x=1694643025;
+        d=1e100.net; s=20221208; t=1694059032; x=1694663832;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2sW5n0U9nqfDRjI4qbYKErrgizSRaxysFjpyGkvRHBg=;
-        b=lgiWjeK8wQxSfTHx/x7AeKMtpAUvOxNdMdysOfYxUt7R7FmRW4+VcfeT/KKIu/7601
-         z4vL/GFV+DMDRX0AswKr1pyuDkwqWF1EpGpxLcQkx/qZ8T/C8kSmokhzoSidipmtcAUw
-         QlwA5n+LZtQg3TSfcRjln59e7WqM9X8wM8+Wvn321HsNTd7RIj1dtBFVddg0udwwnUxg
-         VjdXWYr8O9q9Smw9u1IPS9GXRipGWQLAo9VR2vsU47IDzayMMSss4qov+53GlraD0Txz
-         C25lpS5EJT9W0TfGUGvIk2uHD0YNciPnhcAlsZAWwcd7+zk8POm32+FThvmNFWAMkVMj
-         /o0w==
-X-Gm-Message-State: AOJu0YyXBAeVq9QwFVcdvJXYr/g0gArhew7X0USkBL0v4R8Vg6mUS/6t
-	dJTO+4pzgeCXX2NxS4Uja1n6A4N20gdRXx6f4sGvyOuHqhKCbm5nHXbB4ROUlS3jr6+32LAmsZ9
-	wGNAtlJM3cQuhnqbB5EZ+HEtoM+bx93qt
-X-Received: by 2002:a67:ee4d:0:b0:444:17aa:df60 with SMTP id g13-20020a67ee4d000000b0044417aadf60mr4110672vsp.13.1694038225083;
-        Wed, 06 Sep 2023 15:10:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHp5n1WB8R1og/NcZaTM8SckALAeHpMUrTVBDu8TXyXcr3qI/pIRPsrfv30I89brgsoG52emGtevyCvY1jn784=
-X-Received: by 2002:a67:ee4d:0:b0:444:17aa:df60 with SMTP id
- g13-20020a67ee4d000000b0044417aadf60mr4110646vsp.13.1694038224758; Wed, 06
- Sep 2023 15:10:24 -0700 (PDT)
+        bh=3UQs6noN/LuXhMaxtbcJru+m5+v+IlSKIcqynK+aM9Y=;
+        b=ZCZ4Vq0e2El8XJmzDa/d25S71gEQDf2HntLwvvOLLctqwae3lbfLh9BuRwQQ5K2jdw
+         P4k8RnJm6zJ8yFMY+fFFJMAwwnWgRODWreHpFAXhoFAy8zoBhcKjEexFO7WhSXtUm1n2
+         7r/bs4w1dDUlmmO2BDSDj9phKsi31jKvh7aNMJhazDn/2jRAevp5JGp58EPXCWF6NLVl
+         jPhzib1Z2I7x+vDA4ZB5WCCPLVHT5Co2X8X8NElM6JFLyJXL3kvC1O3qiDaATenQLotI
+         TCeYLCshfBX8j7co0nKNJYr87QGN81Gr1H+4D+zaPqxcipXwfevk8rmEMAnrAVEbnxPQ
+         DrNQ==
+X-Gm-Message-State: AOJu0YxY+mh5Nlm/LKJoqsy3dO7nhlb/gnXxuvqmSCkrj5EAb8L7DDMO
+	sMsaWihMOehq4Tk3AxFyILw3GrWJ/jetTDD6oYU=
+X-Google-Smtp-Source: AGHT+IGI6qgIYSsAicMI6I+r6ioP3/2vp5QnhFlwnPmei3QJDcCP4J/D9Z4FZEYYhTF0QZ1jr8qCxHSm6ZraniakZgA=
+X-Received: by 2002:a2e:9c10:0:b0:2bc:b70d:9cb5 with SMTP id
+ s16-20020a2e9c10000000b002bcb70d9cb5mr3530939lji.33.1694059032084; Wed, 06
+ Sep 2023 20:57:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-14-seanjc@google.com>
- <84a908ae-04c7-51c7-c9a8-119e1933a189@redhat.com> <ZLq8ylTsFQ1s4BAZ@google.com>
-In-Reply-To: <ZLq8ylTsFQ1s4BAZ@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 7 Sep 2023 00:10:13 +0200
-Message-ID: <CABgObfYLuRx5oAfOKM1fNuyRw5BNhe127sbRYhmpoT9MsjMYQQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v11 13/29] KVM: Add transparent hugepage support for
- dedicated guest memory
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+References: <cover.1693659382.git.haibo1.xu@intel.com> <b6ef1b031e3a581f481cf19a26623388163444b4.1693659382.git.haibo1.xu@intel.com>
+ <20230904-aa8b0d8d23d391586686038a@orel> <CAJve8ok5cU+h1K+WJ+aDpB+u+PBo8XosUyyVbMGy-xR0XiWFdw@mail.gmail.com>
+In-Reply-To: <CAJve8ok5cU+h1K+WJ+aDpB+u+PBo8XosUyyVbMGy-xR0XiWFdw@mail.gmail.com>
+From: Haibo Xu <xiaobo55x@gmail.com>
+Date: Thu, 7 Sep 2023 11:57:00 +0800
+Message-ID: <CAJve8om+dLcG+4trDfG1yx8vhj52RhPZrJoF-emWDX+OPM088A@mail.gmail.com>
+Subject: Re: [PATCH v2 7/8] KVM: riscv: selftest: Change vcpu_has_ext to a
+ common function
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: Haibo Xu <haibo1.xu@intel.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
 	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
+	Daniel Henrique Barboza <dbarboza@ventanamicro.com>, wchen <waylingii@gmail.com>, 
+	Sean Christopherson <seanjc@google.com>, Ricardo Koller <ricarkol@google.com>, 
+	Vishal Annapurve <vannapurve@google.com>, David Matlack <dmatlack@google.com>, 
+	Aaron Lewis <aaronlewis@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Mingwei Zhang <mizhang@google.com>, 
+	Jim Mattson <jmattson@google.com>, Lei Wang <lei4.wang@intel.com>, 
+	Vipin Sharma <vipinsh@google.com>, Maxim Levitsky <mlevitsk@redhat.com>, Like Xu <likexu@tencent.com>, 
+	Peter Gonda <pgonda@google.com>, Thomas Huth <thuth@redhat.com>, 
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
+	David Woodhouse <dwmw@amazon.co.uk>, Michal Luczaj <mhal@rbox.co>, Paul Durrant <paul@xen.org>, 
+	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Maciej Szmigiero <mail@maciej.szmigiero.name>, Vlastimil Babka <vbabka@suse.cz>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+	kvm-riscv@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 21, 2023 at 7:13=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
-> On Fri, Jul 21, 2023, Paolo Bonzini wrote:
-> > On 7/19/23 01:44, Sean Christopherson wrote:
-> > > @@ -413,6 +454,9 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_c=
-reate_guest_memfd *args)
-> > >     u64 flags =3D args->flags;
-> > >     u64 valid_flags =3D 0;
-> > > +   if (IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE))
-> > > +           valid_flags |=3D KVM_GUEST_MEMFD_ALLOW_HUGEPAGE;
-> > > +
-> >
-> > I think it should be always allowed.  The outcome would just be "never =
-have
-> > a hugepage" if thp is not enabled in the kernel.
+On Wed, Sep 6, 2023 at 6:10=E2=80=AFPM Haibo Xu <xiaobo55x@gmail.com> wrote=
+:
 >
-> I don't have a strong preference.  My thinking was that userspace would p=
-robably
-> rather have an explicit error, as opposed to silently running with a misc=
-onfigured
-> setup.
+> On Mon, Sep 4, 2023 at 10:04=E2=80=AFPM Andrew Jones <ajones@ventanamicro=
+.com> wrote:
+> >
+> > On Sat, Sep 02, 2023 at 08:59:29PM +0800, Haibo Xu wrote:
+> > > diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools=
+/testing/selftests/kvm/riscv/get-reg-list.c
+> > > index d8ecacd03ecf..c4028bf32e3f 100644
+> > > --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> > > +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> > > @@ -44,20 +44,6 @@ bool check_reject_set(int err)
+> > >       return err =3D=3D EINVAL;
+> > >  }
+> > >
+> > > -static inline bool vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
+> > > -{
+> > > -     int ret;
+> > > -     unsigned long value;
+> > > -
+> > > -     ret =3D __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
+> > > -     if (ret) {
+> > > -             printf("Failed to get ext %d", ext);
+> > > -             return false;
+> > > -     }
+> > > -
+> > > -     return !!value;
+> >
+> > get-reg-list will now assert on get-reg when an extension isn't present=
+,
+> > rather than failing the __TEST_REQUIRE(), which would do a skip instead=
+.
+> > We need both the return false version and the assert version.
+> >
+>
+> Ok, Will keep this one for get-reg-list and add another one for
+> arch-timer specific usage.
+>
 
-Considering that is how madvise(MADV_HUGEPAGE) behaves, your patch is
-good. I disagree but consistency is better.
+Just thought about it again, maybe we only need the "return false"
+version for both get-reg-list
+and arch-timer tests since if an extension was not available, the test
+can be skipped with a message.
 
-Paolo
+bool vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
+{
+       unsigned long value =3D 0;
 
+       __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
+
+       return !!value;
+}
+
+> > > -}
+> > > -
+> > >  void finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu_reg_list *c)
+> > >  {
+> > >       struct vcpu_reg_sublist *s;
+> > > --
+> > > 2.34.1
+> > >
+> >
+> > Thanks,
+> > drew
