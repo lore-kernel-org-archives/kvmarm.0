@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9AB1134DD
-	for <kvmarm@lists.linux.dev>; Thu,  7 Sep 2023 18:15:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5449BC433C8;
-	Thu,  7 Sep 2023 18:15:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB601134DD
+	for <kvmarm@lists.linux.dev>; Thu,  7 Sep 2023 18:16:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58A2FC433C8;
+	Thu,  7 Sep 2023 18:16:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694110533;
-	bh=5szpdA83l9R1ikFYVyG1shRGZ7+F4onPaR5XCxJ8/Tc=;
+	s=k20201202; t=1694110619;
+	bh=pgPQZpPdSxYb4vyanAX9ByOxUGHPSY4LDmwB3+rSqAQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VCSZbDLz4YecrxSQkSQG7ueSL/fV36qFTMzY/NjxaHFGH+HHJIYEZK11CHQnAPzfX
-	 a+57O4h8ogot7mSjABe98hHAzcEjNcsGHO/3L6r8CEfIlKHTlPQ7KIm6eIF+hWW/1v
-	 9cTFSB0Pu+8YM7fePGv5ni8QeZsuidRDawWn75nHpiVgMFXA8/nP62T7NI+l1gK4DH
-	 YBXT+/5Fh7xaS72TiwCcYxl2/k0ZPdg7j1iC5cGWoqVa7q+RbYbrfuzW5Tq49NaId0
-	 ShX+dhcs5e+cYvKzoi7NdYJN/4cE3+m6Euty1v6dnuvdlvboFuJjaJFrrX47PyFjin
-	 cWgSfzwf0Q0UQ==
+	b=cPSBRph7tlBskH77ZtFKAfdtabVJ1ZNxIbDWBowLvLxegBfA55FwpkQ6DiOsur7e7
+	 PxCwpoUjHx/qPXLeajoHCXaxp8LGdPx63jjZNq3TrFeZVgZJTIm+KI1WaWaU6RTLz5
+	 bITlscIpmkA0xyd289Skgpb93y8MXBEGyaf0szIsCHK1MA5Q2B405GEnD1YiYWncBv
+	 RLM72p0Gd4jMvv+nUbd8ptVaT2i5+c+bf2DvtHptL1ihi2+SYs4KTQJ+JJg1hqQNqV
+	 bhhcUqYjOjaqgjMKbqe8jyN38JrImo46RHlYBx/iPKynpIjCd9OF22KbJaTX2E9xEU
+	 lzyOnyViSAWug==
 Received: from [82.132.186.150] (helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qeJXO-00BAmG-Lk;
-	Thu, 07 Sep 2023 19:15:30 +0100
-Date: Thu, 07 Sep 2023 19:15:38 +0100
-Message-ID: <8734zpq27p.wl-maz@kernel.org>
+	id 1qeJYm-00BAq7-K8;
+	Thu, 07 Sep 2023 19:16:56 +0100
+Date: Thu, 07 Sep 2023 19:17:03 +0100
+Message-ID: <871qf9q25c.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Joey Gouly <joey.gouly@arm.com>
 Cc: kvmarm@lists.linux.dev,
@@ -33,11 +33,10 @@ Cc: kvmarm@lists.linux.dev,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Xu Zhao <zhaoxu.35@bytedance.com>
-Subject: Re: [PATCH 2/5] KVM: arm64: Build MPIDR to vcpu index cache at runtime
-In-Reply-To: <20230907152918.GB69899@e124191.cambridge.arm.com>
+Subject: Re: [PATCH 0/5] KVM: arm64: Accelerate lookup of vcpus by MPIDR values
+In-Reply-To: <20230907153052.GD69899@e124191.cambridge.arm.com>
 References: <20230907100931.1186690-1-maz@kernel.org>
-	<20230907100931.1186690-3-maz@kernel.org>
-	<20230907152918.GB69899@e124191.cambridge.arm.com>
+	<20230907153052.GD69899@e124191.cambridge.arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -53,76 +52,16 @@ X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 07 Sep 2023 16:29:18 +0100,
+On Thu, 07 Sep 2023 16:30:52 +0100,
 Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> On Thu, Sep 07, 2023 at 11:09:28AM +0100, Marc Zyngier wrote:
 
 [...]
 
-> > @@ -578,6 +579,57 @@ static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
-> >  	return vcpu_get_flag(vcpu, VCPU_INITIALIZED);
-> >  }
-> >  
-> > +static void kvm_init_mpidr_data(struct kvm *kvm)
-> > +{
-> > +	struct kvm_mpidr_data *data = NULL;
-> > +	unsigned long c, mask, nr_entries;
-> > +	u64 aff_set = 0, aff_clr = ~0UL;
-> > +	struct kvm_vcpu *vcpu;
-> > +
-> > +	mutex_lock(&kvm->arch.config_lock);
-> > +
-> > +	if (kvm->arch.mpidr_data || atomic_read(&kvm->online_vcpus) == 1)
-> > +		goto out;
-> > +
-> > +	kvm_for_each_vcpu(c, vcpu, kvm) {
-> > +		u64 aff = kvm_vcpu_get_mpidr_aff(vcpu);
-> > +		aff_set |= aff;
-> > +		aff_clr &= aff;
-> > +	}
-> > +
-> > +	/*
-> > +	 * A significant bit can be either 0 or 1, and will only appear in
-> > +	 * aff_set. Use aff_clr to weed out the useless stuff.
-> > +	 */
-> > +	mask = aff_set ^ aff_clr;
-> > +	nr_entries = BIT_ULL(hweight_long(mask));
-> > +
-> > +	/*
-> > +	 * Don't let userspace fool us. If we need more than a single page
-> > +	 * to describe the compressed MPIDR array, just fall back to the
-> > +	 * iterative method. Single vcpu VMs do not need this either.
-> > +	 */
-> > +	if (struct_size(data, cmpidr_to_idx, nr_entries) <= PAGE_SIZE)
-> > +		data = kzalloc(struct_size(data, cmpidr_to_idx, nr_entries),
-> > +			       GFP_KERNEL_ACCOUNT);
-> > +
-> > +	if (!data)
-> > +		goto out;
-> 
-> Probably not a big deal, but if the data doesn't fit, every vCPU will run this
-> function up until this point (if the data fits or there's only 1 vCPU we bail
-> out earlier)
+> Got a roughly similar perf improvement (about 28%).
 
-Yeah, I thought about that when writing this code, and applied the
-following reasoning:
+Out of curiosity, on which HW?
 
-- this code is only run once per vcpu
-
-- being able to remember that we cannot allocate the hash table
-  requires at least an extra flag or a special value for the pointer
-
-- this sequence is pretty quick (one read/or/and * nr_vcpu^2), and
-  even if you have 512 vcpus, it isn't *that* much stuff given that it
-  is spread across vcpus
-
-Now, if someone can actually measure a significant boot-time speed-up,
-I'll happily add that flag.
-
-[...]
-
-> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+> Tested-by: Joey Gouly <joey.gouly@arm.com>
 
 Thanks!
 
