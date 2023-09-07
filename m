@@ -1,285 +1,208 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2053.outbound.protection.outlook.com [40.107.212.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E2E11CA8
-	for <kvmarm@lists.linux.dev>; Thu,  7 Sep 2023 19:01:14 +0000 (UTC)
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-402d499580dso14414115e9.1
-        for <kvmarm@lists.linux.dev>; Thu, 07 Sep 2023 12:01:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1694113272; x=1694718072; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=eociOZShIIhf6uzSUtfcCoJa3P8brx2laWW2HO9Th3Y=;
-        b=kJKnR5kr6t0dKCmCjGmgcXf551SMiTV7Im0+eba+v+0h2xn80XyZcrnpC3SMTkI5cl
-         /6sF2MLUdcDAMLIuKkv9KEXkXY23phoJcxwCu0Ib1POMVmtQfY4U5iLiv4AbCCVCUHWn
-         dLYuo+Vw4hNybz67fK33DGx4qcXydKB5XRaSzh4OdHTR6zLlIOeAeAlUGiDsoKUIiZST
-         pNJkkGUAwrodeSjK+60Hoe98wuHYW/2IHoo16XoX8vgikQl0zulmn+l7vOEO+tJo851g
-         NDSi8hbnjAsY6fJjaFMyXvKTjbdXfDN15ZzL6Yx763bCyK7iU3i4ya2yB0jXf3JjqX2h
-         nC2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694113272; x=1694718072;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eociOZShIIhf6uzSUtfcCoJa3P8brx2laWW2HO9Th3Y=;
-        b=qt3ylndznKs28nh328Bv1x4pFVA36tHX27WRsO5HCnKGwApyd072kjwurzP9OuWzMC
-         ym1rwK5R9D54A0Co0Dp7V5Lir46rwnUMEu5kr/l25X+38OUOt0Vxf4lsQmqeEy/RFqxZ
-         dr/OEDGICV+SX5RYOlJf5C6uRYz7CRWQh2411r1mDC49Ug1dSzssULJb2t1YITVXDFRz
-         N8XRjCqPA6D+DeEpjHhcnAU5mEnksTDOW94w8RU9w4FF9jQ7iLnTWxEXQMxXlMvvvClp
-         42kr/J4c6e0Am41/wKV3cspfEX+8dlryQEqe39/inZQxwibqI4VQxQbq1q6ID0vqiijf
-         8sdA==
-X-Gm-Message-State: AOJu0Yy0tcStO2qNm9h09oDcb251+71lhJufD93i+DRDmcxA1npPATL4
-	10jZe7ocD2NpFY8/g9AQUGX+ng==
-X-Google-Smtp-Source: AGHT+IGhEgKQHBGkqLlsP4F/DGv1jyf9duZnERJIUkqYRa1UCO/fiKxyNhLBIfZMVQ0b4/1jnwd8TQ==
-X-Received: by 2002:a05:600c:3b1f:b0:401:b204:3b85 with SMTP id m31-20020a05600c3b1f00b00401b2043b85mr392330wms.36.1694113272221;
-        Thu, 07 Sep 2023 12:01:12 -0700 (PDT)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id q10-20020adfea0a000000b0031ae2a7adb5sm109334wrm.85.2023.09.07.12.01.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Sep 2023 12:01:11 -0700 (PDT)
-Date: Thu, 7 Sep 2023 21:01:10 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Haibo Xu <xiaobo55x@gmail.com>
-Cc: Haibo Xu <haibo1.xu@intel.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
-	Conor Dooley <conor.dooley@microchip.com>, Greentime Hu <greentime.hu@sifive.com>, 
-	wchen <waylingii@gmail.com>, Daniel Henrique Barboza <dbarboza@ventanamicro.com>, 
-	Sean Christopherson <seanjc@google.com>, Ricardo Koller <ricarkol@google.com>, 
-	Vishal Annapurve <vannapurve@google.com>, David Matlack <dmatlack@google.com>, 
-	Aaron Lewis <aaronlewis@google.com>, Mingwei Zhang <mizhang@google.com>, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Vipin Sharma <vipinsh@google.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
-	Peter Gonda <pgonda@google.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>, 
-	Thomas Huth <thuth@redhat.com>, Like Xu <likexu@tencent.com>, 
-	David Woodhouse <dwmw@amazon.co.uk>, Michal Luczaj <mhal@rbox.co>, 
-	zhang songyi <zhang.songyi@zte.com.cn>, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 8/8] KVM: riscv: selftests: Add sstc timer test
-Message-ID: <20230907-5d3da2b6dca23bedb31b33a0@orel>
-References: <cover.1693659382.git.haibo1.xu@intel.com>
- <d2b3c53537fef3f0a2d27d8be663a64123d4bc3c.1693659382.git.haibo1.xu@intel.com>
- <20230904-a69c6a228bf4553cc58bca17@orel>
- <CAJve8ok03P-t7pTA9mH=5vvkUy4NtxHac_Z_NM88cs55YQZATg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B760213AE1
+	for <kvmarm@lists.linux.dev>; Thu,  7 Sep 2023 19:12:55 +0000 (UTC)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TPMHk6dwRszr89qaqlrI8Malv7Q69gkr0Gkbh03bAghCuzqEEsYkR3zkE4twAUcwDakiB1Urxig9Kp9lakArpSjI+c5ciDs7pXPjFCg5in8pRnWppnU46KvFKsN6N4cKNrQHYhBwCR8F/jxVwaHs9DJpmvyJykYv2QhnNsWD38Plou492AgWAhgyoA1p5h2NF0cYlT1s5E4Mkp7QS6FihE2k10RXTnTZ368zqb16OHdG4LHFzRNTrClZjE9Q+cDMnNznXR5fdf2Vp7GM3huNPGKuYtMS6ER2ETYVgVIrGRzFrRCzBiZY9o8z6/b8auGd9Bt3TjXRcjK0cpdTvCNiUw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=i0l1AdAZiODMadtabvLl7+/kinAxrSSe/8nKQmy1aL4=;
+ b=ME+Q/TBTW10sMEHO5scpb9SI/OHCH5dN59QDdsAlwhJZXRD++kZgy6f0Stz1heAnbFY5rb0w7zYZwE9XQK0mJsjOD3s9SeTmPhos0IGYKfOfjozgbR4aGNtfIsS7+jnM44n6NjAo0H4Gxtv1sO3eMJA7GrwBE0WxSwWrrY+5sjKew159oKw8vyLDD9xBCL17sPReIuCP9wJZ4Imq5CFW75WSFcVyRIv2M8JUbaSs8eHlGSb21CNv0kU1ZyAy5m+lLn6a6T8q/t+TLAnqD7Fg3rjRBEveMomMGbt73tS+tqEwKIlrgi2HfmHTLh3BCQSj7KpNd8owZyYPo/13I0tCMQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=i0l1AdAZiODMadtabvLl7+/kinAxrSSe/8nKQmy1aL4=;
+ b=VkQJpe8loD/ipXnuIWQ7/KiqPdemT+zFFejqZoi1lNXst3Lz/sM+ORvnup/z0Se8nkazI2CpVhsoHpt946RWmCepgkbDfD4bwwk67lJ18sjYHUUGfhW+jcKKstSIASBMUmBt2nHKjXMC4dof8O0Z6a6nZ/YNSPdObHA8W8iMK9LSRriOuCkF8QUWnraM4A1hFCUVpPHzJfZZImLRV6sHn2FS7ZTSItaZy/1n/lZfsFCYi6XudtT1zV8O/UMKOo68SvgGD0WTHYGux9vTmz5aP5+Q+0cGBgQp37TCBTdNInu0x17m89HNR9IXS4zEE2YocCfqf8UR3BS97Zl8QPD+9w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by SA3PR12MB7903.namprd12.prod.outlook.com (2603:10b6:806:307::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.34; Thu, 7 Sep
+ 2023 19:12:51 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::faf:4cd0:ae27:1073]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::faf:4cd0:ae27:1073%5]) with mapi id 15.20.6745.035; Thu, 7 Sep 2023
+ 19:12:51 +0000
+Date: Thu, 7 Sep 2023 16:12:49 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: ankita@nvidia.com
+Cc: maz@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com,
+	will@kernel.org, aniketa@nvidia.com, cjia@nvidia.com,
+	kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com,
+	acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com,
+	danw@nvidia.com, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 1/2] KVM: arm64: determine memory type from VMA
+Message-ID: <ZPogsU6YihY2+qR6@nvidia.com>
+References: <20230907181459.18145-1-ankita@nvidia.com>
+ <20230907181459.18145-2-ankita@nvidia.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230907181459.18145-2-ankita@nvidia.com>
+X-ClientProxiedBy: BL1PR13CA0125.namprd13.prod.outlook.com
+ (2603:10b6:208:2bb::10) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="moqzehiniedyglk4"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJve8ok03P-t7pTA9mH=5vvkUy4NtxHac_Z_NM88cs55YQZATg@mail.gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SA3PR12MB7903:EE_
+X-MS-Office365-Filtering-Correlation-Id: abca863d-8c6e-4a1f-3e29-08dbafd66e25
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	+aAQiZic2d0f9fU3B176nE6cLDCRg2fWN5WOhhkMsLqDmg9zc4sggbySHzsog3wVu3lOLu9VkBhrTkWgA2SDI6D5eNuaIgSy9ZSSwtmc7wRg0hiwqyaC2xgyzQ53bh6mAkIwE6D6GfIDYL0CMDCGHfLxBExKoBpMGV1sPKVscBZ0DzQ/Msz9MYFMZpI/qfGgdvax1GvvhlubXBcU+qtIX+/frOed9e6kw1aI+WyUdBSdZ5jM47zsLTy6LyytdBxXojKsbj+e+7jf8yKP5+T3McYBQHa33SP8sYLEynlnPyW8/mduIvi3GBjLLRJYAZzglr9lAHDpL6AXpf8QDJvKa3le1Hj2UYOsl9j6ZQN8Zdpf9Gc6K/yp75WSY1P9DkgczolnAROH+4R4kPWUF/veChGKo0mnyMvbVAfMMdyanYYtwTyudG0Rt0K01nBjPQNwoeTdsMDToAOTDKq9o03b1vEzWfd8Ua/EdRgSkzD812Z93J2EscvZqORdlkEKcfJpwRau40ETMOQmCQV3vSUqrdxfgcjDNsld0wOOGi4ef/QdXswO6IMQSw/JrhES8RIGovOFNHHr+Sf7PDUqnGdmoQtO/yr+Hhv5LWLuWdb3iAs=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(376002)(346002)(136003)(366004)(186009)(1800799009)(451199024)(6486002)(6506007)(6512007)(83380400001)(478600001)(41300700001)(26005)(2906002)(66556008)(66476007)(37006003)(316002)(66946007)(34206002)(5660300002)(4326008)(6636002)(8676002)(8936002)(2616005)(86362001)(36756003)(38100700002)(67856001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?XbUZ1+DGd3vkVJBzUWymEvGheqrRqboemBfE+F5rBdBqYHccaZSsaj5OkB1b?=
+ =?us-ascii?Q?zUFtc32/1IPDEWZ/VvwYiK3iHbHqtKamQrZwt55y9G9rgX60GwIskpc8EcDp?=
+ =?us-ascii?Q?1gMCQfyOTow5tvcqFZFvqR3lHuUP/WRcKvGJadYnMG/TfIAd71vg2mogHkHL?=
+ =?us-ascii?Q?8vl82HKdtj7U7QWbbB537k6Y3LhIU/gFq9K6vQNBXDZT89GaIbEd3fmm7jl0?=
+ =?us-ascii?Q?RRoHw0kxkDWq+iN7iY3uV19/UHPztUUxcvuIZpDsrjon5IhD8eK1fBF85UJJ?=
+ =?us-ascii?Q?LloRQTCoozFhTog4xjWR8sopYl22MHrJ8aiROYQKaGPeyK0/uOFYkFWtKyk9?=
+ =?us-ascii?Q?lkT+vWoVV1fbIaVIYtUMTu/4vjxDhWoVdFysoRWTwd8luU2kljiaKaCX0sas?=
+ =?us-ascii?Q?lBqzhg2GGmuoJlDWSfjuUKtJUbm/7x0CyvKJ6U5BJJmhbij/EUTufE1nGqns?=
+ =?us-ascii?Q?dNEH+EsLVraBplK0i8dqyA6RtzhzgAU/roiZxv3h9HdbjyZKu9PBpiGw+2W3?=
+ =?us-ascii?Q?adWRw016L1SQ0emm7a7/67eAVAXHFQpY4fxIRV+i1zH1fyToTqQFT04wQ4wu?=
+ =?us-ascii?Q?c4yav1XYA8SBtKZIS+Jp1Udihqhm5fJWlTwpYulytZSpFzj6BaDGeeAI1dHy?=
+ =?us-ascii?Q?dBkiYkDFawJNcZU+kR4ZOlUh6Y1cp+sbNikWQt5fSbMpN2XhmOG4YTvy64+b?=
+ =?us-ascii?Q?18/8NwAUD0SmeVA46YSezV+UAIZzpoyQc3XfE+PT49dekqANqCzBYbHGaBbV?=
+ =?us-ascii?Q?7mofiSu1eALFS1Lir1XPJLPnoL6soS2ErSi9GtGnabYzH3evJB3q41Wvkq5a?=
+ =?us-ascii?Q?tRCXNLXqlJdiLqdYlXGhV+B2Tbe6/wCyBEuEUh8vtJm5HOHaS2Cb7xRNBs4B?=
+ =?us-ascii?Q?0Lph9QPt5WkScOiS2JT99+JLsoCA4Tpw80nso3ORrrfOZYkmm24wk7C2xLdr?=
+ =?us-ascii?Q?SqZqVVo56LiJf63Tk7hegnQ903la+2F0yrqVX0r0C3Dd6APxWbaMGKW0cxYR?=
+ =?us-ascii?Q?Z7oTGJHQmx1uIdEYJWAnSbNqJE1nIDpDsCAB4Z4UE8vs9EmzjsAqF3pj50sm?=
+ =?us-ascii?Q?yH9YDU8lWHlG+zbAJagKV2J0ZEqANTGF+GS1U3zFocORrTUl1KfnrguKKc11?=
+ =?us-ascii?Q?uV9o5cFRl/FrNf467djZOdFZdFEFzgSAylb1DMPBdFRSJk9E83WSr2FZjjab?=
+ =?us-ascii?Q?kbVKndjvQPyAs7Da6+c7R+wTx2dbRt+UJ0N12Sni7PFOvEAF52NyfKQER9lg?=
+ =?us-ascii?Q?UsbUwIGPzPEEoqoPsA7QTQC70l4ul6fYfseP2i14a7rDR5PFmg3optvpRkhm?=
+ =?us-ascii?Q?KIV49yLw9wCItVFzL6hHFtsZatlZsNawhr/q22Z+n4huAt8VRq/Ad1jRbtvT?=
+ =?us-ascii?Q?ByhhkLwVtybFETOFV5TG4sn1g3e0pCqGXcup5TSzF2HBwEs6ICnY6Q5JvAry?=
+ =?us-ascii?Q?hz38In4gp7I/Xv6z5JjYxJ1FCMv3wCTu7NzJiRdBDQjd+awx44v/yjQtm+RB?=
+ =?us-ascii?Q?E9+Br8eWRGJN/ZpQbHntC83ppLVP4KUnkRxFfzSOHBVKh4Esz/MuuLtevkvj?=
+ =?us-ascii?Q?7DU41kQsT3rogdFSHJu/aAHM0/7YQK09X0CfQicM?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: abca863d-8c6e-4a1f-3e29-08dbafd66e25
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2023 19:12:51.0876
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9yM1oB2/8mNJLtboAG1XszrS7/Thz3lj9ZE7j1nfAjuaKzmGPi35S7mC4qY/qpSI
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7903
 
-
---moqzehiniedyglk4
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-
-On Thu, Sep 07, 2023 at 12:20:29PM +0800, Haibo Xu wrote:
-> On Mon, Sep 4, 2023 at 10:58 PM Andrew Jones <ajones@ventanamicro.com> wrote:
-> >
-> > On Sat, Sep 02, 2023 at 08:59:30PM +0800, Haibo Xu wrote:
-> > > Add a KVM selftest to validate the Sstc timer functionality.
-> > > The test was ported from arm64 arch timer test.
-> > >
-> > > Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
-> > > ---
+On Thu, Sep 07, 2023 at 11:14:58AM -0700, ankita@nvidia.com wrote:
+> From: Ankit Agrawal <ankita@nvidia.com>
 > 
-> > > diff --git a/tools/testing/selftests/kvm/riscv/arch_timer.c b/tools/testing/selftests/kvm/riscv/arch_timer.c
-> > > new file mode 100644
-> > > index 000000000000..c50a33c1e4f9
-> > > --- /dev/null
-> > > +++ b/tools/testing/selftests/kvm/riscv/arch_timer.c
-> > > @@ -0,0 +1,130 @@
-> > > +// SPDX-License-Identifier: GPL-2.0-only
-> > > +/*
-> > > + * arch_timer.c - Tests the riscv64 sstc timer IRQ functionality
-> > > + *
-> > > + * The test validates the sstc timer IRQs using vstimecmp registers.
-> > > + * It's ported from the aarch64 arch_timer test.
-> > > + *
+> Currently KVM determines if a VMA is pointing at IO memory by checking
+> pfn_is_map_memory(). However, the MM already gives us a way to tell what
+> kind of memory it is by inspecting the VMA.
 > 
-> > guest_run[_stage]() can be shared with aarch64, we just have a single
-> > stage=0 for riscv.
-> >
+> Replace pfn_is_map_memory() with a check on the VMA pgprot to determine if
+> the memory is IO and thus needs stage-2 device mapping.
 > 
-> Yes, we can. But if we share the guest_run[_stage]() by moving it to
-> kvm/arch_timer.c
-> or kvm/include/timer_test.h, we need to declare extra sub-functions
-> somewhere in a
-> header file(etc. guest_configure_timer_action()).
-
-OK, whatever balances the reduction of duplicate code and avoidance of
-exporting helper functions. BTW, riscv may not need/want all the same
-helper functions as aarch64. Anyway, I guess I'll see how the next version
-turns out.
-
+> The VMA's pgprot is tested to determine the memory type with the
+> following mapping:
 > 
-> > > +
-> > > +static void guest_code(void)
-> > > +{
-> > > +     uint32_t cpu = guest_get_vcpuid();
-> > > +     struct test_vcpu_shared_data *shared_data = &vcpu_shared_data[cpu];
-> > > +
-> > > +     local_irq_disable();
-> > > +     timer_irq_disable();
-> > > +     local_irq_enable();
-> >
-> > I don't think we need to disable all interrupts when disabling the timer
-> > interrupt.
-> >
+>  pgprot_noncached    MT_DEVICE_nGnRnE   device
+>  pgprot_writecombine MT_NORMAL_NC       device
+>  pgprot_device       MT_DEVICE_nGnRE    device
+>  pgprot_tagged       MT_NORMAL_TAGGED   RAM
 > 
-> There is no local_irq_disable() protection during the initial debug
-> phase, but the test always
-> fail with below error messages:
+> This patch solves a problems where it is possible for the kernel to
+> have VMAs pointing at cachable memory without causing
+> pfn_is_map_memory() to be true, eg DAX memremap cases and CXL/pre-CXL
+> devices. This memory is now properly marked as cachable in KVM.
 > 
-> Guest assert failed,  vcpu 0; stage; 0; iter: 0
-> ==== Test Assertion Failure ====
->   riscv/arch_timer.c:78: config_iter + 1 == irq_iter
->   pid=585 tid=586 errno=4 - Interrupted system call
->   (stack trace empty)
->   0x1 != 0x0 (config_iter + 1 != irq_iter)
-> 
-> To be frank, I am not quite sure why the local_irq_disable/enable() matters.
-> One possible reason may be some timer irq was triggered before we set up the
-> timecmp register.
+> Unfortunately when FWB is not enabled, the kernel expects to naively do
+> cache management by flushing the memory using an address in the
+> kernel's map. This does not work in several of the newly allowed
+> cases such as dcache_clean_inval_poc(). Check whether the targeted pfn
+> and its mapping KVA is valid in case the FWB is absent before
+> continuing.
 
-We should ensure we know the exact, expected state of the vcpu before,
-during, and after the test. If a state doesn't match expectations,
-then the test should assert and we should go investigate the test code
-to see if setup/checking is correct. If it is, then we've found a bug
-in KVM that we need to go investigate.
+Looking at this more closely, it relies on kvm_pte_follow() which
+ultimately calls __va(), and the ARM 64 version of page_to_virt() is:
 
-For Sstc, a pending timer interrupt completely depends on stimecmp, so
-we need to watch that closely. Take a look at the attached simple timer
-test I pulled together to illustrate how stimecmp, timer interrupt enable,
-and all interrupt enable interact. You may want to use it to help port
-the arch_timer.
+#define page_to_virt(x) ({                                              \
+        __typeof__(x) __page = x;                                       \
+        void *__addr = __va(page_to_phys(__page));                      \
+        (void *)__tag_set((const void *)__addr, page_kasan_tag(__page));\
+})
 
-Thanks,
-drew
+So we don't actually have an issue here, anything with a struct page
+will be properly handled by KVM.
 
---moqzehiniedyglk4
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="simple-riscv-timer-test.c"
+Thus this can just be:
 
-#include <stdio.h>
+	if (!stage2_has_fwb(pgt) && !pfn_valid(pfn)))
 
-#define CONFIG_64BIT
-#include "kvm_util.h"
-#include "riscv/arch_timer.h"
+Then the last paragraph of the commit message is:
 
-static unsigned long timer_freq;
-static unsigned int irq_fired;
+ As cachable vs device memory is now determined by the VMA adjust
+ the other checks to match their purpose. In most cases the code needs
+ to know if there is a struct page, or if the memory is in the kernel
+ map and pfn_valid() is an appropriate API for this.
 
-void mdelay(unsigned long msecs)
-{
-	while (msecs--)
-		udelay(1000);
-}
+ Note when FWB is not enabled, the kernel expects to trivially do
+ cache management by flushing the memory by linearly converting a
+ kvm_pte to phys_addr to a KVA, see kvm_flush_dcache_to_poc(). This is
+ only possibile for struct page backed memory. Do not allow non-struct
+ page memory to be cachable without FWB.
 
-static void guest_irq_handler(struct ex_regs *regs)
-{
-	GUEST_PRINTF("%s\n", __func__);
+> @@ -1490,6 +1499,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	gfn = fault_ipa >> PAGE_SHIFT;
+>  	mte_allowed = kvm_vma_mte_allowed(vma);
+>  
+> +	/*
+> +	 * Figure out the memory type based on the user va mapping properties
+> +	 * Only MT_DEVICE_nGnRE and MT_DEVICE_nGnRnE will be set using
+> +	 * pgprot_device() and pgprot_noncached() respectively.
+> +	 */
+> +	if ((mapping_type(vma->vm_page_prot) == MT_DEVICE_nGnRE) ||
+> +	    (mapping_type(vma->vm_page_prot) == MT_DEVICE_nGnRnE) ||
+> +	    (mapping_type(vma->vm_page_prot) == MT_NORMAL_NC))
+> +		prot |= KVM_PGTABLE_PROT_DEVICE;
+> +	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
+> +		prot |= KVM_PGTABLE_PROT_X;
+> +
+>  	/* Don't use the VMA after the unlock -- it may have vanished */
+>  	vma = NULL;
+>  
+> @@ -1576,10 +1597,21 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	if (exec_fault)
+>  		prot |= KVM_PGTABLE_PROT_X;
 
-	GUEST_ASSERT_EQ(regs->cause & ~CAUSE_IRQ_FLAG, IRQ_S_TIMER);
+You still didn't remove the kvm_is_device_pfn() check from this code,
+I don't think it can really stay and make any sense..
 
-	irq_fired = 1;
+Probably this:
 
-	csr_write(CSR_STIMECMP, -1);
-	while (csr_read(CSR_SIP) & IE_TIE)
-		cpu_relax();
-}
+   if (exec_fault && (prot & KVM_PGTABLE_PROT_DEVICE))
+		return -ENOEXEC;
 
-static void guest_code(void)
-{
-	GUEST_PRINTF("stage 1\n");
-	mdelay(1000);
+And these two should also be pfn_valid() [precompute pfn_valid]
 
-	GUEST_ASSERT_EQ(irq_fired, 0);
+	if (vma_pagesize == PAGE_SIZE && !(force_pte || !pfn_valid(pte))) {
 
-	GUEST_PRINTF("stage 2\n");
-	timer_set_next_cval_ms(500);
-	mdelay(1000);
+	if (fault_status != ESR_ELx_FSC_PERM && pfn_valid(pte) && kvm_has_mte(kvm)) {
 
-	GUEST_ASSERT_EQ(irq_fired, 1);
-	irq_fired = 0;
+Makes sense?
 
-	GUEST_PRINTF("stage 3\n");
-	csr_clear(CSR_SIE, IE_TIE);
-	timer_set_next_cval_ms(500);
-	mdelay(1000);
+Check if kvm_is_device_pfn() can be removed entirely.
 
-	GUEST_ASSERT_EQ(irq_fired, 0);
-
-	GUEST_PRINTF("stage 4\n");
-	csr_set(CSR_SIE, IE_TIE);
-	mdelay(1);
-
-	GUEST_ASSERT_EQ(irq_fired, 1);
-	irq_fired = 0;
-
-	GUEST_PRINTF("stage 5\n");
-	csr_clear(CSR_SSTATUS, SR_IE);
-	timer_set_next_cval_ms(500);
-	mdelay(1000);
-
-	GUEST_ASSERT_EQ(irq_fired, 0);
-
-	GUEST_PRINTF("stage 6\n");
-	csr_set(CSR_SSTATUS, SR_IE);
-	mdelay(1);
-
-	GUEST_ASSERT_EQ(irq_fired, 1);
-	irq_fired = 0;
-
-	GUEST_PRINTF("guest done\n");
-	GUEST_DONE();
-}
-
-int main(void)
-{
-	struct kvm_vcpu *vcpu;
-	struct kvm_vm *vm;
-	struct ucall uc;
-	uint64_t val;
-	int done = 0;
-
-	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-	vm_init_vector_tables(vm);
-	vm_install_interrupt_handler(vm, guest_irq_handler);
-	vcpu_init_vector_tables(vcpu);
-	vcpu_set_reg(vcpu, RISCV_CSR_REG(sstatus), SR_IE);
-	vcpu_set_reg(vcpu, RISCV_CSR_REG(sie), IE_TIE);
-
-	vcpu_get_reg(vcpu, RISCV_TIMER_REG(frequency), &timer_freq);
-	sync_global_to_guest(vm, timer_freq);
-
-	vcpu_get_reg(vcpu, RISCV_TIMER_REG(compare), &val);
-	assert(val == -1);
-
-	while (!done) {
-		vcpu_run(vcpu);
-
-		switch (get_ucall(vcpu, &uc)) {
-		case UCALL_PRINTF:
-			printf("%s", uc.buffer);
-			break;
-		case UCALL_DONE:
-			printf("Done.\n");
-			done = 1;
-			break;
-		}
-	}
-}
-
---moqzehiniedyglk4--
+Jason
