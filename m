@@ -1,40 +1,40 @@
 Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20303B650
-	for <kvmarm@lists.linux.dev>; Fri,  8 Sep 2023 22:29:55 +0000 (UTC)
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d7b9eb73dcdso2315872276.0
-        for <kvmarm@lists.linux.dev>; Fri, 08 Sep 2023 15:29:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48322B64D
+	for <kvmarm@lists.linux.dev>; Fri,  8 Sep 2023 22:29:56 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d7e8e12df78so2293644276.3
+        for <kvmarm@lists.linux.dev>; Fri, 08 Sep 2023 15:29:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1694212194; x=1694816994; darn=lists.linux.dev;
+        d=google.com; s=20221208; t=1694212195; x=1694816995; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LzMBBO3+QOcCxytQD9gvt8PFFPzKUty4hf8hE8hWFnE=;
-        b=b/yawMAtOZ+Img2fcZ92sMNwbbjtikGvvtObML0HMXcrAg0Ow3hcHjUKCNrYs4VGUA
-         1CDr/yFLvpYmHIgrrpKeoDoIeGBAEOWdf1fAWKNhvxNVMCGCaUoCiHMFn3CGWwknlBFh
-         aRDOxkc5jJTOMyZGyTj7TCnASXXLMOtlInzIJgiWKj3cr285puwKwlgAPAthlhkQebSi
-         GIzCoTHxuCJj1tatR2F7T5qp9WR398Xr5i9cHKhj/SdE+UHF4NCCUvnP6KVV/v/bf745
-         qXi/3t2ofRx0fNpIeaY2HUzLA07Fho5tKKISmlylvUr8CrtG+ERdEQ6tcM7d2Z9Ge1/g
-         HeeQ==
+        bh=tw1V6jjZtxQPmQpxo2OqWdUijyBXviuVC0rwevTlCmY=;
+        b=B9UD2PXQHs3SEt5mA8FxTdH2iDNOnszJPciUJGLEqUYow/4kXHD89yxG1JpAr+ng1P
+         1AWzCKMSY2osFiqHDq9E+JDyqWTJolzAlJiQvpyKMaq7ecFJjudbQMxjf6p64kOXJxTP
+         3iHrcPOorH4mgkoop19/M8LPapbmhPIy695KoLFsqi4Zs0SeNyW/eZ4MyEDd9WNWx77k
+         d89+jMQgRIPBCSL5PpE3f3wFjuEyv0IuG+bV0vo6mzZLaeaIfasS0DbdgLI92ToYIAUq
+         tLjHZLgWikbbxj/LGCuQru28oN0GycKC2emkkwcKVwmYOR9uZ68N099JZoSKr1pdKbn6
+         8AMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694212194; x=1694816994;
+        d=1e100.net; s=20230601; t=1694212195; x=1694816995;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LzMBBO3+QOcCxytQD9gvt8PFFPzKUty4hf8hE8hWFnE=;
-        b=d+jMjHnlxKeBdShB4tLrY6aXX6infBex7QraSWuRfpmlKH6p6RICPGxnL4Uvd9KfV8
-         zBkwUh40Ol465CffUiO27Sa7yq1LWhuYw/okAhYZGf0E5zDezZXLQ5x+pDZ0FuQktoWV
-         NOd3jUxqSAoI7eLWwPxe95DQjzaMVgy2DaHaW+W1qzOKO35XQAnuOGLahH2CHvpuIXL3
-         DeHZQOBsoSGVmkvpb4M+0skdE2H2RPFRbpJ1b/gaCP1X5JduyM/ognTBeNi8qMiT7HWk
-         ko+4n/mUIwKIej03sbnKV/nLnr3JtSKqQgEl5cgC5ylUSErby70QVce7KtdXt1Rl8H+h
-         pvqw==
-X-Gm-Message-State: AOJu0YyooVIw9x9+Odf8WD9D7LAFFdQAh3K7shdJnoCy8SvsPBnPkDZP
-	G7kMvVVlCciF+S6qO0BOxW5KFRVemVbiEQ==
-X-Google-Smtp-Source: AGHT+IGgQ6+xByO+HkT24hG/yB9NqyYPbYWpx7ZIjBxm/QZKjr8AwVFmzf4mP+1g9/qAE5XNiwUyfp/6A4SM3Q==
+        bh=tw1V6jjZtxQPmQpxo2OqWdUijyBXviuVC0rwevTlCmY=;
+        b=pyMnXQb0Jq98NYWrjUTWoBxQ5GJTQwXBdz/JwXDXb3ms3Ptcv0TJwFp93K1Q+IZHX0
+         3ME1Ze/ZrHprA1NKZVM3fUYB5cxEkQMdr9/W1vhVzDpdOjlMQs575N+flUWgm5UMjeGt
+         8A7AI9o4lsOh0rfPqgihouV+21AgKuxA44vs/1msD7KPfQfc+9EYdFd+GP7wuZFHXO/L
+         1JHDuOLuPWo7DvQrYOSPhFI17AixAO7UHTYdfH5yBiAxTueI8jvKnoGOK5YbmTUh8SDx
+         BRKeP6GK1aMqWFPd9CYPiS4xNmBFpY8qdcVR3vFCEbO6Uc0FF4+43Jmo8tAwx0IYPlL3
+         n2vQ==
+X-Gm-Message-State: AOJu0YzFUCQIu5L1QK39VLma3tY2LdzJA41Etx3gKZ/0YKbGpkYPgMO6
+	fVh3EGgwoCmyvDueig0KGlEDhyJDN6VnRA==
+X-Google-Smtp-Source: AGHT+IFidILo8DbI1LLUBkpdLdDWa4EPEgOq/ggpLsuiBitayiGeHEqMSH561wdBMd5QP0I3V80StiKjXtme2Q==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a05:6902:168b:b0:d80:cf4:7e80 with SMTP
- id bx11-20020a056902168b00b00d800cf47e80mr72394ybb.7.1694212194254; Fri, 08
- Sep 2023 15:29:54 -0700 (PDT)
-Date: Fri,  8 Sep 2023 22:28:53 +0000
+ (user=amoorthy job=sendgmr) by 2002:a25:ac02:0:b0:d7f:f3e:74ab with SMTP id
+ w2-20020a25ac02000000b00d7f0f3e74abmr86043ybi.1.1694212195382; Fri, 08 Sep
+ 2023 15:29:55 -0700 (PDT)
+Date: Fri,  8 Sep 2023 22:28:54 +0000
 In-Reply-To: <20230908222905.1321305-1-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230908222905.1321305-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
-Message-ID: <20230908222905.1321305-7-amoorthy@google.com>
-Subject: [PATCH v5 06/17] KVM: x86: Annotate -EFAULTs from kvm_handle_error_pfn()
+Message-ID: <20230908222905.1321305-8-amoorthy@google.com>
+Subject: [PATCH v5 07/17] KVM: arm64: Annotate -EFAULT from user_mem_abort()
 From: Anish Moorthy <amoorthy@google.com>
 To: seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org, 
 	kvmarm@lists.linux.dev
@@ -55,45 +55,46 @@ Cc: pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com,
 	isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
 Content-Type: text/plain; charset="UTF-8"
 
-Implement KVM_CAP_MEMORY_FAULT_INFO for efaults generated by
-kvm_handle_error_pfn().
+Implement KVM_CAP_MEMORY_FAULT_INFO for guest access failure in
+user_mem_abort().
 
 Signed-off-by: Anish Moorthy <amoorthy@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ arch/arm64/kvm/mmu.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index e1d011c67cc6..deae8ac74d9a 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3267,6 +3267,8 @@ static void kvm_send_hwpoison_signal(struct kvm_memory_slot *slot, gfn_t gfn)
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 587a104f66c3..8ede6c5edc5f 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1408,6 +1408,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	long vma_pagesize, fault_granule;
+ 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+ 	struct kvm_pgtable *pgt;
++	uint64_t memory_fault_flags;
  
- static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- {
-+	u64 fault_flags;
-+
- 	if (is_sigpending_pfn(fault->pfn)) {
- 		kvm_handle_signal_exit(vcpu);
- 		return -EINTR;
-@@ -3285,6 +3287,17 @@ static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fa
- 		return RET_PF_RETRY;
+ 	fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
+ 	write_fault = kvm_is_write_fault(vcpu);
+@@ -1507,8 +1508,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		kvm_send_hwpoison_signal(hva, vma_shift);
+ 		return 0;
  	}
+-	if (is_error_noslot_pfn(pfn))
++	if (is_error_noslot_pfn(pfn)) {
++		memory_fault_flags = 0;
++		if (write_fault)
++			memory_fault_flags = KVM_MEMORY_FAULT_FLAG_EXEC;
++		else if (exec_fault)
++			memory_fault_flags = KVM_MEMORY_FAULT_FLAG_EXEC;
++		else
++			memory_fault_flags = KVM_MEMORY_FAULT_FLAG_READ;
++		kvm_handle_guest_uaccess_fault(vcpu, round_down(gfn * PAGE_SIZE, vma_pagesize),
++					       vma_pagesize, memory_fault_flags);
+ 		return -EFAULT;
++	}
  
-+	WARN_ON_ONCE(fault->goal_level != PG_LEVEL_4K);
-+
-+	fault_flags = 0;
-+	if (fault->write)
-+		fault_flags = KVM_MEMORY_FAULT_FLAG_WRITE;
-+	else if (fault->exec)
-+		fault_flags = KVM_MEMORY_FAULT_FLAG_EXEC;
-+	else
-+		fault_flags = KVM_MEMORY_FAULT_FLAG_READ;
-+	kvm_handle_guest_uaccess_fault(vcpu, gfn_to_gpa(fault->gfn), PAGE_SIZE,
-+				       fault_flags);
- 	return -EFAULT;
- }
- 
+ 	if (kvm_is_device_pfn(pfn)) {
+ 		/*
 -- 
 2.42.0.283.g2d96d420d3-goog
 
