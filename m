@@ -1,40 +1,40 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D341B64D
-	for <kvmarm@lists.linux.dev>; Fri,  8 Sep 2023 22:29:50 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-59b59e1ac70so12985157b3.1
-        for <kvmarm@lists.linux.dev>; Fri, 08 Sep 2023 15:29:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57886B64F
+	for <kvmarm@lists.linux.dev>; Fri,  8 Sep 2023 22:29:51 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d8011973047so1610241276.3
+        for <kvmarm@lists.linux.dev>; Fri, 08 Sep 2023 15:29:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1694212189; x=1694816989; darn=lists.linux.dev;
+        d=google.com; s=20221208; t=1694212190; x=1694816990; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iUDCny58mTjAasfc+MarJfyUNBk+L++E3fgqNSlzCZM=;
-        b=Ms8n9AjFWPOrd5GfUmBO7Fs/usWpn7LWExfHhJ+d5g+uNqsYC9b9q9DU14mP6BokRJ
-         OHU/TPoxWoHrO3aS334ODqa5vczap4EIx78IGAFw3CQwzXXBk5ZiQ39EgtzT6vu+5pks
-         mKBM1+7u/VR70xUWM13UMJh6hdowdLUFJoNxXhkwfbYKKxuvPSsjsnAdnT5lMDfW6pUE
-         bV2/CAqxJ4rIg0Tl8btpTNWsXnBQvnhS0Z65slD25zVuJXw20R7NIt9u0jTBe7Ivca4I
-         k6K5uz9PYjQbb7NbV4L+g8t5PcFnR3/siDSNdylANPiDGTa0jwpHoihQNirkLa1rR4Uu
-         uVsQ==
+        bh=/0BHnhPQjohMasi1FkwP4rKpLhtBzedfsHeNgZmOOQA=;
+        b=Pjb+BsrP7rcLJzxjbXpb95QZD4OkUONrWjKa8yimZZrW8ks8AXEHMMZD2m8y8U/TjN
+         vuDWiYn48R0zaA0qVXRY5KjIgxi85iX8SGyGCPoG3o+27UjCzAGwxVo9HX5EWuftEGPN
+         PtY80JY+2I6tz7FFIEmu5y0w8lsyV5blSAKrFDfb5ps7jndXKQ6DWqrVcoa0A+UC/zyI
+         lrSlFanad14jZl5vMbKsDIrjcip5nlZjUnH2JzOtJVvr7Z6HZYikl9uZA7k7/VnulCtT
+         Fzp3cHfnho7D4L8IOuFcKDxGENQOYTFVzoiXYUgjPzFyPjJbaqsPT0e547aICLHOcfKm
+         CuIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694212189; x=1694816989;
+        d=1e100.net; s=20230601; t=1694212190; x=1694816990;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iUDCny58mTjAasfc+MarJfyUNBk+L++E3fgqNSlzCZM=;
-        b=Jg3d8Tu74EyfCjitDcErqX6j16DOlLctdgE7KGR3E/8F5/TskIXqL4wzuK4BjIkAwa
-         2TX0AKjBUNPpcG0x6xy2a/mLk0ih4k0V+ozArvJnkLrhb/m7GSEXzqynDGaDVhEztzDI
-         PKg8UWCgqEjPNJyo10IcUCOuhfHFyuFlCEDbGBhcU1iyybIVf7Bl/YpZZGzg/K1mIpHE
-         UgFER0DnwwBnKhWIXTyx9iKCgsEXkgR5OhrQk5MTZ31rhfFp6Em9/QYMnvixeS5W6oNE
-         zErukmrYWpioipjmM5RVQj+vJgn+hG25mKJ4L4RLz/KwVDLdiFQke2T4AHP8yR866Hoc
-         lr2Q==
-X-Gm-Message-State: AOJu0Yzhax9xaw/3UiLeLBrIFBFoVNvU6pbsFWbPdjiOYJbjS0d1GEyc
-	jItJ03VIsY7ma4vxUcB9HE1iKZbM7TYG4Q==
-X-Google-Smtp-Source: AGHT+IEDvILkGVKALVwPWgXNiW3g6dYyieYFxOwYXxGieU/y+z8cJi+9eCRUi/zrcXi4OV1bNd39rVDx4ol+Xg==
+        bh=/0BHnhPQjohMasi1FkwP4rKpLhtBzedfsHeNgZmOOQA=;
+        b=DOXVrKDKRAU+PCAsvCDQ1GHiUS1Rwuy99lvDVtUSFoNNQob2k8K7vTxnSUpebxVcPK
+         bD8yxBUjJHC/0V3n+eI3PabBPxkgKNdfSFBpWeDhq7QchQODogNPb0M1OJlC+iYl2DUO
+         OvmmDufMJ2qOob6mhZgbXZC7k2eIiZzI85ylGnlsi/ouai9eDKzkp77YfFUCS0z9of/s
+         6Xi6Vkx6tIZoWDIbimJw3e5KxRYWqvGyCdny+asDpx9FsizTp8Lgxe6TH1ch7GcpcNdG
+         v7A7nF6/2+L9rX/4KvFGSnL2sH0mq7B1PMN/94UQUKb2ohPTivFTTqRJyVmgMKDPYU0+
+         wjFQ==
+X-Gm-Message-State: AOJu0YyAvbXXbWAiWZZIjj2Kso7RCHLzUcVLB409IzIzLoA/GQ0PODwE
+	BJ7dH1aJhLsKds8p2mC3FLZmS0e69RlD9g==
+X-Google-Smtp-Source: AGHT+IGp3U+3huHXNrxPmxtY8xOiIHumjFDWxT6bJyVrVGJlTBuqH0tDk2yalvdlbk+Mgf/zY5+CmxE2i9YNdA==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a25:df13:0:b0:d7f:d239:596 with SMTP id
- w19-20020a25df13000000b00d7fd2390596mr82253ybg.0.1694212189354; Fri, 08 Sep
- 2023 15:29:49 -0700 (PDT)
-Date: Fri,  8 Sep 2023 22:28:48 +0000
+ (user=amoorthy job=sendgmr) by 2002:a05:6902:a8b:b0:d12:d6e4:a08f with SMTP
+ id cd11-20020a0569020a8b00b00d12d6e4a08fmr72162ybb.6.1694212190325; Fri, 08
+ Sep 2023 15:29:50 -0700 (PDT)
+Date: Fri,  8 Sep 2023 22:28:49 +0000
 In-Reply-To: <20230908222905.1321305-1-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,9 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230908222905.1321305-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
-Message-ID: <20230908222905.1321305-2-amoorthy@google.com>
-Subject: [PATCH v5 01/17] KVM: Clarify documentation of hva_to_pfn()'s
- 'atomic' parameter
+Message-ID: <20230908222905.1321305-3-amoorthy@google.com>
+Subject: [PATCH v5 02/17] KVM: Add docstrings to __kvm_read/write_guest_page()
 From: Anish Moorthy <amoorthy@google.com>
 To: seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org, 
 	kvmarm@lists.linux.dev
@@ -56,28 +55,39 @@ Cc: pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com,
 	isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
 Content-Type: text/plain; charset="UTF-8"
 
-The current docstring can be read as "atomic -> allowed to sleep," when
-in fact the intended statement is "atomic -> NOT allowed to sleep." Make
-that clearer in the docstring.
+The (gfn, data, offset, len) order of parameters is a little strange,
+since "offset" actually applies to "gfn" rather than to "data". Add
+docstrings to make things perfectly clear.
 
 Signed-off-by: Anish Moorthy <amoorthy@google.com>
 ---
- virt/kvm/kvm_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ virt/kvm/kvm_main.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index d63cf1c4f5a7..84e90ed3a134 100644
+index 84e90ed3a134..12837416ce8a 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -2669,7 +2669,7 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
- /*
-  * Pin guest page in memory and return its pfn.
-  * @addr: host virtual address which maps memory to the guest
-- * @atomic: whether this function can sleep
-+ * @atomic: whether this function is forbidden from sleeping
-  * @interruptible: whether the process can be interrupted by non-fatal signals
-  * @async: whether this function need to wait IO complete if the
-  *         host page is not in the memory
+@@ -3014,6 +3014,9 @@ static int next_segment(unsigned long len, int offset)
+ 		return len;
+ }
+ 
++/*
++ * Copy 'len' bytes from guest memory at '(gfn * PAGE_SIZE) + offset' to 'data'
++ */
+ static int __kvm_read_guest_page(struct kvm_memory_slot *slot, gfn_t gfn,
+ 				 void *data, int offset, int len)
+ {
+@@ -3115,6 +3118,9 @@ int kvm_vcpu_read_guest_atomic(struct kvm_vcpu *vcpu, gpa_t gpa,
+ }
+ EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest_atomic);
+ 
++/*
++ * Copy 'len' bytes from 'data' into guest memory at '(gfn * PAGE_SIZE) + offset'
++ */
+ static int __kvm_write_guest_page(struct kvm *kvm,
+ 				  struct kvm_memory_slot *memslot, gfn_t gfn,
+ 			          const void *data, int offset, int len)
 -- 
 2.42.0.283.g2d96d420d3-goog
 
