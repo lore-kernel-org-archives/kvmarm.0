@@ -1,50 +1,52 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F73430FAA
-	for <kvmarm@lists.linux.dev>; Fri,  8 Sep 2023 22:29:48 +0000 (UTC)
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d78452de9cbso2501230276.2
-        for <kvmarm@lists.linux.dev>; Fri, 08 Sep 2023 15:29:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D341B64D
+	for <kvmarm@lists.linux.dev>; Fri,  8 Sep 2023 22:29:50 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-59b59e1ac70so12985157b3.1
+        for <kvmarm@lists.linux.dev>; Fri, 08 Sep 2023 15:29:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1694212188; x=1694816988; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=+mRD5R0g+3C4eFyIJeU86inpLRRH1F8aUW/T/MJ4xk0=;
-        b=NUb0VBUlL9wXNxAFWQc91o3DV+UHMRIbcvpYRhw9pn31OUO93TmfbnC1GHq8J5DD4H
-         7xqBKSQDGQtaHPEOSy8NhzEVoFhpZTKY2RNLew/EhZ/6/bqORmCdzs8IBKrEEibIbt8h
-         5VlB0TC5qlvfSq+3qvcf7fjS33YUA9JWhxMWnQqXx9vAai5GbkE8sicsNyDtGZ7GB1ro
-         J0RkNWurQt6+a9xn2cZWhTXBL4Yg7zOtA6n79lhO5M/whFX2m4995fHq99NuECQK9CUi
-         mP76i/7GtlkKks0TQrZHHiiNJcDYhkiawc87RLy4Qc0578FgK7L7TL9kYWzFnQmjBBgK
-         vMMg==
+        d=google.com; s=20221208; t=1694212189; x=1694816989; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=iUDCny58mTjAasfc+MarJfyUNBk+L++E3fgqNSlzCZM=;
+        b=Ms8n9AjFWPOrd5GfUmBO7Fs/usWpn7LWExfHhJ+d5g+uNqsYC9b9q9DU14mP6BokRJ
+         OHU/TPoxWoHrO3aS334ODqa5vczap4EIx78IGAFw3CQwzXXBk5ZiQ39EgtzT6vu+5pks
+         mKBM1+7u/VR70xUWM13UMJh6hdowdLUFJoNxXhkwfbYKKxuvPSsjsnAdnT5lMDfW6pUE
+         bV2/CAqxJ4rIg0Tl8btpTNWsXnBQvnhS0Z65slD25zVuJXw20R7NIt9u0jTBe7Ivca4I
+         k6K5uz9PYjQbb7NbV4L+g8t5PcFnR3/siDSNdylANPiDGTa0jwpHoihQNirkLa1rR4Uu
+         uVsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694212188; x=1694816988;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+mRD5R0g+3C4eFyIJeU86inpLRRH1F8aUW/T/MJ4xk0=;
-        b=B0T/SuKurCTLIYlOONUH69AS79j4Pz6o/+3JLLjK068riDVkJtUtI3EJJbft/Df6qd
-         hZizrPLio5M9CJpqH4ldRDoKi1kH1EYPYVFHqUuZBUypdNrZZH1ToXeCVPA6orZORyUS
-         nEYgQ4jK0Pwoiny/7iyJ8uTbwWSjxoB+KhixUJqjpQd4vkAai5Dh4TPiesPHN30M7wuw
-         z+nOTJh7fPQsSZtNBSi3Ru1VugvCA/wc1/q/Lk09RYh5tU5YGVWnSJDUHS4arh+Lr5N/
-         a6KwupMvCUxKWLw6vdVzDnn0IQBPBKozXaCRd2APMc0yWB4kCCHzuaZY2k4pk1fFItDJ
-         BKJQ==
-X-Gm-Message-State: AOJu0YzlzkRkjr7AoUjTcMwfEWIwTiVlg5hj+5Qv4sb833hlFWeo5e2X
-	BP+mA3h0jD7jlogrvHoIL9o5Q0E1vnMhYg==
-X-Google-Smtp-Source: AGHT+IHmsxaY3bkuY8VBzYpFB/Q8l2vMvWvc+aSfV3MyKlmDY5wUsQbKQrNZr6Y4Ly2m8H8ylcs04PpFQ8MwEw==
+        d=1e100.net; s=20230601; t=1694212189; x=1694816989;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iUDCny58mTjAasfc+MarJfyUNBk+L++E3fgqNSlzCZM=;
+        b=Jg3d8Tu74EyfCjitDcErqX6j16DOlLctdgE7KGR3E/8F5/TskIXqL4wzuK4BjIkAwa
+         2TX0AKjBUNPpcG0x6xy2a/mLk0ih4k0V+ozArvJnkLrhb/m7GSEXzqynDGaDVhEztzDI
+         PKg8UWCgqEjPNJyo10IcUCOuhfHFyuFlCEDbGBhcU1iyybIVf7Bl/YpZZGzg/K1mIpHE
+         UgFER0DnwwBnKhWIXTyx9iKCgsEXkgR5OhrQk5MTZ31rhfFp6Em9/QYMnvixeS5W6oNE
+         zErukmrYWpioipjmM5RVQj+vJgn+hG25mKJ4L4RLz/KwVDLdiFQke2T4AHP8yR866Hoc
+         lr2Q==
+X-Gm-Message-State: AOJu0Yzhax9xaw/3UiLeLBrIFBFoVNvU6pbsFWbPdjiOYJbjS0d1GEyc
+	jItJ03VIsY7ma4vxUcB9HE1iKZbM7TYG4Q==
+X-Google-Smtp-Source: AGHT+IEDvILkGVKALVwPWgXNiW3g6dYyieYFxOwYXxGieU/y+z8cJi+9eCRUi/zrcXi4OV1bNd39rVDx4ol+Xg==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a25:5083:0:b0:d7b:9d44:7578 with SMTP id
- e125-20020a255083000000b00d7b9d447578mr77991ybb.12.1694212188120; Fri, 08 Sep
- 2023 15:29:48 -0700 (PDT)
-Date: Fri,  8 Sep 2023 22:28:47 +0000
+ (user=amoorthy job=sendgmr) by 2002:a25:df13:0:b0:d7f:d239:596 with SMTP id
+ w19-20020a25df13000000b00d7fd2390596mr82253ybg.0.1694212189354; Fri, 08 Sep
+ 2023 15:29:49 -0700 (PDT)
+Date: Fri,  8 Sep 2023 22:28:48 +0000
+In-Reply-To: <20230908222905.1321305-1-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20230908222905.1321305-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
-Message-ID: <20230908222905.1321305-1-amoorthy@google.com>
-Subject: [PATCH v5 00/17] Improve KVM + userfaultfd live migration via
- annotated memory faults.
+Message-ID: <20230908222905.1321305-2-amoorthy@google.com>
+Subject: [PATCH v5 01/17] KVM: Clarify documentation of hva_to_pfn()'s
+ 'atomic' parameter
 From: Anish Moorthy <amoorthy@google.com>
 To: seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org, 
 	kvmarm@lists.linux.dev
@@ -54,159 +56,28 @@ Cc: pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com,
 	isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
 Content-Type: text/plain; charset="UTF-8"
 
-This series improves the scalability of KVM and userfaultfd migration by
-actually providing a mechanism to *bypass* userfaultfd while handling
-stage 2 page table violations. A more complete description of the
-problem is provided in the cover letter for v4 (linked below).
+The current docstring can be read as "atomic -> allowed to sleep," when
+in fact the intended statement is "atomic -> NOT allowed to sleep." Make
+that clearer in the docstring.
 
-Major changes in v5
-~~~~~~~~~~~~~~~~~~~
-* A new union is added to the run struct to store memory fault
-  annotations. This resolves the concerns I brought up (see the
-  "Important Note") in the cover letter of v4.
-* Querying the new memslot flag is moved out of x86/arm64 code and into
-  __gfn_to_pfn_memslot() itself.
-
-Outstanding Issues/Details
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-The two commits for introducing/implementing
-KVM_CAP_USERFAULT_ON_MISSING will/should probably generate the most
-discussion on this version.
-
-Also, a question: in the user_mem_abort() annotation, should the
-annotations be aligned to PAGE_SIZE rather than vma_pagesize?
-
-Base Commit
-~~~~~~~~~~~
-This series is based off of kvm/next (d011151616e7)
-
-Links/Notes
-~~~~~~~~~~~
-[1] https://lore.kernel.org/linux-mm/CADrL8HVDB3u2EOhXHCrAgJNLwHkj2Lka1B_kkNb0dNwiWiAN_Q@mail.gmail.com/
-[2] ./demand_paging_test -b 64M -u MINOR -s shmem -a -v <n> -r <n> [-w]
-    A quick rundown of the new flags (also detailed in later commits)
-        -a registers all of guest memory to a single uffd.
-        -r species the number of reader threads for polling the uffd.
-        -w is what actually enables the new capabilities.
-    All data was collected after applying the entire series
-[3] https://lore.kernel.org/kvm/ZBTgnjXJvR8jtc4i@google.com/
-[4] https://lore.kernel.org/kvm/ZHkfDCItA8HUxOG1@linux.dev/T/#mfe28e6a5015b7cd8c5ea1c351b0ca194aeb33daf
-[5] https://lore.kernel.org/kvm/168556721574.515120.10821482819846567909.b4-ty@google.com/T/#t
-
+Signed-off-by: Anish Moorthy <amoorthy@google.com>
 ---
+ virt/kvm/kvm_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-v5
-  - Rename APIs (again) [Sean]
-  - Initialize hardware_exit_reason along w/ exit_reason on x86 [Isaku]
-  - Reword hva_to_pfn_fast() change commit message [Sean]
-  - Correct style on terminal if statements [Sean]
-  - Switch to kconfig to signal KVM_CAP_USERFAULT_ON_MISSING [Sean]
-  - Add read fault flag for annotated faults [Sean]
-  - read/write_guest_page() changes
-      - Move the annotations into vcpu wrapper fns [Sean]
-      - Reorder parameters [Robert]
-  - Rename kvm_populate_efault_info() to
-    kvm_handle_guest_uaccess_fault() [Sean]
-  - Remove unnecessary EINVAL on trying to enable memory fault info cap [Sean]
-  - Correct description of the faults which hva_to_pfn_fast() can now
-    resolve [Sean]
-  - Eliminate unnecessary parameter added to __kvm_faultin_pfn() [Sean]
-  - Magnanimously accept Sean's rewrite of the handle_error_pfn()
-    annotation [Anish]
-  - Remove vcpu null check from kvm_handle_guest_uaccess_fault [Sean]
-
-v4: https://lore.kernel.org/kvm/20230602161921.208564-1-amoorthy@google.com/T/#t
-  - Fix excessive indentation [Robert, Oliver]
-  - Calculate final stats when uffd handler fn returns an error [Robert]
-  - Remove redundant info from uffd_desc [Robert]
-  - Fix various commit message typos [Robert]
-  - Add comment about suppressed EEXISTs in selftest [Robert]
-  - Add exit_reasons_known definition for KVM_EXIT_MEMORY_FAULT [Robert]
-  - Fix some include/logic issues in self test [Robert]
-  - Rename no-slow-gup cap to KVM_CAP_NOWAIT_ON_FAULT [Oliver, Sean]
-  - Make KVM_CAP_MEMORY_FAULT_INFO informational-only [Oliver, Sean]
-  - Drop most of the annotations from v3: see
-    https://lore.kernel.org/kvm/20230412213510.1220557-1-amoorthy@google.com/T/#mfe28e6a5015b7cd8c5ea1c351b0ca194aeb33daf
-  - Remove WARN on bare efaults [Sean, Oliver]
-  - Eliminate unnecessary UFFDIO_WAKE call from self test [James]
-
-v3: https://lore.kernel.org/kvm/ZEBXi5tZZNxA+jRs@x1n/T/#t
-  - Rework the implementation to be based on two orthogonal
-    capabilities (KVM_CAP_MEMORY_FAULT_INFO and
-    KVM_CAP_NOWAIT_ON_FAULT) [Sean, Oliver]
-  - Change return code of kvm_populate_efault_info [Isaku]
-  - Use kvm_populate_efault_info from arm code [Oliver]
-
-v2: https://lore.kernel.org/kvm/20230315021738.1151386-1-amoorthy@google.com/
-
-    This was a bit of a misfire, as I sent my WIP series on the mailing
-    list but was just targeting Sean for some feedback. Oliver Upton and
-    Isaku Yamahata ended up discovering the series and giving me some
-    feedback anyways, so thanks to them :) In the end, there was enough
-    discussion to justify retroactively labeling it as v2, even with the
-    limited cc list.
-
-  - Introduce KVM_CAP_X86_MEMORY_FAULT_EXIT.
-  - API changes:
-        - Gate KVM_CAP_MEMORY_FAULT_NOWAIT behind
-          KVM_CAP_x86_MEMORY_FAULT_EXIT (on x86 only: arm has no such
-          requirement).
-        - Switched to memslot flag
-  - Take Oliver's simplification to the "allow fast gup for readable
-    faults" logic.
-  - Slightly redefine the return code of user_mem_abort.
-  - Fix documentation errors brought up by Marc
-  - Reword commit messages in imperative mood
-
-v1: https://lore.kernel.org/kvm/20230215011614.725983-1-amoorthy@google.com/
-
-Anish Moorthy (17):
-  KVM: Clarify documentation of hva_to_pfn()'s 'atomic' parameter
-  KVM: Add docstrings to __kvm_read/write_guest_page()
-  KVM: Simplify error handling in __gfn_to_pfn_memslot()
-  KVM: Add KVM_CAP_MEMORY_FAULT_INFO
-  KVM: Annotate -EFAULTs from kvm_vcpu_read/write_guest_page()
-  KVM: x86: Annotate -EFAULTs from kvm_handle_error_pfn()
-  KVM: arm64: Annotate -EFAULT from user_mem_abort()
-  KVM: Allow hva_pfn_fast() to resolve read faults
-  KVM: Introduce KVM_CAP_USERFAULT_ON_MISSING without implementation
-  KVM: Implement KVM_CAP_USERFAULT_ON_MISSING by atomizing
-    __gfn_to_pfn_memslot() calls
-  KVM: x86: Enable KVM_CAP_USERFAULT_ON_MISSING
-  KVM: arm64: Enable KVM_CAP_USERFAULT_ON_MISSING
-  KVM: selftests: Report per-vcpu demand paging rate from demand paging
-    test
-  KVM: selftests: Allow many vCPUs and reader threads per UFFD in demand
-    paging test
-  KVM: selftests: Use EPOLL in userfaultfd_util reader threads and
-    signal errors via TEST_ASSERT
-  KVM: selftests: Add memslot_flags parameter to memstress_create_vm()
-  KVM: selftests: Handle memory fault exits in demand_paging_test
-
- Documentation/virt/kvm/api.rst                |  77 ++++-
- arch/arm64/kvm/Kconfig                        |   1 +
- arch/arm64/kvm/mmu.c                          |  17 +-
- arch/powerpc/kvm/book3s_64_mmu_hv.c           |   3 +-
- arch/powerpc/kvm/book3s_64_mmu_radix.c        |   3 +-
- arch/x86/kvm/Kconfig                          |   1 +
- arch/x86/kvm/mmu/mmu.c                        |  21 +-
- include/linux/kvm_host.h                      |  58 +++-
- include/uapi/linux/kvm.h                      |  36 +++
- tools/include/uapi/linux/kvm.h                |  25 ++
- .../selftests/kvm/aarch64/page_fault_test.c   |   4 +-
- .../selftests/kvm/access_tracking_perf_test.c |   2 +-
- .../selftests/kvm/demand_paging_test.c        | 295 ++++++++++++++----
- .../selftests/kvm/dirty_log_perf_test.c       |   2 +-
- .../testing/selftests/kvm/include/memstress.h |   2 +-
- .../selftests/kvm/include/userfaultfd_util.h  |  17 +-
- tools/testing/selftests/kvm/lib/memstress.c   |   4 +-
- .../selftests/kvm/lib/userfaultfd_util.c      | 159 ++++++----
- .../kvm/memslot_modification_stress_test.c    |   2 +-
- .../x86_64/dirty_log_page_splitting_test.c    |   2 +-
- virt/kvm/Kconfig                              |   3 +
- virt/kvm/kvm_main.c                           |  83 +++--
- 22 files changed, 633 insertions(+), 184 deletions(-)
-
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index d63cf1c4f5a7..84e90ed3a134 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2669,7 +2669,7 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
+ /*
+  * Pin guest page in memory and return its pfn.
+  * @addr: host virtual address which maps memory to the guest
+- * @atomic: whether this function can sleep
++ * @atomic: whether this function is forbidden from sleeping
+  * @interruptible: whether the process can be interrupted by non-fatal signals
+  * @async: whether this function need to wait IO complete if the
+  *         host page is not in the memory
 -- 
 2.42.0.283.g2d96d420d3-goog
 
