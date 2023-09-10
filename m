@@ -1,86 +1,320 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4658163
-	for <kvmarm@lists.linux.dev>; Sat,  9 Sep 2023 00:15:50 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-59285f1e267so68622457b3.0
-        for <kvmarm@lists.linux.dev>; Fri, 08 Sep 2023 17:15:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1694218549; x=1694823349; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gaKhly8Aj9nDlRectFKYGw3FxO6EGE4C2aH6vsrGIcs=;
-        b=mmWzKt2McVAxJZQeyTopavuAzTGoioLQLJG3WVyZwqJkhOSM8zjUUorArmjSX9K9Sh
-         1bB8iF4o/ZBeOUGzoxHk0eyVT0wHaU7tYFRpTMw1zfM60SRX/o8Ka1mTY46wM7NybRJu
-         wplepfndp7uDwK0do0DGVyKrF+D0VJHsVqttWSRGjC+SvAf7vg4y9SwZVi50pu7ILZGf
-         UNCB4m+JhlABnAn3iU8Hvw9Ql+GwUJoCoywS+QCWfSInuaPxMohglSsknnj4H4827z9G
-         awnH+Yg4hYmeHsUE8TdFizom25RCzE7hRYq4QZSuCRmjVoFbZ589K9NGkuNVCUYBYNIC
-         wjAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694218549; x=1694823349;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gaKhly8Aj9nDlRectFKYGw3FxO6EGE4C2aH6vsrGIcs=;
-        b=mqEqfmZ8HZxt3KMQNeEAQANjY097WqjyASTht+33FSLXGxPAUm0mo0dy02d2DOtZUI
-         1bsB+F6A3P8KlnmY7NMsIQ+yvoZPWrdexQ7/Td66eLshpgtOK058JEr0kMqGSQQgMx+B
-         AusLnt8APc7MTCNiGzRPAhQV62joyhEqs0+LHjl5q9zjBFpJ2qjiqH6TcNzejyPdbZUm
-         uSnHhg/9opySDP0ZBjJ/xNSnn/RUcYA/+qNIMhKmBfRFhFpVGMEE6yqqOy6e718TQMu5
-         Zq0ErRyd7smtvG4Q0E4fi0n4HAwsG/kyw/IqDea2RZrNg8Ix9do4VJt40MzcGoouthBC
-         qxsw==
-X-Gm-Message-State: AOJu0YyJzwwvXIO3RTBaZfPoK7+y6Q8Dvp4ghZOn5sp2X1a6jqgoJZ0d
-	9hxyMv9bMaIHPIZkeA+yQJNwOAQU6sI=
-X-Google-Smtp-Source: AGHT+IF1C60bg2DJN40Ko3jIsOcOxP0NOjMSP0DFTt+pfC3PQMs+2qr1EtNSX5EQJ2FP9+vXkLa3AHa75+U=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:9848:0:b0:59b:5a5b:3a91 with SMTP id
- p69-20020a819848000000b0059b5a5b3a91mr89060ywg.2.1694218549752; Fri, 08 Sep
- 2023 17:15:49 -0700 (PDT)
-Date: Fri,  8 Sep 2023 17:15:33 -0700
-In-Reply-To: <20230908074222.28723-2-vbabka@suse.cz>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B6B257C
+	for <kvmarm@lists.linux.dev>; Sun, 10 Sep 2023 11:45:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCE92C433C8;
+	Sun, 10 Sep 2023 11:45:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694346359;
+	bh=1fPgt6NqjDOo0BmZtv5QdNaLWSnnSlPoyiIVdfmQyi0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QDDaexTUFDKdmVvCWhEPitc7stGlgZIlrhwXVBJ5Mqj3fyZCEiErhXvUZ7Ixv6SWR
+	 2ivotYuf1mPueOcrNd+CDiOZIw3PfMA/thrgMr3pGeleB+3DFUB6uye/THSw260Y0f
+	 NtPpSYV7n5+n8KHXBYGxqvwLrmsMFxs7NL/yIkrGOJkuC3FpCj0FMq6irdpMrXDBuP
+	 oqzTefuCrGVz54cgYtcgkLThrkafS53HzlDe7xFb65cfCDXsh4tDixjdEf5rE6Jjam
+	 nXKyYAaqZCh92qpq55WTnXpmYK18FUrRwNmihbCvlqDy7XzCD5fBqepy5PRiwrk0gy
+	 d189TXbKxNN/g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qfIt2-00Bipc-3b;
+	Sun, 10 Sep 2023 12:45:56 +0100
+Date: Sun, 10 Sep 2023 12:45:55 +0100
+Message-ID: <86bkeadzf0.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc: linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Christoffer.Dall@arm.com,
+	eauger@redhat.com,
+	miguel.luis@oracle.com,
+	darren@os.amperecomputing.com,
+	scott@os.amperecomputing.com
+Subject: Re: [PATCH v2 2/2] KVM: arm64: timers: Save restore CVAL of a ptimer across guest entry and exits
+In-Reply-To: <20230904114218.590304-3-gankulkarni@os.amperecomputing.com>
+References: <20230904114218.590304-1-gankulkarni@os.amperecomputing.com>
+	<20230904114218.590304-3-gankulkarni@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230908074222.28723-2-vbabka@suse.cz>
-X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
-Message-ID: <169421599820.98577.9267896589643015779.b4-ty@google.com>
-Subject: Re: [PATCH gmem FIXUP v2] mm, compaction: make testing
- mapping_unmovable() safe
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Vlastimil Babka <vbabka@suse.cz>
-Cc: ackerleytng@google.com, akpm@linux-foundation.org, anup@brainfault.org, 
-	aou@eecs.berkeley.edu, chao.p.peng@linux.intel.com, chenhuacai@kernel.org, 
-	david@redhat.com, isaku.yamahata@gmail.com, jarkko@kernel.org, 
-	jmorris@namei.org, kirill.shutemov@linux.intel.com, 
-	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	liam.merwick@oracle.com, linux-arm-kernel@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-mm@kvack.org, 
-	linux-riscv@lists.infradead.org, linux-security-module@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, mail@maciej.szmigiero.name, maz@kernel.org, 
-	michael.roth@amd.com, mpe@ellerman.id.au, oliver.upton@linux.dev, 
-	palmer@dabbelt.com, paul.walmsley@sifive.com, paul@paul-moore.com, 
-	pbonzini@redhat.com, qperret@google.com, serge@hallyn.com, tabba@google.com, 
-	vannapurve@google.com, wei.w.wang@intel.com, willy@infradead.org, 
-	yu.c.zhang@linux.intel.com
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Christoffer.Dall@arm.com, eauger@redhat.com, miguel.luis@oracle.com, darren@os.amperecomputing.com, scott@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 08 Sep 2023 09:42:23 +0200, Vlastimil Babka wrote:
-> As Kirill pointed out, mapping can be removed under us due to
-> truncation. Test it under folio lock as already done for the async
-> compaction / dirty folio case. To prevent locking every folio with
-> mapping to do the test, do it only for unevictable folios, as we can
-> expect the unmovable mapping folios are also unevictable. To enforce
-> that expecation, make mapping_set_unmovable() also set AS_UNEVICTABLE.
-> 
-> [...]
+On Mon, 04 Sep 2023 12:42:18 +0100,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+>=20
+> As per FEAT_ECV, when HCR_EL2.{E2H, TGE} =3D=3D {1, 1}, Enhanced Counter
+> Virtualization functionality is disabled and CNTPOFF_EL2 value is treated
+> as zero. On VHE host, E2H and TGE are set, hence it is required
+> to save Guest's CVAL to memory and increment it by CNTPOFF_EL2 at
+> guest exit to avoid false physical timer interrupts and also
+> restore back the CVAL with saved value before the guest entry.
+>=20
+> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+> ---
+>  arch/arm64/kvm/arch_timer.c     | 60 ++++++++++++++++++++++++++++++---
+>  arch/arm64/kvm/hyp/vhe/switch.c | 13 +++++++
+>  include/kvm/arm_arch_timer.h    |  1 +
+>  3 files changed, 69 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 98b0e8ac02ae..9fe3fa6ed98a 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -514,6 +514,59 @@ static void set_cntpoff(u64 cntpoff)
+>  		write_sysreg_s(cntpoff, SYS_CNTPOFF_EL2);
+>  }
+> =20
+> +static void ptimer_cval_save(struct arch_timer_context *ctx, u64 offset)
+> +{
+> +	unsigned long flags;
+> +	u64 cval;
+> +
+> +	local_irq_save(flags);
+> +	cval =3D read_sysreg_el0(SYS_CNTP_CVAL);
+> +	timer_set_cval(ctx, cval);
+> +	cval +=3D offset;
+> +	write_sysreg_el0(cval, SYS_CNTP_CVAL);
+> +	isb();
+> +	local_irq_restore(flags);
+> +}
+> +
+> +static void ptimer_cval_restore(struct arch_timer_context *ctx, u64 offs=
+et)
+> +{
+> +	unsigned long flags;
+> +	u64 cval;
+> +
+> +	local_irq_save(flags);
+> +	cval =3D timer_get_cval(ctx);
+> +	write_sysreg_el0(cval, SYS_CNTP_CVAL);
+> +	isb();
+> +	local_irq_restore(flags);
+> +}
+> +
+> +void kvm_ptimer_cval_save_restore(struct kvm_vcpu *vcpu, bool save)
+> +{
+> +	struct timer_map map;
+> +	struct arch_timer_cpu *timer;
+> +	struct arch_timer_context *ctxp;
+> +	u64 offset;
+> +
+> +	get_timer_map(vcpu, &map);
+> +	ctxp =3D map.direct_ptimer;
+> +
+> +	if (unlikely(ctxp =3D=3D NULL))
+> +		return;
+> +
+> +	offset =3D timer_get_offset(ctxp);
+> +	if (!offset)
+> +		return;
+> +
+> +	timer =3D vcpu_timer(ctxp->vcpu);
+> +	if (!timer->enabled || !ctxp->loaded)
+> +		return;
+> +
+> +	if (save)
+> +		ptimer_cval_save(ctxp, offset);
+> +	else
+> +		ptimer_cval_restore(ctxp, offset);
+> +}
+> +
 
-Applied to kvm-x86 guest_memfd, thanks!
+I really don't want to see any of this code in the arch_timer
+backend. There is nothing here that executes in the context of the
+world-switch until this, and I think this is the wrong level of
+abstraction.
 
-[1/1] mm, compaction: make testing mapping_unmovable() safe
-      https://github.com/kvm-x86/linux/commit/4876a35647b9
+You end-up doing things that make no sense in the expected execution
+context (timer not loaded?, not enabled?, disabling interrupts?), and
+this makes the whole thing pointlessly complex.
 
---
-https://github.com/kvm-x86/linux/tree/next
-https://github.com/kvm-x86/linux/tree/fixes
+My take on this problem is still the same (vaguely amended compared to
+the previous version). If this doesn't work for you, please explain
+what is wrong with it. But it has the shape of what I really want to
+see.
+
+Thanks,
+
+	M.
+
+=46rom 2516a1410c0d45a7d3ba0523847be339bfcb1e50 Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Tue, 22 Aug 2023 13:18:10 +0100
+Subject: [PATCH] KVM: arm64: timers: Correctly handle TGE flip with
+ CNTPOFF_EL2
+
+Contrary to common belief, HCR_EL2.TGE has a direct and immediate
+effect on the way the EL0 physical counter is offset. Flipping
+TGE from 1 to 0 while at EL2 immediately changes the way the counter
+compared to the CVAL limit.
+
+This means that we cannot directly save/restore the guest's view of
+CVAL, but that we instead must treat it as if CNTPOFF didn't exist.
+Only in the world switch, once we figure out that we do have CNTPOFF,
+can we must the offset back and forth depending on the polarity of
+TGE.
+
+Fixes: 2b4825a86940 ("KVM: arm64: timers: Use CNTPOFF_EL2 to offset the phy=
+sical timer")
+Reported-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/arch_timer.c     | 13 +++-------
+ arch/arm64/kvm/hyp/vhe/switch.c | 45 +++++++++++++++++++++++++++++++++
+ include/kvm/arm_arch_timer.h    |  7 +++++
+ 3 files changed, 55 insertions(+), 10 deletions(-)
+
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 6dcdae4d38cb..a1e24228aaaa 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -55,11 +55,6 @@ static struct irq_ops arch_timer_irq_ops =3D {
+ 	.get_input_level =3D kvm_arch_timer_get_input_level,
+ };
+=20
+-static bool has_cntpoff(void)
+-{
+-	return (has_vhe() && cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF));
+-}
+-
+ static int nr_timers(struct kvm_vcpu *vcpu)
+ {
+ 	if (!vcpu_has_nv(vcpu))
+@@ -180,7 +175,7 @@ u64 kvm_phys_timer_read(void)
+ 	return timecounter->cc->read(timecounter->cc);
+ }
+=20
+-static void get_timer_map(struct kvm_vcpu *vcpu, struct timer_map *map)
++void get_timer_map(struct kvm_vcpu *vcpu, struct timer_map *map)
+ {
+ 	if (vcpu_has_nv(vcpu)) {
+ 		if (is_hyp_ctxt(vcpu)) {
+@@ -548,8 +543,7 @@ static void timer_save_state(struct arch_timer_context =
+*ctx)
+ 		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTP_CTL));
+ 		cval =3D read_sysreg_el0(SYS_CNTP_CVAL);
+=20
+-		if (!has_cntpoff())
+-			cval -=3D timer_get_offset(ctx);
++		cval -=3D timer_get_offset(ctx);
+=20
+ 		timer_set_cval(ctx, cval);
+=20
+@@ -636,8 +630,7 @@ static void timer_restore_state(struct arch_timer_conte=
+xt *ctx)
+ 		cval =3D timer_get_cval(ctx);
+ 		offset =3D timer_get_offset(ctx);
+ 		set_cntpoff(offset);
+-		if (!has_cntpoff())
+-			cval +=3D offset;
++		cval +=3D offset;
+ 		write_sysreg_el0(cval, SYS_CNTP_CVAL);
+ 		isb();
+ 		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTP_CTL);
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switc=
+h.c
+index 6537f58b1a8c..5dcbde57f466 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -39,6 +39,26 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+=20
+ 	___activate_traps(vcpu);
+=20
++	if (has_cntpoff()) {
++		struct timer_map map;
++
++		get_timer_map(vcpu, &map);
++
++		/*
++		 * We're entrering the guest. Reload the correct
++		 * values from memory now that TGE is clear.
++		 */
++		if (map.direct_ptimer =3D=3D vcpu_ptimer(vcpu))
++			val =3D __vcpu_sys_reg(vcpu, CNTP_CVAL_EL0);
++		if (map.direct_ptimer =3D=3D vcpu_hptimer(vcpu))
++			val =3D __vcpu_sys_reg(vcpu, CNTHP_CVAL_EL2);
++
++		if (map.direct_ptimer) {
++			write_sysreg_s(val, SYS_CNTP_CVAL_EL0);
++			isb();
++		}
++	}
++
+ 	val =3D read_sysreg(cpacr_el1);
+ 	val |=3D CPACR_ELx_TTA;
+ 	val &=3D ~(CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN |
+@@ -77,6 +97,31 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
+=20
+ 	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
+=20
++	if (has_cntpoff()) {
++		struct timer_map map;
++		u64 val, offset;
++
++		get_timer_map(vcpu, &map);
++
++		/*
++		 * We're exiting the guest. Save the latest CVAL value
++		 * to memory and apply the offset now that TGE is set.
++		 */
++		val =3D read_sysreg_s(SYS_CNTP_CVAL_EL0);
++		if (map.direct_ptimer =3D=3D vcpu_ptimer(vcpu))
++			__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0) =3D val;
++		if (map.direct_ptimer =3D=3D vcpu_hptimer(vcpu))
++			__vcpu_sys_reg(vcpu, CNTHP_CVAL_EL2) =3D val;
++
++		offset =3D read_sysreg_s(SYS_CNTPOFF_EL2);
++
++		if (map.direct_ptimer && offset) {
++			offset =3D read_sysreg_s(SYS_CNTPOFF_EL2);
++			write_sysreg_s(val + offset, SYS_CNTP_CVAL_EL0);
++			isb();
++		}
++	}
++
+ 	/*
+ 	 * ARM errata 1165522 and 1530923 require the actual execution of the
+ 	 * above before we can switch to the EL2/EL0 translation regime used by
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index bb3cb005873e..e748bc957d83 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -82,6 +82,8 @@ struct timer_map {
+ 	struct arch_timer_context *emul_ptimer;
+ };
+=20
++void get_timer_map(struct kvm_vcpu *vcpu, struct timer_map *map);
++
+ struct arch_timer_cpu {
+ 	struct arch_timer_context timers[NR_KVM_TIMERS];
+=20
+@@ -145,4 +147,9 @@ u64 timer_get_cval(struct arch_timer_context *ctxt);
+ void kvm_timer_cpu_up(void);
+ void kvm_timer_cpu_down(void);
+=20
++static inline bool has_cntpoff(void)
++{
++	return (has_vhe() && cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF));
++}
++
+ #endif
+--=20
+2.34.1
+
+
+--=20
+Without deviation from the norm, progress is not possible.
