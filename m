@@ -1,276 +1,142 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5316A257E
-	for <kvmarm@lists.linux.dev>; Sun, 10 Sep 2023 18:18:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A26BCC433C8;
-	Sun, 10 Sep 2023 18:18:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694369924;
-	bh=ASilHGVZgGzH/f+ZMWTcrcQGEIs4+1IIpikMRP0PMLE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nSgkGpXEC1TaKGgH5EDL4geDysjEA5MRO61k1UHKPd/DoAmbuRBqINYW1jGOHezc8
-	 I7PxdZvZkwkid7DXa9UvKCC7ybtOxgwngPiKRwvNq1vTCnqHTzpYTxaPqhVtF0bOtn
-	 pjGmtojRoHBcYw+8nnzA9+QibjIzPOqHrHDjq9RreEDzb9RIHesBwpWZ//Z30YkAMo
-	 WLFwkPi4PHkAcHe8gGd3rVSV5Dt0I1YN2ekQGuvj2SONeO/EBwfrtkE49oWr6pGA7O
-	 pJJI/GOa/xnqyt1BLq0rJ3mgj7nR6SJYqP8rnZ+AhmhRg5oKnSXCyh19WtgTQd7jlU
-	 jQvtJgZgbquWQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qfP18-00BlHD-3Q;
-	Sun, 10 Sep 2023 19:18:42 +0100
-Date: Sun, 10 Sep 2023 19:18:37 +0100
-Message-ID: <87ledd51tu.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Zenghui Yu <zenghui.yu@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAFBA17C8
+	for <kvmarm@lists.linux.dev>; Mon, 11 Sep 2023 02:16:47 +0000 (UTC)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1c336f5b1ffso32267305ad.2
+        for <kvmarm@lists.linux.dev>; Sun, 10 Sep 2023 19:16:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1694398607; x=1695003407; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vqoA9GhDYxmGiRCW6kUKLzalkSujRXWk0xXWsVaqSl0=;
+        b=Ll1y4cJ7wt25CiM6lBMpN/CmQ0mz8urYlPfdKRQlOf4qnXs4LvgZqPAWLFqVVNYRlb
+         y9XpaHJYutmn2/pb4opGGoO0FPM4xBUoeM69dSgMVvrtDKon/3t01NCMYb5XFAqp425T
+         L7/YL7Bi6vMnr4+4uT/IOImhAw7L+X2UHEw74=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694398607; x=1695003407;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vqoA9GhDYxmGiRCW6kUKLzalkSujRXWk0xXWsVaqSl0=;
+        b=XdtWSViZ9YWFzUQi6GV0VDCb76vTCjDVUKLIl5R1ATuXFYVpPCwBiZ76O70oJetoua
+         fjbSWO8tQ6D+axLMJg8UrE8X1xa1fD1/AUPVE+9N/eCn0V1E5W9kaSGxDN3pdjAaHODn
+         Wve0xudsQSPLQ8Yyf1W5QtQbwFmpkU3xDh9saFPKliGoqW4GU2ZnEZBm9v8k2Ek0LrA6
+         eTZHwf445VGyrtnUjpvpqw/jQQuqinlz1m3qV5mTCSDEhjUxWyZGIWFiaG2Z8mHtjidM
+         VWfu0agD4b/uFNMyjHqtvjnw+w+Fy6MTgafjk8aeFidSpNzDzCtD91UvA8kI2e9u39Pd
+         wFPg==
+X-Gm-Message-State: AOJu0YyyudIG+HkuqpfpcY20WlcPhZdBF8Jw98mAhzFM4kLUmCteB+O5
+	l95rLkUipzTJpfwXX1bD0ANUAg==
+X-Google-Smtp-Source: AGHT+IHwrp4u7peThbJCv3jlphOZQ/t5wNetdYpbttfEVToV24awEthc+P0HA+ZZ6XmS9NnPtx+BLg==
+X-Received: by 2002:a17:902:ed53:b0:1bf:64c9:a67c with SMTP id y19-20020a170902ed5300b001bf64c9a67cmr8538505plb.22.1694398607060;
+        Sun, 10 Sep 2023 19:16:47 -0700 (PDT)
+Received: from localhost ([2401:fa00:8f:203:282a:59c8:cc3a:2d6])
+        by smtp.gmail.com with UTF8SMTPSA id g2-20020a1709026b4200b001b8a00d4f7asm5171961plt.9.2023.09.10.19.16.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 10 Sep 2023 19:16:46 -0700 (PDT)
+From: David Stevens <stevensd@chromium.org>
+X-Google-Original-From: David Stevens <stevensd@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Yu Zhang <yu.c.zhang@linux.intel.com>,
+	Isaku Yamahata <isaku.yamahata@gmail.com>,
+	Zhi Wang <zhi.wang.linux@gmail.com>,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Xu Zhao <zhaoxu.35@bytedance.com>
-Subject: Re: [PATCH 4/5] KVM: arm64: vgic-v3: Refactor GICv3 SGI generation
-In-Reply-To: <fd96f034-b7ca-c1bd-a94e-06f8e84e52a7@linux.dev>
-References: <20230907100931.1186690-1-maz@kernel.org>
-	<20230907100931.1186690-5-maz@kernel.org>
-	<fd96f034-b7ca-c1bd-a94e-06f8e84e52a7@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	David Stevens <stevensd@chromium.org>
+Subject: [PATCH v9 0/6] KVM: allow mapping non-refcounted pages
+Date: Mon, 11 Sep 2023 11:16:30 +0900
+Message-ID: <20230911021637.1941096-1-stevensd@google.com>
+X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: zenghui.yu@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, zhaoxu.35@bytedance.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Sun, 10 Sep 2023 17:25:36 +0100,
-Zenghui Yu <zenghui.yu@linux.dev> wrote:
-> 
-> Hi Marc,
-> 
-> On 2023/9/7 18:09, Marc Zyngier wrote:
-> > As we're about to change the way SGIs are sent, start by splitting
-> > out some of the basic functionnality: instead of intermingling
-> 
-> functionality
-> 
-> > the broadcast and non-broadcast cases with the actual SGI generation,
-> > perform the following cleanups:
-> > 
-> > - move the SGI queuing into its own helper
-> > - split the broadcast code from the affinity-driven code
-> > - replace the mask/shift combinations with FIELD_GET()
-> > 
-> > The result is much more readable, and paves the way for further
-> > optimisations.
-> 
-> Indeed!
-> 
-> > @@ -1070,19 +1102,30 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
-> >  {
-> >  	struct kvm *kvm = vcpu->kvm;
-> >  	struct kvm_vcpu *c_vcpu;
-> > -	u16 target_cpus;
-> > +	unsigned long target_cpus;
-> >  	u64 mpidr;
-> > -	int sgi;
-> > -	int vcpu_id = vcpu->vcpu_id;
-> > -	bool broadcast;
-> > -	unsigned long c, flags;
-> > -
-> > -	sgi = (reg & ICC_SGI1R_SGI_ID_MASK) >> ICC_SGI1R_SGI_ID_SHIFT;
-> > -	broadcast = reg & BIT_ULL(ICC_SGI1R_IRQ_ROUTING_MODE_BIT);
-> > -	target_cpus = (reg & ICC_SGI1R_TARGET_LIST_MASK) >> ICC_SGI1R_TARGET_LIST_SHIFT;
-> > +	u32 sgi;
-> > +	unsigned long c;
-> > +
-> > +	sgi = FIELD_GET(ICC_SGI1R_SGI_ID_MASK, reg);
-> > +
-> > +	/* Broadcast */
-> > +	if (unlikely(reg & BIT_ULL(ICC_SGI1R_IRQ_ROUTING_MODE_BIT))) {
-> > +		kvm_for_each_vcpu(c, c_vcpu, kvm) {
-> > +			/* Don't signal the calling VCPU */
-> > +			if (c_vcpu == vcpu)
-> > +				continue;
-> > +
-> > +			vgic_v3_queue_sgi(c_vcpu, sgi, allow_group1);
-> > +		}
-> > +
-> > +		return;
-> > +	}
-> > +
-> >  	mpidr = SGI_AFFINITY_LEVEL(reg, 3);
-> >  	mpidr |= SGI_AFFINITY_LEVEL(reg, 2);
-> >  	mpidr |= SGI_AFFINITY_LEVEL(reg, 1);
-> > +	target_cpus = FIELD_GET(ICC_SGI1R_TARGET_LIST_MASK, reg);
-> >   	/*
-> >  	 * We iterate over all VCPUs to find the MPIDRs matching the request.
-> > @@ -1091,54 +1134,19 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
-> >  	 * VCPUs when most of the times we just signal a single VCPU.
-> >  	 */
-> >  	kvm_for_each_vcpu(c, c_vcpu, kvm) {
-> > -		struct vgic_irq *irq;
-> > +		int level0;
-> >   		/* Exit early if we have dealt with all requested CPUs
-> > */
-> > -		if (!broadcast && target_cpus == 0)
-> > +		if (target_cpus == 0)
-> >  			break;
-> > -
-> > -		/* Don't signal the calling VCPU */
-> > -		if (broadcast && c == vcpu_id)
-> 
-> Unrelated to this patch, but it looks that we were comparing the value
-> of *vcpu_idx* and vcpu_id to skip the calling VCPU.
+From: David Stevens <stevensd@chromium.org>
 
-Huh, well caught. That was definitely a bug that was there for ever,
-and only you spotted it. Guess I should flag it as a stable candidate.
+This patch series adds support for mapping VM_IO and VM_PFNMAP memory
+that is backed by struct pages that aren't currently being refcounted
+(e.g. tail pages of non-compound higher order allocations) into the
+guest.
 
-> Is there a rule in KVM that userspace should invoke KVM_CREATE_VCPU
-> with sequential "vcpu id"s, starting at 0, so that the user-provided
-> vcpu_id always equals to the KVM-internal vcpu_idx for a given VCPU?
+Our use case is virtio-gpu blob resources [1], which directly map host
+graphics buffers into the guest as "vram" for the virtio-gpu device.
+This feature currently does not work on systems using the amdgpu driver,
+as that driver allocates non-compound higher order pages via
+ttm_pool_alloc_page.
 
-I don't think there is any such rule. As far as I can tell, any number
-will do as long as it is within the range [0, max_vcpu_id). Of course,
-max_vcpu_id doesn't even exist on arm64. From what I can tell, this is
-just some random number between 0 and 511 for us (GICv2
-notwithstanding).
+First, this series replaces the __gfn_to_pfn_memslot API with a more
+extensible __kvm_faultin_pfn API. The updated API rearranges
+__gfn_to_pfn_memslot's args into a struct and where possible packs the
+bool arguments into a FOLL_ flags argument. The refactoring changes do
+not change any behavior.
 
-> I asked because it seems that in kvm/arm64 we always use
-> kvm_get_vcpu(kvm, i) to obtain the kvm_vcpu pointer, even if *i* is
-> sometimes essentially provided by userspace..
+From there, this series extends the __kvm_faultin_pfn API so that
+non-refconuted pages can be safely handled. This invloves adding an
+input parameter to indicate whether the caller can safely use
+non-refcounted pfns and an output parameter to tell the caller whether
+or not the returned page is refcounted. This change includes a breaking
+change, by disallowing non-refcounted pfn mappings by default, as such
+mappings are unsafe. To allow such systems to continue to function, an
+opt-in module parameter is added to allow the unsafe behavior.
 
-Huh, this is incredibly dodgy. I had a go at a few occurrences (see
-below), but this is hardly a complete list.
+This series only adds support for non-refcounted pages to x86. Other
+MMUs can likely be updated without too much difficulty, but it is not
+needed at this point. Updating other parts of KVM (e.g. pfncache) is not
+straightforward [2].
 
-> Besides, the refactor itself looks good to me.
+[1]
+https://patchwork.kernel.org/project/dri-devel/cover/20200814024000.2485-1-gurchetansingh@chromium.org/
+[2] https://lore.kernel.org/all/ZBEEQtmtNPaEqU1i@google.com/
 
-Cool, thanks!
+v8 -> v9:
+ - Make paying attention to is_refcounted_page mandatory. This means
+   that FOLL_GET is no longer necessary. For compatibility with
+   un-migrated callers, add a temporary parameter to sidestep
+   ref-counting issues.
+ - Add allow_unsafe_mappings, which is a breaking change.
+ - Migrate kvm_vcpu_map and other callsites used by x86 to the new API.
+ - Drop arm and ppc changes.
+v7 -> v8:
+ - Set access bits before releasing mmu_lock.
+ - Pass FOLL_GET on 32-bit x86 or !tdp_enabled.
+ - Refactor FOLL_GET handling, add kvm_follow_refcounted_pfn helper.
+ - Set refcounted bit on >4k pages.
+ - Add comments and apply formatting suggestions.
+ - rebase on kvm next branch.
+v6 -> v7:
+ - Replace __gfn_to_pfn_memslot with a more flexible __kvm_faultin_pfn,
+   and extend that API to support non-refcounted pages (complete
+   rewrite).
 
-	M.
+David Stevens (5):
+  KVM: mmu: Introduce __kvm_follow_pfn function
+  KVM: mmu: Improve handling of non-refcounted pfns
+  KVM: Migrate kvm_vcpu_map to __kvm_follow_pfn
+  KVM: x86: Migrate to __kvm_follow_pfn
+  KVM: x86/mmu: Handle non-refcounted pages
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 6dcdae4d38cb..e32c867e7b48 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -458,7 +458,7 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
- 				   timer_ctx->irq.level);
- 
- 	if (!userspace_irqchip(vcpu->kvm)) {
--		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
-+		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_idx,
- 					  timer_irq(timer_ctx),
- 					  timer_ctx->irq.level,
- 					  timer_ctx);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index a3b13281d38a..1f7b074b81df 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -439,9 +439,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	 * We might get preempted before the vCPU actually runs, but
- 	 * over-invalidation doesn't affect correctness.
- 	 */
--	if (*last_ran != vcpu->vcpu_id) {
-+	if (*last_ran != vcpu->vcpu_idx) {
- 		kvm_call_hyp(__kvm_flush_cpu_context, mmu);
--		*last_ran = vcpu->vcpu_id;
-+		*last_ran = vcpu->vcpu_idx;
- 	}
- 
- 	vcpu->cpu = cpu;
-@@ -1207,7 +1207,7 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
- 		if (vcpu_idx >= nrcpus)
- 			return -EINVAL;
- 
--		vcpu = kvm_get_vcpu(kvm, vcpu_idx);
-+		vcpu = kvm_get_vcpu_by_id(kvm, vcpu_idx);
- 		if (!vcpu)
- 			return -EINVAL;
- 
-@@ -1222,14 +1222,14 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
- 		if (vcpu_idx >= nrcpus)
- 			return -EINVAL;
- 
--		vcpu = kvm_get_vcpu(kvm, vcpu_idx);
-+		vcpu = kvm_get_vcpu_by_id(kvm, vcpu_idx);
- 		if (!vcpu)
- 			return -EINVAL;
- 
- 		if (irq_num < VGIC_NR_SGIS || irq_num >= VGIC_NR_PRIVATE_IRQS)
- 			return -EINVAL;
- 
--		return kvm_vgic_inject_irq(kvm, vcpu->vcpu_id, irq_num, level, NULL);
-+		return kvm_vgic_inject_irq(kvm, vcpu->vcpu_idx, irq_num, level, NULL);
- 	case KVM_ARM_IRQ_TYPE_SPI:
- 		if (!irqchip_in_kernel(kvm))
- 			return -ENXIO;
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 6b066e04dc5d..4448940b6d79 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -348,7 +348,7 @@ static void kvm_pmu_update_state(struct kvm_vcpu *vcpu)
- 	pmu->irq_level = overflow;
- 
- 	if (likely(irqchip_in_kernel(vcpu->kvm))) {
--		int ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
-+		int ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_idx,
- 					      pmu->irq_num, overflow, pmu);
- 		WARN_ON(ret);
- 	}
-diff --git a/arch/arm64/kvm/vgic/vgic-debug.c b/arch/arm64/kvm/vgic/vgic-debug.c
-index 07aa0437125a..85606a531dc3 100644
---- a/arch/arm64/kvm/vgic/vgic-debug.c
-+++ b/arch/arm64/kvm/vgic/vgic-debug.c
-@@ -166,7 +166,7 @@ static void print_header(struct seq_file *s, struct vgic_irq *irq,
- 
- 	if (vcpu) {
- 		hdr = "VCPU";
--		id = vcpu->vcpu_id;
-+		id = vcpu->vcpu_idx;
- 	}
- 
- 	seq_printf(s, "\n");
-@@ -212,7 +212,7 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
- 		      "     %2d "
- 		      "\n",
- 			type, irq->intid,
--			(irq->target_vcpu) ? irq->target_vcpu->vcpu_id : -1,
-+			(irq->target_vcpu) ? irq->target_vcpu->vcpu_idx : -1,
- 			pending,
- 			irq->line_level,
- 			irq->active,
-@@ -224,7 +224,7 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
- 			irq->mpidr,
- 			irq->source,
- 			irq->priority,
--			(irq->vcpu) ? irq->vcpu->vcpu_id : -1);
-+			(irq->vcpu) ? irq->vcpu->vcpu_idx : -1);
- }
- 
- static int vgic_debug_show(struct seq_file *s, void *v)
-diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-index 212b73a715c1..82b264ad68c4 100644
---- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-+++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-@@ -345,7 +345,7 @@ int vgic_v2_parse_attr(struct kvm_device *dev, struct kvm_device_attr *attr,
- 	if (cpuid >= atomic_read(&dev->kvm->online_vcpus))
- 		return -EINVAL;
- 
--	reg_attr->vcpu = kvm_get_vcpu(dev->kvm, cpuid);
-+	reg_attr->vcpu = kvm_get_vcpu_by_id(dev->kvm, cpuid);
- 	reg_attr->addr = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
- 
- 	return 0;
+Sean Christopherson (1):
+  KVM: Assert that a page's refcount is elevated when marking
+    accessed/dirty
+
+ arch/x86/kvm/mmu/mmu.c          |  93 +++++++---
+ arch/x86/kvm/mmu/mmu_internal.h |   1 +
+ arch/x86/kvm/mmu/paging_tmpl.h  |   8 +-
+ arch/x86/kvm/mmu/spte.c         |   4 +-
+ arch/x86/kvm/mmu/spte.h         |  12 +-
+ arch/x86/kvm/mmu/tdp_mmu.c      |  22 ++-
+ arch/x86/kvm/x86.c              |  12 +-
+ include/linux/kvm_host.h        |  42 ++++-
+ virt/kvm/kvm_main.c             | 294 +++++++++++++++++++-------------
+ virt/kvm/kvm_mm.h               |   3 +-
+ virt/kvm/pfncache.c             |  11 +-
+ 11 files changed, 339 insertions(+), 163 deletions(-)
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.42.0.283.g2d96d420d3-goog
+
