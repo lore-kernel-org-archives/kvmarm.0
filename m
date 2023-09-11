@@ -1,166 +1,169 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AFC1E546
-	for <kvmarm@lists.linux.dev>; Mon, 11 Sep 2023 12:29:09 +0000 (UTC)
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-382-eva_vlpZN7Ka4rPPLu4VrQ-1; Mon, 11 Sep 2023 08:29:07 -0400
-X-MC-Unique: eva_vlpZN7Ka4rPPLu4VrQ-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-401dba99384so32745965e9.3
-        for <kvmarm@lists.linux.dev>; Mon, 11 Sep 2023 05:29:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694435346; x=1695040146;
-        h=content-transfer-encoding:in-reply-to:subject:organization:from
-         :references:cc:to:content-language:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DHwDjcrul9YxmPEcQYx4HYVTPitVbFTJsMO8Jxfoen4=;
-        b=K9n8nDBee6cUhXjMng3xj9K0QNcjRIPPTRRVSFTCfKriFkXhMsw0zYWUlFPgZU8qLC
-         gj5YyNGJCc1wphRoTLsDIycPl5h0jdONRthm//iccBn67lIr1DjKqHDxCLCdezbYQMeJ
-         OYfG4NSO6SZxUS/ApCfKqJG2CAbSE12Du3te9e/ToJni8ACK2YIcVLt019WvNXkL0zux
-         RvbE4pJXg+1ro1HSpwItkMplSZcL8GHKD9TSPwat0n42garARsCEP3PqXJZQskPOheC7
-         TMHP7YpK4Vm/5QXRSr7DK4fNimSfSKbvHpgplGJAzfQ97a+UbfuT4YmxDHtfaDXkeuIJ
-         QGEA==
-X-Gm-Message-State: AOJu0YzyniKltg0SdFD3l9+jPFKMQM4i3WSiW3M+8BA5N1s/w8v8WnnY
-	RgjP1/FhGN5gtUUne7izRUs/lyMYB2VunPjfi5yKxyldXyqcBr8wuEOQZVRUQUZYr9/9fe99o7d
-	YQTDvJYdvLogzHphy
-X-Received: by 2002:a05:600c:2208:b0:3fe:f667:4e4c with SMTP id z8-20020a05600c220800b003fef6674e4cmr8229328wml.12.1694435346279;
-        Mon, 11 Sep 2023 05:29:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF0LpLhNizaUMU3zKfHh49aqw4McELTtqbEdG0mSCPhvh4bG6htIZyW8h2QYhMj39he9TwHvA==
-X-Received: by 2002:a05:600c:2208:b0:3fe:f667:4e4c with SMTP id z8-20020a05600c220800b003fef6674e4cmr8229290wml.12.1694435345880;
-        Mon, 11 Sep 2023 05:29:05 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c743:5500:a9bd:94ab:74e9:782f? (p200300cbc7435500a9bd94ab74e9782f.dip0.t-ipconnect.de. [2003:cb:c743:5500:a9bd:94ab:74e9:782f])
-        by smtp.gmail.com with ESMTPSA id z18-20020a1c4c12000000b003fedcd02e2asm9929615wmf.35.2023.09.11.05.29.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Sep 2023 05:29:05 -0700 (PDT)
-Message-ID: <0cc8a118-2522-f666-5bcc-af06263fd352@redhat.com>
-Date: Mon, 11 Sep 2023 14:29:03 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E5C11719
+	for <kvmarm@lists.linux.dev>; Mon, 11 Sep 2023 14:57:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F205AC433C8;
+	Mon, 11 Sep 2023 14:57:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694444278;
+	bh=bQfMxb8+0HLBcBK15McAVOoJ4uTK8OsVjnEBuWMDElM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sUsSOGJyRfMKdnb5MxsvDKxeR1+28guLt+j2WSEuS+e+p8RkicfbuGIMJc7m8Patm
+	 hmBkAKcEjQ2xQQHJaZPQA1owXs45QxDuFAL3rEarN7G+Jo8GrSB7AEN5ATGsen2LCu
+	 CNaSt/78+JcgNNx+X+23m5wJCZdFZ7cFZjyt15ZvhA4BAzxZBmj9pjMY+9YwyRUKZo
+	 f7SvOQEADlk7vE2f31yKb6zI3akyx7r10oDUPBRx6a9PP7XITusl3MBE4CWrIYtaG0
+	 mRkGcl59P+Qm12WVPnExYDR0qdkIixyWZLS9UerXj16PSguyNiY+gByAZBUslgEkHQ
+	 rDYvj9HinWGPQ==
+Date: Mon, 11 Sep 2023 16:57:51 +0200
+From: Lorenzo Pieralisi <lpieralisi@kernel.org>
+To: ankita@nvidia.com
+Cc: jgg@nvidia.com, maz@kernel.org, oliver.upton@linux.dev,
+	catalin.marinas@arm.com, will@kernel.org, aniketa@nvidia.com,
+	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
+	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
+	jhubbard@nvidia.com, danw@nvidia.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 2/2] KVM: arm64: allow the VM to select DEVICE_* and
+ NORMAL_NC for IO memory
+Message-ID: <ZP8q71+YXoU6O9uh@lpieralisi>
+References: <20230907181459.18145-1-ankita@nvidia.com>
+ <20230907181459.18145-3-ankita@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-To: Catalin Marinas <catalin.marinas@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: will@kernel.org, oliver.upton@linux.dev, maz@kernel.org,
- james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
- arnd@arndb.de, akpm@linux-foundation.org, mingo@redhat.com,
- peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
- dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
- mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com,
- mhiramat@kernel.org, rppt@kernel.org, hughd@google.com, pcc@google.com,
- steven.price@arm.com, anshuman.khandual@arm.com, vincenzo.frascino@arm.com,
- eugenis@google.com, kcc@google.com, hyesoo.yu@samsung.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-mm@kvack.org,
- linux-trace-kernel@vger.kernel.org
-References: <20230823131350.114942-1-alexandru.elisei@arm.com>
- <33def4fe-fdb8-6388-1151-fabd2adc8220@redhat.com> <ZOc0fehF02MohuWr@arm.com>
- <ebd3f142-43cc-dc92-7512-8f1c99073fce@redhat.com>
- <0b9c122a-c05a-b3df-c69f-85f520294adc@redhat.com> <ZOd2LvUKMguWdlgq@arm.com>
- <ZPhfNVWXhabqnknK@monolith> <ZP7/e8YFiosElvTm@arm.com>
-From: David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Subject: Re: [PATCH RFC 00/37] Add support for arm64 MTE dynamic tag storage
- reuse
-In-Reply-To: <ZP7/e8YFiosElvTm@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230907181459.18145-3-ankita@nvidia.com>
 
-On 11.09.23 13:52, Catalin Marinas wrote:
-> On Wed, Sep 06, 2023 at 12:23:21PM +0100, Alexandru Elisei wrote:
->> On Thu, Aug 24, 2023 at 04:24:30PM +0100, Catalin Marinas wrote:
->>> On Thu, Aug 24, 2023 at 01:25:41PM +0200, David Hildenbrand wrote:
->>>> On 24.08.23 13:06, David Hildenbrand wrote:
->>>>> Regarding one complication: "The kernel needs to know where to allocate
->>>>> a PROT_MTE page from or migrate a current page if it becomes PROT_MTE
->>>>> (mprotect()) and the range it is in does not support tagging.",
->>>>> simplified handling would be if it's in a MIGRATE_CMA pageblock, it
->>>>> doesn't support tagging. You have to migrate to a !CMA page (for
->>>>> example, not specifying GFP_MOVABLE as a quick way to achieve that).
->>>>
->>>> Okay, I now realize that this patch set effectively duplicates some CMA
->>>> behavior using a new migrate-type.
-> [...]
->> I considered mixing the tag storage memory memory with normal memory and
->> adding it to MIGRATE_CMA. But since tag storage memory cannot be tagged,
->> this means that it's not enough anymore to have a __GFP_MOVABLE allocation
->> request to use MIGRATE_CMA.
->>
->> I considered two solutions to this problem:
->>
->> 1. Only allocate from MIGRATE_CMA is the requested memory is not tagged =>
->> this effectively means transforming all memory from MIGRATE_CMA into the
->> MIGRATE_METADATA migratetype that the series introduces. Not very
->> appealing, because that means treating normal memory that is also on the
->> MIGRATE_CMA lists as tagged memory.
+On Thu, Sep 07, 2023 at 11:14:59AM -0700, ankita@nvidia.com wrote:
+> From: Ankit Agrawal <ankita@nvidia.com>
 > 
-> That's indeed not ideal. We could try this if it makes the patches
-> significantly simpler, though I'm not so sure.
+> Linux allows device drivers to map IO memory on a per-page basis using
+> "write combining" or WC. This is often done using
+> pgprot_writecombing(). The driver knows which pages can support WC
+
+pgprot_writecombine() ?
+
+> access and the proper programming model to generate this IO. Generally
+> the use case is to boost performance by using write combining to
+> generate larger PCIe MemWr TLPs.
+
+First off, this changeset does not affect *only* Linux guests, obviously.
+
+I understand that's the use case you are after but this change is
+targeting all VMs, it must be clear.
+
+Then WC and mapping to PCI TLPs, either you describe that in details
+(NormalNC vs device-nGnRE and resulting SystemBus<->PCI transactions) or
+you don't describe it at all, as it stands I don't know how to use
+this information.
+
+> Allow VMs to select DEVICE_* or NORMAL_NC on a page by page basis for
+> all IO memory. This puts the VM in charge of the memory attributes,
+> and removes the KVM override to DEVICE_nGnRE.
 > 
-> Allocating metadata is the easier part as we know the correspondence
-> from the tagged pages (32 PROT_MTE page) to the metadata page (1 tag
-> storage page), so alloc_contig_range() does this for us. Just adding it
-> to the CMA range is sufficient.
+> Ultimately this makes pgprot_writecombing() work correctly in VMs and
+
+pgprot_writecombine() ?
+
+> allows drivers like mlx5 to fully operate their HW.
 > 
-> However, making sure that we don't allocate PROT_MTE pages from the
-> metadata range is what led us to another migrate type. I guess we could
-> achieve something similar with a new zone or a CPU-less NUMA node,
+> After some discussions with ARM and CPU architects we reached the
+> conclusion there was no need for KVM to prevent the VM from selecting
+> between DEVICE_* and NORMAL_NC for IO memory in VMs. There was a fear
+> that NORMAL_NC could result in uncontained failures, but upon deeper
+> analysis it turns out there are already possible cases for uncontained
+> failures with DEVICE types too. Ultimately the platform must be
+> implemented in a way that ensures that all DEVICE_* and NORMAL_NC
+> accesses have no uncontained failures.
 
-Ideally, no significant core-mm changes to optimize for an architecture 
-oddity. That implies, no new zones and no new migratetypes -- unless it 
-is unavoidable and you are confident that you can convince core-MM 
-people that the use case (giving back 3% of system RAM at max in some 
-setups) is worth the trouble.
+I would reorder/rephrase this changelog as follows:
 
-I also had CPU-less NUMA nodes in mind when thinking about that, but not 
-sure how easy it would be to integrate it. If the tag memory has 
-actually different performance characteristics as well, a NUMA node 
-would be the right choice.
+- Describe what the problem is (ie KVM default s2 mappings)
+- Describe how you are solving it
+- Add a link to the documentation that states why it is safe to do
+  that and the resulting s1/s2 mappings combination
 
-If we could find some way to easily support this either via CMA or 
-CPU-less NUMA nodes, that would be much preferable; even if we cannot 
-cover each and every future use case right now. I expect some issues 
-with CXL+MTE either way , but are happy to be taught otherwise :)
+It must be clear why from a legacy standpoint this is a safe change
+to apply.
 
+> Fortunately real platforms do tend to implement this.
 
-Another thought I had was adding something like CMA memory 
-characteristics. Like, asking if a given CMA area/page supports tagging 
-(i.e., flag for the CMA area set?)?
+Remove this sentence, it adds no information for someone who
+is chasing bugs or just wants to understand the change itself.
 
-When you need memory that supports tagging and have a page that does not 
-support tagging (CMA && taggable), simply migrate to !MOVABLE memory 
-(eventually we could also try adding !CMA).
+> This patch makes the VM's memory attributes behave as follows:
 
-Was that discussed and what would be the challenges with that? Page 
-migration due to compaction comes to mind, but it might also be easy to 
-handle if we can just avoid CMA memory for that.
+"The resulting stage 1 and stage 2 memory types and cacheability
+attributes are as follows":
 
-> though the latter is not guaranteed not to allocate memory from the
-> range, only make it less likely. Both these options are less flexible in
-> terms of size/alignment/placement.
+>  S1           |   S2          |  Result
+>  NORMAL-WB    |  NORMAL-NC    |  NORMAL-NC
+>  NORMAL-WT    |  NORMAL-NC    |  NORMAL-NC
+>  NORMAL-NC    |  NORMAL-NC    |  NORMAL-NC
+>  DEVICE<attr> |  NORMAL-NC    |  DEVICE<attr>
 > 
-> Maybe as a quick hack - only allow PROT_MTE from ZONE_NORMAL and
-> configure the metadata range in ZONE_MOVABLE but at some point I'd
-> expect some CXL-attached memory to support MTE with additional carveout
-> reserved.
+> See section D8.5.5 of DDI0487_I_a_a-profile_architecture_reference_manual.pdf
+> for details.
 
-I have no idea how we could possibly cleanly support memory hotplug in 
-virtual environments (virtual DIMMs, virtio-mem) with MTE. In contrast 
-to s390x storage keys, the approach that arm64 with MTE took here 
-(exposing tag memory to the VM) makes it rather hard and complicated.
+D8.5 I assume.
 
--- 
-Cheers,
+I commented on the log because it must be easy to follow, it is an
+important change (and there is a lot of background information
+required to understand it - please report it).
 
-David / dhildenb
+The patch itself must be reviewed by arm64/kvm maintainers; the changes
+(given the background work that led to them) seem fine to me (please CC
+me on next versions).
 
+Thanks
+Lorenzo
+
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> ---
+>  arch/arm64/include/asm/memory.h | 2 ++
+>  arch/arm64/kvm/hyp/pgtable.c    | 2 +-
+>  2 files changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
+> index fde4186cc387..c247e5f29d5a 100644
+> --- a/arch/arm64/include/asm/memory.h
+> +++ b/arch/arm64/include/asm/memory.h
+> @@ -147,6 +147,7 @@
+>   * Memory types for Stage-2 translation
+>   */
+>  #define MT_S2_NORMAL		0xf
+> +#define MT_S2_NORMAL_NC	0x5
+>  #define MT_S2_DEVICE_nGnRE	0x1
+>  
+>  /*
+> @@ -154,6 +155,7 @@
+>   * Stage-2 enforces Normal-WB and Device-nGnRE
+>   */
+>  #define MT_S2_FWB_NORMAL	6
+> +#define MT_S2_FWB_NORMAL_NC	5
+>  #define MT_S2_FWB_DEVICE_nGnRE	1
+>  
+>  #ifdef CONFIG_ARM64_4K_PAGES
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index ccd291b6893d..a80949002191 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -696,7 +696,7 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
+>  				kvm_pte_t *ptep)
+>  {
+>  	bool device = prot & KVM_PGTABLE_PROT_DEVICE;
+> -	kvm_pte_t attr = device ? KVM_S2_MEMATTR(pgt, DEVICE_nGnRE) :
+> +	kvm_pte_t attr = device ? KVM_S2_MEMATTR(pgt, NORMAL_NC) :
+>  			    KVM_S2_MEMATTR(pgt, NORMAL);
+>  	u32 sh = KVM_PTE_LEAF_ATTR_LO_S2_SH_IS;
+>  
+> -- 
+> 2.17.1
+> 
