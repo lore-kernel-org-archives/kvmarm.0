@@ -1,106 +1,231 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97221567E;
-	Tue, 12 Sep 2023 17:02:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E425233E9
+	for <kvmarm@lists.linux.dev>; Tue, 12 Sep 2023 17:37:50 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B803CC15;
-	Tue, 12 Sep 2023 10:02:45 -0700 (PDT)
-Received: from [10.1.197.60] (eglon.cambridge.arm.com [10.1.197.60])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 431A73F738;
-	Tue, 12 Sep 2023 10:02:03 -0700 (PDT)
-Message-ID: <3ad03f27-1f2b-a79f-130d-afb9e713fa70@arm.com>
-Date: Tue, 12 Sep 2023 18:01:43 +0100
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 024A6C15;
+	Tue, 12 Sep 2023 10:38:27 -0700 (PDT)
+Received: from [192.168.4.86] (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 918333F738;
+	Tue, 12 Sep 2023 10:37:47 -0700 (PDT)
+Message-ID: <a50a7468-923b-fbb2-32b9-7e371710a1d5@arm.com>
+Date: Tue, 12 Sep 2023 18:37:42 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [RFC PATCH 30/32] KVM: arm64: Pass PSCI calls to userspace
-Content-Language: en-GB
-To: Salil Mehta <salil.mehta@huawei.com>,
- "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
- "loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
- "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
- "linux-ia64@vger.kernel.org" <linux-ia64@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>, "x86@kernel.org" <x86@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Lorenzo Pieralisi <lpieralisi@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Sudeep Holla <sudeep.holla@arm.com>,
- Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
- Dave Hansen <dave.hansen@linux.intel.com>, Ingo Molnar <mingo@redhat.com>,
- Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Huacai Chen <chenhuacai@kernel.org>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Len Brown <lenb@kernel.org>,
- Rafael Wysocki <rafael@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
- Russell King <linux@armlinux.org.uk>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>
-References: <20230203135043.409192-1-james.morse@arm.com>
- <20230203135043.409192-31-james.morse@arm.com>
- <7e182886f20044d09d5b269cb6224af7@huawei.com>
-From: James Morse <james.morse@arm.com>
-In-Reply-To: <7e182886f20044d09d5b269cb6224af7@huawei.com>
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.0
+Subject: Re: [PATCH v2 2/2] coresight: Allow guests to be traced when FEAT_TRF
+ and VHE are present
+To: James Clark <james.clark@arm.com>, coresight@lists.linaro.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ broonie@kernel.org, Marc Zyngier <maz@kernel.org>
+Cc: maz@kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Mike Leach <mike.leach@linaro.org>,
+ Leo Yan <leo.yan@linaro.org>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ James Morse <james.morse@arm.com>,
+ Kristina Martsenko <kristina.martsenko@arm.com>,
+ Anshuman Khandual <anshuman.khandual@arm.com>, Rob Herring
+ <robh@kernel.org>, Jintack Lim <jintack.lim@linaro.org>,
+ Joey Gouly <joey.gouly@arm.com>, linux-kernel@vger.kernel.org
+References: <20230904140705.1620708-1-james.clark@arm.com>
+ <20230904140705.1620708-3-james.clark@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20230904140705.1620708-3-james.clark@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Salil,
+Hi James
 
-On 23/05/2023 10:32, Salil Mehta wrote:
->> From: James Morse <james.morse@arm.com>
->> Sent: Friday, February 3, 2023 1:51 PM
->> To: linux-pm@vger.kernel.org; loongarch@lists.linux.dev;
->> kvmarm@lists.linux.dev; kvm@vger.kernel.org; linux-acpi@vger.kernel.org;
->> linux-arch@vger.kernel.org; linux-ia64@vger.kernel.org; linux-
->> kernel@vger.kernel.org; linux-arm-kernel@lists.infradead.org;
->> x86@kernel.org
+
+On 04/09/2023 15:07, James Clark wrote:
+> Currently the userspace and kernel filters for guests are never set, so
+> no trace will be generated for them. Add it by writing to the guest
+> filters when exclude_guest isn't set. By writing either E1TRE or E0TRE,
+> filtering on either guest kernel or guest userspace is also supported.
 > 
-> [...]
+> Since TRFCR_EL1 access is trapped, this can't be  modified by the guest.
 > 
+> This change also brings exclude_host support which is difficult to add
+> as a separate commit without excess churn and resulting in no trace at
+> all.
 > 
->>
->> When the KVM_CAP_ARM_PSCI_TO_USER capability is available, userspace can
->> request to handle PSCI calls.
->>
->> This is required for virtual CPU hotplug to allow the VMM to enforce the
->> online/offline policy it has advertised via ACPI. By managing PSCI in
->> user-space, the VMM is able to return PSCI_DENIED when the guest attempts
->> to bring a disabled vCPU online.
->> Without this, the VMM is only able to not-run the vCPU, the kernel will
->> have already returned PSCI_SUCCESS to the guest. This results in
->> timeouts during boot as the OS must wait for the secondary vCPU.
->>
->> SMCCC probe requires PSCI v1.x. If userspace only implements PSCI v0.2,
->> the guest won't query SMCCC support through PSCI and won't use the
->> spectre workarounds. We could hijack PSCI_VERSION and pretend to support
->> v1.0 if userspace does not, then handle all v1.0 calls ourselves
->> (including guessing the PSCI feature set implemented by the guest), but
->> that seems unnecessary. After all the API already allows userspace to
->> force a version lower than v1.0 using the firmware pseudo-registers.
->>
->> The KVM_REG_ARM_PSCI_VERSION pseudo-register currently resets to either
->> v0.1 if userspace doesn't set KVM_ARM_VCPU_PSCI_0_2, or
->> KVM_ARM_PSCI_LATEST (1.0).
-
-> I just saw the latest PSCI standard issue (Mar 2023 E Non-Confidential
-> PSCI 1.2 issue E) and it contains the DENIED return value for the CPU_ON. 
+> Testing
+> =======
 > 
-> Should we *explicitly* check for PSCI 1.2 support before allowing vCPU
-> Hot plug support? For this we would need KVM changes.
+> The addresses were counted with the following:
+> 
+>    $ perf report -D | grep -Eo 'EL2|EL1|EL0' | sort | uniq -c
+> 
+> Guest kernel only:
+> 
+>    $ perf record -e cs_etm//Gk -a -- true
+>      535 EL1
+>        1 EL2
+> 
+> Guest user only (0 addresses expected because the guest OS hasn't reached
+> userspace yet):
+> 
+>    $ perf record -e cs_etm//Gu -a -- true
+> 
+> Host kernel only:
+> 
+>    $  perf record -e cs_etm//Hk -a -- true
+>     3501 EL2
+> 
+> Host userspace only:
+> 
+>    $  perf record -e cs_etm//Hu -a -- true
+>      408 EL0
+>        1 EL2
+> 
+> Reviewed-by: Mark Brown <broonie@kernel.org> (sysreg)
+> Signed-off-by: James Clark <james.clark@arm.com>
+> ---
+>   arch/arm64/tools/sysreg                       |  4 ++
+>   .../coresight/coresight-etm4x-core.c          | 51 ++++++++++++++++---
+>   drivers/hwtracing/coresight/coresight-etm4x.h |  2 +-
+>   drivers/hwtracing/coresight/coresight-priv.h  |  3 ++
+>   4 files changed, 53 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index 6ca7db69d6c9..cae9139b6c05 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -2531,3 +2531,7 @@ EndSysreg
+>   Sysreg	TRFCR_EL2	3	4	1	2	1
+>   Fields	TRFCR_EL2
+>   EndSysreg
+> +
+> +Sysreg TRFCR_EL12	3	5	1	2	1
+> +Fields	TRFCR_ELx
+> +EndSysreg
+> diff --git a/drivers/hwtracing/coresight/coresight-etm4x-core.c b/drivers/hwtracing/coresight/coresight-etm4x-core.c
+> index 77b0271ce6eb..6c16a14d6fbe 100644
+> --- a/drivers/hwtracing/coresight/coresight-etm4x-core.c
+> +++ b/drivers/hwtracing/coresight/coresight-etm4x-core.c
+> @@ -274,6 +274,18 @@ static void etm4x_prohibit_trace(struct etmv4_drvdata *drvdata)
+>   	cpu_prohibit_trace();
+>   }
+>   
+> +static u64 etm4x_get_kern_user_filter(struct etmv4_drvdata *drvdata)
+> +{
+> +	u64 trfcr = drvdata->trfcr;
+> +
+> +	if (drvdata->config.mode & ETM_MODE_EXCL_KERN)
+> +		trfcr &= ~TRFCR_ELx_ExTRE;
+> +	if (drvdata->config.mode & ETM_MODE_EXCL_USER)
+> +		trfcr &= ~TRFCR_ELx_E0TRE;
+> +
+> +	return trfcr;
+> +}
+> +
+>   /*
+>    * etm4x_allow_trace - Allow CPU tracing in the respective ELs,
+>    * as configured by the drvdata->config.mode for the current
+> @@ -286,18 +298,39 @@ static void etm4x_prohibit_trace(struct etmv4_drvdata *drvdata)
+>    */
+>   static void etm4x_allow_trace(struct etmv4_drvdata *drvdata)
+>   {
+> -	u64 trfcr = drvdata->trfcr;
+> +	u64 trfcr;
+>   
+>   	/* If the CPU doesn't support FEAT_TRF, nothing to do */
+> -	if (!trfcr)
+> +	if (!drvdata->trfcr)
+>   		return;
+>   
+> -	if (drvdata->config.mode & ETM_MODE_EXCL_KERN)
+> -		trfcr &= ~TRFCR_ELx_ExTRE;
+> -	if (drvdata->config.mode & ETM_MODE_EXCL_USER)
+> -		trfcr &= ~TRFCR_ELx_E0TRE;
+> +	if (drvdata->config.mode & ETM_MODE_EXCL_HOST)
+> +		trfcr = drvdata->trfcr & ~(TRFCR_ELx_ExTRE | TRFCR_ELx_E0TRE);
+> +	else
+> +		trfcr = etm4x_get_kern_user_filter(drvdata);
+>   
+>   	write_trfcr(trfcr);
+> +
+> +	/*
+> +	 * Filters for EL1 and EL0 (when running a guest) are stored in
+> +	 * TRFCR_EL1 so write it there for VHE. For nVHE, the filters in
+> +	 * have to be re-applied when switching to the guest instead.
+> +	 */
+> +	if (!is_kernel_in_hyp_mode())
+> +		return;
+> +
+> +	if (drvdata->config.mode & ETM_MODE_EXCL_GUEST)
+> +		trfcr = drvdata->trfcr & ~(TRFCR_ELx_ExTRE | TRFCR_ELx_E0TRE);
+> +	else
+> +		trfcr = etm4x_get_kern_user_filter(drvdata);
+> +
+> +	/*
+> +	 * TRFCR_EL1 doesn't have CX and TRFCR_EL1.TS has no effect when TS is
+> +	 * set in EL2 so mask them out.
+> +	 */
+> +	trfcr &= ~(TRFCR_ELx_TS_MASK | TRFCR_EL2_CX);
+> +
+> +	write_sysreg_s(trfcr, SYS_TRFCR_EL12);
 
-The VMM should certainly check which version of PSCI it supports, to make sure it doesn't
-return an error code that the spec says that version of PSCI doesn't use.
-
-Moving the PSCI support to the VMM is a pre-requisite for supporting this mechanism,
-otherwise KVM will allow the CPUs to come online immediately.
 
 
-Thanks,
+While I agree with the intention of the patch, I am not sure if we
+should do the TRFCR_EL1 (via TRFCR_EL12) updates from CoreSight driver.
 
-James
+It might be much better to do it from the KVM for both VHE and nVHE.
+
+
+Marc
+
+What are your thoughts on this ?
+
+Suzuki
+
+
+>   }
+>   
+>   #ifdef CONFIG_ETM4X_IMPDEF_FEATURE
+> @@ -655,6 +688,12 @@ static int etm4_parse_event_config(struct coresight_device *csdev,
+>   	if (attr->exclude_user)
+>   		config->mode = ETM_MODE_EXCL_USER;
+>   
+> +	if (attr->exclude_host)
+> +		config->mode |= ETM_MODE_EXCL_HOST;
+> +
+> +	if (attr->exclude_guest)
+> +		config->mode |= ETM_MODE_EXCL_GUEST;
+> +
+>   	/* Always start from the default config */
+>   	etm4_set_default_config(config);
+>   
+> diff --git a/drivers/hwtracing/coresight/coresight-etm4x.h b/drivers/hwtracing/coresight/coresight-etm4x.h
+> index 20e2e4cb7614..3f170599822f 100644
+> --- a/drivers/hwtracing/coresight/coresight-etm4x.h
+> +++ b/drivers/hwtracing/coresight/coresight-etm4x.h
+> @@ -841,7 +841,7 @@ enum etm_impdef_type {
+>    * @s_ex_level: Secure ELs where tracing is supported.
+>    */
+>   struct etmv4_config {
+> -	u32				mode;
+> +	u64				mode;
+>   	u32				pe_sel;
+>   	u32				cfg;
+>   	u32				eventctrl0;
+> diff --git a/drivers/hwtracing/coresight/coresight-priv.h b/drivers/hwtracing/coresight/coresight-priv.h
+> index 767076e07970..727dd27ba800 100644
+> --- a/drivers/hwtracing/coresight/coresight-priv.h
+> +++ b/drivers/hwtracing/coresight/coresight-priv.h
+> @@ -39,6 +39,9 @@
+>   
+>   #define ETM_MODE_EXCL_KERN	BIT(30)
+>   #define ETM_MODE_EXCL_USER	BIT(31)
+> +#define ETM_MODE_EXCL_HOST	BIT(32)
+> +#define ETM_MODE_EXCL_GUEST	BIT(33)
+> +
+>   struct cs_pair_attribute {
+>   	struct device_attribute attr;
+>   	u32 lo_off;
+
