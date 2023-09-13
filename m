@@ -1,12 +1,12 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4194133DA;
-	Wed, 13 Sep 2023 16:39:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AA1C33DA;
+	Wed, 13 Sep 2023 16:39:07 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 437381FB;
-	Wed, 13 Sep 2023 09:39:42 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 43985C15;
+	Wed, 13 Sep 2023 09:39:44 -0700 (PDT)
 Received: from merodach.members.linode.com (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 47F8C3F5A1;
-	Wed, 13 Sep 2023 09:39:03 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4845B3F5A1;
+	Wed, 13 Sep 2023 09:39:05 -0700 (PDT)
 From: James Morse <james.morse@arm.com>
 To: linux-pm@vger.kernel.org,
 	loongarch@lists.linux.dev,
@@ -22,9 +22,9 @@ Cc: x86@kernel.org,
 	Jean-Philippe Brucker <jean-philippe@linaro.org>,
 	jianyong.wu@arm.com,
 	justin.he@arm.com
-Subject: [RFC PATCH v2 06/35] arm64: setup: Switch over to GENERIC_CPU_DEVICES using arch_register_cpu()
-Date: Wed, 13 Sep 2023 16:37:54 +0000
-Message-Id: <20230913163823.7880-7-james.morse@arm.com>
+Subject: [RFC PATCH v2 07/35] x86: intel_epb: Don't rely on link order
+Date: Wed, 13 Sep 2023 16:37:55 +0000
+Message-Id: <20230913163823.7880-8-james.morse@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20230913163823.7880-1-james.morse@arm.com>
 References: <20230913163823.7880-1-james.morse@arm.com>
@@ -36,83 +36,36 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To allow ACPI's _STA value to hide CPUs that are present, but not
-available to online right now due to VMM or firmware policy, the
-register_cpu() call needs to be made by the ACPI machinery when ACPI
-is in use. This allows it to hide CPUs that are unavailable from sysfs.
+intel_epb_init() is called as a subsys_initcall() to register cpuhp
+callbacks. The callbacks make use of get_cpu_device() which will return
+NULL unless register_cpu() has been called. register_cpu() is called
+from topology_init(), which is also a subsys_initcall().
 
-Switching to GENERIC_CPU_DEVICES is an intermediate step to allow all
-five ACPI architectures to be modified at once.
+This is fragile. Moving the register_cpu() to a different
+subsys_initcall()  leads to a NULL derefernce during boot.
 
-Switch over to GENERIC_CPU_DEVICES, and provide an arch_register_cpu()
-that populates the hotpluggable flag. arch_register_cpu() is also the
-interface the ACPI machinery expects.
-
-The struct cpu in struct cpuinfo_arm64 is never used directly, remove
-it to use the one GENERIC_CPU_DEVICES provides.
-
-This changes the CPUs visible in sysfs from possible to present, but
-on arm64 smp_prepare_cpus() ensures these are the same.
+Make intel_epb_init() a late_initcall(), user-space can't provide a
+policy before this point anyway.
 
 Signed-off-by: James Morse <james.morse@arm.com>
 ---
- arch/arm64/Kconfig           |  1 +
- arch/arm64/include/asm/cpu.h |  1 -
- arch/arm64/kernel/setup.c    | 13 ++++---------
- 3 files changed, 5 insertions(+), 10 deletions(-)
+subsys_initcall_sync() would be an option, but moving the register_cpu()
+calls into ACPI also means adding a safety net for CPUs that are online
+but not described properly by firmware. This lives in subsys_initcall_sync().
+---
+ arch/x86/kernel/cpu/intel_epb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index b10515c0200b..7b3990abf87a 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -132,6 +132,7 @@ config ARM64
- 	select GENERIC_ARCH_TOPOLOGY
- 	select GENERIC_CLOCKEVENTS_BROADCAST
- 	select GENERIC_CPU_AUTOPROBE
-+	select GENERIC_CPU_DEVICES
- 	select GENERIC_CPU_VULNERABILITIES
- 	select GENERIC_EARLY_IOREMAP
- 	select GENERIC_IDLE_POLL_SETUP
-diff --git a/arch/arm64/include/asm/cpu.h b/arch/arm64/include/asm/cpu.h
-index e749838b9c5d..887bd0d992bb 100644
---- a/arch/arm64/include/asm/cpu.h
-+++ b/arch/arm64/include/asm/cpu.h
-@@ -38,7 +38,6 @@ struct cpuinfo_32bit {
- };
- 
- struct cpuinfo_arm64 {
--	struct cpu	cpu;
- 	struct kobject	kobj;
- 	u64		reg_ctr;
- 	u64		reg_cntfrq;
-diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
-index 417a8a86b2db..165bd2c0dd5a 100644
---- a/arch/arm64/kernel/setup.c
-+++ b/arch/arm64/kernel/setup.c
-@@ -402,19 +402,14 @@ static inline bool cpu_can_disable(unsigned int cpu)
- 	return false;
+diff --git a/arch/x86/kernel/cpu/intel_epb.c b/arch/x86/kernel/cpu/intel_epb.c
+index e4c3ba91321c..f18d35fe27a9 100644
+--- a/arch/x86/kernel/cpu/intel_epb.c
++++ b/arch/x86/kernel/cpu/intel_epb.c
+@@ -237,4 +237,4 @@ static __init int intel_epb_init(void)
+ 	cpuhp_remove_state(CPUHP_AP_X86_INTEL_EPB_ONLINE);
+ 	return ret;
  }
- 
--static int __init topology_init(void)
-+int arch_register_cpu(int num)
- {
--	int i;
-+	struct cpu *cpu = &per_cpu(cpu_devices, num);
- 
--	for_each_possible_cpu(i) {
--		struct cpu *cpu = &per_cpu(cpu_data.cpu, i);
--		cpu->hotpluggable = cpu_can_disable(i);
--		register_cpu(cpu, i);
--	}
-+	cpu->hotpluggable = cpu_can_disable(num);
- 
--	return 0;
-+	return register_cpu(cpu, num);
- }
--subsys_initcall(topology_init);
- 
- static void dump_kernel_offset(void)
- {
+-subsys_initcall(intel_epb_init);
++late_initcall(intel_epb_init);
 -- 
 2.39.2
 
