@@ -1,131 +1,108 @@
-Received: from out-219.mta1.migadu.com (out-219.mta1.migadu.com [95.215.58.219])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3102A1A72C
-	for <kvmarm@lists.linux.dev>; Wed, 13 Sep 2023 17:30:10 +0000 (UTC)
-Date: Wed, 13 Sep 2023 17:30:03 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1694626209;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2jxXuDsdxHjvkm94f22PEQvZk32OEtTjBlaxJsBMLbI=;
-	b=c6QvLNV30cJqCkCX7oLBhgkG42dkPQdepaLwLCGf4Nn1+mCXbT8eTbHs5H6L5w5rjL5rJQ
-	TxE2q8GVA8+z3twT2/ZJ1iM6czH3S4wEm9kNEbu0wfzZ6aaxafm5AYIh4iMRo4oyQMkGAy
-	bNyxYeZyI163al5tNrlTnsuXODecGvk=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
-	will@kernel.org, catalin.marinas@arm.com, james.morse@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, zhukeqian1@huawei.com,
-	jonathan.cameron@huawei.com, linuxarm@huawei.com
-Subject: Re: [RFC PATCH v2 0/8] KVM: arm64: Implement SW/HW combined dirty log
-Message-ID: <ZQHxm+L890yTpY91@linux.dev>
-References: <20230825093528.1637-1-shameerali.kolothum.thodi@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7028C37F
+	for <kvmarm@lists.linux.dev>; Wed, 13 Sep 2023 18:34:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E92B3C433C8;
+	Wed, 13 Sep 2023 18:34:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694630072;
+	bh=24jGWq19/rv3+6J5AgpLm/HbwyWq/3uIYq2kxo6jB8Q=;
+	h=From:Date:Subject:To:Cc:From;
+	b=MX+kGbDvofFkEwStch87Uzmw14ffdjzzAnYyfV1KWNeN0kbxrcqzH+KfaBXWme27H
+	 zuE/iNUfDr6UXMLTuUlbPaHpObWHnpNcUNBm3iJ7KHqHet2PByBlIH42OYrvpKUCSY
+	 SgL+vr8OcrD4lTT6v0jfvbPDRmG28Ml2buetfE1McFH44S/IkXBXmMMgwUe+HlsnUX
+	 K3hWhcLmRf8mA2phK7ioY0Kjq9THyazyqMZcIt4qVKRfb4hPbzCCeBD7XR0E1+PZmi
+	 H5HjL6RM5XZqwFjmm2/93Gjcf1SfVVw5+jvgqYoZ4VkIza4lQqXEg0jH6a34KBjzgt
+	 xLE2GIVY05Phg==
+From: Mark Brown <broonie@kernel.org>
+Date: Wed, 13 Sep 2023 19:34:16 +0100
+Subject: [PATCH] KVM: arm64: Only default to enabling SVE when present
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230825093528.1637-1-shameerali.kolothum.thodi@huawei.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20230913-kvm-arm64-fp-init-v1-1-8ce9ba1cc4c4@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAKcAAmUC/x3MQQqAIBBA0avIrBuwstCuEi0kpxoiCw0JpLsnL
+ d/i/wyRAlOEQWQIlDjy6QvqSsC8Wb8SsiuGRjatNFLjng604egVLhey5xu1Udpq13WkFJTuCrT
+ w8z/H6X0/Yv5G5GMAAAA=
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ James Morse <james.morse@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.13-dev-034f2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2331; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=24jGWq19/rv3+6J5AgpLm/HbwyWq/3uIYq2kxo6jB8Q=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBlAgC0g4V1utvnFCrJGRX/IIAlVdEhwtsmuZXB/psP
+ +m6cleCJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZQIAtAAKCRAk1otyXVSH0Et1B/
+ wPRc04N8fDXXPVzS0NHrRGqRG/AcAcViQkowmHjW+vL2/C0b/eG0Xz37VnUiyuHK4q2CELDMuSGmib
+ 6uJ0KBu0HqR7OMsgId8D6rCS14TNxW+uu8SecUtpdA/t73FISy04yo/IP0FJZ19ejd8enjS+x3xuP7
+ gX+pdRN9t2qL6SmNEvCFiQEK3vYd/qcY9+GB8XkcelPKW/0kHtlYR2lo7pZk0STfmioks5Snh4gkcT
+ 5d6TWha3oqAs2WPh+ndqb8AcaZ4i5mEC0M9yjkMP741Rx3peFV7/rR5UC372VGBM4sUs5fvR5+iQtZ
+ 19geP4n7PqrahE+jTpib3X3W37LNhN
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-Hi Shameer,
+For unclear reasons our handling of SVE and SME when setting the default
+value of CPTR_EL2 for VHE mode is inconsistent. For normal VHE we
+unconditionally set CPTR_EL2.ZEN to 0b01 but only set the equivalent
+field CPTR_EL2.SMEN to 0b01 if SME is present, for hVHE we will always
+set the field 0b11 if SVE is not supported. Given the similarities
+between the two extensions it would generally be expected that the code
+handling SVE and SME would be very similar.
 
-On Fri, Aug 25, 2023 at 10:35:20AM +0100, Shameer Kolothum wrote:
-> Hi,
-> 
-> This is to revive the RFC series[1], which makes use of hardware dirty
-> bit modifier(DBM) feature(FEAT_HAFDBS) for dirty page tracking, sent
-> out by Zhu Keqian sometime back.
-> 
-> One of the main drawbacks in using the hardware DBM feature for dirty
-> page tracking is the additional overhead in scanning the PTEs for dirty
-> pages[2]. Also there are no vCPU page faults when we set the DBM bit,
-> which may result in higher convergence time during guest migration. 
-> 
-> This series tries to reduce these overheads by not setting the
-> DBM for all the writeable pages during migration and instead uses a
-> combined software(current page fault mechanism) and hardware approach
-> (set DBM) for dirty page tracking.
-> 
-> As noted in RFC v1[1],
-> "The core idea is that we do not enable hardware dirty at start (do not
-> add DBM bit). When an arbitrary PT occurs fault, we execute soft tracking
-> for this PT and enable hardware tracking for its *nearby* PTs (e.g. Add
-> DBM bit for nearby 64PTs). Then when sync dirty log, we have known all
-> PTs with hardware dirty enabled, so we do not need to scan all PTs."
+Since CPTR_ELx.ZEN is RES0 when SVE is not implemented it is probably not
+harmful to try to set the bits but it is better practice to not set
+unimplemented bits so resolve the inconsistency in favour of checking if
+SVE is present too.
 
-I'm unconvinced of the value of such a change.
+FPSIMD is also in theory optional though there's probably much more work to
+handle the case where it is not implemented properly and that is not
+something we see in practical systems.
 
-What you're proposing here is complicated and I fear not easily
-maintainable. Keeping the *two* sources of dirty state seems likely to
-fail (eventually) with some very unfortunate consequences.
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+ arch/arm64/include/asm/kvm_emulate.h | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-The optimization of enabling DBM on neighboring PTEs is presumptive of
-the guest access pattern and could incur unnecessary scans of the
-stage-2 page table w/ a sufficiently sparse guest access pattern.
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 3d6725ff0bf6..4cf53b4aa226 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -584,15 +584,17 @@ static __always_inline u64 kvm_get_reset_cptr_el2(struct kvm_vcpu *vcpu)
+ 	u64 val;
+ 
+ 	if (has_vhe()) {
+-		val = (CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |
+-		       CPACR_EL1_ZEN_EL1EN);
++		val = (CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN);
++		if (cpus_have_final_cap(ARM64_SVE))
++			val |= CPACR_EL1_ZEN_EL1EN;
+ 		if (cpus_have_final_cap(ARM64_SME))
+ 			val |= CPACR_EL1_SMEN_EL1EN;
+ 	} else if (has_hvhe()) {
+ 		val = (CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN);
+ 
+-		if (!vcpu_has_sve(vcpu) ||
+-		    (vcpu->arch.fp_state != FP_STATE_GUEST_OWNED))
++		if (cpus_have_final_cap(ARM64_SVE) &&
++		    (!vcpu_has_sve(vcpu) ||
++		     (vcpu->arch.fp_state != FP_STATE_GUEST_OWNED)))
+ 			val |= CPACR_EL1_ZEN_EL1EN | CPACR_EL1_ZEN_EL0EN;
+ 		if (cpus_have_final_cap(ARM64_SME))
+ 			val |= CPACR_EL1_SMEN_EL1EN | CPACR_EL1_SMEN_EL0EN;
 
-> Tests with dirty_log_perf_test with anonymous THP pages shows significant
-> improvement in "dirty memory time" as expected but with a hit on
-> "get dirty time" .
-> 
-> ./dirty_log_perf_test -b 512MB -v 96 -i 5 -m 2 -s anonymous_thp
-> 
-> +---------------------------+----------------+------------------+
-> |                           |   6.5-rc5      | 6.5-rc5 + series |
-> |                           |     (s)        |       (s)        |
-> +---------------------------+----------------+------------------+
-> |    dirty memory time      |    4.22        |          0.41    |
-> |    get dirty log time     |    0.00047     |          3.25    |
-> |    clear dirty log time   |    0.48        |          0.98    |
-> +---------------------------------------------------------------+
+---
+base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
+change-id: 20230908-kvm-arm64-fp-init-8948a8d55e44
 
-The vCPU:memory ratio you're testing doesn't seem representative of what
-a typical cloud provider would be configuring, and the dirty log
-collection is going to scale linearly with the size of guest memory.
-
-Slow dirty log collection is going to matter a lot for VM blackout,
-which from experience tends to be the most sensitive period of live
-migration for guest workloads.
-
-At least in our testing, the split GET/CLEAR dirty log ioctls
-dramatically improved the performance of a write-protection based ditry
-tracking scheme, as the false positive rate for dirtied pages is
-significantly reduced. FWIW, this is what we use for doing LM on arm64 as
-opposed to the D-bit implemenation that we use on x86.
-       
-> In order to get some idea on actual live migration performance,
-> I created a VM (96vCPUs, 1GB), ran a redis-benchmark test and
-> while the test was in progress initiated live migration(local).
-> 
-> redis-benchmark -t set -c 900 -n 5000000 --threads 96
-> 
-> Average of 5 runs shows that benchmark finishes ~10% faster with
-> a ~8% increase in "total time" for migration.
-> 
-> +---------------------------+----------------+------------------+
-> |                           |   6.5-rc5      | 6.5-rc5 + series |
-> |                           |     (s)        |    (s)           |
-> +---------------------------+----------------+------------------+
-> | [redis]5000000 requests in|    79.428      |      71.49       |
-> | [info migrate]total time  |    8438        |      9097        |
-> +---------------------------------------------------------------+
-
-Faster pre-copy performance would help the benchmark complete faster,
-but the goal for a live migration should be to minimize the lost
-computation for the entire operation. You'd need to test with a
-continuous workload rather than one with a finite amount of work.
-
-Also, do you know what live migration scheme you're using here?
-
+Best regards,
 -- 
-Thanks,
-Oliver
+Mark Brown <broonie@kernel.org>
+
