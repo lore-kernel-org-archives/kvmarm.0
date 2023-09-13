@@ -1,108 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-213.mta1.migadu.com (out-213.mta1.migadu.com [95.215.58.213])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7028C37F
-	for <kvmarm@lists.linux.dev>; Wed, 13 Sep 2023 18:34:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E92B3C433C8;
-	Wed, 13 Sep 2023 18:34:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694630072;
-	bh=24jGWq19/rv3+6J5AgpLm/HbwyWq/3uIYq2kxo6jB8Q=;
-	h=From:Date:Subject:To:Cc:From;
-	b=MX+kGbDvofFkEwStch87Uzmw14ffdjzzAnYyfV1KWNeN0kbxrcqzH+KfaBXWme27H
-	 zuE/iNUfDr6UXMLTuUlbPaHpObWHnpNcUNBm3iJ7KHqHet2PByBlIH42OYrvpKUCSY
-	 SgL+vr8OcrD4lTT6v0jfvbPDRmG28Ml2buetfE1McFH44S/IkXBXmMMgwUe+HlsnUX
-	 K3hWhcLmRf8mA2phK7ioY0Kjq9THyazyqMZcIt4qVKRfb4hPbzCCeBD7XR0E1+PZmi
-	 H5HjL6RM5XZqwFjmm2/93Gjcf1SfVVw5+jvgqYoZ4VkIza4lQqXEg0jH6a34KBjzgt
-	 xLE2GIVY05Phg==
-From: Mark Brown <broonie@kernel.org>
-Date: Wed, 13 Sep 2023 19:34:16 +0100
-Subject: [PATCH] KVM: arm64: Only default to enabling SVE when present
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A8D81FAC
+	for <kvmarm@lists.linux.dev>; Wed, 13 Sep 2023 18:42:38 +0000 (UTC)
+Date: Wed, 13 Sep 2023 18:42:31 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1694630556;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zbGmeaiAhruCsTYtUBEjHjtu3fwpdJmWOhi1GQR/CuQ=;
+	b=nB+4ixR36xp5mTADmigicU6BIarSlxQlccDXHV1SUJ7P8f6pFGZVg4OF/uIv7pcoe9hdad
+	jBdPUyp1xeot1bSoOjjyBPz8i/wj52zbxAV3IaqQycfdzLdM2EIt0AnekYJXHBLP8UAI7J
+	X8kE56ZheHYdxhuKrin2YEMhf5bFFtg=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
+	Julien Thierry <julien.thierry.kdev@gmail.com>,
+	Salil Mehta <salil.mehta@huawei.com>
+Subject: Re: [PATCH kvmtool v3 00/17] aarch64: Handle PSCI calls in userspace
+Message-ID: <ZQIClyAyD4Y67qng@linux.dev>
+References: <20230802234255.466782-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230913-kvm-arm64-fp-init-v1-1-8ce9ba1cc4c4@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAKcAAmUC/x3MQQqAIBBA0avIrBuwstCuEi0kpxoiCw0JpLsnL
- d/i/wyRAlOEQWQIlDjy6QvqSsC8Wb8SsiuGRjatNFLjng604egVLhey5xu1Udpq13WkFJTuCrT
- w8z/H6X0/Yv5G5GMAAAA=
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
- linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.13-dev-034f2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2331; i=broonie@kernel.org;
- h=from:subject:message-id; bh=24jGWq19/rv3+6J5AgpLm/HbwyWq/3uIYq2kxo6jB8Q=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBlAgC0g4V1utvnFCrJGRX/IIAlVdEhwtsmuZXB/psP
- +m6cleCJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZQIAtAAKCRAk1otyXVSH0Et1B/
- wPRc04N8fDXXPVzS0NHrRGqRG/AcAcViQkowmHjW+vL2/C0b/eG0Xz37VnUiyuHK4q2CELDMuSGmib
- 6uJ0KBu0HqR7OMsgId8D6rCS14TNxW+uu8SecUtpdA/t73FISy04yo/IP0FJZ19ejd8enjS+x3xuP7
- gX+pdRN9t2qL6SmNEvCFiQEK3vYd/qcY9+GB8XkcelPKW/0kHtlYR2lo7pZk0STfmioks5Snh4gkcT
- 5d6TWha3oqAs2WPh+ndqb8AcaZ4i5mEC0M9yjkMP741Rx3peFV7/rR5UC372VGBM4sUs5fvR5+iQtZ
- 19geP4n7PqrahE+jTpib3X3W37LNhN
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230802234255.466782-1-oliver.upton@linux.dev>
+X-Migadu-Flow: FLOW_OUT
 
-For unclear reasons our handling of SVE and SME when setting the default
-value of CPTR_EL2 for VHE mode is inconsistent. For normal VHE we
-unconditionally set CPTR_EL2.ZEN to 0b01 but only set the equivalent
-field CPTR_EL2.SMEN to 0b01 if SME is present, for hVHE we will always
-set the field 0b11 if SVE is not supported. Given the similarities
-between the two extensions it would generally be expected that the code
-handling SVE and SME would be very similar.
+Hey Will,
 
-Since CPTR_ELx.ZEN is RES0 when SVE is not implemented it is probably not
-harmful to try to set the bits but it is better practice to not set
-unimplemented bits so resolve the inconsistency in favour of checking if
-SVE is present too.
+Haven't heard anything on v2 or v3 of this series and this has been on
+the list for a while. Any thoughts?
 
-FPSIMD is also in theory optional though there's probably much more work to
-handle the case where it is not implemented properly and that is not
-something we see in practical systems.
+I want to get a VMM using the SMCCC filtering UAPI ahead of CPU hotplug
+on QEMU so we have some test coverage :) There's a knock-on benefit of
+plugging some of the inherent races in system-scoped PSCI calls getting
+out to userspace too.
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- arch/arm64/include/asm/kvm_emulate.h | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+--
+Thanks,
+Oliver
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 3d6725ff0bf6..4cf53b4aa226 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -584,15 +584,17 @@ static __always_inline u64 kvm_get_reset_cptr_el2(struct kvm_vcpu *vcpu)
- 	u64 val;
- 
- 	if (has_vhe()) {
--		val = (CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |
--		       CPACR_EL1_ZEN_EL1EN);
-+		val = (CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN);
-+		if (cpus_have_final_cap(ARM64_SVE))
-+			val |= CPACR_EL1_ZEN_EL1EN;
- 		if (cpus_have_final_cap(ARM64_SME))
- 			val |= CPACR_EL1_SMEN_EL1EN;
- 	} else if (has_hvhe()) {
- 		val = (CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN);
- 
--		if (!vcpu_has_sve(vcpu) ||
--		    (vcpu->arch.fp_state != FP_STATE_GUEST_OWNED))
-+		if (cpus_have_final_cap(ARM64_SVE) &&
-+		    (!vcpu_has_sve(vcpu) ||
-+		     (vcpu->arch.fp_state != FP_STATE_GUEST_OWNED)))
- 			val |= CPACR_EL1_ZEN_EL1EN | CPACR_EL1_ZEN_EL0EN;
- 		if (cpus_have_final_cap(ARM64_SME))
- 			val |= CPACR_EL1_SMEN_EL1EN | CPACR_EL1_SMEN_EL0EN;
+On Wed, Aug 02, 2023 at 11:42:38PM +0000, Oliver Upton wrote:
+> v3 of the series to do PSCI calls in userspace, as an example for using
+> the SMCCC filtering API added to KVM in 6.4.
+> 
+> v2 -> v3:
+>  - Dropped some of the headers patches since they've already been
+>    updated
+>  - Redo header imports on top of 6.5-rc1
+>  - Actually use the right subject prefix...
+> 
+> v2: https://lore.kernel.org/kvmarm/20230620163353.2688567-1-oliver.upton@linux.dev/
+> 
+> Oliver Upton (17):
+>   Import arm-smccc.h from Linux 6.5-rc1
+>   aarch64: Copy cputype.h from Linux 6.5-rc1
+>   Update psci.h to Linux 6.5-rc1
+>   arm: Stash kvm_vcpu_init for later use
+>   arm: Use KVM_SET_MP_STATE ioctl to power off non-boot vCPUs
+>   aarch64: Expose ARM64_CORE_REG() for general use
+>   arm: Generalize execution state specific VM initialization
+>   Add helpers to pause the VM from vCPU thread
+>   aarch64: Add support for finding vCPU for given MPIDR
+>   aarch64: Add skeleton implementation for PSCI
+>   aarch64: psci: Implement CPU_SUSPEND
+>   aarch64: psci: Implement CPU_OFF
+>   aarch64: psci: Implement CPU_ON
+>   aarch64: psci: Implement AFFINITY_INFO
+>   aarch64: psci: Implement MIGRATE_INFO_TYPE
+>   aarch64: psci: Implement SYSTEM_{OFF,RESET}
+>   aarch64: smccc: Start sending PSCI to userspace
+> 
+>  Makefile                                  |   4 +-
+>  arm/aarch32/include/kvm/kvm-arch.h        |   2 +-
+>  arm/aarch32/kvm-cpu.c                     |   5 +
+>  arm/aarch64/include/asm/cputype.h         | 186 +++++++++++++++++
+>  arm/aarch64/include/asm/smccc.h           |  65 ++++++
+>  arm/aarch64/include/kvm/kvm-arch.h        |   2 +-
+>  arm/aarch64/include/kvm/kvm-config-arch.h |   6 +-
+>  arm/aarch64/include/kvm/kvm-cpu-arch.h    |  28 ++-
+>  arm/aarch64/kvm-cpu.c                     |  48 +++--
+>  arm/aarch64/kvm.c                         |  25 ++-
+>  arm/aarch64/psci.c                        | 207 +++++++++++++++++++
+>  arm/aarch64/smccc.c                       |  81 ++++++++
+>  arm/include/arm-common/kvm-arch.h         |   2 +
+>  arm/include/arm-common/kvm-config-arch.h  |   1 +
+>  arm/include/arm-common/kvm-cpu-arch.h     |   2 +-
+>  arm/kvm-cpu.c                             |  21 +-
+>  arm/kvm.c                                 |   2 +-
+>  include/kvm/kvm-cpu.h                     |   3 +
+>  include/linux/arm-smccc.h                 | 240 ++++++++++++++++++++++
+>  include/linux/psci.h                      |  47 +++++
+>  kvm-cpu.c                                 |  16 ++
+>  21 files changed, 959 insertions(+), 34 deletions(-)
+>  create mode 100644 arm/aarch64/include/asm/cputype.h
+>  create mode 100644 arm/aarch64/include/asm/smccc.h
+>  create mode 100644 arm/aarch64/psci.c
+>  create mode 100644 arm/aarch64/smccc.c
+>  create mode 100644 include/linux/arm-smccc.h
+> 
+> 
+> base-commit: 106e2ea7756d980454d68631b87d5e25ba4e4881
+> -- 
+> 2.41.0.585.gd2178a4bd4-goog
+> 
 
----
-base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
-change-id: 20230908-kvm-arm64-fp-init-8948a8d55e44
-
-Best regards,
 -- 
-Mark Brown <broonie@kernel.org>
-
+Thanks,
+Oliver
