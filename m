@@ -1,220 +1,146 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF65D14F6B;
-	Thu, 14 Sep 2023 16:54:47 +0000 (UTC)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.201])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Rmk1X02Syz6K66F;
-	Fri, 15 Sep 2023 00:54:07 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 14 Sep
- 2023 17:54:44 +0100
-Date: Thu, 14 Sep 2023 17:54:43 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: James Morse <james.morse@arm.com>
-CC: <linux-pm@vger.kernel.org>, <loongarch@lists.linux.dev>,
-	<linux-acpi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-riscv@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<x86@kernel.org>, Salil Mehta <salil.mehta@huawei.com>, Russell King
-	<linux@armlinux.org.uk>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	<jianyong.wu@arm.com>, <justin.he@arm.com>
-Subject: Re: [RFC PATCH v2 35/35] cpumask: Add enabled cpumask for present
- CPUs that can be brought online
-Message-ID: <20230914175443.000038f6@Huawei.com>
-In-Reply-To: <20230913163823.7880-36-james.morse@arm.com>
-References: <20230913163823.7880-1-james.morse@arm.com>
-	<20230913163823.7880-36-james.morse@arm.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56A0C10A2F
+	for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 17:37:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B111C433C8;
+	Thu, 14 Sep 2023 17:37:14 +0000 (UTC)
+Date: Thu, 14 Sep 2023 18:37:12 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Kuan-Ying Lee =?utf-8?B?KOadjuWGoOepjik=?= <Kuan-Ying.Lee@mediatek.com>
+Cc: "dietmar.eggemann@arm.com" <dietmar.eggemann@arm.com>,
+	"hughd@google.com" <hughd@google.com>,
+	"peterz@infradead.org" <peterz@infradead.org>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"rostedt@goodmis.org" <rostedt@goodmis.org>,
+	"rppt@kernel.org" <rppt@kernel.org>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"james.morse@arm.com" <james.morse@arm.com>,
+	"vschneid@redhat.com" <vschneid@redhat.com>,
+	"bristot@redhat.com" <bristot@redhat.com>,
+	"juri.lelli@redhat.com" <juri.lelli@redhat.com>,
+	"alexandru.elisei@arm.com" <alexandru.elisei@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"mingo@redhat.com" <mingo@redhat.com>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"mhiramat@kernel.org" <mhiramat@kernel.org>,
+	"bsegall@google.com" <bsegall@google.com>,
+	"mgorman@suse.de" <mgorman@suse.de>,
+	"arnd@arndb.de" <arnd@arndb.de>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"vincent.guittot@linaro.org" <vincent.guittot@linaro.org>,
+	"will@kernel.org" <will@kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>,
+	Qun-wei Lin =?utf-8?B?KOael+e+pOW0tCk=?= <Qun-wei.Lin@mediatek.com>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"hyesoo.yu@samsung.com" <hyesoo.yu@samsung.com>,
+	"kcc@google.com" <kcc@google.com>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"david@redhat.com" <david@redhat.com>,
+	Casper Li =?utf-8?B?KOadjuS4reamrik=?= <casper.li@mediatek.com>,
+	"steven.price@arm.com" <steven.price@arm.com>,
+	Chinwen Chang =?utf-8?B?KOW8temMpuaWhyk=?= <chinwen.chang@mediatek.com>,
+	"eugenis@google.com" <eugenis@google.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"pcc@google.com" <pcc@google.com>,
+	"vincenzo.frascino@arm.com" <vincenzo.frascino@arm.com>,
+	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"anshuman.khandual@arm.com" <anshuman.khandual@arm.com>
+Subject: Re: [PATCH RFC 00/37] Add support for arm64 MTE dynamic tag storage
+ reuse
+Message-ID: <ZQNEyFOcLv+eJkAr@arm.com>
+References: <20230823131350.114942-1-alexandru.elisei@arm.com>
+ <0dc2afaf8a976ef8eb9af711fd941f1bbfd71321.camel@mediatek.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.227.76]
-X-ClientProxiedBy: lhrpeml500005.china.huawei.com (7.191.163.240) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0dc2afaf8a976ef8eb9af711fd941f1bbfd71321.camel@mediatek.com>
 
-On Wed, 13 Sep 2023 16:38:23 +0000
-James Morse <james.morse@arm.com> wrote:
+Hi Kuan-Ying,
 
-> The 'offline' file in sysfs shows all offline CPUs, including those
-> that aren't present. User-space is expected to remove not-present CPUs
-> from this list to learn which CPUs could be brought online.
+On Wed, Sep 13, 2023 at 08:11:40AM +0000, Kuan-Ying Lee (李冠穎) wrote:
+> On Wed, 2023-08-23 at 14:13 +0100, Alexandru Elisei wrote:
+> > diff --git a/arch/arm64/boot/dts/arm/fvp-base-revc.dts
+> > b/arch/arm64/boot/dts/arm/fvp-base-revc.dts
+> > index 60472d65a355..bd050373d6cf 100644
+> > --- a/arch/arm64/boot/dts/arm/fvp-base-revc.dts
+> > +++ b/arch/arm64/boot/dts/arm/fvp-base-revc.dts
+> > @@ -165,10 +165,28 @@ C1_L2: l2-cache1 {
+> >                 };
+> >         };
+> >  
+> > -       memory@80000000 {
+> > +       memory0: memory@80000000 {
+> >                 device_type = "memory";
+> > -               reg = <0x00000000 0x80000000 0 0x80000000>,
+> > -                     <0x00000008 0x80000000 0 0x80000000>;
+> > +               reg = <0x00 0x80000000 0x00 0x7c000000>;
+> > +       };
+> > +
+> > +       metadata0: metadata@c0000000  {
+> > +               compatible = "arm,mte-tag-storage";
+> > +               reg = <0x00 0xfc000000 0x00 0x3e00000>;
+> > +               block-size = <0x1000>;
+> > +               memory = <&memory0>;
+> > +       };
+> > +
+> > +       memory1: memory@880000000 {
+> > +               device_type = "memory";
+> > +               reg = <0x08 0x80000000 0x00 0x7c000000>;
+> > +       };
+> > +
+> > +       metadata1: metadata@8c0000000  {
+> > +               compatible = "arm,mte-tag-storage";
+> > +               reg = <0x08 0xfc000000 0x00 0x3e00000>;
+> > +               block-size = <0x1000>;
+> > +               memory = <&memory1>;
+> >         };
+> >  
 > 
-> CPUs can be present but not-enabled. These CPUs can't be brought online
-> until the firmware policy changes, which comes with an ACPI notification
-> that will register the CPUs.
+> AFAIK, the above memory configuration means that there are two region
+> of dram(0x80000000-0xfc000000 and 0x8_80000000-0x8_fc0000000) and this
+> is called PDD memory map.
 > 
-> With only the offline and present files, user-space is unable to
-> determine which CPUs it can try to bring online. Add a new CPU mask
-> that shows this based on all the registered CPUs.
-
-Bikeshed should be blue.
-
-Enabled is a really confusing name for this - to the extent that I'm not sure
-what it means.  Assuming I have the sense right, how about the horrible
-onlineable or online_capable?
-
-
+> Document[1] said there are some constraints of tag memory as below.
 > 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> ---
->  drivers/base/cpu.c      | 10 ++++++++++
->  include/linux/cpumask.h | 25 +++++++++++++++++++++++++
->  kernel/cpu.c            |  3 +++
->  3 files changed, 38 insertions(+)
+> | The following constraints apply to the tag regions in DRAM:
+> | 1. The tag region cannot be interleaved with the data region.
+> | The tag region must also be above the data region within DRAM.
+> |
+> | 2.The tag region in the physical address space cannot straddle
+> | multiple regions of a memory map.
+> |
+> | PDD memory map is not allowed to have part of the tag region between
+> | 2GB-4GB and another part between 34GB-64GB.
 > 
-> diff --git a/drivers/base/cpu.c b/drivers/base/cpu.c
-> index c709747c4a18..a19a8be93102 100644
-> --- a/drivers/base/cpu.c
-> +++ b/drivers/base/cpu.c
-> @@ -95,6 +95,7 @@ void unregister_cpu(struct cpu *cpu)
->  {
->  	int logical_cpu = cpu->dev.id;
->  
-> +	set_cpu_enabled(logical_cpu, false);
->  	unregister_cpu_under_node(logical_cpu, cpu_to_node(logical_cpu));
->  
->  	device_unregister(&cpu->dev);
-> @@ -273,6 +274,13 @@ static ssize_t print_cpus_offline(struct device *dev,
->  }
->  static DEVICE_ATTR(offline, 0444, print_cpus_offline, NULL);
->  
-> +static ssize_t print_cpus_enabled(struct device *dev,
-> +				  struct device_attribute *attr, char *buf)
-> +{
-> +	return sysfs_emit(buf, "%*pbl\n", cpumask_pr_args(cpu_enabled_mask));
-> +}
-> +static DEVICE_ATTR(enabled, 0444, print_cpus_enabled, NULL);
-> +
->  static ssize_t print_cpus_isolated(struct device *dev,
->  				  struct device_attribute *attr, char *buf)
->  {
-> @@ -413,6 +421,7 @@ int register_cpu(struct cpu *cpu, int num)
->  	register_cpu_under_node(num, cpu_to_node(num));
->  	dev_pm_qos_expose_latency_limit(&cpu->dev,
->  					PM_QOS_RESUME_LATENCY_NO_CONSTRAINT);
-> +	set_cpu_enabled(num, true);
->  
->  	return 0;
->  }
-> @@ -494,6 +503,7 @@ static struct attribute *cpu_root_attrs[] = {
->  	&cpu_attrs[2].attr.attr,
->  	&dev_attr_kernel_max.attr,
->  	&dev_attr_offline.attr,
-> +	&dev_attr_enabled.attr,
->  	&dev_attr_isolated.attr,
->  #ifdef CONFIG_NO_HZ_FULL
->  	&dev_attr_nohz_full.attr,
-> diff --git a/include/linux/cpumask.h b/include/linux/cpumask.h
-> index f10fb87d49db..a29ee03f13ff 100644
-> --- a/include/linux/cpumask.h
-> +++ b/include/linux/cpumask.h
-> @@ -92,6 +92,7 @@ static inline void set_nr_cpu_ids(unsigned int nr)
->   *
->   *     cpu_possible_mask- has bit 'cpu' set iff cpu is populatable
->   *     cpu_present_mask - has bit 'cpu' set iff cpu is populated
-> + *     cpu_enabled_mask  - has bit 'cpu' set iff cpu can be brought online
->   *     cpu_online_mask  - has bit 'cpu' set iff cpu available to scheduler
->   *     cpu_active_mask  - has bit 'cpu' set iff cpu available to migration
->   *
-> @@ -124,11 +125,13 @@ static inline void set_nr_cpu_ids(unsigned int nr)
->  
->  extern struct cpumask __cpu_possible_mask;
->  extern struct cpumask __cpu_online_mask;
-> +extern struct cpumask __cpu_enabled_mask;
->  extern struct cpumask __cpu_present_mask;
->  extern struct cpumask __cpu_active_mask;
->  extern struct cpumask __cpu_dying_mask;
->  #define cpu_possible_mask ((const struct cpumask *)&__cpu_possible_mask)
->  #define cpu_online_mask   ((const struct cpumask *)&__cpu_online_mask)
-> +#define cpu_enabled_mask   ((const struct cpumask *)&__cpu_enabled_mask)
->  #define cpu_present_mask  ((const struct cpumask *)&__cpu_present_mask)
->  #define cpu_active_mask   ((const struct cpumask *)&__cpu_active_mask)
->  #define cpu_dying_mask    ((const struct cpumask *)&__cpu_dying_mask)
-> @@ -973,6 +976,7 @@ extern const DECLARE_BITMAP(cpu_all_bits, NR_CPUS);
->  #else
->  #define for_each_possible_cpu(cpu) for_each_cpu((cpu), cpu_possible_mask)
->  #define for_each_online_cpu(cpu)   for_each_cpu((cpu), cpu_online_mask)
-> +#define for_each_enabled_cpu(cpu)   for_each_cpu((cpu), cpu_enabled_mask)
->  #define for_each_present_cpu(cpu)  for_each_cpu((cpu), cpu_present_mask)
->  #endif
->  
-> @@ -995,6 +999,15 @@ set_cpu_possible(unsigned int cpu, bool possible)
->  		cpumask_clear_cpu(cpu, &__cpu_possible_mask);
->  }
->  
-> +static inline void
-> +set_cpu_enabled(unsigned int cpu, bool can_be_onlined)
-> +{
-> +	if (can_be_onlined)
-> +		cpumask_set_cpu(cpu, &__cpu_enabled_mask);
-> +	else
-> +		cpumask_clear_cpu(cpu, &__cpu_enabled_mask);
-> +}
-> +
->  static inline void
->  set_cpu_present(unsigned int cpu, bool present)
->  {
-> @@ -1074,6 +1087,7 @@ static __always_inline unsigned int num_online_cpus(void)
->  	return raw_atomic_read(&__num_online_cpus);
->  }
->  #define num_possible_cpus()	cpumask_weight(cpu_possible_mask)
-> +#define num_enabled_cpus()	cpumask_weight(cpu_enabled_mask)
->  #define num_present_cpus()	cpumask_weight(cpu_present_mask)
->  #define num_active_cpus()	cpumask_weight(cpu_active_mask)
->  
-> @@ -1082,6 +1096,11 @@ static inline bool cpu_online(unsigned int cpu)
->  	return cpumask_test_cpu(cpu, cpu_online_mask);
->  }
->  
-> +static inline bool cpu_enabled(unsigned int cpu)
-> +{
-> +	return cpumask_test_cpu(cpu, cpu_enabled_mask);
-> +}
-> +
->  static inline bool cpu_possible(unsigned int cpu)
->  {
->  	return cpumask_test_cpu(cpu, cpu_possible_mask);
-> @@ -1106,6 +1125,7 @@ static inline bool cpu_dying(unsigned int cpu)
->  
->  #define num_online_cpus()	1U
->  #define num_possible_cpus()	1U
-> +#define num_enabled_cpus()	1U
->  #define num_present_cpus()	1U
->  #define num_active_cpus()	1U
->  
-> @@ -1119,6 +1139,11 @@ static inline bool cpu_possible(unsigned int cpu)
->  	return cpu == 0;
->  }
->  
-> +static inline bool cpu_enabled(unsigned int cpu)
-> +{
-> +	return cpu == 0;
-> +}
-> +
->  static inline bool cpu_present(unsigned int cpu)
->  {
->  	return cpu == 0;
-> diff --git a/kernel/cpu.c b/kernel/cpu.c
-> index 6de7c6bb74ee..2201a6a449b5 100644
-> --- a/kernel/cpu.c
-> +++ b/kernel/cpu.c
-> @@ -3101,6 +3101,9 @@ EXPORT_SYMBOL(__cpu_possible_mask);
->  struct cpumask __cpu_online_mask __read_mostly;
->  EXPORT_SYMBOL(__cpu_online_mask);
->  
-> +struct cpumask __cpu_enabled_mask __read_mostly;
-> +EXPORT_SYMBOL(__cpu_enabled_mask);
-> +
->  struct cpumask __cpu_present_mask __read_mostly;
->  EXPORT_SYMBOL(__cpu_present_mask);
->  
+> I'm not sure if we can separate tag memory with the above
+> configuration. Or do I miss something?
+> 
+> [1] https://developer.arm.com/documentation/101569/0300/?lang=en
+> (Section 5.4.6.1)
 
+Good point, thanks. The above dts some random layout we picked as an
+example, it doesn't match any real hardware and we didn't pay attention
+to the interconnect limitations (we fake the tag storage on the model).
+
+I'll try to dig out how the mtu_tag_addr_shutter registers work and how
+the sparse DRAM space is compressed to a smaller tag range. But that's
+something done by firmware and the kernel only learns the tag storage
+location from the DT (provided by firmware). We also don't need to know
+the fine-grained mapping between 32 bytes of data and 1 byte (2 tags) in
+the tag storage, only the block size in the tag storage space that
+covers all interleaving done by the interconnect (it can be from 1 byte
+to something larger like a page; the kernel will then use the lowest
+common multiple between a page size and this tag block size to figure
+out how many pages to reserve).
+
+-- 
+Catalin
