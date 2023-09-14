@@ -1,125 +1,102 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C20FD28E32
-	for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 15:07:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1694704020;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6SQ8P9dIo86mGdYMXEQK4IXZZmN0xP5iEUDVuGzb4As=;
-	b=FsZ/NwkgMDrKBG7mK43Lnww0Dcf7BWAEGCcjNJt3wC79eeCehnWN8UjmhQXyhSoxYC+Eau
-	RHXNYIGRKUNdDueyiaZxl3hgsk3go/EvPl/hZU7RIpvgDmIE16yF+l58eVE+fIPVMFtd1p
-	rdg4hX4qrhOfctiJOqvovzeDzS10Dsw=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-215-wedAhwoMNmyyHvx_SNYzaA-1; Thu, 14 Sep 2023 11:06:57 -0400
-X-MC-Unique: wedAhwoMNmyyHvx_SNYzaA-1
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-76efd8bf515so155853285a.1
-        for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 08:06:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694704017; x=1695308817;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6SQ8P9dIo86mGdYMXEQK4IXZZmN0xP5iEUDVuGzb4As=;
-        b=BsSq/iYhqcdJGXdWileE2DAAkAd5pnVEmN6zNPvQ3tfR4N5S5ByJIjpFJEvTE/PoAx
-         kMzLIWdkBbwgAT2WbLHZhtWeixJ3/i0Ep8mEd27Ywu0UN/JsmMSlEoTM+Hp9mjD6yNnR
-         zRRaXbJioAz0tE9sQ+T3WGMqOFZLSmQtzzQBZAMTJ3Fd6JyKGmnPzixcEt7XUbDYxbIf
-         IUt5TlclDrah/TxN09lRRmj4HpEGkvJKSdxfG+iUxlUI5W+izLkZF3xmOJGlBamMfEix
-         WVsiUDnxHKu4pMTYE6Xewtb+aCHquqyqnod1WSijem2PSouLj81aDAK3NElv/Hvb2ugJ
-         SqDw==
-X-Gm-Message-State: AOJu0YwjVd9WQxRU2NLwu1lm3WOE6kty4fo8U23VpZ36k9gzAgwYE26T
-	LYfJkWUwHzIQByslJTgWP27xKXWHRAyt+Qwn1cmHlb7xPYk6BTQMFIv0XvhHVcTvnRB87Td6sqQ
-	PumXOGiiG7dKuBxWnVQzNmi/5LeMjWENW
-X-Received: by 2002:a05:620a:394c:b0:76e:f7f3:723e with SMTP id qs12-20020a05620a394c00b0076ef7f3723emr2511744qkn.38.1694704016760;
-        Thu, 14 Sep 2023 08:06:56 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGr5GWcNmJQqe0VBfr6DB/4guT1vGO8AReywmKm2vd5XigC6NeS7B46k887wY3VGiqerPvT3lVSVi0vWsHoqlY=
-X-Received: by 2002:a05:620a:394c:b0:76e:f7f3:723e with SMTP id
- qs12-20020a05620a394c00b0076ef7f3723emr2511720qkn.38.1694704016470; Thu, 14
- Sep 2023 08:06:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CD6B1CFA1;
+	Thu, 14 Sep 2023 15:34:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAE18C433C9;
+	Thu, 14 Sep 2023 15:34:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694705679;
+	bh=TC5noj5ktH2x7QwQggxt68bg/J4n39+D6FUOyZfzpR8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=VhZ3lpyNJ5JBnKIJXQOzqzyIyRP8YcFLhoDiqbK4XOP9op/up4vR9RzbsJ7Pv804p
+	 1KFaej6Kan7MvEO6Pff3K4+JM46O38+EbToWV3Bm57EFMSKdtyiTKP8sGrZqGcoNdp
+	 CZVXZ7ghIgZvbiwLSS2efunPvRGUYvHx4DmsMMhmbogIs5mrsYaG/1ZVOjhrE2UAhz
+	 Tn0tyQ2lp9STPxG+fwsM3Aw/uNkTbUagLsBC1h2k74xzjTz5o/s0LCn+IvEaZY/DjV
+	 QdWtANlmUc8rNkMzESluMKsL114Kx9zJGiTuZMwgoFyXLwvPd/RJc/dXHmUviwA8Eq
+	 xR45CY7Bl5RKw==
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-50078eba7afso1907799e87.0;
+        Thu, 14 Sep 2023 08:34:39 -0700 (PDT)
+X-Gm-Message-State: AOJu0YxkN/McqIr9zXFYAXr2UHUXHe0DBZ4utrieHICgCGQTWfG/1brc
+	WQ8CNtdOedlobW5Ud6kbVliCcr+qVmmFo9ZgJDI=
+X-Google-Smtp-Source: AGHT+IHQWhXWk9WB76jsul3E8BXF8FIj2XgeZXziogZ8+9RlZta9SMLLLzxXno0++LBAsD2vWnMl44SVOfg370+hAkA=
+X-Received: by 2002:a05:6512:452:b0:500:bb99:69a7 with SMTP id
+ y18-20020a056512045200b00500bb9969a7mr4588249lfk.14.1694705677877; Thu, 14
+ Sep 2023 08:34:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230914144802.1637804-1-maz@kernel.org>
-In-Reply-To: <20230914144802.1637804-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 14 Sep 2023 17:06:43 +0200
-Message-ID: <CABgObfarGB50ZCUdLWLeTGFV+7Z8iriv1B61KaTX-1RnXRtJ7A@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.6, take #1
-To: Marc Zyngier <maz@kernel.org>
-Cc: Ben Horgan <ben.horgan@arm.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
-	Vincent Donnefort <vdonnefort@google.com>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+References: <20230913163823.7880-1-james.morse@arm.com> <20230913163823.7880-28-james.morse@arm.com>
+ <CAMj1kXHRAt7ecB9p_dm3MjDL5wZkAsVh30hMY2SV_XUe=bm6Vg@mail.gmail.com> <20230914155459.00002dba@Huawei.com>
+In-Reply-To: <20230914155459.00002dba@Huawei.com>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Thu, 14 Sep 2023 17:34:25 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXFquiLGCMow3iujHUU4GBZx2t9KfKy1R9iqjBFjY+acaA@mail.gmail.com>
+Message-ID: <CAMj1kXFquiLGCMow3iujHUU4GBZx2t9KfKy1R9iqjBFjY+acaA@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 27/35] ACPICA: Add new MADT GICC flags fields [code first?]
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: James Morse <james.morse@arm.com>, linux-pm@vger.kernel.org, 
+	loongarch@lists.linux.dev, linux-acpi@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	kvmarm@lists.linux.dev, x86@kernel.org, Salil Mehta <salil.mehta@huawei.com>, 
+	Russell King <linux@armlinux.org.uk>, Jean-Philippe Brucker <jean-philippe@linaro.org>, jianyong.wu@arm.com, 
+	justin.he@arm.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 14, 2023 at 4:48=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
-:
+On Thu, 14 Sept 2023 at 16:55, Jonathan Cameron
+<Jonathan.Cameron@huawei.com> wrote:
 >
-> Paolo,
+> On Thu, 14 Sep 2023 09:57:44 +0200
+> Ard Biesheuvel <ardb@kernel.org> wrote:
 >
-> Here's the first set of fixes for 6.6, addressing two regressions: use
-> of uninitialised memory as a VA to map the GICv2 CPU interface at EL2
-> stage-1, and a SMCCC fix covering the use of the SVE hint.
+> > Hello James,
+> >
+> > On Wed, 13 Sept 2023 at 18:41, James Morse <james.morse@arm.com> wrote:
+> > >
+> > > Add the new flag field to the MADT's GICC structure.
+> > >
+> > > 'Online Capable' indicates a disabled CPU can be enabled later.
+> > >
+> >
+> > Why do we need a bit for this? What would be the point of describing
+> > disabled CPUs that cannot be enabled (and are you are aware of
+> > firmware doing this?).
 >
-> Please pull.,
-
-Done, thanks.
-
-Paolo
-
->         M.
+> Enabled being not set is common at some similar ACPI tables at least.
 >
-> The following changes since commit 0bb80ecc33a8fb5a682236443c1e740d5c917d=
-1d:
+> This is available in most ACPI tables to allow firmware to use 'nearly'
+> static tables and just tweak the 'enabled' bit to say if the record should
+> be ignored or not. Also _STA not present which is for same trick.
+> If you are doing clever dynamic tables, then you can just not present
+> the entry.
 >
->   Linux 6.6-rc1 (2023-09-10 16:28:41 -0700)
+> With that existing use case in mind, need another bit to say this
+> one might one day turn up.  Note this is copied from x86 though no
+> one seems to have implemented the kernel support for them yet.
 >
-> are available in the Git repository at:
+> Note as per my other reply - this isn't a code first proposal. It's in the
+> spec already (via a code first proposal last year I think).
 >
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
-marm-fixes-6.6-1
+> >
+> > So why are we not able to assume that this new bit can always be treated as '1'?
 >
-> for you to fetch changes up to 373beef00f7d781a000b12c31fb17a5a9c25969c:
->
->   KVM: arm64: nvhe: Ignore SVE hint in SMCCC function ID (2023-09-12 13:0=
-7:37 +0100)
->
-> ----------------------------------------------------------------
-> KVM/arm64 fixes for 6.6, take #1
->
-> - Fix EL2 Stage-1 MMIO mappings where a random address was used
->
-> - Fix SMCCC function number comparison when the SVE hint is set
->
-> ----------------------------------------------------------------
-> Jean-Philippe Brucker (1):
->       KVM: arm64: nvhe: Ignore SVE hint in SMCCC function ID
->
-> Marc Zyngier (1):
->       KVM: arm64: Properly return allocated EL2 VA from hyp_alloc_private=
-_va_range()
->
->  arch/arm64/include/asm/kvm_hyp.h      | 2 +-
->  arch/arm64/kvm/hyp/include/nvhe/ffa.h | 2 +-
->  arch/arm64/kvm/hyp/nvhe/ffa.c         | 3 +--
->  arch/arm64/kvm/hyp/nvhe/hyp-init.S    | 1 +
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c    | 8 ++++++--
->  arch/arm64/kvm/hyp/nvhe/psci-relay.c  | 3 +--
->  arch/arm64/kvm/mmu.c                  | 3 +++
->  include/linux/arm-smccc.h             | 2 ++
->  8 files changed, 16 insertions(+), 8 deletions(-)
+> Given above, need the extra bit to size stuff to allow for the CPU showing up
+> late.
 >
 
+So does this mean that on x86, the CPU object is instantiated only
+when the hardware level hotplug occurs? And before that, the object
+does not exist at all?
+
+Because it seems to me that _STA, having both enabled and present
+bits, could already describe what we need here, and arguably, a CPU
+that is not both present and enabled should not be used by the OS.
+This would leave room for representing off-line CPUs as present but
+not enabled.
+
+Apologies if I am missing something obvious here - the whole rationale
+behind this thing is rather confusing to me.
