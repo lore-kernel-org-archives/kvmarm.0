@@ -1,208 +1,95 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAD4A1D558
-	for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 10:06:43 +0000 (UTC)
-Received: from lhrpeml500002.china.huawei.com (unknown [172.18.147.200])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RmXXw4vk5z6K5yT;
-	Thu, 14 Sep 2023 17:47:12 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- lhrpeml500002.china.huawei.com (7.191.160.78) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Thu, 14 Sep 2023 10:47:48 +0100
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.031;
- Thu, 14 Sep 2023 10:47:48 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "maz@kernel.org" <maz@kernel.org>,
-	"will@kernel.org" <will@kernel.org>, "catalin.marinas@arm.com"
-	<catalin.marinas@arm.com>, "james.morse@arm.com" <james.morse@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, yuzenghui
-	<yuzenghui@huawei.com>, zhukeqian <zhukeqian1@huawei.com>, Jonathan Cameron
-	<jonathan.cameron@huawei.com>, Linuxarm <linuxarm@huawei.com>
-Subject: RE: [RFC PATCH v2 0/8] KVM: arm64: Implement SW/HW combined dirty log
-Thread-Topic: [RFC PATCH v2 0/8] KVM: arm64: Implement SW/HW combined dirty
- log
-Thread-Index: AQHZ1zeYniphcsNMdESdQqigwTISA7AZEKiAgAEU5SA=
-Date: Thu, 14 Sep 2023 09:47:48 +0000
-Message-ID: <14eb2648eb594dd9a46a179733cee0df@huawei.com>
-References: <20230825093528.1637-1-shameerali.kolothum.thodi@huawei.com>
- <ZQHxm+L890yTpY91@linux.dev>
-In-Reply-To: <ZQHxm+L890yTpY91@linux.dev>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [10.202.227.178]
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA5B21D524
+	for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 10:15:54 +0000 (UTC)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-401c90ed2ecso8626045e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 03:15:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1694686553; x=1695291353; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VyIjI/I6fiuQb5fro76kkYxOSc4xq/0TuIo+mtjDBWI=;
+        b=mE45ncYLRKHPTLIByuZaGmDpt75RBLlXYzbV70tVQ1gd81Dux5iPdBUod1biDASQzD
+         uM99vNgCFm5Zz3YyDsVRwvpWWZckEjfNhUJBLgCWKJ96c94CC+btIxkJnRAqF9AIcvWn
+         l3YzmEywMXRQRhiKMcmoZi04ndsClJ+cBKR4vYrOfXBRquwKwwQJazE1ODp8VyNJ0DGi
+         axIFyLYq2/FhPMZjz5sgn1gIynd/z6/VQPo3FOGG8OQIOPYBUVIgJEf3jbu9SQjPcAfE
+         gUXez2yth4w5aanLKWJJpiot4l7qwjtYVDqLWk5qNb5Qe/eNLTl5VrN/2C71B5cBDE+a
+         qE/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694686553; x=1695291353;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VyIjI/I6fiuQb5fro76kkYxOSc4xq/0TuIo+mtjDBWI=;
+        b=voLYsq12P1rXSM98jD5SSmerR10MShccmf3EoRF//RFGUJv/10q9dfd4gKuMtYD9vd
+         KRk28HwyNaQOteoPV0ZA4C2y6amSg81eIySzcajXVbqvBZmX639zyhU2Wl9bGJvlNzbv
+         eNxfQTszNmBtjAt37bPSuZVW+pUPA+6XEnh8+NyAg0SX2UdZp3tVw5natV7MVFvSyYH1
+         hgBBfCuK0MJlEBlSj4gF4Rj2zkdISxapNJMon4AMrhdSuU0Mhbr5AN5UtS70KNjpuSUi
+         LACqpzn890ZQJfpOr+1+EyiDvNnIKfQqTBCxcovEdXD0gH/CATtSLXQvIFou+vwM+SAv
+         Dmsg==
+X-Gm-Message-State: AOJu0Yyz3DXN8pvfpnOfnoybNY8CGwxSGkbYL2D7p4SNdDoiy/IK58jt
+	EZ1xMeRpsVyyv42zuNgFZlKfgg==
+X-Google-Smtp-Source: AGHT+IH7ZT746JOyiS+eOvZlolhRQEl4EX2Lm6S0kGQOnu5nvVuWeFGDXcIG88aW5kDFIAcnKh6/BQ==
+X-Received: by 2002:adf:d0c3:0:b0:31a:d2f9:7372 with SMTP id z3-20020adfd0c3000000b0031ad2f97372mr4347143wrh.29.1694686552802;
+        Thu, 14 Sep 2023 03:15:52 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id k8-20020a5d5248000000b0031fc4c31d77sm1340310wrc.88.2023.09.14.03.15.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Sep 2023 03:15:51 -0700 (PDT)
+Date: Thu, 14 Sep 2023 12:15:50 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Conor Dooley <conor.dooley@microchip.com>
+Cc: Haibo Xu <haibo1.xu@intel.com>, xiaobo55x@gmail.com, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Sean Christopherson <seanjc@google.com>, Ricardo Koller <ricarkol@google.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Vipin Sharma <vipinsh@google.com>, David Matlack <dmatlack@google.com>, 
+	Colton Lewis <coltonlewis@google.com>, Aaron Lewis <aaronlewis@google.com>, 
+	Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v3 9/9] KVM: riscv: selftests: Add sstc timer test
+Message-ID: <20230914-2232dea1c6d03fb5985755e6@orel>
+References: <cover.1694421911.git.haibo1.xu@intel.com>
+ <64e0637cd6f22dd7557ed44bd2242001e7830d1c.1694421911.git.haibo1.xu@intel.com>
+ <20230914-ee133dd5e804282ce28833d6@orel>
+ <20230914-reflector-preshow-786425ad7ae2@wendy>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230914-reflector-preshow-786425ad7ae2@wendy>
 
-Hi Oliver,
+On Thu, Sep 14, 2023 at 10:52:15AM +0100, Conor Dooley wrote:
+> On Thu, Sep 14, 2023 at 11:36:01AM +0200, Andrew Jones wrote:
+> > > +static inline void cpu_relax(void)
+> > > +{
+> > > +#ifdef __riscv_zihintpause
+> > > +	asm volatile("pause" ::: "memory");
+> > > +#else
+> > > +	/* Encoding of the pause instruction */
+> > > +	asm volatile(".4byte 0x100000F" ::: "memory");
+> > > +#endif
+> > > +}
+> > 
+> > cpu_relax() should go to include/riscv/processor.h
+> 
+> Can the one from asm/vdso/processor.h be reused, or are there special
+> considerations preventing that?
 
-> -----Original Message-----
-> From: Oliver Upton [mailto:oliver.upton@linux.dev]
-> Sent: 13 September 2023 18:30
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: kvmarm@lists.linux.dev; kvm@vger.kernel.org;
-> linux-arm-kernel@lists.infradead.org; maz@kernel.org; will@kernel.org;
-> catalin.marinas@arm.com; james.morse@arm.com;
-> suzuki.poulose@arm.com; yuzenghui <yuzenghui@huawei.com>; zhukeqian
-> <zhukeqian1@huawei.com>; Jonathan Cameron
-> <jonathan.cameron@huawei.com>; Linuxarm <linuxarm@huawei.com>
-> Subject: Re: [RFC PATCH v2 0/8] KVM: arm64: Implement SW/HW combined
-> dirty log
->=20
-> Hi Shameer,
->=20
-> On Fri, Aug 25, 2023 at 10:35:20AM +0100, Shameer Kolothum wrote:
-> > Hi,
-> >
-> > This is to revive the RFC series[1], which makes use of hardware dirty
-> > bit modifier(DBM) feature(FEAT_HAFDBS) for dirty page tracking, sent
-> > out by Zhu Keqian sometime back.
-> >
-> > One of the main drawbacks in using the hardware DBM feature for dirty
-> > page tracking is the additional overhead in scanning the PTEs for dirty
-> > pages[2]. Also there are no vCPU page faults when we set the DBM bit,
-> > which may result in higher convergence time during guest migration.
-> >
-> > This series tries to reduce these overheads by not setting the
-> > DBM for all the writeable pages during migration and instead uses a
-> > combined software(current page fault mechanism) and hardware
-> approach
-> > (set DBM) for dirty page tracking.
-> >
-> > As noted in RFC v1[1],
-> > "The core idea is that we do not enable hardware dirty at start (do not
-> > add DBM bit). When an arbitrary PT occurs fault, we execute soft tracki=
-ng
-> > for this PT and enable hardware tracking for its *nearby* PTs (e.g. Add
-> > DBM bit for nearby 64PTs). Then when sync dirty log, we have known all
-> > PTs with hardware dirty enabled, so we do not need to scan all PTs."
->=20
-> I'm unconvinced of the value of such a change.
->=20
-> What you're proposing here is complicated and I fear not easily
-> maintainable. Keeping the *two* sources of dirty state seems likely to
-> fail (eventually) with some very unfortunate consequences.
-
-It does adds complexity to the dirty state management code. I have tried
-to separate the code path using appropriate FLAGS etc to make it more
-manageable. But this is probably one area we can work on if the overall
-approach does have some benefits.
-
-> The optimization of enabling DBM on neighboring PTEs is presumptive of
-> the guest access pattern and could incur unnecessary scans of the
-> stage-2 page table w/ a sufficiently sparse guest access pattern.
-
-Agree. This may not work as intended for all workloads and especially=20
-if the access pattern is sparse. But still hopeful that it will be benefici=
-al for
-workloads that have continuous write patterns. And we do have a knob to
-turn it on or off.
-
-> > Tests with dirty_log_perf_test with anonymous THP pages shows
-> significant
-> > improvement in "dirty memory time" as expected but with a hit on
-> > "get dirty time" .
-> >
-> > ./dirty_log_perf_test -b 512MB -v 96 -i 5 -m 2 -s anonymous_thp
-> >
-> > +---------------------------+----------------+------------------+
-> > | =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 | =A0 6.5-rc5 =A0=
- =A0 =A0| 6.5-rc5 + series
-> |
-> >
-> | =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 | =A0 =A0 (s) =A0 =
-=A0 =A0 =A0| =A0 =A0 =A0 (s)
-> =A0 =A0|
-> > +---------------------------+----------------+------------------+
-> > | =A0 =A0dirty memory
-> time =A0 =A0 =A0| =A0 =A04.22 =A0 =A0 =A0 =A0| =A0 =A0 =A0 =A0 =A00.41 =
-=A0 =A0|
-> > | =A0 =A0get dirty log
-> time =A0 =A0 | =A0 =A00.00047 =A0 =A0 | =A0 =A0 =A0 =A0 =A03.25 =A0 =A0|
-> > | =A0 =A0clear dirty log
-> time =A0 | =A0 =A00.48 =A0 =A0 =A0 =A0| =A0 =A0 =A0 =A0 =A00.98 =A0 =A0|
-> > +---------------------------------------------------------------+
->=20
-> The vCPU:memory ratio you're testing doesn't seem representative of what
-> a typical cloud provider would be configuring, and the dirty log
-> collection is going to scale linearly with the size of guest memory.
-
-I was limited by the test setup I had. I will give it a go with a higher me=
-m
-system.=20
-=20
-> Slow dirty log collection is going to matter a lot for VM blackout,
-> which from experience tends to be the most sensitive period of live
-> migration for guest workloads.
->=20
-> At least in our testing, the split GET/CLEAR dirty log ioctls
-> dramatically improved the performance of a write-protection based ditry
-> tracking scheme, as the false positive rate for dirtied pages is
-> significantly reduced. FWIW, this is what we use for doing LM on arm64 as
-> opposed to the D-bit implemenation that we use on x86.
-
-Guess, by D-bit on x86 you mean the PML feature. Unfortunately that is
-something we lack on ARM yet.
-=20
-> > In order to get some idea on actual live migration performance,
-> > I created a VM (96vCPUs, 1GB), ran a redis-benchmark test and
-> > while the test was in progress initiated live migration(local).
-> >
-> > redis-benchmark -t set -c 900 -n 5000000 --threads 96
-> >
-> > Average of 5 runs shows that benchmark finishes ~10% faster with
-> > a ~8% increase in "total time" for migration.
-> >
-> > +---------------------------+----------------+------------------+
-> > | =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 | =A0 6.5-rc5 =A0=
- =A0 =A0| 6.5-rc5 + series
-> |
-> >
-> | =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 | =A0 =A0 (s) =A0 =
-=A0 =A0 =A0| =A0 =A0(s)
-> =A0 =A0 |
-> > +---------------------------+----------------+------------------+
-> > | [redis]5000000 requests in| =A0 =A079.428 =A0 =A0 =A0| =A0 =A0 =A071.=
-49 =A0 =A0 =A0 |
-> > | [info migrate]total
-> time =A0| =A0 =A08438 =A0 =A0 =A0 =A0| =A0 =A0 =A09097 =A0 =A0 =A0 =A0|
-> > +---------------------------------------------------------------+
->=20
-> Faster pre-copy performance would help the benchmark complete faster,
-> but the goal for a live migration should be to minimize the lost
-> computation for the entire operation. You'd need to test with a
-> continuous workload rather than one with a finite amount of work.
-
-Ok. Though the above is not representative of a real workload, I thought
-it gives some idea on how "Guest up time improvement" is benefitting the
-overall availability of the workload during migration. I will check within =
-our
-wider team to see if I can setup a more suitable test/workload to show some
-improvement with this approach.=20
-
-Please let me know if there is a specific workload you have in mind.
-
-> Also, do you know what live migration scheme you're using here?
-
-The above is the default one (pre-copy).
-
-Thanks for getting back on this. Appreciate if you can do a quick glance
-through the rest of the patches as well for any gross errors especially wit=
-h
-respect to page table walk locking, usage of DBM FLAGS etc.
+We'd need to copy it into tools/arch/riscv/include/asm, but it could be
+done. Hmm, now that I look at it, I see we're missing the barrier() call
+in this kvm selftests version.
 
 Thanks,
-Shameer=20
+drew
