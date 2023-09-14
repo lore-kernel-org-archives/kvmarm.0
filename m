@@ -1,43 +1,43 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38C2B224C5
-	for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 09:05:16 +0000 (UTC)
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-402cc6b8bedso7953045e9.1
-        for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 02:05:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BCFF224EC
+	for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 09:36:05 +0000 (UTC)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-401d80f4ef8so8114775e9.1
+        for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 02:36:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1694682315; x=1695287115; darn=lists.linux.dev;
+        d=ventanamicro.com; s=google; t=1694684164; x=1695288964; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/mRrBnh8S4j8WTa2+bV8lSaUBhWpdN931kOj5VJSEI8=;
-        b=T4X30vaIFMYCaQtSCttnnDbXyQwnpYeKUJl86wzAV65thvXA/ZrQmjbq2Q3m0jVnU3
-         +2+fYAm6pCy7qPDBLHbr59Ce0Muiw8haJ0ma8zrDVnj7nQ5hwt1YS7EOiME89fwSMN3j
-         8ZtqBuW4IVwFXwkfo5wGhfO/nIATVfmjL7X/ObgmaZGHe5gY3x14t0d1hELdP4bf90aL
-         doo+mdnp+4p/wbfsOuw+TeyuvdWGnIBi8dl9HvrusKBtKgKqlXnW7xf2LZUaSpcXcEXX
-         GkA2uNUO2TPWQS71NDdXCQ5/PixWD1i+xdLQhWgeIvcNzEEb8quhapw4gbekGbm6T2tp
-         KWTw==
+        bh=CCZCFnlZJGvjka4NILPiAYA/zskUo3Xn5QtdhyBtM2Y=;
+        b=CEPGmeQGiW+FjLdDTuOVesc0CYba5r1Ee4M+WHQpXzc5sOaO12fgWCeEtKwOoZtUim
+         Cw3xmDPW39Dmth4+MH1rj3jqWYlcJeP8cPRFDDbMLvrLHyuqWxgm9osLBo5QZmbm4bm+
+         vYhupd9JclPQ58ayTaOheuXtiCryQ25oly7WOOs/M8weALJmeIuAG+gT5BfnLbnMzksk
+         xCIxMO3y0ibXcDMG4dBHOT1srjvAyRe1yiqJMSbD6wJHFyJL7ZdXA1PjczrsPG3Zl242
+         QNJ/e1rYR6m92rheddA9l/rcFghn7MJ0qAW7m18Py+N2lqUoSEbm6KXUe7zmwUe7K3dz
+         I3xA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694682315; x=1695287115;
+        d=1e100.net; s=20230601; t=1694684164; x=1695288964;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/mRrBnh8S4j8WTa2+bV8lSaUBhWpdN931kOj5VJSEI8=;
-        b=bonht0VdiGYpRhTtN/gDaItcsYq2eDj9ciPle+ukJFXQtKBTrBpZlT+gM43OoH14La
-         QEnAYKi1g/Cb92l4GwS2ABbu3DINIQEOnOL4PZq2QabfCkSeNtOX3qd5akpoToip4Bwj
-         9HBDfY3+/Ay4aLVmoGOiPvRzqWUDmTMOQrRoe1FgNOM2NnZV1ZtgvUg5uKrkqP58gbDk
-         r8ZCZPictOqQ7hIDEZ4JTtyeTMtGOvvlc03sXlYTmGo1SzUDiqQfMPR46V0cQfzzwh1o
-         c4ccNfaNWpDxLfSYiKvloi2NtAwkWl4MAHXJtPRlRKZjNVewfUlnQI6/hbjXBKNOvCep
-         4seg==
-X-Gm-Message-State: AOJu0YzZhbuZsOSDj1axpocSpQAAp8UbqfruW3l25Zxm6xsCVPf/e1qv
-	jb9FzQLcwX4Cz+n8srA10sRrVHwQM3J/VSqkvi8=
-X-Google-Smtp-Source: AGHT+IFy8TjeoZnzEKVRF6ve15/1ZtfpBeOza9n+OW8rYx1ZUEatSJ80NefZ30RlKJWhr7ppOLul1g==
-X-Received: by 2002:a05:600c:6d7:b0:404:74e3:27a4 with SMTP id b23-20020a05600c06d700b0040474e327a4mr285671wmn.40.1694682315033;
-        Thu, 14 Sep 2023 02:05:15 -0700 (PDT)
+        bh=CCZCFnlZJGvjka4NILPiAYA/zskUo3Xn5QtdhyBtM2Y=;
+        b=wniPZkkOG+VXuL+pdnYdeHHWs2SfuHKWYbsArfYrHWwrXxiNk41QqBqVw3L6ZMspkK
+         54QEmsi6wmHBESgsN6ZDS1+EeLSC2U8vMrjKoT97UhknXVgvbNuD0HuNIA80fSSWtvZI
+         wL+Jj2K9ln53/NPJnd/CZxoYVYz/eesZhW5CUOsvqYt8yAfaKClZsQPCUm4d+SDl7rLH
+         Yi8RnKZ3UxAT321oa72T3iKwYEGENHApcqVwHdzHtRlLVINZLx2sFLRgO58/5jPAd7pz
+         iwAO3CmqAgGgG2m0XSWEOntmDPuRp4aKGwkJ3WV53Q8k87rMk5RiR9BPVzcKiZgRu3Gz
+         by2w==
+X-Gm-Message-State: AOJu0Yw3aXdyETVibnpRevMlVKRk2/xHMy3kdnhL4rZWpfvRZzzY5aSu
+	/eOpds0KJT29T7bqDBh6RAbeAw==
+X-Google-Smtp-Source: AGHT+IEiIxzBcyLkmHLkrz7w2hqdJlTCFKJPIAZw8Hpyv1+O9WtgLsgm4Epy4ya7CqDQyGl8fHTsCA==
+X-Received: by 2002:a1c:6a18:0:b0:3fe:5053:1a0b with SMTP id f24-20020a1c6a18000000b003fe50531a0bmr4400672wmc.11.1694684162891;
+        Thu, 14 Sep 2023 02:36:02 -0700 (PDT)
 Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id m10-20020a7bce0a000000b003fee53feab5sm1391448wmc.10.2023.09.14.02.05.14
+        by smtp.gmail.com with ESMTPSA id w16-20020adfec50000000b003141a3c4353sm1252322wrn.30.2023.09.14.02.36.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Sep 2023 02:05:14 -0700 (PDT)
-Date: Thu, 14 Sep 2023 11:05:13 +0200
+        Thu, 14 Sep 2023 02:36:02 -0700 (PDT)
+Date: Thu, 14 Sep 2023 11:36:01 +0200
 From: Andrew Jones <ajones@ventanamicro.com>
 To: Haibo Xu <haibo1.xu@intel.com>
 Cc: xiaobo55x@gmail.com, Paul Walmsley <paul.walmsley@sifive.com>, 
@@ -49,15 +49,14 @@ Cc: xiaobo55x@gmail.com, Paul Walmsley <paul.walmsley@sifive.com>,
 	Sean Christopherson <seanjc@google.com>, Ricardo Koller <ricarkol@google.com>, 
 	Vishal Annapurve <vannapurve@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
 	Vipin Sharma <vipinsh@google.com>, David Matlack <dmatlack@google.com>, 
-	Thomas Huth <thuth@redhat.com>, Colton Lewis <coltonlewis@google.com>, 
-	Aaron Lewis <aaronlewis@google.com>, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	Colton Lewis <coltonlewis@google.com>, Aaron Lewis <aaronlewis@google.com>, 
+	Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
 	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v3 8/9] KVM: riscv: selftests: Change vcpu_has_ext to a
- common function
-Message-ID: <20230914-d6645bbc5ac80999674e9685@orel>
+Subject: Re: [PATCH v3 9/9] KVM: riscv: selftests: Add sstc timer test
+Message-ID: <20230914-ee133dd5e804282ce28833d6@orel>
 References: <cover.1694421911.git.haibo1.xu@intel.com>
- <dd81ef2b87e4cc160cb0ee782010dcf3543e065a.1694421911.git.haibo1.xu@intel.com>
+ <64e0637cd6f22dd7557ed44bd2242001e7830d1c.1694421911.git.haibo1.xu@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -66,102 +65,350 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <dd81ef2b87e4cc160cb0ee782010dcf3543e065a.1694421911.git.haibo1.xu@intel.com>
+In-Reply-To: <64e0637cd6f22dd7557ed44bd2242001e7830d1c.1694421911.git.haibo1.xu@intel.com>
 
-On Thu, Sep 14, 2023 at 09:37:02AM +0800, Haibo Xu wrote:
-> Move vcpu_has_ext to the processor.c and rename it to __vcpu_has_ext
-> so that other test cases can use it for vCPU extension check.
+On Thu, Sep 14, 2023 at 09:37:03AM +0800, Haibo Xu wrote:
+> Add a KVM selftests to validate the Sstc timer functionality.
+> The test was ported from arm64 arch timer test.
 > 
 > Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
 > ---
->  .../selftests/kvm/include/riscv/processor.h      |  2 ++
->  .../testing/selftests/kvm/lib/riscv/processor.c  |  9 +++++++++
->  tools/testing/selftests/kvm/riscv/get-reg-list.c | 16 +---------------
->  3 files changed, 12 insertions(+), 15 deletions(-)
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../selftests/kvm/aarch64/arch_timer.c        |  12 +-
+>  tools/testing/selftests/kvm/arch_timer.c      |  10 +-
+>  .../selftests/kvm/include/riscv/arch_timer.h  |  80 +++++++++++++
+>  .../selftests/kvm/include/riscv/processor.h   |  10 ++
+>  .../selftests/kvm/include/timer_test.h        |   3 +-
+>  .../testing/selftests/kvm/riscv/arch_timer.c  | 107 ++++++++++++++++++
+>  7 files changed, 214 insertions(+), 9 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/include/riscv/arch_timer.h
+>  create mode 100644 tools/testing/selftests/kvm/riscv/arch_timer.c
 > 
-> diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/tools/testing/selftests/kvm/include/riscv/processor.h
-> index 2c975d9cead2..7d5517648ea7 100644
-> --- a/tools/testing/selftests/kvm/include/riscv/processor.h
-> +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
-> @@ -42,6 +42,8 @@ static inline uint64_t __kvm_reg_id(uint64_t type, uint64_t idx,
->  #define RISCV_ISA_EXT_REG(idx)	__kvm_reg_id(KVM_REG_RISCV_ISA_EXT, \
->  					     idx, KVM_REG_SIZE_ULONG)
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index a5bc8e156047..73d393a5f337 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -180,6 +180,7 @@ TEST_GEN_PROGS_s390x += rseq_test
+>  TEST_GEN_PROGS_s390x += set_memory_region_test
+>  TEST_GEN_PROGS_s390x += kvm_binary_stats_test
 >  
-> +bool __vcpu_has_ext(struct kvm_vcpu *vcpu, int ext);
+> +TEST_GEN_PROGS_riscv += arch_timer
+>  TEST_GEN_PROGS_riscv += demand_paging_test
+>  TEST_GEN_PROGS_riscv += dirty_log_test
+>  TEST_GEN_PROGS_riscv += guest_print_test
+> diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> index 4688b258247c..178f37737d33 100644
+> --- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> +++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> @@ -190,10 +190,14 @@ struct kvm_vm *test_vm_create(void)
+>  	vm_init_vector_tables(vm);
+>  	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT, guest_irq_handler);
+>  
+> -	if (!test_args.offset.reserved) {
+> -		if (kvm_has_cap(KVM_CAP_COUNTER_OFFSET))
+> -			vm_ioctl(vm, KVM_ARM_SET_COUNTER_OFFSET, &test_args.offset);
+> -		else
+> +	if (!test_args.reserved) {
+> +		if (kvm_has_cap(KVM_CAP_COUNTER_OFFSET)) {
+> +			struct kvm_arm_counter_offset offset = {
+> +				.counter_offset = test_args.counter_offset,
+> +				.reserved = 0,
+> +			};
+> +			vm_ioctl(vm, KVM_ARM_SET_COUNTER_OFFSET, &offset);
+> +		} else
+>  			TEST_FAIL("no support for global offset\n");
+>  	}
+>  
+> diff --git a/tools/testing/selftests/kvm/arch_timer.c b/tools/testing/selftests/kvm/arch_timer.c
+> index ea3dd1a772b0..184a0f5f484d 100644
+> --- a/tools/testing/selftests/kvm/arch_timer.c
+> +++ b/tools/testing/selftests/kvm/arch_timer.c
+> @@ -33,7 +33,7 @@ struct test_args test_args = {
+>  	.nr_iter = NR_TEST_ITERS_DEF,
+>  	.timer_period_ms = TIMER_TEST_PERIOD_MS_DEF,
+>  	.migration_freq_ms = TIMER_TEST_MIGRATION_FREQ_MS,
+> -	.offset = { .reserved = 1 },
+> +	.reserved = 1,
+>  };
+>  
+>  struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
+> @@ -72,6 +72,8 @@ static void *test_vcpu_run(void *arg)
+>  		TEST_FAIL("Unexpected guest exit\n");
+>  	}
+>  
+> +	pr_info("PASS(vCPU-%d).\n", vcpu_idx);
 > +
->  struct ex_regs {
->  	unsigned long ra;
->  	unsigned long sp;
-> diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> index 39a1e9902dec..e527ad0abc30 100644
-> --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> @@ -15,6 +15,15 @@
+>  	return NULL;
+>  }
 >  
->  static vm_vaddr_t exception_handlers;
+> @@ -186,7 +188,7 @@ static void test_print_help(char *name)
+>  		TIMER_TEST_PERIOD_MS_DEF);
+>  	pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different pCPU. 0 to turn off (default: %u)\n",
+>  		TIMER_TEST_MIGRATION_FREQ_MS);
+> -	pr_info("\t-o: Counter offset (in counter cycles, default: 0)\n");
+> +	pr_info("\t-o: Counter offset (in counter cycles, default: 0)[aarch64-only]\n");
+                                                                     ^
+								     need
+						     		a space here
+
+>  	pr_info("\t-h: print this help screen\n");
+>  }
 >  
-> +bool __vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
+> @@ -214,8 +216,8 @@ static bool parse_args(int argc, char *argv[])
+>  			test_args.migration_freq_ms = atoi_non_negative("Frequency", optarg);
+>  			break;
+>  		case 'o':
+> -			test_args.offset.counter_offset = strtol(optarg, NULL, 0);
+> -			test_args.offset.reserved = 0;
+> +			test_args.counter_offset = strtol(optarg, NULL, 0);
+> +			test_args.reserved = 0;
+>  			break;
+>  		case 'h':
+>  		default:
+> diff --git a/tools/testing/selftests/kvm/include/riscv/arch_timer.h b/tools/testing/selftests/kvm/include/riscv/arch_timer.h
+> new file mode 100644
+> index 000000000000..5c063df13b98
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/include/riscv/arch_timer.h
+> @@ -0,0 +1,80 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * RISC-V Arch Timer(sstc) specific interface
+> + *
+> + * Copyright (c) 2023 Intel Corporation
+> + */
+> +
+> +#ifndef SELFTEST_KVM_ARCH_TIMER_H
+> +#define SELFTEST_KVM_ARCH_TIMER_H
+> +
+> +#include <asm/csr.h>
+> +
+> +static unsigned long timer_freq;
+> +
+> +#define msec_to_cycles(msec)	\
+> +	((timer_freq) * (uint64_t)(msec) / 1000)
+> +
+> +#define usec_to_cycles(usec)	\
+> +	((timer_freq) * (uint64_t)(usec) / 1000000)
+> +
+> +#define cycles_to_usec(cycles) \
+> +	((uint64_t)(cycles) * 1000000 / (timer_freq))
+> +
+> +static inline uint64_t timer_get_cycles(void)
 > +{
-> +	unsigned long value = 0;
-> +
-> +	__vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
-> +
-> +	return !!value;
-
-I'd rather not assume that value will remain zero across a system call
-which fails. Let's write this as
-
-     unsigned long value = 0;
-     int ret;
-
-     ret = __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
-
-     return !ret && !!value;
-
+> +	return csr_read(CSR_TIME);
 > +}
 > +
->  static uint64_t page_align(struct kvm_vm *vm, uint64_t v)
->  {
->  	return (v + vm->page_size) & ~(vm->page_size - 1);
-> diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> index d8ecacd03ecf..0dcff823f287 100644
-> --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> @@ -44,20 +44,6 @@ bool check_reject_set(int err)
->  	return err == EINVAL;
->  }
+> +static inline void timer_set_cmp(uint64_t cval)
+> +{
+> +	csr_write(CSR_STIMECMP, cval);
+> +}
+> +
+> +static inline uint64_t timer_get_cmp(void)
+> +{
+> +	return csr_read(CSR_STIMECMP);
+> +}
+> +
+> +static inline void timer_irq_enable(void)
+> +{
+> +	csr_set(CSR_SIE, IE_TIE);
+> +}
+> +
+> +static inline void timer_irq_disable(void)
+> +{
+> +	csr_clear(CSR_SIE, IE_TIE);
+> +}
+> +
+> +static inline void timer_set_next_cmp_ms(uint32_t msec)
+> +{
+> +	uint64_t now_ct = timer_get_cycles();
+> +	uint64_t next_ct = now_ct + msec_to_cycles(msec);
+> +
+> +	timer_set_cmp(next_ct);
+> +}
+> +
+> +static inline void cpu_relax(void)
+> +{
+> +#ifdef __riscv_zihintpause
+> +	asm volatile("pause" ::: "memory");
+> +#else
+> +	/* Encoding of the pause instruction */
+> +	asm volatile(".4byte 0x100000F" ::: "memory");
+> +#endif
+> +}
+
+cpu_relax() should go to include/riscv/processor.h
+
+> +
+> +static inline void __delay(uint64_t cycles)
+> +{
+> +	uint64_t start = timer_get_cycles();
+> +
+> +	while ((timer_get_cycles() - start) < cycles)
+> +		cpu_relax();
+> +}
+> +
+> +static inline void udelay(unsigned long usec)
+> +{
+> +	__delay(usec_to_cycles(usec));
+> +}
+> +
+> +#endif /* SELFTEST_KVM_ARCH_TIMER_H */
+> diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/tools/testing/selftests/kvm/include/riscv/processor.h
+> index 7d5517648ea7..268c549f87cf 100644
+> --- a/tools/testing/selftests/kvm/include/riscv/processor.h
+> +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
+> @@ -158,4 +158,14 @@ struct sbiret sbi_ecall(int ext, int fid, unsigned long arg0,
+>  			unsigned long arg3, unsigned long arg4,
+>  			unsigned long arg5);
 >  
-> -static inline bool vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
-> -{
-> -	int ret;
-> -	unsigned long value;
-> -
-> -	ret = __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
-> -	if (ret) {
-> -		printf("Failed to get ext %d", ext);
-> -		return false;
-> -	}
-> -
-> -	return !!value;
-> -}
-> -
->  void finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu_reg_list *c)
->  {
->  	struct vcpu_reg_sublist *s;
-> @@ -77,7 +63,7 @@ void finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu_reg_list *c)
->  		__vcpu_set_reg(vcpu, RISCV_ISA_EXT_REG(s->feature), 1);
+> +static inline void local_irq_enable(void)
+> +{
+> +	csr_set(CSR_SSTATUS, SR_SIE);
+> +}
+> +
+> +static inline void local_irq_disable(void)
+> +{
+> +	csr_clear(CSR_SSTATUS, SR_SIE);
+> +}
+> +
+>  #endif /* SELFTEST_KVM_PROCESSOR_H */
+> diff --git a/tools/testing/selftests/kvm/include/timer_test.h b/tools/testing/selftests/kvm/include/timer_test.h
+> index 04e8aff2dc22..00b455235b82 100644
+> --- a/tools/testing/selftests/kvm/include/timer_test.h
+> +++ b/tools/testing/selftests/kvm/include/timer_test.h
+> @@ -22,7 +22,8 @@ struct test_args {
+>  	int nr_iter;
+>  	int timer_period_ms;
+>  	int migration_freq_ms;
+> -	struct kvm_arm_counter_offset offset;
+> +	uint64_t counter_offset;
+> +	uint64_t reserved;
+
+These need a comment above them explaining that they are the members of
+struct kvm_arm_counter_offset or they can be renamed with arm_ prefixes.
+
+>  };
 >  
->  		/* Double check whether the desired extension was enabled */
-> -		__TEST_REQUIRE(vcpu_has_ext(vcpu, s->feature),
-> +		__TEST_REQUIRE(__vcpu_has_ext(vcpu, s->feature),
->  			       "%s not available, skipping tests\n", s->name);
->  	}
->  }
+>  /* Shared variables between host and guest */
+> diff --git a/tools/testing/selftests/kvm/riscv/arch_timer.c b/tools/testing/selftests/kvm/riscv/arch_timer.c
+> new file mode 100644
+> index 000000000000..13bf184d1ff5
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/riscv/arch_timer.c
+> @@ -0,0 +1,107 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * arch_timer.c - Tests the riscv64 sstc timer IRQ functionality
+> + *
+> + * The test validates the sstc timer IRQs using vstimecmp registers.
+> + * It's ported from the aarch64 arch_timer test.
+> + *
+> + * Copyright (c) 2023, Intel Corporation.
+> + */
+> +
+> +#define _GNU_SOURCE
+> +
+> +#include "arch_timer.h"
+> +#include "kvm_util.h"
+> +#include "processor.h"
+> +#include "timer_test.h"
+> +
+> +static int timer_irq = IRQ_S_TIMER;
+> +
+> +static void guest_irq_handler(struct ex_regs *regs)
+> +{
+> +	uint64_t xcnt, xcnt_diff_us, cmp;
+> +	unsigned int intid = regs->cause & ~CAUSE_IRQ_FLAG;
+> +	uint32_t cpu = guest_get_vcpuid();
+> +	struct test_vcpu_shared_data *shared_data = &vcpu_shared_data[cpu];
+> +
+> +	timer_irq_disable();
+> +
+> +	xcnt = timer_get_cycles();
+> +	cmp = timer_get_cmp();
+> +	xcnt_diff_us = cycles_to_usec(xcnt - shared_data->xcnt);
+> +
+> +	/* Make sure we are dealing with the correct timer IRQ */
+> +	GUEST_ASSERT_EQ(intid, timer_irq);
+> +
+> +	__GUEST_ASSERT(xcnt >= cmp,
+> +			"xcnt = 0x%llx, cmp = 0x%llx, xcnt_diff_us = 0x%llx",
+> +			xcnt, cmp, xcnt_diff_us);
+> +
+> +	WRITE_ONCE(shared_data->nr_iter, shared_data->nr_iter + 1);
+> +}
+> +
+> +static void guest_run(struct test_vcpu_shared_data *shared_data)
+> +{
+> +	uint32_t irq_iter, config_iter;
+> +
+> +	shared_data->nr_iter = 0;
+> +	shared_data->guest_stage = 0;
+> +
+> +	for (config_iter = 0; config_iter < test_args.nr_iter; config_iter++) {
+> +		/* Setup the next interrupt */
+> +		timer_set_next_cmp_ms(test_args.timer_period_ms);
+> +		shared_data->xcnt = timer_get_cycles();
+> +		timer_irq_enable();
+> +
+> +		/* Setup a timeout for the interrupt to arrive */
+> +		udelay(msecs_to_usecs(test_args.timer_period_ms) +
+> +			TIMER_TEST_ERR_MARGIN_US);
+> +
+> +		irq_iter = READ_ONCE(shared_data->nr_iter);
+> +		GUEST_ASSERT_EQ(config_iter + 1, irq_iter);
+> +	}
+> +}
+> +
+> +static void guest_code(void)
+> +{
+> +	uint32_t cpu = guest_get_vcpuid();
+> +	struct test_vcpu_shared_data *shared_data = &vcpu_shared_data[cpu];
+> +
+> +	timer_irq_disable();
+> +	local_irq_enable();
+> +
+> +	guest_run(shared_data);
+> +
+> +	GUEST_DONE();
+> +}
+> +
+> +struct kvm_vm *test_vm_create(void)
+> +{
+> +	struct kvm_vm *vm;
+> +	int nr_vcpus = test_args.nr_vcpus;
+> +
+> +	vm = vm_create_with_vcpus(nr_vcpus, guest_code, vcpus);
+> +	__TEST_REQUIRE(__vcpu_has_ext(vcpus[0], KVM_RISCV_ISA_EXT_SSTC),
+> +				   "SSTC not available, skipping test\n");
+> +
+> +	vm_init_vector_tables(vm);
+> +	vm_install_interrupt_handler(vm, guest_irq_handler);
+> +
+> +	for (int i = 0; i < nr_vcpus; i++)
+> +		vcpu_init_vector_tables(vcpus[i]);
+> +
+> +	/* Initialize guest timer frequency. */
+> +	vcpu_get_reg(vcpus[0], RISCV_TIMER_REG(frequency), &timer_freq);
+> +	sync_global_to_guest(vm, timer_freq);
+> +	pr_debug("timer_freq: %lu\n", timer_freq);
+> +
+> +	/* Make all the test's cmdline args visible to the guest */
+> +	sync_global_to_guest(vm, test_args);
+> +
+> +	return vm;
+> +}
+> +
+> +void test_vm_cleanup(struct kvm_vm *vm)
+> +{
+> +	kvm_vm_free(vm);
+> +}
 > -- 
 > 2.34.1
 >
 
-Otherwise,
+Besides the three minor comments, this looks good to me.
 
 Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 
