@@ -1,114 +1,125 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441BF21A08
-	for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 13:37:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B97FBC433C8;
-	Thu, 14 Sep 2023 13:37:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694698632;
-	bh=Fl6RNpJimEuHpL5sPJLw45C8oocbmvKU729su9Dk9wo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pt+eN9LPhV/y8mBV/XzMPHIkcxgQ/uO4qEu4xUKH+bsnFneOCl1sOpF8jmddmRMvy
-	 PdiplUPKQdJaFy9ecE1NRUTl8zODWSLmxzNiXCPVkKZcn9CMvJTW5wQFpSe9lZozJW
-	 6lJh6edujGtDNPh4VoGYSJA1TXVYvK7Q0aBRKQwlgog1vwyeKxogjWmjKhmk1yxlsY
-	 PgHh3sHt6BpTSYNx72z6L/z9/MmjAUVOko7lti/QABrHl1A6I+ir9noq8hDxzoXkvZ
-	 JAzOTqfG6waKPiMv2TPcugjQc7H3YBo89GikUnf4FWYzrOA/Nu7QaT9F5DAs45SPvY
-	 LacycEtpqU7fw==
-Received: from disco-boy.misterjones.org ([217.182.43.188] helo=www.loen.fr)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qgmWr-00CvtI-LK;
-	Thu, 14 Sep 2023 14:37:09 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77FBF21A17;
+	Thu, 14 Sep 2023 13:53:58 +0000 (UTC)
+Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.226])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RmdwB3Lzdz6D8rX;
+	Thu, 14 Sep 2023 21:49:14 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 14 Sep
+ 2023 14:53:54 +0100
+Date: Thu, 14 Sep 2023 14:53:53 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: James Morse <james.morse@arm.com>
+CC: <linux-pm@vger.kernel.org>, <loongarch@lists.linux.dev>,
+	<linux-acpi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-riscv@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<x86@kernel.org>, Salil Mehta <salil.mehta@huawei.com>, Russell King
+	<linux@armlinux.org.uk>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	<jianyong.wu@arm.com>, <justin.he@arm.com>
+Subject: Re: [RFC PATCH v2 15/35] ACPI: processor: Add support for
+ processors described as container packages
+Message-ID: <20230914145353.000072e2@Huawei.com>
+In-Reply-To: <20230913163823.7880-16-james.morse@arm.com>
+References: <20230913163823.7880-1-james.morse@arm.com>
+	<20230913163823.7880-16-james.morse@arm.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Date: Thu, 14 Sep 2023 14:37:09 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Christoffer Dall
- <christoffer.dall@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
- Andre Przywara <andre.przywara@arm.com>, Chase Conklin
- <chase.conklin@arm.com>, Darren Hart <darren@os.amperecomputing.com>,
- Jintack Lim <jintack@cs.columbia.edu>, Russell King
- <rmk+kernel@armlinux.org.uk>, Miguel Luis <miguel.luis@oracle.com>, James
- Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>, D
- Scott Phillips <scott@os.amperecomputing.com>
-Subject: Re: [PATCH v10 29/59] KVM: arm64: nv: Unmap/flush shadow stage 2 page
- tables
-In-Reply-To: <8d0f77a8-00db-93f7-aeae-bf96190b6f5b@os.amperecomputing.com>
-References: <20230515173103.1017669-1-maz@kernel.org>
- <20230515173103.1017669-30-maz@kernel.org>
- <8d0f77a8-00db-93f7-aeae-bf96190b6f5b@os.amperecomputing.com>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <3454100b4bb927a24b380f442f02d178@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 217.182.43.188
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, christoffer.dall@arm.com, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, scott@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Originating-IP: [10.202.227.76]
+X-ClientProxiedBy: lhrpeml500006.china.huawei.com (7.191.161.198) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
+X-CFilter-Loop: Reflected
 
-Hi Ganapatrao,
+On Wed, 13 Sep 2023 16:38:03 +0000
+James Morse <james.morse@arm.com> wrote:
 
-On 2023-09-14 14:10, Ganapatrao Kulkarni wrote:
-> Hi Marc,
+> ACPI has two ways of describing processors in the DSDT. Either as a device
+> object with HID ACPI0007, or as a type 'C' package inside a Processor
+> Container. The ACPI processor driver probes CPUs described as devices, but
+> not those described as packages.
 > 
-> On 15-05-2023 11:00 pm, Marc Zyngier wrote:
->> From: Christoffer Dall <christoffer.dall@linaro.org>
->> 
->> Unmap/flush shadow stage 2 page tables for the nested VMs as well as 
->> the
->> stage 2 page table for the guest hypervisor.
->> 
->> Note: A bunch of the code in mmu.c relating to MMU notifiers is
->> currently dealt with in an extremely abrupt way, for example by 
->> clearing
->> out an entire shadow stage-2 table. This will be handled in a more
->> efficient way using the reverse mapping feature in a later version of
->> the patch series.
+
+Specification reference needed...
+
+Terminology wise, I'd just refer to Processor() objects as I think they
+are named objects rather than data terms like a package (Which include
+a PkgLength etc)
+
+
+
+> Duplicate descriptions are not allowed, the ACPI processor driver already
+> parses the UID from both devices and containers. acpi_processor_get_info()
+> returns an error if the UID exists twice in the DSDT.
 > 
-> We are seeing spin-lock contention due to this patch when the
-> Guest-Hypervisor(L1) is booted with higher number of cores and
-> auto-numa is enabled on L0.
-> kvm_nested_s2_unmap is called as part of notifier call-back when numa
-> page migration is happening and this function which holds lock becomes
-> source of contention when there are more vCPUs are processing the
-> auto-numa page fault/migration.
-
-This is fully expected. Honestly, expecting any sort of performance at
-this stage is extremely premature (and I have zero sympathy for hacks
-like auto-numa...).
-
-[...]
-
->>   +	kvm_nested_s2_unmap(kvm);
+> The missing probe for CPUs described as packages creates a problem for
+> moving the cpu_register() calls into the acpi_processor driver, as CPUs
+> described like this don't get registered, leading to errors from other
+> subsystems when they try to add new sysfs entries to the CPU node.
+> (e.g. topology_sysfs_init()'s use of topology_add_dev() via cpuhp)
 > 
-> This kvm_nested_s2_unmap/kvm_unmap_stage2_range is called for every
-> active L2 and page table walk-through iterates for long iterations
-> since kvm_phys_size(mmu) is pretty big size(atleast 48bits).
-> What would be the best fix if we want to avoid this unnessary long
-> iteration of page table lookup?
+> To fix this, parse the processor container and call acpi_processor_add()
+> for each processor that is discovered like this. The processor container
+> handler is added with acpi_scan_add_handler(), so no detach call will
+> arrive.
+> 
+> Qemu TCG describes CPUs using packages in a processor container.
 
-The fix would be to have a reverse mapping for any canonical IPA to
-any shadow IPA, which would allow us to not fully tear down the shadow
-PTs but only the bit we need to remove. This is clearly stated in the
-commit message you quoted.
+processor terms in a processor container. 
+> 
+> Signed-off-by: James Morse <james.morse@arm.com>
 
-However, this plan is pretty far down the list, and I have no plan to
-work on performance optimisations until we have basic support merged
-upstream.
+Otherwise looks fine to me.
 
-Thanks,
+Jonathan
+> ---
+>  drivers/acpi/acpi_processor.c | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
+> 
+> diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.c
+> index c0839bcf78c1..b4bde78121bb 100644
+> --- a/drivers/acpi/acpi_processor.c
+> +++ b/drivers/acpi/acpi_processor.c
+> @@ -625,9 +625,31 @@ static struct acpi_scan_handler processor_handler = {
+>  	},
+>  };
+>  
+> +static acpi_status acpi_processor_container_walk(acpi_handle handle,
+> +						 u32 lvl,
+> +						 void *context,
+> +						 void **rv)
+> +{
+> +	struct acpi_device *adev;
+> +	acpi_status status;
+> +
+> +	adev = acpi_get_acpi_dev(handle);
+> +	if (!adev)
+> +		return AE_ERROR;
+> +
+> +	status = acpi_processor_add(adev, &processor_device_ids[0]);
+> +	acpi_put_acpi_dev(adev);
+> +
+> +	return status;
+> +}
+> +
+>  static int acpi_processor_container_attach(struct acpi_device *dev,
+>  					   const struct acpi_device_id *id)
+>  {
+> +	acpi_walk_namespace(ACPI_TYPE_PROCESSOR, dev->handle,
+> +			    ACPI_UINT32_MAX, acpi_processor_container_walk,
+> +			    NULL, NULL, NULL);
+> +
+>  	return 1;
+>  }
+>  
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
