@@ -1,98 +1,152 @@
-Received: from out-226.mta1.migadu.com (out-226.mta1.migadu.com [95.215.58.226])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D26191
-	for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 00:04:35 +0000 (UTC)
-Date: Thu, 14 Sep 2023 00:04:29 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1694649873;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kfv4Zhx1bwbtVJ2Jm5wO4ve633QMh2KTeWELK3A6p6w=;
-	b=EkjUA9C2vZhCis33BkatvJsmHMcE1KLe7dGi3Nt1OT2o9Tupl61AJHhh6y2YeC3C31PwGF
-	4284oBDu7yFUrVmO/1zQO7/2K+kvNbOOR66xDE7O7pt0oDzqr3jpZFCB28ZER9VodQDeut
-	GANLbUAdtod/774vv0kRmU7VY7Y3vd4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Mark Brown <broonie@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F8DA369
+	for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 01:27:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694654877; x=1726190877;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ueE/011k9DiwV0Anf9SWAZccz4IuGXFEGSyhfc+Fk0k=;
+  b=STbJAo3LB/QUI6cm3VfPfpWvtJt/zr+7QNFBviHtSBpXFTBxHHy339N4
+   Omh76/Cwxf8aeQEaHErAafsYZuLnvWgGmcf7EIYnAAoR+lFl9yk2RO7Ov
+   QI36U7b2URt8+rbcQnSAOePzbPD9xmeRoeFZs7oiIC4sdv5Z2UKGJ0JIU
+   Z4XvA0M+LF6LHhnA4jmPRPLzFgUA+T4VApgci2fsOSxyKmlsQrfpsRaAm
+   6wSJIczQN88buRkNJ6roJOLxRm8oA4QRBWURCEmnsWDwGcp99YnQ8lXwo
+   KLBiIAVcmSfjMFpPPj1FoLrDbXuHY4QnpIkHbC3o3mL7wY3fwX+Os0w9c
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="377733961"
+X-IronPort-AV: E=Sophos;i="6.02,144,1688454000"; 
+   d="scan'208";a="377733961"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 18:27:55 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="694048860"
+X-IronPort-AV: E=Sophos;i="6.02,144,1688454000"; 
+   d="scan'208";a="694048860"
+Received: from haibo-optiplex-7090.sh.intel.com ([10.239.159.132])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 18:27:48 -0700
+From: Haibo Xu <haibo1.xu@intel.com>
+To: 
+Cc: xiaobo55x@gmail.com,
+	haibo1.xu@intel.com,
+	ajones@ventanamicro.com,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Only default to enabling SVE when present
-Message-ID: <ZQJODdfwZLxc9o1l@linux.dev>
-References: <20230913-kvm-arm64-fp-init-v1-1-8ce9ba1cc4c4@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	Like Xu <likexu@tencent.com>,
+	Vipin Sharma <vipinsh@google.com>,
+	David Matlack <dmatlack@google.com>,
+	Thomas Huth <thuth@redhat.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	Aaron Lewis <aaronlewis@google.com>,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm-riscv@lists.infradead.org
+Subject: [PATCH v3 0/9] RISCV: Add kvm Sstc timer selftests
+Date: Thu, 14 Sep 2023 09:36:54 +0800
+Message-Id: <cover.1694421911.git.haibo1.xu@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230913-kvm-arm64-fp-init-v1-1-8ce9ba1cc4c4@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-Hi Mark,
+The RISC-V arch_timer selftests is used to validate Sstc timer
+functionality in a guest, which sets up periodic timer interrupts
+and check the basic interrupt status upon its receipt.
 
-On Wed, Sep 13, 2023 at 07:34:16PM +0100, Mark Brown wrote:
-> For unclear reasons our handling of SVE and SME when setting the default
-> value of CPTR_EL2 for VHE mode is inconsistent. For normal VHE we
-> unconditionally set CPTR_EL2.ZEN to 0b01 but only set the equivalent
-> field CPTR_EL2.SMEN to 0b01 if SME is present, for hVHE we will always
-> set the field 0b11 if SVE is not supported. Given the similarities
-> between the two extensions it would generally be expected that the code
-> handling SVE and SME would be very similar.
-> 
-> Since CPTR_ELx.ZEN is RES0 when SVE is not implemented it is probably not
-> harmful to try to set the bits but it is better practice to not set
-> unimplemented bits so resolve the inconsistency in favour of checking if
-> SVE is present too.
+This KVM selftests was ported from aarch64 arch_timer and tested
+with Linux v6.6-rc1 on a Qemu riscv64 virt machine.
 
-It is entirely possible that implementers 'disable' a feature by hiding
-it from the ID register, leaving the control bits completely functional.
-These systems are at odds with the architecture, though we probably
-shouldn't engage in _deliberately_ hostile programming patterns in the
-kernel :)
+---
+Changed since v2:
+  * Rebase to Linux 6.6-rc1
+  * Add separate patch for kvm/Makefile improvement
+  * Move aarch64 specific macros to aarch64/arch_timer.c
+  * Add -DCONFIG_64BIT to kvm/Makefile CFLAGS to ensure
+    only 64bit registers were available in csr.h
+  * Avoid some #ifdef in kvm/arch_timer.c by setting some
+    aarch64 specific variable to 0 on risc-v
 
-> FPSIMD is also in theory optional though there's probably much more work to
-> handle the case where it is not implemented properly and that is not
-> something we see in practical systems.
->
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_emulate.h | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 3d6725ff0bf6..4cf53b4aa226 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -584,15 +584,17 @@ static __always_inline u64 kvm_get_reset_cptr_el2(struct kvm_vcpu *vcpu)
->  	u64 val;
->  
->  	if (has_vhe()) {
-> -		val = (CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |
-> -		       CPACR_EL1_ZEN_EL1EN);
-> +		val = (CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN);
-> +		if (cpus_have_final_cap(ARM64_SVE))
-> +			val |= CPACR_EL1_ZEN_EL1EN;
->  		if (cpus_have_final_cap(ARM64_SME))
->  			val |= CPACR_EL1_SMEN_EL1EN;
->  	} else if (has_hvhe()) {
->  		val = (CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN);
->  
-> -		if (!vcpu_has_sve(vcpu) ||
-> -		    (vcpu->arch.fp_state != FP_STATE_GUEST_OWNED))
-> +		if (cpus_have_final_cap(ARM64_SVE) &&
-> +		    (!vcpu_has_sve(vcpu) ||
-> +		     (vcpu->arch.fp_state != FP_STATE_GUEST_OWNED)))
+Haibo Xu (9):
+  KVM: selftests: Unify the codes for guest exception handling
+  KVM: selftests: Unify the makefile rule for split targets
+  KVM: arm64: selftests: Split arch_timer test code
+  tools: riscv: Add header file csr.h
+  KVM: riscv: selftests: Switch to use macro from csr.h
+  KVM: riscv: selftests: Add exception handling support
+  KVM: riscv: selftests: Add guest helper to get vcpu id
+  KVM: riscv: selftests: Change vcpu_has_ext to a common function
+  KVM: riscv: selftests: Add sstc timer test
 
-vcpu_has_sve() already tests system_supports_sve(), so I don't believe
-this hunk is necessary.
+ tools/arch/riscv/include/asm/csr.h            | 521 ++++++++++++++++++
+ tools/testing/selftests/kvm/Makefile          |  14 +-
+ .../selftests/kvm/aarch64/arch_timer.c        | 291 +---------
+ .../selftests/kvm/aarch64/debug-exceptions.c  |   4 +-
+ .../selftests/kvm/aarch64/page_fault_test.c   |   4 +-
+ .../testing/selftests/kvm/aarch64/vgic_irq.c  |   4 +-
+ tools/testing/selftests/kvm/arch_timer.c      | 250 +++++++++
+ .../selftests/kvm/include/aarch64/processor.h |  12 +-
+ .../selftests/kvm/include/kvm_util_base.h     |   9 +
+ .../selftests/kvm/include/riscv/arch_timer.h  |  80 +++
+ .../selftests/kvm/include/riscv/processor.h   |  63 ++-
+ .../testing/selftests/kvm/include/test_util.h |   2 +
+ .../selftests/kvm/include/timer_test.h        |  43 ++
+ .../selftests/kvm/include/x86_64/processor.h  |   5 -
+ .../selftests/kvm/lib/aarch64/processor.c     |   6 +-
+ .../selftests/kvm/lib/riscv/handlers.S        | 101 ++++
+ .../selftests/kvm/lib/riscv/processor.c       |  86 +++
+ .../selftests/kvm/lib/x86_64/processor.c      |   4 +-
+ .../testing/selftests/kvm/riscv/arch_timer.c  | 107 ++++
+ .../selftests/kvm/riscv/get-reg-list.c        |  16 +-
+ tools/testing/selftests/kvm/x86_64/amx_test.c |   4 +-
+ .../selftests/kvm/x86_64/fix_hypercall_test.c |   4 +-
+ .../selftests/kvm/x86_64/hyperv_evmcs.c       |   4 +-
+ .../selftests/kvm/x86_64/hyperv_features.c    |   8 +-
+ .../testing/selftests/kvm/x86_64/hyperv_ipi.c |   6 +-
+ .../selftests/kvm/x86_64/kvm_pv_test.c        |   4 +-
+ .../selftests/kvm/x86_64/monitor_mwait_test.c |   4 +-
+ .../kvm/x86_64/pmu_event_filter_test.c        |   8 +-
+ .../smaller_maxphyaddr_emulation_test.c       |   4 +-
+ .../selftests/kvm/x86_64/svm_int_ctl_test.c   |   4 +-
+ .../kvm/x86_64/svm_nested_shutdown_test.c     |   4 +-
+ .../kvm/x86_64/svm_nested_soft_inject_test.c  |   4 +-
+ .../kvm/x86_64/ucna_injection_test.c          |   8 +-
+ .../kvm/x86_64/userspace_msr_exit_test.c      |   4 +-
+ .../vmx_exception_with_invalid_guest_state.c  |   4 +-
+ .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  |   4 +-
+ .../selftests/kvm/x86_64/xapic_ipi_test.c     |   4 +-
+ .../selftests/kvm/x86_64/xcr0_cpuid_test.c    |   4 +-
+ .../selftests/kvm/x86_64/xen_shinfo_test.c    |   4 +-
+ 39 files changed, 1338 insertions(+), 374 deletions(-)
+ create mode 100644 tools/arch/riscv/include/asm/csr.h
+ create mode 100644 tools/testing/selftests/kvm/arch_timer.c
+ create mode 100644 tools/testing/selftests/kvm/include/riscv/arch_timer.h
+ create mode 100644 tools/testing/selftests/kvm/include/timer_test.h
+ create mode 100644 tools/testing/selftests/kvm/lib/riscv/handlers.S
+ create mode 100644 tools/testing/selftests/kvm/riscv/arch_timer.c
 
 -- 
-Thanks,
-Oliver
+2.34.1
+
