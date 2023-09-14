@@ -1,134 +1,135 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C840F21A09;
-	Thu, 14 Sep 2023 14:17:24 +0000 (UTC)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.200])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RmfRD5nVkz6D8gq;
-	Thu, 14 Sep 2023 22:12:40 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 14 Sep
- 2023 15:17:21 +0100
-Date: Thu, 14 Sep 2023 15:17:20 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: James Morse <james.morse@arm.com>
-CC: <linux-pm@vger.kernel.org>, <loongarch@lists.linux.dev>,
-	<linux-acpi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-riscv@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<x86@kernel.org>, Salil Mehta <salil.mehta@huawei.com>, Russell King
-	<linux@armlinux.org.uk>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	<jianyong.wu@arm.com>, <justin.he@arm.com>
-Subject: Re: [RFC PATCH v2 20/35] ACPI: Rename acpi_processor_hotadd_init
- and remove pre-processor guards
-Message-ID: <20230914151720.00007105@Huawei.com>
-In-Reply-To: <20230913163823.7880-21-james.morse@arm.com>
-References: <20230913163823.7880-1-james.morse@arm.com>
-	<20230913163823.7880-21-james.morse@arm.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0AE241E7
+	for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 14:19:59 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d8186d705a9so1257611276.3
+        for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 07:19:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1694701199; x=1695305999; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OinN3M2z4I/Qg8aCda0iI1MRdyz332KlEPPYu5muKwI=;
+        b=zY1Nx8B+RKapMj7ED58YGOc3UfzWxOkB/0017tey5dBHw1Nkzt6ASOAfldOMB9DUCO
+         RyCBYA3DJu66RlzZv/BEBewRohLkj32HEfbPjba67ciHvCvJBS9tVwaPs8z7idgbzV69
+         /txB32YniboOpz6p4HuqxOFpayap6fEUx8GXvsOb2y2thKXxIiqhRxpFzALL48l7wtPv
+         Vi2zJA24T19b7eX2DVNGEteoV3dQ5/JTLoiZRbhcOOnvwsJ8Qi7TXp6meoZmUenIJuMo
+         OACWXBCTLLBUbD4PPozis5X1xVOqESQw7lGYPpsxXGLfuGSpNy2+5MrTjVTv/X5mO1Nr
+         dJ6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694701199; x=1695305999;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OinN3M2z4I/Qg8aCda0iI1MRdyz332KlEPPYu5muKwI=;
+        b=dWqN167crGRiiRBn59N1zjC+Rj/V6huP4WWIcsSg6QbuZBI7I7GubpKkiczyPiWeai
+         P7t8KBufEKXSOystWs37Zeaq5nYWY2eOJzBAJRN3Ohcy9W/9KxghPg3JYeinhgzbTxu+
+         0HPgR8+wchx1kzNl108IjRYdckeurEZX1ltgUarIuuk57GAk8d9Gy4N8GUnH3+F7BAmr
+         V3y679vJFxPuv3Tt71p+b0aZig0+D9n7lj65A81S6svxqoNjqMz/EzwABh0AA2sZHDrd
+         a0jbI5ei4zglwhJvVg6WNFNDFWWGuKpIEZA+sBQ25oIqSFX1ujmy8KWpeKE2oiPPF1DR
+         rPnw==
+X-Gm-Message-State: AOJu0YxSLVpgr9LSuVksSDUUU88NiRUZqyy5PKOysv8A/GnNuxpyOaPA
+	QoigY4jpNnmkCVS5QstuKeNbrkBQb5Y=
+X-Google-Smtp-Source: AGHT+IEn69IOl2rxglDVCjXW4KTdScyqCw6tLi48MQpyb+nW1MjRKbjq1lfqPgEextp+IedkDxkiKrdOCXU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:e6c4:0:b0:d78:f45:d7bd with SMTP id
+ d187-20020a25e6c4000000b00d780f45d7bdmr129688ybh.4.1694701199053; Thu, 14 Sep
+ 2023 07:19:59 -0700 (PDT)
+Date: Thu, 14 Sep 2023 07:19:57 -0700
+In-Reply-To: <54d3e6bf-d374-caa5-0920-bb2fe3b7595c@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.227.76]
-X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
-X-CFilter-Loop: Reflected
+Mime-Version: 1.0
+References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-3-seanjc@google.com>
+ <54d3e6bf-d374-caa5-0920-bb2fe3b7595c@linux.intel.com>
+Message-ID: <ZQMWjbt/SzKvag2K@google.com>
+Subject: Re: [RFC PATCH v12 02/33] KVM: Use gfn instead of hva for mmu_notifier_retry
+From: Sean Christopherson <seanjc@google.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, Fuad Tabba <tabba@google.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
+	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Vlastimil Babka <vbabka@suse.cz>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
+	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, 13 Sep 2023 16:38:08 +0000
-James Morse <james.morse@arm.com> wrote:
+On Thu, Sep 14, 2023, Binbin Wu wrote:
+> 
+> On 9/14/2023 9:55 AM, Sean Christopherson wrote:
+> > +void kvm_mmu_invalidate_end(struct kvm *kvm)
+> >   {
+> >   	/*
+> >   	 * This sequence increase will notify the kvm page fault that
+> > @@ -833,6 +848,13 @@ void kvm_mmu_invalidate_end(struct kvm *kvm, unsigned long start,
+> >   	 * in conjunction with the smp_rmb in mmu_invalidate_retry().
+> >   	 */
+> >   	kvm->mmu_invalidate_in_progress--;
+> > +
+> > +	/*
+> > +	 * Assert that at least one range must be added between start() and
+> > +	 * end().  Not adding a range isn't fatal, but it is a KVM bug.
+> > +	 */
+> > +	WARN_ON_ONCE(kvm->mmu_invalidate_in_progress &&
+> > +		     kvm->mmu_invalidate_range_start == INVALID_GPA);
+> Should the check happen before the decrease of kvm->mmu_invalidate_in_progress?
+> Otherwise, KVM calls kvm_mmu_invalidate_begin(), then kvm_mmu_invalidate_end()
+> the check will not take effect.
 
-> acpi_processor_hotadd_init() will make a CPU present by mapping it
-> based on its hardware id.
-> 
-> 'hotadd_init' is ambiguous once there are two different behaviours
-> for cpu hotplug. This is for toggling the _STA present bit. Subsequent
-> patches will add support for toggling the _STA enabled bit, named
-> acpi_processor_make_enabled().
-> 
-> Rename it acpi_processor_make_present() to make it clear this is
-> for CPUs that were not previously present.
-> 
-> Expose the function prototypes it uses to allow the preprocessor
-> guards to be removed. The IS_ENABLED() check will let the compiler
-> dead-code elimination pass remove this if it isn't going to be
-> used.
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> ---
->  drivers/acpi/acpi_processor.c | 14 +++++---------
->  include/linux/acpi.h          |  2 --
->  2 files changed, 5 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.c
-> index 75257fae10e7..22a15a614f95 100644
-> --- a/drivers/acpi/acpi_processor.c
-> +++ b/drivers/acpi/acpi_processor.c
-> @@ -182,13 +182,15 @@ static void __init acpi_pcc_cpufreq_init(void) {}
->  #endif /* CONFIG_X86 */
->  
->  /* Initialization */
-> -#ifdef CONFIG_ACPI_HOTPLUG_PRESENT_CPU
-> -static int acpi_processor_hotadd_init(struct acpi_processor *pr)
-> +static int acpi_processor_make_present(struct acpi_processor *pr)
->  {
->  	unsigned long long sta;
->  	acpi_status status;
->  	int ret;
->  
-> +	if (!IS_ENABLED(CONFIG_ACPI_HOTPLUG_PRESENT_CPU))
-> +		return -ENODEV;
-> +
->  	if (invalid_phys_cpuid(pr->phys_id))
->  		return -ENODEV;
->  
-> @@ -222,12 +224,6 @@ static int acpi_processor_hotadd_init(struct acpi_processor *pr)
->  	cpu_maps_update_done();
->  	return ret;
->  }
-> -#else
-> -static inline int acpi_processor_hotadd_init(struct acpi_processor *pr)
-> -{
-> -	return -ENODEV;
-> -}
-> -#endif /* CONFIG_ACPI_HOTPLUG_PRESENT_CPU */
->  
->  static int acpi_processor_get_info(struct acpi_device *device)
->  {
-> @@ -335,7 +331,7 @@ static int acpi_processor_get_info(struct acpi_device *device)
->  	 *  because cpuid <-> apicid mapping is persistent now.
->  	 */
->  	if (invalid_logical_cpuid(pr->id) || !cpu_present(pr->id)) {
-> -		int ret = acpi_processor_hotadd_init(pr);
-> +		int ret = acpi_processor_make_present(pr);
->  
->  		if (ret)
->  			return ret;
-> diff --git a/include/linux/acpi.h b/include/linux/acpi.h
-> index 651dd43976a9..b7ab85857bb7 100644
-> --- a/include/linux/acpi.h
-> +++ b/include/linux/acpi.h
-> @@ -316,12 +316,10 @@ static inline int acpi_processor_evaluate_cst(acpi_handle handle, u32 cpu,
->  }
->  #endif
->  
-> -#ifdef CONFIG_ACPI_HOTPLUG_PRESENT_CPU
->  /* Arch dependent functions for cpu hotplug support */
->  int acpi_map_cpu(acpi_handle handle, phys_cpuid_t physid, u32 acpi_id,
->  		 int *pcpu);
->  int acpi_unmap_cpu(int cpu);
+Indeed.  I'm pretty sure I added this code, not sure what I was thinking.  There's
+no reason to check mmu_invalidate_in_progress, it's not like KVM allows
+mmu_invalidate_in_progress to go negative.  The comment is also a bit funky.  I'll
+post a fixup patch to make it look like this (assuming I'm not forgetting a subtle
+reason for guarding the check with the in-progress flag):
 
-I've lost track somewhat but I think the definitions of these are still under ifdefs
-which is messy if nothing else and might cause build issues.
+	/*
+	 * Assert that at least one range was added between start() and end().
+	 * Not adding a range isn't fatal, but it is a KVM bug.
+	 */
+	WARN_ON_ONCE(kvm->mmu_invalidate_range_start == INVALID_GPA);
 
-> -#endif /* CONFIG_ACPI_HOTPLUG_PRESENT_CPU */
->  
->  #ifdef CONFIG_ACPI_HOTPLUG_IOAPIC
->  int acpi_get_ioapic_id(acpi_handle handle, u32 gsi_base, u64 *phys_addr);
+Regarding kvm->mmu_invalidate_in_progress, this would be a good opportunity to
+move the BUG_ON() into the common end(), e.g. as is, an end() without a start()
+from something other than the generic mmu_notifier would go unnoticed.  And I
+_think_ we can replace the BUG_ON() with a KVM_BUG_ON() without putting the
+kernel at risk.  E.g.
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index dd948276e5d6..54480655bcce 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -870,6 +870,7 @@ void kvm_mmu_invalidate_end(struct kvm *kvm)
+         * in conjunction with the smp_rmb in mmu_invalidate_retry().
+         */
+        kvm->mmu_invalidate_in_progress--;
++       KVM_BUG_ON(kvm->mmu_invalidate_in_progress < 0, kvm);
+ 
+        /*
+         * Assert that at least one range was added between start() and end().
+@@ -905,8 +906,6 @@ static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
+         */
+        if (wake)
+                rcuwait_wake_up(&kvm->mn_memslots_update_rcuwait);
+-
+-       BUG_ON(kvm->mmu_invalidate_in_progress < 0);
+ }
+ 
+ static int kvm_mmu_notifier_clear_flush_young(struct mmu_notifier *mn,
 
