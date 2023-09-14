@@ -1,99 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA9B28E11
-	for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 14:48:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC38BC433B6;
-	Thu, 14 Sep 2023 14:48:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694702901;
-	bh=elTaVfoRjBAQ+RlyBd8HEpdgL87y4NjXRY4zEkFLP1A=;
-	h=From:To:Cc:Subject:Date:From;
-	b=TW6Bym8Oh7v/18JtJe1Xo1GeJcM/NCNKRtV6UTvMcKZUB53s0atl+kO/tVpcN1OEa
-	 RZQfCpdY5U8mdymgvBzDLhOLwamo1tzsKEgRRj5729G3kSoWTCn1aoJFRzmYu1HgEz
-	 Yz7y6b8ADrybcFFw8o3HQHmNyVEfHwVBUpnGCMCK7c5I6vXOtqXzl5emY80kzglrQ+
-	 MqK7hNnIvL5U/Eltu0Kvj3iU9Dsd25SyKwHNSoWDgNN/rOnoAwAWVF0b0i1MERn1ZA
-	 i200P8K+SLDQTqb/cqpf3Jb1Z8zMUn4WluPdESBbSonmrvzd8yYBoc3BMz93Y96hwB
-	 Etr0lOC2GMj2A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qgndi-00Cx4Y-8z;
-	Thu, 14 Sep 2023 15:48:18 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Ben Horgan <ben.horgan@arm.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.6, take #1
-Date: Thu, 14 Sep 2023 15:48:02 +0100
-Message-Id: <20230914144802.1637804-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CCC2210E9;
+	Thu, 14 Sep 2023 14:55:02 +0000 (UTC)
+Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.207])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RmgMM5jtxz6FGPS;
+	Thu, 14 Sep 2023 22:54:23 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 14 Sep
+ 2023 15:54:59 +0100
+Date: Thu, 14 Sep 2023 15:54:59 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Ard Biesheuvel <ardb@kernel.org>
+CC: James Morse <james.morse@arm.com>, <linux-pm@vger.kernel.org>,
+	<loongarch@lists.linux.dev>, <linux-acpi@vger.kernel.org>,
+	<linux-arch@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <x86@kernel.org>, Salil Mehta
+	<salil.mehta@huawei.com>, Russell King <linux@armlinux.org.uk>, Jean-Philippe
+ Brucker <jean-philippe@linaro.org>, <jianyong.wu@arm.com>,
+	<justin.he@arm.com>
+Subject: Re: [RFC PATCH v2 27/35] ACPICA: Add new MADT GICC flags fields
+ [code first?]
+Message-ID: <20230914155459.00002dba@Huawei.com>
+In-Reply-To: <CAMj1kXHRAt7ecB9p_dm3MjDL5wZkAsVh30hMY2SV_XUe=bm6Vg@mail.gmail.com>
+References: <20230913163823.7880-1-james.morse@arm.com>
+	<20230913163823.7880-28-james.morse@arm.com>
+	<CAMj1kXHRAt7ecB9p_dm3MjDL5wZkAsVh30hMY2SV_XUe=bm6Vg@mail.gmail.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, ben.horgan@arm.com, jean-philippe@linaro.org, m.szyprowski@samsung.com, philmd@linaro.org, vdonnefort@google.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.76]
+X-ClientProxiedBy: lhrpeml500006.china.huawei.com (7.191.161.198) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
+X-CFilter-Loop: Reflected
 
-Paolo,
+On Thu, 14 Sep 2023 09:57:44 +0200
+Ard Biesheuvel <ardb@kernel.org> wrote:
 
-Here's the first set of fixes for 6.6, addressing two regressions: use
-of uninitialised memory as a VA to map the GICv2 CPU interface at EL2
-stage-1, and a SMCCC fix covering the use of the SVE hint.
+> Hello James,
+> 
+> On Wed, 13 Sept 2023 at 18:41, James Morse <james.morse@arm.com> wrote:
+> >
+> > Add the new flag field to the MADT's GICC structure.
+> >
+> > 'Online Capable' indicates a disabled CPU can be enabled later.
+> >  
+> 
+> Why do we need a bit for this? What would be the point of describing
+> disabled CPUs that cannot be enabled (and are you are aware of
+> firmware doing this?).
 
-Please pull.,
+Enabled being not set is common at some similar ACPI tables at least.
 
-	M.
+This is available in most ACPI tables to allow firmware to use 'nearly'
+static tables and just tweak the 'enabled' bit to say if the record should
+be ignored or not. Also _STA not present which is for same trick.
+If you are doing clever dynamic tables, then you can just not present 
+the entry.
 
-The following changes since commit 0bb80ecc33a8fb5a682236443c1e740d5c917d1d:
+With that existing use case in mind, need another bit to say this
+one might one day turn up.  Note this is copied from x86 though no
+one seems to have implemented the kernel support for them yet.
 
-  Linux 6.6-rc1 (2023-09-10 16:28:41 -0700)
+Note as per my other reply - this isn't a code first proposal. It's in the
+spec already (via a code first proposal last year I think).
 
-are available in the Git repository at:
+> 
+> So why are we not able to assume that this new bit can always be treated as '1'?
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.6-1
+Given above, need the extra bit to size stuff to allow for the CPU showing up
+late.
 
-for you to fetch changes up to 373beef00f7d781a000b12c31fb17a5a9c25969c:
 
-  KVM: arm64: nvhe: Ignore SVE hint in SMCCC function ID (2023-09-12 13:07:37 +0100)
+> 
+> 
+> > Signed-off-by: James Morse <james.morse@arm.com>
+> > ---
+> > This patch probably needs to go via the upstream acpica project,
+> > but is included here so the feature can be testd.
+> > ---
+> >  include/acpi/actbl2.h | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/include/acpi/actbl2.h b/include/acpi/actbl2.h
+> > index 3751ae69432f..c433a079d8e1 100644
+> > --- a/include/acpi/actbl2.h
+> > +++ b/include/acpi/actbl2.h
+> > @@ -1046,6 +1046,7 @@ struct acpi_madt_generic_interrupt {
+> >  /* ACPI_MADT_ENABLED                    (1)      Processor is usable if set */
+> >  #define ACPI_MADT_PERFORMANCE_IRQ_MODE  (1<<1) /* 01: Performance Interrupt Mode */
+> >  #define ACPI_MADT_VGIC_IRQ_MODE         (1<<2) /* 02: VGIC Maintenance Interrupt mode */
+> > +#define ACPI_MADT_GICC_CPU_CAPABLE      (1<<3) /* 03: CPU is online capable */
+> >
+> >  /* 12: Generic Distributor (ACPI 5.0 + ACPI 6.0 changes) */
+> >
+> > --
+> > 2.39.2
+> >  
+> 
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> 
 
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.6, take #1
-
-- Fix EL2 Stage-1 MMIO mappings where a random address was used
-
-- Fix SMCCC function number comparison when the SVE hint is set
-
-----------------------------------------------------------------
-Jean-Philippe Brucker (1):
-      KVM: arm64: nvhe: Ignore SVE hint in SMCCC function ID
-
-Marc Zyngier (1):
-      KVM: arm64: Properly return allocated EL2 VA from hyp_alloc_private_va_range()
-
- arch/arm64/include/asm/kvm_hyp.h      | 2 +-
- arch/arm64/kvm/hyp/include/nvhe/ffa.h | 2 +-
- arch/arm64/kvm/hyp/nvhe/ffa.c         | 3 +--
- arch/arm64/kvm/hyp/nvhe/hyp-init.S    | 1 +
- arch/arm64/kvm/hyp/nvhe/hyp-main.c    | 8 ++++++--
- arch/arm64/kvm/hyp/nvhe/psci-relay.c  | 3 +--
- arch/arm64/kvm/mmu.c                  | 3 +++
- include/linux/arm-smccc.h             | 2 ++
- 8 files changed, 16 insertions(+), 8 deletions(-)
