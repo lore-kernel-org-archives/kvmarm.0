@@ -1,183 +1,86 @@
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F4EA7F
-	for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 03:07:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694660844; x=1726196844;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=hQLGmdNELjYMZnPnnmaVF9DnSi0UkgWqzZbEZVq1o/k=;
-  b=FI9x9MO5qnIqKzGBysp95vNBROi36Q7/V4jPiHVcgspt8vmNYz8klgfq
-   3CZCTuGPniIWfha733s4sET13N09B2ekEYh+sY4awVSxC94jcck6ZUU0o
-   S9d4kORNFCh6bcMBDei7xLcde4JADeQgnnUsS1e54AGIKaa5vuTDHEt2L
-   3fH2BsYqqbttb3R7bJSv8KXbXXfYf/tQJhhzyhvMCrYlRxmskLtX0y4qo
-   H0sIU19QQE5d6TU2NQQZ6aZzan5ZAO9tvN5SuMqZDk5oEKjKMEXbyuE5u
-   bfYod9APQN2sBs4JcveKa0dTedprBke5YUFwLSIwO4LJ+YFABiOKtdTuL
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="382644879"
-X-IronPort-AV: E=Sophos;i="6.02,144,1688454000"; 
-   d="scan'208";a="382644879"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 20:07:23 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="747565104"
-X-IronPort-AV: E=Sophos;i="6.02,144,1688454000"; 
-   d="scan'208";a="747565104"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.8.84]) ([10.238.8.84])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 20:07:14 -0700
-Message-ID: <54d3e6bf-d374-caa5-0920-bb2fe3b7595c@linux.intel.com>
-Date: Thu, 14 Sep 2023 11:07:12 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE9B79D3;
+	Thu, 14 Sep 2023 07:57:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 302AEC433C7;
+	Thu, 14 Sep 2023 07:57:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694678278;
+	bh=w97jgCxmnIaSV+4bbnSk1R7YKOaENxmwU85CS3tNcPo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=ZhVxi3ng0SyBcUTeBMQePKCqcaLd8ethtP02v1fL+sfnyUaoKqHkq9ju2Mb2DzGmx
+	 12cPbr6KS37U3XQdfYDg39fefRxRGPkNAt0JcrqNuLoRrMOChzJNI4I+30xyF/Z+DO
+	 9uUgJtnDdJgF7nEXzChIzKYS5cn58Peg6JMWClVEEmyT8kN2TvcDY5+cWznkmtlWEO
+	 c1HUPT6VfSprEw7p42m6MzIVjlX2UkH0Kd4+Pu+jggh68f29rTsOMA5jm7wh31KLCT
+	 cO/FDvorrtEl5TBHSc2NBxToKVfMI9e/jz1tApeqdW/ft0iWrkGBooY5qJ9zwbp4IC
+	 8ehDh8M7Vy3CQ==
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2bcbfb3705dso9666681fa.1;
+        Thu, 14 Sep 2023 00:57:58 -0700 (PDT)
+X-Gm-Message-State: AOJu0YzMCYufo3ElkVa9jOqnmIB1YNNRxVDCC1ifxKDib7n8TkXZqMwJ
+	65Wsm89ynnYuGO57Ut8uKSOC2duO9aSSkoQnXPU=
+X-Google-Smtp-Source: AGHT+IFuQtEiIDjo1DdCQY9KR6JQVDNyxLjSiMxhcLunotHqZWQic/fNmbjkP5sAIxtK7RWx3KWbiGw4//GC4psRyfI=
+X-Received: by 2002:a2e:a172:0:b0:2bc:db70:b563 with SMTP id
+ u18-20020a2ea172000000b002bcdb70b563mr4235801ljl.32.1694678276384; Thu, 14
+ Sep 2023 00:57:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [RFC PATCH v12 02/33] KVM: Use gfn instead of hva for
- mmu_notifier_retry
-To: Sean Christopherson <seanjc@google.com>,
- Chao Peng <chao.p.peng@linux.intel.com>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linux-security-module@vger.kernel.org,
- linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
- Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Andrew Morton <akpm@linux-foundation.org>, Paul Moore <paul@paul-moore.com>,
- James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
- Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
- Anish Moorthy <amoorthy@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>, Xu Yilun <yilun.xu@intel.com>,
- Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>,
- Ackerley Tng <ackerleytng@google.com>,
- Maciej Szmigiero <mail@maciej.szmigiero.name>,
- David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
- Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
- Liam Merwick <liam.merwick@oracle.com>,
- Isaku Yamahata <isaku.yamahata@gmail.com>,
- "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20230914015531.1419405-1-seanjc@google.com>
- <20230914015531.1419405-3-seanjc@google.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20230914015531.1419405-3-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20230913163823.7880-1-james.morse@arm.com> <20230913163823.7880-28-james.morse@arm.com>
+In-Reply-To: <20230913163823.7880-28-james.morse@arm.com>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Thu, 14 Sep 2023 09:57:44 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXHRAt7ecB9p_dm3MjDL5wZkAsVh30hMY2SV_XUe=bm6Vg@mail.gmail.com>
+Message-ID: <CAMj1kXHRAt7ecB9p_dm3MjDL5wZkAsVh30hMY2SV_XUe=bm6Vg@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 27/35] ACPICA: Add new MADT GICC flags fields [code first?]
+To: James Morse <james.morse@arm.com>
+Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev, x86@kernel.org, 
+	Salil Mehta <salil.mehta@huawei.com>, Russell King <linux@armlinux.org.uk>, 
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, jianyong.wu@arm.com, justin.he@arm.com
+Content-Type: text/plain; charset="UTF-8"
+
+Hello James,
+
+On Wed, 13 Sept 2023 at 18:41, James Morse <james.morse@arm.com> wrote:
+>
+> Add the new flag field to the MADT's GICC structure.
+>
+> 'Online Capable' indicates a disabled CPU can be enabled later.
+>
+
+Why do we need a bit for this? What would be the point of describing
+disabled CPUs that cannot be enabled (and are you are aware of
+firmware doing this?).
+
+So why are we not able to assume that this new bit can always be treated as '1'?
 
 
-
-On 9/14/2023 9:55 AM, Sean Christopherson wrote:
-> From: Chao Peng <chao.p.peng@linux.intel.com>
->
-> Currently in mmu_notifier invalidate path, hva range is recorded and
-> then checked against by mmu_notifier_retry_hva() in the page fault
-> handling path. However, for the to be introduced private memory, a page
-> fault may not have a hva associated, checking gfn(gpa) makes more sense.
->
-> For existing hva based shared memory, gfn is expected to also work. The
-> only downside is when aliasing multiple gfns to a single hva, the
-> current algorithm of checking multiple ranges could result in a much
-> larger range being rejected. Such aliasing should be uncommon, so the
-> impact is expected small.
->
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> Reviewed-by: Fuad Tabba <tabba@google.com>
-> Tested-by: Fuad Tabba <tabba@google.com>
-> [sean: convert vmx_set_apic_access_page_addr() to gfn-based API]
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: James Morse <james.morse@arm.com>
 > ---
->   arch/x86/kvm/mmu/mmu.c   | 10 ++++++----
->   arch/x86/kvm/vmx/vmx.c   | 11 +++++------
->   include/linux/kvm_host.h | 33 +++++++++++++++++++++------------
->   virt/kvm/kvm_main.c      | 40 +++++++++++++++++++++++++++++++---------
->   4 files changed, 63 insertions(+), 31 deletions(-)
+> This patch probably needs to go via the upstream acpica project,
+> but is included here so the feature can be testd.
+> ---
+>  include/acpi/actbl2.h | 1 +
+>  1 file changed, 1 insertion(+)
 >
-[...]
->   
-> -void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
-> -			      unsigned long end)
-> +void kvm_mmu_invalidate_begin(struct kvm *kvm)
->   {
-> +	lockdep_assert_held_write(&kvm->mmu_lock);
->   	/*
->   	 * The count increase must become visible at unlock time as no
->   	 * spte can be established without taking the mmu_lock and
->   	 * count is also read inside the mmu_lock critical section.
->   	 */
->   	kvm->mmu_invalidate_in_progress++;
-> +
-> +	if (likely(kvm->mmu_invalidate_in_progress == 1))
-> +		kvm->mmu_invalidate_range_start = INVALID_GPA;
-> +}
-> +
-> +void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end)
-> +{
-> +	lockdep_assert_held_write(&kvm->mmu_lock);
-> +
-> +	WARN_ON_ONCE(!kvm->mmu_invalidate_in_progress);
-> +
->   	if (likely(kvm->mmu_invalidate_in_progress == 1)) {
->   		kvm->mmu_invalidate_range_start = start;
->   		kvm->mmu_invalidate_range_end = end;
-> @@ -771,6 +781,12 @@ void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
->   	}
->   }
->   
-> +static bool kvm_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
-> +{
-> +	kvm_mmu_invalidate_range_add(kvm, range->start, range->end);
-> +	return kvm_unmap_gfn_range(kvm, range);
-> +}
-> +
->   static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
->   					const struct mmu_notifier_range *range)
->   {
-> @@ -778,7 +794,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
->   	const struct kvm_mmu_notifier_range hva_range = {
->   		.start		= range->start,
->   		.end		= range->end,
-> -		.handler	= kvm_unmap_gfn_range,
-> +		.handler	= kvm_mmu_unmap_gfn_range,
->   		.on_lock	= kvm_mmu_invalidate_begin,
->   		.on_unlock	= kvm_arch_guest_memory_reclaimed,
->   		.flush_on_ret	= true,
-> @@ -817,8 +833,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
->   	return 0;
->   }
->   
-> -void kvm_mmu_invalidate_end(struct kvm *kvm, unsigned long start,
-> -			    unsigned long end)
-> +void kvm_mmu_invalidate_end(struct kvm *kvm)
->   {
->   	/*
->   	 * This sequence increase will notify the kvm page fault that
-> @@ -833,6 +848,13 @@ void kvm_mmu_invalidate_end(struct kvm *kvm, unsigned long start,
->   	 * in conjunction with the smp_rmb in mmu_invalidate_retry().
->   	 */
->   	kvm->mmu_invalidate_in_progress--;
-> +
-> +	/*
-> +	 * Assert that at least one range must be added between start() and
-> +	 * end().  Not adding a range isn't fatal, but it is a KVM bug.
-> +	 */
-> +	WARN_ON_ONCE(kvm->mmu_invalidate_in_progress &&
-> +		     kvm->mmu_invalidate_range_start == INVALID_GPA);
-Should the check happen before the decrease of 
-kvm->mmu_invalidate_in_progress?
-Otherwise, KVM calls kvm_mmu_invalidate_begin(), then 
-kvm_mmu_invalidate_end()
-the check will not take effect.
-
->   }
->   
->   static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
-
+> diff --git a/include/acpi/actbl2.h b/include/acpi/actbl2.h
+> index 3751ae69432f..c433a079d8e1 100644
+> --- a/include/acpi/actbl2.h
+> +++ b/include/acpi/actbl2.h
+> @@ -1046,6 +1046,7 @@ struct acpi_madt_generic_interrupt {
+>  /* ACPI_MADT_ENABLED                    (1)      Processor is usable if set */
+>  #define ACPI_MADT_PERFORMANCE_IRQ_MODE  (1<<1) /* 01: Performance Interrupt Mode */
+>  #define ACPI_MADT_VGIC_IRQ_MODE         (1<<2) /* 02: VGIC Maintenance Interrupt mode */
+> +#define ACPI_MADT_GICC_CPU_CAPABLE      (1<<3) /* 03: CPU is online capable */
+>
+>  /* 12: Generic Distributor (ACPI 5.0 + ACPI 6.0 changes) */
+>
+> --
+> 2.39.2
+>
