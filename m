@@ -1,103 +1,78 @@
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE175224CC
-	for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 09:54:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1694685242; x=1726221242;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=zsiz6QuHidta1MZIjKdX2IK5RrYiU1OXGZGUU7TjwBM=;
-  b=AB1x+L2gRt5j7IIKZEohaa5yS+mlKJ63CJmB+24xzDBr1c6hOSXmnkRO
-   4AnkJOtmlbUJryDjnxp/kjptUj/7BkS/FGS0f4DyYNcaTNkNSBGQTwrf4
-   5iJ8rQVt0jXraLxPwziVIF563AubyoSyFNNIv4ywe1lTDELvsoHBx76oG
-   nbXugq6TtRWf0UU7XeseEYa/IvoktsQO3k32PNR25YxgelTmMCXZVs76/
-   mIIjMnTX5KBC1ohLf9wRf4nHCCH7dGbeVS2dQf/U/N6CIbv5ureWXYEsn
-   VEPsnBqfZMSWL/78l9I2Az7iNiufr3KQWf8zsWwJa6vudVVBe+5+J6WNk
-   w==;
-X-CSE-ConnectionGUID: jCeTh2jUTiuWpEOHIgZ08A==
-X-CSE-MsgGUID: UY8Fpe7jT9qj55hJGpC4ZQ==
-X-ThreatScanner-Verdict: Negative
-X-IronPort-AV: E=Sophos;i="6.02,145,1688454000"; 
-   d="asc'?scan'208";a="4801598"
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Sep 2023 02:52:53 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Thu, 14 Sep 2023 02:52:36 -0700
-Received: from wendy (10.10.85.11) by chn-vm-ex03.mchp-main.com (10.10.85.151)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21 via Frontend
- Transport; Thu, 14 Sep 2023 02:52:31 -0700
-Date: Thu, 14 Sep 2023 10:52:15 +0100
-From: Conor Dooley <conor.dooley@microchip.com>
-To: Andrew Jones <ajones@ventanamicro.com>
-CC: Haibo Xu <haibo1.xu@intel.com>, <xiaobo55x@gmail.com>, Paul Walmsley
-	<paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
-	<aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan
-	<shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton
-	<oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, Suzuki K Poulose
-	<suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Anup Patel
-	<anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, Sean
- Christopherson <seanjc@google.com>, Ricardo Koller <ricarkol@google.com>,
-	Vishal Annapurve <vannapurve@google.com>, Vitaly Kuznetsov
-	<vkuznets@redhat.com>, Vipin Sharma <vipinsh@google.com>, David Matlack
-	<dmatlack@google.com>, Colton Lewis <coltonlewis@google.com>, Aaron Lewis
-	<aaronlewis@google.com>, Thomas Huth <thuth@redhat.com>,
-	<linux-kernel@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
-	<kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<kvm-riscv@lists.infradead.org>
-Subject: Re: [PATCH v3 9/9] KVM: riscv: selftests: Add sstc timer test
-Message-ID: <20230914-reflector-preshow-786425ad7ae2@wendy>
-References: <cover.1694421911.git.haibo1.xu@intel.com>
- <64e0637cd6f22dd7557ed44bd2242001e7830d1c.1694421911.git.haibo1.xu@intel.com>
- <20230914-ee133dd5e804282ce28833d6@orel>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7CB420B3E
+	for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 09:56:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=nP1pXEvfpRxVMRlVL6GZ7KmnP0/koUCsxjP2bUE3Dxs=; b=QZN1Uv6McwaU/rZKUdGG+Y8SPi
+	B7dnxNB7rM/FkA9uhd63tATvdH6mrqT6waXq7aOUCocqJjW2XSorFVS04zOfhFgKbmRXAGOk7vnIB
+	NO9BnLrIGOkMT+hbqOg4lH3DBGFYGMiycW0wWo2D92yyBUaiXSPF+bkNUMCt2e/XPLlZuAx5q1LAn
+	BBoybYriHPVqqXfM38rdRmxfE1JXJzNhK55UdWpTQnpQeogylo394JV6RPh5eTElanDlyddNiVKkP
+	KS/2YVx5DItjEt1IbDBbx3X7N9CacN8OVAJD3QidDGfzAZSsQl6mCsnCrYoq+4ODxRpFm8VZxux05
+	wi7tKYNQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57224)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qgj4z-0003pl-34;
+	Thu, 14 Sep 2023 10:56:09 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qgj50-0004eo-LY; Thu, 14 Sep 2023 10:56:10 +0100
+Date: Thu, 14 Sep 2023 10:56:10 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: James Morse <james.morse@arm.com>
+Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
+	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
+	x86@kernel.org, Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	jianyong.wu@arm.com, justin.he@arm.com
+Subject: Re: [RFC PATCH v2 06/35] arm64: setup: Switch over to
+ GENERIC_CPU_DEVICES using arch_register_cpu()
+Message-ID: <ZQLYuo0J1WWunb5R@shell.armlinux.org.uk>
+References: <20230913163823.7880-1-james.morse@arm.com>
+ <20230913163823.7880-7-james.morse@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="QNGDKlO9qNzaNQl+"
-Content-Disposition: inline
-In-Reply-To: <20230914-ee133dd5e804282ce28833d6@orel>
-
---QNGDKlO9qNzaNQl+
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20230913163823.7880-7-james.morse@arm.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Sep 14, 2023 at 11:36:01AM +0200, Andrew Jones wrote:
-> > +static inline void cpu_relax(void)
-> > +{
-> > +#ifdef __riscv_zihintpause
-> > +	asm volatile("pause" ::: "memory");
-> > +#else
-> > +	/* Encoding of the pause instruction */
-> > +	asm volatile(".4byte 0x100000F" ::: "memory");
-> > +#endif
-> > +}
->=20
-> cpu_relax() should go to include/riscv/processor.h
+On Wed, Sep 13, 2023 at 04:37:54PM +0000, James Morse wrote:
+> To allow ACPI's _STA value to hide CPUs that are present, but not
+> available to online right now due to VMM or firmware policy, the
+> register_cpu() call needs to be made by the ACPI machinery when ACPI
+> is in use. This allows it to hide CPUs that are unavailable from sysfs.
+> 
+> Switching to GENERIC_CPU_DEVICES is an intermediate step to allow all
+> five ACPI architectures to be modified at once.
+> 
+> Switch over to GENERIC_CPU_DEVICES, and provide an arch_register_cpu()
+> that populates the hotpluggable flag. arch_register_cpu() is also the
+> interface the ACPI machinery expects.
+> 
+> The struct cpu in struct cpuinfo_arm64 is never used directly, remove
+> it to use the one GENERIC_CPU_DEVICES provides.
+> 
+> This changes the CPUs visible in sysfs from possible to present, but
+> on arm64 smp_prepare_cpus() ensures these are the same.
+> 
+> Signed-off-by: James Morse <james.morse@arm.com>
 
-Can the one from asm/vdso/processor.h be reused, or are there special
-considerations preventing that?
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
---QNGDKlO9qNzaNQl+
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZQLXzgAKCRB4tDGHoIJi
-0jRlAP0UeFru9d2hDB+V95CsBHvHieORe8d/jeHJTK7NMGIDgwD8Dqdge5VTTSyn
-ljeYudKmUM0GDQOhOOq8DQG3G+sO5gM=
-=uzJX
------END PGP SIGNATURE-----
-
---QNGDKlO9qNzaNQl+--
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
