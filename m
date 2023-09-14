@@ -1,78 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B972B3C1
-	for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 10:32:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE97BC433C7;
-	Thu, 14 Sep 2023 10:32:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694687537;
-	bh=HWuwnMWwmoy6y7laW8KuI+FiHflIOtHqs/4Y7u4IyRY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Vt5N4LvG5mD+1xGzst1aDJ4tbntqF3o5GfmCS2r+ZXx0DW6ZYmygEFJMddzXLu7x0
-	 zqHabs+cbjvebiTmOWGujwGmfGDjL8lIxWDUUuXybrBzBwi/tsyh8iwSdYugHjqoer
-	 6TH84ietbmQGqsSOPZqIV06BGUFmDyrlYbLsROp1MKApKYcNm4yqQ4QrOkwKXvCo0d
-	 0xFnyfYeI5RbjQO737blVUnSZpeCWiknG7bR9bHa0cZpcDwY6l7r2460Jas1sjO8oi
-	 a9dNtbKbWKASHlI9rJ2lap/sa70puBAIyR2ecZMcR1pKMwnTBQYsg3DoCy1/biGzRo
-	 /mTE9uxV8ClBg==
-Date: Thu, 14 Sep 2023 11:32:12 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Only default to enabling SVE when present
-Message-ID: <d090e3db-ebed-4cc8-a1f8-a2c15f8a39b1@sirena.org.uk>
-References: <20230913-kvm-arm64-fp-init-v1-1-8ce9ba1cc4c4@kernel.org>
- <ZQJODdfwZLxc9o1l@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98D02208B4;
+	Thu, 14 Sep 2023 10:56:19 +0000 (UTC)
+Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.200])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RmZ3v01jqz6K5v5;
+	Thu, 14 Sep 2023 18:55:38 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 14 Sep
+ 2023 11:56:14 +0100
+Date: Thu, 14 Sep 2023 11:56:13 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+CC: James Morse <james.morse@arm.com>, <linux-pm@vger.kernel.org>,
+	<loongarch@lists.linux.dev>, <linux-acpi@vger.kernel.org>,
+	<linux-arch@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <x86@kernel.org>, Salil Mehta
+	<salil.mehta@huawei.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	<jianyong.wu@arm.com>, <justin.he@arm.com>
+Subject: Re: [RFC PATCH v2 02/35] drivers: base: Use present CPUs in
+ GENERIC_CPU_DEVICES
+Message-ID: <20230914115613.0000778e@Huawei.com>
+In-Reply-To: <ZQLCZsw+ZGbTM8oK@shell.armlinux.org.uk>
+References: <20230913163823.7880-1-james.morse@arm.com>
+	<20230913163823.7880-3-james.morse@arm.com>
+	<ZQLCZsw+ZGbTM8oK@shell.armlinux.org.uk>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="z0nQ7h2X83FBCQV9"
-Content-Disposition: inline
-In-Reply-To: <ZQJODdfwZLxc9o1l@linux.dev>
-X-Cookie: Do clones have navels?
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.76]
+X-ClientProxiedBy: lhrpeml100004.china.huawei.com (7.191.162.219) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
+X-CFilter-Loop: Reflected
 
+On Thu, 14 Sep 2023 09:20:54 +0100
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
 
---z0nQ7h2X83FBCQV9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> On Wed, Sep 13, 2023 at 04:37:50PM +0000, James Morse wrote:
+> > Three of the five ACPI architectures create sysfs entries using
+> > register_cpu() for present CPUs, whereas arm64, riscv and all
+> > GENERIC_CPU_DEVICES do this for possible CPUs.
+> > 
+> > Registering a CPU is what causes them to show up in sysfs.
+> > 
+> > It makes very little sense to register all possible CPUs. Registering
+> > a CPU is what triggers the udev notifications allowing user-space to
+> > react to newly added CPUs.
+> > 
+> > To allow all five ACPI architectures to use GENERIC_CPU_DEVICES, change
+> > it to use for_each_present_cpu(). Making the ACPI architectures use
+> > GENERIC_CPU_DEVICES is a pre-requisite step to centralise their
+> > cpu_register() logic, before moving it into the ACPI processor driver.
+> > When ACPI is disabled this work would be done by
+> > cpu_dev_register_generic().
+> > 
+> > Of the ACPI architectures that register possible CPUs, arm64 and riscv
+> > do not support making possible CPUs present as they use the weak 'always
+> > fails' version of arch_register_cpu().
+> > 
+> > Only two of the eight architectures that use GENERIC_CPU_DEVICES have a
+> > distinction between present and possible CPUs.
+> > 
+> > The following architectures use GENERIC_CPU_DEVICES but are not SMP,
+> > so possible == present:
+> >  * m68k
+> >  * microblaze
+> >  * nios2
+> > 
+> > The following architectures use GENERIC_CPU_DEVICES and consider
+> > possible == present:
+> >  * csky: setup_smp()
+> >  * parisc: smp_prepare_boot_cpu() marks the boot cpu as present,
+> >    processor_probe() sets possible for all CPUs and present for all CPUs
+> >    except the boot cpu.  
+> 
+> However, init/main.c::start_kernel() calls boot_cpu_init() which sets
+> the boot CPU in the online, active, present and possible masks. So,
+> _every_ architecture gets the boot CPU in all these masks no matter
+> what.
+> 
+> Only of something then clears the boot CPU from these masks (which
+> would be silly) would the boot CPU not be in all of these masks.
+Hi Russel,
 
-On Thu, Sep 14, 2023 at 12:04:29AM +0000, Oliver Upton wrote:
-> On Wed, Sep 13, 2023 at 07:34:16PM +0100, Mark Brown wrote:
+Upshot is that the code in parisc smp_prepare_boot_cpu() can be dropped?
+Seems like another useful simplification to add to front of this series.
+The function will end up with just a print then. 
+Seems there are lots of other empty implementations of smp_prepare_boot_cpu()
+maybe worth making that optional whilst here and dropping all the empty ones?
 
-> > -		if (!vcpu_has_sve(vcpu) ||
-> > -		    (vcpu->arch.fp_state != FP_STATE_GUEST_OWNED))
-> > +		if (cpus_have_final_cap(ARM64_SVE) &&
-> > +		    (!vcpu_has_sve(vcpu) ||
-> > +		     (vcpu->arch.fp_state != FP_STATE_GUEST_OWNED)))
+There seem to be some other architectures setting at least some of the cpu masks
+that could perhaps be tidied up a little via same logic?
 
-> vcpu_has_sve() already tests system_supports_sve(), so I don't believe
-> this hunk is necessary.
+Jonathan
 
-That'll mean that the first branch of the || should always return true
-on systems without SVE so we'll set CPTR_EL2_TZ, and there's also the
-check for guest ownership as well.
+> 
 
---z0nQ7h2X83FBCQV9
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmUC4SsACgkQJNaLcl1U
-h9CFOQf/QechB02CRL9EgDHH6cg1JKq0BnYtRhWUwz4dRh8P9+AOR9+EGb+HsFXO
-fEDX/KBk6rjyAQxOdW4h9Xeiz3FwDwzqp5bByWlQqCBahox0Hu9tVq2B592IhzOm
-Iskr9i0ysKw/oJ40YgBYB2dMuAEoS3kCk3rLGhzog4N59jzt3l/NkKt4SHkhjwtE
-83pIAzF+TGu2g2fzMaDRYdGyA/RobSDnxGyLrDvSRyq4PVHIAzHWhS2+e5yoNid7
-tNeo65Rxjumu3e8DdGhQarWfW9Rb51cWFIGEw3SqYn73DdnV7DBxMSVPaq1McW3n
-cz1MP4Y8H+8mm+6rOtv5S4/SzzfEyQ==
-=Ph8R
------END PGP SIGNATURE-----
-
---z0nQ7h2X83FBCQV9--
