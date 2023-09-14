@@ -1,107 +1,125 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7710728E32;
-	Thu, 14 Sep 2023 15:02:27 +0000 (UTC)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.200])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RmgWw1VMVz6K5sT;
-	Thu, 14 Sep 2023 23:01:48 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 14 Sep
- 2023 16:02:24 +0100
-Date: Thu, 14 Sep 2023 16:02:23 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: James Morse <james.morse@arm.com>
-CC: <linux-pm@vger.kernel.org>, <loongarch@lists.linux.dev>,
-	<linux-acpi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-riscv@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<x86@kernel.org>, Salil Mehta <salil.mehta@huawei.com>, Russell King
-	<linux@armlinux.org.uk>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	<jianyong.wu@arm.com>, <justin.he@arm.com>
-Subject: Re: [RFC PATCH v2 29/35] irqchip/gic-v3: Don't return errors from
- gic_acpi_match_gicc()
-Message-ID: <20230914160223.0000782f@Huawei.com>
-In-Reply-To: <20230913163823.7880-30-james.morse@arm.com>
-References: <20230913163823.7880-1-james.morse@arm.com>
-	<20230913163823.7880-30-james.morse@arm.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C20FD28E32
+	for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 15:07:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1694704020;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6SQ8P9dIo86mGdYMXEQK4IXZZmN0xP5iEUDVuGzb4As=;
+	b=FsZ/NwkgMDrKBG7mK43Lnww0Dcf7BWAEGCcjNJt3wC79eeCehnWN8UjmhQXyhSoxYC+Eau
+	RHXNYIGRKUNdDueyiaZxl3hgsk3go/EvPl/hZU7RIpvgDmIE16yF+l58eVE+fIPVMFtd1p
+	rdg4hX4qrhOfctiJOqvovzeDzS10Dsw=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-215-wedAhwoMNmyyHvx_SNYzaA-1; Thu, 14 Sep 2023 11:06:57 -0400
+X-MC-Unique: wedAhwoMNmyyHvx_SNYzaA-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-76efd8bf515so155853285a.1
+        for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 08:06:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694704017; x=1695308817;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6SQ8P9dIo86mGdYMXEQK4IXZZmN0xP5iEUDVuGzb4As=;
+        b=BsSq/iYhqcdJGXdWileE2DAAkAd5pnVEmN6zNPvQ3tfR4N5S5ByJIjpFJEvTE/PoAx
+         kMzLIWdkBbwgAT2WbLHZhtWeixJ3/i0Ep8mEd27Ywu0UN/JsmMSlEoTM+Hp9mjD6yNnR
+         zRRaXbJioAz0tE9sQ+T3WGMqOFZLSmQtzzQBZAMTJ3Fd6JyKGmnPzixcEt7XUbDYxbIf
+         IUt5TlclDrah/TxN09lRRmj4HpEGkvJKSdxfG+iUxlUI5W+izLkZF3xmOJGlBamMfEix
+         WVsiUDnxHKu4pMTYE6Xewtb+aCHquqyqnod1WSijem2PSouLj81aDAK3NElv/Hvb2ugJ
+         SqDw==
+X-Gm-Message-State: AOJu0YwjVd9WQxRU2NLwu1lm3WOE6kty4fo8U23VpZ36k9gzAgwYE26T
+	LYfJkWUwHzIQByslJTgWP27xKXWHRAyt+Qwn1cmHlb7xPYk6BTQMFIv0XvhHVcTvnRB87Td6sqQ
+	PumXOGiiG7dKuBxWnVQzNmi/5LeMjWENW
+X-Received: by 2002:a05:620a:394c:b0:76e:f7f3:723e with SMTP id qs12-20020a05620a394c00b0076ef7f3723emr2511744qkn.38.1694704016760;
+        Thu, 14 Sep 2023 08:06:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGr5GWcNmJQqe0VBfr6DB/4guT1vGO8AReywmKm2vd5XigC6NeS7B46k887wY3VGiqerPvT3lVSVi0vWsHoqlY=
+X-Received: by 2002:a05:620a:394c:b0:76e:f7f3:723e with SMTP id
+ qs12-20020a05620a394c00b0076ef7f3723emr2511720qkn.38.1694704016470; Thu, 14
+ Sep 2023 08:06:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.227.76]
-X-ClientProxiedBy: lhrpeml500006.china.huawei.com (7.191.161.198) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
-X-CFilter-Loop: Reflected
+References: <20230914144802.1637804-1-maz@kernel.org>
+In-Reply-To: <20230914144802.1637804-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 14 Sep 2023 17:06:43 +0200
+Message-ID: <CABgObfarGB50ZCUdLWLeTGFV+7Z8iriv1B61KaTX-1RnXRtJ7A@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.6, take #1
+To: Marc Zyngier <maz@kernel.org>
+Cc: Ben Horgan <ben.horgan@arm.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
+	Vincent Donnefort <vdonnefort@google.com>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 13 Sep 2023 16:38:17 +0000
-James Morse <james.morse@arm.com> wrote:
+On Thu, Sep 14, 2023 at 4:48=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> Paolo,
+>
+> Here's the first set of fixes for 6.6, addressing two regressions: use
+> of uninitialised memory as a VA to map the GICv2 CPU interface at EL2
+> stage-1, and a SMCCC fix covering the use of the SVE hint.
+>
+> Please pull.,
 
-> gic_acpi_match_gicc() is only called via gic_acpi_count_gicr_regions().
-> It should only count the number of enabled redistributors, but it
-> also tries to sanity check the GICC entry, currently returning an
-> error if the Enabled bit is set, but the gicr_base_address is zero.
-> 
-> Adding support for the online-capable bit to the sanity check
-> complicates it, for no benefit. The existing check implicitly
-> depends on gic_acpi_count_gicr_regions() previous failing to find
-> any GICR regions (as it is valid to have gicr_base_address of zero if
-> the redistributors are described via a GICR entry).
-> 
-> Instead of complicating the check, remove it. Failures that happen
-> at this point cause the irqchip not to register, meaning no irqs
-> can be requested. The kernel grinds to a panic() pretty quickly.
-> 
-> Without the check, MADT tables that exhibit this problem are still
-> caught by gic_populate_rdist(), which helpfully also prints what
-> went wrong:
-> | CPU4: mpidr 100 has no re-distributor!
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> ---
->  drivers/irqchip/irq-gic-v3.c | 18 ++++++------------
->  1 file changed, 6 insertions(+), 12 deletions(-)
-> 
-> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-> index 72d3cdebdad1..0f54811262eb 100644
-> --- a/drivers/irqchip/irq-gic-v3.c
-> +++ b/drivers/irqchip/irq-gic-v3.c
-> @@ -2415,21 +2415,15 @@ static int __init gic_acpi_match_gicc(union acpi_subtable_headers *header,
->  
->  	/*
->  	 * If GICC is enabled and has valid gicr base address, then it means
-> -	 * GICR base is presented via GICC
-> +	 * GICR base is presented via GICC. The redistributor is only known to
-> +	 * be accessible if the GICC is marked as enabled. If this bit is not
-> +	 * set, we'd need to add the redistributor at runtime, which isn't
-> +	 * supported.
->  	 */
-> -	if (acpi_gicc_is_usable(gicc) && gicc->gicr_base_address) {
-> +	if (gicc->flags & ACPI_MADT_ENABLED && gicc->gicr_base_address)
+Done, thanks.
 
-Going in circles...
+Paolo
 
->  		acpi_data.enabled_rdists++;
-> -		return 0;
-> -	}
->  
-> -	/*
-> -	 * It's perfectly valid firmware can pass disabled GICC entry, driver
-> -	 * should not treat as errors, skip the entry instead of probe fail.
-> -	 */
-> -	if (!acpi_gicc_is_usable(gicc))
-> -		return 0;
-> -
-> -	return -ENODEV;
-> +	return 0;
->  }
->  
->  static int __init gic_acpi_count_gicr_regions(void)
+>         M.
+>
+> The following changes since commit 0bb80ecc33a8fb5a682236443c1e740d5c917d=
+1d:
+>
+>   Linux 6.6-rc1 (2023-09-10 16:28:41 -0700)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
+marm-fixes-6.6-1
+>
+> for you to fetch changes up to 373beef00f7d781a000b12c31fb17a5a9c25969c:
+>
+>   KVM: arm64: nvhe: Ignore SVE hint in SMCCC function ID (2023-09-12 13:0=
+7:37 +0100)
+>
+> ----------------------------------------------------------------
+> KVM/arm64 fixes for 6.6, take #1
+>
+> - Fix EL2 Stage-1 MMIO mappings where a random address was used
+>
+> - Fix SMCCC function number comparison when the SVE hint is set
+>
+> ----------------------------------------------------------------
+> Jean-Philippe Brucker (1):
+>       KVM: arm64: nvhe: Ignore SVE hint in SMCCC function ID
+>
+> Marc Zyngier (1):
+>       KVM: arm64: Properly return allocated EL2 VA from hyp_alloc_private=
+_va_range()
+>
+>  arch/arm64/include/asm/kvm_hyp.h      | 2 +-
+>  arch/arm64/kvm/hyp/include/nvhe/ffa.h | 2 +-
+>  arch/arm64/kvm/hyp/nvhe/ffa.c         | 3 +--
+>  arch/arm64/kvm/hyp/nvhe/hyp-init.S    | 1 +
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c    | 8 ++++++--
+>  arch/arm64/kvm/hyp/nvhe/psci-relay.c  | 3 +--
+>  arch/arm64/kvm/mmu.c                  | 3 +++
+>  include/linux/arm-smccc.h             | 2 ++
+>  8 files changed, 16 insertions(+), 8 deletions(-)
+>
 
