@@ -1,50 +1,54 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A55617C7
-	for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 01:55:36 +0000 (UTC)
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1bf681d3d04so3893055ad.2
-        for <kvmarm@lists.linux.dev>; Wed, 13 Sep 2023 18:55:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8FE317C7
+	for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 01:55:38 +0000 (UTC)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1c395534687so3970275ad.1
+        for <kvmarm@lists.linux.dev>; Wed, 13 Sep 2023 18:55:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694656535; x=1695261335; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bJKy84XSuMTmOC63vQkGfkXTGkwOOuRa5fNJs1nSv9Y=;
-        b=pisiWCaOYxAO7e2xyLTFNo5gtGbbqZpQBNXO+ardSY9mbayNvOQkoWE0JmmTwV1cIn
-         c/dtgwbxUqv01v1yO1V0bsrsuCtSUy7AGS8brjV2VzDtblxPRpbMl6s07t3njna4SeIk
-         Qy3FzvmZjdKztawJLzbbMI/vE4x42yC0gDvL+m/1YD0vNfKShZWLOazwPBXFQ61VEJ5G
-         6JtygEk802k7k7mvMp0c9uH210rZts1oRkikMG4KlHNuv6GxW6UsoKZpQ3DsXmsLklNM
-         DhwxQvnezRdqPVf7eN40MDLs/Ua5bH2PCzIW36JIJeB8UVJTJGCj5+COLN9lzX/NJANL
-         1tPQ==
+        d=google.com; s=20230601; t=1694656538; x=1695261338; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=/cDQ8+RWss5y1dl7//cmz9qd0NB/VeUV6+/tNlKTQHI=;
+        b=UKoIiOhNGEgiVNhMUgDLiC2VsaR3LduQWZy8WeTZVW/v1qHSamRUzbAyxDBwv0/zgj
+         EBIgcTDX0FiocsJLISNdCKKJK5INLMbdOq0UwEbfSQWVcz0volSMPJbHABKk2sBxf51l
+         NjJZRHe3LgAQlho3cslF8hd2+0W060ETxE50UOR2ud9uPdeC6bBvSFHuKz311FXfh1jU
+         C3i7gTlwJVl6z1hYDo1FMnFBGwFaxHJPZL7AP37ugHLvvVU07J5mfJOaVrR2WGoqfAHV
+         XMIar8T8N7XsobwG+2DlOqDAu8MIZnuPbYVjuFLpSH71yzsNdwJDJK+nw1SlwXFBfjNk
+         ZAnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694656535; x=1695261335;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bJKy84XSuMTmOC63vQkGfkXTGkwOOuRa5fNJs1nSv9Y=;
-        b=FYhfXMh3qDtm/4U2tywD/uWNY6+5F/VE6iFVTm62A127igQN+1w1ut6LZojT5G+Dao
-         hRAwh1ByF++a0SOL2cVxvaJu69Xfc6nUbwRk9YYKv/LF2e2Uoh6W/201rmO3usmFAVsh
-         xz84G409H9SI/E4CQuyAHXT/m3s/c091rFxKeEcJjW9yTpQ1XBvK4TpNq6D486iexLpD
-         /sV4hbqFtuxd8OsA0IYfI8gVqmnNP+sxRwmQmscz/HJmXOYmXd/aEky+uYfO2QLxHKcN
-         ZEEpV1xx+LdT4ZjXS5/e4VSMrKtO4NHbAgCqQxT2TDARSaa2BUgI0kDJJ5mZoehO03F1
-         5RLA==
-X-Gm-Message-State: AOJu0YwxpFXhBYB7Wff2GhEVOJ8xLbK1CZ5mGKerssoGqcKsUS5909zZ
-	sOnr4iyV/EQ4ympop/ChJdDLUjrcc+g=
-X-Google-Smtp-Source: AGHT+IGnw6PJDWM0E1VK/7ZuUO30qpP9NQbgvDz7dNd87qt+PDes/hO2OajwY8ZpLg9diAiXM3Vfd4Drz0o=
+        d=1e100.net; s=20230601; t=1694656538; x=1695261338;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/cDQ8+RWss5y1dl7//cmz9qd0NB/VeUV6+/tNlKTQHI=;
+        b=ahYFNZbZRVKffJpZAjGEx1g4ms5xpz1wRhmVjRUkl00mwVan05cBe9uMYhorTma3nw
+         e5YmuyusvNpFI+wQN88FI3XvIuw4MxoQFw844w0P/KltcSUBnMMQ8+D3Z3Z52dVLWLrb
+         DhUVas1jDhSY4S8OqPJCpMPmQLlgFRvkm/zXuR7D9DN21bvlDPLWpJFr3UZPS5rUCo9h
+         V62RFWGf6TEm0e1C98WuiDPfWTHSAZwzSOwQepWJ2NrJIEefmwlXNhJt9A6M1vL1Legz
+         6grI46GsgE3gBbf6EMUCFU/HFGsF1rjyWZ+7WW6zg7ITHzoFM7tM1ILB9ik/MbztcNHk
+         EnZw==
+X-Gm-Message-State: AOJu0Yx/o/wgkZuurpJx9juvHgZjFSDelfcB4aJGW6Kx+dCEJArLNBYP
+	Mqw1dnNwcj1A3oDUC4iaWVDLKfNa+QQ=
+X-Google-Smtp-Source: AGHT+IE0PXMQEm/IFGrVOf6ppWkIN82E9wFoqnKGFhjVJyi0Xqws7PTmRSBCpdZciUBlWguOQ7crfgDDDDg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:2445:b0:1c3:1ceb:97b6 with SMTP id
- l5-20020a170903244500b001c31ceb97b6mr183120pls.7.1694656535510; Wed, 13 Sep
- 2023 18:55:35 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:e88f:b0:1b8:8c7:31e6 with SMTP id
+ w15-20020a170902e88f00b001b808c731e6mr201908plg.1.1694656537960; Wed, 13 Sep
+ 2023 18:55:37 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 13 Sep 2023 18:54:58 -0700
+Date: Wed, 13 Sep 2023 18:54:59 -0700
+In-Reply-To: <20230914015531.1419405-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20230914015531.1419405-1-seanjc@google.com>
 X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
-Message-ID: <20230914015531.1419405-1-seanjc@google.com>
-Subject: [RFC PATCH v12 00/33] KVM: guest_memfd() and per-page attributes
+Message-ID: <20230914015531.1419405-2-seanjc@google.com>
+Subject: [RFC PATCH v12 01/33] KVM: Tweak kvm_hva_range and hva_handler_t to
+ allow reusing for gfn ranges
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
@@ -71,205 +75,117 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This is hopefully the last RFC for implementing fd-based (instead of vma-based)
-memory for KVM guests.  If you want the full background of why we are doing
-this, please go read the v10 cover letter.  With luck, v13 will be a "normal"
-series that's ready for inclusion.
+Rework and rename "struct kvm_hva_range" into "kvm_mmu_notifier_range" so
+that the structure can be used to handle notifications that operate on gfn
+context, i.e. that aren't tied to a host virtual address.
 
-Tagged RFC as there are still several empty changelogs, a lot of missing
-documentation, and a handful of TODOs.  And I haven't tested or proofread this
-anywhere near as much as I normally would.  I am posting even though the
-remaining TODOs aren't _that_ big so that people can test this new version
-without having to wait a few weeks to close out the remaining TODOs, i.e. to
-give us at least some chance of hitting v6.7.
+Practically speaking, this is a nop for 64-bit kernels as the only
+meaningful change is to store start+end as u64s instead of unsigned longs.
 
-The most relevant TODO item for non-KVM folks is that we are planning on
-dropping the dedicated "gmem" file system.  Assuming that pans out, the patch
-to export security_inode_init_security_anon() should go away.
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ virt/kvm/kvm_main.c | 34 +++++++++++++++++++---------------
+ 1 file changed, 19 insertions(+), 15 deletions(-)
 
-KVM folks, there a few changes I want to highlight and get feedback on, all of
-which are directly related to the "annotated memory faults" series[*]:
-
- - Rename kvm_run.memory to kvm_run.memory_fault
- - Place "memory_fault" in a separate union
- - Return -EFAULT or -EHWPOISON with exiting with KVM_EXIT_MEMORY_FAULT
-
-The first one is pretty self-explanatory, "run->memory.gpa" looks quite odd and
-would prevent ever doing something directly with memory.
-
-Putting the struct in a separate union is not at all necessary for supporting
-private memory, it's purely forward looking to Anish series, which wants to
-annotate (fill memory_fault) on all faults, even if KVM ultimately doesn't exit
-to userspace (x86 has a few unfortunate flows where KVM can clobber a previous
-exit, or suppress a memory fault exit).  Using a separate union, i.e. different
-bytes in kvm_run, allows exiting to userspace with both memory_fault and the
-"normal" union filled, e.g. if KVM starts an MMIO exit and then hits a memory
-fault exit, the MMIO exit will be preserved.  It's unlikely userspace will be
-able to do anything useful with the info in that case, but the reverse will
-likely be much more interesting, e.g. if KVM hits a memory fault and then doesn't
-report it to userspace for whatever reason.
-
-As for returning -EFAULT/-EHWPOISON, far too many helpers that touch guest
-memory, i.e. can "fault", return 0 on success, which makes it all bug impossible
-to use '0' to signal "exit to userspace".  Rather than use '0' for _just_ the
-case where the guest is accessing private vs. shared, my thought is to use
--EFAULT everywhere except for the poisoned page case.
-
-[*] https://lore.kernel.org/all/20230908222905.1321305-1-amoorthy@google.com
-
-TODOs [owner]:
- - Documentation [none]
- - Changelogs [Sean]
- - Fully anonymous inode vs. proper filesystem [Paolo]
- - kvm_gmem_error_page() testing (my version is untested) [Isaku?]
-
-v12:
- - Squash fixes from others. [Many people]
- - Kill of the .on_unlock() callback and use .on_lock() when handling
-   memory attributes updates. [Isaku]
- - Add more tests. [Ackerley]
- - Move range_has_attrs() to common code. [Paolo]
- - Return actually number of address spaces for the VM-scoped version of
-   KVM_CAP_MULTI_ADDRESS_SPACE. [Paolo]
- - Move forward declaration of "struct kvm_gfn_range" to kvm_types.h. [Yuan]
- - Plumb code to have HVA-based mmu_notifier events affect only shared
-   mappings. [Asish]
- - Clean up kvm_vm_ioctl_set_mem_attributes() math. [Binbin]
- - Collect a few reviews and acks. [Paolo, Paul]
- - Unconditionally advertise a synchronized MMU on PPC. [Paolo]
- - Check for error return from filemap_grab_folio(). [A
- - Make max_order optional. [Fuad]
- - Remove signal injection, zap SPTEs on memory error. [Isaku]
- - Add KVM_CAP_GUEST_MEMFD. [Xiaoyao]
- - Invoke kvm_arch_pre_set_memory_attributes() instead of
-   kvm_mmu_unmap_gfn_range().
- - Rename kvm_run.memory to kvm_run.memory_fault
- - Place "memory_fault" in a separate union
- - Return -EFAULT and -EHWPOISON with KVM_EXIT_MEMORY_FAULT
- - "Init" run->exit_reason in x86's vcpu_run()
-
-v11:
- - https://lore.kernel.org/all/20230718234512.1690985-1-seanjc@google.com
- - Test private<=>shared conversions *without* doing fallocate()
- - PUNCH_HOLE all memory between iterations of the conversion test so that
-   KVM doesn't retain pages in the guest_memfd
- - Rename hugepage control to be a very generic ALLOW_HUGEPAGE, instead of
-   giving it a THP or PMD specific name.
- - Fold in fixes from a lot of people (thank you!)
- - Zap SPTEs *before* updating attributes to ensure no weirdness, e.g. if
-   KVM handles a page fault and looks at inconsistent attributes
- - Refactor MMU interaction with attributes updates to reuse much of KVM's
-   framework for mmu_notifiers.
-
-v10: https://lore.kernel.org/all/20221202061347.1070246-1-chao.p.peng@linux.intel.com
-
-Ackerley Tng (1):
-  KVM: selftests: Test KVM exit behavior for private memory/access
-
-Chao Peng (8):
-  KVM: Use gfn instead of hva for mmu_notifier_retry
-  KVM: Add KVM_EXIT_MEMORY_FAULT exit to report faults to userspace
-  KVM: Introduce per-page memory attributes
-  KVM: x86: Disallow hugepages when memory attributes are mixed
-  KVM: x86/mmu: Handle page fault for private memory
-  KVM: selftests: Add KVM_SET_USER_MEMORY_REGION2 helper
-  KVM: selftests: Expand set_memory_region_test to validate
-    guest_memfd()
-  KVM: selftests: Add basic selftest for guest_memfd()
-
-Sean Christopherson (21):
-  KVM: Tweak kvm_hva_range and hva_handler_t to allow reusing for gfn
-    ranges
-  KVM: PPC: Drop dead code related to KVM_ARCH_WANT_MMU_NOTIFIER
-  KVM: PPC: Return '1' unconditionally for KVM_CAP_SYNC_MMU
-  KVM: Convert KVM_ARCH_WANT_MMU_NOTIFIER to
-    CONFIG_KVM_GENERIC_MMU_NOTIFIER
-  KVM: Introduce KVM_SET_USER_MEMORY_REGION2
-  KVM: Add a dedicated mmu_notifier flag for reclaiming freed memory
-  KVM: Drop .on_unlock() mmu_notifier hook
-  KVM: Set the stage for handling only shared mappings in mmu_notifier
-    events
-  mm: Add AS_UNMOVABLE to mark mapping as completely unmovable
-  security: Export security_inode_init_security_anon() for use by KVM
-  KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for guest-specific backing
-    memory
-  KVM: Add transparent hugepage support for dedicated guest memory
-  KVM: x86: "Reset" vcpu->run->exit_reason early in KVM_RUN
-  KVM: Drop superfluous __KVM_VCPU_MULTIPLE_ADDRESS_SPACE macro
-  KVM: Allow arch code to track number of memslot address spaces per VM
-  KVM: x86: Add support for "protected VMs" that can utilize private
-    memory
-  KVM: selftests: Drop unused kvm_userspace_memory_region_find() helper
-  KVM: selftests: Convert lib's mem regions to
-    KVM_SET_USER_MEMORY_REGION2
-  KVM: selftests: Add support for creating private memslots
-  KVM: selftests: Introduce VM "shape" to allow tests to specify the VM
-    type
-  KVM: selftests: Add GUEST_SYNC[1-6] macros for synchronizing more data
-
-Vishal Annapurve (3):
-  KVM: selftests: Add helpers to convert guest memory b/w private and
-    shared
-  KVM: selftests: Add helpers to do KVM_HC_MAP_GPA_RANGE hypercalls
-    (x86)
-  KVM: selftests: Add x86-only selftest for private memory conversions
-
- Documentation/virt/kvm/api.rst                | 116 ++++
- arch/arm64/include/asm/kvm_host.h             |   2 -
- arch/arm64/kvm/Kconfig                        |   2 +-
- arch/mips/include/asm/kvm_host.h              |   2 -
- arch/mips/kvm/Kconfig                         |   2 +-
- arch/powerpc/include/asm/kvm_host.h           |   2 -
- arch/powerpc/kvm/Kconfig                      |   8 +-
- arch/powerpc/kvm/book3s_hv.c                  |   2 +-
- arch/powerpc/kvm/powerpc.c                    |   7 +-
- arch/riscv/include/asm/kvm_host.h             |   2 -
- arch/riscv/kvm/Kconfig                        |   2 +-
- arch/x86/include/asm/kvm_host.h               |  17 +-
- arch/x86/include/uapi/asm/kvm.h               |   3 +
- arch/x86/kvm/Kconfig                          |  14 +-
- arch/x86/kvm/debugfs.c                        |   2 +-
- arch/x86/kvm/mmu/mmu.c                        | 264 +++++++-
- arch/x86/kvm/mmu/mmu_internal.h               |   2 +
- arch/x86/kvm/mmu/tdp_mmu.c                    |   2 +-
- arch/x86/kvm/vmx/vmx.c                        |  11 +-
- arch/x86/kvm/x86.c                            |  25 +-
- include/linux/kvm_host.h                      | 143 +++-
- include/linux/kvm_types.h                     |   1 +
- include/linux/pagemap.h                       |  19 +-
- include/uapi/linux/kvm.h                      |  67 ++
- include/uapi/linux/magic.h                    |   1 +
- mm/compaction.c                               |  43 +-
- mm/migrate.c                                  |   2 +
- security/security.c                           |   1 +
- tools/testing/selftests/kvm/Makefile          |   3 +
- tools/testing/selftests/kvm/dirty_log_test.c  |   2 +-
- .../testing/selftests/kvm/guest_memfd_test.c  | 165 +++++
- .../selftests/kvm/include/kvm_util_base.h     | 148 +++-
- .../testing/selftests/kvm/include/test_util.h |   5 +
- .../selftests/kvm/include/ucall_common.h      |  11 +
- .../selftests/kvm/include/x86_64/processor.h  |  15 +
- .../selftests/kvm/kvm_page_table_test.c       |   2 +-
- tools/testing/selftests/kvm/lib/kvm_util.c    | 231 ++++---
- tools/testing/selftests/kvm/lib/memstress.c   |   3 +-
- .../selftests/kvm/set_memory_region_test.c    | 100 +++
- .../kvm/x86_64/private_mem_conversions_test.c | 410 +++++++++++
- .../kvm/x86_64/private_mem_kvm_exits_test.c   | 121 ++++
- .../kvm/x86_64/ucna_injection_test.c          |   2 +-
- virt/kvm/Kconfig                              |  17 +
- virt/kvm/Makefile.kvm                         |   1 +
- virt/kvm/dirty_ring.c                         |   2 +-
- virt/kvm/guest_mem.c                          | 637 ++++++++++++++++++
- virt/kvm/kvm_main.c                           | 482 +++++++++++--
- virt/kvm/kvm_mm.h                             |  38 ++
- 48 files changed, 2888 insertions(+), 271 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/guest_memfd_test.c
- create mode 100644 tools/testing/selftests/kvm/x86_64/private_mem_conversions_test.c
- create mode 100644 tools/testing/selftests/kvm/x86_64/private_mem_kvm_exits_test.c
- create mode 100644 virt/kvm/guest_mem.c
-
-
-base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 486800a7024b..0524933856d4 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -541,18 +541,22 @@ static inline struct kvm *mmu_notifier_to_kvm(struct mmu_notifier *mn)
+ 	return container_of(mn, struct kvm, mmu_notifier);
+ }
+ 
+-typedef bool (*hva_handler_t)(struct kvm *kvm, struct kvm_gfn_range *range);
++typedef bool (*gfn_handler_t)(struct kvm *kvm, struct kvm_gfn_range *range);
+ 
+ typedef void (*on_lock_fn_t)(struct kvm *kvm, unsigned long start,
+ 			     unsigned long end);
+ 
+ typedef void (*on_unlock_fn_t)(struct kvm *kvm);
+ 
+-struct kvm_hva_range {
+-	unsigned long start;
+-	unsigned long end;
++struct kvm_mmu_notifier_range {
++	/*
++	 * 64-bit addresses, as KVM notifiers can operate on host virtual
++	 * addresses (unsigned long) and guest physical addresses (64-bit).
++	 */
++	u64 start;
++	u64 end;
+ 	union kvm_mmu_notifier_arg arg;
+-	hva_handler_t handler;
++	gfn_handler_t handler;
+ 	on_lock_fn_t on_lock;
+ 	on_unlock_fn_t on_unlock;
+ 	bool flush_on_ret;
+@@ -581,7 +585,7 @@ static const union kvm_mmu_notifier_arg KVM_MMU_NOTIFIER_NO_ARG;
+ 	     node = interval_tree_iter_next(node, start, last))	     \
+ 
+ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+-						  const struct kvm_hva_range *range)
++						  const struct kvm_mmu_notifier_range *range)
+ {
+ 	bool ret = false, locked = false;
+ 	struct kvm_gfn_range gfn_range;
+@@ -608,9 +612,9 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+ 			unsigned long hva_start, hva_end;
+ 
+ 			slot = container_of(node, struct kvm_memory_slot, hva_node[slots->node_idx]);
+-			hva_start = max(range->start, slot->userspace_addr);
+-			hva_end = min(range->end, slot->userspace_addr +
+-						  (slot->npages << PAGE_SHIFT));
++			hva_start = max_t(unsigned long, range->start, slot->userspace_addr);
++			hva_end = min_t(unsigned long, range->end,
++					slot->userspace_addr + (slot->npages << PAGE_SHIFT));
+ 
+ 			/*
+ 			 * To optimize for the likely case where the address
+@@ -660,10 +664,10 @@ static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
+ 						unsigned long start,
+ 						unsigned long end,
+ 						union kvm_mmu_notifier_arg arg,
+-						hva_handler_t handler)
++						gfn_handler_t handler)
+ {
+ 	struct kvm *kvm = mmu_notifier_to_kvm(mn);
+-	const struct kvm_hva_range range = {
++	const struct kvm_mmu_notifier_range range = {
+ 		.start		= start,
+ 		.end		= end,
+ 		.arg		= arg,
+@@ -680,10 +684,10 @@ static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
+ static __always_inline int kvm_handle_hva_range_no_flush(struct mmu_notifier *mn,
+ 							 unsigned long start,
+ 							 unsigned long end,
+-							 hva_handler_t handler)
++							 gfn_handler_t handler)
+ {
+ 	struct kvm *kvm = mmu_notifier_to_kvm(mn);
+-	const struct kvm_hva_range range = {
++	const struct kvm_mmu_notifier_range range = {
+ 		.start		= start,
+ 		.end		= end,
+ 		.handler	= handler,
+@@ -771,7 +775,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+ 					const struct mmu_notifier_range *range)
+ {
+ 	struct kvm *kvm = mmu_notifier_to_kvm(mn);
+-	const struct kvm_hva_range hva_range = {
++	const struct kvm_mmu_notifier_range hva_range = {
+ 		.start		= range->start,
+ 		.end		= range->end,
+ 		.handler	= kvm_unmap_gfn_range,
+@@ -835,7 +839,7 @@ static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
+ 					const struct mmu_notifier_range *range)
+ {
+ 	struct kvm *kvm = mmu_notifier_to_kvm(mn);
+-	const struct kvm_hva_range hva_range = {
++	const struct kvm_mmu_notifier_range hva_range = {
+ 		.start		= range->start,
+ 		.end		= range->end,
+ 		.handler	= (void *)kvm_null_fn,
 -- 
 2.42.0.283.g2d96d420d3-goog
 
