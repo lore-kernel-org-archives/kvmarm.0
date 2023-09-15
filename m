@@ -1,28 +1,28 @@
-Received: from out-213.mta1.migadu.com (out-213.mta1.migadu.com [95.215.58.213])
+Received: from out-224.mta0.migadu.com (out-224.mta0.migadu.com [91.218.175.224])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4BD4101C6
-	for <kvmarm@lists.linux.dev>; Fri, 15 Sep 2023 20:36:16 +0000 (UTC)
-Date: Fri, 15 Sep 2023 20:36:09 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 224DF1B279
+	for <kvmarm@lists.linux.dev>; Fri, 15 Sep 2023 20:53:18 +0000 (UTC)
+Date: Fri, 15 Sep 2023 20:53:11 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1694810174;
+	t=1694811196;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Jh8wxRtaCDmNfJKXz9NRQ7CZIQMzCI29C3PoTr8TsLs=;
-	b=v0fuP40FaFR3ghn7RXIwy67Q0K0A9PV4x7M7qmiJj74u7uqOJcrmJy/NRsbpejjUsPsPU4
-	o8NKRojsEw1KDsPIIQzBTZ71ljSVKKl4nchWZXeaA7gfwOJFxk7ZY/eqk94xQwimORQ6yv
-	FbOt19DOumNoGkOOaXU99v5XYPYZOhU=
+	bh=y7OM5v7blYOAJxEJ3s0YCjQVgdsW57nwTu7RUWwmajk=;
+	b=WUgTdPy3r/vauuaDrIYbzKUJBVRiZtdsHsT0S+gxTtgpjItrfnOfVIa5iN5njKOUsxCFwG
+	3vNVLS+vQx0k1l5eeblNMvEa/3HbVWyRVFq6CPHpqiNYwL+jSnl+uGk9EMrCRNIhTrsGJ5
+	BuFjAwp4Qecsddpz7fxnU4li3QgtiAk=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Shaoqin Huang <shahuang@redhat.com>
-Cc: Raghavendra Rao Ananta <rananta@google.com>,
-	Marc Zyngier <maz@kernel.org>,
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Marc Zyngier <maz@kernel.org>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
 	Jing Zhang <jingzhangos@google.com>,
 	Reiji Watanabe <reijiw@google.com>,
 	Colton Lewis <coltonlewis@google.com>,
@@ -30,12 +30,9 @@ Cc: Raghavendra Rao Ananta <rananta@google.com>,
 	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Subject: Re: [PATCH v5 08/12] KVM: arm64: PMU: Allow userspace to limit
  PMCR_EL0.N for the guest
-Message-ID: <ZQTAOcTsGPos/mBD@linux.dev>
+Message-ID: <ZQTEN664F/5PzyId@linux.dev>
 References: <20230817003029.3073210-1-rananta@google.com>
  <20230817003029.3073210-9-rananta@google.com>
- <6dc460d2-c7fb-e299-b0a3-55b43de31555@redhat.com>
- <CAJHc60whpvOHYCFueqh0Q=SbmmeRBG_x90QOvX+vOun73ttjPA@mail.gmail.com>
- <e479914b-7ba2-3a9a-2b07-9965532cbcfa@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,63 +41,69 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e479914b-7ba2-3a9a-2b07-9965532cbcfa@redhat.com>
+In-Reply-To: <20230817003029.3073210-9-rananta@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, Aug 22, 2023 at 11:26:23AM +0800, Shaoqin Huang wrote:
+Hi Raghu,
 
-[...]
-
-> > > > +static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
-> > > > +                 u64 val)
-> > > > +{
-> > > > +     struct kvm *kvm = vcpu->kvm;
-> > > > +     u64 new_n, mutable_mask;
-> > > > +     int ret = 0;
-> > > > +
-> > > > +     new_n = FIELD_GET(ARMV8_PMU_PMCR_N, val);
-> > > > +
-> > > > +     mutex_lock(&kvm->arch.config_lock);
-> > > > +     if (unlikely(new_n != kvm->arch.pmcr_n)) {
-> > > > +             /*
-> > > > +              * The vCPU can't have more counters than the PMU
-> > > > +              * hardware implements.
-> > > > +              */
-> > > > +             if (new_n <= kvm->arch.pmcr_n_limit)
-> > > > +                     kvm->arch.pmcr_n = new_n;
-> > > > +             else
-> > > > +                     ret = -EINVAL;
-> > > > +     }
-> > > 
-> > > Since we have set the default value of pmcr_n, if we want to set a new
-> > > pmcr_n, shouldn't it be a different value?
-> > > 
-> > > So how about change the checking to:
-> > > 
-> > > if (likely(new_n <= kvm->arch.pmcr_n_limit)
-> > >          kvm->arch.pmcr_n = new_n;
-> > > else
-> > >          ret = -EINVAL;
-> > > 
-> > > what do you think?
-> > > 
-> > Sorry, I guess I didn't fully understand your suggestion. Are you
-> > saying that it's 'likely' that userspace would configure the correct
-> > value?
-> > 
-> It depends on how userspace use this api to limit the number of pmcr. I
-> think what you mean in the code is that userspace need to set every vcpu's
-> pmcr to the same value, so the `unlikely` here is right, only one vcpu can
-> change the kvm->arch.pmcr.n, it saves the cpu cycles.
+On Thu, Aug 17, 2023 at 12:30:25AM +0000, Raghavendra Rao Ananta wrote:
+> From: Reiji Watanabe <reijiw@google.com>
 > 
-> What suggest above might be wrong. Since I think when userspace want to
-> limit the number of pmcr, it may just set the new_n on one vcpu, since the
-> kvm->arch.pmcr_n is a VM-local value, every vcpu can see it, so it's
-> `likely` the (new_n <= kvm->arch.pmcr_n_limit), it can decrease one checking
-> statement.
+> KVM does not yet support userspace modifying PMCR_EL0.N (With
+> the previous patch, KVM ignores what is written by upserspace).
 
-How about we just do away with branch hints in the first place? This is
-_not_ a hot path.
+typo: userspace
+
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index ce7de6bbdc967..39ad56a71ad20 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -896,6 +896,7 @@ int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
+>  	 * while the latter does not.
+>  	 */
+>  	kvm->arch.pmcr_n = arm_pmu->num_events - 1;
+> +	kvm->arch.pmcr_n_limit = arm_pmu->num_events - 1;
+
+Can't we just get at this through the arm_pmu instance rather than
+copying it into kvm_arch?
+
+>  	return 0;
+>  }
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 2075901356c5b..c01d62afa7db4 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1086,6 +1086,51 @@ static int get_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+>  	return 0;
+>  }
+>  
+> +static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+> +		    u64 val)
+> +{
+> +	struct kvm *kvm = vcpu->kvm;
+> +	u64 new_n, mutable_mask;
+> +	int ret = 0;
+> +
+> +	new_n = FIELD_GET(ARMV8_PMU_PMCR_N, val);
+> +
+> +	mutex_lock(&kvm->arch.config_lock);
+> +	if (unlikely(new_n != kvm->arch.pmcr_n)) {
+> +		/*
+> +		 * The vCPU can't have more counters than the PMU
+> +		 * hardware implements.
+> +		 */
+> +		if (new_n <= kvm->arch.pmcr_n_limit)
+> +			kvm->arch.pmcr_n = new_n;
+> +		else
+> +			ret = -EINVAL;
+> +	}
+
+Hmm, I'm not so sure about returning an error here. ABI has it that
+userspace can write any value to PMCR_EL0 successfully. Can we just
+ignore writes that attempt to set PMCR_EL0.N to something higher than
+supported by hardware? Our general stance should be that system register
+fields responsible for feature identification are immutable after the VM
+has started.
 
 -- 
 Thanks,
