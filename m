@@ -1,103 +1,81 @@
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9CA663A5;
-	Fri, 15 Sep 2023 10:21:20 +0000 (UTC)
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3ab8e324725so381260b6e.0;
-        Fri, 15 Sep 2023 03:21:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694773280; x=1695378080;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=T2EQISS+TI6FymgehjVGYiebl+s7fB1qqSBohFwF18Y=;
-        b=NZugN1bBxSNzhtnSCxByPgDNX546xui31JpRyLoJmlpxBxm0rjaGAIBqQUHhYZkzcW
-         /430pQ/s4JkkX5s8HAxexk7sEx6wB2zDy3KMdL5qKVUDNBm2XXGZqMXGsQWPX2iZIvoJ
-         5JUQFOfmnO1FOXisjnpcOvYTxhdhUF/0lER8tSoelYHtydPwESsa8zv+6JgWsvwDxS0e
-         vtv7zSXyZHRz8FzUkFitm86Pj27Z1C/unjBbI6pnPAKmiqtgOnUC12O2kKUT/5FSAV4o
-         R+KBpGcWlhwn2d6EArsPL1uhZ22c+ySx1/z7nkCsyBQ4FEDNLezmdgkXXEqp04fM/DHA
-         0WXQ==
-X-Gm-Message-State: AOJu0YwSymf3tHZjNYJwJZE+VFJWmzhs+TDIJRfNV7yD1Nkx2A7ZUYy1
-	z8EJmTj0Nuq9UwpJFy9tDQpVuR0PsTvkGbMNWLo=
-X-Google-Smtp-Source: AGHT+IE91hPOK8y/kVeJFKJe8XyQhu0n/Q+0x2/bog6c455z4TN1+FSBkfJT1sJVgSvtor6J5rMGJgfx0mnsyytHqT0=
-X-Received: by 2002:a4a:de83:0:b0:56e:94ed:c098 with SMTP id
- v3-20020a4ade83000000b0056e94edc098mr1206706oou.0.1694773279760; Fri, 15 Sep
- 2023 03:21:19 -0700 (PDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75D6610785
+	for <kvmarm@lists.linux.dev>; Fri, 15 Sep 2023 12:49:44 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BC3501FB;
+	Fri, 15 Sep 2023 05:50:19 -0700 (PDT)
+Received: from e126864.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B99A93F5A1;
+	Fri, 15 Sep 2023 05:49:39 -0700 (PDT)
+From: Kristina Martsenko <kristina.martsenko@arm.com>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Vladimir Murzin <vladimir.murzin@arm.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/3] KVM: arm64: Support for Arm v8.8 memcpy instructions in KVM guests
+Date: Fri, 15 Sep 2023 13:48:37 +0100
+Message-Id: <20230915124840.474888-1-kristina.martsenko@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230913163823.7880-1-james.morse@arm.com> <20230913163823.7880-28-james.morse@arm.com>
- <CAMj1kXHRAt7ecB9p_dm3MjDL5wZkAsVh30hMY2SV_XUe=bm6Vg@mail.gmail.com>
- <20230914155459.00002dba@Huawei.com> <CAMj1kXFquiLGCMow3iujHUU4GBZx2t9KfKy1R9iqjBFjY+acaA@mail.gmail.com>
- <f5d9beea95e149ab89364dcdb0f8bf69@huawei.com> <ZQQDJT6MOaIOPmq5@shell.armlinux.org.uk>
- <CAJZ5v0jUQ+4G5ArYAtu1gvYF4356CK_QVTO4oWn0ukwdOiZaHA@mail.gmail.com> <80e36ff513504a0382a1cbce83e42295@huawei.com>
-In-Reply-To: <80e36ff513504a0382a1cbce83e42295@huawei.com>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Fri, 15 Sep 2023 12:21:08 +0200
-Message-ID: <CAJZ5v0gou9Pdj_CPC=vLJ-6S-hz+0VY+GMgXcRJk=6t9mL1ykw@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 27/35] ACPICA: Add new MADT GICC flags fields [code first?]
-To: Salil Mehta <salil.mehta@huawei.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, "Russell King (Oracle)" <linux@armlinux.org.uk>, 
-	Ard Biesheuvel <ardb@kernel.org>, Jonathan Cameron <jonathan.cameron@huawei.com>, 
-	James Morse <james.morse@arm.com>, "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>, 
-	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>, 
-	"linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, 
-	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, 
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "x86@kernel.org" <x86@kernel.org>, 
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, "jianyong.wu@arm.com" <jianyong.wu@arm.com>, 
-	"justin.he@arm.com" <justin.he@arm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 15, 2023 at 11:34=E2=80=AFAM Salil Mehta <salil.mehta@huawei.co=
-m> wrote:
->
->
-> > From: Rafael J. Wysocki <rafael@kernel.org>
-> > Sent: Friday, September 15, 2023 9:45 AM
-> > To: Russell King (Oracle) <linux@armlinux.org.uk>
-> > Cc: Salil Mehta <salil.mehta@huawei.com>; Ard Biesheuvel <ardb@kernel.o=
-rg>;
-> > Jonathan Cameron <jonathan.cameron@huawei.com>; James Morse
-> > <james.morse@arm.com>; linux-pm@vger.kernel.org; loongarch@lists.linux.=
-dev;
-> > linux-acpi@vger.kernel.org; linux-arch@vger.kernel.org; linux-
-> > kernel@vger.kernel.org; linux-arm-kernel@lists.infradead.org; linux-
-> > riscv@lists.infradead.org; kvmarm@lists.linux.dev; x86@kernel.org; Jean=
--
-> > Philippe Brucker <jean-philippe@linaro.org>; jianyong.wu@arm.com;
-> > justin.he@arm.com
-> > Subject: Re: [RFC PATCH v2 27/35] ACPICA: Add new MADT GICC flags field=
-s
-> > [code first?]
-> >
-> > On Fri, Sep 15, 2023 at 9:09=E2=80=AFAM Russell King (Oracle)
-> > <linux@armlinux.org.uk> wrote:
-> > >
-> > > On Fri, Sep 15, 2023 at 02:29:13AM +0000, Salil Mehta wrote:
-> > > > On x86, during init, if the MADT entry for LAPIC is found to be
-> > > > online-capable and is enabled as well then possible and present
-> > >
-> > > Note that the ACPI spec says enabled + online-capable isn't defined.
-> > >
-> > > "The information conveyed by this bit depends on the value of the
-> > > Enabled bit. If the Enabled bit is set, this bit is reserved and
-> > > must be zero."
-> > >
-> > > So, if x86 is doing something with the enabled && online-capable
-> > > state (other than ignoring the online-capable) then technically it
-> > > is doing something that the spec doesn't define
-> >
-> > And so it is wrong.
->
->
-> Or maybe, specification has not been updated yet. code-first?
+Hi,
 
-Well, if you are aware of any change requests related to this and
-posted as code-first, please let me know.
+This series adds support for using the new Arm memory copy instructions in KVM
+guests.  A previous series [1] added support for using the instructions in
+userspace applications.  Similarly to that series, the main thing to note here
+is the handling for when a memcpy is stopped and continued on a different type
+of CPU. See patch #2 for details.
+
+As background, the Armv8.8 extension adds new instructions to perform memcpy(),
+memset() and memmove() operations in hardware (FEAT_MOPS).  The aim is to avoid
+having many different performance-optimal memcpy implementations in software
+(tailored to CPU model and copy size) and the overhead of selecting between
+them.  The new instructions are intended to be at least as fast as any
+alternative instruction sequence.
+
+The series has been tested on the Arm FVP.
+
+Thanks,
+Kristina
+
+[1] https://lore.kernel.org/all/20230509142235.3284028-1-kristina.martsenko@arm.com/
+
+
+Kristina Martsenko (3):
+  KVM: arm64: Configure HCRX_EL2 dynamically
+  KVM: arm64: Add handler for MOPS exceptions
+  KVM: arm64: Expose MOPS instructions to guests
+
+ arch/arm64/include/asm/kvm_emulate.h          | 10 ++++
+ arch/arm64/include/asm/kvm_host.h             |  1 +
+ arch/arm64/include/asm/traps.h                | 54 ++++++++++++++++++-
+ arch/arm64/kernel/traps.c                     | 48 +----------------
+ arch/arm64/kvm/arm.c                          |  1 +
+ arch/arm64/kvm/hyp/include/hyp/switch.h       | 19 ++++++-
+ .../arm64/kvm/hyp/include/nvhe/fixed_config.h |  3 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  1 +
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                |  1 +
+ arch/arm64/kvm/hyp/nvhe/switch.c              |  2 +
+ arch/arm64/kvm/hyp/vhe/switch.c               |  1 +
+ arch/arm64/kvm/sys_regs.c                     |  1 -
+ 12 files changed, 90 insertions(+), 52 deletions(-)
+
+
+base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
+-- 
+2.25.1
+
