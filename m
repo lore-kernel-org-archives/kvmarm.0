@@ -1,221 +1,91 @@
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B537C468E
-	for <kvmarm@lists.linux.dev>; Fri, 15 Sep 2023 06:14:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694758471; x=1726294471;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=HZMbCZelhu36ygYyynRyqeUx95U5zs8SUE7ZZO1LmY4=;
-  b=ZVq/k1anIg5B3KVRRvNs7GQM5RpDOqgVrtW1rSE9OYjKolGkgm2J/NUa
-   WYbFXu1hN3DxXhHD+lDYvehajiTS9QhDzK0N+XHOnmWY08HKQqWrW7lCf
-   IpQGkqNG/1/0oB2Z+dbq3uXCxGFPIiXugRk5CL8AGIkNemHCftG3Nf+C2
-   3f7e10ry/d/iY8CHgbM3Y4/6e6Q9DTuM+oI6ICvDoVQf2N4mS8tG73+GP
-   1+1/z1RsjG+n8rswAOmB8lo46PPzwzqejFrJKGuG0Cxnv55bP40xdJtnU
-   VhpbI523MCRU4ODvX4n2J+Do5J8FPAkcQ5YOe/QCy7YHHXkY0Q107vtIP
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="445627404"
-X-IronPort-AV: E=Sophos;i="6.02,148,1688454000"; 
-   d="scan'208";a="445627404"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2023 23:08:08 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="744842944"
-X-IronPort-AV: E=Sophos;i="6.02,148,1688454000"; 
-   d="scan'208";a="744842944"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Sep 2023 23:08:07 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Thu, 14 Sep 2023 23:08:07 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Thu, 14 Sep 2023 23:08:07 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Thu, 14 Sep 2023 23:08:07 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UFhyF/HZyVlvjh8N18MdKVcxgoU0y6fYpky+ymsCBme+tRht1HvMfZE570L7aIGt4gwIxksMZ7S04tZ5uGFuP48KwpxHl25hFLMriOehW48m+pAF9AiVhIfwx7TkJRSHHyDuCyGb6qDOerUr/S2hAghoqXdXaytu5SORzzoi0Ug2OWlnf25iVEB5t01g7nrzEhlDJ5ELy9U/GqCApD/qN4lEIy3dbH8wDcNNDWbAJ+JfpLMO6ZyVQiy8tDe7dJjfEfqnv6zrSl0coo05qaeth7CHWqrHFCRXNXBplwYhtHYm9tAectdeocvKxe7QNsaF38cHln60PIHsvNqA/7Iq2g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cpu28DmXm6A1XkXBryuH7hR7TnWPAtI5Us2qwoMSvw8=;
- b=kNcUModrGUmHPINpDBTFNnILZRyp4nwjBKDXsV6gjAt4gvR+6aDW4D2RYhs2oI8lTRDqmz2Dvzy+4udOWX2aSpqccLQ9EtkzhEptA8Fmv9ld8OFoZYZeI8NoZazk9ybwhJh+b0XhjMWfCfFW5ipzC2c8eXgo05hlMPyatuwiFyyDKD7WDby31c/f2eMwTK6FeIn5w9/L63cr3R17grVjPL0AjvqWVuh6N0xwnvmww8YW42MEEQCwmG6m/NebzcJd6ycLcZ+oqohhLaUbUcTJOAPDEP5uxiz8KDwXejpbH39ZtHWyPyBeAVb5xnMeMEcRoPd/cgAzrUgjgjYaq+/+5A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- BN9PR11MB5242.namprd11.prod.outlook.com (2603:10b6:408:133::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.21; Fri, 15 Sep
- 2023 06:08:04 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::5e79:2d52:51e:f602]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::5e79:2d52:51e:f602%6]) with mapi id 15.20.6768.029; Fri, 15 Sep 2023
- 06:08:04 +0000
-Date: Fri, 15 Sep 2023 13:40:00 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	"Oliver Upton" <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
-	"Michael Ellerman" <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
-	"Paul Walmsley" <paul.walmsley@sifive.com>, Palmer Dabbelt
-	<palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, "Matthew Wilcox
- (Oracle)" <willy@infradead.org>, Andrew Morton <akpm@linux-foundation.org>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, "Serge E.
- Hallyn" <serge@hallyn.com>, <kvm@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<linux-mips@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
-	<kvm-riscv@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
-	<linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
-	<linux-security-module@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	"Chao Peng" <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>,
-	"Jarkko Sakkinen" <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>,
-	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata
-	<isaku.yamahata@intel.com>, "Xu Yilun" <yilun.xu@intel.com>, Vlastimil Babka
-	<vbabka@suse.cz>, "Vishal Annapurve" <vannapurve@google.com>, Ackerley Tng
-	<ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>,
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, Liam
- Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [RFC PATCH v12 18/33] KVM: x86/mmu: Handle page fault for
- private memory
-Message-ID: <ZQPuMK6D/7UzDH+D@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20230914015531.1419405-1-seanjc@google.com>
- <20230914015531.1419405-19-seanjc@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230914015531.1419405-19-seanjc@google.com>
-X-ClientProxiedBy: SI2PR02CA0050.apcprd02.prod.outlook.com
- (2603:1096:4:196::11) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE1AA4437
+	for <kvmarm@lists.linux.dev>; Fri, 15 Sep 2023 06:21:54 +0000 (UTC)
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-502e385e33bso2939912e87.0
+        for <kvmarm@lists.linux.dev>; Thu, 14 Sep 2023 23:21:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1694758912; x=1695363712; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4CbOaBoTgdqZjkC9bgxngrjMf2gb+bcUOXRH9i9PPC4=;
+        b=LXlOv100rFEmkPf8be1F2eIodoz9ipQCETtBQ42MPJ1xCK5rHYrwHQ2B+IQ44KNntd
+         vEm4rRCedG5k2SUThs4SJQxH8nCqytrX0Hse7Sw2F2JzQm+LtS005+3GCcotatdM+y0w
+         tz9i6gel5qdSv+e6fVoV0WCjVHB5mLxBCezJ8Y1WmaiD4XampYNSO0dWr5eWE1Qspj1z
+         mzrof4MYT/LRLOvr72pThJBqO+7MuGZBAASL2+9/k77pgrFGs504vYbX5Du4vLC+UVnK
+         J+N3r1obGvQWGuYulp+7J8ePx0p2ONnAu8c0ZZbkkzjRXcfOX1HWsu9yoSWj1/wCX0yI
+         99Mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694758912; x=1695363712;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4CbOaBoTgdqZjkC9bgxngrjMf2gb+bcUOXRH9i9PPC4=;
+        b=GLj2oTGHYjG8WzDGtW7RXeAiC/ybv6Q6lxWrGtCJMM7CoSeg/wVPUX7VQ2X+b19K/i
+         mz+AmfQ4fme3GzkTcFld8343fc+FKrpEwabvtLm5Lwg6P8DX2uvvsPK4X+WvUGTtf2y5
+         OtQyNb49cVGce5g3FwninAK6IPBYQUN8f2E3eehuh+FDA+5zhZowUMorBBztEuXjPOPC
+         YrrG+rgG87qmX/COaFQ2HFC44aX6AzPut8TeSlhka/eFE6lz+lEV+81GAqh2BXnj+IZ9
+         JNBoqFLJJPA+PxpQmfQiwWCx6zsutvd7fovs7ebsZrUBEZE6l/N+CjdwZvk+1MEODPlD
+         6kJQ==
+X-Gm-Message-State: AOJu0YwKj2zrgRBM6TKLearpYXt3w0nkq4FpVgrev/lkRdzdvciS7RMb
+	6mDnuq9R3Etj8z8pj3Q1IW5jgxFSu2356vgexbw=
+X-Google-Smtp-Source: AGHT+IFQEpOnX9uf3gdbZsJHudImE7kbvB8OM+rS3Fi4ABBNMgv5QYCfVKA10TAI1f03ryjhcKZYalx2hAKJFWVnvIc=
+X-Received: by 2002:a19:6715:0:b0:502:e2be:54b5 with SMTP id
+ b21-20020a196715000000b00502e2be54b5mr569046lfc.17.1694758912398; Thu, 14 Sep
+ 2023 23:21:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|BN9PR11MB5242:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2565bab3-13d1-47da-6156-08dbb5b21f53
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: S+zDc2lULBJdvPOkh2FPKWDoTr5B51mLcT74DEhoUXqG8yYN80NbHvB8ZYEkc8cf7X7tX75g6pIQp4K/AL5OCSxTpaZNbj5er3wQP99E4wZTXsrGRg5YCAXPYye8UdGI6zjFpnr55b0gVgFYj6FmTchWPbxO5k29b2z8It7TDX8dfnjgkmhy9n5hwggUxBbmdJzy18DFNEoLscEpl75dPODbZy9M+60YIqMu4U+enKDnp3hcbUeOPifLcocTVmE+Yt8cF2Jd7WoNJYczK6LbW5utZKRO7yl2e03GdzSdofb+Y5qx6zisWOk/50PhyadhjTuNqPAejIFlKx0j1ss0gBah6ntVXOCusL2TyJsiMW4wRrWWlQ3Sfeppy1fk4IbQesmc7XtUfL522hOdT8Wiln20TQRTgkdjbm5m557yQIdcq4xOX/Did/czTPBuEFiSVhBVkWV82uWD4pIgw9TXZFhkgUetNQmSeIhZLbXnruDHY2CF80thYfvvx+GdIfvrowMLDlK/S4M2jSNC30yyagtHjf9OFATUKy709Qgu6CkXo89btOazrOwQhtjjmMKs
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(346002)(39860400002)(366004)(376002)(451199024)(1800799009)(186009)(6506007)(6486002)(7416002)(7406005)(6512007)(2906002)(26005)(66556008)(3450700001)(5660300002)(38100700002)(66476007)(316002)(8676002)(4326008)(41300700001)(8936002)(6916009)(54906003)(66946007)(82960400001)(6666004)(478600001)(86362001)(83380400001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?oGkly7Efjpo2HEAbxPMZ4aGaRk5erelMBtYaeumhRSf4JPCcurMCNUlhg6XS?=
- =?us-ascii?Q?rR03HAnPXj0TXpRj6S5dCtd9r2fZHRsEZrCNvvh4od2lCl9b0lTcKhKs5L5T?=
- =?us-ascii?Q?vGdOizc0+Bb9ThdIj19RlqORbIW7tNqOnSwuu+GkyXRUz+RjjgvZtvH0HMtG?=
- =?us-ascii?Q?1nqnOgV4aSBAJi4J7QDjZCHKSA34Rnly+gc+2ARRYA9ihvbjk43QxxQRa0as?=
- =?us-ascii?Q?H4Khy39GIXg/rL/EUmC6OQQUBsbGJhdXrfnALvOE339+qenGJS0TD6g4N8sz?=
- =?us-ascii?Q?FFo7rHn+Z/fLfvACJobHwdbiit/APLktfaLTShYpl/aITPD4abUXeLNzb2gj?=
- =?us-ascii?Q?a1w88RH4bHeLOWtbtixiwS1mYr09WDxzFuaMNfxYYmK4S2rjuSvxAkUyYcab?=
- =?us-ascii?Q?9/o6FjexIl0lP+Yj37fGg/jcdiDt6lU/IKLagqRQvUJ33ULbO7u6dWCLO89L?=
- =?us-ascii?Q?Bju9PhWKAbrEod6tC0/rn4abWlVCQ44TVg2qPXYdQndBa6Gh5bdOMB13dfU5?=
- =?us-ascii?Q?+omdo1Afi2bEQ8GF4BLtQb0e4l44o3jX43Y4CBWVD9TinfYHX1cGUILcxdWr?=
- =?us-ascii?Q?bHoLWouNRfzuN1kU11hwKP1xi9fTmDkT2wnfaZU+Al1/2Ud0RHqh6t4bmgCg?=
- =?us-ascii?Q?0WtgrewIRrjHgQYjHDN9FdCu7/ha+Q9nR69xbrCyJ+ctDJlj9cq3I3aEyK8m?=
- =?us-ascii?Q?YoOxA42ph6t331rDokxzABFOas+fJKbADCfrxC4NpOdBh7cxU2UdMokWPUXa?=
- =?us-ascii?Q?jexYETkzp8NV5X9EW7iFP30CKoZC1fpyY969hN69zjhWrOKLL2Rsk0LANxUC?=
- =?us-ascii?Q?xjuFyKpecKlBLcvfrFRBVR7VS1i212OHf6qK24rnTHZCKoOcSfoabZOHUxXo?=
- =?us-ascii?Q?yh85Npo/kTOW7HzVlJgjwu5bmYaEA6mA0LD3tJxB2faWz5lJ7kWat+P9GRde?=
- =?us-ascii?Q?MLEirzmJPCTi+ZKo8leXrRC+ttG2joFcRHg114jxmSBgg0PWQA+Rn+kmj0u2?=
- =?us-ascii?Q?4qURY/EVoGDdPuVZwDm+GxoRAruzKwDrzpuw5QVr1IdpkCkxGvXmIZnUTj8p?=
- =?us-ascii?Q?atWkBapA8ihG8/PXz/IVOqwnNKaY4AfQttxv1Vp5j+GjsKabo3IplExvObGn?=
- =?us-ascii?Q?kY5UZu5DAJuH6eNOpXCk/gFw2VSeYKZER9eztJPRuZ7Hhh+HpFUdWvR9xkE4?=
- =?us-ascii?Q?KNlovuUmfpSLj+IdIiJ025QnXHeT728U4ppH1cXl8Bq4cJf5jk6HGPsTnsjj?=
- =?us-ascii?Q?P+9GymwmG0UFmWCgVww2wzZ7U8h4OS7Xp9vFjSU9MC3pNNlsDwJtS5PfN9SC?=
- =?us-ascii?Q?LiELTa9f0zFLnfZY/IIsWbENc1d2ar13W3PuwXetj100K6LccieSIln8lv1h?=
- =?us-ascii?Q?1YBwPObMB1bYptkBMDuoV5WruEdMGzT6xDvF2JBjIXeSoNtTq6B5C68dQ8YI?=
- =?us-ascii?Q?NhWBBlpJiT/miwAlrVpOzicMpQ9eAWLItd3n+auG63KRdn+IQ1peEcb4nSrd?=
- =?us-ascii?Q?6UEGqT3MjD7LtckP/0+O3PH/7/eVwGgR/nVg4Cg/1t6t4XpCVJ/zAwADOPz2?=
- =?us-ascii?Q?gKG2iP58jk+EdSvqLD+fHoD4iw1lAqQt+g0sN2p3?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2565bab3-13d1-47da-6156-08dbb5b21f53
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2023 06:08:04.0409
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3BqdQQt6ZGtrfK54GbYMi54+OeE95wRqXTESwBFb5sP4OU+uWGKyzzSwlaywaLAnTI3P5b9sVJMBR7ffdEqLyQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5242
-X-OriginatorOrg: intel.com
+References: <cover.1694421911.git.haibo1.xu@intel.com> <64e0637cd6f22dd7557ed44bd2242001e7830d1c.1694421911.git.haibo1.xu@intel.com>
+ <20230914-d2e594e7d84503ad14036e2d@orel>
+In-Reply-To: <20230914-d2e594e7d84503ad14036e2d@orel>
+From: Haibo Xu <xiaobo55x@gmail.com>
+Date: Fri, 15 Sep 2023 14:21:41 +0800
+Message-ID: <CAJve8onhY534T=Hyncjfi4GfdZ+0D2xM+jRSaYCAWCdaKxPUcQ@mail.gmail.com>
+Subject: Re: [PATCH v3 9/9] KVM: riscv: selftests: Add sstc timer test
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: Haibo Xu <haibo1.xu@intel.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Sean Christopherson <seanjc@google.com>, Ricardo Koller <ricarkol@google.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Vipin Sharma <vipinsh@google.com>, David Matlack <dmatlack@google.com>, 
+	Colton Lewis <coltonlewis@google.com>, Aaron Lewis <aaronlewis@google.com>, 
+	Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 13, 2023 at 06:55:16PM -0700, Sean Christopherson wrote:
-....
-> +static void kvm_mmu_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
-> +					      struct kvm_page_fault *fault)
-> +{
-> +	kvm_prepare_memory_fault_exit(vcpu, fault->gfn << PAGE_SHIFT,
-> +				      PAGE_SIZE, fault->write, fault->exec,
-> +				      fault->is_private);
-> +}
-> +
-> +static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
-> +				   struct kvm_page_fault *fault)
-> +{
-> +	int max_order, r;
-> +
-> +	if (!kvm_slot_can_be_private(fault->slot)) {
-> +		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> +		return -EFAULT;
-> +	}
-> +
-> +	r = kvm_gmem_get_pfn(vcpu->kvm, fault->slot, fault->gfn, &fault->pfn,
-> +			     &max_order);
-> +	if (r) {
-> +		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> +		return r;
-> +	}
-> +
-> +	fault->max_level = min(kvm_max_level_for_order(max_order),
-> +			       fault->max_level);
-> +	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
-> +
-> +	return RET_PF_CONTINUE;
-> +}
-> +
->  static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->  {
->  	struct kvm_memory_slot *slot = fault->slot;
-> @@ -4293,6 +4356,14 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->  			return RET_PF_EMULATE;
->  	}
->  
-> +	if (fault->is_private != kvm_mem_is_private(vcpu->kvm, fault->gfn)) {
-In patch 21,
-fault->is_private is set as:
-	".is_private = kvm_mem_is_private(vcpu->kvm, cr2_or_gpa >> PAGE_SHIFT)",
-then, the inequality here means memory attribute has been updated after
-last check.
-So, why an exit to user space for converting is required instead of a mere retry?
+On Thu, Sep 14, 2023 at 5:52=E2=80=AFPM Andrew Jones <ajones@ventanamicro.c=
+om> wrote:
+>
+> On Thu, Sep 14, 2023 at 09:37:03AM +0800, Haibo Xu wrote:
+> > Add a KVM selftests to validate the Sstc timer functionality.
+> > The test was ported from arm64 arch timer test.
+>
+> I just tried this test out. Running it over and over again on QEMU I see
+> it works sometimes, but it frequently fails with the
+> GUEST_ASSERT_EQ(config_iter + 1, irq_iter) assert and at least once I
+> also saw the __GUEST_ASSERT(xcnt >=3D cmp) assert.
+>
 
-Or, is it because how .is_private is assigned in patch 21 is subjected to change
-in future? 
+Good catch!
 
-> +		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> +		return -EFAULT;
-> +	}
-> +
-> +	if (fault->is_private)
-> +		return kvm_faultin_pfn_private(vcpu, fault);
-> +
->  	async = false;
->  	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, false, &async,
->  					  fault->write, &fault->map_writable,
-> @@ -7184,6 +7255,19 @@ void kvm_mmu_pre_destroy_vm(struct kvm *kvm)
->  }
->  
- 
+I can also reproduce this issue and it is a common problem for both
+arm64 and riscv because it also happens in a arm64 Qemu VM.
+
+It seems like a synchronization issue between host and guest shared
+variables. Will double check the test code.
+
+> Thanks,
+> drew
