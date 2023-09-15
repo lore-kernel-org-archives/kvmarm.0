@@ -1,88 +1,104 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A35C510A0A
-	for <kvmarm@lists.linux.dev>; Fri, 15 Sep 2023 13:30:31 +0000 (UTC)
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1694784624;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=t4a69QAJHoLA0O/kevTly+3PbGRi/ca9qXsnMKQmmz4=;
-	b=VvhyY2DjZI2vuivX7kUro9SCFkXJxhGEOzbmZVk78FLfzmED6+pXPF71mKfsEnmzi5ke/Y
-	JzUSn+Y4ieqsib0SLhHkNeXeE0eeZdOPsxH9BFFg8IGHpqUHhgLFKbM9jjmOlkBUh0oI7i
-	D0CUFWf00DY0DU2tvyKNA9Fy0I7H9gfSlZXnZdrEVs19CYik3pGy+KHhMjC7HIQUOPnBHB
-	6rtDDAbD2aLigxZObvxapKneQW+ZtNScPpN+tl85LIxzZiGvpCw/J+HUOEkOuxNEzFQ6WK
-	8Z7B7kQsYsXXU4WOrzqKpQOnKVj2jUk9bQFluXtkTHfD/+f37KWohaOdnnT1ZA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1694784624;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=t4a69QAJHoLA0O/kevTly+3PbGRi/ca9qXsnMKQmmz4=;
-	b=MB7u8FElR3aNFJLb/9MfgTw1mqXDhAupHamM3e/Ij4hNRTGnIiKMXsws8Nk249DLQk0XIb
-	2cTXmHAYSYrwk0Dg==
-To: Peter Hilber <peter.hilber@opensynergy.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Peter Hilber <peter.hilber@opensynergy.com>, Ingo Molnar
- <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
- <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
- <hpa@zytor.com>, Richard Cochran <richardcochran@gmail.com>, John Stultz
- <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>,
- netdev@vger.kernel.org, Marc Zyngier <maz@kernel.org>, Paolo Bonzini
- <pbonzini@redhat.com>, Oliver Upton <oliver.upton@linux.dev>, James Morse
- <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui
- Yu <yuzenghui@huawei.com>, Sean Christopherson <seanjc@google.com>
-Subject: Re: [RFC PATCH 4/4] treewide: Use clocksource id for struct
- system_counterval_t
-In-Reply-To: <20230818011256.211078-5-peter.hilber@opensynergy.com>
-References: <20230818011256.211078-1-peter.hilber@opensynergy.com>
- <20230818011256.211078-5-peter.hilber@opensynergy.com>
-Date: Fri, 15 Sep 2023 15:30:23 +0200
-Message-ID: <87cyyj1s40.ffs@tglx>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1517101EB
+	for <kvmarm@lists.linux.dev>; Fri, 15 Sep 2023 13:43:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=MDmOVUGFw7psqGT5ektePsIj1IbCfn8TY/XxeJGVNTw=; b=rtC74pAlfCcyhcB3Wyl8LKCPB0
+	Xwz14Qd36TL0PKhw7Zk+LHnxUd5XgAmKuJEe7akvV+FC/sROu11SxSxKI+0wEMV+5tyG+iCX3Olrr
+	lO0y6WnYO8QsojbcRYxX9UrQdN/L/OAffvM0kt7yypxuwclbo3I2J8b4RIOb+s/+WUwGejgTGc/Xo
+	dStNDrPrXV6sXo2DJ/ln2JUAiLUi/5f/0lMGJHd3Kav6/MEdvhDb63mrP0ECRMh5DT6Wb67I6BORS
+	s9AtdfQyX3WJB4LjYZCrgQaddENsVW+TeUjrQddQqbbbUdsUALBFXgdcFgNaR305NNyFce8J7knKh
+	AzEeS2ng==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40636)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qh96C-0005hw-0w;
+	Fri, 15 Sep 2023 14:43:08 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qh969-0005qV-Do; Fri, 15 Sep 2023 14:43:05 +0100
+Date: Fri, 15 Sep 2023 14:43:05 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Salil Mehta <salil.mehta@huawei.com>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Jonathan Cameron <jonathan.cameron@huawei.com>,
+	James Morse <james.morse@arm.com>,
+	"linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
+	"linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
+	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"x86@kernel.org" <x86@kernel.org>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	"jianyong.wu@arm.com" <jianyong.wu@arm.com>,
+	"justin.he@arm.com" <justin.he@arm.com>
+Subject: Re: [RFC PATCH v2 27/35] ACPICA: Add new MADT GICC flags fields
+ [code first?]
+Message-ID: <ZQRfaYYwrYQEfICN@shell.armlinux.org.uk>
+References: <20230913163823.7880-1-james.morse@arm.com>
+ <20230913163823.7880-28-james.morse@arm.com>
+ <CAMj1kXHRAt7ecB9p_dm3MjDL5wZkAsVh30hMY2SV_XUe=bm6Vg@mail.gmail.com>
+ <20230914155459.00002dba@Huawei.com>
+ <CAMj1kXFquiLGCMow3iujHUU4GBZx2t9KfKy1R9iqjBFjY+acaA@mail.gmail.com>
+ <f5d9beea95e149ab89364dcdb0f8bf69@huawei.com>
+ <ZQQDJT6MOaIOPmq5@shell.armlinux.org.uk>
+ <CAJZ5v0jUQ+4G5ArYAtu1gvYF4356CK_QVTO4oWn0ukwdOiZaHA@mail.gmail.com>
+ <80e36ff513504a0382a1cbce83e42295@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <80e36ff513504a0382a1cbce83e42295@huawei.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Peter!
+On Fri, Sep 15, 2023 at 09:34:46AM +0000, Salil Mehta wrote:
+> > > Note that the ACPI spec says enabled + online-capable isn't defined.
+> > >
+> > > "The information conveyed by this bit depends on the value of the
+> > > Enabled bit. If the Enabled bit is set, this bit is reserved and
+> > > must be zero."
+> > >
+> > > So, if x86 is doing something with the enabled && online-capable
+> > > state (other than ignoring the online-capable) then technically it
+> > > is doing something that the spec doesn't define
+> > 
+> > And so it is wrong.
+> 
+> Or maybe, specification has not been updated yet. code-first?
 
-On Fri, Aug 18 2023 at 03:12, Peter Hilber wrote:
-> --- a/arch/x86/kernel/tsc.c
-> +++ b/arch/x86/kernel/tsc.c
-> @@ -1313,7 +1313,7 @@ struct system_counterval_t convert_art_to_tsc(u64 art)
->  	res += tmp + art_to_tsc_offset;
->  
->  	return (struct system_counterval_t) {
-> -		.cs = have_art ? &clocksource_tsc : NULL,
-> +		.cs_id = have_art ? CSID_TSC : CSID_GENERIC,
->  		.cycles = res
+What is the point in speculating. If you want to speculate about it,
+fine, but please don't use speculation as a reason that "oh we need
+to sort this out before we can merge the patches".
 
-Can you please change all of this so that:
+This is precisely why engineers are bad at producing products. They
+like to continually tweak the design, and the design never gets out
+the door. You need someone who is a project manager to tell engineers
+when to stop. Without a project manager to do that, eventually the
+project fades into insignificance because it becomes no longer relevant
+or has its funding cut.
 
-    patch 1:   Adds cs_id to struct system_counterval_t
-    patch 2-4: Add the clocksource ID and set the cs_id field
-    patch 5:   Switches the core to evaluate cs_id
-    patch 6:   Remove the cs field from system_counterval_t
+Hotplug VCPU on aarch64 feels exactly like that - it seems to be an
+engineer project that is just going to for-ever rumble on and never
+actually see the light of day.
 
+So please - stop speculating and lets get vCPU hotplug *actually*
+delivered and usable. Even if it's not 100% perfect.
 
-> --- a/include/linux/timekeeping.h
-> +++ b/include/linux/timekeeping.h
-> @@ -270,12 +270,12 @@ struct system_device_crosststamp {
->   * struct system_counterval_t - system counter value with the pointer to the
->   *				corresponding clocksource
->   * @cycles:	System counter value
-> - * @cs:		Clocksource corresponding to system counter value. Used by
-> + * @cs_id:	Clocksource corresponding to system counter value. Used by
->   *		timekeeping code to verify comparibility of two cycle values
-
-That comment is inaccurate. It's not longer the clocksource itself. It's
-the ID which is used for validation.
-
-Thanks,
-
-        tglx
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
