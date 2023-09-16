@@ -1,42 +1,42 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 369C6EA6
-	for <kvmarm@lists.linux.dev>; Sat, 16 Sep 2023 00:31:41 +0000 (UTC)
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1c0cfc2b995so24152505ad.2
-        for <kvmarm@lists.linux.dev>; Fri, 15 Sep 2023 17:31:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A71C0A47
+	for <kvmarm@lists.linux.dev>; Sat, 16 Sep 2023 00:31:43 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d8141d6fbe3so3253523276.3
+        for <kvmarm@lists.linux.dev>; Fri, 15 Sep 2023 17:31:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694824300; x=1695429100; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1694824302; x=1695429102; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=RPxwiI+CF5oY5axnD8PplP8rMTdwT2bOTUtJzDVfTIk=;
-        b=IjtQrqbUQi46AwMxyTcErmxmrO4En5nWFkH/PT0DVlgH8y/i322Wm1IS5+NOqM/3GP
-         L0jHpqlVhS32YSPwb4UVvFMpr1EnoKSveDxualxgrIX6J4ltu192YQtYWWnEbK5A6owh
-         zsOP2Fxq0pii00z3tNK5vbP5RF6WzBxJPUURPzfImvHPxYPgdXzFutH8DKi9n2mOYCx+
-         0pIMD4YNCxSmKtnnQsFZSlszyE7LnhSTzUa8/LKyASGqSVlfYwW6F1uSWxYzgdZfXG87
-         9+oqCvP3Mfm1Xl4UO89Z8chvXuFEhRpuSAhzqJ/PTj2/VhWxsLs4becJiXPyhTULSkj8
-         ZS/w==
+        bh=11iXbA6RA96N2ihdzvT9DOzykVF8TPNgieg32BOfaCo=;
+        b=qq/ex2tnH+J639m204mezpUlCRql/sUW6YFq9oxL0qIt1Fz7g58GXBVfybVqvjnV15
+         i2l2Js+uxuFYZlR73MC69MDUCy76dXDuHR0sGEh22+Cv6vEbwMeumUiUb+edKFQdznkn
+         uV/tkRXKL3EYkHXZWRm892OT+F0pxeljSc3zNDB/CQGG1IaT4DiDgw3AS/qFG94b/ZK0
+         XRLHjaW1jLoEtK0hjIJ8U5E/PHT0TSUxGJXjpwRfr4ZZbjVuWORwzm9Ou+n1+O4edj/1
+         at7gKZU1RzWC3qtDPmBRE2HX2R6mYgnDoUiylnuh4Zye2ZeZc6gN7UZJtM2YjHlgdhaJ
+         hgtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694824300; x=1695429100;
+        d=1e100.net; s=20230601; t=1694824302; x=1695429102;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=RPxwiI+CF5oY5axnD8PplP8rMTdwT2bOTUtJzDVfTIk=;
-        b=CpYIxRBOduhDAAMWFi/9ec7K5po3P1FhjNsBMpT8QiDKOphmSVg8Wb51MoF9fVnOpA
-         N3dlfqYEc6Dsy31yz5HZes0be61jfSmDQwjNrnJTQ1leldU3tF//yrt9v/kDNwGS91a2
-         HPerp20k7EZ0zRYnBH9SW+1BOm3c84F/qZamxQ5IF9lQwTUOFiuk3tVgx+uCZeA9W2O0
-         rwMQNHa9HBHNPTkWX/laAhdAr/UoB3DXrWgwdMlDP05ttNNefrXodwuTCGVzacOKmFWY
-         wlwsDqZ/9NG05Yz8ei/35TaYRRUujP9iJPtDQbsCNDTepK65KAyrk4AINtmedoAirhVn
-         3Vbw==
-X-Gm-Message-State: AOJu0Yzo+JFS9l7FuA8J9wo99rtGCRDqg+q+2gWu+zMsBrFciJFMKgAu
-	ge0LohBKnol1nzWTuJQ5T+HEayuSIXw=
-X-Google-Smtp-Source: AGHT+IHW1P62bdhU5bhLcOltXlUxrv9g7sIQXkfjHJs3Wzbb395eeX6g+RNXiUsvwMV2ESouovB/6KamMFU=
+        bh=11iXbA6RA96N2ihdzvT9DOzykVF8TPNgieg32BOfaCo=;
+        b=BnRnYZ4W53FEy3bAv5wCEusRmW2oMnlmJyjhKuDZLgk2LOHJSLdeTSgM2bw+jxgAOV
+         IvTzffvbDs6EpyQy5EMqvDCIjResSJpZoAEmbrU7zjisbfb13g1k019vryeX0egvk7Vl
+         Pj0mHdtnoqxOQgWqyqTOh5oVDl0sRwBZRaQgTGpg2oMvOzCXtOA+6nxKFIX58QoSMbAW
+         HpY8fvzo5uoUqFx3vUMJUNALm5sMf1Buf4QiDh5fHjI8UlC/SiMfQhNSvLhiJagOyYYN
+         qFSYfJHBDA56y03y3zlcagua1H0CG26gWLqx5va61b+4MiPq20N4ALfVqOobfD8d9+k7
+         Qv4Q==
+X-Gm-Message-State: AOJu0Yx5MpNjcnD2m9vknq5aRSkzIn1SxgflOFWALQV2fLjbWSZmnuUI
+	k78N+IS2WNgfNl31RH5zjnj0Wjdi8RE=
+X-Google-Smtp-Source: AGHT+IEXzBZMjfoz19MMDpz0z/mfp5J4Xc54+oTqT/y9sTC3/YRTAU+NLkJhdnChwcXUDWkKwhep1BL4HMg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:2302:b0:1b8:a555:385d with SMTP id
- d2-20020a170903230200b001b8a555385dmr88540plh.9.1694824300497; Fri, 15 Sep
- 2023 17:31:40 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6902:138e:b0:d78:245a:aac4 with SMTP id
+ x14-20020a056902138e00b00d78245aaac4mr82625ybu.1.1694824302614; Fri, 15 Sep
+ 2023 17:31:42 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 15 Sep 2023 17:31:02 -0700
+Date: Fri, 15 Sep 2023 17:31:03 -0700
 In-Reply-To: <20230916003118.2540661-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -46,8 +46,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230916003118.2540661-1-seanjc@google.com>
 X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
-Message-ID: <20230916003118.2540661-11-seanjc@google.com>
-Subject: [PATCH 10/26] KVM: s390: Stop selecting and depending on HAVE_KVM
+Message-ID: <20230916003118.2540661-12-seanjc@google.com>
+Subject: [PATCH 11/26] KVM: MIPS: Make HAVE_KVM a MIPS-only Kconfig
 From: Sean Christopherson <seanjc@google.com>
 To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
 	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
@@ -73,40 +73,45 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Andrew Thornton <andrewth@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Now that nothing in s390 or architecture agnostic code consumes HAVE_KVM,
-stop selecting it in s390.  This is one of several steps towards deleting
-HAVE_KVM from the common KVM Kconfig.
+Now that MIPS is the sole remaining user of HAVE_KVM, make HAVE_KVM a
+MIPS-only Kconfig.  Because most architectures unconditionally support
+virtualization, advertising to the kernel at-large that an arch has KVM
+just led to a bunch of useless and misguided #ifdefs.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/s390/Kconfig     | 1 -
- arch/s390/kvm/Kconfig | 1 -
- 2 files changed, 2 deletions(-)
+ arch/mips/kvm/Kconfig | 3 +++
+ virt/kvm/Kconfig      | 3 ---
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
-index ae29e4392664..8a5dca0036d9 100644
---- a/arch/s390/Kconfig
-+++ b/arch/s390/Kconfig
-@@ -193,7 +193,6 @@ config S390
- 	select HAVE_KPROBES
- 	select HAVE_KPROBES_ON_FTRACE
- 	select HAVE_KRETPROBES
--	select HAVE_KVM
- 	select HAVE_LIVEPATCH
- 	select HAVE_MEMBLOCK_PHYS_MAP
- 	select HAVE_MOD_ARCH_SPECIFIC
-diff --git a/arch/s390/kvm/Kconfig b/arch/s390/kvm/Kconfig
-index 459d536116a6..9056cee72945 100644
---- a/arch/s390/kvm/Kconfig
-+++ b/arch/s390/kvm/Kconfig
-@@ -19,7 +19,6 @@ if VIRTUALIZATION
- config KVM
- 	def_tristate y
- 	prompt "Kernel-based Virtual Machine (KVM) support"
--	depends on HAVE_KVM
- 	select PREEMPT_NOTIFIERS
- 	select HAVE_KVM_CPU_RELAX_INTERCEPT
- 	select HAVE_KVM_VCPU_ASYNC_IOCTL
+diff --git a/arch/mips/kvm/Kconfig b/arch/mips/kvm/Kconfig
+index a8cdba75f98d..c4508f49caae 100644
+--- a/arch/mips/kvm/Kconfig
++++ b/arch/mips/kvm/Kconfig
+@@ -4,6 +4,9 @@
+ #
+ source "virt/kvm/Kconfig"
+ 
++config HAVE_KVM
++       bool
++
+ menuconfig VIRTUALIZATION
+ 	bool "Virtualization"
+ 	help
+diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+index f0be3b55cea6..f7bb6c59658e 100644
+--- a/virt/kvm/Kconfig
++++ b/virt/kvm/Kconfig
+@@ -1,9 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
+ # KVM common configuration items and defaults
+ 
+-config HAVE_KVM
+-       bool
+-
+ config HAVE_KVM_PFNCACHE
+        bool
+ 
 -- 
 2.42.0.459.ge4e396fd5e-goog
 
