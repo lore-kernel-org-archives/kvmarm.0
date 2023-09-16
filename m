@@ -1,42 +1,42 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5843EA6
-	for <kvmarm@lists.linux.dev>; Sat, 16 Sep 2023 00:31:33 +0000 (UTC)
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d7ec535fe42so3057561276.1
-        for <kvmarm@lists.linux.dev>; Fri, 15 Sep 2023 17:31:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E71CEC0
+	for <kvmarm@lists.linux.dev>; Sat, 16 Sep 2023 00:31:35 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d818fb959f4so2979470276.1
+        for <kvmarm@lists.linux.dev>; Fri, 15 Sep 2023 17:31:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694824292; x=1695429092; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1694824294; x=1695429094; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=qo2m7xsYGxv0LvZBx1IOU3suTnYOrGiO/bIX70mqbME=;
-        b=VeANmzb9+TgtcELEw5tPgk3/N2d0/c9OroJ8mz5n52ZdoegBm80w1CT6hqTdYBo3fa
-         4Qi50tFK26BDUq30LtBu7gSCAKKeXM4I+KbURHsIJkxZo6BMd5vluhBBdYdHPud65h+A
-         O3oeAE17nWm07z2Szzx+fQIFn8cmxWwYGrzo+zyHK7Nxr+nz36koDZejY5/vTlzp+uh1
-         8ATPIDb78n/Rg1leU7YxPH864kfeXf5JT7jw5xOJ1JwmYFxcu+mAlliTaeSu07WuVCD0
-         YMUq1UUq1D72MzBICbkfL+Q3JDLGXgurtHFwwY/Sb3FKwFNhwSM2AoU5/ptWvqgQ4WOi
-         JWFw==
+        bh=XQRlLqUbNuYp1+FU2drQZXL0G0BiKv3N4ijMXeK3kKU=;
+        b=ObcP2959DcsRHBY35OHl130rH5QdwWfGl2cVZ0ijdsgMm4DmlCe4AJJImynG+tDjNg
+         pGQ853WJDYICUHx8Sk45SgOvA/lrnBLwRlYBrv8/mX7aCiYnGSkg89adveYbeJC2cB+L
+         d3Mi8oNq2dNCrVmCcgfAgu3Z1hqIysOYfjyZKu9nPW5eCMIu7UK918kx2bGDxMZfby1s
+         9TEKv9qDniSVVXQDAJNwnLClCUbgh6QDfwooDzeF6IaMHGy+DX9OQK5c4AfSpvhk1bP5
+         3R2I+Cs1v2+SLM+4GSdJdRbe+VKfD8fadZ6w3qPyT9YlloIl9z+8wjDkdITFklyD/kJ5
+         XhCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694824292; x=1695429092;
+        d=1e100.net; s=20230601; t=1694824294; x=1695429094;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=qo2m7xsYGxv0LvZBx1IOU3suTnYOrGiO/bIX70mqbME=;
-        b=MmMjWshKKCE2tchUwzmBbtfRI6BfEEBtzrxBJYxldnU5E5ulgafsNXlx14uygklE2L
-         zQKhTV97JMLymrNcuHaLKnvpv4QKt/DXKcAIUOD29yHOAVH5mP84t9FFYyIGecsqOCUg
-         W5bf8cibXQ07v4T2TLLGeLVEssJZpkPabx/PICKG/j1Iab1bGZfslxTtT8HcpPy1aCBZ
-         Dy8g828itO/TzOPxhSkZnO3GamHLQRbSDPsLaKgvgpGLvfwry75UCU7kmg1cPIg2D0TH
-         pkFyerYA487NVc8pRgLKZXpe/tE3J9Qz/gGrxjBOmvfpmX4a72oU37sMDDpElVVP09xc
-         UXxA==
-X-Gm-Message-State: AOJu0YypQD6s42o3/O9keM1HKtQoGGvVy3Y09nxajQzG3tpTm5I6qC1W
-	MS/x6GtAdgeXfmM1IBcgeOHpr0Tq9X8=
-X-Google-Smtp-Source: AGHT+IGldyHqJlNQwUdnpkugxOOkbUw+dVHZu9n7C9ywbITmCocjjVdCkDZmP9v50Lpi+O1mI86Ze95fAkM=
+        bh=XQRlLqUbNuYp1+FU2drQZXL0G0BiKv3N4ijMXeK3kKU=;
+        b=kyRALSgccFF55BsxquTGRAEiwGVJlw0+/Tb0LUzi0WV1HTugJj98ZQ6E0m/lH2Y8jQ
+         27xWM2aYV00bAGcw3sF6KPOMsX+cegm6Stug1RSVJZrM8I6767/B6Wsgy4cyeCfDzkYh
+         5LLzaZ6fA61kkSHmhZQM3vSIbX5gnFPNvbVEwCE8s33D+YB0ZSdT2/e7iMueeeqybwxJ
+         NHgHk1/2hqtAXom9pp18wDLDAmy+QOccWIuOivKsZfosuiQKHJ7z6LcWM1thJLls5QOf
+         8KOUGW/nCxXnldBlVKoy6uIavFeZYvTBz9y9GPq3qX+dPR9gZkQ91HuM46LuQlGhc8Jo
+         Cl8g==
+X-Gm-Message-State: AOJu0Yx6nNjFlktdsDJO76ya3QztF70/9uPMQpghImwH+UVrDQGGVX14
+	v4Tx2wH1CdxgunzPkXAPgoL+lgwAbLs=
+X-Google-Smtp-Source: AGHT+IHBAJpKVTk5K4TnqnuCpKfAMfti0UcZajyltDkU/ESq4jqN2J77nrZn8mACY7DFJ5DSU6KVipQ1KO4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:d045:0:b0:d7e:afff:c8fa with SMTP id
- h66-20020a25d045000000b00d7eafffc8famr73977ybg.5.1694824292733; Fri, 15 Sep
- 2023 17:31:32 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:aa6c:0:b0:d7e:a025:2672 with SMTP id
+ s99-20020a25aa6c000000b00d7ea0252672mr72126ybi.9.1694824294437; Fri, 15 Sep
+ 2023 17:31:34 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 15 Sep 2023 17:30:58 -0700
+Date: Fri, 15 Sep 2023 17:30:59 -0700
 In-Reply-To: <20230916003118.2540661-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -46,8 +46,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230916003118.2540661-1-seanjc@google.com>
 X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
-Message-ID: <20230916003118.2540661-7-seanjc@google.com>
-Subject: [PATCH 06/26] KVM: Drop CONFIG_KVM_VFIO and just look at KVM+VFIO
+Message-ID: <20230916003118.2540661-8-seanjc@google.com>
+Subject: [PATCH 07/26] x86/idt: Wrap KVM logic with CONFIG_KVM instead of CONFIG_HAVE_KVM
 From: Sean Christopherson <seanjc@google.com>
 To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
 	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
@@ -73,117 +73,156 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Andrew Thornton <andrewth@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Drop KVM's KVM_VFIO Kconfig, and instead compile in VFIO support if
-and only if VFIO itself is enabled.  Similar to the recent change to have
-VFIO stop looking at HAVE_KVM, compiling in support for talking to VFIO
-just because the architecture supports VFIO is nonsensical.
+Wrap all of the IDT-related code that deals with KVM in CONFIG_KVM instead
+of CONFIG_HAVE_KVM.  x86 always "has" KVM, i.e. checking CONFIG_HAVE_KVM
+is pointless.
 
-This fixes a bug where RISC-V doesn't select KVM_VFIO, i.e. would silently
-fail to do connect KVM and VFIO, even though RISC-V supports VFIO.  The
-bug is benign as the only driver in all of Linux that actually uses the
-KVM reference provided by VFIO is KVM-GT, which is x86/Intel specific.
+Alternatively, the #ifdefs could simply be deleted, but the only potential
+value is in printing the number of posted interrupts that end up being
+handled by the host, everything else is completely dead code when KVM is
+disabled.  And if KVM is disabled, there should not be any posted
+interrupts, i.e. NOT wiring up the "dummy" handlers and treating IRQs on
+those vectors as spurious is the right thing to do.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/arm64/kvm/Kconfig   | 1 -
- arch/powerpc/kvm/Kconfig | 1 -
- arch/s390/kvm/Kconfig    | 1 -
- arch/x86/kvm/Kconfig     | 1 -
- virt/kvm/Kconfig         | 3 ---
- virt/kvm/Makefile.kvm    | 4 +++-
- virt/kvm/vfio.h          | 2 +-
- 7 files changed, 4 insertions(+), 9 deletions(-)
+ arch/x86/include/asm/hardirq.h           | 2 +-
+ arch/x86/include/asm/idtentry.h          | 2 +-
+ arch/x86/include/asm/irq.h               | 2 +-
+ arch/x86/include/asm/irq_vectors.h       | 2 +-
+ arch/x86/kernel/idt.c                    | 2 +-
+ arch/x86/kernel/irq.c                    | 4 ++--
+ scripts/gdb/linux/constants.py.in        | 2 +-
+ scripts/gdb/linux/interrupts.py          | 2 +-
+ tools/arch/x86/include/asm/irq_vectors.h | 2 +-
+ 9 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 83c1e09be42e..2b5c332f157d 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -28,7 +28,6 @@ menuconfig KVM
- 	select KVM_MMIO
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
- 	select KVM_XFER_TO_GUEST_WORK
--	select KVM_VFIO
- 	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_IRQFD
- 	select HAVE_KVM_DIRTY_RING_ACQ_REL
-diff --git a/arch/powerpc/kvm/Kconfig b/arch/powerpc/kvm/Kconfig
-index 902611954200..c4beb49c0eb2 100644
---- a/arch/powerpc/kvm/Kconfig
-+++ b/arch/powerpc/kvm/Kconfig
-@@ -22,7 +22,6 @@ config KVM
- 	select PREEMPT_NOTIFIERS
- 	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_VCPU_ASYNC_IOCTL
--	select KVM_VFIO
- 	select IRQ_BYPASS_MANAGER
- 	select HAVE_KVM_IRQ_BYPASS
- 	select INTERVAL_TREE
-diff --git a/arch/s390/kvm/Kconfig b/arch/s390/kvm/Kconfig
-index 45fdf2a9b2e3..459d536116a6 100644
---- a/arch/s390/kvm/Kconfig
-+++ b/arch/s390/kvm/Kconfig
-@@ -31,7 +31,6 @@ config KVM
- 	select HAVE_KVM_IRQ_ROUTING
- 	select HAVE_KVM_INVALID_WAKEUPS
- 	select HAVE_KVM_NO_POLL
--	select KVM_VFIO
- 	select INTERVAL_TREE
- 	select MMU_NOTIFIER
- 	help
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index ed90f148140d..0f01e5600b5f 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -45,7 +45,6 @@ config KVM
- 	select HAVE_KVM_NO_POLL
- 	select KVM_XFER_TO_GUEST_WORK
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
--	select KVM_VFIO
- 	select INTERVAL_TREE
- 	select HAVE_KVM_PM_NOTIFIER if PM
- 	select KVM_GENERIC_HARDWARE_ENABLING
-diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-index 484d0873061c..f0be3b55cea6 100644
---- a/virt/kvm/Kconfig
-+++ b/virt/kvm/Kconfig
-@@ -59,9 +59,6 @@ config HAVE_KVM_MSI
- config HAVE_KVM_CPU_RELAX_INTERCEPT
-        bool
+diff --git a/arch/x86/include/asm/hardirq.h b/arch/x86/include/asm/hardirq.h
+index 66837b8c67f1..fbc7722b87d1 100644
+--- a/arch/x86/include/asm/hardirq.h
++++ b/arch/x86/include/asm/hardirq.h
+@@ -15,7 +15,7 @@ typedef struct {
+ 	unsigned int irq_spurious_count;
+ 	unsigned int icr_read_retry_count;
+ #endif
+-#ifdef CONFIG_HAVE_KVM
++#if IS_ENABLED(CONFIG_KVM)
+ 	unsigned int kvm_posted_intr_ipis;
+ 	unsigned int kvm_posted_intr_wakeup_ipis;
+ 	unsigned int kvm_posted_intr_nested_ipis;
+diff --git a/arch/x86/include/asm/idtentry.h b/arch/x86/include/asm/idtentry.h
+index 05fd175cec7d..8eef16d0d72b 100644
+--- a/arch/x86/include/asm/idtentry.h
++++ b/arch/x86/include/asm/idtentry.h
+@@ -671,7 +671,7 @@ DECLARE_IDTENTRY_SYSVEC(IRQ_WORK_VECTOR,		sysvec_irq_work);
+ # endif
+ #endif
  
--config KVM_VFIO
--       bool
--
- config HAVE_KVM_INVALID_WAKEUPS
-        bool
+-#ifdef CONFIG_HAVE_KVM
++#if IS_ENABLED(CONFIG_KVM)
+ DECLARE_IDTENTRY_SYSVEC(POSTED_INTR_VECTOR,		sysvec_kvm_posted_intr_ipi);
+ DECLARE_IDTENTRY_SYSVEC(POSTED_INTR_WAKEUP_VECTOR,	sysvec_kvm_posted_intr_wakeup_ipi);
+ DECLARE_IDTENTRY_SYSVEC(POSTED_INTR_NESTED_VECTOR,	sysvec_kvm_posted_intr_nested_ipi);
+diff --git a/arch/x86/include/asm/irq.h b/arch/x86/include/asm/irq.h
+index 836c170d3087..194dfff84cb1 100644
+--- a/arch/x86/include/asm/irq.h
++++ b/arch/x86/include/asm/irq.h
+@@ -29,7 +29,7 @@ struct irq_desc;
  
-diff --git a/virt/kvm/Makefile.kvm b/virt/kvm/Makefile.kvm
-index 2c27d5d0c367..29373b59d89a 100644
---- a/virt/kvm/Makefile.kvm
-+++ b/virt/kvm/Makefile.kvm
-@@ -6,7 +6,9 @@
- KVM ?= ../../../virt/kvm
+ extern void fixup_irqs(void);
  
- kvm-y := $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/binary_stats.o
--kvm-$(CONFIG_KVM_VFIO) += $(KVM)/vfio.o
-+ifdef CONFIG_VFIO
-+kvm-y += $(KVM)/vfio.o
-+endif
- kvm-$(CONFIG_KVM_MMIO) += $(KVM)/coalesced_mmio.o
- kvm-$(CONFIG_KVM_ASYNC_PF) += $(KVM)/async_pf.o
- kvm-$(CONFIG_HAVE_KVM_IRQ_ROUTING) += $(KVM)/irqchip.o
-diff --git a/virt/kvm/vfio.h b/virt/kvm/vfio.h
-index e130a4a03530..af475a323965 100644
---- a/virt/kvm/vfio.h
-+++ b/virt/kvm/vfio.h
-@@ -2,7 +2,7 @@
- #ifndef __KVM_VFIO_H
- #define __KVM_VFIO_H
+-#ifdef CONFIG_HAVE_KVM
++#if IS_ENABLED(CONFIG_KVM)
+ extern void kvm_set_posted_intr_wakeup_handler(void (*handler)(void));
+ #endif
  
--#ifdef CONFIG_KVM_VFIO
-+#if IS_ENABLED(CONFIG_KVM) && IS_ENABLED(CONFIG_VFIO)
- int kvm_vfio_ops_init(void);
- void kvm_vfio_ops_exit(void);
- #else
+diff --git a/arch/x86/include/asm/irq_vectors.h b/arch/x86/include/asm/irq_vectors.h
+index 3a19904c2db6..3f73ac3ed3a0 100644
+--- a/arch/x86/include/asm/irq_vectors.h
++++ b/arch/x86/include/asm/irq_vectors.h
+@@ -84,7 +84,7 @@
+ #define HYPERVISOR_CALLBACK_VECTOR	0xf3
+ 
+ /* Vector for KVM to deliver posted interrupt IPI */
+-#ifdef CONFIG_HAVE_KVM
++#if IS_ENABLED(CONFIG_KVM)
+ #define POSTED_INTR_VECTOR		0xf2
+ #define POSTED_INTR_WAKEUP_VECTOR	0xf1
+ #define POSTED_INTR_NESTED_VECTOR	0xf0
+diff --git a/arch/x86/kernel/idt.c b/arch/x86/kernel/idt.c
+index b786d48f5a0f..a9e6363d88c2 100644
+--- a/arch/x86/kernel/idt.c
++++ b/arch/x86/kernel/idt.c
+@@ -149,7 +149,7 @@ static const __initconst struct idt_data apic_idts[] = {
+ #ifdef CONFIG_X86_LOCAL_APIC
+ 	INTG(LOCAL_TIMER_VECTOR,		asm_sysvec_apic_timer_interrupt),
+ 	INTG(X86_PLATFORM_IPI_VECTOR,		asm_sysvec_x86_platform_ipi),
+-# ifdef CONFIG_HAVE_KVM
++#if IS_ENABLED(CONFIG_KVM)
+ 	INTG(POSTED_INTR_VECTOR,		asm_sysvec_kvm_posted_intr_ipi),
+ 	INTG(POSTED_INTR_WAKEUP_VECTOR,		asm_sysvec_kvm_posted_intr_wakeup_ipi),
+ 	INTG(POSTED_INTR_NESTED_VECTOR,		asm_sysvec_kvm_posted_intr_nested_ipi),
+diff --git a/arch/x86/kernel/irq.c b/arch/x86/kernel/irq.c
+index 11761c124545..35fde0107901 100644
+--- a/arch/x86/kernel/irq.c
++++ b/arch/x86/kernel/irq.c
+@@ -164,7 +164,7 @@ int arch_show_interrupts(struct seq_file *p, int prec)
+ #if defined(CONFIG_X86_IO_APIC)
+ 	seq_printf(p, "%*s: %10u\n", prec, "MIS", atomic_read(&irq_mis_count));
+ #endif
+-#ifdef CONFIG_HAVE_KVM
++#if IS_ENABLED(CONFIG_KVM)
+ 	seq_printf(p, "%*s: ", prec, "PIN");
+ 	for_each_online_cpu(j)
+ 		seq_printf(p, "%10u ", irq_stats(j)->kvm_posted_intr_ipis);
+@@ -290,7 +290,7 @@ DEFINE_IDTENTRY_SYSVEC(sysvec_x86_platform_ipi)
+ }
+ #endif
+ 
+-#ifdef CONFIG_HAVE_KVM
++#if IS_ENABLED(CONFIG_KVM)
+ static void dummy_handler(void) {}
+ static void (*kvm_posted_intr_wakeup_handler)(void) = dummy_handler;
+ 
+diff --git a/scripts/gdb/linux/constants.py.in b/scripts/gdb/linux/constants.py.in
+index e3517d4ab8ec..054630f511e0 100644
+--- a/scripts/gdb/linux/constants.py.in
++++ b/scripts/gdb/linux/constants.py.in
+@@ -129,7 +129,7 @@ LX_CONFIG(CONFIG_X86_MCE_THRESHOLD)
+ LX_CONFIG(CONFIG_X86_MCE_AMD)
+ LX_CONFIG(CONFIG_X86_MCE)
+ LX_CONFIG(CONFIG_X86_IO_APIC)
+-LX_CONFIG(CONFIG_HAVE_KVM)
++LX_CONFIG(CONFIG_KVM)
+ LX_CONFIG(CONFIG_NUMA)
+ LX_CONFIG(CONFIG_ARM64)
+ LX_CONFIG(CONFIG_ARM64_4K_PAGES)
+diff --git a/scripts/gdb/linux/interrupts.py b/scripts/gdb/linux/interrupts.py
+index ef478e273791..66ae5c7690cf 100644
+--- a/scripts/gdb/linux/interrupts.py
++++ b/scripts/gdb/linux/interrupts.py
+@@ -151,7 +151,7 @@ def x86_show_interupts(prec):
+         if cnt is not None:
+             text += "%*s: %10u\n" % (prec, "MIS", cnt['counter'])
+ 
+-    if constants.LX_CONFIG_HAVE_KVM:
++    if constants.LX_CONFIG_KVM:
+         text += x86_show_irqstat(prec, "PIN", 'kvm_posted_intr_ipis', 'Posted-interrupt notification event')
+         text += x86_show_irqstat(prec, "NPI", 'kvm_posted_intr_nested_ipis', 'Nested posted-interrupt event')
+         text += x86_show_irqstat(prec, "PIW", 'kvm_posted_intr_wakeup_ipis', 'Posted-interrupt wakeup event')
+diff --git a/tools/arch/x86/include/asm/irq_vectors.h b/tools/arch/x86/include/asm/irq_vectors.h
+index 3a19904c2db6..3f73ac3ed3a0 100644
+--- a/tools/arch/x86/include/asm/irq_vectors.h
++++ b/tools/arch/x86/include/asm/irq_vectors.h
+@@ -84,7 +84,7 @@
+ #define HYPERVISOR_CALLBACK_VECTOR	0xf3
+ 
+ /* Vector for KVM to deliver posted interrupt IPI */
+-#ifdef CONFIG_HAVE_KVM
++#if IS_ENABLED(CONFIG_KVM)
+ #define POSTED_INTR_VECTOR		0xf2
+ #define POSTED_INTR_WAKEUP_VECTOR	0xf1
+ #define POSTED_INTR_NESTED_VECTOR	0xf0
 -- 
 2.42.0.459.ge4e396fd5e-goog
 
