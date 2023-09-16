@@ -1,89 +1,281 @@
-Received: from out-228.mta0.migadu.com (out-228.mta0.migadu.com [91.218.175.228])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E12518E1B
-	for <kvmarm@lists.linux.dev>; Fri, 15 Sep 2023 22:54:11 +0000 (UTC)
-Date: Fri, 15 Sep 2023 22:54:03 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1694818449;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KidOv9DSZAjEZIZG6nwJqS8LlzxpoGzMBkcO8YHnSf0=;
-	b=WpMdNxCJephGV00l0B7yPCHwJbcig2u/mPAQIlQXMhAkBzaV71kc9ZStGjZVb0J8KxbB4H
-	wmahZeT7OIkpM11aCJLlk6M1LnDM4sA59JYyM+fE7lzL1PjC8WYDJe3ZPwI4mdCC5r1tZi
-	6uhV6toXbUvDDuFW9mRy1Yv/jLvKVlM=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
-	will@kernel.org, catalin.marinas@arm.com, james.morse@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, zhukeqian1@huawei.com,
-	jonathan.cameron@huawei.com, linuxarm@huawei.com
-Subject: Re: [RFC PATCH v2 4/8] KVM: arm64: Set DBM for previously writeable
- pages
-Message-ID: <ZQTgi/lsClyM6b1j@linux.dev>
-References: <20230825093528.1637-1-shameerali.kolothum.thodi@huawei.com>
- <20230825093528.1637-5-shameerali.kolothum.thodi@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BD9AA2A
+	for <kvmarm@lists.linux.dev>; Sat, 16 Sep 2023 00:31:21 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-59285f1e267so71324687b3.0
+        for <kvmarm@lists.linux.dev>; Fri, 15 Sep 2023 17:31:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1694824281; x=1695429081; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=d+v3gsOh/890lJDyi2atnrT8KioShqwRzfV2UUthNgY=;
+        b=RWFuLZXdFyMUKt/dTGjlSOnYq2yS4nXxvUL8jnZqPnNfoGjEUaI741sGZATa7J/kDF
+         kkeJOBZbwZ9ph3WRYODioQAX5a28coLQ5cCs9iQuvPAUnbOu5sGD80G9O7IKimp61A96
+         KLGBWW3WxjBOzy8KvuvZOUaibzzXLFzv9DG3N87UcvFoaTtffuCNJuht83jgXeQKXYbG
+         pVTtNfcLrkgynRt/Te5pfS/EpP3esRvVM7HdccyBesNhjADXusq6CWa0jTGrZ006ViLu
+         a5McxsHXVglJg98XQeN5CGFKiNFfv66byiHCI7jdCL/S9PzHj2kmtdJVOTPNUFrR7QP5
+         499g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694824281; x=1695429081;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=d+v3gsOh/890lJDyi2atnrT8KioShqwRzfV2UUthNgY=;
+        b=brDRxGIiS59KotjliKrGU/ziB52j18FQWMZ6KW/xDJSoytpOSw5+YIHKwI0cs9xYeu
+         LW2SMmzoTNkQG1MGTxlXz+Dpgj+9QarsxO4hTmgwL9z3WNWPEkv72O2anj7SjQFMu5x2
+         nCGMVlYuCC/OUM1q//zUoJsUSytXeAYufLYGoV1u0bMePmYNUQhg/Kf8RehEeXTUggJR
+         YtUnvhG7dwFm0Hd+4ROp5GWQdvDjUI9OlQrK9BSkSc/1p/eSnEnnwSSTKehhmvflC2kT
+         naFz6fnzyhFXNSS4lyAVxCjMSKpBsO0fvFbUh9c0886a1T2ahVUW7fVBlAfFoMrd6hC9
+         P/kg==
+X-Gm-Message-State: AOJu0YwH15zy3HaQGJyRs63O8X8aJXUvwVItxed8SNkiJNukYyClYNEk
+	Y3mLtRMH8URe51IMLDndT7bUWMFBUAg=
+X-Google-Smtp-Source: AGHT+IHwIfgzmidHRVnFwyjq5xxKkTsUmzHH5rOWwrOCjAKfiyYkOEMh1VsVt19qwGFmjKKFISeZq6Tx90c=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:554:0:b0:d47:3d35:1604 with SMTP id
+ 81-20020a250554000000b00d473d351604mr95244ybf.2.1694824280932; Fri, 15 Sep
+ 2023 17:31:20 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri, 15 Sep 2023 17:30:52 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230825093528.1637-5-shameerali.kolothum.thodi@huawei.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
+Message-ID: <20230916003118.2540661-1-seanjc@google.com>
+Subject: [PATCH 00/26] KVM: vfio: Hide KVM internals from others
+From: Sean Christopherson <seanjc@google.com>
+To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Tony Krowiak <akrowiak@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, 
+	Jason Herne <jjherne@linux.ibm.com>, Harald Freudenberger <freude@linux.ibm.com>, 
+	Alex Williamson <alex.williamson@redhat.com>, Andy Lutomirski <luto@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	Anish Ghulati <aghulati@google.com>, Venkatesh Srinivas <venkateshs@chromium.org>, 
+	Andrew Thornton <andrewth@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Aug 25, 2023 at 10:35:24AM +0100, Shameer Kolothum wrote:
-> We only set DBM if the page is writeable (S2AP[1] == 1). But once migration
-> starts, CLEAR_LOG path will write protect the pages (S2AP[1] = 0) and there
-> isn't an easy way to differentiate the writeable pages that gets write
-> protected from read-only pages as we only have S2AP[1] bit to check.
-> 
-> Introduced a ctx->flag KVM_PGTABLE_WALK_WC_HINT to identify the dirty page
-> tracking related write-protect page table walk and used one of the "Reserved
-> for software use" bit in page descriptor to mark a page as "writeable-clean". 
-> 
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> ---
->  arch/arm64/include/asm/kvm_pgtable.h |  5 +++++
->  arch/arm64/kvm/hyp/pgtable.c         | 25 ++++++++++++++++++++++---
->  2 files changed, 27 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index a12add002b89..67bcbc5984f9 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -190,6 +190,8 @@ enum kvm_pgtable_prot {
->  #define KVM_PGTABLE_PROT_RW	(KVM_PGTABLE_PROT_R | KVM_PGTABLE_PROT_W)
->  #define KVM_PGTABLE_PROT_RWX	(KVM_PGTABLE_PROT_RW | KVM_PGTABLE_PROT_X)
->  
-> +#define KVM_PGTABLE_PROT_WC	KVM_PGTABLE_PROT_SW0  /*write-clean*/
-> +
->  #define PKVM_HOST_MEM_PROT	KVM_PGTABLE_PROT_RWX
->  #define PKVM_HOST_MMIO_PROT	KVM_PGTABLE_PROT_RW
->  
-> @@ -221,6 +223,8 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
->   *					operations required.
->   * @KVM_PGTABLE_WALK_HW_DBM:		Indicates that the attribute update is
->   *					HW DBM related.
-> + * @KVM_PGTABLE_WALK_WC_HINT:		Update the page as writeable-clean(software attribute)
-> + *					if we are write protecting a writeable page.
+This is a borderline RFC series to hide KVM's internals from the rest of
+the kernel, where "internals" means data structures, enums, #defines,
+APIs, etc. that are intended to be KVM-only, but are exposed everywhere
+due to kvm_host.h (and other headers) living in the global include paths.
 
-This really looks like a permission bit, not a walker flag. This should
-be defined in kvm_pgtable_prot and converted to the hardware definition
-in stage2_set_prot_attr(). Also, the first time I saw 'WC' I read it as
-'write-combine', not writable-clean.
+The motiviation for hiding KVM's internals is to allow *safely* loading a
+"new" KVM module without having to reboot the host.  Where "new" doesn't
+have to be strictly newer, just a different incarnation of KVM.  Hiding
+KVM's internals means those assets can change across KVM instances without
+breaking things, e.g. would allow modifying the layout of struct kvm_vcpu
+to introduce new fields related to a new feature or mitigation for hardware
+bugs.
 
-As I understand it, the only need for an additional software bit here is
-to identify neighboring PTEs that can have DBM set while we're in the
-middle of the walk right?
+The end goal for all of this is to allow loading and running multiple
+instances of KVM (the module) simultaneously on a single host, e.g. to
+deploy fixes, mitigations, and/or new features without having to drain
+all VMs from the host.
 
+For now, the immediate goal is to get KVM to a state where KVM x86 doesn't
+expose anything to the broader world that isn't intended for external
+consumption, e.g. the page write-tracking APIs used by KVM-GT.
+
+I say this is borderline RFC because I don't think I've "formally" proposed
+the idea of hiding KVM internals before now.  I decided not to tag this RFC
+because the changes ended up being not _that_ invasive, and everything
+before the last six patches is worthwhile even if hiding internals is
+ultimately rejected (IMO).
+
+This would ideally be ~5 separate series, and I certainly have no objection
+if that's how we want to get this stuff merged.  E.g. (1) VFIO cleanups,
+(2) drop HAVE_KVM, (3) clean up makefiles, (4) x86 perf cleanup, and
+(5) final push for hiding state.  The HAVE_KVM and virt/kvm include stuff
+isn't strictly necessary, but I included them here because they're
+relatively minor (in the grand scheme).
+
+We've explore several alternatives to the #ifdef __KVM__ approach, and
+they all sucked, hard.  What I really wanted (and still want) to do, is to
+bury the bulk of kvm_host.h (and other KVM headers) in virt/kvm, but every
+attempt to do that ended in flames.  Even with the __KVM__ guards in place,
+each architecture's kvm_host.h is too intertwined with the common kvm_host.h,
+and trying to extract small-ish pieces just doesn't work (each patch
+inevitably snowballed into a gigantic beast).
+
+The other idea we considered (which I thought of, and feel dirty for even
+proposing it internally), is to move all headers under virt/kvm, add
+virt/kvm/include to the global header path, and then have KVM x86 omit
+virt/kvm/include when configured to hide KVM internals.  I hate this idea
+because it sets a bad precedent, and requires a lot of file movement
+without providing any benefit to other architectures.  E.g. I hope that
+guarding KVM internals with #ifdef __KVM__ will allow us to slowly clean
+things up so that some day KVM only exposes a handful of APIs to the rest
+of the kernel (probably a pipe dream).
+
+Anish Ghulati (1):
+  KVM: arm64: Move arm_{psci,hypercalls}.h to an internal KVM path
+
+Sean Christopherson (25):
+  vfio: Wrap KVM helpers with CONFIG_KVM instead of CONFIG_HAVE_KVM
+  vfio: Move KVM get/put helpers to colocate it with other KVM related
+    code
+  virt: Declare and define vfio_file_set_kvm() iff CONFIG_KVM is enabled
+  vfio: Add struct to hold KVM assets and dedup group vs. iommufd code
+  vfio: KVM: Pass get/put helpers from KVM to VFIO, don't do circular
+    lookup
+  KVM: Drop CONFIG_KVM_VFIO and just look at KVM+VFIO
+  x86/idt: Wrap KVM logic with CONFIG_KVM instead of CONFIG_HAVE_KVM
+  KVM: x86: Stop selecting and depending on HAVE_KVM
+  KVM: arm64: Stop selecting and depending on HAVE_KVM
+  KVM: s390: Stop selecting and depending on HAVE_KVM
+  KVM: MIPS: Make HAVE_KVM a MIPS-only Kconfig
+  KVM: arm64: Include KVM headers to get forward declarations
+  KVM: arm64: Move ARM specific headers in include/kvm to arch directory
+  KVM: Move include/kvm/iodev.h to include/linux as kvm_iodev.h
+  KVM: MIPS: Stop adding virt/kvm to the arch include path
+  KVM: PPC: Stop adding virt/kvm to the arch include path
+  KVM: s390: Stop adding virt/kvm to the arch include path
+  KVM: Standardize include paths across all architectures
+  perf/x86: KVM: Have perf define a dedicated struct for getting guest
+    PEBS data
+  entry/kvm: Drop @vcpu param from arch_xfer_to_guest_mode_handle_work()
+  entry/kvm: KVM: Move KVM details related to signal/-EINTR into KVM
+    proper
+  KVM: arm64: Move and consolidate "public" functions in asm/kvm_host.h
+  powerpc/xics: Move declaration of xics_wake_cpu() out of kvm_ppc.h
+  KVM: PPC: Rearrange code in kvm_ppc.h to isolate "public" information
+  KVM: Hide KVM internal data structures and values from kernel at-large
+
+ MAINTAINERS                                   |   1 -
+ arch/arm64/Kconfig                            |   1 -
+ .../arm64/include/asm/kvm_arch_timer.h        |   2 +
+ arch/arm64/include/asm/kvm_emulate.h          |   3 +
+ arch/arm64/include/asm/kvm_host.h             |  57 ++--
+ arch/arm64/include/asm/kvm_mmu.h              |   4 +
+ .../arm64/include/asm/kvm_pmu.h               |   2 +
+ .../arm64/include/asm/kvm_vgic.h              |   2 +-
+ arch/arm64/kernel/asm-offsets.c               |   2 +
+ arch/arm64/kvm/Kconfig                        |   2 -
+ arch/arm64/kvm/Makefile                       |   2 -
+ arch/arm64/kvm/arch_timer.c                   |   5 +-
+ arch/arm64/kvm/arm.c                          |   9 +-
+ {include => arch/arm64}/kvm/arm_hypercalls.h  |   0
+ {include => arch/arm64}/kvm/arm_psci.h        |   0
+ arch/arm64/kvm/guest.c                        |   2 +-
+ arch/arm64/kvm/handle_exit.c                  |   2 +-
+ arch/arm64/kvm/hyp/Makefile                   |   4 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h       |   4 +-
+ arch/arm64/kvm/hyp/nvhe/Makefile              |   3 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c              |   4 +-
+ arch/arm64/kvm/hyp/vhe/Makefile               |   2 +-
+ arch/arm64/kvm/hyp/vhe/switch.c               |   4 +-
+ arch/arm64/kvm/hypercalls.c                   |   4 +-
+ arch/arm64/kvm/pmu-emul.c                     |   6 +-
+ arch/arm64/kvm/psci.c                         |   4 +-
+ arch/arm64/kvm/pvtime.c                       |   2 +-
+ arch/arm64/kvm/reset.c                        |   3 +-
+ arch/arm64/kvm/trace_arm.h                    |   2 +-
+ arch/arm64/kvm/trng.c                         |   2 +-
+ arch/arm64/kvm/vgic/vgic-debug.c              |   2 +-
+ arch/arm64/kvm/vgic/vgic-init.c               |   2 +-
+ arch/arm64/kvm/vgic/vgic-irqfd.c              |   2 +-
+ arch/arm64/kvm/vgic/vgic-kvm-device.c         |   2 +-
+ arch/arm64/kvm/vgic/vgic-mmio-v2.c            |   4 +-
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c            |   4 +-
+ arch/arm64/kvm/vgic/vgic-mmio.c               |   6 +-
+ arch/arm64/kvm/vgic/vgic-v2.c                 |   2 +-
+ arch/arm64/kvm/vgic/vgic-v3.c                 |   2 +-
+ arch/mips/include/asm/kvm_host.h              |   5 +-
+ arch/mips/kernel/asm-offsets.c                |   2 +
+ arch/mips/kvm/Kconfig                         |   3 +
+ arch/mips/kvm/Makefile                        |   2 -
+ arch/powerpc/include/asm/kvm_book3s.h         |   3 +
+ arch/powerpc/include/asm/kvm_book3s_64.h      |   2 +
+ arch/powerpc/include/asm/kvm_booke.h          |   4 +
+ arch/powerpc/include/asm/kvm_host.h           |   7 +-
+ arch/powerpc/include/asm/kvm_ppc.h            | 306 +++++++++---------
+ arch/powerpc/include/asm/xics.h               |   3 +
+ arch/powerpc/kernel/asm-offsets.c             |   1 +
+ arch/powerpc/kvm/Kconfig                      |   1 -
+ arch/powerpc/kvm/Makefile                     |   2 -
+ arch/powerpc/kvm/mpic.c                       |   2 +-
+ arch/riscv/include/asm/kvm_host.h             |   3 +
+ arch/riscv/kernel/asm-offsets.c               |   1 +
+ arch/riscv/kvm/Makefile                       |   2 -
+ arch/riscv/kvm/aia_aplic.c                    |   2 +-
+ arch/riscv/kvm/aia_imsic.c                    |   2 +-
+ arch/riscv/kvm/vcpu.c                         |   2 +-
+ arch/s390/Kconfig                             |   1 -
+ arch/s390/include/asm/kvm_host.h              |   7 +-
+ arch/s390/kernel/asm-offsets.c                |   1 +
+ arch/s390/kvm/Kconfig                         |   2 -
+ arch/s390/kvm/Makefile                        |   2 -
+ arch/x86/Kconfig                              |   1 -
+ arch/x86/events/core.c                        |   5 +-
+ arch/x86/events/intel/core.c                  |  18 +-
+ arch/x86/events/perf_event.h                  |   3 +-
+ arch/x86/include/asm/hardirq.h                |   2 +-
+ arch/x86/include/asm/idtentry.h               |   2 +-
+ arch/x86/include/asm/irq.h                    |   2 +-
+ arch/x86/include/asm/irq_vectors.h            |   2 +-
+ arch/x86/include/asm/kvm_host.h               |  12 +-
+ arch/x86/include/asm/perf_event.h             |  12 +-
+ arch/x86/kernel/idt.c                         |   2 +-
+ arch/x86/kernel/irq.c                         |   4 +-
+ arch/x86/kvm/Kconfig                          |   3 -
+ arch/x86/kvm/Makefile                         |   1 -
+ arch/x86/kvm/i8254.h                          |   2 +-
+ arch/x86/kvm/ioapic.h                         |   2 +-
+ arch/x86/kvm/irq.h                            |   2 +-
+ arch/x86/kvm/lapic.h                          |   2 +-
+ arch/x86/kvm/vmx/pmu_intel.c                  |  16 +-
+ arch/x86/kvm/vmx/vmx.c                        |  11 +-
+ arch/x86/kvm/vmx/vmx.h                        |   2 +-
+ arch/x86/kvm/x86.c                            |   3 +-
+ drivers/s390/crypto/vfio_ap_drv.c             |   1 +
+ drivers/s390/crypto/vfio_ap_ops.c             |   2 +
+ drivers/vfio/device_cdev.c                    |   9 +-
+ drivers/vfio/group.c                          |  18 +-
+ drivers/vfio/vfio.h                           |  26 +-
+ drivers/vfio/vfio_main.c                      | 139 ++++----
+ include/linux/entry-kvm.h                     |  10 +-
+ include/linux/kvm_host.h                      |  17 +-
+ include/{kvm/iodev.h => linux/kvm_iodev.h}    |   0
+ include/linux/kvm_types.h                     |   3 +
+ include/linux/vfio.h                          |   6 +-
+ include/trace/events/kvm.h                    |   5 +
+ kernel/entry/kvm.c                            |  13 +-
+ scripts/gdb/linux/constants.py.in             |   2 +-
+ scripts/gdb/linux/interrupts.py               |   2 +-
+ tools/arch/x86/include/asm/irq_vectors.h      |   2 +-
+ virt/kvm/Kconfig                              |   6 -
+ virt/kvm/Makefile.kvm                         |   6 +-
+ virt/kvm/coalesced_mmio.c                     |   3 +-
+ virt/kvm/eventfd.c                            |   2 +-
+ virt/kvm/kvm_main.c                           |   3 +-
+ virt/kvm/vfio.c                               |   9 +-
+ virt/kvm/vfio.h                               |   2 +-
+ 109 files changed, 489 insertions(+), 440 deletions(-)
+ rename include/kvm/arm_arch_timer.h => arch/arm64/include/asm/kvm_arch_timer.h (98%)
+ rename include/kvm/arm_pmu.h => arch/arm64/include/asm/kvm_pmu.h (99%)
+ rename include/kvm/arm_vgic.h => arch/arm64/include/asm/kvm_vgic.h (99%)
+ rename {include => arch/arm64}/kvm/arm_hypercalls.h (100%)
+ rename {include => arch/arm64}/kvm/arm_psci.h (100%)
+ rename include/{kvm/iodev.h => linux/kvm_iodev.h} (100%)
+
+
+base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
 -- 
-Thanks,
-Oliver
+2.42.0.459.ge4e396fd5e-goog
+
