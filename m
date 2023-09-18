@@ -1,83 +1,65 @@
-Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C7E01C2AC
-	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 09:58:37 +0000 (UTC)
-Received: from [192.168.2.59] (109-252-153-31.dynamic.spd-mgts.ru [109.252.153.31])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(No client certificate requested)
-	(Authenticated sender: dmitry.osipenko)
-	by madras.collabora.co.uk (Postfix) with ESMTPSA id 1279F6607181;
-	Mon, 18 Sep 2023 10:58:34 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1695031115;
-	bh=1RNaixjMXA54V+2/e4luR24uvJkM1LcXIR0eY3+Epv8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=PXGmfVf/NVnH7ZhV99d4xVXJ2zHhS05iCl/sOAl7OfLwMIGhXCok/5smR1lTKJRxR
-	 FUTIaUvF+Yg06PS4GxXOd4B/z+RgDUnn1wumQfgKJUCQEx6DruNnLFAvTMT8zTCnPQ
-	 tiZwaNKOWGzJVmXf/dxsAqE9LYplPWpcouLnIDASr+G+EDVkyEOi2+Igj13qS+gzQu
-	 Wr32PJ41n/sboSnmUhnBCkVDp9Gczd/Ds2HBnLyC7Kr8c2plHT5ibgbnAHsLVSdoOU
-	 ZaMNowQbx1sw8sDZDoCbclA+wFMVjpLKGbEtuz9ztpkhz8zT5x5KfaIxmcR++3QDE0
-	 vbVJnZUJ6NAaQ==
-Message-ID: <14db8c0b-77de-34ec-c847-d7360025a571@collabora.com>
-Date: Mon, 18 Sep 2023 12:58:32 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF4A610F9
+	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 10:27:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=JpmACuKzLEySkiefvR4XEzLq2l/GD0gp2bnZ8kEBIFI=; b=kVzQ7/vwTnpP+CIOcOrHaveVQL
+	sLK/dUbflp5AVZCi1NjTN4vGf0n8ODQ7+WX0qtIA+7Sj8W67e4mukT7UakvHTeQdXmkgGSHuD5qlA
+	hrSjKimLBut7aaQ14th62KlJ7yiOPuQc4rl7JsKxe0s/9reJwnUuY01QSW/vr6EANjJKVBe++3mpj
+	ePhEwkrYE2JyWBt0U0Utguc04Ew3fBOT2gmdqMGE/JseHq70NaEbGE7t+Yc6zjLSOXMHhyz8rkrp3
+	qCRkwR9dMkY8mB4getceyrmE3pKMTQIEtRvNZUG1hYZEd24ULHMIsy0/3v3OM9HvXiG2d2pib11lA
+	dMSc1aMg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34502)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qiBTj-000059-36;
+	Mon, 18 Sep 2023 11:27:43 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qiBTi-0000Oe-EM; Mon, 18 Sep 2023 11:27:42 +0100
+Date: Mon, 18 Sep 2023 11:27:42 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: James Morse <james.morse@arm.com>
+Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
+	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
+	x86@kernel.org, Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	jianyong.wu@arm.com, justin.he@arm.com
+Subject: Re: [RFC PATCH v2 00/35] ACPI/arm64: add support for virtual
+ cpuhotplug
+Message-ID: <ZQgmHtG10n+XyZYR@shell.armlinux.org.uk>
+References: <20230913163823.7880-1-james.morse@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v9 6/6] KVM: x86/mmu: Handle non-refcounted pages
-Content-Language: en-US
-To: David Stevens <stevensd@chromium.org>,
- Sean Christopherson <seanjc@google.com>
-Cc: Yu Zhang <yu.c.zhang@linux.intel.com>,
- Isaku Yamahata <isaku.yamahata@gmail.com>,
- Zhi Wang <zhi.wang.linux@gmail.com>, kvmarm@lists.linux.dev,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20230911021637.1941096-1-stevensd@google.com>
- <20230911021637.1941096-7-stevensd@google.com>
-From: Dmitry Osipenko <dmitry.osipenko@collabora.com>
-In-Reply-To: <20230911021637.1941096-7-stevensd@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230913163823.7880-1-james.morse@arm.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 9/11/23 05:16, David Stevens wrote:
-> From: David Stevens <stevensd@chromium.org>
-> 
-> Handle non-refcounted pages in __kvm_faultin_pfn. This allows the host
-> to map memory into the guest that is backed by non-refcounted struct
-> pages - for example, the tail pages of higher order non-compound pages
-> allocated by the amdgpu driver via ttm_pool_alloc_page.
-> 
-> The bulk of this change is tracking the is_refcounted_page flag so that
-> non-refcounted pages don't trigger page_count() == 0 warnings. This is
-> done by storing the flag in an unused bit in the sptes. There are no
-> bits available in PAE SPTEs, so non-refcounted pages can only be handled
-> on TDP and x86-64.
-> 
-> Signed-off-by: David Stevens <stevensd@chromium.org>
-> ---
->  arch/x86/kvm/mmu/mmu.c          | 52 +++++++++++++++++++++++----------
->  arch/x86/kvm/mmu/mmu_internal.h |  1 +
->  arch/x86/kvm/mmu/paging_tmpl.h  |  8 +++--
->  arch/x86/kvm/mmu/spte.c         |  4 ++-
->  arch/x86/kvm/mmu/spte.h         | 12 +++++++-
->  arch/x86/kvm/mmu/tdp_mmu.c      | 22 ++++++++------
->  include/linux/kvm_host.h        |  3 ++
->  virt/kvm/kvm_main.c             |  6 ++--
->  8 files changed, 76 insertions(+), 32 deletions(-)
+On Wed, Sep 13, 2023 at 04:37:48PM +0000, James Morse wrote:
+> This series is based on v6.6-rc1, and can be retrieved from:
+> https://git.kernel.org/pub/scm/linux/kernel/git/morse/linux.git/ virtual_cpu_hotplug/rfc/v2
 
-Could you please tell which kernel tree you used for the base of this
-series? This patch #6 doesn't apply cleanly to stable/mainline/next/kvm
+Hi James,
 
-error: sha1 information is lacking or useless (arch/x86/kvm/mmu/mmu.c).
-error: could not build fake ancestor
+FYI, this doesn't seem to be based upon v6.6-rc1, but v6.4-rc5.
+virtual_cpu_hotplug/rfc/v2 seems to have a hash of 505859b05e15.
+
+Thanks.
 
 -- 
-Best regards,
-Dmitry
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
