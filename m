@@ -1,147 +1,157 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7382F1CFAF
-	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 12:56:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1510C433C8;
-	Mon, 18 Sep 2023 12:56:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695041815;
-	bh=PQ12Teyfc+RzCK1vh1Mh8c932ain1F5sReUBIdCQlqU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oCkjTg3dtcDupIPuTpuYyIQ19Mm62dVrhhN7F6ZaeX3zaeg4gqDo2EQdPrVM9HHGZ
-	 hKJdpzeJNCpFfG3xBle++vISZrCbriFC2WLrY2N218JAOGisYb+1hnnP3uIgpr1fgo
-	 eUsAbvyFGekR/YmcJLfxydI2iDyCIkR8nvGU0dU8dYUaX9sT73cFeoHfwOX+5qixr+
-	 qmY0WD7OXtBQ5Ju4qvzRntPeW3xBk/3+vLXcvdqD8kSci+22VNzKyfOwLE/w99XLaM
-	 NPmYBnX2am3l7qkzTvOtO2njX4/eTuMCpLd6MSR8JPVqX2VjENmlolJYvZZbBYgtVI
-	 O6+vfubsGv6sQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qiDo4-00Dy7d-CC;
-	Mon, 18 Sep 2023 13:56:52 +0100
-Date: Mon, 18 Sep 2023 13:56:51 +0100
-Message-ID: <861qevej1o.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Miguel Luis <miguel.luis@oracle.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>
-Subject: Re: [PATCH 3/3] KVM: arm64: nv: Handle all _EL02 and _EL12 registers
-In-Reply-To: <4A24B4EC-B221-48B6-BA91-DB7AC72CAA8D@oracle.com>
-References: <20230913185209.32282-1-miguel.luis@oracle.com>
-	<20230913185209.32282-4-miguel.luis@oracle.com>
-	<867conerys.wl-maz@kernel.org>
-	<4A24B4EC-B221-48B6-BA91-DB7AC72CAA8D@oracle.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EFDE6FB8
+	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 13:39:50 +0000 (UTC)
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38IDW6fj029216;
+	Mon, 18 Sep 2023 13:39:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=MSStuaxrt3lPU0HToni05ntjf8mTFhyARXhcilaZ3Qc=;
+ b=H+pxQ1+Ho7+UtVHW+L+9U4TuBLIXLcxbX+V8fMPXWPDnrPxLop3kj0Ug8XoR2+7cKQxH
+ SkSawKO1zJz6g6f71w4b0EoO4uNyXLTmMybbt1oSFzLZL/Qo2VuDiZUVaRy8O0lKe4Ie
+ CE4N/VgGVZ0sdqRvJ4nmUpzypFxx5VVNSV2ae3lFRT0BCZftapG4ledUVupfc4IyjW/o
+ Mkw6CToee56m1uHFs9Ymm8uXoghcEP3ll/zGtQDUN6osRFCSgNxDiEfxlDJVUrw+EM6X
+ qVY8aKeJ+eCYRb+5QaUpCGr2Ui6Q9h6hURBdTbM65CcsEn9BOGcShugNqh9g5Wj0ArRc Ug== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t6qcnreuh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 18 Sep 2023 13:39:06 +0000
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38IDNBeL019026;
+	Mon, 18 Sep 2023 13:39:05 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t6qcnretu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 18 Sep 2023 13:39:05 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38IDXOwx016436;
+	Mon, 18 Sep 2023 13:39:04 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3t5sd1jkpv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 18 Sep 2023 13:39:04 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38IDd1K314025382
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 18 Sep 2023 13:39:01 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9DC312004B;
+	Mon, 18 Sep 2023 13:39:01 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CCB1C20040;
+	Mon, 18 Sep 2023 13:39:00 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 18 Sep 2023 13:39:00 +0000 (GMT)
+Date: Mon, 18 Sep 2023 15:38:49 +0200
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon
+ <will@kernel.org>,
+        Marc Zyngier <maz@kernel.org>, Oliver Upton
+ <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael
+ Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul
+ Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Christian Borntraeger
+ <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Thomas
+ Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+        Borislav
+ Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arnaldo Carvalho de
+ Melo <acme@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tony Krowiak
+ <akrowiak@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne
+ <jjherne@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Alex
+ Williamson <alex.williamson@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        Anish
+ Ghulati <aghulati@google.com>,
+        Venkatesh Srinivas
+ <venkateshs@chromium.org>,
+        Andrew Thornton <andrewth@google.com>
+Subject: Re: [PATCH 18/26] KVM: s390: Stop adding virt/kvm to the arch
+ include path
+Message-ID: <20230918153849.0363e8f9@p-imbrenda>
+In-Reply-To: <20230916003118.2540661-19-seanjc@google.com>
+References: <20230916003118.2540661-1-seanjc@google.com>
+	<20230916003118.2540661-19-seanjc@google.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: fPGL0P6aBZRPKpHoi9BsueIs0DR2UDLH
+X-Proofpoint-GUID: IufBZyFpbUqfPMs_X5VI6hKT9V7tJleH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-18_06,2023-09-18_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ suspectscore=0 clxscore=1011 lowpriorityscore=0 impostorscore=0
+ phishscore=0 malwarescore=0 priorityscore=1501 spamscore=0 mlxscore=0
+ bulkscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2308100000 definitions=main-2309180114
 
-On Mon, 18 Sep 2023 13:41:45 +0100,
-Miguel Luis <miguel.luis@oracle.com> wrote:
+On Fri, 15 Sep 2023 17:31:10 -0700
+Sean Christopherson <seanjc@google.com> wrote:
+
+> Don't add virt/kvm to KVM s390's include path, the headers in virt/kvm are
+> intended to be used only by other code in virt/kvm, i.e. are "private" to
+> the core KVM code.  It's not clear that s390 *ever* included a header from
+> virt/kvm, i.e. odds are good the "-Ivirt/kvm" was copied from a x86's
+> Makefile when s390 support was first added.
 > 
-> Hi Marc,
+> The only headers in virt/kvm at the time were the x86 specific ioapic.h,
+> and iodev.h, neither of which shows up as an #include in the diff for the
+> commit range 37817f2982d0f..e976a2b997fc4.
 > 
-> > On 18 Sep 2023, at 09:44, Marc Zyngier <maz@kernel.org> wrote:
-> > 
-> > On Wed, 13 Sep 2023 19:52:08 +0100,
-> > Miguel Luis <miguel.luis@oracle.com> wrote:
-> >> 
-> >> Specify both _EL02 and _EL12 system registers.
-> >> 
-> >> Signed-off-by: Miguel Luis <miguel.luis@oracle.com>
-> >> ---
-> >> arch/arm64/kvm/emulate-nested.c | 35 +++++++++++++++++++++++++++++----
-> >> 1 file changed, 31 insertions(+), 4 deletions(-)
-> >> 
-> >> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> >> index 9aa1c06abdb7..957afd97e488 100644
-> >> --- a/arch/arm64/kvm/emulate-nested.c
-> >> +++ b/arch/arm64/kvm/emulate-nested.c
-> >> @@ -690,10 +690,37 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
-> >> SR_RANGE_TRAP(sys_reg(3, 4, 14, 0, 3),
-> >> sys_reg(3, 4, 14, 5, 2), CGT_HCR_NV),
-> >> /* All _EL02, _EL12 registers */
-> >> - SR_RANGE_TRAP(sys_reg(3, 5, 0, 0, 0),
-> >> -       sys_reg(3, 5, 10, 15, 7), CGT_HCR_NV),
-> >> - SR_RANGE_TRAP(sys_reg(3, 5, 12, 0, 0),
-> >> -       sys_reg(3, 5, 14, 15, 7), CGT_HCR_NV),
-> >> + SR_TRAP(SYS_SCTLR_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_CPACR_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_SCTLR2_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_ZCR_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_TRFCR_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_SMCR_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_TTBR0_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_TTBR1_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_TCR_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_TCR2_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_SPSR_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_ELR_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_AFSR0_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_AFSR1_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_ESR_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_TFSR_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_FAR_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_BRBCR_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_PMSCR_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_MAIR_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_AMAIR_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_VBAR_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_CONTEXTIDR_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_SCXTNUM_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_CNTKCTL_EL12, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_CNTP_TVAL_EL02, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_CNTP_CTL_EL02, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_CNTP_CVAL_EL02, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_CNTV_TVAL_EL02, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_CNTV_CTL_EL02, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_CNTV_CVAL_EL02, CGT_HCR_NV),
-> >> SR_TRAP(OP_AT_S1E2R, CGT_HCR_NV),
-> >> SR_TRAP(OP_AT_S1E2W, CGT_HCR_NV),
-> >> SR_TRAP(OP_AT_S12E1R, CGT_HCR_NV),
-> > 
-> > While I could see the problem with the EL2 registers, I'm not
-> > convinced by this patch. Is there an actual case for non _EL02, non
-> > _EL12 registers that are included in the two ranges above?
-> > 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/s390/kvm/Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Having DDI0487Ja as reference, there is none. It is not clear to me having two
-> separate ranges. If it is to cover _EL02 and _EL12 ranges separately then the
-> second range is covering both aliases. I couldn't find the reason for these
-> aliases start and end other than SYS_SCTLR_EL12 and SYS_CNTV_CVAL_EL02,
-> respectively.
+> diff --git a/arch/s390/kvm/Makefile b/arch/s390/kvm/Makefile
+> index 02217fb4ae10..f17249ab2a72 100644
+> --- a/arch/s390/kvm/Makefile
+> +++ b/arch/s390/kvm/Makefile
+> @@ -5,7 +5,7 @@
+>  
+>  include $(srctree)/virt/kvm/Makefile.kvm
+>  
+> -ccflags-y := -Ivirt/kvm -Iarch/s390/kvm
+> +ccflags-y := -Iarch/s390/kvm
+>  
+>  kvm-y += kvm-s390.o intercept.o interrupt.o priv.o sigp.o
+>  kvm-y += diag.o gaccess.o guestdbg.o vsie.o pv.o
 
-The reason we have two ranges is to explicitly exclude the IMPDEF
-range, which is trapped by HCR_EL2.TIDCP:
-
-	SR_RANGE_TRAP(sys_reg(3, 5, 11, 0, 0),
-		      sys_reg(3, 5, 11, 15, 7), CGT_HCR_TIDCP),
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Acked-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
