@@ -1,47 +1,47 @@
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8115B1F5F0
-	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 16:03:16 +0000 (UTC)
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-64cca551ae2so28298456d6.0
-        for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 09:03:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8769622F1F
+	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 16:17:52 +0000 (UTC)
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-576918d0a42so2825488eaf.3
+        for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 09:17:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1695052995; x=1695657795; darn=lists.linux.dev;
+        d=ziepe.ca; s=google; t=1695053871; x=1695658671; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1AtaBW2SsBllDiJ99v10Ny7HNDE5iUEtI8mOBYM/rVQ=;
-        b=FMYrmViNHhpDIQG7aE4b8Zj46Zmtob+ZjiP+mU04vlK+EP7SXXjTr9AHJkK8bUjZvf
-         u4/iNTXM4hk53yV60OAiXwR72CXPQiENQRVO0R3xxn3juB2x5yWT9RCuqwn//yOBw3CO
-         77F4l3w+B/h1kMN4MNf6MQecvbHwAe718pITHo8yedRckSqH6p/12MrlUSqbZr2rdzOQ
-         Xo6pglhn6SPeTRd0rAJz5QvuVbSl42KUwwHx6tZbwLjlaWIjlAf4XOotHVDMuZHM2HxZ
-         aq0tjL6on5qOTw4Rt+ri1y0McFedxTy3E4aCUD5Uka2n5eKTdQZh6deuOIY93yr/jJUp
-         GJEA==
+        bh=2rBowV5k7lk2ieUe+gHPEvDWhBOkpthR4x1/BaQpS1E=;
+        b=kiKorsg2aJsiUYEx5K3WptXyW/UfUBUZ33rNSJeS8XvrIcMorDv37AR2ofen4onUwY
+         hte5a10HwN3MQlaVA8TsqEuMCy+dfpIr+M+NO0lXd+iqOO+H16LYldBXgl6RrceS3jEM
+         RSYSmf9g9QIrVO3kl4DPXA7hNOFJc0PEY5kCK2Kq12X8sy68FONR7y+c4tn4fMratUgg
+         7SRb7BEV2FDHFvpeyUFidBL2MMdoneYLVtfJm51oGqM7kTeUEQFKPjRR8DJBOc3ipgC0
+         j4V5u1bZ4pfC8nB6BLZ8DkaW1xyaO8eRfXfETwAFy/my3Bb8VNOrW8CronGMpmC6D2Fv
+         1JvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695052995; x=1695657795;
+        d=1e100.net; s=20230601; t=1695053871; x=1695658671;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1AtaBW2SsBllDiJ99v10Ny7HNDE5iUEtI8mOBYM/rVQ=;
-        b=OvTG8HHLHZgMr/cQJmLI27ndgn38HmKJ1Y+fKy/4F861Lt/vU09dYpFGvDqIZPRNN6
-         puxePYkRoEhDC4DCm+laKuHbQDkrdt5p13b4IhOVYlY49AH1yr+RJBBusvyzYwRai28Q
-         iSgsXEXsUqLbWQGIJ1sRIFLcLckFRfnX4iclDtkdxctKM6evKHV+r6TJ8VqU70HQnalG
-         Ao4I1QVBir1I9rqWjyawC6/BEdLGMFT6o4KemAlKa0kEFOVKI1+icCdIWS5F/+3dJ240
-         e5I38rZT5PSvy26ykxJK26spmwySeI7DJArbJSqjoPly65f90Hpvdyo16qYMcM1aPtqH
-         81SQ==
-X-Gm-Message-State: AOJu0YxhBs5VAKCn6OKcRP4YiyYFXuR5wAOOxBVxjRfwswSGEyl/VyYm
-	ZJaQkDCZ9ut5BIewmRtkwuEzeg==
-X-Google-Smtp-Source: AGHT+IH/YnREI891cZLYoBidRStzCIsQeTayS2VX/iNCJzxAWIRbDBhzALGmOqWbEj1DKL9seHAlIw==
-X-Received: by 2002:a0c:eacf:0:b0:655:78f5:bef7 with SMTP id y15-20020a0ceacf000000b0065578f5bef7mr9471806qvp.21.1695052995341;
-        Mon, 18 Sep 2023 09:03:15 -0700 (PDT)
+        bh=2rBowV5k7lk2ieUe+gHPEvDWhBOkpthR4x1/BaQpS1E=;
+        b=ZNt6xOQOKPUY0uQn2iMbASyKU7t3RBk5ZtZHTatRjwfkKcp4ceJPeaB1hoK7PDtiZM
+         69mEysilKHV8RD6sRTTp7i/xMku4Dbe8mJdCqBFVs/Ar0mUU5UE5WNhcPdfjvDbuiCSt
+         zaK2rpIaIep+0N1o/5s6eG/u7g+fdt0mpf/gOzT5K2+AWnZNX3xr/TdB09x58bIwj4rh
+         7zPY80K4MaedVGvB0guHDHdhtUTv1MVkFIpnTkMHJLEmzQW8NMH72gvqyropxiLCKmfm
+         xdVyUEbRNdNWs4S6bN67J6BSL2ph9NMJ2Rgg2EA8H+bt5uSlLhCxS4eP3dCIuw/0fhnI
+         UAxA==
+X-Gm-Message-State: AOJu0YydSilC1hneT2+9sUxvNWiEWBejxMjuigb/mxov0Lx24MhpwlKw
+	VOP2UW6flStnEJd49IBvklBhow==
+X-Google-Smtp-Source: AGHT+IEIIPi01LMzDkzmjlUBhug1qKaxU6nRjVuZ+XGbMUgkxm1Qfw0TLzJDUPnbwFfEuT1QKajmag==
+X-Received: by 2002:a05:6358:7207:b0:13f:411:c1a9 with SMTP id h7-20020a056358720700b0013f0411c1a9mr13490229rwa.17.1695053871422;
+        Mon, 18 Sep 2023 09:17:51 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-142-68-26-201.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.26.201])
-        by smtp.gmail.com with ESMTPSA id u20-20020a0cdd14000000b006581e82a628sm989437qvk.134.2023.09.18.09.02.58
+        by smtp.gmail.com with ESMTPSA id pz10-20020ad4550a000000b00656260e67afsm3340834qvb.115.2023.09.18.09.17.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Sep 2023 09:03:14 -0700 (PDT)
+        Mon, 18 Sep 2023 09:17:50 -0700 (PDT)
 Received: from jgg by wakko with local (Exim 4.95)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1qiGiA-0005k6-DG;
-	Mon, 18 Sep 2023 13:02:58 -0300
-Date: Mon, 18 Sep 2023 13:02:58 -0300
+	id 1qiGwY-0005mj-Ao;
+	Mon, 18 Sep 2023 13:17:50 -0300
+Date: Mon, 18 Sep 2023 13:17:50 -0300
 From: Jason Gunthorpe <jgg@ziepe.ca>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
@@ -79,13 +79,12 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Anish Ghulati <aghulati@google.com>,
 	Venkatesh Srinivas <venkateshs@chromium.org>,
 	Andrew Thornton <andrewth@google.com>
-Subject: Re: [PATCH 05/26] vfio: KVM: Pass get/put helpers from KVM to VFIO,
- don't do circular lookup
-Message-ID: <20230918160258.GL13795@ziepe.ca>
+Subject: Re: [PATCH 06/26] KVM: Drop CONFIG_KVM_VFIO and just look at KVM+VFIO
+Message-ID: <20230918161750.GM13795@ziepe.ca>
 References: <20230916003118.2540661-1-seanjc@google.com>
- <20230916003118.2540661-6-seanjc@google.com>
- <20230918152110.GI13795@ziepe.ca>
- <ZQhxpesyXeG+qbS6@google.com>
+ <20230916003118.2540661-7-seanjc@google.com>
+ <20230918152946.GJ13795@ziepe.ca>
+ <ZQhySMjmuyW2Czas@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -94,50 +93,37 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZQhxpesyXeG+qbS6@google.com>
+In-Reply-To: <ZQhySMjmuyW2Czas@google.com>
 
-On Mon, Sep 18, 2023 at 08:49:57AM -0700, Sean Christopherson wrote:
-> On Mon, Sep 18, 2023, Jason Gunthorpe wrote:
-> > On Fri, Sep 15, 2023 at 05:30:57PM -0700, Sean Christopherson wrote:
-> > > Explicitly pass KVM's get/put helpers to VFIO when attaching a VM to
-> > > VFIO instead of having VFIO do a symbol lookup back into KVM.  Having both
-> > > KVM and VFIO do symbol lookups increases the overall complexity and places
-> > > an unnecessary dependency on KVM (from VFIO) without adding any value.
-> > > 
-> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > > ---
-> > >  drivers/vfio/vfio.h      |  2 ++
-> > >  drivers/vfio/vfio_main.c | 74 +++++++++++++++++++---------------------
-> > >  include/linux/vfio.h     |  4 ++-
-> > >  virt/kvm/vfio.c          |  9 +++--
-> > >  4 files changed, 47 insertions(+), 42 deletions(-)
-> > 
-> > I don't mind this, but Christoph had disliked my prior attempt to do
-> > this with function pointers..
-> > 
-> > The get can be inlined, IIRC, what about putting a pointer to the put
-> > inside the kvm struct?
+On Mon, Sep 18, 2023 at 08:52:40AM -0700, Sean Christopherson wrote:
+
+> > I wonder if we should be making the VFIO drivers that need the kvm to
+> > ask for it? 'select CONFIG_NEED_VFIO_KVM' or something?
 > 
-> That wouldn't allow us to achieve our goal, which is to hide the details of
-> "struct kvm" from VFIO (and the rest of the kernel).
+> I wondered the same thing, if only to make it easier to track which
+> drivers actually end up interacting directly with KVM.
 
-> What's the objection to handing VFIO a function pointer?
+There are two usages I've seen..
 
-Hmm, looks like it was this thread:
+GVT's uage is just totally broken:
 
- https://lore.kernel.org/r/0-v1-33906a626da1+16b0-vfio_kvm_no_group_jgg@nvidia.com
+https://lore.kernel.org/kvm/661447fd-b041-c08d-cedc-341b31c405f8@intel.com/
 
-Your rational looks a little better to me.
+It is trying to use KVM to write protect IOVA DMA memory, and it just
+doesn't work. If we want to do something like this the core vfio code
+should provide this service and it should be wired into KVM
+properly.
 
-> > The the normal kvm get/put don't have to exported symbols at all?
-> 
-> The export of kvm_get_kvm_safe() can go away (I forgot to do that in this series),
-> but kvm_get_kvm() will hang around as it's needed by KVM sub-modules (PPC and x86),
-> KVMGT (x86), and drivers/s390/crypto/vfio_ap_ops.c (no idea what to call that beast).
+power and s390 have actual architectural "virtual machines" and they
+need actual arch operations to install VFIO devices into those
+things. In this regard having the arch opt into the integration would
+make some sense. I expect this will get worse in our CC future where
+VFIO devices will need to be passed into arch specific CC code
+somehow.
 
-My thought would be to keep it as an inline, there should be some way
-to do that without breaking your desire to hide the bulk of the kvm
-struct content. Like put the refcount as the first element in the
-struct and just don't ifdef it away?.
+This arch stuff isn't cleanly done, the code is sprinkled all over the
+place. Some in mdevs, some in PCI arch code, some in #ifdefs..
+
+Maybe the CC people will clean it up instead of making the mess bigger :)
 
 Jason
