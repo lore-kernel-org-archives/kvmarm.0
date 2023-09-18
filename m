@@ -1,47 +1,47 @@
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49FEE15494
-	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 15:18:07 +0000 (UTC)
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-411f5dd7912so31065551cf.3
-        for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 08:18:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0676B38F8A
+	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 15:21:12 +0000 (UTC)
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-770ef353b8fso303548085a.0
+        for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 08:21:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1695050286; x=1695655086; darn=lists.linux.dev;
+        d=ziepe.ca; s=google; t=1695050472; x=1695655272; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=skILK3+RqLs29/E8NIb2upQKKLhMeBuYLpBX+o8j0o8=;
-        b=NeGyEDAQUamBvGuZf9UHstJRgGQV1X24WUPvfXLiDEP4WYPuIjnmMOiL6i0gUiyVQ0
-         4x5DUBOpeAPh8VqAOCvQm5eKiUW5n+Zlk3gzGyArM3Lcb59f2YO1z6aCJkDXCQ2od2X9
-         7efrrQRjES9MPoF6v56Z66huZ4ziRP/KQE0JiP3YXjpQSu3sDVLDvyjTOkbv4uaiezrY
-         rdxFArEiFEUTrSdj0p74l2gNVEDbn0coc6lQ8/ReABh9+4hQSpH8Njv1jiiM3Nko1BRa
-         DVTj1s4VQ0li9ecXKM9vxGsfnAfZxEUUZhUT0ktP/+uBNXK1DmM5QYt1idN6ISGZlabA
-         K5zQ==
+        bh=9iwt12QdmH2nPtcjR0iEq1G+1D18erLjJ1cQj58qe4I=;
+        b=nkGldrEVhWhWvkjqnWXkhvDWz8BjGrujn8htTm1wzYjQvr6A5n/7kknqZdsd9hApSI
+         mci7+yt9mjo5w9WdEb1pfsiwxtjp+QM4qU+53C3V1sgHyte/Q/N5kYCL+uWfSav3OX1e
+         X4pcwAwgRRg/uXatXy6HahwMI8vVqaHepb1hnBj4k7b2IG8ojWPp7VRmWOijBwIjBhn4
+         hNpWMIYGqIzGG0DcBs5rluPcLDnf+RqY051GOD146T4qsgOVJotlNq132HwhcxcJ6nEo
+         S4fLC1e+Bb5VleBL4dt44ZtS9KbIu/E+MkyA1Caub2uYk9GUOKgeUosSB0bSgr4UYIQW
+         l1kQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695050286; x=1695655086;
+        d=1e100.net; s=20230601; t=1695050472; x=1695655272;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=skILK3+RqLs29/E8NIb2upQKKLhMeBuYLpBX+o8j0o8=;
-        b=hZtf6lCaYfVZFqzcfRuR4aM87zCumLh6Ag2U6sUJSaGuCYvgtLDp9lzU3+1IylJDV1
-         0ks/YdAzU9ML8rIKCgXmoVJEoU1/LABidGSwUJtinbprNa3IqMOPpm89B19JGY5d+AlI
-         3uJWQ5PdZ6aT0S4f9gS3bXVnnIUwpJd8bwVGw3elclYmeYb0U5FL0Av1Zew+mbCbI30a
-         hFyxzCimZC0zu0ADTUcmCeWCU7nukLlZkzhAyIRuSn9S+zpTYc3PzuviSjt6ZwDd6TwL
-         a/gEsQLNv5fe3o8FnNDf2N6AjaB5AXQwNPeQtNOQz7UEcvh2C4tBH5N5mlENOzfQftbm
-         Dt0w==
-X-Gm-Message-State: AOJu0YyYUkZrjOFNaLYimWPwhBzcQEYfCB7eY3mV77jGFD57U/EJ2y3W
-	8CkBgQWO2d1lr8+hQjIVC2vFdA==
-X-Google-Smtp-Source: AGHT+IEPjZK20Aqh4DOH80nyWTVB2XY8RoIapnvcyiksM3wp5qxi6JV9wSTNi2A0D4DmrBL930vlSw==
-X-Received: by 2002:ad4:458d:0:b0:63f:9aa3:867b with SMTP id x13-20020ad4458d000000b0063f9aa3867bmr9395365qvu.40.1695050286275;
-        Mon, 18 Sep 2023 08:18:06 -0700 (PDT)
+        bh=9iwt12QdmH2nPtcjR0iEq1G+1D18erLjJ1cQj58qe4I=;
+        b=sGSy+G9h2+pi7qxKQsREh8BOAD4bg2U3gL6RQAvE+SQYurKNiao1dGpHDdcZR5S+am
+         kTDM4jzaYwmzCASyZ1ymAtk3s20EmcrkqIHpYVf24L4gPwUhjNGRwOfrC98jOyig3JLw
+         1lTpzQ/0H8pXFOw3WiYVW9e95+1gWt7nDNLX0N5MSgXdMRGGF82T/iIJGoJaRIDX3M50
+         weLSEuxd9jhN11LYhcUDXd8bPyjVyB08pdBzhz+hMvMCZfUJxwxQkCWPK03OgULhD3QK
+         EBquBrL0mEXOFI7TZYTvxgRTzv/VmmF3WeK/5Txx0Sv/0bdH5LdX3tqq4dox+9zJQ+aE
+         qrvw==
+X-Gm-Message-State: AOJu0YwuUtZaeZKweqprPuIxNJYQiOXvD9WXhgZMShGcGWJlvOLXe2Yq
+	XwmtKiqUX156mRxDM/9vepMsXg==
+X-Google-Smtp-Source: AGHT+IEUJFa3aXEX1YodKfdMrwJPEEuzBhbA2hgycHy86i8DANtxQ0UmL29SlN96YZ1Wg+zGpbaj/w==
+X-Received: by 2002:a05:620a:31a8:b0:76d:a110:856d with SMTP id bi40-20020a05620a31a800b0076da110856dmr11089993qkb.0.1695050471902;
+        Mon, 18 Sep 2023 08:21:11 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-142-68-26-201.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.26.201])
-        by smtp.gmail.com with ESMTPSA id r28-20020a0cb29c000000b0063d038df3f3sm3532215qve.52.2023.09.18.08.18.05
+        by smtp.gmail.com with ESMTPSA id i20-20020a05620a145400b0076f18be9a64sm3220186qkl.81.2023.09.18.08.21.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Sep 2023 08:18:05 -0700 (PDT)
+        Mon, 18 Sep 2023 08:21:11 -0700 (PDT)
 Received: from jgg by wakko with local (Exim 4.95)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1qiG0i-0005OR-Iy;
-	Mon, 18 Sep 2023 12:18:04 -0300
-Date: Mon, 18 Sep 2023 12:18:04 -0300
+	id 1qiG3i-0005PK-IY;
+	Mon, 18 Sep 2023 12:21:10 -0300
+Date: Mon, 18 Sep 2023 12:21:10 -0300
 From: Jason Gunthorpe <jgg@ziepe.ca>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
@@ -79,11 +79,11 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Anish Ghulati <aghulati@google.com>,
 	Venkatesh Srinivas <venkateshs@chromium.org>,
 	Andrew Thornton <andrewth@google.com>
-Subject: Re: [PATCH 03/26] virt: Declare and define vfio_file_set_kvm() iff
- CONFIG_KVM is enabled
-Message-ID: <20230918151804.GH13795@ziepe.ca>
+Subject: Re: [PATCH 05/26] vfio: KVM: Pass get/put helpers from KVM to VFIO,
+ don't do circular lookup
+Message-ID: <20230918152110.GI13795@ziepe.ca>
 References: <20230916003118.2540661-1-seanjc@google.com>
- <20230916003118.2540661-4-seanjc@google.com>
+ <20230916003118.2540661-6-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -92,29 +92,28 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230916003118.2540661-4-seanjc@google.com>
+In-Reply-To: <20230916003118.2540661-6-seanjc@google.com>
 
-On Fri, Sep 15, 2023 at 05:30:55PM -0700, Sean Christopherson wrote:
-> Hide vfio_file_set_kvm() and its unique helpers if KVM is not enabled,
-> nothing else in the kernel (or out of the kernel) should be using a
-> KVM specific helper.
+On Fri, Sep 15, 2023 at 05:30:57PM -0700, Sean Christopherson wrote:
+> Explicitly pass KVM's get/put helpers to VFIO when attaching a VM to
+> VFIO instead of having VFIO do a symbol lookup back into KVM.  Having both
+> KVM and VFIO do symbol lookups increases the overall complexity and places
+> an unnecessary dependency on KVM (from VFIO) without adding any value.
 > 
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  drivers/vfio/vfio_main.c | 2 +-
->  include/linux/vfio.h     | 2 ++
->  2 files changed, 3 insertions(+), 1 deletion(-)
+>  drivers/vfio/vfio.h      |  2 ++
+>  drivers/vfio/vfio_main.c | 74 +++++++++++++++++++---------------------
+>  include/linux/vfio.h     |  4 ++-
+>  virt/kvm/vfio.c          |  9 +++--
+>  4 files changed, 47 insertions(+), 42 deletions(-)
 
-Patch subject should be vfio not virt
+I don't mind this, but Christoph had disliked my prior attempt to do
+this with function pointers..
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+The get can be inlined, IIRC, what about putting a pointer to the put
+inside the kvm struct?
 
-> @@ -1388,6 +1387,7 @@ void vfio_file_set_kvm(struct file *file, struct kvm *kvm)
->  		vfio_device_file_set_kvm(file, kvm);
->  }
->  EXPORT_SYMBOL_GPL(vfio_file_set_kvm);
-> +#endif
-
-We could even put this in a symbol namespace..
+The the normal kvm get/put don't have to exported symbols at all?
 
 Jason
