@@ -1,18 +1,18 @@
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7E01C2AC
-	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 09:54:36 +0000 (UTC)
-Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.226])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Rq0Q21XVHz6D9BK;
-	Mon, 18 Sep 2023 17:49:46 +0800 (CST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BB661C2AC
+	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 09:55:25 +0000 (UTC)
+Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.207])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Rq0VG5DX5z6HJlt;
+	Mon, 18 Sep 2023 17:53:26 +0800 (CST)
 Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
  lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Mon, 18 Sep 2023 10:54:32 +0100
+ 15.1.2507.31; Mon, 18 Sep 2023 10:55:23 +0100
 Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
  lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.031;
- Mon, 18 Sep 2023 10:54:31 +0100
+ Mon, 18 Sep 2023 10:55:23 +0100
 From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
 To: Oliver Upton <oliver.upton@linux.dev>
 CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "kvm@vger.kernel.org"
@@ -23,23 +23,22 @@ CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "kvm@vger.kernel.org"
 	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, yuzenghui
 	<yuzenghui@huawei.com>, zhukeqian <zhukeqian1@huawei.com>, Jonathan Cameron
 	<jonathan.cameron@huawei.com>, Linuxarm <linuxarm@huawei.com>
-Subject: RE: [RFC PATCH v2 4/8] KVM: arm64: Set DBM for previously writeable
- pages
-Thread-Topic: [RFC PATCH v2 4/8] KVM: arm64: Set DBM for previously writeable
- pages
-Thread-Index: AQHZ1zeuYuzeI01Cc0itfn6DpxzudLAcj9iAgAPhe+A=
-Date: Mon, 18 Sep 2023 09:54:31 +0000
-Message-ID: <731949dbc1d44925af40acc0d4f7650a@huawei.com>
+Subject: RE: [RFC PATCH v2 0/8] KVM: arm64: Implement SW/HW combined dirty log
+Thread-Topic: [RFC PATCH v2 0/8] KVM: arm64: Implement SW/HW combined dirty
+ log
+Thread-Index: AQHZ1zeYniphcsNMdESdQqigwTISA7AZEKiAgAEU5SCAAPR6AIAFYYpQ
+Date: Mon, 18 Sep 2023 09:55:22 +0000
+Message-ID: <853b333084c4462a870bb2a37ec65935@huawei.com>
 References: <20230825093528.1637-1-shameerali.kolothum.thodi@huawei.com>
- <20230825093528.1637-5-shameerali.kolothum.thodi@huawei.com>
- <ZQTgi/lsClyM6b1j@linux.dev>
-In-Reply-To: <ZQTgi/lsClyM6b1j@linux.dev>
+ <ZQHxm+L890yTpY91@linux.dev> <14eb2648eb594dd9a46a179733cee0df@huawei.com>
+ <ZQOm9gUo8un+claf@linux.dev>
+In-Reply-To: <ZQOm9gUo8un+claf@linux.dev>
 Accept-Language: en-GB, en-US
 Content-Language: en-US
 X-MS-Has-Attach:
 X-MS-TNEF-Correlator:
 x-originating-ip: [10.202.227.178]
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -53,7 +52,7 @@ X-CFilter-Loop: Reflected
 
 > -----Original Message-----
 > From: Oliver Upton [mailto:oliver.upton@linux.dev]
-> Sent: 15 September 2023 23:54
+> Sent: 15 September 2023 01:36
 > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
 > Cc: kvmarm@lists.linux.dev; kvm@vger.kernel.org;
 > linux-arm-kernel@lists.infradead.org; maz@kernel.org; will@kernel.org;
@@ -61,74 +60,117 @@ X-CFilter-Loop: Reflected
 > suzuki.poulose@arm.com; yuzenghui <yuzenghui@huawei.com>; zhukeqian
 > <zhukeqian1@huawei.com>; Jonathan Cameron
 > <jonathan.cameron@huawei.com>; Linuxarm <linuxarm@huawei.com>
-> Subject: Re: [RFC PATCH v2 4/8] KVM: arm64: Set DBM for previously
-> writeable pages
+> Subject: Re: [RFC PATCH v2 0/8] KVM: arm64: Implement SW/HW combined
+> dirty log
 >=20
-> On Fri, Aug 25, 2023 at 10:35:24AM +0100, Shameer Kolothum wrote:
-> > We only set DBM if the page is writeable (S2AP[1] =3D=3D 1).=A0But once
-> migration
-> > starts, CLEAR_LOG path will write protect the pages (S2AP[1] =3D 0) and
-> there
-> > isn't=A0an easy way to differentiate the writeable pages that gets writ=
+> On Thu, Sep 14, 2023 at 09:47:48AM +0000, Shameerali Kolothum Thodi
+> wrote:
+>=20
+> [...]
+>=20
+> > > What you're proposing here is complicated and I fear not easily
+> > > maintainable. Keeping the *two* sources of dirty state seems likely t=
+o
+> > > fail (eventually) with some very unfortunate consequences.
+> >
+> > It does adds complexity to the dirty state management code. I have trie=
+d
+> > to separate the code path using appropriate FLAGS etc to make it more
+> > manageable. But this is probably one area we can work on if the overall
+> > approach does have some benefits.
+>=20
+> I'd be a bit more amenable to a solution that would select either
+> write-protection or dirty state management, but not both.
+>=20
+> > > The vCPU:memory ratio you're testing doesn't seem representative of
+> what
+> > > a typical cloud provider would be configuring, and the dirty log
+> > > collection is going to scale linearly with the size of guest memory.
+> >
+> > I was limited by the test setup I had. I will give it a go with a highe=
+r mem
+> > system.
+>=20
+> Thanks. Dirty log collection needn't be single threaded, but the
+> fundamental concern of dirty log collection time scaling linearly w.r.t.
+> the size to memory remains. Write-protection helps spread the cost of
+> collecting dirty state out across all the vCPU threads.
+>=20
+> There could be some value in giving userspace the ability to parallelize
+> calls to dirty log ioctls to work on non-intersecting intervals.
+>=20
+> > > Slow dirty log collection is going to matter a lot for VM blackout,
+> > > which from experience tends to be the most sensitive period of live
+> > > migration for guest workloads.
+> > >
+> > > At least in our testing, the split GET/CLEAR dirty log ioctls
+> > > dramatically improved the performance of a write-protection based dit=
+ry
+> > > tracking scheme, as the false positive rate for dirtied pages is
+> > > significantly reduced. FWIW, this is what we use for doing LM on arm6=
+4
+> as
+> > > opposed to the D-bit implemenation that we use on x86.
+> >
+> > Guess, by D-bit on x86 you mean the PML feature. Unfortunately that is
+> > something we lack on ARM yet.
+>=20
+> Sorry, this was rather nonspecific. I was describing the pre-copy
+> strategies we're using at Google (out of tree). We're carrying patches
+> to use EPT D-bit for exitless dirty tracking.
+
+Just curious, how does it handle the overheads associated with scanning for
+dirty pages and the convergence w.r.t high rate of dirtying in exitless mod=
+e?=20
+=20
+> > > Faster pre-copy performance would help the benchmark complete faster,
+> > > but the goal for a live migration should be to minimize the lost
+> > > computation for the entire operation. You'd need to test with a
+> > > continuous workload rather than one with a finite amount of work.
+> >
+> > Ok. Though the above is not representative of a real workload, I though=
+t
+> > it gives some idea on how "Guest up time improvement" is benefitting th=
 e
-> > protected from read-only pages as we only have S2AP[1] bit to check.
+> > overall availability of the workload during migration. I will check wit=
+hin our
+> > wider team to see if I can setup a more suitable test/workload to show
+> some
+> > improvement with this approach.
 > >
-> > Introduced a ctx->flag KVM_PGTABLE_WALK_WC_HINT to=A0identify the
-> dirty page
-> > tracking related write-protect=A0page table walk and=A0used one of the
-> "Reserved
-> > for software use" bit in page descriptor to mark a page as
-> "writeable-clean".
-> >
-> > Signed-off-by: Shameer Kolothum
-> <shameerali.kolothum.thodi@huawei.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_pgtable.h |  5 +++++
-> >  arch/arm64/kvm/hyp/pgtable.c         | 25
-> ++++++++++++++++++++++---
-> >  2 files changed, 27 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h
-> b/arch/arm64/include/asm/kvm_pgtable.h
-> > index a12add002b89..67bcbc5984f9 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -190,6 +190,8 @@ enum kvm_pgtable_prot {
-> >  #define KVM_PGTABLE_PROT_RW	(KVM_PGTABLE_PROT_R |
-> KVM_PGTABLE_PROT_W)
-> >  #define KVM_PGTABLE_PROT_RWX	(KVM_PGTABLE_PROT_RW |
-> KVM_PGTABLE_PROT_X)
-> >
-> > +#define KVM_PGTABLE_PROT_WC	KVM_PGTABLE_PROT_SW0
-> /*write-clean*/
-> > +
-> >  #define PKVM_HOST_MEM_PROT	KVM_PGTABLE_PROT_RWX
-> >  #define PKVM_HOST_MMIO_PROT	KVM_PGTABLE_PROT_RW
-> >
-> > @@ -221,6 +223,8 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64
-> addr, u64 end,
-> >   *					operations required.
-> >   * @KVM_PGTABLE_WALK_HW_DBM:		Indicates that the attribute
-> update is
-> >   *					HW DBM related.
-> > + * @KVM_PGTABLE_WALK_WC_HINT:		Update the page as
-> writeable-clean(software attribute)
-> > + *					if we are write protecting a writeable page.
+> > Please let me know if there is a specific workload you have in mind.
 >=20
-> This really looks like a permission bit, not a walker flag. This should
-> be defined in kvm_pgtable_prot and converted to the hardware definition
-> in stage2_set_prot_attr(). Also, the first time I saw 'WC' I read it as
-> 'write-combine', not writable-clean.
-
-Ok. I will have a go as suggested above. In fact "writeable-clean" is an
-ARM ARM term, I will make it more specific.
-
+> No objection to the workload you've chosen, I'm more concerned about the
+> benchmark finishing before live migration completes.
 >=20
-> As I understand it, the only need for an additional software bit here is
-> to identify neighboring PTEs that can have DBM set while we're in the
-> middle of the walk right?
+> What I'm looking for is something like this:
+>=20
+>  - Calculate the ops/sec your benchmark completes in steady state
+>=20
+>  - Do a live migration and sample the rate throughout the benchmark,
+>    accounting for VM blackout time
+>=20
+>  - Calculate the area under the curve of:
+>=20
+>      y =3D steady_state_rate - live_migration_rate(t)
+>=20
+>  - Compare the area under the curve for write-protection and your DBM
+>    approach.
 
-Yes, that is the purpose.
+Ok. Got it.
 
-Thanks,
+> > Thanks for getting back on this. Appreciate if you can do a quick glanc=
+e
+> > through the rest of the patches as well for any gross errors especially=
+ with
+> > respect to page table walk locking, usage of DBM FLAGS etc.
+>=20
+> I'll give it a read when I have some spare cycles. To be entirely clear,
+> I don't have any fundamental objections to using DBM for dirty tracking.
+> I just want to make sure that all alternatives have been considered
+> in the current scheme before we seriously consider a new approach with
+> its own set of tradeoffs.
+
+Thanks for taking a look.
+
 Shameer
