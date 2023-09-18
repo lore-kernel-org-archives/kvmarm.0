@@ -1,65 +1,145 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980B51BDC5
-	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 11:16:33 +0000 (UTC)
-Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.55])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Rq2FG3jY9ztSSK;
-	Mon, 18 Sep 2023 19:12:18 +0800 (CST)
-Received: from [10.174.185.179] (10.174.185.179) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Mon, 18 Sep 2023 19:16:29 +0800
-Subject: Re: [PATCH] KVM: arm64: selftests: Add arch_timer_edge_cases selftest
-To: Colton Lewis <coltonlewis@google.com>
-CC: <kvm@vger.kernel.org>, <maz@kernel.org>, <oliver.upton@linux.dev>,
-	<james.morse@arm.com>, <suzuki.poulose@arm.com>, <ricarkol@google.com>,
-	<kvmarm@lists.linux.dev>
-References: <gsnt8r97ifsz.fsf@coltonlewis-kvm.c.googlers.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <9bf8d239-2851-087b-9608-0c776b721ed7@huawei.com>
-Date: Mon, 18 Sep 2023 19:16:21 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 828C57464
+	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 11:19:32 +0000 (UTC)
+Received: from [192.168.2.59] (109-252-153-31.dynamic.spd-mgts.ru [109.252.153.31])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: dmitry.osipenko)
+	by madras.collabora.co.uk (Postfix) with ESMTPSA id F38DE6607181;
+	Mon, 18 Sep 2023 12:19:29 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1695035970;
+	bh=hgnk48RgG+7cwbqcRVLD9sBkHSjtoXbVw0Wf/m2TIho=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=Hg2rvjWDbAtt9zyN/6VUG9k4ys3RaaAGEoyLFGIezgW+Uos5TX8wEmjQ6ecZAbq7l
+	 XBoaIVFRHfXyJJH+PG9upVQG+pKyXj+4+VZRFq+AUE8o9wa80TNtkMHEtmLG1hQdS3
+	 lPimLpF4Aqc06t+CnwguDX3nJVz/TnemE+oSluae5+OANtdnqVhhNDj+O8x8QMsucn
+	 lqknbR2nO/mTE/7YEUrzpirP61UUywYq600UE+DdosRs/pTtqGS/LbBlavecnYa8bn
+	 d6lSQYdURwN+dxkWyYSShW0KEFnr/IyeYGSRRA9CxqFnJlylocRHY2lPkS7tt92XxG
+	 jXM1+rczch0OA==
+Message-ID: <207c8e59-f92a-96c0-bc5e-39b73a840110@collabora.com>
+Date: Mon, 18 Sep 2023 14:19:27 +0300
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <gsnt8r97ifsz.fsf@coltonlewis-kvm.c.googlers.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v9 6/6] KVM: x86/mmu: Handle non-refcounted pages
 Content-Language: en-US
+From: Dmitry Osipenko <dmitry.osipenko@collabora.com>
+To: David Stevens <stevensd@chromium.org>,
+ Sean Christopherson <seanjc@google.com>
+Cc: Yu Zhang <yu.c.zhang@linux.intel.com>,
+ Isaku Yamahata <isaku.yamahata@gmail.com>,
+ Zhi Wang <zhi.wang.linux@gmail.com>, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20230911021637.1941096-1-stevensd@google.com>
+ <20230911021637.1941096-7-stevensd@google.com>
+ <14db8c0b-77de-34ec-c847-d7360025a571@collabora.com>
+In-Reply-To: <14db8c0b-77de-34ec-c847-d7360025a571@collabora.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.185.179]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm600007.china.huawei.com (7.193.23.208)
-X-CFilter-Loop: Reflected
 
-Hi Colton,
-
-On 2023/9/16 0:04, Colton Lewis wrote:
-> It's been a few months with no comment on this. Can someone please
-> review? There was no need to rebase from the original patch. It's all
-> new code so there are no conflicts.
+On 9/18/23 12:58, Dmitry Osipenko wrote:
+> On 9/11/23 05:16, David Stevens wrote:
+>> From: David Stevens <stevensd@chromium.org>
+>>
+>> Handle non-refcounted pages in __kvm_faultin_pfn. This allows the host
+>> to map memory into the guest that is backed by non-refcounted struct
+>> pages - for example, the tail pages of higher order non-compound pages
+>> allocated by the amdgpu driver via ttm_pool_alloc_page.
+>>
+>> The bulk of this change is tracking the is_refcounted_page flag so that
+>> non-refcounted pages don't trigger page_count() == 0 warnings. This is
+>> done by storing the flag in an unused bit in the sptes. There are no
+>> bits available in PAE SPTEs, so non-refcounted pages can only be handled
+>> on TDP and x86-64.
+>>
+>> Signed-off-by: David Stevens <stevensd@chromium.org>
+>> ---
+>>  arch/x86/kvm/mmu/mmu.c          | 52 +++++++++++++++++++++++----------
+>>  arch/x86/kvm/mmu/mmu_internal.h |  1 +
+>>  arch/x86/kvm/mmu/paging_tmpl.h  |  8 +++--
+>>  arch/x86/kvm/mmu/spte.c         |  4 ++-
+>>  arch/x86/kvm/mmu/spte.h         | 12 +++++++-
+>>  arch/x86/kvm/mmu/tdp_mmu.c      | 22 ++++++++------
+>>  include/linux/kvm_host.h        |  3 ++
+>>  virt/kvm/kvm_main.c             |  6 ++--
+>>  8 files changed, 76 insertions(+), 32 deletions(-)
 > 
-> I understand it's a bigger patch, but I believe it all falls under the
-> same functional umbrella.
+> Could you please tell which kernel tree you used for the base of this
+> series? This patch #6 doesn't apply cleanly to stable/mainline/next/kvm
+> 
+> error: sha1 information is lacking or useless (arch/x86/kvm/mmu/mmu.c).
+> error: could not build fake ancestor
 
-Thanks for your efforts. I'd like to give it a go but this patch fails
-to compile on the mainline kernel.
+I applied the patch manually to v6.5.2 and tested Venus using Intel TGL iGPU, the intel driver is crashing:
 
-In file included from include/aarch64/delay.h:9,
-                 from lib/aarch64/gic_v3.c:10:
-include/aarch64/arch_timer.h: In function 'timer_get_tval':
-include/aarch64/arch_timer.h:107:3: warning: implicit declaration of 
-function 'GUEST_ASSERT_1'; did you mean 'GUEST_ASSERT_NE'? 
-[-Wimplicit-function-declaration]
-  107 |   GUEST_ASSERT_1(0, timer);
-      |   ^~~~~~~~~~~~~~
-      |   GUEST_ASSERT_NE
+   BUG: kernel NULL pointer dereference, address: 0000000000000058
+   #PF: supervisor read access in kernel mode
+   #PF: error_code(0x0000) - not-present page
+   PGD 0 P4D 0 
+   Oops: 0000 [#1] PREEMPT SMP
+   CPU: 1 PID: 5926 Comm: qemu-system-x86 Not tainted 6.5.2+ #114
+   Hardware name: LENOVO 20VE/LNVNB161216, BIOS F8CN43WW(V2.06) 08/12/2021
+   RIP: 0010:gen8_ppgtt_insert+0x50b/0x8f0
+   Code: 00 00 f7 c2 00 00 20 00 74 15 f7 c3 ff ff 1f 00 75 0d 41 81 fc ff ff 1f 00 0f 87 0e 02 00 00 48 8b 74 24 08 44 89 c0 45 85 ed <48> 8b 4e 58 48 8b 04 c1 0f 85 0b 02 00 00 81 e2 00 00 01 00 0f 84
+   RSP: 0018:ffffafc085afb820 EFLAGS: 00010246
+   RAX: 0000000000000000 RBX: 00000000e9604000 RCX: 000000000000001b
+   RDX: 0000000000211000 RSI: 0000000000000000 RDI: ffff9513d44c1000
+   RBP: ffff951106f8dfc0 R08: 0000000000000000 R09: 0000000000000003
+   R10: 0000000000000fff R11: 00000000e9800000 R12: 00000000001fc000
+   R13: 0000000000000000 R14: 0000000000001000 R15: 0000ffff00000000
+   FS:  00007f2a5bcced80(0000) GS:ffff951a87a40000(0000) knlGS:0000000000000000
+   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+   CR2: 0000000000000058 CR3: 0000000116f16006 CR4: 0000000000772ee0
+   PKRU: 55555554
+   Call Trace:
+    <TASK>
+    ? __die+0x1f/0x60
+    ? page_fault_oops+0x14d/0x420
+    ? exc_page_fault+0x3d7/0x880
+    ? lock_acquire+0xc9/0x290
+    ? asm_exc_page_fault+0x22/0x30
+    ? gen8_ppgtt_insert+0x50b/0x8f0
+    ppgtt_bind_vma+0x4f/0x60
+    fence_work+0x1b/0x70
+    fence_notify+0x8f/0x130
+    __i915_sw_fence_complete+0x58/0x230
+    i915_vma_pin_ww+0x513/0xa80
+    eb_validate_vmas+0x17e/0x9e0
+    ? eb_pin_engine+0x2bb/0x340
+    i915_gem_do_execbuffer+0xc85/0x2bf0
+    ? __lock_acquire+0x3b6/0x21c0
+    i915_gem_execbuffer2_ioctl+0xee/0x240
+    ? i915_gem_do_execbuffer+0x2bf0/0x2bf0
+    drm_ioctl_kernel+0x9d/0x140
+    drm_ioctl+0x1dd/0x410
+    ? i915_gem_do_execbuffer+0x2bf0/0x2bf0
+    ? __fget_files+0xc5/0x170
+    __x64_sys_ioctl+0x8c/0xc0
+    do_syscall_64+0x34/0x80
+    entry_SYSCALL_64_after_hwframe+0x46/0xb0
+   RIP: 0033:0x7f2a60b0c9df
 
-... and something like that. It'd be good if you could have a look.
 
-Thanks,
-Zenghui
+$ ./scripts/faddr2line ./vmlinux gen8_ppgtt_insert+0x50b/0x8f0
+gen8_ppgtt_insert+0x50b/0x8f0:
+i915_pt_entry at drivers/gpu/drm/i915/gt/intel_gtt.h:557
+(inlined by) gen8_ppgtt_insert_huge at drivers/gpu/drm/i915/gt/gen8_ppgtt.c:641
+(inlined by) gen8_ppgtt_insert at drivers/gpu/drm/i915/gt/gen8_ppgtt.c:743
+
+It's likely should be the i915 driver issue that is crashes with the NULL deref, but the origin of the bug should be the kvm page fault handling. 
+
+David, could you please tell what tests you've run and post a link to yours kernel tree? Maybe I made obscure mistake while applied the patch manually.
+
+-- 
+Best regards,
+Dmitry
+
