@@ -1,47 +1,47 @@
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7CE31170A
-	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 15:16:40 +0000 (UTC)
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-41214998fc2so27335321cf.0
-        for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 08:16:40 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018241170A
+	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 15:17:12 +0000 (UTC)
+Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3a7f4f7a8easo2203897b6e.2
+        for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 08:17:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1695050199; x=1695654999; darn=lists.linux.dev;
+        d=ziepe.ca; s=google; t=1695050232; x=1695655032; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6Ucvab0+WYvq4UufE5S4SV2ca9jdWUsP9GGHLs6BCgo=;
-        b=Es+VaBjpGDjxjUTVB5qVZUr0MDx/EZB3yS03V0tRcrOwKuoB4a8kj5gcJILXMA/hxj
-         JrccQpqn6tR5WHI+Ft1zWYUQjuNrQtsapTTmegJb50N2vkplGY1yDQbPTh+utOD9sdgx
-         9wbQ9A8b04uh6IhYGssahvPRDsVB2ShjHR5zVhVvtT49B/eNENR20lMwnlNpIVuG1Ctd
-         nJRIPDESqVJpclt5w9FT+cktQ/XiVZN+OBMaLu1uWp+AqxhPPr5Z1MvzzEMnTFA3+N21
-         N/npxxQOxzVGgjLX+JhAaEVkIYjZ9hTp067wwSVgT9U3mR3egPWl6dE51Gykouju9ZBp
-         Hdfg==
+        bh=/NB9QogE7/hqQA3eAPgSewNzbsnZd2QFPin+QhCO7do=;
+        b=J2Gfj6q4M/MBtU9WPY6f23cW2QCyngNjN292Dg0SQFF+TRpEIxjLdEwcqHISjj/pop
+         3vZ7ikorf8WuGK5dVzklevOwiayaB1Jv1GuPnoRG5u6QS93i2fJOIfCbV52//6FAxpWc
+         AmrtD1iRFLLFVCV9bmMtuEMQ5XGjkAHJ+PVL7JD+03HqCFYcy+wMy4FKz69hMYwkn+wr
+         AHN6UvduzJ07vHL7ms6xC+VSxl2izEnybxUrnQnLXvXhfKLhUXHhbzHj8tEPkqysfwBl
+         7Iwc9VNxqVtbwUh1NrNeKok8Cdi6UYTuMyo0ciPI+5ql73LFFxaxlAww6d4uGjdXFX98
+         lUlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695050199; x=1695654999;
+        d=1e100.net; s=20230601; t=1695050232; x=1695655032;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6Ucvab0+WYvq4UufE5S4SV2ca9jdWUsP9GGHLs6BCgo=;
-        b=npYDzQWh0meaDZGtrnuGeldMgAjKTubOsLOXWpmtz6e6shCu5RBgR2jvXaBhSo915u
-         6zIt9+dvsUVZAfvaSKaCq8gV2gFQeFmJDN2pGjchCveWyCJOiQjpLiryxpkfOJcnVMbg
-         I9vjmgADYwP9WGEnCr0Qupr/UmsizCKf0QelqN32ZrskkTvwZ7g/p1MMFgltH3FCgsn2
-         XsLmztwczv5/2zYSLlqX/meM5rVpTBkBBlHz4A+RkEeCO5xhRBgQaClqt7LHkq4EXkJn
-         YFhygF1r5Q3a4vpntuvlTojT7keLVOOVFJ0HQAcuVR86uXLoFo73GICGz+f4D59TJPy0
-         DJ9Q==
-X-Gm-Message-State: AOJu0YzZO7XNOjn3L+V/yyj5YnEVXp2/TQ1tHhmLOOI7CeEBAjfE2lrT
-	iWpcchSj8QozeSoyq4rhbIJt4Q==
-X-Google-Smtp-Source: AGHT+IE1nILLKPaFxe5im/MfVjUE0HuRytyibnYnzCmrjBnu/bqUhqldLHu9krEWO371lIWoHdHJrg==
-X-Received: by 2002:ac8:5ac9:0:b0:403:ef0a:ac69 with SMTP id d9-20020ac85ac9000000b00403ef0aac69mr11892621qtd.62.1695050199490;
-        Mon, 18 Sep 2023 08:16:39 -0700 (PDT)
+        bh=/NB9QogE7/hqQA3eAPgSewNzbsnZd2QFPin+QhCO7do=;
+        b=SwwcGAh0psH+nIQ7LQQaoczFnqaJ8FDKhJvsNwLkdBrvKFpopGOSL4ujPNw1yQfMAA
+         1SKhgGMH7tZNHdtcxXoI5g3cyM/5VB0gB/qCaLRn6scMPPTqbNbMoXiIgTTz7KwFYWml
+         2fbPQBgLn2tiM4O5+DT2sWbUBO3ziS8LY7RjhQ85yD5s/kEx8SJwt9HD6QgJ4roeuZUq
+         nhgESc+aPYQYXAlgq64ADG2i+k27XVBx+n24KoWPfI7RyjDVlOP3huBCrDXZ0cnpDgDn
+         67kE+x9gqkTPXOwdoIOreeELd+G2YYGaWPQ4F1RLYac78xTL3gsXGCXfl/srkaDUOrGf
+         5HFQ==
+X-Gm-Message-State: AOJu0Yz0WO2uP8DFKarpJTOM0Vap9JP5rbjv6FoUYhbhfQIJf8Bg1uND
+	WF8raWcu25C1YREJPro9qpC0mw==
+X-Google-Smtp-Source: AGHT+IGk3T+gnY/Ry6RzP8KMpZ6etd0YaUlt1+KGAcu6zz40/S34i/NvbRLiXeftEMRhME9haaF4Dg==
+X-Received: by 2002:a05:6870:b691:b0:1d5:b442:5de7 with SMTP id cy17-20020a056870b69100b001d5b4425de7mr10054844oab.35.1695050231963;
+        Mon, 18 Sep 2023 08:17:11 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-142-68-26-201.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.26.201])
-        by smtp.gmail.com with ESMTPSA id z22-20020ac87116000000b004108f6788a6sm3081779qto.41.2023.09.18.08.16.37
+        by smtp.gmail.com with ESMTPSA id r13-20020a0ce28d000000b0064f50e2c551sm1477356qvl.1.2023.09.18.08.17.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Sep 2023 08:16:38 -0700 (PDT)
+        Mon, 18 Sep 2023 08:17:11 -0700 (PDT)
 Received: from jgg by wakko with local (Exim 4.95)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1qiFzJ-0005Nh-7L;
-	Mon, 18 Sep 2023 12:16:37 -0300
-Date: Mon, 18 Sep 2023 12:16:37 -0300
+	id 1qiFzq-0005O4-IS;
+	Mon, 18 Sep 2023 12:17:10 -0300
+Date: Mon, 18 Sep 2023 12:17:10 -0300
 From: Jason Gunthorpe <jgg@ziepe.ca>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
@@ -79,11 +79,11 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Anish Ghulati <aghulati@google.com>,
 	Venkatesh Srinivas <venkateshs@chromium.org>,
 	Andrew Thornton <andrewth@google.com>
-Subject: Re: [PATCH 01/26] vfio: Wrap KVM helpers with CONFIG_KVM instead of
- CONFIG_HAVE_KVM
-Message-ID: <20230918151637.GF13795@ziepe.ca>
+Subject: Re: [PATCH 02/26] vfio: Move KVM get/put helpers to colocate it with
+ other KVM related code
+Message-ID: <20230918151710.GG13795@ziepe.ca>
 References: <20230916003118.2540661-1-seanjc@google.com>
- <20230916003118.2540661-2-seanjc@google.com>
+ <20230916003118.2540661-3-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -92,23 +92,17 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230916003118.2540661-2-seanjc@google.com>
+In-Reply-To: <20230916003118.2540661-3-seanjc@google.com>
 
-On Fri, Sep 15, 2023 at 05:30:53PM -0700, Sean Christopherson wrote:
-> Wrap the helpers for getting references to KVM instances with a check on
-> CONFIG_KVM being enabled, not on CONFIG_HAVE_KVM being defined.  PPC does
-> NOT select HAVE_KVM, despite obviously supporting KVM, and guarding code
-> to get references to KVM based on whether or not the architecture supports
-> KVM is nonsensical.
-> 
-> Drop the guard around linux/kvm_host.h entirely, conditionally including a
-> generic headers is completely unnecessary.
+On Fri, Sep 15, 2023 at 05:30:54PM -0700, Sean Christopherson wrote:
+> Move the definitions of vfio_device_get_kvm_safe() and vfio_device_put_kvm()
+> down in vfio_main.c to colocate them with other KVM-specific functions,
+> e.g. to allow wrapping them all with a single CONFIG_KVM check.
 > 
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  drivers/vfio/vfio.h      | 2 +-
->  drivers/vfio/vfio_main.c | 4 +---
->  2 files changed, 2 insertions(+), 4 deletions(-)
+>  drivers/vfio/vfio_main.c | 104 +++++++++++++++++++--------------------
+>  1 file changed, 52 insertions(+), 52 deletions(-)
 
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
