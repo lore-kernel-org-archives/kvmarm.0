@@ -1,94 +1,143 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D84D63CC
-	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 15:57:48 +0000 (UTC)
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d81486a0382so4854692276.0
-        for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 08:57:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8115B1F5F0
+	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 16:03:16 +0000 (UTC)
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-64cca551ae2so28298456d6.0
+        for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 09:03:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695052667; x=1695657467; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=s17YssV/eLMk3v6BQw21PztJLVQ1uDSUDnGyHA0nJic=;
-        b=o0IENACE1jMyAufmCVKBiAEdbDmM1r4DviWVQu4Eu6bkFp9TYvkMjgk9wNkS0CaPp3
-         rWaXGi2S4TpPg1L7Xb5q0JMSGgbKNc6t3z0q7eWPoVz7/sjwv6ZLmjLfIaj4yUfkF5wB
-         Ev7rnHwPyv9K8MSgjMB/CRZuGJiJXyfLp5O53CIr2HTa6JQ3kHEJaK+YlQH8ahuECzRW
-         oHyrrIyxPa5IQTpKuXkoiDamm+WXePmlzT8NM0zeawetJsFROAKxjp0mDBrEMUXNlGxX
-         gJ+TzCbNcDdPkaS8Gs5nV5KNALHTe1BH3O3zsVtigD8yySVHg8zpph6j+od8j7BcWiqY
-         V2Fw==
+        d=ziepe.ca; s=google; t=1695052995; x=1695657795; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1AtaBW2SsBllDiJ99v10Ny7HNDE5iUEtI8mOBYM/rVQ=;
+        b=FMYrmViNHhpDIQG7aE4b8Zj46Zmtob+ZjiP+mU04vlK+EP7SXXjTr9AHJkK8bUjZvf
+         u4/iNTXM4hk53yV60OAiXwR72CXPQiENQRVO0R3xxn3juB2x5yWT9RCuqwn//yOBw3CO
+         77F4l3w+B/h1kMN4MNf6MQecvbHwAe718pITHo8yedRckSqH6p/12MrlUSqbZr2rdzOQ
+         Xo6pglhn6SPeTRd0rAJz5QvuVbSl42KUwwHx6tZbwLjlaWIjlAf4XOotHVDMuZHM2HxZ
+         aq0tjL6on5qOTw4Rt+ri1y0McFedxTy3E4aCUD5Uka2n5eKTdQZh6deuOIY93yr/jJUp
+         GJEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695052667; x=1695657467;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s17YssV/eLMk3v6BQw21PztJLVQ1uDSUDnGyHA0nJic=;
-        b=VlNhOe8FhwxfKH4fXET2otuDSKSavm8HrUQ0It8ltP3PunmevUXsA4E3ztJXBqBznp
-         +ohYsga+BI4GG490MKKxcyOGpMhJ2P7gH7L/pR1AfhyZfMg4PveVCGhYi/QcTWSYZjw1
-         3wMFiqpW4QLGWuPTgVASQNOtGBQ6InpUJDlaUWePGR685q7kIr2UyVV9HmNGcymM46xs
-         XEpLXPutoDexqJ+7S8T59dPA92Eq15ARfaXBhHEv6wVZ+/6cf7+pXh+BVybplVpuKJ7V
-         OcTdyAxpmd3wyx6Mnkyd0CEkFTszcEJ5t6XakT8hWKxhubyPr+HvyNDtQd22cLCx1JvY
-         SoWw==
-X-Gm-Message-State: AOJu0Yw5iFjVQspxkuth9O+4LDS5btBpnYWTLUoZ+lHHwAeNON8JwdIJ
-	xZTNaAxRc5QRfn5itpSw/bzkyr0Am8s=
-X-Google-Smtp-Source: AGHT+IFqXVMaW5EWUR3sn7RRHAULv1S9Ax+JzluU+Y462jgw29bgpZAEkbL739S68Hx7QOlYkiFqSLcGAUw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:4cf:b0:d7f:f3e:74ab with SMTP id
- v15-20020a05690204cf00b00d7f0f3e74abmr227961ybs.1.1695052667494; Mon, 18 Sep
- 2023 08:57:47 -0700 (PDT)
-Date: Mon, 18 Sep 2023 08:57:45 -0700
-In-Reply-To: <9925e01b-7fa9-95e4-dc21-1d760ef9cde4@linux.intel.com>
+        d=1e100.net; s=20230601; t=1695052995; x=1695657795;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1AtaBW2SsBllDiJ99v10Ny7HNDE5iUEtI8mOBYM/rVQ=;
+        b=OvTG8HHLHZgMr/cQJmLI27ndgn38HmKJ1Y+fKy/4F861Lt/vU09dYpFGvDqIZPRNN6
+         puxePYkRoEhDC4DCm+laKuHbQDkrdt5p13b4IhOVYlY49AH1yr+RJBBusvyzYwRai28Q
+         iSgsXEXsUqLbWQGIJ1sRIFLcLckFRfnX4iclDtkdxctKM6evKHV+r6TJ8VqU70HQnalG
+         Ao4I1QVBir1I9rqWjyawC6/BEdLGMFT6o4KemAlKa0kEFOVKI1+icCdIWS5F/+3dJ240
+         e5I38rZT5PSvy26ykxJK26spmwySeI7DJArbJSqjoPly65f90Hpvdyo16qYMcM1aPtqH
+         81SQ==
+X-Gm-Message-State: AOJu0YxhBs5VAKCn6OKcRP4YiyYFXuR5wAOOxBVxjRfwswSGEyl/VyYm
+	ZJaQkDCZ9ut5BIewmRtkwuEzeg==
+X-Google-Smtp-Source: AGHT+IH/YnREI891cZLYoBidRStzCIsQeTayS2VX/iNCJzxAWIRbDBhzALGmOqWbEj1DKL9seHAlIw==
+X-Received: by 2002:a0c:eacf:0:b0:655:78f5:bef7 with SMTP id y15-20020a0ceacf000000b0065578f5bef7mr9471806qvp.21.1695052995341;
+        Mon, 18 Sep 2023 09:03:15 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-26-201.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.26.201])
+        by smtp.gmail.com with ESMTPSA id u20-20020a0cdd14000000b006581e82a628sm989437qvk.134.2023.09.18.09.02.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Sep 2023 09:03:14 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1qiGiA-0005k6-DG;
+	Mon, 18 Sep 2023 13:02:58 -0300
+Date: Mon, 18 Sep 2023 13:02:58 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	Peter Zijlstra <peterz@infradead.org>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Tony Krowiak <akrowiak@linux.ibm.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Jason Herne <jjherne@linux.ibm.com>,
+	Harald Freudenberger <freude@linux.ibm.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+	Anish Ghulati <aghulati@google.com>,
+	Venkatesh Srinivas <venkateshs@chromium.org>,
+	Andrew Thornton <andrewth@google.com>
+Subject: Re: [PATCH 05/26] vfio: KVM: Pass get/put helpers from KVM to VFIO,
+ don't do circular lookup
+Message-ID: <20230918160258.GL13795@ziepe.ca>
+References: <20230916003118.2540661-1-seanjc@google.com>
+ <20230916003118.2540661-6-seanjc@google.com>
+ <20230918152110.GI13795@ziepe.ca>
+ <ZQhxpesyXeG+qbS6@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-11-seanjc@google.com>
- <9925e01b-7fa9-95e4-dc21-1d760ef9cde4@linux.intel.com>
-Message-ID: <ZQhzeQLbB5zz2yIc@google.com>
-Subject: Re: [RFC PATCH v12 10/33] KVM: Set the stage for handling only shared
- mappings in mmu_notifier events
-From: Sean Christopherson <seanjc@google.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org, 
-	linux-mm@kvack.org, linux-security-module@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Anish Moorthy <amoorthy@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, Xu Yilun <yilun.xu@intel.com>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZQhxpesyXeG+qbS6@google.com>
 
-On Mon, Sep 18, 2023, Binbin Wu wrote:
-> 
-> 
-> On 9/14/2023 9:55 AM, Sean Christopherson wrote:
-> > Add flags to "struct kvm_gfn_range" to let notifier events target only
-> > shared and only private mappings, and write up the existing mmu_notifier
-> > events to be shared-only (private memory is never associated with a
-> > userspace virtual address, i.e. can't be reached via mmu_notifiers).
+On Mon, Sep 18, 2023 at 08:49:57AM -0700, Sean Christopherson wrote:
+> On Mon, Sep 18, 2023, Jason Gunthorpe wrote:
+> > On Fri, Sep 15, 2023 at 05:30:57PM -0700, Sean Christopherson wrote:
+> > > Explicitly pass KVM's get/put helpers to VFIO when attaching a VM to
+> > > VFIO instead of having VFIO do a symbol lookup back into KVM.  Having both
+> > > KVM and VFIO do symbol lookups increases the overall complexity and places
+> > > an unnecessary dependency on KVM (from VFIO) without adding any value.
+> > > 
+> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > > ---
+> > >  drivers/vfio/vfio.h      |  2 ++
+> > >  drivers/vfio/vfio_main.c | 74 +++++++++++++++++++---------------------
+> > >  include/linux/vfio.h     |  4 ++-
+> > >  virt/kvm/vfio.c          |  9 +++--
+> > >  4 files changed, 47 insertions(+), 42 deletions(-)
 > > 
-> > Add two flags so that KVM can handle the three possibilities (shared,
-> > private, and shared+private) without needing something like a tri-state
-> > enum.
+> > I don't mind this, but Christoph had disliked my prior attempt to do
+> > this with function pointers..
+> > 
+> > The get can be inlined, IIRC, what about putting a pointer to the put
+> > inside the kvm struct?
 > 
-> How to understand the word "stage" in short log?
+> That wouldn't allow us to achieve our goal, which is to hide the details of
+> "struct kvm" from VFIO (and the rest of the kernel).
 
-Sorry, it's an idiom[*] that essentially means "to prepare for".  I'll rephrase
-the shortlog to be more straightforward (I have a bad habit of using idioms).
+> What's the objection to handing VFIO a function pointer?
 
-[*] https://dictionary.cambridge.org/us/dictionary/english/set-the-stage-for
+Hmm, looks like it was this thread:
+
+ https://lore.kernel.org/r/0-v1-33906a626da1+16b0-vfio_kvm_no_group_jgg@nvidia.com
+
+Your rational looks a little better to me.
+
+> > The the normal kvm get/put don't have to exported symbols at all?
+> 
+> The export of kvm_get_kvm_safe() can go away (I forgot to do that in this series),
+> but kvm_get_kvm() will hang around as it's needed by KVM sub-modules (PPC and x86),
+> KVMGT (x86), and drivers/s390/crypto/vfio_ap_ops.c (no idea what to call that beast).
+
+My thought would be to keep it as an inline, there should be some way
+to do that without breaking your desire to hide the bulk of the kvm
+struct content. Like put the refcount as the first element in the
+struct and just don't ifdef it away?.
+
+Jason
