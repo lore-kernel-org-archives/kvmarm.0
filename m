@@ -1,205 +1,121 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D4FA7464
-	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 06:58:18 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 27CE3143D;
-	Sun, 17 Sep 2023 23:58:55 -0700 (PDT)
-Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com [10.1.196.26])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 242993F5A1;
-	Sun, 17 Sep 2023 23:58:16 -0700 (PDT)
-From: Ryan Roberts <ryan.roberts@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: Ryan Roberts <ryan.roberts@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: [PATCH v3 13/13] KVM: selftests: arm64: Support P52V48 4K and 16K guest_modes
-Date: Mon, 18 Sep 2023 07:57:40 +0100
-Message-Id: <20230918065740.3670662-14-ryan.roberts@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230918065740.3670662-1-ryan.roberts@arm.com>
-References: <20230918065740.3670662-1-ryan.roberts@arm.com>
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD4A11C20
+	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 07:51:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695023515; x=1726559515;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=F92rNU2upp1sAb9O/m30BxSQQfs05gdxlTOIwaluPho=;
+  b=gb7QfdLj4L4ihjLLOdTuzP5NQV5P4uW9ry5TMuFR+qGTTL8tk9tg2hAS
+   +FA9C1A+STzOT2Zfdx9AodyatFQNUuqo/cL4NoP87EGW4VHh+D6SqINnM
+   bO8ldFVJOf+GwVG4b5rncPstb0wKDqmk0df9xBFm8LHQQv5XALa1B1Vs8
+   qYfKxpIWGVWh8cU9BHZa6VyvAeEA8NSlcPsPOi4mX/HxcjLTl9RgZeWGO
+   +0fvkETy1/Jq0AubCahWBZJ1ZrGNFmeQMJY1KS0KiDUv2Phz+mna0bxLU
+   ZFAA1BHEz22zpDPmaWKWsKV7gLZrJ0gcr7bW1dM6Ox1gKw45olY9+KT4l
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10836"; a="382335530"
+X-IronPort-AV: E=Sophos;i="6.02,156,1688454000"; 
+   d="scan'208";a="382335530"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 00:51:54 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10836"; a="811262156"
+X-IronPort-AV: E=Sophos;i="6.02,156,1688454000"; 
+   d="scan'208";a="811262156"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.8.84]) ([10.238.8.84])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 00:51:45 -0700
+Message-ID: <d66795f8-e524-2912-4b71-92ca4ffe8807@linux.intel.com>
+Date: Mon, 18 Sep 2023 15:51:43 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [RFC PATCH v12 11/33] KVM: Introduce per-page memory attributes
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-security-module@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
+ Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Andrew Morton <akpm@linux-foundation.org>, Paul Moore <paul@paul-moore.com>,
+ James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>,
+ Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>,
+ Yu Zhang <yu.c.zhang@linux.intel.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>, Xu Yilun <yilun.xu@intel.com>,
+ Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>,
+ Ackerley Tng <ackerleytng@google.com>,
+ Maciej Szmigiero <mail@maciej.szmigiero.name>,
+ David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
+ Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
+ Liam Merwick <liam.merwick@oracle.com>,
+ Isaku Yamahata <isaku.yamahata@gmail.com>,
+ "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20230914015531.1419405-1-seanjc@google.com>
+ <20230914015531.1419405-12-seanjc@google.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20230914015531.1419405-12-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Add support for VM_MODE_P52V48_4K and VM_MODE_P52V48_16K guest modes by
-using the FEAT_LPA2 pte format for stage1, when FEAT_LPA2 is available.
 
-Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
----
- .../selftests/kvm/include/kvm_util_base.h     |  1 +
- .../selftests/kvm/lib/aarch64/processor.c     | 39 ++++++++++++++-----
- tools/testing/selftests/kvm/lib/guest_modes.c |  2 +
- tools/testing/selftests/kvm/lib/kvm_util.c    |  3 ++
- 4 files changed, 36 insertions(+), 9 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index a18db6a7b3cf..406500fb6e28 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -171,6 +171,7 @@ static inline struct userspace_mem_region *vm_get_mem_region(struct kvm_vm *vm,
- 
- enum vm_guest_mode {
- 	VM_MODE_P52V48_4K,
-+	VM_MODE_P52V48_16K,
- 	VM_MODE_P52V48_64K,
- 	VM_MODE_P48V48_4K,
- 	VM_MODE_P48V48_16K,
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index e50dad81e956..7137222d7bcb 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -12,6 +12,7 @@
- #include "kvm_util.h"
- #include "processor.h"
- #include <linux/bitfield.h>
-+#include <linux/sizes.h>
- 
- #define DEFAULT_ARM64_GUEST_STACK_VADDR_MIN	0xac0000
- 
-@@ -58,13 +59,25 @@ static uint64_t pte_index(struct kvm_vm *vm, vm_vaddr_t gva)
- 	return (gva >> vm->page_shift) & mask;
- }
- 
-+static inline bool use_lpa2_pte_format(struct kvm_vm *vm)
-+{
-+	return (vm->page_size == SZ_4K || vm->page_size == SZ_16K) &&
-+	    (vm->pa_bits > 48 || vm->va_bits > 48);
-+}
-+
- static uint64_t addr_pte(struct kvm_vm *vm, uint64_t pa, uint64_t attrs)
- {
- 	uint64_t pte;
- 
--	pte = pa & GENMASK(47, vm->page_shift);
--	if (vm->page_shift == 16)
--		pte |= FIELD_GET(GENMASK(51, 48), pa) << 12;
-+	if (use_lpa2_pte_format(vm)) {
-+		pte = pa & GENMASK(49, vm->page_shift);
-+		pte |= FIELD_GET(GENMASK(51, 50), pa) << 8;
-+		attrs &= ~GENMASK(9, 8);
-+	} else {
-+		pte = pa & GENMASK(47, vm->page_shift);
-+		if (vm->page_shift == 16)
-+			pte |= FIELD_GET(GENMASK(51, 48), pa) << 12;
-+	}
- 	pte |= attrs;
- 
- 	return pte;
-@@ -74,9 +87,14 @@ static uint64_t pte_addr(struct kvm_vm *vm, uint64_t pte)
- {
- 	uint64_t pa;
- 
--	pa = pte & GENMASK(47, vm->page_shift);
--	if (vm->page_shift == 16)
--		pa |= FIELD_GET(GENMASK(15, 12), pte) << 48;
-+	if (use_lpa2_pte_format(vm)) {
-+		pa = pte & GENMASK(49, vm->page_shift);
-+		pa |= FIELD_GET(GENMASK(9, 8), pte) << 50;
-+	} else {
-+		pa = pte & GENMASK(47, vm->page_shift);
-+		if (vm->page_shift == 16)
-+			pa |= FIELD_GET(GENMASK(15, 12), pte) << 48;
-+	}
- 
- 	return pa;
- }
-@@ -266,9 +284,6 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
- 
- 	/* Configure base granule size */
- 	switch (vm->mode) {
--	case VM_MODE_P52V48_4K:
--		TEST_FAIL("AArch64 does not support 4K sized pages "
--			  "with 52-bit physical address ranges");
- 	case VM_MODE_PXXV48_4K:
- 		TEST_FAIL("AArch64 does not support 4K sized pages "
- 			  "with ANY-bit physical address ranges");
-@@ -278,12 +293,14 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
- 	case VM_MODE_P36V48_64K:
- 		tcr_el1 |= 1ul << 14; /* TG0 = 64KB */
- 		break;
-+	case VM_MODE_P52V48_16K:
- 	case VM_MODE_P48V48_16K:
- 	case VM_MODE_P40V48_16K:
- 	case VM_MODE_P36V48_16K:
- 	case VM_MODE_P36V47_16K:
- 		tcr_el1 |= 2ul << 14; /* TG0 = 16KB */
- 		break;
-+	case VM_MODE_P52V48_4K:
- 	case VM_MODE_P48V48_4K:
- 	case VM_MODE_P40V48_4K:
- 	case VM_MODE_P36V48_4K:
-@@ -297,6 +314,8 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
- 
- 	/* Configure output size */
- 	switch (vm->mode) {
-+	case VM_MODE_P52V48_4K:
-+	case VM_MODE_P52V48_16K:
- 	case VM_MODE_P52V48_64K:
- 		tcr_el1 |= 6ul << 32; /* IPS = 52 bits */
- 		ttbr0_el1 |= FIELD_GET(GENMASK(51, 48), vm->pgd) << 2;
-@@ -325,6 +344,8 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
- 	/* TCR_EL1 |= IRGN0:WBWA | ORGN0:WBWA | SH0:Inner-Shareable */;
- 	tcr_el1 |= (1 << 8) | (1 << 10) | (3 << 12);
- 	tcr_el1 |= (64 - vm->va_bits) /* T0SZ */;
-+	if (use_lpa2_pte_format(vm))
-+		tcr_el1 |= (1ul << 59) /* DS */;
- 
- 	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SCTLR_EL1), sctlr_el1);
- 	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TCR_EL1), tcr_el1);
-diff --git a/tools/testing/selftests/kvm/lib/guest_modes.c b/tools/testing/selftests/kvm/lib/guest_modes.c
-index c64c5cf49942..6634afc22137 100644
---- a/tools/testing/selftests/kvm/lib/guest_modes.c
-+++ b/tools/testing/selftests/kvm/lib/guest_modes.c
-@@ -23,6 +23,8 @@ void guest_modes_append_default(void)
- 
- 		aarch64_get_supported_page_sizes(limit, &ipa4k, &ipa16k, &ipa64k);
- 
-+		guest_mode_append(VM_MODE_P52V48_4K, ipa4k >= 52, ipa4k >= 52);
-+		guest_mode_append(VM_MODE_P52V48_16K, ipa16k >= 52, ipa16k >= 52);
- 		guest_mode_append(VM_MODE_P52V48_64K, ipa64k >= 52, ipa64k >= 52);
- 
- 		guest_mode_append(VM_MODE_P48V48_4K, ipa4k >= 48, ipa4k >= 48);
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 7a8af1821f5d..aeba7a23105c 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -148,6 +148,7 @@ const char *vm_guest_mode_string(uint32_t i)
- {
- 	static const char * const strings[] = {
- 		[VM_MODE_P52V48_4K]	= "PA-bits:52,  VA-bits:48,  4K pages",
-+		[VM_MODE_P52V48_16K]	= "PA-bits:52,  VA-bits:48, 16K pages",
- 		[VM_MODE_P52V48_64K]	= "PA-bits:52,  VA-bits:48, 64K pages",
- 		[VM_MODE_P48V48_4K]	= "PA-bits:48,  VA-bits:48,  4K pages",
- 		[VM_MODE_P48V48_16K]	= "PA-bits:48,  VA-bits:48, 16K pages",
-@@ -173,6 +174,7 @@ const char *vm_guest_mode_string(uint32_t i)
- 
- const struct vm_guest_mode_params vm_guest_mode_params[] = {
- 	[VM_MODE_P52V48_4K]	= { 52, 48,  0x1000, 12 },
-+	[VM_MODE_P52V48_16K]	= { 52, 48,  0x4000, 14 },
- 	[VM_MODE_P52V48_64K]	= { 52, 48, 0x10000, 16 },
- 	[VM_MODE_P48V48_4K]	= { 48, 48,  0x1000, 12 },
- 	[VM_MODE_P48V48_16K]	= { 48, 48,  0x4000, 14 },
-@@ -251,6 +253,7 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mode)
- 	case VM_MODE_P36V48_64K:
- 		vm->pgtable_levels = 3;
- 		break;
-+	case VM_MODE_P52V48_16K:
- 	case VM_MODE_P48V48_16K:
- 	case VM_MODE_P40V48_16K:
- 	case VM_MODE_P36V48_16K:
--- 
-2.25.1
+On 9/14/2023 9:55 AM, Sean Christopherson wrote:
+> From: Chao Peng <chao.p.peng@linux.intel.com>
+[...]
+>   
+> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+> +/*
+> + * Returns true if _all_ gfns in the range [@start, @end) have attributes
+> + * matching @attrs.
+> + */
+> +bool kvm_range_has_memory_attributes(struct kvm *kvm, gfn_t start, gfn_t end,
+> +				     unsigned long attrs)
+> +{
+> +	XA_STATE(xas, &kvm->mem_attr_array, start);
+> +	unsigned long index;
+> +	bool has_attrs;
+> +	void *entry;
+> +
+> +	rcu_read_lock();
+> +
+> +	if (!attrs) {
+> +		has_attrs = !xas_find(&xas, end);
+IIUIC, xas_find() is inclusive for "end", so here should be "end - 1" ?
 
+
+> +		goto out;
+> +	}
+> +
+> +	has_attrs = true;
+> +	for (index = start; index < end; index++) {
+> +		do {
+> +			entry = xas_next(&xas);
+> +		} while (xas_retry(&xas, entry));
+> +
+> +		if (xas.xa_index != index || xa_to_value(entry) != attrs) {
+> +			has_attrs = false;
+> +			break;
+> +		}
+> +	}
+> +
+> +out:
+> +	rcu_read_unlock();
+> +	return has_attrs;
+> +}
+> +
+>
+[...]
