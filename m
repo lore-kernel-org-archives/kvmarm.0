@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D9A6FD0
-	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 09:40:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA1D5C433C8;
-	Mon, 18 Sep 2023 09:40:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A0ED14AB6
+	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 09:44:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F0EDC433C7;
+	Mon, 18 Sep 2023 09:44:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695030021;
-	bh=HVSpFQnmXQ6FFjFm3ben4gsTYRSP8yFtpc7kR540pqk=;
+	s=k20201202; t=1695030254;
+	bh=d5QNa0rFPQKJhTfE6aV8V13ZKrAJ2zdet4hfSfVVYpg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=m01BeqeWOZUF7RuUbLKaq2WW41I4cDu3hC2ZRxHGt7JnErfhOxBgQiuFloTVFr250
-	 ftjLpTaMf8jMLQ+b0L/XloOps2FYp4+soBM+2TjgAwbQzhHs9RLmh0kslkPoAkFL6p
-	 /mtGNe43CnsROOyJfVxp0lw50t/TXXZ2XvmWLaAoUXwgRtQOdW2YpQXovCg3sbDInv
-	 Mfm8XhNovFVuxB2VmaQiSmnvihnNfLXkx5d+GqDTXFyf82QLt5GGNyx/17ZhmetJLv
-	 HBIcdwgnf/ShQS38U5xhN0CO6tV4PRfZPi3P6qcYRdOaOtkG3+8Pe69k3zV7EINApL
-	 X26nE++7OIAlA==
+	b=k15vNTBJeQ2IwRF75jvpvYHPug/r/abpjSo7sVgKfzVncJt7UNob0Yz70j3Vqva6F
+	 iSY7X4waG67B2Pur4aFcXrlfwJCeapbh8K9o60uP7Z1gSszBvar3+u1Mj6sxN8JFMd
+	 ICTCnrD0gs6Bhq810dGQ4k7Lq5FrK7M3TA2LBvBfH2U+IFQjfBcifecmPZQvabc033
+	 uq6EtC4WhGmdvKcwGreiNljuJUr97bsqKDq10k52FBQG46IbZILoU8evAKK10tS4rW
+	 LvoTiQ7z8AbJKyyJ70PUw+3Y0OG3xNfThziyNA7PWFlQLHvxbVOCHZY4lUFY9GqeMU
+	 RLMfPqaMFmyrA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qiAjq-00DuMf-CM;
-	Mon, 18 Sep 2023 10:40:18 +0100
-Date: Mon, 18 Sep 2023 10:40:17 +0100
-Message-ID: <868r93es5a.wl-maz@kernel.org>
+	id 1qiAnb-00DuQH-Us;
+	Mon, 18 Sep 2023 10:44:12 +0100
+Date: Mon, 18 Sep 2023 10:44:11 +0100
+Message-ID: <867conerys.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Miguel Luis <miguel.luis@oracle.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
@@ -34,10 +34,10 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 2/3] arm64/kvm: Fine grain _EL2 system registers list that affect nested virtualization
-In-Reply-To: <20230913185209.32282-3-miguel.luis@oracle.com>
+Subject: Re: [PATCH 3/3] KVM: arm64: nv: Handle all _EL02 and _EL12 registers
+In-Reply-To: <20230913185209.32282-4-miguel.luis@oracle.com>
 References: <20230913185209.32282-1-miguel.luis@oracle.com>
-	<20230913185209.32282-3-miguel.luis@oracle.com>
+	<20230913185209.32282-4-miguel.luis@oracle.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -53,93 +53,66 @@ X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, catalin.marinas@arm.com, will@kernel.
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Miguel,
-
-On Wed, 13 Sep 2023 19:52:07 +0100,
+On Wed, 13 Sep 2023 19:52:08 +0100,
 Miguel Luis <miguel.luis@oracle.com> wrote:
 > 
-> Some _EL1 registers got included in the _EL2 ranges, which are not
-> affected by NV. Remove them and fine grain the ranges to exclusively
-> include the _EL2 ones.
+> Specify both _EL02 and _EL12 system registers.
 > 
 > Signed-off-by: Miguel Luis <miguel.luis@oracle.com>
 > ---
->  arch/arm64/kvm/emulate-nested.c | 44 ++++++++++++++++++++++++++++-----
->  1 file changed, 38 insertions(+), 6 deletions(-)
+>  arch/arm64/kvm/emulate-nested.c | 35 +++++++++++++++++++++++++++++----
+>  1 file changed, 31 insertions(+), 4 deletions(-)
 > 
 > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index 9ced1bf0c2b7..9aa1c06abdb7 100644
+> index 9aa1c06abdb7..957afd97e488 100644
 > --- a/arch/arm64/kvm/emulate-nested.c
 > +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -649,14 +649,46 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
->  	SR_TRAP(SYS_APGAKEYHI_EL1,	CGT_HCR_APK),
->  	/* All _EL2 registers */
->  	SR_RANGE_TRAP(sys_reg(3, 4, 0, 0, 0),
-> -		      sys_reg(3, 4, 3, 15, 7), CGT_HCR_NV),
-> +			sys_reg(3, 4, 4, 0, 1), CGT_HCR_NV),
-
-It would be good if the commit message explained that you are folding
-SPSR/ELR into the existing range. Also, please keep the two ends of
-the ranges vertically aligned.
-
->  	/* Skip the SP_EL1 encoding... */
-> -	SR_TRAP(SYS_SPSR_EL2,		CGT_HCR_NV),
-> -	SR_TRAP(SYS_ELR_EL2,		CGT_HCR_NV),
-> -	SR_RANGE_TRAP(sys_reg(3, 4, 4, 1, 1),
-> -		      sys_reg(3, 4, 10, 15, 7), CGT_HCR_NV),
-> +	SR_RANGE_TRAP(sys_reg(3, 4, 4, 3, 0),
-> +			sys_reg(3, 4, 10, 6, 7), CGT_HCR_NV),
-> +	/* skip MECID_A0_EL2, MECID_A1_EL2, MECID_P0_EL2,
-> +	 *      MECID_P1_EL2, MECIDR_EL2, VMECID_A_EL2,
-> +	 *      VMECID_P_EL2.
-> +	 */
-
-Please follow the kernel comment format. Also, why are you skipping
-the MEC registers, but not the MPAM ones? At least indicate a
-rationale for this.
-
->  	SR_RANGE_TRAP(sys_reg(3, 4, 12, 0, 0),
-> -		      sys_reg(3, 4, 14, 15, 7), CGT_HCR_NV),
-> +			sys_reg(3, 4, 12, 1, 1), CGT_HCR_NV),
-> +	/* ICH_AP0R<m>_EL2 */
-> +	SR_RANGE_TRAP(SYS_ICH_AP0R0_EL2,
-> +			SYS_ICH_AP0R3_EL2, CGT_HCR_NV),
-> +	/* ICH_AP1R<m>_EL2 */
-> +	SR_RANGE_TRAP(SYS_ICH_AP1R0_EL2,
-> +			SYS_ICH_AP1R3_EL2, CGT_HCR_NV),
-> +	SR_RANGE_TRAP(sys_reg(3, 4, 12, 9, 5),
-> +			sys_reg(3, 4, 12, 11, 7), CGT_HCR_NV),
-> +	/* ICH_LR<m>_EL2 */
-> +	SR_TRAP(SYS_ICH_LR0_EL2,	CGT_HCR_NV),
-> +	SR_TRAP(SYS_ICH_LR1_EL2,	CGT_HCR_NV),
-> +	SR_TRAP(SYS_ICH_LR2_EL2,	CGT_HCR_NV),
-> +	SR_TRAP(SYS_ICH_LR3_EL2,	CGT_HCR_NV),
-> +	SR_TRAP(SYS_ICH_LR4_EL2,	CGT_HCR_NV),
-> +	SR_TRAP(SYS_ICH_LR5_EL2,	CGT_HCR_NV),
-> +	SR_TRAP(SYS_ICH_LR6_EL2,	CGT_HCR_NV),
-> +	SR_TRAP(SYS_ICH_LR7_EL2,	CGT_HCR_NV),
-> +	SR_TRAP(SYS_ICH_LR8_EL2,	CGT_HCR_NV),
-> +	SR_TRAP(SYS_ICH_LR9_EL2,	CGT_HCR_NV),
-> +	SR_TRAP(SYS_ICH_LR10_EL2,	CGT_HCR_NV),
-> +	SR_TRAP(SYS_ICH_LR11_EL2,	CGT_HCR_NV),
-> +	SR_TRAP(SYS_ICH_LR12_EL2,	CGT_HCR_NV),
-> +	SR_TRAP(SYS_ICH_LR13_EL2,	CGT_HCR_NV),
-> +	SR_TRAP(SYS_ICH_LR14_EL2,	CGT_HCR_NV),
-> +	SR_TRAP(SYS_ICH_LR15_EL2,	CGT_HCR_NV),
-
-You could describe all the LRs a single range.
-
-> +	SR_RANGE_TRAP(sys_reg(3, 4, 13, 0, 1),
-> +			sys_reg(3, 4, 13, 0, 7), CGT_HCR_NV),
-> +	/* skip AMEVCNTVOFF0<n>_EL2 and AMEVCNTVOFF1<n>_EL2 */
-
-Why?
-
-> +	SR_RANGE_TRAP(sys_reg(3, 4, 14, 0, 3),
-> +			sys_reg(3, 4, 14, 5, 2), CGT_HCR_NV),
+> @@ -690,10 +690,37 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+>  	SR_RANGE_TRAP(sys_reg(3, 4, 14, 0, 3),
+>  			sys_reg(3, 4, 14, 5, 2), CGT_HCR_NV),
 >  	/* All _EL02, _EL12 registers */
->  	SR_RANGE_TRAP(sys_reg(3, 5, 0, 0, 0),
->  		      sys_reg(3, 5, 10, 15, 7), CGT_HCR_NV),
+> -	SR_RANGE_TRAP(sys_reg(3, 5, 0, 0, 0),
+> -		      sys_reg(3, 5, 10, 15, 7), CGT_HCR_NV),
+> -	SR_RANGE_TRAP(sys_reg(3, 5, 12, 0, 0),
+> -		      sys_reg(3, 5, 14, 15, 7), CGT_HCR_NV),
+> +	SR_TRAP(SYS_SCTLR_EL12,		CGT_HCR_NV),
+> +	SR_TRAP(SYS_CPACR_EL12,		CGT_HCR_NV),
+> +	SR_TRAP(SYS_SCTLR2_EL12,	CGT_HCR_NV),
+> +	SR_TRAP(SYS_ZCR_EL12,		CGT_HCR_NV),
+> +	SR_TRAP(SYS_TRFCR_EL12,		CGT_HCR_NV),
+> +	SR_TRAP(SYS_SMCR_EL12,		CGT_HCR_NV),
+> +	SR_TRAP(SYS_TTBR0_EL12,		CGT_HCR_NV),
+> +	SR_TRAP(SYS_TTBR1_EL12,		CGT_HCR_NV),
+> +	SR_TRAP(SYS_TCR_EL12,		CGT_HCR_NV),
+> +	SR_TRAP(SYS_TCR2_EL12,		CGT_HCR_NV),
+> +	SR_TRAP(SYS_SPSR_EL12,		CGT_HCR_NV),
+> +	SR_TRAP(SYS_ELR_EL12,		CGT_HCR_NV),
+> +	SR_TRAP(SYS_AFSR0_EL12,		CGT_HCR_NV),
+> +	SR_TRAP(SYS_AFSR1_EL12,		CGT_HCR_NV),
+> +	SR_TRAP(SYS_ESR_EL12,		CGT_HCR_NV),
+> +	SR_TRAP(SYS_TFSR_EL12,		CGT_HCR_NV),
+> +	SR_TRAP(SYS_FAR_EL12,		CGT_HCR_NV),
+> +	SR_TRAP(SYS_BRBCR_EL12,		CGT_HCR_NV),
+> +	SR_TRAP(SYS_PMSCR_EL12,		CGT_HCR_NV),
+> +	SR_TRAP(SYS_MAIR_EL12,		CGT_HCR_NV),
+> +	SR_TRAP(SYS_AMAIR_EL12,		CGT_HCR_NV),
+> +	SR_TRAP(SYS_VBAR_EL12,		CGT_HCR_NV),
+> +	SR_TRAP(SYS_CONTEXTIDR_EL12,	CGT_HCR_NV),
+> +	SR_TRAP(SYS_SCXTNUM_EL12,	CGT_HCR_NV),
+> +	SR_TRAP(SYS_CNTKCTL_EL12,	CGT_HCR_NV),
+> +	SR_TRAP(SYS_CNTP_TVAL_EL02,	CGT_HCR_NV),
+> +	SR_TRAP(SYS_CNTP_CTL_EL02,	CGT_HCR_NV),
+> +	SR_TRAP(SYS_CNTP_CVAL_EL02,	CGT_HCR_NV),
+> +	SR_TRAP(SYS_CNTV_TVAL_EL02,	CGT_HCR_NV),
+> +	SR_TRAP(SYS_CNTV_CTL_EL02,	CGT_HCR_NV),
+> +	SR_TRAP(SYS_CNTV_CVAL_EL02,	CGT_HCR_NV),
+>  	SR_TRAP(OP_AT_S1E2R,		CGT_HCR_NV),
+>  	SR_TRAP(OP_AT_S1E2W,		CGT_HCR_NV),
+>  	SR_TRAP(OP_AT_S12E1R,		CGT_HCR_NV),
+
+While I could see the problem with the EL2 registers, I'm not
+convinced by this patch. Is there an actual case for non _EL02, non
+_EL12 registers that are included in the two ranges above?
 
 Thanks,
 
