@@ -1,176 +1,83 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BB661C2AC
-	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 09:55:25 +0000 (UTC)
-Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.207])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Rq0VG5DX5z6HJlt;
-	Mon, 18 Sep 2023 17:53:26 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Mon, 18 Sep 2023 10:55:23 +0100
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.031;
- Mon, 18 Sep 2023 10:55:23 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "maz@kernel.org" <maz@kernel.org>,
-	"will@kernel.org" <will@kernel.org>, "catalin.marinas@arm.com"
-	<catalin.marinas@arm.com>, "james.morse@arm.com" <james.morse@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, yuzenghui
-	<yuzenghui@huawei.com>, zhukeqian <zhukeqian1@huawei.com>, Jonathan Cameron
-	<jonathan.cameron@huawei.com>, Linuxarm <linuxarm@huawei.com>
-Subject: RE: [RFC PATCH v2 0/8] KVM: arm64: Implement SW/HW combined dirty log
-Thread-Topic: [RFC PATCH v2 0/8] KVM: arm64: Implement SW/HW combined dirty
- log
-Thread-Index: AQHZ1zeYniphcsNMdESdQqigwTISA7AZEKiAgAEU5SCAAPR6AIAFYYpQ
-Date: Mon, 18 Sep 2023 09:55:22 +0000
-Message-ID: <853b333084c4462a870bb2a37ec65935@huawei.com>
-References: <20230825093528.1637-1-shameerali.kolothum.thodi@huawei.com>
- <ZQHxm+L890yTpY91@linux.dev> <14eb2648eb594dd9a46a179733cee0df@huawei.com>
- <ZQOm9gUo8un+claf@linux.dev>
-In-Reply-To: <ZQOm9gUo8un+claf@linux.dev>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [10.202.227.178]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C7E01C2AC
+	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 09:58:37 +0000 (UTC)
+Received: from [192.168.2.59] (109-252-153-31.dynamic.spd-mgts.ru [109.252.153.31])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(No client certificate requested)
+	(Authenticated sender: dmitry.osipenko)
+	by madras.collabora.co.uk (Postfix) with ESMTPSA id 1279F6607181;
+	Mon, 18 Sep 2023 10:58:34 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1695031115;
+	bh=1RNaixjMXA54V+2/e4luR24uvJkM1LcXIR0eY3+Epv8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=PXGmfVf/NVnH7ZhV99d4xVXJ2zHhS05iCl/sOAl7OfLwMIGhXCok/5smR1lTKJRxR
+	 FUTIaUvF+Yg06PS4GxXOd4B/z+RgDUnn1wumQfgKJUCQEx6DruNnLFAvTMT8zTCnPQ
+	 tiZwaNKOWGzJVmXf/dxsAqE9LYplPWpcouLnIDASr+G+EDVkyEOi2+Igj13qS+gzQu
+	 Wr32PJ41n/sboSnmUhnBCkVDp9Gczd/Ds2HBnLyC7Kr8c2plHT5ibgbnAHsLVSdoOU
+	 ZaMNowQbx1sw8sDZDoCbclA+wFMVjpLKGbEtuz9ztpkhz8zT5x5KfaIxmcR++3QDE0
+	 vbVJnZUJ6NAaQ==
+Message-ID: <14db8c0b-77de-34ec-c847-d7360025a571@collabora.com>
+Date: Mon, 18 Sep 2023 12:58:32 +0300
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v9 6/6] KVM: x86/mmu: Handle non-refcounted pages
+Content-Language: en-US
+To: David Stevens <stevensd@chromium.org>,
+ Sean Christopherson <seanjc@google.com>
+Cc: Yu Zhang <yu.c.zhang@linux.intel.com>,
+ Isaku Yamahata <isaku.yamahata@gmail.com>,
+ Zhi Wang <zhi.wang.linux@gmail.com>, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20230911021637.1941096-1-stevensd@google.com>
+ <20230911021637.1941096-7-stevensd@google.com>
+From: Dmitry Osipenko <dmitry.osipenko@collabora.com>
+In-Reply-To: <20230911021637.1941096-7-stevensd@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 9/11/23 05:16, David Stevens wrote:
+> From: David Stevens <stevensd@chromium.org>
+> 
+> Handle non-refcounted pages in __kvm_faultin_pfn. This allows the host
+> to map memory into the guest that is backed by non-refcounted struct
+> pages - for example, the tail pages of higher order non-compound pages
+> allocated by the amdgpu driver via ttm_pool_alloc_page.
+> 
+> The bulk of this change is tracking the is_refcounted_page flag so that
+> non-refcounted pages don't trigger page_count() == 0 warnings. This is
+> done by storing the flag in an unused bit in the sptes. There are no
+> bits available in PAE SPTEs, so non-refcounted pages can only be handled
+> on TDP and x86-64.
+> 
+> Signed-off-by: David Stevens <stevensd@chromium.org>
+> ---
+>  arch/x86/kvm/mmu/mmu.c          | 52 +++++++++++++++++++++++----------
+>  arch/x86/kvm/mmu/mmu_internal.h |  1 +
+>  arch/x86/kvm/mmu/paging_tmpl.h  |  8 +++--
+>  arch/x86/kvm/mmu/spte.c         |  4 ++-
+>  arch/x86/kvm/mmu/spte.h         | 12 +++++++-
+>  arch/x86/kvm/mmu/tdp_mmu.c      | 22 ++++++++------
+>  include/linux/kvm_host.h        |  3 ++
+>  virt/kvm/kvm_main.c             |  6 ++--
+>  8 files changed, 76 insertions(+), 32 deletions(-)
 
+Could you please tell which kernel tree you used for the base of this
+series? This patch #6 doesn't apply cleanly to stable/mainline/next/kvm
 
-> -----Original Message-----
-> From: Oliver Upton [mailto:oliver.upton@linux.dev]
-> Sent: 15 September 2023 01:36
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: kvmarm@lists.linux.dev; kvm@vger.kernel.org;
-> linux-arm-kernel@lists.infradead.org; maz@kernel.org; will@kernel.org;
-> catalin.marinas@arm.com; james.morse@arm.com;
-> suzuki.poulose@arm.com; yuzenghui <yuzenghui@huawei.com>; zhukeqian
-> <zhukeqian1@huawei.com>; Jonathan Cameron
-> <jonathan.cameron@huawei.com>; Linuxarm <linuxarm@huawei.com>
-> Subject: Re: [RFC PATCH v2 0/8] KVM: arm64: Implement SW/HW combined
-> dirty log
->=20
-> On Thu, Sep 14, 2023 at 09:47:48AM +0000, Shameerali Kolothum Thodi
-> wrote:
->=20
-> [...]
->=20
-> > > What you're proposing here is complicated and I fear not easily
-> > > maintainable. Keeping the *two* sources of dirty state seems likely t=
-o
-> > > fail (eventually) with some very unfortunate consequences.
-> >
-> > It does adds complexity to the dirty state management code. I have trie=
-d
-> > to separate the code path using appropriate FLAGS etc to make it more
-> > manageable. But this is probably one area we can work on if the overall
-> > approach does have some benefits.
->=20
-> I'd be a bit more amenable to a solution that would select either
-> write-protection or dirty state management, but not both.
->=20
-> > > The vCPU:memory ratio you're testing doesn't seem representative of
-> what
-> > > a typical cloud provider would be configuring, and the dirty log
-> > > collection is going to scale linearly with the size of guest memory.
-> >
-> > I was limited by the test setup I had. I will give it a go with a highe=
-r mem
-> > system.
->=20
-> Thanks. Dirty log collection needn't be single threaded, but the
-> fundamental concern of dirty log collection time scaling linearly w.r.t.
-> the size to memory remains. Write-protection helps spread the cost of
-> collecting dirty state out across all the vCPU threads.
->=20
-> There could be some value in giving userspace the ability to parallelize
-> calls to dirty log ioctls to work on non-intersecting intervals.
->=20
-> > > Slow dirty log collection is going to matter a lot for VM blackout,
-> > > which from experience tends to be the most sensitive period of live
-> > > migration for guest workloads.
-> > >
-> > > At least in our testing, the split GET/CLEAR dirty log ioctls
-> > > dramatically improved the performance of a write-protection based dit=
-ry
-> > > tracking scheme, as the false positive rate for dirtied pages is
-> > > significantly reduced. FWIW, this is what we use for doing LM on arm6=
-4
-> as
-> > > opposed to the D-bit implemenation that we use on x86.
-> >
-> > Guess, by D-bit on x86 you mean the PML feature. Unfortunately that is
-> > something we lack on ARM yet.
->=20
-> Sorry, this was rather nonspecific. I was describing the pre-copy
-> strategies we're using at Google (out of tree). We're carrying patches
-> to use EPT D-bit for exitless dirty tracking.
+error: sha1 information is lacking or useless (arch/x86/kvm/mmu/mmu.c).
+error: could not build fake ancestor
 
-Just curious, how does it handle the overheads associated with scanning for
-dirty pages and the convergence w.r.t high rate of dirtying in exitless mod=
-e?=20
-=20
-> > > Faster pre-copy performance would help the benchmark complete faster,
-> > > but the goal for a live migration should be to minimize the lost
-> > > computation for the entire operation. You'd need to test with a
-> > > continuous workload rather than one with a finite amount of work.
-> >
-> > Ok. Though the above is not representative of a real workload, I though=
-t
-> > it gives some idea on how "Guest up time improvement" is benefitting th=
-e
-> > overall availability of the workload during migration. I will check wit=
-hin our
-> > wider team to see if I can setup a more suitable test/workload to show
-> some
-> > improvement with this approach.
-> >
-> > Please let me know if there is a specific workload you have in mind.
->=20
-> No objection to the workload you've chosen, I'm more concerned about the
-> benchmark finishing before live migration completes.
->=20
-> What I'm looking for is something like this:
->=20
->  - Calculate the ops/sec your benchmark completes in steady state
->=20
->  - Do a live migration and sample the rate throughout the benchmark,
->    accounting for VM blackout time
->=20
->  - Calculate the area under the curve of:
->=20
->      y =3D steady_state_rate - live_migration_rate(t)
->=20
->  - Compare the area under the curve for write-protection and your DBM
->    approach.
+-- 
+Best regards,
+Dmitry
 
-Ok. Got it.
-
-> > Thanks for getting back on this. Appreciate if you can do a quick glanc=
-e
-> > through the rest of the patches as well for any gross errors especially=
- with
-> > respect to page table walk locking, usage of DBM FLAGS etc.
->=20
-> I'll give it a read when I have some spare cycles. To be entirely clear,
-> I don't have any fundamental objections to using DBM for dirty tracking.
-> I just want to make sure that all alternatives have been considered
-> in the current scheme before we seriously consider a new approach with
-> its own set of tradeoffs.
-
-Thanks for taking a look.
-
-Shameer
