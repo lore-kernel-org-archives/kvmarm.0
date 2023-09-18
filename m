@@ -1,54 +1,54 @@
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89E0E1F5E9
-	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 17:22:45 +0000 (UTC)
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-41761e9181eso17711cf.1
-        for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 10:22:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D360123774
+	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 17:25:06 +0000 (UTC)
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-41761e9181eso18791cf.1
+        for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 10:25:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695057764; x=1695662564; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1695057905; x=1695662705; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xvvJYFIiUxdYFTdPHEaO0CeIjpRLTphScVUwzbxkZK0=;
-        b=qOnonfAjY7gOwdiKTpbPm0QxTH6hFWKxnYnT6ML+vloXawmoUsQdn7kK9pC2r/h1Df
-         IiCt1iuA66pzENGvoy4Yx1SzqIKw+u+K6pPfDKGNtb2pbcg2yxc9zI3J6zP42JXg/zty
-         Ac9/FffKNRMh6/Q3b2MRJNKVEgPV20IYydQ8kopenCaWEGVip++nWa1LZrtdj5ycZ53o
-         74LMZTh+ioGncUFFwvOLOmtb3fmEh4lKlcjsZ0tz8OxGGmbhiAaOJnZmvyzy8lSaHm8A
-         mSZMsxw/MboasqVxd57asZn1gYeKN9NJjrUHrqaffcj3vxHvJLLeCYA1forsfg6EZZ6V
-         0ovA==
+        bh=JpfHnxzUVMMWabALTl0v26Xf5DOzz1X5VHLZhINkdjo=;
+        b=snTCews8jHDvaR3lhLmRqfijJcXqQj0ageKm4cHyNu1lcoZmmXQ10SrK63ILYZP5zf
+         9gHNM+KiChctSaIGYAdYoPZfYIAK8eSVdzv6L1+5wLmSa8I9edu/RAWysMuyMUFR2Ypy
+         WZxqrTxiNu1mRrmvO+cSDMy/lXOzGwSQeQkXHxSp6oqPUoYyk4uFwBHzmjr/Exd/LntK
+         k1IwQ7N2bVhsmMIDY3prACiIXW5u5rsUfMxF8fxhCfNXjtsP75l+35qrA3xLa6NohLC/
+         +MFfyKwmR2bVJGMl+ErSBagdQFZOgkDuln8H8wh9RZ/lBTKzLSZZmC/ReqFXOYOr57QS
+         9McA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695057764; x=1695662564;
+        d=1e100.net; s=20230601; t=1695057905; x=1695662705;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xvvJYFIiUxdYFTdPHEaO0CeIjpRLTphScVUwzbxkZK0=;
-        b=P4Yv56l9H6HzH0bDGtm591hREmkDRZ6Z1B2wir/tzmL84C9+T5Fco0gJE6swDugLrd
-         S9sACz63JQuOEvao1rvS+yuIci/EaRvm+b05m6ewxIJLImDg980+yw4Ojo4Cpwm6vDbW
-         Gqv0raeAsYQhSsCFz+8OPVZKGE2n7/8UzfDKcuJ/+uejnNCYAnq7TYmuST4bbU0R1Q+B
-         QUO68IhIqrseToZsw/0vOZm35tiQwAQ+WJSsXoObwTYHIO1t1fUhwHJMBmwWKYrwnysq
-         BAgo0XzxyU5FRBxlR7tTy6JG6RXNDuXaN3/0HELtdElPlVkkEPsnz3lE5CRtYzFt4TNd
-         kIFg==
-X-Gm-Message-State: AOJu0YyiSgzDhlfVQWegezotoNnYKvldaQb8sD2uyAl1AB43miuWprJ+
-	xIRXpmr4mAhZG51z1GrHMA5s9lAdN86hLz0xt7IplA==
-X-Google-Smtp-Source: AGHT+IHAUHQ/AMU/gJEDTtvG0y4/dOXnZypfx1XktwC4AQ0OOJH50KDr2c6hw6wINJLIcAGQ28aoPbcDfjjgNSFkLq4=
-X-Received: by 2002:a05:622a:1049:b0:410:9855:ac6 with SMTP id
- f9-20020a05622a104900b0041098550ac6mr5770qte.14.1695057764287; Mon, 18 Sep
- 2023 10:22:44 -0700 (PDT)
+        bh=JpfHnxzUVMMWabALTl0v26Xf5DOzz1X5VHLZhINkdjo=;
+        b=nlKnCXBOYQtwDtGpm6+ghgSyI4mD296VJUFU9VB5icetFVgcwTom3KqkkXaGF4CMtE
+         8tZdbLnQJqvHwRF1VzMCMiAV7G0s1xN4mK65CCFa6Do7apTUThcG2pWIIOntsQz0Jrjz
+         RMRm6VWxMJPdUR0KmArxPA2Z0QDW8tLYhMEf7VvTkYDeoU4K3LpSgR74A+Y4D/bAZuRI
+         kVxbW7uaJQXiZfa0KuTcuPKTPqU2nUasfzxP//tXpf6Jmv8F4GlpcW454RmAHxoZuM9V
+         BDJplnwV3AE48XzMSD2q0DsK7jJMhXrm4HIMVx0Sz5D6UeJAv6RFzY72XMLxBlJu/VLX
+         OoFQ==
+X-Gm-Message-State: AOJu0YwkskI7GpP4H55VntdVOOuc4P3/49S7lBU5aEA2E29IvWx4ye5a
+	+goG+93HgnPaXr1Cbaod4sSfqeR/EJaKQdF/e0d+Ww==
+X-Google-Smtp-Source: AGHT+IGXcCZbbS4ArJa/YBg3SDkl1c2jMvOnRFmN6r7bxpBzmZyDDMDABzE75sg1fulhUmN1NSPOxFtp0zWGBCHDd4c=
+X-Received: by 2002:a05:622a:1b9f:b0:3de:1aaa:42f5 with SMTP id
+ bp31-20020a05622a1b9f00b003de1aaa42f5mr440373qtb.15.1695057905499; Mon, 18
+ Sep 2023 10:25:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230817003029.3073210-1-rananta@google.com> <20230817003029.3073210-9-rananta@google.com>
- <ZQTEN664F/5PzyId@linux.dev> <ZQTSffkkI1x5lWIG@linux.dev> <CAJHc60y+xwV3oYk7-YxE1WiOfnSNFzroM419UDJwTeb=MCJdkA@mail.gmail.com>
-In-Reply-To: <CAJHc60y+xwV3oYk7-YxE1WiOfnSNFzroM419UDJwTeb=MCJdkA@mail.gmail.com>
+References: <20230817003029.3073210-1-rananta@google.com> <20230817003029.3073210-2-rananta@google.com>
+ <ZQSvB4ZZ25eIHt/G@linux.dev>
+In-Reply-To: <ZQSvB4ZZ25eIHt/G@linux.dev>
 From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Mon, 18 Sep 2023 10:22:32 -0700
-Message-ID: <CAJHc60xT61+o2SY45X9m=ffypo9L3k_wMAU9FTCDay9w1RwM5g@mail.gmail.com>
-Subject: Re: [PATCH v5 08/12] KVM: arm64: PMU: Allow userspace to limit
- PMCR_EL0.N for the guest
+Date: Mon, 18 Sep 2023 10:24:53 -0700
+Message-ID: <CAJHc60zdow4OPTh27V=LR3TNHjUqtuxq5KOqKrAj0Fyw9VORBA@mail.gmail.com>
+Subject: Re: [PATCH v5 01/12] KVM: arm64: PMU: Introduce a helper to set the
+ guest's PMU
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: Marc Zyngier <maz@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>, 
 	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
@@ -60,107 +60,99 @@ Cc: Marc Zyngier <maz@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Oliver,
-
-On Mon, Sep 18, 2023 at 10:11=E2=80=AFAM Raghavendra Rao Ananta
-<rananta@google.com> wrote:
+On Fri, Sep 15, 2023 at 12:22=E2=80=AFPM Oliver Upton <oliver.upton@linux.d=
+ev> wrote:
 >
-> On Fri, Sep 15, 2023 at 2:54=E2=80=AFPM Oliver Upton <oliver.upton@linux.=
-dev> wrote:
-> >
-> > On Fri, Sep 15, 2023 at 08:53:16PM +0000, Oliver Upton wrote:
-> > > Hi Raghu,
-> > >
-> > > On Thu, Aug 17, 2023 at 12:30:25AM +0000, Raghavendra Rao Ananta wrot=
-e:
-> > > > From: Reiji Watanabe <reijiw@google.com>
-> > > >
-> > > > KVM does not yet support userspace modifying PMCR_EL0.N (With
-> > > > the previous patch, KVM ignores what is written by upserspace).
-> > >
-> > > typo: userspace
-> > >
-> > > > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> > > > index ce7de6bbdc967..39ad56a71ad20 100644
-> > > > --- a/arch/arm64/kvm/pmu-emul.c
-> > > > +++ b/arch/arm64/kvm/pmu-emul.c
-> > > > @@ -896,6 +896,7 @@ int kvm_arm_set_vm_pmu(struct kvm *kvm, struct =
-arm_pmu *arm_pmu)
-> > > >      * while the latter does not.
-> > > >      */
-> > > >     kvm->arch.pmcr_n =3D arm_pmu->num_events - 1;
-> > > > +   kvm->arch.pmcr_n_limit =3D arm_pmu->num_events - 1;
-> > >
-> > > Can't we just get at this through the arm_pmu instance rather than
-> > > copying it into kvm_arch?
-> > >
-> > > >     return 0;
-> > > >  }
-> > > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > > > index 2075901356c5b..c01d62afa7db4 100644
-> > > > --- a/arch/arm64/kvm/sys_regs.c
-> > > > +++ b/arch/arm64/kvm/sys_regs.c
-> > > > @@ -1086,6 +1086,51 @@ static int get_pmcr(struct kvm_vcpu *vcpu, c=
-onst struct sys_reg_desc *r,
-> > > >     return 0;
-> > > >  }
-> > > >
-> > > > +static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_de=
-sc *r,
-> > > > +               u64 val)
-> > > > +{
-> > > > +   struct kvm *kvm =3D vcpu->kvm;
-> > > > +   u64 new_n, mutable_mask;
-> > > > +   int ret =3D 0;
-> > > > +
-> > > > +   new_n =3D FIELD_GET(ARMV8_PMU_PMCR_N, val);
-> > > > +
-> > > > +   mutex_lock(&kvm->arch.config_lock);
-> > > > +   if (unlikely(new_n !=3D kvm->arch.pmcr_n)) {
-> > > > +           /*
-> > > > +            * The vCPU can't have more counters than the PMU
-> > > > +            * hardware implements.
-> > > > +            */
-> > > > +           if (new_n <=3D kvm->arch.pmcr_n_limit)
-> > > > +                   kvm->arch.pmcr_n =3D new_n;
-> > > > +           else
-> > > > +                   ret =3D -EINVAL;
-> > > > +   }
-> > >
-> > > Hmm, I'm not so sure about returning an error here. ABI has it that
-> > > userspace can write any value to PMCR_EL0 successfully. Can we just
-> > > ignore writes that attempt to set PMCR_EL0.N to something higher than
-> > > supported by hardware? Our general stance should be that system regis=
-ter
-> > > fields responsible for feature identification are immutable after the=
- VM
-> > > has started.
-> >
-> > I hacked up my reply and dropped some context; this doesn't read right.
-> > Shaoqin made the point about preventing changes to PMCR_EL0.N after the
-> > VM has started and I firmly agree. The behavior should be:
-> >
-> >  - Writes to PMCR always succeed
-> >
-> >  - PMCR_EL0.N values greater than what's supported by hardware are
-> >    ignored
-> >
-> >  - Changes to N after the VM has started are ignored.
-> >
-> Reiji and I were wondering if we should proceed with this as this
-> would change userspace expectation. BTW, when you said "ignored", does
-> that mean we silently return to userspace with a success or with EBUSY
-> (changing the expectations)?
+> Hi Raghu,
 >
-Sorry, I just read your earlier comment (one before you detailed the
-behavior), from which I'm guessing "ignore" means simply disregard the
-change and return success to userspace. But wouldn't that cause issues
-in debugging?
+> On Thu, Aug 17, 2023 at 12:30:18AM +0000, Raghavendra Rao Ananta wrote:
+> > From: Reiji Watanabe <reijiw@google.com>
+> >
+> > Introduce a new helper function to set the guest's PMU
+> > (kvm->arch.arm_pmu), and use it when the guest's PMU needs
+> > to be set. This helper will make it easier for the following
+> > patches to modify the relevant code.
+> >
+> > No functional change intended.
+> >
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > ---
+> >  arch/arm64/kvm/pmu-emul.c | 52 +++++++++++++++++++++++++++------------
+> >  1 file changed, 36 insertions(+), 16 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> > index 5606509724787..0ffd1efa90c07 100644
+> > --- a/arch/arm64/kvm/pmu-emul.c
+> > +++ b/arch/arm64/kvm/pmu-emul.c
+> > @@ -865,6 +865,32 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int =
+irq)
+> >       return true;
+> >  }
+> >
+> > +static int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu=
+)
+> > +{
+> > +     lockdep_assert_held(&kvm->arch.config_lock);
+> > +
+> > +     if (!arm_pmu) {
+> > +             /*
+> > +              * No PMU set, get the default one.
+> > +              *
+> > +              * The observant among you will notice that the supported=
+_cpus
+> > +              * mask does not get updated for the default PMU even tho=
+ugh it
+> > +              * is quite possible the selected instance supports only =
+a
+> > +              * subset of cores in the system. This is intentional, an=
+d
+> > +              * upholds the preexisting behavior on heterogeneous syst=
+ems
+> > +              * where vCPUs can be scheduled on any core but the guest
+> > +              * counters could stop working.
+> > +              */
+> > +             arm_pmu =3D kvm_pmu_probe_armpmu();
+> > +             if (!arm_pmu)
+> > +                     return -ENODEV;
+> > +     }
+> > +
+> > +     kvm->arch.arm_pmu =3D arm_pmu;
+> > +
+> > +     return 0;
+> > +}
+> > +
+>
+> I'm not too big of a fan of adding the 'default' path to this helper.
+> I'd prefer it if kvm_arm_set_vm_pmu() does all the necessary
+> initialization for a valid pmu instance. You then avoid introducing
+> unexpected error handling where it didn't exist before.
+>
+>   static void kvm_arm_set_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
+>   {
+>         lockdep_assert_held(&kvm->arch.config_lock);
+>
+>         kvm->arch.arm_pmu =3D arm_pmu;
+>   }
+>
+>   /*
+>    * Blurb about default PMUs I'm too lazy to copy/paste
+>    */
+>   static int kvm_arm_set_default_pmu(struct kvm *kvm)
+>   {
+>         struct arm_pmu *arm_pmu =3D kvm_pmu_probe_armpmu();
+>
+>         if (!arm_pmu)
+>                 return -ENODEV;
+>
+>         kvm_arm_set_pmu(kvm, arm_pmu);
+>         return 0;
+>   }
+>
+Sounds good. We can adapt to your suggestion.
 
 Thank you.
 Raghavendra
-> Thank you.
-> Raghavendra
-> > --
-> > Thanks,
-> > Oliver
+> --
+> Thanks,
+> Oliver
