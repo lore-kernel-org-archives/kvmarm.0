@@ -1,176 +1,149 @@
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57B091FDD
-	for <kvmarm@lists.linux.dev>; Tue, 19 Sep 2023 02:59:19 +0000 (UTC)
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-502fd1e1dd8so4670252e87.1
-        for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 19:59:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1695092357; x=1695697157; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nNGWNN/ATRw4P/f9tgfQnGw5a01oPlZp0FFvjCAOyvA=;
-        b=Q6BnJvZaHycKQ9fsJxwOD9C8xAucgXL/vS7eDVS7nDMKTASw+G9iv24BBR/4iSGYp5
-         qYJwOQnPUUVW2aw6rE8aFl+Nuz1iFLYylN0U/5sllgEsFDGWB3Uyw6tOpmhDQC9eDt3K
-         EcbKCKQmjRurSxKJahEF77eOQFlq5lVgmjdtU=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 806DF8481
+	for <kvmarm@lists.linux.dev>; Tue, 19 Sep 2023 03:39:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1695094760;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CBvJUlyaw2bkgeQrcu2quBogD5BtM2KTe/dcbAYZ1+c=;
+	b=XRsOHo1xemZzdKUrTyBuUPUnVtHNLfi4LMok9ICS4ohNDi1j9iK8PErL35SMfmGdcQmhPM
+	hta60y5U2Lu+UhpZC8kvzN6lWhJqp55szRXb/OF0t/TR0HRnJdw6L7Hocb3E4Z5yCKzkbw
+	5QgbInSjNgxblMEkPnr9eVcnCxd14ZQ=
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
+ [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-592-mbg1igD6OSyHYQqavw6IfA-1; Mon, 18 Sep 2023 23:39:18 -0400
+X-MC-Unique: mbg1igD6OSyHYQqavw6IfA-1
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1c44a2cbea0so20428775ad.0
+        for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 20:39:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695092357; x=1695697157;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nNGWNN/ATRw4P/f9tgfQnGw5a01oPlZp0FFvjCAOyvA=;
-        b=JAT69qVDKrA6P/dF3GEtsr88gpcq7D8n4SrSePO9CcstqP16Mt3+xA4QLTjuZiWLM9
-         TK4zVTSOK7VNyucf+E9cC2AyPzPkNp15WmwROyTg0VDyB+CcFvdvVIVicVHYnFSg91Hz
-         okBsG8O1UIHw88HLNKckAgvouoVFmLWa63rpRamSProdg0w1/2cAxSDBoxf+GD6hiaGG
-         GKKnOVNeGVdQq2+WdI0/rY29Hp3DNIm9v9k38Y97Ed/iB/DHK8U/giWRdW/8aY19y3p7
-         cb73gvgvHVdOefTHBF2FN2mShOzHXrpAhodQj/Hk9z3t3ds687ju8HqCCm6PGrLVnJ7E
-         ercg==
-X-Gm-Message-State: AOJu0YwWPrPisAszN1LIjwuym2CI/LfM3nt23AW+98IEDQ+HKqDVNnQx
-	EvCzHnaL2YZHOV7op2IWVTtGzP+xL8SLebzi3AqVqA==
-X-Google-Smtp-Source: AGHT+IGd/5P0BVGrgR2KT5TUob9plCgOghbXldX0sYOpwKWnUfpBt1lb7zXMDhvOSZn62uTU04NBHWYzq1EOUJhuHx4=
-X-Received: by 2002:a05:6512:ea9:b0:503:c51:74df with SMTP id
- bi41-20020a0565120ea900b005030c5174dfmr6415241lfb.48.1695092357319; Mon, 18
- Sep 2023 19:59:17 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1695094758; x=1695699558;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CBvJUlyaw2bkgeQrcu2quBogD5BtM2KTe/dcbAYZ1+c=;
+        b=g8D19SCL7kMMbX7dSVkMLpcYB11K8ke5CHHX7sw26vH1xExPL0YewvYjIc2epcHOCb
+         DbR7vWD2yamnMkr7fJvoK2+icTcNUncGS3hl2ydBr+47y/qcJsJrPRkeI3F/HPrMm4Ez
+         ig/PYbMVA9295eEyzNVrMlTypFzeX1aK6mKRBNz62+iy03LIydWXLjR33674oWVthnfN
+         DDCudy7ecXAk1cY5G9SV8ECR34NMj4Ze0b0SwodvIlawqcg10yzogwe/8vTJcQBW0FbZ
+         jP3Z8LXFGs3rTEwhQ0BTrCyX2uPx9Avg5Lg6VooPRcL+mgxsAWZDvXwN1EPUYK9WXuLJ
+         fMDw==
+X-Gm-Message-State: AOJu0YySpuGjI1Lkgobe5117P4yim2dmPlPuogt4uGHbyId7xyH3F2P5
+	5F25KfLQVWvjHYnOWl/1Yr6JFYpXFB6o/5K0rN1mRsSDXO18ze+Y5cRtc95x6T4zLDKPXVsXnu+
+	CDNhwZiL+qotuu7v3
+X-Received: by 2002:a17:902:ecca:b0:1c3:432f:9f69 with SMTP id a10-20020a170902ecca00b001c3432f9f69mr2008952plh.23.1695094757878;
+        Mon, 18 Sep 2023 20:39:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEaoSZiSFZ7Dx5QmHpQ853bVS36OFRusCjmGB2jt3hklfrALFF9t8rRDnMvZC9r997ICNVz6g==
+X-Received: by 2002:a17:902:ecca:b0:1c3:432f:9f69 with SMTP id a10-20020a170902ecca00b001c3432f9f69mr2008930plh.23.1695094757591;
+        Mon, 18 Sep 2023 20:39:17 -0700 (PDT)
+Received: from ?IPV6:2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5? ([2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5])
+        by smtp.gmail.com with ESMTPSA id 20-20020a170902e9d400b001c567dcf22dsm2846570plk.281.2023.09.18.20.39.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Sep 2023 20:39:16 -0700 (PDT)
+Message-ID: <31fa3aa7-c12c-3eb7-e9d2-5967a735ac78@redhat.com>
+Date: Tue, 19 Sep 2023 13:39:09 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230911021637.1941096-1-stevensd@google.com> <20230911021637.1941096-7-stevensd@google.com>
- <14db8c0b-77de-34ec-c847-d7360025a571@collabora.com> <207c8e59-f92a-96c0-bc5e-39b73a840110@collabora.com>
-In-Reply-To: <207c8e59-f92a-96c0-bc5e-39b73a840110@collabora.com>
-From: David Stevens <stevensd@chromium.org>
-Date: Tue, 19 Sep 2023 11:59:05 +0900
-Message-ID: <CAD=HUj51M9Eh=5Q=XQjPJ7No4i-z0en-1L3s0G8_fBZp0+NUZw@mail.gmail.com>
-Subject: Re: [PATCH v9 6/6] KVM: x86/mmu: Handle non-refcounted pages
-To: Dmitry Osipenko <dmitry.osipenko@collabora.com>
-Cc: Sean Christopherson <seanjc@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@gmail.com>, Zhi Wang <zhi.wang.linux@gmail.com>, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [RFC PATCH v2 29/35] irqchip/gic-v3: Don't return errors from
+ gic_acpi_match_gicc()
+To: James Morse <james.morse@arm.com>, linux-pm@vger.kernel.org,
+ loongarch@lists.linux.dev, linux-acpi@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org,
+ kvmarm@lists.linux.dev
+Cc: x86@kernel.org, Salil Mehta <salil.mehta@huawei.com>,
+ Russell King <linux@armlinux.org.uk>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>, jianyong.wu@arm.com,
+ justin.he@arm.com
+References: <20230913163823.7880-1-james.morse@arm.com>
+ <20230913163823.7880-30-james.morse@arm.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20230913163823.7880-30-james.morse@arm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Sep 18, 2023 at 8:19=E2=80=AFPM Dmitry Osipenko
-<dmitry.osipenko@collabora.com> wrote:
->
-> On 9/18/23 12:58, Dmitry Osipenko wrote:
-> > On 9/11/23 05:16, David Stevens wrote:
-> >> From: David Stevens <stevensd@chromium.org>
-> >>
-> >> Handle non-refcounted pages in __kvm_faultin_pfn. This allows the host
-> >> to map memory into the guest that is backed by non-refcounted struct
-> >> pages - for example, the tail pages of higher order non-compound pages
-> >> allocated by the amdgpu driver via ttm_pool_alloc_page.
-> >>
-> >> The bulk of this change is tracking the is_refcounted_page flag so tha=
-t
-> >> non-refcounted pages don't trigger page_count() =3D=3D 0 warnings. Thi=
-s is
-> >> done by storing the flag in an unused bit in the sptes. There are no
-> >> bits available in PAE SPTEs, so non-refcounted pages can only be handl=
-ed
-> >> on TDP and x86-64.
-> >>
-> >> Signed-off-by: David Stevens <stevensd@chromium.org>
-> >> ---
-> >>  arch/x86/kvm/mmu/mmu.c          | 52 +++++++++++++++++++++++---------=
--
-> >>  arch/x86/kvm/mmu/mmu_internal.h |  1 +
-> >>  arch/x86/kvm/mmu/paging_tmpl.h  |  8 +++--
-> >>  arch/x86/kvm/mmu/spte.c         |  4 ++-
-> >>  arch/x86/kvm/mmu/spte.h         | 12 +++++++-
-> >>  arch/x86/kvm/mmu/tdp_mmu.c      | 22 ++++++++------
-> >>  include/linux/kvm_host.h        |  3 ++
-> >>  virt/kvm/kvm_main.c             |  6 ++--
-> >>  8 files changed, 76 insertions(+), 32 deletions(-)
-> >
-> > Could you please tell which kernel tree you used for the base of this
-> > series? This patch #6 doesn't apply cleanly to stable/mainline/next/kvm
-> >
-> > error: sha1 information is lacking or useless (arch/x86/kvm/mmu/mmu.c).
-> > error: could not build fake ancestor
->
-> I applied the patch manually to v6.5.2 and tested Venus using Intel TGL i=
-GPU, the intel driver is crashing:
->
->    BUG: kernel NULL pointer dereference, address: 0000000000000058
->    #PF: supervisor read access in kernel mode
->    #PF: error_code(0x0000) - not-present page
->    PGD 0 P4D 0
->    Oops: 0000 [#1] PREEMPT SMP
->    CPU: 1 PID: 5926 Comm: qemu-system-x86 Not tainted 6.5.2+ #114
->    Hardware name: LENOVO 20VE/LNVNB161216, BIOS F8CN43WW(V2.06) 08/12/202=
-1
->    RIP: 0010:gen8_ppgtt_insert+0x50b/0x8f0
->    Code: 00 00 f7 c2 00 00 20 00 74 15 f7 c3 ff ff 1f 00 75 0d 41 81 fc f=
-f ff 1f 00 0f 87 0e 02 00 00 48 8b 74 24 08 44 89 c0 45 85 ed <48> 8b 4e 58=
- 48 8b 04 c1 0f 85 0b 02 00 00 81 e2 00 00 01 00 0f 84
->    RSP: 0018:ffffafc085afb820 EFLAGS: 00010246
->    RAX: 0000000000000000 RBX: 00000000e9604000 RCX: 000000000000001b
->    RDX: 0000000000211000 RSI: 0000000000000000 RDI: ffff9513d44c1000
->    RBP: ffff951106f8dfc0 R08: 0000000000000000 R09: 0000000000000003
->    R10: 0000000000000fff R11: 00000000e9800000 R12: 00000000001fc000
->    R13: 0000000000000000 R14: 0000000000001000 R15: 0000ffff00000000
->    FS:  00007f2a5bcced80(0000) GS:ffff951a87a40000(0000) knlGS:0000000000=
-000000
->    CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->    CR2: 0000000000000058 CR3: 0000000116f16006 CR4: 0000000000772ee0
->    PKRU: 55555554
->    Call Trace:
->     <TASK>
->     ? __die+0x1f/0x60
->     ? page_fault_oops+0x14d/0x420
->     ? exc_page_fault+0x3d7/0x880
->     ? lock_acquire+0xc9/0x290
->     ? asm_exc_page_fault+0x22/0x30
->     ? gen8_ppgtt_insert+0x50b/0x8f0
->     ppgtt_bind_vma+0x4f/0x60
->     fence_work+0x1b/0x70
->     fence_notify+0x8f/0x130
->     __i915_sw_fence_complete+0x58/0x230
->     i915_vma_pin_ww+0x513/0xa80
->     eb_validate_vmas+0x17e/0x9e0
->     ? eb_pin_engine+0x2bb/0x340
->     i915_gem_do_execbuffer+0xc85/0x2bf0
->     ? __lock_acquire+0x3b6/0x21c0
->     i915_gem_execbuffer2_ioctl+0xee/0x240
->     ? i915_gem_do_execbuffer+0x2bf0/0x2bf0
->     drm_ioctl_kernel+0x9d/0x140
->     drm_ioctl+0x1dd/0x410
->     ? i915_gem_do_execbuffer+0x2bf0/0x2bf0
->     ? __fget_files+0xc5/0x170
->     __x64_sys_ioctl+0x8c/0xc0
->     do_syscall_64+0x34/0x80
->     entry_SYSCALL_64_after_hwframe+0x46/0xb0
->    RIP: 0033:0x7f2a60b0c9df
->
->
-> $ ./scripts/faddr2line ./vmlinux gen8_ppgtt_insert+0x50b/0x8f0
-> gen8_ppgtt_insert+0x50b/0x8f0:
-> i915_pt_entry at drivers/gpu/drm/i915/gt/intel_gtt.h:557
-> (inlined by) gen8_ppgtt_insert_huge at drivers/gpu/drm/i915/gt/gen8_ppgtt=
-.c:641
-> (inlined by) gen8_ppgtt_insert at drivers/gpu/drm/i915/gt/gen8_ppgtt.c:74=
-3
->
-> It's likely should be the i915 driver issue that is crashes with the NULL=
- deref, but the origin of the bug should be the kvm page fault handling.
->
-> David, could you please tell what tests you've run and post a link to you=
-rs kernel tree? Maybe I made obscure mistake while applied the patch manual=
-ly.
 
-For tests, I ran the kvm selftests and then various ChromeOS
-virtualization tests. Two things to note about the ChromeOS
-virtualization tests are that they use crosvm instead of qemu, and
-they use virtio-gpu+virgl for graphics in the guest. I tested on an
-AMD device (since the goal of this series is to fix a compatibility
-issue with the amdgpu driver), and on a TGL device.
+On 9/14/23 02:38, James Morse wrote:
+> gic_acpi_match_gicc() is only called via gic_acpi_count_gicr_regions().
+> It should only count the number of enabled redistributors, but it
+> also tries to sanity check the GICC entry, currently returning an
+> error if the Enabled bit is set, but the gicr_base_address is zero.
+> 
+> Adding support for the online-capable bit to the sanity check
+> complicates it, for no benefit. The existing check implicitly
+> depends on gic_acpi_count_gicr_regions() previous failing to find
+> any GICR regions (as it is valid to have gicr_base_address of zero if
+> the redistributors are described via a GICR entry).
+> 
+> Instead of complicating the check, remove it. Failures that happen
+> at this point cause the irqchip not to register, meaning no irqs
+> can be requested. The kernel grinds to a panic() pretty quickly.
+> 
+> Without the check, MADT tables that exhibit this problem are still
+> caught by gic_populate_rdist(), which helpfully also prints what
+> went wrong:
+> | CPU4: mpidr 100 has no re-distributor!
+> 
+> Signed-off-by: James Morse <james.morse@arm.com>
+> ---
+>   drivers/irqchip/irq-gic-v3.c | 18 ++++++------------
+>   1 file changed, 6 insertions(+), 12 deletions(-)
+> 
 
-I don't have an easy way to share my kernel tree, but it's based on
-v6.5-r3. The series I sent out is rebased onto the kvm next branch,
-but there were only minor conflicts.
+With below nits resolved:
 
--David
+Reviewed-by: Gavin Shan <gshan@redhat.com>
+
+> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+> index 72d3cdebdad1..0f54811262eb 100644
+> --- a/drivers/irqchip/irq-gic-v3.c
+> +++ b/drivers/irqchip/irq-gic-v3.c
+> @@ -2415,21 +2415,15 @@ static int __init gic_acpi_match_gicc(union acpi_subtable_headers *header,
+>   
+>   	/*
+>   	 * If GICC is enabled and has valid gicr base address, then it means
+> -	 * GICR base is presented via GICC
+> +	 * GICR base is presented via GICC. The redistributor is only known to
+> +	 * be accessible if the GICC is marked as enabled. If this bit is not
+> +	 * set, we'd need to add the redistributor at runtime, which isn't
+> +	 * supported.
+>   	 */
+> -	if (acpi_gicc_is_usable(gicc) && gicc->gicr_base_address) {
+> +	if (gicc->flags & ACPI_MADT_ENABLED && gicc->gicr_base_address)
+>   		acpi_data.enabled_rdists++;
+> -		return 0;
+> -	}
+>   
+
+	if (acpi_gicc_is_usable(gicc) && gicc->gicr_base_address) {
+	
+
+> -	/*
+> -	 * It's perfectly valid firmware can pass disabled GICC entry, driver
+> -	 * should not treat as errors, skip the entry instead of probe fail.
+> -	 */
+> -	if (!acpi_gicc_is_usable(gicc))
+> -		return 0;
+> -
+> -	return -ENODEV;
+> +	return 0;
+>   }
+>   
+>   static int __init gic_acpi_count_gicr_regions(void)
+
+Thanks,
+Gavin
+
