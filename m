@@ -1,189 +1,454 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93144163
-	for <kvmarm@lists.linux.dev>; Tue, 19 Sep 2023 01:23:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695086592;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8rZEMBXcWAsOd1JUxhybBTc4j/duZaFTPteC/Fr9lkM=;
-	b=Jb0J9KD2H5NUEGxdUcXDXWGTu8JCrsmqKoWKi+MFcxHA9vbD72fpBoeWjZ466Y3FkOMyIa
-	uvKg5qHvs0AeJWIp4+ErLqDyRI4oqruZP7v4aNmeNf4FsOG4LnAZ/gu/7R34Ava6jaHkNB
-	KL53mN+mVBxm4YHHUh6atNL9ZTt69c8=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-416-9JO0CLrjO5aLRFawxSF4Cg-1; Mon, 18 Sep 2023 21:23:08 -0400
-X-MC-Unique: 9JO0CLrjO5aLRFawxSF4Cg-1
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-1c387a09de4so41272135ad.1
-        for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 18:23:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC64C450F6
+	for <kvmarm@lists.linux.dev>; Tue, 19 Sep 2023 02:25:26 +0000 (UTC)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1bf5c314a57so37458475ad.1
+        for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 19:25:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1695090326; x=1695695126; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yRgKdJmzYKRPDUBlvijGWHc0m2uR5nOKamFSVK+OxX4=;
+        b=ET8oLHBcjXdOETz8tOsmI/QDNNh0UGe+30fjfSKaVLE1tLZWeQvlC0z/4IA8hSuvE2
+         +dME4c2bbasZxry1EuwzlVu2goZNwI3EsCTqzAmanMM1G8Tu931w1OAvz374cGf/aZbs
+         Qku+NtoHZkHghM+C6qVjcdF5jg4yjMhCeQXa0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695086588; x=1695691388;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8rZEMBXcWAsOd1JUxhybBTc4j/duZaFTPteC/Fr9lkM=;
-        b=JHRjCAXpURsl/i2pp++0mTPCDJMsEtb37KBS41pzpuY7gglWEtamHiENkyfe9Qln+J
-         xqsrZmCcn0DKlawiRu/rSKcPr1OQWaWZUfzwKC5V+1sIQCTd1+utrgU/KEjk7LoSNKbp
-         87NpIcteEvehI2DG05FVLZMhq5Yg+/isCNBw7HdqT3VxE60ATILWDpPcldmMjYcmlTwz
-         hhsMIfCuPijH93MlXNOhtGMizMAICNok+gnbWok6MVj/nUOQ2g3GT3kdhfOXPuINvnRI
-         gfaZ++nlO0gNXMmYX20bZNtMH/ktNIQo6z4zkAYMG8QKRwAMcNMhN1pnmT9s57ZzSEiB
-         4PGQ==
-X-Gm-Message-State: AOJu0YyXdvySdGSqJbtPjXU6xNXL1+YQG2u8vLADjD7gPpnIv1EEkJny
-	oFECrgSP79gsoEmSDOYjsJHssp4KJL3jyepV+ZDWm4TA8lLQpRH4oXY0fX6YWJW3fMkOijktqHM
-	KMDcj12PfruDZuePs
-X-Received: by 2002:a17:902:d4c7:b0:1c3:c687:4793 with SMTP id o7-20020a170902d4c700b001c3c6874793mr10025111plg.63.1695086587826;
-        Mon, 18 Sep 2023 18:23:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHoDFw/kgFjKPQwWTf0Oet8p5HAvy+YamWqASTKA/sRdSVgiuLoUsA4+OwthgzDWlhTMjCURQ==
-X-Received: by 2002:a17:902:d4c7:b0:1c3:c687:4793 with SMTP id o7-20020a170902d4c700b001c3c6874793mr10025086plg.63.1695086587495;
-        Mon, 18 Sep 2023 18:23:07 -0700 (PDT)
-Received: from ?IPV6:2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5? ([2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5])
-        by smtp.gmail.com with ESMTPSA id z12-20020a170903018c00b001beef2c9bffsm8873509plg.85.2023.09.18.18.23.02
+        d=1e100.net; s=20230601; t=1695090326; x=1695695126;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yRgKdJmzYKRPDUBlvijGWHc0m2uR5nOKamFSVK+OxX4=;
+        b=IcTV8t80TpJlWxh63fkZk3MqG/MISOxuDc93OzQzWLLMihHrPcColfuq/7Q4oV+GYv
+         J47GdpN1pPT8K2JfPG5lrJwTAVwJpX7NRQ+gcS5i0EaofJ9qgw8W2YNxwHphmGlli4y4
+         1aPTwa+PfQRgd285/TUEX1HAofC+Tukguw4ur7Gj2IDeukNtZwRdYjmmp8Vng7wyybeb
+         NA2g3cNrysulYk62hEztvoDxZ4fHNtvX7pzyLLrF+yGjcvint/HhOI3JMjTi59Njpr0k
+         lVpU2HGAVBc1GwQ7fSZU7hZup845UQIsgQzh50PWA2pV6tZiF2JsQYd0h0Zo2JcIXmjP
+         k9hw==
+X-Gm-Message-State: AOJu0Yy2UM7icJB/WO+Vb13t9lOnEaDrb+ogUfX9SLAcXwPWmvOVfTRd
+	iCNB66rTa0LjXhxV7RSPwd6H8A==
+X-Google-Smtp-Source: AGHT+IEGyedbt/KelU1o+lc1b5wTP54HBT+PPTvmsjgFGj+juiBb9K1MRwSbRxtaWi7qM7zeWSGzew==
+X-Received: by 2002:a17:902:6806:b0:1b3:d4ae:7e21 with SMTP id h6-20020a170902680600b001b3d4ae7e21mr10149851plk.63.1695090325874;
+        Mon, 18 Sep 2023 19:25:25 -0700 (PDT)
+Received: from localhost ([2401:fa00:8f:203:3632:47f7:e44b:9a16])
+        by smtp.gmail.com with UTF8SMTPSA id l7-20020a170903120700b001bd99fd1114sm8941317plh.288.2023.09.18.19.25.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Sep 2023 18:23:06 -0700 (PDT)
-Message-ID: <f45820cf-3ea5-6f5a-7702-bb4b14811e56@redhat.com>
-Date: Tue, 19 Sep 2023 11:23:00 +1000
+        Mon, 18 Sep 2023 19:25:25 -0700 (PDT)
+From: David Stevens <stevensd@chromium.org>
+To: Dmitry Osipenko <dmitry.osipenko@collabora.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Yu Zhang <yu.c.zhang@linux.intel.com>,
+	Isaku Yamahata <isaku.yamahata@gmail.com>,
+	Zhi Wang <zhi.wang.linux@gmail.com>,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	David Stevens <stevensd@chromium.org>
+Subject: [PATCH v9 6/6] KVM: x86/mmu: Handle non-refcounted pages
+Date: Tue, 19 Sep 2023 11:25:03 +0900
+Message-ID: <20230919022504.3153043-1-stevensd@chromium.org>
+X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
+In-Reply-To: <d272613e-aed9-4cbc-26dd-78bc8fca2650@collabora.com>
+References: <d272613e-aed9-4cbc-26dd-78bc8fca2650@collabora.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [RFC PATCH v2 28/35] arm64, irqchip/gic-v3, ACPI: Move MADT GICC
- enabled check into a helper
-To: James Morse <james.morse@arm.com>, linux-pm@vger.kernel.org,
- loongarch@lists.linux.dev, linux-acpi@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org,
- kvmarm@lists.linux.dev
-Cc: x86@kernel.org, Salil Mehta <salil.mehta@huawei.com>,
- Russell King <linux@armlinux.org.uk>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>, jianyong.wu@arm.com,
- justin.he@arm.com
-References: <20230913163823.7880-1-james.morse@arm.com>
- <20230913163823.7880-29-james.morse@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20230913163823.7880-29-james.morse@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-
-
-On 9/14/23 02:38, James Morse wrote:
-> ACPI, irqchip and the architecture code all inspect the MADT
-> enabled bit for a GICC entry in the MADT.
+On Mon, Sep 18, 2023 at 6:53 PM Dmitry Osipenko <dmitry.osipenko@collabora.com> wrote:
+>
+> On 9/11/23 05:16, David Stevens wrote:
+> > --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> > +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> > @@ -848,7 +848,8 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+> >  
+> >  out_unlock:
+> >       write_unlock(&vcpu->kvm->mmu_lock);
+> > -     kvm_release_pfn_clean(fault->pfn);
+> > +     if (fault->is_refcounted_page)
+> > +             kvm_set_page_accessed(pfn_to_page(fault->pfn));
 > 
-> The addition of an 'online capable' bit means all these sites need
-> updating.
+> The other similar occurrences in the code that replaced
+> kvm_release_pfn_clean() with kvm_set_page_accessed() did it under the
+> held mmu_lock.
 > 
-> Move the current checks behind a helper to make future updates easier.
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> ---
->   arch/arm64/kernel/smp.c       |  2 +-
->   drivers/acpi/processor_core.c |  2 +-
->   drivers/irqchip/irq-gic-v3.c  | 10 ++++------
->   include/linux/acpi.h          |  5 +++++
->   4 files changed, 11 insertions(+), 8 deletions(-)
-> 
+> Does kvm_set_page_accessed() needs to be invoked under the lock?
 
-With Jonathan and Russell's comments addressed:
+It looks like I made a mistake when folding the v8->v9 delta into the stack of
+patches to get a clean v9 series. v8 of the series returned pfns without
+reference counts from __kvm_follow_pfn, so the x86 MMU needed to mark the pages
+as accessed under the lock. v9 instead returns pfns with a refcount (i.e. does
+the same thing as __gfn_to_pfn_memslot), so the x86 MMU should instead call
+kvm_release_page_clean outside of the lock. I've included the corrected version
+of this patch in this email.
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-
-> diff --git a/arch/arm64/kernel/smp.c b/arch/arm64/kernel/smp.c
-> index 960b98b43506..8c8f55721786 100644
-> --- a/arch/arm64/kernel/smp.c
-> +++ b/arch/arm64/kernel/smp.c
-> @@ -520,7 +520,7 @@ acpi_map_gic_cpu_interface(struct acpi_madt_generic_interrupt *processor)
->   {
->   	u64 hwid = processor->arm_mpidr;
->   
-> -	if (!(processor->flags & ACPI_MADT_ENABLED)) {
-> +	if (!acpi_gicc_is_usable(processor)) {
->   		pr_debug("skipping disabled CPU entry with 0x%llx MPIDR\n", hwid);
->   		return;
->   	}
-> diff --git a/drivers/acpi/processor_core.c b/drivers/acpi/processor_core.c
-> index 7dd6dbaa98c3..b203cfe28550 100644
-> --- a/drivers/acpi/processor_core.c
-> +++ b/drivers/acpi/processor_core.c
-> @@ -90,7 +90,7 @@ static int map_gicc_mpidr(struct acpi_subtable_header *entry,
->   	struct acpi_madt_generic_interrupt *gicc =
->   	    container_of(entry, struct acpi_madt_generic_interrupt, header);
->   
-> -	if (!(gicc->flags & ACPI_MADT_ENABLED))
-> +	if (!acpi_gicc_is_usable(gicc))
->   		return -ENODEV;
->   
->   	/* device_declaration means Device object in DSDT, in the
-> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-> index eedfa8e9f077..72d3cdebdad1 100644
-> --- a/drivers/irqchip/irq-gic-v3.c
-> +++ b/drivers/irqchip/irq-gic-v3.c
-> @@ -2367,8 +2367,7 @@ gic_acpi_parse_madt_gicc(union acpi_subtable_headers *header,
->   	u32 size = reg == GIC_PIDR2_ARCH_GICv4 ? SZ_64K * 4 : SZ_64K * 2;
->   	void __iomem *redist_base;
->   
-> -	/* GICC entry which has !ACPI_MADT_ENABLED is not unusable so skip */
-> -	if (!(gicc->flags & ACPI_MADT_ENABLED))
-> +	if (!acpi_gicc_is_usable(gicc))
->   		return 0;
->   
->   	redist_base = ioremap(gicc->gicr_base_address, size);
-> @@ -2418,7 +2417,7 @@ static int __init gic_acpi_match_gicc(union acpi_subtable_headers *header,
->   	 * If GICC is enabled and has valid gicr base address, then it means
->   	 * GICR base is presented via GICC
->   	 */
-> -	if ((gicc->flags & ACPI_MADT_ENABLED) && gicc->gicr_base_address) {
-> +	if (acpi_gicc_is_usable(gicc) && gicc->gicr_base_address) {
->   		acpi_data.enabled_rdists++;
->   		return 0;
->   	}
-> @@ -2427,7 +2426,7 @@ static int __init gic_acpi_match_gicc(union acpi_subtable_headers *header,
->   	 * It's perfectly valid firmware can pass disabled GICC entry, driver
->   	 * should not treat as errors, skip the entry instead of probe fail.
->   	 */
-> -	if (!(gicc->flags & ACPI_MADT_ENABLED))
-> +	if (!acpi_gicc_is_usable(gicc))
->   		return 0;
->   
->   	return -ENODEV;
-> @@ -2486,8 +2485,7 @@ static int __init gic_acpi_parse_virt_madt_gicc(union acpi_subtable_headers *hea
->   	int maint_irq_mode;
->   	static int first_madt = true;
->   
-> -	/* Skip unusable CPUs */
-> -	if (!(gicc->flags & ACPI_MADT_ENABLED))
-> +	if (!acpi_gicc_is_usable(gicc))
->   		return 0;
->   
->   	maint_irq_mode = (gicc->flags & ACPI_MADT_VGIC_IRQ_MODE) ?
-> diff --git a/include/linux/acpi.h b/include/linux/acpi.h
-> index b7ab85857bb7..e3265a9eafae 100644
-> --- a/include/linux/acpi.h
-> +++ b/include/linux/acpi.h
-> @@ -256,6 +256,11 @@ acpi_table_parse_cedt(enum acpi_cedt_type id,
->   int acpi_parse_mcfg (struct acpi_table_header *header);
->   void acpi_table_print_madt_entry (struct acpi_subtable_header *madt);
->   
-> +static inline bool acpi_gicc_is_usable(struct acpi_madt_generic_interrupt *gicc)
-> +{
-> +	return (gicc->flags & ACPI_MADT_ENABLED);
-> +}
-> +
->   /* the following numa functions are architecture-dependent */
->   void acpi_numa_slit_init (struct acpi_table_slit *slit);
->   
-
-Thanks,
-Gavin
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index e1eca26215e2..5e7124f63fbc 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -545,12 +545,14 @@ static bool mmu_spte_update(u64 *sptep, u64 new_spte)
+ 
+ 	if (is_accessed_spte(old_spte) && !is_accessed_spte(new_spte)) {
+ 		flush = true;
+-		kvm_set_pfn_accessed(spte_to_pfn(old_spte));
++		if (is_refcounted_page_pte(old_spte))
++			kvm_set_page_accessed(pfn_to_page(spte_to_pfn(old_spte)));
+ 	}
+ 
+ 	if (is_dirty_spte(old_spte) && !is_dirty_spte(new_spte)) {
+ 		flush = true;
+-		kvm_set_pfn_dirty(spte_to_pfn(old_spte));
++		if (is_refcounted_page_pte(old_spte))
++			kvm_set_page_dirty(pfn_to_page(spte_to_pfn(old_spte)));
+ 	}
+ 
+ 	return flush;
+@@ -588,14 +590,18 @@ static u64 mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
+ 	 * before they are reclaimed.  Sanity check that, if the pfn is backed
+ 	 * by a refcounted page, the refcount is elevated.
+ 	 */
+-	page = kvm_pfn_to_refcounted_page(pfn);
+-	WARN_ON_ONCE(page && !page_count(page));
++	if (is_refcounted_page_pte(old_spte)) {
++		page = kvm_pfn_to_refcounted_page(pfn);
++		WARN_ON_ONCE(!page || !page_count(page));
++	}
+ 
+-	if (is_accessed_spte(old_spte))
+-		kvm_set_pfn_accessed(pfn);
++	if (is_refcounted_page_pte(old_spte)) {
++		if (is_accessed_spte(old_spte))
++			kvm_set_page_accessed(pfn_to_page(pfn));
+ 
+-	if (is_dirty_spte(old_spte))
+-		kvm_set_pfn_dirty(pfn);
++		if (is_dirty_spte(old_spte))
++			kvm_set_page_dirty(pfn_to_page(pfn));
++	}
+ 
+ 	return old_spte;
+ }
+@@ -631,8 +637,8 @@ static bool mmu_spte_age(u64 *sptep)
+ 		 * Capture the dirty status of the page, so that it doesn't get
+ 		 * lost when the SPTE is marked for access tracking.
+ 		 */
+-		if (is_writable_pte(spte))
+-			kvm_set_pfn_dirty(spte_to_pfn(spte));
++		if (is_writable_pte(spte) && is_refcounted_page_pte(spte))
++			kvm_set_page_dirty(pfn_to_page(spte_to_pfn(spte)));
+ 
+ 		spte = mark_spte_for_access_track(spte);
+ 		mmu_spte_update_no_track(sptep, spte);
+@@ -1261,8 +1267,8 @@ static bool spte_wrprot_for_clear_dirty(u64 *sptep)
+ {
+ 	bool was_writable = test_and_clear_bit(PT_WRITABLE_SHIFT,
+ 					       (unsigned long *)sptep);
+-	if (was_writable && !spte_ad_enabled(*sptep))
+-		kvm_set_pfn_dirty(spte_to_pfn(*sptep));
++	if (was_writable && !spte_ad_enabled(*sptep) && is_refcounted_page_pte(*sptep))
++		kvm_set_page_dirty(pfn_to_page(spte_to_pfn(*sptep)));
+ 
+ 	return was_writable;
+ }
+@@ -2913,6 +2919,11 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+ 	bool host_writable = !fault || fault->map_writable;
+ 	bool prefetch = !fault || fault->prefetch;
+ 	bool write_fault = fault && fault->write;
++	/*
++	 * Prefetching uses gfn_to_page_many_atomic, which never gets
++	 * non-refcounted pages.
++	 */
++	bool is_refcounted = !fault || fault->is_refcounted_page;
+ 
+ 	if (unlikely(is_noslot_pfn(pfn))) {
+ 		vcpu->stat.pf_mmio_spte_created++;
+@@ -2940,7 +2951,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+ 	}
+ 
+ 	wrprot = make_spte(vcpu, sp, slot, pte_access, gfn, pfn, *sptep, prefetch,
+-			   true, host_writable, &spte);
++			   true, host_writable, is_refcounted, &spte);
+ 
+ 	if (*sptep == spte) {
+ 		ret = RET_PF_SPURIOUS;
+@@ -4254,13 +4265,18 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ {
+ 	struct kvm_memory_slot *slot = fault->slot;
++	/*
++	 * There are no extra bits for tracking non-refcounted pages in
++	 * PAE SPTEs, so reject non-refcounted struct pages in that case.
++	 */
++	bool has_spte_refcount_bit = tdp_enabled && IS_ENABLED(CONFIG_X86_64);
+ 	struct kvm_follow_pfn foll = {
+ 		.slot = slot,
+ 		.gfn = fault->gfn,
+ 		.flags = fault->write ? FOLL_WRITE : 0,
+ 		.try_map_writable = true,
+ 		.guarded_by_mmu_notifier = true,
+-		.allow_non_refcounted_struct_page = false,
++		.allow_non_refcounted_struct_page = has_spte_refcount_bit,
+ 	};
+ 
+ 	/*
+@@ -4277,6 +4293,7 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 			fault->slot = NULL;
+ 			fault->pfn = KVM_PFN_NOSLOT;
+ 			fault->map_writable = false;
++			fault->is_refcounted_page = false;
+ 			return RET_PF_CONTINUE;
+ 		}
+ 		/*
+@@ -4332,6 +4349,7 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ success:
+ 	fault->hva = foll.hva;
+ 	fault->map_writable = foll.writable;
++	fault->is_refcounted_page = foll.is_refcounted_page;
+ 	return RET_PF_CONTINUE;
+ }
+ 
+@@ -4421,7 +4439,8 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 
+ out_unlock:
+ 	write_unlock(&vcpu->kvm->mmu_lock);
+-	kvm_release_pfn_clean(fault->pfn);
++	if (fault->is_refcounted_page)
++		kvm_release_page_clean(pfn_to_page(fault->pfn));
+ 	return r;
+ }
+ 
+@@ -4497,7 +4516,8 @@ static int kvm_tdp_mmu_page_fault(struct kvm_vcpu *vcpu,
+ 
+ out_unlock:
+ 	read_unlock(&vcpu->kvm->mmu_lock);
+-	kvm_release_pfn_clean(fault->pfn);
++	if (fault->is_refcounted_page)
++		kvm_release_page_clean(pfn_to_page(fault->pfn));
+ 	return r;
+ }
+ #endif
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index b102014e2c60..7f73bc2a552e 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -239,6 +239,7 @@ struct kvm_page_fault {
+ 	kvm_pfn_t pfn;
+ 	hva_t hva;
+ 	bool map_writable;
++	bool is_refcounted_page;
+ 
+ 	/*
+ 	 * Indicates the guest is trying to write a gfn that contains one or
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index c85255073f67..b2d62fd9634c 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -848,7 +848,8 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 
+ out_unlock:
+ 	write_unlock(&vcpu->kvm->mmu_lock);
+-	kvm_release_pfn_clean(fault->pfn);
++	if (fault->is_refcounted_page)
++		kvm_release_page_clean(pfn_to_page(fault->pfn));
+ 	return r;
+ }
+ 
+@@ -902,7 +903,7 @@ static gpa_t FNAME(gva_to_gpa)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+  */
+ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int i)
+ {
+-	bool host_writable;
++	bool host_writable, is_refcounted;
+ 	gpa_t first_pte_gpa;
+ 	u64 *sptep, spte;
+ 	struct kvm_memory_slot *slot;
+@@ -959,10 +960,11 @@ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int
+ 	sptep = &sp->spt[i];
+ 	spte = *sptep;
+ 	host_writable = spte & shadow_host_writable_mask;
++	is_refcounted = spte & SPTE_MMU_PAGE_REFCOUNTED;
+ 	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+ 	make_spte(vcpu, sp, slot, pte_access, gfn,
+ 		  spte_to_pfn(spte), spte, true, false,
+-		  host_writable, &spte);
++		  host_writable, is_refcounted, &spte);
+ 
+ 	return mmu_spte_update(sptep, spte);
+ }
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 4a599130e9c9..ce495819061f 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -138,7 +138,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 	       const struct kvm_memory_slot *slot,
+ 	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
+ 	       u64 old_spte, bool prefetch, bool can_unsync,
+-	       bool host_writable, u64 *new_spte)
++	       bool host_writable, bool is_refcounted, u64 *new_spte)
+ {
+ 	int level = sp->role.level;
+ 	u64 spte = SPTE_MMU_PRESENT_MASK;
+@@ -188,6 +188,8 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 
+ 	if (level > PG_LEVEL_4K)
+ 		spte |= PT_PAGE_SIZE_MASK;
++	if (is_refcounted)
++		spte |= SPTE_MMU_PAGE_REFCOUNTED;
+ 
+ 	if (shadow_memtype_mask)
+ 		spte |= static_call(kvm_x86_get_mt_mask)(vcpu, gfn,
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index a129951c9a88..4bf4a535c23d 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -96,6 +96,11 @@ static_assert(!(EPT_SPTE_MMU_WRITABLE & SHADOW_ACC_TRACK_SAVED_MASK));
+ /* Defined only to keep the above static asserts readable. */
+ #undef SHADOW_ACC_TRACK_SAVED_MASK
+ 
++/*
++ * Indicates that the SPTE refers to a page with a valid refcount.
++ */
++#define SPTE_MMU_PAGE_REFCOUNTED        BIT_ULL(59)
++
+ /*
+  * Due to limited space in PTEs, the MMIO generation is a 19 bit subset of
+  * the memslots generation and is derived as follows:
+@@ -345,6 +350,11 @@ static inline bool is_dirty_spte(u64 spte)
+ 	return dirty_mask ? spte & dirty_mask : spte & PT_WRITABLE_MASK;
+ }
+ 
++static inline bool is_refcounted_page_pte(u64 spte)
++{
++	return spte & SPTE_MMU_PAGE_REFCOUNTED;
++}
++
+ static inline u64 get_rsvd_bits(struct rsvd_bits_validate *rsvd_check, u64 pte,
+ 				int level)
+ {
+@@ -475,7 +485,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 	       const struct kvm_memory_slot *slot,
+ 	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
+ 	       u64 old_spte, bool prefetch, bool can_unsync,
+-	       bool host_writable, u64 *new_spte);
++	       bool host_writable, bool is_refcounted, u64 *new_spte);
+ u64 make_huge_page_split_spte(struct kvm *kvm, u64 huge_spte,
+ 		      	      union kvm_mmu_page_role role, int index);
+ u64 make_nonleaf_spte(u64 *child_pt, bool ad_disabled);
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 6c63f2d1675f..185f3c666c2b 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -474,6 +474,7 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 	bool was_leaf = was_present && is_last_spte(old_spte, level);
+ 	bool is_leaf = is_present && is_last_spte(new_spte, level);
+ 	bool pfn_changed = spte_to_pfn(old_spte) != spte_to_pfn(new_spte);
++	bool is_refcounted = is_refcounted_page_pte(old_spte);
+ 
+ 	WARN_ON_ONCE(level > PT64_ROOT_MAX_LEVEL);
+ 	WARN_ON_ONCE(level < PG_LEVEL_4K);
+@@ -538,9 +539,9 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 	if (is_leaf != was_leaf)
+ 		kvm_update_page_stats(kvm, level, is_leaf ? 1 : -1);
+ 
+-	if (was_leaf && is_dirty_spte(old_spte) &&
++	if (was_leaf && is_dirty_spte(old_spte) && is_refcounted &&
+ 	    (!is_present || !is_dirty_spte(new_spte) || pfn_changed))
+-		kvm_set_pfn_dirty(spte_to_pfn(old_spte));
++		kvm_set_page_dirty(pfn_to_page(spte_to_pfn(old_spte)));
+ 
+ 	/*
+ 	 * Recursively handle child PTs if the change removed a subtree from
+@@ -552,9 +553,9 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 	    (is_leaf || !is_present || WARN_ON_ONCE(pfn_changed)))
+ 		handle_removed_pt(kvm, spte_to_child_pt(old_spte, level), shared);
+ 
+-	if (was_leaf && is_accessed_spte(old_spte) &&
++	if (was_leaf && is_accessed_spte(old_spte) && is_refcounted &&
+ 	    (!is_present || !is_accessed_spte(new_spte) || pfn_changed))
+-		kvm_set_pfn_accessed(spte_to_pfn(old_spte));
++		kvm_set_page_accessed(pfn_to_page(spte_to_pfn(old_spte)));
+ }
+ 
+ /*
+@@ -988,8 +989,9 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
+ 		new_spte = make_mmio_spte(vcpu, iter->gfn, ACC_ALL);
+ 	else
+ 		wrprot = make_spte(vcpu, sp, fault->slot, ACC_ALL, iter->gfn,
+-					 fault->pfn, iter->old_spte, fault->prefetch, true,
+-					 fault->map_writable, &new_spte);
++				   fault->pfn, iter->old_spte, fault->prefetch, true,
++				   fault->map_writable, fault->is_refcounted_page,
++				   &new_spte);
+ 
+ 	if (new_spte == iter->old_spte)
+ 		ret = RET_PF_SPURIOUS;
+@@ -1205,8 +1207,9 @@ static bool age_gfn_range(struct kvm *kvm, struct tdp_iter *iter,
+ 		 * Capture the dirty status of the page, so that it doesn't get
+ 		 * lost when the SPTE is marked for access tracking.
+ 		 */
+-		if (is_writable_pte(iter->old_spte))
+-			kvm_set_pfn_dirty(spte_to_pfn(iter->old_spte));
++		if (is_writable_pte(iter->old_spte) &&
++		    is_refcounted_page_pte(iter->old_spte))
++			kvm_set_page_dirty(pfn_to_page(spte_to_pfn(iter->old_spte)));
+ 
+ 		new_spte = mark_spte_for_access_track(iter->old_spte);
+ 		iter->old_spte = kvm_tdp_mmu_write_spte(iter->sptep,
+@@ -1628,7 +1631,8 @@ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
+ 		trace_kvm_tdp_mmu_spte_changed(iter.as_id, iter.gfn, iter.level,
+ 					       iter.old_spte,
+ 					       iter.old_spte & ~dbit);
+-		kvm_set_pfn_dirty(spte_to_pfn(iter.old_spte));
++		if (is_refcounted_page_pte(iter.old_spte))
++			kvm_set_page_dirty(pfn_to_page(spte_to_pfn(iter.old_spte)));
+ 	}
+ 
+ 	rcu_read_unlock();
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index b95c79b7833b..6696925f01f1 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1179,6 +1179,9 @@ unsigned long gfn_to_hva_memslot_prot(struct kvm_memory_slot *slot, gfn_t gfn,
+ void kvm_release_page_clean(struct page *page);
+ void kvm_release_page_dirty(struct page *page);
+ 
++void kvm_set_page_accessed(struct page *page);
++void kvm_set_page_dirty(struct page *page);
++
+ struct kvm_follow_pfn {
+ 	const struct kvm_memory_slot *slot;
+ 	gfn_t gfn;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 913de4e86d9d..4d8538cdb690 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2979,17 +2979,19 @@ static bool kvm_is_ad_tracked_page(struct page *page)
+ 	return !PageReserved(page);
+ }
+ 
+-static void kvm_set_page_dirty(struct page *page)
++void kvm_set_page_dirty(struct page *page)
+ {
+ 	if (kvm_is_ad_tracked_page(page))
+ 		SetPageDirty(page);
+ }
++EXPORT_SYMBOL_GPL(kvm_set_page_dirty);
+ 
+-static void kvm_set_page_accessed(struct page *page)
++void kvm_set_page_accessed(struct page *page)
+ {
+ 	if (kvm_is_ad_tracked_page(page))
+ 		mark_page_accessed(page);
+ }
++EXPORT_SYMBOL_GPL(kvm_set_page_accessed);
+ 
+ void kvm_release_page_clean(struct page *page)
+ {
+-- 
+2.42.0.459.ge4e396fd5e-goog
 
