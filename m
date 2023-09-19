@@ -1,49 +1,51 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD808BE2
-	for <kvmarm@lists.linux.dev>; Tue, 19 Sep 2023 19:13:48 +0000 (UTC)
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-27474c64aa0so110694a91.0
-        for <kvmarm@lists.linux.dev>; Tue, 19 Sep 2023 12:13:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B824D8BE2
+	for <kvmarm@lists.linux.dev>; Tue, 19 Sep 2023 19:13:50 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-59bf37b7734so68754657b3.0
+        for <kvmarm@lists.linux.dev>; Tue, 19 Sep 2023 12:13:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695150827; x=1695755627; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/BoKZ32KwsxUQ3UINg4R8i6IlvYW9M8AXX0zSojGAm4=;
-        b=TasJuGbIy+GNxv1fbaVXNZXtagI5SbghAMkEb7aaa09BrIpkUIlMtn2pA448DGwnFY
-         xQ7G2aSa6qjWV0rOOhwZRJ3ywTUmLLofHmza6c7lFngSJ4i/woXm1hmsWm7ytAIfnevC
-         wRqzfUbyruLXeNM14urvrJwujHxw+8eyBvJ0JIs8fHLscfMBpi7DUm156dTCRKHxHnhF
-         QFIY8/vsa1465DQwLzqrBGzDti3h7OxzUSqMKTMWlrZs4ff3tuZErrclBiB30ly0CHd1
-         9K0QGA4Y1ae2GO0/OM+Q9m+XE3sydCU2NU/Lr1TvfEILhh+idqreD9nhWkss/UT1L5i3
-         yeIg==
+        d=google.com; s=20230601; t=1695150829; x=1695755629; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qeAM8cO1E8iArE2v6SDLTuZIn362ohCP7RKHypOM/58=;
+        b=kN0jQIG8zK679cYnxyllGchPtbDnuoOyg3Q/Ve6EUZUUZ/audTcjZIJkLed5sCGdBI
+         3kaR4m6CxvIGs15HdC6RWn7FmBCHaY4Dhxx7A9xjxULbNaACjOcxqxn8XcIq0rsdPtyf
+         fIByU027g9pfxQt4R699iVaCezTBWOh5zRdRE4OD8H/s7vgU04GcqtDYRV9Ltp2qr2bX
+         8eiY28F3dQqVGzS0NhOSAb+yzlYqidIeJ9lsuPlZN3UcRv4mIuono0aQnZJ9lgPpPC9Q
+         zuozOI9zjO0nih4aKMs/t245vM7v9OnHTQlafUSDApo59RzITh5L24q3pBqNmUVSCoY8
+         YuDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695150827; x=1695755627;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/BoKZ32KwsxUQ3UINg4R8i6IlvYW9M8AXX0zSojGAm4=;
-        b=xTEELMV5YNC5MD9Z/8xNymHl1+S/Oau4PCu3kMiQpQTwGT/XKxW7NcSbJbUbewxisQ
-         DavaFGYW9IclG0pdWX+6ZutJfyiVclk7qAoeSu6GpeZVuUKCKVBk0zca8M9dWqYwckZC
-         EbeOscEM4lbP+JQF8USm2kz1RHDSEcjaK57zGouNm9jTWdbwXr2cRh9lY76i7dRpmeVb
-         bmUsJpVYjEs9Mjuw4IPLjHN4FVZ+3u+Wj9ZNaP3tRFxzGg2nZyHPP6KNnH/lwhHYoLIT
-         IKyAFBggSVKEWqsYI1GFizDzAESpY0TFo+cdP66RxWlkNC+Y4uClPTT47lczyw62r2yy
-         zo5A==
-X-Gm-Message-State: AOJu0Yy9m2hW3ozOLIBYL+hsFikc43UfvjRYY0MoUKDWTJKWhnZFR+Or
-	j+e5SNHzi+kNt6D51mE7wb4/kbE2MqWD4zaPdg==
-X-Google-Smtp-Source: AGHT+IHYSIEHbHJmaCdLAaNpjmkKhOqgXDOedC82RMItc2VlqXfAmzhsKN0kZMrNHaxd+LKsgRiePbdSSmg9p1vbNA==
+        d=1e100.net; s=20230601; t=1695150829; x=1695755629;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qeAM8cO1E8iArE2v6SDLTuZIn362ohCP7RKHypOM/58=;
+        b=oTGco7VHuasdEh505GFXz72DFbZUdZO5HDKLdjPVjB8JkVKFHz2k9YFABAClDzU5gc
+         /WLEJ1HkGjgSPDj4ZWVxbWJJgz7rIyzJG8zEP8VMgAlKQwG+Ej/2x3oJlH8IdfAE65dW
+         WGvyyBPDxYMvoPs31Yr6tMg+f6go6nSNx8natUqC0KDALH4SiL5Qm9lMkt4rl5V+7pGb
+         4bjZ/L4jjVNdk5Hy8qwnF9XUGpOkEfzHreii3+fR29fwYjSG57Qh7Wtr//JCHmNuTDhE
+         ZGmEFebQmzS/AtEmRSfEm1UHdB9BJ5H4aJBY/ztQKVosEqqLO9aSOuZoPbZSRlkpK/QC
+         n09Q==
+X-Gm-Message-State: AOJu0YxJTxOXHfSWDkMd+Yq+obFz77ZvJY9wObJKt5j3vZjaotcT36JX
+	FiWQZcVKAPJ0lrI1aZwgLOydhHr/x0R0h56sMA==
+X-Google-Smtp-Source: AGHT+IF2d4KrJ1GHT4Wa0TWb/gB6h+01oF3SSuguWwR8jl5KeSmF35wx3cwBJE4NxJ48inzWufA/M0MEyfBgcW0+rg==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a17:90b:3a86:b0:26b:43f1:e69f with
- SMTP id om6-20020a17090b3a8600b0026b43f1e69fmr86598pjb.1.1695150827508; Tue,
- 19 Sep 2023 12:13:47 -0700 (PDT)
-Date: Tue, 19 Sep 2023 12:13:42 -0700
+ (user=jingzhangos job=sendgmr) by 2002:a25:73c7:0:b0:d7e:afff:c8fa with SMTP
+ id o190-20020a2573c7000000b00d7eafffc8famr8262ybc.5.1695150829589; Tue, 19
+ Sep 2023 12:13:49 -0700 (PDT)
+Date: Tue, 19 Sep 2023 12:13:43 -0700
+In-Reply-To: <20230919191343.693415-1-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20230919191343.693415-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
-Message-ID: <20230919191343.693415-1-jingzhangos@google.com>
-Subject: [PATCH v2] KVM: arm64: selftests: Test pointer authentication support
+Message-ID: <20230919191343.693415-2-jingzhangos@google.com>
+Subject: [PATCH v3] KVM: arm64: selftests: Test pointer authentication support
  in KVM guest
 From: Jing Zhang <jingzhangos@google.com>
 To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
@@ -64,12 +66,17 @@ It also shows the implemented algorithm for both address authentication
 and generic code authentication.
 
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
+
+---
+* v2 -> v3:
+  - Rebased on v6.6-rc2.
+  - Use guest assert for every comparison in keys retainable test.
 ---
  tools/arch/arm64/include/asm/sysreg.h         |   5 +
  tools/testing/selftests/kvm/Makefile          |   5 +
- .../selftests/kvm/aarch64/pauth_test.c        | 511 ++++++++++++++++++
+ .../selftests/kvm/aarch64/pauth_test.c        | 507 ++++++++++++++++++
  .../selftests/kvm/include/aarch64/processor.h |   2 +
- 4 files changed, 523 insertions(+)
+ 4 files changed, 519 insertions(+)
  create mode 100644 tools/testing/selftests/kvm/aarch64/pauth_test.c
 
 diff --git a/tools/arch/arm64/include/asm/sysreg.h b/tools/arch/arm64/include/asm/sysreg.h
@@ -96,18 +103,18 @@ index 7640fa27be94..9d903eb8388c 100644
  #define ID_AA64PFR0_CSV3_SHIFT		60
  #define ID_AA64PFR0_CSV2_SHIFT		56
 diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index c692cc86e7da..0fe40fcb02ec 100644
+index a3bb36fb3cfc..c3a1a3898f71 100644
 --- a/tools/testing/selftests/kvm/Makefile
 +++ b/tools/testing/selftests/kvm/Makefile
-@@ -143,6 +143,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
+@@ -144,6 +144,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
+ TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
  TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
  TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
 +TEST_GEN_PROGS_aarch64 += aarch64/pauth_test
  TEST_GEN_PROGS_aarch64 += aarch64/psci_test
  TEST_GEN_PROGS_aarch64 += aarch64/smccc_filter
  TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
-@@ -212,6 +213,10 @@ ifeq ($(ARCH),s390)
+@@ -222,6 +223,10 @@ ifeq ($(ARCH),s390)
  	CFLAGS += -march=z10
  endif
  
@@ -120,10 +127,10 @@ index c692cc86e7da..0fe40fcb02ec 100644
  
 diff --git a/tools/testing/selftests/kvm/aarch64/pauth_test.c b/tools/testing/selftests/kvm/aarch64/pauth_test.c
 new file mode 100644
-index 000000000000..c40c59e4139a
+index 000000000000..0107c5b5949a
 --- /dev/null
 +++ b/tools/testing/selftests/kvm/aarch64/pauth_test.c
-@@ -0,0 +1,511 @@
+@@ -0,0 +1,507 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * pauth_test - Test for KVM guest pointer authentication.
@@ -155,6 +162,8 @@ index 000000000000..c40c59e4139a
 +#define KEY4_HI		0x789abcdef0123456UL
 +#define KEY5_LO		0x89abcdef01234567UL
 +#define KEY5_HI		0x9abcdef012345678UL
++
++#define PAUTH_ENABLE	(SCTLR_ELx_ENIA | SCTLR_ELx_ENIB | SCTLR_ELx_ENDA | SCTLR_ELx_ENDB)
 +
 +enum uc_args {
 +	WAIT_MIGRATION,
@@ -254,8 +263,6 @@ index 000000000000..c40c59e4139a
 +/* Setup PAuth keys and check their retainability */
 +static void check_keys_retainable(void)
 +{
-+	bool retainable = true;
-+
 +	/* Address */
 +	write_sysreg_s(KEY1_LO, SYS_APIAKEYLO_EL1);
 +	write_sysreg_s(KEY1_HI, SYS_APIAKEYHI_EL1);
@@ -274,20 +281,18 @@ index 000000000000..c40c59e4139a
 +	GUEST_SYNC(WAIT_MIGRATION);
 +
 +	/* Address */
-+	retainable = retainable && (read_sysreg_s(SYS_APIAKEYLO_EL1) == KEY1_LO);
-+	retainable = retainable && (read_sysreg_s(SYS_APIAKEYHI_EL1) == KEY1_HI);
-+	retainable = retainable && (read_sysreg_s(SYS_APIBKEYLO_EL1) == KEY2_LO);
-+	retainable = retainable && (read_sysreg_s(SYS_APIBKEYHI_EL1) == KEY2_HI);
++	GUEST_ASSERT(read_sysreg_s(SYS_APIAKEYLO_EL1) == KEY1_LO);
++	GUEST_ASSERT(read_sysreg_s(SYS_APIAKEYHI_EL1) == KEY1_HI);
++	GUEST_ASSERT(read_sysreg_s(SYS_APIBKEYLO_EL1) == KEY2_LO);
++	GUEST_ASSERT(read_sysreg_s(SYS_APIBKEYHI_EL1) == KEY2_HI);
 +	/* Data */
-+	retainable = retainable && (read_sysreg_s(SYS_APDAKEYLO_EL1) == KEY3_LO);
-+	retainable = retainable && (read_sysreg_s(SYS_APDAKEYHI_EL1) == KEY3_HI);
-+	retainable = retainable && (read_sysreg_s(SYS_APDBKEYLO_EL1) == KEY4_LO);
-+	retainable = retainable && (read_sysreg_s(SYS_APDBKEYHI_EL1) == KEY4_HI);
++	GUEST_ASSERT(read_sysreg_s(SYS_APDAKEYLO_EL1) == KEY3_LO);
++	GUEST_ASSERT(read_sysreg_s(SYS_APDAKEYHI_EL1) == KEY3_HI);
++	GUEST_ASSERT(read_sysreg_s(SYS_APDBKEYLO_EL1) == KEY4_LO);
++	GUEST_ASSERT(read_sysreg_s(SYS_APDBKEYHI_EL1) == KEY4_HI);
 +	/* Generic */
-+	retainable = retainable && (read_sysreg_s(SYS_APGAKEYLO_EL1) == KEY5_LO);
-+	retainable = retainable && (read_sysreg_s(SYS_APGAKEYHI_EL1) == KEY5_HI);
-+
-+	GUEST_ASSERT(retainable);
++	GUEST_ASSERT(read_sysreg_s(SYS_APGAKEYLO_EL1) == KEY5_LO);
++	GUEST_ASSERT(read_sysreg_s(SYS_APGAKEYHI_EL1) == KEY5_HI);
 +}
 +
 +#define ADDR_START	0x8000
@@ -479,9 +484,7 @@ index 000000000000..c40c59e4139a
 +	 * in SCTLR should have been cleared in the trap handler.
 +	 * Otherwise, the auth instructions didn't work as expected.
 +	 */
-+	if (read_sysreg(sctlr_el1) &
-+	    (SCTLR_ELx_ENIA | SCTLR_ELx_ENIB | SCTLR_ELx_ENDA | SCTLR_ELx_ENDB))
-+		GUEST_ASSERT(0);
++	GUEST_ASSERT(!(read_sysreg(sctlr_el1) & PAUTH_ENABLE));
 +}
 +
 +static void guest_code(void)
@@ -492,7 +495,7 @@ index 000000000000..c40c59e4139a
 +	check_keys_retainable();
 +
 +	/* Enable PAuth */
-+	sctlr |= SCTLR_ELx_ENIA | SCTLR_ELx_ENIB | SCTLR_ELx_ENDA | SCTLR_ELx_ENDB;
++	sctlr |= PAUTH_ENABLE;
 +	write_sysreg(sctlr, sctlr_el1);
 +	isb();
 +
@@ -589,7 +592,7 @@ index 000000000000..c40c59e4139a
 +				 * screwed up the emulation somehow or the PAuth
 +				 * was not enabled for the guest.
 +				 */
-+				TEST_FAIL("Geust PAuth was not enabled!\n");
++				TEST_FAIL("Guest PAuth was not enabled!\n");
 +				break;
 +			case GENERIC_PAUTH_ALGO: {
 +				enum pauth_algo algo = uc.args[2];
@@ -650,7 +653,7 @@ index cb537253a6b9..f8d541af9c06 100644
  #define ESR_EC_DABT		0x25
  #define ESR_EC_HW_BP_CURRENT	0x31
 
-base-commit: 52a93d39b17dc7eb98b6aa3edb93943248e03b2f
+base-commit: ce9ecca0238b140b88f43859b211c9fdfd8e5b70
 -- 
-2.41.0.640.ga95def55d0-goog
+2.42.0.459.ge4e396fd5e-goog
 
