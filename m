@@ -1,146 +1,115 @@
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8267233996
-	for <kvmarm@lists.linux.dev>; Tue, 19 Sep 2023 10:24:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ZB9BH5s6f+1vWNC2c2Ik282bpxBrIN2PmS2ywFcicC0=; b=QFgL+GrLi4spuAOmLz3KFJCeSu
-	7JM8L9KKnKdJd3mizqrd7r8XOiJmeFq4ouhF6CtN3jNRYGfxLg15k+cYTBuT7BZSjFu9zVQF8U/CB
-	qxcY62BX4iTdtz8TxPGyYqW8R9PtxZRdZm6Gd0YY/iva1tazgUAbLpcGUJM32rZEm45UkyONvMzWs
-	Mp0U+xYRw+Re/2wd/EZgoyLCr3uesAioIu99+to9tNugowUvbsi+ux/B43lRIuE/x2tdQaVoO4Cwn
-	OKzk1azVmZpkMlOWJfGw9LFPDoFDTEZ5kdmDVEPR5gKaIiaDFlSVebUav8i0+wPxIeqx4CC53O9wi
-	X2T6BZ8A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48024)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qiXuL-0001gT-1a;
-	Tue, 19 Sep 2023 11:24:41 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qiXuL-0001QG-Gh; Tue, 19 Sep 2023 11:24:41 +0100
-Date: Tue, 19 Sep 2023 11:24:41 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc: James Morse <james.morse@arm.com>, linux-pm@vger.kernel.org,
-	loongarch@lists.linux.dev, linux-acpi@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
-	x86@kernel.org, Salil Mehta <salil.mehta@huawei.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	jianyong.wu@arm.com, justin.he@arm.com
-Subject: Re: [RFC PATCH v2 32/35] ACPI: add support to register CPUs based on
- the _STA enabled bit
-Message-ID: <ZQl26YlRnQaKwCg6@shell.armlinux.org.uk>
-References: <20230913163823.7880-1-james.morse@arm.com>
- <20230913163823.7880-33-james.morse@arm.com>
- <20230914171341.00006e51@Huawei.com>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 805723D82
+	for <kvmarm@lists.linux.dev>; Tue, 19 Sep 2023 11:26:18 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CECA51FB;
+	Tue, 19 Sep 2023 04:26:54 -0700 (PDT)
+Received: from [10.1.36.155] (e126864.cambridge.arm.com [10.1.36.155])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E62923F67D;
+	Tue, 19 Sep 2023 04:26:14 -0700 (PDT)
+Message-ID: <e892be93-6b5a-940c-c07f-7164646d5aca@arm.com>
+Date: Tue, 19 Sep 2023 12:26:06 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230914171341.00006e51@Huawei.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Subject: Re: [PATCH 1/3] KVM: arm64: Configure HCRX_EL2 dynamically
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Vladimir Murzin <vladimir.murzin@arm.com>,
+ Colton Lewis <coltonlewis@google.com>, linux-kernel@vger.kernel.org
+References: <20230915124840.474888-1-kristina.martsenko@arm.com>
+ <20230915124840.474888-2-kristina.martsenko@arm.com>
+ <865y47enz2.wl-maz@kernel.org>
+From: Kristina Martsenko <kristina.martsenko@arm.com>
+In-Reply-To: <865y47enz2.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 14, 2023 at 05:13:41PM +0100, Jonathan Cameron wrote:
-> On Wed, 13 Sep 2023 16:38:20 +0000
-> James Morse <james.morse@arm.com> wrote:
-> > +static int acpi_processor_make_enabled(struct acpi_processor *pr)
-> > +{
-> > +	unsigned long long sta;
-> > +	acpi_status status;
-> > +	bool present, enabled;
-> > +
-> > +	if (!acpi_has_method(pr->handle, "_STA"))
-> > +		return arch_register_cpu(pr->id);
-> > +
-> > +	status = acpi_evaluate_integer(pr->handle, "_STA", NULL, &sta);
-> > +	if (ACPI_FAILURE(status))
-> > +		return -ENODEV;
-> > +
-> > +	present = sta & ACPI_STA_DEVICE_PRESENT;
-> > +	enabled = sta & ACPI_STA_DEVICE_ENABLED;
-> > +
-> > +	if (cpu_online(pr->id) && (!present || !enabled)) {
-> > +		pr_err_once(FW_BUG "CPU %u is online, but described as not present or disabled!\n", pr->id);
+On 18/09/2023 12:10, Marc Zyngier wrote:
+> Hi Kristina,
+
+Hi Marc,
+
+> On Fri, 15 Sep 2023 13:48:38 +0100,
+> Kristina Martsenko <kristina.martsenko@arm.com> wrote:
+>>
+>> At the moment the HCRX_EL2 system register is always initialized to
+>> HCRX_GUEST_FLAGS when running a guest. Instead, choose the configuration
+>> at vcpu reset time and save it in the vcpu struct, similarly to how
+>> HCR_EL2 is set up. This will be needed in a subsequent change to
+>> configure the register based on CPU features detected at runtime.
+>>
+>> Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
+>> ---
+>>  arch/arm64/include/asm/kvm_emulate.h    | 5 +++++
+>>  arch/arm64/include/asm/kvm_host.h       | 1 +
+>>  arch/arm64/kvm/arm.c                    | 1 +
+>>  arch/arm64/kvm/hyp/include/hyp/switch.h | 2 +-
+>>  arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 1 +
+>>  arch/arm64/kvm/hyp/nvhe/pkvm.c          | 1 +
+>>  6 files changed, 10 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+>> index 3d6725ff0bf6..64ea27e6deb1 100644
+>> --- a/arch/arm64/include/asm/kvm_emulate.h
+>> +++ b/arch/arm64/include/asm/kvm_emulate.h
+>> @@ -134,6 +134,11 @@ static inline void vcpu_ptrauth_disable(struct kvm_vcpu *vcpu)
+>>  	vcpu->arch.hcr_el2 &= ~(HCR_API | HCR_APK);
+>>  }
+>>  
+>> +static inline void vcpu_reset_hcrx(struct kvm_vcpu *vcpu)
+>> +{
+>> +	vcpu->arch.hcrx_el2 = HCRX_GUEST_FLAGS;
+>> +}
+>> +
+>>  static inline unsigned long vcpu_get_vsesr(struct kvm_vcpu *vcpu)
+>>  {
+>>  	return vcpu->arch.vsesr_el2;
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index af06ccb7ee34..2764748756a7 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -487,6 +487,7 @@ struct kvm_vcpu_arch {
+>>  
+>>  	/* Values of trap registers for the guest. */
+>>  	u64 hcr_el2;
+>> +	u64 hcrx_el2;
 > 
-> Why once?  If this for some reason happened on multiple CPUs I think we'd want to know.
+> Do we really need this extra field? Yes, this is only an extra 64bit,
+> but they tend to accumulate...
 > 
-> > +		add_taint(TAINT_FIRMWARE_WORKAROUND, LOCKDEP_STILL_OK);
-> > +	} else if (!present || !enabled) {
-> > +		return -ENODEV;
-> > +	}
+> Looking at patch #3, the change is related to this:
 > 
-> I guess you didn't do a nested if here to avoid even longer lines.
-> Could flip things around though I don't like this much either as it makes
-> the normal good path exit mid way down.
+>  	vcpu->arch.hcrx_el2 = HCRX_GUEST_FLAGS;
+> +
+> +	if (cpus_have_final_cap(ARM64_HAS_MOPS)) {
+> +		vcpu->arch.hcrx_el2 |= HCRX_EL2_MSCEn;
+> +		vcpu->arch.hcrx_el2 |= HCRX_EL2_MCE2;
+> +	}
 > 
-> 	if (present && enabled)
-> 		return arch_register_cpu(pr->id);
+> meaning that this is a constant value for a given boot of the host.
 > 
-> 	if (!cpu_online(pr->id))
-> 		return -ENODEV;
+> At this stage, I'd rather you define HCRX_GUEST_FLAGS as:
 > 
-> 	pr_err...
-> 	add_taint(...
+> #define HCRX_GUEST_FLAGS \
+> 	(HCRX_EL2_SMPME | HCRX_EL2_TCR2En | \
+> 	 cpus_have_final_cap(ARM64_HAS_MOPS) ? \
+> 	 (HCRX_EL2_MSCEn | HCRX_EL2_MCE2) : 0)
 > 
-> 	return arch_register_cpu(pr->id);
-> 
-> Ah well. Some code just has to be less than pretty.
+> and drop the new field altogether, until we have something that
+> requires dynamic flipping of an HCRX_EL2 field.
 
-How about:
+Makes sense, the field isn't strictly required yet, I'll drop it in v2.
 
-static int acpi_processor_should_register_cpu(struct acpi_processor *pr)
-{
-	unsigned long long sta;
-	acpi_status status;
+Thanks,
+Kristina
 
-	if (!acpi_has_method(pr->handle, "_STA"))
-		return 0;
-
-	status = acpi_evaluate_integer(pr->handle, "_STA", NULL, &sta);
-	if (ACPI_FAILURE(status))
-		return -ENODEV;
-
-	if (sta & ACPI_STA_DEVICE_PRESENT && sta & ACPI_STA_DEVICE_ENABLED)
-		return 0;
-
-	if (cpu_online(pr->id)) {
-		pr_err_once(FW_BUG
-			    "CPU %u is online, but described as not present or disabled!\n",
-			    pr->id);
-
-		/* Register the CPU anyway */
-		return 0;
-	}
-
-	return -ENODEV;
-}
-
-static int acpi_processor_make_enabled(struct acpi_processor *pr)
-{
-	int ret = acpi_processor_should_register_cpu(pr);
-
-	if (ret)
-		return ret;
-
-	return arch_register_cpu(pr->id);
-}
-
-I would keep the "cpu online but !present and !disabled" as a sub-block
-because it makes better reading flow, but instead break the message as
-I've indicated above.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
