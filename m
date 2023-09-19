@@ -1,239 +1,167 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4857450F6
-	for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 23:43:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695080638;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zVlOSfQ+Cs92BylKR+M/JB7hqrVK10vOpKWpaqimizU=;
-	b=gti5wqkPNzoHb41DYIPLbqGF7s7ANHSvaG1kZ6jj7gGIDVbDZzXIHCRCpo8ScSz7n/WNTX
-	3Uh9CJ82Zw17p9iTh6mnhGm6CaKfO3OwXOU/Ug25DktkMSznqEkL3IYz29Y8oVoNxvejuq
-	lytGQR5Vjv2lQSeoikVQIKiEIe0R8AE=
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-93-g7Cl2q3dN2GCn1-7BP-P3w-1; Mon, 18 Sep 2023 19:43:57 -0400
-X-MC-Unique: g7Cl2q3dN2GCn1-7BP-P3w-1
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-68fbe41b9d3so4683262b3a.2
-        for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 16:43:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE2B6180
+	for <kvmarm@lists.linux.dev>; Tue, 19 Sep 2023 00:08:43 +0000 (UTC)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-59c12d31d04so36887157b3.1
+        for <kvmarm@lists.linux.dev>; Mon, 18 Sep 2023 17:08:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695082122; x=1695686922; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dInZugQi4I3jT3AsjQuL7R2MGGG9K+dIBnr86/ph3q8=;
+        b=GmkZKmC1wLS7I9Kuqm9W8ruPNvs1lFHUbwBTnnTYxNHX51xEX7shNX0U0tVAy9IE7L
+         jLOaAw5jhD6ETEro/vsaQHwSQ7RyDjhqZpYxto/F0mryCzI+WTmG9h/GzH4NMn/UdJzt
+         eW9/qgYaizfC+WJuuBtUMG0BXA9uyDKXJo/li6WSXtDpSv7nHIGjbiyIgeSV9je6cYv3
+         YLu4qEP7DML0sRCdzc+k+7IApoT7gd9xXXlgGEmR6XKk3EItoEMx9crRlyeVoY8Jtvz0
+         PDKObbytslyzP/MGSrgrzlz+EC+3c10Shsx8qBxxb7gyQNzFIYn1K137VGK8aqJJl8Jj
+         m5QA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695080636; x=1695685436;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zVlOSfQ+Cs92BylKR+M/JB7hqrVK10vOpKWpaqimizU=;
-        b=eJDNMyvHRf1UfN9VIj0FRcf8IiEyuRjz9kChyBWtqX540JoURAjQGKun+iAYufUpbE
-         y2eGoZtMNW8Dx5fZ8IuzSpuXY3Nrd6a1yB6BVoL8BILdKWDzRC8g56ENoiZ2Z5bg8pUJ
-         yL4VvnFuneuEam/o782NOJf0Feg3G0YQ8a9jtIf/HGD7mTcQ+hV7mc7kFpn108kd+aSk
-         5ZUQO/+DPi66Y9diC2iTKsiKFhW/x5lkOb/lEvYSZnKXAYsiMc5TkC4A7C5NL2IpKppE
-         FfPuZiMLFHedNNgpA9WPYQFylI/Hrurntj1ewf+nn1Vxiyic9HGRhiW89UVMwfcx77qC
-         ujMw==
-X-Gm-Message-State: AOJu0Yw50NZTQsdXOBA0LZBJjWu+viv0sqLpYUIq8e+oI4/+fOwBHsXg
-	uI2tL2svQdq7TMM4g1W2duLOaeXa0b0qKDTgkj1KGPUPmNeUPvjDgmjLe7OgjVEWIXLWtBbBivq
-	MipXIbPot52D3b2zC
-X-Received: by 2002:a05:6a20:430d:b0:118:e70:6f7d with SMTP id h13-20020a056a20430d00b001180e706f7dmr10495443pzk.10.1695080635939;
-        Mon, 18 Sep 2023 16:43:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHFKOy814XSQK8TdPjNzCWuHRcOodlWCLUpNrs1TYBainKT1BB0hWvhf0Gyqm0LB88Jzxx1dQ==
-X-Received: by 2002:a05:6a20:430d:b0:118:e70:6f7d with SMTP id h13-20020a056a20430d00b001180e706f7dmr10495432pzk.10.1695080635630;
-        Mon, 18 Sep 2023 16:43:55 -0700 (PDT)
-Received: from ?IPV6:2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5? ([2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5])
-        by smtp.gmail.com with ESMTPSA id jo13-20020a170903054d00b001bc68602e54sm8823472plb.142.2023.09.18.16.43.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Sep 2023 16:43:54 -0700 (PDT)
-Message-ID: <ebfa8b5c-c09f-a1e6-e6ec-f4f3cda9de03@redhat.com>
-Date: Tue, 19 Sep 2023 09:43:46 +1000
+        d=1e100.net; s=20230601; t=1695082122; x=1695686922;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dInZugQi4I3jT3AsjQuL7R2MGGG9K+dIBnr86/ph3q8=;
+        b=a6RqAwsidGxtZlxI+JVmLINLkm1T/RBluCQl/aqwO7C1jtnpulxkUPnow+XfDjB8uT
+         JKIroy6Vieq976280usxbKXvDCG5ZjvsuFrW5fqcleGfkrnhXM6QJX1FIlPF9vJ2JoTD
+         TGE/8pWreiNCXgEwDiFVn4QOhItHyg1t8DSEKM9mcq8AEVgK2I2FbUDwn1jZioyIJDUs
+         gAAeNEoPIA/qhGtYy5mWEMrLAfd0CSdAEMafztldbbqSFILU7MWgiVDeU/U3H/LW8yRJ
+         0kb4lPgCECw+ncltPJVmrbh/KJl7LhFuFzve4jTPhG2pyV6boKRDc3vpBYTaQImbwcu7
+         Sn3g==
+X-Gm-Message-State: AOJu0YyLGsOZg1hRoUrf8CyItM5ZwbX2NzcZrUw/OXK1u4J1kPxwN2Uy
+	4Gk6E/mp8Kzb9PLiHffLncdszSQK8h4=
+X-Google-Smtp-Source: AGHT+IHHNvt5OesaYTZ4SrOkO6G/E0GpOB67x3jgD/5Z7IEbZFEyHH5t/MUiil/50JGkevI3xvv2hT/ge04=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:11cf:b0:d80:23ff:ae7f with SMTP id
+ n15-20020a05690211cf00b00d8023ffae7fmr237508ybu.4.1695082122578; Mon, 18 Sep
+ 2023 17:08:42 -0700 (PDT)
+Date: Mon, 18 Sep 2023 17:08:40 -0700
+In-Reply-To: <20230918180754.iomoaqnw75j3rrxb@amd.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [RFC PATCH v2 14/35] ACPI: Only enumerate enabled (or functional)
- devices
-To: James Morse <james.morse@arm.com>, linux-pm@vger.kernel.org,
- loongarch@lists.linux.dev, linux-acpi@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org,
- kvmarm@lists.linux.dev
-Cc: x86@kernel.org, Salil Mehta <salil.mehta@huawei.com>,
- Russell King <linux@armlinux.org.uk>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>, jianyong.wu@arm.com,
- justin.he@arm.com
-References: <20230913163823.7880-1-james.morse@arm.com>
- <20230913163823.7880-15-james.morse@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20230913163823.7880-15-james.morse@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-11-seanjc@google.com>
+ <20230918180754.iomoaqnw75j3rrxb@amd.com>
+Message-ID: <ZQjmiE7cQ/4UynNz@google.com>
+Subject: Re: [RFC PATCH v12 10/33] KVM: Set the stage for handling only shared
+ mappings in mmu_notifier events
+From: Sean Christopherson <seanjc@google.com>
+To: Michael Roth <michael.roth@amd.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
+	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Vlastimil Babka <vbabka@suse.cz>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
+	Quentin Perret <qperret@google.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Ashish Kalra <Ashish.Kalra@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 9/14/23 02:38, James Morse wrote:
-> Today the ACPI enumeration code 'visits' all devices that are present.
+On Mon, Sep 18, 2023, Michael Roth wrote:
+> On Wed, Sep 13, 2023 at 06:55:08PM -0700, Sean Christopherson wrote:
+> > Add flags to "struct kvm_gfn_range" to let notifier events target only
+> > shared and only private mappings, and write up the existing mmu_notifier
+> > events to be shared-only (private memory is never associated with a
+> > userspace virtual address, i.e. can't be reached via mmu_notifiers).
+> > 
+> > Add two flags so that KVM can handle the three possibilities (shared,
+> > private, and shared+private) without needing something like a tri-state
+> > enum.
+> > 
+> > Link: https://lore.kernel.org/all/ZJX0hk+KpQP0KUyB@google.com
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  include/linux/kvm_host.h | 2 ++
+> >  virt/kvm/kvm_main.c      | 7 +++++++
+> >  2 files changed, 9 insertions(+)
+> > 
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index d8c6ce6c8211..b5373cee2b08 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -263,6 +263,8 @@ struct kvm_gfn_range {
+> >  	gfn_t start;
+> >  	gfn_t end;
+> >  	union kvm_mmu_notifier_arg arg;
+> > +	bool only_private;
+> > +	bool only_shared;
+> >  	bool may_block;
+> >  };
+> >  bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 174de2789657..a41f8658dfe0 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -635,6 +635,13 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
+> >  			 * the second or later invocation of the handler).
+> >  			 */
+> >  			gfn_range.arg = range->arg;
+> > +
+> > +			/*
+> > +			 * HVA-based notifications aren't relevant to private
+> > +			 * mappings as they don't have a userspace mapping.
+> > +			 */
+> > +			gfn_range.only_private = false;
+> > +			gfn_range.only_shared = true;
+> >  			gfn_range.may_block = range->may_block;
 > 
-> This is a problem for arm64, where CPUs are always present, but not
-> always enabled. When a device-check occurs because the firmware-policy
-> has changed and a CPU is now enabled, the following error occurs:
-> | acpi ACPI0007:48: Enumeration failure
+> Who is supposed to read only_private/only_shared? Is it supposed to be
+> plumbed onto arch code and handled specially there?
+
+Yeah, that's the idea.  Though I don't know that it's worth using for SNP, the
+cost of checking the RMP may be higher than just eating the extra faults.
+
+> I ask because I see elsewhere you have:
 > 
-> This is ultimately because acpi_dev_ready_for_enumeration() returns
-> true for a device that is not enabled. The ACPI Processor driver
-> will not register such CPUs as they are not 'decoding their resources'.
+>     /*
+>      * If one or more memslots were found and thus zapped, notify arch code
+>      * that guest memory has been reclaimed.  This needs to be done *after*
+>      * dropping mmu_lock, as x86's reclaim path is slooooow.
+>      */
+>     if (__kvm_handle_hva_range(kvm, &hva_range).found_memslot)
+>             kvm_arch_guest_memory_reclaimed(kvm);
 > 
-> Change acpi_dev_ready_for_enumeration() to also check the enabled bit.
-> ACPI allows a device to be functional instead of maintaining the
-> present and enabled bit. Make this behaviour an explicit check with
-> a reference to the spec, and then check the present and enabled bits.
-> This is needed to avoid enumerating present && functional devices that
-> are not enabled.
+> and if there are any MMU notifier events that touch HVAs, then
+> kvm_arch_guest_memory_reclaimed()->wbinvd_on_all_cpus() will get called,
+> which causes the performance issues for SEV and SNP that Ashish had brought
+> up. Technically that would only need to happen if there are GPAs in that
+> memslot that aren't currently backed by gmem pages (and then gmem could handle
+> its own wbinvd_on_all_cpus() (or maybe clflush per-page)). 
 > 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> ---
-> If this change causes problems on deployed hardware, I suggest an
-> arch opt-in: ACPI_IGNORE_STA_ENABLED, that causes
-> acpi_dev_ready_for_enumeration() to only check the present bit.
-> ---
->   drivers/acpi/device_pm.c    |  2 +-
->   drivers/acpi/device_sysfs.c |  2 +-
->   drivers/acpi/internal.h     |  1 -
->   drivers/acpi/property.c     |  2 +-
->   drivers/acpi/scan.c         | 23 +++++++++++++----------
->   5 files changed, 16 insertions(+), 14 deletions(-)
-> 
-> diff --git a/drivers/acpi/device_pm.c b/drivers/acpi/device_pm.c
-> index f007116a8427..76c38478a502 100644
-> --- a/drivers/acpi/device_pm.c
-> +++ b/drivers/acpi/device_pm.c
-> @@ -313,7 +313,7 @@ int acpi_bus_init_power(struct acpi_device *device)
->   		return -EINVAL;
->   
->   	device->power.state = ACPI_STATE_UNKNOWN;
-> -	if (!acpi_device_is_present(device)) {
-> +	if (!acpi_dev_ready_for_enumeration(device)) {
->   		device->flags.initialized = false;
->   		return -ENXIO;
->   	}
-> diff --git a/drivers/acpi/device_sysfs.c b/drivers/acpi/device_sysfs.c
-> index b9bbf0746199..16e586d74aa2 100644
-> --- a/drivers/acpi/device_sysfs.c
-> +++ b/drivers/acpi/device_sysfs.c
-> @@ -141,7 +141,7 @@ static int create_pnp_modalias(const struct acpi_device *acpi_dev, char *modalia
->   	struct acpi_hardware_id *id;
->   
->   	/* Avoid unnecessarily loading modules for non present devices. */
-> -	if (!acpi_device_is_present(acpi_dev))
-> +	if (!acpi_dev_ready_for_enumeration(acpi_dev))
->   		return 0;
->   
->   	/*
-> diff --git a/drivers/acpi/internal.h b/drivers/acpi/internal.h
-> index 866c7c4ed233..a1b45e345bcc 100644
-> --- a/drivers/acpi/internal.h
-> +++ b/drivers/acpi/internal.h
-> @@ -107,7 +107,6 @@ int acpi_device_setup_files(struct acpi_device *dev);
->   void acpi_device_remove_files(struct acpi_device *dev);
->   void acpi_device_add_finalize(struct acpi_device *device);
->   void acpi_free_pnp_ids(struct acpi_device_pnp *pnp);
-> -bool acpi_device_is_present(const struct acpi_device *adev);
->   bool acpi_device_is_battery(struct acpi_device *adev);
->   bool acpi_device_is_first_physical_node(struct acpi_device *adev,
->   					const struct device *dev);
-> diff --git a/drivers/acpi/property.c b/drivers/acpi/property.c
-> index 413e4fcadcaf..e03f00b98701 100644
-> --- a/drivers/acpi/property.c
-> +++ b/drivers/acpi/property.c
-> @@ -1418,7 +1418,7 @@ static bool acpi_fwnode_device_is_available(const struct fwnode_handle *fwnode)
->   	if (!is_acpi_device_node(fwnode))
->   		return false;
->   
-> -	return acpi_device_is_present(to_acpi_device_node(fwnode));
-> +	return acpi_dev_ready_for_enumeration(to_acpi_device_node(fwnode));
->   }
->   
->   static const void *
-> diff --git a/drivers/acpi/scan.c b/drivers/acpi/scan.c
-> index 17ab875a7d4e..f898591ce05f 100644
-> --- a/drivers/acpi/scan.c
-> +++ b/drivers/acpi/scan.c
-> @@ -304,7 +304,7 @@ static int acpi_scan_device_check(struct acpi_device *adev)
->   	int error;
->   
->   	acpi_bus_get_status(adev);
-> -	if (acpi_device_is_present(adev)) {
-> +	if (acpi_dev_ready_for_enumeration(adev)) {
->   		/*
->   		 * This function is only called for device objects for which
->   		 * matching scan handlers exist.  The only situation in which
-> @@ -338,7 +338,7 @@ static int acpi_scan_bus_check(struct acpi_device *adev, void *not_used)
->   	int error;
->   
->   	acpi_bus_get_status(adev);
-> -	if (!acpi_device_is_present(adev)) {
-> +	if (!acpi_dev_ready_for_enumeration(adev)) {
->   		acpi_scan_device_not_enumerated(adev);
->   		return 0;
->   	}
-> @@ -1908,11 +1908,6 @@ static bool acpi_device_should_be_hidden(acpi_handle handle)
->   	return true;
->   }
->   
-> -bool acpi_device_is_present(const struct acpi_device *adev)
-> -{
-> -	return adev->status.present || adev->status.functional;
-> -}
-> -
->   static bool acpi_scan_handler_matching(struct acpi_scan_handler *handler,
->   				       const char *idstr,
->   				       const struct acpi_device_id **matchid)
-> @@ -2375,16 +2370,24 @@ EXPORT_SYMBOL_GPL(acpi_dev_clear_dependencies);
->    * acpi_dev_ready_for_enumeration - Check if the ACPI device is ready for enumeration
->    * @device: Pointer to the &struct acpi_device to check
->    *
-> - * Check if the device is present and has no unmet dependencies.
-> + * Check if the device is functional or enabled and has no unmet dependencies.
->    *
-> - * Return true if the device is ready for enumeratino. Otherwise, return false.
-> + * Return true if the device is ready for enumeration. Otherwise, return false.
->    */
->   bool acpi_dev_ready_for_enumeration(const struct acpi_device *device)
->   {
->   	if (device->flags.honor_deps && device->dep_unmet)
->   		return false;
->   
-> -	return acpi_device_is_present(device);
-> +	/*
-> +	 * ACPI 6.5's 6.3.7 "_STA (Device Status)" allows firmware to return
-> +	 * (!present && functional) for certain types of devices that should be
-> +	 * enumerated.
-> +	 */
-> +	if (!device->status.present && !device->status.enabled)
-> +		return device->status.functional;
-> +
-> +	return device->status.present && device->status.enabled;
->   }
->   EXPORT_SYMBOL_GPL(acpi_dev_ready_for_enumeration);
->   
+> Actually, even if there are shared pages in the GPA range, the
+> kvm_arch_guest_memory_reclaimed()->wbinvd_on_all_cpus() can be skipped for
+> guests that only use gmem pages for private memory. Is that acceptable?
 
-Looking at Salil's latest branch (vcpu-hotplug-RFCv2-rc7), there are 3 possible statuses:
+Yes, that was my original plan.  I may have forgotten that exact plan at one point
+or another and not communicated it well.  But the idea is definitely that if a VM
+type, a.k.a. SNP guests, is required to use gmem for private memory, then there's
+no need to blast WBINVD because barring a KVM bug, the mmu_notifier event can't
+have freed private memory, even if it *did* zap SPTEs.
 
-   0x0       when CPU isn't present
-   0xD       when CPU is present, but not enabled
-   0xF       when CPU is present and enabled
+For gmem, if KVM doesn't precisely zap only shared SPTEs for SNP (is that even
+possible to do race-free?), then KVM needs to blast WBINVD when freeing memory
+from gmem even if there are no SPTEs.  But that seems like a non-issue for a
+well-behaved setup because the odds of there being *zero* SPTEs should be nil.
 
-Previously, the ACPI device is enumerated on 0xD and 0xF. We want to avoid the enumeration
-on 0xD since the processor isn't ready for enumeration in this specific case. The changed
-check (device->status.present && device->status.enabled) can ensure it. So the addition
-of checking @device->state.functional seems irrelevant to ARM64 vCPU hot-add? I guess we
-probably want a relaxation after the condition (device->status.present || device->status.enabled)
-becomes a more strict one (device->status.present && device->status.enabled)
+> Just trying to figure out where this only_private/only_shared handling ties
+> into that (or if it's a separate thing entirely).
 
-Thanks,
-Gavin
-
+It's mostly a TDX thing.  I threw it in this series mostly to "formally" document
+that the mmu_notifier path only affects shared mappings.  If the code causes
+confusion without the TDX context, and won't be used by SNP, we can and should
+drop it from the initial merge and have it go along with the TDX series.
