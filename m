@@ -1,163 +1,656 @@
 Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8453399A
-	for <kvmarm@lists.linux.dev>; Tue, 19 Sep 2023 17:50:32 +0000 (UTC)
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-274b736caf3so2660688a91.2
-        for <kvmarm@lists.linux.dev>; Tue, 19 Sep 2023 10:50:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD808BE2
+	for <kvmarm@lists.linux.dev>; Tue, 19 Sep 2023 19:13:48 +0000 (UTC)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-27474c64aa0so110694a91.0
+        for <kvmarm@lists.linux.dev>; Tue, 19 Sep 2023 12:13:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695145832; x=1695750632; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WDqS9gCK2hWJbMjalAxBpmnQXFt//tHeeybGxVMKHYk=;
-        b=k1KUX8hO7uPkSqIg1pl6qvS9NIUaftfii9IPBLa/ePl5M8+ubNaHdhmg7kMbxSUfqX
-         jvrjCoDQ5pF1RsA3bsJCDrD9b9AI+ZekwWlS6VIMdXds0gMoTl8ghlDJWwhdMo8+cUUx
-         tqebPm4mhAHLeYsDbjiMW+7j3iSeqSLISAjCG1qeM7TzIxGYN0Rj15YSoRxaKkcoWoty
-         CaqDiONOBTMuye/E43w/wKKJbDux6NSUxJ15aFzJsYci+pncC0Q1JMxzJXYx47KIfUYE
-         c5A60PVBY7JAc2t2l67ktljbge5o/1PP7ne7aR0SkiCcp857m0KZOkSroN60XHAmJ/Ja
-         zheg==
+        d=google.com; s=20230601; t=1695150827; x=1695755627; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/BoKZ32KwsxUQ3UINg4R8i6IlvYW9M8AXX0zSojGAm4=;
+        b=TasJuGbIy+GNxv1fbaVXNZXtagI5SbghAMkEb7aaa09BrIpkUIlMtn2pA448DGwnFY
+         xQ7G2aSa6qjWV0rOOhwZRJ3ywTUmLLofHmza6c7lFngSJ4i/woXm1hmsWm7ytAIfnevC
+         wRqzfUbyruLXeNM14urvrJwujHxw+8eyBvJ0JIs8fHLscfMBpi7DUm156dTCRKHxHnhF
+         QFIY8/vsa1465DQwLzqrBGzDti3h7OxzUSqMKTMWlrZs4ff3tuZErrclBiB30ly0CHd1
+         9K0QGA4Y1ae2GO0/OM+Q9m+XE3sydCU2NU/Lr1TvfEILhh+idqreD9nhWkss/UT1L5i3
+         yeIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695145832; x=1695750632;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WDqS9gCK2hWJbMjalAxBpmnQXFt//tHeeybGxVMKHYk=;
-        b=iZrV6ltbQgxEkEaj0vX5s5irai/2JT9mJeXaEXc8GH11M/mGlg6LuGjzP7UTN1rCtT
-         k270RBPvtpArcQMmP6RN/aCE/CwY4iyLKGjQ8Yq5Jb/Axn1RLxFNk/MOMiLlFjKvHB9K
-         hj6y9+m98QObTobY9a2gKkbP620gqtoOpr8GbeTZU/gdBbrezIDFRmeyWzKBL+uXSNQ6
-         IAojl/vpqMlU3JzNdLl5+0c1+zR2W/w3nvd35xqGF9Gq/8TtnOcY3OFENcrYT7w2zTuJ
-         a5TUW5137Y08JjOvBxo+P7fpH/8Bq5/GwmtW40dZpfT1iHVxjEYIy2looyVQPKaLOm8X
-         mv5w==
-X-Gm-Message-State: AOJu0YzwaU5apYQxh0KoMu2E5SwzSBJBgt+WCpa5HAhRe/wQUDmmpTeG
-	g6ZB5txVjgj4uDthWjR1K5fU9Cfdxs91V7EqSw==
-X-Google-Smtp-Source: AGHT+IFN34HCsWwHcm0VPaYd7vZlKFFWGc9Vo3Vmh+MXi2TsekzYPzoQupklZxM0iu6EWzoGRPjs/bXawpslssLVYQ==
+        d=1e100.net; s=20230601; t=1695150827; x=1695755627;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/BoKZ32KwsxUQ3UINg4R8i6IlvYW9M8AXX0zSojGAm4=;
+        b=xTEELMV5YNC5MD9Z/8xNymHl1+S/Oau4PCu3kMiQpQTwGT/XKxW7NcSbJbUbewxisQ
+         DavaFGYW9IclG0pdWX+6ZutJfyiVclk7qAoeSu6GpeZVuUKCKVBk0zca8M9dWqYwckZC
+         EbeOscEM4lbP+JQF8USm2kz1RHDSEcjaK57zGouNm9jTWdbwXr2cRh9lY76i7dRpmeVb
+         bmUsJpVYjEs9Mjuw4IPLjHN4FVZ+3u+Wj9ZNaP3tRFxzGg2nZyHPP6KNnH/lwhHYoLIT
+         IKyAFBggSVKEWqsYI1GFizDzAESpY0TFo+cdP66RxWlkNC+Y4uClPTT47lczyw62r2yy
+         zo5A==
+X-Gm-Message-State: AOJu0Yy9m2hW3ozOLIBYL+hsFikc43UfvjRYY0MoUKDWTJKWhnZFR+Or
+	j+e5SNHzi+kNt6D51mE7wb4/kbE2MqWD4zaPdg==
+X-Google-Smtp-Source: AGHT+IHYSIEHbHJmaCdLAaNpjmkKhOqgXDOedC82RMItc2VlqXfAmzhsKN0kZMrNHaxd+LKsgRiePbdSSmg9p1vbNA==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a17:90a:fa12:b0:268:1d63:b9ae with
- SMTP id cm18-20020a17090afa1200b002681d63b9aemr8189pjb.3.1695145831933; Tue,
- 19 Sep 2023 10:50:31 -0700 (PDT)
-Date: Tue, 19 Sep 2023 10:50:16 -0700
-In-Reply-To: <20230919175017.538312-1-jingzhangos@google.com>
+ (user=jingzhangos job=sendgmr) by 2002:a17:90b:3a86:b0:26b:43f1:e69f with
+ SMTP id om6-20020a17090b3a8600b0026b43f1e69fmr86598pjb.1.1695150827508; Tue,
+ 19 Sep 2023 12:13:47 -0700 (PDT)
+Date: Tue, 19 Sep 2023 12:13:42 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230919175017.538312-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
-Message-ID: <20230919175017.538312-5-jingzhangos@google.com>
-Subject: [PATCH v1 4/4] KVM: arm64: Reject attempts to set invalid debug arch version
+Message-ID: <20230919191343.693415-1-jingzhangos@google.com>
+Subject: [PATCH v2] KVM: arm64: selftests: Test pointer authentication support
+ in KVM guest
 From: Jing Zhang <jingzhangos@google.com>
 To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
 	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>
-Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, 
-	Suraj Jitindar Singh <surajjs@amazon.com>, Cornelia Huck <cohuck@redhat.com>, 
-	Shaoqin Huang <shahuang@redhat.com>, Jing Zhang <jingzhangos@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Raghavendra Rao Ananta <rananta@google.com>, Colton Lewis <coltonlewis@google.com>, 
+	Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Oliver Upton <oliver.upton@linux.dev>
+Verify the KVM guest PAuth support on H/W with FEAT_PAuth. This test
+will be skipped on H/W without FEAT_PAuth.
+Following PAuth instructions are tested:
+paciza, pacizb, pacdza, pacdzb, autiza, autizb, autdza, autdzb,
+pacga, xpaclri, xpaci, xpacd
+It also shows the implemented algorithm for both address authentication
+and generic code authentication.
 
-The debug architecture is mandatory in ARMv8, so KVM should not allow
-userspace to configure a vCPU with less than that. Of course, this isn't
-handled elegantly by the generic ID register plumbing, as the respective
-ID register fields have a nonzero starting value.
-
-Add an explicit check for debug versions less than v8 of the
-architecture.
-
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 32 +++++++++++++++++++++++++++++---
- 1 file changed, 29 insertions(+), 3 deletions(-)
+ tools/arch/arm64/include/asm/sysreg.h         |   5 +
+ tools/testing/selftests/kvm/Makefile          |   5 +
+ .../selftests/kvm/aarch64/pauth_test.c        | 511 ++++++++++++++++++
+ .../selftests/kvm/include/aarch64/processor.h |   2 +
+ 4 files changed, 523 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/pauth_test.c
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 4dcc9272fbb8..fdebd9d042c3 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1216,8 +1216,14 @@ static s64 kvm_arm64_ftr_safe_value(u32 id, const struct arm64_ftr_bits *ftrp,
- 	/* Some features have different safe value type in KVM than host features */
- 	switch (id) {
- 	case SYS_ID_AA64DFR0_EL1:
--		if (kvm_ftr.shift == ID_AA64DFR0_EL1_PMUVer_SHIFT)
-+		switch (kvm_ftr.shift) {
-+		case ID_AA64DFR0_EL1_PMUVer_SHIFT:
- 			kvm_ftr.type = FTR_LOWER_SAFE;
-+			break;
-+		case ID_AA64DFR0_EL1_DebugVer_SHIFT:
-+			kvm_ftr.type = FTR_LOWER_SAFE;
-+			break;
-+		}
- 		break;
- 	case SYS_ID_DFR0_EL1:
- 		if (kvm_ftr.shift == ID_DFR0_EL1_PerfMon_SHIFT)
-@@ -1476,14 +1482,22 @@ static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
- 	return val;
- }
+diff --git a/tools/arch/arm64/include/asm/sysreg.h b/tools/arch/arm64/include/asm/sysreg.h
+index 7640fa27be94..9d903eb8388c 100644
+--- a/tools/arch/arm64/include/asm/sysreg.h
++++ b/tools/arch/arm64/include/asm/sysreg.h
+@@ -179,6 +179,7 @@
  
-+#define ID_REG_LIMIT_FIELD_ENUM(val, reg, field, limit)			       \
-+({									       \
-+	u64 __f_val = FIELD_GET(reg##_##field##_MASK, val);		       \
-+	(val) &= ~reg##_##field##_MASK;					       \
-+	(val) |= FIELD_PREP(reg##_##field##_MASK,			       \
-+			min(__f_val, (u64)reg##_##field##_##limit));	       \
-+	(val);								       \
-+})
+ #define SYS_ID_AA64ISAR0_EL1		sys_reg(3, 0, 0, 6, 0)
+ #define SYS_ID_AA64ISAR1_EL1		sys_reg(3, 0, 0, 6, 1)
++#define SYS_ID_AA64ISAR2_EL1		sys_reg(3, 0, 0, 6, 2)
+ 
+ #define SYS_ID_AA64MMFR0_EL1		sys_reg(3, 0, 0, 7, 0)
+ #define SYS_ID_AA64MMFR1_EL1		sys_reg(3, 0, 0, 7, 1)
+@@ -764,6 +765,10 @@
+ #define ID_AA64ISAR1_GPI_NI			0x0
+ #define ID_AA64ISAR1_GPI_IMP_DEF		0x1
+ 
++/* id_aa64isar2 */
++#define ID_AA64ISAR2_APA3_SHIFT		12
++#define ID_AA64ISAR2_GPA3_SHIFT		8
 +
- static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
- 					  const struct sys_reg_desc *rd)
- {
- 	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
+ /* id_aa64pfr0 */
+ #define ID_AA64PFR0_CSV3_SHIFT		60
+ #define ID_AA64PFR0_CSV2_SHIFT		56
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index c692cc86e7da..0fe40fcb02ec 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -143,6 +143,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
+ TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
+ TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
+ TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
++TEST_GEN_PROGS_aarch64 += aarch64/pauth_test
+ TEST_GEN_PROGS_aarch64 += aarch64/psci_test
+ TEST_GEN_PROGS_aarch64 += aarch64/smccc_filter
+ TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
+@@ -212,6 +213,10 @@ ifeq ($(ARCH),s390)
+ 	CFLAGS += -march=z10
+ endif
  
- 	/* Limit debug to ARMv8.0 */
--	val &= ~ID_AA64DFR0_EL1_DebugVer_MASK;
--	val |= SYS_FIELD_PREP_ENUM(ID_AA64DFR0_EL1, DebugVer, IMP);
-+	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, IMP);
++ifeq ($(ARCH),arm64)
++	CFLAGS += -march=armv8.3-a
++endif
++
+ no-pie-option := $(call try-run, echo 'int main(void) { return 0; }' | \
+         $(CC) -Werror $(CFLAGS) -no-pie -x c - -o "$$TMP", -no-pie)
  
- 	/*
- 	 * Only initialize the PMU version if the vCPU was configured with one.
-@@ -1503,6 +1517,7 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
- 			       const struct sys_reg_desc *rd,
- 			       u64 val)
- {
-+	u8 debugver = SYS_FIELD_GET(ID_AA64DFR0_EL1, DebugVer, val);
- 	u8 pmuver = SYS_FIELD_GET(ID_AA64DFR0_EL1, PMUVer, val);
- 
- 	/*
-@@ -1522,6 +1537,13 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
- 	if (pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
- 		val &= ~ID_AA64DFR0_EL1_PMUVer_MASK;
- 
+diff --git a/tools/testing/selftests/kvm/aarch64/pauth_test.c b/tools/testing/selftests/kvm/aarch64/pauth_test.c
+new file mode 100644
+index 000000000000..c40c59e4139a
+--- /dev/null
++++ b/tools/testing/selftests/kvm/aarch64/pauth_test.c
+@@ -0,0 +1,511 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * pauth_test - Test for KVM guest pointer authentication.
++ * Following PAuth instructions are tested:
++ * paciza, pacizb, pacdza, pacdzb, autiza, autizb, autdza, autdzb,
++ * pacga, xpaclri, xpaci, xpacd
++ * It also shows the implemented algorithm for both address authentication
++ * and generic code authentication.
++ *
++ * Copyright (c) 2023 Google LLC.
++ *
++ */
++
++#define _GNU_SOURCE
++
++#include <sched.h>
++
++#include "kvm_util.h"
++#include "processor.h"
++#include "test_util.h"
++
++#define KEY1_LO		0x0123456789abcdefUL
++#define KEY1_HI		0x123456789abcdef0UL
++#define KEY2_LO		0x23456789abcdef01UL
++#define KEY2_HI		0x3456789abcdef012UL
++#define KEY3_LO		0x456789abcdef0123UL
++#define KEY3_HI		0x56789abcdef01234UL
++#define KEY4_LO		0x6789abcdef012345UL
++#define KEY4_HI		0x789abcdef0123456UL
++#define KEY5_LO		0x89abcdef01234567UL
++#define KEY5_HI		0x9abcdef012345678UL
++
++enum uc_args {
++	WAIT_MIGRATION,
++	ADDR_PAUTH_ALGO,
++	GENERIC_PAUTH_ALGO,
++	FAIL_GUEST_PAUTH,
++};
++
++enum pauth_algo {
++	QARMA5,
++	QARMA3,
++	PACIMP,
++	NOALGO,
++};
++
++static const char *const algo_string[] = {
++	"QARMA5", "QARMA3", "PACIMP", "Undefined",
++};
++
++#define DEFINE_SIGN_FUNC(INSTR)						\
++	static size_t INSTR##_sign(size_t ptr)				\
++	{								\
++		__asm__ __volatile__(					\
++			#INSTR" %[p]"					\
++			: [p] "+r" (ptr)				\
++		);							\
++		return ptr;						\
++	}
++
++DEFINE_SIGN_FUNC(paciza)
++DEFINE_SIGN_FUNC(pacizb)
++DEFINE_SIGN_FUNC(pacdza)
++DEFINE_SIGN_FUNC(pacdzb)
++
++static size_t pacga_sign(size_t ptr)
++{
++	size_t dest = 0;
++
++	__asm__ __volatile__(
++		"pacga %[d], %[p], %[m]"
++		: [d] "=r" (dest)
++		: [p] "r" (ptr), [m] "r" (0)
++	);
++
++	return dest;
++}
++
++#define DEFINE_AUTH_STRIP_FUNC(AUTH, STRIP)				\
++	static size_t AUTH##_auth_##STRIP##_strip(size_t ptr)		\
++	{								\
++		__asm__ __volatile__(					\
++			#AUTH" %[p]\n"					\
++			#STRIP" %[p]\n"					\
++			: [p] "+r" (ptr)				\
++		);							\
++		return ptr;						\
++	}
++
++DEFINE_AUTH_STRIP_FUNC(autiza, xpaci)
++DEFINE_AUTH_STRIP_FUNC(autizb, xpaci)
++DEFINE_AUTH_STRIP_FUNC(autdza, xpacd)
++DEFINE_AUTH_STRIP_FUNC(autdzb, xpacd)
++
++#define GUEST_ALGO(type, algo)	GUEST_SYNC_ARGS(type, algo, 0, 0, 0)
++
++static void check_pauth_algorithms(void)
++{
++	uint64_t isar1 = read_sysreg_s(SYS_ID_AA64ISAR1_EL1);
++	uint64_t isar2 = read_sysreg_s(SYS_ID_AA64ISAR2_EL1);
++	enum pauth_algo algo;
++
++	/* Check generic authentication algorithm */
++	if (isar1 & ARM64_FEATURE_MASK(ID_AA64ISAR1_GPI))
++		algo = PACIMP;
++	else if (isar1 & ARM64_FEATURE_MASK(ID_AA64ISAR1_GPA))
++		algo = QARMA5;
++	else if (isar2 & ARM64_FEATURE_MASK(ID_AA64ISAR2_GPA3))
++		algo = QARMA3;
++	else
++		algo = NOALGO;
++
++	GUEST_ALGO(GENERIC_PAUTH_ALGO, algo);
++
++	/* Check address authentication algorithm */
++	if (isar1 & ARM64_FEATURE_MASK(ID_AA64ISAR1_API))
++		algo = PACIMP;
++	else if (isar1 & ARM64_FEATURE_MASK(ID_AA64ISAR1_APA))
++		algo = QARMA5;
++	else if (isar2 & ARM64_FEATURE_MASK(ID_AA64ISAR2_APA3))
++		algo = QARMA3;
++	else
++		algo = NOALGO;
++
++	GUEST_ALGO(ADDR_PAUTH_ALGO, algo);
++}
++
++/* Setup PAuth keys and check their retainability */
++static void check_keys_retainable(void)
++{
++	bool retainable = true;
++
++	/* Address */
++	write_sysreg_s(KEY1_LO, SYS_APIAKEYLO_EL1);
++	write_sysreg_s(KEY1_HI, SYS_APIAKEYHI_EL1);
++	write_sysreg_s(KEY2_LO, SYS_APIBKEYLO_EL1);
++	write_sysreg_s(KEY2_HI, SYS_APIBKEYHI_EL1);
++	/* Data */
++	write_sysreg_s(KEY3_LO, SYS_APDAKEYLO_EL1);
++	write_sysreg_s(KEY3_HI, SYS_APDAKEYHI_EL1);
++	write_sysreg_s(KEY4_LO, SYS_APDBKEYLO_EL1);
++	write_sysreg_s(KEY4_HI, SYS_APDBKEYHI_EL1);
++	/* Generic */
++	write_sysreg_s(KEY5_LO, SYS_APGAKEYLO_EL1);
++	write_sysreg_s(KEY5_HI, SYS_APGAKEYHI_EL1);
++	isb();
++
++	GUEST_SYNC(WAIT_MIGRATION);
++
++	/* Address */
++	retainable = retainable && (read_sysreg_s(SYS_APIAKEYLO_EL1) == KEY1_LO);
++	retainable = retainable && (read_sysreg_s(SYS_APIAKEYHI_EL1) == KEY1_HI);
++	retainable = retainable && (read_sysreg_s(SYS_APIBKEYLO_EL1) == KEY2_LO);
++	retainable = retainable && (read_sysreg_s(SYS_APIBKEYHI_EL1) == KEY2_HI);
++	/* Data */
++	retainable = retainable && (read_sysreg_s(SYS_APDAKEYLO_EL1) == KEY3_LO);
++	retainable = retainable && (read_sysreg_s(SYS_APDAKEYHI_EL1) == KEY3_HI);
++	retainable = retainable && (read_sysreg_s(SYS_APDBKEYLO_EL1) == KEY4_LO);
++	retainable = retainable && (read_sysreg_s(SYS_APDBKEYHI_EL1) == KEY4_HI);
++	/* Generic */
++	retainable = retainable && (read_sysreg_s(SYS_APGAKEYLO_EL1) == KEY5_LO);
++	retainable = retainable && (read_sysreg_s(SYS_APGAKEYHI_EL1) == KEY5_HI);
++
++	GUEST_ASSERT(retainable);
++}
++
++#define ADDR_START	0x8000
++#define ADDR_END	0x8008
++
++static void test_same_keys(void)
++{
++	/* Set the same keys */
++	write_sysreg_s(KEY1_LO, SYS_APIAKEYLO_EL1);
++	write_sysreg_s(KEY1_HI, SYS_APIAKEYHI_EL1);
++	write_sysreg_s(KEY1_LO, SYS_APIBKEYLO_EL1);
++	write_sysreg_s(KEY1_HI, SYS_APIBKEYHI_EL1);
++	write_sysreg_s(KEY1_LO, SYS_APDAKEYLO_EL1);
++	write_sysreg_s(KEY1_HI, SYS_APDAKEYHI_EL1);
++	write_sysreg_s(KEY1_LO, SYS_APDBKEYLO_EL1);
++	write_sysreg_s(KEY1_HI, SYS_APDBKEYHI_EL1);
++	isb();
++
++	/* Same algorithm, same address, same keys should have same PAC */
++	for (size_t i = ADDR_START; i < ADDR_END; i++) {
++		/* Assert if the PAuth instruction did nothing */
++		GUEST_ASSERT(paciza_sign(i) != i);
++
++		GUEST_ASSERT(paciza_sign(i) == pacizb_sign(i));
++		GUEST_ASSERT(paciza_sign(i) == pacdza_sign(i));
++		GUEST_ASSERT(paciza_sign(i) == pacdzb_sign(i));
++	}
++}
++
++static void test_different_keys(void)
++{
++	write_sysreg_s(KEY1_LO, SYS_APIAKEYLO_EL1);
++	write_sysreg_s(KEY1_HI, SYS_APIAKEYHI_EL1);
++	write_sysreg_s(KEY2_LO, SYS_APIBKEYLO_EL1);
++	write_sysreg_s(KEY2_HI, SYS_APIBKEYHI_EL1);
++	write_sysreg_s(KEY3_LO, SYS_APDAKEYLO_EL1);
++	write_sysreg_s(KEY3_HI, SYS_APDAKEYHI_EL1);
++	write_sysreg_s(KEY4_LO, SYS_APDBKEYLO_EL1);
++	write_sysreg_s(KEY4_HI, SYS_APDBKEYHI_EL1);
++	isb();
++
++	/* Same algorithm, same address, different keys should have different PAc */
++	for (size_t i = ADDR_START; i < ADDR_END; i++) {
++		/* Assert if the PAuth instruction did nothing */
++		GUEST_ASSERT(paciza_sign(i) != i);
++
++		GUEST_ASSERT(paciza_sign(i) != pacizb_sign(i));
++		GUEST_ASSERT(paciza_sign(i) != pacdza_sign(i));
++		GUEST_ASSERT(paciza_sign(i) != pacdzb_sign(i));
++	}
++}
++
++static void test_generic_sign(void)
++{
++	size_t ga_signs[ADDR_END - ADDR_START];
++	size_t i;
++
++	write_sysreg_s(KEY1_LO, SYS_APGAKEYLO_EL1);
++	write_sysreg_s(KEY1_HI, SYS_APGAKEYHI_EL1);
++	isb();
++
++	for (i = ADDR_START; i < ADDR_END; i++) {
++		ga_signs[i - ADDR_START] = pacga_sign(i);
++		/* Assert if the PAuth instruction did nothing */
++		GUEST_ASSERT(ga_signs[i - ADDR_START] != i);
++	}
++
++	write_sysreg_s(KEY5_LO, SYS_APGAKEYLO_EL1);
++	write_sysreg_s(KEY5_HI, SYS_APGAKEYHI_EL1);
++	isb();
++
++	/* Different key should have different sign */
++	for (i = ADDR_START; i < ADDR_END; i++) {
++		/* Assert if the PAuth instruction did nothing */
++		GUEST_ASSERT(pacga_sign(i) != i);
++		GUEST_ASSERT(pacga_sign(i) != ga_signs[i - ADDR_START]);
++	}
++}
++
++static void test_ia_auth_strip(void)
++{
++	size_t ptr = ADDR_START;
++
++	write_sysreg_s(KEY2_LO, SYS_APIAKEYLO_EL1);
++	write_sysreg_s(KEY2_HI, SYS_APIAKEYHI_EL1);
++	isb();
++
++	ptr = paciza_sign(ptr);
++
++	write_sysreg_s(KEY1_LO, SYS_APIAKEYLO_EL1);
++	write_sysreg_s(KEY1_HI, SYS_APIAKEYHI_EL1);
++	isb();
++
 +	/*
-+	 * ID_AA64DFR0_EL1.DebugVer is one of those awkward fields with a
-+	 * nonzero minimum safe value.
++	 * Since key has changed, the authentication would fail and be trapped.
++	 * In the trap handler, the pauth would be disabled to avoid future trap
++	 * for auth failure.
 +	 */
-+	if (debugver < ID_AA64DFR0_EL1_DebugVer_IMP)
-+		return -EINVAL;
++	ptr = autiza_auth_xpaci_strip(ptr);
 +
- 	return set_id_reg(vcpu, rd, val);
- }
- 
-@@ -1543,6 +1565,7 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
- 			   u64 val)
- {
- 	u8 perfmon = SYS_FIELD_GET(ID_DFR0_EL1, PerfMon, val);
-+	u8 copdbg = SYS_FIELD_GET(ID_DFR0_EL1, CopDbg, val);
- 
- 	if (perfmon == ID_DFR0_EL1_PerfMon_IMPDEF) {
- 		val &= ~ID_DFR0_EL1_PerfMon_MASK;
-@@ -1558,6 +1581,9 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
- 	if (perfmon != 0 && perfmon < ID_DFR0_EL1_PerfMon_PMUv3)
- 		return -EINVAL;
- 
-+	if (copdbg < ID_DFR0_EL1_CopDbg_Armv8)
-+		return -EINVAL;
++	/* Assert if the strip instruction didn't work */
++	GUEST_ASSERT(ptr == ADDR_START);
++}
 +
- 	return set_id_reg(vcpu, rd, val);
- }
++static void test_ib_auth_strip(void)
++{
++	size_t ptr = ADDR_START;
++
++	write_sysreg_s(KEY3_LO, SYS_APIBKEYLO_EL1);
++	write_sysreg_s(KEY3_HI, SYS_APIBKEYHI_EL1);
++	isb();
++
++	ptr = pacizb_sign(ptr);
++
++	write_sysreg_s(KEY2_LO, SYS_APIBKEYLO_EL1);
++	write_sysreg_s(KEY2_HI, SYS_APIBKEYHI_EL1);
++	isb();
++
++	/*
++	 * Since key has changed, the authentication would fail and be trapped.
++	 * In the trap handler, the pauth would be disabled to avoid future trap
++	 * for auth failure.
++	 */
++	ptr = autizb_auth_xpaci_strip(ptr);
++
++	/* Assert if the strip instruction didn't work */
++	GUEST_ASSERT(ptr == ADDR_START);
++}
++
++static void test_da_auth_strip(void)
++{
++	size_t ptr = ADDR_START;
++
++	write_sysreg_s(KEY4_LO, SYS_APDAKEYLO_EL1);
++	write_sysreg_s(KEY4_HI, SYS_APDAKEYHI_EL1);
++	isb();
++
++	ptr = pacdza_sign(ptr);
++
++	write_sysreg_s(KEY3_LO, SYS_APDAKEYLO_EL1);
++	write_sysreg_s(KEY3_HI, SYS_APDAKEYHI_EL1);
++	isb();
++
++	/*
++	 * Since key has changed, the authentication would fail and be trapped.
++	 * In the trap handler, the pauth would be disabled to avoid future trap
++	 * for auth failure.
++	 */
++	ptr = autdza_auth_xpacd_strip(ptr);
++
++	/* Assert if the strip instruction didn't work */
++	GUEST_ASSERT(ptr == ADDR_START);
++}
++
++static void test_db_auth_strip(void)
++{
++	size_t ptr = ADDR_START;
++
++	write_sysreg_s(KEY5_LO, SYS_APDBKEYLO_EL1);
++	write_sysreg_s(KEY5_HI, SYS_APDBKEYHI_EL1);
++	isb();
++
++	ptr = pacdzb_sign(ptr);
++
++	write_sysreg_s(KEY4_LO, SYS_APDBKEYLO_EL1);
++	write_sysreg_s(KEY4_HI, SYS_APDBKEYHI_EL1);
++	isb();
++
++	/*
++	 * Since key has changed, the authentication would fail and be trapped.
++	 * In the trap handler, the pauth would be disabled to avoid future trap
++	 * for auth failure.
++	 */
++	ptr = autdzb_auth_xpacd_strip(ptr);
++
++	/* Assert if the strip instruction didn't work */
++	GUEST_ASSERT(ptr == ADDR_START);
++}
++
++static void test_auth_strip(void)
++{
++	test_ia_auth_strip();
++	test_ib_auth_strip();
++	test_da_auth_strip();
++	test_db_auth_strip();
++
++	/*
++	 * If all authentication instructions have failed, the PAuth enable bits
++	 * in SCTLR should have been cleared in the trap handler.
++	 * Otherwise, the auth instructions didn't work as expected.
++	 */
++	if (read_sysreg(sctlr_el1) &
++	    (SCTLR_ELx_ENIA | SCTLR_ELx_ENIB | SCTLR_ELx_ENDA | SCTLR_ELx_ENDB))
++		GUEST_ASSERT(0);
++}
++
++static void guest_code(void)
++{
++	uint64_t sctlr = read_sysreg(sctlr_el1);
++
++	check_pauth_algorithms();
++	check_keys_retainable();
++
++	/* Enable PAuth */
++	sctlr |= SCTLR_ELx_ENIA | SCTLR_ELx_ENIB | SCTLR_ELx_ENDA | SCTLR_ELx_ENDB;
++	write_sysreg(sctlr, sctlr_el1);
++	isb();
++
++	test_same_keys();
++	test_different_keys();
++	test_generic_sign();
++	test_auth_strip();
++
++	GUEST_DONE();
++}
++
++/* Guest will get an unknown exception (UNDEF) if guest PAuth is not enabled. */
++static void guest_unknown_handler(struct ex_regs *regs)
++{
++	GUEST_SYNC(FAIL_GUEST_PAUTH);
++	GUEST_DONE();
++}
++
++/* Guest will get a FPAC exception if KVM support guest PAuth */
++static void guest_fpac_handler(struct ex_regs *regs)
++{
++	uint64_t sctlr = read_sysreg(sctlr_el1);
++
++	if (sctlr & SCTLR_ELx_ENIA) {
++		sctlr &= ~SCTLR_ELx_ENIA;
++		write_sysreg(sctlr, sctlr_el1);
++		isb();
++	} else if (sctlr & SCTLR_ELx_ENIB) {
++		sctlr &= ~SCTLR_ELx_ENIB;
++		write_sysreg(sctlr, sctlr_el1);
++		isb();
++	} else if (sctlr & SCTLR_ELx_ENDA) {
++		sctlr &= ~SCTLR_ELx_ENDA;
++		write_sysreg(sctlr, sctlr_el1);
++		isb();
++	} else if (sctlr & SCTLR_ELx_ENDB) {
++		sctlr &= ~SCTLR_ELx_ENDB;
++		write_sysreg(sctlr, sctlr_el1);
++		isb();
++	}
++}
++
++int main(void)
++{
++	struct kvm_vcpu_init init;
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++	struct ucall uc;
++	cpu_set_t cpu_mask;
++	bool guest_done = false;
++
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PTRAUTH_ADDRESS));
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PTRAUTH_GENERIC));
++
++	vm = vm_create(1);
++
++	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
++	init.features[0] |= ((1 << KVM_ARM_VCPU_PTRAUTH_ADDRESS) |
++			     (1 << KVM_ARM_VCPU_PTRAUTH_GENERIC));
++
++	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
++
++	vm_init_descriptor_tables(vm);
++	vcpu_init_descriptor_tables(vcpu);
++
++	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
++				ESR_EC_UNKNOWN, guest_unknown_handler);
++	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
++				ESR_EC_FPAC, guest_fpac_handler);
++
++	ksft_print_header();
++	ksft_set_plan(3);
++
++	while (!guest_done) {
++		vcpu_run(vcpu);
++
++		switch (get_ucall(vcpu, &uc)) {
++		case UCALL_ABORT:
++			REPORT_GUEST_ASSERT(uc);
++			break;
++		case UCALL_SYNC:
++			switch (uc.args[1]) {
++			case WAIT_MIGRATION:
++				sched_getaffinity(0, sizeof(cpu_mask), &cpu_mask);
++				CPU_CLR(sched_getcpu(), &cpu_mask);
++				sched_setaffinity(0, sizeof(cpu_mask), &cpu_mask);
++				break;
++			case FAIL_GUEST_PAUTH:
++				/*
++				 * KVM has already claimed that both itself and
++				 * HW support PAuth, but the guest still got the
++				 * UNDEF with PAuth instruction.
++				 * Usually this shouldn't happen unless KVM
++				 * screwed up the emulation somehow or the PAuth
++				 * was not enabled for the guest.
++				 */
++				TEST_FAIL("Geust PAuth was not enabled!\n");
++				break;
++			case GENERIC_PAUTH_ALGO: {
++				enum pauth_algo algo = uc.args[2];
++
++				if (algo == NOALGO) {
++					ksft_print_msg("Make sure the VCPU feature is enabled:\n");
++					ksft_print_msg("KVM_ARM_VCPU_PTRAUTH_GENERIC\n");
++					TEST_FAIL("No generic PAuth algorithm in guest!\n");
++				}
++
++				ksft_test_result_pass("Generic PAuth Algorithm: %s\n",
++						      algo_string[algo]);
++				break;
++			}
++			case ADDR_PAUTH_ALGO: {
++				enum pauth_algo algo = uc.args[2];
++
++				if (algo == NOALGO) {
++					ksft_print_msg("Make sure the VCPU feature is enabled:\n");
++					ksft_print_msg("KVM_ARM_VCPU_PTRAUTH_ADDRESS\n");
++					TEST_FAIL("No address PAuth algorithm in guest!\n");
++				}
++
++				ksft_test_result_pass("Address PAuth Algorithm: %s\n",
++						      algo_string[algo]);
++				break;
++			}
++			default:
++				ksft_print_msg("Unexpected guest sync arg: 0x%016llx\n",
++					       uc.args[1]);
++				break;
++			}
++			break;
++		case UCALL_DONE:
++			ksft_test_result_pass("Guest PAuth\n");
++			guest_done = true;
++			break;
++		default:
++			TEST_FAIL("Unexpected ucall: %lu", uc.cmd);
++		}
++	}
++
++	ksft_finished();
++	kvm_vm_free(vm);
++}
+diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+index cb537253a6b9..f8d541af9c06 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/processor.h
++++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+@@ -104,7 +104,9 @@ enum {
+ #define ESR_EC_SHIFT		26
+ #define ESR_EC_MASK		(ESR_EC_NUM - 1)
  
++#define ESR_EC_UNKNOWN		0x00
+ #define ESR_EC_SVC64		0x15
++#define ESR_EC_FPAC		0x1c
+ #define ESR_EC_IABT		0x21
+ #define ESR_EC_DABT		0x25
+ #define ESR_EC_HW_BP_CURRENT	0x31
+
+base-commit: 52a93d39b17dc7eb98b6aa3edb93943248e03b2f
 -- 
-2.42.0.459.ge4e396fd5e-goog
+2.41.0.640.ga95def55d0-goog
 
