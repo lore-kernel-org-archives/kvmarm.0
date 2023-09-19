@@ -1,180 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E8C03F817
-	for <kvmarm@lists.linux.dev>; Tue, 19 Sep 2023 16:31:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7114C433C9;
-	Tue, 19 Sep 2023 16:31:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695141067;
-	bh=5a+elSpKhcGOSKULvNRpmeAVuPK0jEBaAiyUS/Utgg0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XSUaJcOxScCOSgohi0fqmrftMabZq/HFkz+n4molps3vikQJsgrw7cW9grFP9lhrb
-	 4i0C1tlI8z4EBERM4kQHjZO88Q8nclyKZBNOZIw+vmji6EogCZryDQxntBBzLORgwS
-	 Xed3ufZOP4d9qCi5R9s5twMAkSwoKWLElMOKEzmDOV2b1mbC0RVvGd6SjKh7amGIVc
-	 BXCM505VxcKtVPt+9/vVdCCj3IHI/3iReL9EMe/opdXJaEcSdoTsacjZ9MJHd/qCTc
-	 GWcO2qTIhLkGyYFOoOIkN2N6/3lQkkurLrxOZszOFhIVRNRZbu5hdYw39t6D59537E
-	 Ay/xgyYSYA5Kw==
-Received: from [104.132.45.96] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qidcv-00EOIj-DZ;
-	Tue, 19 Sep 2023 17:31:05 +0100
-Date: Tue, 19 Sep 2023 17:31:04 +0100
-Message-ID: <87bkdy3z1z.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Miguel Luis <miguel.luis@oracle.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>
-Subject: Re: [PATCH 2/3] arm64/kvm: Fine grain _EL2 system registers list that affect nested virtualization
-In-Reply-To: <00087AB1-3F94-4D3B-8498-3CE3AEDFE6FA@oracle.com>
-References: <20230913185209.32282-1-miguel.luis@oracle.com>
-	<20230913185209.32282-3-miguel.luis@oracle.com>
-	<868r93es5a.wl-maz@kernel.org>
-	<00087AB1-3F94-4D3B-8498-3CE3AEDFE6FA@oracle.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EFB828E24
+	for <kvmarm@lists.linux.dev>; Tue, 19 Sep 2023 17:50:24 +0000 (UTC)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-690bb524a97so1512113b3a.2
+        for <kvmarm@lists.linux.dev>; Tue, 19 Sep 2023 10:50:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695145823; x=1695750623; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=kWnTlx7Gdnm5Vz0/SIGYkkfnd0U6Pz1ne+euXaONdhM=;
+        b=q0ggXUvTsBxVDfzeuy85smPh1e+Z9OxSRezICVENlNfeoHlnrGyim9ZFGnZYYXcpML
+         Yf+1JrkwRZ44n9XAqtzjI68m9xvXYZBAQ8OdGYGXzNWi2ZxP2sTT3aRfeVQGV3ecUS2A
+         OdxYdEgCGQ0pgGPbRFxqIqIUy/9wkhf2CrAlGaKf9S/7g7iO55/PKv7ewimDKCRZNLNV
+         45zW+GWSfkq43kXR0VDWkKpfZKJb2PFJUxk0BjbKYeh1c71eC0Gt01mq4NgbimzdG7KQ
+         W8208313COB62qtGW5Jq3IrTTCoq4SKxKrWYyzhPqspE7Uj0B6W+pyREDngZa8+max4p
+         XczQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695145823; x=1695750623;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kWnTlx7Gdnm5Vz0/SIGYkkfnd0U6Pz1ne+euXaONdhM=;
+        b=qP+hdzAE33ShT5X1g+5hjMeJUjkiQiwaXxnEcorYF45A+iXR7DSz9dZawh8Ir1rSxT
+         F/XOfC6asc2ihwCZyfQc0xlGRkiNhkhoOGPvLXoqjrQp//kF4hbWZG2cHGiZ4VZg5zYI
+         Idxp3h3C/CniDKTMIrnjsvKoM5C5oIi0myYjLGJbJ+DTtj5WHJQm3ybNl24XuANjxHYP
+         t8AH+iCUXEyn+3qn9exR1eRoy4nY5RKRUcCokCR/79l/QVF29DFO1XgZQXqODE/hbGHE
+         cvaRmRanFwVlD5/NSSMyHWvDHvpmT+f6bby08mGUISNztNth0RJb3jZ0rAc7B3mkPKbo
+         aGAg==
+X-Gm-Message-State: AOJu0Yx3XWBPz4RwTNlRtZ/SsPUigQ9PWXw8t+UkibiphejCToGXjst+
+	zZklE02VyZzf6tWyAlGA+GDZ/tV6YWV+KfmPhQ==
+X-Google-Smtp-Source: AGHT+IEeHiio7e1vKdIgqVCmVLTA7YryY2gvJQIIbbaxBDphMBRHHqcu+bML2gSb43lnX/ewy3LJgGjLyxr0jFKanA==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a05:6a00:2d84:b0:68f:f868:a4fe with
+ SMTP id fb4-20020a056a002d8400b0068ff868a4femr10033pfb.2.1695145823586; Tue,
+ 19 Sep 2023 10:50:23 -0700 (PDT)
+Date: Tue, 19 Sep 2023 10:50:12 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 104.132.45.96
-X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
+Message-ID: <20230919175017.538312-1-jingzhangos@google.com>
+Subject: [PATCH v1 0/4] Get writable masks for feature ID from userspace
+From: Jing Zhang <jingzhangos@google.com>
+To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, 
+	Suraj Jitindar Singh <surajjs@amazon.com>, Cornelia Huck <cohuck@redhat.com>, 
+	Shaoqin Huang <shahuang@redhat.com>, Jing Zhang <jingzhangos@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 19 Sep 2023 15:54:53 +0100,
-Miguel Luis <miguel.luis@oracle.com> wrote:
->=20
-> Hi Marc,
->=20
-> > On 18 Sep 2023, at 09:40, Marc Zyngier <maz@kernel.org> wrote:
-> >=20
-> > Hi Miguel,
-> >=20
-> > On Wed, 13 Sep 2023 19:52:07 +0100,
-> > Miguel Luis <miguel.luis@oracle.com> wrote:
-> >>=20
-> >> Some _EL1 registers got included in the _EL2 ranges, which are not
-> >> affected by NV. Remove them and fine grain the ranges to exclusively
-> >> include the _EL2 ones.
-> >>=20
-> >> Signed-off-by: Miguel Luis <miguel.luis@oracle.com>
-> >> ---
-> >> arch/arm64/kvm/emulate-nested.c | 44 ++++++++++++++++++++++++++++-----
-> >> 1 file changed, 38 insertions(+), 6 deletions(-)
-> >>=20
-> >> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-=
-nested.c
-> >> index 9ced1bf0c2b7..9aa1c06abdb7 100644
-> >> --- a/arch/arm64/kvm/emulate-nested.c
-> >> +++ b/arch/arm64/kvm/emulate-nested.c
-> >> @@ -649,14 +649,46 @@ static const struct encoding_to_trap_config enco=
-ding_to_cgt[] __initconst =3D {
-> >> SR_TRAP(SYS_APGAKEYHI_EL1, CGT_HCR_APK),
-> >> /* All _EL2 registers */
-> >> SR_RANGE_TRAP(sys_reg(3, 4, 0, 0, 0),
-> >> -       sys_reg(3, 4, 3, 15, 7), CGT_HCR_NV),
-> >> + sys_reg(3, 4, 4, 0, 1), CGT_HCR_NV),
-> >=20
-> > It would be good if the commit message explained that you are folding
-> > SPSR/ELR into the existing range. Also, please keep the two ends of
-> > the ranges vertically aligned.
-> >=20
->=20
-> OK.
->=20
-> >> /* Skip the SP_EL1 encoding... */
-> >> - SR_TRAP(SYS_SPSR_EL2, CGT_HCR_NV),
-> >> - SR_TRAP(SYS_ELR_EL2, CGT_HCR_NV),
-> >> - SR_RANGE_TRAP(sys_reg(3, 4, 4, 1, 1),
-> >> -       sys_reg(3, 4, 10, 15, 7), CGT_HCR_NV),
-> >> + SR_RANGE_TRAP(sys_reg(3, 4, 4, 3, 0),
-> >> + sys_reg(3, 4, 10, 6, 7), CGT_HCR_NV),
-> >> + /* skip MECID_A0_EL2, MECID_A1_EL2, MECID_P0_EL2,
-> >> +  *      MECID_P1_EL2, MECIDR_EL2, VMECID_A_EL2,
-> >> +  *      VMECID_P_EL2.
-> >> +  */
-> >=20
-> > Please follow the kernel comment format. Also, why are you skipping
-> > the MEC registers, but not the MPAM ones? At least indicate a
-> > rationale for this.
-> >=20
->=20
-> I=E2=80=99m not aware of any exceptions for MPAM registers, although there
-> are for MEC when HCR_EL2.NV2 is 0.
+This patch series were part of [1], but actually are independent from that.
+In this patch series, a VM ioctl is added to allow userspace to get writable
+masks for feature ID registers.
+Another two fixes for ID registers are also included in this series.
+This is based on v6.6-rc2.
 
-Then this rationale should probably be captured here.
+[1] https://lore.kernel.org/all/20230821212243.491660-1-jingzhangos@google.com
 
->=20
-> >> SR_RANGE_TRAP(sys_reg(3, 4, 12, 0, 0),
-> >> -       sys_reg(3, 4, 14, 15, 7), CGT_HCR_NV),
-> >> + sys_reg(3, 4, 12, 1, 1), CGT_HCR_NV),
-> >> + /* ICH_AP0R<m>_EL2 */
-> >> + SR_RANGE_TRAP(SYS_ICH_AP0R0_EL2,
-> >> + SYS_ICH_AP0R3_EL2, CGT_HCR_NV),
-> >> + /* ICH_AP1R<m>_EL2 */
-> >> + SR_RANGE_TRAP(SYS_ICH_AP1R0_EL2,
-> >> + SYS_ICH_AP1R3_EL2, CGT_HCR_NV),
-> >> + SR_RANGE_TRAP(sys_reg(3, 4, 12, 9, 5),
-> >> + sys_reg(3, 4, 12, 11, 7), CGT_HCR_NV),
-> >> + /* ICH_LR<m>_EL2 */
-> >> + SR_TRAP(SYS_ICH_LR0_EL2, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_ICH_LR1_EL2, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_ICH_LR2_EL2, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_ICH_LR3_EL2, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_ICH_LR4_EL2, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_ICH_LR5_EL2, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_ICH_LR6_EL2, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_ICH_LR7_EL2, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_ICH_LR8_EL2, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_ICH_LR9_EL2, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_ICH_LR10_EL2, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_ICH_LR11_EL2, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_ICH_LR12_EL2, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_ICH_LR13_EL2, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_ICH_LR14_EL2, CGT_HCR_NV),
-> >> + SR_TRAP(SYS_ICH_LR15_EL2, CGT_HCR_NV),
-> >=20
-> > You could describe all the LRs a single range.
-> >=20
->=20
-> Should we skip the gap between LR7 - LR8 ?
+---
 
-Which gap? LRn n described by (3,4,12,12,n) when n is in [0-7], and
-(3,4,12,13,n-8) when n is in [8-15]. These two ranges are contiguous.
+Jing Zhang (3):
+  KVM: arm64: Allow userspace to get the writable masks for feature ID
+    registers
+  KVM: arm64: Document KVM_ARM_GET_REG_WRITABLE_MASKS
+  KVM: arm64: Use guest ID register values for the sake of emulation
 
->=20
-> >> + SR_RANGE_TRAP(sys_reg(3, 4, 13, 0, 1),
-> >> + sys_reg(3, 4, 13, 0, 7), CGT_HCR_NV),
-> >> + /* skip AMEVCNTVOFF0<n>_EL2 and AMEVCNTVOFF1<n>_EL2 */
-> >=20
-> > Why?
->=20
-> I didn=E2=80=99t find its definition TBH although these could use a singl=
-e range.
+Oliver Upton (1):
+  KVM: arm64: Reject attempts to set invalid debug arch version
 
-D19.6.11 and following?
+ Documentation/virt/kvm/api.rst    |  42 ++++++++++++
+ arch/arm64/include/asm/kvm_host.h |   2 +
+ arch/arm64/include/uapi/asm/kvm.h |  32 +++++++++
+ arch/arm64/kvm/arm.c              |  10 +++
+ arch/arm64/kvm/sys_regs.c         | 104 ++++++++++++++++++++++++++++--
+ include/uapi/linux/kvm.h          |   2 +
+ 6 files changed, 186 insertions(+), 6 deletions(-)
 
-Thanks,
 
-	M.
+base-commit: ce9ecca0238b140b88f43859b211c9fdfd8e5b70
+-- 
+2.42.0.459.ge4e396fd5e-goog
 
---=20
-Without deviation from the norm, progress is not possible.
