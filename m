@@ -1,659 +1,372 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B824D8BE2
-	for <kvmarm@lists.linux.dev>; Tue, 19 Sep 2023 19:13:50 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-59bf37b7734so68754657b3.0
-        for <kvmarm@lists.linux.dev>; Tue, 19 Sep 2023 12:13:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695150829; x=1695755629; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qeAM8cO1E8iArE2v6SDLTuZIn362ohCP7RKHypOM/58=;
-        b=kN0jQIG8zK679cYnxyllGchPtbDnuoOyg3Q/Ve6EUZUUZ/audTcjZIJkLed5sCGdBI
-         3kaR4m6CxvIGs15HdC6RWn7FmBCHaY4Dhxx7A9xjxULbNaACjOcxqxn8XcIq0rsdPtyf
-         fIByU027g9pfxQt4R699iVaCezTBWOh5zRdRE4OD8H/s7vgU04GcqtDYRV9Ltp2qr2bX
-         8eiY28F3dQqVGzS0NhOSAb+yzlYqidIeJ9lsuPlZN3UcRv4mIuono0aQnZJ9lgPpPC9Q
-         zuozOI9zjO0nih4aKMs/t245vM7v9OnHTQlafUSDApo59RzITh5L24q3pBqNmUVSCoY8
-         YuDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695150829; x=1695755629;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qeAM8cO1E8iArE2v6SDLTuZIn362ohCP7RKHypOM/58=;
-        b=oTGco7VHuasdEh505GFXz72DFbZUdZO5HDKLdjPVjB8JkVKFHz2k9YFABAClDzU5gc
-         /WLEJ1HkGjgSPDj4ZWVxbWJJgz7rIyzJG8zEP8VMgAlKQwG+Ej/2x3oJlH8IdfAE65dW
-         WGvyyBPDxYMvoPs31Yr6tMg+f6go6nSNx8natUqC0KDALH4SiL5Qm9lMkt4rl5V+7pGb
-         4bjZ/L4jjVNdk5Hy8qwnF9XUGpOkEfzHreii3+fR29fwYjSG57Qh7Wtr//JCHmNuTDhE
-         ZGmEFebQmzS/AtEmRSfEm1UHdB9BJ5H4aJBY/ztQKVosEqqLO9aSOuZoPbZSRlkpK/QC
-         n09Q==
-X-Gm-Message-State: AOJu0YxJTxOXHfSWDkMd+Yq+obFz77ZvJY9wObJKt5j3vZjaotcT36JX
-	FiWQZcVKAPJ0lrI1aZwgLOydhHr/x0R0h56sMA==
-X-Google-Smtp-Source: AGHT+IF2d4KrJ1GHT4Wa0TWb/gB6h+01oF3SSuguWwR8jl5KeSmF35wx3cwBJE4NxJ48inzWufA/M0MEyfBgcW0+rg==
-X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a25:73c7:0:b0:d7e:afff:c8fa with SMTP
- id o190-20020a2573c7000000b00d7eafffc8famr8262ybc.5.1695150829589; Tue, 19
- Sep 2023 12:13:49 -0700 (PDT)
-Date: Tue, 19 Sep 2023 12:13:43 -0700
-In-Reply-To: <20230919191343.693415-1-jingzhangos@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76A3522B
+	for <kvmarm@lists.linux.dev>; Wed, 20 Sep 2023 06:07:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695190058; x=1726726058;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=xzxB1PT2WKDcrdmJMNjWM/AAXQaE89QtQicHLkgqo00=;
+  b=A1v4TLGsGJN4X97sihnhKoI/glVKnszfX7eLqp+z3AokryJ7MDaG/gSN
+   tI5O52F6mQwRbQjxT9OF2V4qV9tLh3TeYuMD+WUt3anSIqgb/ovhVmMKw
+   +k+W9/h85KNV2JPX7ysi/2QqRb/fV0WdUEdjHbPsdel4mllAZaIrZBq+2
+   8THqIin624HeltQHBzAGmP285om3W8bhe2zUqfnUISVAzgOTCd6GNJNPk
+   pFcqevuqOVlBwRuQDihYiMJJaNxAjsYL9+jmaB1icIfy2Whqn0ZSDRJlv
+   cra+5L3X/mA7162Y7AIqKKMo96gTng5c8rX2Eb7EIPBpXIY/B36OYDF1o
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10838"; a="370449365"
+X-IronPort-AV: E=Sophos;i="6.02,161,1688454000"; 
+   d="scan'208";a="370449365"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2023 23:07:37 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10838"; a="870242723"
+X-IronPort-AV: E=Sophos;i="6.02,161,1688454000"; 
+   d="scan'208";a="870242723"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orsmga004.jf.intel.com with ESMTP; 19 Sep 2023 23:07:26 -0700
+Date: Wed, 20 Sep 2023 14:07:00 +0800
+From: Xu Yilun <yilun.xu@intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Chao Peng <chao.p.peng@linux.intel.com>,
+	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+	Anish Moorthy <amoorthy@google.com>,
+	Yu Zhang <yu.c.zhang@linux.intel.com>,
+	Isaku Yamahata <isaku.yamahata@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Vishal Annapurve <vannapurve@google.com>,
+	Ackerley Tng <ackerleytng@google.com>,
+	Maciej Szmigiero <mail@maciej.szmigiero.name>,
+	David Hildenbrand <david@redhat.com>,
+	Quentin Perret <qperret@google.com>,
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
+	Liam Merwick <liam.merwick@oracle.com>,
+	Isaku Yamahata <isaku.yamahata@gmail.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [RFC PATCH v12 02/33] KVM: Use gfn instead of hva for
+ mmu_notifier_retry
+Message-ID: <ZQqMBEL61p739dpF@yilunxu-OptiPlex-7050>
+References: <20230914015531.1419405-1-seanjc@google.com>
+ <20230914015531.1419405-3-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230919191343.693415-1-jingzhangos@google.com>
-X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
-Message-ID: <20230919191343.693415-2-jingzhangos@google.com>
-Subject: [PATCH v3] KVM: arm64: selftests: Test pointer authentication support
- in KVM guest
-From: Jing Zhang <jingzhangos@google.com>
-To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Raghavendra Rao Ananta <rananta@google.com>, Colton Lewis <coltonlewis@google.com>, 
-	Jing Zhang <jingzhangos@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230914015531.1419405-3-seanjc@google.com>
 
-Verify the KVM guest PAuth support on H/W with FEAT_PAuth. This test
-will be skipped on H/W without FEAT_PAuth.
-Following PAuth instructions are tested:
-paciza, pacizb, pacdza, pacdzb, autiza, autizb, autdza, autdzb,
-pacga, xpaclri, xpaci, xpacd
-It also shows the implemented algorithm for both address authentication
-and generic code authentication.
+On 2023-09-13 at 18:55:00 -0700, Sean Christopherson wrote:
+> From: Chao Peng <chao.p.peng@linux.intel.com>
+> 
+> Currently in mmu_notifier invalidate path, hva range is recorded and
+> then checked against by mmu_notifier_retry_hva() in the page fault
+                          ^
 
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
+Now it is mmu_invalidate_retry_hva().
 
----
-* v2 -> v3:
-  - Rebased on v6.6-rc2.
-  - Use guest assert for every comparison in keys retainable test.
----
- tools/arch/arm64/include/asm/sysreg.h         |   5 +
- tools/testing/selftests/kvm/Makefile          |   5 +
- .../selftests/kvm/aarch64/pauth_test.c        | 507 ++++++++++++++++++
- .../selftests/kvm/include/aarch64/processor.h |   2 +
- 4 files changed, 519 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/aarch64/pauth_test.c
+> handling path. However, for the to be introduced private memory, a page
+> fault may not have a hva associated, checking gfn(gpa) makes more sense.
+> 
+> For existing hva based shared memory, gfn is expected to also work. The
+> only downside is when aliasing multiple gfns to a single hva, the
+> current algorithm of checking multiple ranges could result in a much
+> larger range being rejected. Such aliasing should be uncommon, so the
+> impact is expected small.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> Reviewed-by: Fuad Tabba <tabba@google.com>
+> Tested-by: Fuad Tabba <tabba@google.com>
+> [sean: convert vmx_set_apic_access_page_addr() to gfn-based API]
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c   | 10 ++++++----
+>  arch/x86/kvm/vmx/vmx.c   | 11 +++++------
+>  include/linux/kvm_host.h | 33 +++++++++++++++++++++------------
+>  virt/kvm/kvm_main.c      | 40 +++++++++++++++++++++++++++++++---------
+>  4 files changed, 63 insertions(+), 31 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index e1d011c67cc6..0f0231d2b74f 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3056,7 +3056,7 @@ static void direct_pte_prefetch(struct kvm_vcpu *vcpu, u64 *sptep)
+>   *
+>   * There are several ways to safely use this helper:
+>   *
+> - * - Check mmu_invalidate_retry_hva() after grabbing the mapping level, before
+> + * - Check mmu_invalidate_retry_gfn() after grabbing the mapping level, before
+>   *   consuming it.  In this case, mmu_lock doesn't need to be held during the
+>   *   lookup, but it does need to be held while checking the MMU notifier.
+>   *
+> @@ -4358,7 +4358,7 @@ static bool is_page_fault_stale(struct kvm_vcpu *vcpu,
+>  		return true;
+>  
+>  	return fault->slot &&
+> -	       mmu_invalidate_retry_hva(vcpu->kvm, fault->mmu_seq, fault->hva);
+> +	       mmu_invalidate_retry_gfn(vcpu->kvm, fault->mmu_seq, fault->gfn);
+>  }
+>  
+>  static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> @@ -6253,7 +6253,9 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+>  
+>  	write_lock(&kvm->mmu_lock);
+>  
+> -	kvm_mmu_invalidate_begin(kvm, 0, -1ul);
+> +	kvm_mmu_invalidate_begin(kvm);
+> +
+> +	kvm_mmu_invalidate_range_add(kvm, gfn_start, gfn_end);
+>  
+>  	flush = kvm_rmap_zap_gfn_range(kvm, gfn_start, gfn_end);
+>  
+> @@ -6266,7 +6268,7 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+>  	if (flush)
+>  		kvm_flush_remote_tlbs_range(kvm, gfn_start, gfn_end - gfn_start);
+>  
+> -	kvm_mmu_invalidate_end(kvm, 0, -1ul);
+> +	kvm_mmu_invalidate_end(kvm);
+>  
+>  	write_unlock(&kvm->mmu_lock);
+>  }
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 72e3943f3693..6e502ba93141 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -6757,10 +6757,10 @@ static void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu)
+>  		return;
+>  
+>  	/*
+> -	 * Grab the memslot so that the hva lookup for the mmu_notifier retry
+> -	 * is guaranteed to use the same memslot as the pfn lookup, i.e. rely
+> -	 * on the pfn lookup's validation of the memslot to ensure a valid hva
+> -	 * is used for the retry check.
+> +	 * Explicitly grab the memslot using KVM's internal slot ID to ensure
+> +	 * KVM doesn't unintentionally grab a userspace memslot.  It _should_
+> +	 * be impossible for userspace to create a memslot for the APIC when
+> +	 * APICv is enabled, but paranoia won't hurt in this case.
+>  	 */
+>  	slot = id_to_memslot(slots, APIC_ACCESS_PAGE_PRIVATE_MEMSLOT);
+>  	if (!slot || slot->flags & KVM_MEMSLOT_INVALID)
+> @@ -6785,8 +6785,7 @@ static void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu)
+>  		return;
+>  
+>  	read_lock(&vcpu->kvm->mmu_lock);
+> -	if (mmu_invalidate_retry_hva(kvm, mmu_seq,
+> -				     gfn_to_hva_memslot(slot, gfn))) {
+> +	if (mmu_invalidate_retry_gfn(kvm, mmu_seq, gfn)) {
+>  		kvm_make_request(KVM_REQ_APIC_PAGE_RELOAD, vcpu);
+>  		read_unlock(&vcpu->kvm->mmu_lock);
+>  		goto out;
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index fb6c6109fdca..11d091688346 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -787,8 +787,8 @@ struct kvm {
+>  	struct mmu_notifier mmu_notifier;
+>  	unsigned long mmu_invalidate_seq;
+>  	long mmu_invalidate_in_progress;
+> -	unsigned long mmu_invalidate_range_start;
+> -	unsigned long mmu_invalidate_range_end;
+> +	gfn_t mmu_invalidate_range_start;
+> +	gfn_t mmu_invalidate_range_end;
+>  #endif
+>  	struct list_head devices;
+>  	u64 manual_dirty_log_protect;
+> @@ -1392,10 +1392,9 @@ void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc);
+>  void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
+>  #endif
+>  
+> -void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
+> -			      unsigned long end);
+> -void kvm_mmu_invalidate_end(struct kvm *kvm, unsigned long start,
+> -			    unsigned long end);
+> +void kvm_mmu_invalidate_begin(struct kvm *kvm);
+> +void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end);
+> +void kvm_mmu_invalidate_end(struct kvm *kvm);
+>  
+>  long kvm_arch_dev_ioctl(struct file *filp,
+>  			unsigned int ioctl, unsigned long arg);
+> @@ -1970,9 +1969,9 @@ static inline int mmu_invalidate_retry(struct kvm *kvm, unsigned long mmu_seq)
+>  	return 0;
+>  }
+>  
+> -static inline int mmu_invalidate_retry_hva(struct kvm *kvm,
+> +static inline int mmu_invalidate_retry_gfn(struct kvm *kvm,
+>  					   unsigned long mmu_seq,
+> -					   unsigned long hva)
+> +					   gfn_t gfn)
+>  {
+>  	lockdep_assert_held(&kvm->mmu_lock);
+>  	/*
+> @@ -1981,10 +1980,20 @@ static inline int mmu_invalidate_retry_hva(struct kvm *kvm,
+>  	 * that might be being invalidated. Note that it may include some false
+>  	 * positives, due to shortcuts when handing concurrent invalidations.
+>  	 */
+> -	if (unlikely(kvm->mmu_invalidate_in_progress) &&
+> -	    hva >= kvm->mmu_invalidate_range_start &&
+> -	    hva < kvm->mmu_invalidate_range_end)
+> -		return 1;
+> +	if (unlikely(kvm->mmu_invalidate_in_progress)) {
+> +		/*
+> +		 * Dropping mmu_lock after bumping mmu_invalidate_in_progress
+> +		 * but before updating the range is a KVM bug.
+> +		 */
+> +		if (WARN_ON_ONCE(kvm->mmu_invalidate_range_start == INVALID_GPA ||
+> +				 kvm->mmu_invalidate_range_end == INVALID_GPA))
+> +			return 1;
+> +
+> +		if (gfn >= kvm->mmu_invalidate_range_start &&
+> +		    gfn < kvm->mmu_invalidate_range_end)
+> +			return 1;
+> +	}
+> +
+>  	if (kvm->mmu_invalidate_seq != mmu_seq)
+>  		return 1;
+>  	return 0;
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 0524933856d4..4fad3b01dc1f 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -543,9 +543,7 @@ static inline struct kvm *mmu_notifier_to_kvm(struct mmu_notifier *mn)
+>  
+>  typedef bool (*gfn_handler_t)(struct kvm *kvm, struct kvm_gfn_range *range);
+>  
+> -typedef void (*on_lock_fn_t)(struct kvm *kvm, unsigned long start,
+> -			     unsigned long end);
+> -
+> +typedef void (*on_lock_fn_t)(struct kvm *kvm);
+>  typedef void (*on_unlock_fn_t)(struct kvm *kvm);
+>  
+>  struct kvm_mmu_notifier_range {
+> @@ -637,7 +635,8 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+>  				locked = true;
+>  				KVM_MMU_LOCK(kvm);
+>  				if (!IS_KVM_NULL_FN(range->on_lock))
+> -					range->on_lock(kvm, range->start, range->end);
+> +					range->on_lock(kvm);
+> +
+>  				if (IS_KVM_NULL_FN(range->handler))
+>  					break;
+>  			}
+> @@ -742,15 +741,26 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
+>  	kvm_handle_hva_range(mn, address, address + 1, arg, kvm_change_spte_gfn);
+>  }
+>  
+> -void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
+> -			      unsigned long end)
+> +void kvm_mmu_invalidate_begin(struct kvm *kvm)
+>  {
+> +	lockdep_assert_held_write(&kvm->mmu_lock);
+>  	/*
+>  	 * The count increase must become visible at unlock time as no
+>  	 * spte can be established without taking the mmu_lock and
+>  	 * count is also read inside the mmu_lock critical section.
+>  	 */
+>  	kvm->mmu_invalidate_in_progress++;
+> +
+> +	if (likely(kvm->mmu_invalidate_in_progress == 1))
+> +		kvm->mmu_invalidate_range_start = INVALID_GPA;
+> +}
+> +
+> +void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end)
+> +{
+> +	lockdep_assert_held_write(&kvm->mmu_lock);
+> +
+> +	WARN_ON_ONCE(!kvm->mmu_invalidate_in_progress);
+> +
+>  	if (likely(kvm->mmu_invalidate_in_progress == 1)) {
+>  		kvm->mmu_invalidate_range_start = start;
+>  		kvm->mmu_invalidate_range_end = end;
 
-diff --git a/tools/arch/arm64/include/asm/sysreg.h b/tools/arch/arm64/include/asm/sysreg.h
-index 7640fa27be94..9d903eb8388c 100644
---- a/tools/arch/arm64/include/asm/sysreg.h
-+++ b/tools/arch/arm64/include/asm/sysreg.h
-@@ -179,6 +179,7 @@
- 
- #define SYS_ID_AA64ISAR0_EL1		sys_reg(3, 0, 0, 6, 0)
- #define SYS_ID_AA64ISAR1_EL1		sys_reg(3, 0, 0, 6, 1)
-+#define SYS_ID_AA64ISAR2_EL1		sys_reg(3, 0, 0, 6, 2)
- 
- #define SYS_ID_AA64MMFR0_EL1		sys_reg(3, 0, 0, 7, 0)
- #define SYS_ID_AA64MMFR1_EL1		sys_reg(3, 0, 0, 7, 1)
-@@ -764,6 +765,10 @@
- #define ID_AA64ISAR1_GPI_NI			0x0
- #define ID_AA64ISAR1_GPI_IMP_DEF		0x1
- 
-+/* id_aa64isar2 */
-+#define ID_AA64ISAR2_APA3_SHIFT		12
-+#define ID_AA64ISAR2_GPA3_SHIFT		8
-+
- /* id_aa64pfr0 */
- #define ID_AA64PFR0_CSV3_SHIFT		60
- #define ID_AA64PFR0_CSV2_SHIFT		56
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index a3bb36fb3cfc..c3a1a3898f71 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -144,6 +144,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
- TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
- TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
- TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
-+TEST_GEN_PROGS_aarch64 += aarch64/pauth_test
- TEST_GEN_PROGS_aarch64 += aarch64/psci_test
- TEST_GEN_PROGS_aarch64 += aarch64/smccc_filter
- TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
-@@ -222,6 +223,10 @@ ifeq ($(ARCH),s390)
- 	CFLAGS += -march=z10
- endif
- 
-+ifeq ($(ARCH),arm64)
-+	CFLAGS += -march=armv8.3-a
-+endif
-+
- no-pie-option := $(call try-run, echo 'int main(void) { return 0; }' | \
-         $(CC) -Werror $(CFLAGS) -no-pie -x c - -o "$$TMP", -no-pie)
- 
-diff --git a/tools/testing/selftests/kvm/aarch64/pauth_test.c b/tools/testing/selftests/kvm/aarch64/pauth_test.c
-new file mode 100644
-index 000000000000..0107c5b5949a
---- /dev/null
-+++ b/tools/testing/selftests/kvm/aarch64/pauth_test.c
-@@ -0,0 +1,507 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * pauth_test - Test for KVM guest pointer authentication.
-+ * Following PAuth instructions are tested:
-+ * paciza, pacizb, pacdza, pacdzb, autiza, autizb, autdza, autdzb,
-+ * pacga, xpaclri, xpaci, xpacd
-+ * It also shows the implemented algorithm for both address authentication
-+ * and generic code authentication.
-+ *
-+ * Copyright (c) 2023 Google LLC.
-+ *
-+ */
-+
-+#define _GNU_SOURCE
-+
-+#include <sched.h>
-+
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+
-+#define KEY1_LO		0x0123456789abcdefUL
-+#define KEY1_HI		0x123456789abcdef0UL
-+#define KEY2_LO		0x23456789abcdef01UL
-+#define KEY2_HI		0x3456789abcdef012UL
-+#define KEY3_LO		0x456789abcdef0123UL
-+#define KEY3_HI		0x56789abcdef01234UL
-+#define KEY4_LO		0x6789abcdef012345UL
-+#define KEY4_HI		0x789abcdef0123456UL
-+#define KEY5_LO		0x89abcdef01234567UL
-+#define KEY5_HI		0x9abcdef012345678UL
-+
-+#define PAUTH_ENABLE	(SCTLR_ELx_ENIA | SCTLR_ELx_ENIB | SCTLR_ELx_ENDA | SCTLR_ELx_ENDB)
-+
-+enum uc_args {
-+	WAIT_MIGRATION,
-+	ADDR_PAUTH_ALGO,
-+	GENERIC_PAUTH_ALGO,
-+	FAIL_GUEST_PAUTH,
-+};
-+
-+enum pauth_algo {
-+	QARMA5,
-+	QARMA3,
-+	PACIMP,
-+	NOALGO,
-+};
-+
-+static const char *const algo_string[] = {
-+	"QARMA5", "QARMA3", "PACIMP", "Undefined",
-+};
-+
-+#define DEFINE_SIGN_FUNC(INSTR)						\
-+	static size_t INSTR##_sign(size_t ptr)				\
-+	{								\
-+		__asm__ __volatile__(					\
-+			#INSTR" %[p]"					\
-+			: [p] "+r" (ptr)				\
-+		);							\
-+		return ptr;						\
-+	}
-+
-+DEFINE_SIGN_FUNC(paciza)
-+DEFINE_SIGN_FUNC(pacizb)
-+DEFINE_SIGN_FUNC(pacdza)
-+DEFINE_SIGN_FUNC(pacdzb)
-+
-+static size_t pacga_sign(size_t ptr)
-+{
-+	size_t dest = 0;
-+
-+	__asm__ __volatile__(
-+		"pacga %[d], %[p], %[m]"
-+		: [d] "=r" (dest)
-+		: [p] "r" (ptr), [m] "r" (0)
-+	);
-+
-+	return dest;
-+}
-+
-+#define DEFINE_AUTH_STRIP_FUNC(AUTH, STRIP)				\
-+	static size_t AUTH##_auth_##STRIP##_strip(size_t ptr)		\
-+	{								\
-+		__asm__ __volatile__(					\
-+			#AUTH" %[p]\n"					\
-+			#STRIP" %[p]\n"					\
-+			: [p] "+r" (ptr)				\
-+		);							\
-+		return ptr;						\
-+	}
-+
-+DEFINE_AUTH_STRIP_FUNC(autiza, xpaci)
-+DEFINE_AUTH_STRIP_FUNC(autizb, xpaci)
-+DEFINE_AUTH_STRIP_FUNC(autdza, xpacd)
-+DEFINE_AUTH_STRIP_FUNC(autdzb, xpacd)
-+
-+#define GUEST_ALGO(type, algo)	GUEST_SYNC_ARGS(type, algo, 0, 0, 0)
-+
-+static void check_pauth_algorithms(void)
-+{
-+	uint64_t isar1 = read_sysreg_s(SYS_ID_AA64ISAR1_EL1);
-+	uint64_t isar2 = read_sysreg_s(SYS_ID_AA64ISAR2_EL1);
-+	enum pauth_algo algo;
-+
-+	/* Check generic authentication algorithm */
-+	if (isar1 & ARM64_FEATURE_MASK(ID_AA64ISAR1_GPI))
-+		algo = PACIMP;
-+	else if (isar1 & ARM64_FEATURE_MASK(ID_AA64ISAR1_GPA))
-+		algo = QARMA5;
-+	else if (isar2 & ARM64_FEATURE_MASK(ID_AA64ISAR2_GPA3))
-+		algo = QARMA3;
-+	else
-+		algo = NOALGO;
-+
-+	GUEST_ALGO(GENERIC_PAUTH_ALGO, algo);
-+
-+	/* Check address authentication algorithm */
-+	if (isar1 & ARM64_FEATURE_MASK(ID_AA64ISAR1_API))
-+		algo = PACIMP;
-+	else if (isar1 & ARM64_FEATURE_MASK(ID_AA64ISAR1_APA))
-+		algo = QARMA5;
-+	else if (isar2 & ARM64_FEATURE_MASK(ID_AA64ISAR2_APA3))
-+		algo = QARMA3;
-+	else
-+		algo = NOALGO;
-+
-+	GUEST_ALGO(ADDR_PAUTH_ALGO, algo);
-+}
-+
-+/* Setup PAuth keys and check their retainability */
-+static void check_keys_retainable(void)
-+{
-+	/* Address */
-+	write_sysreg_s(KEY1_LO, SYS_APIAKEYLO_EL1);
-+	write_sysreg_s(KEY1_HI, SYS_APIAKEYHI_EL1);
-+	write_sysreg_s(KEY2_LO, SYS_APIBKEYLO_EL1);
-+	write_sysreg_s(KEY2_HI, SYS_APIBKEYHI_EL1);
-+	/* Data */
-+	write_sysreg_s(KEY3_LO, SYS_APDAKEYLO_EL1);
-+	write_sysreg_s(KEY3_HI, SYS_APDAKEYHI_EL1);
-+	write_sysreg_s(KEY4_LO, SYS_APDBKEYLO_EL1);
-+	write_sysreg_s(KEY4_HI, SYS_APDBKEYHI_EL1);
-+	/* Generic */
-+	write_sysreg_s(KEY5_LO, SYS_APGAKEYLO_EL1);
-+	write_sysreg_s(KEY5_HI, SYS_APGAKEYHI_EL1);
-+	isb();
-+
-+	GUEST_SYNC(WAIT_MIGRATION);
-+
-+	/* Address */
-+	GUEST_ASSERT(read_sysreg_s(SYS_APIAKEYLO_EL1) == KEY1_LO);
-+	GUEST_ASSERT(read_sysreg_s(SYS_APIAKEYHI_EL1) == KEY1_HI);
-+	GUEST_ASSERT(read_sysreg_s(SYS_APIBKEYLO_EL1) == KEY2_LO);
-+	GUEST_ASSERT(read_sysreg_s(SYS_APIBKEYHI_EL1) == KEY2_HI);
-+	/* Data */
-+	GUEST_ASSERT(read_sysreg_s(SYS_APDAKEYLO_EL1) == KEY3_LO);
-+	GUEST_ASSERT(read_sysreg_s(SYS_APDAKEYHI_EL1) == KEY3_HI);
-+	GUEST_ASSERT(read_sysreg_s(SYS_APDBKEYLO_EL1) == KEY4_LO);
-+	GUEST_ASSERT(read_sysreg_s(SYS_APDBKEYHI_EL1) == KEY4_HI);
-+	/* Generic */
-+	GUEST_ASSERT(read_sysreg_s(SYS_APGAKEYLO_EL1) == KEY5_LO);
-+	GUEST_ASSERT(read_sysreg_s(SYS_APGAKEYHI_EL1) == KEY5_HI);
-+}
-+
-+#define ADDR_START	0x8000
-+#define ADDR_END	0x8008
-+
-+static void test_same_keys(void)
-+{
-+	/* Set the same keys */
-+	write_sysreg_s(KEY1_LO, SYS_APIAKEYLO_EL1);
-+	write_sysreg_s(KEY1_HI, SYS_APIAKEYHI_EL1);
-+	write_sysreg_s(KEY1_LO, SYS_APIBKEYLO_EL1);
-+	write_sysreg_s(KEY1_HI, SYS_APIBKEYHI_EL1);
-+	write_sysreg_s(KEY1_LO, SYS_APDAKEYLO_EL1);
-+	write_sysreg_s(KEY1_HI, SYS_APDAKEYHI_EL1);
-+	write_sysreg_s(KEY1_LO, SYS_APDBKEYLO_EL1);
-+	write_sysreg_s(KEY1_HI, SYS_APDBKEYHI_EL1);
-+	isb();
-+
-+	/* Same algorithm, same address, same keys should have same PAC */
-+	for (size_t i = ADDR_START; i < ADDR_END; i++) {
-+		/* Assert if the PAuth instruction did nothing */
-+		GUEST_ASSERT(paciza_sign(i) != i);
-+
-+		GUEST_ASSERT(paciza_sign(i) == pacizb_sign(i));
-+		GUEST_ASSERT(paciza_sign(i) == pacdza_sign(i));
-+		GUEST_ASSERT(paciza_sign(i) == pacdzb_sign(i));
-+	}
-+}
-+
-+static void test_different_keys(void)
-+{
-+	write_sysreg_s(KEY1_LO, SYS_APIAKEYLO_EL1);
-+	write_sysreg_s(KEY1_HI, SYS_APIAKEYHI_EL1);
-+	write_sysreg_s(KEY2_LO, SYS_APIBKEYLO_EL1);
-+	write_sysreg_s(KEY2_HI, SYS_APIBKEYHI_EL1);
-+	write_sysreg_s(KEY3_LO, SYS_APDAKEYLO_EL1);
-+	write_sysreg_s(KEY3_HI, SYS_APDAKEYHI_EL1);
-+	write_sysreg_s(KEY4_LO, SYS_APDBKEYLO_EL1);
-+	write_sysreg_s(KEY4_HI, SYS_APDBKEYHI_EL1);
-+	isb();
-+
-+	/* Same algorithm, same address, different keys should have different PAc */
-+	for (size_t i = ADDR_START; i < ADDR_END; i++) {
-+		/* Assert if the PAuth instruction did nothing */
-+		GUEST_ASSERT(paciza_sign(i) != i);
-+
-+		GUEST_ASSERT(paciza_sign(i) != pacizb_sign(i));
-+		GUEST_ASSERT(paciza_sign(i) != pacdza_sign(i));
-+		GUEST_ASSERT(paciza_sign(i) != pacdzb_sign(i));
-+	}
-+}
-+
-+static void test_generic_sign(void)
-+{
-+	size_t ga_signs[ADDR_END - ADDR_START];
-+	size_t i;
-+
-+	write_sysreg_s(KEY1_LO, SYS_APGAKEYLO_EL1);
-+	write_sysreg_s(KEY1_HI, SYS_APGAKEYHI_EL1);
-+	isb();
-+
-+	for (i = ADDR_START; i < ADDR_END; i++) {
-+		ga_signs[i - ADDR_START] = pacga_sign(i);
-+		/* Assert if the PAuth instruction did nothing */
-+		GUEST_ASSERT(ga_signs[i - ADDR_START] != i);
-+	}
-+
-+	write_sysreg_s(KEY5_LO, SYS_APGAKEYLO_EL1);
-+	write_sysreg_s(KEY5_HI, SYS_APGAKEYHI_EL1);
-+	isb();
-+
-+	/* Different key should have different sign */
-+	for (i = ADDR_START; i < ADDR_END; i++) {
-+		/* Assert if the PAuth instruction did nothing */
-+		GUEST_ASSERT(pacga_sign(i) != i);
-+		GUEST_ASSERT(pacga_sign(i) != ga_signs[i - ADDR_START]);
-+	}
-+}
-+
-+static void test_ia_auth_strip(void)
-+{
-+	size_t ptr = ADDR_START;
-+
-+	write_sysreg_s(KEY2_LO, SYS_APIAKEYLO_EL1);
-+	write_sysreg_s(KEY2_HI, SYS_APIAKEYHI_EL1);
-+	isb();
-+
-+	ptr = paciza_sign(ptr);
-+
-+	write_sysreg_s(KEY1_LO, SYS_APIAKEYLO_EL1);
-+	write_sysreg_s(KEY1_HI, SYS_APIAKEYHI_EL1);
-+	isb();
-+
-+	/*
-+	 * Since key has changed, the authentication would fail and be trapped.
-+	 * In the trap handler, the pauth would be disabled to avoid future trap
-+	 * for auth failure.
-+	 */
-+	ptr = autiza_auth_xpaci_strip(ptr);
-+
-+	/* Assert if the strip instruction didn't work */
-+	GUEST_ASSERT(ptr == ADDR_START);
-+}
-+
-+static void test_ib_auth_strip(void)
-+{
-+	size_t ptr = ADDR_START;
-+
-+	write_sysreg_s(KEY3_LO, SYS_APIBKEYLO_EL1);
-+	write_sysreg_s(KEY3_HI, SYS_APIBKEYHI_EL1);
-+	isb();
-+
-+	ptr = pacizb_sign(ptr);
-+
-+	write_sysreg_s(KEY2_LO, SYS_APIBKEYLO_EL1);
-+	write_sysreg_s(KEY2_HI, SYS_APIBKEYHI_EL1);
-+	isb();
-+
-+	/*
-+	 * Since key has changed, the authentication would fail and be trapped.
-+	 * In the trap handler, the pauth would be disabled to avoid future trap
-+	 * for auth failure.
-+	 */
-+	ptr = autizb_auth_xpaci_strip(ptr);
-+
-+	/* Assert if the strip instruction didn't work */
-+	GUEST_ASSERT(ptr == ADDR_START);
-+}
-+
-+static void test_da_auth_strip(void)
-+{
-+	size_t ptr = ADDR_START;
-+
-+	write_sysreg_s(KEY4_LO, SYS_APDAKEYLO_EL1);
-+	write_sysreg_s(KEY4_HI, SYS_APDAKEYHI_EL1);
-+	isb();
-+
-+	ptr = pacdza_sign(ptr);
-+
-+	write_sysreg_s(KEY3_LO, SYS_APDAKEYLO_EL1);
-+	write_sysreg_s(KEY3_HI, SYS_APDAKEYHI_EL1);
-+	isb();
-+
-+	/*
-+	 * Since key has changed, the authentication would fail and be trapped.
-+	 * In the trap handler, the pauth would be disabled to avoid future trap
-+	 * for auth failure.
-+	 */
-+	ptr = autdza_auth_xpacd_strip(ptr);
-+
-+	/* Assert if the strip instruction didn't work */
-+	GUEST_ASSERT(ptr == ADDR_START);
-+}
-+
-+static void test_db_auth_strip(void)
-+{
-+	size_t ptr = ADDR_START;
-+
-+	write_sysreg_s(KEY5_LO, SYS_APDBKEYLO_EL1);
-+	write_sysreg_s(KEY5_HI, SYS_APDBKEYHI_EL1);
-+	isb();
-+
-+	ptr = pacdzb_sign(ptr);
-+
-+	write_sysreg_s(KEY4_LO, SYS_APDBKEYLO_EL1);
-+	write_sysreg_s(KEY4_HI, SYS_APDBKEYHI_EL1);
-+	isb();
-+
-+	/*
-+	 * Since key has changed, the authentication would fail and be trapped.
-+	 * In the trap handler, the pauth would be disabled to avoid future trap
-+	 * for auth failure.
-+	 */
-+	ptr = autdzb_auth_xpacd_strip(ptr);
-+
-+	/* Assert if the strip instruction didn't work */
-+	GUEST_ASSERT(ptr == ADDR_START);
-+}
-+
-+static void test_auth_strip(void)
-+{
-+	test_ia_auth_strip();
-+	test_ib_auth_strip();
-+	test_da_auth_strip();
-+	test_db_auth_strip();
-+
-+	/*
-+	 * If all authentication instructions have failed, the PAuth enable bits
-+	 * in SCTLR should have been cleared in the trap handler.
-+	 * Otherwise, the auth instructions didn't work as expected.
-+	 */
-+	GUEST_ASSERT(!(read_sysreg(sctlr_el1) & PAUTH_ENABLE));
-+}
-+
-+static void guest_code(void)
-+{
-+	uint64_t sctlr = read_sysreg(sctlr_el1);
-+
-+	check_pauth_algorithms();
-+	check_keys_retainable();
-+
-+	/* Enable PAuth */
-+	sctlr |= PAUTH_ENABLE;
-+	write_sysreg(sctlr, sctlr_el1);
-+	isb();
-+
-+	test_same_keys();
-+	test_different_keys();
-+	test_generic_sign();
-+	test_auth_strip();
-+
-+	GUEST_DONE();
-+}
-+
-+/* Guest will get an unknown exception (UNDEF) if guest PAuth is not enabled. */
-+static void guest_unknown_handler(struct ex_regs *regs)
-+{
-+	GUEST_SYNC(FAIL_GUEST_PAUTH);
-+	GUEST_DONE();
-+}
-+
-+/* Guest will get a FPAC exception if KVM support guest PAuth */
-+static void guest_fpac_handler(struct ex_regs *regs)
-+{
-+	uint64_t sctlr = read_sysreg(sctlr_el1);
-+
-+	if (sctlr & SCTLR_ELx_ENIA) {
-+		sctlr &= ~SCTLR_ELx_ENIA;
-+		write_sysreg(sctlr, sctlr_el1);
-+		isb();
-+	} else if (sctlr & SCTLR_ELx_ENIB) {
-+		sctlr &= ~SCTLR_ELx_ENIB;
-+		write_sysreg(sctlr, sctlr_el1);
-+		isb();
-+	} else if (sctlr & SCTLR_ELx_ENDA) {
-+		sctlr &= ~SCTLR_ELx_ENDA;
-+		write_sysreg(sctlr, sctlr_el1);
-+		isb();
-+	} else if (sctlr & SCTLR_ELx_ENDB) {
-+		sctlr &= ~SCTLR_ELx_ENDB;
-+		write_sysreg(sctlr, sctlr_el1);
-+		isb();
-+	}
-+}
-+
-+int main(void)
-+{
-+	struct kvm_vcpu_init init;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+	cpu_set_t cpu_mask;
-+	bool guest_done = false;
-+
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PTRAUTH_ADDRESS));
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PTRAUTH_GENERIC));
-+
-+	vm = vm_create(1);
-+
-+	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
-+	init.features[0] |= ((1 << KVM_ARM_VCPU_PTRAUTH_ADDRESS) |
-+			     (1 << KVM_ARM_VCPU_PTRAUTH_GENERIC));
-+
-+	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
-+
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vcpu);
-+
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_EC_UNKNOWN, guest_unknown_handler);
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_EC_FPAC, guest_fpac_handler);
-+
-+	ksft_print_header();
-+	ksft_set_plan(3);
-+
-+	while (!guest_done) {
-+		vcpu_run(vcpu);
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			break;
-+		case UCALL_SYNC:
-+			switch (uc.args[1]) {
-+			case WAIT_MIGRATION:
-+				sched_getaffinity(0, sizeof(cpu_mask), &cpu_mask);
-+				CPU_CLR(sched_getcpu(), &cpu_mask);
-+				sched_setaffinity(0, sizeof(cpu_mask), &cpu_mask);
-+				break;
-+			case FAIL_GUEST_PAUTH:
-+				/*
-+				 * KVM has already claimed that both itself and
-+				 * HW support PAuth, but the guest still got the
-+				 * UNDEF with PAuth instruction.
-+				 * Usually this shouldn't happen unless KVM
-+				 * screwed up the emulation somehow or the PAuth
-+				 * was not enabled for the guest.
-+				 */
-+				TEST_FAIL("Guest PAuth was not enabled!\n");
-+				break;
-+			case GENERIC_PAUTH_ALGO: {
-+				enum pauth_algo algo = uc.args[2];
-+
-+				if (algo == NOALGO) {
-+					ksft_print_msg("Make sure the VCPU feature is enabled:\n");
-+					ksft_print_msg("KVM_ARM_VCPU_PTRAUTH_GENERIC\n");
-+					TEST_FAIL("No generic PAuth algorithm in guest!\n");
-+				}
-+
-+				ksft_test_result_pass("Generic PAuth Algorithm: %s\n",
-+						      algo_string[algo]);
-+				break;
-+			}
-+			case ADDR_PAUTH_ALGO: {
-+				enum pauth_algo algo = uc.args[2];
-+
-+				if (algo == NOALGO) {
-+					ksft_print_msg("Make sure the VCPU feature is enabled:\n");
-+					ksft_print_msg("KVM_ARM_VCPU_PTRAUTH_ADDRESS\n");
-+					TEST_FAIL("No address PAuth algorithm in guest!\n");
-+				}
-+
-+				ksft_test_result_pass("Address PAuth Algorithm: %s\n",
-+						      algo_string[algo]);
-+				break;
-+			}
-+			default:
-+				ksft_print_msg("Unexpected guest sync arg: 0x%016llx\n",
-+					       uc.args[1]);
-+				break;
-+			}
-+			break;
-+		case UCALL_DONE:
-+			ksft_test_result_pass("Guest PAuth\n");
-+			guest_done = true;
-+			break;
-+		default:
-+			TEST_FAIL("Unexpected ucall: %lu", uc.cmd);
-+		}
-+	}
-+
-+	ksft_finished();
-+	kvm_vm_free(vm);
-+}
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index cb537253a6b9..f8d541af9c06 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -104,7 +104,9 @@ enum {
- #define ESR_EC_SHIFT		26
- #define ESR_EC_MASK		(ESR_EC_NUM - 1)
- 
-+#define ESR_EC_UNKNOWN		0x00
- #define ESR_EC_SVC64		0x15
-+#define ESR_EC_FPAC		0x1c
- #define ESR_EC_IABT		0x21
- #define ESR_EC_DABT		0x25
- #define ESR_EC_HW_BP_CURRENT	0x31
+IIUC, Now we only add or override a part of the invalidate range in
+these fields, IOW only the range in last slot is stored when we unlock.
+That may break mmu_invalidate_retry_gfn() cause it can never know the
+whole invalidate range.
 
-base-commit: ce9ecca0238b140b88f43859b211c9fdfd8e5b70
--- 
-2.42.0.459.ge4e396fd5e-goog
+How about we extend the mmu_invalidate_range_start/end everytime so that
+it records the whole invalidate range:
 
+if (kvm->mmu_invalidate_range_start == INVALID_GPA) {
+	kvm->mmu_invalidate_range_start = start;
+	kvm->mmu_invalidate_range_end = end;
+} else {
+	kvm->mmu_invalidate_range_start =
+		min(kvm->mmu_invalidate_range_start, start);
+	kvm->mmu_invalidate_range_end =
+		max(kvm->mmu_invalidate_range_end, end);
+}
+
+Thanks,
+Yilun
+
+> @@ -771,6 +781,12 @@ void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
+>  	}
+>  }
+>  
+> +static bool kvm_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+> +{
+> +	kvm_mmu_invalidate_range_add(kvm, range->start, range->end);
+> +	return kvm_unmap_gfn_range(kvm, range);
+> +}
+> +
+>  static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+>  					const struct mmu_notifier_range *range)
+>  {
+> @@ -778,7 +794,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+>  	const struct kvm_mmu_notifier_range hva_range = {
+>  		.start		= range->start,
+>  		.end		= range->end,
+> -		.handler	= kvm_unmap_gfn_range,
+> +		.handler	= kvm_mmu_unmap_gfn_range,
+>  		.on_lock	= kvm_mmu_invalidate_begin,
+>  		.on_unlock	= kvm_arch_guest_memory_reclaimed,
+>  		.flush_on_ret	= true,
+> @@ -817,8 +833,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+>  	return 0;
+>  }
+>  
+> -void kvm_mmu_invalidate_end(struct kvm *kvm, unsigned long start,
+> -			    unsigned long end)
+> +void kvm_mmu_invalidate_end(struct kvm *kvm)
+>  {
+>  	/*
+>  	 * This sequence increase will notify the kvm page fault that
+> @@ -833,6 +848,13 @@ void kvm_mmu_invalidate_end(struct kvm *kvm, unsigned long start,
+>  	 * in conjunction with the smp_rmb in mmu_invalidate_retry().
+>  	 */
+>  	kvm->mmu_invalidate_in_progress--;
+> +
+> +	/*
+> +	 * Assert that at least one range must be added between start() and
+> +	 * end().  Not adding a range isn't fatal, but it is a KVM bug.
+> +	 */
+> +	WARN_ON_ONCE(kvm->mmu_invalidate_in_progress &&
+> +		     kvm->mmu_invalidate_range_start == INVALID_GPA);
+>  }
+>  
+>  static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
+> -- 
+> 2.42.0.283.g2d96d420d3-goog
+> 
