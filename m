@@ -1,68 +1,269 @@
-Received: from out-213.mta1.migadu.com (out-213.mta1.migadu.com [95.215.58.213])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99EFE41A80
-	for <kvmarm@lists.linux.dev>; Wed, 20 Sep 2023 21:12:36 +0000 (UTC)
-Date: Wed, 20 Sep 2023 21:12:29 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1695244354;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EoUJ+vC7dyHc4K1PhRWk1cP4axcoR/iMI8O3D2rH4lY=;
-	b=nRiL2bpy2TvTJglYvs33qdCvn+bntJIqeFLZAQ008Kh+KjusCOOUq6O7scKrO2N6lGZ447
-	wdyM74RKMJ8MiwBGBne8n/vHE2RLBbEhrWTqojIiycJD+VQbnINfiM5f19woTYK0+D1dMX
-	aj0Js4mG+/ntjHCDt8mp6aXb0/VaF9c=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"will@kernel.org" <will@kernel.org>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"james.morse@arm.com" <james.morse@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	yuzenghui <yuzenghui@huawei.com>, zhukeqian <zhukeqian1@huawei.com>,
-	Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Linuxarm <linuxarm@huawei.com>
-Subject: Re: [RFC PATCH v2 0/8] KVM: arm64: Implement SW/HW combined dirty log
-Message-ID: <ZQtgPSsOGgWE4MZ1@linux.dev>
-References: <20230825093528.1637-1-shameerali.kolothum.thodi@huawei.com>
- <ZQHxm+L890yTpY91@linux.dev>
- <14eb2648eb594dd9a46a179733cee0df@huawei.com>
- <ZQOm9gUo8un+claf@linux.dev>
- <853b333084c4462a870bb2a37ec65935@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C14A715AF6
+	for <kvmarm@lists.linux.dev>; Wed, 20 Sep 2023 23:44:49 +0000 (UTC)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1c43cd8b6cbso2975385ad.0
+        for <kvmarm@lists.linux.dev>; Wed, 20 Sep 2023 16:44:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695253489; x=1695858289; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YMbatuEIGrWsTlMlK7Tk6yapZGH8kwO0Z4+wG56Y3PQ=;
+        b=LNwAxumInx5byaWSuFIBg/+Qc9HShVOxoJLoylbCTDoqCfOtRxStg7CfDA8EXNKXEC
+         R/l5lDnqqk24+Uz/+ZtiWSLp2L3YMhbwHW9mILe2oq6NaS0F91xr9JLeW7/4n9hPYnf8
+         PjJGcPpGChPnJTwNBG3xa4a6I+96IBmSrYkNEGAOly84mm3KhB1kU3fKwTHaFzAtR7sp
+         2rjshoJ/OnyoNU8LgUe0Dl0+joFyLMXstSM75SYIO+e8Zg6z8j0qtDkDQTNw6pBUqdJS
+         yuD9sYYvw8OA2+LpXMbjcGktv5qJbx1ByuZsP9erZQ3soju/pvrR33yptdc8KZiAT2JK
+         s2sA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695253489; x=1695858289;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YMbatuEIGrWsTlMlK7Tk6yapZGH8kwO0Z4+wG56Y3PQ=;
+        b=hDLq1nhnp43FDKjGfvQLRwGUjeWqgjE0tMbaDvcF7kuuJucg7tdR2wcZDADUYrgy0T
+         psRPRGPe9Qwzt/oGq1bnS30Kc7iu55C9xTnE9ibOW6nAhD/ReRBE9umhmULqB9oqq6fy
+         2FP+RBIb0Isqk+NgXkqLDOFkVWQCToI1rBNxFUMhv8Ce1/LxyaapujJPi7ESEpuNj+ze
+         S61yFPtLeznccvvviWuaegtQkn9XO7h0O7bJIR1ngTcxpsluwLiAXlb9kr2aCz0E+fPZ
+         uZEcP+nsbFF0pXTGfzmL4l9NsIhN8NshfU6hcmB6E0ih387hhPGTH/Bv1PSugdqcFu+0
+         V4Jg==
+X-Gm-Message-State: AOJu0YyyzO7SGZgY0AZdxRAbcGv2IOkNyL9KYXaDE3kf3KYUZI0aCaJe
+	8HmmfKNZruaPYSpX7bt49v4TaSsjqsw=
+X-Google-Smtp-Source: AGHT+IHQbG7yFE9jJPEUI1XKEjcd5Hn7eouqEyZetIlWhAmmYx1Ip3XqohOdLN8YNlfaQrxQ5DSfhNksAYI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:22d0:b0:1ae:6895:cb96 with SMTP id
+ y16-20020a17090322d000b001ae6895cb96mr56298plg.5.1695253488829; Wed, 20 Sep
+ 2023 16:44:48 -0700 (PDT)
+Date: Wed, 20 Sep 2023 16:44:47 -0700
+In-Reply-To: <20230918163647.m6bjgwusc7ww5tyu@amd.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <853b333084c4462a870bb2a37ec65935@huawei.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-15-seanjc@google.com>
+ <20230918163647.m6bjgwusc7ww5tyu@amd.com>
+Message-ID: <ZQuD77vlBiSU/PE4@google.com>
+Subject: Re: [RFC PATCH v12 14/33] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+From: Sean Christopherson <seanjc@google.com>
+To: Michael Roth <michael.roth@amd.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
+	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Vlastimil Babka <vbabka@suse.cz>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
+	Quentin Perret <qperret@google.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Sep 18, 2023 at 09:55:22AM +0000, Shameerali Kolothum Thodi wrote:
-
-[...]
-
-> > Sorry, this was rather nonspecific. I was describing the pre-copy
-> > strategies we're using at Google (out of tree). We're carrying patches
-> > to use EPT D-bit for exitless dirty tracking.
+On Mon, Sep 18, 2023, Michael Roth wrote:
+> > +static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
+> > +{
+> > +	struct list_head *gmem_list = &inode->i_mapping->private_list;
+> > +	pgoff_t start = offset >> PAGE_SHIFT;
+> > +	pgoff_t end = (offset + len) >> PAGE_SHIFT;
+> > +	struct kvm_gmem *gmem;
+> > +
+> > +	/*
+> > +	 * Bindings must stable across invalidation to ensure the start+end
+> > +	 * are balanced.
+> > +	 */
+> > +	filemap_invalidate_lock(inode->i_mapping);
+> > +
+> > +	list_for_each_entry(gmem, gmem_list, entry) {
+> > +		kvm_gmem_invalidate_begin(gmem, start, end);
 > 
-> Just curious, how does it handle the overheads associated with scanning for
-> dirty pages and the convergence w.r.t high rate of dirtying in exitless mode? 
+> In v11 we used to call truncate_inode_pages_range() here to drop filemap's
+> reference on the folio. AFAICT the folios are only getting free'd upon
+> guest shutdown without this. Was this on purpose?
 
-A pool of kthreads, which really isn't a good solution at all. The
-'better' way to do it would be to add some back pressure to the guest
-such that your pre-copy transfer can converge with the guest and use the
-freed up CPU time to manage the dirty state.
+Nope, I just spotted this too.  And then after scratching my head for a few minutes,
+wondering if I was having an -ENOCOFFEE moment, I finally read your mail.  *sigh*
 
-But hopefully we can make that a userspace issue.
+Looking at my reflog history, I'm pretty sure I deleted the wrong line when
+removing the truncation from kvm_gmem_error_page().
 
+> > +		kvm_gmem_invalidate_end(gmem, start, end);
+> > +	}
+> > +
+> > +	filemap_invalidate_unlock(inode->i_mapping);
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static long kvm_gmem_allocate(struct inode *inode, loff_t offset, loff_t len)
+> > +{
+> > +	struct address_space *mapping = inode->i_mapping;
+> > +	pgoff_t start, index, end;
+> > +	int r;
+> > +
+> > +	/* Dedicated guest is immutable by default. */
+> > +	if (offset + len > i_size_read(inode))
+> > +		return -EINVAL;
+> > +
+> > +	filemap_invalidate_lock_shared(mapping);
+> 
+> We take the filemap lock here, but not for
+> kvm_gmem_get_pfn()->kvm_gmem_get_folio(). Is it needed there as well?
+
+No, we specifically do not want to take a rwsem when faulting in guest memory.
+Callers of kvm_gmem_get_pfn() *must* guard against concurrent invalidations via
+mmu_invalidate_seq and friends.
+
+> > +	/*
+> > +	 * For simplicity, require the offset into the file and the size of the
+> > +	 * memslot to be aligned to the largest possible page size used to back
+> > +	 * the file (same as the size of the file itself).
+> > +	 */
+> > +	if (!kvm_gmem_is_valid_size(offset, flags) ||
+> > +	    !kvm_gmem_is_valid_size(size, flags))
+> > +		goto err;
+> 
+> I needed to relax this check for SNP. KVM_GUEST_MEMFD_ALLOW_HUGEPAGE
+> applies to entire gmem inode, so it makes sense for userspace to enable
+> hugepages if start/end are hugepage-aligned, but QEMU will do things
+> like map overlapping regions for ROMs and other things on top of the
+> GPA range that the gmem inode was originally allocated for. For
+> instance:
+> 
+>   692500@1689108688.696338:kvm_set_user_memory AddrSpace#0 Slot#0 flags=0x4 gpa=0x0 size=0x80000000 ua=0x7fbf5be00000 ret=0 restricted_fd=19 restricted_offset=0x0
+>   692500@1689108688.699802:kvm_set_user_memory AddrSpace#0 Slot#1 flags=0x4 gpa=0x100000000 size=0x380000000 ua=0x7fbfdbe00000 ret=0 restricted_fd=19 restricted_offset=0x80000000
+>   692500@1689108688.795412:kvm_set_user_memory AddrSpace#0 Slot#0 flags=0x0 gpa=0x0 size=0x0 ua=0x7fbf5be00000 ret=0 restricted_fd=19 restricted_offset=0x0
+>   692500@1689108688.795550:kvm_set_user_memory AddrSpace#0 Slot#0 flags=0x4 gpa=0x0 size=0xc0000 ua=0x7fbf5be00000 ret=0 restricted_fd=19 restricted_offset=0x0
+>   692500@1689108688.796227:kvm_set_user_memory AddrSpace#0 Slot#6 flags=0x4 gpa=0x100000 size=0x7ff00000 ua=0x7fbf5bf00000 ret=0 restricted_fd=19 restricted_offset=0x100000
+> 
+> Because of that the KVM_SET_USER_MEMORY_REGIONs for non-THP-aligned GPAs
+> will fail. Maybe instead it should be allowed, and kvm_gmem_get_folio()
+> should handle the alignment checks on a case-by-case and simply force 4k
+> for offsets corresponding to unaligned bindings?
+
+Yeah, I wanted to keep the code simple, but disallowing small bindings/memslots
+is probably going to be a deal-breaker.  Even though I'm skeptical that QEMU
+_needs_ to play these games for SNP guests, not playing nice will make it all
+but impossible to use guest_memfd for regular VMs.
+
+And the code isn't really any more complex, so long as we punt on allowing
+hugepages on interior sub-ranges.
+
+Compile-tested only, but this?
+
+---
+ virt/kvm/guest_mem.c | 54 ++++++++++++++++++++++----------------------
+ 1 file changed, 27 insertions(+), 27 deletions(-)
+
+diff --git a/virt/kvm/guest_mem.c b/virt/kvm/guest_mem.c
+index a819367434e9..dc12e38211df 100644
+--- a/virt/kvm/guest_mem.c
++++ b/virt/kvm/guest_mem.c
+@@ -426,20 +426,6 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags,
+ 	return err;
+ }
+ 
+-static bool kvm_gmem_is_valid_size(loff_t size, u64 flags)
+-{
+-	if (size < 0 || !PAGE_ALIGNED(size))
+-		return false;
+-
+-#ifdef CONFIG_TRANSPARENT_HUGEPAGE
+-	if ((flags & KVM_GUEST_MEMFD_ALLOW_HUGEPAGE) &&
+-	    !IS_ALIGNED(size, HPAGE_PMD_SIZE))
+-		return false;
+-#endif
+-
+-	return true;
+-}
+-
+ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
+ {
+ 	loff_t size = args->size;
+@@ -452,9 +438,15 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
+ 	if (flags & ~valid_flags)
+ 		return -EINVAL;
+ 
+-	if (!kvm_gmem_is_valid_size(size, flags))
++	if (size < 0 || !PAGE_ALIGNED(size))
+ 		return -EINVAL;
+ 
++#ifdef CONFIG_TRANSPARENT_HUGEPAGE
++	if ((flags & KVM_GUEST_MEMFD_ALLOW_HUGEPAGE) &&
++	    !IS_ALIGNED(size, HPAGE_PMD_SIZE))
++		return false;
++#endif
++
+ 	return __kvm_gmem_create(kvm, size, flags, kvm_gmem_mnt);
+ }
+ 
+@@ -462,7 +454,7 @@ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 		  unsigned int fd, loff_t offset)
+ {
+ 	loff_t size = slot->npages << PAGE_SHIFT;
+-	unsigned long start, end, flags;
++	unsigned long start, end;
+ 	struct kvm_gmem *gmem;
+ 	struct inode *inode;
+ 	struct file *file;
+@@ -481,16 +473,9 @@ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 		goto err;
+ 
+ 	inode = file_inode(file);
+-	flags = (unsigned long)inode->i_private;
+ 
+-	/*
+-	 * For simplicity, require the offset into the file and the size of the
+-	 * memslot to be aligned to the largest possible page size used to back
+-	 * the file (same as the size of the file itself).
+-	 */
+-	if (!kvm_gmem_is_valid_size(offset, flags) ||
+-	    !kvm_gmem_is_valid_size(size, flags))
+-		goto err;
++	if (offset < 0 || !PAGE_ALIGNED(offset))
++		return -EINVAL;
+ 
+ 	if (offset + size > i_size_read(inode))
+ 		goto err;
+@@ -591,8 +576,23 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 	page = folio_file_page(folio, index);
+ 
+ 	*pfn = page_to_pfn(page);
+-	if (max_order)
+-		*max_order = compound_order(compound_head(page));
++	if (!max_order)
++		goto success;
++
++	*max_order = compound_order(compound_head(page));
++	if (!*max_order)
++		goto success;
++
++	/*
++	 * For simplicity, allow mapping a hugepage if and only if the entire
++	 * binding is compatible, i.e. don't bother supporting mapping interior
++	 * sub-ranges with hugepages (unless userspace comes up with a *really*
++	 * strong use case for needing hugepages within unaligned bindings).
++	 */
++	if (!IS_ALIGNED(slot->gmem.pgoff, 1ull << *max_order) ||
++	    !IS_ALIGNED(slot->npages, 1ull << *max_order))
++		*max_order = 0;
++success:
+ 	r = 0;
+ 
+ out_unlock:
+
+base-commit: bc1a54ee393e0574ea422525cf0b2f1e768e38c5
 -- 
-Thanks,
-Oliver
+
