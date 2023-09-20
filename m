@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC5FA3CCFC
-	for <kvmarm@lists.linux.dev>; Wed, 20 Sep 2023 18:17:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1AFCC433C9;
-	Wed, 20 Sep 2023 18:17:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4541F3CCFC
+	for <kvmarm@lists.linux.dev>; Wed, 20 Sep 2023 18:17:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D0B3C43391;
+	Wed, 20 Sep 2023 18:17:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695233860;
-	bh=eAFhYdYPK7xFl+776FskY4IDP549/3Ym7n8sQg2d9bM=;
+	s=k20201202; t=1695233861;
+	bh=wzE7HqcraBe9mrlMhJ+Pu6o6vKM3Z/OrOZBJZhhfoAs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iop30yaCZsWLzwY0A/VUzzh9MyQHiCFXiAoutqtG0GtJedsiZiAj2R5knpMqb9nmY
-	 ynUQtJxyWMkWd5z4QPsi1wg4LqO6PauQYn4OPRDtilO50ZYNUVVuPN2pzPNM3mu6sK
-	 ioFNQEqvKk0hJUUCaz77F2B+gquk9lyWQ6uToWFhaXLws9R2t9/2p3tiSORpespo0d
-	 9jIgphjpQCzw1xZG4XOQG82B5nTlN1lqYKClEODnplkoWSxi9zilYqjvkkN3SfWom8
-	 t/4XXpoNEUeK1xBTphto1MBrTVqTW1yqbzf0EkUCz8U4+TAjPSMtEACTvclnLUokmv
-	 zMgIBoFp3mbjw==
+	b=UVjPeXYl+oeQ42iz3scoQeXLapBq339ixBgZa4YEeTBP1NtSKwhrDju4+2ef8G2vx
+	 WlQJpjeThcva37UNOpL8IuZUBYC5HtfB72ml5He9XXy7g3+lhELGIg7I7rwE5nKP7V
+	 ctdVtxMPlIpVPkj+gd/iwKbptbXs+xJ9dWe6Pq8VCUTYbhhs5FjqcSKPBzHlTxGD7e
+	 1H+TPtjU14mkV8G01mkfqCLeu2n8mvMm2PgHRcQTNsW74tq2ixuBxOtc0nBujg4Tt1
+	 7he5lkc2iUjF3/0CzVFsLNyot/AzvLabt+bz81A5z6m94PxWAztiWEv50AhWCq1YOS
+	 V2oiQL09Du9ag==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qj1la-00Ejx0-U0;
-	Wed, 20 Sep 2023 19:17:38 +0100
+	id 1qj1lb-00Ejx0-72;
+	Wed, 20 Sep 2023 19:17:39 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -33,9 +33,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
 	Xu Zhao <zhaoxu.35@bytedance.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v2 09/11] KVM: arm64: Fast-track kvm_mpidr_to_vcpu() when mpidr_data is available
-Date: Wed, 20 Sep 2023 19:17:29 +0100
-Message-Id: <20230920181731.2232453-10-maz@kernel.org>
+Subject: [PATCH v2 10/11] KVM: arm64: vgic-v3: Optimize affinity-based SGI injection
+Date: Wed, 20 Sep 2023 19:17:30 +0100
+Message-Id: <20230920181731.2232453-11-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230920181731.2232453-1-maz@kernel.org>
 References: <20230920181731.2232453-1-maz@kernel.org>
@@ -51,40 +51,115 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-If our fancy little table is present when calling kvm_mpidr_to_vcpu(),
-use it to recover the corresponding vcpu.
+Our affinity-based SGI injection code is a bit daft. We iterate
+over all the CPUs trying to match the set of affinities that the
+guest is trying to reach, leading to some very bad behaviours
+if the selected targets are at a high vcpu index.
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+Instead, we can now use the fact that we have an optimised
+MPIDR to vcpu mapping, and only look at the relevant values.
+
+This results in a much faster injection for large VMs, and
+in a near constant time, irrespective of the position in the
+vcpu index space.
+
+As a bonus, this is mostly deleting a lot of hard-to-read
+code. Nobody will complain about that.
+
+Suggested-by: Xu Zhao <zhaoxu.35@bytedance.com>
 Tested-by: Joey Gouly <joey.gouly@arm.com>
 Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arm.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c | 56 ++++--------------------------
+ 1 file changed, 6 insertions(+), 50 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index d9de4d3a339c..28f3940fa724 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2395,6 +2395,18 @@ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr)
- 	unsigned long i;
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+index 88b8d4524854..c7337a0fd242 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+@@ -1013,35 +1013,6 @@ int vgic_v3_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
  
- 	mpidr &= MPIDR_HWID_BITMASK;
-+
-+	if (kvm->arch.mpidr_data) {
-+		u16 idx = kvm_mpidr_index(kvm->arch.mpidr_data, mpidr);
-+
-+		vcpu = kvm_get_vcpu(kvm,
-+				    kvm->arch.mpidr_data->cmpidr_to_idx[idx]);
-+		if (mpidr != kvm_vcpu_get_mpidr_aff(vcpu))
-+			vcpu = NULL;
-+
-+		return vcpu;
-+	}
-+
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
- 		if (mpidr == kvm_vcpu_get_mpidr_aff(vcpu))
- 			return vcpu;
+ 	return 0;
+ }
+-/*
+- * Compare a given affinity (level 1-3 and a level 0 mask, from the SGI
+- * generation register ICC_SGI1R_EL1) with a given VCPU.
+- * If the VCPU's MPIDR matches, return the level0 affinity, otherwise
+- * return -1.
+- */
+-static int match_mpidr(u64 sgi_aff, u16 sgi_cpu_mask, struct kvm_vcpu *vcpu)
+-{
+-	unsigned long affinity;
+-	int level0;
+-
+-	/*
+-	 * Split the current VCPU's MPIDR into affinity level 0 and the
+-	 * rest as this is what we have to compare against.
+-	 */
+-	affinity = kvm_vcpu_get_mpidr_aff(vcpu);
+-	level0 = MPIDR_AFFINITY_LEVEL(affinity, 0);
+-	affinity &= ~MPIDR_LEVEL_MASK;
+-
+-	/* bail out if the upper three levels don't match */
+-	if (sgi_aff != affinity)
+-		return -1;
+-
+-	/* Is this VCPU's bit set in the mask ? */
+-	if (!(sgi_cpu_mask & BIT(level0)))
+-		return -1;
+-
+-	return level0;
+-}
+ 
+ /*
+  * The ICC_SGI* registers encode the affinity differently from the MPIDR,
+@@ -1104,7 +1075,7 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
+ 	struct kvm_vcpu *c_vcpu;
+ 	unsigned long target_cpus;
+ 	u64 mpidr;
+-	u32 sgi;
++	u32 sgi, aff0;
+ 	unsigned long c;
+ 
+ 	sgi = FIELD_GET(ICC_SGI1R_SGI_ID_MASK, reg);
+@@ -1122,31 +1093,16 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
+ 		return;
+ 	}
+ 
++	/* We iterate over affinities to find the corresponding vcpus */
+ 	mpidr = SGI_AFFINITY_LEVEL(reg, 3);
+ 	mpidr |= SGI_AFFINITY_LEVEL(reg, 2);
+ 	mpidr |= SGI_AFFINITY_LEVEL(reg, 1);
+ 	target_cpus = FIELD_GET(ICC_SGI1R_TARGET_LIST_MASK, reg);
+ 
+-	/*
+-	 * We iterate over all VCPUs to find the MPIDRs matching the request.
+-	 * If we have handled one CPU, we clear its bit to detect early
+-	 * if we are already finished. This avoids iterating through all
+-	 * VCPUs when most of the times we just signal a single VCPU.
+-	 */
+-	kvm_for_each_vcpu(c, c_vcpu, kvm) {
+-		int level0;
+-
+-		/* Exit early if we have dealt with all requested CPUs */
+-		if (target_cpus == 0)
+-			break;
+-		level0 = match_mpidr(mpidr, target_cpus, c_vcpu);
+-		if (level0 == -1)
+-			continue;
+-
+-		/* remove this matching VCPU from the mask */
+-		target_cpus &= ~BIT(level0);
+-
+-		vgic_v3_queue_sgi(c_vcpu, sgi, allow_group1);
++	for_each_set_bit(aff0, &target_cpus, hweight_long(ICC_SGI1R_TARGET_LIST_MASK)) {
++		c_vcpu = kvm_mpidr_to_vcpu(kvm, mpidr | aff0);
++		if (c_vcpu)
++			vgic_v3_queue_sgi(c_vcpu, sgi, allow_group1);
+ 	}
+ }
+ 
 -- 
 2.34.1
 
