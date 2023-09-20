@@ -1,231 +1,155 @@
-Received: from out-226.mta0.migadu.com (out-226.mta0.migadu.com [91.218.175.226])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B313FB3E
-	for <kvmarm@lists.linux.dev>; Wed, 20 Sep 2023 19:51:00 +0000 (UTC)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1695239458;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=StOBBduZhWznhRh47grr17G/cGCpfNWRT0uF7YdH2CI=;
-	b=dVH+BMxf3625PGnYYF/7CHiO/yCguj+ke3hTxHx3SJrgYqzgXJKrqv16Yoi6W2sYSmQDwf
-	1zgZoTUJlULqM6C4c/AtpruOg8tMUAALXDWpaTWF3aYk8V59B48GjCGORz7mxquC0ZDIwD
-	58vSWQ49EWVqqWf3qrTwusdQhu4PFss=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 8/8] KVM: arm64: Get rid of vCPU-scoped feature bitmap
-Date: Wed, 20 Sep 2023 19:50:36 +0000
-Message-ID: <20230920195036.1169791-9-oliver.upton@linux.dev>
-In-Reply-To: <20230920195036.1169791-1-oliver.upton@linux.dev>
-References: <20230920195036.1169791-1-oliver.upton@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21F8241AB9
+	for <kvmarm@lists.linux.dev>; Wed, 20 Sep 2023 21:00:24 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d81a47e12b5so447889276.0
+        for <kvmarm@lists.linux.dev>; Wed, 20 Sep 2023 14:00:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695243624; x=1695848424; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WD85YU6GCdPtOsLZeVlIeZZfzAYdtoOH/7wu6gyWXNI=;
+        b=k5kWbmlw6d8Ytb3B5+0pdGzjP74fD9imjogHxnilOX3G5flVxJ4zkemxngzGv9kVOR
+         QfZIK51e+ajEh3QHmbSKB6WAidNyDURx517F/KKyC2WV7vu5XxXDNdNydBi29epN58Jg
+         TaQ2S25G+31R+by2aio37FGPi3dMJGE6JP4t1DU/R0rwRjGdBJMJUGNEHegPMrbDXJWe
+         TrQE2xz+1oxcCfIIBmoayiF1SW7ZtH946z1gA5UZSU5GCbVknIx8SQLUdxYI86q4UNLS
+         Q3d2FxkIiaggYGVTh8vlyUHfZ7oIDOX8g5kJK05sTm3/60VwiGOowe206rFgc3hIwr0y
+         hYMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695243624; x=1695848424;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WD85YU6GCdPtOsLZeVlIeZZfzAYdtoOH/7wu6gyWXNI=;
+        b=T2NYmnruCqox9GiQHwozP3NlrYVyyJj3XGpHUfuipSNQez7wKra0znw5YkkxwuvLUb
+         OapvMyRBk97oiOxy2DaF/gyd9feP9TxCE5joUuUep3ADGvh9kqfX74y6WGCOP4lJ3Lux
+         ux4wVAsMQXC0yVO5BFNxmOurOKgI5u5DIaIKKYAVdYSRUWB27KjfmEujjuLJloh6O+4U
+         WO1JP1dLABIwQFolxEnqeMQAtReobirqL8M8Jucu5CLYSrLbKYxKdUJH4/73NiOaZNJf
+         B0UVOx+wJfsZMqAuzbbRfPu3m+nt6FVzu+Fg4I0OWyPUsgevhIjVfT9urFI0IZ09KIQe
+         RwYQ==
+X-Gm-Message-State: AOJu0Yw+dfxn+ZekPbXWpuKC1sVMYR+8wZUajVoEL3ZmwKBJM1gbec7b
+	H7HVos4rVwDwKKHVkM4Flcn1XvISs8U=
+X-Google-Smtp-Source: AGHT+IE6bowhyf6hyHthYBPyW6IZfmwFxVZA3ErkF6QZibGvin1ESoG81Vf7MPhR8G5wDRxCxsmQT8EV7w4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:496:0:b0:d7f:2cb6:7d88 with SMTP id
+ 144-20020a250496000000b00d7f2cb67d88mr58003ybe.13.1695243624102; Wed, 20 Sep
+ 2023 14:00:24 -0700 (PDT)
+Date: Wed, 20 Sep 2023 14:00:22 -0700
+In-Reply-To: <ZQP6ZqXH81V24Lj/@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-12-seanjc@google.com>
+ <ZQP6ZqXH81V24Lj/@yzhao56-desk.sh.intel.com>
+Message-ID: <ZQtdZmJ3SekURjiQ@google.com>
+Subject: Re: [RFC PATCH v12 11/33] KVM: Introduce per-page memory attributes
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
+	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Vlastimil Babka <vbabka@suse.cz>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
+	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-The vCPU-scoped feature bitmap was left in place a couple of releases
-ago in case the change to VM-scoped vCPU features broke anyone. Nobody
-has complained and the interop between VM and vCPU bitmaps is pretty
-gross. Throw it out.
+On Fri, Sep 15, 2023, Yan Zhao wrote:
+> On Wed, Sep 13, 2023 at 06:55:09PM -0700, Sean Christopherson wrote:
+> > From: Chao Peng <chao.p.peng@linux.intel.com>
+> > 
+> > In confidential computing usages, whether a page is private or shared is
+> > necessary information for KVM to perform operations like page fault
+> > handling, page zapping etc. There are other potential use cases for
+> > per-page memory attributes, e.g. to make memory read-only (or no-exec,
+> > or exec-only, etc.) without having to modify memslots.
+> > 
+> ...
+> >> +bool kvm_range_has_memory_attributes(struct kvm *kvm, gfn_t start, gfn_t end,
+> > +				     unsigned long attrs)
+> > +{
+> > +	XA_STATE(xas, &kvm->mem_attr_array, start);
+> > +	unsigned long index;
+> > +	bool has_attrs;
+> > +	void *entry;
+> > +
+> > +	rcu_read_lock();
+> > +
+> > +	if (!attrs) {
+> > +		has_attrs = !xas_find(&xas, end);
+> > +		goto out;
+> > +	}
+> > +
+> > +	has_attrs = true;
+> > +	for (index = start; index < end; index++) {
+> > +		do {
+> > +			entry = xas_next(&xas);
+> > +		} while (xas_retry(&xas, entry));
+> > +
+> > +		if (xas.xa_index != index || xa_to_value(entry) != attrs) {
+> Should "xa_to_value(entry) != attrs" be "!(xa_to_value(entry) & attrs)" ?
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/include/asm/kvm_emulate.h | 13 ++++++-------
- arch/arm64/include/asm/kvm_host.h    |  3 ---
- arch/arm64/include/asm/kvm_nested.h  |  3 ++-
- arch/arm64/kvm/arm.c                 |  9 ++++-----
- arch/arm64/kvm/hypercalls.c          |  2 +-
- arch/arm64/kvm/reset.c               |  6 +++---
- include/kvm/arm_pmu.h                |  2 +-
- include/kvm/arm_psci.h               |  2 +-
- 8 files changed, 18 insertions(+), 22 deletions(-)
+No, the exact comparsion is deliberate.  The intent of the API is to determine
+if the entire range already has the desired attributes, not if there is overlap
+between the two.
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 3d6725ff0bf6..965b4cd8c247 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -54,6 +54,11 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu);
- int kvm_inject_nested_sync(struct kvm_vcpu *vcpu, u64 esr_el2);
- int kvm_inject_nested_irq(struct kvm_vcpu *vcpu);
- 
-+static inline bool vcpu_has_feature(const struct kvm_vcpu *vcpu, int feature)
-+{
-+	return test_bit(feature, vcpu->kvm->arch.vcpu_features);
-+}
-+
- #if defined(__KVM_VHE_HYPERVISOR__) || defined(__KVM_NVHE_HYPERVISOR__)
- static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
- {
-@@ -62,7 +67,7 @@ static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
- #else
- static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
- {
--	return test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features);
-+	return vcpu_has_feature(vcpu, KVM_ARM_VCPU_EL1_32BIT);
- }
- #endif
- 
-@@ -565,12 +570,6 @@ static __always_inline void kvm_incr_pc(struct kvm_vcpu *vcpu)
- 		vcpu_set_flag((v), e);					\
- 	} while (0)
- 
--
--static inline bool vcpu_has_feature(struct kvm_vcpu *vcpu, int feature)
--{
--	return test_bit(feature, vcpu->arch.features);
--}
--
- static __always_inline void kvm_write_cptr_el2(u64 val)
- {
- 	if (has_vhe() || has_hvhe())
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index cb2cde7b2682..c3a17888f183 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -574,9 +574,6 @@ struct kvm_vcpu_arch {
- 	/* Cache some mmu pages needed inside spinlock regions */
- 	struct kvm_mmu_memory_cache mmu_page_cache;
- 
--	/* feature flags */
--	DECLARE_BITMAP(features, KVM_VCPU_MAX_FEATURES);
--
- 	/* Virtual SError ESR to restore when HCR_EL2.VSE is set */
- 	u64 vsesr_el2;
- 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index fa23cc9c2adc..6cec8e9c6c91 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -2,13 +2,14 @@
- #ifndef __ARM64_KVM_NESTED_H
- #define __ARM64_KVM_NESTED_H
- 
-+#include <asm/kvm_emulate.h>
- #include <linux/kvm_host.h>
- 
- static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
- {
- 	return (!__is_defined(__KVM_NVHE_HYPERVISOR__) &&
- 		cpus_have_final_cap(ARM64_HAS_NESTED_VIRT) &&
--		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
-+		vcpu_has_feature(vcpu, KVM_ARM_VCPU_HAS_EL2));
- }
- 
- extern bool __check_nv_sr_forward(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 32360a5f3779..30b7e8e7b668 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -367,7 +367,6 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 
- 	/* Force users to call KVM_ARM_VCPU_INIT */
- 	vcpu_clear_flag(vcpu, VCPU_INITIALIZED);
--	bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
- 
- 	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
- 
-@@ -1263,7 +1262,8 @@ static bool kvm_vcpu_init_changed(struct kvm_vcpu *vcpu,
- {
- 	unsigned long features = init->features[0];
- 
--	return !bitmap_equal(vcpu->arch.features, &features, KVM_VCPU_MAX_FEATURES);
-+	return !bitmap_equal(vcpu->kvm->arch.vcpu_features, &features,
-+			     KVM_VCPU_MAX_FEATURES);
- }
- 
- static int __kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
-@@ -1276,15 +1276,14 @@ static int __kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
- 	mutex_lock(&kvm->arch.config_lock);
- 
- 	if (test_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED, &kvm->arch.flags) &&
--	    !bitmap_equal(kvm->arch.vcpu_features, &features, KVM_VCPU_MAX_FEATURES))
-+	    kvm_vcpu_init_changed(vcpu, init))
- 		goto out_unlock;
- 
--	bitmap_copy(vcpu->arch.features, &features, KVM_VCPU_MAX_FEATURES);
-+	bitmap_copy(kvm->arch.vcpu_features, &features, KVM_VCPU_MAX_FEATURES);
- 
- 	/* Now we know what it is, we can reset it. */
- 	kvm_reset_vcpu(vcpu);
- 
--	bitmap_copy(kvm->arch.vcpu_features, &features, KVM_VCPU_MAX_FEATURES);
- 	set_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED, &kvm->arch.flags);
- 	vcpu_set_flag(vcpu, VCPU_INITIALIZED);
- 	ret = 0;
-diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index 7fb4df0456de..1b79219c590c 100644
---- a/arch/arm64/kvm/hypercalls.c
-+++ b/arch/arm64/kvm/hypercalls.c
-@@ -554,7 +554,7 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	{
- 		bool wants_02;
- 
--		wants_02 = test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features);
-+		wants_02 = vcpu_has_feature(vcpu, KVM_ARM_VCPU_PSCI_0_2);
- 
- 		switch (val) {
- 		case KVM_ARM_PSCI_0_1:
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 96ef9b7e74d4..5bb4de162cab 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -208,14 +208,14 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 		kvm_arch_vcpu_put(vcpu);
- 
- 	if (!kvm_arm_vcpu_sve_finalized(vcpu)) {
--		if (test_bit(KVM_ARM_VCPU_SVE, vcpu->arch.features))
-+		if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_SVE))
- 			kvm_vcpu_enable_sve(vcpu);
- 	} else {
- 		kvm_vcpu_reset_sve(vcpu);
- 	}
- 
--	if (test_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, vcpu->arch.features) ||
--	    test_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, vcpu->arch.features))
-+	if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_PTRAUTH_ADDRESS) ||
-+	    vcpu_has_feature(vcpu, KVM_ARM_VCPU_PTRAUTH_GENERIC))
- 		kvm_vcpu_enable_ptrauth(vcpu);
- 
- 	if (vcpu_el1_is_32bit(vcpu))
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 31029f4f7be8..3546ebc469ad 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -77,7 +77,7 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
- void kvm_vcpu_pmu_resync_el0(void);
- 
- #define kvm_vcpu_has_pmu(vcpu)					\
--	(test_bit(KVM_ARM_VCPU_PMU_V3, (vcpu)->arch.features))
-+	(vcpu_has_feature(vcpu, KVM_ARM_VCPU_PMU_V3))
- 
- /*
-  * Updates the vcpu's view of the pmu events for this cpu.
-diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
-index 6e55b9283789..e8fb624013d1 100644
---- a/include/kvm/arm_psci.h
-+++ b/include/kvm/arm_psci.h
-@@ -26,7 +26,7 @@ static inline int kvm_psci_version(struct kvm_vcpu *vcpu)
- 	 * revisions. It is thus safe to return the latest, unless
- 	 * userspace has instructed us otherwise.
- 	 */
--	if (test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features)) {
-+	if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_PSCI_0_2)) {
- 		if (vcpu->kvm->arch.psci_version)
- 			return vcpu->kvm->arch.psci_version;
- 
--- 
-2.42.0.515.g380fc7ccd1-goog
+E.g. if/when RWX attributes are supported, the exact comparison is needed to
+handle a RW => R conversion.
 
+> > +			has_attrs = false;
+> > +			break;
+> > +		}
+> > +	}
+> > +
+> > +out:
+> > +	rcu_read_unlock();
+> > +	return has_attrs;
+> > +}
+> > +
+> ...
+> > +/* Set @attributes for the gfn range [@start, @end). */
+> > +static int kvm_vm_set_mem_attributes(struct kvm *kvm, gfn_t start, gfn_t end,
+> > +				     unsigned long attributes)
+> > +{
+> > +	struct kvm_mmu_notifier_range pre_set_range = {
+> > +		.start = start,
+> > +		.end = end,
+> > +		.handler = kvm_arch_pre_set_memory_attributes,
+> > +		.on_lock = kvm_mmu_invalidate_begin,
+> > +		.flush_on_ret = true,
+> > +		.may_block = true,
+> > +	};
+> > +	struct kvm_mmu_notifier_range post_set_range = {
+> > +		.start = start,
+> > +		.end = end,
+> > +		.arg.attributes = attributes,
+> > +		.handler = kvm_arch_post_set_memory_attributes,
+> > +		.on_lock = kvm_mmu_invalidate_end,
+> > +		.may_block = true,
+> > +	};
+> > +	unsigned long i;
+> > +	void *entry;
+> > +	int r = 0;
+> > +
+> > +	entry = attributes ? xa_mk_value(attributes) : NULL;
+> Also here, do we need to get existing attributes of a GFN first ?
+
+No?  @entry is the new value that will be set for all entries.  This line doesn't
+touch the xarray in any way.  Maybe I'm just not understanding your question.
