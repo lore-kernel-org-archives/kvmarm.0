@@ -1,121 +1,109 @@
-Received: from out-222.mta1.migadu.com (out-222.mta1.migadu.com [95.215.58.222])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94D25C8F8
-	for <kvmarm@lists.linux.dev>; Wed, 20 Sep 2023 08:01:53 +0000 (UTC)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1695196911;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uvviR8Tdi7KfiLkhBYZ0V8IZJiQLCIG8mWutZwpfO4Y=;
-	b=Q1pRgANn7cLFCdOOTwJefgK8ef5xMI97aclHzaRwSuCodeYZsifg5u26btwIoIXqgTSVun
-	Tw5dCgzGObGsSXFOGHa8XwTJ6jjKLuelPFfppgW7g6gr8g2E+AslCe0NHEtcrlsoyqagbw
-	4cFdYCu7vDkYD7n60OEMvc9d7EF3pPc=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Gavin Shan <gshan@redhat.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 2/2] KVM: arm64: Avoid soft lockups due to I-cache maintenance
-Date: Wed, 20 Sep 2023 08:01:33 +0000
-Message-ID: <20230920080133.944717-3-oliver.upton@linux.dev>
-In-Reply-To: <20230920080133.944717-1-oliver.upton@linux.dev>
-References: <20230920080133.944717-1-oliver.upton@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9338415AE5
+	for <kvmarm@lists.linux.dev>; Wed, 20 Sep 2023 13:55:07 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-59c15767524so66874747b3.0
+        for <kvmarm@lists.linux.dev>; Wed, 20 Sep 2023 06:55:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695218106; x=1695822906; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0APReAt4bNnnd5kx+NahuCYj0tgbUgwxY6/xmv3q1x8=;
+        b=ws4TiFrp8aT1HOp6RcAm4shLsQr7hokhhDoKnJMblVIONMmvzFmtORdD2WVvdFRamG
+         Wv6ymOYvUzd5fK5GlYUdmko9gAdHl520tpExAogPkZdd76g7NYJES1J+ZMCPS8gVjtFj
+         +Xpbi7myu88q4UZp06RC4XKkFyqfDfwZ5AMReScHJIZZ0r7kOrUpmd/Dv2EVKmJMnKwM
+         Fe+JrqjzBmCqqpdVR0teDYH8DaG6cyCsujffeAqXL6XOQ19CEg2FEttX/AbrUxS10+Md
+         oEWdQoWmlaeT6mtdI1a1yiTXW5KkycL/x4VUcqK5BHJBRVgqpgowTUjLZz9C25klCK0Y
+         GG5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695218106; x=1695822906;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0APReAt4bNnnd5kx+NahuCYj0tgbUgwxY6/xmv3q1x8=;
+        b=PirMg0FDel9My4aHIex6JA2tHGdFXqyqIfipScgi772g8OsL2ndZJhOjnePM0Hf118
+         cbblsXyCkn6Oq2I3PPnAnH0UNbgUvEliE0F84WidNyWXhVWgUva3hXPWe9ut214XDNs/
+         KKzx1oQ/P6i9OU8xcAIC/J4QoshShvgQhkwSJ7cjnjtXFT7Ml56rI0RNLf5SxBUegUAK
+         sYSBcbcdz9GwiZ5H+2JOKeTWvM795yi47RKbuVM21LYSWDPjNgL0EKX/qvlNYh/baTcp
+         dSm5oM2rnOeZIFrETNt4zPfyakjKBXYCipQ5ghenh7c7/55DkJv/CUw2Xr+qh5JjUlw3
+         ykCg==
+X-Gm-Message-State: AOJu0YysXbTsKvEO0IlRHS3jbrCvFODU0KTxbq0MvXoaG32fawMJfE33
+	XDiH3jX/EubUIVUFIzlPuPmD4gZxU0A=
+X-Google-Smtp-Source: AGHT+IHuQ24Hy0wlZqpKThD2hndi3rYWapG+J/d1L/ai4z7W/k7rmZdxNg2zwHr4zmYKJTJyjaSKmjFgB/U=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:ae57:0:b0:59b:ee27:bbe9 with SMTP id
+ g23-20020a81ae57000000b0059bee27bbe9mr35901ywk.9.1695218106527; Wed, 20 Sep
+ 2023 06:55:06 -0700 (PDT)
+Date: Wed, 20 Sep 2023 06:55:05 -0700
+In-Reply-To: <ZQqMBEL61p739dpF@yilunxu-OptiPlex-7050>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-3-seanjc@google.com>
+ <ZQqMBEL61p739dpF@yilunxu-OptiPlex-7050>
+Message-ID: <ZQr5uXhV6Cnx4DYT@google.com>
+Subject: Re: [RFC PATCH v12 02/33] KVM: Use gfn instead of hva for mmu_notifier_retry
+From: Sean Christopherson <seanjc@google.com>
+To: Xu Yilun <yilun.xu@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
+	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Gavin reports of soft lockups on his Ampere Altra Max machine when
-backing KVM guests with hugetlb pages. Upon further investigation, it
-was found that the system is unable to keep up with parallel I-cache
-invalidations done by KVM's stage-2 fault handler.
+On Wed, Sep 20, 2023, Xu Yilun wrote:
+> On 2023-09-13 at 18:55:00 -0700, Sean Christopherson wrote:
+> > +void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end)
+> > +{
+> > +	lockdep_assert_held_write(&kvm->mmu_lock);
+> > +
+> > +	WARN_ON_ONCE(!kvm->mmu_invalidate_in_progress);
+> > +
+> >  	if (likely(kvm->mmu_invalidate_in_progress == 1)) {
+> >  		kvm->mmu_invalidate_range_start = start;
+> >  		kvm->mmu_invalidate_range_end = end;
+> 
+> IIUC, Now we only add or override a part of the invalidate range in
+> these fields, IOW only the range in last slot is stored when we unlock.
 
-This is ultimately an implementation problem. I-cache maintenance
-instructions are available at EL0, so nothing stops a malicious
-userspace from hammering a system with CMOs and cause it to fall over.
-"Fixing" this problem in KVM is nothing more than slapping a bandage
-over a much deeper problem.
+Ouch.  Good catch!
 
-Anyway, the kernel already has a heuristic for limiting TLB
-invalidations to avoid soft lockups. Reuse that logic to limit I-cache
-CMOs done by KVM to map executable pages on systems without FEAT_DIC.
-While at it, restructure __invalidate_icache_guest_page() to improve
-readability and squeeze our new condition into the existing branching
-structure.
+> That may break mmu_invalidate_retry_gfn() cause it can never know the
+> whole invalidate range.
+> 
+> How about we extend the mmu_invalidate_range_start/end everytime so that
+> it records the whole invalidate range:
+> 
+> if (kvm->mmu_invalidate_range_start == INVALID_GPA) {
+> 	kvm->mmu_invalidate_range_start = start;
+> 	kvm->mmu_invalidate_range_end = end;
+> } else {
+> 	kvm->mmu_invalidate_range_start =
+> 		min(kvm->mmu_invalidate_range_start, start);
+> 	kvm->mmu_invalidate_range_end =
+> 		max(kvm->mmu_invalidate_range_end, end);
+> }
 
-Link: https://lore.kernel.org/kvmarm/20230904072826.1468907-1-gshan@redhat.com/
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/include/asm/kvm_mmu.h | 37 ++++++++++++++++++++++++++------
- 1 file changed, 31 insertions(+), 6 deletions(-)
+Yeah, that does seem to be the easiest solution.
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 96a80e8f6226..a425ecdd7be0 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -224,16 +224,41 @@ static inline void __clean_dcache_guest_page(void *va, size_t size)
- 	kvm_flush_dcache_to_poc(va, size);
- }
- 
-+static inline size_t __invalidate_icache_max_range(void)
-+{
-+	u8 iminline;
-+	u64 ctr;
-+
-+	asm volatile(ALTERNATIVE_CB("movz %0, #0\n"
-+				    "movk %0, #0, lsl #16\n"
-+				    "movk %0, #0, lsl #32\n"
-+				    "movk %0, #0, lsl #48\n",
-+				    ARM64_ALWAYS_SYSTEM,
-+				    kvm_compute_final_ctr_el0)
-+		     : "=r" (ctr));
-+
-+	iminline = SYS_FIELD_GET(CTR_EL0, IminLine, ctr) + 2;
-+	return MAX_DVM_OPS << iminline;
-+}
-+
- static inline void __invalidate_icache_guest_page(void *va, size_t size)
- {
--	if (icache_is_aliasing()) {
--		/* any kind of VIPT cache */
-+	/*
-+	 * VPIPT I-cache maintenance must be done from EL2. See comment in the
-+	 * nVHE flavor of __kvm_tlb_flush_vmid_ipa().
-+	 */
-+	if (icache_is_vpipt() && read_sysreg(CurrentEL) != CurrentEL_EL2)
-+		return;
-+
-+	/*
-+	 * Blow the whole I-cache if it is aliasing (i.e. VIPT) or the
-+	 * invalidation range exceeds our arbitrary limit on invadations by
-+	 * cache line.
-+	 */
-+	if (icache_is_aliasing() || size > __invalidate_icache_max_range())
- 		icache_inval_all_pou();
--	} else if (read_sysreg(CurrentEL) != CurrentEL_EL1 ||
--		   !icache_is_vpipt()) {
--		/* PIPT or VPIPT at EL2 (see comment in __kvm_tlb_flush_vmid_ipa) */
-+	else
- 		icache_inval_pou((unsigned long)va, (unsigned long)va + size);
--	}
- }
- 
- void kvm_set_way_flush(struct kvm_vcpu *vcpu);
--- 
-2.42.0.459.ge4e396fd5e-goog
-
+I'll post a fixup patch, unless you want the honors.
