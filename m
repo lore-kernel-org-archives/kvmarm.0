@@ -1,19 +1,19 @@
-Received: from out-225.mta1.migadu.com (out-225.mta1.migadu.com [95.215.58.225])
+Received: from out-222.mta1.migadu.com (out-222.mta1.migadu.com [95.215.58.222])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56605C8E3
-	for <kvmarm@lists.linux.dev>; Wed, 20 Sep 2023 08:01:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94D25C8F8
+	for <kvmarm@lists.linux.dev>; Wed, 20 Sep 2023 08:01:53 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1695196909;
+	t=1695196911;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=xfbh8qQL9QW5BcJKxEDXewQuyfv4M5lak2q1jy6348Q=;
-	b=kJfWlYzUpeP9zIU/DMOihsHo4wNb5lISvzWIPxEGTfLtXeW7QzzHIIFQUt9VdXyBJ1qfNl
-	XiaSonGNvCmM14etc2Y/yw2NIdjgpfkvUQetSAj2KPbk3CxgvpQSN8SiJ0Wq53/yyOAWAy
-	WmgKUWt8goAWcxpo1wvmmhksbPK/EN8=
+	bh=uvviR8Tdi7KfiLkhBYZ0V8IZJiQLCIG8mWutZwpfO4Y=;
+	b=Q1pRgANn7cLFCdOOTwJefgK8ef5xMI97aclHzaRwSuCodeYZsifg5u26btwIoIXqgTSVun
+	Tw5dCgzGObGsSXFOGHa8XwTJ6jjKLuelPFfppgW7g6gr8g2E+AslCe0NHEtcrlsoyqagbw
+	4cFdYCu7vDkYD7n60OEMvc9d7EF3pPc=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -26,9 +26,9 @@ Cc: kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	Gavin Shan <gshan@redhat.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 1/2] arm64: tlbflush: Rename MAX_TLBI_OPS
-Date: Wed, 20 Sep 2023 08:01:32 +0000
-Message-ID: <20230920080133.944717-2-oliver.upton@linux.dev>
+Subject: [PATCH 2/2] KVM: arm64: Avoid soft lockups due to I-cache maintenance
+Date: Wed, 20 Sep 2023 08:01:33 +0000
+Message-ID: <20230920080133.944717-3-oliver.upton@linux.dev>
 In-Reply-To: <20230920080133.944717-1-oliver.upton@linux.dev>
 References: <20230920080133.944717-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -40,56 +40,82 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Perhaps unsurprisingly, I-cache invalidations suffer from performance
-issues similar to TLB invalidations on certain systems. TLB and I-cache
-maintenance all result in DVM on the mesh, which is where the real
-bottleneck lies.
+Gavin reports of soft lockups on his Ampere Altra Max machine when
+backing KVM guests with hugetlb pages. Upon further investigation, it
+was found that the system is unable to keep up with parallel I-cache
+invalidations done by KVM's stage-2 fault handler.
 
-Rename the heuristic to point the finger at DVM, such that it may be
-reused for limiting I-cache invalidations.
+This is ultimately an implementation problem. I-cache maintenance
+instructions are available at EL0, so nothing stops a malicious
+userspace from hammering a system with CMOs and cause it to fall over.
+"Fixing" this problem in KVM is nothing more than slapping a bandage
+over a much deeper problem.
 
+Anyway, the kernel already has a heuristic for limiting TLB
+invalidations to avoid soft lockups. Reuse that logic to limit I-cache
+CMOs done by KVM to map executable pages on systems without FEAT_DIC.
+While at it, restructure __invalidate_icache_guest_page() to improve
+readability and squeeze our new condition into the existing branching
+structure.
+
+Link: https://lore.kernel.org/kvmarm/20230904072826.1468907-1-gshan@redhat.com/
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/tlbflush.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ arch/arm64/include/asm/kvm_mmu.h | 37 ++++++++++++++++++++++++++------
+ 1 file changed, 31 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
-index b149cf9f91bc..3431d37e5054 100644
---- a/arch/arm64/include/asm/tlbflush.h
-+++ b/arch/arm64/include/asm/tlbflush.h
-@@ -333,7 +333,7 @@ static inline void arch_tlbbatch_flush(struct arch_tlbflush_unmap_batch *batch)
-  * This is meant to avoid soft lock-ups on large TLB flushing ranges and not
-  * necessarily a performance improvement.
-  */
--#define MAX_TLBI_OPS	PTRS_PER_PTE
-+#define MAX_DVM_OPS	PTRS_PER_PTE
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 96a80e8f6226..a425ecdd7be0 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -224,16 +224,41 @@ static inline void __clean_dcache_guest_page(void *va, size_t size)
+ 	kvm_flush_dcache_to_poc(va, size);
+ }
  
- /*
-  * __flush_tlb_range_op - Perform TLBI operation upon a range
-@@ -413,12 +413,12 @@ static inline void __flush_tlb_range(struct vm_area_struct *vma,
- 
- 	/*
- 	 * When not uses TLB range ops, we can handle up to
--	 * (MAX_TLBI_OPS - 1) pages;
-+	 * (MAX_DVM_OPS - 1) pages;
- 	 * When uses TLB range ops, we can handle up to
- 	 * (MAX_TLBI_RANGE_PAGES - 1) pages.
- 	 */
- 	if ((!system_supports_tlb_range() &&
--	     (end - start) >= (MAX_TLBI_OPS * stride)) ||
-+	     (end - start) >= (MAX_DVM_OPS * stride)) ||
- 	    pages >= MAX_TLBI_RANGE_PAGES) {
- 		flush_tlb_mm(vma->vm_mm);
- 		return;
-@@ -451,7 +451,7 @@ static inline void flush_tlb_kernel_range(unsigned long start, unsigned long end
++static inline size_t __invalidate_icache_max_range(void)
++{
++	u8 iminline;
++	u64 ctr;
++
++	asm volatile(ALTERNATIVE_CB("movz %0, #0\n"
++				    "movk %0, #0, lsl #16\n"
++				    "movk %0, #0, lsl #32\n"
++				    "movk %0, #0, lsl #48\n",
++				    ARM64_ALWAYS_SYSTEM,
++				    kvm_compute_final_ctr_el0)
++		     : "=r" (ctr));
++
++	iminline = SYS_FIELD_GET(CTR_EL0, IminLine, ctr) + 2;
++	return MAX_DVM_OPS << iminline;
++}
++
+ static inline void __invalidate_icache_guest_page(void *va, size_t size)
  {
- 	unsigned long addr;
+-	if (icache_is_aliasing()) {
+-		/* any kind of VIPT cache */
++	/*
++	 * VPIPT I-cache maintenance must be done from EL2. See comment in the
++	 * nVHE flavor of __kvm_tlb_flush_vmid_ipa().
++	 */
++	if (icache_is_vpipt() && read_sysreg(CurrentEL) != CurrentEL_EL2)
++		return;
++
++	/*
++	 * Blow the whole I-cache if it is aliasing (i.e. VIPT) or the
++	 * invalidation range exceeds our arbitrary limit on invadations by
++	 * cache line.
++	 */
++	if (icache_is_aliasing() || size > __invalidate_icache_max_range())
+ 		icache_inval_all_pou();
+-	} else if (read_sysreg(CurrentEL) != CurrentEL_EL1 ||
+-		   !icache_is_vpipt()) {
+-		/* PIPT or VPIPT at EL2 (see comment in __kvm_tlb_flush_vmid_ipa) */
++	else
+ 		icache_inval_pou((unsigned long)va, (unsigned long)va + size);
+-	}
+ }
  
--	if ((end - start) > (MAX_TLBI_OPS * PAGE_SIZE)) {
-+	if ((end - start) > (MAX_DVM_OPS * PAGE_SIZE)) {
- 		flush_tlb_all();
- 		return;
- 	}
+ void kvm_set_way_flush(struct kvm_vcpu *vcpu);
 -- 
 2.42.0.459.ge4e396fd5e-goog
 
