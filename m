@@ -1,198 +1,98 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF6828F9
-	for <kvmarm@lists.linux.dev>; Thu, 21 Sep 2023 05:58:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695275894; x=1726811894;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=D2Ofh4NhqIgE7X1sOt5XtBxAR4C9rpdFRo7VG5iLwuA=;
-  b=eR0Y66aNS+GHqPHnA7Jmrd7b4bv7Chen8qUhQJoLzZ/SNlz2Y4Pcw1iu
-   MELTP82XRUHqzaN7YohCUkpUcANs1/4CsXYxojqx9ZKh0k9lmPwaciRqT
-   sFx3siwtLA2wHf3rJZcdSgcHam9KkCnConT1Cv7SBtxjlEWsSOORacvtx
-   VCyU2Po+FNbsJuv1WdDzpjfElEXEcUZbgiJF12pdXNblNZm/xK35Pg7wA
-   1T0sDoAxuvRlHb7xV3uterS/fp/8DXSDxxE+uLMIvlFOx8MSX1Ou7I9Vs
-   rc6nNNA+9owfVU5mDOmvqBFGWMwvBqklvh3vKZfpfxtDxqj1iYg7KNxxI
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="380337415"
-X-IronPort-AV: E=Sophos;i="6.03,164,1694761200"; 
-   d="scan'208";a="380337415"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2023 22:58:13 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="740494287"
-X-IronPort-AV: E=Sophos;i="6.03,164,1694761200"; 
-   d="scan'208";a="740494287"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.93.17.222]) ([10.93.17.222])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2023 22:58:02 -0700
-Message-ID: <f9ca9457-ca64-484c-7306-97a3236210da@linux.intel.com>
-Date: Thu, 21 Sep 2023 13:58:00 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 858CC3D90
+	for <kvmarm@lists.linux.dev>; Thu, 21 Sep 2023 07:14:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FB1CC43397;
+	Thu, 21 Sep 2023 07:14:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695280460;
+	bh=sbkMaObnKRwmPdGiHp5t8tLUVEh68i9Dek5db4bGsRI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=otAknR7kPOaMqD/Ihsj4qYdxAt3lmU1INGuf7Ggozz7L5M7AkgAYnmqwQBVvrK2JY
+	 cp0h77ns9QvRutZwtn6j8H+twS6B1HitnWufCR4xfKx5+XJKy9Ae9szfB41ChjkTef
+	 E60nsJFZLkS+jYeAQtpYLjnSungfyh9OAmpL+nJgrgnJ1M88B1XCIex6+DayWE6ChJ
+	 D1Xwh0035idybMDFBLwiW/QdGMnqQzRh4jmbKOUb98NU1TI9EqdbRWhXeYUPenQwaB
+	 M2kHK4KyX3YJvYLT9VJgBj5q097fSTZEKbzfdPFD3bnWX3xqZsC43tIdY0vvSq9z9F
+	 BCgMr4/nd71IA==
+Received: from 82-132-232-12.dab.02.net ([82.132.232.12] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qjDsl-00ErtX-Dv;
+	Thu, 21 Sep 2023 08:14:17 +0100
+Date: Thu, 21 Sep 2023 08:13:40 +0100
+Message-ID: <878r903snv.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Suraj Jitindar Singh <surajjs@amazon.com>
+Cc:<stable@vger.kernel.org>,<james.morse@arm.com>,<alexandru.elisei@arm.com>
+ ,<suzuki.poulose@arm.com>,<oliver.upton@linux.dev>,
+ <catalin.marinas@arm.com>,<linux-arm-kernel@lists.infradead.org>,
+ <kvmarm@lists.linux.dev>,<kvmarm@lists.cs.columbia.edu>,
+ <linux-kernel@vger.kernel.org>,<sjitindarsingh@gmail.com>,	Quentin Perret
+ <qperret@google.com>,	Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?=
+ <philmd@linaro.org>,	Vincent Donnefort <vdonnefort@google.com>,	Will Deacon
+ <will@kernel.org>
+Subject: Re: [PATCH stable 6.1.y 1/2] KVM: arm64: Prevent the donation of no-map pages
+In-Reply-To: <20230920192729.694309-1-surajjs@amazon.com>
+References: <20230920192729.694309-1-surajjs@amazon.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [RFC PATCH v12 14/33] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linux-security-module@vger.kernel.org,
- linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
- Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Andrew Morton <akpm@linux-foundation.org>, Paul Moore <paul@paul-moore.com>,
- James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
- Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>,
- Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>,
- Yu Zhang <yu.c.zhang@linux.intel.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>, Xu Yilun <yilun.xu@intel.com>,
- Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>,
- Ackerley Tng <ackerleytng@google.com>,
- Maciej Szmigiero <mail@maciej.szmigiero.name>,
- David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
- Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
- Liam Merwick <liam.merwick@oracle.com>,
- Isaku Yamahata <isaku.yamahata@gmail.com>,
- "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20230914015531.1419405-1-seanjc@google.com>
- <20230914015531.1419405-15-seanjc@google.com>
- <e397d30c-c6af-e68f-d18e-b4e3739c5389@linux.intel.com>
- <ZQsAiGuw/38jIOV7@google.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <ZQsAiGuw/38jIOV7@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 82.132.232.12
+X-SA-Exim-Rcpt-To: surajjs@amazon.com, stable@vger.kernel.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, sjitindarsingh@gmail.com, qperret@google.com, philmd@linaro.org, vdonnefort@google.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Wed, 20 Sep 2023 20:27:28 +0100,
+Suraj Jitindar Singh <surajjs@amazon.com> wrote:
+>=20
+> From: Quentin Perret <qperret@google.com>
+>=20
+> commit 43c1ff8b75011bc3e3e923adf31ba815864a2494 upstream.
+>=20
+> Memory regions marked as "no-map" in the host device-tree routinely
+> include TrustZone carev-outs and DMA pools. Although donating such pages
+> to the hypervisor may not breach confidentiality, it could be used to
+> corrupt its state in uncontrollable ways. To prevent this, let's block
+> host-initiated memory transitions targeting "no-map" pages altogether in
+> nVHE protected mode as there should be no valid reason to do this in
+> current operation.
+>=20
+> Thankfully, the pKVM EL2 hypervisor has a full copy of the host's list
+> of memblock regions, so we can easily check for the presence of the
+> MEMBLOCK_NOMAP flag on a region containing pages being donated from the
+> host.
+>=20
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+> Tested-by: Vincent Donnefort <vdonnefort@google.com>
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> Signed-off-by: Will Deacon <will@kernel.org>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Link: https://lore.kernel.org/r/20221110190259.26861-8-will@kernel.org
+> [ bp: clean ]
 
+What is this?
 
-On 9/20/2023 10:24 PM, Sean Christopherson wrote:
-> On Tue, Sep 19, 2023, Binbin Wu wrote:
->>
->> On 9/14/2023 9:55 AM, Sean Christopherson wrote:
->> [...]
->>> +
->>> +static void kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
->>> +				      pgoff_t end)
->>> +{
->>> +	struct kvm_memory_slot *slot;
->>> +	struct kvm *kvm = gmem->kvm;
->>> +	unsigned long index;
->>> +	bool flush = false;
->>> +
->>> +	KVM_MMU_LOCK(kvm);
->>> +
->>> +	kvm_mmu_invalidate_begin(kvm);
->>> +
->>> +	xa_for_each_range(&gmem->bindings, index, slot, start, end - 1) {
->>> +		pgoff_t pgoff = slot->gmem.pgoff;
->>> +
->>> +		struct kvm_gfn_range gfn_range = {
->>> +			.start = slot->base_gfn + max(pgoff, start) - pgoff,
->>> +			.end = slot->base_gfn + min(pgoff + slot->npages, end) - pgoff,
->>> +			.slot = slot,
->>> +			.may_block = true,
->>> +		};
->>> +
->>> +		flush |= kvm_mmu_unmap_gfn_range(kvm, &gfn_range);
->>> +	}
->>> +
->>> +	if (flush)
->>> +		kvm_flush_remote_tlbs(kvm);
->>> +
->>> +	KVM_MMU_UNLOCK(kvm);
->>> +}
->>> +
->>> +static void kvm_gmem_invalidate_end(struct kvm_gmem *gmem, pgoff_t start,
->>> +				    pgoff_t end)
->>> +{
->>> +	struct kvm *kvm = gmem->kvm;
->>> +
->>> +	KVM_MMU_LOCK(kvm);
->>> +	if (xa_find(&gmem->bindings, &start, end - 1, XA_PRESENT))
->>> +		kvm_mmu_invalidate_end(kvm);
->> kvm_mmu_invalidate_begin() is called unconditionally in
->> kvm_gmem_invalidate_begin(),
->> but kvm_mmu_invalidate_end() is not here.
->> This makes the kvm_gmem_invalidate_{begin, end}() calls asymmetric.
-> Another ouch :-(
->
-> And there should be no need to acquire mmu_lock() unconditionally, the inode's
-> mutex protects the bindings, not mmu_lock.
->
-> I'll get a fix posted today.  I think KVM can also add a sanity check to detect
-> unresolved invalidations, e.g.
->
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 7ba1ab1832a9..2a2d18070856 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1381,8 +1381,13 @@ static void kvm_destroy_vm(struct kvm *kvm)
->           * No threads can be waiting in kvm_swap_active_memslots() as the
->           * last reference on KVM has been dropped, but freeing
->           * memslots would deadlock without this manual intervention.
-> +        *
-> +        * If the count isn't unbalanced, i.e. KVM did NOT unregister between
-> +        * a start() and end(), then there shouldn't be any in-progress
-> +        * invalidations.
->           */
->          WARN_ON(rcuwait_active(&kvm->mn_memslots_update_rcuwait));
-> +       WARN_ON(!kvm->mn_active_invalidate_count && kvm->mmu_invalidate_in_progress);
->          kvm->mn_active_invalidate_count = 0;
->   #else
->          kvm_flush_shadow_all(kvm);
->
->
-> or an alternative style
->
-> 	if (kvm->mn_active_invalidate_count)
-> 		kvm->mn_active_invalidate_count = 0;
-> 	else
-> 		WARN_ON(kvm->mmu_invalidate_in_progress)
->
->>> +	KVM_MMU_UNLOCK(kvm);
->>> +}
->>> +
->>> +static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
->>> +{
->>> +	struct list_head *gmem_list = &inode->i_mapping->private_list;
->>> +	pgoff_t start = offset >> PAGE_SHIFT;
->>> +	pgoff_t end = (offset + len) >> PAGE_SHIFT;
->>> +	struct kvm_gmem *gmem;
->>> +
->>> +	/*
->>> +	 * Bindings must stable across invalidation to ensure the start+end
->>> +	 * are balanced.
->>> +	 */
->>> +	filemap_invalidate_lock(inode->i_mapping);
->>> +
->>> +	list_for_each_entry(gmem, gmem_list, entry) {
->>> +		kvm_gmem_invalidate_begin(gmem, start, end);
->>> +		kvm_gmem_invalidate_end(gmem, start, end);
->>> +	}
->> Why to loop for each gmem in gmem_list here?
->>
->> IIUIC, offset is the offset according to the inode, it is only meaningful to
->> the inode passed in, i.e, it is only meaningful to the gmem binding with the
->> inode, not others.
-> The code is structured to allow for multiple gmem instances per inode.  This isn't
-> actually possible in the initial code base, but it's on the horizon[*].  I included
-> the list-based infrastructure in this initial series to ensure that guest_memfd
-> can actually support multiple files per inode, and to minimize the churn when the
-> "link" support comes along.
->
-> [*] https://lore.kernel.org/all/cover.1691446946.git.ackerleytng@google.com
-Got it, thanks for the explanation!
+> Signed-off-by: Suraj Jitindar Singh <surajjs@amazon.com>
 
+What is the rationale for backporting this? It wasn't tagged as Cc: to
+stable for a reason: pKVM isn't functional upstream, and won't be for
+the next couple of cycles *at least*.
 
+So at it stands, I'm against such a backport.
 
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
