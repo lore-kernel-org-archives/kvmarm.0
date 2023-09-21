@@ -1,68 +1,60 @@
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C179CA57
-	for <kvmarm@lists.linux.dev>; Thu, 21 Sep 2023 22:23:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD88C9CA57
+	for <kvmarm@lists.linux.dev>; Thu, 21 Sep 2023 22:25:23 +0000 (UTC)
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7740d57e9f3so57880485a.3
+        for <kvmarm@lists.linux.dev>; Thu, 21 Sep 2023 15:25:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1695334989; x=1726870989;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=g7EFafS6t1foqgqAqNV0pkx1nSCq9B41+AoW2S9TWQg=;
-  b=HtKZ3swlu5guLQ2/O3mQlFHO1kiQZG3g+h8v84hr2y6iFAoPyVhpzf8X
-   1z32Q/tS6r8oKFs6AitfYFdisOydublKfzVmWPHjA9Ld5rvrIky2E2llg
-   7XoJ8whV9Xe2KAoB2rPQOXyTD4TBQVuiA8clTfoghQ72MH6yi7oB4ayjw
-   U=;
-X-IronPort-AV: E=Sophos;i="6.03,166,1694736000"; 
-   d="scan'208";a="365147049"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-54a853e6.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 22:23:07 +0000
-Received: from EX19MTAUWC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-	by email-inbound-relay-iad-1a-m6i4x-54a853e6.us-east-1.amazon.com (Postfix) with ESMTPS id 4099248173;
-	Thu, 21 Sep 2023 22:23:02 +0000 (UTC)
-Received: from EX19D030UWB004.ant.amazon.com (10.13.139.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Thu, 21 Sep 2023 22:22:55 +0000
-Received: from EX19D030UWB002.ant.amazon.com (10.13.139.182) by
- EX19D030UWB004.ant.amazon.com (10.13.139.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Thu, 21 Sep 2023 22:22:54 +0000
-Received: from EX19D030UWB002.ant.amazon.com ([fe80::8cbd:fcae:56ad:4dfa]) by
- EX19D030UWB002.ant.amazon.com ([fe80::8cbd:fcae:56ad:4dfa%6]) with mapi id
- 15.02.1118.037; Thu, 21 Sep 2023 22:22:54 +0000
-From: "Jitindar Singh, Suraj" <surajjs@amazon.com>
-To: "maz@kernel.org" <maz@kernel.org>
-CC: "vdonnefort@google.com" <vdonnefort@google.com>, "philmd@linaro.org"
-	<philmd@linaro.org>, "james.morse@arm.com" <james.morse@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, "qperret@google.com" <qperret@google.com>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "catalin.marinas@arm.com"
-	<catalin.marinas@arm.com>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu"
-	<kvmarm@lists.cs.columbia.edu>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>, "will@kernel.org" <will@kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"alexandru.elisei@arm.com" <alexandru.elisei@arm.com>
-Subject: Re: [PATCH stable 6.1.y 1/2] KVM: arm64: Prevent the donation of
- no-map pages
-Thread-Topic: [PATCH stable 6.1.y 1/2] KVM: arm64: Prevent the donation of
- no-map pages
-Thread-Index: AQHZ7NoqQQBf46ilGUajYblrTraBLA==
-Date: Thu, 21 Sep 2023 22:22:54 +0000
-Message-ID: <a64c30b027951c4c533dea858150e2e807a912b7.camel@amazon.com>
+        d=gmail.com; s=20230601; t=1695335122; x=1695939922; darn=lists.linux.dev;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=w2WooG+QkTpfUqojwok2CEiVMWZpsqmSjm3ZHCN+V1E=;
+        b=kML8YbdfpLzbKUfu68rP+F0CaHS0uea8T+tS3t5uOC1JKeM3afYUxNBOyRA61kkXpf
+         T3/YVUr6E86TJ7UJJzvR5Yfb+xq8Jq5OjaG6TSFxdkOZ3dxZzCAEoh8ZoGCzE9TP/D7g
+         2iqAdY0Xqq9FkppxPQ9z1UY8w0z01/pgIJtuG0mp+ybhIM3c6ophRGjCaos7klKe+kQq
+         RBs4UnvTj7gzjvGyFQSd1OE6Ylb6wWnDmD2cwM67tQIiFqiguNsStS9DyiIDNzf14qGZ
+         /dFqOOdEE58QUqaY7oDQG4UJoEYKtqhEHwHDVnHGcHy89vwa5x1Po/QUw72OEG9jQCeL
+         dfZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695335122; x=1695939922;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=w2WooG+QkTpfUqojwok2CEiVMWZpsqmSjm3ZHCN+V1E=;
+        b=M+4JMR/Kk5ef7RXnJ8TnqqRGSvIW6NqEAsml12VJDtsNUj5RK2y2L7xJJ1HgXpvCZL
+         skBVZAJgKjQvHdWtheM1zO3Wv6SjERnf7tWSVhgbyh9GPguDPrphmaSRl3gduN2j4K1O
+         AvymF+VJoqbNlmZHm7pUAdvfLdnPsjC9MmqOfKBnpWU6ymLbtvWAs3YMYnQPTaBlPAMH
+         wcN4ezlV4AuwlyJwTjsSuTF1LGqqJ29L5DrQcCLTht8fkf1GtgTdivmGgLXBo+ZbSc9x
+         YNh38NKcNc0mLcfAsfc5iO7Cfhq08bBpIvRSMeGNVRdKsNLHI3lCa696RMnt8D1suMEb
+         9ikA==
+X-Gm-Message-State: AOJu0YwS+2CF6mFFLtod9IGsLQdQe6+o3Ey2llD/IMkOwalVhrOpTsIl
+	D5yNPID2D3yCuMm7b8nBFvs=
+X-Google-Smtp-Source: AGHT+IFF0Fxu8IrAYMqbYE9O+JZeHJhGWgzy2cxwLDKKEWylEYlzdyNJ+FOguWr32UjLJJaA5m+Wew==
+X-Received: by 2002:a0c:e106:0:b0:651:6968:ae40 with SMTP id w6-20020a0ce106000000b006516968ae40mr6418148qvk.20.1695335122511;
+        Thu, 21 Sep 2023 15:25:22 -0700 (PDT)
+Received: from freeip.amazon.com ([205.251.233.111])
+        by smtp.googlemail.com with ESMTPSA id v7-20020a0ce1c7000000b00655d55117f5sm924928qvl.81.2023.09.21.15.25.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Sep 2023 15:25:21 -0700 (PDT)
+Message-ID: <2031eecaa417d4f6021717dcbbba133d784add72.camel@gmail.com>
+Subject: Re: [PATCH stable 6.1.y 2/2] KVM: arm64: Prevent unconditional
+ donation of unmapped regions from the host
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: stable@vger.kernel.org, james.morse@arm.com, alexandru.elisei@arm.com, 
+	suzuki.poulose@arm.com, oliver.upton@linux.dev, catalin.marinas@arm.com, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Will Deacon <will@kernel.org>, Quentin Perret
+	 <qperret@google.com>
+Date: Thu, 21 Sep 2023 15:25:19 -0700
+In-Reply-To: <877cok3skn.wl-maz@kernel.org>
 References: <20230920192729.694309-1-surajjs@amazon.com>
-	 <878r903snv.wl-maz@kernel.org>
-In-Reply-To: <878r903snv.wl-maz@kernel.org>
-Accept-Language: en-AU, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [10.187.171.47]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C6192A419174F448B28D39C53A1949A3@amazon.com>
-Content-Transfer-Encoding: base64
+	 <20230920192729.694309-2-surajjs@amazon.com> <877cok3skn.wl-maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -70,44 +62,60 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 
-T24gVGh1LCAyMDIzLTA5LTIxIGF0IDA4OjEzICswMTAwLCBNYXJjIFp5bmdpZXIgd3JvdGU6DQo+
-IE9uIFdlZCwgMjAgU2VwIDIwMjMgMjA6Mjc6MjggKzAxMDAsDQo+IFN1cmFqIEppdGluZGFyIFNp
-bmdoIDxzdXJhampzQGFtYXpvbi5jb20+IHdyb3RlOg0KPiA+IA0KPiA+IEZyb206IFF1ZW50aW4g
-UGVycmV0IDxxcGVycmV0QGdvb2dsZS5jb20+DQo+ID4gDQo+ID4gY29tbWl0IDQzYzFmZjhiNzUw
-MTFiYzNlM2U5MjNhZGYzMWJhODE1ODY0YTI0OTQgdXBzdHJlYW0uDQo+ID4gDQo+ID4gTWVtb3J5
-IHJlZ2lvbnMgbWFya2VkIGFzICJuby1tYXAiIGluIHRoZSBob3N0IGRldmljZS10cmVlIHJvdXRp
-bmVseQ0KPiA+IGluY2x1ZGUgVHJ1c3Rab25lIGNhcmV2LW91dHMgYW5kIERNQSBwb29scy4gQWx0
-aG91Z2ggZG9uYXRpbmcgc3VjaA0KPiA+IHBhZ2VzDQo+ID4gdG8gdGhlIGh5cGVydmlzb3IgbWF5
-IG5vdCBicmVhY2ggY29uZmlkZW50aWFsaXR5LCBpdCBjb3VsZCBiZSB1c2VkDQo+ID4gdG8NCj4g
-PiBjb3JydXB0IGl0cyBzdGF0ZSBpbiB1bmNvbnRyb2xsYWJsZSB3YXlzLiBUbyBwcmV2ZW50IHRo
-aXMsIGxldCdzDQo+ID4gYmxvY2sNCj4gPiBob3N0LWluaXRpYXRlZCBtZW1vcnkgdHJhbnNpdGlv
-bnMgdGFyZ2V0aW5nICJuby1tYXAiIHBhZ2VzDQo+ID4gYWx0b2dldGhlciBpbg0KPiA+IG5WSEUg
-cHJvdGVjdGVkIG1vZGUgYXMgdGhlcmUgc2hvdWxkIGJlIG5vIHZhbGlkIHJlYXNvbiB0byBkbyB0
-aGlzDQo+ID4gaW4NCj4gPiBjdXJyZW50IG9wZXJhdGlvbi4NCj4gPiANCj4gPiBUaGFua2Z1bGx5
-LCB0aGUgcEtWTSBFTDIgaHlwZXJ2aXNvciBoYXMgYSBmdWxsIGNvcHkgb2YgdGhlIGhvc3Qncw0K
-PiA+IGxpc3QNCj4gPiBvZiBtZW1ibG9jayByZWdpb25zLCBzbyB3ZSBjYW4gZWFzaWx5IGNoZWNr
-IGZvciB0aGUgcHJlc2VuY2Ugb2YgdGhlDQo+ID4gTUVNQkxPQ0tfTk9NQVAgZmxhZyBvbiBhIHJl
-Z2lvbiBjb250YWluaW5nIHBhZ2VzIGJlaW5nIGRvbmF0ZWQgZnJvbQ0KPiA+IHRoZQ0KPiA+IGhv
-c3QuDQo+ID4gDQo+ID4gUmV2aWV3ZWQtYnk6IFBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpIDxwaGls
-bWRAbGluYXJvLm9yZz4NCj4gPiBUZXN0ZWQtYnk6IFZpbmNlbnQgRG9ubmVmb3J0IDx2ZG9ubmVm
-b3J0QGdvb2dsZS5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogUXVlbnRpbiBQZXJyZXQgPHFwZXJy
-ZXRAZ29vZ2xlLmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBXaWxsIERlYWNvbiA8d2lsbEBrZXJu
-ZWwub3JnPg0KPiA+IFNpZ25lZC1vZmYtYnk6IE1hcmMgWnluZ2llciA8bWF6QGtlcm5lbC5vcmc+
-DQo+ID4gTGluazoNCj4gPiBodHRwczovL2xvcmUua2VybmVsLm9yZy9yLzIwMjIxMTEwMTkwMjU5
-LjI2ODYxLTgtd2lsbEBrZXJuZWwub3JnDQo+ID4gWyBicDogY2xlYW4gXQ0KPiANCj4gV2hhdCBp
-cyB0aGlzPw0KDQpOb3RpbmcgYW55IGRldGFpbHMgYWJvdXQgdGhlIGJhY2twb3J0LiBJbiB0aGlz
-IGNhc2UgaXQgd2FzIGEgY2xlYW4NCmJhY2twb3J0Lg0KDQo+IA0KPiA+IFNpZ25lZC1vZmYtYnk6
-IFN1cmFqIEppdGluZGFyIFNpbmdoIDxzdXJhampzQGFtYXpvbi5jb20+DQo+IA0KPiBXaGF0IGlz
-IHRoZSByYXRpb25hbGUgZm9yIGJhY2twb3J0aW5nIHRoaXM/IEl0IHdhc24ndCB0YWdnZWQgYXMg
-Q2M6DQo+IHRvDQo+IHN0YWJsZSBmb3IgYSByZWFzb246IHBLVk0gaXNuJ3QgZnVuY3Rpb25hbCB1
-cHN0cmVhbSwgYW5kIHdvbid0IGJlIGZvcg0KPiB0aGUgbmV4dCBjb3VwbGUgb2YgY3ljbGVzICph
-dCBsZWFzdCouDQo+IA0KPiBTbyBhdCBpdCBzdGFuZHMsIEknbSBhZ2FpbnN0IHN1Y2ggYSBiYWNr
-cG9ydC4NCj4gDQoNClRoZSAyIHBhdGNoZXMgd2VyZSBiYWNrcG9ydGVkIHRvIGFkZHJlc3MgQ1ZF
-LTIwMjMtMjEyNjQuDQpUaGlzIG9uZSBwcm92aWRlcyBjb250ZXh0IGZvciB0aGUgcHJvY2VlZGlu
-ZyBwYXRjaC4NCg0KSSB3YXNuJ3QgYXdhcmUgdGhhdCBpdCdzIG5vbiBmdW5jdGlvbmFsLiBEb2Vz
-IHRoaXMgbWVhbiB0aGF0IHRoZSBjb2RlDQp3b24ndCBiZSBjb21waWxlZCBvciBqdXN0IHRoYXQg
-aXQgY2FuJ3QgYWN0dWFsbHkgYmUgcnVuIGN1cnJlbnRseSBmcm9tDQp0aGUgdXBzdHJlYW0gY29k
-ZWJhc2U/DQoNCkkgZ3Vlc3MgSSdtIHRyeWluZyB0byB1bmRlcnN0YW5kIGlmIHRoZSBjb25kaXRp
-b25zIG9mIHRoZSBDVkUgYXJlIGENCnJlYWwgY29uY2VybiBldmVuIGlmIGl0IGlzbid0IHRlY2hu
-aWNhbGx5IGZ1bmN0aW9uYWwuDQoNClRoYW5rcw0KDQo+IFRoYW5rcywNCj4gDQo+IMKgwqDCoMKg
-wqDCoMKgwqBNLg0KPiANCg0K
+On Thu, 2023-09-21 at 08:15 +0100, Marc Zyngier wrote:
+> On Wed, 20 Sep 2023 20:27:29 +0100,
+> Suraj Jitindar Singh <surajjs@amazon.com> wrote:
+> >=20
+> > From: Will Deacon <will@kernel.org>
+> >=20
+> > commit 09cce60bddd6461a93a5bf434265a47827d1bc6f upstream.
+> >=20
+> > Since host stage-2 mappings are created lazily, we cannot rely
+> > solely on
+> > the pte in order to recover the target physical address when
+> > checking a
+> > host-initiated memory transition as this permits donation of
+> > unmapped
+> > regions corresponding to MMIO or "no-map" memory.
+> >=20
+> > Instead of inspecting the pte, move the addr_is_allowed_memory()
+> > check
+> > into the host callback function where it is passed the physical
+> > address
+> > directly from the walker.
+> >=20
+> > Cc: Quentin Perret <qperret@google.com>
+> > Fixes: e82edcc75c4e ("KVM: arm64: Implement do_share() helper for
+> > sharing memory")
+> > Signed-off-by: Will Deacon <will@kernel.org>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Link:
+> > https://lore.kernel.org/r/20230518095844.1178-1-will@kernel.org
+> > [ bp: s/ctx->addr/addr in __check_page_state_visitor due to missing
+> > commit
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "KVM: arm64: Combine visitor arguments i=
+nto a context
+> > structure"
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 in stable.
+> > ]
+>=20
+> Same question.
+
+Noting what changes were made to the patch from the upstream mainline
+version when it was applied to the stable tree.
+
+>=20
+> > Signed-off-by: Suraj Jitindar Singh <surajjs@amazon.com>
+>=20
+> Again, I find this backport pretty pointless. What is the rationale
+> for it?
+
+The 2 patches were backported to address CVE-2023-21264.
+This one addresses the CVE.
+
+Thanks
+
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0M.
+>=20
+
