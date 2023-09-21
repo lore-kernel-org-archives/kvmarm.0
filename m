@@ -1,74 +1,85 @@
-Received: from out-220.mta0.migadu.com (out-220.mta0.migadu.com [91.218.175.220])
+Received: from out-220.mta1.migadu.com (out-220.mta1.migadu.com [95.215.58.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D87A4E26F
-	for <kvmarm@lists.linux.dev>; Thu, 21 Sep 2023 18:18:42 +0000 (UTC)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B074E26F
+	for <kvmarm@lists.linux.dev>; Thu, 21 Sep 2023 18:20:31 +0000 (UTC)
+Date: Thu, 21 Sep 2023 18:20:25 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1695320320;
+	t=1695320429;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ESi6WCBz3OcaqeHi98zUfJuzlX+aJShGsyp1e4x2WAo=;
-	b=nc+IU8ws3v0fKGEvdOjh+9eclrG3oseb4BTozEvJFAu7EQZoT9TP39KHIoK4TxYmEHb5qT
-	uj1EqJaYMzwur6Dmig4qb3MpZTUT+bkK7RD1d7gSUKSVR0fiYw1LSCc/BbalF2oQZxiDSg
-	dBW48jpwPZenKHf8Kwrxe64vw5nX/wA=
+	bh=eDVj7vBYL4POoo6A10PvdiayJKcc6WHRQ4O+JZKL8UQ=;
+	b=PUfudyk6ReRH+2s9ORiXaDcNJc1LVPsIdVjHGxtialJrGPv8q0nhuk/Zz2yjSMIP2NuhYt
+	g2PsOwBPZiuEvi/YVVdOIYS3BH9lalo4i7M/KfR11Yk/7yg2TN7/Wp7ZdsKxFpLRN33oDm
+	aoMzv/WbffsVif7m0tpLKUgfICd9A7I=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev,
-	Oliver Upton <oliver.upton@linux.dev>
-Cc: James Morse <james.morse@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 0/8] KVM: arm64: Cleanup + fix to vCPU reset, feature flags
-Date: Thu, 21 Sep 2023 18:18:28 +0000
-Message-ID: <169532025748.1287192.9601319237389431113.b4-ty@linux.dev>
-In-Reply-To: <20230920195036.1169791-1-oliver.upton@linux.dev>
-References: <20230920195036.1169791-1-oliver.upton@linux.dev>
+	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
+	Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v10 01/12] KVM: arm64: Allow userspace to get the
+ writable masks for feature ID registers
+Message-ID: <ZQyJaUVZZEKHiUMe@linux.dev>
+References: <20230920183310.1163034-1-oliver.upton@linux.dev>
+ <20230920183310.1163034-2-oliver.upton@linux.dev>
+ <874jjn26oq.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <874jjn26oq.fsf@redhat.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, 20 Sep 2023 19:50:28 +0000, Oliver Upton wrote:
-> The way we do vCPU feature flag checks is a bit of a scattered mess
-> between the KVM_ARM_VCPU_INIT ioctl handler and kvm_reset_vcpu(). Let's
-> move all the feature flag checks up into the ioctl() handler to
-> eliminate failure paths from kvm_reset_vcpu(), as other usage of this
-> function no not handle returned errors.
+On Thu, Sep 21, 2023 at 11:53:41AM +0200, Cornelia Huck wrote:
+> On Wed, Sep 20 2023, Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Nobody screamed about the VM-wide feature flag change, so its also a
-> good time to rip out the vestiges of the vCPU-scoped bitmap.
+> > From: Jing Zhang <jingzhangos@google.com>
+> >
+> > While the Feature ID range is well defined and pretty large, it isn't
+> > inconceivable that the architecture will eventually grow some other
+> > ranges that will need to similarly be described to userspace.
+> >
+> > Add a VM ioctl to allow userspace to get writable masks for feature ID
+> > registers in below system register space:
+> > op0 = 3, op1 = {0, 1, 3}, CRn = 0, CRm = {0 - 7}, op2 = {0 - 7}
+> > This is used to support mix-and-match userspace and kernels for writable
+> > ID registers, where userspace may want to know upfront whether it can
+> > actually tweak the contents of an idreg or not.
+> >
+> > Add a new capability (KVM_CAP_ARM_SUPPORTED_FEATURE_ID_RANGES) that
+> > returns a bitmap of the valid ranges, which can subsequently be
+> > retrieved, one at a time by setting the index of the set bit as the
+> > range identifier.
+> >
+> > Suggested-by: Marc Zyngier <maz@kernel.org>
+> > Suggested-by: Cornelia Huck <cohuck@redhat.com>
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > 
-> [...]
+> <process>I think you need to add your s-o-b here.</process>
 
-Applied to kvmarm/next, with the change to use cpus_have_final_cap() per
-Marc's suggestion.
+Whoops, I thought I gave the right mix of flags to b4... clearly not.
 
-[1/8] KVM: arm64: Add generic check for system-supported vCPU features
-      https://git.kernel.org/kvmarm/kvmarm/c/ef150908b6bd
-[2/8] KVM: arm64: Hoist PMUv3 check into KVM_ARM_VCPU_INIT ioctl handler
-      https://git.kernel.org/kvmarm/kvmarm/c/9116db11feb5
-[3/8] KVM: arm64: Hoist SVE check into KVM_ARM_VCPU_INIT ioctl handler
-      https://git.kernel.org/kvmarm/kvmarm/c/be9c0c018389
-[4/8] KVM: arm64: Hoist PAuth checks into KVM_ARM_VCPU_INIT ioctl
-      https://git.kernel.org/kvmarm/kvmarm/c/baa28a53ddbe
-[5/8] KVM: arm64: Prevent NV feature flag on systems w/o nested virt
-      https://git.kernel.org/kvmarm/kvmarm/c/12405b09926f
-[6/8] KVM: arm64: Hoist NV+SVE check into KVM_ARM_VCPU_INIT ioctl handler
-      https://git.kernel.org/kvmarm/kvmarm/c/d99fb82fd35e
-[7/8] KVM: arm64: Remove unused return value from kvm_reset_vcpu()
-      https://git.kernel.org/kvmarm/kvmarm/c/3d4b2a4cddd7
-[8/8] KVM: arm64: Get rid of vCPU-scoped feature bitmap
-      https://git.kernel.org/kvmarm/kvmarm/c/1de10b7d13a9
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h |  2 +
+> >  arch/arm64/include/uapi/asm/kvm.h | 32 +++++++++++++++
+> >  arch/arm64/kvm/arm.c              | 10 +++++
+> >  arch/arm64/kvm/sys_regs.c         | 66 +++++++++++++++++++++++++++++++
+> >  include/uapi/linux/kvm.h          |  2 +
+> >  5 files changed, 112 insertions(+)
+> 
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> 
 
---
-Best,
+Appreciated!
+
+-- 
+Thanks,
 Oliver
