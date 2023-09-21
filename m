@@ -1,156 +1,74 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-220.mta0.migadu.com (out-220.mta0.migadu.com [91.218.175.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F3939475
-	for <kvmarm@lists.linux.dev>; Thu, 21 Sep 2023 14:59:13 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-58f9db8bc1dso14226067b3.3
-        for <kvmarm@lists.linux.dev>; Thu, 21 Sep 2023 07:59:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695308352; x=1695913152; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4hX9qb1Iw7SkuB3FcSZYopfwd6y9xnz247DDm3mrX40=;
-        b=j9g9hg14HoJ9pv99VRfPeMXNDBlasYEzjCwU8sqYnP3eYInU7KifLZV48XrEo+hQ4Y
-         malPfGiYQDCs44FunqzRpY2ei0MpBqmtFsMRwNgyEOzV9AXpsmwzfu/Rk0kX19MTEH3V
-         1LBZqB/rmMv2lp29T9oFr9PVjysA5HK89Ip6M34tPe/O37B0w+OutEIeDr7mNSUiEvyB
-         vN/aU4XrrNRQ1xhIe3jFM7j/D6zTS5hVukLzvyxXmXqgp93Y/hZSwqOus2ytqmzQMlid
-         sIt4CRxDKlnX69QgZxvUOrNHMJ7ySQwMC4cG07p+oWv59MUUYVBZucbQ9svh2A+syspa
-         cqyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695308352; x=1695913152;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4hX9qb1Iw7SkuB3FcSZYopfwd6y9xnz247DDm3mrX40=;
-        b=qJ+UpQkOq1rrUyA25G5dZyl/yE+j/dCZcMo9v5gR1zU9cOO8Qr5hq5XWE4VHesz+Rb
-         g3FVyNbPsSFl1iHyotcA6uVljRYLTR+9RbNcCbDQrSyH9iRdBSHsuYEBJU/EHacE/6DM
-         b2k8Yh+UkufMXKjtq3ELCyu3J9Kt3PqUuZ38V601febXvwIT7PnO3aQ3O41UNXCJvTF3
-         GfsUQcBQNtW6/YjJ6KEaiRKMu5d6DpFDoC3GNBM9icBrLdQ72+unqtQR6f0SF52Wkf89
-         P8IK6uiCKHk3ALdLuFtZoniTtqkyDsxvpsXzBoN3S9IY0WpccUmsqJPxf3bIMrfF2mrx
-         D57Q==
-X-Gm-Message-State: AOJu0YwCCXaL7zR2yLuEn62/zv+hCYt8mL+OVXXvpLfF+oJ8MnwR/1m8
-	3yw//93Zp2lwH1zmv5DSEESPt0G/jbY=
-X-Google-Smtp-Source: AGHT+IGMlI3r5pTKtUH2X22CRcKkDXwZa01FQ/zuLj/x6iC6Lpx1DAvznI7oMbumBcX5i3FsE4fH+yzcjSE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:2906:b0:59e:ee51:52a1 with SMTP id
- eg6-20020a05690c290600b0059eee5152a1mr76581ywb.10.1695308352199; Thu, 21 Sep
- 2023 07:59:12 -0700 (PDT)
-Date: Thu, 21 Sep 2023 07:59:10 -0700
-In-Reply-To: <ZQef3zAEYjZMkn9k@yzhao56-desk.sh.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D87A4E26F
+	for <kvmarm@lists.linux.dev>; Thu, 21 Sep 2023 18:18:42 +0000 (UTC)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1695320320;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ESi6WCBz3OcaqeHi98zUfJuzlX+aJShGsyp1e4x2WAo=;
+	b=nc+IU8ws3v0fKGEvdOjh+9eclrG3oseb4BTozEvJFAu7EQZoT9TP39KHIoK4TxYmEHb5qT
+	uj1EqJaYMzwur6Dmig4qb3MpZTUT+bkK7RD1d7gSUKSVR0fiYw1LSCc/BbalF2oQZxiDSg
+	dBW48jpwPZenKHf8Kwrxe64vw5nX/wA=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: James Morse <james.morse@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 0/8] KVM: arm64: Cleanup + fix to vCPU reset, feature flags
+Date: Thu, 21 Sep 2023 18:18:28 +0000
+Message-ID: <169532025748.1287192.9601319237389431113.b4-ty@linux.dev>
+In-Reply-To: <20230920195036.1169791-1-oliver.upton@linux.dev>
+References: <20230920195036.1169791-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-19-seanjc@google.com>
- <ZQPuMK6D/7UzDH+D@yzhao56-desk.sh.intel.com> <ZQRpiOd1DNDDJQ3r@google.com> <ZQef3zAEYjZMkn9k@yzhao56-desk.sh.intel.com>
-Message-ID: <ZQxaPsNiFgfXH7aq@google.com>
-Subject: Re: [RFC PATCH v12 18/33] KVM: x86/mmu: Handle page fault for private memory
-From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Paul Moore <paul@paul-moore.com>, 
-	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
-	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Vlastimil Babka <vbabka@suse.cz>, 
-	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
-	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Sep 18, 2023, Yan Zhao wrote:
-> On Fri, Sep 15, 2023 at 07:26:16AM -0700, Sean Christopherson wrote:
-> > On Fri, Sep 15, 2023, Yan Zhao wrote:
-> > > >  static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> > > >  {
-> > > >  	struct kvm_memory_slot *slot = fault->slot;
-> > > > @@ -4293,6 +4356,14 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
-> > > >  			return RET_PF_EMULATE;
-> > > >  	}
-> > > >  
-> > > > +	if (fault->is_private != kvm_mem_is_private(vcpu->kvm, fault->gfn)) {
-> > > In patch 21,
-> > > fault->is_private is set as:
-> > > 	".is_private = kvm_mem_is_private(vcpu->kvm, cr2_or_gpa >> PAGE_SHIFT)",
-> > > then, the inequality here means memory attribute has been updated after
-> > > last check.
-> > > So, why an exit to user space for converting is required instead of a mere retry?
-> > > 
-> > > Or, is it because how .is_private is assigned in patch 21 is subjected to change
-> > > in future? 
-> > 
-> > This.  Retrying on SNP or TDX would hang the guest.  I suppose we could special
-> Is this because if the guest access a page in private way (e.g. via
-> private key in TDX), the returned page must be a private page?
-
-Yes, the returned page must be private, because the GHCI (TDX) and GHCB (SNP)
-require that the host allow implicit conversions.  I.e. if the guest accesses
-memory as private (or shared), then the host must map memory as private (or shared).
-Simply resuming the guest will not change the guest access, nor will it change KVM's
-memory attributes.
-
-Ideally (IMO), implicit conversions would be disallowed, but even if implicit
-conversions weren't a thing, retrying would still be wrong as KVM would either
-inject an exception into the guest or exit to userspace to let userspace handle
-the illegal access.
-
-> > case VMs where .is_private is derived from the memory attributes, but the
-> > SW_PROTECTED_VM type is primary a development vehicle at this point.  I'd like to
-> > have it mimic SNP/TDX as much as possible; performance is a secondary concern.
-> Ok. But this mimic is somewhat confusing as it may be problematic in below scenario,
-> though sane guest should ensure no one is accessing a page before doing memory
-> conversion.
+On Wed, 20 Sep 2023 19:50:28 +0000, Oliver Upton wrote:
+> The way we do vCPU feature flag checks is a bit of a scattered mess
+> between the KVM_ARM_VCPU_INIT ioctl handler and kvm_reset_vcpu(). Let's
+> move all the feature flag checks up into the ioctl() handler to
+> eliminate failure paths from kvm_reset_vcpu(), as other usage of this
+> function no not handle returned errors.
 > 
+> Nobody screamed about the VM-wide feature flag change, so its also a
+> good time to rip out the vestiges of the vCPU-scoped bitmap.
 > 
-> CPU 0                           CPU 1
-> access GFN A in private way
-> fault->is_private=true
->                                 convert GFN A to shared
-> 			        set memory attribute of A to shared
-> 
-> faultin, mismatch and exit
-> set memory attribute of A
-> to private
-> 
->                                 vCPU access GFN A in shared way
->                                 fault->is_private = true
->                                 faultin, match and map a private PFN B
-> 
->                                 vCPU accesses private PFN B in shared way
+> [...]
 
-If this is a TDX or SNP VM, then the private vs. shared information comes from
-the guest itself, e.g. this sequence
+Applied to kvmarm/next, with the change to use cpus_have_final_cap() per
+Marc's suggestion.
 
-                                   vCPU access GFN A in shared way
-                                   fault->is_private = true
+[1/8] KVM: arm64: Add generic check for system-supported vCPU features
+      https://git.kernel.org/kvmarm/kvmarm/c/ef150908b6bd
+[2/8] KVM: arm64: Hoist PMUv3 check into KVM_ARM_VCPU_INIT ioctl handler
+      https://git.kernel.org/kvmarm/kvmarm/c/9116db11feb5
+[3/8] KVM: arm64: Hoist SVE check into KVM_ARM_VCPU_INIT ioctl handler
+      https://git.kernel.org/kvmarm/kvmarm/c/be9c0c018389
+[4/8] KVM: arm64: Hoist PAuth checks into KVM_ARM_VCPU_INIT ioctl
+      https://git.kernel.org/kvmarm/kvmarm/c/baa28a53ddbe
+[5/8] KVM: arm64: Prevent NV feature flag on systems w/o nested virt
+      https://git.kernel.org/kvmarm/kvmarm/c/12405b09926f
+[6/8] KVM: arm64: Hoist NV+SVE check into KVM_ARM_VCPU_INIT ioctl handler
+      https://git.kernel.org/kvmarm/kvmarm/c/d99fb82fd35e
+[7/8] KVM: arm64: Remove unused return value from kvm_reset_vcpu()
+      https://git.kernel.org/kvmarm/kvmarm/c/3d4b2a4cddd7
+[8/8] KVM: arm64: Get rid of vCPU-scoped feature bitmap
+      https://git.kernel.org/kvmarm/kvmarm/c/1de10b7d13a9
 
-cannot happen because is_private will be false based on the error code (SNP) or
-the GPA (TDX).
-
-And when hardware doesn't generate page faults based on private vs. shared, i.e.
-for non-TDX/SNP VMs, from a fault handling perspective there is no concept of the
-guest accessing a GFN in a "private way" or a "shared way".  I.e. there are no
-implicit conversions.
-
-For SEV and SEV-ES, the guest can access memory as private vs. shared, but the
-and the host VMM absolutely must be in agreement and synchronized with respect to
-the state of a page, otherwise guest memory will be corrupted.  But that has
-nothing to do with the fault handling, e.g. creating aliases in the guest to access
-a single GFN as shared and private from two CPUs will create incoherent cache
-entries and/or corrupt data without any involvement from KVM.
-
-In other words, the above isn't possible for TDX/SNP, and for all other types,
-the conflict between CPU0 and CPU1 is unequivocally a guest bug.
+--
+Best,
+Oliver
