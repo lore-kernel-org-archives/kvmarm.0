@@ -1,32 +1,74 @@
-Received: from out-212.mta0.migadu.com (out-212.mta0.migadu.com [91.218.175.212])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55A3D138E
-	for <kvmarm@lists.linux.dev>; Thu, 21 Sep 2023 02:11:44 +0000 (UTC)
-Date: Thu, 21 Sep 2023 02:11:37 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1695262302;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FW3p4VZIzuygrjsMUziYPALYuVKWOnunmv01SSe6GfA=;
-	b=IDZSCRSwygs8bsWOJ77HlflG6hYQLi5RwZzud31RDVA2h87NoE+NQKWu9MzZzjbNqLH9+b
-	4scDyVusgOwT4VG5EsvTvBzKYaveGm4M4S5WNW0B/5kzm8M/Pu8RU68FHwR3vXIn3JlvJk
-	L7nbPllEEafHK3nvi+EHW8iEeF87PG4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	Xu Zhao <zhaoxu.35@bytedance.com>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v2 00/11] KVM: arm64: Accelerate lookup of vcpus by MPIDR
- values (and other fixes)
-Message-ID: <ZQumWVPQ3nxWjnON@linux.dev>
-References: <20230920181731.2232453-1-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B281840
+	for <kvmarm@lists.linux.dev>; Thu, 21 Sep 2023 02:39:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695263995; x=1726799995;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=iSkpE1N9Jcp84HPqnZ+sK/v5B9D3q8Q2ZGh6iASUxTU=;
+  b=QMxYLfRcxVjlt2JELGOu9PCSyMNr1ixLCAbfbUpWOLVunrJeyQ80UA7s
+   8H12ILDLy45wWwrEjygDsrV8PeeBlEp6OIQaSq6E8/BhsiXRN28Yz2oPh
+   /ksj9i6pXn6H3V97kDFf+VjAiBf7LyV3l+BBlWmtguiTAwba6i7o6S85o
+   01rxP/GrIT1aUy9f+/JcEXtpygpQ/yfFzX3bhe1yB7Z29/gj4Y7BLkD9b
+   OYX0UKHHt9oNM5HndiEbdeM11Jzm4f9ePwaU3fPpHDEC9Xk0xuyJAVvbw
+   tb9vqu5Kr48uJwsC+p4uz8ZML7jzrGxCgBfmddbQn9fOLHscV1OeiW2nH
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="360653920"
+X-IronPort-AV: E=Sophos;i="6.03,164,1694761200"; 
+   d="scan'208";a="360653920"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2023 19:39:54 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="1077731075"
+X-IronPort-AV: E=Sophos;i="6.03,164,1694761200"; 
+   d="scan'208";a="1077731075"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by fmsmga005.fm.intel.com with ESMTP; 20 Sep 2023 19:39:45 -0700
+Date: Thu, 21 Sep 2023 10:39:18 +0800
+From: Xu Yilun <yilun.xu@intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Chao Peng <chao.p.peng@linux.intel.com>,
+	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+	Anish Moorthy <amoorthy@google.com>,
+	Yu Zhang <yu.c.zhang@linux.intel.com>,
+	Isaku Yamahata <isaku.yamahata@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Vishal Annapurve <vannapurve@google.com>,
+	Ackerley Tng <ackerleytng@google.com>,
+	Maciej Szmigiero <mail@maciej.szmigiero.name>,
+	David Hildenbrand <david@redhat.com>,
+	Quentin Perret <qperret@google.com>,
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
+	Liam Merwick <liam.merwick@oracle.com>,
+	Isaku Yamahata <isaku.yamahata@gmail.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [RFC PATCH v12 02/33] KVM: Use gfn instead of hva for
+ mmu_notifier_retry
+Message-ID: <ZQus1v3AvEZjuat9@yilunxu-OptiPlex-7050>
+References: <20230914015531.1419405-1-seanjc@google.com>
+ <20230914015531.1419405-3-seanjc@google.com>
+ <ZQqMBEL61p739dpF@yilunxu-OptiPlex-7050>
+ <ZQr5uXhV6Cnx4DYT@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,27 +77,56 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230920181731.2232453-1-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <ZQr5uXhV6Cnx4DYT@google.com>
 
-Heh, "and other fixes" is quite the understatement :)
-
-This looks good to me, only issues I've spotted so far are a few typos
-that are easty enough to fix when I apply the series. I'll give it a
-couple days for folks to have a look, but otherwise intend on picking
-this up for 6.7.
-
-On Wed, Sep 20, 2023 at 07:17:20PM +0100, Marc Zyngier wrote:
-> This is a follow-up on [1], which contains the original patches, only
-> augmented with a bunch of fixes after Zenghui pointed out that I was
-> inadvertently fixing bugs (yay!), but that there were plenty more.
+On 2023-09-20 at 06:55:05 -0700, Sean Christopherson wrote:
+> On Wed, Sep 20, 2023, Xu Yilun wrote:
+> > On 2023-09-13 at 18:55:00 -0700, Sean Christopherson wrote:
+> > > +void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end)
+> > > +{
+> > > +	lockdep_assert_held_write(&kvm->mmu_lock);
+> > > +
+> > > +	WARN_ON_ONCE(!kvm->mmu_invalidate_in_progress);
+> > > +
+> > >  	if (likely(kvm->mmu_invalidate_in_progress == 1)) {
+> > >  		kvm->mmu_invalidate_range_start = start;
+> > >  		kvm->mmu_invalidate_range_end = end;
+> > 
+> > IIUC, Now we only add or override a part of the invalidate range in
+> > these fields, IOW only the range in last slot is stored when we unlock.
 > 
-> The core of the issue is that we tend to confuse vcpu_id with
-> vcpu_idx. The first is a userspace-provided value, from which we
-> derive the default MPIDR_EL1 value, while the second is something that
-> used to represent the position in the vcpu array, and is now more of
-> an internal identifier.
+> Ouch.  Good catch!
+> 
+> > That may break mmu_invalidate_retry_gfn() cause it can never know the
+> > whole invalidate range.
+> > 
+> > How about we extend the mmu_invalidate_range_start/end everytime so that
+> > it records the whole invalidate range:
+> > 
+> > if (kvm->mmu_invalidate_range_start == INVALID_GPA) {
+> > 	kvm->mmu_invalidate_range_start = start;
+> > 	kvm->mmu_invalidate_range_end = end;
+> > } else {
+> > 	kvm->mmu_invalidate_range_start =
+> > 		min(kvm->mmu_invalidate_range_start, start);
+> > 	kvm->mmu_invalidate_range_end =
+> > 		max(kvm->mmu_invalidate_range_end, end);
+> > }
+> 
+> Yeah, that does seem to be the easiest solution.
+> 
+> I'll post a fixup patch, unless you want the honors.
 
--- 
+Please go ahead, cause at a second thought I'm wondering if this simple
+range extension is reasonable.
+
+When the invalidation acrosses multiple slots, I'm not sure if the
+contiguous HVA range must correspond to contiguous GFN range. If not,
+are we producing a larger range than required?
+
+And when the invalidation acrosses multiple address space, I'm almost
+sure it is wrong to merge GFN ranges from different address spaces. But
+I have no clear solution yet.
+
 Thanks,
-Oliver
+Yilun
