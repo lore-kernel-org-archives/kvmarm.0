@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4300E7F7
-	for <kvmarm@lists.linux.dev>; Thu, 21 Sep 2023 08:31:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0D7FC116CA;
-	Thu, 21 Sep 2023 08:31:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F6DF8F55
+	for <kvmarm@lists.linux.dev>; Thu, 21 Sep 2023 08:49:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06268C116D3;
+	Thu, 21 Sep 2023 08:49:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695285062;
-	bh=kB4LhEjqLrRHXbvRoCAvnP5iEiWmIRBRjQ+v51+IXkY=;
+	s=k20201202; t=1695286186;
+	bh=jBI4DDTzsnjvbT2OViCJyfEIRHKk7D4YO/h+LRCNpFk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UsRlVqGQVju8/qDh03TLqaHEO8aM9FoYk6nyBZGIgwEfoYbvxMR2SzbauwXO6Fm7f
-	 9m+Hs2nV+DG8BANdv1V4rQxVPtivVRVjtc5CdzXdSaSO/+18y5jl5LEcH8TRXH2kn2
-	 I/KWYdKAS1AkADu8xu5Ua2F8MTt/JLwsH8KBabMQkQCgDGwJY57taq5hS04+5fZoak
-	 /OXPlGJagdcoQNNMyPXX6pZBnGK0Jh0dFaHvrxPfP9qK+KpGT3A2QFU8RdEbD/yNio
-	 YyOe3ADN6Rzo2jvSFqGnsbOmDSIGdW21ghzCOTUeIioepD+YGMhLMA/8cfmMhEQESX
-	 zBkqcWAt6DcIQ==
+	b=Ugp3m588JhNt/HGv0edk/kOhAp9E77T4Hq7x5Ym4IMtyo0u9vBM9nLksFdSodF8xS
+	 T3S3T2dUJXMi+h0gtVvtyiFRDw01l+G/qlbLNly+XOnXaS+frc6AS9Yc3qBeW9a22M
+	 rJsf4iyBtf1jpkaVVr+DYsqP9Dhz+mxW/aaXR+HVvMuYHBvtOsgp7dYqFJSu9n/8Y7
+	 73sXd+xonoWiesTuoRsOG2tXJMUgZp4/yRmkmM2pBAcKzKVmpZsppkOzrIsVBgUToh
+	 9uaWmW+30PhsUMj/+9RuKf5th1N1u8X3DCNCP4iNHVYyLle/xdLP+w/UDbQzed/EUa
+	 V5sNSQ97PH98g==
 Received: from 82-132-232-12.dab.02.net ([82.132.232.12] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qjF5P-00Esfc-SV;
-	Thu, 21 Sep 2023 09:31:00 +0100
-Date: Thu, 21 Sep 2023 09:30:27 +0100
-Message-ID: <87wmwk2ajg.wl-maz@kernel.org>
+	id 1qjFNX-00Esuq-EB;
+	Thu, 21 Sep 2023 09:49:43 +0100
+Date: Thu, 21 Sep 2023 09:49:40 +0100
+Message-ID: <87v8c33o7v.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -30,10 +30,9 @@ Cc: kvmarm@lists.linux.dev,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 1/8] KVM: arm64: Add generic check for system-supported vCPU features
-In-Reply-To: <20230920195036.1169791-2-oliver.upton@linux.dev>
+Subject: Re: [PATCH 0/8] KVM: arm64: Cleanup + fix to vCPU reset, feature flags
+In-Reply-To: <20230920195036.1169791-1-oliver.upton@linux.dev>
 References: <20230920195036.1169791-1-oliver.upton@linux.dev>
-	<20230920195036.1169791-2-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -49,48 +48,28 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kern
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 20 Sep 2023 20:50:29 +0100,
+On Wed, 20 Sep 2023 20:50:28 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> To date KVM has relied on kvm_reset_vcpu() failing when the vCPU feature
-> flags are unsupported by the system. This is a bit messy since
-> kvm_reset_vcpu() is called at runtime outside of the KVM_ARM_VCPU_INIT
-> ioctl when it is expected to succeed. Further complicating the matter is
-> that kvm_reset_vcpu() must tolerate be idemptotent to the config_lock,
-> as it isn't consistently called with the lock held.
+> The way we do vCPU feature flag checks is a bit of a scattered mess
+> between the KVM_ARM_VCPU_INIT ioctl handler and kvm_reset_vcpu(). Let's
+> move all the feature flag checks up into the ioctl() handler to
+> eliminate failure paths from kvm_reset_vcpu(), as other usage of this
+> function no not handle returned errors.
 > 
-> Prepare to move feature compatibility checks out of kvm_reset_vcpu() with
-> a 'generic' check that compares the user-provided flags with a computed
-> maximum feature set for the system.
+> Nobody screamed about the VM-wide feature flag change, so its also a
+> good time to rip out the vestiges of the vCPU-scoped bitmap.
 > 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/arm.c | 16 +++++++++++++---
->  1 file changed, 13 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 4866b3f7b4ea..66f3720cdd3a 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1190,6 +1190,16 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
->  	return -EINVAL;
->  }
->  
-> +static unsigned long system_supported_vcpu_features(void)
-> +{
-> +	unsigned long features = KVM_VCPU_VALID_FEATURES;
-> +
-> +	if (!cpus_have_const_cap(ARM64_HAS_32BIT_EL1))
+> I also spotted a bug with the NV feature flag where we allow it
+> regardless of system support.
 
-I think we can now convert this to a cpus_have_final_cap(), as Mark is
-getting rid of the helper altogether, see [1].
+Thanks for going the extra mile refactoring this stuff. Apart from the
+const/final nit, this looks good to me. It'd be good to have this in
+-next shortly.
 
-Thanks,
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
 	M.
-	
-[1] https://lore.kernel.org/r/20230919092850.1940729-1-mark.rutland@arm.com
-
 
 -- 
 Without deviation from the norm, progress is not possible.
