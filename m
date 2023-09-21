@@ -1,179 +1,113 @@
-Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E49E1799E
-	for <kvmarm@lists.linux.dev>; Thu, 21 Sep 2023 20:06:37 +0000 (UTC)
-Received: from [192.168.2.59] (109-252-153-31.dynamic.spd-mgts.ru [109.252.153.31])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(No client certificate requested)
-	(Authenticated sender: dmitry.osipenko)
-	by madras.collabora.co.uk (Postfix) with ESMTPSA id 2A6DD66072A2;
-	Thu, 21 Sep 2023 21:06:35 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1695326795;
-	bh=HJZj4tL19myGpTxphjexxKcgBooAQOGMkPxijqRLW4k=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=VR42JGadjRAYiveQpgi1ROWyHZVJRToum30ci6EUeexG5WQPL75rWfp1AUwbguY1h
-	 4cX3JGs5B/KTytKRbeRMUJ0pOSjK6saByxaxd6vcPaQLLgMspuuqwawOyYQCm0CTQ7
-	 bg8wV6ylxVaUbuMQDOiQLUlPV2Qcu6V3U4AXV9d8ro5MgUbAlOIZpjH35xbIBd/UYr
-	 +1nSuzUPzFfveko6knVummHMJb3FeKg0HfIgsnz6aFSbt5Cvh8fZohJZ0CUOU8z6yj
-	 bl+Yoxt2AGI6YU7+Lk/1oquOvrp5FnMcal/AVr7AGNcs4ChI/spifJ81zaKrddT30L
-	 zqpXSpoUEro4A==
-Message-ID: <2126e800-f9db-b3f8-3d1c-454b5b2c169e@collabora.com>
-Date: Thu, 21 Sep 2023 23:06:32 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C179CA57
+	for <kvmarm@lists.linux.dev>; Thu, 21 Sep 2023 22:23:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1695334989; x=1726870989;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=g7EFafS6t1foqgqAqNV0pkx1nSCq9B41+AoW2S9TWQg=;
+  b=HtKZ3swlu5guLQ2/O3mQlFHO1kiQZG3g+h8v84hr2y6iFAoPyVhpzf8X
+   1z32Q/tS6r8oKFs6AitfYFdisOydublKfzVmWPHjA9Ld5rvrIky2E2llg
+   7XoJ8whV9Xe2KAoB2rPQOXyTD4TBQVuiA8clTfoghQ72MH6yi7oB4ayjw
+   U=;
+X-IronPort-AV: E=Sophos;i="6.03,166,1694736000"; 
+   d="scan'208";a="365147049"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-54a853e6.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 22:23:07 +0000
+Received: from EX19MTAUWC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+	by email-inbound-relay-iad-1a-m6i4x-54a853e6.us-east-1.amazon.com (Postfix) with ESMTPS id 4099248173;
+	Thu, 21 Sep 2023 22:23:02 +0000 (UTC)
+Received: from EX19D030UWB004.ant.amazon.com (10.13.139.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Thu, 21 Sep 2023 22:22:55 +0000
+Received: from EX19D030UWB002.ant.amazon.com (10.13.139.182) by
+ EX19D030UWB004.ant.amazon.com (10.13.139.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Thu, 21 Sep 2023 22:22:54 +0000
+Received: from EX19D030UWB002.ant.amazon.com ([fe80::8cbd:fcae:56ad:4dfa]) by
+ EX19D030UWB002.ant.amazon.com ([fe80::8cbd:fcae:56ad:4dfa%6]) with mapi id
+ 15.02.1118.037; Thu, 21 Sep 2023 22:22:54 +0000
+From: "Jitindar Singh, Suraj" <surajjs@amazon.com>
+To: "maz@kernel.org" <maz@kernel.org>
+CC: "vdonnefort@google.com" <vdonnefort@google.com>, "philmd@linaro.org"
+	<philmd@linaro.org>, "james.morse@arm.com" <james.morse@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>, "qperret@google.com" <qperret@google.com>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "catalin.marinas@arm.com"
+	<catalin.marinas@arm.com>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu"
+	<kvmarm@lists.cs.columbia.edu>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>, "will@kernel.org" <will@kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"alexandru.elisei@arm.com" <alexandru.elisei@arm.com>
+Subject: Re: [PATCH stable 6.1.y 1/2] KVM: arm64: Prevent the donation of
+ no-map pages
+Thread-Topic: [PATCH stable 6.1.y 1/2] KVM: arm64: Prevent the donation of
+ no-map pages
+Thread-Index: AQHZ7NoqQQBf46ilGUajYblrTraBLA==
+Date: Thu, 21 Sep 2023 22:22:54 +0000
+Message-ID: <a64c30b027951c4c533dea858150e2e807a912b7.camel@amazon.com>
+References: <20230920192729.694309-1-surajjs@amazon.com>
+	 <878r903snv.wl-maz@kernel.org>
+In-Reply-To: <878r903snv.wl-maz@kernel.org>
+Accept-Language: en-AU, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-originating-ip: [10.187.171.47]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <C6192A419174F448B28D39C53A1949A3@amazon.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v9 6/6] KVM: x86/mmu: Handle non-refcounted pages
-Content-Language: en-US
-To: David Stevens <stevensd@chromium.org>
-Cc: Sean Christopherson <seanjc@google.com>,
- Yu Zhang <yu.c.zhang@linux.intel.com>,
- Isaku Yamahata <isaku.yamahata@gmail.com>,
- Zhi Wang <zhi.wang.linux@gmail.com>, kvmarm@lists.linux.dev,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20230911021637.1941096-1-stevensd@google.com>
- <20230911021637.1941096-7-stevensd@google.com>
- <14db8c0b-77de-34ec-c847-d7360025a571@collabora.com>
- <207c8e59-f92a-96c0-bc5e-39b73a840110@collabora.com>
- <CAD=HUj51M9Eh=5Q=XQjPJ7No4i-z0en-1L3s0G8_fBZp0+NUZw@mail.gmail.com>
-From: Dmitry Osipenko <dmitry.osipenko@collabora.com>
-In-Reply-To: <CAD=HUj51M9Eh=5Q=XQjPJ7No4i-z0en-1L3s0G8_fBZp0+NUZw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 
-On 9/19/23 05:59, David Stevens wrote:
-> On Mon, Sep 18, 2023 at 8:19 PM Dmitry Osipenko
-> <dmitry.osipenko@collabora.com> wrote:
->>
->> On 9/18/23 12:58, Dmitry Osipenko wrote:
->>> On 9/11/23 05:16, David Stevens wrote:
->>>> From: David Stevens <stevensd@chromium.org>
->>>>
->>>> Handle non-refcounted pages in __kvm_faultin_pfn. This allows the host
->>>> to map memory into the guest that is backed by non-refcounted struct
->>>> pages - for example, the tail pages of higher order non-compound pages
->>>> allocated by the amdgpu driver via ttm_pool_alloc_page.
->>>>
->>>> The bulk of this change is tracking the is_refcounted_page flag so that
->>>> non-refcounted pages don't trigger page_count() == 0 warnings. This is
->>>> done by storing the flag in an unused bit in the sptes. There are no
->>>> bits available in PAE SPTEs, so non-refcounted pages can only be handled
->>>> on TDP and x86-64.
->>>>
->>>> Signed-off-by: David Stevens <stevensd@chromium.org>
->>>> ---
->>>>  arch/x86/kvm/mmu/mmu.c          | 52 +++++++++++++++++++++++----------
->>>>  arch/x86/kvm/mmu/mmu_internal.h |  1 +
->>>>  arch/x86/kvm/mmu/paging_tmpl.h  |  8 +++--
->>>>  arch/x86/kvm/mmu/spte.c         |  4 ++-
->>>>  arch/x86/kvm/mmu/spte.h         | 12 +++++++-
->>>>  arch/x86/kvm/mmu/tdp_mmu.c      | 22 ++++++++------
->>>>  include/linux/kvm_host.h        |  3 ++
->>>>  virt/kvm/kvm_main.c             |  6 ++--
->>>>  8 files changed, 76 insertions(+), 32 deletions(-)
->>>
->>> Could you please tell which kernel tree you used for the base of this
->>> series? This patch #6 doesn't apply cleanly to stable/mainline/next/kvm
->>>
->>> error: sha1 information is lacking or useless (arch/x86/kvm/mmu/mmu.c).
->>> error: could not build fake ancestor
->>
->> I applied the patch manually to v6.5.2 and tested Venus using Intel TGL iGPU, the intel driver is crashing:
->>
->>    BUG: kernel NULL pointer dereference, address: 0000000000000058
->>    #PF: supervisor read access in kernel mode
->>    #PF: error_code(0x0000) - not-present page
->>    PGD 0 P4D 0
->>    Oops: 0000 [#1] PREEMPT SMP
->>    CPU: 1 PID: 5926 Comm: qemu-system-x86 Not tainted 6.5.2+ #114
->>    Hardware name: LENOVO 20VE/LNVNB161216, BIOS F8CN43WW(V2.06) 08/12/2021
->>    RIP: 0010:gen8_ppgtt_insert+0x50b/0x8f0
->>    Code: 00 00 f7 c2 00 00 20 00 74 15 f7 c3 ff ff 1f 00 75 0d 41 81 fc ff ff 1f 00 0f 87 0e 02 00 00 48 8b 74 24 08 44 89 c0 45 85 ed <48> 8b 4e 58 48 8b 04 c1 0f 85 0b 02 00 00 81 e2 00 00 01 00 0f 84
->>    RSP: 0018:ffffafc085afb820 EFLAGS: 00010246
->>    RAX: 0000000000000000 RBX: 00000000e9604000 RCX: 000000000000001b
->>    RDX: 0000000000211000 RSI: 0000000000000000 RDI: ffff9513d44c1000
->>    RBP: ffff951106f8dfc0 R08: 0000000000000000 R09: 0000000000000003
->>    R10: 0000000000000fff R11: 00000000e9800000 R12: 00000000001fc000
->>    R13: 0000000000000000 R14: 0000000000001000 R15: 0000ffff00000000
->>    FS:  00007f2a5bcced80(0000) GS:ffff951a87a40000(0000) knlGS:0000000000000000
->>    CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>    CR2: 0000000000000058 CR3: 0000000116f16006 CR4: 0000000000772ee0
->>    PKRU: 55555554
->>    Call Trace:
->>     <TASK>
->>     ? __die+0x1f/0x60
->>     ? page_fault_oops+0x14d/0x420
->>     ? exc_page_fault+0x3d7/0x880
->>     ? lock_acquire+0xc9/0x290
->>     ? asm_exc_page_fault+0x22/0x30
->>     ? gen8_ppgtt_insert+0x50b/0x8f0
->>     ppgtt_bind_vma+0x4f/0x60
->>     fence_work+0x1b/0x70
->>     fence_notify+0x8f/0x130
->>     __i915_sw_fence_complete+0x58/0x230
->>     i915_vma_pin_ww+0x513/0xa80
->>     eb_validate_vmas+0x17e/0x9e0
->>     ? eb_pin_engine+0x2bb/0x340
->>     i915_gem_do_execbuffer+0xc85/0x2bf0
->>     ? __lock_acquire+0x3b6/0x21c0
->>     i915_gem_execbuffer2_ioctl+0xee/0x240
->>     ? i915_gem_do_execbuffer+0x2bf0/0x2bf0
->>     drm_ioctl_kernel+0x9d/0x140
->>     drm_ioctl+0x1dd/0x410
->>     ? i915_gem_do_execbuffer+0x2bf0/0x2bf0
->>     ? __fget_files+0xc5/0x170
->>     __x64_sys_ioctl+0x8c/0xc0
->>     do_syscall_64+0x34/0x80
->>     entry_SYSCALL_64_after_hwframe+0x46/0xb0
->>    RIP: 0033:0x7f2a60b0c9df
->>
->>
->> $ ./scripts/faddr2line ./vmlinux gen8_ppgtt_insert+0x50b/0x8f0
->> gen8_ppgtt_insert+0x50b/0x8f0:
->> i915_pt_entry at drivers/gpu/drm/i915/gt/intel_gtt.h:557
->> (inlined by) gen8_ppgtt_insert_huge at drivers/gpu/drm/i915/gt/gen8_ppgtt.c:641
->> (inlined by) gen8_ppgtt_insert at drivers/gpu/drm/i915/gt/gen8_ppgtt.c:743
->>
->> It's likely should be the i915 driver issue that is crashes with the NULL deref, but the origin of the bug should be the kvm page fault handling.
->>
->> David, could you please tell what tests you've run and post a link to yours kernel tree? Maybe I made obscure mistake while applied the patch manually.
-> 
-> For tests, I ran the kvm selftests and then various ChromeOS
-> virtualization tests. Two things to note about the ChromeOS
-> virtualization tests are that they use crosvm instead of qemu, and
-> they use virtio-gpu+virgl for graphics in the guest. I tested on an
-> AMD device (since the goal of this series is to fix a compatibility
-> issue with the amdgpu driver), and on a TGL device.
-> 
-> I don't have an easy way to share my kernel tree, but it's based on
-> v6.5-r3. The series I sent out is rebased onto the kvm next branch,
-> but there were only minor conflicts.
-
-It's good that you mentioned crosvm because I only tested qemu.
-Interestingly, the problem doesn't present using crosvm.
-
-I made few more tests using these options:
-
-  1. yours latest version of the patch based on v6.5.4
-  2. yours latest version of the patch based on the kvm tree
-  3. by forward-porting yours older version of the kvm patchset to v6.5
-that works well based on v6.4 kernel
-
-Neither of the options work with qemu and v6.5 kernel, but crosvm works.
-
-At first I felt confident that it must be i915 bug of the v6.5 kernel.
-But given that crosvm works, now I'm not sure.
-
-Will try to bisect 6.5 kernel, at minimum the i915 driver changes.
-
--- 
-Best regards,
-Dmitry
-
+T24gVGh1LCAyMDIzLTA5LTIxIGF0IDA4OjEzICswMTAwLCBNYXJjIFp5bmdpZXIgd3JvdGU6DQo+
+IE9uIFdlZCwgMjAgU2VwIDIwMjMgMjA6Mjc6MjggKzAxMDAsDQo+IFN1cmFqIEppdGluZGFyIFNp
+bmdoIDxzdXJhampzQGFtYXpvbi5jb20+IHdyb3RlOg0KPiA+IA0KPiA+IEZyb206IFF1ZW50aW4g
+UGVycmV0IDxxcGVycmV0QGdvb2dsZS5jb20+DQo+ID4gDQo+ID4gY29tbWl0IDQzYzFmZjhiNzUw
+MTFiYzNlM2U5MjNhZGYzMWJhODE1ODY0YTI0OTQgdXBzdHJlYW0uDQo+ID4gDQo+ID4gTWVtb3J5
+IHJlZ2lvbnMgbWFya2VkIGFzICJuby1tYXAiIGluIHRoZSBob3N0IGRldmljZS10cmVlIHJvdXRp
+bmVseQ0KPiA+IGluY2x1ZGUgVHJ1c3Rab25lIGNhcmV2LW91dHMgYW5kIERNQSBwb29scy4gQWx0
+aG91Z2ggZG9uYXRpbmcgc3VjaA0KPiA+IHBhZ2VzDQo+ID4gdG8gdGhlIGh5cGVydmlzb3IgbWF5
+IG5vdCBicmVhY2ggY29uZmlkZW50aWFsaXR5LCBpdCBjb3VsZCBiZSB1c2VkDQo+ID4gdG8NCj4g
+PiBjb3JydXB0IGl0cyBzdGF0ZSBpbiB1bmNvbnRyb2xsYWJsZSB3YXlzLiBUbyBwcmV2ZW50IHRo
+aXMsIGxldCdzDQo+ID4gYmxvY2sNCj4gPiBob3N0LWluaXRpYXRlZCBtZW1vcnkgdHJhbnNpdGlv
+bnMgdGFyZ2V0aW5nICJuby1tYXAiIHBhZ2VzDQo+ID4gYWx0b2dldGhlciBpbg0KPiA+IG5WSEUg
+cHJvdGVjdGVkIG1vZGUgYXMgdGhlcmUgc2hvdWxkIGJlIG5vIHZhbGlkIHJlYXNvbiB0byBkbyB0
+aGlzDQo+ID4gaW4NCj4gPiBjdXJyZW50IG9wZXJhdGlvbi4NCj4gPiANCj4gPiBUaGFua2Z1bGx5
+LCB0aGUgcEtWTSBFTDIgaHlwZXJ2aXNvciBoYXMgYSBmdWxsIGNvcHkgb2YgdGhlIGhvc3Qncw0K
+PiA+IGxpc3QNCj4gPiBvZiBtZW1ibG9jayByZWdpb25zLCBzbyB3ZSBjYW4gZWFzaWx5IGNoZWNr
+IGZvciB0aGUgcHJlc2VuY2Ugb2YgdGhlDQo+ID4gTUVNQkxPQ0tfTk9NQVAgZmxhZyBvbiBhIHJl
+Z2lvbiBjb250YWluaW5nIHBhZ2VzIGJlaW5nIGRvbmF0ZWQgZnJvbQ0KPiA+IHRoZQ0KPiA+IGhv
+c3QuDQo+ID4gDQo+ID4gUmV2aWV3ZWQtYnk6IFBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpIDxwaGls
+bWRAbGluYXJvLm9yZz4NCj4gPiBUZXN0ZWQtYnk6IFZpbmNlbnQgRG9ubmVmb3J0IDx2ZG9ubmVm
+b3J0QGdvb2dsZS5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogUXVlbnRpbiBQZXJyZXQgPHFwZXJy
+ZXRAZ29vZ2xlLmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBXaWxsIERlYWNvbiA8d2lsbEBrZXJu
+ZWwub3JnPg0KPiA+IFNpZ25lZC1vZmYtYnk6IE1hcmMgWnluZ2llciA8bWF6QGtlcm5lbC5vcmc+
+DQo+ID4gTGluazoNCj4gPiBodHRwczovL2xvcmUua2VybmVsLm9yZy9yLzIwMjIxMTEwMTkwMjU5
+LjI2ODYxLTgtd2lsbEBrZXJuZWwub3JnDQo+ID4gWyBicDogY2xlYW4gXQ0KPiANCj4gV2hhdCBp
+cyB0aGlzPw0KDQpOb3RpbmcgYW55IGRldGFpbHMgYWJvdXQgdGhlIGJhY2twb3J0LiBJbiB0aGlz
+IGNhc2UgaXQgd2FzIGEgY2xlYW4NCmJhY2twb3J0Lg0KDQo+IA0KPiA+IFNpZ25lZC1vZmYtYnk6
+IFN1cmFqIEppdGluZGFyIFNpbmdoIDxzdXJhampzQGFtYXpvbi5jb20+DQo+IA0KPiBXaGF0IGlz
+IHRoZSByYXRpb25hbGUgZm9yIGJhY2twb3J0aW5nIHRoaXM/IEl0IHdhc24ndCB0YWdnZWQgYXMg
+Q2M6DQo+IHRvDQo+IHN0YWJsZSBmb3IgYSByZWFzb246IHBLVk0gaXNuJ3QgZnVuY3Rpb25hbCB1
+cHN0cmVhbSwgYW5kIHdvbid0IGJlIGZvcg0KPiB0aGUgbmV4dCBjb3VwbGUgb2YgY3ljbGVzICph
+dCBsZWFzdCouDQo+IA0KPiBTbyBhdCBpdCBzdGFuZHMsIEknbSBhZ2FpbnN0IHN1Y2ggYSBiYWNr
+cG9ydC4NCj4gDQoNClRoZSAyIHBhdGNoZXMgd2VyZSBiYWNrcG9ydGVkIHRvIGFkZHJlc3MgQ1ZF
+LTIwMjMtMjEyNjQuDQpUaGlzIG9uZSBwcm92aWRlcyBjb250ZXh0IGZvciB0aGUgcHJvY2VlZGlu
+ZyBwYXRjaC4NCg0KSSB3YXNuJ3QgYXdhcmUgdGhhdCBpdCdzIG5vbiBmdW5jdGlvbmFsLiBEb2Vz
+IHRoaXMgbWVhbiB0aGF0IHRoZSBjb2RlDQp3b24ndCBiZSBjb21waWxlZCBvciBqdXN0IHRoYXQg
+aXQgY2FuJ3QgYWN0dWFsbHkgYmUgcnVuIGN1cnJlbnRseSBmcm9tDQp0aGUgdXBzdHJlYW0gY29k
+ZWJhc2U/DQoNCkkgZ3Vlc3MgSSdtIHRyeWluZyB0byB1bmRlcnN0YW5kIGlmIHRoZSBjb25kaXRp
+b25zIG9mIHRoZSBDVkUgYXJlIGENCnJlYWwgY29uY2VybiBldmVuIGlmIGl0IGlzbid0IHRlY2hu
+aWNhbGx5IGZ1bmN0aW9uYWwuDQoNClRoYW5rcw0KDQo+IFRoYW5rcywNCj4gDQo+IMKgwqDCoMKg
+wqDCoMKgwqBNLg0KPiANCg0K
