@@ -1,86 +1,65 @@
-Received: from out-207.mta1.migadu.com (out-207.mta1.migadu.com [95.215.58.207])
+Received: from out-195.mta0.migadu.com (out-195.mta0.migadu.com [91.218.175.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99F84446B
-	for <kvmarm@lists.linux.dev>; Fri, 22 Sep 2023 17:52:47 +0000 (UTC)
-Date: Fri, 22 Sep 2023 17:52:41 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3F3544495
+	for <kvmarm@lists.linux.dev>; Fri, 22 Sep 2023 17:56:54 +0000 (UTC)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1695405165;
+	t=1695405412;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=b6iWf57e0btlxCO8zs88JHQdmJ0JvNggT2Tp8hV4cPY=;
-	b=JKN34yxrMcc59sr+QL6GDOj17uB5G6/J0/7c8MaJCND53PrNKYsnWNEI9iM+QvNA6iUOFV
-	flpqdIg+/4qmIGlEdXgFxMmSko++7izrs4IlBuMC6AewOkD8LldjUkYFxZQsPVFeVdrHZq
-	j3vebGTmLpkViWfnho5iRMtpsBPE+3U=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	bh=X/vIlwev0NInC5X3bGDj9xIaIis5oChB8JH6RisijWU=;
+	b=Dd1dWJO/4NuL36W09TKuSLMZSfNiVE4gJ8iFXmU8g6Dzw04WDj+DKCK4RPY0hh0Eem4g+Y
+	4e4WPqFr/omIMOB9IOeZgUTjUhuLqXZ+gFgs4lPLdQOgUB5xQZnzC0O3Ztc6rKO5GJEjgj
+	YW2yBrczpUEjdPTcwglIQf1Yhfx5UD4=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Kristina Martsenko <kristina.martsenko@arm.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
+To: kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Jing Zhang <jingzhangos@google.com>, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v10 06/12] KVM: arm64: Allow userspace to change
- ID_AA64ISAR{0-2}_EL1
-Message-ID: <ZQ3UaYTsZ1lVeShQ@linux.dev>
-References: <20230920183310.1163034-1-oliver.upton@linux.dev>
- <20230920183310.1163034-7-oliver.upton@linux.dev>
- <80140d61-82e7-2795-409d-2cf6dc4993bc@arm.com>
+	kvm@vger.kernel.org,
+	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH 0/2] KVM: arm64: Address soft lockups due to I-cache CMOs
+Date: Fri, 22 Sep 2023 17:56:07 +0000
+Message-ID: <169540533312.1416870.6209003020435706086.b4-ty@linux.dev>
+In-Reply-To: <20230920080133.944717-1-oliver.upton@linux.dev>
+References: <20230920080133.944717-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <80140d61-82e7-2795-409d-2cf6dc4993bc@arm.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On Fri, Sep 22, 2023 at 06:18:37PM +0100, Kristina Martsenko wrote:
-> On 20/09/2023 19:33, Oliver Upton wrote:
-> > Almost all of the features described by the ISA registers have no KVM
-> > involvement. Allow userspace to change the value of these registers with
-> > a couple exceptions:
-> >
-> >  - MOPS is not writable as KVM does not currently virtualize FEAT_MOPS.
-> >
-> >  - The PAuth fields are not writable as KVM requires both address and
-> >    generic authentication be enabled.
-> >
-> >  - Override the kernel's handling of BC to LOWER_SAFE.
-> >
-> > Co-developed-by: Jing Zhang <jingzhangos@google.com>
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> > ---
-> >  arch/arm64/kvm/sys_regs.c | 42 ++++++++++++++++++++++++++++-----------
-> >  1 file changed, 30 insertions(+), 12 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 10e3e6a736dc..71664bec2808 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -1225,6 +1225,10 @@ static s64 kvm_arm64_ftr_safe_value(u32 id, const struct arm64_ftr_bits *ftrp,
-> >                       break;
-> >               }
-> >               break;
-> > +     case SYS_ID_AA64ISAR2_EL1:
-> > +             if (kvm_ftr.shift == ID_AA64ISAR2_EL1_BC_SHIFT)
-> > +                     kvm_ftr.type = FTR_LOWER_SAFE;
-> > +             break;
-> >       case SYS_ID_DFR0_EL1:
-> >               if (kvm_ftr.shift == ID_DFR0_EL1_PerfMon_SHIFT)
-> >                       kvm_ftr.type = FTR_LOWER_SAFE;
+On Wed, 20 Sep 2023 08:01:31 +0000, Oliver Upton wrote:
+> Small series to address the soft lockups that Gavin hits when running
+> KVM guests w/ hugepages on an Ampere Altra Max machine. While I
+> absolutely loathe "fixing" the issue of slow I-cache CMOs in this way,
+> I can't really think of an alternative.
 > 
-> Nit: it shouldn't be necessary to override BC anymore, as it was recently fixed
-> in the arm64 code:
->   https://lore.kernel.org/linux-arm-kernel/20230912133429.2606875-1-kristina.martsenko@arm.com/
+> Oliver Upton (2):
+>   arm64: tlbflush: Rename MAX_TLBI_OPS
+>   KVM: arm64: Avoid soft lockups due to I-cache maintenance
+> 
+> [...]
 
-Perfect, looks like that patch should go in 6.6 too. Thanks for the fix!
+Applied to kvmarm/next, thanks!
 
--- 
-Thanks,
+[1/2] arm64: tlbflush: Rename MAX_TLBI_OPS
+      https://git.kernel.org/kvmarm/kvmarm/c/ec1c3b9ff160
+[2/2] KVM: arm64: Avoid soft lockups due to I-cache maintenance
+      https://git.kernel.org/kvmarm/kvmarm/c/909b583f81b5
+
+--
+Best,
 Oliver
