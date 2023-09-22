@@ -1,98 +1,67 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D38081EA7E
-	for <kvmarm@lists.linux.dev>; Fri, 22 Sep 2023 10:25:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A588C433C8;
-	Fri, 22 Sep 2023 10:25:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695378337;
-	bh=Wc3oGik2b3xC60zZ2thLAcrs3gO0rhT5suSF1Jz39N8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=E9doIbNLN7pl6noXB9KJPXotrmbmEhfBvBfpv+hiH8U0Xe1IVHmm1s8QkpYLd+5A4
-	 YQay4xzPJ18XCibiYMMuTWgF1EzBRU+k8s9CJhlLc2O3By9L0f8z9oQO8E1rlMy2TO
-	 WuiAnw8tmGS7quhhzfNJDCbNhndvCMUzxYB5390OlKcTmWrvH5DUCZDWwuY1rBQJ6l
-	 8/pJw1ty32NOPYYdMD2n1T6/YI8dhXeg36lpMIl+1dfASaa2KhU8QALWc/a9Ce63am
-	 3Llrp9HzVo3v2TB5G0FH02quiThBee8Q/g4w8Ou1AUxa20f7HhFmDuNKs5fLDIZ1LG
-	 pWas8X7y9Q2fQ==
-Date: Fri, 22 Sep 2023 11:25:31 +0100
-From: Will Deacon <will@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED25A1F183
+	for <kvmarm@lists.linux.dev>; Fri, 22 Sep 2023 11:26:03 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A15D8DA7;
+	Fri, 22 Sep 2023 04:26:39 -0700 (PDT)
+Received: from e126864.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A5D903F5A1;
+	Fri, 22 Sep 2023 04:25:59 -0700 (PDT)
+From: Kristina Martsenko <kristina.martsenko@arm.com>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	linux-arm-kernel@lists.infradead.org, Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH 1/2] arm64: tlbflush: Rename MAX_TLBI_OPS
-Message-ID: <20230922102531.GA22838@willie-the-truck>
-References: <20230920080133.944717-1-oliver.upton@linux.dev>
- <20230920080133.944717-2-oliver.upton@linux.dev>
+	Will Deacon <will@kernel.org>,
+	Vladimir Murzin <vladimir.murzin@arm.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/2] KVM: arm64: Support for Arm v8.8 memcpy instructions in KVM guests
+Date: Fri, 22 Sep 2023 12:25:06 +0100
+Message-Id: <20230922112508.1774352-1-kristina.martsenko@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230920080133.944717-2-oliver.upton@linux.dev>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 
-On Wed, Sep 20, 2023 at 08:01:32AM +0000, Oliver Upton wrote:
-> Perhaps unsurprisingly, I-cache invalidations suffer from performance
-> issues similar to TLB invalidations on certain systems. TLB and I-cache
-> maintenance all result in DVM on the mesh, which is where the real
-> bottleneck lies.
-> 
-> Rename the heuristic to point the finger at DVM, such that it may be
-> reused for limiting I-cache invalidations.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/include/asm/tlbflush.h | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
-> index b149cf9f91bc..3431d37e5054 100644
-> --- a/arch/arm64/include/asm/tlbflush.h
-> +++ b/arch/arm64/include/asm/tlbflush.h
-> @@ -333,7 +333,7 @@ static inline void arch_tlbbatch_flush(struct arch_tlbflush_unmap_batch *batch)
->   * This is meant to avoid soft lock-ups on large TLB flushing ranges and not
->   * necessarily a performance improvement.
->   */
-> -#define MAX_TLBI_OPS	PTRS_PER_PTE
-> +#define MAX_DVM_OPS	PTRS_PER_PTE
->  
->  /*
->   * __flush_tlb_range_op - Perform TLBI operation upon a range
-> @@ -413,12 +413,12 @@ static inline void __flush_tlb_range(struct vm_area_struct *vma,
->  
->  	/*
->  	 * When not uses TLB range ops, we can handle up to
-> -	 * (MAX_TLBI_OPS - 1) pages;
-> +	 * (MAX_DVM_OPS - 1) pages;
->  	 * When uses TLB range ops, we can handle up to
->  	 * (MAX_TLBI_RANGE_PAGES - 1) pages.
->  	 */
->  	if ((!system_supports_tlb_range() &&
-> -	     (end - start) >= (MAX_TLBI_OPS * stride)) ||
-> +	     (end - start) >= (MAX_DVM_OPS * stride)) ||
->  	    pages >= MAX_TLBI_RANGE_PAGES) {
->  		flush_tlb_mm(vma->vm_mm);
->  		return;
-> @@ -451,7 +451,7 @@ static inline void flush_tlb_kernel_range(unsigned long start, unsigned long end
->  {
->  	unsigned long addr;
->  
-> -	if ((end - start) > (MAX_TLBI_OPS * PAGE_SIZE)) {
-> +	if ((end - start) > (MAX_DVM_OPS * PAGE_SIZE)) {
->  		flush_tlb_all();
->  		return;
->  	}
-> -- 
-> 2.42.0.459.ge4e396fd5e-goog
+Hi,
 
-Acked-by: Will Deacon <will@kernel.org>
+This is v2 of the series to allow using the new Arm memory copy instructions
+in KVM guests. See v1 for more information [1].
 
-Will
+Changes in v2:
+ - Dropped HCRX_EL2 vcpu field
+ - Rebased onto v6.6-rc2
+
+Thanks,
+Kristina
+
+[1] https://lore.kernel.org/kvmarm/20230915124840.474888-1-kristina.martsenko@arm.com/
+
+Kristina Martsenko (2):
+  KVM: arm64: Add handler for MOPS exceptions
+  KVM: arm64: Expose MOPS instructions to guests
+
+ arch/arm64/include/asm/kvm_arm.h              |  4 +-
+ arch/arm64/include/asm/traps.h                | 54 ++++++++++++++++++-
+ arch/arm64/kernel/traps.c                     | 48 +----------------
+ arch/arm64/kvm/hyp/include/hyp/switch.h       | 17 ++++++
+ .../arm64/kvm/hyp/include/nvhe/fixed_config.h |  3 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c              |  2 +
+ arch/arm64/kvm/hyp/vhe/switch.c               |  1 +
+ arch/arm64/kvm/sys_regs.c                     |  1 -
+ 8 files changed, 78 insertions(+), 52 deletions(-)
+
+
+base-commit: ce9ecca0238b140b88f43859b211c9fdfd8e5b70
+-- 
+2.25.1
+
