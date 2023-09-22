@@ -1,84 +1,126 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B83422943C
-	for <kvmarm@lists.linux.dev>; Fri, 22 Sep 2023 17:20:47 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E3688DA7;
-	Fri, 22 Sep 2023 10:21:23 -0700 (PDT)
-Received: from [10.57.65.61] (unknown [10.57.65.61])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9ED1C3F5A1;
-	Fri, 22 Sep 2023 10:20:44 -0700 (PDT)
-Message-ID: <07bd3b4e-05d8-79e0-94cc-e55d224a17be@arm.com>
-Date: Fri, 22 Sep 2023 18:20:37 +0100
+Received: from out-208.mta0.migadu.com (out-208.mta0.migadu.com [91.218.175.208])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8E22436B1
+	for <kvmarm@lists.linux.dev>; Fri, 22 Sep 2023 17:49:07 +0000 (UTC)
+Date: Fri, 22 Sep 2023 17:49:00 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1695404945;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yWuya+6N9+7BTSlOuj84T8LL44d++YMtdnE2EXlJ65Q=;
+	b=gHYjf5dc1QB8Xn3bItq2aA450TW2y+qAb32zmwoTAMpAjILjlfiu3Ebq97l/ioV1UzZ6Pe
+	gfrRIqsyLqkAkXhCExidjRzzUcPD+GzKtfDlwpuhdxUV0Kok8Z/6CRxoyQomtxDA169KDd
+	P22eWFdau/9obDGPbQGrhbMWT9AFuM4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+	will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, zhukeqian1@huawei.com,
+	jonathan.cameron@huawei.com, linuxarm@huawei.com
+Subject: Re: [RFC PATCH v2 3/8] KVM: arm64: Add some HW_DBM related pgtable
+ interfaces
+Message-ID: <ZQ3TjMcc0FhZCR0r@linux.dev>
+References: <20230825093528.1637-1-shameerali.kolothum.thodi@huawei.com>
+ <20230825093528.1637-4-shameerali.kolothum.thodi@huawei.com>
+ <ZQ2xmzZ0H5v5wDSw@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v10 06/12] KVM: arm64: Allow userspace to change
- ID_AA64ISAR{0-2}_EL1
-Content-Language: en-US
-From: Kristina Martsenko <kristina.martsenko@arm.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Will Deacon <will@kernel.org>, Cornelia Huck <cohuck@redhat.com>,
- Jing Zhang <jingzhangos@google.com>, kvmarm@lists.linux.dev
-References: <20230920183310.1163034-1-oliver.upton@linux.dev>
- <20230920183310.1163034-7-oliver.upton@linux.dev>
- <80140d61-82e7-2795-409d-2cf6dc4993bc@arm.com>
-In-Reply-To: <80140d61-82e7-2795-409d-2cf6dc4993bc@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZQ2xmzZ0H5v5wDSw@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 22/09/2023 18:18, Kristina Martsenko wrote:
-> On 20/09/2023 19:33, Oliver Upton wrote:
->> Almost all of the features described by the ISA registers have no KVM
->> involvement. Allow userspace to change the value of these registers with
->> a couple exceptions:
->>
->>  - MOPS is not writable as KVM does not currently virtualize FEAT_MOPS.
->>
->>  - The PAuth fields are not writable as KVM requires both address and
->>    generic authentication be enabled.
->>
->>  - Override the kernel's handling of BC to LOWER_SAFE.
->>
->> Co-developed-by: Jing Zhang <jingzhangos@google.com>
->> Signed-off-by: Jing Zhang <jingzhangos@google.com>
->> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
->> ---
->>  arch/arm64/kvm/sys_regs.c | 42 ++++++++++++++++++++++++++++-----------
->>  1 file changed, 30 insertions(+), 12 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index 10e3e6a736dc..71664bec2808 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -1225,6 +1225,10 @@ static s64 kvm_arm64_ftr_safe_value(u32 id, const struct arm64_ftr_bits *ftrp,
->>                       break;
->>               }
->>               break;
->> +     case SYS_ID_AA64ISAR2_EL1:
->> +             if (kvm_ftr.shift == ID_AA64ISAR2_EL1_BC_SHIFT)
->> +                     kvm_ftr.type = FTR_LOWER_SAFE;
->> +             break;
->>       case SYS_ID_DFR0_EL1:
->>               if (kvm_ftr.shift == ID_DFR0_EL1_PerfMon_SHIFT)
->>                       kvm_ftr.type = FTR_LOWER_SAFE;
+On Fri, Sep 22, 2023 at 04:24:11PM +0100, Catalin Marinas wrote:
+> On Fri, Aug 25, 2023 at 10:35:23AM +0100, Shameer Kolothum wrote:
+> > +static bool stage2_pte_writeable(kvm_pte_t pte)
+> > +{
+> > +	return pte & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> > +}
+> > +
+> > +static void kvm_update_hw_dbm(const struct kvm_pgtable_visit_ctx *ctx,
+> > +			      kvm_pte_t new)
+> > +{
+> > +	kvm_pte_t old_pte, pte = ctx->old;
+> > +
+> > +	/* Only set DBM if page is writeable */
+> > +	if ((new & KVM_PTE_LEAF_ATTR_HI_S2_DBM) && !stage2_pte_writeable(pte))
+> > +		return;
+> > +
+> > +	/* Clear DBM walk is not shared, update */
+> > +	if (!kvm_pgtable_walk_shared(ctx)) {
+> > +		WRITE_ONCE(*ctx->ptep, new);
+> > +		return;
+> > +	}
 > 
-> Nit: it shouldn't be necessary to override BC anymore, as it was recently fixed
-> in the arm64 code:
->   https://lore.kernel.org/linux-arm-kernel/20230912133429.2606875-1-kristina.martsenko@arm.com/
+> I was wondering if this interferes with the OS dirty tracking (not the
+> KVM one) but I think that's ok, at least at this point, since the PTE is
+> already writeable and a fault would have marked the underlying page as
+> dirty (user_mem_abort() -> kvm_set_pfn_dirty()).
 > 
-> Kristina
-> IMPORTANT NOTICE: The contents of this email and any attachments are confidential and may also be privileged. If you are not the intended recipient, please notify the sender immediately and do not disclose the contents to any other person, use it for any purpose, or store or copy the information in any medium. Thank you.
+> I'm not particularly fond of relying on this but I need to see how it
+> fits with the rest of the series. IIRC KVM doesn't go around and make
+> Stage 2 PTEs read-only but rather unmaps them when it changes the
+> permission of the corresponding Stage 1 VMM mapping.
 > 
+> My personal preference would be to track dirty/clean properly as we do
+> for stage 1 (e.g. DBM means writeable PTE) but it has some downsides
+> like the try_to_unmap() code having to retrieve the dirty state via
+> notifiers.
 
-Sorry, please ignore this disclaimer, I messed up my mail setup.
+KVM's usage of DBM is complicated by the fact that the dirty log
+interface w/ userspace is at PTE granularity. We only want the page
+table walker to relax PTEs, but take faults on hugepages so we can do
+page splitting.
 
-Kristina
+> Anyway, assuming this works correctly, it means that live migration via
+> DBM is only tracked for PTEs already made dirty/writeable by some guest
+> write.
 
+I'm hoping that we move away from this combined write-protection and DBM
+scheme and only use a single dirty tracking strategy at a time.
+
+> > @@ -952,6 +990,11 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+> >  	    stage2_pte_executable(new))
+> >  		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
+> >  
+> > +	/* Save the possible hardware dirty info */
+> > +	if ((ctx->level == KVM_PGTABLE_MAX_LEVELS - 1) &&
+> > +	    stage2_pte_writeable(ctx->old))
+> > +		mark_page_dirty(kvm_s2_mmu_to_kvm(pgt->mmu), ctx->addr >> PAGE_SHIFT);
+> > +
+> >  	stage2_make_pte(ctx, new);
+> 
+> Isn't this racy and potentially losing the dirty state? Or is the 'new'
+> value guaranteed to have the S2AP[1] bit? For stage 1 we normally make
+> the page genuinely read-only (clearing DBM) in a cmpxchg loop to
+> preserve the dirty state (see ptep_set_wrprotect()).
+
+stage2_try_break_pte() a few lines up does a cmpxchg() and full
+break-before-make, so at this point there shouldn't be a race with
+either software or hardware table walkers.
+
+But I'm still confused by this one. KVM only goes down the map
+walker path (in the context of dirty tracking) if:
+
+ - We took a translation fault
+
+ - We took a write permission fault on a hugepage and need to split
+
+In both cases the 'old' translation should have DBM cleared. Even if the
+PTE were dirty, this is wasted work since we need to do a final scan of
+the stage-2 when userspace collects the dirty log.
+
+Am I missing something?
+
+-- 
+Thanks,
+Oliver
