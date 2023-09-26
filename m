@@ -1,103 +1,137 @@
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2085.outbound.protection.outlook.com [40.107.223.85])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A03134D1
-	for <kvmarm@lists.linux.dev>; Tue, 26 Sep 2023 09:54:38 +0000 (UTC)
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-53074ee0c2aso11042a12.1
-        for <kvmarm@lists.linux.dev>; Tue, 26 Sep 2023 02:54:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695722076; x=1696326876; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6RX+RxNThxWlZjWaBBvh6220YGe9sto71QyN0kHdm+4=;
-        b=JGeUKqnetfc6CbyTvGU+d40MLHfylOFILyqvUFi3fhJPtR8T17Y+4683gsg+ohDHNK
-         j4f3zEFwFoeLpfjAHKowndjBmtOrgWjZOmRwjUmF0Lus9PlMXAzO5+yv/xRFe43UpYW1
-         xjHEOCvGLbzcIjU90DzSQVr0SXQQEK0HEOp7qwQNyIM8Hw4rdqesngmqWynhMmYbdL0f
-         LuO0fXF495BKicKb/u4XhEKHeqYCDdzKoNZzc4SbFvQ5jSwqnfgsOi80ZV3+SZoWhcWx
-         hHUKIGTNdRrmH0bGZPtc7UER4GBWkvgqiNr8ELD7j1PlPjtvbIhlYgwnX2bFbK/LLmn3
-         UtPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695722076; x=1696326876;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6RX+RxNThxWlZjWaBBvh6220YGe9sto71QyN0kHdm+4=;
-        b=pUJELHBsJo3nJJPWUa0tTm43hwqHfGhOMYe120ZaCutAxsHr+iQ2vPUZDOM/yCqZJS
-         iYekK5A/JGpNcxiXLcU+3bwFVhLgdxL8MlRvIjefOM+uNkamfxhYsNubAggDMu6Yv5yC
-         gQQQDxfG5tKloZABamOXhJBKOvN0sj+2Rh/IzbBEpDC77mv2VO3M6cETIHzLZKSUXHt0
-         M2aycRKZDk09fYAOWJvnVwSs5uMvm8rLottHc2Z9y+Wkl6BNErTxy3fw8Qz3eoohcq1L
-         psOBSWKWPZUCChAWh7mkjWy7grlQpavVx+hQI+oUEm5DoSk6PZcGXEPLr+PGoJIoXBNr
-         1/ug==
-X-Gm-Message-State: AOJu0YyQB7D3o6xQhQ6ZWNjEBnRWPGsZnLw0Hxi//Fda79v/qZF8JCps
-	vPi2RcZMU/7JUt0uZkoNPvWM0Q==
-X-Google-Smtp-Source: AGHT+IH0oPXZ48Gz2F+rYGnYegliWL0EvgOHsb6Ik8iDn17MeOfSc7/8iYbXOPOHUtU7T66FPETntw==
-X-Received: by 2002:a50:9fef:0:b0:523:b133:57fe with SMTP id c102-20020a509fef000000b00523b13357femr77612edf.1.1695722076407;
-        Tue, 26 Sep 2023 02:54:36 -0700 (PDT)
-Received: from google.com (203.75.199.104.bc.googleusercontent.com. [104.199.75.203])
-        by smtp.gmail.com with ESMTPSA id q18-20020adfb192000000b0031f8a59dbeasm1842861wra.62.2023.09.26.02.54.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Sep 2023 02:54:35 -0700 (PDT)
-Date: Tue, 26 Sep 2023 09:54:31 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org,
-	joro@8bytes.org, robin.murphy@arm.com, james.morse@arm.com,
-	suzuki.poulose@arm.com, oliver.upton@linux.dev,
-	yuzenghui@huawei.com, dbrazdil@google.com, ryan.roberts@arm.com,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC513846A
+	for <kvmarm@lists.linux.dev>; Tue, 26 Sep 2023 12:26:02 +0000 (UTC)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nXuuHvR71U136BtmRNbMZI07+t8jzsF7F6uqQUbWBwzQOlCkbpQEDgTX6rIdIp5oo0eNCXy3gIPJ4UpORomJcPLypB2O/YXmGd/aEbpQKml1GzljGaGrPQorLYFA4YX+9EsuU341a2bkdR6FfDSYvymA05jXHmgabAL7Sr+qyBbb3M3DlKUGz3gGNkWPIX2QtvMAwhHkQzxK3mv4AWAJEw6tXZa2nD9x2zksWbDPUniMXynOJXqhK4k79O1+LvKc3A2rFYWKCQwt6n04afVXD+UwJAM3WUazWuo06Xdt/4YJVjBBrRznOI5IArWPeUdaAJgf66U0XEM82vHXBZ104Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=d++A4egwGTvB34vCxpqM6Z5+oT8CfWZOpGVUirwaxiI=;
+ b=GMpoELMysMXad5RB+narD0AviiyZzGEzURQD+mnjUoZQXbEszQ4lm0QHRivxBm4KE43L/IQXOxScPN5ELwZOX04VlstYymoMt7V0/e8s0hmJUgevbepR80lGGvswZzQZiKgDu+a5dk52ZYgo9tQWmPM3tnNXsXf/zej7QfPItwYclw58GWXkwX2amq8jOIfIU5tLyZUGuo02PmMD0hs6xBOIWu5XXdMiXHKWQtIeaYZ+/AoDW+wqZUKlPX1bwaG9bo+AuKebZk6oJpbuNoj33lklykYDCWVsxi8vAspUmFsuEe1bYifGRXklGfSU38G0ZoKMovyUPsJ7v0i5IUrRFw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=d++A4egwGTvB34vCxpqM6Z5+oT8CfWZOpGVUirwaxiI=;
+ b=eQrp7vOA/vYJhDrbjIbQMZJxgFWkgLcgaF3tyUVFQyjB4c+57+yV1mlYwMAofUEl7PMnBgCxhgmq/DZprpGJGD/ae+nuLKCDpwxHcyJPODowAkDFjKZIKbGWRR7Rlg7XdQR8kUXV1BVLgHXbZCpAqm6UhmPurMTLwIicl62CrEPeZMhQkdGtuphxAK/lRwBvZnIWJ2PPzUcG423mfrDtlrMo9LyHQxXc7613Hz+adOu/Tu+sJFN1m87eRIcUFRmbstFACDy8Cvcf/xAypqrkMXAu6gXsPeFEGPrn9JTP5f8WramXw5LFXYerY4CrTIx9VhQ1GOtvpWhl5MU/9wJ7gw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by BN9PR12MB5099.namprd12.prod.outlook.com (2603:10b6:408:118::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.23; Tue, 26 Sep
+ 2023 12:26:00 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3f66:c2b6:59eb:78c2%5]) with mapi id 15.20.6838.016; Tue, 26 Sep 2023
+ 12:26:00 +0000
+Date: Tue, 26 Sep 2023 09:25:58 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Lorenzo Pieralisi <lpieralisi@kernel.org>
+Cc: ankita@nvidia.com, maz@kernel.org, oliver.upton@linux.dev,
+	catalin.marinas@arm.com, will@kernel.org, aniketa@nvidia.com,
+	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
+	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
+	jhubbard@nvidia.com, danw@nvidia.com,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	iommu@lists.linux.dev
-Subject: Re: [RFC PATCH 40/45] iommu/arm-smmu-v3-kvm: Add IOMMU ops
-Message-ID: <ZRKqV88hfmz+mfB3@google.com>
-References: <20230201125328.2186498-1-jean-philippe@linaro.org>
- <20230201125328.2186498-41-jean-philippe@linaro.org>
- <ZQsdfcCaeQSn2pzQ@google.com>
- <20230925171853.GA2068481@myrica>
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 2/2] KVM: arm64: allow the VM to select DEVICE_* and
+ NORMAL_NC for IO memory
+Message-ID: <20230926122558.GN13733@nvidia.com>
+References: <20230907181459.18145-1-ankita@nvidia.com>
+ <20230907181459.18145-3-ankita@nvidia.com>
+ <ZP8q71+YXoU6O9uh@lpieralisi>
+ <ZP9MQdRYmlawNsbC@nvidia.com>
+ <ZQHUifAfJ+lZikAn@lpieralisi>
+ <ZQIFfqgR5zcidRR3@nvidia.com>
+ <ZRKW6uDR/+eXYMzl@lpieralisi>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZRKW6uDR/+eXYMzl@lpieralisi>
+X-ClientProxiedBy: BL1PR13CA0254.namprd13.prod.outlook.com
+ (2603:10b6:208:2ba::19) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230925171853.GA2068481@myrica>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BN9PR12MB5099:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9ced7b40-67d8-4908-2bdc-08dbbe8bbdfb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	PIc72Cw8lFkHCyMgkzC18Rigmx70bf3SYMeYsBmAnvDlSQzETrhsLSCA0vFVrsKHWUdbupXZGJO6ZK8jRg5ENQKtIYfEKu5K4S0Su3M5IdsYFwpALhRSJlBcUE83hOm3XwnDF/KVE9NmrvjeaSCY5B316eDchNbpcHEN6lHRjRGqno9uA5UcdiplyRELbnQ4js5BFRnlICpdAcdgXviZq5H5RsGQzhHWfFNu/ckb5Dytllh7WOWkO6PAeq4Z/zqlq6FDVM4OZel/IJHuS4TH+A4SCHXTk7/bXQRAucnU4RZsKLyCXEuKNYbkG5VnGduetmYWcuqx2x05EIoOvTFdepXitvBYeDTnwfFHFGgRh/Wguivhc4doz6r28LGzy9ihfP7Gnav3QxY7lRh8TsA667JboanlNgmT/VEXy+wvdxzlYV1W5BYW4O59WrPjnSb2a/SyK+edHz8DBoFD1KL4OKs7i3Hdft+QhQZJ47v7g7ijD/A8uvdCr2SyTqdkWPjL29Jkr/GmXA8ftjrOkEgyZE0JrWAV4A/MwHr8BxSK5TcTBM0QUMJyuXZORupdjT7y
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(366004)(39860400002)(136003)(396003)(230922051799003)(451199024)(1800799009)(186009)(86362001)(2616005)(1076003)(26005)(41300700001)(6506007)(6486002)(6512007)(36756003)(38100700002)(33656002)(316002)(8936002)(6916009)(8676002)(4326008)(66556008)(66476007)(5660300002)(66946007)(4744005)(2906002)(478600001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?iuUjYZ57BW4oUykHMzWZaVNwWM7+Q81WXrCsXkC6lh0WbAnR229GGp/bCDtc?=
+ =?us-ascii?Q?IepAYsIyhruhPvwZVDsECbrbJIgMYT2KHIZzz2Nv2/hzGuRXIUNEfi8+VHm1?=
+ =?us-ascii?Q?2tAtpG19FoRRFdjDk4pEz2PnHgjQ8ocdYRuhtwoq7RysR5LQ6oWtkO7kb4ur?=
+ =?us-ascii?Q?YI694H7nnqQN9Ku4+HYm3t/7ZuHuTlGDKy5w4kgfiVk87+ufPJpi38bFmW1R?=
+ =?us-ascii?Q?BdogKKQ/lKreAJw9dvrNuW1TAtaa6j5l4OtVcVHgpZz5ONjP3hXiZUkeYLtx?=
+ =?us-ascii?Q?OrMYz6PK3lPhwqHZYJyB4oCcoHKbSonV0bgYykauV+PBtALG0raVarwvWfZN?=
+ =?us-ascii?Q?PNHNWLgQSeWe7kNMgcrN7hbKXe6A/X4SOlKWuvOqB6nP6v6I3RujB7TGsGe3?=
+ =?us-ascii?Q?evHzmq6T+ooj7PhEgGwNHbzNWsgkCAlgdZsOaAZae1rn1OomLd/JHee+psAb?=
+ =?us-ascii?Q?NHotnF0MjfgNXWnlTBUNYtLX+bO1QDcuD6q4eAj/bSzTHMta6OQ8ygiGdArb?=
+ =?us-ascii?Q?04G0A2UVa0Fr6+j4aGoLU0/Dd3o/AD5RQ5TG2D7UJ8AbGU2hGT2IpZRjPufV?=
+ =?us-ascii?Q?koeCoRHEXaH8yU2pE9mEDFIEmLRL5ioXJ7YGdf4ZESKGZEnfQbdDrO+XF68k?=
+ =?us-ascii?Q?D5jISXY/c8QBRRxy5p05mu27RbWmyv2NDfpvbbk9P6s13+u26zSlRUagS+bf?=
+ =?us-ascii?Q?b11JYrYVTX9rb4ExvXw/KJGtWav8fcuid1JqxPs4oVxWzXIBM2nfigp4BNXt?=
+ =?us-ascii?Q?t1glKUA+AdXYYp1BWqVHbdv/8V0sIh4ScA9pYXFE+EKN4gmsD0cRihTpu4BM?=
+ =?us-ascii?Q?xOS+/XufV6G4PNTmiF3ZKOQmGYe7khb2lu9kKuHss9jg/3ABpjAmI9qTQ/Kn?=
+ =?us-ascii?Q?1jJIUpCbvft9ARdmNDD5r09AXzH/V3KDOna6J7JxMpTatIvtFIjeUNbgzaRl?=
+ =?us-ascii?Q?nbd9DAgCstn7ySm6LXeR/lUWGYfSuJEYOzkJHFRbWJONfZzoDlFCiwOTx1zg?=
+ =?us-ascii?Q?G9+mn1mFBi3v4Ib2HhLmNwxVMBBygzSbvGHIkx87845KUtfTt9WM6m0YD77i?=
+ =?us-ascii?Q?xh6F3alE+GEDEcX+zwEN4n5bqRFXMXuZMvSRRuHfygGEYyZOS3hd4JyMVTlu?=
+ =?us-ascii?Q?DyRDoTOERQz4WCSpRdji9BST4dRcSkL3OLR5tJRsCjrVkOEPAorJJaGapYi/?=
+ =?us-ascii?Q?Z14qNkBMd2KVtsNyy9i9+9R7lYCBNugJKSTOf2QW2QMJulQBdNzPWOz0ZuTT?=
+ =?us-ascii?Q?ysOlYKykPSyjOc0pOxMnXS/7coLtSSXc/wLc5Rttj7BrFp//UoLyxFA+ctTZ?=
+ =?us-ascii?Q?+htiXJ/bMqYJeSdu32NykxOG6SriVvX0NdqmjxKQit3gvHTjkRIogt1kRhcv?=
+ =?us-ascii?Q?VCEL8cbtZcEeo1co1SMvNSE/kOr8XEh6u1mrbFcmQp21eRg5Vlt9DNZ05mUN?=
+ =?us-ascii?Q?2GADle6QrvkMuZmjwTySDLCjcAmP2HuudPDuL/0uo9LmINyww1Tk7VxPiPIm?=
+ =?us-ascii?Q?ALhosSHn1oZqTy3AeDwodlXvB4t2haK+RRRQxJqA8+1MVBi1z3NIN/WKViPZ?=
+ =?us-ascii?Q?+ZWvdeMbTlF1RRe9o05Hi0UJTSc0Fu15BNAw3ns2?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9ced7b40-67d8-4908-2bdc-08dbbe8bbdfb
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Sep 2023 12:26:00.3568
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: xmKE7IJpPeXovpPJ2IXoyO3tT6bxts2vavccPXVFyzFEPbECiSBbYlZBLHsDyAUE
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5099
 
-Hi Jean,
-
-On Mon, Sep 25, 2023 at 06:18:53PM +0100, Jean-Philippe Brucker wrote:
-> On Wed, Sep 20, 2023 at 04:27:41PM +0000, Mostafa Saleh wrote:
-> > > +static void kvm_arm_smmu_domain_free(struct iommu_domain *domain)
-> > > +{
-> > > +	int ret;
-> > > +	struct kvm_arm_smmu_domain *kvm_smmu_domain = to_kvm_smmu_domain(domain);
-> > > +	struct arm_smmu_device *smmu = kvm_smmu_domain->smmu;
-> > > +
-> > > +	if (smmu) {
-> > > +		struct host_arm_smmu_device *host_smmu = smmu_to_host(smmu);
-> > > +
-> > > +		ret = kvm_call_hyp_nvhe(__pkvm_host_iommu_free_domain,
-> > > +					host_smmu->id, kvm_smmu_domain->id);
-> > > +		/*
-> > > +		 * On failure, leak the pgd because it probably hasn't been
-> > > +		 * reclaimed by the host.
-> > > +		 */
-> > > +		if (!WARN_ON(ret))
-> > > +			free_pages(kvm_smmu_domain->pgd, host_smmu->pgd_order);
-> > I believe this doube-free the pgd in case of attatch_dev fails, as it
-> > would try to free it their also (in kvm_arm_smmu_domain_finalize).
-> > 
-> > I think this is right place to free the pgd.
+On Tue, Sep 26, 2023 at 10:31:38AM +0200, Lorenzo Pieralisi wrote:
+> On Wed, Sep 13, 2023 at 03:54:54PM -0300, Jason Gunthorpe wrote:
+> > On Wed, Sep 13, 2023 at 05:26:01PM +0200, Lorenzo Pieralisi wrote:
 > 
-> Since this depends on kvm_smmu_domain->smmu being non-NULL, which is only
-> true if finalize() succeeded, then we shouldn't get a double-free.
+> [...]
+> 
+> > > I can write up the commit log and post it if I manage to summarize
+> > > it any better - more important the review on the code (that was already
+> > > provided), I will try to write something up asap.
+> > 
+> > Thank you!
+> > 
+> > Jason
+> 
+> FWIW, I have come up with the commit log below - please review and
+> scrutinize/change it as deemed fit - it is not necessarily clearer
+> than this one and it definitely requires MarcZ/Catalin/Will attention
+> before it can be considered:
 
-Yes, the other free was comming from an experiment I was making to use
-the IOMMU layer with guest VMs, so this is correct. Sorry about that.
+I have no issue with this language.
 
-> But finalize() does leak kvm_smmu_domain->id if the pgd allocation fails,
-> I fixed that.
-
-Thanks!
-
-> Thanks,
-> Jean
+Thanks,
+Jason
