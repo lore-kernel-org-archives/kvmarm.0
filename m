@@ -1,40 +1,40 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C1D4998F
-	for <kvmarm@lists.linux.dev>; Tue, 26 Sep 2023 23:40:15 +0000 (UTC)
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-c647150c254so20684242276.1
-        for <kvmarm@lists.linux.dev>; Tue, 26 Sep 2023 16:40:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB934BDAD
+	for <kvmarm@lists.linux.dev>; Tue, 26 Sep 2023 23:40:16 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d81646fcf3eso15441357276.0
+        for <kvmarm@lists.linux.dev>; Tue, 26 Sep 2023 16:40:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695771614; x=1696376414; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1695771615; x=1696376415; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qevun5/yY9+JK3ZHPWuRVz7IcDpyIACFdYtKkR+rLD4=;
-        b=oOq5QhKkAraPDRos+NFaG0ZRn/84GwwNecQx/R9zSBvemN/vPOlRuGopKYGlYVSXKr
-         x+uJtwtqMurXg5FyKFaILrbXIwjJpY/lVOEcXCyNQxAUtgs1Korv/me0l15R3ptc3nA7
-         /ejQeNQBMf+4bXE0+jugz9sN9UX8A4e1eZaMLsLtEFr5l3yEpSzu51DNVhMjBbsatkEi
-         Um888jSJzhQppml/W6jIPkkZ2xWzsyiSk35jx7b+CzawVAC8h9dMF6uZbFh9nHvz9G6B
-         BOsIUjWeFvQkqiHtEsagEsOQYDsTJbVmWtYMuJyO77cV/RZyORxmjKQb/UOCTlojvBai
-         RLBw==
+        bh=jKu1b4ypf/1yghTsriWdPSnBvGzU0xcIPJuBHtiUctI=;
+        b=UFyWuaGjeWwM/TIs4fHhicuYIusyJM17ZeL1ChqtNrRqtkddpYdv9ImusKjgnaxqKc
+         ibQdEe0bHBHV1s9oH4zgZ9ssz+5Ar/IsHCH3aLTA1NHqN9TSiwmnP3G96i2p594tvWqe
+         l2+8Fi6nTFfuF+k3e3RiNoasBkB7kCo+vsx1qm4n669euaTrQzAsQ3AtQ+Mm4UlepzpC
+         /I+qPm+iSdSKe4vabNnttsYXY3fM4YYbgwPsNzrylEfWItBu48lWBhYHceacchsWsTTD
+         4fWE1qq4od9Vglb/nRYQ7GMQ4g9O6pkhPH0apooJ4g6BJommCWn9q7Hux9DK+EMIOyV4
+         gRoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695771614; x=1696376414;
+        d=1e100.net; s=20230601; t=1695771615; x=1696376415;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qevun5/yY9+JK3ZHPWuRVz7IcDpyIACFdYtKkR+rLD4=;
-        b=T4sSzN5p4USb9h8bVl4szwRQ/gd0JwBoNu5qyysaOYkykbUVjuIWIjt35vSq/T4apZ
-         d23W14MTwzPPFBkBJxBzDZzrpQM6UNQjYvH03dDCc2un026uCwdNazPoYA+xqfe9rJvJ
-         /qESOWy+DNsbM3dzlm+nrAcJpTZaw6XOU9RW64xegEGSDjb56J0VItNxOvq2apw14m2s
-         vOLYlGCC6whtGbPCxG+9LXct9G5xOzPHA9niFe3AqNyTCVdzr+Saa/qAJhkADwSECLtP
-         BxA9hgP2pp9NGdwA+zNcVbx8i4ICd8DKVt+5xcoihE3nybe9xQGIIJFdxvqHLym5NK4F
-         GXqw==
-X-Gm-Message-State: AOJu0YwdUtYloiODPVYTHgjthsYpiDRXQFjIH4YkrNmklbrrnnK1i/tj
-	Frra5qwl4vwgPzDnf9ylBpruWg4O+JKl
-X-Google-Smtp-Source: AGHT+IEetmKobj2HvrfP5UmgYOr+yV8c5JH7C8utm5y5aVOqCwA2WWM3hZUA8gTkdds5ZVhPcUCGyps/w76l
+        bh=jKu1b4ypf/1yghTsriWdPSnBvGzU0xcIPJuBHtiUctI=;
+        b=oVkArjKXRPRrnlMG/lDuClTFZTtljcAi81yRailbv8yT7QLq6a9A+H9Y5l2annIPsU
+         H/Kq1d5aw2HCq7vidruS3a1KyhoNOCu/ohxPwoCgnn0tjG465PveqYRLoIPYY9ixs6GH
+         REBYFBRoRXAcgFryT0vawF1aeCqSvOCGK2SqzSUuLPFaXYK9BPXzEP/acehVe9IwSr/3
+         XTo3m2XyZRyhzLfMaDfo84NewVMFZLAxHx/Mkfk1kPEGAwBON1c6mmRORh6NBTAD0ii2
+         fdLTMSXM2iXLyvDQckIjlVfLfn9hHBPagIc5xTDiZihygHabGSoNb8kYuXsD164cap/Y
+         DJeA==
+X-Gm-Message-State: AOJu0YyTi9CJ7rbApra/tvHbf3aaLIn4L+uOJtN6vzNqCwkq/1uSU8XB
+	5s0xnwiMPgAY9xy9StbjeOXij8CtEuJc
+X-Google-Smtp-Source: AGHT+IGV5SFhSIRyByL8fTSP12VqgZmgARh5Ry8ZzINOdYh4tv/44IYbvZ41cAWOSTLUQkOt8P/xRpn4mw7O
 X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:20a1])
- (user=rananta job=sendgmr) by 2002:a05:6902:4f2:b0:ca3:3341:6315 with SMTP id
- w18-20020a05690204f200b00ca333416315mr8256ybs.0.1695771614584; Tue, 26 Sep
- 2023 16:40:14 -0700 (PDT)
-Date: Tue, 26 Sep 2023 23:40:00 +0000
+ (user=rananta job=sendgmr) by 2002:a25:ad13:0:b0:d77:984e:c770 with SMTP id
+ y19-20020a25ad13000000b00d77984ec770mr4746ybi.5.1695771615699; Tue, 26 Sep
+ 2023 16:40:15 -0700 (PDT)
+Date: Tue, 26 Sep 2023 23:40:01 +0000
 In-Reply-To: <20230926234008.2348607-1-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,9 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230926234008.2348607-1-rananta@google.com>
 X-Mailer: git-send-email 2.42.0.582.g8ccd20d70d-goog
-Message-ID: <20230926234008.2348607-4-rananta@google.com>
-Subject: [PATCH v6 03/11] KVM: arm64: PMU: Clear PM{C,I}NTEN{SET,CLR} and
- PMOVS{SET,CLR} on vCPU reset
+Message-ID: <20230926234008.2348607-5-rananta@google.com>
+Subject: [PATCH v6 04/11] KVM: arm64: PMU: Don't define the sysreg reset() for PM{USERENR,CCFILTR}_EL0
 From: Raghavendra Rao Ananta <rananta@google.com>
 To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
 Cc: Alexandru Elisei <alexandru.elisei@arm.com>, James Morse <james.morse@arm.com>, 
@@ -60,70 +59,43 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Reiji Watanabe <reijiw@google.com>
 
-On vCPU reset, PMCNTEN{SET,CLR}_EL0, PMINTEN{SET,CLR}_EL1, and
-PMOVS{SET,CLR}_EL1 for a vCPU are reset by reset_pmu_reg().
-This function clears RAZ bits of those registers corresponding
-to unimplemented event counters on the vCPU, and sets bits
-corresponding to implemented event counters to a predefined
-pseudo UNKNOWN value (some bits are set to 1).
+The default reset function for PMU registers (defined by PMU_SYS_REG)
+now simply clears a specified register. Use the default one for
+PMUSERENR_EL0 and PMCCFILTR_EL0, as KVM currently clears those
+registers on vCPU reset (NOTE: All non-RES0 fields of those
+registers have UNKNOWN reset values, and the same fields of
+their AArch32 registers have 0 reset values).
 
-The function identifies (un)implemented event counters on the
-vCPU based on the PMCR_EL0.N value on the host. Using the host
-value for this would be problematic when KVM supports letting
-userspace set PMCR_EL0.N to a value different from the host value
-(some of the RAZ bits of those registers could end up being set to 1).
-
-Fix this by clearing the registers so that it can ensure
-that all the RAZ bits are cleared even when the PMCR_EL0.N value
-for the vCPU is different from the host value. Use reset_val() to
-do this instead of fixing reset_pmu_reg(), and remove
-reset_pmu_reg(), as it is no longer used.
+No functional change intended.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 21 +--------------------
- 1 file changed, 1 insertion(+), 20 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index e92ec810d4494..ffd123fae30d6 100644
+index ffd123fae30d6..66b9e1de54230 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -717,25 +717,6 @@ static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
- 	return REG_HIDDEN;
- }
+@@ -2180,7 +2180,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	 * in 32bit mode. Here we choose to reset it as zero for consistency.
+ 	 */
+ 	{ PMU_SYS_REG(PMUSERENR_EL0), .access = access_pmuserenr,
+-	  .reset = reset_val, .reg = PMUSERENR_EL0, .val = 0 },
++	  .reg = PMUSERENR_EL0, },
+ 	{ PMU_SYS_REG(PMOVSSET_EL0),
+ 	  .access = access_pmovs, .reg = PMOVSSET_EL0 },
  
--static u64 reset_pmu_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
--{
--	u64 n, mask = BIT(ARMV8_PMU_CYCLE_IDX);
--
--	/* No PMU available, any PMU reg may UNDEF... */
--	if (!kvm_arm_support_pmu_v3())
--		return 0;
--
--	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
--	n &= ARMV8_PMU_PMCR_N_MASK;
--	if (n)
--		mask |= GENMASK(n - 1, 0);
--
--	reset_unknown(vcpu, r);
--	__vcpu_sys_reg(vcpu, r->reg) &= mask;
--
--	return __vcpu_sys_reg(vcpu, r->reg);
--}
--
- static u64 reset_pmevcntr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- {
- 	reset_unknown(vcpu, r);
-@@ -1115,7 +1096,7 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	  trap_wcr, reset_wcr, 0, 0,  get_wcr, set_wcr }
+@@ -2338,7 +2338,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	 * in 32bit mode. Here we choose to reset it as zero for consistency.
+ 	 */
+ 	{ PMU_SYS_REG(PMCCFILTR_EL0), .access = access_pmu_evtyper,
+-	  .reset = reset_val, .reg = PMCCFILTR_EL0, .val = 0 },
++	  .reg = PMCCFILTR_EL0, },
  
- #define PMU_SYS_REG(name)						\
--	SYS_DESC(SYS_##name), .reset = reset_pmu_reg,			\
-+	SYS_DESC(SYS_##name), .reset = reset_val,			\
- 	.visibility = pmu_visibility
- 
- /* Macro to expand the PMEVCNTRn_EL0 register */
+ 	EL2_REG(VPIDR_EL2, access_rw, reset_unknown, 0),
+ 	EL2_REG(VMPIDR_EL2, access_rw, reset_unknown, 0),
 -- 
 2.42.0.582.g8ccd20d70d-goog
 
