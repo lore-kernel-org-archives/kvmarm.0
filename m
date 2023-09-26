@@ -1,166 +1,83 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A54838DD6
-	for <kvmarm@lists.linux.dev>; Tue, 26 Sep 2023 18:19:49 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-59f7d109926so92284437b3.2
-        for <kvmarm@lists.linux.dev>; Tue, 26 Sep 2023 11:19:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2064C23D7
+	for <kvmarm@lists.linux.dev>; Tue, 26 Sep 2023 20:35:42 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d866d13c637so11268095276.3
+        for <kvmarm@lists.linux.dev>; Tue, 26 Sep 2023 13:35:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695752388; x=1696357188; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7evrq3PKBiHzaLA4DGci/aYqgw5Y4nsW4sL/8l2Nq7I=;
-        b=CezcnnsylZVm97py/n04YSn5O1nnZVKPijYXOOMibS2Yc1GxctMYgaoiN24mLra6bx
-         HWENSNtsDiB8h7QmH0GobsXPQNMZwlIrIXK2aXC6B4WqoNS90WYPWsj4WyHoFIcPDNut
-         11Q+VJSeSowxtB26UIwiONorvhC8L4OQNwcMNQLndNvbYd1z+0EN6Mc/0HV14KXo82bd
-         4CLr8xMH5EetnBbh5QOs8d37+E6IjPof3dYBRAPwnqSWzZftLteTdmaPg2cfrwK2TeGE
-         Cyhyv4Ua97UwPmnXah0dpDmT2faH4Kuj+M06nfEByaYoS7Y3FS1/aMoXqk3jXox1hdon
-         JWog==
+        d=google.com; s=20230601; t=1695760542; x=1696365342; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=gBgGdeEWghtFptaMQEsHDDCQhw184YQ6Ycjl2VsrZq4=;
+        b=xxW1irR09zIIpUyxuI4tTNKqPcsrDYXr9srDsZFNfLncGIQxXyVoM1SKuZc1CGko12
+         CirJkuR3UBq7uYjv1o9VcE0n8iFgQcR2qkGVtxc4m/CeMD8pfkNlfrBIX6+ScFd7kbvH
+         JDMP9NyeJ3hEPpD9km7KocUMB70UiIrWZw273AijwACKtC0o4AfAcTdbBnxCVYxbyV1i
+         vIsJO5dGKMnHjtwUACMGnpAy+H/BJgQQnDJp4v9e99Cdldud71vfwhGzbzn0jWlBKzJ0
+         9+FzTqFToJP5uHwaLJNxgcmt9ytWRiJ3tjvwtv7gC1DTjpdbGafs+bhvKU6Dc7WeAuH5
+         rVCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695752388; x=1696357188;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7evrq3PKBiHzaLA4DGci/aYqgw5Y4nsW4sL/8l2Nq7I=;
-        b=u52U8UDWgCm+qMRssHjEXqjj3hzEbsLorA5Ww+k06uqpeysLVPWlyxuSWRIdzxq7nB
-         Za5O6LaVImfrvRwP2t7jixCi9UacBirWMKl9ezaDaudmxFs/xXz23gjytZV27Yrurb53
-         rWYRFVhRlDDyIpVQSb/WMdaejGIHtm/UvIgP9c1yHmkkb2sPZqCBkphbF4LWICRvklS8
-         TEbKntrKO5LUkpF2kf3/te8kIx9zmHKAho919SN2zHFW8a+1ek9gKZXgsHaqiZsgwa34
-         Sn4Ki0MNWyQHuSH2e+Huom3PpqjgP2lwxFNXCuWbQyxEZayWOEXLk0tKuGYGyPdsJ9qj
-         dGYQ==
-X-Gm-Message-State: AOJu0YyeImgmw5EP6DORHRHuax4PGtek4DZqpIqfxqDWzQIqqzALKnY3
-	lSW0YL+0T4e6e9Etbwa4S7xoWVOS16Syuv7e
-X-Google-Smtp-Source: AGHT+IFsBLgs3gQ7K5g/UspJwVgIViCv0ygjK5w+Pz4KI1o7o1An2/fTMUVh8EL5Mm2ZDlEZ0xrd5xxhWPj51vn2
-X-Received: from vdonnefort.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:2eea])
- (user=vdonnefort job=sendgmr) by 2002:a0d:ec10:0:b0:59b:e1db:562c with SMTP
- id q16-20020a0dec10000000b0059be1db562cmr140768ywn.5.1695752388237; Tue, 26
- Sep 2023 11:19:48 -0700 (PDT)
-Date: Tue, 26 Sep 2023 19:19:32 +0100
-In-Reply-To: <20230926181932.1650692-1-vdonnefort@google.com>
+        d=1e100.net; s=20230601; t=1695760542; x=1696365342;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gBgGdeEWghtFptaMQEsHDDCQhw184YQ6Ycjl2VsrZq4=;
+        b=Bw6uq7IMXPKQy19vZREW58CedsOVtRrJuCZzF/8OlYRK3CdPkIO29Ht0VJqT2gvf7b
+         9sxeceIFH9i+8stet+mSxTRksQDj4Mszj1CYEaxna7uxBbn4IZcePVJunFdKxeEqAnM8
+         hm23zesbqd/ZOp+dJA+42CdVSWo14cxtuPmooy9EgYKpbYgVPLYEN4cZkdp7MCKFG5QB
+         sNk1oOkp29yfb7g4QPJlSq6CMJyK23SdJSg6j57E7BLoYbrdV9Aygl2mTKe7C3c4mSsd
+         l61+evLNaIZoDTW+9Q5cbYssN+fxDoYEEqQJO9MVBqGS+f0FwTUzcBbVMr+/Vkzd0nh4
+         oENA==
+X-Gm-Message-State: AOJu0Yx1KwM1NQrtGZBDQTAkS44D8+rP8BoFkyMKngnYUt4FkZ9d0WXh
+	Imiq4PBEVqatIIdGSmCmwdCq3S4MN50mt2dYkw==
+X-Google-Smtp-Source: AGHT+IGjI2QiYKNg5G+Jh+AzDxStZmGOTFezLlj2LgEDS7lrar4VAi7pc9DGlMxlvU+hONN81Pn1xc/3gcuU7CDJuw==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a05:6902:4c8:b0:d85:ae1e:f696 with
+ SMTP id v8-20020a05690204c800b00d85ae1ef696mr309ybs.0.1695760541740; Tue, 26
+ Sep 2023 13:35:41 -0700 (PDT)
+Date: Tue, 26 Sep 2023 20:35:40 +0000
+In-Reply-To: <9bf8d239-2851-087b-9608-0c776b721ed7@huawei.com> (message from
+ Zenghui Yu on Mon, 18 Sep 2023 19:16:21 +0800)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230926181932.1650692-1-vdonnefort@google.com>
-X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
-Message-ID: <20230926181932.1650692-3-vdonnefort@google.com>
-Subject: [PATCH v1 2/2] KVM: arm64: Use folio for THP adjustment
-From: Vincent Donnefort <vdonnefort@google.com>
-To: maz@kernel.org, oliver.upton@linux.dev
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	kernel-team@android.com, will@kernel.org, willy@infradead.org, 
-	Vincent Donnefort <vdonnefort@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Message-ID: <gsntwmwc3c6b.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH] KVM: arm64: selftests: Add arch_timer_edge_cases selftest
+From: Colton Lewis <coltonlewis@google.com>
+To: Zenghui Yu <yuzenghui@huawei.com>
+Cc: kvm@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
+	james.morse@arm.com, suzuki.poulose@arm.com, ricarkol@google.com, 
+	kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-Now transparent huge pages use folios, we can check efficiently if a
-page is mapped by a block by checking the folio size. This is saving a
-page table walk.
+Zenghui Yu <yuzenghui@huawei.com> writes:
 
-It is safe to read the folio in this path. We've just increased its
-refcount (GUP from __gfn_to_pfn_memslot()). This will prevent attempts
-of splitting the huge page.
+> Hi Colton,
 
-Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> On 2023/9/16 0:04, Colton Lewis wrote:
+>> It's been a few months with no comment on this. Can someone please
+>> review? There was no need to rebase from the original patch. It's all
+>> new code so there are no conflicts.
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index de5e5148ef5d..69fcbcc7aca5 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -791,51 +791,6 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
- 	return 0;
- }
- 
--static struct kvm_pgtable_mm_ops kvm_user_mm_ops = {
--	/* We shouldn't need any other callback to walk the PT */
--	.phys_to_virt		= kvm_host_va,
--};
--
--static int get_user_mapping_size(struct kvm *kvm, u64 addr)
--{
--	struct kvm_pgtable pgt = {
--		.pgd		= (kvm_pteref_t)kvm->mm->pgd,
--		.ia_bits	= vabits_actual,
--		.start_level	= (KVM_PGTABLE_MAX_LEVELS -
--				   CONFIG_PGTABLE_LEVELS),
--		.mm_ops		= &kvm_user_mm_ops,
--	};
--	unsigned long flags;
--	kvm_pte_t pte = 0;	/* Keep GCC quiet... */
--	u32 level = ~0;
--	int ret;
--
--	/*
--	 * Disable IRQs so that we hazard against a concurrent
--	 * teardown of the userspace page tables (which relies on
--	 * IPI-ing threads).
--	 */
--	local_irq_save(flags);
--	ret = kvm_pgtable_get_leaf(&pgt, addr, &pte, &level);
--	local_irq_restore(flags);
--
--	if (ret)
--		return ret;
--
--	/*
--	 * Not seeing an error, but not updating level? Something went
--	 * deeply wrong...
--	 */
--	if (WARN_ON(level >= KVM_PGTABLE_MAX_LEVELS))
--		return -EFAULT;
--
--	/* Oops, the userspace PTs are gone... Replay the fault */
--	if (!kvm_pte_valid(pte))
--		return -EAGAIN;
--
--	return BIT(ARM64_HW_PGTABLE_LEVEL_SHIFT(level));
--}
--
- static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
- 	.zalloc_page		= stage2_memcache_zalloc_page,
- 	.zalloc_pages_exact	= kvm_s2_zalloc_pages_exact,
-@@ -1274,7 +1229,7 @@ static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
-  *
-  * Returns the size of the mapping.
-  */
--static long
-+static unsigned long
- transparent_hugepage_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
- 			    unsigned long hva, kvm_pfn_t *pfnp,
- 			    phys_addr_t *ipap)
-@@ -1287,10 +1242,7 @@ transparent_hugepage_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
- 	 * block map is contained within the memslot.
- 	 */
- 	if (fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE)) {
--		int sz = get_user_mapping_size(kvm, hva);
--
--		if (sz < 0)
--			return sz;
-+		size_t sz = folio_size(pfn_folio(pfn));
- 
- 		if (sz < PMD_SIZE)
- 			return PAGE_SIZE;
-@@ -1385,7 +1337,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	kvm_pfn_t pfn;
- 	bool logging_active = memslot_is_logging(memslot);
- 	unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
--	long vma_pagesize, fault_granule;
-+	unsigned long vma_pagesize, fault_granule;
- 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
- 	struct kvm_pgtable *pgt;
- 
-@@ -1530,11 +1482,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 			vma_pagesize = transparent_hugepage_adjust(kvm, memslot,
- 								   hva, &pfn,
- 								   &fault_ipa);
--
--		if (vma_pagesize < 0) {
--			ret = vma_pagesize;
--			goto out_unlock;
--		}
- 	}
- 
- 	if (fault_status != ESR_ELx_FSC_PERM && !device && kvm_has_mte(kvm)) {
--- 
-2.42.0.515.g380fc7ccd1-goog
+>> I understand it's a bigger patch, but I believe it all falls under the
+>> same functional umbrella.
 
+> Thanks for your efforts. I'd like to give it a go but this patch fails
+> to compile on the mainline kernel.
+
+> In file included from include/aarch64/delay.h:9,
+>                   from lib/aarch64/gic_v3.c:10:
+> include/aarch64/arch_timer.h: In function 'timer_get_tval':
+> include/aarch64/arch_timer.h:107:3: warning: implicit declaration of
+> function 'GUEST_ASSERT_1'; did you mean 'GUEST_ASSERT_NE'?
+> [-Wimplicit-function-declaration]
+>    107 |   GUEST_ASSERT_1(0, timer);
+>        |   ^~~~~~~~~~~~~~
+>        |   GUEST_ASSERT_NE
+
+> ... and something like that. It'd be good if you could have a look.
+
+Sorry about that. I'll make those updates right away and rerun the
+testing I did when I originally sent the patch.
