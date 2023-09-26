@@ -1,120 +1,108 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4551B2F24;
-	Tue, 26 Sep 2023 13:16:45 +0000 (UTC)
-Received: from lhrpeml500002.china.huawei.com (unknown [172.18.147.200])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Rw0bh0SMmz6K7vG;
-	Tue, 26 Sep 2023 21:15:28 +0800 (CST)
-Received: from lhrpeml500001.china.huawei.com (7.191.163.213) by
- lhrpeml500002.china.huawei.com (7.191.160.78) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Tue, 26 Sep 2023 14:16:41 +0100
-Received: from lhrpeml500001.china.huawei.com ([7.191.163.213]) by
- lhrpeml500001.china.huawei.com ([7.191.163.213]) with mapi id 15.01.2507.031;
- Tue, 26 Sep 2023 14:16:41 +0100
-From: Salil Mehta <salil.mehta@huawei.com>
-To: James Morse <james.morse@arm.com>, "linux-pm@vger.kernel.org"
-	<linux-pm@vger.kernel.org>, "loongarch@lists.linux.dev"
-	<loongarch@lists.linux.dev>, "linux-acpi@vger.kernel.org"
-	<linux-acpi@vger.kernel.org>, "linux-arch@vger.kernel.org"
-	<linux-arch@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-riscv@lists.infradead.org"
-	<linux-riscv@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>
-CC: "x86@kernel.org" <x86@kernel.org>, Russell King <linux@armlinux.org.uk>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, "jianyong.wu@arm.com"
-	<jianyong.wu@arm.com>, "justin.he@arm.com" <justin.he@arm.com>
-Subject: RE: [RFC PATCH v2 00/35] ACPI/arm64: add support for virtual
- cpuhotplug
-Thread-Topic: [RFC PATCH v2 00/35] ACPI/arm64: add support for virtual
- cpuhotplug
-Thread-Index: AQHZ5mDIR7JMF2KEeEGQTVeJuAX/8LAtKYMg
-Date: Tue, 26 Sep 2023 13:16:41 +0000
-Message-ID: <622a39bda12a4b75a6da84f4566b4238@huawei.com>
-References: <20230913163823.7880-1-james.morse@arm.com>
-In-Reply-To: <20230913163823.7880-1-james.morse@arm.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [10.126.174.16]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6333E26E34
+	for <kvmarm@lists.linux.dev>; Tue, 26 Sep 2023 13:52:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24545C433C7;
+	Tue, 26 Sep 2023 13:52:15 +0000 (UTC)
+Date: Tue, 26 Sep 2023 14:52:13 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Lorenzo Pieralisi <lpieralisi@kernel.org>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, ankita@nvidia.com, maz@kernel.org,
+	oliver.upton@linux.dev, will@kernel.org, aniketa@nvidia.com,
+	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
+	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
+	jhubbard@nvidia.com, danw@nvidia.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 2/2] KVM: arm64: allow the VM to select DEVICE_* and
+ NORMAL_NC for IO memory
+Message-ID: <ZRLiDf204zCpO6Mv@arm.com>
+References: <20230907181459.18145-1-ankita@nvidia.com>
+ <20230907181459.18145-3-ankita@nvidia.com>
+ <ZP8q71+YXoU6O9uh@lpieralisi>
+ <ZP9MQdRYmlawNsbC@nvidia.com>
+ <ZQHUifAfJ+lZikAn@lpieralisi>
+ <ZQIFfqgR5zcidRR3@nvidia.com>
+ <ZRKW6uDR/+eXYMzl@lpieralisi>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZRKW6uDR/+eXYMzl@lpieralisi>
 
-> From: James Morse <james.morse@arm.com>
-> Sent: Wednesday, September 13, 2023 5:38 PM
+On Tue, Sep 26, 2023 at 10:31:38AM +0200, Lorenzo Pieralisi wrote:
+> Currently, KVM for ARM64 maps at stage 2 memory that is
+> considered device (ie using pfn_is_map_memory() to discern
+> between device memory and memory itself) with DEVICE_nGnRE
+> memory attributes; this setting overrides (as per the ARM
+> architecture [1]) any device MMIO mapping present at stage
+> 1, resulting in a set-up whereby a guest operating system
+> can't determine device MMIO mapping memory attributes on its
+> own but it is always overriden by the KVM stage 2 default.
+> 
+> This set-up does not allow guest operating systems to map
+> device memory on a page by page basis with combined attributes
+> other than DEVICE_nGnRE,
 
-[...]
+Well, it also has the option of DEVICE_nGnRnE ;).
 
->=20
-> Hello!
->=20
-> Changes since RFC-v1:
->  * riscv is new, ia64 is gone
->  * The KVM support is different, and upstream - no need to patch the host=
-.
->=20
-> ---
->=20
-> This series adds what looks like cpuhotplug support to arm64 for use in
-> virtual machines. It does this by moving the cpu_register() calls for
-> architectures that support ACPI out of the arch code by using
-> GENERIC_CPU_DEVICES, then into the ACPI processor driver.
->=20
-> The kubernetes folk really want to be able to add CPUs to an existing VM,
-> in exactly the same way they do on x86. The use-case is pre-booting guest=
-s
-> with one CPU, then adding the number that were actually needed when the
-> workload is provisioned.
->=20
+> which turns out to be an issue in that
+> guest operating systems (eg Linux) may request to map
+> devices MMIO regions with memory attributes that guarantee
+> better performance (eg gathering attribute - that for some
+> devices can generate larger PCIe memory writes TLPs)
+> and specific operations (eg unaligned transactions) such as
+> the NormalNC memory type.
+> 
+> The default device stage 2 mapping was chosen in KVM
+> for ARM64 since it was considered safer (ie it would
+> not allow guests to trigger uncontained failures
+> ultimately crashing the machine) but this turned out
+> to be imprecise.
+> 
+> Failures containability is a property of the platform
+> and is independent from the memory type used for MMIO
+> device memory mappings (ie DEVICE_nGnRE memory type is
+> even more problematic than NormalNC in terms of containability
+> since eg aborts triggered on loads cannot be made synchronous,
+> which make them harder to contain); this means that,
+> regardless of the combined stage1+stage2 mappings a
+> platform is safe if and only if device transactions cannot trigger
+> uncontained failures; reworded, the default KVM device
+> stage 2 memory attributes play no role in making device
+> assignment safer for a given platform and therefore can
+> be relaxed.
+> 
+> For all these reasons, relax the KVM stage 2 device
+> memory attributes from DEVICE_nGnRE to NormalNC.
+> 
+> This puts guests in control (thanks to stage1+stage2
+> combined memory attributes rules [1]) of device MMIO
+> regions memory mappings, according to the rules
+> described in [1] and summarized here ([(S1) = Stage1][(S2) = Stage2]):
+> 
+> �S1���������� |�� S2��������� |� Result
+> �NORMAL-WB����|� NORMAL-NC����|� NORMAL-NC
+> �NORMAL-WT����|� NORMAL-NC����|� NORMAL-NC
+> �NORMAL-NC����|� NORMAL-NC����|� NORMAL-NC
+> �DEVICE<attr>�|� NORMAL-NC����|� DEVICE<attr>
 
-[...]
+Not sure what's wrong with my font setup as I can't see the above table
+but I know it from the Arm ARM.
 
->=20
-> I had a go at switching the remaining architectures over to
-> GENERIC_CPU_DEVICES,
-> so that the Kconfig symbol can be removed, but I got stuck with powerpc
-> and s390.
->=20
-> I've only build tested Loongarch and riscv. I've removed the ia64 specifi=
-c
-> patches, but left the changes in other patches to make git-grep review of
-> renames easier.
->=20
-> If folk want to play along at home, you'll need a copy of Qemu that
-> supports this.
-> https://github.com/salil-mehta/qemu.git salil/virt-cpuhp-armv8/rfc-v2-rc6
+Anyway, the text looks fine to me. Thanks for putting it together
+Lorenzo.
 
+One thing not mentioned here is that pci-vfio still maps such memory as
+Device-nGnRnE in user space and relaxing this potentially creates an
+alias. But such alias is only relevant of both the VMM and the VM try to
+access the same device which I doubt is a realistic scenario.
 
-Please use the latest pushed RFC V2 instead:
-https://lore.kernel.org/qemu-devel/20230926100436.28284-1-salil.mehta@huawe=
-i.com/T/#m523b37819c4811c7827333982004e07a1ef03879
-
-Repository:
-https://github.com/salil-mehta/qemu.git  virt-cpuhp-armv8/rfc-v2
-
-
-Thanks
-Salil.
-
-
-[...]
-
-> Why is this still an RFC? I'm still looking for confirmation from the
-> kubernetes/kata folk that this works for them. Because of this I've culle=
-d
-> the CC list...
->=20
->=20
-> This series is based on v6.6-rc1, and can be retrieved from:
-> https://git.kernel.org/pub/scm/linux/kernel/git/morse/linux.git/virtual_c=
-pu_hotplug/rfc/v2
+-- 
+Catalin
