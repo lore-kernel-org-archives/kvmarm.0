@@ -1,40 +1,40 @@
 Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C11674998F
-	for <kvmarm@lists.linux.dev>; Tue, 26 Sep 2023 23:40:13 +0000 (UTC)
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d8153284d6eso15405929276.3
-        for <kvmarm@lists.linux.dev>; Tue, 26 Sep 2023 16:40:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2715A4E
+	for <kvmarm@lists.linux.dev>; Tue, 26 Sep 2023 23:40:14 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d868842eda1so11016135276.0
+        for <kvmarm@lists.linux.dev>; Tue, 26 Sep 2023 16:40:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695771612; x=1696376412; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1695771614; x=1696376414; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5wBvgde8NqXXedlUolMxmuLFm0wZFB1ciTVf7h91dh0=;
-        b=oCQmYBW9tw1c4N94N59a3dkXUYN99DSfNwDu8VuSYZSa3sB2d2dfHN3iiTScwLhhEG
-         FZAi3JrF6eiIoA4OMSkXXGozzfwVJa0HH896qFpyzI5KQDoZmkUZghyKY5PsyYjaRHc/
-         H77nQPNTPeUtg4HoUtgtwyeZRqLH72FZ9qjsQLZQeOxaIZlFo9VEnw1/Hwdqya34RJP5
-         417ZNc/ObCZ+X3U6BRAgexyQMVe2WgmT6+kVQAIQVqeA56VRXm4EIZV+HsG+tYo8SHdv
-         9H1GrBE+i6nwFLEmjiYoJwrigN1t/5KQKY67/QNFjzhX3K6Rt6oB5nj1ERAklhy2n2BA
-         SuAg==
+        bh=BFZ3oRaktvjpak7EYQ8bhPZASUfW0XMcRMU08mfnD9k=;
+        b=B8sxPIQ1FIaKRJeyg3WkfDYAaeHB2+opx0PYjYufrJf2I9GyVkns4BJgPF8sXK2I+p
+         4GxWLPP7XAwzyEVa0geff+MGVj9g2ZILb1R4FJLvmwPs5ileRHbPCnxsK6GbcKm08dDb
+         004qmmy/9zo30Ng2faMGsbS9iEbz4lIPHWekK1Kr/4OzF2pEAksDFP5+ubhNTF4NNDTv
+         oxhDpcq2hBN+wx9v41pBC+w7twhblJBG3HNdaNXKmgQIlZELyD9VE8eJBGYSMzSNluN8
+         K1JB1qHib9AQ1aBpShBpBTBDxyT461HqlksPR02tM/4GJX9CUi9wE6K92OCTVcBrCDPm
+         6Suw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695771612; x=1696376412;
+        d=1e100.net; s=20230601; t=1695771614; x=1696376414;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5wBvgde8NqXXedlUolMxmuLFm0wZFB1ciTVf7h91dh0=;
-        b=Xv4EVt0Npgy1ERTTcC3i7p0z0wkOjv/3s7dgJEnf/yYKGRURMNIaM1vYz9Mmph2Z5d
-         VxnbCSkhlWEsyaLPsEw8eQYkkW9R8JiiKCdVbCBtqx8mexyfYFsTVgeW+BdoV0wovmqW
-         l0qliLJkREgIGmaQDlOIpCMR6YT4E7Aje1ms9N+sLao6ly3pOD7momXZT/h9CX06LdK4
-         zuML76nL1uRcpIm8fQPRW8/c3mGA8gNTdKha8r7ormk2G1Cb9LSj5ilSJZA3iuGaw76j
-         3GBjBCcNH9mGRSMsNzHk1NoTPKC7oysvmiMa8x1sjJDOGscGRIuRIiFgR9+nsKvkWPcU
-         GYmw==
-X-Gm-Message-State: AOJu0YxKyur3TTy0I2aDRxJxL0pCSAkkiOxAxOhrDrXEoFLsIvO9374w
-	CZ8loXNITpP6MPoNjcpfyCb0DGp9Fa4q
-X-Google-Smtp-Source: AGHT+IGQ/Bhiz9+l+ftp30n3Q3sAQclow99O2nr45tC++G2Qcf6D0tuF4DRExCh4Bp6rFs3g73lmp3qip+2k
+        bh=BFZ3oRaktvjpak7EYQ8bhPZASUfW0XMcRMU08mfnD9k=;
+        b=H1l1npIYiHw88yA7FWmZ4ZJXuZIxTMBmGRsMU7GrF3LK5OmcNwVJpXFJvXSQR6DEno
+         w29qtIFJwcEH3xg91wAtoKPif03EnHhztCD/psdtksdnYI+CgS2P910tnkbiP/F39xLw
+         uFw79BQlxdX/dXbl8NAWgTSs0qXYZv8CJDMOlQoO4IoZKb9dV0tuNlTD/il/e2OuBWfm
+         w4eyJVnHdixJepBzpqfJZz/C2h56MWkucNfwkXnUwJhE5WSEqvmKW3jtAQQoE9e4enoe
+         Eyr8fryvdZ85A9cUpnKoTJ428nuHtEqEso7kSBvBZRXhbdoJCvsEIAOPhkCYcZN9e0pk
+         lmAA==
+X-Gm-Message-State: AOJu0YwcGPGQUdxnk+LxiRBaeTqARdbk7vjkC+0M7JF0UxqSufPMmv5y
+	KoPE05bT15lD/vn8G7GXYi0hg6CsuAYb
+X-Google-Smtp-Source: AGHT+IFN5HNodPoGlToxTiiSd7fvpfXOrzUL/D9RDPBlHqgEooH+ChekIwrgR4jDdec6AG78NEq0auXsSQym
 X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:20a1])
- (user=rananta job=sendgmr) by 2002:a05:6902:1682:b0:d81:78ec:c403 with SMTP
- id bx2-20020a056902168200b00d8178ecc403mr4790ybb.12.1695771612735; Tue, 26
- Sep 2023 16:40:12 -0700 (PDT)
-Date: Tue, 26 Sep 2023 23:39:58 +0000
+ (user=rananta job=sendgmr) by 2002:a25:9289:0:b0:d89:425b:77bd with SMTP id
+ y9-20020a259289000000b00d89425b77bdmr4669ybl.1.1695771613788; Tue, 26 Sep
+ 2023 16:40:13 -0700 (PDT)
+Date: Tue, 26 Sep 2023 23:39:59 +0000
 In-Reply-To: <20230926234008.2348607-1-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,9 +44,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230926234008.2348607-1-rananta@google.com>
 X-Mailer: git-send-email 2.42.0.582.g8ccd20d70d-goog
-Message-ID: <20230926234008.2348607-2-rananta@google.com>
-Subject: [PATCH v6 01/11] KVM: arm64: PMU: Introduce helpers to set the
- guest's PMU
+Message-ID: <20230926234008.2348607-3-rananta@google.com>
+Subject: [PATCH v6 02/11] KVM: arm64: PMU: Set the default PMU for the guest
+ on vCPU reset
 From: Raghavendra Rao Ananta <rananta@google.com>
 To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
 Cc: Alexandru Elisei <alexandru.elisei@arm.com>, James Morse <james.morse@arm.com>, 
@@ -60,95 +60,127 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Reiji Watanabe <reijiw@google.com>
 
-Introduce new helper functions to set the guest's PMU
-(kvm->arch.arm_pmu) either to a default probed instance or to a
-caller requested one, and use it when the guest's PMU needs to
-be set. These helpers will make it easier for the following
-patches to modify the relevant code.
+The following patches will use the number of counters information
+from the arm_pmu and use this to set the PMCR.N for the guest
+during vCPU reset. However, since the guest is not associated
+with any arm_pmu until userspace configures the vPMU device
+attributes, and a reset can happen before this event, call
+kvm_arm_support_pmu_v3() just before doing the reset.
 
 No functional change intended.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
- arch/arm64/kvm/pmu-emul.c | 50 +++++++++++++++++++++++++++------------
- 1 file changed, 35 insertions(+), 15 deletions(-)
+ arch/arm64/kvm/pmu-emul.c | 12 ++----------
+ arch/arm64/kvm/reset.c    | 18 +++++++++++++-----
+ include/kvm/arm_pmu.h     |  6 ++++++
+ 3 files changed, 21 insertions(+), 15 deletions(-)
 
 diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 6b066e04dc5df..fb9817bdfeb57 100644
+index fb9817bdfeb57..998e1bbd5310d 100644
 --- a/arch/arm64/kvm/pmu-emul.c
 +++ b/arch/arm64/kvm/pmu-emul.c
-@@ -874,6 +874,36 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
- 	return true;
- }
- 
-+static void kvm_arm_set_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
-+{
-+	lockdep_assert_held(&kvm->arch.config_lock);
-+
-+	kvm->arch.arm_pmu = arm_pmu;
-+}
-+
-+/**
-+ * kvm_arm_set_default_pmu - No PMU set, get the default one.
-+ * @kvm: The kvm pointer
-+ *
-+ * The observant among you will notice that the supported_cpus
-+ * mask does not get updated for the default PMU even though it
-+ * is quite possible the selected instance supports only a
-+ * subset of cores in the system. This is intentional, and
-+ * upholds the preexisting behavior on heterogeneous systems
-+ * where vCPUs can be scheduled on any core but the guest
-+ * counters could stop working.
-+ */
-+static int kvm_arm_set_default_pmu(struct kvm *kvm)
-+{
-+	struct arm_pmu *arm_pmu = kvm_pmu_probe_armpmu();
-+
-+	if (!arm_pmu)
-+		return -ENODEV;
-+
-+	kvm_arm_set_pmu(kvm, arm_pmu);
-+	return 0;
-+}
-+
- static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
+@@ -717,8 +717,7 @@ static struct arm_pmu *kvm_pmu_probe_armpmu(void)
+ 	 * It is still necessary to get a valid cpu, though, to probe for the
+ 	 * default PMU instance as userspace is not required to specify a PMU
+ 	 * type. In order to uphold the preexisting behavior KVM selects the
+-	 * PMU instance for the core where the first call to the
+-	 * KVM_ARM_VCPU_PMU_V3_CTRL attribute group occurs. A dependent use case
++	 * PMU instance for the core during the vcpu reset. A dependent use case
+ 	 * would be a user with disdain of all things big.LITTLE that affines
+ 	 * the VMM to a particular cluster of cores.
+ 	 *
+@@ -893,7 +892,7 @@ static void kvm_arm_set_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
+  * where vCPUs can be scheduled on any core but the guest
+  * counters could stop working.
+  */
+-static int kvm_arm_set_default_pmu(struct kvm *kvm)
++int kvm_arm_set_default_pmu(struct kvm *kvm)
  {
- 	struct kvm *kvm = vcpu->kvm;
-@@ -893,7 +923,7 @@ static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
- 				break;
- 			}
+ 	struct arm_pmu *arm_pmu = kvm_pmu_probe_armpmu();
  
--			kvm->arch.arm_pmu = arm_pmu;
-+			kvm_arm_set_pmu(kvm, arm_pmu);
- 			cpumask_copy(kvm->arch.supported_cpus, &arm_pmu->supported_cpus);
- 			ret = 0;
- 			break;
-@@ -917,20 +947,10 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+@@ -946,13 +945,6 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 	if (vcpu->arch.pmu.created)
  		return -EBUSY;
  
- 	if (!kvm->arch.arm_pmu) {
--		/*
--		 * No PMU set, get the default one.
--		 *
--		 * The observant among you will notice that the supported_cpus
--		 * mask does not get updated for the default PMU even though it
--		 * is quite possible the selected instance supports only a
--		 * subset of cores in the system. This is intentional, and
--		 * upholds the preexisting behavior on heterogeneous systems
--		 * where vCPUs can be scheduled on any core but the guest
--		 * counters could stop working.
--		 */
--		kvm->arch.arm_pmu = kvm_pmu_probe_armpmu();
--		if (!kvm->arch.arm_pmu)
--			return -ENODEV;
-+		int ret = kvm_arm_set_default_pmu(kvm);
-+
-+		if (ret)
-+			return ret;
- 	}
- 
+-	if (!kvm->arch.arm_pmu) {
+-		int ret = kvm_arm_set_default_pmu(kvm);
+-
+-		if (ret)
+-			return ret;
+-	}
+-
  	switch (attr->attr) {
+ 	case KVM_ARM_VCPU_PMU_V3_IRQ: {
+ 		int __user *uaddr = (int __user *)(long)attr->addr;
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 7a65a35ee4ac4..6912832b44b6d 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -206,6 +206,7 @@ static int kvm_vcpu_enable_ptrauth(struct kvm_vcpu *vcpu)
+  */
+ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ {
++	struct kvm *kvm = vcpu->kvm;
+ 	struct vcpu_reset_state reset_state;
+ 	int ret;
+ 	bool loaded;
+@@ -216,6 +217,18 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.reset_state.reset = false;
+ 	spin_unlock(&vcpu->arch.mp_state_lock);
+ 
++	if (kvm_vcpu_has_pmu(vcpu)) {
++		if (!kvm_arm_support_pmu_v3())
++			return -EINVAL;
++
++		/*
++		 * When the vCPU has a PMU, but no PMU is set for the guest
++		 * yet, set the default one.
++		 */
++		if (unlikely(!kvm->arch.arm_pmu) && kvm_arm_set_default_pmu(kvm))
++			return -EINVAL;
++	}
++
+ 	/* Reset PMU outside of the non-preemptible section */
+ 	kvm_pmu_vcpu_reset(vcpu);
+ 
+@@ -255,11 +268,6 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 	else
+ 		pstate = VCPU_RESET_PSTATE_EL1;
+ 
+-	if (kvm_vcpu_has_pmu(vcpu) && !kvm_arm_support_pmu_v3()) {
+-		ret = -EINVAL;
+-		goto out;
+-	}
+-
+ 	/* Reset core registers */
+ 	memset(vcpu_gp_regs(vcpu), 0, sizeof(*vcpu_gp_regs(vcpu)));
+ 	memset(&vcpu->arch.ctxt.fp_regs, 0, sizeof(vcpu->arch.ctxt.fp_regs));
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 31029f4f7be85..b80c75d80886b 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -101,6 +101,7 @@ void kvm_vcpu_pmu_resync_el0(void);
+ })
+ 
+ u8 kvm_arm_pmu_get_pmuver_limit(void);
++int kvm_arm_set_default_pmu(struct kvm *kvm);
+ 
+ #else
+ struct kvm_pmu {
+@@ -174,6 +175,11 @@ static inline u8 kvm_arm_pmu_get_pmuver_limit(void)
+ }
+ static inline void kvm_vcpu_pmu_resync_el0(void) {}
+ 
++static inline int kvm_arm_set_default_pmu(struct kvm *kvm)
++{
++	return -ENODEV;
++}
++
+ #endif
+ 
+ #endif
 -- 
 2.42.0.582.g8ccd20d70d-goog
 
