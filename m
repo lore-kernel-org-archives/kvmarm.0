@@ -1,91 +1,82 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCF68208C3
-	for <kvmarm@lists.linux.dev>; Wed, 27 Sep 2023 09:09:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2BBDC43395;
-	Wed, 27 Sep 2023 09:09:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695805760;
-	bh=JypXsHJ4InnnDaRcHTXpCOmOh/qZk14zMN+csAv3sVQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=L0sOSEmCli0cv5bClWusW9jpAKHZEyVWze2Jj+KM4gc5M5ew3sgoPGWnK95US7FtV
-	 wl98R6DE7BJNax8X9JpwkvzqB0MhoG+MU5qdjDAdjqVzlnZz7xU9ELRPzHhlFOJSpS
-	 Gvgvv7nvXtCTibHiFR7URTIGzFK+uJxl2416Wd4gVAEZ4hYvvu4dxzoeDO52YVRtiA
-	 FJxHpSiQnemXPvRn65IbInEnzBSPRGZxqy1ij5PjjSej7fHRDdorJjMFBHMs6eqKb0
-	 B8sTbWFtQTHSoZmrLolKwkTKdaVV7uYza6fh96tv8c84Xmpv+kX7NpHEHCYm3q0FBp
-	 xUqmwK0P44V2A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qlQXm-00GaLb-ND;
-	Wed, 27 Sep 2023 10:09:18 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	Xu Zhao <zhaoxu.35@bytedance.com>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v3 11/11] KVM: arm64: Clarify the ordering requirements for vcpu/RD creation
-Date: Wed, 27 Sep 2023 10:09:11 +0100
-Message-Id: <20230927090911.3355209-12-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230927090911.3355209-1-maz@kernel.org>
-References: <20230927090911.3355209-1-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDDF723742
+	for <kvmarm@lists.linux.dev>; Wed, 27 Sep 2023 12:39:49 +0000 (UTC)
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3226cc3e324so9892140f8f.3
+        for <kvmarm@lists.linux.dev>; Wed, 27 Sep 2023 05:39:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695818388; x=1696423188; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bTA1Nn/9nJiqE2dp6IAJC+LQ+4ngnD0zddI0+KHWMMU=;
+        b=RPaIss2i8PNQy52Rhwhjyju0/I5S6hPcjS++/EHlXVpi+XgLQHiRSfbM1GS1aJMMuF
+         mrpMcPvAB0Z1U/eDXNvY0Lkb96BFTcaRdZd81SLS0ZdSijQXV1nKpSGz8o4iDuNuDOy8
+         25hRlwMsoaEdZGdHGSjUxh54mFIqXCdwodBAT1M87Q+rqz+zW/cA0JRHARTZcb7N7Tlf
+         Ofh7IbX5hfju3Y3G64VmOXKrLYFtfsGetkGH/zTgc3SkkA7scKMBFEenUniOH2RDe0Z4
+         iMjUFWUyovIoIESfUNJlCsp+Gacx6JHIh89wVDvkw2rAUMRCEEqn/Z4GRq3h/+7F+7aX
+         912w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695818388; x=1696423188;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bTA1Nn/9nJiqE2dp6IAJC+LQ+4ngnD0zddI0+KHWMMU=;
+        b=SwvEoEBDYtU8M8NX/0asH/CwjI6075TmKkA9Z0qk+Q6ee1WBXjlB7QqcIDGp25nPfp
+         SzXKPO+MxmggkFi0UQR7O7PgE8zw8n30CGsP59fNDYJyNUIxEwDRIFGStLIfX81c1mgo
+         /YAKQs8jWb9hg2EkIEZvV7PzTxoRg4ZlB3JUzdN51LlrXOffY0W2uEuX/d6udrfs+Epl
+         gFVcnbJQKD+GnAXwPvhJFHqPGaa3YKRsBlq3h+amcFaiTE0FBrgIBq2ZFITvThyeE8jc
+         MHlg7S7VHsOnrGdgqDEw+zhYOCcaHW21BgCeAHhD5vcBzVxjlejthCwKJWQLlb26aljt
+         Tlfg==
+X-Gm-Message-State: AOJu0YzdyTnJvPJq+pJV4b99OEWbpO2Y0MEkfekkc/YzC8fElpxElYZC
+	uiNL3zbI7McHnOShRP439VbAKA==
+X-Google-Smtp-Source: AGHT+IFOfZDsaU2Wgb3xBaiFul+bsaxW9mNk2PdMLIdYcGcI0xasbJngjJZ+HmHKLZ1uS0jKT6rkIw==
+X-Received: by 2002:a5d:67cd:0:b0:31a:e73f:3fe7 with SMTP id n13-20020a5d67cd000000b0031ae73f3fe7mr1853788wrw.3.1695818387830;
+        Wed, 27 Sep 2023 05:39:47 -0700 (PDT)
+Received: from google.com (65.0.187.35.bc.googleusercontent.com. [35.187.0.65])
+        by smtp.gmail.com with ESMTPSA id h4-20020a056000000400b0031aef72a021sm17254092wrx.86.2023.09.27.05.39.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Sep 2023 05:39:47 -0700 (PDT)
+Date: Wed, 27 Sep 2023 13:39:39 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: maz@kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
+	will@kernel.org, willy@infradead.org
+Subject: Re: [PATCH v1 0/2] KVM: arm64: Use folio for THP support
+Message-ID: <ZRQii9II1zGJF4vw@google.com>
+References: <20230926181932.1650692-1-vdonnefort@google.com>
+ <ZRPMEFvQ-bt4rPDQ@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, shameerali.kolothum.thodi@huawei.com, zhaoxu.35@bytedance.com, eric.auger@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZRPMEFvQ-bt4rPDQ@linux.dev>
 
-It goes without saying, but it is probably better to spell it out:
+On Wed, Sep 27, 2023 at 06:30:40AM +0000, Oliver Upton wrote:
+> Vincent,
+> 
+> On Tue, Sep 26, 2023 at 07:19:30PM +0100, Vincent Donnefort wrote:
+> > With the introduction of folios for transparent huge pages [1], we
+> > can rely on this support to identify if a page is backed by a huge one,
+> > saving a page table walk.
+> 
+> Better yet, this gets rid of a particular walk that has had some rather
+> hairy bugs in the past :)
+> 
+> > [1] https://lkml.kernel.org/r/20220504182857.4013401-3-willy@infradead.org
+> 
+> nit: for the sake of posterity, it might be good to stick a reference to
+> commit cb196ee1ef39 ("mm/huge_memory: convert do_huge_pmd_anonymous_page()
+> to use vma_alloc_folio()") in the changelogs.
 
-If userspace tries to restore and VM, but creates vcpus and/or RDs
-in a different order, the vcpu/RD mapping will be different. Yes,
-our API is an ugly piece of crap and I can't believe that we missed
-this.
+I'll add that reference in the following version.
 
-If we want to relax the above, we'll need to define a new userspace
-API that allows the mapping to be specified, rather than relying
-on the kernel to perform the mapping on its own.
-
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- Documentation/virt/kvm/devices/arm-vgic-v3.rst | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/Documentation/virt/kvm/devices/arm-vgic-v3.rst b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-index 51e5e5762571..5817edb4e046 100644
---- a/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-+++ b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-@@ -59,6 +59,13 @@ Groups:
-   It is invalid to mix calls with KVM_VGIC_V3_ADDR_TYPE_REDIST and
-   KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION attributes.
- 
-+  Note that to obtain reproducible results (the same VCPU being associated
-+  with the same redistributor across a save/restore operation), VCPU creation
-+  order, redistributor region creation order as well as the respective
-+  interleaves of VCPU and region creation MUST be preserved.  Any change in
-+  either ordering may result in a different vcpu_id/redistributor association,
-+  resulting in a VM that will fail to run at restore time.
-+
-   Errors:
- 
-     =======  =============================================================
--- 
-2.34.1
-
+> 
+> -- 
+> Thanks,
+> Oliver
