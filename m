@@ -1,27 +1,32 @@
-Received: from out-205.mta0.migadu.com (out-205.mta0.migadu.com [91.218.175.205])
+Received: from out-201.mta1.migadu.com (out-201.mta1.migadu.com [95.215.58.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86F2C1C29F
-	for <kvmarm@lists.linux.dev>; Wed, 27 Sep 2023 06:30:46 +0000 (UTC)
-Date: Wed, 27 Sep 2023 06:30:40 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA702C80
+	for <kvmarm@lists.linux.dev>; Wed, 27 Sep 2023 06:38:49 +0000 (UTC)
+Date: Wed, 27 Sep 2023 06:38:43 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1695796244;
+	t=1695796728;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OcHQMUs7S3hEb2hCa9u3IStXK67tQ8ZYrh/J/yyNvkI=;
-	b=Bzfo+qfXvK46D68vbx/KAsiucToKdFvwToS8WnNmrBCzGQvsQEYZzvyFNGBV5d/sgs3QWr
-	r8oU/5cg+zIq1Ys5Kzw3nAYODCQKUj8nx8Q4uOBC46VzTlOGCwnSviPDBmXD4HrUG8Brnw
-	kKSJgeJ+9ww4rBOtb+79O3mqT/ZqeDQ=
+	bh=ANzSUeT13BcRikCCyItwl6K1na2mnc5Bfg6YABeioAE=;
+	b=IgC7EixxEj/SBVKdii29qQDtWu6vEhtxjFFXja4fPRIMHRqtffx8C94iuWKAWq/qz1iHjW
+	ewCFJBH55eGEvMJAUYEofWEt5zWNd7Cb9pFEw5+4QN5hjG+aoe3BuANLRZf0Ldgn3nfOmB
+	6iNv9tvn6GGhMk75/QgJu7Zqg859qWI=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: maz@kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
-	will@kernel.org, willy@infradead.org
-Subject: Re: [PATCH v1 0/2] KVM: arm64: Use folio for THP support
-Message-ID: <ZRPMEFvQ-bt4rPDQ@linux.dev>
-References: <20230926181932.1650692-1-vdonnefort@google.com>
+To: Ryan Roberts <ryan.roberts@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 04/13] KVM: arm64: Add ARM64_HAS_LPA2 CPU capability
+Message-ID: <ZRPN8yOkfwiasLDl@linux.dev>
+References: <20230918065740.3670662-1-ryan.roberts@arm.com>
+ <20230918065740.3670662-5-ryan.roberts@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -30,24 +35,25 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230926181932.1650692-1-vdonnefort@google.com>
+In-Reply-To: <20230918065740.3670662-5-ryan.roberts@arm.com>
 X-Migadu-Flow: FLOW_OUT
 
-Vincent,
+Hi Ryan,
 
-On Tue, Sep 26, 2023 at 07:19:30PM +0100, Vincent Donnefort wrote:
-> With the introduction of folios for transparent huge pages [1], we
-> can rely on this support to identify if a page is backed by a huge one,
-> saving a page table walk.
+On Mon, Sep 18, 2023 at 07:57:31AM +0100, Ryan Roberts wrote:
 
-Better yet, this gets rid of a particular walk that has had some rather
-hairy bugs in the past :)
+[...]
 
-> [1] https://lkml.kernel.org/r/20220504182857.4013401-3-willy@infradead.org
+> +static bool has_lpa2(const struct arm64_cpu_capabilities *entry, int scope)
+> +{
+> +	u64 mmfr0;
+> +
+> +	mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
+> +	return has_lpa2_at_stage1(mmfr0) && has_lpa2_at_stage2(mmfr0);
 
-nit: for the sake of posterity, it might be good to stick a reference to
-commit cb196ee1ef39 ("mm/huge_memory: convert do_huge_pmd_anonymous_page()
-to use vma_alloc_folio()") in the changelogs.
+Should we only require consistency between stage-1 and stage-2 if KVM
+kvm_get_mode() != KVM_MODE_NONE? In case there are systems that have
+mismatched LPA2 support users can just disable KVM to use the feature.
 
 -- 
 Thanks,
