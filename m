@@ -1,23 +1,23 @@
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2061.outbound.protection.outlook.com [40.107.105.61])
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2040.outbound.protection.outlook.com [40.107.22.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84A9C37CAC
-	for <kvmarm@lists.linux.dev>; Wed, 27 Sep 2023 14:03:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96EE837CAC
+	for <kvmarm@lists.linux.dev>; Wed, 27 Sep 2023 14:03:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
  s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/jeZoJNj3DCve0zLnDradealBpu4fQiYUevBJ8HVNHI=;
- b=7ZtNi6modLeQ+Yr/N4wT/5W6lAcz1UtNtX6xJMPFl+rKelt9CGXY7fgMesOofLcL8aVJjFADB3JtdxitEGyzOIXxxfnhIPdctQuzmcRx3uzO3DtUrWy5IuQpzt2+NU9b6LM8MmrSJC5xGqR1v1IWqIir6H+eYVXQ7hJiSDZlp+Y=
-Received: from DUZPR01CA0200.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4b6::10) by DB9PR08MB6395.eurprd08.prod.outlook.com
- (2603:10a6:10:254::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.28; Wed, 27 Sep
- 2023 14:03:14 +0000
-Received: from DBAEUR03FT056.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:10:4b6:cafe::19) by DUZPR01CA0200.outlook.office365.com
- (2603:10a6:10:4b6::10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.35 via Frontend
- Transport; Wed, 27 Sep 2023 14:03:14 +0000
+ bh=IbrnELc79cTTyl8mSzRLYhNT8sC3fwyI3hxFhzA9Hnk=;
+ b=6aQKWRsScIzuVfSjKGLTQmcWu2faaUoQTjPYQnoXbjADikL3RRfMuCtb+7+bEueP7Ju1ZQtGr5SRzkccgiOSR9+Bf2u1lx6JgSiN/uTZRIFqaXr4PunhZVt2DkzaPS4Oul+p270vI7sifIr3KEq2zWvjKegATFFw03WmEkHmmyU=
+Received: from AS9PR05CA0038.eurprd05.prod.outlook.com (2603:10a6:20b:489::25)
+ by AS4PR08MB7530.eurprd08.prod.outlook.com (2603:10a6:20b:4f9::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.21; Wed, 27 Sep
+ 2023 14:03:19 +0000
+Received: from AM7EUR03FT050.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:20b:489:cafe::c9) by AS9PR05CA0038.outlook.office365.com
+ (2603:10a6:20b:489::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.21 via Frontend
+ Transport; Wed, 27 Sep 2023 14:03:19 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
  smtp.mailfrom=arm.com; dkim=pass (signature was verified)
  header.d=armh.onmicrosoft.com;dmarc=pass action=none header.from=arm.com;
@@ -26,27 +26,27 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
  pr=C
 Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- DBAEUR03FT056.mail.protection.outlook.com (100.127.142.88) with Microsoft
+ AM7EUR03FT050.mail.protection.outlook.com (100.127.141.27) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6838.21 via Frontend Transport; Wed, 27 Sep 2023 14:03:14 +0000
-Received: ("Tessian outbound ab4fc72d2cd4:v211"); Wed, 27 Sep 2023 14:03:14 +0000
+ 15.20.6838.22 via Frontend Transport; Wed, 27 Sep 2023 14:03:19 +0000
+Received: ("Tessian outbound 0ae75d4034ba:v211"); Wed, 27 Sep 2023 14:03:19 +0000
 X-CheckRecipientChecked: true
-X-CR-MTA-CID: f324b05c154a856d
+X-CR-MTA-CID: 2a9f62c7b57c88f0
 X-CR-MTA-TID: 64aa7808
-Received: from a10bfef047fc.1
-	by 64aa7808-outbound-1.mta.getcheckrecipient.com id B8ADBD8E-3C9F-4822-B815-164669FEEACB.1;
-	Wed, 27 Sep 2023 14:01:51 +0000
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com
-    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id a10bfef047fc.1
+Received: from 6692e6f04f1b.1
+	by 64aa7808-outbound-1.mta.getcheckrecipient.com id DB31AE2E-8849-486B-AC68-2C7CE4026BC5.1;
+	Wed, 27 Sep 2023 14:01:50 +0000
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com
+    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 6692e6f04f1b.1
     (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
-    Wed, 27 Sep 2023 14:01:51 +0000
+    Wed, 27 Sep 2023 14:01:50 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EZ1NghPCNkDzOWaMD3uX+tWFNV/JnAt8Hj4bN513bF52EiVdR8qjHXSPMaQaXvX6bCvueUqj7lsx9bhmG6uMDKQum0Q3HFk4d6QgnYwbQ8FA+Og7aSR0aikJ5PNjtFVUUJ6jUGgnc0KasqlququR5vYQLTf0ugSKm2s5jRph+0iUGoOADQj5B1/ICaj3g0yoH+uAYKR6wcrYJxPqwKyZEvd41rzI0PBdwtQ4HjOTDrkrZDDj1bRVZsrVNkOh1YeJmoz+aY2C9BWGV0IfvyMyxo3XIEY4zhJzKmHi+J3HC7vy5l1NrXpnZO281HdEHztv1RbyuCxpGDsxtxgw2zjPvw==
+ b=bjOUkYPs8AOGRxlPXGIkojfy6ug5wwNgWZ7T/YqxFk495Y6ggR9K7kHGCTZmGbIYW1HhGag/zVqoZq0g3CjSUq1kdjgxxuUXRtHwl8tK5F13WlwDSOowikbZxvj7qd9Wzf3XOZTTRIXxy8KfJ0MAat0yl7I6TOsDikW8CzoeW1GAmYLKd+wz200VToV3B2X1/eDZOIZl4LIzugX6Kc/1XfQmBP+faz3odddFz+kmLYuJolD3f/FFJVE8f4fu0PaHrdkRhPpMiY6+HYqR4K/kWMSWxzwZklBN4zDroYNPI2z6jXcU1tOz4WUeMgsFg8/AWpWKmIeyIEIe5deAWjEJgA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/jeZoJNj3DCve0zLnDradealBpu4fQiYUevBJ8HVNHI=;
- b=TD2sV0q0KmZggk7gig/OAqX7zOD/fvAGIGl4uzNrkdee20Wi1o5xHI4dI90kWw4CJ/Chl5z2daiJmkEXHTatOWNhjSkfKz/MIgZdjXuxDK5TT5hJkcU7OBpnRuPQ1fBGLIigfRk02s/3k7fn4qMcw4TR3GOdM+4pmJRfFeHncAfB/5jFiq7zpbux3p0PUmrrHlGlOWrpv0mlESK4/j6DrkAz7qZ6awxhnLBLtsfg23uRXWiP1Sk9ZCEus12BdHtYRr8uiR46+jZYX5YL2TabS1WJ/37W422Qy/kR55ZKMasqxA8UB0Hu3IDxTzhDLXuBGwSZh9XYjB60wTjdnJ8YPw==
+ bh=IbrnELc79cTTyl8mSzRLYhNT8sC3fwyI3hxFhzA9Hnk=;
+ b=E9UO6GBxo/Q2pCRIolUhyA5uFDcO/sp9tb6gOD4AT9kLw8ULTWIH/CL8zKOLa4eSA2jpZ8yuHy/LrvBjuer6tsCkedtjF+hsHvkKKk1JPzulzhJ/N8aHeXR4zF6ay/mv9FnkMaQegRB9VuK2T2XRM7qUdyZwP/sP5gvHDbamJRdMA/OtjupZ1bSo3lvHU3CJrC7vFObzadwn7GqKZMAGMVZaaLQYz/Lhas2Xv/qUchyPFNX0g2xZTCjBlkfFgRz+wZ54LA+gCqyyzRD9Ic4oD/DZC2G1u9WqOQy/r5XMwSqh563oWY4/9fOOCGHctAs8iU0gnzZG4Sn5ux7A5o7XOQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  40.67.248.234) smtp.rcpttodomain=lists.infradead.org smtp.mailfrom=arm.com;
  dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
@@ -54,18 +54,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
  s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/jeZoJNj3DCve0zLnDradealBpu4fQiYUevBJ8HVNHI=;
- b=7ZtNi6modLeQ+Yr/N4wT/5W6lAcz1UtNtX6xJMPFl+rKelt9CGXY7fgMesOofLcL8aVJjFADB3JtdxitEGyzOIXxxfnhIPdctQuzmcRx3uzO3DtUrWy5IuQpzt2+NU9b6LM8MmrSJC5xGqR1v1IWqIir6H+eYVXQ7hJiSDZlp+Y=
-Received: from AM7PR02CA0005.eurprd02.prod.outlook.com (2603:10a6:20b:100::15)
- by AM8PR08MB5666.eurprd08.prod.outlook.com (2603:10a6:20b:1de::21) with
+ bh=IbrnELc79cTTyl8mSzRLYhNT8sC3fwyI3hxFhzA9Hnk=;
+ b=6aQKWRsScIzuVfSjKGLTQmcWu2faaUoQTjPYQnoXbjADikL3RRfMuCtb+7+bEueP7Ju1ZQtGr5SRzkccgiOSR9+Bf2u1lx6JgSiN/uTZRIFqaXr4PunhZVt2DkzaPS4Oul+p270vI7sifIr3KEq2zWvjKegATFFw03WmEkHmmyU=
+Received: from AM0PR07CA0006.eurprd07.prod.outlook.com (2603:10a6:208:ac::19)
+ by DB4PR08MB8053.eurprd08.prod.outlook.com (2603:10a6:10:38a::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.21; Wed, 27 Sep
- 2023 14:01:48 +0000
-Received: from AM7EUR03FT030.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:20b:100:cafe::4d) by AM7PR02CA0005.outlook.office365.com
- (2603:10a6:20b:100::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.35 via Frontend
- Transport; Wed, 27 Sep 2023 14:01:48 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.28; Wed, 27 Sep
+ 2023 14:01:45 +0000
+Received: from AM7EUR03FT048.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:208:ac:cafe::6) by AM0PR07CA0006.outlook.office365.com
+ (2603:10a6:208:ac::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.19 via Frontend
+ Transport; Wed, 27 Sep 2023 14:01:45 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 40.67.248.234)
  smtp.mailfrom=arm.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=arm.com;
@@ -73,16 +73,16 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  40.67.248.234 as permitted sender) receiver=protection.outlook.com;
  client-ip=40.67.248.234; helo=nebula.arm.com; pr=C
 Received: from nebula.arm.com (40.67.248.234) by
- AM7EUR03FT030.mail.protection.outlook.com (100.127.140.180) with Microsoft
+ AM7EUR03FT048.mail.protection.outlook.com (100.127.140.86) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6838.19 via Frontend Transport; Wed, 27 Sep 2023 14:01:48 +0000
+ 15.20.6838.22 via Frontend Transport; Wed, 27 Sep 2023 14:01:45 +0000
 Received: from AZ-NEU-EX03.Arm.com (10.251.24.31) by AZ-NEU-EX04.Arm.com
  (10.251.24.32) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 27 Sep
- 2023 14:01:38 +0000
+ 2023 14:01:36 +0000
 Received: from e124191.cambridge.arm.com (10.1.197.45) by mail.arm.com
  (10.251.24.31) with Microsoft SMTP Server id 15.1.2507.27 via Frontend
- Transport; Wed, 27 Sep 2023 14:01:38 +0000
+ Transport; Wed, 27 Sep 2023 14:01:35 +0000
 From: Joey Gouly <joey.gouly@arm.com>
 To: <linux-arm-kernel@lists.infradead.org>
 CC: <nd@arm.com>, <akpm@linux-foundation.org>, <aneesh.kumar@linux.ibm.com>,
@@ -91,9 +91,9 @@ CC: <nd@arm.com>, <akpm@linux-foundation.org>, <aneesh.kumar@linux.ibm.com>,
 	<shuah@kernel.org>, <will@kernel.org>, <kvmarm@lists.linux.dev>,
 	<linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
 	<linux-kselftest@vger.kernel.org>
-Subject: [PATCH v1 09/20] arm64: define VM_PKEY_BIT* for arm64
-Date: Wed, 27 Sep 2023 15:01:12 +0100
-Message-ID: <20230927140123.5283-10-joey.gouly@arm.com>
+Subject: [PATCH v1 04/20] arm64: disable trapping of POR_EL0 to EL2
+Date: Wed, 27 Sep 2023 15:01:07 +0100
+Message-ID: <20230927140123.5283-5-joey.gouly@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230927140123.5283-1-joey.gouly@arm.com>
 References: <20230927140123.5283-1-joey.gouly@arm.com>
@@ -107,138 +107,75 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 1
 X-MS-TrafficTypeDiagnostic:
-	AM7EUR03FT030:EE_|AM8PR08MB5666:EE_|DBAEUR03FT056:EE_|DB9PR08MB6395:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3e004388-6b32-495c-5802-08dbbf627e04
+	AM7EUR03FT048:EE_|DB4PR08MB8053:EE_|AM7EUR03FT050:EE_|AS4PR08MB7530:EE_
+X-MS-Office365-Filtering-Correlation-Id: be56eb65-7f56-4bac-d553-08dbbf628109
 x-checkrecipientrouted: true
 NoDisclaimer: true
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam-Untrusted: BCL:0;
 X-Microsoft-Antispam-Message-Info-Original:
- jsMJfLYrUQXbs1koVzHyY3RDkn7JQaMLZIogET6oAFR/U69G8LlYE3PkEST/+o8jd7oN1KRQXsGGWOAQIMxTtB66Bq7EJSos1FI3cyQEq0wunYUK2L5j4u3c+szUJCC4BgFp1FzfuOQ9pGqWu/VCyL9AaK1s3GGOkSLrqR9g9dyhLy1O9gGOUOIz/ugxU8qblMTlBn3gxRHxiTS8JRToUUrU4ryjTvH+WXhP3wTSCfMJ0Z0QbfyvgP20iIB9knjpCabfcYo3y8dXdgWOanvNiY+CCR/8AxeHw0lfQm/JGQLzD2Am5wpc/LPiXJVb96iniWKw8o9aVE/Hpy8P8Ceu76DXENoCFevRbXPoP/ol2u0Dd/4VOoCVHyEvZXXCW8Z5UgtM0I6CkXmlj7nzOF1XAlGuu8jv//1X2DjgGAdP+HeHl8h6gPvLSIe7SteZMrsc1xIu5itjI200viv1PYb/tx6SzmxvwyQdBD78f5pBpH7ErcRH2/v2KIYwaQcRCb+2FEGJi+YSBrrXJ3JviSGTuteqmxzaLUhGY+rwbXYVllZXGMRV2bCw+qMujzWvhxx92U1mAKecdl/XjxURElgsiF4M+kkgCZtZkb/HCRNRVUDJB3tMRAROGqgZERXBtHatlzd6gAnUkaq2WNpy6TiBEU13JPx/2j70CBhq4tV7qXsFloZzhobSwCX0kM+D1Kg67F9bUhFAqy6ZScCoWliFrPwfJUVnOUnzq62hKnnBPT4hm4FM94ssiKPFafRoat7gXZ0tb8agreaPoc4fj8qKEw==
+ 114EbaRsOdDyRGPQNFCG/BIeVUDVOS+O42HUP9oLsTBUuJDfcdQTBiLyYE1fJ3wgMZgX7bsroDT1G7hEmf9SMxRWpD7yEEqGNzn+Ewa/69Vzd2/konOZdPO9ACP8oOhHfnz7YeNdkiS1XysRzCzdke2Tz33qy3cJyGMoZ0Guh7hOH03xseSFGb50yGHouyKJeZC2ibeG7UsFQrsiD8HE8m/Dkz+ymwG4R2cpLo3pXR4nregWDR0mk+Wmy42w3QUQAczyyHeFOs5y6CMowJLX6259JBIIBZMEWQBRCgaSYfbSree1z5gx4DsnQUuO0euNMupU0l0Fgf5O/QA8TyBd0sw5nhY8T6YJrygldatlziDb4rej0/tPMJo6L5nMOEAhBf48iue30OOu85kb9Ro1DnSODjxoJj4Etqsex6S6mEJguyChZ/at39mJfO7Tfj0ZS364USnhotImCHmsEKbuI2h+K4a3JuEsjs+AiedeJyI4r68HeJlIyveoQ5KrjZFyLwwkrDpUNZwDbuydWp0M6xUpW+9VFq+Tyw1wcG7nu/Ng1tTbeMzo9/vopxnjiU9L53fMZDq1Czc7cB4bKCoALsGZT89p6b9rMczn0IUCP+TLtiqZMsnx1RWzHOz6jStoEH5UA+uQxrs18F6bfam8QxM5tKTlLzMaRV8bJ2wccJwSXZ/V6JGsNoysCgZn9+wldRTMBasPdmrU6EaMDX5zuZb54DpNlUThMtPgkzvwU8wXFsoo2XOhgsP579bVcCJQ
 X-Forefront-Antispam-Report-Untrusted:
- CIP:40.67.248.234;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:nebula.arm.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(39860400002)(136003)(376002)(346002)(230922051799003)(1800799009)(186009)(82310400011)(451199024)(46966006)(36840700001)(40470700004)(7696005)(6666004)(478600001)(2906002)(83380400001)(336012)(426003)(1076003)(2616005)(7416002)(316002)(40480700001)(8676002)(6916009)(70206006)(8936002)(70586007)(41300700001)(44832011)(54906003)(5660300002)(4326008)(36756003)(47076005)(36860700001)(82740400003)(81166007)(356005)(86362001)(26005)(40460700003)(36900700001);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR08MB5666
+ CIP:40.67.248.234;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:nebula.arm.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(346002)(39860400002)(376002)(136003)(230922051799003)(1800799009)(186009)(451199024)(82310400011)(36840700001)(46966006)(70206006)(40480700001)(54906003)(6916009)(70586007)(2906002)(316002)(7416002)(4326008)(41300700001)(19627235002)(44832011)(8676002)(8936002)(478600001)(1076003)(6666004)(36860700001)(5660300002)(47076005)(7696005)(83380400001)(426003)(356005)(86362001)(336012)(36756003)(2616005)(26005)(82740400003)(81166007)(36900700001);DIR:OUT;SFP:1101;
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB4PR08MB8053
 X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DBAEUR03FT056.eop-EUR03.prod.protection.outlook.com
+ AM7EUR03FT050.eop-EUR03.prod.protection.outlook.com
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	8bab5f68-6dfa-4da5-0cbd-08dbbf624abc
+	c359938e-8340-4828-5fa0-08dbbf6248f0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	SokfOsj+cfRRGZo2yYrvoDA9HMqH6LFJlLKtThfTnVF4ft+6jV4U8SXyQLe4Iq3y7+ZYh019V0GPp/SKL5Nzu9MxjOKw04kOalCo8B8zg/vhIii3aYNcXNXpV6jyLbe2f8URlakrfhIzL2NOnGRIYI/adLtoYWOIvoJKuLYTaHPg7nzEbJBuRRCE+sDFVZPBzz9M8y8PFQUCZiZlI8Nk0G0jjNHUNKV9Svf4RzeL6mQdebhErmdvGE7mgwCuecXaaUCNSXi5mCfoSGdGzDOt6MSrJUpsNUD4njp/AbMW+ByXeawz8CEJRjqq/x8CN9D1Jwd0GOJ5aH5579MIUhq2bJeHQGCxbD1tZ4qlOCvrbteD1CtfenMBXI+7hRoVJj6uKxhcfqGfDQ9Ad+pAuldJhPY7Fs3co5dov9b55SjtBdRhNcDzmVH2yv1xLLhfBhrLw3EVMHov6uFza6HbcJmJp4BMD+fGzh/tgQoK5mFm7kL1v6u7VHgegWTpPZ3UUnKUV8lZ5xsDg6ltxVwJctnyKzqycuK88l6ibSW4HpRWWfA+h0sR+g+eXPaaB/wjw+nAM6ym6W8KsPa1MTYtwjtOoUefzTN+6LOSEh3sUq/jCwEip7BLWtkR5vkbCdNFOLKlHFE/2yzhOLkwa/Q38Izq9ih3qaczevBFY4kr5AY9at7E3BCp4UWzNa8nU3xZyjh4w9mrBCMo2/2AT/eK/2FXwPPgwTxC3HfenwXgC3onZ46JxZmiN9H3EsR/CDqsHm4f
+	r8NMV4uLiDsbD4kdSSAM1yk6QpgYeU0y5to2UpK6a0/IOSxxNiavQGJc3plQZmW/vDxN/ve0iaq4RmupssWL/9WoSaEyXLWet8AWe2x8HwAI4BjUsqcd+XByq/qwaHssMy6gcFiiAE/upqVK1f7vzzmXJsNe8yizBaAvb5whlk0Vz6l2fSyiwLm7A8fCJO3dOZ7oGO/LimLqZ4wr6CFbs901gtrH2Zo3Mv+5HU54SQo9Z1VYvu54Nb1wx4z+raQvsinOmkHZvmOVFT178dtVt8xR0Sgs+GbMnysShkiKffdQZkNiTMceaso0aowgoAaMlrsrb40o70fGIddN0/sVEidDocbAvPbQSZFEMJpF8pUxfZPdap5ysgl6iHShRAGPO0pQ90L5BgQxPRfy/KfgxgYQWWLPUj40Ym4K87eLlLFRr3qNGBXOVHZUJgNkM8uwfFOINoO+O3BNC6lzbJgjoOtHgautHsK9icQKVfeo2BQTB1FyGx0pUA7slev+1vRlyuRNU4Fl2G+zPqqmVmTZX4EJkBP94LD+vM6rDtGG8XKXnEKEO7nhbwY3cEj7P74AxHe3q18ktW+Pk98RnsKgciqPl5ooq4HpagfVfmkRi/3WDyx42GtU9GitLJV8WjopD8wz9nfDZgA5NU+McNE8TXsm5UzXJyktLvoeJyVQLHL45HipdKcjrpkoKEnLTTsd8s8wFWeQgo7dCxMU0ovJ/Sdb3O0p42o02utG0Bw8FI43NH0wUqfcLwceu4drR4LY
 X-Forefront-Antispam-Report:
-	CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(396003)(346002)(376002)(136003)(230922051799003)(82310400011)(186009)(451199024)(1800799009)(40470700004)(46966006)(36840700001)(36756003)(86362001)(40480700001)(2906002)(81166007)(2616005)(316002)(41300700001)(478600001)(70206006)(70586007)(54906003)(5660300002)(6666004)(7696005)(44832011)(47076005)(107886003)(83380400001)(40460700003)(336012)(4326008)(426003)(36860700001)(6862004)(8676002)(8936002)(26005)(1076003)(82740400003);DIR:OUT;SFP:1101;
+	CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(376002)(346002)(396003)(39860400002)(230922051799003)(82310400011)(186009)(1800799009)(451199024)(46966006)(40470700004)(36840700001)(40460700003)(44832011)(7696005)(6666004)(70206006)(81166007)(2616005)(70586007)(54906003)(316002)(478600001)(86362001)(36860700001)(47076005)(19627235002)(426003)(336012)(82740400003)(1076003)(107886003)(83380400001)(26005)(5660300002)(40480700001)(41300700001)(36756003)(6862004)(4326008)(2906002)(8676002)(8936002);DIR:OUT;SFP:1101;
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Sep 2023 14:03:14.4502
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Sep 2023 14:03:19.5037
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3e004388-6b32-495c-5802-08dbbf627e04
+X-MS-Exchange-CrossTenant-Network-Message-Id: be56eb65-7f56-4bac-d553-08dbbf628109
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DBAEUR03FT056.eop-EUR03.prod.protection.outlook.com
+	AM7EUR03FT050.eop-EUR03.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR08MB6395
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR08MB7530
 
-Define the VM_PKEY_BIT* values for arm64, and convert them into the arm64
-specific pgprot values.
+Allow EL0 or EL1 to access POR_EL0 without being trapped to EL2.
 
 Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/mman.h |  6 +++++-
- arch/arm64/mm/mmap.c          |  7 +++++++
- fs/proc/task_mmu.c            |  2 ++
- include/linux/mm.h            | 11 ++++++++++-
- 4 files changed, 24 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/el2_setup.h | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/mman.h b/arch/arm64/include/asm/mman.h
-index 5966ee4a6154..22de55518913 100644
---- a/arch/arm64/include/asm/mman.h
-+++ b/arch/arm64/include/asm/mman.h
-@@ -7,7 +7,7 @@
- #include <uapi/asm/mman.h>
+diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+index b7afaa026842..df5614be4b70 100644
+--- a/arch/arm64/include/asm/el2_setup.h
++++ b/arch/arm64/include/asm/el2_setup.h
+@@ -184,12 +184,20 @@
+ .Lset_pie_fgt_\@:
+ 	mrs_s	x1, SYS_ID_AA64MMFR3_EL1
+ 	ubfx	x1, x1, #ID_AA64MMFR3_EL1_S1PIE_SHIFT, #4
+-	cbz	x1, .Lset_fgt_\@
++	cbz	x1, .Lset_poe_fgt_\@
  
- static inline unsigned long arch_calc_vm_prot_bits(unsigned long prot,
--	unsigned long pkey __always_unused)
-+	unsigned long pkey)
- {
- 	unsigned long ret = 0;
+ 	/* Disable trapping of PIR_EL1 / PIRE0_EL1 */
+ 	orr	x0, x0, #HFGxTR_EL2_nPIR_EL1
+ 	orr	x0, x0, #HFGxTR_EL2_nPIRE0_EL1
  
-@@ -17,6 +17,10 @@ static inline unsigned long arch_calc_vm_prot_bits(unsigned long prot,
- 	if (system_supports_mte() && (prot & PROT_MTE))
- 		ret |= VM_MTE;
- 
-+	ret |= pkey & 0x1 ? VM_PKEY_BIT0 : 0;
-+	ret |= pkey & 0x2 ? VM_PKEY_BIT1 : 0;
-+	ret |= pkey & 0x4 ? VM_PKEY_BIT2 : 0;
++.Lset_poe_fgt_\@:
++	mrs_s	x1, SYS_ID_AA64MMFR3_EL1
++	ubfx	x1, x1, #ID_AA64MMFR3_EL1_S1POE_SHIFT, #4
++	cbz	x1, .Lset_fgt_\@
 +
- 	return ret;
- }
- #define arch_calc_vm_prot_bits(prot, pkey) arch_calc_vm_prot_bits(prot, pkey)
-diff --git a/arch/arm64/mm/mmap.c b/arch/arm64/mm/mmap.c
-index 8f5b7ce857ed..ef75b04f9d02 100644
---- a/arch/arm64/mm/mmap.c
-+++ b/arch/arm64/mm/mmap.c
-@@ -98,6 +98,13 @@ pgprot_t vm_get_page_prot(unsigned long vm_flags)
- 	if (vm_flags & VM_MTE)
- 		prot |= PTE_ATTRINDX(MT_NORMAL_TAGGED);
- 
-+	if (vm_flags & VM_PKEY_BIT0)
-+		prot |= PTE_PO_IDX_0;
-+	if (vm_flags & VM_PKEY_BIT1)
-+		prot |= PTE_PO_IDX_1;
-+	if (vm_flags & VM_PKEY_BIT2)
-+		prot |= PTE_PO_IDX_2;
++	/* Disable trapping of POR_EL0 */
++	orr	x0, x0, #HFGxTR_EL2_nPOR_EL0
 +
- 	return __pgprot(prot);
- }
- EXPORT_SYMBOL(vm_get_page_prot);
-diff --git a/fs/proc/task_mmu.c b/fs/proc/task_mmu.c
-index 3dd5be96691b..fcd94a39bb30 100644
---- a/fs/proc/task_mmu.c
-+++ b/fs/proc/task_mmu.c
-@@ -689,7 +689,9 @@ static void show_smap_vma_flags(struct seq_file *m, struct vm_area_struct *vma)
- 		[ilog2(VM_PKEY_BIT0)]	= "",
- 		[ilog2(VM_PKEY_BIT1)]	= "",
- 		[ilog2(VM_PKEY_BIT2)]	= "",
-+#if VM_PKEY_BIT3
- 		[ilog2(VM_PKEY_BIT3)]	= "",
-+#endif
- #if VM_PKEY_BIT4
- 		[ilog2(VM_PKEY_BIT4)]	= "",
- #endif
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index bf5d0b1b16f4..43d96c925b9b 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -328,7 +328,7 @@ extern unsigned int kobjsize(const void *objp);
- #define VM_HIGH_ARCH_5	BIT(VM_HIGH_ARCH_BIT_5)
- #endif /* CONFIG_ARCH_USES_HIGH_VMA_FLAGS */
- 
--#ifdef CONFIG_ARCH_HAS_PKEYS
-+#if defined(CONFIG_ARCH_HAS_PKEYS) && !defined(CONFIG_ARM64)
- # define VM_PKEY_SHIFT	VM_HIGH_ARCH_BIT_0
- # define VM_PKEY_BIT0	VM_HIGH_ARCH_0	/* A protection key is a 4-bit value */
- # define VM_PKEY_BIT1	VM_HIGH_ARCH_1	/* on x86 and 5-bit value on ppc64   */
-@@ -341,6 +341,15 @@ extern unsigned int kobjsize(const void *objp);
- #endif
- #endif /* CONFIG_ARCH_HAS_PKEYS */
- 
-+#if defined(CONFIG_ARM64)
-+# define VM_PKEY_SHIFT	VM_HIGH_ARCH_BIT_2
-+# define VM_PKEY_BIT0	VM_HIGH_ARCH_2	/* A protection key is a 3-bit value on arm64 */
-+# define VM_PKEY_BIT1	VM_HIGH_ARCH_3
-+# define VM_PKEY_BIT2	VM_HIGH_ARCH_4
-+# define VM_PKEY_BIT3	0
-+# define VM_PKEY_BIT4	0
-+#endif
-+
- #ifdef CONFIG_X86_USER_SHADOW_STACK
- /*
-  * VM_SHADOW_STACK should not be set with VM_SHARED because of lack of
+ .Lset_fgt_\@:
+ 	msr_s	SYS_HFGRTR_EL2, x0
+ 	msr_s	SYS_HFGWTR_EL2, x0
 -- 
 2.25.1
 
