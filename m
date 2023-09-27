@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5501F922
-	for <kvmarm@lists.linux.dev>; Wed, 27 Sep 2023 09:09:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5C63C433C8;
-	Wed, 27 Sep 2023 09:09:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7571F922
+	for <kvmarm@lists.linux.dev>; Wed, 27 Sep 2023 09:09:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13F36C433C9;
+	Wed, 27 Sep 2023 09:09:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695805758;
-	bh=C9ocmaLeJ5OV2/exh6Fmx96swKIGVo7eqxyWmcVY69k=;
-	h=From:To:Cc:Subject:Date:From;
-	b=f7IS6WDEAZ7yEDG09Ffg4Z3cYuPSPKL1PD/kAf7Awod/zSeXp2o/h149LrpDokqPQ
-	 PD06JhtGcKwgoPQYiwN6L7GRsfdRv59MUWM8HUqb9PHguKEXfmC1t+GB14+TKO8PVj
-	 jogDvv/I8JQUj/5j/0M14fjjctCzllPiQYH7V3SATYuQfitZG35485TTtyDS10Xs3T
-	 P+fIRquDzVizuNB9T+jtEp00XCyu/EWn2Vz8RHs+UHYWZPrIivesKzQ6dfk9ZRA8dD
-	 unWc0espMvtjQC57aDyrnIqZlz1bpTcql9PRegYV2oFpN1ylkt4mLQ1i5zBOJocbNA
-	 10LdwlKBVLvlw==
+	s=k20201202; t=1695805759;
+	bh=K+tFfLelIwox1keoN0XKV44DfzHUWb6y5oJTZXZ0HsM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=NfZwNgNtyXwGkBUhaFeS33Vfok8E+Gs8AqUG1xNqdzq0xwE4nLhepHf4tGA57HJ7f
+	 U3QcmIKLqgZr3DaF6fUQNwuC3cuZtLt1BX/MwJMQFksIMU2n/MhFqVjOsFOVymoyck
+	 Q1imQaDlpgu1t/FRftxWhKlDYyBSr8Xjzql3mx/dbTTsN31Pr2GebiBkQjWLOC7mAE
+	 swbeEBmbdIVcmSalTFrP4Zz3lEqzw1jugkm14wAnH4x74Q/iozmuo+rOlAOreA3VkN
+	 24DU0henqZmBnBZ+Q2oNqIo40FQGtqFmzEZVl5z4s0yZFj20k86iQRLtm9sZkMt7/7
+	 5DPyCR9CHCv/w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qlQXk-00GaLb-3Q;
-	Wed, 27 Sep 2023 10:09:16 +0100
+	id 1qlQXk-00GaLb-QV;
+	Wed, 27 Sep 2023 10:09:17 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -33,10 +33,12 @@ Cc: James Morse <james.morse@arm.com>,
 	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
 	Xu Zhao <zhaoxu.35@bytedance.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v3 00/11] KVM: arm64: Accelerate lookup of vcpus by MPIDR values (and other fixes)
-Date: Wed, 27 Sep 2023 10:09:00 +0100
-Message-Id: <20230927090911.3355209-1-maz@kernel.org>
+Subject: [PATCH v3 03/11] KVM: arm64: vgic-v3: Refactor GICv3 SGI generation
+Date: Wed, 27 Sep 2023 10:09:03 +0100
+Message-Id: <20230927090911.3355209-4-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230927090911.3355209-1-maz@kernel.org>
+References: <20230927090911.3355209-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,59 +51,173 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-This is a follow-up on [2], which addresses both the O(n) SGI injection
-issue, and cleans up a number of embarassing bugs steaming form the
-vcpuid/vcpu_idx confusion.
+As we're about to change the way SGIs are sent, start by splitting
+out some of the basic functionnality: instead of intermingling
+the broadcast and non-broadcast cases with the actual SGI generation,
+perform the following cleanups:
 
-See the changelog below for details.
+- move the SGI queuing into its own helper
+- split the broadcast code from the affinity-driven code
+- replace the mask/shift combinations with FIELD_GET()
+- fix the confusion between vcpu_id and vcpu when handling
+  the broadcast case
 
-Oliver, assuming that you haven't changed your mind and that
-nobody shouts, feel free to queue this in -next.
+The result is much more readable, and paves the way for further
+optimisations.
 
-* From v2 [2]:
-  - Killed a number of online_vcpus comparisons, which didn't make
-    much sense (Zenghui)
-  - Added missing commit logs (oops)
-  - Fixed some comments
-  - Collected RBs, with thanks
+Tested-by: Joey Gouly <joey.gouly@arm.com>
+Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c | 110 ++++++++++++++++-------------
+ 1 file changed, 59 insertions(+), 51 deletions(-)
 
-* From v1 [1]:
-  - Added a bunch of patches fixing the vcpu_id[x] ambiguity
-  - Added a documentation update spelling out some extra ordering requirements
-  - Collected RBs/TBs, with thanks
-
-[1] https://lore.kernel.org/r/20230907100931.1186690-1-maz@kernel.org
-[2] https://lore.kernel.org/r/20230920181731.2232453-1-maz@kernel.org
-
-Marc Zyngier (11):
-  KVM: arm64: vgic: Make kvm_vgic_inject_irq() take a vcpu pointer
-  KVM: arm64: vgic-its: Treat the collection target address as a vcpu_id
-  KVM: arm64: vgic-v3: Refactor GICv3 SGI generation
-  KVM: arm64: vgic-v2: Use cpuid from userspace as vcpu_id
-  KVM: arm64: vgic: Use vcpu_idx for the debug information
-  KVM: arm64: Use vcpu_idx for invalidation tracking
-  KVM: arm64: Simplify kvm_vcpu_get_mpidr_aff()
-  KVM: arm64: Build MPIDR to vcpu index cache at runtime
-  KVM: arm64: Fast-track kvm_mpidr_to_vcpu() when mpidr_data is
-    available
-  KVM: arm64: vgic-v3: Optimize affinity-based SGI injection
-  KVM: arm64: Clarify the ordering requirements for vcpu/RD creation
-
- .../virt/kvm/devices/arm-vgic-v3.rst          |   7 +
- arch/arm64/include/asm/kvm_emulate.h          |   2 +-
- arch/arm64/include/asm/kvm_host.h             |  28 ++++
- arch/arm64/kvm/arch_timer.c                   |   2 +-
- arch/arm64/kvm/arm.c                          |  93 +++++++++--
- arch/arm64/kvm/pmu-emul.c                     |   2 +-
- arch/arm64/kvm/vgic/vgic-debug.c              |   6 +-
- arch/arm64/kvm/vgic/vgic-irqfd.c              |   2 +-
- arch/arm64/kvm/vgic/vgic-its.c                |  49 +++---
- arch/arm64/kvm/vgic/vgic-kvm-device.c         |   8 +-
- arch/arm64/kvm/vgic/vgic-mmio-v3.c            | 150 +++++++-----------
- arch/arm64/kvm/vgic/vgic.c                    |  12 +-
- include/kvm/arm_vgic.h                        |   4 +-
- 13 files changed, 212 insertions(+), 153 deletions(-)
-
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+index 188d2187eede..88b8d4524854 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+@@ -1052,6 +1052,38 @@ static int match_mpidr(u64 sgi_aff, u16 sgi_cpu_mask, struct kvm_vcpu *vcpu)
+ 	((((reg) & ICC_SGI1R_AFFINITY_## level ##_MASK) \
+ 	>> ICC_SGI1R_AFFINITY_## level ##_SHIFT) << MPIDR_LEVEL_SHIFT(level))
+ 
++static void vgic_v3_queue_sgi(struct kvm_vcpu *vcpu, u32 sgi, bool allow_group1)
++{
++	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, sgi);
++	unsigned long flags;
++
++	raw_spin_lock_irqsave(&irq->irq_lock, flags);
++
++	/*
++	 * An access targeting Group0 SGIs can only generate
++	 * those, while an access targeting Group1 SGIs can
++	 * generate interrupts of either group.
++	 */
++	if (!irq->group || allow_group1) {
++		if (!irq->hw) {
++			irq->pending_latch = true;
++			vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
++		} else {
++			/* HW SGI? Ask the GIC to inject it */
++			int err;
++			err = irq_set_irqchip_state(irq->host_irq,
++						    IRQCHIP_STATE_PENDING,
++						    true);
++			WARN_RATELIMIT(err, "IRQ %d", irq->host_irq);
++			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
++		}
++	} else {
++		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
++	}
++
++	vgic_put_irq(vcpu->kvm, irq);
++}
++
+ /**
+  * vgic_v3_dispatch_sgi - handle SGI requests from VCPUs
+  * @vcpu: The VCPU requesting a SGI
+@@ -1070,19 +1102,30 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
+ 	struct kvm_vcpu *c_vcpu;
+-	u16 target_cpus;
++	unsigned long target_cpus;
+ 	u64 mpidr;
+-	int sgi;
+-	int vcpu_id = vcpu->vcpu_id;
+-	bool broadcast;
+-	unsigned long c, flags;
+-
+-	sgi = (reg & ICC_SGI1R_SGI_ID_MASK) >> ICC_SGI1R_SGI_ID_SHIFT;
+-	broadcast = reg & BIT_ULL(ICC_SGI1R_IRQ_ROUTING_MODE_BIT);
+-	target_cpus = (reg & ICC_SGI1R_TARGET_LIST_MASK) >> ICC_SGI1R_TARGET_LIST_SHIFT;
++	u32 sgi;
++	unsigned long c;
++
++	sgi = FIELD_GET(ICC_SGI1R_SGI_ID_MASK, reg);
++
++	/* Broadcast */
++	if (unlikely(reg & BIT_ULL(ICC_SGI1R_IRQ_ROUTING_MODE_BIT))) {
++		kvm_for_each_vcpu(c, c_vcpu, kvm) {
++			/* Don't signal the calling VCPU */
++			if (c_vcpu == vcpu)
++				continue;
++
++			vgic_v3_queue_sgi(c_vcpu, sgi, allow_group1);
++		}
++
++		return;
++	}
++
+ 	mpidr = SGI_AFFINITY_LEVEL(reg, 3);
+ 	mpidr |= SGI_AFFINITY_LEVEL(reg, 2);
+ 	mpidr |= SGI_AFFINITY_LEVEL(reg, 1);
++	target_cpus = FIELD_GET(ICC_SGI1R_TARGET_LIST_MASK, reg);
+ 
+ 	/*
+ 	 * We iterate over all VCPUs to find the MPIDRs matching the request.
+@@ -1091,54 +1134,19 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
+ 	 * VCPUs when most of the times we just signal a single VCPU.
+ 	 */
+ 	kvm_for_each_vcpu(c, c_vcpu, kvm) {
+-		struct vgic_irq *irq;
++		int level0;
+ 
+ 		/* Exit early if we have dealt with all requested CPUs */
+-		if (!broadcast && target_cpus == 0)
++		if (target_cpus == 0)
+ 			break;
+-
+-		/* Don't signal the calling VCPU */
+-		if (broadcast && c == vcpu_id)
++		level0 = match_mpidr(mpidr, target_cpus, c_vcpu);
++		if (level0 == -1)
+ 			continue;
+ 
+-		if (!broadcast) {
+-			int level0;
+-
+-			level0 = match_mpidr(mpidr, target_cpus, c_vcpu);
+-			if (level0 == -1)
+-				continue;
+-
+-			/* remove this matching VCPU from the mask */
+-			target_cpus &= ~BIT(level0);
+-		}
++		/* remove this matching VCPU from the mask */
++		target_cpus &= ~BIT(level0);
+ 
+-		irq = vgic_get_irq(vcpu->kvm, c_vcpu, sgi);
+-
+-		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+-
+-		/*
+-		 * An access targeting Group0 SGIs can only generate
+-		 * those, while an access targeting Group1 SGIs can
+-		 * generate interrupts of either group.
+-		 */
+-		if (!irq->group || allow_group1) {
+-			if (!irq->hw) {
+-				irq->pending_latch = true;
+-				vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
+-			} else {
+-				/* HW SGI? Ask the GIC to inject it */
+-				int err;
+-				err = irq_set_irqchip_state(irq->host_irq,
+-							    IRQCHIP_STATE_PENDING,
+-							    true);
+-				WARN_RATELIMIT(err, "IRQ %d", irq->host_irq);
+-				raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+-			}
+-		} else {
+-			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+-		}
+-
+-		vgic_put_irq(vcpu->kvm, irq);
++		vgic_v3_queue_sgi(c_vcpu, sgi, allow_group1);
+ 	}
+ }
+ 
 -- 
 2.34.1
 
