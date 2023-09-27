@@ -1,38 +1,36 @@
-Received: from out-202.mta1.migadu.com (out-202.mta1.migadu.com [95.215.58.202])
+Received: from out-201.mta1.migadu.com (out-201.mta1.migadu.com [95.215.58.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1B451FD9
-	for <kvmarm@lists.linux.dev>; Wed, 27 Sep 2023 08:02:47 +0000 (UTC)
-Date: Wed, 27 Sep 2023 08:02:40 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E403A1F611
+	for <kvmarm@lists.linux.dev>; Wed, 27 Sep 2023 08:28:27 +0000 (UTC)
+Date: Wed, 27 Sep 2023 08:28:20 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1695801765;
+	t=1695803306;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=P1b5Vu+07ETgZbRINBDyHraEk19f7O0PJbIxNMiL+uw=;
-	b=MvKjYHrYCAKE6MJeHVIPDbLVB7UDJsGnTRk6BcBQ/nKGRmhszabL6whjC3rmPsLpupHTxQ
-	Iu2mElUNoePLQxX85XCn2Sd46cCd7Ip7oaD/P/Z+rqQh4eAXeBV7xIb9+fPXiOhBOvfRqk
-	dy5Pn0ozwmok3Xl0WTydQ4tiIOMIKQ8=
+	bh=JsXW76YQkWWd3KcbYHc5LUjz+hl6N7YHm4uh3HGSGpg=;
+	b=LtQiyZ0uGVb8Rv3QD8dC2/G/zWWQ27meJIFYdXmORPcx9sijsUdn9u4ERK8b39FP/ukuy8
+	BCwdmxf2jvUydfPuh8l4+/VfBqpgi+cJEQg26cLsFreEJdOvIXD9YkQ4iqFwAnVgrLYM+Y
+	LbqEHZKO/CXJnfFtvt7NvdbReUkAVB4=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Marc Zyngier <maz@kernel.org>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
+To: Kristina Martsenko <kristina.martsenko@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Shaoqin Huang <shahuang@redhat.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Reiji Watanabe <reijiw@google.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v6 02/11] KVM: arm64: PMU: Set the default PMU for the
- guest on vCPU reset
-Message-ID: <ZRPhoExoiU3_Jvxy@linux.dev>
-References: <20230926234008.2348607-1-rananta@google.com>
- <20230926234008.2348607-3-rananta@google.com>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Vladimir Murzin <vladimir.murzin@arm.com>,
+	Colton Lewis <coltonlewis@google.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] KVM: arm64: Add handler for MOPS exceptions
+Message-ID: <ZRPnpHwiRhrYwfSM@linux.dev>
+References: <20230922112508.1774352-1-kristina.martsenko@arm.com>
+ <20230922112508.1774352-2-kristina.martsenko@arm.com>
+ <87sf734ofv.wl-maz@kernel.org>
+ <9f731870-ed36-d2e4-378b-f7fbf338ebd6@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,56 +39,38 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230926234008.2348607-3-rananta@google.com>
+In-Reply-To: <9f731870-ed36-d2e4-378b-f7fbf338ebd6@arm.com>
 X-Migadu-Flow: FLOW_OUT
 
-Hi Raghu,
+On Mon, Sep 25, 2023 at 04:16:06PM +0100, Kristina Martsenko wrote:
 
-On Tue, Sep 26, 2023 at 11:39:59PM +0000, Raghavendra Rao Ananta wrote:
-> From: Reiji Watanabe <reijiw@google.com>
+[...]
+
+> > What is the rationale for advancing the state machine? Shouldn't we
+> > instead return to the guest and immediately get the SS exception,
+> > which in turn gets reported to userspace? Is it because we rollback
+> > the PC to a previous instruction?
 > 
-> The following patches will use the number of counters information
-> from the arm_pmu and use this to set the PMCR.N for the guest
-> during vCPU reset. However, since the guest is not associated
-> with any arm_pmu until userspace configures the vPMU device
-> attributes, and a reset can happen before this event, call
-> kvm_arm_support_pmu_v3() just before doing the reset.
-> 
-> No functional change intended.
+> Yes, because we rollback the PC to the prologue instruction. We advance the
+> state machine so that the SS exception is taken immediately upon returning to
+> the guest at the prologue instruction. If we didn't advance it then we would
+> return to the guest, execute the prologue instruction, and then take the SS
+> exception on the middle instruction. Which would be surprising as userspace
+> would see the middle and epilogue instructions executed multiple times but not
+> the prologue.
 
-I would argue there still is a functional change here, as PMU
-initialization failure now shows up on a completely different ioctl for
-userspace.
+I agree with Kristina that taking the SS exception on the prologue is
+likely the best course of action. Especially since it matches the
+behavior of single-stepping an EL0 MOPS sequence with an intervening CPU
+migration.
 
-> @@ -216,6 +217,18 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
->  	vcpu->arch.reset_state.reset = false;
->  	spin_unlock(&vcpu->arch.mp_state_lock);
->  
-> +	if (kvm_vcpu_has_pmu(vcpu)) {
-> +		if (!kvm_arm_support_pmu_v3())
-> +			return -EINVAL;
-> +
-> +		/*
-> +		 * When the vCPU has a PMU, but no PMU is set for the guest
-> +		 * yet, set the default one.
-> +		 */
-> +		if (unlikely(!kvm->arch.arm_pmu) && kvm_arm_set_default_pmu(kvm))
-> +			return -EINVAL;
-> +	}
-> +
+This behavior might throw an EL1 that single-steps itself for a loop,
+but I think it is impossible for a hypervisor to hide the consequences
+of vCPU migration with MOPS in the first place.
 
-Ah, this probably will not mix well with my recent change to get rid of
-the return value altogether from kvm_reset_vcpu() [*]. I see two ways to
-handle this:
-
- - Add a separate helper responsible for one-time setup of the vCPU
-   called from KVM_ARM_VCPU_INIT which may fail.
-
- - Add a check for !kvm->arch.arm_pmu to kvm_arm_pmu_v3_init().
-
-No strong preference, though.
-
-[*]: https://lore.kernel.org/r/20230920195036.1169791-8-oliver.upton@linux.dev
+Marc, I'm guessing you were most concerned about the former case where
+the VMM was debugging the guest. Is there something you're concerned
+about I missed?
 
 -- 
 Thanks,
