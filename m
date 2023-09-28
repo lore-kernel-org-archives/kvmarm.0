@@ -1,51 +1,78 @@
-Received: from out-194.mta0.migadu.com (out-194.mta0.migadu.com [91.218.175.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE9F328B0
-	for <kvmarm@lists.linux.dev>; Thu, 28 Sep 2023 16:47:44 +0000 (UTC)
-Date: Thu, 28 Sep 2023 09:47:35 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1695919662;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wveZV/OpMnfjYWiQaY9ODeOIzpESq4cgbicBnYivGwk=;
-	b=AD+KxXFw3jS2YoHuX20ZNxTD8+hrALeFSW0wAeV6Vjor2bsIyDZYKI++uX1ccll5mauxTK
-	3vNa+wMJFMgf7fC52qho8oaplJQ1YmKsx2wkjjIVQOibksmRnua8ruhBqfkhPU7zhxNTaH
-	gu+EXU2wTEIgkokCVjRRcrZJyrWRncM=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, nd@arm.com,
-	akpm@linux-foundation.org, aneesh.kumar@linux.ibm.com,
-	catalin.marinas@arm.com, dave.hansen@linux.intel.com,
-	maz@kernel.org, shuah@kernel.org, will@kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v1 06/20] KVM: arm64: Save/restore POE registers
-Message-ID: <ZRWuJ9jses6b7Lmc@linux.dev>
-References: <20230927140123.5283-1-joey.gouly@arm.com>
- <20230927140123.5283-7-joey.gouly@arm.com>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 353093C6AC
+	for <kvmarm@lists.linux.dev>; Thu, 28 Sep 2023 16:55:52 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 829881FB;
+	Thu, 28 Sep 2023 09:56:30 -0700 (PDT)
+Received: from [10.1.32.180] (e126864.cambridge.arm.com [10.1.32.180])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 90DAA3F5A1;
+	Thu, 28 Sep 2023 09:55:49 -0700 (PDT)
+Message-ID: <6687f58c-0da9-0583-2dc1-2089f292b745@arm.com>
+Date: Thu, 28 Sep 2023 17:55:39 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230927140123.5283-7-joey.gouly@arm.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v2 0/2] KVM: arm64: Support for Arm v8.8 memcpy
+ instructions in KVM guests
+Content-Language: en-US
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Vladimir Murzin <vladimir.murzin@arm.com>,
+ Colton Lewis <coltonlewis@google.com>, linux-kernel@vger.kernel.org
+References: <20230922112508.1774352-1-kristina.martsenko@arm.com>
+ <ZRPE9OcB9ndgFxbs@linux.dev>
+From: Kristina Martsenko <kristina.martsenko@arm.com>
+In-Reply-To: <ZRPE9OcB9ndgFxbs@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Joey,
+On 27/09/2023 07:00, Oliver Upton wrote:
+> Hi Kristina,
 
-On Wed, Sep 27, 2023 at 03:01:09PM +0100, Joey Gouly wrote:
-> Define the new system registers that POE introduces and context switch them.
+Hi Oliver,
 
-I'm not seeing the latter part in the diff. I was anticipating that the
-POE context switching hooks into __sysreg_{save,restore}_{el1,user}_state() like
-we do for most other bits of sysreg context.
+> 
+> On Fri, Sep 22, 2023 at 12:25:06PM +0100, Kristina Martsenko wrote:
+>> Hi,
+>>
+>> This is v2 of the series to allow using the new Arm memory copy instructions
+>> in KVM guests. See v1 for more information [1].
+> 
+> 
+> Thanks for sending out the series. I've been thinking about what the
+> architecture says for MOPS, and I wonder if what's currently in the
+> Arm ARM is clear enough for EL1 software to be written robustly.
+> 
+> While HCRX_EL2.MCE2 allows the hypervisor to intervene on MOPS
+> exceptions from EL1, there's no such control for EL0. So when vCPU
+> migration occurs EL1 could get an unexpected MOPS exception, even for a
+> process that was pinned to a single (virtual) CPU implementation.
+> 
+> Additionally, the wording of I_NXHPS seems to suggest that EL2 handling
+> of MOPS exceptions is only expected in certain circumstances where EL1 is
+> incapable of handling an exception. Is the unwritten expectation then
+> that EL1 software should tolerate 'unexpected' MOPS exceptions from EL1
+> and EL0, even if EL1 did not migrate the PE context?
+> 
+> Perhaps I'm being pedantic, but I'd really like for there to be some
+> documentation that suggests MOPS exceptions can happen due to context
+> migration done by a higher EL as that is the only option in the context
+> of virtualization.
 
---
-Thanks,
-Oliver
+That's a good point. This shouldn't affect Linux guests as Linux is
+always able to handle a MOPS exception coming from EL0. But it would
+affect any non-Linux guest that pins all its EL0 tasks and doesn't
+implement a handler. It's not clear to me what the expectation for
+guests is, I'll ask the architects to clarify and get back to you.
+
+Thanks for the feedback!
+
+Kristina
