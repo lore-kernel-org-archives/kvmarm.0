@@ -1,270 +1,186 @@
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6395563A4;
-	Sat, 30 Sep 2023 13:07:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696079221; x=1727615221;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=wfmlaQ/yZCImQAuL1Y8jKhC6VFeirk/jHwd2wi9Cg6c=;
-  b=T0pv6VfhObW2G/cGb9o4IXZVlPeilr7ROp7qgKSVvwi0WwBMixVqzEyw
-   FxL+mARVQ4TSqj8ahNkLbNcUxS12y9u/kltJBxuLp2VRIt8zu9UC53XfW
-   2NevbnMVXNvS28tcy2rEDEfD9F0GpChd+w9ahkiGIs1aW3ZTSjqrRqVWK
-   0qJMLeUDmwoGFAIMDaOpxfd3nokJ43vKuCrE+H4ZXM6OQIvlPNbI8C4pc
-   KjuGW6ta3Cx4blriHY52fHo12CdqJAt2Lv9w3j1TI/8UK+5lHjYWY+g6K
-   aMwV/xG13ZvYyXCsAaoJvuDJeNZIbwgGBqkcTwtXW8+x4LpnWe9oMEcZx
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10849"; a="385269678"
-X-IronPort-AV: E=Sophos;i="6.03,190,1694761200"; 
-   d="scan'208";a="385269678"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2023 06:06:59 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10849"; a="923829876"
-X-IronPort-AV: E=Sophos;i="6.03,190,1694761200"; 
-   d="scan'208";a="923829876"
-Received: from lkp-server02.sh.intel.com (HELO c3b01524d57c) ([10.239.97.151])
-  by orsmga005.jf.intel.com with ESMTP; 30 Sep 2023 06:06:55 -0700
-Received: from kbuild by c3b01524d57c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qmZgL-00049f-0e;
-	Sat, 30 Sep 2023 13:06:53 +0000
-Date: Sat, 30 Sep 2023 21:05:56 +0800
-From: kernel test robot <lkp@intel.com>
-To: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: oe-kbuild-all@lists.linux.dev, nd@arm.com, akpm@linux-foundation.org,
-	aneesh.kumar@linux.ibm.com, catalin.marinas@arm.com,
-	dave.hansen@linux.intel.com, joey.gouly@arm.com, maz@kernel.org,
-	oliver.upton@linux.dev, shuah@kernel.org, will@kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v1 11/20] arm64: enable ARCH_HAS_PKEYS on arm64
-Message-ID: <202309302050.SO3QXUkm-lkp@intel.com>
-References: <20230927140123.5283-12-joey.gouly@arm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 725471FA8
+	for <kvmarm@lists.linux.dev>; Sat, 30 Sep 2023 13:34:48 +0000 (UTC)
+Received: from [192.168.2.47] (109-252-153-31.dynamic.spd-mgts.ru [109.252.153.31])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: dmitry.osipenko)
+	by madras.collabora.co.uk (Postfix) with ESMTPSA id 374A96607295;
+	Sat, 30 Sep 2023 14:34:40 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1696080881;
+	bh=3ugUArCZyI9Pxj0Ig4JO2jUAAoqUfEtB3QWnI+YrbKU=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=X30bolcVG+1WB7372sxMbbSh9sOaWGBweZzWxaHpwhZiDfx3RqeokLsndhBZQBGOA
+	 yVfH784ob+2OLed/WAvg57dT5W/hG6yrvPMg79G8HSG4HLxh6YTCjes/1RXy8M5PE6
+	 xh7JuC0b6OyVfTtpnKkrcCIJ0ejGc31xoAU+iFG+EE24r6KEDdt2RVnJ07hxykz1xD
+	 JzFZcUNosXBp+1EYbzszlIUThweCXQRtEoCxeEal/K6JiR/svMJ+JREP1qijhCIq8l
+	 RsSt+y+siNYnBPrRZhgf7i9CmgGyuLxPyQNnHaVERZX5O+u2Nr7DvoB7hjjgxpyVud
+	 veE8bnosFqzLQ==
+Message-ID: <bd21a3bf-2033-288d-d376-77d7bc054ca9@collabora.com>
+Date: Sat, 30 Sep 2023 16:34:37 +0300
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230927140123.5283-12-joey.gouly@arm.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v9 6/6] KVM: x86/mmu: Handle non-refcounted pages
+Content-Language: en-US
+From: Dmitry Osipenko <dmitry.osipenko@collabora.com>
+To: David Stevens <stevensd@chromium.org>
+Cc: Sean Christopherson <seanjc@google.com>,
+ Yu Zhang <yu.c.zhang@linux.intel.com>,
+ Isaku Yamahata <isaku.yamahata@gmail.com>,
+ Zhi Wang <zhi.wang.linux@gmail.com>, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20230911021637.1941096-1-stevensd@google.com>
+ <20230911021637.1941096-7-stevensd@google.com>
+ <14db8c0b-77de-34ec-c847-d7360025a571@collabora.com>
+ <207c8e59-f92a-96c0-bc5e-39b73a840110@collabora.com>
+ <CAD=HUj51M9Eh=5Q=XQjPJ7No4i-z0en-1L3s0G8_fBZp0+NUZw@mail.gmail.com>
+ <2126e800-f9db-b3f8-3d1c-454b5b2c169e@collabora.com>
+In-Reply-To: <2126e800-f9db-b3f8-3d1c-454b5b2c169e@collabora.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Joey,
+On 9/21/23 23:06, Dmitry Osipenko wrote:
+> On 9/19/23 05:59, David Stevens wrote:
+>> On Mon, Sep 18, 2023 at 8:19 PM Dmitry Osipenko
+>> <dmitry.osipenko@collabora.com> wrote:
+>>>
+>>> On 9/18/23 12:58, Dmitry Osipenko wrote:
+>>>> On 9/11/23 05:16, David Stevens wrote:
+>>>>> From: David Stevens <stevensd@chromium.org>
+>>>>>
+>>>>> Handle non-refcounted pages in __kvm_faultin_pfn. This allows the host
+>>>>> to map memory into the guest that is backed by non-refcounted struct
+>>>>> pages - for example, the tail pages of higher order non-compound pages
+>>>>> allocated by the amdgpu driver via ttm_pool_alloc_page.
+>>>>>
+>>>>> The bulk of this change is tracking the is_refcounted_page flag so that
+>>>>> non-refcounted pages don't trigger page_count() == 0 warnings. This is
+>>>>> done by storing the flag in an unused bit in the sptes. There are no
+>>>>> bits available in PAE SPTEs, so non-refcounted pages can only be handled
+>>>>> on TDP and x86-64.
+>>>>>
+>>>>> Signed-off-by: David Stevens <stevensd@chromium.org>
+>>>>> ---
+>>>>>  arch/x86/kvm/mmu/mmu.c          | 52 +++++++++++++++++++++++----------
+>>>>>  arch/x86/kvm/mmu/mmu_internal.h |  1 +
+>>>>>  arch/x86/kvm/mmu/paging_tmpl.h  |  8 +++--
+>>>>>  arch/x86/kvm/mmu/spte.c         |  4 ++-
+>>>>>  arch/x86/kvm/mmu/spte.h         | 12 +++++++-
+>>>>>  arch/x86/kvm/mmu/tdp_mmu.c      | 22 ++++++++------
+>>>>>  include/linux/kvm_host.h        |  3 ++
+>>>>>  virt/kvm/kvm_main.c             |  6 ++--
+>>>>>  8 files changed, 76 insertions(+), 32 deletions(-)
+>>>>
+>>>> Could you please tell which kernel tree you used for the base of this
+>>>> series? This patch #6 doesn't apply cleanly to stable/mainline/next/kvm
+>>>>
+>>>> error: sha1 information is lacking or useless (arch/x86/kvm/mmu/mmu.c).
+>>>> error: could not build fake ancestor
+>>>
+>>> I applied the patch manually to v6.5.2 and tested Venus using Intel TGL iGPU, the intel driver is crashing:
+>>>
+>>>    BUG: kernel NULL pointer dereference, address: 0000000000000058
+>>>    #PF: supervisor read access in kernel mode
+>>>    #PF: error_code(0x0000) - not-present page
+>>>    PGD 0 P4D 0
+>>>    Oops: 0000 [#1] PREEMPT SMP
+>>>    CPU: 1 PID: 5926 Comm: qemu-system-x86 Not tainted 6.5.2+ #114
+>>>    Hardware name: LENOVO 20VE/LNVNB161216, BIOS F8CN43WW(V2.06) 08/12/2021
+>>>    RIP: 0010:gen8_ppgtt_insert+0x50b/0x8f0
+>>>    Code: 00 00 f7 c2 00 00 20 00 74 15 f7 c3 ff ff 1f 00 75 0d 41 81 fc ff ff 1f 00 0f 87 0e 02 00 00 48 8b 74 24 08 44 89 c0 45 85 ed <48> 8b 4e 58 48 8b 04 c1 0f 85 0b 02 00 00 81 e2 00 00 01 00 0f 84
+>>>    RSP: 0018:ffffafc085afb820 EFLAGS: 00010246
+>>>    RAX: 0000000000000000 RBX: 00000000e9604000 RCX: 000000000000001b
+>>>    RDX: 0000000000211000 RSI: 0000000000000000 RDI: ffff9513d44c1000
+>>>    RBP: ffff951106f8dfc0 R08: 0000000000000000 R09: 0000000000000003
+>>>    R10: 0000000000000fff R11: 00000000e9800000 R12: 00000000001fc000
+>>>    R13: 0000000000000000 R14: 0000000000001000 R15: 0000ffff00000000
+>>>    FS:  00007f2a5bcced80(0000) GS:ffff951a87a40000(0000) knlGS:0000000000000000
+>>>    CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>>    CR2: 0000000000000058 CR3: 0000000116f16006 CR4: 0000000000772ee0
+>>>    PKRU: 55555554
+>>>    Call Trace:
+>>>     <TASK>
+>>>     ? __die+0x1f/0x60
+>>>     ? page_fault_oops+0x14d/0x420
+>>>     ? exc_page_fault+0x3d7/0x880
+>>>     ? lock_acquire+0xc9/0x290
+>>>     ? asm_exc_page_fault+0x22/0x30
+>>>     ? gen8_ppgtt_insert+0x50b/0x8f0
+>>>     ppgtt_bind_vma+0x4f/0x60
+>>>     fence_work+0x1b/0x70
+>>>     fence_notify+0x8f/0x130
+>>>     __i915_sw_fence_complete+0x58/0x230
+>>>     i915_vma_pin_ww+0x513/0xa80
+>>>     eb_validate_vmas+0x17e/0x9e0
+>>>     ? eb_pin_engine+0x2bb/0x340
+>>>     i915_gem_do_execbuffer+0xc85/0x2bf0
+>>>     ? __lock_acquire+0x3b6/0x21c0
+>>>     i915_gem_execbuffer2_ioctl+0xee/0x240
+>>>     ? i915_gem_do_execbuffer+0x2bf0/0x2bf0
+>>>     drm_ioctl_kernel+0x9d/0x140
+>>>     drm_ioctl+0x1dd/0x410
+>>>     ? i915_gem_do_execbuffer+0x2bf0/0x2bf0
+>>>     ? __fget_files+0xc5/0x170
+>>>     __x64_sys_ioctl+0x8c/0xc0
+>>>     do_syscall_64+0x34/0x80
+>>>     entry_SYSCALL_64_after_hwframe+0x46/0xb0
+>>>    RIP: 0033:0x7f2a60b0c9df
+>>>
+>>>
+>>> $ ./scripts/faddr2line ./vmlinux gen8_ppgtt_insert+0x50b/0x8f0
+>>> gen8_ppgtt_insert+0x50b/0x8f0:
+>>> i915_pt_entry at drivers/gpu/drm/i915/gt/intel_gtt.h:557
+>>> (inlined by) gen8_ppgtt_insert_huge at drivers/gpu/drm/i915/gt/gen8_ppgtt.c:641
+>>> (inlined by) gen8_ppgtt_insert at drivers/gpu/drm/i915/gt/gen8_ppgtt.c:743
+>>>
+>>> It's likely should be the i915 driver issue that is crashes with the NULL deref, but the origin of the bug should be the kvm page fault handling.
+>>>
+>>> David, could you please tell what tests you've run and post a link to yours kernel tree? Maybe I made obscure mistake while applied the patch manually.
+>>
+>> For tests, I ran the kvm selftests and then various ChromeOS
+>> virtualization tests. Two things to note about the ChromeOS
+>> virtualization tests are that they use crosvm instead of qemu, and
+>> they use virtio-gpu+virgl for graphics in the guest. I tested on an
+>> AMD device (since the goal of this series is to fix a compatibility
+>> issue with the amdgpu driver), and on a TGL device.
+>>
+>> I don't have an easy way to share my kernel tree, but it's based on
+>> v6.5-r3. The series I sent out is rebased onto the kvm next branch,
+>> but there were only minor conflicts.
+> 
+> It's good that you mentioned crosvm because I only tested qemu.
+> Interestingly, the problem doesn't present using crosvm.
+> 
+> I made few more tests using these options:
+> 
+>   1. yours latest version of the patch based on v6.5.4
+>   2. yours latest version of the patch based on the kvm tree
+>   3. by forward-porting yours older version of the kvm patchset to v6.5
+> that works well based on v6.4 kernel
+> 
+> Neither of the options work with qemu and v6.5 kernel, but crosvm works.
+> 
+> At first I felt confident that it must be i915 bug of the v6.5 kernel.
+> But given that crosvm works, now I'm not sure.
+> 
+> Will try to bisect 6.5 kernel, at minimum the i915 driver changes.
 
-kernel test robot noticed the following build errors:
+The bisection said that it's not i915 bug.
 
-[auto build test ERROR on arm64/for-next/core]
-[also build test ERROR on linus/master v6.6-rc3 next-20230929]
-[cannot apply to akpm-mm/mm-everything kvmarm/next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Joey-Gouly/arm64-sysreg-add-system-register-POR_EL-0-1/20230927-221459
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-next/core
-patch link:    https://lore.kernel.org/r/20230927140123.5283-12-joey.gouly%40arm.com
-patch subject: [PATCH v1 11/20] arm64: enable ARCH_HAS_PKEYS on arm64
-config: arm64-randconfig-001-20230930 (https://download.01.org/0day-ci/archive/20230930/202309302050.SO3QXUkm-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230930/202309302050.SO3QXUkm-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202309302050.SO3QXUkm-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from arch/arm64/include/asm/hwcap.h:50,
-                    from arch/arm64/include/asm/cpufeature.h:12,
-                    from arch/arm64/include/asm/ptrace.h:11,
-                    from arch/arm64/include/asm/irqflags.h:10,
-                    from include/linux/irqflags.h:17,
-                    from include/linux/spinlock.h:59,
-                    from include/linux/mmzone.h:8,
-                    from include/linux/gfp.h:7,
-                    from include/linux/mm.h:7,
-                    from include/linux/pagewalk.h:5,
-                    from fs/proc/task_mmu.c:2:
-   fs/proc/task_mmu.c: In function 'show_smap_vma_flags':
-   include/linux/mm.h:346:25: error: 'VM_HIGH_ARCH_2' undeclared (first use in this function)
-     346 | # define VM_PKEY_BIT0   VM_HIGH_ARCH_2  /* A protection key is a 3-bit value on arm64 */
-         |                         ^~~~~~~~~~~~~~
-   include/linux/log2.h:158:30: note: in definition of macro 'ilog2'
-     158 |         __builtin_constant_p(n) ?       \
-         |                              ^
-   fs/proc/task_mmu.c:689:24: note: in expansion of macro 'VM_PKEY_BIT0'
-     689 |                 [ilog2(VM_PKEY_BIT0)]   = "",
-         |                        ^~~~~~~~~~~~
-   include/linux/mm.h:346:25: note: each undeclared identifier is reported only once for each function it appears in
-     346 | # define VM_PKEY_BIT0   VM_HIGH_ARCH_2  /* A protection key is a 3-bit value on arm64 */
-         |                         ^~~~~~~~~~~~~~
-   include/linux/log2.h:158:30: note: in definition of macro 'ilog2'
-     158 |         __builtin_constant_p(n) ?       \
-         |                              ^
-   fs/proc/task_mmu.c:689:24: note: in expansion of macro 'VM_PKEY_BIT0'
-     689 |                 [ilog2(VM_PKEY_BIT0)]   = "",
-         |                        ^~~~~~~~~~~~
->> include/linux/log2.h:157:1: error: array index in initializer not of integer type
-     157 | ( \
-         | ^
-   fs/proc/task_mmu.c:689:18: note: in expansion of macro 'ilog2'
-     689 |                 [ilog2(VM_PKEY_BIT0)]   = "",
-         |                  ^~~~~
-   include/linux/log2.h:157:1: note: (near initialization for 'mnemonics')
-     157 | ( \
-         | ^
-   fs/proc/task_mmu.c:689:18: note: in expansion of macro 'ilog2'
-     689 |                 [ilog2(VM_PKEY_BIT0)]   = "",
-         |                  ^~~~~
-   include/linux/mm.h:347:25: error: 'VM_HIGH_ARCH_3' undeclared (first use in this function)
-     347 | # define VM_PKEY_BIT1   VM_HIGH_ARCH_3
-         |                         ^~~~~~~~~~~~~~
-   include/linux/log2.h:158:30: note: in definition of macro 'ilog2'
-     158 |         __builtin_constant_p(n) ?       \
-         |                              ^
-   fs/proc/task_mmu.c:690:24: note: in expansion of macro 'VM_PKEY_BIT1'
-     690 |                 [ilog2(VM_PKEY_BIT1)]   = "",
-         |                        ^~~~~~~~~~~~
->> include/linux/log2.h:157:1: error: array index in initializer not of integer type
-     157 | ( \
-         | ^
-   fs/proc/task_mmu.c:690:18: note: in expansion of macro 'ilog2'
-     690 |                 [ilog2(VM_PKEY_BIT1)]   = "",
-         |                  ^~~~~
-   include/linux/log2.h:157:1: note: (near initialization for 'mnemonics')
-     157 | ( \
-         | ^
-   fs/proc/task_mmu.c:690:18: note: in expansion of macro 'ilog2'
-     690 |                 [ilog2(VM_PKEY_BIT1)]   = "",
-         |                  ^~~~~
-   include/linux/mm.h:348:25: error: 'VM_HIGH_ARCH_4' undeclared (first use in this function)
-     348 | # define VM_PKEY_BIT2   VM_HIGH_ARCH_4
-         |                         ^~~~~~~~~~~~~~
-   include/linux/log2.h:158:30: note: in definition of macro 'ilog2'
-     158 |         __builtin_constant_p(n) ?       \
-         |                              ^
-   fs/proc/task_mmu.c:691:24: note: in expansion of macro 'VM_PKEY_BIT2'
-     691 |                 [ilog2(VM_PKEY_BIT2)]   = "",
-         |                        ^~~~~~~~~~~~
->> include/linux/log2.h:157:1: error: array index in initializer not of integer type
-     157 | ( \
-         | ^
-   fs/proc/task_mmu.c:691:18: note: in expansion of macro 'ilog2'
-     691 |                 [ilog2(VM_PKEY_BIT2)]   = "",
-         |                  ^~~~~
-   include/linux/log2.h:157:1: note: (near initialization for 'mnemonics')
-     157 | ( \
-         | ^
-   fs/proc/task_mmu.c:691:18: note: in expansion of macro 'ilog2'
-     691 |                 [ilog2(VM_PKEY_BIT2)]   = "",
-         |                  ^~~~~
-
-
-vim +157 include/linux/log2.h
-
-b311e921b385b5a Robert P. J. Day 2007-10-16   69  
-f0d1b0b30d250a0 David Howells    2006-12-08   70  /**
-dbef91ec5482239 Martin Wilck     2018-04-18   71   * const_ilog2 - log base 2 of 32-bit or a 64-bit constant unsigned value
-a1c4d24e02d093e Randy Dunlap     2017-09-30   72   * @n: parameter
-f0d1b0b30d250a0 David Howells    2006-12-08   73   *
-dbef91ec5482239 Martin Wilck     2018-04-18   74   * Use this where sparse expects a true constant expression, e.g. for array
-dbef91ec5482239 Martin Wilck     2018-04-18   75   * indices.
-f0d1b0b30d250a0 David Howells    2006-12-08   76   */
-dbef91ec5482239 Martin Wilck     2018-04-18   77  #define const_ilog2(n)				\
-f0d1b0b30d250a0 David Howells    2006-12-08   78  (						\
-f0d1b0b30d250a0 David Howells    2006-12-08   79  	__builtin_constant_p(n) ? (		\
-474c90156c8dcc2 Linus Torvalds   2017-03-02   80  		(n) < 2 ? 0 :			\
-f0d1b0b30d250a0 David Howells    2006-12-08   81  		(n) & (1ULL << 63) ? 63 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08   82  		(n) & (1ULL << 62) ? 62 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08   83  		(n) & (1ULL << 61) ? 61 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08   84  		(n) & (1ULL << 60) ? 60 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08   85  		(n) & (1ULL << 59) ? 59 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08   86  		(n) & (1ULL << 58) ? 58 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08   87  		(n) & (1ULL << 57) ? 57 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08   88  		(n) & (1ULL << 56) ? 56 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08   89  		(n) & (1ULL << 55) ? 55 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08   90  		(n) & (1ULL << 54) ? 54 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08   91  		(n) & (1ULL << 53) ? 53 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08   92  		(n) & (1ULL << 52) ? 52 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08   93  		(n) & (1ULL << 51) ? 51 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08   94  		(n) & (1ULL << 50) ? 50 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08   95  		(n) & (1ULL << 49) ? 49 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08   96  		(n) & (1ULL << 48) ? 48 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08   97  		(n) & (1ULL << 47) ? 47 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08   98  		(n) & (1ULL << 46) ? 46 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08   99  		(n) & (1ULL << 45) ? 45 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  100  		(n) & (1ULL << 44) ? 44 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  101  		(n) & (1ULL << 43) ? 43 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  102  		(n) & (1ULL << 42) ? 42 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  103  		(n) & (1ULL << 41) ? 41 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  104  		(n) & (1ULL << 40) ? 40 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  105  		(n) & (1ULL << 39) ? 39 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  106  		(n) & (1ULL << 38) ? 38 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  107  		(n) & (1ULL << 37) ? 37 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  108  		(n) & (1ULL << 36) ? 36 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  109  		(n) & (1ULL << 35) ? 35 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  110  		(n) & (1ULL << 34) ? 34 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  111  		(n) & (1ULL << 33) ? 33 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  112  		(n) & (1ULL << 32) ? 32 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  113  		(n) & (1ULL << 31) ? 31 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  114  		(n) & (1ULL << 30) ? 30 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  115  		(n) & (1ULL << 29) ? 29 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  116  		(n) & (1ULL << 28) ? 28 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  117  		(n) & (1ULL << 27) ? 27 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  118  		(n) & (1ULL << 26) ? 26 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  119  		(n) & (1ULL << 25) ? 25 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  120  		(n) & (1ULL << 24) ? 24 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  121  		(n) & (1ULL << 23) ? 23 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  122  		(n) & (1ULL << 22) ? 22 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  123  		(n) & (1ULL << 21) ? 21 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  124  		(n) & (1ULL << 20) ? 20 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  125  		(n) & (1ULL << 19) ? 19 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  126  		(n) & (1ULL << 18) ? 18 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  127  		(n) & (1ULL << 17) ? 17 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  128  		(n) & (1ULL << 16) ? 16 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  129  		(n) & (1ULL << 15) ? 15 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  130  		(n) & (1ULL << 14) ? 14 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  131  		(n) & (1ULL << 13) ? 13 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  132  		(n) & (1ULL << 12) ? 12 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  133  		(n) & (1ULL << 11) ? 11 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  134  		(n) & (1ULL << 10) ? 10 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  135  		(n) & (1ULL <<  9) ?  9 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  136  		(n) & (1ULL <<  8) ?  8 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  137  		(n) & (1ULL <<  7) ?  7 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  138  		(n) & (1ULL <<  6) ?  6 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  139  		(n) & (1ULL <<  5) ?  5 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  140  		(n) & (1ULL <<  4) ?  4 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  141  		(n) & (1ULL <<  3) ?  3 :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  142  		(n) & (1ULL <<  2) ?  2 :	\
-474c90156c8dcc2 Linus Torvalds   2017-03-02  143  		1) :				\
-dbef91ec5482239 Martin Wilck     2018-04-18  144  	-1)
-dbef91ec5482239 Martin Wilck     2018-04-18  145  
-dbef91ec5482239 Martin Wilck     2018-04-18  146  /**
-dbef91ec5482239 Martin Wilck     2018-04-18  147   * ilog2 - log base 2 of 32-bit or a 64-bit unsigned value
-dbef91ec5482239 Martin Wilck     2018-04-18  148   * @n: parameter
-dbef91ec5482239 Martin Wilck     2018-04-18  149   *
-dbef91ec5482239 Martin Wilck     2018-04-18  150   * constant-capable log of base 2 calculation
-dbef91ec5482239 Martin Wilck     2018-04-18  151   * - this can be used to initialise global variables from constant data, hence
-dbef91ec5482239 Martin Wilck     2018-04-18  152   * the massive ternary operator construction
-dbef91ec5482239 Martin Wilck     2018-04-18  153   *
-dbef91ec5482239 Martin Wilck     2018-04-18  154   * selects the appropriately-sized optimised version depending on sizeof(n)
-dbef91ec5482239 Martin Wilck     2018-04-18  155   */
-dbef91ec5482239 Martin Wilck     2018-04-18  156  #define ilog2(n) \
-dbef91ec5482239 Martin Wilck     2018-04-18 @157  ( \
-dbef91ec5482239 Martin Wilck     2018-04-18  158  	__builtin_constant_p(n) ?	\
-2f78788b55baa34 Jakub Jelinek    2020-12-15  159  	((n) < 2 ? 0 :			\
-2f78788b55baa34 Jakub Jelinek    2020-12-15  160  	 63 - __builtin_clzll(n)) :	\
-f0d1b0b30d250a0 David Howells    2006-12-08  161  	(sizeof(n) <= 4) ?		\
-f0d1b0b30d250a0 David Howells    2006-12-08  162  	__ilog2_u32(n) :		\
-f0d1b0b30d250a0 David Howells    2006-12-08  163  	__ilog2_u64(n)			\
-f0d1b0b30d250a0 David Howells    2006-12-08  164   )
-f0d1b0b30d250a0 David Howells    2006-12-08  165  
+Good news, the bug was fixed in a recent linux-next. Don't know what is
+the exact fix, suppose it's something in mm/
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Best regards,
+Dmitry
+
