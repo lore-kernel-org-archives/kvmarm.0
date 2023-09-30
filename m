@@ -1,37 +1,37 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AFFE8F5A;
-	Sat, 30 Sep 2023 11:57:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6395563A4;
+	Sat, 30 Sep 2023 13:07:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696075069; x=1727611069;
+  t=1696079221; x=1727615221;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=PdU2bkeAHGUqnJlEXO1kGz3P3YD4ICw84B9+BzRlc2Q=;
-  b=DRkq3AHtIPBVWRIPo8sO0gskQZmq3yXyqAVLUCjhmgvS76EiMHIO+Qy3
-   FzPpGZbly1qSPiRa6+Wf3j06lvzmGuOnmJCFXlyOpZXKKQYf+oaA2uHb+
-   /+Ko4rBhlhd78ANOFxuLLtq4FKrvDNTX9uLwoPYNxx2mWNmr+iMgJKbuE
-   Ca8stiAAc8gGwZoD2NFsv3Vs0Tkx3lYv6GVwIESdP8K0KCoFi2nj7M9Ne
-   H2qc++ASHC6JUdhakjgh1kc5cnU6q/sZugP3o57eEy2oB2NsAvgEBZpzE
-   hkSH1SZ+HtTQ3evQ1Em1evkUh9bk609UpZAisKGubnyB5v5WmE5BzfQyK
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10848"; a="413343955"
+  bh=wfmlaQ/yZCImQAuL1Y8jKhC6VFeirk/jHwd2wi9Cg6c=;
+  b=T0pv6VfhObW2G/cGb9o4IXZVlPeilr7ROp7qgKSVvwi0WwBMixVqzEyw
+   FxL+mARVQ4TSqj8ahNkLbNcUxS12y9u/kltJBxuLp2VRIt8zu9UC53XfW
+   2NevbnMVXNvS28tcy2rEDEfD9F0GpChd+w9ahkiGIs1aW3ZTSjqrRqVWK
+   0qJMLeUDmwoGFAIMDaOpxfd3nokJ43vKuCrE+H4ZXM6OQIvlPNbI8C4pc
+   KjuGW6ta3Cx4blriHY52fHo12CdqJAt2Lv9w3j1TI/8UK+5lHjYWY+g6K
+   aMwV/xG13ZvYyXCsAaoJvuDJeNZIbwgGBqkcTwtXW8+x4LpnWe9oMEcZx
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10849"; a="385269678"
 X-IronPort-AV: E=Sophos;i="6.03,190,1694761200"; 
-   d="scan'208";a="413343955"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2023 04:57:48 -0700
+   d="scan'208";a="385269678"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2023 06:06:59 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10848"; a="785342863"
+X-IronPort-AV: E=McAfee;i="6600,9927,10849"; a="923829876"
 X-IronPort-AV: E=Sophos;i="6.03,190,1694761200"; 
-   d="scan'208";a="785342863"
+   d="scan'208";a="923829876"
 Received: from lkp-server02.sh.intel.com (HELO c3b01524d57c) ([10.239.97.151])
-  by orsmga001.jf.intel.com with ESMTP; 30 Sep 2023 04:57:43 -0700
+  by orsmga005.jf.intel.com with ESMTP; 30 Sep 2023 06:06:55 -0700
 Received: from kbuild by c3b01524d57c with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1qmYbN-00046l-2a;
-	Sat, 30 Sep 2023 11:57:41 +0000
-Date: Sat, 30 Sep 2023 19:57:40 +0800
+	id 1qmZgL-00049f-0e;
+	Sat, 30 Sep 2023 13:06:53 +0000
+Date: Sat, 30 Sep 2023 21:05:56 +0800
 From: kernel test robot <lkp@intel.com>
 To: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org
 Cc: oe-kbuild-all@lists.linux.dev, nd@arm.com, akpm@linux-foundation.org,
@@ -40,9 +40,9 @@ Cc: oe-kbuild-all@lists.linux.dev, nd@arm.com, akpm@linux-foundation.org,
 	oliver.upton@linux.dev, shuah@kernel.org, will@kernel.org,
 	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
 	linux-mm@kvack.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v1 09/20] arm64: define VM_PKEY_BIT* for arm64
-Message-ID: <202309301944.jGh1qzvm-lkp@intel.com>
-References: <20230927140123.5283-10-joey.gouly@arm.com>
+Subject: Re: [PATCH v1 11/20] arm64: enable ARCH_HAS_PKEYS on arm64
+Message-ID: <202309302050.SO3QXUkm-lkp@intel.com>
+References: <20230927140123.5283-12-joey.gouly@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -51,7 +51,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230927140123.5283-10-joey.gouly@arm.com>
+In-Reply-To: <20230927140123.5283-12-joey.gouly@arm.com>
 
 Hi Joey,
 
@@ -66,59 +66,204 @@ https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
 url:    https://github.com/intel-lab-lkp/linux/commits/Joey-Gouly/arm64-sysreg-add-system-register-POR_EL-0-1/20230927-221459
 base:   https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-next/core
-patch link:    https://lore.kernel.org/r/20230927140123.5283-10-joey.gouly%40arm.com
-patch subject: [PATCH v1 09/20] arm64: define VM_PKEY_BIT* for arm64
-config: arm64-randconfig-001-20230930 (https://download.01.org/0day-ci/archive/20230930/202309301944.jGh1qzvm-lkp@intel.com/config)
+patch link:    https://lore.kernel.org/r/20230927140123.5283-12-joey.gouly%40arm.com
+patch subject: [PATCH v1 11/20] arm64: enable ARCH_HAS_PKEYS on arm64
+config: arm64-randconfig-001-20230930 (https://download.01.org/0day-ci/archive/20230930/202309302050.SO3QXUkm-lkp@intel.com/config)
 compiler: aarch64-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230930/202309301944.jGh1qzvm-lkp@intel.com/reproduce)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230930/202309302050.SO3QXUkm-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202309301944.jGh1qzvm-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202309302050.SO3QXUkm-lkp@intel.com/
 
 All errors (new ones prefixed by >>):
 
-   In file included from fs/proc/meminfo.c:5:
-   arch/arm64/include/asm/mman.h: In function 'arch_calc_vm_prot_bits':
->> include/linux/mm.h:346:25: error: 'VM_HIGH_ARCH_2' undeclared (first use in this function)
+   In file included from arch/arm64/include/asm/hwcap.h:50,
+                    from arch/arm64/include/asm/cpufeature.h:12,
+                    from arch/arm64/include/asm/ptrace.h:11,
+                    from arch/arm64/include/asm/irqflags.h:10,
+                    from include/linux/irqflags.h:17,
+                    from include/linux/spinlock.h:59,
+                    from include/linux/mmzone.h:8,
+                    from include/linux/gfp.h:7,
+                    from include/linux/mm.h:7,
+                    from include/linux/pagewalk.h:5,
+                    from fs/proc/task_mmu.c:2:
+   fs/proc/task_mmu.c: In function 'show_smap_vma_flags':
+   include/linux/mm.h:346:25: error: 'VM_HIGH_ARCH_2' undeclared (first use in this function)
      346 | # define VM_PKEY_BIT0   VM_HIGH_ARCH_2  /* A protection key is a 3-bit value on arm64 */
          |                         ^~~~~~~~~~~~~~
-   arch/arm64/include/asm/mman.h:20:29: note: in expansion of macro 'VM_PKEY_BIT0'
-      20 |         ret |= pkey & 0x1 ? VM_PKEY_BIT0 : 0;
-         |                             ^~~~~~~~~~~~
+   include/linux/log2.h:158:30: note: in definition of macro 'ilog2'
+     158 |         __builtin_constant_p(n) ?       \
+         |                              ^
+   fs/proc/task_mmu.c:689:24: note: in expansion of macro 'VM_PKEY_BIT0'
+     689 |                 [ilog2(VM_PKEY_BIT0)]   = "",
+         |                        ^~~~~~~~~~~~
    include/linux/mm.h:346:25: note: each undeclared identifier is reported only once for each function it appears in
      346 | # define VM_PKEY_BIT0   VM_HIGH_ARCH_2  /* A protection key is a 3-bit value on arm64 */
          |                         ^~~~~~~~~~~~~~
-   arch/arm64/include/asm/mman.h:20:29: note: in expansion of macro 'VM_PKEY_BIT0'
-      20 |         ret |= pkey & 0x1 ? VM_PKEY_BIT0 : 0;
-         |                             ^~~~~~~~~~~~
->> include/linux/mm.h:347:25: error: 'VM_HIGH_ARCH_3' undeclared (first use in this function)
+   include/linux/log2.h:158:30: note: in definition of macro 'ilog2'
+     158 |         __builtin_constant_p(n) ?       \
+         |                              ^
+   fs/proc/task_mmu.c:689:24: note: in expansion of macro 'VM_PKEY_BIT0'
+     689 |                 [ilog2(VM_PKEY_BIT0)]   = "",
+         |                        ^~~~~~~~~~~~
+>> include/linux/log2.h:157:1: error: array index in initializer not of integer type
+     157 | ( \
+         | ^
+   fs/proc/task_mmu.c:689:18: note: in expansion of macro 'ilog2'
+     689 |                 [ilog2(VM_PKEY_BIT0)]   = "",
+         |                  ^~~~~
+   include/linux/log2.h:157:1: note: (near initialization for 'mnemonics')
+     157 | ( \
+         | ^
+   fs/proc/task_mmu.c:689:18: note: in expansion of macro 'ilog2'
+     689 |                 [ilog2(VM_PKEY_BIT0)]   = "",
+         |                  ^~~~~
+   include/linux/mm.h:347:25: error: 'VM_HIGH_ARCH_3' undeclared (first use in this function)
      347 | # define VM_PKEY_BIT1   VM_HIGH_ARCH_3
          |                         ^~~~~~~~~~~~~~
-   arch/arm64/include/asm/mman.h:21:29: note: in expansion of macro 'VM_PKEY_BIT1'
-      21 |         ret |= pkey & 0x2 ? VM_PKEY_BIT1 : 0;
-         |                             ^~~~~~~~~~~~
->> include/linux/mm.h:348:25: error: 'VM_HIGH_ARCH_4' undeclared (first use in this function)
+   include/linux/log2.h:158:30: note: in definition of macro 'ilog2'
+     158 |         __builtin_constant_p(n) ?       \
+         |                              ^
+   fs/proc/task_mmu.c:690:24: note: in expansion of macro 'VM_PKEY_BIT1'
+     690 |                 [ilog2(VM_PKEY_BIT1)]   = "",
+         |                        ^~~~~~~~~~~~
+>> include/linux/log2.h:157:1: error: array index in initializer not of integer type
+     157 | ( \
+         | ^
+   fs/proc/task_mmu.c:690:18: note: in expansion of macro 'ilog2'
+     690 |                 [ilog2(VM_PKEY_BIT1)]   = "",
+         |                  ^~~~~
+   include/linux/log2.h:157:1: note: (near initialization for 'mnemonics')
+     157 | ( \
+         | ^
+   fs/proc/task_mmu.c:690:18: note: in expansion of macro 'ilog2'
+     690 |                 [ilog2(VM_PKEY_BIT1)]   = "",
+         |                  ^~~~~
+   include/linux/mm.h:348:25: error: 'VM_HIGH_ARCH_4' undeclared (first use in this function)
      348 | # define VM_PKEY_BIT2   VM_HIGH_ARCH_4
          |                         ^~~~~~~~~~~~~~
-   arch/arm64/include/asm/mman.h:22:29: note: in expansion of macro 'VM_PKEY_BIT2'
-      22 |         ret |= pkey & 0x4 ? VM_PKEY_BIT2 : 0;
-         |                             ^~~~~~~~~~~~
+   include/linux/log2.h:158:30: note: in definition of macro 'ilog2'
+     158 |         __builtin_constant_p(n) ?       \
+         |                              ^
+   fs/proc/task_mmu.c:691:24: note: in expansion of macro 'VM_PKEY_BIT2'
+     691 |                 [ilog2(VM_PKEY_BIT2)]   = "",
+         |                        ^~~~~~~~~~~~
+>> include/linux/log2.h:157:1: error: array index in initializer not of integer type
+     157 | ( \
+         | ^
+   fs/proc/task_mmu.c:691:18: note: in expansion of macro 'ilog2'
+     691 |                 [ilog2(VM_PKEY_BIT2)]   = "",
+         |                  ^~~~~
+   include/linux/log2.h:157:1: note: (near initialization for 'mnemonics')
+     157 | ( \
+         | ^
+   fs/proc/task_mmu.c:691:18: note: in expansion of macro 'ilog2'
+     691 |                 [ilog2(VM_PKEY_BIT2)]   = "",
+         |                  ^~~~~
 
 
-vim +/VM_HIGH_ARCH_2 +346 include/linux/mm.h
+vim +157 include/linux/log2.h
 
-   343	
-   344	#if defined(CONFIG_ARM64)
-   345	# define VM_PKEY_SHIFT	VM_HIGH_ARCH_BIT_2
- > 346	# define VM_PKEY_BIT0	VM_HIGH_ARCH_2	/* A protection key is a 3-bit value on arm64 */
- > 347	# define VM_PKEY_BIT1	VM_HIGH_ARCH_3
- > 348	# define VM_PKEY_BIT2	VM_HIGH_ARCH_4
-   349	# define VM_PKEY_BIT3	0
-   350	# define VM_PKEY_BIT4	0
-   351	#endif
-   352	
+b311e921b385b5a Robert P. J. Day 2007-10-16   69  
+f0d1b0b30d250a0 David Howells    2006-12-08   70  /**
+dbef91ec5482239 Martin Wilck     2018-04-18   71   * const_ilog2 - log base 2 of 32-bit or a 64-bit constant unsigned value
+a1c4d24e02d093e Randy Dunlap     2017-09-30   72   * @n: parameter
+f0d1b0b30d250a0 David Howells    2006-12-08   73   *
+dbef91ec5482239 Martin Wilck     2018-04-18   74   * Use this where sparse expects a true constant expression, e.g. for array
+dbef91ec5482239 Martin Wilck     2018-04-18   75   * indices.
+f0d1b0b30d250a0 David Howells    2006-12-08   76   */
+dbef91ec5482239 Martin Wilck     2018-04-18   77  #define const_ilog2(n)				\
+f0d1b0b30d250a0 David Howells    2006-12-08   78  (						\
+f0d1b0b30d250a0 David Howells    2006-12-08   79  	__builtin_constant_p(n) ? (		\
+474c90156c8dcc2 Linus Torvalds   2017-03-02   80  		(n) < 2 ? 0 :			\
+f0d1b0b30d250a0 David Howells    2006-12-08   81  		(n) & (1ULL << 63) ? 63 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08   82  		(n) & (1ULL << 62) ? 62 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08   83  		(n) & (1ULL << 61) ? 61 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08   84  		(n) & (1ULL << 60) ? 60 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08   85  		(n) & (1ULL << 59) ? 59 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08   86  		(n) & (1ULL << 58) ? 58 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08   87  		(n) & (1ULL << 57) ? 57 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08   88  		(n) & (1ULL << 56) ? 56 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08   89  		(n) & (1ULL << 55) ? 55 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08   90  		(n) & (1ULL << 54) ? 54 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08   91  		(n) & (1ULL << 53) ? 53 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08   92  		(n) & (1ULL << 52) ? 52 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08   93  		(n) & (1ULL << 51) ? 51 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08   94  		(n) & (1ULL << 50) ? 50 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08   95  		(n) & (1ULL << 49) ? 49 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08   96  		(n) & (1ULL << 48) ? 48 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08   97  		(n) & (1ULL << 47) ? 47 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08   98  		(n) & (1ULL << 46) ? 46 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08   99  		(n) & (1ULL << 45) ? 45 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  100  		(n) & (1ULL << 44) ? 44 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  101  		(n) & (1ULL << 43) ? 43 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  102  		(n) & (1ULL << 42) ? 42 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  103  		(n) & (1ULL << 41) ? 41 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  104  		(n) & (1ULL << 40) ? 40 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  105  		(n) & (1ULL << 39) ? 39 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  106  		(n) & (1ULL << 38) ? 38 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  107  		(n) & (1ULL << 37) ? 37 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  108  		(n) & (1ULL << 36) ? 36 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  109  		(n) & (1ULL << 35) ? 35 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  110  		(n) & (1ULL << 34) ? 34 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  111  		(n) & (1ULL << 33) ? 33 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  112  		(n) & (1ULL << 32) ? 32 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  113  		(n) & (1ULL << 31) ? 31 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  114  		(n) & (1ULL << 30) ? 30 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  115  		(n) & (1ULL << 29) ? 29 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  116  		(n) & (1ULL << 28) ? 28 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  117  		(n) & (1ULL << 27) ? 27 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  118  		(n) & (1ULL << 26) ? 26 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  119  		(n) & (1ULL << 25) ? 25 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  120  		(n) & (1ULL << 24) ? 24 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  121  		(n) & (1ULL << 23) ? 23 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  122  		(n) & (1ULL << 22) ? 22 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  123  		(n) & (1ULL << 21) ? 21 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  124  		(n) & (1ULL << 20) ? 20 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  125  		(n) & (1ULL << 19) ? 19 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  126  		(n) & (1ULL << 18) ? 18 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  127  		(n) & (1ULL << 17) ? 17 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  128  		(n) & (1ULL << 16) ? 16 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  129  		(n) & (1ULL << 15) ? 15 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  130  		(n) & (1ULL << 14) ? 14 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  131  		(n) & (1ULL << 13) ? 13 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  132  		(n) & (1ULL << 12) ? 12 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  133  		(n) & (1ULL << 11) ? 11 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  134  		(n) & (1ULL << 10) ? 10 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  135  		(n) & (1ULL <<  9) ?  9 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  136  		(n) & (1ULL <<  8) ?  8 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  137  		(n) & (1ULL <<  7) ?  7 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  138  		(n) & (1ULL <<  6) ?  6 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  139  		(n) & (1ULL <<  5) ?  5 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  140  		(n) & (1ULL <<  4) ?  4 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  141  		(n) & (1ULL <<  3) ?  3 :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  142  		(n) & (1ULL <<  2) ?  2 :	\
+474c90156c8dcc2 Linus Torvalds   2017-03-02  143  		1) :				\
+dbef91ec5482239 Martin Wilck     2018-04-18  144  	-1)
+dbef91ec5482239 Martin Wilck     2018-04-18  145  
+dbef91ec5482239 Martin Wilck     2018-04-18  146  /**
+dbef91ec5482239 Martin Wilck     2018-04-18  147   * ilog2 - log base 2 of 32-bit or a 64-bit unsigned value
+dbef91ec5482239 Martin Wilck     2018-04-18  148   * @n: parameter
+dbef91ec5482239 Martin Wilck     2018-04-18  149   *
+dbef91ec5482239 Martin Wilck     2018-04-18  150   * constant-capable log of base 2 calculation
+dbef91ec5482239 Martin Wilck     2018-04-18  151   * - this can be used to initialise global variables from constant data, hence
+dbef91ec5482239 Martin Wilck     2018-04-18  152   * the massive ternary operator construction
+dbef91ec5482239 Martin Wilck     2018-04-18  153   *
+dbef91ec5482239 Martin Wilck     2018-04-18  154   * selects the appropriately-sized optimised version depending on sizeof(n)
+dbef91ec5482239 Martin Wilck     2018-04-18  155   */
+dbef91ec5482239 Martin Wilck     2018-04-18  156  #define ilog2(n) \
+dbef91ec5482239 Martin Wilck     2018-04-18 @157  ( \
+dbef91ec5482239 Martin Wilck     2018-04-18  158  	__builtin_constant_p(n) ?	\
+2f78788b55baa34 Jakub Jelinek    2020-12-15  159  	((n) < 2 ? 0 :			\
+2f78788b55baa34 Jakub Jelinek    2020-12-15  160  	 63 - __builtin_clzll(n)) :	\
+f0d1b0b30d250a0 David Howells    2006-12-08  161  	(sizeof(n) <= 4) ?		\
+f0d1b0b30d250a0 David Howells    2006-12-08  162  	__ilog2_u32(n) :		\
+f0d1b0b30d250a0 David Howells    2006-12-08  163  	__ilog2_u64(n)			\
+f0d1b0b30d250a0 David Howells    2006-12-08  164   )
+f0d1b0b30d250a0 David Howells    2006-12-08  165  
 
 -- 
 0-DAY CI Kernel Test Service
