@@ -1,33 +1,35 @@
-Received: from out-205.mta1.migadu.com (out-205.mta1.migadu.com [95.215.58.205])
+Received: from out-202.mta0.migadu.com (out-202.mta0.migadu.com [91.218.175.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70238B678
-	for <kvmarm@lists.linux.dev>; Sat, 30 Sep 2023 17:57:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08802182DE
+	for <kvmarm@lists.linux.dev>; Sat, 30 Sep 2023 18:12:58 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1696096666;
+	t=1696097577;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=YP8pzHoOJhEVL/4e1lPSUV1DVqINT91qtiUeFMbVwVM=;
-	b=RVGhZwpAnOY3ylOU1HW+QfCDrCjIslGJdDvhZ6BBHv0C9cI/wgz42KCbBovNQFylhSI7Ox
-	t932vZozhjfgQOx83MHD0UP91RbF9vpJeFt5FXZbG01OrqekguT/Lko18ZgJT44z1cd26N
-	6osboL1N/cgWA7vuOBIFZLGJjrua6mM=
+	bh=NobuwGoK/IfZYCAUHu+l3Ra9aadEGrlb36GWP9YgCKg=;
+	b=eeTMEX7jx4g/oM9E4pE2PlyJUQHQkWgZ7FBfm42L2iH5P9365yWo3i+3WP9lL3A0fekqJI
+	T0jftYIUzrw9zZLaMHhuVxhqg1oRtACaDzeA/pWJ2Flp1N/AD0EULy7xiQJtV50RoZlOB4
+	URdfRNjH0XKRse9u9QF/WwmI/3u2V6w=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: maz@kernel.org,
-	Vincent Donnefort <vdonnefort@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	kvmarm@lists.linux.dev,
-	kernel-team@android.com,
-	willy@infradead.org,
-	linux-arm-kernel@lists.infradead.org,
-	will@kernel.org
-Subject: Re: [PATCH v2 0/2] KVM: arm64: Use folio for THP support
-Date: Sat, 30 Sep 2023 17:57:31 +0000
-Message-ID: <169609490682.1603054.2653332700305524612.b4-ty@linux.dev>
-In-Reply-To: <20230928173205.2826598-1-vdonnefort@google.com>
-References: <20230928173205.2826598-1-vdonnefort@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>,
+	kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	stable@vger.kernel.org,
+	Vipin Sharma <vipinsh@google.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH] KVM: arm64: Always invalidate TLB for stage-2 permission faults
+Date: Sat, 30 Sep 2023 18:12:42 +0000
+Message-ID: <169609738440.1610883.10121904970438248127.b4-ty@linux.dev>
+In-Reply-To: <20230922223229.1608155-1-oliver.upton@linux.dev>
+References: <20230922223229.1608155-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,24 +40,27 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On Thu, 28 Sep 2023 18:32:02 +0100, Vincent Donnefort wrote:
-> With the introduction of folios for transparent huge pages [1], we
-> can rely on this support to identify if a page is backed by a huge one,
-> saving a page table walk.
+On Fri, 22 Sep 2023 22:32:29 +0000, Oliver Upton wrote:
+> It is possible for multiple vCPUs to fault on the same IPA and attempt
+> to resolve the fault. One of the page table walks will actually update
+> the PTE and the rest will return -EAGAIN per our race detection scheme.
+> KVM elides the TLB invalidation on the racing threads as the return
+> value is nonzero.
 > 
-> v1 -> v2:
->   * Add git reference to [1] in the commit message
->   * GUP always acted on the Head page under the hood. Update the commit
->     message.
+> Before commit a12ab1378a88 ("KVM: arm64: Use local TLBI on permission
+> relaxation") KVM always used broadcast TLB invalidations when handling
+> permission faults, which had the convenient property of making the
+> stage-2 updates visible to all CPUs in the system. However now we do a
+> local invalidation, and TLBI elision leads to vCPUs getting stuck in a
+> permission fault loop. Remember that the architecture permits the TLB to
+> cache translations that precipitate a permission fault.
 > 
 > [...]
 
-Applied to kvmarm/next, thanks!
+Applied to kvmarm/next, with the fixes and stable tag dropped.
 
-[1/2] KVM: arm64: Do not transfer page refcount for THP adjustment
-      https://git.kernel.org/kvmarm/kvmarm/c/c04bf723ccd6
-[2/2] KVM: arm64: Use folio for THP adjustment
-      https://git.kernel.org/kvmarm/kvmarm/c/bf92834e6f6e
+[1/1] KVM: arm64: Always invalidate TLB for stage-2 permission faults
+      https://git.kernel.org/kvmarm/kvmarm/c/5a6e594fc607
 
 --
 Best,
