@@ -1,84 +1,59 @@
-Received: from out-207.mta1.migadu.com (out-207.mta1.migadu.com [95.215.58.207])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8EF0B678
-	for <kvmarm@lists.linux.dev>; Sat, 30 Sep 2023 18:27:19 +0000 (UTC)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1696098435;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fHjWeUwUzHpdUMgKgpnqE1STeGfAbmIbXCpljrvsbfc=;
-	b=xjnxJTmvhvgoi9ivxjvefbvnNTCPI5BKQkMFepeY32S9maH6zpDsqYlJwR9oTZ81sq4Bf7
-	PzANH8q4fl9+cVaW6tkaCDUSfZYPHk1/AoWdp8jTSuaUR9+TxXqM3qCZp8FO8GGSadORtx
-	j6Z5dJmuc+L2GyBGUKLbVGYKbKYMVAc=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>,
-	kvm@vger.kernel.org
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Xu Zhao <zhaoxu.35@bytedance.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v3 00/11] KVM: arm64: Accelerate lookup of vcpus by MPIDR values (and other fixes)
-Date: Sat, 30 Sep 2023 18:27:03 +0000
-Message-ID: <169609840956.1767077.12635408767994539864.b4-ty@linux.dev>
-In-Reply-To: <20230927090911.3355209-1-maz@kernel.org>
-References: <20230927090911.3355209-1-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FE7F10F3
+	for <kvmarm@lists.linux.dev>; Mon,  2 Oct 2023 06:25:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=InW3sf1bK5Wc2jmOSnsvmSrnjzk2Pzj04pfxMdYCcWw=; b=KeC8/ODHqVRyPLLWTzKg4B/RiX
+	fPBt0w/lD4S8/QIqpD+hkjWXG/ZRlw2awKa7EeCDakGqfaUYsRpXLfLIdnX5ZdhHACB5v+HSFdHhy
+	6SU/hpjWN+8azZT5kEBsea/MFxaP6zhO5asfb3UYYjJOIASgSWpozEbgmEg69rOgtS/MtbcK6hwY8
+	9zXkZzVH3S1k4EE42GznSO6OYLokbZGqWmuEyYIJ/hhSAXHXxRhW+/ITDrnSwQ2JZk6zvwl8r09q/
+	x42JUrQIjBGe7n/CXpq9oUwMZyaxAf93dytavaeVE5nDl7wbV8TVh7N39BOluX0nUYe8bEVnl2rGi
+	q4KhlGZA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1qnCN4-00C1Xw-0I;
+	Mon, 02 Oct 2023 06:25:34 +0000
+Date: Sun, 1 Oct 2023 23:25:34 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	David Stevens <stevensd@chromium.org>,
+	Yu Zhang <yu.c.zhang@linux.intel.com>,
+	Isaku Yamahata <isaku.yamahata@gmail.com>,
+	Zhi Wang <zhi.wang.linux@gmail.com>, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v9 0/6] KVM: allow mapping non-refcounted pages
+Message-ID: <ZRpiXsm7X6BFAU/y@infradead.org>
+References: <20230911021637.1941096-1-stevensd@google.com>
+ <ZRZeaP7W5SuereMX@infradead.org>
+ <ZRb2CljPvHlUErwM@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZRb2CljPvHlUErwM@google.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, 27 Sep 2023 10:09:00 +0100, Marc Zyngier wrote:
-> This is a follow-up on [2], which addresses both the O(n) SGI injection
-> issue, and cleans up a number of embarassing bugs steaming form the
-> vcpuid/vcpu_idx confusion.
+On Fri, Sep 29, 2023 at 09:06:34AM -0700, Sean Christopherson wrote:
+> KVM needs to be aware of non-refcounted struct page memory no matter what; see
+> CVE-2021-22543 and, commit f8be156be163 ("KVM: do not allow mapping valid but
+> non-reference-counted pages").  I don't think it makes any sense whatsoever to
+> remove that code and assume every driver in existence will do the right thing.
+
+Agreed.
+
 > 
-> See the changelog below for details.
-> 
-> Oliver, assuming that you haven't changed your mind and that
-> nobody shouts, feel free to queue this in -next.
-> 
-> [...]
+> With the cleanups done, playing nice with non-refcounted paged instead of outright
+> rejecting them is a wash in terms of lines of code, complexity, and ongoing
+> maintenance cost.
 
-Applied to kvmarm/next, thanks!
-
-[01/11] KVM: arm64: vgic: Make kvm_vgic_inject_irq() take a vcpu pointer
-        https://git.kernel.org/kvmarm/kvmarm/c/9a0a75d3ccee
-[02/11] KVM: arm64: vgic-its: Treat the collection target address as a vcpu_id
-        https://git.kernel.org/kvmarm/kvmarm/c/d455d366c451
-[03/11] KVM: arm64: vgic-v3: Refactor GICv3 SGI generation
-        https://git.kernel.org/kvmarm/kvmarm/c/f3f60a565391
-[04/11] KVM: arm64: vgic-v2: Use cpuid from userspace as vcpu_id
-        https://git.kernel.org/kvmarm/kvmarm/c/4e7728c81a54
-[05/11] KVM: arm64: vgic: Use vcpu_idx for the debug information
-        https://git.kernel.org/kvmarm/kvmarm/c/ac0fe56d46c0
-[06/11] KVM: arm64: Use vcpu_idx for invalidation tracking
-        https://git.kernel.org/kvmarm/kvmarm/c/5f4bd815ec71
-[07/11] KVM: arm64: Simplify kvm_vcpu_get_mpidr_aff()
-        https://git.kernel.org/kvmarm/kvmarm/c/0a2acd38d23b
-[08/11] KVM: arm64: Build MPIDR to vcpu index cache at runtime
-        https://git.kernel.org/kvmarm/kvmarm/c/5544750efd51
-[09/11] KVM: arm64: Fast-track kvm_mpidr_to_vcpu() when mpidr_data is available
-        https://git.kernel.org/kvmarm/kvmarm/c/54a8006d0b49
-[10/11] KVM: arm64: vgic-v3: Optimize affinity-based SGI injection
-        https://git.kernel.org/kvmarm/kvmarm/c/b5daffb120bb
-[11/11] KVM: arm64: Clarify the ordering requirements for vcpu/RD creation
-        https://git.kernel.org/kvmarm/kvmarm/c/f9940416f193
-
---
-Best,
-Oliver
+I tend to strongly disagree with that, though.  We can't just let these
+non-refcounted pages spread everywhere and instead need to fix their
+usage.
