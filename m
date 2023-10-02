@@ -1,229 +1,267 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38081F934
-	for <kvmarm@lists.linux.dev>; Mon,  2 Oct 2023 21:43:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696283010; x=1727819010;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=ImBSKqFocFUuPet6uNRyHRBpn4ZUmgtlBaXfVqyA7Lg=;
-  b=gUgFdGnARPysxvyfvecu3arApiTvRvX3yoPyfvvnBSE+pMIjmkaLr6Bq
-   u4x6XY3RxRNQ+GliPs9695MrIlgmO0pyu1cARopJbtg2x04+JgxY7N+Zm
-   6AP1KS2mZk0OslBg8Q2y8Yi8ftwVgdBfr9zWQDkgc/i/CfTbGCsjTHDv7
-   YphljYB5PwHI35dOaQiDvGdu9r7bsB2/Zg1f0a5Ye5oRk+dMpCLCqHZYj
-   yLUi6/ttXADVsuxoDd5+kAfwRW8hYF2SZP+tVLtPr8Y/nXcDtV2RlBEPy
-   6PbDqX/eapXEP/d+WQ+rtdcdgFSwDbRchp42fDBs95ZDrFuu0XnZOVJ0s
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="469020076"
-X-IronPort-AV: E=Sophos;i="6.03,194,1694761200"; 
-   d="scan'208";a="469020076"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2023 14:43:29 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.03,194,1694761200"; 
-   d="scan'208";a="1644548"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 02 Oct 2023 14:42:48 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Mon, 2 Oct 2023 14:43:28 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Mon, 2 Oct 2023 14:43:27 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Mon, 2 Oct 2023 14:43:27 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.172)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Mon, 2 Oct 2023 14:43:27 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JK4G5zfeB2pIgnky3H1tQLRFo6sakhlVKcawr3n7vmy6ZBXd41mP7Ha6I0KrtOkPJvvcsjAtFxVQB5P4t7ZSoOeTNFeIoATAUSfddXDhSRF25WB1JiZ5BFqA35Jkd0AqTFgxzXV5rzld4mI0Lze5jC4/O+56+oa35eAEHGOyJhXEelxboFmRuClG5LS5yi7IqvHudfUQm4Ac43pWnjzeL1j2SlqzcqKG8O9gh4eodYG8bWjUSj0tnQpIXi+llVPSeBcyZ/e0Dd9zKjF+atdrJPHym2DaT3K8BGxYCTP39715pDehj7HKD6V37V2OMV6Xm/hyCrqW9mSdJUh5MaYygA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ImBSKqFocFUuPet6uNRyHRBpn4ZUmgtlBaXfVqyA7Lg=;
- b=TYGd0c2TCLlqd70MKzPddUVIIpRgqKy5Ryk2zuQyt2jd+ozvGKPUfqe+3WwxMtAnLCTX0Z0FA812r47pWXL73+OxVujQCvETv6N9OJ4+YshOn3ve+aDtLUzcQvuFuJIt5SaUxTmKeNf9Y19BBSmk0l7XF2OgK/rj+jf31cSZh4l2togX4cAAUxOgPUq1gDo8NCX3yMhSMY2aoHtpls13p6O53MKr3hLYY4EbvX5xp7wR0DriiVVwefMHcBvJbUySJqeuMHZoXUVdpqTyvp6/QDDfCf+3nHl185O2NcbscUZB90Sf5l8FoVWLNlDvvKZmYilFJfFXmUzQa7NiHhhI2g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
- by SJ0PR11MB4974.namprd11.prod.outlook.com (2603:10b6:a03:2d6::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.25; Mon, 2 Oct
- 2023 21:43:25 +0000
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::56f1:507b:133e:57cf]) by MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::56f1:507b:133e:57cf%5]) with mapi id 15.20.6838.030; Mon, 2 Oct 2023
- 21:43:25 +0000
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To: "broonie@kernel.org" <broonie@kernel.org>, "Szabolcs.Nagy@arm.com"
-	<Szabolcs.Nagy@arm.com>
-CC: "corbet@lwn.net" <corbet@lwn.net>, "ardb@kernel.org" <ardb@kernel.org>,
-	"maz@kernel.org" <maz@kernel.org>, "shuah@kernel.org" <shuah@kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"keescook@chromium.org" <keescook@chromium.org>, "james.morse@arm.com"
-	<james.morse@arm.com>, "debug@rivosinc.com" <debug@rivosinc.com>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "palmer@dabbelt.com"
-	<palmer@dabbelt.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"hjl.tools@gmail.com" <hjl.tools@gmail.com>, "paul.walmsley@sifive.com"
-	<paul.walmsley@sifive.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "oleg@redhat.com"
-	<oleg@redhat.com>, "arnd@arndb.de" <arnd@arndb.de>, "ebiederm@xmission.com"
-	<ebiederm@xmission.com>, "will@kernel.org" <will@kernel.org>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-fsdevel@vger.kernel.org"
-	<linux-fsdevel@vger.kernel.org>, "linux-kselftest@vger.kernel.org"
-	<linux-kselftest@vger.kernel.org>, "linux-arch@vger.kernel.org"
-	<linux-arch@vger.kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, "linux-riscv@lists.infradead.org"
-	<linux-riscv@lists.infradead.org>
-Subject: Re: [PATCH v4 03/36] arm64/gcs: Document the ABI for Guarded Control
- Stacks
-Thread-Topic: [PATCH v4 03/36] arm64/gcs: Document the ABI for Guarded Control
- Stacks
-Thread-Index: AQHZyXrQTo7DD5VaeE6rWykOJvFzra/iB2IAgAATqwCADkUwAIAAI80AgAYaVoCAABGwgIABEOyAgAAynICAONO3gIAGeNeAgAAf1YA=
-Date: Mon, 2 Oct 2023 21:43:25 +0000
-Message-ID: <add914d6ad943139cd4a8f23fea7167b083a53db.camel@intel.com>
-References: <20230807-arm64-gcs-v4-3-68cfa37f9069@kernel.org>
-	 <ZNOhjrYleGBR6Pbs@arm.com>
-	 <f4cec4b3-c386-4873-aa1d-90528e062f2a@sirena.org.uk>
-	 <ZN+qki9EaZ6f9XNi@arm.com>
-	 <aaea542c-929c-4c9b-8caa-ca67e0eb9c1e@sirena.org.uk>
-	 <ZOTnL1SDJWZjHPUW@arm.com>
-	 <43ec219d-bf20-47b8-a5f8-32bc3b64d487@sirena.org.uk>
-	 <ZOXa98SqwYPwxzNP@arm.com> <ZOYFazB1gYjzDRdA@arm.com>
-	 <ZRWw7aa3C0LlMPTH@arm.com>
-	 <38edb5c3-367e-4ab7-8cb7-aa1a5c0e330c@sirena.org.uk>
-In-Reply-To: <38edb5c3-367e-4ab7-8cb7-aa1a5c0e330c@sirena.org.uk>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.44.4-0ubuntu2 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|SJ0PR11MB4974:EE_
-x-ms-office365-filtering-correlation-id: ec537086-f2d9-450e-89c9-08dbc3909bbe
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 685drLnPBiZtATRAjWsBLJpvEsuc3YULI1pvkx9DbyKx/PJZ2ghdYNS4iTaiapUgKX4eqCkBeCdqh4OvY1gYeRpMm51Qo1b7+bJKouikyVPOP4Pl4J5gF37xk/wzBjlBw5XWZP4mdklZUlzXzx0sVAevUfrIa4TT+Cwn+5pEk/v99Gg7ERxIewXnOOEiN0Gr3OkIZ6gg0jWs7DdnLwIo7Xdfsf8SgbX7ZcepjoYDyZHwI1naMQ5QMpZegWHkn0HnWKZoa0tsfAnxzk2WjX6TAT3QYMz0qwiaAQM4ShdKOkKEjYXpwXqRIa9LQjdIXYnHKwo6zMrc1azfuFffo/6mlrZ4ixC4v6J5wZ9XhOniQGNXwiiKqfzMrEmBIydNXnWLBfMYtcRDlc53Q3yZtyJEG98kjtrRBHqk67Nae5nYn6Mule+vrOLVyNu7x6KQY1FjmURB05Hzt7LoD4laV9iN0tAxc74epKEOdAvAQ+VDJ2fAOruu5vB6UgfiEBK/bpWdlrNOqJDS412tGPgBKOOaSY1QhGzhYCeeGnZdXWklJcN7r5QgF16rI7CfXbrthE0Dp+2OoaFFXGZ2tQ7/2saoiFIqNF7pO6fv6/oC5U73v1YIaUHwA2JZcmBfqz7++7K/
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(396003)(39860400002)(376002)(346002)(230922051799003)(451199024)(64100799003)(1800799009)(186009)(2906002)(83380400001)(7406005)(7416002)(316002)(5660300002)(36756003)(41300700001)(4326008)(8676002)(8936002)(76116006)(66476007)(54906003)(64756008)(91956017)(26005)(86362001)(6506007)(6486002)(66946007)(2616005)(6512007)(71200400001)(38100700002)(38070700005)(122000001)(110136005)(66556008)(82960400001)(66446008)(478600001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?UWNnQUhsMS9mWTExYkJyYjcxei9vZTVZbWpFQWVhTDRiRUFxUS8vSnlXU01n?=
- =?utf-8?B?eFhQVjdHVUUvUCtVUGE2bk9JTnFObFpBeE9rcS8wR2lJS2lKZXBZUnBTcDJW?=
- =?utf-8?B?Q2YxNm9hc0d1UFhkQkU1RHlWOGZwdjFoSE5qU09nVVpLdWtPM0V0NitoNnpk?=
- =?utf-8?B?RjVDOEc0TlZyd0VQUzZRMFlTMXNJK016U0FmZWxVSlF6UHlpdGJFVFZsdXV2?=
- =?utf-8?B?bkRrZVFoRjhwU0E1SEJtTURGNG9KYnkyS3pGdVlnUzAyNnJTZno1T1R2b3V3?=
- =?utf-8?B?Nm13T0puL1Voc25sTGthUWRUa01wQUFqT0tXR21zM1pEWDJUTUZmWlhHeFNO?=
- =?utf-8?B?Wmc1Z3BLb2dUREtQcWVQVENrM2xtbGp2UjRnQjA1bDFWN1hvOGJra2JzdlpW?=
- =?utf-8?B?UUtqVW1rMU90cm9mVEREc3Rwc3RzOFR6YmhoQ042OTZ4cWxiOFVaeTZxUURv?=
- =?utf-8?B?NE1aWjVLdUljZU9hNnVaNVQwWk9FeENvYTVDa0FlTFV0Q0xsK3NYTHBtZjBo?=
- =?utf-8?B?Q0JuMU1pUmIvbGFoWUI1d3lFZEpUU1VqVnE5ZEhtWENXc1R6WVJaZzd1TTVy?=
- =?utf-8?B?RThoeGZBR1dkZ0Fob1NZZS9QOGExNHZzQWIxUy9JcnRDdkt1NS94Nkx4RzhR?=
- =?utf-8?B?UndtdW5CZE1iWllsYWFLRVZlVno2T1JnWUJyVkhlY2V6STdpOTI1MTFwUjBU?=
- =?utf-8?B?ZXQreWxiUTdka054ZUx5M0JNZE1jeEJJc1hiV2dQcFJ0M25VaG9ITXF4VEls?=
- =?utf-8?B?SktETnMwNDZoNXd2YlEzVmdzUzM0Nnlna2tDQmUxZVRqcVV2K01BdzJzMXN3?=
- =?utf-8?B?NlI2M0JUNGd1bFRxcXkvVmZJQ1IzWnkzWkM1UWptYWVyWXlHbjBucGRWRWM3?=
- =?utf-8?B?VzczTmk3VmcvMWZWQ3hSYUpHUjlMY0dsZmxQMHFkZldUMHF1UXNFTUlxNkVz?=
- =?utf-8?B?cWpaOG0vekErcTRJZHo4RzN6T1N6V2NHaVIzaFpDMGFnQlRvalRwclgyL041?=
- =?utf-8?B?TG93a0N0Tm5wZVcvdnl5Nm5ZLzU2dmRSTVpDWDFiUXpONGwzVDlGdS9nQ1NT?=
- =?utf-8?B?R2wxWktlOWhIYTZxZnBQRGxGbVVhNDN1S3Qxenk1OVZaaVpPQVdUUWZwdU80?=
- =?utf-8?B?SnlvRVY1YzVrTWwvc0xRM1gyN2dqMHgrdjZtTzQ4enVxMW9ERlNxdnVtLzJ6?=
- =?utf-8?B?S2JvL3BMb0JyLzFHd0VmbzVobllOT2o2R1c4QkdGc0c3dzdIVDZkQ3lHbk40?=
- =?utf-8?B?VWd5b3Y4Y3Z6V0IvSXIySk1vOFh4ckRDdHg0TzNvNWk3MUR4bStRQ0s5QzRU?=
- =?utf-8?B?TG85S01SVkNjYUJYT01UTXVDM3l5ZVMrRlZrbFM0TUhVMEJzeWk0dytmWmxu?=
- =?utf-8?B?cUZCMVUzMnZTRVlYQzM2OFlWUXAzeWt2ZFRpbGIwaXhoSlVqY3pSMEIxM1B3?=
- =?utf-8?B?Q0Jwcmwvc3RzK3VzVTdPM08zNEI2ZTlMV1J5U243VWlLRU14cW9aS0dBM2NW?=
- =?utf-8?B?QzBoRlo1RzBWM1NNelBHNG44MVdnTkx6SHZzSVRmRHd2QU1UUnoyZ1ZaQXJB?=
- =?utf-8?B?dk5WWFJ6NlZxTWtrdnZiMFFNdURydDlEYUtwNk9qMXVna09WeFVzaFhkM1ZL?=
- =?utf-8?B?Z2ovSExCM1hWOTJXS1FnOEprVHVqbUxyU3lPajhHTkJ6WjFLTXpFb2EwbzBR?=
- =?utf-8?B?YSs0ZFlsQ3BXVytPQkxNYXcrdlRZazltVzlHQVJRTk5jTE03ei9UQ2x4dm50?=
- =?utf-8?B?OHU2REdjdk84OXpDNUUyNlk5MjJ5RXhnbDN4TnhVK0JUN211RHFwQnFWZ28x?=
- =?utf-8?B?NGxIcE5PbTFNWU1SVm1HYUZwTGZ0SXQ5dVNRWkNjNjhRaExNZDJIY0s5ckxH?=
- =?utf-8?B?TUcwMUlKKzVuUmJMYlV4VTNzVUhtMVRRY2I3TXRua1IrZE1qVlkySjRTRWd5?=
- =?utf-8?B?R1k4dXRnZFRNMWtWakxXQ3dOZXJUcHhjTVl3dU8zc3F5c2owMmRWVHVTMkE3?=
- =?utf-8?B?WDlEVHRyMDR5Z3ZjOEx1dktJajZMQzZOOHJMcHlCMnpJVjU4S29GOWR4UEVO?=
- =?utf-8?B?Mk1YdzNXNmRjUDNjM21QeHJXenBUQkNOcEl1M2ZiMUZqZnRia2VzOHB5aFhw?=
- =?utf-8?B?RWRKRndBaDZ2T1NPZUtoZk5sMHNwREExTUh2RWRibWg0NnkvT0Iza3lqSnA2?=
- =?utf-8?B?RVE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <84742A11A380D44391AEBCD9D5719729@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7546C1F183
+	for <kvmarm@lists.linux.dev>; Mon,  2 Oct 2023 22:34:29 +0000 (UTC)
+Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-49970221662so137076e0c.0
+        for <kvmarm@lists.linux.dev>; Mon, 02 Oct 2023 15:34:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696286068; x=1696890868; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0D+gsuQdOwcWnbWTeVpJ3kkjsJtSvYb638sfQAfzu6A=;
+        b=WxOaRBEPvi6nptv+ACVxQ7yDDfcUiKQwefz/LZyoMYpuLjpVdADkAe1Nmcedk6Qv0H
+         CoGk/cg+eQhIu58Y9ZT/hIRF2O0k/T7XXnu52WjYql/z/JgbdaC2VD0CIAQpdTPFN+t5
+         lxgNfTmYdIj6+2+SZcXUsWpj5wNgnysXJb1cyZlAN3/Qw7Q0/mMYhNus4TBO+leKHvx0
+         Ihrpe+S7AyNYkR4MPSOc2nzvRZ8aNvQUpFh9Dk0gbO1c3M09qAbBhrn+/VP4K5M4+R4N
+         9nYvoju0rsvYeYI7gc0rWK/8sRJLr9dPPrwZqx8M2flkoOVevsdGog5KP2NWo532WXWY
+         3Rrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696286068; x=1696890868;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0D+gsuQdOwcWnbWTeVpJ3kkjsJtSvYb638sfQAfzu6A=;
+        b=nCbNtzwzqhdmYMKpzDi3Td0Yjp3uavwPAuOy7vDr395LXsn2JpVpLgc/JFeYph/08K
+         Dq3W6AQ8qXtVMIaycYoRw3l6CEEcGE3WqPUPiaGnaZPmkaTk8lguxmyfqoEW3y6xcUkv
+         Gjj/t90xQf2jGDQpRr1mn412+K1ISpwOevFVOJG6d7qhTFmEtYycEn4wBFvN8ZEbisjk
+         Rq/6jTERu9SpVZ67hI3q1dsmR9Erpn7nYDe6sK2bJhFbh4bSSCmeN8pDkeFhepfqd3iH
+         OrB0JD8/83QFUmY1IPSJI80AJu/Jg6nNHvO2KGD3aKFV2orGRQErLNzT54doQtR+9SEj
+         Apqw==
+X-Gm-Message-State: AOJu0YwhbydDj/0Hq3/cpzfsS25gEhpV138l5vagN5GZj3mU4MpBstoc
+	esoEBqD+xHwQXytUyHzqg+wgrKdsvkxJyQELnThmxA==
+X-Google-Smtp-Source: AGHT+IFpYXxgcGLgPpprP4KPLQoN5qCpiAYZTRtw0p896539ZQWnBJ0XhZh8uY+8KZAQ/hzk0BT8KycGM7WYrJRxXJQ=
+X-Received: by 2002:a05:6122:a20:b0:49c:79f3:27a4 with SMTP id
+ 32-20020a0561220a2000b0049c79f327a4mr12486615vkn.3.1696286068162; Mon, 02 Oct
+ 2023 15:34:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ec537086-f2d9-450e-89c9-08dbc3909bbe
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Oct 2023 21:43:25.8664
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ybuPqNcmvpgSDLl7VBB8I9tjc0+XoW5fhoRFx1wZHzna6ahNcPGq+t5F72ig69v8+z1OnkN2AFrrLX9y/laZEnM8GaTHXop4LmfPXaI4ycE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4974
-X-OriginatorOrg: intel.com
+References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-8-seanjc@google.com>
+ <117db856-9aec-e91c-b1d4-db2b90ae563d@intel.com> <ZQ3AmLO2SYv3DszH@google.com>
+In-Reply-To: <ZQ3AmLO2SYv3DszH@google.com>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Mon, 2 Oct 2023 15:33:52 -0700
+Message-ID: <CAF7b7mrf-y9DNdsreOAedGJueOThnYE=ascFd4=rvW0Z4rhTQg@mail.gmail.com>
+Subject: Re: [RFC PATCH v12 07/33] KVM: Add KVM_EXIT_MEMORY_FAULT exit to
+ report faults to userspace
+To: Sean Christopherson <seanjc@google.com>
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, Xu Yilun <yilun.xu@intel.com>, 
+	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-T24gTW9uLCAyMDIzLTEwLTAyIGF0IDIwOjQ5ICswMTAwLCBNYXJrIEJyb3duIHdyb3RlOg0KPiBP
-biBUaHUsIFNlcCAyOCwgMjAyMyBhdCAwNTo1OToyNVBNICswMTAwLCBTemFib2xjcyBOYWd5IHdy
-b3RlOg0KPiA+IFRoZSAwOC8yMy8yMDIzIDE0OjExLCBDYXRhbGluIE1hcmluYXMgd3JvdGU6DQo+
-IA0KPiA+ID4gPiBhbmQgdGhlcmUgaXMgdXNlciBjb2RlIGRvaW5nIHJhdyBjbG9uZSB0aHJlYWRz
-IChzdWNoIHRocmVhZHMNCj4gPiA+ID4gYXJlDQo+ID4gPiA+IHRlY2huaWNhbGx5IG5vdCBhbGxv
-d2VkIHRvIGNhbGwgaW50byBsaWJjKSBpdCdzIG5vdCBpbW1lZGlhdGVseQ0KPiA+ID4gPiBjbGVh
-ciB0byBtZSBpZiBoYXZpbmcgZ2NzIGluIHRob3NlIHRocmVhZHMgaXMgYmV0dGVyIG9yIHdvcnNl
-Lg0KPiANCj4gPiBpIHRoaW5rIHJhdyBjbG9uZSAvIGNsb25lMyB1c2VycyBtYXkgYmUgcmVsZXZh
-bnQgc28gd2UgbmVlZCBhDQo+ID4gc29sdXRpb24gc3VjaCB0aGF0IHRoZXkgZG9uJ3QgZmFpbCB3
-aGVuIGdjcyBhcmdzIGFyZSBtaXNzaW5nLg0KPiANCj4gQXJlIHdlIHN1cmUgYWJvdXQgdGhhdD/C
-oCBPbGQgYmluYXJpZXMgc2hvdWxkbid0IGJlIGFmZmVjdGVkIHNpbmNlDQo+IHRoZXkNCj4gd29u
-J3QgdHVybiBHQ1Mgc28gd2UncmUganVzdCB0YWxraW5nIGFib3V0IG5ldyBiaW5hcmllcyBoZXJl
-IC0gYXJlDQo+IHRoZXJlDQo+IHJlYWxseSBzbyBtYW55IG9mIHRoZW0gdGhhdCB3ZSB3b24ndCBi
-ZSBhYmxlIHRvIGdldCB0aGVtIGFsbA0KPiBjb252ZXJ0ZWQNCj4gb3ZlciB0byBjbG9uZTMoKSBh
-bmQgR0NTIGluIHRoZSB0aW1lc2NhbGVzIHdlJ3JlIHRhbGtpbmcgYWJvdXQgZm9yDQo+IEdDUw0K
-PiBkZXBsb3ltZW50P8KgIEkgb2J2aW91c2x5IGRvbid0IHBhcnRpY3VsYXJseSBtaW5kIGhhdmlu
-ZyB0aGUgZGVmYXVsdA0KPiBzaXplDQo+IGxvZ2ljIGJ1dCBpZiB3ZSBhbGxvdyBjbG9uZSgpIHRo
-ZW4gdGhhdCdzIGtlZXBpbmcgdGhlIGV4aXN0aW5nDQo+IGJlaGF2aW91cg0KPiBhbmQgbGF5ZXJp
-bmcgYWxsb2NhdGlvbiB2aWEgY2xvbmUzKCkgb24gdG9wIG9mIGl0IHdoaWNoIENhdGFsaW4NCj4g
-ZGlkbid0DQo+IHdhbnQuwqANCg0KT24gdGhlIHg4NiBzaWRlLCB0aGVyZSBoYXZlIGJlZW4gYSBs
-b3Qgb2YgYmluYXJpZXMgZ2VuZXJhdGVkIHRoYXQgaGF2ZQ0KYmVlbiBibGluZGx5IG1hcmtlZCBh
-cyBzdXBwb3J0aW5nIHNoYWRvdyBzdGFjay4gU28gZXZlbiBpZiB0aGV5IGFyZSBub3QNCm9sZCwg
-dGhlcmUgbWF5IHN0aWxsIGJlIG1pc21hcmtlZCBvbmVzIHVzaW5nIGNsb25lKCkuDQoNCkluIGdl
-bmVyYWwgdGhlcmUgYXJlIGEgbG90IG9mIHRyYWRlb2ZmcyB3aXRoIHNoYWRvdyBzdGFjayBiZXR3
-ZWVuDQpzZWN1cml0eSwgY29tcGF0aWJpbGl0eSBhbmQgcGVyZm9ybWFuY2UuIFN6YWJvbGNzIGhh
-ZCBwcmV2aW91c2x5DQpkaXNjdXNzZWQgc29tZSBpZGVhcyBhcm91bmQgYWxsIHRocmVlOg0KIC0g
-Y29tcGF0aWJpbGl0eSAoYXV0b21hdGljIHNpZ2FsdHN0YWNrKCkpDQogLSBwZXJmb3JtYW5jZS91
-dGlsaXR5IChjcmVhdGluZyBhIG5ldyBsaWJjIEFQSSBmb3IgbWFrZWNvbnRleHQoKSkNCiAtIHNl
-Y3VyaXR5ICh0b2tlbiBzY2hlbWVzIHRvIGd1YXJhbnRlZSBvbmx5IG9uZSB1c2VyIG9mIGEgc2hh
-ZG93wqANCiAgICAgICAgICAgICBzdGFja8KgYXQgYSB0aW1lKQ0KDQpPbiB0aGUgeDg2IGtlcm5l
-bCBzaWRlLCB3ZSBoYWQgb3VyIGhhbmRzIHRpZWQgYSBiaXQgYnkgdGhlIGV4aXN0aW5nDQp1c2Vy
-c3BhY2UsIGFuZCBraW5kIG9mIGVuZGVkIHVwIHdpdGggYSBtaXguIEkgaW1hZ2luZWQgdGhhdCB3
-ZSBtaWdodA0Kc2VlIGRlbWFuZCBhbG9uZyBvbmUgb2YgdGhvc2UgYXhlcyBhZnRlciBzb21lIHJl
-YWwgd29ybGQgdXNlLiBBdCB3aGljaA0KcG9pbnQgd2UgY291bGQgYWRkIHNvbWUgb3B0LWluIEFC
-SSB0d2Vha3MgdG8gaGVscC4NCg0KSWYgQVJNIGlzIHRoaW5raW5nIG9mIGRvaW5nIHRoaW5ncyBk
-aWZmZXJlbnRseSB0aGFuIHg4NiwgeW91IG1pZ2h0DQp0aGluayBhYm91dCBob3cgeW91IHdlaWdo
-dCB0aG9zZSB0cmFkZW9mZnMuIExpa2UsIGl0IG1pZ2h0IGJlIHNpbGx5IHRvDQp3b3JyeSBhYm91
-dCBjbG9uZSgpIHN1cHBvcnQgaWYgc29tZXRoaW5nIGVsc2UgZW5kcyB1cCBicmVha2luZw0KY29t
-cGF0aWJpbGl0eSBtYWpvcmx5LiBCdXQsIGl0IG1pZ2h0IGJlIHdvcnRod2hpbGUgaXQgeW91IGVu
-ZCB1cCBnb2luZw0KdG8gdGhlIHByb3Bvc2VkIGV4dHJlbWVzIGFyb3VuZCBzaWduYWwgYWx0IHN0
-YWNrcywgdG8gbWF4aW1pemUNCmNvbXBhdGliaWxpdHkNCg0KQWxzbyB0aGVuIG1heWJlIHg4NiBj
-b3VsZCBjb3B5IHRoZSBBUk0gQUJJIHNvbWUgZGF5LCBpZiBpdCBlbmRzIHVwDQpjaGFzaW5nIHRo
-ZSB0cmFkZW9mZiBwZW9wbGUgcHJlZmVyLiBJdCBwcm9iYWJseSBnb2VzIHdpdGhvdXQgc2F5aW5n
-DQp0aGF0IHRoZSBjbG9zZXIgdGhlc2UgZmVhdHVyZXMgYmVoYXZlIGZyb20gdGhlIGFwcCBkZXZl
-bG9wZXINCnBlcnNwZWN0aXZlLCB0aGUgYmV0dGVyLiBTbyBhIGRpZmZlcmVudCBBQkkgdGhhbiB4
-ODYgdGhhdCBhbHNvIHRhcmdldHMNCmEgbWl4IHdvdWxkIGJlIGEgYml0IHVuZm9ydHVuYXRlLiAo
-bm90IHRoZSBlbmQgb2YgdGhlIHdvcmxkIHRob3VnaCkNCg0KQW55d2F5LCBqdXN0IHdhbnRlZCB0
-byBzaGFyZSBzb21lIHBlcnNwZWN0aXZlIHRoZXJlLiBTb3JyeSBmb3Igam9pbmluZw0KdGhpcyB0
-aHJlYWQgc28gbGF0ZS4NCg0K
+On Fri, Sep 22, 2023 at 9:28=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> > So when exit reason is KVM_EXIT_MEMORY_FAULT, how can we tell which fie=
+ld in
+> > the first union is valid?
+>
+> /facepalm
+>
+> At one point, I believe we had discussed a second exit reason field?  But=
+ yeah,
+> as is, there's no way for userspace to glean anything useful from the fir=
+st union.
+
+Oh, was this an objective? When I was pushing for the second union
+this I was just trying to make sure all the efault annotations
+wouldn't clobber *other* exits. But yeah, I don't/didn't see a
+meaningful way to have valid information in both structs.
+
+> The more I think about this, the more I think it's a fool's errand.  Even=
+ if KVM
+> provides the exit_reason history, userspace can't act on the previous, un=
+fulfilled
+> exit without *knowing* that it's safe/correct to process the previous exi=
+t.  I
+> don't see how that's remotely possible.
+>
+> Practically speaking, there is one known instance of this in KVM, and it'=
+s a
+> rather riduclous edge case that has existed "forever".  I'm very strongly=
+ inclined
+> to do nothing special, and simply treat clobbering an exit that userspace=
+ actually
+> cares about like any other KVM bug.
+>
+> > When exit reason is not KVM_EXIT_MEMORY_FAULT, how can we know the info=
+ in
+> > the second union run.memory is valid without a run.memory.valid field?
+>
+> Anish's series adds a flag in kvm_run.flags to track whether or not memor=
+y_fault
+> has been filled.  The idea is that KVM would clear the flag early in KVM_=
+RUN, and
+> then set the flag when memory_fault is first filled.
+>
+>         /* KVM_CAP_MEMORY_FAULT_INFO flag for kvm_run.flags */
+>         #define KVM_RUN_MEMORY_FAULT_FILLED (1 << 8)
+>
+> I didn't propose that flag here because clobbering memory_fault from the =
+page
+> fault path would be a flagrant KVM bug.
+>
+> Honestly, I'm becoming more and more skeptical that separating memory_fau=
+lt is
+> worthwhile, or even desirable.  Similar to memory_fault clobbering someth=
+ing else,
+> userspace can only take action if memory_fault is clobbered if userspace =
+somehow
+> knows that it's safe/correct to do so.
+>
+> Even if KVM exits "immediately" after initially filling memory_fault, the=
+ fact
+> that KVM is exiting for a different reason (or a different memory fault) =
+means
+> that KVM did *something* between filling memory_fault and actually exitin=
+g.  And
+> it's completely impossible for usersepace to know what that "something" w=
+as.
+
+Are you describing a scenario in which memory_fault is (initially)
+filled, then something else happens to fill memory_fault (thus
+clobbering it), then KVM_RUN exits? I'm confused by the tension
+between the "KVM exits 'immediately'" and "KVM did *something* between
+filling memory_fault and actually existing" statements here.
+
+> E.g. in the splat from selftests[1], KVM reacts to a failure during Real =
+Mode
+> event injection by synthesizing a triple fault
+>
+>         ret =3D emulate_int_real(ctxt, irq);
+>
+>         if (ret !=3D X86EMUL_CONTINUE) {
+>                 kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
+>
+> There are multiple KVM bugs at play: read_emulate() and write_emulate() i=
+ncorrectly
+> assume *all* failures should be treated like MMIO, and conversely ->read_=
+std() and
+> ->write_std() don't handle *any* failures as MMIO.
+>
+> Circling back to my "capturing the history is pointless" assertion, by th=
+e time
+> userspace gets an exit, the vCPU is already in shutdown, and KVM has clob=
+bered
+> memory_fault something like five times.  There is zero chance userspace c=
+an do
+> anything but shed a tear for the VM and move on.
+>
+> The whole "let's annotate all memory faults" idea came from my desire to =
+push KVM
+> towards a future where all -EFAULT exits are annotated[2].  I still think=
+ we should
+> point KVM in that general direction, i.e. implement something that _can_ =
+provide
+> 100% "coverage" in the future, even though we don't expect to get there a=
+nytime soon.
+>
+> I bring that up because neither private memory nor userfault-on-missing n=
+eeds to
+> annotate anything other than -EFAULT during guest page faults.  I.e. all =
+of this
+> paranoia about clobbering memory_fault isn't actually buying us anything =
+other
+> than noise and complexity.  The cases we need to work _today_ are perfect=
+ly fine,
+> and _if_ some future use cases needs all/more paths to be 100% accurate, =
+then the
+> right thing to do is to make whatever changes are necessary for KVM to be=
+ 100%
+> accurate.
+>
+> In other words, trying to gracefully handle memory_fault clobbering is po=
+intless.
+> KVM either needs to guarantee there's no clobbering (guest page fault pat=
+hs) or
+> treat the annotation as best effort and informational-only (everything el=
+se at
+> this time).  Future features may grow the set of paths that needs strong =
+guarantees,
+> but that just means fixing more paths and treating any violation of the c=
+ontract
+> like any other KVM bug.
+
+Ok, so if we're restricting the exit to just the places it's totally
+accurate (page-fault paths) then, IIUC,
+
+- There's no reason to attach it to EFAULT, ie it becomes a "normal" exit
+- I should go drop the patches annotating kvm_vcpu_read/write_page
+from my series
+- The helper function [a] for filling the memory_fault field
+(downgraded back into the current union) can drop the "has the field
+already been filled?" check/WARN.
+- [KVM_CAP_USERFAULT_ON_MISSING] The memslot flag check [b] needs to
+be moved back from __gfn_to_pfn_memslot() into
+user_mem_abort()/kvm_handle_error_pfn() since the slot flag-triggered
+fast-gup failures *have* to result in the memory fault exits, and we
+only want to do those in the two SLAT-failure paths (for now).
+
+[a] https://lore.kernel.org/all/20230908222905.1321305-5-amoorthy@google.co=
+m/
+[b] https://lore.kernel.org/all/20230908222905.1321305-11-amoorthy@google.c=
+om/
+
+> And if we stop being unnecessarily paranoid, KVM_RUN_MEMORY_FAULT_FILLED =
+can also
+> go away.  The flag came about in part because *unconditionally* sanitizin=
+g
+> kvm_run.exit_reason at the start of KVM_RUN would break KVM's ABI, as use=
+rspace
+> may rely on the exit_reason being preserved when calling back into KVM to=
+ complete
+> userspace I/O (or MMIO)[3].  But the goal is purely to avoid exiting with=
+ stale
+> memory_fault information, not to sanitize every other existing exit_reaso=
+n, and
+> that can be achieved by simply making the reset conditional.
+>
+> ...
+>
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 96fc609459e3..d78e97b527e5 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -4450,6 +4450,16 @@ static long kvm_vcpu_ioctl(struct file *filp,
+>                                 synchronize_rcu();
+>                         put_pid(oldpid);
+>                 }
+> +
+> +               /*
+> +                * Reset the exit reason if the previous userspace exit w=
+as due
+> +                * to a memory fault.  Not all -EFAULT exits are annotate=
+d, and
+> +                * so leaving exit_reason set to KVM_EXIT_MEMORY_FAULT co=
+uld
+> +                * result in feeding userspace stale information.
+> +                */
+> +               if (vcpu->run->exit_reason =3D=3D KVM_EXIT_MEMORY_FAULT)
+> +                       vcpu->run->exit_reason =3D KVM_EXIT_UNKNOWN
+> +
+>                 r =3D kvm_arch_vcpu_ioctl_run(vcpu);
+
+Under my reading of the earlier block I'm not sure why we need to keep
+this around. The original idea behind a canary of this type was to
+avoid stomping on non-memory-fault exits in cases where something
+caused an (ignored) annotated memory fault before the exit could be
+completed. But if the annotations are going to be restricted in
+general to just the page fault paths, then we can just eliminate the
+sentinel check (and just this block) entirely, right?
