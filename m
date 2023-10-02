@@ -1,329 +1,336 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFCB58835;
-	Mon,  2 Oct 2023 12:43:30 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 974C7C15;
-	Mon,  2 Oct 2023 05:44:02 -0700 (PDT)
-Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 7A63F3F59C;
-	Mon,  2 Oct 2023 05:43:20 -0700 (PDT)
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-To: linux-coco@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: catalin.marinas@arm.com,
-	will@kernel.org,
-	maz@kernel.org,
-	steven.price@arm.com,
-	alexandru.elisei@arm.com,
-	joey.gouly@arm.com,
-	james.morse@arm.com,
-	Jonathan.Cameron@Huawei.com,
-	dgilbert@redhat.com,
-	jpb@kernel.org,
-	oliver.upton@linux.dev,
-	zhi.wang.linux@gmail.com,
-	yuzenghui@huawei.com,
-	salil.mehta@huawei.com,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Joey Gouly <Joey.Gouly@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Quentin Perret <qperret@google.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Thomas Huth <thuth@redhat.com>
-Subject: Re: [RFC] Support for Arm CCA VMs on Linux
-Date: Mon,  2 Oct 2023 13:43:11 +0100
-Message-Id: <20231002124311.204614-1-suzuki.poulose@arm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230127112248.136810-1-suzuki.poulose@arm.com>
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E31A2106
+	for <kvmarm@lists.linux.dev>; Mon,  2 Oct 2023 13:37:26 +0000 (UTC)
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3928XrSH024037;
+	Mon, 2 Oct 2023 13:37:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2023-03-30;
+ bh=iv7ko6NMEiTionyg9Ud7w9/9XIbvRqhjD5pgK2OXykQ=;
+ b=2IpkRc4UsLrqleKmmefLxu8pJTUFKgXtRPEP2k4PkL1Zp4ya71sV9lLcUfF42TD/8tMJ
+ 1NZQfZfcVzB87x8vDWwaN7d7TU/OOqPZFUtVr2pfgyds8f4mi0PuyMc0AmA3i3YtsQV1
+ uOa/r2Em+m6U+JO775H/a4FbTvW8foPbI/YqUUPzaXgeAP9tms5BKK0enmJrFKgHyxIq
+ DZjDFrtbEQpYCUFUh1JpwA/RXxpQyyr13maiBH8Dupm4+dvuHsJwO+LNyVsLoBpZOxAW
+ fpbJYRKDNwZUgZzJ3mNpqtHaaJA5LSdAK06Y5WNgm54y4oHnrnHekwc4anMYgJrDCuzC ew== 
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tebjbte6a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 02 Oct 2023 13:37:05 +0000
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 392DBPKH002846;
+	Mon, 2 Oct 2023 13:37:03 GMT
+Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2173.outbound.protection.outlook.com [104.47.56.173])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3tea44jbpa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 02 Oct 2023 13:37:03 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lmQNyFVcHZJMhbFyWHN+zpDgYPA1W9Xc2YxMrIGhsaAfqQC+ipaLCvQwjpjtOyqXKMgwe2G4ZSF4AiQjE8HfuuqYmD6+PNUrGvqkMo0qG5YlxXK4TNzXAq8rDzcdgXaywTna3BqfpbpqpQc2vrf2KpuCpK2aP+9KpDsgSMm5cqkee+vJdzHTPNIQ/mQCYlhN41IEUMTAdtg+gSGpxAXGyKBtQXT0+T5nqDAs7Ao2SUwJe+hKaEwaPduLaJQnacRGUWqZuEOy7z2p7vtWnpOq5i7XlmeMBvw1e4GwgArNEJgZzmd58m3iClbPxmpmwVuLbTiUvD82DQvoggQ+lAXhSw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iv7ko6NMEiTionyg9Ud7w9/9XIbvRqhjD5pgK2OXykQ=;
+ b=HIAu3NrR0x36WRjFwGhq6jDhpyWzQK7fh3DxGKXyI5uS2VHh6bYfR5P5oqcrKsUDQnvOytVJV78QRXuwn43u/um9ShVBKr2hpumt9MJpHdnkojFv5WbbSDb7RIjD1hO/VAN2V3BfaMgcbw8wmz3LpZ4kVWK31pgZCx6F2VxrcUQDO9NL9m45N4hf81K1Y70iIWdXjiryUhZLAH+Di7M00J6EzUXFKeibduaHnwC7elH3eS6WHMVv8qHNMsT+TzGZIMCSkpujepwSwLpXWGlJlAkYrHuhpsrCsmdFXhT/EhaY8pR19tmSbW0K9zopj6mVzy8vbJrnTRTDsQvNSPeSpg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iv7ko6NMEiTionyg9Ud7w9/9XIbvRqhjD5pgK2OXykQ=;
+ b=FvWzD1W1g6/UcZkGxikWqetye7gQgbpudY0777AI0k4MwUvVaqAskyZKQAcmXi/9SHjDUJe7xoIy47Wd/INFZX7OqpPIDfawfH+Kj6HR2tSrutB+HlDk9a/N8vVQYC1VgJAQM7mLxU+KUu39ROHWo4TydHGkOEuZ0Cq+luG01pU=
+Received: from PH0PR10MB5433.namprd10.prod.outlook.com (2603:10b6:510:e0::9)
+ by CH2PR10MB4152.namprd10.prod.outlook.com (2603:10b6:610:79::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.28; Mon, 2 Oct
+ 2023 13:36:59 +0000
+Received: from PH0PR10MB5433.namprd10.prod.outlook.com
+ ([fe80::9e2f:88c3:ca28:45a3]) by PH0PR10MB5433.namprd10.prod.outlook.com
+ ([fe80::9e2f:88c3:ca28:45a3%3]) with mapi id 15.20.6838.024; Mon, 2 Oct 2023
+ 13:36:59 +0000
+Message-ID: <52f36393-c764-4b9a-b153-1d34126739b2@oracle.com>
+Date: Mon, 2 Oct 2023 13:36:50 +0000
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/2] arm64/kvm: Fine grain _EL2 system registers list
+ that affect nested virtualization
+Content-Language: en-US
+To: Eric Auger <eauger@redhat.com>, Catalin Marinas
+ <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose
+ <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvmarm@lists.linux.dev
+References: <20230925162057.27548-1-miguel.luis@oracle.com>
+ <20230925162057.27548-3-miguel.luis@oracle.com>
+ <c01525e8-0906-6990-19b9-df374fdb087b@redhat.com>
+From: Miguel Luis <miguel.luis@oracle.com>
+In-Reply-To: <c01525e8-0906-6990-19b9-df374fdb087b@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM9P193CA0026.EURP193.PROD.OUTLOOK.COM
+ (2603:10a6:20b:21e::31) To PH0PR10MB5433.namprd10.prod.outlook.com
+ (2603:10b6:510:e0::9)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR10MB5433:EE_|CH2PR10MB4152:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6051eb13-d2ef-459c-d5fd-08dbc34ca712
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 
+	NL74C5360TizH45Jr9TVJDdhF/0r3GFayyFZ6bXdgy1xDCnnlEH0tFGOHNRGdgfNdcpqf3ECT7KR5HjcjMDTBgOxpuKtN618LCV8hHVOc32UKMasiEwqvQvo6CfJ8GOvnEQ+8VJg8QmH5JMh1rc9mVLrFn1LaKNoK0KgQvTFlasUq8QRhk/K3rBwMLMAXsfcK58hAMiXwkcUnw5K2SP7dOfFGoZRv6p+IKICcKyzqBQr3woix9axJNhZKRd2qQVWeC61pBCEI1056CZfvC2s+j5e547Uu+wr/PdGQhVGyAMQnIqgCRucCpPgPVcS8f/rXB+zvwyZ5SIc8OCjMdjNo73rOvJBcjVR7HMP/vZV9b3K284up6Oftfgm7dTSO/IeQgwkFwWWI/9HVSDLQbU+JC0rM4Fl/sMgG+PWyoZQJDgg5eZ3cAVVquPK+5W3tiYi/iEmJdgmPrKrvBRlQtZ0q1d8HnnMUlHv0E/sxjxFDIosdmeSJr3KorUAcD6+cu2ereb7JJzLSbIA+rS9wNasZOT9pwPg4gbMiPML4u/wyKB5uW834MzJXpqt9a65apfY6uGC5/bHc1eo4EdGqLXoFMP0Fcau9Gd9yoIxhAxgZWNfLeJoC4zxSNXNJ04+/FHmdq3LmNozp94mVxeOjp/KsQTvPYfKuM3TKEj27t9HY8A=
+X-Forefront-Antispam-Report: 
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB5433.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(366004)(396003)(376002)(39860400002)(230922051799003)(186009)(451199024)(64100799003)(1800799009)(31686004)(66899024)(2906002)(6486002)(6506007)(53546011)(6666004)(36756003)(86362001)(921005)(38100700002)(41300700001)(478600001)(8676002)(26005)(2616005)(83380400001)(6512007)(31696002)(110136005)(8936002)(44832011)(5660300002)(66946007)(316002)(66556008)(7416002)(66476007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: 
+	=?utf-8?B?UWIxeU8zT0t5U2J4Qmp5dk9PVmx4SDR3OFhMdW1QTVFMb3JJN0puNjlXL2s4?=
+ =?utf-8?B?OFh1QklYOXZkaU9UUW1abDNxRVVQcFBidGF1QWpkbFp4NGkyMmdVM2sxTERN?=
+ =?utf-8?B?S3oxNjhhVTZTaVRSNElIVU82RHR3czQ0dUJRYXlIRkg1QlIyQXJtYlVaT25R?=
+ =?utf-8?B?OFVXY3BsVWhxczRXbGtWdVlZbVdwMG1zVlZ5QTRkVlpRNEVqTzBiRk45MnlT?=
+ =?utf-8?B?RFJabVQxTlZOdTh3NUZxTTV5TFZtWmNVbld0QlFVZXIzb3JhaEl3SzB5VWZo?=
+ =?utf-8?B?cHZQOEhFRjhSMkxwYUwwREd3UmhzdGI1bnF4SmJSdG1pQU16TkNLbHdZZjVM?=
+ =?utf-8?B?MjFuUTd2QndHNzlOSlFiZWI3dVAvdUhLQUkxNFVzd1ovMkJTNXZ4MlZUdkN4?=
+ =?utf-8?B?dyt2NVI1SFFxUWhsSVlUeTNVODh3V0Y5S1gxZHh3ZU8zKy83STFlSzVuZmMz?=
+ =?utf-8?B?L2VtMzFlN2t0aHhtd2dCYVZoTU56cUtCQWRtTmtSaUNVVVVvUks1akx5ZHgy?=
+ =?utf-8?B?NDFvZDZuRWkxZTJJU2VPcXoxcTRPM25aSVM1SlZCMk5XQ1BXdTlyQk9hdHRY?=
+ =?utf-8?B?Ri9HcldyVmhWVEZudTFKLzhDemllOWVodDVmS2owR0todFhEeFZVZXNpeE5i?=
+ =?utf-8?B?c3h4Tml1TnNXTHFEcVpFdHJQNkZxaWZqQWMySE5qd2VOcXdIbllDMnRscWxa?=
+ =?utf-8?B?NDBpSm8zbG5EaWVORUhtQjVEM1hudER2WjdmVUhrcU5Ta2lMMHZEUGFSWk9y?=
+ =?utf-8?B?blVJSTc2eXlPYlNMWU9uUlJiT1BtKzdmNWJVVnAzNDNLbXRYTFd5R29qbGR3?=
+ =?utf-8?B?NDA4UnlaS1h1aHIrUS9YNnNuQ2o2RWNpMmM3K0lOVVlTUjMyeldyc0dWMm55?=
+ =?utf-8?B?VWFqSHNCRThiVUFaVGFsVEhldXI2SW5GK2pvR05pZ2ZHRTV4RnlkQ2dzL1dI?=
+ =?utf-8?B?RzJuYWlUR1FPVXNUVHVrREdoZmY2dTZxNFJ5SzNVYnlvRHRHVmZ5SEZmTGxt?=
+ =?utf-8?B?NW9kUjBFME93RVV3SDVuRFk2WkxrNXhSS0tMeEM3UnN5VXZhcGpxRjlkR3FH?=
+ =?utf-8?B?WjZFZ3VNMm01Y1JJNDlSM3hQOUdveWp2b200QkpaQUc4V3NqNDFwMjVQWk4r?=
+ =?utf-8?B?b29DS20yd0tKSm40dUx4OVMxRVVSVDN2UTVSQ0Q1RitGY1doeEZXMjJLMHNK?=
+ =?utf-8?B?REhWTnBhM1AwMGIxRm5Qc3dmOUhaT2xoc1V1TlJ2cDNmV2pTSXlLZWcwRnRN?=
+ =?utf-8?B?T2l0Z3piTExuVmdyVUlOYWY4MThPNFJwUDRaeG1ISCtZd1VYZG1BL0svVkRY?=
+ =?utf-8?B?ZGtKUjF4MDQ3ZEJUQjVIbGlYMzlMMHdLaXdhcno1T204aVhoK2hYQjFZS2dN?=
+ =?utf-8?B?emlQMUtVem15SHpjWlg0YThHNGZxUnRCdmJoSkMzdGkrVXVlSUc3Q2tFRHpY?=
+ =?utf-8?B?dC9EUERCNVNCZi9zdWNxN3VNT0tqNTlmelIzS2psRU9IZHNkdkJQRVZOQWQx?=
+ =?utf-8?B?R0FWQkNxUlhEQyt6c2Nlcm84dmdVbld1ZUY4YmcwWS8rUGQrbmN0WjRhb0hH?=
+ =?utf-8?B?VTFNWGljUG4vQXJPVk9UcC9MTHZoZXprbnBzckRUZGw3Ujh1QW1Ra3RGMHo2?=
+ =?utf-8?B?djZUeEJXQnBjbmVBdS9XT1ozVENPTVRWazZna0c5N3IwQmlneUNUU2JwZUtP?=
+ =?utf-8?B?S2c0SWVjRldKeWoxTkJmdElTZUh0cnR2Q1hPY3NLcHRRY0JPK2d2QnVLbDFk?=
+ =?utf-8?B?eHpzdVp5aDNmUVU0K01XQmR2amhQSmRqT1ZRcmJJNjJrb0ZONmpob2NVMXl6?=
+ =?utf-8?B?aFlZaHJCODNnQlVuOXJkYlJOcjkyN2pSeTJRSlErVW4zd2hLYlJQMGF1Y2pQ?=
+ =?utf-8?B?MHpHaVhJYjlDaDIzRzUva1VUSUhRc2hRMis5dVlGYlJyQjdzZ3hNQy83cGto?=
+ =?utf-8?B?dzljK0dOUWZDNTREVEtJb1dOQXVHVjBySnBzb0lyMHh5ZHB2S2d3SW1QWUs3?=
+ =?utf-8?B?SVV3VnZtR0dDQjlGQkNBc1hFaDRKUkI5bUhTWmRSaGlzQnE3N3NZZXZwUFJV?=
+ =?utf-8?B?R2lMZ2Q2NFJKajFraUloQ3VKM1ZnbEtMck9hZ1RvZCtBZDhMS1daa25CVS8v?=
+ =?utf-8?Q?zK34xAnm40yjFglx+Bxdrkrkt?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	=?utf-8?B?NERoTDM0UXQycENGYVZSZTBtbWI0YVVXTHNrb3hFNmEySjQrT09TbU02UWNr?=
+ =?utf-8?B?OFF0QXloazhkZGhmSnFsa2hBTnBNYkMyazhkZW9mZmh1SVFHOVRUcko4OTJX?=
+ =?utf-8?B?OGY1dlBwTHA3cE9qc3FLdnVjcDFrYjFEMHRnNWZadURQTm12TnZETFczeVJN?=
+ =?utf-8?B?U0xpS280Q0xqVkMwS2h2Ly9WVFNWSFQyY0RXYXZIVnVHQlpzK2lIQVF5bi9z?=
+ =?utf-8?B?aFRXRHp0TExvZUg0ZDlGdzlmL1g2MVk5N2lwc0VsV3NlcVZweUFGdjdLNktG?=
+ =?utf-8?B?dHZ0WUtIUzJOa2w5SDBNbDJydWNiOWFnKzFaZis4cE9jQndRNEhqT2taTUh6?=
+ =?utf-8?B?SENaZkljK0EzT1hOU0p4UnlRMHpFVzFwR0pCUWdnYXpKZGNoMzJaSkNON0xX?=
+ =?utf-8?B?OTh1WnZ6MmxTQllxdTRLc0tsSXluT0V6NmpZV3F1NXZ5UURXRW8wWWJtcHc5?=
+ =?utf-8?B?amVWdjlpZ2RUcUVvT3RJRWJkSTJnWXcxR1lHbzdVSy9XakhFVlFvMy9XbklO?=
+ =?utf-8?B?QVk2YVhDaGdwTW5paHNzL3Zlam53aEs3ZWFibkhmZ1hkeW9xdnVBdzhvM3FN?=
+ =?utf-8?B?SVkzQlo0Tkd6Uys4TmxZRGhCMk9iaGkxRWFFekNwanUwWTBtOW1yelAyVzJr?=
+ =?utf-8?B?WWdYUWRrOGpRK3l1clViM0ZERUVBb2dJYlVReTBLbW1SK0ZoT1MxWWJNRTJP?=
+ =?utf-8?B?SXRDZHpvSE82TUkvRy9JR1plc1BjYkFUcVlnWHN5Nldzcmo1SVp3b25KRTQ2?=
+ =?utf-8?B?bEpXNHg0NHcxNlp3Z3lkbjBLSGpHM3l3THBHUUIzSlhRdFhJMmhUeW9NRWR4?=
+ =?utf-8?B?c09BV1BaeFFleGhRcm55WFNDZS9VV05Mb0hUZ3cwVUhTNVdXUEpnTW1lU1dP?=
+ =?utf-8?B?UXgzRW1yYktja09XblhBRzdyZjhGdlZkVWVZS3JZK2o1Y0NnOStQMzRjYUwz?=
+ =?utf-8?B?eWt3SmE5b2lsZ2ozNlJ4ZFMvd1A3cVFGQzF0VWVJYzlCRmVJempYaXJEanZK?=
+ =?utf-8?B?SVJaWTh5ei91UXd6RkdmYUNKWEM2M1QreXQ3MUZxWEZhNWswSXlLaWhNYnZ3?=
+ =?utf-8?B?ejZ6ZjQ2Y3hieFFSdDJNT1JGR1ViakJlU28zekFLK081U2FlbWppOThSOVJt?=
+ =?utf-8?B?SFNXSW1EZHlPRlpEQ0FYUmpteU5kOFlDV0MzMkRFK3pIRnIzMGZwQlJUM1lk?=
+ =?utf-8?B?TUNMS1U0bEtWMVE5d1VJbGZkNXNDZjV3Qm9WN04xRmpqaWxPaGJnQ1pvMnFR?=
+ =?utf-8?B?RGRLRjI0WjhiSjJtMDFIOFh0RTFDbXpuSkF4a0lIZUFzM0J0aWtqUWNrbGxR?=
+ =?utf-8?Q?KaKbFa/BtFcp+2IJtv0p/cuvqD2Jx9ceX4?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6051eb13-d2ef-459c-d5fd-08dbc34ca712
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB5433.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Oct 2023 13:36:59.3555
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: udJuVbRWz0h3jjX8CYwjAlQq+OYO/yMiXWMHYkqWVJ7yE8dx4j+E4a/Pw4rE/6df8pYOydc/+Chrx9gB8K7ByA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR10MB4152
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-02_07,2023-10-02_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999 mlxscore=0
+ spamscore=0 malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
+ definitions=main-2310020102
+X-Proofpoint-GUID: KZ47_TcIbtelGwuNASywgcfW167EXquV
+X-Proofpoint-ORIG-GUID: KZ47_TcIbtelGwuNASywgcfW167EXquV
 
-Hi,
+Hi Eric,
 
+On 29/09/2023 15:08, Eric Auger wrote:
+> Hi Miguel,
+> On 9/25/23 18:20, Miguel Luis wrote:
+>> Some _EL1 registers got included in the _EL2 ranges, which are not
+> if they aren't too many, you may list them as it eases the review
 
-> We are happy to announce the early RFC version of the Arm
-> Confidential Compute Architecture (CCA) support for the Linux
-> stack. The intention is to seek early feedback in the following areas:
->  * KVM integration of the Arm CCA
->  * KVM UABI for managing the Realms, seeking to generalise the operations
->    wherever possible with other Confidential Compute solutions.
->    Note: This version doesn't support Guest Private memory, which will be added
->    later (see below).
->  * Linux Guest support for Realms
->
+Thanks for bringing it up.
 
-We have updated the stack for Arm CCA Linux support to RMM-v1.0-EAC2 (See links)
-We are not posting the patches for review yet, as we plan to update our
-stack to support the latest RMM-v1.0 specification, which includes some
-functional changes to support PSCI monitoring by the VMM along with other
-minor changes. All relevant components are updated on a new branch "rmm-v1.0-eac2"
-Guest-mem support is not included, but is in progress.
+Initially I thought those _EL1 registers would be ESR_EL1, TFSR_EL1 and FAR_EL1,
+but as I re-run through the process I cannot confirm the statement anymore.
+So that statement is a mistake now?
 
-Change log :
- - KVM RMI support updated to v1.0-eac2, with optimisations to stage2 tear down
- - Guest (Linux and kvm-unit-test) support for RSI compliant to v1.0-eac2
- - SVE, PMU support for Realms
+I took as reference Table D18-2 on page D18-6307 where are listed instruction
+encodings for non-debug system register accesses. Having to deal with the
+document format is surely not an easy task, so I converted it to text using
+pdftotext -layout.
 
-kvmtool :
-  - Dropped no-compat and switched to --loglevel (merged upstream)
-  - Support for SVE, --sve-vl for vector length
+After scraping, the end result is a table of encodings which we're allowed to
+sort/grep which may be handy to this when you consider the statement that all
+accesses (but the exceptions) to system registers ending in _EL2 should trap.
 
-> Arm CCA Introduction
-> =====================
-> 
-> The Arm CCA is a reference software architecture and implementation that builds
-> on the Realm Management Extension (RME), enabling the execution of Virtual
-> machines, while preventing access by more privileged software, such as hypervisor.
-> The Arm CCA allows the hypervisor to control the VM, but removes the right for
-> access to the code, register state or data that is used by VM.
-> More information on the architecture is available here[0].
-> 
->     Arm CCA Reference Software Architecture
-> 
->         Realm World    ||    Normal World   ||  Secure World  ||
->                        ||        |          ||                ||
->  EL0 x-------x         || x----x | x------x ||                ||
->      | Realm |         || |    | | |      | ||                ||
->      |       |         || | VM | | |      | ||                ||
->  ----|  VM*  |---------||-|    |---|      |-||----------------||
->      |       |         || |    | | |  H   | ||                ||
->  EL1 x-------x         || x----x | |      | ||                ||
->          ^             ||        | |  o   | ||                ||
->          |             ||        | |      | ||                ||
->  ------- R*------------------------|  s  -|---------------------
->          S             ||          |      | ||                ||
->          I             ||          |  t   | ||                ||
->          |             ||          |      | ||                || 
->          v             ||          x------x ||                ||
->  EL2    RMM*           ||              ^    ||                ||
->          ^             ||              |    ||                ||
->  ========|=============================|========================
->          |                             | SMC
->          x--------- *RMI* -------------x
-> 
->  EL3                   Root World
->                        EL3 Firmware
->  ===============================================================
-> Where :
->  RMM - Realm Management Monitor
->  RMI - Realm Management Interface
->  RSI - Realm Service Interface
->  SMC - Secure Monitor Call
-> 
-> RME introduces a new security state "Realm world", in addition to the
-> traditional Secure and Non-Secure states. The Arm CCA defines a new component,
-> Realm Management Monitor (RMM) that runs at R-EL2. This is a standard piece of
-> firmware, verified, installed and loaded by the EL3 firmware (e.g, TF-A), at
-> system boot.
-> 
-> The RMM provides standard interfaces - Realm Management Interface (RMI) - to the
-> Normal world hypervisor to manage the VMs running in the Realm world (also called
-> Realms in short). These are exposed via SMC and are routed through the EL3
-> firmwre.
-> The RMI interface includes:
->   - Move a physical page from the Normal world to the Realm world
->   - Creating a Realm with requested parameters, tracked via Realm Descriptor (RD)
->   - Creating VCPUs aka Realm Execution Context (REC), with initial register state.
->   - Create stage2 translation table at any level.
->   - Load initial images into Realm Memory from normal world memory
->   - Schedule RECs (vCPUs) and handle exits
->   - Inject virtual interrupts into the Realm
->   - Service stage2 runtime faults with pages (provided by host, scrubbed by RMM).
->   - Create "shared" mappings that can be accessed by VMM/Hyp.
->   - Reclaim the memory allocated for the RAM and RTTs (Realm Translation Tables)
-> 
-> However v1.0 of RMM specifications doesn't support:
->  - Paging protected memory of a Realm VM. Thus the pages backing the protected
->    memory region must be pinned.
->  - Live migration of Realms.
->  - Trusted Device assignment.
->  - Physical interrupt backed Virtual interrupts for Realms
-> 
-> RMM also provides certain services to the Realms via SMC, called Realm Service
-> Interface (RSI). These include:
->  - Realm Guest Configuration.
->  - Attestation & Measurement services
->  - Managing the state of an Intermediate Physical Address (IPA aka GPA) page.
->  - Host Call service (Communication with the Normal world Hypervisor)
-> 
-> The specifications for the RMM software is currently at *v1.0-Beta2* and the
-> latest version is available here [1].
-> 
-> The Trusted Firmware foundation has an implementation of the RMM - TF-RMM -
-> available here [3].
-> 
-> Implementation
-> =================
-> 
-> This version of the stack is based on the RMM specification v1.0-Beta0[2], with
-> following exceptions :
->   - TF-RMM/KVM currently doesn't support the optional features of PMU,
->      SVE and Self-hosted debug (coming soon).
->   - The RSI_HOST_CALL structure alignment requirement is reduced to match
->      RMM v1.0 Beta1
->   - RMI/RSI version numbers do not match the RMM spec. This will be
->     resolved once the spec/implementation is complete, across TF-RMM+Linux stack.
-> 
-> We plan to update the stack to support the latest version of the RMMv1.0 spec
-> in the coming revisions.
-> 
-> This release includes the following components :
-> 
->  a) Linux Kernel
->      i) Host / KVM support - Support for driving the Realms via RMI. This is
->      dependent on running in the Kernel at EL2 (aka VHE mode). Also provides
->      UABI for VMMs to manage the Realm VMs. The support is restricted to 4K page
->      size, matching the Stage2 granule supported by RMM. The VMM is responsible
->      for making sure the guest memory is locked.
-> 
->        TODO: Guest Private memory[10] integration - We have been following the
->        series and support will be added once it is merged upstream.
->      
->      ii) Guest support - Support for a Linux Kernel to run in the Realm VM at
->      Realm-EL1, using RSI services. This includes virtio support (virtio-v1.0
->      only). All I/O are treated as non-secure/shared.
->  
->  c) kvmtool - VMM changes required to manage Realm VMs. No guest private memory
->     as mentioned above.
->  d) kvm-unit-tests - Support for running in Realms along with additional tests
->     for RSI ABI.
-> 
-> Running the stack
-> ====================
-> 
-> To run/test the stack, you would need the following components :
-> 
-> 1) FVP Base AEM RevC model with FEAT_RME support [4]
-> 2) TF-A firmware for EL3 [5]
-> 3) TF-A RMM for R-EL2 [3]
-> 4) Linux Kernel [6]
-> 5) kvmtool [7]
-> 6) kvm-unit-tests [8]
-> 
-> Instructions for building the firmware components and running the model are
-> available here [9]. Once, the host kernel is booted, a Realm can be launched by
-> invoking the `lkvm` commad as follows:
-> 
->  $ lkvm run --realm 				 \
-> 	 --measurement-algo=["sha256", "sha512"] \
-> 	 --disable-sve				 \
+>> affected by NV. Remove them, fine grain the ranges to exclusively
+>> include the _EL2 ones and fold SPSR/ELR _EL2 registers into the
+>> existing range.
+>>
+>> Signed-off-by: Miguel Luis <miguel.luis@oracle.com>
+> Fixes: d0fc0a2519a6 (" KVM: arm64: nv: Add trap forwarding for HCR_EL2") ?
 
-As noted above, this is no longer required.
+OK.
 
-> 	 <normal-vm-options>
-> 
-> Where:
->  * --measurement-algo (Optional) specifies the algorithm selected for creating the
->    initial measurements by the RMM for this Realm (defaults to sha256).
->  * GICv3 is mandatory for the Realms.
->  * SVE is not yet supported in the TF-RMM, and thus must be disabled using
->    --disable-sve
-> 
-> You may also run the kvm-unit-tests inside the Realm world, using the similar
-> options as above.
-> 
-> 
-> Links
-> ============
-> 
-> [0] Arm CCA Landing page (See Key Resources section for various documentations)
->     https://www.arm.com/architecture/security-features/arm-confidential-compute-architecture
-> 
-> [1] RMM Specification Latest
->     https://developer.arm.com/documentation/den0137/latest
-> 
-> [2] RMM v1.0-Beta0 specification
->     https://developer.arm.com/documentation/den0137/1-0bet0/
+>> ---
+>>  arch/arm64/kvm/emulate-nested.c | 44 ++++++++++++++++++++++++++++-----
+>>  1 file changed, 38 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+>> index 9ced1bf0c2b7..f6d0c87803f4 100644
+>> --- a/arch/arm64/kvm/emulate-nested.c
+>> +++ b/arch/arm64/kvm/emulate-nested.c
+>> @@ -649,14 +649,46 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+>>  	SR_TRAP(SYS_APGAKEYHI_EL1,	CGT_HCR_APK),
+>>  	/* All _EL2 registers */
+>>  	SR_RANGE_TRAP(sys_reg(3, 4, 0, 0, 0),
+>> -		      sys_reg(3, 4, 3, 15, 7), CGT_HCR_NV),
+>> +		      sys_reg(3, 4, 4, 0, 1), CGT_HCR_NV),
+>>  	/* Skip the SP_EL1 encoding... */
+>> -	SR_TRAP(SYS_SPSR_EL2,		CGT_HCR_NV),
+>> -	SR_TRAP(SYS_ELR_EL2,		CGT_HCR_NV),
+>> -	SR_RANGE_TRAP(sys_reg(3, 4, 4, 1, 1),
+>> -		      sys_reg(3, 4, 10, 15, 7), CGT_HCR_NV),
+> I am not sure I fully understand the sysreg encoding but globally there
+> are not so many _EL2 regs trapped with .NV. And I can see holes within
+> somes ranges defined above (I searched all "if EL2Enabled() &&
+> HCR_EL2.NV == '1' then" in the ARM ARM). Maybe I don't know how to use
+> the ARM ARM doc but I feel  difficult to understand if the "holes"
+> within the encoding of some ranges are unused or are allocated to some
+> other sysregs, which wouldn't be trapped by /NV. I fear range encoding
+> may be quite risky.
 
- EAC2 spec: https://developer.arm.com/documentation/den0137/1-0eac2/
+That's definitely fair and I share the same concerns too.
+Having table D18-2 sorted helped defining those ranges although I did not
+find the answer to those questions. Perhaps we could query for assumptions
+on the desired approach in which such implementation would rely.
+
+>> +	SR_RANGE_TRAP(sys_reg(3, 4, 4, 3, 0),
+>> +		      sys_reg(3, 4, 10, 6, 7), CGT_HCR_NV),
+>> +	/*
+>> +	 * Note that the spec. describes a group of MEC registers
+>> +	 * whose access should not trap, therefore skip the following:
+>> +	 * MECID_A0_EL2, MECID_A1_EL2, MECID_P0_EL2,
+>> +	 * MECID_P1_EL2, MECIDR_EL2, VMECID_A_EL2,
+>> +	 * VMECID_P_EL2.
+>> +	 */
+>>  	SR_RANGE_TRAP(sys_reg(3, 4, 12, 0, 0),
+>> -		      sys_reg(3, 4, 14, 15, 7), CGT_HCR_NV),
+>> +		      sys_reg(3, 4, 12, 1, 1), CGT_HCR_NV),
+>> +	/* ICH_AP0R<m>_EL2 */
+>> +	SR_RANGE_TRAP(SYS_ICH_AP0R0_EL2,
+>> +		      SYS_ICH_AP0R3_EL2, CGT_HCR_NV),
+>> +	/* ICH_AP1R<m>_EL2 */
+>> +	SR_RANGE_TRAP(SYS_ICH_AP1R0_EL2,
+>> +		      SYS_ICH_AP1R3_EL2, CGT_HCR_NV),
+>> +	SR_RANGE_TRAP(sys_reg(3, 4, 12, 9, 5),
+>> +		      sys_reg(3, 4, 12, 11, 7), CGT_HCR_NV),
+>> +	/* ICH_LR<m>_EL2 */
+>> +	SR_RANGE_TRAP(SYS_ICH_LR0_EL2,
+>> +		      SYS_ICH_LR7_EL2, CGT_HCR_NV),
+>> +	SR_RANGE_TRAP(SYS_ICH_LR8_EL2,
+>> +		      SYS_ICH_LR15_EL2, CGT_HCR_NV),
+>> +	SR_RANGE_TRAP(sys_reg(3, 4, 13, 0, 1),
+>> +		      sys_reg(3, 4, 13, 0, 7), CGT_HCR_NV),
+>> +	/* AMEVCNTVOFF0<n>_EL2 */
+>> +	SR_RANGE_TRAP(sys_reg(3, 4, 13, 8, 0),
+>> +		      sys_reg(3, 4, 13, 8, 7), CGT_HCR_NV),
+>> +	SR_RANGE_TRAP(sys_reg(3, 4, 13, 9, 0),
+>> +		      sys_reg(3, 4, 13, 9, 7), CGT_HCR_NV),
+> I think those 2 above ranges can be merged
+
+Oh, indeed. For both AMEVCNTVOFF0<n>_EL2 and AMEVCNTVOFF1<n>_EL2.
+
+>> +	/* AMEVCNTVOFF1<n>_EL2 */
+>> +	SR_RANGE_TRAP(sys_reg(3, 4, 13, 10, 0),
+>> +		      sys_reg(3, 4, 13, 10, 7), CGT_HCR_NV),
+>> +	SR_RANGE_TRAP(sys_reg(3, 4, 13, 11, 0),
+>> +		      sys_reg(3, 4, 13, 11, 7), CGT_HCR_NV),
+> /* CNT*_EL2 */
+
+OK.
+
+>> +	SR_RANGE_TRAP(sys_reg(3, 4, 14, 0, 3),
+>> +		      sys_reg(3, 4, 14, 5, 2), CGT_HCR_NV),
+>>  	/* All _EL02, _EL12 registers */
+>>  	SR_RANGE_TRAP(sys_reg(3, 5, 0, 0, 0),
+>>  		      sys_reg(3, 5, 10, 15, 7), CGT_HCR_NV),
+> not related to your patch but wrt the EL02 the only ones that I
+> idenftied beeing trapped by NV using above search are
 > 
-> [3] Trusted Firmware RMM - TF-RMM
->     https://www.trustedfirmware.org/projects/tf-rmm/
->     GIT: https://git.trustedfirmware.org/TF-RMM/tf-rmm.git
-> 
-> [4] FVP Base RevC AEM Model (available on x86_64 / Arm64 Linux)
->     https://developer.arm.com/Tools%20and%20Software/Fixed%20Virtual%20Platforms
-> 
-> [5] Trusted Firmware for A class
->     https://www.trustedfirmware.org/projects/tf-a/
-> 
-> [6] Linux kernel support for Arm-CCA
->     https://gitlab.arm.com/linux-arm/linux-cca
->     Host Support branch:	cca-host/rfc-v1
-
-Update branch : cca-host/rmm-v1.0-eac2
-
->     Guest Support branch:	cca-guest/rfc-v1
-
-Update branch : cca-guest/rmm-v1.0-eac2
-
-Combined tree for host and guest is also available at: "cca-full/rmm-v1.0-eac2"
-
-> 
-> [7] kvmtool support for Arm CCA
->     https://gitlab.arm.com/linux-arm/kvmtool-cca cca/rfc-v1
-
-Update branch : cca/rmm-v1.0-eac2
-
-> 
-> [8] kvm-unit-tests support for Arm CCA
->     https://gitlab.arm.com/linux-arm/kvm-unit-tests-cca  cca/rfc-v1
+> CNTP_TVAL_EL02	3	5	14	2	0
+> CNTP_CTL_EL02	3	5	14	2	1
+> CNTP_CVAL_EL02	3	5	14	2	2
+> CNTV_TVAL_EL02	3	5	14	3	0
+> CNTV_CTL_EL02	3	5	14	3	1
+> CNTV_CVAL_EL02	3	5	14	3	2
 > 
 
-Update branch : cca/rmm-v1.0-eac2
+That matches my search too. FWIW, below are the _EL12 from my search:
 
+AFSR0_EL12 	3 5 5 1 0
+AFSR1_EL12 	3 5 5 1 1
+AMAIR_EL12 	3 5 5 3 0
+CONTEXTIDR_EL12 3 5 13 0 1
+CPACR_EL12 	3 5 1 0 2
+ESR_EL12 	3 5 5 2 0
+FAR_EL12 	3 5 6 0 0
+MAIR_EL12 	3 5 10 2 0
+SCTLR2_EL12 	3 5 1 0 3
+SCTLR_EL12 	3 5 1 0 0
+SMCR_EL12 	3 5 1 2 6
+TCR2_EL12 	3 5 2 0 3
+TCR_EL12 	3 5 2 0 2
+TFSR_EL12 	3 5 5 6 0
+TTBR0_EL12 	3 5 2 0 0
+TTBR1_EL12 	3 5 2 0 1
+VBAR_EL12 	3 5 12 0 0
+ZCR_EL12 	3 5 1 2 0
+TRFCR_EL12 	3 5 1 2 1
+PMSCR_EL12 	3 5 9 9 0
+CNTKCTL_EL12 	3 5 14 1 0
 
-Suzuki
+Thanks
 
-> [9] Instructions for Building Firmware components and running the model, see
->     section 4.19.2 "Building and running TF-A with RME"
->     https://trustedfirmware-a.readthedocs.io/en/latest/components/realm-management-extension.html#building-and-running-tf-a-with-rme
+Miguel
+
+> Thanks
 > 
-> [10] fd based Guest Private memory for KVM
->    https://lkml.kernel.org/r/20221202061347.1070246-1-chao.p.peng@linux.intel.com
-
-
-
-
-
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: Andrew Jones <andrew.jones@linux.dev>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Chao Peng <chao.p.peng@linux.intel.com>
-Cc: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Fuad Tabba <tabba@google.com>
-Cc: Jonathan Cameron <jonathan.cameron@huawei.com>
-Cc: James Morse <james.morse@arm.com>
-Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc: Joey Gouly <Joey.Gouly@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Quentin Perret <qperret@google.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Steven Price <steven.price@arm.com>
-Cc: Thomas Huth <thuth@redhat.com>
-Cc: Will Deacon <will@kernel.org>
-Cc: Zenghui Yu <yuzenghui@huawei.com>
-To: linux-coco@lists.linux.dev
-To: kvmarm@lists.linux.dev
-Cc: linux-arm-kernel@lists.infradead.org
-To: linux-kernel@vger.kernel.org
-To: kvm@vger.kernel.org
+> Eric
+> 
