@@ -1,118 +1,127 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29FB018E30
-	for <kvmarm@lists.linux.dev>; Mon,  2 Oct 2023 14:58:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EB8BC433C7;
-	Mon,  2 Oct 2023 14:58:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A42841F92E
+	for <kvmarm@lists.linux.dev>; Mon,  2 Oct 2023 19:49:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54401C433C8;
+	Mon,  2 Oct 2023 19:49:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696258734;
-	bh=aPElMtrm6cRnjvgAzssfrsP0JzinANpUMRWhgXxUB/M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ozqfavxtalm0nQpoOCGplrCeGMuZYRp5LLJ0XRkTKgyTSSTQHbAKqZZWhFleLIpUT
-	 KWfz3NLQMpaQD3eOIWU8HYPYVmiMV5UHGnAjaLYgkGMj3Gd2D+81ZSxcgDJKDnv2K2
-	 aypXo8nmaf4zp1lHMCKHde66SK9gUZu4qGZk0TKWtCOOAGmLXCwb95wRhVu3585CMH
-	 trJwNkpZpxLkitNP7cjcsK1brUYA1t00Lnhw064moonHpEqHQZO3vSZL4UE2dBMp1T
-	 uP7alNf2phJqCqkyjVjSsuJtl9cmQay/sIdIOv7U/e3kSK7krW3DFdDPuX0NH6ZHD0
-	 z1+uYvV4nFqtg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qnKNo-000OrN-93;
-	Mon, 02 Oct 2023 15:58:52 +0100
-Date: Mon, 02 Oct 2023 15:58:50 +0100
-Message-ID: <86sf6tnk9h.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Kristina Martsenko <kristina.martsenko@arm.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
+	s=k20201202; t=1696276178;
+	bh=LSyryQpZ8HNgK9TYVlNlqsE7lc5WMeTA4wsbmFm3L9s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kKXwOWMamRR/cwKFQzaeuZxYaQcA9pAOs++Wwik8ym5z22A7p3jNfV2rtHHzHNGC8
+	 0lheJnqFSM7L6ZYmOforDPwwL/34IFYGrLkgotPsqeADaR3LXrKS8hbZ/2FUWkkJNw
+	 LPB+4mw1S7AfYmbFrEOJSjjElJ1mJhnH1mh9IY7IFLod4E9pim8Rsyo+JVFASECtPU
+	 7BJQzLgZfLui0jLmBNFFeGBb8GdQjLybPYSQZzcK78Be1ldmSWDG2t/IIul/GB9ivp
+	 PcFV0VmXEr1/HmvuFQ9ZAmkhFvUg2DUTdbV6RN72AGy3lVH9mUOZ3mPBUhvBoTKNPk
+	 Q6T67HS2ww7dA==
+Date: Mon, 2 Oct 2023 20:49:29 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu
- <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Vladimir Murzin <vladimir.murzin@arm.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/2] KVM: arm64: Support for Arm v8.8 memcpy instructions in KVM guests
-In-Reply-To: <d0b0a7c3-1944-8758-7967-c981c343cea6@arm.com>
-References: <20230922112508.1774352-1-kristina.martsenko@arm.com>
-	<ZRPE9OcB9ndgFxbs@linux.dev>
-	<6687f58c-0da9-0583-2dc1-2089f292b745@arm.com>
-	<87fs2xmiof.wl-maz@kernel.org>
-	<d0b0a7c3-1944-8758-7967-c981c343cea6@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v4 03/36] arm64/gcs: Document the ABI for Guarded Control
+ Stacks
+Message-ID: <38edb5c3-367e-4ab7-8cb7-aa1a5c0e330c@sirena.org.uk>
+References: <20230807-arm64-gcs-v4-3-68cfa37f9069@kernel.org>
+ <ZNOhjrYleGBR6Pbs@arm.com>
+ <f4cec4b3-c386-4873-aa1d-90528e062f2a@sirena.org.uk>
+ <ZN+qki9EaZ6f9XNi@arm.com>
+ <aaea542c-929c-4c9b-8caa-ca67e0eb9c1e@sirena.org.uk>
+ <ZOTnL1SDJWZjHPUW@arm.com>
+ <43ec219d-bf20-47b8-a5f8-32bc3b64d487@sirena.org.uk>
+ <ZOXa98SqwYPwxzNP@arm.com>
+ <ZOYFazB1gYjzDRdA@arm.com>
+ <ZRWw7aa3C0LlMPTH@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kristina.martsenko@arm.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, vladimir.murzin@arm.com, coltonlewis@google.com, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="gCNrmYlrm9/empAg"
+Content-Disposition: inline
+In-Reply-To: <ZRWw7aa3C0LlMPTH@arm.com>
+X-Cookie: Postage will be paid by addressee.
 
-On Fri, 29 Sep 2023 15:51:32 +0100,
-Kristina Martsenko <kristina.martsenko@arm.com> wrote:
-> 
-> On 29/09/2023 10:29, Marc Zyngier wrote:
-> > On Thu, 28 Sep 2023 17:55:39 +0100,
-> > Kristina Martsenko <kristina.martsenko@arm.com> wrote:
-> >>
-> >> On 27/09/2023 07:00, Oliver Upton wrote:
-> >>>
-> >>> On Fri, Sep 22, 2023 at 12:25:06PM +0100, Kristina Martsenko wrote:
-> >>>> Hi,
-> >>>>
-> >>>> This is v2 of the series to allow using the new Arm memory copy instructions
-> >>>> in KVM guests. See v1 for more information [1].
-> >>>
-> >>>
-> >>> Thanks for sending out the series. I've been thinking about what the
-> >>> architecture says for MOPS, and I wonder if what's currently in the
-> >>> Arm ARM is clear enough for EL1 software to be written robustly.
-> >>>
-> >>> While HCRX_EL2.MCE2 allows the hypervisor to intervene on MOPS
-> >>> exceptions from EL1, there's no such control for EL0. So when vCPU
-> >>> migration occurs EL1 could get an unexpected MOPS exception, even for a
-> >>> process that was pinned to a single (virtual) CPU implementation.
-> >>>
-> >>> Additionally, the wording of I_NXHPS seems to suggest that EL2 handling
-> >>> of MOPS exceptions is only expected in certain circumstances where EL1 is
-> >>> incapable of handling an exception. Is the unwritten expectation then
-> >>> that EL1 software should tolerate 'unexpected' MOPS exceptions from EL1
-> >>> and EL0, even if EL1 did not migrate the PE context?
-> >>>
-> >>> Perhaps I'm being pedantic, but I'd really like for there to be some
-> >>> documentation that suggests MOPS exceptions can happen due to context
-> >>> migration done by a higher EL as that is the only option in the context
-> >>> of virtualization.
-> >>
-> >> That's a good point. This shouldn't affect Linux guests as Linux is
-> >> always able to handle a MOPS exception coming from EL0. But it would
-> >> affect any non-Linux guest that pins all its EL0 tasks and doesn't
-> >> implement a handler. It's not clear to me what the expectation for
-> >> guests is, I'll ask the architects to clarify and get back to you.
-> > 
-> > My understanding is that MCE2 should always be set if the hypervisor
-> > can migrate vcpus across implementations behind EL1's back, and that
-> > in this context, EL1 never sees such an exception.
-> 
-> Notice that MCE2 only traps exceptions from EL1, not from EL0.
-> Exceptions from EL0 always go to EL1. Even if MCE2 is always set, EL1
-> will see the exception when the hypervisor migrates the vcpu while the
-> vcpu is executing a MOPS instruction in EL0.
 
-Ah, good point. I stand corrected.
+--gCNrmYlrm9/empAg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-	M.
+On Thu, Sep 28, 2023 at 05:59:25PM +0100, Szabolcs Nagy wrote:
+> The 08/23/2023 14:11, Catalin Marinas wrote:
 
--- 
-Without deviation from the norm, progress is not possible.
+> > > and there is user code doing raw clone threads (such threads are
+> > > technically not allowed to call into libc) it's not immediately
+> > > clear to me if having gcs in those threads is better or worse.
+
+> i think raw clone / clone3 users may be relevant so we need a
+> solution such that they don't fail when gcs args are missing.
+
+Are we sure about that?  Old binaries shouldn't be affected since they
+won't turn GCS so we're just talking about new binaries here - are there
+really so many of them that we won't be able to get them all converted
+over to clone3() and GCS in the timescales we're talking about for GCS
+deployment?  I obviously don't particularly mind having the default size
+logic but if we allow clone() then that's keeping the existing behaviour
+and layering allocation via clone3() on top of it which Catalin didn't
+want.  Catalin?
+
+> userspace allocated gcs works for me, but maybe the alternative
+> with size only is more consistent (thread gcs is kernel mapped
+> with fallback size logic if gcs size is missing):
+
+If we have size only then the handling of GCS and normal stack in struct
+clone_args would be inconsistent.  Given that it seems better to have
+the field present, we can allow it to be NULL and do the allocation with
+the specified size but it should be there.
+
+> > An alternative would be for the clone3() to provide an address _hint_
+> > and size for GCS and it would still be the kernel doing the mmap (and
+> > munmap on clearing). But at least the user has some control over the
+> > placement of the GCS and its size (and maybe providing the address has
+> > MAP_FIXED semantics).
+
+> the main thread gcs is still special: the size is provided
+> via prctl (if at all).
+
+Either that or we have it do a map_shadow_stack() but that's an extra
+syscall during startup.
+
+--gCNrmYlrm9/empAg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmUbHsgACgkQJNaLcl1U
+h9Dyngf9Hy8AfP5kC/6h6EPVo7EVDeJ1A4cbGRBtR61F+kO0Gknu6S0AxnHkfkgt
+cODaJDIw85fav0lGTTx8Rlr/77kzihHWSNLwnyAaR1gPYzRgqM/XBdwf9M6mnT7I
+907nXSNYnfB1pE+8Be1LmcXX8hbHhr6l3K+FT5vZQTcpEAGrxAv7xLNEZ7xMkqV0
+PPa+7hjf+9MpBcZQbqjK+KpoCWdTAZkTcnqpKQApUqiAbs5aeKuDfqulxl4eQ7IF
+4y3g5jbZpwsCSjlxNnQaT+K8cof3zDuHUV6Hf4rpNA4XfwybEbSPNYD8zZ8TYzbj
+1IGtDcFokNQ4Y0FbRpYBRx621claGQ==
+=f6SF
+-----END PGP SIGNATURE-----
+
+--gCNrmYlrm9/empAg--
