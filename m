@@ -1,345 +1,69 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-197.mta1.migadu.com (out-197.mta1.migadu.com [95.215.58.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2BF763D
-	for <kvmarm@lists.linux.dev>; Tue,  3 Oct 2023 01:42:59 +0000 (UTC)
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d81c39acfd9so577003276.0
-        for <kvmarm@lists.linux.dev>; Mon, 02 Oct 2023 18:42:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696297379; x=1696902179; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fD3Xa8/vhFMIhH4RbdgiQUOLcrn+ryvbOzbRIeJeNfY=;
-        b=0tD/NFCUq4sRx3Cil+b0Wsx1xpVBuQt5nupR1buSvyMKlgpBv8TjwAIqE0EOUpdV2Q
-         RXHkHPfIWjgZB9xHKNBKyYkHqhodnuVYRntV2YY91P3Uol1x76EbV61TkuYRXb2ryzf3
-         pFDB3QIJkBJrl4UFTKVrey65qwCGp3AM04eWC4IQ9OdF/vZweVMq0bWBu/z388ftLtne
-         /ylWyh82Z7EQH81sYWOn6fiM+tWSs+Q1+TGTG9Mo7f9udin8s7O2clOZGHf8eRDb0gSg
-         Hz8IqZjEGf+G5TKGDWvdfDLpkL3lNSOEoW5cReh0DUTNAgAERj+2RQlfgS7JeJ4W75ZR
-         yM2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696297379; x=1696902179;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=fD3Xa8/vhFMIhH4RbdgiQUOLcrn+ryvbOzbRIeJeNfY=;
-        b=v6FGfClkCb2HrOAXYqIYTLEhpvU0n6iTJTjZLPxoppjllEm9rY65Q8Qxf8oBsIaWe0
-         /6+QAXtc5JA73tACxvVGJlA5+xMhLwE15g+ilXlxw5ZRg9WHGKnU8/IkHm6OljlhOW8u
-         xO4IWAur443zEFXnlCdp+BD9IXHf62URgFZzZ1av1eWu9Ikjp1LIOXdevjsyLZ3UCazs
-         JiewqNrUvXwadzEURRPwZgcuNrqKxY9anGmX6S/iILoXpm7hXMN4w0X3BPdAdDwtg5QK
-         rKpfvdv/FKlTRDTxW+glQ6EbL5OtcavIdQWuB5UvALAmYz3YE8jni/+B7oOvQte6i4Uj
-         sNRA==
-X-Gm-Message-State: AOJu0YxV95zGVBNx5dbfQChC9ObzpqKbYxFvp7wgD5vsZoJlOL1zXmGL
-	OH/6tuWwms2ATPyAL4WdDiZ2KA0ouvQ=
-X-Google-Smtp-Source: AGHT+IHBWTaJik82WBgvMqCFwbjJHa4GFzJZkgqGHbEG/l2KauJ16tH+FN+XncRJjiRf+QJz8JKbMW9q5as=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:136b:b0:d81:4107:7a1 with SMTP id
- bt11-20020a056902136b00b00d81410707a1mr209690ybb.2.1696297378712; Mon, 02 Oct
- 2023 18:42:58 -0700 (PDT)
-Date: Mon, 2 Oct 2023 18:42:57 -0700
-In-Reply-To: <CAF7b7mrf-y9DNdsreOAedGJueOThnYE=ascFd4=rvW0Z4rhTQg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E23C746AB
+	for <kvmarm@lists.linux.dev>; Tue,  3 Oct 2023 06:14:41 +0000 (UTC)
+Date: Tue, 3 Oct 2023 08:14:33 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1696313679;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0lhrbswG2p44Bvv455TmMlICJyrlE01TZRslI5wXx10=;
+	b=ekgM54Qrfuvjj7vsrGrMAfdsruoRW/pxLqw7eRos/9dA5jKx740HrExryKIJ3y7FvA3yn0
+	QDhWiZl6DqXMQZJrlC87V60liFuJ82Ru2iUtVjY2DOmHO3kXy4l+9+ycn0tuux9tomQ23Z
+	MQ4XX9hI81VtC/0XFg9M0BM848dVWl0=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Matthias Rosenfelder <matthias.rosenfelder@nio.io>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Eric Auger <eric.auger@redhat.com>, 
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
+Subject: Re: [kvm-unit-tests PATCH] arm: pmu: Fix overflow test condition
+Message-ID: <20231003-e7e54e0ce6d7cfe167a73df4@orel>
+References: <FRYP281MB31463EC1486883DDA477393DF2C0A@FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-8-seanjc@google.com>
- <117db856-9aec-e91c-b1d4-db2b90ae563d@intel.com> <ZQ3AmLO2SYv3DszH@google.com>
- <CAF7b7mrf-y9DNdsreOAedGJueOThnYE=ascFd4=rvW0Z4rhTQg@mail.gmail.com>
-Message-ID: <ZRtxoaJdVF1C2Mvy@google.com>
-Subject: Re: [RFC PATCH v12 07/33] KVM: Add KVM_EXIT_MEMORY_FAULT exit to
- report faults to userspace
-From: Sean Christopherson <seanjc@google.com>
-To: Anish Moorthy <amoorthy@google.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, Xu Yilun <yilun.xu@intel.com>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <FRYP281MB31463EC1486883DDA477393DF2C0A@FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Oct 02, 2023, Anish Moorthy wrote:
-> On Fri, Sep 22, 2023 at 9:28=E2=80=AFAM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >
-> > > So when exit reason is KVM_EXIT_MEMORY_FAULT, how can we tell which f=
-ield in
-> > > the first union is valid?
-> >
-> > /facepalm
-> >
-> > At one point, I believe we had discussed a second exit reason field?  B=
-ut yeah,
-> > as is, there's no way for userspace to glean anything useful from the f=
-irst union.
->=20
-> Oh, was this an objective? When I was pushing for the second union
-> this I was just trying to make sure all the efault annotations
-> wouldn't clobber *other* exits. But yeah, I don't/didn't see a
-> meaningful way to have valid information in both structs.
+On Fri, Sep 29, 2023 at 09:19:37PM +0000, Matthias Rosenfelder wrote:
+> Hello,
+> 
+> I think one of the test conditions for the KVM PMU unit test "basic_event_count" is not strong enough. It only checks whether an overflow occurred for counter #0, but it should also check that none happened for the other counter(s):
+> 
+> report(read_sysreg(pmovsclr_el0) & 0x1,
+>       "check overflow happened on #0 only");
+> 
+> This should be "==" instead of "&".
+> 
+> Note that this test uses one more counter (#1), which must not overflow. This should also be checked, even though this would be visible through the "report_info()" a few lines above. But the latter does not mark the test failing - it is purely informational, so any test automation will not notice.
+> 
+> 
+> I apologize in advance if my email program at work messes up any formatting. Please let me know and I will try to reconfigure and resend if necessary. Thank you.
 
-Clobbering other exits means KVM is already broken, because simply accessin=
-g memory
-in guest context after initiating an exit is a KVM bug as it would violate =
-ordering
-and maybe causality.   E.g. the only reason the preemption case (see below)=
- isn't
-completely buggy is specifically because it's host paravirt behavior.
+Hi Matthias,
 
-In other words, ignoring preemption for the moment, not clobbering other ex=
-its isn't
-useful because whatever buggy KVM behavior caused the clobbering already ha=
-ppened,
-i.e. the VM is already in trouble either way.  The only realistic options a=
-re to fix
-the KVM bugs, or to effectively take an errata and say "don't do that" (lik=
-e we've
-done for the silly PUSHD to MMIO case).
+Your mail client sent the patch as an attachment. Please use
+get-send-email to submit patches and put the justifications for the
+patches, like you've written above, in the commit messages.
 
-> > The more I think about this, the more I think it's a fool's errand.  Ev=
-en if KVM
-> > provides the exit_reason history, userspace can't act on the previous, =
-unfulfilled
-> > exit without *knowing* that it's safe/correct to process the previous e=
-xit.  I
-> > don't see how that's remotely possible.
-> >
-> > Practically speaking, there is one known instance of this in KVM, and i=
-t's a
-> > rather riduclous edge case that has existed "forever".  I'm very strong=
-ly inclined
-> > to do nothing special, and simply treat clobbering an exit that userspa=
-ce actually
-> > cares about like any other KVM bug.
-> >
-> > > When exit reason is not KVM_EXIT_MEMORY_FAULT, how can we know the in=
-fo in
-> > > the second union run.memory is valid without a run.memory.valid field=
-?
-> >
-> > Anish's series adds a flag in kvm_run.flags to track whether or not mem=
-ory_fault
-> > has been filled.  The idea is that KVM would clear the flag early in KV=
-M_RUN, and
-> > then set the flag when memory_fault is first filled.
-> >
-> >         /* KVM_CAP_MEMORY_FAULT_INFO flag for kvm_run.flags */
-> >         #define KVM_RUN_MEMORY_FAULT_FILLED (1 << 8)
-> >
-> > I didn't propose that flag here because clobbering memory_fault from th=
-e page
-> > fault path would be a flagrant KVM bug.
-> >
-> > Honestly, I'm becoming more and more skeptical that separating memory_f=
-ault is
-> > worthwhile, or even desirable.  Similar to memory_fault clobbering some=
-thing else,
-> > userspace can only take action if memory_fault is clobbered if userspac=
-e somehow
-> > knows that it's safe/correct to do so.
-> >
-> > Even if KVM exits "immediately" after initially filling memory_fault, t=
-he fact
-> > that KVM is exiting for a different reason (or a different memory fault=
-) means
-> > that KVM did *something* between filling memory_fault and actually exit=
-ing.  And
-> > it's completely impossible for usersepace to know what that "something"=
- was.
->=20
-> Are you describing a scenario in which memory_fault is (initially)
-> filled, then something else happens to fill memory_fault (thus
-> clobbering it), then KVM_RUN exits? I'm confused by the tension
-> between the "KVM exits 'immediately'" and "KVM did *something* between
-> filling memory_fault and actually existing" statements here.
+Thanks,
+drew
 
-Yes, I'm describing a hypothetical scenario.  Immediately was in quotes bec=
-ause
-even if KVM returns from the *current* function straightaway, it's possible=
- that
-control is deep in a call stack, i.e. KVM may "immediately" try to exit fro=
-m the
-current function's perspective, but in reality it may take a while to actua=
-lly
-get out to userspace.
+> 
+> Best Regards,
+> 
+> Matthias
+> [Banner]<http://www.nio.io>
+> This email and any files transmitted with it are confidential and intended solely for the use of the individual or entity to whom they are addressed. You may NOT use, disclose, copy or disseminate this information. If you have received this email in error, please notify the sender and destroy all copies of the original message and all attachments. Please note that any views or opinions presented in this email are solely those of the author and do not necessarily represent those of the company. Finally, the recipient should check this email and any attachments for the presence of viruses. The company accepts no liability for any damage caused by any virus transmitted by this email.
 
-> > > E.g. in the splat from selftests[1], KVM reacts to a failure during R=
-eal Mode
-> > event injection by synthesizing a triple fault
-> >
-> >         ret =3D emulate_int_real(ctxt, irq);
-> >
-> >         if (ret !=3D X86EMUL_CONTINUE) {
-> >                 kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
-> >
-> > There are multiple KVM bugs at play: read_emulate() and write_emulate()=
- incorrectly
-> > assume *all* failures should be treated like MMIO, and conversely ->rea=
-d_std() and
-> > ->write_std() don't handle *any* failures as MMIO.
-> >
-> > Circling back to my "capturing the history is pointless" assertion, by =
-the time
-> > userspace gets an exit, the vCPU is already in shutdown, and KVM has cl=
-obbered
-> > memory_fault something like five times.  There is zero chance userspace=
- can do
-> > anything but shed a tear for the VM and move on.
-> >
-> > The whole "let's annotate all memory faults" idea came from my desire t=
-o push KVM
-> > towards a future where all -EFAULT exits are annotated[2].  I still thi=
-nk we should
-> > point KVM in that general direction, i.e. implement something that _can=
-_ provide
-> > 100% "coverage" in the future, even though we don't expect to get there=
- anytime soon.
-> >
-> > I bring that up because neither private memory nor userfault-on-missing=
- needs to
-> > annotate anything other than -EFAULT during guest page faults.  I.e. al=
-l of this
-> > paranoia about clobbering memory_fault isn't actually buying us anythin=
-g other
-> > than noise and complexity.  The cases we need to work _today_ are perfe=
-ctly fine,
-> > and _if_ some future use cases needs all/more paths to be 100% accurate=
-, then the
-> > right thing to do is to make whatever changes are necessary for KVM to =
-be 100%
-> > accurate.
-> >
-> > In other words, trying to gracefully handle memory_fault clobbering is =
-pointless.
-> > KVM either needs to guarantee there's no clobbering (guest page fault p=
-aths) or
-> > treat the annotation as best effort and informational-only (everything =
-else at
-> > this time).  Future features may grow the set of paths that needs stron=
-g guarantees,
-> > but that just means fixing more paths and treating any violation of the=
- contract
-> > like any other KVM bug.
->=20
-> Ok, so if we're restricting the exit to just the places it's totally
-> accurate (page-fault paths) then, IIUC,
->=20
-> - There's no reason to attach it to EFAULT, ie it becomes a "normal" exit
 
-No, I still want at least partial line of sight to being able to provide us=
-eful
-information to userspace on EFAULT.  Making KVM_EXIT_MEMORY_FAULT a "normal=
-" exit
-pretty much squashes any hope of that.
-
-> - I should go drop the patches annotating kvm_vcpu_read/write_page
-> from my series
-
-Hold up on that.  I'd prefer to keep them as there's still value in giving =
-userspace
-debug information.  All I'm proposing is that we would firmly state in the
-documentation that those paths must be treated as informational-only.
-
-The whole kvm_steal_time_set_preempted() mess does give me pause though.  T=
-hat
-helper isn't actually problematic, but only because it uses copy_to_user_no=
-fault()
-directly :-/
-
-But that doesn't necessarily mean we need to abandon the entire idea, e.g. =
-it
-might not be a terrible idea to explicitly differentiate accesses to guest =
-memory
-for paravirt stuff, from accesses to guest memory on behalf of the guest.
-
-Anyways, don't do anything just yet.
-
-> - The helper function [a] for filling the memory_fault field
-> (downgraded back into the current union) can drop the "has the field
-> already been filled?" check/WARN.
-
-That would need to be dropped regardless because it's user-triggered (sadly=
-).
-
-> - [KVM_CAP_USERFAULT_ON_MISSING] The memslot flag check [b] needs to
-> be moved back from __gfn_to_pfn_memslot() into
-> user_mem_abort()/kvm_handle_error_pfn() since the slot flag-triggered
-> fast-gup failures *have* to result in the memory fault exits, and we
-> only want to do those in the two SLAT-failure paths (for now).
-
-I'll look at this more closely when I review your series (slowly, slowly ge=
-tting
-there).  There's no right or wrong answer here, it's more a question of wha=
-t's the
-easiest to maintain.
-
-> [a] https://lore.kernel.org/all/20230908222905.1321305-5-amoorthy@google.=
-com/
-> [b] https://lore.kernel.org/all/20230908222905.1321305-11-amoorthy@google=
-.com/
->=20
-> > And if we stop being unnecessarily paranoid, KVM_RUN_MEMORY_FAULT_FILLE=
-D can also
-> > go away.  The flag came about in part because *unconditionally* sanitiz=
-ing
-> > kvm_run.exit_reason at the start of KVM_RUN would break KVM's ABI, as u=
-serspace
-> > may rely on the exit_reason being preserved when calling back into KVM =
-to complete
-> > userspace I/O (or MMIO)[3].  But the goal is purely to avoid exiting wi=
-th stale
-> > memory_fault information, not to sanitize every other existing exit_rea=
-son, and
-> > that can be achieved by simply making the reset conditional.
-> >
-> > ...
-> >
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 96fc609459e3..d78e97b527e5 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -4450,6 +4450,16 @@ static long kvm_vcpu_ioctl(struct file *filp,
-> >                                 synchronize_rcu();
-> >                         put_pid(oldpid);
-> >                 }
-> > +
-> > +               /*
-> > +                * Reset the exit reason if the previous userspace exit=
- was due
-> > +                * to a memory fault.  Not all -EFAULT exits are annota=
-ted, and
-> > +                * so leaving exit_reason set to KVM_EXIT_MEMORY_FAULT =
-could
-> > +                * result in feeding userspace stale information.
-> > +                */
-> > +               if (vcpu->run->exit_reason =3D=3D KVM_EXIT_MEMORY_FAULT=
-)
-> > +                       vcpu->run->exit_reason =3D KVM_EXIT_UNKNOWN
-> > +
-> >                 r =3D kvm_arch_vcpu_ioctl_run(vcpu);
->=20
-> Under my reading of the earlier block I'm not sure why we need to keep
-> this around. The original idea behind a canary of this type was to
-> avoid stomping on non-memory-fault exits in cases where something
-> caused an (ignored) annotated memory fault before the exit could be
-> completed. But if the annotations are going to be restricted in
-> general to just the page fault paths, then we can just eliminate the
-> sentinel check (and just this block) entirely, right?
-
-This isn't a canary, it's to ensure KVM doesn't feed userspace garbage.  As=
- above,
-I'm not saying we throw away all of the code for the "optional" paths, I'm =
-saying
-that we only commit to 100% accuracy for the paths that the two use cases n=
-eed to
-work, i.e. the page fault handlers.
