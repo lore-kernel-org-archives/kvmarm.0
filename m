@@ -1,117 +1,136 @@
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAC70D302
-	for <kvmarm@lists.linux.dev>; Tue,  3 Oct 2023 10:28:46 +0000 (UTC)
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-9a9d82d73f9so124101966b.3
-        for <kvmarm@lists.linux.dev>; Tue, 03 Oct 2023 03:28:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 187512915
+	for <kvmarm@lists.linux.dev>; Tue,  3 Oct 2023 12:48:01 +0000 (UTC)
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-65af7d102b3so5868976d6.1
+        for <kvmarm@lists.linux.dev>; Tue, 03 Oct 2023 05:48:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1696328924; x=1696933724; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XsdqrdEkDSj8N1JGo8GS+Y+t1N9Ffxo49rjL66LLWiU=;
-        b=UGf0aFIqnRtqKgfpHtcd3S2Ec2j2ci5xu/568aUqjclnFTpJQ+M9L+viBpMl2zKV1/
-         kJr+YffjIMRVtl8osr9B/zr7Gdg+uHRu/EZTBAkzFAy6bMvm9CBnMJAbchhyLEBk7aLZ
-         iBWCxl231nE+fgxnfPhkU5jV2qN3KVLozU6IR0+ceQh9KXVDsS1NmMmpM8Pmg5YzoJTh
-         dahzL2Jia1EiUFEEtJp7E2hz0aVnnUVb7DbVMATKW/5LfRXUQjns4eQNX+2j5xe7v/UB
-         jtggbLsqIdh0q6EePtGN0IB5oTiA6xVI4udvorI2ha8RPm0gfQNLYmM7rtvq/L2zTHIt
-         HtxA==
+        d=google.com; s=20230601; t=1696337280; x=1696942080; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=YZe9z/CDJkweGhxZy3F+7e7AP42NZQg1sBDsRc6xWLw=;
+        b=SUhj2orGTOe5LZIlVKY/bEwhjJItvPrdAUXcE2cvQR60HOH6ZjvOgoNtPU5O7ZHm08
+         k9bWwXromxcpNX5OAnVlJ1fQ+5DPAVnpfdZq/lBlmBKvpoGPIEpn4efygNGqftpZwlkE
+         4ouycC6y6q5LrGCUfOTCe1lY29DWaYJ1nbrbha1gJGGL0+kLAFeJY/3XRhblv9G1B8FT
+         Dj71FF32V+WvjTzbqxWNx/k+ByicCrTwfSTzdU/hQTra+Un0f+SUd2NzLvhH9sunjaFs
+         zv8wPhz3406gtZzIFqXpGC0bB43ufHEpqCOdkcALtDP5RmdfVZoJuNvVrSeiekYmogeg
+         lDOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696328924; x=1696933724;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XsdqrdEkDSj8N1JGo8GS+Y+t1N9Ffxo49rjL66LLWiU=;
-        b=omDXmBEHYDpUIzWVPKwWb92cPQs9mDQ1CMsY8eYkF2FM3kcl7N9y0VBU4GLKECmCmw
-         hMv0ISfasBzLY2fRoRvgK/biEOwvKLOXNPHTDa1ECrq5lM7u4UYyX8uD2uLNu3jwwzHM
-         ch4Doa7C2TdR1StzQ4LhdYJ8jSkL86VcLgyQWzEBTf9wl+0G6FBqkcPjw0rDjbp6mqgw
-         LwA0P45UOgwF2giBGjRlpDF1eryrTPR8SMbYx2vZI3sPhXmPNyRORwnVWu0r35r0vOp7
-         M4QDmcIIp1ue6j+kqR3L/HX4+PbmCqifH9vedSO+BsPyujaOQ8DMLmENeGZNagI5ZHAo
-         2wzw==
-X-Gm-Message-State: AOJu0Yw1qpAzyiMr7Xzju3vfiGtK2uHowFllL7qUSRy+3tGzTvFYKHPR
-	Sd6KqXLmqRPibiK1FZYCUplF8A==
-X-Google-Smtp-Source: AGHT+IG9ar/of5h3vBdRHdNrUbHgfPXCJHKRmFUO92+SzwFtgCwBykQiZdbI9ipIbOFvP0+0VOSg1w==
-X-Received: by 2002:a17:906:109e:b0:9ae:6d0:84f7 with SMTP id u30-20020a170906109e00b009ae06d084f7mr11197111eju.32.1696328924382;
-        Tue, 03 Oct 2023 03:28:44 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id op19-20020a170906bcf300b009adc743340fsm822007ejb.197.2023.10.03.03.28.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Oct 2023 03:28:43 -0700 (PDT)
-Date: Tue, 3 Oct 2023 12:28:42 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Haibo Xu <haibo1.xu@intel.com>
-Cc: xiaobo55x@gmail.com, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Sean Christopherson <seanjc@google.com>, Ricardo Koller <ricarkol@google.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Vipin Sharma <vipinsh@google.com>, 
-	David Matlack <dmatlack@google.com>, Aaron Lewis <aaronlewis@google.com>, 
-	Colton Lewis <coltonlewis@google.com>, Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v3 2/9] KVM: selftests: Unify the makefile rule for split
- targets
-Message-ID: <20231003-d44206f71d0b22e539833697@orel>
-References: <cover.1694421911.git.haibo1.xu@intel.com>
- <cda6cc71c9bdde87fe87f6c2dec4f03ca249dd62.1694421911.git.haibo1.xu@intel.com>
+        d=1e100.net; s=20230601; t=1696337280; x=1696942080;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YZe9z/CDJkweGhxZy3F+7e7AP42NZQg1sBDsRc6xWLw=;
+        b=INYibZjkLB+nx9yYp6B19TPGm69IWu3UGrbRA5S5ht3MXmaFyCY+uhT030V3AGsbNP
+         W0ZLNOGcKpZP/JCw+4daImzhtvuyzqH6h2vsHtc7bdR+eGssEPbKBNmh/FZWdVNtSmzt
+         w1R+1aJeYC6tNUwxkBu7LYcEGCC/stGpSR/xRn1xUvrvYpJTmpGql0YAzgDeZwYypq/p
+         MVzj7DtAbBPdH8PYE00cKbiXddjMXINtTU03DbvMHPaDzFzPRU0RniUANpmb4Ot52aGD
+         qmw/dbMKVI9Nv4GdMd+ghmdS4drtqKleua/Av5uMCT080ts69UBRJ42b0GG81X9kvERm
+         TyuQ==
+X-Gm-Message-State: AOJu0Yz/xINg9YahzIUkF6uClcTJNa5PuD2d7hnVn2fP4R7RUyBNS7c7
+	Cvwj+twIRav67uV1n2+EoqScpOmmOjVqc0YlSmxy5A==
+X-Google-Smtp-Source: AGHT+IGdg5KfMiaxwpI9vdrZwCI62gGbA1qcJqHvAfDGqDxEQ2JSHryTMBO/72MMo9L0zK8WyPrlSIxRkNMNwCJdjzY=
+X-Received: by 2002:a0c:e493:0:b0:656:347b:ea75 with SMTP id
+ n19-20020a0ce493000000b00656347bea75mr13564335qvl.24.1696337280208; Tue, 03
+ Oct 2023 05:48:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cda6cc71c9bdde87fe87f6c2dec4f03ca249dd62.1694421911.git.haibo1.xu@intel.com>
+References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-12-seanjc@google.com>
+In-Reply-To: <20230914015531.1419405-12-seanjc@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 3 Oct 2023 13:47:23 +0100
+Message-ID: <CA+EHjTzSUXx8P9gWmUERg4owxH6r6yNPm1_RL-BzS_2CNPtRKw@mail.gmail.com>
+Subject: Re: [RFC PATCH v12 11/33] KVM: Introduce per-page memory attributes
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Anish Moorthy <amoorthy@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, Xu Yilun <yilun.xu@intel.com>, 
+	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Sep 14, 2023 at 09:36:56AM +0800, Haibo Xu wrote:
-> A separate makefile rule was used for split targets which was added
-> in patch(KVM: arm64: selftests: Split get-reg-list test code). This
-> could be avoided by minor changes to the recipes of current rule.
-> 
-> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
-> ---
->  tools/testing/selftests/kvm/Makefile | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index a3bb36fb3cfc..7972269e8c5f 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -249,13 +249,10 @@ TEST_DEP_FILES += $(patsubst %.o, %.d, $(SPLIT_TESTS_OBJS))
->  -include $(TEST_DEP_FILES)
->  
->  $(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED): %: %.o
-> -	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $< $(LIBKVM_OBJS) $(LDLIBS) -o $@
-> +	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
->  $(TEST_GEN_OBJ): $(OUTPUT)/%.o: %.c
->  	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
->  
-> -$(SPLIT_TESTS_TARGETS): %: %.o $(SPLIT_TESTS_OBJS)
-> -	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
-> -
->  EXTRA_CLEAN += $(LIBKVM_OBJS) $(TEST_DEP_FILES) $(TEST_GEN_OBJ) $(SPLIT_TESTS_OBJS) cscope.*
->  
->  x := $(shell mkdir -p $(sort $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
-> @@ -274,6 +271,7 @@ $(LIBKVM_STRING_OBJ): $(OUTPUT)/%.o: %.c
->  x := $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
->  $(TEST_GEN_PROGS): $(LIBKVM_OBJS)
->  $(TEST_GEN_PROGS_EXTENDED): $(LIBKVM_OBJS)
-> +$(SPLIT_TESTS_TARGETS): $(OUTPUT)/%: $(ARCH_DIR)/%.o
->  
->  cscope: include_paths = $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) include lib ..
->  cscope:
-> -- 
-> 2.34.1
+Hi,
+
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index d2d913acf0df..f8642ff2eb9d 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1227,6 +1227,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
+>  #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
+>  #define KVM_CAP_USER_MEMORY2 230
+> +#define KVM_CAP_MEMORY_ATTRIBUTES 231
 >
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>
+> @@ -2293,4 +2294,17 @@ struct kvm_s390_zpci_op {
+>  /* flags for kvm_s390_zpci_op->u.reg_aen.flags */
+>  #define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
+>
+> +/* Available with KVM_CAP_MEMORY_ATTRIBUTES */
+> +#define KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES    _IOR(KVMIO,  0xd2, __u64)
+> +#define KVM_SET_MEMORY_ATTRIBUTES              _IOW(KVMIO,  0xd3, struct kvm_memory_attributes)
+> +
+> +struct kvm_memory_attributes {
+> +       __u64 address;
+> +       __u64 size;
+> +       __u64 attributes;
+> +       __u64 flags;
+> +};
+> +
+> +#define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
+> +
 
-I just noticed that with and without this patch we're building the
-arch-specific part in tools/testing/selftests/kvm/riscv even when we have
-an $(OUTPUT) directory (e.g. O=build). Those build artifacts should be in
-build/kselftest/kvm/riscv instead.
+In pKVM, we don't want to allow setting (or clearing) of
+PRIVATE/SHARED attributes from userspace. However, we'd like to use
+the attributes xarray to track the sharing state of guest pages at the
+host kernel.
+
+Moreover, we'd rather the default guest page state be PRIVATE, and
+only specify which pages are shared. All pKVM guest pages start off as
+private, and the majority will remain so.
+
+I'm not sure if this is the best way to do this: One idea would be to
+move the definition of KVM_MEMORY_ATTRIBUTE_PRIVATE to
+arch/*/include/asm/kvm_host.h, which is where
+kvm_arch_supported_attributes() lives as well. This would allow
+different architectures to specify their own attributes (i.e., instead
+we'd have a KVM_MEMORY_ATTRIBUTE_SHARED for pKVM). This wouldn't help
+in terms of preventing userspace from clearing attributes (i.e.,
+setting a 0 attribute) though.
+
+The other thing, which we need for pKVM anyway, is to make
+kvm_vm_set_mem_attributes() global, so that it can be called from
+outside of kvm_main.c (already have a local patch for this that
+declares it in kvm_host.h), and not gate this function by
+KVM_GENERIC_MEMORY_ATTRIBUTES. This would let pKVM select only
+KVM_PRIVATE_MEM (as opposed to KVM_GENERIC_PRIVATE_MEM, which selects
+KVM_GENERIC_MEMORY_ATTRIBUTES), preventing userspace from setting
+these attributes, while allowing pKVM to call
+kvm_vm_set_mem_attributes().
+
+What do you think?
 
 Thanks,
-drew
+/fuad
