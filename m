@@ -1,104 +1,99 @@
-Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-198.mta0.migadu.com (out-198.mta0.migadu.com [91.218.175.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 233623E48B
-	for <kvmarm@lists.linux.dev>; Tue,  3 Oct 2023 22:59:52 +0000 (UTC)
-Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-49d0f24a815so695894e0c.2
-        for <kvmarm@lists.linux.dev>; Tue, 03 Oct 2023 15:59:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696373992; x=1696978792; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VuLZmgaV89lzOHymPqsmAC6abj1UTBHkava0gPj509c=;
-        b=vKm+/ceCo0YB1IyShNykhWEykoEE3JoyemRHhz9Ji6W0fxujdu0ZaT/szcQ0mCf7uS
-         aZv6rkSaAkTJGrplcj+BfKucGish9qansxnZj5TCjt8WWyCgLKe/qPibuuJuW+653xLN
-         EqvDXiju+C4vOlFvGlMfERYUvX63gC41c5rpZUj2RRngi6jjZGA4dQO/p1mgYSiePenP
-         EcUz3iAM7d9td0kQqfNMYXmhLQqnwEynhMzSe+cBVmlp1tsbvAx6twrF+0UNfYm6LIVU
-         4rncfx6PSYS/1QsVU/JExgofjYH9Xa4j/g2S3UAIj6HmBaZhLMF8nNwKxRedmt1ibeII
-         I6AA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696373992; x=1696978792;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VuLZmgaV89lzOHymPqsmAC6abj1UTBHkava0gPj509c=;
-        b=UxCgf6IqAONSNZc+ZQTEzMbYRm9dD4Pc/38iPCEACsTmoojFPWACiLUIu3rzTg3yFI
-         5PmLfrDT7qd1Y6URzvlA6iPdC/b2M57JUHsjqyXZyR4xzHtNthflD0q4De5V9mRGtOwI
-         ezolg4isf/yiD97Qa6K1N4maQMo8O0OLfrYKMnqowTi6cR2/VRiwPDWmNZPvwSREiuRr
-         XWuNFICK9Q5kS13djIQkWShMCPi0MSvuNHuwh+HKBcLwtNRO6Ju2ZTAUeYy4mmK1x0b7
-         3retL+Q17/z8CupaxrnxWArb0FcY6XGnDGF4fFqVU8qCPUopMEjys+bO2TQnN82vOpMP
-         W1Cg==
-X-Gm-Message-State: AOJu0YxkQKd4xiYy8IO5APqC6myBKYC8C1G069R21J/iD2UBmXCUxQKy
-	LyEH27Y4eCUuIzw9M2uM3tgb/GD8hGuQKM8Xb28H4Q==
-X-Google-Smtp-Source: AGHT+IHt/5hi86I5tWmFhMD1MR9ouSEy0bKqsB0WSgB1we3wcIPiKRqguWhLnlbBZgNBr6PNxrWaK8kmhmE6ei5mSik=
-X-Received: by 2002:a1f:4887:0:b0:493:3491:ce89 with SMTP id
- v129-20020a1f4887000000b004933491ce89mr587565vka.14.1696373991201; Tue, 03
- Oct 2023 15:59:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B7DB3E48B
+	for <kvmarm@lists.linux.dev>; Tue,  3 Oct 2023 23:04:19 +0000 (UTC)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1696374258;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=vVOxICpIQ/PQQ7Lqo0OPeRUAu3It0WcvPdKF8Eoi9TA=;
+	b=OpeiqJDlNiTXIai0HbgVEZuCTF8nMDrdngg02MJaEYOtgZEQp+bjqPVn8+2Md2F/QVc01+
+	q6Z/PUFBDV+xhgMruGeOjF66Ch0Ungj3cKYGiI5VP+pbgFprDgSN645QB5KaK8GhYLKek0
+	MlYuhHhh3VX+LM31jT/xjeota29w2ZM=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH v11 00/12] KVM: arm64: Enable 'writable' ID registers
+Date: Tue,  3 Oct 2023 23:03:56 +0000
+Message-ID: <20231003230408.3405722-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-8-seanjc@google.com>
- <117db856-9aec-e91c-b1d4-db2b90ae563d@intel.com> <ZQ3AmLO2SYv3DszH@google.com>
- <CAF7b7mrf-y9DNdsreOAedGJueOThnYE=ascFd4=rvW0Z4rhTQg@mail.gmail.com> <ZRtxoaJdVF1C2Mvy@google.com>
-In-Reply-To: <ZRtxoaJdVF1C2Mvy@google.com>
-From: Anish Moorthy <amoorthy@google.com>
-Date: Tue, 3 Oct 2023 15:59:15 -0700
-Message-ID: <CAF7b7mqyU059YpBBVYjTMNXf9VHSc6tbKrQ8avFXYtP6LWMh8Q@mail.gmail.com>
-Subject: Re: [RFC PATCH v12 07/33] KVM: Add KVM_EXIT_MEMORY_FAULT exit to
- report faults to userspace
-To: Sean Christopherson <seanjc@google.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, Xu Yilun <yilun.xu@intel.com>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Oct 2, 2023 at 6:43=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> > - I should go drop the patches annotating kvm_vcpu_read/write_page
-> > from my series
->
-> Hold up on that.  I'd prefer to keep them as there's still value in givin=
-g userspace
-> debug information.  All I'm proposing is that we would firmly state in th=
-e
-> documentation that those paths must be treated as informational-only.
+Few more fixes that I threw on top:
 
-Userspace would then need to know whether annotations were performed
-from reliable/unreliable paths though, right? That'd imply another
-flag bit beyond the current R/W/E bits.
+v10 -> v11:
+ - Drop the custom handling of FEAT_BC as it is now fixed on the arm64
+   side (Kristina)
+ - Bikeshed on the naming of the masks ioctl to keep things in the KVM_
+   namespace
+ - Apply more bikeshedding to the ioctl documentation, spinning off
+   separate blocks for the 'generic' description and the Feature ID
+   documentation
+ - Fix referencing in the vCPU features doc
+ - Fix use of uninitialized data in selftest
 
-> > - The helper function [a] for filling the memory_fault field
-> > (downgraded back into the current union) can drop the "has the field
-> > already been filled?" check/WARN.
->
-> That would need to be dropped regardless because it's user-triggered (sad=
-ly).
+Jing Zhang (7):
+  KVM: arm64: Allow userspace to get the writable masks for feature ID
+    registers
+  KVM: arm64: Document KVM_ARM_GET_REG_WRITABLE_MASKS
+  KVM: arm64: Use guest ID register values for the sake of emulation
+  KVM: arm64: Allow userspace to change ID_AA64MMFR{0-2}_EL1
+  KVM: arm64: Allow userspace to change ID_AA64PFR0_EL1
+  KVM: arm64: selftests: Import automatic generation of sysreg defs
+  KVM: arm64: selftests: Test for setting ID register from usersapce
 
-Well the current v5 of the series uses a non-userspace visible canary-
-it seems like there'd still be value in that if we were to keep the
-annotations in potentially unreliable spots. Although perhaps that
-test failure you noticed [1] is a good counter-argument, since it
-shows a known case where a current flow does multiple writes to the
-memory_fault member.
+Oliver Upton (5):
+  KVM: arm64: Reject attempts to set invalid debug arch version
+  KVM: arm64: Bump up the default KVM sanitised debug version to v8p8
+  KVM: arm64: Allow userspace to change ID_AA64ISAR{0-2}_EL1
+  KVM: arm64: Allow userspace to change ID_AA64ZFR0_EL1
+  KVM: arm64: Document vCPU feature selection UAPIs
 
-[1] https://lore.kernel.org/all/202309141107.30863e9d-oliver.sang@intel.com
+ Documentation/virt/kvm/api.rst                |   52 +
+ Documentation/virt/kvm/arm/index.rst          |    1 +
+ Documentation/virt/kvm/arm/vcpu-features.rst  |   48 +
+ arch/arm64/include/asm/kvm_host.h             |    2 +
+ arch/arm64/include/uapi/asm/kvm.h             |   32 +
+ arch/arm64/kvm/arm.c                          |   10 +
+ arch/arm64/kvm/sys_regs.c                     |  181 +-
+ include/uapi/linux/kvm.h                      |    2 +
+ tools/arch/arm64/include/.gitignore           |    1 +
+ tools/arch/arm64/include/asm/gpr-num.h        |   26 +
+ tools/arch/arm64/include/asm/sysreg.h         |  839 ++----
+ tools/arch/arm64/tools/gen-sysreg.awk         |  336 +++
+ tools/arch/arm64/tools/sysreg                 | 2497 +++++++++++++++++
+ tools/testing/selftests/kvm/Makefile          |   15 +-
+ .../selftests/kvm/aarch64/aarch32_id_regs.c   |    4 +-
+ .../selftests/kvm/aarch64/debug-exceptions.c  |   12 +-
+ .../selftests/kvm/aarch64/page_fault_test.c   |    6 +-
+ .../selftests/kvm/aarch64/set_id_regs.c       |  479 ++++
+ .../selftests/kvm/lib/aarch64/processor.c     |    6 +-
+ 19 files changed, 3860 insertions(+), 689 deletions(-)
+ create mode 100644 Documentation/virt/kvm/arm/vcpu-features.rst
+ create mode 100644 tools/arch/arm64/include/.gitignore
+ create mode 100644 tools/arch/arm64/include/asm/gpr-num.h
+ create mode 100755 tools/arch/arm64/tools/gen-sysreg.awk
+ create mode 100644 tools/arch/arm64/tools/sysreg
+ create mode 100644 tools/testing/selftests/kvm/aarch64/set_id_regs.c
 
-> Anyways, don't do anything just yet.
 
-:salutes:
+base-commit: 6465e260f48790807eef06b583b38ca9789b6072
+-- 
+2.42.0.609.gbb76f46606-goog
+
