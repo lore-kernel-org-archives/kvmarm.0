@@ -1,34 +1,34 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E783630CF2
-	for <kvmarm@lists.linux.dev>; Tue,  3 Oct 2023 16:46:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 665CA30CF2
+	for <kvmarm@lists.linux.dev>; Tue,  3 Oct 2023 16:46:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696351598; x=1727887598;
+  t=1696351611; x=1727887611;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=WABA3N82zUWgofliPDkDARwavt+9zpHw4Esz4HwHYMg=;
-  b=K/k8FxnbsqxEE5vVU/QJiIVBa4inmLKGwUThVbXSIZ7wv+LJuDrwlTWa
-   GVlZ41AKWh0lX6za4KSJgSP70S/hEwwuB7c7XIRcVOTBx/Be1qhAHmuh6
-   m8AU5HdKjFnofMSPVkn9Y9/3dddqrohDagPgilIb6gP119NR6af6Q2zDw
-   lWbbFi19RljT721XRq8274vBeBG0LI1mXt/TrH3eegxqs5A11FQ0l9DGZ
-   D+tEQNhuan4eruqMjebNDUIpsNH8Jk+sigWspumhXZR7yNWCnmPQ5L1Dd
-   kh00SzcC2p6cyn7kU8lM8ESIXDKljYndy9a5nkQeA7cuy1b9PaEV8rJEv
+  bh=nN2KPp3CaN2kwskRxd/Tu+L9S923Q8/Pb0VWg57BRPA=;
+  b=bIh/AdAAdw5LyT3G7gPgoZjrkkyquKAd7233EPjYAiNdjMNXWxwT60qu
+   gGfnnqaaukivtn/X/cn3xx9rh+g3zTTBTAwchtRz9XENXoacV4d/jule0
+   aUP37koViXIDDeoL0TXDV0k86cN7cE8VzAMsNW593mxYmWUViiL2WaHvT
+   VDrCVBwGTDvYqfdmVHaHAGCC9ErrgUTKzMLHV/hSARPOrORaM1H+nW0cS
+   dNeqZECDaC20a7ktrQGIW4Hmvyq1514JkGipX1grxKVHEuAzsrZrqQNYW
+   zRwAZ8WwHpO5honn+5tVga5jGa3E1lxO2yhlRFsMY2+qNL4RNpwCiHY4D
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10852"; a="380198862"
+X-IronPort-AV: E=McAfee;i="6600,9927,10852"; a="380198940"
 X-IronPort-AV: E=Sophos;i="6.03,197,1694761200"; 
-   d="scan'208";a="380198862"
+   d="scan'208";a="380198940"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 09:46:37 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 09:46:50 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10852"; a="841423206"
+X-IronPort-AV: E=McAfee;i="6600,9927,10852"; a="841423262"
 X-IronPort-AV: E=Sophos;i="6.03,197,1694761200"; 
-   d="scan'208";a="841423206"
+   d="scan'208";a="841423262"
 Received: from ddiaz-mobl4.amr.corp.intel.com (HELO [10.209.57.36]) ([10.209.57.36])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 09:46:37 -0700
-Message-ID: <875f8a6f-c2b3-92f4-f067-b969a9fc1112@intel.com>
-Date: Tue, 3 Oct 2023 09:46:36 -0700
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 09:46:49 -0700
+Message-ID: <36c9a903-eb48-f262-9d39-c58ff7fb8052@intel.com>
+Date: Tue, 3 Oct 2023 09:46:49 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -37,8 +37,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.15.1
-Subject: Re: [PATCH v1 20/20] selftests: mm: make protection_keys test work on
- arm64
+Subject: Re: [PATCH v1 19/20] selftests: mm: move fpregs printing
 Content-Language: en-US
 To: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org
 Cc: nd@arm.com, akpm@linux-foundation.org, aneesh.kumar@linux.ibm.com,
@@ -47,27 +46,14 @@ Cc: nd@arm.com, akpm@linux-foundation.org, aneesh.kumar@linux.ibm.com,
  kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
  linux-kselftest@vger.kernel.org
 References: <20230927140123.5283-1-joey.gouly@arm.com>
- <20230927140123.5283-21-joey.gouly@arm.com>
+ <20230927140123.5283-20-joey.gouly@arm.com>
 From: Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <20230927140123.5283-21-joey.gouly@arm.com>
+In-Reply-To: <20230927140123.5283-20-joey.gouly@arm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 9/27/23 07:01, Joey Gouly wrote:
-> The encoding of the pkey register differs on arm64, than on x86/ppc. On those
-> platforms, a bit in the register is used to disable permissions, for arm64, a
-> bit enabled in the register indicates that the permission is allowed.
-> 
-> This drops two asserts of the form:
-> 	 assert(read_pkey_reg() <= orig_pkey_reg);
-> Because on arm64 this doesn't hold, due to the encoding.
-> 
-> The pkey must be reset to both access allow and write allow in the signal
-> handler. pkey_access_allow() works currently for PowerPC as the
-> PKEY_DISABLE_ACCESS and PKEY_DISABLE_WRITE have overlapping bits set.
-> 
-> Access to the uc_mcontext is abstracted, as arm64 has a different structure.
-
-This all looks sane enough.  Welcome to the pkey party! :)
+> arm64's fpregs are not at a constant offset from sigcontext. Since this is
+> not an important part of the test, don't print the fpregs pointer on arm64.
 
 Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
