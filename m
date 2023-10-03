@@ -1,488 +1,235 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C66E29415
-	for <kvmarm@lists.linux.dev>; Tue,  3 Oct 2023 16:55:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1696352101;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uUE4b4eA8EVcusS8OYgffaSubZlYW8k7hwjIUaJEuJ0=;
-	b=VDuWYGIJJrZKpxyDxIL08GshDqeHe/nNQ3Dc1vquzyU9fyl1YhkZPQbB474/0Lxc1aygm2
-	F/on72leqHvxTbwrz+zXRznZoYvadiwv1eMfHBOJHUNs5rB3A3SaEUgCb4kOZRq7eudm5G
-	maPraggsKWM3yFxxAiLT+OCNlV6gJ+o=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-92-p-01F15GNf6dPg1vPM4QRw-1; Tue, 03 Oct 2023 12:54:59 -0400
-X-MC-Unique: p-01F15GNf6dPg1vPM4QRw-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-3fef5403093so84685e9.0
-        for <kvmarm@lists.linux.dev>; Tue, 03 Oct 2023 09:54:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3836208D9
+	for <kvmarm@lists.linux.dev>; Tue,  3 Oct 2023 18:33:48 +0000 (UTC)
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-65b0a54d436so7090846d6.3
+        for <kvmarm@lists.linux.dev>; Tue, 03 Oct 2023 11:33:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696358028; x=1696962828; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R9RZg3twPdN7SJarZ/3IsJk/93o/jgnrY3ylxDmEVWY=;
+        b=22YTCAsZxykMIbrgrioVTtBSLARw9ZJ0CRAb88QCescdQ2H45UpNFEbhMu0ZSPuQuM
+         RXuA+vfH9RoSPC6W8bnGiU7Zxz6GUwqroANTG9s90jAHa4dL/pSFvEG7ZuKyTPxUkKkt
+         C4anNpbNvsWASHBN3YpBfwLpYxaQDuSCoTLFkTdAvJvm9wNRc1Bcn3+lFSKMhCRcalsX
+         VoUFPpLzUh83TrLNAjWjBWwc+u7QYRBghV1E9YPET39e1J55GoFKYAwAl8Ty9ZSEakEZ
+         l1O5mFMRDsthlzuqJV4SJJHTYLdLGvsmjEFprHSmM3sxfzJrbhAJXTt6VaO7uZiO8nEV
+         WTTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696352098; x=1696956898;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uUE4b4eA8EVcusS8OYgffaSubZlYW8k7hwjIUaJEuJ0=;
-        b=OGCVNmVgSQsHVulVXJ0sjpQgvlR+bl5cCED6LTjknJP/JLKL5WZkRektO+nBWwM/ZR
-         hqtpPa5guon1HVuwUH1CDtT7NVToKkIGv6JvfEiKJEkPEeo9yTxifLPZPaCk6dtRXv/9
-         9xKeiFwo6O8K5Luf74ouzdtndGd2NVT3imVcDaob5rusNXkHRNmuNy60Sl7IH/p5VysO
-         HDpzZlsobAUiIbWN/Hby1vVdCuXJG27tGHL15WH4fsNNilhLACW6BIZARfkpfzH9W4qp
-         f7D9NSUP5UhVVKErKcnDWGKT0jrBmV/jEsT4naXiNOuX+GUVsj9YSrh906te0y5bxvvH
-         UYrg==
-X-Gm-Message-State: AOJu0YzznVgqCtyU5otnXMrNpu6ffjtOuXAumHnWk3HYDaMkVwzIAB/y
-	sIVz2hAfaRTeismXqAbC3jnZ8fDdGNeM91pT89YF+rm8j+gaSLoDFhd4leGYB+YLa0oLXH4Mk8H
-	NeaUVkXO6cKkIdijT
-X-Received: by 2002:a05:600c:1c9b:b0:405:3622:382c with SMTP id k27-20020a05600c1c9b00b004053622382cmr2665565wms.17.1696352098619;
-        Tue, 03 Oct 2023 09:54:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFP4APoMvfSFRDaIFr2iCuYs0CEJsDHoCSuhiuSiY9KVZfnpDvSxlj0ZWm4z0+iu/WKyObsyw==
-X-Received: by 2002:a05:600c:1c9b:b0:405:3622:382c with SMTP id k27-20020a05600c1c9b00b004053622382cmr2665541wms.17.1696352098090;
-        Tue, 03 Oct 2023 09:54:58 -0700 (PDT)
-Received: from starship ([89.237.100.246])
-        by smtp.gmail.com with ESMTPSA id c6-20020a5d4cc6000000b00325c7295450sm1978005wrt.3.2023.10.03.09.54.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Oct 2023 09:54:57 -0700 (PDT)
-Message-ID: <ca9dde6a5c8d8ff9eb1945fd6c846ed5184d45ee.camel@redhat.com>
-Subject: Re: [PATCH v9 6/6] KVM: x86/mmu: Handle non-refcounted pages
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: David Stevens <stevensd@chromium.org>, Sean Christopherson
-	 <seanjc@google.com>
-Cc: Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata
-	 <isaku.yamahata@gmail.com>, Zhi Wang <zhi.wang.linux@gmail.com>, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Date: Tue, 03 Oct 2023 19:54:56 +0300
-In-Reply-To: <20230911021637.1941096-7-stevensd@google.com>
-References: <20230911021637.1941096-1-stevensd@google.com>
-	 <20230911021637.1941096-7-stevensd@google.com>
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32)
+        d=1e100.net; s=20230601; t=1696358028; x=1696962828;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=R9RZg3twPdN7SJarZ/3IsJk/93o/jgnrY3ylxDmEVWY=;
+        b=fXVIo5X5LUfWDyJNebvH/MzDZuY2IW2MevXKDgaomGTm0NM+lhJqPqenuFPqScJP2n
+         USWLFDOec4biTvYuArcKS0f0+KwO1NiZ8Lq7UNzo9keXiWEvCwej97lKdRz9HEU2ichY
+         JsA5sqJxXb7eytIFwODkOliHCsYLPWHhll1QGtw+HQYfQnuGA3x1hFl0Ljygq3kmQ61M
+         VycQXBEz4wV7/I2GSTnzEEoQBOrTy8znmou/lVvbaeAOtXZLy2qS+N7Zjc9CiM2sf9lA
+         E/GQXPvmDS0EdlVtjh4YXIP/2FaJ9/V6aAKj9A2sLCtZSDLAJVkoRu9OsL+911ihXWGj
+         13cA==
+X-Gm-Message-State: AOJu0YzXbzrSFmCmZCfZpKQnlBWfC42dW64KJYIJFlQqIzYpuhnD6yha
+	ewbBUKRN490LeRjhU364PMkNHVmP/ThxYOlvtJEG8A==
+X-Google-Smtp-Source: AGHT+IFD9MiWpIrPl+X1KG+mF8SaIxZsGnEuN1WGAxrVYz5JoBkTLtzwKfCvY0TUsCLlDtWXvgqIVLrhKrhnAnrWPa0=
+X-Received: by 2002:a0c:c409:0:b0:64f:3699:90cd with SMTP id
+ r9-20020a0cc409000000b0064f369990cdmr170157qvi.42.1696358027177; Tue, 03 Oct
+ 2023 11:33:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-12-seanjc@google.com>
+ <CA+EHjTzSUXx8P9gWmUERg4owxH6r6yNPm1_RL-BzS_2CNPtRKw@mail.gmail.com> <ZRw6X2BptZnRPNK7@google.com>
+In-Reply-To: <ZRw6X2BptZnRPNK7@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 3 Oct 2023 19:33:09 +0100
+Message-ID: <CA+EHjTzx+0pxh7DYONZUeJsm1GCiC6L8Vg_Tm9MLVEae-FKuQg@mail.gmail.com>
+Subject: Re: [RFC PATCH v12 11/33] KVM: Introduce per-page memory attributes
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Anish Moorthy <amoorthy@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, Xu Yilun <yilun.xu@intel.com>, 
+	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 
-У пн, 2023-09-11 у 11:16 +0900, David Stevens пише:
-> From: David Stevens <stevensd@chromium.org>
-> 
-> Handle non-refcounted pages in __kvm_faultin_pfn. This allows the host
-> to map memory into the guest that is backed by non-refcounted struct
-> pages - for example, the tail pages of higher order non-compound pages
-> allocated by the amdgpu driver via ttm_pool_alloc_page.
-> 
-> The bulk of this change is tracking the is_refcounted_page flag so that
-> non-refcounted pages don't trigger page_count() == 0 warnings. This is
-> done by storing the flag in an unused bit in the sptes. There are no
-> bits available in PAE SPTEs, so non-refcounted pages can only be handled
-> on TDP and x86-64.
-> 
-> Signed-off-by: David Stevens <stevensd@chromium.org>
-> ---
->  arch/x86/kvm/mmu/mmu.c          | 52 +++++++++++++++++++++++----------
->  arch/x86/kvm/mmu/mmu_internal.h |  1 +
->  arch/x86/kvm/mmu/paging_tmpl.h  |  8 +++--
->  arch/x86/kvm/mmu/spte.c         |  4 ++-
->  arch/x86/kvm/mmu/spte.h         | 12 +++++++-
->  arch/x86/kvm/mmu/tdp_mmu.c      | 22 ++++++++------
->  include/linux/kvm_host.h        |  3 ++
->  virt/kvm/kvm_main.c             |  6 ++--
->  8 files changed, 76 insertions(+), 32 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index e1eca26215e2..b8168cc4cc96 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -545,12 +545,14 @@ static bool mmu_spte_update(u64 *sptep, u64 new_spte)
->  
->  	if (is_accessed_spte(old_spte) && !is_accessed_spte(new_spte)) {
->  		flush = true;
-> -		kvm_set_pfn_accessed(spte_to_pfn(old_spte));
-> +		if (is_refcounted_page_pte(old_spte))
-> +			kvm_set_page_accessed(pfn_to_page(spte_to_pfn(old_spte)));
->  	}
->  
->  	if (is_dirty_spte(old_spte) && !is_dirty_spte(new_spte)) {
->  		flush = true;
-> -		kvm_set_pfn_dirty(spte_to_pfn(old_spte));
-> +		if (is_refcounted_page_pte(old_spte))
-> +			kvm_set_page_dirty(pfn_to_page(spte_to_pfn(old_spte)));
->  	}
->  
->  	return flush;
-> @@ -588,14 +590,18 @@ static u64 mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
->  	 * before they are reclaimed.  Sanity check that, if the pfn is backed
->  	 * by a refcounted page, the refcount is elevated.
->  	 */
-> -	page = kvm_pfn_to_refcounted_page(pfn);
-> -	WARN_ON_ONCE(page && !page_count(page));
-> +	if (is_refcounted_page_pte(old_spte)) {
-> +		page = kvm_pfn_to_refcounted_page(pfn);
-> +		WARN_ON_ONCE(!page || !page_count(page));
-> +	}
->  
-> -	if (is_accessed_spte(old_spte))
-> -		kvm_set_pfn_accessed(pfn);
-> +	if (is_refcounted_page_pte(old_spte)) {
-> +		if (is_accessed_spte(old_spte))
-> +			kvm_set_page_accessed(pfn_to_page(pfn));
->  
-> -	if (is_dirty_spte(old_spte))
-> -		kvm_set_pfn_dirty(pfn);
-> +		if (is_dirty_spte(old_spte))
-> +			kvm_set_page_dirty(pfn_to_page(pfn));
-> +	}
->  
->  	return old_spte;
->  }
-> @@ -631,8 +637,8 @@ static bool mmu_spte_age(u64 *sptep)
->  		 * Capture the dirty status of the page, so that it doesn't get
->  		 * lost when the SPTE is marked for access tracking.
->  		 */
-> -		if (is_writable_pte(spte))
-> -			kvm_set_pfn_dirty(spte_to_pfn(spte));
-> +		if (is_writable_pte(spte) && is_refcounted_page_pte(spte))
-> +			kvm_set_page_dirty(pfn_to_page(spte_to_pfn(spte)));
->  
->  		spte = mark_spte_for_access_track(spte);
->  		mmu_spte_update_no_track(sptep, spte);
-> @@ -1261,8 +1267,8 @@ static bool spte_wrprot_for_clear_dirty(u64 *sptep)
->  {
->  	bool was_writable = test_and_clear_bit(PT_WRITABLE_SHIFT,
->  					       (unsigned long *)sptep);
-> -	if (was_writable && !spte_ad_enabled(*sptep))
-> -		kvm_set_pfn_dirty(spte_to_pfn(*sptep));
-> +	if (was_writable && !spte_ad_enabled(*sptep) && is_refcounted_page_pte(*sptep))
-> +		kvm_set_page_dirty(pfn_to_page(spte_to_pfn(*sptep)));
->  
->  	return was_writable;
->  }
-> @@ -2913,6 +2919,11 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
->  	bool host_writable = !fault || fault->map_writable;
->  	bool prefetch = !fault || fault->prefetch;
->  	bool write_fault = fault && fault->write;
-> +	/*
-> +	 * Prefetching uses gfn_to_page_many_atomic, which never gets
-> +	 * non-refcounted pages.
-> +	 */
-> +	bool is_refcounted = !fault || fault->is_refcounted_page;
-A WARN_ON_ONCE for a future bug that will make this condition false might be a good idea.
-
->  
->  	if (unlikely(is_noslot_pfn(pfn))) {
->  		vcpu->stat.pf_mmio_spte_created++;
-> @@ -2940,7 +2951,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
->  	}
->  
->  	wrprot = make_spte(vcpu, sp, slot, pte_access, gfn, pfn, *sptep, prefetch,
-> -			   true, host_writable, &spte);
-> +			   true, host_writable, is_refcounted, &spte);
->  
->  	if (*sptep == spte) {
->  		ret = RET_PF_SPURIOUS;
-> @@ -4254,13 +4265,18 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
->  static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->  {
->  	struct kvm_memory_slot *slot = fault->slot;
-> +	/*
-> +	 * There are no extra bits for tracking non-refcounted pages in
-> +	 * PAE SPTEs, so reject non-refcounted struct pages in that case.
-> +	 */
-> +	bool has_spte_refcount_bit = tdp_enabled && IS_ENABLED(CONFIG_X86_64);
-
-I think that the tdp_enabled condition is needed because shadow paging uses the same
-paging mode as the guest and it can use PAE, thus there will be no reserved bits.
-
-Is this true? If true, can you write a comment about this? I haven't worked with shadow paging
-for a long time, I no longer remember some of the details.
+Hi Sean,
 
 
->  	struct kvm_follow_pfn foll = {
->  		.slot = slot,
->  		.gfn = fault->gfn,
->  		.flags = fault->write ? FOLL_WRITE : 0,
->  		.try_map_writable = true,
->  		.guarded_by_mmu_notifier = true,
-> -		.allow_non_refcounted_struct_page = false,
-> +		.allow_non_refcounted_struct_page = has_spte_refcount_bit,
->  	};
->  
->  	/*
-> @@ -4277,6 +4293,7 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->  			fault->slot = NULL;
->  			fault->pfn = KVM_PFN_NOSLOT;
->  			fault->map_writable = false;
-> +			fault->is_refcounted_page = false;
->  			return RET_PF_CONTINUE;
->  		}
->  		/*
-> @@ -4332,6 +4349,7 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->  success:
->  	fault->hva = foll.hva;
->  	fault->map_writable = foll.writable;
-> +	fault->is_refcounted_page = foll.is_refcounted_page;
->  	return RET_PF_CONTINUE;
->  }
->  
-> @@ -4420,8 +4438,9 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->  	r = direct_map(vcpu, fault);
->  
->  out_unlock:
-> +	if (fault->is_refcounted_page)
-> +		kvm_set_page_accessed(pfn_to_page(fault->pfn));
->  	write_unlock(&vcpu->kvm->mmu_lock);
-> -	kvm_release_pfn_clean(fault->pfn);
->  	return r;
->  }
->  
-> @@ -4496,8 +4515,9 @@ static int kvm_tdp_mmu_page_fault(struct kvm_vcpu *vcpu,
->  	r = kvm_tdp_mmu_map(vcpu, fault);
->  
->  out_unlock:
-> +	if (fault->is_refcounted_page)
-> +		kvm_set_page_accessed(pfn_to_page(fault->pfn));
->  	read_unlock(&vcpu->kvm->mmu_lock);
-> -	kvm_release_pfn_clean(fault->pfn);
->  	return r;
->  }
->  #endif
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> index b102014e2c60..7f73bc2a552e 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -239,6 +239,7 @@ struct kvm_page_fault {
->  	kvm_pfn_t pfn;
->  	hva_t hva;
->  	bool map_writable;
-> +	bool is_refcounted_page;
->  
->  	/*
->  	 * Indicates the guest is trying to write a gfn that contains one or
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index c85255073f67..0ac4a4e5870c 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -848,7 +848,8 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->  
->  out_unlock:
->  	write_unlock(&vcpu->kvm->mmu_lock);
-> -	kvm_release_pfn_clean(fault->pfn);
-> +	if (fault->is_refcounted_page)
-> +		kvm_set_page_accessed(pfn_to_page(fault->pfn));
->  	return r;
->  }
->  
-> @@ -902,7 +903,7 @@ static gpa_t FNAME(gva_to_gpa)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
->   */
->  static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int i)
->  {
-> -	bool host_writable;
-> +	bool host_writable, is_refcounted;
->  	gpa_t first_pte_gpa;
->  	u64 *sptep, spte;
->  	struct kvm_memory_slot *slot;
-> @@ -959,10 +960,11 @@ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int
->  	sptep = &sp->spt[i];
->  	spte = *sptep;
->  	host_writable = spte & shadow_host_writable_mask;
-> +	is_refcounted = spte & SPTE_MMU_PAGE_REFCOUNTED;
+On Tue, Oct 3, 2023 at 4:59=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Tue, Oct 03, 2023, Fuad Tabba wrote:
+> > Hi,
+> >
+> > > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > > index d2d913acf0df..f8642ff2eb9d 100644
+> > > --- a/include/uapi/linux/kvm.h
+> > > +++ b/include/uapi/linux/kvm.h
+> > > @@ -1227,6 +1227,7 @@ struct kvm_ppc_resize_hpt {
+> > >  #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
+> > >  #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
+> > >  #define KVM_CAP_USER_MEMORY2 230
+> > > +#define KVM_CAP_MEMORY_ATTRIBUTES 231
+> > >
+> > >  #ifdef KVM_CAP_IRQ_ROUTING
+> > >
+> > > @@ -2293,4 +2294,17 @@ struct kvm_s390_zpci_op {
+> > >  /* flags for kvm_s390_zpci_op->u.reg_aen.flags */
+> > >  #define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
+> > >
+> > > +/* Available with KVM_CAP_MEMORY_ATTRIBUTES */
+> > > +#define KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES    _IOR(KVMIO,  0xd2, __=
+u64)
+> > > +#define KVM_SET_MEMORY_ATTRIBUTES              _IOW(KVMIO,  0xd3, st=
+ruct kvm_memory_attributes)
+> > > +
+> > > +struct kvm_memory_attributes {
+> > > +       __u64 address;
+> > > +       __u64 size;
+> > > +       __u64 attributes;
+> > > +       __u64 flags;
+> > > +};
+> > > +
+> > > +#define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
+> > > +
+> >
+> > In pKVM, we don't want to allow setting (or clearing) of PRIVATE/SHARED
+> > attributes from userspace.
+>
+> Why not?  The whole thing falls apart if userspace doesn't *know* the sta=
+te of a
+> page, and the only way for userspace to know the state of a page at a giv=
+en moment
+> in time is if userspace controls the attributes.  E.g. even if KVM were t=
+o provide
+> a way for userspace to query attributes, the attributes exposed to usrspa=
+ce would
+> become stale the instant KVM drops slots_lock (or whatever lock protects =
+the attributes)
+> since userspace couldn't prevent future changes.
 
-What will happen if this function is run on 32 bit kernel and/or without tdp enabled
-(that is when SPTE_MMU_PAGE_REFCOUNTED is not defined)?
+I think I might not quite understand the purpose of the
+KVM_SET_MEMORY_ATTRIBUTES ABI. In pKVM, all of a protected guest's
+memory is private by default, until the guest shares it with the host
+(via a hypercall), or another guest (future work). When the guest
+shares it, userspace is notified via KVM_EXIT_HYPERCALL. In many use
+cases, userspace doesn't need to keep track directly of all of this,
+but can reactively un/map the memory being un/shared.
 
->  	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
->  	make_spte(vcpu, sp, slot, pte_access, gfn,
->  		  spte_to_pfn(spte), spte, true, false,
-> -		  host_writable, &spte);
-> +		  host_writable, is_refcounted, &spte);
->  
->  	return mmu_spte_update(sptep, spte);
->  }
-> diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-> index 4a599130e9c9..ce495819061f 100644
-> --- a/arch/x86/kvm/mmu/spte.c
-> +++ b/arch/x86/kvm/mmu/spte.c
-> @@ -138,7 +138,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
->  	       const struct kvm_memory_slot *slot,
->  	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
->  	       u64 old_spte, bool prefetch, bool can_unsync,
-> -	       bool host_writable, u64 *new_spte)
-> +	       bool host_writable, bool is_refcounted, u64 *new_spte)
->  {
->  	int level = sp->role.level;
->  	u64 spte = SPTE_MMU_PRESENT_MASK;
-> @@ -188,6 +188,8 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
->  
->  	if (level > PG_LEVEL_4K)
->  		spte |= PT_PAGE_SIZE_MASK;
-> +	if (is_refcounted)
-> +		spte |= SPTE_MMU_PAGE_REFCOUNTED;
+> Why does pKVM need to prevent userspace from stating *its* view of attrib=
+utes?
+>
+> If the goal is to reduce memory overhead, that can be solved by using an =
+internal,
+> non-ABI attributes flag to track pKVM's view of SHARED vs. PRIVATE.  If t=
+he guest
+> attempts to access memory where pKVM and userspace don't agree on the sta=
+te,
+> generate an exit to userspace.  Or kill the guest.  Or do something else =
+entirely.
 
-Same here, if make_spte is used in these modes won't it set a bit it shouldn't?
+For the pKVM hypervisor the guest's view of the attributes doesn't
+matter. The hypervisor at the end of the day is the ultimate arbiter
+for what is shared and with how. For pKVM (at least in my port of
+guestmem), we use the memory attributes from guestmem essentially to
+control which memory can be mapped by the host.
 
->  
->  	if (shadow_memtype_mask)
->  		spte |= static_call(kvm_x86_get_mt_mask)(vcpu, gfn,
-> diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-> index a129951c9a88..4bf4a535c23d 100644
-> --- a/arch/x86/kvm/mmu/spte.h
-> +++ b/arch/x86/kvm/mmu/spte.h
-> @@ -96,6 +96,11 @@ static_assert(!(EPT_SPTE_MMU_WRITABLE & SHADOW_ACC_TRACK_SAVED_MASK));
->  /* Defined only to keep the above static asserts readable. */
->  #undef SHADOW_ACC_TRACK_SAVED_MASK
->  
-> +/*
-> + * Indicates that the SPTE refers to a page with a valid refcount.
-> + */
-> +#define SPTE_MMU_PAGE_REFCOUNTED        BIT_ULL(59)
-> +
->  /*
->   * Due to limited space in PTEs, the MMIO generation is a 19 bit subset of
->   * the memslots generation and is derived as follows:
-> @@ -345,6 +350,11 @@ static inline bool is_dirty_spte(u64 spte)
->  	return dirty_mask ? spte & dirty_mask : spte & PT_WRITABLE_MASK;
->  }
->  
-> +static inline bool is_refcounted_page_pte(u64 spte)
-> +{
-> +	return spte & SPTE_MMU_PAGE_REFCOUNTED;
+One difference between pKVM and TDX (as I understand it), is that TDX
+uses the msb of the guest's IPA to indicate whether memory is shared
+or private, and that can generate a mismatch on guest memory access
+between what it thinks the state is, and what the sharing state in
+reality is. pKVM doesn't have that. Memory is private by default, and
+can be shared in-place, both in the guest's IPA space as well as the
+underlying physical page.
 
-Here also: if the bit is not supported, we need to assume that all sptes are refcounted I think.
+> > However, we'd like to use the attributes xarray to track the sharing st=
+ate of
+> > guest pages at the host kernel.
+> >
+> > Moreover, we'd rather the default guest page state be PRIVATE, and
+> > only specify which pages are shared. All pKVM guest pages start off as
+> > private, and the majority will remain so.
+>
+> I would rather optimize kvm_vm_set_mem_attributes() to generate range-bas=
+ed
+> xarray entries, at which point it shouldn't matter all that much whether =
+PRIVATE
+> or SHARED is the default "empty" state.  We opted not to do that for the =
+initial
+> merge purely to keep the code as simple as possible (which is obviously s=
+till not
+> exactly simple).
+>
+> With range-based xarray entries, the cost of tagging huge chunks of memor=
+y as
+> PRIVATE should be a non-issue.  And if that's not enough for whatever rea=
+son, I
+> would rather define the polarity of PRIVATE on a per-VM basis, but only f=
+or internal
+> storage.
 
-> +}
-> +
->  static inline u64 get_rsvd_bits(struct rsvd_bits_validate *rsvd_check, u64 pte,
->  				int level)
->  {
-> @@ -475,7 +485,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
->  	       const struct kvm_memory_slot *slot,
->  	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
->  	       u64 old_spte, bool prefetch, bool can_unsync,
-> -	       bool host_writable, u64 *new_spte);
-> +	       bool host_writable, bool is_refcounted, u64 *new_spte);
->  u64 make_huge_page_split_spte(struct kvm *kvm, u64 huge_spte,
->  		      	      union kvm_mmu_page_role role, int index);
->  u64 make_nonleaf_spte(u64 *child_pt, bool ad_disabled);
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 6c63f2d1675f..185f3c666c2b 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -474,6 +474,7 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
->  	bool was_leaf = was_present && is_last_spte(old_spte, level);
->  	bool is_leaf = is_present && is_last_spte(new_spte, level);
->  	bool pfn_changed = spte_to_pfn(old_spte) != spte_to_pfn(new_spte);
-> +	bool is_refcounted = is_refcounted_page_pte(old_spte);
->  
->  	WARN_ON_ONCE(level > PT64_ROOT_MAX_LEVEL);
->  	WARN_ON_ONCE(level < PG_LEVEL_4K);
-> @@ -538,9 +539,9 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
->  	if (is_leaf != was_leaf)
->  		kvm_update_page_stats(kvm, level, is_leaf ? 1 : -1);
->  
-> -	if (was_leaf && is_dirty_spte(old_spte) &&
-> +	if (was_leaf && is_dirty_spte(old_spte) && is_refcounted &&
->  	    (!is_present || !is_dirty_spte(new_spte) || pfn_changed))
-> -		kvm_set_pfn_dirty(spte_to_pfn(old_spte));
-> +		kvm_set_page_dirty(pfn_to_page(spte_to_pfn(old_spte)));
->  
->  	/*
->  	 * Recursively handle child PTs if the change removed a subtree from
-> @@ -552,9 +553,9 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
->  	    (is_leaf || !is_present || WARN_ON_ONCE(pfn_changed)))
->  		handle_removed_pt(kvm, spte_to_child_pt(old_spte, level), shared);
->  
-> -	if (was_leaf && is_accessed_spte(old_spte) &&
-> +	if (was_leaf && is_accessed_spte(old_spte) && is_refcounted &&
->  	    (!is_present || !is_accessed_spte(new_spte) || pfn_changed))
-> -		kvm_set_pfn_accessed(spte_to_pfn(old_spte));
-> +		kvm_set_page_accessed(pfn_to_page(spte_to_pfn(old_spte)));
->  }
->  
->  /*
-> @@ -988,8 +989,9 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
->  		new_spte = make_mmio_spte(vcpu, iter->gfn, ACC_ALL);
->  	else
->  		wrprot = make_spte(vcpu, sp, fault->slot, ACC_ALL, iter->gfn,
-> -					 fault->pfn, iter->old_spte, fault->prefetch, true,
-> -					 fault->map_writable, &new_spte);
-> +				   fault->pfn, iter->old_spte, fault->prefetch, true,
-> +				   fault->map_writable, fault->is_refcounted_page,
-> +				   &new_spte);
->  
->  	if (new_spte == iter->old_spte)
->  		ret = RET_PF_SPURIOUS;
-> @@ -1205,8 +1207,9 @@ static bool age_gfn_range(struct kvm *kvm, struct tdp_iter *iter,
->  		 * Capture the dirty status of the page, so that it doesn't get
->  		 * lost when the SPTE is marked for access tracking.
->  		 */
-> -		if (is_writable_pte(iter->old_spte))
-> -			kvm_set_pfn_dirty(spte_to_pfn(iter->old_spte));
-> +		if (is_writable_pte(iter->old_spte) &&
-> +		    is_refcounted_page_pte(iter->old_spte))
-> +			kvm_set_page_dirty(pfn_to_page(spte_to_pfn(iter->old_spte)));
->  
->  		new_spte = mark_spte_for_access_track(iter->old_spte);
->  		iter->old_spte = kvm_tdp_mmu_write_spte(iter->sptep,
-> @@ -1628,7 +1631,8 @@ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
->  		trace_kvm_tdp_mmu_spte_changed(iter.as_id, iter.gfn, iter.level,
->  					       iter.old_spte,
->  					       iter.old_spte & ~dbit);
-> -		kvm_set_pfn_dirty(spte_to_pfn(iter.old_spte));
-> +		if (is_refcounted_page_pte(iter.old_spte))
-> +			kvm_set_page_dirty(pfn_to_page(spte_to_pfn(iter.old_spte)));
->  	}
->  
->  	rcu_read_unlock();
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index b95c79b7833b..6696925f01f1 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1179,6 +1179,9 @@ unsigned long gfn_to_hva_memslot_prot(struct kvm_memory_slot *slot, gfn_t gfn,
->  void kvm_release_page_clean(struct page *page);
->  void kvm_release_page_dirty(struct page *page);
->  
-> +void kvm_set_page_accessed(struct page *page);
-> +void kvm_set_page_dirty(struct page *page);
-> +
->  struct kvm_follow_pfn {
->  	const struct kvm_memory_slot *slot;
->  	gfn_t gfn;
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 913de4e86d9d..4d8538cdb690 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2979,17 +2979,19 @@ static bool kvm_is_ad_tracked_page(struct page *page)
->  	return !PageReserved(page);
->  }
->  
-> -static void kvm_set_page_dirty(struct page *page)
-> +void kvm_set_page_dirty(struct page *page)
->  {
->  	if (kvm_is_ad_tracked_page(page))
->  		SetPageDirty(page);
->  }
-> +EXPORT_SYMBOL_GPL(kvm_set_page_dirty);
->  
-> -static void kvm_set_page_accessed(struct page *page)
-> +void kvm_set_page_accessed(struct page *page)
->  {
->  	if (kvm_is_ad_tracked_page(page))
->  		mark_page_accessed(page);
->  }
-> +EXPORT_SYMBOL_GPL(kvm_set_page_accessed);
->  
->  void kvm_release_page_clean(struct page *page)
->  {
+Sounds good.
 
+> > I'm not sure if this is the best way to do this: One idea would be to m=
+ove
+> > the definition of KVM_MEMORY_ATTRIBUTE_PRIVATE to
+> > arch/*/include/asm/kvm_host.h, which is where kvm_arch_supported_attrib=
+utes()
+> > lives as well. This would allow different architectures to specify thei=
+r own
+> > attributes (i.e., instead we'd have a KVM_MEMORY_ATTRIBUTE_SHARED for p=
+KVM).
+> > This wouldn't help in terms of preventing userspace from clearing attri=
+butes
+> > (i.e., setting a 0 attribute) though.
+> >
+> > The other thing, which we need for pKVM anyway, is to make
+> > kvm_vm_set_mem_attributes() global, so that it can be called from outsi=
+de of
+> > kvm_main.c (already have a local patch for this that declares it in
+> > kvm_host.h),
+>
+> That's no problem, but I am definitely opposed to KVM modifying attribute=
+s that
+> are owned by userspace.
+>
+> > and not gate this function by KVM_GENERIC_MEMORY_ATTRIBUTES.
+>
+> As above, I am opposed to pKVM having a completely different ABI for mana=
+ging
+> PRIVATE vs. SHARED.  I have no objection to pKVM using unclaimed flags in=
+ the
+> attributes to store extra metadata, but if KVM_SET_MEMORY_ATTRIBUTES does=
+n't work
+> for pKVM, then we've failed miserably and should revist the uAPI.
 
-Best regards,
-	Maxim Levitsky
+Like I said, pKVM doesn't need a userspace ABI for managing
+PRIVATE/SHARED, just a way of tracking in the host kernel of what is
+shared (as opposed to the hypervisor, which already has the
+knowledge). The solution could simply be that pKVM does not enable
+KVM_GENERIC_MEMORY_ATTRIBUTES, has its own tracking of the status of
+the guest pages, and only selects KVM_PRIVATE_MEM.
 
-
-
-
+Thanks!
+/fuad
