@@ -1,61 +1,61 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C1729415
-	for <kvmarm@lists.linux.dev>; Tue,  3 Oct 2023 16:54:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEDFC29415
+	for <kvmarm@lists.linux.dev>; Tue,  3 Oct 2023 16:54:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1696352085;
+	s=mimecast20190719; t=1696352093;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=AEA4UEa1g2oq3JcBQNLhy9atPLV06mxTKsyGqlcJSvY=;
-	b=Z7JY62+OUBsMDwL80nNlemd/+Fv9DzbYl+uUfZk37FfyfKj0qskYUX7JcSYh8RmILOVOLF
-	IXCnMHDtQz83IHJQ56+ZcXecoA1ftlmox9vkcAnwb8osK5yekO2a/q5ld0M1RUJmnYU/me
-	XrjTwRvSeoInrY4FJa9ZD3v0BqwBlBU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=UKz6JlccCVdwAjHFNSIJ5aqOB7SHuX73H5DKrk7P0eA=;
+	b=Gc9Kw2gXfcy/HKWZ4PjQCCUqzkLNY3pHA/iiYYwjWE1Re928VkM1lrIRmQyJ4g1BI1Ooor
+	XRMB5YXm/y1diuxd+Le7VH1ovoXjjnEvWYceZ4+fBlKp38obZOvXXWpYr3lHwSPgdxdimj
+	OKIzd9DHbYs42YSUo8F5FUt6L9iHVgY=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-117-0qW2LIgOOyqtjHpWClfrMA-1; Tue, 03 Oct 2023 12:54:43 -0400
-X-MC-Unique: 0qW2LIgOOyqtjHpWClfrMA-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-324810f3bfcso1870377f8f.1
-        for <kvmarm@lists.linux.dev>; Tue, 03 Oct 2023 09:54:43 -0700 (PDT)
+ us-mta-629-N5Fbc2p_Nz220Ht2JUvIEw-1; Tue, 03 Oct 2023 12:54:52 -0400
+X-MC-Unique: N5Fbc2p_Nz220Ht2JUvIEw-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3172a94b274so923323f8f.0
+        for <kvmarm@lists.linux.dev>; Tue, 03 Oct 2023 09:54:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696352083; x=1696956883;
+        d=1e100.net; s=20230601; t=1696352091; x=1696956891;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=AEA4UEa1g2oq3JcBQNLhy9atPLV06mxTKsyGqlcJSvY=;
-        b=XWDLW4GzsY91sYwoDARK2who0wk3uDjxNzQnv9o7pRqZ7v3Or7rQXPI4bXkVI71k31
-         CuLVPZB7WS0E0BOYeq5wX3+mfhgDrytNFTGWdGNLgh69AIX8SjS/AdZ18AiqxHUZP5Or
-         XweoyWAbfTQYqz/bAxeCogT0v92+priQkGtdFXHSu4tw2uytfAAd/b9zw3oG8Z9Iwcor
-         tPO9EVdj14Bm9DlVbPZUYCwO68+YQEEDuHvQ45e/o3A3e5RqSsTfp1FKXegRMRT+rxMr
-         CkHs+whdbSKGNxxZYHBA4WPVnEuQD7VDg+PSGBYsWVqFeTUbdZsaIyjfese8ufi0nr1n
-         FJPw==
-X-Gm-Message-State: AOJu0Ywp0Gbd1A2nbIeXzGICn+58tAw+os19sL6R5tfAvc3I70omOtnq
-	rHnpzQByBX4Jean4YWo3M+YIca6/Z8KlKUCeW+Nrpx0pH4ebOWmk/8mk7ASyUNxYH/nU7EaaLcn
-	gbZDESBygn8RE1ugd
-X-Received: by 2002:a5d:4d4f:0:b0:321:6339:f523 with SMTP id a15-20020a5d4d4f000000b003216339f523mr2507870wru.22.1696352082898;
-        Tue, 03 Oct 2023 09:54:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFlDv2gBqmNjvi8JNhQ5M3NWUTvo78ciQKNKG4gkmI0moK0OwgDXlqnMKPVIA5lvJAWxNQcww==
-X-Received: by 2002:a5d:4d4f:0:b0:321:6339:f523 with SMTP id a15-20020a5d4d4f000000b003216339f523mr2507859wru.22.1696352082685;
-        Tue, 03 Oct 2023 09:54:42 -0700 (PDT)
+        bh=UKz6JlccCVdwAjHFNSIJ5aqOB7SHuX73H5DKrk7P0eA=;
+        b=hfYxs2O3AwkIofHHdvfXIpvSx31TGBTLjudbuEwrttxTCBDHNCrf+I89AbC9s3Y5n9
+         vSSN6dcXQLtfTvlddpuPoGEExrkiGoFCqsUt8gDh0PEMpxB1Z3k2XvK82JxfxMEFjdpe
+         lfNKIsFzSdjj/rAU8NfCn/PZeY5/a11P+UHUiS8b5lye7CWJnDqhVeHh7YmAgmNlJntV
+         ElvM2c/nJV/T4/zN0lRoLY4lyP6spN02VEaQFCwqih+QI6o4mlDb99G2aW7KhtAxBKWC
+         GSaHy0H+mM4L7kBSdO5bU2b+Ad3rYMVo6c2wt5nJfZnMCEQg8YtoM42Ln/DL18jkLIRK
+         k4rQ==
+X-Gm-Message-State: AOJu0YweNgfRUwh19hf9DlwlBAa/mu9Pj95peqgmMQayK8JcTx2l7xWM
+	cuwGB+91RKkB5t0dURpG1uiwIkR+auOZ2b8RJidWBU+grN2psX+t2m9hcIk1HNa0ITlNJqy8GEl
+	sZ2E6czwAwH6la2xe
+X-Received: by 2002:a5d:46cc:0:b0:31f:8999:c409 with SMTP id g12-20020a5d46cc000000b0031f8999c409mr12798726wrs.66.1696352091213;
+        Tue, 03 Oct 2023 09:54:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHEw8GrseodyMNQjRvXwM2R7y7QiATyOCHeguCOnxlPwguiOvboAnAcudNz+gmFlWejG4+qew==
+X-Received: by 2002:a5d:46cc:0:b0:31f:8999:c409 with SMTP id g12-20020a5d46cc000000b0031f8999c409mr12798708wrs.66.1696352090912;
+        Tue, 03 Oct 2023 09:54:50 -0700 (PDT)
 Received: from starship ([89.237.100.246])
-        by smtp.gmail.com with ESMTPSA id p9-20020a5d4589000000b00326dd5486dcsm1968179wrq.107.2023.10.03.09.54.41
+        by smtp.gmail.com with ESMTPSA id c6-20020a5d4cc6000000b00325c7295450sm1977795wrt.3.2023.10.03.09.54.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Oct 2023 09:54:42 -0700 (PDT)
-Message-ID: <5e6665dc76663c9e7d1d47b3488184d5f23ce51f.camel@redhat.com>
-Subject: Re: [PATCH v9 4/6] KVM: Migrate kvm_vcpu_map to __kvm_follow_pfn
+        Tue, 03 Oct 2023 09:54:50 -0700 (PDT)
+Message-ID: <fe832be36d46a946431567cbc315766fbdc772b1.camel@redhat.com>
+Subject: Re: [PATCH v9 5/6] KVM: x86: Migrate to __kvm_follow_pfn
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: David Stevens <stevensd@chromium.org>, Sean Christopherson
 	 <seanjc@google.com>
 Cc: Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata
 	 <isaku.yamahata@gmail.com>, Zhi Wang <zhi.wang.linux@gmail.com>, 
 	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Date: Tue, 03 Oct 2023 19:54:40 +0300
-In-Reply-To: <20230911021637.1941096-5-stevensd@google.com>
+Date: Tue, 03 Oct 2023 19:54:48 +0300
+In-Reply-To: <20230911021637.1941096-6-stevensd@google.com>
 References: <20230911021637.1941096-1-stevensd@google.com>
-	 <20230911021637.1941096-5-stevensd@google.com>
+	 <20230911021637.1941096-6-stevensd@google.com>
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -71,96 +71,142 @@ Content-Transfer-Encoding: 8bit
 У пн, 2023-09-11 у 11:16 +0900, David Stevens пише:
 > From: David Stevens <stevensd@chromium.org>
 > 
-> Migrate kvm_vcpu_map to __kvm_follow_pfn. Track is_refcounted_page so
-> that kvm_vcpu_unmap know whether or not it needs to release the page.
+> Migrate functions which need access to is_refcounted_page to
+> __kvm_follow_pfn. The functions which need this are __kvm_faultin_pfn
+> and reexecute_instruction. The former requires replacing the async
+> in/out parameter with FOLL_NOWAIT parameter and the KVM_PFN_ERR_NEEDS_IO
+> return value. Handling non-refcounted pages is complicated, so it will
+> be done in a followup. The latter is a straightforward refactor.
+> 
+> APIC related callers do not need to migrate because KVM controls the
+> memslot, so it will always be regular memory. Prefetch related callers
+> do not need to be migrated because atomic gfn_to_pfn calls can never
+> make it to hva_to_pfn_remapped.
 > 
 > Signed-off-by: David Stevens <stevensd@chromium.org>
 > ---
->  include/linux/kvm_host.h |  2 +-
->  virt/kvm/kvm_main.c      | 24 ++++++++++++++----------
->  2 files changed, 15 insertions(+), 11 deletions(-)
+>  arch/x86/kvm/mmu/mmu.c | 43 ++++++++++++++++++++++++++++++++----------
+>  arch/x86/kvm/x86.c     | 12 ++++++++++--
+>  2 files changed, 43 insertions(+), 12 deletions(-)
 > 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 2ed08ae1a9be..b95c79b7833b 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -294,6 +294,7 @@ struct kvm_host_map {
->  	void *hva;
->  	kvm_pfn_t pfn;
->  	kvm_pfn_t gfn;
-> +	bool is_refcounted_page;
->  };
->  
->  /*
-> @@ -1228,7 +1229,6 @@ void kvm_release_pfn_dirty(kvm_pfn_t pfn);
->  void kvm_set_pfn_dirty(kvm_pfn_t pfn);
->  void kvm_set_pfn_accessed(kvm_pfn_t pfn);
->  
-> -void kvm_release_pfn(kvm_pfn_t pfn, bool dirty);
->  int kvm_read_guest_page(struct kvm *kvm, gfn_t gfn, void *data, int offset,
->  			int len);
->  int kvm_read_guest(struct kvm *kvm, gpa_t gpa, void *data, unsigned long len);
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 235c5cb3fdac..913de4e86d9d 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2886,24 +2886,22 @@ struct page *gfn_to_page(struct kvm *kvm, gfn_t gfn)
->  }
->  EXPORT_SYMBOL_GPL(gfn_to_page);
->  
-> -void kvm_release_pfn(kvm_pfn_t pfn, bool dirty)
-> -{
-> -	if (dirty)
-> -		kvm_release_pfn_dirty(pfn);
-> -	else
-> -		kvm_release_pfn_clean(pfn);
-> -}
-> -
->  int kvm_vcpu_map(struct kvm_vcpu *vcpu, gfn_t gfn, struct kvm_host_map *map)
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index e1d011c67cc6..e1eca26215e2 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4254,7 +4254,14 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+>  static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
 >  {
->  	kvm_pfn_t pfn;
->  	void *hva = NULL;
->  	struct page *page = KVM_UNMAPPED_PAGE;
+>  	struct kvm_memory_slot *slot = fault->slot;
+> -	bool async;
 > +	struct kvm_follow_pfn foll = {
-> +		.slot = gfn_to_memslot(vcpu->kvm, gfn),
-> +		.gfn = gfn,
+> +		.slot = slot,
+> +		.gfn = fault->gfn,
+> +		.flags = fault->write ? FOLL_WRITE : 0,
+> +		.try_map_writable = true,
+> +		.guarded_by_mmu_notifier = true,
+> +		.allow_non_refcounted_struct_page = false,
+> +	};
+>  
+>  	/*
+>  	 * Retry the page fault if the gfn hit a memslot that is being deleted
+> @@ -4283,12 +4290,20 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>  			return RET_PF_EMULATE;
+>  	}
+>  
+> -	async = false;
+> -	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, false, &async,
+> -					  fault->write, &fault->map_writable,
+> -					  &fault->hva);
+> -	if (!async)
+> -		return RET_PF_CONTINUE; /* *pfn has correct page already */
+> +	foll.flags |= FOLL_NOWAIT;
+> +	fault->pfn = __kvm_follow_pfn(&foll);
+> +
+> +	if (!is_error_noslot_pfn(fault->pfn))
+> +		goto success;
+Unrelated but I can't say I like the 'is_error_noslot_pfn()' name, 
+I wish it was called something like is_valid_pfn().
+
+> +
+> +	/*
+> +	 * If __kvm_follow_pfn() failed because I/O is needed to fault in the
+> +	 * page, then either set up an asynchronous #PF to do the I/O, or if
+> +	 * doing an async #PF isn't possible, retry __kvm_follow_pfn() with
+> +	 * I/O allowed. All other failures are fatal, i.e. retrying won't help.
+> +	 */
+> +	if (fault->pfn != KVM_PFN_ERR_NEEDS_IO)
+> +		return RET_PF_CONTINUE;
+>  
+>  	if (!fault->prefetch && kvm_can_do_async_pf(vcpu)) {
+>  		trace_kvm_try_async_get_page(fault->addr, fault->gfn);
+> @@ -4306,9 +4321,17 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>  	 * to wait for IO.  Note, gup always bails if it is unable to quickly
+>  	 * get a page and a fatal signal, i.e. SIGKILL, is pending.
+>  	 */
+> -	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, true, NULL,
+> -					  fault->write, &fault->map_writable,
+> -					  &fault->hva);
+> +	foll.flags |= FOLL_INTERRUPTIBLE;
+> +	foll.flags &= ~FOLL_NOWAIT;
+> +	fault->pfn = __kvm_follow_pfn(&foll);
+> +
+> +	if (!is_error_noslot_pfn(fault->pfn))
+> +		goto success;
+> +
+> +	return RET_PF_CONTINUE;
+> +success:
+> +	fault->hva = foll.hva;
+> +	fault->map_writable = foll.writable;
+>  	return RET_PF_CONTINUE;
+>  }
+>  
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 6c9c81e82e65..2011a7e47296 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -8556,6 +8556,7 @@ static bool reexecute_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  {
+>  	gpa_t gpa = cr2_or_gpa;
+>  	kvm_pfn_t pfn;
+> +	struct kvm_follow_pfn foll;
+>  
+>  	if (!(emulation_type & EMULTYPE_ALLOW_RETRY_PF))
+>  		return false;
+> @@ -8585,7 +8586,13 @@ static bool reexecute_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  	 * retry instruction -> write #PF -> emulation fail -> retry
+>  	 * instruction -> ...
+>  	 */
+> -	pfn = gfn_to_pfn(vcpu->kvm, gpa_to_gfn(gpa));
+> +	foll = (struct kvm_follow_pfn) {
+> +		.slot = gfn_to_memslot(vcpu->kvm, gpa_to_gfn(gpa)),
+> +		.gfn = gpa_to_gfn(gpa),
 > +		.flags = FOLL_WRITE,
 > +		.allow_non_refcounted_struct_page = true,
 > +	};
->  
->  	if (!map)
->  		return -EINVAL;
->  
-> -	pfn = gfn_to_pfn(vcpu->kvm, gfn);
 > +	pfn = __kvm_follow_pfn(&foll);
+>  
+>  	/*
+>  	 * If the instruction failed on the error pfn, it can not be fixed,
+> @@ -8594,7 +8601,8 @@ static bool reexecute_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
 >  	if (is_error_noslot_pfn(pfn))
->  		return -EINVAL;
+>  		return false;
 >  
-> @@ -2923,6 +2921,7 @@ int kvm_vcpu_map(struct kvm_vcpu *vcpu, gfn_t gfn, struct kvm_host_map *map)
->  	map->hva = hva;
->  	map->pfn = pfn;
->  	map->gfn = gfn;
-> +	map->is_refcounted_page = foll.is_refcounted_page;
+> -	kvm_release_pfn_clean(pfn);
+> +	if (foll.is_refcounted_page)
+> +		kvm_release_page_clean(pfn_to_page(pfn));
 >  
->  	return 0;
->  }
-> @@ -2946,7 +2945,12 @@ void kvm_vcpu_unmap(struct kvm_vcpu *vcpu, struct kvm_host_map *map, bool dirty)
->  	if (dirty)
->  		kvm_vcpu_mark_page_dirty(vcpu, map->gfn);
->  
-> -	kvm_release_pfn(map->pfn, dirty);
-> +	if (map->is_refcounted_page) {
-> +		if (dirty)
-> +			kvm_release_page_dirty(map->page);
-> +		else
-> +			kvm_release_page_clean(map->page);
-> +	}
->  
->  	map->hva = NULL;
->  	map->page = NULL;
+>  	/* The instructions are well-emulated on direct mmu. */
+>  	if (vcpu->arch.mmu->root_role.direct) {
+
+
+Overall looks good, I might have missed something.
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
+
 Best regards,
 	Maxim Levitsky
+
+
+
 
