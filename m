@@ -1,117 +1,163 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 977F62940B
-	for <kvmarm@lists.linux.dev>; Tue,  3 Oct 2023 14:29:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE72EC433C8;
-	Tue,  3 Oct 2023 14:29:44 +0000 (UTC)
-Date: Tue, 3 Oct 2023 15:29:42 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
-	Vladimir Murzin <vladimir.murzin@arm.com>,
-	Colton Lewis <coltonlewis@google.com>, linux-kernel@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH v2 1/2] KVM: arm64: Add handler for MOPS exceptions
-Message-ID: <ZRwlVgWTqtCRi/jz@arm.com>
-References: <20230922112508.1774352-1-kristina.martsenko@arm.com>
- <20230922112508.1774352-2-kristina.martsenko@arm.com>
- <87sf734ofv.wl-maz@kernel.org>
- <9f731870-ed36-d2e4-378b-f7fbf338ebd6@arm.com>
- <ZRPnpHwiRhrYwfSM@linux.dev>
- <87h6ndmixh.wl-maz@kernel.org>
- <0f99fa65-c8c1-5d5c-d9b0-5436b7592656@arm.com>
- <86ttr9nkey.wl-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36FDC36B16
+	for <kvmarm@lists.linux.dev>; Tue,  3 Oct 2023 15:59:29 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d81646fcf3eso1311280276.0
+        for <kvmarm@lists.linux.dev>; Tue, 03 Oct 2023 08:59:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696348769; x=1696953569; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xP89tk8jeFUDqiHwgtcyinENLLmFDFAo+sp2wFgmRBw=;
+        b=2W1/Lh1/41FhaQIxtDf0ppTtIKf6ft8gN3k/ReLJCNaVi90vGAJnGe86kQYYIalXSG
+         bQ9LYnrouR/8NGnO8EJqstgJN8ve4g4+YwJfNbgneLRiHlB+s4qixODnVLHYB4HvmW+8
+         IMrAznGSBU1oRRWI3o5tTbg/14kGDZl5uz95fHLOm9X9nFSxZeormdApLkt9ZJbYOJ1d
+         K/NmNpTXmSTy+0yQOfXpOtBMNArjI7OBfziVhgKD0myeCX7QoNrwzHB7lL+UtPY2UPI6
+         Lb2IW7sX35QVgUuOIihce9aAjgCfW8vMqddvMeFP3fA7TcOzfWJ2ehP/1yfPdliNTS8k
+         RIhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696348769; x=1696953569;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xP89tk8jeFUDqiHwgtcyinENLLmFDFAo+sp2wFgmRBw=;
+        b=ca7CWTb6DH0GHpNUYUhL6Wkga2cTxRUVVjFcEdChNXv9f+434i83Thz8vTlNjwoRGI
+         NyfkDf6qQVbXsoSjv7KJ7jr8dlp7LltDnzDGg7mCn96Y05bLLlZoc0DLDEJf+VNj75QY
+         AKuAefSo09AUiCj7SFbcZKZlwIATNl4zcimNoZmeJUc0eKDeR61hpRtr25/eBV5vYhHY
+         YWODkl7LyniQHAhCRf59kosSEwEhwcMu0X0cTWWPuxC3XpCo/GFyRK2MlR/WpqQ5CnDH
+         LktBD0QZlR/nRW0jNEdX6JfiHCgwQ62q1xF6mSVJ39UvIAL3breePDwqB5NBYWkfZOjB
+         xFbA==
+X-Gm-Message-State: AOJu0YyrqMkJ6iYaRJcZheZkNGu1AXEx29EUVJGa5fTEmrzhT9a7cJEP
+	6n1VXdBMg8+F8FLIPL/q/NfpuICa84Y=
+X-Google-Smtp-Source: AGHT+IHlsTPxnmIroL8cntBugIBpa7VGBcPZjKPldlj/dItcEWdxSvIkKSkj76hPSiTFqWvviFkle9Hc81s=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:3604:0:b0:d7a:c85c:725b with SMTP id
+ d4-20020a253604000000b00d7ac85c725bmr227114yba.7.1696348768967; Tue, 03 Oct
+ 2023 08:59:28 -0700 (PDT)
+Date: Tue, 3 Oct 2023 08:59:27 -0700
+In-Reply-To: <CA+EHjTzSUXx8P9gWmUERg4owxH6r6yNPm1_RL-BzS_2CNPtRKw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86ttr9nkey.wl-maz@kernel.org>
+Mime-Version: 1.0
+References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-12-seanjc@google.com>
+ <CA+EHjTzSUXx8P9gWmUERg4owxH6r6yNPm1_RL-BzS_2CNPtRKw@mail.gmail.com>
+Message-ID: <ZRw6X2BptZnRPNK7@google.com>
+Subject: Re: [RFC PATCH v12 11/33] KVM: Introduce per-page memory attributes
+From: Sean Christopherson <seanjc@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Anish Moorthy <amoorthy@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, Xu Yilun <yilun.xu@intel.com>, 
+	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Oct 02, 2023 at 03:55:33PM +0100, Marc Zyngier wrote:
-> On Mon, 02 Oct 2023 15:06:33 +0100,
-> Kristina Martsenko <kristina.martsenko@arm.com> wrote:
-> > On 29/09/2023 10:23, Marc Zyngier wrote:
-> > > On Wed, 27 Sep 2023 09:28:20 +0100,
-> > > Oliver Upton <oliver.upton@linux.dev> wrote:
-> > >> On Mon, Sep 25, 2023 at 04:16:06PM +0100, Kristina Martsenko wrote:
-> > >>>> What is the rationale for advancing the state machine? Shouldn't we
-> > >>>> instead return to the guest and immediately get the SS exception,
-> > >>>> which in turn gets reported to userspace? Is it because we rollback
-> > >>>> the PC to a previous instruction?
-> > >>>
-> > >>> Yes, because we rollback the PC to the prologue instruction. We advance the
-> > >>> state machine so that the SS exception is taken immediately upon returning to
-> > >>> the guest at the prologue instruction. If we didn't advance it then we would
-> > >>> return to the guest, execute the prologue instruction, and then take the SS
-> > >>> exception on the middle instruction. Which would be surprising as userspace
-> > >>> would see the middle and epilogue instructions executed multiple times but not
-> > >>> the prologue.
-> > >>
-> > >> I agree with Kristina that taking the SS exception on the prologue is
-> > >> likely the best course of action. Especially since it matches the
-> > >> behavior of single-stepping an EL0 MOPS sequence with an intervening CPU
-> > >> migration.
-> > >>
-> > >> This behavior might throw an EL1 that single-steps itself for a loop,
-> > >> but I think it is impossible for a hypervisor to hide the consequences
-> > >> of vCPU migration with MOPS in the first place.
-> > >>
-> > >> Marc, I'm guessing you were most concerned about the former case where
-> > >> the VMM was debugging the guest. Is there something you're concerned
-> > >> about I missed?
-> > > 
-> > > My concern is not only the VMM, but any userspace that perform
-> > > single-stepping. Imagine the debugger tracks PC by itself, and simply
-> > > increments it by 4 on a non-branch, non-fault instruction.
-> > > 
-> > > Move the vcpu or the userspace around, rewind PC, and now the debugger
-> > > is out of whack with what is executing. While I agree that there is
-> > > not much a hypervisor can do about that, I'm a bit worried that we are
-> > > going to break existing SW with this.
-> > > 
-> > > Now the obvious solution is "don't do that"...
-> > 
-> > If the debugger can handle the PC changing on branching or faulting
-> > instructions, then why can't it handle it on MOPS instructions? Wouldn't
-> > such a debugger need to be updated any time the architecture adds new
-> > branching or faulting instructions? What's different here?
+On Tue, Oct 03, 2023, Fuad Tabba wrote:
+> Hi,
 > 
-> What is different is that we *go back* in the instruction stream,
-> which is a first. I'm not saying that the debugger I describe above
-> would be a very clever piece of SW, quite the opposite. But the way
-> the architecture works results in some interesting side-effects, and
-> I'm willing to bet that some SW will break (rr?).
+> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > index d2d913acf0df..f8642ff2eb9d 100644
+> > --- a/include/uapi/linux/kvm.h
+> > +++ b/include/uapi/linux/kvm.h
+> > @@ -1227,6 +1227,7 @@ struct kvm_ppc_resize_hpt {
+> >  #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
+> >  #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
+> >  #define KVM_CAP_USER_MEMORY2 230
+> > +#define KVM_CAP_MEMORY_ATTRIBUTES 231
+> >
+> >  #ifdef KVM_CAP_IRQ_ROUTING
+> >
+> > @@ -2293,4 +2294,17 @@ struct kvm_s390_zpci_op {
+> >  /* flags for kvm_s390_zpci_op->u.reg_aen.flags */
+> >  #define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
+> >
+> > +/* Available with KVM_CAP_MEMORY_ATTRIBUTES */
+> > +#define KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES    _IOR(KVMIO,  0xd2, __u64)
+> > +#define KVM_SET_MEMORY_ATTRIBUTES              _IOW(KVMIO,  0xd3, struct kvm_memory_attributes)
+> > +
+> > +struct kvm_memory_attributes {
+> > +       __u64 address;
+> > +       __u64 size;
+> > +       __u64 attributes;
+> > +       __u64 flags;
+> > +};
+> > +
+> > +#define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
+> > +
+> 
+> In pKVM, we don't want to allow setting (or clearing) of PRIVATE/SHARED
+> attributes from userspace.
 
-The way the architecture works, either with or without Kristina's
-single-step change, a debugger would get confused. At least for EL0, I
-find the proposed (well, upstreamed) approach more predictable - it
-always restarts from the prologue in case of migration between CPUs with
-different MOPS implementation (which is not just theoretical AFAIK).
-It's more like these three instructions are a bigger CISC one ;) (though
-the CPU can step through its parts).
+Why not?  The whole thing falls apart if userspace doesn't *know* the state of a
+page, and the only way for userspace to know the state of a page at a given moment
+in time is if userspace controls the attributes.  E.g. even if KVM were to provide
+a way for userspace to query attributes, the attributes exposed to usrspace would
+become stale the instant KVM drops slots_lock (or whatever lock protects the attributes)
+since userspace couldn't prevent future changes.
 
-A more transparent approach would have been to fully emulate the
-instructions in the kernel and advance the PC as expected but I don't
-think that's even possible. An implementation may decide to leave some
-bytes to be copied by the epilogue but we can't know that in software,
-it's a microarchitecture thing.
+Why does pKVM need to prevent userspace from stating *its* view of attributes?
 
-There is the case of EL1 debugging itself (kgdb) and it triggers a MOPS
-exception to EL2. It would look weird for the guest but I guess the only
-other option is to disable MCE2 and let EL1 handle the mismatch MOPS
-option itself (assuming it knows how to; it should be fine for Linux). I
-think I still prefer Kristina's proposal for KVM as more generic, with
-the downside of breaking less usual cases like the kernel
-single-stepping itself.
+If the goal is to reduce memory overhead, that can be solved by using an internal,
+non-ABI attributes flag to track pKVM's view of SHARED vs. PRIVATE.  If the guest
+attempts to access memory where pKVM and userspace don't agree on the state,
+generate an exit to userspace.  Or kill the guest.  Or do something else entirely.
 
--- 
-Catalin
+> However, we'd like to use the attributes xarray to track the sharing state of
+> guest pages at the host kernel.
+> 
+> Moreover, we'd rather the default guest page state be PRIVATE, and
+> only specify which pages are shared. All pKVM guest pages start off as
+> private, and the majority will remain so.
+
+I would rather optimize kvm_vm_set_mem_attributes() to generate range-based
+xarray entries, at which point it shouldn't matter all that much whether PRIVATE
+or SHARED is the default "empty" state.  We opted not to do that for the initial
+merge purely to keep the code as simple as possible (which is obviously still not
+exactly simple).
+
+With range-based xarray entries, the cost of tagging huge chunks of memory as
+PRIVATE should be a non-issue.  And if that's not enough for whatever reason, I
+would rather define the polarity of PRIVATE on a per-VM basis, but only for internal
+storage.
+ 
+> I'm not sure if this is the best way to do this: One idea would be to move
+> the definition of KVM_MEMORY_ATTRIBUTE_PRIVATE to
+> arch/*/include/asm/kvm_host.h, which is where kvm_arch_supported_attributes()
+> lives as well. This would allow different architectures to specify their own
+> attributes (i.e., instead we'd have a KVM_MEMORY_ATTRIBUTE_SHARED for pKVM).
+> This wouldn't help in terms of preventing userspace from clearing attributes
+> (i.e., setting a 0 attribute) though.
+> 
+> The other thing, which we need for pKVM anyway, is to make
+> kvm_vm_set_mem_attributes() global, so that it can be called from outside of
+> kvm_main.c (already have a local patch for this that declares it in
+> kvm_host.h),
+
+That's no problem, but I am definitely opposed to KVM modifying attributes that
+are owned by userspace.
+
+> and not gate this function by KVM_GENERIC_MEMORY_ATTRIBUTES.
+
+As above, I am opposed to pKVM having a completely different ABI for managing
+PRIVATE vs. SHARED.  I have no objection to pKVM using unclaimed flags in the
+attributes to store extra metadata, but if KVM_SET_MEMORY_ATTRIBUTES doesn't work
+for pKVM, then we've failed miserably and should revist the uAPI.
