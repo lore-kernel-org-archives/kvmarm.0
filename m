@@ -1,136 +1,106 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 187512915
-	for <kvmarm@lists.linux.dev>; Tue,  3 Oct 2023 12:48:01 +0000 (UTC)
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-65af7d102b3so5868976d6.1
-        for <kvmarm@lists.linux.dev>; Tue, 03 Oct 2023 05:48:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696337280; x=1696942080; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=YZe9z/CDJkweGhxZy3F+7e7AP42NZQg1sBDsRc6xWLw=;
-        b=SUhj2orGTOe5LZIlVKY/bEwhjJItvPrdAUXcE2cvQR60HOH6ZjvOgoNtPU5O7ZHm08
-         k9bWwXromxcpNX5OAnVlJ1fQ+5DPAVnpfdZq/lBlmBKvpoGPIEpn4efygNGqftpZwlkE
-         4ouycC6y6q5LrGCUfOTCe1lY29DWaYJ1nbrbha1gJGGL0+kLAFeJY/3XRhblv9G1B8FT
-         Dj71FF32V+WvjTzbqxWNx/k+ByicCrTwfSTzdU/hQTra+Un0f+SUd2NzLvhH9sunjaFs
-         zv8wPhz3406gtZzIFqXpGC0bB43ufHEpqCOdkcALtDP5RmdfVZoJuNvVrSeiekYmogeg
-         lDOA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D22024209
+	for <kvmarm@lists.linux.dev>; Tue,  3 Oct 2023 13:03:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1696338198;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3GFwg56FjUnk/RYyxX0j6V0Iiz4DYd4P83sGmmUcaE8=;
+	b=KxXYstQj2QNguSZW2zsV5Z9VYPBh9a59t21Z+UjiLVTCRyctEF3MSJI3PqdGPJhshDTdLc
+	L99AeKipRacMXHSt1fs7LtVaQRVkoOVOpk0iUHmq47FKTYUldyibL+GGmf7Kmxr7fNGqgn
+	LCCQOJcBLgfs5TKy7utlPNqIX+zl6M4=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-255-ARjsyz0wMkm1Zdq5TumuvQ-1; Tue, 03 Oct 2023 09:03:01 -0400
+X-MC-Unique: ARjsyz0wMkm1Zdq5TumuvQ-1
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-65b1c33bf59so9623806d6.3
+        for <kvmarm@lists.linux.dev>; Tue, 03 Oct 2023 06:03:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696337280; x=1696942080;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1696338181; x=1696942981;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=YZe9z/CDJkweGhxZy3F+7e7AP42NZQg1sBDsRc6xWLw=;
-        b=INYibZjkLB+nx9yYp6B19TPGm69IWu3UGrbRA5S5ht3MXmaFyCY+uhT030V3AGsbNP
-         W0ZLNOGcKpZP/JCw+4daImzhtvuyzqH6h2vsHtc7bdR+eGssEPbKBNmh/FZWdVNtSmzt
-         w1R+1aJeYC6tNUwxkBu7LYcEGCC/stGpSR/xRn1xUvrvYpJTmpGql0YAzgDeZwYypq/p
-         MVzj7DtAbBPdH8PYE00cKbiXddjMXINtTU03DbvMHPaDzFzPRU0RniUANpmb4Ot52aGD
-         qmw/dbMKVI9Nv4GdMd+ghmdS4drtqKleua/Av5uMCT080ts69UBRJ42b0GG81X9kvERm
-         TyuQ==
-X-Gm-Message-State: AOJu0Yz/xINg9YahzIUkF6uClcTJNa5PuD2d7hnVn2fP4R7RUyBNS7c7
-	Cvwj+twIRav67uV1n2+EoqScpOmmOjVqc0YlSmxy5A==
-X-Google-Smtp-Source: AGHT+IGdg5KfMiaxwpI9vdrZwCI62gGbA1qcJqHvAfDGqDxEQ2JSHryTMBO/72MMo9L0zK8WyPrlSIxRkNMNwCJdjzY=
-X-Received: by 2002:a0c:e493:0:b0:656:347b:ea75 with SMTP id
- n19-20020a0ce493000000b00656347bea75mr13564335qvl.24.1696337280208; Tue, 03
- Oct 2023 05:48:00 -0700 (PDT)
+        bh=3GFwg56FjUnk/RYyxX0j6V0Iiz4DYd4P83sGmmUcaE8=;
+        b=KNq2chTNl+r3Xg5oQIUkstymqFUecIbNFGd7qqoGXNiNOMQQeVv0TjkKH8lGqnwCYP
+         /QIQmYnC8fZnwvSGWtHSbASjFA7FOih25rXsfaMOdJO3QAoBmZNGAbRgiURj2sAfjmue
+         LREZg/9gQ/L8m5VEYKSnOo6B+iHDPpX6As3oFBkNyruevZte0upiJLFNYBuYaIyflkHZ
+         wiTsCwOuixK5DKvSn7ClVRDuNn9CnzP4DIrsE8CWmN8IfCwVFXXuVUIO8hm4xkQjwaNn
+         WKtV4TW4sywZ16y8OQku11RNlW7wk/4VcXlfcXhLtptNhaDJdktQcXs32jvgHz6/kJHH
+         YLBw==
+X-Gm-Message-State: AOJu0YwojUKRoXpXCQSE3C9U/sHIw6wK3QyfK2x/rOBZqimTxKiN3U/p
+	zqzbBa+omSdrjGXmTk8qB/xnqcUy4sBQl+NMed9hijfwGzei8GC1sWHBd14VnmxGIuILAMx1oko
+	FJ6GrA0/+FiAMssea
+X-Received: by 2002:a0c:e184:0:b0:64f:3bec:9b29 with SMTP id p4-20020a0ce184000000b0064f3bec9b29mr16313138qvl.39.1696338181294;
+        Tue, 03 Oct 2023 06:03:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEFu2JXglfNoNOa1zYOGFmLH18oaA0qRkmgTq9KV7s1VRSKyL03flSA7O6FwDPBplykwo50Vg==
+X-Received: by 2002:a0c:e184:0:b0:64f:3bec:9b29 with SMTP id p4-20020a0ce184000000b0064f3bec9b29mr16313116qvl.39.1696338180979;
+        Tue, 03 Oct 2023 06:03:00 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id s2-20020a0ce302000000b0064723b94a23sm453235qvl.27.2023.10.03.06.02.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Oct 2023 06:03:00 -0700 (PDT)
+Message-ID: <ef81a814-2733-8c1a-bfb0-bb1187881c94@redhat.com>
+Date: Tue, 3 Oct 2023 15:02:57 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-12-seanjc@google.com>
-In-Reply-To: <20230914015531.1419405-12-seanjc@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 3 Oct 2023 13:47:23 +0100
-Message-ID: <CA+EHjTzSUXx8P9gWmUERg4owxH6r6yNPm1_RL-BzS_2CNPtRKw@mail.gmail.com>
-Subject: Re: [RFC PATCH v12 11/33] KVM: Introduce per-page memory attributes
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Paul Moore <paul@paul-moore.com>, 
-	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Anish Moorthy <amoorthy@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, Xu Yilun <yilun.xu@intel.com>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH] arm: pmu: Fix overflow test condition
+To: Matthias Rosenfelder <matthias.rosenfelder@nio.io>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc: Andrew Jones <andrew.jones@linux.dev>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
+References: <FRYP281MB31463EC1486883DDA477393DF2C0A@FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <FRYP281MB31463EC1486883DDA477393DF2C0A@FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi,
+Hi Matthias,
 
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index d2d913acf0df..f8642ff2eb9d 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1227,6 +1227,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
->  #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
->  #define KVM_CAP_USER_MEMORY2 230
-> +#define KVM_CAP_MEMORY_ATTRIBUTES 231
+On 9/29/23 23:19, Matthias Rosenfelder wrote:
+> Hello,
 >
->  #ifdef KVM_CAP_IRQ_ROUTING
+> I think one of the test conditions for the KVM PMU unit test "basic_event_count" is not strong enough. It only checks whether an overflow occurred for counter #0, but it should also check that none happened for the other counter(s):
 >
-> @@ -2293,4 +2294,17 @@ struct kvm_s390_zpci_op {
->  /* flags for kvm_s390_zpci_op->u.reg_aen.flags */
->  #define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
+> report(read_sysreg(pmovsclr_el0) & 0x1,
+>       "check overflow happened on #0 only");
 >
-> +/* Available with KVM_CAP_MEMORY_ATTRIBUTES */
-> +#define KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES    _IOR(KVMIO,  0xd2, __u64)
-> +#define KVM_SET_MEMORY_ATTRIBUTES              _IOW(KVMIO,  0xd3, struct kvm_memory_attributes)
-> +
-> +struct kvm_memory_attributes {
-> +       __u64 address;
-> +       __u64 size;
-> +       __u64 attributes;
-> +       __u64 flags;
-> +};
-> +
-> +#define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
-> +
+> This should be "==" instead of "&".
 
-In pKVM, we don't want to allow setting (or clearing) of
-PRIVATE/SHARED attributes from userspace. However, we'd like to use
-the attributes xarray to track the sharing state of guest pages at the
-host kernel.
+Your change indeed makes sense to match the comment. Please resubmit
+following Drew's hint and feel free to add my
 
-Moreover, we'd rather the default guest page state be PRIVATE, and
-only specify which pages are shared. All pKVM guest pages start off as
-private, and the majority will remain so.
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-I'm not sure if this is the best way to do this: One idea would be to
-move the definition of KVM_MEMORY_ATTRIBUTE_PRIVATE to
-arch/*/include/asm/kvm_host.h, which is where
-kvm_arch_supported_attributes() lives as well. This would allow
-different architectures to specify their own attributes (i.e., instead
-we'd have a KVM_MEMORY_ATTRIBUTE_SHARED for pKVM). This wouldn't help
-in terms of preventing userspace from clearing attributes (i.e.,
-setting a 0 attribute) though.
+Thanks
 
-The other thing, which we need for pKVM anyway, is to make
-kvm_vm_set_mem_attributes() global, so that it can be called from
-outside of kvm_main.c (already have a local patch for this that
-declares it in kvm_host.h), and not gate this function by
-KVM_GENERIC_MEMORY_ATTRIBUTES. This would let pKVM select only
-KVM_PRIVATE_MEM (as opposed to KVM_GENERIC_PRIVATE_MEM, which selects
-KVM_GENERIC_MEMORY_ATTRIBUTES), preventing userspace from setting
-these attributes, while allowing pKVM to call
-kvm_vm_set_mem_attributes().
+Eric
+>
+> Note that this test uses one more counter (#1), which must not overflow. This should also be checked, even though this would be visible through the "report_info()" a few lines above. But the latter does not mark the test failing - it is purely informational, so any test automation will not notice.
+>
+>
+> I apologize in advance if my email program at work messes up any formatting. Please let me know and I will try to reconfigure and resend if necessary. Thank you.
+>
+> Best Regards,
+>
+> Matthias
+> [Banner]<http://www.nio.io>
+> This email and any files transmitted with it are confidential and intended solely for the use of the individual or entity to whom they are addressed. You may NOT use, disclose, copy or disseminate this information. If you have received this email in error, please notify the sender and destroy all copies of the original message and all attachments. Please note that any views or opinions presented in this email are solely those of the author and do not necessarily represent those of the company. Finally, the recipient should check this email and any attachments for the presence of viruses. The company accepts no liability for any damage caused by any virus transmitted by this email.
 
-What do you think?
-
-Thanks,
-/fuad
