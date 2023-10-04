@@ -1,18 +1,18 @@
-Received: from out-201.mta0.migadu.com (out-201.mta0.migadu.com [91.218.175.201])
+Received: from out-209.mta1.migadu.com (out-209.mta1.migadu.com [95.215.58.209])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A4F51C68D
-	for <kvmarm@lists.linux.dev>; Wed,  4 Oct 2023 16:53:22 +0000 (UTC)
-Date: Wed, 4 Oct 2023 16:53:16 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E05A1C2BF
+	for <kvmarm@lists.linux.dev>; Wed,  4 Oct 2023 17:08:39 +0000 (UTC)
+Date: Wed, 4 Oct 2023 17:08:33 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1696438400;
+	t=1696439317;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3x/C3uN5n0ecJ753anGN387LclKbafyhiu3iWfcPQOk=;
-	b=qv2CfXgUqzzcISXuh8De8e2oB88njrk6/igWX7smSRtFN+QKjjH3Bzc+hHdVmug+0EP/qQ
-	8P0Q0iia1COY0c2Rr41HVVOy6Ia/8cjKDQzh8d/PMA6y9JTaxPJEmXxuuq/qGKm/GTCgch
-	D0IYfpzU/pcWAkJcQe9rlZyJ3NwjjnA=
+	bh=oxEbMZBN/i2VVwJjFBHaIQZhAFMYiYRDjGSEG1mONFg=;
+	b=g5COsr582BwuSWvweC4vNOp9mxwo086nOLt3za/MgcIK1zVlcEJysTG8w1byOMk2WlrEBx
+	GAkUn0pUtqPd6CZfeOGhY+wZO4fEEVfvOUaQWpZ1uHKnjp5tOLrOssMK4HTkLrrgCOhM71
+	NgYC7UaZiqnh8vYUhu41xaEdLJMzMyc=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>
@@ -22,10 +22,12 @@ Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Jing Zhang <jingzhangos@google.com>,
 	Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH v11 00/12] KVM: arm64: Enable 'writable' ID registers
-Message-ID: <ZR2YfAixZgbCFnb8@linux.dev>
+Subject: Re: [PATCH v11 05/12] KVM: arm64: Bump up the default KVM sanitised
+ debug version to v8p8
+Message-ID: <ZR2cEYQLrPCStcgy@linux.dev>
 References: <20231003230408.3405722-1-oliver.upton@linux.dev>
- <86mswyohcy.wl-maz@kernel.org>
+ <20231003230408.3405722-6-oliver.upton@linux.dev>
+ <86pm1uojcn.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -34,37 +36,95 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86mswyohcy.wl-maz@kernel.org>
+In-Reply-To: <86pm1uojcn.wl-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, Oct 04, 2023 at 10:40:45AM +0100, Marc Zyngier wrote:
-> On Wed, 04 Oct 2023 00:03:56 +0100,
+On Wed, Oct 04, 2023 at 09:57:44AM +0100, Marc Zyngier wrote:
+> On Wed, 04 Oct 2023 00:04:01 +0100,
 > Oliver Upton <oliver.upton@linux.dev> wrote:
 > > 
-> > Few more fixes that I threw on top:
+> > Since ID_AA64DFR0_EL1 and ID_DFR0_EL1 are now writable from userspace,
+> > it is safe to bump up the default KVM sanitised debug version to v8p8.
 > > 
-> > v10 -> v11:
-> >  - Drop the custom handling of FEAT_BC as it is now fixed on the arm64
-> >    side (Kristina)
-> >  - Bikeshed on the naming of the masks ioctl to keep things in the KVM_
-> >    namespace
-> >  - Apply more bikeshedding to the ioctl documentation, spinning off
-> >    separate blocks for the 'generic' description and the Feature ID
-> >    documentation
-> >  - Fix referencing in the vCPU features doc
-> >  - Fix use of uninitialized data in selftest
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > 
-> We'll probably need another bit on top to deal with Kirstina's
-> FEAT_MOPS series and make that field writable.
+> The SoB sequence looks odd. Either you're the author, and Jing's SoB
+> shouldn't be there without a Co-DB tag, or you've lost Jing's
+> attribution (which sometimes happens when rebasing and squashing
+> patches together).
 
-Yep, I was planning on a one-liner to unmask MOPS once I get Kristina's
-patches applied.
+This is an artifact of me applying Jing's version of the series and
+hacking on top of it.
 
-> The minor nitpicks I had notwithstanding:
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 11 +++++++----
+> >  1 file changed, 7 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 8fbfe61fe7bc..b342c96e08f4 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -1496,8 +1496,7 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+> >  {
+> >  	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
+> >  
+> > -	/* Limit debug to ARMv8.0 */
+> > -	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, IMP);
+> > +	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, V8P8);
+> >  
+> >  	/*
+> >  	 * Only initialize the PMU version if the vCPU was configured with one.
+> > @@ -1557,6 +1556,8 @@ static u64 read_sanitised_id_dfr0_el1(struct kvm_vcpu *vcpu,
+> >  	if (kvm_vcpu_has_pmu(vcpu))
+> >  		val |= SYS_FIELD_PREP(ID_DFR0_EL1, PerfMon, perfmon);
+> >  
+> > +	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_DFR0_EL1, CopDbg, Debugv8p8);
+> > +
 > 
-> Reviewed-by: Marc Zyngier <maz@kernel.org>
+> For consistency, you should also repaint DBGDIDR, which has a
+> hardcoded '6' (ARMv8) as the supported debug version.
 
-Appreciated!
+Ah, good point. I'll extract the value from the ID register much like we
+do for other fields in DBGDIDR:
+
+commit b92565ca433f611ea0901a6098d72f91be84cdb0
+Author: Oliver Upton <oliver.upton@linux.dev>
+Date:   Wed Oct 4 17:03:17 2023 +0000
+
+    KVM: arm64: Advertise selected DebugVer in DBGDIDR.Version
+    
+    Much like we do for other fields, extract the Debug architecture version
+    from the ID register to populate the corresponding field in DBGDIDR.
+    Rewrite the existing sysreg field extractors to use SYS_FIELD_GET() for
+    consistency.
+    
+    Suggested-by: Marc Zyngier <maz@kernel.org>
+    Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index cf1b2def53db..57c8190d5438 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2510,12 +2510,13 @@ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
+ 	} else {
+ 		u64 dfr = IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1);
+ 		u64 pfr = IDREG(vcpu->kvm, SYS_ID_AA64PFR0_EL1);
+-		u32 el3 = !!cpuid_feature_extract_unsigned_field(pfr, ID_AA64PFR0_EL1_EL3_SHIFT);
++		u32 el3 = !!SYS_FIELD_GET(ID_AA64PFR0_EL1, EL3, pfr);
+ 
+-		p->regval = ((((dfr >> ID_AA64DFR0_EL1_WRPs_SHIFT) & 0xf) << 28) |
+-			     (((dfr >> ID_AA64DFR0_EL1_BRPs_SHIFT) & 0xf) << 24) |
+-			     (((dfr >> ID_AA64DFR0_EL1_CTX_CMPs_SHIFT) & 0xf) << 20)
+-			     | (6 << 16) | (1 << 15) | (el3 << 14) | (el3 << 12));
++		p->regval = ((SYS_FIELD_GET(ID_AA64DFR0_EL1, WRPs, dfr) << 28) |
++			     (SYS_FIELD_GET(ID_AA64DFR0_EL1, BRPs, dfr) << 24) |
++			     (SYS_FIELD_GET(ID_AA64DFR0_EL1, CTX_CMPs, dfr) << 20) |
++			     (SYS_FIELD_GET(ID_AA64DFR0_EL1, DebugVer, dfr) << 16) |
++			     (1 << 15) | (el3 << 14) | (el3 << 12));
+ 		return true;
+ 	}
+ }
 
 -- 
 Thanks,
