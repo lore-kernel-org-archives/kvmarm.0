@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05F610A0B
-	for <kvmarm@lists.linux.dev>; Wed,  4 Oct 2023 09:36:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3557DC433CA;
-	Wed,  4 Oct 2023 09:36:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D489B63C3
+	for <kvmarm@lists.linux.dev>; Wed,  4 Oct 2023 09:40:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FE66C433C7;
+	Wed,  4 Oct 2023 09:40:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696412213;
-	bh=nhBCsDpwNVLWHwfW6eG2neTZ8vbY5dFCKwdiEzjew6g=;
+	s=k20201202; t=1696412449;
+	bh=9rUttwmbGfzvb8LTBTxttVGtVFeCBb4xuSS+asNfggc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=H2yxlXhzPlYIHLltoKDNRWONtpESL2yyvO3vQ0xXK7cLaJT+NwID7qhDnLh3T2Jix
-	 2MHuGV3NxRjIpRdLAHuMxrqL/NB56Y0aRWwYxw8dumjGBbEzLtMjSOEKucgyWpAEsp
-	 RtOvZheSDjgunwaZoHU1tmrGy8Ash02uOUoALjeS75bon9pkck3uiZ3FpuJ4BXB9PX
-	 lgsv5kYTF+0vvdNrWUl4uijsCyNaiMkyw4sp7dF0PGQUNfBQVJEwFMtrqoUdjKcpNk
-	 1OET2bo0werD9FitDGaGc6jxNJvh5VCslDn/lrX3IDTlTrdhyEFU9joyMx1C/4pKX8
-	 0q1GnLroq+DgA==
+	b=HEbz9p8v3ic/uf56GLJx9YldqSz9UhE1QTGrXF9Mq/F8ul3mjLZ9o7fWd8WFswU2J
+	 5305mpMjvT4ockPbfr1QVE9mQ4vCrECPTxx/TEoHWAeTQIB8e8Vjbc3Wd/TR6wZfjZ
+	 prg4qBqifHtNgDz/nsxmXxcAJFaiMoblUewPoXeNf4snaglLS8Y+6issJdw4KltYzN
+	 8fDTAKrb6YwaYb5kSdi9O/ihrufzOoubU7mhIdwZdxy1skKo7pI0/FLytt2xxyWBF6
+	 vZpZyvQYAIEsoH/O3RUkzZCAY1kp95Y6aZSCFSnNYYf2s87+2vL6lcGy/qODHarJgV
+	 /DhFU/hc82v8w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qnyJG-0010OJ-Q7;
-	Wed, 04 Oct 2023 10:36:50 +0100
-Date: Wed, 04 Oct 2023 10:36:50 +0100
-Message-ID: <86o7heohjh.wl-maz@kernel.org>
+	id 1qnyN4-0010TH-To;
+	Wed, 04 Oct 2023 10:40:46 +0100
+Date: Wed, 04 Oct 2023 10:40:45 +0100
+Message-ID: <86mswyohcy.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -32,10 +32,9 @@ Cc: kvmarm@lists.linux.dev,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Jing Zhang <jingzhangos@google.com>,
 	Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH v11 10/12] KVM: arm64: Document vCPU feature selection UAPIs
-In-Reply-To: <20231003230408.3405722-11-oliver.upton@linux.dev>
+Subject: Re: [PATCH v11 00/12] KVM: arm64: Enable 'writable' ID registers
+In-Reply-To: <20231003230408.3405722-1-oliver.upton@linux.dev>
 References: <20231003230408.3405722-1-oliver.upton@linux.dev>
-	<20231003230408.3405722-11-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -51,126 +50,28 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kern
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 04 Oct 2023 00:04:06 +0100,
+On Wed, 04 Oct 2023 00:03:56 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> KVM/arm64 has a couple schemes for handling vCPU feature selection now,
-> which is a lot to put on userspace. Add some documentation about how
-> these interact and provide some recommendations for how to use the
-> writable ID register scheme.
+> Few more fixes that I threw on top:
 > 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  Documentation/virt/kvm/api.rst               |  4 ++
->  Documentation/virt/kvm/arm/index.rst         |  1 +
->  Documentation/virt/kvm/arm/vcpu-features.rst | 48 ++++++++++++++++++++
->  3 files changed, 53 insertions(+)
->  create mode 100644 Documentation/virt/kvm/arm/vcpu-features.rst
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index d55c2b68c0a9..8d4050eedb26 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -3370,6 +3370,8 @@ return indicates the attribute is implemented.  It does not necessarily
->  indicate that the attribute can be read or written in the device's
->  current state.  "addr" is ignored.
->  
-> +.. _KVM_ARM_VCPU_INIT:
-> +
->  4.82 KVM_ARM_VCPU_INIT
->  ----------------------
->  
-> @@ -6070,6 +6072,8 @@ writes to the CNTVCT_EL0 and CNTPCT_EL0 registers using the SET_ONE_REG
->  interface. No error will be returned, but the resulting offset will not be
->  applied.
->  
-> +.. _KVM_ARM_GET_REG_WRITABLE_MASKS:
-> +
->  4.139 KVM_ARM_GET_REG_WRITABLE_MASKS
->  -------------------------------------------
->  
-> diff --git a/Documentation/virt/kvm/arm/index.rst b/Documentation/virt/kvm/arm/index.rst
-> index e84848432158..7f231c724e16 100644
-> --- a/Documentation/virt/kvm/arm/index.rst
-> +++ b/Documentation/virt/kvm/arm/index.rst
-> @@ -11,3 +11,4 @@ ARM
->     hypercalls
->     pvtime
->     ptp_kvm
-> +   vcpu-features
-> diff --git a/Documentation/virt/kvm/arm/vcpu-features.rst b/Documentation/virt/kvm/arm/vcpu-features.rst
-> new file mode 100644
-> index 000000000000..2d2f89c5781f
-> --- /dev/null
-> +++ b/Documentation/virt/kvm/arm/vcpu-features.rst
-> @@ -0,0 +1,48 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +===============================
-> +vCPU feature selection on arm64
-> +===============================
-> +
-> +KVM/arm64 provides two mechanisms that allow userspace to configure
-> +the CPU features presented to the guest.
-> +
-> +KVM_ARM_VCPU_INIT
-> +=================
-> +
-> +The ``KVM_ARM_VCPU_INIT`` ioctl accepts a bitmap of feature flags
-> +(``struct kvm_vcpu_init::features``). Features enabled by this interface are
-> +*opt-in* and may change/extend UAPI. See :ref:`KVM_ARM_VCPU_INIT` for complete
-> +documentation of the features controlled by the ioctl.
-> +
-> +Otherwise, all CPU features supported by KVM are described by the architected
-> +ID registers.
-> +
-> +The ID Registers
-> +================
-> +
-> +The Arm architecture specifies a range of *ID Registers* that describe the set
-> +of architectural features supported by the CPU implementation. KVM initializes
-> +the guest's ID registers to the maximum set of CPU features supported by the
-> +system. The ID register values are VM-scoped in KVM, meaning that the values
-> +are identical for all vCPUs in a VM.
+> v10 -> v11:
+>  - Drop the custom handling of FEAT_BC as it is now fixed on the arm64
+>    side (Kristina)
+>  - Bikeshed on the naming of the masks ioctl to keep things in the KVM_
+>    namespace
+>  - Apply more bikeshedding to the ioctl documentation, spinning off
+>    separate blocks for the 'generic' description and the Feature ID
+>    documentation
+>  - Fix referencing in the vCPU features doc
+>  - Fix use of uninitialized data in selftest
 
-I'm a bit reluctant to give this guarantee. Case in point: MPIDR_EL1
-is part of the Feature ID space, and is definitely *not* a register
-that we can make global, even on a fully homogeneous system.
+We'll probably need another bit on top to deal with Kirstina's
+FEAT_MOPS series and make that field writable.
 
-I'd also like to give us more flexibility to change the implementation
-in the future without having to change the API again. IMO, the fact
-that we make our life simpler by only tracking a single copy is an
-implementation detail, not something that userspace should rely on.
+The minor nitpicks I had notwithstanding:
 
-I would simply turn the "The ID register values are VM-scoped" into
-"The ID register values may be VM-scoped", which gives us that
-flexibility.
-
-> +
-> +KVM allows userspace to *opt-out* of certain CPU features described by the ID
-> +registers by writing values to them via the ``KVM_SET_ONE_REG`` ioctl. The ID
-> +registers are mutable until the VM has started, i.e. userspace has called
-> +``KVM_RUN`` on at least one vCPU in the VM. Userspace can discover what fields
-> +are mutable in the ID registers using the ``KVM_ARM_GET_REG_WRITABLE_MASKS``.
-> +See the :ref:`ioctl documentation <KVM_ARM_GET_REG_WRITABLE_MASKS>` for more
-> +details.
-> +
-> +Userspace is allowed to *limit* or *mask* CPU features according to the rules
-> +outlined by the architecture in DDI0487J 'D19.1.3 Principles of the ID scheme
-
-nit: consider spelling out the *full* version of the ARM ARM (DDI
-0487J.a), just in case we get a J.b this side of Xmas and that this
-reference is renumbered...
-
-> +for fields in ID register'. KVM does not allow ID register values that exceed
-> +the capabilities of the system.
-> +
-> +.. warning::
-> +   It is **strongly recommended** that userspace modify the ID register values
-> +   before accessing the rest of the vCPU's CPU register state. KVM may use the
-> +   ID register values to control feature emulation. Interleaving ID register
-> +   modification with other system register accesses may lead to unpredictable
-> +   behavior.
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
 Thanks,
 
