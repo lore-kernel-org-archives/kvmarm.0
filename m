@@ -1,140 +1,101 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B94A93FB09
-	for <kvmarm@lists.linux.dev>; Tue,  3 Oct 2023 23:46:28 +0000 (UTC)
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-27756e0e4d8so1300053a91.3
-        for <kvmarm@lists.linux.dev>; Tue, 03 Oct 2023 16:46:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696376788; x=1696981588; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gaHRh+iyoB6/OttqFX2Q86pGvl0bhGVCVyqFTvtoGcw=;
-        b=G7l2tqIVlTwsZ9Yt4fL1/qrWtFhDiM9EGgsMJCHpMSViMponGp/7jizAXiYXMUatsI
-         qzDFWIsBunCb+kE+OAtPzzHKXjEd7xu3V3lfg1CwWSQrmkMtnMrRalMXYwv6L9jplmFE
-         DxQvf6fwRujZ3XtHalnBo74y1Zd1bUqYTiFy+FNJ5O7BgmXlZ71vzvDSMj6FTiMwZLH3
-         jgUBrXgmx8o9nF03xSLnQyZiN4lrZEaYMspwoMawRP4b+Ax0l09kpDjTK9zDb+6kDJ8M
-         hpN670L17HiA45thZUE4boUw77zTKqNHKgOhfGewXPG7IA7VYm6wwQsAeD4mFAnoVFRy
-         qVZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696376788; x=1696981588;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=gaHRh+iyoB6/OttqFX2Q86pGvl0bhGVCVyqFTvtoGcw=;
-        b=A3qItbMRQ9PXRL19hS3bqk35As1/iBAuc07LyIDeSUQOOBeyzKLQP4Gn9A+8obFy/Y
-         u30VW7+5JH0GId5n/doX/gMWitNSXPKzcpU+wTF8koq8IfVmcdzVTJvDbcO1iRPWV4Sf
-         Zs2cqB+TmsIhLkTCt4klQA3bkLW/gD6mFxFDAANGc4V8DA2Ny8bqTZbeGjBR04Y3TvaB
-         HrYJXW/41B1HhPEHZ6c9O5WX3oGTtFHRrMtWG51nw0qinf+wAqcOMseyn36fhxuO6wAa
-         Btv8YUSZD5IoqvemVvvPdN03+Ooow9rLsN/BET+BCN7bd80bHx8zy5tEzkQppfNeeWDZ
-         Fmwg==
-X-Gm-Message-State: AOJu0YzkjX0zmD1nROV58R42FSEEE+xQ9oLD4O5JQT6yWEnSJW5JpNvV
-	8smkCXyLEXu8W46NK50zy5mfltWXOb0=
-X-Google-Smtp-Source: AGHT+IE1XHpyO3fF4751nYD6L1cufL1XUM2b3xSCMQMb58rp5yQSCvcWy8YfsNAskAty/E/22t80Ux7giMw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:8186:b0:274:6af0:d75b with SMTP id
- e6-20020a17090a818600b002746af0d75bmr12051pjn.7.1696376787828; Tue, 03 Oct
- 2023 16:46:27 -0700 (PDT)
-Date: Tue, 3 Oct 2023 16:46:26 -0700
-In-Reply-To: <CAF7b7mqyU059YpBBVYjTMNXf9VHSc6tbKrQ8avFXYtP6LWMh8Q@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6890107A2
+	for <kvmarm@lists.linux.dev>; Wed,  4 Oct 2023 08:57:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E387C433C8;
+	Wed,  4 Oct 2023 08:57:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696409867;
+	bh=yH6k8GoAJwpgqGqdDVsBapQr9WwoXO3s+AZxwUytCe0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=WIWP5jEKrL/AdbqLlOVHbljtYRzI47rPWzdEugupzl8YUkponrUyhoqdROyWjan+v
+	 FGjiSskgYyUz6oSH/Req8B/ddgb8JcfO/ek/i8JbAotQLWzd9YPJBSqhR7JaB6Qu7L
+	 TJkPaBH6OOTyje03vGRkwJx42Rpj8FnYpBZf2Ky0Jp8z01TVNYbWcGsTXPukUuUXi0
+	 mTuyt0s5h4G7aUCJP0uQk+McgabQn1zQZGeLodbNnYUjcyYBXWibYVz+Wj75XDy4QG
+	 5d3NZKn8DLgsqa2BMIxOnJmfqShpm8x8H43aznuL9B2ld0mJHcSWoyuyMT1tiv1IXP
+	 zFyO7XhKBQHjg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qnxhQ-000zUU-K3;
+	Wed, 04 Oct 2023 09:57:44 +0100
+Date: Wed, 04 Oct 2023 09:57:44 +0100
+Message-ID: <86pm1uojcn.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH v11 05/12] KVM: arm64: Bump up the default KVM sanitised debug version to v8p8
+In-Reply-To: <20231003230408.3405722-6-oliver.upton@linux.dev>
+References: <20231003230408.3405722-1-oliver.upton@linux.dev>
+	<20231003230408.3405722-6-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-8-seanjc@google.com>
- <117db856-9aec-e91c-b1d4-db2b90ae563d@intel.com> <ZQ3AmLO2SYv3DszH@google.com>
- <CAF7b7mrf-y9DNdsreOAedGJueOThnYE=ascFd4=rvW0Z4rhTQg@mail.gmail.com>
- <ZRtxoaJdVF1C2Mvy@google.com> <CAF7b7mqyU059YpBBVYjTMNXf9VHSc6tbKrQ8avFXYtP6LWMh8Q@mail.gmail.com>
-Message-ID: <ZRyn0nPQpbVpz8ah@google.com>
-Subject: Re: [RFC PATCH v12 07/33] KVM: Add KVM_EXIT_MEMORY_FAULT exit to
- report faults to userspace
-From: Sean Christopherson <seanjc@google.com>
-To: Anish Moorthy <amoorthy@google.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, Xu Yilun <yilun.xu@intel.com>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, jingzhangos@google.com, cohuck@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Oct 03, 2023, Anish Moorthy wrote:
-> On Mon, Oct 2, 2023 at 6:43=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
-> >
-> > > - I should go drop the patches annotating kvm_vcpu_read/write_page
-> > > from my series
-> >
-> > Hold up on that.  I'd prefer to keep them as there's still value in giv=
-ing userspace
-> > debug information.  All I'm proposing is that we would firmly state in =
-the
-> > documentation that those paths must be treated as informational-only.
->=20
-> Userspace would then need to know whether annotations were performed
-> from reliable/unreliable paths though, right? That'd imply another
-> flag bit beyond the current R/W/E bits.
+On Wed, 04 Oct 2023 00:04:01 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Since ID_AA64DFR0_EL1 and ID_DFR0_EL1 are now writable from userspace,
+> it is safe to bump up the default KVM sanitised debug version to v8p8.
+> 
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 
-No, what's missing is a guarantee in KVM that every attempt to exit will ac=
-tually
-make it to userspace.  E.g. if a different exit, including another memory_f=
-ault
-exit, clobbers an attempt to exit, the "unreliable" annotation will never b=
-e seen
-by userspace.
+The SoB sequence looks odd. Either you're the author, and Jing's SoB
+shouldn't be there without a Co-DB tag, or you've lost Jing's
+attribution (which sometimes happens when rebasing and squashing
+patches together).
 
-The only way a KVM_EXIT_MEMORY_FAULT that actually reaches userspace could =
-be
-"unreliable" is if something other than a memory_fault exit clobbered the u=
-nion,
-but didn't signal its KVM_EXIT_* reason.  And that would be an egregious bu=
-g that
-isn't unique to KVM_EXIT_MEMORY_FAULT, i.e. the same data corruption would =
-affect
-each and every other KVM_EXIT_* reason.
+> ---
+>  arch/arm64/kvm/sys_regs.c | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 8fbfe61fe7bc..b342c96e08f4 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1496,8 +1496,7 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+>  {
+>  	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
+>  
+> -	/* Limit debug to ARMv8.0 */
+> -	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, IMP);
+> +	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, V8P8);
+>  
+>  	/*
+>  	 * Only initialize the PMU version if the vCPU was configured with one.
+> @@ -1557,6 +1556,8 @@ static u64 read_sanitised_id_dfr0_el1(struct kvm_vcpu *vcpu,
+>  	if (kvm_vcpu_has_pmu(vcpu))
+>  		val |= SYS_FIELD_PREP(ID_DFR0_EL1, PerfMon, perfmon);
+>  
+> +	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_DFR0_EL1, CopDbg, Debugv8p8);
+> +
 
-The "informational only" part is that userspace can't develop features that
-*require* KVM to exit.
+For consistency, you should also repaint DBGDIDR, which has a
+hardcoded '6' (ARMv8) as the supported debug version.
 
-> > > - The helper function [a] for filling the memory_fault field
-> > > (downgraded back into the current union) can drop the "has the field
-> > > already been filled?" check/WARN.
-> >
-> > That would need to be dropped regardless because it's user-triggered (s=
-adly).
->=20
-> Well the current v5 of the series uses a non-userspace visible canary-
-> it seems like there'd still be value in that if we were to keep the
-> annotations in potentially unreliable spots. Although perhaps that
-> test failure you noticed [1] is a good counter-argument, since it
-> shows a known case where a current flow does multiple writes to the
-> memory_fault member.
+Thanks,
 
-The problem is that anything but a WARN will go unnoticed, and we can't hav=
-e any
-WARNs that are user-triggerable, at least not in upstream.  Internally, we =
-can
-and probably should add a canary, and an aggressive one at that, but I can'=
-t think
-of a sane way to add a canary in upstream while avoiding the known offender=
-s. :-(
+	M.
 
-> [1] https://lore.kernel.org/all/202309141107.30863e9d-oliver.sang@intel.c=
-om
->=20
-> > Anyways, don't do anything just yet.
->=20
-> :salutes:
-
-LOL
+-- 
+Without deviation from the norm, progress is not possible.
