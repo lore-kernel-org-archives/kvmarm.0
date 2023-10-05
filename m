@@ -1,96 +1,198 @@
-Received: from out-202.mta0.migadu.com (out-202.mta0.migadu.com [91.218.175.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEA8B37CBC
-	for <kvmarm@lists.linux.dev>; Wed,  4 Oct 2023 23:50:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2A5110EE
+	for <kvmarm@lists.linux.dev>; Thu,  5 Oct 2023 01:14:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iEB4lm3J"
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1696463410;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fl86I5gPbdkyQPqJ+kvtLKD9yW4tKYQD63RMxf1odH8=;
-	b=iEB4lm3JD0Rr+VngWeFL4XPKUNkBRNtWciw/ijB3miM5nDeBWTWIqyOQ8yeVB9pwjS4wTC
-	TH/kp5fmo+/+o88jCqrYC97j5q+robY4i868718oaJYrkzcnfngUd5cTRAYmVq+vXNoxaj
-	gEmI3pMevEm7NqxA5TbuECUwFJhlJRY=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 3/3] KVM: arm64: Use mtree_empty() to determine if SMCCC filter configured
-Date: Wed,  4 Oct 2023 23:49:47 +0000
-Message-ID: <20231004234947.207507-4-oliver.upton@linux.dev>
-In-Reply-To: <20231004234947.207507-1-oliver.upton@linux.dev>
-References: <20231004234947.207507-1-oliver.upton@linux.dev>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="y8sPYL33"
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d8191a1d5acso602972276.1
+        for <kvmarm@lists.linux.dev>; Wed, 04 Oct 2023 18:14:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696468466; x=1697073266; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0Y/+ytNHh3Rx6h0IBirVmq3gWYE0mzaC15X7Izg3qUQ=;
+        b=y8sPYL33StLdjRvSTlHwdqgPzCeu/7HnrbXIrN7bMqRTqFdIlSERq2H7kyWLFmuCL9
+         AJJfbfnlSVGehWgWG44U/D0Ir9Od7sEGk3HcskvuZSMl73YtmT9amgMSI+l04bg7d+vr
+         8CHuuf6kueNbwT7m0WKjSC4YYv02sFQHD/SjN5XHa9gUG9btPo2eD18lKZVZXtW52B8Z
+         tFEvlxS1Au6oITorr2shb/6n7pT2Y45Ig7E+mzoR63JPVuXjcqdqx0d/AD1a+XKKgS17
+         6fSlsSpQ/CNiFpweIv2pnL8hmyzQGnL+yzXR2DVsEFnsP7dzvUmyhjOOwybMtk6T+mYQ
+         TaYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696468466; x=1697073266;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0Y/+ytNHh3Rx6h0IBirVmq3gWYE0mzaC15X7Izg3qUQ=;
+        b=ATDZgFqCpGcXsRim6t8uJ3kjBPcqRJ5uSRHg5s+QK2h+FP7MfyuTJCacpghWbb7c78
+         9E/8bobObUj+5dtYh3LQ4+W/0npgiodAJSSd3PmugIPhhOwviPWOKCAm4VoSI8eS9oql
+         OVGCd0PCVXFyQ6eVPJt2IM57tYRRzyaJl0ub0eEAYA+NmVP4ppxdduWBIdKgSfxKUtMp
+         bjtC9U24h6v45YL5UxFPRCx3XgT+9p+CQRAfFAIfElfTGeuRoOwSS0hqU0LPVCN6t7Vz
+         V91rapOn91PNqL9FU5lHUu8CdJdQC/MypZH0EkEoZM9NLkJqCDYswNiX8go8w9YpebYA
+         VGpg==
+X-Gm-Message-State: AOJu0YwmynxYMqqYpErK5aySCgRFZTipxHXnDPbhJtaOYptGZOGsaEk6
+	IAdLafpNvuHuakbboAiLYHCnYjM23RA=
+X-Google-Smtp-Source: AGHT+IE2suCFJ6sEmbTdEgrYVcCKCq2ROOicsKkEhiEVBgiHlmYy2FyPb023AQDl6p5tPFynQv0lyL/d5Q8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:74c2:0:b0:d7b:9902:fb3d with SMTP id
+ p185-20020a2574c2000000b00d7b9902fb3dmr63106ybc.0.1696468466603; Wed, 04 Oct
+ 2023 18:14:26 -0700 (PDT)
+Date: Wed, 4 Oct 2023 18:14:25 -0700
+In-Reply-To: <20230908222905.1321305-5-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-5-amoorthy@google.com>
+Message-ID: <ZR4N8cwzTMDanPUY@google.com>
+Subject: Re: [PATCH v5 04/17] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+From: Sean Christopherson <seanjc@google.com>
+To: Anish Moorthy <amoorthy@google.com>
+Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
+	jthoughton@google.com, ricarkol@google.com, axelrasmussen@google.com, 
+	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com, 
+	kconsul@linux.vnet.ibm.com
+Content-Type: text/plain; charset="us-ascii"
 
-The smccc_filter maple tree is only populated if userspace attempted to
-configure it. Use the state of the maple tree to determine if the filter
-has been configured, eliminating the VM flag.
+On Fri, Sep 08, 2023, Anish Moorthy wrote:
+> @@ -2318,4 +2324,33 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
+>  /* Max number of entries allowed for each kvm dirty ring */
+>  #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
+>  
+> +/*
+> + * Attempts to set the run struct's exit reason to KVM_EXIT_MEMORY_FAULT and
+> + * populate the memory_fault field with the given information.
+> + *
+> + * WARNs and does nothing if the speculative exit canary has already been set
+> + * or if 'vcpu' is not the current running vcpu.
+> + */
+> +static inline void kvm_handle_guest_uaccess_fault(struct kvm_vcpu *vcpu,
+> +						  uint64_t gpa, uint64_t len, uint64_t flags)
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/include/asm/kvm_host.h | 4 +---
- arch/arm64/kvm/hypercalls.c       | 7 +------
- 2 files changed, 2 insertions(+), 9 deletions(-)
+After a lot of fiddling and leading you on a wild goose chase, I think the least
+awful name is kvm_prepare_memory_fault_exit().  Like kvm_prepare_emulation_failure_exit(),
+this doesn't actually "handle" anything, it just preps for the exit.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index af06ccb7ee34..feb63db7a5cf 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -239,10 +239,8 @@ struct kvm_arch {
- #define KVM_ARCH_FLAG_VM_COUNTER_OFFSET			5
- 	/* Timer PPIs made immutable */
- #define KVM_ARCH_FLAG_TIMER_PPIS_IMMUTABLE		6
--	/* SMCCC filter initialized for the VM */
--#define KVM_ARCH_FLAG_SMCCC_FILTER_CONFIGURED		7
- 	/* Initial ID reg values loaded */
--#define KVM_ARCH_FLAG_ID_REGS_INITIALIZED		8
-+#define KVM_ARCH_FLAG_ID_REGS_INITIALIZED		7
- 	unsigned long flags;
- 
- 	/* VM-wide vCPU feature set */
-diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index 20a878c64ba7..a61213786e5f 100644
---- a/arch/arm64/kvm/hypercalls.c
-+++ b/arch/arm64/kvm/hypercalls.c
-@@ -164,7 +164,7 @@ static int kvm_smccc_filter_insert_reserved(struct kvm *kvm)
- 
- static bool kvm_smccc_filter_configured(struct kvm *kvm)
- {
--	return test_bit(KVM_ARCH_FLAT_SMCCC_FILTER_CONFIGURED, &kvm->arch.flags);
-+	return !mtree_empty(&kvm->arch.smccc_filter);
- }
- 
- static int kvm_smccc_set_filter(struct kvm *kvm, struct kvm_smccc_filter __user *uaddr)
-@@ -201,11 +201,6 @@ static int kvm_smccc_set_filter(struct kvm *kvm, struct kvm_smccc_filter __user
- 
- 	r = mtree_insert_range(&kvm->arch.smccc_filter, start, end,
- 			       xa_mk_value(filter.action), GFP_KERNEL_ACCOUNT);
--	if (r)
--		goto out_unlock;
--
--	set_bit(KVM_ARCH_FLAG_SMCCC_FILTER_CONFIGURED, &kvm->arch.flags);
--
- out_unlock:
- 	mutex_unlock(&kvm->arch.config_lock);
- 	return r;
--- 
-2.42.0.609.gbb76f46606-goog
+If it actually returned something then maybe kvm_handle_guest_uaccess_fault()
+would be an ok name (IIRC, that was my original intent, but we wandered in a
+different direction).
 
+And peeking at future patches, pass in the RWX flags as bools, that way this
+helper can deal with the bools=>flags conversion.  Oh, and fill the flags with
+bitwise ORs, that way future conflicts with private memory will be trivial to
+resolve.
+
+E.g.
+
+static inline void kvm_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
+						 gpa_t gpa, gpa_t size,
+						 bool is_write, bool is_exec)
+{
+	vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
+	vcpu->run->memory_fault.gpa = gpa;
+	vcpu->run->memory_fault.size = size;
+
+	vcpu->run->memory_fault.flags = 0;
+	if (is_write)
+		vcpu->run->memory_fault.flags |= KVM_MEMORY_FAULT_FLAG_WRITE;
+	else if (is_exec)
+		vcpu->run->memory_fault.flags |= KVM_MEMORY_FAULT_FLAG_EXEC;
+	else
+		vcpu->run->memory_fault.flags |= KVM_MEMORY_FAULT_FLAG_READ;
+}
+
+> +{
+> +	/*
+> +	 * Ensure that an unloaded vCPU's run struct isn't being modified
+
+"unloaded" isn't accurate, e.g. the vCPU could be loaded, just not on this vCPU.
+I'd just drop the comment entirely, this one is fairly self-explanatory.
+
+> +	 */
+> +	if (WARN_ON_ONCE(vcpu != kvm_get_running_vcpu()))
+> +		return;
+> +
+> +	/*
+> +	 * Warn when overwriting an already-populated run struct.
+> +	 */
+
+For future reference, use this style
+
+	/*
+	 *
+	 */
+
+only if the comment spans multiple lines.  For single line comments, just:
+
+	/* Warn when overwriting an already-populated run struct. */
+
+> +	WARN_ON_ONCE(vcpu->speculative_exit_canary != KVM_SPEC_EXIT_UNUSED);
+
+As mentioned in the guest_memfd thread[1], this WARN can be triggered by userspace,
+e.g. by getting KVM to fill the union but not exit, which is sadly not too hard
+because emulator_write_phys() incorrectly treats all failures as MMIO.
+
+I'm not even sure how to fix that in a race-free, sane way.  E.g. rechecking the
+memslots doesn't work because a memslot could appear between __kvm_write_guest_page()
+failing and rechecking in emulator_read_write_onepage().
+
+Hmm, maybe we could get away with returning a different errno, e.g. -ENXIO?  And
+then emulator_write_phys() and emulator_read_write_onepage() can be taught to
+handle different errors accordingly.
+
+Anyways, I highly recommend just dropping the canary for now, trying to clean up
+the emulator and get this fully functional probably won't be a smooth process.
+
+> diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
+> index f089ab290978..d19aa7965392 100644
+> --- a/tools/include/uapi/linux/kvm.h
+> +++ b/tools/include/uapi/linux/kvm.h
+> @@ -278,6 +278,9 @@ struct kvm_xen_exit {
+>  /* Flags that describe what fields in emulation_failure hold valid data. */
+>  #define KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES (1ULL << 0)
+>  
+> +/* KVM_CAP_MEMORY_FAULT_INFO flag for kvm_run.flags */
+> +#define KVM_RUN_MEMORY_FAULT_FILLED (1 << 8)
+> +
+>  /* for KVM_RUN, returned by mmap(vcpu_fd, offset=0) */
+>  struct kvm_run {
+>  	/* in */
+> @@ -531,6 +534,27 @@ struct kvm_run {
+>  		struct kvm_sync_regs regs;
+>  		char padding[SYNC_REGS_SIZE_BYTES];
+>  	} s;
+> +
+> +	/*
+> +	 * This second exit union holds structs for exits which may be triggered
+> +	 * after KVM has already initiated a different exit, and/or may be
+> +	 * filled speculatively by KVM.
+> +	 *
+> +	 * For instance, because of limitations in KVM's uAPI, a memory fault
+> +	 * may be encounterd after an MMIO exit is initiated and exit_reason and
+> +	 * kvm_run.mmio are filled: isolating the speculative exits here ensures
+> +	 * that KVM won't clobber information for the original exit.
+> +	 */
+> +	union {
+> +		/* KVM_RUN_MEMORY_FAULT_FILLED + EFAULT */
+> +		struct {
+> +			__u64 flags;
+> +			__u64 gpa;
+> +			__u64 len;
+> +		} memory_fault;
+> +		/* Fix the size of the union. */
+> +		char speculative_exit_padding[256];
+> +	};
+>  };
+
+As proposed in the guest_memfd thread[2], I think we should scrap the second union
+and just commit to achieving 100% accuracy only for page fault paths in the
+initial merge.
+
+I'll send you a clean-ish patch to use as a starting point sometime next week.
+
+[1] https://lore.kernel.org/all/ZRtxoaJdVF1C2Mvy@google.com
+[2] https://lore.kernel.org/all/ZQ3AmLO2SYv3DszH@google.com
