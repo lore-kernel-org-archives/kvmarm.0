@@ -1,100 +1,121 @@
-Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5657D12B74
-	for <kvmarm@lists.linux.dev>; Thu,  5 Oct 2023 22:07:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA2A012B74
+	for <kvmarm@lists.linux.dev>; Thu,  5 Oct 2023 22:13:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e9NSsfig"
-Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-57de6e502fcso834991eaf.3
-        for <kvmarm@lists.linux.dev>; Thu, 05 Oct 2023 15:07:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mpE4wy5r"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2775a7f3803so1370864a91.1
+        for <kvmarm@lists.linux.dev>; Thu, 05 Oct 2023 15:13:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696543676; x=1697148476; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jVEDH7DIG0wbfSQq3l//NlGrUn25Tt5fS9CoqUlLrR0=;
-        b=e9NSsfigdixOmsilxYq5Ma/1uO+/UGgH9enQbDTajjDS6OTZxn7vN7xfZA1T98lCCs
-         0oC/4XhwDI8gqCYK5bwC6pb1+TriP6gbYRvUpbKsp8cBGM7ktPoBiZinvDzZVPcylw0P
-         lYBCHdbhDbZ4QKfQSQ3udJz/JIP2C2gOLSaD1wN5zBCf3bTl4Xz2fJaEnvrLsaz6wwTs
-         UwL+p4vgzyAgioiKuGTWz0nG3tcg/5bFpc8StsKKUNPaPnMLWILel16/YgAmiRMfxMRI
-         3T+sy5rmgcMQimewLwWqg5Y5amCCHE2oazLbtzWmGz5vy9KSFp8Jn1DUjtecflmtZfuu
-         6d1A==
+        d=google.com; s=20230601; t=1696543985; x=1697148785; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GnXAgmYjWV4CQ2aJrszJtrf0PhF8V6dwxv1eIYoBHbA=;
+        b=mpE4wy5rB7mB28+LqFp4QVw7kpWfjVIuPaLnkF97wdsjYsoasFjanYWpxYEp4JKIeZ
+         ziyidMXU4a9zwho2ZDYVNwCsVquB9tOxe6p1zTJTDtd+n0YsjAvPnxgrg20ktXHa4Pwe
+         rk2FN3MFvc8ZdSYbhSiIQbvWTMF/LiCn+KwUTEult8NbqXHsls0rJzsFY3yitcWYeuvj
+         AaSeKKUfm97M8+wKCIZq5eA0+XxajlS0Rui6RyvJv9+lVKDFbiNVk4D4u8QDxVbSWmSC
+         BFS0BNvaLdLiSWQZSVrGyPmia69jCFwjrWbcfiY05AjquFnC4LpAkukj989yfWwh0k11
+         YM1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696543676; x=1697148476;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jVEDH7DIG0wbfSQq3l//NlGrUn25Tt5fS9CoqUlLrR0=;
-        b=YwfV4ZRgXU6TWZkYv9tI1rbptfgrEkfnefr/WKgRsmIp49H6dJcNgK3zq9tBtO2QVL
-         x05OoNUET2a0yNzAre1VlJYJPzPnqTyEprAggK03DaCJlwjy8TIpyNJ/zyfFybgDAwA9
-         ajwri+OGJLEjwS4uOR1H0F02PtAUYJx/p12SpIvwKvvysLf5NpqxRvvfaDjoKydG4o2Q
-         bjl0zfOryzHEHbbxvknqrlRwYXYtDEzXfb12AugRDU4IB9H4fpPGaBqJvjPCXIVLnooS
-         wXFYfv374FT5Hxm6dCNmg+V9QOT7PWNKKSaYmf/0N10tsAb0NC4y7LBG5wTmX//nBanA
-         aoxQ==
-X-Gm-Message-State: AOJu0YymW84+jKYRB7eG0Rw2rWmkvJ6DeNEziNsFb1YWQRHTfnOQ559h
-	sb5BzcQyrehyBP013vlfEwLcgJ0Z77HwJKdbXXp5pQ==
-X-Google-Smtp-Source: AGHT+IEZBLWG7MHKbRYLlAd2jmfuZ64eocXXaB5o38fDnCbh9AkI5WYrmKeXE/dRrdn/9j/liwFQcw/a3M1v6AdfJBQ=
-X-Received: by 2002:a4a:270d:0:b0:57b:4f1e:96e4 with SMTP id
- l13-20020a4a270d000000b0057b4f1e96e4mr6802480oof.1.1696543676303; Thu, 05 Oct
- 2023 15:07:56 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1696543985; x=1697148785;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=GnXAgmYjWV4CQ2aJrszJtrf0PhF8V6dwxv1eIYoBHbA=;
+        b=haQ5ApGUPWWgplYVNlhpm/hoAG3Ocz/vHT5gkzOm7gfeJC3AwCC0fhRHhVVBYov3tv
+         FOR1w16UkFNz8Im03Hq0TEnYblRoliAePhubl4n5+3mpdjyaY4R5jieXs/zOs+biTobW
+         zJbj+JmzhisoligSaPXvnmUqtfvwWrYovezIakU2O6Cg4h1Pjub3KJ6vuSvdKmRvUSiK
+         GNoOjXKnyfdhw46D90Y1F8NEoHJPtk7N6xQrDeY9J7u0Bk+Tj2wrbavS5GsENeJrxFLO
+         R9FJr6mc3cHouALTpARKRQKC9lrzbmggS4XLnPa+v+at9s0r5WfnzeJx1tiUfB47aONK
+         M5VA==
+X-Gm-Message-State: AOJu0Yyjxqm0n+6C1+kDRxbkE7DFqeK4V1io1bQ/rhdF1qQwBLefpiYN
+	DZbPz5ZPocTc9Z6VPn/ee8h/GInPP5E=
+X-Google-Smtp-Source: AGHT+IF1mCbw2/u0ploN08QMjX7gv1FuTEbeeim8gFeu1LQBP/sup1ckQwFmhuEJoEnMwmMZs/vciGiNjEw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:a393:b0:274:90a4:f29 with SMTP id
+ x19-20020a17090aa39300b0027490a40f29mr104682pjp.1.1696543985158; Thu, 05 Oct
+ 2023 15:13:05 -0700 (PDT)
+Date: Thu, 5 Oct 2023 15:13:03 -0700
+In-Reply-To: <CAF7b7moE19p+kDXuwaxHCY6=NXB95fNJ7ectNRxdUMMBpgT0Fg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-8-seanjc@google.com>
- <117db856-9aec-e91c-b1d4-db2b90ae563d@intel.com> <ZQ3AmLO2SYv3DszH@google.com>
- <CAF7b7mrf-y9DNdsreOAedGJueOThnYE=ascFd4=rvW0Z4rhTQg@mail.gmail.com>
- <ZRtxoaJdVF1C2Mvy@google.com> <CAF7b7mqyU059YpBBVYjTMNXf9VHSc6tbKrQ8avFXYtP6LWMh8Q@mail.gmail.com>
- <ZRyn0nPQpbVpz8ah@google.com>
-In-Reply-To: <ZRyn0nPQpbVpz8ah@google.com>
-From: Anish Moorthy <amoorthy@google.com>
-Date: Thu, 5 Oct 2023 15:07:19 -0700
-Message-ID: <CAF7b7mqYr0J-J2oaU=c-dzLys-m6Ttp7ZOb3Em7n1wUj3rhh+A@mail.gmail.com>
-Subject: Re: [RFC PATCH v12 07/33] KVM: Add KVM_EXIT_MEMORY_FAULT exit to
- report faults to userspace
-To: Sean Christopherson <seanjc@google.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, Xu Yilun <yilun.xu@intel.com>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-5-amoorthy@google.com>
+ <ZR4N8cwzTMDanPUY@google.com> <CAF7b7moE19p+kDXuwaxHCY6=NXB95fNJ7ectNRxdUMMBpgT0Fg@mail.gmail.com>
+Message-ID: <ZR807zVvDytyO1zV@google.com>
+Subject: Re: [PATCH v5 04/17] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+From: Sean Christopherson <seanjc@google.com>
+To: Anish Moorthy <amoorthy@google.com>
+Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
+	jthoughton@google.com, ricarkol@google.com, axelrasmussen@google.com, 
+	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com, 
+	kconsul@linux.vnet.ibm.com
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 3, 2023 at 4:46=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> The only way a KVM_EXIT_MEMORY_FAULT that actually reaches userspace coul=
-d be
-> "unreliable" is if something other than a memory_fault exit clobbered the=
- union,
-> but didn't signal its KVM_EXIT_* reason.  And that would be an egregious =
-bug that
-> isn't unique to KVM_EXIT_MEMORY_FAULT, i.e. the same data corruption woul=
-d affect
-> each and every other KVM_EXIT_* reason.
+On Thu, Oct 05, 2023, Anish Moorthy wrote:
+> On Wed, Oct 4, 2023 at 6:14=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+> >
+> > And peeking at future patches, pass in the RWX flags as bools, that way=
+ this
+> > helper can deal with the bools=3D>flags conversion.  Oh, and fill the f=
+lags with
+> > bitwise ORs, that way future conflicts with private memory will be triv=
+ial to
+> > resolve.
+> >
+> > E.g.
+> >
+> > static inline void kvm_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
+> >                                                  gpa_t gpa, gpa_t size,
+> >                                                  bool is_write, bool is=
+_exec)
+> > {
+> >         vcpu->run->exit_reason =3D KVM_EXIT_MEMORY_FAULT;
+> >         vcpu->run->memory_fault.gpa =3D gpa;
+> >         vcpu->run->memory_fault.size =3D size;
+> >
+> >         vcpu->run->memory_fault.flags =3D 0;
+> >         if (is_write)
+> >                 vcpu->run->memory_fault.flags |=3D KVM_MEMORY_FAULT_FLA=
+G_WRITE;
+> >         else if (is_exec)
+> >                 vcpu->run->memory_fault.flags |=3D KVM_MEMORY_FAULT_FLA=
+G_EXEC;
+> >         else
+> >                 vcpu->run->memory_fault.flags |=3D KVM_MEMORY_FAULT_FLA=
+G_READ;
+> > }
+>=20
+> Is a BUG/VM_BUG_ON() warranted in the (is_write && is_exec) case do
+> you think?
 
-Keep in mind the case where an "unreliable" annotation sets up a
-KVM_EXIT_MEMORY_FAULT, KVM_RUN ends up continuing, then something
-unrelated comes up and causes KVM_RUN to EFAULT. Although this at
-least is a case of "outdated" information rather than blatant
-corruption.
+Nah, not here.  If we really wanted to add a sanity check, a KVM_MMU_WARN_O=
+N()
+in kvm_mmu_page_fault() would be the way to go.
 
-IIRC the last time this came up we said that there's minimal harm in
-userspace acting on the outdated info, but it seems like another good
-argument for just restricting the annotations to paths we know are
-reliable. What if the second EFAULT above is fatal (as I understand
-all are today) and sets up subsequent KVM_RUNs to crash and burn
-somehow? Seems like that'd be a safety issue.
+> I see that user_mem_abort already VM_BUG_ON()s for this case, but if ther=
+e's
+> one in the x86 page fault path I don't immediately see it. Also this help=
+er
+> could be called from other paths, so maybe there's some value in it.
+>=20
+> > I'll send you a clean-ish patch to use as a starting point sometime nex=
+t week.
+>=20
+> You mean something containing the next spin of the guest memfd stuff?
+> Or parts of David's series as well?
+
+guest_memfd stuff.  Effectively this patch, just massaged to splice togethe=
+r all
+of the fixups.
