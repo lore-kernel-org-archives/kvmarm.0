@@ -1,92 +1,76 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-193.mta1.migadu.com (out-193.mta1.migadu.com [95.215.58.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A125030D05
-	for <kvmarm@lists.linux.dev>; Thu,  5 Oct 2023 17:23:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E350DC433C8;
-	Thu,  5 Oct 2023 17:23:12 +0000 (UTC)
-Date: Thu, 5 Oct 2023 18:23:10 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Will Deacon <will@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0403B7A7
+	for <kvmarm@lists.linux.dev>; Thu,  5 Oct 2023 18:03:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Uzgc9b0u"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1696529026;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Tureg2m9XbvXMu5THHgF3eRFwznEfRjXAAD0FdkzkLo=;
+	b=Uzgc9b0uCw1rPM/5/bI9rx+0ms7sEWeBrThOZwMJ1sOKo3tblQr7qosDLovH7xUPOpnhwd
+	thuyI92s3Es6QzinXVu8YJTPEjeKMgAftMMgE/0pikHc9IWvRTn5G4ZPe62p6iPzedyqi4
+	Nm882lSOyb+zZJuqRkN5En9lZyC+mjg=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org,
 	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v4 03/36] arm64/gcs: Document the ABI for Guarded Control
- Stacks
-Message-ID: <ZR7w/mr0xZbpIPc5@arm.com>
-References: <ZN+qki9EaZ6f9XNi@arm.com>
- <aaea542c-929c-4c9b-8caa-ca67e0eb9c1e@sirena.org.uk>
- <ZOTnL1SDJWZjHPUW@arm.com>
- <43ec219d-bf20-47b8-a5f8-32bc3b64d487@sirena.org.uk>
- <ZOXa98SqwYPwxzNP@arm.com>
- <ZOYFazB1gYjzDRdA@arm.com>
- <ZRWw7aa3C0LlMPTH@arm.com>
- <38edb5c3-367e-4ab7-8cb7-aa1a5c0e330c@sirena.org.uk>
- <ZRvUxLgMse8QYlGS@arm.com>
- <a7d2fd66-c06b-4033-bca2-4b14afc4904f@sirena.org.uk>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Brown <broonie@kernel.org>,
+	Jing Zhang <jingzhangos@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH 0/2] tools: arm64: Sync sysreg.h with the kernel
+Date: Thu,  5 Oct 2023 18:03:22 +0000
+Message-ID: <20231005180325.525236-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a7d2fd66-c06b-4033-bca2-4b14afc4904f@sirena.org.uk>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Oct 03, 2023 at 03:26:51PM +0100, Mark Brown wrote:
-> On Tue, Oct 03, 2023 at 09:45:56AM +0100, Szabolcs Nagy wrote:
-> > clone3 seems to have features that are only available in clone3 and
-> > not exposed (reasonably) in libc apis so ppl will use clone3 directly
-> > and those will be hard to fix for gcs (you have to convince upstream
-> > to add future arm64 arch specific changes that they cannot test).
-> 
-> Ah, I hadn't realised that there were things that weren't available via
-> libc - that does change the calculation a bit here.  I would hope that
-> anything we do for clone3() would work just as well for x86 so the test
-> side should be a bit easier there than if it were a future arm64 thing,
-> though obviously it wouldn't be mandatory on x86 in the way that Catalin
-> wanted it for arm64.
+KVM selftests needs to use the full set of sysreg definitions for an
+upcoming change [1]. We took a stab at copying the entire sysreg
+generation infrastructure into the tools directory, but that exploded
+and broke the build for perf, oops [2].
 
-I haven't checked how many clone() or clone3() uses outside the libc are
-(I tried some quick search in Debian but did not dig into the specifics
-to see how generic that code is). I agree that having to change valid
-cases outside of libc is not ideal. Even if we have the same clone3()
-interface for x86 and arm64, we'd have other architectures that need
-#ifdef'ing.
+Short of better build infrastructure in tools for handling common
+prerequisite tasks, this series takes the lazy route and copies the
+generated output of the sysreg infra from the kernel.
 
-So I'm slightly warming up to the idea of having a default shadow stack
-size (either RLIMIT_STACK or the clone3() stack size, following x86). A
-clone3() extension can be added on top, though I wonder whether anyone
-will use it if the kernel allocates a shadow stack by default.
+Plan is to apply this series as part of the 'writable' ID register
+series, replacing the broken change.
 
-It's not just the default size that I dislike (I think the x86
-RLIMIT_STACK or clone3() stack_size is probably good enough) but the
-kernel allocating the shadow stack and inserting it into the user
-address space. The actual thread stack is managed by the user but the
-shadow stack is not (and we don't do this very often). Anyway, I don't
-have a better solution for direct uses of clone() or clone3(), other
-than running those threads with the shadow stack disabled. Not sure
-that's desirable.
+[1]: https://lore.kernel.org/kvmarm/20231003230408.3405722-13-oliver.upton@linux.dev/
+[2]: https://lore.kernel.org/linux-next/20231005123159.1b7dff0f@canb.auug.org.au/
+
+Jing Zhang (1):
+  tools: arm64: Sync sysreg.h with the kernel source
+
+Oliver Upton (1):
+  tools: arm64: Add a copy of sysreg-defs.h generated from the kernel
+
+ tools/arch/arm64/include/asm/gpr-num.h        |   26 +
+ tools/arch/arm64/include/asm/sysreg-defs.h    | 6806 +++++++++++++++++
+ tools/arch/arm64/include/asm/sysreg.h         |  839 +-
+ .../selftests/kvm/aarch64/aarch32_id_regs.c   |    4 +-
+ .../selftests/kvm/aarch64/debug-exceptions.c  |   12 +-
+ .../selftests/kvm/aarch64/page_fault_test.c   |    6 +-
+ .../selftests/kvm/lib/aarch64/processor.c     |    6 +-
+ 7 files changed, 7038 insertions(+), 661 deletions(-)
+ create mode 100644 tools/arch/arm64/include/asm/gpr-num.h
+ create mode 100644 tools/arch/arm64/include/asm/sysreg-defs.h
 
 -- 
-Catalin
+2.42.0.609.gbb76f46606-goog
+
