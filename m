@@ -1,189 +1,146 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E2630F93
-	for <kvmarm@lists.linux.dev>; Thu,  5 Oct 2023 16:15:42 +0000 (UTC)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179D9134D6
+	for <kvmarm@lists.linux.dev>; Thu,  5 Oct 2023 16:39:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83AE3C433C9;
-	Thu,  5 Oct 2023 16:15:39 +0000 (UTC)
-Date: Thu, 5 Oct 2023 17:15:37 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: ankita@nvidia.com
-Cc: jgg@nvidia.com, maz@kernel.org, oliver.upton@linux.dev, will@kernel.org,
-	aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
-	targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
-	apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 1/2] KVM: arm64: determine memory type from VMA
-Message-ID: <ZR7hKYU1Wj+VTqpO@arm.com>
-References: <20230907181459.18145-1-ankita@nvidia.com>
- <20230907181459.18145-2-ankita@nvidia.com>
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 845B2C15;
+	Thu,  5 Oct 2023 09:39:43 -0700 (PDT)
+Received: from [10.57.2.226] (unknown [10.57.2.226])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 267713F5A1;
+	Thu,  5 Oct 2023 09:39:02 -0700 (PDT)
+Message-ID: <46de1eb3-c237-2433-0ca7-ebeff47abc1a@arm.com>
+Date: Thu, 5 Oct 2023 17:39:00 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230907181459.18145-2-ankita@nvidia.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH v2 1/6] arm64/sysreg: Move TRFCR definitions to sysreg
+To: James Clark <james.clark@arm.com>, coresight@lists.linaro.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ broonie@kernel.org, maz@kernel.org
+Cc: Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mike Leach <mike.leach@linaro.org>, Leo Yan <leo.yan@linaro.org>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Anshuman Khandual <anshuman.khandual@arm.com>, Rob Herring
+ <robh@kernel.org>, Jintack Lim <jintack.lim@linaro.org>,
+ Akihiko Odaki <akihiko.odaki@daynix.com>, Fuad Tabba <tabba@google.com>,
+ Joey Gouly <joey.gouly@arm.com>, linux-kernel@vger.kernel.org
+References: <20231005125757.649345-1-james.clark@arm.com>
+ <20231005125757.649345-2-james.clark@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20231005125757.649345-2-james.clark@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 07, 2023 at 11:14:58AM -0700, ankita@nvidia.com wrote:
-> From: Ankit Agrawal <ankita@nvidia.com>
+On 05/10/2023 13:57, James Clark wrote:
+> Add separate definitions for ELx and EL2 as TRFCR_EL1 doesn't have CX.
+> This also mirrors the previous definition so no code change is required.
 > 
-> Currently KVM determines if a VMA is pointing at IO memory by checking
-> pfn_is_map_memory(). However, the MM already gives us a way to tell what
-> kind of memory it is by inspecting the VMA.
-
-Well, it doesn't. It tells us what attributes the user mapped that
-memory with, not whether it's I/O memory or standard RAM.
-
-> Replace pfn_is_map_memory() with a check on the VMA pgprot to determine if
-> the memory is IO and thus needs stage-2 device mapping.
+> Also add TRFCR_EL12 which will start to be used in a later commit.
 > 
-> The VMA's pgprot is tested to determine the memory type with the
-> following mapping:
-> 
->  pgprot_noncached    MT_DEVICE_nGnRnE   device
->  pgprot_writecombine MT_NORMAL_NC       device
->  pgprot_device       MT_DEVICE_nGnRE    device
->  pgprot_tagged       MT_NORMAL_TAGGED   RAM
+> Reviewed-by: Mark Brown <broonie@kernel.org>
+> Signed-off-by: James Clark <james.clark@arm.com>
 
-I would move the second patch to be the first, we could even merge that
-independently as it is about relaxing the stage 2 mapping to Normal NC.
-It would make it simpler I think to reason about the second patch which
-further relaxes the stage 2 mapping to Normal Cacheable under certain
-conditions.
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-> This patch solves a problems where it is possible for the kernel to
-> have VMAs pointing at cachable memory without causing
-> pfn_is_map_memory() to be true, eg DAX memremap cases and CXL/pre-CXL
-> devices. This memory is now properly marked as cachable in KVM.
-> 
-> Unfortunately when FWB is not enabled, the kernel expects to naively do
-> cache management by flushing the memory using an address in the
-> kernel's map. This does not work in several of the newly allowed
-> cases such as dcache_clean_inval_poc(). Check whether the targeted pfn
-> and its mapping KVA is valid in case the FWB is absent before continuing.
 
-I would only allow cacheable stage 2 mappings if FWB is enabled.
-Otherwise we end up with a mismatch between the VMM mapping and whatever
-the guest may do.
-
-> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
 > ---
->  arch/arm64/include/asm/kvm_pgtable.h |  8 ++++++
->  arch/arm64/kvm/hyp/pgtable.c         |  2 +-
->  arch/arm64/kvm/mmu.c                 | 40 +++++++++++++++++++++++++---
->  3 files changed, 45 insertions(+), 5 deletions(-)
+>   arch/arm64/include/asm/sysreg.h | 12 ----------
+>   arch/arm64/tools/sysreg         | 41 +++++++++++++++++++++++++++++++++
+>   2 files changed, 41 insertions(+), 12 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index d3e354bb8351..0579dbe958b9 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -430,6 +430,14 @@ u64 kvm_pgtable_hyp_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size);
->   */
->  u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift);
->  
-> +/**
-> + * stage2_has_fwb() - Determine whether FWB is supported
-> + * @pgt:    Page-table structure initialised by kvm_pgtable_stage2_init*()
-> + *
-> + * Return: True if FWB is supported.
-> + */
-> +bool stage2_has_fwb(struct kvm_pgtable *pgt);
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 38296579a4fd..068dd6abe273 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -278,8 +278,6 @@
+>   #define SYS_RGSR_EL1			sys_reg(3, 0, 1, 0, 5)
+>   #define SYS_GCR_EL1			sys_reg(3, 0, 1, 0, 6)
+>   
+> -#define SYS_TRFCR_EL1			sys_reg(3, 0, 1, 2, 1)
+> -
+>   #define SYS_TCR_EL1			sys_reg(3, 0, 2, 0, 2)
+>   
+>   #define SYS_APIAKEYLO_EL1		sys_reg(3, 0, 2, 1, 0)
+> @@ -496,7 +494,6 @@
+>   #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
+>   #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
+>   
+> -#define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
+>   #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
+>   #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
+>   #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
+> @@ -904,15 +901,6 @@
+>   /* Safe value for MPIDR_EL1: Bit31:RES1, Bit30:U:0, Bit24:MT:0 */
+>   #define SYS_MPIDR_SAFE_VAL	(BIT(31))
+>   
+> -#define TRFCR_ELx_TS_SHIFT		5
+> -#define TRFCR_ELx_TS_MASK		((0x3UL) << TRFCR_ELx_TS_SHIFT)
+> -#define TRFCR_ELx_TS_VIRTUAL		((0x1UL) << TRFCR_ELx_TS_SHIFT)
+> -#define TRFCR_ELx_TS_GUEST_PHYSICAL	((0x2UL) << TRFCR_ELx_TS_SHIFT)
+> -#define TRFCR_ELx_TS_PHYSICAL		((0x3UL) << TRFCR_ELx_TS_SHIFT)
+> -#define TRFCR_EL2_CX			BIT(3)
+> -#define TRFCR_ELx_ExTRE			BIT(1)
+> -#define TRFCR_ELx_E0TRE			BIT(0)
+> -
+>   /* GIC Hypervisor interface registers */
+>   /* ICH_MISR_EL2 bit definitions */
+>   #define ICH_MISR_EOI		(1 << 0)
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index 2517ef7c21cf..2104152db18e 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -2624,3 +2624,44 @@ Field	5	F
+>   Field	4	P
+>   Field	3:0	Align
+>   EndSysreg
 > +
->  /**
->   * kvm_pgtable_stage2_pgd_size() - Helper to compute size of a stage-2 PGD
->   * @vtcr:	Content of the VTCR register.
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index f155b8c9e98c..ccd291b6893d 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -662,7 +662,7 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
->  	return vtcr;
->  }
->  
-> -static bool stage2_has_fwb(struct kvm_pgtable *pgt)
-> +bool stage2_has_fwb(struct kvm_pgtable *pgt)
->  {
->  	if (!cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
->  		return false;
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 482280fe22d7..79f1caaa08a0 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1391,6 +1391,15 @@ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
->  	return vma->vm_flags & VM_MTE_ALLOWED;
->  }
->  
-> +/*
-> + * Determine the memory region cacheability from VMA's pgprot. This
-> + * is used to set the stage 2 PTEs.
-> + */
-> +static unsigned long mapping_type(pgprot_t page_prot)
-> +{
-> +	return FIELD_GET(PTE_ATTRINDX_MASK, pgprot_val(page_prot));
-> +}
+> +SysregFields TRFCR_EL2
+> +Res0	63:7
+> +UnsignedEnum	6:5	TS
+> +	0b0000	USE_TRFCR_EL1_TS
+> +	0b0001	VIRTUAL
+> +	0b0010	GUEST_PHYSICAL
+> +	0b0011	PHYSICAL
+> +EndEnum
+> +Res0	4
+> +Field	3	CX
+> +Res0	2
+> +Field	1	E2TRE
+> +Field	0	E0HTRE
+> +EndSysregFields
 > +
->  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  			  struct kvm_memory_slot *memslot, unsigned long hva,
->  			  unsigned long fault_status)
-> @@ -1490,6 +1499,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	gfn = fault_ipa >> PAGE_SHIFT;
->  	mte_allowed = kvm_vma_mte_allowed(vma);
->  
-> +	/*
-> +	 * Figure out the memory type based on the user va mapping properties
-> +	 * Only MT_DEVICE_nGnRE and MT_DEVICE_nGnRnE will be set using
-> +	 * pgprot_device() and pgprot_noncached() respectively.
-> +	 */
-> +	if ((mapping_type(vma->vm_page_prot) == MT_DEVICE_nGnRE) ||
-> +	    (mapping_type(vma->vm_page_prot) == MT_DEVICE_nGnRnE) ||
-> +	    (mapping_type(vma->vm_page_prot) == MT_NORMAL_NC))
-> +		prot |= KVM_PGTABLE_PROT_DEVICE;
-> +	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
-> +		prot |= KVM_PGTABLE_PROT_X;
-
-Does this mean that we can end up with some I/O memory also mapped as
-executable? Is there a use-case (e.g. using CXL memory as standard guest
-RAM, executable)?
-
+> +# TRFCR_EL1 doesn't have the CX bit so redefine it without CX instead of
+> +# using a shared definition between TRFCR_EL2 and TRFCR_EL1
+> +SysregFields TRFCR_ELx
+> +Res0	63:7
+> +UnsignedEnum	6:5	TS
+> +	0b0001	VIRTUAL
+> +	0b0010	GUEST_PHYSICAL
+> +	0b0011	PHYSICAL
+> +EndEnum
+> +Res0	4:2
+> +Field	1	ExTRE
+> +Field	0	E0TRE
+> +EndSysregFields
 > +
->  	/* Don't use the VMA after the unlock -- it may have vanished */
->  	vma = NULL;
->  
-> @@ -1576,10 +1597,21 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	if (exec_fault)
->  		prot |= KVM_PGTABLE_PROT_X;
->  
-> -	if (device)
-> -		prot |= KVM_PGTABLE_PROT_DEVICE;
-> -	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
-> -		prot |= KVM_PGTABLE_PROT_X;
-> +	/*
-> +	 *  When FWB is unsupported KVM needs to do cache flushes
-> +	 *  (via dcache_clean_inval_poc()) of the underlying memory. This is
-> +	 *  only possible if the memory is already mapped into the kernel map
-> +	 *  at the usual spot.
-> +	 *
-> +	 *  Validate that there is a struct page for the PFN which maps
-> +	 *  to the KVA that the flushing code expects.
-> +	 */
-> +	if (!stage2_has_fwb(pgt) &&
-> +	    !(pfn_valid(pfn) &&
-> +	      page_to_virt(pfn_to_page(pfn)) == kvm_host_va(PFN_PHYS(pfn)))) {
-> +		ret = -EINVAL;
-> +		goto out_unlock;
-> +	}
+> +Sysreg	TRFCR_EL1	3	0	1	2	1
+> +Fields	TRFCR_ELx
+> +EndSysreg
+> +
+> +Sysreg	TRFCR_EL2	3	4	1	2	1
+> +Fields	TRFCR_EL2
+> +EndSysreg
+> +
+> +Sysreg	TRFCR_EL12	3	5	1	2	1
+> +Fields	TRFCR_ELx
+> +EndSysreg
 
-My preference would be to keep most of the current logic (including
-pfn_is_map_memory()) but force stage 2 cacheable for this page if the
-user vma_page_prot is MT_NORMAL or MT_NORMAL_TAGGED and we have FWB. It
-might be seen as an ABI change but I don't think it matters, it mostly
-brings cacheable I/O mem mappings in line with standard RAM (bar the
-exec permission unless there is a use-case for it).
-
--- 
-Catalin
