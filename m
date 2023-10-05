@@ -1,54 +1,54 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3DD1EA9
-	for <kvmarm@lists.linux.dev>; Thu,  5 Oct 2023 01:26:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F08C1112
+	for <kvmarm@lists.linux.dev>; Thu,  5 Oct 2023 01:26:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IbjZFcXw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fL1kIYFh"
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2777d237229so380107a91.2
-        for <kvmarm@lists.linux.dev>; Wed, 04 Oct 2023 18:26:09 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5a22eb73cb3so5930467b3.3
+        for <kvmarm@lists.linux.dev>; Wed, 04 Oct 2023 18:26:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696469169; x=1697073969; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1696469195; x=1697073995; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/TYfhcgTqo5ZRyy5fcNvbHFZ7+EudMa0DogQVaLExeg=;
-        b=IbjZFcXwIIoap4ldZlnLb3BLo7ieRQLj7OZmrH8TSn0WJvsEk/q8VDbLF/hTWB5gQn
-         CsPo5IGzCAxrYlcC/oa/vsWWXrBOJyxX0XTH0X9YgBqNggTcj+5oP6Wm3Y/psQ2yc+qw
-         ZwT+xz8fh0FFZYue6Iul3xCwTQe8wYhv/bY1PFAOyuXUusUv8o4ZJlE72LMI3rRwcNiZ
-         Yrl2fp3ywywsU6ukLz5chK96IdaSHcJh5tH9d47C67qjMHxn+B9w7k93D3zyb9VMBJR/
-         dCFTvSf73ngfJsqCQILEKplx2FToz/WnLDxwghE75FyzsqScI9pVHQK0uig8qYsMJgXV
-         EBGQ==
+        bh=pAYXXZZrtq6qVtd9bBLCof1AkK8uP0CzKodj/aevUuM=;
+        b=fL1kIYFhGjUmVfbRjfMBOoaM2eXoTN0aV65RuN44H0PmiEEXxgqZL8siIWIjDaOVac
+         ssFaEOgOTEeyYdzVgUIEoZc5wy8uTwyTsqgywfgziVMO1OZkrAE0MndydJ76Sr07VY6B
+         YGajee/EKf9kJSFCIzmRy2XLFuLn8Pp8l/qhUZXgYfZSmi9+OY/1z5k4A/wQ/f7bK68Q
+         Xa2o+iXrz8yj70EhPyevA1rPwt2rG9WRaly/uL/VFZ7QbxF+aBdsMrr5BD5skfkpnHoH
+         lKwVEOGf3MSujgMAweDJYmO1naUqQdMUbpyuXoEHm049pUrLLOgQ1OYZt976SQTiZfLR
+         zUYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696469169; x=1697073969;
+        d=1e100.net; s=20230601; t=1696469195; x=1697073995;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/TYfhcgTqo5ZRyy5fcNvbHFZ7+EudMa0DogQVaLExeg=;
-        b=l7OV50knVq9MABI1v9yuU558MwEi4C/rR8NlBBa65PVOM8g1L3cM0RkHaH2ZGCIyBW
-         VSAOaq504hAj+b0GyH8OPL6U1iL052dHxGnLK4RKAjAqTtiJjK65gs+qIYOPTx9dMz5e
-         OMWJi6tY0rKICjTdd8sDdbB4x6+wUA6C4/CBGfuED9uRAME9Erv69son2vlIkIl9k2ZJ
-         USU7kFA+6I3Dl+uA0MNwiMVDu/x8zawo6u79x358t6e0CMVZOu2ONx/CMDLoPsKUcT9o
-         J65aUnYfqYfaZjwLVkcZLyMNyjp6wWhrcRNEfZcyBzQ/UtJqEet5LBt7V41Zf1o0naJn
-         m8zg==
-X-Gm-Message-State: AOJu0YypD+EaOAvW8PkSGlSNTo+nZQuXsiy5NFCamp2fGynoa4kBjjrB
-	f0J+QsrPAB2qFETTVXTvSroc54dbk4I=
-X-Google-Smtp-Source: AGHT+IEfh6PZmAexjHN3igsJGvIKhGoBOSIMHSS/3bzuKrRlDIj+2RI1Fh55kTfxzztFM3zd3m2gy0y4R7A=
+        bh=pAYXXZZrtq6qVtd9bBLCof1AkK8uP0CzKodj/aevUuM=;
+        b=f3Ug0OHgZwW5tnBtJQRXbQiDir8cbjnWO5OZ7cq7rNrRIQb8H/BcCTzME9q/shXOme
+         awl7ELsVLKd3UU30EgvTNiDOrs3ulEhCwIF2Ar60Rop+kWvQ25z4ngodaHSrFSyCTQUm
+         W7i/NJq1OMgR8DRzWK6OlILzCIfvEPuN5B3RLrq/TzyW340I57iksfqy4G9e40q1Ur2T
+         cg9fU6nwwOnTdGadPv45S1rvqgRu8Yj5gMGzLYZ1ovpFL86wN698cJMGg8Nyy09VeTmn
+         md7Ai8QZDw7/JNWFEZrA4HpYdcPy8+tz+uMmw0/j1RzSaVNHv5uA6kySpyeMOjECk8c2
+         GORQ==
+X-Gm-Message-State: AOJu0YxkUdOq2rRppP+7e0fUG+bbNGj42N3W9NLe+NM+WmHlEMHvYiDs
+	ClHFaVh3DzCErpc9IqqFAlKGQojQw/U=
+X-Google-Smtp-Source: AGHT+IE4tvEFWYdA+2STjnyOz4sD7+XQagXBrtdo4DeeBBCeS2cJcL9Ogqq1easuFZmclPalNjWAGSxhH6g=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:b790:b0:269:4850:5411 with SMTP id
- m16-20020a17090ab79000b0026948505411mr61401pjr.4.1696469169119; Wed, 04 Oct
- 2023 18:26:09 -0700 (PDT)
-Date: Wed, 4 Oct 2023 18:26:07 -0700
-In-Reply-To: <20230908222905.1321305-7-amoorthy@google.com>
+ (user=seanjc job=sendgmr) by 2002:a81:b2c6:0:b0:586:a58d:2e24 with SMTP id
+ q189-20020a81b2c6000000b00586a58d2e24mr79019ywh.5.1696469195294; Wed, 04 Oct
+ 2023 18:26:35 -0700 (PDT)
+Date: Wed, 4 Oct 2023 18:26:34 -0700
+In-Reply-To: <20230908222905.1321305-8-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-7-amoorthy@google.com>
-Message-ID: <ZR4Qr4Yzj7nUNIT3@google.com>
-Subject: Re: [PATCH v5 06/17] KVM: x86: Annotate -EFAULTs from kvm_handle_error_pfn()
+References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-8-amoorthy@google.com>
+Message-ID: <ZR4QyijDUsMX40U8@google.com>
+Subject: Re: [PATCH v5 07/17] KVM: arm64: Annotate -EFAULT from user_mem_abort()
 From: Sean Christopherson <seanjc@google.com>
 To: Anish Moorthy <amoorthy@google.com>
 Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
@@ -59,11 +59,7 @@ Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
 Content-Type: text/plain; charset="us-ascii"
 
 On Fri, Sep 08, 2023, Anish Moorthy wrote:
-> Implement KVM_CAP_MEMORY_FAULT_INFO for efaults generated by
-> kvm_handle_error_pfn().
+> Implement KVM_CAP_MEMORY_FAULT_INFO for guest access failure in
+> user_mem_abort().
 
-Rewrite with --verbose please.  And avoid function names if possible.  Sometimes
-it's better/useful/necessary to reference a function by name, but in this case,
-just saying kvm_handle_error_pfn() isn't helpful because it doesn't provide any
-insight into the actual impact of the change, i.e. requires the reader to already
-know exactly how and when kvm_handle_error_pfn() is used.
+Same comments as the x86 patch, this is way too terse.
