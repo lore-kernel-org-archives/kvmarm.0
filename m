@@ -1,300 +1,189 @@
-Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F5E629438
-	for <kvmarm@lists.linux.dev>; Thu,  5 Oct 2023 14:43:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xJr9tfqe"
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-d81afd5273eso1126509276.3
-        for <kvmarm@lists.linux.dev>; Thu, 05 Oct 2023 07:43:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696516999; x=1697121799; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=EE8iPYu9LpRlrA3P5svRFO6CzOzjvPUAMSGvj485Oxk=;
-        b=xJr9tfqe7b8snvXjEJ/Dq9czdxzQZ+uBEDD6d6/GkQFOmC6ewaxc48EOV++8x3jZuU
-         pbKjYD8rsliLF0FWNrraI3/YDr+K5qnmmrg6gYo4eGryyXha1sAsiPEMR9+8RTOYzjuK
-         nPVZzNf+ZZJy6b3fx3a8mseyk3vsenImI95FzbavfS8CQRuXCZ/lEYQUDBHAn19rsBRO
-         mjKkY524bKPE3ptE+OnTEjjYpTy4fF5UDBMSYIT9SNnTMmV102s8EIfnQoJC4FV5eAUz
-         EsMurOxh3X/rX58rKHcpYBiSnM22y7qwnCkvhPQqhChUHjKyNp0a7Tp36sXWIf9lU45H
-         +9+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696516999; x=1697121799;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=EE8iPYu9LpRlrA3P5svRFO6CzOzjvPUAMSGvj485Oxk=;
-        b=u7lO65HG/KXtzr9AqESy9swTdEv4geTM4haC998zmX7Yc/jkMaqV8CGWFwNOBHv5ek
-         aTO5xC7qMn5oxdBuMogo+h3fUX/cIRbZAQPnqipYqQBeiuiZl+7A34cochD25cOj+lP0
-         wofnxTzBCRgudBF+XEtb1X4lS9QitrndxHO9p/uoXSXnANj/rJOZNkr67sXcPO6cA+xQ
-         VeVYz9FEDx3BUhSbHNpYvZQIlQ1Q2Zpu8S0u7ohL6MCXm98z/PvWfI8KydJGZhF/DKVg
-         3ESb5ZkXe6VuJlm1gmmQGoryZ2Af1WGQmk54jlX/bzhZWQrDcvMApPmK/Y79NqmqIddZ
-         PC1g==
-X-Gm-Message-State: AOJu0YzvMNz250GhMcPlqJbAuFp0rCUPGZBNgezpT+7P0pl3ORLiwLiP
-	mpCgiE+G6Lxo0hRleKVav3rwrqawIQ4CkvroFNWQ8A==
-X-Google-Smtp-Source: AGHT+IGOqTvtxfqWgNnMMFc4737tOPznDx2Ec+u1Qc6vg6Ytf9IAjo7xOI8HjQPL083wFsBnlWD0qahO/3mYB56VT9A=
-X-Received: by 2002:a25:23ce:0:b0:d91:5a1b:eea with SMTP id
- j197-20020a2523ce000000b00d915a1b0eeamr4876224ybj.50.1696516998560; Thu, 05
- Oct 2023 07:43:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E2630F93
+	for <kvmarm@lists.linux.dev>; Thu,  5 Oct 2023 16:15:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83AE3C433C9;
+	Thu,  5 Oct 2023 16:15:39 +0000 (UTC)
+Date: Thu, 5 Oct 2023 17:15:37 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: ankita@nvidia.com
+Cc: jgg@nvidia.com, maz@kernel.org, oliver.upton@linux.dev, will@kernel.org,
+	aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
+	targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
+	apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 1/2] KVM: arm64: determine memory type from VMA
+Message-ID: <ZR7hKYU1Wj+VTqpO@arm.com>
+References: <20230907181459.18145-1-ankita@nvidia.com>
+ <20230907181459.18145-2-ankita@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 5 Oct 2023 15:42:42 +0100
-Message-ID: <CA+EHjTwTgEVtea7wgef5G6EEgFa0so_GbNXTMZNKyFE=ucyV0g@mail.gmail.com>
-Subject: Re: [RFC PATCH v12 11/33] KVM: Introduce per-page memory attributes
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Paul Moore <paul@paul-moore.com>, 
-	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, KVM <kvm@vger.kernel.org>, 
-	"moderated list:ARM64 PORT (AARCH64 ARCHITECTURE)" <linux-arm-kernel@lists.infradead.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	LinuxMIPS <linux-mips@vger.kernel.org>, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-security-module@vger.kernel.org, 
-	open list <linux-kernel@vger.kernel.org>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
-	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Vlastimil Babka <vbabka@suse.cz>, 
-	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
-	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230907181459.18145-2-ankita@nvidia.com>
 
-Hi Sean,
+On Thu, Sep 07, 2023 at 11:14:58AM -0700, ankita@nvidia.com wrote:
+> From: Ankit Agrawal <ankita@nvidia.com>
+> 
+> Currently KVM determines if a VMA is pointing at IO memory by checking
+> pfn_is_map_memory(). However, the MM already gives us a way to tell what
+> kind of memory it is by inspecting the VMA.
 
-On Tue, Oct 3, 2023 at 9:51=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Tue, Oct 03, 2023, Fuad Tabba wrote:
-> > On Tue, Oct 3, 2023 at 4:59=E2=80=AFPM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> > > On Tue, Oct 03, 2023, Fuad Tabba wrote:
-> > > > > +#define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
-> > > > > +
-> > > >
-> > > > In pKVM, we don't want to allow setting (or clearing) of PRIVATE/SH=
-ARED
-> > > > attributes from userspace.
-> > >
-> > > Why not?  The whole thing falls apart if userspace doesn't *know* the=
- state of a
-> > > page, and the only way for userspace to know the state of a page at a=
- given moment
-> > > in time is if userspace controls the attributes.  E.g. even if KVM we=
-re to provide
-> > > a way for userspace to query attributes, the attributes exposed to us=
-rspace would
-> > > become stale the instant KVM drops slots_lock (or whatever lock prote=
-cts the attributes)
-> > > since userspace couldn't prevent future changes.
-> >
-> > I think I might not quite understand the purpose of the
-> > KVM_SET_MEMORY_ATTRIBUTES ABI. In pKVM, all of a protected guest's memo=
-ry is
-> > private by default, until the guest shares it with the host (via a
-> > hypercall), or another guest (future work). When the guest shares it,
-> > userspace is notified via KVM_EXIT_HYPERCALL. In many use cases, usersp=
-ace
-> > doesn't need to keep track directly of all of this, but can reactively =
-un/map
-> > the memory being un/shared.
->
-> Yes, and then userspace needs to tell KVM, via KVM_SET_MEMORY_ATTRIBUTES,=
- that
-> userspace has agreed to change the state of the page.  Userspace may not =
-need/want
-> to explicitly track the state of pages, but userspace still needs to tell=
- KVM what
-> userspace wants.
->
-> KVM is primarily an accelerator, e.g. KVM's role is to make things go fas=
-t (relative
-> to doing things in userspace) and provide access to resources/instruction=
-s that
-> require elevated privileges.  As a general rule, we try to avoid defining=
- the vCPU
-> model, security policies, etc. in KVM, because hardcoding policy into KVM=
- (and the
-> kernel as a whole) eventually limits the utility of KVM.
->
-> As it pertains to PRIVATE vs. SHARED, KVM's role is to define and enforce=
- the basic
-> rules, but KVM shouldn't do things like define when it is (il)legal to co=
-nvert
-> memory to/from SHARED, what pages can be converted, what happens if the g=
-uest and
-> userspace disagree, etc.
+Well, it doesn't. It tells us what attributes the user mapped that
+memory with, not whether it's I/O memory or standard RAM.
 
-Thanks for clarifying that. My initial understanding of the purpose of
-KVM_SET_MEMORY_ATTRIBUTES wasn't clear. Now I see how having the
-userspace view in KVM would avoid the need to hardcore many policies,
-and I can see how this could come in handy in the future when we start
-going into multi-sharing, for example.
+> Replace pfn_is_map_memory() with a check on the VMA pgprot to determine if
+> the memory is IO and thus needs stage-2 device mapping.
+> 
+> The VMA's pgprot is tested to determine the memory type with the
+> following mapping:
+> 
+>  pgprot_noncached    MT_DEVICE_nGnRnE   device
+>  pgprot_writecombine MT_NORMAL_NC       device
+>  pgprot_device       MT_DEVICE_nGnRE    device
+>  pgprot_tagged       MT_NORMAL_TAGGED   RAM
 
-> > > Why does pKVM need to prevent userspace from stating *its* view of at=
-tributes?
-> > >
-> > > If the goal is to reduce memory overhead, that can be solved by using=
- an internal,
-> > > non-ABI attributes flag to track pKVM's view of SHARED vs. PRIVATE.  =
-If the guest
-> > > attempts to access memory where pKVM and userspace don't agree on the=
- state,
-> > > generate an exit to userspace.  Or kill the guest.  Or do something e=
-lse entirely.
-> >
-> > For the pKVM hypervisor the guest's view of the attributes doesn't
-> > matter. The hypervisor at the end of the day is the ultimate arbiter
-> > for what is shared and with how. For pKVM (at least in my port of
-> > guestmem), we use the memory attributes from guestmem essentially to
-> > control which memory can be mapped by the host.
->
-> The guest's view absolutely matters.  The guest's view may not be express=
-ed at
-> access time, e.g. as you note below, pKVM and other software-protected VM=
-s don't
-> have a dedicated shared vs. private bit like TDX and SNP.  But the view i=
-s still
-> there, e.g. in the pKVM model, the guest expresses its desire for shared =
-vs.
-> private via hypercall, and IIRC, the guest's view is tracked by the hyper=
-visor
-> in the stage-2 PTEs.  pKVM itself may track the guest's view on things, b=
-ut the
-> view is still the guest's.
+I would move the second patch to be the first, we could even merge that
+independently as it is about relaxing the stage 2 mapping to Normal NC.
+It would make it simpler I think to reason about the second patch which
+further relaxes the stage 2 mapping to Normal Cacheable under certain
+conditions.
 
-This was poorly worded on my part. You're right that in practice the
-pKVM hypervisor is the one tracking the guest's view, based on the
-hypercalls from the guest.
+> This patch solves a problems where it is possible for the kernel to
+> have VMAs pointing at cachable memory without causing
+> pfn_is_map_memory() to be true, eg DAX memremap cases and CXL/pre-CXL
+> devices. This memory is now properly marked as cachable in KVM.
+> 
+> Unfortunately when FWB is not enabled, the kernel expects to naively do
+> cache management by flushing the memory using an address in the
+> kernel's map. This does not work in several of the newly allowed
+> cases such as dcache_clean_inval_poc(). Check whether the targeted pfn
+> and its mapping KVA is valid in case the FWB is absent before continuing.
 
-> E.g. if the guest thinks a page is private, but in reality KVM and host u=
-serspace
-> have it as shared, then the guest may unintentionally leak data to the un=
-trusted
-> world.
->
-> IIUC, you have implemented guest_memfd support in pKVM by changing the at=
-tributes
-> when the guest makes the hypercall.  This can work, but only so long as t=
-he guest
-> and userspace are well-behaved, and it will likely paint pKVM into a corn=
-er in
-> the long run.
->
-> E.g. if the guest makes a hypercall to convert memory to PRIVATE, but the=
-re is
-> no memslot or the memslot doesn't support private memory, then unless the=
-re is
-> policy baked into KVM, or an ABI for the guest<=3D>host hypercall interfa=
-ce that
-> allows unwinding the program counter, you're stuck.  Returning an error f=
-or the
-> hypercall straight from KVM is undesirable as that would put policy into =
-KVM that
-> doesn't need to be there, e.g. that would prevent userspace from manipula=
-ting
-> memslots in response to (un)share requests from the guest.  It's a simila=
-r story
-> if KVM marks the page as PRIVATE, as that would prevent userspace from re=
-turning
-> an error for the hypercall, i.e. would prevent usersepace from denying th=
-e request
-> to convert to PRIVATE.
+I would only allow cacheable stage 2 mappings if FWB is enabled.
+Otherwise we end up with a mismatch between the VMM mapping and whatever
+the guest may do.
 
-Ack.
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h |  8 ++++++
+>  arch/arm64/kvm/hyp/pgtable.c         |  2 +-
+>  arch/arm64/kvm/mmu.c                 | 40 +++++++++++++++++++++++++---
+>  3 files changed, 45 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index d3e354bb8351..0579dbe958b9 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -430,6 +430,14 @@ u64 kvm_pgtable_hyp_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size);
+>   */
+>  u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift);
+>  
+> +/**
+> + * stage2_has_fwb() - Determine whether FWB is supported
+> + * @pgt:    Page-table structure initialised by kvm_pgtable_stage2_init*()
+> + *
+> + * Return: True if FWB is supported.
+> + */
+> +bool stage2_has_fwb(struct kvm_pgtable *pgt);
+> +
+>  /**
+>   * kvm_pgtable_stage2_pgd_size() - Helper to compute size of a stage-2 PGD
+>   * @vtcr:	Content of the VTCR register.
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index f155b8c9e98c..ccd291b6893d 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -662,7 +662,7 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
+>  	return vtcr;
+>  }
+>  
+> -static bool stage2_has_fwb(struct kvm_pgtable *pgt)
+> +bool stage2_has_fwb(struct kvm_pgtable *pgt)
+>  {
+>  	if (!cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
+>  		return false;
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 482280fe22d7..79f1caaa08a0 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1391,6 +1391,15 @@ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
+>  	return vma->vm_flags & VM_MTE_ALLOWED;
+>  }
+>  
+> +/*
+> + * Determine the memory region cacheability from VMA's pgprot. This
+> + * is used to set the stage 2 PTEs.
+> + */
+> +static unsigned long mapping_type(pgprot_t page_prot)
+> +{
+> +	return FIELD_GET(PTE_ATTRINDX_MASK, pgprot_val(page_prot));
+> +}
+> +
+>  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  			  struct kvm_memory_slot *memslot, unsigned long hva,
+>  			  unsigned long fault_status)
+> @@ -1490,6 +1499,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	gfn = fault_ipa >> PAGE_SHIFT;
+>  	mte_allowed = kvm_vma_mte_allowed(vma);
+>  
+> +	/*
+> +	 * Figure out the memory type based on the user va mapping properties
+> +	 * Only MT_DEVICE_nGnRE and MT_DEVICE_nGnRnE will be set using
+> +	 * pgprot_device() and pgprot_noncached() respectively.
+> +	 */
+> +	if ((mapping_type(vma->vm_page_prot) == MT_DEVICE_nGnRE) ||
+> +	    (mapping_type(vma->vm_page_prot) == MT_DEVICE_nGnRnE) ||
+> +	    (mapping_type(vma->vm_page_prot) == MT_NORMAL_NC))
+> +		prot |= KVM_PGTABLE_PROT_DEVICE;
+> +	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
+> +		prot |= KVM_PGTABLE_PROT_X;
 
-> > One difference between pKVM and TDX (as I understand it), is that TDX
-> > uses the msb of the guest's IPA to indicate whether memory is shared
-> > or private, and that can generate a mismatch on guest memory access
-> > between what it thinks the state is, and what the sharing state in
-> > reality is. pKVM doesn't have that. Memory is private by default, and
-> > can be shared in-place, both in the guest's IPA space as well as the
-> > underlying physical page.
->
-> TDX's shared bit and SNP's encryption bit are just a means of hardware en=
-forcement.
-> pKVM does have a hardware bit because hardware doesn't provide any enforc=
-ement.
-> But as above, pKVM does have an equivalent *somewhere*.
->
-> > > > The other thing, which we need for pKVM anyway, is to make
-> > > > kvm_vm_set_mem_attributes() global, so that it can be called from o=
-utside of
-> > > > kvm_main.c (already have a local patch for this that declares it in
-> > > > kvm_host.h),
-> > >
-> > > That's no problem, but I am definitely opposed to KVM modifying attri=
-butes that
-> > > are owned by userspace.
-> > >
-> > > > and not gate this function by KVM_GENERIC_MEMORY_ATTRIBUTES.
-> > >
-> > > As above, I am opposed to pKVM having a completely different ABI for =
-managing
-> > > PRIVATE vs. SHARED.  I have no objection to pKVM using unclaimed flag=
-s in the
-> > > attributes to store extra metadata, but if KVM_SET_MEMORY_ATTRIBUTES =
-doesn't work
-> > > for pKVM, then we've failed miserably and should revist the uAPI.
-> >
-> > Like I said, pKVM doesn't need a userspace ABI for managing PRIVATE/SHA=
-RED,
-> > just a way of tracking in the host kernel of what is shared (as opposed=
- to
-> > the hypervisor, which already has the knowledge). The solution could si=
-mply
-> > be that pKVM does not enable KVM_GENERIC_MEMORY_ATTRIBUTES, has its own
-> > tracking of the status of the guest pages, and only selects KVM_PRIVATE=
-_MEM.
->
-> At the risk of overstepping my bounds, I think that effectively giving th=
-e guest
-> full control over what is shared vs. private is a mistake.  It more or le=
-ss locks
-> pKVM into a single model, and even within that model, dealing with errors=
- and/or
-> misbehaving guests becomes unnecessarily problematic.
->
-> Using KVM_SET_MEMORY_ATTRIBUTES may not provide value *today*, e.g. the u=
-serspace
-> side of pKVM could simply "reflect" all conversion hypercalls, and termin=
-ate the
-> VM on errors.  But the cost is very minimal, e.g. a single extra ioctl() =
-per
-> converion, and the upside is that pKVM won't be stuck if a use case comes=
- along
-> that wants to go beyond "all conversion requests either immediately succe=
-ed or
-> terminate the guest".
+Does this mean that we can end up with some I/O memory also mapped as
+executable? Is there a use-case (e.g. using CXL memory as standard guest
+RAM, executable)?
 
-Now that I understand the purpose of KVM_SET_MEMORY_ATTRIBUTES, I
-agree. However, pKVM needs to track at the host kernel (i.e., EL1)
-whether guest memory is shared or private.
+> +
+>  	/* Don't use the VMA after the unlock -- it may have vanished */
+>  	vma = NULL;
+>  
+> @@ -1576,10 +1597,21 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	if (exec_fault)
+>  		prot |= KVM_PGTABLE_PROT_X;
+>  
+> -	if (device)
+> -		prot |= KVM_PGTABLE_PROT_DEVICE;
+> -	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
+> -		prot |= KVM_PGTABLE_PROT_X;
+> +	/*
+> +	 *  When FWB is unsupported KVM needs to do cache flushes
+> +	 *  (via dcache_clean_inval_poc()) of the underlying memory. This is
+> +	 *  only possible if the memory is already mapped into the kernel map
+> +	 *  at the usual spot.
+> +	 *
+> +	 *  Validate that there is a struct page for the PFN which maps
+> +	 *  to the KVA that the flushing code expects.
+> +	 */
+> +	if (!stage2_has_fwb(pgt) &&
+> +	    !(pfn_valid(pfn) &&
+> +	      page_to_virt(pfn_to_page(pfn)) == kvm_host_va(PFN_PHYS(pfn)))) {
+> +		ret = -EINVAL;
+> +		goto out_unlock;
+> +	}
 
-One approach would be to add another flag to the attributes that
-tracks the host kernel view. The way KVM_SET_MEMORY_ATTRIBUTES is
-implemented now, userspace can zero it, so in that case, that
-operation would need to be masked to avoid that.
+My preference would be to keep most of the current logic (including
+pfn_is_map_memory()) but force stage 2 cacheable for this page if the
+user vma_page_prot is MT_NORMAL or MT_NORMAL_TAGGED and we have FWB. It
+might be seen as an ABI change but I don't think it matters, it mostly
+brings cacheable I/O mem mappings in line with standard RAM (bar the
+exec permission unless there is a use-case for it).
 
-Another approach would be to have a pKVM-specific xarray (or similar)
-to do the tracking, but since there is a structure that's already
-doing something similar (i.e.,the attributes array), it seems like it
-would be unnecessary overhead.
-
-Do you have any ideas or preferences?
-
-Cheers,
-/fuad
+-- 
+Catalin
