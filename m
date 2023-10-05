@@ -1,65 +1,78 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08C001373
-	for <kvmarm@lists.linux.dev>; Thu,  5 Oct 2023 01:53:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABED9538F
+	for <kvmarm@lists.linux.dev>; Thu,  5 Oct 2023 07:24:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2g9OxDkb"
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d8191a1d5acso633788276.1
-        for <kvmarm@lists.linux.dev>; Wed, 04 Oct 2023 18:53:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696470783; x=1697075583; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=grrioV+IuPOlzeiTfMVLnMrxd2jdrACTo36YNzEpcnI=;
-        b=2g9OxDkbXYrY/9rdhquGH5zeBwPZHTWxXaQvAZgy/Xd2yZmEh2yLlL7vo0wsEhFkiu
-         rbY1FSd9hYzXYqTbcpxsXkkyvU2TG2v0LIbk5ncxQgy4zvRzSRarS5TkaJIq3DxPfpmr
-         cmAxoOeUuWAorUwRlNGmXuJJbTRO734iP+BPkRHx9DpktoD1B5xxB9Elzb6cVrmTptDg
-         ABd9ppEHWHu7rnQ8OxgW5dZ8oBAkvjjuNuvEGJIi7BzqDj/klhEYONSdz4kUIMi8Dsf4
-         uDA52NEVYRVLr33wcYPWWL0Z/wgRI4ZYHOe7xG9n+iRwi7TEElZb07pyyiDTrpG8dzGz
-         yRcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696470783; x=1697075583;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=grrioV+IuPOlzeiTfMVLnMrxd2jdrACTo36YNzEpcnI=;
-        b=byA55C1ZG7kHfJ8ZoarenYwvjrTvwE4C28ynpLUJCN/7mD7KGfWT8sOMYobMOOlZM1
-         HdNgGp+4R79SZVmo5yIg+SVQRaINB8kiZpffa1NOOL9h0FedrNF4qyTgGOiLQ7eJoEmF
-         xaaO46mMMGyZnmr8ARTjjT9+YkPWNK3EBWb7vWMKkvcGBFsHNKZpls7mhb/hiRF3EyYo
-         /IM5AKUM8Xm2RitgGOs4P/8AEzF/cQqT6aU7wz3a0nuYiplyXxK5DUtgrhsqBCB8a6fI
-         wihyKwIqSYcKz8+8wvwG5HYiIsOdJLsYd2JGmg3tNa7jb1DgKJJXWS8tCPkdMJBpTy2+
-         d0UA==
-X-Gm-Message-State: AOJu0YwZB5aJ/oihqaC5+1cWnxQTh+UIA5QzI6neQvDLxjVCSUopBGp5
-	vnbb2v23dlEPJUyBdqgdVIStwJXlMZk=
-X-Google-Smtp-Source: AGHT+IHyV4IRMorQjfEJtl3bCgO+6BZ9+2Q8anlpnWP+qXYS7Vaclmt7RTiW/s/YifIgopVhJqSKRRy92OU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:ae52:0:b0:d7b:8d0c:43f1 with SMTP id
- g18-20020a25ae52000000b00d7b8d0c43f1mr60811ybe.9.1696470782888; Wed, 04 Oct
- 2023 18:53:02 -0700 (PDT)
-Date: Wed, 4 Oct 2023 18:53:01 -0700
-In-Reply-To: <20230908222905.1321305-6-amoorthy@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u3d1h3Tj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14620C433BB;
+	Thu,  5 Oct 2023 07:24:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696490661;
+	bh=bf2xIDOJU4y5J9sRuHALUS8ViG7MnRYFCaU5pondAnY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=u3d1h3TjLX0o2Gw543yRZtfRsxWG7Fa8adCBh0FO12CLKp/M97B15ofpvVheZE3MP
+	 y2APP5pQD6LXD0S97siCvemUC/oN/4xEe1BNlJc65EGzERJxw8aj0h1axMDKuGDsVq
+	 WoZci/BKkDholhUer2ZSYgrplbJXsdylQUmXxjAXCoTDUd188yyOKBeHJQzKzR4FL4
+	 l10IZ8/HrnSTWD34W6a54GIq94Ve49oLn0MOM4FOW/BYzTBDBMaepfWBaLLK6aVvsC
+	 ZwN2vW/W6ezf7GyL/IenfhdNbChD4qoa6EaZIPG/9Tr0a4HTjXJwbqBvJF5tlFilav
+	 1N19cdmCqqZPA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qoIiY-001JO4-Kj;
+	Thu, 05 Oct 2023 08:24:18 +0100
+Date: Thu, 05 Oct 2023 08:24:18 +0100
+Message-ID: <868r8ho7kt.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 0/3] KVM: arm64: Cleanups for managing SMCCC filter maple tree
+In-Reply-To: <20231004234947.207507-1-oliver.upton@linux.dev>
+References: <20231004234947.207507-1-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-6-amoorthy@google.com>
-Message-ID: <ZR4W_c_dTHuKjB5q@google.com>
-Subject: Re: [PATCH v5 05/17] KVM: Annotate -EFAULTs from kvm_vcpu_read/write_guest_page()
-From: Sean Christopherson <seanjc@google.com>
-To: Anish Moorthy <amoorthy@google.com>
-Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
-	jthoughton@google.com, ricarkol@google.com, axelrasmussen@google.com, 
-	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com, 
-	kconsul@linux.vnet.ibm.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Sep 08, 2023, Anish Moorthy wrote:
-> Implement KVM_CAP_MEMORY_FAULT_INFO for uaccess failures in
-> kvm_vcpu_read/write_guest_page()
+On Thu, 05 Oct 2023 00:49:44 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Small series to clean up the way KVM manages the maple tree
+> representation of the SMCCC filter, only allocating nodes in the tree if
+> the SMCCC filter is used.
+> 
+> The other ugly bit that this fixes is the error path when 'reserved'
+> ranges cannot be inserted into the maple tree, instead returning an
+> error to userspace.
+> 
+> Oliver Upton (3):
+>   KVM: arm64: Add a predicate for testing if SMCCC filter is configured
+>   KVM: arm64: Only insert reserved ranges when SMCCC filter is used
+>   KVM: arm64: Use mtree_empty() to determine if SMCCC filter configured
+> 
+>  arch/arm64/include/asm/kvm_host.h |  4 +---
+>  arch/arm64/kvm/hypercalls.c       | 34 ++++++++++++++++++++-----------
+>  2 files changed, 23 insertions(+), 15 deletions(-)
 
-Why?  (rhetorical question)
+Reviewed-by: Marc Zyngier <maz@kernel.org>
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
