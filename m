@@ -1,133 +1,149 @@
-Received: from out03.mta.xmission.com (out03.mta.xmission.com [166.70.13.233])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B1081D690
-	for <kvmarm@lists.linux.dev>; Fri,  6 Oct 2023 12:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xmission.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xmission.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from in02.mta.xmission.com ([166.70.13.52]:37482)
-	by out03.mta.xmission.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.93)
-	(envelope-from <ebiederm@xmission.com>)
-	id 1qojy7-00AOeg-9W; Fri, 06 Oct 2023 06:30:11 -0600
-Received: from ip68-227-168-167.om.om.cox.net ([68.227.168.167]:49692 helo=email.froward.int.ebiederm.org.xmission.com)
-	by in02.mta.xmission.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.93)
-	(envelope-from <ebiederm@xmission.com>)
-	id 1qojy5-001oHA-T0; Fri, 06 Oct 2023 06:30:10 -0600
-From: "Eric W. Biederman" <ebiederm@xmission.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,  Szabolcs Nagy
- <Szabolcs.Nagy@arm.com>,  Will Deacon <will@kernel.org>,  Jonathan Corbet
- <corbet@lwn.net>,  Andrew Morton <akpm@linux-foundation.org>,  Marc
- Zyngier <maz@kernel.org>,  Oliver Upton <oliver.upton@linux.dev>,  James
- Morse <james.morse@arm.com>,  Suzuki K Poulose <suzuki.poulose@arm.com>,
-  Arnd Bergmann <arnd@arndb.de>,  Oleg Nesterov <oleg@redhat.com>,  Kees
- Cook <keescook@chromium.org>,  Shuah Khan <shuah@kernel.org>,  "Rick P.
- Edgecombe" <rick.p.edgecombe@intel.com>,  Deepak Gupta
- <debug@rivosinc.com>,  Ard Biesheuvel <ardb@kernel.org>,  "H.J. Lu"
- <hjl.tools@gmail.com>,  Paul Walmsley <paul.walmsley@sifive.com>,  Palmer
- Dabbelt <palmer@dabbelt.com>,  Albert Ou <aou@eecs.berkeley.edu>,
-  linux-arm-kernel@lists.infradead.org,  linux-doc@vger.kernel.org,
-  kvmarm@lists.linux.dev,  linux-fsdevel@vger.kernel.org,
-  linux-arch@vger.kernel.org,  linux-mm@kvack.org,
-  linux-kselftest@vger.kernel.org,  linux-kernel@vger.kernel.org,
-  linux-riscv@lists.infradead.org
-References: <aaea542c-929c-4c9b-8caa-ca67e0eb9c1e@sirena.org.uk>
-	<ZOTnL1SDJWZjHPUW@arm.com>
-	<43ec219d-bf20-47b8-a5f8-32bc3b64d487@sirena.org.uk>
-	<ZOXa98SqwYPwxzNP@arm.com> <ZOYFazB1gYjzDRdA@arm.com>
-	<ZRWw7aa3C0LlMPTH@arm.com>
-	<38edb5c3-367e-4ab7-8cb7-aa1a5c0e330c@sirena.org.uk>
-	<ZRvUxLgMse8QYlGS@arm.com>
-	<a7d2fd66-c06b-4033-bca2-4b14afc4904f@sirena.org.uk>
-	<ZR7w/mr0xZbpIPc5@arm.com>
-	<638a7be5-6662-471d-a3ce-0de0ac768e99@sirena.org.uk>
-Date: Fri, 06 Oct 2023 07:29:45 -0500
-In-Reply-To: <638a7be5-6662-471d-a3ce-0de0ac768e99@sirena.org.uk> (Mark
-	Brown's message of "Fri, 6 Oct 2023 13:17:01 +0100")
-Message-ID: <87y1ggylvq.fsf@email.froward.int.ebiederm.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E4821F959
+	for <kvmarm@lists.linux.dev>; Fri,  6 Oct 2023 13:23:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r7kN1bhY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B6A1C433C8;
+	Fri,  6 Oct 2023 13:23:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696598608;
+	bh=EaTnbJI4I15tCsE5PAEOFEMV2gEpZ5O8xv29SdDb+qM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=r7kN1bhYCxtxsrayiH2/Qvakhgo3xCg+wGyDWqoba/ZC5pHVgpQDCCyLUBMq5h54g
+	 ECPy9lW5VnfDNKExrrh7fEdQi/U/bsZ892xqQHM3S72mb56W82U4MfmqpjVIrrIJyB
+	 qr4LzQDOov95/YlKhpIXNX+7KimqRGoyORxBH1I2m/XYsnYxcLtqw4e1YjQNFIDBA5
+	 tnW4b6DBxOSfdtiaDHBr9QAGaSCEQWZ729s1flrAd+bmsOCjhqUZ+msIzUEQjcpObI
+	 fcYAdK0dvdOg+7/O/AD46RjkpZyTdrX3BsQGRWK8UKSyIfp93PxVJs9Zo8bm/vRFfv
+	 hsYBCwh6ppprg==
+Date: Fri, 6 Oct 2023 14:23:18 +0100
+From: Mark Brown <broonie@kernel.org>
+To: "Eric W. Biederman" <ebiederm@xmission.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>
+Subject: Re: [PATCH v4 03/36] arm64/gcs: Document the ABI for Guarded Control
+ Stacks
+Message-ID: <b100a80c-4460-4258-92b8-d232f553cab6@sirena.org.uk>
+References: <43ec219d-bf20-47b8-a5f8-32bc3b64d487@sirena.org.uk>
+ <ZOXa98SqwYPwxzNP@arm.com>
+ <ZOYFazB1gYjzDRdA@arm.com>
+ <ZRWw7aa3C0LlMPTH@arm.com>
+ <38edb5c3-367e-4ab7-8cb7-aa1a5c0e330c@sirena.org.uk>
+ <ZRvUxLgMse8QYlGS@arm.com>
+ <a7d2fd66-c06b-4033-bca2-4b14afc4904f@sirena.org.uk>
+ <ZR7w/mr0xZbpIPc5@arm.com>
+ <638a7be5-6662-471d-a3ce-0de0ac768e99@sirena.org.uk>
+ <87y1ggylvq.fsf@email.froward.int.ebiederm.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-XM-SPF: eid=1qojy5-001oHA-T0;;;mid=<87y1ggylvq.fsf@email.froward.int.ebiederm.org>;;;hst=in02.mta.xmission.com;;;ip=68.227.168.167;;;frm=ebiederm@xmission.com;;;spf=pass
-X-XM-AID: U2FsdGVkX1+LvOjycHAoB6LT49HjM3IrRBVDb8ivK8I=
-X-SA-Exim-Connect-IP: 68.227.168.167
-X-SA-Exim-Mail-From: ebiederm@xmission.com
-X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on sa05.xmission.com
-X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=8.0 tests=ALL_TRUSTED,BAYES_40,
-	DCC_CHECK_NEGATIVE,T_TM2_M_HEADER_IN_MSG,XMSubLong shortcircuit=no
-	autolearn=disabled version=3.4.2
-X-Spam-Report: 
-	* -1.0 ALL_TRUSTED Passed through trusted hosts only via SMTP
-	* -0.0 BAYES_40 BODY: Bayes spam probability is 20 to 40%
-	*      [score: 0.2176]
-	*  0.7 XMSubLong Long Subject
-	*  0.0 T_TM2_M_HEADER_IN_MSG BODY: No description available.
-	* -0.0 DCC_CHECK_NEGATIVE Not listed in DCC
-	*      [sa05 1397; Body=1 Fuz1=1 Fuz2=1]
-X-Spam-DCC: XMission; sa05 1397; Body=1 Fuz1=1 Fuz2=1 
-X-Spam-Combo: ;Mark Brown <broonie@kernel.org>
-X-Spam-Relay-Country: 
-X-Spam-Timing: total 551 ms - load_scoreonly_sql: 0.05 (0.0%),
-	signal_user_changed: 9 (1.6%), b_tie_ro: 8 (1.4%), parse: 1.11 (0.2%),
-	extract_message_metadata: 3.3 (0.6%), get_uri_detail_list: 1.27 (0.2%),
-	 tests_pri_-2000: 3.5 (0.6%), tests_pri_-1000: 4.8 (0.9%),
-	tests_pri_-950: 1.21 (0.2%), tests_pri_-900: 1.03 (0.2%),
-	tests_pri_-200: 0.80 (0.1%), tests_pri_-100: 3.3 (0.6%),
-	tests_pri_-90: 226 (41.0%), check_bayes: 222 (40.3%), b_tokenize: 10
-	(1.8%), b_tok_get_all: 123 (22.2%), b_comp_prob: 3.0 (0.5%),
-	b_tok_touch_all: 82 (14.9%), b_finish: 1.17 (0.2%), tests_pri_0: 271
-	(49.3%), check_dkim_signature: 0.68 (0.1%), check_dkim_adsp: 3.1
-	(0.6%), poll_dns_idle: 0.87 (0.2%), tests_pri_10: 4.3 (0.8%),
-	tests_pri_500: 13 (2.4%), rewrite_mail: 0.00 (0.0%)
-Subject: Re: [PATCH v4 03/36] arm64/gcs: Document the ABI for Guarded
- Control Stacks
-X-SA-Exim-Version: 4.2.1 (built Sat, 08 Feb 2020 21:53:50 +0000)
-X-SA-Exim-Scanned: Yes (on in02.mta.xmission.com)
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Ji8GpeD8VVTZwCCT"
+Content-Disposition: inline
+In-Reply-To: <87y1ggylvq.fsf@email.froward.int.ebiederm.org>
+X-Cookie: Rome wasn't burnt in a day.
 
-Mark Brown <broonie@kernel.org> writes:
 
-> On Thu, Oct 05, 2023 at 06:23:10PM +0100, Catalin Marinas wrote:
->
->> It's not just the default size that I dislike (I think the x86
->> RLIMIT_STACK or clone3() stack_size is probably good enough) but the
->> kernel allocating the shadow stack and inserting it into the user
->> address space. The actual thread stack is managed by the user but the
->> shadow stack is not (and we don't do this very often). Anyway, I don't
->> have a better solution for direct uses of clone() or clone3(), other
->> than running those threads with the shadow stack disabled. Not sure
->> that's desirable.
->
-> Running threads with the shadow stack disabled if they don't explicitly
-> request it feels like it's asking for trouble - as well as the escape
-> route from the protection it'd provide I'd expect there to be trouble
-> for things that do stack pivots, potentially random issues if there's a
-> mix of ways threads are started.  It's going to be a tradeoff whatever
-> we do.
+--Ji8GpeD8VVTZwCCT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Something I haven't seen in the discussion is that one of the ways I
-have seen a non-libc clone used is to implement a fork with flags.
-That is a new mm is created, and effectively a new process.  Which
-makes the characterization different.
+On Fri, Oct 06, 2023 at 07:29:45AM -0500, Eric W. Biederman wrote:
+> Mark Brown <broonie@kernel.org> writes:
 
-In general creating a thread with clone and bypassing libc is
-incompatible with pthreads, and the caller gets to keep both pieces.
+> >> It's not just the default size that I dislike (I think the x86
+> >> RLIMIT_STACK or clone3() stack_size is probably good enough) but the
+> >> kernel allocating the shadow stack and inserting it into the user
+> >> address space. The actual thread stack is managed by the user but the
+> >> shadow stack is not (and we don't do this very often). Anyway, I don't
+> >> have a better solution for direct uses of clone() or clone3(), other
+> >> than running those threads with the shadow stack disabled. Not sure
+> >> that's desirable.
 
-As long as there is enough information code can detect that
-shadow stacks are in use, and the code is able to create their own
-I don't see why it shouldn't be the callers responsibility.
+> > Running threads with the shadow stack disabled if they don't explicitly
+> > request it feels like it's asking for trouble - as well as the escape
+> > route from the protection it'd provide I'd expect there to be trouble
+> > for things that do stack pivots, potentially random issues if there's a
+> > mix of ways threads are started.  It's going to be a tradeoff whatever
+> > we do.
 
-On the other hand I don't see the maintainer of clone Christian Brauner
-or the libc folks especially Florian cc'd on this thread.  So I really
-don't think you have the right folks in on this conversation.
+> Something I haven't seen in the discussion is that one of the ways I
+> have seen a non-libc clone used is to implement a fork with flags.
+> That is a new mm is created, and effectively a new process.  Which
+> makes the characterization different.
 
-Eric
-k
+> In general creating a thread with clone and bypassing libc is
+> incompatible with pthreads, and the caller gets to keep both pieces.
+
+> As long as there is enough information code can detect that
+> shadow stacks are in use, and the code is able to create their own
+> I don't see why it shouldn't be the callers responsibility.
+
+> On the other hand I don't see the maintainer of clone Christian Brauner
+> or the libc folks especially Florian cc'd on this thread.  So I really
+> don't think you have the right folks in on this conversation.
+
+Well, copying them in now.  The discussion here is about allocation of
+shadow stacks for the arm64 implementation of the feature (the arm64
+feature is called Guarded Control Stack in the architecture).  These
+maintain a second copy of the stack with only the return targets in
+memory allocated with special protections so userspace can't write to it
+directly and use this when doing returns to ensure that the returns
+haven't been redirected.  These shadow stacks can be allocated directly
+by userspace using a new system call map_shadow_stack(), doing this via
+mmap() was extensively discussed but it was concluded that this was very
+likely to lead to security problems so we've got this new syscall that
+ensures that shadow stack memory is never accessible to userspace via
+other means.
+
+The x86 implementation that has already been merged into mainline will
+allocate a new shadow stack for newly created threads when the creating
+thread has one.  There was a suggestion to have arm64 diverge and
+require that threads be created with clone3() and manualy provide a
+shadow stack but then concerns were raised that as well as the issues
+with divergence this would be too disruptive for adoption due to
+non-libc thread creation.  It's not controversial that it'd be good to
+have clone3() by able to explicitly specify a shadow stack, just if it
+should be required.
+
+--Ji8GpeD8VVTZwCCT
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmUgCkUACgkQJNaLcl1U
+h9DirQf/ftVM53t8n7Iz/c70/XaZOa6o2/1qaxs00hlLIEkmuVk5LjL0TViJlfRw
+qIRUvbR8y9MkOCjJOTAErDvidq4rFwmPiuk9mFZViDpRkDxpG13xvHCHIqZ4NPUe
+Eve09ZqsJK5dCaW8G4/FCkSIZF2yD1lGttWRhYwckUPBSHMVZevuylvin7vdrWAr
+sPCe3qp4gWYgplUtfxKadGeowpldz9LRCbARrBYB1jqSXcJbskcDd0L3KUH9ElFv
+kYT+Iyoh0j36gEZFuwWXioYTEbQcD5qsqcftvc5LW0vRiUlKo/MUND/c07YdRoBy
+DfP12K7+lLpdbS17lq6f6DfTuLAwcg==
+=J8v2
+-----END PGP SIGNATURE-----
+
+--Ji8GpeD8VVTZwCCT--
