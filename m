@@ -1,37 +1,38 @@
-Received: from out-208.mta0.migadu.com (out-208.mta0.migadu.com [91.218.175.208])
+Received: from out-210.mta0.migadu.com (out-210.mta0.migadu.com [91.218.175.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A9382AB3B
-	for <kvmarm@lists.linux.dev>; Fri,  6 Oct 2023 18:11:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC60138FBC
+	for <kvmarm@lists.linux.dev>; Fri,  6 Oct 2023 19:41:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ekM8vZzY"
-Date: Fri, 6 Oct 2023 18:11:30 +0000
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gvMuv/kt"
+Date: Fri, 6 Oct 2023 19:41:53 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1696615894;
+	t=1696621317;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=L8lSHiz12Aav9oLTb3CvxyN/1lWwyX+P2/Gb3/jsWN8=;
-	b=ekM8vZzYxNkS7ov34yAiI2ikVogB11+UMM8enyKgtFmPU0bJJuCG03J+tEnrvdgqESM/9n
-	sQbJ/RtmtDy5DsVN276UDVnQt8i7GrUkAE2HwzwTB0DeQVs0XaUQ/Kgva1YqOcqt9cqGfQ
-	240/dslRH4LQvWMLIdJzmBarVpzPiWI=
+	bh=vbZQIdAI5SufBWkEnAicqe6YpUsHJGukAGL4rjlW0as=;
+	b=gvMuv/kta5sMP92U7s7hL4jqIgx86ia/PnhLjX6FqlQEDBEKOdI5BRpXeYzHnqYtBExtzm
+	6koLBOQ1XWaAuDHuQWoep7fg5dcETAJGm0ft1KWBFs9ohosM8+PWPoPhq8VHk4D7VeOxGP
+	ucma4LY185PbyV7vDFXp6lmQXnIzVCE=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
 Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
+	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 0/3] KVM: arm64: Load the stage-2 MMU from vcpu_load()
- for VHE
-Message-ID: <ZSBN0nAKANRHsxll@linux.dev>
-References: <20231006093600.1250986-1-oliver.upton@linux.dev>
- <8634yongw3.wl-maz@kernel.org>
- <861qe8nd45.wl-maz@kernel.org>
- <86zg0vnaen.wl-maz@kernel.org>
- <86y1gfn67v.wl-maz@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH 1/2] tools: arm64: Add a copy of sysreg-defs.h generated
+ from the kernel
+Message-ID: <ZSBjAWlPUBjiU7Vj@linux.dev>
+References: <20231005180325.525236-1-oliver.upton@linux.dev>
+ <20231005180325.525236-2-oliver.upton@linux.dev>
+ <66914631-c2fe-4a20-bfd6-561657cfe8e8@sirena.org.uk>
+ <ZR_SLyTfkhmdZoXI@linux.dev>
+ <ec96d303-f0c4-470c-b23c-e59054c52008@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -40,41 +41,67 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86y1gfn67v.wl-maz@kernel.org>
+In-Reply-To: <ec96d303-f0c4-470c-b23c-e59054c52008@sirena.org.uk>
 X-Migadu-Flow: FLOW_OUT
 
-Hey Marc,
+On Fri, Oct 06, 2023 at 12:33:48PM +0100, Mark Brown wrote:
+> On Fri, Oct 06, 2023 at 09:23:59AM +0000, Oliver Upton wrote:
+> > On Fri, Oct 06, 2023 at 01:23:08AM +0100, Mark Brown wrote:
 
-On Fri, Oct 06, 2023 at 04:03:32PM +0100, Marc Zyngier wrote:
-> On Fri, 06 Oct 2023 14:33:04 +0100,
-> Marc Zyngier <maz@kernel.org> wrote:
+[...]
+
+> > incidental user of this via cputype.h, KVM selftests is what's taking
+> > the direct dependency.
 > 
-> Still talking to myself! :D
+> If perf doesn't care perhaps just restructure things so it doesn't pull
+> it in and do whatever you were doing originally then?
 
-Seems like you had a good bit of fun :)
+The only option would be to use yet another set of headers that are
+specific to KVM selftests, which I feel would only complicate things
+further.
 
-> >
-> > However, this isn't enough.
-> > 
-> > [   63.450113] Oh crap 400000435c001 vs 3000004430001
-> > 
-> > So there are situations where we end-up with the wrong VTTBR, rather
-> > than the wrong VMID, which is even worse. Haven't worked out the
-> > scenario yet, but it apparently involves being preempted by a vcpu
-> > from a different VM and not doing the right thing.
+> > > Surely if perf is happy to peer into the main kernel source it could
+> > > just as well do the generation as part of the build?  There's no great
+> > > obstacle to having a target which runs the generation script that I
+> > > can see.
 > 
-> Actually, no. It is the MMU notifiers kicking in and performing TLB
-> invalidation for a guest while we're in the context of another. The
-> joy of running 4 large VMs on a box with 2GB of RAM, basically running
-> from swap.
+> > That'd be less than ideal, IMO. tools maintaining a separate set of kernel
+> > headers from the authoritative source avoids the need to coordinate
+> > changes across kernel and tools. To keep things that way we either need
+> > to copy the script+encoding or the header output. The latter isn't that
+> > bothersome if/when we need an update.
+> 
+> The error Stephen found was:
+> 
+> | In file included from util/../../arch/arm64/include/asm/cputype.h:201,
+> |                  from util/arm-spe.c:37:
+> | tools/arch/arm64/include/asm/sysreg.h:132:10: fatal error: asm/sysreg-defs.h: No such file or directory
+> 
+> so that's already happening - see perf's arm-spe.c.  You could also fix
+> perf by avoiding spelunking in the main kernel source like it's
+> currently doing.
 
-Whelp, looks like my self-rule of no patches on the list after midnight
-is in force again. Clearly this was all quite gently tested, thanks for
-being the guinea pig.
+My interpretation of that relative path is tools/arch/arm64/include/asm/cputype.h
 
-> There's the sum of my hacks, which keeps the box alive.
+The include path in tools/perf/Makefile.config is using tools/ headers
+as well:
 
-Thanks! I'll roll it into v2 so we have something that actually works.
+  INC_FLAGS += -I$(src-perf)/util/include
+  INC_FLAGS += -I$(src-perf)/arch/$(SRCARCH)/include
+  INC_FLAGS += -I$(srctree)/tools/include/
+  INC_FLAGS += -I$(srctree)/tools/arch/$(SRCARCH)/include/uapi
+  INC_FLAGS += -I$(srctree)/tools/include/uapi
+  INC_FLAGS += -I$(srctree)/tools/arch/$(SRCARCH)/include/
+  INC_FLAGS += -I$(srctree)/tools/arch/$(SRCARCH)/
+
+perf + KVM selftests aren't directly using kernel headers, and I'd rather
+not revisit that just for handling the sysreg definitions. So then if we
+must periodically copy things out of the kernel tree anyway, what value
+do we derive from copying the script as opposed to just lifting the
+generated output?
+
+We must do _something_ about this, as updates to sysreg.h are blocked
+until the handling of generated headers gets worked out.
 
 -- 
 Thanks,
